@@ -17,10 +17,11 @@
 - **Spring Boot**: 3.5.4
 - **Sa-Token**: 1.44.0 (认证授权)
 - **MyBatis Plus**: 3.5.12 (ORM)
+- **PostgreSQL**: 42.7.5 驱动 (主数据库)
+- **Vavr**: 0.10.4 (函数式编程)
 - **Knife4j**: 4.6.0 (API 文档)
 - **Druid**: 1.2.25 (数据库连接池)
 - **Redis**: Redisson 3.50.0 (缓存和分布式)
-- **MySQL**: 9.3.0 驱动
 - **P6Spy**: 3.9.1 (SQL 监控)
 
 ### 前端 (smart-admin-web)
@@ -191,6 +192,119 @@ public class CategoryService {
         // 写操作必须加事务
     }
 }
+```
+
+#### 9. 函数式编程 (Vavr)
+
+使用 Vavr 提升代码健壮性和可维护性：
+
+```java
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import io.vavr.control.Either;
+
+@Service
+public class UserService {
+
+    // Option 替代 null 检查
+    public Option<User> findById(Long id) {
+        return Option.of(userMapper.selectById(id));
+    }
+
+    // Try 替代 try-catch
+    public Try<User> createUser(UserCreateDTO dto) {
+        return Try.of(() -> {
+            User user = User.builder()
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .build();
+            userMapper.insert(user);
+            return user;
+        });
+    }
+
+    // Either 业务逻辑分支
+    public Either<String, Order> validateAndCreateOrder(OrderDTO dto) {
+        return validateStock(dto.getItems())
+            .flatMap(items -> validatePayment(dto.getPayment()))
+            .map(payment -> createOrder(dto));
+    }
+}
+
+// Controller 层使用
+@RestController
+public class UserController {
+
+    @GetMapping("/{id}")
+    public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
+        return userService.findById(id)
+            .map(UserVO::from)
+            .fold(
+                () -> ResponseDTO.error("用户不存在"),
+                user -> ResponseDTO.ok(user)
+            );
+    }
+}
+```
+
+#### 10. PostgreSQL 特性
+
+充分利用 PostgreSQL 高级功能：
+
+**JSONB 字段**:
+```java
+// Entity
+@Data
+@TableName("t_order")
+public class Order {
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> metadata;  // JSONB 映射
+}
+
+// Mapper 查询
+@Mapper
+public interface OrderMapper extends BaseMapper<Order> {
+    default List<Order> findByMetadata(String key, String value) {
+        return selectList(
+            new LambdaQueryWrapper<Order>()
+                .apply("metadata @> '{\"" + key + "\": \"" + value + "\"}'::jsonb")
+        );
+    }
+}
+```
+
+**数组类型**:
+```java
+// Entity
+@Data
+@TableName("t_article")
+public class Article {
+    @TableField(typeHandler = StringArrayTypeHandler.class)
+    private String[] tags;  // PostgreSQL 数组
+}
+
+// Mapper 查询
+default List<Article> findByTag(String tag) {
+    return selectList(
+        new LambdaQueryWrapper<Article>()
+            .apply("tags && ARRAY[{0}]::TEXT[]", tag)
+    );
+}
+```
+
+**数据库配置**:
+```yaml
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/smart_admin_v3?useSSL=false
+    username: smartadmin
+    password: SmartAdmin@2024
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: AUTO  # PostgreSQL SERIAL 策略
 ```
 
 ---
