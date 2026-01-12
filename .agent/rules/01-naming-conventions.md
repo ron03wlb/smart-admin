@@ -1,5 +1,9 @@
 ---
 trigger: always_on
+description: 命名規範（類、方法、變量、常量）
+tags: [naming, code-style, alibaba-java-coding-guidelines]
+positioning: current-standard
+last_updated: 2025-01-12
 ---
 
 # 命名規範 (基於阿里巴巴黃山版)

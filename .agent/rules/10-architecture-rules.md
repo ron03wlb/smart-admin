@@ -1,5 +1,9 @@
 ---
 trigger: always_on
+description: 分層架構規範 - Controller/Service/Manager/Dao/Entity
+tags: [architecture, layering, spring-mvc, dto-vo-pattern]
+positioning: current-standard
+last_updated: 2025-01-12
 ---
 
 # 架構約束規範 - 分層架構與模塊化設計

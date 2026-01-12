@@ -1,5 +1,11 @@
 ---
-description: TDD 測試驅動開發工作流
+trigger: on_demand
+description: 測試驅動開發工作流程（TDD）
+tags: [tdd, testing, junit5, mockito, test-driven-development]
+required_rules:
+  - rules/10-architecture-rules.md
+  - rules/01-naming-conventions.md
+last_updated: 2025-01-12
 ---
 
 ## Red-Green-Refactor 循環

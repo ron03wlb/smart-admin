@@ -1,5 +1,13 @@
 ---
-description: 失敗重試與問題追蹤機制
+trigger: on_demand
+description: Java 項目錯誤恢復流程
+tags: [troubleshooting, error-recovery, build-failure, maven]
+required_rules:
+  - rules/04-exception-logging.md
+  - rules/06-sonarqube-rules.md
+related_workflows:
+  - workflows/quality-gates-local-ci.md
+last_updated: 2025-01-12
 ---
 
 ## 編譯失敗自動診斷

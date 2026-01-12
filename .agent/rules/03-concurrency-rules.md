@@ -1,5 +1,9 @@
 ---
 trigger: always_on
+description: 並發編程規範 - 線程池、鎖、線程安全
+tags: [concurrency, thread-safety, executor]
+positioning: current-standard
+last_updated: 2025-01-12
 ---
 
 # 併發處理規範

@@ -1,5 +1,9 @@
 ---
 trigger: always_on
+description: OOP 原則 - SOLID、繼承、多態
+tags: [oop, solid, design-principles]
+positioning: current-standard
+last_updated: 2025-01-12
 ---
 
 # OOP 規約
