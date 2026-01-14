@@ -1,0 +1,137 @@
+[versions]
+# Core versions
+java = "21"
+springBoot = "3.5.4"
+springSecurity = "6.5.1"
+mybatisPlus = "3.5.12"
+
+# Database
+mysqlConnector = "9.3.0"
+druid = "1.2.25"
+p6spy = "3.9.1"
+
+# API Documentation
+knife4j = "4.6.0"
+springdocOpenapi = "2.8.9"
+
+# JSON & Data
+fastjson = "2.0.57"
+fastexcel = "1.2.0"
+poi = "5.4.1"
+tika = "3.1.0"
+
+# Cache & Redis
+redisson = "3.50.0"
+
+# Utilities
+guava = "20.0"
+hutool = "5.8.39"
+commonsIo = "2.19.0"
+commonsLang3 = "3.18.0"
+commonsCollections4 = "4.5.0"
+commonsCompress = "1.27.1"
+commonsCodec = "1.18.0"
+commonsText = "1.13.1"
+
+# Template Engines
+velocity = "2.4.1"
+velocityTools = "3.1"
+freemarker = "2.3.34"
+
+# Security & Auth
+saToken = "1.44.0"
+ip2region = "2.7.0"
+bcprov = "1.80"
+
+# AWS & Cloud
+awsSdkS3 = "2.31.78"
+
+# Other
+smartdb = "1.2.0"
+reflections = "0.10.2"
+concurrentlinkedhashmap = "1.4.2"
+snakeyaml = "2.4"
+jsoup = "1.21.1"
+httpcomponents = "5.5"
+jsonSmart = "2.5.1"
+
+[libraries]
+# Spring Boot BOMs
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+mybatis-plus-bom = { module = "com.baomidou:mybatis-plus-bom", version.ref = "mybatisPlus" }
+
+# Spring Boot Starters
+spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
+spring-boot-starter-log4j2 = { module = "org.springframework.boot:spring-boot-starter-log4j2" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+
+# Spring Security
+spring-security-crypto = { module = "org.springframework.security:spring-security-crypto", version.ref = "springSecurity" }
+
+# Database
+mysql-connector-j = { module = "com.mysql:mysql-connector-j", version.ref = "mysqlConnector" }
+druid-spring-boot-starter = { module = "com.alibaba:druid-spring-boot-3-starter", version.ref = "druid" }
+p6spy = { module = "p6spy:p6spy", version.ref = "p6spy" }
+
+# MyBatis-Plus
+mybatis-plus-spring-boot-starter = { module = "com.baomidou:mybatis-plus-spring-boot3-starter" }
+mybatis-plus-jsqlparser = { module = "com.baomidou:mybatis-plus-jsqlparser" }
+
+# API Documentation
+knife4j-openapi3-jakarta = { module = "com.github.xingfudeshi:knife4j-openapi3-jakarta-spring-boot-starter", version.ref = "knife4j" }
+
+# JSON & Data Processing
+fastjson = { module = "com.alibaba:fastjson", version.ref = "fastjson" }
+fastexcel = { module = "cn.idev.excel:fastexcel", version.ref = "fastexcel" }
+poi = { module = "org.apache.poi:poi", version.ref = "poi" }
+poi-scratchpad = { module = "org.apache.poi:poi-scratchpad", version.ref = "poi" }
+poi-ooxml-full = { module = "org.apache.poi:poi-ooxml-full", version.ref = "poi" }
+tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
+
+# Cache & Redis
+redisson-spring-boot-starter = { module = "org.redisson:redisson-spring-boot-starter", version.ref = "redisson" }
+redisson-spring-data-27 = { module = "org.redisson:redisson-spring-data-27", version.ref = "redisson" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
+
+# Utilities
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+hutool-all = { module = "cn.hutool:hutool-all", version.ref = "hutool" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commonsIo" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commonsLang3" }
+commons-collections4 = { module = "org.apache.commons:commons-collections4", version.ref = "commonsCollections4" }
+commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commonsCodec" }
+commons-text = { module = "org.apache.commons:commons-text", version.ref = "commonsText" }
+commons-pool2 = { module = "org.apache.commons:commons-pool2" }
+
+# Template Engines
+velocity-engine-core = { module = "org.apache.velocity:velocity-engine-core", version.ref = "velocity" }
+velocity-tools-generic = { module = "org.apache.velocity.tools:velocity-tools-generic", version.ref = "velocityTools" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
+
+# Authentication
+sa-token-spring-boot-starter = { module = "cn.dev33:sa-token-spring-boot3-starter", version.ref = "saToken" }
+sa-token-redis-jackson = { module = "cn.dev33:sa-token-redis-jackson", version.ref = "saToken" }
+ip2region = { module = "org.lionsoul:ip2region", version.ref = "ip2region" }
+bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov" }
+
+# AWS & Cloud
+aws-sdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awsSdkS3" }
+
+# Other
+smartdb = { module = "net.1024lab:smartdb", version.ref = "smartdb" }
+reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
+concurrentlinkedhashmap-lru = { module = "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru", version.ref = "concurrentlinkedhashmap" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpcomponents" }
+json-smart = { module = "net.minidev:json-smart", version.ref = "jsonSmart" }
+lombok = { module = "org.projectlombok:lombok" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.6" }
