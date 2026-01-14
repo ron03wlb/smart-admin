@@ -5,7 +5,88 @@ tags: [tdd, testing, junit5, mockito, test-driven-development]
 required_rules:
   - rules/10-architecture-rules.md
   - rules/01-naming-conventions.md
-last_updated: 2025-01-12
+  - rules/08-vavr-fundamentals.md
+
+execution_order:
+  - step: write_failing_test
+    description: 編寫失敗測試（RED）
+    apply_rules: [01-naming, 10-architecture]
+    expected_output: 測試類文件，測試失敗
+    validation: 測試編譯通過但執行失敗
+
+  - step: implement_minimal_code
+    description: 最小化實現（GREEN）
+    apply_rules: [01-naming, 08-vavr, 10-architecture]
+    expected_output: 實現類文件，測試通過
+    validation: mvn test 通過
+
+  - step: refactor_code
+    description: 重構優化（REFACTOR）
+    apply_rules: [02-oop, 08-vavr-advanced]
+    expected_output: 優化後的代碼
+    validation: mvn test 仍通過，代碼質量提升
+
+  - step: verify_quality
+    description: 質量門禁檢查（VERIFY）
+    commands:
+      - mvn test
+      - mvn jacoco:report
+      - mvn test -Dtest=ArchitectureTest
+    quality_gates:
+      - coverage: ">= 80%"
+      - archunit: "all pass"
+      - checkstyle: "0 errors"
+
+last_updated: 2025-01-13
+---
+
+# 測試驅動開發工作流程（TDD）
+
+---
+
+## 🤖 AI 執行指南
+
+### 何時應用此 Workflow
+- ✅ 用戶要求 "使用 TDD 開發功能"
+- ✅ 用戶說 "先寫測試"
+- ✅ 需要高質量的代碼實現
+- ✅ 開發複雜業務邏輯
+
+### 執行檢查清單
+在開始之前確認：
+- [ ] 開發環境已初始化（參考 init.md）
+- [ ] 理解用戶需求（功能、邊界條件、異常情況）
+- [ ] 確定測試範圍（單元測試/集成測試）
+
+### 執行流程決策樹
+```
+用戶要求: "使用 TDD 開發用戶查詢功能"
+  ├─ 1️⃣ 確認需求
+  │   ├─ 查詢單個用戶? → 是
+  │   ├─ 需要處理不存在? → 是
+  │   └─ 需要過濾條件? → 是（只返回活躍用戶）
+  │
+  ├─ 2️⃣ RED：編寫測試
+  │   ├─ 測試文件: UserServiceTest.java
+  │   ├─ 測試方法: shouldReturnSome_whenUserExists()
+  │   ├─ 測試方法: shouldReturnNone_whenUserNotExists()
+  │   └─ 測試方法: shouldFilterInactiveUsers()
+  │
+  ├─ 3️⃣ GREEN：最小實現
+  │   ├─ Service 方法: Option<User> findById(Long id)
+  │   ├─ 應用規則: 08-vavr（返回 Option）
+  │   └─ 應用規則: 10-architecture（注入 Mapper）
+  │
+  ├─ 4️⃣ REFACTOR：重構
+  │   ├─ 提取方法: findActiveById()
+  │   └─ 使用鏈式調用: findById().filter(User::isActive)
+  │
+  └─ 5️⃣ VERIFY：質量檢查
+      ├─ mvn test（所有測試通過）
+      ├─ mvn jacoco:report（覆蓋率 >= 80%）
+      └─ mvn test -Dtest=ArchitectureTest（架構正確）
+```
+
 ---
 
 ## Red-Green-Refactor 循環

@@ -3,24 +3,34 @@ package net.lab1024.sa.admin;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;
+import com.tngtech.archunit.core.domain.JavaParameter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
-import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.base.DescribedPredicate;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
- * SmartAdmin 架构测试
+ * SmartAdmin 架构测试 - 增强版
  *
  * 确保项目遵循：
  * - 分层架构（Controller → Service → Manager → Domain）
- * - Vavr 函数式编程规范
+ * - Vavr 函数式编程规范（强制新代码使用）
  * - PostgreSQL 数据库约束
  * - 依赖注入最佳实践
+ * - 命名规范
+ *
+ * @version 2.0
+ * @since 2025-01-13
  */
 @AnalyzeClasses(
     packages = "net.lab1024.sa.admin",
@@ -61,6 +71,13 @@ public class ArchitectureTest {
         .should().haveSimpleNameEndingWith("Service")
         .as("Service 类必须以 Service 结尾");
 
+    @ArchTest
+    static final ArchRule managerNaming = classes()
+        .that().resideInAPackage("..manager..")
+        .and().areAnnotatedWith(org.springframework.stereotype.Service.class)
+        .should().haveSimpleNameEndingWith("Manager")
+        .as("Manager 类必须以 Manager 结尾（规则：09-manager-layer.md）");
+
     // ========== 依赖注入约束 ==========
 
     @ArchTest
@@ -78,22 +95,98 @@ public class ArchitectureTest {
         .should().dependOnClassesThat().resideInAPackage("..manager..")
         .as("Controller 不能直接访问 Manager 层，必须通过 Service");
 
-    // ========== Vavr 函数式编程约束 ==========
+    // ========== Vavr 函数式编程约束（强制执行）==========
 
+    /**
+     * 强制：Service 层公共方法不能返回 java.util.Optional
+     * 新代码必须使用 io.vavr.control.Option
+     */
     @ArchTest
-    static final ArchRule preferVavrOptionOverOptional = noMethods()
-        .that().areDeclaredInClassesThat().resideInAnyPackage("..service..")
+    static final ArchRule serviceUsesVavrOption = methods()
+        .that().areDeclaredInClassesThat().resideInAPackage("..service..")
+        .and().areDeclaredInClassesThat().areAnnotatedWith(Service.class)
         .and().arePublic()
-        .should().haveRawReturnType(java.util.Optional.class)
-        .as("Service 层推荐使用 Vavr Option 代替 Java Optional");
+        .and().doNotHaveName("toString")
+        .and().doNotHaveName("equals")
+        .and().doNotHaveName("hashCode")
+        .should(new ArchCondition<JavaMethod>("return Vavr Option instead of java.util.Optional") {
+            @Override
+            public void check(JavaMethod method, ConditionEvents events) {
+                JavaClass returnType = method.getReturnType();
+                if (returnType.isAssignableTo(java.util.Optional.class)) {
+                    String message = String.format(
+                        "Method %s.%s() returns java.util.Optional, should use io.vavr.control.Option (Rule: 08-vavr-fundamentals.md)",
+                        method.getOwner().getSimpleName(),
+                        method.getName()
+                    );
+                    events.add(SimpleConditionEvent.violated(method, message));
+                }
+            }
+        })
+        .as("Service 层方法必须返回 Vavr Option 而不是 java.util.Optional（强制规则）");
 
-    // ========== 事务管理约束 ==========
+    /**
+     * 强制：Service 层不能依赖 java.util.Optional
+     * 确保整个 Service 层使用 Vavr Option
+     */
+    @ArchTest
+    static final ArchRule noJavaOptionalInService = noClasses()
+        .that().resideInAPackage("..service..")
+        .should().dependOnClassesThat().haveFullyQualifiedName("java.util.Optional")
+        .as("Service 层禁止使用 java.util.Optional，必须使用 io.vavr.control.Option");
+
+    /**
+     * 强制：Controller 参数不能使用 Option
+     * Option 应该只在内部逻辑中使用，不应暴露在 API 接口
+     */
+    @ArchTest
+    static final ArchRule noOptionInControllerParams = methods()
+        .that().areDeclaredInClassesThat().resideInAPackage("..controller..")
+        .should(new ArchCondition<JavaMethod>("not have Option parameters") {
+            @Override
+            public void check(JavaMethod method, ConditionEvents events) {
+                for (JavaParameter param : method.getParameters()) {
+                    JavaClass paramType = param.getRawType();
+                    if (paramType.getFullName().contains("io.vavr.control.Option")) {
+                        String message = String.format(
+                            "Controller method %s.%s() has Option parameter '%s', should use primitive types",
+                            method.getOwner().getSimpleName(),
+                            method.getName(),
+                            param.getName()
+                        );
+                        events.add(SimpleConditionEvent.violated(method, message));
+                    }
+                }
+            }
+        })
+        .as("Controller 参数禁止使用 Option，应该使用基本类型");
+
+    /**
+     * 推荐：优先使用 Vavr Try 处理异常
+     * 检测到 try-catch 时给出警告（非强制）
+     */
+    @ArchTest
+    static final ArchRule preferVavrTry = noClasses()
+        .that().resideInAPackage("..service..")
+        .should().dependOnClassesThat().haveSimpleName("IOException")
+        .andShould().dependOnClassesThat().haveSimpleName("SQLException")
+        .because("推荐使用 Vavr Try 替代 try-catch（参考 08-vavr-fundamentals.md）");
+
+    // ========== 事务与缓存管理约束（Manager 层）==========
 
     @ArchTest
-    static final ArchRule transactionalOnlyInService = methods()
+    static final ArchRule transactionalOnlyInManager = methods()
         .that().areAnnotatedWith(org.springframework.transaction.annotation.Transactional.class)
-        .should().beDeclaredInClassesThat().resideInAPackage("..service..")
-        .as("@Transactional 只应在 Service 层使用");
+        .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
+        .as("@Transactional 只能在 Manager 层使用（规则：09-manager-layer.md）");
+
+    @ArchTest
+    static final ArchRule cacheableOnlyInManager = methods()
+        .that().areAnnotatedWith(org.springframework.cache.annotation.Cacheable.class)
+        .or().areAnnotatedWith(org.springframework.cache.annotation.CacheEvict.class)
+        .or().areAnnotatedWith(org.springframework.cache.annotation.CachePut.class)
+        .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
+        .as("缓存注解只能在 Manager 层使用（规则：09-manager-layer.md）");
 
     // ========== 循环依赖检测 ==========
 

@@ -3,13 +3,255 @@ trigger: always_on
 description: 分層架構規範 - Controller/Service/Manager/Dao/Entity
 tags: [architecture, layering, spring-mvc, dto-vo-pattern]
 positioning: current-standard
-last_updated: 2025-01-12
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: true
+prerequisites:
+  - rules/01-naming-conventions.md
+  - rules/02-oop-principles.md
+conflicts_with: []
+related_rules:
+  - rules/08-vavr-fundamentals.md
+  - rules/09-mybatis-plus-core.md
+archunit_test: ArchitectureTest#layerDependencies
+checkstyle_rule: none
+spotbugs_rule: none
+last_updated: 2025-01-13
 ---
 
 # 架構約束規範 - 分層架構與模塊化設計
 
 定義 Spring Boot 應用的架構邊界、分層職責與模塊化約束。
 所有規則可通過 ArchUnit 自動化驗證。
+
+---
+
+## 🤖 AI 指令區塊
+
+### 何時應用此規則
+- ✅ **永遠**: 生成任何 Java 代碼時都必須遵守架構規範
+- ✅ 用戶要求創建 Controller/Service/Repository/Entity
+- ✅ Code Review 時檢查分層正確性
+- ✅ 檢測到跨層訪問（如 Controller 直接訪問 Repository）
+- ✅ 檢測到字段注入（應該用構造函數注入）
+
+### 強制執行檢查清單
+生成或審查代碼時，必須確認：
+- [ ] **依賴方向正確**: Controller → Service → Manager → Mapper → Domain（禁止反向）
+- [ ] **Controller 不直接訪問 Mapper**（必須通過 Service）
+- [ ] **使用構造函數注入**（禁止 @Autowired 字段注入）
+- [ ] **@Transactional/@Cacheable 只在 Manager 層**（參考 09-manager-layer.md）
+- [ ] **類命名規範**: XxxController, XxxService, XxxManager, XxxMapper, XxxEntity
+- [ ] **Controller 使用 DTO/VO**（不直接暴露 Entity）
+- [ ] **Domain 層無 Spring 依賴**（純 POJO）
+
+### AI 決策樹
+```
+用戶要求: "創建用戶管理功能"
+  ├─ 1️⃣ 確定需要的層次
+  │   ├─ Controller? → YES（需要 HTTP 接口）
+  │   ├─ Service? → YES（業務邏輯）
+  │   ├─ Repository? → YES（數據訪問）
+  │   └─ Entity? → 檢查是否已存在
+  │
+  ├─ 2️⃣ 按順序生成（從內層到外層）
+  │   Step 1: Entity（如果不存在）
+  │   Step 2: Repository extends BaseMapper
+  │   Step 3: Service implements XxxService
+  │   Step 4: Controller 注入 Service
+  │
+  ├─ 3️⃣ 確認依賴注入方式
+  │   └─ 使用 @RequiredArgsConstructor + private final
+  │       ❌ 不使用 @Autowired 字段注入
+  │
+  └─ 4️⃣ 確認職責分配
+      ├─ Controller: HTTP 處理、DTO 轉換、參數校驗
+      ├─ Service: 業務邏輯、事務管理、調用 Repository
+      └─ Repository: 數據訪問、類型安全查詢
+```
+
+### 錯誤模式檢測與修正
+
+#### 模式 1: Controller 直接訪問 Repository（嚴重錯誤）
+```java
+// ❌ 檢測到架構違規
+@RestController
+@RequiredArgsConstructor
+public class UserController {
+    private final UserRepository userRepository; // ❌ 錯誤！
+
+    @GetMapping("/{id}")
+    public ResponseDTO<User> getUser(@PathVariable Long id) {
+        return ResponseDTO.ok(userRepository.findById(id)); // ❌
+    }
+}
+
+// 🔧 需要詢問用戶後修正
+// AI: "檢測到 Controller 直接訪問 Repository，這違反了分層架構。我將創建 UserService 作為中間層，是否繼續？"
+
+// ✅ 修正為
+// 1. 創建 Service
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserMapper userMapper;
+
+    public Option<User> findById(Long id) {
+        return Option.of(userMapper.selectById(id));
+    }
+}
+
+// 2. 修改 Controller
+@RestController
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService userService; // ✅ 正確
+
+    @GetMapping("/{id}")
+    public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
+        return userService.findById(id)
+            .map(UserVO::from)
+            .map(ResponseDTO::ok)
+            .getOrElse(() -> ResponseDTO.error("用戶不存在"));
+    }
+}
+```
+
+#### 模式 2: 字段注入（需要修正）
+```java
+// ❌ 檢測到錯誤
+@Service
+public class UserService {
+    @Autowired // ❌ 字段注入
+    private UserRepository userRepository;
+
+    @Autowired // ❌ 字段注入
+    private EmailService emailService;
+}
+
+// ✅ 自動修正為
+@Service
+@RequiredArgsConstructor // ✅ Lombok 構造函數
+public class UserService {
+    private final UserMapper userMapper; // ✅ final 字段
+    private final EmailService emailService; // ✅ final 字段
+}
+```
+
+#### 模式 3: Entity 依賴 Spring（錯誤）
+```java
+// ❌ 檢測到錯誤
+@TableName("t_user")
+public class User {
+    @Autowired // ❌ Entity 不應該有依賴注入
+    private UserRepository repository;
+}
+
+// ✅ 修正為（Domain 應該是純 POJO）
+@Data
+@Builder
+@TableName("t_user")
+public class User {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    private String username;
+    private String email;
+    // ... 只有數據字段，無依賴
+}
+```
+
+### 生成代碼標準模板
+
+#### 模板 1: 完整的 CRUD 功能（推薦順序）
+
+**Step 1: Entity（如果不存在）**
+```java
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("t_user")
+public class User {
+    @TableId(type = IdType.AUTO)
+    private Long userId;
+
+    private String username;
+    private String email;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedTime;
+}
+```
+
+**Step 2: Repository/Mapper**
+```java
+@Mapper
+public interface UserMapper extends BaseMapper<User> {
+
+    // 使用 default 方法添加自定義查詢
+    default Option<User> findByEmail(String email) {
+        return Option.of(selectOne(
+            Wrappers.<User>lambdaQuery()
+                .eq(User::getEmail, email)
+        ));
+    }
+}
+```
+
+**Step 3: Service（業務邏輯）**
+```java
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserMapper userMapper;
+
+    public Option<User> findById(Long id) {
+        return Option.of(userMapper.selectById(id));
+    }
+
+    public void createUser(UserCreateDTO dto) {
+        User user = User.builder()
+            .username(dto.getUsername())
+            .email(dto.getEmail())
+            .build();
+        userMapper.insert(user);
+    }
+}
+```
+
+**Step 4: Controller（HTTP 接口）**
+```java
+@RestController
+@RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService userService;
+
+    @GetMapping("/{id}")
+    public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
+        return userService.findById(id)
+            .map(UserVO::from)
+            .fold(() -> ResponseDTO.error("用戶不存在"), ResponseDTO::ok);
+    }
+
+    @PostMapping
+    public ResponseDTO<Void> createUser(@Valid @RequestBody UserCreateDTO dto) {
+        userService.createUser(dto);
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 驗證命令
+```bash
+mvn test -Dtest=ArchitectureTest  # 完整架構測試
+mvn test -Dtest=ArchitectureTest#layerDependencies  # 分層依賴檢查
+```
+
+---
 
 ---
 
@@ -39,154 +281,7 @@ Controller → Service → Repository → Domain
 
 ---
 
-## 第二部分：各層職責與約束
-
-### Controller 層
-
-```java
-// ✅ 正確 - 只負責 HTTP 處理
-@RestController
-@RequestMapping("/api/v1/users")
-@RequiredArgsConstructor
-@Validated
-public class UserController {
-    
-    private final UserService userService;
-    private final UserMapper userMapper;
-    
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse createUser(@Valid @RequestBody UserCreateRequest request) {
-        UserCreateDTO dto = userMapper.toDTO(request);
-        User user = userService.createUser(dto);
-        return userMapper.toResponse(user);
-    }
-    
-    @GetMapping("/{id}")
-    public UserResponse getUser(@PathVariable @Positive Long id) {
-        return userService.findById(id)
-            .map(userMapper::toResponse)
-            .orElseThrow(() -> new ResourceNotFoundException("User", id));
-    }
-}
-
-// ❌ 錯誤 - 業務邏輯洩漏到 Controller
-@PostMapping
-public User createUser(@RequestBody UserCreateRequest request) {
-    // ❌ 不應直接訪問 Repository
-    if (userRepository.existsByEmail(request.getEmail())) {
-        throw new DuplicateEmailException();
-    }
-    User user = new User();
-    user.setEmail(request.getEmail());
-    user.setPassword(passwordEncoder.encode(request.getPassword())); // ❌
-    return userRepository.save(user); // ❌
-}
-```
-
-### Service 層
-
-```java
-// ✅ 正確 - 封裝所有業務邏輯
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class UserServiceImpl implements UserService {
-    
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final ApplicationEventPublisher eventPublisher;
-    
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public User createUser(UserCreateDTO dto) {
-        validateUniqueEmail(dto.getEmail());
-        
-        User user = User.builder()
-            .email(dto.getEmail())
-            .password(passwordEncoder.encode(dto.getPassword()))
-            .status(UserStatus.PENDING)
-            .build();
-        
-        User saved = userRepository.save(user);
-        eventPublisher.publishEvent(new UserCreatedEvent(saved));
-        
-        log.info("User created: id={}", saved.getId());
-        return saved;
-    }
-    
-    private void validateUniqueEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new DuplicateEmailException("Email exists: " + email);
-        }
-    }
-}
-
-// ❌ 錯誤 - 依賴 HTTP 層概念
-@Service
-public class BadUserService {
-    @Autowired
-    private HttpServletRequest request; // ❌ 依賴 HTTP
-}
-```
-
-### Repository 層
-
-```java
-// ✅ 正確 - 只負責數據訪問
-public interface UserRepository extends BaseMapper<User> {
-    
-    @Select("SELECT * FROM t_user WHERE email = #{email}")
-    Optional<User> findByEmail(@Param("email") String email);
-    
-    boolean existsByEmail(String email);
-    
-    default List<User> findActiveByRole(String role) {
-        return selectList(
-            Wrappers.<User>lambdaQuery()
-                .eq(User::getStatus, UserStatus.ACTIVE)
-                .eq(User::getRole, role)
-        );
-    }
-}
-
-// ❌ 錯誤 - 包含業務邏輯
-public interface BadUserRepository extends BaseMapper<User> {
-    // ❌ 密碼驗證不應在 Repository
-    default boolean authenticate(String email, String password) {
-        User user = findByEmail(email);
-        return passwordEncoder.matches(password, user.getPassword());
-    }
-}
-```
-
-### Domain 層
-
-```java
-// ✅ 正確 - 純 POJO
-@Data @Builder @TableName("t_user")
-public class User {
-    @TableId(type = IdType.AUTO)
-    private Long id;
-    private String email;
-    @JsonIgnore
-    private String password;
-    private UserStatus status;
-    
-    public boolean isActive() {
-        return UserStatus.ACTIVE.equals(this.status);
-    }
-}
-
-// ❌ 錯誤 - 實體依賴 Spring
-public class BadUser {
-    @Autowired private UserRepository repository; // ❌
-}
-```
-
----
-
-## 第三部分：ArchUnit 自動化測試
+## ArchUnit 自動化測試
 
 ```java
 @AnalyzeClasses(packages = "com.example", 
@@ -254,93 +349,13 @@ public class ArchitectureTest {
 
 ---
 
-## 第四部分：多模塊項目
-
-### 模塊結構
-
-```
-my-application/
-├── my-app-api/              # 接口 + DTO
-├── my-app-domain/           # 純 POJO，無依賴
-├── my-app-service/          # 業務實現
-├── my-app-infrastructure/   # MyBatis Plus、外部服務
-└── my-app-web/              # Controller + 啟動
-```
-
-### Maven 依賴約束
-
-```
-依賴方向：
-web → infrastructure → service → api → domain
-
-domain:        無依賴（純 POJO）
-api:           依賴 domain
-service:       依賴 api + domain
-infrastructure: 依賴 service + MyBatis Plus
-web:           聚合所有 + Spring Boot Web
-```
-
----
-
-## 第五部分：API 設計規範
-
-### RESTful 風格
-
-```java
-@RestController
-@RequestMapping("/api/v1/users")
-public class UserController {
-    
-    @GetMapping                    // GET /users - 列表
-    @GetMapping("/{id}")           // GET /users/123 - 詳情
-    @PostMapping                   // POST /users - 創建
-    @PutMapping("/{id}")           // PUT /users/123 - 全量更新
-    @PatchMapping("/{id}")         // PATCH /users/123 - 部分更新
-    @DeleteMapping("/{id}")        // DELETE /users/123 - 刪除
-    
-    // 子資源
-    @GetMapping("/{userId}/orders")
-    @PostMapping("/{userId}/orders")
-    
-    // 動作
-    @PostMapping("/{id}/activate")
-}
-
-// ❌ 錯誤
-@GetMapping("/getUserById")        // 動詞在 URL
-@PostMapping("/users/delete/{id}") // 用 POST 刪除
-```
-
-### 統一響應格式
-
-```java
-@Data
-@Builder
-public class ApiResponse<T> {
-    private int code;
-    private String message;
-    private T data;
-    private long timestamp;
-    
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
-            .code(200).message("Success").data(data)
-            .timestamp(System.currentTimeMillis()).build();
-    }
-}
-```
-
----
-
 ## 架構檢查清單
 
 - [ ] ArchUnit 所有測試通過
 - [ ] 無循環依賴
-- [ ] Controller 不直接訪問 Repository
-- [ ] Controller 使用 DTO 不暴露 Entity
+- [ ] Controller 不直接訪問 Mapper
+- [ ] Controller 使用 DTO/VO 不暴露 Entity
 - [ ] Service 使用構造函數注入
-- [ ] @Transactional 只在 Service 層
-- [ ] 自定義異常在 exception 包
+- [ ] @Transactional/@Cacheable 只在 Manager 層（參考 09-manager-layer.md）
 - [ ] Domain 層無 Spring 依賴
 - [ ] 命名規範符合約定
-- [ ] RESTful API 設計規範

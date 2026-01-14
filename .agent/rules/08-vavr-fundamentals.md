@@ -3,7 +3,20 @@ trigger: always_on
 description: Vavr 基礎 - Option 與 Try
 tags: [vavr, functional-programming, option, try]
 positioning: ideal
-last_updated: 2025-01-12
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+prerequisites:
+  - rules/01-naming-conventions.md
+  - rules/10-architecture-rules.md
+conflicts_with: []
+related_rules:
+  - rules/08-vavr-advanced.md
+  - rules/08-vavr-mybatis-integration.md
+archunit_test: ArchitectureTest#serviceUsesVavrOption
+checkstyle_rule: none
+spotbugs_rule: none
+last_updated: 2025-01-13
 ---
 
 # Vavr 函數式編程基礎 - Option 與 Try
@@ -11,6 +24,183 @@ last_updated: 2025-01-12
 > **TL;DR**: 使用 Vavr Option 替代 null 檢查，使用 Try 替代 try-catch，實現優雅的函數式異常處理。
 
 **定位說明**: 本規範定義理想目標架構，引導專案從傳統 Java null/異常處理遷移至 Vavr 函數式模式。
+
+---
+
+## 🤖 AI 指令區塊
+
+### 何時應用此規則
+- ✅ 用戶要求生成 Service 層代碼
+- ✅ Service 方法需要返回可能為 null 的對象
+- ✅ 代碼中需要處理可能拋異常的操作（IO、網絡、外部 API）
+- ✅ Code Review 時發現 `Optional` 或 `try-catch` 使用
+- ✅ 用戶詢問如何處理 null 或異常
+
+### 強制執行檢查清單
+當生成或審查 Service 層代碼時，必須確認：
+- [ ] Service 方法返回類型是 `Option<T>` 而非 `Optional<T>` 或 `T`
+- [ ] 沒有顯式的 null 檢查（`if (obj == null)` 或 `obj != null`）
+- [ ] 異常處理使用 `Try.of()` 而非 `try-catch` 塊
+- [ ] 沒有在 Controller 參數中使用 Option（應該用基本類型）
+- [ ] 使用 `map()`/`flatMap()` 進行鏈式調用而非嵌套 if
+
+### AI 決策樹
+```
+用戶要求: "查詢用戶" / "獲取訂單"
+  ├─ 返回單個對象？
+  │   └─ YES → 使用 Option<Entity>
+  │       ├─ Repository 返回可能為 null？
+  │       │   └─ 使用: Option.of(repository.selectById(id))
+  │       └─ Repository 返回 Optional？
+  │           └─ 使用: Option.ofOptional(repository.findById(id))
+  │
+  ├─ 可能拋異常？
+  │   └─ YES → 使用 Try<Entity>
+  │       ├─ IO 操作（文件、網絡）？
+  │       │   └─ 使用: Try.of(() -> ...).mapTry(...)
+  │       ├─ 外部 API 調用？
+  │       │   └─ 使用: Try.of(() -> ...).recover(...)
+  │       └─ 數據庫操作？
+  │           └─ 使用: Try.of(() -> ...).onFailure(log::error)
+  │
+  └─ 需要嵌套檢查？（user → address → city）
+      └─ 使用 flatMap 鏈式調用
+          Option.of(user)
+            .flatMap(u -> Option.of(u.getAddress()))
+            .map(Address::getCity)
+```
+
+### 錯誤模式檢測與自動修正
+
+#### 模式 1: 檢測到 Optional 返回類型
+```java
+// ❌ 檢測到錯誤
+public Optional<User> findById(Long id) {
+    return userMapper.findById(id);
+}
+
+// ✅ 自動修正為
+public Option<User> findById(Long id) {
+    return Option.ofOptional(userMapper.findById(id));
+}
+// 或者（如果 Mapper 返回可能為 null）
+public Option<User> findById(Long id) {
+    return Option.of(userMapper.selectById(id));
+}
+```
+
+#### 模式 2: 檢測到 null 檢查
+```java
+// ❌ 檢測到錯誤
+public UserVO getUserCity(Long id) {
+    User user = userRepository.findById(id);
+    if (user == null) {
+        throw new NotFoundException();
+    }
+    Address address = user.getAddress();
+    if (address == null) {
+        return new UserVO(user.getName(), "Unknown");
+    }
+    return new UserVO(user.getName(), address.getCity());
+}
+
+// ✅ 自動修正為
+public UserVO getUserCity(Long id) {
+    return Option.of(userRepository.findById(id))
+        .map(user -> new UserVO(
+            user.getName(),
+            Option.of(user.getAddress())
+                .map(Address::getCity)
+                .getOrElse("Unknown")
+        ))
+        .getOrElseThrow(() -> new NotFoundException("用戶不存在"));
+}
+```
+
+#### 模式 3: 檢測到 try-catch
+```java
+// ❌ 檢測到錯誤
+public String readConfig(String path) {
+    try {
+        return Files.readString(Paths.get(path));
+    } catch (IOException e) {
+        log.error("配置讀取失敗", e);
+        return "default-config";
+    }
+}
+
+// ✅ 自動修正為
+public Try<String> readConfig(String path) {
+    return Try.of(() -> Files.readString(Paths.get(path)))
+        .onFailure(e -> log.error("配置讀取失敗", e));
+}
+// Controller 層處理:
+// readConfig(path).getOrElse("default-config")
+```
+
+#### 模式 4: 檢測到 Controller 參數使用 Option（錯誤）
+```java
+// ❌ 檢測到錯誤
+@GetMapping("/{id}")
+public ResponseDTO<UserVO> getUser(Option<Long> id) { // ❌ 錯誤用法
+    ...
+}
+
+// ✅ 修正為
+@GetMapping("/{id}")
+public ResponseDTO<UserVO> getUser(@PathVariable Long id) { // ✅ 正確
+    return userService.findById(id)
+        .map(UserVO::from)
+        .map(ResponseDTO::ok)
+        .getOrElse(() -> ResponseDTO.error("用戶不存在"));
+}
+```
+
+### 生成代碼標準模板
+
+```java
+// Service 層查詢
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserMapper mapper;
+
+    public Option<User> findById(Long id) {
+        return Option.of(mapper.selectById(id));
+    }
+
+    public Option<User> findActiveById(Long id) {
+        return findById(id).filter(User::isActive);
+    }
+}
+
+// Controller 層處理 Option
+@RestController
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService service;
+
+    @GetMapping("/{id}")
+    public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
+        return service.findById(id)
+            .map(UserVO::from)
+            .fold(() -> ResponseDTO.error("不存在"), ResponseDTO::ok);
+    }
+}
+
+// Try 異常處理
+public Try<String> readFile(String path) {
+    return Try.of(() -> Files.readString(Paths.get(path)))
+        .onFailure(e -> log.error("文件讀取失敗", e));
+}
+```
+
+### 驗證命令
+```bash
+mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
+```
+
+---
 
 ---
 
@@ -104,65 +294,18 @@ Option<String> city = Option.of(user)
     .map(Address::getCity);
 ```
 
-### 【推薦】在 Service 層使用
+### 【推薦】Service 層鏈式處理
 
 ```java
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final UserMapper mapper;
 
-    private final UserMapper userMapper;
-
-    // ✅ 返回 Option 代替 Optional
-    public Option<User> findById(Long id) {
-        return Option.of(userMapper.selectById(id));
-    }
-
-    // ✅ 鏈式處理
     public Option<UserDetailVO> getUserDetail(Long id) {
-        return findById(id)
+        return Option.of(mapper.selectById(id))
             .filter(User::isActive)
-            .map(this::enrichWithOrders)
             .map(UserDetailVO::from);
-    }
-
-    private User enrichWithOrders(User user) {
-        List<Order> orders = orderMapper.selectByUserId(user.getId());
-        user.setOrders(orders);
-        return user;
-    }
-}
-```
-
-### 【推薦】Controller 集成
-
-```java
-@RestController
-@RequestMapping("/api/v1/users")
-@RequiredArgsConstructor
-public class UserController {
-
-    private final UserService userService;
-
-    // ✅ fold() 處理 Option
-    @GetMapping("/{id}")
-    public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
-        return userService.findById(id)
-            .map(UserVO::from)
-            .fold(
-                () -> ResponseDTO.error("用戶不存在"),
-                user -> ResponseDTO.ok(user)
-            );
-    }
-
-    // ✅ peek() 執行副作用
-    @GetMapping("/{id}/profile")
-    public ResponseDTO<UserProfileVO> getProfile(@PathVariable Long id) {
-        return userService.findById(id)
-            .peek(user -> log.info("訪問用戶檔案: {}", user.getId()))
-            .map(UserProfileVO::from)
-            .map(ResponseDTO::ok)
-            .getOrElse(() -> ResponseDTO.error("用戶不存在"));
     }
 }
 ```
@@ -174,147 +317,47 @@ public class UserController {
 ### 【強制】基本使用
 
 ```java
-// ❌ 傳統方式 - 異常處理冗長
-public OrderVO createOrder(OrderCreateDTO dto) {
+// ❌ 傳統 try-catch
+public String readFile(String path) {
     try {
-        Order order = orderService.create(dto);
-        try {
-            paymentService.processPayment(order.getId());
-            return OrderVO.from(order);
-        } catch (PaymentException e) {
-            orderService.markAsFailed(order.getId());
-            throw new BusinessException("支付失敗", e);
-        }
-    } catch (Exception e) {
-        log.error("訂單創建失敗", e);
-        throw new BusinessException("訂單創建失敗", e);
+        return Files.readString(Paths.get(path));
+    } catch (IOException e) {
+        log.error("文件讀取失敗", e);
+        throw new RuntimeException(e);
     }
 }
 
-// ✅ Vavr Try - 函數式異常處理
-public OrderVO createOrder(OrderCreateDTO dto) {
-    return Try.of(() -> orderService.create(dto))
-        .andThen(order -> paymentService.processPayment(order.getId()))
-        .map(OrderVO::from)
-        .recover(PaymentException.class, ex -> {
-            log.warn("支付失敗，訂單已標記失敗", ex);
-            throw new BusinessException("支付失敗", ex);
-        })
-        .getOrElseThrow(ex -> new BusinessException("訂單創建失敗", ex));
+// ✅ Vavr Try
+public Try<String> readFile(String path) {
+    return Try.of(() -> Files.readString(Paths.get(path)))
+        .onFailure(e -> log.error("文件讀取失敗", e));
 }
 ```
 
 ### 【強制】Try API
 
 ```java
-// 創建 Try
-Try<Integer> success = Try.of(() -> 42);
-Try<Integer> failure = Try.of(() -> 1 / 0);
-
-// 轉換（僅 Success 執行）
-Try<String> result = success.map(Object::toString);
-Try<Integer> doubled = success.map(i -> i * 2);
-
-// mapTry 處理可能拋異常的函數
-Try<String> content = Try.of(() -> Paths.get("file.txt"))
-    .mapTry(Files::readString);
-
-// 鏈式調用
-Try<Result> result = Try.of(() -> step1())
-    .mapTry(this::step2)
-    .mapTry(this::step3);
+// 創建與轉換
+Try<Integer> result = Try.of(() -> 42).map(i -> i * 2);
+Try<String> content = Try.of(() -> Paths.get("f.txt")).mapTry(Files::readString);
 
 // 錯誤恢復
-Try<Integer> recovered = failure
-    .recover(ArithmeticException.class, 0)
-    .recover(ex -> -1);
-
-// 錯誤轉換
-Try<Integer> mapped = failure
-    .recoverWith(ex -> Try.of(() -> fallbackComputation()));
+Try<Integer> recovered = Try.of(() -> 1 / 0)
+    .recover(ArithmeticException.class, 0);
 
 // 獲取值
-Integer value = success.get();                        // 成功返回值，失敗拋異常
-Integer value2 = success.getOrElse(0);
-Integer value3 = success.getOrElseGet(ex -> computeDefault());
-
-// 轉換為 Either
-Either<Throwable, Integer> either = success.toEither();
-
-// 判斷
-if (success.isSuccess()) { ... }
-if (failure.isFailure()) { ... }
-```
-
-### 【推薦】文件操作
-
-```java
-@Service
-public class FileService {
-
-    // ✅ Try 處理 IO 異常
-    public Try<String> readFile(String path) {
-        return Try.of(() -> Paths.get(path))
-            .mapTry(Files::readString)
-            .mapTry(String::trim);
-    }
-
-    // ✅ andThen 執行副作用
-    public Try<Void> writeFile(String path, String content) {
-        return Try.of(() -> Paths.get(path))
-            .andThenTry(p -> Files.writeString(p, content))
-            .andThen(() -> log.info("文件寫入成功: {}", path));
-    }
-
-    // ✅ 組合多個操作
-    public Try<FileProcessResult> processFile(String inputPath, String outputPath) {
-        return readFile(inputPath)
-            .mapTry(this::transform)
-            .flatMapTry(content -> writeFile(outputPath, content)
-                .map(v -> new FileProcessResult(inputPath, outputPath)));
-    }
-}
+Integer value = result.getOrElse(0);
 ```
 
 ### 【推薦】外部 API 調用
 
 ```java
-@Service
-@RequiredArgsConstructor
-public class ThirdPartyService {
-
-    private final RestTemplate restTemplate;
-
-    // ✅ Try 包裝 HTTP 調用
-    public Try<ApiResponse> callExternalApi(String endpoint, Object request) {
-        return Try.of(() -> restTemplate.postForObject(
-                endpoint,
-                request,
-                ApiResponse.class
-            ))
-            .recover(HttpClientErrorException.class, ex -> {
-                log.error("API 調用失敗: {} - {}", ex.getStatusCode(), ex.getMessage());
-                throw new ExternalApiException("第三方服務異常", ex);
-            })
-            .recover(ResourceAccessException.class, ex -> {
-                log.error("API 連接超時", ex);
-                throw new ExternalApiException("連接超時", ex);
-            });
-    }
-
-    // ✅ 重試邏輯
-    public Try<ApiResponse> callWithRetry(String endpoint, Object request, int maxAttempts) {
-        return retry(maxAttempts, () -> callExternalApi(endpoint, request));
-    }
-
-    private <T> Try<T> retry(int maxAttempts, Supplier<Try<T>> operation) {
-        Try<T> result = operation.get();
-        for (int i = 1; i < maxAttempts && result.isFailure(); i++) {
-            log.info("重試第 {} 次", i);
-            result = operation.get();
-        }
-        return result;
-    }
+public Try<ApiResponse> callApi(String endpoint, Object req) {
+    return Try.of(() -> restTemplate.postForObject(endpoint, req, ApiResponse.class))
+        .recover(HttpClientErrorException.class, ex -> {
+            log.error("API 失敗: {}", ex.getStatusCode());
+            throw new ExternalApiException("第三方服務異常", ex);
+        });
 }
 ```
 
