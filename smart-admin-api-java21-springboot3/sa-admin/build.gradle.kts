@@ -9,6 +9,15 @@ val activeEnv: String by lazy {
     (project.findProperty("env") as? String) ?: "dev"
 }
 
+configurations {
+    testImplementation {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    testRuntimeOnly {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+}
+
 dependencies {
     // Dependency on sa-base module
     implementation(project(":sa-base"))
@@ -17,6 +26,7 @@ dependencies {
     annotationProcessor(libs.lombok)
 
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.archunit.junit5)
 }
 
 tasks {

@@ -1,81 +1,79 @@
 package net.lab1024.sa.admin.module.system.login.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 import lombok.Data;
 import net.lab1024.sa.base.common.domain.RequestUser;
 import net.lab1024.sa.base.common.enumeration.GenderEnum;
 import net.lab1024.sa.base.common.enumeration.UserTypeEnum;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
 
-import java.io.Serializable;
-
 /**
  * 请求员工登录信息
  *
- * @Author 1024创新实验室: 善逸
- * @Date 2021/8/4 21:15
- * @Wechat zhuoda1024
- * @Email lab1024@163.com
- * @Copyright  <a href="https://1024lab.net">1024创新实验室</a>
+ * @author 1024创新实验室: 善逸
+ * @since 2021/8/4 21:15 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
 public class RequestEmployee implements RequestUser, Serializable {
 
-    @Schema(description = "员工id")
-    private Long employeeId;
+  private static final long serialVersionUID = 1L;
 
-    @SchemaEnum(UserTypeEnum.class)
-    private UserTypeEnum userType;
+  @Schema(description = "员工id")
+  private Long employeeId;
 
-    @Schema(description = "登录账号")
-    private String loginName;
+  @SchemaEnum(UserTypeEnum.class)
+  private UserTypeEnum userType;
 
-    @Schema(description = "员工名称")
-    private String actualName;
+  @Schema(description = "登录账号")
+  private String loginName;
 
-    @Schema(description = "头像")
-    private String avatar;
+  @Schema(description = "员工名称")
+  private String actualName;
 
-    @SchemaEnum(GenderEnum.class)
-    private Integer gender;
+  @Schema(description = "头像")
+  private String avatar;
 
-    @Schema(description = "手机号码")
-    private String phone;
+  @SchemaEnum(GenderEnum.class)
+  private Integer gender;
 
-    @Schema(description = "部门id")
-    private Long departmentId;
+  @Schema(description = "手机号码")
+  private String phone;
 
-    @Schema(description = "部门名称")
-    private String departmentName;
+  @Schema(description = "部门id")
+  private Long departmentId;
 
-    @Schema(description = "职务级别ID")
-    private Long positionId;
+  @Schema(description = "部门名称")
+  private String departmentName;
 
-    @Schema(description = "邮箱")
-    private String email;
+  @Schema(description = "职务级别ID")
+  private Long positionId;
 
-    @Schema(description = "是否禁用")
-    private Boolean disabledFlag;
+  @Schema(description = "邮箱")
+  private String email;
 
-    @Schema(description = "是否为超管")
-    private Boolean administratorFlag;
+  @Schema(description = "是否禁用")
+  private Boolean disabledFlag;
 
-    @Schema(description = "备注")
-    private String remark;
+  @Schema(description = "是否为超管")
+  private Boolean administratorFlag;
 
-    @Schema(description = "请求ip")
-    private String ip;
+  @Schema(description = "备注")
+  private String remark;
 
-    @Schema(description = "请求user-agent")
-    private String userAgent;
+  @Schema(description = "请求ip")
+  private String ip;
 
-    @Override
-    public Long getUserId() {
-        return employeeId;
-    }
+  @Schema(description = "请求user-agent")
+  private String userAgent;
 
-    @Override
-    public String getUserName() {
-        return actualName;
-    }
+  @Override
+  public Long getUserId() {
+    return employeeId;
+  }
+
+  @Override
+  public String getUserName() {
+    return actualName;
+  }
 }

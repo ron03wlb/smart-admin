@@ -8,92 +8,72 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 接口
  *
- * @Author 1024创新实验室: 罗伊
- * @Date 2019年10月11日 15:34:47
- * @Wechat zhuoda1024
- * @Email lab1024@163.com
- * @Copyright  <a href="https://1024lab.net">1024创新实验室</a>
+ * @author 1024创新实验室: 罗伊
+ * @since 2019年10月11日 15:34:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 public interface IFileStorageService {
 
-    /**
-     * 文件上传
-     *
-     * @param file
-     * @param path
-     * @return
-     */
-    ResponseDTO<FileUploadVO> upload(MultipartFile file, String path);
+  /**
+   * 文件上传
+   *
+   * @param file
+   * @param path
+   * @return
+   */
+  ResponseDTO<FileUploadVO> upload(MultipartFile file, String path);
 
-    /**
-     * 获取文件url
-     *
-     * @param fileKey
-     * @return
-     */
-    ResponseDTO<String> getFileUrl(String fileKey);
+  /**
+   * 获取文件url
+   *
+   * @param fileKey
+   * @return
+   */
+  ResponseDTO<String> getFileUrl(String fileKey);
 
+  /**
+   * 流式下载（名称为原文件）
+   *
+   * @param key
+   * @return
+   */
+  ResponseDTO<FileDownloadVO> download(String key);
 
-    /**
-     * 流式下载（名称为原文件）
-     *
-     * @param key
-     * @return
-     */
-    ResponseDTO<FileDownloadVO> download(String key);
+  /**
+   * 单个删除文件 根据文件key删除
+   *
+   * @param fileKey
+   * @return
+   */
+  ResponseDTO<String> delete(String fileKey);
 
-    /**
-     * 单个删除文件
-     * 根据文件key删除
-     *
-     * @param fileKey
-     * @return
-     */
-    ResponseDTO<String> delete(String fileKey);
+  /** Static map for file extension to content type mapping */
+  java.util.Map<String, String> CONTENT_TYPE_MAP =
+      java.util.Map.ofEntries(
+          java.util.Map.entry("bmp", "image/bmp"),
+          java.util.Map.entry("gif", "image/gif"),
+          java.util.Map.entry("jpeg", "image/jpeg"),
+          java.util.Map.entry("jpg", "image/jpeg"),
+          java.util.Map.entry("png", "image/png"),
+          java.util.Map.entry("html", "text/html"),
+          java.util.Map.entry("txt", "text/plain"),
+          java.util.Map.entry("vsd", "application/vnd.visio"),
+          java.util.Map.entry("ppt", "application/vnd.ms-powerpoint"),
+          java.util.Map.entry("pptx", "application/vnd.ms-powerpoint"),
+          java.util.Map.entry("doc", "application/msword"),
+          java.util.Map.entry("docx", "application/msword"),
+          java.util.Map.entry("pdf", "application/pdf"),
+          java.util.Map.entry("xml", "text/xml"));
 
-
-    /**
-     * 获取文件类型
-     *
-     * @param fileExt
-     * @return
-     */
-    default String getContentType(String fileExt) {
-        // 文件的后缀名
-        if ("bmp".equalsIgnoreCase(fileExt)) {
-            return "image/bmp";
-        }
-        if ("gif".equalsIgnoreCase(fileExt)) {
-            return "image/gif";
-        }
-        if ("jpeg".equalsIgnoreCase(fileExt) || "jpg".equalsIgnoreCase(fileExt)) {
-            return "image/jpeg";
-        }
-        if ("png".equalsIgnoreCase(fileExt)) {
-            return "image/png";
-        }
-        if ("html".equalsIgnoreCase(fileExt)) {
-            return "text/html";
-        }
-        if ("txt".equalsIgnoreCase(fileExt)) {
-            return "text/plain";
-        }
-        if ("vsd".equalsIgnoreCase(fileExt)) {
-            return "application/vnd.visio";
-        }
-        if ("ppt".equalsIgnoreCase(fileExt) || "pptx".equalsIgnoreCase(fileExt)) {
-            return "application/vnd.ms-powerpoint";
-        }
-        if ("doc".equalsIgnoreCase(fileExt) || "docx".equalsIgnoreCase(fileExt)) {
-            return "application/msword";
-        }
-        if ("pdf".equalsIgnoreCase(fileExt)) {
-            return "application/pdf";
-        }
-        if ("xml".equalsIgnoreCase(fileExt)) {
-            return "text/xml";
-        }
-        return "";
+  /**
+   * 获取文件类型
+   *
+   * @param fileExt
+   * @return
+   */
+  default String getContentType(String fileExt) {
+    if (fileExt == null) {
+      return "";
     }
-
+    return CONTENT_TYPE_MAP.getOrDefault(fileExt.toLowerCase(java.util.Locale.ROOT), "");
+  }
 }

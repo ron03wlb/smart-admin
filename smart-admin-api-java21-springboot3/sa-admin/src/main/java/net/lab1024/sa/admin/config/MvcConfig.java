@@ -11,31 +11,27 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * web相关配置
  *
- * @Author 1024创新实验室-主任: 卓大
- * @Date 2021-09-02 20:21:10
- * @Wechat zhuoda1024
- * @Email lab1024@163.com
- * @Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ * @author 1024创新实验室-主任: 卓大
+ * @since 2021-09-02 20:21:10 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
-    @Resource
-    private AdminInterceptor adminInterceptor;
+  @Resource private AdminInterceptor adminInterceptor;
 
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry
+        .addInterceptor(adminInterceptor)
+        .excludePathPatterns(SwaggerConfig.SWAGGER_WHITELIST.toArray(new String[0]))
+        .addPathPatterns("/**");
+  }
 
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(adminInterceptor)
-                .excludePathPatterns(SwaggerConfig.SWAGGER_WHITELIST)
-                .addPathPatterns("/**");
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
-
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
+    registry
+        .addResourceHandler("/webjars/**")
+        .addResourceLocations("classpath:/META-INF/resources/webjars/");
+  }
 }

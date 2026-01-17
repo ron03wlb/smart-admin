@@ -10,24 +10,18 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * mp 插件
  *
- * @Author 1024创新实验室-主任: 卓大
- * @Date 2021-09-02 20:21:10
- * @Wechat zhuoda1024
- * @Email lab1024@163.com
- * @Copyright  <a href="https://1024lab.net">1024创新实验室</a>
+ * @author 1024创新实验室-主任: 卓大
+ * @since 2021-09-02 20:21:10 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @EnableTransactionManagement
 @Configuration
 public class MybatisPlusConfig {
 
-    /**
-     * 分页插件
-     */
-    @Bean
-    public MybatisPlusInterceptor paginationInterceptor() {
-        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
-        return interceptor;
-    }
-
+  /** 分页插件 */
+  @Bean
+  public MybatisPlusInterceptor paginationInterceptor() {
+    MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+    interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+    return interceptor;
+  }
 }

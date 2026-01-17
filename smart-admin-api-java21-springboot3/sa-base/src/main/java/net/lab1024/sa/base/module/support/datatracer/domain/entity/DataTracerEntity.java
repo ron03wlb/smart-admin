@@ -3,93 +3,62 @@ package net.lab1024.sa.base.module.support.datatracer.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
 import lombok.Data;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
-
-import java.time.LocalDateTime;
 
 /**
  * 数据记录 实体
  *
- * @Author 1024创新实验室-主任: 卓大
- * @Date 2022-07-23 19:38:52
- * @Wechat zhuoda1024
- * @Email lab1024@163.com
- * @Copyright  <a href="https://1024lab.net">1024创新实验室</a>
+ * @author 1024创新实验室-主任: 卓大
+ * @since 2022-07-23 19:38:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
 @TableName("t_data_tracer")
 public class DataTracerEntity {
 
-    @TableId(type = IdType.AUTO)
-    private Long dataTracerId;
-    /**
-     * 数据id
-     */
-    private Long dataId;
-    /**
-     * 业务类型
-     * {@link DataTracerTypeEnum}
-     */
-    private Integer type;
+  @TableId(type = IdType.AUTO)
+  private Long dataTracerId;
 
-    /**
-     * 内容
-     */
-    private String content;
+  /** 数据id */
+  private Long dataId;
 
-    /**
-     * diff 差异：旧的数据
-     */
-    private String diffOld;
+  /** 业务类型 {@link DataTracerTypeEnum} */
+  private Integer type;
 
-    /**
-     * 差异：新的数据
-     */
-    private String diffNew;
+  /** 内容 */
+  private String content;
 
-    /**
-     * 扩展字段
-     */
-    private String extraData;
+  /** diff 差异：旧的数据 */
+  private String diffOld;
 
-    /**
-     * 用户
-     */
-    private Long userId;
+  /** 差异：新的数据 */
+  private String diffNew;
 
-    /**
-     * 用户类型
-     */
-    private Integer userType;
+  /** 扩展字段 */
+  private String extraData;
 
-    /**
-     * 用户名
-     */
-    private String userName;
+  /** 用户 */
+  private Long userId;
 
-    /**
-     * 请求ip
-     */
-    private String ip;
+  /** 用户类型 */
+  private Integer userType;
 
-    /**
-     * 请求ip地区
-     */
-    private String ipRegion;
+  /** 用户名 */
+  private String userName;
 
-    /**
-     * 请求头
-     */
-    private String userAgent;
+  /** 请求ip */
+  private String ip;
 
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
+  /** 请求ip地区 */
+  private String ipRegion;
 
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
+  /** 请求头 */
+  private String userAgent;
+
+  /** 创建时间 */
+  private LocalDateTime createTime;
+
+  /** 更新时间 */
+  private LocalDateTime updateTime;
 }

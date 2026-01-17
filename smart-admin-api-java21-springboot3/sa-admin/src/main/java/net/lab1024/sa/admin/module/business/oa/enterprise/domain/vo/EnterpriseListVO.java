@@ -7,14 +7,14 @@ import lombok.Data;
  * OA企业模块列表
  *
  * @author lihaifan
- * @date 2022/6/23 14:31
+ * @since 2022/6/23 14:31
  */
 @Data
 public class EnterpriseListVO {
 
-    @Schema(description = "企业ID")
-    private Long enterpriseId;
+  @Schema(description = "企业ID")
+  private Long enterpriseId;
 
-    @Schema(description = "企业名称")
-    private String enterpriseName;
+  @Schema(description = "企业名称")
+  private String enterpriseName;
 }
