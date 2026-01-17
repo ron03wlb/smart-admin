@@ -4,6 +4,12 @@ description: Java 錯誤診斷與恢復流程
 tags: [troubleshooting, debugging, error-recovery, archunit, quality-gate]
 required_rules:
   - rules/10-architecture-rules.md
+  - rules/11-checkstyle-rules.md
+  - rules/12-pmd-rules.md
+  - rules/13-spotbugs-rules.md
+  - rules/14-spotless-rules.md
+  - rules/15-error-prone-rules.md
+  - rules/16-jacoco-coverage-rules.md
 
 execution_order:
   - step: identify_error_type

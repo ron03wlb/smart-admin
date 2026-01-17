@@ -5,6 +5,12 @@ tags: [ci-cd, local-checks, gitlab-ci, quality-gate, troubleshooting]
 required_rules:
   - rules/10-architecture-rules.md
   - rules/06-sonarqube-rules.md
+  - rules/11-checkstyle-rules.md
+  - rules/12-pmd-rules.md
+  - rules/13-spotbugs-rules.md
+  - rules/14-spotless-rules.md
+  - rules/15-error-prone-rules.md
+  - rules/16-jacoco-coverage-rules.md
 related_workflows:
   - workflows/github-actions-pipeline.md
 last_updated: 2025-01-12
@@ -78,12 +84,12 @@ open target/site/jacoco/index.html
 
 ## 二、增量 vs 全量分析
 
-| 觸發條件              | 分析類型 | 範圍              | 檢查項目                   |
-|-----------------------|----------|-------------------|----------------------------|
-| PR 開啟/更新          | 增量分析 | 僅變更文件        | Checkstyle + 單元測試      |
-| Push 到 main/master   | 全量分析 | 整個項目          | 全部檢查 + SonarQube       |
-| 定時任務 (每日)       | 全量分析 | 整個項目          | 全部檢查 + 依賴安全掃描    |
-| 手動觸發 (workflow_dispatch) | 可選 | 指定範圍          | 可配置                     |
+| 觸發條件                     | 分析類型 | 範圍       | 檢查項目                |
+| ---------------------------- | -------- | ---------- | ----------------------- |
+| PR 開啟/更新                 | 增量分析 | 僅變更文件 | Checkstyle + 單元測試   |
+| Push 到 main/master          | 全量分析 | 整個項目   | 全部檢查 + SonarQube    |
+| 定時任務 (每日)              | 全量分析 | 整個項目   | 全部檢查 + 依賴安全掃描 |
+| 手動觸發 (workflow_dispatch) | 可選     | 指定範圍   | 可配置                  |
 
 ## 三、常見問題 (FAQ)
 
@@ -231,13 +237,13 @@ build:
 
 ### GitLab vs GitHub Actions 對比
 
-| 功能                  | GitHub Actions              | GitLab CI/CD               |
-|-----------------------|-----------------------------|----------------------------|
-| **配置文件**          | `.github/workflows/*.yml`   | `.gitlab-ci.yml`           |
-| **Services 定義**     | `services` (job 級別)       | `services` (job 級別)      |
-| **Cache**             | `actions/cache`             | `cache` (內建)             |
-| **Artifacts**         | `actions/upload-artifact`   | `artifacts` (內建)         |
-| **條件執行**          | `if: github.ref == 'refs/heads/main'` | `only: [main]` |
+| 功能              | GitHub Actions                        | GitLab CI/CD          |
+| ----------------- | ------------------------------------- | --------------------- |
+| **配置文件**      | `.github/workflows/*.yml`             | `.gitlab-ci.yml`      |
+| **Services 定義** | `services` (job 級別)                 | `services` (job 級別) |
+| **Cache**         | `actions/cache`                       | `cache` (內建)        |
+| **Artifacts**     | `actions/upload-artifact`             | `artifacts` (內建)    |
+| **條件執行**      | `if: github.ref == 'refs/heads/main'` | `only: [main]`        |
 
 ## 五、持續改進建議
 

@@ -9,14 +9,12 @@ ask_before_fix: true
 prerequisites:
   - rules/01-naming-conventions.md
   - rules/02-oop-principles.md
-conflicts_with: []
 related_rules:
   - rules/08-vavr-fundamentals.md
   - rules/09-mybatis-plus-core.md
+  - rules/09-manager-layer.md
 archunit_test: ArchitectureTest#layerDependencies
-checkstyle_rule: none
-spotbugs_rule: none
-last_updated: 2025-01-13
+last_updated: 2025-01-17
 ---
 
 # 架構約束規範 - 分層架構與模塊化設計
@@ -36,14 +34,11 @@ last_updated: 2025-01-13
 - ✅ 檢測到字段注入（應該用構造函數注入）
 
 ### 強制執行檢查清單
-生成或審查代碼時，必須確認：
-- [ ] **依賴方向正確**: Controller → Service → Manager → Mapper → Domain（禁止反向）
-- [ ] **Controller 不直接訪問 Mapper**（必須通過 Service）
-- [ ] **Manager 層禁止調用 Service 層**（嚴格執行，禁止向上調用）
-- [ ] **Manager 層禁止調用其他業務 Manager**（避免事務嵌套）
+- [ ] **依賴方向正確**: Controller → Service → Manager → Mapper → Domain
+- [ ] **Controller 不直接訪問 Mapper**
 - [ ] **使用構造函數注入**（禁止 @Autowired 字段注入）
-- [ ] **@Transactional/@Cacheable 只在 Manager 層**（參考 09-manager-layer.md）
-- [ ] **類命名規範**: XxxController, XxxService, XxxManager, XxxMapper, XxxEntity
+- [ ] **@Transactional/@Cacheable 只在 Manager 層**（參考 [09-manager-layer.md](./09-manager-layer.md)）
+- [ ] **類命名規範**: XxxController, XxxService, XxxManager, XxxMapper
 - [ ] **Controller 使用 DTO/VO**（不直接暴露 Entity）
 - [ ] **Domain 層無 Spring 依賴**（純 POJO）
 
@@ -57,153 +52,105 @@ last_updated: 2025-01-13
   │   └─ Entity? → 檢查是否已存在
   │
   ├─ 2️⃣ 按順序生成（從內層到外層）
-  │   Step 1: Entity（如果不存在）
-  │   Step 2: Repository extends BaseMapper
-  │   Step 3: Service implements XxxService
-  │   Step 4: Controller 注入 Service
+  │   Step 1: Entity → Step 2: Mapper → Step 3: Service → Step 4: Controller
   │
-  ├─ 3️⃣ 確認依賴注入方式
-  │   └─ 使用 @RequiredArgsConstructor + private final
-  │       ❌ 不使用 @Autowired 字段注入
-  │
-  └─ 4️⃣ 確認職責分配
-      ├─ Controller: HTTP 處理、DTO 轉換、參數校驗
-      ├─ Service: 業務邏輯、事務管理、調用 Repository
-      └─ Repository: 數據訪問、類型安全查詢
+  └─ 3️⃣ 確認依賴注入
+      └─ 使用 @RequiredArgsConstructor + private final
 ```
 
-### 錯誤模式檢測與修正
+---
 
-#### 模式 1: Controller 直接訪問 Repository（嚴重錯誤）
+## 分層架構
+
+### 標準目錄結構
+```
+com.example.myapp/
+├── controller/          # 表現層 - HTTP、DTO
+├── service/             # 業務層 - 核心邏輯
+├── manager/             # 管理層 - 事務、緩存
+├── mapper/              # 持久層 - 數據訪問
+├── domain/entity/       # 領域層 - 實體
+└── common/              # exception、util
+```
+
+### 【強制】層級依賴方向
+```
+Controller → Service → Manager → Mapper/DAO → Domain
+
+✅ 允許：上層依賴下層
+✅ 允許：Service → Mapper（簡單場景可跳過 Manager）
+❌ 禁止：反向依賴（Manager → Service）
+❌ 禁止：跨層訪問（Controller → Manager/Mapper）
+❌ 禁止：Manager 橫向調用（ManagerA → ManagerB）
+```
+
+> **Manager 層詳細約束**: 參考 [09-manager-layer.md](./09-manager-layer.md)
+
+---
+
+## 錯誤模式檢測
+
+### 模式 1: Controller 直接訪問 Repository
 ```java
-// ❌ 檢測到架構違規
+// ❌ 架構違規
 @RestController
-@RequiredArgsConstructor
 public class UserController {
-    private final UserRepository userRepository; // ❌ 錯誤！
-
-    @GetMapping("/{id}")
-    public ResponseDTO<User> getUser(@PathVariable Long id) {
-        return ResponseDTO.ok(userRepository.findById(id)); // ❌
-    }
+    private final UserMapper userMapper; // ❌ 錯誤！
 }
 
-// 🔧 需要詢問用戶後修正
-// AI: "檢測到 Controller 直接訪問 Repository，這違反了分層架構。我將創建 UserService 作為中間層，是否繼續？"
-
 // ✅ 修正為
-// 1. 創建 Service
+@RestController
+public class UserController {
+    private final UserService userService; // ✅ 正確
+}
+```
+
+### 模式 2: 字段注入
+```java
+// ❌ 字段注入
+@Service
+public class UserService {
+    @Autowired
+    private UserMapper userMapper;
+}
+
+// ✅ 構造函數注入
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserMapper userMapper;
-
-    public Option<User> findById(Long id) {
-        return Option.of(userMapper.selectById(id));
-    }
-}
-
-// 2. 修改 Controller
-@RestController
-@RequiredArgsConstructor
-public class UserController {
-    private final UserService userService; // ✅ 正確
-
-    @GetMapping("/{id}")
-    public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
-        return userService.findById(id)
-            .map(UserVO::from)
-            .map(ResponseDTO::ok)
-            .getOrElse(() -> ResponseDTO.error("用戶不存在"));
-    }
 }
 ```
 
-#### 模式 2: 字段注入（需要修正）
-```java
-// ❌ 檢測到錯誤
-@Service
-public class UserService {
-    @Autowired // ❌ 字段注入
-    private UserRepository userRepository;
+---
 
-    @Autowired // ❌ 字段注入
-    private EmailService emailService;
-}
+## 生成代碼模板
 
-// ✅ 自動修正為
-@Service
-@RequiredArgsConstructor // ✅ Lombok 構造函數
-public class UserService {
-    private final UserMapper userMapper; // ✅ final 字段
-    private final EmailService emailService; // ✅ final 字段
-}
-```
-
-#### 模式 3: Entity 依賴 Spring（錯誤）
-```java
-// ❌ 檢測到錯誤
-@TableName("t_user")
-public class User {
-    @Autowired // ❌ Entity 不應該有依賴注入
-    private UserRepository repository;
-}
-
-// ✅ 修正為（Domain 應該是純 POJO）
-@Data
-@Builder
-@TableName("t_user")
-public class User {
-    @TableId(type = IdType.AUTO)
-    private Long id;
-    private String username;
-    private String email;
-    // ... 只有數據字段，無依賴
-}
-```
-
-### 生成代碼標準模板
-
-#### 模板 1: 完整的 CRUD 功能（推薦順序）
-
-**Step 1: Entity（如果不存在）**
+### Entity
 ```java
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @TableName("t_user")
 public class User {
     @TableId(type = IdType.AUTO)
     private Long userId;
-
     private String username;
     private String email;
-
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createdTime;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatedTime;
 }
 ```
 
-**Step 2: Repository/Mapper**
+### Mapper
 ```java
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-
-    // 使用 default 方法添加自定義查詢
     default Option<User> findByEmail(String email) {
         return Option.of(selectOne(
-            Wrappers.<User>lambdaQuery()
-                .eq(User::getEmail, email)
-        ));
+            Wrappers.<User>lambdaQuery().eq(User::getEmail, email)));
     }
 }
 ```
 
-**Step 3: Service（業務邏輯）**
+### Service
 ```java
 @Service
 @RequiredArgsConstructor
@@ -213,18 +160,10 @@ public class UserService {
     public Option<User> findById(Long id) {
         return Option.of(userMapper.selectById(id));
     }
-
-    public void createUser(UserCreateDTO dto) {
-        User user = User.builder()
-            .username(dto.getUsername())
-            .email(dto.getEmail())
-            .build();
-        userMapper.insert(user);
-    }
 }
 ```
 
-**Step 4: Controller（HTTP 接口）**
+### Controller
 ```java
 @RestController
 @RequestMapping("/api/v1/users")
@@ -238,126 +177,37 @@ public class UserController {
             .map(UserVO::from)
             .fold(() -> ResponseDTO.error("用戶不存在"), ResponseDTO::ok);
     }
-
-    @PostMapping
-    public ResponseDTO<Void> createUser(@Valid @RequestBody UserCreateDTO dto) {
-        userService.createUser(dto);
-        return ResponseDTO.ok();
-    }
 }
 ```
-
-### 驗證命令
-```bash
-mvn test -Dtest=ArchitectureTest  # 完整架構測試
-mvn test -Dtest=ArchitectureTest#layerDependencies  # 分層依賴檢查
-```
-
----
-
----
-
-## 第一部分：分層架構
-
-### 標準目錄結構
-
-```
-com.example.myapp/
-├── controller/          # 表現層 - HTTP、DTO
-├── service/             # 業務層 - 核心邏輯
-│   └── impl/
-├── repository/          # 持久層 - 數據訪問
-├── domain/entity/       # 領域層 - 實體
-├── infrastructure/      # 基礎設施 - config、external
-└── common/              # exception、util
-```
-
-### 【強制】層級依賴方向
-
-```
-Controller → Service → Manager → Mapper/DAO → Domain
-
-✅ 允許：上層依賴下層
-✅ 允許：Service → Mapper（簡單場景可跳過 Manager）
-❌ 禁止：反向依賴（Manager → Service）
-❌ 禁止：跨層訪問（Controller → Manager/Mapper）
-❌ 禁止：Manager 橫向調用（ManagerA → ManagerB）
-```
-
-### Manager 層調用約束（嚴格執行）
-
-| 調用方向 | 是否允許 | 說明 |
-|----------|----------|------|
-| Manager → Service | ❌ 禁止 | 禁止向上調用（嚴格執行） |
-| ManagerA → ManagerB | ❌ 禁止 | 避免事務嵌套 |
-| Manager → Mapper/DAO | ✅ 允許 | 只能向下調用 |
-| Service → Manager | ✅ 允許 | 正常調用方向 |
 
 ---
 
 ## ArchUnit 自動化測試
 
 ```java
-@AnalyzeClasses(packages = "com.example", 
-    importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(packages = "com.example")
 public class ArchitectureTest {
 
-    // 分層約束
     @ArchTest
     static final ArchRule layerDependencies = layeredArchitecture()
-        .consideringAllDependencies()
         .layer("Controller").definedBy("..controller..")
         .layer("Service").definedBy("..service..")
-        .layer("Repository").definedBy("..repository..")
+        .layer("Repository").definedBy("..mapper..", "..repository..")
         .layer("Domain").definedBy("..domain..", "..entity..")
         .whereLayer("Controller").mayNotBeAccessedByAnyLayer()
-        .whereLayer("Service").mayOnlyBeAccessedByLayers("Controller", "Infrastructure")
-        .whereLayer("Repository").mayOnlyBeAccessedByLayers("Service");
+        .whereLayer("Service").mayOnlyBeAccessedByLayers("Controller")
+        .whereLayer("Repository").mayOnlyBeAccessedByLayers("Service", "Manager");
 
-    // 命名規範
-    @ArchTest
-    static final ArchRule controllerNaming = classes()
-        .that().resideInAPackage("..controller..")
-        .and().areAnnotatedWith(RestController.class)
-        .should().haveSimpleNameEndingWith("Controller");
-
-    @ArchTest
-    static final ArchRule serviceImplNaming = classes()
-        .that().resideInAPackage("..service.impl..")
-        .should().haveSimpleNameEndingWith("ServiceImpl");
-
-    // 禁止字段注入
     @ArchTest
     static final ArchRule noFieldInjection = fields()
         .that().areDeclaredInClassesThat()
         .resideInAnyPackage("..controller..", "..service..")
         .should().notBeAnnotatedWith(Autowired.class);
 
-    // Controller 不能直接訪問 Repository
     @ArchTest
     static final ArchRule controllerNotAccessRepository = noClasses()
         .that().resideInAPackage("..controller..")
-        .should().dependOnClassesThat().resideInAPackage("..repository..");
-
-    // Domain 層無 Spring 依賴
-    @ArchTest
-    static final ArchRule domainPure = noClasses()
-        .that().resideInAPackage("..domain..", "..entity..")
-        .should().dependOnClassesThat()
-        .resideInAnyPackage("org.springframework..");
-
-    // 無循環依賴
-    @ArchTest
-    static final ArchRule noCycles = slices()
-        .matching("com.example.(*)..")
-        .should().beFreeOfCycles();
-
-    // @Transactional 只在 Service 層
-    @ArchTest
-    static final ArchRule transactionalInService = methods()
-        .that().areDeclaredInClassesThat()
-        .resideOutsideOfPackage("..service..")
-        .should().notBeAnnotatedWith(Transactional.class);
+        .should().dependOnClassesThat().resideInAPackage("..mapper..");
 }
 ```
 
@@ -370,6 +220,12 @@ public class ArchitectureTest {
 - [ ] Controller 不直接訪問 Mapper
 - [ ] Controller 使用 DTO/VO 不暴露 Entity
 - [ ] Service 使用構造函數注入
-- [ ] @Transactional/@Cacheable 只在 Manager 層（參考 09-manager-layer.md）
+- [ ] @Transactional/@Cacheable 只在 Manager 層
 - [ ] Domain 層無 Spring 依賴
 - [ ] 命名規範符合約定
+
+### 驗證命令
+```bash
+./gradlew check
+mvn test -Dtest=ArchitectureTest
+```
