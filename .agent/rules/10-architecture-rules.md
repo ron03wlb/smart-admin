@@ -39,6 +39,8 @@ last_updated: 2025-01-13
 生成或審查代碼時，必須確認：
 - [ ] **依賴方向正確**: Controller → Service → Manager → Mapper → Domain（禁止反向）
 - [ ] **Controller 不直接訪問 Mapper**（必須通過 Service）
+- [ ] **Manager 層禁止調用 Service 層**（嚴格執行，禁止向上調用）
+- [ ] **Manager 層禁止調用其他業務 Manager**（避免事務嵌套）
 - [ ] **使用構造函數注入**（禁止 @Autowired 字段注入）
 - [ ] **@Transactional/@Cacheable 只在 Manager 層**（參考 09-manager-layer.md）
 - [ ] **類命名規範**: XxxController, XxxService, XxxManager, XxxMapper, XxxEntity
@@ -273,11 +275,23 @@ com.example.myapp/
 ### 【強制】層級依賴方向
 
 ```
-Controller → Service → Repository → Domain
+Controller → Service → Manager → Mapper/DAO → Domain
 
 ✅ 允許：上層依賴下層
-❌ 禁止：反向依賴、跨層訪問（Controller → Repository）
+✅ 允許：Service → Mapper（簡單場景可跳過 Manager）
+❌ 禁止：反向依賴（Manager → Service）
+❌ 禁止：跨層訪問（Controller → Manager/Mapper）
+❌ 禁止：Manager 橫向調用（ManagerA → ManagerB）
 ```
+
+### Manager 層調用約束（嚴格執行）
+
+| 調用方向 | 是否允許 | 說明 |
+|----------|----------|------|
+| Manager → Service | ❌ 禁止 | 禁止向上調用（嚴格執行） |
+| ManagerA → ManagerB | ❌ 禁止 | 避免事務嵌套 |
+| Manager → Mapper/DAO | ✅ 允許 | 只能向下調用 |
+| Service → Manager | ✅ 允許 | 正常調用方向 |
 
 ---
 

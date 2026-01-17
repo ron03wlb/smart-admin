@@ -32,6 +32,8 @@ last_updated: 2025-01-13
 - [ ] Manager 類使用 `@Service` 注解
 - [ ] Manager 類使用構造函數注入（`@RequiredArgsConstructor`）
 - [ ] Service 層不包含事務或緩存注解
+- [ ] **Manager 層禁止調用 Service 層（嚴格執行）**
+- [ ] **Manager 層禁止調用其他業務的 Manager（避免事務嵌套）**
 
 ### AI 決策樹
 ```
@@ -99,15 +101,33 @@ public class DepartmentCacheManager {
 
 ## Manager 層架構定位
 
-### 分層架構
+### 分層架構（嚴格單向依賴）
 ```
 Controller (控制層)
     ↓ 調用
 Service (服務層) - 單一業務邏輯，返回 Option/Try
-    ↓ 調用
-Manager (管理層) - 事務邊界 + 緩存管理 + 業務編排
-    ↓ 調用
-Mapper (持久層) - MyBatis Plus 數據訪問
+    ↓ 調用（只能向下）
+Manager (管理層) - 事務邊界 + 緩存管理 + DAO 組合
+    ↓ 調用（只能向下）
+Mapper/DAO (持久層) - MyBatis Plus 數據訪問
+```
+
+### 調用約束（嚴格執行）
+
+| 約束 | 說明 |
+|------|------|
+| **✗ Manager → Service** | 禁止向上調用（嚴格執行） |
+| **✗ ManagerA → ManagerB** | 禁止不同業務 Manager 互調（避免事務嵌套） |
+| **✓ Manager → DAO/Mapper** | 允許調用 DAO 層 |
+| **✓ Service → Manager** | 允許 Service 調用 Manager |
+| **✓ Service → DAO/Mapper** | 允許 Service 直接調用 DAO（簡單場景可跳過 Manager） |
+
+```
+✓ Service  → Manager  → DAO
+✓ Service  → DAO（跳過 Manager，簡單場景）
+
+✗ Manager  → Service（禁止向上調用）
+✗ ManagerA → ManagerB（禁止橫向調用）
 ```
 
 ### Manager 層三大職責
@@ -158,21 +178,40 @@ public class LoginManager {
 }
 ```
 
-#### 3. 複雜業務編排（調用多個 Service/Mapper）
+#### 3. 複雜業務編排（只調用 DAO/Mapper，禁止調用 Service）
 ```java
 @Service
 @RequiredArgsConstructor
 public class OrderManager {
     private final OrderMapper orderMapper;
-    private final InventoryService inventoryService;
-    private final PaymentService paymentService;
+    private final InventoryMapper inventoryMapper;  // ✅ 只調用 Mapper
+    private final PaymentMapper paymentMapper;      // ✅ 只調用 Mapper
+
+    // ❌ 禁止注入 Service
+    // private final InventoryService inventoryService;  // ❌ 違規！
 
     @Transactional(rollbackFor = Throwable.class)
-    public void createOrder(Order order) {
-        inventoryService.checkStock(order.getProductId(), order.getQuantity());
+    public void createOrder(Order order, Integer quantity, BigDecimal amount) {
+        // 直接操作 Mapper，不調用 Service
+        inventoryMapper.deductStock(order.getProductId(), quantity);
         orderMapper.insert(order);
-        inventoryService.deductStock(order.getProductId(), order.getQuantity());
-        paymentService.createPayment(order.getId(), order.getAmount());
+        paymentMapper.insertPayment(order.getId(), amount);
+    }
+}
+
+// ✅ 正確：Service 層負責業務編排，調用多個 Manager
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+    private final OrderManager orderManager;
+    private final InventoryService inventoryService;
+
+    public void createOrder(OrderCreateDTO dto) {
+        // Service 層做業務邏輯校驗
+        inventoryService.checkStock(dto.getProductId(), dto.getQuantity());
+
+        // 事務操作下沉到 Manager
+        orderManager.createOrder(toEntity(dto), dto.getQuantity(), dto.getAmount());
     }
 }
 ```
@@ -282,6 +321,19 @@ static final ArchRule cacheableOnlyInManager = methods()
     .or().areAnnotatedWith(CachePut.class)
     .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
     .because("緩存注解只能在 Manager 層使用（規則：09-manager-layer.md）");
+
+/**
+ * 【嚴格執行】Manager 層禁止調用業務 Service 層
+ *
+ * 排除項：
+ * - MyBatis-Plus 框架類（com.baomidou..service..）- 規範允許 Manager 使用 ServiceImpl
+ * - sa-base 模組的基礎設施服務 - 非業務邏輯
+ */
+@ArchTest
+static final ArchRule managerShouldNotAccessBusinessService = noClasses()
+    .that().resideInAPackage("..manager..")
+    .should().dependOnClassesThat().resideInAPackage("net.lab1024.sa.admin..service..")
+    .because("Manager 層禁止調用業務 Service 層（嚴格執行）");
 ```
 
 ---

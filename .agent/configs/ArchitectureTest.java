@@ -95,6 +95,23 @@ public class ArchitectureTest {
         .should().dependOnClassesThat().resideInAPackage("..manager..")
         .as("Controller 不能直接访问 Manager 层，必须通过 Service");
 
+    /**
+     * 【嚴格執行】Manager 層禁止調用業務 Service 層
+     *
+     * Manager 只能向下調用 DAO/Mapper，不能向上調用業務 Service
+     *
+     * 排除項：
+     * - MyBatis-Plus 框架類（com.baomidou..service..）- 規範允許 Manager 使用 ServiceImpl
+     * - sa-base 模組的基礎設施服務 - 非業務邏輯
+     *
+     * 規則來源：09-manager-layer.md
+     */
+    @ArchTest
+    static final ArchRule managerShouldNotAccessBusinessService = noClasses()
+        .that().resideInAPackage("..manager..")
+        .should().dependOnClassesThat().resideInAPackage("net.lab1024.sa.admin..service..")
+        .as("Manager 層禁止調用業務 Service 層（嚴格執行，規則：09-manager-layer.md）");
+
     // ========== Vavr 函数式编程约束（强制执行）==========
 
     /**
