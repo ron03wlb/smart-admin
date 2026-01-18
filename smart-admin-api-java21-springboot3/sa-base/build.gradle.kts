@@ -86,9 +86,6 @@ dependencies {
     // HTTP Client
     api(libs.httpclient5)
 
-    // JSON
-    api(libs.fastjson)
-
     // Utilities
     api(libs.guava)
     api(libs.concurrentlinkedhashmap.lru)

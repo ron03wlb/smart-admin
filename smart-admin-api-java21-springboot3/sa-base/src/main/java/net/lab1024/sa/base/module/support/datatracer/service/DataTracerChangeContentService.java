@@ -3,7 +3,6 @@ package net.lab1024.sa.base.module.support.datatracer.service;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.google.common.base.CaseFormat;
@@ -25,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.common.util.SmartBigDecimalUtil;
 import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
@@ -342,7 +342,7 @@ public class DataTracerChangeContentService {
         fieldContent = value.toString();
       }
     } else {
-      fieldContent = JSON.toJSONString(fieldValue);
+      fieldContent = JsonUtil.toJson(fieldValue);
     }
     DataTracerContentBO dataTracerContentBO = new DataTracerContentBO();
     dataTracerContentBO.setField(field);

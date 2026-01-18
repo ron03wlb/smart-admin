@@ -17,7 +17,6 @@ knife4j = "4.6.0"
 springdocOpenapi = "2.8.9"
 
 # JSON & Data
-fastjson = "2.0.57"
 fastexcel = "1.2.0"
 poi = "5.4.1"
 tika = "3.1.0"
@@ -105,7 +104,6 @@ mybatis-plus-jsqlparser = { module = "com.baomidou:mybatis-plus-jsqlparser" }
 knife4j-openapi3-jakarta = { module = "com.github.xingfudeshi:knife4j-openapi3-jakarta-spring-boot-starter", version.ref = "knife4j" }
 
 # JSON & Data Processing
-fastjson = { module = "com.alibaba:fastjson", version.ref = "fastjson" }
 fastexcel = { module = "cn.idev.excel:fastexcel", version.ref = "fastexcel" }
 poi = { module = "org.apache.poi:poi", version.ref = "poi" }
 poi-scratchpad = { module = "org.apache.poi:poi-scratchpad", version.ref = "poi" }

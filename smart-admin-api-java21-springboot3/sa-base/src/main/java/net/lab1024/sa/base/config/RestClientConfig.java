@@ -1,6 +1,7 @@
 package net.lab1024.sa.base.config;
 
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -27,6 +29,8 @@ import org.springframework.web.client.RestClient;
  */
 @Configuration
 public class RestClientConfig {
+
+  @Resource private ObjectMapper objectMapper;
 
   @Value("${http.pool.max-total}")
   private Integer maxTotal;
@@ -71,14 +75,16 @@ public class RestClientConfig {
 
   public List<HttpMessageConverter<?>> converters() {
     List<HttpMessageConverter<?>> converters = new ArrayList<>();
-    HttpMessageConverter<?> converter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-    FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
-    List<MediaType> fastMediaTypes = new ArrayList<>();
-    fastMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
-    fastMediaTypes.add(MediaType.APPLICATION_JSON);
-    fastConverter.setSupportedMediaTypes(fastMediaTypes);
-    converters.add(converter);
-    converters.add(fastConverter);
+    HttpMessageConverter<?> stringConverter =
+        new StringHttpMessageConverter(StandardCharsets.UTF_8);
+    MappingJackson2HttpMessageConverter jacksonConverter =
+        new MappingJackson2HttpMessageConverter(objectMapper);
+    List<MediaType> mediaTypes = new ArrayList<>();
+    mediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
+    mediaTypes.add(MediaType.APPLICATION_JSON);
+    jacksonConverter.setSupportedMediaTypes(mediaTypes);
+    converters.add(stringConverter);
+    converters.add(jacksonConverter);
     return converters;
   }
 }

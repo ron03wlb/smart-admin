@@ -1,9 +1,9 @@
 package net.lab1024.sa.base.module.support.table;
 
-import com.alibaba.fastjson.JSONArray;
 import jakarta.annotation.Resource;
 import net.lab1024.sa.base.common.domain.RequestUser;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnEntity;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnUpdateForm;
 import org.apache.commons.collections4.CollectionUtils;
@@ -52,10 +52,10 @@ public class TableColumnService {
       tableColumnEntity.setUserId(requestUser.getUserId());
       tableColumnEntity.setUserType(requestUser.getUserType().getValue());
 
-      tableColumnEntity.setColumns(JSONArray.toJSONString(updateForm.getColumnList()));
+      tableColumnEntity.setColumns(JsonUtil.toJson(updateForm.getColumnList()));
       tableColumnDao.insert(tableColumnEntity);
     } else {
-      tableColumnEntity.setColumns(JSONArray.toJSONString(updateForm.getColumnList()));
+      tableColumnEntity.setColumns(JsonUtil.toJson(updateForm.getColumnList()));
       tableColumnDao.updateById(tableColumnEntity);
     }
     return ResponseDTO.ok();

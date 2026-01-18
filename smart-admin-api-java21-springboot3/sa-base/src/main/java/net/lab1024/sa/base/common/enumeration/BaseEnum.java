@@ -1,13 +1,10 @@
 package net.lab1024.sa.base.common.enumeration;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONAware;
 import com.google.common.base.CaseFormat;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import lombok.Data;
+import net.lab1024.sa.base.common.json.JsonUtil;
 
 /**
  * 枚举类接口
@@ -51,16 +48,20 @@ public interface BaseEnum {
     BaseEnum[] enums = clazz.getEnumConstants();
     Map<String, Object> json = new LinkedHashMap<>(enums.length);
     for (BaseEnum e : enums) {
-      Map<String, Object> jsonObject = new HashMap<>();
-      jsonObject.put("value", new DeletedQuotationAware(e.getValue()));
-      jsonObject.put("desc", new DeletedQuotationAware(e.getDesc()));
+      Map<String, Object> jsonObject = new LinkedHashMap<>();
+      jsonObject.put("value", formatValue(e.getValue()));
+      jsonObject.put("desc", formatValue(e.getDesc()));
       json.put(e.toString(), jsonObject);
     }
 
-    String enumJson = JSON.toJSONString(json, true);
+    String enumJson = JsonUtil.toPrettyJson(json);
+    if (enumJson == null) {
+      enumJson = "{}";
+    }
     enumJson = enumJson.replaceAll("\"", "");
     enumJson = enumJson.replaceAll("\t", "&nbsp;&nbsp;");
     enumJson = enumJson.replaceAll("\n", "<br>");
+    enumJson = enumJson.replaceAll("  ", "&nbsp;&nbsp;");
     String prefix =
         "  <br>  export const "
             + CaseFormat.UPPER_CAMEL.to(
@@ -68,22 +69,11 @@ public interface BaseEnum {
     return prefix + enumJson + " <br>";
   }
 
-  @Data
-  class DeletedQuotationAware implements JSONAware {
-
-    private String value;
-
-    public DeletedQuotationAware(Object value) {
-      if (value instanceof String) {
-        this.value = "'" + value + "'";
-      } else {
-        this.value = value.toString();
-      }
+  /** Format value for display - wrap strings with single quotes */
+  private static String formatValue(Object value) {
+    if (value instanceof String) {
+      return "'" + value + "'";
     }
-
-    @Override
-    public String toJSONString() {
-      return value;
-    }
+    return value == null ? "" : value.toString();
   }
 }

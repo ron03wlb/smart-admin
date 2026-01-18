@@ -1,7 +1,6 @@
 package net.lab1024.sa.base.module.support.config;
 
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.code.UserErrorCode;
 import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.constant.ReloadConst;
@@ -104,7 +104,7 @@ public class ConfigService {
   /** 根据参数key查询 并转换为对象 */
   public <T> T getConfigValue2Obj(ConfigKeyEnum configKey, Class<T> clazz) {
     String configValue = this.getConfigValue(configKey);
-    return JSON.parseObject(configValue, clazz);
+    return JsonUtil.fromJson(configValue, clazz);
   }
 
   /** 添加系统配置 */

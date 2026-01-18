@@ -1,6 +1,5 @@
 package net.lab1024.sa.base.module.support.redis;
 
-import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.lab1024.sa.base.common.domain.SystemEnvironment;
 import net.lab1024.sa.base.common.enumeration.SystemEnvironmentEnum;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.constant.RedisKeyConst;
 import org.slf4j.Logger;
@@ -183,8 +183,7 @@ public class RedisService {
     if (json == null) {
       return null;
     }
-    T obj = JSON.parseObject(json.toString(), clazz);
-    return obj;
+    return JsonUtil.fromJson(json.toString(), clazz);
   }
 
   /** 普通缓存放入 */
@@ -193,7 +192,7 @@ public class RedisService {
   }
 
   public void set(Object key, Object value) {
-    String jsonString = JSON.toJSONString(value);
+    String jsonString = JsonUtil.toJson(value);
     redisValueOperations.set(key.toString(), jsonString);
   }
 
@@ -204,7 +203,7 @@ public class RedisService {
 
   /** 普通缓存放入并设置时间 */
   public void set(Object key, Object value, long second) {
-    String jsonString = JSON.toJSONString(value);
+    String jsonString = JsonUtil.toJson(value);
     if (second > 0) {
       redisValueOperations.set(key.toString(), jsonString, second, TimeUnit.SECONDS);
     } else {

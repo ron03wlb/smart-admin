@@ -6,8 +6,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.CaseFormat;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
@@ -20,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.codegenerator.domain.entity.CodeGeneratorConfigEntity;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGeneratorConfigForm;
@@ -101,7 +100,7 @@ public class CodeGeneratorTemplateService {
     File dir = new File(uuid);
 
     // 1、生产文件
-    CodeBasic basic = JSON.parseObject(codeGeneratorConfigEntity.getBasic(), CodeBasic.class);
+    CodeBasic basic = JsonUtil.fromJson(codeGeneratorConfigEntity.getBasic(), CodeBasic.class);
     String moduleName = basic.getModuleName();
 
     for (Map.Entry<String, CodeGenerateBaseVariableService> entry : map.entrySet()) {
@@ -140,7 +139,7 @@ public class CodeGeneratorTemplateService {
 
     // 2、后端的枚举文件
     List<CodeField> fields =
-        JSONArray.parseArray(codeGeneratorConfigEntity.getFields(), CodeField.class);
+        JsonUtil.fromJsonArray(codeGeneratorConfigEntity.getFields(), CodeField.class);
     if (CollectionUtils.isNotEmpty(fields)) {
       List<CodeField> enumFiledList =
           fields.stream()
@@ -204,17 +203,18 @@ public class CodeGeneratorTemplateService {
       return "代码生成Service不存在，请检查相关代码！";
     }
 
-    CodeBasic basic = JSON.parseObject(codeGeneratorConfigEntity.getBasic(), CodeBasic.class);
+    CodeBasic basic = JsonUtil.fromJson(codeGeneratorConfigEntity.getBasic(), CodeBasic.class);
     List<CodeField> fields =
-        JSONArray.parseArray(codeGeneratorConfigEntity.getFields(), CodeField.class);
+        JsonUtil.fromJsonArray(codeGeneratorConfigEntity.getFields(), CodeField.class);
     CodeInsertAndUpdate insertAndUpdate =
-        JSON.parseObject(codeGeneratorConfigEntity.getInsertAndUpdate(), CodeInsertAndUpdate.class);
+        JsonUtil.fromJson(
+            codeGeneratorConfigEntity.getInsertAndUpdate(), CodeInsertAndUpdate.class);
     CodeDelete deleteInfo =
-        JSON.parseObject(codeGeneratorConfigEntity.getDeleteInfo(), CodeDelete.class);
+        JsonUtil.fromJson(codeGeneratorConfigEntity.getDeleteInfo(), CodeDelete.class);
     List<CodeQueryField> queryFields =
-        JSONArray.parseArray(codeGeneratorConfigEntity.getQueryFields(), CodeQueryField.class);
+        JsonUtil.fromJsonArray(codeGeneratorConfigEntity.getQueryFields(), CodeQueryField.class);
     List<CodeTableField> tableFields =
-        JSONArray.parseArray(codeGeneratorConfigEntity.getTableFields(), CodeTableField.class);
+        JsonUtil.fromJsonArray(codeGeneratorConfigEntity.getTableFields(), CodeTableField.class);
     tableFields.forEach(e -> e.setWidth(e.getWidth() == null ? Integer.valueOf(0) : e.getWidth()));
 
     CodeGeneratorConfigForm form =

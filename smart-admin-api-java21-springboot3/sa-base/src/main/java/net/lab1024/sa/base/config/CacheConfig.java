@@ -1,6 +1,12 @@
 package net.lab1024.sa.base.config;
 
-import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.Resource;
 import net.lab1024.sa.base.module.support.cache.CacheService;
 import net.lab1024.sa.base.module.support.cache.CaffeineCacheServiceImpl;
@@ -13,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 /** 缓存配置 */
@@ -45,13 +52,31 @@ public class CacheConfig {
             // 禁止缓存 null 值，避免缓存穿透
             .disableCachingNullValues()
             .computePrefixWith(name -> "cache:" + name + ":")
-            // 使用 FastJSON 序列化缓存值，支持复杂对象
+            // 使用 Jackson 序列化缓存值，支持复杂对象
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
-                    new GenericFastJsonRedisSerializer()));
+                    createJacksonRedisSerializer()));
 
     // 返回自定义缓存管理器，支持 cacheName#ttl 格式与永久缓存（#-1）
     return new CustomRedisCacheManager(redisCacheWriter, defaultCacheConfig);
+  }
+
+  /** 创建 Jackson Redis 序列化器 */
+  private GenericJackson2JsonRedisSerializer createJacksonRedisSerializer() {
+    ObjectMapper om = new ObjectMapper();
+    // 注册 Java 8 时间模块
+    om.registerModule(new JavaTimeModule());
+    // 配置序列化选项
+    om.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    // 不序列化 null 值
+    om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    // 启用类型信息，以便反序列化时知道具体类型
+    om.activateDefaultTyping(
+        LaissezFaireSubTypeValidator.instance,
+        ObjectMapper.DefaultTyping.NON_FINAL,
+        JsonTypeInfo.As.PROPERTY);
+    return new GenericJackson2JsonRedisSerializer(om);
   }
 
   @Bean

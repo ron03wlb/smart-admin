@@ -1,6 +1,5 @@
 package net.lab1024.sa.base.module.support.operatelog.core;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.constant.StringConst;
 import net.lab1024.sa.base.common.domain.RequestUser;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.common.util.SmartIpUtil;
 import net.lab1024.sa.base.common.util.SmartRequestUtil;
 import net.lab1024.sa.base.module.support.operatelog.OperateLogDao;
@@ -221,7 +221,7 @@ public abstract class OperateLogAspect {
           new ResponseDTO(
               response.getCode(), response.getLevel(), response.getOk(), response.getMsg(), null);
       logResponseDTO.setDataType(response.getDataType());
-      operateLogEntity.setResponse(JSON.toJSONString(logResponseDTO));
+      operateLogEntity.setResponse(JsonUtil.toJson(logResponseDTO));
     }
 
     this.ensureThreadInit();
@@ -256,7 +256,7 @@ public abstract class OperateLogAspect {
       }
       filterArgs.add(arg);
     }
-    return JSON.toJSONString(filterArgs);
+    return JsonUtil.toJson(filterArgs);
   }
 
   private String getExceptionString(Throwable e) {

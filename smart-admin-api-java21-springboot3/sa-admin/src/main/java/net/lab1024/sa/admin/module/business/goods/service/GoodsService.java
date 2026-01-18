@@ -1,7 +1,6 @@
 package net.lab1024.sa.admin.module.business.goods.service;
 
 import cn.idev.excel.FastExcel;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.io.IOException;
@@ -28,6 +27,7 @@ import net.lab1024.sa.base.common.code.UserErrorCode;
 import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.exception.BusinessException;
+import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
@@ -206,7 +206,7 @@ public class GoodsService {
       return ResponseDTO.userErrorParam("数据为空");
     }
 
-    return ResponseDTO.okMsg("成功导入" + dataList.size() + "条，具体数据为：" + JSON.toJSONString(dataList));
+    return ResponseDTO.okMsg("成功导入" + dataList.size() + "条，具体数据为：" + JsonUtil.toJson(dataList));
   }
 
   /** 商品导出 */
