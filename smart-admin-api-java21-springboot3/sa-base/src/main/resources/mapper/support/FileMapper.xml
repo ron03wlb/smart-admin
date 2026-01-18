@@ -31,10 +31,10 @@
             </if>
             <!--创建时间-->
             <if test="queryForm.createTimeBegin != null">
-                AND DATE_FORMAT(t_file.create_time, '%Y-%m-%d') &gt;= #{queryForm.createTimeBegin}
+                AND TO_CHAR(t_file.create_time, 'YYYY-MM-DD') &gt;= #{queryForm.createTimeBegin}
             </if>
             <if test="queryForm.createTimeEnd != null">
-                AND DATE_FORMAT(t_file.create_time, '%Y-%m-%d') &lt;= #{queryForm.createTimeEnd}
+                AND TO_CHAR(t_file.create_time, 'YYYY-MM-DD') &lt;= #{queryForm.createTimeEnd}
             </if>
         </where>
         <if test="queryForm.sortItemList == null or queryForm.sortItemList.size == 0">

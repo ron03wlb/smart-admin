@@ -36,6 +36,6 @@ public class OperateLogQueryForm extends PageParam {
   @Schema(description = "用户名称")
   private String userName;
 
-  @Schema(description = "请求结果 false失败 true成功")
-  private Boolean successFlag;
+  @Schema(description = "请求结果 0失败 1成功")
+  private Integer successFlag;
 }

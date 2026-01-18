@@ -21,10 +21,10 @@
                 AND success_flag = #{query.successFlag}
             </if>
             <if test="query.startTime != null">
-                AND DATE_FORMAT(execute_start_time, '%Y-%m-%d') &gt;= #{query.startTime}
+                AND TO_CHAR(execute_start_time, 'YYYY-MM-DD') &gt;= #{query.startTime}
             </if>
             <if test="query.endTime != null">
-                AND DATE_FORMAT(execute_start_time, '%Y-%m-%d') &lt;= #{query.endTime}
+                AND TO_CHAR(execute_start_time, 'YYYY-MM-DD') &lt;= #{query.endTime}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">

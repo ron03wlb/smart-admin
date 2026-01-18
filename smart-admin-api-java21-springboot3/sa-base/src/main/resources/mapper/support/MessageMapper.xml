@@ -35,10 +35,10 @@
                 AND read_flag = #{query.readFlag}
             </if>
             <if test="query.startDate != null">
-                AND DATE_FORMAT(create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.startDate}, '%Y-%m-%d')
+                AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= TO_CHAR(#{query.startDate}, 'YYYY-MM-DD')
             </if>
             <if test="query.endDate != null">
-                AND DATE_FORMAT(create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.endDate}, '%Y-%m-%d')
+                AND TO_CHAR(create_time, 'YYYY-MM-DD') &lt;= TO_CHAR(#{query.endDate}, 'YYYY-MM-DD')
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">

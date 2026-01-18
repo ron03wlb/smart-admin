@@ -21,14 +21,14 @@
             </if>
             <!--发布日期-->
             <if test="queryForm.publicDateBegin != null">
-                AND DATE_FORMAT(t_change_log.public_date, '%Y-%m-%d') &gt;= #{queryForm.publicDateBegin}
+                AND TO_CHAR(t_change_log.public_date, 'YYYY-MM-DD') &gt;= #{queryForm.publicDateBegin}
             </if>
             <if test="queryForm.publicDateEnd != null">
-                AND DATE_FORMAT(t_change_log.public_date, '%Y-%m-%d') &lt;= #{queryForm.publicDateEnd}
+                AND TO_CHAR(t_change_log.public_date, 'YYYY-MM-DD') &lt;= #{queryForm.publicDateEnd}
             </if>
             <!--创建时间-->
             <if test="queryForm.createTime != null">
-                AND DATE_FORMAT(t_change_log.create_time, '%Y-%m-%d') = #{queryForm.createTime}
+                AND TO_CHAR(t_change_log.create_time, 'YYYY-MM-DD') = #{queryForm.createTime}
             </if>
             <!--跳转链接-->
             <if test="queryForm.link != null">

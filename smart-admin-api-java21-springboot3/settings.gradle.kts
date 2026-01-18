@@ -6,5 +6,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 // Include subprojects
 include(
     "sa-base",
-    "sa-admin"
+    "sa-admin",
+    "sa-common",
+    "sa-common:mq"
 )

@@ -9,6 +9,14 @@ val activeEnv: String by lazy {
 }
 
 configurations {
+    // Exclude Tomcat globally - using Undertow instead
+    all {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
+        // Exclude conflicting logging frameworks - using Log4j2
+        exclude(group = "ch.qos.logback", module = "logback-classic")
+        exclude(group = "ch.qos.logback", module = "logback-core")
+        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+    }
     testImplementation {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
@@ -29,13 +37,20 @@ dependencies {
 
     api(libs.spring.boot.starter.web) {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
     }
+
+    // Undertow - lightweight, high-performance embedded server
+    api(libs.spring.boot.starter.undertow)
 
     api(libs.spring.boot.starter.log4j2)
     api(libs.spring.boot.starter.validation)
     api(libs.spring.boot.starter.mail)
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.archunit.junit5)
+    testImplementation(libs.testcontainers)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
 
     // Spring Security
     api(libs.spring.security.crypto)
@@ -44,9 +59,8 @@ dependencies {
     api(libs.sa.token.spring.boot.starter)
     api(libs.sa.token.redis.jackson)
 
-    // Database
-    api(libs.mysql.connector.j)
-    api(libs.druid.spring.boot.starter)
+    // Database - PostgreSQL + HikariCP (Spring Boot default)
+    api(libs.postgresql)
     api(libs.p6spy)
 
     // MyBatis-Plus
@@ -62,8 +76,8 @@ dependencies {
     api(libs.redisson.spring.boot.starter) {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-actuator")
         exclude(group = "org.redisson", module = "redisson-spring-data-32")
-        exclude(group = "org.objenesis", module = "objenesis")
     }
+    api(libs.objenesis)
     api(libs.commons.pool2)
 
     // API Documentation

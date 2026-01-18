@@ -1,24 +1,17 @@
 spring:
-  # 数据库连接信息
+  # 数据库连接信息 - PostgreSQL + HikariCP
   datasource:
-    url: jdbc:p6spy:mysql://127.0.0.1:3306/smart_admin_v3?autoReconnect=true&useServerPreparedStmts=false&rewriteBatchedStatements=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-    username: root
+    url: jdbc:p6spy:postgresql://127.0.0.1:5432/smart_admin_v3?currentSchema=public
+    username: postgres
     password: SmartAdmin666
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    initial-size: 2
-    min-idle: 2
-    max-active: 10
-    max-wait: 60000
-    time-between-eviction-runs-millis: 60000
-    min-evictable-idle-time-millis: 300000
-    filters: stat
-    druid:
-      username: druid
-      password: 1024
-      login:
-        enabled: false
-      method:
-        pointcut: net.lab1024.sa..*Service.*
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: SmartAdminHikariCP
 
   # redis 连接池配置信息
   data:
@@ -26,7 +19,7 @@ spring:
       database: 1
       host: 127.0.0.1
       port: 6379
-      password:
+      password: SmartAdmin@2024
       timeout: 10000ms
       lettuce:
         pool:
@@ -34,6 +27,7 @@ spring:
           min-idle: 1
           max-idle: 3
           max-wait: 30000ms
+
 
   # 邮件，置以SSL的方式发送, 这个需要使用这种方式并且端口是465
   mail:
@@ -185,3 +179,36 @@ smart:
     db-refresh-enabled: true
     # 数据库配置检测-执行间隔 默认120秒 可选
     db-refresh-interval: 60
+
+  # Kafka 消息队列配置
+  kafka:
+    enabled: false                    # 开关（默认关闭）
+    bootstrap-servers: localhost:9094
+    producer:
+      acks: all
+      retries: 3
+      enable-idempotence: true
+      max-in-flight-requests-per-connection: 1
+      batch-size: 16384
+      buffer-memory: 33554432
+      linger-ms: 5
+    consumer:
+      group-id: smart-admin-pre
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      max-poll-records: 500
+      max-poll-interval-ms: 300000
+      session-timeout-ms: 45000
+      heartbeat-interval-ms: 3000
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+      concurrency: 3
+    # 死信队列配置
+    dead-letter-queue:
+      enabled: true                   # DLQ 开关
+      topic-suffix: ".dlq"            # DLQ topic 后缀
+      retry:
+        max-attempts: 3               # 最大重试次数
+        initial-interval: 1000        # 初始重试间隔 (1秒)
+        max-interval: 10000           # 最大重试间隔 (10秒)
+        multiplier: 2.0               # 指数退避乘数

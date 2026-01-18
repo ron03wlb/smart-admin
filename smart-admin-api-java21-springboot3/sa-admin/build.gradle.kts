@@ -22,6 +22,9 @@ dependencies {
     // Dependency on sa-base module
     implementation(project(":sa-base"))
 
+    // Dependency on sa-common:mq module
+    implementation(project(":sa-common:mq"))
+
     // Lombok annotation processor
     annotationProcessor(libs.lombok)
 

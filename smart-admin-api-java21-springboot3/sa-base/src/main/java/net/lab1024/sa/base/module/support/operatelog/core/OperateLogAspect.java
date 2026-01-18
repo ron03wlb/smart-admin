@@ -182,9 +182,9 @@ public abstract class OperateLogAspect {
     String methodName = joinPoint.getSignature().getName();
     String operateMethod = className + "." + methodName;
     String failReason = null;
-    boolean successFlag = true;
+    Integer successFlag = 1;
     if (e != null) {
-      successFlag = false;
+      successFlag = 0;
       failReason = getExceptionString(e);
     }
 

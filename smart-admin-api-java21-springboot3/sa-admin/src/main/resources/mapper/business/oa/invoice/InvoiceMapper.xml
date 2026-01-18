@@ -29,10 +29,10 @@
                 INSTR(t_oa_invoice.create_user_name,#{queryForm.keywords}))
             </if>
             <if test="queryForm.startTime != null">
-                AND DATE_FORMAT(t_oa_invoice.create_time, '%Y-%m-%d') &gt;= #{queryForm.startTime}
+                AND TO_CHAR(t_oa_invoice.create_time, 'YYYY-MM-DD') &gt;= #{queryForm.startTime}
             </if>
             <if test="queryForm.endTime != null">
-                AND DATE_FORMAT(t_oa_invoice.create_time, '%Y-%m-%d') &lt;= #{queryForm.endTime}
+                AND TO_CHAR(t_oa_invoice.create_time, 'YYYY-MM-DD') &lt;= #{queryForm.endTime}
             </if>
             <if test="queryForm.disabledFlag != null">
                 AND t_oa_invoice.disabled_flag = #{queryForm.disabledFlag}

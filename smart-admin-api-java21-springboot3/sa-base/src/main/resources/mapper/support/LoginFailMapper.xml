@@ -18,10 +18,10 @@
             </if>
             <!--登录失败锁定时间-->
             <if test="queryForm.loginLockBeginTimeBegin != null">
-                AND DATE_FORMAT(t_login_fail.login_lock_begin_time, '%Y-%m-%d') &gt;= #{queryForm.loginLockBeginTimeBegin}
+                AND TO_CHAR(t_login_fail.login_lock_begin_time, 'YYYY-MM-DD') &gt;= #{queryForm.loginLockBeginTimeBegin}
             </if>
             <if test="queryForm.loginLockBeginTimeEnd != null">
-                AND DATE_FORMAT(t_login_fail.login_lock_begin_time, '%Y-%m-%d') &lt;= #{queryForm.loginLockBeginTimeEnd}
+                AND TO_CHAR(t_login_fail.login_lock_begin_time, 'YYYY-MM-DD') &lt;= #{queryForm.loginLockBeginTimeEnd}
             </if>
         </where>
         order by t_login_fail.update_time desc

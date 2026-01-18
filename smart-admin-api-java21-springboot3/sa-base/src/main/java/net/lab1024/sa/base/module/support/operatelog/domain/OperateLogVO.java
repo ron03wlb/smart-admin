@@ -56,7 +56,7 @@ public class OperateLogVO {
   private String userAgent;
 
   @Schema(description = "请求结果 0失败 1成功")
-  private Boolean successFlag;
+  private Integer successFlag;
 
   @Schema(description = "失败原因")
   private String failReason;

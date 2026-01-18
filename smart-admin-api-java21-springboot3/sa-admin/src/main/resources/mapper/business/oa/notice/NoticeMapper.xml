@@ -83,19 +83,16 @@
                 AND t_notice.deleted_flag = #{query.deletedFlag}
             </if>
             <if test="query.createTimeBegin != null">
-                AND DATE_FORMAT(t_notice.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.createTimeBegin},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.create_time, 'YYYY-MM-DD') &gt;= #{query.createTimeBegin}
             </if>
             <if test="query.createTimeEnd != null">
-                AND DATE_FORMAT(t_notice.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.createTimeEnd}, '%Y-%m-%d')
+                AND TO_CHAR(t_notice.create_time, 'YYYY-MM-DD') &lt;= TO_CHAR(#{query.createTimeEnd}, 'YYYY-MM-DD')
             </if>
             <if test="query.publishTimeBegin != null">
-                AND DATE_FORMAT(t_notice.publish_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.publishTimeBegin},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.publish_time, 'YYYY-MM-DD') &gt;= #{query.publishTimeBegin}
             </if>
             <if test="query.publishTimeEnd != null">
-                AND DATE_FORMAT(t_notice.publish_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.publishTimeEnd},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.publish_time, 'YYYY-MM-DD') &lt;= #{query.publishTimeEnd}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">
@@ -148,12 +145,10 @@
                 )
             </if>
             <if test="query.publishTimeBegin != null">
-                AND DATE_FORMAT(t_notice.publish_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.publishTimeBegin},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.publish_time, 'YYYY-MM-DD') &gt;= #{query.publishTimeBegin}
             </if>
             <if test="query.publishTimeEnd != null">
-                AND DATE_FORMAT(t_notice.publish_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.publishTimeEnd},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.publish_time, 'YYYY-MM-DD') &lt;= #{query.publishTimeEnd}
             </if>
             <if test="query.notViewFlag">
                 AND viewFlag = 0
@@ -205,12 +200,10 @@
                 )
             </if>
             <if test="query.publishTimeBegin != null">
-                AND DATE_FORMAT(t_notice.publish_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.publishTimeBegin},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.publish_time, 'YYYY-MM-DD') &gt;= #{query.publishTimeBegin}
             </if>
             <if test="query.publishTimeEnd != null">
-                AND DATE_FORMAT(t_notice.publish_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.publishTimeEnd},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_notice.publish_time, 'YYYY-MM-DD') &lt;= #{query.publishTimeEnd}
             </if>
         </where>
         ) t where viewFlag = 0

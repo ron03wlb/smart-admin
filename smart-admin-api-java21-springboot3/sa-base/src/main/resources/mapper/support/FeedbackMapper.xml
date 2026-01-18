@@ -13,10 +13,10 @@
                 )
             </if>
             <if test="query.startDate != null">
-                AND DATE_FORMAT(create_time, '%Y-%m-%d') &gt;= #{query.startDate}
+                AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= #{query.startDate}
             </if>
             <if test="query.endDate != null">
-                AND DATE_FORMAT(create_time, '%Y-%m-%d') &lt;= #{query.endDate}
+                AND TO_CHAR(create_time, 'YYYY-MM-DD') &lt;= #{query.endDate}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">

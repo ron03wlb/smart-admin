@@ -27,12 +27,10 @@
                 )
             </if>
             <if test="query.createTimeBegin != null">
-                AND DATE_FORMAT(t_help_doc.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{query.createTimeBegin},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_help_doc.create_time, 'YYYY-MM-DD') &gt;= #{query.createTimeBegin}
             </if>
             <if test="query.createTimeEnd != null">
-                AND DATE_FORMAT(t_help_doc.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{query.createTimeEnd},
-                '%Y-%m-%d')
+                AND TO_CHAR(t_help_doc.create_time, 'YYYY-MM-DD') &lt;= #{query.createTimeEnd}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">

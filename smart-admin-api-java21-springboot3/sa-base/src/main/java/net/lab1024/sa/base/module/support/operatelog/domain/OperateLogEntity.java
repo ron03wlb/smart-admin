@@ -63,7 +63,7 @@ public class OperateLogEntity {
   private String userAgent;
 
   /** 请求结果 0失败 1成功 */
-  private Boolean successFlag;
+  private Integer successFlag;
 
   /** 失败原因 */
   private String failReason;

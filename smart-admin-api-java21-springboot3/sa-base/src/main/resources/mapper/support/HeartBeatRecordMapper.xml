@@ -22,10 +22,10 @@
         t_heart_beat_record
         <where>
             <if test="query.startDate != null ">
-                AND DATE_FORMAT(heart_beat_time, '%Y-%m-%d') &gt;= #{query.startDate}
+                AND TO_CHAR(heart_beat_time, 'YYYY-MM-DD') &gt;= #{query.startDate}
             </if>
             <if test="query.endDate != null ">
-                AND DATE_FORMAT(heart_beat_time, '%Y-%m-%d') &lt;= #{query.endDate}
+                AND TO_CHAR(heart_beat_time, 'YYYY-MM-DD') &lt;= #{query.endDate}
             </if>
             <if test="query.keywords != null and query.keywords != ''">
                 AND (INSTR(project_path,#{query.keywords}) or INSTR(server_ip,#{query.keywords}) or INSTR(process_no,#{query.keywords}))

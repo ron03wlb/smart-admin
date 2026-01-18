@@ -25,7 +25,7 @@ public class SmartJobLogQueryForm extends PageParam {
   private Integer jobId;
 
   @Schema(description = "是否成功|可选")
-  private Boolean successFlag;
+  private Integer successFlag;
 
   @Schema(description = "开始时间|可选", example = "2024-06-06")
   private LocalDate startTime;

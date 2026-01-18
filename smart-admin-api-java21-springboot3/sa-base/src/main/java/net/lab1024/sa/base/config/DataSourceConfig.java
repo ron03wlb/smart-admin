@@ -1,134 +1,46 @@
 package net.lab1024.sa.base.config;
 
-import com.alibaba.druid.filter.Filter;
-import com.alibaba.druid.filter.stat.StatFilter;
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.support.jakarta.StatViewServlet;
-import com.alibaba.druid.support.jakarta.WebStatFilter;
-import com.alibaba.druid.support.spring.stat.DruidStatInterceptor;
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.domain.DataScopePlugin;
 import net.lab1024.sa.base.handler.MybatisPlusFillHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
-import org.springframework.aop.support.JdkRegexpMethodPointcut;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
- * 数据源配置
+ * 数据源配置 - PostgreSQL + HikariCP
+ *
+ * <p>使用 Spring Boot 自动配置的 HikariCP 数据源，无需手动配置 Druid。 数据源通过 application.yaml 中的
+ * spring.datasource.hikari 配置。
  *
  * @author 1024创新实验室-主任: 卓大
  * @since 2017-11-28 15:21:10 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class DataSourceConfig {
 
-  @Value("${spring.datasource.driver-class-name}")
-  String driver;
+  private final DataSource dataSource;
 
-  @Value("${spring.datasource.url}")
-  String url;
+  private final MybatisPlusInterceptor paginationInterceptor;
 
-  @Value("${spring.datasource.username}")
-  String username;
-
-  @Value("${spring.datasource.password}")
-  String password;
-
-  @Value("${spring.datasource.initial-size}")
-  int initialSize;
-
-  @Value("${spring.datasource.min-idle}")
-  int minIdle;
-
-  @Value("${spring.datasource.max-active}")
-  int maxActive;
-
-  @Value("${spring.datasource.max-wait}")
-  long maxWait;
-
-  @Value("${spring.datasource.time-between-eviction-runs-millis}")
-  long timeBetweenEvictionRunsMillis;
-
-  @Value("${spring.datasource.min-evictable-idle-time-millis}")
-  long minEvictableIdleTimeMillis;
-
-  @Value("${spring.datasource.filters}")
-  String filters;
-
-  @Value("${spring.datasource.druid.username}")
-  String druidUserName;
-
-  @Value("${spring.datasource.druid.password}")
-  String druidPassword;
-
-  @Value("${spring.datasource.druid.login.enabled}")
-  boolean druidLoginEnable;
-
-  @Value("${spring.datasource.druid.method.pointcut}")
-  String methodPointcut;
-
-  @jakarta.annotation.Resource private MybatisPlusInterceptor paginationInterceptor;
-
-  @jakarta.annotation.Resource private DataScopePlugin dataScopePlugin;
-
-  @Bean
-  @Primary
-  public DataSource druidDataSource() {
-    DruidDataSource druidDataSource = new DruidDataSource();
-    druidDataSource.setDbType(DbType.MYSQL.getDb());
-    druidDataSource.setDriverClassName(driver);
-    druidDataSource.setUrl(url);
-    druidDataSource.setUsername(username);
-    druidDataSource.setPassword(password);
-    druidDataSource.setInitialSize(initialSize);
-    druidDataSource.setMinIdle(minIdle);
-    druidDataSource.setMaxActive(maxActive);
-    druidDataSource.setMaxWait(maxWait);
-    druidDataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-    druidDataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-    druidDataSource.setValidationQuery("SELECT 1");
-    try {
-      druidDataSource.setFilters(filters);
-      List<Filter> arrayList = new ArrayList<>();
-      StatFilter statFilter = new StatFilter();
-      statFilter.setMergeSql(true);
-      statFilter.setSlowSqlMillis(1000);
-      statFilter.setLogSlowSql(true);
-      arrayList.add(statFilter);
-      druidDataSource.setProxyFilters(arrayList);
-      druidDataSource.init();
-    } catch (SQLException e) {
-      log.error("初始化数据源出错", e);
-    }
-
-    return druidDataSource;
-  }
+  private final DataScopePlugin dataScopePlugin;
 
   @Bean
   public SqlSessionFactory sqlSessionFactory() throws Exception {
     MybatisSqlSessionFactoryBean factoryBean = new MybatisSqlSessionFactoryBean();
-    factoryBean.setDataSource(druidDataSource());
+    factoryBean.setDataSource(dataSource);
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     Resource[] resources = resolver.getResources("classpath*:/mapper/**/*.xml");
     factoryBean.setMapperLocations(resources);
@@ -145,53 +57,5 @@ public class DataSourceConfig {
         new GlobalConfig().setBanner(false).setMetaObjectHandler(new MybatisPlusFillHandler()));
 
     return factoryBean.getObject();
-  }
-
-  /**
-   * 非正式环境 才加载
-   *
-   * @return
-   */
-  @Conditional(SystemEnvironmentConfig.class)
-  @Bean
-  public ServletRegistrationBean<StatViewServlet> druidServlet() {
-    ServletRegistrationBean<StatViewServlet> servletRegistrationBean =
-        new ServletRegistrationBean<>();
-    servletRegistrationBean.setServlet(new StatViewServlet());
-    servletRegistrationBean.addUrlMappings("/druid/*");
-    Map<String, String> initParameters = new HashMap<String, String>();
-    // 不设置用户名密码可以直接通过druid/index.html访问
-    if (druidLoginEnable) {
-      initParameters.put("loginUsername", druidUserName);
-      initParameters.put("loginPassword", druidPassword);
-    }
-    initParameters.put("resetEnable", "false");
-    servletRegistrationBean.setInitParameters(initParameters);
-    return servletRegistrationBean;
-  }
-
-  @Bean
-  public FilterRegistrationBean<WebStatFilter> filterRegistrationBean() {
-    FilterRegistrationBean<WebStatFilter> filterRegistrationBean =
-        new FilterRegistrationBean<WebStatFilter>();
-    filterRegistrationBean.setFilter(new WebStatFilter());
-    filterRegistrationBean.addUrlPatterns("/*");
-    filterRegistrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/*");
-    return filterRegistrationBean;
-  }
-
-  @Bean
-  public JdkRegexpMethodPointcut jdkRegexpMethodPointcut() {
-    JdkRegexpMethodPointcut jdkRegexpMethodPointcut = new JdkRegexpMethodPointcut();
-    jdkRegexpMethodPointcut.setPatterns(methodPointcut);
-    return jdkRegexpMethodPointcut;
-  }
-
-  @Bean
-  public DefaultPointcutAdvisor defaultPointcutAdvisor() {
-    DefaultPointcutAdvisor pointcutAdvisor = new DefaultPointcutAdvisor();
-    pointcutAdvisor.setPointcut(jdkRegexpMethodPointcut());
-    pointcutAdvisor.setAdvice(new DruidStatInterceptor());
-    return pointcutAdvisor;
   }
 }

@@ -29,7 +29,7 @@ public class SmartJobLogEntity {
   private String param;
 
   /** 执行结果 是否成功 */
-  private Boolean successFlag;
+  private Integer successFlag;
 
   /** 开始执行时间 */
   private LocalDateTime executeStartTime;

@@ -26,7 +26,7 @@ public class SmartJobLogVO {
   private String param;
 
   @Schema(description = "执行结果是否成功")
-  private Boolean successFlag;
+  private Integer successFlag;
 
   @Schema(description = "开始执行时间")
   private LocalDateTime executeStartTime;

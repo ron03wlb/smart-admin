@@ -17,10 +17,10 @@
                 AND INSTR(login_ip,#{query.ip})
             </if>
             <if test="query.startDate != null and query.startDate != ''">
-                AND DATE_FORMAT(create_time, '%Y-%m-%d') &gt;= #{query.startDate}
+                AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= #{query.startDate}
             </if>
             <if test="query.endDate != null and query.endDate != ''">
-                AND DATE_FORMAT(create_time, '%Y-%m-%d') &lt;= #{query.endDate}
+                AND TO_CHAR(create_time, 'YYYY-MM-DD') &lt;= #{query.endDate}
             </if>
             <if test="query.userName != null and query.userName != ''">
                 AND INSTR(user_name,#{query.userName})

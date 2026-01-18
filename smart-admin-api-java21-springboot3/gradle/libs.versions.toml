@@ -6,9 +6,11 @@ springSecurity = "6.5.1"
 mybatisPlus = "3.5.12"
 
 # Database
-mysqlConnector = "9.3.0"
-druid = "1.2.25"
+postgresql = "42.7.5"
 p6spy = "3.9.1"
+
+# Testing
+testcontainers = "1.20.4"
 
 # API Documentation
 knife4j = "4.6.0"
@@ -22,6 +24,7 @@ tika = "3.1.0"
 
 # Cache & Redis
 redisson = "3.50.0"
+objenesis = "3.4"
 
 # Utilities
 guava = "20.0"
@@ -77,14 +80,22 @@ spring-boot-starter-log4j2 = { module = "org.springframework.boot:spring-boot-st
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring-boot-starter-undertow = { module = "org.springframework.boot:spring-boot-starter-undertow" }
+spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure" }
+spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
 
 # Spring Security
 spring-security-crypto = { module = "org.springframework.security:spring-security-crypto", version.ref = "springSecurity" }
 
 # Database
-mysql-connector-j = { module = "com.mysql:mysql-connector-j", version.ref = "mysqlConnector" }
-druid-spring-boot-starter = { module = "com.alibaba:druid-spring-boot-3-starter", version.ref = "druid" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 p6spy = { module = "p6spy:p6spy", version.ref = "p6spy" }
+
+# Testing - Testcontainers
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+testcontainers = { module = "org.testcontainers:testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
 
 # MyBatis-Plus
 mybatis-plus-spring-boot-starter = { module = "com.baomidou:mybatis-plus-spring-boot3-starter" }
@@ -104,6 +115,7 @@ tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
 # Cache & Redis
 redisson-spring-boot-starter = { module = "org.redisson:redisson-spring-boot-starter", version.ref = "redisson" }
 redisson-spring-data-27 = { module = "org.redisson:redisson-spring-data-27", version.ref = "redisson" }
+objenesis = { module = "org.objenesis:objenesis", version.ref = "objenesis" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 
 # Utilities

@@ -107,14 +107,14 @@ public class SmartJobExecutor implements Runnable {
     stopWatch.start();
 
     // 执行任务
-    boolean successFlag = true;
+    Integer successFlag = 1;
     String executeResult;
     try {
       executeResult = jobInterface.run(jobEntity.getParam());
       stopWatch.stop();
     } catch (Exception t) {
       stopWatch.stop();
-      successFlag = false;
+      successFlag = 0;
       // ps:异常信息不大于数据库字段长度限制
       executeResult = ExceptionUtil.stacktraceToString(t, 1800);
       if (log.isErrorEnabled()) {
@@ -150,7 +150,7 @@ public class SmartJobExecutor implements Runnable {
     logEntity.setJobId(jobId);
     logEntity.setJobName(jobEntity.getJobName());
     logEntity.setParam(jobEntity.getParam());
-    logEntity.setSuccessFlag(true);
+    logEntity.setSuccessFlag(1);
     // 执行开始时间
     logEntity.setExecuteStartTime(executeTime);
     logEntity.setExecuteEndTime(executeTime);

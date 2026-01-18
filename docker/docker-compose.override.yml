@@ -1,0 +1,26 @@
+# Smart Admin 21 - 開發環境覆蓋配置
+# 此文件會自動被 docker compose 加載
+# 用於開發環境的額外配置
+
+services:
+  # PostgreSQL 開發配置
+  postgres:
+    environment:
+      # 開發環境可以使用較寬鬆的配置
+      POSTGRES_HOST_AUTH_METHOD: md5
+    # 開發環境打開日誌
+    command: >
+      postgres -c log_statement=all -c log_connections=on -c log_disconnections=on
+
+  # Redis 開發配置
+  redis:
+    # 開發環境不需要持久化
+    command: redis-server --appendonly no --save ""
+
+  # Kafka 開發配置（KRaft 模式）
+  kafka:
+    environment:
+      # 開發環境減少資源占用
+      KAFKA_HEAP_OPTS: "-Xmx256M -Xms256M"
+      # 更短的日誌保留時間
+      KAFKA_LOG_RETENTION_HOURS: 1
