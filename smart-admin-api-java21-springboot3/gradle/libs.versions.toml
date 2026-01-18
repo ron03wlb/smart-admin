@@ -24,6 +24,8 @@ tika = "3.1.0"
 # Cache & Redis
 redisson = "3.50.0"
 objenesis = "3.4"
+jetcache = "2.7.7"
+lock4j = "2.2.7"
 
 # Utilities
 guava = "20.0"
@@ -115,6 +117,14 @@ redisson-spring-boot-starter = { module = "org.redisson:redisson-spring-boot-sta
 redisson-spring-data-27 = { module = "org.redisson:redisson-spring-data-27", version.ref = "redisson" }
 objenesis = { module = "org.objenesis:objenesis", version.ref = "objenesis" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
+
+# JetCache
+jetcache-starter-redis = { module = "com.alicp.jetcache:jetcache-starter-redis", version.ref = "jetcache" }
+jetcache-starter-redis-lettuce = { module = "com.alicp.jetcache:jetcache-starter-redis-lettuce", version.ref = "jetcache" }
+
+# Lock4j
+lock4j-redis-template-spring-boot-starter = { module = "com.baomidou:lock4j-redis-template-spring-boot-starter", version.ref = "lock4j" }
+lock4j-redisson-spring-boot-starter = { module = "com.baomidou:lock4j-redisson-spring-boot-starter", version.ref = "lock4j" }
 
 # Utilities
 guava = { module = "com.google.guava:guava", version.ref = "guava" }

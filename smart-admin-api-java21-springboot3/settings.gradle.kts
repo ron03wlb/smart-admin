@@ -8,5 +8,7 @@ include(
     "sa-base",
     "sa-admin",
     "sa-common",
-    "sa-common:mq"
+    "sa-common:mq",
+    "sa-common:cache",
+    "sa-common:d-lock"
 )
