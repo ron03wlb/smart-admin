@@ -34,4 +34,13 @@ To get the full system up and running, please follow these steps:
 
 ---
 
-> **Note:** Older versions or other directories in this repository (like `smart-admin-api-java8-springboot2`) are legacy or reference implementations and are not the focus of this workspace.
+## 🛠️ Git Sparse Checkout Configuration
+
+To focus only on the relevant directories for this workspace (Java 21 + Vue 3), use the following commands to configure git sparse checkout:
+
+```bash
+git sparse-checkout init --cone
+git sparse-checkout set .agent .github docker smart-admin-api-java21-springboot3 smart-admin-web smart-app 数据库SQL脚本
+```
+
+> **Note:** Older versions or other directories in this repository (like `smart-admin-api-java8-springboot2`) are legacy or reference implementations and are hidden by this configuration.
