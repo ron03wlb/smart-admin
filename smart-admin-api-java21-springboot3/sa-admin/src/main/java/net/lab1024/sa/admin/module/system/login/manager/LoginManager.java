@@ -1,14 +1,18 @@
 package net.lab1024.sa.admin.module.system.login.manager;
 
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CacheUpdate;
+import com.alicp.jetcache.anno.Cached;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.constant.AdminCacheConst;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
@@ -25,12 +29,10 @@ import net.lab1024.sa.base.common.domain.UserPermission;
 import net.lab1024.sa.base.common.enumeration.UserTypeEnum;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.module.support.file.service.IFileStorageService;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,7 +56,13 @@ public class LoginManager {
   @Resource private RoleMenuDao roleMenuDao;
 
   /** 获取请求用户信息 */
-  @Cacheable(AdminCacheConst.Login.REQUEST_EMPLOYEE)
+  @Cached(
+      name = CacheKeyConst.Login.REQUEST_EMPLOYEE,
+      key = "#requestEmployeeId",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public RequestEmployee getRequestEmployee(Long requestEmployeeId) {
     if (requestEmployeeId == null) {
       return null;
@@ -69,7 +77,10 @@ public class LoginManager {
   }
 
   /** 获取登录的用户信息 */
-  @CachePut(value = AdminCacheConst.Login.REQUEST_EMPLOYEE, key = "#employeeEntity.employeeId")
+  @CacheUpdate(
+      name = CacheKeyConst.Login.REQUEST_EMPLOYEE,
+      key = "#employeeEntity.employeeId",
+      value = "#result")
   public RequestEmployee loadLoginInfo(EmployeeEntity employeeEntity) {
     // 基础信息
     RequestEmployee requestEmployee = SmartBeanUtil.copy(employeeEntity, RequestEmployee.class);
@@ -92,7 +103,13 @@ public class LoginManager {
   }
 
   /** 获取用户的权限（包含 角色列表、权限列表） */
-  @Cacheable(AdminCacheConst.Login.USER_PERMISSION)
+  @Cached(
+      name = CacheKeyConst.Login.USER_PERMISSION,
+      key = "#employeeId",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public UserPermission getUserPermission(Long employeeId) {
     if (null == employeeId) {
       return null;
@@ -102,7 +119,7 @@ public class LoginManager {
   }
 
   /** 获取用户的权限（包含 角色列表、权限列表） */
-  @CachePut(AdminCacheConst.Login.USER_PERMISSION)
+  @CacheUpdate(name = CacheKeyConst.Login.USER_PERMISSION, key = "#employeeId", value = "#result")
   public UserPermission loadUserPermission(Long employeeId) {
     UserPermission userPermission = new UserPermission();
     userPermission.setPermissionList(new ArrayList<>());
@@ -153,10 +170,10 @@ public class LoginManager {
   }
 
   /** 清除用户权限 */
-  @CacheEvict(value = AdminCacheConst.Login.USER_PERMISSION)
+  @CacheInvalidate(name = CacheKeyConst.Login.USER_PERMISSION, key = "#employeeId")
   public void clearUserPermission(Long employeeId) {}
 
   /** 清除用户登录信息 */
-  @CacheEvict(value = AdminCacheConst.Login.REQUEST_EMPLOYEE)
+  @CacheInvalidate(name = CacheKeyConst.Login.REQUEST_EMPLOYEE, key = "#employeeId")
   public void clearUserLoginInfo(Long employeeId) {}
 }

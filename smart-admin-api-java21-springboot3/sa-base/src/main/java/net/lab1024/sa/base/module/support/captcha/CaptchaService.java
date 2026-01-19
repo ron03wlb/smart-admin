@@ -15,7 +15,7 @@ import net.lab1024.sa.base.common.domain.SystemEnvironment;
 import net.lab1024.sa.base.constant.RedisKeyConst;
 import net.lab1024.sa.base.module.support.captcha.domain.CaptchaForm;
 import net.lab1024.sa.base.module.support.captcha.domain.CaptchaVO;
-import net.lab1024.sa.base.module.support.redis.RedisService;
+import net.lab1024.sa.base.module.support.redis.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class CaptchaService {
 
   @Resource private SystemEnvironment systemEnvironment;
 
-  @Resource private RedisService redisService;
+  @Resource private RedisUtil redisService;
 
   /** 生成图形验证码 默认 1 分钟有效期 */
   public CaptchaVO generateCaptcha() {

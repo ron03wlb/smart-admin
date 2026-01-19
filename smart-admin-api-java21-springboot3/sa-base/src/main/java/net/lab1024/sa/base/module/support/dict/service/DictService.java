@@ -1,16 +1,17 @@
 package net.lab1024.sa.base.module.support.dict.service;
 
+import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
-import net.lab1024.sa.base.constant.CacheKeyConst;
 import net.lab1024.sa.base.module.support.dict.dao.DictDao;
 import net.lab1024.sa.base.module.support.dict.dao.DictDataDao;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictDataEntity;
@@ -23,10 +24,9 @@ import net.lab1024.sa.base.module.support.dict.domain.form.DictUpdateForm;
 import net.lab1024.sa.base.module.support.dict.domain.vo.DictDataVO;
 import net.lab1024.sa.base.module.support.dict.domain.vo.DictVO;
 import net.lab1024.sa.base.module.support.dict.manager.DictManager;
+import net.lab1024.sa.common.cache.CacheService;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,7 +42,7 @@ public class DictService {
 
   @Resource private DictDataDao dictDataDao;
 
-  @Resource private CacheManager cacheManager;
+  @Resource private CacheService cacheService;
 
   @Resource private DictManager dictManager;
 
@@ -92,7 +92,7 @@ public class DictService {
   }
 
   /** 更新 */
-  @CacheEvict(CacheKeyConst.Dict.DICT_DATA)
+  @CacheInvalidate(name = CacheKeyConst.Dict.DICT_DATA, key = "'all'")
   public synchronized ResponseDTO<String> update(DictUpdateForm updateForm) {
     DictEntity existDictCode = dictDao.selectByCode(updateForm.getDictCode());
     if (null != existDictCode && !existDictCode.getDictId().equals(updateForm.getDictId())) {
@@ -105,7 +105,7 @@ public class DictService {
   }
 
   /** 批量删除 */
-  @CacheEvict(CacheKeyConst.Dict.DICT_DATA)
+  @CacheInvalidate(name = CacheKeyConst.Dict.DICT_DATA, key = "'all'")
   public synchronized ResponseDTO<String> batchDelete(List<Long> idList) {
     if (CollectionUtils.isEmpty(idList)) {
       return ResponseDTO.ok();
@@ -116,7 +116,7 @@ public class DictService {
   }
 
   /** 单个删除 */
-  @CacheEvict(CacheKeyConst.Dict.DICT_DATA)
+  @CacheInvalidate(name = CacheKeyConst.Dict.DICT_DATA, key = "'all'")
   public synchronized ResponseDTO<String> delete(Long dictId) {
     if (null == dictId) {
       return ResponseDTO.ok();
@@ -166,8 +166,8 @@ public class DictService {
   }
 
   /** 更新 */
-  @CacheEvict(
-      value = CacheKeyConst.Dict.DICT_DATA,
+  @CacheInvalidate(
+      name = CacheKeyConst.Dict.DICT_DATA,
       key = "#updateForm.dictCode + '_' + #updateForm.dataValue")
   public synchronized ResponseDTO<String> updateDictData(DictDataUpdateForm updateForm) {
 
@@ -216,14 +216,15 @@ public class DictService {
   /** 清空字典数据缓存 */
   private void clearDictDataCache(List<Long> idList) {
     List<DictDataVO> dictDataList = dictDataDao.selectByDictDataIds(idList);
-    Cache cache = cacheManager.getCache(CacheKeyConst.Dict.DICT_DATA);
-    if (cache == null) {
+    if (CollectionUtils.isEmpty(dictDataList)) {
       return;
     }
 
-    for (DictDataVO dictDataVO : dictDataList) {
-      cache.evict(dictDataVO.getDictCode() + "_" + dictDataVO.getDataValue());
-    }
+    Set<String> keys =
+        dictDataList.stream()
+            .map(vo -> vo.getDictCode() + "_" + vo.getDataValue())
+            .collect(Collectors.toSet());
+    cacheService.removeAll(CacheKeyConst.Dict.DICT_DATA, keys);
   }
 
   /** 更新启用/禁用 */

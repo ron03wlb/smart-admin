@@ -1,20 +1,22 @@
 package net.lab1024.sa.admin.module.business.category.manager;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.constant.AdminCacheConst;
 import net.lab1024.sa.admin.module.business.category.dao.CategoryDao;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
 import net.lab1024.sa.admin.module.business.category.domain.vo.CategoryTreeVO;
 import net.lab1024.sa.base.common.constant.StringConst;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
+import net.lab1024.sa.common.cache.CacheService;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,32 +31,48 @@ public class CategoryCacheManager {
 
   @Resource private CategoryDao categoryDao;
 
+  @Resource private CacheService cacheService;
+
   /** 根据类目id 移除缓存 */
-  @CacheEvict(
-      value = {
-        AdminCacheConst.Category.CATEGORY_ENTITY,
-        AdminCacheConst.Category.CATEGORY_SUB,
-        AdminCacheConst.Category.CATEGORY_TREE
-      },
-      allEntries = true)
   public void removeCache() {
+    cacheService.clear(CacheKeyConst.Category.CATEGORY_ENTITY);
+    cacheService.clear(CacheKeyConst.Category.CATEGORY_SUB);
+    cacheService.clear(CacheKeyConst.Category.CATEGORY_TREE);
     log.info("clear CATEGORY , CATEGORY_SUB , CATEGORY_TREE");
   }
 
   /** 查詢类目 */
-  @Cacheable(AdminCacheConst.Category.CATEGORY_ENTITY)
+  @Cached(
+      name = CacheKeyConst.Category.CATEGORY_ENTITY,
+      key = "#categoryId",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public CategoryEntity queryCategory(Long categoryId) {
     return categoryDao.selectById(categoryId);
   }
 
   /** 查询类目 子级 */
-  @Cacheable(AdminCacheConst.Category.CATEGORY_SUB)
+  @Cached(
+      name = CacheKeyConst.Category.CATEGORY_SUB,
+      key = "#categoryId",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public List<CategoryEntity> querySubCategory(Long categoryId) {
     return categoryDao.queryByParentId(Lists.newArrayList(categoryId), false);
   }
 
   /** 查询类目 层级树 优先查询缓存 */
-  @Cacheable(AdminCacheConst.Category.CATEGORY_TREE)
+  @Cached(
+      name = CacheKeyConst.Category.CATEGORY_TREE,
+      key = "#parentId + '_' + #categoryType",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public List<CategoryTreeVO> queryCategoryTree(Long parentId, Integer categoryType) {
     List<CategoryEntity> allCategoryEntityList = categoryDao.queryByType(categoryType, false);
 

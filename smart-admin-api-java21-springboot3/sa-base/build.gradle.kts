@@ -83,6 +83,9 @@ dependencies {
     // Distributed Lock - Lock4j
     api(project(":sa-common:d-lock"))
 
+    // Cache - JetCache
+    api(project(":sa-common:cache"))
+
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)
 

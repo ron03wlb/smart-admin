@@ -15,9 +15,7 @@ import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.constant.RedisKeyConst;
 import org.slf4j.Logger;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -30,9 +28,9 @@ import org.springframework.util.CollectionUtils;
  * @since 2020/8/25 21:57 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
-public class RedisService {
+public class RedisUtil {
 
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(RedisService.class);
+  private static final Logger log = org.slf4j.LoggerFactory.getLogger(RedisUtil.class);
 
   private static final int MIN_INDEX_FOR_SUBSTRING = 1;
 
@@ -45,10 +43,6 @@ public class RedisService {
   @Resource private ValueOperations<String, String> redisValueOperations;
 
   @Resource private HashOperations<String, String, Object> redisHashOperations;
-
-  @Resource private ListOperations<String, Object> redisListOperations;
-
-  @Resource private SetOperations<String, Object> redisSetOperations;
 
   @Resource private SystemEnvironment systemEnvironment;
 

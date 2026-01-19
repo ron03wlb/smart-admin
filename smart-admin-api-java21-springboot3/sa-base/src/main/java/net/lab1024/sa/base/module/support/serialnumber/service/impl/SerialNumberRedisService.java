@@ -13,7 +13,7 @@ import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartLocalDateUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.constant.RedisKeyConst;
-import net.lab1024.sa.base.module.support.redis.RedisService;
+import net.lab1024.sa.base.module.support.redis.RedisUtil;
 import net.lab1024.sa.base.module.support.serialnumber.constant.SerialNumberRuleTypeEnum;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
@@ -31,7 +31,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Slf4j
 public class SerialNumberRedisService extends SerialNumberBaseService {
 
-  @Resource private RedisService redisService;
+  @Resource private RedisUtil redisService;
 
   @Resource private RedisTemplate redisTemplate;
 

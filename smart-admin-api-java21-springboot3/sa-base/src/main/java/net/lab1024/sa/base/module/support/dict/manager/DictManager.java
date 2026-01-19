@@ -1,14 +1,16 @@
 package net.lab1024.sa.base.module.support.dict.manager;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
 import jakarta.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
-import net.lab1024.sa.base.constant.CacheKeyConst;
 import net.lab1024.sa.base.module.support.dict.dao.DictDao;
 import net.lab1024.sa.base.module.support.dict.dao.DictDataDao;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictDataEntity;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictEntity;
 import net.lab1024.sa.base.module.support.dict.domain.vo.DictDataVO;
-import org.springframework.cache.annotation.Cacheable;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.springframework.stereotype.Service;
 
 /**
@@ -25,7 +27,13 @@ public class DictManager {
   @Resource private DictDataDao dictDataDao;
 
   /** 获取字典 */
-  @Cacheable(value = CacheKeyConst.Dict.DICT_DATA, key = "#dictCode + '_' + #dataValue")
+  @Cached(
+      name = CacheKeyConst.Dict.DICT_DATA,
+      key = "#dictCode + '_' + #dataValue",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public DictDataVO getDictData(String dictCode, String dataValue) {
     DictEntity dictEntity = dictDao.selectByCode(dictCode);
     if (dictEntity == null) {

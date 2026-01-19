@@ -24,7 +24,7 @@ import net.lab1024.sa.base.module.support.file.domain.vo.FileDownloadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileMetadataVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileUploadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileVO;
-import net.lab1024.sa.base.module.support.redis.RedisService;
+import net.lab1024.sa.base.module.support.redis.RedisUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +67,7 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
 
   @Resource private FileConfig cloudConfig;
 
-  @Resource private RedisService redisService;
+  @Resource private RedisUtil redisService;
 
   @Resource private FileDao fileDao;
 

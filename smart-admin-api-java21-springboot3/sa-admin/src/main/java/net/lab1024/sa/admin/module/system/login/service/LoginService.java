@@ -52,7 +52,7 @@ import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogEntity;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
 import net.lab1024.sa.base.module.support.mail.MailService;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
-import net.lab1024.sa.base.module.support.redis.RedisService;
+import net.lab1024.sa.base.module.support.redis.RedisUtil;
 import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailEntity;
 import net.lab1024.sa.base.module.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.base.module.support.securityprotect.service.SecurityLoginService;
@@ -94,7 +94,7 @@ public class LoginService implements StpInterface {
 
   @Resource private MailService mailService;
 
-  @Resource private RedisService redisService;
+  @Resource private RedisUtil redisService;
 
   @Resource private LoginManager loginManager;
 

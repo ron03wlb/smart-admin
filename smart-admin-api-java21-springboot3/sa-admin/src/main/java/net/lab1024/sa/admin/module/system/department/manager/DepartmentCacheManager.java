@@ -1,5 +1,7 @@
 package net.lab1024.sa.admin.module.system.department.manager;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
@@ -7,18 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.constant.AdminCacheConst;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentTreeVO;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,46 +34,69 @@ public class DepartmentCacheManager {
 
   @Resource private DepartmentDao departmentDao;
 
+  @Resource private net.lab1024.sa.common.cache.CacheService cacheService;
+
   private void logClearInfo(String cache) {
     if (log.isInfoEnabled()) {
       log.info("clear " + cache);
     }
   }
 
-  @CacheEvict(
-      value = {
-        AdminCacheConst.Department.DEPARTMENT_LIST_CACHE,
-        AdminCacheConst.Department.DEPARTMENT_SELF_CHILDREN_CACHE,
-        AdminCacheConst.Department.DEPARTMENT_TREE_CACHE,
-        AdminCacheConst.Department.DEPARTMENT_PATH_CACHE,
-      },
-      allEntries = true)
+  /** 清除所有部门相关缓存 */
   public void clearCache() {
-    logClearInfo(AdminCacheConst.Department.DEPARTMENT_LIST_CACHE);
+    cacheService.clear(CacheKeyConst.Department.DEPARTMENT_LIST_CACHE);
+    cacheService.clear(CacheKeyConst.Department.DEPARTMENT_TREE_CACHE);
+    cacheService.clear(CacheKeyConst.Department.DEPARTMENT_SELF_CHILDREN_CACHE);
+    cacheService.clear(CacheKeyConst.Department.DEPARTMENT_PATH_CACHE);
+    logClearInfo(CacheKeyConst.Department.DEPARTMENT_LIST_CACHE);
   }
 
   /** 部门列表 */
-  @Cacheable(AdminCacheConst.Department.DEPARTMENT_LIST_CACHE)
+  @Cached(
+      name = CacheKeyConst.Department.DEPARTMENT_LIST_CACHE,
+      key = "'all'",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public List<DepartmentVO> getDepartmentList() {
     return departmentDao.listAll();
   }
 
   /** 缓存部门树结构 */
-  @Cacheable(AdminCacheConst.Department.DEPARTMENT_TREE_CACHE)
+  @Cached(
+      name = CacheKeyConst.Department.DEPARTMENT_TREE_CACHE,
+      key = "'all'",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public List<DepartmentTreeVO> getDepartmentTree() {
     List<DepartmentVO> departmentVOList = departmentDao.listAll();
     return this.buildTree(departmentVOList);
   }
 
   /** 缓存某个部门的下级id列表 */
-  @Cacheable(AdminCacheConst.Department.DEPARTMENT_SELF_CHILDREN_CACHE)
+  @Cached(
+      name = CacheKeyConst.Department.DEPARTMENT_SELF_CHILDREN_CACHE,
+      key = "#departmentId",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public List<Long> getDepartmentSelfAndChildren(Long departmentId) {
     List<DepartmentVO> departmentVOList = departmentDao.listAll();
     return this.selfAndChildrenIdList(departmentId, departmentVOList);
   }
 
   /** 部门的路径名称 */
-  @Cacheable(AdminCacheConst.Department.DEPARTMENT_PATH_CACHE)
+  @Cached(
+      name = CacheKeyConst.Department.DEPARTMENT_PATH_CACHE,
+      key = "'all'",
+      cacheType = CacheType.BOTH,
+      localExpire = 30,
+      expire = 120,
+      timeUnit = TimeUnit.MINUTES)
   public Map<Long, String> getDepartmentPathMap() {
     List<DepartmentVO> departmentVOList = departmentDao.listAll();
     Map<Long, DepartmentVO> departmentMap =
