@@ -10,6 +10,12 @@ dependencies {
     // Lock4j - Redisson implementation (reuse existing Redisson)
     api(libs.lock4j.redisson.spring.boot.starter)
 
+    // Redisson - for RedissonService
+    api(libs.redisson.spring.boot.starter) {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-actuator")
+        exclude(group = "org.redisson", module = "redisson-spring-data-32")
+    }
+
     // Lombok
     api(libs.lombok)
     annotationProcessor(libs.lombok)

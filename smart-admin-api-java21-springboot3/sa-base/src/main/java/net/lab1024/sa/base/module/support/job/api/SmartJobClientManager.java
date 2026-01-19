@@ -1,12 +1,12 @@
 package net.lab1024.sa.base.module.support.job.api;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.lock.LockInfo;
 import com.google.common.collect.Lists;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobMsg;
 import net.lab1024.sa.base.module.support.job.config.SmartJobAutoConfiguration;
@@ -15,7 +15,7 @@ import net.lab1024.sa.base.module.support.job.core.SmartJobExecutor;
 import net.lab1024.sa.base.module.support.job.core.SmartJobLauncher;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
-import org.redisson.api.RLock;
+import net.lab1024.sa.common.dlock.LockService;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.MessageListener;
@@ -43,7 +43,10 @@ public class SmartJobClientManager {
 
   private static final String TOPIC = "smart-job-instance";
 
-  private final RedissonClient redissonClient;
+  /** 锁持有时间：20秒 */
+  private static final long LOCK_EXPIRE_MS = 20000L;
+
+  private final LockService lockService;
 
   private final RTopic topic;
 
@@ -53,11 +56,12 @@ public class SmartJobClientManager {
       SmartJobLauncher jobLauncher,
       SmartJobRepository jobRepository,
       List<SmartJob> jobInterfaceList,
-      RedissonClient redissonClient) {
+      RedissonClient redissonClient,
+      LockService lockService) {
     this.jobLauncher = jobLauncher;
     this.jobRepository = jobRepository;
     this.jobInterfaceList = (jobInterfaceList == null) ? List.of() : List.copyOf(jobInterfaceList);
-    this.redissonClient = redissonClient;
+    this.lockService = lockService;
 
     // 添加监听器
     this.topic = redissonClient.getTopic(TOPIC);
@@ -133,23 +137,23 @@ public class SmartJobClientManager {
       return;
     }
 
-    // 获取执行锁 无需主动释放
-    RLock rLock = redissonClient.getLock(EXECUTE_LOCK + msg.getMsgId());
-    try {
-      boolean getLock = rLock.tryLock(0, 20, TimeUnit.SECONDS);
-      if (!getLock) {
-        return;
-      }
-    } catch (InterruptedException e) {
-      log.error("==== SmartJob ==== msg execute err:", e);
+    // 获取执行锁 使用 Lock4j
+    LockInfo lockInfo =
+        lockService.tryLockNonBlocking(EXECUTE_LOCK + msg.getMsgId(), LOCK_EXPIRE_MS);
+    if (lockInfo == null) {
+      // 无法获取锁，说明其他实例已经在处理此消息
       return;
     }
 
-    // 通过执行器 执行任务
-    jobEntity.setParam(msg.getParam());
-    SmartJobExecutor jobExecutor =
-        new SmartJobExecutor(jobEntity, jobRepository, optional.get(), redissonClient);
-    jobExecutor.execute(msg.getUpdateName());
+    try {
+      // 通过执行器 执行任务
+      jobEntity.setParam(msg.getParam());
+      SmartJobExecutor jobExecutor =
+          new SmartJobExecutor(jobEntity, jobRepository, optional.get(), lockService);
+      jobExecutor.execute(msg.getUpdateName());
+    } finally {
+      lockService.releaseLock(lockInfo);
+    }
   }
 
   @PreDestroy

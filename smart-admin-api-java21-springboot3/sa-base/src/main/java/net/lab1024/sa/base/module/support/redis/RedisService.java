@@ -86,12 +86,28 @@ public class RedisService {
     return redisKey.substring(index);
   }
 
+  /**
+   * 获取锁
+   *
+   * @param key 锁的 key
+   * @param expire 过期时间（毫秒）
+   * @return 是否获取成功
+   * @deprecated 请使用 {@link net.lab1024.sa.common.dlock.LockService} 替代
+   */
+  @Deprecated(since = "3.1.0", forRemoval = true)
   public boolean getLock(String key, long expire) {
     return Boolean.TRUE.equals(
         redisValueOperations.setIfAbsent(
             key, String.valueOf(System.currentTimeMillis()), expire, TimeUnit.MILLISECONDS));
   }
 
+  /**
+   * 释放锁
+   *
+   * @param key 锁的 key
+   * @deprecated 请使用 {@link net.lab1024.sa.common.dlock.LockService} 替代
+   */
+  @Deprecated(since = "3.1.0", forRemoval = true)
   public void unLock(String key) {
     redisValueOperations.getOperations().delete(key);
   }

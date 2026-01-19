@@ -1,10 +1,10 @@
 package net.lab1024.sa.base.module.support.job.core;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import com.baomidou.lock.LockInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.util.SmartIpUtil;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobConst;
@@ -12,8 +12,7 @@ import net.lab1024.sa.base.module.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobLogEntity;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
+import net.lab1024.sa.common.dlock.LockService;
 import org.springframework.util.StopWatch;
 
 /**
@@ -32,19 +31,22 @@ public class SmartJobExecutor implements Runnable {
 
   private final SmartJob jobInterface;
 
-  private final RedissonClient redissonClient;
+  private final LockService lockService;
 
   private static final String EXECUTE_LOCK = "smart-job-lock-execute-";
+
+  /** 锁持有时间：30秒 */
+  private static final long LOCK_EXPIRE_MS = 30000L;
 
   public SmartJobExecutor(
       SmartJobEntity jobEntity,
       SmartJobRepository jobRepository,
       SmartJob jobInterface,
-      RedissonClient redissonClient) {
+      LockService lockService) {
     this.jobEntity = jobEntity;
     this.jobRepository = jobRepository;
     this.jobInterface = jobInterface;
-    this.redissonClient = redissonClient;
+    this.lockService = lockService;
   }
 
   /** 系统线程执行 */
@@ -52,12 +54,12 @@ public class SmartJobExecutor implements Runnable {
   public void run() {
     // 获取当前任务执行锁 最多持有30s自动释放
     Integer jobId = jobEntity.getJobId();
-    RLock rLock = redissonClient.getLock(EXECUTE_LOCK + jobId);
+    LockInfo lockInfo = lockService.tryLockNonBlocking(EXECUTE_LOCK + jobId, LOCK_EXPIRE_MS);
+    if (lockInfo == null) {
+      // 无法获取锁，说明其他实例正在执行此任务
+      return;
+    }
     try {
-      boolean lock = rLock.tryLock(0, 30, TimeUnit.SECONDS);
-      if (!lock) {
-        return;
-      }
       // 查询上次执行时间 校验执行间隔
       SmartJobEntity dbJobEntity = jobRepository.getJobDao().selectById(jobId);
       if (null == dbJobEntity) {
@@ -86,9 +88,7 @@ public class SmartJobExecutor implements Runnable {
         log.error("==== SmartJob ==== execute err:", t);
       }
     } finally {
-      if (rLock.isHeldByCurrentThread()) {
-        rLock.unlock();
-      }
+      lockService.releaseLock(lockInfo);
     }
   }
 

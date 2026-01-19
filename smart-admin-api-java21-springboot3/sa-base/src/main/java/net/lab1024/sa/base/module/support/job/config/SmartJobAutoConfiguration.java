@@ -5,7 +5,7 @@ import java.util.List;
 import net.lab1024.sa.base.module.support.job.core.SmartJob;
 import net.lab1024.sa.base.module.support.job.core.SmartJobLauncher;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
-import org.redisson.api.RedissonClient;
+import net.lab1024.sa.common.dlock.LockService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +45,7 @@ public class SmartJobAutoConfiguration {
    * @return
    */
   @Bean
-  public SmartJobLauncher initJobLauncher(RedissonClient redissonClient) {
-    return new SmartJobLauncher(jobConfig, jobRepository, jobInterfaceList, redissonClient);
+  public SmartJobLauncher initJobLauncher(LockService lockService) {
+    return new SmartJobLauncher(jobConfig, jobRepository, jobInterfaceList, lockService);
   }
 }

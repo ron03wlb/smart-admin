@@ -1,13 +1,10 @@
-package net.lab1024.sa.base.module.support.redis;
+package net.lab1024.sa.common.dlock;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.exception.BusinessException;
 import org.redisson.api.RBucket;
 import org.redisson.api.RIdGenerator;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,8 +21,11 @@ public class RedissonService {
 
   @Autowired private final RedissonClient redissonClient;
 
-  public RedissonService(RedissonClient redissonClient) {
+  private final LockService lockService;
+
+  public RedissonService(RedissonClient redissonClient, LockService lockService) {
     this.redissonClient = redissonClient;
+    this.lockService = lockService;
   }
 
   public RedissonClient getRedissonClient() {
@@ -35,64 +35,31 @@ public class RedissonService {
   /**
    * 获取锁 并 执行程序
    *
-   * @param lockKey
-   * @param waitTime 毫秒
-   * @param lockTime 毫秒
-   * @param supplier
+   * @param lockKey 锁的 key
+   * @param waitTime 等待时间（毫秒）
+   * @param lockTime 锁持有时间（毫秒）
+   * @param supplier 业务逻辑
+   * @param <T> 返回值类型
+   * @return 业务逻辑返回值
+   * @deprecated 请使用 {@link LockService#executeWithLock(String, long, long, Supplier)} 替代
    */
+  @Deprecated(since = "3.1.0")
   public <T> T executeWithLock(String lockKey, long waitTime, long lockTime, Supplier<T> supplier) {
-    // 获取锁
-    RLock lock = this.tryLock(lockKey, waitTime, lockTime);
-    try {
-      return supplier.get();
-    } finally {
-      // 释放锁
-      if (lock.isHeldByCurrentThread()) {
-        lock.unlock();
-      }
-    }
+    return lockService.executeWithLock(lockKey, waitTime, lockTime, supplier);
   }
 
   /**
    * 获取锁 并 执行程序
    *
-   * @param lockKey
-   * @param waitTime 毫秒
-   * @param lockTime 毫秒
-   * @param runnable
+   * @param lockKey 锁的 key
+   * @param waitTime 等待时间（毫秒）
+   * @param lockTime 锁持有时间（毫秒）
+   * @param runnable 业务逻辑
+   * @deprecated 请使用 {@link LockService#executeWithLock(String, long, long, Runnable)} 替代
    */
+  @Deprecated(since = "3.1.0")
   public void executeWithLock(String lockKey, long waitTime, long lockTime, Runnable runnable) {
-    // 获取锁
-    RLock lock = this.tryLock(lockKey, waitTime, lockTime);
-    try {
-      runnable.run();
-    } finally {
-      // 释放锁
-      if (lock.isHeldByCurrentThread()) {
-        lock.unlock();
-      }
-    }
-  }
-
-  /**
-   * 尝试获取锁 最多等待 waitTime 毫秒 获取锁成功后占用 lockTime 毫秒 ps:需要手动解锁 lock.unlock()
-   *
-   * @param lockKey
-   * @param waitTime 毫秒
-   * @param lockTime 毫秒
-   * @return
-   */
-  public RLock tryLock(String lockKey, long waitTime, long lockTime) {
-    RLock lock = redissonClient.getLock(lockKey);
-    try {
-      boolean getLock = lock.tryLock(waitTime, lockTime, TimeUnit.MILLISECONDS);
-      if (getLock) {
-        return lock;
-      }
-    } catch (InterruptedException e) {
-      log.error("Redisson tryLock", e);
-    }
-    throw new BusinessException("业务繁忙,请稍后重试~");
+    lockService.executeWithLock(lockKey, waitTime, lockTime, runnable);
   }
 
   /**

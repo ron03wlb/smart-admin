@@ -16,7 +16,7 @@ import net.lab1024.sa.base.module.support.job.constant.SmartJobConst;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
-import org.redisson.api.RedissonClient;
+import net.lab1024.sa.common.dlock.LockService;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -32,7 +32,7 @@ public class SmartJobLauncher {
 
   private final List<SmartJob> jobInterfaceList;
 
-  private final RedissonClient redissonClient;
+  private final LockService lockService;
 
   private ScheduledThreadPoolExecutor launcherExecutor;
 
@@ -40,10 +40,10 @@ public class SmartJobLauncher {
       SmartJobConfig jobConfig,
       SmartJobRepository jobRepository,
       List<SmartJob> jobInterfaceList,
-      RedissonClient redissonClient) {
+      LockService lockService) {
     this.jobRepository = jobRepository;
     this.jobInterfaceList = (jobInterfaceList == null) ? List.of() : List.copyOf(jobInterfaceList);
-    this.redissonClient = redissonClient;
+    this.lockService = lockService;
 
     // init job scheduler
     SmartJobScheduler.init(jobConfig);
@@ -122,7 +122,7 @@ public class SmartJobLauncher {
       }
       // 添加任务
       SmartJobExecutor jobExecute =
-          new SmartJobExecutor(jobEntity, jobRepository, jobImpl, redissonClient);
+          new SmartJobExecutor(jobEntity, jobRepository, jobImpl, lockService);
       SmartJobScheduler.addJob(jobExecute);
     }
     List<SmartJobEntity> runjJobList = SmartJobScheduler.getJobInfo();

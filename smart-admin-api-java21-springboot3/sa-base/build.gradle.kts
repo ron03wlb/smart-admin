@@ -80,6 +80,9 @@ dependencies {
     api(libs.objenesis)
     api(libs.commons.pool2)
 
+    // Distributed Lock - Lock4j
+    api(project(":sa-common:d-lock"))
+
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)
 

@@ -12,27 +12,27 @@ services:
   # ===========================================
   # PostgreSQL - 本地開發數據庫
   # ===========================================
-  postgres:
-    image: postgres:16-alpine
-    container_name: sa21-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-smartadmin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SmartAdmin@2024}
-      POSTGRES_DB: ${POSTGRES_DB:-smart_admin}
-      TZ: Asia/Taipei
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartadmin} -d ${POSTGRES_DB:-smart_admin}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - sa21-network
+  # postgres:
+    # image: postgres:16-alpine
+    # container_name: sa21-postgres
+    # restart: unless-stopped
+    # environment:
+      # POSTGRES_USER: ${POSTGRES_USER:-smartadmin}
+      # POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SmartAdmin@2024}
+      # POSTGRES_DB: ${POSTGRES_DB:-smart_admin}
+      # TZ: Asia/Taipei
+    # ports:
+      # - "${POSTGRES_PORT:-5432}:5432"
+    # volumes:
+      # - postgres_data:/var/lib/postgresql/data
+      # - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    # healthcheck:
+      # test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartadmin} -d ${POSTGRES_DB:-smart_admin}" ]
+      # interval: 10s
+      # timeout: 5s
+      # retries: 5
+    # networks:
+      # - sa21-network
 
   # ===========================================
   # Redis - 緩存服務

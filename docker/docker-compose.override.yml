@@ -4,13 +4,13 @@
 
 services:
   # PostgreSQL 開發配置
-  postgres:
-    environment:
+  # postgres:
+    # environment:
       # 開發環境可以使用較寬鬆的配置
-      POSTGRES_HOST_AUTH_METHOD: md5
+      # POSTGRES_HOST_AUTH_METHOD: md5
     # 開發環境打開日誌
-    command: >
-      postgres -c log_statement=all -c log_connections=on -c log_disconnections=on
+    # command: >
+      # postgres -c log_statement=all -c log_connections=on -c log_disconnections=on
 
   # Redis 開發配置
   redis:

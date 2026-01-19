@@ -1,6 +1,5 @@
-package net.lab1024.sa.base.module.support.redis;
+package net.lab1024.sa.common.dlock.config;
 
-import net.lab1024.sa.base.common.util.SmartStringUtil;
 import org.redisson.config.Config;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.stereotype.Component;
@@ -14,20 +13,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class RedissonPasswordConfigurationCustomizer
     implements RedissonAutoConfigurationCustomizer {
+
   @Override
   public void customize(Config configuration) {
-    if (configuration.isSingleConfig()
-        && SmartStringUtil.isEmpty(configuration.useSingleServer().getPassword())) {
+    if (configuration.isSingleConfig() && isEmpty(configuration.useSingleServer().getPassword())) {
       configuration.useSingleServer().setPassword(null);
     }
 
     if (configuration.isClusterConfig()
-        && SmartStringUtil.isEmpty(configuration.useClusterServers().getPassword())) {
+        && isEmpty(configuration.useClusterServers().getPassword())) {
       configuration.useClusterServers().setPassword(null);
     }
     if (configuration.isSentinelConfig()
-        && SmartStringUtil.isEmpty(configuration.useSentinelServers().getPassword())) {
+        && isEmpty(configuration.useSentinelServers().getPassword())) {
       configuration.useSentinelServers().setPassword(null);
     }
+  }
+
+  private static boolean isEmpty(String str) {
+    return str == null || str.isEmpty();
   }
 }
