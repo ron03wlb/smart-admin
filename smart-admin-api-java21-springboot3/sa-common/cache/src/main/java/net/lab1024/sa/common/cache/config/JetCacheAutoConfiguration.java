@@ -55,6 +55,12 @@ public class JetCacheAutoConfiguration {
   @Value("${spring.data.redis.timeout:10000ms}")
   private Duration redisTimeout;
 
+  @Value("${project.name:smart-admin}")
+  private String projectName;
+
+  @Value("${spring.profiles.active:dev}")
+  private String environment;
+
   /** Lettuce Redis Client */
   @Bean
   @ConditionalOnMissingBean
@@ -96,6 +102,8 @@ public class JetCacheAutoConfiguration {
             .expireAfterWrite(30, TimeUnit.MINUTES));
 
     // 远程缓存配置 (Redis Lettuce)
+    // Key 前缀格式: {projectName}:{environment}:
+    String keyPrefix = projectName + ":" + environment + ":";
     Map<String, CacheBuilder> remoteBuilders = new HashMap<>();
     remoteBuilders.put(
         CacheConsts.DEFAULT_AREA,
@@ -104,7 +112,7 @@ public class JetCacheAutoConfiguration {
             .valueEncoder(JavaValueEncoder.INSTANCE)
             .valueDecoder(JavaValueDecoder.INSTANCE)
             .redisClient(redisClient)
-            .keyPrefix("jetcache:")
+            .keyPrefix(keyPrefix)
             .expireAfterWrite(2, TimeUnit.HOURS));
 
     GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
@@ -114,5 +122,15 @@ public class JetCacheAutoConfiguration {
     globalCacheConfig.setAreaInCacheName(false);
 
     return globalCacheConfig;
+  }
+
+  /**
+   * 提供缓存 Key 前缀
+   *
+   * @return Key 前缀，格式为 {projectName}:{environment}:
+   */
+  @Bean
+  public String cacheKeyPrefix() {
+    return projectName + ":" + environment + ":";
   }
 }

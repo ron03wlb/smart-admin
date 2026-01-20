@@ -38,6 +38,9 @@ public class JetCacheServiceImpl implements CacheService {
 
   @Resource private RedisClient redisClient;
 
+  /** 缓存 Key 前缀，格式为 {projectName}:{environment}: */
+  @Resource private String cacheKeyPrefix;
+
   /** 缓存实例管理器 */
   private final Map<String, Cache<?, ?>> cacheMap = new ConcurrentHashMap<>();
 
@@ -99,7 +102,7 @@ public class JetCacheServiceImpl implements CacheService {
         .valueEncoder(JavaValueEncoder.INSTANCE)
         .valueDecoder(JavaValueDecoder.INSTANCE)
         .redisClient(redisClient)
-        .keyPrefix("jetcache:" + name + ":")
+        .keyPrefix(cacheKeyPrefix + name + ":")
         .expireAfterWrite(expire, timeUnit)
         .buildCache();
   }
@@ -228,14 +231,14 @@ public class JetCacheServiceImpl implements CacheService {
   @Override
   public List<String> cacheKey(String cacheName) {
     // 使用Redis KEYS命令扫描指定缓存的所有key
-    String pattern = "jetcache:" + cacheName + ":*";
+    String prefix = cacheKeyPrefix + cacheName + ":";
+    String pattern = prefix + "*";
     try (var connection = redisClient.connect()) {
       var keys = connection.sync().keys(pattern);
       if (keys == null || keys.isEmpty()) {
         return new ArrayList<>();
       }
       // 提取key的最后部分（去除前缀）
-      String prefix = "jetcache:" + cacheName + ":";
       return keys.stream().map(key -> key.substring(prefix.length())).collect(Collectors.toList());
     }
   }

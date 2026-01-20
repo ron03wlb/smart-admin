@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
@@ -40,7 +42,6 @@ import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartIpUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.constant.LoginDeviceEnum;
-import net.lab1024.sa.base.constant.RedisKeyConst;
 import net.lab1024.sa.base.module.support.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.base.module.support.captcha.CaptchaService;
 import net.lab1024.sa.base.module.support.captcha.domain.CaptchaVO;
@@ -52,11 +53,12 @@ import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogEntity;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
 import net.lab1024.sa.base.module.support.mail.MailService;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
-import net.lab1024.sa.base.module.support.redis.RedisUtil;
 import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailEntity;
 import net.lab1024.sa.base.module.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.base.module.support.securityprotect.service.SecurityLoginService;
 import net.lab1024.sa.base.module.support.securityprotect.service.SecurityPasswordService;
+import net.lab1024.sa.common.cache.CacheService;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.springframework.stereotype.Service;
 
 /**
@@ -94,7 +96,7 @@ public class LoginService implements StpInterface {
 
   @Resource private MailService mailService;
 
-  @Resource private RedisUtil redisService;
+  @Resource private CacheService cacheService;
 
   @Resource private LoginManager loginManager;
 
@@ -431,13 +433,10 @@ public class LoginService implements StpInterface {
     }
 
     // 校验验证码发送时间，60秒内不能重复发生
-    String redisVerificationCodeKey =
-        redisService.generateRedisKey(
-            RedisKeyConst.Support.LOGIN_VERIFICATION_CODE,
-            UserTypeEnum.ADMIN_EMPLOYEE.getValue()
-                + RedisKeyConst.SEPARATOR
-                + employeeEntity.getEmployeeId());
-    String emailCode = redisService.get(redisVerificationCodeKey);
+    String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeEntity.getEmployeeId();
+    Optional<String> emailCodeOpt =
+        cacheService.get(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class);
+    String emailCode = emailCodeOpt.orElse(null);
     long sendCodeTimeMills = -1;
     if (!SmartStringUtil.isEmpty(emailCode)) {
       sendCodeTimeMills = NumberUtil.parseLong(emailCode.split(StringConst.UNDERLINE)[1]);
@@ -450,10 +449,12 @@ public class LoginService implements StpInterface {
     // 生成验证码
     long currentTimeMillis = System.currentTimeMillis();
     String verificationCode = RandomUtil.randomNumbers(4);
-    redisService.set(
-        redisVerificationCodeKey,
+    cacheService.put(
+        CacheKeyConst.Support.LOGIN_VERIFICATION_CODE,
+        cacheKey,
         verificationCode + StringConst.UNDERLINE + currentTimeMillis,
-        300);
+        300,
+        TimeUnit.SECONDS);
 
     // 发送邮件验证码
     Map<String, Object> mailParams = new HashMap<>();
@@ -482,13 +483,10 @@ public class LoginService implements StpInterface {
     }
 
     // 校验验证码
-    String redisVerificationCodeKey =
-        redisService.generateRedisKey(
-            RedisKeyConst.Support.LOGIN_VERIFICATION_CODE,
-            UserTypeEnum.ADMIN_EMPLOYEE.getValue()
-                + RedisKeyConst.SEPARATOR
-                + employeeEntity.getEmployeeId());
-    String emailCode = redisService.get(redisVerificationCodeKey);
+    String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeEntity.getEmployeeId();
+    Optional<String> emailCodeOpt =
+        cacheService.get(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class);
+    String emailCode = emailCodeOpt.orElse(null);
     if (SmartStringUtil.isEmpty(emailCode)) {
       return ResponseDTO.userErrorParam("邮箱验证码已失效，请重新发送");
     }
@@ -502,11 +500,8 @@ public class LoginService implements StpInterface {
 
   /** 移除邮箱验证码 */
   private void deleteEmailCode(Long employeeId) {
-    String redisVerificationCodeKey =
-        redisService.generateRedisKey(
-            RedisKeyConst.Support.LOGIN_VERIFICATION_CODE,
-            UserTypeEnum.ADMIN_EMPLOYEE.getValue() + RedisKeyConst.SEPARATOR + employeeId);
-    redisService.delete(redisVerificationCodeKey);
+    String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeId;
+    cacheService.remove(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey);
   }
 
   public void clearLoginEmployeeCache(Long employeeId) {

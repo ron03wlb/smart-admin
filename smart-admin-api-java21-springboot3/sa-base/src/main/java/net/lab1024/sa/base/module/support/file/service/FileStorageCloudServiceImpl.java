@@ -12,19 +12,21 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.code.SystemErrorCode;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.config.FileConfig;
-import net.lab1024.sa.base.constant.RedisKeyConst;
 import net.lab1024.sa.base.module.support.file.constant.FileFolderTypeEnum;
 import net.lab1024.sa.base.module.support.file.dao.FileDao;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileDownloadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileMetadataVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileUploadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileVO;
-import net.lab1024.sa.base.module.support.redis.RedisUtil;
+import net.lab1024.sa.common.cache.CacheService;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +69,7 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
 
   @Resource private FileConfig cloudConfig;
 
-  @Resource private RedisUtil redisService;
+  @Resource private CacheService cacheService;
 
   @Resource private FileDao fileDao;
 
@@ -148,8 +150,9 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
 
     // 如果是私有的，则规定时间内可以访问，超过规定时间，则连接失效
 
-    String fileRedisKey = RedisKeyConst.Support.FILE_PRIVATE_VO + fileKey;
-    FileVO fileVO = redisService.getObject(fileRedisKey, FileVO.class);
+    Optional<FileVO> fileVOOpt =
+        cacheService.get(CacheKeyConst.Support.FILE_PRIVATE, fileKey, FileVO.class);
+    FileVO fileVO = fileVOOpt.orElse(null);
     if (fileVO == null) {
       fileVO = fileDao.getByFileKey(fileKey);
       if (fileVO == null) {
@@ -172,7 +175,12 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
         url = presignedGetObjectRequest.url().toString();
       }
       fileVO.setFileUrl(url);
-      redisService.set(fileRedisKey, fileVO, cloudConfig.getPrivateUrlExpireSeconds() - 5);
+      cacheService.put(
+          CacheKeyConst.Support.FILE_PRIVATE,
+          fileKey,
+          fileVO,
+          cloudConfig.getPrivateUrlExpireSeconds() - 5,
+          TimeUnit.SECONDS);
     }
 
     return ResponseDTO.ok(fileVO.getFileUrl());

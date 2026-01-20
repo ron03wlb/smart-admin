@@ -12,14 +12,14 @@ import net.lab1024.sa.base.common.util.SmartDateFormatterEnum;
 import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartLocalDateUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
-import net.lab1024.sa.base.constant.RedisKeyConst;
-import net.lab1024.sa.base.module.support.redis.RedisUtil;
 import net.lab1024.sa.base.module.support.serialnumber.constant.SerialNumberRuleTypeEnum;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.base.module.support.serialnumber.service.SerialNumberBaseService;
-import org.springframework.data.redis.core.RedisTemplate;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
+import net.lab1024.sa.common.redislock.RedissonService;
+import org.redisson.api.RAtomicLong;
 import org.springframework.scheduling.annotation.Scheduled;
 
 /**
@@ -31,11 +31,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Slf4j
 public class SerialNumberRedisService extends SerialNumberBaseService {
 
-  @Resource private RedisUtil redisService;
-
-  @Resource private RedisTemplate redisTemplate;
+  @Resource private RedissonService redissonService;
 
   private static final int BATCH_GENERATE_THRESHOLD = 1;
+
+  private static final String SERIAL_NUMBER_PREFIX = CacheKeyConst.Support.SERIAL_NUMBER + ":";
 
   @Override
   public void initLastGenerateData(List<SerialNumberEntity> serialNumberEntityList) {
@@ -57,9 +57,9 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
                   SerialNumberRuleTypeEnum.class),
               serialNumberEntity.getLastTime().toLocalDate());
 
-      Object o = redisTemplate.opsForValue().get(redisKey);
-      if (o == null) {
-        redisTemplate.opsForValue().set(redisKey, serialNumberEntity.getLastNumber());
+      RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
+      if (!atomicLong.isExists()) {
+        atomicLong.set(serialNumberEntity.getLastNumber());
       }
     }
   }
@@ -88,11 +88,9 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
       }
       if (SmartStringUtil.isNotEmpty(dateStr)) {
         String redisKey =
-            RedisKeyConst.Support.SERIAL_NUMBER
-                + serialNumberInfoBO.getSerialNumberId()
-                + ":"
-                + dateStr;
-        redisService.delete(redisKey);
+            SERIAL_NUMBER_PREFIX + serialNumberInfoBO.getSerialNumberId() + ":" + dateStr;
+        RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
+        atomicLong.delete();
       }
     }
   }
@@ -118,7 +116,8 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
               serialNumberInfo.getSerialNumberId(),
               serialNumberInfo.getSerialNumberRuleTypeEnum(),
               LocalDate.now());
-      Long increaseResult = redisTemplate.opsForValue().increment(redisKey, redisIncrease);
+      RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
+      Long increaseResult = atomicLong.addAndGet(redisIncrease);
 
       List<Long> numberList = new ArrayList<>(count);
       Long number = increaseResult;
@@ -167,17 +166,17 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
     return switch (serialNumberRuleTypeEnum) {
       case DAY -> {
         String dayStr = SmartLocalDateUtil.format(localDate, SmartDateFormatterEnum.YMD);
-        yield RedisKeyConst.Support.SERIAL_NUMBER + serialNumberId + ":" + dayStr;
+        yield SERIAL_NUMBER_PREFIX + serialNumberId + ":" + dayStr;
       }
       case MONTH -> {
         String monthStr = SmartLocalDateUtil.format(localDate, SmartDateFormatterEnum.YM);
-        yield RedisKeyConst.Support.SERIAL_NUMBER + serialNumberId + ":" + monthStr;
+        yield SERIAL_NUMBER_PREFIX + serialNumberId + ":" + monthStr;
       }
       case YEAR -> {
         String yearStr = String.valueOf(localDate.getYear());
-        yield RedisKeyConst.Support.SERIAL_NUMBER + serialNumberId + ":" + yearStr;
+        yield SERIAL_NUMBER_PREFIX + serialNumberId + ":" + yearStr;
       }
-      case NONE -> RedisKeyConst.Support.SERIAL_NUMBER + serialNumberId;
+      case NONE -> SERIAL_NUMBER_PREFIX + serialNumberId;
       default ->
           throw new IllegalArgumentException("Unsupported rule type: " + serialNumberRuleTypeEnum);
     };

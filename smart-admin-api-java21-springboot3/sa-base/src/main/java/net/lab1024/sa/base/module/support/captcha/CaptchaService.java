@@ -9,13 +9,15 @@ import jakarta.annotation.Resource;
 import java.awt.Color;
 import java.awt.Image;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.domain.SystemEnvironment;
-import net.lab1024.sa.base.constant.RedisKeyConst;
 import net.lab1024.sa.base.module.support.captcha.domain.CaptchaForm;
 import net.lab1024.sa.base.module.support.captcha.domain.CaptchaVO;
-import net.lab1024.sa.base.module.support.redis.RedisUtil;
+import net.lab1024.sa.common.cache.CacheService;
+import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,7 @@ public class CaptchaService {
 
   @Resource private SystemEnvironment systemEnvironment;
 
-  @Resource private RedisUtil redisService;
+  @Resource private CacheService cacheService;
 
   /** 生成图形验证码 默认 1 分钟有效期 */
   public CaptchaVO generateCaptcha() {
@@ -68,8 +70,8 @@ public class CaptchaService {
     if (!systemEnvironment.isProd()) {
       captchaVO.setCaptchaText(captchaText);
     }
-    String redisCaptchaKey = redisService.generateRedisKey(RedisKeyConst.Support.CAPTCHA, uuid);
-    redisService.set(redisCaptchaKey, captchaText, EXPIRE_SECOND);
+    cacheService.put(
+        CacheKeyConst.Support.CAPTCHA, uuid, captchaText, EXPIRE_SECOND, TimeUnit.SECONDS);
     return captchaVO;
   }
 
@@ -83,9 +85,9 @@ public class CaptchaService {
      * 1、校验redis里的验证码
      * 2、校验成功后，删除redis
      */
-    String redisCaptchaKey =
-        redisService.generateRedisKey(RedisKeyConst.Support.CAPTCHA, captchaForm.getCaptchaUuid());
-    String redisCaptchaCode = redisService.get(redisCaptchaKey);
+    Optional<String> captchaOpt =
+        cacheService.get(CacheKeyConst.Support.CAPTCHA, captchaForm.getCaptchaUuid(), String.class);
+    String redisCaptchaCode = captchaOpt.orElse(null);
     if (StringUtils.isBlank(redisCaptchaCode)) {
       return ResponseDTO.userErrorParam("验证码已过期，请刷新重试");
     }
@@ -93,7 +95,7 @@ public class CaptchaService {
       return ResponseDTO.userErrorParam("验证码错误，请输入正确的验证码");
     }
     // 删除已使用的验证码
-    redisService.delete(redisCaptchaKey);
+    cacheService.remove(CacheKeyConst.Support.CAPTCHA, captchaForm.getCaptchaUuid());
     return ResponseDTO.ok();
   }
 }

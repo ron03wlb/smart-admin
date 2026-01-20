@@ -80,4 +80,21 @@ public final class CacheKeyConst {
 
     private Login() {}
   }
+
+  /** 支撑功能缓存 */
+  public static final class Support {
+    /** 验证码 */
+    public static final String CAPTCHA = "captcha";
+
+    /** 登录验证码 */
+    public static final String LOGIN_VERIFICATION_CODE = "login:verification-code";
+
+    /** 私有文件 */
+    public static final String FILE_PRIVATE = "file:private";
+
+    /** 序列号 */
+    public static final String SERIAL_NUMBER = "serial-number";
+
+    private Support() {}
+  }
 }
