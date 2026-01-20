@@ -11,6 +11,7 @@ related_rules:
   - rules/10-architecture-rules.md
   - rules/08-vavr-fundamentals.md
   - rules/11-16 (靜態分析工具)
+  - rules/17-commit-message-conventions.md
 last_updated: 2025-01-17
 ---
 
@@ -73,11 +74,14 @@ last_updated: 2025-01-17
 │   ├─ Error Prone: [15-error-prone-rules]
 │   └─ JaCoCo: [16-jacoco-coverage-rules]
 │
-└─ 6️⃣ 知識查詢
-    ├─ PostgreSQL: [05-postgresql-*]
-    ├─ Vavr: [08-vavr-*]
-    ├─ MyBatis Plus: [09-mybatis-plus-*]
-    └─ 架構設計: [10-architecture-rules]
+├─ 6️⃣ 知識查詢
+│   ├─ PostgreSQL: [05-postgresql-*]
+│   ├─ Vavr: [08-vavr-*]
+│   ├─ MyBatis Plus: [09-mybatis-plus-*]
+│   └─ 架構設計: [10-architecture-rules]
+│
+└─ 7️⃣ Git 操作
+    └─ Commit Message: [17-commit-message-conventions]
 ```
 
 ---
@@ -156,6 +160,7 @@ Quality Gate 通過條件:
 | "JSONB"           | 05-advanced, 09-postgresql | TypeHandler               |
 | "異常處理"        | 08-vavr, 04                | Try.of(), 日誌記錄        |
 | "事務"            | 09-manager-layer           | @Transactional 在 Manager |
+| "commit"          | 17-commit-message          | Conventional Commits 格式 |
 
 ---
 
