@@ -42,8 +42,6 @@ import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartIpUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.constant.LoginDeviceEnum;
-import net.lab1024.sa.base.module.support.captcha.CaptchaService;
-import net.lab1024.sa.base.module.support.captcha.domain.CaptchaVO;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
 import net.lab1024.sa.base.module.support.loginlog.LoginLogResultEnum;
@@ -59,6 +57,9 @@ import net.lab1024.sa.base.module.support.securityprotect.service.SecurityPasswo
 import net.lab1024.sa.common.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.common.cache.CacheService;
 import net.lab1024.sa.common.cache.constant.CacheKeyConst;
+import net.lab1024.sa.common.captcha.CaptchaException;
+import net.lab1024.sa.common.captcha.CaptchaService;
+import net.lab1024.sa.common.captcha.CaptchaVO;
 import org.springframework.stereotype.Service;
 
 /**
@@ -119,9 +120,10 @@ public class LoginService implements StpInterface {
     }
 
     // 校验 图形验证码
-    ResponseDTO<String> checkCaptcha = captchaService.checkCaptcha(loginForm);
-    if (!checkCaptcha.getOk()) {
-      return ResponseDTO.error(UserErrorCode.PARAM_ERROR, checkCaptcha.getMsg());
+    try {
+      captchaService.checkCaptcha(loginForm);
+    } catch (CaptchaException e) {
+      return ResponseDTO.error(UserErrorCode.PARAM_ERROR, e.getMessage());
     }
 
     // 验证登录名

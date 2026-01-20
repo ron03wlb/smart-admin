@@ -25,6 +25,9 @@ dependencies {
     // Dependency on sa-common:mq module
     implementation(project(":sa-common:mq"))
 
+    // Dependency on sa-common:captcha module
+    implementation(project(":sa-common:captcha"))
+
     // Lombok annotation processor
     annotationProcessor(libs.lombok)
 

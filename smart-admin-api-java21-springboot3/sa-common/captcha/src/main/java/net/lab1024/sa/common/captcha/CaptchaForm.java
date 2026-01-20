@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.captcha.domain;
+package net.lab1024.sa.common.captcha;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

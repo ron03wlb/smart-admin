@@ -11,5 +11,6 @@ include(
     "sa-common:mq",
     "sa-common:cache",
     "sa-common:redis-lock",
-    "sa-common:api-encrypt"
+    "sa-common:api-encrypt",
+    "sa-common:captcha"
 )
