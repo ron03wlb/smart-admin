@@ -86,6 +86,9 @@ dependencies {
     // Cache - JetCache
     api(project(":sa-common:cache"))
 
+    // API Encrypt
+    api(project(":sa-common:api-encrypt"))
+
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)
 

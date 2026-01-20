@@ -42,7 +42,6 @@ import net.lab1024.sa.base.common.util.SmartEnumUtil;
 import net.lab1024.sa.base.common.util.SmartIpUtil;
 import net.lab1024.sa.base.common.util.SmartStringUtil;
 import net.lab1024.sa.base.constant.LoginDeviceEnum;
-import net.lab1024.sa.base.module.support.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.base.module.support.captcha.CaptchaService;
 import net.lab1024.sa.base.module.support.captcha.domain.CaptchaVO;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
@@ -57,6 +56,7 @@ import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailEntity
 import net.lab1024.sa.base.module.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.base.module.support.securityprotect.service.SecurityLoginService;
 import net.lab1024.sa.base.module.support.securityprotect.service.SecurityPasswordService;
+import net.lab1024.sa.common.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.common.cache.CacheService;
 import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import org.springframework.stereotype.Service;

@@ -1,13 +1,12 @@
-package net.lab1024.sa.base.module.support.apiencrypt.service;
+package net.lab1024.sa.common.apiencrypt.service;
 
 import cn.hutool.crypto.symmetric.SM4;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.constant.StringConst;
+import net.lab1024.sa.common.apiencrypt.constant.EncryptConst;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.springframework.stereotype.Service;
 
 /**
  * 国产 SM4 加密 和 解密 1、国密SM4 要求秘钥为 128bit，转化字节为 16个字节； 2、js前端使用 UCS-2 或者 UTF-16 编码，字母、数字、特殊符号等 占用1个字节；
@@ -17,13 +16,10 @@ import org.springframework.stereotype.Service;
  * @since 2023/10/21 11:41:46 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
-@Service
 public class ApiEncryptServiceSmImpl implements ApiEncryptService {
 
-  private static final String CHARSET = "UTF-8";
   private static final String SM4_KEY = "1024lab__1024lab";
   private static final int MODULO_2 = 2;
-  private static final int REMAINDER_1 = 1;
 
   static {
     Security.addProvider(new BouncyCastleProvider());
@@ -38,13 +34,15 @@ public class ApiEncryptServiceSmImpl implements ApiEncryptService {
       String encryptHex = sm4.encryptHex(data);
 
       // 第二步： Base64 编码
-      return new String(Base64.getEncoder().encode(encryptHex.getBytes(CHARSET)), CHARSET);
+      return new String(
+          Base64.getEncoder().encode(encryptHex.getBytes(EncryptConst.CHARSET_UTF8)),
+          EncryptConst.CHARSET_UTF8);
 
     } catch (Exception e) {
       if (log.isErrorEnabled()) {
         log.error(e.getMessage(), e);
       }
-      return StringConst.EMPTY;
+      return EncryptConst.EMPTY;
     }
   }
 
@@ -63,7 +61,7 @@ public class ApiEncryptServiceSmImpl implements ApiEncryptService {
       if (log.isErrorEnabled()) {
         log.error(e.getMessage(), e);
       }
-      return StringConst.EMPTY;
+      return EncryptConst.EMPTY;
     }
   }
 

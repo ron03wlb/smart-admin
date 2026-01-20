@@ -1,10 +1,10 @@
-package net.lab1024.sa.base.module.support.apiencrypt.service;
+package net.lab1024.sa.common.apiencrypt.service;
 
 import cn.hutool.crypto.symmetric.AES;
 import java.security.Security;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.constant.StringConst;
+import net.lab1024.sa.common.apiencrypt.constant.EncryptConst;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
@@ -16,8 +16,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 @Slf4j
 public class ApiEncryptServiceAesImpl implements ApiEncryptService {
-
-  private static final String CHARSET = "UTF-8";
 
   private static final String AES_KEY = "1024lab__1024lab";
   private static final int MODULO_2 = 2;
@@ -37,7 +35,7 @@ public class ApiEncryptServiceAesImpl implements ApiEncryptService {
       if (log.isErrorEnabled()) {
         log.error(e.getMessage(), e);
       }
-      return StringConst.EMPTY;
+      return EncryptConst.EMPTY;
     }
   }
 
@@ -50,13 +48,13 @@ public class ApiEncryptServiceAesImpl implements ApiEncryptService {
       // 第二步： AES 解密
       AES aes = new AES(hexToBytes(stringToHex(AES_KEY)));
       byte[] decryptedBytes = aes.decrypt(base64Decode);
-      return new String(decryptedBytes, CHARSET);
+      return new String(decryptedBytes, EncryptConst.CHARSET_UTF8);
 
     } catch (Exception e) {
       if (log.isErrorEnabled()) {
         log.error(e.getMessage(), e);
       }
-      return StringConst.EMPTY;
+      return EncryptConst.EMPTY;
     }
   }
 

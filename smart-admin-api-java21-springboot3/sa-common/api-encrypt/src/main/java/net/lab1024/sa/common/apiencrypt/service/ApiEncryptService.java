@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.apiencrypt.service;
+package net.lab1024.sa.common.apiencrypt.service;
 
 /**
  * 接口加密、解密 Service
@@ -11,16 +11,16 @@ public interface ApiEncryptService {
   /**
    * 解密
    *
-   * @param data
-   * @return
+   * @param data 加密數據
+   * @return 解密後的數據
    */
   String decrypt(String data);
 
   /**
    * 加密
    *
-   * @param data
-   * @return
+   * @param data 原始數據
+   * @return 加密後的數據
    */
   String encrypt(String data);
 }

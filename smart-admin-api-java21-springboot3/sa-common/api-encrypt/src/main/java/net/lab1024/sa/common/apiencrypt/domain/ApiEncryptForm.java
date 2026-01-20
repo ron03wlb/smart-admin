@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.apiencrypt.domain;
+package net.lab1024.sa.common.apiencrypt.domain;
 
 import lombok.Data;
 

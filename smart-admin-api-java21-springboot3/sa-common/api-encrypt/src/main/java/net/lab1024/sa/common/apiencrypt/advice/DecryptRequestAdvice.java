@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.apiencrypt.advice;
+package net.lab1024.sa.common.apiencrypt.advice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.util.SmartStringUtil;
-import net.lab1024.sa.base.module.support.apiencrypt.annotation.ApiDecrypt;
-import net.lab1024.sa.base.module.support.apiencrypt.domain.ApiEncryptForm;
-import net.lab1024.sa.base.module.support.apiencrypt.service.ApiEncryptService;
+import net.lab1024.sa.common.apiencrypt.annotation.ApiDecrypt;
+import net.lab1024.sa.common.apiencrypt.constant.EncryptConst;
+import net.lab1024.sa.common.apiencrypt.domain.ApiEncryptForm;
+import net.lab1024.sa.common.apiencrypt.service.ApiEncryptService;
+import net.lab1024.sa.common.apiencrypt.util.EncryptStringUtil;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
@@ -28,8 +29,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
 @ControllerAdvice
 @SuppressWarnings("PMD.LooseCoupling")
 public class DecryptRequestAdvice extends RequestBodyAdviceAdapter {
-
-  private static final String ENCODING = "UTF-8";
 
   @Resource private ApiEncryptService apiEncryptService;
 
@@ -52,14 +51,14 @@ public class DecryptRequestAdvice extends RequestBodyAdviceAdapter {
       Type targetType,
       Class<? extends HttpMessageConverter<?>> converterType) {
     try {
-      String bodyStr = IOUtils.toString(inputMessage.getBody(), ENCODING);
+      String bodyStr = IOUtils.toString(inputMessage.getBody(), EncryptConst.CHARSET_UTF8);
       ApiEncryptForm apiEncryptForm = objectMapper.readValue(bodyStr, ApiEncryptForm.class);
-      if (SmartStringUtil.isEmpty(apiEncryptForm.getEncryptData())) {
+      if (EncryptStringUtil.isEmpty(apiEncryptForm.getEncryptData())) {
         return inputMessage;
       }
       String decrypt = apiEncryptService.decrypt(apiEncryptForm.getEncryptData());
       return new DecryptHttpInputMessage(
-          inputMessage.getHeaders(), IOUtils.toInputStream(decrypt, ENCODING));
+          inputMessage.getHeaders(), IOUtils.toInputStream(decrypt, EncryptConst.CHARSET_UTF8));
     } catch (IOException e) {
       if (log.isErrorEnabled()) {
         log.error("", e);
