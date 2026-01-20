@@ -81,7 +81,7 @@ dependencies {
     api(libs.commons.pool2)
 
     // Distributed Lock - Lock4j
-    api(project(":sa-common:d-lock"))
+    api(project(":sa-common:redis-lock"))
 
     // Cache - JetCache
     api(project(":sa-common:cache"))

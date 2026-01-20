@@ -10,5 +10,5 @@ include(
     "sa-common",
     "sa-common:mq",
     "sa-common:cache",
-    "sa-common:d-lock"
+    "sa-common:redis-lock"
 )
