@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.json.serializer;
+package net.lab1024.sa.common.datamasking.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -7,16 +7,15 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import java.io.IOException;
-import net.lab1024.sa.base.module.support.datamasking.DataMasking;
-import net.lab1024.sa.base.module.support.datamasking.DataMaskingTypeEnum;
-import net.lab1024.sa.base.module.support.datamasking.SmartDataMaskingUtil;
+import net.lab1024.sa.common.datamasking.annotation.DataMasking;
+import net.lab1024.sa.common.datamasking.constant.DataMaskingTypeEnum;
+import net.lab1024.sa.common.datamasking.util.SmartDataMaskingUtil;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * 脱敏序列化
  *
  * @author 罗伊
- * @description:
  * @since 2024/7/21 4:39 下午
  */
 public class DataMaskingSerializer extends JsonSerializer<Object> implements ContextualSerializer {

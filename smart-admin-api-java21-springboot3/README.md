@@ -18,7 +18,7 @@ SmartAdmin is a modern, enterprise-grade admin system backend based on Java 21 a
 Before you begin, ensure you have the following installed:
 
 - **JDK 17 or 21**: This project is built with Java 21 features.
-- **Maven 3.8+**: For dependency management and build.
+- **Gradle 8.11+**: For dependency management and build (or use the included Gradle Wrapper).
 - **MySQL 8.0+**: Database server.
 - **Redis**: For caching and session management.
 
@@ -53,18 +53,18 @@ Before you begin, ensure you have the following installed:
 1.  **Build the project:**
 
     ```bash
-    mvn clean package -P dev
+    ./gradlew build -Penv=dev
     ```
 
 2.  **Run the application:**
 
     ```bash
-    mvn spring-boot:run
+    ./gradlew :sa-admin:bootRun
     ```
 
     Alternatively, run the jar file:
     ```bash
-    java -jar target/smart-admin-api-java21-springboot3.jar
+    java -jar sa-admin/build/libs/sa-admin-*.jar
     ```
 
 3.  **Access the API Documentation:**

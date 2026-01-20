@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.datamasking;
+package net.lab1024.sa.common.datamasking.util;
 
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.datamasking.annotation.DataMasking;
+import net.lab1024.sa.common.datamasking.constant.DataMaskingTypeEnum;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 

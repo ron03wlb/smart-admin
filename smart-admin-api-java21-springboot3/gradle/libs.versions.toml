@@ -106,6 +106,7 @@ mybatis-plus-jsqlparser = { module = "com.baomidou:mybatis-plus-jsqlparser" }
 knife4j-openapi3-jakarta = { module = "com.github.xingfudeshi:knife4j-openapi3-jakarta-spring-boot-starter", version.ref = "knife4j" }
 
 # JSON & Data Processing
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 fastexcel = { module = "cn.idev.excel:fastexcel", version.ref = "fastexcel" }
 poi = { module = "org.apache.poi:poi", version.ref = "poi" }
 poi-scratchpad = { module = "org.apache.poi:poi-scratchpad", version.ref = "poi" }

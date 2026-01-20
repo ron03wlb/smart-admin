@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.datamasking;
+package net.lab1024.sa.common.datamasking.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -6,13 +6,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import net.lab1024.sa.base.common.json.serializer.DataMaskingSerializer;
+import net.lab1024.sa.common.datamasking.constant.DataMaskingTypeEnum;
+import net.lab1024.sa.common.datamasking.serializer.DataMaskingSerializer;
 
 /**
  * 脱敏注解
  *
  * @author 罗伊
- * @description:
  * @since 2024/7/21 4:39 下午
  */
 @Target(ElementType.FIELD)

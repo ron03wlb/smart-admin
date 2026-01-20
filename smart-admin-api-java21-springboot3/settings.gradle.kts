@@ -13,5 +13,6 @@ include(
     "sa-common:redis-lock",
     "sa-common:api-encrypt",
     "sa-common:captcha",
-    "sa-common:repeat-submit"
+    "sa-common:repeat-submit",
+    "sa-common:data-masking"
 )

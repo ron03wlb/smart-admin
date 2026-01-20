@@ -21,13 +21,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Backend location: `smart-admin-api-java21-springboot3/`
 
 ```bash
-# Build (Gradle - primary)
+# Build
 ./gradlew clean build
 ./gradlew build -x test                    # Skip tests
 ./gradlew build -Penv=dev|test|pre|prod    # Environment-specific
-
-# Build (Maven - legacy)
-mvn clean package -P dev
 
 # Run application
 ./gradlew :sa-admin:bootRun
@@ -43,9 +40,6 @@ mvn clean package -P dev
 # Single test class
 ./gradlew :sa-admin:test --tests ArchitectureTest
 ./gradlew :sa-admin:test --tests AdminApplicationTest
-
-# Maven equivalent
-mvn test -Dtest=ArchitectureTest
 ```
 
 ## Architecture

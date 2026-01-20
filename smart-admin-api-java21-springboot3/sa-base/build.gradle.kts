@@ -92,6 +92,9 @@ dependencies {
     // Repeat Submit
     api(project(":sa-common:repeat-submit"))
 
+    // Data Masking
+    api(project(":sa-common:data-masking"))
+
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)
 

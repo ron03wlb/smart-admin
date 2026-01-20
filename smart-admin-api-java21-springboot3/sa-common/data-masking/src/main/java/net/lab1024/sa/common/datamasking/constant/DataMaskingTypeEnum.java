@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.datamasking;
+package net.lab1024.sa.common.datamasking.constant;
 
 import cn.hutool.core.util.DesensitizedUtil;
 import lombok.AllArgsConstructor;
