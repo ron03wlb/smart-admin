@@ -50,7 +50,9 @@
       "Bash(xargs -I {} sh -c 'echo \"\"\"\"=== {} ===\"\"\"\" && head -15 {}')",
       "Bash(for file in ResponseDTO PageParam PageResult RequestUser ErrorCode UserErrorCode SystemErrorCode UnexpectedErrorCode BaseEnum UserTypeEnum DataTypeEnum GenderEnum BusinessException RequestHeaderConst StringConst SmartBeanUtil SmartEnumUtil)",
       "Bash(do if find /Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-base/src/main/java -name $file.java)",
-      "Bash(then echo \"❌ $file.java still exists\" else echo \"✅ $file.java deleted\" fi done)"
+      "Bash(then echo \"❌ $file.java still exists\" else echo \"✅ $file.java deleted\" fi done)",
+      "Bash(xargs:*)",
+      "Bash(cut:*)"
     ]
   }
 }
