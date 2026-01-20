@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.repeatsubmit.annoation;
+package net.lab1024.sa.common.repeatsubmit.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

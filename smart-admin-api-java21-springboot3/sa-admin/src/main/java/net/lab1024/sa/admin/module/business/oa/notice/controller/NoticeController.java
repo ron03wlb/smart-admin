@@ -27,7 +27,7 @@ import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.util.SmartRequestUtil;
 import net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog;
-import net.lab1024.sa.base.module.support.repeatsubmit.annoation.RepeatSubmit;
+import net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

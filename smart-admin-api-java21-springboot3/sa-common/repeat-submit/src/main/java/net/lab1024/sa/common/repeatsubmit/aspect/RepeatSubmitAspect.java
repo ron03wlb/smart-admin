@@ -1,12 +1,12 @@
-package net.lab1024.sa.base.module.support.repeatsubmit;
+package net.lab1024.sa.common.repeatsubmit.aspect;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.code.UserErrorCode;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.module.support.repeatsubmit.annoation.RepeatSubmit;
-import net.lab1024.sa.base.module.support.repeatsubmit.ticket.AbstractRepeatSubmitTicket;
+import net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit;
+import net.lab1024.sa.common.repeatsubmit.exception.RepeatSubmitException;
+import net.lab1024.sa.common.repeatsubmit.ticket.RepeatSubmitTicket;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,8 +16,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * 重复提交 aop切口 <br>
- * -------------------------<br>
+ * 重复提交 AOP 切面
+ *
+ * <p>基于 AOP 实现的防重复提交拦截器。
+ *
+ * <p>-------------------------<br>
  * 着重说明：<br>
  * 注解属性 intervalMilliSecond 是指 一段时间内只允许有一次请求；<br>
  * intervalMilliSecond = 0: 表示只有上个请求执行完以后才可以执行<br>
@@ -32,17 +35,19 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 @Aspect
 @Slf4j
+@RequiredArgsConstructor
 public class RepeatSubmitAspect {
 
-  private final AbstractRepeatSubmitTicket repeatSubmitTicket;
+  private final RepeatSubmitTicket repeatSubmitTicket;
 
-  /** 获取凭证信息 */
-  public RepeatSubmitAspect(AbstractRepeatSubmitTicket repeatSubmitTicket) {
-    this.repeatSubmitTicket = repeatSubmitTicket;
-  }
-
-  /** 定义切入点 */
-  @Around("@annotation(net.lab1024.sa.base.module.support.repeatsubmit.annoation.RepeatSubmit)")
+  /**
+   * 定义切入点，拦截所有标注 @RepeatSubmit 注解的方法
+   *
+   * @param point 切入点
+   * @return 方法执行结果
+   * @throws Throwable 异常
+   */
+  @Around("@annotation(net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit)")
   public Object around(ProceedingJoinPoint point) throws Throwable {
 
     ServletRequestAttributes attributes =
@@ -51,7 +56,8 @@ public class RepeatSubmitAspect {
       return point.proceed();
     }
 
-    /** 第一步：生成防重复提交的 ticket凭证 ticket 是根据 Request对象 自定义 生成的，可以加入请求user相关属性作为生成要素 */
+    // 第一步：生成防重复提交的 ticket凭证
+    // ticket 是根据 Request对象 自定义 生成的，可以加入请求user相关属性作为生成要素
     HttpServletRequest request = attributes.getRequest();
     String ticket = this.repeatSubmitTicket.generateTicket(request);
     if (StringUtils.isEmpty(ticket)) {
@@ -62,11 +68,12 @@ public class RepeatSubmitAspect {
     RepeatSubmit annotation = method.getAnnotation(RepeatSubmit.class);
     Long intervalMilliSecond = (long) annotation.intervalMilliSecond();
 
-    /** 第二步：根据 ticket 凭证进行 加锁 能加锁，则可以执行 若不能加锁，则证明还是时间间隔interval中 */
+    // 第二步：根据 ticket 凭证进行加锁
+    // 能加锁，则可以执行；若不能加锁，则证明还在时间间隔interval中
     boolean lockSuccessFlag =
         this.repeatSubmitTicket.tryLock(ticket, System.currentTimeMillis(), intervalMilliSecond);
     if (!lockSuccessFlag) {
-      return ResponseDTO.error(UserErrorCode.REPEAT_SUBMIT);
+      throw new RepeatSubmitException();
     }
 
     try {

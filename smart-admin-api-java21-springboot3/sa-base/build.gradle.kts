@@ -89,6 +89,9 @@ dependencies {
     // API Encrypt
     api(project(":sa-common:api-encrypt"))
 
+    // Repeat Submit
+    api(project(":sa-common:repeat-submit"))
+
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)
 

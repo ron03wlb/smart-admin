@@ -19,7 +19,7 @@ import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocDetailVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO;
 import net.lab1024.sa.base.module.support.helpdoc.service.HelpDocCatalogService;
 import net.lab1024.sa.base.module.support.helpdoc.service.HelpDocService;
-import net.lab1024.sa.base.module.support.repeatsubmit.annoation.RepeatSubmit;
+import net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

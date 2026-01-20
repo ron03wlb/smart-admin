@@ -19,7 +19,7 @@ import net.lab1024.sa.base.module.support.job.api.domain.SmartJobQueryForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobUpdateForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobVO;
 import net.lab1024.sa.base.module.support.job.config.SmartJobAutoConfiguration;
-import net.lab1024.sa.base.module.support.repeatsubmit.annoation.RepeatSubmit;
+import net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.web.bind.annotation.GetMapping;

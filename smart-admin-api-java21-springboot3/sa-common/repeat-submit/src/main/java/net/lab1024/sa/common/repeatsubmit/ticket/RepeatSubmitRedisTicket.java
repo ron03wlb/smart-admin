@@ -1,15 +1,16 @@
-package net.lab1024.sa.base.module.support.repeatsubmit.ticket;
+package net.lab1024.sa.common.repeatsubmit.ticket;
 
 import com.baomidou.lock.LockInfo;
 import com.baomidou.lock.LockTemplate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import net.lab1024.sa.common.repeatsubmit.generator.TicketGenerator;
 
 /**
  * 凭证（使用 Lock4j 实现）
+ *
+ * <p>基于 Redis（Lock4j）的防重复提交实现，支持分布式场景。 使用 Lock4j 的 LockTemplate 进行分布式锁操作。
  *
  * @author 1024创新实验室-主任: 卓大
  * @since 2025-07-26 23:56:58 Copyright <a href="https://1024lab.net">1024创新实验室</a>
@@ -22,12 +23,25 @@ public class RepeatSubmitRedisTicket extends AbstractRepeatSubmitTicket {
   /** 存储 intervalMilliSecond == 0 时的锁信息，用于手动释放 */
   private final Map<String, LockInfo> lockInfoMap = new ConcurrentHashMap<>();
 
-  public RepeatSubmitRedisTicket(
-      LockTemplate lockTemplate, Function<HttpServletRequest, String> ticketFunction) {
-    super(ticketFunction);
+  /**
+   * 构造函数
+   *
+   * @param lockTemplate Lock4j 锁模板
+   * @param ticketGenerator 凭证生成器
+   */
+  public RepeatSubmitRedisTicket(LockTemplate lockTemplate, TicketGenerator ticketGenerator) {
+    super(ticketGenerator);
     this.lockTemplate = lockTemplate;
   }
 
+  /**
+   * 尝试加锁
+   *
+   * @param ticket 凭证
+   * @param currentTimestamp 当前时间戳
+   * @param intervalMilliSecond 间隔时间（毫秒）
+   * @return 是否加锁成功
+   */
   @Override
   public boolean tryLock(String ticket, Long currentTimestamp, Long intervalMilliSecond) {
     // 使用 acquireTimeout=0 表示不等待，立即返回
@@ -47,6 +61,12 @@ public class RepeatSubmitRedisTicket extends AbstractRepeatSubmitTicket {
     return true;
   }
 
+  /**
+   * 释放锁
+   *
+   * @param ticket 凭证
+   * @param intervalMilliSecond 间隔时间（毫秒）
+   */
   @Override
   public void unLock(String ticket, Long intervalMilliSecond) {
     // intervalMilliSecond > 0 时，锁会自动过期，无需手动释放

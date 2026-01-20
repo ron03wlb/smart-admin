@@ -11,6 +11,7 @@ import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.domain.SystemEnvironment;
 import net.lab1024.sa.base.common.enumeration.SystemEnvironmentEnum;
 import net.lab1024.sa.base.common.exception.BusinessException;
+import net.lab1024.sa.common.repeatsubmit.exception.RepeatSubmitException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -97,6 +98,13 @@ public class GlobalExceptionHandler {
       }
     }
     return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, e.getMessage());
+  }
+
+  /** 重复提交异常 */
+  @ResponseBody
+  @ExceptionHandler(RepeatSubmitException.class)
+  public ResponseDTO<?> repeatSubmitExceptionHandler(RepeatSubmitException e) {
+    return ResponseDTO.error(UserErrorCode.REPEAT_SUBMIT);
   }
 
   /**
