@@ -24,7 +24,8 @@ import net.lab1024.sa.base.module.support.file.domain.form.FileQueryForm;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileDownloadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileUploadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileVO;
-import net.lab1024.sa.base.module.support.securityprotect.service.SecurityFileService;
+import net.lab1024.sa.common.securityprotect.service.FileSecurityService;
+import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,9 @@ public class FileService {
 
   @Resource private FileDao fileDao;
 
-  @Resource private SecurityFileService securityFileService;
+  @Resource private FileSecurityService fileSecurityService;
+
+  @Resource private SecurityConfigProvider securityConfigProvider;
 
   /**
    * 文件上传服务
@@ -78,7 +81,7 @@ public class FileService {
     }
 
     // 校验文件大小以及安全性
-    ResponseDTO<String> validateFile = securityFileService.checkFile(file);
+    ResponseDTO<String> validateFile = checkFileSecurity(file);
     if (!validateFile.getOk()) {
       return ResponseDTO.error(validateFile);
     }
@@ -188,5 +191,30 @@ public class FileService {
     Page<?> page = SmartPageUtil.convert2PageQuery(queryForm);
     List<FileVO> list = fileDao.queryPage(page, queryForm);
     return SmartPageUtil.convert2PageResult(page, list);
+  }
+
+  /**
+   * 校验文件安全性
+   *
+   * @param file 上传的文件
+   * @return 校验结果
+   */
+  private ResponseDTO<String> checkFileSecurity(MultipartFile file) {
+    // 检验文件大小
+    java.util.Optional<String> sizeError =
+        fileSecurityService.checkFileSize(file, securityConfigProvider.getMaxUploadFileSizeMb());
+    if (sizeError.isPresent()) {
+      return ResponseDTO.userErrorParam(sizeError.get());
+    }
+
+    // 文件类型安全检测
+    if (securityConfigProvider.isFileDetectEnabled()) {
+      java.util.Optional<String> typeError = fileSecurityService.checkFileType(file);
+      if (typeError.isPresent()) {
+        return ResponseDTO.userErrorParam(typeError.get());
+      }
+    }
+
+    return ResponseDTO.ok();
   }
 }

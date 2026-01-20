@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.securityprotect.domain;
+package net.lab1024.sa.admin.module.support.securityprotect.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;

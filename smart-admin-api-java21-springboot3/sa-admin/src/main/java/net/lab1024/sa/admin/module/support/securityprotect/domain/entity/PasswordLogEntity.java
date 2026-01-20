@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.securityprotect.domain;
+package net.lab1024.sa.admin.module.support.securityprotect.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,9 +7,10 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 /**
+ * 密码修改日志
+ *
  * @author yandy
- * @description:
- * @since 2024/7/15 1:39 下午
+ * @since 2024/7/15 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
 @TableName("t_password_log")

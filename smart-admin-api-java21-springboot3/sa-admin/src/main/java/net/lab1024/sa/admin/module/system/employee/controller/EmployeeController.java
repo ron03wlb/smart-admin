@@ -19,8 +19,8 @@ import net.lab1024.sa.admin.module.system.employee.service.EmployeeService;
 import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.util.SmartRequestUtil;
-import net.lab1024.sa.base.module.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.common.apiencrypt.annotation.ApiDecrypt;
+import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +40,7 @@ public class EmployeeController {
 
   @Resource private EmployeeService employeeService;
 
-  @Resource private Level3ProtectConfigService level3ProtectConfigService;
+  @Resource private SecurityConfigProvider securityConfigProvider;
 
   @PostMapping("/employee/query")
   @Operation(summary = "员工管理查询 @author 卓大")
@@ -114,7 +114,7 @@ public class EmployeeController {
   @GetMapping("/employee/getPasswordComplexityEnabled")
   @ApiDecrypt
   public ResponseDTO<Boolean> getPasswordComplexityEnabled() {
-    return ResponseDTO.ok(level3ProtectConfigService.isPasswordComplexityEnabled());
+    return ResponseDTO.ok(securityConfigProvider.isPasswordComplexityEnabled());
   }
 
   @Operation(summary = "重置员工密码 @author 卓大")

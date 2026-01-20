@@ -19,6 +19,10 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.LoginFailEntity;
+import net.lab1024.sa.admin.module.support.securityprotect.service.Level3ProtectConfigService;
+import net.lab1024.sa.admin.module.support.securityprotect.service.SecurityLoginService;
+import net.lab1024.sa.admin.module.support.securityprotect.service.SecurityPasswordService;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
 import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
 import net.lab1024.sa.admin.module.system.login.domain.LoginForm;
@@ -50,10 +54,6 @@ import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogEntity;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
 import net.lab1024.sa.base.module.support.mail.MailService;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
-import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailEntity;
-import net.lab1024.sa.base.module.support.securityprotect.service.Level3ProtectConfigService;
-import net.lab1024.sa.base.module.support.securityprotect.service.SecurityLoginService;
-import net.lab1024.sa.base.module.support.securityprotect.service.SecurityPasswordService;
 import net.lab1024.sa.common.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.common.cache.CacheService;
 import net.lab1024.sa.common.cache.constant.CacheKeyConst;
@@ -189,7 +189,7 @@ public class LoginService implements StpInterface {
               + employeeEntity.getEmployeeUid().toUpperCase(Locale.ROOT)
               + StringConst.UNDERLINE
               + employeeEntity.getEmployeeUid().toLowerCase(Locale.ROOT);
-      if (!SecurityPasswordService.matchesPwd(saltPassword, employeeEntity.getLoginPwd())) {
+      if (!protectPasswordService.matchesPwd(saltPassword, employeeEntity.getLoginPwd())) {
         // 记录登录失败
         saveLoginLog(
             employeeEntity, ip, userAgent, "密码错误", LoginLogResultEnum.LOGIN_FAIL, loginDeviceEnum);

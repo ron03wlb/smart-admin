@@ -1,12 +1,11 @@
-package net.lab1024.sa.base.module.support.securityprotect.service;
+package net.lab1024.sa.common.securityprotect.service;
 
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
@@ -18,18 +17,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 三级等保 文件 相关
+ * 文件安全检测服务
  *
- * @author 1024创新实验室-主任:卓大
- * @since 2024/08/22 19:25:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>，Since 2012
+ * <p>提供文件MIME类型检测和安全性验证功能，使用Apache Tika进行真实文件类型检测。
+ *
+ * @author 1024创新实验室-主任: 卓大
+ * @since 2025-01-20 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
-@Service
 @Slf4j
-public class SecurityFileService {
+@Service
+public class FileSecurityService {
 
-  @Resource private Level3ProtectConfigService level3ProtectConfigService;
-
-  // 定义白名单MIME类型
+  /** 白名单MIME类型列表 */
   private static final List<String> ALLOWED_MIME_TYPES =
       Arrays.asList(
           "application/json",
@@ -44,45 +43,59 @@ public class SecurityFileService {
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "application/vnd.ms-works",
           "text/csv",
+          "text/plain",
           "audio/*",
           "video/*",
           // 图片类型 svg有安全隐患，所以不使用"image/*"
           "image/jpeg",
           "image/png",
           "image/gif",
-          "image/bmp");
+          "image/bmp",
+          "image/webp");
 
-  /** 检测文件安全类型 */
-  public ResponseDTO<String> checkFile(MultipartFile file) {
+  /**
+   * 检测文件类型是否安全
+   *
+   * @param file 待检测的文件
+   * @return 检测失败时返回错误消息，检测通过返回 empty
+   */
+  public Optional<String> checkFileType(MultipartFile file) {
+    String fileType = getFileMimeType(file);
+    if (ALLOWED_MIME_TYPES.stream()
+        .noneMatch(allowedType -> matchesMimeType(fileType, allowedType))) {
+      return Optional.of("禁止上传此文件类型");
+    }
+    return Optional.empty();
+  }
 
-    // 检验文件大小
-    if (level3ProtectConfigService.getMaxUploadFileSizeMb() > 0) {
-      long maxSize = level3ProtectConfigService.getMaxUploadFileSizeMb() * 1024 * 1024;
-      if (file.getSize() > maxSize) {
-        return ResponseDTO.userErrorParam(
-            "上传文件最大为:" + level3ProtectConfigService.getMaxUploadFileSizeMb() + " mb");
-      }
+  /**
+   * 检测文件大小
+   *
+   * @param file 待检测的文件
+   * @param maxSizeMb 最大文件大小（MB）
+   * @return 检测失败时返回错误消息，检测通过返回 empty
+   */
+  public Optional<String> checkFileSize(MultipartFile file, long maxSizeMb) {
+    if (maxSizeMb <= 0) {
+      return Optional.empty();
     }
 
-    // 文件类型安全检测
-    if (level3ProtectConfigService.isFileDetectFlag()) {
-      String fileType = getFileMimeType(file);
-      if (ALLOWED_MIME_TYPES.stream()
-          .noneMatch(allowedType -> matchesMimeType(fileType, allowedType))) {
-        return ResponseDTO.userErrorParam("禁止上传此文件类型");
-      }
+    long maxSize = maxSizeMb * 1024 * 1024;
+    if (file.getSize() > maxSize) {
+      return Optional.of("上传文件最大为:" + maxSizeMb + " mb");
     }
-
-    return ResponseDTO.ok();
+    return Optional.empty();
   }
 
   /**
    * 获取文件的 MIME 类型
    *
+   * <p>使用 Apache Tika 进行真实文件类型检测，不依赖文件扩展名。
+   *
    * @param file 要检查的文件
    * @return 文件的 MIME 类型
    */
-  public static String getFileMimeType(MultipartFile file) {
+  public String getFileMimeType(MultipartFile file) {
     try (InputStream inputStream = file.getInputStream();
         TikaInputStream stream = TikaInputStream.get(inputStream)) {
       TikaConfig tika = new TikaConfig();
@@ -92,7 +105,7 @@ public class SecurityFileService {
       return mimetype.toString();
     } catch (IOException | TikaException e) {
       if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
+        log.error("获取文件MIME类型失败: {}", e.getMessage(), e);
       }
       return MimeTypes.OCTET_STREAM;
     }
@@ -102,10 +115,10 @@ public class SecurityFileService {
    * 检查文件的 MIME 类型是否与指定的MIME 类型匹配（支持通配符）
    *
    * @param fileType 文件的 MIME 类型
-   * @param mimetype MIME 类型（支持通配符）
+   * @param mimetype MIME 类型（支持通配符，如 image/*）
    * @return 是否匹配
    */
-  private static boolean matchesMimeType(String fileType, String mimetype) {
+  private boolean matchesMimeType(String fileType, String mimetype) {
     if (mimetype.endsWith("/*")) {
       String prefix = mimetype.substring(0, mimetype.length() - 1);
       return fileType.startsWith(prefix);

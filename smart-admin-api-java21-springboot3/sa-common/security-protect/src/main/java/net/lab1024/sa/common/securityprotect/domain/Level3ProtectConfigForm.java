@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.securityprotect.domain;
+package net.lab1024.sa.common.securityprotect.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

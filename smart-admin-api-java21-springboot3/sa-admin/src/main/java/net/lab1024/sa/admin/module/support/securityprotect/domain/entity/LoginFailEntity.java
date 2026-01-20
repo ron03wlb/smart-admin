@@ -1,11 +1,13 @@
-package net.lab1024.sa.base.module.support.securityprotect.domain;
+package net.lab1024.sa.admin.module.support.securityprotect.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 登录失败记录
@@ -15,6 +17,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("t_login_fail")
 public class LoginFailEntity {
 

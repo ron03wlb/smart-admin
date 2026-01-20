@@ -1,21 +1,21 @@
-package net.lab1024.sa.admin.module.system.support;
+package net.lab1024.sa.admin.module.support.securityprotect.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.admin.module.support.securityprotect.domain.form.LoginFailQueryForm;
+import net.lab1024.sa.admin.module.support.securityprotect.domain.vo.LoginFailVO;
+import net.lab1024.sa.admin.module.support.securityprotect.service.Level3ProtectConfigService;
+import net.lab1024.sa.admin.module.support.securityprotect.service.SecurityLoginService;
 import net.lab1024.sa.base.common.controller.SupportBaseController;
 import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.constant.SwaggerTagConst;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
-import net.lab1024.sa.base.module.support.securityprotect.domain.Level3ProtectConfigForm;
-import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailQueryForm;
-import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailVO;
-import net.lab1024.sa.base.module.support.securityprotect.service.Level3ProtectConfigService;
-import net.lab1024.sa.base.module.support.securityprotect.service.SecurityLoginService;
+import net.lab1024.sa.common.securityprotect.domain.Level3ProtectConfigForm;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,13 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Tag(name = SwaggerTagConst.Support.PROTECT)
+@RequiredArgsConstructor
 public class AdminProtectController extends SupportBaseController {
 
-  @Resource private SecurityLoginService securityLoginService;
-
-  @Resource private Level3ProtectConfigService level3ProtectConfigService;
-
-  @Resource private ConfigService configService;
+  private final SecurityLoginService securityLoginService;
+  private final Level3ProtectConfigService level3ProtectConfigService;
+  private final ConfigService configService;
 
   @Operation(summary = "分页查询 @author 1024创新实验室-主任-卓大")
   @PostMapping("/protect/loginFail/queryPage")

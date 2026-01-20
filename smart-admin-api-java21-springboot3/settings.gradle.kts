@@ -14,5 +14,6 @@ include(
     "sa-common:api-encrypt",
     "sa-common:captcha",
     "sa-common:repeat-submit",
-    "sa-common:data-masking"
+    "sa-common:data-masking",
+    "sa-common:security-protect"
 )

@@ -1,21 +1,24 @@
-package net.lab1024.sa.base.module.support.securityprotect.service;
+package net.lab1024.sa.admin.module.support.securityprotect.service;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
-import net.lab1024.sa.base.module.support.securityprotect.domain.Level3ProtectConfigForm;
+import net.lab1024.sa.common.securityprotect.domain.Level3ProtectConfigForm;
+import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 /**
- * 三级等保配置
+ * 三级等保配置服务
+ *
+ * <p>实现 SecurityConfigProvider 接口，提供安全配置参数。
  *
  * @author 1024创新实验室-创始人兼主任:卓大
  * @since 2024/7/30 Copyright <a href="https://1024lab.net">1024创新实验室</a> ，Since 2012
@@ -23,38 +26,45 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @DependsOn("jsonUtil")
-public class Level3ProtectConfigService {
+@RequiredArgsConstructor
+public class Level3ProtectConfigService implements SecurityConfigProvider {
 
-  /** 开启双因子登录，默认：开启 -- GETTER -- 开启双因子登录，默认：开启 */
+  /** 开启双因子登录，默认：关闭 */
   @Getter private boolean twoFactorLoginEnabled = false;
 
-  /** 连续登录失败次数则锁定，-1表示不受限制，可以一直尝试登录 -- GETTER -- 连续登录失败次数则锁定，-1表示不受限制，可以一直尝试登录 */
+  /** 连续登录失败次数则锁定，-1表示不受限制，可以一直尝试登录 */
   @Getter private int loginFailMaxTimes = -1;
 
-  /** 连续登录失败锁定时间（单位：秒），-1表示不锁定，建议锁定30分钟 -- GETTER -- 连续登录失败锁定时间（单位：秒），-1表示不锁定，建议锁定30分钟 */
+  /** 连续登录失败锁定时间（单位：秒），-1表示不锁定，建议锁定30分钟 */
   @Getter private int loginFailLockSeconds = 1800;
 
   /** 最低活跃时间（单位：秒），超过此时间没有操作系统就会被冻结，默认-1 代表不限制，永不冻结; 默认 30分钟 */
   private int loginActiveTimeoutSeconds = -1;
 
-  /** 密码复杂度 是否开启，默认：开启 -- GETTER -- 密码复杂度 是否开启，默认：开启 */
+  /** 密码复杂度 是否开启，默认：开启 */
   @Getter private boolean passwordComplexityEnabled = true;
 
-  /** 定期修改密码时间间隔（默认：天），默认：建议90天更换密码 -- GETTER -- 定期修改密码时间间隔（默认：天），默认：建议90天更换密码 */
+  /** 定期修改密码时间间隔（默认：天），默认：建议90天更换密码 */
   @Getter private int regularChangePasswordDays = 90;
 
-  /** 定期修改密码不允许相同次数，默认：3次以内密码不能相同 -- GETTER -- 定期修改密码不允许相同次数，默认：3次以内密码不能相同 */
+  /** 定期修改密码不允许相同次数，默认：3次以内密码不能相同 */
   @Getter private int regularChangePasswordNotAllowRepeatTimes = 3;
 
-  /** 文件大小限制，单位 mb ，(默认：50 mb) -- GETTER -- 文件大小限制，单位 mb ，(默认：50 mb) */
+  /** 文件大小限制，单位 mb ，(默认：50 mb) */
   @Getter private long maxUploadFileSizeMb = 50;
 
-  /** 文件检测，默认：不开启 -- GETTER -- 文件检测，默认：不开启 */
-  @Getter private boolean fileDetectFlag = false;
+  /** 文件检测，默认：不开启 */
+  private boolean fileDetectEnabled = false;
 
-  @Resource private ConfigService configService;
+  private final ConfigService configService;
+
+  @Override
+  public boolean isFileDetectEnabled() {
+    return fileDetectEnabled;
+  }
 
   /** 最低活跃时间（单位：秒），超过此时间没有操作系统就会被冻结，默认-1 代表不限制，永不冻结; 默认 30分钟 */
+  @Override
   public int getLoginActiveTimeoutSeconds() {
     return loginActiveTimeoutSeconds > 0 ? loginActiveTimeoutSeconds : -1;
   }
@@ -74,7 +84,7 @@ public class Level3ProtectConfigService {
   private void setProp(Level3ProtectConfigForm configForm) {
 
     if (configForm.getFileDetectFlag() != null) {
-      this.fileDetectFlag = configForm.getFileDetectFlag();
+      this.fileDetectEnabled = configForm.getFileDetectFlag();
     }
 
     if (configForm.getMaxUploadFileSizeMb() != null) {
@@ -120,7 +130,12 @@ public class Level3ProtectConfigService {
     }
   }
 
-  /** 更新三级等保配置 */
+  /**
+   * 更新三级等保配置
+   *
+   * @param configForm 配置表单
+   * @return 操作结果
+   */
   public ResponseDTO<String> updateLevel3Config(Level3ProtectConfigForm configForm) {
     // 设置属性
     setProp(configForm);

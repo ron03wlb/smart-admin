@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import net.lab1024.sa.admin.module.support.securityprotect.service.SecurityPasswordService;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEntity;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
@@ -39,7 +40,6 @@ import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.enumeration.UserTypeEnum;
 import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
-import net.lab1024.sa.base.module.support.securityprotect.service.SecurityPasswordService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -168,7 +168,7 @@ public class EmployeeService {
     // 设置密码 随机密码
     String randomPassword = securityPasswordService.randomPassword();
     String generateSaltPassword = this.generateSaltPassword(randomPassword, employeeUid);
-    entity.setLoginPwd(SecurityPasswordService.getEncryptPwd(generateSaltPassword));
+    entity.setLoginPwd(securityPasswordService.getEncryptPwd(generateSaltPassword));
 
     // 保存数据
     entity.setDeletedFlag(Boolean.FALSE);
@@ -368,7 +368,7 @@ public class EmployeeService {
     }
 
     // 校验原始密码
-    if (!SecurityPasswordService.matchesPwd(
+    if (!securityPasswordService.matchesPwd(
         this.generateSaltPassword(
             updatePasswordForm.getOldPassword(), employeeEntity.getEmployeeUid()),
         employeeEntity.getLoginPwd())) {
@@ -399,7 +399,7 @@ public class EmployeeService {
 
     // 更新密码
     String newEncryptPassword =
-        SecurityPasswordService.getEncryptPwd(
+        securityPasswordService.getEncryptPwd(
             this.generateSaltPassword(
                 updatePasswordForm.getNewPassword(), employeeEntity.getEmployeeUid()));
     EmployeeEntity updateEntity = new EmployeeEntity();
@@ -448,7 +448,7 @@ public class EmployeeService {
 
     String password = securityPasswordService.randomPassword();
     String saltPassword = this.generateSaltPassword(password, employeeEntity.getEmployeeUid());
-    employeeDao.updatePassword(employeeId, SecurityPasswordService.getEncryptPwd(saltPassword));
+    employeeDao.updatePassword(employeeId, securityPasswordService.getEncryptPwd(saltPassword));
     return ResponseDTO.ok(password);
   }
 

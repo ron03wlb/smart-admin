@@ -95,6 +95,9 @@ dependencies {
     // Data Masking
     api(project(":sa-common:data-masking"))
 
+    // Security Protect
+    api(project(":sa-common:security-protect"))
+
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)
 

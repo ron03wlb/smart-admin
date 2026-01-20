@@ -1,19 +1,21 @@
-package net.lab1024.sa.base.module.support.securityprotect.service;
+package net.lab1024.sa.admin.module.support.securityprotect.service;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.admin.module.support.securityprotect.dao.LoginFailDao;
+import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.LoginFailEntity;
+import net.lab1024.sa.admin.module.support.securityprotect.domain.form.LoginFailQueryForm;
+import net.lab1024.sa.admin.module.support.securityprotect.domain.vo.LoginFailVO;
 import net.lab1024.sa.base.common.code.UserErrorCode;
 import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.enumeration.UserTypeEnum;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
-import net.lab1024.sa.base.module.support.securityprotect.dao.LoginFailDao;
-import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailEntity;
-import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailQueryForm;
-import net.lab1024.sa.base.module.support.securityprotect.domain.LoginFailVO;
+import net.lab1024.sa.common.securityprotect.constant.SecurityConst;
+import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,29 +26,27 @@ import org.springframework.stereotype.Service;
  * @since 2023/10/11 19:25:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>，Since 2012
  */
 @Service
+@RequiredArgsConstructor
 public class SecurityLoginService {
 
   private static final String LOGIN_LOCK_MSG = "您已连续登录失败%s次，账号锁定%s分钟，解锁时间为：%s，请您耐心等待！";
 
   private static final String LOGIN_FAIL_MSG = "登录名或密码错误！连续登录失败%s次，账号将锁定%s分钟！您还可以再尝试%s次！";
 
-  @Resource private Level3ProtectConfigService level3ProtectConfigService;
-
-  @Resource private LoginFailDao loginFailDao;
-
-  private static final int MIN_FAIL_TIMES_THRESHOLD = 1;
+  private final SecurityConfigProvider securityConfigProvider;
+  private final LoginFailDao loginFailDao;
 
   /**
    * 检查是否可以登录
    *
-   * @param userId
-   * @param userType
-   * @return
+   * @param userId 用户ID
+   * @param userType 用户类型
+   * @return 检查结果
    */
   public ResponseDTO<LoginFailEntity> checkLogin(Long userId, UserTypeEnum userType) {
 
     // 若登录最大失败次数小于1，无需校验
-    if (level3ProtectConfigService.getLoginFailMaxTimes() < MIN_FAIL_TIMES_THRESHOLD) {
+    if (securityConfigProvider.getLoginFailMaxTimes() < SecurityConst.MIN_FAIL_TIMES_THRESHOLD) {
       return ResponseDTO.ok();
     }
 
@@ -57,7 +57,7 @@ public class SecurityLoginService {
     }
 
     // 校验登录失败次数
-    if (loginFailEntity.getLoginFailCount() < level3ProtectConfigService.getLoginFailMaxTimes()) {
+    if (loginFailEntity.getLoginFailCount() < securityConfigProvider.getLoginFailMaxTimes()) {
       return ResponseDTO.ok(loginFailEntity);
     }
 
@@ -69,7 +69,7 @@ public class SecurityLoginService {
     // 校验锁定时长
     if (loginFailEntity
         .getLoginLockBeginTime()
-        .plusSeconds(level3ProtectConfigService.getLoginFailLockSeconds())
+        .plusSeconds(securityConfigProvider.getLoginFailLockSeconds())
         .isBefore(LocalDateTime.now())) {
       // 过了锁定时间
       return ResponseDTO.ok(loginFailEntity);
@@ -78,34 +78,36 @@ public class SecurityLoginService {
     LocalDateTime unlockTime =
         loginFailEntity
             .getLoginLockBeginTime()
-            .plusSeconds(level3ProtectConfigService.getLoginFailLockSeconds());
+            .plusSeconds(securityConfigProvider.getLoginFailLockSeconds());
     return ResponseDTO.error(
         UserErrorCode.LOGIN_FAIL_LOCK,
         String.format(
             LOGIN_LOCK_MSG,
             loginFailEntity.getLoginFailCount(),
-            level3ProtectConfigService.getLoginFailLockSeconds() / 60,
+            securityConfigProvider.getLoginFailLockSeconds() / 60,
             LocalDateTimeUtil.formatNormal(unlockTime)));
   }
 
   /**
    * 登录失败后记录
    *
-   * @param userId
-   * @param userType
-   * @param loginFailEntity
+   * @param userId 用户ID
+   * @param userType 用户类型
+   * @param loginName 登录名
+   * @param loginFailEntity 登录失败实体
+   * @return 提示消息
    */
   public String recordLoginFail(
       Long userId, UserTypeEnum userType, String loginName, LoginFailEntity loginFailEntity) {
 
     // 若登录最大失败次数小于1，无需记录
-    if (level3ProtectConfigService.getLoginFailMaxTimes() < MIN_FAIL_TIMES_THRESHOLD) {
+    if (securityConfigProvider.getLoginFailMaxTimes() < SecurityConst.MIN_FAIL_TIMES_THRESHOLD) {
       return null;
     }
 
     // 登录失败
     int loginFailCount = loginFailEntity == null ? 1 : loginFailEntity.getLoginFailCount() + 1;
-    boolean lockFlag = loginFailCount >= level3ProtectConfigService.getLoginFailMaxTimes();
+    boolean lockFlag = loginFailCount >= securityConfigProvider.getLoginFailMaxTimes();
     LocalDateTime lockBeginTime = lockFlag ? LocalDateTime.now() : null;
 
     LoginFailEntity loginFail = loginFailEntity;
@@ -133,31 +135,31 @@ public class SecurityLoginService {
       LocalDateTime unlockTime =
           loginFail
               .getLoginLockBeginTime()
-              .plusSeconds(level3ProtectConfigService.getLoginFailLockSeconds());
+              .plusSeconds(securityConfigProvider.getLoginFailLockSeconds());
       return String.format(
           LOGIN_LOCK_MSG,
           loginFail.getLoginFailCount(),
-          level3ProtectConfigService.getLoginFailLockSeconds() / 60,
+          securityConfigProvider.getLoginFailLockSeconds() / 60,
           LocalDateTimeUtil.formatNormal(unlockTime));
     } else {
       return String.format(
           LOGIN_FAIL_MSG,
-          level3ProtectConfigService.getLoginFailMaxTimes(),
-          level3ProtectConfigService.getLoginFailLockSeconds() / 60,
-          level3ProtectConfigService.getLoginFailMaxTimes() - loginFail.getLoginFailCount());
+          securityConfigProvider.getLoginFailMaxTimes(),
+          securityConfigProvider.getLoginFailLockSeconds() / 60,
+          securityConfigProvider.getLoginFailMaxTimes() - loginFail.getLoginFailCount());
     }
   }
 
   /**
    * 清除登录失败
    *
-   * @param userId
-   * @param userType
+   * @param userId 用户ID
+   * @param userType 用户类型
    */
   public void removeLoginFail(Long userId, UserTypeEnum userType) {
 
     // 若登录最大失败次数小于1，无需校验
-    if (level3ProtectConfigService.getLoginFailMaxTimes() < MIN_FAIL_TIMES_THRESHOLD) {
+    if (securityConfigProvider.getLoginFailMaxTimes() < SecurityConst.MIN_FAIL_TIMES_THRESHOLD) {
       return;
     }
 
@@ -167,8 +169,8 @@ public class SecurityLoginService {
   /**
    * 分页查询
    *
-   * @param queryForm
-   * @return
+   * @param queryForm 查询表单
+   * @return 分页结果
    */
   public PageResult<LoginFailVO> queryPage(LoginFailQueryForm queryForm) {
     Page<?> page = SmartPageUtil.convert2PageQuery(queryForm);
@@ -179,8 +181,8 @@ public class SecurityLoginService {
   /**
    * 批量删除
    *
-   * @param idList
-   * @return
+   * @param idList ID列表
+   * @return 操作结果
    */
   public ResponseDTO<String> batchDelete(List<Long> idList) {
     if (CollectionUtils.isEmpty(idList)) {
@@ -191,4 +193,3 @@ public class SecurityLoginService {
     return ResponseDTO.ok();
   }
 }
-;

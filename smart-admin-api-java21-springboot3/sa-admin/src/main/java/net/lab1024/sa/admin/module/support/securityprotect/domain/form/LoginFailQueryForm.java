@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.securityprotect.domain;
+package net.lab1024.sa.admin.module.support.securityprotect.domain.form;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
@@ -22,9 +22,9 @@ public class LoginFailQueryForm extends PageParam {
   @Schema(description = "锁定状态")
   private Boolean lockFlag;
 
-  @Schema(description = "登录失败锁定时间")
+  @Schema(description = "登录失败锁定时间-开始")
   private LocalDate loginLockBeginTimeBegin;
 
-  @Schema(description = "登录失败锁定时间")
+  @Schema(description = "登录失败锁定时间-结束")
   private LocalDate loginLockBeginTimeEnd;
 }
