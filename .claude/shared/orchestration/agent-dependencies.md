@@ -10,15 +10,15 @@
                     (requirements)
                            ↓
                     java-architect ←─────┐
-                      /         \        |
-                     /           \       |
-          (database)              (code) |
-                   /               \     |
-                  ↓                 ↓    |
-            postgres-pro      devops-engineer
-                  |                 |
-             (db health)    (infrastructure)
-                  |                 |
+                      /    |     \       |
+                     /     |      \      |
+          (database)   (API)   (code)    |
+                   /       ↓      \      |
+                  ↓    vue-expert  ↓     |
+            postgres-pro     |   devops-engineer
+                  |    (frontend)|       |
+             (db health)     └───────────┤
+                  |                      |
                   └────→ chaos-engineer ←┘
                       (resilience testing)
 ```
@@ -45,6 +45,11 @@
   - Format: application.yml, environment variables
 
 **Feeds Into:**
+- **vue-expert** (backend API contracts)
+  - Provides: API documentation, Request/Response DTOs, permission requirements
+  - When: Backend API complete
+  - Format: Swagger docs, API contracts, test data
+
 - **chaos-engineer** (code for testing)
   - Provides: Critical code paths, error handling
   - When: Feature complete
@@ -107,6 +112,41 @@
 **Feeds Into:**
 - **chaos-engineer** (deployed system for testing)
 - **business-analyst** (deployment metrics, uptime data)
+
+### vue-expert Dependencies
+
+**Depends On:**
+- **business-analyst** (UI/UX requirements)
+  - Needs: User workflows, UI mockups, interaction patterns
+  - Before: Starting frontend implementation
+  - Format: User stories, wireframes, acceptance criteria
+
+- **java-architect** (backend API contracts)
+  - Needs: API endpoints, Request/Response models, permissions
+  - Before: API integration
+  - Format: Swagger/OpenAPI docs, sample requests, test data
+
+**Collaborates With:**
+- **java-architect** (API alignment)
+  - When: Integrating frontend with backend
+  - Exchange: Request/Response structure validation, permission alignment
+  - Format: TypeScript interfaces ↔ Java DTOs, v-privilege ↔ @SaCheckPermission
+
+- **devops-engineer** (frontend deployment)
+  - When: Frontend build configuration
+  - Exchange: Build artifacts, environment configs, CDN setup
+  - Format: Vite configs, environment variables, deployment scripts
+
+- **business-analyst** (UI feedback)
+  - When: Reviewing implemented UI
+  - Exchange: User workflow validation, UI improvement suggestions
+  - Format: Screenshots, interactive prototypes
+
+**Feeds Into:**
+- **devops-engineer** (frontend build artifacts)
+  - Provides: Built static files, deployment configs
+  - When: Frontend complete
+  - Format: dist/ folder, nginx configs, environment files
 
 ### postgres-pro Dependencies
 
@@ -203,6 +243,35 @@
 - No security vulnerabilities
 - Documentation updated
 
+### java-architect → vue-expert
+
+**Handoff Trigger:** Backend API implemented and tested
+
+**Handoff Package:**
+- Swagger/OpenAPI documentation (accessible at /swagger-ui.html)
+- API endpoint URLs and HTTP methods
+- Request DTO structures (Form objects)
+- Response DTO structures (VO objects)
+- Permission requirements (@SaCheckPermission annotations)
+- Sample request/response JSON
+- Error codes and messages (ErrorCode enum)
+- Test data (employee IDs, valid payloads)
+- Mock server URL (if available)
+
+**Acceptance Criteria:**
+- All tests pass (unit + integration)
+- API accessible in dev environment
+- Swagger documentation complete
+- Sample data available for testing
+- Permissions configured
+
+**API Contract Alignment Checklist:**
+- [ ] Request DTO fields match frontend Form interfaces
+- [ ] Response DTO fields match frontend VO interfaces
+- [ ] Permission strings documented (for v-privilege)
+- [ ] Error handling patterns documented
+- [ ] Pagination parameters consistent (pageNum, pageSize)
+
 ### java-architect → postgres-pro
 
 **Handoff Trigger:** Complex query or performance issue identified
@@ -218,6 +287,28 @@
 - Query patterns documented
 - Performance baseline established
 - Optimization goals defined
+
+### vue-expert → devops-engineer
+
+**Handoff Trigger:** Frontend implementation complete and tested
+
+**Handoff Package:**
+- Build artifacts (dist/ folder with static files)
+- Environment configuration (.env files for dev/test/prod)
+- Build commands (npm run build, npm run type-check)
+- Vite configuration (vite.config.ts)
+- Nginx configuration (if custom routing needed)
+- Asset optimization settings
+- API proxy configuration
+- Frontend resource requirements (CDN, bandwidth)
+
+**Acceptance Criteria:**
+- All tests pass (unit + integration)
+- Build succeeds without errors
+- Type checking passes (TypeScript)
+- No linting errors
+- Test coverage >80%
+- Frontend accessible in dev environment
 
 ### devops-engineer → chaos-engineer
 
@@ -241,11 +332,13 @@
 
 **When:** Dependencies between agents
 
-**Example:** New Feature
+**Example:** New Full-Stack Feature
 ```
 business-analyst (complete requirements)
         ↓
-java-architect (implement feature)
+java-architect (implement backend API)
+        ↓
+vue-expert (implement frontend)
         ↓
 devops-engineer (deploy to staging)
         ↓
@@ -271,7 +364,30 @@ problem ┤
 
 **Communication:** Regular sync points to align
 
-### Pattern 3: Iterative Refinement
+### Pattern 3: Frontend-Backend Integration
+
+**When:** API integration issues or contract misalignment
+
+**Example:** API Debugging
+```
+        ┌──→ java-architect (check backend logs, validation)
+problem ┤
+        └──→ vue-expert (check frontend payload, error handling)
+                    ↓
+            (sync on data structures)
+                    ↓
+        ┌──→ java-architect (fix DTO if needed)
+aligned ┤
+        └──→ vue-expert (fix TypeScript interface if needed)
+                    ↓
+            (integration testing)
+                    ↓
+            devops-engineer (deploy)
+```
+
+**Communication:** Real-time collaboration to align API contracts
+
+### Pattern 4: Iterative Refinement
 
 **When:** Solution requires multiple rounds
 
@@ -281,22 +397,24 @@ business-analyst → java-architect → business-analyst (clarification)
                         ↓
                 java-architect (revised implementation)
                         ↓
+                   vue-expert
+                        ↓
                 devops-engineer
 ```
 
 **Communication:** Continuous feedback loops
 
-### Pattern 4: Hub-and-Spoke
+### Pattern 5: Hub-and-Spoke
 
 **When:** Central coordinator with multiple specialists
 
 **Example:** Production Incident
 ```
             devops-engineer (hub - triage)
-                /        |        \
-               /         |         \
-    java-architect  postgres-pro  chaos-engineer
-     (as needed)    (as needed)   (as needed)
+                /        |        \        \
+               /         |         \        \
+    java-architect  vue-expert  postgres-pro  chaos-engineer
+     (as needed)    (as needed)  (as needed)   (as needed)
 ```
 
 **Communication:** Central agent orchestrates
@@ -367,9 +485,10 @@ business-analyst → java-architect → business-analyst (clarification)
 
 | Agent | Depends On | Feeds Into | Parallel With |
 |-------|------------|------------|---------------|
-| **business-analyst** | None (starts chain) | java-architect, All | - |
-| **java-architect** | business-analyst | devops, chaos | postgres-pro |
-| **devops-engineer** | java-architect, postgres-pro | chaos, business-analyst | - |
+| **business-analyst** | None (starts chain) | java-architect, vue-expert, All | - |
+| **java-architect** | business-analyst | vue-expert, devops, chaos | postgres-pro |
+| **vue-expert** | business-analyst, java-architect | devops | java-architect (for API debugging) |
+| **devops-engineer** | java-architect, vue-expert, postgres-pro | chaos, business-analyst | - |
 | **postgres-pro** | java-architect | java-architect, devops | java-architect |
 | **chaos-engineer** | All technical | All technical | - |
 
@@ -384,9 +503,17 @@ business-analyst → java-architect → business-analyst (clarification)
 
 **Most Important:**
 - business-analyst typically starts new features
-- java-architect is central to implementation
-- devops-engineer enables deployment
+- java-architect implements backend APIs
+- vue-expert implements frontend UI
+- java-architect ↔ vue-expert must align on API contracts
+- devops-engineer enables deployment (both backend + frontend)
 - postgres-pro optimizes database
 - chaos-engineer validates resilience
+
+**Key Handoffs:**
+- BA → Java: Requirements with API contracts
+- Java → Vue: Swagger docs + test data + permissions
+- Vue → DevOps: Build artifacts + configs
+- Java/Vue → DevOps: Complete feature for deployment
 
 **Collaboration beats isolation!**

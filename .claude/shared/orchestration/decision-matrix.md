@@ -9,6 +9,8 @@
     ↓
 Is it about Java code implementation? ──YES──→ java-architect
     ↓ NO
+Is it about Vue/Frontend implementation? ──YES──→ vue-expert
+    ↓ NO
 Is it about requirements/process/stakeholders? ──YES──→ business-analyst
     ↓ NO
 Is it about deployment/CI-CD/infrastructure? ──YES──→ devops-engineer
@@ -26,6 +28,8 @@ Use general-purpose or ask user for clarification
 |---------------------|-------|------------|------------------|
 | **Java Development** ||||
 | Spring Boot, @Transactional, @Service, Controller, REST API, layering, MyBatis Plus, entity, service layer | **java-architect** | High | "implement employee API", "add REST endpoint", "optimize JPA queries", "fix N+1 problem", "review service code" |
+| **Frontend Development** ||||
+| Vue, Component, Frontend, UI, Ant Design Vue, Composition API, form-modal, v-privilege, Pinia, reactive, Vite | **vue-expert** | High | "create employee list page", "implement form validation", "integrate backend API", "add permission controls", "optimize Vue performance" |
 | **Business Analysis** ||||
 | requirements, stakeholders, ROI, business process, user story, workflow, acceptance criteria, KPI, metrics | **business-analyst** | High | "gather requirements", "analyze process", "improve workflow", "calculate ROI", "define success metrics" |
 | **DevOps & Deployment** ||||
@@ -37,16 +41,17 @@ Use general-purpose or ask user for clarification
 
 ## Context-Based Decision Logic
 
-### Scenario 1: New Feature Implementation
+### Scenario 1: New Feature Implementation (Full-Stack)
 
 **Request:** "Add employee performance review feature"
 
 **Agent Sequence:**
 1. **business-analyst** (first) - Gather requirements, define user stories, create process flows
-2. **java-architect** (second) - Implement the feature following SmartAdmin patterns
-3. **postgres-pro** (if complex queries) - Optimize database performance
-4. **devops-engineer** (third) - Deploy to staging/production
-5. **chaos-engineer** (fourth) - Validate resilience of critical path
+2. **java-architect** (second) - Implement backend API (Controller → Service → Dao)
+3. **vue-expert** (third) - Implement frontend pages (list, form-modal) and integrate with backend API
+4. **postgres-pro** (if complex queries) - Optimize database performance
+5. **devops-engineer** (fourth) - Deploy to staging/production
+6. **chaos-engineer** (fifth) - Validate resilience of critical path
 
 ### Scenario 2: Performance Problem
 
@@ -72,15 +77,36 @@ Use general-purpose or ask user for clarification
    - Infrastructure → **devops-engineer** (continues)
 3. **chaos-engineer** (prevention) - Create test to prevent recurrence
 
-### Scenario 4: Process Improvement
+### Scenario 4: Frontend Performance Issue
+
+**Request:** "Employee list page is lagging"
+
+**Sequential Response:**
+1. **vue-expert** (lead) - Profile Vue reactivity, check for unnecessary re-renders
+2. **java-architect** (if API slow) - Review backend API performance
+3. **postgres-pro** (if query slow) - Optimize database queries
+4. **devops-engineer** (deploy) - Deploy optimizations, monitor improvements
+
+### Scenario 5: API Integration Issue
+
+**Request:** "Frontend getting 500 errors from backend"
+
+**Parallel Investigation:**
+- **vue-expert** - Check frontend request payload, error handling
+- **java-architect** - Review backend API, check logs and validation
+
+**Convergence:** Align on data structures, fix contract mismatch
+
+### Scenario 6: Process Improvement
 
 **Request:** "Employee onboarding takes too long"
 
 **Agent Sequence:**
 1. **business-analyst** (lead) - Analyze current process, identify bottlenecks
 2. **java-architect** (if automation needed) - Implement workflow automation
-3. **devops-engineer** (if infrastructure change) - Update deployment process
-4. **chaos-engineer** (if critical) - Test resilience of new process
+3. **vue-expert** (if UI needed) - Create frontend interface for automation
+4. **devops-engineer** (if infrastructure change) - Update deployment process
+5. **chaos-engineer** (if critical) - Test resilience of new process
 
 ## Ambiguous Requests - How to Clarify
 
@@ -88,7 +114,8 @@ Use general-purpose or ask user for clarification
 
 | User Says | Likely Means | Agent |
 |-----------|--------------|-------|
-| "How do I add a feature?" | Implementation guidance | **java-architect** |
+| "How do I add a feature?" | Implementation guidance (backend) | **java-architect** |
+| "How do I create a Vue component?" | Frontend implementation | **vue-expert** |
 | "How do I improve this process?" | Process optimization | **business-analyst** |
 | "How do I deploy this?" | Deployment setup | **devops-engineer** |
 | "How do I optimize queries?" | Database performance | **postgres-pro** |
@@ -98,7 +125,8 @@ Use general-purpose or ask user for clarification
 
 | User Says | Likely Means | Agent |
 |-----------|--------------|-------|
-| "...my code" | Code implementation/review | **java-architect** |
+| "...my Java code" | Backend code review | **java-architect** |
+| "...my Vue component" | Frontend code review | **vue-expert** |
 | "...requirements" | Requirements analysis | **business-analyst** |
 | "...deployment" | CI/CD and infrastructure | **devops-engineer** |
 | "...database" | Database operations | **postgres-pro** |
@@ -108,7 +136,8 @@ Use general-purpose or ask user for clarification
 
 | User Says | What They Want Reviewed | Agent |
 |-----------|-------------------------|-------|
-| "...this Java class" | Code quality, patterns | **java-architect** |
+| "...this Java class" | Backend code quality, patterns | **java-architect** |
+| "...this Vue component" | Frontend code quality, patterns | **vue-expert** |
 | "...this business process" | Process efficiency | **business-analyst** |
 | "...this pipeline" | CI/CD configuration | **devops-engineer** |
 | "...this query" | Query performance | **postgres-pro** |
@@ -185,6 +214,7 @@ Use general-purpose or ask user for clarification
 ### User provides code snippet
 
 **If Java code:** java-architect (review, improve)
+**If Vue/TypeScript code:** vue-expert (review, improve)
 **If SQL:** postgres-pro (optimize query)
 **If YAML/config:** devops-engineer (review infrastructure config)
 
@@ -206,8 +236,13 @@ Use general-purpose or ask user for clarification
 **Tertiary Rule:** When uncertain, ask clarifying questions
 
 **Most Common Patterns:**
-1. New feature: BA → Java → DevOps → Chaos
-2. Bug fix: Java → (DB if needed) → DevOps
-3. Performance: Java + DB parallel → DevOps
-4. Production issue: DevOps → Specialist → Chaos
-5. Process improvement: BA → (Java if automation) → DevOps
+1. New full-stack feature: BA → Java → Vue → DevOps → Chaos
+2. Backend-only feature: BA → Java → DevOps → Chaos
+3. Frontend-only feature: BA → Vue → DevOps
+4. Bug fix (backend): Java → (DB if needed) → DevOps
+5. Bug fix (frontend): Vue → DevOps
+6. Performance (backend): Java + DB parallel → DevOps
+7. Performance (frontend): Vue → (Java/DB if API slow) → DevOps
+8. Production issue: DevOps → Specialist → Chaos
+9. Process improvement: BA → (Java/Vue if automation) → DevOps
+10. API integration: Java + Vue parallel → Integration testing

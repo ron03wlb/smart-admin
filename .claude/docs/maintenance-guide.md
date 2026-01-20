@@ -8,7 +8,8 @@
 .claude/
 ├── shared/                        # Shared knowledge and templates
 │   ├── knowledge/                 # SmartAdmin patterns (edit once, affects all)
-│   │   ├── smartadmin-patterns.md
+│   │   ├── smartadmin-patterns.md              # Backend patterns
+│   │   ├── smartadmin-frontend-patterns.md     # Frontend patterns (v2.2.0)
 │   │   ├── project-architecture.md
 │   │   └── quality-standards.md
 │   ├── templates/                 # Agent inheritance system
@@ -19,26 +20,27 @@
 │       ├── decision-matrix.md
 │       ├── agent-dependencies.md
 │       └── workflow-patterns.md
-├── agents/                        # Individual agent definitions
-│   ├── java-architect.md         # References shared knowledge
+├── agents/                        # Individual agent definitions (6 agents)
+│   ├── java-architect.md          # Backend expert - References shared knowledge
+│   ├── vue-expert.md              # Frontend expert - References frontend patterns
 │   ├── business-analyst.md
 │   ├── chaos-engineer.md
 │   ├── devops-engineer.md
 │   └── postgres-pro.md
 ├── settings.local.json            # Consolidated permissions (12 patterns)
 └── docs/                          # Documentation
-    ├── maintenance-guide.md      # This file
+    ├── maintenance-guide.md       # This file
     ├── permission-guide.md
     └── changelog.md
 ```
 
 ## Common Maintenance Tasks
 
-### Task 1: Update SmartAdmin Patterns
+### Task 1: Update SmartAdmin Backend Patterns
 
-**Scenario:** SmartAdmin adds new pattern or changes convention (e.g., new utility class, changed naming convention)
+**Scenario:** SmartAdmin adds new backend pattern or changes convention (e.g., new utility class, changed naming convention)
 
-**Impact:** All 5 agents automatically get the update
+**Impact:** All backend-related agents (java-architect, business-analyst, devops-engineer, postgres-pro, chaos-engineer) automatically get the update
 
 **Steps:**
 1. **Edit ONE file:** `.claude/shared/knowledge/smartadmin-patterns.md`
@@ -52,7 +54,7 @@
    git commit -m "docs(agents): update SmartAdmin pattern - [description]"
    ```
 
-**Time:** 5 minutes (vs 50 minutes editing 5 files)
+**Time:** 5 minutes (vs 50+ minutes editing 5 backend agent files individually)
 
 **Example:**
 ```markdown
@@ -122,6 +124,186 @@ LocalDateTime parsed = DateUtil.parse(dateString);
    ```
 
 **Time:** 10-15 minutes
+
+### Task 4.5: Update Frontend Agent (vue-expert) or SmartAdmin Frontend Patterns
+
+**Scenario:** SmartAdmin frontend adds new pattern, updates Ant Design Vue usage, or changes frontend conventions
+
+**Impact:** vue-expert agent automatically gets the update
+
+**Steps:**
+1. **Determine if change is:**
+   - ✅ SmartAdmin frontend pattern (applies to all Vue code) → Edit `.claude/shared/knowledge/smartadmin-frontend-patterns.md`
+   - ✅ Vue-specific expertise (vue-expert only) → Edit `.claude/agents/vue-expert.md`
+
+2. **If updating frontend patterns (most common):**
+   - Edit `.claude/shared/knowledge/smartadmin-frontend-patterns.md`
+   - Add or update the pattern with clear examples
+   - Test with vue-expert agent to confirm
+   - Update changelog
+   - Commit:
+     ```bash
+     git add .claude/shared/knowledge/smartadmin-frontend-patterns.md .claude/docs/changelog.md
+     git commit -m "docs(agents): update SmartAdmin frontend pattern - [description]"
+     ```
+
+3. **If updating vue-expert specific expertise:**
+   - Edit `.claude/agents/vue-expert.md`
+   - Only modify "Your Unique Expertise" sections
+   - Don't duplicate what's in smartadmin-frontend-patterns.md
+   - Test the agent
+   - Update changelog
+   - Commit:
+     ```bash
+     git commit -m "feat(vue-expert): add [new Vue 3 feature] expertise"
+     ```
+
+**Time:** 5 minutes (editing shared patterns) or 10-15 minutes (editing agent)
+
+**Common Frontend Pattern Updates:**
+
+**Example 1: New SmartAdmin Custom Component**
+```markdown
+# In smartadmin-frontend-patterns.md, add:
+
+### smart-date-picker (New Component)
+
+**Purpose:** Standardized date picker with SmartAdmin styling
+
+**Usage:**
+```vue
+<smart-date-picker
+  v-model:value="form.createTime"
+  placeholder="请选择日期"
+  format="YYYY-MM-DD HH:mm:ss"
+/>
+```
+
+**Example 2: Changed API Response Format**
+```markdown
+# In smartadmin-frontend-patterns.md, update:
+
+### ResponseModel Structure (UPDATED)
+
+**New field added:**
+```typescript
+interface ResponseModel<T> {
+  code: number;
+  data: T;
+  msg?: string;
+  success: boolean;
+  timestamp?: number;  // NEW: Response timestamp
+}
+```
+
+**Usage update:**
+```typescript
+const response = await employeeApi.query(params);
+if (response.success) {
+  console.log('Response time:', response.timestamp);
+  tableData.value = response.data.list;
+}
+```
+
+**Example 3: New Permission Pattern**
+```markdown
+# In smartadmin-frontend-patterns.md, add:
+
+### Dynamic Permissions (New Pattern)
+
+**For conditionally showing elements based on multiple permissions:**
+```vue
+<a-button
+  v-privilege="['system:employee:add', 'system:employee:update']"
+  :mode="'any'"
+  type="primary">
+  批量操作
+</a-button>
+```
+
+**Mode options:**
+- `any`: User has at least one permission (OR logic)
+- `all`: User has all permissions (AND logic, default)
+```
+
+### Task 4.6: Update Frontend-Backend Collaboration Patterns
+
+**Scenario:** API contract format changes, permission alignment needs update, or new handoff procedure
+
+**Impact:** Both java-architect and vue-expert agents
+
+**Files to update:**
+- `.claude/shared/knowledge/smartadmin-frontend-patterns.md` (frontend side)
+- `.claude/shared/knowledge/smartadmin-patterns.md` (backend side)
+- `.claude/shared/orchestration/agent-dependencies.md` (handoff protocol)
+- `.claude/shared/orchestration/workflow-patterns.md` (integration workflow)
+
+**Steps:**
+1. **Update both knowledge files for consistency:**
+   ```bash
+   # Ensure ResponseDTO (backend) ↔ ResponseModel (frontend) alignment
+   # Edit smartadmin-patterns.md and smartadmin-frontend-patterns.md
+   ```
+
+2. **Update handoff protocol if needed:**
+   ```bash
+   # Edit agent-dependencies.md
+   # Update "java-architect → vue-expert" handoff section
+   # Update API Contract Alignment Checklist
+   ```
+
+3. **Update workflow pattern if integration process changes:**
+   ```bash
+   # Edit workflow-patterns.md
+   # Update Pattern 7: API Integration & Debugging
+   ```
+
+4. **Test both agents:**
+   - Test java-architect with backend implementation
+   - Test vue-expert with frontend implementation
+   - Verify API integration works correctly
+
+5. **Update changelog** (both frontend and backend changes)
+
+6. Commit:
+   ```bash
+   git commit -m "docs(agents): update frontend-backend API contract alignment - [description]"
+   ```
+
+**Time:** 15-20 minutes
+
+**Common API Alignment Updates:**
+
+**Example 1: New Error Code Format**
+```markdown
+# In smartadmin-patterns.md (backend):
+### ErrorCode Enum
+public enum EmployeeErrorCode {
+    EMPLOYEE_NOT_EXIST(30001, "Employee not found"),
+    EMPLOYEE_DISABLED(30002, "Employee is disabled"),
+    EMPLOYEE_DUPLICATE_PHONE(30003, "Phone number already exists")
+}
+
+# In smartadmin-frontend-patterns.md (frontend):
+### Error Handling
+When backend returns error, check `response.code`:
+- 30001: Employee not found → Show "员工不存在"
+- 30002: Employee disabled → Show "员工已禁用"
+- 30003: Duplicate phone → Show "手机号已存在"
+```
+
+**Example 2: New Permission Requirement**
+```markdown
+# In agent-dependencies.md, update handoff checklist:
+
+### API Contract Alignment Checklist:
+- [ ] Request DTO fields match frontend Form interfaces
+- [ ] Response DTO fields match frontend VO interfaces
+- [ ] Permission strings documented (for v-privilege)
+- [ ] **NEW:** Permission format uses dot notation: "module.entity.action"
+- [ ] Error handling patterns documented
+- [ ] Pagination parameters consistent (pageNum, pageSize)
+```
 
 ### Task 5: Add New Agent
 

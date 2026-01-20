@@ -2,13 +2,13 @@
 
 **Purpose:** Define common multi-agent workflow patterns for efficient collaboration.
 
-## Pattern 1: New Feature Implementation (Sequential)
+## Pattern 1: New Full-Stack Feature Implementation (Sequential)
 
-**When:** User requests a new business feature
+**When:** User requests a new business feature requiring both backend and frontend
 
-**Agents:** business-analyst → java-architect → devops-engineer → chaos-engineer
+**Agents:** business-analyst → java-architect → vue-expert → devops-engineer → chaos-engineer
 
-**Timeline:** 1-5 days depending on complexity
+**Timeline:** 2-7 days depending on complexity
 
 ### Phase 1: Requirements (business-analyst)
 
@@ -33,7 +33,7 @@
 - Technical feasibility validated
 - Acceptance criteria clear
 
-### Phase 2: Implementation (java-architect)
+### Phase 2: Backend Implementation (java-architect)
 
 **Duration:** 1-3 days
 
@@ -45,43 +45,75 @@
 - Implement Controller layer (API endpoints)
 - Write unit and integration tests
 - Run ArchitectureTest validation
+- Generate Swagger documentation
 
 **Deliverables:**
-- Feature code following SmartAdmin patterns
+- Backend API code following SmartAdmin patterns
 - Unit tests (>85% coverage)
 - Integration tests
-- API documentation
+- Swagger/OpenAPI documentation
+- Sample test data
 
-**Handoff to devops-engineer when:**
+**Handoff to vue-expert when:**
 - All tests passing
 - ArchitectureTest passing
-- Code reviewed
-- Documentation complete
+- API accessible in dev environment
+- Swagger documentation complete
+- Sample request/response data available
 
-### Phase 3: Deployment (devops-engineer)
+### Phase 3: Frontend Implementation (vue-expert)
+
+**Duration:** 1-3 days
+
+**Activities:**
+- Define TypeScript interfaces matching backend DTOs
+- Create API module (employee-api.ts)
+- Implement list page component (employee-list.vue)
+- Implement form modal component (employee-form-modal.vue)
+- Integrate with backend API (ResponseModel handling)
+- Add permission controls (v-privilege directives)
+- Write component tests (>80% coverage)
+- Run type checking and build validation
+
+**Deliverables:**
+- Frontend pages following SmartAdmin patterns
+- Component tests (>80% coverage)
+- TypeScript type definitions
+- Build artifacts (dist/ folder)
+- Frontend working in dev environment
+
+**Handoff to devops-engineer when:**
+- All tests passing (unit + integration)
+- Type checking passing
+- Frontend successfully integrated with backend API
+- Build succeeds without errors
+- Permissions working correctly
+
+### Phase 4: Deployment (devops-engineer)
 
 **Duration:** 0.5-1 day
 
 **Activities:**
-- Update CI/CD pipeline if needed
-- Configure environment-specific settings
-- Deploy to staging environment
-- Run smoke tests
+- Update CI/CD pipeline if needed (backend + frontend)
+- Configure environment-specific settings (backend configs, frontend .env)
+- Deploy backend to staging
+- Deploy frontend to staging (static files to CDN/nginx)
+- Run smoke tests (backend API + frontend UI)
 - Monitor deployment
 - Deploy to production (manual approval)
 
 **Deliverables:**
-- Staging deployment complete
+- Backend and frontend deployed to staging
 - Production deployment ready
 - Monitoring dashboards updated
 - Runbook updated
 
 **Handoff to chaos-engineer when:**
-- Feature deployed to staging
-- Monitoring in place
-- Rollback tested
+- Full-stack feature deployed to staging
+- Monitoring in place (backend + frontend)
+- Rollback tested (both layers)
 
-### Phase 4: Resilience Validation (chaos-engineer)
+### Phase 5: Resilience Validation (chaos-engineer)
 
 **Duration:** 0.5-1 day
 
@@ -372,12 +404,157 @@
 
 ---
 
+## Pattern 7: API Integration & Debugging (Parallel Convergence)
+
+**When:** Frontend and backend integration issues (500 errors, data mismatch, contract issues)
+
+**Agents:** java-architect + vue-expert (parallel investigation) → converge → devops-engineer
+
+**Timeline:** 0.5-1 day
+
+### Phase 1: Parallel Investigation (java-architect + vue-expert)
+
+**Duration:** 15-30 minutes
+
+**java-architect Activities:**
+- Review backend logs for errors
+- Check request validation logic
+- Verify DTO structure matches documentation
+- Test API endpoint with curl/Postman
+- Check @SaCheckPermission annotations
+
+**vue-expert Activities:**
+- Review frontend request payload in Network tab
+- Check TypeScript interface matches backend DTO
+- Verify API request method (postRequest/getRequest)
+- Check response.success handling
+- Verify v-privilege permission strings
+
+**Sync Point:**
+- Share findings (logs, screenshots, payloads)
+- Identify root cause (contract mismatch, validation error, permission issue)
+- Agree on fix location (backend, frontend, or both)
+
+### Phase 2: Aligned Fix (Coordinated)
+
+**Duration:** 30-60 minutes
+
+**If Contract Mismatch:**
+- **java-architect:** Update DTO field names/types OR
+- **vue-expert:** Update TypeScript interface OR
+- **Both:** Align on new contract structure
+
+**If Validation Error:**
+- **java-architect:** Fix backend validation logic OR
+- **vue-expert:** Fix frontend form validation
+
+**If Permission Error:**
+- **java-architect:** Update @SaCheckPermission OR
+- **vue-expert:** Update v-privilege string OR
+- **devops-engineer:** Update role configuration
+
+**Deliverables:**
+- Aligned API contract (Java DTO ↔ TypeScript interface)
+- Fixed validation/permission issues
+- Integration tests passing
+- Documentation updated (if contract changed)
+
+### Phase 3: Verification & Deployment (devops-engineer)
+
+**Duration:** 15-30 minutes
+
+**Activities:**
+- Deploy fixes to dev environment
+- Run integration tests (frontend + backend)
+- Verify API contract alignment
+- Deploy to staging if tests pass
+
+**Complete when:**
+- Frontend successfully calls backend API
+- No 500 errors
+- Data flows correctly
+- Permissions working
+
+---
+
+## Pattern 8: Frontend Performance Optimization (Sequential)
+
+**When:** Frontend UI is slow (laggy table, slow rendering, excessive re-renders)
+
+**Agents:** vue-expert → java-architect (if API slow) → postgres-pro (if query slow) → devops-engineer
+
+**Timeline:** 0.5-2 days
+
+### Phase 1: Frontend Profiling (vue-expert)
+
+**Duration:** 1-2 hours
+
+**Activities:**
+- Profile component with Vue DevTools
+- Identify unnecessary re-renders
+- Check for reactive data issues (large arrays, deep nesting)
+- Review computed property dependencies
+- Check v-for key usage
+- Profile Vite build size
+
+**Findings:**
+- If frontend issue → Phase 2A
+- If API slow → Phase 2B
+- If both → Phase 2A then 2B
+
+### Phase 2A: Frontend Optimization (vue-expert)
+
+**Duration:** 2-4 hours
+
+**Activities:**
+- Implement shallow reactivity (shallowRef/shallowReactive) for large datasets
+- Add virtual scrolling for large tables (if >1000 rows)
+- Optimize computed dependencies
+- Debounce user input
+- Memoize expensive computations
+- Lazy load components
+- Optimize bundle size (code splitting)
+
+**Deliverables:**
+- Optimized Vue components
+- Performance test results (before/after)
+- Bundle size reduction metrics
+
+### Phase 2B: Backend/Database Optimization (java-architect + postgres-pro)
+
+**Duration:** 2-4 hours
+
+**If API response time >500ms:**
+- **java-architect:** Review service logic, add caching (Manager layer)
+- **postgres-pro:** Optimize queries, add indexes
+
+**Follow Pattern 2 (Performance Optimization - Parallel)**
+
+### Phase 3: Deployment & Validation (devops-engineer)
+
+**Duration:** 0.5-1 hour
+
+**Activities:**
+- Deploy optimizations to staging
+- Run performance tests
+- Monitor metrics (page load time, API response time, render time)
+- Deploy to production
+- Continue monitoring
+
+**Complete when:**
+- Page load time <2 seconds
+- Table rendering smooth (<100ms per interaction)
+- No user-reported lag
+- Metrics show improvement
+
+---
+
 ## Pattern Selection Guide
 
-### Use Pattern 1 (Sequential) When:
+### Use Pattern 1 (Full-Stack Sequential) When:
+- New feature requires both backend and frontend
 - Clear requirements needed upfront
-- Phases have hard dependencies
-- New feature development
+- Phases have hard dependencies (backend API → frontend UI)
 - User-facing changes
 
 ### Use Pattern 2 (Parallel) When:
@@ -409,6 +586,20 @@
 - Continuous improvement
 - Risk must be minimized
 - No hard deadlines
+
+### Use Pattern 7 (API Integration) When:
+- Frontend getting 500 errors from backend
+- Data structure mismatch between frontend and backend
+- Permission issues (frontend vs backend mismatch)
+- Integration testing failures
+- Contract alignment needed
+
+### Use Pattern 8 (Frontend Performance) When:
+- UI is laggy or slow to render
+- Table with many rows performing poorly
+- User reporting slow page load
+- Excessive re-renders detected
+- Frontend profiling shows bottlenecks
 
 ## Workflow Best Practices
 
@@ -469,15 +660,26 @@
 ❌ **Skipping handoff protocols**
 - Result: Missing information, delays
 
+❌ **Starting frontend before backend API ready**
+- Result: Mocked APIs, rework when real API differs
+
+❌ **Not aligning API contracts between java-architect and vue-expert**
+- Result: 500 errors, data mismatch, integration failures
+
+❌ **Deploying frontend without testing API integration**
+- Result: Production errors, broken user flows
+
 ## Summary
 
 **Choose the right pattern for the task:**
-- New feature → Sequential (Pattern 1)
-- Performance → Parallel (Pattern 2)
-- Incident → Hub-and-Spoke (Pattern 3)
-- Migration → Sequential with Checkpoints (Pattern 4)
-- Architecture → Collaborative (Pattern 5)
-- Tech debt → Iterative (Pattern 6)
+- New full-stack feature → Full-Stack Sequential (Pattern 1)
+- Backend performance → Parallel (Pattern 2)
+- Production incident → Hub-and-Spoke (Pattern 3)
+- Database migration → Sequential with Checkpoints (Pattern 4)
+- Architecture review → Collaborative (Pattern 5)
+- Technical debt → Iterative (Pattern 6)
+- API integration issue → API Integration (Pattern 7)
+- Frontend performance → Frontend Performance (Pattern 8)
 
 **Key Success Factors:**
 1. Clear entry/exit criteria
