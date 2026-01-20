@@ -5,7 +5,7 @@ import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.common.code.ErrorCodeRegister;
 import net.lab1024.sa.base.common.enumeration.SystemEnvironmentEnum;
-import net.lab1024.sa.base.common.util.SmartEnumUtil;
+import net.lab1024.sa.common.core.util.SmartEnumUtil;
 import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;

@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 枚举类校验器

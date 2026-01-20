@@ -12,7 +12,7 @@ import net.lab1024.sa.admin.module.system.department.domain.form.DepartmentUpdat
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentTreeVO;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.admin.module.system.department.service.DepartmentService;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

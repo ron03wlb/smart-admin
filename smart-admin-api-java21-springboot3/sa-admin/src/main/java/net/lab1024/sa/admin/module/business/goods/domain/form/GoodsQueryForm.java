@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.admin.module.business.goods.constant.GoodsStatusEnum;
-import net.lab1024.sa.base.common.domain.PageParam;
 import net.lab1024.sa.base.common.json.deserializer.DictDataDeserializer;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
 import net.lab1024.sa.base.common.validator.enumeration.CheckEnum;
+import net.lab1024.sa.common.core.domain.PageParam;
 import org.hibernate.validator.constraints.Length;
 
 /**

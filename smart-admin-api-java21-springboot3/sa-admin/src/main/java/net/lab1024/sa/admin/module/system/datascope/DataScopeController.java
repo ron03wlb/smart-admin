@@ -7,7 +7,7 @@ import java.util.List;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeAndViewTypeVO;
 import net.lab1024.sa.admin.module.system.datascope.service.DataScopeService;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

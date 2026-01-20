@@ -3,16 +3,16 @@ package net.lab1024.sa.base.module.support.feedback.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.List;
-import net.lab1024.sa.base.common.domain.PageResult;
-import net.lab1024.sa.base.common.domain.RequestUser;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.feedback.dao.FeedbackDao;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackAddForm;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackEntity;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackQueryForm;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackVO;
+import net.lab1024.sa.common.core.domain.PageResult;
+import net.lab1024.sa.common.core.domain.RequestUser;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**

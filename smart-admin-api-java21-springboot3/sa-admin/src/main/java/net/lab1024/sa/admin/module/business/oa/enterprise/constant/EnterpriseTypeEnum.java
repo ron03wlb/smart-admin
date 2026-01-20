@@ -1,6 +1,6 @@
 package net.lab1024.sa.admin.module.business.oa.enterprise.constant;
 
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 企业类型

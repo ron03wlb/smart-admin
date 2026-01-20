@@ -1,8 +1,8 @@
 package net.lab1024.sa.admin.util;
 
 import net.lab1024.sa.admin.module.system.login.domain.RequestEmployee;
-import net.lab1024.sa.base.common.domain.RequestUser;
 import net.lab1024.sa.base.common.util.SmartRequestUtil;
+import net.lab1024.sa.common.core.domain.RequestUser;
 
 /**
  * admin 端的请求工具类

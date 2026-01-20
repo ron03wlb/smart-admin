@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.module.support.job.core.SmartJob;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.scheduling.support.CronExpression;
 
 /**

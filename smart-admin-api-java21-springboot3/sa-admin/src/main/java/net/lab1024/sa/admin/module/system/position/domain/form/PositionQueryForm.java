@@ -3,7 +3,7 @@ package net.lab1024.sa.admin.module.system.position.domain.form;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.common.domain.PageParam;
+import net.lab1024.sa.common.core.domain.PageParam;
 
 /**
  * 职务表 分页查询表单

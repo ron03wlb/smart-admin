@@ -6,7 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 自定义的属性校验注解，为了方便与校验属性的值是否为合法的枚举值

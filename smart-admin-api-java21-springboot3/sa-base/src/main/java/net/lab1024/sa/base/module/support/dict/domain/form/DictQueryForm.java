@@ -3,7 +3,7 @@ package net.lab1024.sa.base.module.support.dict.domain.form;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.common.domain.PageParam;
+import net.lab1024.sa.common.core.domain.PageParam;
 
 /**
  * 数据字典 分页查询表单

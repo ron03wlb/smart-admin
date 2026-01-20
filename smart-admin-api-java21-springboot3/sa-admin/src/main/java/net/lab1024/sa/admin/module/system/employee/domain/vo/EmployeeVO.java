@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
-import net.lab1024.sa.base.common.enumeration.GenderEnum;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.common.core.enumeration.GenderEnum;
 
 /**
  * 员工信息

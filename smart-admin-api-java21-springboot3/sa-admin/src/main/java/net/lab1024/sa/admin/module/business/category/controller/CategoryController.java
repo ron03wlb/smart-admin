@@ -13,7 +13,7 @@ import net.lab1024.sa.admin.module.business.category.domain.form.CategoryUpdateF
 import net.lab1024.sa.admin.module.business.category.domain.vo.CategoryTreeVO;
 import net.lab1024.sa.admin.module.business.category.domain.vo.CategoryVO;
 import net.lab1024.sa.admin.module.business.category.service.CategoryService;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

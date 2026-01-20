@@ -3,10 +3,6 @@ package net.lab1024.sa.base.module.support.helpdoc.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.List;
-import net.lab1024.sa.base.common.domain.PageResult;
-import net.lab1024.sa.base.common.domain.RequestUser;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao;
 import net.lab1024.sa.base.module.support.helpdoc.domain.entity.HelpDocEntity;
@@ -14,6 +10,10 @@ import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocViewRecordQ
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocDetailVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocViewRecordVO;
+import net.lab1024.sa.common.core.domain.PageResult;
+import net.lab1024.sa.common.core.domain.RequestUser;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**

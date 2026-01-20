@@ -1,6 +1,6 @@
 package net.lab1024.sa.admin.module.system.datascope.constant;
 
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 数据范围 sql where

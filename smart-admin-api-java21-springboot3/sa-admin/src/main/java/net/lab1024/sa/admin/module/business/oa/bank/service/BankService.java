@@ -13,13 +13,13 @@ import net.lab1024.sa.admin.module.business.oa.bank.domain.BankUpdateForm;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankVO;
 import net.lab1024.sa.admin.module.business.oa.enterprise.dao.EnterpriseDao;
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.entity.EnterpriseEntity;
-import net.lab1024.sa.base.common.domain.PageResult;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerConst;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
+import net.lab1024.sa.common.core.domain.PageResult;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

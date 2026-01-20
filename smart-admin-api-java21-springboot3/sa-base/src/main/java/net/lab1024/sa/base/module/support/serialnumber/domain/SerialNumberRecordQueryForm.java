@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.common.domain.PageParam;
+import net.lab1024.sa.common.core.domain.PageParam;
 
 /**
  * 单据序列号 生成记录 查询

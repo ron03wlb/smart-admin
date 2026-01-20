@@ -14,7 +14,7 @@ import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
 import net.lab1024.sa.admin.module.system.role.dao.RoleDataScopeDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.admin.module.system.role.domain.entity.RoleDataScopeEntity;
-import net.lab1024.sa.base.common.util.SmartEnumUtil;
+import net.lab1024.sa.common.core.util.SmartEnumUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

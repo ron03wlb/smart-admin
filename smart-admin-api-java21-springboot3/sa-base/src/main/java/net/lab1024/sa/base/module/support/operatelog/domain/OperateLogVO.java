@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
-import net.lab1024.sa.base.common.enumeration.UserTypeEnum;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
 
 /**
  * 操作日志信息

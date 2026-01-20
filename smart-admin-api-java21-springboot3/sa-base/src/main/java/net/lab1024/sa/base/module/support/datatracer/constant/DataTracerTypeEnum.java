@@ -2,7 +2,7 @@ package net.lab1024.sa.base.module.support.datatracer.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 数据业务类型

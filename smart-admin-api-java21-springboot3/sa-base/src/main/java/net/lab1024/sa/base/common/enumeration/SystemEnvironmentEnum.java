@@ -2,6 +2,7 @@ package net.lab1024.sa.base.common.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 系统环境枚举类

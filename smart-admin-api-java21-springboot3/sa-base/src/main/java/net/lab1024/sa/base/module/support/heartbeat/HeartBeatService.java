@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.domain.PageResult;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordQueryForm;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordVO;
+import net.lab1024.sa.common.core.domain.PageResult;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

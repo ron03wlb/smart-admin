@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.file.service;
 
-import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileDownloadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileUploadVO;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

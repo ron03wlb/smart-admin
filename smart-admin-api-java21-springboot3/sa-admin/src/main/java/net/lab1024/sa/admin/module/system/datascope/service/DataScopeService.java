@@ -8,8 +8,8 @@ import net.lab1024.sa.admin.module.system.datascope.constant.DataScopeViewTypeEn
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeAndViewTypeVO;
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeDTO;
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeViewTypeVO;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**

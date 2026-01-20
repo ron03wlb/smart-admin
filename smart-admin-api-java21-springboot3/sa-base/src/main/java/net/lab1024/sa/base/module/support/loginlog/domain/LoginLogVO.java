@@ -3,9 +3,9 @@ package net.lab1024.sa.base.module.support.loginlog.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
-import net.lab1024.sa.base.common.enumeration.UserTypeEnum;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
 import net.lab1024.sa.base.module.support.loginlog.LoginLogResultEnum;
+import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
 
 /**
  * 登录日志

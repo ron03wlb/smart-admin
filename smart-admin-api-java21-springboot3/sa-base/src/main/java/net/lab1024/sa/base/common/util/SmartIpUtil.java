@@ -9,7 +9,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.constant.StringConst;
+import net.lab1024.sa.common.core.constant.StringConst;
 import org.lionsoul.ip2region.xdb.Searcher;
 
 /**

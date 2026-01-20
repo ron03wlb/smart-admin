@@ -4,13 +4,13 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.module.support.dict.dao.DictDao;
 import net.lab1024.sa.base.module.support.dict.dao.DictDataDao;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictDataEntity;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictEntity;
 import net.lab1024.sa.base.module.support.dict.domain.vo.DictDataVO;
 import net.lab1024.sa.common.cache.constant.CacheKeyConst;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**

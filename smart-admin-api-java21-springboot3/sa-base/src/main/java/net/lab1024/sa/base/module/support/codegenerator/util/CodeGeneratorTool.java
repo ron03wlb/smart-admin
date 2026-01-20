@@ -1,7 +1,7 @@
 package net.lab1024.sa.base.module.support.codegenerator.util;
 
 import com.google.common.base.CaseFormat;
-import net.lab1024.sa.base.common.constant.StringConst;
+import net.lab1024.sa.common.core.constant.StringConst;
 
 /**
  * 代码生成 velocity 工具类

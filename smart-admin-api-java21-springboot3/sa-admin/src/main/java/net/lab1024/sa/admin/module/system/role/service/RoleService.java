@@ -9,9 +9,9 @@ import net.lab1024.sa.admin.module.system.role.domain.entity.RoleEntity;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleAddForm;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
-import net.lab1024.sa.base.common.code.UserErrorCode;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
+import net.lab1024.sa.common.core.code.UserErrorCode;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

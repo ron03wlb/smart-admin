@@ -27,13 +27,13 @@ import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEnt
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
 import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
-import net.lab1024.sa.base.common.constant.StringConst;
-import net.lab1024.sa.base.common.domain.PageResult;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
+import net.lab1024.sa.common.core.constant.StringConst;
+import net.lab1024.sa.common.core.domain.PageResult;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

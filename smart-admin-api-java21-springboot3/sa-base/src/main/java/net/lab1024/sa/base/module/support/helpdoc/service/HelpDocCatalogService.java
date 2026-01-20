@@ -3,8 +3,6 @@ package net.lab1024.sa.base.module.support.helpdoc.service;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocCatalogDao;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao;
 import net.lab1024.sa.base.module.support.helpdoc.domain.entity.HelpDocCatalogEntity;
@@ -12,6 +10,8 @@ import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocCatalogAddF
 import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocCatalogUpdateForm;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocCatalogVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

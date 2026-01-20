@@ -2,12 +2,12 @@ package net.lab1024.sa.base.module.support.serialnumber.service.impl;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.exception.BusinessException;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberLastGenerateBO;
 import net.lab1024.sa.base.module.support.serialnumber.service.SerialNumberBaseService;
+import net.lab1024.sa.common.core.exception.BusinessException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

@@ -1,7 +1,7 @@
 package net.lab1024.sa.base.common.util;
 
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.domain.RequestUser;
+import net.lab1024.sa.common.core.domain.RequestUser;
 
 /**
  * 请求用户 工具类

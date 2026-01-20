@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import jakarta.annotation.Resource;
 import java.io.IOException;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.module.support.file.service.FileService;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.apache.commons.lang3.StringUtils;
 
 /**

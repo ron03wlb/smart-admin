@@ -80,6 +80,9 @@ dependencies {
     api(libs.objenesis)
     api(libs.commons.pool2)
 
+    // SA Common Core - foundational domain objects and utilities
+    api(project(":sa-common:core"))
+
     // Distributed Lock - Lock4j
     api(project(":sa-common:redis-lock"))
 

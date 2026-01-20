@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.category.domain.dto.CategorySimpleDTO;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
 import net.lab1024.sa.admin.module.business.category.manager.CategoryCacheManager;
-import net.lab1024.sa.base.common.constant.StringConst;
+import net.lab1024.sa.common.core.constant.StringConst;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

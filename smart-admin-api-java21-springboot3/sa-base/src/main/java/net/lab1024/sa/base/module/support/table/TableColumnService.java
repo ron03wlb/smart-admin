@@ -1,11 +1,11 @@
 package net.lab1024.sa.base.module.support.table;
 
 import jakarta.annotation.Resource;
-import net.lab1024.sa.base.common.domain.RequestUser;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.json.JsonUtil;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnEntity;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnUpdateForm;
+import net.lab1024.sa.common.core.domain.RequestUser;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

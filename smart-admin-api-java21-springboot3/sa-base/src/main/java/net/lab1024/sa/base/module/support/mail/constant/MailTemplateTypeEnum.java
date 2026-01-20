@@ -2,7 +2,7 @@ package net.lab1024.sa.base.module.support.mail.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 邮件模板类型

@@ -1,6 +1,6 @@
 package net.lab1024.sa.base.module.support.codegenerator.constant;
 
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 页面类型

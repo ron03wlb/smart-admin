@@ -9,7 +9,7 @@ import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleMenuUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleMenuTreeVO;
 import net.lab1024.sa.admin.module.system.role.service.RoleMenuService;
-import net.lab1024.sa.base.common.domain.ResponseDTO;
+import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

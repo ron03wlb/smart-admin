@@ -2,7 +2,7 @@ package net.lab1024.sa.base.module.support.changelog.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.base.common.enumeration.BaseEnum;
+import net.lab1024.sa.common.core.enumeration.BaseEnum;
 
 /**
  * 更新类型:[1:特大版本功能更新;2:功能更新;3:bug修复]

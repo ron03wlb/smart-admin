@@ -2,6 +2,10 @@ package net.lab1024.sa.base.common.code;
 
 import static net.lab1024.sa.base.common.code.ErrorCodeRangeContainer.register;
 
+import net.lab1024.sa.common.core.code.SystemErrorCode;
+import net.lab1024.sa.common.core.code.UnexpectedErrorCode;
+import net.lab1024.sa.common.core.code.UserErrorCode;
+
 /**
  * 注册code状态码 <br>
  * ps：为什么要在此处不那么优雅的手动注册？ 主要是为了能统一、清晰、浏览当前定义的所有状态码 方便后续维护

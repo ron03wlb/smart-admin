@@ -2,10 +2,10 @@ package net.lab1024.sa.base.module.support.heartbeat;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.util.SmartBeanUtil;
 import net.lab1024.sa.base.module.support.heartbeat.core.HeartBeatRecord;
 import net.lab1024.sa.base.module.support.heartbeat.core.IHeartBeatRecordHandler;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordEntity;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**
