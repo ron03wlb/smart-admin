@@ -10,11 +10,11 @@ val activeEnv: String by lazy {
 }
 
 configurations {
-    testImplementation {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-    }
-    testRuntimeOnly {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    // Exclude Logback and log4j-to-slf4j globally - using Log4j2 with log4j-slf4j2-impl
+    all {
+        exclude(group = "ch.qos.logback", module = "logback-classic")
+        exclude(group = "ch.qos.logback", module = "logback-core")
+        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
 }
 

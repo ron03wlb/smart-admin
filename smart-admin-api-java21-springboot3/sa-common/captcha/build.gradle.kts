@@ -29,8 +29,8 @@ dependencies {
     // Apache Commons Lang
     api(libs.commons.lang3)
 
-    // Logging
-    implementation(libs.spring.boot.starter.log4j2)
+    // Logging API (implementation provided by application)
+    api(libs.slf4j.api)
 
     // Test
     testImplementation(libs.spring.boot.starter.test)

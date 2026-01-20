@@ -22,9 +22,6 @@ dependencies {
     // SpotBugs annotations
     api(libs.spotbugs.annotations)
 
-    // Logging
-    implementation(libs.spring.boot.starter.log4j2)
-
     // Test
     testImplementation(libs.spring.boot.starter.test)
 }

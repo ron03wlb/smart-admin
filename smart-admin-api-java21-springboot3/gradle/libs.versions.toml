@@ -161,6 +161,7 @@ jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpcomponents" }
 json-smart = { module = "net.minidev:json-smart", version.ref = "jsonSmart" }
 lombok = { module = "org.projectlombok:lombok" }
+slf4j-api = { module = "org.slf4j:slf4j-api" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 # ArchUnit
 archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
