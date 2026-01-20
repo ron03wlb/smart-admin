@@ -71,7 +71,20 @@ subprojects {
         val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
         toolVersion = libs.findVersion("pmd").get().toString()
         isIgnoreFailures = false
-        ruleSets = listOf("category/java/errorprone.xml", "category/java/bestpractices.xml")
+
+        // 使用自定义规则集（与 Checkstyle 配置结构保持一致）
+        ruleSetFiles = files("${rootProject.projectDir}/config/pmd/ruleset.xml")
+
+        // 清空默认规则集
+        ruleSets = listOf()
+    }
+
+    // 配置 PMD 报告输出
+    tasks.withType<Pmd> {
+        reports {
+            xml.required.set(true)    // 生成 XML 报告供 CI/CD 使用
+            html.required.set(true)   // 生成 HTML 报告供开发者查看
+        }
     }
 
     // SpotBugs Configuration
