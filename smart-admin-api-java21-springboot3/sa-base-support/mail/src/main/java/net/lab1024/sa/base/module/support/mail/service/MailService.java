@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.module.support.mail;
+package net.lab1024.sa.base.module.support.mail.service;
 
 import cn.hutool.core.util.IdUtil;
 import freemarker.cache.StringTemplateLoader;
@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.core.domain.SystemEnvironment;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateTypeEnum;
+import net.lab1024.sa.base.module.support.mail.dao.MailTemplateDao;
 import net.lab1024.sa.base.module.support.mail.domain.MailTemplateEntity;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.apache.commons.collections4.CollectionUtils;

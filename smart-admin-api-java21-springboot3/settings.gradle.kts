@@ -27,5 +27,10 @@ include(
     "sa-base-support:table",
     "sa-base-support:feedback",
     "sa-base-support:changelog",
-    "sa-base-support:message"
+    "sa-base-support:message",
+    // Phase 2B support modules
+    "sa-base-support:heartbeat",
+    "sa-base-support:mail",
+    "sa-base-support:serialnumber",
+    "sa-base-support:helpdoc"
 )

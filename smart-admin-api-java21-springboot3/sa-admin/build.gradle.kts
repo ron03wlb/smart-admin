@@ -43,6 +43,19 @@ dependencies {
     // Dependency on sa-base-support:message module
     implementation(project(":sa-base-support:message"))
 
+    // Phase 2B support modules
+    // Dependency on sa-base-support:heartbeat module
+    implementation(project(":sa-base-support:heartbeat"))
+
+    // Dependency on sa-base-support:mail module
+    implementation(project(":sa-base-support:mail"))
+
+    // Dependency on sa-base-support:serialnumber module
+    implementation(project(":sa-base-support:serialnumber"))
+
+    // Dependency on sa-base-support:helpdoc module
+    implementation(project(":sa-base-support:helpdoc"))
+
     // Lombok annotation processor
     annotationProcessor(libs.lombok)
 

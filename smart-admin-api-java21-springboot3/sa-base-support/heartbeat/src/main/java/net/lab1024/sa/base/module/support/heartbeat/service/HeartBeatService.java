@@ -1,10 +1,11 @@
-package net.lab1024.sa.base.module.support.heartbeat;
+package net.lab1024.sa.base.module.support.heartbeat.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.core.util.SmartPageUtil;
+import net.lab1024.sa.base.module.support.heartbeat.dao.HeartBeatRecordDao;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordQueryForm;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordVO;
 import net.lab1024.sa.common.core.domain.PageResult;
