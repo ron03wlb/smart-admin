@@ -27,10 +27,10 @@ public class FeedbackService {
   @Resource private FeedbackDao feedbackDao;
 
   /** 分页查询 */
-  public ResponseDTO<PageResult<FeedbackVO>> query(FeedbackQueryForm queryForm) {
-    Page page = SmartPageUtil.convert2PageQuery(queryForm);
-    List<FeedbackVO> list = feedbackDao.queryPage(page, queryForm);
-    PageResult<FeedbackVO> pageResultDTO = SmartPageUtil.convert2PageResult(page, list);
+  public ResponseDTO<PageResult<FeedbackVO>> query(final FeedbackQueryForm queryForm) {
+    final Page page = SmartPageUtil.convert2PageQuery(queryForm);
+    final List<FeedbackVO> list = feedbackDao.queryPage(page, queryForm);
+    final PageResult<FeedbackVO> pageResultDTO = SmartPageUtil.convert2PageResult(page, list);
     if (pageResultDTO.getEmptyFlag()) {
       return ResponseDTO.ok(pageResultDTO);
     }
@@ -38,8 +38,8 @@ public class FeedbackService {
   }
 
   /** 新建 */
-  public ResponseDTO<String> add(FeedbackAddForm addForm, RequestUser requestUser) {
-    FeedbackEntity feedback = SmartBeanUtil.copy(addForm, FeedbackEntity.class);
+  public ResponseDTO<String> add(final FeedbackAddForm addForm, final RequestUser requestUser) {
+    final FeedbackEntity feedback = SmartBeanUtil.copy(addForm, FeedbackEntity.class);
     feedback.setUserType(requestUser.getUserType().getValue());
     feedback.setUserId(requestUser.getUserId());
     feedback.setUserName(requestUser.getUserName());

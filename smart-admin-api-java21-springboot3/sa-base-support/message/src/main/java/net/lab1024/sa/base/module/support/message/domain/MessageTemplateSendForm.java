@@ -18,6 +18,7 @@ import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
  */
 @Data
 @SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
+@SuppressWarnings("PMD.LongVariable")
 public class MessageTemplateSendForm {
 
   @NotNull(message = "消息子类型不能为空")

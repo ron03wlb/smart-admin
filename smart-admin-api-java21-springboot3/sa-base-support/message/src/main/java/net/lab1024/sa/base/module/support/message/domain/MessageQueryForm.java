@@ -24,7 +24,7 @@ public class MessageQueryForm extends PageParam {
   @Length(max = 50, message = "搜索词最多50字符")
   private String searchWord;
 
-  @SchemaEnum(value = MessageTypeEnum.class)
+  @SchemaEnum(MessageTypeEnum.class)
   @CheckEnum(value = MessageTypeEnum.class, message = "消息类型")
   private Integer messageType;
 

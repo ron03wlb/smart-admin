@@ -32,13 +32,13 @@ public class ChangeLogController extends SupportBaseController {
   @Operation(summary = "分页查询 @author 卓大")
   @PostMapping("/changeLog/queryPage")
   public ResponseDTO<PageResult<ChangeLogVO>> queryPage(
-      @RequestBody @Valid ChangeLogQueryForm queryForm) {
+      @RequestBody @Valid final ChangeLogQueryForm queryForm) {
     return ResponseDTO.ok(changeLogService.queryPage(queryForm));
   }
 
   @Operation(summary = "变更内容详情 @author 卓大")
   @GetMapping("/changeLog/getDetail/{changeLogId}")
-  public ResponseDTO<ChangeLogVO> getDetail(@PathVariable Long changeLogId) {
+  public ResponseDTO<ChangeLogVO> getDetail(@PathVariable final Long changeLogId) {
     return ResponseDTO.ok(changeLogService.getById(changeLogId));
   }
 }

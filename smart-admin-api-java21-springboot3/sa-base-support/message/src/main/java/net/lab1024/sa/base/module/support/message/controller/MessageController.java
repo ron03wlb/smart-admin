@@ -29,14 +29,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = SwaggerTagConst.Support.MESSAGE)
 public class MessageController extends SupportBaseController {
 
+  private static final String USER_NOT_LOGIN = "用户未登录";
+
   @Resource private MessageService messageService;
 
   @Operation(summary = "分页查询我的消息 @luoyi")
   @PostMapping("/message/queryMyMessage")
-  public ResponseDTO<PageResult<MessageVO>> query(@RequestBody @Valid MessageQueryForm queryForm) {
-    RequestUser user = SmartRequestUtil.getRequestUser();
+  public ResponseDTO<PageResult<MessageVO>> query(
+      @RequestBody @Valid final MessageQueryForm queryForm) {
+    final RequestUser user = SmartRequestUtil.getRequestUser();
     if (user == null) {
-      return ResponseDTO.userErrorParam("用户未登录");
+      return ResponseDTO.userErrorParam(USER_NOT_LOGIN);
     }
 
     queryForm.setSearchCount(false);
@@ -48,19 +51,19 @@ public class MessageController extends SupportBaseController {
   @Operation(summary = "查询未读消息数量 @luoyi")
   @GetMapping("/message/getUnreadCount")
   public ResponseDTO<Long> getUnreadCount() {
-    RequestUser user = SmartRequestUtil.getRequestUser();
+    final RequestUser user = SmartRequestUtil.getRequestUser();
     if (user == null) {
-      return ResponseDTO.userErrorParam("用户未登录");
+      return ResponseDTO.userErrorParam(USER_NOT_LOGIN);
     }
     return ResponseDTO.ok(messageService.getUnreadCount(user.getUserType(), user.getUserId()));
   }
 
   @Operation(summary = "更新已读 @luoyi")
   @GetMapping("/message/read/{messageId}")
-  public ResponseDTO<String> updateReadFlag(@PathVariable Long messageId) {
-    RequestUser user = SmartRequestUtil.getRequestUser();
+  public ResponseDTO<String> updateReadFlag(@PathVariable final Long messageId) {
+    final RequestUser user = SmartRequestUtil.getRequestUser();
     if (user == null) {
-      return ResponseDTO.userErrorParam("用户未登录");
+      return ResponseDTO.userErrorParam(USER_NOT_LOGIN);
     }
 
     messageService.updateReadFlag(messageId, user.getUserType(), user.getUserId());

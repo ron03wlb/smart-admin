@@ -18,10 +18,10 @@ public class MessageVO {
 
   private Long messageId;
 
-  @SchemaEnum(value = MessageTypeEnum.class)
+  @SchemaEnum(MessageTypeEnum.class)
   private Integer messageType;
 
-  @SchemaEnum(value = UserTypeEnum.class)
+  @SchemaEnum(UserTypeEnum.class)
   private Integer receiverUserType;
 
   @Schema(description = "接收者id")

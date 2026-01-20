@@ -15,6 +15,7 @@ import net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;
  * @since 2022-08-11 20:48:09 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@SuppressWarnings("PMD.LongVariable")
 public class FeedbackAddForm {
 
   @Schema(description = "反馈内容")

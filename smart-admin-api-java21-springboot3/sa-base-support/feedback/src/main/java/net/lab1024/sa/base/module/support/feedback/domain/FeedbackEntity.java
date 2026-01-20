@@ -14,6 +14,7 @@ import lombok.Data;
  */
 @Data
 @TableName("t_feedback")
+@SuppressWarnings("PMD.LongVariable")
 public class FeedbackEntity {
   /** 主键 */
   @TableId(type = IdType.AUTO)
