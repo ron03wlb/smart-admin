@@ -20,5 +20,7 @@ include(
     // New modules - Phase 1 (core infrastructure)
     "sa-common:core",
     // sa-base infrastructure modules - Phase 2
-    "sa-base-core"
+    "sa-base-core",
+    // sa-base devtools module - Code generator and development utilities
+    "sa-base-devtools"
 )
