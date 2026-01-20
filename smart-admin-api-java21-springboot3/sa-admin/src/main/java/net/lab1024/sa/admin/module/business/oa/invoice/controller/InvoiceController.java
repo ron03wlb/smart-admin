@@ -13,7 +13,7 @@ import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceQueryForm;
 import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceUpdateForm;
 import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceVO;
 import net.lab1024.sa.admin.module.business.oa.invoice.service.InvoiceService;
-import net.lab1024.sa.base.common.util.SmartRequestUtil;
+import net.lab1024.sa.base.core.util.SmartRequestUtil;
 import net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.RequestUser;

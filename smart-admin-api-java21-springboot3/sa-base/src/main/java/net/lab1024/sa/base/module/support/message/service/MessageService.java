@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.message.constant.MessageTemplateEnum;
 import net.lab1024.sa.base.module.support.message.dao.MessageDao;
 import net.lab1024.sa.base.module.support.message.domain.MessageEntity;

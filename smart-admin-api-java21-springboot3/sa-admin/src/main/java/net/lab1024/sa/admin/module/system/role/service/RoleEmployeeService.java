@@ -20,7 +20,7 @@ import net.lab1024.sa.admin.module.system.role.domain.form.RoleEmployeeUpdateFor
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleSelectedVO;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
 import net.lab1024.sa.admin.module.system.role.manager.RoleEmployeeManager;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.common.core.constant.StringConst;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;

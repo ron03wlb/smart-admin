@@ -6,7 +6,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.json.JsonUtil;
+import net.lab1024.sa.base.core.json.JsonUtil;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
 import net.lab1024.sa.common.core.domain.ResponseDTO;

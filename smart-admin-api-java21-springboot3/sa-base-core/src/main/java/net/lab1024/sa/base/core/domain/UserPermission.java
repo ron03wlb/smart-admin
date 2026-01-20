@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.domain;
+package net.lab1024.sa.base.core.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;

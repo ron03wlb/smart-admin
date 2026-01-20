@@ -8,7 +8,7 @@ import java.util.List;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.domain.DataScopePlugin;
+import net.lab1024.sa.base.core.domain.DataScopePlugin;
 import net.lab1024.sa.base.handler.MybatisPlusFillHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;

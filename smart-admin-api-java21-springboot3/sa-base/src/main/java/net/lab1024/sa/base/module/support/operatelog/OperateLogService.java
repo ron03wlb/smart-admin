@@ -3,7 +3,7 @@ package net.lab1024.sa.base.module.support.operatelog;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.List;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogEntity;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogQueryForm;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogVO;

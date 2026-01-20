@@ -6,7 +6,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.util.SmartIpUtil;
+import net.lab1024.sa.base.core.util.SmartIpUtil;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobConst;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;

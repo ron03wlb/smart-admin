@@ -3,7 +3,7 @@ package net.lab1024.sa.base.module.support.changelog.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import java.util.List;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.changelog.dao.ChangeLogDao;
 import net.lab1024.sa.base.module.support.changelog.domain.entity.ChangeLogEntity;
 import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogAddForm;

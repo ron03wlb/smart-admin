@@ -23,7 +23,7 @@ import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeViewRecord
 import net.lab1024.sa.admin.module.business.oa.notice.service.NoticeEmployeeService;
 import net.lab1024.sa.admin.module.business.oa.notice.service.NoticeService;
 import net.lab1024.sa.admin.module.business.oa.notice.service.NoticeTypeService;
-import net.lab1024.sa.base.common.util.SmartRequestUtil;
+import net.lab1024.sa.base.core.util.SmartRequestUtil;
 import net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;

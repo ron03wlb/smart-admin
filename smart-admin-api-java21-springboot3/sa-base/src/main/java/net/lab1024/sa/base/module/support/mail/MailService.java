@@ -15,7 +15,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.domain.SystemEnvironment;
+import net.lab1024.sa.base.core.domain.SystemEnvironment;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateTypeEnum;
 import net.lab1024.sa.base.module.support.mail.domain.MailTemplateEntity;

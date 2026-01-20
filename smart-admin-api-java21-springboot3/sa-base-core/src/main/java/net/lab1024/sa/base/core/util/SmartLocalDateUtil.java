@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.util;
+package net.lab1024.sa.base.core.util;
 
 import java.time.Duration;
 import java.time.Instant;

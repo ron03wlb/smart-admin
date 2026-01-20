@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.util;
+package net.lab1024.sa.base.core.util;
 
 import static cn.hutool.core.util.CharsetUtil.UTF_8;
 
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.json.JsonUtil;
+import net.lab1024.sa.base.core.json.JsonUtil;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

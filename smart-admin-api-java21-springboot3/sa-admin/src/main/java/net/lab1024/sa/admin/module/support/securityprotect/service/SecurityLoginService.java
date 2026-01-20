@@ -9,7 +9,7 @@ import net.lab1024.sa.admin.module.support.securityprotect.dao.LoginFailDao;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.LoginFailEntity;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.form.LoginFailQueryForm;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.vo.LoginFailVO;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;

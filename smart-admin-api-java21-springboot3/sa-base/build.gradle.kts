@@ -83,6 +83,9 @@ dependencies {
     // SA Common Core - foundational domain objects and utilities
     api(project(":sa-common:core"))
 
+    // SA Base Core - sa-base specific domain objects and utilities
+    api(project(":sa-base-core"))
+
     // Distributed Lock - Lock4j
     api(project(":sa-common:redis-lock"))
 

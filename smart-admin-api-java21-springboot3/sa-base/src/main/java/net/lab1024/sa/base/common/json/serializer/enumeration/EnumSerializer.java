@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import java.io.IOException;
 import java.util.stream.Collectors;
-import net.lab1024.sa.base.common.util.SmartStringUtil;
+import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.common.core.constant.StringConst;
 import net.lab1024.sa.common.core.enumeration.BaseEnum;
 import net.lab1024.sa.common.core.util.SmartEnumUtil;

@@ -3,7 +3,7 @@ package net.lab1024.sa.base.listener;
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.util.SmartIpUtil;
+import net.lab1024.sa.base.core.util.SmartIpUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;

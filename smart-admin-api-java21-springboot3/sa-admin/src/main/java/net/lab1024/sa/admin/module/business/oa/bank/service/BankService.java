@@ -13,7 +13,7 @@ import net.lab1024.sa.admin.module.business.oa.bank.domain.BankUpdateForm;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankVO;
 import net.lab1024.sa.admin.module.business.oa.enterprise.dao.EnterpriseDao;
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.entity.EnterpriseEntity;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerConst;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;

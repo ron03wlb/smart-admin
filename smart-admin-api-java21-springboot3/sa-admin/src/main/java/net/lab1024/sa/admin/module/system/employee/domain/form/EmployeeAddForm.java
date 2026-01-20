@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
-import net.lab1024.sa.base.common.util.SmartVerificationUtil;
 import net.lab1024.sa.base.common.validator.enumeration.CheckEnum;
+import net.lab1024.sa.base.core.util.SmartVerificationUtil;
 import net.lab1024.sa.common.core.enumeration.GenderEnum;
 import org.hibernate.validator.constraints.Length;
 

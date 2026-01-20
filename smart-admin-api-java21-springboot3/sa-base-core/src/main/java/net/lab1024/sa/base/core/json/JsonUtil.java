@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.json;
+package net.lab1024.sa.base.core.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

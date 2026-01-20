@@ -1,8 +1,8 @@
-package net.lab1024.sa.base.common.domain;
+package net.lab1024.sa.base.core.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.base.common.enumeration.SystemEnvironmentEnum;
+import net.lab1024.sa.base.core.enumeration.SystemEnvironmentEnum;
 
 /**
  * 系统环境

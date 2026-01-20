@@ -6,7 +6,7 @@ import cn.dev33.satoken.annotation.SaMode;
 import io.swagger.v3.oas.models.Operation;
 import java.util.ArrayList;
 import java.util.List;
-import net.lab1024.sa.base.common.util.SmartStringUtil;
+import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.common.apiencrypt.annotation.ApiDecrypt;
 import net.lab1024.sa.common.apiencrypt.annotation.ApiEncrypt;
 import org.springdoc.core.customizers.OperationCustomizer;

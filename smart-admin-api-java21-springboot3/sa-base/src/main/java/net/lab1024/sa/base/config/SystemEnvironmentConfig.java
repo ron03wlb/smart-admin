@@ -1,7 +1,7 @@
 package net.lab1024.sa.base.config;
 
-import net.lab1024.sa.base.common.domain.SystemEnvironment;
-import net.lab1024.sa.base.common.enumeration.SystemEnvironmentEnum;
+import net.lab1024.sa.base.core.domain.SystemEnvironment;
+import net.lab1024.sa.base.core.enumeration.SystemEnvironmentEnum;
 import net.lab1024.sa.common.core.util.SmartEnumUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;

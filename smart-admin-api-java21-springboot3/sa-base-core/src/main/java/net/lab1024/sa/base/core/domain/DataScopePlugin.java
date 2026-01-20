@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.domain;
+package net.lab1024.sa.base.core.domain;
 
 import org.apache.ibatis.plugin.Interceptor;
 

@@ -32,7 +32,7 @@ import net.lab1024.sa.admin.module.system.position.dao.PositionDao;
 import net.lab1024.sa.admin.module.system.position.domain.entity.PositionEntity;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleEmployeeVO;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.common.core.constant.StringConst;
 import net.lab1024.sa.common.core.domain.PageResult;

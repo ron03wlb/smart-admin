@@ -18,5 +18,7 @@ include(
     "sa-common:data-masking",
     "sa-common:security-protect",
     // New modules - Phase 1 (core infrastructure)
-    "sa-common:core"
+    "sa-common:core",
+    // sa-base infrastructure modules - Phase 2
+    "sa-base-core"
 )

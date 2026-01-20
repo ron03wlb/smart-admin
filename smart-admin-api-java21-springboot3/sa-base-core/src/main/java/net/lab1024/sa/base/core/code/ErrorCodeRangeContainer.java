@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.common.code;
+package net.lab1024.sa.base.core.code;
 
 import java.util.Collection;
 import java.util.List;

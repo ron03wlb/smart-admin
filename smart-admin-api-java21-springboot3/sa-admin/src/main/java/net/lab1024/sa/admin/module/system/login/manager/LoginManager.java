@@ -23,7 +23,7 @@ import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuVO;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
-import net.lab1024.sa.base.common.domain.UserPermission;
+import net.lab1024.sa.base.core.domain.UserPermission;
 import net.lab1024.sa.base.module.support.file.service.IFileStorageService;
 import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import net.lab1024.sa.common.core.constant.StringConst;

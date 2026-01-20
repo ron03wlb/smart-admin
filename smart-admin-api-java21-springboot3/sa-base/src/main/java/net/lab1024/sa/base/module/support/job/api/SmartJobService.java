@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import net.lab1024.sa.base.common.util.SmartPageUtil;
+import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobAddForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobEnabledUpdateForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobExecuteForm;

@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.common.util.SmartStringUtil;
+import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileDownloadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileMetadataVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileUploadVO;
