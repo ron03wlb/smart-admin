@@ -3,7 +3,8 @@ trigger: always_on
 description: PostgreSQL 高級特性：JSONB、數組、CTE、窗口函數
 tags: [postgresql, jsonb, array, cte, window-function]
 positioning: ideal
-prerequisites: [rules/05-postgresql-basics.md]
+prerequisites:
+  - rules/05-postgresql-basics.md
 last_updated: 2025-01-12
 ---
 

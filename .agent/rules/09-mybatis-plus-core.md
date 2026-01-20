@@ -3,7 +3,14 @@ trigger: always_on
 description: MyBatis Plus 核心用法 - LambdaQueryWrapper、分頁、IEnum
 tags: [mybatis-plus, lambda-query, pagination, ienum]
 positioning: ideal
-last_updated: 2025-01-12
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/05-postgresql-mybatis-integration.md
+  - rules/08-vavr-mybatis-integration.md
+  - rules/10-architecture-rules.md
+last_updated: 2025-01-21
 ---
 
 # MyBatis Plus 核心規範

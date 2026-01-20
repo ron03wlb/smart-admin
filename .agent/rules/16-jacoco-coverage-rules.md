@@ -1,3 +1,18 @@
+---
+trigger: on_test_failure
+description: JaCoCo 測試覆蓋率規範
+tags: [testing, coverage, jacoco, quality-gate]
+positioning: current-standard
+ai_role: test_generator
+auto_apply: false
+ask_before_fix: true
+related_rules:
+  - rules/10-architecture-rules.md
+prerequisites:
+  - workflows/tdd-workflow.md
+last_updated: 2025-01-21
+---
+
 # JaCoCo 測試覆蓋率規範
 
 **TL;DR**: JaCoCo 測量測試覆蓋率，強制要求行覆蓋率 ≥80%、分支覆蓋率 ≥70%。新代碼必須有對應測試。

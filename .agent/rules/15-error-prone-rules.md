@@ -1,3 +1,17 @@
+---
+trigger: always_on
+description: Error Prone 編譯時檢查規範
+tags: [static-analysis, error-prone, compile-time-check]
+positioning: current-standard
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/02-oop-principles.md
+  - rules/03-concurrency-rules.md
+last_updated: 2025-01-21
+---
+
 # Error Prone 規範
 
 **TL;DR**: Error Prone 是 Google 開發的 Java 編譯器插件，在編譯時檢測常見 Bug 模式並提供修復建議。

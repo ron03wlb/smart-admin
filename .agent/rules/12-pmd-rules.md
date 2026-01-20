@@ -1,3 +1,17 @@
+---
+trigger: always_on
+description: PMD 代碼質量規範
+tags: [static-analysis, pmd, code-quality, best-practices]
+positioning: current-standard
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/02-oop-principles.md
+  - rules/04-exception-logging.md
+last_updated: 2025-01-21
+---
+
 # PMD 規範
 
 **TL;DR**: PMD 檢測代碼異味、潛在 Bug 和最佳實踐違規。啟用 `bestpractices` 和 `errorprone` 規則集，所有 Priority 1-3 違規必須修復。

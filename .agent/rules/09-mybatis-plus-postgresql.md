@@ -3,8 +3,12 @@ trigger: always_on
 description: MyBatis Plus 與 PostgreSQL 整合 - JSONB、陣列、Vavr
 tags: [mybatis-plus, postgresql, jsonb, arrays, vavr, integration]
 positioning: ideal
-prerequisites: [rules/09-mybatis-plus-core.md, rules/05-postgresql-advanced.md]
-related_rules: [rules/05-postgresql-mybatis-integration.md, rules/08-vavr-mybatis-integration.md]
+prerequisites:
+  - rules/09-mybatis-plus-core.md
+  - rules/05-postgresql-advanced.md
+related_rules:
+  - rules/05-postgresql-mybatis-integration.md
+  - rules/08-vavr-mybatis-integration.md
 last_updated: 2025-01-12
 ---
 

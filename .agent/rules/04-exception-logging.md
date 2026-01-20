@@ -3,7 +3,13 @@ trigger: always_on
 description: 異常處理與日誌規範 - SLF4J、異常鏈
 tags: [exception-handling, logging, slf4j]
 positioning: current-standard
-last_updated: 2025-01-12
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/02-oop-principles.md
+  - rules/10-architecture-rules.md
+last_updated: 2025-01-21
 ---
 
 # 異常日誌規範

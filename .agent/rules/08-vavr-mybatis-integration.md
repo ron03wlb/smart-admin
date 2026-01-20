@@ -3,8 +3,12 @@ trigger: always_on
 description: Vavr 與 MyBatis Plus 整合
 tags: [vavr, mybatis-plus, integration, functional-programming]
 positioning: ideal
-prerequisites: [rules/08-vavr-fundamentals.md, rules/09-mybatis-plus-core.md]
-related_rules: [rules/05-postgresql-mybatis-integration.md, rules/09-mybatis-plus-postgresql.md]
+prerequisites:
+  - rules/08-vavr-fundamentals.md
+  - rules/09-mybatis-plus-core.md
+related_rules:
+  - rules/05-postgresql-mybatis-integration.md
+  - rules/09-mybatis-plus-postgresql.md
 last_updated: 2025-01-12
 ---
 

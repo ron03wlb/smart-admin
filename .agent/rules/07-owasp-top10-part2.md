@@ -3,7 +3,8 @@ trigger: always_on
 description: OWASP Top 10 安全規範 Part 2 (A05-A10)
 tags: [security, owasp, authentication, ssrf, logging]
 positioning: current-standard
-prerequisites: [rules/07-owasp-top10-part1.md]
+prerequisites:
+  - rules/07-owasp-top10-part1.md
 last_updated: 2025-01-12
 ---
 

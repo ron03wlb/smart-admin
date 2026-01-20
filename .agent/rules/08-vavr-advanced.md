@@ -3,7 +3,8 @@ trigger: always_on
 description: Vavr 進階 - Either、集合、模式匹配
 tags: [vavr, functional-programming, either, collections, pattern-matching]
 positioning: ideal
-prerequisites: [rules/08-vavr-fundamentals.md]
+prerequisites:
+  - rules/08-vavr-fundamentals.md
 last_updated: 2025-01-12
 ---
 

@@ -159,47 +159,17 @@ public class UserService {
 }
 ```
 
-#### 違規 3: Controller 直接訪問 Repository
-```
-Error: Controller should not access Repository directly
-```
+#### 其他常見違規
 
-**解決**:
-```java
-// ❌ 錯誤
-@RestController
-public class UserController {
-    private final UserMapper userMapper;  // 不能直接注入 Mapper
-}
+**違規 3: Controller 直接訪問 Repository**
+- 錯誤：Controller 直接注入 Mapper/Dao
+- 正確：必須通過 Service 層訪問
+- 詳細修正方案：[10-architecture-rules.md §錯誤模式檢測](../rules/10-architecture-rules.md)
 
-// ✅ 正確
-@RestController
-public class UserController {
-    private final UserService userService;  // 必須通過 Service
-}
-```
-
-#### 違規 4: @Transactional 位置錯誤
-```
-Error: @Transactional should only be in Service layer
-```
-
-**解決**:
-```java
-// ❌ 錯誤
-@RestController
-public class UserController {
-    @Transactional
-    public ResponseDTO add() { ... }
-}
-
-// ✅ 正確
-@Service
-public class UserService {
-    @Transactional(rollbackFor = Exception.class)
-    public ResponseDTO add() { ... }
-}
-```
+**違規 4: @Transactional 位置錯誤**
+- 錯誤：在 Controller 或 Service 層使用 @Transactional
+- 正確：只能在 Manager 層使用 @Transactional
+- 詳細修正方案：[09-manager-layer.md](../rules/09-manager-layer.md)
 
 **完整診斷**:
 ```bash

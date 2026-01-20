@@ -10,7 +10,12 @@ related_rules:
   - rules/01-naming-conventions.md
   - rules/10-architecture-rules.md
   - rules/08-vavr-fundamentals.md
-  - rules/11-16 (靜態分析工具)
+  - rules/11-checkstyle-rules.md
+  - rules/12-pmd-rules.md
+  - rules/13-spotbugs-rules.md
+  - rules/14-spotless-rules.md
+  - rules/15-error-prone-rules.md
+  - rules/16-jacoco-coverage-rules.md
   - rules/17-commit-message-conventions.md
 last_updated: 2025-01-17
 ---

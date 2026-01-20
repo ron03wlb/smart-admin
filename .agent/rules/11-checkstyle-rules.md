@@ -1,3 +1,17 @@
+---
+trigger: always_on
+description: Checkstyle 代碼風格規範
+tags: [static-analysis, checkstyle, code-style]
+positioning: current-standard
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/01-naming-conventions.md
+checkstyle_rule: TypeName,MethodName,ConstantName,AvoidStarImport
+last_updated: 2025-01-21
+---
+
 # Checkstyle 規範
 
 **TL;DR**: Checkstyle 強制執行代碼風格一致性，包括命名規範、空白符、大括號、import 規則。所有違規必須在提交前修復。

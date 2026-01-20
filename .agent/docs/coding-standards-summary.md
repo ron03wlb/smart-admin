@@ -2,6 +2,12 @@
 
 > 本文檔整理了 SmartAdmin 專案的完整編碼標準，包括後端、前端、資料庫、Git、測試等各方面規範。
 
+**📖 閱讀指南**:
+- 本文提供 **開發規範概述**，適合快速瀏覽和新人入職
+- 完整規範和 AI 決策邏輯請參考 [rules/](../rules/) 目錄下的詳細文檔
+- 常用命令速查請參考 [quick-reference.md](quick-reference.md)
+- 遇到問題請參考 [faq-troubleshooting.md](faq-troubleshooting.md)
+
 ---
 
 ## 1. 後端規範

@@ -3,7 +3,15 @@ trigger: always_on
 description: SonarQube 代碼質量規則
 tags: [sonarqube, code-quality, static-analysis]
 positioning: current-standard
-last_updated: 2025-01-12
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/07-owasp-top10-part1.md
+  - rules/11-checkstyle-rules.md
+  - rules/12-pmd-rules.md
+  - rules/13-spotbugs-rules.md
+last_updated: 2025-01-21
 ---
 
 # SonarQube 規則配置

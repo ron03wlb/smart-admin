@@ -3,8 +3,12 @@ trigger: always_on
 description: PostgreSQL + MyBatis Plus：SQL 優化、MySQL 遷移、性能調優
 tags: [postgresql, mybatis-plus, migration, performance, optimization]
 positioning: migration
-prerequisites: [rules/05-postgresql-basics.md, rules/09-mybatis-plus-core.md]
-related_rules: [rules/08-vavr-mybatis-integration.md, rules/09-mybatis-plus-postgresql.md]
+prerequisites:
+  - rules/05-postgresql-basics.md
+  - rules/09-mybatis-plus-core.md
+related_rules:
+  - rules/08-vavr-mybatis-integration.md
+  - rules/09-mybatis-plus-postgresql.md
 last_updated: 2025-01-12
 ---
 

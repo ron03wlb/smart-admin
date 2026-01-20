@@ -1,3 +1,18 @@
+---
+trigger: always_on
+description: SpotBugs 缺陷檢測規範
+tags: [static-analysis, spotbugs, bug-detection, security]
+positioning: current-standard
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/03-concurrency-rules.md
+  - rules/07-owasp-top10-part1.md
+spotbugs_rule: NP_NULL_ON_SOME_PATH,DM_STRING_CTOR,SQL_INJECTION
+last_updated: 2025-01-21
+---
+
 # SpotBugs 規範
 
 **TL;DR**: SpotBugs 檢測潛在 Bug 和安全漏洞。配置 MAX effort + LOW confidence，所有檢測到的問題必須修復。結合 FindSecBugs 插件進行安全掃描。

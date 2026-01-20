@@ -1,3 +1,17 @@
+---
+trigger: always_on
+description: Spotless 自動格式化規範
+tags: [static-analysis, spotless, code-formatting]
+positioning: current-standard
+ai_role: code_reviewer_and_generator
+auto_apply: true
+ask_before_fix: false
+related_rules:
+  - rules/01-naming-conventions.md
+  - rules/11-checkstyle-rules.md
+last_updated: 2025-01-21
+---
+
 # Spotless 規範
 
 **TL;DR**: Spotless 自動格式化代碼，使用 Google Java Format 標準。編譯前自動執行 `spotlessApply`，確保代碼風格一致。
