@@ -31,6 +31,18 @@ dependencies {
     // Dependency on sa-common:captcha module
     implementation(project(":sa-common:captcha"))
 
+    // Dependency on sa-base-support:table module
+    implementation(project(":sa-base-support:table"))
+
+    // Dependency on sa-base-support:feedback module
+    implementation(project(":sa-base-support:feedback"))
+
+    // Dependency on sa-base-support:changelog module
+    implementation(project(":sa-base-support:changelog"))
+
+    // Dependency on sa-base-support:message module
+    implementation(project(":sa-base-support:message"))
+
     // Lombok annotation processor
     annotationProcessor(libs.lombok)
 

@@ -22,5 +22,10 @@ include(
     // sa-base infrastructure modules - Phase 2
     "sa-base-core",
     // sa-base devtools module - Code generator and development utilities
-    "sa-base-devtools"
+    "sa-base-devtools",
+    // sa-base support modules - Extracted support functionality
+    "sa-base-support:table",
+    "sa-base-support:feedback",
+    "sa-base-support:changelog",
+    "sa-base-support:message"
 )

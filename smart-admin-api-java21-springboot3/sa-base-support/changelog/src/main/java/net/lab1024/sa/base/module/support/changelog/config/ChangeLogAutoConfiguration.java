@@ -1,0 +1,35 @@
+package net.lab1024.sa.base.module.support.changelog.config;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ComponentScan;
+
+/**
+ * ChangeLog Module Auto-Configuration
+ *
+ * <p>This module provides functionality for system change log management.
+ *
+ * <p>Enable/disable via configuration:
+ *
+ * <pre>
+ * smart-admin:
+ *   support:
+ *     changelog:
+ *       enabled: true  # default is true
+ * </pre>
+ *
+ * @author 1024创新实验室
+ * @since 2024
+ */
+@AutoConfiguration
+@ConditionalOnProperty(
+    prefix = "smart-admin.support.changelog",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
+@ComponentScan("net.lab1024.sa.base.module.support.changelog")
+@MapperScan("net.lab1024.sa.base.module.support.changelog.dao")
+public class ChangeLogAutoConfiguration {
+  // Auto-configuration for changelog module
+}
