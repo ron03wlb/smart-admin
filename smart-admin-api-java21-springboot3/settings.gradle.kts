@@ -8,6 +8,7 @@ include(
     "sa-base",
     "sa-admin",
     "sa-common",
+    // Existing sa-common modules
     "sa-common:mq",
     "sa-common:cache",
     "sa-common:redis-lock",
@@ -15,5 +16,7 @@ include(
     "sa-common:captcha",
     "sa-common:repeat-submit",
     "sa-common:data-masking",
-    "sa-common:security-protect"
+    "sa-common:security-protect",
+    // New modules - Phase 1 (core infrastructure)
+    "sa-common:core"
 )
