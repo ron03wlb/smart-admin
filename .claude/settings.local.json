@@ -52,7 +52,8 @@
       "Bash(do if find /Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-base/src/main/java -name $file.java)",
       "Bash(then echo \"❌ $file.java still exists\" else echo \"✅ $file.java deleted\" fi done)",
       "Bash(xargs:*)",
-      "Bash(cut:*)"
+      "Bash(cut:*)",
+      "Bash(timeout 180 tail:*)"
     ]
   }
 }
