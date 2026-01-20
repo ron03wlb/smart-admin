@@ -86,7 +86,7 @@ public class RedisUtil {
    * @param key 锁的 key
    * @param expire 过期时间（毫秒）
    * @return 是否获取成功
-   * @deprecated 请使用 {@link net.lab1024.sa.common.dlock.LockService} 替代
+   * @deprecated 请使用 {@link net.lab1024.sa.common.redislock.LockService} 替代
    */
   @Deprecated(since = "3.1.0", forRemoval = true)
   public boolean getLock(String key, long expire) {
@@ -99,7 +99,7 @@ public class RedisUtil {
    * 释放锁
    *
    * @param key 锁的 key
-   * @deprecated 请使用 {@link net.lab1024.sa.common.dlock.LockService} 替代
+   * @deprecated 请使用 {@link net.lab1024.sa.common.redislock.LockService} 替代
    */
   @Deprecated(since = "3.1.0", forRemoval = true)
   public void unLock(String key) {

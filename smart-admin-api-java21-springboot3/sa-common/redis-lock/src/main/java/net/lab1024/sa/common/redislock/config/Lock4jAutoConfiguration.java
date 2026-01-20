@@ -1,4 +1,4 @@
-package net.lab1024.sa.common.dlock.config;
+package net.lab1024.sa.common.redislock.config;
 
 import com.baomidou.lock.LockTemplate;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @AutoConfiguration
 @ConditionalOnClass(LockTemplate.class)
-@ComponentScan(basePackages = "net.lab1024.sa.common.dlock")
+@ComponentScan(basePackages = "net.lab1024.sa.common.redislock")
 public class Lock4jAutoConfiguration {
   // Lock4j 會自動配置 LockTemplate Bean
   // 通過 lock4j-redisson-spring-boot-starter 依賴，自動使用現有的 RedissonClient

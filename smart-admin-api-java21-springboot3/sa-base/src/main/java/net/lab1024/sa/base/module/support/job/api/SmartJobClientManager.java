@@ -15,7 +15,7 @@ import net.lab1024.sa.base.module.support.job.core.SmartJobExecutor;
 import net.lab1024.sa.base.module.support.job.core.SmartJobLauncher;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
-import net.lab1024.sa.common.dlock.LockService;
+import net.lab1024.sa.common.redislock.LockService;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.MessageListener;

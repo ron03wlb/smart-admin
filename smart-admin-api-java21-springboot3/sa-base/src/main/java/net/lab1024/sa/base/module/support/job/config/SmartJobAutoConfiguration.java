@@ -5,7 +5,7 @@ import java.util.List;
 import net.lab1024.sa.base.module.support.job.core.SmartJob;
 import net.lab1024.sa.base.module.support.job.core.SmartJobLauncher;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
-import net.lab1024.sa.common.dlock.LockService;
+import net.lab1024.sa.common.redislock.LockService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

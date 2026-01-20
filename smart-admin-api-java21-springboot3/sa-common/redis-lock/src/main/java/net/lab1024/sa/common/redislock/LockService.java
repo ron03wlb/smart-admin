@@ -1,4 +1,4 @@
-package net.lab1024.sa.common.dlock;
+package net.lab1024.sa.common.redislock;
 
 import com.baomidou.lock.LockInfo;
 import com.baomidou.lock.LockTemplate;

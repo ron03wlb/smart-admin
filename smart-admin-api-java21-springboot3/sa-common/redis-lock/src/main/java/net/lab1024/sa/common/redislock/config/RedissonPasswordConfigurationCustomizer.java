@@ -1,4 +1,4 @@
-package net.lab1024.sa.common.dlock.config;
+package net.lab1024.sa.common.redislock.config;
 
 import org.redisson.config.Config;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
