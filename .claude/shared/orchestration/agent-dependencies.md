@@ -4,30 +4,139 @@
 
 ## Dependency Graph
 
+### Agent Dependency Flow
+
+```mermaid
+graph TB
+    %% Analysis & Requirements
+    ArchRev[architect-reviewer<br/>Design Validation]
+    BA[business-analyst<br/>Requirements & Process]
+
+    %% Implementation Agents
+    Java[java-architect<br/>Backend Implementation]
+    Vue[vue-expert<br/>Frontend Implementation]
+    PG[postgres-pro<br/>Database Optimization]
+    Docs[documentation-engineer<br/>Documentation Creation]
+
+    %% Infrastructure & Quality
+    DevOps[devops-engineer<br/>CI/CD & Infrastructure]
+    CodeRev[code-reviewer<br/>Quality Gate]
+
+    %% Resilience
+    Chaos[chaos-engineer<br/>Resilience Testing]
+
+    %% Design validation flows into requirements
+    ArchRev -->|validates design| BA
+    ArchRev -->|reviews architecture| Java
+    ArchRev -->|reviews architecture| Vue
+
+    %% Requirements flow to implementation
+    BA -->|requirements| Java
+    BA -->|requirements| Vue
+    BA -->|requirements| DevOps
+
+    %% Backend to frontend API contract
+    Java -->|API contract| Vue
+    Java -->|needs optimization| PG
+    Java -->|code complete| CodeRev
+    Java -->|code complete| Docs
+
+    %% Frontend flows
+    Vue -->|code complete| CodeRev
+    Vue -->|code complete| Docs
+
+    %% Database flows
+    PG -->|optimizations| DevOps
+    PG -->|health metrics| Chaos
+
+    %% Documentation flows
+    Docs -->|docs complete| DevOps
+
+    %% Quality gate to deployment
+    CodeRev -->|approved| DevOps
+
+    %% Deployment to resilience testing
+    DevOps -->|deployed| Chaos
+
+    %% Feedback loops
+    Chaos -->|issues found| Java
+    Chaos -->|issues found| PG
+    Chaos -->|issues found| DevOps
+
+    CodeRev -.->|needs arch review| ArchRev
+
+    style ArchRev fill:#4ecdc4,stroke:#22a6b3,color:#fff
+    style BA fill:#ffeaa7,stroke:#fdcb6e,color:#000
+    style Java fill:#45b7d1,stroke:#3498db,color:#fff
+    style Vue fill:#96ceb4,stroke:#6ab04c,color:#fff
+    style PG fill:#fd79a8,stroke:#e84393,color:#fff
+    style Docs fill:#a29bfe,stroke:#6c5ce7,color:#fff
+    style DevOps fill:#dfe6e9,stroke:#b2bec3,color:#000
+    style CodeRev fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style Chaos fill:#ff6348,stroke:#e74c3c,color:#fff
 ```
-         architect-reviewer
-              |   (design validation)
-              ↓
-        business-analyst
-              |
-       (requirements)
-              ↓
-       java-architect ←──────────┐
-         /    |     \             |
-        /     |      \            |
-  (database) (API) (code)         |
-      /      ↓       \            |
-     ↓   vue-expert   ↓           |
-postgres-pro   |   devops-engineer
-     |   (frontend)   |           |
-(db health)   └───────┴───────────┤
-     |                            |
-     └────→ chaos-engineer ←──────┘
-         (resilience testing)
-              ↑
-              |
-      code-reviewer (quality gate)
-       (hub for pre-merge reviews)
+
+### Collaboration Patterns
+
+```mermaid
+graph LR
+    subgraph "Sequential Pattern"
+        direction LR
+        S1[Agent 1] --> S2[Agent 2]
+        S2 --> S3[Agent 3]
+        S3 --> S4[Agent 4]
+    end
+
+    subgraph "Parallel Pattern"
+        direction TB
+        P0[Trigger]
+        P1[Agent A]
+        P2[Agent B]
+        P3[Agent C]
+        PC[Converge Results]
+        P0 --> P1
+        P0 --> P2
+        P0 --> P3
+        P1 --> PC
+        P2 --> PC
+        P3 --> PC
+    end
+
+    subgraph "Hub-and-Spoke Pattern"
+        direction TB
+        HS1[Specialist 1] --> Hub[Hub Agent]
+        HS2[Specialist 2] --> Hub
+        HS3[Specialist 3] --> Hub
+        Hub --> HSR[Consolidated Result]
+    end
+
+    subgraph "Iterative Pattern"
+        direction TB
+        I1[Assess] --> I2[Implement]
+        I2 --> I3[Validate]
+        I3 -.->|repeat if needed| I1
+        I3 --> I4[Complete]
+    end
+
+    style S1 fill:#45b7d1,color:#fff
+    style S2 fill:#96ceb4,color:#fff
+    style S3 fill:#dfe6e9,color:#000
+    style S4 fill:#a29bfe,color:#fff
+
+    style P1 fill:#45b7d1,color:#fff
+    style P2 fill:#fd79a8,color:#fff
+    style P3 fill:#96ceb4,color:#fff
+    style PC fill:#ffeaa7,color:#000
+
+    style Hub fill:#ff6b6b,color:#fff
+    style HS1 fill:#45b7d1,color:#fff
+    style HS2 fill:#96ceb4,color:#fff
+    style HS3 fill:#fd79a8,color:#fff
+
+    style I1 fill:#ffeaa7,color:#000
+    style I2 fill:#45b7d1,color:#fff
+    style I3 fill:#ff6b6b,color:#fff
+    style I4 fill:#00b894,color:#fff
 ```
 
 ## Agent-to-Agent Dependencies

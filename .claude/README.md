@@ -2,14 +2,14 @@
 
 Configuration system for Claude Code agents optimized for SmartAdmin project.
 
-**Version:** 2.3.0
+**Version:** 2.5.0
 **Status:** 100% Complete
 **Last Updated:** 2026-01-21
 
 ## Quick Start
 
 This directory contains a sophisticated agent configuration system with:
-- **8 specialized agents** for full-stack development
+- **9 specialized agents** for full-stack development
 - **Shared knowledge base** (single source of truth)
 - **Template inheritance** (DRY principle)
 - **Orchestration framework** (10 workflow patterns)
@@ -32,7 +32,7 @@ This directory contains a sophisticated agent configuration system with:
 │       ├── decision-matrix.md                  # Agent selection guide
 │       ├── agent-dependencies.md               # Collaboration patterns
 │       └── workflow-patterns.md                # Multi-agent workflows
-├── agents/                   # Specialized agents (8 files)
+├── agents/                   # Specialized agents (9 files)
 │   ├── java-architect.md
 │   ├── vue-expert.md
 │   ├── business-analyst.md
@@ -40,7 +40,8 @@ This directory contains a sophisticated agent configuration system with:
 │   ├── devops-engineer.md
 │   ├── postgres-pro.md
 │   ├── architect-reviewer.md
-│   └── code-reviewer.md
+│   ├── code-reviewer.md
+│   └── documentation-engineer.md
 ├── docs/                     # Documentation
 │   ├── maintenance-guide.md
 │   ├── permission-guide.md

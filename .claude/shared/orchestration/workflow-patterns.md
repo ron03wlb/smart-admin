@@ -10,6 +10,59 @@
 
 **Timeline:** 2-7 days depending on complexity
 
+### Workflow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant BA as business-analyst
+    participant Java as java-architect
+    participant Vue as vue-expert
+    participant Code as code-reviewer
+    participant Docs as documentation-engineer
+    participant DevOps as devops-engineer
+    participant Chaos as chaos-engineer
+
+    User->>BA: Request new feature
+    BA->>BA: Gather requirements
+    BA->>BA: Define user stories & API contracts
+    BA-->>User: Requirements document
+    User->>User: Approve requirements
+
+    BA->>Java: Provide requirements & API contracts
+    Java->>Java: Implement backend (Controller→Service→Manager→Dao)
+    Java->>Java: Write tests & generate Swagger docs
+    Java->>Code: Request code review
+    Code->>Code: Review SmartAdmin patterns
+    Code-->>Java: Approved
+    Java->>Docs: Code complete
+    Docs->>Docs: Generate API documentation
+    Java-->>Vue: Backend API ready + docs
+
+    Vue->>Vue: Implement frontend (list + form-modal)
+    Vue->>Vue: Integrate with backend API & permissions
+    Vue->>Vue: Write component tests
+    Vue->>Code: Request code review
+    Code->>Code: Review Vue patterns
+    Code-->>Vue: Approved
+    Vue->>Docs: Code complete
+    Docs->>Docs: Update component documentation
+    Vue-->>DevOps: Frontend ready
+
+    DevOps->>DevOps: Update CI/CD pipeline
+    DevOps->>DevOps: Deploy to staging
+    DevOps->>DevOps: Run smoke tests
+    DevOps-->>Chaos: Deployed to staging
+
+    Chaos->>Chaos: Design chaos experiments
+    Chaos->>Chaos: Test failure scenarios
+    Chaos->>Chaos: Validate resilience
+    Chaos-->>DevOps: Validation complete
+
+    DevOps->>DevOps: Deploy to production
+    DevOps-->>User: Feature deployed
+```
+
 ### Phase 1: Requirements (business-analyst)
 
 **Duration:** 0.5-1 day

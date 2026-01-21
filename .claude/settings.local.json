@@ -1,41 +1,37 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} sh -c 'echo \"\"=== {} ===\"\" && cat \"\"{}\"\"')",
+      "Bash(git add:*)",
+      "Bash(ls:*)",
+      "Bash(test:*)",
+      "Bash(bash scripts/verify-config.sh:*)",
+      "Bash(bash:*)"
+    ]
+  },
   "allowedCommands": {
     "claude": {
       "loops": 100
     },
     "patterns": [
-      // Version control
       "Bash(git *:*)",
-
-      // Build tools (cross-platform)
       "Bash(./gradlew *:*)",
       "Bash(gradlew.bat *:*)",
-
-      // Container management
       "Bash(docker *:*)",
       "Bash(docker-compose *:*)",
-
-      // System utilities
       "Bash(netstat *:*)",
       "Bash(curl *:*)",
-
-      // Text search (cross-platform)
       "Bash(findstr *:*)",
       "Bash(grep *:*)",
-
-      // File operations (cross-platform)
       "Bash(dir *:*)",
       "Bash(ls *:*)",
       "Bash(find *:*)",
       "Bash(del *:*)",
       "Bash(rm *:*)",
-
-      // Code formatting (for hooks system)
       "Bash(./gradlew spotless*:*)",
       "Bash(gradlew.bat spotless*:*)"
     ]
   },
-
   "hooksConfig": {
     "autoFix": {
       "enabled": true,

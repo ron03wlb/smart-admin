@@ -33,10 +33,10 @@ print_warning() {
 
 echo "1. Checking agent count..."
 AGENT_COUNT=$(ls -1 .claude/agents/*.md 2>/dev/null | wc -l)
-if [ "$AGENT_COUNT" -eq 8 ]; then
-    print_success "Found 8 agents"
+if [ "$AGENT_COUNT" -eq 9 ]; then
+    print_success "Found 9 agents"
 else
-    print_error "Expected 8 agents, found $AGENT_COUNT"
+    print_error "Expected 9 agents, found $AGENT_COUNT"
 fi
 echo ""
 
@@ -112,10 +112,24 @@ echo "6. Checking for duplication..."
 PATTERN_COUNT=$(grep -r "Controller → Service → Manager → Dao" .claude/agents/ 2>/dev/null | wc -l)
 
 if [ "$PATTERN_COUNT" -gt 1 ]; then
-    print_warning "SmartAdmin pattern found in $PATTERN_COUNT agent files"
-    echo "   This may indicate duplication."
+    print_warning "SmartAdmin pattern found in $PATTERN_COUNT agent files (potential duplication)"
+    grep -r "Controller → Service → Manager → Dao" .claude/agents/ 2>/dev/null | head -5 | while read line; do
+        echo "    $line"
+    done
 else
-    print_success "No duplication detected"
+    print_success "No SmartAdmin pattern duplication detected"
+fi
+
+# Check ResponseDTO duplication
+RESPONSE_COUNT=$(grep -r "ResponseDTO\.ok" .claude/agents/ 2>/dev/null | wc -l)
+if [ "$RESPONSE_COUNT" -gt 2 ]; then
+    print_warning "ResponseDTO pattern found in $RESPONSE_COUNT agent files"
+fi
+
+# Check LambdaQueryWrapper duplication
+WRAPPER_COUNT=$(grep -r "LambdaQueryWrapper" .claude/agents/ 2>/dev/null | wc -l)
+if [ "$WRAPPER_COUNT" -gt 2 ]; then
+    print_warning "LambdaQueryWrapper pattern found in $WRAPPER_COUNT agent files"
 fi
 echo ""
 
@@ -127,7 +141,7 @@ else
 fi
 
 if [ -f ".claude/docs/OPTIMIZATION-COMPLETE.md" ]; then
-    if grep -q "v2.3.0" ".claude/docs/OPTIMIZATION-COMPLETE.md"; then
+    if grep -q "v2.3.0\|v2.4.0\|v2.5.0" ".claude/docs/OPTIMIZATION-COMPLETE.md"; then
         print_success "Documentation version up to date"
     else
         print_warning "Documentation may need version update"
@@ -135,6 +149,97 @@ if [ -f ".claude/docs/OPTIMIZATION-COMPLETE.md" ]; then
 else
     print_error "OPTIMIZATION-COMPLETE.md missing"
 fi
+echo ""
+
+echo "8. Validating agent knowledge base references..."
+for agent in .claude/agents/*.md; do
+    agent_name=$(basename "$agent")
+
+    # Check if agent references shared knowledge
+    if grep -q "smartadmin-patterns.md" "$agent"; then
+        print_success "$agent_name references smartadmin-patterns.md"
+    else
+        print_warning "$agent_name doesn't reference smartadmin-patterns.md"
+    fi
+
+    # Check for Foundation Knowledge section
+    if grep -q "## Foundation Knowledge" "$agent"; then
+        print_success "$agent_name has Foundation Knowledge section"
+    else
+        print_warning "$agent_name missing Foundation Knowledge section"
+    fi
+done
+echo ""
+
+echo "9. Checking for broken cross-references..."
+BROKEN_REFS=0
+
+# Find markdown files and check links
+for file in $(find .claude -name "*.md" 2>/dev/null); do
+    # Extract relative markdown links
+    grep -o '\[.*\](\.\.*/.*\.md)' "$file" 2>/dev/null | while read link; do
+        # Extract path from [text](path)
+        ref_path=$(echo "$link" | sed 's/.*(\(.*\))/\1/')
+
+        # Resolve relative to file's directory
+        file_dir=$(dirname "$file")
+        full_path="$file_dir/$ref_path"
+
+        if [ ! -f "$full_path" ]; then
+            print_error "Broken reference in $(basename $file): $ref_path"
+            ((BROKEN_REFS++))
+        fi
+    done
+done
+
+if [ $BROKEN_REFS -eq 0 ]; then
+    print_success "No broken cross-references found"
+fi
+echo ""
+
+echo "10. Validating hook integration..."
+
+# Check hooks.json exists
+if [ -f ".claude/hooks.json" ]; then
+    print_success "hooks.json exists"
+
+    # Validate JSON syntax (if jq is available)
+    if command -v jq &> /dev/null; then
+        if jq empty .claude/hooks.json 2>/dev/null; then
+            print_success "hooks.json is valid JSON"
+        else
+            print_error "hooks.json has invalid JSON syntax"
+        fi
+    fi
+else
+    print_warning "hooks.json missing (hooks system not configured)"
+fi
+
+# Check review agents support machine-readable output
+for agent in code-reviewer architect-reviewer documentation-engineer; do
+    if [ -f ".claude/agents/${agent}.md" ]; then
+        if grep -q "Machine-Readable Output\|JSON output" ".claude/agents/${agent}.md"; then
+            print_success "${agent} supports machine-readable output"
+        else
+            print_warning "${agent} missing machine-readable output section"
+        fi
+    fi
+done
+echo ""
+
+echo "11. Collecting configuration metrics..."
+
+TOTAL_LINES=$(find .claude -name "*.md" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
+AGENT_COUNT=$(ls -1 .claude/agents/*.md 2>/dev/null | wc -l)
+KNOWLEDGE_LINES=$(find .claude/shared/knowledge -name "*.md" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
+ORCHESTRATION_LINES=$(find .claude/shared/orchestration -name "*.md" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
+MERMAID_COUNT=$(grep -r "```mermaid" .claude/shared/orchestration 2>/dev/null | wc -l)
+
+echo "  Total markdown lines: $TOTAL_LINES"
+echo "  Agent count: $AGENT_COUNT"
+echo "  Knowledge base lines: $KNOWLEDGE_LINES"
+echo "  Orchestration lines: $ORCHESTRATION_LINES"
+echo "  Mermaid diagrams: $MERMAID_COUNT"
 echo ""
 
 echo "======================================"

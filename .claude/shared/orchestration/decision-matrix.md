@@ -4,6 +4,8 @@
 
 ## Quick Decision Flow
 
+### Text-Based Decision Tree
+
 ```
 [User Request]
     ↓
@@ -26,6 +28,50 @@ Is it about resilience/chaos testing? ──YES──→ chaos-engineer
 Use general-purpose or ask user for clarification
 ```
 
+### Visual Decision Flow
+
+```mermaid
+flowchart TD
+    Start([User Request]) --> Q1{Code quality/<br/>pre-merge review?}
+    Q1 -->|Yes| CodeRev[code-reviewer]
+    Q1 -->|No| Q2{Architecture/<br/>design review?}
+
+    Q2 -->|Yes| ArchRev[architect-reviewer]
+    Q2 -->|No| Q3{Java code<br/>implementation?}
+
+    Q3 -->|Yes| JavaArch[java-architect]
+    Q3 -->|No| Q4{Vue/Frontend<br/>implementation?}
+
+    Q4 -->|Yes| VueExp[vue-expert]
+    Q4 -->|No| Q5{Requirements/<br/>process/stakeholders?}
+
+    Q5 -->|Yes| BA[business-analyst]
+    Q5 -->|No| Q6{Deployment/<br/>CI-CD/infrastructure?}
+
+    Q6 -->|Yes| DevOps[devops-engineer]
+    Q6 -->|No| Q7{PostgreSQL<br/>database specific?}
+
+    Q7 -->|Yes| PG[postgres-pro]
+    Q7 -->|No| Q8{Resilience/<br/>chaos testing?}
+
+    Q8 -->|Yes| Chaos[chaos-engineer]
+    Q8 -->|No| Q9{Documentation<br/>creation/updates?}
+
+    Q9 -->|Yes| Docs[documentation-engineer]
+    Q9 -->|No| Clarify[Ask user<br/>for clarification]
+
+    style CodeRev fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style ArchRev fill:#4ecdc4,stroke:#22a6b3,color:#fff
+    style JavaArch fill:#45b7d1,stroke:#3498db,color:#fff
+    style VueExp fill:#96ceb4,stroke:#6ab04c,color:#fff
+    style BA fill:#ffeaa7,stroke:#fdcb6e,color:#000
+    style DevOps fill:#dfe6e9,stroke:#b2bec3,color:#000
+    style PG fill:#fd79a8,stroke:#e84393,color:#fff
+    style Chaos fill:#ff6348,stroke:#e74c3c,color:#fff
+    style Docs fill:#a29bfe,stroke:#6c5ce7,color:#fff
+    style Clarify fill:#ffeaa7,stroke:#fdcb6e,color:#000
+```
+
 ## Keyword-Based Agent Mapping
 
 | Keywords in Request | Agent | Confidence | Example Requests |
@@ -46,6 +92,8 @@ Use general-purpose or ask user for clarification
 | architecture, design, scalability, pattern validation, layer boundaries, module structure, technical debt assessment, architectural patterns, refactoring strategy | **architect-reviewer** | High | "review architecture", "validate design", "assess scalability", "evaluate module structure", "identify technical debt", "architecture audit" |
 | **Code Quality Review** ||||
 | code quality, security review, pull request, pre-merge, quality gate, code standards, vulnerability, code review, best practices, maintainability | **code-reviewer** | High | "review code", "pre-merge review", "check code quality", "security audit", "validate standards", "quality gate check" |
+| **Documentation** ||||
+| documentation, API docs, README, tutorial, architecture guide, user guide, developer docs, Swagger, OpenAPI, technical writing, doc generation | **documentation-engineer** | High | "document API", "update README", "create architecture guide", "write tutorial", "generate API docs", "document layered architecture" |
 
 ## Context-Based Decision Logic
 
