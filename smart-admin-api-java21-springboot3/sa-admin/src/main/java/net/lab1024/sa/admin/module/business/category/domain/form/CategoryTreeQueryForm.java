@@ -3,7 +3,7 @@ package net.lab1024.sa.admin.module.business.category.domain.form;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import net.lab1024.sa.admin.module.business.category.constant.CategoryTypeEnum;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 
 /**
  * 类目 层级树查询

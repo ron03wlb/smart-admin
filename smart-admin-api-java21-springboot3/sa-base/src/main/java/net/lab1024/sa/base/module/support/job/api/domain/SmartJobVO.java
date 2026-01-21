@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
-import net.lab1024.sa.base.common.json.serializer.enumeration.EnumSerialize;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobTriggerTypeEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.base.web.json.serializer.enumeration.EnumSerialize;
 
 /**
  * 定时任务 vo

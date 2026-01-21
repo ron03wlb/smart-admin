@@ -3,7 +3,7 @@ package net.lab1024.sa.admin.module.business.oa.notice.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import net.lab1024.sa.admin.module.business.oa.notice.constant.NoticeVisibleRangeDataTypeEnum;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 
 /**
  * 新闻、公告 可见范围数据 VO

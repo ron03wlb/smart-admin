@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Data;
 import net.lab1024.sa.admin.module.business.goods.constant.GoodsStatusEnum;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 
 /**
  * 商品

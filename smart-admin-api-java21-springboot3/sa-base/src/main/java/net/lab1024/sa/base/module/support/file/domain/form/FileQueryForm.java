@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
 import net.lab1024.sa.base.common.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.module.support.file.constant.FileFolderTypeEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.domain.PageParam;
 
 /**

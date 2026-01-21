@@ -3,7 +3,7 @@ package net.lab1024.sa.admin.module.system.login.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import lombok.Data;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.domain.RequestUser;
 import net.lab1024.sa.common.core.enumeration.GenderEnum;
 import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
