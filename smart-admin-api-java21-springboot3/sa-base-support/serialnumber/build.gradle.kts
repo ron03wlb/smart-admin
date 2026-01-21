@@ -30,8 +30,8 @@ dependencies {
     // SA Base Core - sa-base specific domain objects and utilities
     api(project(":sa-base-core"))
 
-    // SA Base - required for SupportBaseController, SwaggerTagConst
-    api(project(":sa-base"))
+    // SA Base Infrastructure - specific modules instead of monolithic sa-base
+    // Note: This module doesn't have controllers, so no need for sa-base-web
 
     // Guava for Interner
     api(libs.guava)

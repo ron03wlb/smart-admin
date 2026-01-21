@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
 import net.lab1024.sa.base.module.support.message.constant.MessageTypeEnum;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
 
 /**

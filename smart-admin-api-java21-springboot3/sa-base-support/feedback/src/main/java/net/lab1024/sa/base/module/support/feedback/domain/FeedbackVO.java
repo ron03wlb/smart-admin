@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
-import net.lab1024.sa.base.common.json.deserializer.FileKeyVoDeserializer;
-import net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;
-import net.lab1024.sa.base.common.swagger.SchemaEnum;
+import net.lab1024.sa.base.module.support.file.json.deserializer.FileKeyVoDeserializer;
+import net.lab1024.sa.base.module.support.file.json.serializer.FileKeyVoSerializer;
+import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
 
 /**

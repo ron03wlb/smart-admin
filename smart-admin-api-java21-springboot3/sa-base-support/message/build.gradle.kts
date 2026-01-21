@@ -24,8 +24,10 @@ dependencies {
     // SA Base Core - sa-base specific domain objects and utilities
     api(project(":sa-base-core"))
 
-    // SA Base - required for SupportBaseController, SwaggerTagConst, JSON serializers
-    api(project(":sa-base"))
+    // SA Base Infrastructure - specific modules instead of monolithic sa-base
+    api(project(":sa-base-web"))        // For SupportBaseController, JSON serializers
+    api(project(":sa-base-mybatis"))    // For MyBatis Plus support
+    api(project(":sa-base-swagger"))    // For SwaggerTagConst
 
     // Apache Commons Text for StringSubstitutor
     api(libs.commons.text)

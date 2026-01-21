@@ -4,6 +4,9 @@ plugins {
 }
 
 dependencies {
+    // SA Common Core (for ResponseDTO, DataTypeEnum)
+    api(project(":sa-common:core"))
+
     // Spring Boot Autoconfigure
     api(libs.spring.boot.autoconfigure)
 

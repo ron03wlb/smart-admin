@@ -22,10 +22,11 @@ dependencies {
     api(project(":sa-common:core"))
 
     // SA Base Core - sa-base specific domain objects and utilities
+    // Note: SystemEnvironment is in sa-base-core, so no need for sa-base
     api(project(":sa-base-core"))
 
-    // SA Base - required for SystemEnvironment
-    api(project(":sa-base"))
+    // SA Base Infrastructure - specific modules instead of monolithic sa-base
+    api(project(":sa-base-mybatis"))    // For MyBatis Plus support
 
     // Freemarker for template rendering
     api(libs.freemarker)

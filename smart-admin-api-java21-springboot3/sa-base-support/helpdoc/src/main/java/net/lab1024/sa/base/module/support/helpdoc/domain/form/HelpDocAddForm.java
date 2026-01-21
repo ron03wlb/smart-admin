@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
-import net.lab1024.sa.base.common.json.deserializer.FileKeyVoDeserializer;
+import net.lab1024.sa.base.module.support.file.json.deserializer.FileKeyVoDeserializer;
 import org.hibernate.validator.constraints.Length;
 
 /**
