@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@SuppressWarnings("PMD.LongVariable")
 public class MailService {
 
   @Resource private JavaMailSender javaMailSender;
@@ -54,12 +55,12 @@ public class MailService {
 
   /** 使用模板发送邮件 */
   public ResponseDTO<String> sendMail(
-      MailTemplateCodeEnum templateCode,
-      Map<String, Object> templateParamsMap,
-      List<String> receiverUserList,
-      List<File> fileList) {
+      final MailTemplateCodeEnum templateCode,
+      final Map<String, Object> templateParamsMap,
+      final List<String> receiverUserList,
+      final List<File> fileList) {
 
-    MailTemplateEntity mailTemplateEntity =
+    final MailTemplateEntity mailTemplateEntity =
         mailTemplateDao.selectById(templateCode.name().toLowerCase(java.util.Locale.ROOT));
     if (mailTemplateEntity == null) {
       return ResponseDTO.userErrorParam("模版不存在");
@@ -69,7 +70,7 @@ public class MailService {
       return ResponseDTO.userErrorParam("模版已禁用，无法发送");
     }
 
-    String content;
+    final String content;
     if (MailTemplateTypeEnum.FREEMARKER
         .name()
         .equalsIgnoreCase(mailTemplateEntity.getTemplateType().trim())) {
@@ -99,9 +100,9 @@ public class MailService {
 
   /** 使用模板发送邮件 */
   public ResponseDTO<String> sendMail(
-      MailTemplateCodeEnum templateCode,
-      Map<String, Object> templateParamsMap,
-      List<String> receiverUserList) {
+      final MailTemplateCodeEnum templateCode,
+      final Map<String, Object> templateParamsMap,
+      final List<String> receiverUserList) {
     return this.sendMail(templateCode, templateParamsMap, receiverUserList, null);
   }
 
@@ -115,11 +116,11 @@ public class MailService {
    * @throws MessagingException
    */
   public void sendMail(
-      String subject,
-      String content,
-      List<File> fileList,
-      List<String> receiverUserList,
-      boolean isHtml)
+      final String subject,
+      final String content,
+      final List<File> fileList,
+      final List<String> receiverUserList,
+      final boolean isHtml)
       throws MessagingException {
 
     if (CollectionUtils.isEmpty(receiverUserList)) {
@@ -135,11 +136,11 @@ public class MailService {
       actualSubject = "(测试)" + subject;
     }
 
-    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+    final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
     // 是否为多文件上传
-    boolean multiparty = !CollectionUtils.isEmpty(fileList);
-    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, multiparty);
+    final boolean multiparty = !CollectionUtils.isEmpty(fileList);
+    final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, multiparty);
     helper.setFrom(clientMail);
     helper.setTo(receiverUserList.toArray(new String[0]));
     helper.setSubject(actualSubject);
@@ -148,7 +149,7 @@ public class MailService {
 
     // 附件
     if (multiparty) {
-      for (File file : fileList) {
+      for (final File file : fileList) {
         helper.addAttachment(file.getName(), file);
       }
     }
@@ -157,25 +158,25 @@ public class MailService {
 
   /** 使用字符串生成最终内容 */
   private String stringResolverContent(
-      String stringTemplate, Map<String, Object> templateParamsMap) {
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(templateParamsMap);
-    String contractHtml = stringSubstitutor.replace(stringTemplate);
-    Document doc = Jsoup.parse(contractHtml);
+      final String stringTemplate, final Map<String, Object> templateParamsMap) {
+    final StringSubstitutor stringSubstitutor = new StringSubstitutor(templateParamsMap);
+    final String contractHtml = stringSubstitutor.replace(stringTemplate);
+    final Document doc = Jsoup.parse(contractHtml);
     doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
     return doc.outerHtml();
   }
 
   /** 使用 freemarker 生成最终内容 */
   private String freemarkerResolverContent(
-      String htmlTemplate, Map<String, Object> templateParamsMap) {
-    Configuration configuration = new Configuration(Configuration.VERSION_2_3_23);
-    StringTemplateLoader stringLoader = new StringTemplateLoader();
-    String templateName = IdUtil.fastSimpleUUID();
+      final String htmlTemplate, final Map<String, Object> templateParamsMap) {
+    final Configuration configuration = new Configuration(Configuration.VERSION_2_3_23);
+    final StringTemplateLoader stringLoader = new StringTemplateLoader();
+    final String templateName = IdUtil.fastSimpleUUID();
     stringLoader.putTemplate(templateName, htmlTemplate);
     configuration.setTemplateLoader(stringLoader);
     try {
-      Template template = configuration.getTemplate(templateName, "utf-8");
-      Writer out = new StringWriter(2048);
+      final Template template = configuration.getTemplate(templateName, "utf-8");
+      final Writer out = new StringWriter(2048);
       template.process(templateParamsMap, out);
       return out.toString();
     } catch (IOException | TemplateException e) {

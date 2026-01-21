@@ -17,6 +17,7 @@ import org.apache.ibatis.annotations.Param;
  * @since 2022-01-09 20:57:24 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Mapper
+@SuppressWarnings({"PMD.ShortVariable", "PMD.LongVariable"})
 public interface HeartBeatRecordDao extends BaseMapper<HeartBeatRecordEntity> {
 
   /**

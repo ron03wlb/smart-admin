@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@SuppressWarnings({"PMD.LongVariable", "PMD.AvoidInstantiatingObjectsInLoops"})
 public abstract class SerialNumberBaseService implements SerialNumberService {
 
   @Resource protected SerialNumberRecordDao serialNumberRecordDao;
@@ -45,12 +46,12 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
 
   @PostConstruct
   void init() {
-    List<SerialNumberEntity> serialNumberEntityList = serialNumberDao.selectList(null);
+    final List<SerialNumberEntity> serialNumberEntityList = serialNumberDao.selectList(null);
     if (serialNumberEntityList == null) {
       return;
     }
-    for (SerialNumberEntity serialNumberEntity : serialNumberEntityList) {
-      SerialNumberRuleTypeEnum ruleTypeEnum =
+    for (final SerialNumberEntity serialNumberEntity : serialNumberEntityList) {
+      final SerialNumberRuleTypeEnum ruleTypeEnum =
           SmartEnumUtil.getEnumByName(
               serialNumberEntity.getRuleType().toUpperCase(java.util.Locale.ROOT),
               SerialNumberRuleTypeEnum.class);
@@ -59,22 +60,22 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
             "cannot find rule type , id : " + serialNumberEntity.getSerialNumberId());
       }
 
-      String format = serialNumberEntity.getFormat();
-      int startIndex = format.indexOf("[n");
-      int endIndex = format.indexOf("n]");
+      final String format = serialNumberEntity.getFormat();
+      final int startIndex = format.indexOf("[n");
+      final int endIndex = format.indexOf("n]");
       if (startIndex == -1 || endIndex == -1 || endIndex <= startIndex) {
         throw new ExceptionInInitializerError(
             "[nnn] 配置错误，请仔细查看 id : " + serialNumberEntity.getSerialNumberId());
       }
-
-      String numberFormat = format.substring(startIndex + 1, endIndex + 1);
 
       if (serialNumberEntity.getStepRandomRange() < MIN_STEP_RANDOM_RANGE) {
         throw new ExceptionInInitializerError(
             "random step range must greater than 1 " + serialNumberEntity.getSerialNumberId());
       }
 
-      SerialNumberInfoBO serialNumberInfoBO =
+      final String numberFormat = format.substring(startIndex + 1, endIndex + 1);
+
+      final SerialNumberInfoBO serialNumberInfoBO =
           SerialNumberInfoBO.builder()
               .serialNumberId(serialNumberEntity.getSerialNumberId())
               .serialNumberRuleTypeEnum(ruleTypeEnum)
@@ -104,8 +105,8 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public String generate(SerialNumberIdEnum serialNumberIdEnum) {
-    List<String> generateList = this.generate(serialNumberIdEnum, 1);
+  public String generate(final SerialNumberIdEnum serialNumberIdEnum) {
+    final List<String> generateList = this.generate(serialNumberIdEnum, 1);
     if (generateList == null || generateList.isEmpty()) {
       throw new BusinessException("cannot generate : " + serialNumberIdEnum.toString());
     }
@@ -114,8 +115,8 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public List<String> generate(SerialNumberIdEnum serialNumberIdEnum, int count) {
-    SerialNumberInfoBO serialNumberInfoBO =
+  public List<String> generate(final SerialNumberIdEnum serialNumberIdEnum, final int count) {
+    final SerialNumberInfoBO serialNumberInfoBO =
         serialNumberMap.get(serialNumberIdEnum.getSerialNumberId());
     if (serialNumberInfoBO == null) {
       throw new BusinessException("cannot found SerialNumberId : " + serialNumberIdEnum.toString());
@@ -132,7 +133,9 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
    * @return
    */
   protected SerialNumberGenerateResultBO loopNumberList(
-      SerialNumberLastGenerateBO lastGenerate, SerialNumberInfoBO serialNumberInfo, int count) {
+      final SerialNumberLastGenerateBO lastGenerate,
+      final SerialNumberInfoBO serialNumberInfo,
+      final int count) {
     Long lastNumber = lastGenerate.getLastNumber();
     boolean isReset = false;
     if (isResetInitNumber(lastGenerate, serialNumberInfo)) {
@@ -140,9 +143,9 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
       isReset = true;
     }
 
-    java.util.List<Long> numberList = Lists.newArrayListWithCapacity(count);
+    final List<Long> numberList = Lists.newArrayListWithCapacity(count);
     for (int i = 0; i < count; i++) {
-      Integer stepRandomRange = serialNumberInfo.getStepRandomRange();
+      final Integer stepRandomRange = serialNumberInfo.getStepRandomRange();
       if (stepRandomRange > MIN_STEP_FOR_RANDOM) {
         lastNumber = lastNumber + RandomUtils.nextInt(1, stepRandomRange + 1);
       } else {
@@ -161,8 +164,8 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
         .build();
   }
 
-  protected void saveRecord(SerialNumberGenerateResultBO resultBO) {
-    Long effectRows =
+  protected void saveRecord(final SerialNumberGenerateResultBO resultBO) {
+    final Long effectRows =
         serialNumberRecordDao.updateRecord(
             resultBO.getSerialNumberId(),
             resultBO.getLastTime().toLocalDate(),
@@ -171,7 +174,7 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
 
     // 需要插入
     if (effectRows == null || effectRows == 0) {
-      SerialNumberRecordEntity recordEntity =
+      final SerialNumberRecordEntity recordEntity =
           SerialNumberRecordEntity.builder()
               .serialNumberId(resultBO.getSerialNumberId())
               .recordDate(LocalDate.now())
@@ -189,19 +192,19 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
    * @return
    */
   private boolean isResetInitNumber(
-      SerialNumberLastGenerateBO lastGenerate, SerialNumberInfoBO serialNumberInfo) {
-    LocalDateTime lastTime = lastGenerate.getLastTime();
+      final SerialNumberLastGenerateBO lastGenerate, final SerialNumberInfoBO serialNumberInfo) {
+    final LocalDateTime lastTime = lastGenerate.getLastTime();
     if (lastTime == null) {
       return true;
     }
 
-    SerialNumberRuleTypeEnum serialNumberRuleTypeEnum =
+    final SerialNumberRuleTypeEnum serialNumberRuleTypeEnum =
         serialNumberInfo.getSerialNumberRuleTypeEnum();
-    int lastTimeYear = lastTime.getYear();
-    int lastTimeMonth = lastTime.getMonthValue();
-    int lastTimeDay = lastTime.getDayOfYear();
+    final int lastTimeYear = lastTime.getYear();
+    final int lastTimeMonth = lastTime.getMonthValue();
+    final int lastTimeDay = lastTime.getDayOfYear();
 
-    LocalDateTime now = LocalDateTime.now();
+    final LocalDateTime now = LocalDateTime.now();
 
     switch (serialNumberRuleTypeEnum) {
       case YEAR:
@@ -217,16 +220,17 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
 
   /** 替换特殊rule，即替换[yyyy][mm][dd][nnn]等规则 */
   protected List<String> formatNumberList(
-      SerialNumberGenerateResultBO generateResult, SerialNumberInfoBO serialNumberInfo) {
+      final SerialNumberGenerateResultBO generateResult,
+      final SerialNumberInfoBO serialNumberInfo) {
 
     /** 第一步：替换年、月、日 */
-    LocalDate lastTime = generateResult.getLastTime().toLocalDate();
-    String year = String.valueOf(lastTime.getYear());
-    String month =
+    final LocalDate lastTime = generateResult.getLastTime().toLocalDate();
+    final String year = String.valueOf(lastTime.getYear());
+    final String month =
         lastTime.getMonthValue() > 9
             ? String.valueOf(lastTime.getMonthValue())
             : "0" + lastTime.getMonthValue();
-    String day =
+    final String day =
         lastTime.getDayOfMonth() > 9
             ? String.valueOf(lastTime.getDayOfMonth())
             : "0" + lastTime.getDayOfMonth();
@@ -245,20 +249,21 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
     }
 
     /** 第二步：替换数字 */
-    List<String> numberList = Lists.newArrayListWithCapacity(generateResult.getNumberList().size());
-    for (Long number : generateResult.getNumberList()) {
-      StringBuilder numberStringBuilder = new StringBuilder();
-      int currentNumberCount = String.valueOf(number).length();
+    final List<String> numberList =
+        Lists.newArrayListWithCapacity(generateResult.getNumberList().size());
+    for (final Long number : generateResult.getNumberList()) {
+      final StringBuilder numberStringBuilder = new StringBuilder();
+      final int currentNumberCount = String.valueOf(number).length();
       // 数量不够，前面补0
       if (serialNumberInfo.getNumberCount() > currentNumberCount) {
-        int remain = serialNumberInfo.getNumberCount() - currentNumberCount;
+        final int remain = serialNumberInfo.getNumberCount() - currentNumberCount;
         for (int i = 0; i < remain; i++) {
           numberStringBuilder.append(0);
         }
       }
       numberStringBuilder.append(number);
       // 最终替换
-      String finalNumber =
+      final String finalNumber =
           format.replaceAll(serialNumberInfo.getNumberFormat(), numberStringBuilder.toString());
       numberList.add(finalNumber);
     }

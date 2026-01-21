@@ -20,6 +20,7 @@ import org.apache.ibatis.annotations.Param;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Mapper
+@SuppressWarnings({"PMD.LongVariable", "PMD.ShortVariable"})
 public interface HelpDocDao extends BaseMapper<HelpDocEntity> {
 
   String HELP_DOC_ID = "helpDocId";

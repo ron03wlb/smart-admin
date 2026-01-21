@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@SuppressWarnings("PMD.LongVariable")
 public class HelpDocUserService {
 
   @Resource private HelpDocDao helpDocDao;
@@ -41,14 +42,15 @@ public class HelpDocUserService {
    *
    * @return
    */
-  public ResponseDTO<HelpDocDetailVO> view(RequestUser requestUser, Long helpDocId) {
-    HelpDocEntity helpDocEntity = helpDocDao.selectById(helpDocId);
+  public ResponseDTO<HelpDocDetailVO> view(final RequestUser requestUser, final Long helpDocId) {
+    final HelpDocEntity helpDocEntity = helpDocDao.selectById(helpDocId);
     if (helpDocEntity == null) {
       return ResponseDTO.userErrorParam("帮助文档不存在");
     }
 
-    HelpDocDetailVO helpDocDetailVO = SmartBeanUtil.copy(helpDocEntity, HelpDocDetailVO.class);
-    long viewCount = helpDocDao.viewRecordCount(helpDocId, requestUser.getUserId());
+    final HelpDocDetailVO helpDocDetailVO =
+        SmartBeanUtil.copy(helpDocEntity, HelpDocDetailVO.class);
+    final long viewCount = helpDocDao.viewRecordCount(helpDocId, requestUser.getUserId());
     if (viewCount == 0) {
       helpDocDao.insertViewRecord(
           helpDocId,
@@ -77,9 +79,9 @@ public class HelpDocUserService {
    * @return
    */
   public PageResult<HelpDocViewRecordVO> queryViewRecord(
-      HelpDocViewRecordQueryForm helpDocViewRecordQueryForm) {
-    Page<?> page = SmartPageUtil.convert2PageQuery(helpDocViewRecordQueryForm);
-    List<HelpDocViewRecordVO> noticeViewRecordVOS =
+      final HelpDocViewRecordQueryForm helpDocViewRecordQueryForm) {
+    final Page<?> page = SmartPageUtil.convert2PageQuery(helpDocViewRecordQueryForm);
+    final List<HelpDocViewRecordVO> noticeViewRecordVOS =
         helpDocDao.queryViewRecordList(page, helpDocViewRecordQueryForm);
     return SmartPageUtil.convert2PageResult(page, noticeViewRecordVOS);
   }

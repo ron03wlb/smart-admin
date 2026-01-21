@@ -14,7 +14,7 @@ import lombok.Data;
  * @since 2022-01-09 20:57:24 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
-@TableName(value = "t_heart_beat_record")
+@TableName("t_heart_beat_record")
 public class HeartBeatRecordEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;

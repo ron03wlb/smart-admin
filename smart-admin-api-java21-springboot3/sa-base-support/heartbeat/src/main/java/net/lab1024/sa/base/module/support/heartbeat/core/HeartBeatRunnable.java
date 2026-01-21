@@ -34,14 +34,14 @@ public final class HeartBeatRunnable implements Runnable {
 
   private IHeartBeatRecordHandler recordHandler;
 
-  public HeartBeatRunnable(IHeartBeatRecordHandler recordHandler) {
+  public HeartBeatRunnable(final IHeartBeatRecordHandler recordHandler) {
     this.recordHandler = recordHandler;
     this.initServerInfo();
   }
 
   /** 初始化心跳相关信息 */
   private void initServerInfo() {
-    RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+    final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     this.projectPath = System.getProperty("user.dir");
     this.serverIps = new ArrayList<>(NetUtil.localIpv4s());
     this.processNo = Integer.valueOf(runtimeMXBean.getName().split("@")[0]);
@@ -52,7 +52,7 @@ public final class HeartBeatRunnable implements Runnable {
 
   @Override
   public void run() {
-    HeartBeatRecord heartBeatRecord = new HeartBeatRecord();
+    final HeartBeatRecord heartBeatRecord = new HeartBeatRecord();
     heartBeatRecord.setProjectPath(this.projectPath);
     heartBeatRecord.setServerIp(StringUtils.join(this.serverIps, ";"));
     heartBeatRecord.setProcessNo(this.processNo);

@@ -17,6 +17,7 @@ import net.lab1024.sa.base.module.support.serialnumber.constant.SerialNumberRule
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuppressWarnings("PMD.LongVariable")
 public class SerialNumberInfoBO {
 
   /**

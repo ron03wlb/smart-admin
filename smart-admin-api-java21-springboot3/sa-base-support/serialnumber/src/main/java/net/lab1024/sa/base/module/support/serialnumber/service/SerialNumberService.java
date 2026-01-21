@@ -9,6 +9,7 @@ import net.lab1024.sa.base.module.support.serialnumber.constant.SerialNumberIdEn
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@SuppressWarnings("PMD.LongVariable")
 public interface SerialNumberService {
 
   /**

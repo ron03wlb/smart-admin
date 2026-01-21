@@ -11,6 +11,7 @@ import lombok.Data;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@SuppressWarnings("PMD.LongVariable")
 public class HelpDocVO {
 
   @Schema(description = "id")

@@ -27,9 +27,10 @@ public class HelpDocManager {
    * @param relationList
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void save(HelpDocEntity helpDocEntity, List<HelpDocRelationForm> relationList) {
+  public void save(
+      final HelpDocEntity helpDocEntity, final List<HelpDocRelationForm> relationList) {
     helpDocDao.insert(helpDocEntity);
-    Long helpDocId = helpDocEntity.getHelpDocId();
+    final Long helpDocId = helpDocEntity.getHelpDocId();
     // 保存关联
     if (CollectionUtils.isNotEmpty(relationList)) {
       helpDocDao.insertRelation(helpDocId, relationList);
@@ -43,9 +44,10 @@ public class HelpDocManager {
    * @param relationList
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void update(HelpDocEntity helpDocEntity, List<HelpDocRelationForm> relationList) {
+  public void update(
+      final HelpDocEntity helpDocEntity, final List<HelpDocRelationForm> relationList) {
     helpDocDao.updateById(helpDocEntity);
-    Long helpDocId = helpDocEntity.getHelpDocId();
+    final Long helpDocId = helpDocEntity.getHelpDocId();
     // 保存关联
     if (CollectionUtils.isNotEmpty(relationList)) {
       helpDocDao.deleteRelation(helpDocId);

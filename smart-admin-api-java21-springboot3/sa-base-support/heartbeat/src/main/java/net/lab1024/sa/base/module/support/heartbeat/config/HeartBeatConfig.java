@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2018/10/9 18:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
+@SuppressWarnings("PMD.LongVariable")
 public class HeartBeatConfig {
 
   /** 间隔时间 */

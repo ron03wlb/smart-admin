@@ -15,6 +15,7 @@ import net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@SuppressWarnings("PMD.LongVariable")
 public class HelpDocDetailVO {
 
   @Schema(description = "id")
@@ -62,7 +63,7 @@ public class HelpDocDetailVO {
     return relationList == null ? java.util.Collections.emptyList() : List.copyOf(relationList);
   }
 
-  public void setRelationList(List<HelpDocRelationVO> relationList) {
+  public void setRelationList(final List<HelpDocRelationVO> relationList) {
     this.relationList =
         relationList == null ? java.util.Collections.emptyList() : List.copyOf(relationList);
   }

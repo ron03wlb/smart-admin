@@ -29,6 +29,7 @@ import org.springframework.scheduling.annotation.Scheduled;
  * @since 2025-08-03 22:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@SuppressWarnings("PMD.LongVariable")
 public class SerialNumberRedisService extends SerialNumberBaseService {
 
   @Resource private RedissonService redissonService;
@@ -38,18 +39,18 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
   private static final String SERIAL_NUMBER_PREFIX = CacheKeyConst.Support.SERIAL_NUMBER + ":";
 
   @Override
-  public void initLastGenerateData(List<SerialNumberEntity> serialNumberEntityList) {
+  public void initLastGenerateData(final List<SerialNumberEntity> serialNumberEntityList) {
     if (serialNumberEntityList == null) {
       return;
     }
 
     // 设置redis的上次值
-    for (SerialNumberEntity serialNumberEntity : serialNumberEntityList) {
+    for (final SerialNumberEntity serialNumberEntity : serialNumberEntityList) {
       if (serialNumberEntity.getLastTime() == null) {
         continue;
       }
 
-      String redisKey =
+      final String redisKey =
           generateRedisKeyByDate(
               serialNumberEntity.getSerialNumberId(),
               SmartEnumUtil.getEnumByName(
@@ -57,7 +58,7 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
                   SerialNumberRuleTypeEnum.class),
               serialNumberEntity.getLastTime().toLocalDate());
 
-      RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
+      final RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
       if (!atomicLong.isExists()) {
         atomicLong.set(serialNumberEntity.getLastNumber());
       }
@@ -67,8 +68,8 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
   /** 每天凌晨一点进行检测； 检测单位数量为3; 3天前、3月前、3年前 */
   @Scheduled(cron = "0 0 1 * * ?")
   public void tryDeleteUnusedRedisKey() {
-    for (SerialNumberInfoBO serialNumberInfoBO : serialNumberMap.values()) {
-      SerialNumberRuleTypeEnum typeEnum = serialNumberInfoBO.getSerialNumberRuleTypeEnum();
+    for (final SerialNumberInfoBO serialNumberInfoBO : serialNumberMap.values()) {
+      final SerialNumberRuleTypeEnum typeEnum = serialNumberInfoBO.getSerialNumberRuleTypeEnum();
       String dateStr = "";
       switch (typeEnum) {
         case DAY -> {
@@ -87,22 +88,23 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
         }
       }
       if (SmartStringUtil.isNotEmpty(dateStr)) {
-        String redisKey =
+        final String redisKey =
             SERIAL_NUMBER_PREFIX + serialNumberInfoBO.getSerialNumberId() + ":" + dateStr;
-        RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
+        final RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
         atomicLong.delete();
       }
     }
   }
 
   @Override
-  public List<String> generateSerialNumberList(SerialNumberInfoBO serialNumberInfo, int count) {
+  public List<String> generateSerialNumberList(
+      final SerialNumberInfoBO serialNumberInfo, final int count) {
     // 根据步长，计算 redis 增加值
-    List<Integer> list = new ArrayList<>(count);
+    final List<Integer> list = new ArrayList<>(count);
     int redisIncrease = 0;
     for (int i = 0; i < count; i++) {
       int stepIncrease = 1;
-      Integer stepRandomRange = serialNumberInfo.getStepRandomRange();
+      final Integer stepRandomRange = serialNumberInfo.getStepRandomRange();
       if (stepRandomRange > BATCH_GENERATE_THRESHOLD) {
         stepIncrease =
             RandomUtil.getSecureRandom().nextInt(1, serialNumberInfo.getStepRandomRange() + 1);
@@ -111,24 +113,24 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
       list.add(stepIncrease);
     }
     try {
-      String redisKey =
+      final String redisKey =
           generateRedisKeyByDate(
               serialNumberInfo.getSerialNumberId(),
               serialNumberInfo.getSerialNumberRuleTypeEnum(),
               LocalDate.now());
-      RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
-      Long increaseResult = atomicLong.addAndGet(redisIncrease);
+      final RAtomicLong atomicLong = redissonService.getRedissonClient().getAtomicLong(redisKey);
+      final Long increaseResult = atomicLong.addAndGet(redisIncrease);
 
-      List<Long> numberList = new ArrayList<>(count);
+      final List<Long> numberList = new ArrayList<>(count);
       Long number = increaseResult;
-      for (Integer i : list) {
+      for (final Integer i : list) {
         number = number - i;
-        numberList.add((number + 1));
+        numberList.add(number + 1);
       }
 
       Collections.reverse(numberList);
 
-      SerialNumberGenerateResultBO serialNumberGenerateResult =
+      final SerialNumberGenerateResultBO serialNumberGenerateResult =
           SerialNumberGenerateResultBO.builder()
               .serialNumberId(serialNumberInfo.getSerialNumberId())
               .lastNumber(increaseResult)
@@ -146,12 +148,7 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
       // 把生成过程保存到数据库里
       super.saveRecord(serialNumberGenerateResult);
       return formatNumberList(serialNumberGenerateResult, serialNumberInfo);
-    } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
-      throw e;
-    } catch (Error e) {
+    } catch (Exception | Error e) {
       if (log.isErrorEnabled()) {
         log.error(e.getMessage(), e);
       }
@@ -160,20 +157,20 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
   }
 
   private String generateRedisKeyByDate(
-      Integer serialNumberId,
-      SerialNumberRuleTypeEnum serialNumberRuleTypeEnum,
-      LocalDate localDate) {
+      final Integer serialNumberId,
+      final SerialNumberRuleTypeEnum serialNumberRuleTypeEnum,
+      final LocalDate localDate) {
     return switch (serialNumberRuleTypeEnum) {
       case DAY -> {
-        String dayStr = SmartLocalDateUtil.format(localDate, SmartDateFormatterEnum.YMD);
+        final String dayStr = SmartLocalDateUtil.format(localDate, SmartDateFormatterEnum.YMD);
         yield SERIAL_NUMBER_PREFIX + serialNumberId + ":" + dayStr;
       }
       case MONTH -> {
-        String monthStr = SmartLocalDateUtil.format(localDate, SmartDateFormatterEnum.YM);
+        final String monthStr = SmartLocalDateUtil.format(localDate, SmartDateFormatterEnum.YM);
         yield SERIAL_NUMBER_PREFIX + serialNumberId + ":" + monthStr;
       }
       case YEAR -> {
-        String yearStr = String.valueOf(localDate.getYear());
+        final String yearStr = String.valueOf(localDate.getYear());
         yield SERIAL_NUMBER_PREFIX + serialNumberId + ":" + yearStr;
       }
       case NONE -> SERIAL_NUMBER_PREFIX + serialNumberId;

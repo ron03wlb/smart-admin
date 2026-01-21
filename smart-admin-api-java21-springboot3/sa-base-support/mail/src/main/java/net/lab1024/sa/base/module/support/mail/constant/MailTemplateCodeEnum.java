@@ -6,6 +6,7 @@ package net.lab1024.sa.base.module.support.mail.constant;
  * @author 1024创新实验室-创始人兼主任:卓大
  * @since 2024/8/5 Copyright <a href="https://1024lab.net">1024创新实验室</a> ，Since 2012
  */
+@SuppressWarnings("PMD.LongVariable")
 public enum MailTemplateCodeEnum {
 
   /** 登录验证码 */

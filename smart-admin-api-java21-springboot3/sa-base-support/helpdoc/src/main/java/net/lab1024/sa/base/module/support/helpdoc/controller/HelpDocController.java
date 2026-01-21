@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = SwaggerTagConst.Support.HELP_DOC)
 @RestController
+@SuppressWarnings("PMD.LongVariable")
 public class HelpDocController extends SupportBaseController {
 
   @Resource private HelpDocCatalogService helpDocCatalogService;
@@ -53,7 +54,7 @@ public class HelpDocController extends SupportBaseController {
   @GetMapping("/helpDoc/user/view/{helpDocId}")
   @RepeatSubmit
   public ResponseDTO<HelpDocDetailVO> view(
-      @PathVariable Long helpDocId, HttpServletRequest request) {
+      @PathVariable final Long helpDocId, final HttpServletRequest request) {
     return helpDocUserService.view(SmartRequestUtil.getRequestUser(), helpDocId);
   }
 
@@ -68,7 +69,7 @@ public class HelpDocController extends SupportBaseController {
   @PostMapping("/helpDoc/user/queryViewRecord")
   @RepeatSubmit
   public ResponseDTO<PageResult<HelpDocViewRecordVO>> queryViewRecord(
-      @RequestBody @Valid HelpDocViewRecordQueryForm helpDocViewRecordQueryForm) {
+      @RequestBody @Valid final HelpDocViewRecordQueryForm helpDocViewRecordQueryForm) {
     return ResponseDTO.ok(helpDocUserService.queryViewRecord(helpDocViewRecordQueryForm));
   }
 }

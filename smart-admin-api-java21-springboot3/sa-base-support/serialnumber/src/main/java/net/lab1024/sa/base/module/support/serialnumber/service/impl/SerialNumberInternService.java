@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@SuppressWarnings("PMD.LongVariable")
 public class SerialNumberInternService extends SerialNumberBaseService {
 
   /** 按照 serialNumberId 进行锁 */
@@ -28,13 +29,13 @@ public class SerialNumberInternService extends SerialNumberBaseService {
       new ConcurrentHashMap<>();
 
   @Override
-  public void initLastGenerateData(List<SerialNumberEntity> serialNumberEntityList) {
+  public void initLastGenerateData(final List<SerialNumberEntity> serialNumberEntityList) {
     if (serialNumberEntityList == null) {
       return;
     }
 
-    for (SerialNumberEntity serialNumberEntity : serialNumberEntityList) {
-      SerialNumberLastGenerateBO lastGenerateBO =
+    for (final SerialNumberEntity serialNumberEntity : serialNumberEntityList) {
+      final SerialNumberLastGenerateBO lastGenerateBO =
           SerialNumberLastGenerateBO.builder()
               .serialNumberId(serialNumberEntity.getSerialNumberId())
               .lastNumber(serialNumberEntity.getLastNumber())
@@ -45,12 +46,13 @@ public class SerialNumberInternService extends SerialNumberBaseService {
   }
 
   @Override
-  public List<String> generateSerialNumberList(SerialNumberInfoBO serialNumberInfo, int count) {
-    SerialNumberGenerateResultBO serialNumberGenerateResult;
+  public List<String> generateSerialNumberList(
+      final SerialNumberInfoBO serialNumberInfo, final int count) {
+    final SerialNumberGenerateResultBO serialNumberGenerateResult;
     synchronized (POOL.intern(String.valueOf(serialNumberInfo.getSerialNumberId()))) {
 
       // 获取上次的生成结果
-      SerialNumberLastGenerateBO lastGenerateBO =
+      final SerialNumberLastGenerateBO lastGenerateBO =
           serialNumberLastGenerateMap.get(serialNumberInfo.getSerialNumberId());
 
       // 生成

@@ -37,9 +37,9 @@ public class HelpDocService {
    * @param queryForm
    * @return
    */
-  public PageResult<HelpDocVO> query(HelpDocQueryForm queryForm) {
-    Page<?> page = SmartPageUtil.convert2PageQuery(queryForm);
-    List<HelpDocVO> list = helpDocDao.query(page, queryForm);
+  public PageResult<HelpDocVO> query(final HelpDocQueryForm queryForm) {
+    final Page<?> page = SmartPageUtil.convert2PageQuery(queryForm);
+    final List<HelpDocVO> list = helpDocDao.query(page, queryForm);
     return SmartPageUtil.convert2PageResult(page, list);
   }
 
@@ -49,8 +49,8 @@ public class HelpDocService {
    * @param addForm
    * @return
    */
-  public ResponseDTO<String> add(HelpDocAddForm addForm) {
-    HelpDocEntity helpDaoEntity = SmartBeanUtil.copy(addForm, HelpDocEntity.class);
+  public ResponseDTO<String> add(final HelpDocAddForm addForm) {
+    final HelpDocEntity helpDaoEntity = SmartBeanUtil.copy(addForm, HelpDocEntity.class);
     helpDaoManager.save(helpDaoEntity, addForm.getRelationList());
     return ResponseDTO.ok();
   }
@@ -61,9 +61,9 @@ public class HelpDocService {
    * @param updateForm
    * @return
    */
-  public ResponseDTO<String> update(HelpDocUpdateForm updateForm) {
+  public ResponseDTO<String> update(final HelpDocUpdateForm updateForm) {
     // 更新
-    HelpDocEntity helpDaoEntity = SmartBeanUtil.copy(updateForm, HelpDocEntity.class);
+    final HelpDocEntity helpDaoEntity = SmartBeanUtil.copy(updateForm, HelpDocEntity.class);
     helpDaoManager.update(helpDaoEntity, updateForm.getRelationList());
     return ResponseDTO.ok();
   }
@@ -75,8 +75,8 @@ public class HelpDocService {
    * @return
    */
   @Transactional(rollbackFor = Exception.class)
-  public ResponseDTO<String> delete(Long helpDocId) {
-    HelpDocEntity helpDaoEntity = helpDocDao.selectById(helpDocId);
+  public ResponseDTO<String> delete(final Long helpDocId) {
+    final HelpDocEntity helpDaoEntity = helpDocDao.selectById(helpDocId);
     if (helpDaoEntity != null) {
       helpDocDao.deleteById(helpDocId);
       helpDocDao.deleteRelation(helpDocId);
@@ -90,9 +90,9 @@ public class HelpDocService {
    * @param helpDocId
    * @return
    */
-  public HelpDocDetailVO getDetail(Long helpDocId) {
-    HelpDocEntity helpDaoEntity = helpDocDao.selectById(helpDocId);
-    HelpDocDetailVO detail = SmartBeanUtil.copy(helpDaoEntity, HelpDocDetailVO.class);
+  public HelpDocDetailVO getDetail(final Long helpDocId) {
+    final HelpDocEntity helpDaoEntity = helpDocDao.selectById(helpDocId);
+    final HelpDocDetailVO detail = SmartBeanUtil.copy(helpDaoEntity, HelpDocDetailVO.class);
     if (detail != null) {
       detail.setRelationList(helpDocDao.queryRelationByHelpDoc(helpDocId));
     }
@@ -105,7 +105,7 @@ public class HelpDocService {
    * @param relationId
    * @return
    */
-  public List<HelpDocVO> queryHelpDocByRelationId(Long relationId) {
+  public List<HelpDocVO> queryHelpDocByRelationId(final Long relationId) {
     return helpDocDao.queryHelpDocByRelationId(relationId);
   }
 }

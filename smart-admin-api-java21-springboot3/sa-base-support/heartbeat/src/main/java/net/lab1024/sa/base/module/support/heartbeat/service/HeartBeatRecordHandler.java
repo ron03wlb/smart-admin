@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@SuppressWarnings("PMD.LongVariable")
 public class HeartBeatRecordHandler implements IHeartBeatRecordHandler {
 
   @Resource private HeartBeatRecordDao heartBeatRecordDao;
@@ -27,10 +28,11 @@ public class HeartBeatRecordHandler implements IHeartBeatRecordHandler {
    * @param heartBeatRecord
    */
   @Override
-  public void handler(HeartBeatRecord heartBeatRecord) {
-    HeartBeatRecordEntity heartBeatRecordEntity =
+  public void handler(final HeartBeatRecord heartBeatRecord) {
+    final HeartBeatRecordEntity heartBeatRecordEntity =
         SmartBeanUtil.copy(heartBeatRecord, HeartBeatRecordEntity.class);
-    HeartBeatRecordEntity heartBeatRecordOld = heartBeatRecordDao.query(heartBeatRecordEntity);
+    final HeartBeatRecordEntity heartBeatRecordOld =
+        heartBeatRecordDao.query(heartBeatRecordEntity);
     if (heartBeatRecordOld == null) {
       heartBeatRecordDao.insert(heartBeatRecordEntity);
     } else {

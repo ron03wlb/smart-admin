@@ -17,13 +17,14 @@ import org.springframework.stereotype.Service;
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@SuppressWarnings("PMD.LongVariable")
 public class SerialNumberRecordService {
 
   @Resource private SerialNumberRecordDao serialNumberRecordDao;
 
-  public PageResult<SerialNumberRecordEntity> query(SerialNumberRecordQueryForm queryForm) {
-    Page page = SmartPageUtil.convert2PageQuery(queryForm);
-    List<SerialNumberRecordEntity> recordList = serialNumberRecordDao.query(page, queryForm);
+  public PageResult<SerialNumberRecordEntity> query(final SerialNumberRecordQueryForm queryForm) {
+    final Page page = SmartPageUtil.convert2PageQuery(queryForm);
+    final List<SerialNumberRecordEntity> recordList = serialNumberRecordDao.query(page, queryForm);
     return SmartPageUtil.convert2PageResult(page, recordList);
   }
 }

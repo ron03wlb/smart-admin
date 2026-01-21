@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-01-09 20:57:24 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@SuppressWarnings({"PMD.LongVariable", "PMD.ShortVariable"})
 public class HeartBeatManager {
 
   private static final String THREAD_NAME_PREFIX = "smart-heart-beat";
@@ -27,7 +28,7 @@ public class HeartBeatManager {
    * @param intervalMilliseconds 间隔执行时间(毫秒)
    */
   public HeartBeatManager(
-      Long intervalMilliseconds, IHeartBeatRecordHandler heartBeatRecordHandler) {
+      final Long intervalMilliseconds, final IHeartBeatRecordHandler heartBeatRecordHandler) {
     this.intervalMilliseconds = intervalMilliseconds;
     this.heartBeatRecordHandler = heartBeatRecordHandler;
     // 使用守护线程去处理
@@ -35,7 +36,7 @@ public class HeartBeatManager {
         new ScheduledThreadPoolExecutor(
             THREAD_COUNT,
             r -> {
-              Thread t = new Thread(r, THREAD_NAME_PREFIX);
+              final Thread t = new Thread(r, THREAD_NAME_PREFIX);
               if (!t.isDaemon()) {
                 t.setDaemon(true);
               }
@@ -47,7 +48,7 @@ public class HeartBeatManager {
 
   /** 开启心跳 */
   private void beginHeartBeat() {
-    HeartBeatRunnable heartBeatRunnable = new HeartBeatRunnable(heartBeatRecordHandler);
+    final HeartBeatRunnable heartBeatRunnable = new HeartBeatRunnable(heartBeatRecordHandler);
     threadPoolExecutor.scheduleWithFixedDelay(
         heartBeatRunnable, INITIAL_DELAY, intervalMilliseconds, TimeUnit.MILLISECONDS);
   }

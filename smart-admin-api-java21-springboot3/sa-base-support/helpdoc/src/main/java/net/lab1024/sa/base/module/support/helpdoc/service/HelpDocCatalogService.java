@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@SuppressWarnings("PMD.LongVariable")
 public class HelpDocCatalogService {
 
   @Resource private HelpDocCatalogDao helpDocCatalogDao;
@@ -43,9 +44,9 @@ public class HelpDocCatalogService {
    * @param helpDocCatalogAddForm
    * @return
    */
-  public synchronized ResponseDTO<String> add(HelpDocCatalogAddForm helpDocCatalogAddForm) {
-    List<HelpDocCatalogVO> helpDocCatalogList = getAll();
-    Optional<HelpDocCatalogVO> exist =
+  public synchronized ResponseDTO<String> add(final HelpDocCatalogAddForm helpDocCatalogAddForm) {
+    final List<HelpDocCatalogVO> helpDocCatalogList = getAll();
+    final Optional<HelpDocCatalogVO> exist =
         helpDocCatalogList.stream()
             .filter(e -> helpDocCatalogAddForm.getName().equals(e.getName()))
             .findFirst();
@@ -63,15 +64,15 @@ public class HelpDocCatalogService {
    * @param updateForm
    * @return
    */
-  public synchronized ResponseDTO<String> update(HelpDocCatalogUpdateForm updateForm) {
-    HelpDocCatalogEntity helpDocCatalogEntity =
+  public synchronized ResponseDTO<String> update(final HelpDocCatalogUpdateForm updateForm) {
+    final HelpDocCatalogEntity helpDocCatalogEntity =
         helpDocCatalogDao.selectById(updateForm.getHelpDocCatalogId());
     if (helpDocCatalogEntity == null) {
       return ResponseDTO.userErrorParam("目录不存在");
     }
 
-    List<HelpDocCatalogVO> helpDocCatalogList = getAll();
-    Optional<HelpDocCatalogVO> exist =
+    final List<HelpDocCatalogVO> helpDocCatalogList = getAll();
+    final Optional<HelpDocCatalogVO> exist =
         helpDocCatalogList.stream()
             .filter(e -> updateForm.getName().equals(e.getName()))
             .findFirst();
@@ -89,25 +90,26 @@ public class HelpDocCatalogService {
    * @param helpDocCatalogId
    * @return
    */
-  public synchronized ResponseDTO<String> delete(Long helpDocCatalogId) {
+  public synchronized ResponseDTO<String> delete(final Long helpDocCatalogId) {
     if (helpDocCatalogId == null) {
       return ResponseDTO.ok();
     }
 
-    HelpDocCatalogEntity helpDocCatalogEntity = helpDocCatalogDao.selectById(helpDocCatalogId);
+    final HelpDocCatalogEntity helpDocCatalogEntity =
+        helpDocCatalogDao.selectById(helpDocCatalogId);
     if (helpDocCatalogEntity == null) {
       return ResponseDTO.userErrorParam("目录不存在");
     }
 
     // 如果有子目录，则不能删除
-    Optional<HelpDocCatalogVO> existOptional =
+    final Optional<HelpDocCatalogVO> existOptional =
         getAll().stream().filter(e -> helpDocCatalogId.equals(e.getParentId())).findFirst();
     if (existOptional.isPresent()) {
       return ResponseDTO.userErrorParam("存在子目录：" + existOptional.get().getName());
     }
 
     // 查询是否有帮助文档
-    List<HelpDocVO> helpDocVOList = helpDocDao.queryHelpDocByCatalogId(helpDocCatalogId);
+    final List<HelpDocVO> helpDocVOList = helpDocDao.queryHelpDocByCatalogId(helpDocCatalogId);
     if (CollectionUtils.isNotEmpty(helpDocVOList)) {
       return ResponseDTO.userErrorParam("目录下存在文档，不能删除");
     }
