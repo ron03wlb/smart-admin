@@ -17,20 +17,19 @@ This workspace focuses on the following two core projects:
 *   **Documentation:** [Click here to view Frontend README](./smart-admin-web/README.md)
 
 ### 3. Documentation: [docs](./docs/README.md)
-*   **Tech Stack:** VitePress, Vue 3, Mermaid
+*   **Format:** Markdown documentation
 *   **Path:** `docs/`
-*   **Live Site:** `http://localhost:8081/docs/` (when running Docker)
-*   **Features:**
-    - 📚 Comprehensive Kafka integration guide
-    - 🚀 Quick start tutorials and examples
-    - 📐 Architecture diagrams and design documentation
-    - 🔧 Operations, monitoring, and troubleshooting guides
-    - 💡 Advanced topics and best practices
+*   **Content:**
+    - 📚 Kafka integration guide (46 documents)
+    - 📦 MinIO object storage guide (8 documents)
+    - 🏢 Multi-tenant architecture design (5 documents)
+    - 🧪 Testing strategies and guides (5 documents)
 
-**Quick Links:**
-- [Kafka Documentation](./docs/kafka/) - Enterprise Kafka integration
-- [Quick Start](./docs/kafka/getting-started/quick-start.md) - Get started in 5 minutes
-- [Quick Reference](./docs/kafka/getting-started/quick-reference.md) - API cheat sheet
+**Quick Access:**
+- [Kafka Quick Start](./docs/kafka/getting-started/quick-start.md) - Get started in 5 minutes
+- [Kafka Quick Reference](./docs/kafka/getting-started/quick-reference.md) - API cheat sheet
+- [MinIO Setup](./docs/minio/01-quick-start.md) - Object storage configuration
+- [All Documentation](./docs/README.md) - Full documentation index
 
 ---
 

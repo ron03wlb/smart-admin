@@ -1,124 +1,54 @@
----
-layout: home
+# SmartAdmin Enterprise Documentation
 
-hero:
-  name: "SmartAdmin"
-  text: "Enterprise Documentation"
-  tagline: Modern modular monolith framework based on Spring Boot 3 and Java 21
-  image:
-    src: /logo.svg
-    alt: SmartAdmin
-  actions:
-    - theme: brand
-      text: Get Started
-      link: /kafka/getting-started/quick-start
-    - theme: alt
-      text: View on GitHub
-      link: https://github.com/smart-admin
+> Modern modular monolith framework based on Spring Boot 3 and Java 21
 
-features:
-  - icon: 🚀
-    title: Kafka Integration
-    details: Enterprise-grade Kafka integration with batch processing, DLQ, error handling, and comprehensive monitoring
-    link: /kafka/
-    linkText: Read Kafka Docs
+## Quick Links
 
-  - icon: ⚡
-    title: Redis Support
-    details: Advanced Redis integration with distributed locks, caching strategies, and pub/sub messaging
-    link: /redis/
-    linkText: Read Redis Docs
+- **[Get Started](./kafka/getting-started/quick-start.md)** - 5-minute quick start
+- **[Browse Documentation](./README.md)** - Full documentation index
+- **[View on GitHub](https://github.com/smart-admin)** - Source code and issues
 
-  - icon: 📨
-    title: RocketMQ
-    details: Reliable message queue integration with transactional messages and ordered delivery
-    link: /rocketmq/
-    linkText: Read RocketMQ Docs
+## Features
 
-  - icon: 🗄️
-    title: Database
-    details: MyBatis Plus integration with multi-datasource support, sharding, and read-write splitting
-    link: /database/
-    linkText: Read Database Docs
+### 🚀 Kafka Integration
+Enterprise-grade Kafka integration with batch processing, DLQ, error handling, and comprehensive monitoring.
 
-  - icon: 🔒
-    title: Security
-    details: Sa-Token based authentication and authorization with role-based access control
-    link: /security/
-    linkText: Read Security Docs
+**[Read Kafka Documentation →](./kafka/)**
 
-  - icon: 🐳
-    title: Deployment
-    details: Docker and Kubernetes deployment guides with production-ready configurations
-    link: /deployment/
-    linkText: Read Deployment Docs
+### 📦 MinIO Object Storage
+Advanced MinIO integration with security best practices, monitoring, and troubleshooting guides.
+
+**[Read MinIO Documentation →](./minio/)**
+
+### 🏢 Multi-Tenant Architecture
+Complete multi-tenant system design with requirements analysis, technical guide, and API specifications.
+
+**[Read Multi-Tenant Documentation →](./tenant/)**
+
+### 🧪 Testing & Quality
+Comprehensive testing strategies, unit test guides, and architecture validation documentation.
+
+**[Read Testing Documentation →](./testing/)**
 
 ---
 
-## Quick Navigation
+## Quick Start
 
-### Message Queue
-
-- **[Kafka](/kafka/)** - Enterprise Kafka integration
-  - [Quick Start](/kafka/getting-started/quick-start) - Get up and running in 5 minutes
-  - [Quick Reference](/kafka/getting-started/quick-reference) - API cheat sheet
-  - [Architecture](/kafka/architecture/overview) - Design and architecture
-  - [Troubleshooting](/kafka/troubleshooting/common-issues) - Common issues and solutions
-
-- **[RocketMQ](/rocketmq/)** - Coming soon
-- **[Redis Pub/Sub](/redis/)** - Coming soon
-
-### Data Access
-
-- **[Database](/database/)** - Coming soon
-- **[Redis](/redis/)** - Coming soon
-- **[Cache](/cache/)** - Coming soon
-
-### Infrastructure
-
-- **[Deployment](/deployment/)** - Coming soon
-- **[Monitoring](/monitoring/)** - Coming soon
-- **[Security](/security/)** - Coming soon
+1. **Explore Documentation**: Browse the [documentation index](./README.md)
+2. **Get Started with Kafka**: Follow the [Kafka Quick Start](./kafka/getting-started/quick-start.md)
+3. **Setup MinIO**: Configure [MinIO object storage](./minio/01-quick-start.md)
 
 ---
 
-## Documentation Philosophy
+## Documentation Structure
 
-Our documentation is built with the following principles:
-
-- **Quick to Find** - Get answers in under 2 minutes with quick reference cards and effective search
-- **Easy to Understand** - Clear examples, diagrams, and step-by-step guides
-- **Production Ready** - Real-world patterns, best practices, and troubleshooting guides
-- **Always Updated** - Synchronized with code changes and version releases
+- **Kafka** (46 documents) - Complete Kafka integration guide
+- **MinIO** (8 documents) - Object storage configuration and usage
+- **Multi-Tenant** (5 documents) - Architecture and implementation
+- **Testing** (5 documents) - Quality assurance strategies
 
 ---
 
-## Technology Stack
+**Note**: This documentation is available as Markdown files. View in GitHub or any Markdown reader for the best experience.
 
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| Java | 21 | Language runtime |
-| Spring Boot | 3.5.4 | Application framework |
-| MyBatis Plus | 3.5.12 | ORM framework |
-| Sa-Token | 1.44.0 | Authentication |
-| Redisson | 3.50.0 | Redis client |
-| Kafka | 3.x | Message queue |
-
----
-
-## Getting Help
-
-- **Issues**: [GitHub Issues](https://github.com/smart-admin/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/smart-admin/discussions)
-- **Email**: support@smart-admin.io
-
----
-
-<div style="text-align: center; margin-top: 48px; color: var(--vp-c-text-2);">
-  <p>Built with ❤️ by SmartAdmin Team</p>
-  <p>
-    <a href="/kafka/appendix/contributing">Contributing</a> ·
-    <a href="/kafka/appendix/changelog">Changelog</a> ·
-    <a href="https://github.com/smart-admin">GitHub</a>
-  </p>
-</div>
+**Apache License 2.0** | Copyright © 2024-present SmartAdmin Team

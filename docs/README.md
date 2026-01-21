@@ -1,91 +1,104 @@
 # SmartAdmin Documentation
 
-This directory contains the VitePress-powered documentation site for SmartAdmin.
+> Enterprise modular monolith framework documentation
 
-## Quick Start
+## 📚 Documentation Categories
 
-### Development
+### 🚀 Kafka Integration (46 documents)
+Complete guide for enterprise Kafka integration with batch processing, error handling, and monitoring.
 
-```bash
-# Install dependencies
-npm install
+**[→ Browse Kafka Documentation](./kafka/)**
 
-# Start dev server
-npm run dev
-```
+**Quick Links:**
+- [Quick Start](./kafka/getting-started/quick-start.md) - Get started in 5 minutes
+- [Quick Reference](./kafka/getting-started/quick-reference.md) - API cheat sheet
+- [Architecture Overview](./kafka/architecture/overview.md) - System design
+- [Best Practices](./kafka/guides/best-practices.md) - Production recommendations
+- [Troubleshooting](./kafka/troubleshooting/common-issues.md) - Common issues
 
-Visit `http://localhost:5173`
+---
 
-### Build
+### 📦 MinIO Object Storage (8 documents)
+MinIO integration for file storage, security configuration, and monitoring.
 
-```bash
-# Build for production
-npm run build
+**[→ Browse MinIO Documentation](./minio/)**
 
-# Preview production build
-npm run preview
-```
+**Quick Links:**
+- [Quick Start](./minio/01-quick-start.md) - Setup in 10 minutes
+- [Configuration](./minio/02-configuration.md) - Configuration guide
+- [Security Guide](./minio/03-security.md) - Best practices
+- [API Usage](./minio/04-api-usage.md) - Code examples
+- [Monitoring](./minio/07-monitoring.md) - Observability
 
-### Docker
+---
 
-```bash
-# Build Docker image
-docker build -t smart-admin-docs:latest .
+### 🏢 Multi-Tenant Architecture (5 documents)
+Design documents for multi-tenant system implementation.
 
-# Run container
-docker run -d -p 8080:80 smart-admin-docs:latest
-```
+**Quick Links:**
+- [Overview](./tenant/MULTI_TENANT_README.md) - Multi-tenant overview
+- [Requirements](./tenant/MULTI_TENANT_REQUIREMENTS.md) - Requirements analysis
+- [Technical Guide](./tenant/MULTI_TENANT_TECHNICAL_GUIDE.md) - Implementation guide
+- [API Design](./tenant/MULTI_TENANT_API_DESIGN.md) - API specifications
+- [Database Migration](./tenant/MULTI_TENANT_DATABASE_MIGRATION.md) - Migration strategy
 
-Visit `http://localhost:8080/docs/`
+---
 
-## Project Structure
+### 🧪 Testing Documentation (5 documents)
+Testing strategies, unit testing guides, and architecture validation.
 
-```
-docs/
-├── .vitepress/
-│   ├── config.ts           # VitePress configuration
-│   ├── theme/              # Custom theme
-│   └── public/             # Static assets
-├── kafka/                  # Kafka documentation
-│   ├── getting-started/
-│   ├── architecture/
-│   ├── guides/
-│   ├── operations/
-│   ├── troubleshooting/
-│   ├── advanced/
-│   ├── examples/
-│   ├── testing/
-│   ├── reference/
-│   └── appendix/
-├── index.md                # Documentation homepage
-└── package.json
-```
+**Quick Links:**
+- [Testing Strategy](./testing/testing-strategy.md) - Overall test approach
+- [Unit Test Plan](./testing/unit-test-implementation-plan.md) - Implementation plan
+- [Architecture Fixes](./testing/architecture-fixes.md) - Architecture improvements
+- [Quick Reference](./testing/quick-reference.md) - Testing cheat sheet
 
-## Documentation Standards
+---
 
-- All documentation follows Markdown format
-- Code examples must be tested and runnable
-- Diagrams use Mermaid syntax
-- Each page has clear navigation links
-- Maximum line length: no strict limit (Markdown flows naturally)
+## 🔍 Find What You Need
 
-## Contributing
+### By Task
+- **Getting Started**: See [Kafka Quick Start](./kafka/getting-started/quick-start.md)
+- **API Reference**: See [Kafka Quick Reference](./kafka/getting-started/quick-reference.md)
+- **Troubleshooting**: See [Common Issues](./kafka/troubleshooting/common-issues.md)
+- **Best Practices**: See [Kafka Best Practices](./kafka/guides/best-practices.md)
+- **Storage Setup**: See [MinIO Quick Start](./minio/01-quick-start.md)
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test the documentation locally
-5. Submit a pull request
+### By Topic
+- **Configuration**: [Kafka Config](./kafka/guides/configuration.md) | [MinIO Config](./minio/02-configuration.md)
+- **Monitoring**: [Kafka Monitoring](./kafka/operations/monitoring.md) | [MinIO Monitoring](./minio/07-monitoring.md)
+- **Security**: [MinIO Security](./minio/03-security.md)
+- **Deployment**: [Kafka Deployment](./kafka/operations/deployment.md)
+- **Architecture**: [Kafka Architecture](./kafka/architecture/overview.md) | [Multi-Tenant](./tenant/MULTI_TENANT_TECHNICAL_GUIDE.md)
 
-See [Contributing Guide](/kafka/appendix/contributing.md) for details.
+---
 
-## Technology Stack
+## 📂 Project Documentation
 
-- **VitePress**: ^1.0.0 - Documentation framework
-- **Vue**: ^3.4.0 - UI framework
-- **Mermaid**: ^10.6.1 - Diagram rendering
-- **Nginx**: alpine - Production web server
+- [Developer Guide](./DEVELOPER_GUIDE.md) - Development setup and guidelines
+- [Quick Start](./QUICK_START.md) - Quick start guide
+- [Implementation Progress](./IMPLEMENTATION_PROGRESS.md) - Project progress tracking
+- [Phase 1 Summary](./PHASE1_COMPLETE_SUMMARY.md) - Phase 1 completion summary
 
-## License
+---
 
-Apache License 2.0
+## 📖 How to Read This Documentation
+
+**On GitHub**:
+1. Browse files directly in the repository
+2. Use GitHub's search (press `/` to search)
+3. Links between documents work automatically
+
+**Locally**:
+1. Clone the repository
+2. Open in VS Code with Markdown Preview Enhanced plugin
+3. Or use any Markdown reader (Typora, Mark Text, etc.)
+
+**Tips**:
+- All relative links work in both GitHub and local viewers
+- Mermaid diagrams render in GitHub and most IDEs
+- Use your IDE's file search (Ctrl/Cmd+P) to quickly jump to documents
+
+---
+
+**[← Back to Main README](../README.md)**
