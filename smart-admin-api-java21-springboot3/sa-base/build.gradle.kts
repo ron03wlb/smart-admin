@@ -80,72 +80,45 @@ dependencies {
     api(libs.objenesis)
     api(libs.commons.pool2)
 
-    // ========== Tier 0: Foundation ==========
-    // SA Common Core - foundational domain objects and utilities
-    api(project(":sa-common:core"))
+    // ========== Layer 0: Foundation (9 modules, formerly sa-common) ==========
+    api(project(":sa-base:foundation:core"))
+    api(project(":sa-base:foundation:mq"))
+    api(project(":sa-base:foundation:cache"))
+    api(project(":sa-base:foundation:redis-lock"))
+    api(project(":sa-base:foundation:api-encrypt"))
+    api(project(":sa-base:foundation:captcha"))
+    api(project(":sa-base:foundation:repeat-submit"))
+    api(project(":sa-base:foundation:data-masking"))
+    api(project(":sa-base:foundation:security-protect"))
 
-    // ========== Tier 1: Infrastructure Modules ==========
-    // SA Base Core - sa-base specific domain objects and utilities
-    api(project(":sa-base-core"))
+    // ========== Layer 1: Infrastructure (7 modules, formerly sa-base-*) ==========
+    // Note: infrastructure:core merged into foundation:core to resolve Gradle circular dependency
+    api(project(":sa-base:infrastructure:web"))
+    api(project(":sa-base:infrastructure:mybatis"))
+    api(project(":sa-base:infrastructure:redis"))
+    api(project(":sa-base:infrastructure:token"))
+    api(project(":sa-base:infrastructure:datasource"))
+    api(project(":sa-base:infrastructure:swagger"))
+    api(project(":sa-base:infrastructure:devtools"))
 
-    // SA Base Web - Web configuration, JSON serialization, base controllers
-    api(project(":sa-base-web"))
-
-    // SA Base MyBatis - MyBatis Plus configuration and handlers
-    api(project(":sa-base-mybatis"))
-
-    // SA Base Redis - Redis/Redisson configuration
-    api(project(":sa-base-redis"))
-
-    // SA Base Token - Sa-Token configuration
-    api(project(":sa-base-token"))
-
-    // SA Base DataSource - Data source configuration with IP utilities
-    api(project(":sa-base-datasource"))
-
-    // SA Base Swagger - Swagger/Knife4j configuration and annotations
-    api(project(":sa-base-swagger"))
-
-    // ========== Tier 2: Support Modules ==========
-    // Business Support Modules (9 newly extracted)
-    api(project(":sa-base-support:config"))         // System configuration management
-    api(project(":sa-base-support:dict"))           // Data dictionary with caching
-    api(project(":sa-base-support:file"))           // File upload (local/S3)
-    api(project(":sa-base-support:job"))            // Scheduled task management
-    api(project(":sa-base-support:datatracer"))     // Data change tracking
-    api(project(":sa-base-support:loginlog"))       // Login log
-    api(project(":sa-base-support:operatelog"))     // Operation log
-    api(project(":sa-base-support:reload"))         // Dynamic configuration reload
-    api(project(":sa-base-support:codegenerator"))  // Code generator
-
-    // Business Support Modules (8 previously extracted)
-    api(project(":sa-base-support:table"))          // Table column customization
-    api(project(":sa-base-support:feedback"))       // User feedback
-    api(project(":sa-base-support:changelog"))      // Change log
-    api(project(":sa-base-support:message"))        // Internal messaging
-    api(project(":sa-base-support:heartbeat"))      // Heartbeat monitoring
-    api(project(":sa-base-support:mail"))           // Email service
-    api(project(":sa-base-support:serialnumber"))   // Serial number generation
-    api(project(":sa-base-support:helpdoc"))        // Help documentation
-
-    // ========== SA Common Modules ==========
-    // Distributed Lock - Lock4j
-    api(project(":sa-common:redis-lock"))
-
-    // Cache - JetCache
-    api(project(":sa-common:cache"))
-
-    // API Encrypt
-    api(project(":sa-common:api-encrypt"))
-
-    // Repeat Submit
-    api(project(":sa-common:repeat-submit"))
-
-    // Data Masking
-    api(project(":sa-common:data-masking"))
-
-    // Security Protect
-    api(project(":sa-common:security-protect"))
+    // ========== Layer 2: Business Support (17 modules, formerly sa-base-support) ==========
+    api(project(":sa-base:support:config"))         // System configuration management
+    api(project(":sa-base:support:dict"))           // Data dictionary with caching
+    api(project(":sa-base:support:file"))           // File upload (local/S3)
+    api(project(":sa-base:support:job"))            // Scheduled task management
+    api(project(":sa-base:support:datatracer"))     // Data change tracking
+    api(project(":sa-base:support:loginlog"))       // Login log
+    api(project(":sa-base:support:operatelog"))     // Operation log
+    api(project(":sa-base:support:reload"))         // Dynamic configuration reload
+    api(project(":sa-base:support:codegenerator"))  // Code generator
+    api(project(":sa-base:support:table"))          // Table column customization
+    api(project(":sa-base:support:feedback"))       // User feedback
+    api(project(":sa-base:support:changelog"))      // Change log
+    api(project(":sa-base:support:message"))        // Internal messaging
+    api(project(":sa-base:support:heartbeat"))      // Heartbeat monitoring
+    api(project(":sa-base:support:mail"))           // Email service
+    api(project(":sa-base:support:serialnumber"))   // Serial number generation
+    api(project(":sa-base:support:helpdoc"))        // Help documentation
 
     // API Documentation
     api(libs.knife4j.openapi3.jakarta)

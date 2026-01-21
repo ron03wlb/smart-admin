@@ -5,62 +5,57 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 // Include subprojects
 include(
-    // === Tier 0: Foundation - Core domain objects and utilities ===
-    "sa-common",
-    "sa-common:core",
+    // === Layer 0: Foundation - Cross-cutting concerns (9 modules, formerly sa-common) ===
+    "sa-base",
+    "sa-base:foundation:core",
+    "sa-base:foundation:mq",
+    "sa-base:foundation:cache",
+    "sa-base:foundation:redis-lock",
+    "sa-base:foundation:api-encrypt",
+    "sa-base:foundation:captcha",
+    "sa-base:foundation:repeat-submit",
+    "sa-base:foundation:data-masking",
+    "sa-base:foundation:security-protect",
 
-    // === SA Common - Shared cross-cutting concerns ===
-    "sa-common:mq",
-    "sa-common:cache",
-    "sa-common:redis-lock",
-    "sa-common:api-encrypt",
-    "sa-common:captcha",
-    "sa-common:repeat-submit",
-    "sa-common:data-masking",
-    "sa-common:security-protect",
+    // === Layer 1: Infrastructure (7 modules, formerly sa-base-*) ===
+    // Note: infrastructure:core merged into foundation:core to resolve Gradle circular dependency
+    "sa-base:infrastructure:web",
+    "sa-base:infrastructure:mybatis",
+    "sa-base:infrastructure:redis",
+    "sa-base:infrastructure:token",
+    "sa-base:infrastructure:datasource",
+    "sa-base:infrastructure:swagger",
+    "sa-base:infrastructure:devtools",
 
-    // === Tier 1: Infrastructure - Base configurations and utilities (7 modules) ===
-    "sa-base-core",
-    "sa-base-web",
-    "sa-base-mybatis",
-    "sa-base-redis",
-    "sa-base-token",
-    "sa-base-datasource",
-    "sa-base-swagger",
-    "sa-base-devtools",
-
-    // === Tier 2: Support - Business support modules (17 modules) ===
+    // === Layer 2: Business Support (17 modules, formerly sa-base-support) ===
     // Configuration and system management
-    "sa-base-support:config",
-    "sa-base-support:dict",
-    "sa-base-support:reload",
+    "sa-base:support:config",
+    "sa-base:support:dict",
+    "sa-base:support:reload",
 
     // File and document management
-    "sa-base-support:file",
-    "sa-base-support:helpdoc",
+    "sa-base:support:file",
+    "sa-base:support:helpdoc",
 
     // Job scheduling and monitoring
-    "sa-base-support:job",
-    "sa-base-support:heartbeat",
+    "sa-base:support:job",
+    "sa-base:support:heartbeat",
 
     // Logging and auditing
-    "sa-base-support:loginlog",
-    "sa-base-support:operatelog",
-    "sa-base-support:datatracer",
+    "sa-base:support:loginlog",
+    "sa-base:support:operatelog",
+    "sa-base:support:datatracer",
 
     // User interaction
-    "sa-base-support:feedback",
-    "sa-base-support:message",
-    "sa-base-support:changelog",
+    "sa-base:support:feedback",
+    "sa-base:support:message",
+    "sa-base:support:changelog",
 
     // Utilities
-    "sa-base-support:table",
-    "sa-base-support:mail",
-    "sa-base-support:serialnumber",
-    "sa-base-support:codegenerator",
-
-    // === Tier 3: Aggregator - Backward compatibility layer ===
-    "sa-base",
+    "sa-base:support:table",
+    "sa-base:support:mail",
+    "sa-base:support:serialnumber",
+    "sa-base:support:codegenerator",
 
     // === Application Layer ===
     "sa-admin"

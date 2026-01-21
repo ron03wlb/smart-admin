@@ -23,38 +23,38 @@ dependencies {
     implementation(project(":sa-base"))
 
     // Dependency on sa-base-devtools module (code generator)
-    implementation(project(":sa-base-devtools"))
+    implementation(project(":sa-base:infrastructure:devtools"))
 
     // Dependency on sa-common:mq module
-    implementation(project(":sa-common:mq"))
+    implementation(project(":sa-base:foundation:mq"))
 
     // Dependency on sa-common:captcha module
-    implementation(project(":sa-common:captcha"))
+    implementation(project(":sa-base:foundation:captcha"))
 
     // Dependency on sa-base-support:table module
-    implementation(project(":sa-base-support:table"))
+    implementation(project(":sa-base:support:table"))
 
     // Dependency on sa-base-support:feedback module
-    implementation(project(":sa-base-support:feedback"))
+    implementation(project(":sa-base:support:feedback"))
 
     // Dependency on sa-base-support:changelog module
-    implementation(project(":sa-base-support:changelog"))
+    implementation(project(":sa-base:support:changelog"))
 
     // Dependency on sa-base-support:message module
-    implementation(project(":sa-base-support:message"))
+    implementation(project(":sa-base:support:message"))
 
     // Phase 2B support modules
     // Dependency on sa-base-support:heartbeat module
-    implementation(project(":sa-base-support:heartbeat"))
+    implementation(project(":sa-base:support:heartbeat"))
 
     // Dependency on sa-base-support:mail module
-    implementation(project(":sa-base-support:mail"))
+    implementation(project(":sa-base:support:mail"))
 
     // Dependency on sa-base-support:serialnumber module
-    implementation(project(":sa-base-support:serialnumber"))
+    implementation(project(":sa-base:support:serialnumber"))
 
     // Dependency on sa-base-support:helpdoc module
-    implementation(project(":sa-base-support:helpdoc"))
+    implementation(project(":sa-base:support:helpdoc"))
 
     // Lombok annotation processor
     annotationProcessor(libs.lombok)
