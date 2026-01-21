@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;
+import net.lab1024.sa.base.module.support.file.json.serializer.FileKeyVoSerializer;
 
 /**
  * 用于更新 【通知、公告】 的 VO 对象

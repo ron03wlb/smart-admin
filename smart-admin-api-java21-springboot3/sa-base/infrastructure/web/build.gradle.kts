@@ -11,6 +11,9 @@ dependencies {
     api(libs.spring.boot.starter.validation)
     api(libs.spring.boot.autoconfigure)
 
+    // Apache HttpClient 5 (for RestClient configuration)
+    api(libs.httpclient5)
+
     // SA Base Core
     api(project(":sa-base:foundation:core"))
 

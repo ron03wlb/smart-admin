@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin;
 
-import net.lab1024.sa.base.listener.Ip2RegionListener;
-import net.lab1024.sa.base.listener.LogVariableListener;
+import net.lab1024.sa.base.datasource.listener.Ip2RegionListener;
+import net.lab1024.sa.base.listener.LogVariableListener; // Now in infrastructure:web
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

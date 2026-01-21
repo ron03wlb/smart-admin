@@ -1,7 +1,10 @@
 plugins {
-    `java-library`
+    `java-library`  // Required for api() configuration
     id("io.spring.dependency-management")
 }
+
+// sa-base is a "BOM-style" aggregator: uses api() to expose 34 submodules
+// without containing implementation code (no src/ directory)
 
 // Get environment from project property (defaults to 'dev')
 val activeEnv: String by lazy {

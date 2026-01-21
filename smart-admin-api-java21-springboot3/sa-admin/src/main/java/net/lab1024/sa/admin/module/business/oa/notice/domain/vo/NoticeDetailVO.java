@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Data;
-import net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;
+import net.lab1024.sa.base.module.support.file.json.serializer.FileKeyVoSerializer;
 
 /**
  * 通知公告 详情
