@@ -5,22 +5,29 @@
 ## Dependency Graph
 
 ```
-                    business-analyst
-                           |
-                    (requirements)
-                           ↓
-                    java-architect ←─────┐
-                      /    |     \       |
-                     /     |      \      |
-          (database)   (API)   (code)    |
-                   /       ↓      \      |
-                  ↓    vue-expert  ↓     |
-            postgres-pro     |   devops-engineer
-                  |    (frontend)|       |
-             (db health)     └───────────┤
-                  |                      |
-                  └────→ chaos-engineer ←┘
-                      (resilience testing)
+         architect-reviewer
+              |   (design validation)
+              ↓
+        business-analyst
+              |
+       (requirements)
+              ↓
+       java-architect ←──────────┐
+         /    |     \             |
+        /     |      \            |
+  (database) (API) (code)         |
+      /      ↓       \            |
+     ↓   vue-expert   ↓           |
+postgres-pro   |   devops-engineer
+     |   (frontend)   |           |
+(db health)   └───────┴───────────┤
+     |                            |
+     └────→ chaos-engineer ←──────┘
+         (resilience testing)
+              ↑
+              |
+      code-reviewer (quality gate)
+       (hub for pre-merge reviews)
 ```
 
 ## Agent-to-Agent Dependencies
@@ -207,6 +214,91 @@
 - **devops-engineer** (infrastructure improvements)
 - **business-analyst** (resilience reports, risk assessments)
 
+### architect-reviewer Dependencies
+
+**Depends On:**
+- **java-architect** (code for architecture review)
+  - Needs: Current architecture, module structure, layer implementations
+  - Before: Starting architecture review
+  - Format: Code walkthrough, architecture diagrams, dependency analysis
+
+- **vue-expert** (frontend architecture)
+  - Needs: Frontend architecture patterns, component structure
+  - Before: Full-stack architecture review
+  - Format: Component hierarchy, state management patterns
+
+**Collaborates With:**
+- **java-architect** (architecture validation)
+  - When: Reviewing layered architecture, module boundaries
+  - Exchange: Architecture compliance findings, refactoring recommendations
+  - Format: Architecture review report, violation list
+
+- **postgres-pro** (database architecture)
+  - When: Reviewing database schema design, query patterns
+  - Exchange: Database architecture assessment, optimization recommendations
+  - Format: Schema review, index strategy
+
+- **devops-engineer** (infrastructure architecture)
+  - When: Reviewing deployment architecture, scalability
+  - Exchange: Infrastructure recommendations, scaling strategies
+  - Format: Architecture assessment, capacity planning
+
+**Feeds Into:**
+- **java-architect** (refactoring priorities)
+  - Provides: Architecture violations, recommended patterns, technical debt priorities
+  - When: Architecture review complete
+  - Format: Architecture review report, refactoring roadmap
+
+- **business-analyst** (technical debt assessment)
+  - Provides: Technical debt impact, ROI for refactoring
+  - When: Prioritizing improvements
+  - Format: Risk assessment, cost-benefit analysis
+
+### code-reviewer Dependencies
+
+**Depends On:**
+- **java-architect** (code to review)
+  - Needs: Recently written code, pull request changes
+  - Before: Starting code review
+  - Format: Git diff, pull request link, implementation context
+
+- **vue-expert** (frontend code to review)
+  - Needs: Vue component changes, frontend code
+  - Before: Frontend code review
+  - Format: Git diff, component files, style changes
+
+**Collaborates With:**
+- **architect-reviewer** (architectural violations)
+  - When: Code changes impact architecture
+  - Exchange: Layer boundary violations, architectural concerns
+  - Format: Architecture compliance check
+
+- **java-architect** (SmartAdmin pattern validation)
+  - When: Reviewing backend code
+  - Exchange: Pattern violations, best practice recommendations
+  - Format: Code review comments, refactoring suggestions
+
+- **vue-expert** (Vue best practices)
+  - When: Reviewing frontend code
+  - Exchange: Vue 3 pattern violations, performance issues
+  - Format: Code review comments, optimization suggestions
+
+- **postgres-pro** (query validation)
+  - When: Database queries in code changes
+  - Exchange: Query optimization recommendations, index suggestions
+  - Format: Query review, performance analysis
+
+**Feeds Into:**
+- **java-architect** (fixes needed)
+  - Provides: Critical/major issues to fix, line-specific feedback
+  - When: Code review complete
+  - Format: Code review report with severity levels
+
+- **vue-expert** (frontend fixes needed)
+  - Provides: Frontend code issues, component improvements
+  - When: Frontend review complete
+  - Format: Code review report, component feedback
+
 ## Handoff Protocols
 
 ### business-analyst → java-architect
@@ -326,6 +418,44 @@
 - Rollback tested
 - Team trained on procedures
 
+### architect-reviewer → java-architect
+
+**Handoff Trigger:** Architecture review complete with recommendations
+
+**Handoff Package:**
+- Architecture review report
+- Identified architectural violations
+- Recommended patterns and refactoring priorities
+- Layer boundary issues
+- Module structure improvements
+- Technical debt assessment with ROI estimates
+
+**Acceptance Criteria:**
+- All architectural violations documented with severity
+- Refactoring recommendations are specific and actionable
+- Technical debt prioritized by business impact
+- Architecture compliance checklist provided
+
+### code-reviewer → java-architect / vue-expert
+
+**Handoff Trigger:** Code review complete with findings
+
+**Handoff Package:**
+- Code review report (categorized: Critical/Major/Minor/Suggestions)
+- File-specific feedback with line numbers
+- Security vulnerabilities identified
+- Performance issues flagged
+- SmartAdmin pattern violations
+- Test coverage gaps
+- Pass/Fail decision with rationale
+
+**Acceptance Criteria:**
+- All issues categorized by severity
+- Specific line numbers and file paths provided
+- Suggested fixes included for critical issues
+- Clear pass/fail criteria defined
+- Re-review requested if needed
+
 ## Collaboration Patterns
 
 ### Pattern 1: Sequential Handoff
@@ -419,6 +549,65 @@ business-analyst → java-architect → business-analyst (clarification)
 
 **Communication:** Central agent orchestrates
 
+### Pattern 6: Design-First Development (Sequential)
+
+**When:** New feature requiring architectural validation before implementation
+
+**Example:** Complex Feature with Architecture Review
+```
+architect-reviewer (validate design)
+        ↓
+business-analyst (refine requirements based on architecture)
+        ↓
+java-architect (implement backend following architectural guidance)
+        ↓
+vue-expert (implement frontend)
+        ↓
+code-reviewer (pre-merge quality gate)
+        ↓
+devops-engineer (deploy)
+```
+
+**Communication:** Each phase validates before next begins
+
+**Benefits:**
+- Prevents architectural debt
+- Ensures scalable design from start
+- Reduces rework from architectural issues
+
+### Pattern 7: Quality Gate (Hub-and-Spoke)
+
+**When:** Pre-merge code review requiring multiple specialist validations
+
+**Example:** Pre-Merge Quality Gate
+```
+            code-reviewer (hub - initial scan)
+                /       |        |        \
+               /        |        |         \
+    architect-reviewer  |   postgres-pro   |
+    (if architecture)   |   (if DB changes)|
+                        |                  |
+                 java-architect      vue-expert
+                 (backend code)    (frontend code)
+                        \                /
+                         \              /
+                    code-reviewer (consolidate)
+                            ↓
+                    (pass/fail decision)
+                            ↓
+                    java-architect/vue-expert (fix)
+                            ↓
+                    code-reviewer (re-validate)
+```
+
+**Communication:** Hub coordinates specialist reviews, consolidates findings
+
+**Benefits:**
+- Comprehensive quality validation
+- Domain-specific expertise applied
+- Consolidated feedback for developers
+- Clear pass/fail decision
+
 ## Communication Standards
 
 ### Information Sharing Format
@@ -485,11 +674,13 @@ business-analyst → java-architect → business-analyst (clarification)
 
 | Agent | Depends On | Feeds Into | Parallel With |
 |-------|------------|------------|---------------|
-| **business-analyst** | None (starts chain) | java-architect, vue-expert, All | - |
-| **java-architect** | business-analyst | vue-expert, devops, chaos | postgres-pro |
-| **vue-expert** | business-analyst, java-architect | devops | java-architect (for API debugging) |
+| **architect-reviewer** | java-architect, vue-expert | java-architect, business-analyst | - |
+| **business-analyst** | architect-reviewer (optional) | java-architect, vue-expert, All | - |
+| **java-architect** | business-analyst | vue-expert, devops, chaos, code-reviewer | postgres-pro |
+| **vue-expert** | business-analyst, java-architect | devops, code-reviewer | java-architect (for API debugging) |
 | **devops-engineer** | java-architect, vue-expert, postgres-pro | chaos, business-analyst | - |
 | **postgres-pro** | java-architect | java-architect, devops | java-architect |
+| **code-reviewer** | java-architect, vue-expert | java-architect, vue-expert (for fixes) | architect-reviewer, postgres-pro |
 | **chaos-engineer** | All technical | All technical | - |
 
 ## Summary
@@ -502,18 +693,27 @@ business-analyst → java-architect → business-analyst (clarification)
 5. **Parallel when possible** - Work simultaneously when independent
 
 **Most Important:**
+- architect-reviewer validates design before implementation (optional but recommended for complex features)
 - business-analyst typically starts new features
 - java-architect implements backend APIs
 - vue-expert implements frontend UI
 - java-architect ↔ vue-expert must align on API contracts
 - devops-engineer enables deployment (both backend + frontend)
 - postgres-pro optimizes database
+- code-reviewer performs pre-merge quality gate
 - chaos-engineer validates resilience
 
 **Key Handoffs:**
+- Architect-Reviewer → Java: Architecture validation + refactoring priorities
 - BA → Java: Requirements with API contracts
 - Java → Vue: Swagger docs + test data + permissions
 - Vue → DevOps: Build artifacts + configs
+- Java/Vue → Code-Reviewer: Pull request for pre-merge review
+- Code-Reviewer → Java/Vue: Review findings + fixes needed
 - Java/Vue → DevOps: Complete feature for deployment
+
+**New Patterns:**
+- Pattern 6: Design-First Development (validate architecture before coding)
+- Pattern 7: Quality Gate (hub-and-spoke pre-merge review)
 
 **Collaboration beats isolation!**

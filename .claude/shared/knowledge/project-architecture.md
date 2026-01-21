@@ -108,6 +108,78 @@ All build commands run from the project root: `smart-admin-api-java21-springboot
 
 **Important:** `ArchitectureTest` enforces all architectural rules using ArchUnit. This test MUST pass before committing code.
 
+## Frontend Commands
+
+### Vue 3 Web Application (smart-admin-web/)
+
+**Location:** `smart-admin-web/` (Vue 3 + Vite + TypeScript + Ant Design Vue)
+
+```bash
+# Install dependencies
+npm install
+# or
+pnpm install
+
+# Development server (http://localhost:5173)
+npm run dev
+# or
+pnpm dev
+
+# Production build
+npm run build
+# or
+pnpm build
+
+# Preview production build
+npm run preview
+
+# Type checking (TypeScript)
+npm run type-check
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+```
+
+**Frontend development server:** `http://localhost:5173`
+
+**Note:** Frontend connects to backend API at `http://localhost:1024`
+
+### Mobile Application (smart-app/)
+
+**Location:** `smart-app/` (uni-app framework for multi-platform mobile)
+
+```bash
+# Install dependencies
+npm install
+
+# Development (choose platform)
+npm run dev:mp-weixin     # WeChat Mini Program
+npm run dev:h5            # H5 web app
+npm run dev:app           # Native app
+
+# Build for production
+npm run build:mp-weixin
+npm run build:h5
+npm run build:app
+```
+
+**Platforms supported:** WeChat Mini Program, H5, iOS, Android
+
+### Frontend-Backend Integration
+
+**Backend API:** `http://localhost:1024`
+**Frontend Dev:** `http://localhost:5173`
+**Swagger UI:** `http://localhost:1024/swagger-ui.html`
+
+**Typical Development Workflow:**
+1. Start backend: `cd smart-admin-api-java21-springboot3 && ./gradlew :sa-admin:bootRun`
+2. Start frontend: `cd smart-admin-web && npm run dev`
+3. Access frontend: `http://localhost:5173`
+4. Test APIs: `http://localhost:1024/swagger-ui.html`
+
 ## Application Configuration
 
 ### Profiles and Environments

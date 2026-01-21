@@ -4,6 +4,162 @@ All notable changes to the Claude Code agent configuration for SmartAdmin projec
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.3.0] - 2026-01-21
+
+### 🎉 100% Completion Milestone - 8-Agent System Complete
+
+**Major Achievement:** All agents now follow v2.x architecture with template inheritance and shared knowledge base.
+
+### Added - Quality & Architecture Review Agents
+
+**New Agent Integration:**
+
+Two critical review agents integrated into v2.x system:
+
+1. **architect-reviewer.md** - Architecture design validation specialist
+   - Reduced from 156 lines → ~135 lines (13% reduction, 21 lines removed)
+   - Added v2.x frontmatter: `inherits` + `knowledge_base` references
+   - Added "Foundation Knowledge (MUST READ FIRST)" section
+   - Removed embedded SmartAdmin architecture (lines 10-42, 33 lines) → references shared knowledge
+   - Focuses on: Layer boundary validation, scalability assessment, technical debt analysis
+   - Validates: SmartAdmin layered architecture (Controller → Service → Manager → Dao)
+
+2. **code-reviewer.md** - Pre-merge quality gate specialist
+   - Reduced from 189 lines → ~155 lines (18% reduction, 34 lines removed)
+   - Added v2.x frontmatter: `inherits` + `knowledge_base` references
+   - Added "Foundation Knowledge (MUST READ FIRST)" section
+   - Removed embedded SmartAdmin patterns (lines 21-47, 27 lines) → references shared knowledge
+   - Removed anti-patterns table (lines 167-179, 13 lines) → references quality-standards.md
+   - Focuses on: Security, correctness, performance, maintainability, testing
+
+3. **postgres-pro.md** - Verified v2.x compliance
+   - Already compliant with v2.x architecture (no changes needed)
+   - Inherits from agent-base.md + technical-agent-mixin.md
+   - References all 4 shared knowledge files
+
+**Orchestration Framework Enhancements:**
+
+- **decision-matrix.md** - Expanded for 8-agent system
+  - Updated Quick Decision Flow with quality/architecture review priorities
+  - Added "Architecture Review" keyword mapping (architecture, design, scalability, pattern validation, layer boundaries, module structure, technical debt)
+  - Added "Code Quality Review" keyword mapping (code quality, security review, pull request, pre-merge, quality gate, code standards, vulnerability)
+  - Added **Scenario 7: Architecture Review** - Module restructuring, pre-refactoring evaluation, technical debt assessment
+  - Added **Scenario 8: Pre-Merge Code Review (Quality Gate)** - Hub-and-Spoke pattern with code-reviewer as hub, dispatching to specialists
+  - Updated "Can you review..." clarification table with architect-reviewer and code-reviewer
+
+- **agent-dependencies.md** - 8-agent collaboration framework
+  - Updated dependency graph to include architect-reviewer and code-reviewer
+  - Added **architect-reviewer Dependencies:**
+    - Upstream: Triggered by BA or user concerns
+    - Downstream: Feeds recommendations to java-architect, vue-expert, devops-engineer, postgres-pro
+    - Collaboration: Works with all technical agents for impact analysis
+  - Added **code-reviewer Dependencies:**
+    - Hub role: Coordinates with all specialist agents
+    - Downstream: Dispatches to java-architect, vue-expert, postgres-pro, architect-reviewer based on change scope
+    - Quality gate: Aggregates findings, determines pass/fail
+  - Added handoff protocols:
+    - architect-reviewer → java-architect: Architecture review report, recommended patterns, refactoring priorities
+    - code-reviewer → java-architect/vue-expert: Code issues list with severity, line numbers, suggested fixes
+  - Added **Pattern 6: Design-First Development (Sequential)**
+    - architect-reviewer validates design → java-architect implements → vue-expert frontend → code-reviewer validates → devops-engineer deploys
+  - Added **Pattern 7: Quality Gate (Hub-and-Spoke)**
+    - code-reviewer (hub) coordinates with architect-reviewer, java-architect, postgres-pro, vue-expert for comprehensive review
+  - Updated Dependency Matrix table for 8 agents
+
+- **workflow-patterns.md** - Added 2 comprehensive review patterns
+  - Added **Pattern 9: Architecture Review & Refactoring (Collaborative)**
+    - 5 phases: Assessment (architect-reviewer) → Impact Analysis (parallel specialists) → Business Impact (BA) → Final Roadmap → Implementation (with code-reviewer validation)
+    - Duration: 1-3 days
+    - Use cases: Periodic architecture assessment, pre-refactoring, technical debt reduction
+  - Added **Pattern 10: Pre-Merge Quality Gate (Hub-and-Spoke)**
+    - 7 steps: Initial scan → Dispatch to specialists → Consolidate findings → Fix issues → Re-validate → Approve/iterate
+    - Duration: 30 minutes - 2 hours
+    - Use cases: Before merging feature branches, critical fixes, major refactoring
+  - Updated Pattern Selection Guide with Pattern 9 and 10 decision criteria
+  - Updated Summary section: 10 workflow patterns now documented
+  - Added anti-patterns: Skipping architecture review before refactoring, merging without quality gate validation
+
+### Changed
+
+**Agent Architecture Compliance:**
+- All 8 agents now follow v2.x template inheritance pattern
+- Total duplication removed in Phase 1: ~73 lines (architect-reviewer: 33 lines, code-reviewer: 40 lines)
+- All agents reference shared knowledge base (single source of truth)
+- Foundation Knowledge sections added to architect-reviewer and code-reviewer
+
+**Orchestration Framework Maturity:**
+- Decision matrix expanded from 6-agent to 8-agent scenarios
+- Agent dependencies updated with 2 new collaboration patterns
+- Workflow patterns expanded from 8 to 10 patterns (complete framework)
+- Hub-and-Spoke pattern now used for both architecture review and quality gate
+
+### Metrics Update
+
+| Metric | v2.2.0 | v2.3.0 | Change |
+|--------|--------|--------|--------|
+| Agent total count | 6 (documented) | 8 (documented) | +2 agents (architect-reviewer, code-reviewer) |
+| Agents v2.x compliant | 6/6 (100%) | 8/8 (100%) | Maintained 100% compliance |
+| Agent duplication | <10% | <10% | Maintained low duplication |
+| Orchestration scenarios | 6 | 8 | +2 scenarios (Architecture Review, Quality Gate) |
+| Workflow patterns | 8 | 10 | +2 patterns (Pattern 9, 10) |
+| Collaboration patterns | 5 | 7 | +2 patterns (Design-First, Quality Gate Hub-and-Spoke) |
+| Orchestration framework completeness | 100% (6/6 agents) | 100% (8/8 agents) | Complete 8-agent coverage |
+
+### Key Improvements
+
+**Architecture & Quality Assurance:**
+- ✅ Dedicated architect-reviewer for design validation and technical debt assessment
+- ✅ Dedicated code-reviewer for pre-merge quality gates
+- ✅ Hub-and-Spoke pattern ensures comprehensive review before merge
+- ✅ Design-First Development pattern prevents architectural issues early
+- ✅ All 8 agents follow consistent v2.x architecture
+
+**Review Capabilities:**
+- ✅ Architecture review: Layer boundaries, scalability, technical debt, SmartAdmin pattern compliance
+- ✅ Code review: Security, correctness, performance, maintainability, testing
+- ✅ Pre-merge validation: Automated quality gate with specialist coordination
+- ✅ Multi-dimensional evaluation: Technical, architectural, quality perspectives
+
+**Developer Experience:**
+- ✅ Clear decision flow: Quality review vs architecture review
+- ✅ Systematic quality gates before merge
+- ✅ Early architecture validation prevents refactoring rework
+- ✅ Comprehensive review without manual coordination
+
+**System Maturity:**
+- ✅ 100% agent integration (8/8 complete)
+- ✅ 10 workflow patterns documented (complete orchestration framework)
+- ✅ 8 orchestration scenarios covering full development lifecycle
+- ✅ <10% duplication maintained across all agents
+
+### Impact
+
+**For Code Quality:**
+- Pre-merge quality gate catches issues before merge
+- Multi-agent review provides comprehensive coverage
+- Security, performance, maintainability validated systematically
+- SmartAdmin patterns enforced consistently
+
+**For Architecture:**
+- Architecture review prevents technical debt accumulation
+- Layer boundary violations caught early
+- Scalability concerns addressed proactively
+- Refactoring planned with architectural guidance
+
+**For Team Workflow:**
+- Clear review triggers (pre-merge, architecture changes)
+- Automated specialist coordination via Hub-and-Spoke
+- Reduced manual review overhead
+- Consistent quality standards across all code
+
+**For Maintenance:**
+- 8-agent system fully documented
+- All agents follow v2.x architecture
+- Orchestration framework complete
+- Clear patterns for all development scenarios
+
+---
+
 ## [2.2.0] - 2026-01-21
 
 ### Added - vue-expert Optimization & Frontend Knowledge Base

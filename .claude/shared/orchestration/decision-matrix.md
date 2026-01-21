@@ -7,6 +7,10 @@
 ```
 [User Request]
     ↓
+Is it a code quality/pre-merge review? ──YES──→ code-reviewer
+    ↓ NO
+Is it an architecture/design review? ──YES──→ architect-reviewer
+    ↓ NO
 Is it about Java code implementation? ──YES──→ java-architect
     ↓ NO
 Is it about Vue/Frontend implementation? ──YES──→ vue-expert
@@ -38,6 +42,10 @@ Use general-purpose or ask user for clarification
 | PostgreSQL, query optimization, index, replication, pg_stat, slow query, database performance | **postgres-pro** | High | "optimize database", "setup replication", "analyze query performance", "create indexes", "backup strategy" |
 | **Resilience** ||||
 | resilience, chaos, failure injection, game day, circuit breaker, fallback, antifragility, disaster recovery | **chaos-engineer** | High | "test failover", "improve resilience", "design chaos experiment", "validate recovery", "test failure scenarios" |
+| **Architecture Review** ||||
+| architecture, design, scalability, pattern validation, layer boundaries, module structure, technical debt assessment, architectural patterns, refactoring strategy | **architect-reviewer** | High | "review architecture", "validate design", "assess scalability", "evaluate module structure", "identify technical debt", "architecture audit" |
+| **Code Quality Review** ||||
+| code quality, security review, pull request, pre-merge, quality gate, code standards, vulnerability, code review, best practices, maintainability | **code-reviewer** | High | "review code", "pre-merge review", "check code quality", "security audit", "validate standards", "quality gate check" |
 
 ## Context-Based Decision Logic
 
@@ -108,6 +116,36 @@ Use general-purpose or ask user for clarification
 4. **devops-engineer** (if infrastructure change) - Update deployment process
 5. **chaos-engineer** (if critical) - Test resilience of new process
 
+### Scenario 7: Architecture Review
+
+**Request:** "Can you review the architecture of our employee module?"
+
+**Agent Sequence:**
+1. **architect-reviewer** (lead) - Comprehensive architecture assessment, validate layered architecture, check dependencies
+2. **java-architect** (if code changes needed) - Implement recommended refactoring
+3. **vue-expert** (if frontend architectural impact) - Review frontend architecture alignment
+4. **devops-engineer** (if infrastructure impact) - Assess deployment and scaling implications
+5. **postgres-pro** (if database architectural concerns) - Evaluate database schema and query patterns
+
+**When to Use:** Module restructuring, pre-refactoring evaluation, technical debt assessment, scalability review
+
+### Scenario 8: Pre-Merge Code Review (Quality Gate)
+
+**Request:** "I've finished the notification feature, please check if it's ready for merge"
+
+**Hub-and-Spoke Pattern:**
+1. **code-reviewer** (hub) - Initial scan for security, correctness, performance, maintainability
+2. **Dispatch to specialists** based on change scope:
+   - Backend changes → **java-architect** (SmartAdmin patterns validation)
+   - Frontend changes → **vue-expert** (Vue 3 best practices)
+   - Database changes → **postgres-pro** (query optimization)
+   - Architectural impact → **architect-reviewer** (layer boundary validation)
+3. **code-reviewer** (consolidate) - Aggregate findings, determine pass/fail
+4. **java-architect** or **vue-expert** (fix) - Address critical/major issues
+5. **code-reviewer** (validate) - Re-check after fixes, approve merge or iterate
+
+**When to Use:** Before merging feature branches, critical fixes, major refactoring
+
 ## Ambiguous Requests - How to Clarify
 
 ### "How do I..."
@@ -136,6 +174,8 @@ Use general-purpose or ask user for clarification
 
 | User Says | What They Want Reviewed | Agent |
 |-----------|-------------------------|-------|
+| "...this code before merge" | Pre-merge code quality gate | **code-reviewer** |
+| "...our architecture" | System design, layering, scalability | **architect-reviewer** |
 | "...this Java class" | Backend code quality, patterns | **java-architect** |
 | "...this Vue component" | Frontend code quality, patterns | **vue-expert** |
 | "...this business process" | Process efficiency | **business-analyst** |

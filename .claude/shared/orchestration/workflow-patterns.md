@@ -549,6 +549,240 @@
 
 ---
 
+## Pattern 9: Architecture Review & Refactoring (Collaborative)
+
+**When:** Periodic architecture assessment, pre-refactoring, technical debt reduction, scalability evaluation
+
+**Agents:** architect-reviewer → (java-architect + vue-expert + postgres-pro + devops-engineer parallel) → business-analyst → architect-reviewer
+
+**Timeline:** 1-3 days
+
+### Phase 1: Architecture Assessment (architect-reviewer - 4-8 hours)
+
+**Activities:**
+- Comprehensive architecture review
+- Validate layered architecture compliance (Controller → Service → Manager → Dao)
+- Check layer boundary violations
+- Assess module structure and cohesion
+- Identify technical debt hotspots
+- Evaluate scalability and maintainability
+- Review architectural patterns adherence
+
+**Deliverables:**
+- Architecture review report
+- Violations list with severity
+- Technical debt assessment
+- Scalability concerns
+- Refactoring priorities
+
+**Handoff when:**
+- Architecture violations documented
+- Technical debt quantified
+- Refactoring priorities identified
+
+### Phase 2: Impact Analysis (Parallel - 4-8 hours)
+
+**java-architect:**
+- Analyze code refactoring effort
+- Estimate complexity and risk
+- Identify affected modules
+- Plan implementation approach
+
+**vue-expert:**
+- Assess frontend architectural impact
+- Identify component restructuring needs
+- Estimate frontend refactoring effort
+
+**postgres-pro:**
+- Review database schema implications
+- Assess query pattern changes needed
+- Estimate database refactoring effort
+
+**devops-engineer:**
+- Evaluate infrastructure impact
+- Assess deployment complexity
+- Estimate infrastructure changes needed
+
+**Deliverables (from each):**
+- Impact assessment report
+- Effort estimates
+- Risk assessment
+- Dependencies identified
+
+### Phase 3: Business Impact & ROI (business-analyst - 2-4 hours)
+
+**Activities:**
+- Calculate refactoring costs
+- Estimate business value of improvements
+- Assess risk of NOT refactoring (technical debt interest)
+- Prioritize improvements by ROI
+- Create phased refactoring roadmap
+
+**Deliverables:**
+- ROI analysis
+- Cost-benefit summary
+- Prioritized refactoring backlog
+- Phased implementation plan
+
+### Phase 4: Final Refactoring Roadmap (architect-reviewer - 2-4 hours)
+
+**Activities:**
+- Consolidate all findings
+- Create comprehensive refactoring roadmap
+- Define success metrics
+- Document architectural principles to follow
+- Identify quick wins vs long-term improvements
+
+**Deliverables:**
+- Comprehensive refactoring roadmap
+- Phased implementation plan (with business priorities)
+- Architectural principles document
+- Success metrics and KPIs
+
+### Phase 5: Implementation (Per Phase)
+
+**Execute with code-reviewer validation:**
+- java-architect implements backend refactoring
+- vue-expert implements frontend refactoring
+- code-reviewer validates each phase (quality gate)
+- devops-engineer deploys incremental changes
+- chaos-engineer tests resilience after critical changes
+
+**Complete when:**
+- All critical architectural violations resolved
+- High-priority technical debt addressed
+- ArchitectureTest passing
+- Scalability concerns mitigated
+- Team aligned on new patterns
+
+---
+
+## Pattern 10: Pre-Merge Quality Gate (Hub-and-Spoke)
+
+**When:** Before merging feature branches, critical fixes, major refactoring
+
+**Hub:** code-reviewer (orchestrates all specialist reviews)
+**Spokes:** architect-reviewer, java-architect, vue-expert, postgres-pro (as needed)
+
+**Timeline:** 30 minutes - 2 hours
+
+### Phase 1: Initial Scan (code-reviewer - 10-20 min)
+
+**Activities:**
+- Review pull request changes (git diff)
+- Identify change scope (backend, frontend, database, architecture)
+- Check for obvious issues:
+  - Security vulnerabilities (SQL injection, XSS, auth bypass)
+  - Critical bugs (null pointer, logic errors)
+  - Performance red flags (N+1 queries, missing indexes)
+  - Code quality issues (complexity, duplication)
+
+**Decision Point - Dispatch to specialists:**
+- **Backend changes** → java-architect
+- **Frontend changes** → vue-expert
+- **Database changes** → postgres-pro
+- **Architectural impact** → architect-reviewer
+- **None needed** → Proceed to decision
+
+### Phase 2: Specialist Reviews (Parallel - 15-45 min)
+
+**java-architect (if backend):**
+- Validate SmartAdmin patterns (layered architecture)
+- Check ResponseDTO usage
+- Verify dependency injection (constructor injection only)
+- Review transaction management (@Transactional in Manager only)
+- Check naming conventions
+- Validate MyBatis Plus patterns (LambdaQueryWrapper)
+
+**vue-expert (if frontend):**
+- Validate Vue 3 Composition API patterns
+- Check Ant Design Vue component usage
+- Verify API integration (ResponseModel handling)
+- Check permission controls (v-privilege vs @SaCheckPermission alignment)
+- Review TypeScript interfaces (alignment with backend DTOs)
+- Validate frontend performance patterns
+
+**postgres-pro (if database):**
+- Review query patterns and performance
+- Check index usage
+- Validate migration scripts (if any)
+- Assess query optimization opportunities
+
+**architect-reviewer (if architectural):**
+- Validate layer boundaries (no Controller → Dao violations)
+- Check module dependencies
+- Assess architectural debt introduced
+- Verify adherence to architectural principles
+
+**Each delivers:**
+- Domain-specific findings (Critical/Major/Minor/Suggestions)
+- File paths and line numbers
+- Specific recommendations
+- Pass/Fail for their domain
+
+### Phase 3: Consolidation (code-reviewer - 10-15 min)
+
+**Activities:**
+- Aggregate all specialist findings
+- Categorize by severity:
+  - **Critical** (must fix, blocks merge)
+  - **Major** (should fix, may block merge)
+  - **Minor** (nice to fix, doesn't block)
+  - **Suggestions** (improvements)
+- Eliminate duplicates
+- Create consolidated review report
+- Make pass/fail decision
+
+**Pass Criteria:**
+- Zero critical issues
+- Zero major security issues
+- ArchitectureTest passing (if backend changes)
+- Test coverage >85% for backend, >80% for frontend
+- No architectural violations
+
+**Fail Criteria:**
+- Any critical issue present
+- Security vulnerabilities
+- ArchitectureTest failures
+- Test coverage below threshold
+
+### Phase 4: Fix Issues (java-architect or vue-expert - 30-60 min)
+
+**If FAIL:**
+- Developer (java-architect/vue-expert) fixes critical/major issues
+- Updates tests if needed
+- Commits fixes to same PR
+
+**Communication:**
+- code-reviewer provides clear, actionable feedback
+- Developers acknowledge and commit to timeline
+- code-reviewer tracks fix progress
+
+### Phase 5: Re-Validation (code-reviewer - 10-15 min)
+
+**Activities:**
+- Review fixes
+- Verify critical/major issues resolved
+- Check no new issues introduced
+- Confirm tests passing
+- Make final pass/fail decision
+
+**If PASS:**
+- Approve merge ✅
+- Notify devops-engineer for deployment
+
+**If FAIL:**
+- Document remaining issues
+- Iterate back to Phase 4
+
+**Complete when:**
+- All critical and major issues resolved
+- Tests passing
+- No architectural violations
+- Ready for merge and deployment
+
+---
+
 ## Pattern Selection Guide
 
 ### Use Pattern 1 (Full-Stack Sequential) When:
@@ -600,6 +834,24 @@
 - User reporting slow page load
 - Excessive re-renders detected
 - Frontend profiling shows bottlenecks
+
+### Use Pattern 9 (Architecture Review & Refactoring) When:
+- Module restructuring needed
+- Pre-refactoring evaluation required
+- Technical debt assessment needed
+- Scalability concerns identified
+- Architecture audit requested
+- Post-major-release architecture review
+- Planning significant refactoring effort
+
+### Use Pattern 10 (Pre-Merge Quality Gate) When:
+- Feature branch ready for merge
+- Critical fix before deployment
+- Major refactoring complete
+- Pull request submitted
+- Code review required before merge
+- Quality validation needed
+- Pre-deployment checkpoint
 
 ## Workflow Best Practices
 
@@ -669,6 +921,12 @@
 ❌ **Deploying frontend without testing API integration**
 - Result: Production errors, broken user flows
 
+❌ **Skipping architecture review before major refactoring**
+- Result: Architectural debt, incorrect patterns, wasted effort
+
+❌ **Merging code without quality gate review**
+- Result: Bugs in production, technical debt accumulation, security vulnerabilities
+
 ## Summary
 
 **Choose the right pattern for the task:**
@@ -680,6 +938,8 @@
 - Technical debt → Iterative (Pattern 6)
 - API integration issue → API Integration (Pattern 7)
 - Frontend performance → Frontend Performance (Pattern 8)
+- Architecture & refactoring → Architecture Review & Refactoring (Pattern 9)
+- Pre-merge code review → Pre-Merge Quality Gate (Pattern 10)
 
 **Key Success Factors:**
 1. Clear entry/exit criteria

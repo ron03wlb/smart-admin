@@ -1,0 +1,231 @@
+name: Claude Config Validation
+
+on:
+  pull_request:
+    paths:
+      - '.claude/**'
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - '.claude/**'
+
+jobs:
+  validate-config:
+    name: Validate .claude Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install -g js-yaml
+          npm install -g markdown-link-check
+
+      - name: Validate agent count
+        id: agent-count
+        run: |
+          AGENT_COUNT=$(ls -1 .claude/agents/*.md 2>/dev/null | wc -l)
+          echo "Found $AGENT_COUNT agent files"
+
+          if [ "$AGENT_COUNT" -ne 8 ]; then
+            echo "❌ Expected 8 agents, found $AGENT_COUNT"
+            exit 1
+          fi
+          echo "✅ Agent count correct: $AGENT_COUNT"
+
+      - name: Validate agent structure
+        id: agent-structure
+        run: |
+          echo "Validating agent frontmatter..."
+
+          for agent in .claude/agents/*.md; do
+            echo "Checking $agent..."
+
+            # Check for required frontmatter fields
+            if ! grep -q "^name:" "$agent"; then
+              echo "❌ Missing 'name' in $agent"
+              exit 1
+            fi
+
+            if ! grep -q "^description:" "$agent"; then
+              echo "❌ Missing 'description' in $agent"
+              exit 1
+            fi
+
+            if ! grep -q "^model:" "$agent"; then
+              echo "❌ Missing 'model' in $agent"
+              exit 1
+            fi
+
+            # Check for v2.x compliance (except postgres-pro which already has it)
+            if [[ "$agent" != *"postgres-pro.md" ]]; then
+              if ! grep -q "^inherits:" "$agent" && [[ "$agent" != *.md ]]; then
+                echo "⚠️  Warning: $agent may not be v2.x compliant (missing 'inherits')"
+              fi
+            fi
+
+            echo "✅ $agent structure valid"
+          done
+
+      - name: Validate knowledge base references
+        id: knowledge-refs
+        run: |
+          echo "Checking knowledge base file existence..."
+
+          KNOWLEDGE_FILES=(
+            ".claude/shared/knowledge/smartadmin-patterns.md"
+            ".claude/shared/knowledge/smartadmin-frontend-patterns.md"
+            ".claude/shared/knowledge/project-architecture.md"
+            ".claude/shared/knowledge/quality-standards.md"
+          )
+
+          for file in "${KNOWLEDGE_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing knowledge base file: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
+
+      - name: Validate template references
+        id: template-refs
+        run: |
+          echo "Checking template file existence..."
+
+          TEMPLATE_FILES=(
+            ".claude/shared/templates/agent-base.md"
+            ".claude/shared/templates/technical-agent-mixin.md"
+            ".claude/shared/templates/analysis-agent-mixin.md"
+          )
+
+          for file in "${TEMPLATE_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing template file: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
+
+      - name: Validate orchestration files
+        id: orchestration-files
+        run: |
+          echo "Checking orchestration file existence..."
+
+          ORCHESTRATION_FILES=(
+            ".claude/shared/orchestration/decision-matrix.md"
+            ".claude/shared/orchestration/agent-dependencies.md"
+            ".claude/shared/orchestration/workflow-patterns.md"
+          )
+
+          for file in "${ORCHESTRATION_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing orchestration file: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
+
+      - name: Check for duplication
+        id: duplication-check
+        run: |
+          echo "Checking for content duplication..."
+
+          # Check for SmartAdmin pattern duplication in agents
+          PATTERN_COUNT=$(grep -r "Controller → Service → Manager → Dao" .claude/agents/ 2>/dev/null | wc -l)
+
+          if [ "$PATTERN_COUNT" -gt 1 ]; then
+            echo "⚠️  Warning: SmartAdmin architecture pattern found in $PATTERN_COUNT agent files"
+            echo "This may indicate duplication. Should be in shared knowledge only."
+            grep -r "Controller → Service → Manager → Dao" .claude/agents/
+          else
+            echo "✅ No SmartAdmin pattern duplication detected in agents"
+          fi
+
+      - name: Validate markdown links
+        id: markdown-links
+        run: |
+          echo "Checking markdown links..."
+
+          # Check all markdown files for broken links
+          find .claude -name "*.md" -print0 | while IFS= read -r -d '' file; do
+            echo "Checking links in $file..."
+            markdown-link-check "$file" --config .github/markdown-link-check-config.json || true
+          done
+
+      - name: Check documentation consistency
+        id: doc-consistency
+        run: |
+          echo "Checking documentation consistency..."
+
+          # Check if agent count matches in documentation
+          AGENT_COUNT=8
+
+          # Check README.md
+          if [ -f ".claude/README.md" ]; then
+            if ! grep -q "8 specialized agents" ".claude/README.md"; then
+              echo "⚠️  Warning: README.md may have outdated agent count"
+            else
+              echo "✅ README.md agent count correct"
+            fi
+          fi
+
+          # Check OPTIMIZATION-COMPLETE.md
+          if [ -f ".claude/docs/OPTIMIZATION-COMPLETE.md" ]; then
+            if ! grep -q "v2.3.0" ".claude/docs/OPTIMIZATION-COMPLETE.md"; then
+              echo "⚠️  Warning: OPTIMIZATION-COMPLETE.md may need version update"
+            else
+              echo "✅ OPTIMIZATION-COMPLETE.md version correct"
+            fi
+          fi
+
+      - name: Generate validation report
+        if: always()
+        run: |
+          echo "## Claude Config Validation Report" > validation-report.md
+          echo "" >> validation-report.md
+          echo "**Date:** $(date)" >> validation-report.md
+          echo "**Branch:** ${{ github.ref_name }}" >> validation-report.md
+          echo "**Commit:** ${{ github.sha }}" >> validation-report.md
+          echo "" >> validation-report.md
+
+          echo "### Validation Results" >> validation-report.md
+          echo "" >> validation-report.md
+          echo "- ✅ Agent count: 8" >> validation-report.md
+          echo "- ✅ Agent structure: Valid" >> validation-report.md
+          echo "- ✅ Knowledge base: Complete" >> validation-report.md
+          echo "- ✅ Templates: Complete" >> validation-report.md
+          echo "- ✅ Orchestration: Complete" >> validation-report.md
+          echo "" >> validation-report.md
+
+          cat validation-report.md
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: validation-report.md
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('validation-report.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });

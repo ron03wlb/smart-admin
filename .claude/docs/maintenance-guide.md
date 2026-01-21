@@ -20,13 +20,15 @@
 │       ├── decision-matrix.md
 │       ├── agent-dependencies.md
 │       └── workflow-patterns.md
-├── agents/                        # Individual agent definitions (6 agents)
+├── agents/                        # Individual agent definitions (8 agents)
 │   ├── java-architect.md          # Backend expert - References shared knowledge
 │   ├── vue-expert.md              # Frontend expert - References frontend patterns
-│   ├── business-analyst.md
-│   ├── chaos-engineer.md
-│   ├── devops-engineer.md
-│   └── postgres-pro.md
+│   ├── business-analyst.md        # Requirements & stakeholder expert
+│   ├── chaos-engineer.md          # Resilience testing expert
+│   ├── devops-engineer.md         # CI/CD & infrastructure expert
+│   ├── postgres-pro.md            # Database optimization expert
+│   ├── architect-reviewer.md      # Architecture & design review expert
+│   └── code-reviewer.md           # Pre-merge quality gate expert
 ├── settings.local.json            # Consolidated permissions (12 patterns)
 └── docs/                          # Documentation
     ├── maintenance-guide.md       # This file
@@ -40,7 +42,7 @@
 
 **Scenario:** SmartAdmin adds new backend pattern or changes convention (e.g., new utility class, changed naming convention)
 
-**Impact:** All backend-related agents (java-architect, business-analyst, devops-engineer, postgres-pro, chaos-engineer) automatically get the update
+**Impact:** All backend-related agents (java-architect, business-analyst, devops-engineer, postgres-pro, chaos-engineer) automatically get the update. Review agents (architect-reviewer, code-reviewer) also benefit as they validate code against these patterns.
 
 **Steps:**
 1. **Edit ONE file:** `.claude/shared/knowledge/smartadmin-patterns.md`
@@ -350,7 +352,74 @@ When backend returns error, check `response.code`:
 - [ ] Description includes examples
 - [ ] Tested successfully
 
-### Task 6: Update Orchestration
+### Task 6.5: Add Review Agent (Quality/Architecture Review)
+
+**Scenario:** Need specialized review agent (e.g., security-reviewer, performance-reviewer)
+
+**Background:** Review agents follow special patterns (architect-reviewer, code-reviewer serve as examples)
+
+**Steps:**
+1. **Copy template from existing review agent:**
+   - Use `.claude/agents/code-reviewer.md` for quality-focused reviews
+   - Use `.claude/agents/architect-reviewer.md` for design-focused reviews
+
+2. **Customize review criteria:**
+   - Define "Foundation Knowledge (MUST READ FIRST)" section
+   - Reference all shared knowledge: smartadmin-patterns.md, project-architecture.md, quality-standards.md, CLAUDE.md
+   - Define review phases (Security, Correctness, Performance, etc.)
+   - Create output format template
+   - Define anti-patterns to flag
+
+3. **Define review agent characteristics:**
+   - **Hub role:** Can coordinate with specialist agents (Hub-and-Spoke pattern)
+   - **Input:** Code changes, design documents, or architecture artifacts
+   - **Output:** Structured review report with prioritized findings
+   - **Triggers:** Pre-merge, post-implementation, periodic assessment
+
+4. **Update orchestration:**
+   - Add to `decision-matrix.md` with clear review triggers
+   - Add to `agent-dependencies.md` with Hub-and-Spoke pattern
+   - Add to `workflow-patterns.md` with review workflow (similar to Pattern 10: Quality Gate)
+
+5. **Test review workflow:**
+   - Test with sample code/design
+   - Verify hub coordination with specialists
+   - Validate review output format
+
+6. **Update changelog:**
+   ```markdown
+   ## [Version] - Date
+   ### Added
+   - [agent-name]-reviewer agent for [specific review type]
+   ```
+
+7. Commit:
+   ```bash
+   git commit -m "feat(agents): add [agent-name]-reviewer for [purpose]"
+   ```
+
+**Time:** 45-60 minutes
+
+**Review Agent Checklist:**
+- [ ] Inherits from agent-base.md + technical-agent-mixin.md
+- [ ] References all 4 shared knowledge files + CLAUDE.md
+- [ ] Has "Foundation Knowledge (MUST READ FIRST)" section
+- [ ] Defines clear review phases
+- [ ] Has structured output format (with severity levels)
+- [ ] Can act as Hub in Hub-and-Spoke pattern
+- [ ] Added to decision-matrix.md with review triggers
+- [ ] Added to agent-dependencies.md with coordination patterns
+- [ ] Added to workflow-patterns.md with review workflow
+- [ ] Model: opus (for deep analysis capability)
+- [ ] Tested with sample artifacts
+
+**Example Review Agents:**
+- `code-reviewer.md` - Pre-merge quality gate (security, correctness, performance, maintainability)
+- `architect-reviewer.md` - Architecture & design validation (layer boundaries, scalability, technical debt)
+- `security-reviewer.md` (future) - Security audit (OWASP Top 10, authentication, authorization)
+- `performance-reviewer.md` (future) - Performance analysis (query optimization, caching, concurrency)
+
+### Task 7: Update Orchestration
 
 **Scenario:** New workflow pattern discovered or agent collaboration needs clarification
 
