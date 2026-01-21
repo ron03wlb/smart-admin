@@ -28,7 +28,36 @@
       "Bash(ls *:*)",
       "Bash(find *:*)",
       "Bash(del *:*)",
-      "Bash(rm *:*)"
+      "Bash(rm *:*)",
+
+      // Code formatting (for hooks system)
+      "Bash(./gradlew spotless*:*)",
+      "Bash(gradlew.bat spotless*:*)"
     ]
+  },
+
+  "hooksConfig": {
+    "autoFix": {
+      "enabled": true,
+      "maxRetries": 3,
+      "failOnCritical": true,
+      "failOnMajor": false
+    },
+    "autoFormat": {
+      "enabled": true,
+      "tool": "spotless",
+      "trigger": "postAgentCompletion"
+    },
+    "autoRecordRules": {
+      "enabled": true,
+      "minSeverity": "minor",
+      "destination": ".claude/shared/knowledge/quality-standards.md"
+    },
+    "notifications": {
+      "onSuccess": true,
+      "onFailure": true,
+      "onFixAttempt": true,
+      "verbose": true
+    }
   }
 }

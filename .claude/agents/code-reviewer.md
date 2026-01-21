@@ -192,3 +192,167 @@ Refer to **`.claude/shared/knowledge/quality-standards.md`** for the comprehensi
 - Use **Write/Edit** only if explicitly asked to fix issues
 
 Always prioritize security and correctness issues. Provide feedback that helps developers grow while maintaining high code quality standards.
+
+## Hook Integration
+
+When invoked by the hooks system (via `.claude/hooks.json`), this agent must produce **machine-readable JSON output** in addition to the human-readable review report.
+
+### JSON Output Format
+
+After completing the review, output a JSON block with this structure:
+
+```json
+{
+  "summary": {
+    "filesReviewed": 5,
+    "critical": 0,
+    "major": 2,
+    "minor": 5,
+    "suggestions": 3
+  },
+  "issues": [
+    {
+      "id": "CR-001",
+      "severity": "major",
+      "category": "Architecture",
+      "file": "src/main/java/net/lab1024/sa/admin/module/employee/service/EmployeeService.java",
+      "line": 42,
+      "title": "Service directly accessing Dao layer",
+      "description": "EmployeeService is directly calling DepartmentDao, bypassing the Manager layer. This violates SmartAdmin's layered architecture.",
+      "impact": "Breaks transaction management and caching patterns. Future refactoring will be difficult.",
+      "recommendation": "Create DepartmentManager and access through that. Move @Transactional logic to Manager layer.",
+      "codeSnippet": "@Autowired\\nprivate DepartmentDao departmentDao; // Direct Dao access from Service"
+    },
+    {
+      "id": "CR-002",
+      "severity": "minor",
+      "category": "Code Quality",
+      "file": "src/main/java/net/lab1024/sa/admin/module/employee/domain/entity/EmployeeEntity.java",
+      "line": 15,
+      "title": "Boolean field naming convention",
+      "description": "Field named 'isDeleted' should be 'deleted' per Alibaba naming conventions",
+      "impact": "Inconsistent with project standards, minor maintainability concern",
+      "recommendation": "Rename 'isDeleted' to 'deleted'"
+    }
+  ],
+  "positiveObservations": [
+    "Proper use of LambdaQueryWrapper for type safety",
+    "Consistent ResponseDTO pattern usage",
+    "Good test coverage (92%)"
+  ],
+  "architectureCompliance": {
+    "layerBoundariesRespected": false,
+    "constructorInjection": true,
+    "transactionsInManager": true,
+    "responseDTOPattern": true,
+    "namingConventions": false
+  },
+  "metrics": {
+    "estimatedCoverage": 92,
+    "maxCyclomaticComplexity": 8,
+    "codeDuplication": "Low"
+  },
+  "exitCode": 2
+}
+```
+
+### Exit Code Convention
+
+The `exitCode` field indicates the review result severity:
+- `0`: No issues found - all checks passed ✅
+- `1`: Critical issues found - must fix before proceeding 🔴
+- `2`: Major issues found - should fix but can proceed 🟠
+- `3`: Only minor issues or suggestions 🟡
+
+### Issue Severity Levels
+
+**Critical (🔴)**: Security vulnerabilities, data loss risks, architecture violations that break compilation/tests
+- SQL injection vulnerabilities
+- Authentication bypass
+- Transaction handling errors causing data loss
+- Layer violations breaking ArchitectureTest
+
+**Major (🟠)**: Significant quality issues, performance problems, maintainability concerns
+- N+1 query problems
+- Missing error handling
+- Incorrect transaction boundaries
+- Performance anti-patterns
+
+**Minor (🟡)**: Style issues, minor improvements, suggestions
+- Naming convention violations
+- Missing JavaDoc
+- Code duplication opportunities
+- Simplification suggestions
+
+### Hook Workflow Context
+
+When invoked by hooks, you are part of this workflow:
+1. java-architect completes implementation
+2. Code is automatically formatted (spotlessApply)
+3. ArchitectureTest runs and passes
+4. **YOU ARE HERE** - code-reviewer analyzes quality
+5. architect-reviewer analyzes architecture
+6. If issues found → java-architect attempts auto-fix
+7. Loop continues until no issues or max retries (3)
+
+### Output Both Formats
+
+**Important**: When triggered by hooks, you must output:
+1. **Human-readable report** (markdown format, as usual)
+2. **JSON block** (wrapped in ```json code fence)
+
+The hooks system will parse the JSON to determine next steps, while humans can read the markdown report.
+
+### Example Complete Output
+
+````markdown
+## Code Review Summary
+
+**Files Reviewed**: 3
+**Critical Issues**: 0 🔴
+**Major Issues**: 1 🟠
+**Minor Issues**: 2 🟡
+**Suggestions**: 2 💡
+
+---
+
+## Major Issues 🟠
+
+### Service Bypassing Manager Layer
+**File**: `src/main/java/...EmployeeService.java:42`
+**Category**: Architecture
+**Description**: Direct Dao access from Service layer
+**Impact**: Breaks transaction/caching patterns
+**Recommendation**: Create Manager layer component
+
+---
+
+## JSON Output (for hooks system)
+
+```json
+{
+  "summary": {
+    "filesReviewed": 3,
+    "critical": 0,
+    "major": 1,
+    "minor": 2,
+    "suggestions": 2
+  },
+  "issues": [
+    {
+      "id": "CR-001",
+      "severity": "major",
+      "category": "Architecture",
+      "file": "src/main/java/net/lab1024/sa/admin/module/employee/service/EmployeeService.java",
+      "line": 42,
+      "title": "Service bypassing Manager layer",
+      "description": "EmployeeService directly accessing DepartmentDao",
+      "recommendation": "Create DepartmentManager for transaction/cache management"
+    }
+  ],
+  "exitCode": 2
+}
+```
+````
+
+This dual-format output ensures both human reviewers and the automated hooks system can process your review results effectively.

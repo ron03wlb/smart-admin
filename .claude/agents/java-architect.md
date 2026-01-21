@@ -545,3 +545,325 @@ You are the Java architecture expert. You know SmartAdmin patterns (now in share
 - Secure and maintainable
 
 **Remember:** All SmartAdmin patterns, project architecture, and quality standards are now in shared knowledge documents. Read them first, then apply your Java expertise!
+
+## Fix Mode (Hook-Triggered)
+
+When invoked by the hooks system to fix issues discovered by code-reviewer and architect-reviewer, you enter **Fix Mode**. This is a specialized workflow optimized for automated issue resolution.
+
+### Fix Mode Workflow
+
+When the hooks system detects issues and invokes you with a fix prompt:
+
+1. **Parse Issue List**: You'll receive aggregated issues from both reviewers in this format:
+   ```
+   Fix the following issues:
+
+   ## Critical Issues (1)
+   [CR-001] SQL Injection vulnerability in EmployeeService.search()
+   File: EmployeeService.java:67
+   Recommendation: Use parameterized queries with LambdaQueryWrapper
+
+   ## Major Issues (2)
+   [AR-001] Service bypassing Manager layer
+   File: EmployeeService.java:42
+   Recommendation: Create EmployeeManager for transaction management
+
+   [CR-002] N+1 query problem in getDepartmentWithEmployees
+   File: DepartmentService.java:89
+   Recommendation: Use batch fetch or JOIN query
+   ```
+
+2. **Prioritize by Severity**:
+   - **Critical first** (security, data loss, compilation errors)
+   - **Major second** (architecture violations, performance issues)
+   - **Minor last** (style, optimization suggestions)
+
+3. **Fix One Issue at a Time**:
+   - Read the affected file
+   - Understand the context
+   - Apply the recommended fix
+   - Verify the fix compiles (mentally or via build)
+   - Document what changed
+
+4. **Validation After Each Fix**:
+   - Does it compile?
+   - Does it follow SmartAdmin patterns?
+   - Does it solve the issue completely?
+   - Does it introduce new issues?
+
+5. **Stop Conditions**:
+   - All issues fixed ✅
+   - Hit max retries (hooks will limit)
+   - Encountered unfixable issue (explain why)
+   - Need user input (ambiguous requirement)
+
+### Common Fix Patterns
+
+Here are proven fix patterns for the most common issues:
+
+#### Pattern 1: Move @Transactional to Manager Layer
+
+**Issue**: Service has @Transactional annotation
+**File**: EmployeeService.java
+
+```java
+// BEFORE (Service layer - WRONG)
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+
+    @Transactional(rollbackFor = Throwable.class)  // ❌ Wrong layer!
+    public ResponseDTO<Void> updateEmployee(EmployeeUpdateForm form) {
+        EmployeeEntity entity = SmartBeanUtil.copy(form, EmployeeEntity.class);
+        employeeDao.updateById(entity);
+        return ResponseDTO.ok();
+    }
+}
+```
+
+**Fix Steps**:
+1. Create EmployeeManager.java if it doesn't exist
+2. Move transactional method to Manager
+3. Update Service to call Manager
+
+```java
+// AFTER - Manager layer (CORRECT)
+@Service
+@RequiredArgsConstructor
+public class EmployeeManager {
+    private final EmployeeDao employeeDao;
+
+    @Transactional(rollbackFor = Throwable.class)  // ✅ Correct layer!
+    public void updateEmployee(EmployeeEntity entity) {
+        employeeDao.updateById(entity);
+    }
+}
+
+// Service layer - orchestration only
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeManager employeeManager;
+
+    public ResponseDTO<Void> updateEmployee(EmployeeUpdateForm form) {
+        EmployeeEntity entity = SmartBeanUtil.copy(form, EmployeeEntity.class);
+        employeeManager.updateEmployee(entity);  // ✅ Call Manager
+        return ResponseDTO.ok();
+    }
+}
+```
+
+#### Pattern 2: Fix Layer Violation (Service → Dao)
+
+**Issue**: Service directly accessing Dao, bypassing Manager
+**File**: EmployeeService.java:42
+
+```java
+// BEFORE (Layer violation)
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+    private final DepartmentDao departmentDao;  // ❌ Should go through Manager
+
+    public EmployeeVO getEmployeeWithDepartment(Long id) {
+        EmployeeEntity employee = employeeDao.selectById(id);
+        DepartmentEntity dept = departmentDao.selectById(employee.getDepartmentId());  // ❌ Direct Dao access
+        // ...
+    }
+}
+```
+
+**Fix Steps**:
+1. Create DepartmentManager if it doesn't exist (or identify existing)
+2. Add method to Manager for the operation
+3. Update Service to use Manager
+
+```java
+// DepartmentManager (create if needed)
+@Service
+@RequiredArgsConstructor
+public class DepartmentManager {
+    private final DepartmentDao departmentDao;
+
+    @Cacheable(value = "department", key = "#id")  // Bonus: add caching
+    public DepartmentEntity getById(Long id) {
+        return departmentDao.selectById(id);
+    }
+}
+
+// Service - fixed
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+    private final DepartmentManager departmentManager;  // ✅ Through Manager
+
+    public EmployeeVO getEmployeeWithDepartment(Long id) {
+        EmployeeEntity employee = employeeDao.selectById(id);
+        DepartmentEntity dept = departmentManager.getById(employee.getDepartmentId());  // ✅ Correct
+        // ...
+    }
+}
+```
+
+#### Pattern 3: Fix SQL Injection (QueryWrapper → LambdaQueryWrapper)
+
+**Issue**: Using string-based QueryWrapper vulnerable to injection
+**File**: EmployeeService.java:89
+
+```java
+// BEFORE (SQL injection risk)
+public List<EmployeeEntity> searchByName(String name) {
+    QueryWrapper<EmployeeEntity> wrapper = new QueryWrapper<>();
+    wrapper.like("name", name);  // ❌ String-based, type unsafe
+    return employeeDao.selectList(wrapper);
+}
+```
+
+**Fix**:
+```java
+// AFTER (Type-safe)
+public List<EmployeeEntity> searchByName(String name) {
+    LambdaQueryWrapper<EmployeeEntity> wrapper = Wrappers.<EmployeeEntity>lambdaQuery()
+        .like(StringUtils.isNotBlank(name), EmployeeEntity::getName, name);  // ✅ Type-safe
+    return employeeDao.selectList(wrapper);
+}
+```
+
+#### Pattern 4: Fix N+1 Query Problem
+
+**Issue**: Loading related entities in a loop
+**File**: DepartmentService.java:67
+
+```java
+// BEFORE (N+1 problem)
+public List<DepartmentVO> listWithEmployeeCounts() {
+    List<DepartmentEntity> departments = departmentDao.selectList(null);
+    List<DepartmentVO> result = new ArrayList<>();
+
+    for (DepartmentEntity dept : departments) {
+        DepartmentVO vo = SmartBeanUtil.copy(dept, DepartmentVO.class);
+        // N queries - one per department!
+        Long count = employeeDao.selectCount(
+            Wrappers.<EmployeeEntity>lambdaQuery()
+                .eq(EmployeeEntity::getDepartmentId, dept.getId())
+        );
+        vo.setEmployeeCount(count);
+        result.add(vo);
+    }
+    return result;
+}
+```
+
+**Fix - Batch Query**:
+```java
+// AFTER (Single batch query)
+public List<DepartmentVO> listWithEmployeeCounts() {
+    List<DepartmentEntity> departments = departmentDao.selectList(null);
+
+    // Batch fetch all employee counts in ONE query
+    List<Long> deptIds = departments.stream()
+        .map(DepartmentEntity::getId)
+        .collect(Collectors.toList());
+
+    // Custom query method in EmployeeDao
+    Map<Long, Long> countMap = employeeDao.countByDepartmentIds(deptIds);
+
+    // Map results
+    return departments.stream()
+        .map(dept -> {
+            DepartmentVO vo = SmartBeanUtil.copy(dept, DepartmentVO.class);
+            vo.setEmployeeCount(countMap.getOrDefault(dept.getId(), 0L));
+            return vo;
+        })
+        .collect(Collectors.toList());
+}
+
+// Add to EmployeeDao.java
+@Mapper
+public interface EmployeeDao extends BaseMapper<EmployeeEntity> {
+    @Select("SELECT department_id, COUNT(*) as count FROM t_employee WHERE department_id IN "
+        + "<foreach item='id' collection='deptIds' open='(' separator=',' close=')'>"
+        + "#{id}"
+        + "</foreach> "
+        + "GROUP BY department_id")
+    Map<Long, Long> countByDepartmentIds(@Param("deptIds") List<Long> deptIds);
+}
+```
+
+### Fix Mode Communication
+
+When fixing issues, provide clear updates:
+
+```markdown
+## Fixing Issues
+
+### Issue CR-001: SQL Injection in EmployeeService.search()
+**Status**: ✅ Fixed
+**Changes**:
+- Converted QueryWrapper to LambdaQueryWrapper in EmployeeService.java:89
+- Replaced string-based column reference with method reference
+**Verification**: Code compiles, follows SmartAdmin patterns
+
+### Issue AR-001: Service bypassing Manager layer
+**Status**: ✅ Fixed
+**Changes**:
+- Created EmployeeManager.java with @Transactional method
+- Updated EmployeeService to call EmployeeManager instead of direct Dao
+- Added @Cacheable annotation to Manager for performance
+**Verification**: ArchitectureTest should now pass
+
+### Issue CR-002: N+1 query in DepartmentService
+**Status**: ⚠️ Needs Discussion
+**Reason**: Requires custom SQL query in EmployeeDao. Need to verify if we should:
+1. Add custom @Select method to Dao (simple but adds SQL)
+2. Use MyBatis XML mapper (more complex but separates SQL)
+**Recommendation**: Option 1 for simplicity, can refactor later if needed
+```
+
+### Handling Unfixable Issues
+
+If you encounter an issue you cannot fix automatically:
+
+```markdown
+## Cannot Auto-Fix: Issue AR-003
+
+**Issue**: Complex transaction boundary spanning multiple services
+**Reason**: Requires architectural decision on transaction scope
+**Context**: EmployeeService.createWithPermissions() calls both RoleService and PermissionService within a transaction. Unclear which service should own the transaction.
+
+**Options**:
+1. Create EmployeePermissionManager to own the cross-cutting transaction
+2. Use distributed transaction (overkill for this case)
+3. Accept eventual consistency with compensation logic
+
+**Recommendation**: Option 1 - create Manager layer component
+**User Input Needed**: Confirm preferred approach before implementing
+```
+
+### After Fixing
+
+After you fix issues, the hooks system will:
+1. Run spotlessApply (reformat code)
+2. Run ArchitectureTest (validate architecture)
+3. Re-run code-reviewer (check if issues resolved)
+4. Re-run architect-reviewer (check architecture)
+
+If issues remain, you'll be invoked again (up to max 3 times).
+
+### Success Criteria
+
+A fix is successful when:
+- ✅ Code compiles without errors
+- ✅ ArchitectureTest passes
+- ✅ Reviewers report no issues (or only minor suggestions)
+- ✅ No new issues introduced
+- ✅ Follows SmartAdmin patterns strictly
+
+### Documentation
+
+After successful fixes, the hooks system will automatically invoke documentation-generator:technical-writer to record the fixed issues as new rules in `.claude/shared/knowledge/quality-standards.md`.
+
+You don't need to document the fixes manually - focus on making correct, clean fixes that follow patterns.

@@ -340,6 +340,48 @@ Scopes: `sa-admin`, `sa-base`, `sa-common`
 - ❌ Obvious code (self-documenting)
 - ❌ Redundant comments
 
+## Discovered Rules (Hook-Generated)
+
+This section is automatically maintained by the hooks system when issues are discovered and fixed. These rules represent real issues found in the codebase and their solutions, serving as a knowledge base for the team.
+
+**How This Works**:
+1. code-reviewer and architect-reviewer find issues
+2. java-architect fixes them
+3. Hooks system records successful fixes here
+4. Rules accumulate over time, improving code quality
+
+**Format**: Each rule follows this template:
+
+### Rule: [Rule Name]
+- **Discovered**: [Date]
+- **Severity**: [Critical/Major/Minor]
+- **Category**: [Architecture/Security/Performance/Code Quality]
+- **Issue ID**: [CR-XXX or AR-XXX]
+- **Anti-Pattern**:
+  ```java
+  // Bad example that was found
+  ```
+- **Correct Pattern**:
+  ```java
+  // Good example after fix
+  ```
+- **Rationale**: Why this rule exists
+- **References**: Related sections in other docs
+
+---
+
+**Note**: Rules below this line are automatically generated. Manual edits may be overwritten by hooks system.
+
+---
+
+<!-- AUTO-GENERATED RULES START -->
+
+_No rules have been auto-generated yet. Rules will appear here after the first java-architect auto-fix cycle._
+
+<!-- AUTO-GENERATED RULES END -->
+
+---
+
 ## References
 
 - **Alibaba Java Coding Guidelines**: See `.agent/rules/01-naming-conventions.md`
