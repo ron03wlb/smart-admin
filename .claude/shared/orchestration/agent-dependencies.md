@@ -792,6 +792,468 @@ devops-engineer (deploy)
 | **code-reviewer** | java-architect, vue-expert | java-architect, vue-expert (for fixes) | architect-reviewer, postgres-pro |
 | **chaos-engineer** | All technical | All technical | - |
 
+## Collaboration Troubleshooting Guide
+
+### Common Handoff Issues and Solutions
+
+#### Issue 1: API Contract Mismatch (Backend ↔ Frontend)
+
+**Symptoms**:
+- Frontend receives 400 Bad Request errors
+- Field name mismatches (e.g., `employeeName` vs `employee_name`)
+- Type mismatches (string vs number)
+- Date format inconsistencies
+
+**Root Causes**:
+- DTO field names differ from TypeScript interface properties
+- Enum values don't match exactly
+- Pagination parameter names inconsistent
+- Date serialization format differs
+
+**Prevention**:
+- java-architect provides exact JSON samples (copy-paste ready)
+- vue-expert validates against Swagger docs before implementation
+- Use SmartAdmin patterns: `pageNum`, `pageSize` (not `page`, `size`)
+- Date format: Always ISO 8601 (`yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`)
+
+**Resolution** (4-step fix):
+1. **java-architect**: Provide sample JSON for request/response
+   ```json
+   {
+     "employeeName": "John Doe",
+     "departmentId": 123,
+     "hireDate": "2024-01-15T00:00:00.000Z"
+   }
+   ```
+2. **vue-expert**: Compare TypeScript interface with JSON
+3. **Identify mismatch**: Document exact differences
+4. **Align**: Update either backend DTO or frontend interface (prefer backend as source of truth)
+
+---
+
+#### Issue 2: Permission String Mismatch
+
+**Symptoms**:
+- User gets 403 Forbidden despite having correct role
+- `v-privilege` directive doesn't hide UI elements
+- Sa-Token throws permission denied
+
+**Root Cause**:
+- Frontend uses `v-privilege="employee:add"`
+- Backend requires `@SaCheckPermission("system:employee:add")`
+- Missing `system:` prefix in frontend
+
+**Prevention**:
+- java-architect documents **exact** permission strings in handoff package
+- vue-expert copies permission strings **verbatim** (no modifications)
+- Backend provides constants: `public static final String PERMISSION = "system:employee:add";`
+
+**Resolution**:
+1. **java-architect**: Extract all `@SaCheckPermission` strings from controllers
+2. **java-architect**: Provide list in handoff package:
+   ```markdown
+   ### Permission Strings
+   - Add Employee: `system:employee:add`
+   - Edit Employee: `system:employee:edit`
+   - Delete Employee: `system:employee:delete`
+   - Query Employees: `system:employee:query`
+   ```
+3. **vue-expert**: Use exact strings in `v-privilege` directives
+4. **Test**: Verify permissions work end-to-end
+
+---
+
+#### Issue 3: Pagination Parameter Inconsistency
+
+**Symptoms**:
+- Frontend sends `page` but backend expects `pageNum`
+- Backend returns wrong page
+- Pagination controls don't work
+
+**Root Cause**:
+- Not following SmartAdmin pagination standard
+
+**SmartAdmin Standard**:
+- **Always** use `pageNum` and `pageSize` (never `page`, `size`, `offset`, `limit`)
+- Backend: `PageParam` base class with `pageNum`, `pageSize`
+- Frontend: Send `pageNum`, `pageSize` in query params
+
+**Prevention**:
+- Use `SmartPageUtil.convert2PageQuery(form)` in backend
+- Use consistent naming in frontend API calls
+
+**Resolution**:
+1. **java-architect**: Verify `QueryForm` extends `PageParam`
+2. **vue-expert**: Update API call to use `pageNum`, `pageSize`
+3. **Test**: Verify pagination works across pages
+
+---
+
+#### Issue 4: Blocked Waiting for Handoff
+
+**Symptoms**:
+- Agent waiting for another agent to complete work
+- Work stalled, no progress
+- Uncertainty about when work will be ready
+
+**Root Causes**:
+- Previous agent taking longer than expected
+- Unclear handoff timeline
+- No communication about delays
+
+**Prevention**:
+- Agree on handoff timeline upfront
+- Communicate delays immediately
+- Consider partial handoffs (e.g., API contract before full implementation)
+
+**Resolution**:
+1. **Waiting agent**: Ask for status update
+2. **Blocking agent**: Provide realistic ETA or partial handoff
+3. **Options**:
+   - **Partial handoff**: Share API contract, let frontend mock API
+   - **Parallel work**: Work on independent parts while waiting
+   - **Escalate**: If blocked >4 hours, escalate to business-analyst
+
+---
+
+#### Issue 5: Reviewers Overwhelmed with Context
+
+**Symptoms**:
+- code-reviewer asks many clarification questions
+- Review takes much longer than expected
+- Reviewer misses important context
+
+**Root Causes**:
+- PR description lacks context
+- No design docs provided
+- Test results not shared
+- Changes too large (>500 lines)
+
+**Prevention**:
+- Provide complete handoff package to code-reviewer:
+  - PR description with context
+  - Link to requirements/design docs
+  - Test results (all passing)
+  - Screenshots/demo for UI changes
+  - Performance metrics (if applicable)
+
+**Resolution**:
+1. **Developer**: Create comprehensive PR description using template (see below)
+2. **code-reviewer**: Has all context needed, reviews efficiently
+3. **If PR too large**: Break into smaller PRs (recommended: <300 lines per PR)
+
+---
+
+### Collaboration Communication Templates
+
+#### Template 1: Handoff Notification
+
+```markdown
+### Handoff from [Agent A] to [Agent B]
+
+**Task**: [Description of completed work]
+
+**What's Complete**:
+- ✅ [Deliverable 1]
+- ✅ [Deliverable 2]
+- ✅ [Deliverable 3]
+
+**Handoff Package**:
+- [Link to code/branch/commit]
+- [Link to documentation]
+- [Link to Swagger/API docs if applicable]
+
+**What You Need to Do**:
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+**Expected Output**:
+- [Deliverable 1]
+- [Deliverable 2]
+
+**Blocked On**: None | [Blocker description if applicable]
+
+**Questions**:
+- [Question 1 if clarification needed]
+- [Question 2 if clarification needed]
+
+**Estimated Effort**: [e.g., 3-5 hours] (optional)
+```
+
+**Example Usage**:
+```markdown
+### Handoff from java-architect to vue-expert
+
+**Task**: Employee management backend API implementation
+
+**What's Complete**:
+- ✅ REST API endpoints (CRUD operations)
+- ✅ Service + Manager + Dao layers
+- ✅ Unit tests (92% coverage)
+- ✅ Integration tests passing
+- ✅ Swagger documentation
+
+**Handoff Package**:
+- Branch: `feature/employee-management-backend`
+- Swagger: http://localhost:1024/swagger-ui.html#/employee-controller
+- Sample JSON: See attached employee-api-samples.json
+- Permission strings:
+  - Add: `system:employee:add`
+  - Edit: `system:employee:edit`
+  - Delete: `system:employee:delete`
+  - Query: `system:employee:query`
+
+**What You Need to Do**:
+1. Create employee list page with table, filters, pagination
+2. Create employee add/edit form with validation
+3. Integrate with backend API
+4. Add permission directives using exact permission strings above
+
+**Expected Output**:
+- Employee management UI in `smart-admin-web/src/views/employee/`
+- Components: EmployeeList.vue, EmployeeForm.vue
+- API integration using provided endpoints
+- Frontend tests passing
+
+**Blocked On**: None
+
+**Questions**:
+- Should we support bulk operations (multi-select + bulk delete)?
+```
+
+---
+
+#### Template 2: Blocking Issue Escalation
+
+```markdown
+### 🚨 BLOCKER: [Issue Title]
+
+**Impact**: [Who is blocked / what work is blocked]
+
+**Root Cause**: [Why we're blocked]
+
+**Options**:
+- **Option A**: [Description]
+  - Pros: [Pros]
+  - Cons: [Cons]
+  - Effort: [Estimate]
+
+- **Option B**: [Description]
+  - Pros: [Pros]
+  - Cons: [Cons]
+  - Effort: [Estimate]
+
+- **Option C**: [Description]
+  - Pros: [Pros]
+  - Cons: [Cons]
+  - Effort: [Estimate]
+
+**Recommendation**: [Preferred option with rationale]
+
+**Decision Needed From**: [Stakeholder]
+
+**Urgency**: Critical / High / Medium / Low
+
+**Timeline**: [When decision is needed]
+```
+
+**Example Usage**:
+```markdown
+### 🚨 BLOCKER: API Contract Incompatible with Frontend Requirements
+
+**Impact**: vue-expert blocked on employee management implementation
+
+**Root Cause**: Backend pagination returns `total` as number, but frontend table component requires `{ total, pages, current }` object
+
+**Options**:
+- **Option A**: Change backend DTO to return pagination object
+  - Pros: Frontend gets all needed info
+  - Cons: Breaking change for existing frontend code
+  - Effort: 2 hours (backend change + update existing frontend)
+
+- **Option B**: Frontend transforms backend response
+  - Pros: No backend changes
+  - Cons: Frontend duplication (every API call needs transformation)
+  - Effort: 1 hour (create utility function)
+
+- **Option C**: Adopt SmartAdmin standard `PageResult<T>` format
+  - Pros: Consistent with SmartAdmin patterns, reusable
+  - Cons: Requires backend change
+  - Effort: 1.5 hours (backend change + utility function)
+
+**Recommendation**: Option C - Adopt SmartAdmin `PageResult<T>` format
+- Rationale: Follows SmartAdmin conventions, most maintainable long-term
+
+**Decision Needed From**: java-architect
+
+**Urgency**: High (vue-expert blocked)
+
+**Timeline**: Decision needed within 2 hours to avoid delaying frontend work
+```
+
+---
+
+#### Template 3: Multi-Agent Sync Request
+
+```markdown
+### Sync Request: [Topic]
+
+**Participants**: @[agent-1] @[agent-2] @[agent-3]
+
+**Purpose**: [Why we need to sync]
+
+**Discussion Points**:
+1. [Point 1]
+2. [Point 2]
+3. [Point 3]
+
+**Desired Outcome**:
+- [Goal 1]
+- [Goal 2]
+
+**Duration**: [Expected sync time, e.g., 30 min]
+
+**Proposed Time**: [When to sync, if applicable]
+```
+
+**Example Usage**:
+```markdown
+### Sync Request: Employee Performance Review API Design
+
+**Participants**: @business-analyst @java-architect @vue-expert
+
+**Purpose**: Align on API contract before implementation to avoid rework
+
+**Discussion Points**:
+1. What fields should be in the review form?
+2. How do we handle multi-step approval workflow?
+3. What permission granularity (view vs edit vs approve)?
+4. Do we need file attachments?
+
+**Desired Outcome**:
+- Agreed API contract (endpoints, DTOs, permissions)
+- Documented approval workflow
+- Clear handoff packages defined
+
+**Duration**: 30-45 minutes
+
+**Proposed Time**: Next available window for all three agents
+```
+
+---
+
+### Handoff Quality Checklists
+
+#### java-architect → vue-expert
+
+**Checklist for java-architect**:
+- [ ] Backend tests passing (run `./gradlew :sa-admin:test`)
+- [ ] Swagger documentation accessible (http://localhost:1024/swagger-ui.html)
+- [ ] Sample JSON provided for each endpoint (request + response)
+- [ ] Permission strings documented (exact format for `v-privilege`)
+- [ ] Error codes and messages documented
+- [ ] Test data created in database (or SQL script provided)
+- [ ] Backend running and accessible (dev environment or localhost)
+
+**Checklist for vue-expert** (before starting):
+- [ ] Swagger docs reviewed and understood
+- [ ] Sample JSON compared with TypeScript interfaces
+- [ ] Permission strings copied to frontend constants
+- [ ] Test data accessible (can call API endpoints successfully)
+- [ ] API contract questions resolved with java-architect
+
+---
+
+#### vue-expert → devops-engineer
+
+**Checklist for vue-expert**:
+- [ ] Frontend tests passing (run `npm run test`)
+- [ ] TypeScript type checking clean (run `npm run type-check`)
+- [ ] Build succeeds (run `npm run build`)
+- [ ] API integration tested (all endpoints work end-to-end)
+- [ ] Browser console clean (no errors or warnings)
+- [ ] Responsive design validated (mobile, tablet, desktop)
+- [ ] Accessibility validated (keyboard navigation, screen readers)
+
+**Checklist for devops-engineer** (before deploying):
+- [ ] Build artifacts generated successfully
+- [ ] Environment variables documented
+- [ ] Dependencies compatible with production
+- [ ] Smoke tests defined for deployment validation
+
+---
+
+#### devops-engineer → chaos-engineer
+
+**Checklist for devops-engineer**:
+- [ ] Deployed to staging and healthy (health check passing)
+- [ ] Smoke tests passing (basic functionality works)
+- [ ] Monitoring dashboards configured (metrics, logs, traces)
+- [ ] Rollback procedure tested and documented
+- [ ] Production deployment plan ready
+
+**Checklist for chaos-engineer** (before starting):
+- [ ] Staging environment accessible
+- [ ] Monitoring accessible (to observe failures)
+- [ ] Rollback procedure understood
+- [ ] Failure scenarios defined and prioritized
+
+---
+
+### Escalation Paths
+
+#### When to Escalate to business-analyst
+
+Escalate when:
+- ❗ Requirements unclear or ambiguous
+- ❗ Business logic questions arise during implementation
+- ❗ Conflicting requirements discovered
+- ❗ Scope creep detected
+- ❗ Stakeholder decision needed
+
+**How to escalate**:
+1. Document the ambiguity/conflict clearly
+2. Provide context (what you're trying to implement)
+3. List questions or options
+4. Tag business-analyst with Template 2 (Blocking Issue Escalation)
+
+---
+
+#### When to Escalate to architect-reviewer
+
+Escalate when:
+- ❗ Significant architectural decision required
+- ❗ Design patterns unclear or conflicting
+- ❗ Scalability concerns
+- ❗ Technical debt tradeoffs needed
+- ❗ Cross-cutting concerns (security, performance) require design
+
+**How to escalate**:
+1. Describe the architectural challenge
+2. Provide context (current design, constraints)
+3. List architectural options with pros/cons
+4. Tag architect-reviewer with Template 2 (Blocking Issue Escalation)
+
+---
+
+#### When to Escalate to code-reviewer
+
+Escalate when:
+- ❗ Code quality concerns during implementation
+- ❗ Security vulnerabilities discovered
+- ❗ Performance issues detected
+- ❗ Architectural violations in existing code
+- ❗ Need pre-merge review guidance
+
+**How to escalate**:
+1. Describe the code quality/security/performance issue
+2. Provide file paths and line numbers
+3. Ask for recommended approach
+4. Tag code-reviewer with clear question
+
+---
+
 ## Summary
 
 **Key Principles:**

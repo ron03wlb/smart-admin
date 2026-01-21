@@ -52,7 +52,7 @@ This directory contains a sophisticated agent configuration system with:
 └── settings.local.json       # Permissions
 ```
 
-## Available Agents (8)
+## Available Agents (9)
 
 | Agent | Purpose | Model | Use When |
 |-------|---------|-------|----------|
@@ -64,6 +64,7 @@ This directory contains a sophisticated agent configuration system with:
 | [postgres-pro](agents/postgres-pro.md) | PostgreSQL expert | opus | Database optimization |
 | [architect-reviewer](agents/architect-reviewer.md) | Architecture review | opus | Design validation, scalability |
 | [code-reviewer](agents/code-reviewer.md) | Code quality review | opus | Pre-merge review, quality gate |
+| [documentation-engineer](agents/documentation-engineer.md) | Documentation creation | opus | API docs, architecture guides |
 
 ## How to Use
 
@@ -81,6 +82,9 @@ Agents are invoked automatically by Claude Code based on task context using the 
 
 ## Documentation
 
+- **[Agent Capability Matrix](docs/agent-capability-matrix.md)** - Visual agent comparison and selection guide
+- **[Troubleshooting Guide](docs/troubleshooting-guide.md)** - Self-service problem resolution
+- **[Hooks Guide](docs/hooks-guide.md)** - Hook system and custom hook development
 - **[Maintenance Guide](docs/maintenance-guide.md)** - How to update and maintain configuration
 - **[Changelog](docs/changelog.md)** - Version history and changes
 - **[Permission Guide](docs/permission-guide.md)** - Permission system rationale
@@ -91,7 +95,7 @@ Agents are invoked automatically by Claude Code based on task context using the 
 
 | Metric | v1.0.0 | v2.3.0 | Improvement |
 |--------|--------|--------|-------------|
-| Agent count | 5 | 8 | +60% |
+| Agent count | 5 | 9 | +80% |
 | Duplication | 55% | <10% | 82% reduction |
 | Permissions | 58 patterns | 12 patterns | 79% consolidation |
 | Maintenance time | 50 min | 5 min | 90% faster |
@@ -179,7 +183,7 @@ See [workflow-patterns.md](shared/orchestration/workflow-patterns.md) for detail
 
 ### Quality Metrics (v2.3.0)
 
-✅ **Agent Integration**: 8/8 complete (100%)
+✅ **Agent Integration**: 9/9 complete (100%)
 ✅ **Duplication**: <10% across all agents
 ✅ **Orchestration**: 10 workflow patterns documented
 ✅ **Documentation**: 100% complete
@@ -191,7 +195,7 @@ See [workflow-patterns.md](shared/orchestration/workflow-patterns.md) for detail
 ```bash
 # Check agent count
 ls -1 .claude/agents/*.md | wc -l
-# Expected output: 8
+# Expected output: 9
 
 # Verify shared knowledge exists
 ls -1 .claude/shared/knowledge/*.md | wc -l

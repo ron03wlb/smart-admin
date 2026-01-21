@@ -554,6 +554,844 @@ If you encounter bugs or have suggestions:
 
 3. Report to team with above information
 
+## Custom Hook Development
+
+### Understanding Hook Architecture
+
+#### Hook Lifecycle
+
+```mermaid
+graph TD
+    A[Git Operation Triggered] --> B[Hook Enabled?]
+    B -->|No| C[Skip Hook]
+    B -->|Yes| D[Execute Hook Steps Sequentially]
+    D --> E[Step 1: Command or Agent]
+    E --> F[Success?]
+    F -->|No| G[Auto-Fix Enabled?]
+    G -->|Yes| H[Attempt Auto-Fix]
+    G -->|No| I[Hook Failed]
+    H --> J[Fix Successful?]
+    J -->|Yes| K[Continue to Next Step]
+    J -->|No| L[Retry or Fail]
+    F -->|Yes| K
+    K --> M[More Steps?]
+    M -->|Yes| D
+    M -->|No| N[All Steps Complete]
+    N --> O[Hook Succeeded]
+    C --> P[Continue Git Operation]
+    O --> P
+    I --> Q[Block Git Operation]
+```
+
+#### When Hooks Execute
+
+**Git Pre-Commit Hook**:
+- Triggers: `git commit`
+- Executes: Before commit is created
+- Can block: Yes (commit fails if hook fails)
+- Use for: Code quality, formatting, linting
+
+**Git Pre-Push Hook**:
+- Triggers: `git push`
+- Executes: Before push to remote
+- Can block: Yes (push fails if hook fails)
+- Use for: Integration tests, security scans
+
+**Post-Agent-Completion Hook**:
+- Triggers: Agent completes task
+- Executes: After agent finishes work
+- Can block: No (advisory only)
+- Use for: Quality checks, documentation validation
+
+#### Hook Step Types
+
+**Type 1: Command Step**
+```json
+{
+  "name": "format-check",
+  "type": "command",
+  "command": "./gradlew spotlessCheck",
+  "timeout": 60000,
+  "continueOnError": false
+}
+```
+
+**Type 2: Agent Step**
+```json
+{
+  "name": "code-review",
+  "type": "agent",
+  "agent": "code-reviewer",
+  "prompt": "Review changes for quality issues",
+  "autoFix": true,
+  "maxAttempts": 3
+}
+```
+
+**Type 3: Conditional Step** (Planned)
+```json
+{
+  "name": "integration-tests",
+  "type": "command",
+  "command": "./gradlew integrationTest",
+  "condition": "changedFiles.some(f => f.includes('/controller/'))"
+}
+```
+
+---
+
+### Creating Custom Hooks
+
+#### Use Case 1: Add Security Scanning Hook
+
+**Goal**: Scan dependencies for known vulnerabilities before commit
+
+**Step 1: Configure OWASP Dependency Check**
+
+```groovy
+// build.gradle
+
+plugins {
+    id 'org.owasp.dependencycheck' version '8.4.0'
+}
+
+dependencyCheck {
+    autoUpdate = true
+    format = 'JSON'
+    outputDirectory = 'build/reports/dependency-check'
+    failBuildOnCVSS = 7  // Fail on HIGH and CRITICAL
+}
+```
+
+**Step 2: Add Hook to settings.local.json**
+
+```json
+{
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "steps": [
+        {
+          "name": "dependency-security-scan",
+          "type": "command",
+          "command": "./gradlew dependencyCheckAnalyze",
+          "timeout": 300000,
+          "continueOnError": false,
+          "description": "Scan dependencies for known vulnerabilities"
+        }
+      ]
+    }
+  }
+}
+```
+
+**Step 3: Test the Hook**
+
+```bash
+# Test manually first
+./gradlew dependencyCheckAnalyze
+
+# Check report
+cat build/reports/dependency-check/dependency-check-report.json
+
+# Test hook execution
+echo "test" >> README.md
+git add README.md
+git commit -m "test: verify security scan hook"
+
+# Expected: Hook executes security scan before commit
+```
+
+**Full Working Example**:
+
+```json
+// .claude/settings.local.json
+
+{
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "timeout": 600000,
+      "steps": [
+        // Existing steps...
+        {
+          "name": "format-check",
+          "type": "command",
+          "command": "./gradlew spotlessCheck",
+          "timeout": 60000
+        },
+
+        // NEW: Security scan
+        {
+          "name": "dependency-security-scan",
+          "type": "command",
+          "command": "./gradlew dependencyCheckAnalyze",
+          "timeout": 300000,
+          "continueOnError": false,
+          "description": "OWASP dependency check for vulnerabilities",
+          "notification": {
+            "onFailure": "Security vulnerabilities detected. Review build/reports/dependency-check/"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
+#### Use Case 2: Add Custom Linting Hook
+
+**Goal**: Validate SmartAdmin-specific patterns before commit
+
+**Step 1: Create Validation Script**
+
+```bash
+#!/bin/bash
+# File: .claude/scripts/validate-smartadmin-patterns.sh
+
+echo "Validating SmartAdmin patterns..."
+
+VIOLATIONS=0
+
+# Check 1: @TableName annotations
+echo "Checking @TableName annotations..."
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "Entity.java$")
+for FILE in $FILES; do
+    if ! grep -q "@TableName" "$FILE"; then
+        echo "❌ $FILE: Missing @TableName annotation"
+        VIOLATIONS=$((VIOLATIONS + 1))
+    fi
+done
+
+# Check 2: ResponseDTO usage
+echo "Checking ResponseDTO usage in controllers..."
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "Controller.java$")
+for FILE in $FILES; do
+    # Check if public methods return ResponseDTO
+    NON_RESPONSEDTO=$(grep -n "public.*{" "$FILE" | grep -v "ResponseDTO" | grep -v "void" | wc -l)
+    if [ "$NON_RESPONSEDTO" -gt 0 ]; then
+        echo "⚠️  $FILE: Some methods may not return ResponseDTO"
+        VIOLATIONS=$((VIOLATIONS + 1))
+    fi
+done
+
+# Check 3: @Transactional placement
+echo "Checking @Transactional in Manager layer only..."
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "Service.java$")
+for FILE in $FILES; do
+    if grep -q "@Transactional" "$FILE"; then
+        echo "❌ $FILE: @Transactional found in Service layer (should be Manager layer only)"
+        VIOLATIONS=$((VIOLATIONS + 1))
+    fi
+done
+
+# Check 4: @Autowired field injection (anti-pattern)
+echo "Checking for @Autowired field injection..."
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep ".java$")
+for FILE in $FILES; do
+    AUTOWIRED_FIELDS=$(grep -c "^[[:space:]]*@Autowired[[:space:]]*$" "$FILE" 2>/dev/null || echo 0)
+    if [ "$AUTOWIRED_FIELDS" -gt 0 ]; then
+        echo "❌ $FILE: Uses @Autowired field injection (use constructor injection)"
+        VIOLATIONS=$((VIOLATIONS + 1))
+    fi
+done
+
+# Summary
+echo ""
+echo "===================================="
+if [ "$VIOLATIONS" -eq 0 ]; then
+    echo "✅ All SmartAdmin pattern checks passed"
+    exit 0
+else
+    echo "❌ Found $VIOLATIONS SmartAdmin pattern violations"
+    echo "===================================="
+    exit 1
+fi
+```
+
+**Step 2: Make Script Executable**
+
+```bash
+chmod +x .claude/scripts/validate-smartadmin-patterns.sh
+```
+
+**Step 3: Add Hook Configuration**
+
+```json
+{
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "steps": [
+        {
+          "name": "smartadmin-pattern-validation",
+          "type": "command",
+          "command": "bash .claude/scripts/validate-smartadmin-patterns.sh",
+          "timeout": 30000,
+          "continueOnError": false,
+          "description": "Validate SmartAdmin coding patterns"
+        }
+      ]
+    }
+  }
+}
+```
+
+**Step 4: Test**
+
+```bash
+# Test with valid code
+git add ValidController.java
+git commit -m "test: valid patterns"
+# Expected: ✅ All checks pass
+
+# Test with invalid code (missing @TableName)
+# Create test file without @TableName
+git add InvalidEntity.java
+git commit -m "test: invalid patterns"
+# Expected: ❌ Commit blocked with violations listed
+```
+
+---
+
+#### Use Case 3: Add Performance Benchmark Hook
+
+**Goal**: Ensure new code doesn't regress performance
+
+**Step 1: Create Benchmark Script**
+
+```bash
+#!/bin/bash
+# File: .claude/scripts/performance-benchmark.sh
+
+echo "Running performance benchmarks..."
+
+# Run performance tests
+./gradlew :sa-admin:performanceTest --tests "*Benchmark*"
+
+# Extract results
+RESULTS_FILE="build/reports/performance/benchmark-results.json"
+
+if [ ! -f "$RESULTS_FILE" ]; then
+    echo "❌ Benchmark results not found"
+    exit 1
+fi
+
+# Parse results (simplified)
+CURRENT_P95=$(jq '.p95_ms' "$RESULTS_FILE")
+BASELINE_P95=100  # Baseline from previous benchmark
+
+echo "Current P95: ${CURRENT_P95}ms"
+echo "Baseline P95: ${BASELINE_P95}ms"
+
+# Check for regression (>10% slower)
+THRESHOLD=$(echo "$BASELINE_P95 * 1.10" | bc)
+
+if (( $(echo "$CURRENT_P95 > $THRESHOLD" | bc -l) )); then
+    echo "❌ Performance regression detected"
+    echo "   Current: ${CURRENT_P95}ms exceeds threshold: ${THRESHOLD}ms"
+    exit 1
+else
+    echo "✅ Performance benchmarks passed"
+    exit 0
+fi
+```
+
+**Step 2: Add Gradle Task**
+
+```groovy
+// build.gradle
+
+tasks.register('performanceTest', Test) {
+    useJUnitPlatform {
+        includeTags 'performance'
+    }
+    outputs.upToDateWhen { false }  // Always run
+}
+```
+
+**Step 3: Create Baseline**
+
+```bash
+# Run benchmarks to establish baseline
+./gradlew :sa-admin:performanceTest
+# Save results as baseline
+cp build/reports/performance/benchmark-results.json \
+   .claude/baselines/performance-baseline.json
+```
+
+**Step 4: Add Hook**
+
+```json
+{
+  "hooks": {
+    "pre-push": {
+      "enabled": true,
+      "steps": [
+        {
+          "name": "performance-benchmark",
+          "type": "command",
+          "command": "bash .claude/scripts/performance-benchmark.sh",
+          "timeout": 300000,
+          "continueOnError": false,
+          "description": "Validate performance benchmarks",
+          "notification": {
+            "onFailure": "Performance regression detected. Review benchmark report."
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
+### Hook Configuration API Reference
+
+#### settings.local.json Schema
+
+```json
+{
+  "hooks": {
+    "enabled": true,           // Global enable/disable
+
+    "pre-commit": {
+      "enabled": true,         // Hook-specific enable
+      "timeout": 600000,       // Max execution time (ms)
+
+      "steps": [
+        {
+          "name": "step-name",           // Unique identifier
+          "type": "command",             // "command" or "agent"
+          "command": "bash script.sh",   // Command to execute
+          "timeout": 60000,              // Step timeout (ms)
+          "continueOnError": false,      // Continue if fails
+          "description": "What it does", // Human-readable
+
+          "notification": {
+            "onSuccess": "Success message",
+            "onFailure": "Failure message"
+          }
+        }
+      ]
+    },
+
+    "pre-push": { /* same structure */ },
+    "post-agent-completion": { /* same structure */ },
+
+    "autoFix": {
+      "enabled": true,
+      "maxAttempts": 3,
+      "timeout": 300000,
+      "minSeverity": "minor",     // "minor", "major", "critical"
+      "agent": "java-architect"
+    },
+
+    "autoFormat": {
+      "enabled": true,
+      "formatters": {
+        "java": "./gradlew spotlessApply",
+        "javascript": "npm run format",
+        "markdown": "prettier --write"
+      }
+    },
+
+    "autoRecordRules": {
+      "enabled": true,
+      "knowledgeBase": ".claude/shared/knowledge/quality-standards.md",
+      "section": "## Automated Quality Rules"
+    },
+
+    "notifications": {
+      "enabled": true,
+      "channels": ["console", "file"],
+      "logFile": ".claude/hooks/hook-execution.log"
+    },
+
+    "issueDetection": {
+      "enabled": true,
+      "severity": {
+        "critical": ["security", "data-loss"],
+        "major": ["performance", "correctness"],
+        "minor": ["style", "convention"]
+      }
+    }
+  }
+}
+```
+
+---
+
+### Advanced Hook Patterns
+
+#### Pattern 1: Multi-Stage Validation (Fast → Slow)
+
+**Goal**: Run fast checks first, slow checks only if fast checks pass
+
+```json
+{
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "steps": [
+        // Stage 1: Fast checks (<10 seconds)
+        {
+          "name": "syntax-check",
+          "command": "./gradlew compileJava",
+          "timeout": 10000
+        },
+        {
+          "name": "format-check",
+          "command": "./gradlew spotlessCheck",
+          "timeout": 5000
+        },
+
+        // Stage 2: Medium checks (<60 seconds)
+        {
+          "name": "unit-tests",
+          "command": "./gradlew test -x integrationTest",
+          "timeout": 60000
+        },
+
+        // Stage 3: Slow checks (if previous stages pass)
+        {
+          "name": "architecture-validation",
+          "command": "./gradlew test --tests ArchitectureTest",
+          "timeout": 30000
+        },
+        {
+          "name": "code-review",
+          "type": "agent",
+          "agent": "code-reviewer",
+          "prompt": "Review for quality issues",
+          "timeout": 120000
+        }
+      ]
+    }
+  }
+}
+```
+
+**Benefits**:
+- Fail fast on simple issues
+- Don't waste time on slow checks if fast checks fail
+- Provide immediate feedback
+
+---
+
+#### Pattern 2: Conditional Hook Execution (Planned Feature)
+
+**Goal**: Run hooks based on what files changed
+
+```json
+{
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "steps": [
+        {
+          "name": "backend-tests",
+          "command": "./gradlew :sa-admin:test",
+          "condition": "hasChanges('**/*.java')",
+          "timeout": 60000
+        },
+        {
+          "name": "frontend-tests",
+          "command": "npm run test",
+          "condition": "hasChanges('smart-admin-web/**/*')",
+          "timeout": 60000
+        },
+        {
+          "name": "database-migration-validation",
+          "command": "./gradlew flywayValidate",
+          "condition": "hasChanges('**/db/migration/**')",
+          "timeout": 30000
+        }
+      ]
+    }
+  }
+}
+```
+
+**Benefits**:
+- Run only relevant hooks
+- Faster execution
+- Reduced resource usage
+
+---
+
+#### Pattern 3: Parallel Review Execution (Planned Feature)
+
+**Goal**: Run multiple reviews in parallel for speed
+
+```json
+{
+  "hooks": {
+    "post-agent-completion": {
+      "enabled": true,
+      "parallelSteps": [
+        {
+          "name": "code-quality-review",
+          "type": "agent",
+          "agent": "code-reviewer",
+          "prompt": "Review for code quality"
+        },
+        {
+          "name": "architecture-review",
+          "type": "agent",
+          "agent": "architect-reviewer",
+          "prompt": "Review for architecture"
+        },
+        {
+          "name": "security-review",
+          "type": "agent",
+          "agent": "code-reviewer",
+          "prompt": "Review for security issues"
+        }
+      ],
+      "waitForAll": true,
+      "timeout": 300000
+    }
+  }
+}
+```
+
+**Benefits**:
+- 3x faster than sequential (if independent)
+- Comprehensive review coverage
+- Efficient resource usage
+
+---
+
+### Hook Error Handling
+
+#### Error Codes
+
+| Code Range | Meaning | Example |
+|------------|---------|---------|
+| 0 | Success | All checks passed |
+| 1-99 | Command failed | Test failures, linting errors |
+| 100-199 | Agent invocation error | Agent timeout, agent not found |
+| 200-299 | Configuration error | Invalid JSON, missing files |
+| 300-399 | System error | Out of memory, disk full |
+
+#### Retry Strategy (Future Feature)
+
+```json
+{
+  "hooks": {
+    "autoFix": {
+      "enabled": true,
+      "retryStrategy": {
+        "maxAttempts": 3,
+        "backoff": "exponential",
+        "initialDelay": 1000,
+        "maxDelay": 10000
+      }
+    }
+  }
+}
+```
+
+---
+
+### Debugging Hooks
+
+#### Enable Verbose Logging
+
+```json
+{
+  "hooks": {
+    "debug": {
+      "enabled": true,
+      "verbose": true,
+      "logLevel": "debug",
+      "logFile": ".claude/hooks/debug.log"
+    }
+  }
+}
+```
+
+#### Dry Run Mode (Future Feature)
+
+```bash
+# Test hooks without executing
+claude-code hooks --dry-run
+
+# Output shows what would execute
+Hook: pre-commit
+  Step 1: format-check [WOULD RUN: ./gradlew spotlessCheck]
+  Step 2: unit-tests [WOULD RUN: ./gradlew test]
+```
+
+#### Manual Hook Execution (Future Feature)
+
+```bash
+# Run specific hook manually
+claude-code hooks run pre-commit
+
+# Run specific step
+claude-code hooks run pre-commit --step format-check
+```
+
+---
+
+### Hook Performance Metrics
+
+#### Track Execution Time
+
+```json
+{
+  "hooks": {
+    "metrics": {
+      "enabled": true,
+      "outputFile": ".claude/hooks/metrics.json",
+      "format": "json"
+    }
+  }
+}
+```
+
+#### Metrics Output Format
+
+```json
+{
+  "hookName": "pre-commit",
+  "executionDate": "2026-01-21T10:30:00Z",
+  "totalDuration": 45000,
+  "steps": [
+    {
+      "name": "format-check",
+      "duration": 5000,
+      "status": "success"
+    },
+    {
+      "name": "unit-tests",
+      "duration": 35000,
+      "status": "success"
+    },
+    {
+      "name": "code-review",
+      "duration": 5000,
+      "status": "success"
+    }
+  ]
+}
+```
+
+#### Performance Analysis
+
+```bash
+# Analyze hook performance over time
+cat .claude/hooks/metrics.json | jq '[.steps[] | {name, avgDuration: .duration}]'
+
+# Identify slow steps
+cat .claude/hooks/metrics.json | jq '.steps | sort_by(.duration) | reverse'
+```
+
+---
+
+### Best Practices
+
+#### DO ✅
+
+1. **Test Hooks Independently**
+   ```bash
+   # Test script directly before adding to hook
+   bash .claude/scripts/validate-patterns.sh
+
+   # Verify exit codes
+   echo $?  # Should be 0 for success
+   ```
+
+2. **Set Appropriate Timeouts**
+   ```json
+   // Fast checks: 5-10 seconds
+   { "name": "lint", "timeout": 10000 }
+
+   // Unit tests: 30-60 seconds
+   { "name": "test", "timeout": 60000 }
+
+   // Integration tests: 2-5 minutes
+   { "name": "integration-test", "timeout": 300000 }
+   ```
+
+3. **Provide Clear Error Messages**
+   ```bash
+   # GOOD:
+   echo "❌ Found 5 violations in EmployeeController.java:
+      - Line 23: Missing @SaCheckPermission
+      - Line 45: Non-ResponseDTO return type"
+
+   # BAD:
+   echo "Error in controller"
+   ```
+
+4. **Use Incremental Checks**
+   ```bash
+   # Check only changed files, not entire codebase
+   git diff --cached --name-only --diff-filter=ACM | grep ".java$"
+   ```
+
+5. **Document Hook Purpose**
+   ```json
+   {
+     "name": "security-scan",
+     "description": "OWASP dependency check to prevent vulnerable dependencies",
+     "rationale": "Catch security issues before they reach production"
+   }
+   ```
+
+#### DON'T ❌
+
+1. **Don't Create Untested Hooks**
+   ```bash
+   # Never add hook without testing it first
+   # ALWAYS test manually before enabling
+   ```
+
+2. **Don't Make Hooks Too Slow**
+   ```bash
+   # Bad: Run full integration test suite in pre-commit
+   #      (Takes 10+ minutes, blocks commits)
+
+   # Good: Run fast unit tests in pre-commit (<60s)
+   #       Run integration tests in pre-push or CI
+   ```
+
+3. **Don't Use Hardcoded Paths**
+   ```bash
+   # Bad:
+   /Users/john/projects/smart-admin/gradlew test
+
+   # Good:
+   ./gradlew test
+   # (Relative to repository root)
+   ```
+
+4. **Don't Suppress All Errors**
+   ```json
+   // Bad: Ignores all failures
+   { "name": "test", "continueOnError": true }
+
+   // Good: Fail on critical issues
+   { "name": "test", "continueOnError": false }
+   ```
+
+5. **Don't Duplicate CI Checks**
+   ```markdown
+   Pre-commit: Fast, essential checks only
+   Pre-push: Medium checks (integration tests)
+   CI: Comprehensive checks (security, performance, full suite)
+
+   Avoid running everything everywhere (wasteful)
+   ```
+
+---
+
 ## Version History
 
 ### v2.4.0 (2026-01-21)

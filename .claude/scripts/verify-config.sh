@@ -106,6 +106,15 @@ for file in "${ORCHESTRATION_FILES[@]}"; do
         print_error "Missing: $file"
     fi
 done
+
+# Check if agent-dependencies.md has collaboration troubleshooting section (v2.6.0)
+if [ -f ".claude/shared/orchestration/agent-dependencies.md" ]; then
+    if grep -q "## Collaboration Troubleshooting Guide" ".claude/shared/orchestration/agent-dependencies.md"; then
+        print_success "agent-dependencies.md includes collaboration troubleshooting"
+    else
+        print_warning "agent-dependencies.md missing collaboration troubleshooting section"
+    fi
+fi
 echo ""
 
 echo "6. Checking for duplication..."
@@ -148,6 +157,30 @@ if [ -f ".claude/docs/OPTIMIZATION-COMPLETE.md" ]; then
     fi
 else
     print_error "OPTIMIZATION-COMPLETE.md missing"
+fi
+
+# Check for new documentation files (v2.6.0)
+if [ -f ".claude/docs/agent-capability-matrix.md" ]; then
+    print_success "agent-capability-matrix.md exists"
+else
+    print_error "agent-capability-matrix.md missing"
+fi
+
+if [ -f ".claude/docs/troubleshooting-guide.md" ]; then
+    print_success "troubleshooting-guide.md exists"
+else
+    print_error "troubleshooting-guide.md missing"
+fi
+
+if [ -f ".claude/docs/hooks-guide.md" ]; then
+    # Check if hooks guide has custom hook development section
+    if grep -q "## Custom Hook Development" ".claude/docs/hooks-guide.md"; then
+        print_success "hooks-guide.md includes custom hook development section"
+    else
+        print_warning "hooks-guide.md missing custom hook development section"
+    fi
+else
+    print_error "hooks-guide.md missing"
 fi
 echo ""
 
