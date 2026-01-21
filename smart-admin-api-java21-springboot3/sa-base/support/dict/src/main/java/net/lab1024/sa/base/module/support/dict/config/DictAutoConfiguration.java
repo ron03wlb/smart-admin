@@ -1,12 +1,12 @@
 package net.lab1024.sa.base.module.support.dict.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.lab1024.sa.base.module.support.dict.json.deserializer.DictDataDeserializer;
 import net.lab1024.sa.base.mybatis.config.MybatisAutoConfiguration;
 import net.lab1024.sa.base.web.config.WebAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -19,12 +19,13 @@ import org.springframework.context.annotation.Bean;
 @AutoConfigureAfter({WebAutoConfiguration.class, MybatisAutoConfiguration.class})
 public class DictAutoConfiguration {
 
-  /** Register DictDataDeserializer with Jackson ObjectMapper */
+  /** Register DictDataDeserializer with Jackson ObjectMapper via customizer pattern */
   @Bean
-  public SimpleModule dictJacksonModule(ObjectMapper objectMapper) {
-    SimpleModule module = new SimpleModule("DictModule");
-    module.addDeserializer(String.class, new DictDataDeserializer());
-    objectMapper.registerModule(module);
-    return module;
+  public Jackson2ObjectMapperBuilderCustomizer dictJacksonCustomizer() {
+    return builder -> {
+      SimpleModule module = new SimpleModule("DictModule");
+      module.addDeserializer(String.class, new DictDataDeserializer());
+      builder.modules(module);
+    };
   }
 }
