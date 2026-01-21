@@ -36,11 +36,11 @@ This document outlines a comprehensive plan to implement unit tests for SmartAdm
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| JUnit 5 (Jupiter) | Ready | Configured via spring-boot-starter-test |
-| Mockito | Ready | Available in test dependencies |
-| JaCoCo | Needs Configuration | Version 0.8.12 available |
-| Test Configuration | Ready | application.yaml with H2 database |
-| ArchUnit | Active | Architecture rules enforced |
+| JUnit 5 (Jupiter) | ✅ Ready | Configured via spring-boot-starter-test |
+| Mockito | ✅ Ready | Available in test dependencies |
+| JaCoCo | ⚠️ Needs Configuration | Version 0.8.12 available |
+| Test Configuration | ✅ Ready | application.yaml with H2 database |
+| ArchUnit | ✅ Active | Architecture rules enforced |
 
 ### Existing Test Files
 
@@ -60,7 +60,11 @@ sa-admin/src/test/java/net/lab1024/sa/admin/
 
 ## Target State
 
-### Coverage Requirements by Layer
+### Coverage Requirements
+
+→ See [Testing Strategy - Coverage Requirements](./testing-strategy.md#coverage-requirements-by-layer) for detailed targets
+
+**Summary**:
 
 | Layer | Line Coverage | Branch Coverage | Priority |
 |-------|---------------|-----------------|----------|
@@ -71,45 +75,14 @@ sa-admin/src/test/java/net/lab1024/sa/admin/
 
 ### Test Infrastructure to Create
 
-```
-sa-admin/src/test/java/net/lab1024/sa/admin/
-|-- base/                           # Test infrastructure
-|   |-- BaseServiceTest.java
-|   |-- BaseManagerTest.java
-|   |-- BaseControllerTest.java
-|-- fixture/                        # Test data builders
-|   |-- EmployeeFixture.java
-|   |-- LoginFixture.java
-|   |-- RoleFixture.java
-|   |-- DepartmentFixture.java
-|   |-- SecurityFixture.java
-|-- mock/                           # Mock configurations
-|   |-- MockSecurityConfig.java
-|-- module/                         # Test classes (mirror source structure)
-    |-- support/
-    |   |-- securityprotect/
-    |       |-- service/
-    |           |-- SecurityLoginServiceTest.java
-    |           |-- SecurityPasswordServiceTest.java
-    |-- system/
-        |-- login/
-        |   |-- service/
-        |   |   |-- LoginServiceTest.java
-        |   |-- manager/
-        |       |-- LoginManagerTest.java
-        |-- employee/
-        |   |-- service/
-        |   |   |-- EmployeeServiceTest.java
-        |   |-- manager/
-        |       |-- EmployeeManagerTest.java
-        |-- role/
-        |   |-- service/
-        |       |-- RoleServiceTest.java
-        |       |-- RoleMenuServiceTest.java
-        |-- department/
-            |-- service/
-                |-- DepartmentServiceTest.java
-```
+→ See [Testing Strategy - Test Infrastructure](./testing-strategy.md#test-infrastructure-design) for design details
+
+**Key files to create**:
+- `base/BaseServiceTest.java` - ResponseDTO assertion helpers
+- `base/BaseManagerTest.java` - DAO interaction verification helpers
+- `base/BaseControllerTest.java` - MockMvc helpers
+- `fixture/` - Test data builders (EmployeeFixture, LoginFixture, etc.)
+- `mock/MockSecurityConfig.java` - Centralized mock configurations
 
 ---
 
@@ -117,20 +90,22 @@ sa-admin/src/test/java/net/lab1024/sa/admin/
 
 ### Phase 0: Architecture Fixes (Days 1-2)
 
-> **Prerequisite**: Must complete before writing tests
+> **Prerequisite**: MUST complete before writing tests
 
-| Violation | Location | Fix Required |
-|-----------|----------|--------------|
-| `@Transactional` in Service | `EmployeeService.updatePassword()` line 361 | Move to EmployeeManager |
-| `@Transactional` in Service | `RoleService` lines 51+ | Create RoleManager, move logic |
-| `rollbackFor = Exception.class` | `RoleService` | Change to `Throwable.class` |
+**Violations to fix**: 2 `@Transactional` violations in Service layer
+
+→ **Detailed fix guides**: [Architecture Overview](./architecture/overview.md)
+
+**Quick summary**:
+- **Violation 1**: `EmployeeService.updatePassword()` - Move @Transactional to EmployeeManager
+- **Violation 2**: `RoleService` methods - Create RoleManager, move transactional operations
 
 **Verification**:
 ```bash
 ./gradlew :sa-admin:test --tests ArchitectureTest
 ```
 
-See [Architecture Fixes Guide](./architecture-fixes.md) for detailed instructions.
+→ For complete verification commands, see [Quick Reference](./quick-reference.md#commands)
 
 ---
 
@@ -250,14 +225,13 @@ String expectedSalt = password + "_" + uid.toUpperCase() + "_" + uid.toLowerCase
 
 ## Success Criteria
 
-### Coverage Targets (JaCoCo Verification)
+### Coverage Targets
 
-| Metric | Threshold | Enforcement |
-|--------|-----------|-------------|
-| Line Coverage | >= 80% | Build fails if not met |
-| Branch Coverage | >= 70% | Build fails if not met |
-| Service Layer | >= 85% | Per-class verification |
-| Manager Layer | >= 80% | Per-class verification |
+→ See [Testing Strategy - Coverage Targets](./testing-strategy.md#coverage-targets-summary) for detailed thresholds
+
+**Build enforcement**:
+- Line Coverage >= 80% (build fails if not met)
+- Branch Coverage >= 70% (build fails if not met)
 
 ### Quality Gates
 
@@ -266,6 +240,8 @@ String expectedSalt = password + "_" + uid.toUpperCase() + "_" + uid.toLowerCase
 - [ ] Coverage verification: `./gradlew :sa-admin:jacocoTestCoverageVerification`
 - [ ] No flaky tests (run 3 times, all pass)
 - [ ] Test execution time < 5 minutes
+
+→ For all verification commands, see [Quick Reference](./quick-reference.md#commands)
 
 ### Documentation Requirements
 
@@ -320,46 +296,35 @@ String expectedSalt = password + "_" + uid.toUpperCase() + "_" + uid.toLowerCase
 
 ### Resource Requirements
 
-- **Developer Time**: 1 developer, 6 weeks
+- **Developer Time**: 1 developer, 6 weeks full-time
 - **Review Time**: ~2 hours per phase for code review
-- **CI/CD Integration**: ~4 hours for JaCoCo setup
-
----
-
-## Verification Commands
-
-```bash
-# Run all tests
-./gradlew :sa-admin:test
-
-# Run specific test class
-./gradlew :sa-admin:test --tests SecurityLoginServiceTest
-
-# Generate coverage report
-./gradlew :sa-admin:jacocoTestReport
-# View: sa-admin/build/reports/jacoco/test/html/index.html
-
-# Verify coverage thresholds
-./gradlew :sa-admin:jacocoTestCoverageVerification
-
-# Full quality check
-./gradlew :sa-admin:check
-```
+- **CI/CD Integration**: ~4 hours for JaCoCo setup and verification
 
 ---
 
 ## Related Documentation
 
-- [Testing Strategy Guide](./testing-strategy.md) - Mock strategy and best practices
-- [Architecture Fixes Guide](./architecture-fixes.md) - Phase 0 violations and fixes
-- [Test Templates](./test-templates.md) - Code examples for base classes and fixtures
-- [Quick Start Guide](./quick-start.md) - Getting started with running tests
+### Core Testing Documentation
+
+- **[Testing Strategy](./testing-strategy.md)** - Mock strategy, best practices, naming conventions
+- **[Architecture Fixes](./architecture/overview.md)** - Phase 0 violations and detailed fix guides
+- **[Quick Reference](./quick-reference.md)** - Commands, rules cheatsheet, common patterns
+
+### Specific Fix Guides
+
+- **[Employee Fix Guide](./architecture/fix-employee-transactional.md)** - EmployeeService @Transactional violation
+- **[Role Fix Guide](./architecture/fix-role-transactional.md)** - RoleService @Transactional violations
+
+### Project Standards
+
+- **[Project Conventions](../../CLAUDE.md)** - SmartAdmin coding standards
+- **[Architecture Rules](../../.agent/rules/10-architecture-rules.md)** - Layer architecture enforcement
 
 ---
 
-## Appendix: File Locations
+## Appendix: Key Source Files
 
-### Source Files Requiring Tests
+### Files Requiring Tests (Priority Order)
 
 | Module | Path | Priority |
 |--------|------|----------|
@@ -370,6 +335,44 @@ String expectedSalt = password + "_" + uid.toUpperCase() + "_" + uid.toLowerCase
 | RoleService | `module/system/role/service/RoleService.java` | HIGH |
 | DepartmentService | `module/system/department/service/DepartmentService.java` | MEDIUM |
 
-### Test Files to Create
+---
 
-See [Test Templates](./test-templates.md) for complete file listings and code examples.
+## Getting Started
+
+### Step 1: Fix Architecture Violations
+
+Before writing any tests:
+
+1. Read: [Architecture Overview](./architecture/overview.md)
+2. Fix: [EmployeeService](./architecture/fix-employee-transactional.md)
+3. Fix: [RoleService](./architecture/fix-role-transactional.md)
+4. Verify: `./gradlew :sa-admin:test --tests ArchitectureTest`
+
+### Step 2: Set Up Test Infrastructure
+
+Follow: [Testing Strategy - Test Infrastructure](./testing-strategy.md#test-infrastructure-design)
+
+Create:
+- Base test classes
+- Fixture classes
+- Mock configurations
+
+### Step 3: Write Your First Test
+
+Follow: [Testing Strategy - Best Practices](./testing-strategy.md#best-practices)
+
+Start with: `SecurityLoginServiceTest` (simplest critical service)
+
+### Step 4: Verify Coverage
+
+```bash
+# Generate coverage report
+./gradlew :sa-admin:jacocoTestReport
+
+# View report
+open sa-admin/build/reports/jacoco/test/html/index.html
+```
+
+---
+
+**Ready to start? Begin with [Architecture Fixes](./architecture/overview.md)!**

@@ -72,132 +72,59 @@ Cache methods  -> Mock Manager layer
 
 #### BaseServiceTest
 
-Purpose: Common functionality for Service layer tests.
+**Purpose**: Provides ResponseDTO assertion helpers for Service layer tests.
 
+**Key methods**:
 ```java
-package net.lab1024.sa.admin.base;
-
-import net.lab1024.sa.base.common.domain.ResponseDTO;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public abstract class BaseServiceTest {
-
-    /**
-     * Assert that ResponseDTO indicates success
-     */
-    protected <T> void assertSuccess(ResponseDTO<T> response) {
-        assertNotNull(response, "Response should not be null");
-        assertTrue(response.getOk(),
-            "Expected success but got: " + response.getMsg());
-    }
-
-    /**
-     * Assert that ResponseDTO indicates success with specific data
-     */
-    protected <T> void assertSuccessWithData(ResponseDTO<T> response, T expectedData) {
-        assertSuccess(response);
-        assertEquals(expectedData, response.getData());
-    }
-
-    /**
-     * Assert that ResponseDTO indicates error
-     */
-    protected void assertError(ResponseDTO<?> response) {
-        assertNotNull(response, "Response should not be null");
-        assertFalse(response.getOk(), "Expected error but got success");
-    }
-
-    /**
-     * Assert error with specific message substring
-     */
-    protected void assertErrorContains(ResponseDTO<?> response, String expectedSubstring) {
-        assertError(response);
-        assertTrue(response.getMsg().contains(expectedSubstring),
-            "Expected message containing '" + expectedSubstring +
-            "' but got: " + response.getMsg());
-    }
-
-    /**
-     * Assert error with specific error code
-     */
-    protected void assertErrorCode(ResponseDTO<?> response, int expectedCode) {
-        assertError(response);
-        assertEquals(expectedCode, response.getCode());
-    }
-}
+protected void assertSuccess(ResponseDTO<T> response)
+protected void assertSuccessWithData(ResponseDTO<T> response, T expectedData)
+protected void assertError(ResponseDTO<?> response)
+protected void assertErrorContains(ResponseDTO<?> response, String expectedSubstring)
+protected void assertErrorCode(ResponseDTO<?> response, int expectedCode)
 ```
+
+**Usage**: Extend this class in your Service tests.
+
+**Implementation**: `sa-admin/src/test/java/net/lab1024/sa/admin/base/BaseServiceTest.java`
+
+---
 
 #### BaseManagerTest
 
-Purpose: Common functionality for Manager layer tests.
+**Purpose**: Common functionality for Manager layer tests.
 
-```java
-package net.lab1024.sa.admin.base;
+**Key design principles**:
+- Verify DAO methods are called in correct order (use `InOrder`)
+- Ensure transaction boundaries (multiple DAO calls should be atomic)
+- Verify cache invalidation triggers
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+**Usage**: Extend this class in your Manager tests.
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public abstract class BaseManagerTest {
+**Implementation**: `sa-admin/src/test/java/net/lab1024/sa/admin/base/BaseManagerTest.java`
 
-    /**
-     * Manager layer tests should verify:
-     * 1. Correct DAO methods are called in correct order
-     * 2. Transaction boundaries (multiple DAO calls should be atomic)
-     * 3. Cache invalidation triggers
-     */
-}
-```
+---
 
 #### BaseControllerTest
 
-Purpose: Common functionality for Controller layer tests with MockMvc.
+**Purpose**: Common functionality for Controller layer tests with MockMvc.
 
+**Key features**:
 ```java
-package net.lab1024.sa.admin.base;
+@Autowired
+protected MockMvc mockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+@Autowired
+protected ObjectMapper objectMapper;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
-@ActiveProfiles("test")
-public abstract class BaseControllerTest {
-
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    /**
-     * Convert object to JSON string
-     */
-    protected String toJson(Object obj) throws Exception {
-        return objectMapper.writeValueAsString(obj);
-    }
-
-    /**
-     * Extract response body as string
-     */
-    protected String getResponseBody(MvcResult result) throws Exception {
-        return result.getResponse().getContentAsString();
-    }
-}
+protected String toJson(Object obj) throws Exception
+protected String getResponseBody(MvcResult result) throws Exception
 ```
+
+**Usage**: Extend this class in your Controller tests with `@WebMvcTest`.
+
+**Implementation**: `sa-admin/src/test/java/net/lab1024/sa/admin/base/BaseControllerTest.java`
+
+---
 
 ### Fixture Classes
 
@@ -223,47 +150,33 @@ public static EmployeeEntity adminEmployee() {
 public static EmployeeEntity.EmployeeEntityBuilder defaultEmployee() {
     return EmployeeEntity.builder()
         .employeeId(DEFAULT_EMPLOYEE_ID)
+        .loginName(DEFAULT_LOGIN_NAME)
         // ... default values
 }
 ```
+
+---
 
 ### Mock Configurations
 
 Centralize mock configurations for reuse across tests.
 
+**Example**: `MockSecurityConfig.java`
+
 ```java
-package net.lab1024.sa.admin.mock;
-
-import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
-import static org.mockito.Mockito.*;
-
-public class MockSecurityConfig {
-
-    /**
-     * Default security configuration for most tests
-     */
-    public static SecurityConfigProvider defaultConfig() {
-        SecurityConfigProvider mock = mock(SecurityConfigProvider.class);
-        when(mock.getLoginFailMaxTimes()).thenReturn(5);
-        when(mock.getLoginFailLockSeconds()).thenReturn(1800L);
-        when(mock.isPasswordComplexityEnabled()).thenReturn(true);
-        when(mock.getRegularChangePasswordDays()).thenReturn(90);
-        when(mock.getRegularChangePasswordNotAllowRepeatTimes()).thenReturn(3);
-        return mock;
-    }
-
-    /**
-     * Security disabled for simpler tests
-     */
-    public static SecurityConfigProvider securityDisabled() {
-        SecurityConfigProvider mock = mock(SecurityConfigProvider.class);
-        when(mock.getLoginFailMaxTimes()).thenReturn(0);
-        when(mock.isPasswordComplexityEnabled()).thenReturn(false);
-        when(mock.getRegularChangePasswordDays()).thenReturn(0);
-        return mock;
-    }
+/**
+ * Default security configuration for most tests
+ */
+public static SecurityConfigProvider defaultConfig() {
+    SecurityConfigProvider mock = mock(SecurityConfigProvider.class);
+    when(mock.getLoginFailMaxTimes()).thenReturn(5);
+    when(mock.getLoginFailLockSeconds()).thenReturn(1800L);
+    when(mock.isPasswordComplexityEnabled()).thenReturn(true);
+    return mock;
 }
 ```
+
+**Implementation**: `sa-admin/src/test/java/net/lab1024/sa/admin/mock/MockSecurityConfig.java`
 
 ---
 
@@ -410,46 +323,47 @@ void testGetEmployee_ValidId_Returns200() throws Exception {
 }
 ```
 
+### Coverage Targets Summary
+
+| Layer | Line Coverage | Branch Coverage |
+|-------|---------------|-----------------|
+| **Service** | ≥ 85% | ≥ 75% |
+| **Manager** | ≥ 80% | ≥ 70% |
+| **Controller** | ≥ 60% | ≥ 50% |
+| **Overall** | ≥ 80% | ≥ 70% |
+
+**Excluded**:
+- DTO/VO/Form classes (data containers)
+- Entity classes
+- Constants/Enums
+
 ---
 
-## Best Practices for SmartAdmin Testing
+## Best Practices
 
-### 1. ResponseDTO Assertions
+### 1. Use ResponseDTO Assertion Helpers
 
-Always use helper methods from BaseServiceTest:
+Always use helper methods from BaseServiceTest for clearer failure messages:
 
 ```java
-// Good
+// ✅ Good - clear failure messages
 assertSuccess(response);
 assertError(response);
 assertErrorContains(response, "already exists");
 
-// Avoid
-assertTrue(response.getOk());  // Less informative on failure
+// ❌ Avoid - less informative
+assertTrue(response.getOk());
 ```
 
-### 2. Mock Setup with lenient()
+### 2. Verify Interaction Order
 
-Use `lenient()` for setup stubs that may not be used in all tests:
-
-```java
-@BeforeEach
-void setUp() {
-    lenient().when(configService.getConfigValue(ConfigKeyEnum.SUPER_PASSWORD))
-        .thenReturn("super_secret");
-    lenient().when(level3ProtectConfigService.isTwoFactorLoginEnabled())
-        .thenReturn(false);
-}
-```
-
-### 3. Verify Interactions
-
-For Manager layer, verify the sequence of DAO calls:
+For Manager layer, verify the sequence of DAO calls using `InOrder`:
 
 ```java
 @Test
 void testUpdateEmployeeRole_DeletesThenInserts() {
     Long employeeId = 1L;
+    List<Long> newRoles = List.of(2L, 3L);
 
     employeeManager.updateEmployeeRole(employeeId, newRoles);
 
@@ -459,7 +373,7 @@ void testUpdateEmployeeRole_DeletesThenInserts() {
 }
 ```
 
-### 4. Handle SA-Token Static Methods
+### 3. Handle SA-Token Static Methods
 
 Use `MockedStatic` for SA-Token calls:
 
@@ -477,40 +391,52 @@ void testLogin_Success_SetsToken() {
 }
 ```
 
-### 5. Time-Based Testing
+### 4. Use Deterministic Test Data
 
-Avoid flaky time-based assertions:
+Use constants from fixtures, not random values:
 
 ```java
-// Bad - may fail due to timing
+// ✅ Good - deterministic
+EmployeeEntity employee = EmployeeFixture.defaultEmployee().build();
+assertEquals(EmployeeFixture.DEFAULT_LOGIN_NAME, employee.getLoginName());
+
+// ❌ Avoid - random data causes flaky tests
+EmployeeEntity employee = new EmployeeEntity();
+employee.setLoginName(UUID.randomUUID().toString());
+```
+
+### 5. Use lenient() for Setup Stubs
+
+Use `lenient()` for setup stubs that may not be used in all tests:
+
+```java
+@BeforeEach
+void setUp() {
+    lenient().when(configService.getConfigValue(ConfigKeyEnum.SUPER_PASSWORD))
+        .thenReturn("super_secret");
+    lenient().when(level3ProtectConfigService.isTwoFactorLoginEnabled())
+        .thenReturn(false);
+}
+```
+
+### 6. Avoid Time-Based Flaky Assertions
+
+```java
+// ❌ Bad - may fail due to timing
 assertTrue(lockTime.isBefore(LocalDateTime.now()));
 
-// Good - use fixed time reference
+// ✅ Good - use fixed time reference
 LocalDateTime fixedNow = LocalDateTime.of(2026, 1, 21, 10, 0, 0);
 LoginFailEntity locked = SecurityFixture.locked(5, 10); // Locked 10 min ago
 assertTrue(locked.getLoginLockBeginTime().plusSeconds(lockSeconds).isBefore(fixedNow));
 ```
 
-### 6. Deterministic Test Data
-
-Use constants from fixtures, not random values:
-
-```java
-// Good - deterministic
-EmployeeEntity employee = EmployeeFixture.defaultEmployee().build();
-assertEquals(EmployeeFixture.DEFAULT_LOGIN_NAME, employee.getLoginName());
-
-// Avoid - random data
-EmployeeEntity employee = new EmployeeEntity();
-employee.setLoginName(UUID.randomUUID().toString()); // Flaky
-```
-
-### 7. One Assertion Focus
+### 7. One Logical Assertion per Test
 
 Each test should verify one logical assertion (or closely related assertions):
 
 ```java
-// Good - focused test
+// ✅ Good - focused test
 @Test
 void testLogin_WrongPassword_ReturnsError() {
     // Given
@@ -536,7 +462,7 @@ void testLogin_WrongPassword_RecordsFailure() {
 }
 ```
 
-### 8. Test Data Cleanup
+### 8. Reset Mocks Between Tests
 
 Reset mocks between tests using `@BeforeEach`:
 
@@ -555,7 +481,7 @@ void setUp() {
 
 ## Mocking Complex Dependencies
 
-### LoginService with 13 Dependencies
+### Example: LoginService with Multiple Dependencies
 
 ```java
 @ExtendWith(MockitoExtension.class)
@@ -616,45 +542,38 @@ void testGetLoginEmployee_CallsManagerCorrectly() {
 
 ---
 
-## Test Execution Strategy
+## Test Execution
 
-### Parallel Execution
-
-Configure Gradle for parallel test execution:
-
-```kotlin
-// build.gradle.kts
-tasks.test {
-    maxParallelForks = Runtime.getRuntime().availableProcessors() / 2
-}
-```
-
-### Test Filtering
+### Run Tests
 
 ```bash
-# Run specific test class
+# All tests
+./gradlew :sa-admin:test
+
+# Specific test class
 ./gradlew :sa-admin:test --tests "LoginServiceTest"
 
-# Run tests matching pattern
+# Tests matching pattern
 ./gradlew :sa-admin:test --tests "*Security*"
 
-# Run single test method
+# Single test method
 ./gradlew :sa-admin:test --tests "LoginServiceTest.testLogin_ValidCredentials_ReturnsToken"
 ```
 
-### CI/CD Integration
+### Generate Coverage Reports
 
-```yaml
-# .github/workflows/test.yml
-- name: Run Unit Tests
-  run: ./gradlew :sa-admin:test
+```bash
+# Generate JaCoCo report
+./gradlew :sa-admin:jacocoTestReport
 
-- name: Generate Coverage Report
-  run: ./gradlew :sa-admin:jacocoTestReport
+# View HTML report
+open sa-admin/build/reports/jacoco/test/html/index.html
 
-- name: Verify Coverage Thresholds
-  run: ./gradlew :sa-admin:jacocoTestCoverageVerification
+# Verify coverage thresholds
+./gradlew :sa-admin:jacocoTestCoverageVerification
 ```
+
+→ For more commands, see [Quick Reference](./quick-reference.md)
 
 ---
 
@@ -667,15 +586,15 @@ tasks.test {
 | Testing private methods | Fragile tests | Test through public API |
 | Multiple assertions per test | Hard to diagnose failures | One logical assertion per test |
 | Mocking what you own | Tight coupling | Test real collaborators where possible |
-| Time.now() in assertions | Race conditions | Use fixed time references |
-| Shared mutable state | Test interference | Reset in @BeforeEach |
+| `Time.now()` in assertions | Race conditions | Use fixed time references |
+| Shared mutable state | Test interference | Reset in `@BeforeEach` |
 | Testing implementation details | Brittle tests | Test behavior, not implementation |
 
 ---
 
 ## Related Documentation
 
-- [Implementation Plan](./unit-test-implementation-plan.md) - 6-week roadmap
-- [Architecture Fixes](./architecture-fixes.md) - Required fixes before testing
-- [Test Templates](./test-templates.md) - Code examples
-- [Quick Start](./quick-start.md) - Getting started
+- **Implementation Plan**: [unit-test-implementation-plan.md](./unit-test-implementation-plan.md) - 6-week roadmap
+- **Architecture Fixes**: [architecture/overview.md](./architecture/overview.md) - Required fixes before testing
+- **Quick Reference**: [quick-reference.md](./quick-reference.md) - Commands and rules cheatsheet
+- **Project Conventions**: [../../CLAUDE.md](../../CLAUDE.md) - SmartAdmin coding standards
