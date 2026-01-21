@@ -31,6 +31,9 @@ dependencies {
     // SA Common Repeat Submit - for @RepeatSubmit annotation
     api(project(":sa-common:repeat-submit"))
 
+    // SA Base Support Reload - for @SmartReload annotation and ReloadConst
+    api(project(":sa-base-support:reload"))
+
     // Utilities
     api(libs.commons.lang3)
 

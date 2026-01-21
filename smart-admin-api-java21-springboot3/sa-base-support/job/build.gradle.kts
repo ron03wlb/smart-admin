@@ -22,6 +22,15 @@ dependencies {
     // SA Common Repeat Submit
     api(project(":sa-common:repeat-submit"))
 
+    // SA Common Redis Lock - for LockService
+    api(project(":sa-common:redis-lock"))
+
+    // SA Base Redis - for RedissonClient
+    api(project(":sa-base-redis"))
+
+    // SA Base Support Config - for ConfigDao and ConfigEntity (optional, for samples)
+    compileOnly(project(":sa-base-support:config"))
+
     // Quartz Scheduler (add to version catalog if not present)
     implementation("org.springframework.boot:spring-boot-starter-quartz")
 
