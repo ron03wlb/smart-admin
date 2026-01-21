@@ -16,6 +16,22 @@ This workspace focuses on the following two core projects:
 *   **Path:** `smart-admin-web/`
 *   **Documentation:** [Click here to view Frontend README](./smart-admin-web/README.md)
 
+### 3. Documentation: [docs](./docs/README.md)
+*   **Tech Stack:** VitePress, Vue 3, Mermaid
+*   **Path:** `docs/`
+*   **Live Site:** `http://localhost:8081/docs/` (when running Docker)
+*   **Features:**
+    - 📚 Comprehensive Kafka integration guide
+    - 🚀 Quick start tutorials and examples
+    - 📐 Architecture diagrams and design documentation
+    - 🔧 Operations, monitoring, and troubleshooting guides
+    - 💡 Advanced topics and best practices
+
+**Quick Links:**
+- [Kafka Documentation](./docs/kafka/) - Enterprise Kafka integration
+- [Quick Start](./docs/kafka/getting-started/quick-start.md) - Get started in 5 minutes
+- [Quick Reference](./docs/kafka/getting-started/quick-reference.md) - API cheat sheet
+
 ---
 
 ## 🚀 Quick Start Guide

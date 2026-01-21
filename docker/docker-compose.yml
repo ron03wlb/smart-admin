@@ -116,6 +116,25 @@ services:
       - sa21-network
 
   # ===========================================
+  # Documentation - VitePress 文檔站點
+  # ===========================================
+  docs:
+    build:
+      context: ../docs
+      dockerfile: Dockerfile
+    container_name: sa21-docs
+    restart: unless-stopped
+    ports:
+      - "${DOCS_PORT:-8081}:80"
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost/docs/" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - sa21-network
+
+  # ===========================================
   # Frontend - 前端應用（可選）
   # 使用 profile 控制: docker compose --profile frontend up -d
   # ===========================================
