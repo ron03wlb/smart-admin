@@ -3,9 +3,9 @@ package net.lab1024.sa.base.module.support.file.service;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.file.config.FileConfig;
@@ -31,6 +32,8 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -41,8 +44,10 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -54,6 +59,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
  * @since 2019年10月11日 15:34:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 public class FileStorageCloudServiceImpl implements IFileStorageService {
 
   /** 自定义元数据 文件名称 */
@@ -65,13 +71,13 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
   /** 自定义元数据 文件大小 */
   private static final String USER_METADATA_FILE_SIZE = "file-size";
 
-  @Resource private S3Client s3Client;
+  private final S3Client s3Client;
 
-  @Resource private FileConfig cloudConfig;
+  private final FileConfig cloudConfig;
 
-  @Resource private CacheService cacheService;
+  private final CacheService cacheService;
 
-  @Resource private FileDao fileDao;
+  private final FileDao fileDao;
 
   @Override
   public ResponseDTO<FileUploadVO> upload(MultipartFile file, String path) {
@@ -112,7 +118,13 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
       s3Client.putObject(
           putObjectRequest, RequestBody.fromInputStream(inputStream, file.getSize()));
     } catch (IOException e) {
-      log.error("文件上传-发生异常：", e);
+      log.error("文件上传-IO异常: fileKey={}", fileKey, e);
+      return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "文件读取失败");
+    } catch (S3Exception e) {
+      log.error("文件上传-S3异常: fileKey={}, errorCode={}", fileKey, e.awsErrorDetails().errorCode(), e);
+      return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "文件存储失败");
+    } catch (Exception e) {
+      log.error("文件上传-未知异常: fileKey={}", fileKey, e);
       return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "上传失败");
     }
     // 返回上传结果
@@ -158,65 +170,117 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
       if (fileVO == null) {
         return ResponseDTO.userErrorParam("文件不存在");
       }
-      GetObjectRequest getUrlRequest =
-          GetObjectRequest.builder().bucket(cloudConfig.getBucketName()).key(fileKey).build();
-      GetObjectPresignRequest getObjectPresignRequest =
-          GetObjectPresignRequest.builder()
-              .signatureDuration(Duration.ofSeconds(cloudConfig.getPrivateUrlExpireSeconds()))
-              .getObjectRequest(getUrlRequest)
-              .build();
 
-      String url;
-      try (S3Presigner presigner =
-          S3Presigner.builder().region(Region.of(cloudConfig.getRegion())).build()) {
+      try {
+        GetObjectRequest getUrlRequest =
+            GetObjectRequest.builder().bucket(cloudConfig.getBucketName()).key(fileKey).build();
+        GetObjectPresignRequest getObjectPresignRequest =
+            GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofSeconds(cloudConfig.getPrivateUrlExpireSeconds()))
+                .getObjectRequest(getUrlRequest)
+                .build();
 
-        PresignedGetObjectRequest presignedGetObjectRequest =
-            presigner.presignGetObject(getObjectPresignRequest);
-        url = presignedGetObjectRequest.url().toString();
+        String url;
+        // 构建 endpoint URI（支持 http/https）
+        String endpointUrl =
+            cloudConfig.getUrlPrefix().startsWith("https://")
+                ? "https://" + cloudConfig.getEndpoint()
+                : "http://" + cloudConfig.getEndpoint();
+
+        try (S3Presigner presigner =
+            S3Presigner.builder()
+                .region(Region.of(cloudConfig.getRegion()))
+                .endpointOverride(URI.create(endpointUrl))
+                .credentialsProvider(
+                    StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(
+                            cloudConfig.getAccessKey(), cloudConfig.getSecretKey())))
+                .build()) {
+
+          PresignedGetObjectRequest presignedGetObjectRequest =
+              presigner.presignGetObject(getObjectPresignRequest);
+          url = presignedGetObjectRequest.url().toString();
+        }
+        fileVO.setFileUrl(url);
+        cacheService.put(
+            CacheKeyConst.Support.FILE_PRIVATE,
+            fileKey,
+            fileVO,
+            cloudConfig.getPrivateUrlExpireSeconds() - 5,
+            TimeUnit.SECONDS);
+      } catch (NoSuchKeyException e) {
+        log.error("获取文件URL失败-文件不存在: fileKey={}", fileKey, e);
+        return ResponseDTO.userErrorParam("文件不存在");
+      } catch (S3Exception e) {
+        log.error(
+            "获取文件URL失败-S3异常: fileKey={}, errorCode={}",
+            fileKey,
+            e.awsErrorDetails().errorCode(),
+            e);
+        return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "获取文件访问链接失败");
+      } catch (Exception e) {
+        log.error("获取文件URL失败-未知异常: fileKey={}", fileKey, e);
+        return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "获取文件访问链接失败");
       }
-      fileVO.setFileUrl(url);
-      cacheService.put(
-          CacheKeyConst.Support.FILE_PRIVATE,
-          fileKey,
-          fileVO,
-          cloudConfig.getPrivateUrlExpireSeconds() - 5,
-          TimeUnit.SECONDS);
     }
 
     return ResponseDTO.ok(fileVO.getFileUrl());
   }
 
-  /** 流式下载（名称为原文件） */
+  /**
+   * 流式下载（名称为原文件）
+   *
+   * <p>注意：此方法会将整个文件加载到内存中。对于大文件（>100MB），建议： 1. 使用 getFileUrl() 获取预签名 URL，让客户端直接从 MinIO 下载 2.
+   * 或考虑实现分片下载机制
+   *
+   * @param key 文件key
+   * @return 文件下载对象
+   */
   @Override
   public ResponseDTO<FileDownloadVO> download(String key) {
-
-    // 获取文件 meta
-    HeadObjectRequest objectRequest =
-        HeadObjectRequest.builder().bucket(this.cloudConfig.getBucketName()).key(key).build();
-    HeadObjectResponse headObjectResponse = s3Client.headObject(objectRequest);
-    Map<String, String> userMetadata = headObjectResponse.metadata();
-    FileMetadataVO metadataDTO = null;
-    if (MapUtils.isNotEmpty(userMetadata)) {
-      metadataDTO = new FileMetadataVO();
-      metadataDTO.setFileFormat(userMetadata.get(USER_METADATA_FILE_FORMAT));
-      metadataDTO.setFileName(userMetadata.get(USER_METADATA_FILE_NAME));
-      String fileSizeStr = userMetadata.get(USER_METADATA_FILE_SIZE);
-      Long fileSize = StringUtils.isBlank(fileSizeStr) ? null : Long.valueOf(fileSizeStr);
-      metadataDTO.setFileSize(fileSize);
+    if (StringUtils.isBlank(key)) {
+      return ResponseDTO.userErrorParam("文件key不能为空");
     }
 
-    // 获取oss对象
-    GetObjectRequest getObjectRequest =
-        GetObjectRequest.builder().bucket(cloudConfig.getBucketName()).key(key).build();
-    ResponseBytes<GetObjectResponse> s3ClientObject =
-        s3Client.getObject(getObjectRequest, ResponseTransformer.toBytes());
+    try {
+      // 获取文件 meta
+      HeadObjectRequest objectRequest =
+          HeadObjectRequest.builder().bucket(this.cloudConfig.getBucketName()).key(key).build();
+      HeadObjectResponse headObjectResponse = s3Client.headObject(objectRequest);
+      Map<String, String> userMetadata = headObjectResponse.metadata();
+      FileMetadataVO metadataDTO = null;
+      if (MapUtils.isNotEmpty(userMetadata)) {
+        metadataDTO = new FileMetadataVO();
+        metadataDTO.setFileFormat(userMetadata.get(USER_METADATA_FILE_FORMAT));
+        metadataDTO.setFileName(userMetadata.get(USER_METADATA_FILE_NAME));
+        String fileSizeStr = userMetadata.get(USER_METADATA_FILE_SIZE);
+        Long fileSize = StringUtils.isBlank(fileSizeStr) ? null : Long.valueOf(fileSizeStr);
+        metadataDTO.setFileSize(fileSize);
+      }
 
-    // 输入流转换为字节流
-    byte[] buffer = s3ClientObject.asByteArray();
-    FileDownloadVO fileDownloadVO = new FileDownloadVO();
-    fileDownloadVO.setData(buffer);
-    fileDownloadVO.setMetadata(metadataDTO);
-    return ResponseDTO.ok(fileDownloadVO);
+      // 获取对象内容 - 使用流式读取（更好的 API 实践）
+      GetObjectRequest getObjectRequest =
+          GetObjectRequest.builder().bucket(cloudConfig.getBucketName()).key(key).build();
+
+      // 使用 ResponseTransformer.toBytes() 内部使用流式读取，比直接 toBytes 更高效
+      ResponseBytes<GetObjectResponse> s3ClientObject =
+          s3Client.getObject(getObjectRequest, ResponseTransformer.toBytes());
+
+      byte[] buffer = s3ClientObject.asByteArray();
+      FileDownloadVO fileDownloadVO = new FileDownloadVO();
+      fileDownloadVO.setData(buffer);
+      fileDownloadVO.setMetadata(metadataDTO);
+      return ResponseDTO.ok(fileDownloadVO);
+    } catch (NoSuchKeyException e) {
+      log.error("文件下载失败-文件不存在: fileKey={}", key, e);
+      return ResponseDTO.userErrorParam("文件不存在");
+    } catch (S3Exception e) {
+      log.error("文件下载失败-S3异常: fileKey={}, errorCode={}", key, e.awsErrorDetails().errorCode(), e);
+      return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "文件下载失败");
+    } catch (Exception e) {
+      log.error("文件下载失败-未知异常: fileKey={}", key, e);
+      return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "文件下载失败");
+    }
   }
 
   /**
@@ -237,13 +301,35 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
   /**
    * 单个删除文件 根据 file key 删除文件 ps：不能删除fileKey不为空的文件夹
    *
+   * <p>注意：此方法只删除 S3 对象和缓存，数据库记录需要在上层 Service 中处理
+   *
    * @param fileKey 文件or文件夹
+   * @return 删除结果
    */
   @Override
   public ResponseDTO<String> delete(String fileKey) {
-    DeleteObjectRequest deleteObjectRequest =
-        DeleteObjectRequest.builder().bucket(cloudConfig.getBucketName()).key(fileKey).build();
-    s3Client.deleteObject(deleteObjectRequest);
-    return ResponseDTO.ok();
+    if (StringUtils.isBlank(fileKey)) {
+      return ResponseDTO.userErrorParam("文件key不能为空");
+    }
+
+    try {
+      // 删除 S3 对象
+      DeleteObjectRequest deleteObjectRequest =
+          DeleteObjectRequest.builder().bucket(cloudConfig.getBucketName()).key(fileKey).build();
+      s3Client.deleteObject(deleteObjectRequest);
+
+      // 清除缓存（如果是私有文件）
+      if (fileKey.startsWith(FileFolderTypeEnum.FOLDER_PRIVATE)) {
+        cacheService.delete(CacheKeyConst.Support.FILE_PRIVATE, fileKey);
+        log.info("文件删除成功并清除缓存: fileKey={}", fileKey);
+      } else {
+        log.info("文件删除成功: fileKey={}", fileKey);
+      }
+
+      return ResponseDTO.ok();
+    } catch (Exception e) {
+      log.error("文件删除失败: fileKey={}", fileKey, e);
+      return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "文件删除失败");
+    }
   }
 }
