@@ -20,6 +20,9 @@ dependencies {
     // Logging API (implementation provided by application)
     api(libs.slf4j.api)
 
-    // Test
+    // Test dependencies
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("org.awaitility:awaitility:4.2.0")
+    testAnnotationProcessor(libs.lombok)
 }
