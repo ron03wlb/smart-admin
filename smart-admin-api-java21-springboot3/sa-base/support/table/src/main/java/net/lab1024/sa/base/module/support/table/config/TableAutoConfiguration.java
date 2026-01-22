@@ -1,6 +1,5 @@
 package net.lab1024.sa.base.module.support.table.config;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.ComponentScan;
     havingValue = "true",
     matchIfMissing = true)
 @ComponentScan("net.lab1024.sa.base.module.support.table")
-@MapperScan("net.lab1024.sa.base.module.support.table")
 public class TableAutoConfiguration {
   // Auto-configuration for table column customization module
 }

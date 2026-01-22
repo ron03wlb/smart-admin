@@ -1,6 +1,5 @@
 package net.lab1024.sa.base.module.support.feedback.config;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,7 +28,6 @@ import org.springframework.context.annotation.ComponentScan;
     havingValue = "true",
     matchIfMissing = true)
 @ComponentScan("net.lab1024.sa.base.module.support.feedback")
-@MapperScan("net.lab1024.sa.base.module.support.feedback.dao")
 public class FeedbackAutoConfiguration {
   // Auto-configuration for feedback module
 }

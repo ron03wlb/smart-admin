@@ -1,6 +1,5 @@
 package net.lab1024.sa.base.module.support.serialnumber.config;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
@@ -30,7 +29,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     havingValue = "true",
     matchIfMissing = true)
 @ComponentScan("net.lab1024.sa.base.module.support.serialnumber")
-@MapperScan("net.lab1024.sa.base.module.support.serialnumber.dao")
 @EnableScheduling
 public class SerialNumberAutoConfiguration {
   // Auto-configuration for serial number module
