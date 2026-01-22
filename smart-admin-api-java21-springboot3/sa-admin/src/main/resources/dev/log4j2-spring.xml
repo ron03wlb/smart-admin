@@ -102,6 +102,11 @@
     </Appenders>
 
     <Loggers>
+        <!-- Suppress Spring BeanPostProcessor warnings from SmartReloadManager -->
+        <logger name="org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker"
+                level="ERROR" additivity="false">
+            <AppenderRef ref="error"/>
+        </logger>
         <logger name="com.alibaba.druid.filter.stat.StatFilter" level="ERROR" additivity="false">
             <AppenderRef ref="druidSlowSqlLog"/>
         </logger>

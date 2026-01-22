@@ -2,7 +2,6 @@ package net.lab1024.sa.base.module.support.reload.core;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
@@ -14,6 +13,8 @@ import net.lab1024.sa.base.module.support.reload.core.annoation.SmartReload;
 import net.lab1024.sa.base.module.support.reload.core.domain.SmartReloadObject;
 import net.lab1024.sa.base.module.support.reload.core.thread.SmartReloadRunnable;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import org.springframework.util.ReflectionUtils;
  */
 @Slf4j
 @Service
-public class SmartReloadManager implements BeanPostProcessor {
+public class SmartReloadManager implements BeanPostProcessor, BeanFactoryAware {
 
   private static final String THREAD_NAME_PREFIX = "smart-reload";
   private static final int THREAD_COUNT = 1;
@@ -38,17 +39,26 @@ public class SmartReloadManager implements BeanPostProcessor {
   @Value("${reload.interval-seconds}")
   private Integer intervalSeconds;
 
-  @Resource private AbstractSmartReloadCommand reloadCommand;
+  private BeanFactory beanFactory;
 
   private final Map<String, SmartReloadObject> reloadObjectMap = new ConcurrentHashMap<>();
 
   private ScheduledThreadPoolExecutor threadPoolExecutor;
+
+  @Override
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    this.beanFactory = beanFactory;
+  }
 
   @PostConstruct
   public void init() {
     if (threadPoolExecutor != null) {
       return;
     }
+
+    // 延迟获取 reloadCommand，避免触发早期bean创建
+    AbstractSmartReloadCommand reloadCommand =
+        beanFactory.getBean(AbstractSmartReloadCommand.class);
 
     this.threadPoolExecutor =
         new ScheduledThreadPoolExecutor(
@@ -61,8 +71,8 @@ public class SmartReloadManager implements BeanPostProcessor {
               return t;
             });
     this.threadPoolExecutor.scheduleWithFixedDelay(
-        new SmartReloadRunnable(this.reloadCommand), 10, this.intervalSeconds, TimeUnit.SECONDS);
-    this.reloadCommand.setReloadManager(this);
+        new SmartReloadRunnable(reloadCommand), 10, this.intervalSeconds, TimeUnit.SECONDS);
+    reloadCommand.setReloadManager(this);
   }
 
   @PreDestroy
