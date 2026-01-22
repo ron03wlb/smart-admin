@@ -217,7 +217,7 @@ return userService.findById(id)
 - **MyBatis Plus**: [rules/09-mybatis-plus-core.md](../rules/09-mybatis-plus-core.md)
 
 ### 配置文件
-- **Maven 依賴**: [configs/maven-dependencies.md](../configs/maven-dependencies.md)
+- **技術棧與依賴**: [.claude/shared/knowledge/project-architecture.md](../../.claude/shared/knowledge/project-architecture.md)
 - **Docker 環境**: [configs/docker-compose.yml](../configs/docker-compose.yml)
 - **架構測試**: [configs/ArchitectureTest.java](../configs/ArchitectureTest.java)
 

@@ -10,9 +10,9 @@ import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentTreeVO;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.admin.module.system.department.manager.DepartmentCacheManager;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
-import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.common.core.code.UserErrorCode;
 import org.springframework.stereotype.Service;
 
 /**

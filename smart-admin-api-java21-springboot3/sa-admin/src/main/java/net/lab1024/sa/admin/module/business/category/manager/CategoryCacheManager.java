@@ -14,8 +14,8 @@ import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntit
 import net.lab1024.sa.admin.module.business.category.domain.vo.CategoryTreeVO;
 import net.lab1024.sa.common.cache.CacheService;
 import net.lab1024.sa.common.cache.constant.CacheKeyConst;
-import net.lab1024.sa.common.core.constant.StringConst;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.constant.StringConst;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

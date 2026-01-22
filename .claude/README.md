@@ -1,5 +1,7 @@
 # .claude Directory
 
+**Root Documentation**: See [../README.md](../README.md) for project overview and complete navigation.
+
 **Multi-agent AI system** for SmartAdmin development with specialized agents, shared knowledge, and automated quality gates.
 
 ## Quick Links

@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**Navigation**: See [README.md](README.md) for complete documentation index and "I want to..." guide.
+
 **Quick Reference Card** for SmartAdmin development. This document provides essential patterns, commands, and conventions for rapid development.
 
 **For detailed guidance**, see:
@@ -11,43 +13,27 @@
 
 ## Quick Reference Card
 
-| Task | Pattern |
-|------|---------|
-| Return success | `ResponseDTO.ok(data)` |
-| Return error | `ResponseDTO.error(ErrorCode)` |
-| Throw exception | `throw new BusinessException(ErrorCode)` |
-| Get current user | `AdminRequestUtil.getRequestUser()` |
-| Skip auth | `@NoNeedLogin` |
-| Check permission | `@SaCheckPermission("module:action")` |
-| Paginated query | `SmartPageUtil.convert2PageQuery(form)` |
-| Bean copy | `SmartBeanUtil.copy(source, Target.class)` |
-| Transaction | `@Transactional(rollbackFor = Throwable.class)` in Manager only |
+| Task | Pattern | Details |
+|------|---------|---------|
+| Return success | `ResponseDTO.ok(data)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#responsedto-pattern) |
+| Paginated query | `SmartPageUtil.convert2PageQuery(form)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#pagination-pattern) |
+| Bean copy | `SmartBeanUtil.copy(source, Target.class)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#bean-conversion) |
+| Transaction | `@Transactional` in Manager only | [→](.claude/shared/knowledge/smartadmin-patterns.md#transaction-management) |
+
+**Complete Patterns**: [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
 
 ## Build Commands
 
-Backend location: `smart-admin-api-java21-springboot3/`
+**Location**: `smart-admin-api-java21-springboot3/`
 
 ```bash
-# Build
-./gradlew clean build
-./gradlew build -x test                    # Skip tests
-./gradlew build -Penv=dev|test|pre|prod    # Environment-specific
-
-# Run application
-./gradlew :sa-admin:bootRun
-# Access: http://localhost:1024/swagger-ui.html
+./gradlew clean build          # Build
+./gradlew :sa-admin:bootRun    # Run (http://localhost:1024)
+./gradlew :sa-admin:test       # Test
+./gradlew :sa-admin:test --tests ArchitectureTest  # Arch validation
 ```
 
-## Test Commands
-
-```bash
-# All tests
-./gradlew :sa-admin:test
-
-# Single test class
-./gradlew :sa-admin:test --tests ArchitectureTest
-./gradlew :sa-admin:test --tests AdminApplicationTest
-```
+→ **[All Build Commands](.claude/shared/knowledge/project-architecture.md#build-commands)**
 
 ## Architecture
 
@@ -72,19 +58,6 @@ Controller → Service → Manager → Dao → Entity
 - `@Transactional` / `@Cacheable`: ONLY in Manager layer
 - `@Autowired` field injection: FORBIDDEN
 
-**Package pattern per module:**
-```
-module/
-├── controller/     # REST endpoints
-├── service/        # Business logic (@Service)
-├── manager/        # Caching, transactions (@Transactional)
-├── dao/            # MyBatis Plus mappers
-└── domain/
-    ├── entity/     # Database entities (@TableName)
-    ├── form/       # Request DTOs (@Valid)
-    └── vo/         # Response DTOs
-```
-
 **See also**:
 - [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md) - Detailed implementation patterns
 - [Project Architecture](.claude/shared/knowledge/project-architecture.md) - Module structure and build configuration
@@ -92,105 +65,27 @@ module/
 
 ## SmartAdmin Patterns
 
-### ResponseDTO Pattern
-```java
-// Success responses
-return ResponseDTO.ok(data);           // With data
-return ResponseDTO.ok();               // Without data
-return ResponseDTO.okMsg("Created");   // With message
+**Core Patterns:**
+- [ResponseDTO Pattern](.claude/shared/knowledge/smartadmin-patterns.md#responsedto-pattern) - API responses (ok, error, exceptions)
+- [Domain Objects](.claude/shared/knowledge/smartadmin-patterns.md#domain-object-pattern) - Entity, Form, VO, QueryForm
+- [Pagination](.claude/shared/knowledge/smartadmin-patterns.md#pagination-pattern) - SmartPageUtil usage
+- [Bean Conversion](.claude/shared/knowledge/smartadmin-patterns.md#bean-conversion) - SmartBeanUtil patterns
+- [Authentication](.claude/shared/knowledge/smartadmin-patterns.md#authentication-sa-token) - Sa-Token (@NoNeedLogin, @SaCheckPermission)
+- [Dependency Injection](.claude/shared/knowledge/smartadmin-patterns.md#dependency-injection) - Constructor injection (MANDATORY)
+- [Transaction Management](.claude/shared/knowledge/smartadmin-patterns.md#transaction-management) - Manager layer only
 
-// Error responses
-return ResponseDTO.error(UserErrorCode.PARAM_ERROR);
-return ResponseDTO.userErrorParam("Invalid email format");
-
-// Exception throwing (caught by GlobalExceptionHandler)
-throw new BusinessException(EmployeeErrorCode.EMPLOYEE_NOT_EXIST);
-```
-
-### Domain Objects
-```java
-// Entity - Database mapping
-@TableName("t_employee")
-public class EmployeeEntity { ... }
-
-// Form - Request input with validation
-public class EmployeeAddForm {
-    @NotBlank(message = "Name required")
-    @Length(max = 50)
-    private String name;
-}
-
-// VO - Response output
-public class EmployeeVO { ... }
-
-// QueryForm - Paginated queries
-public class EmployeeQueryForm extends PageParam { ... }
-```
-
-### Pagination
-```java
-// In Service
-public PageResult<EmployeeVO> query(EmployeeQueryForm form) {
-    Page<?> page = SmartPageUtil.convert2PageQuery(form);
-    List<EmployeeEntity> list = employeeDao.selectList(page, wrapper);
-    return SmartPageUtil.convert2PageResult(page, list, EmployeeVO.class);
-}
-```
-
-### Bean Conversion
-```java
-EmployeeEntity entity = SmartBeanUtil.copy(form, EmployeeEntity.class);
-List<EmployeeVO> voList = SmartBeanUtil.copyList(entities, EmployeeVO.class);
-```
-
-## Authentication (Sa-Token)
-
-```java
-@NoNeedLogin                              // Skip authentication
-@SaCheckPermission("employee:add")        // Require specific permission
-@SaCheckPermission({"a:b", "c:d"})        // Require all permissions
-
-// Get current user
-RequestUser user = AdminRequestUtil.getRequestUser();
-Long userId = user.getUserId();
-```
+**See**: [Complete SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
 
 ## Key Conventions
 
 **Dependency Injection (MANDATORY):**
-```java
-@Service
-@RequiredArgsConstructor
-public class EmployeeService {
-    private final EmployeeDao employeeDao;      // Constructor injection
-    private final DepartmentManager deptManager;
-}
-// NEVER use @Autowired field injection
-```
-
-**Transaction Management (Manager layer ONLY):**
-```java
-@Service
-@RequiredArgsConstructor
-public class EmployeeManager {
-    @Transactional(rollbackFor = Throwable.class)  // NOT Exception.class
-    public void updateWithRoles(EmployeeEntity entity, List<Long> roleIds) { }
-}
-```
+- Use `@RequiredArgsConstructor` + `private final` fields
+- NEVER use `@Autowired` field injection
 
 **Naming:**
 - Classes: `UserController`, `UserService`, `UserManager`, `UserDao`, `UserEntity`
 - Forms: `UserAddForm`, `UserUpdateForm`, `UserQueryForm`
 - Boolean fields: `deleted` NOT `isDeleted`
-- Methods: `getUserById()`, `listUsers()`, `countUsers()`, `saveUser()`, `deleteUser()`
-
-**MyBatis Plus (prefer LambdaQueryWrapper):**
-```java
-LambdaQueryWrapper<Employee> wrapper = Wrappers.<Employee>lambdaQuery()
-    .eq(Employee::getDepartmentId, deptId)
-    .like(StringUtils.isNotBlank(name), Employee::getName, name)
-    .orderByDesc(Employee::getCreateTime);
-```
 
 **Commit messages:** Conventional Commits format
 ```
@@ -200,17 +95,19 @@ Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 Scopes: sa-admin, sa-base, sa-common, smart-admin-web, smart-app, docker, docs
 ```
 
+→ **[Complete Conventions](.agent/rules/01-naming-conventions.md)**
+
 ## Anti-Patterns to Avoid
 
-**Most critical anti-patterns:**
+**Top 3 Critical:**
 
-| Anti-Pattern | Correct Pattern |
-|--------------|-----------------|
+| ❌ Never | ✅ Always |
+|---------|----------|
 | `@Transactional` in Service | Manager layer only |
-| `@Autowired` field injection | `@RequiredArgsConstructor` + `private final` |
-| Controller → Dao directly | Controller → Service → Dao |
+| Field injection | Constructor injection |
+| Controller → Dao | Controller → Service → Dao |
 
-**Complete list**: See [Quality Standards](.claude/shared/knowledge/quality-standards.md#anti-patterns-to-avoid) for all anti-patterns and detailed explanations.
+→ **[Complete Anti-Patterns List](.claude/shared/knowledge/quality-standards.md#anti-patterns-to-avoid)**
 
 ## Technology Stack
 

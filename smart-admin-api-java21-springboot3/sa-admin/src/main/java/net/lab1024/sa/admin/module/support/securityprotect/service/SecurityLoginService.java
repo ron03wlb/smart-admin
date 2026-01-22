@@ -10,11 +10,11 @@ import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.LoginFa
 import net.lab1024.sa.admin.module.support.securityprotect.domain.form.LoginFailQueryForm;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.vo.LoginFailVO;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.securityprotect.constant.SecurityConst;
 import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
+import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;

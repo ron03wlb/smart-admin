@@ -45,7 +45,10 @@
       "Bash(docker logs:*)",
       "Bash(.gradlew.bat:*)",
       "Bash(git mv:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(wc:*)",
+      "Bash(chmod:*)",
+      "Bash(./.claude/scripts/validate-links.sh:*)"
     ]
   },
   "allowedCommands": {

@@ -216,4 +216,67 @@ tasks {
     named("check") {
         dependsOn("jacocoTestCoverageVerification")
     }
+
+    // Foundation package migration task
+    register("migrateToFoundation") {
+        description = "Migrates code to foundation packages"
+        group = "migration"
+
+        doLast {
+            val replacements = linkedMapOf(
+                // Process specific classes first (more specific patterns)
+                "import net.lab1024.sa.common.core.domain.ResponseDTO" to
+                    "import net.lab1024.sa.foundation.domain.response.ResponseDTO",
+                "import net.lab1024.sa.common.core.domain.PageResult" to
+                    "import net.lab1024.sa.foundation.domain.response.PageResult",
+                "import net.lab1024.sa.common.core.domain.RequestUser" to
+                    "import net.lab1024.sa.foundation.domain.request.RequestUser",
+                "import net.lab1024.sa.common.core.domain.PageParam" to
+                    "import net.lab1024.sa.foundation.domain.request.PageParam",
+                // Then process package-level patterns
+                "import net.lab1024.sa.common.core.code" to
+                    "import net.lab1024.sa.foundation.domain.code",
+                "import net.lab1024.sa.common.core.constant" to
+                    "import net.lab1024.sa.foundation.domain.constant",
+                "import net.lab1024.sa.common.core.exception" to
+                    "import net.lab1024.sa.foundation.domain.exception"
+                // NOTE: BaseEnum and SmartBeanUtil are intentionally NOT migrated
+                // BaseEnum: sa-base modules still use old package, causes type mismatch
+                // SmartBeanUtil: remains in common.core.util (not moved to foundation yet)
+            )
+
+            var totalFilesModified = 0
+            var totalReplacements = 0
+
+            fileTree("src").matching {
+                include("**/*.java")
+            }.forEach { file ->
+                var content = file.readText()
+                var fileModified = false
+                var fileReplacements = 0
+
+                replacements.forEach { (old, new) ->
+                    val occurrences = content.split(old).size - 1
+                    if (occurrences > 0) {
+                        content = content.replace(old, new)
+                        fileModified = true
+                        fileReplacements += occurrences
+                    }
+                }
+
+                if (fileModified) {
+                    file.writeText(content)
+                    totalFilesModified++
+                    totalReplacements += fileReplacements
+                    println("✅ Migrated: ${file.path} ($fileReplacements replacements)")
+                }
+            }
+
+            println("\n========================================")
+            println("Migration Summary:")
+            println("  Files modified: $totalFilesModified")
+            println("  Total replacements: $totalReplacements")
+            println("========================================")
+        }
+    }
 }
