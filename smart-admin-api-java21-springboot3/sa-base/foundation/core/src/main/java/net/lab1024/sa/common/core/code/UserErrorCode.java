@@ -1,8 +1,37 @@
 package net.lab1024.sa.common.core.code;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import lombok.extern.slf4j.Slf4j;
+
 /**
- * @deprecated Use {@link net.lab1024.sa.foundation.domain.code.UserErrorCode} instead.
+ * User Error Code Enum Bridge (DEPRECATED)
+ *
+ * @deprecated This bridge enum is deprecated and will be removed in v4.0.0. Please migrate to
+ *     {@link net.lab1024.sa.foundation.domain.code.UserErrorCode} immediately.
+ *     <p><b>⚠️ BREAKING CHANGE ALERT - Migration Required</b>
+ *     <ul>
+ *       <li><b>Removal Date:</b> v4.0.0 (Q4 2026)
+ *       <li><b>Last Compatible Version:</b> v3.9.0 (Q3 2026)
+ *       <li><b>Automated Migration:</b> {@code ./gradlew migrateToFoundation}
+ *       <li><b>Migration Guide:</b> docs/migration/foundation-packages.md
+ *     </ul>
+ *     <p><b>Migration Example:</b>
+ *     <pre>{@code
+ * // OLD (will break in v4.0.0)
+ * import net.lab1024.sa.common.core.code.UserErrorCode;
+ * return ResponseDTO.error(UserErrorCode.PARAM_ERROR);
+ *
+ * // NEW (required for v4.0.0+)
+ * import net.lab1024.sa.foundation.domain.code.UserErrorCode;
+ * return ResponseDTO.error(UserErrorCode.PARAM_ERROR);
+ *
+ * }</pre>
+ *
+ * @author SmartAdmin Team
+ * @since 3.6.0
+ * @see net.lab1024.sa.foundation.domain.code.UserErrorCode New UserErrorCode location
  */
+@Slf4j
 @Deprecated(since = "3.6.0", forRemoval = true)
 public enum UserErrorCode implements ErrorCode {
   PARAM_ERROR(30001, "参数错误"),
@@ -17,6 +46,25 @@ public enum UserErrorCode implements ErrorCode {
   LOGIN_FAIL_LOCK(30010, "登录连续失败已经被锁定，无法登录"),
   LOGIN_FAIL_WILL_LOCK(30011, "登录连续失败将会锁定提醒"),
   LOGIN_ACTIVE_TIMEOUT(30012, "长时间未操作系统，需要重新登录");
+
+  private static final AtomicBoolean WARNING_EMITTED = new AtomicBoolean(false);
+
+  static {
+    if (WARNING_EMITTED.compareAndSet(false, true)) {
+      log.warn(
+          """
+
+          ╔════════════════════════════════════════════════════════════════════════════╗
+          ║ ⚠️  DEPRECATION WARNING - Bridge Class In Use                             ║
+          ╠════════════════════════════════════════════════════════════════════════════╣
+          ║ Class: net.lab1024.sa.common.core.code.UserErrorCode                      ║
+          ║ Use:   net.lab1024.sa.foundation.domain.code.UserErrorCode                ║
+          ║                                                                            ║
+          ║ 📅 Removal: v4.0.0 (Q4 2026) | 🔧 Tool: ./gradlew migrateToFoundation    ║
+          ╚════════════════════════════════════════════════════════════════════════════╝
+          """);
+    }
+  }
 
   private final net.lab1024.sa.foundation.domain.code.UserErrorCode delegate;
 
