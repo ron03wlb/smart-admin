@@ -35,11 +35,4 @@
         order by create_time desc
     </select>
 
-    <delete id="deleteByIds">
-        delete from t_operate_log where id in
-        <foreach collection="idList" open="(" close=")" separator="," item="item">
-            #{item}
-        </foreach>
-    </delete>
-
 </mapper>

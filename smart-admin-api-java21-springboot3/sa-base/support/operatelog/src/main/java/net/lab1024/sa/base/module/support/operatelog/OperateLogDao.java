@@ -25,12 +25,4 @@ public interface OperateLogDao extends BaseMapper<OperateLogEntity> {
    * @return UserOperateLogEntity
    */
   List<OperateLogEntity> queryByPage(Page page, @Param("query") OperateLogQueryForm queryForm);
-
-  /**
-   * 批量删除
-   *
-   * @param idList
-   * @return
-   */
-  void deleteByIds(@Param("idList") List<Long> idList);
 }
