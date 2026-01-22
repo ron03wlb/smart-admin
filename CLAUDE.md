@@ -1,6 +1,13 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**Quick Reference Card** for SmartAdmin development. This document provides essential patterns, commands, and conventions for rapid development.
+
+**For detailed guidance**, see:
+- [.claude/ Directory](.claude/README.md) - AI agent system, multi-agent workflows, and orchestration
+- [.agent/rules/](.agent/rules/) - Comprehensive coding standards and technical rules
+- [Architecture Documentation](docs/) - High-level architecture and design decisions
+
+---
 
 ## Quick Reference Card
 
@@ -77,6 +84,11 @@ module/
     ├── form/       # Request DTOs (@Valid)
     └── vo/         # Response DTOs
 ```
+
+**See also**:
+- [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md) - Detailed implementation patterns
+- [Project Architecture](.claude/shared/knowledge/project-architecture.md) - Module structure and build configuration
+- [Quality Standards](.claude/shared/knowledge/quality-standards.md) - Code quality checklist
 
 ## SmartAdmin Patterns
 
@@ -190,17 +202,15 @@ Scopes: sa-admin, sa-base, sa-common, smart-admin-web, smart-app, docker, docs
 
 ## Anti-Patterns to Avoid
 
+**Most critical anti-patterns:**
+
 | Anti-Pattern | Correct Pattern |
 |--------------|-----------------|
 | `@Transactional` in Service | Manager layer only |
 | `@Autowired` field injection | `@RequiredArgsConstructor` + `private final` |
-| `return null` for missing entity | `ResponseDTO.error(ErrorCode)` |
-| `private Boolean isDeleted` | `private Boolean deleted` |
 | Controller → Dao directly | Controller → Service → Dao |
-| `rollbackFor = Exception.class` | `rollbackFor = Throwable.class` |
-| Empty catch blocks | Log + rethrow as BusinessException |
-| String concat in logs | `log.info("x={}", x)` placeholder |
-| `QueryWrapper` with strings | `LambdaQueryWrapper` for type safety |
+
+**Complete list**: See [Quality Standards](.claude/shared/knowledge/quality-standards.md#anti-patterns-to-avoid) for all anti-patterns and detailed explanations.
 
 ## Technology Stack
 
@@ -212,6 +222,8 @@ Scopes: sa-admin, sa-base, sa-common, smart-admin-web, smart-app, docker, docs
 | Sa-Token | 1.44.0 |
 | Redisson | 3.50.0 |
 | Knife4j | 4.6.0 |
+
+**See also**: [Project Architecture](.claude/shared/knowledge/project-architecture.md) for detailed version compatibility and configuration.
 
 ## Development Guidelines
 
@@ -226,3 +238,36 @@ Run architecture validation before commits:
 ```bash
 ./gradlew :sa-admin:test --tests ArchitectureTest
 ```
+
+**See also**:
+- [Quality Standards](.claude/shared/knowledge/quality-standards.md) - Code quality checklist
+- [.claude/ Directory](.claude/README.md) - Agent system and orchestration
+
+## Quality Tool Patterns
+
+Common quality tool violations and approved solutions:
+
+### PMD Suppressions
+- **CallSuperInConstructor**: Empty constructors (default behavior is acceptable)
+- **AvoidReassigningParameters**: Create local variable copy instead
+- **ShortClassName**: Use `@SuppressWarnings` for utility inner classes (Dict, Expire)
+- **MissingStaticMethodInNonInstantiatableClass**: Constant-only classes are valid
+
+### SpotBugs Exclusions
+- **EI_EXPOSE_REP/EI_EXPOSE_REP2**: DTO/VO/Form/Config classes don't need defensive copying
+- **NP_NULL_ON_SOME_PATH**: CompletableFuture.getNow(null) and Kafka null keys are valid
+- **ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD**: @PostConstruct static field initialization pattern
+- **CT_CONSTRUCTOR_THROW**: Constructor validation pattern is safe for internal classes
+
+Detailed rules: See [.agent/rules/12-pmd-rules.md](.agent/rules/12-pmd-rules.md) and [.agent/rules/13-spotbugs-rules.md](.agent/rules/13-spotbugs-rules.md)
+
+---
+
+## Version
+
+**Document Version**: 1.0.0
+**Last Updated**: 2026-01-22
+**Aligned with**: .claude/ v2.5.0, .agent/rules/ (latest)
+
+**Change History**:
+- 1.0.0 (2026-01-22): Initial versioned release with cross-references to .claude/ and improved navigation

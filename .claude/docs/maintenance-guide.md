@@ -105,7 +105,96 @@ LocalDateTime parsed = DateUtil.parse(dateString);
 
 **Time:** 5 minutes
 
-### Task 4: Modify Individual Agent
+### Task 4: Update Permissions
+
+**Scenario:** Adding new agents, tools, or commands that require bash execution permissions
+
+**When:**
+- Adding new build tools (e.g., webpack, rollup)
+- Adding custom scripts
+- Enabling new agents that need file system access
+- Expanding allowed command patterns
+
+**Steps:**
+1. **Open** `.claude/settings.local.json`
+2. **Add to `allowedPrompts` array:**
+   ```json
+   {
+     "tool": "Bash",
+     "prompt": "your-command-pattern *:*"
+   }
+   ```
+3. **Restart Claude Code session** to apply changes
+4. **Test new permission** with a simple command
+5. **Update changelog** if significant permission added
+6. **Commit:**
+   ```bash
+   git add .claude/settings.local.json
+   git commit -m "config(permissions): add permission for [command-type]"
+   ```
+
+**Time:** 5 minutes
+
+**Common Permission Patterns:**
+
+| Command Type | Pattern Example | Purpose |
+|--------------|----------------|---------|
+| Gradle | `./gradlew *:*` | All Gradle build operations |
+| NPM | `npm *:*` | All NPM package operations |
+| Docker | `docker *:*` | Docker container operations |
+| Docker Compose | `docker compose *:*` | Docker Compose operations |
+| Git | `git *:*` | Git version control operations |
+| Project Scripts | `*/scripts/*.sh:*` | Custom project shell scripts |
+| PostgreSQL | `psql *:*` | Database CLI operations |
+| Curl | `curl *:*` | HTTP requests |
+| Kubernetes | `kubectl *:*` | K8s cluster operations |
+
+**Example 1: Add Webpack Permission**
+```json
+// In .claude/settings.local.json
+{
+  "allowedPrompts": [
+    {
+      "tool": "Bash",
+      "prompt": "npx webpack *:*"
+    },
+    {
+      "tool": "Bash",
+      "prompt": "npm run build *:*"
+    }
+  ]
+}
+```
+
+**Example 2: Add Custom Script Permission**
+```json
+{
+  "allowedPrompts": [
+    {
+      "tool": "Bash",
+      "prompt": "bash .claude/scripts/*.sh:*"
+    }
+  ]
+}
+```
+
+**Security Best Practices:**
+- Use wildcard patterns (`*:*`) for flexibility but maintain security
+- Avoid overly broad patterns like `*:*` for all commands
+- Review permissions quarterly to remove unused patterns
+- Document why each permission is needed
+- Test permissions in dev environment first
+
+**Troubleshooting:**
+- **Permission denied error?** Check if pattern matches your command exactly
+- **Changes not taking effect?** Restart Claude Code session
+- **Too restrictive?** Use more specific wildcards (e.g., `./gradlew build*:*`)
+
+**See also**: [Permission Guide (archived)](_archive/permission-guide.md) for advanced permission patterns and security considerations
+
+---
+
+### Task 5: Modify Individual Agent
 
 **Scenario:** Change agent-specific expertise (e.g., add new Java 21 feature to java-architect)
 
@@ -127,7 +216,7 @@ LocalDateTime parsed = DateUtil.parse(dateString);
 
 **Time:** 10-15 minutes
 
-### Task 4.5: Update Frontend Agent (vue-expert) or SmartAdmin Frontend Patterns
+### Task 5.5: Update Frontend Agent (vue-expert) or SmartAdmin Frontend Patterns
 
 **Scenario:** SmartAdmin frontend adds new pattern, updates Ant Design Vue usage, or changes frontend conventions
 
@@ -720,3 +809,13 @@ git commit -m "revert(java-architect): rollback to previous version - [reason]"
 - Ask clarifying questions rather than guessing
 
 **Remember:** The goal is maintainability. Taking an extra 5 minutes to do it right saves 50 minutes of rework later!
+
+---
+
+## Related Documentation
+
+- [.claude/README.md](../README.md) - Directory overview and navigation hub
+- [CLAUDE.md (root)](../../CLAUDE.md) - Developer quick reference card
+- [Agent Capability Matrix](agent-capability-matrix.md) - Agent comparison
+- [Troubleshooting Guide](troubleshooting-guide.md) - Problem resolution
+- [Quick Start Guide](quick-start-guide.md) - Getting started

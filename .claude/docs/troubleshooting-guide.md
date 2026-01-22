@@ -1443,11 +1443,14 @@ This troubleshooting guide covers:
 - ✅ When configuration doesn't work
 - ✅ When performance is poor
 
-**Related Resources**:
-- [Agent Capability Matrix](agent-capability-matrix.md) - Agent selection
-- [Agent Dependencies](../shared/orchestration/agent-dependencies.md) - Collaboration
+## Related Documentation
+
+- [.claude/README.md](../README.md) - Directory overview and navigation hub
+- [CLAUDE.md (root)](../../CLAUDE.md) - Developer quick reference card
+- [Agent Capability Matrix](agent-capability-matrix.md) - Agent comparison
 - [Maintenance Guide](maintenance-guide.md) - Configuration updates
-- [Permission Guide](permission-guide.md) - Permission management
+- [Permission Guide (archived)](_archive/permission-guide.md) - Permission management
+- [Quick Start Guide](quick-start-guide.md) - Getting started
 
 ---
 

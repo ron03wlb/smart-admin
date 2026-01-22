@@ -36,7 +36,15 @@
       "Bash(git status:*)",
       "Bash(git branch:*)",
       "Bash(docker compose:*)",
-      "Bash(docker info:*)"
+      "Bash(docker info:*)",
+      "Bash(tee:*)",
+      "Bash(cat:*)",
+      "Bash(git stash push:*)",
+      "Bash(git stash:*)",
+      "Bash(findstr:*)",
+      "Bash(docker logs:*)",
+      "Bash(.gradlew.bat:*)",
+      "Bash(git mv:*)"
     ]
   },
   "allowedCommands": {

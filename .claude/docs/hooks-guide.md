@@ -268,140 +268,20 @@ All fixes are documented in:
 
 ## Troubleshooting
 
-### Problem: Hooks Not Triggering
+For comprehensive hook troubleshooting, see [Troubleshooting Guide](troubleshooting-guide.md#4-hook-system-issues).
 
-**Symptoms**: java-architect completes but no hooks run
+**Quick fixes**:
 
-**Diagnosis**:
-1. Check `.claude/hooks.json` → `"enabled": true`
-2. Verify Claude Code supports hooks (check version)
-3. Check console for error messages
+- **Hooks not triggering?** Check `.claude/hooks.json` → `"enabled": true` and restart your Claude Code session
+- **Hooks too slow?** Reduce auto-fix attempts in `.claude/settings.local.json` → `hooksConfig.autoFix.maxRetries: 1`, or disable non-critical review steps
+- **Auto-fix fails repeatedly?** May require manual intervention - review the specific issue details and implement the fix manually
+- **Git pre-commit blocked?** Run `./gradlew spotlessApply` to fix formatting, or use `git commit --no-verify` in emergencies only
 
-**Solution**:
-```json
-// In .claude/hooks.json
-{
-  "hooks": {
-    "postAgentCompletion": {
-      "java-architect": {
-        "enabled": true    // Ensure this is true
-      }
-    }
-  }
-}
-```
-
-### Problem: Hooks Take Too Long
-
-**Symptoms**: Hooks run for 15+ minutes
-
-**Diagnosis**:
-- Large codebase?
-- Many issues found?
-- Network latency?
-
-**Solutions**:
-
-**Option 1**: Reduce review scope
-```json
-{
-  "hooks": {
-    "postAgentCompletion": {
-      "java-architect": {
-        "steps": [
-          // Comment out architecture-review to save time
-          // {
-          //   "id": "architecture-review",
-          //   "type": "agent",
-          //   "agent": "architect-reviewer"
-          // }
-        ]
-      }
-    }
-  }
-}
-```
-
-**Option 2**: Disable auto-fix for minor issues
-```json
-{
-  "hooksConfig": {
-    "autoFix": {
-      "enabled": true,
-      "minSeverity": "major"    // Only fix major+ issues
-    }
-  }
-}
-```
-
-**Option 3**: Reduce max retries
-```json
-{
-  "hooksConfig": {
-    "autoFix": {
-      "maxRetries": 1    // Default is 3
-    }
-  }
-}
-```
-
-### Problem: Auto-Fix Fails Repeatedly
-
-**Symptoms**: Same issue not fixed after 3 attempts
-
-**Diagnosis**:
-- Issue may require manual intervention
-- Conflicting requirements
-- Missing dependencies
-
-**Solution**:
-1. Review the issue details in hook output
-2. Manually implement the fix
-3. Document why auto-fix failed
-4. Consider updating java-architect's fix patterns
-
-### Problem: Git Pre-Commit Hook Fails
-
-**Symptoms**: `git commit` blocked by hook
-
-**Diagnosis**:
-```bash
-# Run checks manually
-cd smart-admin-api-java21-springboot3
-./gradlew spotlessCheck
-./gradlew :sa-admin:test --tests ArchitectureTest
-```
-
-**Solutions**:
-
-**Option 1**: Fix the issues (recommended)
-```bash
-# Fix formatting
-./gradlew spotlessApply
-git add -u
-
-# Fix architecture violations
-# Review errors, fix code, commit again
-```
-
-**Option 2**: Bypass hook (emergency only)
-```bash
-git commit --no-verify
-```
-
-### Problem: Hooks Report False Positives
-
-**Symptoms**: Issues flagged that aren't actually problems
-
-**Diagnosis**:
-- Check issue details in review output
-- Verify against SmartAdmin patterns
-- May indicate pattern needs clarification
-
-**Solution**:
-1. Document the pattern in `.claude/shared/knowledge/quality-standards.md`
-2. Update reviewer agent configurations if needed
-3. Report to team lead for review
+See [Troubleshooting Guide](troubleshooting-guide.md#4-hook-system-issues) for:
+- Detailed diagnosis steps
+- Complete solutions for all hook issues
+- Prevention strategies
+- Advanced troubleshooting techniques
 
 ## Performance Optimization
 

@@ -457,3 +457,13 @@ Start with simple tasks, learn the patterns, and gradually take on more complex 
 ---
 
 **Questions?** Check the [maintenance-guide.md](./maintenance-guide.md) or ask the development team.
+
+---
+
+## Related Documentation
+
+- [.claude/README.md](../README.md) - Directory overview and navigation hub
+- [CLAUDE.md (root)](../../CLAUDE.md) - Developer quick reference card
+- [Agent Capability Matrix](agent-capability-matrix.md) - Agent comparison
+- [Troubleshooting Guide](troubleshooting-guide.md) - Problem resolution
+- [Maintenance Guide](maintenance-guide.md) - Configuration updates

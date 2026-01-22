@@ -437,6 +437,14 @@ When reviewing Java code, verify:
 - [ ] No empty catch blocks
 - [ ] Tests cover >85% of code
 
+### Quality Tool Patterns
+- [ ] PMD suppressions documented (see [.agent/rules/12-pmd-rules.md](../../.agent/rules/12-pmd-rules.md))
+- [ ] SpotBugs exclusions justified (see [.agent/rules/13-spotbugs-rules.md](../../.agent/rules/13-spotbugs-rules.md))
+- [ ] Empty constructors have `@SuppressWarnings("PMD.CallSuperInConstructor")`
+- [ ] Constant-only classes have `@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")`
+- [ ] Parameter modifications create local copies (avoid `AvoidReassigningParameters`)
+- [ ] DTO/VO classes excluded from SpotBugs EI_EXPOSE_REP via exclude.xml
+
 ## Performance Optimization Expertise
 
 ### N+1 Query Detection & Resolution
