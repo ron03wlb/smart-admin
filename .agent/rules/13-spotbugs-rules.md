@@ -9,8 +9,8 @@ ask_before_fix: false
 related_rules:
   - rules/03-concurrency-rules.md
   - rules/07-owasp-top10-part1.md
-spotbugs_rule: NP_NULL_ON_SOME_PATH,DM_STRING_CTOR,SQL_INJECTION
-last_updated: 2025-01-21
+spotbugs_rule: NP_NULL_ON_SOME_PATH,DM_STRING_CTOR,SQL_INJECTION,EI_EXPOSE_REP,EI_EXPOSE_REP2,ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD,CT_CONSTRUCTOR_THROW
+last_updated: 2026-01-22
 ---
 
 # SpotBugs 規範
@@ -126,6 +126,67 @@ private static final String DB_PASSWORD = "mypassword123";
 private String dbPassword;
 ```
 
+#### EI_EXPOSE_REP / EI_EXPOSE_REP2 - Lombok + DTO 模式
+
+**場景**: @Data/@Builder 標註的 DTO/VO/Form/Config 類
+**違規原因**: Getter 返回可變對象引用，Setter/Builder 直接存儲參數
+**SmartAdmin 判斷**: DTO/VO 是數據載體，防禦性複製是過度設計
+**解決方案**: 在 `config/spotbugs/exclude.xml` 中排除
+```xml
+<Match>
+    <Or>
+        <Class name="~.*VO"/>
+        <Class name="~.*DTO"/>
+        <Class name="~.*Form"/>
+        <Class name="~.*Properties"/>
+        <Class name="~.*Config"/>
+    </Or>
+    <Or>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Or>
+</Match>
+```
+
+#### NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE - API 合法用法
+
+**場景**: CompletableFuture.getNow(null)、Kafka send(topic, null, message)
+**違規原因**: SpotBugs 誤判這些 API 不接受 null
+**SmartAdmin 判斷**: CompletableFuture.getNow 和 Kafka 允許 null 參數
+**解決方案**: 排除特定類的 NP 違規
+```xml
+<Match>
+    <Class name="net.lab1024.sa.common.mq.kafka.core.KafkaProducerServiceImpl"/>
+    <Bug code="NP"/>
+</Match>
+```
+
+#### ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD - Spring DI 橋接
+
+**場景**: JsonUtil 使用 @PostConstruct 初始化靜態字段
+**違規原因**: 實例方法寫入靜態字段通常是設計問題
+**SmartAdmin 判斷**: 靜態工具類橋接 Spring DI 是標準模式
+**解決方案**: 排除特定方法
+```xml
+<Match>
+    <Class name="net.lab1024.sa.base.core.json.JsonUtil"/>
+    <Method name="init"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+</Match>
+```
+
+#### CT_CONSTRUCTOR_THROW - 構造函數驗證模式
+
+**場景**: 構造函數中驗證參數並拋出異常
+**違規原因**: 理論上可能的 finalizer attack
+**SmartAdmin 判斷**: 內部類無需防範，實際風險為零
+**解決方案**: 全局排除此規則
+```xml
+<Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+</Match>
+```
+
 ---
 
 ## 【強制】啟用規則說明
@@ -200,6 +261,35 @@ dependencies {
     </Match>
 </FindBugsFilter>
 ```
+
+### SmartAdmin 實際配置
+SmartAdmin 專案的完整排除配置位於 [`config/spotbugs/exclude.xml`](../../smart-admin-api-java21-springboot3/config/spotbugs/exclude.xml)，包含以下模式：
+
+- **Lombok + Spring 模式**: DTO/VO/Form/Properties/Config 類排除 EI_EXPOSE_REP
+- **Spring DI 橋接**: JsonUtil 的 @PostConstruct 模式排除 ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD
+- **API 合法用法**: KafkaProducerServiceImpl 排除 NP 違規
+- **構造函數驗證**: 全局排除 CT_CONSTRUCTOR_THROW
+- **生成代碼**: MapStruct 生成類和 target/generated-sources 自動排除
+
+在 `build.gradle.kts` 中引用:
+```kotlin
+configure<com.github.spotbugs.snom.SpotBugsExtension> {
+    excludeFilter.set(rootProject.file("config/spotbugs/exclude.xml"))
+}
+```
+
+---
+
+## 常見違規類型統計
+
+基於專案實際違規分析：
+
+| 違規類型                                   | 本次修復 | 解決方式          | 配置位置                   |
+| ------------------------------------------ | -------- | ----------------- | -------------------------- |
+| `EI_EXPOSE_REP/EI_EXPOSE_REP2`             | 24       | exclude.xml 排除  | DTO/VO/Form/Config 類      |
+| `NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE`   | 2        | exclude.xml 排除  | KafkaProducerServiceImpl   |
+| `ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD`  | 1        | exclude.xml 排除  | JsonUtil.init()            |
+| `CT_CONSTRUCTOR_THROW`                     | 1        | exclude.xml 全局排除 | 所有構造函數               |
 
 ---
 

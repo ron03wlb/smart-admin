@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.core.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.module.support.changelog.constant.ChangeLogTypeEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.domain.PageParam;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 
 /**
  * 系统更新日志 查询

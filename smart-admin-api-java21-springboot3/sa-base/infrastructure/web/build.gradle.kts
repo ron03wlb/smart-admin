@@ -14,7 +14,13 @@ dependencies {
     // Apache HttpClient 5 (for RestClient configuration)
     api(libs.httpclient5)
 
-    // SA Base Core
+    // SA Foundation - Domain objects (ResponseDTO, ErrorCode)
+    api(project(":sa-base:foundation:domain"))
+
+    // SA Foundation - JSON serialization
+    api(project(":sa-base:foundation:json"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // SA Base Swagger (for SwaggerTagConst)

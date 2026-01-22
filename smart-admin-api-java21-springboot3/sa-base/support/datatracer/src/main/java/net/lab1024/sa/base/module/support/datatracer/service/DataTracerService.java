@@ -5,9 +5,6 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.util.SmartIpUtil;
-import net.lab1024.sa.base.core.util.SmartPageUtil;
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerConst;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.dao.DataTracerDao;
@@ -16,10 +13,13 @@ import net.lab1024.sa.base.module.support.datatracer.domain.form.DataTracerForm;
 import net.lab1024.sa.base.module.support.datatracer.domain.form.DataTracerQueryForm;
 import net.lab1024.sa.base.module.support.datatracer.domain.vo.DataTracerVO;
 import net.lab1024.sa.base.module.support.datatracer.manager.DataTracerManger;
+import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
+import net.lab1024.sa.base.web.util.SmartRequestUtil;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.RequestUser;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -159,7 +159,7 @@ public class DataTracerService {
     tracerEntity.setType(tracerForm.getType().getValue());
     if (requestUser != null) {
       tracerEntity.setIp(requestUser.getIp());
-      tracerEntity.setIpRegion(SmartIpUtil.getRegion(requestUser.getIp()));
+      tracerEntity.setIpRegion(IpGeolocationUtil.getRegion(requestUser.getIp()));
       tracerEntity.setUserAgent(requestUser.getUserAgent());
       tracerEntity.setUserId(requestUser.getUserId());
       tracerEntity.setUserType(requestUser.getUserType().getValue());
@@ -187,7 +187,7 @@ public class DataTracerService {
                   DataTracerEntity tracerEntity = SmartBeanUtil.copy(e, DataTracerEntity.class);
                   tracerEntity.setType(e.getType().getValue());
                   tracerEntity.setIp(requestUser.getIp());
-                  tracerEntity.setIpRegion(SmartIpUtil.getRegion(requestUser.getIp()));
+                  tracerEntity.setIpRegion(IpGeolocationUtil.getRegion(requestUser.getIp()));
                   tracerEntity.setUserAgent(requestUser.getUserAgent());
                   tracerEntity.setUserId(requestUser.getUserId());
                   tracerEntity.setUserType(requestUser.getUserType().getValue());

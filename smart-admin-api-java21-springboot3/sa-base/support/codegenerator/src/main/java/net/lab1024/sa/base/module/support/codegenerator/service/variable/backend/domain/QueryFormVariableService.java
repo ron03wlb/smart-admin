@@ -14,7 +14,7 @@ import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGenerato
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeField;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeQueryField;
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.CodeGenerateBaseVariableService;
-import net.lab1024.sa.common.core.util.SmartEnumUtil;
+import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 /**
@@ -126,7 +126,7 @@ public class QueryFormVariableService extends CodeGenerateBaseVariableService {
                 IMPORT_PREFIX + "com.fasterxml.jackson.databind.annotation.JsonDeserialize;");
             packageList.add(
                 IMPORT_PREFIX
-                    + "net.lab1024.sa.base.common.json.deserializer.DictDataDeserializer;");
+                    + "net.lab1024.sa.foundation.json.deserializer.DictDataDeserializer;");
           }
           finalFieldMap.put(JAVA_TYPE, STRING_TYPE);
           break;

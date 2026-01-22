@@ -18,6 +18,9 @@ import org.springframework.web.method.HandlerMethod;
  * @author 1024创新实验室-主任:卓大
  * @since 2023/12/26 13:47:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@SuppressWarnings(
+    "PMD.ConsecutiveAppendsShouldReuse") // Separate appends improve readability for HTML
+// construction
 public class SmartOperationCustomizer implements OperationCustomizer {
 
   private static final String RED_FONT_START = "<font style=\"color:red\" class=\"light-red\">";

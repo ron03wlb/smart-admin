@@ -10,7 +10,10 @@ dependencies {
     api(libs.spring.boot.autoconfigure)
     api(libs.spring.boot.starter.data.redis)
 
-    // SA Base Core
+    // SA Foundation - Domain objects (ResponseDTO, ErrorCode)
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // Redisson

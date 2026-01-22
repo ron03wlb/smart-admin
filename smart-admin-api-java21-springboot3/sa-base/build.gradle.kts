@@ -83,8 +83,18 @@ dependencies {
     api(libs.objenesis)
     api(libs.commons.pool2)
 
-    // ========== Layer 0: Foundation (9 modules, formerly sa-common) ==========
+    // ========== Layer 0: Foundation (14 modules, formerly sa-common) ==========
+    // Core domain objects - used by all modules
+    api(project(":sa-base:foundation:domain"))
+    api(project(":sa-base:foundation:validation"))
+    api(project(":sa-base:foundation:json"))
+    api(project(":sa-base:foundation:ip-geolocation"))
+    api(project(":sa-base:foundation:excel"))
+
+    // Remaining utilities (temporarily retains some utils during migration)
     api(project(":sa-base:foundation:core"))
+
+    // Message queue, cache, and security modules
     api(project(":sa-base:foundation:mq"))
     api(project(":sa-base:foundation:cache"))
     api(project(":sa-base:foundation:redis-lock"))
@@ -149,7 +159,7 @@ dependencies {
     api(libs.freemarker)
 
     // Security
-    api(libs.ip2region)
+    // Note: ip2region now provided by foundation:ip-geolocation module
     api(libs.bcprov.jdk18on)
 
     // Excel & Documents

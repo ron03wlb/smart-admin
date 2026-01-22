@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 
 /**
  * 变动记录

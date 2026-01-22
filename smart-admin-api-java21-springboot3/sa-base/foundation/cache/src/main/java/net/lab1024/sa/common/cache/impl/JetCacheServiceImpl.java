@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
  * @since 2025-01-19 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@SuppressWarnings("PMD.CloseResource") // Cache 对象由 cacheMap 管理，生命周期由 Spring 容器控制
 public class JetCacheServiceImpl implements CacheService {
 
   private static final long DEFAULT_LOCAL_EXPIRE_SECONDS = 30 * 60;
@@ -229,6 +230,7 @@ public class JetCacheServiceImpl implements CacheService {
   }
 
   @Override
+  @SuppressWarnings("PMD.UseExplicitTypes")
   public List<String> cacheKey(String cacheName) {
     // 使用Redis KEYS命令扫描指定缓存的所有key
     String prefix = cacheKeyPrefix + cacheName + ":";

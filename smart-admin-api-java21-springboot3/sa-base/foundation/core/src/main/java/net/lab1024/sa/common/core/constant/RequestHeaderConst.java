@@ -1,14 +1,8 @@
 package net.lab1024.sa.common.core.constant;
 
 /**
- * 请求消息头常量
- *
- * @author 1024创新实验室: 罗伊
- * @since 2022-05-15 20:46:27 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ * @deprecated Use {@link net.lab1024.sa.foundation.domain.constant.RequestHeaderConst} instead.
  */
-public class RequestHeaderConst {
-
-  public static final String TOKEN = "Authorization";
-
-  public static final String USER_AGENT = "user-agent";
-}
+@Deprecated(since = "3.6.0", forRemoval = true)
+public class RequestHeaderConst
+    extends net.lab1024.sa.foundation.domain.constant.RequestHeaderConst {}

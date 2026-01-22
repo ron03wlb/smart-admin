@@ -42,6 +42,21 @@ Controller -> Service -> Manager -> Dao -> Entity
 ./gradlew :sa-admin:test --tests ArchitectureTest
 ```
 
+### Run Integration Tests
+
+```bash
+# Integration tests with Testcontainers
+./gradlew :sa-admin:test --tests *IntTest
+
+# Specific integration test
+./gradlew :sa-admin:test --tests EmployeeControllerIntTest
+
+# With container reuse (faster)
+./gradlew :sa-admin:test -Dtestcontainers.reuse.enable=true
+
+# See: Integration Testing Quick Reference for more
+```
+
 ### Coverage Reports
 
 ```bash
@@ -298,6 +313,7 @@ assertFalse(response.getOk());
 
 | Topic | Link |
 |-------|------|
+| **Integration Testing** | [integration-testing-quick-reference.md](./integration-testing-quick-reference.md) |
 | **Full Testing Strategy** | [testing-strategy.md](./testing-strategy.md) |
 | **Implementation Roadmap** | [unit-test-implementation-plan.md](./unit-test-implementation-plan.md) |
 | **Architecture Fixes** | [architecture/overview.md](./architecture/overview.md) |

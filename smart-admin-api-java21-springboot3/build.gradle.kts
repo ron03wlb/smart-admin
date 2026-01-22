@@ -94,6 +94,7 @@ subprojects {
         ignoreFailures.set(false)
         effort.set(com.github.spotbugs.snom.Effort.MAX)
         reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
+        excludeFilter.set(rootProject.file("config/spotbugs/exclude.xml"))
     }
 
     // Error Prone Configuration

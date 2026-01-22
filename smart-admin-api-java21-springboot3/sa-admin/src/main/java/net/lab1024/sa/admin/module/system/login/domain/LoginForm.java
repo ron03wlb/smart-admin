@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.base.common.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.constant.LoginDeviceEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.captcha.CaptchaForm;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 import org.hibernate.validator.constraints.Length;
 
 /**

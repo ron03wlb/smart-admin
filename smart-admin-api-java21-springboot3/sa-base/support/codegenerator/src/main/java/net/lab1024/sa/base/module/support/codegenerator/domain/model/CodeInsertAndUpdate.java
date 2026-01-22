@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
-import net.lab1024.sa.base.core.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeGeneratorPageTypeEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 
 /**
  * 代码生成 增加、修改 模型

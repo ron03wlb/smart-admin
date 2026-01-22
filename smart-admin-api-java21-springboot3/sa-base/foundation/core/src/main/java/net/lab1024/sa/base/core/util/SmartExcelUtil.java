@@ -14,6 +14,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -26,6 +28,9 @@ import org.apache.poi.xssf.usermodel.XSSFPictureData;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 
 /**
  * excel 工具类
@@ -44,7 +49,7 @@ public final class SmartExcelUtil {
       Collection<?> data)
       throws IOException {
     // 设置下载消息头
-    SmartResponseUtil.setDownloadFileHeader(response, fileName, null);
+    setDownloadFileHeader(response, fileName, null);
     // 下载
     FastExcel.write(response.getOutputStream(), head)
         .autoCloseStream(Boolean.FALSE)
@@ -62,7 +67,7 @@ public final class SmartExcelUtil {
       String watermarkString)
       throws IOException {
     // 设置下载消息头
-    SmartResponseUtil.setDownloadFileHeader(response, fileName, null);
+    setDownloadFileHeader(response, fileName, null);
     // 水印
     Watermark watermark = new Watermark(watermarkString);
     // 一定要inMemory
@@ -152,6 +157,31 @@ public final class SmartExcelUtil {
         // 处理ImageIO.write可能抛出的异常
         log.error("添加水印图片时发生错误", e);
       }
+    }
+  }
+
+  /**
+   * Set download file header for HTTP response (inlined from SmartResponseUtil to avoid circular
+   * dependency)
+   */
+  private static void setDownloadFileHeader(
+      HttpServletResponse response, String fileName, Long fileSize) {
+    response.setCharacterEncoding("UTF-8");
+    if (fileSize != null) {
+      response.setHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileSize));
+    }
+
+    if (SmartStringUtil.isNotEmpty(fileName)) {
+      response.setHeader(
+          HttpHeaders.CONTENT_TYPE,
+          MediaTypeFactory.getMediaType(fileName).orElse(MediaType.APPLICATION_OCTET_STREAM)
+              + ";charset=utf-8");
+      response.setHeader(
+          HttpHeaders.CONTENT_DISPOSITION,
+          "attachment;filename="
+              + URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20"));
+      response.setHeader(
+          HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
     }
   }
 

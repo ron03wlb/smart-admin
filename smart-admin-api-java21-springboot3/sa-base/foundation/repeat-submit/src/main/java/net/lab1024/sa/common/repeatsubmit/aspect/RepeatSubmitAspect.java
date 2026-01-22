@@ -48,6 +48,7 @@ public class RepeatSubmitAspect {
    * @throws Throwable 异常
    */
   @Around("@annotation(net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit)")
+  @SuppressWarnings("PMD.AvoidCatchingThrowable") // AOP 需要捕获所有异常包括 Error
   public Object around(ProceedingJoinPoint point) throws Throwable {
 
     ServletRequestAttributes attributes =
@@ -78,16 +79,11 @@ public class RepeatSubmitAspect {
 
     try {
       return point.proceed();
-    } catch (Exception exception) {
+    } catch (Throwable throwable) {
       if (log.isErrorEnabled()) {
-        log.error(exception.getMessage(), exception);
+        log.error(throwable.getMessage(), throwable);
       }
-      throw exception;
-    } catch (Error error) {
-      if (log.isErrorEnabled()) {
-        log.error(error.getMessage(), error);
-      }
-      throw error;
+      throw throwable;
     } finally {
       this.repeatSubmitTicket.unLock(ticket, intervalMilliSecond);
     }

@@ -39,7 +39,13 @@
    - Architecture rules cheatsheet
    - Mock strategy decision tree
 
-**Read time**: 45 minutes
+4. **Integration Testing**: [Integration Testing Quick Reference](./integration-testing-quick-reference.md)
+   - Testing Sa-Token authentication
+   - Testing @Transactional methods
+   - Testing cache with JetCache
+   - Testing Kafka & async operations
+
+**Read time**: 60 minutes
 
 ---
 
@@ -99,6 +105,16 @@
 | **[Quick Reference](./quick-reference.md)** | Commands & rules cheatsheet | All | 2 min |
 | **[Testing Strategy](./testing-strategy.md)** | How to write tests | Developers | 30 min |
 | **[Implementation Plan](./unit-test-implementation-plan.md)** | 6-week roadmap | Tech Leads | 20 min |
+
+### Integration Testing
+
+| Document | Purpose | Audience | Read Time |
+|----------|---------|----------|-----------|
+| **[Integration Testing Quick Reference](./integration-testing-quick-reference.md)** | Commands, patterns, 4 challenges | All | 3 min |
+| **[Sa-Token Testing](./integration/sa-token-testing.md)** | Authentication testing | Developers | 15 min |
+| **[Transaction Testing](./integration/transaction-testing.md)** | @Transactional testing | Developers | 12 min |
+| **[Caching Testing](./integration/caching-testing.md)** | JetCache testing | Developers | 15 min |
+| **[Kafka & Async Testing](./integration/kafka-async-testing.md)** | Async operations testing | Developers | 12 min |
 
 ### Architecture Fixes
 

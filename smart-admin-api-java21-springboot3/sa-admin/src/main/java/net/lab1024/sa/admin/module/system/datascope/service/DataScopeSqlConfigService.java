@@ -16,7 +16,7 @@ import net.lab1024.sa.admin.module.system.datascope.constant.DataScopeWhereInTyp
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeSqlConfig;
 import net.lab1024.sa.admin.module.system.datascope.manager.DataScopeViewManager;
 import net.lab1024.sa.admin.module.system.datascope.strategy.AbstractDataScopeStrategy;
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
+import net.lab1024.sa.base.web.util.SmartRequestUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;

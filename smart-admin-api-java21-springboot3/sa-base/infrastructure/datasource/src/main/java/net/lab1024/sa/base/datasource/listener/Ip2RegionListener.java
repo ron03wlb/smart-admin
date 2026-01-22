@@ -3,7 +3,7 @@ package net.lab1024.sa.base.datasource.listener;
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.util.SmartIpUtil;
+import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
@@ -56,7 +56,7 @@ public class Ip2RegionListener implements ApplicationListener<ApplicationEnviron
           new ClassPathResource(IP_FILE_NAME).getInputStream(), tempFile);
 
       // 2、初始化
-      SmartIpUtil.init(tempFilePath);
+      IpGeolocationUtil.init(tempFilePath);
 
     } catch (IOException e) {
       log.error("无法复制ip数据文件 ip2region.xdb", e);

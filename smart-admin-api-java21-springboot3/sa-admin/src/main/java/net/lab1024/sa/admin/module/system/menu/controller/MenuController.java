@@ -13,7 +13,7 @@ import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuTreeVO;
 import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuVO;
 import net.lab1024.sa.admin.module.system.menu.service.MenuService;
 import net.lab1024.sa.base.core.domain.RequestUrlVO;
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
+import net.lab1024.sa.base.web.util.SmartRequestUtil;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

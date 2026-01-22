@@ -36,7 +36,6 @@ import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
 import net.lab1024.sa.base.constant.LoginDeviceEnum;
 import net.lab1024.sa.base.core.domain.UserPermission;
-import net.lab1024.sa.base.core.util.SmartIpUtil;
 import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
@@ -57,9 +56,10 @@ import net.lab1024.sa.common.core.constant.RequestHeaderConst;
 import net.lab1024.sa.common.core.constant.StringConst;
 import net.lab1024.sa.common.core.domain.RequestUser;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
-import net.lab1024.sa.common.core.util.SmartEnumUtil;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
+import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.springframework.stereotype.Service;
 
 /**
@@ -351,7 +351,7 @@ public class LoginService implements StpInterface {
             .userName(requestUser.getUserName())
             .userAgent(requestUser.getUserAgent())
             .loginIp(requestUser.getIp())
-            .loginIpRegion(SmartIpUtil.getRegion(requestUser.getIp()))
+            .loginIpRegion(IpGeolocationUtil.getRegion(requestUser.getIp()))
             .loginResult(LoginLogResultEnum.LOGIN_OUT.getValue())
             .createTime(LocalDateTime.now())
             .build();
@@ -375,7 +375,7 @@ public class LoginService implements StpInterface {
             .userName(employeeEntity.getActualName())
             .userAgent(userAgent)
             .loginIp(ip)
-            .loginIpRegion(SmartIpUtil.getRegion(ip))
+            .loginIpRegion(IpGeolocationUtil.getRegion(ip))
             .remark(remark)
             .loginDevice(loginDeviceEnum.getDesc())
             .loginResult(result.getValue())

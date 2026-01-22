@@ -15,8 +15,8 @@ import net.lab1024.sa.base.module.support.message.domain.MessageTemplateSendForm
 import net.lab1024.sa.base.module.support.message.domain.MessageVO;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Service;
 

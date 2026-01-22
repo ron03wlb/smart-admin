@@ -8,9 +8,18 @@
 |--------|--------|------|------|
 | `MINIO_ROOT_USER` | smartadmin | 管理员账号 | dev/test |
 | `MINIO_ROOT_PASSWORD` | SmartAdmin@2024 | 管理员密码 | dev/test |
+| `MINIO_BUCKET_NAME` | dev-smart-admin | 默认存储桶名称 | dev/test |
+| `MINIO_REGION` | us-east-1 | 区域名称 | 所有 |
 | `MINIO_API_PORT` | 9000 | S3 API 端口 | 所有 |
 | `MINIO_CONSOLE_PORT` | 9001 | Web 控制台端口 | dev/test |
-| `MINIO_REGION_NAME` | us-east-1 | 区域名称 | 所有 |
+
+**修改端口示例**：
+
+```bash
+# .env
+MINIO_API_PORT=19000
+MINIO_CONSOLE_PORT=19001
+```
 
 ### Volume 配置
 

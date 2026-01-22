@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.json.JsonUtil;
 import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeGeneratorConstant;
@@ -27,6 +26,7 @@ import net.lab1024.sa.base.module.support.codegenerator.domain.vo.TableConfigVO;
 import net.lab1024.sa.base.module.support.codegenerator.domain.vo.TableVO;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.json.util.JsonUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

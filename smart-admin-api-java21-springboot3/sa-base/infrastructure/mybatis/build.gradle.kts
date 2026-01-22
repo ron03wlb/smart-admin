@@ -9,8 +9,15 @@ dependencies {
     // Spring Boot
     api(libs.spring.boot.autoconfigure)
 
-    // SA Base Core
+    // SA Foundation - Domain objects (PageParam, PageResult, ResponseDTO, BusinessException)
+    api(project(":sa-base:foundation:domain"))
+
+    // SA Foundation - Core utilities (SmartBeanUtil)
     api(project(":sa-base:foundation:core"))
+
+    // Utilities (for Lists, StringUtils in SmartPageUtil)
+    api(libs.guava)
+    api(libs.commons.lang3)
 
     // MyBatis Plus
     api(libs.mybatis.plus.spring.boot.starter)

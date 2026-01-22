@@ -6,11 +6,10 @@ plugins {
 description = "SmartAdmin Base DevTools - Development utilities and tools (placeholder)"
 
 dependencies {
-    // SA Common Core - foundational domain objects and utilities
-    api(project(":sa-base:foundation:core"))
-
-    // SA Base Core - sa-base specific domain objects and utilities
-    // Note: SmartExcelUtil is in sa-base-core for broader accessibility
+    // SA Foundation - Domain objects
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // Note: Code Generator has been moved to sa-base-support:codegenerator module

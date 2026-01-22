@@ -320,7 +320,7 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
 
       // 清除缓存（如果是私有文件）
       if (fileKey.startsWith(FileFolderTypeEnum.FOLDER_PRIVATE)) {
-        cacheService.delete(CacheKeyConst.Support.FILE_PRIVATE, fileKey);
+        cacheService.remove(CacheKeyConst.Support.FILE_PRIVATE, fileKey);
         log.info("文件删除成功并清除缓存: fileKey={}", fileKey);
       } else {
         log.info("文件删除成功: fileKey={}", fileKey);

@@ -12,9 +12,18 @@ dependencies {
     api(libs.spring.boot.autoconfigure)
 
     // SA Common Core
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
+    // SA Foundation - IP Geolocation (for IpGeolocationUtil)
+    api(project(":sa-base:foundation:ip-geolocation"))
+
     // SA Base Infrastructure
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
     api(project(":sa-base:infrastructure:mybatis"))
     api(project(":sa-base:infrastructure:web"))

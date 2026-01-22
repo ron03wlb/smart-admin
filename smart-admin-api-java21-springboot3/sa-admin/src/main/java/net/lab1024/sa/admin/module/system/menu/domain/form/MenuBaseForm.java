@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import net.lab1024.sa.admin.module.system.menu.constant.MenuPermsTypeEnum;
 import net.lab1024.sa.admin.module.system.menu.constant.MenuTypeEnum;
-import net.lab1024.sa.base.common.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 import org.hibernate.validator.constraints.Length;
 
 /**

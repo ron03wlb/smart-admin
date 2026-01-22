@@ -10,7 +10,13 @@ dependencies {
     api(libs.spring.boot.autoconfigure)
     api(libs.spring.boot.starter.web)
 
-    // SA Base Core
+    // SA Foundation - Domain objects (ResponseDTO, ErrorCode)
+    api(project(":sa-base:foundation:domain"))
+
+    // SA Foundation - Validation (@CheckEnum annotation)
+    api(project(":sa-base:foundation:validation"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // SA Common - API Encrypt (for ApiDecrypt, ApiEncrypt annotations)

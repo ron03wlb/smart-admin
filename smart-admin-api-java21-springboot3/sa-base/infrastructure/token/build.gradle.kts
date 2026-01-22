@@ -9,7 +9,10 @@ dependencies {
     // Spring Boot
     api(libs.spring.boot.autoconfigure)
 
-    // SA Base Core
+    // SA Foundation - Domain objects (ResponseDTO, ErrorCode, RequestUser)
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // SA Common - Security Protect (for SecurityConfigProvider)

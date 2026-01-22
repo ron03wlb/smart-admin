@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.common.core.enumeration.GenderEnum;
+import net.lab1024.sa.foundation.domain.enumeration.GenderEnum;
 
 /**
  * 员工信息

@@ -41,6 +41,8 @@ import org.springframework.http.HttpRequest;
 @Slf4j
 @Configuration
 @Conditional(SystemEnvironmentConfig.class)
+@SuppressWarnings(
+    "PMD.AvoidDuplicateLiterals") // URL wildcard patterns ("/**") are naturally repetitive
 public class SwaggerConfig {
   /** 用于解决/swagger-ui/index.html页面ServersUrl 测试环境部署错误问题 */
   @Value("${springdoc.swagger-ui.server-base-url}")

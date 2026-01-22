@@ -61,6 +61,14 @@ dependencies {
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.archunit.junit5)
+
+    // H2 in-memory database for tests
+    testRuntimeOnly("com.h2database:h2")
+
+    // Testcontainers for integration tests (Redis, PostgreSQL)
+    testImplementation(platform(libs.testcontainers.bom))
+    testImplementation(libs.testcontainers)
+    testImplementation(libs.testcontainers.junit.jupiter)
 }
 
 tasks {
@@ -103,5 +111,109 @@ tasks {
     // Disable plain jar task (we only want the boot jar)
     named<Jar>("jar") {
         enabled = false
+    }
+
+    // JaCoCo Coverage Report Configuration
+    withType<JacocoReport> {
+        dependsOn(test)
+
+        reports {
+            xml.required.set(true) // For SonarQube integration
+            html.required.set(true) // For local review
+        }
+
+        // Exclude generated/config classes from coverage calculation
+        classDirectories.setFrom(
+            files(
+                classDirectories.files.map {
+                    fileTree(it) {
+                        exclude(
+                            "**/config/**",
+                            "**/constant/**",
+                            "**/domain/entity/**",
+                            "**/domain/form/**",
+                            "**/domain/vo/**",
+                            "**/*Application.class",
+                            "**/*Configuration.class"
+                        )
+                    }
+                }
+            )
+        )
+    }
+
+    // JaCoCo Coverage Verification - Enforces 80%+ Coverage
+    named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+        dependsOn(test, jacocoTestReport)
+
+        violationRules {
+            // Rule 1: Overall coverage thresholds
+            rule {
+                enabled = true
+                element = "BUNDLE"
+
+                limit {
+                    counter = "LINE"
+                    value = "COVEREDRATIO"
+                    minimum = "0.80".toBigDecimal() // 80% line coverage
+                }
+
+                limit {
+                    counter = "BRANCH"
+                    value = "COVEREDRATIO"
+                    minimum = "0.70".toBigDecimal() // 70% branch coverage
+                }
+            }
+
+            // Rule 2: Service layer - higher standard
+            rule {
+                enabled = true
+                element = "CLASS"
+                includes = listOf("*.service.*")
+
+                limit {
+                    counter = "LINE"
+                    value = "COVEREDRATIO"
+                    minimum = "0.85".toBigDecimal() // 85% for services
+                }
+            }
+
+            // Rule 3: Manager layer
+            rule {
+                enabled = true
+                element = "CLASS"
+                includes = listOf("*.manager.*")
+
+                limit {
+                    counter = "LINE"
+                    value = "COVEREDRATIO"
+                    minimum = "0.80".toBigDecimal() // 80% for managers
+                }
+            }
+        }
+
+        // Exclude same classes as JacocoReport
+        classDirectories.setFrom(
+            files(
+                classDirectories.files.map {
+                    fileTree(it) {
+                        exclude(
+                            "**/config/**",
+                            "**/constant/**",
+                            "**/domain/entity/**",
+                            "**/domain/form/**",
+                            "**/domain/vo/**",
+                            "**/*Application.class",
+                            "**/*Configuration.class"
+                        )
+                    }
+                }
+            )
+        )
+    }
+
+    // Integrate coverage verification into build pipeline
+    named("check") {
+        dependsOn("jacocoTestCoverageVerification")
     }
 }

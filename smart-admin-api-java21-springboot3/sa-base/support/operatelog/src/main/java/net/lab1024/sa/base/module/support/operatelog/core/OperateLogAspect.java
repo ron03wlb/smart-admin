@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.json.JsonUtil;
-import net.lab1024.sa.base.core.util.SmartIpUtil;
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
 import net.lab1024.sa.base.module.support.operatelog.OperateLogDao;
 import net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogEntity;
+import net.lab1024.sa.base.web.util.SmartRequestUtil;
 import net.lab1024.sa.common.core.constant.StringConst;
 import net.lab1024.sa.common.core.domain.RequestUser;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
+import net.lab1024.sa.foundation.json.util.JsonUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -197,7 +197,7 @@ public abstract class OperateLogAspect {
             .method(operateMethod)
             .param(params)
             .ip(user.getIp())
-            .ipRegion(SmartIpUtil.getRegion(user.getIp()))
+            .ipRegion(IpGeolocationUtil.getRegion(user.getIp()))
             .userAgent(user.getUserAgent())
             .failReason(failReason)
             .successFlag(successFlag)

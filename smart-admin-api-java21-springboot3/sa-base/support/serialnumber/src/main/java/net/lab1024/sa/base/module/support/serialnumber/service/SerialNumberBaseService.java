@@ -18,7 +18,7 @@ import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberLastGenerateBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberRecordEntity;
 import net.lab1024.sa.common.core.exception.BusinessException;
-import net.lab1024.sa.common.core.util.SmartEnumUtil;
+import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

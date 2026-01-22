@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2024-01-01
  */
 @Slf4j
+@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public class MessageAggregator<T> {
 
   /** 聚合数量阈值 */
@@ -64,7 +65,10 @@ public class MessageAggregator<T> {
   private ScheduledFuture<?> scheduledFlush;
 
   /** 是否已关闭 */
-  private volatile boolean shutdown = false;
+  private volatile boolean isShutdown = false;
+
+  /** 首条消息标记 */
+  private static final int FIRST_MESSAGE_SIZE = 1;
 
   /**
    * 创建消息聚合器
@@ -105,7 +109,7 @@ public class MessageAggregator<T> {
    * @param message 消息
    */
   public void add(T message) {
-    if (shutdown) {
+    if (isShutdown) {
       throw new IllegalStateException("Aggregator has been shutdown");
     }
 
@@ -116,7 +120,7 @@ public class MessageAggregator<T> {
       buffer.add(message);
 
       // 第一条消息时启动超时调度
-      if (buffer.size() == 1) {
+      if (buffer.size() == FIRST_MESSAGE_SIZE) {
         scheduleTimeoutFlush();
       }
 
@@ -176,7 +180,7 @@ public class MessageAggregator<T> {
    * <p>刷新剩余消息并关闭调度器
    */
   public void shutdown() {
-    shutdown = true;
+    isShutdown = true;
     flush();
     scheduler.shutdown();
     try {
@@ -235,6 +239,7 @@ public class MessageAggregator<T> {
    *
    * @return 被刷新的消息列表
    */
+  @SuppressWarnings("PMD.NullAssignment") // 主动释放 ScheduledFuture 引用
   private List<T> flushBufferLocked() {
     // 取消超时调度
     if (scheduledFlush != null) {

@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import lombok.Data;
-import net.lab1024.sa.base.core.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeQueryFieldQueryTypeEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 
 /**
  * 代码生成 查询条件 模型

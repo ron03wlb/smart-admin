@@ -100,7 +100,7 @@ public class VOVariableService extends CodeGenerateBaseVariableService {
         finalFieldMap.put("file", "\n    @JsonSerialize(using = FileKeyVoSerializer.class)");
         packageList.add(IMPORT_PREFIX + "com.fasterxml.jackson.databind.annotation.JsonSerialize;");
         packageList.add(
-            IMPORT_PREFIX + "net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;");
+            IMPORT_PREFIX + "net.lab1024.sa.foundation.json.serializer.FileKeyVoSerializer;");
       }
 
       packageList.add(getJavaPackageName(codeField.getJavaType()));

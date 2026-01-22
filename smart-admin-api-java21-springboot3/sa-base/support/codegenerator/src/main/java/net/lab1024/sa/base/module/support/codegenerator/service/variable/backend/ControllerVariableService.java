@@ -12,7 +12,7 @@ import net.lab1024.sa.base.module.support.codegenerator.constant.CodeDeleteEnum;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGeneratorConfigForm;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeInsertAndUpdateField;
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.CodeGenerateBaseVariableService;
-import net.lab1024.sa.common.core.util.SmartEnumUtil;
+import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
 /**

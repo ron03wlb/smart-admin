@@ -12,13 +12,20 @@ dependencies {
     api(libs.spring.boot.autoconfigure)
 
     // SA Common Core
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // SA Base Infrastructure
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
     api(project(":sa-base:infrastructure:mybatis"))
     api(project(":sa-base:infrastructure:web"))
-    api(project(":sa-base:infrastructure:datasource"))  // For SmartIpUtil
+    api(project(":sa-base:infrastructure:datasource"))
+    api(project(":sa-base:foundation:ip-geolocation"))  // For IpGeolocationUtil
 
     // Optional: Dictionary module (for tracking dict changes)
     // Uses compileOnly to avoid circular dependency

@@ -4,7 +4,10 @@ plugins {
 }
 
 dependencies {
-    // SA Common Core (for ResponseDTO, DataTypeEnum)
+    // SA Foundation - Domain objects (ResponseDTO, DataTypeEnum)
+    api(project(":sa-base:foundation:domain"))
+
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // Spring Boot Autoconfigure

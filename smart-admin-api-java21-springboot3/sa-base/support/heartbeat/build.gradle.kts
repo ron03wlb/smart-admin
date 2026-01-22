@@ -19,9 +19,15 @@ dependencies {
     api(libs.mybatis.plus.spring.boot.starter)
 
     // SA Common Core - foundational domain objects and utilities
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // SA Base Core - sa-base specific domain objects and utilities
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
 
     // SA Base Infrastructure - specific modules instead of monolithic sa-base

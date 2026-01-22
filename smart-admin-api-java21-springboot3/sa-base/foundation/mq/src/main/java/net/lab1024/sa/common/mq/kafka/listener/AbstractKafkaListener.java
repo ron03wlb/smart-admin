@@ -34,6 +34,7 @@ import org.springframework.kafka.support.Acknowledgment;
  * @since 2024-01-01
  */
 @Slf4j
+@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public abstract class AbstractKafkaListener<T> {
 
   /**

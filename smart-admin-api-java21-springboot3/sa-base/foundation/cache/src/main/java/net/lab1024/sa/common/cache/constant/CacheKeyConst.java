@@ -10,6 +10,7 @@ import java.time.Duration;
  * @author 1024创新实验室
  * @since 2025-01-19 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class CacheKeyConst {
 
   private CacheKeyConst() {}
@@ -32,6 +33,7 @@ public final class CacheKeyConst {
   }
 
   /** 字典相关缓存 */
+  @SuppressWarnings("PMD.ShortClassName")
   public static final class Dict {
     /** 字典数据缓存 */
     public static final String DICT_DATA = "dict_data_cache";

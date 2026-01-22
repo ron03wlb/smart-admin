@@ -5,8 +5,13 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 // Include subprojects
 include(
-    // === Layer 0: Foundation - Cross-cutting concerns (9 modules, formerly sa-common) ===
+    // === Layer 0: Foundation - Cross-cutting concerns (14 modules, formerly sa-common) ===
     "sa-base",
+    "sa-base:foundation:domain",
+    "sa-base:foundation:validation",
+    "sa-base:foundation:json",
+    "sa-base:foundation:ip-geolocation",
+    "sa-base:foundation:excel",
     "sa-base:foundation:core",
     "sa-base:foundation:mq",
     "sa-base:foundation:cache",

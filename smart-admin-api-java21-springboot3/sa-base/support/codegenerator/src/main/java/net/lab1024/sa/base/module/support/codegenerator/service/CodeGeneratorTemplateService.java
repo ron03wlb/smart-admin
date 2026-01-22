@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.json.JsonUtil;
 import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.codegenerator.domain.entity.CodeGeneratorConfigEntity;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGeneratorConfigForm;
@@ -45,6 +44,7 @@ import net.lab1024.sa.base.module.support.codegenerator.service.variable.front.C
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.front.FormVariableService;
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.front.ListVariableService;
 import net.lab1024.sa.base.module.support.codegenerator.util.CodeGeneratorTool;
+import net.lab1024.sa.foundation.json.util.JsonUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;

@@ -30,7 +30,7 @@ public class MessageEntity {
   /**
    * 接收者类型
    *
-   * @see net.lab1024.sa.common.core.enumeration.UserTypeEnum
+   * @see net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum
    */
   private Integer receiverUserType;
 

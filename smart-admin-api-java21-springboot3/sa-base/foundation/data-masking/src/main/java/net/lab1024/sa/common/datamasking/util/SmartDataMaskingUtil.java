@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 public class SmartDataMaskingUtil {
 
   /** 类 加注解字段缓存 */
-  private static final Map<Class<?>, List<Field>> fieldMap = new ConcurrentHashMap<>();
+  private static final Map<Class<?>, List<Field>> FIELD_MAP = new ConcurrentHashMap<>();
 
   // Length threshold constants for masking
   private static final int LENGTH_THRESHOLD_4 = 4;
@@ -107,6 +107,7 @@ public class SmartDataMaskingUtil {
   }
 
   /** 单个脱敏 */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static <T> void dataMasking(T object)
       throws IntrospectionException, InvocationTargetException, IllegalAccessException {
     Class<?> tClass = object.getClass();
@@ -178,10 +179,11 @@ public class SmartDataMaskingUtil {
     }
   }
 
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static List<Field> getField(Object object) throws IntrospectionException {
     // 从缓存中查询
     Class<?> tClass = object.getClass();
-    List<Field> fieldList = fieldMap.get(tClass);
+    List<Field> fieldList = FIELD_MAP.get(tClass);
     if (null != fieldList) {
       return fieldList;
     }
@@ -209,7 +211,7 @@ public class SmartDataMaskingUtil {
       }
       tempClass = tempClass.getSuperclass();
     }
-    fieldMap.put(tClass, fieldList);
+    FIELD_MAP.put(tClass, fieldList);
     return fieldList;
   }
 

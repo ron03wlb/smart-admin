@@ -1,6 +1,6 @@
 package net.lab1024.sa.admin.constant;
 
-import net.lab1024.sa.base.constant.SwaggerTagConst;
+import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
 
 /**
  * swagger

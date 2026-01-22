@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.Data;
-import net.lab1024.sa.base.core.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.module.support.changelog.constant.ChangeLogTypeEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 
 /**
  * 系统更新日志 更新表单

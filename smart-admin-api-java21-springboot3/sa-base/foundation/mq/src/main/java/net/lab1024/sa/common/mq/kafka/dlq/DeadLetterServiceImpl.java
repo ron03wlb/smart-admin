@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnProperty(prefix = "smart.kafka", name = "enabled", havingValue = "true")
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public class DeadLetterServiceImpl implements DeadLetterService {
 
   private final KafkaProducerService kafkaProducerService;

@@ -4,6 +4,13 @@ plugins {
 }
 
 dependencies {
+    // ========== Foundation modules ==========
+    // Domain module - for backward compatibility bridges
+    api(project(":sa-base:foundation:domain"))
+
+    // Validation module (for SmartEnumUtil in SystemEnvironmentConfig)
+    api(project(":sa-base:foundation:validation"))
+
     // ========== Original dependencies (from foundation:core) ==========
     // Spring Boot Autoconfigure
     api(libs.spring.boot.autoconfigure)

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 
 /**
  * 操作日志信息

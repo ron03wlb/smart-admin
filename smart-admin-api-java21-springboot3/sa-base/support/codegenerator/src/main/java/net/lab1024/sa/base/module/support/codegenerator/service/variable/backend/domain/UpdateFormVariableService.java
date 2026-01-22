@@ -91,7 +91,7 @@ public class UpdateFormVariableService extends CodeGenerateBaseVariableService {
       // 枚举
       if (SmartStringUtil.isNotEmpty(codeField.getEnumName())) {
         packageList.add("import net.lab1024.sa.base.swagger.annotation.SchemaEnum;");
-        packageList.add("import net.lab1024.sa.base.core.validator.enumeration.CheckEnum;");
+        packageList.add("import net.lab1024.sa.foundation.validation.annotation.CheckEnum;");
         packageList.add(
             "import "
                 + form.getBasic().getJavaPackageName()
@@ -148,7 +148,7 @@ public class UpdateFormVariableService extends CodeGenerateBaseVariableService {
         packageList.add(
             IMPORT_PREFIX + "com.fasterxml.jackson.databind.annotation.JsonDeserialize;");
         packageList.add(
-            IMPORT_PREFIX + "net.lab1024.sa.base.common.json.deserializer.DictDataDeserializer;");
+            IMPORT_PREFIX + "net.lab1024.sa.foundation.json.deserializer.DictDataDeserializer;");
       }
 
       // 文件上传
@@ -157,7 +157,7 @@ public class UpdateFormVariableService extends CodeGenerateBaseVariableService {
         packageList.add(
             IMPORT_PREFIX + "com.fasterxml.jackson.databind.annotation.JsonDeserialize;");
         packageList.add(
-            IMPORT_PREFIX + "net.lab1024.sa.base.common.json.deserializer.FileKeyVoDeserializer;");
+            IMPORT_PREFIX + "net.lab1024.sa.foundation.json.deserializer.FileKeyVoDeserializer;");
       }
 
       packageList.add(getJavaPackageName(codeField.getJavaType()));

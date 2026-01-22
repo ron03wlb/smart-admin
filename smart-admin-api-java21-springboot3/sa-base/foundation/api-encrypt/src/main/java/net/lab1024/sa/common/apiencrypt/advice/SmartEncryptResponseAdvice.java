@@ -3,7 +3,7 @@ package net.lab1024.sa.common.apiencrypt.advice;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
-import net.lab1024.sa.common.core.enumeration.DataTypeEnum;
+import net.lab1024.sa.foundation.domain.enumeration.DataTypeEnum;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +32,7 @@ public class SmartEncryptResponseAdvice extends EncryptResponseAdvice {
                 .encrypt(getObjectMapper().writeValueAsString(responseDTO.getData()));
         ResponseDTO<Object> result = (ResponseDTO<Object>) responseDTO;
         result.setData(encrypt);
-        result.setDataType(DataTypeEnum.ENCRYPT.getValue());
+        result.setDataType((Integer) DataTypeEnum.ENCRYPT.getValue());
         return result;
       } catch (JsonProcessingException e) {
         log.error("Failed to encrypt response", e);

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import net.lab1024.sa.base.module.support.message.constant.MessageTypeEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 
 /**
  * 消息发送form

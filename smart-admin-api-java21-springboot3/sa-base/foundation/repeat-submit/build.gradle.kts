@@ -4,8 +4,11 @@ plugins {
 }
 
 dependencies {
-    // Foundation Core (for SmartRequestUtil, StringConst)
+    // Foundation Core (for SmartRequestUtil temporarily)
     api(project(":sa-base:foundation:core"))
+
+    // SA Foundation - Domain objects (StringConst)
+    api(project(":sa-base:foundation:domain"))
 
     // Spring Boot Autoconfigure
     api(libs.spring.boot.autoconfigure)

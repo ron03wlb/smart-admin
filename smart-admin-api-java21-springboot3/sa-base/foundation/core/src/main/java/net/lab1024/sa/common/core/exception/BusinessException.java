@@ -1,28 +1,20 @@
 package net.lab1024.sa.common.core.exception;
 
-import lombok.Getter;
 import net.lab1024.sa.common.core.code.ErrorCode;
 
 /**
- * 业务逻辑异常,全局异常拦截后统一返回ResponseCodeConst.SYSTEM_ERROR
- *
- * @author 1024创新实验室: 罗伊
- * @since 2020/8/25 21:57 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ * @deprecated Use {@link net.lab1024.sa.foundation.domain.exception.BusinessException} instead.
  */
-@Getter
-public class BusinessException extends RuntimeException {
-
-  private static final long serialVersionUID = 1L;
-
-  private Integer code;
+@Deprecated(since = "3.6.0", forRemoval = true)
+public class BusinessException
+    extends net.lab1024.sa.foundation.domain.exception.BusinessException {
 
   public BusinessException() {
-    // empty
+    super();
   }
 
   public BusinessException(ErrorCode errorCode) {
-    super(errorCode.getMsg());
-    this.code = errorCode.getCode();
+    super((net.lab1024.sa.foundation.domain.code.ErrorCode) errorCode);
   }
 
   public BusinessException(String message) {

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import net.lab1024.sa.base.module.support.message.constant.MessageTemplateEnum;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 
 /**
  * 消息发送form

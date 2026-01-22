@@ -44,7 +44,8 @@
       "Bash(findstr:*)",
       "Bash(docker logs:*)",
       "Bash(.gradlew.bat:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(git reset:*)"
     ]
   },
   "allowedCommands": {

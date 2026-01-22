@@ -9,7 +9,7 @@ ask_before_fix: false
 related_rules:
   - rules/02-oop-principles.md
   - rules/04-exception-logging.md
-last_updated: 2025-01-21
+last_updated: 2026-01-22
 ---
 
 # PMD 規範
@@ -127,6 +127,67 @@ public class MenuTreeVO implements Serializable {
 }
 ```
 
+#### CallSuperInConstructor - 構造函數未調用 super
+
+**場景**: BusinessException 等異常類提供無參構造函數
+**違規原因**: PMD 要求所有構造函數顯式調用 super()
+**SmartAdmin 判斷**: Java 默認調用父類無參構造，顯式調用是冗餘的
+**解決方案**:
+```java
+@SuppressWarnings("PMD.CallSuperInConstructor")
+public BusinessException() {
+    // empty - 默認調用父類無參構造
+}
+```
+
+#### AvoidReassigningParameters - 避免參數重新賦值
+
+**場景**: 方法參數需要修改後使用
+**違規原因**: 直接修改參數降低可讀性
+**SmartAdmin 判斷**: 必須修復，創建局部變量
+**解決方案**:
+```java
+// ❌ 違規
+public void process(Integer pageNum) {
+    pageNum = pageNum - 1;  // 修改參數
+    query(pageNum);
+}
+
+// ✅ 修正
+public void process(Integer pageNum) {
+    int adjustedPage = pageNum - 1;  // 局部變量
+    query(adjustedPage);
+}
+```
+
+#### ShortClassName - 類名過短
+
+**場景**: 工具類內的靜態常量分組類（Dict, Expire, Dept, Support）
+**違規原因**: 類名少於 5 個字符
+**SmartAdmin 判斷**: 作為內部常量組織結構是合理的
+**解決方案**:
+```java
+@SuppressWarnings("PMD.ShortClassName")
+public static final class Dict {
+    public static final String DICT_DATA = "dict_data_cache";
+    private Dict() {}
+}
+```
+
+#### MissingStaticMethodInNonInstantiatableClass - 純常量類
+
+**場景**: CacheKeyConst 只包含常量定義，無靜態方法
+**違規原因**: PMD 期望工具類有靜態方法
+**SmartAdmin 判斷**: 純常量類是合法設計模式
+**解決方案**:
+```java
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
+public final class CacheKeyConst {
+    private CacheKeyConst() {}
+    // 只有常量定義
+}
+```
+
 ---
 
 ## 【強制】啟用規則說明
@@ -189,13 +250,17 @@ configure<PmdExtension> {
 
 基於專案實際違規分析：
 
-| 違規類型                  | 數量 | 主要位置           |
-| ------------------------- | ---- | ------------------ |
-| `LooseCoupling`           | ~10  | Controller/Service |
-| `AvoidDuplicateLiterals`  | ~8   | DAO/Mapper         |
-| `UnusedAssignment`        | ~4   | Service            |
-| `GuardLogStatement`       | ~2   | Manager            |
-| `MissingSerialVersionUID` | ~1   | VO/DTO             |
+| 違規類型                                      | 數量 | 主要位置                    | 解決方式              |
+| --------------------------------------------- | ---- | --------------------------- | --------------------- |
+| `LooseCoupling`                               | ~10  | Controller/Service          | 使用接口類型          |
+| `AvoidDuplicateLiterals`                      | ~8   | DAO/Mapper                  | 提取常量              |
+| `UnusedAssignment`                            | ~4   | Service                     | 移除未使用初始化      |
+| `GuardLogStatement`                           | ~2   | Manager                     | 使用日誌佔位符        |
+| `MissingSerialVersionUID`                     | ~1   | VO/DTO                      | 添加 serialVersionUID |
+| `CallSuperInConstructor`                      | 3    | BusinessException.java      | @SuppressWarnings     |
+| `AvoidReassigningParameters`                  | 11   | SmartPageUtil.java          | 創建局部變量          |
+| `ShortClassName`                              | 3    | CacheKeyConst.java          | @SuppressWarnings     |
+| `MissingStaticMethodInNonInstantiatableClass` | 3    | CacheKeyConst.java          | @SuppressWarnings     |
 
 ---
 

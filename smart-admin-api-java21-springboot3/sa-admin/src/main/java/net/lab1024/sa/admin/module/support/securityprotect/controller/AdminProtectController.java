@@ -9,10 +9,10 @@ import net.lab1024.sa.admin.module.support.securityprotect.domain.form.LoginFail
 import net.lab1024.sa.admin.module.support.securityprotect.domain.vo.LoginFailVO;
 import net.lab1024.sa.admin.module.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.admin.module.support.securityprotect.service.SecurityLoginService;
-import net.lab1024.sa.base.common.controller.SupportBaseController;
-import net.lab1024.sa.base.constant.SwaggerTagConst;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
+import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
+import net.lab1024.sa.base.web.base.SupportBaseController;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.securityprotect.domain.Level3ProtectConfigForm;

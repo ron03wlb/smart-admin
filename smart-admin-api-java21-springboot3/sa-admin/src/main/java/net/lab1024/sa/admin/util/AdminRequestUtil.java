@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin.util;
 
 import net.lab1024.sa.admin.module.system.login.domain.RequestEmployee;
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
+import net.lab1024.sa.base.web.util.SmartRequestUtil;
 import net.lab1024.sa.common.core.domain.RequestUser;
 
 /**

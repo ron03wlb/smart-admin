@@ -4,16 +4,15 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import net.lab1024.sa.admin.module.system.role.dao.RoleDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
-import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
 import net.lab1024.sa.admin.module.system.role.domain.entity.RoleEntity;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleAddForm;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
+import net.lab1024.sa.admin.module.system.role.manager.RoleManager;
 import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 角色
@@ -26,9 +25,9 @@ public class RoleService {
 
   @Resource private RoleDao roleDao;
 
-  @Resource private RoleMenuDao roleMenuDao;
-
   @Resource private RoleEmployeeDao roleEmployeeDao;
+
+  @Resource private RoleManager roleManager;
 
   /** 新增添加角色 */
   public ResponseDTO<String> addRole(RoleAddForm roleAddForm) {
@@ -48,7 +47,6 @@ public class RoleService {
   }
 
   /** 根据角色id 删除 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> deleteRole(Long roleId) {
     RoleEntity roleEntity = roleDao.selectById(roleId);
     if (null == roleEntity) {
@@ -59,14 +57,12 @@ public class RoleService {
     if (exists != null) {
       return ResponseDTO.error(UserErrorCode.ALREADY_EXIST, "该角色下存在员工，无法删除");
     }
-    roleDao.deleteById(roleId);
-    roleMenuDao.deleteByRoleId(roleId);
-    roleEmployeeDao.deleteByRoleId(roleId);
+    // 委托给 Manager 层处理事务性删除操作
+    roleManager.deleteRoleWithCascade(roleId);
     return ResponseDTO.ok();
   }
 
   /** 更新角色 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> updateRole(RoleUpdateForm roleUpdateForm) {
     if (null == roleDao.selectById(roleUpdateForm.getRoleId())) {
       return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST);
@@ -85,7 +81,8 @@ public class RoleService {
     }
 
     RoleEntity roleEntity = SmartBeanUtil.copy(roleUpdateForm, RoleEntity.class);
-    roleDao.updateById(roleEntity);
+    // 委托给 Manager 层处理事务性更新操作
+    roleManager.updateRole(roleEntity);
     return ResponseDTO.ok();
   }
 

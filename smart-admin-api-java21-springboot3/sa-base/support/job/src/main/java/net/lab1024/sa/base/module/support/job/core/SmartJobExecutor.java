@@ -6,13 +6,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.util.SmartIpUtil;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobConst;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobLogEntity;
 import net.lab1024.sa.common.redislock.LockService;
+import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
 import org.springframework.util.StopWatch;
 
 /**
@@ -156,7 +156,7 @@ public class SmartJobExecutor implements Runnable {
     logEntity.setExecuteEndTime(executeTime);
     logEntity.setExecuteTimeMillis(0L);
     logEntity.setCreateName(executorName);
-    logEntity.setIp(SmartIpUtil.getLocalFirstIp());
+    logEntity.setIp(IpGeolocationUtil.getLocalFirstIp());
     logEntity.setProcessId(SmartJobUtil.getProcessId());
     logEntity.setProgramPath(SmartJobUtil.getProgramPath());
 

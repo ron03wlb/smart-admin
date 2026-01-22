@@ -9,8 +9,14 @@ dependencies {
     // Spring Boot
     api(libs.spring.boot.autoconfigure)
 
-    // SA Base Core
+    // SA Foundation - Domain objects
+    api(project(":sa-base:foundation:domain"))
+    
+    // SA Foundation - Core (temporary, for backward compatibility bridges)
     api(project(":sa-base:foundation:core"))
+
+    // SA Foundation - IP Geolocation
+    api(project(":sa-base:foundation:ip-geolocation"))
 
     // SA Base MyBatis (for MybatisPlusFillHandler)
     api(project(":sa-base:infrastructure:mybatis"))
@@ -18,9 +24,6 @@ dependencies {
     // Database - PostgreSQL + HikariCP (Spring Boot default)
     api(libs.postgresql)
     api(libs.p6spy)
-
-    // IP utilities (for SmartIpUtil)
-    api(libs.ip2region)
 
     // Apache Commons IO (for FileUtils in Ip2RegionListener)
     api(libs.commons.io)

@@ -91,17 +91,17 @@ server:
 # 文件上传 配置
 file:
   storage:
-    mode: local
+    mode: cloud
     local:
       upload-path: /home/smart_admin_v3/upload/   #文件上传目录
       url-prefix:
     cloud:
-      region: oss-cn-hangzhou
-      endpoint: oss-cn-hangzhou.aliyuncs.com
-      bucket-name: 1024lab-smart-admin
-      access-key:
-      secret-key:
-      url-prefix: https://${file.storage.cloud.bucket-name}.${file.storage.cloud.endpoint}/
+      region: ${MINIO_REGION:us-east-1}
+      endpoint: ${MINIO_ENDPOINT}
+      bucket-name: ${MINIO_BUCKET:prod-smart-admin}
+      access-key: ${MINIO_ACCESS_KEY}
+      secret-key: ${MINIO_SECRET_KEY}
+      url-prefix: ${MINIO_URL_PREFIX}
       private-url-expire-seconds: 3600
 
 # open api配置

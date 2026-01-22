@@ -68,12 +68,12 @@ public class ApiEncryptServiceAesImpl implements ApiEncryptService {
     int length = hex.length();
     byte[] result;
     String hexStr = hex;
-    if (length % MODULO_2 != 0) {
-      length++;
-      result = new byte[(length / 2)];
-      hexStr = "0" + hex;
+    if (length % MODULO_2 == 0) {
+      result = new byte[length / 2];
     } else {
-      result = new byte[(length / 2)];
+      length++;
+      result = new byte[length / 2];
+      hexStr = "0" + hex;
     }
     int j = 0;
     for (int i = 0; i < length; i += 2) {

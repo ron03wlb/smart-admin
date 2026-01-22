@@ -20,20 +20,20 @@ public class SmartStringUtil extends StrUtil {
 
   public static Set<String> splitConvertToSet(String str, String split) {
     if (isEmpty(str)) {
-      return new HashSet<String>();
+      return new HashSet<>();
     }
     String[] splitArr = str.split(split);
-    Set<String> set = new HashSet<String>(splitArr.length);
+    Set<String> set = new HashSet<>(splitArr.length);
     Collections.addAll(set, splitArr);
     return set;
   }
 
   public static List<String> splitConvertToList(String str, String split) {
     if (isEmpty(str)) {
-      return new ArrayList<String>();
+      return new ArrayList<>();
     }
     String[] splitArr = str.split(split);
-    List<String> list = new ArrayList<String>(splitArr.length);
+    List<String> list = new ArrayList<>(splitArr.length);
     list.addAll(Arrays.asList(splitArr));
     return list;
   }
@@ -42,10 +42,10 @@ public class SmartStringUtil extends StrUtil {
 
   public static List<Integer> splitConvertToIntList(String str, String split, int defaultVal) {
     if (isEmpty(str)) {
-      return new ArrayList<Integer>();
+      return new ArrayList<>();
     }
     String[] strArr = str.split(split);
-    List<Integer> list = new ArrayList<Integer>(strArr.length);
+    List<Integer> list = new ArrayList<>(strArr.length);
     for (String s : strArr) {
       try {
         int parseInt = Integer.parseInt(s);
@@ -59,10 +59,10 @@ public class SmartStringUtil extends StrUtil {
 
   public static Set<Integer> splitConvertToIntSet(String str, String split, int defaultVal) {
     if (isEmpty(str)) {
-      return new HashSet<Integer>();
+      return new HashSet<>();
     }
     String[] strArr = str.split(split);
-    Set<Integer> set = new HashSet<Integer>(strArr.length);
+    Set<Integer> set = new HashSet<>(strArr.length);
     for (String s : strArr) {
       try {
         int parseInt = Integer.parseInt(s);
@@ -107,10 +107,10 @@ public class SmartStringUtil extends StrUtil {
 
   public static List<Long> splitConvertToLongList(String str, String split, long defaultVal) {
     if (isEmpty(str)) {
-      return new ArrayList<Long>();
+      return new ArrayList<>();
     }
     String[] strArr = str.split(split);
-    List<Long> list = new ArrayList<Long>(strArr.length);
+    List<Long> list = new ArrayList<>(strArr.length);
     for (String s : strArr) {
       try {
         long parseLong = Long.parseLong(s);
@@ -151,10 +151,10 @@ public class SmartStringUtil extends StrUtil {
 
   public static List<Byte> splitConvertToByteList(String str, String split, byte defaultVal) {
     if (isEmpty(str)) {
-      return new ArrayList<Byte>();
+      return new ArrayList<>();
     }
     String[] strArr = str.split(split);
-    List<Byte> list = new ArrayList<Byte>(strArr.length);
+    List<Byte> list = new ArrayList<>(strArr.length);
     for (String s : strArr) {
       try {
         byte parseByte = Byte.parseByte(s);
@@ -195,10 +195,10 @@ public class SmartStringUtil extends StrUtil {
 
   public static List<Double> splitConvertToDoubleList(String str, String split, double defaultVal) {
     if (isEmpty(str)) {
-      return new ArrayList<Double>();
+      return new ArrayList<>();
     }
     String[] strArr = str.split(split);
-    List<Double> list = new ArrayList<Double>(strArr.length);
+    List<Double> list = new ArrayList<>(strArr.length);
     for (String s : strArr) {
       try {
         double parseByte = Double.parseDouble(s);
@@ -239,10 +239,10 @@ public class SmartStringUtil extends StrUtil {
 
   public static List<Float> splitConvertToFloatList(String str, String split, float defaultVal) {
     if (isEmpty(str)) {
-      return new ArrayList<Float>();
+      return new ArrayList<>();
     }
     String[] strArr = str.split(split);
-    List<Float> list = new ArrayList<Float>(strArr.length);
+    List<Float> list = new ArrayList<>(strArr.length);
     for (String s : strArr) {
       try {
         float parseByte = Float.parseFloat(s);

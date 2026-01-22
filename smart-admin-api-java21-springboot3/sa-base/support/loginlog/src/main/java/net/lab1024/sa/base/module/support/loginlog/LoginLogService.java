@@ -10,7 +10,7 @@ import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogQueryForm;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
-import net.lab1024.sa.common.core.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**

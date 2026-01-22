@@ -23,10 +23,10 @@ import net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseLi
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseVO;
 import net.lab1024.sa.admin.module.business.oa.enterprise.manager.EnterpriseEmployeeManager;
 import net.lab1024.sa.admin.module.system.department.manager.DepartmentCacheManager;
-import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.domain.form.DataTracerForm;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
+import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.common.core.code.UserErrorCode;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;

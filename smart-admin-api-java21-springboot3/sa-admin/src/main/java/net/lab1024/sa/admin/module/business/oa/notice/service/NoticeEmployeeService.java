@@ -18,7 +18,7 @@ import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeVisibleRan
 import net.lab1024.sa.admin.module.system.department.manager.DepartmentCacheManager;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
 import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
-import net.lab1024.sa.base.core.util.SmartPageUtil;
+import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.common.core.domain.PageResult;
 import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;

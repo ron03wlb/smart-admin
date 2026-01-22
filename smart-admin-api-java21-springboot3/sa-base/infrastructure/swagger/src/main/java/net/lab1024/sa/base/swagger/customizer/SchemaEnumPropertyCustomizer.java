@@ -3,10 +3,10 @@ package net.lab1024.sa.base.swagger.customizer;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.oas.models.media.Schema;
 import java.lang.annotation.Annotation;
-import net.lab1024.sa.base.core.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
-import net.lab1024.sa.common.core.util.SmartEnumUtil;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
+import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.springdoc.core.customizers.PropertyCustomizer;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,8 @@ public class SchemaEnumPropertyCustomizer implements PropertyCustomizer {
       return schema;
     }
 
-    StringBuilder description = new StringBuilder();
+    // Initial capacity of 64 for typical enum descriptions with HTML formatting
+    StringBuilder description = new StringBuilder(64);
     for (Annotation ctxAnnotation : type.getCtxAnnotations()) {
       if (ctxAnnotation.annotationType().equals(CheckEnum.class)
           && ((CheckEnum) ctxAnnotation).required()) {

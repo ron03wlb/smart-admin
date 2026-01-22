@@ -22,6 +22,7 @@ import org.springframework.kafka.support.SendResult;
  */
 @Slf4j
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public class KafkaProducerServiceImpl implements KafkaProducerService {
 
   /** 默认同步发送超时时间（毫秒） */

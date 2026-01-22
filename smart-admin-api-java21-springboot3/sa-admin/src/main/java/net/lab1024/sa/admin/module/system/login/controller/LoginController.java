@@ -14,7 +14,7 @@ import net.lab1024.sa.admin.module.system.login.domain.LoginResultVO;
 import net.lab1024.sa.admin.module.system.login.service.LoginService;
 import net.lab1024.sa.admin.util.AdminRequestUtil;
 import net.lab1024.sa.base.core.annoation.NoNeedLogin;
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
+import net.lab1024.sa.base.web.util.SmartRequestUtil;
 import net.lab1024.sa.common.captcha.CaptchaVO;
 import net.lab1024.sa.common.core.constant.RequestHeaderConst;
 import net.lab1024.sa.common.core.domain.ResponseDTO;

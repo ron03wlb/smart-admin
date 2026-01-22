@@ -8,11 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import net.lab1024.sa.admin.module.business.oa.enterprise.constant.EnterpriseTypeEnum;
-import net.lab1024.sa.base.common.validator.enumeration.CheckEnum;
 import net.lab1024.sa.base.core.util.SmartVerificationUtil;
 import net.lab1024.sa.base.module.support.file.json.deserializer.FileKeyVoDeserializer;
 import net.lab1024.sa.base.module.support.file.json.serializer.FileKeyVoSerializer;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 import org.hibernate.validator.constraints.Length;
 
 /**

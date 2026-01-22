@@ -84,6 +84,7 @@ public class UrlConfig {
     return authUrlList;
   }
 
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // DTOs must be created per URL
   private List<RequestUrlVO> buildRequestUrl(Method method, Set<String> urlSet) {
     List<RequestUrlVO> requestUrlList = Lists.newArrayList();
     if (CollectionUtils.isEmpty(urlSet)) {
