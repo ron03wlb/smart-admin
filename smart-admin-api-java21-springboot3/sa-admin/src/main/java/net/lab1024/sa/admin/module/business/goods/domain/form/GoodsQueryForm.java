@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.admin.module.business.goods.constant.GoodsStatusEnum;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.common.core.domain.PageParam;
+import net.lab1024.sa.foundation.domain.request.PageParam;
 import net.lab1024.sa.foundation.json.deserializer.DictDataDeserializer;
 import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 import org.hibernate.validator.constraints.Length;

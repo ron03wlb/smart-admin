@@ -7,7 +7,7 @@ import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenera
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberLastGenerateBO;
 import net.lab1024.sa.base.module.support.serialnumber.service.SerialNumberBaseService;
-import net.lab1024.sa.common.core.exception.BusinessException;
+import net.lab1024.sa.foundation.domain.exception.BusinessException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

@@ -2,8 +2,8 @@ package net.lab1024.sa.base.module.support.serialnumber.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.common.core.constant.StringConst;
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.constant.StringConst;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * 单据序列号 周期

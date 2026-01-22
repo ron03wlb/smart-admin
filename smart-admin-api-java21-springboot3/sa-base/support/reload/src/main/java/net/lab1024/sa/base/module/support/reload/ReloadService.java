@@ -9,8 +9,8 @@ import net.lab1024.sa.base.module.support.reload.domain.ReloadForm;
 import net.lab1024.sa.base.module.support.reload.domain.ReloadItemEntity;
 import net.lab1024.sa.base.module.support.reload.domain.ReloadItemVO;
 import net.lab1024.sa.base.module.support.reload.domain.ReloadResultVO;
-import net.lab1024.sa.common.core.code.UserErrorCode;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.code.UserErrorCode;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

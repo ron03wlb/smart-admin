@@ -8,9 +8,9 @@ import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogEntity;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogQueryForm;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

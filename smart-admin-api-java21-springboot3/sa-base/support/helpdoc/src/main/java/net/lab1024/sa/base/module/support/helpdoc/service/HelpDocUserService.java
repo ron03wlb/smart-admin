@@ -10,10 +10,10 @@ import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocViewRecordQ
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocDetailVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocViewRecordVO;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.RequestUser;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.request.RequestUser;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

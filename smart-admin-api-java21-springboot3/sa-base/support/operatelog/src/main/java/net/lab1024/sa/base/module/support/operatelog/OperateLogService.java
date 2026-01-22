@@ -7,10 +7,10 @@ import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogEntity;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogQueryForm;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogVO;
-import net.lab1024.sa.common.core.code.UserErrorCode;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.code.UserErrorCode;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

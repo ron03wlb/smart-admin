@@ -1,6 +1,6 @@
 package net.lab1024.sa.base.module.support.loginlog;
 
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * 登录类型

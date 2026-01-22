@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.core.util.SmartStringUtil;
-import net.lab1024.sa.common.core.domain.PageParam;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.exception.BusinessException;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.exception.BusinessException;
+import net.lab1024.sa.foundation.domain.request.PageParam;
+import net.lab1024.sa.foundation.domain.response.PageResult;
 import org.apache.commons.collections4.CollectionUtils;
 
 /**

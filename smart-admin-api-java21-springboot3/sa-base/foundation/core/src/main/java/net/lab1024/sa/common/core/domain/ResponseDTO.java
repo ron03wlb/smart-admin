@@ -1,6 +1,6 @@
 package net.lab1024.sa.common.core.domain;
 
-import net.lab1024.sa.common.core.code.ErrorCode;
+import net.lab1024.sa.foundation.domain.code.ErrorCode;
 
 /**
  * @deprecated Use {@link net.lab1024.sa.foundation.domain.response.ResponseDTO} instead.

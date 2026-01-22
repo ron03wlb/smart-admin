@@ -7,7 +7,7 @@ import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberRecordDao;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberRecordEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberRecordQueryForm;
-import net.lab1024.sa.common.core.domain.PageResult;
+import net.lab1024.sa.foundation.domain.response.PageResult;
 import org.springframework.stereotype.Service;
 
 /**

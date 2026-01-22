@@ -10,9 +10,9 @@ import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogAddForm
 import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogQueryForm;
 import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogUpdateForm;
 import net.lab1024.sa.base.module.support.changelog.domain.vo.ChangeLogVO;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

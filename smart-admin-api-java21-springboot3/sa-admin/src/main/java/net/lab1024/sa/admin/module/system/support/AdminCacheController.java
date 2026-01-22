@@ -8,7 +8,7 @@ import java.util.List;
 import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
 import net.lab1024.sa.base.web.base.SupportBaseController;
 import net.lab1024.sa.common.cache.CacheService;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;

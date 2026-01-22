@@ -2,7 +2,7 @@ package net.lab1024.sa.base.module.support.job.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * job 任务触发类型 枚举类

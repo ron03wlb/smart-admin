@@ -10,9 +10,9 @@ import net.lab1024.sa.admin.module.system.position.domain.form.PositionQueryForm
 import net.lab1024.sa.admin.module.system.position.domain.form.PositionUpdateForm;
 import net.lab1024.sa.admin.module.system.position.domain.vo.PositionVO;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

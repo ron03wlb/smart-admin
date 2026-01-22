@@ -2,7 +2,7 @@ package net.lab1024.sa.base.module.support.message.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * 消息模板类型

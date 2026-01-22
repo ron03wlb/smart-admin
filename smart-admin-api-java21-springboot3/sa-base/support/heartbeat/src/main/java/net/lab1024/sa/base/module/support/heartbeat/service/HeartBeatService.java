@@ -8,8 +8,8 @@ import net.lab1024.sa.base.core.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.heartbeat.dao.HeartBeatRecordDao;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordQueryForm;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordVO;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

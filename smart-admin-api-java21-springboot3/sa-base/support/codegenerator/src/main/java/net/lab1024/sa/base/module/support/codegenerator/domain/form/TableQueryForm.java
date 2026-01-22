@@ -3,7 +3,7 @@ package net.lab1024.sa.base.module.support.codegenerator.domain.form;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.common.core.domain.PageParam;
+import net.lab1024.sa.foundation.domain.request.PageParam;
 
 /**
  * 查询表数据

@@ -12,9 +12,9 @@ import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocUpdateForm;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocDetailVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO;
 import net.lab1024.sa.base.module.support.helpdoc.manager.HelpDocManager;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

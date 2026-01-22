@@ -2,8 +2,8 @@ package net.lab1024.sa.common.apiencrypt.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.foundation.domain.enumeration.DataTypeEnum;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Component;
 
 /**

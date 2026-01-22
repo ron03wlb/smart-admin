@@ -2,8 +2,8 @@ package net.lab1024.sa.admin;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import net.lab1024.sa.common.core.code.ErrorCode;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.code.ErrorCode;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 

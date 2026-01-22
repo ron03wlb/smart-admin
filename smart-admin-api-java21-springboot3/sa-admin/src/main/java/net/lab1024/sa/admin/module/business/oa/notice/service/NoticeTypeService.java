@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeTypeDao;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.entity.NoticeTypeEntity;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeTypeVO;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

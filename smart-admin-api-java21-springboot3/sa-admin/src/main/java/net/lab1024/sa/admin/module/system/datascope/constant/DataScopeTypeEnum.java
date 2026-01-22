@@ -1,6 +1,6 @@
 package net.lab1024.sa.admin.module.system.datascope.constant;
 
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * 数据范围 类型

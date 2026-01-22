@@ -13,7 +13,7 @@ import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
 import net.lab1024.sa.base.web.base.SupportBaseController;
 import net.lab1024.sa.common.apiencrypt.annotation.ApiDecrypt;
 import net.lab1024.sa.common.apiencrypt.annotation.ApiEncrypt;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

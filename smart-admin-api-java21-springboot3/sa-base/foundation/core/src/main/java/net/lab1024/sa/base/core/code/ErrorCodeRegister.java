@@ -2,9 +2,9 @@ package net.lab1024.sa.base.core.code;
 
 import static net.lab1024.sa.base.core.code.ErrorCodeRangeContainer.register;
 
-import net.lab1024.sa.common.core.code.SystemErrorCode;
-import net.lab1024.sa.common.core.code.UnexpectedErrorCode;
-import net.lab1024.sa.common.core.code.UserErrorCode;
+import net.lab1024.sa.foundation.domain.code.SystemErrorCode;
+import net.lab1024.sa.foundation.domain.code.UnexpectedErrorCode;
+import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 
 /**
  * 注册code状态码 <br>

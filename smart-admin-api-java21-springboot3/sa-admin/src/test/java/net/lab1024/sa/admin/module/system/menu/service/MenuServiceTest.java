@@ -15,7 +15,7 @@ import net.lab1024.sa.admin.module.system.menu.domain.form.MenuUpdateForm;
 import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuTreeVO;
 import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuVO;
 import net.lab1024.sa.base.core.domain.RequestUrlVO;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

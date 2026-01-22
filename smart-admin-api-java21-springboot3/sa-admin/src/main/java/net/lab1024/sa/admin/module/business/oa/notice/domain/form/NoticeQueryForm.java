@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.common.core.domain.PageParam;
+import net.lab1024.sa.foundation.domain.request.PageParam;
 
 /**
  * 通知公告 管理查询表单

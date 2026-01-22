@@ -6,12 +6,12 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.support.securityprotect.dao.PasswordLogDao;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.PasswordLogEntity;
-import net.lab1024.sa.common.core.domain.RequestUser;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
 import net.lab1024.sa.common.securityprotect.constant.SecurityConst;
 import net.lab1024.sa.common.securityprotect.service.PasswordComplexityService;
 import net.lab1024.sa.common.securityprotect.service.PasswordEncryptService;
 import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
+import net.lab1024.sa.foundation.domain.request.RequestUser;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**

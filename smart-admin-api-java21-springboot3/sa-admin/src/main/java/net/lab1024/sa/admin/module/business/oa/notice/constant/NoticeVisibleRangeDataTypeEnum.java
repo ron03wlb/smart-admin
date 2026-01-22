@@ -2,7 +2,7 @@ package net.lab1024.sa.admin.module.business.oa.notice.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * 公告、通知 可见范围类型

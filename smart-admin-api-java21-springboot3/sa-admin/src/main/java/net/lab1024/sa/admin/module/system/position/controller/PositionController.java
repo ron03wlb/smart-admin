@@ -11,8 +11,8 @@ import net.lab1024.sa.admin.module.system.position.domain.form.PositionQueryForm
 import net.lab1024.sa.admin.module.system.position.domain.form.PositionUpdateForm;
 import net.lab1024.sa.admin.module.system.position.domain.vo.PositionVO;
 import net.lab1024.sa.admin.module.system.position.service.PositionService;
-import net.lab1024.sa.common.core.domain.PageResult;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

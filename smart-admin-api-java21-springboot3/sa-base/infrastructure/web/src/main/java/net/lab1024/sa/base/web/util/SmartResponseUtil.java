@@ -8,7 +8,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.core.util.SmartStringUtil;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.json.util.JsonUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

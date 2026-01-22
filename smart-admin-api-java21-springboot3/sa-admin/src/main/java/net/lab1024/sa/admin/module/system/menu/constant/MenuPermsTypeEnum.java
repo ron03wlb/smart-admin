@@ -1,6 +1,6 @@
 package net.lab1024.sa.admin.module.system.menu.constant;
 
-import net.lab1024.sa.common.core.enumeration.BaseEnum;
+import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 
 /**
  * 权限类型

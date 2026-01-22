@@ -1,0 +1,538 @@
+Type-safe project accessors is an incubating feature.
+> Task :sa-base:processResources NO-SOURCE
+> Task :spotlessInternalRegisterDependencies UP-TO-DATE
+> Task :sa-base:foundation:captcha:processResources UP-TO-DATE
+> Task :sa-base:foundation:cache:processResources UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:processResources UP-TO-DATE
+> Task :sa-base:foundation:data-masking:processResources UP-TO-DATE
+> Task :sa-base:foundation:core:processResources UP-TO-DATE
+> Task :sa-admin:processResources UP-TO-DATE
+> Task :sa-base:foundation:domain:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:validation:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:core:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:cache:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:captcha:spotlessJava UP-TO-DATE
+> Task :sa-base:spotlessJava UP-TO-DATE
+> Task :sa-admin:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:cache:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:validation:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:spotlessJavaApply UP-TO-DATE
+> Task :sa-admin:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:captcha:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:core:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:domain:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:captcha:spotlessApply UP-TO-DATE
+> Task :sa-admin:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:validation:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:cache:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:spotlessApply UP-TO-DATE
+> Task :sa-base:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:core:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:domain:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:json:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:data-masking:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:excel:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:data-masking:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:data-masking:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:json:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:excel:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:json:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:excel:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:mq:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:mq:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:mq:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:security-protect:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:datasource:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:datasource:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:security-protect:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:security-protect:spotlessApply UP-TO-DATE
+> Task :sa-base:infrastructure:datasource:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:mq:compileJava UP-TO-DATE
+> Task :sa-base:foundation:data-masking:compileJava UP-TO-DATE
+> Task :sa-base:foundation:domain:compileJava UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:compileJava UP-TO-DATE
+> Task :sa-base:foundation:cache:compileJava UP-TO-DATE
+> Task :sa-base:foundation:security-protect:compileJava UP-TO-DATE
+> Task :sa-base:infrastructure:devtools:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:devtools:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:infrastructure:devtools:spotlessApply UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:excel:compileJava NO-SOURCE
+> Task :sa-base:infrastructure:swagger:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:swagger:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:infrastructure:swagger:spotlessApply UP-TO-DATE
+> Task :sa-base:infrastructure:token:spotlessJava UP-TO-DATE
+> Task :sa-base:support:changelog:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:web:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:redis:spotlessJava UP-TO-DATE
+> Task :sa-base:infrastructure:redis:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:infrastructure:redis:spotlessApply UP-TO-DATE
+> Task :sa-base:support:changelog:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:changelog:spotlessApply UP-TO-DATE
+> Task :sa-base:infrastructure:web:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:infrastructure:web:spotlessApply UP-TO-DATE
+> Task :sa-base:infrastructure:token:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:infrastructure:token:spotlessApply UP-TO-DATE
+> Task :sa-base:support:codegenerator:spotlessJava UP-TO-DATE
+> Task :sa-base:support:codegenerator:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:codegenerator:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:captcha:compileJava UP-TO-DATE
+> Task :sa-base:foundation:validation:compileJava UP-TO-DATE
+> Task :sa-base:support:config:spotlessJava UP-TO-DATE
+> Task :sa-base:support:reload:spotlessJava UP-TO-DATE
+> Task :sa-base:support:feedback:spotlessJava UP-TO-DATE
+> Task :sa-base:support:reload:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:reload:spotlessApply UP-TO-DATE
+> Task :sa-base:support:dict:spotlessJava UP-TO-DATE
+> Task :sa-base:support:config:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:feedback:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:config:spotlessApply UP-TO-DATE
+> Task :sa-base:support:feedback:spotlessApply UP-TO-DATE
+> Task :sa-base:support:file:spotlessJava UP-TO-DATE
+> Task :sa-base:support:datatracer:spotlessJava UP-TO-DATE
+> Task :sa-base:support:dict:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:dict:spotlessApply UP-TO-DATE
+> Task :sa-base:support:datatracer:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:datatracer:spotlessApply UP-TO-DATE
+> Task :sa-base:support:file:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:file:spotlessApply UP-TO-DATE
+> Task :sa-base:support:heartbeat:spotlessJava UP-TO-DATE
+> Task :sa-base:support:heartbeat:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:heartbeat:spotlessApply UP-TO-DATE
+> Task :sa-base:support:job:spotlessJava UP-TO-DATE
+> Task :sa-base:support:helpdoc:spotlessJava UP-TO-DATE
+> Task :sa-base:support:operatelog:spotlessJava UP-TO-DATE
+> Task :sa-base:support:serialnumber:spotlessJava UP-TO-DATE
+> Task :sa-base:support:loginlog:spotlessJava UP-TO-DATE
+> Task :sa-base:support:mail:spotlessJava UP-TO-DATE
+> Task :sa-base:support:message:spotlessJava UP-TO-DATE
+> Task :sa-base:support:loginlog:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:mail:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:job:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:message:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:operatelog:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:helpdoc:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:serialnumber:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:loginlog:spotlessApply UP-TO-DATE
+> Task :sa-base:support:serialnumber:spotlessApply UP-TO-DATE
+> Task :sa-base:support:operatelog:spotlessApply UP-TO-DATE
+> Task :sa-base:support:message:spotlessApply UP-TO-DATE
+> Task :sa-base:support:mail:spotlessApply UP-TO-DATE
+> Task :sa-base:support:job:spotlessApply UP-TO-DATE
+> Task :sa-base:support:helpdoc:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:cache:classes UP-TO-DATE
+> Task :sa-base:foundation:captcha:classes UP-TO-DATE
+> Task :sa-base:foundation:data-masking:classes UP-TO-DATE
+> Task :sa-base:foundation:excel:processResources NO-SOURCE
+> Task :sa-base:foundation:domain:processResources NO-SOURCE
+> Task :sa-base:foundation:excel:classes UP-TO-DATE
+> Task :sa-base:foundation:domain:classes UP-TO-DATE
+> Task :sa-admin:processTestResources UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:processResources NO-SOURCE
+> Task :sa-base:foundation:json:processResources NO-SOURCE
+> Task :sa-base:foundation:mq:processResources NO-SOURCE
+> Task :sa-base:foundation:mq:classes UP-TO-DATE
+> Task :sa-base:foundation:core:compileJava UP-TO-DATE
+> Task :sa-base:support:table:spotlessJava UP-TO-DATE
+> Task :sa-base:foundation:excel:jar UP-TO-DATE
+> Task :sa-base:foundation:cache:jar UP-TO-DATE
+> Task :sa-base:foundation:domain:jar UP-TO-DATE
+> Task :sa-base:foundation:data-masking:jar UP-TO-DATE
+> Task :sa-base:foundation:mq:jar UP-TO-DATE
+> Task :sa-base:foundation:captcha:jar UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:compileJava UP-TO-DATE
+> Task :sa-base:foundation:json:compileJava UP-TO-DATE
+> Task :sa-base:infrastructure:redis:compileJava UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:compileJava UP-TO-DATE
+> Task :sa-base:support:table:spotlessJavaApply UP-TO-DATE
+> Task :sa-base:support:table:spotlessApply UP-TO-DATE
+> Task :sa-base:foundation:core:classes UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:classes UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:compileJava UP-TO-DATE
+> Task :sa-base:infrastructure:devtools:compileJava UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:classes UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:compileJava UP-TO-DATE
+> Task :sa-base:foundation:json:classes UP-TO-DATE
+> Task :sa-base:infrastructure:swagger:compileJava UP-TO-DATE
+> Task :sa-base:infrastructure:token:compileJava UP-TO-DATE
+> Task :sa-base:support:mail:compileJava UP-TO-DATE
+> Task :sa-base:support:serialnumber:compileJava UP-TO-DATE
+> Task :sa-base:infrastructure:datasource:compileJava UP-TO-DATE
+> Task :sa-base:foundation:security-protect:processResources UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:processResources UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:processResources UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:classes UP-TO-DATE
+> Task :sa-base:foundation:security-protect:classes UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:classes UP-TO-DATE
+> Task :sa-base:infrastructure:web:compileJava UP-TO-DATE
+> Task :sa-base:support:changelog:compileJava UP-TO-DATE
+> Task :sa-base:foundation:security-protect:jar UP-TO-DATE
+> Task :sa-base:foundation:redis-lock:jar UP-TO-DATE
+> Task :sa-base:support:codegenerator:compileJava UP-TO-DATE
+> Task :sa-base:support:dict:compileJava UP-TO-DATE
+> Task :sa-base:support:reload:compileJava UP-TO-DATE
+> Task :sa-base:support:config:compileJava UP-TO-DATE
+> Task :sa-base:support:datatracer:compileJava UP-TO-DATE
+> Task :sa-base:support:file:compileJava UP-TO-DATE
+> Task :sa-base:support:helpdoc:compileJava UP-TO-DATE
+> Task :sa-base:support:heartbeat:compileJava UP-TO-DATE
+> Task :sa-base:support:feedback:compileJava UP-TO-DATE
+> Task :sa-base:support:job:compileJava UP-TO-DATE
+> Task :sa-base:support:message:compileJava UP-TO-DATE
+> Task :sa-base:support:loginlog:compileJava UP-TO-DATE
+> Task :sa-base:foundation:validation:processResources NO-SOURCE
+> Task :sa-base:foundation:validation:classes UP-TO-DATE
+> Task :sa-base:support:table:compileJava UP-TO-DATE
+> Task :sa-base:support:operatelog:compileJava UP-TO-DATE
+> Task :sa-base:compileJava NO-SOURCE
+> Task :sa-base:foundation:validation:jar UP-TO-DATE
+> Task :sa-base:infrastructure:datasource:processResources UP-TO-DATE
+> Task :sa-base:classes UP-TO-DATE
+> Task :sa-base:infrastructure:datasource:classes UP-TO-DATE
+> Task :sa-base:foundation:ip-geolocation:jar
+> Task :sa-base:jar
+> Task :sa-admin:compileJava UP-TO-DATE
+> Task :sa-admin:classes UP-TO-DATE
+> Task :sa-base:infrastructure:devtools:processResources NO-SOURCE
+> Task :sa-base:foundation:json:jar
+> Task :sa-base:infrastructure:devtools:classes UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:processResources UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:classes UP-TO-DATE
+> Task :sa-base:infrastructure:redis:processResources UP-TO-DATE
+> Task :sa-base:infrastructure:redis:classes UP-TO-DATE
+> Task :sa-base:foundation:repeat-submit:jar
+> Task :sa-base:infrastructure:swagger:processResources UP-TO-DATE
+> Task :sa-base:infrastructure:swagger:classes UP-TO-DATE
+> Task :sa-base:infrastructure:devtools:jar
+> Task :sa-base:infrastructure:token:processResources UP-TO-DATE
+> Task :sa-base:infrastructure:token:classes UP-TO-DATE
+> Task :sa-base:foundation:api-encrypt:jar
+> Task :sa-base:infrastructure:web:processResources UP-TO-DATE
+> Task :sa-base:infrastructure:web:classes UP-TO-DATE
+> Task :sa-base:infrastructure:mybatis:jar
+> Task :sa-base:support:changelog:processResources UP-TO-DATE
+> Task :sa-base:support:changelog:classes UP-TO-DATE
+> Task :sa-base:infrastructure:redis:jar
+> Task :sa-base:infrastructure:swagger:jar
+> Task :sa-base:infrastructure:token:jar
+> Task :sa-base:support:datatracer:processResources UP-TO-DATE
+> Task :sa-base:support:config:processResources UP-TO-DATE
+> Task :sa-base:support:codegenerator:processResources UP-TO-DATE
+> Task :sa-base:support:config:classes UP-TO-DATE
+> Task :sa-base:support:codegenerator:classes UP-TO-DATE
+> Task :sa-base:foundation:core:jar
+> Task :sa-base:support:datatracer:classes UP-TO-DATE
+> Task :sa-base:support:dict:processResources UP-TO-DATE
+> Task :sa-base:support:dict:classes UP-TO-DATE
+> Task :sa-base:infrastructure:web:jar
+> Task :sa-base:support:feedback:processResources UP-TO-DATE
+> Task :sa-base:support:feedback:classes UP-TO-DATE
+> Task :sa-base:support:changelog:jar
+> Task :sa-base:support:config:jar
+> Task :sa-base:support:dict:jar
+> Task :sa-base:support:heartbeat:processResources UP-TO-DATE
+> Task :sa-base:support:helpdoc:processResources UP-TO-DATE
+> Task :sa-base:support:helpdoc:classes UP-TO-DATE
+> Task :sa-base:support:heartbeat:classes UP-TO-DATE
+> Task :sa-base:support:file:processResources UP-TO-DATE
+> Task :sa-base:support:file:classes UP-TO-DATE
+> Task :sa-base:support:datatracer:jar
+> Task :sa-base:support:heartbeat:jar
+> Task :sa-base:support:feedback:jar
+> Task :sa-base:support:loginlog:processResources UP-TO-DATE
+> Task :sa-base:support:job:processResources UP-TO-DATE
+> Task :sa-base:support:mail:processResources UP-TO-DATE
+> Task :sa-base:support:codegenerator:jar
+> Task :sa-base:support:job:classes UP-TO-DATE
+> Task :sa-base:support:loginlog:classes UP-TO-DATE
+> Task :sa-base:support:mail:classes UP-TO-DATE
+> Task :sa-base:support:helpdoc:jar
+> Task :sa-base:support:message:processResources UP-TO-DATE
+> Task :sa-base:support:operatelog:processResources UP-TO-DATE
+> Task :sa-base:support:message:classes UP-TO-DATE
+> Task :sa-base:support:operatelog:classes UP-TO-DATE
+> Task :sa-base:support:file:jar
+> Task :sa-base:support:reload:processResources UP-TO-DATE
+> Task :sa-base:support:reload:classes UP-TO-DATE
+> Task :sa-base:support:mail:jar
+> Task :sa-base:support:loginlog:jar
+> Task :sa-base:support:message:jar
+> Task :sa-base:support:serialnumber:processResources UP-TO-DATE
+> Task :sa-base:support:table:processResources UP-TO-DATE
+> Task :sa-base:support:serialnumber:classes UP-TO-DATE
+> Task :sa-base:support:table:classes UP-TO-DATE
+> Task :sa-base:support:operatelog:jar
+> Task :sa-base:support:job:jar
+> Task :sa-base:support:reload:jar
+> Task :sa-base:support:table:jar
+> Task :sa-base:support:serialnumber:jar
+> Task :sa-base:infrastructure:datasource:jar
+
+> Task :sa-admin:compileTestJava
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/department/service/DepartmentServiceTest.java:97: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    testDepartmentVO.setCreateTime(LocalDateTime.now());
+                                                    ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'testDepartmentVO.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/department/service/DepartmentServiceTest.java:98: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    testDepartmentVO.setUpdateTime(LocalDateTime.now());
+                                                    ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'testDepartmentVO.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1102: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toUpperCase()
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.ROOT)' or '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(TEST_EMPLOYEE_UID)'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1104: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toLowerCase();
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.ROOT);' or '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(TEST_EMPLOYEE_UID);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1161: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toUpperCase()
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.ROOT)' or '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(TEST_EMPLOYEE_UID)'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1163: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toLowerCase();
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.ROOT);' or '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(TEST_EMPLOYEE_UID);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1253: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toUpperCase()
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.ROOT)' or '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(TEST_EMPLOYEE_UID)'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1255: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toLowerCase();
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.ROOT);' or '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(TEST_EMPLOYEE_UID);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1265: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toUpperCase()
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.ROOT)' or '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(TEST_EMPLOYEE_UID)'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1267: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toLowerCase();
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.ROOT);' or '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(TEST_EMPLOYEE_UID);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1381: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toUpperCase()
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.ROOT)' or '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(TEST_EMPLOYEE_UID)'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1383: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toLowerCase();
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.ROOT);' or '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(TEST_EMPLOYEE_UID);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1425: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toUpperCase()
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.ROOT)' or '+ TEST_EMPLOYEE_UID.toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(TEST_EMPLOYEE_UID)'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1427: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + TEST_EMPLOYEE_UID.toLowerCase();
+                                             ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.ROOT);' or '+ TEST_EMPLOYEE_UID.toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(TEST_EMPLOYEE_UID);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1505: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+          password + "_" + employeeUid.toUpperCase() + "_" + employeeUid.toLowerCase();
+                                                  ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean 'password + "_" + employeeUid.toUpperCase(Locale.ROOT) + "_" + employeeUid.toLowerCase();' or 'password + "_" + employeeUid.toUpperCase(Locale.getDefault()) + "_" + employeeUid.toLowerCase();' or 'password + "_" + Ascii.toUpperCase(employeeUid) + "_" + employeeUid.toLowerCase();'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java:1505: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+          password + "_" + employeeUid.toUpperCase() + "_" + employeeUid.toLowerCase();
+                                                                                    ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean 'password + "_" + employeeUid.toUpperCase() + "_" + employeeUid.toLowerCase(Locale.ROOT);' or 'password + "_" + employeeUid.toUpperCase() + "_" + employeeUid.toLowerCase(Locale.getDefault());' or 'password + "_" + employeeUid.toUpperCase() + "_" + Ascii.toLowerCase(employeeUid);'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:172: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + testEmployee.getEmployeeUid().toUpperCase()
+                                                         ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ testEmployee.getEmployeeUid().toUpperCase(Locale.ROOT)' or '+ testEmployee.getEmployeeUid().toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(testEmployee.getEmployeeUid())'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:174: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + testEmployee.getEmployeeUid().toLowerCase();
+                                                         ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ testEmployee.getEmployeeUid().toLowerCase(Locale.ROOT);' or '+ testEmployee.getEmployeeUid().toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(testEmployee.getEmployeeUid());'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:316: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + testEmployee.getEmployeeUid().toUpperCase()
+                                                         ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ testEmployee.getEmployeeUid().toUpperCase(Locale.ROOT)' or '+ testEmployee.getEmployeeUid().toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(testEmployee.getEmployeeUid())'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:318: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + testEmployee.getEmployeeUid().toLowerCase();
+                                                         ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ testEmployee.getEmployeeUid().toLowerCase(Locale.ROOT);' or '+ testEmployee.getEmployeeUid().toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(testEmployee.getEmployeeUid());'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:480: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + testEmployee.getEmployeeUid().toUpperCase()
+                                                         ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ testEmployee.getEmployeeUid().toUpperCase(Locale.ROOT)' or '+ testEmployee.getEmployeeUid().toUpperCase(Locale.getDefault())' or '+ Ascii.toUpperCase(testEmployee.getEmployeeUid())'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:482: warning: [StringCaseLocaleUsage] Specify a `Locale` when calling `String#to{Lower,Upper}Case`. (Note: there are multiple suggested fixes; the third may be most appropriate if you're dealing with ASCII Strings.)
+              + testEmployee.getEmployeeUid().toLowerCase();
+                                                         ^
+    (see https://errorprone.info/bugpattern/StringCaseLocaleUsage)
+  Did you mean '+ testEmployee.getEmployeeUid().toLowerCase(Locale.ROOT);' or '+ testEmployee.getEmployeeUid().toLowerCase(Locale.getDefault());' or '+ Ascii.toLowerCase(testEmployee.getEmployeeUid());'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/login/service/LoginServiceTest.java:563: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+      lastLoginLog.setCreateTime(LocalDateTime.now().minusDays(1));
+                                                  ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'lastLoginLog.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()).minusDays(1));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/DepartmentTestFixture.java:77: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setCreateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/DepartmentTestFixture.java:78: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setUpdateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/RoleTestFixture.java:60: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setCreateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/RoleTestFixture.java:61: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setUpdateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/RoleTestFixture.java:153: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setCreateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/RoleTestFixture.java:154: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setUpdateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/EmployeeTestFixture.java:72: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setCreateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/EmployeeTestFixture.java:73: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    entity.setUpdateTime(LocalDateTime.now());
+                                          ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'entity.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/fixtures/EmployeeTestFixture.java:168: warning: [JavaTimeDefaultTimeZone] LocalDateTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+    vo.setCreateTime(LocalDateTime.now());
+                                      ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'vo.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));'?
+Note: /Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceTest.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+32 warnings
+
+> Task :sa-admin:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :sa-admin:test
+
+EmployeeService Tests > updateDisableFlag() Tests - Sa-Token Logout Integration > Should disable employee and force logout FAILED
+    org.mockito.exceptions.verification.WantedButNotInvoked at EmployeeServiceTest.java:848
+
+EmployeeService Tests > updateDisableFlag() Tests - Sa-Token Logout Integration > Should enable employee without logout FAILED
+    org.mockito.exceptions.verification.NeverWantedButInvoked at EmployeeServiceTest.java:869
+
+EmployeeService Tests > queryEmployee() Tests - Pagination with Complex Mapping > Should handle employees with no position FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > sendEmailCode() Tests > Should send email code successfully when 2FA is enabled FAILED
+    org.mockito.exceptions.verification.opentest4j.ArgumentsAreDifferent at LoginServiceTest.java:861
+
+LoginService Tests > logout() Tests > Should call loginManager to clear cache on logout FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:833
+
+LoginService Tests > logout() Tests > Should logout successfully and clear cache FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:783
+
+LoginService Tests > getLoginEmployee() Tests > Should return RequestEmployee for valid loginId FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:664
+
+LoginService Tests > getLoginEmployee() Tests > Should parse super password loginId correctly FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:705
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when captcha validation fails FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should create login success log on successful login FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:514
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when account is disabled FAILED
+    org.opentest4j.AssertionFailedError at LoginServiceTest.java:299
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should login successfully when email code is valid FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:435
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when account is locked due to login failures FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should login successfully with super password FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:363
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when account is deleted FAILED
+    org.opentest4j.AssertionFailedError at LoginServiceTest.java:278
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should increment login fail count on password error FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when password decryption fails FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when 2FA email code is required but missing FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when password is incorrect FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when login device is invalid FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when employee does not exist FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should return error when email code is invalid FAILED
+    org.mockito.exceptions.misusing.UnnecessaryStubbingException at MockitoExtension.java:200
+
+LoginService Tests > login() Tests - CRITICAL Business Logic > Should login successfully with valid credentials FAILED
+    java.lang.NullPointerException at LoginServiceTest.java:205
+
+279 tests completed, 23 failed, 1 skipped
+
+> Task :sa-admin:test FAILED
+[Incubating] Problems report is available at: file:///Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':sa-admin:test'.
+> There were failing tests. See the report at: file:///Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 1m 26s
+193 actionable tasks: 32 executed, 161 up-to-date
