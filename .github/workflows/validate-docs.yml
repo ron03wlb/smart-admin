@@ -1,0 +1,92 @@
+name: AI Documentation Validation
+
+on:
+  pull_request:
+    paths:
+      - 'CLAUDE.md'
+      - '.claude/**'
+      - '.agent/**'
+  workflow_dispatch:
+
+jobs:
+  validate-docs:
+    name: Validate AI Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for accurate checks
+
+      - name: Make scripts executable
+        run: |
+          chmod +x .claude/scripts/validate-cross-references.sh
+          chmod +x .claude/scripts/check-duplication.sh
+
+      - name: Run cross-reference validation
+        run: |
+          echo "================================================"
+          echo "Cross-Reference Validation"
+          echo "================================================"
+          echo ""
+          ./.claude/scripts/validate-cross-references.sh
+
+      - name: Run duplication check
+        run: |
+          echo ""
+          echo "================================================"
+          echo "Content Duplication Check"
+          echo "================================================"
+          echo ""
+          ./.claude/scripts/check-duplication.sh
+
+      - name: Validation Summary
+        if: always()
+        run: |
+          echo ""
+          echo "================================================"
+          echo "AI Documentation Validation Complete"
+          echo "================================================"
+          echo ""
+          if [ $? -eq 0 ]; then
+            echo "✅ All checks passed"
+          else
+            echo "❌ Validation failed - see errors above"
+            exit 1
+          fi
+
+  markdown-lint:
+    name: Markdown Linting (Optional)
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Don't fail PR if linting fails
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if markdownlint config exists
+        id: check_config
+        run: |
+          if [ -f .markdownlint.json ]; then
+            echo "config_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "config_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run markdownlint
+        if: steps.check_config.outputs.config_exists == 'true'
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            CLAUDE.md
+            .claude/**/*.md
+            .agent/**/*.md
+          config: .markdownlint.json
+        continue-on-error: true
+
+      - name: Skip markdownlint
+        if: steps.check_config.outputs.config_exists == 'false'
+        run: |
+          echo "⚠️  No .markdownlint.json found, skipping markdown linting"
+          echo "This is optional and does not affect PR status"
