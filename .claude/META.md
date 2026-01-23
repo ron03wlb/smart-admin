@@ -1,30 +1,131 @@
-# .claude/ Metadata & Version Tracking
+# AI Documentation System Metadata
 
-**Purpose**: Consolidated metadata for the .claude/ agent configuration system
+**Purpose**: Unified version tracking and metadata for entire SmartAdmin AI documentation system (CLAUDE.md, .claude/, .agent/)
 
-**Last Updated**: 2026-01-22
-**Current Version**: 2.6.0
+**Last Updated**: 2026-01-24
+**System Version**: 3.0.0
+**Current .claude/ Version**: 2.7.0
 
 ---
 
 ## Version Information
 
-### Current Versions
+### Component Versions
 
-| System | Version | Last Updated | Status |
-|--------|---------|-------------|--------|
-| CLAUDE.md | 1.0.0 | 2026-01-22 | ✅ Optimized |
-| .claude/ | 2.6.0 | 2026-01-22 | ✅ Optimized |
-| .agent/rules/ | (unversioned) | 2025-12-15 | ✅ Active |
-| README.md | 1.0.0 | 2026-01-22 | ✅ Navigation hub |
+| Component | Version | Last Updated | Status | Owner |
+|-----------|---------|-------------|--------|-------|
+| **CLAUDE.md** | 3.0.0 | 2026-01-24 | ✅ Universal AI Support | Root |
+| **.claude/ System** | 2.7.0 | 2026-01-24 | ✅ Aligned | .claude/META.md |
+| **.agent/ Rules** | 1.0.0 (target) | 2026-01-24 | 🚧 English Translation In Progress | .agent/VERSION.md |
+| **.agents/skills/** | (external) | N/A | ✅ Active | Claude Code |
+
+**Version Notes**:
+- CLAUDE.md v3.0.0: Content deduplication complete, universal AI support added
+- .claude/ v2.7.0: Version management system established, tracking all components
+- .agent/ v1.0.0 (target): Will be released after English translation completes (Wave 3)
+- .agents/skills/: External Claude Code skills, managed independently
+
+### Cross-System Dependencies
+
+**CLAUDE.md → Dependencies**:
+- `.claude/shared/knowledge/smartadmin-patterns.md` (implementation patterns)
+- `.claude/shared/knowledge/project-architecture.md` (build commands, tech stack)
+- `.claude/shared/knowledge/quality-standards.md` (quality checklist)
+- `.agent/rules/01-naming-conventions.md` (naming conventions)
+- `.agent/rules/10-architecture-rules.md` (architecture enforcement)
+- `.agent/rules/00-ai-decision-matrix.md` (AI decision tree)
+- `.agent/rules/17-commit-message-conventions.md` (commit conventions)
+
+**.claude/shared/knowledge/ → Dependencies**:
+- `.agent/rules/*.md` (source of truth for technical rules)
+- References .agent/rules/ for detailed rule enforcement
+- Aggregates and links, does not duplicate content
+
+**.agent/rules/ → Dependencies**:
+- None (source of truth, no external dependencies)
+- All technical rules originate here
+- Other documents reference these as authoritative source
+
+### Content Ownership Map
+
+See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership tracking.
+
+**Quick Reference**:
+- **Architecture Rules**: `.agent/rules/10-architecture-rules.md` (source of truth)
+- **Naming Conventions**: `.agent/rules/01-naming-conventions.md` (source of truth)
+- **SmartAdmin Patterns**: `.claude/shared/knowledge/smartadmin-patterns.md` (source of truth for implementation)
+- **Build Commands**: `.claude/shared/knowledge/project-architecture.md` (source of truth)
+- **Quick Reference**: `CLAUDE.md` (never duplicates, only links + 1-3 examples)
+
+**Key Principle**: Each piece of content has exactly ONE source of truth. All other references link to that source.
+
+### Update Protocols
+
+Document how to maintain consistency when content changes:
+
+#### Scenario 1: Architecture Rule Changes
+
+**Trigger**: `.agent/rules/10-architecture-rules.md` updated
+
+**Impact Chain**:
+1. `.agent/rules/10-architecture-rules.md` (source of truth) - UPDATE
+2. `.claude/shared/knowledge/smartadmin-patterns.md` - VERIFY reference still accurate
+3. `CLAUDE.md` Quick Reference - VERIFY (usually no change needed, links remain valid)
+4. `.agent/configs/ArchitectureTest.java` - UPDATE if enforcement rules changed
+5. Bump `.agent/` version in this META.md Component Versions table
+
+**Example**: Adding new layer dependency rule
+- Update `.agent/rules/10-architecture-rules.md` with new rule
+- Check `.claude/shared/knowledge/smartadmin-patterns.md` references are still correct
+- Update `ArchitectureTest.java` to enforce new rule
+- Update `.agent/VERSION.md` version number
+- Update this META.md: `.agent/ Rules` version
+
+**Time**: ~15-20 minutes
+
+#### Scenario 2: New SmartAdmin Pattern Added
+
+**Trigger**: New implementation pattern created in `.claude/shared/knowledge/`
+
+**Impact Chain**:
+1. `.claude/shared/knowledge/smartadmin-patterns.md` - CREATE new pattern section
+2. `CLAUDE.md` Quick Reference - ADD 1-3 line summary + link (optional)
+3. Related `.agent/rules/*.md` - ADD cross-reference if relevant
+4. Update `.claude/` version in this META.md Component Versions table
+
+**Example**: Adding new caching pattern
+- Document pattern in `.claude/shared/knowledge/smartadmin-patterns.md`
+- Add Quick Reference entry to `CLAUDE.md` (e.g., "Cache: `@Cacheable` in Manager → [link]")
+- Cross-reference from `.agent/rules/09-manager-layer.md` if applicable
+- Update this META.md: `.claude/ System` version
+
+**Time**: ~20-30 minutes
+
+#### Scenario 3: CLAUDE.md Quick Reference Update
+
+**Trigger**: Frequently used command/pattern changes
+
+**Impact Chain**:
+1. `CLAUDE.md` - UPDATE Quick Reference table or example
+2. Source documentation (`.claude/shared/knowledge/` or `.agent/rules/`) - VERIFY still accurate
+3. Update `CLAUDE.md` version in this META.md Component Versions table
+
+**Example**: Gradle command syntax changed
+- Update Build Commands section in `CLAUDE.md`
+- Verify `.claude/shared/knowledge/project-architecture.md` has correct commands
+- Update this META.md: `CLAUDE.md` version
+
+**Time**: ~5-10 minutes
+
+**Key Principle**: Always update the source of truth first, then propagate changes to references. Never update references without checking the source.
 
 ### Version Alignment
 
-All documentation systems are aligned and cross-referenced:
+All documentation systems are coordinated through this META.md:
 - Root README.md serves as primary navigation hub
 - CLAUDE.md provides developer quick reference with links to detailed docs
 - .claude/ contains AI agent system with shared knowledge base
-- .agent/rules/ contains comprehensive coding standards
+- .agent/rules/ contains comprehensive coding standards (source of truth for technical rules)
 
 ---
 

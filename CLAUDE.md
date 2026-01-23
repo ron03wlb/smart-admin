@@ -34,7 +34,7 @@ When working with SmartAdmin codebase, read documentation in this order:
 1. **CLAUDE.md** (this file) - Quick reference and navigation hub
 2. **[.agent/rules/00-ai-decision-matrix.md](.agent/rules/00-ai-decision-matrix.md)** - Scenario-based rule selection
 3. **[.agent/rules/10-architecture-rules.md](.agent/rules/10-architecture-rules.md)** - Mandatory architectural constraints
-4. **[.claude/shared/knowledge/](. claude/shared/knowledge/)** - SmartAdmin implementation patterns
+4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
 5. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
 
 ### Interaction Language
@@ -220,8 +220,8 @@ cd smart-admin-api-java21-springboot3
 |-----------|---------|--------|----------|
 | **This Document** | 3.0.0 | ✅ Universal AI Support | - |
 | **AI Doc System** | 3.0.0 | ✅ Unified | [.claude/META.md](.claude/META.md) |
-| **.claude/** | 2.6.0 | ✅ Agent System | [.claude/README.md](.claude/README.md) |
-| **.agent/** | (unversioned) | ✅ Technical Rules | [.agent/README.md](.agent/README.md) |
+| **.claude/** | 2.7.0 | ✅ Agent System | [.claude/README.md](.claude/README.md) |
+| **.agent/** | 1.0.0-SNAPSHOT | 🚧 Translation In Progress | [.agent/VERSION.md](.agent/VERSION.md) |
 | **SmartAdmin** | v4.0.0 | ✅ Production | - |
 
 **System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership
