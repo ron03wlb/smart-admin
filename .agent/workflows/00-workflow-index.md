@@ -1,41 +1,41 @@
 ---
 trigger: always_on
-description: Workflow 索引與執行順序指南
+description: Workflow index and execution order guide
 tags: [meta, workflow-orchestration, guide]
 required_rules: []
 last_updated: 2025-01-13
 ---
 
-# Workflow 執行索引
+# Workflow Execution Index
 
-> **目的**: 幫助 AI 和開發者快速找到適合當前場景的 Workflow，理解 Workflow 之間的依賴關係和執行順序
+> **Purpose**: Help AI and developers quickly find the appropriate workflow for the current scenario, understand workflow dependencies and execution order
 
 ---
 
-## 🤖 AI 場景匹配
+## 🤖 AI Scenario Matching
 
-### 用戶請求 → Workflow 映射表
+### User Request → Workflow Mapping Table
 
-| 用戶請求關鍵詞 | 調用 Workflow | 前置條件 | 預期結果 | 相關規則 |
+| User Request Keywords | Invoke Workflow | Prerequisites | Expected Result | Related Rules |
 |--------------|--------------|---------|---------|---------|
-| "初始化環境" / "setup" / "啟動項目" | [init.md](./init.md) | Docker 已安裝 | PostgreSQL + Redis 運行 | 05, 08, 09 |
-| "TDD" / "測試驅動" / "先寫測試" | [tdd-workflow.md](./tdd-workflow.md) | 環境已初始化 | 測試 + 實現完成 | 01, 08, 10 |
-| "配置 CI/CD" / "GitHub Actions" | [github-actions-pipeline.md](./github-actions-pipeline.md) | GitHub repo 存在 | .github/workflows/*.yml | 06, 10 |
-| "Quality Gate 失敗" / "本地驗證" | [quality-gates-local-ci.md](./quality-gates-local-ci.md) | 本地環境就緒 | 問題已定位 | 06, 10 |
-| "編譯錯誤" / "運行錯誤" / "ArchUnit 失敗" | [java-failure-recovery.md](./java-failure-recovery.md) | - | 錯誤已診斷 | 10 |
+| "initialize environment" / "setup" / "start project" | [init.md](./init.md) | Docker installed | PostgreSQL + Redis running | 05, 08, 09 |
+| "TDD" / "test-driven" / "write test first" | [tdd-workflow.md](./tdd-workflow.md) | Environment initialized | Test + implementation complete | 01, 08, 10 |
+| "configure CI/CD" / "GitHub Actions" | [github-actions-pipeline.md](./github-actions-pipeline.md) | GitHub repo exists | .github/workflows/*.yml | 06, 10 |
+| "Quality Gate failed" / "local validation" | [quality-gates-local-ci.md](./quality-gates-local-ci.md) | Local environment ready | Issue identified | 06, 10 |
+| "compilation error" / "runtime error" / "ArchUnit failed" | [java-failure-recovery.md](./java-failure-recovery.md) | - | Error diagnosed | 10 |
 
 ---
 
-## 📊 Workflow 依賴圖
+## 📊 Workflow Dependency Graph
 
 ```mermaid
 graph TD
-    A[init.md<br/>環境初始化] --> B[tdd-workflow.md<br/>TDD 開發]
-    A --> C[github-actions-pipeline.md<br/>CI/CD 配置]
-    B --> D[quality-gates-local-ci.md<br/>本地 Quality Gate]
+    A[init.md<br/>Environment Initialization] --> B[tdd-workflow.md<br/>TDD Development]
+    A --> C[github-actions-pipeline.md<br/>CI/CD Configuration]
+    B --> D[quality-gates-local-ci.md<br/>Local Quality Gate]
     C --> D
-    D -.失敗.-> E[java-failure-recovery.md<br/>錯誤診斷與修復]
-    E -.修復後.-> D
+    D -.failure.-> E[java-failure-recovery.md<br/>Error Diagnosis & Fix]
+    E -.after fix.-> D
 
     style A fill:#e1f5e1
     style B fill:#e3f2fd
@@ -44,358 +44,358 @@ graph TD
     style E fill:#ffebee
 ```
 
-### 依賴說明
-- **init.md** - 所有 workflow 的起點，確保開發環境就緒
-- **tdd-workflow.md** - 依賴 init.md，用於日常開發
-- **github-actions-pipeline.md** - 依賴 init.md，配置 CI/CD
-- **quality-gates-local-ci.md** - 本地驗證，可被 tdd 或 ci/cd 調用
-- **java-failure-recovery.md** - 獨立 workflow，處理各類錯誤
+### Dependency Explanation
+- **init.md** - Starting point for all workflows, ensures development environment is ready
+- **tdd-workflow.md** - Depends on init.md, used for daily development
+- **github-actions-pipeline.md** - Depends on init.md, configures CI/CD
+- **quality-gates-local-ci.md** - Local validation, can be invoked by TDD or CI/CD
+- **java-failure-recovery.md** - Independent workflow, handles various errors
 
 ---
 
-## 🎯 典型場景的 Workflow 組合
+## 🎯 Typical Scenario Workflow Combinations
 
-### 場景 1: 新項目啟動（完整流程）
+### Scenario 1: New Project Startup (Complete Flow)
 
 ```bash
-# Step 1: 環境初始化
+# Step 1: Environment Initialization
 Workflow: init.md
-└─ 啟動 Docker (PostgreSQL + Redis)
-└─ 驗證 Java 21 + Maven
-└─ 編譯項目
-└─ 運行 ArchUnit 測試
+└─ Start Docker (PostgreSQL + Redis)
+└─ Verify Java 21 + Maven
+└─ Compile project
+└─ Run ArchUnit tests
 
-# Step 2: 第一個功能開發（TDD）
+# Step 2: First Feature Development (TDD)
 Workflow: tdd-workflow.md
-└─ 編寫測試（RED）
-└─ 最小實現（GREEN）
-└─ 重構優化（REFACTOR）
-└─ 驗證 Quality Gate
+└─ Write test (RED)
+└─ Minimal implementation (GREEN)
+└─ Refactor optimization (REFACTOR)
+└─ Verify Quality Gate
 
-# Step 3: 配置 CI/CD
+# Step 3: Configure CI/CD
 Workflow: github-actions-pipeline.md
-└─ 創建 .github/workflows/ci.yml
-└─ 配置 GitHub Secrets
-└─ 驗證 Actions 運行
+└─ Create .github/workflows/ci.yml
+└─ Configure GitHub Secrets
+└─ Verify Actions execution
 
-# Step 4: 本地驗證流程
+# Step 4: Local Validation Flow
 Workflow: quality-gates-local-ci.md
 └─ Checkstyle + PMD + SpotBugs
-└─ ArchUnit 測試
-└─ JaCoCo 覆蓋率
-└─ SonarQube（如果配置）
+└─ ArchUnit tests
+└─ JaCoCo coverage
+└─ SonarQube (if configured)
 ```
 
-**預期時間**: 1-2 小時
-**應用規則**: 01, 05, 06, 08, 09, 10
+**Expected Time**: 1-2 hours
+**Applied Rules**: 01, 05, 06, 08, 09, 10
 
 ---
 
-### 場景 2: 日常功能開發
+### Scenario 2: Daily Feature Development
 
 ```bash
-# 快速開發流程
+# Quick development flow
 Workflow: tdd-workflow.md
-├─ RED: 編寫失敗測試
-├─ GREEN: 最小實現
-├─ REFACTOR: 重構優化
-└─ VERIFY: 本地 Quality Gate
+├─ RED: Write failing test
+├─ GREEN: Minimal implementation
+├─ REFACTOR: Refactor optimization
+└─ VERIFY: Local Quality Gate
 
-# 如果遇到錯誤
+# If encountering errors
 Workflow: java-failure-recovery.md
-└─ 診斷錯誤類型
-└─ 定位根因
-└─ 提供修復方案
+└─ Diagnose error type
+└─ Locate root cause
+└─ Provide fix solution
 ```
 
-**預期時間**: 30 分鐘 - 2 小時/功能
-**應用規則**: 01, 08, 10
+**Expected Time**: 30 minutes - 2 hours/feature
+**Applied Rules**: 01, 08, 10
 
 ---
 
-### 場景 3: Quality Gate 失敗修復
+### Scenario 3: Quality Gate Failure Fix
 
 ```bash
-# 失敗通知（GitHub Actions 或本地）
+# Failure notification (GitHub Actions or local)
 Workflow: quality-gates-local-ci.md
-├─ 本地複現問題
-├─ mvn checkstyle:check（修復格式）
-├─ mvn test（修復測試）
-├─ mvn jacoco:check（補充測試）
-└─ 驗證通過
+├─ Reproduce issue locally
+├─ mvn checkstyle:check (fix format)
+├─ mvn test (fix tests)
+├─ mvn jacoco:check (add tests)
+└─ Verify passed
 
-# 如果無法解決
+# If unable to resolve
 Workflow: java-failure-recovery.md
-└─ 詳細診斷
-└─ 查看規則文檔
-└─ 逐步修復
+└─ Detailed diagnosis
+└─ Review rule documentation
+└─ Step-by-step fix
 ```
 
-**預期時間**: 10-30 分鐘
-**應用規則**: 01, 06, 10
+**Expected Time**: 10-30 minutes
+**Applied Rules**: 01, 06, 10
 
 ---
 
-### 場景 4: ArchUnit 測試失敗處理
+### Scenario 4: ArchUnit Test Failure Handling
 
 ```bash
-# 收到 ArchUnit 失敗通知
+# Received ArchUnit failure notification
 Workflow: java-failure-recovery.md
-└─ Section: ArchUnit 測試失敗診斷
+└─ Section: ArchUnit Test Failure Diagnosis
 
-# 分析違規類型
-├─ Controller 直接訪問 Repository?
-│   └─ 修復: 創建 Service 中間層
+# Analyze violation type
+├─ Controller directly accessing Repository?
+│   └─ Fix: Create Service intermediate layer
 │
-├─ Service 使用 Optional 而非 Option?
-│   └─ 修復: 替換為 io.vavr.control.Option
+├─ Service using Optional instead of Option?
+│   └─ Fix: Replace with io.vavr.control.Option
 │
-├─ 字段注入?
-│   └─ 修復: 使用構造函數注入
+├─ Field injection?
+│   └─ Fix: Use constructor injection
 │
-└─ @Transactional 位置錯誤?
-    └─ 修復: 移到 Service 層
+└─ @Transactional in wrong location?
+    └─ Fix: Move to Service layer
 
-# 驗證修復
+# Verify fix
 Workflow: quality-gates-local-ci.md
 └─ mvn test -Dtest=ArchitectureTest
 ```
 
-**預期時間**: 5-20 分鐘/違規
-**應用規則**: 10, 08
+**Expected Time**: 5-20 minutes/violation
+**Applied Rules**: 10, 08
 
 ---
 
-## 📋 Workflow 強制檢查點
+## 📋 Workflow Mandatory Checkpoints
 
-每個 workflow 執行完畢後，AI 必須確認以下檢查點：
+After each workflow execution, AI must confirm the following checkpoints:
 
-### ✅ init.md 完成檢查
+### ✅ init.md Completion Check
 ```bash
-# 1. Docker 服務運行
+# 1. Docker services running
 docker ps | grep -E "(postgres|redis)"
-# 預期: 2 個容器 running
+# Expected: 2 containers running
 
-# 2. 項目編譯成功
+# 2. Project compilation success
 mvn clean compile
-# 預期: BUILD SUCCESS
+# Expected: BUILD SUCCESS
 
-# 3. ArchUnit 測試通過
+# 3. ArchUnit tests passed
 mvn test -Dtest=ArchitectureTest
-# 預期: 0 failures
+# Expected: 0 failures
 
-# 4. 數據庫連接正常
+# 4. Database connection working
 docker exec smartadmin-postgres psql -U smartadmin -d smart_admin_v3 -c "SELECT 1"
-# 預期: 返回 1
+# Expected: returns 1
 ```
 
-### ✅ tdd-workflow.md 完成檢查
+### ✅ tdd-workflow.md Completion Check
 ```bash
-# 1. 測試類存在且命名規範
+# 1. Test class exists and follows naming convention
 find . -name "*Test.java" | grep -v target
-# 預期: 找到測試文件
+# Expected: test file found
 
-# 2. 實現類存在且遵循架構
+# 2. Implementation class exists and follows architecture
 mvn test -Dtest=ArchitectureTest#layerDependencies
-# 預期: 0 violations
+# Expected: 0 violations
 
-# 3. 所有測試通過
+# 3. All tests passed
 mvn test
-# 預期: BUILD SUCCESS
+# Expected: BUILD SUCCESS
 
-# 4. 覆蓋率達標
+# 4. Coverage meets threshold
 mvn jacoco:report && mvn jacoco:check -Djacoco.minimum=0.80
-# 預期: BUILD SUCCESS
+# Expected: BUILD SUCCESS
 ```
 
-### ✅ github-actions-pipeline.md 完成檢查
+### ✅ github-actions-pipeline.md Completion Check
 ```bash
-# 1. Workflow 文件存在
+# 1. Workflow file exists
 ls .github/workflows/ci.yml
-# 預期: 文件存在
+# Expected: file exists
 
-# 2. GitHub Secrets 已配置
+# 2. GitHub Secrets configured
 gh secret list
-# 預期: SONAR_TOKEN, SONAR_HOST_URL
+# Expected: SONAR_TOKEN, SONAR_HOST_URL
 
-# 3. 首次 push 後 Actions 運行
+# 3. Actions running after first push
 gh run list --limit 1
-# 預期: status: completed, conclusion: success
+# Expected: status: completed, conclusion: success
 ```
 
-### ✅ quality-gates-local-ci.md 完成檢查
+### ✅ quality-gates-local-ci.md Completion Check
 ```bash
-# 1. Checkstyle 通過
+# 1. Checkstyle passed
 mvn checkstyle:check
-# 預期: 0 errors
+# Expected: 0 errors
 
-# 2. PMD 通過
+# 2. PMD passed
 mvn pmd:check
-# 預期: 0 violations
+# Expected: 0 violations
 
-# 3. SpotBugs 通過
+# 3. SpotBugs passed
 mvn spotbugs:check
-# 預期: 0 bugs
+# Expected: 0 bugs
 
-# 4. JaCoCo 通過
+# 4. JaCoCo passed
 mvn jacoco:check -Djacoco.minimum=0.80
-# 預期: BUILD SUCCESS
+# Expected: BUILD SUCCESS
 
-# 5. ArchUnit 通過
+# 5. ArchUnit passed
 mvn test -Dtest=ArchitectureTest
-# 預期: 0 failures
+# Expected: 0 failures
 ```
 
-### ✅ java-failure-recovery.md 完成檢查
+### ✅ java-failure-recovery.md Completion Check
 ```bash
-# 1. 錯誤已識別
-# 預期: 明確的錯誤類型（編譯/測試/ArchUnit/QualityGate）
+# 1. Error identified
+# Expected: clear error type (compilation/test/ArchUnit/QualityGate)
 
-# 2. 根因已定位
-# 預期: 具體的文件和行號
+# 2. Root cause located
+# Expected: specific file and line number
 
-# 3. 修復方案已應用
-# 預期: 代碼已修改
+# 3. Fix solution applied
+# Expected: code modified
 
-# 4. 問題已解決
+# 4. Issue resolved
 mvn verify
-# 預期: BUILD SUCCESS
+# Expected: BUILD SUCCESS
 ```
 
 ---
 
-## 🔍 Workflow 選擇決策樹
+## 🔍 Workflow Selection Decision Tree
 
 ```
-用戶描述的情況:
-├─ "我想開始開發" / "環境還沒設置"
-│   └─ 執行: init.md
+User described situation:
+├─ "I want to start developing" / "environment not yet set up"
+│   └─ Execute: init.md
 │
-├─ "我要開發新功能" / "需要寫代碼"
-│   ├─ 環境已初始化？
-│   │   ├─ YES → 執行: tdd-workflow.md
-│   │   └─ NO → 先執行: init.md，再執行: tdd-workflow.md
+├─ "I need to develop new feature" / "need to write code"
+│   ├─ Environment initialized?
+│   │   ├─ YES → Execute: tdd-workflow.md
+│   │   └─ NO → First execute: init.md, then execute: tdd-workflow.md
 │   │
-│   └─ 遇到錯誤？
-│       └─ 執行: java-failure-recovery.md
+│   └─ Encountered error?
+│       └─ Execute: java-failure-recovery.md
 │
-├─ "GitHub Actions 失敗" / "CI 失敗"
-│   ├─ 首次配置？
-│   │   └─ YES → 參考: github-actions-pipeline.md
+├─ "GitHub Actions failed" / "CI failed"
+│   ├─ First-time configuration?
+│   │   └─ YES → Reference: github-actions-pipeline.md
 │   │
-│   └─ 本地複現問題
-│       └─ 執行: quality-gates-local-ci.md
+│   └─ Reproduce issue locally
+│       └─ Execute: quality-gates-local-ci.md
 │
-├─ "ArchUnit 測試失敗" / "架構違規"
-│   └─ 執行: java-failure-recovery.md (ArchUnit 診斷部分)
+├─ "ArchUnit test failed" / "architecture violation"
+│   └─ Execute: java-failure-recovery.md (ArchUnit diagnosis section)
 │
-├─ "覆蓋率不足" / "SonarQube 問題"
-│   └─ 執行: quality-gates-local-ci.md
+├─ "insufficient coverage" / "SonarQube issue"
+│   └─ Execute: quality-gates-local-ci.md
 │
-└─ "編譯失敗" / "依賴衝突" / "運行錯誤"
-    └─ 執行: java-failure-recovery.md
+└─ "compilation failed" / "dependency conflict" / "runtime error"
+    └─ Execute: java-failure-recovery.md
 ```
 
 ---
 
-## 📚 Workflow 與 Rules 對應表
+## 📚 Workflow and Rules Correspondence Table
 
 ### init.md
-**依賴規則**:
-- [05-postgresql-basics.md](../rules/05-postgresql-basics.md) - 數據庫初始化
-- [08-vavr-fundamentals.md](../rules/08-vavr-fundamentals.md) - Vavr 依賴配置
-- [09-mybatis-plus-core.md](../rules/09-mybatis-plus-core.md) - MyBatis Plus 配置
+**Dependent Rules**:
+- [05-postgresql-basics.md](../rules/05-postgresql-basics.md) - Database initialization
+- [08-vavr-fundamentals.md](../rules/08-vavr-fundamentals.md) - Vavr dependency configuration
+- [09-mybatis-plus-core.md](../rules/09-mybatis-plus-core.md) - MyBatis Plus configuration
 
-**執行順序**: 環境檢查 → Docker 啟動 → 項目編譯 → ArchUnit 測試
+**Execution Order**: Environment check → Docker startup → Project compilation → ArchUnit tests
 
 ---
 
 ### tdd-workflow.md
-**依賴規則**:
-- [01-naming-conventions.md](../rules/01-naming-conventions.md) - 測試命名
-- [08-vavr-fundamentals.md](../rules/08-vavr-fundamentals.md) - Service 返回 Option
-- [10-architecture-rules.md](../rules/10-architecture-rules.md) - 分層架構
+**Dependent Rules**:
+- [01-naming-conventions.md](../rules/01-naming-conventions.md) - Test naming
+- [08-vavr-fundamentals.md](../rules/08-vavr-fundamentals.md) - Service returns Option
+- [10-architecture-rules.md](../rules/10-architecture-rules.md) - Layered architecture
 
-**執行順序**: RED（測試）→ GREEN（實現）→ REFACTOR（重構）→ VERIFY（驗證）
+**Execution Order**: RED (test) → GREEN (implementation) → REFACTOR (refactor) → VERIFY (validation)
 
 ---
 
 ### github-actions-pipeline.md
-**依賴規則**:
-- [06-sonarqube-rules.md](../rules/06-sonarqube-rules.md) - SonarQube 配置
-- [10-architecture-rules.md](../rules/10-architecture-rules.md) - ArchUnit 測試
+**Dependent Rules**:
+- [06-sonarqube-rules.md](../rules/06-sonarqube-rules.md) - SonarQube configuration
+- [10-architecture-rules.md](../rules/10-architecture-rules.md) - ArchUnit tests
 
-**執行順序**: 創建 Workflow → 配置 Secrets → 推送代碼 → 驗證運行
+**Execution Order**: Create workflow → Configure secrets → Push code → Verify execution
 
 ---
 
 ### quality-gates-local-ci.md
-**依賴規則**:
+**Dependent Rules**:
 - [01-naming-conventions.md](../rules/01-naming-conventions.md) - Checkstyle
-- [06-sonarqube-rules.md](../rules/06-sonarqube-rules.md) - 質量標準
+- [06-sonarqube-rules.md](../rules/06-sonarqube-rules.md) - Quality standards
 - [10-architecture-rules.md](../rules/10-architecture-rules.md) - ArchUnit
 
-**執行順序**: Checkstyle → PMD → SpotBugs → Tests → JaCoCo → ArchUnit
+**Execution Order**: Checkstyle → PMD → SpotBugs → Tests → JaCoCo → ArchUnit
 
 ---
 
 ### java-failure-recovery.md
-**依賴規則**:
-- [10-architecture-rules.md](../rules/10-architecture-rules.md) - 架構錯誤診斷
+**Dependent Rules**:
+- [10-architecture-rules.md](../rules/10-architecture-rules.md) - Architecture error diagnosis
 
-**執行順序**: 識別錯誤類型 → 定位根因 → 查閱規則 → 修復 → 驗證
+**Execution Order**: Identify error type → Locate root cause → Consult rules → Fix → Verify
 
 ---
 
-## 🎓 學習路徑建議
+## 🎓 Learning Path Recommendations
 
-### 對於新人
+### For Newcomers
 ```
 Day 1: init.md
-       └─ 設置開發環境，熟悉項目結構
+       └─ Set up development environment, familiarize with project structure
 
 Day 2-3: tdd-workflow.md
-         └─ 練習 TDD 開發一個簡單功能
+         └─ Practice TDD development on a simple feature
 
 Day 4: quality-gates-local-ci.md
-       └─ 學習質量檢查標準
+       └─ Learn quality check standards
 
-Day 5: github-actions-pipeline.md（可選）
-       └─ 了解 CI/CD 流程
+Day 5: github-actions-pipeline.md (optional)
+       └─ Understand CI/CD workflow
 ```
 
-### 對於熟悉傳統 Java 的開發者
+### For Developers Familiar with Traditional Java
 ```
 Week 1: init.md + tdd-workflow.md
-        └─ 適應 Vavr Option/Try 的使用
+        └─ Adapt to using Vavr Option/Try
 
-Week 2: 重點學習相關規則
+Week 2: Focus on related rules
         └─ 08-vavr-fundamentals.md
         └─ 09-mybatis-plus-core.md
         └─ 05-postgresql-basics.md
 
-Week 3: 完整開發流程
+Week 3: Complete development workflow
         └─ TDD → Quality Gate → PR
 ```
 
 ---
 
-## ⚡ 快速參考
+## ⚡ Quick Reference
 
-### 常用命令組合
+### Common Command Combinations
 
 ```bash
-# 完整開發流程
+# Complete development flow
 mvn clean compile && \
 mvn test && \
 mvn jacoco:report && \
 mvn checkstyle:check && \
 mvn test -Dtest=ArchitectureTest
 
-# 快速檢查（提交前）
+# Quick check (before commit)
 mvn verify
 
-# 本地 Quality Gate（完整）
+# Local Quality Gate (complete)
 mvn clean verify && \
 mvn checkstyle:check && \
 mvn pmd:check && \
@@ -405,14 +405,14 @@ mvn test -Dtest=ArchitectureTest
 
 ---
 
-## 🔗 相關資源
+## 🔗 Related Resources
 
-- [開發規範與導航總覽](../README.md)
-- [規則索引](../rules/00-ai-decision-matrix.md)
-- [ArchUnit 測試配置](../configs/ArchitectureTest.java)
-- [Maven 依賴](../configs/maven-dependencies.md)
+- [Development Standards & Navigation Overview](../README.md)
+- [Rules Index](../rules/00-ai-decision-matrix.md)
+- [ArchUnit Test Configuration](../configs/ArchitectureTest.java)
+- [Maven Dependencies](../configs/maven-dependencies.md)
 
 ---
 
-**最後更新**: 2025-01-13
-**Sprint 2 任務**: Workflow 編排與索引優化
+**Last Updated**: 2025-01-13
+**Sprint 2 Task**: Workflow orchestration and index optimization

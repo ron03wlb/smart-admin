@@ -1,6 +1,6 @@
 ---
 trigger: on_demand
-description: GitHub Actions CI/CD 管道配置
+description: GitHub Actions CI/CD pipeline configuration
 tags: [ci-cd, github-actions, sonarqube, archunit, jacoco]
 required_rules:
   - rules/10-architecture-rules.md
@@ -10,11 +10,11 @@ required_rules:
 last_updated: 2025-01-12
 ---
 
-# GitHub Actions CI/CD 管道配置
+# GitHub Actions CI/CD Pipeline Configuration
 
-> SmartAdmin Java 21 + Spring Boot 3.5.4 + PostgreSQL + Vavr 技術棧
+> SmartAdmin Java 21 + Spring Boot 3.5.4 + PostgreSQL + Vavr Technology Stack
 
-## 一、完整 YAML 配置
+## I. Complete YAML Configuration
 
 ```yaml
 name: Java CI/CD Pipeline
@@ -30,7 +30,7 @@ env:
   JAVA_DISTRIBUTION: 'corretto'
 
 jobs:
-  # 階段 1: 代碼質量檢查
+  # Stage 1: Code Quality Check
   quality-check:
     name: Code Quality Check
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # SonarQube 需要完整歷史
+          fetch-depth: 0  # SonarQube needs full history
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -60,14 +60,14 @@ jobs:
         run: mvn spotbugs:check
         working-directory: ./smart-admin-api-java21-springboot3
 
-  # 階段 2: 測試（包含架構測試）
+  # Stage 2: Tests (including Architecture Tests)
   test:
     name: Unit & Architecture Tests
     needs: quality-check
     runs-on: ubuntu-latest
 
     services:
-      # PostgreSQL 測試數據庫
+      # PostgreSQL Test Database
       postgres:
         image: postgres:16-alpine
         env:
@@ -82,7 +82,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      # Redis 測試緩存
+      # Redis Test Cache
       redis:
         image: redis:7-alpine
         ports:
@@ -138,7 +138,7 @@ jobs:
           mvn jacoco:check -Djacoco.minimum=0.80
         working-directory: ./smart-admin-api-java21-springboot3
 
-  # 階段 3: SonarQube 分析
+  # Stage 3: SonarQube Analysis
   sonar:
     name: SonarQube Analysis
     needs: test
@@ -170,7 +170,7 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
         working-directory: ./smart-admin-api-java21-springboot3
 
-  # 階段 4: Quality Gate 檢查
+  # Stage 4: Quality Gate Check
   quality-gate:
     name: SonarQube Quality Gate
     needs: sonar
@@ -227,7 +227,7 @@ jobs:
               body: '⚠️ **SonarQube Quality Gate Failed**\n\nPlease fix the quality issues before merging.'
             });
 
-  # 階段 5: 構建 (僅 main 分支)
+  # Stage 5: Build (main branch only)
   build:
     name: Build & Package
     needs: quality-gate
@@ -257,84 +257,84 @@ jobs:
           retention-days: 30
 ```
 
-## 二、Branch Protection Rules
+## II. Branch Protection Rules
 
 **Settings → Branches → Branch protection rules → Add rule**
 
-**分支**: `main` / `master`
+**Branch**: `main` / `master`
 
-**必須通過的檢查**:
+**Required Status Checks**:
 ```yaml
 required_status_checks:
-  strict: true  # 要求分支為最新
+  strict: true  # Require branch to be up to date
   contexts:
     - quality-check
     - test
     - quality-gate
 ```
 
-**合併要求**:
-- 至少 1 位 Reviewer 批准
-- 所有 CI 檢查通過
-- 所有對話已解決
-- 分支與 base 同步
+**Merge Requirements**:
+- At least 1 reviewer approval
+- All CI checks passed
+- All conversations resolved
+- Branch in sync with base
 
-## 三、Quality Gate 標準
+## III. Quality Gate Standards
 
-### SonarQube 質量門檻配置
+### SonarQube Quality Gate Configuration
 
 ```yaml
 quality_gate:
   name: "SmartAdmin Quality Gate"
 
   conditions:
-    # 新代碼覆蓋率
+    # New code coverage
     - metric: coverage
       operator: LESS_THAN
       value: 80
       on_new_code: true
 
-    # 新代碼重複率
+    # New code duplication rate
     - metric: duplicated_lines_density
       operator: GREATER_THAN
       value: 3
       on_new_code: true
 
-    # 阻塞級別問題
+    # Blocker level issues
     - metric: blocker_violations
       operator: GREATER_THAN
       value: 0
       on_new_code: false
 
-    # 嚴重級別問題
+    # Critical level issues
     - metric: critical_violations
       operator: GREATER_THAN
       value: 0
       on_new_code: true
 
-    # 技術債務比率
+    # Technical debt ratio
     - metric: sqale_debt_ratio
       operator: GREATER_THAN
       value: 5
       on_new_code: true
 ```
 
-## 四、核心流程總結
+## IV. Core Process Summary
 
-### CI/CD 階段
-1. **代碼質量** → Checkstyle + PMD + SpotBugs
-2. **架構測試** → ArchUnit（分層、命名、Vavr 規範）
-3. **單元測試** → JUnit 5 + Mockito（覆蓋率 ≥ 80%）
-4. **靜態分析** → SonarQube（技術債務、重複代碼）
-5. **Quality Gate** → 所有標準通過才能合併
+### CI/CD Stages
+1. **Code Quality** → Checkstyle + PMD + SpotBugs
+2. **Architecture Tests** → ArchUnit (layering, naming, Vavr standards)
+3. **Unit Tests** → JUnit 5 + Mockito (coverage ≥ 80%)
+4. **Static Analysis** → SonarQube (technical debt, code duplication)
+5. **Quality Gate** → All standards must pass before merge
 
-### 關鍵指標
-- 測試覆蓋率 ≥ 80%
-- 代碼重複率 < 3%
-- 無阻塞/嚴重級別問題
-- 技術債務比率 < 5%
-- ArchUnit 測試全部通過
+### Key Metrics
+- Test coverage ≥ 80%
+- Code duplication < 3%
+- No blocker/critical level issues
+- Technical debt ratio < 5%
+- All ArchUnit tests pass
 
-## 相關 Workflows
+## Related Workflows
 
-- [workflows/quality-gates-local-ci.md](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.agent/workflows/quality-gates-local-ci.md) - 本地 Quality Gate 檢查與 GitLab CI/CD
+- [workflows/quality-gates-local-ci.md](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.agent/workflows/quality-gates-local-ci.md) - Local Quality Gate checks and GitLab CI/CD

@@ -1,6 +1,6 @@
 ---
 trigger: on_demand
-description: Java 錯誤診斷與恢復流程
+description: Java error diagnosis and recovery procedures
 tags: [troubleshooting, debugging, error-recovery, archunit, quality-gate]
 required_rules:
   - rules/10-architecture-rules.md
@@ -13,19 +13,19 @@ required_rules:
 
 execution_order:
   - step: identify_error_type
-    description: 識別錯誤類型
-    validation: 明確的錯誤分類（編譯/測試/ArchUnit/QualityGate）
+    description: Identify error type
+    validation: Clear error classification (compilation/test/ArchUnit/QualityGate)
 
   - step: locate_root_cause
-    description: 定位根因
-    validation: 具體的文件和行號
+    description: Locate root cause
+    validation: Specific file and line number
 
   - step: apply_fix
-    description: 應用修復方案
-    validation: 代碼已修改
+    description: Apply fix solution
+    validation: Code modified
 
   - step: verify_fix
-    description: 驗證修復
+    description: Verify fix
     commands:
       - mvn verify
     validation: BUILD SUCCESS
@@ -33,117 +33,117 @@ execution_order:
 last_updated: 2025-01-13
 ---
 
-# Java 錯誤診斷與恢復流程
+# Java Error Diagnosis and Recovery Procedures
 
-> **目的**: 系統化診斷和修復編譯錯誤、測試失敗、ArchUnit 違規、Quality Gate 失敗等問題
+> **Purpose**: Systematically diagnose and fix compilation errors, test failures, ArchUnit violations, Quality Gate failures, and other issues
 
 ---
 
-## 🤖 AI 執行指南
+## 🤖 AI Execution Guide
 
-### 何時應用此 Workflow
-- ✅ 編譯失敗（compilation errors）
-- ✅ 測試失敗（test failures）
-- ✅ ArchUnit 測試失敗（architecture violations）
-- ✅ Quality Gate 失敗（coverage/sonar/checkstyle）
-- ✅ 運行時錯誤（NPE、異常）
-- ✅ 依賴衝突
+### When to Apply This Workflow
+- ✅ Compilation failures (compilation errors)
+- ✅ Test failures (test failures)
+- ✅ ArchUnit test failures (architecture violations)
+- ✅ Quality Gate failures (coverage/sonar/checkstyle)
+- ✅ Runtime errors (NPE, exceptions)
+- ✅ Dependency conflicts
 
-### 錯誤分類決策樹
+### Error Classification Decision Tree
 ```
-檢測到錯誤 → 識別錯誤類型
-  ├─ 編譯失敗
-  │   ├─ Java 版本錯誤 → Section 1.1
-  │   ├─ 依賴缺失 → Section 1.2
-  │   └─ 語法錯誤 → Section 1.3
+Error detected → Identify error type
+  ├─ Compilation failure
+  │   ├─ Java version error → Section 1.1
+  │   ├─ Missing dependency → Section 1.2
+  │   └─ Syntax error → Section 1.3
   │
-  ├─ ArchUnit 測試失敗
-  │   ├─ 架構違規（Controller → Repository）→ Section 2.1
+  ├─ ArchUnit test failure
+  │   ├─ Architecture violation (Controller → Repository) → Section 2.1
   │   ├─ Optional vs Option → Section 2.2
-  │   ├─ 字段注入 → Section 2.3
-  │   └─ @Transactional 位置 → Section 2.4
+  │   ├─ Field injection → Section 2.3
+  │   └─ @Transactional placement → Section 2.4
   │
-  ├─ Quality Gate 失敗
-  │   ├─ 覆蓋率不足 → Section 3.1
-  │   ├─ Checkstyle 錯誤 → Section 3.2
-  │   └─ SonarQube 問題 → Section 3.3
+  ├─ Quality Gate failure
+  │   ├─ Insufficient coverage → Section 3.1
+  │   ├─ Checkstyle errors → Section 3.2
+  │   └─ SonarQube issues → Section 3.3
   │
-  └─ 運行時錯誤
+  └─ Runtime error
       └─ NullPointerException → Section 4.1
 ```
 
 ---
 
-## Section 1: 編譯錯誤診斷
+## Section 1: Compilation Error Diagnosis
 
-### 1.1 Java 版本錯誤
+### 1.1 Java Version Error
 
-#### 症狀
+#### Symptoms
 ```
 [ERROR] Failed to execute goal maven-compiler-plugin
 [ERROR] Source option 21 is no longer supported
 ```
 
-#### 診斷命令
+#### Diagnosis Commands
 ```bash
-java -version    # 期望: openjdk version "21.x.x"
-mvn -version     # 期望: Java version: 21.x.x
-echo $JAVA_HOME  # 期望: /path/to/jdk-21
+java -version    # Expected: openjdk version "21.x.x"
+mvn -version     # Expected: Java version: 21.x.x
+echo $JAVA_HOME  # Expected: /path/to/jdk-21
 ```
 
-#### AI 自動修復（macOS）
+#### AI Auto-Fix (macOS)
 ```bash
-# 安裝 Java 21
+# Install Java 21
 brew install openjdk@21
 
-# 設置環境變量
+# Set environment variables
 export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 export PATH=$JAVA_HOME/bin:$PATH
 
-# 驗證
+# Verify
 java -version && mvn clean compile
 ```
 
 ---
 
-### 1.2 依賴缺失
+### 1.2 Missing Dependency
 
-#### 症狀
+#### Symptoms
 ```
 [ERROR] cannot find symbol: class Option
   location: package io.vavr.control
 ```
 
-#### 診斷與修復
+#### Diagnosis and Fix
 ```bash
-# 檢查依賴樹
+# Check dependency tree
 mvn dependency:tree | grep vavr
 
-# 清理並重新下載
+# Clean and re-download
 mvn clean install -U
 
-# 驗證
+# Verify
 mvn clean compile
 ```
 
 ---
 
-## Section 2: ArchUnit 測試失敗診斷
+## Section 2: ArchUnit Test Failure Diagnosis
 
-### 2.1 架構違規：Controller 直接訪問 Repository
+### 2.1 Architecture Violation: Controller Directly Accessing Repository
 
-#### AI 自動診斷流程
+#### AI Auto-Diagnosis Process
 ```bash
-# 1. 運行測試查看詳細違規
+# 1. Run test to see detailed violations
 mvn test -Dtest=ArchitectureTest#controllerNotAccessRepository -X
 
-# 2. 定位違規代碼
+# 2. Locate violating code
 grep -r "Repository" --include="*Controller.java" src/
 ```
 
-#### AI 自動修復
+#### AI Auto-Fix
 ```java
-// ❌ 違規代碼
+// ❌ Violating code
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -155,8 +155,8 @@ public class UserController {
     }
 }
 
-// ✅ AI 自動修正為
-// Step 1: 創建 UserService
+// ✅ AI auto-corrected to
+// Step 1: Create UserService
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -167,7 +167,7 @@ public class UserService {
     }
 }
 
-// Step 2: 修改 Controller
+// Step 2: Modify Controller
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -178,23 +178,23 @@ public class UserController {
         return userService.findById(id)
             .map(UserVO::from)
             .map(ResponseDTO::ok)
-            .getOrElse(() -> ResponseDTO.error("用戶不存在"));
+            .getOrElse(() -> ResponseDTO.error("User not found"));
     }
 }
 ```
 
 ---
 
-### 2.2 Vavr 違規：Service 使用 Optional
+### 2.2 Vavr Violation: Service Using Optional
 
-#### AI 自動修復
+#### AI Auto-Fix
 ```java
-// ❌ 違規
+// ❌ Violation
 public Optional<User> findById(Long id) {
     return userMapper.findById(id);
 }
 
-// ✅ 自動修正為
+// ✅ Auto-corrected to
 public Option<User> findById(Long id) {
     return Option.ofOptional(userMapper.findById(id));
 }
@@ -202,20 +202,20 @@ public Option<User> findById(Long id) {
 
 ---
 
-### 2.3 字段注入違規
+### 2.3 Field Injection Violation
 
-#### AI 自動修復
+#### AI Auto-Fix
 ```java
-// ❌ 違規
+// ❌ Violation
 @Service
 public class UserService {
-    @Autowired  // ❌ 字段注入
+    @Autowired  // ❌ Field injection
     private UserRepository userRepository;
 }
 
-// ✅ 自動修正為
+// ✅ Auto-corrected to
 @Service
-@RequiredArgsConstructor  // ✅ 構造函數注入
+@RequiredArgsConstructor  // ✅ Constructor injection
 public class UserService {
     private final UserMapper userMapper;  // ✅
 }
@@ -223,22 +223,22 @@ public class UserService {
 
 ---
 
-## Section 3: Quality Gate 失敗診斷
+## Section 3: Quality Gate Failure Diagnosis
 
-### 3.1 測試覆蓋率不足
+### 3.1 Insufficient Test Coverage
 
-#### 診斷
+#### Diagnosis
 ```bash
-# 生成覆蓋率報告
+# Generate coverage report
 mvn clean test jacoco:report
 
-# 打開報告
+# Open report
 open target/site/jacoco/index.html
 ```
 
-#### 修復：補充測試
+#### Fix: Add Tests
 ```java
-// 找到未測試的方法，補充測試
+// Find untested methods and add tests
 @Test
 void shouldReturnNone_whenUserIsInactive() {
     User inactiveUser = User.builder().id(1L).active(false).build();
@@ -252,33 +252,33 @@ void shouldReturnNone_whenUserIsInactive() {
 
 ---
 
-### 3.2 Checkstyle 錯誤
+### 3.2 Checkstyle Errors
 
-#### AI 批量修復
+#### AI Batch Fix
 ```bash
-# 查看所有錯誤
+# View all errors
 mvn checkstyle:check -Dcheckstyle.console=true
 
-# 自動格式化
+# Auto-format
 mvn spotless:apply
 ```
 
 ---
 
-### 3.3 SonarQube 問題修復
+### 3.3 SonarQube Issue Fix
 
-#### 認知複雜度過高
+#### Cognitive Complexity Too High
 ```java
-// ❌ 複雜度 15
+// ❌ Complexity 15
 public void processOrder(Order order) {
     if (order != null) {
         if (order.getStatus() == Status.PENDING) {
-            // 嵌套過深...
+            // Deeply nested...
         }
     }
 }
 
-// ✅ 使用 Vavr Option 簡化
+// ✅ Simplify using Vavr Option
 public void processOrder(Order order) {
     Option.of(order)
         .filter(o -> o.getStatus() == Status.PENDING)
@@ -288,19 +288,19 @@ public void processOrder(Order order) {
 
 ---
 
-## Section 4: 運行時錯誤診斷
+## Section 4: Runtime Error Diagnosis
 
 ### 4.1 NullPointerException
 
-#### AI 自動重構
+#### AI Auto-Refactor
 ```java
-// ❌ 容易 NPE
+// ❌ Prone to NPE
 public String getUserCity(Long id) {
-    User user = userRepository.findById(id);  // 可能 null
+    User user = userRepository.findById(id);  // Might be null
     return user.getAddress().getCity();  // NPE!
 }
 
-// ✅ 使用 Vavr Option
+// ✅ Use Vavr Option
 public String getUserCity(Long id) {
     return Option.of(userRepository.findById(id))
         .flatMap(user -> Option.of(user.getAddress()))
@@ -311,17 +311,17 @@ public String getUserCity(Long id) {
 
 ---
 
-## 快速診斷命令
+## Quick Diagnosis Commands
 
 ```bash
-# 完整診斷流程
-mvn clean verify                              # 完整構建
-mvn test -Dtest=ArchitectureTest              # 架構測試
-mvn jacoco:report && open target/site/jacoco/index.html  # 覆蓋率
-mvn checkstyle:check                          # 代碼風格
+# Complete diagnosis process
+mvn clean verify                              # Full build
+mvn test -Dtest=ArchitectureTest              # Architecture tests
+mvn jacoco:report && open target/site/jacoco/index.html  # Coverage
+mvn checkstyle:check                          # Code style
 ```
 
 ---
 
-**最後更新**: 2025-01-13
-**Sprint 2 完成**: 詳細錯誤診斷流程
+**Last Updated**: 2025-01-13
+**Sprint 2 Complete**: Detailed error diagnosis procedures

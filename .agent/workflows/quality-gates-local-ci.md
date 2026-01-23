@@ -1,6 +1,6 @@
 ---
 trigger: on_demand
-description: 本地 Quality Gate 檢查與 GitLab CI/CD
+description: Local Quality Gate checks and GitLab CI/CD
 tags: [ci-cd, local-checks, gitlab-ci, quality-gate, troubleshooting]
 required_rules:
   - rules/10-architecture-rules.md
@@ -16,23 +16,23 @@ related_workflows:
 last_updated: 2025-01-12
 ---
 
-# 本地 Quality Gate 檢查與 GitLab CI/CD
+# Local Quality Gate Checks and GitLab CI/CD
 
-> 提交前本地驗證 + 替代 CI/CD 方案
+> Pre-commit local validation + Alternative CI/CD solution
 
-## 一、本地運行 CI 檢查腳本
+## I. Run CI Checks Locally
 
-### 完整流程（推薦）
+### Complete Flow (Recommended)
 
 ```bash
 #!/bin/bash
-# 文件: run-ci-checks.sh
+# File: run-ci-checks.sh
 
 echo "🔍 Running CI Checks Locally..."
 
 cd smart-admin-api-java21-springboot3
 
-# 1. 代碼風格檢查
+# 1. Code style checks
 echo "1️⃣ Checkstyle..."
 mvn checkstyle:check || exit 1
 
@@ -42,19 +42,19 @@ mvn pmd:check || exit 1
 echo "3️⃣ SpotBugs..."
 mvn spotbugs:check || exit 1
 
-# 2. 架構測試
+# 2. Architecture tests
 echo "4️⃣ ArchUnit Tests..."
 mvn test -Dtest=ArchitectureTest || exit 1
 
-# 3. 單元測試 + 覆蓋率
+# 3. Unit tests + coverage
 echo "5️⃣ Unit Tests + Coverage..."
 mvn clean verify || exit 1
 
-# 4. 檢查覆蓋率門檻
+# 4. Check coverage threshold
 echo "6️⃣ Coverage Threshold (≥80%)..."
 mvn jacoco:check -Djacoco.minimum=0.80 || exit 1
 
-# 5. SonarQube 分析（可選）
+# 5. SonarQube analysis (optional)
 if [ -n "$SONAR_TOKEN" ]; then
   echo "7️⃣ SonarQube Scan..."
   mvn sonar:sonar \
@@ -66,74 +66,74 @@ fi
 echo "✅ All CI checks passed!"
 ```
 
-**運行方式**:
+**How to Run**:
 ```bash
 chmod +x run-ci-checks.sh
 ./run-ci-checks.sh
 ```
 
-### 快速檢查（僅核心）
+### Quick Check (Core Only)
 
 ```bash
-# 僅運行核心檢查
+# Run core checks only
 mvn clean verify checkstyle:check
 
-# 查看覆蓋率報告
+# View coverage report
 open target/site/jacoco/index.html
 ```
 
-## 二、增量 vs 全量分析
+## II. Incremental vs Full Analysis
 
-| 觸發條件                     | 分析類型 | 範圍       | 檢查項目                |
-| ---------------------------- | -------- | ---------- | ----------------------- |
-| PR 開啟/更新                 | 增量分析 | 僅變更文件 | Checkstyle + 單元測試   |
-| Push 到 main/master          | 全量分析 | 整個項目   | 全部檢查 + SonarQube    |
-| 定時任務 (每日)              | 全量分析 | 整個項目   | 全部檢查 + 依賴安全掃描 |
-| 手動觸發 (workflow_dispatch) | 可選     | 指定範圍   | 可配置                  |
+| Trigger Condition                | Analysis Type | Scope              | Check Items                           |
+| ------------------------------- | ------------- | ------------------ | ------------------------------------- |
+| PR opened/updated               | Incremental   | Changed files only | Checkstyle + unit tests               |
+| Push to main/master             | Full          | Entire project     | All checks + SonarQube                |
+| Scheduled task (daily)          | Full          | Entire project     | All checks + dependency security scan |
+| Manual trigger (workflow_dispatch) | Optional   | Specified scope    | Configurable                          |
 
-## 三、常見問題 (FAQ)
+## III. Common Issues (FAQ)
 
-### Q1: ArchUnit 測試失敗
+### Q1: ArchUnit Test Failed
 
-**常見原因**:
-- Service 層使用了 `java.util.Optional`（應使用 `io.vavr.control.Option`）
-- 字段注入（應使用構造函數注入）
-- 引入了 MySQL 驅動（應使用 PostgreSQL）
+**Common Causes**:
+- Service layer uses `java.util.Optional` (should use `io.vavr.control.Option`)
+- Field injection (should use constructor injection)
+- Included MySQL driver (should use PostgreSQL)
 
-**解決方式**:
+**Solution**:
 ```bash
 mvn test -Dtest=ArchitectureTest
-# 查看測試報告，按規範修復
+# Review test report and fix according to specifications
 ```
 
-### Q2: JaCoCo 覆蓋率不足
+### Q2: Insufficient JaCoCo Coverage
 
-**查看報告**:
+**View Report**:
 ```bash
 mvn jacoco:report
 open target/site/jacoco/index.html
 ```
 
-**提升覆蓋率策略**:
-- 為 Service 層添加單元測試
-- 使用 Mockito 模擬依賴
-- 覆蓋異常分支
+**Strategies to Improve Coverage**:
+- Add unit tests for Service layer
+- Use Mockito to mock dependencies
+- Cover exception branches
 
-### Q3: SonarQube Quality Gate 失敗
+### Q3: SonarQube Quality Gate Failed
 
-**診斷步驟**:
-1. 訪問 SonarQube Dashboard
-2. 查看 **Issues** 標籤
-3. 按優先級修復（Blocker > Critical > Major）
+**Diagnosis Steps**:
+1. Visit SonarQube Dashboard
+2. View **Issues** tab
+3. Fix by priority (Blocker > Critical > Major)
 
-**常見問題及解決**:
-- **代碼重複 > 3%**: 提取公共方法
-- **認知複雜度過高**: 重構大函數
-- **測試覆蓋率 < 80%**: 補充測試
+**Common Issues and Solutions**:
+- **Code duplication > 3%**: Extract common methods
+- **Cognitive complexity too high**: Refactor large functions
+- **Test coverage < 80%**: Add more tests
 
-### Q4: PostgreSQL 測試連接失敗
+### Q4: PostgreSQL Test Connection Failed
 
-**方案一: GitHub Actions Services（CI 環境推薦）**
+**Option 1: GitHub Actions Services (Recommended for CI)**
 ```yaml
 services:
   postgres:
@@ -146,7 +146,7 @@ services:
       - 5432:5432
 ```
 
-**方案二: Testcontainers（本地開發推薦）**
+**Option 2: Testcontainers (Recommended for Local Development)**
 ```java
 @Testcontainers
 class IntegrationTest {
@@ -156,9 +156,9 @@ class IntegrationTest {
 }
 ```
 
-### Q5: Maven 依賴下載慢
+### Q5: Maven Dependency Download Slow
 
-**配置國內鏡像** (`~/.m2/settings.xml`):
+**Configure China Mirror** (`~/.m2/settings.xml`):
 ```xml
 <mirrors>
   <mirror>
@@ -169,9 +169,9 @@ class IntegrationTest {
 </mirrors>
 ```
 
-## 四、GitLab CI/CD 配置
+## IV. GitLab CI/CD Configuration
 
-### 完整 .gitlab-ci.yml
+### Complete .gitlab-ci.yml
 
 ```yaml
 # .gitlab-ci.yml
@@ -235,35 +235,35 @@ build:
     - main
 ```
 
-### GitLab vs GitHub Actions 對比
+### GitLab vs GitHub Actions Comparison
 
-| 功能              | GitHub Actions                        | GitLab CI/CD          |
-| ----------------- | ------------------------------------- | --------------------- |
-| **配置文件**      | `.github/workflows/*.yml`             | `.gitlab-ci.yml`      |
-| **Services 定義** | `services` (job 級別)                 | `services` (job 級別) |
-| **Cache**         | `actions/cache`                       | `cache` (內建)        |
-| **Artifacts**     | `actions/upload-artifact`             | `artifacts` (內建)    |
-| **條件執行**      | `if: github.ref == 'refs/heads/main'` | `only: [main]`        |
+| Feature            | GitHub Actions                        | GitLab CI/CD          |
+| ------------------ | ------------------------------------- | --------------------- |
+| **Config File**    | `.github/workflows/*.yml`             | `.gitlab-ci.yml`      |
+| **Services Define**| `services` (job level)                | `services` (job level)|
+| **Cache**          | `actions/cache`                       | `cache` (built-in)    |
+| **Artifacts**      | `actions/upload-artifact`             | `artifacts` (built-in)|
+| **Conditional Execution** | `if: github.ref == 'refs/heads/main'` | `only: [main]` |
 
-## 五、持續改進建議
+## V. Continuous Improvement Recommendations
 
-### 定期審查
-- **每週**: 查看 SonarQube 技術債務趨勢
-- **每月**: 更新架構測試規則
-- **每季**: 評估 Quality Gate 標準是否合理
+### Regular Review
+- **Weekly**: Review SonarQube technical debt trends
+- **Monthly**: Update architecture test rules
+- **Quarterly**: Evaluate if Quality Gate standards are reasonable
 
-### 優化方向
-- 提升測試覆蓋率（目標 > 85%）
-- 減少代碼重複（目標 < 2%）
-- 優化構建時間（目標 < 5 分鐘）
-- 增加集成測試覆蓋
+### Optimization Directions
+- Increase test coverage (target > 85%)
+- Reduce code duplication (target < 2%)
+- Optimize build time (target < 5 minutes)
+- Increase integration test coverage
 
-### 團隊協作
-- 定期分享 CI/CD 最佳實踐
-- 記錄常見問題解決方案
-- 建立代碼審查 Checklist
-- 自動化更多質量檢查
+### Team Collaboration
+- Regularly share CI/CD best practices
+- Document common issue solutions
+- Establish code review checklist
+- Automate more quality checks
 
-## 相關 Workflows
+## Related Workflows
 
-- [workflows/github-actions-pipeline.md](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.agent/workflows/github-actions-pipeline.md) - GitHub Actions CI/CD 管道配置
+- [workflows/github-actions-pipeline.md](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.agent/workflows/github-actions-pipeline.md) - GitHub Actions CI/CD pipeline configuration

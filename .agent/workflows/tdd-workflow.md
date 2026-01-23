@@ -1,6 +1,6 @@
 ---
 trigger: on_demand
-description: 測試驅動開發工作流程（TDD）
+description: Test-Driven Development (TDD) workflow
 tags: [tdd, testing, junit5, mockito, test-driven-development]
 required_rules:
   - rules/10-architecture-rules.md
@@ -9,25 +9,25 @@ required_rules:
 
 execution_order:
   - step: write_failing_test
-    description: 編寫失敗測試（RED）
+    description: Write failing test (RED)
     apply_rules: [01-naming, 10-architecture]
-    expected_output: 測試類文件，測試失敗
-    validation: 測試編譯通過但執行失敗
+    expected_output: Test class file, test fails
+    validation: Test compiles but execution fails
 
   - step: implement_minimal_code
-    description: 最小化實現（GREEN）
+    description: Minimal implementation (GREEN)
     apply_rules: [01-naming, 08-vavr, 10-architecture]
-    expected_output: 實現類文件，測試通過
-    validation: mvn test 通過
+    expected_output: Implementation class file, test passes
+    validation: mvn test passes
 
   - step: refactor_code
-    description: 重構優化（REFACTOR）
+    description: Refactor optimization (REFACTOR)
     apply_rules: [02-oop, 08-vavr-advanced]
-    expected_output: 優化後的代碼
-    validation: mvn test 仍通過，代碼質量提升
+    expected_output: Optimized code
+    validation: mvn test still passes, code quality improved
 
   - step: verify_quality
-    description: 質量門禁檢查（VERIFY）
+    description: Quality Gate check (VERIFY)
     commands:
       - mvn test
       - mvn jacoco:report
@@ -40,83 +40,83 @@ execution_order:
 last_updated: 2025-01-13
 ---
 
-# 測試驅動開發工作流程（TDD）
+# Test-Driven Development (TDD) Workflow
 
 ---
 
-## 🤖 AI 執行指南
+## 🤖 AI Execution Guide
 
-### 何時應用此 Workflow
-- ✅ 用戶要求 "使用 TDD 開發功能"
-- ✅ 用戶說 "先寫測試"
-- ✅ 需要高質量的代碼實現
-- ✅ 開發複雜業務邏輯
+### When to Apply This Workflow
+- ✅ User requests "develop feature using TDD"
+- ✅ User says "write test first"
+- ✅ Need high-quality code implementation
+- ✅ Developing complex business logic
 
-### 執行檢查清單
-在開始之前確認：
-- [ ] 開發環境已初始化（參考 init.md）
-- [ ] 理解用戶需求（功能、邊界條件、異常情況）
-- [ ] 確定測試範圍（單元測試/集成測試）
+### Execution Checklist
+Confirm before starting:
+- [ ] Development environment initialized (reference init.md)
+- [ ] Understand user requirements (functionality, boundary conditions, exceptional cases)
+- [ ] Determine test scope (unit test/integration test)
 
-### 執行流程決策樹
+### Execution Flow Decision Tree
 ```
-用戶要求: "使用 TDD 開發用戶查詢功能"
-  ├─ 1️⃣ 確認需求
-  │   ├─ 查詢單個用戶? → 是
-  │   ├─ 需要處理不存在? → 是
-  │   └─ 需要過濾條件? → 是（只返回活躍用戶）
+User request: "develop user query feature using TDD"
+  ├─ 1️⃣ Confirm requirements
+  │   ├─ Query single user? → Yes
+  │   ├─ Handle non-existent? → Yes
+  │   └─ Need filter conditions? → Yes (only return active users)
   │
-  ├─ 2️⃣ RED：編寫測試
-  │   ├─ 測試文件: UserServiceTest.java
-  │   ├─ 測試方法: shouldReturnSome_whenUserExists()
-  │   ├─ 測試方法: shouldReturnNone_whenUserNotExists()
-  │   └─ 測試方法: shouldFilterInactiveUsers()
+  ├─ 2️⃣ RED: Write test
+  │   ├─ Test file: UserServiceTest.java
+  │   ├─ Test method: shouldReturnSome_whenUserExists()
+  │   ├─ Test method: shouldReturnNone_whenUserNotExists()
+  │   └─ Test method: shouldFilterInactiveUsers()
   │
-  ├─ 3️⃣ GREEN：最小實現
-  │   ├─ Service 方法: Option<User> findById(Long id)
-  │   ├─ 應用規則: 08-vavr（返回 Option）
-  │   └─ 應用規則: 10-architecture（注入 Mapper）
+  ├─ 3️⃣ GREEN: Minimal implementation
+  │   ├─ Service method: Option<User> findById(Long id)
+  │   ├─ Apply rule: 08-vavr (return Option)
+  │   └─ Apply rule: 10-architecture (inject Mapper)
   │
-  ├─ 4️⃣ REFACTOR：重構
-  │   ├─ 提取方法: findActiveById()
-  │   └─ 使用鏈式調用: findById().filter(User::isActive)
+  ├─ 4️⃣ REFACTOR: Refactor
+  │   ├─ Extract method: findActiveById()
+  │   └─ Use method chaining: findById().filter(User::isActive)
   │
-  └─ 5️⃣ VERIFY：質量檢查
-      ├─ mvn test（所有測試通過）
-      ├─ mvn jacoco:report（覆蓋率 >= 80%）
-      └─ mvn test -Dtest=ArchitectureTest（架構正確）
+  └─ 5️⃣ VERIFY: Quality check
+      ├─ mvn test (all tests pass)
+      ├─ mvn jacoco:report (coverage >= 80%)
+      └─ mvn test -Dtest=ArchitectureTest (architecture correct)
 ```
 
 ---
 
-## Red-Green-Refactor 循環
+## Red-Green-Refactor Cycle
 
-### 1. RED 階段 (寫失敗測試)
+### 1. RED Phase (Write Failing Test)
 ```java
 @Test
 void shouldCreateUser_whenValidInput() {
     // Given
     UserCreateDTO dto = new UserCreateDTO("john@example.com", "John");
-    
+
     // When
     User result = userService.createUser(dto);
-    
+
     // Then
     assertThat(result).isNotNull();
     assertThat(result.getEmail()).isEqualTo("john@example.com");
     verify(userRepository).save(any(User.class));
 }
 ```
-**執行**: `mvn test -Dtest=UserServiceTest#shouldCreateUser_whenValidInput`
-**預期**: 編譯失敗或測試失敗
+**Execute**: `mvn test -Dtest=UserServiceTest#shouldCreateUser_whenValidInput`
+**Expected**: Compilation fails or test fails
 
-### 2. GREEN 階段 (最小實現)
+### 2. GREEN Phase (Minimal Implementation)
 ```java
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    
+
     public User createUser(UserCreateDTO dto) {
         User user = new User();
         user.setEmail(dto.getEmail());
@@ -125,17 +125,17 @@ public class UserService {
     }
 }
 ```
-**執行**: `mvn test`
-**預期**: 測試通過
+**Execute**: `mvn test`
+**Expected**: Test passes
 
-### 3. REFACTOR 階段
+### 3. REFACTOR Phase
 ```java
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;  // MapStruct
-    
+
     @Transactional(rollbackFor = Exception.class)
     public User createUser(UserCreateDTO dto) {
         User user = userMapper.toEntity(dto);
@@ -143,23 +143,23 @@ public class UserService {
     }
 }
 ```
-**執行**: `mvn test`
-**預期**: 測試仍通過，代碼更乾淨
+**Execute**: `mvn test`
+**Expected**: Test still passes, code cleaner
 
 ## Spring Boot Test Slices
 
-### @WebMvcTest - Controller 測試
+### @WebMvcTest - Controller Tests
 ```java
 @WebMvcTest(UserController.class)
 class UserControllerTest {
     @Autowired private MockMvc mockMvc;
     @MockBean private UserService userService;
-    
+
     @Test
     void shouldReturnUser_whenExists() throws Exception {
         when(userService.findById(1L))
             .thenReturn(Optional.of(new User(1L, "John")));
-        
+
         mockMvc.perform(get("/api/users/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("John"));
@@ -167,42 +167,42 @@ class UserControllerTest {
 }
 ```
 
-### @DataJpaTest - Repository 測試
+### @DataJpaTest - Repository Tests
 ```java
 @DataJpaTest
 class UserRepositoryTest {
     @Autowired private TestEntityManager em;
     @Autowired private UserRepository repository;
-    
+
     @Test
     void shouldFindByEmail() {
         em.persistAndFlush(new User("john@test.com", "John"));
-        
+
         Optional<User> found = repository.findByEmail("john@test.com");
-        
+
         assertThat(found).isPresent()
             .get().extracting(User::getName).isEqualTo("John");
     }
 }
 ```
 
-### @SpringBootTest - 整合測試
+### @SpringBootTest - Integration Tests
 ```java
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ApplicationIT {
     @Autowired private TestRestTemplate restTemplate;
-    
+
     @Test
     void shouldCreateAndRetrieveUser() {
         ResponseEntity<User> response = restTemplate
             .postForEntity("/api/users", createDTO, User.class);
-        
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 }
 ```
 
-## JaCoCo 覆蓋率配置
+## JaCoCo Coverage Configuration
 ```xml
 <plugin>
     <groupId>org.jacoco</groupId>
@@ -244,27 +244,27 @@ class ApplicationIT {
 </plugin>
 ```
 
-## 測試命名規範
+## Test Naming Conventions
 
-### Given-When-Then 格式 (推薦)
+### Given-When-Then Format (Recommended)
 ```java
 givenValidUser_whenCreateUser_thenUserIsSaved()
 givenInvalidEmail_whenCreateUser_thenThrowsValidationException()
 givenExistingId_whenFindById_thenReturnsUser()
 ```
 
-### @Nested 分組
+### @Nested Grouping
 ```java
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    
+
     @Nested
     @DisplayName("Create User")
     class CreateUser {
         @Test void shouldSaveUser_whenValidInput() { }
         @Test void shouldThrow_whenEmailExists() { }
     }
-    
+
     @Nested
     @DisplayName("Find User")
     class FindUser {
