@@ -2,9 +2,9 @@ package net.lab1024.sa.admin.module.business.sample.kafka;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.common.mq.kafka.constant.KafkaConst;
-import net.lab1024.sa.common.mq.kafka.core.KafkaProducerService;
-import net.lab1024.sa.common.mq.kafka.listener.AbstractBatchKafkaListener;
+import net.lab1024.sa.foundation.mq.kafka.constant.KafkaConst;
+import net.lab1024.sa.foundation.mq.kafka.core.KafkaProducerService;
+import net.lab1024.sa.foundation.mq.kafka.listener.AbstractBatchKafkaListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

@@ -16,8 +16,8 @@ import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.base.module.support.serialnumber.service.SerialNumberBaseService;
-import net.lab1024.sa.common.cache.constant.CacheKeyConst;
-import net.lab1024.sa.common.redislock.RedissonService;
+import net.lab1024.sa.foundation.cache.constant.CacheKeyConst;
+import net.lab1024.sa.foundation.redislock.RedissonService;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.redisson.api.RAtomicLong;
 import org.springframework.scheduling.annotation.Scheduled;

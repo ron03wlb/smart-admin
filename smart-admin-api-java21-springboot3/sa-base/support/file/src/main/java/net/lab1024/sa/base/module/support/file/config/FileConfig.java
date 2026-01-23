@@ -94,7 +94,7 @@ public class FileConfig implements WebMvcConfigurer {
   public IFileStorageService initCloudFileService(
       S3Client s3Client,
       FileConfig fileConfig,
-      net.lab1024.sa.common.cache.CacheService cacheService,
+      net.lab1024.sa.foundation.cache.CacheService cacheService,
       net.lab1024.sa.base.module.support.file.dao.FileDao fileDao) {
     return new FileStorageCloudServiceImpl(s3Client, fileConfig, cacheService, fileDao);
   }

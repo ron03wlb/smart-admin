@@ -11,8 +11,8 @@ import net.lab1024.sa.base.module.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobLogEntity;
-import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
+import net.lab1024.sa.foundation.redislock.LockService;
 import org.springframework.util.StopWatch;
 
 /**

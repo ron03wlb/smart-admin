@@ -16,7 +16,7 @@ import net.lab1024.sa.base.module.support.job.constant.SmartJobConst;
 import net.lab1024.sa.base.module.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.base.module.support.job.repository.SmartJobRepository;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
-import net.lab1024.sa.common.redislock.LockService;
+import net.lab1024.sa.foundation.redislock.LockService;
 import org.springframework.util.CollectionUtils;
 
 /**

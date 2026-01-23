@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.common.mq.kafka.batch.BatchSendResult;
-import net.lab1024.sa.common.mq.kafka.batch.BatchSendResult.FailedMessage;
-import net.lab1024.sa.common.mq.kafka.constant.KafkaConst;
-import net.lab1024.sa.common.mq.kafka.core.KafkaProducerService;
+import net.lab1024.sa.foundation.mq.kafka.batch.BatchSendResult;
+import net.lab1024.sa.foundation.mq.kafka.batch.BatchSendResult.FailedMessage;
+import net.lab1024.sa.foundation.mq.kafka.constant.KafkaConst;
+import net.lab1024.sa.foundation.mq.kafka.core.KafkaProducerService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 

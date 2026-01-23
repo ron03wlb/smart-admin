@@ -154,6 +154,114 @@ tasks.register("installGitHooks") {
     }
 }
 
+// Foundation Package Migration Task
+tasks.register("migrateFoundationPackages") {
+    description = "Migrate legacy common.* packages to foundation.* in foundation modules"
+    group = "migration"
+
+    doLast {
+        val modules = listOf(
+            "api-encrypt" to "apiencrypt",
+            "cache" to "cache",
+            "captcha" to "captcha",
+            "data-masking" to "datamasking",
+            "excel" to "excel",
+            "mq" to "mq",
+            "redis-lock" to "redislock",
+            "repeat-submit" to "repeatsubmit",
+            "security-protect" to "securityprotect"
+        )
+
+        println("=".repeat(80))
+        println("Foundation Package Migration Tool")
+        println("=".repeat(80))
+
+        var totalFilesUpdated = 0
+        var totalPackageDeclarationsUpdated = 0
+        var totalImportsUpdated = 0
+
+        modules.forEach { (moduleName, packageName) ->
+            println("\n[Module] Migrating: $moduleName")
+            println("-".repeat(80))
+
+            var moduleFilesUpdated = 0
+            var modulePackagesUpdated = 0
+            var moduleImportsUpdated = 0
+
+            // 1. Update package declarations in module source files
+            val moduleDir = file("sa-base/foundation/$moduleName/src/main/java")
+            if (moduleDir.exists()) {
+                fileTree(moduleDir) {
+                    include("**/*.java")
+                }.forEach { file ->
+                    val content = file.readText()
+                    val updated = content.replace(
+                        "package net.lab1024.sa.common.$packageName",
+                        "package net.lab1024.sa.foundation.$packageName"
+                    )
+                    if (updated != content) {
+                        file.writeText(updated)
+                        moduleFilesUpdated++
+                        modulePackagesUpdated++
+                        println("  ✓ Package declaration: ${file.name}")
+                    }
+                }
+            } else {
+                println("  ⚠ Module directory not found: $moduleDir")
+            }
+
+            // 2. Update imports across entire codebase
+            fileTree(rootDir) {
+                include("**/src/**/*.java")
+                exclude("**/build/**")
+            }.forEach { file ->
+                val content = file.readText()
+                val updated = content.replace(
+                    "import net.lab1024.sa.common.$packageName",
+                    "import net.lab1024.sa.foundation.$packageName"
+                )
+                if (updated != content) {
+                    file.writeText(updated)
+                    moduleImportsUpdated++
+                    val relativePath = file.relativeTo(rootDir).path
+                    println("  ✓ Import: $relativePath")
+                }
+            }
+
+            // 3. Update Spring Boot auto-configuration imports
+            val autoConfigFile = file("sa-base/foundation/$moduleName/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
+            if (autoConfigFile.exists()) {
+                val content = autoConfigFile.readText()
+                val updated = content.replace(
+                    "net.lab1024.sa.common.$packageName",
+                    "net.lab1024.sa.foundation.$packageName"
+                )
+                if (updated != content) {
+                    autoConfigFile.writeText(updated)
+                    println("  ✓ AutoConfiguration.imports updated")
+                }
+            }
+
+            println("  Summary: $modulePackagesUpdated package declarations, $moduleImportsUpdated imports")
+            totalFilesUpdated += moduleFilesUpdated
+            totalPackageDeclarationsUpdated += modulePackagesUpdated
+            totalImportsUpdated += moduleImportsUpdated
+        }
+
+        println("\n" + "=".repeat(80))
+        println("Migration Complete!")
+        println("=".repeat(80))
+        println("Package declarations updated: $totalPackageDeclarationsUpdated")
+        println("Import statements updated: $totalImportsUpdated")
+        println("Total files modified: ${totalPackageDeclarationsUpdated + totalImportsUpdated}")
+        println("\nNext Steps:")
+        println("  1. Run './gradlew clean build' to verify compilation")
+        println("  2. Run './gradlew test' to verify tests (maintain 92%+ pass rate)")
+        println("  3. Review changes with 'git diff'")
+        println("=".repeat(80))
+    }
+}
+
 // Ensure git hooks are installed during project sync or build
 tasks.named("build") {
     dependsOn("installGitHooks")

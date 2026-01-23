@@ -47,9 +47,10 @@ Controller → Service → Manager → Dao → Entity
 ```
 
 **Module structure:**
-- `sa-base/` - Infrastructure, utilities, support modules
+- `sa-base/foundation/` - Foundation layer (cross-cutting concerns)
+- `sa-base/infrastructure/` - Infrastructure services (web, mybatis, redis, etc.)
+- `sa-base/support/` - Business support features (config, dict, file, etc.)
 - `sa-admin/` - Business logic, system modules
-- `sa-common/` - Shared services: api-encrypt, cache, mq, redis-lock
 
 **Layer rules (enforced via ArchitectureTest.java):**
 - Controller → Service ONLY (never directly to Manager/Dao)
@@ -62,6 +63,27 @@ Controller → Service → Manager → Dao → Entity
 - [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md) - Detailed implementation patterns
 - [Project Architecture](.claude/shared/knowledge/project-architecture.md) - Module structure and build configuration
 - [Quality Standards](.claude/shared/knowledge/quality-standards.md) - Code quality checklist
+
+## Foundation Package Naming
+
+**Standard Pattern (v3.6.0+):**
+- Foundation modules: `net.lab1024.sa.foundation.{module-name}.*`
+- Infrastructure modules: `net.lab1024.sa.base.{module-name}.*`
+- Support modules: `net.lab1024.sa.base.module.support.{module-name}.*`
+
+**Examples:**
+- `sa-base/foundation/cache/` → `net.lab1024.sa.foundation.cache.*`
+- `sa-base/foundation/mq/` → `net.lab1024.sa.foundation.mq.kafka.*`
+- `sa-base/infrastructure/web/` → `net.lab1024.sa.base.web.*`
+- `sa-base/support/dict/` → `net.lab1024.sa.base.module.support.dict.*`
+
+**Migrated Modules (8):**
+api-encrypt, cache, captcha, data-masking, mq, redis-lock, repeat-submit, security-protect
+
+**Deprecated (DO NOT USE):**
+- ❌ `net.lab1024.sa.common.*` (legacy naming, removed in package standardization)
+
+→ **[Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
 
 ## SmartAdmin Patterns
 

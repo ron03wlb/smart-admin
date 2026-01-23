@@ -16,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentTreeVO;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
-import net.lab1024.sa.common.cache.constant.CacheKeyConst;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.foundation.cache.constant.CacheKeyConst;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class DepartmentCacheManager {
 
   @Resource private DepartmentDao departmentDao;
 
-  @Resource private net.lab1024.sa.common.cache.CacheService cacheService;
+  @Resource private net.lab1024.sa.foundation.cache.CacheService cacheService;
 
   private void logClearInfo(String cache) {
     if (log.isInfoEnabled()) {

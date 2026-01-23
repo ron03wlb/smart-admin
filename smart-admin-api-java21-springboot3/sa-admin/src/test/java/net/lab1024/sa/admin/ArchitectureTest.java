@@ -108,4 +108,77 @@ public class ArchitectureTest {
           .dependOnClassesThat()
           .resideInAPackage("net.lab1024.sa.admin..service..")
           .because("Manager 層禁止調用業務 Service 層（嚴格執行，規則：09-manager-layer.md）");
+
+  // ========== Foundation Package Naming Standards (Added: foundation migration) ==========
+
+  /**
+   * Admin code should only use migrated foundation packages (not legacy common.* packages)
+   *
+   * <p>As part of the foundation package naming standardization initiative, sa-admin code should
+   * use the new foundation.* packages instead of deprecated common.* packages.
+   *
+   * <p>Allowed exceptions:
+   *
+   * <ul>
+   *   <li>Bridge classes in foundation/core (net.lab1024.sa.common.core.*) - scheduled for removal
+   *       in v4.0.0
+   *   <li>SmartBeanUtil in common.core.util (intentionally not migrated - documented in
+   *       build.gradle.kts)
+   * </ul>
+   *
+   * <p>Migrated modules: api-encrypt, cache, captcha, data-masking, mq, redis-lock, repeat-submit,
+   * security-protect
+   */
+  @ArchTest
+  static final ArchRule adminCodeShouldUseFoundationPackages =
+      noClasses()
+          .that()
+          .resideInAPackage("net.lab1024.sa.admin..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage(
+              "net.lab1024.sa.common.apiencrypt..",
+              "net.lab1024.sa.common.cache..",
+              "net.lab1024.sa.common.captcha..",
+              "net.lab1024.sa.common.datamasking..",
+              "net.lab1024.sa.common.mq..",
+              "net.lab1024.sa.common.redislock..",
+              "net.lab1024.sa.common.repeatsubmit..",
+              "net.lab1024.sa.common.securityprotect..")
+          .because(
+              "Admin code should use foundation.* packages instead of deprecated common.* packages"
+                  + " (migration complete)");
+
+  /**
+   * No new code should use legacy common.* package naming
+   *
+   * <p>Legacy net.lab1024.sa.common.* packages are deprecated. Use net.lab1024.sa.foundation.*
+   * instead.
+   *
+   * <p>Exceptions:
+   *
+   * <ul>
+   *   <li>Bridge classes in foundation/core (scheduled for removal in v4.0.0)
+   *   <li>SmartBeanUtil (intentionally not migrated - documented in build.gradle.kts)
+   * </ul>
+   */
+  @ArchTest
+  static final ArchRule noNewCodeShouldUseLegacyCommonPackages =
+      noClasses()
+          .that()
+          .resideOutsideOfPackage("net.lab1024.sa.common.core..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage(
+              "net.lab1024.sa.common.apiencrypt..",
+              "net.lab1024.sa.common.cache..",
+              "net.lab1024.sa.common.captcha..",
+              "net.lab1024.sa.common.datamasking..",
+              "net.lab1024.sa.common.mq..",
+              "net.lab1024.sa.common.redislock..",
+              "net.lab1024.sa.common.repeatsubmit..",
+              "net.lab1024.sa.common.securityprotect..")
+          .because(
+              "Legacy common.* package naming is deprecated, use foundation.* instead (migration"
+                  + " complete)");
 }

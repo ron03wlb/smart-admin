@@ -17,10 +17,10 @@ import net.lab1024.sa.admin.module.system.employee.domain.form.EmployeeUpdatePas
 import net.lab1024.sa.admin.module.system.employee.domain.vo.EmployeeVO;
 import net.lab1024.sa.admin.module.system.employee.service.EmployeeService;
 import net.lab1024.sa.base.web.util.SmartRequestUtil;
-import net.lab1024.sa.common.apiencrypt.annotation.ApiDecrypt;
-import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
+import net.lab1024.sa.foundation.apiencrypt.annotation.ApiDecrypt;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.foundation.securityprotect.service.SecurityConfigProvider;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -15,7 +15,7 @@ import net.lab1024.sa.admin.module.system.login.service.LoginService;
 import net.lab1024.sa.admin.util.AdminRequestUtil;
 import net.lab1024.sa.base.core.annoation.NoNeedLogin;
 import net.lab1024.sa.base.web.util.SmartRequestUtil;
-import net.lab1024.sa.common.captcha.CaptchaVO;
+import net.lab1024.sa.foundation.captcha.CaptchaVO;
 import net.lab1024.sa.foundation.domain.constant.RequestHeaderConst;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;

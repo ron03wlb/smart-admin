@@ -10,7 +10,7 @@ import net.lab1024.sa.admin.BaseUnitTest;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentTreeVO;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
-import net.lab1024.sa.common.cache.CacheService;
+import net.lab1024.sa.foundation.cache.CacheService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

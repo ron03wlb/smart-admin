@@ -2,7 +2,7 @@ package net.lab1024.sa.base.token.config;
 
 import cn.dev33.satoken.config.SaTokenConfig;
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
+import net.lab1024.sa.foundation.securityprotect.service.SecurityConfigProvider;
 import org.springframework.context.annotation.Configuration;
 
 /**

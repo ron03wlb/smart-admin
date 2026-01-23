@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.config.ConfigKeyEnum;
 import net.lab1024.sa.base.module.support.config.ConfigService;
-import net.lab1024.sa.common.securityprotect.domain.Level3ProtectConfigForm;
-import net.lab1024.sa.common.securityprotect.service.SecurityConfigProvider;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.json.util.JsonUtil;
+import net.lab1024.sa.foundation.securityprotect.domain.Level3ProtectConfigForm;
+import net.lab1024.sa.foundation.securityprotect.service.SecurityConfigProvider;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
