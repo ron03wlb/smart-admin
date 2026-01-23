@@ -30,10 +30,10 @@ import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.domain.constant.StringConst;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

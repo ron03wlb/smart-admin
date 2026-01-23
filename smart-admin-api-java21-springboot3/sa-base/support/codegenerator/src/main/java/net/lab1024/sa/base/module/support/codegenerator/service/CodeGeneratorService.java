@@ -23,10 +23,10 @@ import net.lab1024.sa.base.module.support.codegenerator.domain.vo.TableColumnVO;
 import net.lab1024.sa.base.module.support.codegenerator.domain.vo.TableConfigVO;
 import net.lab1024.sa.base.module.support.codegenerator.domain.vo.TableVO;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.json.util.JsonUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

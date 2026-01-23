@@ -42,16 +42,14 @@ import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogEntity;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
 import net.lab1024.sa.base.module.support.mail.service.MailService;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.constant.LoginDeviceEnum;
+import net.lab1024.sa.domain.UserPermission;
 import net.lab1024.sa.foundation.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.foundation.cache.CacheService;
 import net.lab1024.sa.foundation.cache.constant.CacheKeyConst;
 import net.lab1024.sa.foundation.captcha.CaptchaException;
 import net.lab1024.sa.foundation.captcha.CaptchaService;
 import net.lab1024.sa.foundation.captcha.CaptchaVO;
-import net.lab1024.sa.foundation.core.constant.LoginDeviceEnum;
-import net.lab1024.sa.foundation.core.domain.UserPermission;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.constant.RequestHeaderConst;
 import net.lab1024.sa.foundation.domain.constant.StringConst;
@@ -60,6 +58,8 @@ import net.lab1024.sa.foundation.domain.request.RequestUser;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
+import net.lab1024.sa.util.SmartBeanUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 import org.springframework.stereotype.Service;
 
 /**

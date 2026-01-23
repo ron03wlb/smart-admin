@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.mybatis.handler.MybatisPlusFillHandler;
-import net.lab1024.sa.foundation.core.domain.DataScopePlugin;
+import net.lab1024.sa.domain.DataScopePlugin;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.context.annotation.Bean;

@@ -15,7 +15,7 @@ import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeField;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeInsertAndUpdate;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeInsertAndUpdateField;
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.CodeGenerateBaseVariableService;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 

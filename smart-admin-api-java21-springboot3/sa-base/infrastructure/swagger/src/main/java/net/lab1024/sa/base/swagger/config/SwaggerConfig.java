@@ -12,7 +12,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
 import net.lab1024.sa.base.swagger.customizer.SmartOperationCustomizer;
-import net.lab1024.sa.foundation.core.config.SystemEnvironmentConfig;
+import net.lab1024.sa.config.SystemEnvironmentConfig;
 import net.lab1024.sa.foundation.domain.constant.RequestHeaderConst;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.GlobalOpenApiCustomizer;

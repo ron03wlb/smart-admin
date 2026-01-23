@@ -13,8 +13,8 @@ import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGenerato
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeField;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeQueryField;
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.CodeGenerateBaseVariableService;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 /**

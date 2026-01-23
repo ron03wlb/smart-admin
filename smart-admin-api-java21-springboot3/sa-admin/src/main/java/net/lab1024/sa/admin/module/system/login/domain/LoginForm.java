@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.constant.LoginDeviceEnum;
 import net.lab1024.sa.foundation.captcha.CaptchaForm;
-import net.lab1024.sa.foundation.core.constant.LoginDeviceEnum;
 import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
 import org.hibernate.validator.constraints.Length;
 

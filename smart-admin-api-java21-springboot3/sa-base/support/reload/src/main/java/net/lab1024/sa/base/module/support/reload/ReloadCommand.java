@@ -9,7 +9,7 @@ import net.lab1024.sa.base.module.support.reload.dao.ReloadItemDao;
 import net.lab1024.sa.base.module.support.reload.dao.ReloadResultDao;
 import net.lab1024.sa.base.module.support.reload.domain.ReloadItemEntity;
 import net.lab1024.sa.base.module.support.reload.domain.ReloadResultEntity;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.springframework.stereotype.Component;
 
 /**

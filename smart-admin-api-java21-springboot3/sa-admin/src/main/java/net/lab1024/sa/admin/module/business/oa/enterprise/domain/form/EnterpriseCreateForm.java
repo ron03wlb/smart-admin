@@ -11,8 +11,8 @@ import net.lab1024.sa.admin.module.business.oa.enterprise.constant.EnterpriseTyp
 import net.lab1024.sa.base.module.support.file.json.deserializer.FileKeyVoDeserializer;
 import net.lab1024.sa.base.module.support.file.json.serializer.FileKeyVoSerializer;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.foundation.core.util.SmartVerificationUtil;
 import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
+import net.lab1024.sa.util.SmartVerificationUtil;
 import org.hibernate.validator.constraints.Length;
 
 /**

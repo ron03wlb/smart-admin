@@ -9,10 +9,10 @@ import net.lab1024.sa.base.module.support.feedback.domain.FeedbackEntity;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackQueryForm;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackVO;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.domain.request.RequestUser;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**

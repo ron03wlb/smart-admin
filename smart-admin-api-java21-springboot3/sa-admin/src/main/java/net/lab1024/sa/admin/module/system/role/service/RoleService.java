@@ -9,9 +9,9 @@ import net.lab1024.sa.admin.module.system.role.domain.form.RoleAddForm;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
 import net.lab1024.sa.admin.module.system.role.manager.RoleManager;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
 /**

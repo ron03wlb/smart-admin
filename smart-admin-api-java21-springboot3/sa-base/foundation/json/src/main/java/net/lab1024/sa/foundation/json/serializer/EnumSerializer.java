@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import java.io.IOException;
 import java.util.stream.Collectors;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import net.lab1024.sa.foundation.domain.constant.StringConst;
 import net.lab1024.sa.foundation.domain.enumeration.BaseEnum;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 
 /**
  * 枚举 序列化

@@ -19,7 +19,7 @@ import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateTypeEnum;
 import net.lab1024.sa.base.module.support.mail.dao.MailTemplateDao;
 import net.lab1024.sa.base.module.support.mail.domain.MailTemplateEntity;
-import net.lab1024.sa.foundation.core.domain.SystemEnvironment;
+import net.lab1024.sa.domain.SystemEnvironment;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

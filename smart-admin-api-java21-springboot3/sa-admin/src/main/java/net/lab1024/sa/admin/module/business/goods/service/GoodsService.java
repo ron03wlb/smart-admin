@@ -27,13 +27,13 @@ import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
 import net.lab1024.sa.base.module.support.dict.service.DictService;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.exception.BusinessException;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.json.util.JsonUtil;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

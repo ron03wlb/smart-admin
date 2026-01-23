@@ -1,6 +1,6 @@
 package net.lab1024.sa.base.web.config;
 
-import net.lab1024.sa.foundation.core.config.SystemEnvironmentConfig;
+import net.lab1024.sa.config.SystemEnvironmentConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;

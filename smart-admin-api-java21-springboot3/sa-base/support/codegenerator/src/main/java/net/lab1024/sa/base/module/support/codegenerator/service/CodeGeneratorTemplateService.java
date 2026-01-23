@@ -43,8 +43,8 @@ import net.lab1024.sa.base.module.support.codegenerator.service.variable.front.C
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.front.FormVariableService;
 import net.lab1024.sa.base.module.support.codegenerator.service.variable.front.ListVariableService;
 import net.lab1024.sa.base.module.support.codegenerator.util.CodeGeneratorTool;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import net.lab1024.sa.foundation.json.util.JsonUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;

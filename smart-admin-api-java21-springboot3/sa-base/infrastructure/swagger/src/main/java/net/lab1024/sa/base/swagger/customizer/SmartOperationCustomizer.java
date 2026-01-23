@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.lab1024.sa.foundation.apiencrypt.annotation.ApiDecrypt;
 import net.lab1024.sa.foundation.apiencrypt.annotation.ApiEncrypt;
-import net.lab1024.sa.foundation.core.util.SmartStringUtil;
+import net.lab1024.sa.util.SmartStringUtil;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.web.method.HandlerMethod;
 

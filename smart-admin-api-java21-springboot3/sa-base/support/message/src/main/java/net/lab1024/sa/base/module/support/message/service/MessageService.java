@@ -13,10 +13,10 @@ import net.lab1024.sa.base.module.support.message.domain.MessageSendForm;
 import net.lab1024.sa.base.module.support.message.domain.MessageTemplateSendForm;
 import net.lab1024.sa.base.module.support.message.domain.MessageVO;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Service;
 

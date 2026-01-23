@@ -15,11 +15,11 @@ import net.lab1024.sa.base.module.support.datatracer.domain.vo.DataTracerVO;
 import net.lab1024.sa.base.module.support.datatracer.manager.DataTracerManger;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.base.web.util.SmartRequestUtil;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.domain.request.RequestUser;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.ipgeo.util.IpGeolocationUtil;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

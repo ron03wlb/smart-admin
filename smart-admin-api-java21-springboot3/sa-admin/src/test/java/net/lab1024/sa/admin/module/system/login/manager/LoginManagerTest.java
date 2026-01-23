@@ -17,7 +17,7 @@ import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
 import net.lab1024.sa.base.module.support.file.service.IFileStorageService;
-import net.lab1024.sa.foundation.core.domain.UserPermission;
+import net.lab1024.sa.domain.UserPermission;
 import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.junit.jupiter.api.BeforeEach;

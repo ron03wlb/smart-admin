@@ -12,10 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.category.dao.CategoryDao;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
 import net.lab1024.sa.admin.module.business.category.domain.vo.CategoryTreeVO;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.foundation.cache.CacheService;
 import net.lab1024.sa.foundation.cache.constant.CacheKeyConst;
 import net.lab1024.sa.foundation.domain.constant.StringConst;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

@@ -7,9 +7,9 @@ import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.base.swagger.annotation.SchemaEnum;
-import net.lab1024.sa.foundation.core.util.SmartVerificationUtil;
 import net.lab1024.sa.foundation.domain.enumeration.GenderEnum;
 import net.lab1024.sa.foundation.validation.annotation.CheckEnum;
+import net.lab1024.sa.util.SmartVerificationUtil;
 import org.hibernate.validator.constraints.Length;
 
 /**

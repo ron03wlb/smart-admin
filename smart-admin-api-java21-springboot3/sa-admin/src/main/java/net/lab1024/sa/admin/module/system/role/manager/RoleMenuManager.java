@@ -9,7 +9,7 @@ import net.lab1024.sa.admin.module.system.menu.domain.entity.MenuEntity;
 import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuVO;
 import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
 import net.lab1024.sa.admin.module.system.role.domain.entity.RoleMenuEntity;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
