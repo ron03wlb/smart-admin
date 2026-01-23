@@ -68,22 +68,30 @@ Controller → Service → Manager → Dao → Entity
 
 **Standard Pattern (v3.6.0+):**
 - Foundation modules: `net.lab1024.sa.foundation.{module-name}.*`
+- Foundation domain: `net.lab1024.sa.foundation.domain.*` (ResponseDTO, PageResult, ErrorCode, etc.)
 - Infrastructure modules: `net.lab1024.sa.base.{module-name}.*`
 - Support modules: `net.lab1024.sa.base.module.support.{module-name}.*`
 
 **Examples:**
 - `sa-base/foundation/cache/` → `net.lab1024.sa.foundation.cache.*`
 - `sa-base/foundation/mq/` → `net.lab1024.sa.foundation.mq.kafka.*`
+- `sa-base/foundation/domain/` → `net.lab1024.sa.foundation.domain.response.ResponseDTO`
 - `sa-base/infrastructure/web/` → `net.lab1024.sa.base.web.*`
 - `sa-base/support/dict/` → `net.lab1024.sa.base.module.support.dict.*`
 
-**Migrated Modules (8):**
+**Migrated Modules (8 foundation modules):**
 api-encrypt, cache, captcha, data-masking, mq, redis-lock, repeat-submit, security-protect
+
+**v4.0.0 Breaking Change:**
+- ❌ **REMOVED**: `net.lab1024.sa.common.core.*` bridge classes (ResponseDTO, PageResult, ErrorCode, etc.)
+- ✅ **Use instead**: `net.lab1024.sa.foundation.domain.*` packages
+- ℹ️ **Exception**: `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*` (documented)
 
 **Deprecated (DO NOT USE):**
 - ❌ `net.lab1024.sa.common.*` (legacy naming, removed in package standardization)
 
 → **[Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
+→ **[v4.0.0 Breaking Changes](#v40-breaking-changes)** (see below)
 
 ## SmartAdmin Patterns
 
@@ -182,11 +190,52 @@ Detailed rules: See [.agent/rules/12-pmd-rules.md](.agent/rules/12-pmd-rules.md)
 
 ---
 
+## v4.0.0 Breaking Changes
+
+**Bridge Class Removal (BREAKING):**
+
+As of v4.0.0, all bridge classes in `net.lab1024.sa.common.core.*` have been **permanently removed**. Code must use `net.lab1024.sa.foundation.domain.*` packages.
+
+**Removed Packages:**
+| Removed (v4.0.0) | Use Instead |
+|------------------|-------------|
+| `net.lab1024.sa.common.core.code.*` | `net.lab1024.sa.foundation.domain.code.*` |
+| `net.lab1024.sa.common.core.constant.*` | `net.lab1024.sa.foundation.domain.constant.*` |
+| `net.lab1024.sa.common.core.domain.ResponseDTO` | `net.lab1024.sa.foundation.domain.response.ResponseDTO` |
+| `net.lab1024.sa.common.core.domain.PageResult` | `net.lab1024.sa.foundation.domain.response.PageResult` |
+| `net.lab1024.sa.common.core.domain.PageParam` | `net.lab1024.sa.foundation.domain.request.PageParam` |
+| `net.lab1024.sa.common.core.domain.RequestUser` | `net.lab1024.sa.foundation.domain.request.RequestUser` |
+| `net.lab1024.sa.common.core.enumeration.*` | `net.lab1024.sa.foundation.domain.enumeration.*` |
+| `net.lab1024.sa.common.core.exception.*` | `net.lab1024.sa.foundation.domain.exception.*` |
+
+**Exception:**
+- ✅ `net.lab1024.sa.common.core.util.SmartBeanUtil` - **Remains unchanged** (intentional, documented)
+
+**Migration:**
+```bash
+# Automated migration tool (recommended)
+cd smart-admin-api-java21-springboot3
+./gradlew migrateToFoundation
+
+# Manual search and replace
+# OLD: import net.lab1024.sa.common.core.domain.ResponseDTO;
+# NEW: import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+```
+
+**For External Projects:**
+- **Option 1**: Migrate to v4.0.0 (run migration tool, test, upgrade)
+- **Option 2**: Stay on v3.9.x (receives security patches until Q2 2027)
+
+→ **[Complete Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
+
+---
+
 ## Version
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-01-22
-**Aligned with**: .claude/ v2.5.0, .agent/rules/ (latest)
+**Document Version**: 2.0.0
+**Last Updated**: 2026-01-23
+**Aligned with**: SmartAdmin v4.0.0, .claude/ v2.5.0, .agent/rules/ (latest)
 
 **Change History**:
+- 2.0.0 (2026-01-23): v4.0.0 breaking changes - removed bridge classes, updated foundation package documentation
 - 1.0.0 (2026-01-22): Initial versioned release with cross-references to .claude/ and improved navigation

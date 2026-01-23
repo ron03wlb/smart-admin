@@ -120,8 +120,7 @@ public class ArchitectureTest {
    * <p>Allowed exceptions:
    *
    * <ul>
-   *   <li>Bridge classes in foundation/core (net.lab1024.sa.common.core.*) - scheduled for removal
-   *       in v4.0.0
+   *   <li>Bridge classes in foundation/core (net.lab1024.sa.common.core.*) - REMOVED in v4.0.0
    *   <li>SmartBeanUtil in common.core.util (intentionally not migrated - documented in
    *       build.gradle.kts)
    * </ul>
@@ -158,7 +157,7 @@ public class ArchitectureTest {
    * <p>Exceptions:
    *
    * <ul>
-   *   <li>Bridge classes in foundation/core (scheduled for removal in v4.0.0)
+   *   <li>Bridge classes in foundation/core - REMOVED in v4.0.0
    *   <li>SmartBeanUtil (intentionally not migrated - documented in build.gradle.kts)
    * </ul>
    */
@@ -181,4 +180,46 @@ public class ArchitectureTest {
           .because(
               "Legacy common.* package naming is deprecated, use foundation.* instead (migration"
                   + " complete)");
+
+  // ========== v4.0.0 Breaking Change Validation ==========
+
+  /**
+   * v4.0.0+ Bridge classes have been removed
+   *
+   * <p>In v4.0.0, all bridge classes in net.lab1024.sa.common.core.* were removed as part of the
+   * foundation package migration. Code must use net.lab1024.sa.foundation.domain.* packages
+   * instead.
+   *
+   * <p>Removed bridge packages:
+   *
+   * <ul>
+   *   <li>net.lab1024.sa.common.core.code.* (ErrorCode, SystemErrorCode, UserErrorCode, etc.)
+   *   <li>net.lab1024.sa.common.core.config.* (CoreAutoConfiguration)
+   *   <li>net.lab1024.sa.common.core.constant.* (StringConst, RequestHeaderConst)
+   *   <li>net.lab1024.sa.common.core.domain.* (ResponseDTO, PageResult, PageParam, RequestUser)
+   *   <li>net.lab1024.sa.common.core.enumeration.* (BaseEnum)
+   *   <li>net.lab1024.sa.common.core.exception.* (BusinessException)
+   * </ul>
+   *
+   * <p>Exception: SmartBeanUtil remains in net.lab1024.sa.common.core.util (documented in
+   * build.gradle.kts).
+   *
+   * <p>This rule validates that no code depends on the deleted bridge packages. Any violations
+   * indicate code that was not migrated and will fail to compile.
+   */
+  @ArchTest
+  static final ArchRule noBridgeClassesInV4 =
+      noClasses()
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage(
+              "net.lab1024.sa.common.core.code..",
+              "net.lab1024.sa.common.core.config..",
+              "net.lab1024.sa.common.core.constant..",
+              "net.lab1024.sa.common.core.domain..",
+              "net.lab1024.sa.common.core.enumeration..",
+              "net.lab1024.sa.common.core.exception..")
+          .because(
+              "v4.0.0 removed all bridge classes. Use net.lab1024.sa.foundation.domain.* instead."
+                  + " (Exception: SmartBeanUtil in common.core.util remains)");
 }
