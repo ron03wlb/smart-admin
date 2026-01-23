@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-  net.lab1024.sa.base.config.YamlProcessor
+  net.lab1024.sa.foundation.core.config.YamlProcessor

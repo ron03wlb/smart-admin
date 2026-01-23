@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.annoation.NoNeedLogin;
+import net.lab1024.sa.foundation.core.annotation.NoNeedLogin;
 import net.lab1024.sa.foundation.core.domain.RequestUrlVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.core.annoation;
+package net.lab1024.sa.foundation.core.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

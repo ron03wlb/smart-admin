@@ -1,1 +1,2 @@
-net.lab1024.sa.common.core.config.CoreAutoConfiguration
+# CoreAutoConfiguration was removed in v4.0.0 (Phase 2: Bridge Class Removal)
+# No auto-configuration classes in this module
