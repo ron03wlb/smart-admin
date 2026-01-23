@@ -38,6 +38,7 @@ dependencies {
 
     // SA Base Infrastructure - specific modules instead of monolithic sa-base
     // Note: This module doesn't have controllers, so no need for sa-base-web
+    api(project(":sa-base:infrastructure:mybatis"))
 
     // Guava for Interner
     api(libs.guava)

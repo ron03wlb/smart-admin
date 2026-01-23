@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.core.enumeration;
+package net.lab1024.sa.foundation.core.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

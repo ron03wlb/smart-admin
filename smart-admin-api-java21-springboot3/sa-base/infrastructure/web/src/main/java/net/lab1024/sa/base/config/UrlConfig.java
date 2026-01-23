@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.config;
+package net.lab1024.sa.foundation.core.config;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.util.StrUtil;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.core.annoation.NoNeedLogin;
-import net.lab1024.sa.base.core.domain.RequestUrlVO;
+import net.lab1024.sa.foundation.core.domain.RequestUrlVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

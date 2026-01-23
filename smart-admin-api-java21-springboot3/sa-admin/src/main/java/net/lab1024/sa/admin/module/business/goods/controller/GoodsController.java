@@ -15,7 +15,7 @@ import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsUpdateForm;
 import net.lab1024.sa.admin.module.business.goods.domain.vo.GoodsExcelVO;
 import net.lab1024.sa.admin.module.business.goods.domain.vo.GoodsVO;
 import net.lab1024.sa.admin.module.business.goods.service.GoodsService;
-import net.lab1024.sa.base.core.util.SmartExcelUtil;
+import net.lab1024.sa.foundation.core.util.SmartExcelUtil;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;

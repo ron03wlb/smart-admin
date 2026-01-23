@@ -282,6 +282,36 @@ grep -r "net.lab1024.sa.common.core" src/
 # Refer to the package mapping table
 ```
 
+### Issue: "Cannot find symbol ResponseDTO"
+
+**Cause:** Import not updated or circular dependency issue.
+
+**Solution:**
+1. Check import is correct: `net.lab1024.sa.foundation.domain.response.ResponseDTO`
+2. Verify foundation:domain in dependencies: `implementation project(':sa-base:foundation:domain')`
+3. Clean rebuild: `./gradlew clean --refresh-dependencies build`
+
+### Issue: IDE shows errors after migration
+
+**Cause:** IDE cache out of sync with updated imports.
+
+**Solution:**
+- **IntelliJ IDEA:** File → Invalidate Caches → Restart
+- **Eclipse:** Project → Clean → Clean all projects
+- **VS Code:** Reload Java Language Server (Cmd/Ctrl+Shift+P → "Java: Clean Java Language Server Workspace")
+
+### Issue: "Package does not exist" after migration
+
+**Cause:** Migration tool missed some imports (e.g., in test files or generated code).
+
+**Solution:**
+1. Validate remaining imports:
+   ```bash
+   grep -r "net.lab1024.sa.common.core" src/ | grep -v SmartBeanUtil
+   ```
+2. Manually replace remaining imports using the package mapping table
+3. Rebuild: `./gradlew clean build`
+
 ---
 
 ## Need Help?
@@ -295,19 +325,31 @@ grep -r "net.lab1024.sa.common.core" src/
 ## FAQ
 
 **Q: Do I need to change any code logic?**
-A: No, only import statements need to be updated. The API remains identical.
+A: No, only import statements need to be updated. The API is 100% identical - zero behavioral changes.
 
 **Q: What if I can't migrate before v4.0.0?**
-A: Stay on v3.9.0 until you complete migration. Do not upgrade to v4.0.0 without migrating.
+A: Stay on v3.9.0 until migration is complete. v3.9.x will receive security patches until Q2 2027 (6 months after v4.0.0 release). Do not attempt to upgrade to v4.0.0 without completing migration first.
 
-**Q: Can I mix old and new imports?**
-A: Yes, during v3.7.0 - v3.9.0, but not recommended. Complete migration to avoid confusion.
+**Q: Can I mix old and new imports during transition?**
+A: Yes (v3.7.0-v3.9.0 support both), but complete migration is strongly recommended for consistency and to avoid confusion. Bridge classes are only a temporary compatibility layer.
 
 **Q: What about SmartBeanUtil?**
-A: SmartBeanUtil stays in `net.lab1024.sa.common.core.util` - do not migrate this class.
+A: **CRITICAL:** SmartBeanUtil stays in `net.lab1024.sa.common.core.util.*` permanently - DO NOT migrate it. The migration tool automatically excludes it.
 
-**Q: Will this affect my Vue.js frontend?**
-A: No, frontend code is not affected. This only impacts Java backend imports.
+**Q: Will this affect my Vue.js/React frontend?**
+A: No, frontend is completely unaffected. This only impacts Java backend import statements.
+
+**Q: How long does migration take?**
+A: Using the automated tool: 5-10 minutes. Manual migration: 30-60 minutes depending on project size.
+
+**Q: Is the migration reversible?**
+A: Yes (v3.7.0-v3.9.0). You can revert imports back to old packages if needed. However, once you upgrade to v4.0.0, reverting is not possible.
+
+**Q: What if I'm extending SmartAdmin classes?**
+A: Update your imports to foundation packages. The inheritance hierarchy is unchanged - only package names differ.
+
+**Q: Will Gradle/Maven dependency versions change?**
+A: No, artifact names and versions remain the same. Only Java import statements change.
 
 ---
 

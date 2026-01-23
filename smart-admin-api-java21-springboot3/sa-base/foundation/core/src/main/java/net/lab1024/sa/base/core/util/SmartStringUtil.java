@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.core.util;
+package net.lab1024.sa.foundation.core.util;
 
 import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;

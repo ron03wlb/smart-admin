@@ -1,9 +1,9 @@
-package net.lab1024.sa.base.config;
+package net.lab1024.sa.foundation.core.config;
 
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.base.core.util.SmartStringUtil;
+import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.YamlPropertySourceLoader;

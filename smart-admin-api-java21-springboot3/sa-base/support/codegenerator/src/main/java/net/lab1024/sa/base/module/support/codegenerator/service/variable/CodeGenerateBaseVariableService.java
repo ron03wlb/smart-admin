@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.lab1024.sa.base.core.util.SmartStringUtil;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeFrontComponentEnum;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGeneratorConfigForm;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeField;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeInsertAndUpdate;
 import net.lab1024.sa.base.module.support.codegenerator.domain.model.CodeInsertAndUpdateField;
+import net.lab1024.sa.foundation.core.util.SmartStringUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
 /**

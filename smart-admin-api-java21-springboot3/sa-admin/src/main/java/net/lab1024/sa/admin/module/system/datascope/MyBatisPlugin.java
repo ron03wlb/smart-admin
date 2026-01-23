@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeSqlConfig;
 import net.lab1024.sa.admin.module.system.datascope.service.DataScopeSqlConfigService;
-import net.lab1024.sa.base.core.domain.DataScopePlugin;
+import net.lab1024.sa.foundation.core.domain.DataScopePlugin;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;

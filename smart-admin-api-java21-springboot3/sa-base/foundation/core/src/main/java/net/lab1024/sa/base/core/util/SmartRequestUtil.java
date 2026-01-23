@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.core.util;
+package net.lab1024.sa.foundation.core.util;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.domain.request.RequestUser;

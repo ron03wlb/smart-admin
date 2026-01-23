@@ -1,6 +1,6 @@
-package net.lab1024.sa.base.config;
+package net.lab1024.sa.foundation.core.config;
 
-import net.lab1024.sa.base.core.util.SmartRequestUtil;
+import net.lab1024.sa.foundation.core.util.SmartRequestUtil;
 import net.lab1024.sa.foundation.domain.constant.StringConst;
 import net.lab1024.sa.foundation.repeatsubmit.generator.TicketGenerator;
 import org.springframework.context.annotation.Bean;

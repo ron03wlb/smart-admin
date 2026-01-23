@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.constant;
+package net.lab1024.sa.foundation.core.constant;
 
 /**
  * reload 项目

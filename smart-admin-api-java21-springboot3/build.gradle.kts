@@ -262,6 +262,280 @@ tasks.register("migrateFoundationPackages") {
     }
 }
 
+// Phase 2: Core Bridge Class Migration Task
+tasks.register("migrateToFoundation") {
+    description = "Migrate net.lab1024.sa.common.core.* imports to foundation.domain.*"
+    group = "migration"
+
+    doLast {
+        println("=".repeat(80))
+        println("Phase 2: Core Bridge Class Migration Tool")
+        println("Migrating: net.lab1024.sa.common.core.* → net.lab1024.sa.foundation.domain.*")
+        println("=".repeat(80))
+
+        // Import mappings (order matters - specific before generic)
+        val mappings = mapOf(
+            // Domain objects (specific paths - must come before package-level mappings)
+            "net.lab1024.sa.common.core.domain.ResponseDTO" to
+                "net.lab1024.sa.foundation.domain.response.ResponseDTO",
+            "net.lab1024.sa.common.core.domain.PageResult" to
+                "net.lab1024.sa.foundation.domain.response.PageResult",
+            "net.lab1024.sa.common.core.domain.RequestUser" to
+                "net.lab1024.sa.foundation.domain.request.RequestUser",
+            "net.lab1024.sa.common.core.domain.PageParam" to
+                "net.lab1024.sa.foundation.domain.request.PageParam",
+
+            // Error codes (package-level)
+            "net.lab1024.sa.common.core.code" to
+                "net.lab1024.sa.foundation.domain.code",
+
+            // Constants, enums, exceptions (package-level)
+            "net.lab1024.sa.common.core.constant" to
+                "net.lab1024.sa.foundation.domain.constant",
+            "net.lab1024.sa.common.core.enumeration" to
+                "net.lab1024.sa.foundation.domain.enumeration",
+            "net.lab1024.sa.common.core.exception" to
+                "net.lab1024.sa.foundation.domain.exception"
+        )
+
+        var totalFilesChanged = 0
+        var totalReplacements = 0
+
+        // Find all .java files (exclude SmartBeanUtil - CRITICAL!)
+        fileTree(rootDir) {
+            include("**/src/**/*.java")
+            exclude("**/build/**")
+            exclude("**/SmartBeanUtil.java")  // CRITICAL EXCEPTION
+        }.forEach { file ->
+            val originalContent = file.readText()
+            var content = originalContent
+            var fileChanged = false
+            var fileReplacements = 0
+
+            mappings.forEach { (oldPackage, newPackage) ->
+                // Regular imports
+                val oldImport = "import $oldPackage"
+                val newImport = "import $newPackage"
+                if (content.contains(oldImport)) {
+                    content = content.replace(oldImport, newImport)
+                    fileChanged = true
+                    fileReplacements++
+                }
+
+                // Static imports
+                val oldStaticImport = "import static $oldPackage"
+                val newStaticImport = "import static $newPackage"
+                if (content.contains(oldStaticImport)) {
+                    content = content.replace(oldStaticImport, newStaticImport)
+                    fileChanged = true
+                    fileReplacements++
+                }
+
+                // JavaDoc {@link} references
+                val oldLink = "{@link $oldPackage"
+                val newLink = "{@link $newPackage"
+                if (content.contains(oldLink)) {
+                    content = content.replace(oldLink, newLink)
+                    fileChanged = true
+                    fileReplacements++
+                }
+            }
+
+            if (fileChanged) {
+                file.writeText(content)
+                totalFilesChanged++
+                totalReplacements += fileReplacements
+                val relativePath = file.relativeTo(rootDir).path
+                println("  ✅ Migrated: $relativePath ($fileReplacements replacements)")
+            }
+        }
+
+        println("\n" + "=".repeat(80))
+        println("Migration Complete!")
+        println("=".repeat(80))
+        println("Files modified: $totalFilesChanged")
+        println("Total replacements: $totalReplacements")
+        println("\n⚠️  CRITICAL: SmartBeanUtil.java was EXCLUDED (intentional exception)")
+        println("\nNext steps:")
+        println("  1. Review changes: git diff")
+        println("  2. Build: ./gradlew clean build")
+        println("  3. Test: ./gradlew test")
+        println("  4. Architecture: ./gradlew :sa-admin:test --tests ArchitectureTest")
+        println("\nManual fixes may be required for:")
+        println("  - instanceof checks (e.g., OperateLogAspect.java)")
+        println("  - Pattern matching (e.g., SmartEncryptResponseAdvice.java)")
+        println("=".repeat(80))
+    }
+}
+
+// Phase 3: Core Module Migration Task
+tasks.register("migrateCoreToFoundation") {
+    description = "Migrate net.lab1024.sa.base.core.* to foundation.core.* and resolve SmartPageUtil duplication"
+    group = "migration"
+
+    doLast {
+        println("=".repeat(80))
+        println("Phase 3: Core Module Migration Tool")
+        println("Step 1: Resolving SmartPageUtil duplication")
+        println("Step 2: Migrating base.core.* → foundation.core.*")
+        println("=".repeat(80))
+
+        var totalFilesChanged = 0
+        var totalReplacements = 0
+
+        // ==========================================================================================
+        // STEP 1: Resolve SmartPageUtil Duplication
+        // ==========================================================================================
+        println("\n[Step 1] Resolving SmartPageUtil duplication...")
+        println("  Canonical: net.lab1024.sa.base.mybatis.util.SmartPageUtil")
+        println("  Duplicate: net.lab1024.sa.base.core.util.SmartPageUtil (will be deleted)")
+
+        // Update imports from core.util.SmartPageUtil to mybatis.util.SmartPageUtil
+        val smartPageUtilFiles = mutableListOf<String>()
+        fileTree(rootDir) {
+            include("**/src/**/*.java")
+            exclude("**/build/**")
+        }.forEach { file ->
+            val originalContent = file.readText()
+            var content = originalContent
+
+            // Replace import statement
+            if (content.contains("import net.lab1024.sa.base.core.util.SmartPageUtil")) {
+                content = content.replace(
+                    "import net.lab1024.sa.base.core.util.SmartPageUtil",
+                    "import net.lab1024.sa.base.mybatis.util.SmartPageUtil"
+                )
+                file.writeText(content)
+                totalFilesChanged++
+                totalReplacements++
+                smartPageUtilFiles.add(file.relativeTo(rootDir).path)
+                println("  ✅ Updated: ${file.relativeTo(rootDir).path}")
+            }
+        }
+        println("  → SmartPageUtil imports updated: ${smartPageUtilFiles.size} files")
+
+        // Delete duplicate SmartPageUtil.java
+        val duplicateSmartPageUtil = file("sa-base/foundation/core/src/main/java/net/lab1024/sa/base/core/util/SmartPageUtil.java")
+        if (duplicateSmartPageUtil.exists()) {
+            duplicateSmartPageUtil.delete()
+            println("  ✅ Deleted: sa-base/foundation/core/.../base/core/util/SmartPageUtil.java")
+        }
+
+        // ==========================================================================================
+        // STEP 2: Migrate base.core.* to foundation.core.*
+        // ==========================================================================================
+        println("\n[Step 2] Migrating base.core.* to foundation.core.*...")
+
+        // Package mappings (order matters - specific before generic)
+        val mappings = mapOf(
+            // net.lab1024.sa.base.core.* → net.lab1024.sa.foundation.core.*
+            "net.lab1024.sa.base.core.annotation" to "net.lab1024.sa.foundation.core.annotation",
+            "net.lab1024.sa.base.core.code" to "net.lab1024.sa.foundation.core.code",
+            "net.lab1024.sa.base.core.config" to "net.lab1024.sa.foundation.core.config",
+            "net.lab1024.sa.base.core.domain" to "net.lab1024.sa.foundation.core.domain",
+            "net.lab1024.sa.base.core.enumeration" to "net.lab1024.sa.foundation.core.enumeration",
+            "net.lab1024.sa.base.core.util" to "net.lab1024.sa.foundation.core.util",
+
+            // net.lab1024.sa.base.config.* → net.lab1024.sa.foundation.core.config.*
+            "net.lab1024.sa.base.config" to "net.lab1024.sa.foundation.core.config",
+
+            // net.lab1024.sa.base.constant.* → net.lab1024.sa.foundation.core.constant.*
+            "net.lab1024.sa.base.constant" to "net.lab1024.sa.foundation.core.constant"
+        )
+
+        var step2FilesChanged = 0
+        var step2Replacements = 0
+
+        // Process all .java files (exclude SmartBeanUtil and SmartPageUtil)
+        fileTree(rootDir) {
+            include("**/src/**/*.java")
+            exclude("**/build/**")
+            exclude("**/SmartBeanUtil.java")  // CRITICAL EXCEPTION
+            exclude("**/SmartPageUtil.java")  // Already deleted
+        }.forEach { file ->
+            val originalContent = file.readText()
+            var content = originalContent
+            var fileChanged = false
+            var fileReplacements = 0
+
+            mappings.forEach { (oldPackage, newPackage) ->
+                // Package declarations
+                val oldPkg = "package $oldPackage"
+                val newPkg = "package $newPackage"
+                if (content.contains(oldPkg)) {
+                    content = content.replace(oldPkg, newPkg)
+                    fileChanged = true
+                    fileReplacements++
+                }
+
+                // Regular imports
+                val oldImport = "import $oldPackage"
+                val newImport = "import $newPackage"
+                if (content.contains(oldImport)) {
+                    content = content.replace(oldImport, newImport)
+                    fileChanged = true
+                    fileReplacements++
+                }
+
+                // Static imports
+                val oldStaticImport = "import static $oldPackage"
+                val newStaticImport = "import static $newPackage"
+                if (content.contains(oldStaticImport)) {
+                    content = content.replace(oldStaticImport, newStaticImport)
+                    fileChanged = true
+                    fileReplacements++
+                }
+
+                // JavaDoc {@link} references
+                val oldLink = "{@link $oldPackage"
+                val newLink = "{@link $newPackage"
+                if (content.contains(oldLink)) {
+                    content = content.replace(oldLink, newLink)
+                    fileChanged = true
+                    fileReplacements++
+                }
+            }
+
+            if (fileChanged) {
+                file.writeText(content)
+                step2FilesChanged++
+                step2Replacements += fileReplacements
+                val relativePath = file.relativeTo(rootDir).path
+                println("  ✅ Migrated: $relativePath ($fileReplacements replacements)")
+            }
+        }
+
+        println("  → Package migrations: $step2FilesChanged files, $step2Replacements replacements")
+
+        totalFilesChanged += step2FilesChanged
+        totalReplacements += step2Replacements
+
+        // ==========================================================================================
+        // SUMMARY
+        // ==========================================================================================
+        println("\n" + "=".repeat(80))
+        println("Migration Complete!")
+        println("=".repeat(80))
+        println("Total files modified: $totalFilesChanged")
+        println("Total replacements: $totalReplacements")
+        println("\n✅ Step 1: SmartPageUtil duplication resolved")
+        println("   - Deleted: sa-base/foundation/core/.../base/core/util/SmartPageUtil.java")
+        println("   - Updated ${smartPageUtilFiles.size} files to use mybatis.util.SmartPageUtil")
+        println("\n✅ Step 2: Package migration complete")
+        println("   - Migrated: net.lab1024.sa.base.core.* → net.lab1024.sa.foundation.core.*")
+        println("   - Migrated: net.lab1024.sa.base.config.* → net.lab1024.sa.foundation.core.config.*")
+        println("   - Migrated: net.lab1024.sa.base.constant.* → net.lab1024.sa.foundation.core.constant.*")
+        println("\n⚠️  CRITICAL EXCEPTIONS (intentionally preserved):")
+        println("   - SmartBeanUtil.java in net.lab1024.sa.common.core.util.* (documented)")
+        println("\nNext steps:")
+        println("  1. Review changes: git diff")
+        println("  2. Build: ./gradlew clean build")
+        println("  3. Test: ./gradlew test")
+        println("  4. Architecture: ./gradlew :sa-admin:test --tests ArchitectureTest")
+        println("=".repeat(80))
+    }
+}
+
 // Ensure git hooks are installed during project sync or build
 tasks.named("build") {
     dependsOn("installGitHooks")

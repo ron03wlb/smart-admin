@@ -1,6 +1,6 @@
-package net.lab1024.sa.base.core.code;
+package net.lab1024.sa.foundation.core.code;
 
-import static net.lab1024.sa.base.core.code.ErrorCodeRangeContainer.register;
+import static net.lab1024.sa.foundation.core.code.ErrorCodeRangeContainer.register;
 
 import net.lab1024.sa.foundation.domain.code.SystemErrorCode;
 import net.lab1024.sa.foundation.domain.code.UnexpectedErrorCode;

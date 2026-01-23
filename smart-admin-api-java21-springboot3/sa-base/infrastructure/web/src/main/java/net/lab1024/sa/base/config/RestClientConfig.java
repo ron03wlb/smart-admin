@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.config;
+package net.lab1024.sa.foundation.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;

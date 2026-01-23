@@ -1,4 +1,4 @@
-package net.lab1024.sa.base.core.domain;
+package net.lab1024.sa.foundation.core.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
