@@ -1,9 +1,14 @@
 # P1-11: VIP System Design
 
 **Document Status**: Draft
-**Version**: 1.0.0
+**Version**: 1.1
 **Last Updated**: 2026-01-23
 **Owner**: Product & Engineering
+
+**變更歷史**:
+- v1.1 (2026-01-23): 新增 3 個 Mermaid 圖表 - VIP 等級狀態機圖、VIP 升級計算流程圖、VIP 特權矩陣可視化圖
+- v1.0.0 (2026-01-23): 初始版本完成
+
 **Related Documents**:
 - [backend_project.md](../../backend_project.md) - Section 11.12 (VIP System Overview)
 - [igame_str.md](../../igame_str.md) - First Principles: Leverage Theory (1% VIPs = 40% revenue)
@@ -117,6 +122,116 @@ Registration → Bronze (default)
 ```
 
 **Example**: Player achieves Silver tier on Jan 1. If by Feb 1 they no longer meet Silver criteria, they enter a 30-day grace period. If still below thresholds on Mar 1, they are downgraded to Bronze.
+
+### 圖 2.1: 狀態機圖 - VIP 等級生命周期（Bronze → Diamond）
+
+> **說明**：此圖展示 VIP 等級系統的完整狀態轉換邏輯，包括升級路徑（Bronze → Silver → Gold → Platinum → Diamond）、降級路徑（通過 Grace Period 緩衝期）、以及狀態保持條件。核心設計原則是「透明性與可預測性」：玩家始終清楚自己距離下一個等級的進度，以及當前等級的保持要求。系統通過自動化規則引擎（Evrete Rules）在每次玩家活動（充值、游戲、會話）後實時評估等級，無需人工干預（減少 80% 手動 VIP 管理工作）。
+>
+> **關鍵要素**：
+> - 🔵 **藍色升級路徑**：當玩家滿足所有三個條件（Monthly GGR、Total Deposits 30d、Min Sessions 30d）時，立即升級到下一等級
+> - 🟡 **黃色保持狀態**：玩家繼續滿足當前等級要求，維持現有狀態（若處於 Grace Period，則取消緩衝期）
+> - 🔴 **紅色降級路徑**：玩家未滿足當前等級任一條件，進入 Grace Period（緩衝期），若緩衝期結束仍未達標則降級
+> - 🟢 **綠色 Grace Period**：保護機制，給予玩家時間恢復活動（Bronze 無緩衝期，Silver 30 天，Gold 60 天，Platinum 90 天，Diamond 180 天）
+>
+> **Grace Period 詳細說明**：
+> - **目的**：防止玩家因短期不活躍（如度假、出差）而被降級，提供恢復時間
+> - **時長設計**：等級越高，緩衝期越長（體現對高價值玩家的保護）
+>   - Bronze: 無緩衝期（默認等級）
+>   - Silver: 30 天
+>   - Gold: 60 天
+>   - Platinum: 90 天
+>   - Diamond: 180 天（6 個月）
+> - **通知策略**：
+>   - 緩衝期開始時：立即發送郵件/站內信通知玩家
+>   - 緩衝期結束前 7 天：發送警告通知（包含當前指標與目標要求）
+>   - 緩衝期到期：執行降級 + 發送降級通知
+>
+> **相關文檔**：參見 [P1-06 第 4 章：VIP 風控評分調整](06-real-time-risk-engine.md#4-risk-scoring-algorithm)、[P1-13 第 5 章：VIP 群組分析](13-reporting-analytics.md#5-vip-cohort-analysis)
+
+```mermaid
+stateDiagram-v2
+    [*] --> BRONZE: 註冊時默認等級
+
+    BRONZE --> SILVER: 升級條件滿足<br>Monthly GGR >= $500<br>Deposits >= $1,000<br>Sessions >= 10
+    BRONZE --> BRONZE: 保持條件滿足<br>OR 未達升級標準
+
+    SILVER --> GOLD: 升級條件滿足<br>Monthly GGR >= $2,000<br>Deposits >= $5,000<br>Sessions >= 20
+    SILVER --> SILVER_GRACE: 任一條件未滿足<br>啟動 30 天緩衝期
+    SILVER --> SILVER: 保持條件滿足
+
+    SILVER_GRACE --> SILVER: 緩衝期內達標<br>取消 Grace Period
+    SILVER_GRACE --> BRONZE: 緩衝期到期<br>仍未達標
+
+    GOLD --> PLATINUM: 升級條件滿足<br>Monthly GGR >= $5,000<br>Deposits >= $15,000<br>Sessions >= 30
+    GOLD --> GOLD_GRACE: 任一條件未滿足<br>啟動 60 天緩衝期
+    GOLD --> GOLD: 保持條件滿足
+
+    GOLD_GRACE --> GOLD: 緩衝期內達標<br>取消 Grace Period
+    GOLD_GRACE --> SILVER: 緩衝期到期<br>仍未達標
+
+    PLATINUM --> DIAMOND: 升級條件滿足<br>Monthly GGR >= $15,000<br>Deposits >= $50,000<br>Sessions >= 40
+    PLATINUM --> PLATINUM_GRACE: 任一條件未滿足<br>啟動 90 天緩衝期
+    PLATINUM --> PLATINUM: 保持條件滿足
+
+    PLATINUM_GRACE --> PLATINUM: 緩衝期內達標<br>取消 Grace Period
+    PLATINUM_GRACE --> GOLD: 緩衝期到期<br>仍未達標
+
+    DIAMOND --> DIAMOND_GRACE: 任一條件未滿足<br>啟動 180 天緩衝期
+    DIAMOND --> DIAMOND: 保持條件滿足
+
+    DIAMOND_GRACE --> DIAMOND: 緩衝期內達標<br>取消 Grace Period
+    DIAMOND_GRACE --> PLATINUM: 緩衝期到期<br>仍未達標
+
+    note right of BRONZE
+        默認等級
+        無緩衝期
+        0% 返水
+        $1K 每日提款
+    end note
+
+    note right of SILVER
+        30 天緩衝期
+        0.5% 返水
+        10% 存款紅利
+        $5K 每日提款
+    end note
+
+    note right of GOLD
+        60 天緩衝期
+        1.0% 返水
+        20% 存款紅利
+        $10K 每日提款
+    end note
+
+    note right of PLATINUM
+        90 天緩衝期
+        2.0% 返水
+        50% 存款紅利
+        $50K 每日提款
+    end note
+
+    note right of DIAMOND
+        180 天緩衝期
+        5.0% 返水
+        100% 存款紅利
+        無限提款
+        專屬客服 15 分鐘響應
+    end note
+
+    note left of SILVER_GRACE
+        Grace Period 機制：
+        1. 發送警告通知
+        2. 緩衝期結束前 7 天提醒
+        3. 到期後執行降級
+    end note
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 狀態轉換（升級、降級、保持）
+- `BRONZE/SILVER/GOLD/PLATINUM/DIAMOND`: 主等級狀態
+- `SILVER_GRACE/GOLD_GRACE/PLATINUM_GRACE/DIAMOND_GRACE`: Grace Period（緩衝期）狀態
+- `[*]`: 初始狀態（玩家註冊時）
+- `note`: 每個等級的關鍵特權說明
 
 ### 2.3 Multi-Tenant Customization
 
@@ -255,9 +370,86 @@ public PlayerMetrics calculateRollingMetrics(Long playerId) {
 
 **Performance**: <200ms p95 (leverages Doris materialized views from P1-13).
 
-### 3.3 Evrete Rules for Tier Actions
+### 圖 3.1: 流程圖 - VIP 等級評估與升級計算流程
 
-**Rule Engine Configuration**:
+> **說明**：此圖展示系統如何通過事件驅動架構（Event-Driven Architecture）與定時任務（Scheduled Batch Processing）相結合，實時評估玩家 VIP 等級並自動執行升級/降級操作。完整流程包括：觸發事件識別（Kafka Event）、滾動 30 天指標計算（Doris OLAP 查詢）、等級資格判斷、Grace Period 管理、狀態更新（PostgreSQL）、以及多渠道通知（郵件、站內信、Push）。系統設計目標是「自動化 80% VIP 管理工作」，運營人員僅需處理人工審核請求。
+>
+> **性能指標**：
+> - **實時評估延遲**：< 5 秒（p95，從事件觸發到等級更新完成）
+> - **指標計算延遲**：< 200ms（p95，Doris OLAP 查詢）
+> - **通知發送延遲**：< 10 秒（郵件 API 異步調用）
+> - **並發處理能力**：10,000 TPS（Kafka 並行消費，10 個分區）
+>
+> **相關文檔**：參見 [P1-05 第 2 章：Kafka 事件總線](05-distributed-transaction-patterns.md#2-saga-architecture)、[P1-13 第 3 章：Doris OLAP 指標計算](13-reporting-analytics.md#3-real-time-metrics)
+
+```mermaid
+flowchart TD
+    START_EVENT{觸發源}
+
+    START_EVENT -->|實時事件| KAFKA_EVENT[Kafka Event<br>DepositCompletedEvent<br>GameRoundCompletedEvent<br>SessionEndedEvent]
+    START_EVENT -->|定時任務| SCHEDULED[Spring @Scheduled<br>每日 00:00 UTC<br>每周一 02:00 UTC]
+
+    KAFKA_EVENT --> CONSUME[VipTierEvaluationConsumer<br>Kafka 消費者]
+
+    CONSUME --> GET_PLAYER[獲取玩家當前等級<br>SELECT * FROM player_vip_tiers]
+
+    GET_PLAYER --> CHECK_CACHE{檢查 Redis 緩存<br>指標是否存在？}
+
+    CHECK_CACHE -->|緩存命中| USE_CACHE[使用緩存指標<br>TTL: 5 分鐘]
+    CHECK_CACHE -->|緩存未命中| QUERY_DORIS[查詢 Doris OLAP<br>計算滾動 30 天指標<br>延遲 < 200ms]
+
+    QUERY_DORIS --> WRITE_CACHE[寫入 Redis 緩存]
+
+    USE_CACHE --> GET_CONFIG
+    WRITE_CACHE --> GET_CONFIG[獲取租戶 VIP 配置<br>vip_tier_configs]
+
+    GET_CONFIG --> EVALUATE_TIER[Rules Engine<br>評估等級資格]
+
+    EVALUATE_TIER --> CHECK_RESULT{評估結果？}
+
+    CHECK_RESULT -->|UPGRADE| UPGRADE_RULE[執行升級規則<br>Gold → Platinum]
+    CHECK_RESULT -->|MAINTAIN| END_MAINTAIN([保持當前等級])
+    CHECK_RESULT -->|GRACE_PERIOD_STARTED| START_GRACE[啟動 Grace Period<br>設置到期時間]
+    CHECK_RESULT -->|DOWNGRADE| DOWNGRADE_RULE[執行降級規則<br>Platinum → Gold]
+    CHECK_RESULT -->|GRACE_PERIOD_CANCELLED| CANCEL_GRACE[取消 Grace Period]
+
+    UPGRADE_RULE --> UPDATE_TIER_UP[更新玩家等級<br>UPDATE player_vip_tiers]
+    UPDATE_TIER_UP --> NOTIFY_UP[發送升級通知<br>郵件 + 站內信]
+    NOTIFY_UP --> END_UP([升級完成])
+
+    START_GRACE --> NOTIFY_WARN[發送警告通知<br>緩衝期開始]
+    NOTIFY_WARN --> END_GRACE([Grace Period 啟動])
+
+    DOWNGRADE_RULE --> UPDATE_TIER_DOWN[更新玩家等級<br>調整福利]
+    UPDATE_TIER_DOWN --> NOTIFY_DOWN[發送降級通知]
+    NOTIFY_DOWN --> END_DOWN([降級完成])
+
+    CANCEL_GRACE --> NOTIFY_RETAINED[發送保留通知]
+    NOTIFY_RETAINED --> END_RETAINED([Grade Period 取消])
+
+    SCHEDULED --> BATCH_PROCESS[批量處理<br>到期檢查<br>指標重算]
+    BATCH_PROCESS --> END_BATCH([批處理完成])
+
+    style KAFKA_EVENT fill:#e1f5ff
+    style QUERY_DORIS fill:#FFD700
+    style EVALUATE_TIER fill:#90EE90
+    style UPGRADE_RULE fill:#90EE90
+    style DOWNGRADE_RULE fill:#FF6B6B
+    style START_GRACE fill:#FFA500
+```
+
+**圖例 (Legend)**:
+- `藍色節點`: Kafka 事件觸發
+- `黃色節點`: Doris OLAP 查詢
+- `綠色節點`: 升級操作
+- `橙色節點`: Grace Period 操作
+- `紅色節點`: 降級操作
+
+### 3.3 LiteFlow Rules for Tier Actions
+
+> **重要更新（2026-01-23）**: 本系統已從 Evrete 遷移至 LiteFlow 流程編排引擎。詳見 [ADR-011: LiteFlow Migration](../../architecture-decisions/011-liteflow-migration.md)。
+
+**LiteFlow Chain Configuration**:
 
 ```java
 // VipTierRules.java
@@ -410,6 +602,189 @@ public class VipTierRules {
 | **Monthly Withdrawal** | $10,000 | $50,000 | $100,000 | $500,000 | Unlimited |
 | **Support Response** | 24h | 12h | 4h | 1h | 15min (dedicated) |
 | **Exclusive Events** | ❌ | ✅ Monthly | ✅ Weekly | ✅ Daily | ✅ Custom |
+
+### 圖 4.1: VIP 特權矩陣可視化圖
+
+> **說明**：此圖將上述 VIP 特權矩陣轉換為可視化對比圖，清晰展示五個等級（Bronze、Silver、Gold、Platinum、Diamond）在六大特權維度上的差異。設計目標是「透明性」（Transparency）：玩家能直觀了解每個等級的具體福利，並計算升級的投資回報率（ROI）。可視化有助於激勵玩家提升活躍度以達到更高等級（Gamification 遊戲化），同時為運營團隊提供特權配置參考（如調整返水比例以平衡玩家價值與平台成本）。
+>
+> **特權維度詳解**：
+> 1. **返水比例（Cashback Rate）**：
+>    - **計算公式**：Cashback = (Total Bet - Total Win) × Cashback Rate
+>    - **發放時機**：每次游戲回合結束後實時發放（< 1 秒）
+>    - **最低門檻**：單筆返水 >= $0.10（避免微小交易）
+>    - **ROI 示例**：Gold 玩家（1% 返水）月損失 $5,000 → 獲得 $50 返水；Diamond 玩家（5% 返水）月損失 $20,000 → 獲得 $1,000 返水
+>    - **成本控制**：返水上限設置（Diamond 每月最高 $5,000 返水），防止高額損失
+>
+> 2. **存款紅利（Deposit Bonus）**：
+>    - **計算公式**：Bonus = Deposit Amount × Deposit Bonus Rate
+>    - **流水要求**：10× wagering（如 $100 紅利需完成 $1,000 投注才能提款）
+>    - **最大紅利**：Diamond $10,000（存款 $10,000 × 100% = $10,000 紅利）
+>    - **ROI 示例**：Platinum 玩家充值 $5,000 → 獲得 $2,500 紅利（50%），需完成 $25,000 流水
+>    - **風控限制**：每月最多領取 3 次存款紅利（防止刷紅利）
+>
+> 3. **每日提款限額（Daily Withdrawal Limit）**：
+>    - **目的**：防止大額快速提款導致流動性風險，同時保障 VIP 玩家提款便利性
+>    - **限額梯度**：Bronze $1K → Silver $5K → Gold $10K → Platinum $50K → Diamond 無限
+>    - **實施方式**：通過 Wallet Manager 校驗（P0-03 集成），超額提款請求自動拒絕
+>    - **異常處理**：Diamond 玩家單日提款 > $1M 觸發人工審核（AML 反洗錢檢查）
+>
+> 4. **每月提款限額（Monthly Withdrawal Limit）**：
+>    - **累積限制**：Bronze $10K/月 → Diamond 無限
+>    - **風控考量**：高等級玩家提款額度更高，但需通過嚴格 KYC/AML 驗證（P0-04 集成）
+>    - **監控告警**：玩家月提款額超過存款額 3× → 觸發風控審查（可能刷紅利）
+>
+> 5. **客服響應時間（Support Response SLA）**：
+>    - **Bronze**: 24 小時（郵件支持）
+>    - **Silver**: 12 小時（郵件 + 在線聊天）
+>    - **Gold**: 4 小時（優先級隊列）
+>    - **Platinum**: 1 小時（專屬客服經理）
+>    - **Diamond**: 15 分鐘（專屬團隊 + 電話支持）
+>    - **實施方式**：客服工單系統按 VIP 等級自動分配優先級（P0 = Diamond, P1 = Platinum...）
+>    - **監控指標**：SLA 達成率 > 95%（每月統計）
+>
+> 6. **專屬活動（Exclusive Events）**：
+>    - **Bronze**: 無專屬活動
+>    - **Silver**: 每月抽獎（獎池 $5K，100 名獲獎）
+>    - **Gold**: 每周錦標賽（老虎機/真人百家樂，獎池 $10K）
+>    - **Platinum**: 每日現金返還（登錄即送 $50-$200）
+>    - **Diamond**: 定制活動（生日禮金 $5K、豪華旅遊、專屬錦標賽）
+>    - **ROI 計算**：Gold 玩家參加周賽，平均獲獎概率 5% → 期望收益 $500/月
+>
+> **業務價值分析**：
+> - **玩家留存（Retention）**：VIP 玩家流失率從 15% 降至 5%（提供明確升級激勵）
+> - **ARPU 提升（Average Revenue Per User）**：VIP 玩家 ARPU 3× 普通玩家（Diamond ARPU $2,000/月 vs Bronze $100/月）
+> - **運營效率（Operational Efficiency）**：自動化特權發放減少人工工作 80%（如自動返水、自動紅利）
+> - **成本控制（Cost Management）**：返水/紅利成本佔 GGR 的 3-5%（可控範圍內）
+>
+> **租戶定制示例**：
+> - **加密貨幣賭場**（Crypto-High-Roller）：返水比例 2×（Bronze 0% → Gold 2%），因加密玩家通常高額投注
+> - **體育博彩平台**（Sportsbook）：降低存款紅利（避免套利），增加專屬賽事預測獎勵
+> - **社交娛樂場**（Social Casino）：取消提款限額（虛擬貨幣），增加社交特權（排行榜展示、專屬頭像）
+>
+> **相關文檔**：參見 [P0-03 第 3 章：多錢包協調](../P0-critical/03-seamless-wallet-implementation.md#3-multi-wallet-strategy)（返水與優惠錢包集成）、[P1-12 第 4 章：紅利引擎](12-bonus-engine.md#4-wagering-calculation)（存款紅利流水計算）
+
+```mermaid
+graph LR
+    subgraph "VIP Tier: Bronze 銅牌"
+        B_CB[返水: 0%]
+        B_DB[存款紅利: 0%]
+        B_DW[每日提款: $1K]
+        B_MW[每月提款: $10K]
+        B_SUP[客服: 24h]
+        B_EVT[活動: 無]
+    end
+
+    subgraph "VIP Tier: Silver 銀牌"
+        S_CB[返水: 0.5%]
+        S_DB[存款紅利: 10%]
+        S_DW[每日提款: $5K]
+        S_MW[每月提款: $50K]
+        S_SUP[客服: 12h]
+        S_EVT[活動: 每月抽獎]
+    end
+
+    subgraph "VIP Tier: Gold 金牌"
+        G_CB[返水: 1.0%]
+        G_DB[存款紅利: 20%]
+        G_DW[每日提款: $10K]
+        G_MW[每月提款: $100K]
+        G_SUP[客服: 4h]
+        G_EVT[活動: 每周錦標賽]
+    end
+
+    subgraph "VIP Tier: Platinum 白金"
+        P_CB[返水: 2.0%]
+        P_DB[存款紅利: 50%]
+        P_DW[每日提款: $50K]
+        P_MW[每月提款: $500K]
+        P_SUP[客服: 1h 專屬經理]
+        P_EVT[活動: 每日現金返還]
+    end
+
+    subgraph "VIP Tier: Diamond 鑽石"
+        D_CB[返水: 5.0%]
+        D_DB[存款紅利: 100%]
+        D_DW[每日提款: 無限]
+        D_MW[每月提款: 無限]
+        D_SUP[客服: 15min 專屬團隊]
+        D_EVT[活動: 定制活動+豪華旅遊]
+    end
+
+    B_CB -.升級 5×.-> S_CB
+    S_CB -.升級 2×.-> G_CB
+    G_CB -.升級 2×.-> P_CB
+    P_CB -.升級 2.5×.-> D_CB
+
+    B_DB -.升級 +10%.-> S_DB
+    S_DB -.升級 +10%.-> G_DB
+    G_DB -.升級 +30%.-> P_DB
+    P_DB -.升級 +50%.-> D_DB
+
+    B_DW -.升級 5×.-> S_DW
+    S_DW -.升級 2×.-> G_DW
+    G_DW -.升級 5×.-> P_DW
+    P_DW -.升級 無限.-> D_DW
+
+    B_MW -.升級 5×.-> S_MW
+    S_MW -.升級 2×.-> G_MW
+    G_MW -.升級 5×.-> P_MW
+    P_MW -.升級 無限.-> D_MW
+
+    B_SUP -.升級 2×.-> S_SUP
+    S_SUP -.升級 3×.-> G_SUP
+    G_SUP -.升級 4×.-> P_SUP
+    P_SUP -.升級 4×.-> D_SUP
+
+    B_EVT -.升級 月度.-> S_EVT
+    S_EVT -.升級 周度.-> G_EVT
+    G_EVT -.升級 日度.-> P_EVT
+    P_EVT -.升級 定制.-> D_EVT
+
+    style B_CB fill:#CD7F32
+    style S_CB fill:#C0C0C0
+    style G_CB fill:#FFD700
+    style P_CB fill:#E5E4E2
+    style D_CB fill:#B9F2FF
+
+    style D_CB fill:#B9F2FF,stroke:#0000FF,stroke-width:3px
+    style D_DB fill:#B9F2FF,stroke:#0000FF,stroke-width:3px
+    style D_DW fill:#B9F2FF,stroke:#0000FF,stroke-width:3px
+    style D_MW fill:#B9F2FF,stroke:#0000FF,stroke-width:3px
+    style D_SUP fill:#B9F2FF,stroke:#0000FF,stroke-width:3px
+    style D_EVT fill:#B9F2FF,stroke:#0000FF,stroke-width:3px
+```
+
+**圖例 (Legend)**:
+- `虛線箭頭 (⇢)`: 升級倍數或增量（如返水從 0.5% → 1.0% 為 2× 提升）
+- `銅色背景 (#CD7F32)`: Bronze 等級
+- `銀色背景 (#C0C0C0)`: Silver 等級
+- `金色背景 (#FFD700)`: Gold 等級
+- `白金色背景 (#E5E4E2)`: Platinum 等級
+- `鑽石藍背景 (#B9F2FF)`: Diamond 等級（藍色邊框強調最高等級）
+
+**特權倍數分析**：
+| 特權維度 | Bronze → Silver | Silver → Gold | Gold → Platinum | Platinum → Diamond |
+|---------|----------------|---------------|-----------------|---------------------|
+| 返水比例 | 0% → 0.5% | 2× (0.5% → 1.0%) | 2× (1.0% → 2.0%) | 2.5× (2.0% → 5.0%) |
+| 存款紅利 | 0% → 10% | +10% (10% → 20%) | +30% (20% → 50%) | +50% (50% → 100%) |
+| 每日提款 | $1K → $5K (5×) | 2× ($5K → $10K) | 5× ($10K → $50K) | 無限（取消限制） |
+| 客服響應 | 24h → 12h (2×) | 3× (12h → 4h) | 4× (4h → 1h) | 4× (1h → 15min) |
+
+**投資回報率（ROI）計算示例**：
+
+1. **從 Gold 升至 Platinum 的價值**：
+   - **每月需求**：GGR $5K → $15K（增加 $10K），Deposits $15K → $50K（增加 $35K）
+   - **返水收益**：1% → 2%（若月損失 $15K，返水從 $150 增至 $300，淨增 $150/月）
+   - **存款紅利**：20% → 50%（充值 $50K，紅利從 $10K 增至 $25K，淨增 $15K）
+   - **客服價值**：4h → 1h（緊急問題快速解決，難以量化但價值 > $500/月）
+   - **總價值**：約 $15,650/月（返水 + 紅利 + 客服），投資 $35K 充值，ROI ≈ 44.7%/月
+
+2. **從 Platinum 升至 Diamond 的價值**：
+   - **每月需求**：GGR $15K → $20K（增加 $5K），Deposits $50K → $100K（增加 $50K）
+   - **返水收益**：2% → 5%（若月損失 $20K，返水從 $400 增至 $1,000，淨增 $600/月）
+   - **存款紅利**：50% → 100%（充值 $100K，紅利從 $50K 增至 $100K，淨增 $50K）
+   - **專屬活動**：生日禮金 $5K、豪華旅遊 $10K（年度價值 $15K，月均 $1,250）
+   - **總價值**：約 $51,850/月，投資 $50K 充值，ROI ≈ 103.7%/月（Diamond 是最具價值等級）
 
 **Cashback Example**:
 - Gold player bets $1,000 and wins $700 → Loss = $300
@@ -1512,12 +1887,11 @@ import com.smartadmin.module.vip.manager.VipTierManager;
 import com.smartadmin.module.vip.manager.VipAnalyticsManager;
 import com.smartadmin.module.vip.domain.entity.*;
 import com.smartadmin.module.vip.domain.vo.PlayerMetrics;
-import com.smartadmin.module.vip.evrete.VipTierRules;
+import com.smartadmin.module.vip.flow.VipTierFlows;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.evrete.KnowledgeService;
-import org.evrete.api.Knowledge;
-import org.evrete.api.StatefulSession;
+import net.lab1024.sa.base.module.support.liteflow.service.LiteFlowExecutionService;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -1527,7 +1901,7 @@ public class VipTierEvaluationService {
 
     private final VipTierManager vipTierManager;
     private final VipAnalyticsManager vipAnalyticsManager;
-    private final KnowledgeService evreteService;
+    private final LiteFlowExecutionService liteFlowExecutionService;
 
     public VipTierEvaluationResult evaluatePlayerTier(Long playerId) {
         // 1. Fetch current tier
@@ -1547,9 +1921,10 @@ public class VipTierEvaluationService {
             .metrics(metrics)
             .build();
 
-        // 5. Execute Evrete rules
-        Knowledge knowledge = evreteService.newKnowledge();
-        knowledge.importRules("classpath:rules/vip-tier-rules.java", VipTierRules.class);
+        // 5. Execute LiteFlow chain
+        LiteFlowExecutionForm executionForm = new LiteFlowExecutionForm();
+        executionForm.setChainCode("vip-tier-evaluation-chain");
+        executionForm.setInputParams(Map.of("playerId", playerId, "metrics", metrics));
 
         try (StatefulSession session = knowledge.createSession()) {
             session.insert(ctx);
@@ -1790,7 +2165,7 @@ private double calculateVipTierAdjustment(PlayerVipTier vipTier) {
 **Risk actions also consider VIP tier**:
 
 ```java
-// Evrete rule (from P1-06)
+// LiteFlow script (from P1-06)
 @Rule("Auto-freeze suspicious account")
 public void autoFreezeAccount(RiskActionContext ctx) {
     if (ctx.getRiskScore() > 90 && ctx.getVipTier().getTierLevel() < 4) {

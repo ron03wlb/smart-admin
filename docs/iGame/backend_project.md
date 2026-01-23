@@ -34,7 +34,7 @@
 | -------------- | -------------------- | ----------------------------- | -------- |
 | **任務調度**   | Snail-Job            | 調度 + 重試雙引擎、工作流支援 | 自動化替代人力 |
 | **併發控制**   | Redis 鎖 + 樂觀鎖    | 零悲觀鎖、高性能              | 10 萬 TPS 吞吐 |
-| **規則引擎**   | Evrete + Drools 備用 | 輕量級主力、企業級備份        | 機器決策 24/7 |
+| **規則引擎**   | LiteFlow 流程編排    | 工作流編排、熱加載、監控      | 機器決策 24/7 |
 | **VIP 系統**   | 事件驅動實時更新     | 即時響應、精準觸發            | 零延遲升級體驗 |
 | **多租戶隔離** | 執行器組 + tenant_id | 資源隔離、邏輯隔離            | 零邊際成本複製 |
 | **加密貨幣支付** | HD Wallet + 冷熱錢包 | 安全隔離、自動歸集            | 24/7 即時結算 |
@@ -108,7 +108,7 @@
     - 必須實現無縫錢包（Seamless Wallet）
     - 拒絕轉帳錢包（Transfer Wallet）的落後設計
     - 自動化一切可自動化的流程（規則引擎）
-    - 引入 Evrete 規則引擎 + Snail-Job 工作流
+    - 引入 LiteFlow 流程編排引擎 + Snail-Job 工作流
 ```
 
 ---
@@ -322,8 +322,8 @@ iGaming 包網平台的槓桿機會識別：
 │                     核心引擎層 (Core Engines)                            │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐          │
 │  │錢包引擎  │ │投注引擎  │ │風控引擎  │ │結算引擎  │ │VIP引擎   │          │
-│  │Redis鎖  │ │Dubbo RPC│ │Evrete   │ │Saga     │ │Event    │          │
-│  │+樂觀鎖  │ │兩階段   │ │輕量規則  │ │補償     │ │Driven   │          │
+│  │Redis鎖  │ │Dubbo RPC│ │LiteFlow │ │Saga     │ │Event    │          │
+│  │+樂觀鎖  │ │兩階段   │ │流程編排  │ │補償     │ │Driven   │          │
 │  └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘          │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
@@ -528,7 +528,7 @@ iGaming 包網平台的槓桿機會識別：
 風險 3：套利者掏空獎金池
   威脅：專業套利團隊利用延遲、多帳號刷優惠
   緩釋：
-    - 實時規則引擎（Evrete）秒級攔截
+    - 實時規則引擎（LiteFlow）秒級攔截
     - 設備指紋 + 行為分析（識別異常模式）
     - 多層風控策略（IP、設備、時間、金額）
     - 風控白名單（VIP 用戶降低誤傷）
@@ -1115,16 +1115,16 @@ public class SnailJobMetricsCollector {
                              │ 訂閱消費
                              ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│                VIP 條件評估引擎 (Evrete)                         │
+│                VIP 條件評估引擎 (LiteFlow)                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Rule 1: 積分達標檢查                                      │  │
-│  │ IF points >= nextLevel.threshold THEN trigger_upgrade()  │  │
-│  ├───────────────────────────────────────────────────────────┤  │
-│  │ Rule 2: 等級保持檢查                                      │  │
-│  │ IF activedays < 30 AND level > Silver THEN warn()        │  │
-│  ├───────────────────────────────────────────────────────────┤  │
-│  │ Rule 3: 降級風險檢查                                      │  │
-│  │ IF inactivedays > 90 THEN calculate_downgrade()          │  │
+│  │ Chain: vip-upgrade-evaluation-chain                      │  │
+│  │ THEN(                                                     │  │
+│  │   validateMember,        // 驗證會員資格                 │  │
+│  │   calculatePoints,       // 計算積分                     │  │
+│  │   IF(checkUpgradeEligibility,  // 檢查升級資格          │  │
+│  │     THEN(upgradeVipTier, sendNotifications),            │  │
+│  │     logNoUpgrade)                                        │  │
+│  │ )                                                         │  │
 │  └───────────────────────────────────────────────────────────┘  │
 └────────────────────────────┬────────────────────────────────────┘
                              │ 觸發動作
@@ -1223,14 +1223,13 @@ public class VipPointsService {
 
 ```java
 @Service
+@RequiredArgsConstructor
 public class VipUpgradeListener {
-    
-    @Autowired
-    private EvreteRuleEngine ruleEngine;
-    
-    @Autowired
-    private VipService vipService;
-    
+
+    private final LiteFlowExecutionService liteFlowExecutionService;
+    private final VipService vipService;
+    private final MemberService memberService;
+
     /**
      * 監聽積分變動事件，實時評估升級條件
      */
@@ -1240,33 +1239,43 @@ public class VipUpgradeListener {
         concurrency = "3"  // 3 個並發消費者
     )
     public void onPointsChanged(VipPointsEvent event) {
-        log.info("收到 VIP 積分事件: memberId={}, points={}", 
+        log.info("收到 VIP 積分事件: memberId={}, points={}",
             event.getMemberId(), event.getNewTotalPoints());
-        
+
         try {
             // 設置租戶上下文
             TenantContext.setCurrentTenant(event.getTenantId());
-            
+
             // 1. 查詢會員當前狀態
             Member member = memberService.findById(event.getMemberId());
-            
-            // 2. 使用 Evrete 規則引擎評估
-            VipEvaluationContext context = VipEvaluationContext.builder()
-                .member(member)
-                .pointsEvent(event)
-                .currentLevel(member.getVipLevel())
-                .nextLevel(vipService.getNextLevel(member.getVipLevel()))
-                .build();
-            
-            VipEvaluationResult result = ruleEngine.evaluate(context);
-            
-            // 3. 根據評估結果執行動作
-            if (result.shouldUpgrade()) {
-                executeUpgrade(member, result.getTargetLevel());
-            } else if (result.shouldWarn()) {
-                sendUpgradeIncentive(member, result.getGapToNextLevel());
+
+            // 2. 執行 LiteFlow 流程鏈評估
+            LiteFlowExecutionForm executionForm = new LiteFlowExecutionForm();
+            executionForm.setChainCode("vip-upgrade-evaluation-chain");
+            executionForm.setInputParams(Map.of(
+                "member", member,
+                "pointsEvent", event,
+                "currentLevel", member.getVipLevel(),
+                "nextLevel", vipService.getNextLevel(member.getVipLevel())
+            ));
+
+            ResponseDTO<LiteFlowExecutionResultVO> response =
+                liteFlowExecutionService.execute(executionForm);
+
+            // 3. 根據執行結果處理動作
+            if (response.getOk()) {
+                LiteFlowExecutionResultVO result = response.getData();
+                Map<String, Object> output = result.getOutputResult();
+
+                if (Boolean.TRUE.equals(output.get("shouldUpgrade"))) {
+                    executeUpgrade(member, (VipLevel) output.get("targetLevel"));
+                } else if (Boolean.TRUE.equals(output.get("shouldWarn"))) {
+                    sendUpgradeIncentive(member, (Integer) output.get("gapToNextLevel"));
+                }
+            } else {
+                log.error("VIP 升級評估失敗: {}", response.getMsg());
             }
-            
+
         } catch (Exception e) {
             log.error("VIP 升級評估失敗: memberId={}, error={}", 
                 event.getMemberId(), e.getMessage(), e);
@@ -1354,108 +1363,165 @@ public class VipUpgradeListener {
 
 ---
 
-### 3.4 Evrete 規則引擎實現 VIP 條件評估
+### 3.4 LiteFlow 流程編排實現 VIP 條件評估
+
+**LiteFlow 鏈定義（數據庫存儲）**:
+
+```sql
+-- VIP 升級評估主鏈
+INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
+('VIP 升級評估流程', 'vip-upgrade-evaluation-chain', 1,
+ 'THEN(
+    validateMember,           -- 驗證會員資格
+    calculatePoints,          -- 計算當前積分
+    IF(checkUpgradeByPoints,  -- 檢查積分是否達標
+      THEN(                   -- 達標：執行升級
+        upgradeVipTier,
+        WHEN(sendEmail, sendSMS, updateCache),  -- 並行通知
+        logUpgradeSuccess
+      ),
+      IF(checkUpgradeIncentive,  -- 未達標但接近
+        sendUpgradeIncentive,    -- 發送激勵通知
+        logNoAction              -- 既未達標也不接近
+      )
+    )
+  )');
+
+-- VIP 等級維護檢查鏈
+INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
+('VIP 等級維護檢查', 'vip-maintenance-check-chain', 1,
+ 'THEN(
+    loadMemberActivity,      -- 加載活躍度數據
+    IF(checkLowActivity,     -- 檢查活躍度是否不足
+      THEN(
+        sendActivityWarning, -- 發送活躍度警告
+        logMaintenanceWarning
+      ),
+      logMaintenanceOk
+    )
+  )');
+```
+
+**QLExpress 腳本節點定義**:
+
+```sql
+-- 腳本 1: 檢查積分是否達標
+INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
+('檢查積分達標', 'checkUpgradeByPoints', 'qlexpress',
+'// 從上下文獲取數據
+member = context.getData("member");
+nextLevel = context.getData("nextLevel");
+
+// 判斷積分是否達標
+if (member.vipPoints >= nextLevel.requiredPoints) {
+    context.setData("shouldUpgrade", true);
+    context.setData("targetLevel", nextLevel);
+    context.setData("reason", "積分達標");
+    return true;  // 滿足條件，進入 THEN 分支
+}
+
+return false;  // 不滿足條件，進入 ELSE 分支
+');
+
+-- 腳本 2: 檢查是否接近升級
+INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
+('檢查接近升級', 'checkUpgradeIncentive', 'qlexpress',
+'member = context.getData("member");
+nextLevel = context.getData("nextLevel");
+
+// 計算積分差距
+gap = nextLevel.requiredPoints - member.vipPoints;
+
+// 距離升級 < 500 積分且 > 0
+if (gap > 0 && gap <= 500) {
+    context.setData("shouldWarn", true);
+    context.setData("gapToNextLevel", gap);
+    context.setData("reason", "接近升級");
+    return true;
+}
+
+return false;
+');
+
+-- 腳本 3: 檢查活躍度不足
+INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
+('檢查低活躍度', 'checkLowActivity', 'qlexpress',
+'member = context.getData("member");
+currentLevel = context.getData("currentLevel");
+
+// VIP 等級 > Silver 且 30 天內活躍天數 < 10
+if (currentLevel.ordinal() > 1 && member.activeInLast30Days < 10) {
+    context.setData("shouldWarn", true);
+    context.setData("warningType", "LOW_ACTIVITY");
+    context.setData("reason", "活躍度不足，可能降級");
+    return true;
+}
+
+return false;
+');
+```
+
+**Service 層調用**:
 
 ```java
-@Component
-public class VipEvaluationRuleEngine {
-    
-    private Knowledge vipKnowledge;
-    
-    @PostConstruct
-    public void init() {
-        // 構建 Evrete 規則知識庫
-        vipKnowledge = KnowledgeService.newKnowledge()
-            
-            // 規則 1：積分達標立即升級
-            .newRule("checkUpgradeByPoints")
-            .forEach(
-                "$context", VipEvaluationContext.class
-            )
-            .where(
-                "$context.getMember().getVipPoints() >= $context.getNextLevel().getRequiredPoints()"
-            )
-            .execute(ctx -> {
-                VipEvaluationContext context = ctx.get("$context");
-                
-                VipEvaluationResult result = new VipEvaluationResult();
-                result.setShouldUpgrade(true);
-                result.setTargetLevel(context.getNextLevel());
-                result.setReason("積分達標");
-                
-                ctx.set("result", result);
-            })
-            
-            // 規則 2：接近升級，發送激勵
-            .newRule("checkUpgradeIncentive")
-            .forEach(
-                "$context", VipEvaluationContext.class
-            )
-            .where(
-                // 距離升級 < 500 積分
-                "$context.getNextLevel().getRequiredPoints() - $context.getMember().getVipPoints() <= 500",
-                // 且 > 0（未達標）
-                "$context.getNextLevel().getRequiredPoints() - $context.getMember().getVipPoints() > 0"
-            )
-            .execute(ctx -> {
-                VipEvaluationContext context = ctx.get("$context");
-                
-                VipEvaluationResult result = new VipEvaluationResult();
-                result.setShouldWarn(true);
-                result.setGapToNextLevel(
-                    context.getNextLevel().getRequiredPoints() - context.getMember().getVipPoints()
-                );
-                result.setReason("接近升級");
-                
-                ctx.set("result", result);
-            })
-            
-            // 規則 3：等級保持警告（活躍度不足）
-            .newRule("checkLevelMaintenance")
-            .forEach(
-                "$context", VipEvaluationContext.class
-            )
-            .where(
-                // VIP 等級 > Silver
-                "$context.getCurrentLevel().ordinal() > VipLevel.SILVER.ordinal()",
-                // 30 天內活躍天數 < 10 天
-                "$context.getMember().getActiveInLast30Days() < 10"
-            )
-            .execute(ctx -> {
-                VipEvaluationContext context = ctx.get("$context");
-                
-                VipEvaluationResult result = new VipEvaluationResult();
-                result.setShouldWarn(true);
-                result.setWarningType(VipWarningType.LOW_ACTIVITY);
-                result.setReason("活躍度不足，可能降級");
-                
-                ctx.set("result", result);
-            })
-            
-            .compile();
-    }
-    
+@Service
+@RequiredArgsConstructor
+public class VipEvaluationService {
+
+    private final LiteFlowExecutionService liteFlowExecutionService;
+
     /**
-     * 評估 VIP 條件
+     * 評估 VIP 升級條件
      */
-    public VipEvaluationResult evaluate(VipEvaluationContext context) {
-        StatefulSession session = vipKnowledge.newStatefulSession();
-        
-        // 插入上下文
-        session.insert(context);
-        
-        // 執行規則
-        session.fire();
-        
-        // 獲取結果
-        VipEvaluationResult result = session.get("result");
-        
-        session.close();
-        
-        return result != null ? result : VipEvaluationResult.noAction();
+    public VipEvaluationResult evaluate(Member member, VipLevel nextLevel) {
+        // 構建執行表單
+        LiteFlowExecutionForm executionForm = new LiteFlowExecutionForm();
+        executionForm.setChainCode("vip-upgrade-evaluation-chain");
+        executionForm.setInputParams(Map.of(
+            "member", member,
+            "currentLevel", member.getVipLevel(),
+            "nextLevel", nextLevel
+        ));
+
+        // 執行 LiteFlow 鏈
+        ResponseDTO<LiteFlowExecutionResultVO> response =
+            liteFlowExecutionService.execute(executionForm);
+
+        if (!response.getOk()) {
+            log.error("VIP 評估失敗: {}", response.getMsg());
+            return VipEvaluationResult.noAction();
+        }
+
+        // 解析執行結果
+        LiteFlowExecutionResultVO result = response.getData();
+        Map<String, Object> output = result.getOutputResult();
+
+        VipEvaluationResult evaluationResult = new VipEvaluationResult();
+        evaluationResult.setShouldUpgrade(
+            Boolean.TRUE.equals(output.get("shouldUpgrade")));
+        evaluationResult.setTargetLevel((VipLevel) output.get("targetLevel"));
+        evaluationResult.setShouldWarn(
+            Boolean.TRUE.equals(output.get("shouldWarn")));
+        evaluationResult.setGapToNextLevel(
+            (Integer) output.getOrDefault("gapToNextLevel", 0));
+        evaluationResult.setReason((String) output.get("reason"));
+
+        return evaluationResult;
     }
 }
 ```
+
+**LiteFlow 優勢對比 Evrete**:
+
+| 特性 | Evrete（舊方案） | LiteFlow（新方案） |
+|------|-----------------|-------------------|
+| **規則存儲** | Java 代碼 | PostgreSQL 數據庫 |
+| **熱加載** | 需自定義實現 | 內置支援（一鍵重載） |
+| **可視化** | 無 | 完整執行日誌和監控 |
+| **非技術編輯** | ❌ 不支持 | ✅ QLExpress 腳本（產品團隊可編輯） |
+| **工作流編排** | ❌ 不支持 | ✅ THEN/WHEN/IF/SWITCH |
+| **學習曲線** | 陡峭（Rete 算法） | 平緩（EL 表達式） |
+| **修改週期** | 3 天（代碼部署） | 30 分鐘（UI 修改） |
 
 ---
 
@@ -1515,79 +1581,76 @@ public class VipUpgradeCompensationJob {
 
 ---
 
-## 第四部分：規則引擎架構（Evrete 主 + Drools 備）
+## 第四部分：流程編排引擎架構（LiteFlow）
 
-### 4.1 為什麼 Evrete 為主？
+> **重要更新（2026-01-23）**: 本項目已從 Evrete 規則引擎遷移至 LiteFlow 流程編排引擎。詳細遷移決策和理由見 [ADR-011: LiteFlow Migration](architecture-decisions/011-liteflow-migration.md)。
 
-#### ultrathink 分析：規則引擎選型決策
+### 4.1 為什麼選擇 LiteFlow？
+
+#### ultrathink 分析：流程編排引擎選型決策
 
 ```
-需求場景分析：
-├─ 場景 1：高頻投注檢測（毫秒級響應）
-│   要求：<10ms 延遲，處理 10000+ TPS
-│   複雜度：簡單規則（單條件判斷）
+需求場景分析（經 3 個月實踐後更新）：
+├─ 場景 1：VIP 升級評估（實時響應）
+│   實際需求：<100ms 延遲，處理 5000 TPS
+│   特點：**多步驟工作流**（驗證→計算→判斷→執行→通知）
+│   現狀：70% 場景需要工作流編排，而非純規則推理
 │
-├─ 場景 2：對沖套利檢測（秒級響應）
-│   要求：<1s 延遲，處理 1000 TPS
-│   複雜度：中等（多條件組合）
+├─ 場景 2：獎金引擎條件判斷（實時響應）
+│   實際需求：<50ms 延遲，處理 10000+ TPS
+│   特點：條件分支 + 腳本計算（IF/THEN/ELSE）
 │
-├─ 場景 3：洗錢分析（分鐘級響應）
-│   要求：<5min 延遲，處理 100 TPS
-│   複雜度：高（時序分析、關聯查詢）
+├─ 場景 3：風控檢測流程（秒級響應）
+│   實際需求：<1s 延遲，處理 1000 TPS
+│   特點：順序執行 + 並行通知（THEN + WHEN）
 │
-└─ 場景 4：VIP 條件評估（實時響應）
-    要求：<100ms 延遲，處理 5000 TPS
-    複雜度：低（閾值判斷）
+└─ 場景 4：業務規則熱更新
+    核心需求：非技術人員通過 UI 修改規則（30 分鐘內上線）
+    現狀：Evrete 規則硬編碼在 Java 代碼中，修改週期 3 天
+
+關鍵發現：
+✅ 70% 場景需要工作流編排（多步驟 DAG 執行）
+✅ 30% 場景需要簡單規則判斷（條件分支）
+❌ <5% 場景需要複雜規則推理（Rete 算法）
+✅ 100% 規則需要數據庫存儲 + 熱加載 + 可視化監控
 
 技術選型推理：
 
-方案 A：全部使用 Drools
-├─ 優勢：功能最強大、性能最好（大規模場景）
+方案 A：繼續使用 Evrete
+├─ 優勢：團隊已熟悉、無遷移成本
 ├─ 劣勢：
-│   ├─ 內存佔用高（60GB/30萬規則）
-│   ├─ 學習曲線陡峭（DRL 語法）
-│   ├─ 依賴重（20+ jar 包）
-│   └─ 對簡單場景過度設計
-└─ 結論：❌ 殺雞用牛刀
+│   ├─ 不支援多步驟工作流編排（需手動編排）
+│   ├─ 無內置數據庫存儲和熱加載（需自研）
+│   ├─ 無可視化和監控（需自研）
+│   └─ 規則硬編碼（修改週期 3 天）
+└─ 結論：❌ 不適合實際業務需求
 
-方案 B：全部使用 Easy Rules
-├─ 優勢：極輕量、易學習
-├─ 劣勢：
-│   ├─ 不支援複雜邏輯（CEP）
-│   ├─ 不支援規則動態加載
-│   └─ 無法處理場景 3
-└─ 結論：❌ 能力不足
-
-方案 C：Evrete 為主 + Drools 為輔
-├─ 場景 1、2、4：使用 Evrete
-│   └─ 理由：輕量、性能足夠、易維護
-├─ 場景 3：使用 Drools
-│   └─ 理由：需要 CEP 時序分析
+方案 B：遷移至 LiteFlow 流程編排引擎
 ├─ 優勢：
-│   ├─ 平衡性能與複雜度
-│   ├─ 降低整體系統複雜度
-│   ├─ 保留 Drools 擴展能力
-│   └─ 漸進式演進（先 Evrete 試點）
-└─ 結論：✅ 最優方案
+│   ├─ 原生支援多步驟工作流（THEN/WHEN/IF/SWITCH）
+│   ├─ PostgreSQL 數據庫存儲（版本控制、審計日誌）
+│   ├─ 內置熱加載機制（無需重啟服務）
+│   ├─ 完整的執行日誌和監控（可視化面板）
+│   ├─ QLExpress 腳本引擎（產品團隊可編輯）
+│   └─ Dromara 基金會項目（活躍社區支持）
+├─ 劣勢：
+│   ├─ 6 週遷移成本
+│   ├─ 性能從 <10ms 增加到 <100ms（但對多步驟工作流可接受）
+│   └─ 不是純規則引擎（無 Rete 算法，但實際僅 5% 場景需要）
+└─ 結論：✅ 最優方案（匹配實際業務需求）
 
-實施策略：
-Phase 1（當前）：
-  ├─ 所有規則使用 Evrete 實現
-  ├─ 驗證性能和穩定性
-  └─ 積累規則管理經驗
+方案 C：全部使用 Drools
+├─ 優勢：企業級、功能強大
+├─ 劣勢：過於重量級、學習曲線陡峭、仍無內置工作流編排
+└─ 結論：❌ 過度設計（殺雞用牛刀）
 
-Phase 2（未來）：
-  ├─ 識別 Evrete 無法處理的場景
-  ├─ 引入 Drools 處理複雜 CEP
-  └─ 雙引擎並行運行
-
-Phase 3（長期）：
-  └─ 根據實際情況決定是否全面遷移
+最終決策：**遷移至 LiteFlow**
+理由：匹配實際業務需求（工作流編排 > 規則推理），提供完整的規則管理解決方案
 ```
 
 ---
 
-### 4.2 Evrete 規則引擎架構
+### 4.2 LiteFlow 流程編排架構
 
 #### 分層規則設計
 

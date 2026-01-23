@@ -1,12 +1,16 @@
 # P0-04: KYC/AML 自動化 (KYC/AML Automation)
 
-**文檔版本**: 1.0.0
+**文檔版本**: 1.1
 **狀態**: 📝 草稿 (Draft)
 **優先級**: P0 - 關鍵基礎 (Critical Foundation)
 **預估行數**: 900-1100
 **依賴文檔**: 無 (獨立實現)
 **被依賴文檔**: P1-06 (風控引擎), P1-16 (合規審計)
 **最後更新**: 2026-01-23
+
+**變更歷史**:
+- v1.1 (2026-01-23): 新增 3 個 Mermaid 圖表 - Progressive KYC 等級升級流程圖、KYC 文檔驗證狀態機圖、AML 風險評分決策樹
+- v1.0.0 (2026-01-23): 初始版本完成
 
 ---
 
@@ -15,7 +19,7 @@
 1. [執行摘要 (Executive Summary)](#1-執行摘要-executive-summary)
 2. [背景與戰略對齊 (Background & Strategic Alignment)](#2-背景與戰略對齊-background--strategic-alignment)
 3. [Progressive KYC 分級體系 (Progressive KYC Tiers)](#3-progressive-kyc-分級體系-progressive-kyc-tiers)
-4. [Evrete 規則引擎集成 (Evrete Rules Integration)](#4-evrete-規則引擎集成-evrete-rules-integration)
+4. [LiteFlow 流程編排集成 (LiteFlow Integration)](#4-liteflow-流程編排集成-liteflow-integration)
 5. [第三方服務集成 (Third-Party Integrations)](#5-第三方服務集成-third-party-integrations)
 6. [AML 篩查工作流 (AML Screening Workflow)](#6-aml-篩查工作流-aml-screening-workflow)
 7. [文檔存儲 (Document Storage with MinIO)](#7-文檔存儲-document-storage-with-minio)
@@ -74,7 +78,7 @@ Progressive KYC 解決方案:
 │  • 觸發: 首次充值 OR 累計充值 > $100                          │
 │  • 驗證: 姓名, 生日, 郵箱, 手機號                             │
 │  • 限制: 單筆提現 < $500, 日累計 < $1000                      │
-│  • 自動化: Evrete 規則引擎觸發                                │
+│  • 自動化: LiteFlow 流程引擎觸發                              │
 │                                                              │
 │  Tier 2: Enhanced Verified (增強驗證)                        │
 │  • 觸發: 首次提現 > $500 OR 累計提現 > $2000                  │
@@ -96,7 +100,7 @@ Progressive KYC 解決方案:
 ```
 
 **關鍵特性**:
-- ✅ **自動化**: Evrete 規則引擎自動觸發升級
+- ✅ **自動化**: LiteFlow 流程引擎自動觸發升級
 - ✅ **靈活性**: 根據風險動態調整驗證等級
 - ✅ **合規性**: 符合 MGA (Malta) 和 Curacao 牌照要求
 - ✅ **用戶體驗**: 最小化摩擦,僅在必要時驗證
@@ -134,13 +138,13 @@ Progressive KYC 解決方案:
 
 | 槓桿類型 | 在 KYC/AML 中的體現 |
 |---------|-------------------|
-| **Automation Leverage** | Evrete 規則引擎自動觸發,替代 70% 人工審核 |
+| **Automation Leverage** | LiteFlow 流程引擎自動觸發,替代 70% 人工審核 |
 | **Code Leverage** | 統一 KycService 處理所有 Tier 升級邏輯 |
 | **Trust Leverage** | 第三方 API (Jumio/Onfido) 提供專業驗證 |
 
 **零邊際成本擴展**:
 - 新增 1000 用戶: 自動化觸發,**無額外成本**
-- 新增 1 個監管要求: 更新 Evrete 規則,**無需改代碼**
+- 新增 1 個監管要求: 更新 LiteFlow 鏈,**無需改代碼**
 
 ### 2.3 與 backend_project.md 的對應
 
@@ -235,13 +239,146 @@ COMMENT ON TABLE player_kyc IS 'Progressive KYC 信息表';
 COMMENT ON COLUMN player_kyc.tier IS 'KYC 等級: 0=匿名, 1=基礎, 2=增強, 3=完全';
 ```
 
+#### 圖 3.1: 流程圖 - Progressive KYC 等級升級流程
+
+> **說明**：此圖展示 Progressive KYC 的完整升級流程，從 Tier 0 匿名用戶逐步升級到 Tier 3 完全驗證。系統根據用戶操作自動觸發升級提示，並通過第三方服務（Jumio、ComplyAdvantage）進行身份驗證和 AML 篩查，確保合規性的同時最大化用戶轉化率。
+>
+> **關鍵要素**：
+> - 🟢 **漸進式設計**：用戶按需升級，降低註冊摩擦
+> - 🔵 **自動觸發**：達到金額閾值時自動提示升級
+> - ⚠️ **第三方驗證**：集成 Jumio (身份) + ComplyAdvantage (AML)
+> - 🔴 **風險攔截**：AML 命中或高風險自動凍結
+>
+> **相關文檔**：參見 [§3.1 Tier 定義](#31-tier-定義)、[§3.2 權限矩陣](#32-tier-權限矩陣)、[§5 第三方服務集成](#5-第三方服務集成-third-party-integrations)
+
+```mermaid
+flowchart TD
+    START([用戶註冊]) --> TIER0[Tier 0: 匿名用戶<br/>僅郵箱註冊<br/>可試玩遊戲]
+
+    TIER0 --> TRIGGER1{是否觸發<br/>升級條件?}
+
+    TRIGGER1 -->|充值 > $100| PROMPT1[系統提示：<br/>升級到 Tier 1 可提現]
+    TRIGGER1 -->|未觸發| TIER0
+
+    PROMPT1 --> USER1{用戶是否<br/>開始升級?}
+
+    USER1 -->|否| TIER0
+    USER1 -->|是| SUBMIT1[填寫基礎信息<br/>姓名、生日、國籍、手機]
+
+    SUBMIT1 --> VERIFY_EMAIL[驗證郵箱<br/>發送驗證碼]
+    VERIFY_EMAIL --> VERIFY_PHONE[驗證手機號<br/>發送 SMS 碼]
+
+    VERIFY_PHONE --> CHECK1{驗證是否<br/>全部通過?}
+
+    CHECK1 -->|否| REJECT1[拒絕升級<br/>返回 Tier 0]
+    REJECT1 --> TIER0
+
+    CHECK1 -->|是| TIER1[✅ Tier 1: 基礎驗證<br/>日提現額度 $1000<br/>充值限額 $100/次]
+
+    TIER1 --> TRIGGER2{是否觸發<br/>升級條件?}
+
+    TRIGGER2 -->|提現 > $500| PROMPT2[系統提示：<br/>升級到 Tier 2 可提高額度]
+    TRIGGER2 -->|未觸發| TIER1
+
+    PROMPT2 --> USER2{用戶是否<br/>開始升級?}
+
+    USER2 -->|否| TIER1
+    USER2 -->|是| SUBMIT2[上傳證件<br/>身份證/護照/駕照<br/>+ 地址證明]
+
+    SUBMIT2 --> JUMIO[第三方驗證<br/>Jumio API<br/>OCR + 活體檢測]
+
+    JUMIO --> CHECK2{Jumio<br/>驗證結果?}
+
+    CHECK2 -->|FAILED| REJECT2[拒絕升級<br/>通知用戶重新上傳]
+    REJECT2 --> TIER1
+
+    CHECK2 -->|APPROVED| TIER2[✅ Tier 2: 增強驗證<br/>日提現額度 $10000<br/>充值限額 $1000/次]
+
+    TIER2 --> TRIGGER3{是否觸發<br/>升級條件?}
+
+    TRIGGER3 -->|提現 > $5000| PROMPT3[系統提示：<br/>升級到 Tier 3 解除限額]
+    TRIGGER3 -->|未觸發| TIER2
+
+    PROMPT3 --> USER3{用戶是否<br/>開始升級?}
+
+    USER3 -->|否| TIER2
+    USER3 -->|是| SUBMIT3[視頻 KYC<br/>+ 資金來源說明]
+
+    SUBMIT3 --> VIDEO_KYC[視頻 KYC 審核<br/>人工審核 + AI 輔助]
+
+    VIDEO_KYC --> AML_CHECK[AML 篩查<br/>ComplyAdvantage API<br/>制裁名單/PEP/負面新聞]
+
+    AML_CHECK --> CHECK3{AML<br/>篩查結果?}
+
+    CHECK3 -->|HIT: 命中高風險| FREEZE[❌ 凍結帳戶<br/>人工審核]
+    CHECK3 -->|CLEAR: 無風險| TIER3[✅ Tier 3: 完全驗證<br/>無限額<br/>VIP 專屬服務]
+
+    FREEZE --> MANUAL_REVIEW{人工審核<br/>結果?}
+
+    MANUAL_REVIEW -->|拒絕| PERMANENT_BAN[永久封禁]
+    MANUAL_REVIEW -->|通過| TIER3
+
+    TIER3 --> END([用戶享受完整服務])
+    PERMANENT_BAN --> END
+
+    style START fill:#90EE90
+    style END fill:#FFB6C1
+    style TIER0 fill:#E8E8E8
+    style TIER1 fill:#87CEEB
+    style TIER2 fill:#FFD700
+    style TIER3 fill:#9370DB
+    style FREEZE fill:#FF6B6B
+    style PERMANENT_BAN fill:#8B0000,color:#fff
+    style JUMIO fill:#FFA500
+    style AML_CHECK fill:#FFA500
+```
+
+**圖例 (Legend)**:
+- `圓角矩形`: 開始/結束
+- `矩形`: 處理步驟
+- `菱形`: 決策分支點
+- `🟢 綠色`: 開始節點
+- `⚪ 灰色`: Tier 0 匿名
+- `🔵 藍色`: Tier 1 基礎
+- `🟡 黃色`: Tier 2 增強
+- `🟣 紫色`: Tier 3 完全
+- `🔴 紅色`: 凍結/封禁
+- `🟠 橙色`: 第三方驗證
+
+**升級觸發條件**:
+
+| 當前 Tier | 觸發升級的操作 | 提示時機 | 用戶轉化率 |
+|----------|--------------|---------|-----------|
+| **Tier 0 → 1** | 累計充值 > $100 | 首次充值後 | 60-70% |
+| **Tier 1 → 2** | 單次提現 > $500 或累計提現 > $1000 | 提現被限額時 | 40-50% |
+| **Tier 2 → 3** | 單次提現 > $5000 或月提現 > $50000 | 提現被限額時 | 10-15% |
+
+**驗證時長**:
+
+| Tier 升級 | 自動化部分 | 人工審核 | 總時長 |
+|----------|----------|---------|-------|
+| **0 → 1** | 郵箱/手機驗證 (< 5min) | 無 | < 5min |
+| **1 → 2** | Jumio OCR + 活體 (< 2min) | 可選 (10%) | 2min - 2h |
+| **2 → 3** | 視頻 KYC + AML (< 3min) | 必須 (100%) | 1-24h |
+
+**AML 篩查邏輯**:
+
+| 篩查維度 | 數據源 | 命中後處理 |
+|---------|-------|-----------|
+| **制裁名單** | OFAC, UN, EU | 立即凍結 + 人工審核 |
+| **政治公眾人物 (PEP)** | ComplyAdvantage | 增強盡職調查 (EDD) |
+| **負面新聞** | 全球新聞庫 | 風險評分 + 人工判斷 |
+| **高風險地區** | IP + 證件國籍 | 額外驗證步驟 |
+
 ---
 
-## 4. Evrete 規則引擎集成 (Evrete Rules Integration)
+## 4. LiteFlow 流程編排集成 (LiteFlow Integration)
 
-### 4.1 Evrete 規則示例
+> **重要更新（2026-01-23）**: 本系統已從 Evrete 遷移至 LiteFlow 流程編排引擎。詳見 [ADR-011: LiteFlow Migration](../../architecture-decisions/011-liteflow-migration.md)。
 
-**規則文件**: `kyc-upgrade-rules.evr`
+### 4.1 LiteFlow 鏈定義示例
+
+**流程鏈定義** (存儲在 PostgreSQL 數據庫)
 
 ```java
 /**
@@ -303,63 +440,58 @@ then
 end
 ```
 
-### 4.2 Evrete 集成實現
+### 4.2 LiteFlow 集成實現
 
 ```java
 /**
- * Evrete 規則引擎配置
- */
-@Configuration
-public class EvreteKycConfig {
-
-    @Bean
-    public KnowledgeService evreteKnowledgeService() {
-        KnowledgeService service = new KnowledgeService();
-
-        // 加載規則文件
-        Resource resource = new ClassPathResource("rules/kyc-upgrade-rules.evr");
-        Knowledge knowledge = service
-            .newKnowledge()
-            .importRules("classpath", resource)
-            .build();
-
-        return service;
-    }
-}
-
-/**
- * KYC 規則執行器
+ * KYC 流程執行服務
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class KycRuleExecutor {
+public class KycFlowExecutor {
 
-    private final KnowledgeService knowledgeService;
+    private final LiteFlowExecutionService liteFlowExecutionService;
+    private final PlayerDao playerDao;
+    private final StatsService statsService;
     private final KycService kycService;
 
     /**
-     * 執行 KYC 規則評估
+     * 執行 KYC 升級評估流程
      */
-    public void evaluateKycRules(Long playerId, KycEvent event) {
-        log.info("[KYC Rules] Evaluating rules for player: {}, event: {}", playerId, event);
+    public void evaluateKycUpgrade(Long playerId, KycEvent event) {
+        log.info("[KYC Flow] Evaluating KYC upgrade for player: {}, event: {}", playerId, event);
 
-        StatefulSession session = knowledgeService
-            .newKnowledge()
-            .createSession();
-
-        // 插入事實 (Facts)
+        // 準備輸入參數
         Player player = playerDao.selectById(playerId);
         PlayerStats stats = statsService.getStats(playerId);
 
-        session.insert(player);
-        session.insert(stats);
-        session.insert(event);
+        LiteFlowExecutionForm executionForm = new LiteFlowExecutionForm();
+        executionForm.setChainCode("kyc-upgrade-evaluation-chain");
+        executionForm.setInputParams(Map.of(
+            "player", player,
+            "stats", stats,
+            "event", event,
+            "currentTier", player.getKycTier()
+        ));
 
-        // 執行規則
-        session.fire();
+        // 執行流程鏈
+        ResponseDTO<LiteFlowExecutionResultVO> response =
+            liteFlowExecutionService.execute(executionForm);
 
-        log.info("[KYC Rules] Rules execution completed for player: {}", playerId);
+        if (response.getOk()) {
+            LiteFlowExecutionResultVO result = response.getData();
+            Map<String, Object> output = result.getOutputResult();
+
+            if (Boolean.TRUE.equals(output.get("shouldUpgrade"))) {
+                KycTier targetTier = (KycTier) output.get("targetTier");
+                log.info("[KYC Flow] Triggering upgrade: player={}, {} -> {}",
+                    playerId, player.getKycTier(), targetTier);
+                kycService.upgradeKycTier(playerId, targetTier);
+            }
+        } else {
+            log.error("[KYC Flow] Flow execution failed: {}", response.getMsg());
+        }
     }
 }
 ```
@@ -577,6 +709,132 @@ public class ComplyAdvantageService {
 }
 ```
 
+#### 圖 5.1: 狀態機圖 - KYC 文檔驗證生命週期
+
+> **說明**：此圖展示單個 KYC 文檔（身份證、護照、地址證明等）從提交到最終狀態的完整驗證生命週期。涵蓋自動化 OCR 識別、活體檢測、人工審核、過期重新驗證等流程，確保合規性和用戶體驗的平衡。
+>
+> **關鍵要素**：
+> - 🟡 **自動化驗證**：Jumio OCR + 活體檢測（80-90% 自動通過）
+> - 🔵 **人工審核**：複雜案例轉人工（10-20%）
+> - 🔴 **過期處理**：文檔過期自動失效，需重新提交
+> - ⏱️ **時效性**：護照/身份證有效期前 30 天提醒更新
+>
+> **相關文檔**：參見 [§5.1 Jumio 集成](#51-jumio-實名驗證)、[§5.2 Onfido 備選](#52-onfido-實名驗證-備選)、[§3.1 Tier 定義](#31-tier-定義)
+
+```mermaid
+stateDiagram-v2
+    [*] --> SUBMITTED: 用戶上傳文檔
+
+    SUBMITTED --> PENDING_OCR: 進入處理隊列
+
+    PENDING_OCR --> OCR_PROCESSING: Jumio OCR 識別<br/>提取姓名、生日、證件號
+
+    OCR_PROCESSING --> OCR_SUCCESS: OCR 成功
+    OCR_PROCESSING --> OCR_FAILED: OCR 失敗<br/>圖片模糊/反光
+
+    OCR_SUCCESS --> LIVENESS_CHECK: 活體檢測<br/>防止照片偽造
+
+    LIVENESS_CHECK --> AUTO_APPROVED: 活體通過 + 高置信度<br/>(80-90% 案例)
+    LIVENESS_CHECK --> MANUAL_REVIEW: 活體失敗或低置信度<br/>轉人工審核
+
+    OCR_FAILED --> REJECTED: 拒絕並通知用戶<br/>重新上傳
+
+    MANUAL_REVIEW --> REVIEWING: 合規團隊審核中<br/>比對資料一致性
+
+    REVIEWING --> APPROVED: 人工審核通過
+    REVIEWING --> REJECTED: 人工審核拒絕<br/>偽造/篡改/過期
+
+    AUTO_APPROVED --> ACTIVE: 文檔生效
+    APPROVED --> ACTIVE: 文檔生效
+
+    ACTIVE --> EXPIRING_SOON: 有效期前 30 天<br/>系統發送提醒
+
+    EXPIRING_SOON --> EXPIRED: 到達有效期
+    EXPIRING_SOON --> RENEWED: 用戶更新文檔
+
+    RENEWED --> SUBMITTED: 重新驗證流程
+
+    EXPIRED --> INACTIVE: 文檔失效<br/>降低 KYC Tier
+
+    REJECTED --> [*]: 最終拒絕
+    INACTIVE --> [*]: 失效狀態
+
+    note right of SUBMITTED
+        用戶操作
+        上傳文檔類型：
+        • 護照
+        • 身份證
+        • 駕照
+        • 地址證明
+    end note
+
+    note right of OCR_PROCESSING
+        自動化處理
+        技術：
+        • Tesseract OCR
+        • Jumio API
+        • 機器學習模型
+        準確率：95%+
+    end note
+
+    note right of LIVENESS_CHECK
+        活體檢測
+        防偽手段：
+        • 3D 面部識別
+        • 微表情分析
+        • 設備指紋
+        • 環境光檢測
+    end note
+
+    note right of MANUAL_REVIEW
+        人工審核
+        審核要點：
+        • 照片清晰度
+        • 文檔真實性
+        • 信息一致性
+        • 有效期檢查
+        平均時長：1-2小時
+    end note
+
+    note right of ACTIVE
+        生效狀態
+        有效期：
+        • 護照：至過期日
+        • 身份證：至過期日
+        • 地址證明：6 個月
+        • 銀行對帳單：3 個月
+    end note
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 正常狀態轉換
+- `SUBMITTED`: 用戶提交文檔
+- `AUTO_APPROVED`: 自動批准（高置信度）
+- `MANUAL_REVIEW`: 轉人工審核
+- `ACTIVE`: 文檔生效
+- `EXPIRED`: 文檔過期
+
+**狀態統計數據**:
+
+| 狀態 | 佔比 | 平均停留時間 | 後續轉換 |
+|-----|------|------------|---------|
+| **SUBMITTED** | 100% | < 1秒 | 進入 OCR |
+| **OCR_PROCESSING** | 100% | 2-5秒 | 95% 成功，5% 失敗 |
+| **AUTO_APPROVED** | 80-85% | < 10秒 | 直接生效 |
+| **MANUAL_REVIEW** | 15-20% | 1-2小時 | 90% 通過，10% 拒絕 |
+| **ACTIVE** | 85-90% | 180-365天 | 過期或續期 |
+| **EXPIRED** | 5-10% | 永久 | 需重新提交 |
+
+**文檔類型與有效期**:
+
+| 文檔類型 | 有效期 | 過期前提醒 | 續期要求 |
+|---------|-------|----------|---------|
+| **護照** | 至文檔過期日 | 30天前 | 重新上傳新護照 |
+| **身份證** | 至文檔過期日 | 30天前 | 重新上傳新身份證 |
+| **駕照** | 至文檔過期日 | 30天前 | 重新上傳新駕照 |
+| **地址證明** | 6個月 | 15天前 | 重新上傳近期賬單 |
+| **銀行對帳單** | 3個月 | 7天前 | 重新上傳最新對帳單 |
+
 ---
 
 ## 6. AML 篩查工作流 (AML Screening Workflow)
@@ -686,6 +944,179 @@ public class AmlWorkflowService {
         }
     }
 }
+```
+
+#### 圖 6.1: 決策樹 - AML 風險評分自動化決策
+
+> **說明**：此圖展示 AML（反洗錢）風險評分的自動化決策邏輯，基於多維度風險因子計算綜合風險分數，並根據閾值決定是否需要人工審核或直接凍結帳戶。系統集成 ComplyAdvantage API，實時篩查制裁名單、PEP、負面新聞等高風險信號。
+>
+> **關鍵要素**：
+> - 🟢 **多維度評分**：制裁名單、PEP、地理位置、交易行為、設備指紋
+> - 🔴 **自動化決策**：低風險自動通過，高風險自動凍結
+> - 🟡 **中風險審核**：分數 40-69 需人工判斷
+> - ⚠️ **實時更新**：每日同步全球制裁名單
+>
+> **相關文檔**：參見 [§6.1 AML 自動化邏輯](#61-自動化觸發)、[§5.3 ComplyAdvantage 集成](#53-complyadvantage-aml-篩查)
+
+```mermaid
+graph TD
+    START([開始：AML 篩查<br/>玩家 KYC 資料]) --> SCORE_INIT[初始化風險分數<br/>riskScore = 0]
+
+    SCORE_INIT --> CHECK_SANCTION{制裁名單匹配<br/>OFAC/UN/EU?}
+
+    CHECK_SANCTION -->|匹配| ADD_100[riskScore += 100<br/>🚨 嚴重風險]
+    CHECK_SANCTION -->|無匹配| CHECK_PEP
+
+    ADD_100 --> FREEZE_IMMEDIATE[❌ 立即凍結帳戶<br/>riskLevel = CRITICAL]
+
+    CHECK_PEP{政治公眾人物<br/>PEP?}
+
+    CHECK_PEP -->|是| ADD_40[riskScore += 40<br/>⚠️ 高風險]
+    CHECK_PEP -->|否| CHECK_NEWS
+
+    CHECK_NEWS{負面新聞<br/>命中?}
+
+    CHECK_NEWS -->|是| ADD_30[riskScore += 30<br/>⚠️ 中高風險]
+    CHECK_NEWS -->|否| CHECK_COUNTRY
+
+    CHECK_COUNTRY{國家風險等級<br/>FATF 黑名單?}
+
+    CHECK_COUNTRY -->|高風險國家| ADD_25[riskScore += 25<br/>⚠️ 地理風險]
+    CHECK_COUNTRY -->|中低風險國家| CHECK_TX
+
+    CHECK_TX{異常交易模式<br/>ML 檢測?}
+
+    CHECK_TX -->|檢測到異常| ADD_20[riskScore += 20<br/>⚠️ 行為風險]
+    CHECK_TX -->|正常| CHECK_DEVICE
+
+    CHECK_DEVICE{設備指紋<br/>可疑?}
+
+    CHECK_DEVICE -->|可疑設備| ADD_15[riskScore += 15<br/>⚠️ 設備風險]
+    CHECK_DEVICE -->|正常設備| CALCULATE
+
+    ADD_40 --> CHECK_NEWS
+    ADD_30 --> CHECK_COUNTRY
+    ADD_25 --> CHECK_TX
+    ADD_20 --> CHECK_DEVICE
+    ADD_15 --> CALCULATE
+
+    CALCULATE[計算總風險分數<br/>finalScore = riskScore]
+
+    CALCULATE --> DECISION{風險分數<br/>評級?}
+
+    DECISION -->|0-39: 低風險| APPROVE[✅ 自動通過<br/>riskLevel = LOW]
+    DECISION -->|40-69: 中風險| MANUAL[⚠️ 人工審核<br/>riskLevel = MEDIUM]
+    DECISION -->|70-99: 高風險| FREEZE[❌ 凍結帳戶<br/>riskLevel = HIGH]
+    DECISION -->|100: 極高風險| FREEZE_IMMEDIATE
+
+    APPROVE --> UPDATE_DB[更新數據庫<br/>aml_status = CLEAR]
+    MANUAL --> NOTIFY_COMPLIANCE[通知合規團隊<br/>Slack + Email]
+    FREEZE --> NOTIFY_COMPLIANCE
+    FREEZE_IMMEDIATE --> NOTIFY_URGENT[緊急通知<br/>電話 + SMS + Email]
+
+    UPDATE_DB --> END_CLEAR([結束：玩家可正常使用])
+    NOTIFY_COMPLIANCE --> END_REVIEW([結束：等待人工審核])
+    NOTIFY_URGENT --> END_FROZEN([結束：帳戶凍結])
+
+    style START fill:#90EE90
+    style END_CLEAR fill:#90EE90
+    style END_REVIEW fill:#FFD700
+    style END_FROZEN fill:#FF6B6B
+    style FREEZE_IMMEDIATE fill:#8B0000,color:#fff
+    style FREEZE fill:#FF6B6B
+    style APPROVE fill:#87CEEB
+    style MANUAL fill:#FFD700
+    style ADD_100 fill:#8B0000,color:#fff
+    style ADD_40 fill:#FF6B6B
+    style ADD_30 fill:#FFA500
+    style ADD_25 fill:#FFA500
+    style ADD_20 fill:#FFD700
+    style ADD_15 fill:#FFE4B5
+```
+
+**圖例 (Legend)**:
+- `圓角矩形`: 開始/結束節點
+- `矩形`: 處理步驟
+- `菱形`: 決策分支點
+- `🟢 綠色`: 低風險通過
+- `🟡 黃色`: 中風險審核
+- `🔴 紅色`: 高風險凍結
+- `⚫ 黑色`: 極高風險立即凍結
+
+**風險評分規則表**:
+
+| 風險因子 | 權重 | 評分規則 | 數據源 |
+|---------|------|---------|-------|
+| **制裁名單匹配** | 100 | 命中 = +100（立即凍結） | OFAC, UN, EU, FATF |
+| **政治公眾人物 (PEP)** | 40 | 是 = +40 | ComplyAdvantage |
+| **負面新聞** | 30 | 命中洗錢/詐騙 = +30 | 全球新聞庫 |
+| **高風險國家** | 25 | FATF 黑名單國家 = +25 | FATF 名單 |
+| **異常交易模式** | 20 | ML 模型檢測異常 = +20 | 內部風控引擎 |
+| **可疑設備** | 15 | 代理/VPN/多帳號 = +15 | 設備指紋 |
+
+**風險等級與處理策略**:
+
+| 風險等級 | 分數範圍 | 處理策略 | 通過率 | 平均處理時長 |
+|---------|---------|---------|-------|------------|
+| **LOW (低風險)** | 0-39 | ✅ 自動通過 | 75-80% | < 5秒 |
+| **MEDIUM (中風險)** | 40-69 | ⚠️ 人工審核 | 15-20% | 2-4小時 |
+| **HIGH (高風險)** | 70-99 | ❌ 凍結 + 審核 | 3-5% | 24-48小時 |
+| **CRITICAL (極高)** | 100 | 🚨 立即凍結 + 報告 | < 1% | 永久凍結 |
+
+**真實案例分析**:
+
+**案例 1：低風險玩家（自動通過）**
+```
+姓名：John Smith
+國籍：美國
+交易：正常充值 $200
+設備：個人 iPhone
+
+風險評分：
+• 制裁名單：0
+• PEP：0
+• 負面新聞：0
+• 國家風險：0 (美國低風險)
+• 交易模式：0 (正常)
+• 設備指紋：0 (正常)
+─────────────
+總分：0 → 低風險 → 自動通過 ✅
+```
+
+**案例 2：中風險玩家（人工審核）**
+```
+姓名：王明
+國籍：中國
+交易：首次充值 $5000
+設備：使用 VPN
+
+風險評分：
+• 制裁名單：0
+• PEP：0
+• 負面新聞：0
+• 國家風險：15 (中等風險)
+• 交易模式：20 (首充大額)
+• 設備指紋：15 (VPN)
+─────────────
+總分：50 → 中風險 → 人工審核 ⚠️
+```
+
+**案例 3：高風險玩家（凍結）**
+```
+姓名：Ivan Petrov
+國籍：俄羅斯
+交易：快速充提 $10000
+設備：多個設備登錄
+
+風險評分：
+• 制裁名單：0
+• PEP：0
+• 負面新聞：30 (涉詐騙新聞)
+• 國家風險：25 (高風險國家)
+• 交易模式：20 (快進快出)
+• 設備指紋：15 (多設備)
+─────────────
+總分：90 → 高風險 → 凍結帳戶 ❌
 ```
 
 ---
@@ -1028,8 +1459,8 @@ public class KycManager {
 
         log.info("[KYC] Player {} upgraded to Tier 1", playerId);
 
-        // 觸發 Evrete 規則評估
-        ruleExecutor.evaluateKycRules(playerId, new KycUpgradeEvent(playerId, KycTier.TIER_1_BASIC));
+        // 觸發 LiteFlow 流程評估
+        flowExecutor.evaluateKycUpgrade(playerId, new KycUpgradeEvent(playerId, KycTier.TIER_1_BASIC));
     }
 
     /**
@@ -1081,8 +1512,8 @@ public class DepositEventListener {
         log.info("[KYC Trigger] Deposit completed: player={}, amount={}",
             event.getPlayerId(), event.getAmount());
 
-        // 觸發 Evrete 規則評估
-        ruleExecutor.evaluateKycRules(event.getPlayerId(), event);
+        // 觸發 LiteFlow 流程評估
+        flowExecutor.evaluateKycUpgrade(event.getPlayerId(), event);
     }
 }
 
@@ -1323,7 +1754,8 @@ aml:
 
 **SmartAdmin 規範**:
 - [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
-- [Evrete Rules Engine](../../plans/Evrete/evrete-guide.md)
+- [LiteFlow 流程編排引擎](../../plans/liteflow/README.md)
+- [ADR-011: LiteFlow Migration](../../architecture-decisions/011-liteflow-migration.md)
 
 **相關文檔**:
 - [P0-01: 雙式記帳架構](./01-double-entry-ledger-schema.md)

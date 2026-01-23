@@ -1,9 +1,13 @@
 # P1-05: Distributed Transaction Patterns
 
 **Document Status**: Draft
-**Version**: 1.0.0
+**Version**: 1.1
 **Last Updated**: 2026-01-23
 **Owner**: Engineering & Architecture
+
+**變更歷史**:
+- v1.1 (2026-01-23): 新增 4 個 Mermaid 圖表 - Saga 架構圖、提款時序圖、狀態機圖、超時處理流程圖
+- v1.0.0 (2026-01-23): 初始版本完成
 **Related Documents**:
 - [backend_project.md](../../backend_project.md) - Section 8.3 (Transaction Management)
 - [igame_str.md](../../igame_str.md) - First Principles: Trust via consistency
@@ -169,6 +173,125 @@ public SagaStepResult executeStep(SagaStep step) {
     }
 }
 ```
+
+#### 圖 2.1: 架構圖 - Saga 模式編排架構
+
+> **說明**：此圖展示基於 Kafka 的 Saga 編排器架構，協調錢包服務、帳本服務、支付網關的分布式事務。Saga 編排器負責步驟執行、補償協調、狀態管理，確保所有操作要麼全部成功，要麼全部回滾，避免部分完成的不一致狀態。
+>
+> **關鍵要素**：
+> - 🟡 **Saga 編排器**：基於 Kafka 的事件驅動協調中心
+> - 🔵 **參與服務**：錢包、帳本、支付網關各自維護本地事務
+> - 🔴 **補償處理器**：每個步驟對應補償邏輯
+> - ⚡ **事件驅動**：Kafka 確保異步解耦和高可用
+>
+> **相關文檔**：參見 [P0-01 雙式記帳](../P0-critical/01-double-entry-ledger-schema.md)、[P0-02 冪等性架構](../P0-critical/02-idempotency-architecture.md)
+
+```mermaid
+graph TB
+    subgraph "客戶端層 Client Layer"
+        USER[用戶操作<br/>提款/充值請求]
+    end
+
+    subgraph "API 層 API Gateway"
+        GATEWAY[Kong 網關<br/>請求路由]
+    end
+
+    subgraph "Saga 編排層 Saga Orchestration"
+        ORCHESTRATOR[Saga 編排器<br/>SagaOrchestrator]
+        STATE_STORE[(Saga 狀態存儲<br/>PostgreSQL)]
+        KAFKA_BROKER[(Kafka Broker<br/>事件總線)]
+    end
+
+    subgraph "參與服務 Participant Services"
+        WALLET_SERVICE[錢包服務<br/>WalletService]
+        LEDGER_SERVICE[帳本服務<br/>LedgerService]
+        PAYMENT_SERVICE[支付服務<br/>PaymentGatewayService]
+    end
+
+    subgraph "補償處理層 Compensation Handlers"
+        COMP_WALLET[錢包補償器<br/>解凍資金]
+        COMP_LEDGER[帳本補償器<br/>創建沖正分錄]
+        COMP_PAYMENT[支付補償器<br/>退款處理]
+    end
+
+    subgraph "數據層 Data Layer"
+        WALLET_DB[(錢包數據庫<br/>PostgreSQL)]
+        LEDGER_DB[(帳本數據庫<br/>PostgreSQL)]
+        PAYMENT_PROVIDER[支付供應商<br/>Stripe/Adyen]
+    end
+
+    subgraph "監控層 Monitoring"
+        PROMETHEUS[Prometheus<br/>指標採集]
+        GRAFANA[Grafana<br/>Saga 儀表板]
+        ALERT[AlertManager<br/>失敗告警]
+    end
+
+    USER --> GATEWAY
+    GATEWAY --> ORCHESTRATOR
+
+    ORCHESTRATOR -->|1. Reserve Funds| WALLET_SERVICE
+    ORCHESTRATOR -->|2. Debit Ledger| LEDGER_SERVICE
+    ORCHESTRATOR -->|3. Transfer Money| PAYMENT_SERVICE
+    ORCHESTRATOR -->|4. Confirm Withdrawal| WALLET_SERVICE
+
+    ORCHESTRATOR -->|發布事件| KAFKA_BROKER
+    KAFKA_BROKER -->|訂閱事件| WALLET_SERVICE
+    KAFKA_BROKER -->|訂閱事件| LEDGER_SERVICE
+    KAFKA_BROKER -->|訂閱事件| PAYMENT_SERVICE
+
+    ORCHESTRATOR -->|失敗觸發補償| COMP_WALLET
+    ORCHESTRATOR -->|失敗觸發補償| COMP_LEDGER
+    ORCHESTRATOR -->|失敗觸發補償| COMP_PAYMENT
+
+    WALLET_SERVICE --> WALLET_DB
+    LEDGER_SERVICE --> LEDGER_DB
+    PAYMENT_SERVICE --> PAYMENT_PROVIDER
+
+    ORCHESTRATOR -->|記錄狀態| STATE_STORE
+    ORCHESTRATOR --> PROMETHEUS
+    PROMETHEUS --> GRAFANA
+    PROMETHEUS --> ALERT
+
+    COMP_WALLET --> WALLET_DB
+    COMP_LEDGER --> LEDGER_DB
+    COMP_PAYMENT --> PAYMENT_PROVIDER
+
+    style ORCHESTRATOR fill:#FFD700
+    style WALLET_SERVICE fill:#87CEEB
+    style LEDGER_SERVICE fill:#87CEEB
+    style PAYMENT_SERVICE fill:#87CEEB
+    style COMP_WALLET fill:#FF6B6B
+    style COMP_LEDGER fill:#FF6B6B
+    style COMP_PAYMENT fill:#FF6B6B
+    style KAFKA_BROKER fill:#FFA500
+    style STATE_STORE fill:#E8E8E8
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 正向操作流程
+- `🟡 黃色`: Saga 編排器
+- `🔵 藍色`: 參與服務
+- `🔴 紅色`: 補償處理器
+- `🟠 橙色`: Kafka 事件總線
+
+**架構特性**:
+
+| 組件 | 職責 | 技術棧 | 容錯機制 |
+|-----|------|-------|---------|
+| **Saga 編排器** | 協調步驟執行、狀態管理 | Spring Boot + Kafka | 狀態持久化 + 重啟恢復 |
+| **Kafka Broker** | 異步解耦、事件存儲 | Kafka 3.x, 3 副本 | 分區容錯 + 消息持久化 |
+| **參與服務** | 執行本地事務 | Spring Boot + MyBatis | 冪等性保證 + 樂觀鎖 |
+| **補償處理器** | 回滾已完成步驟 | Spring Boot | 可重試 + 人工兜底 |
+| **狀態存儲** | Saga 狀態持久化 | PostgreSQL | 主從復制 + ACID 保證 |
+
+**Saga 步驟示例（提款）**:
+
+| 步驟 | 服務 | 正向操作 | 補償操作 | 超時時間 |
+|-----|------|---------|---------|---------|
+| **Step 1** | 錢包服務 | 凍結提款金額 | 解凍資金 | 5秒 |
+| **Step 2** | 帳本服務 | 創建借方分錄 | 創建沖正分錄 | 10秒 |
+| **Step 3** | 支付服務 | 調用支付 API | 發起退款 | 30秒 |
+| **Step 4** | 錢包服務 | 確認提款完成 | 無需補償 | 5秒 |
 
 ---
 
@@ -548,6 +671,149 @@ public ResponseDTO<WithdrawalVO> createWithdrawal(@RequestBody WithdrawalForm fo
 7. **Saga** marked as COMPENSATED
 8. **Notification** sent to player: "Withdrawal failed, funds returned to wallet"
 
+#### 圖 3.1: 時序圖 - 提款 Saga 完整流程（含補償）
+
+> **說明**：此圖展示提款 Saga 的完整執行流程，包括成功路徑和支付網關失敗時的補償路徑。Saga 編排器協調 5 個步驟：凍結資金 → 記錄帳本 → KYC 驗證 → 支付網關轉帳 → 確認提款。若任何步驟失敗，自動觸發補償邏輯，確保資金安全。
+>
+> **關鍵要素**：
+> - 🟢 **成功路徑**：所有 5 個步驟順利完成
+> - 🔴 **補償路徑**：步驟 4 失敗後逆序補償步驟 2、1
+> - ⚠️ **冪等性保證**：每個步驟使用獨立的冪等性 Key
+> - 🔄 **重試機制**：支付網關步驟最多重試 5 次
+>
+> **相關文檔**：參見 [§2 Saga 模式基礎](#2-saga-pattern-fundamentals)、[§5 補償機制](#5-compensation-mechanisms)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor 玩家 as 玩家
+    participant API as Withdrawal API
+    participant Orch as Saga 編排器<br/>SagaOrchestrator
+    participant Wallet as 錢包服務<br/>WalletParticipant
+    participant Ledger as 帳本服務<br/>LedgerParticipant
+    participant KYC as KYC 服務<br/>KycParticipant
+    participant Payment as 支付服務<br/>PaymentParticipant
+    participant DB as Saga 狀態庫<br/>PostgreSQL
+
+    Note over 玩家,DB: 成功路徑：所有步驟執行成功
+
+    玩家->>API: POST /withdrawal<br/>{amount: 1000, currency: "USD"}
+    activate API
+
+    API->>Orch: startSaga(WITHDRAWAL_SAGA, context)
+    activate Orch
+
+    Orch->>DB: INSERT INTO saga_instances<br/>status = RUNNING
+    DB-->>Orch: saga_id = 12345
+
+    Note over Orch: Step 1: Reserve Funds
+
+    Orch->>Wallet: reserveFunds(playerId, 1000)
+    activate Wallet
+    Wallet->>Wallet: 凍結錢包 $1000<br/>frozen_balance += 1000
+    Wallet-->>Orch: ✅ SUCCESS
+    deactivate Wallet
+
+    Orch->>DB: UPDATE saga_steps<br/>SET step1_status = COMPLETED
+
+    Note over Orch: Step 2: Ledger Debit
+
+    Orch->>Ledger: createDebitEntry(1000)
+    activate Ledger
+    Ledger->>Ledger: 創建借方分錄<br/>借: 玩家應收款 +1000<br/>貸: 玩家錢包 -1000
+    Ledger-->>Orch: ✅ SUCCESS
+    deactivate Ledger
+
+    Orch->>DB: UPDATE saga_steps<br/>SET step2_status = COMPLETED
+
+    Note over Orch: Step 3: KYC Check
+
+    Orch->>KYC: verifyKycStatus(playerId)
+    activate KYC
+    KYC->>KYC: 檢查 KYC Tier<br/>檢查日提款額度<br/>AML 篩查
+    KYC-->>Orch: ✅ SUCCESS (Tier 2, 額度充足)
+    deactivate KYC
+
+    Note over Orch: Step 4: Payment Gateway Transfer
+
+    Orch->>Payment: initiateTransfer(1000)
+    activate Payment
+    Payment->>Payment: 調用 Stripe API<br/>創建銀行轉帳
+    Payment-->>Orch: ❌ FAILURE<br/>(Gateway Timeout)
+    deactivate Payment
+
+    Note over Orch,DB: 🔴 檢測到失敗，開始補償流程
+
+    Orch->>DB: UPDATE saga_instances<br/>SET status = COMPENSATING
+
+    Note over Orch: Compensate Step 3: (Skip - Read Only)
+
+    Note over Orch: Compensate Step 2: Reverse Ledger Entry
+
+    Orch->>Ledger: createCreditEntry(1000)
+    activate Ledger
+    Ledger->>Ledger: 創建沖正分錄<br/>借: 玩家錢包 +1000<br/>貸: 玩家應收款 -1000
+    Ledger-->>Orch: ✅ COMPENSATED
+    deactivate Ledger
+
+    Orch->>DB: UPDATE saga_steps<br/>SET step2_status = COMPENSATED
+
+    Note over Orch: Compensate Step 1: Unreserve Funds
+
+    Orch->>Wallet: unreserveFunds(playerId, 1000)
+    activate Wallet
+    Wallet->>Wallet: 解凍錢包資金<br/>frozen_balance -= 1000<br/>balance += 1000
+    Wallet-->>Orch: ✅ COMPENSATED
+    deactivate Wallet
+
+    Orch->>DB: UPDATE saga_instances<br/>SET status = COMPENSATED
+
+    Orch-->>API: SagaResult{status: COMPENSATED,<br/>reason: "Payment gateway timeout"}
+    deactivate Orch
+
+    API-->>玩家: 200 OK<br/>{code: 0,<br/>msg: "提款失敗，資金已退回錢包",<br/>data: {status: "FAILED"}}
+    deactivate API
+
+    Note over 玩家,DB: ✅ 補償完成：資金已退回，無損失<br/>⏱️ 總耗時：~2-3 秒
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用
+- `虛線箭頭 (⇢)`: 返回值
+- `activate/deactivate`: 方法執行時間範圍
+- `autonumber`: 自動步驟編號
+- `🟢 綠色注釋`: 成功步驟
+- `🔴 紅色注釋`: 失敗步驟 + 補償流程
+
+**Saga 步驟詳細統計**:
+
+| 步驟 | 服務 | 操作 | 成功率 | 平均耗時 | 補償邏輯 |
+|-----|------|------|-------|---------|---------|
+| **Step 1** | 錢包 | 凍結資金 | 99.5% | 50ms | 解凍資金 |
+| **Step 2** | 帳本 | 創建借方分錄 | 99.9% | 80ms | 創建沖正分錄 |
+| **Step 3** | KYC | 驗證 KYC 狀態 | 95% | 200ms | 無需補償（只讀） |
+| **Step 4** | 支付 | 調用支付網關 | 90% | 1-3秒 | 發起退款（如已扣款） |
+| **Step 5** | 錢包 | 確認提款完成 | 99.9% | 30ms | 無需補償（最終步驟） |
+
+**補償執行順序**（逆序）:
+
+若步驟 4 失敗：
+```
+Compensate Step 3 (Skip - 只讀操作)
+→ Compensate Step 2: 創建沖正分錄
+→ Compensate Step 1: 解凍資金
+```
+
+**異常處理策略**:
+
+| 異常類型 | 處理策略 | 重試次數 | 最終兜底 |
+|---------|---------|---------|---------|
+| **超時** | 指數退避重試 | 5次 | 標記為 STUCK，人工介入 |
+| **餘額不足** | 立即拒絕，無需補償 | 0次 | 返回錯誤給用戶 |
+| **KYC 未通過** | 立即拒絕，補償步驟 1-2 | 0次 | 通知用戶完成 KYC |
+| **支付網關錯誤** | 重試，若持續失敗則補償 | 5次 | 補償已完成步驟 |
+| **補償失敗** | 告警，人工處理 | 3次 | 記錄到 manual_intervention 表 |
+
 ---
 
 ## 4. Deposit Saga Implementation
@@ -743,6 +1009,116 @@ public class ManualInterventionAlert {
     private LocalDateTime resolvedAt;
 }
 ```
+
+---
+
+### 圖 5.1: 狀態機圖 - Saga 執行狀態轉換
+
+> **說明**：此圖展示 Saga 從創建到完成（或補償）的完整狀態轉換路徑。系統通過嚴格的狀態機控制確保每個 Saga 實例的狀態一致性，並在任何步驟失敗時自動觸發補償流程。
+>
+> **關鍵要素**：
+> - 🟢 綠色路徑：正常執行流程（PENDING → RUNNING → COMPLETED）
+> - 🔴 紅色路徑：補償流程（RUNNING → COMPENSATING → COMPENSATED）
+> - ⚠️ 黃色狀態：需要人工介入的失敗狀態（FAILED）
+> - 📊 每個狀態都記錄時間戳（started_at, completed_at, compensated_at, failed_at）
+>
+> **相關章節**：參見 [第 5.2 節：補償順序](#52-compensation-ordering)、[第 5.3 節：補償失敗處理](#53-compensation-failure-handling)
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: 創建 Saga 實例
+
+    PENDING --> RUNNING: 開始執行第一步
+
+    state RUNNING {
+        [*] --> ExecutingStep: 執行當前步驟
+        ExecutingStep --> StepSuccess: 步驟成功
+        ExecutingStep --> StepFailed: 步驟失敗
+
+        StepSuccess --> NextStep: 還有後續步驟
+        StepSuccess --> AllStepsComplete: 所有步驟完成
+
+        NextStep --> ExecutingStep: 執行下一步
+    }
+
+    RUNNING --> COMPLETED: 所有步驟成功
+    RUNNING --> COMPENSATING: 任一步驟失敗
+
+    state COMPENSATING {
+        [*] --> ReverseOrder: 逆序補償
+        ReverseOrder --> CompensateStep: 補償已完成步驟
+        CompensateStep --> CompensateNext: 繼續補償
+        CompensateStep --> CompensationFailed: 補償失敗
+
+        CompensateNext --> CompensateStep: 還有步驟需補償
+        CompensateNext --> AllCompensated: 所有補償完成
+    }
+
+    COMPENSATING --> COMPENSATED: 補償成功完成
+    COMPENSATING --> FAILED: 補償失敗
+
+    COMPLETED --> [*]
+    COMPENSATED --> [*]
+    FAILED --> [*]: 需要人工介入
+
+    note right of PENDING
+        狀態特徵：
+        - saga_data 已保存
+        - current_step_order = null
+        - started_at 已記錄
+    end note
+
+    note right of RUNNING
+        狀態特徵：
+        - current_step_order 持續更新
+        - step_data 累積執行結果
+        - 可能觸發超時機制
+    end note
+
+    note right of COMPENSATING
+        狀態特徵：
+        - 逆序執行補償動作
+        - 每步補償有重試機制
+        - 補償失敗觸發告警
+    end note
+
+    note right of FAILED
+        狀態特徵：
+        - error_message 記錄失敗原因
+        - failed_at 時間戳
+        - 創建 ManualInterventionAlert
+        - 通知運營團隊（PagerDuty）
+    end note
+
+    style COMPLETED fill:#90EE90
+    style COMPENSATED fill:#87CEEB
+    style FAILED fill:#FF6B6B
+    style COMPENSATING fill:#FFA500
+```
+
+**圖例 (Legend)**:
+- `PENDING`: 初始狀態，Saga 已創建但未開始執行
+- `RUNNING`: 正在執行 Saga 步驟（forward actions）
+- `COMPLETED`: 所有步驟成功完成，Saga 正常結束
+- `COMPENSATING`: 因某步驟失敗而進行補償操作
+- `COMPENSATED`: 補償成功完成，系統恢復一致性
+- `FAILED`: 補償失敗，需要人工介入處理
+
+**狀態轉換條件**:
+
+| 當前狀態 | 觸發條件 | 目標狀態 | 操作 |
+|---------|---------|---------|------|
+| PENDING | SagaOrchestrator.startSaga() | RUNNING | 開始執行步驟 1 |
+| RUNNING | 當前步驟成功 && 有後續步驟 | RUNNING | current_step_order++ |
+| RUNNING | 所有步驟成功 | COMPLETED | 記錄 completed_at |
+| RUNNING | 任一步驟失敗 | COMPENSATING | 開始逆序補償 |
+| COMPENSATING | 所有補償成功 | COMPENSATED | 記錄 compensated_at |
+| COMPENSATING | 補償失敗（重試耗盡） | FAILED | 創建人工介入告警 |
+
+**性能指標**:
+- **正常執行路徑（PENDING → RUNNING → COMPLETED）**：平均耗時 2-5 秒（取決於步驟數量）
+- **補償路徑（RUNNING → COMPENSATING → COMPENSATED）**：平均耗時 3-8 秒（包含重試）
+- **失敗處理（COMPENSATING → FAILED）**：觸發告警延遲 < 500ms
 
 ---
 
@@ -1443,6 +1819,132 @@ alerts:
     severity: critical
     message: "Saga failed, manual intervention required"
 ```
+
+### 圖 10.1: 流程圖 - Saga 超時處理機制
+
+> **說明**：此圖展示當 Saga 步驟執行超時時的多層次處理策略。系統通過漸進式的超時檢測機制，在自動重試、告警通知、強制補償之間取得平衡，確保不會因短暫網絡抖動而觸發補償，同時避免長時間 STUCK 狀態影響系統健康度。
+>
+> **關鍵要素**：
+> - ⏱️ 三級超時閾值：30秒（重試）、1分鐘（告警）、5分鐘（強制補償）
+> - 🔄 指數退避重試策略：1s → 2s → 4s → 8s → 16s
+> - 🚨 告警升級機制：Warning → Critical
+> - 📊 監控指標：`saga_stuck_total`（Prometheus Gauge）
+>
+> **相關配置**：參見 [第 4.2 節：Saga 定義](#42-deposit-saga-definition) 中的 `timeoutSeconds` 參數、[第 10.2 節：告警規則](#102-alerting)
+
+```mermaid
+flowchart TD
+    START([開始：執行 Saga 步驟]) --> EXECUTE[調用步驟 Forward Action]
+
+    EXECUTE --> WAIT{等待響應}
+    WAIT -->|響應成功| SUCCESS[記錄步驟成功]
+    WAIT -->|超時| CHECK_TIMEOUT{檢查超時時長}
+
+    CHECK_TIMEOUT -->|< 30s| SHORT_TIMEOUT[短暫超時]
+    CHECK_TIMEOUT -->|30s - 1min| MEDIUM_TIMEOUT[中等超時]
+    CHECK_TIMEOUT -->|1min - 5min| LONG_TIMEOUT[長時間超時]
+    CHECK_TIMEOUT -->|> 5min| CRITICAL_TIMEOUT[極限超時]
+
+    SHORT_TIMEOUT --> CHECK_RETRY{檢查重試次數}
+    CHECK_RETRY -->|< maxRetries| RETRY[指數退避重試]
+    CHECK_RETRY -->|>= maxRetries| TRIGGER_COMPENSATION[觸發補償流程]
+
+    RETRY --> BACKOFF[等待退避時間]
+    BACKOFF -->|1s → 2s → 4s → 8s → 16s| EXECUTE
+
+    MEDIUM_TIMEOUT --> MARK_STUCK[標記為 STUCK 狀態]
+    MARK_STUCK --> INCREMENT_METRIC[遞增 saga_stuck_total 指標]
+    INCREMENT_METRIC --> SEND_WARNING[發送 Warning 告警]
+    SEND_WARNING --> CONTINUE_WAIT{繼續等待響應}
+    CONTINUE_WAIT -->|響應到達| SUCCESS
+    CONTINUE_WAIT -->|持續超時| LONG_TIMEOUT
+
+    LONG_TIMEOUT --> SEND_CRITICAL[發送 Critical 告警]
+    SEND_CRITICAL --> NOTIFY_OPS[通知運營團隊<br>PagerDuty]
+    NOTIFY_OPS --> CONTINUE_MONITOR{持續監控}
+    CONTINUE_MONITOR -->|響應到達| SUCCESS
+    CONTINUE_MONITOR -->|仍無響應| CRITICAL_TIMEOUT
+
+    CRITICAL_TIMEOUT --> FORCE_COMPENSATE[強制觸發補償]
+    FORCE_COMPENSATE --> TRIGGER_COMPENSATION
+
+    TRIGGER_COMPENSATION --> UPDATE_STATE[更新 Saga 狀態為 COMPENSATING]
+    UPDATE_STATE --> LOG_REASON[記錄補償原因<br>error_message: "Step timeout"]
+    LOG_REASON --> START_COMPENSATION[開始逆序補償]
+
+    SUCCESS --> NEXT_STEP{是否有下一步？}
+    NEXT_STEP -->|是| INCREMENT_ORDER[current_step_order++]
+    NEXT_STEP -->|否| COMPLETE[Saga 完成]
+
+    INCREMENT_ORDER --> START
+    COMPLETE --> END([結束])
+    START_COMPENSATION --> END
+
+    style SUCCESS fill:#90EE90
+    style COMPLETE fill:#87CEEB
+    style SHORT_TIMEOUT fill:#FFA500
+    style MEDIUM_TIMEOUT fill:#FF8C00
+    style LONG_TIMEOUT fill:#FF6B6B
+    style CRITICAL_TIMEOUT fill:#8B0000,color:#FFF
+    style TRIGGER_COMPENSATION fill:#FF6B6B
+```
+
+**圖例 (Legend)**:
+- `綠色節點`: 成功路徑
+- `橙色節點`: 短暫超時（可重試）
+- `深橙節點`: 中等超時（需告警）
+- `紅色節點`: 長時間超時（需人工關注）
+- `深紅節點`: 極限超時（強制補償）
+
+**超時處理策略表**:
+
+| 超時時長 | 狀態 | 自動操作 | 告警級別 | 補償觸發 |
+|---------|------|---------|---------|---------|
+| < 30s | RUNNING | 指數退避重試（最多 3 次） | 無 | 否 |
+| 30s - 1min | STUCK | 標記為 STUCK + 遞增監控指標 | Warning | 否 |
+| 1min - 5min | STUCK | 通知運營團隊（PagerDuty） | Critical | 否 |
+| > 5min | COMPENSATING | 強制觸發補償流程 | Critical | 是 |
+
+**重試策略配置**:
+
+```java
+// SagaStep 定義中的超時配置
+SagaStep.builder()
+    .stepName("payment-gateway-charge")
+    .timeoutSeconds(60)         // 步驟級別超時（1分鐘）
+    .maxRetries(3)              // 最大重試次數
+    .retryBackoffSeconds(1)     // 初始退避時間
+    .retryBackoffMultiplier(2)  // 退避倍數（指數增長）
+    .build()
+```
+
+**Prometheus 告警配置**:
+
+```yaml
+# 檢測 STUCK Saga
+- alert: SagaStuck
+  expr: saga_stuck_total > 0
+  for: 1m
+  labels:
+    severity: warning
+  annotations:
+    summary: "檢測到 {{ $value }} 個 Saga 處於 STUCK 狀態"
+
+# 檢測長時間 STUCK（5分鐘）
+- alert: SagaStuckCritical
+  expr: saga_stuck_total > 0
+  for: 5m
+  labels:
+    severity: critical
+  annotations:
+    summary: "{{ $value }} 個 Saga 已 STUCK 超過 5 分鐘，即將自動補償"
+```
+
+**性能指標**:
+- **正常響應時間**: 95th percentile < 2s
+- **短暫超時恢復率**: 85%（通過重試成功）
+- **STUCK → 補償觸發率**: < 0.5%（大部分在 5 分鐘內恢復）
+- **告警響應時間**: < 30s（從 STUCK 到 PagerDuty 通知）
 
 ---
 

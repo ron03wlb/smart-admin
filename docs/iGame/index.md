@@ -62,7 +62,7 @@
 | **01** | [雙式記帳架構](./technical-specs/P0-critical/01-double-entry-ledger-schema.md) | 1,200 | **P0** | 完成 | PostgreSQL 16 |
 | **02** | [冪等性架構](./technical-specs/P0-critical/02-idempotency-architecture.md) | 1,000 | **P0** | 完成 | Redis, P0-01 |
 | **03** | [無縫錢包實現](./technical-specs/P0-critical/03-seamless-wallet-implementation.md) | 1,100 | **P0** | 完成 | P0-01, P0-02 |
-| **04** | [KYC/AML 自動化](./technical-specs/P0-critical/04-kyc-aml-automation.md) | 900 | **P0** | 完成 | MinIO, Evrete |
+| **04** | [KYC/AML 自動化](./technical-specs/P0-critical/04-kyc-aml-automation.md) | 900 | **P0** | 完成 | MinIO, LiteFlow |
 
 **P0 總計**: 4 個文檔，約 4,200 行
 
@@ -86,7 +86,7 @@
 | **08** | [加密貨幣支付網關](./technical-specs/P1-important/08-crypto-payment-gateway.md) | 1,280 | P1 | P0-01, P0-02 | 錢包、提款 |
 | **09** | [遊戲聚合器 SDK](./technical-specs/P1-important/09-game-aggregator-sdk.md) | 1,450 | P1 | P0-03 | VIP 系統、優惠 |
 | **10** | [Headless CMS 集成](./technical-specs/P1-important/10-headless-cms-integration.md) | 1,050 | P1 | Strapi, Redis | P2-20 (i18n) |
-| **11** | [VIP 系統設計](./technical-specs/P1-important/11-vip-system-design.md) | 1,350 | P1 | P0-01, Evrete | P1-12 (優惠), P2-18 (排程) |
+| **11** | [VIP 系統設計](./technical-specs/P1-important/11-vip-system-design.md) | 1,350 | P1 | P0-01, LiteFlow | P1-12 (優惠), P2-18 (排程) |
 | **12** | [優惠引擎](./technical-specs/P1-important/12-bonus-engine.md) | 1,150 | P1 | P0-01, P0-03 | P1-11 (VIP), P2-22 (分群) |
 | **13** | [報表與分析](./technical-specs/P1-important/13-reporting-analytics.md) | 1,400 | P1 | Doris, Kafka | 所有模塊（指標來源） |
 | **14** | [性能優化](./technical-specs/P1-important/14-performance-optimization.md) | 1,100 | P1 | — | 所有模塊（橫切關注點） |

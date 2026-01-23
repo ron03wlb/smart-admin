@@ -1,10 +1,14 @@
 # P1-09: Game Aggregator SDK
 
-**Version**: 1.0.0
+**Version**: 1.1
 **Status**: Draft
 **Last Updated**: 2026-01-23
 **Owner**: iGaming Platform Team
 **Related Documents**: [P0-03 (Wallet)](../P0-critical/03-seamless-wallet-implementation.md), [P1-05 (Saga)](05-distributed-transaction-patterns.md), [P1-07 (Multi-Tenant)](07-multi-tenant-isolation.md), [P1-11 (VIP)](11-vip-system-design.md)
+
+**變更歷史**:
+- v1.1 (2026-01-23): 新增 4 個 Mermaid 圖表 - Game Aggregator 架構圖、供應商適配器類圖、游戲啟動時序圖、游戲目錄同步流程圖
+- v1.0.0 (2026-01-23): 初始版本完成
 
 ---
 
@@ -139,6 +143,210 @@ public class NetEntAdapter implements GameProviderAdapter { ... }
 
 **Benefit**: Add new provider = implement 1 interface (no changes to existing code)
 
+### 圖 3.1: 類圖 - 供應商適配器模式 UML 設計
+
+> **說明**：此圖展示 Gang of Four 設計模式中的**策略模式（Strategy Pattern）**與**適配器模式（Adapter Pattern）**的組合應用。通過定義統一的 `GameProviderAdapter` 接口，每個游戲供應商（Evolution、Pragmatic、NetEnt）實現各自的適配器類，封裝供應商特定的 API 調用邏輯。新增供應商僅需實現該接口的 7 個方法（getProviderId、launchGame、placeBet、settleWin、rollback、syncGameCatalog、validateCallbackSignature），無需修改現有代碼，符合開閉原則（Open-Closed Principle）。
+>
+> **關鍵要素**：
+> - 🔵 **藍色接口層**：`GameProviderAdapter` 定義統一合約（contract），所有適配器必須遵守
+> - 🟢 **綠色實現類**：具體適配器類（EvolutionGamingAdapter、PragmaticPlayAdapter、NetEntAdapter），封裝供應商 API 差異
+> - 🟡 **黃色數據對象**：請求/響應 DTO（GameLaunchRequest、BetRequest、WinRequest、RollbackRequest、GameLaunchResult、GameRoundResult），定義標準化數據結構
+> - 🔴 **紅色註冊中心**：GameProviderAdapterRegistry 管理所有適配器實例，支持運行時動態查找（通過 providerId）
+> - ⚙️ **灰色依賴注入**：Spring @Component 自動發現機制，通過 ApplicationContext.getBeansOfType() 掃描所有適配器 Bean
+>
+> **設計模式收益**：
+> - **可擴展性（Scalability）**：新增 1 個供應商 = 實現 1 個類（~200 行代碼），現有代碼零修改
+> - **可測試性（Testability）**：每個適配器獨立測試，Mock 供應商 API 響應
+> - **可維護性（Maintainability）**：供應商 API 變更僅影響對應適配器，不影響其他供應商
+> - **類型安全（Type Safety）**：Java 接口提供編譯期檢查，避免運行時錯誤
+>
+> **相關文檔**：參見 [P1-05 第 2 章：Saga 編排模式](05-distributed-transaction-patterns.md#2-saga-architecture)（游戲會話生命周期使用 Saga 管理）
+
+```mermaid
+classDiagram
+    class GameProviderAdapter {
+        <<interface>>
+        +String getProviderId()
+        +GameLaunchResult launchGame(GameLaunchRequest)
+        +BalanceResponse getBalance(Long playerId)
+        +GameRoundResult placeBet(BetRequest)
+        +GameRoundResult settleWin(WinRequest)
+        +GameRoundResult rollback(RollbackRequest)
+        +List~Game~ syncGameCatalog()
+        +boolean validateCallbackSignature(String, String)
+    }
+
+    class EvolutionGamingAdapter {
+        -RestTemplate restTemplate
+        -GameProviderConfigDao providerConfigDao
+        -WalletManager walletManager
+        -GameRoundDao gameRoundDao
+        -IdempotencyService idempotencyService
+        +String getProviderId() "evolution"
+        +GameLaunchResult launchGame(request)
+        +GameRoundResult placeBet(request)
+        +GameRoundResult settleWin(request)
+        +GameRoundResult rollback(request)
+        +List~Game~ syncGameCatalog()
+        +boolean validateCallbackSignature(payload, signature)
+        -String generateSessionToken(request, config)
+        -Game convertToGame(evolutionGame)
+    }
+
+    class PragmaticPlayAdapter {
+        -RestTemplate restTemplate
+        -GameProviderConfigDao providerConfigDao
+        -WalletManager walletManager
+        -GameRoundDao gameRoundDao
+        +String getProviderId() "pragmatic"
+        +GameLaunchResult launchGame(request)
+        +GameRoundResult placeBet(request)
+        +GameRoundResult settleWin(request)
+        +GameRoundResult rollback(request)
+        +List~Game~ syncGameCatalog()
+        +boolean validateCallbackSignature(payload, signature)
+    }
+
+    class NetEntAdapter {
+        -SoapClient soapClient
+        -GameProviderConfigDao providerConfigDao
+        -WalletManager walletManager
+        +String getProviderId() "netent"
+        +GameLaunchResult launchGame(request)
+        +GameRoundResult placeBet(request)
+        +GameRoundResult settleWin(request)
+        +GameRoundResult rollback(request)
+        +List~Game~ syncGameCatalog()
+        +boolean validateCallbackSignature(payload, signature)
+    }
+
+    class GameProviderAdapterRegistry {
+        -ApplicationContext applicationContext
+        -Map~String, GameProviderAdapter~ adapters
+        +void initialize() @PostConstruct
+        +GameProviderAdapter getAdapter(String providerId)
+        +List~String~ getSupportedProviders()
+    }
+
+    class GameLaunchRequest {
+        +Long playerId
+        +String gameId
+        +String currency
+        +String locale
+        +boolean realMoney
+        +Long sessionId
+    }
+
+    class GameLaunchResult {
+        +String gameUrl
+        +String sessionToken
+        +LaunchType launchType
+    }
+
+    class BetRequest {
+        +Long playerId
+        +String gameId
+        +String roundId
+        +String transactionId
+        +BigDecimal betAmount
+        +String currency
+    }
+
+    class WinRequest {
+        +Long playerId
+        +String gameId
+        +String roundId
+        +String transactionId
+        +BigDecimal winAmount
+        +String currency
+    }
+
+    class RollbackRequest {
+        +String originalTransactionId
+        +String transactionId
+        +String reason
+    }
+
+    class GameRoundResult {
+        +boolean success
+        +String transactionId
+        +String errorCode
+        +String errorMessage
+        +static GameRoundResult success(String txId)
+        +static GameRoundResult error(String code, String msg)
+        +static GameRoundResult duplicate(String txId)
+    }
+
+    class Game {
+        +String providerId
+        +String providerGameId
+        +String gameName
+        +String gameType
+        +BigDecimal rtp
+        +String thumbnailUrl
+        +GameStatus status
+    }
+
+    %% 繼承關係
+    GameProviderAdapter <|.. EvolutionGamingAdapter : implements
+    GameProviderAdapter <|.. PragmaticPlayAdapter : implements
+    GameProviderAdapter <|.. NetEntAdapter : implements
+
+    %% 組合關係
+    GameProviderAdapterRegistry o-- GameProviderAdapter : manages
+
+    %% 依賴關係
+    EvolutionGamingAdapter ..> GameLaunchRequest : uses
+    EvolutionGamingAdapter ..> GameLaunchResult : returns
+    EvolutionGamingAdapter ..> BetRequest : uses
+    EvolutionGamingAdapter ..> WinRequest : uses
+    EvolutionGamingAdapter ..> RollbackRequest : uses
+    EvolutionGamingAdapter ..> GameRoundResult : returns
+    EvolutionGamingAdapter ..> Game : returns
+
+    %% 註解
+    note for GameProviderAdapter "統一接口定義\n所有供應商必須實現\n7 個核心方法"
+    note for EvolutionGamingAdapter "@Component(evolutionAdapter)\n使用 HMAC-SHA256 簽名\nRESTful API"
+    note for PragmaticPlayAdapter "@Component(pragmaticAdapter)\n使用 MD5 簽名\nRESTful API"
+    note for NetEntAdapter "@Component(netentAdapter)\n使用 IP Whitelist\nSOAP API（遺留系統）"
+    note for GameProviderAdapterRegistry "Spring ApplicationContext\n自動發現所有適配器 Bean\n運行時動態查找"
+```
+
+**圖例 (Legend)**:
+- `<<interface>>`: Java 接口（定義統一合約）
+- `<|..`: implements（實現接口）
+- `o--`: composition（組合關係，Registry 管理 Adapter）
+- `..>`: dependency（依賴關係，方法參數/返回值）
+- `+`: public 方法
+- `-`: private 方法/字段
+
+**代碼示例（新增 Microgaming 適配器）**:
+```java
+@Component("microgamingAdapter")
+@RequiredArgsConstructor
+public class MicrogamingAdapter implements GameProviderAdapter {
+    private final RestTemplate restTemplate;
+    private final WalletManager walletManager;
+
+    @Override
+    public String getProviderId() {
+        return "microgaming";
+    }
+
+    @Override
+    public GameLaunchResult launchGame(GameLaunchRequest request) {
+        // Microgaming-specific implementation
+        String gameUrl = callMicrogamingApi(request);
+        return GameLaunchResult.builder()
+            .gameUrl(gameUrl)
+            .launchType(LaunchType.IFRAME)
+            .build();
+    }
+
+    // ... 實現其他 6 個方法
+}
+```
+
 ### 2.3 Technology Stack
 
 | Component | Technology | Rationale |
@@ -167,6 +375,132 @@ public class NetEntAdapter implements GameProviderAdapter { ... }
          └─► PostgreSQL (game sessions, rounds)
              └─ Partitioned by month (game_rounds_2026_01)
 ```
+
+### 圖 2.1: 架構圖 - Game Aggregator 多供應商適配器拓撲
+
+> **說明**：此圖展示 Game Aggregator SDK 的完整架構，包括適配器註冊中心（Adapter Registry）如何動態發現並管理 20+ 游戲供應商適配器，以及如何通過統一接口（GameProviderAdapter）實現多供應商接入。架構採用策略模式（Strategy Pattern）+ 適配器模式（Adapter Pattern），使得新增供應商僅需實現單一接口，無需修改現有代碼。
+>
+> **關鍵要素**：
+> - 🔵 **藍色適配器層**：每個供應商獨立適配器（Evolution、Pragmatic、NetEnt 等），封裝供應商特定的 API 邏輯
+> - 🟢 **綠色註冊中心**：Spring ApplicationContext 自動發現所有 @Component("providerAdapter") Bean，支持運行時動態加載
+> - 🟡 **黃色緩存層**：Redis 緩存游戲元數據（10s TTL），命中率 95%+，減少對供應商 API 的調用
+> - 🔴 **紅色數據流**：游戲會話（Session）與游戲回合（Round）數據流向，支持按月分區（partition by month）
+> - ⚙️ **灰色外部系統**：游戲供應商 API（Evolution API、Pragmatic API），通過 HMAC-SHA256 簽名驗證回調安全性
+>
+> **性能指標**：
+> - **游戲啟動延遲**：p95 < 2 秒（目標 SLA）、p99 < 3 秒
+> - **回調處理延遲**：p95 < 100ms（同步扣款/派發）
+> - **緩存命中率**：游戲目錄查詢 95%+（Redis 10s TTL）
+> - **並發支持**：單個游戲聚合器實例支持 1,000 TPS（transactions per second）
+> - **可用性**：99.9% uptime（通過多供應商聚合消除單點故障）
+>
+> **相關文檔**：參見 [P0-03 第 2 章：Seamless Wallet 無縫錢包](../P0-critical/03-seamless-wallet-implementation.md#2-architecture-overview)、[P1-05 第 2 章：Saga 編排模式](05-distributed-transaction-patterns.md#2-saga-architecture)
+
+```mermaid
+graph TB
+    subgraph "客戶端層 Client Layer"
+        PLAYER[玩家 Player]
+        WEB_UI[Web 前端<br>Vue 3]
+        MOBILE_APP[移動應用<br>React Native]
+    end
+
+    subgraph "API 網關層 API Gateway"
+        LOAD_BALANCER[Load Balancer<br>Nginx]
+        GAME_CONTROLLER[GameController<br>/api/game/launch<br>/api/game/catalog]
+        CALLBACK_CONTROLLER[CallbackController<br>/callback/evolution/bet<br>/callback/pragmatic/win]
+    end
+
+    subgraph "業務服務層 Business Service Layer"
+        GAME_SERVICE[GameService<br>業務編排]
+        GAME_MANAGER[GameLaunchManager<br>@Transactional]
+        CATALOG_MANAGER[GameCatalogManager<br>@Cacheable]
+    end
+
+    subgraph "適配器註冊中心 Adapter Registry"
+        ADAPTER_REGISTRY[GameProviderAdapterRegistry<br>Spring ApplicationContext]
+        ADAPTER_INTERFACE[GameProviderAdapter<br>統一接口]
+    end
+
+    subgraph "供應商適配器層 Provider Adapters"
+        EVOLUTION_ADAPTER[Evolution Gaming Adapter<br>@Component evolutionAdapter]
+        PRAGMATIC_ADAPTER[Pragmatic Play Adapter<br>@Component pragmaticAdapter]
+        NETENT_ADAPTER[NetEnt Adapter<br>@Component netentAdapter]
+        MICROGAMING_ADAPTER[Microgaming Adapter<br>@Component microgamingAdapter]
+        MORE_ADAPTERS[... 20+ 供應商適配器]
+    end
+
+    subgraph "數據存儲層 Data Layer"
+        REDIS[(Redis Cluster<br>游戲元數據緩存<br>TTL: 10s)]
+        POSTGRES[(PostgreSQL<br>game_sessions<br>game_rounds_2026_01)]
+    end
+
+    subgraph "外部游戲供應商 External Game Providers"
+        EVOLUTION_API[Evolution Gaming API<br>REST + HMAC-SHA256]
+        PRAGMATIC_API[Pragmatic Play API<br>REST + MD5]
+        NETENT_API[NetEnt API<br>SOAP + IP Whitelist]
+    end
+
+    %% 客戶端 → API 網關
+    PLAYER --> WEB_UI
+    PLAYER --> MOBILE_APP
+    WEB_UI --> LOAD_BALANCER
+    MOBILE_APP --> LOAD_BALANCER
+
+    %% API 網關 → 業務服務
+    LOAD_BALANCER --> GAME_CONTROLLER
+    LOAD_BALANCER --> CALLBACK_CONTROLLER
+    GAME_CONTROLLER --> GAME_SERVICE
+    GAME_SERVICE --> GAME_MANAGER
+    GAME_SERVICE --> CATALOG_MANAGER
+
+    %% 業務服務 → 適配器註冊中心
+    GAME_MANAGER --> ADAPTER_REGISTRY
+    CATALOG_MANAGER --> ADAPTER_REGISTRY
+
+    %% 適配器註冊中心 → 供應商適配器
+    ADAPTER_REGISTRY --> ADAPTER_INTERFACE
+    ADAPTER_INTERFACE --> EVOLUTION_ADAPTER
+    ADAPTER_INTERFACE --> PRAGMATIC_ADAPTER
+    ADAPTER_INTERFACE --> NETENT_ADAPTER
+    ADAPTER_INTERFACE --> MICROGAMING_ADAPTER
+    ADAPTER_INTERFACE --> MORE_ADAPTERS
+
+    %% 供應商適配器 → 外部 API
+    EVOLUTION_ADAPTER --> EVOLUTION_API
+    PRAGMATIC_ADAPTER --> PRAGMATIC_API
+    NETENT_ADAPTER --> NETENT_API
+
+    %% 外部 API → 回調控制器（虛線表示異步回調）
+    EVOLUTION_API -.回調 Bet/Win/Rollback.-> CALLBACK_CONTROLLER
+    PRAGMATIC_API -.回調 Bet/Win/Rollback.-> CALLBACK_CONTROLLER
+
+    %% 數據流
+    GAME_MANAGER --> POSTGRES
+    CATALOG_MANAGER --> REDIS
+    CATALOG_MANAGER --> POSTGRES
+
+    %% 樣式
+    style ADAPTER_REGISTRY fill:#90EE90
+    style ADAPTER_INTERFACE fill:#87CEEB
+    style EVOLUTION_ADAPTER fill:#e1f5ff
+    style PRAGMATIC_ADAPTER fill:#e1f5ff
+    style NETENT_ADAPTER fill:#e1f5ff
+    style MICROGAMING_ADAPTER fill:#e1f5ff
+    style MORE_ADAPTERS fill:#e1f5ff
+    style REDIS fill:#FFD700
+    style POSTGRES fill:#FFD700
+    style EVOLUTION_API fill:#FFA500
+    style PRAGMATIC_API fill:#FFA500
+    style NETENT_API fill:#FFA500
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用（等待響應）
+- `虛線箭頭 (⇢)`: 異步回調（供應商主動通知平台）
+- `藍色適配器節點`: 供應商特定適配器實現（封裝 API 差異）
+- `綠色註冊中心`: Spring 自動發現機制（@PostConstruct 掃描所有 GameProviderAdapter Bean）
+- `黃色存儲層`: 數據持久化與緩存
+- `橙色外部系統`: 游戲供應商 API（第三方服務）
 
 ---
 
@@ -807,6 +1141,170 @@ public class GameLaunchManager {
 }
 ```
 
+### 圖 4.1: 時序圖 - 游戲啟動完整流程（Seamless Wallet 模式）
+
+> **說明**：此圖展示玩家點擊「啟動游戲」按鈕後，系統如何通過 Layered Architecture（Controller → Service → Manager → Dao）協調多個組件完成游戲啟動。關鍵流程包括：余額驗證（確保玩家有至少 $10 余額）、並發會話限制檢查（最多 3 個活躍會話）、適配器選擇（根據 providerId 動態選擇對應適配器）、游戲 URL 生成（調用供應商 API）、會話記錄（PostgreSQL 持久化）。整個流程符合 **P0-03 Seamless Wallet** 設計，玩家無需在游戲與平台之間轉移資金，余額實時同步（<200ms SLA）。
+>
+> **關鍵要素**：
+> - 🔵 **藍色前端層**：玩家通過 Web UI（Vue 3）或移動應用（React Native）點擊游戲
+> - 🟢 **綠色業務層**：GameController（REST API）→ GameService（業務編排）→ GameLaunchManager（事務管理 @Transactional）
+> - 🟡 **黃色適配器層**：GameProviderAdapterRegistry 根據 providerId 動態選擇適配器（evolutionAdapter、pragmaticAdapter 等）
+> - 🔴 **紅色錢包集成**：WalletManager（P0-03）驗證余額，實時同步（SELECT balance FROM wallets WHERE player_id = ? FOR UPDATE）
+> - ⚙️ **灰色外部調用**：Evolution Gaming API（HTTPS + JWT token），返回 iframe 嵌入 URL
+> - 🟣 **紫色會話管理**：PostgreSQL 記錄游戲會話（game_sessions 表），狀態：ACTIVE → CLOSED
+>
+> **性能指標**：
+> - **端到端延遲（E2E Latency）**：p95 < 2 秒、p99 < 3 秒（從點擊到游戲加載完成）
+> - **余額查詢延遲**：< 50ms（PostgreSQL SELECT + Redis 緩存）
+> - **適配器調用延遲**：Evolution API p95 < 1 秒、Pragmatic API p95 < 800ms
+> - **會話並發限制**：每個玩家最多 3 個活躍會話（防止多開賬號）
+> - **實時錢包同步**：余額變更 < 200ms（符合 P0-03 SLA）
+>
+> **異常處理**：
+> - **余額不足（Insufficient Balance）**：拋出 ServiceException，前端提示充值
+> - **並發會話超限**：拋出 ServiceException，提示關閉其他游戲
+> - **供應商 API 超時**：Evolution API 超時 5s → 重試 3 次 → 降級到其他供應商（如 Pragmatic）
+> - **游戲禁用（Game Disabled）**：拋出 ServiceException，前端顯示「游戲維護中」
+>
+> **相關文檔**：參見 [P0-03 第 3 章：多錢包協調](../P0-critical/03-seamless-wallet-implementation.md#3-multi-wallet-strategy)、[P1-05 第 3 章：Saga 游戲會話](05-distributed-transaction-patterns.md#3-withdrawal-saga)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor 玩家 as 玩家
+    participant WebUI as Web 前端<br>Vue 3
+    participant Controller as GameController<br>/api/game/launch
+    participant Service as GameService<br>業務編排
+    participant Manager as GameLaunchManager<br>@Transactional
+    participant WalletMgr as WalletManager<br>P0-03 集成
+    participant Registry as GameProviderAdapterRegistry<br>適配器註冊中心
+    participant Adapter as EvolutionGamingAdapter<br>供應商適配器
+    participant EvolutionAPI as Evolution Gaming API<br>外部供應商
+    participant DB as PostgreSQL<br>game_sessions
+
+    玩家->>WebUI: 點擊「啟動游戲」按鈕<br>Evolution - Crazy Time
+    activate WebUI
+
+    WebUI->>Controller: POST /api/game/launch<br>{gameId: "evolution-crazy-time", currency: "USD", realMoney: true}
+    activate Controller
+
+    Controller->>Service: launchGame(form)
+    activate Service
+
+    Service->>Manager: launchGame(form)
+    activate Manager
+
+    Note over Manager: 步驟 1：驗證游戲是否存在且已啟用
+
+    Manager->>DB: SELECT * FROM games<br>WHERE game_id = 'evolution-crazy-time'<br>AND status = 'ENABLED'
+    activate DB
+    DB-->>Manager: Game{providerId: "evolution", rtp: 96.08%}
+    deactivate DB
+
+    Note over Manager: 步驟 2：驗證玩家余額（Seamless Wallet）
+
+    Manager->>WalletMgr: getWallet(playerId)
+    activate WalletMgr
+    WalletMgr->>DB: SELECT balance FROM wallets<br>WHERE player_id = ? FOR UPDATE
+    activate DB
+    DB-->>WalletMgr: Wallet{balance: 150.00 USD}
+    deactivate DB
+    WalletMgr-->>Manager: Wallet{balance: 150.00}
+    deactivate WalletMgr
+
+    alt 余額不足（< $10 最低要求）
+        Manager-->>Service: throw ServiceException("Insufficient balance")
+        Service-->>Controller: ResponseDTO.error("INSUFFICIENT_BALANCE")
+        Controller-->>WebUI: {code: 40001, msg: "余額不足，請充值"}
+        WebUI-->>玩家: 顯示「余額不足」提示
+    end
+
+    Note over Manager: 步驟 3：檢查並發會話限制（最多 3 個）
+
+    Manager->>DB: SELECT COUNT(*) FROM game_sessions<br>WHERE player_id = ? AND status = 'ACTIVE'
+    activate DB
+    DB-->>Manager: activeSessions: 1
+    deactivate DB
+
+    alt 並發會話超限（>= 3）
+        Manager-->>Service: throw ServiceException("Max sessions exceeded")
+        Service-->>Controller: ResponseDTO.error("MAX_SESSIONS_EXCEEDED")
+        Controller-->>WebUI: {code: 40002, msg: "同時游戲數量超限"}
+        WebUI-->>玩家: 提示關閉其他游戲
+    end
+
+    Note over Manager: 步驟 4：創建游戲會話記錄
+
+    Manager->>DB: INSERT INTO game_sessions<br>(player_id, game_id, provider_id, status, started_at)
+    activate DB
+    DB-->>Manager: sessionId: 12345
+    deactivate DB
+
+    Note over Manager: 步驟 5：通過適配器註冊中心選擇供應商適配器
+
+    Manager->>Registry: getAdapter("evolution")
+    activate Registry
+    Registry-->>Manager: EvolutionGamingAdapter instance
+    deactivate Registry
+
+    Note over Manager: 步驟 6：調用適配器生成游戲 URL
+
+    Manager->>Adapter: launchGame(request)<br>{playerId, gameId: "crazy-time", currency: "USD"}
+    activate Adapter
+
+    Adapter->>Adapter: 生成 JWT Session Token<br>payload: {playerId, gameId, timestamp, tenantId}<br>secret: Evolution API Key<br>expiry: 1 hour
+
+    Adapter->>EvolutionAPI: GET /v1/game/launch?token=<JWT>&gameId=crazy-time&mode=real&currency=USD
+    activate EvolutionAPI
+    EvolutionAPI-->>Adapter: {gameUrl: "https://evolution.com/iframe/abc123", sessionToken: "eyJhbG..."}
+    deactivate EvolutionAPI
+
+    Adapter-->>Manager: GameLaunchResult{gameUrl, sessionToken, launchType: IFRAME}
+    deactivate Adapter
+
+    Note over Manager: 步驟 7：更新會話記錄（保存 URL 和 Token）
+
+    Manager->>DB: UPDATE game_sessions<br>SET launch_url = ?, session_token = ?<br>WHERE id = 12345
+    activate DB
+    DB-->>Manager: 更新成功
+    deactivate DB
+
+    Manager-->>Service: GameLaunchResponse{gameUrl, sessionId: 12345, launchType: IFRAME}
+    deactivate Manager
+
+    Service-->>Controller: GameLaunchResponse
+    deactivate Service
+
+    Controller-->>WebUI: ResponseDTO.ok({gameUrl, sessionId, launchType: "IFRAME"})
+    deactivate Controller
+
+    Note over WebUI: 前端渲染 iframe，加載 Evolution Gaming 游戲
+
+    WebUI->>EvolutionAPI: 加載 iframe<br>src="https://evolution.com/iframe/abc123"
+    activate EvolutionAPI
+    EvolutionAPI-->>WebUI: 返回 HTML5 游戲界面
+    deactivate EvolutionAPI
+
+    WebUI-->>玩家: 顯示游戲界面<br>Crazy Time（Evolution Gaming）
+    deactivate WebUI
+
+    Note over 玩家,DB: ✅ 游戲啟動成功，玩家開始游戲<br>✅ 會話狀態：ACTIVE<br>✅ 錢包余額實時同步（Seamless Wallet）
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用（等待響應）
+- `虛線箭頭 (⇢)`: 返回值
+- `activate/deactivate`: 方法執行時間（生命線）
+- `autonumber`: 自動步驟編號（方便追蹤）
+- `alt`: 異常分支（條件判斷）
+- `Note over`: 關鍵說明注釋
+
+**性能優化建議**：
+1. **Redis 緩存游戲元數據**：游戲列表查詢（SELECT * FROM games）添加 Redis 緩存（TTL 10s），減少數據庫查詢
+2. **異步游戲目錄同步**：供應商 API 調用可能較慢（1-2s），考慮使用 WebClient（非阻塞）替代 RestTemplate（阻塞）
+3. **CDN 加速 iframe 加載**：Evolution Gaming iframe URL 通過 CloudFront CDN 加速，減少跨國網絡延遲
+4. **數據庫連接池優化**：HikariCP 連接池配置（maximumPoolSize: 20, connectionTimeout: 5000ms）
+
 ### 4.2 Provider Callback Handling
 
 **Provider callbacks** (bet, win, rollback) are sent to our platform when game rounds occur.
@@ -980,6 +1478,151 @@ public class GameCatalogSyncScheduler {
     }
 }
 ```
+
+### 圖 5.1: 流程圖 - 游戲目錄每日同步流程（Cron Job）
+
+> **說明**：此圖展示系統如何通過 Spring @Scheduled 定時任務（每日 02:00 UTC）自動同步所有游戲供應商的游戲目錄元數據（game catalog metadata）。同步流程包括：遍歷所有已註冊適配器（20+ 供應商）、調用各供應商的 API（Evolution /games、Pragmatic /catalog、NetEnt SOAP API）、Upsert 操作（新游戲插入 INSERT、現有游戲更新 UPDATE）、刷新 Redis 緩存。新游戲默認狀態為 DISABLED（禁用），需要運營人員手動審核啟用，確保合規性（RTP ≥ 92%、無禁止司法管轄區）。
+>
+> **關鍵要素**：
+> - 🔵 **藍色定時任務層**：Spring @Scheduled（cron = "0 0 2 * * ?"），每日凌晨 2 點執行（選擇低峰期避免影響玩家體驗）
+> - 🟢 **綠色適配器遍歷**：從 GameProviderAdapterRegistry 獲取所有已註冊供應商列表（evolutionAdapter、pragmaticAdapter、netentAdapter 等）
+> - 🟡 **黃色 API 調用**：每個適配器調用供應商 API 獲取游戲列表（Evolution REST API、Pragmatic HTTP API、NetEnt SOAP API），超時 30s
+> - 🔴 **紅色 Upsert 邏輯**：查詢 PostgreSQL 檢查游戲是否存在（SELECT WHERE provider_id = ? AND provider_game_id = ?），若不存在則 INSERT（默認 status=DISABLED），若存在則 UPDATE 元數據（RTP、縮略圖、游戲類型）
+> - ⚙️ **灰色緩存刷新**：同步完成後清空 Redis 緩存（deleteByPattern "game:catalog:*"），下次查詢時重新加載最新數據
+> - 🟣 **紫色異常處理**：若某個供應商 API 失敗（超時、網絡錯誤、認證失敗），記錄錯誤日志但繼續同步其他供應商（fail-fast = false）
+>
+> **性能指標**：
+> - **總執行時間**：20 個供應商 × 平均 5 秒/供應商 ≈ 100 秒（p95 < 120 秒）
+> - **API 調用延遲**：Evolution API p95 < 3 秒、Pragmatic API p95 < 2 秒、NetEnt SOAP API p95 < 8 秒（遺留系統較慢）
+> - **數據庫操作**：每個游戲 1 次 SELECT + 1 次 INSERT/UPDATE，5,000 游戲 × 2 操作 = 10,000 次數據庫調用
+> - **數據庫批處理優化**：使用 MyBatis-Plus batch insert（每批 100 條），減少 Round-trip time（RTT）
+> - **Redis 緩存刷新**：deleteByPattern 操作 < 100ms（影響 ~20 個緩存 key）
+>
+> **異常場景與處理**：
+> - **供應商 API 超時**：RestTemplate 超時 30s → 重試 3 次（exponential backoff：1s, 2s, 4s）→ 記錄錯誤日志 → 繼續下一個供應商
+> - **認證失敗（401）**：API Key 過期或無效 → 發送 PagerDuty 告警 → 通知運營團隊更新配置
+> - **游戲元數據缺失**：某些供應商 API 返回不完整數據（缺少 RTP、縮略圖）→ 使用默認值填充（RTP=95%, thumbnail=placeholder.png）
+> - **重複游戲 ID 沖突**：多個供應商提供相同游戲（如 Book of Dead）→ 通過 provider_id + provider_game_id 組合鍵區分
+> - **數據庫死鎖**：多個定時任務並發執行導致死鎖 → 添加分布式鎖（Redisson Lock），確保同一時間只有一個實例執行同步
+>
+> **運營操作流程**：
+> 1. **游戲審核**：同步完成後，運營人員登錄后台（/admin/game/catalog），查看新增游戲列表（status=DISABLED）
+> 2. **合規檢查**：驗證 RTP ≥ 92%（MGA 監管要求）、檢查司法管轄區限制（如英國禁止某些高波動性老虎機）
+> 3. **手動啟用**：通過后台界面將 status 更新為 ENABLED，游戲立即對玩家可見
+> 4. **A/B 測試**：新游戲可先對 VIP 玩家開放（P1-11 VIP 系統集成），收集數據后再全量開放
+>
+> **相關文檔**：參見 [P1-11 第 4 章：VIP 專屬游戲](11-vip-system-design.md#4-vip-privileges)（VIP 玩家優先體驗新游戲）、[P1-06 第 6 章：RTP 驗證](06-real-time-risk-engine.md#6-rtp-verification)
+
+```mermaid
+flowchart TD
+    START([定時任務觸發<br>@Scheduled cron: 0 0 2 * * ?<br>每日 02:00 UTC]) --> LOG_START[記錄同步開始日志<br>Starting game catalog synchronization]
+
+    LOG_START --> GET_PROVIDERS[從註冊中心獲取所有供應商<br>adapterRegistry.getSupportedProviders]
+
+    GET_PROVIDERS --> INIT_COUNTER[初始化計數器<br>totalProviders = 0<br>successCount = 0<br>failCount = 0]
+
+    INIT_COUNTER --> LOOP_START{遍歷所有供應商<br>for providerId in providers}
+
+    LOOP_START -->|有下一個供應商| GET_ADAPTER[獲取適配器實例<br>adapter = registry.getAdapter providerId]
+
+    GET_ADAPTER --> TRY_SYNC{嘗試同步}
+
+    TRY_SYNC -->|成功路徑| CALL_API[調用供應商 API<br>adapter.syncGameCatalog<br>超時 30s]
+
+    CALL_API --> PARSE_RESPONSE[解析 API 響應<br>List of Game objects<br>Evolution: 200+ games<br>Pragmatic: 300+ games]
+
+    PARSE_RESPONSE --> LOG_FETCH[記錄獲取數量<br>Fetched X games from provider Y]
+
+    LOG_FETCH --> LOOP_GAMES{遍歷所有游戲<br>for game in providerGames}
+
+    LOOP_GAMES -->|有下一個游戲| CHECK_EXISTS[檢查游戲是否存在<br>SELECT * FROM games<br>WHERE provider_id = ?<br>AND provider_game_id = ?]
+
+    CHECK_EXISTS -->|游戲不存在| INSERT_GAME[插入新游戲<br>INSERT INTO games<br>status = DISABLED<br>默認禁用待審核]
+
+    CHECK_EXISTS -->|游戲已存在| UPDATE_GAME[更新游戲元數據<br>UPDATE games SET<br>game_name, rtp, thumbnail_url, game_type<br>WHERE id = ?]
+
+    INSERT_GAME --> LOG_INSERT[記錄新增日志<br>New game added: provider, gameId, name]
+    UPDATE_GAME --> LOG_UPDATE[記錄更新日志<br>Game metadata updated]
+
+    LOG_INSERT --> LOOP_GAMES
+    LOG_UPDATE --> LOOP_GAMES
+
+    LOOP_GAMES -->|所有游戲處理完成| INVALIDATE_CACHE[清空 Redis 緩存<br>redisson.getKeys.deleteByPattern<br>game:catalog:*]
+
+    INVALIDATE_CACHE --> LOG_PROVIDER_SUCCESS[記錄供應商同步成功<br>Provider sync completed: provider, games]
+
+    LOG_PROVIDER_SUCCESS --> INCREMENT_SUCCESS[成功計數 +1<br>successCount++]
+
+    INCREMENT_SUCCESS --> LOOP_START
+
+    TRY_SYNC -->|異常路徑| CATCH_ERROR[捕獲異常<br>RestClientException<br>TimeoutException<br>AuthenticationException]
+
+    CATCH_ERROR --> LOG_ERROR[記錄錯誤日志<br>log.error Failed to sync provider: providerId]
+
+    LOG_ERROR --> CHECK_ERROR_TYPE{判斷錯誤類型}
+
+    CHECK_ERROR_TYPE -->|API 超時| ALERT_TIMEOUT[發送 PagerDuty 告警<br>Provider API Timeout: providerId]
+    CHECK_ERROR_TYPE -->|認證失敗 401| ALERT_AUTH[發送緊急告警<br>Provider API Key Invalid: providerId]
+    CHECK_ERROR_TYPE -->|其他錯誤| ALERT_GENERIC[發送一般告警<br>Provider Sync Failed: providerId]
+
+    ALERT_TIMEOUT --> INCREMENT_FAIL[失敗計數 +1<br>failCount++]
+    ALERT_AUTH --> INCREMENT_FAIL
+    ALERT_GENERIC --> INCREMENT_FAIL
+
+    INCREMENT_FAIL --> LOOP_START
+
+    LOOP_START -->|所有供應商處理完成| LOG_SUMMARY[記錄同步匯總日志<br>Game catalog synchronization completed<br>Total: X, Success: Y, Failed: Z]
+
+    LOG_SUMMARY --> CHECK_FAIL_RATE{失敗率檢查<br>failCount / totalProviders}
+
+    CHECK_FAIL_RATE -->|失敗率 > 30%| ALERT_HIGH_FAIL[發送高失敗率告警<br>High failure rate in game sync: Z%]
+    CHECK_FAIL_RATE -->|失敗率 ≤ 30%| NOTIFY_SUCCESS[發送 Slack 通知<br>Game catalog sync completed successfully]
+
+    ALERT_HIGH_FAIL --> END([同步流程結束])
+    NOTIFY_SUCCESS --> END
+
+    %% 樣式定義
+    style START fill:#90EE90
+    style END fill:#FFB6C1
+    style CALL_API fill:#87CEEB
+    style INSERT_GAME fill:#FFD700
+    style UPDATE_GAME fill:#FFD700
+    style INVALIDATE_CACHE fill:#FFA500
+    style CATCH_ERROR fill:#FF6B6B
+    style LOG_ERROR fill:#FF6B6B
+    style ALERT_TIMEOUT fill:#FF6B6B
+    style ALERT_AUTH fill:#FF6B6B
+    style ALERT_HIGH_FAIL fill:#FF6B6B
+```
+
+**圖例 (Legend)**:
+- `圓角矩形 ([])`: 開始/結束節點
+- `矩形`: 操作步驟
+- `菱形 {}`: 決策分支（條件判斷）
+- `綠色節點`: 流程入口
+- `粉色節點`: 流程出口
+- `藍色節點`: 外部 API 調用
+- `黃色節點`: 數據庫操作（INSERT/UPDATE）
+- `橙色節點`: 緩存操作
+- `紅色節點`: 錯誤處理與告警
+
+**性能優化建議**：
+1. **並行同步供應商**：使用 CompletableFuture 或 Spring @Async 並行調用多個供應商 API，總執行時間從 100s 降至 ~10s（受限於最慢供應商）
+   ```java
+   List<CompletableFuture<Void>> futures = providers.stream()
+       .map(providerId -> CompletableFuture.runAsync(() -> syncProvider(providerId), executor))
+       .collect(Collectors.toList());
+   CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+   ```
+
+2. **數據庫批處理**：使用 MyBatis-Plus saveBatch() 方法批量插入/更新，減少數據庫 Round-trip
+   ```java
+   gameDao.saveBatch(newGames, 100);  // 每批 100 條
+   ```
+
+3. **增量同步**：僅同步最近 7 天更新的游戲（通過 API 參數 `updated_since=2026-01-16`），減少數據傳輸量
+
+4. **CDN 預熱**：同步完成後，自動觸發 CloudFront CDN 預熱（預加載熱門游戲縮略圖），減少玩家首次加載延遲
 
 ### 5.2 Game Metadata Caching
 

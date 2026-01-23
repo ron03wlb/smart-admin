@@ -65,8 +65,8 @@
 | **P1-08** | [加密貨幣支付閘道](./P1-important/08-crypto-payment-gateway.md) | 1000-1200 | 📝 草稿 | P0-01, P0-04 | HD Wallet, 冷熱錢包隔離, 區塊鏈監聽 |
 | **P1-09** | [遊戲聚合器 SDK](./P1-important/09-game-aggregator-sdk.md) | 850-1000 | 📝 草稿 | P0-03 | 適配器模式, 元數據同步 |
 | **P1-10** | [Headless CMS 整合](./P1-important/10-headless-cms-integration.md) | 700-850 | 📝 草稿 | P1-07 | 動態主題, 多租戶前端 |
-| **P1-11** | [VIP 系統設計](./P1-important/11-vip-system-design.md) | 800-950 | 📝 草稿 | P0-03, P1-12 | 事件驅動, Flink 聚合, Evrete 規則 |
-| **P1-12** | [獎金引擎](./P1-important/12-bonus-engine.md) | 900-1050 | 📝 草稿 | P0-03 | Evrete 規則, 流水要求追蹤 |
+| **P1-11** | [VIP 系統設計](./P1-important/11-vip-system-design.md) | 800-950 | 📝 草稿 | P0-03, P1-12 | 事件驅動, Flink 聚合, LiteFlow 規則 |
+| **P1-12** | [獎金引擎](./P1-important/12-bonus-engine.md) | 900-1050 | 📝 草稿 | P0-03 | LiteFlow 規則, 流水要求追蹤 |
 | **P1-13** | [報表與分析](./P1-important/13-reporting-analytics.md) | 950-1100 | 📝 草稿 | P0-01 | Doris/ClickHouse, 物化視圖 |
 | **P1-14** | [性能優化](./P1-important/14-performance-optimization.md) | 800-950 | 📝 草稿 | 所有 P0 | 索引策略, 緩存預熱, JVM 調優 |
 | **P1-15** | [安全加固](./P1-important/15-security-hardening.md) | 750-900 | 📝 草稿 | P0-02, P2-23 | OWASP Top 10, WAF, DDoS 防護 |
@@ -187,7 +187,7 @@ P0-02 (冪等性)
 |------|---------|--------|---------|
 | **Week 5** | P1-06 風控引擎<br>P1-07 多租戶隔離 | • Flink 流處理任務<br>• 設備指紋採集<br>• tenant_id 傳播機制 | 2 後端 + 1 數據工程師<br>1 後端 |
 | **Week 6** | P1-08 加密貨幣閘道<br>P1-09 遊戲聚合器 | • HD Wallet 實現<br>• 冷熱錢包隔離<br>• Pragmatic 適配器 | 2 後端 + 1 區塊鏈專家<br>2 後端 |
-| **Week 7** | P1-11 VIP 系統<br>P1-12 獎金引擎 | • 事件驅動升級<br>• Evrete 規則引擎<br>• 流水追蹤器 | 2 後端<br>2 後端 + 1 Evrete 專員 |
+| **Week 7** | P1-11 VIP 系統<br>P1-12 獎金引擎 | • 事件驅動升級<br>• LiteFlow 規則引擎<br>• 流水追蹤器 | 2 後端<br>2 後端 + 1 LiteFlow 專員 |
 | **Week 8** | P1-13 報表分析<br>P1-14 性能優化 | • Doris/ClickHouse schema<br>• 物化視圖<br>• 性能調優報告 | 1 後端 + 1 數據工程師<br>1 性能工程師 |
 
 **里程碑檢查點**:
@@ -266,7 +266,7 @@ P0-02 (冪等性)
 - ✅ Java 21, Spring Boot 3.5.4
 - ✅ PostgreSQL 16, Redis 7, Kafka 3.x
 - ✅ MyBatis Plus 3.5.12, Snail-Job 1.x
-- ✅ Evrete (規則引擎), Flink (流處理)
+- ✅ LiteFlow (規則引擎), Flink (流處理)
 
 #### 圖 1.1: iGaming 平台技術棧架構
 
@@ -298,7 +298,7 @@ graph TB
         D1[Redis 7.2<br>緩存 + 分佈式鎖]
         D2[Kafka 3.7<br>事件流]
         D3[Snail-Job 1.x<br>排程任務]
-        D4[Evrete<br>規則引擎]
+        D4[LiteFlow<br>規則引擎]
     end
 
     subgraph "數據處理層 Data Processing"

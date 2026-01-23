@@ -1,6 +1,6 @@
 # P0-02: 冪等性架構 (Idempotency Architecture)
 
-**文檔版本**: 2.0
+**文檔版本**: 2.1
 **狀態**: 📝 草稿 (Draft)
 **優先級**: P0 - 關鍵基礎 (Critical Foundation)
 **預估行數**: 1000-1200
@@ -9,6 +9,7 @@
 **最後更新**: 2026-01-23
 
 **變更歷史**:
+- v2.1 (2026-01-23): 新增 3 個 Mermaid 圖表 - Idempotency Key 生成流程圖、冪等性檢查架構圖、客戶端重試時序圖
 - v2.0 (2026-01-23): 新增 Mermaid 流程圖 - AOP 冪等性攔截器完整流程圖 (§6.2)
 - v1.0.0 (2026-01-23): 初始版本完成
 
@@ -334,6 +335,91 @@ public class IdempotencyKeyValidator {
 - ✅ 兼具客戶端靈活性和服務端兜底
 - ✅ 新客戶端用 UUID,舊客戶端自動降級
 
+#### 圖 4.1: 流程圖 - Idempotency Key 生成與驗證流程
+
+> **說明**：此圖展示混合方案中客戶端和服務端如何協作生成和驗證 Idempotency Key。客戶端優先使用 UUID v4 生成 Key，服務端驗證格式合法性並在必要時自動降級為服務端生成模式，確保向下兼容性和系統穩定性。
+>
+> **關鍵要素**：
+> - 🟦 **藍色路徑**：客戶端生成 UUID 的標準流程
+> - 🟡 **黃色路徑**：服務端兜底生成的降級流程
+> - ✅ **綠色節點**：驗證通過，Key 可用
+> - ⚠️ **驗證點**：UUID 格式驗證、簽名校驗
+>
+> **相關文檔**：參見 [§4.1 客戶端生成](#41-客戶端生成-client-generated)、[§4.2 服務端生成](#42-服務端生成-server-generated)、[§4.3 混合方案](#43-混合方案-hybrid---推薦)
+
+```mermaid
+flowchart TD
+    START([開始：API 請求到達]) --> CHECK_HEADER{請求頭是否包含<br/>X-Idempotency-Key?}
+
+    CHECK_HEADER -->|是| EXTRACT_KEY[提取客戶端 Key<br/>clientKey = header['X-Idempotency-Key']]
+    CHECK_HEADER -->|否| SERVER_GEN[服務端生成模式]
+
+    EXTRACT_KEY --> VALIDATE_FORMAT{驗證 UUID v4<br/>格式是否正確?}
+
+    VALIDATE_FORMAT -->|是| VALIDATE_SIGN{是否需要<br/>簽名驗證?}
+    VALIDATE_FORMAT -->|否| LOG_INVALID[記錄格式錯誤日誌]
+
+    VALIDATE_SIGN -->|是| CHECK_SIGN{簽名是否<br/>有效?}
+    VALIDATE_SIGN -->|否| USE_CLIENT_KEY[✅ 使用客戶端 Key]
+
+    CHECK_SIGN -->|是| USE_CLIENT_KEY
+    CHECK_SIGN -->|否| REJECT[❌ 拒絕請求<br/>返回 400 Bad Request]
+
+    LOG_INVALID --> SERVER_GEN
+
+    SERVER_GEN --> HASH_REQUEST[計算請求 Hash<br/>SHA-256(userId + apiPath<br/>+ requestBody + timestamp)]
+
+    HASH_REQUEST --> USE_SERVER_KEY[✅ 使用服務端 Key]
+
+    USE_CLIENT_KEY --> BUILD_REDIS_KEY[構建 Redis Key<br/>idempotency:{api}:{key}]
+    USE_SERVER_KEY --> BUILD_REDIS_KEY
+
+    BUILD_REDIS_KEY --> DETERMINE_TTL[根據 API 類型<br/>確定 TTL]
+
+    DETERMINE_TTL --> TTL_TABLE{API 類型?}
+
+    TTL_TABLE -->|deposit| SET_TTL_24H[TTL = 24 小時]
+    TTL_TABLE -->|bet/win| SET_TTL_5M[TTL = 5 分鐘]
+    TTL_TABLE -->|withdrawal| SET_TTL_7D[TTL = 7 天]
+    TTL_TABLE -->|其他| SET_TTL_1H[TTL = 1 小時<br/>默認值]
+
+    SET_TTL_24H --> CONTINUE[繼續後續流程<br/>進入冪等性檢查]
+    SET_TTL_5M --> CONTINUE
+    SET_TTL_7D --> CONTINUE
+    SET_TTL_1H --> CONTINUE
+
+    CONTINUE --> END([Key 生成完成])
+
+    REJECT --> END
+
+    style START fill:#90EE90
+    style END fill:#FFB6C1
+    style USE_CLIENT_KEY fill:#87CEEB
+    style USE_SERVER_KEY fill:#87CEEB
+    style REJECT fill:#FF6B6B
+    style SERVER_GEN fill:#FFD700
+    style VALIDATE_FORMAT fill:#FFA500
+    style CHECK_SIGN fill:#FFA500
+```
+
+**圖例 (Legend)**:
+- `圓角矩形`: 開始/結束節點
+- `菱形`: 決策分支點
+- `矩形`: 處理步驟
+- `實線箭頭 (→)`: 流程方向
+- `🟢 綠色節點`: 正常開始/結束
+- `🔵 藍色節點`: Key 驗證通過
+- `🟡 黃色節點`: 降級到服務端生成
+- `🔴 紅色節點`: 請求拒絕
+
+**Key 生成策略對比**:
+
+| 策略 | 生成方式 | 適用場景 | 優勢 | 劣勢 |
+|-----|---------|---------|------|------|
+| **客戶端生成** | UUID v4 | 新版 App/Web | 完全控制，支持離線生成 | 需客戶端改造 |
+| **服務端生成** | Hash(user+api+body+time) | 舊版客戶端兼容 | 無需前端改動 | 時間窗口影響精度 |
+| **混合方案** | 優先客戶端，兜底服務端 | **推薦** | 兼具靈活性和兼容性 | 邏輯稍複雜 |
+
 ---
 
 ## 5. Redis 存儲設計 (Redis Storage Design)
@@ -471,6 +557,135 @@ public class IdempotencyTtlConfig {
     }
 }
 ```
+
+#### 圖 5.1: 架構圖 - 冪等性檢查雙層架構
+
+> **說明**：此圖展示基於 Redis + PostgreSQL 的雙層冪等性檢查架構。L1 層使用 Redis 提供高性能的快速檢查（TTL 自動過期），L2 層使用 PostgreSQL 提供持久化存儲和審計追蹤。Redisson 分布式鎖確保同一 Key 的並發請求串行執行，防止 Race Condition。
+>
+> **關鍵要素**：
+> - 🔵 **L1 緩存層**：Redis（高性能，自動過期）
+> - 🟢 **L2 持久層**：PostgreSQL（持久化，審計追蹤）
+> - 🔒 **並發控制**：Redisson 分布式鎖
+> - ⏱️ **TTL 策略**：根據 API 類型動態設置（5分鐘～7天）
+>
+> **相關文檔**：參見 [§5.1 Key 命名規範](#51-key-命名規範)、[§5.2 Value 結構](#52-redis-value-結構設計)、[§5.3 TTL 策略](#53-ttl-策略-按-api-類型)、[§7 並發請求處理](#7-並發請求處理-concurrent-request-handling)
+
+```mermaid
+graph TB
+    subgraph "客戶端層 Client Layer"
+        WEB[Web 應用<br/>Vue 3]
+        MOBILE[移動應用<br/>React Native]
+    end
+
+    subgraph "API 網關層 API Gateway"
+        GATEWAY[Kong 網關<br/>速率限制、IP 白名單]
+    end
+
+    subgraph "應用服務層 Application Layer"
+        CONTROLLER[Controller<br/>@RestController]
+        AOP[AOP 攔截器<br/>@Idempotent 註解]
+        SERVICE[Service 層<br/>業務邏輯]
+        MANAGER[Manager 層<br/>@Transactional]
+    end
+
+    subgraph "冪等性檢查層 Idempotency Layer"
+        VALIDATOR[IdempotencyValidator<br/>Key 驗證器]
+        LOCK[Redisson 分布式鎖<br/>防止並發執行]
+        REDIS_SERVICE[IdempotencyRedisService<br/>Redis 操作封裝]
+    end
+
+    subgraph "L1: Redis 緩存層 Cache Layer"
+        REDIS_CLUSTER[(Redis Cluster<br/>3 Master + 3 Replica)]
+        KEY_DEPOSIT[idempotency:deposit:uuid<br/>TTL=24h]
+        KEY_BET[idempotency:bet:uuid<br/>TTL=5min]
+        KEY_WITHDRAWAL[idempotency:withdrawal:uuid<br/>TTL=7days]
+    end
+
+    subgraph "L2: PostgreSQL 持久層 Persistence Layer"
+        PG[(PostgreSQL<br/>Primary + Standby)]
+        TABLE_IDEMPOTENCY[idempotency_keys 表<br/>持久化審計追蹤]
+    end
+
+    subgraph "監控告警層 Monitoring Layer"
+        PROMETHEUS[Prometheus<br/>指標採集]
+        GRAFANA[Grafana<br/>可視化儀表板]
+        ALERT[AlertManager<br/>告警通知]
+    end
+
+    WEB --> GATEWAY
+    MOBILE --> GATEWAY
+    GATEWAY --> CONTROLLER
+
+    CONTROLLER --> AOP
+    AOP --> VALIDATOR
+    VALIDATOR --> LOCK
+
+    LOCK -->|獲取鎖成功| REDIS_SERVICE
+    LOCK -->|等待超時| CONTROLLER
+
+    REDIS_SERVICE -->|檢查 Key 是否存在| REDIS_CLUSTER
+    REDIS_CLUSTER -->|Key 存在：返回緩存結果| CONTROLLER
+    REDIS_CLUSTER -->|Key 不存在：繼續執行| SERVICE
+
+    SERVICE --> MANAGER
+    MANAGER --> PG
+
+    MANAGER -->|執行成功| REDIS_SERVICE
+    REDIS_SERVICE -->|存儲結果| REDIS_CLUSTER
+    REDIS_SERVICE -->|持久化記錄| TABLE_IDEMPOTENCY
+
+    REDIS_CLUSTER --> KEY_DEPOSIT
+    REDIS_CLUSTER --> KEY_BET
+    REDIS_CLUSTER --> KEY_WITHDRAWAL
+
+    REDIS_SERVICE --> PROMETHEUS
+    LOCK --> PROMETHEUS
+    PROMETHEUS --> GRAFANA
+    PROMETHEUS --> ALERT
+
+    style WEB fill:#e1f5ff
+    style MOBILE fill:#e1f5ff
+    style GATEWAY fill:#fff4e6
+    style AOP fill:#e8f5e9
+    style VALIDATOR fill:#e8f5e9
+    style LOCK fill:#ffe0e0
+    style REDIS_SERVICE fill:#e8f5e9
+    style REDIS_CLUSTER fill:#ffebee
+    style PG fill:#e3f2fd
+    style PROMETHEUS fill:#f3e5f5
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用流程
+- `虛線箭頭 (⇢)`: 異步消息/監控
+- `🔵 藍色區域`: 緩存層組件
+- `🟢 綠色區域`: 應用服務層組件
+- `🔴 紅色區域`: 並發控制組件
+- `🟣 紫色區域`: 監控告警組件
+
+**架構特性**:
+
+| 層級 | 組件 | 職責 | 性能指標 |
+|-----|------|------|---------|
+| **L1 緩存層** | Redis Cluster | 快速檢查（< 5ms） | 99.9% 可用性 |
+| **L2 持久層** | PostgreSQL | 持久化審計（< 50ms） | ACID 保證 |
+| **並發控制** | Redisson 分布式鎖 | 防止重複執行 | 鎖超時 30s |
+| **監控告警** | Prometheus + Grafana | 實時監控 | 1秒採集頻率 |
+
+**關鍵設計決策**:
+
+1. **為什麼使用雙層架構？**
+   - L1 (Redis): 處理 99% 的請求，極低延遲
+   - L2 (PostgreSQL): 確保數據持久化，支持審計和合規
+
+2. **為什麼需要分布式鎖？**
+   - 防止同一 Key 的並發請求同時執行（Race Condition）
+   - 後續請求等待首次執行完成，獲取相同結果
+
+3. **TTL 策略如何選擇？**
+   - 充值 24h：支付回調可能延遲
+   - 投注 5min：遊戲 Round 快速結束
+   - 提款 7days：風控審核期間用戶可能多次重試
 
 ---
 
@@ -967,6 +1182,148 @@ public Object waitForResult(String redisKey, long timeoutMs) {
     throw new BusinessException(IdempotencyErrorCode.WAIT_TIMEOUT);
 }
 ```
+
+#### 圖 7.1: 時序圖 - 客戶端重試場景下的冪等性處理
+
+> **說明**：此圖展示當客戶端因網絡延遲或用戶誤操作發送重複請求時，系統如何通過冪等性機制識別重複請求並返回首次執行的緩存結果。關鍵在於分布式鎖確保同一 Key 的並發請求串行執行，後續請求直接獲取首次執行的結果，避免重複扣款或重複操作。
+>
+> **關鍵要素**：
+> - 🔵 **請求 A**：首次請求，正常執行業務邏輯
+> - 🟡 **請求 B**：重試請求（相同 idempotency_key），等待或直接返回
+> - 🔒 **分布式鎖**：Redisson 鎖機制，防止並發執行
+> - ⏱️ **等待策略**：Spin-Wait 模式，後續請求輪詢等待結果
+>
+> **相關文檔**：參見 [§7.1 Race Condition 場景](#71-race-condition-場景)、[§7.2 分布式鎖方案](#72-解決方案-redisson-分布式鎖)、[§7.3 Spin-Wait 優化](#73-spin-wait-優化-可選)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor 用戶 as 用戶<br/>（網絡延遲，點擊 2 次）
+    participant 請求A as 請求 A<br/>(Thread-1)
+    participant AOP as AOP 攔截器
+    participant LOCK as Redisson<br/>分布式鎖
+    participant REDIS as Redis<br/>緩存層
+    participant SERVICE as Service<br/>業務邏輯
+    participant 請求B as 請求 B<br/>(Thread-2)
+
+    Note over 用戶,請求B: 場景：用戶點擊「充值 $100」按鈕 2 次<br/>idempotency_key = "uuid-abc123"
+
+    用戶->>請求A: 第 1 次點擊<br/>POST /deposit<br/>Key: uuid-abc123
+    activate 請求A
+
+    請求A->>AOP: 進入攔截器
+    activate AOP
+
+    AOP->>REDIS: 檢查 Key 是否存在<br/>GET idempotency:deposit:uuid-abc123
+    activate REDIS
+    REDIS-->>AOP: Key 不存在 (nil)
+    deactivate REDIS
+
+    AOP->>LOCK: 嘗試獲取分布式鎖<br/>tryLock("lock:uuid-abc123", 30s)
+    activate LOCK
+    LOCK-->>AOP: ✅ 鎖獲取成功
+    deactivate LOCK
+
+    AOP->>REDIS: 雙重檢查<br/>GET idempotency:deposit:uuid-abc123
+    activate REDIS
+    REDIS-->>AOP: 仍然不存在 (nil)
+    deactivate REDIS
+
+    AOP->>REDIS: 存儲 PROCESSING 狀態<br/>SET key {status: PROCESSING} TTL 24h
+    activate REDIS
+    REDIS-->>AOP: 存儲成功
+    deactivate REDIS
+
+    Note over 用戶,請求B: ⏱️ 此時用戶認為第 1 次點擊失敗，再次點擊
+
+    用戶->>請求B: 第 2 次點擊<br/>POST /deposit<br/>Key: uuid-abc123（相同！）
+    activate 請求B
+
+    請求B->>AOP: 進入攔截器（並發）
+
+    AOP->>REDIS: 檢查 Key 是否存在<br/>GET idempotency:deposit:uuid-abc123
+    activate REDIS
+    REDIS-->>AOP: ⚠️ Key 存在！<br/>{status: PROCESSING}
+    deactivate REDIS
+
+    Note over AOP,請求B: 檢測到重複請求，狀態為 PROCESSING
+
+    AOP->>LOCK: 嘗試獲取鎖<br/>tryLock("lock:uuid-abc123", 30s)
+    activate LOCK
+    Note over LOCK: 🔒 鎖已被請求 A 持有<br/>請求 B 進入等待隊列
+    LOCK-->>AOP: ⏳ 等待中...
+    deactivate LOCK
+
+    AOP->>SERVICE: 執行業務邏輯<br/>processDeposit(100 USD)
+    activate SERVICE
+
+    SERVICE->>SERVICE: 1. 調用支付網關<br/>2. 創建交易記錄<br/>3. 更新錢包餘額<br/>4. 記錄帳本分錄
+
+    SERVICE-->>AOP: ✅ 執行成功<br/>{balance: 1100, txId: 12345}
+    deactivate SERVICE
+
+    AOP->>REDIS: 存儲 SUCCESS 結果<br/>SET key {status: SUCCESS,<br/>result: {balance: 1100}} TTL 24h
+    activate REDIS
+    REDIS-->>AOP: 存儲成功
+    deactivate REDIS
+
+    AOP->>LOCK: 釋放分布式鎖<br/>unlock("lock:uuid-abc123")
+    activate LOCK
+    Note over LOCK: 🔓 鎖釋放，請求 B 被喚醒
+    LOCK-->>AOP: 鎖釋放成功
+    LOCK-->>請求B: ✅ 鎖獲取成功
+    deactivate LOCK
+
+    AOP-->>請求A: 返回成功結果
+    deactivate AOP
+
+    請求A-->>用戶: 200 OK<br/>{code: 1, data: {balance: 1100},<br/>msg: "充值成功"}
+    deactivate 請求A
+
+    Note over 請求B,REDIS: 請求 B 獲取鎖後執行雙重檢查
+
+    請求B->>REDIS: 雙重檢查 Redis<br/>GET idempotency:deposit:uuid-abc123
+    activate REDIS
+    REDIS-->>請求B: ✅ Key 已存在！<br/>{status: SUCCESS, result: {...}}
+    deactivate REDIS
+
+    Note over 請求B: 🎯 檢測到首次請求已完成<br/>直接返回緩存結果
+
+    請求B-->>用戶: 200 OK<br/>{code: 1, data: {balance: 1100},<br/>msg: "充值成功"}<br/>（與請求 A 完全相同）
+    deactivate 請求B
+
+    Note over 用戶,請求B: ✅ 冪等性保證：<br/>• 只執行了 1 次業務邏輯<br/>• 只扣款 $100（不是 $200）<br/>• 兩次請求返回相同結果<br/>• 後續請求延遲 < 100ms
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用
+- `虛線箭頭 (⇢)`: 返回值
+- `activate/deactivate`: 執行時間範圍
+- `autonumber`: 步驟自動編號
+- `Note over`: 關鍵說明注釋
+- `🔒 鎖圖標`: 分布式鎖狀態
+- `⏳ 等待圖標`: 阻塞等待
+- `✅ 成功標記`: 操作成功
+
+**重試場景對比**:
+
+| 場景 | 未實現冪等性 | 實現冪等性 |
+|-----|------------|----------|
+| **用戶操作** | 點擊「充值 $100」2 次 | 點擊「充值 $100」2 次 |
+| **請求到達** | 2 個請求都執行業務邏輯 | 第 1 個請求執行，第 2 個返回緩存 |
+| **支付通道** | 調用 2 次 Stripe API | 調用 1 次 Stripe API |
+| **錢包餘額** | ❌ 增加 $200（錯誤） | ✅ 增加 $100（正確） |
+| **用戶體驗** | 資金被重複扣款，投訴 | 正常充值，體驗良好 |
+| **系統日誌** | 創建 2 筆交易記錄 | 創建 1 筆交易記錄 |
+
+**性能指標**:
+
+| 指標 | 首次請求 | 重試請求 |
+|-----|---------|---------|
+| **執行時間** | 150-300ms（業務邏輯） | < 10ms（Redis 緩存讀取） |
+| **鎖等待時間** | 0ms（無等待） | 0-50ms（等待首次完成） |
+| **Redis 操作** | 2 次（檢查 + 存儲） | 1 次（檢查） |
+| **數據庫操作** | 3-5 次（交易 + 分錄） | 0 次 |
 
 ---
 

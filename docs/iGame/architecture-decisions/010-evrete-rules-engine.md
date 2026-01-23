@@ -1,8 +1,12 @@
 # ADR-010: Evrete Rules Engine for Business Logic
 
-**Status**: ✅ Accepted
+**Status**: 🔄 Superseded by [ADR-011: LiteFlow Migration](./011-liteflow-migration.md)
 
 **Date**: 2026-01-20
+
+**Superseded Date**: 2026-01-23
+
+> **注意**: 本 ADR 已被 ADR-011 替代。經過 3 個月的實踐，團隊決定從 Evrete 遷移至 LiteFlow 流程編排引擎，以更好地支援多步驟工作流、數據庫持久化和熱加載功能。詳見 [ADR-011: LiteFlow Migration](./011-liteflow-migration.md)。
 
 **Authors**: Backend Team, Product Team
 

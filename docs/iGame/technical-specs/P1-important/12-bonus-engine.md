@@ -18,7 +18,7 @@
 1. [Background & Strategic Context](#1-background--strategic-context)
 2. [Bonus Type Taxonomy](#2-bonus-type-taxonomy)
 3. [Wagering Requirements](#3-wagering-requirements)
-4. [Evrete Rules Engine](#4-evrete-rules-engine)
+4. [LiteFlow Rules Engine](#4-liteflow-rules-engine)
 5. [Database Schema Design](#5-database-schema-design)
 6. [SmartAdmin Implementation](#6-smartadmin-implementation)
 7. [Integration Points](#7-integration-points)
@@ -51,7 +51,7 @@
 **This Document Resolves**:
 - ✅ Complete bonus type taxonomy with eligibility rules
 - ✅ Wagering requirement tracking with game contribution weights
-- ✅ Evrete rules for automated bonus grants and abuse detection
+- ✅ LiteFlow rules for automated bonus grants and abuse detection
 - ✅ Multi-currency support with exchange rate handling
 
 ### 1.2 Key Requirements
@@ -299,11 +299,13 @@ private BigDecimal calculateWageringContribution(BigDecimal betAmount, GameType 
 
 ---
 
-## 4. Evrete Rules Engine
+## 4. LiteFlow Rules Engine
+
+> **重要更新（2026-01-23）**: 本系統已從 Evrete 遷移至 LiteFlow 流程編排引擎。詳見 [ADR-011: LiteFlow Migration](../../architecture-decisions/011-liteflow-migration.md)。
 
 ### 4.1 Bonus Eligibility Rules
 
-**Evrete Rules** (`BonusEligibilityRules.java`):
+**LiteFlow Chain Definition** (存儲在 PostgreSQL，支持熱加載):
 
 ```java
 public class BonusEligibilityRules {
@@ -478,7 +480,7 @@ public class BonusEligibilityRules {
 
 ### 4.2 Automatic Bonus Forfeiture Rules
 
-**Evrete Rules** (`BonusForfeitureRules.java`):
+**LiteFlow Chain** (過期和沒收流程):
 
 ```java
 public class BonusForfeitureRules {
@@ -1170,7 +1172,7 @@ public class BonusService {
      * Grant welcome bonus on first deposit
      */
     public void grantWelcomeBonus(Long playerId, BigDecimal depositAmount) {
-        // Check eligibility via Evrete rules
+        // Check eligibility via LiteFlow
         boolean eligible = eligibilityService.checkWelcomeBonusEligibility(playerId, depositAmount);
 
         if (!eligible) {

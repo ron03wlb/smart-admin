@@ -1,6 +1,6 @@
 # P0-01: 雙式記帳架構 (Double-Entry Ledger Schema)
 
-**文檔版本**: 2.0
+**文檔版本**: 2.1
 **狀態**: 📝 草稿 (Draft)
 **優先級**: P0 - 關鍵基礎 (Critical Foundation)
 **預估行數**: 1200-1500
@@ -9,6 +9,7 @@
 **最後更新**: 2026-01-23
 
 **變更歷史**:
+- v2.1 (2026-01-23): 新增 3 個 Mermaid 圖表 - 帳本分錄狀態機圖、玩家充值時序圖、對帳失敗補償流程圖
 - v2.0 (2026-01-23): 新增 2 個 Mermaid 圖表 - 數據庫 Schema ER 圖、日終對帳流程時序圖
 - v1.0.0 (2026-01-23): 初始版本完成
 
@@ -546,6 +547,74 @@ COMMENT ON COLUMN ledger_entries.entry_type IS '借方 (DEBIT) 或 貸方 (CREDI
 COMMENT ON COLUMN ledger_entries.amount IS '分錄金額,必須 > 0';
 ```
 
+#### 圖 5.1: 狀態機圖 - 帳本分錄生命週期
+
+> **說明**：此圖展示帳本分錄從創建到最終狀態的完整生命週期。分錄一旦創建即不可修改（不可變性原則），僅允許通過沖正操作進行補償。正常路徑為 PENDING → POSTED → RECONCILED，異常路徑則通過 REVERSED 狀態實現補償邏輯。
+>
+> **關鍵要素**：
+> - 🟢 **PENDING 狀態**：分錄已創建，等待交易確認
+> - 🔵 **POSTED 狀態**：交易已確認，分錄生效
+> - ✅ **RECONCILED 狀態**：已通過日終對帳驗證
+> - 🔴 **REVERSED 狀態**：分錄已沖正（補償操作）
+>
+> **相關文檔**：參見 [§3.3 強制約束](#33-強制約束-mandatory-constraints) 不可變性原則、[§7 對帳算法](#7-對帳算法-reconciliation-algorithm)
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: 創建分錄
+
+    PENDING --> POSTED: 交易確認成功
+    PENDING --> FAILED: 交易失敗
+
+    POSTED --> RECONCILED: 通過日終對帳
+    POSTED --> REVERSED: 需要沖正補償
+
+    RECONCILED --> [*]: 完成
+    FAILED --> [*]: 終止
+    REVERSED --> [*]: 沖正完成
+
+    note right of PENDING
+        等待交易確認
+        狀態特徵：
+        • 未計入餘額
+        • 可被取消
+    end note
+
+    note right of POSTED
+        分錄已生效
+        狀態特徵：
+        • 已計入帳戶餘額
+        • 不可修改，僅可沖正
+        • 參與實時對帳驗證
+    end note
+
+    note right of RECONCILED
+        最終狀態
+        狀態特徵：
+        • 已通過日終對帳
+        • 數學驗證完成
+        • 可用於財務報表
+    end note
+
+    note right of REVERSED
+        補償狀態
+        觸發條件：
+        • 業務邏輯錯誤
+        • 支付失敗退款
+        • 風控攔截退款
+        操作：創建反向分錄
+    end note
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 正常狀態轉換
+- `PENDING 狀態`: 初始等待狀態，交易未確認
+- `POSTED 狀態`: 分錄已生效，計入餘額
+- `RECONCILED 狀態`: 已通過對帳驗證的最終狀態
+- `REVERSED 狀態`: 補償路徑，通過反向分錄實現沖正
+
+---
+
 ### 5.5 數據庫初始化腳本
 
 ```sql
@@ -972,6 +1041,95 @@ public class PostingRuleFactory {
 }
 ```
 
+#### 圖 6.1: 時序圖 - 玩家充值完整流程
+
+> **說明**：此圖展示玩家發起充值請求後，系統協調錢包服務、帳本服務、支付網關三個組件的完整交互流程。關鍵點在於通過雙式記帳確保資金安全，並通過冪等性檢查防止重複扣款。整個流程在單一事務中執行，確保原子性。
+>
+> **關鍵要素**：
+> - 🟦 **藍色激活框**：服務執行時間
+> - 🟢 **綠色注釋**：事務邊界（BEGIN/COMMIT）
+> - ⚠️ **黃色注釋**：關鍵驗證點（冪等性、餘額、借貸平衡）
+> - 🔢 **自動編號**：步驟序號，便於追蹤調用順序
+>
+> **相關文檔**：參見 [§6.1 充值過帳規則](#61-充值-deposit)、[P0-02 冪等性架構](./02-idempotency-architecture.md)、[§9 並發控制](#9-並發控制-concurrency-control)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor 玩家 as 玩家
+    participant 錢包API as 錢包 API<br/>(Controller)
+    participant 錢包Service as 錢包 Service
+    participant 錢包Manager as 錢包 Manager
+    participant 帳本Manager as 帳本 Manager
+    participant 支付網關 as 第三方支付網關<br/>(Stripe)
+    participant 數據庫 as PostgreSQL
+
+    玩家->>錢包API: POST /wallet/deposit<br/>{amount: 100, currency: "USD",<br/>idempotencyKey: "uuid-123"}
+    activate 錢包API
+
+    錢包API->>錢包Service: deposit(request)
+    activate 錢包Service
+
+    錢包Service->>錢包Manager: processDeposit(request)
+    activate 錢包Manager
+
+    Note over 錢包Manager: ⚠️ 驗證冪等性 Key<br/>(Redis + Database)
+
+    錢包Manager->>支付網關: chargePayment(100 USD)
+    activate 支付網關
+    支付網關-->>錢包Manager: {status: SUCCESS,<br/>txId: "stripe-abc123"}
+    deactivate 支付網關
+
+    Note over 錢包Manager,數據庫: 🟢 BEGIN TRANSACTION
+
+    錢包Manager->>帳本Manager: createLedgerEntries(depositContext)
+    activate 帳本Manager
+
+    帳本Manager->>數據庫: INSERT INTO ledger_entries<br/>借: 第三方應收款-Stripe +100<br/>貸: 玩家錢包負債-USD +100
+    activate 數據庫
+    數據庫-->>帳本Manager: 成功
+    deactivate 數據庫
+
+    Note over 帳本Manager: ⚠️ 驗證借貸平衡<br/>Sum(Debits) = Sum(Credits)
+
+    帳本Manager-->>錢包Manager: 分錄創建成功
+    deactivate 帳本Manager
+
+    錢包Manager->>數據庫: UPDATE wallets<br/>SET balance = balance + 100,<br/>version = version + 1<br/>WHERE user_id = ? AND version = ?
+    activate 數據庫
+    數據庫-->>錢包Manager: 更新成功 (1 row affected)
+    deactivate 數據庫
+
+    錢包Manager->>數據庫: INSERT INTO transactions<br/>(type: DEPOSIT, status: SUCCESS,<br/>idempotency_key: "uuid-123")
+    activate 數據庫
+    數據庫-->>錢包Manager: 交易記錄已保存
+    deactivate 數據庫
+
+    Note over 錢包Manager,數據庫: 🟢 COMMIT TRANSACTION
+
+    錢包Manager-->>錢包Service: DepositResult<br/>{newBalance: 1100, txId}
+    deactivate 錢包Manager
+
+    錢包Service-->>錢包API: ResponseDTO.ok(result)
+    deactivate 錢包Service
+
+    錢包API-->>玩家: 200 OK<br/>{code: 1,<br/>data: {balance: 1100},<br/>msg: "充值成功"}
+    deactivate 錢包API
+
+    Note over 玩家,數據庫: ✅ 原子性保證：帳本分錄與錢包餘額在同一事務
+    Note over 玩家,數據庫: ✅ 數學驗證：Sum(Debits) = Sum(Credits) = 100 USD
+    Note over 玩家,數據庫: ✅ 冪等性保證：重複請求返回相同結果
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用（阻塞等待響應）
+- `虛線箭頭 (⇢)`: 返回值
+- `activate/deactivate`: 服務/方法執行時間範圍
+- `autonumber`: 自動步驟編號
+- `Note over`: 關鍵說明注釋
+- `🟢 綠色注釋`: 事務邊界標記
+- `⚠️ 黃色警告`: 關鍵驗證點
+
 ---
 
 ## 7. 對帳算法 (Reconciliation Algorithm)
@@ -1306,6 +1464,109 @@ sequenceDiagram
   "duration": "12.3s"
 }
 ```
+
+#### 圖 7.1: 流程圖 - 日終對帳失敗補償機制
+
+> **說明**：此圖展示當日終對帳發現帳目不平衡時的 Circuit Breaker 自動補償機制。系統會根據誤差大小採取不同級別的應對策略，從自動修復到人工介入，確保資金安全的同時保持系統可用性。關鍵閾值為 $0.01，超過此值將觸發熔斷機制。
+>
+> **關鍵要素**：
+> - 🟢 **綠色路徑**：正常流程，對帳通過
+> - 🟡 **黃色路徑**：可容忍誤差（≤ $0.01），記錄日誌後繼續
+> - 🔴 **紅色路徑**：嚴重誤差（> $0.01），觸發熔斷機制
+> - ⚠️ **關鍵決策點**：誤差閾值判斷、人工審核分支
+>
+> **相關文檔**：參見 [§7.3 日終對帳算法](#73-日終對帳算法)、[§7.5 Circuit Breaker 機制](#75-circuit-breaker-機制)、[§12 運營與監控](#12-運營與監控-operations--monitoring)
+
+```mermaid
+flowchart TD
+    START([開始：日終對帳作業<br/>每日 23:59 執行]) --> VALIDATE_EQUATION{驗證會計恆等式<br/>Assets = Liabilities + Equity}
+
+    VALIDATE_EQUATION -->|計算誤差| CALCULATE[計算總誤差<br/>variance = |leftSide - rightSide|]
+
+    CALCULATE --> CHECK_THRESHOLD{誤差是否<br/>≤ $0.01?}
+
+    CHECK_THRESHOLD -->|是：誤差 = 0| PASS_ZERO[✅ 對帳通過<br/>狀態: SUCCESS]
+    CHECK_THRESHOLD -->|是：0 < 誤差 ≤ $0.01| PASS_MINOR[⚠️ 可容忍誤差<br/>狀態: SUCCESS_WITH_WARNING]
+    CHECK_THRESHOLD -->|否：誤差 > $0.01| FAIL[❌ 對帳失敗<br/>狀態: FAILED]
+
+    PASS_ZERO --> LOG_SUCCESS[記錄成功日誌]
+    PASS_MINOR --> LOG_WARNING[記錄警告日誌<br/>包含誤差詳情]
+
+    LOG_SUCCESS --> GENERATE_REPORT[生成對帳報告]
+    LOG_WARNING --> GENERATE_REPORT
+
+    GENERATE_REPORT --> NORMAL_CUTOFF[執行正常日切<br/>允許新交易]
+    NORMAL_CUTOFF --> END([結束：系統正常運行])
+
+    FAIL --> TRIGGER_BREAKER[🔴 觸發 Circuit Breaker]
+
+    TRIGGER_BREAKER --> FREEZE[凍結所有交易<br/>阻止新充值/提款]
+
+    FREEZE --> ALERT_TEAM[發送緊急告警<br/>• Slack 通知<br/>• Email 通知<br/>• 電話告警]
+
+    ALERT_TEAM --> DETAILED_ANALYSIS[執行詳細分析]
+
+    DETAILED_ANALYSIS --> ANALYSIS_TASKS[分析任務:<br/>1. 檢查異常大額交易<br/>2. 驗證分錄完整性<br/>3. 對比外部對帳單<br/>4. 檢查系統日誌]
+
+    ANALYSIS_TASKS --> IDENTIFY_CAUSE{是否找到<br/>根本原因?}
+
+    IDENTIFY_CAUSE -->|是| CAUSE_TYPE{誤差類型?}
+
+    CAUSE_TYPE -->|系統 Bug| FIX_BUG[修復代碼 Bug<br/>部署補丁]
+    CAUSE_TYPE -->|數據錯誤| CREATE_REVERSAL[創建沖正分錄<br/>手動調整餘額]
+    CAUSE_TYPE -->|外部問題| CONTACT_EXTERNAL[聯繫第三方<br/>確認交易狀態]
+
+    FIX_BUG --> RERUN_RECONCILIATION[重新執行對帳]
+    CREATE_REVERSAL --> RERUN_RECONCILIATION
+    CONTACT_EXTERNAL --> WAIT_RESPONSE[等待外部響應]
+
+    WAIT_RESPONSE --> RERUN_RECONCILIATION
+
+    RERUN_RECONCILIATION --> VERIFY{再次驗證<br/>是否平衡?}
+
+    VERIFY -->|是| MANUAL_APPROVE[人工審核確認]
+    VERIFY -->|否| ESCALATE[升級處理<br/>聯繫技術總監]
+
+    MANUAL_APPROVE --> UNFREEZE[解除交易凍結<br/>恢復系統運行]
+    UNFREEZE --> DOCUMENT[記錄事故報告<br/>更新 Runbook]
+    DOCUMENT --> END
+
+    ESCALATE --> MANUAL_INTERVENTION[深度人工介入<br/>可能需要停機維護]
+    MANUAL_INTERVENTION --> END
+
+    IDENTIFY_CAUSE -->|否| MANUAL_REVIEW[需要深度人工審核<br/>逐筆核對分錄]
+    MANUAL_REVIEW --> MANUAL_INTERVENTION
+
+    style START fill:#90EE90
+    style END fill:#FFB6C1
+    style PASS_ZERO fill:#87CEEB
+    style PASS_MINOR fill:#FFD700
+    style FAIL fill:#FF6B6B
+    style TRIGGER_BREAKER fill:#FF6B6B
+    style FREEZE fill:#FF6B6B
+    style ALERT_TEAM fill:#FFA500
+    style MANUAL_APPROVE fill:#87CEEB
+    style UNFREEZE fill:#90EE90
+```
+
+**圖例 (Legend)**:
+- `圓角矩形`: 開始/結束節點
+- `菱形`: 決策分支點
+- `矩形`: 處理步驟
+- `實線箭頭 (→)`: 流程方向
+- `🟢 綠色節點`: 正常流程
+- `🟡 黃色節點`: 警告狀態
+- `🔴 紅色節點`: 錯誤/熔斷狀態
+- `🟦 藍色節點`: 恢復狀態
+
+**補償策略說明**:
+
+| 誤差範圍 | 處理策略 | 系統行為 | 恢復時間 |
+|---------|---------|---------|---------|
+| **= $0** | ✅ 正常日切 | 無影響 | N/A |
+| **0 < 誤差 ≤ $0.01** | ⚠️ 記錄警告 | 允許新交易，增加監控 | N/A |
+| **$0.01 < 誤差 ≤ $1** | 🔴 輕度熔斷 | 凍結新交易，保留查詢 | 2-4 小時 |
+| **誤差 > $1** | 🔴 完全熔斷 | 全部凍結 + 緊急響應 | 4-24 小時 |
 
 ---
 

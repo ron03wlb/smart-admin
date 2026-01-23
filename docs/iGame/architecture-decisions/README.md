@@ -2,7 +2,7 @@
 
 **最後更新**: 2026-01-23
 **狀態**: 啟用中
-**ADR 總數**: 12
+**ADR 總數**: 12 (1 個已替代)
 **版本**: 2.0
 
 ---
@@ -42,13 +42,13 @@
 |---|------|------|---------|
 | [ADR-008](./008-adapter-pattern-game-provider-integration.md) | 適配器模式整合遊戲供應商 | ✅ 已採納 | P1-09 |
 | [ADR-009](./009-strapi-headless-cms.md) | Strapi 無頭 CMS 平台 | ✅ 已採納 | P1-10 |
-| [ADR-010](./010-evrete-rules-engine.md) | Evrete 規則引擎處理業務邏輯 | ✅ 已採納 | P1-11, P1-12 |
+| [ADR-010](./010-evrete-rules-engine.md) | Evrete 規則引擎處理業務邏輯 | 🔄 已替代 | 被 ADR-011 取代 |
+| [ADR-011](./011-liteflow-migration.md) | LiteFlow 流程編排引擎遷移 | ✅ 已採納 | P1-11, P1-12, P0-04, P1-06 |
 
 ### 基礎設施架構
 
 | # | 標題 | 狀態 | 相關文檔 |
 |---|------|------|---------|
-| [ADR-011](./011-minio-object-storage.md) | MinIO S3 兼容對象存儲 | ✅ 已採納 | P2-19 |
 | [ADR-012](./012-token-bucket-rate-limiting.md) | 基於 Redisson 的令牌桶限流 | ✅ 已採納 | P2-23 |
 
 ---
@@ -172,12 +172,12 @@ stateDiagram-v2
 **玩家體驗**:
 - [ADR-008: 遊戲供應商適配器](./008-adapter-pattern-game-provider-integration.md) - <2 秒遊戲啟動
 - [ADR-009: 無頭 CMS](./009-strapi-headless-cms.md) - 多品牌支持
-- [ADR-010: 規則引擎](./010-evrete-rules-engine.md) - 個性化優惠
+- [ADR-011: LiteFlow 流程編排](./011-liteflow-migration.md) - 工作流自動化與個性化優惠
 
 **營運效率**:
 - [ADR-005: OLAP 分析](./005-apache-doris-olap-engine.md) - 實時商業智能
 - [ADR-007: Flink 處理](./007-flink-real-time-stream-processing.md) - <5 分鐘數據新鮮度
-- [ADR-011: MinIO 存儲](./011-minio-object-storage.md) - 相比 AWS S3 節省 70% 成本
+- [ADR-011: LiteFlow 流程編排](./011-liteflow-migration.md) - 規則修改週期從 3 天縮短到 30 分鐘
 
 ---
 
@@ -188,6 +188,7 @@ stateDiagram-v2
 1. 複製 [TEMPLATE.md](./TEMPLATE.md) 模板
 2. 填寫所有章節（情境、決策、結果、替代方案）
 3. 依序編號（下一個可用編號: ADR-013）
+   - 注意：ADR-011 已用於 LiteFlow Migration（2026-01-23）
 4. 提交給架構團隊審查
 5. 批准後更新本索引文件
 
@@ -205,5 +206,6 @@ stateDiagram-v2
 
 | 版本 | 日期 | 變更說明 |
 |------|------|---------|
+| 2.1 | 2026-01-23 | 新增 ADR-011 (LiteFlow Migration)，ADR-010 標記為已替代 |
 | 2.0 | 2026-01-23 | 翻譯為繁體中文，添加 Mermaid ADR 生命週期狀態圖 |
 | 1.0 | 2026-01-20 | 初始英文版本，12 個 ADR 索引 |
