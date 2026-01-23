@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: 異常處理與日誌規範 - SLF4J、異常鏈
+description: Exception Handling and Logging Rules - SLF4J, Exception Chain
 tags: [exception-handling, logging, slf4j]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -12,105 +12,105 @@ related_rules:
 last_updated: 2025-01-21
 ---
 
-# 異常日誌規範
+# Exception and Logging Rules
 
-## 【強制】異常處理
+## 【Mandatory】Exception Handling
 
-### 1. 禁止捕獲 RuntimeException 做流程控制
+### 1. Prohibit Catching RuntimeException for Flow Control
 ```java
-// ❌ 錯誤
+// ❌ Incorrect
 try {
     obj.method();
 } catch (NullPointerException e) {
-    // 用異常做流程控制
+    // Using exception for flow control
 }
 
-// ✅ 正確
+// ✅ Correct
 if (obj != null) {
     obj.method();
 }
 ```
 
-### 2. 禁止空 catch 塊
+### 2. Prohibit Empty Catch Blocks
 ```java
-// ❌ 錯誤 - 吞掉異常
+// ❌ Incorrect - Swallowing exception
 try {
     riskyOperation();
 } catch (Exception e) {
-    // 空的
+    // Empty
 }
 
-// ✅ 正確
+// ✅ Correct
 try {
     riskyOperation();
 } catch (Exception e) {
-    log.error("操作失敗, context={}", context, e);
-    throw new ServiceException("操作失敗", e);
+    log.error("Operation failed, context={}", context, e);
+    throw new ServiceException("Operation failed", e);
 }
 ```
 
 ### 3. try-with-resources
 ```java
-// ✅ 正確 (Java 7+)
+// ✅ Correct (Java 7+)
 try (InputStream is = new FileInputStream(file);
      BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
     return br.readLine();
 }
 
-// ❌ 錯誤 - 可能資源洩漏
+// ❌ Incorrect - Possible resource leak
 InputStream is = new FileInputStream(file);
 String line = new BufferedReader(new InputStreamReader(is)).readLine();
-is.close();  // 若上一行拋異常，永遠不會執行
+is.close();  // Will never execute if above line throws exception
 ```
 
-### 4. 事務回滾
+### 4. Transaction Rollback
 ```java
-// ✅ 正確 - 明確指定回滾異常
+// ✅ Correct - Explicitly specify rollback exception
 @Transactional(rollbackFor = Exception.class)
 public void createOrder(OrderDTO dto) {
     // ...
 }
 
-// ❌ 錯誤 - 默認只回滾 RuntimeException
+// ❌ Incorrect - Default only rolls back RuntimeException
 @Transactional
 public void createOrder(OrderDTO dto) throws IOException {
-    // IOException 不會回滾
+    // IOException will not rollback
 }
 ```
 
-## 【強制】日誌規範
+## 【Mandatory】Logging Rules
 
-### 1. 使用 SLF4J 門面
+### 1. Use SLF4J Facade
 ```java
-// ✅ 正確
+// ✅ Correct
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-// ❌ 錯誤 - 直接使用實現
+// ❌ Incorrect - Direct use of implementation
 import org.apache.log4j.Logger;
 ```
 
-### 2. 佔位符方式
+### 2. Placeholder Style
 ```java
-// ✅ 正確 - 使用佔位符
+// ✅ Correct - Use placeholders
 log.debug("Processing trade id={}, symbol={}", id, symbol);
 
-// ✅ 正確 - 條件輸出（性能敏感場景）
+// ✅ Correct - Conditional output (performance sensitive scenario)
 if (log.isDebugEnabled()) {
     log.debug("Heavy operation result: " + computeExpensive());
 }
 
-// ❌ 錯誤 - 字符串拼接
+// ❌ Incorrect - String concatenation
 log.debug("Processing trade id=" + id + ", symbol=" + symbol);
 ```
 
-### 3. 異常日誌完整性
+### 3. Exception Log Completeness
 ```java
-// ✅ 正確 - 包含上下文和堆棧
-log.error("訂單創建失敗, userId={}, orderId={}", userId, orderId, e);
+// ✅ Correct - Include context and stack trace
+log.error("Order creation failed, userId={}, orderId={}", userId, orderId, e);
 
-// ❌ 錯誤 - 只打印消息
-log.error("訂單創建失敗: " + e.getMessage());
+// ❌ Incorrect - Only print message
+log.error("Order creation failed: " + e.getMessage());
 ```

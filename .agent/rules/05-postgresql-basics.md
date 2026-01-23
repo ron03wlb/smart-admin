@@ -1,44 +1,44 @@
 ---
 trigger: always_on
-description: PostgreSQL 建表與索引規範
+description: PostgreSQL Table Creation and Index Rules
 tags: [postgresql, database, schema, indexes]
 positioning: ideal
 last_updated: 2025-01-12
 ---
 
-# PostgreSQL 建表與索引規範
+# PostgreSQL Table Creation and Index Rules
 
-**TL;DR**: PostgreSQL 建表必須包含審計字段（created_at/updated_at/deleted_at），使用 BIGSERIAL 主鍵、TIMESTAMPTZ 時間戳、JSONB 存儲非結構化數據。索引選擇 B-Tree（默認）、GIN（JSONB/數組）、BRIN（時序數據）、部分索引（活躍數據）。
+**TL;DR**: PostgreSQL table creation must include audit fields (created_at/updated_at/deleted_at), use BIGSERIAL primary key, TIMESTAMPTZ timestamp, JSONB for unstructured data. Index selection: B-Tree (default), GIN (JSONB/array), BRIN (time-series data), partial index (active data).
 
-**定位說明**: 本規範是 PostgreSQL 開發的基礎，適用於所有數據庫設計場景。高級特性（JSONB、CTE、窗口函數）見 `05-postgresql-advanced.md`，MyBatis 整合見 `05-postgresql-mybatis-integration.md`。
+**Positioning**: This specification is the foundation for PostgreSQL development, applicable to all database design scenarios. Advanced features (JSONB, CTE, Window Functions) see `05-postgresql-advanced.md`, MyBatis integration see `05-postgresql-mybatis-integration.md`.
 
 ---
 
-## 【強制】建表規範
+## 【Mandatory】Table Creation Rules
 
-### 1. 必備字段
+### 1. Required Fields
 
-每張表必須包含以下字段：
+Every table must include the following fields:
 
 ```sql
 CREATE TABLE t_user (
-    id BIGSERIAL PRIMARY KEY,  -- PostgreSQL 自增主鍵
+    id BIGSERIAL PRIMARY KEY,  -- PostgreSQL auto-increment primary key
 
-    -- 業務字段 --
+    -- Business fields --
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
 
-    -- 審計字段 --
+    -- Audit fields --
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ,  -- 軟刪除（NULL 表示未刪除）
+    deleted_at TIMESTAMPTZ,  -- Soft delete (NULL means not deleted)
     created_by BIGINT,
     updated_by BIGINT,
 
     CONSTRAINT uk_user_email UNIQUE (email)
 );
 
--- 自動更新 updated_at 觸發器
+-- Auto-update updated_at trigger
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -53,174 +53,174 @@ CREATE TRIGGER update_user_modtime
     EXECUTE FUNCTION update_modified_column();
 ```
 
-**字段說明**:
-- `id`: 使用 `BIGSERIAL`（等價於 `BIGINT` + `AUTO_INCREMENT`）
-- `created_at/updated_at`: 使用 `TIMESTAMPTZ`（帶時區時間戳）
-- `deleted_at`: 軟刪除字段，NULL 表示未刪除
+**Field Description**:
+- `id`: Use `BIGSERIAL` (equivalent to `BIGINT` + `AUTO_INCREMENT`)
+- `created_at/updated_at`: Use `TIMESTAMPTZ` (timestamp with timezone)
+- `deleted_at`: Soft delete field, NULL means not deleted
 
-### 2. 命名規範
+### 2. Naming Convention
 
-| 類型     | 規範              | 正例                      | 反例                  |
-| -------- | ----------------- | ------------------------- | --------------------- |
-| 表名     | 小寫+下劃線，單數 | `t_user`, `t_order_item`  | `Users`, `orderItems` |
-| 字段名   | 小寫+下劃線       | `user_name`, `created_at` | `userName`            |
-| 布爾字段 | is_xxx            | `is_deleted`, `is_active` | `deleted`, `active`   |
-| 索引命名 | 見索引規範        | `idx_user_email`          | `index1`              |
+| Type          | Convention             | Correct                   | Incorrect             |
+| ------------- | ---------------------- | ------------------------- | --------------------- |
+| Table Name    | lowercase+underscore, singular | `t_user`, `t_order_item`  | `Users`, `orderItems` |
+| Field Name    | lowercase+underscore   | `user_name`, `created_at` | `userName`            |
+| Boolean Field | is_xxx                 | `is_deleted`, `is_active` | `deleted`, `active`   |
+| Index Naming  | See index rules        | `idx_user_email`          | `index1`              |
 
-### 3. 類型選擇（PostgreSQL 專用）
+### 3. Type Selection (PostgreSQL-Specific)
 
 ```sql
--- ✅ 正確 - 使用 PostgreSQL 優勢類型
+-- ✅ Correct - Use PostgreSQL advantage types
 CREATE TABLE t_product (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
-    price NUMERIC(10,2) NOT NULL,          -- 精確數值（金額）
-    status SMALLINT DEFAULT 0,             -- 狀態碼（2字節）
-    description TEXT,                      -- 不限長度文本
-    tags TEXT[],                           -- 數組類型
-    metadata JSONB,                        -- JSON 存儲
-    ip_address INET,                       -- IP 地址
-    created_at TIMESTAMPTZ DEFAULT NOW(),  -- 帶時區時間戳
-    valid_period DATERANGE                 -- 日期範圍
+    price NUMERIC(10,2) NOT NULL,          -- Exact numeric (amount)
+    status SMALLINT DEFAULT 0,             -- Status code (2 bytes)
+    description TEXT,                      -- Unlimited text
+    tags TEXT[],                           -- Array type
+    metadata JSONB,                        -- JSON storage
+    ip_address INET,                       -- IP address
+    created_at TIMESTAMPTZ DEFAULT NOW(),  -- Timestamp with timezone
+    valid_period DATERANGE                 -- Date range
 );
 ```
 
-**類型映射建議**:
-- 整數: `SMALLINT` (2字節) / `INTEGER` (4字節) / `BIGINT` (8字節)
-- 精確數值: `NUMERIC(precision, scale)`
-- 文本: `VARCHAR(n)` / `TEXT`（無長度限制）
-- 時間: `TIMESTAMPTZ`（帶時區） / `DATE` / `TIME`
-- 布爾: `BOOLEAN`
-- JSON: `JSONB`（推薦，支持索引） / `JSON`
-- 數組: `type[]` 如 `TEXT[]`, `INTEGER[]`
+**Type Mapping Recommendations**:
+- Integer: `SMALLINT` (2 bytes) / `INTEGER` (4 bytes) / `BIGINT` (8 bytes)
+- Exact Numeric: `NUMERIC(precision, scale)`
+- Text: `VARCHAR(n)` / `TEXT` (no length limit)
+- Time: `TIMESTAMPTZ` (with timezone) / `DATE` / `TIME`
+- Boolean: `BOOLEAN`
+- JSON: `JSONB` (recommended, supports indexing) / `JSON`
+- Array: `type[]` such as `TEXT[]`, `INTEGER[]`
 
 ---
 
-## 【強制】索引規範
+## 【Mandatory】Index Rules
 
-### 1. 索引命名
+### 1. Index Naming
 
-- 主鍵: `pk_tablename` 或 默認（系統生成）
-- 唯一索引: `uk_tablename_columnname`
-- 普通索引: `idx_tablename_columnname`
-- 外鍵索引: `fk_tablename_columnname`
+- Primary Key: `pk_tablename` or default (system generated)
+- Unique Index: `uk_tablename_columnname`
+- Regular Index: `idx_tablename_columnname`
+- Foreign Key Index: `fk_tablename_columnname`
 
-### 2. PostgreSQL 索引類型
+### 2. PostgreSQL Index Types
 
-#### 2.1 B-Tree（默認，大多數場景）
+#### 2.1 B-Tree (Default, Most Scenarios)
 
 ```sql
--- 適用於: 等值查詢、範圍查詢、排序
+-- Suitable for: Equality queries, range queries, sorting
 CREATE INDEX idx_user_email ON t_user(email);
 CREATE INDEX idx_order_created ON t_order(created_at);
 
--- 聯合索引
+-- Composite index
 CREATE INDEX idx_order_user_status ON t_order(user_id, status, created_at);
 ```
 
-#### 2.2 GIN（JSONB、數組、全文搜索）
+#### 2.2 GIN (JSONB, Array, Full-Text Search)
 
 ```sql
--- JSONB 索引
+-- JSONB index
 CREATE INDEX idx_order_items ON t_order USING GIN(items);
 CREATE INDEX idx_metadata ON t_order USING GIN(metadata jsonb_path_ops);
 
--- 數組索引
+-- Array index
 CREATE INDEX idx_article_tags ON t_article USING GIN(tags);
 
--- 全文搜索索引
+-- Full-text search index
 CREATE INDEX idx_article_search ON t_article USING GIN(search_vector);
 ```
 
-#### 2.3 GiST（地理位置、範圍類型）
+#### 2.3 GiST (Geolocation, Range Types)
 
 ```sql
--- 地理位置索引（需要 PostGIS 擴展）
+-- Geolocation index (requires PostGIS extension)
 CREATE INDEX idx_store_location ON t_store USING GIST(location);
 
--- 範圍類型索引
+-- Range type index
 CREATE INDEX idx_event_period ON t_event USING GIST(valid_period);
 ```
 
-#### 2.4 BRIN（大表且數據有序）
+#### 2.4 BRIN (Large Tables with Ordered Data)
 
 ```sql
--- 適用於: 時間序列數據、日誌表
+-- Suitable for: Time-series data, log tables
 CREATE INDEX idx_log_created ON t_log USING BRIN(created_at);
 ```
 
-#### 2.5 部分索引（僅索引活躍數據）
+#### 2.5 Partial Index (Index Active Data Only)
 
 ```sql
--- 僅索引未刪除的數據
+-- Index only non-deleted data
 CREATE INDEX idx_active_users ON t_user(email)
 WHERE deleted_at IS NULL AND status = 'ACTIVE';
 
--- 僅索引最近一年的訂單
+-- Index only recent year orders
 CREATE INDEX idx_recent_orders ON t_order(user_id, created_at)
 WHERE created_at > NOW() - INTERVAL '1 year';
 ```
 
-#### 2.6 表達式索引
+#### 2.6 Expression Index
 
 ```sql
--- 小寫郵箱索引
+-- Lowercase email index
 CREATE INDEX idx_user_lower_email ON t_user(LOWER(email));
 
--- JSON 字段提取索引
+-- JSON field extraction index
 CREATE INDEX idx_order_user_id ON t_order((metadata->>'user_id'));
 ```
 
-### 3. 聯合索引設計
+### 3. Composite Index Design
 
 ```sql
--- 查詢: WHERE status=? AND type=? ORDER BY created_at
--- ✅ 正確順序：等值查詢在前，範圍/排序在後
+-- Query: WHERE status=? AND type=? ORDER BY created_at
+-- ✅ Correct order: Equality query first, range/sort last
 CREATE INDEX idx_order_status_type_created
 ON t_order(status, type, created_at);
 ```
 
-**最左前綴原則**:
+**Leftmost Prefix Principle**:
 
 ```sql
--- 索引: idx_a_b_c (a, b, c)
+-- Index: idx_a_b_c (a, b, c)
 
--- ✅ 可以使用索引
+-- ✅ Can use index
 WHERE a = 1
 WHERE a = 1 AND b = 2
 WHERE a = 1 AND b = 2 AND c = 3
 
--- ❌ 無法使用索引
-WHERE b = 2           -- 缺少 a
-WHERE b = 2 AND c = 3 -- 缺少 a
-WHERE a = 1 AND c = 3 -- 跳過 b，只能用 a
+-- ❌ Cannot use index
+WHERE b = 2           -- Missing a
+WHERE b = 2 AND c = 3 -- Missing a
+WHERE a = 1 AND c = 3 -- Skip b, only uses a
 ```
 
 ---
 
-## 檢查清單
+## Checklist
 
-**建表規範**:
-- ✅ 使用 BIGSERIAL 主鍵
-- ✅ 時間字段使用 TIMESTAMPTZ
-- ✅ 添加 created_at/updated_at 觸發器
-- ✅ 表名、字段名小寫+下劃線
-- ✅ 金額使用 NUMERIC 類型
-- ✅ 軟刪除使用 deleted_at (TIMESTAMPTZ)
+**Table Creation Rules**:
+- ✅ Use BIGSERIAL primary key
+- ✅ Time fields use TIMESTAMPTZ
+- ✅ Add created_at/updated_at trigger
+- ✅ Table name, field name lowercase+underscore
+- ✅ Amount uses NUMERIC type
+- ✅ Soft delete uses deleted_at (TIMESTAMPTZ)
 
-**索引優化**:
-- ✅ 選擇正確的索引類型（B-Tree/GIN/BRIN）
-- ✅ 部分索引減少索引大小
-- ✅ 聯合索引遵循最左前綴原則
-- ✅ JSONB/數組使用 GIN 索引
-- ✅ 時序數據使用 BRIN 索引
-- ✅ 活躍數據使用部分索引
+**Index Optimization**:
+- ✅ Select correct index type (B-Tree/GIN/BRIN)
+- ✅ Partial index reduces index size
+- ✅ Composite index follows leftmost prefix principle
+- ✅ JSONB/array uses GIN index
+- ✅ Time-series data uses BRIN index
+- ✅ Active data uses partial index
 
 ---
 
-## 相關規範
+## Related Rules
 
-- **高級特性**: [rules/05-postgresql-advanced.md](./05-postgresql-advanced.md) - JSONB、數組、CTE、窗口函數
-- **MyBatis 整合**: [rules/05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md) - SQL 優化、遷移指南
-- **MyBatis Plus**: [rules/09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - 核心配置
-- **Vavr 整合**: [rules/08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md) - 函數式查詢
+- **Advanced Features**: [rules/05-postgresql-advanced.md](./05-postgresql-advanced.md) - JSONB, Array, CTE, Window Functions
+- **MyBatis Integration**: [rules/05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md) - SQL Optimization, Migration Guide
+- **MyBatis Plus**: [rules/09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - Core Configuration
+- **Vavr Integration**: [rules/08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md) - Functional Query

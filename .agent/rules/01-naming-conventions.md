@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: 命名規範（類、方法、變量、常量）
+description: Naming Convention (Classes, Methods, Variables, Constants)
 tags: [naming, code-style, alibaba-java-coding-guidelines]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -17,144 +17,144 @@ spotbugs_rule: none
 last_updated: 2025-01-13
 ---
 
-# 命名規範 (基於阿里巴巴黃山版)
+# Naming Convention (Based on Alibaba Java Coding Guidelines)
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Instructions Block
 
-### 何時應用此規則
-- ✅ **永遠**: 生成任何 Java 代碼時都必須遵守命名規範
-- ✅ Code Review 時檢查命名是否規範
-- ✅ 檢測到不規範的命名（如 userService 作為類名）
-- ✅ 檢測到魔法數字（應該定義為常量）
+### When to Apply This Rule
+- ✅ **Always**: Must follow naming conventions when generating any Java code
+- ✅ Check naming convention during Code Review
+- ✅ Detected non-compliant naming (e.g., userService as a class name)
+- ✅ Detected magic numbers (should be defined as constants)
 
-### 強制執行檢查清單
-生成或審查代碼時，必須確認：
-- [ ] 類名使用 **UpperCamelCase**（如 UserService）
-- [ ] 方法名和變量名使用 **lowerCamelCase**（如 getUserById）
-- [ ] 常量使用 **UPPER_SNAKE_CASE**（如 MAX_RETRY_COUNT）
-- [ ] Boolean 變量/字段不使用 **is** 前綴（POJO 類中）
-- [ ] 集合變量使用複數形式（如 users, orderList）
-- [ ] Service/DAO 方法前綴正確（get/list/count/save/delete/update）
+### Mandatory Enforcement Checklist
+When generating or reviewing code, must confirm:
+- [ ] Class names use **UpperCamelCase** (e.g., UserService)
+- [ ] Method names and variable names use **lowerCamelCase** (e.g., getUserById)
+- [ ] Constants use **UPPER_SNAKE_CASE** (e.g., MAX_RETRY_COUNT)
+- [ ] Boolean variables/fields do not use **is** prefix (in POJO classes)
+- [ ] Collection variables use plural form (e.g., users, orderList)
+- [ ] Service/DAO method prefixes are correct (get/list/count/save/delete/update)
 
-### AI 決策樹
+### AI Decision Tree
 ```
-命名檢查流程:
-  ├─ 1️⃣ 識別代碼元素類型
-  │   ├─ 類/接口? → UpperCamelCase
-  │   ├─ 方法/變量? → lowerCamelCase
-  │   ├─ 常量? → UPPER_SNAKE_CASE
-  │   └─ 包名? → lowercase（單數）
+Naming Check Flow:
+  ├─ 1️⃣ Identify Code Element Type
+  │   ├─ Class/Interface? → UpperCamelCase
+  │   ├─ Method/Variable? → lowerCamelCase
+  │   ├─ Constant? → UPPER_SNAKE_CASE
+  │   └─ Package Name? → lowercase (singular)
   │
-  ├─ 2️⃣ 檢查特殊規則
-  │   ├─ Boolean 字段? → 不用 is 前綴
-  │   ├─ 集合? → 使用複數
-  │   ├─ Service 方法? → 檢查前綴
-  │   └─ Controller/Service/Dao? → 檢查後綴
+  ├─ 2️⃣ Check Special Rules
+  │   ├─ Boolean Field? → No is prefix
+  │   ├─ Collection? → Use plural
+  │   ├─ Service Method? → Check prefix
+  │   └─ Controller/Service/Dao? → Check suffix
   │
-  └─ 3️⃣ 運行自動檢查
+  └─ 3️⃣ Run Automatic Checks
       ├─ Checkstyle: mvn checkstyle:check
       └─ ArchUnit: mvn test -Dtest=ArchitectureTest#controllerNaming
 ```
 
-### 錯誤模式檢測與自動修正
+### Error Pattern Detection and Auto-Fix
 
-#### 模式 1: 類名不規範
+#### Pattern 1: Non-Compliant Class Names
 ```java
-// ❌ 檢測到錯誤
-public class userService { } // 應該首字母大寫
-public class Userdao { }     // 應該是 UserDao（駝峰）
-public class USER_ENTITY { } // 不應該全大寫
+// ❌ Detected Error
+public class userService { } // Should start with uppercase
+public class Userdao { }     // Should be UserDao (camelCase)
+public class USER_ENTITY { } // Should not be all uppercase
 
-// ✅ 自動修正為
+// ✅ Auto-Fix to
 public class UserService { }
 public class UserDao { }
 public class UserEntity { }
 ```
 
-#### 模式 2: 方法名不規範
+#### Pattern 2: Non-Compliant Method Names
 ```java
-// ❌ 檢測到錯誤
-public User GetUserById(Long id) { }      // 首字母不應該大寫
-public List<User> QueryUserList() { }     // 首字母不應該大寫
-public void Delete_User(Long id) { }      // 不應該使用下劃線
+// ❌ Detected Error
+public User GetUserById(Long id) { }      // First letter should not be uppercase
+public List<User> QueryUserList() { }     // First letter should not be uppercase
+public void Delete_User(Long id) { }      // Should not use underscore
 
-// ✅ 自動修正為
+// ✅ Auto-Fix to
 public User getUserById(Long id) { }
-public List<User> listUsers() { }        // 或 queryUserList
+public List<User> listUsers() { }        // or queryUserList
 public void deleteUser(Long id) { }
 ```
 
-#### 模式 3: 常量命名不規範
+#### Pattern 3: Non-Compliant Constant Naming
 ```java
-// ❌ 檢測到錯誤
-private final int maxRetryCount = 3;     // 常量應該全大寫
-public static int Max_Size = 100;        // 應該全大寫且用下劃線
-private static final String apiUrl = "..."; // 應該全大寫
+// ❌ Detected Error
+private final int maxRetryCount = 3;     // Constants should be all uppercase
+public static int Max_Size = 100;        // Should be all uppercase with underscores
+private static final String apiUrl = "..."; // Should be all uppercase
 
-// ✅ 自動修正為
+// ✅ Auto-Fix to
 private static final int MAX_RETRY_COUNT = 3;
 public static final int MAX_SIZE = 100;
 private static final String API_URL = "...";
 ```
 
-#### 模式 4: Boolean 字段命名（POJO）
+#### Pattern 4: Boolean Field Naming (POJO)
 ```java
-// ❌ 檢測到錯誤（在 POJO 類中）
+// ❌ Detected Error (in POJO class)
 @Data
 public class User {
-    private Boolean isSuccess;  // ❌ POJO 禁止 is 前綴
+    private Boolean isSuccess;  // ❌ POJO prohibits is prefix
     private Boolean isDeleted;  // ❌
 }
 
-// ✅ 自動修正為
+// ✅ Auto-Fix to
 @Data
 public class User {
-    private Boolean success;    // ✅ 去掉 is 前綴
+    private Boolean success;    // ✅ Remove is prefix
     private Boolean deleted;    // ✅
 }
 
-// ⚠️ 注意: 方法名仍可以用 is 前綴
-public boolean isActive() {  // ✅ 方法名沒問題
+// ⚠️ Note: Method names can still use is prefix
+public boolean isActive() {  // ✅ Method name is fine
     return this.status == Status.ACTIVE;
 }
 ```
 
-#### 模式 5: 集合命名
+#### Pattern 5: Collection Naming
 ```java
-// ❌ 檢測到錯誤
-List<User> user;              // 應該用複數
-Map<Long, Order> orderMap;    // Map 可以保留 Map 後綴（但建議複數）
-Set<String> tagSet;           // Set 可以保留 Set 後綴（但建議複數）
+// ❌ Detected Error
+List<User> user;              // Should use plural
+Map<Long, Order> orderMap;    // Map can keep Map suffix (but plural recommended)
+Set<String> tagSet;           // Set can keep Set suffix (but plural recommended)
 
-// ✅ 修正為
-List<User> users;             // ✅ 複數
-Map<Long, Order> orders;      // ✅ 或 orderMap（可選）
-Set<String> tags;             // ✅ 或 tagSet（可選）
+// ✅ Fix to
+List<User> users;             // ✅ Plural
+Map<Long, Order> orders;      // ✅ or orderMap (optional)
+Set<String> tags;             // ✅ or tagSet (optional)
 ```
 
-#### 模式 6: Service/Dao 方法前綴
+#### Pattern 6: Service/Dao Method Prefixes
 ```java
-// ❌ 檢測到錯誤
-public User findUserById(Long id) { }       // Service 應該用 get
-public List<User> getUserList() { }         // 應該用 list 前綴
-public int totalUsers() { }                 // 應該用 count 前綴
+// ❌ Detected Error
+public User findUserById(Long id) { }       // Service should use get
+public List<User> getUserList() { }         // Should use list prefix
+public int totalUsers() { }                 // Should use count prefix
 
-// ✅ 自動修正為
-public User getUserById(Long id) { }        // ✅ get 單個對象
-public List<User> listUsers() { }           // ✅ list 列表
-public int countUsers() { }                 // ✅ count 統計
+// ✅ Auto-Fix to
+public User getUserById(Long id) { }        // ✅ get for single object
+public List<User> listUsers() { }           // ✅ list for collections
+public int countUsers() { }                 // ✅ count for statistics
 ```
 
-### 生成代碼標準模板
+### Code Generation Standard Templates
 
-#### 模板 1: Controller 類
+#### Template 1: Controller Class
 ```java
-// ✅ 命名標準
+// ✅ Naming Standard
 @RestController
 @RequestMapping("/api/v1/users")
-public class UserController {  // ✅ UpperCamelCase + Controller 後綴
+public class UserController {  // ✅ UpperCamelCase + Controller suffix
 
     private final UserService userService;  // ✅ lowerCamelCase
 
@@ -165,165 +165,165 @@ public class UserController {  // ✅ UpperCamelCase + Controller 後綴
 }
 ```
 
-#### 模板 2: Service 類
+#### Template 2: Service Class
 ```java
-// ✅ 命名標準
+// ✅ Naming Standard
 @Service
-public class UserService {  // ✅ UpperCamelCase + Service 後綴
+public class UserService {  // ✅ UpperCamelCase + Service suffix
 
     private final UserMapper userMapper;
-    private static final int MAX_RETRY_COUNT = 3;  // ✅ 常量全大寫
+    private static final int MAX_RETRY_COUNT = 3;  // ✅ Constants all uppercase
 
-    public Option<User> getUserById(Long id) {  // ✅ get 前綴（單個）
+    public Option<User> getUserById(Long id) {  // ✅ get prefix (single)
         ...
     }
 
-    public List<User> listUsersByStatus(String status) {  // ✅ list 前綴（列表）
+    public List<User> listUsersByStatus(String status) {  // ✅ list prefix (collection)
         ...
     }
 
-    public int countActiveUsers() {  // ✅ count 前綴（統計）
-        ...
-    }
-
-    @Transactional
-    public void saveUser(User user) {  // ✅ save 前綴（保存）
+    public int countActiveUsers() {  // ✅ count prefix (statistics)
         ...
     }
 
     @Transactional
-    public void deleteUser(Long id) {  // ✅ delete 前綴（刪除）
+    public void saveUser(User user) {  // ✅ save prefix (save)
+        ...
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {  // ✅ delete prefix (delete)
         ...
     }
 }
 ```
 
-#### 模板 3: Entity/DTO 類
+#### Template 3: Entity/DTO Class
 ```java
-// ✅ 命名標準
+// ✅ Naming Standard
 @Data
 @TableName("t_user")
-public class User {  // ✅ UpperCamelCase（不用 Entity 後綴）
+public class User {  // ✅ UpperCamelCase (no Entity suffix)
 
     @TableId(type = IdType.AUTO)
     private Long userId;  // ✅ lowerCamelCase
 
     private String username;
     private String email;
-    private Boolean deleted;  // ✅ Boolean 不用 is 前綴
+    private Boolean deleted;  // ✅ Boolean no is prefix
 
-    // ✅ 方法可以用 is 前綴
+    // ✅ Methods can use is prefix
     public boolean isActive() {
         return !deleted;
     }
 }
 
-// DTO 示例
-public class UserCreateDTO {  // ✅ UpperCamelCase + DTO 後綴
+// DTO example
+public class UserCreateDTO {  // ✅ UpperCamelCase + DTO suffix
     private String username;
     private String email;
 }
 
-// VO 示例
-public class UserVO {  // ✅ UpperCamelCase + VO 後綴
+// VO example
+public class UserVO {  // ✅ UpperCamelCase + VO suffix
     private Long userId;
     private String username;
 }
 ```
 
-#### 模板 4: 常量類/枚舉
+#### Template 4: Constants Class/Enum
 ```java
-// ✅ 常量類
-public class UserConstants {  // ✅ UpperCamelCase + Constants 後綴
+// ✅ Constants Class
+public class UserConstants {  // ✅ UpperCamelCase + Constants suffix
 
-    // ✅ 常量全大寫，下劃線分隔
+    // ✅ Constants all uppercase, underscore separated
     public static final int MAX_USERNAME_LENGTH = 50;
     public static final int MIN_PASSWORD_LENGTH = 8;
     public static final String DEFAULT_ROLE = "USER";
 
-    private UserConstants() {  // 私有構造函數
+    private UserConstants() {  // Private constructor
         throw new UnsupportedOperationException();
     }
 }
 
-// ✅ 枚舉
+// ✅ Enum
 public enum UserStatus {  // ✅ UpperCamelCase
-    ACTIVE,     // ✅ 枚舉值全大寫
+    ACTIVE,     // ✅ Enum values all uppercase
     INACTIVE,
     DELETED
 }
 ```
 
-### 驗證命令
-生成代碼後，自動運行以下命令驗證命名規範：
+### Validation Commands
+After generating code, automatically run the following commands to validate naming conventions:
 
 ```bash
-# 1. Checkstyle 檢查命名規範
+# 1. Checkstyle check naming conventions
 mvn checkstyle:check
 
-# 2. ArchUnit 檢查類命名後綴
+# 2. ArchUnit check class naming suffixes
 mvn test -Dtest=ArchitectureTest#controllerNaming
 mvn test -Dtest=ArchitectureTest#serviceNaming
 mvn test -Dtest=ArchitectureTest#daoNaming
 
-# 3. 查看詳細錯誤（如果失敗）
+# 3. View detailed errors (if failed)
 mvn checkstyle:check -Dcheckstyle.console=true
 ```
 
-**預期結果**: 0 errors, 0 warnings
+**Expected Result**: 0 errors, 0 warnings
 
 ---
 
-## 強制級別規則
+## Mandatory Level Rules
 
-### 1. 類名規範
-- **規則**: 使用 UpperCamelCase，領域模型除外
-- **正例**: `UserService`, `OrderDTO`, `PaymentVO`
-- **反例**: `userService`, `orderDto`
+### 1. Class Naming
+- **Rule**: Use UpperCamelCase, except domain models
+- **Correct**: `UserService`, `OrderDTO`, `PaymentVO`
+- **Incorrect**: `userService`, `orderDto`
 ```java
-// ✅ 正確
+// ✅ Correct
 public class UserServiceImpl implements UserService { }
 public class OrderDTO { }
 
-// ❌ 錯誤
+// ❌ Incorrect
 public class userService { }
 public class Orderdto { }
 ```
 
-### 2. 方法/變量命名
-- **規則**: 使用 lowerCamelCase
-- **正例**: `getUserById()`, `localValue`
-- **反例**: `GetUserById()`, `LocalValue`
+### 2. Method/Variable Naming
+- **Rule**: Use lowerCamelCase
+- **Correct**: `getUserById()`, `localValue`
+- **Incorrect**: `GetUserById()`, `LocalValue`
 
-### 3. 常量命名
-- **規則**: 全大寫，下劃線分隔
-- **正例**: `MAX_RETRY_COUNT = 3`
-- **反例**: `maxRetryCount = 3`
+### 3. Constant Naming
+- **Rule**: All uppercase, underscore separated
+- **Correct**: `MAX_RETRY_COUNT = 3`
+- **Incorrect**: `maxRetryCount = 3`
 
-### 4. 布爾變量
-- **規則**: 禁止 is 前綴（POJO 類）
-- **正例**: `private Boolean success;`
-- **反例**: `private Boolean isSuccess;`
-- **原因**: 部分框架解析 getter/setter 時產生序列化問題
+### 4. Boolean Variables
+- **Rule**: Prohibit is prefix (POJO classes)
+- **Correct**: `private Boolean success;`
+- **Incorrect**: `private Boolean isSuccess;`
+- **Reason**: Some frameworks have serialization issues when parsing getter/setter
 
-### 5. Service/DAO 方法命名
-| 操作類型 | 前綴          | 示例                  |
-| -------- | ------------- | --------------------- |
-| 獲取單個 | get           | `getUserById()`       |
-| 獲取列表 | list          | `listUsersByStatus()` |
-| 統計數量 | count         | `countActiveUsers()`  |
-| 新增保存 | save/insert   | `saveUser()`          |
-| 刪除操作 | delete/remove | `deleteUserById()`    |
-| 更新操作 | update        | `updateUserStatus()`  |
+### 5. Service/DAO Method Naming
+| Operation Type | Prefix        | Example               |
+| -------------- | ------------- | --------------------- |
+| Get Single     | get           | `getUserById()`       |
+| Get List       | list          | `listUsersByStatus()` |
+| Count          | count         | `countActiveUsers()`  |
+| Add/Save       | save/insert   | `saveUser()`          |
+| Delete         | delete/remove | `deleteUserById()`    |
+| Update         | update        | `updateUserStatus()`  |
 
-### 6. 包名規範
-- **規則**: 全小寫，單數形式
-- **正例**: `com.example.user.service`
-- **反例**: `com.example.Users.Services`
+### 6. Package Naming
+- **Rule**: All lowercase, singular form
+- **Correct**: `com.example.user.service`
+- **Incorrect**: `com.example.Users.Services`
 
-## 自動檢查配置
+## Automatic Check Configuration
 ```xml
-<!-- Checkstyle 配置 -->
+<!-- Checkstyle Configuration -->
 <module name="TypeName">
     <property name="format" value="^[A-Z][a-zA-Z0-9]*$"/>
 </module>

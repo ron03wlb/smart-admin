@@ -1,30 +1,30 @@
 ---
 trigger: always_on
-description: 並發編程規範 - 線程池、鎖、線程安全
+description: Concurrency Programming Rules - Thread Pool, Lock, Thread Safety
 tags: [concurrency, thread-safety, executor]
 positioning: current-standard
 last_updated: 2025-01-12
 ---
 
-# 併發處理規範
+# Concurrency Rules
 
-## 【強制】線程池創建
+## 【Mandatory】Thread Pool Creation
 
-### 禁止使用 Executors
+### Prohibit Using Executors
 ```java
-// ❌ 嚴禁 - OOM 風險
+// ❌ Strictly Prohibited - OOM Risk
 ExecutorService fixed = Executors.newFixedThreadPool(10);
-// 原因: LinkedBlockingQueue 無界，可能 OOM
+// Reason: LinkedBlockingQueue unbounded, may cause OOM
 
 ExecutorService cached = Executors.newCachedThreadPool();
-// 原因: maximumPoolSize = Integer.MAX_VALUE，可能創建大量線程
+// Reason: maximumPoolSize = Integer.MAX_VALUE, may create massive threads
 
-// ✅ 正確 - 使用 ThreadPoolExecutor
+// ✅ Correct - Use ThreadPoolExecutor
 ThreadPoolExecutor executor = new ThreadPoolExecutor(
     5,                      // corePoolSize
     10,                     // maximumPoolSize
     60L, TimeUnit.SECONDS,  // keepAliveTime
-    new LinkedBlockingQueue<>(1000),  // 有界隊列
+    new LinkedBlockingQueue<>(1000),  // Bounded queue
     new ThreadFactoryBuilder()
         .setNameFormat("order-pool-%d")
         .build(),
@@ -32,40 +32,40 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 );
 ```
 
-### 拒絕策略選擇
-| 策略                | 行為                          | 適用場景         |
-| ------------------- | ----------------------------- | ---------------- |
-| AbortPolicy         | 拋 RejectedExecutionException | 默認，需處理異常 |
-| CallerRunsPolicy    | 調用線程執行                  | 不能丟棄任務     |
-| DiscardOldestPolicy | 丟棄隊首任務                  | 允許丟棄舊任務   |
-| DiscardPolicy       | 靜默丟棄                      | 可忽略的任務     |
+### Rejection Policy Selection
+| Policy              | Behavior                       | Use Case                   |
+| ------------------- | ------------------------------ | -------------------------- |
+| AbortPolicy         | Throw RejectedExecutionException | Default, need handle exception |
+| CallerRunsPolicy    | Caller thread executes         | Cannot discard tasks       |
+| DiscardOldestPolicy | Discard oldest task in queue   | Allow discarding old tasks |
+| DiscardPolicy       | Silently discard               | Ignorable tasks            |
 
-## 【強制】Lock 使用規範
+## 【Mandatory】Lock Usage Rules
 ```java
-// ✅ 正確 - lock() 在 try 外面
+// ✅ Correct - lock() outside try
 Lock lock = new ReentrantLock();
 lock.lock();
 try {
-    // 業務邏輯
+    // Business logic
 } finally {
     lock.unlock();
 }
 
-// ❌ 錯誤 - lock() 在 try 裡面
+// ❌ Incorrect - lock() inside try
 try {
-    lock.lock();  // 若拋異常，finally 會釋放未獲取的鎖
+    lock.lock();  // If throws exception, finally will unlock an unacquired lock
     // ...
 } finally {
     lock.unlock();
 }
 ```
 
-## 【強制】雙重檢查單例
+## 【Mandatory】Double-Checked Singleton
 ```java
 public class Singleton {
-    // 必須 volatile - 防止指令重排序
+    // Must be volatile - Prevent instruction reordering
     private static volatile Singleton instance;
-    
+
     public static Singleton getInstance() {
         if (instance == null) {
             synchronized (Singleton.class) {
@@ -79,17 +79,17 @@ public class Singleton {
 }
 ```
 
-## 【強制】ThreadLocal 清理
+## 【Mandatory】ThreadLocal Cleanup
 ```java
-// ✅ 正確 - 使用後必須 remove
+// ✅ Correct - Must remove after use
 private static final ThreadLocal<User> userContext = new ThreadLocal<>();
 
 public void process() {
     userContext.set(currentUser);
     try {
-        // 業務邏輯
+        // Business logic
     } finally {
-        userContext.remove();  // 必須清理，防止內存洩漏
+        userContext.remove();  // Must cleanup, prevent memory leak
     }
 }
 ```

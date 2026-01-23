@@ -1,93 +1,93 @@
 ---
 trigger: always_on
-description: OOP 原則 - SOLID、繼承、多態
+description: OOP Principles - SOLID, Inheritance, Polymorphism
 tags: [oop, solid, design-principles]
 positioning: current-standard
 last_updated: 2025-01-12
 ---
 
-# OOP 規約
+# OOP Conventions
 
-## 強制規則
+## Mandatory Rules
 
-### 1. @Override 註解
-- **規則**: 重寫方法必須加 @Override
+### 1. @Override Annotation
+- **Rule**: Overriding methods must have @Override
 ```java
-// ✅ 正確
+// ✅ Correct
 @Override
 public String toString() { return "User"; }
 
-// ❌ 錯誤
+// ❌ Incorrect
 public String toString() { return "User"; }
 ```
 
-### 2. equals 調用順序
-- **規則**: 常量或確定非空對象調用 equals
+### 2. equals Call Order
+- **Rule**: Constants or confirmed non-null objects call equals
 ```java
-// ✅ 正確
+// ✅ Correct
 "active".equals(status)
 Objects.equals(status, "active")
 
-// ❌ 錯誤 - 可能 NPE
+// ❌ Incorrect - Possible NPE
 status.equals("active")
 ```
 
-### 3. 包裝類比較
-- **規則**: 用 equals()，禁止 ==
+### 3. Wrapper Class Comparison
+- **Rule**: Use equals(), prohibit ==
 ```java
-// ✅ 正確
+// ✅ Correct
 Integer a = 128, b = 128;
-if (a.equals(b)) { /* 相等 */ }
+if (a.equals(b)) { /* equal */ }
 
-// ❌ 錯誤 - Integer 緩存範圍 -128~127
-if (a == b) { /* 可能為 false */ }
+// ❌ Incorrect - Integer cache range -128~127
+if (a == b) { /* may be false */ }
 ```
 
-### 4. 浮點數比較
-- **規則**: 禁止 == 或 equals
+### 4. Floating Point Comparison
+- **Rule**: Prohibit == or equals
 ```java
-// ✅ 正確：誤差範圍
+// ✅ Correct: Error range
 float diff = 1e-6f;
-if (Math.abs(a - b) < diff) { /* 相等 */ }
+if (Math.abs(a - b) < diff) { /* equal */ }
 
-// ✅ 正確：BigDecimal
+// ✅ Correct: BigDecimal
 BigDecimal a = new BigDecimal("0.1");
 BigDecimal b = new BigDecimal("0.10");
 a.compareTo(b) == 0  // true
 
-// ❌ 錯誤
+// ❌ Incorrect
 float a = 0.1f, b = 0.1f;
-if (a == b) { /* 不可靠 */ }
+if (a == b) { /* unreliable */ }
 ```
 
-### 5. POJO 類規範
-- **規則**: 成員變量必須用包裝類型
+### 5. POJO Class Convention
+- **Rule**: Member variables must use wrapper types
 ```java
-// ✅ 正確
+// ✅ Correct
 public class UserDO {
     private Long id;
     private Integer age;
     private Boolean active;
 }
 
-// ❌ 錯誤 - 基本類型有默認值，無法區分未設置
+// ❌ Incorrect - Primitive types have default values, cannot distinguish unset
 public class UserDO {
-    private long id;    // 默認 0
-    private int age;    // 默認 0
-    private boolean active; // 默認 false
+    private long id;    // Default 0
+    private int age;    // Default 0
+    private boolean active; // Default false
 }
 ```
 
-### 6. 字符串拼接
-- **規則**: 循環內用 StringBuilder
+### 6. String Concatenation
+- **Rule**: Use StringBuilder in loops
 ```java
-// ✅ 正確
+// ✅ Correct
 StringBuilder sb = new StringBuilder();
 for (String item : items) {
     sb.append(item);
 }
 
-// ❌ 錯誤 - 每次創建新 StringBuilder
+// ❌ Incorrect - Creates new StringBuilder each iteration
 String result = "";
 for (String item : items) {
     result = result + item;

@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: SonarQube 代碼質量規則
+description: SonarQube Code Quality Rules
 tags: [sonarqube, code-quality, static-analysis]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -14,12 +14,12 @@ related_rules:
 last_updated: 2025-01-21
 ---
 
-# SonarQube 規則配置
+# SonarQube Rules Configuration
 
-## 必須啟用的 Blocker/Critical 規則
+## Must-Enable Blocker/Critical Rules
 
-### 安全漏洞類
-| 規則 ID | 名稱              | 類型          |
+### Security Vulnerability
+| Rule ID | Name              | Type          |
 | ------- | ----------------- | ------------- |
 | S3649   | SQL Injection     | Vulnerability |
 | S5131   | XSS Prevention    | Vulnerability |
@@ -27,56 +27,56 @@ last_updated: 2025-01-21
 | S5135   | Deserialization   | Vulnerability |
 | S2755   | XXE Vulnerability | Vulnerability |
 
-### Bug 類
-| 規則 ID | 名稱             | 說明                  |
+### Bug
+| Rule ID | Name             | Description           |
 | ------- | ---------------- | --------------------- |
-| S2259   | Null Pointer     | 潛在 NPE              |
-| S2095   | Resources Closed | 資源洩漏              |
-| S1143   | Jump in finally  | finally 中禁止 return |
+| S2259   | Null Pointer     | Potential NPE         |
+| S2095   | Resources Closed | Resource leak         |
+| S1143   | Jump in finally  | Prohibit return in finally |
 
-### 代碼異味
-| 規則 ID | 名稱                 | 閾值   |
-| ------- | -------------------- | ------ |
-| S3776   | Cognitive Complexity | ≤ 15   |
-| S1192   | String Duplication   | ≥ 3 次 |
-| S1481   | Unused Variables     | 0      |
+### Code Smell
+| Rule ID | Name                 | Threshold |
+| ------- | -------------------- | --------- |
+| S3776   | Cognitive Complexity | ≤ 15      |
+| S1192   | String Duplication   | ≥ 3 times |
+| S1481   | Unused Variables     | 0         |
 
-## Spring 專屬規則 (2024-2025)
+## Spring-Specific Rules (2024-2025)
 
-### 必須啟用
+### Must Enable
 ```yaml
 rules:
-  S4684: ERROR  # 禁止 Entity 作為 RequestMapping 參數
-  S4288: ERROR  # 必須使用構造函數注入
-  S2229: ERROR  # @Transactional 自調用問題
-  S2230: ERROR  # @Transactional 方法必須 public
-  S4601: ERROR  # Security URL 匹配順序
-  S4602: ERROR  # 禁止默認包
+  S4684: ERROR  # Prohibit Entity as RequestMapping parameter
+  S4288: ERROR  # Must use constructor injection
+  S2229: ERROR  # @Transactional self-invocation issue
+  S2230: ERROR  # @Transactional method must be public
+  S4601: ERROR  # Security URL match order
+  S4602: ERROR  # Prohibit default package
 ```
 
-### 代碼示例
+### Code Examples
 
-#### S4684 - Entity 暴露
+#### S4684 - Entity Exposure
 ```java
-// ❌ 錯誤 - Entity 直接暴露
+// ❌ Incorrect - Entity directly exposed
 @PostMapping("/user")
 public void createUser(@RequestBody User user) { }
 
-// ✅ 正確 - 使用 DTO
+// ✅ Correct - Use DTO
 @PostMapping("/user")
 public void createUser(@RequestBody UserCreateDTO dto) { }
 ```
 
-#### S4288 - 構造函數注入
+#### S4288 - Constructor Injection
 ```java
-// ❌ 錯誤 - 字段注入
+// ❌ Incorrect - Field injection
 @Service
 public class UserService {
     @Autowired
     private UserRepository repository;
 }
 
-// ✅ 正確 - 構造函數注入
+// ✅ Correct - Constructor injection
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -84,33 +84,33 @@ public class UserService {
 }
 ```
 
-#### S4601 - Security URL 順序
+#### S4601 - Security URL Order
 ```java
-// ❌ 錯誤 - 通配符在前
+// ❌ Incorrect - Wildcard first
 http.authorizeRequests()
     .antMatchers("/admin/**").authenticated()
     .antMatchers("/admin/user").hasRole("ADMIN");
 
-// ✅ 正確 - 具體規則在前
+// ✅ Correct - Specific rules first
 http.authorizeRequests()
     .antMatchers("/admin/user").hasRole("ADMIN")
     .antMatchers("/admin/**").authenticated();
 ```
 
-## Quality Gate 配置
+## Quality Gate Configuration
 ```yaml
-# 新代碼標準 (Clean as You Code)
+# New Code Standard (Clean as You Code)
 conditions:
   - metric: new_reliability_rating
     operator: GREATER_THAN
-    value: "1"  # A 級 - 無新 Bug
+    value: "1"  # A grade - No new bugs
   - metric: new_security_rating
     operator: GREATER_THAN
-    value: "1"  # A 級 - 無新漏洞
+    value: "1"  # A grade - No new vulnerabilities
   - metric: new_coverage
     operator: LESS_THAN
-    value: "80" # 新代碼覆蓋率 ≥ 80%
+    value: "80" # New code coverage ≥ 80%
   - metric: new_duplicated_lines_density
     operator: GREATER_THAN
-    value: "3"  # 重複代碼 ≤ 3%
+    value: "3"  # Duplicated code ≤ 3%
 ```

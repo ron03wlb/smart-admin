@@ -1,6 +1,6 @@
 ---
 trigger: on_demand
-description: Manager 层架构规范 - 事务边界与缓存管理
+description: Manager Layer Architecture Rules - Transaction Boundary and Cache Management
 tags: [architecture, manager, transaction, cache, smart-admin]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -9,68 +9,68 @@ archunit_test: ArchitectureTest#managerLayerRules
 last_updated: 2025-01-17
 ---
 
-# Manager 层架构规范
+# Manager Layer Architecture Rules
 
-> **核心原则**: @Transactional 和缓存注解（@Cacheable/@CacheEvict/@CachePut）**只在 Manager 层使用**
-
----
-
-## 🤖 AI 指令區塊
-
-### 何時應用此規則
-- ✅ 用戶要求生成跨多個 Mapper/DAO 的事務操作
-- ✅ 用戶要求添加緩存功能
-- ✅ Service 層方法變得複雜（調用多個 Mapper）
-- ✅ Code Review 時發現 Service 層使用 @Transactional/@Cacheable
-
-### 強制執行檢查清單
-- [ ] `@Transactional` 只出現在 Manager 類中
-- [ ] `@Cacheable/@CacheEvict/@CachePut` 只出現在 Manager 類中
-- [ ] Manager 類以 `Manager` 結尾
-- [ ] Manager 類使用構造函數注入（`@RequiredArgsConstructor`）
-- [ ] **Manager 層禁止調用 Service 層（嚴格執行）**
-- [ ] **Manager 層禁止調用其他業務 Manager（避免事務嵌套）**
-
-### AI 決策樹
-```
-檢測到代碼生成請求 → 判斷是否需要 Manager 層
-  ├─ 需要跨多個 Mapper 事務? → 是 → 創建 Manager
-  ├─ 需要緩存? → 是 → 創建 CacheManager
-  └─ 單一 Mapper 操作? → 否 → 使用 Service 層即可
-```
+> **Core Principle**: @Transactional and cache annotations (@Cacheable/@CacheEvict/@CachePut) **only in Manager Layer**
 
 ---
 
-## 錯誤模式檢測與自動修正
+## 🤖 AI Instructions Block
 
-### 模式 1: Service 層使用 @Transactional
+### When to Apply This Rule
+- ✅ User requests to generate operations across multiple Mapper/DAO with transactions
+- ✅ User requests to add caching functionality
+- ✅ Service layer method becomes complex (calling multiple Mappers)
+- ✅ Code Review detects Service layer using @Transactional/@Cacheable
+
+### Mandatory Enforcement Checklist
+- [ ] `@Transactional` only appears in Manager classes
+- [ ] `@Cacheable/@CacheEvict/@CachePut` only appears in Manager classes
+- [ ] Manager classes end with `Manager`
+- [ ] Manager classes use Constructor Injection (`@RequiredArgsConstructor`)
+- [ ] **Manager layer prohibits calling Service layer (strictly enforced)**
+- [ ] **Manager layer prohibits calling other business Managers (avoid transaction nesting)**
+
+### AI Decision Tree
+```
+Detect code generation request → Determine if Manager layer needed
+  ├─ Need transaction across multiple Mappers? → Yes → Create Manager
+  ├─ Need caching? → Yes → Create CacheManager
+  └─ Single Mapper operation? → No → Use Service layer only
+```
+
+---
+
+## Error Pattern Detection and Auto-Fix
+
+### Pattern 1: Service Layer Using @Transactional
 ```java
-// ❌ Service 層使用事務
+// ❌ Service layer using transaction
 @Service
 public class EmployeeService {
-    @Transactional(rollbackFor = Exception.class)  // ❌ 禁止
+    @Transactional(rollbackFor = Exception.class)  // ❌ Prohibited
     public void saveEmployee(Employee e) { }
 }
 
-// ✅ 創建 EmployeeManager
+// ✅ Create EmployeeManager
 @Service
 @RequiredArgsConstructor
 public class EmployeeManager {
-    @Transactional(rollbackFor = Throwable.class)  // ✅ Manager 層
+    @Transactional(rollbackFor = Throwable.class)  // ✅ Manager layer
     public void saveEmployee(Employee e, List<Long> roleIds) { }
 }
 ```
 
-### 模式 2: Service 層使用緩存注解
+### Pattern 2: Service Layer Using Cache Annotations
 ```java
-// ❌ Service 層使用緩存
+// ❌ Service layer using cache
 @Service
 public class DepartmentService {
-    @Cacheable("deptList")  // ❌ 禁止
+    @Cacheable("deptList")  // ❌ Prohibited
     public List<Department> listAll() { }
 }
 
-// ✅ 創建 DepartmentCacheManager
+// ✅ Create DepartmentCacheManager
 @Service
 public class DepartmentCacheManager {
     @Cacheable(AdminCacheConst.Department.DEPARTMENT_LIST_CACHE)
@@ -80,22 +80,22 @@ public class DepartmentCacheManager {
 
 ---
 
-## 調用約束（嚴格執行）
+## Invocation Constraints (Strictly Enforced)
 
-> 詳細分層架構參考 [10-architecture-rules.md](./10-architecture-rules.md)
+> For detailed layered architecture, refer to [10-architecture-rules.md](./10-architecture-rules.md)
 
-| 約束                       | 說明                         |
-| -------------------------- | ---------------------------- |
-| **✗ Manager → Service**    | 禁止向上調用                 |
-| **✗ ManagerA → ManagerB**  | 禁止橫向調用（避免事務嵌套） |
-| **✓ Manager → DAO/Mapper** | 允許調用 DAO 層              |
-| **✓ Service → Manager**    | 允許 Service 調用 Manager    |
+| Constraint                 | Description                      |
+| -------------------------- | -------------------------------- |
+| **✗ Manager → Service**    | Prohibit upward invocation       |
+| **✗ ManagerA → ManagerB**  | Prohibit lateral invocation (avoid transaction nesting) |
+| **✓ Manager → DAO/Mapper** | Allow calling DAO layer          |
+| **✓ Service → Manager**    | Allow Service calling Manager    |
 
 ---
 
-## Manager 層三大職責
+## Manager Layer Three Responsibilities
 
-### 1. 事務管理（跨多個 Mapper 操作）
+### 1. Transaction Management (Across Multiple Mapper Operations)
 ```java
 @Service
 @RequiredArgsConstructor
@@ -114,7 +114,7 @@ public class EmployeeManager {
 }
 ```
 
-### 2. 緩存管理
+### 2. Cache Management
 ```java
 @Service
 public class DepartmentCacheManager {
@@ -126,14 +126,14 @@ public class DepartmentCacheManager {
 }
 ```
 
-### 3. 複雜業務編排（只調用 DAO/Mapper）
+### 3. Complex Business Orchestration (Only Call DAO/Mapper)
 ```java
 @Service
 @RequiredArgsConstructor
 public class OrderManager {
     private final OrderMapper orderMapper;
-    private final InventoryMapper inventoryMapper;  // ✅ 只調用 Mapper
-    // ❌ private final InventoryService inventoryService;  // 禁止
+    private final InventoryMapper inventoryMapper;  // ✅ Only call Mapper
+    // ❌ private final InventoryService inventoryService;  // Prohibited
 
     @Transactional(rollbackFor = Throwable.class)
     public void createOrder(Order order, Integer quantity) {
@@ -145,47 +145,47 @@ public class OrderManager {
 
 ---
 
-## 事務注解規範
+## Transaction Annotation Rules
 
 ```java
-// ✅ 正確：rollbackFor = Throwable.class
+// ✅ Correct: rollbackFor = Throwable.class
 @Transactional(rollbackFor = Throwable.class)
 public void saveEmployee(Employee employee) { }
 
-// ❌ 錯誤：rollbackFor = Exception.class（無法捕獲 Error）
+// ❌ Incorrect: rollbackFor = Exception.class (cannot catch Error)
 @Transactional(rollbackFor = Exception.class)
 
-// ❌ 錯誤：不指定 rollbackFor
+// ❌ Incorrect: No rollbackFor specified
 @Transactional
 ```
 
 ---
 
-## 命名規範
+## Naming Convention
 
-- **事務管理**: `{Entity}Manager`（如 `EmployeeManager`）
-- **緩存管理**: `{Entity}CacheManager`（如 `DepartmentCacheManager`）
-- **混合功能**: `{Domain}Manager`（如 `LoginManager`）
+- **Transaction Management**: `{Entity}Manager` (e.g., `EmployeeManager`)
+- **Cache Management**: `{Entity}CacheManager` (e.g., `DepartmentCacheManager`)
+- **Mixed Functionality**: `{Domain}Manager` (e.g., `LoginManager`)
 
 ---
 
-## ArchUnit 測試規則
+## ArchUnit Test Rules
 
 ```java
 @ArchTest
 static final ArchRule transactionalOnlyInManager = methods()
     .that().areAnnotatedWith(Transactional.class)
     .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
-    .because("@Transactional 只能在 Manager 層使用");
+    .because("@Transactional can only be used in Manager layer");
 
 @ArchTest
 static final ArchRule cacheableOnlyInManager = methods()
     .that().areAnnotatedWith(Cacheable.class)
     .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
-    .because("緩存注解只能在 Manager 層使用");
+    .because("Cache annotations can only be used in Manager layer");
 ```
 
 ---
 
-**最後更新**: 2025-01-17
-**強制級別**: 🚫 ArchUnit 阻止 PR 合併
+**Last Updated**: 2025-01-17
+**Mandatory Level**: 🚫 ArchUnit blocks PR merge

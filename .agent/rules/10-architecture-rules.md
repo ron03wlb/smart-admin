@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: 分層架構規範 - Controller/Service/Manager/Dao/Entity
+description: Layered Architecture Rules - Controller/Service/Manager/Dao/Entity
 tags: [architecture, layering, spring-mvc, dto-vo-pattern]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -17,104 +17,104 @@ archunit_test: ArchitectureTest#layerDependencies
 last_updated: 2025-01-17
 ---
 
-# 架構約束規範 - 分層架構與模塊化設計
+# Architecture Constraint Rules - Layered Architecture and Modular Design
 
-定義 Spring Boot 應用的架構邊界、分層職責與模塊化約束。
-所有規則可通過 ArchUnit 自動化驗證。
+Defines architecture boundaries, layer responsibilities, and modular constraints for Spring Boot applications.
+All rules can be automatically validated through ArchUnit.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Instructions Block
 
-### 何時應用此規則
-- ✅ **永遠**: 生成任何 Java 代碼時都必須遵守架構規範
-- ✅ 用戶要求創建 Controller/Service/Repository/Entity
-- ✅ Code Review 時檢查分層正確性
-- ✅ 檢測到跨層訪問（如 Controller 直接訪問 Repository）
-- ✅ 檢測到字段注入（應該用構造函數注入）
+### When to Apply This Rule
+- ✅ **Always**: Must follow architecture rules when generating any Java code
+- ✅ User requests to create Controller/Service/Repository/Entity
+- ✅ Check layer correctness during Code Review
+- ✅ Detected cross-layer access (e.g., Controller directly accessing Repository)
+- ✅ Detected field injection (should use constructor injection)
 
-### 強制執行檢查清單
-- [ ] **依賴方向正確**: Controller → Service → Manager → Mapper → Domain
-- [ ] **Controller 不直接訪問 Mapper**
-- [ ] **使用構造函數注入**（禁止 @Autowired 字段注入）
-- [ ] **@Transactional/@Cacheable 只在 Manager 層**（參考 [09-manager-layer.md](./09-manager-layer.md)）
-- [ ] **類命名規範**: XxxController, XxxService, XxxManager, XxxMapper
-- [ ] **Controller 使用 DTO/VO**（不直接暴露 Entity）
-- [ ] **Domain 層無 Spring 依賴**（純 POJO）
+### Mandatory Enforcement Checklist
+- [ ] **Dependency direction correct**: Controller → Service → Manager → Mapper → Domain
+- [ ] **Controller does not directly access Mapper**
+- [ ] **Use Constructor Injection** (prohibit @Autowired field injection)
+- [ ] **@Transactional/@Cacheable only in Manager layer** (refer to [09-manager-layer.md](./09-manager-layer.md))
+- [ ] **Class naming convention**: XxxController, XxxService, XxxManager, XxxMapper
+- [ ] **Controller uses DTO/VO** (do not directly expose Entity)
+- [ ] **Domain layer has no Spring dependencies** (pure POJO)
 
-### AI 決策樹
+### AI Decision Tree
 ```
-用戶要求: "創建用戶管理功能"
-  ├─ 1️⃣ 確定需要的層次
-  │   ├─ Controller? → YES（需要 HTTP 接口）
-  │   ├─ Service? → YES（業務邏輯）
-  │   ├─ Repository? → YES（數據訪問）
-  │   └─ Entity? → 檢查是否已存在
+User request: "Create user management functionality"
+  ├─ 1️⃣ Determine required layers
+  │   ├─ Controller? → YES (need HTTP interface)
+  │   ├─ Service? → YES (business logic)
+  │   ├─ Repository? → YES (data access)
+  │   └─ Entity? → Check if already exists
   │
-  ├─ 2️⃣ 按順序生成（從內層到外層）
+  ├─ 2️⃣ Generate in order (inner layer to outer layer)
   │   Step 1: Entity → Step 2: Mapper → Step 3: Service → Step 4: Controller
   │
-  └─ 3️⃣ 確認依賴注入
-      └─ 使用 @RequiredArgsConstructor + private final
+  └─ 3️⃣ Confirm dependency injection
+      └─ Use @RequiredArgsConstructor + private final
 ```
 
 ---
 
-## 分層架構
+## Layered Architecture
 
-### 標準目錄結構
+### Standard Directory Structure
 ```
 com.example.myapp/
-├── controller/          # 表現層 - HTTP、DTO
-├── service/             # 業務層 - 核心邏輯
-├── manager/             # 管理層 - 事務、緩存
-├── mapper/              # 持久層 - 數據訪問
-├── domain/entity/       # 領域層 - 實體
-└── common/              # exception、util
+├── controller/          # Presentation Layer - HTTP, DTO
+├── service/             # Business Layer - Core logic
+├── manager/             # Manager Layer - Transactions, Cache
+├── mapper/              # Persistence Layer - Data Access
+├── domain/entity/       # Domain Layer - Entities
+└── common/              # exception, util
 ```
 
-### 【強制】層級依賴方向
+### 【Mandatory】Layer Dependency Direction
 ```
 Controller → Service → Manager → Mapper/DAO → Domain
 
-✅ 允許：上層依賴下層
-✅ 允許：Service → Mapper（簡單場景可跳過 Manager）
-❌ 禁止：反向依賴（Manager → Service）
-❌ 禁止：跨層訪問（Controller → Manager/Mapper）
-❌ 禁止：Manager 橫向調用（ManagerA → ManagerB）
+✅ Allowed: Upper layer depends on lower layer
+✅ Allowed: Service → Mapper (simple scenarios can skip Manager)
+❌ Prohibited: Reverse dependency (Manager → Service)
+❌ Prohibited: Cross-layer access (Controller → Manager/Mapper)
+❌ Prohibited: Manager lateral invocation (ManagerA → ManagerB)
 ```
 
-> **Manager 層詳細約束**: 參考 [09-manager-layer.md](./09-manager-layer.md)
+> **Manager Layer Detailed Constraints**: Refer to [09-manager-layer.md](./09-manager-layer.md)
 
 ---
 
-## 錯誤模式檢測
+## Error Pattern Detection
 
-### 模式 1: Controller 直接訪問 Repository
+### Pattern 1: Controller Directly Accessing Repository
 ```java
-// ❌ 架構違規
+// ❌ Architecture Violation
 @RestController
 public class UserController {
-    private final UserMapper userMapper; // ❌ 錯誤！
+    private final UserMapper userMapper; // ❌ Incorrect!
 }
 
-// ✅ 修正為
+// ✅ Fix to
 @RestController
 public class UserController {
-    private final UserService userService; // ✅ 正確
+    private final UserService userService; // ✅ Correct
 }
 ```
 
-### 模式 2: 字段注入
+### Pattern 2: Field Injection
 ```java
-// ❌ 字段注入
+// ❌ Field Injection
 @Service
 public class UserService {
     @Autowired
     private UserMapper userMapper;
 }
 
-// ✅ 構造函數注入
+// ✅ Constructor Injection
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -124,7 +124,7 @@ public class UserService {
 
 ---
 
-## 生成代碼模板
+## Code Generation Templates
 
 ### Entity
 ```java
@@ -175,14 +175,14 @@ public class UserController {
     public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
         return userService.findById(id)
             .map(UserVO::from)
-            .fold(() -> ResponseDTO.error("用戶不存在"), ResponseDTO::ok);
+            .fold(() -> ResponseDTO.error("User not found"), ResponseDTO::ok);
     }
 }
 ```
 
 ---
 
-## ArchUnit 自動化測試
+## ArchUnit Automated Testing
 
 ```java
 @AnalyzeClasses(packages = "com.example")
@@ -213,18 +213,18 @@ public class ArchitectureTest {
 
 ---
 
-## 架構檢查清單
+## Architecture Checklist
 
-- [ ] ArchUnit 所有測試通過
-- [ ] 無循環依賴
-- [ ] Controller 不直接訪問 Mapper
-- [ ] Controller 使用 DTO/VO 不暴露 Entity
-- [ ] Service 使用構造函數注入
-- [ ] @Transactional/@Cacheable 只在 Manager 層
-- [ ] Domain 層無 Spring 依賴
-- [ ] 命名規範符合約定
+- [ ] ArchUnit all tests passing
+- [ ] No circular dependencies
+- [ ] Controller does not directly access Mapper
+- [ ] Controller uses DTO/VO, does not expose Entity
+- [ ] Service uses Constructor Injection
+- [ ] @Transactional/@Cacheable only in Manager layer
+- [ ] Domain layer has no Spring dependencies
+- [ ] Naming convention follows agreement
 
-### 驗證命令
+### Validation Commands
 ```bash
 ./gradlew check
 mvn test -Dtest=ArchitectureTest

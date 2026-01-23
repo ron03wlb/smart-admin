@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: PostgreSQL 高級特性：JSONB、數組、CTE、窗口函數
+description: PostgreSQL Advanced Features - JSONB, Array, CTE, Window Function
 tags: [postgresql, jsonb, array, cte, window-function]
 positioning: ideal
 prerequisites:
@@ -8,24 +8,24 @@ prerequisites:
 last_updated: 2025-01-12
 ---
 
-# PostgreSQL 高級特性
+# PostgreSQL Advanced Features
 
-**TL;DR**: 掌握 PostgreSQL 特有功能：JSONB 存儲動態數據（支持 GIN 索引查詢）、數組類型（標籤系統）、CTE 提升複雜查詢可讀性、窗口函數實現排名/累計統計、全文搜索（中文需 jieba 插件）。
+**TL;DR**: Master PostgreSQL-specific features: JSONB for dynamic data storage (supports GIN index queries), Array Type (tag system), CTE improves complex query readability, Window Functions for ranking/cumulative statistics, Full-Text Search (Chinese requires jieba plugin).
 
-**前置條件**: 閱讀 [05-postgresql-basics.md](./05-postgresql-basics.md) 了解基礎建表與索引規範。
+**Prerequisites**: Read [05-postgresql-basics.md](./05-postgresql-basics.md) for basic table creation and index rules.
 
 ---
 
-## 【強制】JSONB 字段
+## 【Mandatory】JSONB Fields
 
-### 1. 使用場景
+### 1. Use Cases
 
-- 靈活的擴展字段（避免頻繁加字段）
-- 動態表單數據
-- 審計日誌（記錄變更詳情）
-- 配置存儲
+- Flexible extension fields (avoid frequent column addition)
+- Dynamic form data
+- Audit Log (record change details)
+- Configuration storage
 
-### 2. 建表示例
+### 2. Table Creation Example
 
 ```sql
 CREATE TABLE t_order (
@@ -33,50 +33,50 @@ CREATE TABLE t_order (
     user_id BIGINT NOT NULL,
     total_amount NUMERIC(12,2) NOT NULL,
 
-    -- JSONB 字段
-    items JSONB NOT NULL,       -- 訂單項詳情
-    metadata JSONB,             -- 擴展字段
+    -- JSONB fields
+    items JSONB NOT NULL,       -- Order item details
+    metadata JSONB,             -- Extension fields
 
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- JSONB 索引 (GIN - Generalized Inverted Index)
+-- JSONB Index (GIN - Generalized Inverted Index)
 CREATE INDEX idx_order_items ON t_order USING GIN(items);
 CREATE INDEX idx_order_metadata ON t_order USING GIN(metadata jsonb_path_ops);
 ```
 
-### 3. 查詢操作
+### 3. Query Operations
 
 ```sql
--- 查詢包含特定商品的訂單
+-- Query orders containing specific product
 SELECT * FROM t_order
 WHERE items @> '[{"product_id": 123}]'::jsonb;
 
--- 提取 JSONB 字段
+-- Extract JSONB fields
 SELECT
     id,
     items->>'total_amount' as total,
     metadata->'shipping_address'->>'city' as city
 FROM t_order;
 
--- 更新 JSONB 字段
+-- Update JSONB fields
 UPDATE t_order
 SET metadata = jsonb_set(
     metadata,
     '{shipping_address, city}',
-    '"杭州"'
+    '"Hangzhou"'
 )
 WHERE id = 1;
 
--- 檢查鍵是否存在
+-- Check if key exists
 SELECT * FROM t_order
 WHERE metadata ? 'vip_discount';
 ```
 
-### 4. MyBatis Plus 整合
+### 4. MyBatis Plus Integration
 
 ```java
-// Entity 定義
+// Entity definition
 @Data
 @TableName("t_order")
 public class Order {
@@ -91,7 +91,7 @@ public class Order {
     private Map<String, Object> metadata;
 }
 
-// TypeHandler 實現（序列化 JSONB）
+// TypeHandler implementation (serialize JSONB)
 public class JacksonTypeHandler extends BaseTypeHandler<Object> {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final Class<?> type;
@@ -125,7 +125,7 @@ public class JacksonTypeHandler extends BaseTypeHandler<Object> {
     }
 }
 
-// Mapper 查詢
+// Mapper query
 default List<Order> findByProductId(Long productId) {
     return selectList(new LambdaQueryWrapper<Order>()
         .apply("items @> '[{\"product_id\": {0}}]'::jsonb", productId));
@@ -134,15 +134,15 @@ default List<Order> findByProductId(Long productId) {
 
 ---
 
-## 【強制】數組類型
+## 【Mandatory】Array Type
 
-### 1. 使用場景
+### 1. Use Cases
 
-- 標籤系統（tags）
-- 權限列表（roles）
-- 多選字段
+- Tag system (tags)
+- Permission list (roles)
+- Multi-select fields
 
-### 2. 建表與查詢
+### 2. Table Creation and Query
 
 ```sql
 CREATE TABLE t_article (
@@ -150,38 +150,38 @@ CREATE TABLE t_article (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
 
-    -- 數組字段
-    tags TEXT[],            -- 標籤數組
-    category_ids INTEGER[], -- 分類 ID 數組
+    -- Array fields
+    tags TEXT[],            -- Tag array
+    category_ids INTEGER[], -- Category ID array
 
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 數組索引 (GIN)
+-- Array index (GIN)
 CREATE INDEX idx_article_tags ON t_article USING GIN(tags);
 
--- 插入數組
+-- Insert array
 INSERT INTO t_article (title, content, tags)
-VALUES ('示例文章', '內容', ARRAY['Java', 'PostgreSQL', 'Spring']);
+VALUES ('Sample Article', 'Content', ARRAY['Java', 'PostgreSQL', 'Spring']);
 
--- 查詢包含特定標籤（任一匹配）
+-- Query containing specific tags (any match)
 SELECT * FROM t_article
 WHERE tags && ARRAY['Java', 'Python'];
 
--- 查詢包含所有標籤
+-- Query containing all tags
 SELECT * FROM t_article
 WHERE tags @> ARRAY['Java', 'Spring'];
 
--- 數組追加
+-- Append to array
 UPDATE t_article
 SET tags = array_append(tags, 'NewTag')
 WHERE id = 1;
 ```
 
-### 3. MyBatis Plus 整合
+### 3. MyBatis Plus Integration
 
 ```java
-// Entity 定義
+// Entity definition
 @Data
 @TableName("t_article")
 public class Article {
@@ -193,7 +193,7 @@ public class Article {
     private String[] tags;
 }
 
-// TypeHandler 實現
+// TypeHandler implementation
 public class StringArrayTypeHandler extends BaseTypeHandler<String[]> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, String[] parameter, JdbcType jdbcType) throws SQLException {
@@ -219,7 +219,7 @@ public class StringArrayTypeHandler extends BaseTypeHandler<String[]> {
     }
 }
 
-// Mapper 查詢
+// Mapper query
 default List<Article> findByTag(String tag) {
     return selectList(new LambdaQueryWrapper<Article>()
         .apply("tags && ARRAY[{0}]::TEXT[]", tag));
@@ -228,12 +228,12 @@ default List<Article> findByTag(String tag) {
 
 ---
 
-## 【強制】CTE (公用表表達式)
+## 【Mandatory】CTE (Common Table Expression)
 
-### 1. 基本 CTE
+### 1. Basic CTE
 
 ```sql
--- 提升可讀性和可維護性
+-- Improve readability and maintainability
 WITH active_users AS (
     SELECT id, name, department_id
     FROM t_user
@@ -255,12 +255,12 @@ FROM t_department d
 LEFT JOIN department_stats ds ON d.id = ds.department_id;
 ```
 
-### 2. 遞歸 CTE（組織樹）
+### 2. Recursive CTE (Organization Tree)
 
 ```sql
--- 遞歸查詢組織樹
+-- Recursive query for organization tree
 WITH RECURSIVE org_tree AS (
-    -- 初始查詢（根節點）
+    -- Initial query (root node)
     SELECT
         id,
         name,
@@ -272,7 +272,7 @@ WITH RECURSIVE org_tree AS (
 
     UNION ALL
 
-    -- 遞歸部分
+    -- Recursive part
     SELECT
         d.id,
         d.name,
@@ -281,7 +281,7 @@ WITH RECURSIVE org_tree AS (
         ot.path || d.id
     FROM t_department d
     JOIN org_tree ot ON d.parent_id = ot.id
-    WHERE NOT d.id = ANY(ot.path)  -- 防止循環
+    WHERE NOT d.id = ANY(ot.path)  -- Prevent cycles
 )
 SELECT
     id,
@@ -292,7 +292,7 @@ FROM org_tree
 ORDER BY path;
 ```
 
-### 3. MyBatis 中使用
+### 3. MyBatis Usage
 
 ```xml
 <select id="getDepartmentStats" resultType="DepartmentStatVO">
@@ -308,12 +308,12 @@ ORDER BY path;
 
 ---
 
-## 【強制】窗口函數
+## 【Mandatory】Window Functions
 
-### 1. 排名函數
+### 1. Ranking Functions
 
 ```sql
--- 每個部門的薪資排名
+-- Salary ranking within each department
 SELECT
     name,
     department_id,
@@ -323,16 +323,16 @@ SELECT
     ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY salary DESC) as row_num
 FROM t_employee;
 
--- 差異：
--- RANK: 1, 2, 2, 4（有並列時跳號）
--- DENSE_RANK: 1, 2, 2, 3（有並列不跳號）
--- ROW_NUMBER: 1, 2, 3, 4（唯一序號）
+-- Differences:
+-- RANK: 1, 2, 2, 4 (skip number when tied)
+-- DENSE_RANK: 1, 2, 2, 3 (no skip when tied)
+-- ROW_NUMBER: 1, 2, 3, 4 (unique sequence)
 ```
 
-### 2. 聚合函數
+### 2. Aggregate Functions
 
 ```sql
--- 部門平均薪資 vs 個人薪資
+-- Department average salary vs personal salary
 SELECT
     name,
     department_id,
@@ -341,7 +341,7 @@ SELECT
     salary - AVG(salary) OVER (PARTITION BY department_id) as diff_from_avg
 FROM t_employee;
 
--- 累計統計
+-- Cumulative statistics
 SELECT
     order_date,
     amount,
@@ -353,10 +353,10 @@ FROM t_order
 ORDER BY order_date;
 ```
 
-### 3. LAG/LEAD 函數
+### 3. LAG/LEAD Functions
 
 ```sql
--- 對比上一次/下一次的值
+-- Compare with previous/next value
 SELECT
     order_date,
     amount,
@@ -369,23 +369,23 @@ ORDER BY order_date;
 
 ---
 
-## 【推薦】全文搜索
+## 【Recommended】Full-Text Search
 
-### 1. 基本使用
+### 1. Basic Usage
 
 ```sql
--- 添加全文搜索列
+-- Add full-text search column
 ALTER TABLE t_article
 ADD COLUMN search_vector TSVECTOR;
 
--- 更新搜索向量（中文使用 zhparser 或 jieba）
+-- Update search vector (Chinese use zhparser or jieba)
 UPDATE t_article
 SET search_vector = to_tsvector('english', title || ' ' || content);
 
--- 創建 GIN 索引
+-- Create GIN index
 CREATE INDEX idx_article_search ON t_article USING GIN(search_vector);
 
--- 全文搜索查詢
+-- Full-text search query
 SELECT
     id,
     title,
@@ -396,7 +396,7 @@ WHERE search_vector @@ query
 ORDER BY rank DESC;
 ```
 
-### 2. 自動更新觸發器
+### 2. Auto-Update Trigger
 
 ```sql
 CREATE OR REPLACE FUNCTION article_search_trigger()
@@ -418,30 +418,30 @@ EXECUTE FUNCTION article_search_trigger();
 
 ---
 
-## 檢查清單
+## Checklist
 
-**JSONB 字段**:
-- ✅ 動態字段使用 JSONB 而非多列
-- ✅ 添加 GIN 索引支持查詢
-- ✅ 使用 JacksonTypeHandler 序列化
-- ✅ 使用 @> 操作符包含查詢
+**JSONB Fields**:
+- ✅ Use JSONB instead of multiple columns for dynamic fields
+- ✅ Add GIN index to support queries
+- ✅ Use JacksonTypeHandler for serialization
+- ✅ Use @> operator for containment queries
 
-**數組類型**:
-- ✅ 標籤系統使用 TEXT[]
-- ✅ 添加 GIN 索引支持查詢
-- ✅ 使用 StringArrayTypeHandler
-- ✅ 使用 && 或 @> 操作符查詢
+**Array Type**:
+- ✅ Use TEXT[] for tag system
+- ✅ Add GIN index to support queries
+- ✅ Use StringArrayTypeHandler
+- ✅ Use && or @> operators for queries
 
-**CTE 與窗口函數**:
-- ✅ 複雜查詢使用 CTE 提升可讀性
-- ✅ 遞歸查詢使用 RECURSIVE CTE
-- ✅ 統計分析使用窗口函數
-- ✅ 排名使用 RANK/DENSE_RANK/ROW_NUMBER
+**CTE and Window Functions**:
+- ✅ Use CTE to improve readability for complex queries
+- ✅ Use RECURSIVE CTE for recursive queries
+- ✅ Use Window Functions for statistical analysis
+- ✅ Use RANK/DENSE_RANK/ROW_NUMBER for ranking
 
 ---
 
-## 相關規範
+## Related Rules
 
-- **基礎規範**: [rules/05-postgresql-basics.md](./05-postgresql-basics.md) - 建表與索引
-- **MyBatis 整合**: [rules/05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md) - SQL 優化、遷移
-- **MyBatis Plus**: [rules/09-mybatis-plus-postgresql.md](./09-mybatis-plus-postgresql.md) - PostgreSQL 配置
+- **Basic Rules**: [rules/05-postgresql-basics.md](./05-postgresql-basics.md) - Table Creation and Indexing
+- **MyBatis Integration**: [rules/05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md) - SQL Optimization, Migration
+- **MyBatis Plus**: [rules/09-mybatis-plus-postgresql.md](./09-mybatis-plus-postgresql.md) - PostgreSQL Configuration
