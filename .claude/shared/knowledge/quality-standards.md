@@ -1,6 +1,12 @@
 # Code Quality Standards
 
-This document defines quality standards that all code must meet in the SmartAdmin project. **All agents must enforce these standards when writing or reviewing code.**
+This document provides a quality checklist and quick reference for SmartAdmin code standards. **All agents must enforce these standards when writing or reviewing code.**
+
+**For detailed technical rules**, see:
+- [Architecture Rules](../../../.agent/rules/10-architecture-rules.md) - Layered architecture enforcement
+- [Naming Conventions](../../../.agent/rules/01-naming-conventions.md) - Complete Alibaba guidelines
+- [Exception & Logging](../../../.agent/rules/04-exception-logging.md) - Error handling standards
+- [Quality Tool Rules](../../../.agent/rules/) - PMD, SpotBugs, Checkstyle, etc.
 
 ## Code Quality Checklist
 
@@ -50,7 +56,11 @@ Before completing any implementation, verify:
 - [ ] Edge cases covered
 - [ ] Mock external dependencies
 
-## Naming Conventions (Alibaba Guidelines)
+## Naming Conventions
+
+→ **[Complete Naming Conventions (Alibaba Guidelines)](../../../.agent/rules/01-naming-conventions.md)**
+
+**Quick Reference:**
 
 ### Class Naming
 

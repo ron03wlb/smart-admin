@@ -362,8 +362,8 @@ List<OrderVO> orders = orderMapper.selectOrdersWithUser(wrapper);
 
 如果以上方案無法解決您的問題:
 
-1. **查看詳細規範**: [rules/](../rules/) 目錄下的相關規則文檔
-2. **查看工作流程**: [workflows/](../workflows/) 目錄下的相關流程
+1. **查看詳細規範**: [rules/00-ai-decision-matrix.md](../rules/00-ai-decision-matrix.md) 和 rules/ 目錄下的相關規則文檔
+2. **查看工作流程**: [workflows/00-workflow-index.md](../workflows/00-workflow-index.md) 和 workflows/ 目錄下的相關流程
 3. **查看錯誤恢復流程**: [workflows/java-failure-recovery.md](../workflows/java-failure-recovery.md)
 4. **官方文檔**: https://smartadmin.vip
 

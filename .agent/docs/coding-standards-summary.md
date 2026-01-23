@@ -4,8 +4,8 @@
 
 **📖 閱讀指南**:
 - 本文提供 **開發規範概述**，適合快速瀏覽和新人入職
-- 完整規範和 AI 決策邏輯請參考 [rules/](../rules/) 目錄下的詳細文檔
-- 常用命令速查請參考 [quick-reference.md](quick-reference.md)
+- 完整規範和 AI 決策邏輯請參考 [rules/00-ai-decision-matrix.md](../rules/00-ai-decision-matrix.md) 和 rules/ 目錄下的詳細文檔
+- 常用命令速查請參考 [CLAUDE.md](../../CLAUDE.md) (Quick Reference Card)
 - 遇到問題請參考 [faq-troubleshooting.md](faq-troubleshooting.md)
 
 ---

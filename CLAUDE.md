@@ -1,13 +1,14 @@
 # CLAUDE.md
 
-**Navigation**: See [README.md](README.md) for complete documentation index and "I want to..." guide.
+**For AI Assistants**: This documentation is designed for **Claude, Antigravity, Gemini, and other AI coding assistants**. All AI tools should read this as the primary entry point to SmartAdmin development guidelines.
 
-**Quick Reference Card** for SmartAdmin development. This document provides essential patterns, commands, and conventions for rapid development.
+**For Developers**: Quick Reference Card for SmartAdmin development patterns, conventions, and commands.
 
-**For detailed guidance**, see:
-- [.claude/ Directory](.claude/README.md) - AI agent system, multi-agent workflows, and orchestration
-- [.agent/rules/](.agent/rules/) - Comprehensive coding standards and technical rules
-- [Architecture Documentation](docs/) - High-level architecture and design decisions
+**Navigation**:
+- [README.md](README.md) - Project overview and "I want to..." guide
+- [.claude/README.md](.claude/README.md) - AI agent system and orchestration
+- [.agent/README.md](.agent/README.md) - Comprehensive technical rules
+- [Architecture Documentation](docs/) - High-level system design
 
 ---
 
@@ -22,76 +23,88 @@
 
 **Complete Patterns**: [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
 
+---
+
+## For AI Coding Assistants
+
+### Reading Priority
+
+When working with SmartAdmin codebase, read documentation in this order:
+
+1. **CLAUDE.md** (this file) - Quick reference and navigation hub
+2. **[.agent/rules/00-ai-decision-matrix.md](.agent/rules/00-ai-decision-matrix.md)** - Scenario-based rule selection
+3. **[.agent/rules/10-architecture-rules.md](.agent/rules/10-architecture-rules.md)** - Mandatory architectural constraints
+4. **[.claude/shared/knowledge/](. claude/shared/knowledge/)** - SmartAdmin implementation patterns
+5. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
+
+### Interaction Language
+
+- **Documentation**: All AI instruction documents are in English
+- **User Communication**: Respond to users in **Traditional Chinese (繁體中文)**
+- **Code Comments**: Follow project conventions (typically English)
+
+### Key Constraints (Always Apply)
+
+**CRITICAL** - These rules are enforced by ArchitectureTest and must NEVER be violated:
+
+- ✅ Service layer MUST use `io.vavr.control.Option` (NOT `java.util.Optional`)
+- ✅ Controller NEVER directly accesses Repository/Dao (must go through Service)
+- ✅ `@Transactional` / `@Cacheable` annotations ONLY in Manager layer
+- ✅ Constructor injection via `@RequiredArgsConstructor` + `private final` (NEVER `@Autowired` field injection)
+- ✅ Boolean fields: `deleted` NOT `isDeleted`
+- ✅ Use `ResponseDTO.ok(data)` for all API responses
+- ✅ Transaction annotation: `@Transactional(rollbackFor = Throwable.class)`
+
+### When in Doubt
+
+- **Architecture questions**: Consult [.agent/rules/00-ai-decision-matrix.md](.agent/rules/00-ai-decision-matrix.md) for scenario-based guidance
+- **Architectural violations**: Will fail ArchUnit tests - check [.agent/configs/ArchitectureTest.java](.agent/configs/ArchitectureTest.java)
+- **Pattern implementation**: See [.claude/shared/knowledge/smartadmin-patterns.md](.claude/shared/knowledge/smartadmin-patterns.md)
+
+---
+
 ## Build Commands
 
 **Location**: `smart-admin-api-java21-springboot3/`
 
 ```bash
-./gradlew clean build          # Build
 ./gradlew :sa-admin:bootRun    # Run (http://localhost:1024)
 ./gradlew :sa-admin:test       # Test
-./gradlew :sa-admin:test --tests ArchitectureTest  # Arch validation
 ```
 
 → **[All Build Commands](.claude/shared/knowledge/project-architecture.md#build-commands)**
 
 ## Architecture
 
-Modular monolith with strict layered architecture enforced by ArchUnit:
+Modular monolith with strict layered architecture:
 
 ```
 Controller → Service → Manager → Dao → Entity
-     ↓          ↓          ↓        ↓
-@RestController  Business   Cache   BaseMapper
- @Valid         Logic      @Transactional
 ```
 
-**Module structure:**
-- `sa-base/foundation/` - Foundation layer (cross-cutting concerns)
-- `sa-base/infrastructure/` - Infrastructure services (web, mybatis, redis, etc.)
-- `sa-base/support/` - Business support features (config, dict, file, etc.)
-- `sa-admin/` - Business logic, system modules
-
-**Layer rules (enforced via ArchitectureTest.java):**
-- Controller → Service ONLY (never directly to Manager/Dao)
-- Service → Manager OR Dao
-- Manager → Dao ONLY (never to Service or other Managers)
-- `@Transactional` / `@Cacheable`: ONLY in Manager layer
+**Key Rules** (enforced by ArchUnit):
+- Controller → Service ONLY
+- `@Transactional` / `@Cacheable`: Manager layer ONLY
 - `@Autowired` field injection: FORBIDDEN
 
-**See also**:
-- [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md) - Detailed implementation patterns
-- [Project Architecture](.claude/shared/knowledge/project-architecture.md) - Module structure and build configuration
-- [Quality Standards](.claude/shared/knowledge/quality-standards.md) - Code quality checklist
+→ **[Complete Architecture Rules](.agent/rules/10-architecture-rules.md)**
+→ **[SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)**
+→ **[Project Architecture](.claude/shared/knowledge/project-architecture.md)**
 
 ## Foundation Package Naming
 
-**Standard Pattern (v3.6.0+):**
-- Foundation modules: `net.lab1024.sa.foundation.{module-name}.*`
-- Foundation domain: `net.lab1024.sa.foundation.domain.*` (ResponseDTO, PageResult, ErrorCode, etc.)
-- Infrastructure modules: `net.lab1024.sa.base.{module-name}.*`
-- Support modules: `net.lab1024.sa.base.module.support.{module-name}.*`
-
-**Examples:**
-- `sa-base/foundation/cache/` → `net.lab1024.sa.foundation.cache.*`
-- `sa-base/foundation/mq/` → `net.lab1024.sa.foundation.mq.kafka.*`
-- `sa-base/foundation/domain/` → `net.lab1024.sa.foundation.domain.response.ResponseDTO`
-- `sa-base/infrastructure/web/` → `net.lab1024.sa.base.web.*`
-- `sa-base/support/dict/` → `net.lab1024.sa.base.module.support.dict.*`
-
-**Migrated Modules (8 foundation modules):**
-api-encrypt, cache, captcha, data-masking, mq, redis-lock, repeat-submit, security-protect
+**v3.6.0+ Standard Pattern:**
+- Foundation: `net.lab1024.sa.foundation.{module}.*`
+- Infrastructure: `net.lab1024.sa.base.{module}.*`
+- Support: `net.lab1024.sa.base.module.support.{module}.*`
 
 **v4.0.0 Breaking Change:**
-- ❌ **REMOVED**: `net.lab1024.sa.common.core.*` bridge classes (ResponseDTO, PageResult, ErrorCode, etc.)
-- ✅ **Use instead**: `net.lab1024.sa.foundation.domain.*` packages
-- ℹ️ **Exception**: `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*` (documented)
+- ❌ **REMOVED**: `net.lab1024.sa.common.core.*` bridge classes
+- ✅ **Use instead**: `net.lab1024.sa.foundation.domain.*`
+- ℹ️ **Exception**: `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*`
 
-**Deprecated (DO NOT USE):**
-- ❌ `net.lab1024.sa.common.*` (legacy naming, removed in package standardization)
-
-→ **[Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
-→ **[v4.0.0 Breaking Changes](#v40-breaking-changes)** (see below)
+→ **[Complete Package Naming Guide](docs/migration/foundation-package-naming-standardization.md)**
+→ **[v4.0.0 Breaking Changes](#v40-breaking-changes)**
 
 ## SmartAdmin Patterns
 
@@ -109,23 +122,17 @@ api-encrypt, cache, captcha, data-masking, mq, redis-lock, repeat-submit, securi
 ## Key Conventions
 
 **Dependency Injection (MANDATORY):**
-- Use `@RequiredArgsConstructor` + `private final` fields
-- NEVER use `@Autowired` field injection
+- `@RequiredArgsConstructor` + `private final` fields
+- NEVER `@Autowired` field injection
 
-**Naming:**
-- Classes: `UserController`, `UserService`, `UserManager`, `UserDao`, `UserEntity`
-- Forms: `UserAddForm`, `UserUpdateForm`, `UserQueryForm`
-- Boolean fields: `deleted` NOT `isDeleted`
+**Naming Examples:**
+- Classes: `UserController`, `UserService`, `UserManager`, `UserDao`
+- Boolean: `deleted` NOT `isDeleted`
 
-**Commit messages:** Conventional Commits format
-```
-<type>(<scope>): <subject>
+**Commit Format:** `<type>(<scope>): <subject>`
 
-Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-Scopes: sa-admin, sa-base, sa-common, smart-admin-web, smart-app, docker, docs
-```
-
-→ **[Complete Conventions](.agent/rules/01-naming-conventions.md)**
+→ **[Complete Naming Conventions](.agent/rules/01-naming-conventions.md)**
+→ **[Commit Message Guide](.agent/rules/17-commit-message-conventions.md)**
 
 ## Anti-Patterns to Avoid
 
@@ -154,21 +161,19 @@ Scopes: sa-admin, sa-base, sa-common, smart-admin-web, smart-app, docker, docs
 
 ## Development Guidelines
 
-Detailed coding standards in `.agent/rules/`:
-- `10-architecture-rules.md` - Layered architecture
-- `09-manager-layer.md` - Manager layer constraints
-- `01-naming-conventions.md` - Naming standards (Alibaba guidelines)
-- `17-commit-message-conventions.md` - Git conventions
-- `04-exception-logging.md` - Exception & logging standards
+**Essential Rules** (see `.agent/rules/`):
+- Architecture: `10-architecture-rules.md`
+- Manager Layer: `09-manager-layer.md`
+- Naming: `01-naming-conventions.md`
+- Exceptions: `04-exception-logging.md`
 
-Run architecture validation before commits:
+**Validation**:
 ```bash
 ./gradlew :sa-admin:test --tests ArchitectureTest
 ```
 
-**See also**:
-- [Quality Standards](.claude/shared/knowledge/quality-standards.md) - Code quality checklist
-- [.claude/ Directory](.claude/README.md) - Agent system and orchestration
+→ **[All Rules Index](.agent/rules/00-ai-decision-matrix.md)**
+→ **[Quality Standards](.claude/shared/knowledge/quality-standards.md)**
 
 ## Quality Tool Patterns
 
@@ -192,50 +197,38 @@ Detailed rules: See [.agent/rules/12-pmd-rules.md](.agent/rules/12-pmd-rules.md)
 
 ## v4.0.0 Breaking Changes
 
-**Bridge Class Removal (BREAKING):**
+**Bridge Class Removal**: All `net.lab1024.sa.common.core.*` bridge classes permanently removed.
 
-As of v4.0.0, all bridge classes in `net.lab1024.sa.common.core.*` have been **permanently removed**. Code must use `net.lab1024.sa.foundation.domain.*` packages.
+**Key Changes:**
+- ❌ OLD: `net.lab1024.sa.common.core.domain.ResponseDTO`
+- ✅ NEW: `net.lab1024.sa.foundation.domain.response.ResponseDTO`
+- ℹ️ **Exception**: `SmartBeanUtil` remains in `common.core.util.*`
 
-**Removed Packages:**
-| Removed (v4.0.0) | Use Instead |
-|------------------|-------------|
-| `net.lab1024.sa.common.core.code.*` | `net.lab1024.sa.foundation.domain.code.*` |
-| `net.lab1024.sa.common.core.constant.*` | `net.lab1024.sa.foundation.domain.constant.*` |
-| `net.lab1024.sa.common.core.domain.ResponseDTO` | `net.lab1024.sa.foundation.domain.response.ResponseDTO` |
-| `net.lab1024.sa.common.core.domain.PageResult` | `net.lab1024.sa.foundation.domain.response.PageResult` |
-| `net.lab1024.sa.common.core.domain.PageParam` | `net.lab1024.sa.foundation.domain.request.PageParam` |
-| `net.lab1024.sa.common.core.domain.RequestUser` | `net.lab1024.sa.foundation.domain.request.RequestUser` |
-| `net.lab1024.sa.common.core.enumeration.*` | `net.lab1024.sa.foundation.domain.enumeration.*` |
-| `net.lab1024.sa.common.core.exception.*` | `net.lab1024.sa.foundation.domain.exception.*` |
-
-**Exception:**
-- ✅ `net.lab1024.sa.common.core.util.SmartBeanUtil` - **Remains unchanged** (intentional, documented)
-
-**Migration:**
+**Migration Tool:**
 ```bash
-# Automated migration tool (recommended)
 cd smart-admin-api-java21-springboot3
 ./gradlew migrateToFoundation
-
-# Manual search and replace
-# OLD: import net.lab1024.sa.common.core.domain.ResponseDTO;
-# NEW: import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 ```
 
-**For External Projects:**
-- **Option 1**: Migrate to v4.0.0 (run migration tool, test, upgrade)
-- **Option 2**: Stay on v3.9.x (receives security patches until Q2 2027)
-
-→ **[Complete Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
+→ **[Complete Package Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
 
 ---
 
-## Version
+## Documentation System Version
 
-**Document Version**: 2.0.0
-**Last Updated**: 2026-01-23
-**Aligned with**: SmartAdmin v4.0.0, .claude/ v2.5.0, .agent/rules/ (latest)
+| Component | Version | Status | Metadata |
+|-----------|---------|--------|----------|
+| **This Document** | 3.0.0 | ✅ Universal AI Support | - |
+| **AI Doc System** | 3.0.0 | ✅ Unified | [.claude/META.md](.claude/META.md) |
+| **.claude/** | 2.6.0 | ✅ Agent System | [.claude/README.md](.claude/README.md) |
+| **.agent/** | (unversioned) | ✅ Technical Rules | [.agent/README.md](.agent/README.md) |
+| **SmartAdmin** | v4.0.0 | ✅ Production | - |
+
+**System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership
+
+**Last Updated**: 2026-01-24
 
 **Change History**:
-- 2.0.0 (2026-01-23): v4.0.0 breaking changes - removed bridge classes, updated foundation package documentation
-- 1.0.0 (2026-01-22): Initial versioned release with cross-references to .claude/ and improved navigation
+- 3.0.0 (2026-01-24): Content deduplication, universal AI support, unified version management
+- 2.0.0 (2026-01-23): v4.0.0 breaking changes, foundation package documentation
+- 1.0.0 (2026-01-22): Initial versioned release

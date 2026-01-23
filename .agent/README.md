@@ -128,9 +128,9 @@ smart-admin-web/
 ## 4. 技術棧與開發規範
 
 ### 📚 詳細文檔
-- **技術棧詳情**: [docs/tech-stack.md](docs/tech-stack.md)
+- **技術棧詳情**: [../.claude/shared/knowledge/project-architecture.md](../.claude/shared/knowledge/project-architecture.md#technology-stack)
 - **開發規範總覽**: [docs/coding-standards-summary.md](docs/coding-standards-summary.md)
-- **快速參考**: [docs/quick-reference.md](docs/quick-reference.md)
+- **快速參考**: [../CLAUDE.md](../CLAUDE.md)
 - **常見問題**: [docs/faq-troubleshooting.md](docs/faq-troubleshooting.md)
 
 ### 核心技術要點
@@ -226,7 +226,7 @@ Quality Gate 通過條件:
 ## 7. 快速導航
 
 ### 常用資源
-- **快速參考**: [docs/quick-reference.md](docs/quick-reference.md) - 常用命令、模式速查
+- **快速參考**: [../CLAUDE.md](../CLAUDE.md) - 常用命令、模式速查
 - **常見問題**: [docs/faq-troubleshooting.md](docs/faq-troubleshooting.md) - 故障排除
 - **官方文件**: https://smartadmin.vip
 - **線上預覽**: https://preview.smartadmin.vip

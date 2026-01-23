@@ -4,15 +4,56 @@ This document provides essential context about the SmartAdmin project structure,
 
 ## Technology Stack
 
+### Backend Stack (smart-admin-api-java21-springboot3)
+
+| Component | Version | Purpose | Rules Reference |
+|-----------|---------|---------|-----------------|
+| **Java** | 21 | Programming language with modern features | [01-naming-conventions.md](../../../.agent/rules/01-naming-conventions.md) |
+| **Spring Boot** | 3.5.4 | Application framework | [10-architecture-rules.md](../../../.agent/rules/10-architecture-rules.md) |
+| **MyBatis Plus** | 3.5.12 | ORM and database access | [09-mybatis-plus-core.md](../../../.agent/rules/09-mybatis-plus-core.md) |
+| **Sa-Token** | 1.44.0 | Authentication and authorization | - |
+| **PostgreSQL Driver** | 42.7.5 | Database driver | [05-postgresql-basics.md](../../../.agent/rules/05-postgresql-basics.md) |
+| **Vavr** | 0.10.4 | Functional programming library | [08-vavr-fundamentals.md](../../../.agent/rules/08-vavr-fundamentals.md) |
+| **Knife4j** | 4.6.0 | API documentation (Swagger UI) | - |
+| **Druid** | 1.2.25 | Database connection pool | - |
+| **Redisson** | 3.50.0 | Distributed Redis client with caching | - |
+| **P6Spy** | 3.9.1 | SQL monitoring and logging | - |
+| **Gradle** | - | Build tool with Kotlin DSL | - |
+
+### Frontend Stack (smart-admin-web)
+
 | Component | Version | Purpose |
 |-----------|---------|---------|
-| **Java** | 21 | Programming language with modern features |
-| **Spring Boot** | 3.5.4 | Application framework |
-| **MyBatis Plus** | 3.5.12 | ORM and database access |
-| **Sa-Token** | 1.44.0 | Authentication and authorization |
-| **Redisson** | 3.50.0 | Distributed Redis client with caching |
-| **Knife4j** | 4.6.0 | API documentation (Swagger UI) |
-| **Gradle** | - | Build tool with Kotlin DSL |
+| **Vue** | 3.4.27 | Progressive JavaScript framework |
+| **TypeScript** | 5.6.3 | Type-safe JavaScript |
+| **Vite** | 5.2.12 | Build tool and dev server |
+| **Ant Design Vue** | 4.2.5 | Enterprise UI component library |
+| **Pinia** | 2.1.7 | State management |
+| **Vue Router** | 4.3.2 | Routing library |
+| **Node.js** | >= 18 | JavaScript runtime |
+
+### Technology Highlights
+
+**Java 21**
+- Virtual Threads for improved concurrency
+- Pattern Matching for cleaner code
+- Record types for immutable data classes
+
+**Vavr 0.10.4**
+- Functional containers: `Option`, `Try`, `Either`
+- Replaces null checks and try-catch blocks
+- See: [08-vavr-fundamentals.md](../../../.agent/rules/08-vavr-fundamentals.md)
+
+**PostgreSQL 16** (Target Architecture)
+- JSONB support for flexible document storage
+- Array types for efficient data structures
+- CTEs and window functions for complex queries
+- See: [05-postgresql-advanced.md](../../../.agent/rules/05-postgresql-advanced.md)
+
+**MyBatis Plus 3.5.12**
+- LambdaQueryWrapper for type-safe queries (preferred)
+- Automatic CRUD via BaseMapper
+- See: [09-mybatis-plus-core.md](../../../.agent/rules/09-mybatis-plus-core.md)
 
 ## Module Structure
 

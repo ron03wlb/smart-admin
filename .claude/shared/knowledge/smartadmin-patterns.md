@@ -1,14 +1,18 @@
-# SmartAdmin Architecture Patterns
+# SmartAdmin Implementation Patterns
 
-This document defines the mandatory architectural patterns and conventions for the SmartAdmin framework. **All agents must adhere to these patterns when working with this codebase.**
+This document provides SmartAdmin-specific implementation patterns and code examples. **All agents must adhere to these patterns when working with this codebase.**
 
-## Mandatory Layered Architecture
+**For detailed architectural rules and enforcement**, see: [.agent/rules/10-architecture-rules.md](../../../.agent/rules/10-architecture-rules.md)
+
+## Layered Architecture Overview
 
 SmartAdmin enforces strict layering rules validated by `ArchitectureTest.java`:
 
 ```
 Controller → Service → Manager → Dao → Entity
 ```
+
+**Quick Reference** (see [architecture rules](../../../.agent/rules/10-architecture-rules.md) for complete details):
 
 ### Layer Responsibilities
 
@@ -44,14 +48,14 @@ Controller → Service → Manager → Dao → Entity
 
 ### Critical Architecture Rules
 
-**MANDATORY (enforced by ArchitectureTest):**
-- ✅ Controllers call Service layer ONLY
-- ✅ Services call Manager OR Dao (never other Services)
-- ✅ Managers call Dao ONLY (never Services or other Managers)
-- ✅ `@Transactional` belongs ONLY in Manager layer with `rollbackFor = Throwable.class`
-- ✅ `@Cacheable` belongs ONLY in Manager layer
-- ✅ Constructor injection ONLY via `@RequiredArgsConstructor` + `private final`
-- ❌ NEVER use `@Autowired` field injection
+**MANDATORY** (enforced by ArchitectureTest - see [complete rules](../../../.agent/rules/10-architecture-rules.md)):
+- ✅ Controller → Service ONLY
+- ✅ `@Transactional` / `@Cacheable`: Manager layer ONLY
+- ✅ Constructor injection via `@RequiredArgsConstructor` + `private final`
+- ❌ NEVER `@Autowired` field injection
+
+→ **[Complete Architecture Rules & ArchUnit Tests](../../../.agent/rules/10-architecture-rules.md)**
+→ **[Manager Layer Constraints](../../../.agent/rules/09-manager-layer.md)**
 
 ## ResponseDTO Pattern
 
