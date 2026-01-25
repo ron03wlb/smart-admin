@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Error Prone 編譯時檢查規範
+description: Error Prone Compile-Time Check Standards
 tags: [static-analysis, error-prone, compile-time-check]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -12,144 +12,144 @@ related_rules:
 last_updated: 2025-01-21
 ---
 
-# Error Prone 規範
+# Error Prone Standards
 
-**TL;DR**: Error Prone 是 Google 開發的 Java 編譯器插件，在編譯時檢測常見 Bug 模式並提供修復建議。
+**TL;DR**: Error Prone is a Google-developed Java compiler plugin that detects common bug patterns at compile time and provides fix suggestions.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Directive Block
 
-### 何時應用此規則
-- ✅ 生成任何 Java 代碼時
-- ✅ 編譯失敗且錯誤來自 Error Prone 時
-- ✅ 用戶詢問編譯時 Bug 檢測
+### When to Apply This Rule
+- ✅ When generating any Java code
+- ✅ When compilation fails with Error Prone errors
+- ✅ User asks about compile-time bug detection
 
-### 強制執行檢查清單
-- [ ] 無 `==` 比較字符串（使用 `equals()`）
-- [ ] 無忽略返回值的方法調用
-- [ ] 無格式化字符串參數數量不匹配
-- [ ] 無未使用的變量/參數
-- [ ] 無不安全的類型轉換
+### Mandatory Enforcement Checklist
+- [ ] No `==` for string comparison (use `equals()`)
+- [ ] No ignored return values from method calls
+- [ ] No format string parameter count mismatch
+- [ ] No unused variables/parameters
+- [ ] No unsafe type casts
 
-### AI 決策樹
+### AI Decision Tree
 ```
-Error Prone 錯誤 → 識別 Bug 類型
+Error Prone Error → Identify Bug Type
   ├─ StringEquality
-  │   └─ 使用 equals() 替代 ==
+  │   └─ Use equals() instead of ==
   ├─ ReturnValueIgnored
-  │   └─ 處理或賦值返回結果
+  │   └─ Handle or assign return result
   ├─ FormatString
-  │   └─ 修正格式化參數數量
+  │   └─ Fix format parameter count
   └─ UnusedVariable
-      └─ 移除或使用該變量
+      └─ Remove or use the variable
 ```
 
-### 錯誤模式檢測與自動修正
+### Error Pattern Detection and Auto-Fix
 
-#### StringEquality - 字符串比較
+#### StringEquality - String Comparison
 ```java
-// ❌ 違規 - 編譯錯誤
+// ❌ Violation - Compilation error
 if (status == "ACTIVE") {
     // ...
 }
 
-// ✅ 修正
+// ✅ Fix
 if ("ACTIVE".equals(status)) {
     // ...
 }
 
-// ✅ 或使用 Objects.equals
+// ✅ Or use Objects.equals
 if (Objects.equals(status, "ACTIVE")) {
     // ...
 }
 ```
 
-#### ReturnValueIgnored - 忽略返回值
+#### ReturnValueIgnored - Ignored Return Value
 ```java
-// ❌ 違規 - 編譯警告/錯誤
-stringBuilder.append("text");  // StringBuilder.append 返回 this
-file.delete();                  // File.delete 返回 boolean
+// ❌ Violation - Compilation warning/error
+stringBuilder.append("text");  // StringBuilder.append returns this
+file.delete();                  // File.delete returns boolean
 
-// ✅ 修正
+// ✅ Fix
 stringBuilder = stringBuilder.append("text");
-// 或鏈式調用
+// Or method chaining
 stringBuilder.append("text").append("more");
 
-// 對於 delete
+// For delete
 if (!file.delete()) {
     log.warn("Failed to delete file: {}", file);
 }
 ```
 
-#### FormatString - 格式化字符串
+#### FormatString - Format String
 ```java
-// ❌ 違規 - 參數數量不匹配
-String.format("User: %s, Age: %d", name);  // 缺少 age 參數
-log.info("Processing {} with status {}", id);  // 缺少 status 參數
+// ❌ Violation - Parameter count mismatch
+String.format("User: %s, Age: %d", name);  // Missing age parameter
+log.info("Processing {} with status {}", id);  // Missing status parameter
 
-// ✅ 修正
+// ✅ Fix
 String.format("User: %s, Age: %d", name, age);
 log.info("Processing {} with status {}", id, status);
 ```
 
-#### UnusedVariable - 未使用變量
+#### UnusedVariable - Unused Variable
 ```java
-// ❌ 違規
+// ❌ Violation
 public void process(String data) {
-    int count = 0;  // 未使用
+    int count = 0;  // Unused
     // ...
 }
 
-// ✅ 修正 - 移除未使用變量
+// ✅ Fix - Remove unused variable
 public void process(String data) {
     // ...
 }
 
-// ✅ 或者使用 @SuppressWarnings
+// ✅ Or use @SuppressWarnings
 @SuppressWarnings("UnusedVariable")
 public void process(String data) {
-    int count = 0;  // 有意保留
+    int count = 0;  // Intentionally kept
     // ...
 }
 ```
 
 ---
 
-## 【強制】啟用規則說明
+## [Mandatory] Enabled Rule Description
 
-### 默認錯誤級別
+### Default Error Level
 
-| Bug Pattern          | 說明                   | 級別    |
-| -------------------- | ---------------------- | ------- |
-| `StringEquality`     | 使用 == 比較字符串     | ERROR   |
-| `ReturnValueIgnored` | 忽略重要返回值         | WARNING |
-| `FormatString`       | 格式化參數不匹配       | ERROR   |
-| `MissingOverride`    | 缺少 @Override         | WARNING |
-| `UnusedVariable`     | 未使用的變量           | WARNING |
-| `UnusedMethod`       | 未使用的私有方法       | WARNING |
-| `FallThrough`        | switch 語句穿透        | WARNING |
-| `EqualsHashCode`     | equals/hashCode 不匹配 | ERROR   |
+| Bug Pattern          | Description                | Level   |
+| -------------------- | -------------------------- | ------- |
+| `StringEquality`     | Using == to compare strings | ERROR   |
+| `ReturnValueIgnored` | Ignoring important return values | WARNING |
+| `FormatString`       | Format parameter mismatch   | ERROR   |
+| `MissingOverride`    | Missing @Override           | WARNING |
+| `UnusedVariable`     | Unused variable             | WARNING |
+| `UnusedMethod`       | Unused private method       | WARNING |
+| `FallThrough`        | Switch statement fall-through | WARNING |
+| `EqualsHashCode`     | equals/hashCode mismatch    | ERROR   |
 
-### 安全相關規則
+### Security-Related Rules
 
-| Bug Pattern          | 說明              | 級別    |
-| -------------------- | ----------------- | ------- |
-| `InsecureCipherMode` | 不安全的加密模式  | ERROR   |
-| `BadShiftAmount`     | 錯誤的位移量      | ERROR   |
-| `ArrayToString`      | 數組直接 toString | WARNING |
+| Bug Pattern          | Description             | Level   |
+| -------------------- | ----------------------- | ------- |
+| `InsecureCipherMode` | Insecure cipher mode    | ERROR   |
+| `BadShiftAmount`     | Incorrect shift amount  | ERROR   |
+| `ArrayToString`      | Array direct toString   | WARNING |
 
 ---
 
-## 配置說明
+## Configuration Description
 
-### Gradle 配置位置
+### Gradle Configuration Location
 ```
 smart-admin-api-java21-springboot3/
-└── build.gradle.kts          # Error Prone 插件配置
+└── build.gradle.kts          # Error Prone plugin configuration
 ```
 
-### build.gradle.kts 配置
+### build.gradle.kts Configuration
 ```kotlin
 plugins {
     alias(libs.plugins.errorprone) apply false
@@ -164,7 +164,7 @@ subprojects {
 }
 ```
 
-### 版本配置（gradle/libs.versions.toml）
+### Version Configuration (gradle/libs.versions.toml)
 ```toml
 [versions]
 errorprone = "2.36.0"
@@ -177,17 +177,17 @@ error-prone-core = { module = "com.google.errorprone:error_prone_core", version.
 errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
 ```
 
-### 自定義錯誤級別
+### Custom Error Level
 ```kotlin
 tasks.withType<JavaCompile>().configureEach {
     options.errorprone {
-        // 將警告升級為錯誤
+        // Upgrade warning to error
         error("ReturnValueIgnored")
-        
-        // 將錯誤降級為警告
+
+        // Downgrade error to warning
         warn("UnusedVariable")
-        
-        // 禁用特定檢查
+
+        // Disable specific check
         disable("MissingSummary")
     }
 }
@@ -195,21 +195,21 @@ tasks.withType<JavaCompile>().configureEach {
 
 ---
 
-## 抑制警告
+## Suppressing Warnings
 
-### 方法級別
+### Method Level
 ```java
 @SuppressWarnings("ReturnValueIgnored")
 public void processFile(File file) {
-    file.delete();  // 有意忽略返回值
+    file.delete();  // Intentionally ignore return value
 }
 ```
 
-### 行級別
+### Line Level
 ```java
 @SuppressWarnings("StringEquality")
 public boolean isSameInstance(String a, String b) {
-    return a == b;  // 故意比較引用
+    return a == b;  // Intentionally compare reference
 }
 ```
 
@@ -217,37 +217,37 @@ public boolean isSameInstance(String a, String b) {
 
 ## Error Prone vs SpotBugs
 
-| 功能         | Error Prone  | SpotBugs         |
-| ------------ | ------------ | ---------------- |
-| **執行時機** | 編譯時       | 編譯後           |
-| **分析方式** | 源碼分析     | 字節碼分析       |
-| **速度**     | 快（編譯時） | 慢（單獨步驟）   |
-| **規則數量** | ~500         | ~450             |
-| **安全規則** | 較少         | FindSecBugs 豐富 |
+| Feature         | Error Prone    | SpotBugs           |
+| --------------- | -------------- | ------------------ |
+| **Timing**      | Compile-time   | Post-compilation   |
+| **Analysis**    | Source analysis | Bytecode analysis  |
+| **Speed**       | Fast (compile) | Slow (separate step) |
+| **Rule Count**  | ~500           | ~450               |
+| **Security**    | Fewer          | FindSecBugs rich   |
 
-**建議**: 兩者互補使用
-- Error Prone: 編譯時快速反饋
-- SpotBugs: 更深入的安全和 Bug 分析
+**Recommendation**: Use both complementarily
+- Error Prone: Quick compile-time feedback
+- SpotBugs: Deeper security and bug analysis
 
 ---
 
-## 驗證命令
+## Verification Commands
 
 ```bash
-# Error Prone 在編譯時自動執行
+# Error Prone runs automatically during compilation
 ./gradlew compileJava
 
-# 查看編譯輸出中的 Error Prone 警告
+# View Error Prone warnings in compilation output
 ./gradlew compileJava --warning-mode all
 
-# 如需單獨運行（通常不需要）
+# If separate run needed (usually not necessary)
 ./gradlew check
 ```
 
 ---
 
-## 相關規範
+## Related Specifications
 
-- [13-spotbugs-rules.md](./13-spotbugs-rules.md) - SpotBugs Bug 檢測
-- [02-oop-principles.md](./02-oop-principles.md) - OOP 規範
-- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - 質量門禁流程
+- [13-spotbugs-rules.md](./13-spotbugs-rules.md) - SpotBugs bug detection
+- [02-oop-principles.md](./02-oop-principles.md) - OOP standards
+- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - Quality gates workflow

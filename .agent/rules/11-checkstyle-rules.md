@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Checkstyle 代碼風格規範
+description: Checkstyle Code Style Standards
 tags: [static-analysis, checkstyle, code-style]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -12,52 +12,52 @@ checkstyle_rule: TypeName,MethodName,ConstantName,AvoidStarImport
 last_updated: 2025-01-21
 ---
 
-# Checkstyle 規範
+# Checkstyle Standards
 
-**TL;DR**: Checkstyle 強制執行代碼風格一致性，包括命名規範、空白符、大括號、import 規則。所有違規必須在提交前修復。
+**TL;DR**: Checkstyle enforces code style consistency, including naming conventions, whitespace, braces, and import rules. All violations must be fixed before committing.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Directive Block
 
-### 何時應用此規則
-- ✅ 生成任何 Java 代碼時
-- ✅ Code Review 時檢查代碼風格
-- ✅ `./gradlew checkstyleMain` 或 `mvn checkstyle:check` 失敗時
-- ✅ 用戶詢問代碼格式問題
+### When to Apply This Rule
+- ✅ When generating any Java code
+- ✅ During Code Review to check code style
+- ✅ When `./gradlew checkstyleMain` or `mvn checkstyle:check` fails
+- ✅ User asks about code formatting issues
 
-### 強制執行檢查清單
-- [ ] 禁止 `import *` 星號導入
-- [ ] 每個文件只有一個頂層類
-- [ ] 大括號 `{` 不換行（K&R 風格）
-- [ ] 操作符周圍有空白符
-- [ ] 類名 UpperCamelCase、方法名 lowerCamelCase
-- [ ] 包名全小寫
+### Mandatory Enforcement Checklist
+- [ ] Prohibit `import *` star imports
+- [ ] One top-level class per file
+- [ ] Opening brace `{` does not break line (K&R style)
+- [ ] Whitespace around operators
+- [ ] Class names UpperCamelCase, method names lowerCamelCase
+- [ ] Package names all lowercase
 
-### AI 決策樹
+### AI Decision Tree
 ```
-Checkstyle 錯誤 → 識別規則類型
+Checkstyle Error → Identify Rule Type
   ├─ AvoidStarImport
-  │   └─ 展開為具體類導入
+  │   └─ Expand to specific class imports
   ├─ WhitespaceAround
-  │   └─ 在操作符/關鍵字周圍添加空格
+  │   └─ Add spaces around operators/keywords
   ├─ NeedBraces
-  │   └─ 添加大括號（即使單行）
+  │   └─ Add braces (even for single line)
   ├─ LeftCurly / RightCurly
-  │   └─ 調整大括號位置
-  └─ 命名規則 (TypeName/MethodName/...)
-      └─ 按規範重命名
+  │   └─ Adjust brace position
+  └─ Naming Rules (TypeName/MethodName/...)
+      └─ Rename according to specification
 ```
 
-### 錯誤模式檢測與自動修正
+### Error Pattern Detection and Auto-Fix
 
 #### AvoidStarImport
 ```java
-// ❌ 違規
+// ❌ Violation
 import java.util.*;
 import org.springframework.web.bind.annotation.*;
 
-// ✅ 修正
+// ✅ Fix
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,12 +66,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 #### WhitespaceAround
 ```java
-// ❌ 違規
+// ❌ Violation
 if(condition){
 int x=1+2;
 }
 
-// ✅ 修正
+// ✅ Fix
 if (condition) {
     int x = 1 + 2;
 }
@@ -79,25 +79,25 @@ if (condition) {
 
 #### NeedBraces
 ```java
-// ❌ 違規
+// ❌ Violation
 if (condition)
     doSomething();
 
-// ✅ 修正
+// ✅ Fix
 if (condition) {
     doSomething();
 }
 ```
 
-#### LeftCurly (K&R 風格)
+#### LeftCurly (K&R Style)
 ```java
-// ❌ 違規
+// ❌ Violation
 public void method()
 {
     // ...
 }
 
-// ✅ 修正
+// ✅ Fix
 public void method() {
     // ...
 }
@@ -105,53 +105,53 @@ public void method() {
 
 ---
 
-## 【強制】啟用規則說明
+## [Mandatory] Enabled Rule Description
 
-| 規則                           | 說明                           | 示例                                  |
-| ------------------------------ | ------------------------------ | ------------------------------------- |
-| `AvoidStarImport`              | 禁止星號導入                   | `import java.util.*` ❌                |
-| `OneTopLevelClass`             | 每個文件只有一個頂層類         | -                                     |
-| `NoLineWrap`                   | 禁止 package/import 換行       | -                                     |
-| `NeedBraces`                   | 強制大括號                     | `if (x) y;` ❌                         |
-| `LeftCurly`                    | 左大括號不換行                 | K&R 風格                              |
-| `RightCurly`                   | 右大括號獨立一行或與 else 同行 | -                                     |
-| `WhitespaceAround`             | 操作符周圍空白                 | `x=1` ❌ → `x = 1` ✅                   |
-| `OneStatementPerLine`          | 每行一個語句                   | -                                     |
-| `MultipleVariableDeclarations` | 每行一個變量聲明               | `int a, b;` ❌                         |
-| `ArrayTypeStyle`               | 數組類型風格                   | `String args[]` ❌ → `String[] args` ✅ |
-| `UpperEll`                     | 長整型用大寫 L                 | `100l` ❌ → `100L` ✅                   |
-| `ModifierOrder`                | 修飾符順序                     | `public static final`                 |
-| `PackageName`                  | 包名全小寫                     | `com.example.myapp`                   |
-| `TypeName`                     | 類名 UpperCamelCase            | `UserService`                         |
-| `MemberName`                   | 成員名 lowerCamelCase          | `userName`                            |
-| `ParameterName`                | 參數名 lowerCamelCase          | `userId`                              |
-| `LocalVariableName`            | 局部變量 lowerCamelCase        | `itemCount`                           |
-| `MethodName`                   | 方法名 lowerCamelCase          | `getUserById`                         |
-| `NoFinalizer`                  | 禁止 finalize() 方法           | -                                     |
+| Rule                           | Description                         | Example                               |
+| ------------------------------ | ----------------------------------- | ------------------------------------- |
+| `AvoidStarImport`              | Prohibit star imports               | `import java.util.*` ❌                |
+| `OneTopLevelClass`             | One top-level class per file        | -                                     |
+| `NoLineWrap`                   | Prohibit package/import line break  | -                                     |
+| `NeedBraces`                   | Mandatory braces                    | `if (x) y;` ❌                         |
+| `LeftCurly`                    | Opening brace does not break line   | K&R style                             |
+| `RightCurly`                   | Closing brace on own line or with else | -                                  |
+| `WhitespaceAround`             | Whitespace around operators         | `x=1` ❌ → `x = 1` ✅                   |
+| `OneStatementPerLine`          | One statement per line              | -                                     |
+| `MultipleVariableDeclarations` | One variable declaration per line   | `int a, b;` ❌                         |
+| `ArrayTypeStyle`               | Array type style                    | `String args[]` ❌ → `String[] args` ✅ |
+| `UpperEll`                     | Long literal uses uppercase L       | `100l` ❌ → `100L` ✅                   |
+| `ModifierOrder`                | Modifier order                      | `public static final`                 |
+| `PackageName`                  | Package name all lowercase          | `com.example.myapp`                   |
+| `TypeName`                     | Class name UpperCamelCase           | `UserService`                         |
+| `MemberName`                   | Member name lowerCamelCase          | `userName`                            |
+| `ParameterName`                | Parameter name lowerCamelCase       | `userId`                              |
+| `LocalVariableName`            | Local variable lowerCamelCase       | `itemCount`                           |
+| `MethodName`                   | Method name lowerCamelCase          | `getUserById`                         |
+| `NoFinalizer`                  | Prohibit finalize() method          | -                                     |
 
 ---
 
-## 配置說明
+## Configuration Description
 
-### Gradle 配置位置
+### Gradle Configuration Location
 ```
 smart-admin-api-java21-springboot3/
-├── build.gradle.kts          # Checkstyle 插件配置
+├── build.gradle.kts          # Checkstyle plugin configuration
 └── config/checkstyle/
-    └── checkstyle.xml        # 規則配置文件
+    └── checkstyle.xml        # Rule configuration file
 ```
 
-### build.gradle.kts 配置
+### build.gradle.kts Configuration
 ```kotlin
 configure<CheckstyleExtension> {
     toolVersion = libs.findVersion("checkstyle").get().toString()
-    isIgnoreFailures = false  // 發現違規即失敗
-    maxWarnings = 0           // 警告也視為錯誤
+    isIgnoreFailures = false  // Fail on violation
+    maxWarnings = 0           // Warnings also treated as errors
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
 }
 ```
 
-### checkstyle.xml 配置
+### checkstyle.xml Configuration
 ```xml
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
@@ -197,23 +197,23 @@ configure<CheckstyleExtension> {
 
 ---
 
-## 驗證命令
+## Verification Commands
 
 ```bash
 # Gradle
 ./gradlew checkstyleMain checkstyleTest
 
-# 查看報告
+# View report
 open sa-admin/build/reports/checkstyle/main.html
 
-# Maven (如使用)
+# Maven (if used)
 mvn checkstyle:check
 ```
 
 ---
 
-## 相關規範
+## Related Specifications
 
-- [01-naming-conventions.md](./01-naming-conventions.md) - 命名規範詳細說明
-- [14-spotless-rules.md](./14-spotless-rules.md) - 自動格式化（可修復部分 Checkstyle 問題）
-- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - 質量門禁流程
+- [01-naming-conventions.md](./01-naming-conventions.md) - Detailed naming conventions
+- [14-spotless-rules.md](./14-spotless-rules.md) - Auto-formatting (can fix some Checkstyle issues)
+- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - Quality gates workflow

@@ -1,6 +1,6 @@
 ---
 trigger: on_test_failure
-description: JaCoCo 測試覆蓋率規範
+description: JaCoCo Test Coverage Standards
 tags: [testing, coverage, jacoco, quality-gate]
 positioning: current-standard
 ai_role: test_generator
@@ -13,43 +13,43 @@ prerequisites:
 last_updated: 2025-01-21
 ---
 
-# JaCoCo 測試覆蓋率規範
+# JaCoCo Test Coverage Standards
 
-**TL;DR**: JaCoCo 測量測試覆蓋率，強制要求行覆蓋率 ≥80%、分支覆蓋率 ≥70%。新代碼必須有對應測試。
+**TL;DR**: JaCoCo measures test coverage, mandating line coverage ≥80%, branch coverage ≥70%. New code must have corresponding tests.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Directive Block
 
-### 何時應用此規則
-- ✅ 創建新的 Service/Manager 類時
-- ✅ `./gradlew jacocoTestCoverageVerification` 失敗時
-- ✅ Code Review 時檢查測試覆蓋
-- ✅ 用戶詢問測試覆蓋率問題
+### When to Apply This Rule
+- ✅ When creating new Service/Manager classes
+- ✅ When `./gradlew jacocoTestCoverageVerification` fails
+- ✅ During Code Review to check test coverage
+- ✅ User asks about test coverage issues
 
-### 強制執行檢查清單
-- [ ] 行覆蓋率 ≥ 80%
-- [ ] 分支覆蓋率 ≥ 70%
-- [ ] 新代碼有對應單元測試
-- [ ] 異常分支有測試覆蓋
-- [ ] Service 層方法全覆蓋
+### Mandatory Enforcement Checklist
+- [ ] Line coverage ≥ 80%
+- [ ] Branch coverage ≥ 70%
+- [ ] New code has corresponding unit tests
+- [ ] Exception branches have test coverage
+- [ ] Service layer methods fully covered
 
-### AI 決策樹
+### AI Decision Tree
 ```
-覆蓋率不足 → 識別未覆蓋區域
-  ├─ Service 方法未測試
-  │   └─ 創建對應單元測試
-  ├─ 異常分支未覆蓋
-  │   └─ 添加異常場景測試
-  ├─ 條件分支未覆蓋
-  │   └─ 添加邊界條件測試
-  └─ 不需要測試的代碼
-      └─ 添加到排除配置
+Coverage Insufficient → Identify Uncovered Area
+  ├─ Service method not tested
+  │   └─ Create corresponding unit test
+  ├─ Exception branch not covered
+  │   └─ Add exception scenario test
+  ├─ Conditional branch not covered
+  │   └─ Add boundary condition test
+  └─ Code not requiring tests
+      └─ Add to exclusion configuration
 ```
 
-### 測試模板
+### Test Template
 
-#### Service 單元測試模板
+#### Service Unit Test Template
 ```java
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -97,36 +97,36 @@ class UserServiceTest {
 
 ---
 
-## 【強制】覆蓋率標準
+## [Mandatory] Coverage Standards
 
-| 指標                | 最低要求 | 目標  |
-| ------------------- | -------- | ----- |
-| 行覆蓋率 (Line)     | ≥ 80%    | ≥ 85% |
-| 分支覆蓋率 (Branch) | ≥ 70%    | ≥ 75% |
-| 方法覆蓋率 (Method) | ≥ 75%    | ≥ 80% |
-| 類覆蓋率 (Class)    | ≥ 90%    | ≥ 95% |
+| Metric               | Minimum | Target |
+| -------------------- | ------- | ------ |
+| Line Coverage        | ≥ 80%   | ≥ 85%  |
+| Branch Coverage      | ≥ 70%   | ≥ 75%  |
+| Method Coverage      | ≥ 75%   | ≥ 80%  |
+| Class Coverage       | ≥ 90%   | ≥ 95%  |
 
-### 分層覆蓋率要求
+### Layered Coverage Requirements
 
-| 層級          | 行覆蓋率 | 說明                |
-| ------------- | -------- | ------------------- |
-| Service 層    | ≥ 85%    | 核心業務邏輯        |
-| Manager 層    | ≥ 80%    | 事務/緩存邏輯       |
-| Controller 層 | ≥ 60%    | HTTP 處理（可較低） |
-| DTO/VO/Entity | 排除     | 純數據類            |
-| Config        | 排除     | 配置類              |
+| Layer          | Line Coverage | Description            |
+| -------------- | ------------- | ---------------------- |
+| Service Layer  | ≥ 85%         | Core business logic    |
+| Manager Layer  | ≥ 80%         | Transaction/cache logic |
+| Controller Layer | ≥ 60%       | HTTP handling (can be lower) |
+| DTO/VO/Entity  | Excluded      | Pure data classes      |
+| Config         | Excluded      | Configuration classes  |
 
 ---
 
-## 配置說明
+## Configuration Description
 
-### Gradle 配置位置
+### Gradle Configuration Location
 ```
 smart-admin-api-java21-springboot3/
-└── build.gradle.kts          # JaCoCo 插件配置
+└── build.gradle.kts          # JaCoCo plugin configuration
 ```
 
-### build.gradle.kts 配置
+### build.gradle.kts Configuration
 ```kotlin
 subprojects {
     apply(plugin = "jacoco")
@@ -137,14 +137,14 @@ subprojects {
 
     tasks.withType<JacocoReport> {
         reports {
-            xml.required.set(true)   // SonarQube 需要
-            html.required.set(true)  // 人工查看
+            xml.required.set(true)   // Required for SonarQube
+            html.required.set(true)  // For manual review
         }
     }
 
     tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
         dependsOn("test")
-        
+
         violationRules {
             rule {
                 limit {
@@ -169,7 +169,7 @@ subprojects {
 }
 ```
 
-### 排除配置
+### Exclusion Configuration
 ```kotlin
 tasks.withType<JacocoReport> {
     afterEvaluate {
@@ -179,10 +179,10 @@ tasks.withType<JacocoReport> {
                     "**/domain/**",      // Entity
                     "**/dto/**",         // DTO
                     "**/vo/**",          // VO
-                    "**/config/**",      // 配置類
-                    "**/constant/**",    // 常量類
-                    "**/*Application*",  // 啟動類
-                    "**/*Config*"        // 配置類
+                    "**/config/**",      // Config classes
+                    "**/constant/**",    // Constant classes
+                    "**/*Application*",  // Startup class
+                    "**/*Config*"        // Config classes
                 )
             }
         }))
@@ -192,53 +192,53 @@ tasks.withType<JacocoReport> {
 
 ---
 
-## 報告解讀
+## Report Interpretation
 
-### 報告位置
+### Report Location
 ```
 sa-admin/build/reports/jacoco/test/html/index.html
 ```
 
-### 顏色含義
-- 🟢 **綠色**: 已覆蓋
-- 🔴 **紅色**: 未覆蓋
-- 🟡 **黃色**: 部分覆蓋（分支）
+### Color Meaning
+- 🟢 **Green**: Covered
+- 🔴 **Red**: Not covered
+- 🟡 **Yellow**: Partially covered (branches)
 
-### 常見問題
+### Common Issues
 
-#### 分支覆蓋不足
+#### Insufficient Branch Coverage
 ```java
-// 原代碼 - 只測試了 true 分支
+// Original code - only tested true branch
 public String getStatus(boolean active) {
-    if (active) {        // 🟡 部分覆蓋
+    if (active) {        // 🟡 Partially covered
         return "ACTIVE";
     }
-    return "INACTIVE";   // 🔴 未覆蓋
+    return "INACTIVE";   // 🔴 Not covered
 }
 
-// 補充測試
+// Add test
 @Test
 void getStatus_shouldReturnInactive_whenNotActive() {
     assertThat(service.getStatus(false)).isEqualTo("INACTIVE");
 }
 ```
 
-#### 異常分支未覆蓋
+#### Exception Branch Not Covered
 ```java
-// 原代碼
+// Original code
 public User findById(Long id) {
     User user = userMapper.selectById(id);
-    if (user == null) {       // 🔴 異常分支未覆蓋
-        throw new NotFoundException("用戶不存在");
+    if (user == null) {       // 🔴 Exception branch not covered
+        throw new NotFoundException("User not found");
     }
     return user;
 }
 
-// 補充測試
+// Add test
 @Test
 void findById_shouldThrow_whenUserNotFound() {
     when(userMapper.selectById(1L)).thenReturn(null);
-    
+
     assertThatThrownBy(() -> service.findById(1L))
         .isInstanceOf(NotFoundException.class);
 }
@@ -246,36 +246,36 @@ void findById_shouldThrow_whenUserNotFound() {
 
 ---
 
-## 驗證命令
+## Verification Commands
 
 ```bash
-# 運行測試並生成覆蓋率報告
+# Run tests and generate coverage report
 ./gradlew test jacocoTestReport
 
-# 查看覆蓋率報告
+# View coverage report
 open sa-admin/build/reports/jacoco/test/html/index.html
 
-# 驗證覆蓋率門檻
+# Verify coverage threshold
 ./gradlew jacocoTestCoverageVerification
 
-# 完整驗證
+# Full verification
 ./gradlew check
 
-# Maven (如使用)
+# Maven (if used)
 mvn clean test jacoco:report
 mvn jacoco:check -Djacoco.minimum=0.80
 ```
 
 ---
 
-## SonarQube 整合
+## SonarQube Integration
 
-JaCoCo 報告可以上傳到 SonarQube：
+JaCoCo reports can be uploaded to SonarQube:
 
 ```kotlin
 sonarqube {
     properties {
-        property("sonar.coverage.jacoco.xmlReportPaths", 
+        property("sonar.coverage.jacoco.xmlReportPaths",
             "${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
@@ -283,8 +283,8 @@ sonarqube {
 
 ---
 
-## 相關規範
+## Related Specifications
 
-- [06-sonarqube-rules.md](./06-sonarqube-rules.md) - SonarQube 質量門禁
-- [workflows/tdd-workflow.md](../workflows/tdd-workflow.md) - TDD 工作流程
-- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - 質量門禁流程
+- [06-sonarqube-rules.md](./06-sonarqube-rules.md) - SonarQube quality gates
+- [workflows/tdd-workflow.md](../workflows/tdd-workflow.md) - TDD workflow
+- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - Quality gates workflow

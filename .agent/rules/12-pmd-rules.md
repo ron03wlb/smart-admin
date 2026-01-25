@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: PMD 代碼質量規範
+description: PMD Code Quality Standards
 tags: [static-analysis, pmd, code-quality, best-practices]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -12,75 +12,75 @@ related_rules:
 last_updated: 2026-01-22
 ---
 
-# PMD 規範
+# PMD Standards
 
-**TL;DR**: PMD 檢測代碼異味、潛在 Bug 和最佳實踐違規。啟用 `bestpractices` 和 `errorprone` 規則集，所有 Priority 1-3 違規必須修復。
+**TL;DR**: PMD detects code smells, potential bugs, and best practice violations. Enable `bestpractices` and `errorprone` rulesets, all Priority 1-3 violations must be fixed.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Directive Block
 
-### 何時應用此規則
-- ✅ 生成任何 Java 代碼時
-- ✅ Code Review 時檢查代碼質量
-- ✅ `./gradlew pmdMain` 或 `mvn pmd:check` 失敗時
-- ✅ 用戶詢問代碼異味問題
+### When to Apply This Rule
+- ✅ When generating any Java code
+- ✅ During Code Review to check code quality
+- ✅ When `./gradlew pmdMain` or `mvn pmd:check` fails
+- ✅ User asks about code smell issues
 
-### 強制執行檢查清單
-- [ ] 使用接口類型而非實現類型（LooseCoupling）
-- [ ] 無重複字符串字面量（AvoidDuplicateLiterals）
-- [ ] 無未使用的變量賦值（UnusedAssignment）
-- [ ] 日誌語句有 Guard（GuardLogStatement）
-- [ ] Serializable 類有 serialVersionUID
+### Mandatory Enforcement Checklist
+- [ ] Use interface types instead of implementation types (LooseCoupling)
+- [ ] No duplicate string literals (AvoidDuplicateLiterals)
+- [ ] No unused variable assignments (UnusedAssignment)
+- [ ] Log statements have guard (GuardLogStatement)
+- [ ] Serializable classes have serialVersionUID
 
-### AI 決策樹
+### AI Decision Tree
 ```
-PMD 違規 → 識別規則類型
+PMD Violation → Identify Rule Type
   ├─ LooseCoupling
-  │   └─ 將 HashMap/ArrayList 改為 Map/List
+  │   └─ Change HashMap/ArrayList to Map/List
   ├─ AvoidDuplicateLiterals
-  │   └─ 提取為常量
+  │   └─ Extract as constant
   ├─ UnusedAssignment
-  │   └─ 移除未使用的初始化
+  │   └─ Remove unused initialization
   ├─ GuardLogStatement
-  │   └─ 添加日誌級別檢查或使用佔位符
+  │   └─ Add log level check or use placeholders
   └─ MissingSerialVersionUID
-      └─ 添加 serialVersionUID 字段
+      └─ Add serialVersionUID field
 ```
 
-### 錯誤模式檢測與自動修正
+### Error Pattern Detection and Auto-Fix
 
-#### LooseCoupling - 鬆耦合
+#### LooseCoupling - Loose Coupling
 ```java
-// ❌ 違規 - 使用實現類型
+// ❌ Violation - Using implementation type
 public HashMap<String, Object> processData() {
     HashMap<String, Object> result = new HashMap<>();
     return result;
 }
 
-// ✅ 修正 - 使用接口類型
+// ✅ Fix - Use interface type
 public Map<String, Object> processData() {
     Map<String, Object> result = new HashMap<>();
     return result;
 }
 ```
 
-#### AvoidDuplicateLiterals - 避免重複字面量
+#### AvoidDuplicateLiterals - Avoid Duplicate Literals
 ```java
-// ❌ 違規 - 字符串重複 4 次以上
+// ❌ Violation - String repeated 4+ times
 @Select("SELECT * FROM t_user WHERE deleted_flag = 0")
 User findOne();
 @Select("SELECT * FROM t_user WHERE deleted_flag = 0 AND status = 1")
 List<User> findActive();
 
-// ✅ 修正 - 提取常量
+// ✅ Fix - Extract constant
 private static final String DELETED_FLAG = "deleted_flag";
 private static final String NOT_DELETED = DELETED_FLAG + " = 0";
 ```
 
-#### UnusedAssignment - 未使用的賦值
+#### UnusedAssignment - Unused Assignment
 ```java
-// ❌ 違規 - 初始化值被覆蓋
+// ❌ Violation - Initialization value is overwritten
 List<User> users = null;
 if (condition) {
     users = findActiveUsers();
@@ -88,7 +88,7 @@ if (condition) {
     users = findAllUsers();
 }
 
-// ✅ 修正 - 移除無用初始化
+// ✅ Fix - Remove useless initialization
 List<User> users;
 if (condition) {
     users = findActiveUsers();
@@ -97,15 +97,15 @@ if (condition) {
 }
 ```
 
-#### GuardLogStatement - 日誌 Guard
+#### GuardLogStatement - Log Guard
 ```java
-// ❌ 違規 - 無 Guard 的 debug 日誌
+// ❌ Violation - Debug log without guard
 log.debug("Processing user: " + user.toString());
 
-// ✅ 修正方案 1 - 使用佔位符
+// ✅ Fix Option 1 - Use placeholder
 log.debug("Processing user: {}", user);
 
-// ✅ 修正方案 2 - 添加 Guard
+// ✅ Fix Option 2 - Add guard
 if (log.isDebugEnabled()) {
     log.debug("Processing user: " + user.toString());
 }
@@ -113,13 +113,13 @@ if (log.isDebugEnabled()) {
 
 #### MissingSerialVersionUID
 ```java
-// ❌ 違規 - 缺少 serialVersionUID
+// ❌ Violation - Missing serialVersionUID
 public class MenuTreeVO implements Serializable {
     private Long id;
     private String name;
 }
 
-// ✅ 修正
+// ✅ Fix
 public class MenuTreeVO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
@@ -127,45 +127,45 @@ public class MenuTreeVO implements Serializable {
 }
 ```
 
-#### CallSuperInConstructor - 構造函數未調用 super
+#### CallSuperInConstructor - Constructor Not Calling super
 
-**場景**: BusinessException 等異常類提供無參構造函數
-**違規原因**: PMD 要求所有構造函數顯式調用 super()
-**SmartAdmin 判斷**: Java 默認調用父類無參構造，顯式調用是冗餘的
-**解決方案**:
+**Scenario**: Exception classes like BusinessException provide no-arg constructor
+**Violation Reason**: PMD requires all constructors to explicitly call super()
+**SmartAdmin Decision**: Java defaults to calling parent no-arg constructor, explicit call is redundant
+**Solution**:
 ```java
 @SuppressWarnings("PMD.CallSuperInConstructor")
 public BusinessException() {
-    // empty - 默認調用父類無參構造
+    // empty - default calls parent no-arg constructor
 }
 ```
 
-#### AvoidReassigningParameters - 避免參數重新賦值
+#### AvoidReassigningParameters - Avoid Reassigning Parameters
 
-**場景**: 方法參數需要修改後使用
-**違規原因**: 直接修改參數降低可讀性
-**SmartAdmin 判斷**: 必須修復，創建局部變量
-**解決方案**:
+**Scenario**: Method parameter needs modification before use
+**Violation Reason**: Directly modifying parameter reduces readability
+**SmartAdmin Decision**: Must fix, create local variable
+**Solution**:
 ```java
-// ❌ 違規
+// ❌ Violation
 public void process(Integer pageNum) {
-    pageNum = pageNum - 1;  // 修改參數
+    pageNum = pageNum - 1;  // Modifying parameter
     query(pageNum);
 }
 
-// ✅ 修正
+// ✅ Fix
 public void process(Integer pageNum) {
-    int adjustedPage = pageNum - 1;  // 局部變量
+    int adjustedPage = pageNum - 1;  // Local variable
     query(adjustedPage);
 }
 ```
 
-#### ShortClassName - 類名過短
+#### ShortClassName - Class Name Too Short
 
-**場景**: 工具類內的靜態常量分組類（Dict, Expire, Dept, Support）
-**違規原因**: 類名少於 5 個字符
-**SmartAdmin 判斷**: 作為內部常量組織結構是合理的
-**解決方案**:
+**Scenario**: Static constant grouping classes in utility classes (Dict, Expire, Dept, Support)
+**Violation Reason**: Class name less than 5 characters
+**SmartAdmin Decision**: As internal constant organization structure is reasonable
+**Solution**:
 ```java
 @SuppressWarnings("PMD.ShortClassName")
 public static final class Dict {
@@ -174,61 +174,61 @@ public static final class Dict {
 }
 ```
 
-#### MissingStaticMethodInNonInstantiatableClass - 純常量類
+#### MissingStaticMethodInNonInstantiatableClass - Pure Constants Class
 
-**場景**: CacheKeyConst 只包含常量定義，無靜態方法
-**違規原因**: PMD 期望工具類有靜態方法
-**SmartAdmin 判斷**: 純常量類是合法設計模式
-**解決方案**:
+**Scenario**: CacheKeyConst only contains constant definitions, no static methods
+**Violation Reason**: PMD expects utility class to have static methods
+**SmartAdmin Decision**: Pure constants class is a legitimate design pattern
+**Solution**:
 ```java
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class CacheKeyConst {
     private CacheKeyConst() {}
-    // 只有常量定義
+    // Only constant definitions
 }
 ```
 
 ---
 
-## 【強制】啟用規則說明
+## [Mandatory] Enabled Rule Description
 
-### Best Practices 規則集
+### Best Practices Ruleset
 
-| 規則                    | 優先級 | 說明                   |
-| ----------------------- | ------ | ---------------------- |
-| `LooseCoupling`         | P3     | 使用接口類型而非實現類 |
-| `UnusedAssignment`      | P3     | 避免未使用的變量賦值   |
-| `GuardLogStatement`     | P2     | 日誌語句需要 Guard     |
-| `UnusedFormalParameter` | P3     | 避免未使用的方法參數   |
-| `UnusedLocalVariable`   | P3     | 避免未使用的局部變量   |
-| `UnusedPrivateField`    | P3     | 避免未使用的私有字段   |
-| `UnusedPrivateMethod`   | P3     | 避免未使用的私有方法   |
+| Rule                    | Priority | Description                           |
+| ----------------------- | -------- | ------------------------------------- |
+| `LooseCoupling`         | P3       | Use interface types not implementation |
+| `UnusedAssignment`      | P3       | Avoid unused variable assignments     |
+| `GuardLogStatement`     | P2       | Log statements need guard             |
+| `UnusedFormalParameter` | P3       | Avoid unused method parameters        |
+| `UnusedLocalVariable`   | P3       | Avoid unused local variables          |
+| `UnusedPrivateField`    | P3       | Avoid unused private fields           |
+| `UnusedPrivateMethod`   | P3       | Avoid unused private methods          |
 
-### Error Prone 規則集
+### Error Prone Ruleset
 
-| 規則                                  | 優先級 | 說明                                 |
-| ------------------------------------- | ------ | ------------------------------------ |
-| `AvoidDuplicateLiterals`              | P3     | 字符串字面量重複 ≥4 次需提取常量     |
-| `MissingSerialVersionUID`             | P3     | Serializable 類需要 serialVersionUID |
-| `CloseResource`                       | P3     | 資源需要正確關閉                     |
-| `EmptyCatchBlock`                     | P3     | 禁止空 catch 塊                      |
-| `AvoidBranchingStatementAsLastInLoop` | P2     | 循環末尾避免 break/continue/return   |
+| Rule                                  | Priority | Description                                      |
+| ------------------------------------- | -------- | ------------------------------------------------ |
+| `AvoidDuplicateLiterals`              | P3       | String literal repeated ≥4 times needs extraction |
+| `MissingSerialVersionUID`             | P3       | Serializable class needs serialVersionUID        |
+| `CloseResource`                       | P3       | Resources need proper closing                    |
+| `EmptyCatchBlock`                     | P3       | Prohibit empty catch blocks                      |
+| `AvoidBranchingStatementAsLastInLoop` | P2       | Avoid break/continue/return at loop end          |
 
 ---
 
-## 配置說明
+## Configuration Description
 
-### Gradle 配置位置
+### Gradle Configuration Location
 ```
 smart-admin-api-java21-springboot3/
-└── build.gradle.kts          # PMD 插件配置
+└── build.gradle.kts          # PMD plugin configuration
 ```
 
-### build.gradle.kts 配置
+### build.gradle.kts Configuration
 ```kotlin
 configure<PmdExtension> {
     toolVersion = libs.findVersion("pmd").get().toString()
-    isIgnoreFailures = false  // 發現違規即失敗
+    isIgnoreFailures = false  // Fail on violation
     ruleSets = listOf(
         "category/java/errorprone.xml",
         "category/java/bestpractices.xml"
@@ -236,7 +236,7 @@ configure<PmdExtension> {
 }
 ```
 
-### 自定義規則排除（如需要）
+### Custom Rule Exclusion (If Needed)
 ```kotlin
 configure<PmdExtension> {
     ruleSets = emptyList()
@@ -246,45 +246,45 @@ configure<PmdExtension> {
 
 ---
 
-## 常見違規類型統計
+## Common Violation Type Statistics
 
-基於專案實際違規分析：
+Based on actual project violation analysis:
 
-| 違規類型                                      | 數量 | 主要位置                    | 解決方式              |
-| --------------------------------------------- | ---- | --------------------------- | --------------------- |
-| `LooseCoupling`                               | ~10  | Controller/Service          | 使用接口類型          |
-| `AvoidDuplicateLiterals`                      | ~8   | DAO/Mapper                  | 提取常量              |
-| `UnusedAssignment`                            | ~4   | Service                     | 移除未使用初始化      |
-| `GuardLogStatement`                           | ~2   | Manager                     | 使用日誌佔位符        |
-| `MissingSerialVersionUID`                     | ~1   | VO/DTO                      | 添加 serialVersionUID |
-| `CallSuperInConstructor`                      | 3    | BusinessException.java      | @SuppressWarnings     |
-| `AvoidReassigningParameters`                  | 11   | SmartPageUtil.java          | 創建局部變量          |
-| `ShortClassName`                              | 3    | CacheKeyConst.java          | @SuppressWarnings     |
-| `MissingStaticMethodInNonInstantiatableClass` | 3    | CacheKeyConst.java          | @SuppressWarnings     |
+| Violation Type                                | Count | Main Location              | Resolution Method    |
+| --------------------------------------------- | ----- | -------------------------- | -------------------- |
+| `LooseCoupling`                               | ~10   | Controller/Service         | Use interface type   |
+| `AvoidDuplicateLiterals`                      | ~8    | DAO/Mapper                 | Extract constant     |
+| `UnusedAssignment`                            | ~4    | Service                    | Remove unused init   |
+| `GuardLogStatement`                           | ~2    | Manager                    | Use log placeholder  |
+| `MissingSerialVersionUID`                     | ~1    | VO/DTO                     | Add serialVersionUID |
+| `CallSuperInConstructor`                      | 3     | BusinessException.java     | @SuppressWarnings    |
+| `AvoidReassigningParameters`                  | 11    | SmartPageUtil.java         | Create local variable |
+| `ShortClassName`                              | 3     | CacheKeyConst.java         | @SuppressWarnings    |
+| `MissingStaticMethodInNonInstantiatableClass` | 3     | CacheKeyConst.java         | @SuppressWarnings    |
 
 ---
 
-## 驗證命令
+## Verification Commands
 
 ```bash
 # Gradle
 ./gradlew pmdMain pmdTest
 
-# 查看報告
+# View report
 open sa-admin/build/reports/pmd/main.html
 
-# Maven (如使用)
+# Maven (if used)
 mvn pmd:check
 
-# 僅檢查特定模塊
+# Check specific module only
 ./gradlew :sa-admin:pmdMain
 ```
 
 ---
 
-## 相關規範
+## Related Specifications
 
-- [11-checkstyle-rules.md](./11-checkstyle-rules.md) - 代碼風格檢查
-- [13-spotbugs-rules.md](./13-spotbugs-rules.md) - Bug 模式檢測
-- [04-exception-logging.md](./04-exception-logging.md) - 日誌規範
-- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - 質量門禁流程
+- [11-checkstyle-rules.md](./11-checkstyle-rules.md) - Code style checking
+- [13-spotbugs-rules.md](./13-spotbugs-rules.md) - Bug pattern detection
+- [04-exception-logging.md](./04-exception-logging.md) - Logging standards
+- [workflows/quality-gates-local-ci.md](../workflows/quality-gates-local-ci.md) - Quality gates workflow

@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Vavr 與 MyBatis Plus 整合
+description: Vavr and MyBatis Plus Integration
 tags: [vavr, mybatis-plus, integration, functional-programming]
 positioning: ideal
 prerequisites:
@@ -12,35 +12,35 @@ related_rules:
 last_updated: 2025-01-12
 ---
 
-# Vavr 與 MyBatis Plus 整合
+# Vavr and MyBatis Plus Integration
 
-> **TL;DR**: 在 MyBatis Plus 數據訪問層整合 Vavr，使用 Option 包裝查詢、Try 處理事務、Either 表達業務邏輯，提升代碼健壯性。
+> **TL;DR**: Integrate Vavr into MyBatis Plus data access layer using Option to wrap queries, Try to handle transactions, and Either to express business logic, improving code robustness.
 
-**定位說明**: 本規範定義 Vavr 函數式編程與 MyBatis Plus 整合的理想模式，以及從 Java Stream API 遷移的指南。
+**Positioning**: This specification defines ideal patterns for integrating Vavr functional programming with MyBatis Plus, and provides migration guidance from Java Stream API.
 
-**前置依賴**:
-- [08-vavr-fundamentals.md](./08-vavr-fundamentals.md) - Vavr Option/Try 基礎
-- [09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - MyBatis Plus 核心用法
-
----
-
-## 目錄
-- [Mapper 查詢包裝](#mapper-查詢包裝)
-- [Service 層集成](#service-層集成)
-- [事務處理](#事務處理)
-- [Java Stream API 規範](#java-stream-api-規範)
+**Prerequisites**:
+- [08-vavr-fundamentals.md](./08-vavr-fundamentals.md) - Vavr Option/Try fundamentals
+- [09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - MyBatis Plus core usage
 
 ---
 
-## Mapper 查詢包裝
+## Table of Contents
+- [Mapper Query Wrapping](#mapper-query-wrapping)
+- [Service Layer Integration](#service-layer-integration)
+- [Transaction Handling](#transaction-handling)
+- [Java Stream API Standards](#java-stream-api-standards)
 
-### 【強制】默認方法返回 Option
+---
+
+## Mapper Query Wrapping
+
+### [Mandatory] Default Methods Return Option
 
 ```java
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-    // ✅ 默認方法返回 Option
+    // ✅ Default methods return Option
     default Option<User> findByIdSafe(Long id) {
         return Option.of(selectById(id));
     }
@@ -52,7 +52,7 @@ public interface UserMapper extends BaseMapper<User> {
         ));
     }
 
-    // ✅ 返回不可變 List
+    // ✅ Return immutable List
     default io.vavr.collection.List<User> findAllActive() {
         return io.vavr.collection.List.ofAll(
             selectList(
@@ -66,9 +66,9 @@ public interface UserMapper extends BaseMapper<User> {
 
 ---
 
-## Service 層集成
+## Service Layer Integration
 
-### 【推薦】Option 包裝查詢
+### [Recommended] Option Wrapping Queries
 
 ```java
 @Service
@@ -78,12 +78,12 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    // ✅ Option 包裝查詢
+    // ✅ Option wrapping queries
     public Option<User> findById(Long id) {
         return userMapper.findByIdSafe(id);
     }
 
-    // ✅ Try 包裝寫操作
+    // ✅ Try wrapping write operations
     public Try<User> createUser(UserCreateDTO dto) {
         return Try.of(() -> {
             User user = User.builder()
@@ -96,16 +96,16 @@ public class UserService {
         });
     }
 
-    // ✅ Either 業務驗證 + 寫操作
+    // ✅ Either for business validation + write operations
     public Either<String, User> registerUser(UserRegisterDTO dto) {
         return validateEmail(dto.getEmail())
             .flatMap(email -> validatePassword(dto.getPassword()))
             .flatMap(password -> checkEmailNotExists(dto.getEmail()))
             .flatMap(email -> createUser(dto).toEither()
-                .mapLeft(ex -> "註冊失敗: " + ex.getMessage()));
+                .mapLeft(ex -> "Registration failed: " + ex.getMessage()));
     }
 
-    // ✅ 批量操作
+    // ✅ Batch operations
     public io.vavr.collection.List<User> batchCreate(
             List<UserCreateDTO> dtos) {
         return io.vavr.collection.List.ofAll(dtos)
@@ -117,18 +117,18 @@ public class UserService {
     private Either<String, String> validateEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches()
             ? Either.right(email)
-            : Either.left("郵箱格式錯誤");
+            : Either.left("Invalid email format");
     }
 
     private Either<String, String> validatePassword(String password) {
         return password.length() >= 8
             ? Either.right(password)
-            : Either.left("密碼至少8位");
+            : Either.left("Password must be at least 8 characters");
     }
 
     private Either<String, String> checkEmailNotExists(String email) {
         return userMapper.findByEmail(email).isDefined()
-            ? Either.left("郵箱已存在")
+            ? Either.left("Email already exists")
             : Either.right(email);
     }
 }
@@ -136,9 +136,9 @@ public class UserService {
 
 ---
 
-## 事務處理
+## Transaction Handling
 
-### 【推薦】Try + @Transactional
+### [Recommended] Try + @Transactional
 
 ```java
 @Service
@@ -173,12 +173,12 @@ public class OrderService {
     }
 
     private Either<String, OrderCreateDTO> validateOrder(OrderCreateDTO dto) {
-        // 驗證邏輯
+        // Validation logic
         return Either.right(dto);
     }
 
     private Either<String, OrderCreateDTO> reserveInventory(OrderCreateDTO dto) {
-        // 庫存預留
+        // Inventory reservation
         return Either.right(dto);
     }
 
@@ -189,7 +189,7 @@ public class OrderService {
                 return order;
             })
             .toEither()
-            .mapLeft(ex -> "訂單保存失敗: " + ex.getMessage());
+            .mapLeft(ex -> "Order save failed: " + ex.getMessage());
     }
 
     private Either<String, Order> processPayment(Order order) {
@@ -200,102 +200,102 @@ public class OrderService {
                 return order;
             })
             .toEither()
-            .mapLeft(ex -> "支付處理失敗: " + ex.getMessage());
+            .mapLeft(ex -> "Payment processing failed: " + ex.getMessage());
     }
 }
 ```
 
 ---
 
-## Java Stream API 規範
+## Java Stream API Standards
 
-### 【強制】基本使用原則
+### [Mandatory] Basic Usage Principles
 
-#### 1. Stream 只能消費一次
+#### 1. Stream Can Only Be Consumed Once
 
 ```java
-// ❌ 錯誤 - IllegalStateException
+// ❌ Wrong - IllegalStateException
 Stream<String> stream = list.stream();
 long count = stream.count();
-List<String> result = stream.collect(toList()); // 異常！
+List<String> result = stream.collect(toList()); // Exception!
 
-// ✅ 正確 - 每次創建新 Stream
+// ✅ Correct - Create new Stream each time
 long count = list.stream().count();
 List<String> result = list.stream().collect(toList());
 ```
 
-#### 2. 禁止修改源集合
+#### 2. Prohibit Modifying Source Collection
 
 ```java
-// ❌ 嚴禁 - ConcurrentModificationException
+// ❌ Forbidden - ConcurrentModificationException
 list.stream()
     .filter(s -> s.equals("b"))
     .forEach(s -> list.remove(s));
 
-// ✅ 正確 - 收集到新集合
+// ✅ Correct - Collect to new collection
 List<String> filtered = list.stream()
     .filter(s -> !s.equals("b"))
     .collect(toList());
 ```
 
-#### 3. 優先使用方法引用
+#### 3. Prefer Method References
 
 ```java
-// ✅ 推薦
+// ✅ Recommended
 list.stream()
     .map(User::getName)
     .filter(Objects::nonNull)
     .forEach(System.out::println);
 ```
 
-### 【強制】性能優化
+### [Mandatory] Performance Optimization
 
-#### 1. 使用原始類型 Stream 避免 Boxing
+#### 1. Use Primitive Type Streams to Avoid Boxing
 
 ```java
-// ❌ 低效 - 自動裝箱拆箱
+// ❌ Inefficient - Auto-boxing/unboxing
 int sum = list.stream()
     .map(User::getAge)
     .reduce(0, Integer::sum);
 
-// ✅ 高效 - IntStream
+// ✅ Efficient - IntStream
 int sum = list.stream()
     .mapToInt(User::getAge)
     .sum();
 ```
 
-#### 2. 短路操作優先
+#### 2. Short-Circuit Operations First
 
 ```java
-// ✅ 正確 - 找到即停止
+// ✅ Correct - Stop when found
 Optional<User> admin = users.stream()
     .filter(u -> "ADMIN".equals(u.getRole()))
     .findFirst();
 
-// ✅ 正確 - anyMatch 短路
+// ✅ Correct - anyMatch short-circuits
 boolean hasAdmin = users.stream()
     .anyMatch(u -> "ADMIN".equals(u.getRole()));
 ```
 
-#### 3. 並行流謹慎使用
+#### 3. Use Parallel Streams Cautiously
 
 ```java
-// ✅ 正確 - 線程安全收集器
+// ✅ Correct - Thread-safe collector
 List<Integer> results = IntStream.range(0, 1000)
     .parallel()
     .boxed()
     .collect(toList());
 ```
 
-**並行流適用條件**:
-- 數據量大（> 10000）
-- 無共享可變狀態
-- CPU 密集型操作
+**Parallel Stream Applicable Conditions**:
+- Large data volume (> 10000)
+- No shared mutable state
+- CPU-intensive operations
 
-### 【推薦】從 Stream API 遷移至 Vavr
+### [Recommended] Migrating from Stream API to Vavr
 
 ```java
-// Java Stream API (傳統方式)
+// Java Stream API (traditional approach)
 public List<UserVO> getActiveUsers_StreamAPI() {
     return userMapper.selectList(
             Wrappers.<User>lambdaQuery()
@@ -308,7 +308,7 @@ public List<UserVO> getActiveUsers_StreamAPI() {
         .collect(Collectors.toList());
 }
 
-// Vavr (理想架構)
+// Vavr (ideal architecture)
 public io.vavr.collection.List<UserVO> getActiveUsers_Vavr() {
     return io.vavr.collection.List.ofAll(
             userMapper.selectList(
@@ -322,42 +322,42 @@ public io.vavr.collection.List<UserVO> getActiveUsers_Vavr() {
 }
 ```
 
-**Vavr 優勢**:
-- 不可變集合，線程安全
-- 鏈式操作更自然
-- 與 Option/Try/Either 無縫整合
-- 無需 collect() 終止操作
+**Vavr Advantages**:
+- Immutable collections, thread-safe
+- More natural method chaining
+- Seamless integration with Option/Try/Either
+- No need for collect() terminal operation
 
 ---
 
-## 檢查清單
+## Checklist
 
-**Mapper 層**:
-- [ ] 自定義 default 方法返回 Option
-- [ ] 批量查詢返回 Vavr List
-- [ ] 避免在 Mapper 內部使用 Try/Either
+**Mapper Layer**:
+- [ ] Custom default methods return Option
+- [ ] Batch queries return Vavr List
+- [ ] Avoid using Try/Either inside Mapper
 
-**Service 層**:
-- [ ] 查詢操作使用 Option 包裝
-- [ ] 寫操作使用 Try 包裝
-- [ ] 複雜業務驗證使用 Either
-- [ ] 批量操作使用 Vavr 集合 map/filter
+**Service Layer**:
+- [ ] Query operations use Option wrapping
+- [ ] Write operations use Try wrapping
+- [ ] Complex business validation uses Either
+- [ ] Batch operations use Vavr collection map/filter
 
-**事務處理**:
-- [ ] @Transactional 與 Try 配合使用
-- [ ] 確保 rollbackFor = Exception.class
-- [ ] Either 錯誤訊息明確具體
+**Transaction Handling**:
+- [ ] @Transactional works with Try
+- [ ] Ensure rollbackFor = Exception.class
+- [ ] Either error messages are clear and specific
 
-**遷移策略**:
-- [ ] 新代碼優先使用 Vavr
-- [ ] 現有 Stream API 代碼逐步重構
-- [ ] 保持向後兼容（必要時使用 toJavaList()）
+**Migration Strategy**:
+- [ ] New code prioritizes Vavr
+- [ ] Gradually refactor existing Stream API code
+- [ ] Maintain backward compatibility (use toJavaList() when necessary)
 
 ---
 
-## 相關規範
-- [08-vavr-fundamentals.md](./08-vavr-fundamentals.md) - Option、Try 基礎
-- [08-vavr-advanced.md](./08-vavr-advanced.md) - Either、集合、模式匹配
-- [09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - MyBatis Plus 核心用法
-- [09-mybatis-plus-postgresql.md](./09-mybatis-plus-postgresql.md) - PostgreSQL 整合
-- [05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md) - SQL 優化
+## Related Specifications
+- [08-vavr-fundamentals.md](./08-vavr-fundamentals.md) - Option, Try fundamentals
+- [08-vavr-advanced.md](./08-vavr-advanced.md) - Either, collections, pattern matching
+- [09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - MyBatis Plus core usage
+- [09-mybatis-plus-postgresql.md](./09-mybatis-plus-postgresql.md) - PostgreSQL integration
+- [05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md) - SQL optimization

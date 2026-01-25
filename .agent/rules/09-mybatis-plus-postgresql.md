@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: MyBatis Plus 與 PostgreSQL 整合 - JSONB、陣列、Vavr
+description: MyBatis Plus and PostgreSQL Integration - JSONB, Arrays, Vavr
 tags: [mybatis-plus, postgresql, jsonb, arrays, vavr, integration]
 positioning: ideal
 prerequisites:
@@ -12,11 +12,11 @@ related_rules:
 last_updated: 2025-01-12
 ---
 
-# MyBatis Plus 與 PostgreSQL 整合
+# MyBatis Plus and PostgreSQL Integration
 
-**TL;DR**: 使用自定義 TypeHandler 處理 PostgreSQL JSONB 和數組類型，結合 Vavr 函數式編程實現類型安全和異常處理。
+**TL;DR**: Use custom TypeHandler to handle PostgreSQL JSONB and array types, combined with Vavr functional programming for type safety and exception handling.
 
-## 【強制】數據源配置
+## [Mandatory] DataSource Configuration
 
 ```yaml
 spring:
@@ -40,9 +40,9 @@ mybatis-plus:
       logic-not-delete-value: 'NULL'
 ```
 
-## 【強制】JSONB 類型處理
+## [Mandatory] JSONB Type Handling
 
-### TypeHandler 實現
+### TypeHandler Implementation
 ```java
 package com.example.config.typehandler;
 
@@ -95,7 +95,7 @@ public class JsonbTypeHandler extends AbstractJsonTypeHandler<Object> {
 }
 ```
 
-### Entity 使用
+### Entity Usage
 ```java
 @Data
 @TableName(value = "t_order", autoResultMap = true)
@@ -105,7 +105,7 @@ public class Order {
 
     private String orderNo;
 
-    // JSONB 字段
+    // JSONB field
     @TableField(typeHandler = JsonbTypeHandler.class)
     private List<OrderItem> items;
 
@@ -114,7 +114,7 @@ public class Order {
 }
 ```
 
-### JSONB 查詢
+### JSONB Queries
 ```xml
 <!-- OrderMapper.xml -->
 <select id="findByProductId" resultType="com.example.entity.Order">
@@ -128,11 +128,11 @@ public class Order {
 </select>
 ```
 
-> **參考**: JSONB 操作符和索引詳見 [05-postgresql-advanced.md](./05-postgresql-advanced.md#jsonb-操作)
+> **Reference**: For JSONB operators and indexes, see [05-postgresql-advanced.md](./05-postgresql-advanced.md#jsonb-operations)
 
-## 【強制】數組類型處理
+## [Mandatory] Array Type Handling
 
-### TypeHandler 實現
+### TypeHandler Implementation
 ```java
 package com.example.config.typehandler;
 
@@ -177,7 +177,7 @@ public class StringArrayTypeHandler extends BaseTypeHandler<List<String>> {
 }
 ```
 
-### Entity 使用
+### Entity Usage
 ```java
 @Data
 @TableName(value = "t_article", autoResultMap = true)
@@ -187,13 +187,13 @@ public class Article {
 
     private String title;
 
-    // TEXT[] 數組
+    // TEXT[] array
     @TableField(typeHandler = StringArrayTypeHandler.class)
     private List<String> tags;
 }
 ```
 
-### 數組查詢
+### Array Queries
 ```xml
 <!-- ArticleMapper.xml -->
 <select id="findByTags" resultType="com.example.entity.Article">
@@ -206,9 +206,9 @@ public class Article {
 </select>
 ```
 
-## 【推薦】Vavr 函數式整合
+## [Recommended] Vavr Functional Integration
 
-### Option 包裝查詢結果
+### Option Wrapping Query Results
 ```java
 @Service
 @RequiredArgsConstructor
@@ -216,12 +216,12 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    // 使用 Vavr Option 替代 Java Optional
+    // Use Vavr Option instead of Java Optional
     public Option<User> findById(Long id) {
         return Option.of(userMapper.selectById(id));
     }
 
-    // Option 鏈式調用
+    // Option method chaining
     public Option<String> getUserEmail(Long id) {
         return findById(id)
             .filter(user -> user.getStatus() == StatusEnum.ACTIVE)
@@ -230,7 +230,7 @@ public class UserService {
 }
 ```
 
-### Try 包裝異常處理
+### Try Wrapping Exception Handling
 ```java
 @Service
 @RequiredArgsConstructor
@@ -249,7 +249,7 @@ public class OrderService {
 }
 ```
 
-### Either 業務邏輯分支
+### Either for Business Logic Branching
 ```java
 @Service
 @RequiredArgsConstructor
@@ -272,27 +272,27 @@ public class UserRegistrationService {
 }
 ```
 
-> **參考**: Vavr 詳細用法見 [08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md)
+> **Reference**: For detailed Vavr usage, see [08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md)
 
-## 性能優化
+## Performance Optimization
 
-### 索引策略
+### Index Strategy
 ```sql
--- GIN 索引（JSONB/數組）
+-- GIN index (JSONB/arrays)
 CREATE INDEX idx_order_items ON t_order USING GIN(items);
 CREATE INDEX idx_article_tags ON t_article USING GIN(tags);
 
--- 表達式索引
+-- Expression index
 CREATE INDEX idx_order_source ON t_order ((metadata ->> 'source'));
 
--- 部分索引
+-- Partial index
 CREATE INDEX idx_active_orders ON t_order USING GIN(metadata)
 WHERE status = 'ACTIVE';
 ```
 
-### 批量操作
+### Batch Operations
 ```xml
-<!-- 批量插入 JSONB -->
+<!-- Batch insert JSONB -->
 <insert id="batchInsert">
     INSERT INTO t_order (order_no, items, metadata)
     VALUES
@@ -304,35 +304,35 @@ WHERE status = 'ACTIVE';
 </insert>
 ```
 
-## 常見問題
+## Common Issues
 
-**Q1: JSONB 查詢性能差？**
+**Q1: Poor JSONB query performance?**
 ```sql
--- ✅ 使用索引
+-- ✅ Uses index
 WHERE items @> '[{"productId": 123}]'::jsonb
 
--- ❌ 無法使用索引
+-- ❌ Cannot use index
 WHERE items::text LIKE '%"productId":123%'
 ```
 
-**Q2: TypeHandler 不生效？**
+**Q2: TypeHandler not working?**
 ```java
-// 確保添加 autoResultMap = true
+// Ensure autoResultMap = true is added
 @TableName(value = "t_order", autoResultMap = true)
 ```
 
-**Q3: 數組查詢報錯？**
+**Q3: Array query error?**
 ```xml
-<!-- 確保類型轉換 -->
+<!-- Ensure type casting -->
 WHERE tags &amp;&amp; ARRAY[#{tag}]::text[]
 ```
 
-**Q4: Vavr Option 和 MyBatis Plus 沖突？**
+**Q4: Vavr Option conflicts with MyBatis Plus?**
 ```java
-// Mapper 層 - 返回原生類型
+// Mapper layer - return native type
 User selectById(Long id);
 
-// Service 層 - 包裝為 Option
+// Service layer - wrap as Option
 public Option<User> findById(Long id) {
     return Option.of(userMapper.selectById(id));
 }
@@ -340,27 +340,27 @@ public Option<User> findById(Long id) {
 
 ## Checklist
 
-### JSONB 使用檢查項
-- [ ] Entity 添加 `autoResultMap = true`
-- [ ] TypeHandler 使用 `PGobject`
-- [ ] 建立 GIN 索引
-- [ ] 查詢使用 `@>` 操作符
-- [ ] 避免 `::text` 轉換查詢
+### JSONB Usage Checklist
+- [ ] Entity has `autoResultMap = true`
+- [ ] TypeHandler uses `PGobject`
+- [ ] GIN index created
+- [ ] Queries use `@>` operator
+- [ ] Avoid `::text` conversion in queries
 
-### 數組使用檢查項
-- [ ] TypeHandler 使用 `java.sql.Array`
-- [ ] 建立 GIN 索引
-- [ ] 查詢使用 `&&` 或 `@>` 操作符
-- [ ] 明確指定數組類型 `::text[]`
+### Array Usage Checklist
+- [ ] TypeHandler uses `java.sql.Array`
+- [ ] GIN index created
+- [ ] Queries use `&&` or `@>` operator
+- [ ] Array type explicitly specified `::text[]`
 
-### Vavr 整合檢查項
-- [ ] Mapper 返回原生類型
-- [ ] Service 層使用 Option/Try/Either
-- [ ] 避免在 Mapper 層使用 Vavr 類型
-- [ ] 事務方法使用 Try 包裝
+### Vavr Integration Checklist
+- [ ] Mapper returns native types
+- [ ] Service layer uses Option/Try/Either
+- [ ] Avoid using Vavr types in Mapper layer
+- [ ] Transactional methods use Try wrapping
 
-## 相關規範
-- **核心用法**: [09-mybatis-plus-core.md](./09-mybatis-plus-core.md)
-- **PostgreSQL 高級特性**: [05-postgresql-advanced.md](./05-postgresql-advanced.md)
-- **PostgreSQL-MyBatis 整合**: [05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md)
-- **Vavr-MyBatis 整合**: [08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md)
+## Related Specifications
+- **Core Usage**: [09-mybatis-plus-core.md](./09-mybatis-plus-core.md)
+- **PostgreSQL Advanced Features**: [05-postgresql-advanced.md](./05-postgresql-advanced.md)
+- **PostgreSQL-MyBatis Integration**: [05-postgresql-mybatis-integration.md](./05-postgresql-mybatis-integration.md)
+- **Vavr-MyBatis Integration**: [08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md)

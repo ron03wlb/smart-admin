@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Commit Message 規範（基於 Conventional Commits）
+description: Commit Message Conventions (Based on Conventional Commits)
 tags: [git, commit, conventional-commits, version-control]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
@@ -14,60 +14,60 @@ commitlint_rule: conventional
 last_updated: 2025-01-20
 ---
 
-# Commit Message 規範
+# Commit Message Conventions
 
-基於 [Conventional Commits](https://www.conventionalcommits.org/) 規範。
+Based on [Conventional Commits](https://www.conventionalcommits.org/) specification.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Directive Block
 
-### 何時應用此規則
-- ✅ 用戶要求生成 commit message
-- ✅ 用戶執行 `git commit` 前
-- ✅ Code Review 時檢查 commit history
-- ✅ 檢測到不規範的 commit message
+### When to Apply This Rule
+- ✅ User requests commit message generation
+- ✅ Before user executes `git commit`
+- ✅ During Code Review when checking commit history
+- ✅ Detecting non-compliant commit messages
 
-### 強制執行檢查清單
-- [ ] 格式符合 `<type>(<scope>): <subject>`
-- [ ] Type 在允許的 11 種類型中
-- [ ] Scope 使用正確的模塊名稱
-- [ ] Subject 使用英文、小寫開頭、無句號結尾
-- [ ] Subject 長度不超過 72 字元
-- [ ] Issue 關聯使用正確格式（Closes/Fixes/Refs #number）
+### Mandatory Enforcement Checklist
+- [ ] Format complies with `<type>(<scope>): <subject>`
+- [ ] Type is one of the 11 allowed types
+- [ ] Scope uses correct module name
+- [ ] Subject uses English, lowercase start, no period at end
+- [ ] Subject length does not exceed 72 characters
+- [ ] Issue association uses correct format (Closes/Fixes/Refs #number)
 
-### AI 決策樹
+### AI Decision Tree
 ```
-Commit Message 生成流程:
-  ├─ 1️⃣ 識別變更類型
-  │   ├─ 新功能? → feat
-  │   ├─ Bug 修復? → fix
-  │   ├─ 重構? → refactor
-  │   ├─ 文件? → docs
-  │   ├─ 測試? → test
-  │   ├─ 效能優化? → perf
-  │   ├─ 格式調整? → style
-  │   ├─ 建置系統? → build
+Commit Message Generation Flow:
+  ├─ 1️⃣ Identify Change Type
+  │   ├─ New feature? → feat
+  │   ├─ Bug fix? → fix
+  │   ├─ Refactoring? → refactor
+  │   ├─ Documentation? → docs
+  │   ├─ Testing? → test
+  │   ├─ Performance optimization? → perf
+  │   ├─ Formatting? → style
+  │   ├─ Build system? → build
   │   ├─ CI/CD? → ci
-  │   ├─ 雜項? → chore
-  │   └─ 復原? → revert
+  │   ├─ Miscellaneous? → chore
+  │   └─ Revert? → revert
   │
-  ├─ 2️⃣ 確定 Scope（模塊）
+  ├─ 2️⃣ Determine Scope (Module)
   │   ├─ sa-admin, sa-base, sa-common
   │   ├─ smart-admin-web, smart-app
   │   └─ docker, docs
   │
-  └─ 3️⃣ 撰寫 Subject
-      ├─ 英文、小寫開頭
-      ├─ 動詞原形開頭（add, fix, update, remove）
-      └─ 不超過 72 字元
+  └─ 3️⃣ Write Subject
+      ├─ English, lowercase start
+      ├─ Start with imperative verb (add, fix, update, remove)
+      └─ No more than 72 characters
 ```
 
 ---
 
-## 【強制】格式規範
+## [Mandatory] Format Specification
 
-### 基本格式
+### Basic Format
 ```
 <type>(<scope>): <subject>
 
@@ -76,35 +76,35 @@ Commit Message 生成流程:
 [optional footer]
 ```
 
-### Type 定義
+### Type Definition
 
-| Type | 說明 | 範例 |
-|------|------|------|
-| `feat` | 新增功能 (Feature) | `feat(sa-admin): add user login validation` |
-| `fix` | 修補 Bug | `fix(sa-base): resolve null pointer in UserService` |
-| `docs` | 僅修改文件 | `docs(sa-admin): update API documentation` |
-| `style` | 格式修改（不影響程式運行） | `style(sa-base): format code with spotless` |
-| `refactor` | 重構（非新功能、非 Bug 修復） | `refactor(sa-common): extract validation logic` |
-| `perf` | 效能優化 | `perf(sa-admin): optimize database query` |
-| `test` | 新增或修正測試 | `test(sa-base): add unit tests for UserService` |
-| `build` | 建置系統或依賴變更 | `build(sa-admin): upgrade spring boot to 3.2` |
-| `ci` | CI 設定變更 | `ci: add github actions workflow` |
-| `chore` | 雜項（不修改 src 或 test） | `chore: update .gitignore` |
-| `revert` | 復原先前的 commit | `revert: revert "feat(sa-admin): add login"` |
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature (Feature) | `feat(sa-admin): add user login validation` |
+| `fix` | Bug fix | `fix(sa-base): resolve null pointer in UserService` |
+| `docs` | Documentation only changes | `docs(sa-admin): update API documentation` |
+| `style` | Formatting changes (not affecting code execution) | `style(sa-base): format code with spotless` |
+| `refactor` | Refactoring (not new feature, not bug fix) | `refactor(sa-common): extract validation logic` |
+| `perf` | Performance optimization | `perf(sa-admin): optimize database query` |
+| `test` | Adding or modifying tests | `test(sa-base): add unit tests for UserService` |
+| `build` | Build system or dependency changes | `build(sa-admin): upgrade spring boot to 3.2` |
+| `ci` | CI configuration changes | `ci: add github actions workflow` |
+| `chore` | Miscellaneous (not modifying src or test) | `chore: update .gitignore` |
+| `revert` | Reverting previous commit | `revert: revert "feat(sa-admin): add login"` |
 
-### Scope 定義（模塊）
+### Scope Definition (Modules)
 
-| Scope | 說明 |
-|-------|------|
-| `sa-admin` | 後台管理模塊 |
-| `sa-base` | 基礎模塊 |
-| `sa-common` | 共用模塊 |
-| `smart-admin-web` | 前端 Web 應用 |
-| `smart-app` | 行動應用 |
-| `docker` | Docker 配置 |
-| `docs` | 專案文件 |
+| Scope | Description |
+|-------|-------------|
+| `sa-admin` | Admin management module |
+| `sa-base` | Base module |
+| `sa-common` | Common module |
+| `smart-admin-web` | Frontend web application |
+| `smart-app` | Mobile application |
+| `docker` | Docker configuration |
+| `docs` | Project documentation |
 
-**跨模塊變更**: 省略 scope 或使用逗號分隔
+**Cross-module changes**: Omit scope or use comma-separated
 ```
 feat: add global error handling
 feat(sa-admin,sa-base): add shared validation
@@ -112,32 +112,32 @@ feat(sa-admin,sa-base): add shared validation
 
 ---
 
-## 【強制】Subject 規則
+## [Mandatory] Subject Rules
 
-1. **語言**: 英文
-2. **大小寫**: 小寫開頭
-3. **時態**: 動詞原形（命令式）
-4. **長度**: 不超過 72 字元
-5. **結尾**: 無句號
+1. **Language**: English
+2. **Case**: Lowercase start
+3. **Tense**: Imperative verb form
+4. **Length**: No more than 72 characters
+5. **Ending**: No period
 
-### 動詞建議
+### Verb Suggestions
 
-| 動作 | 動詞 |
-|------|------|
-| 新增 | add, create, implement, introduce |
-| 修改 | update, change, modify, adjust |
-| 刪除 | remove, delete, drop |
-| 修復 | fix, resolve, correct |
-| 重構 | refactor, restructure, reorganize |
-| 優化 | optimize, improve, enhance |
+| Action | Verbs |
+|--------|-------|
+| Add | add, create, implement, introduce |
+| Modify | update, change, modify, adjust |
+| Remove | remove, delete, drop |
+| Fix | fix, resolve, correct |
+| Refactor | refactor, restructure, reorganize |
+| Optimize | optimize, improve, enhance |
 
 ---
 
-## 【推薦】Body 規範
+## [Recommended] Body Specification
 
-- 用於解釋 **為什麼** 做此變更
-- 每行不超過 72 字元
-- 使用 `-` 列點說明
+- Used to explain **why** the change was made
+- Each line no more than 72 characters
+- Use `-` for bullet points
 
 ```
 fix(sa-base): resolve null pointer in UserService
@@ -149,15 +149,15 @@ fix(sa-base): resolve null pointer in UserService
 
 ---
 
-## 【強制】Footer 規範（GitHub Issues）
+## [Mandatory] Footer Specification (GitHub Issues)
 
-### Issue 關聯格式
+### Issue Association Format
 
-| 關鍵字 | 用途 | 效果 |
-|--------|------|------|
-| `Closes #123` | 關閉 Issue | 合併後自動關閉 Issue |
-| `Fixes #123` | 修復 Bug Issue | 合併後自動關閉 Issue |
-| `Refs #123` | 參考 Issue | 僅建立連結，不關閉 |
+| Keyword | Purpose | Effect |
+|---------|---------|--------|
+| `Closes #123` | Close Issue | Automatically closes Issue after merge |
+| `Fixes #123` | Fix Bug Issue | Automatically closes Issue after merge |
+| `Refs #123` | Reference Issue | Only creates link, does not close |
 
 ### Breaking Change
 
@@ -171,51 +171,51 @@ Closes #456
 
 ---
 
-## 錯誤模式檢測
+## Error Pattern Detection
 
-### 模式 1: Type 錯誤
+### Pattern 1: Type Error
 ```bash
-# ❌ 錯誤
-git commit -m "Fix: resolve login issue"      # 大寫
-git commit -m "fixed login issue"             # 缺少 type
-git commit -m "feature(sa-admin): add login"  # 錯誤 type
+# ❌ Wrong
+git commit -m "Fix: resolve login issue"      # Capitalized
+git commit -m "fixed login issue"             # Missing type
+git commit -m "feature(sa-admin): add login"  # Wrong type
 
-# ✅ 正確
+# ✅ Correct
 git commit -m "fix(sa-admin): resolve login issue"
 ```
 
-### 模式 2: Subject 格式錯誤
+### Pattern 2: Subject Format Error
 ```bash
-# ❌ 錯誤
-git commit -m "feat(sa-admin): Add user login."   # 大寫開頭、句號結尾
-git commit -m "feat(sa-admin): added user login"  # 過去式
+# ❌ Wrong
+git commit -m "feat(sa-admin): Add user login."   # Capitalized start, period ending
+git commit -m "feat(sa-admin): added user login"  # Past tense
 
-# ✅ 正確
+# ✅ Correct
 git commit -m "feat(sa-admin): add user login"
 ```
 
-### 模式 3: Scope 錯誤
+### Pattern 3: Scope Error
 ```bash
-# ❌ 錯誤
-git commit -m "feat(admin): add login"      # 錯誤模塊名
-git commit -m "feat(SA-ADMIN): add login"   # 大寫
+# ❌ Wrong
+git commit -m "feat(admin): add login"      # Wrong module name
+git commit -m "feat(SA-ADMIN): add login"   # Capitalized
 
-# ✅ 正確
+# ✅ Correct
 git commit -m "feat(sa-admin): add user login"
 ```
 
 ---
 
-## 完整範例
+## Complete Examples
 
-### 簡單變更
+### Simple Change
 ```
 feat(sa-admin): add user login validation
 
 Closes #123
 ```
 
-### 複雜變更
+### Complex Change
 ```
 fix(sa-base): resolve null pointer in UserService
 
@@ -243,17 +243,17 @@ Closes #321
 
 ---
 
-## Commitlint + Husky 配置
+## Commitlint + Husky Configuration
 
-### 1. 安裝依賴
+### 1. Install Dependencies
 
 ```bash
-# 在專案根目錄
+# In project root directory
 npm init -y
 npm install --save-dev @commitlint/cli @commitlint/config-conventional husky
 ```
 
-### 2. 建立 commitlint.config.js
+### 2. Create commitlint.config.js
 
 ```javascript
 // commitlint.config.js
@@ -298,17 +298,17 @@ module.exports = {
 };
 ```
 
-### 3. 設定 Husky
+### 3. Setup Husky
 
 ```bash
-# 初始化 husky
+# Initialize husky
 npx husky init
 
-# 建立 commit-msg hook
+# Create commit-msg hook
 echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 ```
 
-### 4. package.json 配置
+### 4. package.json Configuration
 
 ```json
 {
@@ -318,43 +318,43 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 }
 ```
 
-### 驗證安裝
+### Verify Installation
 
 ```bash
-# 測試 commitlint
+# Test commitlint
 echo "feat(sa-admin): add login" | npx commitlint
 
-# 測試錯誤格式
-echo "Add login feature" | npx commitlint  # 應該失敗
+# Test wrong format
+echo "Add login feature" | npx commitlint  # Should fail
 ```
 
 ---
 
-## 檢查清單
+## Checklist
 
-**格式檢查**:
-- [ ] Type 正確（11 種之一）
-- [ ] Scope 正確（模塊名稱）
-- [ ] Subject 英文、小寫開頭、無句號
-- [ ] Subject 長度 ≤ 72 字元
+**Format Check**:
+- [ ] Correct Type (one of 11)
+- [ ] Correct Scope (module name)
+- [ ] Subject in English, lowercase start, no period
+- [ ] Subject length ≤ 72 characters
 
-**內容檢查**:
-- [ ] Subject 清楚描述變更
-- [ ] Body 解釋 why（如需要）
-- [ ] Footer 正確關聯 Issue
+**Content Check**:
+- [ ] Subject clearly describes change
+- [ ] Body explains why (if needed)
+- [ ] Footer correctly associates Issue
 
-**工具驗證**:
+**Tool Validation**:
 ```bash
-# 本地驗證
+# Local validation
 npx commitlint --from HEAD~1
 
-# CI 驗證
+# CI validation
 npx commitlint --from origin/main --to HEAD
 ```
 
 ---
 
-## 相關規範
+## Related Specifications
 
-- **AI 決策矩陣**: [rules/00-ai-decision-matrix.md](./00-ai-decision-matrix.md)
-- **命名規範**: [rules/01-naming-conventions.md](./01-naming-conventions.md)
+- **AI Decision Matrix**: [rules/00-ai-decision-matrix.md](./00-ai-decision-matrix.md)
+- **Naming Conventions**: [rules/01-naming-conventions.md](./01-naming-conventions.md)
