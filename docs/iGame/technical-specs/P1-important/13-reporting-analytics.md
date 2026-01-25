@@ -1,9 +1,12 @@
 # P1-13: Reporting & Analytics
 
-**Document Version**: 1.0.0
+**Document Version**: 1.1
 **Status**: Draft
 **Last Updated**: 2026-01-23
 **Owner**: Data & Analytics Team
+**變更歷史**:
+- v1.1 (2026-01-23): 新增 3 個 Mermaid 圖表 - 數據倉庫全棧架構圖、實時指標計算數據流圖、報表查詢優化決策樹
+- v1.0.0 (2026-01-23): 初始版本完成
 
 **Cross-References**:
 - [P0-01: Double-Entry Ledger Schema](../P0-critical/01-double-entry-ledger-schema.md) - Financial transaction data source
@@ -155,6 +158,163 @@
 - Operational overhead reduction: ~50 hours/month ($10K/month)
 - Performance difference: Negligible at our scale (<1s queries acceptable)
 - **Decision**: Doris wins on TCO and developer productivity
+
+### 圖 2.4: 架構圖 - 數據倉庫全棧架構(OLTP → OLAP → BI 可視化)
+
+> **說明**：此圖展示 iGaming 分析平台的端到端數據流架構，從 PostgreSQL OLTP 資料庫經過 CDC 捕獲、Kafka 消息隊列、Flink 流處理、最終存儲至 Apache Doris OLAP 引擎，並通過 Grafana/Superset 提供即時儀表板與歷史分析報表。整個架構實現 <5 分鐘的數據新鮮度與 p95 < 1 秒的查詢延遲。
+>
+> **關鍵要素**:
+> - 🔵 **CDC 層**: Debezium 捕獲 PostgreSQL WAL(Write-Ahead Log)變更
+> - 🟢 **消息隊列層**: Kafka 16 分區高吞吐(10K+ events/sec)
+> - 🟡 **流處理層**: Flink 實時 ETL、維度擴充、聚合計算
+> - 🟣 **OLAP 存儲層**: Doris 星型架構(Fact + Dim 表)、自動刷新物化視圖
+> - 🔴 **查詢層**: Grafana 即時儀表板、Superset 執行級報表、SmartAdmin API
+>
+> **效能指標**:
+> - **數據新鮮度**: < 5 分鐘 (事件 → 儀表板可見)
+> - **查詢延遲**: p95 < 1s (物化視圖), p95 < 5s (臨時查詢)
+> - **吞吐量**: 10,000+ events/sec (Kafka), 5,000 TPS (Doris 寫入)
+> - **並發查詢**: 100+ 同時查詢 (Doris 資源組隔離)
+> - **資料壓縮率**: 6.2:1 (LZ4 壓縮,1.35TB → 217GB)
+> - **存儲成本**: $22/月 (100 租戶,1 年資料)
+>
+> **相關文檔**: 參見 [第 3 章: OLAP Schema 設計](#3-olap-schema-design)、[第 4 章: 數據管道架構](#4-data-pipeline-architecture)、[第 5 章: 多租戶分析](#5-multi-tenant-analytics)
+
+```mermaid
+graph TB
+    subgraph "OLTP 業務資料庫層 Production OLTP Layer"
+        PG_PLAYERS[(PostgreSQL<br>players 表)]
+        PG_TRANSACTIONS[(PostgreSQL<br>transactions 表)]
+        PG_GAME_ROUNDS[(PostgreSQL<br>game_rounds 表)]
+        PG_WALLETS[(PostgreSQL<br>wallets 表)]
+    end
+
+    subgraph "CDC 變更捕獲層 Change Data Capture Layer"
+        DEBEZIUM[Debezium CDC Connector<br>捕獲 WAL 變更<br>延遲: < 1 秒]
+    end
+
+    subgraph "消息隊列層 Message Queue Layer"
+        KAFKA_PLAYERS[Kafka Topic<br>postgres.public.players<br>Partitions: 16]
+        KAFKA_TRANSACTIONS[Kafka Topic<br>postgres.public.transactions<br>Partitions: 16]
+        KAFKA_ROUNDS[Kafka Topic<br>postgres.public.game_rounds<br>Partitions: 16]
+        KAFKA_WALLETS[Kafka Topic<br>postgres.public.wallets<br>Partitions: 4]
+    end
+
+    subgraph "Flink 流處理層 Stream Processing Layer"
+        FLINK_TRANSACTION_ETL[Transaction ETL Job<br>Parallelism: 4<br>Checkpoint: 60s]
+        FLINK_ROUND_ETL[Game Round ETL Job<br>Parallelism: 4<br>Checkpoint: 60s]
+        FLINK_DAILY_AGG[Player Daily Aggregation Job<br>Tumbling Window: 1 Day<br>Parallelism: 4]
+
+        subgraph "維度擴充服務 Dimension Enrichment"
+            DIM_ENRICH[DimensionEnricher<br>AsyncDataStream<br>查詢 player_sk, game_sk, time_sk]
+            DIM_CACHE[(Redis Cache<br>Dimension Lookups<br>TTL: 30 分鐘)]
+        end
+    end
+
+    subgraph "Apache Doris OLAP 引擎 OLAP Storage & Query Engine"
+        subgraph "維度表層 Dimension Tables"
+            DIM_PLAYERS_DORIS[(dim_players<br>SCD Type 2<br>UNIQUE KEY)]
+            DIM_GAMES[(dim_games<br>UNIQUE KEY)]
+            DIM_TIME[(dim_time<br>預生成時間維度<br>UNIQUE KEY)]
+        end
+
+        subgraph "事實表層 Fact Tables"
+            FACT_TRANSACTIONS[(fact_transactions<br>DUPLICATE KEY<br>Partitioned by MONTH<br>Buckets: 64)]
+            FACT_ROUNDS[(fact_game_rounds<br>DUPLICATE KEY<br>Partitioned by MONTH<br>Buckets: 64)]
+            FACT_DAILY_AGG[(fact_player_daily_aggregates<br>UNIQUE KEY<br>Partitioned by DATE<br>Buckets: 32)]
+        end
+
+        subgraph "物化視圖層 Materialized Views"
+            MV_HOURLY_GGR[mv_hourly_ggr_by_tenant<br>自動刷新: 每 5 分鐘<br>查詢加速: 10-100×]
+            MV_DAILY_GAME[mv_daily_game_performance<br>自動刷新: 每 5 分鐘<br>透明查詢路由]
+        end
+    end
+
+    subgraph "BI 可視化層 Business Intelligence Layer"
+        GRAFANA[Grafana Dashboard<br>即時營運儀表板<br>刷新: 15 秒]
+        SUPERSET[Apache Superset<br>執行級月報<br>歷史趨勢分析]
+        SMARTADMIN_API[SmartAdmin Analytics API<br>租戶專屬報表<br>Controller → Service → Manager]
+    end
+
+    subgraph "應用層 Application Layer"
+        WEB_APP[Web 應用<br>租戶儀表板]
+        MOBILE_APP[移動應用<br>實時指標推送]
+    end
+
+    PG_PLAYERS -->|WAL Stream| DEBEZIUM
+    PG_TRANSACTIONS -->|WAL Stream| DEBEZIUM
+    PG_GAME_ROUNDS -->|WAL Stream| DEBEZIUM
+    PG_WALLETS -->|WAL Stream| DEBEZIUM
+
+    DEBEZIUM -->|發佈變更事件| KAFKA_PLAYERS
+    DEBEZIUM -->|發佈變更事件| KAFKA_TRANSACTIONS
+    DEBEZIUM -->|發佈變更事件| KAFKA_ROUNDS
+    DEBEZIUM -->|發佈變更事件| KAFKA_WALLETS
+
+    KAFKA_TRANSACTIONS -->|批次消費| FLINK_TRANSACTION_ETL
+    KAFKA_ROUNDS -->|批次消費| FLINK_ROUND_ETL
+    KAFKA_ROUNDS -->|批次消費| FLINK_DAILY_AGG
+
+    FLINK_TRANSACTION_ETL --> DIM_ENRICH
+    FLINK_ROUND_ETL --> DIM_ENRICH
+    DIM_ENRICH -.->|查詢維度| DIM_CACHE
+    DIM_CACHE -.->|Cache Miss| DIM_PLAYERS_DORIS
+    DIM_CACHE -.->|Cache Miss| DIM_GAMES
+
+    DIM_ENRICH -->|Stream Load API| FACT_TRANSACTIONS
+    DIM_ENRICH -->|Stream Load API| FACT_ROUNDS
+    FLINK_DAILY_AGG -->|Doris Upsert| FACT_DAILY_AGG
+
+    KAFKA_PLAYERS -->|CDC 同步| DIM_PLAYERS_DORIS
+
+    FACT_ROUNDS -.->|自動聚合| MV_HOURLY_GGR
+    FACT_ROUNDS -.->|自動聚合| MV_DAILY_GAME
+
+    MV_HOURLY_GGR -->|MySQL 協議查詢| GRAFANA
+    FACT_DAILY_AGG -->|MySQL 協議查詢| SUPERSET
+    FACT_TRANSACTIONS -->|JDBC 查詢| SMARTADMIN_API
+
+    GRAFANA --> WEB_APP
+    SUPERSET --> WEB_APP
+    SMARTADMIN_API --> WEB_APP
+    SMARTADMIN_API --> MOBILE_APP
+
+    style PG_TRANSACTIONS fill:#87CEEB
+    style PG_GAME_ROUNDS fill:#87CEEB
+    style DEBEZIUM fill:#90EE90
+    style KAFKA_TRANSACTIONS fill:#FFD700
+    style KAFKA_ROUNDS fill:#FFD700
+    style FLINK_TRANSACTION_ETL fill:#e1f5ff
+    style FLINK_ROUND_ETL fill:#e1f5ff
+    style FLINK_DAILY_AGG fill:#e1f5ff
+    style DIM_ENRICH fill:#FFA500
+    style FACT_TRANSACTIONS fill:#9370DB
+    style FACT_ROUNDS fill:#9370DB
+    style FACT_DAILY_AGG fill:#9370DB
+    style MV_HOURLY_GGR fill:#FF69B4
+    style MV_DAILY_GAME fill:#FF69B4
+    style GRAFANA fill:#90EE90
+    style SUPERSET fill:#90EE90
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 資料流方向
+- `虛線箭頭 (⇢)`: 查詢/查找操作
+- `藍色節點`: OLTP 資料庫(PostgreSQL)
+- `金色節點`: 消息隊列(Kafka)
+- `淺藍色節點`: 流處理作業(Flink)
+- `紫色節點`: 事實表(Doris OLAP)
+- `粉紅色節點`: 物化視圖(自動刷新)
+- `綠色節點`: BI 工具與 API
+
+**技術棧版本**:
+- PostgreSQL: 16.x
+- Debezium: 2.5.x (Kafka Connect)
+- Apache Kafka: 3.6.x
+- Apache Flink: 1.18.x
+- Apache Doris: 2.1.x
+- Grafana: 10.x
+- Apache Superset: 3.x
 
 ### 2.4 Architecture Choice: Doris + Flink
 
@@ -768,6 +928,133 @@ public class DorisStreamLoadSink extends RichSinkFunction<TransactionFact> {
 }
 ```
 
+### 圖 4.3: 數據流圖 - 實時指標計算完整流程(CDC → ETL → 聚合 → 物化視圖)
+
+> **說明**：此圖展示單筆遊戲回合事件從 PostgreSQL 產生到 Grafana 儀表板顯示的端到端數據流全鏈路,涵蓋 Debezium CDC 捕獲、Kafka 事件緩衝、Flink 維度擴充與聚合、Doris Stream Load 寫入、物化視圖自動刷新、最終 BI 工具查詢等 8 個關鍵步驟。整體延遲 < 5 分鐘,查詢響應 < 1 秒。
+>
+> **關鍵要素**:
+> - 📥 **CDC 捕獲**: Debezium 實時捕獲 PostgreSQL WAL(< 1s 延遲)
+> - 🚀 **事件緩衝**: Kafka 16 分區並行處理(10K+ TPS)
+> - 🔄 **維度擴充**: Flink AsyncDataStream 非同步查詢 player_sk, game_sk, time_sk
+> - 💾 **批次寫入**: Doris Stream Load API(批次 1,000 條,降低網絡開銷)
+> - 📊 **自動聚合**: 物化視圖每 5 分鐘自動刷新(透明查詢路由)
+> - 🎯 **智慧查詢**: Doris 查詢優化器自動選擇物化視圖(10-100× 加速)
+>
+> **效能指標**:
+> - **端到端延遲**: < 5 分鐘 (PostgreSQL INSERT → Grafana 可見)
+> - **CDC 延遲**: < 1 秒 (WAL 捕獲)
+> - **Kafka 緩衝延遲**: < 100ms (批次消費)
+> - **Flink ETL 延遲**: < 2 秒 (維度擴充 + 映射)
+> - **Doris 寫入延遲**: < 500ms (批次 Stream Load)
+> - **物化視圖刷新**: 每 5 分鐘自動觸發
+> - **查詢響應**: p95 < 1s (物化視圖), p95 < 5s (原始表)
+>
+> **相關文檔**: 參見 [第 4.2 節: Flink ETL Jobs](#42-flink-etl-jobs)、[第 3.4 節: 物化視圖](#34-materialized-views)、[第 8.1 節: 查詢效能基準測試](#81-query-performance-benchmarks)
+
+```mermaid
+flowchart TD
+    START([開始: 玩家完成遊戲回合]) --> PG_INSERT[PostgreSQL 寫入<br>game_rounds 表<br>COMMIT WAL]
+
+    PG_INSERT --> DEBEZIUM_CDC{Debezium CDC Connector<br>監聽 WAL 變更<br>延遲: < 1 秒}
+
+    DEBEZIUM_CDC --> KAFKA_PUBLISH[發佈至 Kafka Topic<br>postgres.public.game_rounds<br>Partition: 16<br>批次大小: 100]
+
+    KAFKA_PUBLISH --> FLINK_CONSUME[Flink Consumer<br>@KafkaListener<br>批次消費 100 條/次<br>Checkpoint: 60 秒]
+
+    FLINK_CONSUME --> DIMENSION_LOOKUP{維度擴充<br>AsyncDataStream.unorderedWait}
+
+    DIMENSION_LOOKUP --> LOOKUP_PLAYER[查詢 player_sk<br>DimensionEnricher<br>查詢 dim_players 表<br>SCD Type 2 邏輯]
+    DIMENSION_LOOKUP --> LOOKUP_GAME[查詢 game_sk<br>查詢 dim_games 表]
+    DIMENSION_LOOKUP --> GENERATE_TIME[生成 time_sk<br>格式: YYYYMMDDHH]
+
+    LOOKUP_PLAYER --> CHECK_CACHE{Redis 緩存?}
+    CHECK_CACHE -->|命中| RETURN_SK_CACHED[返回 player_sk<br>延遲: 5ms]
+    CHECK_CACHE -->|未命中| QUERY_DORIS[查詢 Doris dim_players<br>延遲: 50ms]
+    QUERY_DORIS --> UPDATE_CACHE[更新 Redis 緩存<br>TTL: 30 分鐘]
+    UPDATE_CACHE --> RETURN_SK_DORIS[返回 player_sk]
+
+    RETURN_SK_CACHED --> ENRICH_COMPLETE
+    RETURN_SK_DORIS --> ENRICH_COMPLETE
+    LOOKUP_GAME --> ENRICH_COMPLETE
+    GENERATE_TIME --> ENRICH_COMPLETE
+
+    ENRICH_COMPLETE[擴充完成<br>EnrichedTransaction] --> MAP_FACT[映射至 Fact Schema<br>TransactionFactMapper]
+
+    MAP_FACT --> BUFFER_BATCH{Stream Load 緩衝區<br>累積 1,000 條?}
+
+    BUFFER_BATCH -->|否| CONTINUE_BUFFER[繼續累積]
+    BUFFER_BATCH -->|是| DORIS_STREAM_LOAD[Doris Stream Load API<br>HTTP PUT /api/analytics/fact_game_rounds/_stream_load<br>格式: CSV<br>批次: 1,000 條]
+
+    DORIS_STREAM_LOAD --> DORIS_WRITE[Doris BE 節點寫入<br>Columnar Storage<br>LZ4 壓縮<br>Replication: 3×]
+
+    DORIS_WRITE --> PARTITION_ROUTING{分區路由<br>time_sk 分區<br>tenant_id Hash 分桶}
+
+    PARTITION_ROUTING --> WRITE_P202601[寫入分區 p202601<br>Bucket: tenant_id % 64]
+
+    WRITE_P202601 --> MV_TRIGGER{觸發物化視圖刷新<br>間隔: 5 分鐘<br>自動檢測資料變更}
+
+    MV_TRIGGER --> MV_REFRESH[刷新 mv_hourly_ggr_by_tenant<br>重新計算 SUM(ggr_usd)<br>增量更新<br>延遲: 2-3 秒]
+
+    MV_REFRESH --> QUERY_READY[物化視圖就緒<br>可被查詢]
+
+    QUERY_READY --> GRAFANA_QUERY[Grafana 查詢<br>SELECT * FROM mv_hourly_ggr_by_tenant<br>WHERE tenant_id = 'merchant-abc'<br>AND hour >= NOW - 24h]
+
+    GRAFANA_QUERY --> DORIS_OPTIMIZER{Doris 查詢優化器<br>自動路由至物化視圖<br>透明加速}
+
+    DORIS_OPTIMIZER --> EXECUTE_QUERY[執行查詢<br>分區裁剪<br>Bucket 裁剪<br>並行掃描]
+
+    EXECUTE_QUERY --> RETURN_RESULT[返回結果<br>查詢延遲: p95 < 1s<br>資料量: 24 小時 × 每小時聚合]
+
+    RETURN_RESULT --> GRAFANA_RENDER[Grafana 渲染儀表板<br>折線圖顯示 GGR 趨勢<br>自動刷新: 15 秒]
+
+    GRAFANA_RENDER --> END([結束: 玩家看到最新指標])
+
+    CONTINUE_BUFFER -.->|等待下一批| FLINK_CONSUME
+
+    style START fill:#90EE90
+    style PG_INSERT fill:#87CEEB
+    style DEBEZIUM_CDC fill:#FFD700
+    style KAFKA_PUBLISH fill:#FFD700
+    style FLINK_CONSUME fill:#e1f5ff
+    style DIMENSION_LOOKUP fill:#FFA500
+    style CHECK_CACHE fill:#FFA500
+    style RETURN_SK_CACHED fill:#90EE90
+    style DORIS_STREAM_LOAD fill:#9370DB
+    style DORIS_WRITE fill:#9370DB
+    style MV_REFRESH fill:#FF69B4
+    style GRAFANA_QUERY fill:#90EE90
+    style DORIS_OPTIMIZER fill:#FF69B4
+    style RETURN_RESULT fill:#90EE90
+    style END fill:#FFB6C1
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步資料流
+- `虛線箭頭 (⇢)`: 異步/條件分支
+- `菱形決策節點`: 條件判斷/優化分支
+- `矩形處理節點`: 資料處理步驟
+- `圓角矩形`: 流程起點/終點
+
+**延遲分解 (Latency Breakdown)**:
+| 階段 | 延遲 (p95) | 累計延遲 |
+|-----|----------|---------|
+| PostgreSQL WAL 寫入 | 50ms | 50ms |
+| Debezium CDC 捕獲 | 1s | 1.05s |
+| Kafka 緩衝 | 100ms | 1.15s |
+| Flink 批次消費 | 2s | 3.15s |
+| 維度擴充 (含緩存命中) | 50ms | 3.2s |
+| Doris Stream Load 寫入 | 500ms | 3.7s |
+| 物化視圖刷新等待 | 最多 5min | < 5min |
+| Grafana 查詢執行 | 1s | < 5min |
+| **總計端到端延遲** | **< 5 分鐘** | — |
+
+**優化策略**:
+1. **批次處理**: Kafka 批次消費 100 條、Doris Stream Load 批次 1,000 條 → 減少網絡開銷 80%
+2. **異步擴充**: AsyncDataStream 並行查詢維度 → 延遲降低 3×
+3. **Redis 緩存**: 維度查詢緩存命中率 85% → 平均延遲 5ms vs 50ms
+4. **物化視圖**: 預計算聚合 → 查詢加速 10-100×
+5. **分區裁剪**: 時間分區 + Hash 分桶 → 掃描資料量減少 95%
+
 ---
 
 ## 5. Multi-Tenant Analytics
@@ -1353,6 +1640,146 @@ SET (
 - Partition pruning: Skip 95% of partitions for date-range queries
 - Faster deletes: Drop old partitions instead of DELETE (instant)
 - Better compression: Immutable partitions → optimize compression
+
+### 圖 8.4: 流程圖 - 報表查詢優化決策樹(分區裁剪 → 物化視圖 → 並行執行)
+
+> **說明**：此圖展示 Apache Doris 查詢優化器的完整決策流程,從接收 SQL 查詢到返回結果的多層優化策略,包括分區裁剪、物化視圖自動路由、Bucket 裁剪、並行掃描等關鍵優化技術。通過這些優化,實現了 p95 查詢延遲從 PostgreSQL 的 30 秒降低至 Doris 的 1 秒以內(267× 加速比)。
+>
+> **關鍵要素**:
+> - 🎯 **智慧路由**: 查詢優化器自動選擇物化視圖(10-100× 加速)
+> - ✂️ **分區裁剪**: 基於 time_sk 分區,跳過 95% 不相關分區
+> - 🪣 **Bucket 裁剪**: 基於 tenant_id Hash 分桶,單節點查詢(降低網絡開銷)
+> - ⚡ **並行執行**: 多 BE 節點並行掃描 + 列式存儲(讀取減少 80%)
+> - 🗜️ **壓縮優化**: LZ4 實時解壓縮(6.2:1 壓縮比,I/O 減少 84%)
+>
+> **效能指標**:
+> - **查詢延遲**: p95 < 1s (物化視圖), p95 < 5s (原始表)
+> - **加速比**: 267× (vs PostgreSQL OLTP)
+> - **資料掃描減少**: 95% (分區裁剪) + 80% (列式存儲)
+> - **I/O 降低**: 84% (LZ4 壓縮)
+> - **並行度**: 6 BE 節點 × 16 cores = 96 並行度
+>
+> **查詢範例**:
+> ```sql
+> SELECT SUM(ggr_usd) FROM fact_game_rounds
+> WHERE tenant_id = 'merchant-abc'
+>   AND time_sk >= 2026012300
+>   AND time_sk <= 2026012323;
+> ```
+>
+> **相關文檔**: 參見 [第 8.1 節: 查詢效能基準測試](#81-query-performance-benchmarks)、[第 3.4 節: 物化視圖](#34-materialized-views)、[第 8.2 節: 資料壓縮](#82-data-compression)
+
+```mermaid
+flowchart TD
+    START([開始: 接收 SQL 查詢<br>來自 Grafana/Superset/SmartAdmin]) --> PARSE_SQL[SQL 解析器<br>解析語法樹<br>提取 SELECT, FROM, WHERE, GROUP BY]
+
+    PARSE_SQL --> CHECK_MV{檢查物化視圖<br>是否存在適用的 MV?}
+
+    CHECK_MV -->|是| MV_MATCH[物化視圖匹配<br>mv_hourly_ggr_by_tenant<br>自動重寫查詢]
+    CHECK_MV -->|否| RAW_TABLE[查詢原始事實表<br>fact_game_rounds]
+
+    MV_MATCH --> MV_FRESH{MV 是否新鮮?<br>上次刷新 < 5 分鐘?}
+    MV_FRESH -->|是| USE_MV[使用物化視圖<br>查詢加速 10-100×]
+    MV_FRESH -->|否| REFRESH_MV[觸發 MV 刷新<br>異步執行<br>繼續使用舊版 MV]
+    REFRESH_MV --> USE_MV
+
+    USE_MV --> PARTITION_PRUNE_MV
+    RAW_TABLE --> PARTITION_PRUNE_RAW
+
+    PARTITION_PRUNE_MV[分區裁剪<br>WHERE time_sk >= X AND time_sk <= Y<br>掃描分區: p202601]
+    PARTITION_PRUNE_RAW[分區裁剪<br>WHERE time_sk >= X AND time_sk <= Y<br>掃描分區: p202601, p202512]
+
+    PARTITION_PRUNE_MV --> BUCKET_PRUNE
+    PARTITION_PRUNE_RAW --> BUCKET_PRUNE
+
+    BUCKET_PRUNE{Bucket 裁剪<br>WHERE tenant_id = 'merchant-abc'<br>Hash(tenant_id) % 64}
+
+    BUCKET_PRUNE --> LOCATE_BUCKET[定位目標 Bucket<br>Bucket 23 on BE Node 2<br>單節點查詢,無需網絡聚合]
+
+    LOCATE_BUCKET --> COLUMN_SELECT[列式存儲讀取<br>僅掃描需要的列<br>SELECT SUM(ggr_usd) → 只讀 ggr_usd 列]
+
+    COLUMN_SELECT --> PARALLEL_SCAN[並行掃描執行<br>6 BE 節點 × 16 cores<br>96 並行度]
+
+    PARALLEL_SCAN --> DECOMPRESS[LZ4 實時解壓縮<br>壓縮比: 6.2:1<br>I/O 降低 84%]
+
+    DECOMPRESS --> FILTER_ROWS[行級過濾<br>WHERE 條件過濾<br>Late Materialization]
+
+    FILTER_ROWS --> AGG_LOCAL[本地聚合<br>各 BE 節點計算 SUM(ggr_usd)<br>降低網絡傳輸]
+
+    AGG_LOCAL --> NETWORK_TRANSFER[網絡傳輸<br>傳輸聚合結果<br>(非原始行,大幅減少資料量)]
+
+    NETWORK_TRANSFER --> AGG_FINAL[FE 節點最終聚合<br>合併各 BE 節點結果<br>返回最終 SUM]
+
+    AGG_FINAL --> RESULT_CACHE{查詢結果緩存<br>相同查詢 5 分鐘內?}
+
+    RESULT_CACHE -->|是| RETURN_CACHED[返回緩存結果<br>延遲: < 10ms]
+    RESULT_CACHE -->|否| RETURN_FRESH[返回新鮮結果<br>延遲: p95 < 1s]
+
+    RETURN_CACHED --> END([結束: 返回結果至客戶端])
+    RETURN_FRESH --> UPDATE_CACHE[更新結果緩存<br>TTL: 5 分鐘]
+    UPDATE_CACHE --> END
+
+    style START fill:#90EE90
+    style CHECK_MV fill:#FFD700
+    style MV_MATCH fill:#90EE90
+    style USE_MV fill:#FF69B4
+    style PARTITION_PRUNE_MV fill:#87CEEB
+    style BUCKET_PRUNE fill:#87CEEB
+    style LOCATE_BUCKET fill:#87CEEB
+    style PARALLEL_SCAN fill:#e1f5ff
+    style DECOMPRESS fill:#e1f5ff
+    style AGG_LOCAL fill:#9370DB
+    style RETURN_FRESH fill:#90EE90
+    style RETURN_CACHED fill:#90EE90
+    style END fill:#FFB6C1
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 查詢執行流程
+- `菱形決策節點`: 優化決策分支
+- `矩形處理節點`: 查詢優化步驟
+- `金色節點`: 關鍵優化決策點
+- `粉紅色節點`: 物化視圖加速
+- `藍色節點`: 分區與分桶優化
+- `淺藍色節點`: 並行執行與壓縮
+- `紫色節點`: 聚合操作
+
+**優化策略詳解**:
+
+| 優化階段 | 技術 | 資料量減少 | 延遲影響 |
+|---------|-----|----------|---------|
+| **1. 物化視圖路由** | 自動重寫查詢 | 99% (預聚合) | 10-100× 加速 |
+| **2. 分區裁剪** | time_sk 範圍過濾 | 95% (跳過舊分區) | 20× 加速 |
+| **3. Bucket 裁剪** | tenant_id Hash | 98% (單節點查詢) | 10× 加速 |
+| **4. 列式存儲** | 僅讀取需要的列 | 80% (vs 行存) | 5× 加速 |
+| **5. LZ4 壓縮** | 實時解壓縮 | 84% (I/O 減少) | 2× 加速 |
+| **6. 並行掃描** | 96 並行度 | N/A | 10× 加速 |
+| **7. Late Materialization** | 延遲物化行 | 50% (提前過濾) | 2× 加速 |
+| **8. 本地聚合** | BE 節點預聚合 | 99% (網絡傳輸) | 5× 加速 |
+
+**查詢計劃範例** (EXPLAIN):
+```sql
+EXPLAIN SELECT SUM(ggr_usd) FROM fact_game_rounds
+WHERE tenant_id = 'merchant-abc'
+  AND time_sk >= 2026012300 AND time_sk <= 2026012323;
+
+-- 查詢計劃輸出:
+-- 1. TABLE: fact_game_rounds
+-- 2. PARTITIONS: 1/24 (p202601)
+-- 3. BUCKETS: 1/64 (bucket_23)
+-- 4. PARALLEL: 16 (BE Node 2)
+-- 5. SCAN ROWS: 1,000,000 → FILTER: 50,000 → AGG: 1
+-- 6. RUNTIME FILTER: time_sk in [2026012300, 2026012323]
+-- 7. ESTIMATE COST: 120ms
+```
+
+**效能對比**:
+| 查詢場景 | PostgreSQL OLTP | Doris (原始表) | Doris (物化視圖) | 加速比 |
+|---------|----------------|---------------|-----------------|-------|
+| 每日 GGR (1 租戶, 30 天) | 12,000ms | 800ms | 45ms | 267× |
+| Top 10 遊戲 | 8,500ms | 1,200ms | 80ms | 106× |
+| 隊列留存 (12 個月) | 45,000ms | 2,000ms | 350ms | 129× |
+| 月度報表 (全資料) | 180,000ms | 5,000ms | 1,200ms | 150× |
 
 ---
 

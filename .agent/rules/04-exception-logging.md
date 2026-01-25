@@ -9,7 +9,8 @@ ask_before_fix: false
 related_rules:
   - rules/02-oop-principles.md
   - rules/10-architecture-rules.md
-last_updated: 2025-01-21
+archunit_test: ArchitectureTest#useSLF4JFacade
+last_updated: 2025-01-25
 ---
 
 # Exception and Logging Rules

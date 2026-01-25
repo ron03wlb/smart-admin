@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: OWASP Top 10 安全規範 Part 2 (A05-A10)
+description: OWASP Top 10 Security Standards Part 2 (A05-A10)
 tags: [security, owasp, authentication, ssrf, logging]
 positioning: current-standard
 prerequisites:
@@ -10,18 +10,18 @@ last_updated: 2025-01-12
 
 # OWASP Top 10 Part 2 - Configuration & Authentication
 
-基於 OWASP Top 10 (2021)，涵蓋配置、認證、日誌及 SSRF 防護。
+Based on OWASP Top 10 (2021), covering configuration, authentication, logging, and SSRF protection.
 
 ---
 
-## A05 - Security Misconfiguration（安全配置錯誤）
+## A05 - Security Misconfiguration
 
-### 【強制】生產環境配置
+### [Mandatory] Production Environment Configuration
 
-**關鍵要求**：
-- 僅暴露必要的端點（health, info, metrics）
-- 禁用錯誤堆疊追蹤和詳細訊息
-- 關閉開發工具（H2 Console, Swagger UI）
+**Key Requirements**:
+- Only expose necessary endpoints (health, info, metrics)
+- Disable error stack traces and detailed messages
+- Turn off development tools (H2 Console, Swagger UI)
 
 ```yaml
 # application-prod.yml
@@ -47,9 +47,9 @@ springdoc:
   swagger-ui.enabled: false
 ```
 
-### 【強制】安全 Headers
+### [Mandatory] Security Headers
 
-**必須啟用**：
+**Must Enable**:
 - `X-Frame-Options: DENY`
 - `Strict-Transport-Security: max-age=31536000; includeSubDomains`
 - `X-Content-Type-Options: nosniff`
@@ -66,14 +66,14 @@ http.headers(headers -> headers
 
 ---
 
-## A06 - Vulnerable Components（易受攻擊組件）
+## A06 - Vulnerable Components
 
-### 【強制】依賴漏洞掃描
+### [Mandatory] Dependency Vulnerability Scanning
 
-**CI/CD 集成**：
-- Maven：OWASP Dependency-Check
-- 每日自動掃描
-- CVSS ≥ 7.0 中斷構建
+**CI/CD Integration**:
+- Maven: OWASP Dependency-Check
+- Daily automatic scanning
+- CVSS ≥ 7.0 fails the build
 
 ```xml
 <plugin>
@@ -86,27 +86,27 @@ http.headers(headers -> headers
 </plugin>
 ```
 
-**執行命令**：
+**Execution Command**:
 ```bash
 mvn dependency-check:check
 ```
 
 ---
 
-## A07 - Authentication Failures（身份驗證失效）
+## A07 - Authentication Failures
 
-### 【強制】JWT 安全配置
+### [Mandatory] JWT Security Configuration
 
-**標準要求**：
-- 算法：HS512（至少 512 bits 密鑰）
-- 過期時間：≤ 1 小時
-- JTI（JWT ID）防重放攻擊
-- 密鑰存儲：環境變量或 Vault
+**Standard Requirements**:
+- Algorithm: HS512 (minimum 512 bits key)
+- Expiration: ≤ 1 hour
+- JTI (JWT ID) for replay attack prevention
+- Key Storage: Environment variable or Vault
 
 ```java
 @PostConstruct
 protected void init() {
-    // HS512 需要至少 512 bits 密鑰
+    // HS512 requires at least 512 bits key
     this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 }
 
@@ -116,23 +116,23 @@ public String createToken(String username, List<String> roles) {
         .claim("roles", roles)
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-        .setId(UUID.randomUUID().toString()) // JTI 防重放
+        .setId(UUID.randomUUID().toString()) // JTI for replay prevention
         .signWith(key, SignatureAlgorithm.HS512)
         .compact();
 }
 
-// ❌ 錯誤
+// ❌ Wrong
 .signWith(SignatureAlgorithm.HS256, "weak-key");
 .signWith(SignatureAlgorithm.NONE);
 ```
 
-### 【強制】Session 安全
+### [Mandatory] Session Security
 
-**Cookie 屬性**：
-- `HttpOnly=true`（防 XSS）
-- `Secure=true`（僅 HTTPS）
-- `SameSite=Strict`（防 CSRF）
-- `Max-Age=3600`（1 小時）
+**Cookie Attributes**:
+- `HttpOnly=true` (prevent XSS)
+- `Secure=true` (HTTPS only)
+- `SameSite=Strict` (prevent CSRF)
+- `Max-Age=3600` (1 hour)
 
 ```yaml
 server:
@@ -148,21 +148,21 @@ server:
 
 ---
 
-## A08 - Data Integrity Failures（數據完整性失效）
+## A08 - Data Integrity Failures
 
-### 【強制】反序列化安全
+### [Mandatory] Deserialization Security
 
-**防護措施**：
-- 禁用不受信任來源的 ObjectInputStream
-- 使用白名單驗證類名
-- 優先使用 JSON 而非 Java 序列化
+**Protection Measures**:
+- Prohibit ObjectInputStream from untrusted sources
+- Use whitelist to validate class names
+- Prefer JSON over Java serialization
 
 ```java
-// ❌ 嚴禁
+// ❌ Forbidden
 ObjectInputStream ois = new ObjectInputStream(untrustedInput);
-Object obj = ois.readObject(); // RCE 風險
+Object obj = ois.readObject(); // RCE risk
 
-// ✅ 正確 - 白名單
+// ✅ Correct - Whitelist
 public class SafeObjectInputStream extends ObjectInputStream {
     private static final Set<String> ALLOWED = Set.of(
         "com.example.dto.UserDTO",
@@ -182,16 +182,16 @@ public class SafeObjectInputStream extends ObjectInputStream {
 
 ---
 
-## A09 - Logging Failures（日誌監控失效）
+## A09 - Logging Failures
 
-### 【強制】安全事件日誌
+### [Mandatory] Security Event Logging
 
-**必須記錄事件**：
-- 認證成功/失敗
-- 授權失敗
-- 輸入驗證失敗
-- 敏感數據訪問（查詢、修改、刪除）
-- 配置變更
+**Must Log Events**:
+- Authentication success/failure
+- Authorization failure
+- Input validation failure
+- Sensitive data access (query, modify, delete)
+- Configuration changes
 
 ```java
 @Aspect
@@ -212,21 +212,21 @@ public class SecurityAuditAspect {
 }
 ```
 
-**日誌格式要求**：
-- 結構化日誌（JSON 或固定格式）
-- 包含：時間戳、用戶 ID、IP、操作、結果
-- 禁止記錄敏感數據（密碼、Token、信用卡號）
+**Log Format Requirements**:
+- Structured logs (JSON or fixed format)
+- Include: Timestamp, user ID, IP, action, result
+- Prohibit logging sensitive data (passwords, tokens, credit cards)
 
 ---
 
-## A10 - SSRF（服務端請求偽造）
+## A10 - SSRF (Server-Side Request Forgery)
 
-### 【強制】SSRF 防護
+### [Mandatory] SSRF Protection
 
-**三層防護策略**：
-1. 協議白名單（僅 http/https）
-2. 主機白名單（信任域名）
-3. 禁止內網地址（Loopback、Site-Local）
+**Three-Layer Defense Strategy**:
+1. Protocol whitelist (http/https only)
+2. Host whitelist (trusted domains)
+3. Block internal addresses (Loopback, Site-Local)
 
 ```java
 private static final Set<String> ALLOWED_HOSTS = Set.of("api.trusted.com");
@@ -234,17 +234,17 @@ private static final Set<String> ALLOWED_HOSTS = Set.of("api.trusted.com");
 public String fetchUrl(String urlString) throws IOException {
     URL url = new URL(urlString);
 
-    // 1. 協議白名單
+    // 1. Protocol whitelist
     if (!Set.of("http", "https").contains(url.getProtocol())) {
         throw new SecurityException("Blocked scheme");
     }
 
-    // 2. 主機白名單
+    // 2. Host whitelist
     if (!ALLOWED_HOSTS.contains(url.getHost())) {
         throw new SecurityException("Host not allowed");
     }
 
-    // 3. 禁止內網
+    // 3. Block internal addresses
     InetAddress addr = InetAddress.getByName(url.getHost());
     if (addr.isLoopbackAddress() || addr.isSiteLocalAddress()) {
         throw new SecurityException("Internal addresses blocked");
@@ -257,26 +257,26 @@ public String fetchUrl(String urlString) throws IOException {
 }
 ```
 
-**額外保護**：
-- 禁用 HTTP 重定向（`setInstanceFollowRedirects(false)`）
-- 設置連接超時（≤ 5 秒）
-- 驗證 Content-Type
+**Additional Protection**:
+- Disable HTTP redirects (`setInstanceFollowRedirects(false)`)
+- Set connection timeout (≤ 5 seconds)
+- Validate Content-Type
 
 ---
 
-## FindSecBugs 必須啟用規則
+## FindSecBugs Required Rules
 
-| 規則 ID                 | 名稱       | 嚴重程度 |
-| ----------------------- | ---------- | -------- |
-| SQL_INJECTION           | SQL 注入   | Critical |
-| COMMAND_INJECTION       | 命令注入   | Critical |
-| PATH_TRAVERSAL_IN       | 路徑遍歷   | Critical |
-| XXE_DOCUMENT            | XXE 攻擊   | Critical |
-| XSS_REQUEST_WRAPPER     | XSS        | High     |
-| WEAK_MESSAGE_DIGEST_MD5 | 弱哈希     | High     |
-| HARD_CODE_PASSWORD      | 硬編碼密碼 | High     |
+| Rule ID                 | Name               | Severity |
+| ----------------------- | ------------------ | -------- |
+| SQL_INJECTION           | SQL Injection      | Critical |
+| COMMAND_INJECTION       | Command Injection  | Critical |
+| PATH_TRAVERSAL_IN       | Path Traversal     | Critical |
+| XXE_DOCUMENT            | XXE Attack         | Critical |
+| XSS_REQUEST_WRAPPER     | XSS                | High     |
+| WEAK_MESSAGE_DIGEST_MD5 | Weak Hash          | High     |
+| HARD_CODE_PASSWORD      | Hardcoded Password | High     |
 
-**集成配置**：
+**Integration Configuration**:
 ```xml
 <plugin>
     <groupId>com.github.spotbugs</groupId>
@@ -295,26 +295,26 @@ public String fetchUrl(String urlString) throws IOException {
 
 ---
 
-## 安全檢查清單
+## Security Checklist
 
-**開發階段**：
-- [ ] 無 SQL/Command 注入風險（Lambda 查詢、參數綁定）
-- [ ] 所有輸入經過 @Valid 驗證
-- [ ] 密碼使用 BCrypt，敏感數據 AES-GCM
-- [ ] 無硬編碼機密（密鑰、密碼、Token）
-- [ ] 實現方法級授權（@PreAuthorize）
+**Development Phase**:
+- [ ] No SQL/Command injection risks (Lambda Query, parameter binding)
+- [ ] All input validated with @Valid
+- [ ] Passwords use BCrypt, sensitive data uses AES-GCM
+- [ ] No hardcoded secrets (keys, passwords, tokens)
+- [ ] Implement method-level authorization (@PreAuthorize)
 
-**部署前**：
-- [ ] SpotBugs + FindSecBugs 無 Critical/High 警告
-- [ ] Dependency Check 無 CVSS ≥ 7.0 漏洞
-- [ ] 生產配置已審查（關閉開發工具、錯誤詳情）
-- [ ] Security Headers 已啟用（HSTS, CSP, X-Frame-Options）
-- [ ] 安全事件日誌已配置（認證、授權、敏感操作）
+**Pre-Deployment**:
+- [ ] SpotBugs + FindSecBugs: No Critical/High warnings
+- [ ] Dependency Check: No CVSS ≥ 7.0 vulnerabilities
+- [ ] Production configuration reviewed (disable dev tools, error details)
+- [ ] Security Headers enabled (HSTS, CSP, X-Frame-Options)
+- [ ] Security event logging configured (authentication, authorization, sensitive operations)
 
 ---
 
-## 相關規範
+## Related Standards
 
-- **Part 1**：`rules/07-owasp-top10-part1.md` - A01-A04 訪問控制、加密、注入
-- **CI/CD Pipeline**：`workflows/java-ci-cd-pipeline.md` - 自動化安全掃描
-- **MyBatis Plus**：`rules/09-mybatis-plus.md` - SQL 注入防護
+- **Part 1**: `rules/07-owasp-top10-part1.md` - A01-A04 Access Control, Encryption, Injection
+- **CI/CD Pipeline**: `workflows/java-ci-cd-pipeline.md` - Automated Security Scanning
+- **MyBatis Plus**: `rules/09-mybatis-plus.md` - SQL Injection Protection

@@ -85,8 +85,28 @@ User Request Classification
 │   ├─ MyBatis Plus: [09-mybatis-plus-*]
 │   └─ Architecture Design: [10-architecture-rules]
 │
-└─ 7️⃣ Git Operations
-    └─ Commit Message: [17-commit-message-conventions]
+├─ 7️⃣ Git Operations
+│   └─ Commit Message: [17-commit-message-conventions]
+│
+├─ 8️⃣ Business Workflows & Orchestration
+│   ├─ Complex Multi-Step Process: Skill [liteflow-rule-builder]
+│   ├─ Approval/Validation Flow: Skill [liteflow-rule-builder]
+│   ├─ Parallel Task Execution: Skill [liteflow-rule-builder]
+│   └─ Rule Engine Migration: Skill [liteflow-rule-builder]
+│
+├─ 9️⃣ Fraud Detection & Risk Control
+│   ├─ Multi-Account Detection: Skill [fraud-detection-pattern-generator]
+│   ├─ Bonus Abuse Prevention: Skill [fraud-detection-pattern-generator]
+│   ├─ Suspicious Betting Patterns: Skill [fraud-detection-pattern-generator]
+│   ├─ Payment Fraud Detection: Skill [fraud-detection-pattern-generator]
+│   ├─ KYC Automation Triggers: Skill [fraud-detection-pattern-generator]
+│   └─ Real-Time Risk Scoring: Skill [fraud-detection-pattern-generator]
+│
+└─ 🔟 Quality Gate & CI/CD
+    ├─ Pre-Merge Quality Checks: Skill [quality-gate-orchestrator]
+    ├─ CI/CD Pipeline Setup: Skill [quality-gate-orchestrator]
+    ├─ Quality Report Aggregation: Skill [quality-gate-orchestrator]
+    └─ Multi-Tool Orchestration: Skill [quality-gate-orchestrator]
 ```
 
 ---
@@ -166,6 +186,9 @@ Quality Gate Pass Criteria:
 | "Exception Handling"  | 08-vavr, 04                | Try.of(), Logging                  |
 | "Transaction"         | 09-manager-layer           | @Transactional in Manager          |
 | "commit"              | 17-commit-message          | Conventional Commits Format        |
+| "workflow"            | liteflow-rule-builder      | LiteFlow EL + QLExpress            |
+| "fraud detection"     | fraud-detection-pattern-generator | Multi-account, Bonus abuse  |
+| "quality gate"        | quality-gate-orchestrator  | ArchUnit, Checkstyle, PMD, SpotBugs |
 
 ---
 

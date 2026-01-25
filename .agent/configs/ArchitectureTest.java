@@ -78,6 +78,60 @@ public class ArchitectureTest {
         .should().haveSimpleNameEndingWith("Manager")
         .as("Manager 类必须以 Manager 结尾（规则：09-manager-layer.md）");
 
+    /**
+     * 【严格执行】POJO 类布尔字段禁止使用 is 前缀
+     *
+     * <p>布尔字段应直接使用描述性名称（如 deleted, active, enabled），
+     * 禁止使用 is 前缀（如 isDeleted, isActive）
+     *
+     * <p>错误示例：
+     * <pre>
+     * public class UserEntity {
+     *     private Boolean isDeleted;  // ❌ 禁止
+     *     private Boolean isActive;   // ❌ 禁止
+     * }
+     * </pre>
+     *
+     * <p>正确示例：
+     * <pre>
+     * public class UserEntity {
+     *     private Boolean deleted;    // ✅ 正确
+     *     private Boolean active;     // ✅ 正确
+     * }
+     * </pre>
+     *
+     * <p>注意事项：
+     * <ul>
+     *   <li>此规则仅适用于字段（field），方法名仍可使用 is 前缀（如 isActive()）
+     *   <li>适用于 POJO/Entity/DTO/VO 等领域对象
+     *   <li>原因：部分序列化框架（如 MyBatis）可能导致 is 字段双重前缀问题
+     * </ul>
+     *
+     * <p>规则来源：01-naming-conventions.md
+     */
+    @ArchTest
+    static final ArchRule noBooleanFieldWithIsPrefix = fields()
+        .that().areDeclaredInClassesThat()
+        .resideInAnyPackage("..domain..", "..entity..", "..dto..", "..vo..")
+        .and().haveRawType(Boolean.class)
+        .or().haveRawType(boolean.class)
+        .should(new ArchCondition<com.tngtech.archunit.core.domain.JavaField>("not start with 'is' prefix") {
+            @Override
+            public void check(com.tngtech.archunit.core.domain.JavaField field, ConditionEvents events) {
+                String fieldName = field.getName();
+                if (fieldName.startsWith("is") && fieldName.length() > 2 && Character.isUpperCase(fieldName.charAt(2))) {
+                    String message = String.format(
+                        "Boolean field %s.%s starts with 'is' prefix, should use '%s' instead (Rule: 01-naming-conventions.md)",
+                        field.getOwner().getSimpleName(),
+                        fieldName,
+                        Character.toLowerCase(fieldName.charAt(2)) + fieldName.substring(3)
+                    );
+                    events.add(SimpleConditionEvent.violated(field, message));
+                }
+            }
+        })
+        .because("POJO boolean fields must not use 'is' prefix (rule: 01-naming-conventions.md)");
+
     // ========== 依赖注入约束 ==========
 
     @ArchTest
@@ -240,4 +294,39 @@ public class ArchitectureTest {
         .should().dependOnClassesThat()
         .haveFullyQualifiedName("com.mysql.cj.jdbc.Driver")
         .as("项目已迁移至 PostgreSQL，禁止使用 MySQL 驱动");
+
+    // ========== 日志记录约束 ==========
+
+    /**
+     * 【严格执行】使用 SLF4J 日志门面，禁止直接使用 Log4j/Logback 实现
+     *
+     * <p>所有业务代码必须使用 org.slf4j.Logger，不能直接依赖日志实现框架
+     *
+     * <p>正确示例：
+     * <pre>
+     * import org.slf4j.Logger;
+     * import org.slf4j.LoggerFactory;
+     *
+     * private static final Logger log = LoggerFactory.getLogger(UserService.class);
+     * </pre>
+     *
+     * <p>禁止使用：
+     * <ul>
+     *   <li>org.apache.log4j.Logger - Log4j 1.x 直接实现
+     *   <li>org.apache.logging.log4j.Logger - Log4j 2.x 直接实现
+     *   <li>ch.qos.logback.classic.Logger - Logback 直接实现
+     * </ul>
+     *
+     * <p>规则来源：04-exception-logging.md
+     */
+    @ArchTest
+    static final ArchRule useSLF4JFacade = noClasses()
+        .that().resideInAnyPackage("..controller..", "..service..", "..manager..", "..domain..")
+        .should().dependOnClassesThat()
+        .resideInAnyPackage(
+            "org.apache.log4j..",
+            "org.apache.logging.log4j..",
+            "ch.qos.logback.classic.."
+        )
+        .because("Must use SLF4J facade (org.slf4j.Logger), prohibit direct logging implementation (rule: 04-exception-logging.md)");
 }

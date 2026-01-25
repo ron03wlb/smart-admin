@@ -5,8 +5,8 @@ tags: [architecture, manager, transaction, cache, smart-admin]
 positioning: current-standard
 ai_role: code_reviewer_and_generator
 auto_apply: true
-archunit_test: ArchitectureTest#managerLayerRules
-last_updated: 2025-01-17
+archunit_test: ArchitectureTest#managerShouldNotAccessBusinessService,ArchitectureTest#transactionalMustUseRollbackForThrowable
+last_updated: 2026-01-25
 ---
 
 # Manager Layer Architecture Rules

@@ -1,9 +1,12 @@
 # P1-12: Bonus Engine
 
 **Document Status**: Draft
-**Version**: 1.0.0
+**Version**: 1.1
 **Last Updated**: 2026-01-23
 **Owner**: Product & Engineering
+**變更歷史**:
+- v1.1 (2026-01-23): 新增 3 個 Mermaid 圖表 - 優惠申請完整流程圖、優惠生命周期狀態機圖、流水追蹤規則引擎架構圖
+- v1.0.0 (2026-01-23): 初始版本完成
 **Related Documents**:
 - [backend_project.md](../../backend_project.md) - Section 11.11 (Bonus & Promotion System)
 - [igame_str.md](../../igame_str.md) - First Principles: Friction reduction via incentives
@@ -151,6 +154,117 @@
 
 **Implementation**: See Section 7.1 (VIP Integration)
 
+### 圖 2.4: 流程圖 - 優惠申請完整流程
+
+> **說明**：此圖展示玩家從觸發優惠活動（如首次充值、週期性充值）到優惠成功發放並開始流水追蹤的完整業務流程。系統通過 LiteFlow 規則引擎自動驗證資格,計算優惠金額,並處理 VIP 等級加成。
+>
+> **關鍵要素**:
+> - 🟢 **綠色路徑**: 驗證通過,優惠成功發放
+> - 🔴 **紅色路徑**: 資格驗證失敗(如重複申領、國家限制、風險檢測觸發)
+> - 🔵 **藍色節點**: LiteFlow 規則引擎決策點
+> - ⚠️ **黃色警告**: 風控檢測節點(多賬號偵測、速度限制)
+>
+> **效能指標**:
+> - 優惠發放延遲: < 1 秒 (p95)
+> - LiteFlow 規則執行: < 200ms
+> - 資格驗證準確率: > 99.5%
+> - 濫用檢測率: > 95% (誤報率 < 5%)
+>
+> **相關文檔**: 參見 [第 4 章: LiteFlow 規則引擎](#4-liteflow-rules-engine)、[P1-11: VIP 系統設計](11-vip-system-design.md)、[P1-06: 實時風控引擎](06-real-time-risk-engine.md)
+
+```mermaid
+flowchart TD
+    START([開始: 玩家觸發優惠事件]) --> IDENTIFY_TRIGGER{識別觸發類型}
+
+    IDENTIFY_TRIGGER -->|首次充值| WELCOME_BONUS[歡迎優惠活動]
+    IDENTIFY_TRIGGER -->|週期性充值| RELOAD_BONUS[充值優惠活動]
+    IDENTIFY_TRIGGER -->|註冊完成| NODEPOSIT_BONUS[無存款優惠活動]
+    IDENTIFY_TRIGGER -->|推薦成功| REFERRAL_BONUS[推薦優惠活動]
+
+    WELCOME_BONUS --> FETCH_CAMPAIGN[查詢活動配置<br>bonus_campaigns 表]
+    RELOAD_BONUS --> FETCH_CAMPAIGN
+    NODEPOSIT_BONUS --> FETCH_CAMPAIGN
+    REFERRAL_BONUS --> FETCH_CAMPAIGN
+
+    FETCH_CAMPAIGN --> CHECK_CAMPAIGN_ACTIVE{活動是否有效?<br>active_from <= NOW <= active_until}
+
+    CHECK_CAMPAIGN_ACTIVE -->|否| REJECT_INACTIVE[拒絕: 活動已結束]
+    CHECK_CAMPAIGN_ACTIVE -->|是| LITEFLOW_ELIGIBILITY[LiteFlow 規則引擎<br>資格驗證流程]
+
+    LITEFLOW_ELIGIBILITY --> CHECK_FIRST_DEPOSIT{規則 1:<br>首存檢查}
+    CHECK_FIRST_DEPOSIT -->|已充值過| REJECT_NOT_FIRST[拒絕: 非首次充值]
+    CHECK_FIRST_DEPOSIT -->|確認首充| CHECK_MIN_DEPOSIT
+
+    CHECK_MIN_DEPOSIT{規則 2:<br>最低充值額檢查<br>deposit >= min_deposit}
+    CHECK_MIN_DEPOSIT -->|低於最低額| REJECT_TOO_LOW[拒絕: 充值金額不足]
+    CHECK_MIN_DEPOSIT -->|達標| CHECK_COUNTRY
+
+    CHECK_COUNTRY{規則 3:<br>國家限制檢查}
+    CHECK_COUNTRY -->|限制國家| REJECT_COUNTRY[拒絕: 國家限制]
+    CHECK_COUNTRY -->|允許國家| CHECK_ABUSE
+
+    CHECK_ABUSE{規則 4:<br>濫用檢測<br>velocity + multi-account}
+    CHECK_ABUSE -->|檢測到濫用| ALERT_ABUSE[觸發風控告警<br>bonus_abuse_alerts]
+    ALERT_ABUSE --> MANUAL_REVIEW[人工審核流程]
+    CHECK_ABUSE -->|通過檢測| CALCULATE_BONUS
+
+    CALCULATE_BONUS[計算優惠金額<br>bonus = deposit × match_rate<br>cap at max_bonus]
+    CALCULATE_BONUS --> CHECK_VIP{玩家 VIP 等級?}
+
+    CHECK_VIP -->|Bronze Tier 1| VIP_1X[VIP 加成: 1.0×]
+    CHECK_VIP -->|Silver Tier 2| VIP_12X[VIP 加成: 1.2×]
+    CHECK_VIP -->|Gold Tier 3| VIP_15X[VIP 加成: 1.5×]
+    CHECK_VIP -->|Platinum Tier 4| VIP_2X[VIP 加成: 2.0×]
+    CHECK_VIP -->|Diamond Tier 5| VIP_25X[VIP 加成: 2.5×]
+
+    VIP_1X --> CALCULATE_WAGERING
+    VIP_12X --> CALCULATE_WAGERING
+    VIP_15X --> CALCULATE_WAGERING
+    VIP_2X --> CALCULATE_WAGERING
+    VIP_25X --> CALCULATE_WAGERING
+
+    CALCULATE_WAGERING[計算流水要求<br>wagering = base × multiplier<br>base = bonus 或 bonus+deposit]
+    CALCULATE_WAGERING --> CREATE_BONUS[創建優惠記錄<br>player_bonuses 表<br>status = ACTIVE]
+
+    CREATE_BONUS --> CREDIT_WALLET[發放至優惠錢包<br>P0-03 無縫錢包整合]
+    CREDIT_WALLET --> SEND_NOTIFICATION[發送通知<br>Email + App Push]
+
+    SEND_NOTIFICATION --> START_WAGERING[開始流水追蹤<br>監聽遊戲投注事件]
+    START_WAGERING --> SUCCESS([成功: 優惠已發放])
+
+    REJECT_INACTIVE --> NOTIFY_FAILURE[通知失敗原因]
+    REJECT_NOT_FIRST --> NOTIFY_FAILURE
+    REJECT_TOO_LOW --> NOTIFY_FAILURE
+    REJECT_COUNTRY --> NOTIFY_FAILURE
+    MANUAL_REVIEW --> NOTIFY_PENDING[通知: 待審核]
+
+    NOTIFY_FAILURE --> END([結束])
+    NOTIFY_PENDING --> END
+    SUCCESS --> END
+
+    style START fill:#90EE90
+    style SUCCESS fill:#87CEEB
+    style END fill:#FFB6C1
+    style REJECT_INACTIVE fill:#FF6B6B
+    style REJECT_NOT_FIRST fill:#FF6B6B
+    style REJECT_TOO_LOW fill:#FF6B6B
+    style REJECT_COUNTRY fill:#FF6B6B
+    style LITEFLOW_ELIGIBILITY fill:#e1f5ff
+    style CALCULATE_BONUS fill:#e1f5ff
+    style CREATE_BONUS fill:#e1f5ff
+    style ALERT_ABUSE fill:#FFA500
+    style MANUAL_REVIEW fill:#FFA500
+```
+
+**圖例 (Legend)**:
+- `開始/結束節點 (圓角矩形)`: 流程起點與終點
+- `決策節點 (菱形)`: LiteFlow 規則引擎驗證點
+- `處理節點 (矩形)`: 業務邏輯執行步驟
+- `綠色節點`: 成功路徑
+- `紅色節點`: 拒絕/失敗路徑
+- `藍色節點`: 核心業務邏輯(計算、創建、發放)
+- `橙色節點`: 風控警告與人工審核
+
 ---
 
 ## 3. Wagering Requirements
@@ -256,6 +370,157 @@ private BigDecimal calculateWageringContribution(BigDecimal betAmount, GameType 
         .setScale(2, RoundingMode.HALF_UP);
 }
 ```
+
+### 圖 3.5: 架構圖 - 流水追蹤規則引擎(遊戲類型權重計算)
+
+> **說明**：此圖展示優惠流水追蹤系統的核心架構,結合 Kafka 事件驅動、LiteFlow 規則引擎、遊戲類型權重配置,實現實時的流水進度計算。每個遊戲類型根據其 RTP(Return to Player)與莊家優勢設定不同的流水貢獻比例,確保公平性與風險控制。
+>
+> **關鍵要素**:
+> - 🔵 **事件驅動層**: Kafka 消息隊列接收遊戲回合事件
+> - 🟢 **規則引擎層**: LiteFlow 執行遊戲權重匹配與流水計算
+> - 🟡 **資料持久層**: PostgreSQL 記錄流水歷史與狀態更新
+> - 🔴 **緩存層**: Redis 緩存活躍優惠資訊(TTL 5 分鐘)
+>
+> **效能指標**:
+> - 事件處理延遲: < 200ms (p95, Kafka 消費到資料庫更新)
+> - LiteFlow 規則執行: < 50ms (遊戲權重計算)
+> - 並發處理能力: 5,000 TPS (每秒遊戲回合)
+> - 資料庫寫入延遲: < 100ms (批次寫入 bonus_wagering_history)
+> - 緩存命中率: 85-90% (活躍優惠查詢)
+>
+> **遊戲權重設計原則**:
+> - **高 RTP 遊戲**(如 Blackjack, Baccarat): 權重 10% (玩家優勢高,降低流水貢獻)
+> - **中 RTP 遊戲**(如 Roulette): 權重 50% (中等莊家優勢)
+> - **標準 RTP 遊戲**(如 Slots): 權重 100% (標準莊家優勢 2-10%)
+> - **真人荷官遊戲**: 權重 20% (考量運營成本)
+> - **體育博彩**: 權重 25% (變動賠率模型)
+>
+> **相關文檔**: 參見 [第 3.2 節: 遊戲貢獻權重](#32-game-contribution-weights)、[第 4 章: LiteFlow 規則引擎](#4-liteflow-rules-engine)、[backend_project.md 第 11.11 節](../../backend_project.md)
+
+```mermaid
+graph TB
+    subgraph "事件源層 Event Source Layer"
+        GAME_PROVIDER[遊戲供應商<br>Evolution, Pragmatic, NetEnt]
+        GAME_ROUND_EVENT[遊戲回合完成事件<br>GameRoundCompletedEvent]
+    end
+
+    subgraph "消息隊列層 Message Queue Layer"
+        KAFKA_TOPIC[Kafka Topic<br>game-rounds-completed<br>Partitions: 16]
+    end
+
+    subgraph "流水追蹤服務 Wagering Tracking Service"
+        KAFKA_CONSUMER[Kafka Consumer<br>@KafkaListener<br>Batch Size: 100]
+
+        subgraph "LiteFlow 規則引擎 Rules Engine"
+            FETCH_BONUSES[節點 1: 查詢活躍優惠<br>status = ACTIVE<br>remaining_wagering > 0]
+            GAME_WEIGHT_CALC[節點 2: 遊戲權重計算<br>見權重配置表]
+            FIFO_ALLOCATION[節點 3: FIFO 流水分配<br>expires_at 排序]
+            CHECK_COMPLETION[節點 4: 檢查流水完成<br>remaining_wagering = 0]
+        end
+
+        BATCH_UPDATE[批次更新<br>BonusManager.processWageringBatch]
+    end
+
+    subgraph "遊戲權重配置 Game Weight Configuration"
+        WEIGHT_SLOT["老虎機 Slots<br>權重: 100%<br>RTP: 92-98%<br>莊家優勢: 2-8%"]
+        WEIGHT_POKER["視訊撲克 Video Poker<br>權重: 10%<br>RTP: 99-99.5%<br>莊家優勢: 0.5-1%"]
+        WEIGHT_BLACKJACK["21 點 Blackjack<br>權重: 10%<br>RTP: 99.5%<br>莊家優勢: 0.5%"]
+        WEIGHT_ROULETTE["輪盤 Roulette<br>權重: 50%<br>RTP: 94.74-97.3%<br>莊家優勢: 2.7-5.26%"]
+        WEIGHT_BACCARAT["百家樂 Baccarat<br>權重: 10%<br>RTP: 98.94%<br>莊家優勢: 1.06%"]
+        WEIGHT_LIVE["真人荷官 Live Casino<br>權重: 20%<br>運營成本考量"]
+        WEIGHT_SPORTS["體育博彩 Sports Betting<br>權重: 25%<br>變動賠率模型"]
+    end
+
+    subgraph "資料持久層 Data Persistence Layer"
+        PG_BONUSES[(PostgreSQL<br>player_bonuses<br>更新 wagered_amount<br>remaining_wagering)]
+        PG_HISTORY[(PostgreSQL<br>bonus_wagering_history<br>審計記錄)]
+    end
+
+    subgraph "緩存層 Cache Layer"
+        REDIS_ACTIVE[(Redis<br>active_bonuses:{player_id}<br>TTL: 5 分鐘<br>命中率: 85-90%)]
+    end
+
+    subgraph "通知層 Notification Layer"
+        NOTIFY_COMPLETE[流水完成通知<br>Email + App Push]
+        NOTIFY_PROGRESS[進度更新通知<br>WebSocket 推送]
+    end
+
+    GAME_PROVIDER -->|回合結算| GAME_ROUND_EVENT
+    GAME_ROUND_EVENT -->|發布事件| KAFKA_TOPIC
+    KAFKA_TOPIC -->|批次消費| KAFKA_CONSUMER
+
+    KAFKA_CONSUMER --> FETCH_BONUSES
+    FETCH_BONUSES -->|查詢 Redis| REDIS_ACTIVE
+    REDIS_ACTIVE -->|Cache Miss| PG_BONUSES
+    PG_BONUSES -->|回填緩存| REDIS_ACTIVE
+
+    FETCH_BONUSES --> GAME_WEIGHT_CALC
+    GAME_WEIGHT_CALC -.->|Slot 投注| WEIGHT_SLOT
+    GAME_WEIGHT_CALC -.->|Video Poker 投注| WEIGHT_POKER
+    GAME_WEIGHT_CALC -.->|Blackjack 投注| WEIGHT_BLACKJACK
+    GAME_WEIGHT_CALC -.->|Roulette 投注| WEIGHT_ROULETTE
+    GAME_WEIGHT_CALC -.->|Baccarat 投注| WEIGHT_BACCARAT
+    GAME_WEIGHT_CALC -.->|Live Casino 投注| WEIGHT_LIVE
+    GAME_WEIGHT_CALC -.->|Sports Betting 投注| WEIGHT_SPORTS
+
+    GAME_WEIGHT_CALC --> FIFO_ALLOCATION
+    FIFO_ALLOCATION --> CHECK_COMPLETION
+
+    CHECK_COMPLETION --> BATCH_UPDATE
+    BATCH_UPDATE -->|事務更新| PG_BONUSES
+    BATCH_UPDATE -->|插入審計記錄| PG_HISTORY
+
+    CHECK_COMPLETION -->|流水完成| NOTIFY_COMPLETE
+    BATCH_UPDATE -->|進度更新| NOTIFY_PROGRESS
+
+    style GAME_ROUND_EVENT fill:#90EE90
+    style KAFKA_TOPIC fill:#87CEEB
+    style FETCH_BONUSES fill:#e1f5ff
+    style GAME_WEIGHT_CALC fill:#e1f5ff
+    style FIFO_ALLOCATION fill:#e1f5ff
+    style CHECK_COMPLETION fill:#e1f5ff
+    style WEIGHT_SLOT fill:#FFD700
+    style WEIGHT_POKER fill:#FFA500
+    style WEIGHT_BLACKJACK fill:#FFA500
+    style WEIGHT_ROULETTE fill:#FFD700
+    style WEIGHT_BACCARAT fill:#FFA500
+    style WEIGHT_LIVE fill:#87CEEB
+    style WEIGHT_SPORTS fill:#87CEEB
+    style NOTIFY_COMPLETE fill:#90EE90
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 同步調用/資料流
+- `虛線箭頭 (⇢)`: 規則引擎查詢權重配置
+- `雙向箭頭 (↔)`: 緩存穿透與回填
+- `金色節點`: 高權重遊戲(50-100%)
+- `橙色節點`: 低權重遊戲(10%)
+- `藍色節點`: 中等權重遊戲(20-25%)
+
+**LiteFlow 規則鏈定義**:
+```java
+// 流水追蹤規則鏈
+THEN(fetchActiveBonuses, calculateGameWeight, allocateWageringFIFO, checkCompletion);
+
+// 遊戲權重規則
+SWITCH(gameType).to(
+    slotWeight,           // case SLOT -> 1.00
+    videoPokerWeight,     // case VIDEO_POKER -> 0.10
+    blackjackWeight,      // case BLACKJACK -> 0.10
+    rouletteWeight,       // case ROULETTE -> 0.50
+    baccaratWeight,       // case BACCARAT -> 0.10
+    liveCasinoWeight,     // case LIVE_CASINO -> 0.20
+    sportsBettingWeight   // case SPORTS_BETTING -> 0.25
+);
+```
+
+**權重調整策略**:
+| 調整原因 | 範例場景 | 調整方向 |
+|---------|---------|---------|
+| 新遊戲上線 | 推廣期提高權重 | 臨時 +20-50% |
+| 玩家濫用檢測 | 特定遊戲套利 | 降低至 0% |
+| VIP 特權 | Diamond 玩家 | 全局 +10% |
+| 促銷活動 | 週末老虎機加倍 | 週期性調整 |
 
 ### 3.4 Wagering Progress Display
 
@@ -673,6 +938,109 @@ CREATE INDEX idx_player_bonuses_tenant_player ON player_bonuses(tenant_id, playe
 CREATE INDEX idx_player_bonuses_status ON player_bonuses(status) WHERE status = 'ACTIVE';
 CREATE INDEX idx_player_bonuses_expiry ON player_bonuses(expires_at) WHERE status = 'ACTIVE';
 ```
+
+### 圖 5.4: 狀態機圖 - 優惠生命周期(PENDING → COMPLETED/EXPIRED/FORFEITED)
+
+> **說明**：此圖展示 `player_bonuses` 表中 `status` 欄位的完整生命周期狀態轉換邏輯。優惠從創建(`PENDING`)到最終狀態(`COMPLETED/EXPIRED/FORFEITED/CANCELLED`)經歷多個階段,每個狀態轉換都伴隨特定的業務規則觸發。
+>
+> **關鍵要素**:
+> - 🟢 **成功路徑**: PENDING → ACTIVE → (流水追蹤) → COMPLETED (流水完成,轉為真實餘額)
+> - 🔴 **過期路徑**: ACTIVE → EXPIRED (超過 expires_at 時間)
+> - 🟠 **沒收路徑**: ACTIVE → FORFEITED (玩家提款請求、違反條款、濫用檢測)
+> - ⚪ **取消路徑**: PENDING → CANCELLED (管理員取消、系統異常)
+>
+> **效能指標**:
+> - 狀態轉換延遲: < 100ms (樂觀鎖定更新)
+> - 過期檢測頻率: 每 15 分鐘掃描一次 (Spring @Scheduled)
+> - 流水完成檢測: 實時(每次遊戲回合後)
+> - 資料庫索引命中率: > 95% (status, expires_at 索引)
+>
+> **相關文檔**: 參見 [第 3 章: 流水追蹤算法](#33-wagering-tracking-algorithm)、[第 4.2 節: 自動沒收規則](#42-automatic-bonus-forfeiture-rules)、[P0-03: 無縫錢包實現](../P0-critical/03-seamless-wallet-implementation.md)
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: 創建優惠記錄<br>(BonusManager.grantBonus)
+
+    PENDING --> ACTIVE: 自動激活<br>(充值確認完成)
+    PENDING --> CANCELLED: 管理員取消<br>或系統異常
+
+    ACTIVE --> WAGERING_IN_PROGRESS: 開始流水追蹤<br>(remaining_wagering > 0)
+    WAGERING_IN_PROGRESS --> WAGERING_IN_PROGRESS: 玩家進行遊戲投注<br>更新 wagered_amount<br>減少 remaining_wagering
+
+    WAGERING_IN_PROGRESS --> COMPLETED: 流水完成<br>(remaining_wagering = 0)<br>轉換為真實餘額
+
+    ACTIVE --> EXPIRED: 過期檢測<br>(NOW > expires_at)<br>@Scheduled 每 15 分鐘
+    WAGERING_IN_PROGRESS --> EXPIRED: 過期檢測<br>(NOW > expires_at)
+
+    ACTIVE --> FORFEITED: 觸發沒收規則<br>見右側說明
+    WAGERING_IN_PROGRESS --> FORFEITED: 觸發沒收規則
+
+    COMPLETED --> [*]: 最終狀態
+    EXPIRED --> [*]: 最終狀態
+    FORFEITED --> [*]: 最終狀態
+    CANCELLED --> [*]: 最終狀態
+
+    note right of FORFEITED
+        沒收觸發條件 (LiteFlow 規則):
+        1. 玩家發起提款請求
+           (流水未完成時)
+        2. 違反優惠條款
+           (投注額超過 max_bet)
+        3. 濫用檢測觸發
+           (風控引擎告警)
+        4. 限制遊戲投注
+           (excluded_games 清單)
+    end note
+
+    note right of COMPLETED
+        成功完成後操作:
+        1. converted_to_real_at = NOW
+        2. 更新 wallets.real_balance
+        3. 記錄 bonus_wagering_history
+        4. 發送完成通知
+        5. 檢查 max_cashout 限制
+           (無存款優惠)
+    end note
+
+    note right of EXPIRED
+        過期處理:
+        1. forfeited_at = NOW
+        2. forfeiture_reason = 'EXPIRED'
+        3. 記錄 bonus_forfeiture_log
+        4. 發送過期通知
+           (expires_at - 24h 提前警告)
+    end note
+
+    note right of PENDING
+        PENDING 狀態持續時間:
+        - 通常 < 5 秒
+        - 等待充值確認
+        - 等待第三方支付回調
+    end note
+
+    state WAGERING_IN_PROGRESS {
+        [*] --> CheckingContribution
+        CheckingContribution --> UpdatingWagering: 計算遊戲貢獻<br>contribution = bet × weight
+        UpdatingWagering --> CheckingComplete: 更新流水進度
+        CheckingComplete --> [*]: 檢查是否完成
+    }
+```
+
+**圖例 (Legend)**:
+- `實線箭頭 (→)`: 正常狀態轉換
+- `虛線箭頭 (⇢)`: 異常/失敗轉換
+- `[*]`: 起始/結束狀態
+- `note right of`: 狀態詳細說明與業務規則
+
+**狀態持續時間統計 (中位數)**:
+| 狀態 | 持續時間 (中位數) | 最大時間 |
+|-----|----------------|---------|
+| PENDING | 2 秒 | 30 秒 |
+| ACTIVE (未開始投注) | 12 小時 | 30 天 |
+| WAGERING_IN_PROGRESS | 7-14 天 | 30 天 (expires_at) |
+| COMPLETED | N/A (最終狀態) | N/A |
+| EXPIRED | N/A (最終狀態) | N/A |
+| FORFEITED | N/A (最終狀態) | N/A |
 
 **`bonus_wagering_history`** (Wagering contributions audit trail):
 

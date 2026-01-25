@@ -63,3 +63,7 @@ out/
 
 # Other
 HELP.md
+
+# AI / Tooling / IDE
+.gemini/
+.windsurf/

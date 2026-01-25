@@ -1,0 +1,155 @@
+package {{package}};
+
+import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Test fixtures for {{entityName}} integration tests
+ *
+ * <p>Provides reusable test data builders for {{entityName}} entities, forms, and VOs.
+ *
+ * <p><b>Usage:</b>
+ *
+ * <pre>{@code
+ * // Create entity with defaults
+ * {{entityName}}Entity entity = {{entityName}}TestFixture.createEntity();
+ *
+ * // Create entity with specific FK
+ * {{entityName}}Entity entity = {{entityName}}TestFixture.createEntity(departmentId);
+ *
+ * // Create add form
+ * {{entityName}}AddForm form = {{entityName}}TestFixture.createAddForm(departmentId);
+ * }</pre>
+ *
+ * @author Claude Code (smartadmin-integration-test skill)
+ * @since {{date}}
+ */
+public class {{entityName}}TestFixture {
+
+  private static final AtomicInteger counter = new AtomicInteger(0);
+
+  /**
+   * Create {{entityName}}Entity with unique test data
+   *
+   * @return Entity with all required fields set
+   */
+  public static {{entityName}}Entity createEntity() {
+    int id = counter.incrementAndGet();
+    long timestamp = System.currentTimeMillis();
+
+    {{entityName}}Entity entity = new {{entityName}}Entity();
+    // TODO: Set all required fields with unique values
+    // Example:
+    // entity.set{{fieldName1}}("test_" + timestamp);
+    // entity.set{{fieldName2}}("Test {{entityName}} " + id);
+    // entity.set{{fieldName3}}(id);
+    // entity.setDeletedFlag(false);
+    // entity.setCreateTime(LocalDateTime.now());
+
+    return entity;
+  }
+
+  /**
+   * Create {{entityName}}Entity with specific FK dependency
+   *
+   * @param dependencyId FK dependency ID
+   * @return Entity with FK set
+   */
+  public static {{entityName}}Entity createEntity(Long dependencyId) {
+    {{entityName}}Entity entity = createEntity();
+    // TODO: Set FK field
+    // entity.setDependencyId(dependencyId);
+    return entity;
+  }
+
+  /**
+   * Create {{entityName}}AddForm with default test data
+   *
+   * @return Form ready for service.add{{entityName}}()
+   */
+  public static {{entityName}}AddForm createAddForm() {
+    long timestamp = System.currentTimeMillis();
+
+    {{entityName}}AddForm form = new {{entityName}}AddForm();
+    // TODO: Set all required fields
+    // Example:
+    // form.set{{fieldName1}}("test_" + timestamp);
+    // form.set{{fieldName2}}("Test {{entityName}}");
+    // form.set{{fieldName3}}(1);
+
+    return form;
+  }
+
+  /**
+   * Create {{entityName}}AddForm with specific FK dependency
+   *
+   * @param dependencyId FK dependency ID
+   * @return Form with FK set
+   */
+  public static {{entityName}}AddForm createAddForm(Long dependencyId) {
+    {{entityName}}AddForm form = createAddForm();
+    // TODO: Set FK field
+    // form.setDependencyId(dependencyId);
+    return form;
+  }
+
+  /**
+   * Create {{entityName}}UpdateForm for updating existing entity
+   *
+   * @param {{entityLower}}Id ID of entity to update
+   * @return Form ready for service.update{{entityName}}()
+   */
+  public static {{entityName}}UpdateForm createUpdateForm(Long {{entityLower}}Id) {
+    {{entityName}}UpdateForm form = new {{entityName}}UpdateForm();
+    form.set{{entityName}}Id({{entityLower}}Id);
+    // TODO: Set fields to update
+    // Example:
+    // form.set{{fieldName1}}("Updated Value");
+    // form.set{{fieldName2}}("Updated {{entityName}}");
+
+    return form;
+  }
+
+  /**
+   * Create {{entityName}}QueryForm with pagination defaults
+   *
+   * @return Form ready for service.query{{entityName}}()
+   */
+  public static {{entityName}}QueryForm createQueryForm() {
+    {{entityName}}QueryForm form = new {{entityName}}QueryForm();
+    form.setPageNum(1);
+    form.setPageSize(10);
+    // TODO: Set search criteria if needed
+    return form;
+  }
+
+  // TODO: Add more builder methods for FK dependencies if needed
+
+  /**
+   * Reset counter (useful in @BeforeEach for test isolation)
+   */
+  public static void resetCounter() {
+    counter.set(0);
+  }
+
+  /**
+   * Generate unique string with prefix
+   */
+  private static String uniqueString(String prefix) {
+    return prefix + "_" + System.currentTimeMillis() + "_" + counter.incrementAndGet();
+  }
+
+  /**
+   * Generate unique phone number
+   */
+  private static String uniquePhone() {
+    return "138" + String.format("%08d", counter.incrementAndGet() % 100000000);
+  }
+
+  /**
+   * Generate unique email
+   */
+  private static String uniqueEmail(String name) {
+    return name + "_" + System.currentTimeMillis() + "@test.com";
+  }
+}

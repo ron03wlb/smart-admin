@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Vavr 基礎 - Option 與 Try
+description: Vavr Fundamentals - Option and Try
 tags: [vavr, functional-programming, option, try]
 positioning: ideal
 ai_role: code_reviewer_and_generator
@@ -19,79 +19,79 @@ spotbugs_rule: none
 last_updated: 2025-01-13
 ---
 
-# Vavr 函數式編程基礎 - Option 與 Try
+# Vavr Functional Programming Fundamentals - Option and Try
 
-> **TL;DR**: 使用 Vavr Option 替代 null 檢查，使用 Try 替代 try-catch，實現優雅的函數式異常處理。
+> **TL;DR**: Use Vavr Option to replace null checks, use Try to replace try-catch, achieving elegant functional exception handling.
 
-**定位說明**: 本規範定義理想目標架構，引導專案從傳統 Java null/異常處理遷移至 Vavr 函數式模式。
+**Positioning Statement**: This specification defines the ideal target architecture, guiding the project from traditional Java null/exception handling to Vavr functional patterns.
 
 ---
 
-## 🤖 AI 指令區塊
+## 🤖 AI Instructions Block
 
-### 何時應用此規則
-- ✅ 用戶要求生成 Service 層代碼
-- ✅ Service 方法需要返回可能為 null 的對象
-- ✅ 代碼中需要處理可能拋異常的操作（IO、網絡、外部 API）
-- ✅ Code Review 時發現 `Optional` 或 `try-catch` 使用
-- ✅ 用戶詢問如何處理 null 或異常
+### When to Apply This Rule
+- ✅ User requests to generate Service layer code
+- ✅ Service method needs to return potentially null objects
+- ✅ Code needs to handle operations that may throw exceptions (IO, network, external API)
+- ✅ Code review finds `Optional` or `try-catch` usage
+- ✅ User asks how to handle null or exceptions
 
-### 強制執行檢查清單
-當生成或審查 Service 層代碼時，必須確認：
-- [ ] Service 方法返回類型是 `Option<T>` 而非 `Optional<T>` 或 `T`
-- [ ] 沒有顯式的 null 檢查（`if (obj == null)` 或 `obj != null`）
-- [ ] 異常處理使用 `Try.of()` 而非 `try-catch` 塊
-- [ ] 沒有在 Controller 參數中使用 Option（應該用基本類型）
-- [ ] 使用 `map()`/`flatMap()` 進行鏈式調用而非嵌套 if
+### Mandatory Enforcement Checklist
+When generating or reviewing Service layer code, must confirm:
+- [ ] Service method return type is `Option<T>` not `Optional<T>` or `T`
+- [ ] No explicit null checks (`if (obj == null)` or `obj != null`)
+- [ ] Exception handling uses `Try.of()` instead of `try-catch` blocks
+- [ ] No using Option in Controller parameters (should use primitive types)
+- [ ] Use `map()`/`flatMap()` for method chaining instead of nested if
 
-### AI 決策樹
+### AI Decision Tree
 ```
-用戶要求: "查詢用戶" / "獲取訂單"
-  ├─ 返回單個對象？
-  │   └─ YES → 使用 Option<Entity>
-  │       ├─ Repository 返回可能為 null？
-  │       │   └─ 使用: Option.of(repository.selectById(id))
-  │       └─ Repository 返回 Optional？
-  │           └─ 使用: Option.ofOptional(repository.findById(id))
+User request: "query user" / "get order"
+  ├─ Return single object?
+  │   └─ YES → Use Option<Entity>
+  │       ├─ Repository returns possibly null?
+  │       │   └─ Use: Option.of(repository.selectById(id))
+  │       └─ Repository returns Optional?
+  │           └─ Use: Option.ofOptional(repository.findById(id))
   │
-  ├─ 可能拋異常？
-  │   └─ YES → 使用 Try<Entity>
-  │       ├─ IO 操作（文件、網絡）？
-  │       │   └─ 使用: Try.of(() -> ...).mapTry(...)
-  │       ├─ 外部 API 調用？
-  │       │   └─ 使用: Try.of(() -> ...).recover(...)
-  │       └─ 數據庫操作？
-  │           └─ 使用: Try.of(() -> ...).onFailure(log::error)
+  ├─ May throw exception?
+  │   └─ YES → Use Try<Entity>
+  │       ├─ IO operation (file, network)?
+  │       │   └─ Use: Try.of(() -> ...).mapTry(...)
+  │       ├─ External API call?
+  │       │   └─ Use: Try.of(() -> ...).recover(...)
+  │       └─ Database operation?
+  │           └─ Use: Try.of(() -> ...).onFailure(log::error)
   │
-  └─ 需要嵌套檢查？（user → address → city）
-      └─ 使用 flatMap 鏈式調用
+  └─ Need nested checks? (user → address → city)
+      └─ Use flatMap chaining
           Option.of(user)
             .flatMap(u -> Option.of(u.getAddress()))
             .map(Address::getCity)
 ```
 
-### 錯誤模式檢測與自動修正
+### Error Pattern Detection and Auto-Fix
 
-#### 模式 1: 檢測到 Optional 返回類型
+#### Pattern 1: Detect Optional return type
 ```java
-// ❌ 檢測到錯誤
+// ❌ Detected error
 public Optional<User> findById(Long id) {
     return userMapper.findById(id);
 }
 
-// ✅ 自動修正為
+// ✅ Auto-fix to
 public Option<User> findById(Long id) {
     return Option.ofOptional(userMapper.findById(id));
 }
-// 或者（如果 Mapper 返回可能為 null）
+// Or (if Mapper returns possibly null)
 public Option<User> findById(Long id) {
     return Option.of(userMapper.selectById(id));
 }
 ```
 
-#### 模式 2: 檢測到 null 檢查
+#### Pattern 2: Detect null checks
 ```java
-// ❌ 檢測到錯誤
+// ❌ Detected error
 public UserVO getUserCity(Long id) {
     User user = userRepository.findById(id);
     if (user == null) {
@@ -104,7 +104,7 @@ public UserVO getUserCity(Long id) {
     return new UserVO(user.getName(), address.getCity());
 }
 
-// ✅ 自動修正為
+// ✅ Auto-fix to
 public UserVO getUserCity(Long id) {
     return Option.of(userRepository.findById(id))
         .map(user -> new UserVO(
@@ -113,53 +113,53 @@ public UserVO getUserCity(Long id) {
                 .map(Address::getCity)
                 .getOrElse("Unknown")
         ))
-        .getOrElseThrow(() -> new NotFoundException("用戶不存在"));
+        .getOrElseThrow(() -> new NotFoundException("User not found"));
 }
 ```
 
-#### 模式 3: 檢測到 try-catch
+#### Pattern 3: Detect try-catch
 ```java
-// ❌ 檢測到錯誤
+// ❌ Detected error
 public String readConfig(String path) {
     try {
         return Files.readString(Paths.get(path));
     } catch (IOException e) {
-        log.error("配置讀取失敗", e);
+        log.error("Config read failed", e);
         return "default-config";
     }
 }
 
-// ✅ 自動修正為
+// ✅ Auto-fix to
 public Try<String> readConfig(String path) {
     return Try.of(() -> Files.readString(Paths.get(path)))
-        .onFailure(e -> log.error("配置讀取失敗", e));
+        .onFailure(e -> log.error("Config read failed", e));
 }
-// Controller 層處理:
+// Controller layer handles:
 // readConfig(path).getOrElse("default-config")
 ```
 
-#### 模式 4: 檢測到 Controller 參數使用 Option（錯誤）
+#### Pattern 4: Detect Controller parameter using Option (wrong)
 ```java
-// ❌ 檢測到錯誤
+// ❌ Detected error
 @GetMapping("/{id}")
-public ResponseDTO<UserVO> getUser(Option<Long> id) { // ❌ 錯誤用法
+public ResponseDTO<UserVO> getUser(Option<Long> id) { // ❌ Wrong usage
     ...
 }
 
-// ✅ 修正為
+// ✅ Fix to
 @GetMapping("/{id}")
-public ResponseDTO<UserVO> getUser(@PathVariable Long id) { // ✅ 正確
+public ResponseDTO<UserVO> getUser(@PathVariable Long id) { // ✅ Correct
     return userService.findById(id)
         .map(UserVO::from)
         .map(ResponseDTO::ok)
-        .getOrElse(() -> ResponseDTO.error("用戶不存在"));
+        .getOrElse(() -> ResponseDTO.error("User not found"));
 }
 ```
 
-### 生成代碼標準模板
+### Code Generation Standard Templates
 
 ```java
-// Service 層查詢
+// Service layer query
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -174,7 +174,7 @@ public class UserService {
     }
 }
 
-// Controller 層處理 Option
+// Controller layer handles Option
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -184,18 +184,18 @@ public class UserController {
     public ResponseDTO<UserVO> getUser(@PathVariable Long id) {
         return service.findById(id)
             .map(UserVO::from)
-            .fold(() -> ResponseDTO.error("不存在"), ResponseDTO::ok);
+            .fold(() -> ResponseDTO.error("Not found"), ResponseDTO::ok);
     }
 }
 
-// Try 異常處理
+// Try exception handling
 public Try<String> readFile(String path) {
     return Try.of(() -> Files.readString(Paths.get(path)))
-        .onFailure(e -> log.error("文件讀取失敗", e));
+        .onFailure(e -> log.error("File read failed", e));
 }
 ```
 
-### 驗證命令
+### Validation Commands
 ```bash
 mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
 ```
@@ -204,7 +204,7 @@ mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
 
 ---
 
-## Maven 依賴
+## Maven Dependencies
 
 ```xml
 <dependency>
@@ -213,7 +213,7 @@ mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
     <version>0.10.4</version>
 </dependency>
 
-<!-- JSON 序列化支持 -->
+<!-- JSON serialization support -->
 <dependency>
     <groupId>io.vavr</groupId>
     <artifactId>vavr-jackson</artifactId>
@@ -223,22 +223,22 @@ mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
 
 ---
 
-## 為什麼使用 Vavr？
+## Why Use Vavr?
 
-- ✅ 不可變集合，線程安全
-- ✅ Try/Option/Either 替代 try-catch 和 null
-- ✅ 函數組合與鏈式調用
-- ✅ 模式匹配增強可讀性
-- ✅ 與 Spring MVC 完美兼容
+- ✅ Immutable collections, thread-safe
+- ✅ Try/Option/Either replace try-catch and null
+- ✅ Function composition and method chaining
+- ✅ Pattern matching enhances readability
+- ✅ Perfect compatibility with Spring MVC
 
 ---
 
-## Option - null 安全
+## Option - Null Safety
 
-### 【強制】基本使用
+### [Mandatory] Basic Usage
 
 ```java
-// ❌ 傳統方式 - null 檢查繁瑣
+// ❌ Traditional way - verbose null checks
 public UserVO getUserById(Long id) {
     User user = userRepository.findById(id);
     if (user == null) {
@@ -251,7 +251,7 @@ public UserVO getUserById(Long id) {
     return new UserVO(user.getName(), address.getCity());
 }
 
-// ✅ Vavr Option - 優雅鏈式調用
+// ✅ Vavr Option - elegant method chaining
 public UserVO getUserById(Long id) {
     return Option.ofOptional(userRepository.findById(id))
         .map(user -> new UserVO(
@@ -264,37 +264,37 @@ public UserVO getUserById(Long id) {
 }
 ```
 
-### 【強制】Option API
+### [Mandatory] Option API
 
 ```java
-// 創建 Option
+// Create Option
 Option<String> some = Option.of("value");
 Option<String> none = Option.of(null);          // None
 Option<String> fromOptional = Option.ofOptional(optional);
 
-// 轉換
+// Transform
 Option<Integer> length = some.map(String::length);
 Option<String> upper = some.map(String::toUpperCase);
 
-// 過濾
+// Filter
 Option<String> filtered = some.filter(s -> s.length() > 5);
 
-// 獲取值
+// Get value
 String value = some.getOrElse("default");
 String value2 = some.getOrElse(() -> computeDefault());
 String value3 = some.getOrElseThrow(() -> new RuntimeException());
 
-// 判斷
+// Check
 if (some.isDefined()) { ... }
 if (some.isEmpty()) { ... }
 
-// flatMap 處理嵌套
+// flatMap for nested handling
 Option<String> city = Option.of(user)
     .flatMap(u -> Option.of(u.getAddress()))
     .map(Address::getCity);
 ```
 
-### 【推薦】Service 層鏈式處理
+### [Recommended] Service Layer Method Chaining
 
 ```java
 @Service
@@ -312,17 +312,17 @@ public class UserService {
 
 ---
 
-## Try - 異常處理
+## Try - Exception Handling
 
-### 【強制】基本使用
+### [Mandatory] Basic Usage
 
 ```java
-// ❌ 傳統 try-catch
+// ❌ Traditional try-catch
 public String readFile(String path) {
     try {
         return Files.readString(Paths.get(path));
     } catch (IOException e) {
-        log.error("文件讀取失敗", e);
+        log.error("File read failed", e);
         throw new RuntimeException(e);
     }
 }
@@ -330,58 +330,58 @@ public String readFile(String path) {
 // ✅ Vavr Try
 public Try<String> readFile(String path) {
     return Try.of(() -> Files.readString(Paths.get(path)))
-        .onFailure(e -> log.error("文件讀取失敗", e));
+        .onFailure(e -> log.error("File read failed", e));
 }
 ```
 
-### 【強制】Try API
+### [Mandatory] Try API
 
 ```java
-// 創建與轉換
+// Create and transform
 Try<Integer> result = Try.of(() -> 42).map(i -> i * 2);
 Try<String> content = Try.of(() -> Paths.get("f.txt")).mapTry(Files::readString);
 
-// 錯誤恢復
+// Error recovery
 Try<Integer> recovered = Try.of(() -> 1 / 0)
     .recover(ArithmeticException.class, 0);
 
-// 獲取值
+// Get value
 Integer value = result.getOrElse(0);
 ```
 
-### 【推薦】外部 API 調用
+### [Recommended] External API Calls
 
 ```java
 public Try<ApiResponse> callApi(String endpoint, Object req) {
     return Try.of(() -> restTemplate.postForObject(endpoint, req, ApiResponse.class))
         .recover(HttpClientErrorException.class, ex -> {
-            log.error("API 失敗: {}", ex.getStatusCode());
-            throw new ExternalApiException("第三方服務異常", ex);
+            log.error("API failed: {}", ex.getStatusCode());
+            throw new ExternalApiException("Third-party service error", ex);
         });
 }
 ```
 
 ---
 
-## 檢查清單
+## Checklist
 
-**Option 使用**:
-- [ ] Service 層方法返回 Option 而非 null
-- [ ] 使用 map/flatMap 鏈式處理而非 if-null 檢查
-- [ ] Controller 使用 fold() 或 getOrElse() 處理 Option
+**Option Usage**:
+- [ ] Service layer methods return Option instead of null
+- [ ] Use map/flatMap chaining instead of if-null checks
+- [ ] Controller uses fold() or getOrElse() to handle Option
 
-**Try 使用**:
-- [ ] 文件操作使用 Try.mapTry() 處理 IOException
-- [ ] 外部 API 調用使用 Try 包裝
-- [ ] 使用 recover() 處理特定異常而非 catch
+**Try Usage**:
+- [ ] File operations use Try.mapTry() to handle IOException
+- [ ] External API calls wrapped with Try
+- [ ] Use recover() to handle specific exceptions instead of catch
 
-**一般原則**:
-- [ ] 避免在 Option/Try 內部拋異常
-- [ ] 優先使用方法引用提升可讀性
-- [ ] 與 Spring MVC 傳統架構兼容
+**General Principles**:
+- [ ] Avoid throwing exceptions inside Option/Try
+- [ ] Prefer method references for better readability
+- [ ] Compatible with Spring MVC traditional architecture
 
 ---
 
-## 相關規範
-- [08-vavr-advanced.md](./08-vavr-advanced.md) - Either、集合、模式匹配
-- [08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md) - MyBatis Plus 整合
+## Related Standards
+- [08-vavr-advanced.md](./08-vavr-advanced.md) - Either, Collections, Pattern Matching
+- [08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md) - MyBatis Plus Integration

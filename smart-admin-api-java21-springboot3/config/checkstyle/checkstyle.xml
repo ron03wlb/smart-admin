@@ -7,6 +7,12 @@
     <property name="severity" value="error"/>
     <property name="fileExtensions" value="java, properties, xml"/>
 
+    <!-- Suppression filter for test files and exceptions -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
+        <property name="optional" value="false"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="AvoidStarImport"/>
         <module name="OneTopLevelClass"/>

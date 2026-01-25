@@ -35,7 +35,8 @@ When working with SmartAdmin codebase, read documentation in this order:
 2. **[.agent/rules/00-ai-decision-matrix.md](.agent/rules/00-ai-decision-matrix.md)** - Scenario-based rule selection
 3. **[.agent/rules/10-architecture-rules.md](.agent/rules/10-architecture-rules.md)** - Mandatory architectural constraints
 4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
-5. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
+5. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks (optional, for Claude Code)
+6. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
 
 ### Interaction Language
 
@@ -174,6 +175,20 @@ Controller → Service → Manager → Dao → Entity
 
 → **[All Rules Index](.agent/rules/00-ai-decision-matrix.md)**
 → **[Quality Standards](.claude/shared/knowledge/quality-standards.md)**
+
+## Specialized Skills
+
+**P1 Skills (Important - Business Logic & Quality)**:
+- **[liteflow-rule-builder](.claude/skills/liteflow-rule-builder/)** - Generate LiteFlow workflow orchestration rules
+- **[fraud-detection-pattern-generator](.claude/skills/fraud-detection-pattern-generator/)** - iGaming fraud detection & risk control
+- **[quality-gate-orchestrator](.claude/skills/quality-gate-orchestrator/)** - Multi-tool quality gate automation
+
+**P0 Skills (Critical - Foundation)**:
+- **[smartadmin-crud-generator](.claude/skills/smartadmin-crud-generator/)** - Full-stack CRUD module generation
+- **[vavr-refactoring-assistant](.claude/skills/vavr-refactoring-assistant/)** - Refactor to Vavr functional patterns
+- **[archunit-test-generator](.claude/skills/archunit-test-generator/)** - Generate architecture tests
+
+→ **[Complete Skills Catalog](.claude/skills/README.md)**
 
 ## Quality Tool Patterns
 

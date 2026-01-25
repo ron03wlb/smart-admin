@@ -1,0 +1,223 @@
+# SmartAdmin GitLab CI/CD Pipeline
+
+variables:
+  JAVA_VERSION: "21"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2g"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  POSTGRES_DB: smartadmin_test
+  POSTGRES_USER: smartadmin
+  POSTGRES_PASSWORD: smartadmin123
+  DATABASE_URL: "jdbc:postgresql://postgres:5432/smartadmin_test"
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+
+stages:
+  - build
+  - test
+  - quality
+  - package
+  - deploy
+
+# Cache Gradle dependencies
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+    - smart-admin-api-java21-springboot3/.gradle/
+
+before_script:
+  - cd smart-admin-api-java21-springboot3
+  - chmod +x gradlew
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+# Build Stage
+build:
+  stage: build
+  image: gradle:8.11-jdk21
+  script:
+    - ./gradlew clean build -x test --no-daemon --stacktrace
+  artifacts:
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/libs/*.jar
+    expire_in: 1 week
+  only:
+    - branches
+    - merge_requests
+
+# Unit Test Stage
+unit-tests:
+  stage: test
+  image: gradle:8.11-jdk21
+  services:
+    - postgres:15
+    - redis:7-alpine
+  script:
+    - ./gradlew :sa-admin:test -x integrationTest --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+      - smart-admin-api-java21-springboot3/sa-admin/build/test-results/
+    reports:
+      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/TEST-*.xml
+    expire_in: 1 week
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  only:
+    - branches
+    - merge_requests
+
+# Integration Test Stage
+integration-tests:
+  stage: test
+  image: gradle:8.11-jdk21
+  services:
+    - name: postgres:15
+      alias: postgres
+    - name: redis:7-alpine
+      alias: redis
+  variables:
+    SPRING_PROFILES_ACTIVE: test
+  script:
+    - ./gradlew :sa-admin:integrationTest --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/integrationTest/
+      - smart-admin-api-java21-springboot3/sa-admin/build/test-results/integrationTest/
+    reports:
+      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/integrationTest/TEST-*.xml
+    expire_in: 1 week
+  only:
+    - branches
+    - merge_requests
+
+# Architecture Test Stage
+architecture-tests:
+  stage: test
+  image: gradle:8.11-jdk21
+  script:
+    - ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+    expire_in: 1 week
+  only:
+    - branches
+    - merge_requests
+
+# Code Quality - SpotBugs
+spotbugs:
+  stage: quality
+  image: gradle:8.11-jdk21
+  script:
+    - ./gradlew :sa-admin:spotbugsMain --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
+    expire_in: 1 week
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# Code Quality - PMD
+pmd:
+  stage: quality
+  image: gradle:8.11-jdk21
+  script:
+    - ./gradlew :sa-admin:pmdMain --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
+    expire_in: 1 week
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# Code Quality - Checkstyle
+checkstyle:
+  stage: quality
+  image: gradle:8.11-jdk21
+  script:
+    - ./gradlew :sa-admin:checkstyleMain --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+    expire_in: 1 week
+  allow_failure: true
+  only:
+    - branches
+    - merge_requests
+
+# Package Docker Image
+docker-build:
+  stage: package
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cd smart-admin-api-java21-springboot3
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+    - master
+    - develop
+
+# Deploy to Development
+deploy-dev:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Deploying to development environment..."
+    # Add your deployment commands here
+    # Example: kubectl set image deployment/smartadmin-api smartadmin-api=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  environment:
+    name: development
+    url: https://dev.smartadmin.example.com
+  only:
+    - develop
+
+# Deploy to Staging
+deploy-staging:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Deploying to staging environment..."
+    # Add your deployment commands here
+  environment:
+    name: staging
+    url: https://staging.smartadmin.example.com
+  only:
+    - main
+    - master
+
+# Deploy to Production (Manual)
+deploy-production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Deploying to production environment..."
+    # Add your deployment commands here
+  environment:
+    name: production
+    url: https://smartadmin.example.com
+  when: manual
+  only:
+    - main
+    - master

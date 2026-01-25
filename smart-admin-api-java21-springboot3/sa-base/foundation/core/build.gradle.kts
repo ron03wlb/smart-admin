@@ -28,6 +28,9 @@ dependencies {
     api(libs.guava)
     api(libs.commons.lang3)
 
+    // Vavr - Functional programming library
+    api("io.vavr:vavr:0.10.4")
+
     // Lombok
     api(libs.lombok)
     annotationProcessor(libs.lombok)

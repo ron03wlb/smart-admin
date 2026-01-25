@@ -19,6 +19,10 @@
               PMD 应专注于检测实际的 bug 和潜在问题，而非代码美学偏好。
     </description>
 
+    <!-- Exclude sample/demo code from all PMD checks -->
+    <!-- Rationale: Sample code demonstrates API usage patterns, not production best practices -->
+    <exclude-pattern>.*/module/business/sample/.*</exclude-pattern>
+
     <!-- ==================== Best Practices ==================== -->
     <rule ref="category/java/bestpractices.xml"/>
 

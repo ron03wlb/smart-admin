@@ -11,7 +11,7 @@ conflicts_with: []
 related_rules:
   - rules/10-architecture-rules.md
   - rules/02-oop-principles.md
-archunit_test: ArchitectureTest#controllerNaming
+archunit_test: ArchitectureTest#controllerNaming,ArchitectureTest#noBooleanFieldWithIsPrefix
 checkstyle_rule: TypeName,MethodName,ConstantName
 spotbugs_rule: none
 last_updated: 2025-01-13
