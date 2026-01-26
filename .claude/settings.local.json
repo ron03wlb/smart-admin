@@ -87,7 +87,13 @@
       "Bash(node generate-weekly-report.js:*)",
       "Bash(node:*)",
       "Bash(if [ -f /private/tmp/claude/-Users-zhangxuanrong-Documents-Workspace-Java-smart-admin/tasks/bb4a81f.output ])",
-      "Bash(then wc -l /private/tmp/claude/-Users-zhangxuanrong-Documents-Workspace-Java-smart-admin/tasks/bb4a81f.output)"
+      "Bash(then wc -l /private/tmp/claude/-Users-zhangxuanrong-Documents-Workspace-Java-smart-admin/tasks/bb4a81f.output)",
+      "Bash(dir:*)",
+      "Bash(for skill in better-auth-best-practices brainstorming claude-settings-audit cloudflare design-md dispatching-parallel-agents executing-plans file-organizer find-bugs finishing-a-development-branch frontend-design git-pushing iterate-pr prompt-engineering receiving-code-review requesting-code-review review-implementing semgrep-rule-creator skill-creator subagent-driven-development supabase-postgres-best-practices test-driven-development tinybird verification-before-completion webapp-testing writing-plans writing-skills)",
+      "Bash(if [ -f \".agents/skills/$skill/SKILL.md\" ])",
+      "Bash(for skill in dispatching-parallel-agents git-pushing skill-creator semgrep-rule-creator)",
+      "Bash(for d in */)",
+      "Bash(do test:*)"
     ]
   },
   "allowedCommands": {
