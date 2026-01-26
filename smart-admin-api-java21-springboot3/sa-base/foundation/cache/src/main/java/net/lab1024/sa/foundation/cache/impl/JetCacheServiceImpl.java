@@ -1,5 +1,6 @@
 package net.lab1024.sa.foundation.cache.impl;
-nimport lombok.RequiredArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;

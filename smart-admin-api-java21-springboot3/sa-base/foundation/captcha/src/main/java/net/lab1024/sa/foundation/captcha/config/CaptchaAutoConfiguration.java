@@ -1,5 +1,6 @@
 package net.lab1024.sa.foundation.captcha.config;
-nimport lombok.RequiredArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 
 import net.lab1024.sa.foundation.captcha.CaptchaService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

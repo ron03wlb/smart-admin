@@ -1,5 +1,6 @@
 package net.lab1024.sa.foundation.core.config;
-nimport lombok.RequiredArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;

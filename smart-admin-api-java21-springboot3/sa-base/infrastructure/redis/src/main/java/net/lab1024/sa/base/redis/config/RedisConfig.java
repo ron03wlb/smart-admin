@@ -1,5 +1,6 @@
 package net.lab1024.sa.base.redis.config;
-nimport lombok.RequiredArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
