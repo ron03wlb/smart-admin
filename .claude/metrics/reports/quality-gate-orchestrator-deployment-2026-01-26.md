@@ -1,4 +1,4 @@
-# Quality Gate Orchestrator - Comprehensive Deployment Report
+﻿# Quality Gate Orchestrator - Comprehensive Deployment Report
 
 **Deployment Date**: 2026-01-26
 **Skill Version**: 1.0.0
@@ -209,7 +209,7 @@ pmd {
 | P3 | MAJOR | ℹ️ Report | GuardLogStatement, AvoidInstantiatingObjectsInLoops |
 | P4-P5 | MINOR | ⏭️ Ignore | Code style, unnecessary code |
 
-**Rationale**: Aligns with SmartAdmin standards (`.agent/rules/12-pmd-rules.md`)
+**Rationale**: Aligns with SmartAdmin standards (`.agent/rules/quality-tools/12-pmd-rules.md`)
 
 ---
 
@@ -258,7 +258,7 @@ pmd {
 
 ### 1. AI Decision Matrix Integration
 
-**File**: `.agent/rules/00-ai-decision-matrix.md`
+**File**: `.agent/rules/00-INDEX.md`
 
 **Scenario 10: Quality Gate & CI/CD**
 
@@ -308,11 +308,11 @@ Use when setting up CI/CD pipelines, pre-commit hooks, or quality orchestration.
 ### 4. Related Documentation Cross-References
 
 **Architecture Rules**:
-- `.agent/rules/10-architecture-rules.md` - ArchUnit enforcement
-- `.agent/rules/11-checkstyle-rules.md` - Code style standards
-- `.agent/rules/12-pmd-rules.md` - Code smell detection
-- `.agent/rules/13-spotbugs-rules.md` - Bug pattern detection
-- `.agent/rules/16-jacoco-coverage-rules.md` - Coverage thresholds
+- `.agent/foundation/10-architecture-rules.md` - ArchUnit enforcement
+- `.agent/rules/quality-tools/11-checkstyle-rules.md` - Code style standards
+- `.agent/rules/quality-tools/12-pmd-rules.md` - Code smell detection
+- `.agent/rules/quality-tools/13-spotbugs-rules.md` - Bug pattern detection
+- `.agent/rules/quality-tools/16-jacoco-coverage-rules.md` - Coverage thresholds
 
 **Workflows**:
 - `.agent/workflows/quality-gates-local-ci.md` - Local validation workflow
@@ -845,11 +845,11 @@ tasks.register("qualityGateParallel") {
 - **PMD Ruleset**: `config/pmd/ruleset.xml`
 
 ### SmartAdmin Standards
-- **Architecture Rules**: `.agent/rules/10-architecture-rules.md`
-- **Checkstyle Rules**: `.agent/rules/11-checkstyle-rules.md`
-- **PMD Rules**: `.agent/rules/12-pmd-rules.md`
-- **SpotBugs Rules**: `.agent/rules/13-spotbugs-rules.md`
-- **AI Decision Matrix**: `.agent/rules/00-ai-decision-matrix.md` (Scenario 10)
+- **Architecture Rules**: `.agent/foundation/10-architecture-rules.md`
+- **Checkstyle Rules**: `.agent/rules/quality-tools/11-checkstyle-rules.md`
+- **PMD Rules**: `.agent/rules/quality-tools/12-pmd-rules.md`
+- **SpotBugs Rules**: `.agent/rules/quality-tools/13-spotbugs-rules.md`
+- **AI Decision Matrix**: `.agent/rules/00-INDEX.md` (Scenario 10)
 
 ---
 

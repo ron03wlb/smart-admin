@@ -1,4 +1,4 @@
-# LambdaQueryWrapper Usage Guide
+﻿# LambdaQueryWrapper Usage Guide
 
 Complete guide to MyBatis Plus LambdaQueryWrapper for type-safe queries in SmartAdmin.
 
@@ -390,4 +390,4 @@ List<Employee> employees = employeeDao.selectList(wrapper);
 
 - [Dao Architecture Guide](dao-architecture.md)
 - [XML Mapper Patterns](xml-mapper-patterns.md)
-- [MyBatis Plus Core Rules](../../../../.agent/rules/09-mybatis-plus-core.md)
+- [MyBatis Plus Core Rules](../../../../.agent/rules/technology/database/09-mybatis-plus-core.md)

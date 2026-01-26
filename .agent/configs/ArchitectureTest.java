@@ -139,7 +139,42 @@ public class ArchitectureTest {
         .that().areDeclaredInClassesThat()
         .resideInAnyPackage("..controller..", "..service..", "..manager..")
         .should().notBeAnnotatedWith(org.springframework.beans.factory.annotation.Autowired.class)
-        .as("禁止字段注入，使用构造函数注入");
+        .as("禁止@Autowired字段注入，使用@RequiredArgsConstructor构造函数注入");
+
+    /**
+     * 【严格执行】禁止 @Resource 字段注入
+     *
+     * <p>SmartAdmin 项目要求所有依赖注入使用构造函数注入模式，通过 @RequiredArgsConstructor + private final 实现
+     *
+     * <p>错误示例：
+     * <pre>
+     * &#64;Service
+     * public class GoodsService {
+     *     &#64;Resource private GoodsDao goodsDao;  // ❌ 禁止
+     *     &#64;Resource private GoodsManager goodsManager;  // ❌ 禁止
+     * }
+     * </pre>
+     *
+     * <p>正确示例：
+     * <pre>
+     * &#64;Service
+     * &#64;RequiredArgsConstructor
+     * public class GoodsService {
+     *     private final GoodsDao goodsDao;  // ✅ 正确
+     *     private final GoodsManager goodsManager;  // ✅ 正确
+     * }
+     * </pre>
+     *
+     * <p>规则来源：.agent/rules/foundation/10-architecture-rules.md
+     *
+     * @since 4.1.0
+     */
+    @ArchTest
+    static final ArchRule noResourceFieldInjection = fields()
+        .that().areDeclaredInClassesThat()
+        .resideInAnyPackage("..controller..", "..service..", "..manager..")
+        .should().notBeAnnotatedWith(jakarta.annotation.Resource.class)
+        .as("禁止@Resource字段注入，使用@RequiredArgsConstructor构造函数注入（规则：foundation/10-architecture-rules.md）");
 
     // ========== 分层访问约束 ==========
 
@@ -197,14 +232,46 @@ public class ArchitectureTest {
         .as("Service 层方法必须返回 Vavr Option 而不是 java.util.Optional（强制规则）");
 
     /**
-     * 强制：Service 层不能依赖 java.util.Optional
-     * 确保整个 Service 层使用 Vavr Option
+     * 【严格执行】Service 层完全禁止依赖 java.util.Optional（包含 private 方法）
+     *
+     * <p>此规则比 serviceUsesVavrOption 更严格，检测所有 Optional 依赖，包括：
+     * <ul>
+     *   <li>Private 方法的返回值
+     *   <li>方法参数类型
+     *   <li>字段类型
+     *   <li>Import 语句
+     * </ul>
+     *
+     * <p>错误示例（GoodsService.java）：
+     * <pre>
+     * import java.util.Optional;  // ❌ 禁止 import
+     *
+     * private Optional&lt;CategoryEntity&gt; queryCategory(Long id) {  // ❌ 禁止返回 Optional
+     *     if (id == null) return Optional.empty();
+     *     return Optional.of(entity);
+     * }
+     * </pre>
+     *
+     * <p>正确示例：
+     * <pre>
+     * import io.vavr.control.Option;  // ✅ 使用 Vavr Option
+     *
+     * private Option&lt;CategoryEntity&gt; queryCategory(Long id) {  // ✅ 返回 Option
+     *     return Option.of(id)
+     *         .flatMap(categoryId -&gt; Option.of(categoryCacheManager.queryCategory(categoryId)))
+     *         .filter(entity -&gt; !entity.getDeletedFlag());
+     * }
+     * </pre>
+     *
+     * <p>规则来源：.agent/rules/technology/functional/08-vavr-fundamentals.md
+     *
+     * @since 4.1.0
      */
     @ArchTest
     static final ArchRule noJavaOptionalInService = noClasses()
         .that().resideInAPackage("..service..")
         .should().dependOnClassesThat().haveFullyQualifiedName("java.util.Optional")
-        .as("Service 层禁止使用 java.util.Optional，必须使用 io.vavr.control.Option");
+        .as("Service 层完全禁止使用 java.util.Optional（包含 private 方法），必须使用 io.vavr.control.Option（规则：technology/functional/08-vavr-fundamentals.md）");
 
     /**
      * 强制：Controller 参数不能使用 Option
@@ -258,6 +325,41 @@ public class ArchitectureTest {
         .or().areAnnotatedWith(org.springframework.cache.annotation.CachePut.class)
         .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
         .as("缓存注解只能在 Manager 层使用（规则：09-manager-layer.md）");
+
+    /**
+     * 【推荐】Manager 事务方法命名约定
+     *
+     * <p>所有带 @Transactional 注解的 Manager 方法应以 "Transaction" 结尾，便于识别事务边界
+     *
+     * <p>正确示例：
+     * <pre>
+     * &#64;Service
+     * public class GoodsManager {
+     *     &#64;Transactional(rollbackFor = Throwable.class)
+     *     public void addGoodsTransaction(GoodsAddForm form) {  // ✅ 以 Transaction 结尾
+     *         // 事务逻辑
+     *     }
+     * }
+     * </pre>
+     *
+     * <p>不推荐示例：
+     * <pre>
+     * &#64;Transactional(rollbackFor = Throwable.class)
+     * public void addGoods(GoodsAddForm form) {  // ⚠️ 未以 Transaction 结尾
+     *     // 事务逻辑
+     * }
+     * </pre>
+     *
+     * <p>规则来源：.agent/rules/foundation/09-manager-layer.md
+     *
+     * @since 4.1.0
+     */
+    @ArchTest
+    static final ArchRule managerTransactionMethodNaming = methods()
+        .that().areAnnotatedWith(org.springframework.transaction.annotation.Transactional.class)
+        .and().areDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
+        .should().haveNameMatching(".*Transaction$")
+        .as("Manager 事务方法应以 Transaction 结尾，便于识别事务边界（规则：foundation/09-manager-layer.md）");
 
     // ========== 循环依赖检测 ==========
 

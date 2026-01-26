@@ -68,22 +68,7 @@ Understanding where information lives:
 
 ### 1. Which agent do I need?
 
-Use the decision matrix:
-
-```mermaid
-graph TD
-    A[What do you need?] --> B{Backend?}
-    A --> C{Frontend?}
-    A --> D{Database?}
-    A --> E{Infrastructure?}
-
-    B --> B1[java-architect]
-    C --> C1[vue-expert]
-    D --> D1[postgres-pro]
-    E --> E1[devops-engineer]
-```
-
-**Or check**: [Decision Matrix](shared/orchestration/decision-matrix.md) for keyword-based selection
+**Check**: [Unified Decision Center](../.agent/rules/00-INDEX.md) for complete rules, skills, and agent routing
 
 ---
 
@@ -103,7 +88,7 @@ Common patterns:
 - **Performance**: java-architect + postgres-pro (parallel) → architect-reviewer
 - **Production Incident**: devops-engineer (hub) → specialists as needed
 
-**See**: [Workflow Patterns](shared/orchestration/workflow-patterns.md) for detailed sequences
+**See**: [Orchestration Playbook](shared/orchestration/orchestration-playbook.md) for complete workflows, collaboration patterns, and handoff protocols
 
 ---
 

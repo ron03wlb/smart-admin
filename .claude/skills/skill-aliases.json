@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SmartAdmin Skill Aliases",
+  "description": "Backward compatibility aliases for consolidated skills. Deprecated commands route to new composite skills with deprecation warnings.",
+  "version": "1.0.0",
+  "deprecationPeriod": {
+    "soft": "12 weeks (display warning, command works)",
+    "hard": "24 weeks (display error + migration guide)",
+    "removal": "Week 25+ (aliases removed)"
+  },
+  "aliases": {
+    "mybatis": {
+      "target": "smartadmin-crud-generator --backend-only",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/mybatis' command is deprecated. Use '/crud --backend-only' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/crud-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "vue-crud": {
+      "target": "smartadmin-crud-generator --frontend-only",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/vue-crud' command is deprecated. Use '/crud --frontend-only' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/crud-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "api-docs": {
+      "target": "smartadmin-crud-generator --docs-only",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/api-docs' command is deprecated. Use '/crud --docs-only' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/crud-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "integration-test": {
+      "target": "smartadmin-testing-suite --mode=integration",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/integration-test' command is deprecated. Use '/test --mode=integration' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/testing-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "test-fixture": {
+      "target": "smartadmin-testing-suite --mode=fixtures",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/test-fixture' command is deprecated. Use '/test --mode=fixtures' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/testing-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "java-performance-pro": {
+      "target": "smartadmin-performance-suite --mode=diagnose",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/java-performance-pro' command is deprecated. Use '/performance --mode=diagnose' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/performance-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "cache-strategy": {
+      "target": "smartadmin-performance-suite --mode=optimize",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/cache-strategy' command is deprecated. Use '/performance --mode=optimize' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/performance-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    },
+    "apm-integration": {
+      "target": "smartadmin-performance-suite --mode=monitor",
+      "deprecated": true,
+      "deprecationPhase": "soft",
+      "message": "⚠️  The '/apm-integration' command is deprecated. Use '/performance --mode=monitor' instead.\n\nMigration Guide: https://smartadmin.ai/docs/skills/performance-consolidation\n\nThis command will be removed after Week 24 (2026-06-30).",
+      "since": "2026-01-27",
+      "removeAfter": "2026-06-30"
+    }
+  },
+  "usageTracking": {
+    "enabled": true,
+    "logFile": ".claude/metrics/skill-alias-usage.log",
+    "trackMetrics": [
+      "aliasUsageCount",
+      "targetSkillSuccessRate",
+      "userAdoptionRate"
+    ]
+  },
+  "migrationGuide": {
+    "url": "https://smartadmin.ai/docs/skills/crud-consolidation",
+    "sections": [
+      {
+        "title": "CRUD Pipeline Consolidation",
+        "description": "4 skills merged into 1 composite skill with phase selection",
+        "oldCommands": ["/mybatis", "/vue-crud", "/api-docs"],
+        "newCommand": "/crud <entity> [--backend-only|--frontend-only|--docs-only|--all-phases]",
+        "examples": [
+          {
+            "old": "/mybatis generate Order",
+            "new": "/crud Order --backend-only",
+            "description": "Generate only backend Dao layer"
+          },
+          {
+            "old": "/vue-crud Brand",
+            "new": "/crud Brand --frontend-only",
+            "description": "Generate only frontend Vue components"
+          },
+          {
+            "old": "/api-docs BrandController",
+            "new": "/crud Brand --docs-only",
+            "description": "Generate only Swagger annotations"
+          },
+          {
+            "old": "/mybatis generate Employee && /vue-crud Employee && /api-docs EmployeeController",
+            "new": "/crud Employee --all-phases",
+            "description": "Generate complete CRUD (backend + frontend + docs + tests)"
+          }
+        ]
+      },
+      {
+        "title": "Testing Suite Consolidation",
+        "description": "2 testing skills merged into 1 unified test orchestrator with multiple modes",
+        "oldCommands": ["/integration-test", "/test-fixture"],
+        "newCommand": "/test <target> [--mode=integration|fixtures|unit|e2e|all]",
+        "examples": [
+          {
+            "old": "/integration-test EmployeeService",
+            "new": "/test EmployeeService --mode=integration",
+            "description": "Generate integration tests with Testcontainers"
+          },
+          {
+            "old": "/test-fixture Employee",
+            "new": "/test Employee --mode=fixtures",
+            "description": "Generate test fixture builders with AtomicInteger"
+          },
+          {
+            "old": "/integration-test EmployeeService && /test-fixture Employee",
+            "new": "/test EmployeeService --mode=all",
+            "description": "Generate integration tests + fixtures + unit tests"
+          }
+        ]
+      },
+      {
+        "title": "Performance Suite Consolidation",
+        "description": "3 performance skills merged into 1 unified performance orchestrator with diagnose → optimize → monitor workflow",
+        "oldCommands": ["/java-performance-pro", "/cache-strategy", "/apm-integration"],
+        "newCommand": "/performance <target> [--mode=diagnose|optimize|monitor|workflow]",
+        "examples": [
+          {
+            "old": "/java-performance-pro analyze /api/employees/list",
+            "new": "/performance /api/employees/list --mode=diagnose",
+            "description": "Profile and identify performance bottlenecks"
+          },
+          {
+            "old": "/cache-strategy ProductService.getById",
+            "new": "/performance ProductService.getById --mode=optimize",
+            "description": "Implement multi-level caching (Caffeine L1 + Redis L2)"
+          },
+          {
+            "old": "/apm-integration OrderService",
+            "new": "/performance OrderService --mode=monitor",
+            "description": "Configure Skywalking, Micrometer, Grafana dashboards"
+          },
+          {
+            "old": "/java-performance-pro analyze /api/orders && /cache-strategy OrderService && /apm-integration OrderService",
+            "new": "/performance /api/orders --workflow",
+            "description": "Complete performance pipeline (diagnose → optimize → monitor)"
+          }
+        ]
+      }
+    ]
+  }
+}

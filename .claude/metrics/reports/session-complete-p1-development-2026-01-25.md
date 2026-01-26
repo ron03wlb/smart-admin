@@ -1,4 +1,4 @@
-# Session Complete: P1 Skills Development & Deployment
+﻿# Session Complete: P1 Skills Development & Deployment
 
 **Date**: 2026-01-25
 **Session Type**: Complete P1 Skills Development Cycle
@@ -138,7 +138,7 @@ Successfully completed the full development cycle for 3 P1 (High Priority) skill
 | File | Type | Lines Added | Purpose |
 |------|------|-------------|---------|
 | `.claude/skills/README.md` | Created | 343 | Complete skills catalog (18 skills) |
-| `.agent/rules/00-ai-decision-matrix.md` | Updated | +60 | Added 3 P1 scenarios |
+| `.agent/rules/00-INDEX.md` | Updated | +60 | Added 3 P1 scenarios |
 | `CLAUDE.md` | Updated | +15 | Added skills quick reference |
 | `.claude/metrics/reports/p1-skills-deployed-2026-01-25.md` | Created | 347 | Deployment report |
 
@@ -238,7 +238,7 @@ Successfully completed the full development cycle for 3 P1 (High Priority) skill
 
 **All P1 skills properly integrated in**:
 - ✅ `.claude/skills/README.md` - Complete catalog with trigger keywords
-- ✅ `.agent/rules/00-ai-decision-matrix.md` - 3 new scenarios (8, 9, 10)
+- ✅ `.agent/rules/00-INDEX.md` - 3 new scenarios (8, 9, 10)
 - ✅ `CLAUDE.md` - Quick reference section
 - ✅ Related technical specs (iGaming, LiteFlow ADRs)
 - ✅ Monitoring system (raw metrics, aggregated, weekly reports)

@@ -1,4 +1,4 @@
-# Quality Gate Orchestrator - Deployment Summary
+﻿# Quality Gate Orchestrator - Deployment Summary
 
 **Date**: 2026-01-26
 **Status**: ⚠️ **95% Complete** (Production Ready - Final Validation Pending)
@@ -152,7 +152,7 @@ Successfully developed quality-gate-orchestrator skill through complete TDD cycl
 
 **Next Action**: Execute after PMD fix
 - Expected violations: Unknown
-- May require exclusion filters (see `.agent/rules/13-spotbugs-rules.md`)
+- May require exclusion filters (see `.agent/rules/quality-tools/13-spotbugs-rules.md`)
 
 **Time Estimate**: 30 minutes
 

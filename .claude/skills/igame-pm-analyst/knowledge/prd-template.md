@@ -1,4 +1,4 @@
-# [功能名稱] 需求分析報告
+﻿# [功能名稱] 需求分析報告
 
 **文檔元數據**
 - 產品經理：igame-pm-analyst
@@ -1006,9 +1006,9 @@ redis-cli FLUSHDB
 #### SmartAdmin規範
 - [CLAUDE.md快速參考](CLAUDE.md)
 - [SmartAdmin模式](.claude/shared/knowledge/smartadmin-patterns.md)
-- [架構規則](.agent/rules/10-architecture-rules.md)
-- [Manager層規範](.agent/rules/09-manager-layer.md)
-- [命名規範](.agent/rules/01-naming-conventions.md)
+- [架構規則](.agent/foundation/10-architecture-rules.md)
+- [Manager層規範](.agent/foundation/09-manager-layer.md)
+- [命名規範](.agent/foundation/01-naming-conventions.md)
 
 #### Foundation模組
 - [Foundation模組總覽](sa-base/foundation/README.md)

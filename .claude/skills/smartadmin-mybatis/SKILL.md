@@ -1,4 +1,4 @@
----
+﻿---
 name: smartadmin-mybatis
 description: MyBatis/MyBatis Plus AI code generator for SmartAdmin framework. Use when creating Dao layer code, optimizing queries, or reviewing MyBatis implementations. Automatically triggers when user mentions creating new Dao/Entity/Mapper or editing Dao layer files.
 license: MIT
@@ -439,5 +439,5 @@ MIT License - See [LICENSE.txt](LICENSE.txt) for details.
 - [SmartAdmin Patterns](../../shared/knowledge/smartadmin-patterns.md)
 - [Project Architecture](../../shared/knowledge/project-architecture.md)
 - [Quality Standards](../../shared/knowledge/quality-standards.md)
-- [Architecture Rules](./../../../.agent/rules/10-architecture-rules.md)
-- [MyBatis Plus Core](./../../../.agent/rules/09-mybatis-plus-core.md)
+- [Architecture Rules](./../../../.agent/foundation/10-architecture-rules.md)
+- [MyBatis Plus Core](./../../../.agent/rules/technology/database/09-mybatis-plus-core.md)

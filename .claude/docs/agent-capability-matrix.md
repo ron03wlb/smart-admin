@@ -547,9 +547,8 @@ This capability matrix provides:
 - ✅ Troubleshooting agent selection issues
 
 **Related Documentation**:
-- [Decision Matrix](../shared/orchestration/decision-matrix.md) - Detailed selection logic
-- [Agent Dependencies](../shared/orchestration/agent-dependencies.md) - Collaboration protocols
-- [Workflow Patterns](../shared/orchestration/workflow-patterns.md) - Complete workflow examples
+- [Unified Decision Center](../../.agent/rules/00-INDEX.md) - Rule routing, skill selection, agent orchestration
+- [Orchestration Playbook](../shared/orchestration/orchestration-playbook.md) - Complete workflows, dependencies, collaboration protocols, handoffs
 
 ---
 

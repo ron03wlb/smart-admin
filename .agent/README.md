@@ -50,9 +50,9 @@ Fundamental coding standards (always apply):
 - [10-architecture-rules.md](rules/10-architecture-rules.md) - Layered architecture
 
 ### 🗄️ PostgreSQL Database Standards (Ideal Architecture)
-- [05-postgresql-basics.md](rules/05-postgresql-basics.md) - Table creation and indexing
-- [05-postgresql-advanced.md](rules/05-postgresql-advanced.md) - JSONB, arrays, CTE, window functions
-- [05-postgresql-mybatis-integration.md](rules/05-postgresql-mybatis-integration.md) - SQL optimization, MySQL migration
+- [05-postgresql-basics.md](rules/technology/database/05-postgresql-basics.md) - Table creation and indexing
+- [05-postgresql-advanced.md](rules/technology/database/05-postgresql-advanced.md) - JSONB, arrays, CTE, window functions
+- [05-postgresql-mybatis.md](rules/technology/database/05-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
 
 ### 🔒 Security Standards (OWASP Top 10)
 - [07-owasp-top10-part1.md](rules/07-owasp-top10-part1.md) - A01-A04
@@ -64,9 +64,9 @@ Fundamental coding standards (always apply):
 - [08-vavr-mybatis-integration.md](rules/08-vavr-mybatis-integration.md) - Vavr + MyBatis Plus
 
 ### 💾 MyBatis Plus Persistence Layer (Ideal Architecture: LambdaQueryWrapper)
-- [09-mybatis-plus-core.md](rules/09-mybatis-plus-core.md) - LambdaQueryWrapper, pagination, IEnum
-- [09-mybatis-plus-postgresql.md](rules/09-mybatis-plus-postgresql.md) - PostgreSQL integration, JSONB/array TypeHandler
-- [09-manager-layer.md](rules/09-manager-layer.md) - Manager layer standards
+- [09-mybatis-plus-core.md](rules/technology/database/09-mybatis-plus-core.md) - LambdaQueryWrapper, pagination, IEnum
+- [05-postgresql-mybatis.md](rules/technology/database/05-postgresql-mybatis.md) - PostgreSQL + MyBatis Plus Integration (TypeHandlers, SQL Optimization, Migration)
+- [09-manager-layer.md](rules/foundation/09-manager-layer.md) - Manager layer standards
 
 ### 🔧 Static Analysis Tool Standards
 - [11-checkstyle-rules.md](rules/11-checkstyle-rules.md) - Checkstyle code style

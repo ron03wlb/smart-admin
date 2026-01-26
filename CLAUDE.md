@@ -32,8 +32,8 @@
 When working with SmartAdmin codebase, read documentation in this order:
 
 1. **CLAUDE.md** (this file) - Quick reference and navigation hub
-2. **[.agent/rules/00-ai-decision-matrix.md](.agent/rules/00-ai-decision-matrix.md)** - Scenario-based rule selection
-3. **[.agent/rules/10-architecture-rules.md](.agent/rules/10-architecture-rules.md)** - Mandatory architectural constraints
+2. **[.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md)** - Unified decision center (rules, skills, agents)
+3. **[.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md)** - Mandatory architectural constraints
 4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
 5. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks (optional, for Claude Code)
 6. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
@@ -58,7 +58,7 @@ When working with SmartAdmin codebase, read documentation in this order:
 
 ### When in Doubt
 
-- **Architecture questions**: Consult [.agent/rules/00-ai-decision-matrix.md](.agent/rules/00-ai-decision-matrix.md) for scenario-based guidance
+- **Rule/Skill/Agent selection**: Consult [.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md) for unified decision center
 - **Architectural violations**: Will fail ArchUnit tests - check [.agent/configs/ArchitectureTest.java](.agent/configs/ArchitectureTest.java)
 - **Pattern implementation**: See [.claude/shared/knowledge/smartadmin-patterns.md](.claude/shared/knowledge/smartadmin-patterns.md)
 
@@ -88,7 +88,7 @@ Controller → Service → Manager → Dao → Entity
 - `@Transactional` / `@Cacheable`: Manager layer ONLY
 - `@Autowired` field injection: FORBIDDEN
 
-→ **[Complete Architecture Rules](.agent/rules/10-architecture-rules.md)**
+→ **[Complete Architecture Rules](.agent/rules/foundation/10-architecture-rules.md)**
 → **[SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)**
 → **[Project Architecture](.claude/shared/knowledge/project-architecture.md)**
 
@@ -132,8 +132,8 @@ Controller → Service → Manager → Dao → Entity
 
 **Commit Format:** `<type>(<scope>): <subject>`
 
-→ **[Complete Naming Conventions](.agent/rules/01-naming-conventions.md)**
-→ **[Commit Message Guide](.agent/rules/17-commit-message-conventions.md)**
+→ **[Complete Naming Conventions](.agent/rules/foundation/01-naming-conventions.md)**
+→ **[Commit Message Guide](.agent/rules/workflows/17-commit-message-conventions.md)**
 
 ## Anti-Patterns to Avoid
 
@@ -163,17 +163,17 @@ Controller → Service → Manager → Dao → Entity
 ## Development Guidelines
 
 **Essential Rules** (see `.agent/rules/`):
-- Architecture: `10-architecture-rules.md`
-- Manager Layer: `09-manager-layer.md`
-- Naming: `01-naming-conventions.md`
-- Exceptions: `04-exception-logging.md`
+- Architecture: [`foundation/10-architecture-rules.md`](.agent/rules/foundation/10-architecture-rules.md)
+- Manager Layer: [`foundation/09-manager-layer.md`](.agent/rules/foundation/09-manager-layer.md)
+- Naming: [`foundation/01-naming-conventions.md`](.agent/rules/foundation/01-naming-conventions.md)
+- Exceptions: [`technology/patterns/04-exception-logging.md`](.agent/rules/technology/patterns/04-exception-logging.md)
 
 **Validation**:
 ```bash
 ./gradlew :sa-admin:test --tests ArchitectureTest
 ```
 
-→ **[All Rules Index](.agent/rules/00-ai-decision-matrix.md)**
+→ **[Unified Decision Center](.agent/rules/00-INDEX.md)** - Rules, Skills, and Agent Routing
 → **[Quality Standards](.claude/shared/knowledge/quality-standards.md)**
 
 ## Specialized Skills
@@ -206,7 +206,7 @@ Common quality tool violations and approved solutions:
 - **ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD**: @PostConstruct static field initialization pattern
 - **CT_CONSTRUCTOR_THROW**: Constructor validation pattern is safe for internal classes
 
-Detailed rules: See [.agent/rules/12-pmd-rules.md](.agent/rules/12-pmd-rules.md) and [.agent/rules/13-spotbugs-rules.md](.agent/rules/13-spotbugs-rules.md)
+Detailed rules: See [.agent/rules/quality-tools/12-pmd-rules.md](.agent/rules/quality-tools/12-pmd-rules.md) and [.agent/rules/quality-tools/13-spotbugs-rules.md](.agent/rules/quality-tools/13-spotbugs-rules.md)
 
 ---
 

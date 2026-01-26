@@ -1,4 +1,4 @@
-# RED Phase: Baseline Behavior Analysis
+﻿# RED Phase: Baseline Behavior Analysis
 
 ## Test Scenario
 
@@ -13,7 +13,7 @@
 ### Problem 1: Cannot Parse Rule Metadata
 
 **What Goes Wrong:**
-- Agent reads `.agent/rules/10-architecture-rules.md` but misses YAML frontmatter context
+- Agent reads `.agent/foundation/10-architecture-rules.md` but misses YAML frontmatter context
 - Doesn't recognize `archunit_test: ArchitectureTest#layerDependencies` field
 - Cannot determine if rule already has a test implementation
 

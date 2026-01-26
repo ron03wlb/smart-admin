@@ -17,9 +17,8 @@
 │   │   ├── technical-agent-mixin.md
 │   │   └── analysis-agent-mixin.md
 │   └── orchestration/             # Agent coordination
-│       ├── decision-matrix.md
-│       ├── agent-dependencies.md
-│       └── workflow-patterns.md
+│       ├── ../../.agent/rules/00-INDEX.md (→ moved to .agent/rules/00-INDEX.md)
+│       └── orchestration-playbook.md  # Unified: workflows + dependencies + handoffs
 ├── agents/                        # Individual agent definitions (8 agents)
 │   ├── java-architect.md          # Backend expert - References shared knowledge
 │   ├── vue-expert.md              # Frontend expert - References frontend patterns
@@ -409,7 +408,7 @@ When backend returns error, check `response.code`:
    - Focus on unique skills
    - Reference shared knowledge (don't duplicate)
 4. **Update orchestration:**
-   - Add to `decision-matrix.md` (keywords, decision flow)
+   - Add to `../../.agent/rules/00-INDEX.md` (keywords, decision flow)
    - Add to `agent-dependencies.md` (collaboration patterns)
    - Add to `workflow-patterns.md` if new workflows needed
 5. **Assign color and model:**
@@ -434,7 +433,7 @@ When backend returns error, check `response.code`:
 - [ ] References appropriate mixin
 - [ ] References shared knowledge files
 - [ ] Doesn't duplicate SmartAdmin patterns
-- [ ] Added to decision-matrix.md
+- [ ] Added to ../../.agent/rules/00-INDEX.md
 - [ ] Added to agent-dependencies.md
 - [ ] Color assigned (unique)
 - [ ] Model specified (opus)
@@ -466,7 +465,7 @@ When backend returns error, check `response.code`:
    - **Triggers:** Pre-merge, post-implementation, periodic assessment
 
 4. **Update orchestration:**
-   - Add to `decision-matrix.md` with clear review triggers
+   - Add to `../../.agent/rules/00-INDEX.md` with clear review triggers
    - Add to `agent-dependencies.md` with Hub-and-Spoke pattern
    - Add to `workflow-patterns.md` with review workflow (similar to Pattern 10: Quality Gate)
 
@@ -496,7 +495,7 @@ When backend returns error, check `response.code`:
 - [ ] Defines clear review phases
 - [ ] Has structured output format (with severity levels)
 - [ ] Can act as Hub in Hub-and-Spoke pattern
-- [ ] Added to decision-matrix.md with review triggers
+- [ ] Added to ../../.agent/rules/00-INDEX.md with review triggers
 - [ ] Added to agent-dependencies.md with coordination patterns
 - [ ] Added to workflow-patterns.md with review workflow
 - [ ] Model: opus (for deep analysis capability)
@@ -514,7 +513,7 @@ When backend returns error, check `response.code`:
 
 **Steps:**
 1. **Identify which file:**
-   - New keywords → `decision-matrix.md`
+   - New keywords → `../../.agent/rules/00-INDEX.md`
    - New dependencies → `agent-dependencies.md`
    - New workflow → `workflow-patterns.md`
 
@@ -655,7 +654,7 @@ After updating orchestration:
 - Multiple agents seem applicable
 
 **Solution:**
-1. Review `.claude/shared/orchestration/decision-matrix.md`
+1. Review `.claude/shared/orchestration/../../.agent/rules/00-INDEX.md`
 2. Add keywords to keyword mapping table
 3. Add scenario to context-based decision logic
 4. Update examples in decision matrix
@@ -755,6 +754,141 @@ git checkout HEAD~1 .claude/agents/java-architect.md
 git commit -m "revert(java-architect): rollback to previous version - [reason]"
 ```
 
+## Standard Maintenance Protocols
+
+### Protocol 1: Updating SmartAdmin Patterns
+
+**When:** SmartAdmin architecture or conventions change
+
+**Process:**
+1. Edit `.claude/shared/knowledge/smartadmin-patterns.md`
+2. Verify CLAUDE.md quick reference links still work
+3. All agents automatically reference updated pattern
+4. Update version in META.md
+5. Test with `./gradlew :sa-admin:test --tests ArchitectureTest`
+6. Commit all changes together
+
+**Time:** ~5 minutes
+
+**Cross-reference:** See [Task 1: Update SmartAdmin Backend Patterns](#task-1-update-smartadmin-backend-patterns) for detailed steps.
+
+---
+
+### Protocol 2: Adding New Agent
+
+**When:** Need new specialized expertise
+
+**Process:**
+1. Copy `.claude/shared/templates/agent-base.md`
+2. Choose appropriate mixin (technical-agent or analysis-agent)
+3. Add agent-specific expertise and examples
+4. Reference shared knowledge base
+5. Update agent-capability-matrix.md
+6. Update `.agent/rules/00-INDEX.md` with keywords
+7. Test agent selection logic
+8. Update version in META.md
+
+**Time:** 30-45 minutes
+
+**Cross-reference:** See [Task 5: Add New Agent](#task-5-add-new-agent) for detailed steps.
+
+---
+
+### Protocol 3: Updating Build Commands
+
+**When:** Gradle configuration changes
+
+**Process:**
+1. Edit `.claude/shared/knowledge/project-architecture.md`
+2. Verify CLAUDE.md quick reference reflects top 4 commands
+3. Update version in META.md
+4. Test commands work correctly
+
+**Time:** ~10 minutes
+
+**Cross-reference:** See [Task 2: Update Project Architecture Information](#task-2-update-project-architecture-information) for detailed steps.
+
+---
+
+### Protocol 4: Adding Permission Pattern
+
+**When:** New tool or workflow needs approval
+
+**Process:**
+1. Identify appropriate category in `settings.local.json`
+2. Add permission with rationale comment
+3. Test the permission works
+4. Update version in META.md if significant
+
+**Time:** ~5 minutes
+
+**Cross-reference:** See [Task 4: Update Permissions](#task-4-update-permissions) for detailed steps.
+
+---
+
+### Protocol 5: Quarterly Review
+
+**Schedule:** Every 3 months (Q1, Q2, Q3, Q4)
+
+**Purpose:** Maintain configuration health, identify duplication, update outdated content
+
+**Tasks:**
+1. **Cross-reference validation:**
+   - Run link validation script (if available)
+   - Check for broken references manually
+   - Verify all file paths are correct
+   - Update any broken links immediately
+
+2. **Duplication check:**
+   - Search for common patterns across agent files
+   - Identify duplicated SmartAdmin patterns
+   - Consolidate duplicates into shared knowledge
+   - Verify agent files reference shared knowledge correctly
+
+3. **Content freshness:**
+   - Review all code examples
+   - Update outdated technology versions
+   - Verify architecture patterns match current SmartAdmin
+   - Remove deprecated content
+
+4. **Agent selection accuracy:**
+   - Review agent usage patterns
+   - Check if users are selecting correct agents
+   - Update keyword mappings in `00-INDEX.md`
+   - Add new scenarios to decision matrix
+
+5. **Metrics update:**
+   - Count agent files, shared knowledge files, permission patterns
+   - Calculate duplication percentage
+   - Measure maintenance time (SmartAdmin pattern update, etc.)
+   - Track agent selection accuracy
+
+6. **Version management:**
+   - Consider version bump if changes accumulated
+   - Update META.md with current metrics
+   - Update changelog with quarterly review summary
+   - Document any breaking changes
+
+**Time:** 2-3 hours per quarter
+
+**Output:**
+- Updated META.md with current metrics
+- Changelog entry documenting quarterly review
+- List of action items for next quarter
+- Version bump if warranted
+
+**Checklist:**
+- [ ] Run link validation (automated + manual)
+- [ ] Check for duplication (search common patterns)
+- [ ] Update outdated examples (code, versions)
+- [ ] Verify agent selection still matches usage patterns
+- [ ] Update metrics in META.md
+- [ ] Consider version bump
+- [ ] Update changelog
+- [ ] Document action items
+
+---
+
 ## Monitoring and Metrics
 
 ### Track Configuration Health
@@ -764,14 +898,20 @@ git commit -m "revert(java-architect): rollback to previous version - [reason]"
 - [ ] No broken references to shared knowledge
 - [ ] Orchestration docs reflect actual usage patterns
 - [ ] Permission patterns cover all needed commands
-- [ ] No duplicate content across agents
+- [ ] No duplicate content across agents (<10% duplication)
 - [ ] Documentation up to date
+- [ ] Cross-references validated (run link checker)
+- [ ] Agent selection accuracy tracked
 
 **Key metrics to track:**
 - Number of permission patterns (target: <15)
 - Duplication % across agents (target: <10%)
 - Time to update SmartAdmin pattern (target: <10 min)
 - Agent selection accuracy (target: >90%)
+- Lines of shared knowledge vs agent-specific content
+- Number of broken links (target: 0)
+- Orchestration file count (target: minimize)
+- Cross-reference count (track growth)
 
 ### Gather User Feedback
 

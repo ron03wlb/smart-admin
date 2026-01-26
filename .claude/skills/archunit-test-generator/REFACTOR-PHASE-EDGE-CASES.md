@@ -1,4 +1,4 @@
-# REFACTOR Phase: Edge Cases and Bulletproofing
+﻿# REFACTOR Phase: Edge Cases and Bulletproofing
 
 ## Edge Case 1: Complex Multi-Condition Rules
 
@@ -107,7 +107,7 @@ archunit_note: "Covered by layered architecture test (Controller may only access
 ## Edge Case 4: Rules Not Yet in ArchitectureTest
 
 **Scenario:**
-> Rule exists in `.agent/rules/08-vavr-fundamentals.md` but NO corresponding ArchUnit test
+> Rule exists in `.agent/technology/functional/08-vavr-fundamentals.md` but NO corresponding ArchUnit test
 
 **Challenge:**
 - How to know if rule is already validated?

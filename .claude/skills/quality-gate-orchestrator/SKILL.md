@@ -1,4 +1,4 @@
-# quality-gate-orchestrator
+﻿# quality-gate-orchestrator
 
 **Priority**: P1 (Critical Infrastructure)
 **Status**: Active
@@ -596,7 +596,7 @@ configure<PmdExtension> {
 - `HARD_CODE_PASSWORD` (CRITICAL)
 - `OBL_UNSATISFIED_OBLIGATION` (CRITICAL)
 
-**Exclusions** (documented in `.agent/rules/13-spotbugs-rules.md`):
+**Exclusions** (documented in `.agent/rules/quality-tools/13-spotbugs-rules.md`):
 ```xml
 <FindBugsFilter>
     <!-- DTO/VO pattern exclusions -->
@@ -851,11 +851,11 @@ pmd-ruleset.xml: Exclude UnusedImports rule
 
 ## Related Rules
 
-- `.agent/rules/10-architecture-rules.md` - ArchUnit enforcement
-- `.agent/rules/11-checkstyle-rules.md` - Code style standards
-- `.agent/rules/12-pmd-rules.md` - Code smell detection
-- `.agent/rules/13-spotbugs-rules.md` - Bug pattern detection
-- `.agent/rules/16-jacoco-coverage-rules.md` - Coverage thresholds
+- `.agent/foundation/10-architecture-rules.md` - ArchUnit enforcement
+- `.agent/rules/quality-tools/11-checkstyle-rules.md` - Code style standards
+- `.agent/rules/quality-tools/12-pmd-rules.md` - Code smell detection
+- `.agent/rules/quality-tools/13-spotbugs-rules.md` - Bug pattern detection
+- `.agent/rules/quality-tools/16-jacoco-coverage-rules.md` - Coverage thresholds
 - `.agent/workflows/quality-gates-local-ci.md` - Local validation workflow
 
 ---

@@ -1,4 +1,4 @@
-# Real-World Test #1: Manager Transaction RollbackFor Rule
+﻿# Real-World Test #1: Manager Transaction RollbackFor Rule
 
 **Date**: 2026-01-25
 **Skill**: archunit-test-generator
@@ -19,7 +19,7 @@
 ## Rule Selected
 
 **Rule**: Manager Layer Transaction Rule
-**Source**: `.agent/rules/09-manager-layer.md` (lines 151-160)
+**Source**: `.agent/foundation/09-manager-layer.md` (lines 151-160)
 **Description**: All public methods in Manager classes annotated with @Transactional must use `rollbackFor = Throwable.class`
 
 **Why this rule?**
@@ -39,7 +39,7 @@
 
 ### Step 1: Parse Rule Metadata ✅
 
-**Action**: Read `.agent/rules/09-manager-layer.md` YAML frontmatter
+**Action**: Read `.agent/foundation/09-manager-layer.md` YAML frontmatter
 
 **Findings**:
 ```yaml
@@ -187,7 +187,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 ### Step 4: Update Rule Frontmatter ✅
 
-**File Modified**: `.agent/rules/09-manager-layer.md`
+**File Modified**: `.agent/foundation/09-manager-layer.md`
 
 **Change**:
 ```diff
@@ -378,7 +378,7 @@ public void batchDelete(java.util.List<Long> brandIdList) { ... }
 
 - ✅ **REAL-WORLD-TEST-1.md** - This document
 - ✅ **Generated ArchUnit test** - `ArchitectureTest#transactionalMustUseRollbackForThrowable`
-- ✅ **Updated rule frontmatter** - `.agent/rules/09-manager-layer.md` (archunit_test field)
+- ✅ **Updated rule frontmatter** - `.agent/foundation/09-manager-layer.md` (archunit_test field)
 - ✅ **Verification proof** - Test report shows 3 violations detected
 - ✅ **Monitoring log** - Logged to system (see below)
 - ✅ **Documentation complete** - All sections filled

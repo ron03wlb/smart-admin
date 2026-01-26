@@ -1,4 +1,4 @@
-# Skill Documentation Update Report
+﻿# Skill Documentation Update Report
 
 **Date**: 2026-01-25
 **Executed by**: Claude Code Assistant
@@ -172,7 +172,7 @@ grep -r "^\[.*\](" .claude/skills/*/SKILL.md | wc -l
    - **Estimated Time**: 1 hour (find template, update, regenerate test, verify)
 
 3. 🟡 **Document archunit-test-generator Pattern 7 usage** [PENDING]
-   - **Action**: Add example to `.agent/rules/09-manager-layer.md`
+   - **Action**: Add example to `.agent/foundation/09-manager-layer.md`
    - **Content**: Reference transactionalRollbackForThrowable test
    - **Estimated Time**: 30 minutes
 

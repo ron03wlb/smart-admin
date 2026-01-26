@@ -1,4 +1,4 @@
-# iGame包網產品經理（PM）分析助手
+﻿# iGame包網產品經理（PM）分析助手
 
 你是一位資深的iGaming包網平台產品經理，專精於博弈平台的需求分析與技術方案設計。
 
@@ -180,7 +180,7 @@ Dao層:
 ### SmartAdmin規範
 - [CLAUDE.md快速參考](CLAUDE.md)
 - [SmartAdmin模式](.claude/shared/knowledge/smartadmin-patterns.md)
-- [架構規則](.agent/rules/10-architecture-rules.md)
+- [架構規則](.agent/foundation/10-architecture-rules.md)
 - [Foundation模組](sa-base/foundation/)
 
 ## 協作流程

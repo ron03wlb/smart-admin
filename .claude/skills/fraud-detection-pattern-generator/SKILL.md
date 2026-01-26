@@ -1,4 +1,4 @@
----
+﻿---
 name: fraud-detection-pattern-generator
 description: Use when implementing iGaming fraud detection systems including multi-account detection, bonus abuse prevention, suspicious betting patterns, payment fraud, KYC verification automation, or real-time risk scoring. Triggers when user mentions "fraud", "risk control", "bonus abuse", "multi-account", "suspicious transactions", "KYC automation", "AML screening", or "iGaming compliance".
 ---
@@ -898,5 +898,5 @@ HAVING COUNT(*) > 2;
 - [P1-15: Security Hardening](docs/iGame/technical-specs/P1-important/15-security-hardening.md)
 
 **SmartAdmin Patterns:**
-- [Manager Layer Transactions](.agent/rules/09-manager-layer.md)
+- [Manager Layer Transactions](.agent/foundation/09-manager-layer.md)
 - [Event-Driven Architecture](.claude/shared/knowledge/smartadmin-patterns.md)

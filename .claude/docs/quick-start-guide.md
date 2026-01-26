@@ -275,8 +275,8 @@ After **java-architect** completes implementation, the hooks system automaticall
 - **`CLAUDE.md`** (root) - Quick reference card
 
 ### For Choosing Agents
-- **`.claude/shared/orchestration/decision-matrix.md`** - Which agent to use?
-- **`.claude/shared/orchestration/workflow-patterns.md`** - How agents collaborate
+- **`../../.agent/rules/00-INDEX.md`** - Which agent to use?
+- **`.claude/shared/orchestration/orchestration-playbook.md`** - Complete workflows, dependencies, handoffs
 
 ### For Maintenance
 - **`.claude/docs/maintenance-guide.md`** - How to update configuration
@@ -290,7 +290,7 @@ After **java-architect** completes implementation, the hooks system automaticall
 
 ### ❌ Mistake 2: Using wrong agent
 **Why wrong:** Inefficient, may miss best practices
-**Correct:** Check [decision-matrix.md](.claude/shared/orchestration/decision-matrix.md) if unsure
+**Correct:** Check [decision-matrix.md](../../.agent/rules/00-INDEX.md) if unsure
 
 ### ❌ Mistake 3: Merging without code-reviewer
 **Why wrong:** Bugs and pattern violations slip into production
@@ -410,8 +410,8 @@ public class EmployeeManager {
 
 ### I want to learn more
 1. Read [README.md](../.claude/README.md) for system overview
-2. Read [decision-matrix.md](.claude/shared/orchestration/decision-matrix.md) for agent selection details
-3. Read [workflow-patterns.md](.claude/shared/orchestration/workflow-patterns.md) for all 10 collaboration patterns
+2. Read [decision-matrix.md](../../.agent/rules/00-INDEX.md) for agent selection details
+3. Read [orchestration-playbook.md](../shared/orchestration/orchestration-playbook.md) for all 10 workflow patterns + collaboration protocols
 
 ### I want to contribute
 1. Read [maintenance-guide.md](.claude/docs/maintenance-guide.md) for update procedures
@@ -432,7 +432,7 @@ public class EmployeeManager {
 - Run `.claude/scripts/verify-config.sh` to diagnose issues
 
 ### Agent Selection Unclear
-- Check [decision-matrix.md](.claude/shared/orchestration/decision-matrix.md) - visual decision flow
+- Check [decision-matrix.md](../../.agent/rules/00-INDEX.md) - visual decision flow
 - Look at example scenarios in [workflow-patterns.md](.claude/shared/orchestration/workflow-patterns.md)
 
 ### SmartAdmin Patterns Questions
@@ -443,7 +443,7 @@ public class EmployeeManager {
 ## Summary
 
 **Remember these key points:**
-1. **Choose the right agent** - use [decision-matrix.md](.claude/shared/orchestration/decision-matrix.md)
+1. **Choose the right agent** - use [decision-matrix.md](../../.agent/rules/00-INDEX.md)
 2. **Follow SmartAdmin patterns** - `CLAUDE.md` is your friend
 3. **Use multi-agent workflows** - agents collaborate for complex tasks
 4. **Always review before merge** - code-reviewer is mandatory

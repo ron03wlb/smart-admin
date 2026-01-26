@@ -1,11 +1,11 @@
-# Code Quality Standards
+﻿# Code Quality Standards
 
 This document provides a quality checklist and quick reference for SmartAdmin code standards. **All agents must enforce these standards when writing or reviewing code.**
 
 **For detailed technical rules**, see:
-- [Architecture Rules](../../../.agent/rules/10-architecture-rules.md) - Layered architecture enforcement
-- [Naming Conventions](../../../.agent/rules/01-naming-conventions.md) - Complete Alibaba guidelines
-- [Exception & Logging](../../../.agent/rules/04-exception-logging.md) - Error handling standards
+- [Architecture Rules](../../../.agent/foundation/10-architecture-rules.md) - Layered architecture enforcement
+- [Naming Conventions](../../../.agent/foundation/01-naming-conventions.md) - Complete Alibaba guidelines
+- [Exception & Logging](../../../.agent/technology/patterns/04-exception-logging.md) - Error handling standards
 - [Quality Tool Rules](../../../.agent/rules/) - PMD, SpotBugs, Checkstyle, etc.
 
 ## Code Quality Checklist
@@ -58,7 +58,7 @@ Before completing any implementation, verify:
 
 ## Naming Conventions
 
-→ **[Complete Naming Conventions (Alibaba Guidelines)](../../../.agent/rules/01-naming-conventions.md)**
+→ **[Complete Naming Conventions (Alibaba Guidelines)](../../../.agent/foundation/01-naming-conventions.md)**
 
 **Quick Reference:**
 
@@ -394,7 +394,7 @@ _No rules have been auto-generated yet. Rules will appear here after the first j
 
 ## References
 
-- **Alibaba Java Coding Guidelines**: See `.agent/rules/01-naming-conventions.md`
-- **Exception Handling**: See `.agent/rules/04-exception-logging.md`
-- **Architecture Rules**: See `.agent/rules/10-architecture-rules.md`
+- **Alibaba Java Coding Guidelines**: See `.agent/foundation/01-naming-conventions.md`
+- **Exception Handling**: See `.agent/technology/patterns/04-exception-logging.md`
+- **Architecture Rules**: See `.agent/foundation/10-architecture-rules.md`
 - **SmartAdmin Patterns**: See `smartadmin-patterns.md` in this directory

@@ -23,7 +23,7 @@
 | **Quality Tool Rules (PMD, SpotBugs, etc.)** | `.agent/rules/11-16*.md` | `.claude/shared/knowledge/quality-standards.md` (summary) | - | Tool-specific details |
 | **Technology Stack** | `.claude/shared/knowledge/project-architecture.md` | `CLAUDE.md` (table + link) | ~~.agent/docs/tech-stack.md~~ (consolidated) | Versions, compatibility |
 | **Foundation Package Naming** | `CLAUDE.md` (unique content) | `CLAUDE.md` | `docs/migration/foundation-package-naming-standardization.md` | v4.0.0 breaking changes |
-| **AI Decision Matrix** | `.agent/rules/00-ai-decision-matrix.md` | - | - | Scenario → rules mapping |
+| **AI Decision Center** | `.agent/rules/00-INDEX.md` | - | - | Unified rule routing, skill selection, agent orchestration |
 | **PostgreSQL Rules** | `.agent/rules/05-postgresql-*.md` | - | `.claude/shared/knowledge/smartadmin-patterns.md` (references) | Database best practices |
 | **Vavr Functional Programming** | `.agent/rules/08-vavr-*.md` | - | `.claude/shared/knowledge/smartadmin-patterns.md` (references) | Option, Try, Either |
 | **MyBatis Plus Rules** | `.agent/rules/09-mybatis-plus-*.md` | - | `.claude/shared/knowledge/smartadmin-patterns.md` (references) | LambdaQueryWrapper |

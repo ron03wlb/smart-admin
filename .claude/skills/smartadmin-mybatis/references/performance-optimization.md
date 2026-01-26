@@ -1,4 +1,4 @@
-# MyBatis Performance Optimization Guide
+﻿# MyBatis Performance Optimization Guide
 
 Comprehensive guide to optimizing MyBatis queries and avoiding common performance pitfalls in SmartAdmin.
 
@@ -548,5 +548,5 @@ WHERE e.actual_name LIKE 'zhang%';
 - [Dao Architecture Guide](dao-architecture.md)
 - [LambdaQueryWrapper Guide](lambda-wrapper-guide.md)
 - [XML Mapper Patterns](xml-mapper-patterns.md)
-- [PostgreSQL Advanced Rules](../../../../.agent/rules/05-postgresql-advanced.md)
-- [MyBatis Plus Core](../../../../.agent/rules/09-mybatis-plus-core.md)
+- [PostgreSQL Advanced Rules](../../../../.agent/technology/database/05-postgresql-advanced.md)
+- [MyBatis Plus Core](../../../../.agent/rules/technology/database/09-mybatis-plus-core.md)

@@ -1,4 +1,4 @@
-# P0 Skills Deployment Complete - Final Report
+﻿# P0 Skills Deployment Complete - Final Report
 
 **Date**: 2026-01-25
 **Session**: Complete SmartAdmin Skills Development Cycle
@@ -408,7 +408,7 @@ CREATE UNIQUE INDEX uk_brand_name ON t_brand(brand_name) WHERE deleted_flag = FA
    - Estimated Time: 1 hour
 
 3. 🟡 **Document Pattern 7 Usage in Rules** [PENDING]
-   - Action: Add example to `.agent/rules/09-manager-layer.md`
+   - Action: Add example to `.agent/foundation/09-manager-layer.md`
    - Reference: `transactionalRollbackForThrowable` test
    - Estimated Time: 30 minutes
 

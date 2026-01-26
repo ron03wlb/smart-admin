@@ -93,7 +93,16 @@
       "Bash(if [ -f \".agents/skills/$skill/SKILL.md\" ])",
       "Bash(for skill in dispatching-parallel-agents git-pushing skill-creator semgrep-rule-creator)",
       "Bash(for d in */)",
-      "Bash(do test:*)"
+      "Bash(do test:*)",
+      "Bash(if not exist \"_deprecated\" mkdir _deprecated)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".agent\\\\scripts\\\\update-rule-paths.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".agent\\\\scripts\\\\update-claude-paths.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".agent\\\\scripts\\\\validate-rule-links.ps1\")",
+      "Bash(cmd /c mklink 05-postgresql-mybatis-integration.md 05-postgresql-mybatis.md)",
+      "Bash(cmd /c mklink 09-mybatis-plus-postgresql.md 05-postgresql-mybatis.md)",
+      "Bash(powershell -ExecutionPolicy Bypass -File:*)",
+      "Bash(pwsh.exe:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \".agent\\\\scripts\\\\validate-rule-links.ps1\")"
     ]
   },
   "allowedCommands": {

@@ -1,4 +1,4 @@
-# SmartAdmin Spring Rules - Detailed Specification
+﻿# SmartAdmin Spring Rules - Detailed Specification
 
 > Comprehensive rule definitions for Spring Pattern Checker
 
@@ -192,7 +192,7 @@ def check_transactional_placement(file_path, content):
 
 ### References
 - ArchUnit test: `ArchitectureTest#managerLayerRules()`
-- Documentation: `.agent/rules/09-manager-layer.md`
+- Documentation: `.agent/foundation/09-manager-layer.md`
 - Pattern guide: `.claude/shared/knowledge/smartadmin-patterns.md#transaction-management`
 
 ---
@@ -327,7 +327,7 @@ def check_dependency_injection(file_path, content):
 
 ### References
 - ArchUnit test: `ArchitectureTest#dependencyRules()`
-- Documentation: `.agent/rules/01-naming-conventions.md`
+- Documentation: `.agent/foundation/01-naming-conventions.md`
 - Pattern guide: `.claude/shared/knowledge/smartadmin-patterns.md#dependency-injection`
 
 ---
@@ -689,7 +689,7 @@ def check_layer_dependencies(file_path, content):
 
 ### References
 - ArchUnit test: `ArchitectureTest#layerDependencyRules()`
-- Documentation: `.agent/rules/10-architecture-rules.md`
+- Documentation: `.agent/foundation/10-architecture-rules.md`
 - Pattern guide: `.claude/shared/knowledge/smartadmin-patterns.md#mandatory-layered-architecture`
 
 ---
@@ -808,7 +808,7 @@ def check_bean_naming(file_path, content):
 
 ### References
 - ArchUnit test: `ArchitectureTest#namingConventionRules()`
-- Documentation: `.agent/rules/01-naming-conventions.md`
+- Documentation: `.agent/foundation/01-naming-conventions.md`
 - Pattern guide: `.claude/shared/knowledge/smartadmin-patterns.md#layer-responsibilities`
 
 ---

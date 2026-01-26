@@ -1,4 +1,4 @@
-# Test Fixture Generator Skill - Deliverables
+﻿# Test Fixture Generator Skill - Deliverables
 
 **Skill Name**: test-fixture-generator
 **Status**: ✅ COMPLETE (TDD Validated)
@@ -324,8 +324,8 @@
 - `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java`
 
 **Related Rules**:
-- `.agent/rules/10-architecture-rules.md` - Architecture constraints
-- `.agent/rules/01-naming-conventions.md` - Naming standards
+- `.agent/foundation/10-architecture-rules.md` - Architecture constraints
+- `.agent/foundation/01-naming-conventions.md` - Naming standards
 - `.claude/shared/knowledge/smartadmin-patterns.md` - Domain patterns
 
 ---

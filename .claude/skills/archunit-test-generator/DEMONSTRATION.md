@@ -1,11 +1,11 @@
-# Skill Demonstration: Boolean Field Naming Rule
+﻿# Skill Demonstration: Boolean Field Naming Rule
 
 ## Scenario: Generate ArchUnit Test for Uncovered Rule
 
 **User Request:**
 > "Create ArchUnit test to enforce that Boolean fields cannot start with 'is' prefix (use 'deleted', not 'isDeleted')"
 
-**Source Rule:** `.agent/rules/01-naming-conventions.md`
+**Source Rule:** `.agent/foundation/01-naming-conventions.md`
 
 ---
 
@@ -173,7 +173,7 @@ static final ArchRule booleanFieldsNoIsPrefix = ...
 
 ### Step 7: Update Rule File Frontmatter
 
-**Edit:** `.agent/rules/01-naming-conventions.md`
+**Edit:** `.agent/foundation/01-naming-conventions.md`
 
 **Before:**
 ```yaml

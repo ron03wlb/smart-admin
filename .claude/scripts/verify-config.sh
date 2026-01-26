@@ -94,7 +94,7 @@ echo ""
 
 echo "5. Checking orchestration files..."
 ORCHESTRATION_FILES=(
-    ".claude/shared/orchestration/decision-matrix.md"
+    ".agent/rules/00-INDEX.md"
     ".claude/shared/orchestration/agent-dependencies.md"
     ".claude/shared/orchestration/workflow-patterns.md"
 )

@@ -1,4 +1,4 @@
----
+﻿---
 name: vavr-refactoring-assistant
 description: Use when refactoring Service layer methods to use Vavr Option/Try/Either instead of java.util.Optional/checked exceptions, when code review detects Optional usage violations in Service classes, when ArchitectureTest serviceUsesVavrOption fails, or when user mentions "refactor to Vavr", "convert Optional", "use Try", "functional exceptions"
 ---
@@ -812,12 +812,12 @@ If test fails, check error message for violating classes.
 ## Reference Files
 
 **Vavr rules:**
-- `.agent/rules/08-vavr-fundamentals.md` - Option/Try basics
-- `.agent/rules/08-vavr-advanced.md` - Either/Collections/Patterns
-- `.agent/rules/08-vavr-mybatis-integration.md` - MyBatis + Vavr patterns
+- `.agent/technology/functional/08-vavr-fundamentals.md` - Option/Try basics
+- `.agent/technology/functional/08-vavr-advanced.md` - Either/Collections/Patterns
+- `.agent/rules/technology/functional/08-vavr-mybatis-integration.md` - MyBatis + Vavr patterns
 
 **Architecture:**
-- `.agent/rules/10-architecture-rules.md` - Service layer constraints
+- `.agent/foundation/10-architecture-rules.md` - Service layer constraints
 - `ArchitectureTest.java` - ArchUnit validation
 
 ---

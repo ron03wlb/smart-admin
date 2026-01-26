@@ -1,4 +1,4 @@
-# Example: Generate ArchUnit Test from Rule
+﻿# Example: Generate ArchUnit Test from Rule
 
 ## Scenario
 
@@ -9,7 +9,7 @@
 
 ## Step 1: Parse Rule File
 
-**Read:** `.agent/rules/08-vavr-fundamentals.md`
+**Read:** `.agent/technology/functional/08-vavr-fundamentals.md`
 
 **Extract Frontmatter:**
 ```yaml
@@ -151,7 +151,7 @@ static final ArchRule serviceUsesVavrOption =
 
 ## Step 7: Update Rule File Frontmatter
 
-**Edit:** `.agent/rules/08-vavr-fundamentals.md`
+**Edit:** `.agent/technology/functional/08-vavr-fundamentals.md`
 
 ```yaml
 ---
@@ -261,7 +261,7 @@ BUILD SUCCESSFUL in 3s
 - **Test Name:** `serviceUsesVavrOption`
 
 ### 2. Updated Rule File
-- **File:** `.agent/rules/08-vavr-fundamentals.md`
+- **File:** `.agent/technology/functional/08-vavr-fundamentals.md`
 - **Changes:** Added `archunit_test`, `archunit_generated` fields
 
 ### 3. Violation Example

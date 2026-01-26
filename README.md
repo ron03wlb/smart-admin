@@ -31,7 +31,7 @@ Choose your role to get started:
 | **Set up Kafka integration** | [docs/kafka/](docs/kafka/getting-started/quick-start.md) - Complete Kafka guide |
 | **Configure MinIO storage** | [docs/minio/](docs/minio/01-quick-start.md) - Object storage setup |
 | **Run architecture tests** | [CLAUDE.md](CLAUDE.md#test-commands) - `./gradlew :sa-admin:test --tests ArchitectureTest` |
-| **Commit code properly** | [Commit Conventions](.agent/rules/17-commit-message-conventions.md) - Conventional Commits format |
+| **Commit code properly** | [Commit Conventions](.agent/rules/workflows/17-commit-message-conventions.md) - Conventional Commits format |
 
 ---
 
@@ -110,11 +110,11 @@ SmartAdmin includes a multi-agent system to accelerate development:
 | **Project Architecture** | [.claude/shared/knowledge/project-architecture.md](.claude/shared/knowledge/project-architecture.md) | Module structure, build system, Gradle configuration |
 | **Quality Standards** | [.claude/shared/knowledge/quality-standards.md](.claude/shared/knowledge/quality-standards.md) | Anti-patterns, code quality checklist |
 | **Coding Standards** | [.agent/rules/](.agent/rules/) | Architecture, naming, PMD, SpotBugs rules |
-| **Architecture Rules** | [.agent/rules/10-architecture-rules.md](.agent/rules/10-architecture-rules.md) | Layered architecture enforcement |
-| **Manager Layer** | [.agent/rules/09-manager-layer.md](.agent/rules/09-manager-layer.md) | Transaction, caching constraints |
-| **Naming Conventions** | [.agent/rules/01-naming-conventions.md](.agent/rules/01-naming-conventions.md) | Alibaba naming guidelines |
-| **Exception & Logging** | [.agent/rules/04-exception-logging.md](.agent/rules/04-exception-logging.md) | Exception handling, logging standards |
-| **Commit Messages** | [.agent/rules/17-commit-message-conventions.md](.agent/rules/17-commit-message-conventions.md) | Conventional Commits format |
+| **Architecture Rules** | [.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md) | Layered architecture enforcement |
+| **Manager Layer** | [.agent/rules/foundation/09-manager-layer.md](.agent/rules/foundation/09-manager-layer.md) | Transaction, caching constraints |
+| **Naming Conventions** | [.agent/rules/foundation/01-naming-conventions.md](.agent/rules/foundation/01-naming-conventions.md) | Alibaba naming guidelines |
+| **Exception & Logging** | [.agent/rules/technology/patterns/04-exception-logging.md](.agent/rules/technology/patterns/04-exception-logging.md) | Exception handling, logging standards |
+| **Commit Messages** | [.agent/rules/workflows/17-commit-message-conventions.md](.agent/rules/workflows/17-commit-message-conventions.md) | Conventional Commits format |
 | **Kafka Guide** | [docs/kafka/](docs/kafka/) | Complete Kafka integration (46 documents) |
 | **MinIO Guide** | [docs/minio/](docs/minio/) | Object storage setup (8 documents) |
 | **Multi-Tenant** | [docs/multi-tenant/](docs/multi-tenant/) | Multi-tenant architecture (5 documents) |
@@ -189,7 +189,7 @@ SmartAdmin enforces layered architecture through ArchUnit tests:
 - `@Transactional` / `@Cacheable`: Manager layer ONLY
 - `@Autowired` field injection: FORBIDDEN (use constructor injection)
 
-→ **[Complete Architecture Rules](.agent/rules/10-architecture-rules.md)**
+→ **[Complete Architecture Rules](.agent/rules/foundation/10-architecture-rules.md)**
 
 ---
 

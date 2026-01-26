@@ -1,4 +1,4 @@
-# P1 Skills Deployment Report
+﻿# P1 Skills Deployment Report
 
 **Deployment Date**: 2026-01-25
 **Version**: 1.0.0
@@ -48,7 +48,7 @@ All skills have been integrated into the AI decision matrix, documented in the s
 - Related docs: 4 (README, architecture, migration, schema)
 
 **Integration Points**:
-- `.agent/rules/00-ai-decision-matrix.md` - Scenario 8: Business Workflows & Orchestration
+- `.agent/rules/00-INDEX.md` - Scenario 8: Business Workflows & Orchestration
 - `.claude/skills/README.md` - P1 Skills section
 - `CLAUDE.md` - Specialized Skills section
 - `docs/plans/liteflow/` - Technical specifications
@@ -89,7 +89,7 @@ All skills have been integrated into the AI decision matrix, documented in the s
 - Database schemas: 5 tables (device_fingerprints, linked_accounts, risk_scores, etc.)
 
 **Integration Points**:
-- `.agent/rules/00-ai-decision-matrix.md` - Scenario 9: Fraud Detection & Risk Control
+- `.agent/rules/00-INDEX.md` - Scenario 9: Fraud Detection & Risk Control
 - `.claude/skills/README.md` - P1 Skills section
 - `CLAUDE.md` - Specialized Skills section
 - `docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md`
@@ -139,13 +139,13 @@ All skills have been integrated into the AI decision matrix, documented in the s
 - Phase reports: 5 (BASELINE, RED, GREEN, GREEN-FINAL, DEPLOYMENT)
 
 **Integration Points**:
-- `.agent/rules/00-ai-decision-matrix.md` - Scenario 10: Quality Gate & CI/CD
+- `.agent/rules/00-INDEX.md` - Scenario 10: Quality Gate & CI/CD
 - `.claude/skills/README.md` - P1 Skills section
 - `CLAUDE.md` - Specialized Skills section
-- `.agent/rules/10-architecture-rules.md`
-- `.agent/rules/11-checkstyle-rules.md`
-- `.agent/rules/12-pmd-rules.md`
-- `.agent/rules/13-spotbugs-rules.md`
+- `.agent/foundation/10-architecture-rules.md`
+- `.agent/rules/quality-tools/11-checkstyle-rules.md`
+- `.agent/rules/quality-tools/12-pmd-rules.md`
+- `.agent/rules/quality-tools/13-spotbugs-rules.md`
 
 **Use Cases**:
 - Pre-merge quality validation
@@ -188,7 +188,7 @@ All skills have been integrated into the AI decision matrix, documented in the s
 
 ### Files Updated
 
-1. **`.agent/rules/00-ai-decision-matrix.md`**
+1. **`.agent/rules/00-INDEX.md`**
    - Added Scenario 8: Business Workflows & Orchestration
    - Added Scenario 9: Fraud Detection & Risk Control
    - Added Scenario 10: Quality Gate & CI/CD
@@ -335,7 +335,7 @@ quality-gate-orchestrator
 
 ### System Documentation
 - [Skills Catalog](./../skills/README.md)
-- [AI Decision Matrix](./../../.agent/rules/00-ai-decision-matrix.md)
+- [AI Decision Matrix](./../../.agent/rules/00-INDEX.md)
 - [CLAUDE.md](./../../CLAUDE.md)
 
 ### Related Specifications

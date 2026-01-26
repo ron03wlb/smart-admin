@@ -1,4 +1,4 @@
-# Deliverables: ArchUnit Test Generator Skill
+﻿# Deliverables: ArchUnit Test Generator Skill
 
 **Created:** 2025-01-25
 **Priority:** P0 (Critical Infrastructure)
@@ -174,7 +174,7 @@ private static final String LAYER_CONTROLLER = "Controller";
 **Scenario:** Generate test for "Service layer must use Vavr Option"
 
 **Complete Workflow Demonstrated:**
-1. Parse `.agent/rules/08-vavr-fundamentals.md` frontmatter
+1. Parse `.agent/technology/functional/08-vavr-fundamentals.md` frontmatter
 2. Extract natural language rule
 3. Select Pattern 2 (Annotation Restrictions) + Custom Predicate
 4. Generate 20-line test method with Javadoc

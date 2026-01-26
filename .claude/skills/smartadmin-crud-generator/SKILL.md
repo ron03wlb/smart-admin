@@ -22,6 +22,78 @@ You will:
 5. Generate API documentation (Swagger annotations)
 6. Validate with ArchitectureTest
 
+## v2.0.0 Composite Skill Architecture
+
+**NEW in v2.0.0 (2026-01-27)**: This skill now consolidates 4 previously separate skills into a unified phase-based workflow.
+
+### Consolidated Skills
+
+This skill **replaces and consolidates**:
+- ✅ **smartadmin-mybatis** (Phase 1: Backend) → `--backend-only`
+- ✅ **smartadmin-vue-crud** (Phase 2: Frontend) → `--frontend-only`
+- ✅ **smartadmin-api-docs** (Phase 3: API Docs) → `--docs-only`
+- ✅ **smartadmin-integration-test patterns** (Phase 4: Tests) → included in `--all-phases`
+
+### Phase-Based Execution
+
+**Complete CRUD (All Phases):**
+```bash
+/crud Employee --all-phases
+# Generates: Backend + Frontend + API Docs + Tests
+# Time: ~20 minutes (vs 45 minutes with separate skills)
+```
+
+**Backend Only (Phase 1):**
+```bash
+/crud Order --backend-only
+# Generates: Entity, Dao, Manager, Service, Controller, Domain objects (Form/VO)
+# Consolidates: former /mybatis command
+```
+
+**Frontend Only (Phase 2):**
+```bash
+/crud Brand --frontend-only
+# Generates: Vue list component, form modal, API client, TypeScript types
+# Consolidates: former /vue-crud command
+```
+
+**API Documentation Only (Phase 3):**
+```bash
+/crud Product --docs-only
+# Generates: Swagger/Knife4j annotations (@Tag, @Operation, @Schema)
+# Consolidates: former /api-docs command
+```
+
+### Backward Compatibility
+
+**Old commands still work** with deprecation warnings (until 2026-06-30):
+
+```bash
+# ⚠️ Deprecated (routes to /crud --backend-only)
+/mybatis generate Employee
+
+# ⚠️ Deprecated (routes to /crud --frontend-only)
+/vue-crud Brand
+
+# ⚠️ Deprecated (routes to /crud --docs-only)
+/api-docs ProductController
+```
+
+**Migration Timeline:**
+- **Weeks 1-12** (Soft Deprecation): Commands work with warnings
+- **Weeks 13-24** (Hard Deprecation): Commands show errors + migration guide
+- **Week 25+** (Removal): Old commands permanently removed
+
+**See:** [skill-aliases.json](../skill-aliases.json) for routing configuration
+
+### Phase Documentation
+
+Each phase has detailed implementation guides:
+- **Phase 1**: [phases/phase-1-backend.md](phases/phase-1-backend.md) - Backend layer generation (MyBatis, layered architecture)
+- **Phase 2**: [phases/phase-2-frontend.md](phases/phase-2-frontend.md) - Vue 3 + Ant Design + TypeScript
+- **Phase 3**: [phases/phase-3-api-docs.md](phases/phase-3-api-docs.md) - Knife4j/OpenAPI annotations
+- **Phase 4**: [phases/phase-4-tests.md](phases/phase-4-tests.md) - Integration tests with Testcontainers
+
 ## Why This Skill Solves Integration Issues
 
 **Problem:** "開發整合不行" (Development integration not working)
@@ -1027,5 +1099,343 @@ For detailed implementation patterns:
 - Code generation: 5 minutes
 - Review and adjust: 15 minutes
 - **Total: 30 minutes**
+
+---
+
+## Phase-Based Execution Logic (v2.0.0)
+
+### Execution Mode Detection
+
+When user makes a request, determine execution mode:
+
+**Mode 1: Complete CRUD (--all-phases)**
+- **Triggers**:
+  - User says "create CRUD module"
+  - User wants "full-stack module"
+  - User requests "complete Employee management"
+  - No specific phase mentioned
+- **Execution**: Run Phase 1 → Phase 2 → Phase 3 → Phase 4
+- **Time**: ~20 minutes
+
+**Mode 2: Backend Only (--backend-only)**
+- **Triggers**:
+  - User says "generate backend only"
+  - User wants "Entity/Dao/Manager/Service/Controller"
+  - User mentions "MyBatis" or "database layer"
+  - Former `/mybatis` command users
+- **Execution**: Run Phase 1 only
+- **Time**: ~8 minutes
+- **Consolidates**: smartadmin-mybatis skill
+
+**Mode 3: Frontend Only (--frontend-only)**
+- **Triggers**:
+  - User says "generate frontend only"
+  - User wants "Vue components"
+  - User mentions "Ant Design" or "TypeScript"
+  - Former `/vue-crud` command users
+- **Execution**: Run Phase 2 only
+- **Time**: ~7 minutes
+- **Consolidates**: smartadmin-vue-crud skill
+
+**Mode 4: API Docs Only (--docs-only)**
+- **Triggers**:
+  - User says "add API documentation"
+  - User wants "Swagger annotations"
+  - User mentions "Knife4j" or "OpenAPI"
+  - Former `/api-docs` command users
+- **Execution**: Run Phase 3 only
+- **Time**: ~3 minutes
+- **Consolidates**: smartadmin-api-docs skill
+
+### Phase Execution Sequence
+
+#### Phase 1: Backend Generation
+
+**Input Required**:
+- Entity name
+- Field specifications (name, type, validations)
+- Module name (e.g., "goods", "oa", "system")
+- Foreign key relationships
+
+**Execution Steps**:
+1. Read [phases/phase-1-backend.md](phases/phase-1-backend.md)
+2. Generate files in order:
+   - Domain objects (Entity, Forms, VO)
+   - Dao interface + Mapper.xml (if complex queries)
+   - Manager class (transaction layer)
+   - Service class (business logic with Vavr)
+   - Controller class (API endpoints)
+3. Validate package imports (use `net.lab1024.sa.foundation.*`)
+4. Add proper annotations (@Transactional, @SaCheckPermission, @Valid)
+
+**Output**:
+```
+sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/
+├── controller/{Entity}Controller.java
+├── service/{Entity}Service.java
+├── manager/{Entity}Manager.java
+├── dao/{Entity}Dao.java
+└── domain/
+    ├── entity/{Entity}Entity.java
+    ├── form/{Entity}QueryForm.java, {Entity}AddForm.java, {Entity}UpdateForm.java
+    └── vo/{Entity}VO.java
+```
+
+**Time**: ~8 minutes
+
+#### Phase 2: Frontend Generation
+
+**Input Required**:
+- Entity name
+- Backend field list (from Phase 1 or user specification)
+- Module route path
+
+**Execution Steps**:
+1. Read [phases/phase-2-frontend.md](phases/phase-2-frontend.md)
+2. Generate files in order:
+   - TypeScript types (matching backend VOs/Forms)
+   - API client (typed Axios with ResponseDTO handling)
+   - List component (a-table with pagination)
+   - Form modal (a-modal with validation)
+3. Map Java types → TypeScript types
+4. Add permission directives (v-privilege)
+5. Configure routes
+
+**Output**:
+```
+smart-admin-web/src/
+├── api/{module}/{entity}-types.ts
+├── api/{module}/{entity}-api.ts
+└── views/{module}/{entity}/
+    ├── {entity}-list.vue
+    └── {entity}-form-modal.vue
+```
+
+**Time**: ~7 minutes
+
+#### Phase 3: API Documentation Generation
+
+**Input Required**:
+- Controller class file path
+- Form/VO class file paths
+- Module name
+
+**Execution Steps**:
+1. Read [phases/phase-3-api-docs.md](phases/phase-3-api-docs.md)
+2. Add annotations to existing files:
+   - Controller: @Tag annotation
+   - Methods: @Operation with summary
+   - Form/VO fields: @Schema with description and examples
+3. Import Swagger packages
+4. Select appropriate AdminSwaggerTagConst
+
+**Output**:
+- Modified Controller.java (with @Tag and @Operation)
+- Modified Form classes (with @Schema)
+- Modified VO classes (with @Schema)
+
+**Time**: ~3 minutes
+
+#### Phase 4: Integration Tests Generation
+
+**Input Required**:
+- Entity name
+- Service class location
+- Test data specifications
+
+**Execution Steps**:
+1. Read [phases/phase-4-tests.md](phases/phase-4-tests.md)
+2. Generate test files:
+   - Integration test class extending BaseIntegrationTest
+   - Test methods for CRUD operations
+   - Testcontainers setup (if needed)
+3. Add test data builders
+4. Validate @Transactional on test methods
+
+**Output**:
+```
+sa-admin/src/test/java/net/lab1024/sa/admin/module/business/{module}/
+└── service/{Entity}IntegrationTest.java
+```
+
+**Time**: ~5 minutes
+
+### Phase Combination Examples
+
+**Example 1: Complete CRUD**
+```
+User: "Create Employee CRUD module with name, email, department fields"
+
+Execution:
+1. Gather requirements (confirm fields, types, validations)
+2. Phase 1: Generate backend (Entity, Dao, Manager, Service, Controller)
+3. Phase 2: Generate frontend (Vue components, API client, types)
+4. Phase 3: Add API documentation (Swagger annotations)
+5. Phase 4: Generate integration tests
+6. Validate with ArchitectureTest
+7. Provide usage instructions
+
+Total: ~20 minutes
+```
+
+**Example 2: Backend Only (former /mybatis)**
+```
+User: "Generate backend Dao layer for Product"
+
+Execution:
+1. Gather requirements (fields, types, relationships)
+2. Phase 1 only: Generate Entity, Dao, Manager, Service, Controller
+3. Skip Phase 2, 3, 4
+4. Provide backend usage instructions
+
+Total: ~8 minutes
+```
+
+**Example 3: Frontend Only (former /vue-crud)**
+```
+User: "Create Vue frontend for Order module (backend already exists)"
+
+Execution:
+1. Read existing backend VO/Form classes to extract field info
+2. Phase 2 only: Generate TypeScript types, API client, Vue components
+3. Skip Phase 1, 3, 4
+4. Provide frontend integration instructions
+
+Total: ~7 minutes
+```
+
+**Example 4: Add Docs to Existing Code (former /api-docs)**
+```
+User: "Add Swagger documentation to BrandController"
+
+Execution:
+1. Read existing Controller, Form, VO classes
+2. Phase 3 only: Add @Tag, @Operation, @Schema annotations
+3. Skip Phase 1, 2, 4
+4. Verify in Knife4j UI (http://localhost:1024/doc.html)
+
+Total: ~3 minutes
+```
+
+### Backward Compatibility Routing
+
+When detecting deprecated command patterns, route to appropriate phase:
+
+```
+User input: "/mybatis generate Employee"
+Detection: Old command pattern
+Response: "⚠️ The '/mybatis' command is deprecated. Routing to '/crud Employee --backend-only'..."
+Execution: Phase 1 only
+```
+
+```
+User input: "/vue-crud Brand"
+Detection: Old command pattern
+Response: "⚠️ The '/vue-crud' command is deprecated. Routing to '/crud Brand --frontend-only'..."
+Execution: Phase 2 only
+```
+
+```
+User input: "/api-docs ProductController"
+Detection: Old command pattern
+Response: "⚠️ The '/api-docs' command is deprecated. Routing to '/crud Product --docs-only'..."
+Execution: Phase 3 only
+```
+
+### Validation After Each Phase
+
+**Phase 1 Validation**:
+- [ ] Entity uses @TableName, @TableId, @TableLogic
+- [ ] Dao extends BaseMapper
+- [ ] Manager has @Transactional(rollbackFor = Throwable.class)
+- [ ] Service uses Vavr Option (not java.util.Optional)
+- [ ] Controller has @SaCheckPermission and @Valid
+
+**Phase 2 Validation**:
+- [ ] TypeScript types match backend Java classes
+- [ ] API client uses postRequest/getRequest wrappers
+- [ ] List component has a-table with pagination
+- [ ] Form modal has validation rules
+- [ ] Permission strings match backend @SaCheckPermission
+
+**Phase 3 Validation**:
+- [ ] Controller has @Tag with AdminSwaggerTagConst
+- [ ] All methods have @Operation with clear summaries
+- [ ] All Form/VO fields have @Schema with descriptions and examples
+- [ ] Visit http://localhost:1024/doc.html to verify UI display
+
+**Phase 4 Validation**:
+- [ ] Test class extends BaseIntegrationTest
+- [ ] Tests use @SpringBootTest and @TestMethodOrder
+- [ ] Testcontainers configured for PostgreSQL + Redis
+- [ ] All CRUD operations have test methods
+- [ ] Tests pass: `./gradlew :sa-admin:test --tests {Entity}IntegrationTest`
+
+---
+
+## Troubleshooting
+
+### Common Issues by Phase
+
+**Phase 1 Issues**:
+
+**Problem**: "SmartBeanUtil not found"
+- **Cause**: Wrong import path (using deprecated `common.core.util.*`)
+- **Solution**: Use `import net.lab1024.sa.util.SmartBeanUtil;`
+
+**Problem**: "ArchitectureTest fails: Service uses java.util.Optional"
+- **Cause**: Using Optional instead of Vavr Option
+- **Solution**: Change `Optional<T>` to `io.vavr.control.Option<T>`
+
+**Problem**: "Field injection detected"
+- **Cause**: Using @Autowired on fields
+- **Solution**: Use constructor injection with @RequiredArgsConstructor
+
+**Phase 2 Issues**:
+
+**Problem**: "Type mismatch: Long vs number"
+- **Cause**: Incorrect Java ↔ TypeScript mapping
+- **Solution**: Check [phase-2-frontend.md](phases/phase-2-frontend.md#type-mapping) for correct mappings
+
+**Problem**: "API call returns undefined"
+- **Cause**: Missing ResponseDTO unwrapping
+- **Solution**: Use `postRequest<PageResult<T>>()` wrapper, not raw axios
+
+**Problem**: "Permission button not hiding"
+- **Cause**: Wrong permission string in v-privilege
+- **Solution**: Ensure frontend string matches backend @SaCheckPermission exactly
+
+**Phase 3 Issues**:
+
+**Problem**: "Controller not showing in Knife4j"
+- **Cause**: Missing @Tag annotation or wrong tag constant
+- **Solution**: Add `@Tag(name = AdminSwaggerTagConst.Business.MANAGER_{MODULE})`
+
+**Problem**: "Field descriptions not displaying"
+- **Cause**: Missing @Schema on Form/VO fields
+- **Solution**: Add `@Schema(description = "...", example = "...")` to each field
+
+**Phase 4 Issues**:
+
+**Problem**: "Testcontainers failed to start"
+- **Cause**: Docker not running or insufficient resources
+- **Solution**: Start Docker Desktop, ensure 4GB+ memory allocated
+
+**Problem**: "Tests fail: Transaction not rolling back"
+- **Cause**: Missing @Transactional on test methods
+- **Solution**: Add `@Transactional` to each test method for automatic rollback
+
+---
+
+## Version History
+
+**v2.0.0** (2026-01-27):
+- Consolidated 4 skills (mybatis, vue-crud, api-docs, integration-test patterns) into phase-based workflow
+- Added --all-phases, --backend-only, --frontend-only, --docs-only execution modes
+- Reduced CRUD generation time: 45 min → 20 min (55% improvement)
+- Backward compatibility via skill-aliases.json
+
+**v1.0.0** (2025-12-01):
+- Initial full-stack CRUD generator
 
 **Savings: 6-9 hours → 30 minutes (92-95% reduction)**

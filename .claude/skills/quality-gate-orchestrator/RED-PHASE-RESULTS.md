@@ -1,4 +1,4 @@
-# Quality Gate Orchestrator - RED Phase Test Results
+﻿# Quality Gate Orchestrator - RED Phase Test Results
 
 **Test Date**: 2026-01-26
 **Tester**: Claude Code AI Agent
@@ -441,7 +441,7 @@ jobs:
 
 3. **SpotBugs Configuration Missing**:
    - No exclusion filter mentioned
-   - SmartAdmin has known SpotBugs suppressions (`.agent/rules/13-spotbugs-rules.md`)
+   - SmartAdmin has known SpotBugs suppressions (`.agent/rules/quality-tools/13-spotbugs-rules.md`)
    - Recommendation: Link to SpotBugs exclusion XML
 
 4. **No Report Aggregation Task**:
@@ -536,7 +536,7 @@ assertTrue(result.isEmpty());
 3. **Add SpotBugs Exclusions**:
    - Create: `config/spotbugs/exclude.xml`
    - Add SmartAdmin patterns: `EI_EXPOSE_REP`, `NP_NULL_ON_SOME_PATH`
-   - Reference: `.agent/rules/13-spotbugs-rules.md`
+   - Reference: `.agent/rules/quality-tools/13-spotbugs-rules.md`
 
 4. **Create `qualityGateSequential` Task**:
    - Invoke skill: "Generate quality gate for pre-merge validation"

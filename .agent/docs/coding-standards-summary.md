@@ -183,8 +183,8 @@ public class Article {
 ```
 
 **詳細規範**:
-- [rules/05-postgresql-advanced.md](../rules/05-postgresql-advanced.md)
-- [rules/05-postgresql-mybatis-integration.md](../rules/05-postgresql-mybatis-integration.md)
+- [rules/05-postgresql-advanced.md](../rules/technology/database/05-postgresql-advanced.md)
+- [rules/05-postgresql-mybatis.md](../rules/technology/database/05-postgresql-mybatis.md)
 
 ---
 

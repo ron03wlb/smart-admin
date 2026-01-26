@@ -1,4 +1,4 @@
----
+﻿---
 name: spring
 description: SmartAdmin Spring Pattern Checker - Validates code compliance with SmartAdmin's Spring-specific conventions (@Transactional placement, dependency injection, layered architecture calls, Spring Bean naming). Use when creating/modifying Spring Bean classes, during code review, or when ArchitectureTest fails. Triggers on @Component, @Service, @Controller, @RestController annotations or explicit /spring command.
 ---
@@ -54,7 +54,7 @@ public class UserManager {
 **Why**: Transaction boundaries must be explicit and managed in a dedicated layer to prevent hidden transaction nesting and ensure proper rollback scope.
 
 **References**:
-- `.agent/rules/09-manager-layer.md`
+- `.agent/foundation/09-manager-layer.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md#transaction-management`
 
 ### Rule 2: Dependency Injection Style
@@ -92,7 +92,7 @@ public class UserService {
 
 **References**:
 - `.claude/shared/knowledge/smartadmin-patterns.md#dependency-injection`
-- `.agent/rules/01-naming-conventions.md`
+- `.agent/foundation/01-naming-conventions.md`
 
 ### Rule 3: Layered Architecture Calls
 **CRITICAL**: Strict call hierarchy enforcement
@@ -163,7 +163,7 @@ public class UserManager {
 
 **References**:
 - `.claude/shared/knowledge/smartadmin-patterns.md#mandatory-layered-architecture`
-- `.agent/rules/10-architecture-rules.md`
+- `.agent/foundation/10-architecture-rules.md`
 
 ### Rule 4: Spring Bean Naming Conventions
 **HIGH**: Class names must match annotation type
@@ -194,7 +194,7 @@ public class EmployeeManager { }  // CORRECT
 - `@Repository` / MyBatis Plus Mapper → `*Dao`
 
 **References**:
-- `.agent/rules/01-naming-conventions.md`
+- `.agent/foundation/01-naming-conventions.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md#layer-responsibilities`
 
 ## Implementation Steps
@@ -284,7 +284,7 @@ public class EmployeeManager {
 \`\`\`
 
 **References**:
-- [Manager Layer Rules](.agent/rules/09-manager-layer.md)
+- [Manager Layer Rules](.agent/foundation/09-manager-layer.md)
 - [Transaction Management](.claude/shared/knowledge/smartadmin-patterns.md#transaction-management)
 
 ---
@@ -299,9 +299,9 @@ cd smart-admin-api-java21-springboot3
 
 **Documentation:**
 - [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
-- [Manager Layer Rules](.agent/rules/09-manager-layer.md)
-- [Architecture Rules](.agent/rules/10-architecture-rules.md)
-- [Naming Conventions](.agent/rules/01-naming-conventions.md)
+- [Manager Layer Rules](.agent/foundation/09-manager-layer.md)
+- [Architecture Rules](.agent/foundation/10-architecture-rules.md)
+- [Naming Conventions](.agent/foundation/01-naming-conventions.md)
 
 **Detailed References** (read when needed):
 - `references/spring-rules-detailed.md` - Complete rule specifications

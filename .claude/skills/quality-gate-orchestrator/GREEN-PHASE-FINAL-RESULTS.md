@@ -1,4 +1,4 @@
-# Quality Gate Orchestrator - GREEN Phase Final Results
+﻿# Quality Gate Orchestrator - GREEN Phase Final Results
 
 **Date**: 2026-01-25
 **Execution**: Full Pipeline Test (After Checkstyle Suppressions)
@@ -137,7 +137,7 @@ if (log.isDebugEnabled()) {
 
 **Why This Matters**: String concatenation in log statements executes even when debug logging is disabled, impacting performance.
 
-**SmartAdmin Convention**: From `.agent/rules/12-pmd-rules.md`, this is a **P3 violation** (MAJOR priority, not CRITICAL).
+**SmartAdmin Convention**: From `.agent/rules/quality-tools/12-pmd-rules.md`, this is a **P3 violation** (MAJOR priority, not CRITICAL).
 
 ---
 
@@ -164,7 +164,7 @@ results = users.stream()
 
 ### Severity Assessment
 
-According to `.agent/rules/12-pmd-rules.md`:
+According to `.agent/rules/quality-tools/12-pmd-rules.md`:
 
 | PMD Priority | Severity | Action | Fail Build? |
 |--------------|----------|--------|-------------|
@@ -479,7 +479,7 @@ After fixing PMD config:
 
 ### For Questions
 - **Orchestration Details**: See `.claude/skills/quality-gate-orchestrator/SKILL.md`
-- **PMD Configuration**: See `.agent/rules/12-pmd-rules.md`
+- **PMD Configuration**: See `.agent/rules/quality-tools/12-pmd-rules.md`
 - **Checkstyle Suppressions**: See `config/checkstyle/checkstyle-suppressions.xml`
 
 ### For Issues

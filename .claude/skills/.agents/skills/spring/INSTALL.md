@@ -1,4 +1,4 @@
-# SmartAdmin Spring Skill - Installation & Usage Guide
+﻿# SmartAdmin Spring Skill - Installation & Usage Guide
 
 ## Installation Status
 
@@ -200,7 +200,7 @@ If SmartAdmin rules change:
 **Questions?**
 - Check [README.md](./README.md) for FAQ
 - Review [SmartAdmin Patterns](../../.claude/shared/knowledge/smartadmin-patterns.md)
-- See [Manager Layer Rules](../../.agent/rules/09-manager-layer.md)
+- See [Manager Layer Rules](../../.agent/foundation/09-manager-layer.md)
 
 **Issues?**
 - Verify ArchitectureTest rules match skill rules

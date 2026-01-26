@@ -576,7 +576,7 @@ public class ArchitectureTest {
 - ArchUnit test exists but is not enforceable
 
 **Root Cause**:
-- `.agent/rules/08-vavr-*.md` documents Vavr usage
+- `.agent/rules/technology/functional/08-vavr-*.md` documents Vavr usage
 - `ArchitectureTest.java` references Vavr Option
 - But `build.gradle.kts` does not include `io.vavr:vavr`
 

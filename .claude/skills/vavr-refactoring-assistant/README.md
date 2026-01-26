@@ -1,4 +1,4 @@
-# Vavr Refactoring Assistant Skill
+﻿# Vavr Refactoring Assistant Skill
 
 ## Overview
 
@@ -141,10 +141,10 @@ public static final ArchRule serviceUsesVavrOption = methods()
 ## Integration with SmartAdmin Rules
 
 ### Foundation Rules Referenced
-- `.agent/rules/08-vavr-fundamentals.md` - Option/Try basics
-- `.agent/rules/08-vavr-advanced.md` - Either/Collections
-- `.agent/rules/08-vavr-mybatis-integration.md` - MyBatis patterns
-- `.agent/rules/10-architecture-rules.md` - Service layer constraints
+- `.agent/technology/functional/08-vavr-fundamentals.md` - Option/Try basics
+- `.agent/technology/functional/08-vavr-advanced.md` - Either/Collections
+- `.agent/rules/technology/functional/08-vavr-mybatis-integration.md` - MyBatis patterns
+- `.agent/foundation/10-architecture-rules.md` - Service layer constraints
 
 ### Architectural Constraints Enforced
 - Service layer MUST use `io.vavr.control.Option` (NOT `java.util.Optional`)

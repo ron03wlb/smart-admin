@@ -1,4 +1,4 @@
-# Quality Gate Orchestrator - Skill Documentation
+﻿# Quality Gate Orchestrator - Skill Documentation
 
 ## Overview
 
@@ -135,10 +135,10 @@ All tools + Coverage + SonarQube
 
 ## Related Documentation
 
-- **Rules**: `.agent/rules/10-architecture-rules.md` (ArchUnit)
-- **Rules**: `.agent/rules/11-checkstyle-rules.md` (Code style)
-- **Rules**: `.agent/rules/12-pmd-rules.md` (Code smells)
-- **Rules**: `.agent/rules/13-spotbugs-rules.md` (Bug patterns)
+- **Rules**: `.agent/foundation/10-architecture-rules.md` (ArchUnit)
+- **Rules**: `.agent/rules/quality-tools/11-checkstyle-rules.md` (Code style)
+- **Rules**: `.agent/rules/quality-tools/12-pmd-rules.md` (Code smells)
+- **Rules**: `.agent/rules/quality-tools/13-spotbugs-rules.md` (Bug patterns)
 - **Workflows**: `.agent/workflows/quality-gates-local-ci.md`
 
 ## Testing

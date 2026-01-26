@@ -1,4 +1,4 @@
-# Dao Layer Architecture Guide
+﻿# Dao Layer Architecture Guide
 
 SmartAdmin Dao layer architecture patterns and conventions for MyBatis Plus integration.
 
@@ -331,6 +331,6 @@ public interface OrderDao extends BaseMapper<OrderEntity> {
 
 ## Related Documentation
 
-- [MyBatis Plus Core Rules](../../../../.agent/rules/09-mybatis-plus-core.md)
-- [Architecture Rules](../../../../.agent/rules/10-architecture-rules.md)
+- [MyBatis Plus Core Rules](../../../../.agent/rules/technology/database/09-mybatis-plus-core.md)
+- [Architecture Rules](../../../../.agent/foundation/10-architecture-rules.md)
 - [SmartAdmin Patterns](../../../shared/knowledge/smartadmin-patterns.md)

@@ -1,4 +1,4 @@
-# Vavr Refactoring Assistant - Deliverables Summary
+﻿# Vavr Refactoring Assistant - Deliverables Summary
 
 **Task:** Create `vavr-refactoring-assistant` skill (P0 Skill #2)
 **Date:** 2026-01-25
@@ -289,10 +289,10 @@ description: Use when refactoring Service layer methods to use Vavr Option/Try/E
 ## Integration Points
 
 ### SmartAdmin Rules Referenced
-- `.agent/rules/08-vavr-fundamentals.md`
-- `.agent/rules/08-vavr-advanced.md`
-- `.agent/rules/08-vavr-mybatis-integration.md`
-- `.agent/rules/10-architecture-rules.md`
+- `.agent/technology/functional/08-vavr-fundamentals.md`
+- `.agent/technology/functional/08-vavr-advanced.md`
+- `.agent/rules/technology/functional/08-vavr-mybatis-integration.md`
+- `.agent/foundation/10-architecture-rules.md`
 
 ### ArchUnit Rules Enforced
 - `serviceUsesVavrOption` - Service MUST NOT use java.util.Optional

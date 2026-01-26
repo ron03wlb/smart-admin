@@ -1,4 +1,4 @@
-# iGame包網PM分析助手使用指南
+﻿# iGame包網PM分析助手使用指南
 
 ## 📋 概述
 
@@ -380,7 +380,7 @@ sequenceDiagram
 ### SmartAdmin規範
 - [CLAUDE.md快速參考](../../CLAUDE.md)
 - [SmartAdmin模式](../shared/knowledge/smartadmin-patterns.md)
-- [架構規則](../../.agent/rules/10-architecture-rules.md)
+- [架構規則](../../.agent/foundation/10-architecture-rules.md)
 - [Foundation模組](../../sa-base/foundation/)
 
 ---

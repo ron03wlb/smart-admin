@@ -1,8 +1,8 @@
-# SmartAdmin Implementation Patterns
+﻿# SmartAdmin Implementation Patterns
 
 This document provides SmartAdmin-specific implementation patterns and code examples. **All agents must adhere to these patterns when working with this codebase.**
 
-**For detailed architectural rules and enforcement**, see: [.agent/rules/10-architecture-rules.md](../../../.agent/rules/10-architecture-rules.md)
+**For detailed architectural rules and enforcement**, see: [.agent/foundation/10-architecture-rules.md](../../../.agent/foundation/10-architecture-rules.md)
 
 ## Layered Architecture Overview
 
@@ -12,7 +12,7 @@ SmartAdmin enforces strict layering rules validated by `ArchitectureTest.java`:
 Controller → Service → Manager → Dao → Entity
 ```
 
-**Quick Reference** (see [architecture rules](../../../.agent/rules/10-architecture-rules.md) for complete details):
+**Quick Reference** (see [architecture rules](../../../.agent/foundation/10-architecture-rules.md) for complete details):
 
 ### Layer Responsibilities
 
@@ -48,14 +48,14 @@ Controller → Service → Manager → Dao → Entity
 
 ### Critical Architecture Rules
 
-**MANDATORY** (enforced by ArchitectureTest - see [complete rules](../../../.agent/rules/10-architecture-rules.md)):
+**MANDATORY** (enforced by ArchitectureTest - see [complete rules](../../../.agent/foundation/10-architecture-rules.md)):
 - ✅ Controller → Service ONLY
 - ✅ `@Transactional` / `@Cacheable`: Manager layer ONLY
 - ✅ Constructor injection via `@RequiredArgsConstructor` + `private final`
 - ❌ NEVER `@Autowired` field injection
 
-→ **[Complete Architecture Rules & ArchUnit Tests](../../../.agent/rules/10-architecture-rules.md)**
-→ **[Manager Layer Constraints](../../../.agent/rules/09-manager-layer.md)**
+→ **[Complete Architecture Rules & ArchUnit Tests](../../../.agent/foundation/10-architecture-rules.md)**
+→ **[Manager Layer Constraints](../../../.agent/foundation/09-manager-layer.md)**
 
 ## ResponseDTO Pattern
 

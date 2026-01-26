@@ -1,4 +1,4 @@
-# Quality Gate Orchestrator - Research Summary
+﻿# Quality Gate Orchestrator - Research Summary
 
 **Date**: 2026-01-25
 **Skill Version**: 1.0.0
@@ -37,20 +37,20 @@ Successfully created the **quality-gate-orchestrator** skill (P1 priority) that 
 
 #### Configuration Analysis
 
-**Checkstyle** (`.agent/rules/11-checkstyle-rules.md`):
+**Checkstyle** (`.agent/rules/quality-tools/11-checkstyle-rules.md`):
 - **Enabled Rules**: 25 rules (AvoidStarImport, NeedBraces, WhitespaceAround, etc.)
 - **Severity**: All violations are BLOCKER
 - **Execution Time**: ~10 seconds
 - **Key Violations**: Star imports, missing braces, whitespace issues
 
-**PMD** (`.agent/rules/12-pmd-rules.md`):
+**PMD** (`.agent/rules/quality-tools/12-pmd-rules.md`):
 - **Rulesets**: bestpractices, errorprone, performance, security
 - **Priority Mapping**: P1/P2 → BLOCKER, P3 → MAJOR
 - **Execution Time**: ~20 seconds
 - **Common Violations**: LooseCoupling (10), AvoidDuplicateLiterals (8), UnusedAssignment (4)
 - **Suppressions**: CallSuperInConstructor, ShortClassName, MissingStaticMethodInNonInstantiatableClass
 
-**SpotBugs** (`.agent/rules/13-spotbugs-rules.md`):
+**SpotBugs** (`.agent/rules/quality-tools/13-spotbugs-rules.md`):
 - **Effort**: MAX
 - **Confidence**: LOW
 - **Plugins**: FindSecBugs 1.13.0 (security scanning)

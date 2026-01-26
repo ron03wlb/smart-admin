@@ -1,4 +1,4 @@
-# SmartAdmin Spring Pattern Checker
+﻿# SmartAdmin Spring Pattern Checker
 
 > Validates code compliance with SmartAdmin's Spring-specific conventions
 
@@ -159,20 +159,20 @@ public class UserController { }
 ## Documentation References
 
 - **[SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)** - Core patterns and conventions
-- **[Manager Layer Rules](.agent/rules/09-manager-layer.md)** - Transaction and cache management
-- **[Architecture Rules](.agent/rules/10-architecture-rules.md)** - Layered architecture enforcement
-- **[Naming Conventions](.agent/rules/01-naming-conventions.md)** - Naming standards
+- **[Manager Layer Rules](.agent/foundation/09-manager-layer.md)** - Transaction and cache management
+- **[Architecture Rules](.agent/foundation/10-architecture-rules.md)** - Layered architecture enforcement
+- **[Naming Conventions](.agent/foundation/01-naming-conventions.md)** - Naming standards
 
 ## FAQ
 
 **Q: Why can't I use @Transactional in Service layer?**
-A: SmartAdmin enforces explicit transaction boundaries in the Manager layer to prevent hidden transaction nesting and ensure proper rollback scope. See [Manager Layer Rules](.agent/rules/09-manager-layer.md).
+A: SmartAdmin enforces explicit transaction boundaries in the Manager layer to prevent hidden transaction nesting and ensure proper rollback scope. See [Manager Layer Rules](.agent/foundation/09-manager-layer.md).
 
 **Q: Why constructor injection instead of field injection?**
 A: Constructor injection ensures immutability, makes dependencies explicit, enables easier testing, and prevents circular dependency issues. See [Dependency Injection](.claude/shared/knowledge/smartadmin-patterns.md#dependency-injection).
 
 **Q: Can Service call another Service?**
-A: No. SmartAdmin prohibits Service→Service calls to prevent tight coupling. If multiple Services are needed, create a Manager to orchestrate them. See [Architecture Rules](.agent/rules/10-architecture-rules.md).
+A: No. SmartAdmin prohibits Service→Service calls to prevent tight coupling. If multiple Services are needed, create a Manager to orchestrate them. See [Architecture Rules](.agent/foundation/10-architecture-rules.md).
 
 **Q: Does this skill modify my code?**
 A: No. This skill is **read-only** - it only provides violation reports and fix suggestions. You review and apply fixes manually.

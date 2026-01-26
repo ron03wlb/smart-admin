@@ -1,4 +1,4 @@
-# SmartAdmin MyBatis Skill
+﻿# SmartAdmin MyBatis Skill
 
 AI-powered MyBatis/MyBatis Plus code generator for SmartAdmin framework.
 
@@ -109,5 +109,5 @@ cd smart-admin-api-java21-springboot3
 
 - [SmartAdmin Patterns](../../shared/knowledge/smartadmin-patterns.md)
 - [Project Architecture](../../shared/knowledge/project-architecture.md)
-- [Architecture Rules](../../../.agent/rules/10-architecture-rules.md)
-- [MyBatis Plus Core](../../../.agent/rules/09-mybatis-plus-core.md)
+- [Architecture Rules](../../../.agent/foundation/10-architecture-rules.md)
+- [MyBatis Plus Core](../../../.agent/rules/technology/database/09-mybatis-plus-core.md)
