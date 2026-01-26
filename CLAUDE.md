@@ -27,22 +27,24 @@
 
 ## For AI Coding Assistants
 
-### Reading Priority
+### Reading Priority (AI Assistants)
 
 When working with SmartAdmin codebase, read documentation in this order:
 
 1. **CLAUDE.md** (this file) - Quick reference and navigation hub
-2. **[.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md)** - Unified decision center (rules, skills, agents)
-3. **[.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md)** - Mandatory architectural constraints
+2. **[.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md)** - Unified decision center (630 lines: rules routing, skill selection, agent orchestration) ⭐
+3. **[.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md)** - Mandatory architectural constraints (enforced by ArchUnit)
 4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
 5. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks (optional, for Claude Code)
 6. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
+
+**Note**: For rule-specific questions (e.g., "How to name Service classes?"), skip directly to relevant rule files in step 3-4. The 00-INDEX.md in step 2 is primarily for AI decision-making (choosing rules/skills/agents).
 
 ### Interaction Language
 
 - **Documentation**: All AI instruction documents are in English
 - **User Communication**: Respond to users in **Traditional Chinese (繁體中文)**
-- **Code Comments**: Follow project conventions (typically English)
+- **Code Comments**: English (SmartAdmin standard - no Chinese in code comments)
 
 ### Key Constraints (Always Apply)
 
@@ -178,17 +180,25 @@ Controller → Service → Manager → Dao → Entity
 
 ## Specialized Skills
 
-**P1 Skills (Important - Business Logic & Quality)**:
-- **[liteflow-rule-builder](.claude/skills/liteflow-rule-builder/)** - Generate LiteFlow workflow orchestration rules
-- **[fraud-detection-pattern-generator](.claude/skills/fraud-detection-pattern-generator/)** - iGaming fraud detection & risk control
-- **[quality-gate-orchestrator](.claude/skills/quality-gate-orchestrator/)** - Multi-tool quality gate automation
+**Quick Overview**: 15 skills across 3 priority levels (see [Complete Catalog](.claude/skills/README.md) for full details)
 
-**P0 Skills (Critical - Foundation)**:
-- **[smartadmin-crud-generator](.claude/skills/smartadmin-crud-generator/)** - Full-stack CRUD module generation
-- **[vavr-refactoring-assistant](.claude/skills/vavr-refactoring-assistant/)** - Refactor to Vavr functional patterns
-- **[archunit-test-generator](.claude/skills/archunit-test-generator/)** - Generate architecture tests
+**P0 Skills (Critical - Foundation)** - 6 skills:
+- **[smartadmin-crud-generator](.claude/skills/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
+- **[vavr-refactoring-assistant](.claude/skills/vavr-refactoring-assistant/)** - Refactor Service layer to Vavr Option/Try/Either patterns
+- **[archunit-test-generator](.claude/skills/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
+- **[security-hardening-pro](.claude/skills/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
+- **[smartadmin-integration-test](.claude/skills/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
+- **[test-fixture-generator](.claude/skills/test-fixture-generator/)** - Test data builders for complex domain objects
 
-→ **[Complete Skills Catalog](.claude/skills/README.md)**
+**P1 Skills (Important - Business Logic & Quality)** - 3 skills:
+- **[liteflow-rule-builder](.claude/skills/liteflow-rule-builder/)** - Generate LiteFlow DSL (EL expressions, QLExpress scripts) for business workflows
+- **[fraud-detection-pattern-generator](.claude/skills/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
+- **[quality-gate-orchestrator](.claude/skills/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
+
+**P2 Skills (Nice-to-have - Productivity)** - 6 skills:
+- smartadmin-performance-suite, smartadmin-testing-suite, db-migration-manager, igame-feature-builder, cicd-pipeline-builder, semgrep-rule-creator
+
+→ **[Complete Skills Catalog](.claude/skills/README.md)** - Full descriptions, trigger keywords, use cases, and phase-based execution details
 
 ## Quality Tool Patterns
 
@@ -233,7 +243,7 @@ cd smart-admin-api-java21-springboot3
 
 | Component | Version | Status | Metadata |
 |-----------|---------|--------|----------|
-| **This Document** | 3.1.0 | ✅ Universal AI Support | - |
+| **This Document** | 3.2.0 | ✅ Universal AI Support | - |
 | **AI Doc System** | 3.0.0 | ✅ Unified | [.claude/META.md](.claude/META.md) |
 | **.claude/** | 2.7.0 | ✅ Agent System | [.claude/README.md](.claude/README.md) |
 | **.agent/** | 1.0.0 | ✅ Production Ready | [.agent/VERSION.md](.agent/VERSION.md) |
@@ -244,7 +254,8 @@ cd smart-admin-api-java21-springboot3
 **Last Updated**: 2026-01-27
 
 **Change History**:
-- 3.1.0 (2026-01-27): Version synchronization - .agent/ v1.0.0 production release, fixed broken migration links, enhanced reading priority guidance, clarified code comment standards, updated skills catalog
+- 3.2.0 (2026-01-27): P1 improvements - Enhanced reading priority guidance with decision-making note, clarified code comment language standard, expanded skills catalog from 6 to 15 (P0: 6, P1: 3, P2: 6)
+- 3.1.0 (2026-01-27): P0 critical fixes - Version synchronization (.agent/ v1.0.0 production release), fixed broken migration links
 - 3.0.0 (2026-01-24): Content deduplication, universal AI support, unified version management
 - 2.0.0 (2026-01-23): v4.0.0 breaking changes, foundation package documentation
 - 1.0.0 (2026-01-22): Initial versioned release
