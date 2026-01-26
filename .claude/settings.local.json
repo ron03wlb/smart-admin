@@ -105,7 +105,12 @@
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \".agent\\\\scripts\\\\validate-rule-links.ps1\")",
       "Bash(while read file)",
       "Bash(if ! grep -q \"import lombok.RequiredArgsConstructor\" \"$file\")",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(docker:*)",
+      "Bash(kind version:*)",
+      "Bash(sysctl:*)",
+      "Bash(git restore:*)",
+      "Bash(xargs:*)"
     ]
   },
   "allowedCommands": {

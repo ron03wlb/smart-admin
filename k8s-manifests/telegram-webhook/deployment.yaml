@@ -1,0 +1,134 @@
+---
+# Telegram Webhook Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegram-webhook
+  namespace: smartadmin
+  labels:
+    app: telegram-webhook
+    component: notification
+spec:
+  replicas: 2  # 高可用部署
+  selector:
+    matchLabels:
+      app: telegram-webhook
+  template:
+    metadata:
+      labels:
+        app: telegram-webhook
+        component: notification
+    spec:
+      serviceAccountName: smartadmin-agent
+
+      containers:
+      - name: webhook
+        image: smartadmin/telegram-webhook:latest
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+
+        env:
+        # Telegram Bot 憑證（從 Secret 讀取）
+        - name: TELEGRAM_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-credentials
+              key: bot-token
+
+        - name: TELEGRAM_CHAT_ID
+          valueFrom:
+            secretKeyRef:
+              name: telegram-bot-credentials
+              key: chat-id
+
+        # 健康檢查
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 2
+
+        # 資源限制
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+
+        # 安全上下文
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+      # 重啟策略
+      restartPolicy: Always
+
+---
+# Telegram Webhook Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: telegram-webhook
+  namespace: smartadmin
+  labels:
+    app: telegram-webhook
+spec:
+  type: ClusterIP
+  selector:
+    app: telegram-webhook
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+
+---
+# HorizontalPodAutoscaler（可選，根據負載自動擴展）
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: telegram-webhook-hpa
+  namespace: smartadmin
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: telegram-webhook
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

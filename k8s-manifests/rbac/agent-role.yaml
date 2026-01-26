@@ -1,0 +1,132 @@
+---
+# SmartAdmin AI Agent 最小權限 RBAC 配置
+# 實施 P0-3 安全修復：限制 Agent 在 K8s 中的權限
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: smartadmin-agent
+  namespace: smartadmin
+  labels:
+    app: smartadmin-ai
+    component: agent
+---
+# Agent 基礎角色（僅讀取權限）
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: smartadmin-agent-base
+  namespace: smartadmin
+rules:
+# Pod 訪問（僅讀取）
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+
+# ConfigMap 讀取（用於讀取配置）
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+
+# Secret 讀取（僅限特定 Secret）
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames:
+    - "claude-api-credentials"
+    - "telegram-bot-credentials"
+  verbs: ["get"]
+
+# Service 查詢
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+---
+# Agent Workflow 角色（可創建/查詢 Workflow）
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: smartadmin-agent-workflow
+  namespace: smartadmin
+rules:
+# Argo Workflows 訪問
+- apiGroups: ["argoproj.io"]
+  resources: ["workflows", "workflowtemplates"]
+  verbs: ["get", "list", "create"]  # 可創建新 Workflow，但不能刪除
+
+# Workflow 狀態查詢
+- apiGroups: ["argoproj.io"]
+  resources: ["workflows/status"]
+  verbs: ["get", "watch"]
+---
+# Agent 審計角色（可寫入審計日誌到 PostgreSQL）
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: smartadmin-agent-audit
+  namespace: smartadmin
+rules:
+# 可訪問 PostgreSQL Service（用於寫入審計日誌）
+- apiGroups: [""]
+  resources: ["services"]
+  resourceNames: ["postgres"]
+  verbs: ["get"]
+
+# 可訪問 ConfigMap（讀取 PostgreSQL 連接配置）
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["postgres-config"]
+  verbs: ["get"]
+---
+# RoleBinding: 綁定基礎角色
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: smartadmin-agent-base-binding
+  namespace: smartadmin
+subjects:
+- kind: ServiceAccount
+  name: smartadmin-agent
+  namespace: smartadmin
+roleRef:
+  kind: Role
+  name: smartadmin-agent-base
+  apiGroup: rbac.authorization.k8s.io
+---
+# RoleBinding: 綁定 Workflow 角色
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: smartadmin-agent-workflow-binding
+  namespace: smartadmin
+subjects:
+- kind: ServiceAccount
+  name: smartadmin-agent
+  namespace: smartadmin
+roleRef:
+  kind: Role
+  name: smartadmin-agent-workflow
+  apiGroup: rbac.authorization.k8s.io
+---
+# RoleBinding: 綁定審計角色
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: smartadmin-agent-audit-binding
+  namespace: smartadmin
+subjects:
+- kind: ServiceAccount
+  name: smartadmin-agent
+  namespace: smartadmin
+roleRef:
+  kind: Role
+  name: smartadmin-agent-audit
+  apiGroup: rbac.authorization.k8s.io
+---
+# 禁止的權限清單（文檔化，不應授予）
+# ❌ NEVER 授予以下權限：
+# - pods: delete, deletecollection, patch, update
+# - secrets: create, delete, update (除指定的 resourceNames)
+# - workflows: delete, deletecollection
+# - namespaces: *（任何命名空間級別操作）
+# - clusterroles: *（任何集群級別操作）
+# - nodes: *（任何節點操作）
