@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-01-09 20:57:24 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@Slf4j
 @SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
 public final class HeartBeatRunnable implements Runnable {
 
@@ -44,7 +46,16 @@ public final class HeartBeatRunnable implements Runnable {
     final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     this.projectPath = System.getProperty("user.dir");
     this.serverIps = new ArrayList<>(NetUtil.localIpv4s());
-    this.processNo = Integer.valueOf(runtimeMXBean.getName().split("@")[0]);
+
+    // RuntimeMXBean.getName() 格式为 "pid@hostname"
+    String[] nameParts = runtimeMXBean.getName().split("@");
+    if (nameParts.length < 1) {
+      log.warn("Unexpected runtime name format: {}", runtimeMXBean.getName());
+      this.processNo = 0;
+    } else {
+      this.processNo = Integer.valueOf(nameParts[0]);
+    }
+
     this.processStartTime =
         LocalDateTime.ofInstant(
             Instant.ofEpochMilli(runtimeMXBean.getStartTime()), ZoneId.systemDefault());

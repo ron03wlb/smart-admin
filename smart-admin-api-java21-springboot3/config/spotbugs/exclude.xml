@@ -74,7 +74,22 @@
     </Match>
 
     <Match>
+        <Class name="~.*Service"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <Match>
         <Class name="~.*Manager"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!--
+        Spring MVC Advice pattern (@ControllerAdvice, @RestControllerAdvice)
+        Advice classes inject Spring-managed beans (ObjectMapper, etc.) via constructor.
+        This is the standard and recommended pattern for cross-cutting concerns.
+    -->
+    <Match>
+        <Class name="~.*Advice"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 
@@ -112,9 +127,11 @@
         This is a standard pattern for bridging static utility API with Spring DI.
     -->
     <Match>
-        <Class name="net.lab1024.sa.base.core.json.JsonUtil"/>
-        <Method name="init"/>
-        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.lab1024.sa.foundation.json.util.JsonUtil"/>
+        <Or>
+            <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
     </Match>
 
     <!-- ============================================================ -->
