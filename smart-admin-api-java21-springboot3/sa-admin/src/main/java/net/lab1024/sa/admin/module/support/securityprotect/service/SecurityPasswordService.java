@@ -1,8 +1,8 @@
 package net.lab1024.sa.admin.module.support.securityprotect.service;
 
+import io.vavr.control.Option;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.support.securityprotect.dao.PasswordLogDao;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.PasswordLogEntity;
@@ -36,12 +36,11 @@ public class SecurityPasswordService {
    * @return 校验结果
    */
   public ResponseDTO<String> validatePasswordComplexity(String password) {
-    Optional<String> errorMsg =
-        passwordComplexityService.validateComplexity(
-            password, securityConfigProvider.isPasswordComplexityEnabled());
-    return errorMsg
-        .<ResponseDTO<String>>map(ResponseDTO::userErrorParam)
-        .orElseGet(ResponseDTO::ok);
+    Option<String> errorMsg =
+        Option.ofOptional(
+            passwordComplexityService.validateComplexity(
+                password, securityConfigProvider.isPasswordComplexityEnabled()));
+    return errorMsg.map(ResponseDTO::<String>userErrorParam).getOrElse(() -> ResponseDTO.ok());
   }
 
   /**

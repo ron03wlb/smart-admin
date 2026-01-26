@@ -55,7 +55,7 @@ public class RoleMenuService {
       roleMenuEntity.setMenuId(menuId);
       roleMenuEntityList.add(roleMenuEntity);
     }
-    roleMenuManager.updateRoleMenu(roleMenuUpdateForm.getRoleId(), roleMenuEntityList);
+    roleMenuManager.updateRoleMenuTransaction(roleMenuUpdateForm.getRoleId(), roleMenuEntityList);
     return ResponseDTO.ok();
   }
 

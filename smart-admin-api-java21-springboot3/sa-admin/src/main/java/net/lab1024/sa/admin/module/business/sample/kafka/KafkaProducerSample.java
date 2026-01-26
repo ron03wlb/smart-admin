@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin.module.business.sample.kafka;
 
-import jakarta.annotation.Resource;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.mq.kafka.constant.KafkaConst;
 import net.lab1024.sa.foundation.mq.kafka.core.KafkaProducerService;
@@ -35,10 +35,11 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnBean(KafkaProducerService.class)
 public class KafkaProducerSample {
 
-  @Resource private KafkaProducerService kafkaProducerService;
+  private final KafkaProducerService kafkaProducerService;
 
   /**
    * 异步发送示例消息

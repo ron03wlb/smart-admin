@@ -1,5 +1,6 @@
 package net.lab1024.sa.foundation.apiencrypt.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.lab1024.sa.foundation.apiencrypt.advice.DecryptRequestAdvice;
 import net.lab1024.sa.foundation.apiencrypt.advice.EncryptResponseAdvice;
 import net.lab1024.sa.foundation.apiencrypt.service.ApiEncryptService;
@@ -32,13 +33,15 @@ public class ApiEncryptAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(DecryptRequestAdvice.class)
-  public DecryptRequestAdvice decryptRequestAdvice() {
-    return new DecryptRequestAdvice();
+  public DecryptRequestAdvice decryptRequestAdvice(
+      ApiEncryptService apiEncryptService, ObjectMapper objectMapper) {
+    return new DecryptRequestAdvice(apiEncryptService, objectMapper);
   }
 
   @Bean
   @ConditionalOnMissingBean(EncryptResponseAdvice.class)
-  public EncryptResponseAdvice encryptResponseAdvice() {
-    return new EncryptResponseAdvice();
+  public EncryptResponseAdvice encryptResponseAdvice(
+      ApiEncryptService apiEncryptService, ObjectMapper objectMapper) {
+    return new EncryptResponseAdvice(apiEncryptService, objectMapper);
   }
 }

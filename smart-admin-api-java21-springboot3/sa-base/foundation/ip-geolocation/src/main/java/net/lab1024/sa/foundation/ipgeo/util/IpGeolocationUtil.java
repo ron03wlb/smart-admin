@@ -51,8 +51,10 @@ public class IpGeolocationUtil {
   /**
    * 自定义解析ip地址
    *
+   * <p>注意：此方法吞沒異常並返回空列表，以避免 IP 解析失敗影響業務流程
+   *
    * @param ipStr ipStr
-   * @return 返回结果例 [河南省, 洛阳市, 洛龙区]
+   * @return 返回结果例 [河南省, 洛阳市, 洛龙区]，解析失敗返回空列表
    */
   public static List<String> getRegionList(String ipStr) {
     List<String> regionList = new ArrayList<>();
@@ -65,7 +67,7 @@ public class IpGeolocationUtil {
       String[] split = region.split("\\|");
       regionList.addAll(Arrays.asList(split));
     } catch (Exception e) {
-      log.error("解析ip地址出错", e);
+      log.warn("解析IP地址失敗 - ip: {}, 返回空列表", ipStr, e);
     }
     return regionList;
   }
@@ -73,8 +75,10 @@ public class IpGeolocationUtil {
   /**
    * 自定义解析ip地址
    *
+   * <p>注意：此方法吞沒異常並返回空字符串，以避免 IP 解析失敗影響業務流程
+   *
    * @param ipStr ipStr
-   * @return 返回结果例 河南省|洛阳市|洛龙区
+   * @return 返回结果例 河南省|洛阳市|洛龙区，解析失敗返回空字符串
    */
   public static String getRegion(String ipStr) {
     try {
@@ -84,7 +88,7 @@ public class IpGeolocationUtil {
       String finalIpStr = ipStr.trim();
       return IP_SEARCHER.get().search(finalIpStr);
     } catch (Exception e) {
-      log.error("解析ip地址出错", e);
+      log.warn("解析IP地址失敗 - ip: {}, 返回空字符串", ipStr, e);
       return StringConst.EMPTY;
     }
   }

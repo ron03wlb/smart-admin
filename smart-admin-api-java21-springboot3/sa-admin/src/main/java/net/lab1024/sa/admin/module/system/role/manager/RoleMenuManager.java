@@ -28,7 +28,7 @@ public class RoleMenuManager extends ServiceImpl<RoleMenuDao, RoleMenuEntity> {
 
   /** 更新角色权限 */
   @Transactional(rollbackFor = Throwable.class)
-  public void updateRoleMenu(Long roleId, List<RoleMenuEntity> roleMenuEntityList) {
+  public void updateRoleMenuTransaction(Long roleId, List<RoleMenuEntity> roleMenuEntityList) {
     // 根据角色ID删除菜单权限
     roleMenuDao.deleteByRoleId(roleId);
     // 批量添加菜单权限

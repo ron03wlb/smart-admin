@@ -1,11 +1,11 @@
 package net.lab1024.sa.admin.module.business.sample.kafka;
 
-import jakarta.annotation.Resource;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.mq.kafka.batch.BatchSendResult;
 import net.lab1024.sa.foundation.mq.kafka.batch.BatchSendResult.FailedMessage;
@@ -47,13 +47,14 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnBean(KafkaProducerService.class)
 public class KafkaBatchProducerSample {
 
   /** 默认同步发送超时时间（毫秒） */
   private static final long DEFAULT_TIMEOUT_MS = 30000;
 
-  @Resource private KafkaProducerService kafkaProducerService;
+  private final KafkaProducerService kafkaProducerService;
 
   /**
    * 异步批量发送示例消息

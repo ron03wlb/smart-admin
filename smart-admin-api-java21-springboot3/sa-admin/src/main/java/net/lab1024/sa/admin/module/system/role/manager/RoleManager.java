@@ -33,7 +33,7 @@ public class RoleManager extends ServiceImpl<RoleDao, RoleEntity> {
    * @param roleId 角色ID
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void deleteRoleWithCascade(Long roleId) {
+  public void deleteRoleWithCascadeTransaction(Long roleId) {
     // 删除角色
     roleDao.deleteById(roleId);
     // 删除角色菜单关联
@@ -48,7 +48,7 @@ public class RoleManager extends ServiceImpl<RoleDao, RoleEntity> {
    * @param roleEntity 角色实体
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void updateRole(RoleEntity roleEntity) {
+  public void updateRoleTransaction(RoleEntity roleEntity) {
     roleDao.updateById(roleEntity);
   }
 }

@@ -3,12 +3,12 @@ package net.lab1024.sa.admin.module.business.category.service;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.vavr.control.Option;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -41,15 +41,15 @@ public class CategoryQueryService {
    * @param categoryId
    * @return 可能 null
    */
-  public Optional<CategoryEntity> queryCategory(Long categoryId) {
+  public Option<CategoryEntity> queryCategory(Long categoryId) {
     if (null == categoryId) {
-      return Optional.empty();
+      return Option.none();
     }
     CategoryEntity entity = categoryCacheManager.queryCategory(categoryId);
     if (null == entity || entity.getDeletedFlag()) {
-      return Optional.empty();
+      return Option.none();
     }
-    return Optional.of(entity);
+    return Option.of(entity);
   }
 
   /** 根据 类目id集合 查询未删除的类目集合 */

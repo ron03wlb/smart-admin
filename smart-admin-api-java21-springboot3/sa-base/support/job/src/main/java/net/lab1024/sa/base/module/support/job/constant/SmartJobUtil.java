@@ -173,11 +173,17 @@ public class SmartJobUtil {
   /**
    * 获取当前 Java 应用程序的进程id
    *
-   * @return
+   * <p>RuntimeMXBean.getName() 格式为 "pid@hostname"
+   *
+   * @return 进程ID，如果无法解析则返回 "unknown"
    */
   public static String getProcessId() {
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-    return runtime.getName().split("@")[0];
+    String[] nameParts = runtime.getName().split("@");
+    if (nameParts.length < 1) {
+      return "unknown";
+    }
+    return nameParts[0];
   }
 
   /** 根据className 判断job class */

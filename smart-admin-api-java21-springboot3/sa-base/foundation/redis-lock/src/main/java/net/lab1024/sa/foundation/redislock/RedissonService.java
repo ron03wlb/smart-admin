@@ -2,11 +2,11 @@ package net.lab1024.sa.foundation.redislock;
 
 import java.time.Duration;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RIdGenerator;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,16 +17,12 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RedissonService {
 
-  @Autowired private final RedissonClient redissonClient;
+  private final RedissonClient redissonClient;
 
   private final LockService lockService;
-
-  public RedissonService(RedissonClient redissonClient, LockService lockService) {
-    this.redissonClient = redissonClient;
-    this.lockService = lockService;
-  }
 
   public RedissonClient getRedissonClient() {
     return redissonClient;

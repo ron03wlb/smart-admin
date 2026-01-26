@@ -1,7 +1,9 @@
 package net.lab1024.sa.foundation.apiencrypt.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.foundation.apiencrypt.service.ApiEncryptService;
 import net.lab1024.sa.foundation.domain.enumeration.DataTypeEnum;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class SmartEncryptResponseAdvice extends EncryptResponseAdvice {
+
+  public SmartEncryptResponseAdvice(
+      ApiEncryptService apiEncryptService, ObjectMapper objectMapper) {
+    super(apiEncryptService, objectMapper);
+  }
 
   @Override
   @SuppressWarnings("unchecked")

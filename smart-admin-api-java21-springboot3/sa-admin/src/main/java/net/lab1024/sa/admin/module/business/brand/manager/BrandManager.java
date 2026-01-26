@@ -25,7 +25,7 @@ public class BrandManager {
    * @param entity Brand entity
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void saveBrand(BrandEntity entity) {
+  public void saveBrandTransaction(BrandEntity entity) {
     entity.setDeletedFlag(false);
     brandDao.insert(entity);
   }
@@ -36,7 +36,7 @@ public class BrandManager {
    * @param entity Brand entity
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void updateBrand(BrandEntity entity) {
+  public void updateBrandTransaction(BrandEntity entity) {
     brandDao.updateById(entity);
   }
 
@@ -46,7 +46,7 @@ public class BrandManager {
    * @param brandIdList Brand ID list
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void batchDelete(java.util.List<Long> brandIdList) {
+  public void batchDeleteTransaction(java.util.List<Long> brandIdList) {
     BrandEntity updateEntity = new BrandEntity();
     updateEntity.setDeletedFlag(true);
     brandDao.update(

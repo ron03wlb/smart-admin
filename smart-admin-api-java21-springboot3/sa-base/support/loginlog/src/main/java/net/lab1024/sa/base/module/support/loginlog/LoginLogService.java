@@ -38,16 +38,23 @@ public class LoginLogService {
   }
 
   /**
+   * 记录登录日志
+   *
+   * <p>注意：此方法吞沒異常以確保登錄日誌失敗不會影響主要登錄流程
+   *
+   * @param loginLogEntity 登錄日誌實體
    * @author 卓大
-   * @description 添加
    */
   public void log(LoginLogEntity loginLogEntity) {
     try {
       loginLogDao.insert(loginLogEntity);
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(
+          "保存登錄日誌失敗 - userId: {}, userType: {}, loginIp: {}",
+          loginLogEntity.getUserId(),
+          loginLogEntity.getUserType(),
+          loginLogEntity.getLoginIp(),
+          e);
     }
   }
 

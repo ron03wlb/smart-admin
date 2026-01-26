@@ -3,6 +3,7 @@ package net.lab1024.sa.admin.module.system.support;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.job.api.SmartJobService;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobAddForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobEnabledUpdateForm;
@@ -20,7 +21,6 @@ import net.lab1024.sa.foundation.domain.request.RequestUser;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.repeatsubmit.annotation.RepeatSubmit;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +37,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = SwaggerTagConst.Support.JOB)
 @RestController
+@RequiredArgsConstructor
 @ConditionalOnBean(SmartJobAutoConfiguration.class)
 public class AdminSmartJobController extends SupportBaseController {
 
-  @Autowired private SmartJobService jobService;
+  private final SmartJobService jobService;
 
   @Operation(summary = "定时任务-立即执行 @huke")
   @PostMapping("/job/execute")

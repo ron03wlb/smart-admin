@@ -2,12 +2,12 @@ package net.lab1024.sa.admin.module.business.goods.service;
 
 import cn.idev.excel.FastExcel;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.vavr.control.Option;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,15 +59,15 @@ public class GoodsService {
   private final DictService dictService;
 
   /** 查询未删除的类目（直接调用 Manager，避免 Service 互调） */
-  private Optional<CategoryEntity> queryCategory(Long categoryId) {
+  private Option<CategoryEntity> queryCategory(Long categoryId) {
     if (categoryId == null) {
-      return Optional.empty();
+      return Option.none();
     }
     CategoryEntity entity = categoryCacheManager.queryCategory(categoryId);
     if (entity == null || entity.getDeletedFlag()) {
-      return Optional.empty();
+      return Option.none();
     }
-    return Optional.of(entity);
+    return Option.of(entity);
   }
 
   /** 查询类目名称（直接调用 Manager，避免 Service 互调） */
@@ -120,8 +120,8 @@ public class GoodsService {
   private ResponseDTO<String> checkGoods(GoodsAddForm addForm) {
     // 校验类目id
     Long categoryId = addForm.getCategoryId();
-    Optional<CategoryEntity> optional = this.queryCategory(categoryId);
-    if (!optional.isPresent()
+    Option<CategoryEntity> optional = this.queryCategory(categoryId);
+    if (!optional.isDefined()
         || !CategoryTypeEnum.GOODS.equalsValue(optional.get().getCategoryType())) {
       return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST, "商品类目不存在~");
     }

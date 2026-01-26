@@ -28,7 +28,7 @@ public class EmployeeManager extends ServiceImpl<EmployeeDao, EmployeeEntity> {
 
   /** 保存员工 */
   @Transactional(rollbackFor = Throwable.class)
-  public void saveEmployee(EmployeeEntity employee, List<Long> roleIdList) {
+  public void saveEmployeeTransaction(EmployeeEntity employee, List<Long> roleIdList) {
     // 保存员工 获得id
     employeeDao.insert(employee);
 
@@ -42,7 +42,7 @@ public class EmployeeManager extends ServiceImpl<EmployeeDao, EmployeeEntity> {
 
   /** 更新员工 */
   @Transactional(rollbackFor = Throwable.class)
-  public void updateEmployee(EmployeeEntity employee, List<Long> roleIdList) {
+  public void updateEmployeeTransaction(EmployeeEntity employee, List<Long> roleIdList) {
     // 保存员工 获得id
     employeeDao.updateById(employee);
 
@@ -56,12 +56,13 @@ public class EmployeeManager extends ServiceImpl<EmployeeDao, EmployeeEntity> {
         roleIdList.stream()
             .map(e -> new RoleEmployeeEntity(e, employee.getEmployeeId()))
             .collect(Collectors.toList());
-    this.updateEmployeeRole(employee.getEmployeeId(), roleEmployeeList);
+    this.updateEmployeeRoleTransaction(employee.getEmployeeId(), roleEmployeeList);
   }
 
   /** 更新员工角色 */
   @Transactional(rollbackFor = Throwable.class)
-  public void updateEmployeeRole(Long employeeId, List<RoleEmployeeEntity> roleEmployeeList) {
+  public void updateEmployeeRoleTransaction(
+      Long employeeId, List<RoleEmployeeEntity> roleEmployeeList) {
 
     roleEmployeeDao.deleteByEmployeeId(employeeId);
 

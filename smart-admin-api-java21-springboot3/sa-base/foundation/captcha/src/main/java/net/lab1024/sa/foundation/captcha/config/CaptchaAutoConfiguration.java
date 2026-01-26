@@ -1,7 +1,6 @@
 package net.lab1024.sa.foundation.captcha.config;
 
-import lombok.RequiredArgsConstructor;
-
+import net.lab1024.sa.foundation.cache.CacheService;
 import net.lab1024.sa.foundation.captcha.CaptchaService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,11 +30,12 @@ public class CaptchaAutoConfiguration {
    *
    * <p>如果应用程序已经定义了 CaptchaService Bean，则不会创建此 Bean。
    *
+   * @param cacheService 缓存服务，用于存储验证码
    * @return CaptchaService 验证码服务实例
    */
   @Bean
   @ConditionalOnMissingBean(CaptchaService.class)
-  public CaptchaService captchaService() {
-    return new CaptchaService();
+  public CaptchaService captchaService(CacheService cacheService) {
+    return new CaptchaService(cacheService);
   }
 }

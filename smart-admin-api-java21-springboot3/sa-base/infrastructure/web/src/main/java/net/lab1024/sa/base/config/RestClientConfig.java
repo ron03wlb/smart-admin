@@ -1,12 +1,11 @@
-package net.lab1024.sa.foundation.core.config;
-
-import lombok.RequiredArgsConstructor;
+package net.lab1024.sa.base.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.TlsConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClients;

@@ -1,10 +1,10 @@
 package net.lab1024.sa.base.module.support.job.sample;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.config.ConfigDao;
 import net.lab1024.sa.base.module.support.config.domain.ConfigEntity;
 import net.lab1024.sa.base.module.support.job.core.SmartJob;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SmartJobSample2 implements SmartJob {
 
-  @Autowired private ConfigDao configDao;
+  private final ConfigDao configDao;
 
   /**
    * 定时任务示例 需要事务时 添加 @Transactional 注解

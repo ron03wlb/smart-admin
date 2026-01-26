@@ -107,11 +107,12 @@ public class SmartReloadRunnable implements Runnable {
       }
     } catch (ReflectiveOperationException | RuntimeException throwable) {
       StringWriter sw = new StringWriter();
-      PrintWriter pw = new PrintWriter(sw);
-      throwable.printStackTrace(pw);
+      try (PrintWriter pw = new PrintWriter(sw)) {
+        throwable.printStackTrace(pw);
+      }
 
       result.setResult(false);
-      result.setException(throwable.toString());
+      result.setException(sw.toString());
     }
     return result;
   }

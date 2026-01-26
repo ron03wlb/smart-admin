@@ -83,7 +83,7 @@ public class NoticeService {
       noticeEntity.setPublishTime(LocalDateTime.now());
     }
     // 保存数据
-    noticeManager.save(noticeEntity, addForm.getVisibleRangeList());
+    noticeManager.saveTransaction(noticeEntity, addForm.getVisibleRangeList());
     // 记录数据追踪
     dataTracerService.insert(noticeEntity.getNoticeId(), DataTracerTypeEnum.OA_NOTICE);
     return ResponseDTO.ok();
@@ -166,7 +166,8 @@ public class NoticeService {
 
     // 更新
     NoticeEntity noticeEntity = SmartBeanUtil.copy(updateForm, NoticeEntity.class);
-    noticeManager.update(oldNoticeEntity, noticeEntity, updateForm.getVisibleRangeList());
+    noticeManager.updateTransaction(
+        oldNoticeEntity, noticeEntity, updateForm.getVisibleRangeList());
     // 记录数据追踪
     dataTracerService.update(
         noticeEntity.getNoticeId(), DataTracerTypeEnum.OA_NOTICE, oldNoticeEntity, noticeEntity);

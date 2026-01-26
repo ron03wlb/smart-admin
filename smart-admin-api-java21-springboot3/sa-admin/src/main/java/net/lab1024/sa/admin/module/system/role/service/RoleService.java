@@ -59,7 +59,7 @@ public class RoleService {
       return ResponseDTO.error(UserErrorCode.ALREADY_EXIST, "该角色下存在员工，无法删除");
     }
     // 委托给 Manager 层处理事务性删除操作
-    roleManager.deleteRoleWithCascade(roleId);
+    roleManager.deleteRoleWithCascadeTransaction(roleId);
     return ResponseDTO.ok();
   }
 
@@ -83,7 +83,7 @@ public class RoleService {
 
     RoleEntity roleEntity = SmartBeanUtil.copy(roleUpdateForm, RoleEntity.class);
     // 委托给 Manager 层处理事务性更新操作
-    roleManager.updateRole(roleEntity);
+    roleManager.updateRoleTransaction(roleEntity);
     return ResponseDTO.ok();
   }
 

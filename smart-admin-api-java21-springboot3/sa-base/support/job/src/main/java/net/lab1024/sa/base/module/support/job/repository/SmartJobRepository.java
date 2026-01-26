@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.job.repository;
 
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity;
 import net.lab1024.sa.base.module.support.job.repository.domain.SmartJobLogEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 2024/6/22 22:28
  */
 @Service
+@RequiredArgsConstructor
 public class SmartJobRepository {
 
-  @Autowired private SmartJobDao jobDao;
+  private final SmartJobDao jobDao;
 
-  @Autowired private SmartJobLogDao jobLogDao;
+  private final SmartJobLogDao jobLogDao;
 
   public SmartJobDao getJobDao() {
     return jobDao;

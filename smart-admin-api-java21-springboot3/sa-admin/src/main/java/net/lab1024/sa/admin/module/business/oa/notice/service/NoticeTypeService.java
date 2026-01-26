@@ -1,8 +1,8 @@
 package net.lab1024.sa.admin.module.business.oa.notice.service;
 
 import cn.hutool.core.util.StrUtil;
+import io.vavr.control.Option;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeTypeDao;
@@ -70,9 +70,12 @@ public class NoticeTypeService {
 
     List<NoticeTypeEntity> noticeTypeEntityList = noticeTypeDao.selectList(null);
     if (!CollectionUtils.isEmpty(noticeTypeEntityList)) {
-      Optional<NoticeTypeEntity> optionalNoticeTypeEntity =
-          noticeTypeEntityList.stream().filter(e -> e.getNoticeTypeName().equals(name)).findFirst();
-      if (optionalNoticeTypeEntity.isPresent()
+      Option<NoticeTypeEntity> optionalNoticeTypeEntity =
+          Option.ofOptional(
+              noticeTypeEntityList.stream()
+                  .filter(e -> e.getNoticeTypeName().equals(name))
+                  .findFirst());
+      if (optionalNoticeTypeEntity.isDefined()
           && !optionalNoticeTypeEntity.get().getNoticeTypeId().equals(noticeTypeId)) {
         return ResponseDTO.userErrorParam("类型名称已经存在");
       }

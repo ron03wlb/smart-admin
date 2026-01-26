@@ -57,7 +57,7 @@ public class BrandService {
     }
 
     BrandEntity entity = SmartBeanUtil.copy(addForm, BrandEntity.class);
-    brandManager.saveBrand(entity);
+    brandManager.saveBrandTransaction(entity);
     return ResponseDTO.ok();
   }
 
@@ -82,7 +82,7 @@ public class BrandService {
     }
 
     BrandEntity entity = SmartBeanUtil.copy(updateForm, BrandEntity.class);
-    brandManager.updateBrand(entity);
+    brandManager.updateBrandTransaction(entity);
     return ResponseDTO.ok();
   }
 
@@ -97,7 +97,7 @@ public class BrandService {
       return ResponseDTO.userErrorParam("Brand ID list cannot be empty");
     }
 
-    brandManager.batchDelete(brandIdList);
+    brandManager.batchDeleteTransaction(brandIdList);
     return ResponseDTO.ok();
   }
 

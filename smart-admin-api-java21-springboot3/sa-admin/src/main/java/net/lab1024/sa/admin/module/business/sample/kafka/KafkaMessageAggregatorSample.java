@@ -2,7 +2,7 @@ package net.lab1024.sa.admin.module.business.sample.kafka;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.mq.kafka.batch.MessageAggregator;
 import net.lab1024.sa.foundation.mq.kafka.constant.KafkaConst;
@@ -68,6 +68,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnBean(KafkaProducerService.class)
 @ConditionalOnProperty(
     prefix = "smart.kafka.batch.aggregate",
@@ -81,7 +82,7 @@ public class KafkaMessageAggregatorSample {
   /** 聚合超时时间（毫秒，超时后强制发送已聚合的消息） */
   private static final long AGGREGATE_TIMEOUT_MS = 5000;
 
-  @Resource private KafkaProducerService kafkaProducerService;
+  private final KafkaProducerService kafkaProducerService;
 
   /** 消息聚合器 */
   private MessageAggregator<String> messageAggregator;

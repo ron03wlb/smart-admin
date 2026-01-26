@@ -1,8 +1,8 @@
 package net.lab1024.sa.admin.module.business.category.service;
 
+import io.vavr.control.Option;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.category.dao.CategoryDao;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
@@ -33,15 +33,15 @@ public class CategoryService {
   private final CategoryCacheManager categoryCacheManager;
 
   /** 查询未删除的类目（直接调用 Manager，避免 Service 互调） */
-  private Optional<CategoryEntity> queryCategory(Long categoryId) {
+  private Option<CategoryEntity> queryCategory(Long categoryId) {
     if (categoryId == null) {
-      return Optional.empty();
+      return Option.none();
     }
     CategoryEntity entity = categoryCacheManager.queryCategory(categoryId);
     if (entity == null || entity.getDeletedFlag()) {
-      return Optional.empty();
+      return Option.none();
     }
-    return Optional.of(entity);
+    return Option.of(entity);
   }
 
   /** 检查是否有未删除的子类目 */
@@ -76,8 +76,8 @@ public class CategoryService {
   public ResponseDTO<String> update(CategoryUpdateForm updateForm) {
     // 校验类目
     Long categoryId = updateForm.getCategoryId();
-    Optional<CategoryEntity> optional = this.queryCategory(categoryId);
-    if (!optional.isPresent()) {
+    Option<CategoryEntity> optional = this.queryCategory(categoryId);
+    if (!optional.isDefined()) {
       return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST);
     }
     CategoryEntity categoryEntity = SmartBeanUtil.copy(updateForm, CategoryEntity.class);
@@ -111,8 +111,8 @@ public class CategoryService {
         return ResponseDTO.userErrorParam("父级类目怎么和自己相同了");
       }
       if (!Objects.equals(parentId, NumberUtils.LONG_ZERO)) {
-        Optional<CategoryEntity> optional = this.queryCategory(parentId);
-        if (!optional.isPresent()) {
+        Option<CategoryEntity> optional = this.queryCategory(parentId);
+        if (!optional.isDefined()) {
           return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST, "父级类目不存在~");
         }
 
@@ -148,8 +148,8 @@ public class CategoryService {
 
   /** 查询 类目详情 */
   public ResponseDTO<CategoryVO> queryDetail(Long categoryId) {
-    Optional<CategoryEntity> optional = this.queryCategory(categoryId);
-    if (!optional.isPresent()) {
+    Option<CategoryEntity> optional = this.queryCategory(categoryId);
+    if (!optional.isDefined()) {
       return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST);
     }
     CategoryVO adminVO = SmartBeanUtil.copy(optional.get(), CategoryVO.class);
@@ -172,8 +172,8 @@ public class CategoryService {
 
   /** 删除类目 如果有未删除的子类 则无法删除 */
   public ResponseDTO<String> delete(Long categoryId) {
-    Optional<CategoryEntity> optional = this.queryCategory(categoryId);
-    if (!optional.isPresent()) {
+    Option<CategoryEntity> optional = this.queryCategory(categoryId);
+    if (!optional.isDefined()) {
       return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST);
     }
 

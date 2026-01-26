@@ -23,7 +23,8 @@ public class NoticeManager {
 
   /** 保存（事务管理，仅操作 DAO） */
   @Transactional(rollbackFor = Throwable.class)
-  public void save(NoticeEntity noticeEntity, List<NoticeVisibleRangeForm> visibleRangeFormList) {
+  public void saveTransaction(
+      NoticeEntity noticeEntity, List<NoticeVisibleRangeForm> visibleRangeFormList) {
     noticeDao.insert(noticeEntity);
     Long noticeId = noticeEntity.getNoticeId();
     // 保存可见范围
@@ -35,7 +36,7 @@ public class NoticeManager {
 
   /** 更新（事务管理，仅操作 DAO） */
   @Transactional(rollbackFor = Throwable.class)
-  public void update(
+  public void updateTransaction(
       NoticeEntity old, NoticeEntity noticeEntity, List<NoticeVisibleRangeForm> visibleRangeList) {
     noticeDao.updateById(noticeEntity);
     Long noticeId = noticeEntity.getNoticeId();

@@ -6,6 +6,7 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
+import io.vavr.control.Option;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -321,7 +321,12 @@ public class LoginService implements StpInterface {
       // 如果是 万能密码 登录的用户
       String employeeIdStr;
       if (loginId.startsWith(SUPER_PASSWORD_LOGIN_ID_PREFIX)) {
-        employeeIdStr = loginId.split(StringConst.COLON)[2];
+        String[] parts = loginId.split(StringConst.COLON);
+        if (parts.length < 3) {
+          log.error("Invalid super password loginId format: {}", loginId);
+          return null;
+        }
+        employeeIdStr = parts[2];
       } else {
         employeeIdStr = loginId.substring(2);
       }
@@ -437,12 +442,19 @@ public class LoginService implements StpInterface {
 
     // 校验验证码发送时间，60秒内不能重复发生
     String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeEntity.getEmployeeId();
-    Optional<String> emailCodeOpt =
-        cacheService.get(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class);
-    String emailCode = emailCodeOpt.orElse(null);
+    Option<String> emailCodeOpt =
+        Option.ofOptional(
+            cacheService.get(
+                CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class));
+    String emailCode = emailCodeOpt.getOrNull();
     long sendCodeTimeMills = -1;
     if (!SmartStringUtil.isEmpty(emailCode)) {
-      sendCodeTimeMills = NumberUtil.parseLong(emailCode.split(StringConst.UNDERLINE)[1]);
+      String[] codeParts = emailCode.split(StringConst.UNDERLINE);
+      if (codeParts.length < 2) {
+        log.warn("Invalid email code format in cache: {}", emailCode);
+      } else {
+        sendCodeTimeMills = NumberUtil.parseLong(codeParts[1]);
+      }
     }
 
     if (System.currentTimeMillis() - sendCodeTimeMills < 60 * 1000) {
@@ -487,14 +499,22 @@ public class LoginService implements StpInterface {
 
     // 校验验证码
     String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeEntity.getEmployeeId();
-    Optional<String> emailCodeOpt =
-        cacheService.get(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class);
-    String emailCode = emailCodeOpt.orElse(null);
+    Option<String> emailCodeOpt =
+        Option.ofOptional(
+            cacheService.get(
+                CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class));
+    String emailCode = emailCodeOpt.getOrNull();
     if (SmartStringUtil.isEmpty(emailCode)) {
       return ResponseDTO.userErrorParam("邮箱验证码已失效，请重新发送");
     }
 
-    if (!emailCode.split(StringConst.UNDERLINE)[0].equals(loginForm.getEmailCode().trim())) {
+    String[] codeParts = emailCode.split(StringConst.UNDERLINE);
+    if (codeParts.length < 1) {
+      log.error("Invalid email code format in cache: {}", emailCode);
+      return ResponseDTO.userErrorParam("验证码格式错误，请重新发送");
+    }
+
+    if (!codeParts[0].equals(loginForm.getEmailCode().trim())) {
       return ResponseDTO.userErrorParam("邮箱验证码错误，请重新填写");
     }
 

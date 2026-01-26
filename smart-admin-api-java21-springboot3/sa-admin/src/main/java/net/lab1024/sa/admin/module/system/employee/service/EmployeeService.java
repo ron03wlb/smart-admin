@@ -172,7 +172,7 @@ public class EmployeeService {
 
     // 保存数据
     entity.setDeletedFlag(Boolean.FALSE);
-    employeeManager.saveEmployee(entity, employeeAddForm.getRoleIdList());
+    employeeManager.saveEmployeeTransaction(entity, employeeAddForm.getRoleIdList());
 
     return ResponseDTO.ok(randomPassword);
   }
@@ -209,7 +209,7 @@ public class EmployeeService {
     entity.setLoginPwd(null);
 
     // 更新数据
-    employeeManager.updateEmployee(entity, employeeUpdateForm.getRoleIdList());
+    employeeManager.updateEmployeeTransaction(entity, employeeUpdateForm.getRoleIdList());
 
     // 清除员工缓存
     clearLoginEmployeeCache(employeeId);
