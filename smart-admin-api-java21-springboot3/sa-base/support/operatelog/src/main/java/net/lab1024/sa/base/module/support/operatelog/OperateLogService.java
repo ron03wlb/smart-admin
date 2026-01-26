@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.operatelog;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogEntity;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogQueryForm;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogVO;
@@ -20,9 +20,10 @@ import org.springframework.stereotype.Service;
  * @since 2021-12-08 20:48:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class OperateLogService {
 
-  @Resource private OperateLogDao operateLogDao;
+  private final OperateLogDao operateLogDao;
 
   /**
    * @author 罗伊

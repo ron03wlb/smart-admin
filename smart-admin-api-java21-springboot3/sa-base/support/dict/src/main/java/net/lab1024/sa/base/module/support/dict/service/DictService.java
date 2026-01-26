@@ -2,11 +2,11 @@ package net.lab1024.sa.base.module.support.dict.service;
 
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.dict.dao.DictDao;
 import net.lab1024.sa.base.module.support.dict.dao.DictDataDao;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictDataEntity;
@@ -36,15 +36,16 @@ import org.springframework.stereotype.Service;
  * @since 2025-03-25 22:25:04 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class DictService {
 
-  @Resource private DictDao dictDao;
+  private final DictDao dictDao;
 
-  @Resource private DictDataDao dictDataDao;
+  private final DictDataDao dictDataDao;
 
-  @Resource private CacheService cacheService;
+  private final CacheService cacheService;
 
-  @Resource private DictManager dictManager;
+  private final DictManager dictManager;
 
   /** 获取全部数据 */
   public List<DictDataVO> getAll() {

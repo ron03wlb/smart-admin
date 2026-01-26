@@ -3,10 +3,10 @@ package net.lab1024.sa.base.module.support.file.controller;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileDownloadVO;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileUploadVO;
 import net.lab1024.sa.base.module.support.file.service.FileService;
@@ -30,10 +30,11 @@ import org.springframework.web.multipart.MultipartFile;
  * @since 2019年10月11日 15:34:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @RestController
+@RequiredArgsConstructor
 @Tag(name = SwaggerTagConst.Support.FILE)
 public class FileController extends SupportBaseController {
 
-  @Resource private FileService fileService;
+  private final FileService fileService;
 
   @Operation(summary = "文件上传 @author 胡克")
   @PostMapping("/file/upload")

@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.feedback.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.feedback.dao.FeedbackDao;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackAddForm;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackEntity;
@@ -22,9 +22,10 @@ import org.springframework.stereotype.Service;
  * @since 2022-08-11 20:48:09 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class FeedbackService {
 
-  @Resource private FeedbackDao feedbackDao;
+  private final FeedbackDao feedbackDao;
 
   /** 分页查询 */
   public ResponseDTO<PageResult<FeedbackVO>> query(final FeedbackQueryForm queryForm) {

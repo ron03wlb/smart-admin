@@ -5,6 +5,8 @@ import com.google.common.collect.Interners;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberDao;
+import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberRecordDao;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
@@ -21,6 +23,11 @@ import org.springframework.stereotype.Service;
 @Service
 @SuppressWarnings("PMD.LongVariable")
 public class SerialNumberInternService extends SerialNumberBaseService {
+
+  public SerialNumberInternService(
+      SerialNumberRecordDao serialNumberRecordDao, SerialNumberDao serialNumberDao) {
+    super(serialNumberRecordDao, serialNumberDao);
+  }
 
   /** 按照 serialNumberId 进行锁 */
   private static final Interner<String> POOL = Interners.newStrongInterner();

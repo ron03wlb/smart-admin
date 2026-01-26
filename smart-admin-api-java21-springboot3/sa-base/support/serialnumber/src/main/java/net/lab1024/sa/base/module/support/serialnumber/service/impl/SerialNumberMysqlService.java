@@ -2,6 +2,8 @@ package net.lab1024.sa.base.module.support.serialnumber.service.impl;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberDao;
+import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberRecordDao;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
@@ -19,6 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SuppressWarnings("PMD.LongVariable")
 public class SerialNumberMysqlService extends SerialNumberBaseService {
+
+  public SerialNumberMysqlService(
+      SerialNumberRecordDao serialNumberRecordDao, SerialNumberDao serialNumberDao) {
+    super(serialNumberRecordDao, serialNumberDao);
+  }
 
   @Override
   @Transactional(rollbackFor = Throwable.class)

@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.menu.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.menu.domain.form.MenuAddForm;
 import net.lab1024.sa.admin.module.system.menu.domain.form.MenuUpdateForm;
@@ -28,11 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室: 善逸
  * @since 2022-03-06 22:04:37 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_MENU)
 public class MenuController {
 
-  @Resource private MenuService menuService;
+  private final MenuService menuService;
 
   @Operation(summary = "添加菜单 @author 卓大")
   @PostMapping("/menu/add")

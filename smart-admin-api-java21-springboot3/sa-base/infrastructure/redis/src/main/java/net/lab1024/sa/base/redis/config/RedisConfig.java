@@ -1,4 +1,5 @@
 package net.lab1024.sa.base.redis.config;
+nimport lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -25,9 +25,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @since 2021-09-02 20:21:10 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
-  @Resource private RedisConnectionFactory factory;
+  private final RedisConnectionFactory factory;
 
   @Bean
   public RedisTemplate<String, Object> redisTemplate() {

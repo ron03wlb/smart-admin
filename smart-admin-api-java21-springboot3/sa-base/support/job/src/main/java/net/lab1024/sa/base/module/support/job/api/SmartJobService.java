@@ -2,13 +2,13 @@ package net.lab1024.sa.base.module.support.job.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobAddForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobEnabledUpdateForm;
 import net.lab1024.sa.base.module.support.job.api.domain.SmartJobExecuteForm;
@@ -43,13 +43,14 @@ import org.springframework.stereotype.Service;
  */
 @ConditionalOnBean(SmartJobAutoConfiguration.class)
 @Service
+@RequiredArgsConstructor
 public class SmartJobService {
 
-  @Resource private SmartJobDao jobDao;
+  private final SmartJobDao jobDao;
 
-  @Resource private SmartJobLogDao jobLogDao;
+  private final SmartJobLogDao jobLogDao;
 
-  @Resource private SmartJobClientManager jobClientManager;
+  private final SmartJobClientManager jobClientManager;
 
   /**
    * 查询 定时任务详情

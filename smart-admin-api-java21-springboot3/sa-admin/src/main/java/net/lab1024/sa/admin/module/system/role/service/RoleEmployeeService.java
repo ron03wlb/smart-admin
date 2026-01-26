@@ -2,12 +2,12 @@ package net.lab1024.sa.admin.module.system.role.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEntity;
 import net.lab1024.sa.admin.module.system.employee.domain.vo.EmployeeVO;
@@ -34,13 +34,14 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室: 善逸
  * @since 2021-10-22 23:17:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class RoleEmployeeService {
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
-  @Resource private RoleDao roleDao;
-  @Resource private DepartmentDao departmentDao;
-  @Resource private RoleEmployeeManager roleEmployeeManager;
+  private final RoleEmployeeDao roleEmployeeDao;
+  private final RoleDao roleDao;
+  private final DepartmentDao departmentDao;
+  private final RoleEmployeeManager roleEmployeeManager;
 
   /** 批量插入 */
   public void batchInsert(List<RoleEmployeeEntity> roleEmployeeList) {

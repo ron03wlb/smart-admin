@@ -1,12 +1,12 @@
 package net.lab1024.sa.admin.module.system.datascope.service;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.AdminApplication;
 import net.lab1024.sa.admin.module.system.datascope.DataScope;
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
  * @since 2020/11/28 20:59:17 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class DataScopeSqlConfigService {
 
@@ -46,9 +47,9 @@ public class DataScopeSqlConfigService {
 
   private final Map<String, DataScopeSqlConfig> dataScopeMethodMap = new ConcurrentHashMap<>();
 
-  @Resource private DataScopeViewManager dataScopeViewManager;
+  private final DataScopeViewManager dataScopeViewManager;
 
-  @Resource private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
   @PostConstruct
   public void initDataScopeMethodMap() {

@@ -1,8 +1,8 @@
 package net.lab1024.sa.admin.module.system.position.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.position.dao.PositionDao;
 import net.lab1024.sa.admin.module.system.position.domain.entity.PositionEntity;
 import net.lab1024.sa.admin.module.system.position.domain.form.PositionAddForm;
@@ -22,10 +22,11 @@ import org.springframework.stereotype.Service;
  * @author kaiyun
  * @since 2024-06-23 23:31:38 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class PositionService {
 
-  @Resource private PositionDao positionDao;
+  private final PositionDao positionDao;
 
   /**
    * 分页查询

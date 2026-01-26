@@ -3,7 +3,7 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.operatelog.OperateLogService;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogQueryForm;
 import net.lab1024.sa.base.module.support.operatelog.domain.OperateLogVO;
@@ -25,11 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室: 罗伊
  * @since 2021-12-08 20:48:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = SwaggerTagConst.Support.OPERATE_LOG)
 public class AdminOperateLogController extends SupportBaseController {
 
-  @Resource private OperateLogService operateLogService;
+  private final OperateLogService operateLogService;
 
   @Operation(summary = "分页查询 @author 罗伊")
   @PostMapping("/operateLog/page/query")

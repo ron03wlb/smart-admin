@@ -2,7 +2,6 @@ package net.lab1024.sa.base.module.support.serialnumber.service;
 
 import com.google.common.collect.Lists;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,9 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressWarnings({"PMD.LongVariable", "PMD.AvoidInstantiatingObjectsInLoops"})
 public abstract class SerialNumberBaseService implements SerialNumberService {
 
-  @Resource protected SerialNumberRecordDao serialNumberRecordDao;
+  protected final SerialNumberRecordDao serialNumberRecordDao;
 
-  @Resource protected SerialNumberDao serialNumberDao;
+  protected final SerialNumberDao serialNumberDao;
+
+  protected SerialNumberBaseService(
+      SerialNumberRecordDao serialNumberRecordDao, SerialNumberDao serialNumberDao) {
+    this.serialNumberRecordDao = serialNumberRecordDao;
+    this.serialNumberDao = serialNumberDao;
+  }
 
   protected Map<Integer, SerialNumberInfoBO> serialNumberMap = new ConcurrentHashMap<>();
 

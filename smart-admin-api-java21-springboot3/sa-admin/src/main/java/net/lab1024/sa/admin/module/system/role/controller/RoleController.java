@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.role.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleAddForm;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleUpdateForm;
@@ -24,11 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室: 胡克
  * @since 2021-12-14 19:40:28 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_ROLE)
 public class RoleController {
 
-  @Resource private RoleService roleService;
+  private final RoleService roleService;
 
   @Operation(summary = "添加角色 @author 卓大")
   @PostMapping("/role/add")

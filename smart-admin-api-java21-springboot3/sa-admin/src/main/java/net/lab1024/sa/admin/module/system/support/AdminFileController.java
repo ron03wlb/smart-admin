@@ -3,8 +3,8 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.file.domain.form.FileQueryForm;
 import net.lab1024.sa.base.module.support.file.domain.vo.FileVO;
 import net.lab1024.sa.base.module.support.file.service.FileService;
@@ -22,11 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室: 罗伊
  * @since 2019年10月11日 15:34:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = SwaggerTagConst.Support.FILE)
 public class AdminFileController extends SupportBaseController {
 
-  @Resource private FileService fileService;
+  private final FileService fileService;
 
   @Operation(summary = "分页查询 @author 1024创新实验室-主任-卓大")
   @PostMapping("/file/queryPage")

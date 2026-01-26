@@ -1,11 +1,11 @@
 package net.lab1024.sa.admin.module.system.datascope.manager;
 
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.datascope.constant.DataScopeTypeEnum;
 import net.lab1024.sa.admin.module.system.datascope.constant.DataScopeViewTypeEnum;
 import net.lab1024.sa.admin.module.system.department.manager.DepartmentCacheManager;
@@ -24,16 +24,17 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室: 罗伊
  * @since 2020/11/28 20:59:17 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class DataScopeViewManager {
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
-  @Resource private RoleDataScopeDao roleDataScopeDao;
+  private final RoleDataScopeDao roleDataScopeDao;
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private DepartmentCacheManager departmentCacheManager;
+  private final DepartmentCacheManager departmentCacheManager;
 
   /** 获取某人可以查看的所有人员数据 */
   public List<Long> getCanViewEmployeeId(DataScopeViewTypeEnum viewType, Long employeeId) {

@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.loginlog;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogEntity;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogQueryForm;
@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
  * @since 2022/07/22 19:46:23 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class LoginLogService {
 
-  @Resource private LoginLogDao loginLogDao;
+  private final LoginLogDao loginLogDao;
 
   /**
    * @author 卓大

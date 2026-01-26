@@ -5,7 +5,6 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import jakarta.annotation.Resource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.File;
@@ -14,6 +13,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateCodeEnum;
 import net.lab1024.sa.base.module.support.mail.constant.MailTemplateTypeEnum;
@@ -41,14 +41,15 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class MailService {
 
-  @Resource private JavaMailSender javaMailSender;
+  private final JavaMailSender javaMailSender;
 
-  @Resource private MailTemplateDao mailTemplateDao;
+  private final MailTemplateDao mailTemplateDao;
 
-  @Resource private SystemEnvironment systemEnvironment;
+  private final SystemEnvironment systemEnvironment;
 
   @Value("${spring.mail.username}")
   private String clientMail;

@@ -1,6 +1,6 @@
 package net.lab1024.sa.base.module.support.heartbeat.service;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.heartbeat.core.HeartBeatRecord;
 import net.lab1024.sa.base.module.support.heartbeat.core.IHeartBeatRecordHandler;
@@ -17,10 +17,11 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class HeartBeatRecordHandler implements IHeartBeatRecordHandler {
 
-  @Resource private HeartBeatRecordDao heartBeatRecordDao;
+  private final HeartBeatRecordDao heartBeatRecordDao;
 
   /**
    * 心跳日志处理方法

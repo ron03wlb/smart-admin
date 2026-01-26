@@ -1,6 +1,6 @@
 package net.lab1024.sa.admin.config;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.interceptor.AdminInterceptor;
 import net.lab1024.sa.base.swagger.config.SwaggerConfig;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +15,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @since 2021-09-02 20:21:10 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
+@RequiredArgsConstructor
 public class MvcConfig implements WebMvcConfigurer {
 
-  @Resource private AdminInterceptor adminInterceptor;
+  private final AdminInterceptor adminInterceptor;
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {

@@ -5,12 +5,12 @@ import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
-import jakarta.annotation.Resource;
 import java.awt.Color;
 import java.awt.Image;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.cache.CacheService;
 import net.lab1024.sa.foundation.cache.constant.CacheKeyConst;
@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CaptchaService {
 
   /** 验证码过期时间：65秒 */
@@ -63,7 +64,7 @@ public class CaptchaService {
   @Value("${spring.profiles.active:dev}")
   private String activeProfile;
 
-  @Resource private CacheService cacheService;
+  private final CacheService cacheService;
 
   /**
    * 生成图形验证码

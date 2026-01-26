@@ -2,10 +2,10 @@ package net.lab1024.sa.admin.module.business.oa.notice.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.oa.notice.constant.NoticeVisibleRangeDataTypeEnum;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeDao;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.entity.NoticeEntity;
@@ -30,14 +30,15 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-08-12 21:40:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class NoticeEmployeeService {
 
-  @Resource private NoticeDao noticeDao;
+  private final NoticeDao noticeDao;
 
-  @Resource private DepartmentCacheManager departmentCacheManager;
+  private final DepartmentCacheManager departmentCacheManager;
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
   /** 查询我的 通知、公告清单 */
   public ResponseDTO<PageResult<NoticeEmployeeVO>> queryList(

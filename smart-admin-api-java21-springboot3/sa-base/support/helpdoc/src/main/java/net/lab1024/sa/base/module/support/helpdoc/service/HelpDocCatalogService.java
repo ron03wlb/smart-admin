@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.helpdoc.service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocCatalogDao;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao;
 import net.lab1024.sa.base.module.support.helpdoc.domain.entity.HelpDocCatalogEntity;
@@ -22,12 +22,13 @@ import org.springframework.stereotype.Service;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class HelpDocCatalogService {
 
-  @Resource private HelpDocCatalogDao helpDocCatalogDao;
+  private final HelpDocCatalogDao helpDocCatalogDao;
 
-  @Resource private HelpDocDao helpDocDao;
+  private final HelpDocDao helpDocDao;
 
   /**
    * 查询全部目录

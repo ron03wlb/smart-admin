@@ -5,11 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.annotation.NoNeedLogin;
 import net.lab1024.sa.domain.RequestUrlVO;
@@ -28,10 +28,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @since 2022-05-30 21:22:12 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
+@RequiredArgsConstructor
 @Slf4j
 public class UrlConfig {
 
-  @Resource private RequestMappingHandlerMapping requestMappingHandlerMapping;
+  private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
   /** 获取每个方法的请求路径 */
   @Bean

@@ -2,9 +2,9 @@ package net.lab1024.sa.admin.module.system.role.manager;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.menu.domain.entity.MenuEntity;
 import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuVO;
 import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
@@ -20,10 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室: 善逸
  * @since 2022-04-09 19:05:49 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class RoleMenuManager extends ServiceImpl<RoleMenuDao, RoleMenuEntity> {
 
-  @Resource private RoleMenuDao roleMenuDao;
+  private final RoleMenuDao roleMenuDao;
 
   /** 更新角色权限 */
   @Transactional(rollbackFor = Throwable.class)

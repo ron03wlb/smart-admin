@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.business.oa.invoice.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceAddForm;
@@ -31,11 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-06-23 19:32:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.Business.OA_INVOICE)
 public class InvoiceController {
 
-  @Resource private InvoiceService invoiceService;
+  private final InvoiceService invoiceService;
 
   @Operation(summary = "分页查询发票信息 @author 善逸")
   @PostMapping("/oa/invoice/page/query")

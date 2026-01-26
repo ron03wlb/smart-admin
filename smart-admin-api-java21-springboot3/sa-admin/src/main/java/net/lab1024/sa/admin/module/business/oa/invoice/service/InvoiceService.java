@@ -1,9 +1,9 @@
 package net.lab1024.sa.admin.module.business.oa.invoice.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.oa.enterprise.dao.EnterpriseDao;
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseVO;
@@ -13,15 +13,11 @@ import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceEntity;
 import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceQueryForm;
 import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceUpdateForm;
 import net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceVO;
-import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerConst;
-import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * OA发票信息
@@ -29,15 +25,19 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室: 善逸
  * @since 2022-06-23 19:32:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class InvoiceService {
 
-  @Resource private InvoiceDao invoiceDao;
+  private final InvoiceDao invoiceDao;
 
-  @Resource private EnterpriseDao enterpriseDao;
+  private final EnterpriseDao enterpriseDao;
 
-  @Resource private DataTracerService dataTracerService;
+  private final DataTracerService dataTracerService;
+
+  private final net.lab1024.sa.admin.module.business.oa.invoice.manager.InvoiceManager
+      invoiceManager;
 
   /** 分页查询发票信息 */
   public ResponseDTO<PageResult<InvoiceVO>> queryByPage(InvoiceQueryForm queryForm) {
@@ -68,7 +68,6 @@ public class InvoiceService {
   }
 
   /** 新建发票信息 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> createInvoice(InvoiceAddForm createVO) {
     Long enterpriseId = createVO.getEnterpriseId();
     // 校验企业是否存在
@@ -83,18 +82,12 @@ public class InvoiceService {
     if (Objects.nonNull(validateInvoice)) {
       return ResponseDTO.userErrorParam("发票信息账号重复");
     }
-    // 数据插入
-    InvoiceEntity insertInvoice = SmartBeanUtil.copy(createVO, InvoiceEntity.class);
-    invoiceDao.insert(insertInvoice);
-    dataTracerService.addTrace(
-        enterpriseId,
-        DataTracerTypeEnum.OA_ENTERPRISE,
-        "新增发票：" + DataTracerConst.HTML_BR + dataTracerService.getChangeContent(insertInvoice));
+    // 调用 Manager 执行事务
+    invoiceManager.createInvoiceTransaction(createVO, enterpriseId);
     return ResponseDTO.ok();
   }
 
   /** 编辑发票信息 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> updateInvoice(InvoiceUpdateForm updateVO) {
     Long enterpriseId = updateVO.getEnterpriseId();
     // 校验企业是否存在
@@ -115,31 +108,20 @@ public class InvoiceService {
     if (Objects.nonNull(validateInvoice)) {
       return ResponseDTO.userErrorParam("发票信息账号重复");
     }
-    // 数据编辑
-    InvoiceEntity updateInvoice = SmartBeanUtil.copy(updateVO, InvoiceEntity.class);
-    invoiceDao.updateById(updateInvoice);
-    dataTracerService.addTrace(
-        enterpriseId,
-        DataTracerTypeEnum.OA_ENTERPRISE,
-        "更新发票："
-            + DataTracerConst.HTML_BR
-            + dataTracerService.getChangeContent(invoiceDetail, updateInvoice));
+    // 调用 Manager 执行事务
+    invoiceManager.updateInvoiceTransaction(updateVO, invoiceDetail, enterpriseId);
     return ResponseDTO.ok();
   }
 
   /** 删除发票信息 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> deleteInvoice(Long invoiceId) {
     // 校验发票信息是否存在
     InvoiceEntity invoiceDetail = invoiceDao.selectById(invoiceId);
     if (Objects.isNull(invoiceDetail) || invoiceDetail.getDeletedFlag()) {
       return ResponseDTO.userErrorParam("发票信息不存在");
     }
-    invoiceDao.deleteInvoice(invoiceId, Boolean.TRUE);
-    dataTracerService.addTrace(
-        invoiceDetail.getEnterpriseId(),
-        DataTracerTypeEnum.OA_ENTERPRISE,
-        "删除发票：" + DataTracerConst.HTML_BR + dataTracerService.getChangeContent(invoiceDetail));
+    // 调用 Manager 执行事务
+    invoiceManager.deleteInvoiceTransaction(invoiceId, invoiceDetail);
     return ResponseDTO.ok();
   }
 }

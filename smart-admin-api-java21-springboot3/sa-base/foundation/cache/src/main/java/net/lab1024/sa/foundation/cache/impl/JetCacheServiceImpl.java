@@ -1,4 +1,5 @@
 package net.lab1024.sa.foundation.cache.impl;
+nimport lombok.RequiredArgsConstructor;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
@@ -9,7 +10,6 @@ import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import io.lettuce.core.RedisClient;
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
  * @since 2025-01-19 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.CloseResource") // Cache 对象由 cacheMap 管理，生命周期由 Spring 容器控制
 public class JetCacheServiceImpl implements CacheService {
 
@@ -37,10 +38,10 @@ public class JetCacheServiceImpl implements CacheService {
   private static final long DEFAULT_REMOTE_EXPIRE_SECONDS = 2 * 60 * 60;
   private static final int DEFAULT_LOCAL_LIMIT = 1000;
 
-  @Resource private RedisClient redisClient;
+  private final RedisClient redisClient;
 
   /** 缓存 Key 前缀，格式为 {projectName}:{environment}: */
-  @Resource private String cacheKeyPrefix;
+  private final String cacheKeyPrefix;
 
   /** 缓存实例管理器 */
   private final Map<String, Cache<?, ?>> cacheMap = new ConcurrentHashMap<>();

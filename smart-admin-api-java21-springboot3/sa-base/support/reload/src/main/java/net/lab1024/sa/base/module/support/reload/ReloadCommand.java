@@ -1,7 +1,7 @@
 package net.lab1024.sa.base.module.support.reload;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.reload.core.AbstractSmartReloadCommand;
 import net.lab1024.sa.base.module.support.reload.core.domain.SmartReloadItem;
 import net.lab1024.sa.base.module.support.reload.core.domain.SmartReloadResult;
@@ -19,11 +19,12 @@ import org.springframework.stereotype.Component;
  * @since 2015-03-02 19:11:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Component
+@RequiredArgsConstructor
 public class ReloadCommand extends AbstractSmartReloadCommand {
 
-  @Resource private ReloadItemDao reloadItemDao;
+  private final ReloadItemDao reloadItemDao;
 
-  @Resource private ReloadResultDao reloadResultDao;
+  private final ReloadResultDao reloadResultDao;
 
   /**
    * 读取数据库中SmartReload项

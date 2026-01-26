@@ -3,7 +3,6 @@ package net.lab1024.sa.admin.module.system.employee.service;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.support.securityprotect.service.SecurityPasswordService;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEntity;
@@ -42,7 +42,6 @@ import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 员工 service
@@ -50,24 +49,25 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室-主任: 卓大
  * @since 2021-12-29 21:52:46 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class EmployeeService {
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private DepartmentDao departmentDao;
+  private final DepartmentDao departmentDao;
 
-  @Resource private EmployeeManager employeeManager;
+  private final EmployeeManager employeeManager;
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
-  @Resource private DepartmentCacheManager departmentCacheManager;
+  private final DepartmentCacheManager departmentCacheManager;
 
-  @Resource private SecurityPasswordService securityPasswordService;
+  private final SecurityPasswordService securityPasswordService;
 
-  @Resource private LoginManager loginManager;
+  private final LoginManager loginManager;
 
-  @Resource private PositionDao positionDao;
+  private final PositionDao positionDao;
 
   public EmployeeEntity getById(Long employeeId) {
     return employeeDao.selectById(employeeId);
@@ -358,7 +358,6 @@ public class EmployeeService {
   }
 
   /** 更新密码 */
-  @Transactional(rollbackFor = Throwable.class)
   public ResponseDTO<String> updatePassword(
       RequestUser requestUser, EmployeeUpdatePasswordForm updatePasswordForm) {
     Long employeeId = updatePasswordForm.getEmployeeId();
@@ -397,17 +396,14 @@ public class EmployeeService {
       return ResponseDTO.error(passwordRepeatTimes);
     }
 
-    // 更新密码
+    // 更新密码（调用 Manager 执行事务）
     String newEncryptPassword =
         securityPasswordService.getEncryptPwd(
             this.generateSaltPassword(
                 updatePasswordForm.getNewPassword(), employeeEntity.getEmployeeUid()));
-    EmployeeEntity updateEntity = new EmployeeEntity();
-    updateEntity.setEmployeeId(employeeId);
-    updateEntity.setLoginPwd(newEncryptPassword);
-    employeeDao.updateById(updateEntity);
+    employeeManager.updatePasswordTransaction(employeeId, newEncryptPassword);
 
-    // 保存修改密码密码记录
+    // 保存修改密码记录
     securityPasswordService.saveUserChangePasswordLog(
         requestUser, newEncryptPassword, employeeEntity.getLoginPwd());
 

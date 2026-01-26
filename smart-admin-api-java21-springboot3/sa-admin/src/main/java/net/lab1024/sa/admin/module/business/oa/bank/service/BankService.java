@@ -1,9 +1,9 @@
 package net.lab1024.sa.admin.module.business.oa.bank.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.oa.bank.dao.BankDao;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankCreateForm;
@@ -11,17 +11,14 @@ import net.lab1024.sa.admin.module.business.oa.bank.domain.BankEntity;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankQueryForm;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankUpdateForm;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankVO;
+import net.lab1024.sa.admin.module.business.oa.bank.manager.BankManager;
 import net.lab1024.sa.admin.module.business.oa.enterprise.dao.EnterpriseDao;
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.entity.EnterpriseEntity;
-import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerConst;
-import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * OA办公-OA银行信息
@@ -31,13 +28,16 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BankService {
 
-  @Resource private BankDao bankDao;
+  private final BankDao bankDao;
 
-  @Resource private EnterpriseDao enterpriseDao;
+  private final EnterpriseDao enterpriseDao;
 
-  @Resource private DataTracerService dataTracerService;
+  private final DataTracerService dataTracerService;
+
+  private final BankManager bankManager;
 
   /** 分页查询银行信息 */
   public ResponseDTO<PageResult<BankVO>> queryByPage(BankQueryForm queryForm) {
@@ -68,7 +68,6 @@ public class BankService {
   }
 
   /** 新建银行信息 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> createBank(BankCreateForm createVO) {
     Long enterpriseId = createVO.getEnterpriseId();
     // 校验企业是否存在
@@ -83,18 +82,12 @@ public class BankService {
     if (Objects.nonNull(validateBank)) {
       return ResponseDTO.userErrorParam("银行信息账号重复");
     }
-    // 数据插入
-    BankEntity insertBank = SmartBeanUtil.copy(createVO, BankEntity.class);
-    bankDao.insert(insertBank);
-    dataTracerService.addTrace(
-        enterpriseId,
-        DataTracerTypeEnum.OA_ENTERPRISE,
-        "新增银行:" + DataTracerConst.HTML_BR + dataTracerService.getChangeContent(insertBank));
+    // 调用 Manager 执行事务
+    bankManager.createBankTransaction(createVO, enterpriseId);
     return ResponseDTO.ok();
   }
 
   /** 编辑银行信息 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> updateBank(BankUpdateForm updateVO) {
     Long enterpriseId = updateVO.getEnterpriseId();
     // 校验企业是否存在
@@ -115,31 +108,20 @@ public class BankService {
     if (Objects.nonNull(validateBank)) {
       return ResponseDTO.userErrorParam("银行信息账号重复");
     }
-    // 数据编辑
-    BankEntity updateBank = SmartBeanUtil.copy(updateVO, BankEntity.class);
-    bankDao.updateById(updateBank);
-    dataTracerService.addTrace(
-        enterpriseId,
-        DataTracerTypeEnum.OA_ENTERPRISE,
-        "更新银行:"
-            + DataTracerConst.HTML_BR
-            + dataTracerService.getChangeContent(bankDetail, updateBank));
+    // 调用 Manager 执行事务
+    bankManager.updateBankTransaction(updateVO, bankDetail, enterpriseId);
     return ResponseDTO.ok();
   }
 
   /** 删除银行信息 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> deleteBank(Long bankId) {
     // 校验银行信息是否存在
     BankEntity bankDetail = bankDao.selectById(bankId);
     if (Objects.isNull(bankDetail) || bankDetail.getDeletedFlag()) {
       return ResponseDTO.userErrorParam("银行信息不存在");
     }
-    bankDao.deleteBank(bankId, Boolean.TRUE);
-    dataTracerService.addTrace(
-        bankDetail.getEnterpriseId(),
-        DataTracerTypeEnum.OA_ENTERPRISE,
-        "删除银行:" + DataTracerConst.HTML_BR + dataTracerService.getChangeContent(bankDetail));
+    // 调用 Manager 执行事务
+    bankManager.deleteBankTransaction(bankId, bankDetail);
     return ResponseDTO.ok();
   }
 }

@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.employee.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.employee.domain.form.EmployeeAddForm;
 import net.lab1024.sa.admin.module.system.employee.domain.form.EmployeeBatchUpdateDepartmentForm;
@@ -34,13 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室-主任: 卓大
  * @since 2021-12-09 22:57:49 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_EMPLOYEE)
 public class EmployeeController {
 
-  @Resource private EmployeeService employeeService;
+  private final EmployeeService employeeService;
 
-  @Resource private SecurityConfigProvider securityConfigProvider;
+  private final SecurityConfigProvider securityConfigProvider;
 
   @PostMapping("/employee/query")
   @Operation(summary = "员工管理查询 @author 卓大")

@@ -2,11 +2,11 @@ package net.lab1024.sa.base.module.support.codegenerator.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGeneratorConfigForm;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.CodeGeneratorPreviewForm;
 import net.lab1024.sa.base.module.support.codegenerator.domain.form.TableQueryForm;
@@ -34,9 +34,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Tag(name = SwaggerTagConst.Support.CODE_GENERATOR)
 @Controller
+@RequiredArgsConstructor
 public class CodeGeneratorController extends SupportBaseController {
 
-  @Resource private CodeGeneratorService codeGeneratorService;
+  private final CodeGeneratorService codeGeneratorService;
 
   // ------------------- 查询 -------------------
 

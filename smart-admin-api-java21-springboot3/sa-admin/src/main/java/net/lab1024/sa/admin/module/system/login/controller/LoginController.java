@@ -4,9 +4,9 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.admin.module.system.login.domain.LoginForm;
@@ -30,13 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室-主任:卓大
  * @since 2021-12-15 21:05:46 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_LOGIN)
 public class LoginController {
 
-  @Resource private LoginService loginService;
+  private final LoginService loginService;
 
-  @Resource private Level3ProtectConfigService level3ProtectConfigService;
+  private final Level3ProtectConfigService level3ProtectConfigService;
 
   @NoNeedLogin
   @PostMapping("/login")

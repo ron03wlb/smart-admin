@@ -3,7 +3,6 @@ package net.lab1024.sa.admin.module.business.category.service;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.category.domain.dto.CategorySimpleDTO;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
@@ -28,11 +28,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CategoryQueryService {
 
   private static final Long DEFAULT_CATEGORY_PARENT_ID = 0L;
 
-  @Resource private CategoryCacheManager categoryCacheManager;
+  private final CategoryCacheManager categoryCacheManager;
 
   /**
    * 根据 id 查询未删除的类目

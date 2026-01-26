@@ -2,7 +2,6 @@ package net.lab1024.sa.admin.module.business.goods.service;
 
 import cn.idev.excel.FastExcel;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.category.constant.CategoryTypeEnum;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
@@ -23,7 +23,7 @@ import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsQueryForm;
 import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsUpdateForm;
 import net.lab1024.sa.admin.module.business.goods.domain.vo.GoodsExcelVO;
 import net.lab1024.sa.admin.module.business.goods.domain.vo.GoodsVO;
-import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
+import net.lab1024.sa.admin.module.business.goods.manager.GoodsManager;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
 import net.lab1024.sa.base.module.support.dict.service.DictService;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
@@ -33,10 +33,8 @@ import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.json.util.JsonUtil;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
-import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -47,15 +45,18 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GoodsService {
 
-  @Resource private GoodsDao goodsDao;
+  private final GoodsDao goodsDao;
 
-  @Resource private CategoryCacheManager categoryCacheManager;
+  private final CategoryCacheManager categoryCacheManager;
 
-  @Resource private DataTracerService dataTracerService;
+  private final GoodsManager goodsManager;
 
-  @Resource private DictService dictService;
+  private final DataTracerService dataTracerService;
+
+  private final DictService dictService;
 
   /** 查询未删除的类目（直接调用 Manager，避免 Service 互调） */
   private Optional<CategoryEntity> queryCategory(Long categoryId) {
@@ -91,22 +92,18 @@ public class GoodsService {
   }
 
   /** 添加商品 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> add(GoodsAddForm addForm) {
     // 商品校验
     ResponseDTO<String> res = this.checkGoods(addForm);
     if (!res.getOk()) {
       return res;
     }
-    GoodsEntity goodsEntity = SmartBeanUtil.copy(addForm, GoodsEntity.class);
-    goodsEntity.setDeletedFlag(Boolean.FALSE);
-    goodsDao.insert(goodsEntity);
-    dataTracerService.insert(goodsEntity.getGoodsId(), DataTracerTypeEnum.GOODS);
+    // 调用 Manager 执行事务
+    goodsManager.addGoodsTransaction(addForm);
     return ResponseDTO.ok();
   }
 
   /** 更新商品 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> update(GoodsUpdateForm updateForm) {
     // 商品校验
     ResponseDTO<String> res = this.checkGoods(updateForm);
@@ -114,10 +111,8 @@ public class GoodsService {
       return res;
     }
     GoodsEntity originEntity = goodsDao.selectById(updateForm.getGoodsId());
-    GoodsEntity goodsEntity = SmartBeanUtil.copy(updateForm, GoodsEntity.class);
-    goodsDao.updateById(goodsEntity);
-    dataTracerService.update(
-        updateForm.getGoodsId(), DataTracerTypeEnum.GOODS, originEntity, goodsEntity);
+    // 调用 Manager 执行事务
+    goodsManager.updateGoodsTransaction(updateForm, originEntity);
     return ResponseDTO.ok();
   }
 
@@ -135,7 +130,6 @@ public class GoodsService {
   }
 
   /** 删除 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> delete(Long goodsId) {
     GoodsEntity goodsEntity = goodsDao.selectById(goodsId);
     if (goodsEntity == null) {
@@ -146,8 +140,8 @@ public class GoodsService {
       return ResponseDTO.userErrorParam("只有售罄的商品才可以删除");
     }
 
-    batchDelete(Collections.singletonList(goodsId));
-    dataTracerService.batchDelete(Collections.singletonList(goodsId), DataTracerTypeEnum.GOODS);
+    // 调用 Manager 执行事务
+    goodsManager.deleteGoodsTransaction(goodsId);
     return ResponseDTO.ok();
   }
 

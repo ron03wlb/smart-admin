@@ -6,7 +6,6 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.LoginFailEntity;
 import net.lab1024.sa.admin.module.support.securityprotect.service.Level3ProtectConfigService;
@@ -69,37 +69,38 @@ import org.springframework.stereotype.Service;
  * @since 2025-05-03 22:56:34 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class LoginService implements StpInterface {
 
   /** 万能密码的 sa token loginId 前缀 */
   private static final String SUPER_PASSWORD_LOGIN_ID_PREFIX = "S";
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private CaptchaService captchaService;
+  private final CaptchaService captchaService;
 
-  @Resource private ConfigService configService;
+  private final ConfigService configService;
 
-  @Resource private LoginLogService loginLogService;
+  private final LoginLogService loginLogService;
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
-  @Resource private RoleMenuDao roleMenuDao;
+  private final RoleMenuDao roleMenuDao;
 
-  @Resource private SecurityLoginService securityLoginService;
+  private final SecurityLoginService securityLoginService;
 
-  @Resource private SecurityPasswordService protectPasswordService;
+  private final SecurityPasswordService protectPasswordService;
 
-  @Resource private ApiEncryptService apiEncryptService;
+  private final ApiEncryptService apiEncryptService;
 
-  @Resource private Level3ProtectConfigService level3ProtectConfigService;
+  private final Level3ProtectConfigService level3ProtectConfigService;
 
-  @Resource private MailService mailService;
+  private final MailService mailService;
 
-  @Resource private CacheService cacheService;
+  private final CacheService cacheService;
 
-  @Resource private LoginManager loginManager;
+  private final LoginManager loginManager;
 
   /** 获取验证码 */
   public ResponseDTO<CaptchaVO> getCaptcha() {

@@ -2,13 +2,13 @@ package net.lab1024.sa.admin.module.business.oa.notice.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Maps;
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.oa.notice.constant.NoticeVisibleRangeDataTypeEnum;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeDao;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeTypeDao;
@@ -43,20 +43,21 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-08-12 21:40:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class NoticeService {
 
-  @Resource private NoticeDao noticeDao;
+  private final NoticeDao noticeDao;
 
-  @Resource private NoticeManager noticeManager;
+  private final NoticeManager noticeManager;
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private DepartmentDao departmentDao;
+  private final DepartmentDao departmentDao;
 
-  @Resource private NoticeTypeDao noticeTypeDao;
+  private final NoticeTypeDao noticeTypeDao;
 
-  @Resource private DataTracerService dataTracerService;
+  private final DataTracerService dataTracerService;
 
   /** 查询 通知、公告 */
   public PageResult<NoticeVO> query(NoticeQueryForm queryForm) {

@@ -1,6 +1,6 @@
 package net.lab1024.sa.base.module.support.heartbeat.config;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.heartbeat.core.HeartBeatManager;
 import net.lab1024.sa.base.module.support.heartbeat.core.IHeartBeatRecordHandler;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2018/10/9 18:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class HeartBeatConfig {
 
@@ -21,7 +22,7 @@ public class HeartBeatConfig {
   @Value("${heart-beat.interval-seconds}")
   private Long intervalSeconds;
 
-  @Resource private IHeartBeatRecordHandler heartBeatRecordHandler;
+  private final IHeartBeatRecordHandler heartBeatRecordHandler;
 
   @Bean
   public HeartBeatManager heartBeatManager() {

@@ -3,12 +3,12 @@ package net.lab1024.sa.base.module.support.file.service;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.file.constant.FileFolderTypeEnum;
 import net.lab1024.sa.base.module.support.file.dao.FileDao;
 import net.lab1024.sa.base.module.support.file.domain.entity.FileEntity;
@@ -38,18 +38,19 @@ import org.springframework.web.multipart.MultipartFile;
  * @since 2019年10月11日 15:34:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class FileService {
 
   /** 文件名最大长度 */
   private static final int FILE_NAME_MAX_LENGTH = 100;
 
-  @Resource private IFileStorageService fileStorageService;
+  private final IFileStorageService fileStorageService;
 
-  @Resource private FileDao fileDao;
+  private final FileDao fileDao;
 
-  @Resource private FileSecurityService fileSecurityService;
+  private final FileSecurityService fileSecurityService;
 
-  @Resource private SecurityConfigProvider securityConfigProvider;
+  private final SecurityConfigProvider securityConfigProvider;
 
   /**
    * 文件上传服务

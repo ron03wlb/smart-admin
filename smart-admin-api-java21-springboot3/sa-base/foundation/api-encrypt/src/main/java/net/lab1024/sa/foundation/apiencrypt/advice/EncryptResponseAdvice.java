@@ -2,7 +2,7 @@ package net.lab1024.sa.foundation.apiencrypt.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.apiencrypt.annotation.ApiEncrypt;
 import net.lab1024.sa.foundation.apiencrypt.service.ApiEncryptService;
@@ -24,11 +24,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  */
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class EncryptResponseAdvice implements ResponseBodyAdvice<Object> {
 
-  @Resource private ApiEncryptService apiEncryptService;
+  private final ApiEncryptService apiEncryptService;
 
-  @Resource private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Override
   public boolean supports(

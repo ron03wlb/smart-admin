@@ -3,8 +3,8 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.config.ConfigService;
 import net.lab1024.sa.base.module.support.config.domain.ConfigAddForm;
 import net.lab1024.sa.base.module.support.config.domain.ConfigQueryForm;
@@ -25,10 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-03-14 20:46:27 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Tag(name = SwaggerTagConst.Support.CONFIG)
+@RequiredArgsConstructor
 @RestController
 public class AdminConfigController extends SupportBaseController {
 
-  @Resource private ConfigService configService;
+  private final ConfigService configService;
 
   @Operation(summary = "分页查询系统配置 @author 卓大")
   @PostMapping("/config/query")

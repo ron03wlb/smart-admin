@@ -1,10 +1,10 @@
 package net.lab1024.sa.base.module.support.codegenerator.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeGeneratorConstant;
 import net.lab1024.sa.base.module.support.codegenerator.dao.CodeGeneratorConfigDao;
@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CodeGeneratorService {
 
   private static final String COLUMN_NO_NULLABLE_IDENTIFY = "NO";
@@ -46,11 +47,11 @@ public class CodeGeneratorService {
 
   private static final String COLUMN_AUTO_INCREASE = "auto_increment";
 
-  @Resource private CodeGeneratorDao codeGeneratorDao;
+  private final CodeGeneratorDao codeGeneratorDao;
 
-  @Resource private CodeGeneratorConfigDao codeGeneratorConfigDao;
+  private final CodeGeneratorConfigDao codeGeneratorConfigDao;
 
-  @Resource private CodeGeneratorTemplateService codeGeneratorTemplateService;
+  private final CodeGeneratorTemplateService codeGeneratorTemplateService;
 
   /**
    * 列信息

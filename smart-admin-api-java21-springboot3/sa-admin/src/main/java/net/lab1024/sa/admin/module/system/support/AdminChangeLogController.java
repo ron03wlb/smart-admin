@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogAddForm;
 import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogUpdateForm;
 import net.lab1024.sa.base.module.support.changelog.service.ChangeLogService;
@@ -24,11 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 卓大
  * @since 2022-09-26 14:53:50 Copyright 1024创新实验室
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = SwaggerTagConst.Support.CHANGE_LOG)
 public class AdminChangeLogController extends SupportBaseController {
 
-  @Resource private ChangeLogService changeLogService;
+  private final ChangeLogService changeLogService;
 
   @Operation(summary = "添加 @author 卓大")
   @PostMapping("/changeLog/add")

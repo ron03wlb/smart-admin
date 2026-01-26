@@ -2,8 +2,8 @@ package net.lab1024.sa.base.module.support.table;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnUpdateForm;
 import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
 import net.lab1024.sa.base.web.base.SupportBaseController;
@@ -23,11 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-08-12 22:52:21 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @RestController
+@RequiredArgsConstructor
 @Tag(name = SwaggerTagConst.Support.TABLE_COLUMN)
 @SuppressWarnings("PMD.LongVariable")
 public class TableColumnController extends SupportBaseController {
 
-  @Resource private TableColumnService tableColumnService;
+  private final TableColumnService tableColumnService;
 
   @Operation(summary = "修改表格列 @author 卓大")
   @PostMapping("/tableColumn/update")

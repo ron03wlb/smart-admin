@@ -2,6 +2,7 @@ package net.lab1024.sa.admin.config;
 
 import net.lab1024.sa.base.module.support.operatelog.core.OperateLogAspect;
 import net.lab1024.sa.base.module.support.operatelog.core.OperateLogConfig;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -12,6 +13,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class OperateLogAspectConfig extends OperateLogAspect {
+
+  public OperateLogAspectConfig(ApplicationContext applicationContext) {
+    super(applicationContext);
+  }
 
   /** 配置信息 */
   @Override

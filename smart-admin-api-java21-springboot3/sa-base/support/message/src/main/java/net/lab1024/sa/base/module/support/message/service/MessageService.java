@@ -2,9 +2,9 @@ package net.lab1024.sa.base.module.support.message.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.message.constant.MessageTemplateEnum;
 import net.lab1024.sa.base.module.support.message.dao.MessageDao;
 import net.lab1024.sa.base.module.support.message.domain.MessageEntity;
@@ -25,12 +25,13 @@ import org.springframework.stereotype.Service;
  * @since 2024/6/27 12:14 上午
  */
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LongVariable"})
 public class MessageService {
 
-  @Resource private MessageDao messageDao;
+  private final MessageDao messageDao;
 
-  @Resource private MessageManager messageManager;
+  private final MessageManager messageManager;
 
   /** 分页查询 消息 */
   public PageResult<MessageVO> query(final MessageQueryForm queryForm) {

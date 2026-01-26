@@ -2,8 +2,8 @@ package net.lab1024.sa.admin.module.system.support;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordQueryForm;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordVO;
 import net.lab1024.sa.base.module.support.heartbeat.service.HeartBeatService;
@@ -22,10 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-01-09 20:57:24 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Tag(name = SwaggerTagConst.Support.HEART_BEAT)
+@RequiredArgsConstructor
 @RestController
 public class AdminHeartBeatController extends SupportBaseController {
 
-  @Resource private HeartBeatService heartBeatService;
+  private final HeartBeatService heartBeatService;
 
   @PostMapping("/heartBeat/query")
   @Operation(summary = "查询心跳记录 @author 卓大")

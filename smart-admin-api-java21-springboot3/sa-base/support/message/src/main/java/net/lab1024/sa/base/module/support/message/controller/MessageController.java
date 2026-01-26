@@ -2,8 +2,8 @@ package net.lab1024.sa.base.module.support.message.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.message.domain.MessageQueryForm;
 import net.lab1024.sa.base.module.support.message.domain.MessageVO;
 import net.lab1024.sa.base.module.support.message.service.MessageService;
@@ -26,12 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2024/06/22 20:20
  */
 @RestController
+@RequiredArgsConstructor
 @Tag(name = SwaggerTagConst.Support.MESSAGE)
 public class MessageController extends SupportBaseController {
 
   private static final String USER_NOT_LOGIN = "用户未登录";
 
-  @Resource private MessageService messageService;
+  private final MessageService messageService;
 
   @Operation(summary = "分页查询我的消息 @luoyi")
   @PostMapping("/message/queryMyMessage")

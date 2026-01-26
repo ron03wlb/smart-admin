@@ -1,9 +1,9 @@
 package net.lab1024.sa.admin.module.system.employee.manager;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
 import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
@@ -18,12 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室: 胡克
  * @since 2021-12-29 21:52:46 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class EmployeeManager extends ServiceImpl<EmployeeDao, EmployeeEntity> {
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
   /** 保存员工 */
   @Transactional(rollbackFor = Throwable.class)
@@ -68,5 +69,14 @@ public class EmployeeManager extends ServiceImpl<EmployeeDao, EmployeeEntity> {
       // 直接调用 DAO，避免 Manager 互调
       roleEmployeeList.forEach(roleEmployeeDao::insert);
     }
+  }
+
+  /** 更新密码（事务方法） */
+  @Transactional(rollbackFor = Throwable.class)
+  public void updatePasswordTransaction(Long employeeId, String newEncryptPassword) {
+    EmployeeEntity updateEntity = new EmployeeEntity();
+    updateEntity.setEmployeeId(employeeId);
+    updateEntity.setLoginPwd(newEncryptPassword);
+    employeeDao.updateById(updateEntity);
   }
 }

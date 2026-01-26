@@ -2,11 +2,11 @@ package net.lab1024.sa.admin.module.business.oa.enterprise.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.oa.enterprise.dao.EnterpriseDao;
 import net.lab1024.sa.admin.module.business.oa.enterprise.dao.EnterpriseEmployeeDao;
@@ -22,18 +22,15 @@ import net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseEx
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseListVO;
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo.EnterpriseVO;
 import net.lab1024.sa.admin.module.business.oa.enterprise.manager.EnterpriseEmployeeManager;
+import net.lab1024.sa.admin.module.business.oa.enterprise.manager.EnterpriseManager;
 import net.lab1024.sa.admin.module.system.department.manager.DepartmentCacheManager;
-import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
-import net.lab1024.sa.base.module.support.datatracer.domain.form.DataTracerForm;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 企业
@@ -41,19 +38,22 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室: 开云
  * @since 2022/7/28 20:37:15 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class EnterpriseService {
 
-  @Resource private EnterpriseDao enterpriseDao;
+  private final EnterpriseDao enterpriseDao;
 
-  @Resource private EnterpriseEmployeeDao enterpriseEmployeeDao;
+  private final EnterpriseEmployeeDao enterpriseEmployeeDao;
 
-  @Resource private EnterpriseEmployeeManager enterpriseEmployeeManager;
+  private final EnterpriseEmployeeManager enterpriseEmployeeManager;
 
-  @Resource private DataTracerService dataTracerService;
+  private final EnterpriseManager enterpriseManager;
 
-  @Resource private DepartmentCacheManager departmentCacheManager;
+  private final DataTracerService dataTracerService;
+
+  private final DepartmentCacheManager departmentCacheManager;
 
   /** 分页查询企业模块 */
   public ResponseDTO<PageResult<EnterpriseVO>> queryByPage(EnterpriseQueryForm queryForm) {
@@ -76,7 +76,6 @@ public class EnterpriseService {
   }
 
   /** 新建企业 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> createEnterprise(EnterpriseCreateForm createVO) {
     // 验证企业名称是否重复
     EnterpriseEntity validateEnterprise =
@@ -84,15 +83,12 @@ public class EnterpriseService {
     if (Objects.nonNull(validateEnterprise)) {
       return ResponseDTO.userErrorParam("企业名称重复");
     }
-    // 数据插入
-    EnterpriseEntity insertEnterprise = SmartBeanUtil.copy(createVO, EnterpriseEntity.class);
-    enterpriseDao.insert(insertEnterprise);
-    dataTracerService.insert(insertEnterprise.getEnterpriseId(), DataTracerTypeEnum.OA_ENTERPRISE);
+    // 调用 Manager 执行事务
+    enterpriseManager.createEnterpriseTransaction(createVO);
     return ResponseDTO.ok();
   }
 
   /** 编辑企业 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> updateEnterprise(EnterpriseUpdateForm updateVO) {
     Long enterpriseId = updateVO.getEnterpriseId();
     // 校验企业是否存在
@@ -107,35 +103,20 @@ public class EnterpriseService {
     if (Objects.nonNull(validateEnterprise)) {
       return ResponseDTO.userErrorParam("企业名称重复");
     }
-    // 数据编辑
-    EnterpriseEntity updateEntity = SmartBeanUtil.copy(enterpriseDetail, EnterpriseEntity.class);
-    SmartBeanUtil.copyProperties(updateVO, updateEntity);
-    enterpriseDao.updateById(updateEntity);
-
-    // 变更记录
-    DataTracerForm dataTracerForm =
-        DataTracerForm.builder()
-            .dataId(updateVO.getEnterpriseId())
-            .type(DataTracerTypeEnum.OA_ENTERPRISE)
-            .content("修改企业信息")
-            .diffOld(dataTracerService.getChangeContent(enterpriseDetail))
-            .diffNew(dataTracerService.getChangeContent(updateEntity))
-            .build();
-
-    dataTracerService.addTrace(dataTracerForm);
+    // 调用 Manager 执行事务
+    enterpriseManager.updateEnterpriseTransaction(updateVO, enterpriseDetail);
     return ResponseDTO.ok();
   }
 
   /** 删除企业 */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> deleteEnterprise(Long enterpriseId) {
     // 校验企业是否存在
     EnterpriseEntity enterpriseDetail = enterpriseDao.selectById(enterpriseId);
     if (Objects.isNull(enterpriseDetail) || enterpriseDetail.getDeletedFlag()) {
       return ResponseDTO.userErrorParam("企业不存在");
     }
-    enterpriseDao.deleteEnterprise(enterpriseId, Boolean.TRUE);
-    dataTracerService.delete(enterpriseId, DataTracerTypeEnum.OA_ENTERPRISE);
+    // 调用 Manager 执行事务
+    enterpriseManager.deleteEnterpriseTransaction(enterpriseId);
     return ResponseDTO.ok();
   }
 

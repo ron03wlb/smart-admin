@@ -1,11 +1,11 @@
 package net.lab1024.sa.admin.module.system.role.service;
 
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.menu.dao.MenuDao;
 import net.lab1024.sa.admin.module.system.menu.domain.entity.MenuEntity;
 import net.lab1024.sa.admin.module.system.menu.domain.vo.MenuSimpleTreeVO;
@@ -30,13 +30,14 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室: 善逸
  * @since 2021-10-22 23:17:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class RoleMenuService {
 
-  @Resource private RoleDao roleDao;
-  @Resource private RoleMenuDao roleMenuDao;
-  @Resource private RoleMenuManager roleMenuManager;
-  @Resource private MenuDao menuDao;
+  private final RoleDao roleDao;
+  private final RoleMenuDao roleMenuDao;
+  private final RoleMenuManager roleMenuManager;
+  private final MenuDao menuDao;
 
   /** 更新角色权限 */
   public ResponseDTO<String> updateRoleMenu(RoleMenuUpdateForm roleMenuUpdateForm) {

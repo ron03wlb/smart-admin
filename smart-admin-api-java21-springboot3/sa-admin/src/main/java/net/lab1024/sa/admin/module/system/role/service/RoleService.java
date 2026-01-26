@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin.module.system.role.service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.role.dao.RoleDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.admin.module.system.role.domain.entity.RoleEntity;
@@ -20,14 +20,15 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室: 胡克
  * @since 2021-08-16 20:19:22 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class RoleService {
 
-  @Resource private RoleDao roleDao;
+  private final RoleDao roleDao;
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
-  @Resource private RoleManager roleManager;
+  private final RoleManager roleManager;
 
   /** 新增添加角色 */
   public ResponseDTO<String> addRole(RoleAddForm roleAddForm) {

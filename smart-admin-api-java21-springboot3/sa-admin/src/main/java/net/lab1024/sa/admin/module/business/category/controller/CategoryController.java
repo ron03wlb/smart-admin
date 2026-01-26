@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.business.category.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.business.category.domain.form.CategoryAddForm;
 import net.lab1024.sa.admin.module.business.category.domain.form.CategoryTreeQueryForm;
@@ -28,9 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Tag(name = AdminSwaggerTagConst.Business.MANAGER_CATEGORY)
+@RequiredArgsConstructor
 public class CategoryController {
 
-  @Resource private CategoryService categoryService;
+  private final CategoryService categoryService;
 
   @Operation(summary = "添加类目 @author 胡克")
   @PostMapping("/category/add")

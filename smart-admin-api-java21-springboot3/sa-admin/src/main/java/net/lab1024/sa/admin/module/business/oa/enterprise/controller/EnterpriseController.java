@@ -3,12 +3,12 @@ package net.lab1024.sa.admin.module.business.oa.enterprise.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.business.oa.enterprise.domain.form.EnterpriseCreateForm;
@@ -46,12 +46,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022/7/28 20:37:15 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.Business.OA_ENTERPRISE)
 @OperateLog
 public class EnterpriseController {
 
-  @Resource private EnterpriseService enterpriseService;
+  private final EnterpriseService enterpriseService;
 
   @Operation(summary = "分页查询企业模块 @author 开云")
   @PostMapping("/oa/enterprise/page/query")

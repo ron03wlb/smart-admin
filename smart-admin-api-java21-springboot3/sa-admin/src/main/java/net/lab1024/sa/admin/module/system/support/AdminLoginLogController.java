@@ -3,7 +3,7 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.loginlog.LoginLogService;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogQueryForm;
 import net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO;
@@ -23,11 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022/07/22 19:46:23 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = SwaggerTagConst.Support.LOGIN_LOG)
 public class AdminLoginLogController extends SupportBaseController {
 
-  @Resource private LoginLogService loginLogService;
+  private final LoginLogService loginLogService;
 
   @Operation(summary = "分页查询 @author 卓大")
   @PostMapping("/loginLog/page/query")

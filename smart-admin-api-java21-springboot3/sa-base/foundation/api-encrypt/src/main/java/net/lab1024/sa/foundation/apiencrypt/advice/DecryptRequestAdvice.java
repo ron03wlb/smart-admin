@@ -1,10 +1,10 @@
 package net.lab1024.sa.foundation.apiencrypt.advice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.apiencrypt.annotation.ApiDecrypt;
 import net.lab1024.sa.foundation.apiencrypt.constant.EncryptConst;
@@ -27,12 +27,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
  */
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LooseCoupling")
 public class DecryptRequestAdvice extends RequestBodyAdviceAdapter {
 
-  @Resource private ApiEncryptService apiEncryptService;
+  private final ApiEncryptService apiEncryptService;
 
-  @Resource private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Override
   public boolean supports(

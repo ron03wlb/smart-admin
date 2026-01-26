@@ -3,11 +3,11 @@ package net.lab1024.sa.admin.module.business.goods.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsAddForm;
 import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsQueryForm;
@@ -34,9 +34,10 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @Tag(name = AdminSwaggerTagConst.Business.MANAGER_GOODS)
+@RequiredArgsConstructor
 public class GoodsController {
 
-  @Resource private GoodsService goodsService;
+  private final GoodsService goodsService;
 
   @Operation(summary = "分页查询 @author 胡克")
   @PostMapping("/goods/query")

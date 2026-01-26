@@ -3,7 +3,6 @@ package net.lab1024.sa.base.module.support.operatelog.core;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -12,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.operatelog.OperateLogDao;
 import net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog;
@@ -46,21 +46,18 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Slf4j
 @Aspect
+@RequiredArgsConstructor
 public abstract class OperateLogAspect {
 
   private static final String POINT_CUT =
       "@within(net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog) || @annotation(net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog)";
 
-  @Resource private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
   /** 线程池 */
   private volatile ThreadPoolTaskExecutor taskExecutor;
 
   public abstract OperateLogConfig getOperateLogConfig();
-
-  public OperateLogAspect() {
-    // empty
-  }
 
   @Pointcut(POINT_CUT)
   public void logPointCut() {

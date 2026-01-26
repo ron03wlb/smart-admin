@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JsonUtil {
 
-  @Resource private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   private static ObjectMapper staticMapper;
 

@@ -2,10 +2,10 @@ package net.lab1024.sa.base.module.support.helpdoc.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocViewRecordQueryForm;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocCatalogVO;
 import net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocDetailVO;
@@ -33,12 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = SwaggerTagConst.Support.HELP_DOC)
 @RestController
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class HelpDocController extends SupportBaseController {
 
-  @Resource private HelpDocCatalogService helpDocCatalogService;
+  private final HelpDocCatalogService helpDocCatalogService;
 
-  @Resource private HelpDocUserService helpDocUserService;
+  private final HelpDocUserService helpDocUserService;
 
   // --------------------- 帮助文档 【目录】 -------------------------
 

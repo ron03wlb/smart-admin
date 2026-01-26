@@ -1,9 +1,9 @@
 package net.lab1024.sa.admin.module.business.category.service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.category.dao.CategoryDao;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
 import net.lab1024.sa.admin.module.business.category.domain.form.CategoryAddForm;
@@ -25,11 +25,12 @@ import org.springframework.stereotype.Service;
  * @since 2021/08/05 21:26:58 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
-  @Resource private CategoryDao categoryDao;
+  private final CategoryDao categoryDao;
 
-  @Resource private CategoryCacheManager categoryCacheManager;
+  private final CategoryCacheManager categoryCacheManager;
 
   /** 查询未删除的类目（直接调用 Manager，避免 Service 互调） */
   private Optional<CategoryEntity> queryCategory(Long categoryId) {

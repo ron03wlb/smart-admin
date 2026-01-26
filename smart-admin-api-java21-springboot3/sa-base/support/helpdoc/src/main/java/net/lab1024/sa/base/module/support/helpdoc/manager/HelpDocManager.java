@@ -1,7 +1,7 @@
 package net.lab1024.sa.base.module.support.helpdoc.manager;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao;
 import net.lab1024.sa.base.module.support.helpdoc.domain.entity.HelpDocEntity;
 import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocRelationForm;
@@ -16,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class HelpDocManager {
 
-  @Resource private HelpDocDao helpDocDao;
+  private final HelpDocDao helpDocDao;
 
   /**
    * 保存

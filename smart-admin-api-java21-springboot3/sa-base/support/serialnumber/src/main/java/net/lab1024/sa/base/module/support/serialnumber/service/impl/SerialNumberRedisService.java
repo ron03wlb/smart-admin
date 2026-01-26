@@ -1,7 +1,6 @@
 package net.lab1024.sa.base.module.support.serialnumber.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.serialnumber.constant.SerialNumberRuleTypeEnum;
+import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberDao;
+import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberRecordDao;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO;
@@ -32,7 +33,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 @SuppressWarnings("PMD.LongVariable")
 public class SerialNumberRedisService extends SerialNumberBaseService {
 
-  @Resource private RedissonService redissonService;
+  private final RedissonService redissonService;
+
+  public SerialNumberRedisService(
+      SerialNumberRecordDao serialNumberRecordDao,
+      SerialNumberDao serialNumberDao,
+      RedissonService redissonService) {
+    super(serialNumberRecordDao, serialNumberDao);
+    this.redissonService = redissonService;
+  }
 
   private static final int BATCH_GENERATE_THRESHOLD = 1;
 

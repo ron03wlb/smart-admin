@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.datatracer.annoation.DataTracerFieldBigDecimal;
 import net.lab1024.sa.base.module.support.datatracer.annoation.DataTracerFieldDict;
@@ -50,13 +50,14 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class DataTracerChangeContentService {
 
   private static final String HTML_BR = "<br/>";
 
-  @Resource private ApplicationContext applicationContext;
-  @Resource private DictService dictService;
+  private final ApplicationContext applicationContext;
+  private final DictService dictService;
 
   /** 字段描述缓存 */
   private final Map<String, String> fieldDescCacheMap = new ConcurrentHashMap<>();

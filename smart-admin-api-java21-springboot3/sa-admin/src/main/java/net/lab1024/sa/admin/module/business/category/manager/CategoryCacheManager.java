@@ -3,11 +3,11 @@ package net.lab1024.sa.admin.module.business.category.manager;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.category.dao.CategoryDao;
 import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
@@ -27,11 +27,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CategoryCacheManager {
 
-  @Resource private CategoryDao categoryDao;
+  private final CategoryDao categoryDao;
 
-  @Resource private CacheService cacheService;
+  private final CacheService cacheService;
 
   /** 根据类目id 移除缓存 */
   public void removeCache() {

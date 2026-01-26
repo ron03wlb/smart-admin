@@ -2,8 +2,8 @@ package net.lab1024.sa.base.module.support.feedback.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackAddForm;
 import net.lab1024.sa.base.module.support.feedback.domain.FeedbackQueryForm;
@@ -28,9 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @Tag(name = SwaggerTagConst.Support.FEEDBACK)
 @RestController
+@RequiredArgsConstructor
 public class FeedbackController extends SupportBaseController {
 
-  @Resource private FeedbackService feedbackService;
+  private final FeedbackService feedbackService;
 
   @Operation(summary = "意见反馈-分页查询 @author 开云")
   @PostMapping("/feedback/query")

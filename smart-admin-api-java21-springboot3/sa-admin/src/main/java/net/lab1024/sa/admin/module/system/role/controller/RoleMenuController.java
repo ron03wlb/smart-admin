@@ -3,8 +3,8 @@ package net.lab1024.sa.admin.module.system.role.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleMenuUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleMenuTreeVO;
@@ -22,11 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-02-26 21:34:01 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_ROLE_MENU)
 public class RoleMenuController {
 
-  @Resource private RoleMenuService roleMenuService;
+  private final RoleMenuService roleMenuService;
 
   @Operation(summary = "更新角色权限 @author 卓大")
   @PostMapping("/role/menu/updateRoleMenu")

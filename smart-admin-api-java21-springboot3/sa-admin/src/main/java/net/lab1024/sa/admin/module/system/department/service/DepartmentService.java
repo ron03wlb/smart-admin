@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin.module.system.department.service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEntity;
 import net.lab1024.sa.admin.module.system.department.domain.form.DepartmentAddForm;
@@ -21,14 +21,15 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-01-12 20:37:48 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class DepartmentService {
 
-  @Resource private DepartmentDao departmentDao;
+  private final DepartmentDao departmentDao;
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private DepartmentCacheManager departmentCacheManager;
+  private final DepartmentCacheManager departmentCacheManager;
 
   // ---------------------------- 增加、修改、删除 ----------------------------
 

@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.business.oa.bank.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankCreateForm;
 import net.lab1024.sa.admin.module.business.oa.bank.domain.BankQueryForm;
@@ -30,9 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Tag(name = AdminSwaggerTagConst.Business.OA_BANK)
+@RequiredArgsConstructor
 public class BankController {
 
-  @Resource private BankService bankService;
+  private final BankService bankService;
 
   @Operation(summary = "分页查询银行信息 @author 善逸")
   @PostMapping("/oa/bank/page/query")

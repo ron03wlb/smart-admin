@@ -1,6 +1,6 @@
 package net.lab1024.sa.base.module.support.table;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnEntity;
 import net.lab1024.sa.base.module.support.table.domain.TableColumnUpdateForm;
 import net.lab1024.sa.foundation.domain.request.RequestUser;
@@ -16,9 +16,10 @@ import org.springframework.stereotype.Service;
  * @since 2022-08-12 22:52:21 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class TableColumnService {
 
-  @Resource private TableColumnDao tableColumnDao;
+  private final TableColumnDao tableColumnDao;
 
   /**
    * 获取 - 表格列

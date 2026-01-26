@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin.module.system.role.manager;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.role.dao.RoleDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.admin.module.system.role.dao.RoleMenuDao;
@@ -17,14 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室
  * @since 2025-01-22 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class RoleManager extends ServiceImpl<RoleDao, RoleEntity> {
 
-  @Resource private RoleDao roleDao;
+  private final RoleDao roleDao;
 
-  @Resource private RoleMenuDao roleMenuDao;
+  private final RoleMenuDao roleMenuDao;
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
   /**
    * 删除角色（级联删除关联数据）

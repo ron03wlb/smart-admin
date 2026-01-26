@@ -1,7 +1,7 @@
 package net.lab1024.sa.foundation.core.config;
+nimport lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +28,10 @@ import org.springframework.web.client.RestClient;
  * @since 2025-07-26 21:22:12 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Configuration
+@RequiredArgsConstructor
 public class RestClientConfig {
 
-  @Resource private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Value("${http.pool.max-total}")
   private Integer maxTotal;

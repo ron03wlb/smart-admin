@@ -1,9 +1,9 @@
 package net.lab1024.sa.base.web.handler;
 
 import cn.dev33.satoken.exception.NotPermissionException;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.domain.SystemEnvironment;
 import net.lab1024.sa.enumeration.SystemEnvironmentEnum;
@@ -32,9 +32,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-  @Resource private SystemEnvironment systemEnvironment;
+  private final SystemEnvironment systemEnvironment;
 
   /** json 格式错误 缺少请求体 */
   @ResponseBody

@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.serialnumber.constant.SerialNumberIdEnum;
 import net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberDao;
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberEntity;
@@ -31,14 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Tag(name = SwaggerTagConst.Support.SERIAL_NUMBER)
+@RequiredArgsConstructor
 @RestController
 public class AdminSerialNumberController extends SupportBaseController {
 
-  @Resource private SerialNumberDao serialNumberDao;
+  private final SerialNumberDao serialNumberDao;
 
-  @Resource private SerialNumberService serialNumberService;
+  private final SerialNumberService serialNumberService;
 
-  @Resource private SerialNumberRecordService serialNumberRecordService;
+  private final SerialNumberRecordService serialNumberRecordService;
 
   @Operation(summary = "生成单号 @author 卓大")
   @PostMapping("/serialNumber/generate")

@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.changelog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.changelog.dao.ChangeLogDao;
 import net.lab1024.sa.base.module.support.changelog.domain.entity.ChangeLogEntity;
 import net.lab1024.sa.base.module.support.changelog.domain.form.ChangeLogAddForm;
@@ -23,9 +23,10 @@ import org.springframework.stereotype.Service;
  * @since 2022-09-26 14:53:50 Copyright 1024创新实验室
  */
 @Service
+@RequiredArgsConstructor
 public class ChangeLogService {
 
-  @Resource private ChangeLogDao changeLogDao;
+  private final ChangeLogDao changeLogDao;
 
   /** 分页查询 */
   public PageResult<ChangeLogVO> queryPage(final ChangeLogQueryForm queryForm) {

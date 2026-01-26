@@ -1,4 +1,5 @@
 package net.lab1024.sa.foundation.captcha.config;
+nimport lombok.RequiredArgsConstructor;
 
 import net.lab1024.sa.foundation.captcha.CaptchaService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Bean;
  * <pre>
  * 1. 在项目中引入 sa-common:captcha 依赖
  * 2. Spring Boot 会自动装配 CaptchaService
- * 3. 直接注入使用：@Resource private CaptchaService captchaService;
+ * 3. 直接注入使用：private final CaptchaService captchaService;
  * </pre>
  *
  * @author 1024创新实验室-主任: 卓大

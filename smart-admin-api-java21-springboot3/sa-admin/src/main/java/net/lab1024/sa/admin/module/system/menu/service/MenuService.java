@@ -2,10 +2,10 @@ package net.lab1024.sa.admin.module.system.menu.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.menu.constant.MenuTypeEnum;
 import net.lab1024.sa.admin.module.system.menu.dao.MenuDao;
 import net.lab1024.sa.admin.module.system.menu.domain.entity.MenuEntity;
@@ -29,12 +29,13 @@ import org.springframework.util.CollectionUtils;
  * @author 1024创新实验室: 善逸
  * @since 2022-03-08 22:15:09 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class MenuService {
 
-  @Resource private MenuDao menuDao;
+  private final MenuDao menuDao;
 
-  @Resource private List<RequestUrlVO> authUrl;
+  private final List<RequestUrlVO> authUrl;
 
   /** 添加菜单 */
   public synchronized ResponseDTO<String> addMenu(MenuAddForm menuAddForm) {

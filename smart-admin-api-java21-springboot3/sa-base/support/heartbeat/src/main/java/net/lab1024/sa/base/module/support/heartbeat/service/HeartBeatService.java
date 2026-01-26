@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.heartbeat.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.heartbeat.dao.HeartBeatRecordDao;
 import net.lab1024.sa.base.module.support.heartbeat.domain.HeartBeatRecordQueryForm;
@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class HeartBeatService {
 
-  @Resource private HeartBeatRecordDao heartBeatRecordDao;
+  private final HeartBeatRecordDao heartBeatRecordDao;
 
   public ResponseDTO<PageResult<HeartBeatRecordVO>> pageQuery(
       final HeartBeatRecordQueryForm pageParam) {

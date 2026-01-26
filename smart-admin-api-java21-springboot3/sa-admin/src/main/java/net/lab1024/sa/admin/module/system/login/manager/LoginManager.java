@@ -4,7 +4,6 @@ import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
@@ -42,18 +42,19 @@ import org.springframework.stereotype.Service;
  * @since 2025-05-03 22:56:34 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class LoginManager {
 
-  @Resource private DepartmentDao departmentDao;
+  private final DepartmentDao departmentDao;
 
-  @Resource private IFileStorageService fileStorageService;
+  private final IFileStorageService fileStorageService;
 
-  @Resource private EmployeeDao employeeDao;
+  private final EmployeeDao employeeDao;
 
-  @Resource private RoleEmployeeDao roleEmployeeDao;
+  private final RoleEmployeeDao roleEmployeeDao;
 
-  @Resource private RoleMenuDao roleMenuDao;
+  private final RoleMenuDao roleMenuDao;
 
   /** 获取请求用户信息 */
   @Cached(

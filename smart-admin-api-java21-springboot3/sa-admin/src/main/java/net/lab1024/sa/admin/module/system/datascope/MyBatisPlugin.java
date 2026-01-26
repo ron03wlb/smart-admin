@@ -3,11 +3,11 @@ package net.lab1024.sa.admin.module.system.datascope;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeSqlConfig;
 import net.lab1024.sa.admin.module.system.datascope.service.DataScopeSqlConfigService;
 import net.lab1024.sa.domain.DataScopePlugin;
@@ -38,10 +38,11 @@ import org.springframework.stereotype.Component;
       method = "query",
       args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})
 })
+@RequiredArgsConstructor
 @Component
 public class MyBatisPlugin extends DataScopePlugin {
 
-  @Resource private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {

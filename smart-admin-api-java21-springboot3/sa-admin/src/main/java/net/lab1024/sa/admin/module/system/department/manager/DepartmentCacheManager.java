@@ -4,7 +4,6 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentTreeVO;
@@ -29,12 +29,13 @@ import org.springframework.stereotype.Service;
  * @since 2022-01-12 20:37:48 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class DepartmentCacheManager {
 
-  @Resource private DepartmentDao departmentDao;
+  private final DepartmentDao departmentDao;
 
-  @Resource private net.lab1024.sa.foundation.cache.CacheService cacheService;
+  private final net.lab1024.sa.foundation.cache.CacheService cacheService;
 
   private void logClearInfo(String cache) {
     if (log.isInfoEnabled()) {

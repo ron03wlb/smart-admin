@@ -406,4 +406,139 @@ public class ArchitectureTest {
               "org.apache.log4j..", "org.apache.logging.log4j..", "ch.qos.logback.classic..")
           .because(
               "Must use SLF4J facade (org.slf4j.Logger), prohibit direct logging implementation (rule: 04-exception-logging.md)");
+
+  // ========== Dependency Injection Constraints (Added: v4.1.0) ==========
+
+  /**
+   * 【嚴格執行】禁止 @Resource 字段注入
+   *
+   * <p>SmartAdmin 項目要求所有依賴注入使用構造函數注入模式，通過 @RequiredArgsConstructor + private final 實現
+   *
+   * <p>錯誤示例：
+   *
+   * <pre>
+   * &#64;Service
+   * public class GoodsService {
+   *     &#64;Resource private GoodsDao goodsDao;  // ❌ 禁止
+   *     &#64;Resource private GoodsManager goodsManager;  // ❌ 禁止
+   * }
+   * </pre>
+   *
+   * <p>正確示例：
+   *
+   * <pre>
+   * &#64;Service
+   * &#64;RequiredArgsConstructor
+   * public class GoodsService {
+   *     private final GoodsDao goodsDao;  // ✅ 正確
+   *     private final GoodsManager goodsManager;  // ✅ 正確
+   * }
+   * </pre>
+   *
+   * <p>規則來源：foundation/10-architecture-rules.md
+   *
+   * @since 4.1.0
+   */
+  @ArchTest
+  static final ArchRule noResourceFieldInjection =
+      fields()
+          .that()
+          .areDeclaredInClassesThat()
+          .resideInAnyPackage("..controller..", "..service..", "..manager..")
+          .should()
+          .notBeAnnotatedWith(jakarta.annotation.Resource.class)
+          .as(
+              "禁止@Resource字段注入，使用@RequiredArgsConstructor構造函數注入（規則：foundation/10-architecture-rules.md）");
+
+  /**
+   * 【嚴格執行】Service 層完全禁止依賴 java.util.Optional（包含 private 方法）
+   *
+   * <p>此規則檢測所有 Optional 依賴，包括：
+   *
+   * <ul>
+   *   <li>Private 方法的返回值
+   *   <li>方法參數類型
+   *   <li>字段類型
+   *   <li>Import 語句
+   * </ul>
+   *
+   * <p>錯誤示例（GoodsService.java）：
+   *
+   * <pre>
+   * import java.util.Optional;  // ❌ 禁止 import
+   *
+   * private Optional&lt;CategoryEntity&gt; queryCategory(Long id) {  // ❌ 禁止返回 Optional
+   *     if (id == null) return Optional.empty();
+   *     return Optional.of(entity);
+   * }
+   * </pre>
+   *
+   * <p>正確示例：
+   *
+   * <pre>
+   * import io.vavr.control.Option;  // ✅ 使用 Vavr Option
+   *
+   * private Option&lt;CategoryEntity&gt; queryCategory(Long id) {  // ✅ 返回 Option
+   *     return Option.of(id)
+   *         .flatMap(categoryId -&gt; Option.of(categoryCacheManager.queryCategory(categoryId)))
+   *         .filter(entity -&gt; !entity.getDeletedFlag());
+   * }
+   * </pre>
+   *
+   * <p>規則來源：technology/functional/08-vavr-fundamentals.md
+   *
+   * @since 4.1.0
+   */
+  @ArchTest
+  static final ArchRule noJavaOptionalInServiceStrict =
+      noClasses()
+          .that()
+          .resideInAPackage("..service..")
+          .should()
+          .dependOnClassesThat()
+          .haveFullyQualifiedName("java.util.Optional")
+          .as(
+              "Service 層完全禁止使用 java.util.Optional（包含 private 方法），必須使用 io.vavr.control.Option（規則：technology/functional/08-vavr-fundamentals.md）");
+
+  /**
+   * 【推薦】Manager 事務方法命名約定
+   *
+   * <p>所有帶 @Transactional 註解的 Manager 方法應以 "Transaction" 結尾，便於識別事務邊界
+   *
+   * <p>正確示例：
+   *
+   * <pre>
+   * &#64;Service
+   * public class GoodsManager {
+   *     &#64;Transactional(rollbackFor = Throwable.class)
+   *     public void addGoodsTransaction(GoodsAddForm form) {  // ✅ 以 Transaction 結尾
+   *         // 事務邏輯
+   *     }
+   * }
+   * </pre>
+   *
+   * <p>不推薦示例：
+   *
+   * <pre>
+   * &#64;Transactional(rollbackFor = Throwable.class)
+   * public void addGoods(GoodsAddForm form) {  // ⚠️ 未以 Transaction 結尾
+   *     // 事務邏輯
+   * }
+   * </pre>
+   *
+   * <p>規則來源：foundation/09-manager-layer.md
+   *
+   * @since 4.1.0
+   */
+  @ArchTest
+  static final ArchRule managerTransactionMethodNaming =
+      methods()
+          .that()
+          .areAnnotatedWith(org.springframework.transaction.annotation.Transactional.class)
+          .and()
+          .areDeclaredInClassesThat()
+          .haveSimpleNameEndingWith("Manager")
+          .should()
+          .haveNameMatching(".*Transaction$")
+          .as("Manager 事務方法應以 Transaction 結尾，便於識別事務邊界（規則：foundation/09-manager-layer.md）");
 }

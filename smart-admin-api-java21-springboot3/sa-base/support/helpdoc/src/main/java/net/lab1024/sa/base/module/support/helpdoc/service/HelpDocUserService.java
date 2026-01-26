@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.helpdoc.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao;
 import net.lab1024.sa.base.module.support.helpdoc.domain.entity.HelpDocEntity;
 import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocViewRecordQueryForm;
@@ -23,10 +23,11 @@ import org.springframework.stereotype.Service;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings("PMD.LongVariable")
 public class HelpDocUserService {
 
-  @Resource private HelpDocDao helpDocDao;
+  private final HelpDocDao helpDocDao;
 
   /**
    * 查询全部 帮助文档

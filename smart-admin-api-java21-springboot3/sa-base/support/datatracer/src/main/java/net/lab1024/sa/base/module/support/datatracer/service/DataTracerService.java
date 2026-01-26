@@ -1,9 +1,9 @@
 package net.lab1024.sa.base.module.support.datatracer.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerConst;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
@@ -31,13 +31,14 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DataTracerService {
 
-  @Resource private DataTracerDao dataTracerDao;
+  private final DataTracerDao dataTracerDao;
 
-  @Resource private DataTracerManger dataTracerManger;
+  private final DataTracerManger dataTracerManger;
 
-  @Resource private DataTracerChangeContentService dataTracerChangeContentService;
+  private final DataTracerChangeContentService dataTracerChangeContentService;
 
   /**
    * 获取变更内容

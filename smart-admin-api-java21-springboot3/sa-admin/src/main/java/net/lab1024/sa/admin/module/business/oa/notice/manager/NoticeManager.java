@@ -1,7 +1,7 @@
 package net.lab1024.sa.admin.module.business.oa.notice.manager;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeDao;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.entity.NoticeEntity;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.form.NoticeVisibleRangeForm;
@@ -15,10 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-08-12 21:40:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class NoticeManager {
 
-  @Resource private NoticeDao noticeDao;
+  private final NoticeDao noticeDao;
 
   /** 保存（事务管理，仅操作 DAO） */
   @Transactional(rollbackFor = Throwable.class)

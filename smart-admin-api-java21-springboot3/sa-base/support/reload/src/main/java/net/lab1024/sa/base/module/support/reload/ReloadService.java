@@ -1,8 +1,8 @@
 package net.lab1024.sa.base.module.support.reload;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.reload.dao.ReloadItemDao;
 import net.lab1024.sa.base.module.support.reload.dao.ReloadResultDao;
 import net.lab1024.sa.base.module.support.reload.domain.ReloadForm;
@@ -20,11 +20,12 @@ import org.springframework.stereotype.Service;
  * @since 2015-03-02 19:11:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class ReloadService {
 
-  @Resource private ReloadItemDao reloadItemDao;
+  private final ReloadItemDao reloadItemDao;
 
-  @Resource private ReloadResultDao reloadResultDao;
+  private final ReloadResultDao reloadResultDao;
 
   /**
    * 查询

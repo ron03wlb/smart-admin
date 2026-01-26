@@ -2,9 +2,9 @@ package net.lab1024.sa.admin.module.system.position.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.position.domain.form.PositionAddForm;
 import net.lab1024.sa.admin.module.system.position.domain.form.PositionQueryForm;
@@ -25,11 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author kaiyun
  * @since 2024-06-23 23:31:38 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_POSITION)
 public class PositionController {
 
-  @Resource private PositionService positionService;
+  private final PositionService positionService;
 
   @Operation(summary = "分页查询 @author kaiyun")
   @PostMapping("/position/queryPage")

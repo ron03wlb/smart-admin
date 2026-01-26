@@ -2,8 +2,8 @@ package net.lab1024.sa.base.module.support.dict.manager;
 
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
-import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.dict.dao.DictDao;
 import net.lab1024.sa.base.module.support.dict.dao.DictDataDao;
 import net.lab1024.sa.base.module.support.dict.domain.entity.DictDataEntity;
@@ -20,11 +20,12 @@ import org.springframework.stereotype.Service;
  * @since 2025-03-25 22:25:04 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Service
+@RequiredArgsConstructor
 public class DictManager {
 
-  @Resource private DictDao dictDao;
+  private final DictDao dictDao;
 
-  @Resource private DictDataDao dictDataDao;
+  private final DictDataDao dictDataDao;
 
   /** 获取字典 */
   @Cached(

@@ -4,10 +4,10 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.system.login.domain.RequestEmployee;
 import net.lab1024.sa.admin.module.system.login.service.LoginService;
@@ -31,6 +31,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AdminInterceptor implements HandlerInterceptor {
 
   private static class SaTokenCode {
@@ -41,7 +42,7 @@ public class AdminInterceptor implements HandlerInterceptor {
     private static final int LOGIN_STATE_INVALID_MAX = 11015;
   }
 
-  @Resource private LoginService loginService;
+  private final LoginService loginService;
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

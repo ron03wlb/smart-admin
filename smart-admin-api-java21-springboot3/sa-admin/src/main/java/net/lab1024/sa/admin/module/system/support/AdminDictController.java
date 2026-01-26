@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.support;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.dict.domain.form.DictAddForm;
 import net.lab1024.sa.base.module.support.dict.domain.form.DictDataAddForm;
 import net.lab1024.sa.base.module.support.dict.domain.form.DictDataUpdateForm;
@@ -31,10 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2025-03-25 22:25:04 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Tag(name = SwaggerTagConst.Support.DICT)
+@RequiredArgsConstructor
 @RestController
 public class AdminDictController extends SupportBaseController {
 
-  @Resource private DictService dictService;
+  private final DictService dictService;
 
   // ------------------- 获取全部数据 -------------------
 

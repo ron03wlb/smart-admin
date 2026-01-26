@@ -1,10 +1,10 @@
 package net.lab1024.sa.admin.module.business.oa.notice.service;
 
 import cn.hutool.core.util.StrUtil;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeTypeDao;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.entity.NoticeTypeEntity;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeTypeVO;
@@ -19,10 +19,11 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-08-12 21:40:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @Service
 public class NoticeTypeService {
 
-  @Resource private NoticeTypeDao noticeTypeDao;
+  private final NoticeTypeDao noticeTypeDao;
 
   /**
    * 查询全部

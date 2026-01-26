@@ -3,9 +3,9 @@ package net.lab1024.sa.admin.module.system.role.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleDataScopeUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleDataScopeVO;
@@ -23,11 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 1024创新实验室-主任: 卓大
  * @since 2022-02-26 22:09:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
+@RequiredArgsConstructor
 @RestController
 @Tag(name = AdminSwaggerTagConst.System.SYSTEM_ROLE_DATA_SCOPE)
 public class RoleDataScopeController {
 
-  @Resource private RoleDataScopeService roleDataScopeService;
+  private final RoleDataScopeService roleDataScopeService;
 
   @Operation(summary = "获取某角色所设置的数据范围 @author 卓大")
   @GetMapping("/role/dataScope/getRoleDataScopeList/{roleId}")

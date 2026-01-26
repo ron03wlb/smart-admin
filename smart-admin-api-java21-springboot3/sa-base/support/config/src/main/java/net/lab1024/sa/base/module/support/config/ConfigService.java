@@ -3,11 +3,11 @@ package net.lab1024.sa.base.module.support.config;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.config.domain.ConfigAddForm;
 import net.lab1024.sa.base.module.support.config.domain.ConfigEntity;
@@ -33,12 +33,13 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ConfigService {
 
   /** 一个简单的系统配置缓存 */
   private final Map<String, ConfigEntity> configCache = new ConcurrentHashMap<>();
 
-  @Resource private ConfigDao configDao;
+  private final ConfigDao configDao;
 
   @SmartReload(ReloadConst.CONFIG_RELOAD)
   public void configReload(String param) {

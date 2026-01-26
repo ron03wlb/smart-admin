@@ -4,10 +4,10 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.form.NoticeAddForm;
 import net.lab1024.sa.admin.module.business.oa.notice.domain.form.NoticeEmployeeQueryForm;
@@ -41,15 +41,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-08-12 21:40:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Tag(name = AdminSwaggerTagConst.Business.OA_NOTICE)
+@RequiredArgsConstructor
 @RestController
 @OperateLog
 public class NoticeController {
 
-  @Resource private NoticeService noticeService;
+  private final NoticeService noticeService;
 
-  @Resource private NoticeTypeService noticeTypeService;
+  private final NoticeTypeService noticeTypeService;
 
-  @Resource private NoticeEmployeeService noticeEmployeeService;
+  private final NoticeEmployeeService noticeEmployeeService;
 
   // --------------------- 通知公告类型 -------------------------
 
