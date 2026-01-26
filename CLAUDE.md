@@ -104,7 +104,7 @@ Controller → Service → Manager → Dao → Entity
 - ✅ **Use instead**: `net.lab1024.sa.foundation.domain.*`
 - ℹ️ **Exception**: `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*`
 
-→ **[Complete Package Naming Guide](docs/migration/foundation-package-naming-standardization.md)**
+→ **[Complete Package Naming Guide](docs/migration/foundation-packages.md)**
 → **[v4.0.0 Breaking Changes](#v40-breaking-changes)**
 
 ## SmartAdmin Patterns
@@ -225,7 +225,7 @@ cd smart-admin-api-java21-springboot3
 ./gradlew migrateToFoundation
 ```
 
-→ **[Complete Package Migration Guide](docs/migration/foundation-package-naming-standardization.md)**
+→ **[Complete Package Migration Guide](docs/migration/foundation-packages.md)**
 
 ---
 
@@ -233,17 +233,18 @@ cd smart-admin-api-java21-springboot3
 
 | Component | Version | Status | Metadata |
 |-----------|---------|--------|----------|
-| **This Document** | 3.0.0 | ✅ Universal AI Support | - |
+| **This Document** | 3.1.0 | ✅ Universal AI Support | - |
 | **AI Doc System** | 3.0.0 | ✅ Unified | [.claude/META.md](.claude/META.md) |
 | **.claude/** | 2.7.0 | ✅ Agent System | [.claude/README.md](.claude/README.md) |
-| **.agent/** | 1.0.0-SNAPSHOT | 🚧 Translation In Progress | [.agent/VERSION.md](.agent/VERSION.md) |
+| **.agent/** | 1.0.0 | ✅ Production Ready | [.agent/VERSION.md](.agent/VERSION.md) |
 | **SmartAdmin** | v4.0.0 | ✅ Production | - |
 
 **System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership
 
-**Last Updated**: 2026-01-24
+**Last Updated**: 2026-01-27
 
 **Change History**:
+- 3.1.0 (2026-01-27): Version synchronization - .agent/ v1.0.0 production release, fixed broken migration links, enhanced reading priority guidance, clarified code comment standards, updated skills catalog
 - 3.0.0 (2026-01-24): Content deduplication, universal AI support, unified version management
 - 2.0.0 (2026-01-23): v4.0.0 breaking changes, foundation package documentation
 - 1.0.0 (2026-01-22): Initial versioned release
