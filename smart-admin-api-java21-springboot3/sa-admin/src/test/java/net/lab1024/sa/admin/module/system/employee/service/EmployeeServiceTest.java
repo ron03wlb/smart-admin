@@ -313,7 +313,9 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(securityPasswordService.randomPassword()).thenReturn(randomPassword);
       when(securityPasswordService.getEncryptPwd(anyString())).thenReturn("encrypted_password");
 
-      doNothing().when(employeeManager).saveEmployee(any(EmployeeEntity.class), anyList());
+      doNothing()
+          .when(employeeManager)
+          .saveEmployeeTransaction(any(EmployeeEntity.class), anyList());
 
       // When
       ResponseDTO<String> response = employeeService.addEmployee(employeeAddForm);
@@ -322,7 +324,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       assertOk(response);
       assertEquals(randomPassword, response.getData());
       verify(employeeManager, times(1))
-          .saveEmployee(
+          .saveEmployeeTransaction(
               argThat(
                   entity ->
                       entity.getLoginName().equals(employeeAddForm.getLoginName())
@@ -344,7 +346,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "登录名重复");
-      verify(employeeManager, never()).saveEmployee(any(), anyList());
+      verify(employeeManager, never()).saveEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -360,7 +362,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "手机号已存在");
-      verify(employeeManager, never()).saveEmployee(any(), anyList());
+      verify(employeeManager, never()).saveEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -377,7 +379,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "部门不存在");
-      verify(employeeManager, never()).saveEmployee(any(), anyList());
+      verify(employeeManager, never()).saveEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -392,7 +394,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(securityPasswordService.randomPassword()).thenReturn(randomPassword);
       when(securityPasswordService.getEncryptPwd(anyString())).thenReturn("encrypted_test_pwd");
 
-      doNothing().when(employeeManager).saveEmployee(any(), anyList());
+      doNothing().when(employeeManager).saveEmployeeTransaction(any(), anyList());
 
       // When
       ResponseDTO<String> response = employeeService.addEmployee(employeeAddForm);
@@ -417,13 +419,14 @@ class EmployeeServiceTest extends BaseUnitTest {
       List<Long> roleIds = List.of(1L, 2L, 3L);
       employeeAddForm.setRoleIdList(roleIds);
 
-      doNothing().when(employeeManager).saveEmployee(any(), anyList());
+      doNothing().when(employeeManager).saveEmployeeTransaction(any(), anyList());
 
       // When
       employeeService.addEmployee(employeeAddForm);
 
       // Then
-      verify(employeeManager, times(1)).saveEmployee(any(EmployeeEntity.class), eq(roleIds));
+      verify(employeeManager, times(1))
+          .saveEmployeeTransaction(any(EmployeeEntity.class), eq(roleIds));
     }
 
     @Test
@@ -436,14 +439,14 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(securityPasswordService.randomPassword()).thenReturn("Random@123");
       when(securityPasswordService.getEncryptPwd(anyString())).thenReturn("encrypted");
 
-      doNothing().when(employeeManager).saveEmployee(any(), anyList());
+      doNothing().when(employeeManager).saveEmployeeTransaction(any(), anyList());
 
       // When
       employeeService.addEmployee(employeeAddForm);
 
       // Then
       verify(employeeManager, times(1))
-          .saveEmployee(
+          .saveEmployeeTransaction(
               argThat(entity -> Boolean.FALSE.equals(entity.getDeletedFlag())), anyList());
     }
 
@@ -457,14 +460,14 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(securityPasswordService.randomPassword()).thenReturn("Random@123");
       when(securityPasswordService.getEncryptPwd(anyString())).thenReturn("encrypted");
 
-      doNothing().when(employeeManager).saveEmployee(any(), anyList());
+      doNothing().when(employeeManager).saveEmployeeTransaction(any(), anyList());
 
       // When
       employeeService.addEmployee(employeeAddForm);
 
       // Then
       verify(employeeManager, times(1))
-          .saveEmployee(
+          .saveEmployeeTransaction(
               argThat(
                   entity ->
                       entity.getEmployeeUid() != null && entity.getEmployeeUid().length() == 32),
@@ -499,7 +502,9 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(employeeDao.getByPhone(updateForm.getPhone(), null)).thenReturn(null);
       when(employeeDao.getByEmail(updateForm.getEmail(), null)).thenReturn(null);
 
-      doNothing().when(employeeManager).updateEmployee(any(EmployeeEntity.class), anyList());
+      doNothing()
+          .when(employeeManager)
+          .updateEmployeeTransaction(any(EmployeeEntity.class), anyList());
       doNothing().when(loginManager).clearUserPermission(TEST_EMPLOYEE_ID);
       doNothing().when(loginManager).clearUserLoginInfo(TEST_EMPLOYEE_ID);
 
@@ -509,7 +514,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertOk(response);
       verify(employeeManager, times(1))
-          .updateEmployee(
+          .updateEmployeeTransaction(
               argThat(
                   entity ->
                       entity.getEmployeeId().equals(TEST_EMPLOYEE_ID)
@@ -530,7 +535,7 @@ class EmployeeServiceTest extends BaseUnitTest {
 
       // Then
       assertError(response, UserErrorCode.DATA_NOT_EXIST);
-      verify(employeeManager, never()).updateEmployee(any(), anyList());
+      verify(employeeManager, never()).updateEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -546,7 +551,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "部门不存在");
-      verify(employeeManager, never()).updateEmployee(any(), anyList());
+      verify(employeeManager, never()).updateEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -568,7 +573,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "登录名重复");
-      verify(employeeManager, never()).updateEmployee(any(), anyList());
+      verify(employeeManager, never()).updateEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -590,7 +595,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "手机号已存在");
-      verify(employeeManager, never()).updateEmployee(any(), anyList());
+      verify(employeeManager, never()).updateEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -613,7 +618,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
       assertErrorContains(response, "邮箱账号已存在");
-      verify(employeeManager, never()).updateEmployee(any(), anyList());
+      verify(employeeManager, never()).updateEmployeeTransaction(any(), anyList());
     }
 
     @Test
@@ -630,7 +635,7 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(employeeDao.getByPhone(updateForm.getPhone(), null)).thenReturn(null);
       when(employeeDao.getByEmail(updateForm.getEmail(), null)).thenReturn(null);
 
-      doNothing().when(employeeManager).updateEmployee(any(), anyList());
+      doNothing().when(employeeManager).updateEmployeeTransaction(any(), anyList());
       doNothing().when(loginManager).clearUserPermission(anyLong());
       doNothing().when(loginManager).clearUserLoginInfo(anyLong());
 
@@ -639,7 +644,7 @@ class EmployeeServiceTest extends BaseUnitTest {
 
       // Then
       assertOk(response);
-      verify(employeeManager, times(1)).updateEmployee(any(), anyList());
+      verify(employeeManager, times(1)).updateEmployeeTransaction(any(), anyList());
     }
   }
 

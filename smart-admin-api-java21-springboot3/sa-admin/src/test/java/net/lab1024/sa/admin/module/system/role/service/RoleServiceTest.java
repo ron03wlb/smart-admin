@@ -199,7 +199,7 @@ class RoleServiceTest extends BaseUnitTest {
       // Given
       when(roleDao.selectById(TEST_ROLE_ID)).thenReturn(testRoleEntity);
       when(roleEmployeeDao.existsByRoleId(TEST_ROLE_ID)).thenReturn(null); // No employees
-      doNothing().when(roleManager).deleteRoleWithCascade(TEST_ROLE_ID);
+      doNothing().when(roleManager).deleteRoleWithCascadeTransaction(TEST_ROLE_ID);
 
       // When
       ResponseDTO<String> result = roleService.deleteRole(TEST_ROLE_ID);
@@ -208,7 +208,7 @@ class RoleServiceTest extends BaseUnitTest {
       assertOk(result);
       verify(roleDao, times(1)).selectById(TEST_ROLE_ID);
       verify(roleEmployeeDao, times(1)).existsByRoleId(TEST_ROLE_ID);
-      verify(roleManager, times(1)).deleteRoleWithCascade(TEST_ROLE_ID);
+      verify(roleManager, times(1)).deleteRoleWithCascadeTransaction(TEST_ROLE_ID);
     }
 
     @Test
@@ -224,7 +224,7 @@ class RoleServiceTest extends BaseUnitTest {
       assertError(result, UserErrorCode.DATA_NOT_EXIST);
       verify(roleDao, times(1)).selectById(TEST_ROLE_ID);
       verify(roleEmployeeDao, never()).existsByRoleId(any());
-      verify(roleManager, never()).deleteRoleWithCascade(any());
+      verify(roleManager, never()).deleteRoleWithCascadeTransaction(any());
     }
 
     @Test
@@ -242,7 +242,7 @@ class RoleServiceTest extends BaseUnitTest {
       assertErrorContains(result, "该角色下存在员工");
       verify(roleDao, times(1)).selectById(TEST_ROLE_ID);
       verify(roleEmployeeDao, times(1)).existsByRoleId(TEST_ROLE_ID);
-      verify(roleManager, never()).deleteRoleWithCascade(any());
+      verify(roleManager, never()).deleteRoleWithCascadeTransaction(any());
     }
 
     @Test
@@ -251,14 +251,14 @@ class RoleServiceTest extends BaseUnitTest {
       // Given
       when(roleDao.selectById(TEST_ROLE_ID)).thenReturn(testRoleEntity);
       when(roleEmployeeDao.existsByRoleId(TEST_ROLE_ID)).thenReturn(null);
-      doNothing().when(roleManager).deleteRoleWithCascade(TEST_ROLE_ID);
+      doNothing().when(roleManager).deleteRoleWithCascadeTransaction(TEST_ROLE_ID);
 
       // When
       ResponseDTO<String> result = roleService.deleteRole(TEST_ROLE_ID);
 
       // Then
       assertOk(result);
-      verify(roleManager, times(1)).deleteRoleWithCascade(TEST_ROLE_ID);
+      verify(roleManager, times(1)).deleteRoleWithCascadeTransaction(TEST_ROLE_ID);
     }
 
     @Test
@@ -287,7 +287,7 @@ class RoleServiceTest extends BaseUnitTest {
       when(roleDao.selectById(TEST_ROLE_ID)).thenReturn(testRoleEntity);
       when(roleDao.getByRoleName(TEST_ROLE_NAME)).thenReturn(null);
       when(roleDao.getByRoleCode(TEST_ROLE_CODE)).thenReturn(null);
-      doNothing().when(roleManager).updateRole(any(RoleEntity.class));
+      doNothing().when(roleManager).updateRoleTransaction(any(RoleEntity.class));
 
       // When
       ResponseDTO<String> result = roleService.updateRole(testUpdateForm);
@@ -297,7 +297,7 @@ class RoleServiceTest extends BaseUnitTest {
       verify(roleDao, times(1)).selectById(TEST_ROLE_ID);
       verify(roleDao, times(1)).getByRoleName(TEST_ROLE_NAME);
       verify(roleDao, times(1)).getByRoleCode(TEST_ROLE_CODE);
-      verify(roleManager, times(1)).updateRole(any(RoleEntity.class));
+      verify(roleManager, times(1)).updateRoleTransaction(any(RoleEntity.class));
     }
 
     @Test
@@ -314,7 +314,7 @@ class RoleServiceTest extends BaseUnitTest {
       verify(roleDao, times(1)).selectById(TEST_ROLE_ID);
       verify(roleDao, never()).getByRoleName(anyString());
       verify(roleDao, never()).getByRoleCode(anyString());
-      verify(roleManager, never()).updateRole(any());
+      verify(roleManager, never()).updateRoleTransaction(any());
     }
 
     @Test
@@ -332,7 +332,7 @@ class RoleServiceTest extends BaseUnitTest {
       verify(roleDao, times(1)).selectById(TEST_ROLE_ID);
       verify(roleDao, times(1)).getByRoleName(TEST_ROLE_NAME);
       verify(roleDao, never()).getByRoleCode(anyString());
-      verify(roleManager, never()).updateRole(any());
+      verify(roleManager, never()).updateRoleTransaction(any());
     }
 
     @Test
@@ -350,7 +350,7 @@ class RoleServiceTest extends BaseUnitTest {
       assertErrorContains(result, "角色编码重复");
       assertErrorContains(result, existingRoleEntity.getRoleName());
       verify(roleDao, times(1)).getByRoleCode(TEST_ROLE_CODE);
-      verify(roleManager, never()).updateRole(any());
+      verify(roleManager, never()).updateRoleTransaction(any());
     }
 
     @Test
@@ -360,14 +360,14 @@ class RoleServiceTest extends BaseUnitTest {
       when(roleDao.selectById(TEST_ROLE_ID)).thenReturn(testRoleEntity);
       when(roleDao.getByRoleName(TEST_ROLE_NAME)).thenReturn(testRoleEntity); // Same ID
       when(roleDao.getByRoleCode(TEST_ROLE_CODE)).thenReturn(null);
-      doNothing().when(roleManager).updateRole(any(RoleEntity.class));
+      doNothing().when(roleManager).updateRoleTransaction(any(RoleEntity.class));
 
       // When
       ResponseDTO<String> result = roleService.updateRole(testUpdateForm);
 
       // Then
       assertOk(result); // Should succeed - same role
-      verify(roleManager, times(1)).updateRole(any(RoleEntity.class));
+      verify(roleManager, times(1)).updateRoleTransaction(any(RoleEntity.class));
     }
 
     @Test
@@ -377,14 +377,14 @@ class RoleServiceTest extends BaseUnitTest {
       when(roleDao.selectById(TEST_ROLE_ID)).thenReturn(testRoleEntity);
       when(roleDao.getByRoleName(TEST_ROLE_NAME)).thenReturn(null);
       when(roleDao.getByRoleCode(TEST_ROLE_CODE)).thenReturn(testRoleEntity); // Same ID
-      doNothing().when(roleManager).updateRole(any(RoleEntity.class));
+      doNothing().when(roleManager).updateRoleTransaction(any(RoleEntity.class));
 
       // When
       ResponseDTO<String> result = roleService.updateRole(testUpdateForm);
 
       // Then
       assertOk(result); // Should succeed - same role
-      verify(roleManager, times(1)).updateRole(any(RoleEntity.class));
+      verify(roleManager, times(1)).updateRoleTransaction(any(RoleEntity.class));
     }
 
     @Test
@@ -394,14 +394,14 @@ class RoleServiceTest extends BaseUnitTest {
       when(roleDao.selectById(TEST_ROLE_ID)).thenReturn(testRoleEntity);
       when(roleDao.getByRoleName(TEST_ROLE_NAME)).thenReturn(null);
       when(roleDao.getByRoleCode(TEST_ROLE_CODE)).thenReturn(null);
-      doNothing().when(roleManager).updateRole(any(RoleEntity.class));
+      doNothing().when(roleManager).updateRoleTransaction(any(RoleEntity.class));
 
       // When
       ResponseDTO<String> result = roleService.updateRole(testUpdateForm);
 
       // Then
       assertOk(result);
-      verify(roleManager, times(1)).updateRole(any(RoleEntity.class));
+      verify(roleManager, times(1)).updateRoleTransaction(any(RoleEntity.class));
     }
   }
 

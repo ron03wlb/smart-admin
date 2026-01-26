@@ -93,10 +93,10 @@ class RoleMenuManagerTest extends BaseUnitTest {
     testMenuEntityList.add(menu3);
   }
 
-  // ==================== updateRoleMenu() Tests ====================
+  // ==================== updateRoleMenuTransaction() Tests ====================
 
   @Nested
-  @DisplayName("updateRoleMenu() Tests - Transaction Pattern (Delete + Batch Insert)")
+  @DisplayName("updateRoleMenuTransaction() Tests - Transaction Pattern (Delete + Batch Insert)")
   class UpdateRoleMenuTests {
 
     @Test
@@ -107,7 +107,7 @@ class RoleMenuManagerTest extends BaseUnitTest {
       // Note: saveBatch is inherited from ServiceImpl, we need to verify the call pattern
 
       // When
-      roleMenuManager.updateRoleMenu(TEST_ROLE_ID, testRoleMenuList);
+      roleMenuManager.updateRoleMenuTransaction(TEST_ROLE_ID, testRoleMenuList);
 
       // Then
       verify(roleMenuDao, times(1)).deleteByRoleId(TEST_ROLE_ID);
@@ -122,7 +122,7 @@ class RoleMenuManagerTest extends BaseUnitTest {
       doNothing().when(roleMenuDao).deleteByRoleId(TEST_ROLE_ID);
 
       // When
-      roleMenuManager.updateRoleMenu(TEST_ROLE_ID, testRoleMenuList);
+      roleMenuManager.updateRoleMenuTransaction(TEST_ROLE_ID, testRoleMenuList);
 
       // Then - verify delete called first
       var inOrder = inOrder(roleMenuDao);
@@ -138,7 +138,7 @@ class RoleMenuManagerTest extends BaseUnitTest {
       doNothing().when(roleMenuDao).deleteByRoleId(TEST_ROLE_ID);
 
       // When
-      roleMenuManager.updateRoleMenu(TEST_ROLE_ID, emptyList);
+      roleMenuManager.updateRoleMenuTransaction(TEST_ROLE_ID, emptyList);
 
       // Then - delete called, but no inserts
       verify(roleMenuDao, times(1)).deleteByRoleId(TEST_ROLE_ID);
@@ -152,7 +152,7 @@ class RoleMenuManagerTest extends BaseUnitTest {
       doNothing().when(roleMenuDao).deleteByRoleId(specificRoleId);
 
       // When
-      roleMenuManager.updateRoleMenu(specificRoleId, testRoleMenuList);
+      roleMenuManager.updateRoleMenuTransaction(specificRoleId, testRoleMenuList);
 
       // Then
       verify(roleMenuDao, times(1)).deleteByRoleId(specificRoleId);
@@ -167,7 +167,7 @@ class RoleMenuManagerTest extends BaseUnitTest {
       doNothing().when(roleMenuDao).deleteByRoleId(TEST_ROLE_ID);
 
       // When
-      roleMenuManager.updateRoleMenu(TEST_ROLE_ID, singleList);
+      roleMenuManager.updateRoleMenuTransaction(TEST_ROLE_ID, singleList);
 
       // Then
       verify(roleMenuDao, times(1)).deleteByRoleId(TEST_ROLE_ID);
@@ -188,7 +188,7 @@ class RoleMenuManagerTest extends BaseUnitTest {
       doNothing().when(roleMenuDao).deleteByRoleId(TEST_ROLE_ID);
 
       // When
-      roleMenuManager.updateRoleMenu(TEST_ROLE_ID, largeBatch);
+      roleMenuManager.updateRoleMenuTransaction(TEST_ROLE_ID, largeBatch);
 
       // Then
       verify(roleMenuDao, times(1)).deleteByRoleId(TEST_ROLE_ID);

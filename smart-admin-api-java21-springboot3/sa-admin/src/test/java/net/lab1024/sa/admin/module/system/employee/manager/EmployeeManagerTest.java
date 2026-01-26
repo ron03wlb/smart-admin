@@ -88,7 +88,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.saveEmployee(testEmployee, testRoleIds);
+      employeeManager.saveEmployeeTransaction(testEmployee, testRoleIds);
 
       // Then
       InOrder inOrder = inOrder(employeeDao, roleEmployeeDao);
@@ -107,7 +107,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(employeeDao.insert(testEmployee)).thenReturn(1);
 
       // When
-      employeeManager.saveEmployee(testEmployee, new ArrayList<>());
+      employeeManager.saveEmployeeTransaction(testEmployee, new ArrayList<>());
 
       // Then
       verify(employeeDao, times(1)).insert(testEmployee);
@@ -121,7 +121,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(employeeDao.insert(testEmployee)).thenReturn(1);
 
       // When
-      employeeManager.saveEmployee(testEmployee, null);
+      employeeManager.saveEmployeeTransaction(testEmployee, null);
 
       // Then
       verify(employeeDao, times(1)).insert(testEmployee);
@@ -137,7 +137,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.saveEmployee(testEmployee, singleRoleList);
+      employeeManager.saveEmployeeTransaction(testEmployee, singleRoleList);
 
       // Then
       verify(employeeDao, times(1)).insert(testEmployee);
@@ -153,7 +153,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.saveEmployee(testEmployee, multipleRoles);
+      employeeManager.saveEmployeeTransaction(testEmployee, multipleRoles);
 
       // Then
       verify(employeeDao, times(1)).insert(testEmployee);
@@ -170,7 +170,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.saveEmployee(newEmployee, List.of(ROLE_ID_1));
+      employeeManager.saveEmployeeTransaction(newEmployee, List.of(ROLE_ID_1));
 
       // Then
       verify(roleEmployeeDao, times(1)).insert(any(RoleEmployeeEntity.class));
@@ -190,7 +190,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.updateEmployee(testEmployee, testRoleIds);
+      employeeManager.updateEmployeeTransaction(testEmployee, testRoleIds);
 
       // Then
       InOrder inOrder = inOrder(employeeDao, roleEmployeeDao);
@@ -213,7 +213,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       doNothing().when(roleEmployeeDao).deleteByEmployeeId(TEST_EMPLOYEE_ID);
 
       // When
-      employeeManager.updateEmployee(testEmployee, new ArrayList<>());
+      employeeManager.updateEmployeeTransaction(testEmployee, new ArrayList<>());
 
       // Then
       InOrder inOrder = inOrder(employeeDao, roleEmployeeDao);
@@ -236,7 +236,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       doNothing().when(roleEmployeeDao).deleteByEmployeeId(TEST_EMPLOYEE_ID);
 
       // When
-      employeeManager.updateEmployee(testEmployee, null);
+      employeeManager.updateEmployeeTransaction(testEmployee, null);
 
       // Then
       verify(employeeDao, times(1)).updateById(testEmployee);
@@ -254,7 +254,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.updateEmployee(testEmployee, newRoles);
+      employeeManager.updateEmployeeTransaction(testEmployee, newRoles);
 
       // Then
       verify(roleEmployeeDao, times(1)).deleteByEmployeeId(TEST_EMPLOYEE_ID);
@@ -270,7 +270,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.updateEmployee(testEmployee, testRoleIds);
+      employeeManager.updateEmployeeTransaction(testEmployee, testRoleIds);
 
       // Then - updateEmployeeRole() delegates to DAO
       verify(roleEmployeeDao, times(1)).deleteByEmployeeId(TEST_EMPLOYEE_ID);
@@ -294,7 +294,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.updateEmployeeRole(TEST_EMPLOYEE_ID, newRoles);
+      employeeManager.updateEmployeeRoleTransaction(TEST_EMPLOYEE_ID, newRoles);
 
       // Then
       InOrder inOrder = inOrder(roleEmployeeDao);
@@ -313,7 +313,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       doNothing().when(roleEmployeeDao).deleteByEmployeeId(TEST_EMPLOYEE_ID);
 
       // When
-      employeeManager.updateEmployeeRole(TEST_EMPLOYEE_ID, new ArrayList<>());
+      employeeManager.updateEmployeeRoleTransaction(TEST_EMPLOYEE_ID, new ArrayList<>());
 
       // Then
       verify(roleEmployeeDao, times(1)).deleteByEmployeeId(TEST_EMPLOYEE_ID);
@@ -327,7 +327,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       doNothing().when(roleEmployeeDao).deleteByEmployeeId(TEST_EMPLOYEE_ID);
 
       // When
-      employeeManager.updateEmployeeRole(TEST_EMPLOYEE_ID, null);
+      employeeManager.updateEmployeeRoleTransaction(TEST_EMPLOYEE_ID, null);
 
       // Then
       verify(roleEmployeeDao, times(1)).deleteByEmployeeId(TEST_EMPLOYEE_ID);
@@ -347,7 +347,7 @@ class EmployeeManagerTest extends BaseUnitTest {
       when(roleEmployeeDao.insert(any(RoleEmployeeEntity.class))).thenReturn(1);
 
       // When
-      employeeManager.updateEmployeeRole(TEST_EMPLOYEE_ID, multipleRoles);
+      employeeManager.updateEmployeeRoleTransaction(TEST_EMPLOYEE_ID, multipleRoles);
 
       // Then
       verify(roleEmployeeDao, times(1)).deleteByEmployeeId(TEST_EMPLOYEE_ID);
@@ -378,7 +378,8 @@ class EmployeeManagerTest extends BaseUnitTest {
 
       // When/Then - Exception propagates (would trigger rollback in production)
       assertThrows(
-          RuntimeException.class, () -> employeeManager.saveEmployee(testEmployee, testRoleIds));
+          RuntimeException.class,
+          () -> employeeManager.saveEmployeeTransaction(testEmployee, testRoleIds));
 
       // Verify employee insert was attempted
       verify(employeeDao, times(1)).insert(testEmployee);
@@ -398,7 +399,8 @@ class EmployeeManagerTest extends BaseUnitTest {
 
       // When/Then - Exception propagates
       assertThrows(
-          RuntimeException.class, () -> employeeManager.updateEmployee(testEmployee, testRoleIds));
+          RuntimeException.class,
+          () -> employeeManager.updateEmployeeTransaction(testEmployee, testRoleIds));
 
       // Verify update was attempted
       verify(employeeDao, times(1)).updateById(testEmployee);
