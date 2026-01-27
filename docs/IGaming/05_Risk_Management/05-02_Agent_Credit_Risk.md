@@ -427,6 +427,266 @@ Exposure Ratio = 800,000 / 1,000,000 = 80%
     *   **全線停權**：該代理旗下所有玩家帳號 "Suspend"。
     *   **強制結算**：立即執行週結流程，鎖定債務。
 
+##### 📊 Diagram 3: 強制平倉決策樹 (Forced Liquidation Decision Tree)
+
+```mermaid
+flowchart TD
+    START[實時監控<br/>Agent Margin Level] --> CALC[計算保證金水平<br/>Margin Level = Deposit + Balance / Current Loss]
+
+    CALC --> CHECK{Margin Level<br/>閾值檢查}
+
+    CHECK -->|≥ 150%| SAFE[🟢 安全區<br/>Safe Zone]
+    CHECK -->|110% - 149%| WATCH[🟡 觀察區<br/>Watch Zone]
+    CHECK -->|100% - 109%| CALL[🟠 追繳區<br/>Margin Call]
+    CHECK -->|80% - 99%| SOFT[🔴 軟停權<br/>Soft Stop]
+    CHECK -->|< 80%| HARD[🚨 硬停權<br/>Hard Stop - Liquidation]
+
+    SAFE --> SAFE_ACTION[✅ 正常運營<br/>Actions allowed:<br/>- 新增玩家<br/>- 發放額度<br/>- 調整佔成<br/>- 正常結算]
+
+    WATCH --> WATCH_ACTION[⚠️ 增強監控<br/>Actions:<br/>- 監控頻率: 10s → 5s<br/>- 發送預警郵件<br/>- 建議補繳保證金<br/>- 所有操作正常]
+
+    CALL --> CALL_NOTIFY[📧 發送追繳通知<br/>Margin Call Notification]
+    CALL_NOTIFY --> CALL_WAIT{等待 24 小時<br/>代理是否補繳?}
+
+    CALL_WAIT -->|已補繳| CALC_RECHECK[重新計算 Margin Level]
+    CALC_RECHECK --> CHECK
+
+    CALL_WAIT -->|24h 內未補繳| CALL_ESCALATE[升級為 Soft Stop]
+    CALL_ESCALATE --> SOFT
+
+    SOFT --> SOFT_ACTION1[🔒 禁止新增玩家<br/>Disable: Add new players]
+    SOFT --> SOFT_ACTION2[🔒 禁止發放新額度<br/>Disable: Grant new credit]
+    SOFT --> SOFT_ACTION3[🔒 鎖定佔成修改<br/>Lock: Position % changes]
+
+    SOFT_ACTION1 --> SOFT_WAIT{等待 48 小時<br/>代理是否補繳?}
+    SOFT_ACTION2 --> SOFT_WAIT
+    SOFT_ACTION3 --> SOFT_WAIT
+
+    SOFT_WAIT -->|已補繳至 ≥ 110%| SOFT_RELEASE[解除軟停權<br/>Resume normal operations]
+    SOFT_RELEASE --> CALC
+
+    SOFT_WAIT -->|48h 內未補繳 OR<br/>Margin Level < 80%| SOFT_ESCALATE[升級為 Hard Stop]
+    SOFT_ESCALATE --> HARD
+
+    HARD --> HARD_ACTION1[🚨 全線停權<br/>Suspend all players under agent]
+    HARD --> HARD_ACTION2[🚨 強制結算<br/>Execute immediate settlement]
+    HARD --> HARD_ACTION3[🚨 凍結資金<br/>Freeze all funds]
+    HARD --> HARD_ACTION4[🚨 通知法務<br/>Notify legal team]
+
+    HARD_ACTION1 --> LIQUIDATION[強制平倉流程<br/>Forced Liquidation Process]
+    HARD_ACTION2 --> LIQUIDATION
+    HARD_ACTION3 --> LIQUIDATION
+    HARD_ACTION4 --> LIQUIDATION
+
+    LIQUIDATION --> LIQ1[計算總債務<br/>Total debt = Σ Player losses]
+    LIQ1 --> LIQ2{保證金是否足夠?<br/>Deposit ≥ Total debt?}
+
+    LIQ2 -->|是| LIQ_COVER[✅ 保證金覆蓋債務<br/>Deduct from deposit<br/>Return remaining balance]
+    LIQ2 -->|否| LIQ_DEFICIT[❌ 保證金不足<br/>Deficit = Total debt - Deposit]
+
+    LIQ_COVER --> LIQ_SETTLE[結算完成<br/>代理帳號狀態: LIQUIDATED]
+    LIQ_DEFICIT --> LIQ_LEGAL[法務追償<br/>Legal debt collection<br/>代理帳號狀態: DEFAULTED]
+
+    LIQ_SETTLE --> END[記錄審計日誌<br/>通知所有相關方<br/>更新代理信用分為 0]
+    LIQ_LEGAL --> END
+
+    SAFE_ACTION --> MONITOR[持續監控]
+    WATCH_ACTION --> MONITOR
+    MONITOR --> CALC
+
+    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style CALC fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+
+    style SAFE fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+    style WATCH fill:#FFC107,stroke:#F57F00,stroke-width:2px
+    style CALL fill:#FF9800,stroke:#E65100,stroke-width:2px
+    style SOFT fill:#F44336,stroke:#B71C1C,stroke-width:2px,color:#FFF
+    style HARD fill:#B71C1C,stroke:#4A0000,stroke-width:3px,color:#FFF
+
+    style SAFE_ACTION fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style WATCH_ACTION fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style CALL_NOTIFY fill:#FFCC80,stroke:#E65100,stroke-width:2px
+
+    style SOFT_ACTION1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style SOFT_ACTION2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style SOFT_ACTION3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+
+    style HARD_ACTION1 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
+    style HARD_ACTION2 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
+    style HARD_ACTION3 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
+    style HARD_ACTION4 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
+
+    style LIQUIDATION fill:#E91E63,stroke:#880E4F,stroke-width:2px,color:#FFF
+
+    style LIQ_COVER fill:#66BB6A,stroke:#2E7D32,stroke-width:2px
+    style LIQ_DEFICIT fill:#EF5350,stroke:#C62828,stroke-width:2px
+
+    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+```
+
+**強制平倉機制詳細說明**:
+
+### 5.2 Margin Level 區間與處置措施
+
+| Margin Level 區間 | 狀態 | 處置措施 | 時限 | 升級條件 |
+|-------------------|------|----------|------|----------|
+| **≥ 150%** | 🟢 安全區 (Safe Zone) | 正常運營，所有操作允許 | - | 持續監控 |
+| **110% - 149%** | 🟡 觀察區 (Watch Zone) | 增強監控（5s 刷新）+ 預警郵件 | - | Margin Level < 110% |
+| **100% - 109%** | 🟠 追繳區 (Margin Call) | 發送追繳通知，要求 24h 內補繳 | 24 小時 | 24h 內未補繳 |
+| **80% - 99%** | 🔴 軟停權 (Soft Stop) | 禁止新增玩家、發放額度、修改佔成 | 48 小時 | 48h 內未補繳 OR Margin Level < 80% |
+| **< 80%** | 🚨 硬停權 (Hard Stop) | 全線停權 + 強制結算 + 凍結資金 | 立即 | 立即觸發平倉流程 |
+
+### 5.3 強制平倉流程 (Liquidation Process)
+
+**階段 1: 債務確認**
+```
+1. 暫停該代理線所有交易（所有玩家帳號 SUSPEND）
+2. 計算總債務 = Σ(所有玩家未結算虧損 + 代理欠款)
+3. 鎖定保證金（Deposit + Account Balance）
+4. 生成債務清單（Debt Statement）
+```
+
+**階段 2: 資金清算**
+```
+if (保證金 ≥ 總債務):
+    1. 從保證金扣除總債務
+    2. 返還剩餘保證金至代理帳戶
+    3. 代理帳號狀態: LIQUIDATED（已清算）
+    4. 可申請重新激活（需重新繳納保證金）
+else:
+    1. 保證金全額扣除
+    2. 計算虧空金額 = 總債務 - 保證金
+    3. 代理帳號狀態: DEFAULTED（違約）
+    4. 轉法務部門追償（Legal Debt Collection）
+```
+
+**階段 3: 審計記錄**
+```
+1. 記錄完整平倉流程日誌
+2. 通知平台管理員 + 財務團隊 + 法務團隊
+3. 更新代理信用分為 0（永久記錄）
+4. 生成事後分析報告（Post-mortem Report）
+```
+
+### 5.4 實際案例
+
+**案例 1: 追繳成功 (Margin Call → Safe)**
+```
+初始狀態:
+  - Agent ID: 10001
+  - Deposit: $100,000
+  - Account Balance: $15,000
+  - Current Loss: $110,000
+  - Margin Level = (100,000 + 15,000) / 110,000 = 104.5%
+
+觸發: 🟠 Margin Call (< 110%)
+處置:
+  1. 發送追繳通知（要求補繳 $10,000）
+  2. 24 小時倒計時
+
+結果: 代理於 12 小時後補繳 $10,000
+  - 新 Deposit: $110,000
+  - Margin Level = (110,000 + 15,000) / 110,000 = 113.6%
+  - 狀態: 🟡 Watch Zone（解除追繳）
+```
+
+**案例 2: 軟停權未補繳 (Soft Stop → Hard Stop)**
+```
+初始狀態:
+  - Agent ID: 20002
+  - Deposit: $50,000
+  - Account Balance: $8,000
+  - Current Loss: $60,000
+  - Margin Level = (50,000 + 8,000) / 60,000 = 96.7%
+
+觸發: 🔴 Soft Stop (< 100%)
+處置:
+  1. 禁止新增玩家、發放額度
+  2. 48 小時倒計時
+
+結果: 代理未補繳，48 小時後虧損擴大
+  - Current Loss: $75,000
+  - Margin Level = 58,000 / 75,000 = 77.3%
+  - 狀態: 🚨 Hard Stop（觸發平倉）
+```
+
+**案例 3: 強制平倉成功覆蓋 (Hard Stop → Liquidated)**
+```
+初始狀態:
+  - Agent ID: 30003
+  - Deposit: $200,000
+  - Account Balance: -$20,000 (虧損)
+  - Current Loss: $220,000
+  - Margin Level = (200,000 - 20,000) / 220,000 = 81.8%
+
+虧損擴大:
+  - Current Loss: $250,000
+  - Margin Level = 180,000 / 250,000 = 72% (< 80%)
+
+觸發: 🚨 Hard Stop - 立即平倉
+處置:
+  1. 全線停權（所有玩家帳號 SUSPEND）
+  2. 強制結算總債務: $250,000
+  3. 保證金扣除: $200,000
+  4. 虧空金額: $50,000
+
+結果:
+  - 代理帳號狀態: DEFAULTED
+  - 虧空 $50,000 轉法務追償
+  - 信用分: 0（永久記錄）
+```
+
+**案例 4: 強制平倉有餘額 (Hard Stop → Liquidated with Refund)**
+```
+初始狀態:
+  - Agent ID: 40004
+  - Deposit: $300,000
+  - Account Balance: $50,000
+  - Current Loss: $180,000
+  - Margin Level = (300,000 + 50,000) / 180,000 = 194.4%
+
+極端虧損:
+  - Current Loss: $480,000（極端黑天鵝事件）
+  - Margin Level = 350,000 / 480,000 = 72.9% (< 80%)
+
+觸發: 🚨 Hard Stop - 立即平倉
+處置:
+  1. 全線停權
+  2. 強制結算總債務: $480,000
+  3. 保證金扣除: $350,000
+  4. 虧空金額: $130,000
+
+結果:
+  - 代理帳號狀態: DEFAULTED
+  - 虧空 $130,000 轉法務追償
+  - 平台損失: $130,000（保證金不足覆蓋）
+  - 教訓: 保證金覆蓋率應設定 ≥ 200%
+```
+
+### 5.5 風險控制建議
+
+1. **保證金覆蓋率設定**:
+   - 最低要求: 150%
+   - 推薦: 200%
+   - 高風險代理: 250%+
+
+2. **監控頻率**:
+   - Safe Zone (≥ 150%): 每 10 分鐘
+   - Watch Zone (110-149%): 每 5 分鐘
+   - Margin Call (100-109%): 每 1 分鐘
+   - Soft Stop (80-99%): 實時 (< 30 秒)
+   - Hard Stop (< 80%): 實時 (< 10 秒)
+
+3. **追繳時限**:
+   - Margin Call: 24 小時
+   - Soft Stop: 48 小時
+   - Hard Stop: 立即觸發（無等待）
+
+4. **法務追償**:
+   - 虧空金額 < $10,000: 內部協商
+   - 虧空金額 $10,000 - $100,000: 法律函件
+   - 虧空金額 > $100,000: 立即提起訴訟
+
 ---
 
 ## 6. 審計與合規 (Audit & Compliance)
