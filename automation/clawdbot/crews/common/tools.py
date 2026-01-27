@@ -530,6 +530,69 @@ class GitOperationTool:
 #
 
 # ----------------------------------------------------------------------------
+# AI 代碼生成工具 (1 個) - Week 1 Day 3-4
+# ----------------------------------------------------------------------------
+
+@tool("Generate Java Code with Claude AI")
+def generate_java_code_tool(feature_spec_json: str) -> str:
+    """
+    使用 Claude AI 生成 Java 後端代碼（符合 SmartAdmin 規範）
+
+    Args:
+        feature_spec_json: 功能規格 JSON 字符串
+            {
+                "name": "Employee Management",
+                "entity": "Employee",
+                "endpoints": ["list", "add", "update", "delete"],
+                "fields": {
+                    "name": {"type": "String", "required": true},
+                    "email": {"type": "String", "required": true}
+                }
+            }
+
+    Returns:
+        生成結果 JSON 字符串，包含文件路徑和內容
+    """
+    try:
+        # 解析 feature_spec
+        feature_spec = json.loads(feature_spec_json)
+
+        # 導入 Claude 服務
+        import sys
+        ai_path = os.path.join(os.path.dirname(__file__), '..', '..', 'ai')
+        if ai_path not in sys.path:
+            sys.path.append(ai_path)
+
+        from claude_service import ClaudeService
+
+        # 初始化 Claude 服務
+        claude = ClaudeService(model="sonnet", temperature=0.2)
+
+        # 讀取 SmartAdmin 示例代碼作為 context（可選）
+        context = {}
+        # TODO: 可以添加示例代碼文件讀取邏輯
+
+        # 生成代碼
+        generated_files = claude.generate_java_backend(feature_spec, context)
+
+        # 返回結果
+        result = {
+            "success": True,
+            "files_generated": len(generated_files),
+            "files": generated_files
+        }
+
+        return json.dumps(result, indent=2, ensure_ascii=False)
+
+    except Exception as e:
+        logger.error(f"generate_java_code_tool error: {e}")
+        return json.dumps({
+            "success": False,
+            "error": str(e)
+        })
+
+
+# ----------------------------------------------------------------------------
 # 文件操作工具 (3 個)
 # ----------------------------------------------------------------------------
 
@@ -906,6 +969,11 @@ def create_pr_tool(title: str, body: str, base_branch: str = "master") -> str:
 # 工具列表導出 (方便 Agent 使用)
 # ============================================================================
 
+# AI 代碼生成工具列表 (v2.0.0 - Week 1 Day 3-4)
+AI_TOOLS = [
+    generate_java_code_tool
+]
+
 # 文件操作工具列表
 FILE_TOOLS = [
     read_file_tool,
@@ -936,7 +1004,7 @@ GIT_TOOLS = [
 ]
 
 # 所有工具列表
-ALL_TOOLS = FILE_TOOLS + CODE_ANALYSIS_TOOLS + DATABASE_TOOLS + GIT_TOOLS
+ALL_TOOLS = AI_TOOLS + FILE_TOOLS + CODE_ANALYSIS_TOOLS + DATABASE_TOOLS + GIT_TOOLS
 
 
 # ============================================================================
@@ -945,12 +1013,13 @@ ALL_TOOLS = FILE_TOOLS + CODE_ANALYSIS_TOOLS + DATABASE_TOOLS + GIT_TOOLS
 
 if __name__ == '__main__':
     print("=" * 70)
-    print("Shared Tools Test (v2.0.0 - CrewAI Tools)")
+    print("Shared Tools Test (v2.1.0 - CrewAI Tools + Claude AI)")
     print("=" * 70)
     print()
 
     # 測試工具列表
     print(f"Total tools available: {len(ALL_TOOLS)}")
+    print(f"  - AI code generation tools: {len(AI_TOOLS)}")
     print(f"  - File tools: {len(FILE_TOOLS)}")
     print(f"  - Code analysis tools: {len(CODE_ANALYSIS_TOOLS)}")
     print(f"  - Database tools: {len(DATABASE_TOOLS)}")

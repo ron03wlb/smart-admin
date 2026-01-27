@@ -32,7 +32,8 @@ from tools import (
     # 導入 @tool 函數
     read_file_tool, write_file_tool, list_files_tool,
     create_branch_tool, commit_changes_tool, create_pr_tool,
-    FILE_TOOLS, GIT_TOOLS
+    generate_java_code_tool,  # Week 1 Day 3-4: Claude AI 集成
+    FILE_TOOLS, GIT_TOOLS, AI_TOOLS
 )
 
 # ============================================================================
@@ -74,19 +75,21 @@ class DeveloperCrew(BaseCrew):
 
     def _create_java_architect_agent(self) -> Agent:
         """
-        創建 Java Architect Agent
+        創建 Java Architect Agent (v2.1.0 - 集成 Claude AI)
 
         職責：實現後端 API（Controller, Service, Manager, Dao）
         """
         return Agent(
             role="Java Architect (Backend Developer)",
-            goal="Implement backend APIs following SmartAdmin patterns",
+            goal="Implement backend APIs following SmartAdmin patterns using Claude AI",
             backstory="""You are an expert Java backend developer specializing in
-            SmartAdmin's layered architecture. You implement RESTful APIs with proper
-            ResponseDTO, pagination, validation, and transaction management.""",
+            SmartAdmin's layered architecture. You use Claude AI to generate production-ready
+            code with proper ResponseDTO, pagination, validation, and transaction management.
+            You ensure all generated code follows SmartAdmin conventions and passes ArchUnit tests.""",
             verbose=True,
             allow_delegation=False,
             tools=[
+                generate_java_code_tool,  # ✅ Claude AI 代碼生成（新增）
                 read_file_tool,
                 write_file_tool,
                 list_files_tool
