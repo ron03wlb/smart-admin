@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
 SmartAdmin Auto-Coding - Telegram Webhook Service
-Flask-based Telegram 通知服務
+Flask-based Telegram 通知服務 + Workflow Command Handler
 
 作者: SmartAdmin Auto-Coding System
-版本: 1.0.0
-日期: 2026-01-27
+版本: 2.0.0 (新增 /command 端點，支持工作流觸發)
+日期: 2026-01-28
 """
 
 import os
@@ -54,21 +54,24 @@ def health_check():
             if response.status_code == 200:
                 return jsonify({
                     "status": "healthy",
-                    "version": "1.0.0",
-                    "telegram_bot": "connected"
+                    "version": "2.0.0",
+                    "telegram_bot": "connected",
+                    "command_handler": "enabled" if command_handler else "disabled"
                 }), 200
             else:
                 return jsonify({
                     "status": "degraded",
-                    "version": "1.0.0",
+                    "version": "2.0.0",
                     "telegram_bot": "disconnected",
+                    "command_handler": "enabled" if command_handler else "disabled",
                     "error": f"HTTP {response.status_code}"
                 }), 200
         else:
             return jsonify({
                 "status": "degraded",
-                "version": "1.0.0",
-                "telegram_bot": "not_configured"
+                "version": "2.0.0",
+                "telegram_bot": "not_configured",
+                "command_handler": "enabled" if command_handler else "disabled"
             }), 200
 
     except Exception as e:
@@ -465,6 +468,95 @@ def send_telegram_message(message: str, parse_mode: str = 'Markdown') -> bool:
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         return False
+
+# ============================================================================
+# 端點 6: Telegram 命令處理（新增 - v2.0.0）
+# ============================================================================
+
+# 導入 Command Handler
+try:
+    from command_handler import TelegramCommandHandler
+    command_handler = TelegramCommandHandler()
+    logger.info("TelegramCommandHandler initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize TelegramCommandHandler: {e}")
+    command_handler = None
+
+@app.route('/command', methods=['POST'])
+def handle_telegram_command():
+    """
+    處理 Telegram Bot 命令（新增 - v2.0.0）
+
+    Request Body:
+        {
+            "command": "/new_feature",
+            "args": {
+                "name": "Employee Management",
+                "entity": "Employee",
+                "target": "sa-admin"
+            }
+        }
+
+    支持的命令:
+        - /new_feature - 創建新功能（完整工作流：Analyzer → Developer → QA）
+        - /code_review - 代碼審查
+        - /analyze - 代碼分析
+        - /help - 顯示幫助信息
+    """
+    try:
+        # 1. 檢查 Command Handler 是否可用
+        if not command_handler:
+            return jsonify({
+                "error": "Command handler not initialized"
+            }), 500
+
+        # 2. 獲取請求數據
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        command = data.get('command')
+        args = data.get('args', {})
+
+        if not command:
+            return jsonify({"error": "Missing 'command' field"}), 400
+
+        logger.info(f"Received command: {command}")
+        logger.info(f"Arguments: {args}")
+
+        # 3. 執行命令並觸發工作流
+        result_message = command_handler.handle_command(command, args)
+
+        # 4. 發送結果到 Telegram
+        success = send_telegram_message(result_message)
+
+        if success:
+            return jsonify({
+                "status": "executed",
+                "command": command,
+                "message": result_message
+            }), 200
+        else:
+            return jsonify({
+                "error": "Failed to send message to Telegram"
+            }), 500
+
+    except Exception as e:
+        logger.error(f"Error handling command: {e}", exc_info=True)
+
+        # 發送錯誤消息到 Telegram
+        error_message = f"""
+❌ *Command Execution Error*
+
+*Command*: `{data.get('command', 'unknown')}`
+*Error*: {str(e)}
+
+Please check the logs for details.
+"""
+        send_telegram_message(error_message)
+
+        return jsonify({"error": str(e)}), 500
 
 # ============================================================================
 # 主函數

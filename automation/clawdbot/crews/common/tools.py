@@ -18,6 +18,7 @@ import subprocess
 import json
 from typing import Dict, Any, List, Optional
 from pathlib import Path
+from contextlib import contextmanager
 import requests
 
 # 導入 CrewAI tool 裝飾器
