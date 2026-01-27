@@ -356,6 +356,129 @@ WHERE r.date = '2026-01-27';
 
 ## 3. 報表類型與實現策略
 
+### 3.0 實時 vs 批次處理決策矩陣 (Real-time vs Batch Processing Decision Matrix)
+
+**概述**：根據業務場景的延遲要求、數據完整性需求、查詢複雜度選擇適合的處理模式。
+
+```mermaid
+flowchart TD
+    START[新增報表需求] --> LATENCY{延遲要求?<br/>━━━━━━━━}
+
+    LATENCY -->|< 5 秒<br/>實時監控| REALTIME_PATH[實時處理路徑<br/>Real-time Path]
+    LATENCY -->|5 秒 - 1 分鐘<br/>準實時| NEAR_REALTIME_PATH[準實時路徑<br/>Near Real-time Path]
+    LATENCY -->|> 1 分鐘<br/>可接受 T+1| BATCH_PATH[批次處理路徑<br/>Batch Path]
+
+    REALTIME_PATH --> RT_COMPLEX{查詢複雜度?}
+    RT_COMPLEX -->|簡單聚合<br/>SUM/COUNT/AVG| RT_REDIS[方案 A: Redis<br/>━━━━━━━━<br/>技術棧:<br/>• Redis Counter/Hash<br/>• Lua Script 原子操作<br/>• TTL: 5 min<br/>━━━━━━━━<br/>優勢:<br/>• 延遲 < 1ms<br/>• 支援高並發 (10K+ QPS)<br/>缺點:<br/>• 僅簡單聚合<br/>• 內存成本高<br/>━━━━━━━━<br/>適用場景:<br/>• 在線人數<br/>• 今日存款總額<br/>• 風控告警計數]
+
+    RT_COMPLEX -->|中等複雜<br/>GROUP BY + JOIN| RT_FLINK[方案 B: Flink SQL<br/>━━━━━━━━<br/>技術棧:<br/>• Flink Streaming SQL<br/>• 滑動視窗 (5s/1min)<br/>• State Backend: RocksDB<br/>━━━━━━━━<br/>優勢:<br/>• 支援複雜聚合<br/>• 支援 JOIN<br/>• 可擴展<br/>缺點:<br/>• 運維複雜<br/>• 資源消耗高<br/>━━━━━━━━<br/>適用場景:<br/>• 實時遊戲排行榜<br/>• 實時交易監控<br/>• 異常行為檢測]
+
+    RT_COMPLEX -->|極高複雜<br/>多表 JOIN + 子查詢| RT_REJECT[❌ 不適合實時<br/>━━━━━━━━<br/>建議:<br/>1️⃣ 降低複雜度<br/>2️⃣ 預計算部分結果<br/>3️⃣ 改用準實時/批次<br/>━━━━━━━━<br/>原因:<br/>• 實時複雜查詢成本極高<br/>• 延遲不可控<br/>• 資源消耗巨大]
+
+    NEAR_REALTIME_PATH --> NRT_COMPLETE{數據完整性要求?}
+    NRT_COMPLETE -->|可接受少量遺漏| NRT_STREAM[方案 C: Flink → ClickHouse<br/>━━━━━━━━<br/>技術棧:<br/>• Flink 消費 Kafka<br/>• 寫入 ClickHouse 實時表<br/>• 更新頻率: 10s-1min<br/>━━━━━━━━<br/>優勢:<br/>• 低延遲 (5-60s)<br/>• 支援複雜查詢<br/>• 可鑽取分析<br/>缺點:<br/>• 可能丟失少量數據<br/>• 需處理重複/亂序<br/>━━━━━━━━<br/>適用場景:<br/>• 運營儀表板<br/>• 實時 KPI 追蹤<br/>• 玩家實時行為分析]
+
+    NRT_COMPLETE -->|必須 100% 完整| NRT_HYBRID[方案 D: 混合模式<br/>━━━━━━━━<br/>技術棧:<br/>• Flink 實時 (初步結果)<br/>• Spark 批次 (修正補全)<br/>• 雙寫 ClickHouse<br/>━━━━━━━━<br/>優勢:<br/>• 兼顧實時性與準確性<br/>• 最終一致性保證<br/>缺點:<br/>• 架構複雜<br/>• 需處理數據修正<br/>━━━━━━━━<br/>適用場景:<br/>• 財務報表 (需最終準確)<br/>• 合規報表<br/>• 結算對帳]
+
+    BATCH_PATH --> BATCH_VOLUME{數據量級?}
+    BATCH_VOLUME -->|< 1 億條<br/>中小數據量| BATCH_SPARK[方案 E: Spark Batch<br/>━━━━━━━━<br/>技術棧:<br/>• Spark SQL<br/>• 從 S3 讀 Parquet<br/>• 寫入 ClickHouse<br/>• 排程: Airflow<br/>━━━━━━━━<br/>優勢:<br/>• 支援複雜 ETL<br/>• 數據 100% 完整<br/>• 成本可控<br/>缺點:<br/>• T+1 延遲<br/>• 不支援實時<br/>━━━━━━━━<br/>適用場景:<br/>• 經營報表<br/>• 月度損益表<br/>• 代理結算]
+
+    BATCH_VOLUME -->|> 1 億條<br/>大數據量| BATCH_OPTIMIZE[方案 F: 優化批次處理<br/>━━━━━━━━<br/>技術棧:<br/>• Spark 分區並行<br/>• ClickHouse 分布式表<br/>• 增量計算 (僅處理變化)<br/>• 物化視圖預聚合<br/>━━━━━━━━<br/>優勢:<br/>• 處理 PB 級數據<br/>• 高度可擴展<br/>缺點:<br/>• 硬件成本高<br/>• 運維複雜<br/>━━━━━━━━<br/>適用場景:<br/>• 全平台數據分析<br/>• 機器學習訓練<br/>• 歷史數據回溯]
+
+    RT_REDIS --> IMPL_EXAMPLE
+    RT_FLINK --> IMPL_EXAMPLE
+    NRT_STREAM --> IMPL_EXAMPLE
+    NRT_HYBRID --> IMPL_EXAMPLE
+    BATCH_SPARK --> IMPL_EXAMPLE
+    BATCH_OPTIMIZE --> IMPL_EXAMPLE
+    RT_REJECT --> START
+
+    IMPL_EXAMPLE[實施檢查清單<br/>━━━━━━━━━━━━<br/>✅ 成本評估 (CPU/內存/存儲)<br/>✅ SLA 定義 (延遲/可用性)<br/>✅ 監控告警配置<br/>✅ 數據質量檢查<br/>✅ 故障恢復方案<br/>✅ 擴展性驗證]
+
+    %% 樣式定義
+    style RT_REDIS fill:#FFCDD2
+    style RT_FLINK fill:#E1BEE7
+    style NRT_STREAM fill:#C8E6C9
+    style NRT_HYBRID fill:#FFF9C4
+    style BATCH_SPARK fill:#BBDEFB
+    style BATCH_OPTIMIZE fill:#B2DFDB
+    style RT_REJECT fill:#FF5252,color:#FFF
+    style IMPL_EXAMPLE fill:#E8F5E9
+```
+
+**方案對比矩陣**：
+
+| 方案 | 延遲 | 數據完整性 | 查詢複雜度 | 成本 | QPS 支援 | 適用場景 |
+|------|------|-----------|-----------|------|---------|---------|
+| **A: Redis** | < 1ms | 可能遺漏 | 簡單 (SUM/COUNT) | 高 (內存) | 10K+ | 實時監控、計數器 |
+| **B: Flink SQL** | < 5s | 較高 (99%+) | 中等 (GROUP BY + JOIN) | 中高 (CPU) | 1K+ | 實時排行榜、異常檢測 |
+| **C: Flink → ClickHouse** | 5-60s | 較高 (99%+) | 高 (任意 SQL) | 中 | 500+ | 運營儀表板、KPI 追蹤 |
+| **D: 混合模式** | 實時 + T+1 修正 | 100% (最終一致) | 極高 | 高 | 500+ | 財務報表、結算對帳 |
+| **E: Spark Batch** | T+1 | 100% | 極高 | 低 | N/A (離線) | 經營報表、月度分析 |
+| **F: 優化批次** | T+1 | 100% | 極高 | 中 | N/A (離線) | PB 級數據、ML 訓練 |
+
+**決策樹使用範例**：
+
+| 報表需求 | 延遲要求 | 複雜度 | 數據完整性 | 推薦方案 | 理由 |
+|---------|---------|--------|-----------|---------|------|
+| **在線人數統計** | < 1s | 簡單 (COUNT) | 可遺漏 | A: Redis | 高頻查詢，簡單計數 |
+| **今日存款總額** | < 5s | 簡單 (SUM) | 可遺漏 | A: Redis | 高頻查詢，容忍少量延遲 |
+| **實時遊戲排行榜** | < 5s | 中等 (GROUP BY + ORDER) | 較高 | B: Flink SQL | 需聚合排序，實時更新 |
+| **運營 KPI 儀表板** | < 1 分鐘 | 高 (多維度聚合) | 較高 | C: Flink → ClickHouse | 支援鑽取分析，可接受分鐘級延遲 |
+| **每日財務報表** | T+1 | 極高 (多表 JOIN) | 100% | E: Spark Batch | 必須準確，可接受次日出報表 |
+| **月度損益表** | T+1 | 極高 | 100% | E: Spark Batch | 合規報表，絕對準確 |
+| **代理結算報表** | T+1 | 極高 | 100% | D: 混合模式 | 需實時預覽 + T+1 最終確認 |
+| **風控實時告警** | < 5s | 中等 (CEP 規則) | 較高 | B: Flink SQL | 複雜事件處理，低延遲 |
+| **玩家 LTV 分析** | T+1 | 極高 (ML 模型) | 100% | F: 優化批次 | 大數據量，複雜計算 |
+| **全平台數據回溯** | N/A | 極高 | 100% | F: 優化批次 | PB 級數據，歷史分析 |
+
+**成本分析 (每月估算)**：
+
+| 方案 | 硬件成本 | 人力成本 | 總成本 (月) | 適用規模 |
+|------|---------|---------|------------|---------|
+| A: Redis | Redis Cluster (32GB × 3) = $450 | 低 (運維簡單) | ~$600 | 中小型 |
+| B: Flink SQL | Flink Cluster (16C 64G × 3) = $1,200 | 高 (需專家) | ~$3,000 | 中大型 |
+| C: Flink → ClickHouse | Flink + ClickHouse (32C 128G × 3) = $2,500 | 中高 | ~$4,500 | 大型 |
+| D: 混合模式 | Flink + Spark + ClickHouse = $3,500 | 極高 (雙棧運維) | ~$7,000 | 超大型 |
+| E: Spark Batch | Spark Cluster (Spot 實例) = $500 | 中 | ~$1,500 | 中大型 |
+| F: 優化批次 | Spark + ClickHouse 分布式 = $5,000 | 極高 | ~$10,000 | 超大型 |
+
+**關鍵決策因素權重**：
+
+1. **延遲要求 (35%)**：
+   - < 5 秒 → 必須實時/準實時
+   - 5s - 1 分鐘 → 準實時優先
+   - > 1 分鐘 → 批次處理即可
+
+2. **數據完整性 (30%)**：
+   - 100% 要求 → 批次處理 或 混合模式
+   - 99%+ 可接受 → Flink 流處理
+   - 95%+ 可接受 → Redis 實時
+
+3. **查詢複雜度 (20%)**：
+   - 簡單聚合 → Redis
+   - 中等複雜 → Flink SQL
+   - 極高複雜 → Spark Batch
+
+4. **成本預算 (10%)**：
+   - 有限預算 → Spark Batch (Spot 實例)
+   - 中等預算 → Flink 流處理
+   - 充裕預算 → 混合模式 (最佳方案)
+
+5. **團隊能力 (5%)**：
+   - 缺乏流處理經驗 → 優先批次處理
+   - 有 Flink 專家 → 可考慮實時方案
+
+**運營建議**：
+
+- **從簡單開始**: 優先實施 Spark Batch (T+1 報表)，滿足 80% 需求
+- **按需添加實時**: 僅對高價值場景 (風控、運營監控) 添加實時處理
+- **避免過度設計**: 不要為了「實時」而實時，評估真實業務價值
+- **成本監控**: 實時處理成本可能是批次處理的 5-10x，需嚴格 ROI 評估
+- **團隊培訓**: 實時處理需專業團隊，建議先外包或諮詢再內部化
+
+---
+
 ### 3.1 實時儀表板 (Real-time Dashboard)
 *   **場景**：在線人數、今日存款總額、風控警報。
 *   **技術**：
