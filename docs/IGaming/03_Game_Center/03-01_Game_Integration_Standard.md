@@ -154,3 +154,29 @@ def check_circuit_breaker(game_id, bet, win):
 - **在大廳者**：
   - 該遊戲 Icon 變灰或添加 "維護中" 標籤。
   - 點擊時彈出維護公告。
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 遊戲錢包轉入轉出邏輯
+- [03-03 無縫錢包對接分析](./03-03_Seamless_Wallet_Analysis.md) - GP 對接極端場景處理
+
+### 業務整合
+- [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳、流水計算
+- [03-02 遊戲大廳管理](./03-02_Game_Lobby_Management.md) - 遊戲元數據同步、大廳配置
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 遊戲風控檢測、熔斷機制
+
+### 技術參考
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 安全、HMAC 簽名驗證
+- [12-04 維護程序](../12_Technical_Operations/12-04_Maintenance_Procedure.md) - 遊戲維護流程
+
+### 延伸閱讀
+- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 敏感數據加密規範
+- [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 遊戲維護通知
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Game Integration Team

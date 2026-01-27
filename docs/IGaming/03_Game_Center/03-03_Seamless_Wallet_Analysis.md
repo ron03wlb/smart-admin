@@ -237,3 +237,28 @@ flowchart TD
 
     CacheRes --> Resp["Return API Response"]
 ```
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包餘額更新、鎖定機制
+- [03-01 遊戲集成標準](./03-01_Game_Integration_Standard.md) - GP API 規格、安全設計
+
+### 業務整合
+- [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳、注單驗證
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 異常投注檢測、負餘額告警
+
+### 技術參考
+- [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 分散式事務、TCC 模式
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流、冪等性保證
+
+### 延伸閱讀
+- [03-02 遊戲大廳管理](./03-02_Game_Lobby_Management.md) - 遊戲入口管理
+- [12-04 維護程序](../12_Technical_Operations/12-04_Maintenance_Procedure.md) - 遊戲維護與餘額同步
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Game Integration Team

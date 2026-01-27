@@ -779,3 +779,29 @@ CREATE TABLE risk_events (
 4.  **性能與安全並重**：在確保低延遲的同時，不能犧牲安全性 (如加密、認證)。
 
 通過本文檔定義的整合 API、錯誤碼、監控指標與降級策略，風控系統能夠成為平台的堅實防線，在保護平台利益的同時，為合法玩家提供流暢的遊戲體驗。
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額曝光度監控、可下注餘額計算
+- [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證、對沖檢測（Layer 1）
+
+### 業務整合
+- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 提款風控規則引擎整合
+- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利濫用檢測、流水作弊識別
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 多帳號檢測、設備指紋
+
+### 技術參考
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 風控決策審計記錄
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流、熔斷機制
+
+### 延伸閱讀
+- [05-02 代理信用風控](./05-02_Agent_Credit_Risk.md) - 代理信用評分、Margin Call
+- [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 遊戲投注異常檢測
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Risk Control Team

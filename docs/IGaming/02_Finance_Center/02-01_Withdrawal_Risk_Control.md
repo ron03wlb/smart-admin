@@ -455,3 +455,31 @@ POST {merchant_webhook_url}
     
 
 這套設計在支援全球多地區合規要求的同時，通過微服務架構和事件驅動設計確保系統可擴展性，風控引擎的混合架構平衡了確定性規則與機器學習的優勢，多層審核工作流滿足不同風險等級的處理需求，統一支付抽象層簡化了多通道整合的複雜性。
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 可提餘額計算、鎖定餘額處理
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控規則引擎、ML 模型整合
+
+### 業務整合
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC 等級驗證
+- [02-04 流水計算與對帳](./02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證、對沖檢測
+- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利流水要求驗證
+
+### 技術參考
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 多層審批 Maker-Checker
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 提款審批日誌記錄
+- [02-07 交易處理流程](./02-07_Transaction_Processing_Flow.md) - SAGA 分散式事務
+
+### 延伸閱讀
+- [02-02 支付網關集成](./02-02_Payment_Gateway_Integration.md) - 代付通道整合
+- [02-03 對賬系統](./02-03_Reconciliation_System.md) - 三方對賬流程
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流、熔斷
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Finance Team & Risk Control Team

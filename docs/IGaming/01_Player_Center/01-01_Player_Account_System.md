@@ -64,3 +64,30 @@
 ## 4. 動態配置與審批 (Dynamic Config & Approval)
 - **配置項**：註冊必填欄位、MFA 強制開啟條件、KYC 等級限制。
 - **審批流**：若修改 "KYC 自動通過閾值" 或 "註冊驗證碼開關"，需觸發 **Maker-Checker** 流程，由商戶管理員審核通過後生效。
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [09-01 管理後台 RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 玩家權限初始化、角色分配
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 註冊時錢包創建
+
+### 業務整合
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 多帳號檢測、設備指紋、風險評分
+- [01-02 VIP 系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級初始化、積分系統
+- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - KYC 等級與提款限額
+
+### 技術參考
+- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 個人資料加密、Blind Index
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC 人工審核流程
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 登入 API 安全、暴力破解防護
+
+### 延伸閱讀
+- [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 註冊開關、IP 限制配置
+- [08-05 本地化系統](../08_Frontend_CMS/08-05_Localization_System.md) - 多語言註冊頁面
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Player Center Team

@@ -540,6 +540,27 @@ def detect_permission_abuse(user_id, time_window='1h'):
 
 ---
 
+## 📚 相關文檔
+
+### 核心依賴
+- [07-01 系統層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶架構、層級設計
+- [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - 操作日誌記錄
+
+### 業務整合
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 玩家權限初始化
+- [09-04 審批工作流系統](./09-04_Approval_Workflow_System.md) - 敏感操作審批
+
+### 技術參考
+- [09-03 數據安全標準](./09-03_Data_Security_Standard.md) - 權限數據加密
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 權限驗證
+
+### 延伸閱讀
+- [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 商戶權限配置
+- [11-01 客服平台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服權限管理
+
+---
+
 **文件版本**: V2.0 (Enhanced)
 **最後更新**: 2026-01-27
 **狀態**: Architecture-Level Complete
+**維護者**: Security Team

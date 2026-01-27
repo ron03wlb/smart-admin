@@ -840,3 +840,29 @@ Topics:
 - **敏感變更審批**：
   - **定義**：若活動進行中需 "增加預算" 或 "降低流水要求"，視為高風險操作。
   - **流程**：需觸發二級審批 (財務總監或更高層級)，確保變更不會導致預算失控。
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - Bonus 錢包整合、可下注餘額計算
+- [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 3 遊戲權重）
+
+### 業務整合
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 紅利濫用檢測、多帳號風控
+- [01-02 VIP 系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - VIP 專屬活動、等級權益
+- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 流水未達標提款限制
+
+### 技術參考
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 活動發布 Maker-Checker 審批
+- [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 活動推送通知
+
+### 延伸閱讀
+- [03-02 遊戲大廳管理](../03_Game_Center/03-02_Game_Lobby_Management.md) - 活動遊戲標籤推薦
+- [08-02 Banner 與公告](../08_Frontend_CMS/08-02_Banner_&_Announcement.md) - 活動橫幅配置
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Activity Team
