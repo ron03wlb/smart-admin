@@ -320,19 +320,82 @@ class DatabaseQueryTool:
     提供 PostgreSQL 查詢和性能分析功能。
     """
 
-    def __init__(self, db_connection_string: str):
+    def __init__(self, connection_pool):
         """
-        初始化數據庫查詢工具
+        初始化數據庫查詢工具（使用共享連接池）
 
         Args:
-            db_connection_string: PostgreSQL 連接字符串
+            connection_pool: PostgreSQL 連接池（來自 BaseCrew）
         """
-        import psycopg2
-        self.conn = psycopg2.connect(db_connection_string)
+        from contextlib import contextmanager
+
+        self.connection_pool = connection_pool
+        self.pg_stat_statements_enabled = False
+        self._check_extensions()
+
+    @contextmanager
+    def _get_connection(self):
+        """
+        內部連接獲取（Context Manager）
+
+        自動管理連接的獲取和歸還。
+        """
+        conn = None
+        try:
+            conn = self.connection_pool.getconn()
+            yield conn
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise
+        finally:
+            if conn:
+                self.connection_pool.putconn(conn)
+
+    def _check_extensions(self):
+        """
+        檢查必需的 PostgreSQL 擴展
+
+        在初始化時檢查，如果擴展未啟用，記錄警告並提供啟用指南。
+        """
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+
+                cursor.execute("""
+                    SELECT name, installed_version, comment
+                    FROM pg_available_extensions
+                    WHERE name = 'pg_stat_statements'
+                """)
+                result = cursor.fetchone()
+
+                if result and result[1]:
+                    logger.info(f"✅ pg_stat_statements enabled (version {result[1]})")
+                    self.pg_stat_statements_enabled = True
+                else:
+                    logger.warning(
+                        "⚠️ pg_stat_statements NOT enabled. "
+                        "Slow query detection will be unavailable."
+                    )
+                    logger.info(
+                        "To enable pg_stat_statements:\n"
+                        "1. Run: CREATE EXTENSION IF NOT EXISTS pg_stat_statements;\n"
+                        "2. Add to postgresql.conf: shared_preload_libraries = 'pg_stat_statements'\n"
+                        "3. Restart PostgreSQL\n"
+                        "4. Verify: SELECT * FROM pg_stat_statements LIMIT 1;"
+                    )
+                    self.pg_stat_statements_enabled = False
+
+                cursor.close()
+
+        except Exception as e:
+            logger.error(f"❌ Failed to check extensions: {e}")
+            self.pg_stat_statements_enabled = False
 
     def analyze_query(self, query: str) -> Dict[str, Any]:
         """
-        分析 SQL 查詢性能
+        分析 SQL 查詢性能（自動管理連接）
 
         Args:
             query: SQL 查詢語句
@@ -341,27 +404,29 @@ class DatabaseQueryTool:
             Dict[str, Any]: 查詢執行計劃
         """
         try:
-            cursor = self.conn.cursor()
+            # ✅ 使用 context manager，自動歸還連接
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
 
-            # 運行 EXPLAIN ANALYZE
-            explain_query = f"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {query}"
-            cursor.execute(explain_query)
-            result = cursor.fetchone()[0]
+                # 運行 EXPLAIN ANALYZE
+                explain_query = f"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {query}"
+                cursor.execute(explain_query)
+                result = cursor.fetchone()[0]
 
-            cursor.close()
+                cursor.close()
 
-            return {
-                "success": True,
-                "query": query,
-                "plan": result
-            }
+                return {
+                    "success": True,
+                    "query": query,
+                    "plan": result
+                }
         except Exception as e:
             logger.error(f"Error analyzing query: {e}")
             return {"success": False, "error": str(e)}
 
     def check_slow_queries(self, min_duration_ms: int = 1000) -> List[Dict[str, Any]]:
         """
-        檢查慢查詢
+        檢查慢查詢（帶擴展檢查，自動管理連接）
 
         Args:
             min_duration_ms: 最小持續時間（毫秒）
@@ -369,40 +434,47 @@ class DatabaseQueryTool:
         Returns:
             List[Dict[str, Any]]: 慢查詢列表
         """
+        # ✅ 檢查擴展狀態
+        if not self.pg_stat_statements_enabled:
+            logger.warning(
+                "Slow query detection unavailable: pg_stat_statements not enabled. "
+                "Returning empty result. See initialization logs for setup instructions."
+            )
+            return []
+
         try:
-            cursor = self.conn.cursor()
+            # ✅ 使用 context manager，自動歸還連接
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
 
-            # 查詢 pg_stat_statements（需要擴展）
-            query = """
-            SELECT query, calls, mean_exec_time, max_exec_time
-            FROM pg_stat_statements
-            WHERE mean_exec_time > %s
-            ORDER BY mean_exec_time DESC
-            LIMIT 10
-            """
-            cursor.execute(query, (min_duration_ms,))
-            rows = cursor.fetchall()
+                # 查詢 pg_stat_statements（擴展已啟用）
+                query = """
+                SELECT query, calls, mean_exec_time, max_exec_time
+                FROM pg_stat_statements
+                WHERE mean_exec_time > %s
+                ORDER BY mean_exec_time DESC
+                LIMIT 10
+                """
+                cursor.execute(query, (min_duration_ms,))
+                rows = cursor.fetchall()
 
-            cursor.close()
+                cursor.close()
 
-            slow_queries = []
-            for row in rows:
-                slow_queries.append({
-                    "query": row[0],
-                    "calls": row[1],
-                    "mean_time_ms": row[2],
-                    "max_time_ms": row[3]
-                })
+                slow_queries = []
+                for row in rows:
+                    slow_queries.append({
+                        "query": row[0],
+                        "calls": row[1],
+                        "mean_time_ms": row[2],
+                        "max_time_ms": row[3]
+                    })
 
-            return slow_queries
+                return slow_queries
         except Exception as e:
             logger.error(f"Error checking slow queries: {e}")
             return []
 
-    def close(self):
-        """關閉數據庫連接"""
-        if self.conn:
-            self.conn.close()
+    # ✅ 不再需要 close() 方法（連接池自動管理）
 
 # ============================================================================
 # Git 操作工具

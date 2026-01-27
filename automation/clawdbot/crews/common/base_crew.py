@@ -14,9 +14,11 @@ import json
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List
 from datetime import datetime
+from contextlib import contextmanager
 import psycopg2
 from psycopg2 import pool
 import requests
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 # ============================================================================
 # 配置
@@ -47,6 +49,22 @@ logging.basicConfig(
 )
 
 # ============================================================================
+# 異常類型
+# ============================================================================
+
+class RetryableError(Exception):
+    """可重試的錯誤（網絡暫時故障等）"""
+    pass
+
+class FatalError(Exception):
+    """不可重試的錯誤（配置錯誤等）"""
+    pass
+
+class SecurityError(Exception):
+    """安全相關錯誤（路徑遍歷等）"""
+    pass
+
+# ============================================================================
 # 基礎類
 # ============================================================================
 
@@ -70,15 +88,17 @@ class BaseCrew(ABC):
         self.crew_type = crew_type
         self.logger = logging.getLogger(f"{__name__}.{crew_name}")
 
-        # 初始化 PostgreSQL 連接池
+        # 初始化 PostgreSQL 連接池（Thread-safe）
         try:
-            self.connection_pool = pool.SimpleConnectionPool(
+            self.connection_pool = pool.ThreadedConnectionPool(
                 minconn=1,
-                maxconn=5,
-                dsn=DB_CONNECTION_STRING
+                maxconn=10,  # 增加連接池大小
+                dsn=DB_CONNECTION_STRING,
+                connect_timeout=10,
+                options="-c statement_timeout=60000"  # 60秒超時
             )
             if self.connection_pool:
-                self.logger.info(f"PostgreSQL connection pool created for {crew_name}")
+                self.logger.info(f"PostgreSQL connection pool created for {crew_name} (maxconn=10)")
             else:
                 self.logger.error(f"Failed to create PostgreSQL connection pool for {crew_name}")
         except psycopg2.Error as e:
@@ -123,6 +143,98 @@ class BaseCrew(ABC):
             Dict[str, Any]: 執行結果
         """
         pass
+
+    # ========================================================================
+    # 連接池管理（Context Manager）
+    # ========================================================================
+
+    @contextmanager
+    def get_db_connection(self):
+        """
+        獲取數據庫連接（Context Manager）
+
+        使用方式:
+        >>> with self.get_db_connection() as conn:
+        >>>     cursor = conn.cursor()
+        >>>     cursor.execute("SELECT ...")
+
+        連接會自動歸還到連接池，即使發生異常。
+        """
+        conn = None
+        try:
+            if not self.connection_pool:
+                raise FatalError("Connection pool not initialized")
+
+            conn = self.connection_pool.getconn()
+            self.logger.debug("Database connection acquired from pool")
+            yield conn
+            conn.commit()
+            self.logger.debug("Database transaction committed")
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+                self.logger.warning(f"Database transaction rolled back due to error: {e}")
+            raise
+
+        finally:
+            # ✅ 關鍵：無論如何都歸還連接
+            if conn:
+                self.connection_pool.putconn(conn)
+                self.logger.debug("Database connection returned to pool")
+
+    # ========================================================================
+    # 錯誤重試機制
+    # ========================================================================
+
+    @retry(
+        retry=retry_if_exception_type(RetryableError),
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        before_sleep=lambda retry_state: logging.getLogger(__name__).warning(
+            f"Retrying after error (attempt {retry_state.attempt_number}/3)..."
+        )
+    )
+    def run_with_retry(self, **kwargs) -> Dict[str, Any]:
+        """
+        帶重試機制的運行方法
+
+        自動重試 RetryableError（最多3次，指數退避）:
+        - 網絡錯誤（requests.exceptions.RequestException）
+        - 數據庫暫時故障（psycopg2.OperationalError）
+
+        不重試 FatalError:
+        - 配置錯誤（ValueError, KeyError）
+        - 文件不存在（FileNotFoundError）
+        - 安全錯誤（SecurityError）
+
+        Args:
+            **kwargs: Crew 執行參數
+
+        Returns:
+            Dict[str, Any]: 執行結果
+
+        Raises:
+            RetryableError: 可重試錯誤（會自動重試）
+            FatalError: 不可重試錯誤（立即失敗）
+        """
+        try:
+            return self.run(**kwargs)
+
+        except (requests.exceptions.RequestException, psycopg2.OperationalError) as e:
+            # 網絡錯誤、數據庫暫時故障 → 可重試
+            self.logger.warning(f"Retryable error encountered: {e}")
+            raise RetryableError(f"Retryable error: {e}") from e
+
+        except (ValueError, KeyError, FileNotFoundError, SecurityError) as e:
+            # 配置錯誤、文件不存在、安全錯誤 → 不可重試
+            self.logger.error(f"Fatal error encountered: {e}")
+            raise FatalError(f"Fatal error: {e}") from e
+
+        except Exception as e:
+            # 其他未知錯誤 → 視為致命錯誤
+            self.logger.error(f"Unknown error encountered: {e}")
+            raise FatalError(f"Unknown error: {e}") from e
 
     # ========================================================================
     # 審計日誌方法

@@ -296,26 +296,62 @@ class FileAccessGuard:
 
 def normalize_path(file_path: str) -> str:
     """
-    規範化文件路徑（處理 Windows/Linux 路徑分隔符差異）
+    安全的路徑規範化，防止路徑遍歷攻擊
+
+    關鍵安全措施:
+    1. 轉換為絕對路徑
+    2. 解析符號鏈接和相對路徑（.. 和 .）
+    3. 驗證路徑在項目根目錄內（防止路徑遍歷）
 
     Args:
         file_path: 原始文件路徑
 
     Returns:
-        規範化後的路徑（統一使用正斜杠）
+        規範化後的安全路徑
+
+    Raises:
+        SecurityError: 如果檢測到路徑遍歷攻擊
     """
     import os
-    # 1. 使用 os.path.normpath 規範化路徑
-    normalized = os.path.normpath(file_path)
+    from pathlib import Path
 
-    # 2. 統一使用正斜杠（便於正則表達式匹配）
-    normalized = normalized.replace('\\', '/')
+    # 項目根目錄
+    PROJECT_ROOT = Path(os.getenv('PROJECT_ROOT', os.getcwd())).resolve()
 
-    # 3. 移除多餘的斜杠
-    while '//' in normalized:
-        normalized = normalized.replace('//', '/')
+    try:
+        # 1. 轉換為絕對路徑
+        if not os.path.isabs(file_path):
+            file_path = os.path.join(PROJECT_ROOT, file_path)
 
-    return normalized
+        # 2. 解析符號鏈接和相對路徑（處理 .., ., symlink）
+        resolved_path = Path(file_path).resolve()
+
+        # 3. 關鍵檢查：確保路徑在項目根目錄內
+        try:
+            # 如果 resolved_path 不在 PROJECT_ROOT 下，會拋出 ValueError
+            resolved_path.relative_to(PROJECT_ROOT)
+        except ValueError as e:
+            # 檢測到路徑遍歷攻擊！
+            logger.error(
+                f"Path traversal attack detected! "
+                f"Requested: {file_path}, "
+                f"Resolved: {resolved_path}, "
+                f"Root: {PROJECT_ROOT}"
+            )
+            raise SecurityError(
+                f"Path traversal detected: {file_path} "
+                f"resolves to {resolved_path} outside project root"
+            ) from e
+
+        # 4. 統一使用正斜杠
+        normalized = str(resolved_path).replace('\\', '/')
+
+        logger.debug(f"Path normalized: {file_path} -> {normalized}")
+        return normalized
+
+    except (OSError, RuntimeError) as e:
+        logger.error(f"Path normalization error: {e}")
+        raise SecurityError(f"Invalid path: {file_path}") from e
 
 # ============================================================================
 # 測試用例 (Inline)
