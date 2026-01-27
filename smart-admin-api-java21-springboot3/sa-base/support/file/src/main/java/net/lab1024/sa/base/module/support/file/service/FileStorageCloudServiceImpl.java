@@ -12,7 +12,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -162,9 +161,9 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
 
     // 如果是私有的，则规定时间内可以访问，超过规定时间，则连接失效
 
-    Optional<FileVO> fileVOOpt =
+    io.vavr.control.Option<FileVO> fileVOOpt =
         cacheService.get(CacheKeyConst.Support.FILE_PRIVATE, fileKey, FileVO.class);
-    FileVO fileVO = fileVOOpt.orElse(null);
+    FileVO fileVO = fileVOOpt.getOrNull();
     if (fileVO == null) {
       fileVO = fileDao.getByFileKey(fileKey);
       if (fileVO == null) {

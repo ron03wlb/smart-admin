@@ -10,7 +10,6 @@ import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberInfoBO
 import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberLastGenerateBO;
 import net.lab1024.sa.base.module.support.serialnumber.service.SerialNumberBaseService;
 import net.lab1024.sa.foundation.domain.exception.BusinessException;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 单据序列号 基于mysql锁实现
@@ -27,8 +26,17 @@ public class SerialNumberMysqlService extends SerialNumberBaseService {
     super(serialNumberRecordDao, serialNumberDao);
   }
 
+  /**
+   * 生成序列號列表（基於 MySQL 鎖實現）
+   *
+   * <p>注意：此方法不包含 @Transactional 註解 根據 SmartAdmin 架構規範，事務由 SerialNumberManager 層處理 此方法在 Manager
+   * 的事務上下文中執行，selectForUpdate 會正常工作
+   *
+   * @param serialNumberInfo 序列號信息
+   * @param count 生成數量
+   * @return 生成的序列號列表
+   */
   @Override
-  @Transactional(rollbackFor = Throwable.class)
   public List<String> generateSerialNumberList(
       final SerialNumberInfoBO serialNumberInfo, final int count) {
     // // 获取上次的生成结果

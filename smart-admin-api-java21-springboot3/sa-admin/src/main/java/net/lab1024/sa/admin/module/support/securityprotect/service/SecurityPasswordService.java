@@ -4,8 +4,10 @@ import io.vavr.control.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.support.securityprotect.dao.PasswordLogDao;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.PasswordLogEntity;
+import net.lab1024.sa.foundation.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.foundation.domain.request.RequestUser;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.securityprotect.constant.SecurityConst;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
  * @author 1024创新实验室-主任:卓大
  * @since 2023/10/11 19:25:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>，Since 2012
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SecurityPasswordService {
@@ -37,9 +40,8 @@ public class SecurityPasswordService {
    */
   public ResponseDTO<String> validatePasswordComplexity(String password) {
     Option<String> errorMsg =
-        Option.ofOptional(
-            passwordComplexityService.validateComplexity(
-                password, securityConfigProvider.isPasswordComplexityEnabled()));
+        passwordComplexityService.validateComplexity(
+            password, securityConfigProvider.isPasswordComplexityEnabled());
     return errorMsg.map(ResponseDTO::<String>userErrorParam).getOrElse(() -> ResponseDTO.ok());
   }
 
@@ -59,10 +61,20 @@ public class SecurityPasswordService {
       return ResponseDTO.ok();
     }
 
-    // 检查最近几次是否有重复密码
+    // 检查最近几次是否有重复密码（使用 Vavr Option 安全處理 getUserType()）
+    Integer userTypeValue =
+        io.vavr.control.Option.of(requestUser.getUserType())
+            .map(userType -> userType.getValue())
+            .getOrElse(
+                () -> {
+                  log.error("User type is null for user: {}", requestUser.getUserId());
+                  // 默認使用管理員員工類型
+                  return UserTypeEnum.ADMIN_EMPLOYEE.getValue();
+                });
+
     List<String> oldPasswords =
         passwordLogDao.selectOldPassword(
-            requestUser.getUserType().getValue(),
+            userTypeValue,
             requestUser.getUserId(),
             securityConfigProvider.getRegularChangePasswordNotAllowRepeatTimes());
     boolean isDuplicate =

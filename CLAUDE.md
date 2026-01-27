@@ -52,7 +52,9 @@ When working with SmartAdmin codebase, read documentation in this order:
 
 - ✅ Service layer MUST use `io.vavr.control.Option` (NOT `java.util.Optional`)
 - ✅ Controller NEVER directly accesses Repository/Dao (must go through Service)
-- ✅ `@Transactional` / `@Cacheable` annotations ONLY in Manager layer
+- ✅ **Service CAN directly call Dao/Mapper** (for single-table CRUD without @Transactional)
+- ✅ `@Transactional` / `@Cacheable` annotations ONLY in Manager layer (NEVER in Service)
+- ✅ **When Service needs @Transactional or @Cacheable → Extract to Manager layer**
 - ✅ Constructor injection via `@RequiredArgsConstructor` + `private final` (NEVER `@Autowired` field injection)
 - ✅ Boolean fields: `deleted` NOT `isDeleted`
 - ✅ Use `ResponseDTO.ok(data)` for all API responses
@@ -83,11 +85,16 @@ Modular monolith with strict layered architecture:
 
 ```
 Controller → Service → Manager → Dao → Entity
+              ↓         ↓
+            (Can call Dao directly for single-table CRUD)
+            (Delegate to Manager when @Transactional needed)
 ```
 
 **Key Rules** (enforced by ArchUnit):
-- Controller → Service ONLY
-- `@Transactional` / `@Cacheable`: Manager layer ONLY
+- Controller → Service ONLY (Controller CANNOT call Dao/Manager directly)
+- **Service → Dao is ALLOWED** (for single-table CRUD without @Transactional)
+- **Service → Manager is REQUIRED** (when @Transactional or @Cacheable needed)
+- `@Transactional` / `@Cacheable`: Manager layer ONLY (NEVER in Service/Controller)
 - `@Autowired` field injection: FORBIDDEN
 
 → **[Complete Architecture Rules](.agent/rules/foundation/10-architecture-rules.md)**

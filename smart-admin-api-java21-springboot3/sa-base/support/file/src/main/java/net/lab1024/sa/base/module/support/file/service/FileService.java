@@ -102,10 +102,16 @@ public class FileService {
     fileEntity.setFileSize(file.getSize());
     fileEntity.setFileKey(uploadVO.getFileKey());
     fileEntity.setFileType(uploadVO.getFileType());
-    fileEntity.setCreatorId(requestUser == null ? null : requestUser.getUserId());
-    fileEntity.setCreatorName(requestUser == null ? null : requestUser.getUserName());
-    fileEntity.setCreatorUserType(
-        requestUser == null ? null : requestUser.getUserType().getValue());
+    // 使用 Vavr Option 安全設置創建者信息，避免 NPE
+    if (requestUser != null) {
+      fileEntity.setCreatorId(requestUser.getUserId());
+      fileEntity.setCreatorName(requestUser.getUserName());
+      // 安全處理 getUserType() 可能返回 null 的情況
+      fileEntity.setCreatorUserType(
+          io.vavr.control.Option.of(requestUser.getUserType())
+              .map(userType -> userType.getValue())
+              .getOrNull());
+    }
     fileDao.insert(fileEntity);
 
     // 将fileId 返回给前端
@@ -202,16 +208,16 @@ public class FileService {
    */
   private ResponseDTO<String> checkFileSecurity(MultipartFile file) {
     // 检验文件大小
-    java.util.Optional<String> sizeError =
+    io.vavr.control.Option<String> sizeError =
         fileSecurityService.checkFileSize(file, securityConfigProvider.getMaxUploadFileSizeMb());
-    if (sizeError.isPresent()) {
+    if (sizeError.isDefined()) {
       return ResponseDTO.userErrorParam(sizeError.get());
     }
 
     // 文件类型安全检测
     if (securityConfigProvider.isFileDetectEnabled()) {
-      java.util.Optional<String> typeError = fileSecurityService.checkFileType(file);
-      if (typeError.isPresent()) {
+      io.vavr.control.Option<String> typeError = fileSecurityService.checkFileType(file);
+      if (typeError.isDefined()) {
         return ResponseDTO.userErrorParam(typeError.get());
       }
     }

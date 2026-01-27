@@ -10,6 +10,9 @@ dependencies {
     // Validation
     api(libs.spring.boot.starter.validation)
 
+    // Vavr (for Option)
+    api("io.vavr:vavr:0.10.4")
+
     // Spring Web (for MultipartFile) - compileOnly as consumer provides it
     compileOnly(libs.spring.boot.starter.web)
 

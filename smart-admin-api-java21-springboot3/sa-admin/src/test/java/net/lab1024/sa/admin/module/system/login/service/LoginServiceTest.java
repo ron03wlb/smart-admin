@@ -5,11 +5,11 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import cn.dev33.satoken.stp.StpUtil;
+import io.vavr.control.Option;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import net.lab1024.sa.admin.BaseUnitTest;
 import net.lab1024.sa.admin.fixtures.EmployeeTestFixture;
 import net.lab1024.sa.admin.module.support.securityprotect.domain.entity.LoginFailEntity;
@@ -49,6 +49,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * LoginService unit tests
@@ -151,6 +153,7 @@ class LoginServiceTest extends BaseUnitTest {
 
   @Nested
   @DisplayName("login() Tests - CRITICAL Business Logic")
+  @MockitoSettings(strictness = Strictness.LENIENT)
   class LoginTests {
 
     @BeforeEach
@@ -178,6 +181,7 @@ class LoginServiceTest extends BaseUnitTest {
       RequestEmployee requestEmployee = new RequestEmployee();
       requestEmployee.setEmployeeId(testEmployee.getEmployeeId());
       requestEmployee.setAdministratorFlag(false);
+      requestEmployee.setUserType(UserTypeEnum.ADMIN_EMPLOYEE); // Fix: 设置 userType 避免 NPE
       when(loginManager.loadLoginInfo(any(EmployeeEntity.class))).thenReturn(requestEmployee);
 
       when(roleEmployeeDao.selectRoleByEmployeeId(anyLong())).thenReturn(Collections.emptyList());
@@ -275,7 +279,7 @@ class LoginServiceTest extends BaseUnitTest {
 
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
-      assertErrorContains(response, "账号已删除");
+      assertErrorContains(response, "已被删除");
       verify(loginLogService, times(1))
           .log(
               argThat(
@@ -296,7 +300,7 @@ class LoginServiceTest extends BaseUnitTest {
 
       // Then
       assertError(response, UserErrorCode.PARAM_ERROR);
-      assertErrorContains(response, "账号已禁用");
+      assertErrorContains(response, "已被禁用");
       verify(loginLogService, times(1))
           .log(
               argThat(
@@ -403,7 +407,7 @@ class LoginServiceTest extends BaseUnitTest {
       when(level3ProtectConfigService.isTwoFactorLoginEnabled()).thenReturn(true);
       loginForm.setEmailCode("9999");
       when(cacheService.get(anyString(), anyString(), eq(String.class)))
-          .thenReturn(Optional.of("1234_" + System.currentTimeMillis()));
+          .thenReturn(Option.of("1234_" + System.currentTimeMillis()));
 
       // When
       ResponseDTO<LoginResultVO> response = loginService.login(loginForm, TEST_IP, TEST_USER_AGENT);
@@ -421,7 +425,7 @@ class LoginServiceTest extends BaseUnitTest {
       when(level3ProtectConfigService.isTwoFactorLoginEnabled()).thenReturn(true);
       loginForm.setEmailCode("1234");
       when(cacheService.get(anyString(), anyString(), eq(String.class)))
-          .thenReturn(Optional.of("1234_" + System.currentTimeMillis()));
+          .thenReturn(Option.of("1234_" + System.currentTimeMillis()));
 
       // When
       try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
@@ -646,6 +650,7 @@ class LoginServiceTest extends BaseUnitTest {
 
   @Nested
   @DisplayName("getLoginEmployee() Tests")
+  @MockitoSettings(strictness = Strictness.LENIENT)
   class GetLoginEmployeeTests {
 
     @Mock private HttpServletRequest request;
@@ -659,6 +664,8 @@ class LoginServiceTest extends BaseUnitTest {
       expected.setEmployeeId(1001L);
       when(loginManager.getRequestEmployee(1001L)).thenReturn(expected);
       when(request.getHeader("user-agent")).thenReturn(TEST_USER_AGENT);
+      when(request.getHeaderNames())
+          .thenReturn(Collections.enumeration(Collections.singletonList("user-agent")));
 
       // When
       RequestEmployee result = loginService.getLoginEmployee(loginId, request);
@@ -700,6 +707,8 @@ class LoginServiceTest extends BaseUnitTest {
       expected.setEmployeeId(1001L);
       when(loginManager.getRequestEmployee(1001L)).thenReturn(expected);
       when(request.getHeader("user-agent")).thenReturn(TEST_USER_AGENT);
+      when(request.getHeaderNames())
+          .thenReturn(Collections.enumeration(Collections.singletonList("user-agent")));
 
       // When
       RequestEmployee result = loginService.getLoginEmployee(superLoginId, request);
@@ -766,6 +775,7 @@ class LoginServiceTest extends BaseUnitTest {
 
   @Nested
   @DisplayName("logout() Tests")
+  @MockitoSettings(strictness = Strictness.LENIENT)
   class LogoutTests {
 
     @Test
@@ -775,6 +785,7 @@ class LoginServiceTest extends BaseUnitTest {
       RequestEmployee requestUser = new RequestEmployee();
       requestUser.setEmployeeId(1001L);
       requestUser.setActualName("Test Employee");
+      requestUser.setUserType(UserTypeEnum.ADMIN_EMPLOYEE); // Fix: 添加 userType 避免 NPE
 
       // When
       try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
@@ -825,6 +836,7 @@ class LoginServiceTest extends BaseUnitTest {
       // Given
       RequestEmployee requestUser = new RequestEmployee();
       requestUser.setEmployeeId(1001L);
+      requestUser.setUserType(UserTypeEnum.ADMIN_EMPLOYEE); // Fix: 添加 userType 避免 NPE
 
       // When
       try (MockedStatic<StpUtil> stpUtilMock = mockStatic(StpUtil.class)) {
@@ -841,6 +853,7 @@ class LoginServiceTest extends BaseUnitTest {
 
   @Nested
   @DisplayName("sendEmailCode() Tests")
+  @MockitoSettings(strictness = Strictness.LENIENT)
   class SendEmailCodeTests {
 
     @Test
@@ -849,8 +862,7 @@ class LoginServiceTest extends BaseUnitTest {
       // Given
       when(level3ProtectConfigService.isTwoFactorLoginEnabled()).thenReturn(true);
       when(employeeDao.getByLoginName("test_user", false)).thenReturn(testEmployee);
-      when(cacheService.get(anyString(), anyString(), eq(String.class)))
-          .thenReturn(Optional.empty());
+      when(cacheService.get(anyString(), anyString(), eq(String.class))).thenReturn(Option.none());
       when(mailService.sendMail(any(), any(), anyList())).thenReturn(ResponseDTO.ok());
 
       // When
@@ -858,7 +870,7 @@ class LoginServiceTest extends BaseUnitTest {
 
       // Then
       assertOk(response);
-      verify(cacheService, times(1)).put(anyString(), anyString(), anyString(), eq(300), any());
+      verify(cacheService, times(1)).put(anyString(), anyString(), anyString(), eq(300L), any());
       verify(mailService, times(1)).sendMail(any(), any(), anyList());
     }
 
@@ -900,7 +912,7 @@ class LoginServiceTest extends BaseUnitTest {
       when(employeeDao.getByLoginName("test_user", false)).thenReturn(testEmployee);
       long recentTimestamp = System.currentTimeMillis() - 30000; // 30 seconds ago
       when(cacheService.get(anyString(), anyString(), eq(String.class)))
-          .thenReturn(Optional.of("1234_" + recentTimestamp));
+          .thenReturn(Option.of("1234_" + recentTimestamp));
 
       // When
       ResponseDTO<String> response = loginService.sendEmailCode("test_user");

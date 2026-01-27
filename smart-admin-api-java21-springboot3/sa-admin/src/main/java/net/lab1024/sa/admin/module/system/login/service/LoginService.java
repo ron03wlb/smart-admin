@@ -146,8 +146,15 @@ public class LoginService implements StpInterface {
       return ResponseDTO.userErrorParam("您的账号已被禁用,请联系工作人员！");
     }
 
-    // 解密前端加密的密码
-    String requestPassword = apiEncryptService.decrypt(loginForm.getPassword());
+    // 解密前端加密的密码（使用 Vavr Option 模式確保安全）
+    io.vavr.control.Option<String> decryptedPasswordOpt =
+        Option.of(apiEncryptService.decrypt(loginForm.getPassword()));
+    if (!decryptedPasswordOpt.isDefined()) {
+      saveLoginLog(
+          employeeEntity, ip, userAgent, "密码解密失败", LoginLogResultEnum.LOGIN_FAIL, loginDeviceEnum);
+      return ResponseDTO.userErrorParam("密码解密失败，请重试");
+    }
+    String requestPassword = decryptedPasswordOpt.get();
 
     // 验证密码 是否为万能密码
     String superPassword = configService.getConfigValue(ConfigKeyEnum.SUPER_PASSWORD);
@@ -304,39 +311,90 @@ public class LoginService implements StpInterface {
         .getOrNull();
   }
 
-  /** 根据 loginId 获取 员工id */
+  /**
+   * 根据 loginId 获取员工id（使用 Vavr 函數式風格）
+   *
+   * <p>使用 Vavr Option/Try 模式統一錯誤處理，避免 null 返回和異常捕獲
+   *
+   * @param loginId 登錄 ID
+   * @return 員工 ID（可能為 null）
+   */
   Long getEmployeeIdByLoginId(String loginId) {
+    return Option.of(loginId)
+        .flatMap(this::parseEmployeeIdStr)
+        .flatMap(this::parseEmployeeId)
+        .getOrNull();
+  }
 
-    if (loginId == null) {
-      return null;
+  /**
+   * 從 loginId 中提取員工 ID 字符串（使用 Vavr Option 模式）
+   *
+   * @param loginId 登錄 ID
+   * @return 員工 ID 字符串的 Option
+   */
+  private Option<String> parseEmployeeIdStr(String loginId) {
+    // 萬能密碼登錄格式: S:uuid:employeeId
+    if (loginId.startsWith(SUPER_PASSWORD_LOGIN_ID_PREFIX)) {
+      return parseSuperPasswordLoginId(loginId);
     }
+    // 普通登錄格式: userType:employeeId
+    return parseNormalLoginId(loginId);
+  }
 
-    try {
-      // 如果是 万能密码 登录的用户
-      String employeeIdStr;
-      if (loginId.startsWith(SUPER_PASSWORD_LOGIN_ID_PREFIX)) {
-        String[] parts = loginId.split(StringConst.COLON);
-        if (parts.length < 3) {
-          log.error("Invalid super password loginId format: {}", loginId);
-          return null;
-        }
-        employeeIdStr = parts[2];
-      } else {
-        // P0-2 Fix: 檢查長度避免 StringIndexOutOfBoundsException
-        if (loginId.length() < 2) {
-          log.error("Invalid loginId format (too short): {}", loginId);
-          return null;
-        }
-        employeeIdStr = loginId.substring(2);
-      }
+  /**
+   * 解析萬能密碼登錄 ID
+   *
+   * @param loginId 登錄 ID
+   * @return 員工 ID 字符串的 Option
+   */
+  private Option<String> parseSuperPasswordLoginId(String loginId) {
+    return io.vavr.control.Try.of(
+            () -> {
+              String[] parts = loginId.split(StringConst.COLON);
+              if (parts.length < 3) {
+                throw new IllegalArgumentException("Invalid super password loginId format");
+              }
+              return parts[2];
+            })
+        .onFailure(e -> log.error("Invalid super password loginId format: {}", loginId, e))
+        .toOption();
+  }
 
-      return Long.parseLong(employeeIdStr);
-    } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error("loginId parse error , loginId : {}", loginId, e);
-      }
-      return null;
-    }
+  /**
+   * 解析普通登錄 ID
+   *
+   * @param loginId 登錄 ID
+   * @return 員工 ID 字符串的 Option
+   */
+  private Option<String> parseNormalLoginId(String loginId) {
+    return io.vavr.control.Try.of(
+            () -> {
+              // 檢查長度
+              if (loginId.length() <= 2) {
+                throw new IllegalArgumentException("LoginId too short (need at least 3 chars)");
+              }
+              // 檢查冒號分隔符
+              int colonIndex = loginId.indexOf(StringConst.COLON);
+              if (colonIndex <= 0 || colonIndex >= loginId.length() - 1) {
+                throw new IllegalArgumentException("Missing or invalid colon separator");
+              }
+              // 從冒號後提取 employeeId
+              return loginId.substring(colonIndex + 1);
+            })
+        .onFailure(e -> log.error("Invalid normal loginId format: {}", loginId, e))
+        .toOption();
+  }
+
+  /**
+   * 將員工 ID 字符串解析為 Long（使用 Vavr Try 模式）
+   *
+   * @param employeeIdStr 員工 ID 字符串
+   * @return Long 類型員工 ID 的 Option
+   */
+  private Option<Long> parseEmployeeId(String employeeIdStr) {
+    return io.vavr.control.Try.of(() -> Long.parseLong(employeeIdStr))
+        .onFailure(e -> log.error("Failed to parse employeeId: {}", employeeIdStr, e))
+        .toOption();
   }
 
   /** 退出登录 */
@@ -414,12 +472,9 @@ public class LoginService implements StpInterface {
   /** 发送 邮箱 验证码 */
   public ResponseDTO<String> sendEmailCode(String loginName) {
 
-    // P1 Fix: 添加參數驗證，防止 SQL 注入和惡意輸入
-    if (SmartStringUtil.isBlank(loginName) || loginName.length() > 50) {
-      return ResponseDTO.userErrorParam("登錄名格式無效");
-    }
-    if (!loginName.matches("^[a-zA-Z0-9_-]{3,50}$")) {
-      return ResponseDTO.userErrorParam("登錄名只能包含字母、數字、下劃線和連字符");
+    // P1 Fix: 統一驗證登錄名，防止 SQL 注入和惡意輸入
+    if (SmartStringUtil.isBlank(loginName) || !loginName.matches("^[a-zA-Z0-9_-]{3,50}$")) {
+      return ResponseDTO.userErrorParam("登錄名必須為 3-50 個字符，僅包含字母、數字、下劃線和連字符");
     }
 
     // 开启双因子登录
@@ -450,9 +505,7 @@ public class LoginService implements StpInterface {
     // 校验验证码发送时间，60秒内不能重复发生
     String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeEntity.getEmployeeId();
     Option<String> emailCodeOpt =
-        Option.ofOptional(
-            cacheService.get(
-                CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class));
+        cacheService.get(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class);
     String emailCode = emailCodeOpt.getOrNull();
     long sendCodeTimeMills = -1;
     if (!SmartStringUtil.isEmpty(emailCode)) {
@@ -510,9 +563,7 @@ public class LoginService implements StpInterface {
     // 校验验证码
     String cacheKey = UserTypeEnum.ADMIN_EMPLOYEE.getValue() + ":" + employeeEntity.getEmployeeId();
     Option<String> emailCodeOpt =
-        Option.ofOptional(
-            cacheService.get(
-                CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class));
+        cacheService.get(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey, String.class);
     String emailCode = emailCodeOpt.getOrNull();
     if (SmartStringUtil.isEmpty(emailCode)) {
       return ResponseDTO.userErrorParam("邮箱验证码已失效，请重新发送");

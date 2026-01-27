@@ -19,8 +19,6 @@ import net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberRecord
 import net.lab1024.sa.foundation.domain.exception.BusinessException;
 import net.lab1024.sa.foundation.validation.util.SmartEnumUtil;
 import org.apache.commons.lang3.RandomUtils;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 单据序列号 基类
@@ -108,8 +106,26 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
    */
   public abstract void initLastGenerateData(List<SerialNumberEntity> serialNumberEntityList);
 
+  /**
+   * 獲取序列號信息（供 Manager 層使用）
+   *
+   * @param serialNumberIdEnum 序列號ID枚舉
+   * @return 序列號信息
+   */
+  public SerialNumberInfoBO getSerialNumberInfo(final SerialNumberIdEnum serialNumberIdEnum) {
+    return serialNumberMap.get(serialNumberIdEnum.getSerialNumberId());
+  }
+
+  /**
+   * 生成單個序列號（無事務）
+   *
+   * <p>注意：此方法不包含 @Transactional 註解 根據 SmartAdmin 架構規範，需要事務時應調用
+   * SerialNumberManager.generateTransaction()
+   *
+   * @param serialNumberIdEnum 序列號ID枚舉
+   * @return 生成的序列號
+   */
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public String generate(final SerialNumberIdEnum serialNumberIdEnum) {
     final List<String> generateList = this.generate(serialNumberIdEnum, 1);
     if (generateList == null || generateList.isEmpty()) {
@@ -118,8 +134,17 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
     return generateList.get(0);
   }
 
+  /**
+   * 批量生成序列號（無事務）
+   *
+   * <p>注意：此方法不包含 @Transactional 註解 根據 SmartAdmin 架構規範，需要事務時應調用
+   * SerialNumberManager.generateTransaction()
+   *
+   * @param serialNumberIdEnum 序列號ID枚舉
+   * @param count 生成數量
+   * @return 生成的序列號列表
+   */
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public List<String> generate(final SerialNumberIdEnum serialNumberIdEnum, final int count) {
     final SerialNumberInfoBO serialNumberInfoBO =
         serialNumberMap.get(serialNumberIdEnum.getSerialNumberId());

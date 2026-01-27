@@ -1,6 +1,5 @@
 package net.lab1024.sa.admin.module.business.sample.kafka;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.mq.kafka.constant.KafkaConst;
@@ -52,7 +51,11 @@ public class KafkaProducerSample {
         .whenComplete(
             (result, ex) -> {
               if (ex != null) {
-                log.error("示例消息发送失败: {}", ex.getMessage());
+                log.error(
+                    "示例消息发送失败: errorType={}, error={}",
+                    ex.getClass().getSimpleName(),
+                    ex.getMessage(),
+                    ex);
               } else {
                 log.info(
                     "示例消息发送成功: partition={}, offset={}",
@@ -76,7 +79,12 @@ public class KafkaProducerSample {
         .whenComplete(
             (result, ex) -> {
               if (ex != null) {
-                log.error("订单消息发送失败: orderId={}, error={}", orderId, ex.getMessage());
+                log.error(
+                    "订单消息发送失败: orderId={}, errorType={}, error={}",
+                    orderId,
+                    ex.getClass().getSimpleName(),
+                    ex.getMessage(),
+                    ex);
               } else {
                 log.info(
                     "订单消息发送成功: orderId={}, partition={}, offset={}",
@@ -94,10 +102,10 @@ public class KafkaProducerSample {
    * @return 是否发送成功
    */
   public boolean sendSampleMessageSync(String message) {
-    Optional<SendResult<String, String>> result =
+    io.vavr.control.Option<SendResult<String, String>> result =
         kafkaProducerService.sendSync(KafkaConst.Topic.SAMPLE, message);
 
-    if (result.isPresent()) {
+    if (result.isDefined()) {
       log.info(
           "示例消息同步发送成功: partition={}, offset={}",
           result.get().getRecordMetadata().partition(),
@@ -117,10 +125,10 @@ public class KafkaProducerSample {
    * @return 是否发送成功
    */
   public boolean sendOrderMessageSync(String orderId, String message) {
-    Optional<SendResult<String, String>> result =
+    io.vavr.control.Option<SendResult<String, String>> result =
         kafkaProducerService.sendSync(KafkaConst.Topic.ORDER, orderId, message);
 
-    if (result.isPresent()) {
+    if (result.isDefined()) {
       log.info(
           "订单消息同步发送成功: orderId={}, partition={}, offset={}",
           orderId,

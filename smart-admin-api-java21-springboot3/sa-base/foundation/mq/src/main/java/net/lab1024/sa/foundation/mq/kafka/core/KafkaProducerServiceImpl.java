@@ -1,12 +1,14 @@
 package net.lab1024.sa.foundation.mq.kafka.core;
 
+import io.vavr.control.Option;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.foundation.mq.kafka.batch.BatchSendResult;
@@ -40,10 +42,16 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
       String topic, String key, String message) {
     CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, key, message);
 
-    future.whenComplete(
+    return future.whenComplete(
         (result, ex) -> {
           if (ex != null) {
-            log.error("Kafka 消息发送失败: topic={}, key={}, error={}", topic, key, ex.getMessage());
+            log.error(
+                "Kafka 消息发送失败: topic={}, key={}, errorType={}, error={}",
+                topic,
+                key,
+                ex.getClass().getSimpleName(),
+                ex.getMessage(),
+                ex);
           } else if (log.isDebugEnabled()) {
             log.debug(
                 "Kafka 消息发送成功: topic={}, key={}, partition={}, offset={}",
@@ -53,22 +61,20 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
                 result.getRecordMetadata().offset());
           }
         });
-
-    return future;
   }
 
   @Override
-  public Optional<SendResult<String, String>> sendSync(String topic, String message) {
+  public Option<SendResult<String, String>> sendSync(String topic, String message) {
     return sendSync(topic, null, message, DEFAULT_TIMEOUT_MS);
   }
 
   @Override
-  public Optional<SendResult<String, String>> sendSync(String topic, String key, String message) {
+  public Option<SendResult<String, String>> sendSync(String topic, String key, String message) {
     return sendSync(topic, key, message, DEFAULT_TIMEOUT_MS);
   }
 
   @Override
-  public Optional<SendResult<String, String>> sendSync(
+  public Option<SendResult<String, String>> sendSync(
       String topic, String key, String message, long timeoutMs) {
     try {
       CompletableFuture<SendResult<String, String>> future =
@@ -83,14 +89,34 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
             result.getRecordMetadata().partition(),
             result.getRecordMetadata().offset());
       }
-      return Optional.of(result);
+      return Option.of(result);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       log.error("Kafka 消息同步发送被中断: topic={}, key={}", topic, key, ex);
-      return Optional.empty();
+      return Option.none();
+    } catch (TimeoutException ex) {
+      log.error("Kafka 消息同步发送超时: topic={}, key={}, timeoutMs={}", topic, key, timeoutMs, ex);
+      return Option.none();
+    } catch (ExecutionException ex) {
+      // ExecutionException 包装了实际的发送异常，需要解包
+      Throwable cause = ex.getCause();
+      log.error(
+          "Kafka 消息同步发送失败 (broker错误): topic={}, key={}, causeType={}, error={}",
+          topic,
+          key,
+          cause != null ? cause.getClass().getSimpleName() : "Unknown",
+          cause != null ? cause.getMessage() : ex.getMessage(),
+          cause != null ? cause : ex);
+      return Option.none();
     } catch (Exception ex) {
-      log.error("Kafka 消息同步发送失败: topic={}, key={}, error={}", topic, key, ex.getMessage(), ex);
-      return Optional.empty();
+      log.error(
+          "Kafka 消息同步发送失败 (未知错误): topic={}, key={}, errorType={}, error={}",
+          topic,
+          key,
+          ex.getClass().getSimpleName(),
+          ex.getMessage(),
+          ex);
+      return Option.none();
     }
   }
 
@@ -161,15 +187,34 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
                     failureCount++;
                   }
                 } catch (Exception e) {
+                  // 解包 CompletionException 获取真实异常
+                  Throwable cause = e.getCause();
+                  Throwable actualException = (cause != null) ? cause : e;
+
+                  String errorMessage =
+                      String.format(
+                          "[%s] %s",
+                          actualException.getClass().getSimpleName(), actualException.getMessage());
+
                   failedMessages.add(
                       FailedMessage.builder()
                           .index(i)
                           .key(originalMessage.getKey())
                           .value(originalMessage.getValue())
-                          .errorMessage(e.getMessage())
-                          .exception(e)
+                          .errorMessage(errorMessage)
+                          .exception((Exception) actualException)
                           .build());
                   failureCount++;
+
+                  if (log.isDebugEnabled()) {
+                    log.debug(
+                        "Kafka 批量发送单条消息失败: topic={}, index={}, key={}, errorType={}",
+                        topic,
+                        i,
+                        originalMessage.getKey(),
+                        actualException.getClass().getSimpleName(),
+                        actualException);
+                  }
                 }
               }
 
@@ -214,10 +259,38 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
       return sendBatchAsyncWithKeys(topic, keyedMessages).get(timeoutMs, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
-      log.error("Kafka 批量同步发送被中断: topic={}", topic, ex);
+      log.error("Kafka 批量同步发送被中断: topic={}, total={}", topic, keyedMessages.size(), ex);
       return createFailedBatchResult(keyedMessages, "发送被中断: " + ex.getMessage(), ex);
+    } catch (TimeoutException ex) {
+      log.error(
+          "Kafka 批量同步发送超时: topic={}, total={}, timeoutMs={}",
+          topic,
+          keyedMessages.size(),
+          timeoutMs,
+          ex);
+      return createFailedBatchResult(
+          keyedMessages, "发送超时 (" + timeoutMs + "ms): " + ex.getMessage(), ex);
+    } catch (ExecutionException ex) {
+      Throwable cause = ex.getCause();
+      log.error(
+          "Kafka 批量同步发送失败 (broker错误): topic={}, total={}, causeType={}, error={}",
+          topic,
+          keyedMessages.size(),
+          cause != null ? cause.getClass().getSimpleName() : "Unknown",
+          cause != null ? cause.getMessage() : ex.getMessage(),
+          cause != null ? cause : ex);
+      return createFailedBatchResult(
+          keyedMessages,
+          "broker错误: " + (cause != null ? cause.getMessage() : ex.getMessage()),
+          cause != null ? (Exception) cause : ex);
     } catch (Exception ex) {
-      log.error("Kafka 批量同步发送失败: topic={}, error={}", topic, ex.getMessage(), ex);
+      log.error(
+          "Kafka 批量同步发送失败 (未知错误): topic={}, total={}, errorType={}, error={}",
+          topic,
+          keyedMessages.size(),
+          ex.getClass().getSimpleName(),
+          ex.getMessage(),
+          ex);
       return createFailedBatchResult(keyedMessages, ex.getMessage(), ex);
     }
   }

@@ -10,6 +10,9 @@ dependencies {
     // Spring Kafka
     api(libs.spring.kafka)
 
+    // Vavr (for Option)
+    api("io.vavr:vavr:0.10.4")
+
     // Lombok
     api(libs.lombok)
     annotationProcessor(libs.lombok)
