@@ -48,10 +48,298 @@ iGaming 產業高度依賴有機流量 (Organic Traffic)，本模組定義如何
 - **邊緣緩存 (Edge Cache)**：HTML 頁面 (尤其是首頁與遊戲詳情頁) 應在 CDN Edge 緩存 TTL 60秒，降低 Origin Server 負載。
 
 ## 4. 多語系 SEO (Hreflang)
-- 針對多國營運站點，必須正確配置 `hreflang` 標籤，防止內容重複 (Duplicate Content) 懲罰。
-- **範例**：
-  ```html
-  <link rel="alternate" hreflang="en" href="https://www.casino.com/games/slot1" />
-  <link rel="alternate" hreflang="th" href="https://www.casino.com/th/games/slot1" />
-  <link rel="alternate" hreflang="x-default" href="https://www.casino.com/games/slot1" />
-  ```
+
+### 4.1 Hreflang 配置
+
+針對多國營運站點，必須正確配置 `hreflang` 標籤，防止內容重複 (Duplicate Content) 懲罰。
+
+**HTML Head 標籤範例**：
+```html
+<link rel="alternate" hreflang="en" href="https://www.casino.com/games/slot1" />
+<link rel="alternate" hreflang="th" href="https://www.casino.com/th/games/slot1" />
+<link rel="alternate" hreflang="vi" href="https://www.casino.com/vi/games/slot1" />
+<link rel="alternate" hreflang="x-default" href="https://www.casino.com/games/slot1" />
+```
+
+**Sitemap 整合**：
+```xml
+<url>
+  <loc>https://www.casino.com/games/slot1</loc>
+  <xhtml:link rel="alternate" hreflang="en" href="https://www.casino.com/games/slot1" />
+  <xhtml:link rel="alternate" hreflang="th" href="https://www.casino.com/th/games/slot1" />
+  <xhtml:link rel="alternate" hreflang="vi" href="https://www.casino.com/vi/games/slot1" />
+</url>
+```
+
+### 4.2 URL 結構策略
+
+**多語言 URL 模式選擇**：
+
+| 模式 | URL 範例 | SEO 友好度 | 實作複雜度 |
+|------|---------|-----------|-----------|
+| **子域名** | `th.casino.com/games` | ⭐⭐⭐⭐⭐ 最佳 | 高（需多個 SSL 證書） |
+| **子目錄** | `casino.com/th/games` | ⭐⭐⭐⭐ 推薦 | 中（路由配置） |
+| **Query 參數** | `casino.com/games?lang=th` | ⭐⭐ 不推薦 | 低（SEO 不友善） |
+
+**推薦方案**：使用子目錄模式（兼顧 SEO 與實作成本）
+
+---
+
+## 5. SSR/ISR 實作細節
+
+### 5.1 Next.js ISR 配置
+
+**遊戲詳情頁面範例**：
+```javascript
+// pages/games/[provider]/[slug].tsx
+export async function getStaticPaths() {
+  // 預渲染前 100 個熱門遊戲
+  const topGames = await fetchTopGames(100);
+
+  return {
+    paths: topGames.map(game => ({
+      params: { provider: game.provider, slug: game.slug }
+    })),
+    fallback: 'blocking' // 其他遊戲首次訪問時 SSR
+  };
+}
+
+export async function getStaticProps({ params }) {
+  const game = await fetchGameBySlug(params.provider, params.slug);
+
+  return {
+    props: { game },
+    revalidate: 3600 // 每小時重新生成一次
+  };
+}
+```
+
+### 5.2 動態路由 SEO 最佳化
+
+**Canonical URL 處理**：
+```html
+<!-- 防止參數污染 SEO -->
+<link rel="canonical" href="https://www.casino.com/games/pg-soft/mahjong-ways-2" />
+```
+
+**Open Graph 標籤**：
+```html
+<meta property="og:title" content="Mahjong Ways 2 - Play Free Demo | Casino" />
+<meta property="og:description" content="Play Mahjong Ways 2 by PG Soft. 96.81% RTP, Medium volatility." />
+<meta property="og:image" content="https://cdn.casino.com/games/mahjong-ways-2.jpg" />
+<meta property="og:url" content="https://www.casino.com/games/pg-soft/mahjong-ways-2" />
+<meta property="og:type" content="website" />
+```
+
+---
+
+## 6. CDN 與快取策略
+
+### 6.1 多層快取架構
+
+```
+┌────────────────────────────────────────────┐
+│  Cloudflare CDN (Edge Cache)               │
+│  - HTML: TTL 60s                           │
+│  - JS/CSS: TTL 7 days (immutable)          │
+│  - Images: TTL 30 days                     │
+└────────────────┬───────────────────────────┘
+                 │
+┌────────────────▼───────────────────────────┐
+│  Origin Server (Next.js)                   │
+│  - ISR 快取: 3600s                         │
+│  - API 快取: Redis 300s                    │
+└────────────────┬───────────────────────────┘
+                 │
+┌────────────────▼───────────────────────────┐
+│  Database (MySQL)                          │
+└────────────────────────────────────────────┘
+```
+
+### 6.2 快取失效策略
+
+**主動清除快取**：
+```javascript
+// 遊戲資訊更新時，清除 CDN 快取
+async function purgeGameCache(gameSlug) {
+  await cloudflarePurge([
+    `/games/*/${gameSlug}`,
+    `/api/games/${gameSlug}`
+  ]);
+
+  await redisDel(`game:${gameSlug}`);
+}
+```
+
+**Cache-Control Headers**：
+```nginx
+# 靜態資源 (帶版本號)
+location /static/ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
+# HTML 頁面
+location / {
+    add_header Cache-Control "public, max-age=60, s-maxage=60, stale-while-revalidate=120";
+}
+```
+
+---
+
+## 7. 圖片優化策略
+
+### 7.1 現代圖片格式
+
+**WebP 自動轉換**：
+```html
+<picture>
+  <source srcset="/games/slot1.avif" type="image/avif" />
+  <source srcset="/games/slot1.webp" type="image/webp" />
+  <img src="/games/slot1.jpg" alt="Fortune Tiger Slot" loading="lazy" />
+</picture>
+```
+
+**響應式圖片**：
+```html
+<img
+  srcset="
+    /games/slot1-320w.webp 320w,
+    /games/slot1-640w.webp 640w,
+    /games/slot1-1280w.webp 1280w
+  "
+  sizes="(max-width: 640px) 100vw, 50vw"
+  src="/games/slot1-640w.webp"
+  alt="Fortune Tiger"
+  loading="lazy"
+  decoding="async"
+/>
+```
+
+### 7.2 圖片 CDN 優化
+
+**Cloudflare Images / Imgix 整合**：
+```
+https://cdn.casino.com/games/slot1.jpg?w=400&h=300&fit=cover&fm=webp&q=85
+```
+
+**參數說明**：
+- `w=400&h=400`: 指定尺寸（避免傳輸過大圖片）
+- `fit=cover`: 裁切模式
+- `fm=webp`: 自動轉 WebP（支援瀏覽器）
+- `q=85`: 品質（85% 為最佳平衡點）
+
+---
+
+## 8. 性能監控
+
+### 8.1 Real User Monitoring (RUM)
+
+**Google Analytics 4 整合**：
+```javascript
+// 追蹤 Core Web Vitals
+import { getCLS, getFID, getLCP } from 'web-vitals';
+
+function sendToAnalytics({ name, value, id }) {
+  gtag('event', name, {
+    event_category: 'Web Vitals',
+    value: Math.round(name === 'CLS' ? value * 1000 : value),
+    event_label: id,
+    non_interaction: true,
+  });
+}
+
+getCLS(sendToAnalytics);
+getFID(sendToAnalytics);
+getLCP(sendToAnalytics);
+```
+
+### 8.2 Lighthouse CI
+
+**自動化性能測試**：
+```yaml
+# .github/workflows/lighthouse.yml
+name: Lighthouse CI
+on: [pull_request]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install && npm run build
+      - run: |
+          npx lhci autorun --config=lighthouserc.json
+```
+
+**性能預算配置** (lighthouserc.json):
+```json
+{
+  "ci": {
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", {"minScore": 0.9}],
+        "first-contentful-paint": ["error", {"maxNumericValue": 2000}],
+        "largest-contentful-paint": ["error", {"maxNumericValue": 2500}],
+        "cumulative-layout-shift": ["error", {"maxNumericValue": 0.1}]
+      }
+    }
+  }
+}
+```
+
+---
+
+## 9. 結構化數據 (Schema.org)
+
+### 9.1 VideoGame Schema
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Mahjong Ways 2",
+  "description": "Exciting slot game with Mahjong theme",
+  "gamePlatform": ["Web Browser", "iOS", "Android"],
+  "applicationCategory": "Casino Game",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.7",
+    "ratingCount": "1234",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "provider": {
+    "@type": "Organization",
+    "name": "PG Soft"
+  }
+}
+</script>
+```
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [08-01 前端佈局引擎](./08-01_Frontend_Layout_Engine.md) - 頁面組件設計
+- [08-05 本地化系統](./08-05_Localization_System.md) - 多語言 SEO
+
+### 技術參考
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - CDN 配置
+- [03-02 遊戲大廳管理](../03_Game_Center/03-02_Game_Lobby_Management.md) - 遊戲列表渲染
+
+### 業務整合
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 用戶體驗優化
+- [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - 性能數據分析
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Frontend Team

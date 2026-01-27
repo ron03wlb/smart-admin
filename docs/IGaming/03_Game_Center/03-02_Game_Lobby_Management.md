@@ -28,8 +28,65 @@
   - 人工置頂 (Pin)
 
 ### 2.3 搜尋與過濾
-- 支援依供應商、遊戲類型、RTP 區間進行篩選。
-- 全文檢索 (Elasticsearch) 支援模糊搜尋。
+
+**基礎篩選維度**：
+- 遊戲供應商（PG Soft, Pragmatic Play, Evolution 等）
+- 遊戲類型（老虎機, 真人, 體育, 彩票）
+- RTP 區間（95-96%, 96-97%, 97%+）
+- 波動率（低, 中, 高）
+- 最小/最大下注額
+
+**全文檢索實作** (Elasticsearch):
+```json
+{
+  "query": {
+    "multi_match": {
+      "query": "水果機",
+      "fields": ["game_name_zh^3", "game_name_en", "tags^2", "provider"],
+      "fuzziness": "AUTO"
+    }
+  }
+}
+```
+
+**搜尋優化策略**：
+- **拼音搜尋**：支援 "shuiguoji" 匹配 "水果機"
+- **同義詞**："老虎機" = "Slot" = "角子機"
+- **搜尋歷史**：記錄用戶搜尋詞，優化熱門搜尋推薦
+
+### 2.4 個性化推薦算法
+
+**推薦策略矩陣**：
+
+| 用戶類型 | 推薦策略 | 權重分配 |
+|---------|---------|---------|
+| **新用戶** | 熱門遊戲 + 高 RTP 遊戲 | 60% 熱度 + 40% RTP |
+| **活躍玩家** | 歷史偏好 + 同類遊戲 | 70% 協同過濾 + 30% 熱度 |
+| **VIP 用戶** | 高額投注遊戲 + 獨家遊戲 | 50% 高投注 + 30% 獨家 + 20% 新遊戲 |
+| **流失用戶** | 曾經喜愛的遊戲 + 新活動 | 60% 歷史偏好 + 40% 新活動 |
+
+**協同過濾實作** (User-Based Collaborative Filtering):
+```python
+# 簡化演算法邏輯
+def recommend_games(user_id):
+    # 1. 找到與目標用戶行為相似的用戶群
+    similar_users = find_similar_users(user_id, top_k=50)
+
+    # 2. 統計相似用戶喜愛的遊戲
+    candidate_games = get_games_played_by(similar_users)
+
+    # 3. 排除用戶已玩過的遊戲
+    new_games = exclude_played_games(user_id, candidate_games)
+
+    # 4. 依投注金額加權排序
+    return rank_by_weighted_score(new_games)
+```
+
+**實時行為追蹤**：
+- 點擊遊戲（+1 分）
+- 試玩遊戲（+3 分）
+- 投注遊戲（+10 分）
+- 加入收藏（+5 分）
 
 ## 3. 商戶差異化
 - **屏蔽遊戲**：商戶 A 可屏蔽 RTP > 98% 的遊戲，商戶 B 可保留。
@@ -48,3 +105,268 @@
 - **上架新遊戲審批**：
   - **流程**：平台同步新遊戲 -> 運營配置圖片與標籤 -> 提交審核 -> 允許上架。
   - **目的**：防止未經測試或翻譯不全的遊戲直接暴露給玩家。
+
+---
+
+## 5. 遊戲標籤與分類策略
+
+### 5.1 多維度標籤體系
+
+**系統標籤** (自動生成):
+- `[NEW]` - 上線 7 天內
+- `[HOT]` - 近 24 小時投注人數 > 100
+- `[JACKPOT]` - 累積彩金池遊戲
+- `[HIGH_RTP]` - RTP ≥ 97%
+- `[EXCLUSIVE]` - 平台獨家
+
+**運營標籤** (人工配置):
+- `[周推薦]`, `[聖誕特輯]`, `[農曆新年]`
+- `[快速遊戲]` - 單局 < 30 秒
+- `[高額投注]` - 單注上限 > $1000
+
+**玩家標籤** (用戶生成):
+- 收藏數量 (❤️ 1.2K 人收藏)
+- 評分 (⭐ 4.8 / 5.0)
+
+### 5.2 智能分類引擎
+
+**基於內容的自動分類**：
+```python
+# 使用遊戲名稱、描述進行 NLP 分類
+def auto_categorize_game(game):
+    keywords = extract_keywords(game.name + game.description)
+
+    if "水果" in keywords or "fruit" in keywords.lower():
+        return "FRUIT_SLOT"
+    elif "埃及" in keywords or "egypt" in keywords.lower():
+        return "EGYPT_THEME"
+    elif "三國" in keywords:
+        return "CHINESE_HISTORY"
+    else:
+        return "GENERAL"
+```
+
+---
+
+## 6. 性能優化策略
+
+### 6.1 多級快取架構
+
+```
+┌─────────────────────────────────────────────┐
+│  L1: CDN 快取 (遊戲圖標、Banner)             │
+│  TTL: 7 天                                  │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│  L2: Redis 快取 (遊戲列表、排序結果)         │
+│  TTL: 15 分鐘                               │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│  L3: Application Cache (JVM Caffeine)       │
+│  TTL: 5 分鐘                                │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│  Database (MySQL - 遊戲元數據主庫)           │
+└─────────────────────────────────────────────┘
+```
+
+**快取更新策略**：
+- **遊戲上下架**：立即清除所有快取（Pub/Sub 廣播）
+- **熱度排序**：每 15 分鐘後台任務重新計算
+- **新遊戲同步**：增量更新，僅清除相關分類快取
+
+### 6.2 分頁與虛擬捲動
+
+**後端分頁 API**：
+```json
+GET /api/v1/game-lobby/games?category=slot&page=1&size=30
+
+Response:
+{
+  "games": [...],
+  "pagination": {
+    "current_page": 1,
+    "total_pages": 45,
+    "total_games": 1340
+  }
+}
+```
+
+**前端虛擬捲動**：
+- 使用 `react-window` / `react-virtualized` 渲染大量遊戲卡片
+- 僅渲染可見區域 + 上下緩衝區（提升滾動流暢度）
+
+---
+
+## 7. 數據模型設計
+
+### 7.1 核心表結構
+
+**game_metadata** (遊戲元數據表):
+```sql
+CREATE TABLE game_metadata (
+    game_id VARCHAR(50) PRIMARY KEY,
+    provider_id VARCHAR(50) NOT NULL,
+    game_name_en VARCHAR(200),
+    game_name_zh VARCHAR(200),
+    game_type ENUM('SLOT', 'LIVE', 'SPORT', 'LOTTERY'),
+    rtp DECIMAL(5,2), -- 96.50
+    volatility ENUM('LOW', 'MEDIUM', 'HIGH'),
+    min_bet DECIMAL(10,2),
+    max_bet DECIMAL(10,2),
+    thumbnail_url VARCHAR(500),
+    is_enabled BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    INDEX idx_provider_type (provider_id, game_type),
+    INDEX idx_rtp (rtp)
+);
+```
+
+**game_lobby_config** (大廳配置表):
+```sql
+CREATE TABLE game_lobby_config (
+    config_id BIGSERIAL PRIMARY KEY,
+    tenant_id BIGINT NOT NULL,
+    category VARCHAR(50), -- 'HOT', 'NEW', 'CUSTOM_001'
+    sort_order INT, -- 顯示順序
+    game_id VARCHAR(50),
+    is_pinned BOOLEAN DEFAULT FALSE, -- 是否置頂
+    FOREIGN KEY (game_id) REFERENCES game_metadata(game_id),
+    UNIQUE (tenant_id, category, game_id)
+);
+```
+
+### 7.2 遊戲熱度計算表
+
+**game_popularity_stats** (熱度統計表):
+```sql
+CREATE TABLE game_popularity_stats (
+    stat_id BIGSERIAL PRIMARY KEY,
+    game_id VARCHAR(50),
+    stat_date DATE,
+    unique_players INT, -- 獨立玩家數
+    total_bets BIGINT, -- 總投注次數
+    total_bet_amount DECIMAL(15,2), -- 總投注金額
+    avg_session_duration INT, -- 平均遊戲時長 (秒)
+    INDEX idx_game_date (game_id, stat_date)
+);
+```
+
+---
+
+## 8. API 設計規範
+
+### 8.1 遊戲列表 API
+
+```http
+GET /api/v1/game-lobby/games?category={category}&provider={provider}&page={page}
+
+Headers:
+  Authorization: Bearer {token}
+  X-Tenant-ID: {tenantId}
+
+Query Parameters:
+  - category (optional): 'HOT', 'NEW', 'JACKPOT'
+  - provider (optional): 'PG', 'PRAGMATIC', 'EVOLUTION'
+  - search (optional): 搜尋關鍵字
+  - page (required): 頁碼
+  - size (optional): 每頁數量 (預設 30)
+
+Response (200 OK):
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "games": [
+      {
+        "game_id": "pg_fortune_tiger",
+        "game_name": "Fortune Tiger",
+        "provider": "PG Soft",
+        "rtp": 96.81,
+        "thumbnail": "https://cdn.example.com/games/fortune_tiger.jpg",
+        "tags": ["HOT", "HIGH_RTP"],
+        "popularity_score": 9.2
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "total_pages": 15,
+      "total_count": 450
+    }
+  }
+}
+```
+
+### 8.2 遊戲詳情 API
+
+```http
+GET /api/v1/game-lobby/games/{gameId}
+
+Response:
+{
+  "code": 0,
+  "data": {
+    "game_id": "pg_fortune_tiger",
+    "game_name": "Fortune Tiger (招財虎)",
+    "provider": "PG Soft",
+    "rtp": 96.81,
+    "volatility": "MEDIUM",
+    "min_bet": 0.10,
+    "max_bet": 250.00,
+    "description": "亞洲主題老虎機...",
+    "features": ["Free Spins", "Multipliers", "Re-Spins"],
+    "stats": {
+      "total_players_today": 1234,
+      "total_bets_today": 45678,
+      "avg_rating": 4.7,
+      "favorite_count": 890
+    }
+  }
+}
+```
+
+---
+
+## 9. 監控指標 (KPIs)
+
+### 9.1 業務指標
+- **遊戲點擊率 (CTR)**: (點擊遊戲數 / 展示次數) × 100%
+- **遊戲轉換率**: (實際投注數 / 點擊遊戲數) × 100%
+- **平均遊戲時長**: AVG(session_duration)
+- **熱門遊戲 TOP 10**: 依投注金額排序
+
+### 9.2 技術指標
+- **API 響應時間**: P50 < 100ms, P99 < 500ms
+- **快取命中率**: Redis > 95%
+- **搜尋查詢延遲**: Elasticsearch < 50ms
+- **圖片 CDN 命中率**: > 98%
+
+### 9.3 告警規則
+- ⚠️ 某遊戲 RTP 異常（> 105% 或 < 90%）
+- ⚠️ 遊戲同步失敗（連續 3 次失敗）
+- ⚠️ API 響應時間 P99 > 1s
+- ⚠️ 快取命中率 < 80%
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [03-01 遊戲集成標準](./03-01_Game_Integration_Standard.md) - GP API 規格
+- [03-03 無縫錢包對接分析](./03-03_Seamless_Wallet_Analysis.md) - 遊戲啟動流程
+
+### 技術架構
+- [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - 大廳頁面設計
+- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流
+
+### 業務整合
+- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動遊戲推薦
+- [01-02 VIP 系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - VIP 獨家遊戲
+
+---
+
+**最後更新**: 2026-01-27
+**維護者**: Game Team
