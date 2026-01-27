@@ -221,12 +221,195 @@ Line Exposure = Sum(Player Outstanding) - Sum(Player Cash Balance)
 *   **Group Exposure Limit**：設定整條線的曝險上限 (e.g. $1M)。
 *   **Alert**：當 Line Exposure 達到 80% 時，通知 Risk Team 介入，詢問是否需要 "強平"。
 
-### 4.2 異常佔成偵測 (Abnormal Position Alert)
-*   **規則**：
-    *   監控 **Position % (佔成比)** 的變更。
-    *   若代理將特定玩家的佔成從 0% 突然調至 100%，且該玩家隨即開始大額下注。
-    *   **判定**：疑似 "對賭" 或 "搶錢" (代理知道該玩家會輸，或者與玩家串通刷量)。
-*   **處置**：暫停該代理線的佔成修改權限，強行鎖定佔成比。
+##### 📊 Diagram 2: 代理曝險實時監控架構 (Agent Exposure Real-time Monitoring Architecture)
+
+```mermaid
+graph TB
+    subgraph "Data Collection Layer - 數據收集層"
+        DC1[Player Wallet Events<br/>玩家錢包事件<br/>Bet, Win, Deposit, Withdrawal]
+        DC2[Agent Credit Events<br/>代理信用事件<br/>Credit Grant, Settlement, Transfer]
+        DC3[Position Changes<br/>佔成變更事件<br/>Position % Adjustments]
+    end
+
+    subgraph "Stream Processing Layer - 流處理層"
+        SP1[Kafka Topic:<br/>player-wallet-events]
+        SP2[Kafka Topic:<br/>agent-credit-events]
+        SP3[Kafka Topic:<br/>position-change-events]
+
+        DC1 --> SP1
+        DC2 --> SP2
+        DC3 --> SP3
+
+        FLINK[Flink Stream Job:<br/>Exposure Aggregator<br/>5-minute tumbling window]
+
+        SP1 --> FLINK
+        SP2 --> FLINK
+        SP3 --> FLINK
+    end
+
+    subgraph "Calculation Engine - 計算引擎"
+        CALC1[Line Exposure Calculator<br/>Sum - Player Outstanding<br/>- Player Cash Balance]
+        CALC2[Agent Tree Aggregator<br/>Recursive aggregation<br/>from leaf to root]
+        CALC3[Margin Level Calculator<br/>Deposit + Balance / Current Loss]
+
+        FLINK --> CALC1
+        CALC1 --> CALC2
+        CALC2 --> CALC3
+    end
+
+    subgraph "Storage Layer - 存儲層"
+        REDIS[Redis:<br/>Real-time Metrics<br/>agent:exposure:{id}<br/>TTL: 10 minutes]
+        CLICKHOUSE[ClickHouse:<br/>Historical Exposure Data<br/>Time-series analytics]
+
+        CALC3 --> REDIS
+        CALC3 --> CLICKHOUSE
+    end
+
+    subgraph "Risk Monitoring Layer - 風險監控層"
+        RULE1[Rule Engine:<br/>Exposure Threshold Check<br/>80% → Warning<br/>90% → Critical]
+        RULE2[Abnormal Position Detector:<br/>Detect 0% → 100% jump<br/>within 1 hour]
+        RULE3[Margin Level Monitor:<br/>< 110% → Margin Call<br/>< 100% → Soft Stop<br/>< 80% → Hard Stop]
+
+        REDIS --> RULE1
+        REDIS --> RULE2
+        REDIS --> RULE3
+    end
+
+    subgraph "Alert & Action Layer - 告警與執行層"
+        ALERT1[Slack/Email Alert<br/>Risk Team notification]
+        ALERT2[Auto Actions:<br/>Freeze credit allocation<br/>Lock position modification]
+        ALERT3[Forced Liquidation:<br/>Suspend all players<br/>Execute settlement]
+
+        RULE1 -->|Exposure ≥ 80%| ALERT1
+        RULE2 -->|Abnormal detected| ALERT2
+        RULE3 -->|Margin < 80%| ALERT3
+    end
+
+    subgraph "Dashboard Layer - 儀表板層"
+        DASH1[Risk Dashboard:<br/>Agent Exposure Heatmap]
+        DASH2[Real-time Alert Feed:<br/>Last 24h alerts]
+        DASH3[Agent Credit Scorecard:<br/>Credit score trends]
+
+        REDIS --> DASH1
+        ALERT1 --> DASH2
+        CLICKHOUSE --> DASH3
+    end
+
+    style DC1 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style DC2 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style DC3 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+
+    style SP1 fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style SP2 fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style SP3 fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style FLINK fill:#FFE082,stroke:#F57F00,stroke-width:2px
+
+    style CALC1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style CALC2 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style CALC3 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+
+    style REDIS fill:#B3E5FC,stroke:#0277BD,stroke-width:2px
+    style CLICKHOUSE fill:#B3E5FC,stroke:#0277BD,stroke-width:2px
+
+    style RULE1 fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style RULE2 fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style RULE3 fill:#FFE082,stroke:#F57F00,stroke-width:2px
+
+    style ALERT1 fill:#FFD54F,stroke:#F9A825,stroke-width:2px
+    style ALERT2 fill:#FFA726,stroke:#E65100,stroke-width:2px
+    style ALERT3 fill:#EF5350,stroke:#C62828,stroke-width:2px
+
+    style DASH1 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
+    style DASH2 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
+    style DASH3 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
+```
+
+**架構說明**:
+
+| 層級 | 組件 | 職責 | 技術棧 | 性能指標 |
+|------|------|------|--------|----------|
+| **數據收集層** | Player/Agent/Position Events | 捕獲所有相關業務事件 | Spring Event, MQ Producer | TPS > 10k |
+| **流處理層** | Kafka + Flink | 實時聚合代理線曝險數據 | Kafka 3.x, Flink 1.18 | Latency < 5s |
+| **計算引擎** | Exposure/Margin Calculator | 計算 Line Exposure, Margin Level | Java 21, Vavr | Throughput > 5k/s |
+| **存儲層** | Redis + ClickHouse | 熱數據快取 + 冷數據分析 | Redis 7.x, ClickHouse 24.x | Redis P99 < 10ms |
+| **風險監控層** | Rule Engine | 閾值檢測與異常識別 | LiteFlow 2.12 | Check interval: 1 min |
+| **告警執行層** | Alert + Auto Actions | 發送告警與自動處置 | Slack API, Email SMTP | Alert latency < 30s |
+| **儀表板層** | Risk Dashboard | 風控儀表板與報表 | Vue 3 + ECharts | Refresh: 10s |
+
+**計算公式**:
+
+1. **Line Exposure (代理線曝險)**:
+```
+Line Exposure = Σ(Player Outstanding) - Σ(Player Cash Balance)
+
+範例:
+Agent A 旗下有 3 個玩家:
+  - Player 1: Outstanding = $5,000, Cash = $1,000
+  - Player 2: Outstanding = $8,000, Cash = $500
+  - Player 3: Outstanding = $2,000, Cash = $3,000
+
+Line Exposure = (5000 + 8000 + 2000) - (1000 + 500 + 3000)
+              = 15,000 - 4,500
+              = $10,500 (代理需承擔的風險)
+```
+
+2. **Margin Level (保證金水平)**:
+```
+Margin Level = (Security Deposit + Account Balance) / Current Loss
+
+範例:
+Agent B:
+  - Security Deposit: $50,000 (保證金)
+  - Account Balance: $20,000 (帳戶餘額)
+  - Current Loss: $60,000 (當前虧損)
+
+Margin Level = (50,000 + 20,000) / 60,000
+             = 70,000 / 60,000
+             = 116.7%
+
+判定: > 110% (安全，但接近 Margin Call 閾值)
+```
+
+3. **Exposure Ratio (曝險比例)**:
+```
+Exposure Ratio = Line Exposure / Group Exposure Limit
+
+範例:
+Agent C:
+  - Line Exposure: $800,000
+  - Group Exposure Limit: $1,000,000
+
+Exposure Ratio = 800,000 / 1,000,000 = 80%
+
+判定: 達到告警閾值 (80%)，需通知風控團隊介入
+```
+
+**告警觸發條件**:
+
+| 告警類型 | 觸發條件 | 嚴重性 | 通知渠道 | 自動處置 |
+|----------|----------|--------|----------|----------|
+| **曝險告警** (Exposure Warning) | Exposure Ratio ≥ 80% | ⚠️ Warning | Slack, Email | 增加監控頻率 (10s → 5s) |
+| **曝險危急** (Exposure Critical) | Exposure Ratio ≥ 90% | 🔴 Critical | Slack, Email, SMS | 凍結新增額度 |
+| **異常佔成** (Abnormal Position) | Position % 0% → 100% 且大額下注 | 🟡 High | Slack, Email | 鎖定佔成修改權限 |
+| **保證金追繳** (Margin Call) | Margin Level < 110% | ⚠️ Warning | Email | 發送追繳通知 |
+| **軟停權** (Soft Stop) | Margin Level < 100% | 🔴 Critical | Slack, Email, SMS | 禁止新增玩家、發放額度 |
+| **強制平倉** (Hard Stop) | Margin Level < 80% | 🚨 Emergency | 電話 + Slack | 全線停權、強制結算 |
+
+**儀表板指標 (Dashboard Metrics)**:
+
+1. **代理曝險熱力圖** (Agent Exposure Heatmap):
+   - X 軸: 代理 ID
+   - Y 軸: 時間 (過去 24 小時)
+   - 顏色: 曝險比例 (綠 < 50%, 黃 50-80%, 紅 > 80%)
+
+2. **實時告警流** (Real-time Alert Feed):
+   - 顯示最近 24 小時所有風險告警
+   - 篩選: 嚴重性、代理、告警類型
+
+3. **代理信用計分卡** (Agent Credit Scorecard):
+   - 信用分數趨勢 (過去 12 週)
+   - 保證金覆蓋率變化
+   - 結算準時率統計
 
 ---
 
