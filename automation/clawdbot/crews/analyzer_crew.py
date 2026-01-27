@@ -26,7 +26,13 @@ from crewai import Crew, Agent, Task, Process
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'common'))
 from base_crew import BaseCrew
-from tools import SafeFileAccessTool, CodeAnalysisTool, DatabaseQueryTool
+from tools import (
+    SafeFileAccessTool, CodeAnalysisTool, DatabaseQueryTool,
+    # 導入 @tool 函數
+    read_file_tool, run_checkstyle_tool, run_pmd_tool,
+    run_spotbugs_tool, run_archunit_tool, check_slow_queries_tool,
+    CODE_ANALYSIS_TOOLS, DATABASE_TOOLS
+)
 
 # ============================================================================
 # Analyzer Crew 實現
@@ -81,7 +87,13 @@ class AnalyzerCrew(BaseCrew):
             architectural rules using ArchUnit and ensure code follows SmartAdmin patterns.""",
             verbose=True,
             allow_delegation=False,
-            tools=[]  # 工具將在 Task 中提供
+            tools=[
+                read_file_tool,
+                run_checkstyle_tool,
+                run_pmd_tool,
+                run_spotbugs_tool,
+                run_archunit_tool
+            ]
         )
 
     def _create_postgres_pro_agent(self) -> Agent:
@@ -97,7 +109,9 @@ class AnalyzerCrew(BaseCrew):
             execution plans, detect N+1 queries, suggest indexes, and optimize slow queries.""",
             verbose=True,
             allow_delegation=False,
-            tools=[]
+            tools=[
+                check_slow_queries_tool
+            ]
         )
 
     def _create_code_reviewer_agent(self) -> Agent:
@@ -113,7 +127,12 @@ class AnalyzerCrew(BaseCrew):
             and SpotBugs to detect code smells, potential bugs, and style violations.""",
             verbose=True,
             allow_delegation=False,
-            tools=[]
+            tools=[
+                run_checkstyle_tool,
+                run_pmd_tool,
+                run_spotbugs_tool,
+                run_archunit_tool
+            ]
         )
 
     # ========================================================================
@@ -277,7 +296,7 @@ class AnalyzerCrew(BaseCrew):
 
     def run(self, target_module: str = "sa-admin") -> Dict[str, Any]:
         """
-        運行 Analyzer Crew
+        運行 Analyzer Crew (v2.0.0 - 使用 CrewAI)
 
         Args:
             target_module: 目標模塊（默認：sa-admin）
@@ -296,8 +315,14 @@ class AnalyzerCrew(BaseCrew):
         try:
             self.logger.info(f"Starting analyzer crew for module: {target_module}")
 
-            # 手動執行分析（不使用 CrewAI，因為工具集成複雜）
-            results = self._run_analysis_manually(target_module)
+            # ✅ 讓 CrewAI 真正執行（不再手動繞過）
+            crew = self.create_crew(target_module)
+            crew_result = crew.kickoff(inputs={
+                "target_module": target_module
+            })
+
+            # 解析 CrewAI 返回結果
+            results = self._parse_crew_output(crew_result)
 
             # 計算執行時長
             duration = time.time() - start_time
@@ -316,9 +341,9 @@ class AnalyzerCrew(BaseCrew):
                 duration=duration_str,
                 summary=f"Analysis completed for module: {target_module}",
                 details=[
-                    f"Architecture violations: {results['architecture']['violations_count']}",
-                    f"Slow queries: {results['database']['slow_queries_count']}",
-                    f"Code quality issues: {results['code_quality']['total_issues']}"
+                    f"Architecture violations: {results.get('architecture', {}).get('violations_count', 'N/A')}",
+                    f"Slow queries: {results.get('database', {}).get('slow_queries_count', 'N/A')}",
+                    f"Code quality issues: {results.get('code_quality', {}).get('total_issues', 'N/A')}"
                 ]
             )
             self.send_telegram_notification(notification)
@@ -335,58 +360,46 @@ class AnalyzerCrew(BaseCrew):
         except Exception as e:
             return self.handle_error(execution_id, e, "Analyzer crew execution failed")
 
+    def _parse_crew_output(self, crew_result: Any) -> Dict[str, Any]:
+        """
+        解析 CrewAI 輸出結果
+
+        Args:
+            crew_result: CrewAI kickoff 返回的結果
+
+        Returns:
+            Dict[str, Any]: 結構化的分析結果
+        """
+        # CrewAI 返回的結果可能是字符串或對象
+        # 這裡需要解析並轉換為結構化數據
+
+        try:
+            # 如果結果是字符串,嘗試解析為 JSON
+            if isinstance(crew_result, str):
+                # 嘗試提取 JSON 部分
+                import re
+                json_match = re.search(r'\{.*\}', crew_result, re.DOTALL)
+                if json_match:
+                    return json.loads(json_match.group())
+
+            # 如果有 output 屬性
+            if hasattr(crew_result, 'output'):
+                return {"raw_output": str(crew_result.output)}
+
+            # 默認返回原始結果
+            return {"raw_output": str(crew_result)}
+
+        except Exception as e:
+            self.logger.warning(f"Failed to parse crew output: {e}")
+            return {"raw_output": str(crew_result), "parse_error": str(e)}
+
     # ========================================================================
     # 內部執行方法
     # ========================================================================
-
-    def _run_analysis_manually(self, target_module: str) -> Dict[str, Any]:
-        """
-        手動運行分析（不使用 CrewAI）
-
-        Args:
-            target_module: 目標模塊
-
-        Returns:
-            Dict[str, Any]: 分析結果
-        """
-        results = {}
-
-        # 1. 架構分析
-        self.logger.info("Running architecture analysis...")
-        archunit_result = self.code_tool.run_archunit_tests(target_module)
-        results['architecture'] = {
-            "success": archunit_result['success'],
-            "violations_count": 0 if archunit_result['success'] else 1,
-            "output": archunit_result.get('output', ''),
-            "errors": archunit_result.get('errors', '')
-        }
-
-        # 2. 數據庫分析
-        self.logger.info("Running database analysis...")
-        slow_queries = self.db_tool.check_slow_queries(min_duration_ms=1000)
-        results['database'] = {
-            "slow_queries_count": len(slow_queries),
-            "slow_queries": slow_queries[:5]  # 只返回前 5 個
-        }
-
-        # 3. 代碼質量檢查
-        self.logger.info("Running code quality checks...")
-        quality_results = self.code_tool.run_all_checks(target_module)
-
-        total_issues = 0
-        for result in quality_results:
-            if not result['success']:
-                total_issues += 1
-
-        results['code_quality'] = {
-            "total_issues": total_issues,
-            "checkstyle": quality_results[0],
-            "pmd": quality_results[1],
-            "spotbugs": quality_results[2],
-            "archunit": quality_results[3]
-        }
-
-        return results
+    #
+    # _run_analysis_manually() 方法已刪除 (v2.0.0)
+    # 現在使用 CrewAI 真正執行 Tasks,不再手動繞過
+    #
 
 # ============================================================================
 # 命令行接口

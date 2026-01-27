@@ -4,8 +4,12 @@ SmartAdmin Auto-Coding - Shared Tools for CrewAI
 CrewAI Crew 使用的共享工具集
 
 作者: SmartAdmin Auto-Coding System
-版本: 1.0.0
+版本: 2.0.0 - CrewAI Tools Integration
 日期: 2026-01-27
+
+變更:
+- v2.0.0: 添加 @tool 裝飾器函數,集成 CrewAI Tools 系統
+- v1.0.0: 初始版本 (工具類封裝)
 """
 
 import os
@@ -15,6 +19,9 @@ import json
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 import requests
+
+# 導入 CrewAI tool 裝飾器
+from crewai.tools import tool
 
 # 導入文件訪問控制
 import sys
@@ -515,13 +522,439 @@ class GitOperationTool:
             return None
 
 # ============================================================================
+# CrewAI Tool 裝飾器函數 (v2.0.0)
+# ============================================================================
+#
+# 這些函數使用 @tool 裝飾器,讓 CrewAI Agents 可以真正調用工具
+# 而不是手動執行 (_run_*_manually())
+#
+
+# ----------------------------------------------------------------------------
+# 文件操作工具 (3 個)
+# ----------------------------------------------------------------------------
+
+@tool("Read File")
+def read_file_tool(file_path: str) -> str:
+    """
+    安全讀取文件內容 (帶訪問控制)
+
+    Args:
+        file_path: 文件路徑 (相對或絕對路徑)
+
+    Returns:
+        文件內容字符串,如果訪問被拒絕則返回錯誤消息
+    """
+    try:
+        db_string = os.getenv('DB_CONNECTION_STRING', '')
+        if not db_string:
+            return "Error: DB_CONNECTION_STRING not configured"
+
+        file_tool = SafeFileAccessTool(db_string, "crewai-agent")
+        content = file_tool.read_file(file_path)
+
+        if content is None:
+            return f"Error: Access denied or file not found: {file_path}"
+
+        return content
+
+    except Exception as e:
+        logger.error(f"read_file_tool error: {e}")
+        return f"Error reading file: {str(e)}"
+
+
+@tool("Write File")
+def write_file_tool(file_path: str, content: str) -> str:
+    """
+    安全寫入文件內容 (帶訪問控制)
+
+    Args:
+        file_path: 文件路徑
+        content: 要寫入的內容
+
+    Returns:
+        成功消息或錯誤消息
+    """
+    try:
+        db_string = os.getenv('DB_CONNECTION_STRING', '')
+        if not db_string:
+            return "Error: DB_CONNECTION_STRING not configured"
+
+        file_tool = SafeFileAccessTool(db_string, "crewai-agent")
+        success = file_tool.write_file(file_path, content)
+
+        if success:
+            return f"File written successfully: {file_path}"
+        else:
+            return f"Error: Access denied for writing: {file_path}"
+
+    except Exception as e:
+        logger.error(f"write_file_tool error: {e}")
+        return f"Error writing file: {str(e)}"
+
+
+@tool("List Files")
+def list_files_tool(directory: str, pattern: str = "*") -> str:
+    """
+    列出目錄中的文件
+
+    Args:
+        directory: 目錄路徑
+        pattern: 文件匹配模式 (如 "*.java")
+
+    Returns:
+        文件列表 JSON 字符串
+    """
+    try:
+        from glob import glob
+        search_path = os.path.join(directory, pattern)
+        files = glob(search_path, recursive=True)
+
+        result = {
+            "directory": directory,
+            "pattern": pattern,
+            "files": files[:100],  # 限制返回 100 個文件
+            "total_count": len(files)
+        }
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"list_files_tool error: {e}")
+        return json.dumps({"error": str(e)})
+
+
+# ----------------------------------------------------------------------------
+# 代碼分析工具 (4 個)
+# ----------------------------------------------------------------------------
+
+@tool("Run Checkstyle")
+def run_checkstyle_tool(target_module: str = "sa-admin") -> str:
+    """
+    運行 Checkstyle 代碼風格檢查
+
+    Args:
+        target_module: 目標模塊名稱 (如 sa-admin)
+
+    Returns:
+        Checkstyle 檢查結果 JSON 字符串
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        code_tool = CodeAnalysisTool(project_root)
+        result = code_tool.run_checkstyle(target_module)
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"run_checkstyle_tool error: {e}")
+        return json.dumps({"error": str(e), "tool": "Checkstyle", "success": False})
+
+
+@tool("Run PMD")
+def run_pmd_tool(target_module: str = "sa-admin") -> str:
+    """
+    運行 PMD 靜態分析
+
+    Args:
+        target_module: 目標模塊名稱
+
+    Returns:
+        PMD 分析結果 JSON 字符串
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        code_tool = CodeAnalysisTool(project_root)
+        result = code_tool.run_pmd(target_module)
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"run_pmd_tool error: {e}")
+        return json.dumps({"error": str(e), "tool": "PMD", "success": False})
+
+
+@tool("Run SpotBugs")
+def run_spotbugs_tool(target_module: str = "sa-admin") -> str:
+    """
+    運行 SpotBugs 缺陷檢測
+
+    Args:
+        target_module: 目標模塊名稱
+
+    Returns:
+        SpotBugs 檢測結果 JSON 字符串
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        code_tool = CodeAnalysisTool(project_root)
+        result = code_tool.run_spotbugs(target_module)
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"run_spotbugs_tool error: {e}")
+        return json.dumps({"error": str(e), "tool": "SpotBugs", "success": False})
+
+
+@tool("Run ArchUnit Tests")
+def run_archunit_tool(target_module: str = "sa-admin") -> str:
+    """
+    運行 ArchUnit 架構測試
+
+    Args:
+        target_module: 目標模塊名稱
+
+    Returns:
+        ArchUnit 測試結果 JSON 字符串
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        code_tool = CodeAnalysisTool(project_root)
+        result = code_tool.run_archunit_tests(target_module)
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"run_archunit_tool error: {e}")
+        return json.dumps({"error": str(e), "tool": "ArchUnit", "success": False})
+
+
+# ----------------------------------------------------------------------------
+# 數據庫操作工具 (3 個)
+# ----------------------------------------------------------------------------
+
+@tool("Query Database")
+def query_database_tool(query: str) -> str:
+    """
+    執行 PostgreSQL 查詢
+
+    Args:
+        query: SQL 查詢語句
+
+    Returns:
+        查詢結果 JSON 字符串
+    """
+    try:
+        db_string = os.getenv('DB_CONNECTION_STRING', '')
+        if not db_string:
+            return json.dumps({"error": "DB_CONNECTION_STRING not configured"})
+
+        db_tool = DatabaseQueryTool(db_string)
+
+        # 這裡需要實現實際的查詢邏輯
+        # 為安全起見,僅允許 SELECT 查詢
+        if not query.strip().upper().startswith('SELECT'):
+            return json.dumps({"error": "Only SELECT queries allowed"})
+
+        # TODO: 實現查詢執行
+        result = {"warning": "Query execution not yet implemented"}
+
+        db_tool.close()
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"query_database_tool error: {e}")
+        return json.dumps({"error": str(e)})
+
+
+@tool("Analyze Query Performance")
+def analyze_query_tool(query: str) -> str:
+    """
+    分析 SQL 查詢性能 (使用 EXPLAIN ANALYZE)
+
+    Args:
+        query: SQL 查詢語句
+
+    Returns:
+        查詢執行計劃 JSON 字符串
+    """
+    try:
+        db_string = os.getenv('DB_CONNECTION_STRING', '')
+        if not db_string:
+            return json.dumps({"error": "DB_CONNECTION_STRING not configured"})
+
+        db_tool = DatabaseQueryTool(db_string)
+        result = db_tool.analyze_query(query)
+        db_tool.close()
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"analyze_query_tool error: {e}")
+        return json.dumps({"error": str(e)})
+
+
+@tool("Check Slow Queries")
+def check_slow_queries_tool(min_duration_ms: int = 1000) -> str:
+    """
+    檢查慢查詢 (基於 pg_stat_statements)
+
+    Args:
+        min_duration_ms: 最小執行時間 (毫秒)
+
+    Returns:
+        慢查詢列表 JSON 字符串
+    """
+    try:
+        db_string = os.getenv('DB_CONNECTION_STRING', '')
+        if not db_string:
+            return json.dumps({"error": "DB_CONNECTION_STRING not configured"})
+
+        db_tool = DatabaseQueryTool(db_string)
+        slow_queries = db_tool.check_slow_queries(min_duration_ms)
+        db_tool.close()
+
+        result = {
+            "min_duration_ms": min_duration_ms,
+            "slow_queries_count": len(slow_queries),
+            "slow_queries": slow_queries
+        }
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        logger.error(f"check_slow_queries_tool error: {e}")
+        return json.dumps({"error": str(e)})
+
+
+# ----------------------------------------------------------------------------
+# Git 操作工具 (2 個)
+# ----------------------------------------------------------------------------
+
+@tool("Create Git Branch")
+def create_branch_tool(branch_name: str, base_branch: str = "master") -> str:
+    """
+    創建 Git 分支
+
+    Args:
+        branch_name: 新分支名稱
+        base_branch: 基礎分支 (默認 master)
+
+    Returns:
+        成功消息或錯誤消息
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        git_tool = GitOperationTool(project_root)
+        success = git_tool.create_branch(branch_name, base_branch)
+
+        if success:
+            return f"Branch created successfully: {branch_name} (from {base_branch})"
+        else:
+            return f"Error: Failed to create branch {branch_name}"
+
+    except Exception as e:
+        logger.error(f"create_branch_tool error: {e}")
+        return f"Error creating branch: {str(e)}"
+
+
+@tool("Commit Changes")
+def commit_changes_tool(message: str) -> str:
+    """
+    提交 Git 變更
+
+    Args:
+        message: 提交消息
+
+    Returns:
+        成功消息或錯誤消息
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        git_tool = GitOperationTool(project_root)
+        success = git_tool.commit_changes(message)
+
+        if success:
+            return f"Changes committed successfully: {message}"
+        else:
+            return "Error: Failed to commit changes"
+
+    except Exception as e:
+        logger.error(f"commit_changes_tool error: {e}")
+        return f"Error committing changes: {str(e)}"
+
+
+@tool("Create Pull Request")
+def create_pr_tool(title: str, body: str, base_branch: str = "master") -> str:
+    """
+    創建 GitHub Pull Request
+
+    Args:
+        title: PR 標題
+        body: PR 描述
+        base_branch: 目標分支 (默認 master)
+
+    Returns:
+        PR URL 或錯誤消息
+    """
+    try:
+        project_root = os.getenv('PROJECT_ROOT', os.getcwd())
+        git_tool = GitOperationTool(project_root)
+        pr_url = git_tool.create_pull_request(title, body, base_branch)
+
+        if pr_url:
+            return f"Pull request created successfully: {pr_url}"
+        else:
+            return "Error: Failed to create pull request"
+
+    except Exception as e:
+        logger.error(f"create_pr_tool error: {e}")
+        return f"Error creating pull request: {str(e)}"
+
+
+# ============================================================================
+# 工具列表導出 (方便 Agent 使用)
+# ============================================================================
+
+# 文件操作工具列表
+FILE_TOOLS = [
+    read_file_tool,
+    write_file_tool,
+    list_files_tool
+]
+
+# 代碼分析工具列表
+CODE_ANALYSIS_TOOLS = [
+    run_checkstyle_tool,
+    run_pmd_tool,
+    run_spotbugs_tool,
+    run_archunit_tool
+]
+
+# 數據庫工具列表
+DATABASE_TOOLS = [
+    query_database_tool,
+    analyze_query_tool,
+    check_slow_queries_tool
+]
+
+# Git 操作工具列表
+GIT_TOOLS = [
+    create_branch_tool,
+    commit_changes_tool,
+    create_pr_tool
+]
+
+# 所有工具列表
+ALL_TOOLS = FILE_TOOLS + CODE_ANALYSIS_TOOLS + DATABASE_TOOLS + GIT_TOOLS
+
+
+# ============================================================================
 # 測試主函數
 # ============================================================================
 
 if __name__ == '__main__':
     print("=" * 70)
-    print("Shared Tools Test")
+    print("Shared Tools Test (v2.0.0 - CrewAI Tools)")
     print("=" * 70)
+    print()
+
+    # 測試工具列表
+    print(f"Total tools available: {len(ALL_TOOLS)}")
+    print(f"  - File tools: {len(FILE_TOOLS)}")
+    print(f"  - Code analysis tools: {len(CODE_ANALYSIS_TOOLS)}")
+    print(f"  - Database tools: {len(DATABASE_TOOLS)}")
+    print(f"  - Git tools: {len(GIT_TOOLS)}")
     print()
 
     # 測試文件訪問工具
@@ -550,5 +983,5 @@ if __name__ == '__main__':
     print()
 
     print("=" * 70)
-    print("Test completed")
+    print("Test completed - CrewAI Tools ready")
     print("=" * 70)

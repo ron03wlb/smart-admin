@@ -27,7 +27,13 @@ from crewai import Crew, Agent, Task, Process
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'common'))
 from base_crew import BaseCrew
-from tools import SafeFileAccessTool, GitOperationTool
+from tools import (
+    SafeFileAccessTool, GitOperationTool,
+    # 導入 @tool 函數
+    read_file_tool, write_file_tool, list_files_tool,
+    create_branch_tool, commit_changes_tool, create_pr_tool,
+    FILE_TOOLS, GIT_TOOLS
+)
 
 # ============================================================================
 # Developer Crew 實現
@@ -80,7 +86,11 @@ class DeveloperCrew(BaseCrew):
             ResponseDTO, pagination, validation, and transaction management.""",
             verbose=True,
             allow_delegation=False,
-            tools=[]
+            tools=[
+                read_file_tool,
+                write_file_tool,
+                list_files_tool
+            ]
         )
 
     def _create_vue_expert_agent(self) -> Agent:
@@ -97,7 +107,11 @@ class DeveloperCrew(BaseCrew):
             API integration, state management (Pinia), and responsive design.""",
             verbose=True,
             allow_delegation=False,
-            tools=[]
+            tools=[
+                read_file_tool,
+                write_file_tool,
+                list_files_tool
+            ]
         )
 
     def _create_devops_engineer_agent(self) -> Agent:
@@ -114,7 +128,10 @@ class DeveloperCrew(BaseCrew):
             GitHub Actions workflows.""",
             verbose=True,
             allow_delegation=False,
-            tools=[]
+            tools=[
+                read_file_tool,
+                write_file_tool
+            ]
         )
 
     # ========================================================================
@@ -309,7 +326,7 @@ class DeveloperCrew(BaseCrew):
 
     def run(self, feature_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
-        運行 Developer Crew
+        運行 Developer Crew (v2.0.0 - 使用 CrewAI)
 
         Args:
             feature_spec: 功能規格
@@ -339,8 +356,14 @@ class DeveloperCrew(BaseCrew):
             branch_name = f"feature/{feature_spec['name'].lower().replace(' ', '-')}"
             self.git_tool.create_branch(branch_name)
 
-            # 手動執行開發工作流（簡化版）
-            results = self._run_development_manually(feature_spec)
+            # ✅ 讓 CrewAI 真正執行（不再手動繞過）
+            crew = self.create_crew(feature_spec)
+            crew_result = crew.kickoff(inputs={
+                "feature_spec": feature_spec
+            })
+
+            # 解析結果
+            results = self._parse_crew_output(crew_result)
 
             # 提交更改
             commit_message = f"feat: implement {feature_spec['name']}"
@@ -376,7 +399,7 @@ Implemented {feature_spec['name']} feature.
 - [ ] Permissions are properly configured
 - [ ] Deployment succeeds in dev environment
 
-🤖 Generated with SmartAdmin Auto-Coding System
+🤖 Generated with SmartAdmin Auto-Coding System (v2.0.0)
 """
             pr_url = self.git_tool.create_pull_request(pr_title, pr_body)
 
@@ -390,7 +413,7 @@ Implemented {feature_spec['name']} feature.
                 status='SUCCESS',
                 output_result={
                     "pr_url": pr_url,
-                    "files_created": results['files_created']
+                    "results": results
                 }
             )
 
@@ -400,8 +423,7 @@ Implemented {feature_spec['name']} feature.
                 duration=duration_str,
                 summary=f"Feature '{feature_spec['name']}' implemented successfully",
                 details=[
-                    f"Backend files: {results['backend_files_count']}",
-                    f"Frontend files: {results['frontend_files_count']}",
+                    f"Branch: {branch_name}",
                     f"PR URL: {pr_url}"
                 ]
             )
@@ -421,44 +443,42 @@ Implemented {feature_spec['name']} feature.
         except Exception as e:
             return self.handle_error(execution_id, e, "Developer crew execution failed")
 
+    def _parse_crew_output(self, crew_result: Any) -> Dict[str, Any]:
+        """
+        解析 CrewAI 輸出結果
+
+        Args:
+            crew_result: CrewAI kickoff 返回的結果
+
+        Returns:
+            Dict[str, Any]: 結構化的開發結果
+        """
+        try:
+            # 如果結果是字符串,嘗試解析為 JSON
+            if isinstance(crew_result, str):
+                import re
+                json_match = re.search(r'\{.*\}', crew_result, re.DOTALL)
+                if json_match:
+                    return json.loads(json_match.group())
+
+            # 如果有 output 屬性
+            if hasattr(crew_result, 'output'):
+                return {"raw_output": str(crew_result.output)}
+
+            # 默認返回原始結果
+            return {"raw_output": str(crew_result)}
+
+        except Exception as e:
+            self.logger.warning(f"Failed to parse crew output: {e}")
+            return {"raw_output": str(crew_result), "parse_error": str(e)}
+
     # ========================================================================
     # 內部執行方法
     # ========================================================================
-
-    def _run_development_manually(self, feature_spec: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        手動運行開發工作流（簡化版）
-
-        Args:
-            feature_spec: 功能規格
-
-        Returns:
-            Dict[str, Any]: 開發結果
-        """
-        # 實際實現中，這裡會調用 Claude API 或其他 AI 工具生成代碼
-        # 這裡返回模擬結果
-
-        self.logger.info("Simulating backend implementation...")
-        backend_files = [
-            f"src/main/java/.../entity/{feature_spec['entity']}Entity.java",
-            f"src/main/java/.../dao/{feature_spec['entity']}Dao.java",
-            f"src/main/java/.../manager/{feature_spec['entity']}Manager.java",
-            f"src/main/java/.../service/{feature_spec['entity']}Service.java",
-            f"src/main/java/.../controller/{feature_spec['entity']}Controller.java",
-        ]
-
-        self.logger.info("Simulating frontend implementation...")
-        frontend_files = [
-            f"src/views/{feature_spec['entity'].lower()}/list.vue",
-            f"src/views/{feature_spec['entity'].lower()}/form-modal.vue",
-            f"src/api/{feature_spec['entity'].lower()}-api.ts",
-        ]
-
-        return {
-            "backend_files_count": len(backend_files),
-            "frontend_files_count": len(frontend_files),
-            "files_created": backend_files + frontend_files
-        }
+    #
+    # _run_development_manually() 方法已刪除 (v2.0.0)
+    # 現在使用 CrewAI 真正執行 Tasks,不再手動繞過
+    #
 
 # ============================================================================
 # 命令行接口
