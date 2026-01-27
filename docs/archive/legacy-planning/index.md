@@ -1,54 +1,84 @@
-# SmartAdmin Enterprise Documentation
+# Legacy 計劃文檔
 
-> Modern modular monolith framework based on Spring Boot 3 and Java 21
-
-## Quick Links
-
-- **[Get Started](./kafka/getting-started/quick-start.md)** - 5-minute quick start
-- **[Browse Documentation](./README.md)** - Full documentation index
-- **[View on GitHub](https://github.com/smart-admin)** - Source code and issues
-
-## Features
-
-### 🚀 Kafka Integration
-Enterprise-grade Kafka integration with batch processing, DLQ, error handling, and comprehensive monitoring.
-
-**[Read Kafka Documentation →](./kafka/)**
-
-### 📦 MinIO Object Storage
-Advanced MinIO integration with security best practices, monitoring, and troubleshooting guides.
-
-**[Read MinIO Documentation →](./minio/)**
-
-### 🏢 Multi-Tenant Architecture
-Complete multi-tenant system design with requirements analysis, technical guide, and API specifications.
-
-**[Read Multi-Tenant Documentation →](./tenant/)**
-
-### 🧪 Testing & Quality
-Comprehensive testing strategies, unit test guides, and architecture validation documentation.
-
-**[Read Testing Documentation →](./testing/)**
+**狀態**：✅ 已實施完成
+**歸檔日期**：2026-01-27
+**歸檔原因**：階段性計劃已執行完成
 
 ---
 
-## Quick Start
+## 歸檔文檔清單
 
-1. **Explore Documentation**: Browse the [documentation index](./README.md)
-2. **Get Started with Kafka**: Follow the [Kafka Quick Start](./kafka/getting-started/quick-start.md)
-3. **Setup MinIO**: Configure [MinIO object storage](./minio/01-quick-start.md)
+### 可行性分析
+- **FEASIBILITY-ANALYSIS-CORRECTION.md**
+  - 內容：Gradle nested module 等可行性分析
+  - 狀態：已評估並採納
+
+### Gradle 調查
+- **gradle-nested-module-investigation.md**
+  - 內容：Gradle 嵌套模組調查
+  - 狀態：調查完成
+
+### 實施進度
+- **IMPLEMENTATION_PROGRESS.md**
+  - 內容：階段性實施進度追蹤
+  - 狀態：對應階段已完成
+
+### Kafka 需求
+- **kafka-batch-requirements.md**
+  - 內容：Kafka 批次處理需求
+  - 狀態：已實施
+
+- **kafka-verification-framework.md**
+  - 內容：Kafka 驗證框架設計
+  - 狀態：已實施
+
+### 模組化計劃
+- **PATH-A-FULL-NESTING-PLAN.md**
+  - 內容：完全嵌套方案計劃
+  - 狀態：已評估（選擇其他方案）
+
+- **sa-base-modularization-plan.md**
+  - 內容：sa-base 模組化計劃
+  - 狀態：已實施
+
+### 階段總結
+- **PHASE1_COMPLETE_SUMMARY.md**
+  - 內容：Phase 1 完成總結
+  - 狀態：已完成
+
+### 快速開始
+- **QUICK_START.md**
+  - 內容：舊版快速開始指南
+  - 狀態：已被新版文檔替代
+
+### 其他
+- **README.md**
+  - 內容：docs/bak/ 的舊 README
+  - 狀態：已歸檔
+
+- **index.md**
+  - 內容：舊版文檔索引
+  - 狀態：已歸檔
 
 ---
 
-## Documentation Structure
+## 當前有效的計劃文檔
 
-- **Kafka** (46 documents) - Complete Kafka integration guide
-- **MinIO** (8 documents) - Object storage configuration and usage
-- **Multi-Tenant** (5 documents) - Architecture and implementation
-- **Testing** (5 documents) - Quality assurance strategies
+最新的計劃文檔位於：
+- **docs/plans/** - 當前活躍的計劃
+- **docs/migration/** - 當前遷移報告
 
 ---
 
-**Note**: This documentation is available as Markdown files. View in GitHub or any Markdown reader for the best experience.
+## 何時參考此文檔
 
-**Apache License 2.0** | Copyright © 2024-present SmartAdmin Team
+- 理解歷史設計決策
+- 追溯功能實施過程
+- 比較原始計劃與實際實施的差異
+
+**注意**：此文檔僅作歷史參考，當前計劃請參考 docs/plans/ 和 docs/migration/。
+
+---
+
+**維護責任**：SmartAdmin Documentation Team
+**版本**：1.0.0

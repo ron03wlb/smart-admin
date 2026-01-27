@@ -179,7 +179,7 @@ Code Review: Service class detected
 |---------|------|--------|
 | 1.0 | 2026-01-27 | Initial clarification document created |
 | - | - | Updated CLAUDE.md with explicit "Service CAN call Dao" statement |
-| - | - | Created ARCHITECTURE-AUDIT-REPORT-CORRECTED.md with rule corrections |
+| - | - | Created [ARCHITECTURE-AUDIT-REPORT-CORRECTED.md](../../docs/archive/2026-01-audit/ARCHITECTURE-AUDIT-REPORT-CORRECTED.md) with rule corrections |
 
 ---
 

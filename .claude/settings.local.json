@@ -110,7 +110,12 @@
       "Bash(kind version:*)",
       "Bash(sysctl:*)",
       "Bash(git restore:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(psql \"postgresql://postgres:smart_admin_pwd@db.vrerqanwgphvfyenjbsd.supabase.co:5432/postgres?sslmode=require\" -f smart-admin-api-java21-springboot3/sa-admin/src/main/resources/db/migration/V999__ai_system_tables.sql)",
+      "Bash(py --version)",
+      "Bash(py -m pip install:*)",
+      "Bash(py deploy_audit_tables.py:*)",
+      "Bash(python -m py_compile:*)"
     ]
   },
   "allowedCommands": {
