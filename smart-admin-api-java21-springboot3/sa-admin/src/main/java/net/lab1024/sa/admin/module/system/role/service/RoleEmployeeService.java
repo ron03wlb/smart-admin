@@ -19,7 +19,6 @@ import net.lab1024.sa.admin.module.system.role.domain.form.RoleEmployeeQueryForm
 import net.lab1024.sa.admin.module.system.role.domain.form.RoleEmployeeUpdateForm;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleSelectedVO;
 import net.lab1024.sa.admin.module.system.role.domain.vo.RoleVO;
-import net.lab1024.sa.admin.module.system.role.manager.RoleEmployeeManager;
 import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.foundation.domain.constant.StringConst;
 import net.lab1024.sa.foundation.domain.response.PageResult;
@@ -41,11 +40,11 @@ public class RoleEmployeeService {
   private final RoleEmployeeDao roleEmployeeDao;
   private final RoleDao roleDao;
   private final DepartmentDao departmentDao;
-  private final RoleEmployeeManager roleEmployeeManager;
 
   /** 批量插入 */
   public void batchInsert(List<RoleEmployeeEntity> roleEmployeeList) {
-    roleEmployeeManager.saveBatch(roleEmployeeList);
+    // Direct Dao call: single-table batch insert, no @Transactional needed
+    roleEmployeeList.forEach(roleEmployeeDao::insert);
   }
 
   /** 通过角色id，分页获取成员员工列表 */
@@ -121,7 +120,8 @@ public class RoleEmployeeService {
           addEmployeeIdList.stream()
               .map(employeeId -> new RoleEmployeeEntity(roleId, employeeId))
               .collect(Collectors.toList());
-      roleEmployeeManager.saveBatch(roleEmployeeList);
+      // Direct Dao call: single-table batch insert, no @Transactional needed
+      roleEmployeeList.forEach(roleEmployeeDao::insert);
     }
     return ResponseDTO.ok();
   }

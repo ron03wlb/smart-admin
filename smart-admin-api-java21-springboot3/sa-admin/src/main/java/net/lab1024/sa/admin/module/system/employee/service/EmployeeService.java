@@ -296,7 +296,8 @@ public class EmployeeService {
     }
     employeeDao.updateDisableFlag(employeeId, !employeeEntity.getDisabledFlag());
 
-    if (employeeEntity.getDisabledFlag()) {
+    // 如果原本是啟用狀態（false），現在變成禁用（true），需要強制退出登錄
+    if (!employeeEntity.getDisabledFlag()) {
       // 强制退出登录
       StpUtil.logout(UserTypeEnum.ADMIN_EMPLOYEE.getValue() + StringConst.COLON + employeeId);
     }

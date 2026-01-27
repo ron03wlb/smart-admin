@@ -3,7 +3,6 @@ package net.lab1024.sa.admin;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -39,11 +38,14 @@ import org.springframework.transaction.annotation.Transactional;
  * <p><b>Note:</b> {@code @Transactional} on test class causes auto-rollback after each test,
  * keeping the database clean without manual cleanup.
  *
+ * <p><b>Test Profile:</b> The "test" profile is automatically activated by {@code
+ * spring.profiles.active: test} in {@code src/test/resources/application.yaml}. No need to
+ * specify @ActiveProfiles annotation.
+ *
  * @author SmartAdmin Testing Framework
  * @since 2025-01-22
  */
 @SpringBootTest
-@ActiveProfiles("test")
 @Transactional // Auto-rollback after each test
 public abstract class BaseIntegrationTest {
 

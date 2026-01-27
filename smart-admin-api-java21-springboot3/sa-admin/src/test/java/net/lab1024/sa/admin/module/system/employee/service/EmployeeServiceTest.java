@@ -230,7 +230,8 @@ class EmployeeServiceTest extends BaseUnitTest {
 
       when(roleEmployeeDao.selectRoleByEmployeeIdList(anyList()))
           .thenReturn(Collections.emptyList());
-      when(positionDao.selectBatchIds(anyList())).thenReturn(Collections.emptyList());
+      // 使用 lenient() 因為當 positionId 為 null 時，可能不會調用 selectBatchIds
+      lenient().when(positionDao.selectBatchIds(anyList())).thenReturn(Collections.emptyList());
       when(departmentCacheManager.getDepartmentPathMap())
           .thenReturn(Map.of(TEST_DEPARTMENT_ID, "Test Department"));
 
@@ -1116,7 +1117,9 @@ class EmployeeServiceTest extends BaseUnitTest {
           .thenReturn(ResponseDTO.ok());
       when(securityPasswordService.getEncryptPwd(anyString())).thenReturn("encrypted_new_password");
 
-      when(employeeDao.updateById(any(EmployeeEntity.class))).thenReturn(1);
+      doNothing()
+          .when(employeeManager)
+          .updatePasswordTransaction(eq(TEST_EMPLOYEE_ID), eq("encrypted_new_password"));
       doNothing()
           .when(securityPasswordService)
           .saveUserChangePasswordLog(eq(requestUser), anyString(), anyString());
@@ -1127,12 +1130,8 @@ class EmployeeServiceTest extends BaseUnitTest {
 
       // Then
       assertOk(response);
-      verify(employeeDao, times(1))
-          .updateById(
-              argThat(
-                  (EmployeeEntity entity) ->
-                      entity.getEmployeeId().equals(TEST_EMPLOYEE_ID)
-                          && entity.getLoginPwd().equals("encrypted_new_password")));
+      verify(employeeManager, times(1))
+          .updatePasswordTransaction(eq(TEST_EMPLOYEE_ID), eq("encrypted_new_password"));
       verify(securityPasswordService, times(1))
           .saveUserChangePasswordLog(
               eq(requestUser), eq("encrypted_new_password"), eq(testEmployee.getLoginPwd()));
@@ -1276,7 +1275,9 @@ class EmployeeServiceTest extends BaseUnitTest {
 
       when(securityPasswordService.getEncryptPwd(expectedNewSaltPwd))
           .thenReturn("encrypted_new_password");
-      when(employeeDao.updateById(any(EmployeeEntity.class))).thenReturn(1);
+      doNothing()
+          .when(employeeManager)
+          .updatePasswordTransaction(eq(TEST_EMPLOYEE_ID), eq("encrypted_new_password"));
       doNothing().when(securityPasswordService).saveUserChangePasswordLog(any(), any(), any());
 
       // When
@@ -1302,7 +1303,9 @@ class EmployeeServiceTest extends BaseUnitTest {
       when(securityPasswordService.validatePasswordRepeatTimes(any(), anyString()))
           .thenReturn(ResponseDTO.ok());
       when(securityPasswordService.getEncryptPwd(anyString())).thenReturn("new_encrypted_password");
-      when(employeeDao.updateById(any(EmployeeEntity.class))).thenReturn(1);
+      doNothing()
+          .when(employeeManager)
+          .updatePasswordTransaction(eq(TEST_EMPLOYEE_ID), eq("new_encrypted_password"));
 
       doNothing()
           .when(securityPasswordService)

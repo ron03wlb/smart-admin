@@ -17,8 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * RoleMenuManager Unit Tests
@@ -35,9 +33,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 @DisplayName("RoleMenuManager Unit Tests")
 class RoleMenuManagerTest extends BaseUnitTest {
 
-  @Spy private RoleMenuManager roleMenuManager;
-
   @Mock private RoleMenuDao roleMenuDao;
+
+  private RoleMenuManager roleMenuManager;
 
   // Test constants
   private static final Long TEST_ROLE_ID = 1001L;
@@ -50,8 +48,11 @@ class RoleMenuManagerTest extends BaseUnitTest {
 
   @BeforeEach
   void setUp() {
-    // Inject mock roleMenuDao into the spy
-    ReflectionTestUtils.setField(roleMenuManager, "roleMenuDao", roleMenuDao);
+    // Create real RoleMenuManager instance with mocked dependencies
+    roleMenuManager = new RoleMenuManager(roleMenuDao);
+
+    // Create spy to verify method calls while keeping real implementation
+    roleMenuManager = spy(roleMenuManager);
 
     // Mock saveBatch method (inherited from ServiceImpl) - lenient since not all tests use it
     lenient().doReturn(true).when(roleMenuManager).saveBatch(anyList());
