@@ -34,9 +34,143 @@ last_updated: 2026-01-25
 ### AI Decision Tree
 ```
 Detect code generation request → Determine if Manager layer needed
-  ├─ Need transaction across multiple Mappers? → Yes → Create Manager
-  ├─ Need caching? → Yes → Create CacheManager
-  └─ Single Mapper operation? → No → Use Service layer only
+  ├─ Need @Transactional? (multi-table operations)
+  │   └─ Yes → Create Manager with @Transactional
+  ├─ Need @Cacheable/@CacheEvict? (caching)
+  │   └─ Yes → Create CacheManager with cache annotations
+  ├─ Single Dao/Mapper operation? (single-table CRUD)
+  │   └─ Yes → Service directly calls Dao (NO Manager needed)
+  └─ Complex orchestration? (multiple Dao calls without transaction)
+      └─ Optional → Can extract to Manager for reusability
+```
+
+### When Manager Layer is REQUIRED
+
+**MUST use Manager layer** when:
+1. ✅ Method needs `@Transactional` annotation
+   - Multi-table insert/update/delete operations
+   - Cascading delete (e.g., delete role + delete role_menu + delete role_employee)
+   - Operations requiring atomicity across multiple steps
+
+2. ✅ Method needs `@Cacheable/@CacheEvict/@CachePut` annotation
+   - Query result caching
+   - Cache invalidation management
+
+3. ✅ Complex cross-table aggregation
+   - Even without transaction, complex logic can be extracted to Manager for reusability
+
+### When Manager Layer is NOT NEEDED
+
+**Service can directly call Dao** when:
+- ✅ Single-table query (selectById, selectList, query with pagination)
+- ✅ Single-table insert (insert single entity)
+- ✅ Single-table update (updateById, updatePassword, updateAvatar)
+- ✅ Single-table delete (deleteById, logically delete)
+- ✅ **As long as NO @Transactional or @Cacheable is needed**
+
+---
+
+## Practical Pattern Comparison
+
+### Pattern A: Service Directly Calls Dao (Single-Table, No Transaction)
+
+```java
+// ✅ Correct: Single-table update, no transaction needed
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+
+    public ResponseDTO<String> updateAvatar(EmployeeUpdateAvatarForm form) {
+        EmployeeEntity entity = new EmployeeEntity();
+        entity.setEmployeeId(form.getEmployeeId());
+        entity.setAvatar(form.getAvatar());
+        employeeDao.updateById(entity);  // ✅ Single update, no @Transactional
+        return ResponseDTO.ok();
+    }
+
+    public ResponseDTO<String> resetPassword(Long employeeId) {
+        String newPassword = securityPasswordService.randomPassword();
+        String encryptedPassword = securityPasswordService.getEncryptPwd(newPassword);
+        employeeDao.updatePassword(employeeId, encryptedPassword);  // ✅ Single update
+        return ResponseDTO.ok(newPassword);
+    }
+}
+```
+
+### Pattern B: Service Delegates to Manager (Multi-Table, Requires Transaction)
+
+```java
+// ✅ Correct: Multi-table operation, delegate to Manager
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+    private final EmployeeManager employeeManager;
+
+    public ResponseDTO<String> addEmployee(EmployeeAddForm form) {
+        // Business validation in Service
+        EmployeeEntity existing = employeeDao.getByLoginName(form.getLoginName());
+        if (existing != null) {
+            return ResponseDTO.userErrorParam("Login name duplicate");
+        }
+
+        // Delegate to Manager for transactional multi-table operation
+        EmployeeEntity entity = SmartBeanUtil.copy(form, EmployeeEntity.class);
+        employeeManager.saveEmployeeTransaction(entity, form.getRoleIds());
+        return ResponseDTO.ok();
+    }
+}
+
+// Manager handles transaction
+@Service
+@RequiredArgsConstructor
+public class EmployeeManager {
+    private final EmployeeDao employeeDao;
+    private final RoleEmployeeDao roleEmployeeDao;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void saveEmployeeTransaction(EmployeeEntity employee, List<Long> roleIds) {
+        // Insert employee + insert role associations (atomic operation)
+        employeeDao.insert(employee);
+        if (CollectionUtils.isNotEmpty(roleIds)) {
+            roleIds.forEach(roleId ->
+                roleEmployeeDao.insert(new RoleEmployeeEntity(roleId, employee.getId())));
+        }
+    }
+}
+```
+
+### Pattern C: WRONG - Service Uses @Transactional (VIOLATION)
+
+```java
+// ❌ VIOLATION: Service layer using @Transactional
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+    private final RoleEmployeeDao roleEmployeeDao;
+
+    @Transactional(rollbackFor = Throwable.class)  // ❌ Service cannot use @Transactional!
+    public ResponseDTO<String> updateEmployee(EmployeeUpdateForm form) {
+        employeeDao.updateById(employee);
+        roleEmployeeDao.deleteByEmployeeId(employee.getId());
+        roleEmployeeDao.batchInsert(form.getRoleIds(), employee.getId());
+        return ResponseDTO.ok();
+    }
+}
+
+// ✅ Fix: Move @Transactional to Manager
+@Service
+@RequiredArgsConstructor
+public class EmployeeManager {
+    @Transactional(rollbackFor = Throwable.class)  // ✅ Correct in Manager
+    public void updateEmployeeTransaction(EmployeeEntity employee, List<Long> roleIds) {
+        employeeDao.updateById(employee);
+        roleEmployeeDao.deleteByEmployeeId(employee.getId());
+        roleEmployeeDao.batchInsert(roleIds, employee.getId());
+    }
+}
 ```
 
 ---

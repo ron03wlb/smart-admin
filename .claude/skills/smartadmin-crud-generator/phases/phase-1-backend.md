@@ -177,18 +177,37 @@ List<{Entity}VO> query(
 
 ## 3. Generate Manager
 
+**IMPORTANT**: Manager layer is **ONLY required when @Transactional or @Cacheable is needed**.
+
+### When to Generate Manager
+
+**Generate Manager** if ANY of these conditions apply:
+- ✅ Multi-table operations (e.g., insert parent + insert children)
+- ✅ Cascading delete (e.g., delete entity + delete relations)
+- ✅ Complex operations requiring atomicity across multiple Dao calls
+- ✅ Need caching with `@Cacheable/@CacheEvict`
+
+**Skip Manager** if:
+- ❌ Basic CRUD with single table only
+- ❌ All operations are single-table insert/update/delete/select
+- ❌ No transaction or cache management needed
+
+### Pattern A: Manager for Multi-Table Operations (REQUIRED)
+
 **File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/manager/{Entity}Manager.java`
 
-**Pattern**:
 ```java
 package net.lab1024.sa.admin.module.business.{module}.manager;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}Dao;
+import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}RelationDao;
 import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}RelationEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 /**
  * {EntityName} Manager
@@ -202,43 +221,43 @@ import org.springframework.transaction.annotation.Transactional;
 public class {Entity}Manager {
 
     private final {Entity}Dao {entity}Dao;
+    private final {Entity}RelationDao {entity}RelationDao;
 
     /**
-     * Add {entity}
+     * Add {entity} with relations (Multi-table operation)
      */
     @Transactional(rollbackFor = Throwable.class)
-    public void add({Entity}Entity entity) {
+    public void addWithRelationsTransaction({Entity}Entity entity, List<Long> relationIds) {
+        // Insert main entity
         {entity}Dao.insert(entity);
+
+        // Insert relations
+        if (CollectionUtils.isNotEmpty(relationIds)) {
+            relationIds.forEach(relationId ->
+                {entity}RelationDao.insert(new {Entity}RelationEntity(entity.getId(), relationId)));
+        }
     }
 
     /**
-     * Update {entity}
+     * Delete {entity} with cascade (Cascading delete)
      */
     @Transactional(rollbackFor = Throwable.class)
-    public void update({Entity}Entity entity) {
-        {entity}Dao.updateById(entity);
-    }
-
-    /**
-     * Delete {entity}
-     */
-    @Transactional(rollbackFor = Throwable.class)
-    public void delete(Long {entity}Id) {
+    public void deleteWithCascadeTransaction(Long {entity}Id) {
         {entity}Dao.deleteById({entity}Id);
-    }
-
-    /**
-     * Batch delete {entity}s
-     */
-    @Transactional(rollbackFor = Throwable.class)
-    public void batchDelete(List<Long> {entity}IdList) {
-        {entity}Dao.deleteBatchIds({entity}IdList);
+        {entity}RelationDao.deleteBy{Entity}Id({entity}Id);
     }
 }
 ```
 
+### Pattern B: No Manager for Basic CRUD (Service → Dao Directly)
+
+**When all operations are single-table CRUD**, Manager is NOT needed. Service calls Dao directly.
+
+See Service section below for examples.
+
 **Key Rules** (ArchUnit enforced):
-- ✅ `@Transactional(rollbackFor = Throwable.class)` on all write methods
+- ✅ `@Transactional(rollbackFor = Throwable.class)` ONLY when multi-table or complex operations
+- ✅ **DO NOT** create Manager with @Transactional for single-table operations
 - ✅ Only Manager layer can have `@Transactional`
 - ✅ Constructor injection via `@RequiredArgsConstructor`
 - ✅ NEVER use field injection (`@Autowired`)
@@ -247,9 +266,12 @@ public class {Entity}Manager {
 
 ## 4. Generate Service
 
+### Pattern A: Service → Dao Directly (Basic CRUD, No Manager)
+
+**Use when**: All operations are single-table CRUD with no @Transactional needed.
+
 **File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/service/{Entity}Service.java`
 
-**Pattern**:
 ```java
 package net.lab1024.sa.admin.module.business.{module}.service;
 
@@ -263,9 +285,8 @@ import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}Dao;
 import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
 import net.lab1024.sa.admin.module.business.{module}.domain.form.*;
 import net.lab1024.sa.admin.module.business.{module}.domain.vo.{Entity}VO;
-import net.lab1024.sa.admin.module.business.{module}.manager.{Entity}Manager;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
-import net.lab1024.sa.common.core.util.SmartPageUtil;
+import net.lab1024.sa.util.SmartBeanUtil;
+import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -282,7 +303,7 @@ import java.util.List;
 public class {Entity}Service {
 
     private final {Entity}Dao {entity}Dao;
-    private final {Entity}Manager {entity}Manager;
+    // NO Manager needed for basic CRUD
 
     /**
      * Query with pagination
@@ -304,46 +325,89 @@ public class {Entity}Service {
     }
 
     /**
-     * Add {entity}
+     * Add {entity} (Single-table insert - no Manager)
      */
     public ResponseDTO<Void> add({Entity}AddForm addForm) {
         {Entity}Entity entity = SmartBeanUtil.copy(addForm, {Entity}Entity.class);
-        {entity}Manager.add(entity);
+        {entity}Dao.insert(entity);  // ✅ Direct Dao call - no @Transactional needed
         return ResponseDTO.ok();
     }
 
     /**
-     * Update {entity}
+     * Update {entity} (Single-table update - no Manager)
      */
     public ResponseDTO<Void> update({Entity}UpdateForm updateForm) {
         // Validate existence
         return Option.of({entity}Dao.selectById(updateForm.get{Entity}Id()))
             .map(existingEntity -> {
                 {Entity}Entity entity = SmartBeanUtil.copy(updateForm, {Entity}Entity.class);
-                {entity}Manager.update(entity);
+                {entity}Dao.updateById(entity);  // ✅ Direct Dao call
                 return ResponseDTO.ok();
             })
             .getOrElse(() -> ResponseDTO.userErrorParam("{Entity} not found"));
     }
 
     /**
-     * Delete {entity}
+     * Delete {entity} (Single-table delete - no Manager)
      */
     public ResponseDTO<Void> delete(Long {entity}Id) {
         return Option.of({entity}Dao.selectById({entity}Id))
             .map(entity -> {
-                {entity}Manager.delete({entity}Id);
+                {entity}Dao.deleteById({entity}Id);  // ✅ Direct Dao call
                 return ResponseDTO.ok();
             })
             .getOrElse(() -> ResponseDTO.userErrorParam("{Entity} not found"));
     }
 
     /**
-     * Batch delete {entity}s
+     * Batch delete {entity}s (Single-table batch delete - no Manager)
      */
     public ResponseDTO<Void> batchDelete({Entity}BatchDeleteForm batchDeleteForm) {
-        {entity}Manager.batchDelete(batchDeleteForm.get{Entity}IdList());
+        {entity}Dao.deleteBatchIds(batchDeleteForm.get{Entity}IdList());  // ✅ Direct Dao call
         return ResponseDTO.ok();
+    }
+}
+```
+
+### Pattern B: Service → Manager (Multi-Table Operations)
+
+**Use when**: Operations require @Transactional (multi-table, cascading, atomicity).
+
+```java
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class {Entity}Service {
+
+    private final {Entity}Dao {entity}Dao;
+    private final {Entity}Manager {entity}Manager;  // Manager needed for multi-table operations
+
+    /**
+     * Add {entity} with relations (Multi-table - requires Manager)
+     */
+    public ResponseDTO<Void> addWithRelations({Entity}AddWithRelationsForm form) {
+        // Business validation
+        if ({entity}Dao.getByName(form.getName()) != null) {
+            return ResponseDTO.userErrorParam("Name already exists");
+        }
+
+        // Delegate to Manager for @Transactional multi-table operation
+        {Entity}Entity entity = SmartBeanUtil.copy(form, {Entity}Entity.class);
+        {entity}Manager.addWithRelationsTransaction(entity, form.getRelationIds());
+        return ResponseDTO.ok();
+    }
+
+    /**
+     * Delete {entity} with cascade (Cascading delete - requires Manager)
+     */
+    public ResponseDTO<Void> deleteWithCascade(Long {entity}Id) {
+        return Option.of({entity}Dao.selectById({entity}Id))
+            .map(entity -> {
+                // Delegate to Manager for @Transactional cascading delete
+                {entity}Manager.deleteWithCascadeTransaction({entity}Id);
+                return ResponseDTO.ok();
+            })
+            .getOrElse(() -> ResponseDTO.userErrorParam("{Entity} not found"));
     }
 }
 ```

@@ -78,13 +78,89 @@ com.example.myapp/
 Controller → Service → Manager → Mapper/DAO → Domain
 
 ✅ Allowed: Upper layer depends on lower layer
-✅ Allowed: Service → Mapper (simple scenarios can skip Manager)
+✅ Allowed: Service → Dao/Mapper (for single CRUD operations without @Transactional)
+✅ Allowed: Service → Manager (when @Transactional/@Cacheable needed)
 ❌ Prohibited: Reverse dependency (Manager → Service)
 ❌ Prohibited: Cross-layer access (Controller → Manager/Mapper)
 ❌ Prohibited: Manager lateral invocation (ManagerA → ManagerB)
 ```
 
 > **Manager Layer Detailed Constraints**: Refer to [09-manager-layer.md](./09-manager-layer.md)
+
+### 【Critical】Service Layer Can Directly Access Dao/Mapper
+
+**Service layer is allowed to directly call Dao/Mapper** for simple single-table CRUD operations:
+
+```java
+// ✅ Allowed: Service directly calls Dao (single-table read)
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+
+    public EmployeeEntity getById(Long id) {
+        return employeeDao.selectById(id);  // ✅ Single query, no transaction
+    }
+
+    public List<EmployeeVO> listAll() {
+        return employeeDao.selectList(null);  // ✅ Single query
+    }
+}
+
+// ✅ Allowed: Service directly calls Dao (single-table write)
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+
+    public void updateAvatar(Long id, String avatar) {
+        EmployeeEntity entity = new EmployeeEntity();
+        entity.setEmployeeId(id);
+        entity.setAvatar(avatar);
+        employeeDao.updateById(entity);  // ✅ Single update, no transaction
+    }
+}
+
+// ❌ Prohibited: Service uses @Transactional for multi-table operations
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+    private final RoleEmployeeDao roleEmployeeDao;
+
+    @Transactional  // ❌ Service cannot use @Transactional!
+    public void updateEmployee(EmployeeEntity employee, List<Long> roleIds) {
+        employeeDao.updateById(employee);
+        roleEmployeeDao.deleteByEmployeeId(employee.getId());
+        roleEmployeeDao.batchInsert(roleIds, employee.getId());
+    }
+}
+
+// ✅ Correct: Delegate to Manager for multi-table operations with @Transactional
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+    private final EmployeeDao employeeDao;
+    private final EmployeeManager employeeManager;
+
+    public void updateEmployee(EmployeeUpdateForm form) {
+        // Business validation
+        EmployeeEntity existing = employeeDao.selectById(form.getId());
+        if (existing == null) {
+            return ResponseDTO.error("Employee not found");
+        }
+
+        // Delegate to Manager for transactional multi-table operation
+        EmployeeEntity entity = SmartBeanUtil.copy(form, EmployeeEntity.class);
+        employeeManager.updateEmployeeTransaction(entity, form.getRoleIds());
+        return ResponseDTO.ok();
+    }
+}
+```
+
+**Decision Rule**:
+- **Service → Dao directly**: Single-table CRUD, no @Transactional, no @Cacheable
+- **Service → Manager**: Multi-table operations, requires @Transactional/@Cacheable
 
 ---
 
