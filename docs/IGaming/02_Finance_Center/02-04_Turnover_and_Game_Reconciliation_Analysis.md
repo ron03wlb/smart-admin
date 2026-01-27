@@ -2,6 +2,14 @@
 
 本文件詳細定義「有效流水 (Valid Turnover)」的計算邏輯以及「遊戲商對帳 (Game Reconciliation)」的完整流程，確保數據精確度與資金安全。
 
+## 📚 補充資料
+
+本文件提供流水計算的核心規則與業務邏輯。如需查看詳細的技術實作、流程圖與時序圖，請參考以下補充文檔：
+
+- [流程圖與時序圖](./02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - Mermaid 圖表、系統互動時序圖
+- [計算邏輯詳解](./02-04-diagrams/02-04-02_Calculation_Logic.md) - 詳細計算流程、邊界條件處理
+- [實作細節與代碼](./02-04-diagrams/02-04-03_Implementation_Details.md) - 代碼範例、資料庫設計、API 介面
+
 ## 1. 流水計算邏輯 (Turnover Calculation Logic)
 
 ### 1.1 有效流水定義

@@ -1,5 +1,7 @@
 # 09-02 審計日誌系統 (Audit Log System)
 
+> **相關文檔**: [09-04 審批工作流系統](./09-04_Approval_Workflow_System.md) - 高風險操作的 Maker-Checker 審批流程
+
 ## 1. 系統概述
 
 為滿足監管 (License) 要求，系統內所有 "敏感操作" 必須留痕 (Audit Log)。本系統提供完整的審計日誌記錄、檢索、導出和合規報告功能。

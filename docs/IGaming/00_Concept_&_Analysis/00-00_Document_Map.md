@@ -84,8 +84,9 @@
 **建議閱讀路徑**：
 1. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
 2. [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 權限管理
-3. [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 審計合規
-4. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 反欺詐
+3. [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 審計日誌記錄與檢索
+4. [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - Maker-Checker 審批
+5. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 反欺詐
 
 ---
 
@@ -107,7 +108,7 @@
 - [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 註冊邏輯、KYC、MFA
 - [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 玩家權限
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包初始化
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 日誌記錄
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 日誌記錄
 
 ---
 
@@ -175,7 +176,7 @@
 **相關文檔**：
 - [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 審核流程
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控引擎
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 審批工作流
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 審批工作流
 - [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 代付
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額扣減
 - [02-03 對賬系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 對賬
@@ -273,8 +274,11 @@
 13. **[07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md)**
     四層多租戶架構
 
-14. **[09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md)**
-    Elasticsearch審計、Maker-Checker
+14. **[09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md)**
+    Elasticsearch審計日誌、檢索與導出
+
+15. **[09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md)**
+    Maker-Checker 審批、多級審批鏈
 
 15. **[09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)**
     加密、盲索引、GDPR Crypto-Shredding
@@ -447,7 +451,8 @@ graph TD
 | [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金引用風控引擎API |
 | [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [04-01 活動系統](../04_Activity_Center/04-01_Activity_System_Design.md) | 活動引用風控檢測 |
 | [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) | [09-01 RBAC](../09_System_Security/09-01_Admin_RBAC.md) | RBAC基於層級架構 |
-| [09-02 審計日誌](../09_System_Security/09-02_Audit_Log_&_Approval.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金審批使用審批工作流 |
+| [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金審批使用審批工作流 |
+| [09-02 審計日誌](../09_System_Security/09-02_Audit_Log_System.md) | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | 審批操作記錄在審計日誌 |
 
 ---
 
@@ -481,12 +486,14 @@ graph TD
 | 02-01 | [Withdrawal_Risk_Control.md](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金風控、多層審核、SAGA | 430+ |
 | 02-02 | [Payment_Gateway_Integration.md](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) | PSP集成、智能路由 | 44 ⚠️ |
 | 02-03 | [Reconciliation_System.md](../02_Finance_Center/02-03_Reconciliation_System.md) | 三方對賬系統 | 47 ⚠️ |
-| 02-04 | [Turnover_and_Game_Reconciliation_Analysis.md](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | **核心** - 流水計算三層驗證 | 538 |
+| 02-04 | [Turnover_and_Game_Reconciliation_Analysis.md](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | **核心** - 流水計算三層驗證（含補充圖表） | 538 |
+| 02-04-diagrams | **補充資料目錄** - 流水計算詳細圖表 | 流程圖、時序圖、實作細節（3個文件） | 📁 |
 | 02-05 | [Billing_&_Invoicing.md](../02_Finance_Center/02-05_Billing_&_Invoicing.md) | B2B租戶計費系統 | 67 |
 | 02-06 | [Unified_Wallet_Model.md](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | **核心** - 錢包模型、可下注餘額公式 | 100+ |
 | 02-07 | [Transaction_Processing_Flow.md](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 事件驅動、Outbox Pattern | 113 |
 
 > ⚠️ **待擴充**：02-02、02-03 文檔較短
+> 📁 **補充資料**：02-04-diagrams 包含流水計算的流程圖、時序圖與實作細節
 
 ---
 
@@ -560,10 +567,12 @@ graph TD
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
 | 09-01 | [Admin_RBAC.md](../09_System_Security/09-01_Admin_RBAC.md) | 管理後台權限管理 | 80+ |
-| 09-02 | [Audit_Log_&_Approval.md](../09_System_Security/09-02_Audit_Log_&_Approval.md) | Elasticsearch審計、Maker-Checker | 740 📏 |
+| 09-02 | [Audit_Log_System.md](../09_System_Security/09-02_Audit_Log_System.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
 | 09-03 | [Data_Security_Standard.md](../09_System_Security/09-03_Data_Security_Standard.md) | 加密、盲索引、GDPR Crypto-Shredding | 676 📏 |
+| 09-04 | [Approval_Workflow_System.md](../09_System_Security/09-04_Approval_Workflow_System.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
 
-> 📏 **考慮拆分**：09-02（740行）、09-03（676行）文檔較長
+> 📏 **考慮拆分**：09-02（832行）、09-03（676行）、09-04（833行）文檔較長
+> ✅ **內容去重完成**：09-02 專注審計日誌，09-04 專注審批流程，已移除重複的合併版文件
 
 ---
 
@@ -687,14 +696,14 @@ graph TD
 1. **帳戶系統**: [01-01 玩家帳戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC等級設計
 2. **第三方整合**: [13-01 第三方整合標準](../13_Third_Party_Integration/13-01_Third_Party_Integration_Standard.md) - Onfido/Jumio集成
 3. **數據安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 身份證件加密存儲
-4. **審批流程**: [09-02 審批工作流](../09_System_Security/09-02_Audit_Log_&_Approval.md) - KYC人工審核
+4. **審批流程**: [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC人工審核
 
 ---
 
 #### 📊 ...後台管理功能
 **導航路徑**:
 1. **權限控制**: [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 角色權限設計
-2. **審計日誌**: [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 操作記錄要求
+2. **審計日誌**: [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 操作記錄要求
 3. **API標準**: [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - RESTful規範
 
 ---
