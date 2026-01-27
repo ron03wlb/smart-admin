@@ -37,10 +37,13 @@ public class DepartmentCacheManager {
 
   private final net.lab1024.sa.foundation.cache.CacheService cacheService;
 
+  /**
+   * 記錄清除緩存信息 P1-1 Fix: 使用 SLF4j placeholder 避免字串拼接效能問題
+   *
+   * @param cache 緩存名稱
+   */
   private void logClearInfo(String cache) {
-    if (log.isInfoEnabled()) {
-      log.info("clear " + cache);
-    }
+    log.info("clear {}", cache);
   }
 
   /** 清除所有部门相关缓存 */

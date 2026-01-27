@@ -4,6 +4,7 @@ import cn.idev.excel.FastExcel;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.vavr.control.Option;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -179,20 +180,17 @@ public class GoodsService {
   }
 
   /**
-   * 商品导入
+   * 商品导入 P1-2 Fix: 使用 try-with-resources 確保 InputStream 正確關閉，避免資源泄漏
    *
    * @param file 上传文件
    * @return 结果
    */
   public ResponseDTO<String> importGoods(MultipartFile file) {
     List<GoodsImportForm> dataList;
-    try {
-      dataList =
-          FastExcel.read(file.getInputStream()).head(GoodsImportForm.class).sheet().doReadSync();
+    try (InputStream is = file.getInputStream()) {
+      dataList = FastExcel.read(is).head(GoodsImportForm.class).sheet().doReadSync();
     } catch (IOException e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       throw new BusinessException("数据格式存在问题，无法读取", e);
     }
 
@@ -215,9 +213,14 @@ public class GoodsService {
                         SmartEnumUtil.getEnumDescByValue(e.getGoodsStatus(), GoodsStatusEnum.class))
                     .categoryName(this.queryCategoryName(e.getCategoryId()))
                     .place(
-                        Arrays.stream(e.getPlace().split(","))
-                            .map(code -> dictService.getDictDataLabel(dictCode, code))
-                            .collect(Collectors.joining(",")))
+                        // P0-3 Fix: 使用 Vavr Option 避免 NullPointerException
+                        Option.of(e.getPlace())
+                            .map(
+                                place ->
+                                    Arrays.stream(place.split(","))
+                                        .map(code -> dictService.getDictDataLabel(dictCode, code))
+                                        .collect(Collectors.joining(",")))
+                            .getOrElse(""))
                     .price(e.getPrice())
                     .goodsName(e.getGoodsName())
                     .remark(e.getRemark())

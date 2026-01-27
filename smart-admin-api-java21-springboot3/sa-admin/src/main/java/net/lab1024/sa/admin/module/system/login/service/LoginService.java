@@ -328,6 +328,11 @@ public class LoginService implements StpInterface {
         }
         employeeIdStr = parts[2];
       } else {
+        // P0-2 Fix: 檢查長度避免 StringIndexOutOfBoundsException
+        if (loginId.length() < 2) {
+          log.error("Invalid loginId format (too short): {}", loginId);
+          return null;
+        }
         employeeIdStr = loginId.substring(2);
       }
 

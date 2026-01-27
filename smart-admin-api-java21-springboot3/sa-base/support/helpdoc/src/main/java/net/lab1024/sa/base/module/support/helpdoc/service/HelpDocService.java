@@ -16,7 +16,6 @@ import net.lab1024.sa.foundation.domain.response.PageResult;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import net.lab1024.sa.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 后台管理业务
@@ -70,17 +69,15 @@ public class HelpDocService {
   }
 
   /**
-   * 删除
+   * 删除 P0-5 Fix: 移除 Service 層的 @Transactional，委派給 Manager 層處理
    *
    * @param helpDocId
    * @return
    */
-  @Transactional(rollbackFor = Exception.class)
   public ResponseDTO<String> delete(final Long helpDocId) {
     final HelpDocEntity helpDaoEntity = helpDocDao.selectById(helpDocId);
     if (helpDaoEntity != null) {
-      helpDocDao.deleteById(helpDocId);
-      helpDocDao.deleteRelation(helpDocId);
+      helpDaoManager.deleteTransaction(helpDocId);
     }
     return ResponseDTO.ok();
   }

@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.admin.module.system.datascope.domain.DataScopeSqlConfig;
 import net.lab1024.sa.admin.module.system.datascope.service.DataScopeSqlConfigService;
 import net.lab1024.sa.domain.DataScopePlugin;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Component;
       args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})
 })
 @RequiredArgsConstructor
+@Slf4j
 @Component
 public class MyBatisPlugin extends DataScopePlugin {
 
@@ -54,6 +56,13 @@ public class MyBatisPlugin extends DataScopePlugin {
     String originalSql = boundSql.getSql().trim();
     String id = mappedStatement.getId();
     List<String> methodStrList = StrUtil.split(id, ".");
+
+    // P0-1 Fix: 檢查數組大小避免 IndexOutOfBoundsException
+    if (methodStrList.size() < 2) {
+      log.warn("Unexpected mapper method ID format: {}, expected at least 2 segments", id);
+      return invocation.proceed();
+    }
+
     String path =
         methodStrList.get(methodStrList.size() - 2)
             + "."

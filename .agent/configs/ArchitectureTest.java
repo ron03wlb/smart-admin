@@ -185,6 +185,19 @@ public class ArchitectureTest {
         .as("Controller 不能直接访问 Manager 层，必须通过 Service");
 
     /**
+     * 【嚴格執行】Service 層禁止使用 @Transactional
+     * P0-4 Fix: 所有事務操作必須在 Manager 層
+     *
+     * 規則來源：foundation/10-architecture-rules.md
+     */
+    @ArchTest
+    static final ArchRule serviceShouldNotUseTransactional = methods()
+        .that().areDeclaredInClassesThat().resideInAPackage("..service..")
+        .and().areAnnotatedWith(org.springframework.transaction.annotation.Transactional.class)
+        .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
+        .as("Service 層方法不能使用 @Transactional，所有事務操作必須在 Manager 層（規則：foundation/10-architecture-rules.md）");
+
+    /**
      * 【嚴格執行】Manager 層禁止調用業務 Service 層
      *
      * Manager 只能向下調用 DAO/Mapper，不能向上調用業務 Service

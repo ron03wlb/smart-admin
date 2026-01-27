@@ -55,4 +55,15 @@ public class HelpDocManager {
       helpDocDao.insertRelation(helpDocId, relationList);
     }
   }
+
+  /**
+   * 删除（事務方法） P0-5 Fix: 從 Service 層遷移至 Manager 層
+   *
+   * @param helpDocId 幫助文檔 ID
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public void deleteTransaction(final Long helpDocId) {
+    helpDocDao.deleteById(helpDocId);
+    helpDocDao.deleteRelation(helpDocId);
+  }
 }
