@@ -72,6 +72,181 @@ class PromotionRulesEngine {
 |獎勵計算 (Reward)|給予什麼獎勵|百分比匹配、固定金額、免費旋轉|
 |限制條件 (Constraint)|使用限制|流水倍數、最大投注、有效期|
 
+#### 規則引擎執行流程圖 (Rule Engine Execution Flow)
+
+**概述**：規則引擎採用責任鏈模式 (Chain of Responsibility) + 策略模式 (Strategy Pattern)，實現可配置、可擴展的規則評估管線。
+
+```mermaid
+flowchart TD
+    START[玩家動作事件觸發] --> EVENT_PARSE[解析事件類型<br/>━━━━━━━━━━━━<br/>DEPOSIT / BET / WIN / LOGIN]
+
+    EVENT_PARSE --> LOAD_CONTEXT[構建玩家上下文<br/>━━━━━━━━━━━━<br/>PlayerContext:<br/>• playerId, tenantId<br/>• VIP Level<br/>• Country, Currency<br/>• Registration Date<br/>• Recent Activity History]
+
+    LOAD_CONTEXT --> FETCH_RULES[查詢適用規則<br/>━━━━━━━━━━━━<br/>WHERE status = ACTIVE<br/>AND event_type = {type}<br/>AND tenant_id IN (platform, {tenantId})<br/>ORDER BY priority ASC]
+
+    FETCH_RULES --> RULES_FOUND{找到規則?}
+    RULES_FOUND -->|否| NO_PROMO[無適用活動<br/>返回空結果]
+
+    RULES_FOUND -->|是| CHAIN_START[規則鏈開始<br/>按 Priority 遞增順序]
+
+    CHAIN_START --> LOOP_RULES[遍歷規則列表]
+
+    LOOP_RULES --> CHECK_SCHEDULE{1️⃣ 時間窗口檢查<br/>━━━━━━━━━━━━<br/>NOW() BETWEEN<br/>startDate AND endDate?}
+    CHECK_SCHEDULE -->|否| SKIP_RULE[跳過此規則<br/>繼續下一個]
+
+    CHECK_SCHEDULE -->|是| CHECK_ELIGIBILITY{2️⃣ 資格條件評估<br/>━━━━━━━━━━━━}
+
+    CHECK_ELIGIBILITY --> ELIG_VIP{VIP 等級符合?}
+    ELIG_VIP -->|否| SKIP_RULE
+    ELIG_VIP -->|是| ELIG_COUNTRY{國家/地區符合?}
+    ELIG_COUNTRY -->|否| SKIP_RULE
+    ELIG_COUNTRY -->|是| ELIG_SEGMENT{玩家分群符合?<br/>NEW_PLAYER /<br/>RETURNING /<br/>HIGH_ROLLER}
+    ELIG_SEGMENT -->|否| SKIP_RULE
+    ELIG_SEGMENT -->|是| ELIG_BLACKLIST{黑名單檢查<br/>is_excluded = false?}
+    ELIG_BLACKLIST -->|是黑名單| SKIP_RULE
+
+    ELIG_BLACKLIST -->|通過| CHECK_TRIGGER{3️⃣ 觸發條件匹配<br/>━━━━━━━━━━━━}
+
+    CHECK_TRIGGER --> TRIGGER_TYPE{觸發類型?}
+    TRIGGER_TYPE -->|首存 FIRST_DEPOSIT| FIRST_DEP_CHECK[檢查:<br/>• 是否首次存款?<br/>• 金額 >= minDeposit?]
+    TRIGGER_TYPE -->|累積存款 ACCUMULATED| ACCUM_CHECK[檢查:<br/>• 週期內累計金額 >= threshold?]
+    TRIGGER_TYPE -->|流水達標 TURNOVER| TURNOVER_CHECK[檢查:<br/>• 有效流水 >= required?]
+    TRIGGER_TYPE -->|手動領取 MANUAL_CLAIM| MANUAL_CHECK[檢查:<br/>• 玩家是否手動觸發?]
+
+    FIRST_DEP_CHECK --> TRIGGER_RESULT{觸發成功?}
+    ACCUM_CHECK --> TRIGGER_RESULT
+    TURNOVER_CHECK --> TRIGGER_RESULT
+    MANUAL_CHECK --> TRIGGER_RESULT
+
+    TRIGGER_RESULT -->|否| SKIP_RULE
+    TRIGGER_RESULT -->|是| CHECK_CONSTRAINTS{4️⃣ 限制條件檢查<br/>━━━━━━━━━━━━}
+
+    CHECK_CONSTRAINTS --> CONST_QUOTA{使用次數限制<br/>player_claims < maxClaims?}
+    CONST_QUOTA -->|否| SKIP_RULE
+    CONST_QUOTA -->|是| CONST_COOLDOWN{冷卻時間<br/>lastClaim + cooldown < NOW()?}
+    CONST_COOLDOWN -->|否| SKIP_RULE
+    CONST_COOLDOWN -->|是| CONST_BUDGET{活動預算檢查<br/>totalCost + rewardAmount <= budget?}
+    CONST_BUDGET -->|否| BUDGET_EXHAUSTED[活動預算耗盡<br/>自動暫停活動<br/>發送運營告警]
+
+    CONST_BUDGET -->|是| PASSED_RULE[✅ 規則匹配成功<br/>記錄匹配規則 ID]
+
+    PASSED_RULE --> CALC_REWARD{5️⃣ 獎勵計算<br/>━━━━━━━━━━━━}
+
+    CALC_REWARD --> REWARD_TYPE{獎勵類型?}
+    REWARD_TYPE -->|百分比匹配<br/>PERCENTAGE_MATCH| CALC_PERCENTAGE[計算:<br/>reward = depositAmount × matchPercentage<br/>reward = MIN(reward, maxReward)]
+    REWARD_TYPE -->|固定金額<br/>FIXED_AMOUNT| CALC_FIXED[直接使用配置金額<br/>reward = fixedAmount]
+    REWARD_TYPE -->|階梯式<br/>TIERED| CALC_TIERED[根據存款區間匹配:<br/>$100-$500 → 100% bonus<br/>$501-$1000 → 150% bonus]
+    REWARD_TYPE -->|免費旋轉<br/>FREE_SPINS| CALC_SPINS[生成 Token:<br/>spins_count = configured_spins<br/>game_id = eligible_game]
+
+    CALC_PERCENTAGE --> REWARD_RESULT[獲得獎勵結果<br/>RewardResult]
+    CALC_FIXED --> REWARD_RESULT
+    CALC_TIERED --> REWARD_RESULT
+    CALC_SPINS --> REWARD_RESULT
+
+    REWARD_RESULT --> MULTI_MATCH{6️⃣ 多規則處理策略}
+
+    MULTI_MATCH -->|策略 A: 取最高| SELECT_MAX[選擇 reward 金額最大的規則<br/>忽略其他匹配規則]
+    MULTI_MATCH -->|策略 B: 累加| SELECT_SUM[累加所有匹配規則的 reward<br/>需配置總上限]
+    MULTI_MATCH -->|策略 C: 優先級| SELECT_FIRST[僅執行 priority 最高 (數字最小) 的規則<br/>忽略其他]
+    MULTI_MATCH -->|策略 D: 玩家選擇| SELECT_PLAYER[展示所有匹配規則<br/>讓玩家手動選擇領取]
+
+    SELECT_MAX --> FINAL_REWARD[最終獎勵決策]
+    SELECT_SUM --> FINAL_REWARD
+    SELECT_FIRST --> FINAL_REWARD
+    SELECT_PLAYER --> FINAL_REWARD
+
+    FINAL_REWARD --> RISK_CHECK{7️⃣ 風控最終審核<br/>━━━━━━━━━━━━}
+
+    RISK_CHECK --> RISK_MULTI_ACCOUNT{多帳號檢測<br/>共享 IP/Device/Payment?}
+    RISK_MULTI_ACCOUNT -->|檢測到| RISK_REJECT[拒絕發放<br/>標記: RISK_REJECTED<br/>觸發人工審核]
+    RISK_MULTI_ACCOUNT -->|通過| RISK_BONUS_HUNTER{獎金獵人模式檢測<br/>高頻領取 + 快速提款?}
+    RISK_BONUS_HUNTER -->|檢測到| RISK_REJECT
+    RISK_BONUS_HUNTER -->|通過| RISK_VELOCITY{存款速度異常?<br/>短時間大量存款}
+    RISK_VELOCITY -->|異常| RISK_MANUAL[標記: PENDING_MANUAL_REVIEW<br/>暫緩發放,等待審核]
+    RISK_VELOCITY -->|正常| RISK_PASS[✅ 風控通過]
+
+    RISK_PASS --> EXECUTE_REWARD{8️⃣ 執行獎勵發放<br/>━━━━━━━━━━━━}
+
+    EXECUTE_REWARD --> WALLET_TYPE{錢包類型選擇}
+    WALLET_TYPE -->|現金<br/>CASH| CREDIT_CASH[直接入現金錢包<br/>wallet_service.creditCash<br/>可立即提款]
+    WALLET_TYPE -->|紅利<br/>BONUS| CREDIT_BONUS[入紅利錢包<br/>wallet_service.creditBonus<br/>創建流水追蹤記錄]
+    WALLET_TYPE -->|免費旋轉<br/>FREE_SPINS| ISSUE_TOKEN[發放 Token<br/>token_service.issueSpins<br/>綁定遊戲 + 有效期]
+
+    CREDIT_CASH --> CREATE_RECORD[創建獎勵記錄<br/>━━━━━━━━━━━━<br/>reward_distributions:<br/>• player_id, promotion_id<br/>• amount, wallet_type<br/>• status: COMPLETED<br/>• created_at, expires_at]
+
+    CREDIT_BONUS --> CREATE_WAGER[創建流水要求<br/>━━━━━━━━━━━━<br/>wagering_requirements:<br/>• bonus_id<br/>• required_turnover = amount × multiplier<br/>• current_progress = 0<br/>• status: ACTIVE<br/>• expires_at = NOW() + validDays]
+
+    ISSUE_TOKEN --> CREATE_RECORD
+
+    CREATE_WAGER --> CREATE_RECORD
+
+    CREATE_RECORD --> NOTIFY_PLAYER[9️⃣ 通知玩家<br/>━━━━━━━━━━━━<br/>• 站內信 (Inbox)<br/>• Push Notification<br/>• Email (Optional)]
+
+    NOTIFY_PLAYER --> AUDIT_LOG[🔟 審計日誌<br/>━━━━━━━━━━━━<br/>記錄完整執行軌跡:<br/>• 規則評估路徑<br/>• 匹配/拒絕原因<br/>• 獎勵計算明細<br/>• 風控決策依據]
+
+    AUDIT_LOG --> SUCCESS[返回成功結果<br/>RewardResult[]<br/>包含獎勵 ID、金額、類型]
+
+    SKIP_RULE --> MORE_RULES{還有更多規則?}
+    MORE_RULES -->|是| LOOP_RULES
+    MORE_RULES -->|否| NO_MATCH[無規則匹配<br/>返回空結果]
+
+    BUDGET_EXHAUSTED --> ALERT_OPS[發送運營告警<br/>Slack/Email<br/>活動預算耗盡]
+    ALERT_OPS --> NO_PROMO
+
+    RISK_REJECT --> AUDIT_LOG
+    RISK_MANUAL --> AUDIT_LOG
+    NO_PROMO --> END[流程結束]
+    NO_MATCH --> END
+    SUCCESS --> END
+
+    %% 樣式定義
+    style PASSED_RULE fill:#C8E6C9
+    style RISK_PASS fill:#C8E6C9
+    style SUCCESS fill:#C8E6C9
+    style SKIP_RULE fill:#FFE082
+    style RISK_REJECT fill:#FFCDD2
+    style BUDGET_EXHAUSTED fill:#FF9800,color:#FFF
+    style RISK_MANUAL fill:#FFF9C4
+```
+
+**規則引擎性能優化策略**：
+
+| 優化點 | 策略 | 預期效果 |
+|--------|------|----------|
+| **規則快取** | Redis 快取活動規則配置 (TTL=5min) | 減少 DB 查詢,響應時間 < 50ms |
+| **玩家上下文快取** | Redis 快取 VIP、國家、分群信息 (TTL=10min) | 避免重複計算,減少 50% 計算量 |
+| **批次觸發** | Kafka 批次消費 (batch_size=100, linger_ms=100) | 提升吞吐量 10x |
+| **異步風控** | 風控檢測異步執行,不阻塞獎勵發放 | 用戶體驗提升,延遲 < 200ms |
+| **預計算** | 每日預計算玩家流水/存款累計 (T+1 批次) | 實時查詢減少聚合計算 |
+| **索引優化** | 規則表索引: (event_type, tenant_id, priority, status) | 查詢時間 < 10ms |
+
+**關鍵設計決策說明**：
+
+1. **為何需要優先級 (Priority)?**
+   - 當多個規則匹配時,需明確執行順序
+   - 例如:「全站通用活動」 vs「VIP 專屬活動」,VIP 應優先
+
+2. **預算控制為何在規則執行時檢查?**
+   - 避免活動超支導致財務風險
+   - 預算耗盡自動暫停,防止運營疏忽
+
+3. **為何需要多規則處理策略?**
+   - 不同業務場景需求不同:
+     - 「首存」通常只能領一次 (取最高)
+     - 「返水」可以疊加多個活動 (累加)
+     - 「VIP 升級獎勵」應優先執行 (優先級)
+
+4. **風控為何放在最後一步?**
+   - 避免每個規則都執行風控 (性能浪費)
+   - 僅對最終決定發放的獎勵進行風控,減少 80% 風控調用
+
+5. **為何需要審計日誌?**
+   - 合規要求:所有獎勵發放必須可追溯
+   - 爭議解決:玩家投訴時可回溯完整決策路徑
+   - 運營優化:分析規則匹配率、拒絕原因分佈
+
+---
+
 ### 獎勵引擎支援的獎勵類型
 
 |獎勵類型|技術實現|特殊處理|
@@ -82,6 +257,187 @@ class PromotionRulesEngine {
 |免費投注|無本金投注 Token（體育專用）|投注額不返還，僅派彩|
 |實物獎品|訂單佇列整合物流系統|兌換流程、物流追蹤|
 |忠誠積分|積分帳本，支援兌換與升級|等級計算、點數過期|
+
+#### 紅利生命週期狀態機 (Bonus Lifecycle State Machine)
+
+**概述**：紅利從發放到清算經歷多個狀態轉換，每個狀態對應不同的業務邏輯與限制條件。
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING_ISSUE: 規則引擎匹配成功<br/>創建獎勵記錄
+
+    PENDING_ISSUE --> ISSUED: 風控審核通過<br/>錢包服務執行發放<br/>━━━━━━━━━━━━<br/>Actions:<br/>• wallet.creditBonus(amount)<br/>• 創建 wagering_requirement<br/>• 發送通知
+
+    PENDING_ISSUE --> REJECTED: 風控審核拒絕<br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 多帳號檢測<br/>• 獎金獵人模式<br/>• 預算耗盡<br/>Actions:<br/>• 標記 status=REJECTED<br/>• 記錄拒絕原因<br/>• 通知運營團隊
+
+    ISSUED --> ACTIVE: 玩家首次使用紅利投注<br/>或手動激活<br/>━━━━━━━━━━━━<br/>Actions:<br/>• 開始流水追蹤<br/>• activated_at = NOW()<br/>• 計時器開始 (有效期倒計時)
+
+    ISSUED --> FORFEITED: 未激活超時<br/>━━━━━━━━━━━━<br/>Condition:<br/>• NOW() > issued_at + grace_period<br/>• grace_period = 7 days (default)<br/>Actions:<br/>• wallet.debitBonus(amount)<br/>• status = FORFEITED<br/>• 釋放活動預算
+
+    ACTIVE --> WAGERING: 流水累積中<br/>━━━━━━━━━━━━<br/>每次投注事件:<br/>• effective_turnover += bet × game_weight<br/>• progress = effective_turnover / required_turnover × 100%<br/>• 實時更新進度條
+
+    WAGERING --> WAGERING: 持續投注累積流水<br/>━━━━━━━━━━━━<br/>Validation Checks:<br/>• 投注額 <= maxBet (anti-abuse)<br/>• 遊戲在 eligible_games 列表<br/>• 無對沖/套利檢測
+
+    WAGERING --> CLEARING_COMPLETED: 流水達標 100%<br/>━━━━━━━━━━━━<br/>Condition:<br/>• effective_turnover >= required_turnover<br/>Actions:<br/>• 觸發結算流程<br/>• 鎖定 bonus_balance (防篡改)
+
+    WAGERING --> EXPIRED: 有效期內未完成流水<br/>━━━━━━━━━━━━<br/>Condition:<br/>• NOW() > expires_at<br/>• effective_turnover < required_turnover<br/>Actions:<br/>• wallet.debitBonus(remaining_balance)<br/>• 扣除未完成部分<br/>• 記錄完成率
+
+    WAGERING --> CANCELLED_BY_PLAYER: 玩家主動取消紅利<br/>━━━━━━━━━━━━<br/>Actions:<br/>• wallet.debitBonus(bonus_balance)<br/>• 清空流水進度<br/>• 不影響已發放的派彩
+
+    WAGERING --> CANCELLED_BY_ADMIN: 運營/風控強制取消<br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 玩家違規 (多帳號被發現)<br/>• 活動緊急下架<br/>Actions:<br/>• wallet.debitBonus(bonus_balance)<br/>• 記錄取消原因<br/>• 必要時回滾派彩
+
+    CLEARING_COMPLETED --> CONVERTED_TO_CASH: 紅利轉現金<br/>━━━━━━━━━━━━<br/>Conversion Process:<br/>1️⃣ Calculate final_balance<br/>2️⃣ wallet.debitBonus(final_balance)<br/>3️⃣ wallet.creditCash(final_balance)<br/>4️⃣ status = CONVERTED
+
+    CONVERTED_TO_CASH --> WITHDRAWABLE: 可提款狀態<br/>━━━━━━━━━━━━<br/>玩家可自由操作:<br/>• 繼續投注<br/>• 發起提款<br/>Actions:<br/>• 解除提款限制<br/>• 標記 bonus_id 已完成
+
+    CLEARING_COMPLETED --> CAPPED: 超過最大派彩上限<br/>━━━━━━━━━━━━<br/>Condition:<br/>• final_balance > max_cashout_cap<br/>Example:<br/>• bonus = $50<br/>• max_cashout = $500<br/>• player_balance = $800 (超限)<br/>Actions:<br/>• wallet.debitBonus($800)<br/>• wallet.creditCash($500)<br/>• 扣除超額部分 $300
+
+    CAPPED --> WITHDRAWABLE: 扣除超額後可提款
+
+    WITHDRAWABLE --> WITHDRAWN: 玩家成功提款<br/>━━━━━━━━━━━━<br/>Actions:<br/>• 執行提款流程<br/>• 標記 withdrawn_at<br/>• 歸檔獎勵記錄
+
+    WITHDRAWN --> [*]: 生命週期結束<br/>━━━━━━━━━━━━<br/>Final Actions:<br/>• 計算 bonus_ROI<br/>• 更新玩家分群<br/>• 生成財務報表
+
+    REJECTED --> [*]: 生命週期結束<br/>未發放
+    FORFEITED --> [*]: 生命週期結束<br/>未使用
+    EXPIRED --> [*]: 生命週期結束<br/>未完成流水
+    CANCELLED_BY_PLAYER --> [*]: 生命週期結束<br/>玩家主動放棄
+    CANCELLED_BY_ADMIN --> [*]: 生命週期結束<br/>強制取消
+
+    note right of PENDING_ISSUE
+        初始狀態
+        ━━━━━━━━
+        風控審核窗口期
+        典型時長: < 5 秒
+    end note
+
+    note right of ACTIVE
+        激活狀態
+        ━━━━━━━━
+        玩家可使用紅利投注
+        但未開始追蹤流水
+        (某些活動需手動激活)
+    end note
+
+    note right of WAGERING
+        流水累積階段
+        ━━━━━━━━
+        核心業務邏輯:
+        • 實時計算有效流水
+        • 檢測濫用行為
+        • 更新進度通知
+
+        典型耗時:
+        • 休閒玩家: 7-14 天
+        • 高頻玩家: 1-3 天
+    end note
+
+    note right of CLEARING_COMPLETED
+        結算狀態
+        ━━━━━━━━
+        流水達標後的臨界點
+        需決定:
+        • 是否超過 max_cashout
+        • 最終可提現金額
+    end note
+
+    note right of WITHDRAWABLE
+        可提款狀態
+        ━━━━━━━━
+        紅利已轉為現金
+        玩家可自由支配
+        此時才算 "真正獲利"
+    end note
+
+    note left of EXPIRED
+        超時失效
+        ━━━━━━━━
+        常見原因:
+        • 流水倍數設置過高
+        • 玩家遊戲頻率低
+        • 遊戲貢獻率設置過低
+
+        運營優化:
+        • 監控 expiry_rate
+        • 調整 wager_multiplier
+    end note
+
+    note left of CANCELLED_BY_ADMIN
+        強制取消
+        ━━━━━━━━
+        需留存證據:
+        • 操作者 ID
+        • 取消原因
+        • 佐證文件
+
+        合規要求:
+        • 玩家有權申訴
+        • 7 天內必須回覆
+    end note
+```
+
+**狀態轉換觸發條件矩陣**：
+
+| 當前狀態 | 目標狀態 | 觸發條件 | 業務邏輯 | 回滾策略 |
+|---------|---------|---------|---------|---------|
+| PENDING_ISSUE | ISSUED | 風控通過 | 錢包加款 + 創建流水記錄 | 風控拒絕 → REJECTED (不加款) |
+| ISSUED | ACTIVE | 玩家首次投注 or 手動激活 | 開始流水計時 | 超時未激活 → FORFEITED (扣除紅利) |
+| ACTIVE | WAGERING | 玩家投注 | 計算有效流水 | 無 (正常流程) |
+| WAGERING | CLEARING_COMPLETED | effective_turnover ≥ required | 鎖定餘額準備結算 | 無 (不可逆) |
+| CLEARING_COMPLETED | CONVERTED_TO_CASH | final_balance ≤ max_cashout | 紅利轉現金 | 無 (不可逆) |
+| CLEARING_COMPLETED | CAPPED | final_balance > max_cashout | 超額扣除 + 部分轉現金 | 無 (按規則執行) |
+| WAGERING | EXPIRED | NOW() > expires_at | 扣除剩餘紅利 | 無 (按規則執行) |
+| WAGERING | CANCELLED_BY_PLAYER | 玩家點擊 "取消紅利" | 扣除紅利但保留派彩 | 需確認彈窗 (防誤操作) |
+| WAGERING | CANCELLED_BY_ADMIN | 風控觸發 or 活動下架 | 強制扣除 + 可選回滾派彩 | 需審批 + 審計日誌 |
+
+**關鍵業務規則說明**：
+
+1. **Grace Period (寬限期)**：
+   - **定義**：紅利發放後，玩家必須在 grace_period 內激活使用
+   - **典型值**：7 天
+   - **原因**：防止玩家大量囤積紅利，影響活動預算預測
+
+2. **Max Cashout Cap (最大派彩上限)**：
+   - **定義**：即使玩家流水達標後贏得大額金額，可提現金額仍受限
+   - **典型配置**：5x-10x bonus amount
+   - **範例**：$50 紅利 → 最多提現 $500
+   - **爭議點**：必須在活動條款明確說明，否則玩家投訴率高
+
+3. **流水有效期 (Wagering Validity Period)**：
+   - **定義**：從 ACTIVE 狀態開始計時，玩家必須在此期限內完成流水
+   - **典型值**：14-30 天
+   - **過短風險**：完成率低 → 玩家不滿
+   - **過長風險**：預算鎖定時間長 → 財務壓力
+
+4. **中途取消規則**：
+   - **玩家主動取消**：扣除紅利餘額，但已發放的派彩保留
+   - **運營強制取消**：可選擇是否回滾派彩 (視違規嚴重程度)
+   - **範例**：
+     - 玩家誤領不想玩 → 保留派彩 (用戶體驗)
+     - 多帳號欺詐被發現 → 回滾所有派彩 (風控需要)
+
+5. **狀態審計追溯**：
+   - 每次狀態轉換必須記錄：
+     - `previous_status`, `new_status`, `transitioned_at`
+     - `triggered_by` (SYSTEM / PLAYER / ADMIN)
+     - `trigger_reason` (詳細原因描述)
+   - 玩家投訴時可回溯完整狀態變更歷史
+
+**典型流程耗時統計**：
+
+| 玩家類型 | ISSUED → ACTIVE | ACTIVE → CLEARING | CLEARING → WITHDRAWN | 總耗時 |
+|---------|----------------|-------------------|---------------------|--------|
+| 高頻玩家 | < 1 小時 | 1-3 天 | < 1 天 | 2-4 天 |
+| 中頻玩家 | 1-24 小時 | 5-10 天 | 1-2 天 | 6-12 天 |
+| 休閒玩家 | 1-3 天 | 10-20 天 | 2-5 天 | 13-28 天 |
+| 流失玩家 | > 7 天 | ∞ (EXPIRED/FORFEITED) | - | - |
+
+**運營優化建議**：
+
+- **監控 FORFEITED 率**：若 > 20%，說明 grace_period 過短或活動吸引力不足
+- **監控 EXPIRED 率**：若 > 50%，說明流水倍數過高或有效期過短
+- **監控 CAPPED 比例**：若 < 5%，說明 max_cashout 設置過高，活動成本超預算
+- **監控平均完成耗時**：用於預測活動預算鎖定週期，優化現金流管理
 
 ---
 
@@ -458,6 +814,221 @@ Topics:
 |高併發寫入|ScyllaDB / CockroachDB|流水記錄、交易日誌|
 |緩存|Redis Cluster|玩家狀態、活動快取|
 |搜尋|Elasticsearch|活動搜尋、玩家查詢|
+
+---
+
+### 多獎金衝突處理決策矩陣 (Multi-Bonus Conflict Resolution Matrix)
+
+**概述**：當玩家同時符合多個活動時，系統需要明確的衝突處理策略，避免活動疊加濫用或用戶體驗混亂。
+
+```mermaid
+flowchart TD
+    START[玩家觸發動作<br/>例: 存款 $200] --> QUERY_RULES[查詢所有匹配規則<br/>━━━━━━━━━━━━<br/>Result: 找到 4 個活動<br/>• A: 首存 100% bonus<br/>• B: 週末充值 50% bonus<br/>• C: VIP 專屬 30% bonus<br/>• D: 全站返水 1% cashback]
+
+    QUERY_RULES --> CLASSIFY{1️⃣ 活動類型分類<br/>━━━━━━━━━━━━}
+
+    CLASSIFY --> CAT_DEPOSIT[存款類活動<br/>Category: DEPOSIT_BONUS]
+    CLASSIFY --> CAT_CASHBACK[返水類活動<br/>Category: CASHBACK]
+    CLASSIFY --> CAT_FREEBET[免費投注類<br/>Category: FREE_BET]
+    CLASSIFY --> CAT_TOURNAMENT[錦標賽類<br/>Category: TOURNAMENT]
+
+    CAT_DEPOSIT --> DEP_LIST[DEPOSIT_BONUS 列表:<br/>• A: 首存 100% (priority=1)<br/>• B: 週末 50% (priority=10)<br/>• C: VIP 30% (priority=5)]
+
+    CAT_CASHBACK --> CB_LIST[CASHBACK 列表:<br/>• D: 全站返水 1% (priority=20)]
+
+    CAT_FREEBET --> FB_LIST[FREE_BET 列表:<br/>• (無匹配)]
+
+    CAT_TOURNAMENT --> TOUR_LIST[TOURNAMENT 列表:<br/>• (無匹配)]
+
+    DEP_LIST --> CHECK_RULE{2️⃣ 檢查衝突規則<br/>━━━━━━━━━━━━}
+
+    CHECK_RULE --> RULE_CONFIG[讀取活動配置<br/>━━━━━━━━━━━━<br/>activity_conflict_rules:<br/>• mutually_exclusive_groups<br/>• stackability_policy<br/>• priority_override]
+
+    RULE_CONFIG --> MUTUAL_EXCLUSIVE{是否互斥?<br/>━━━━━━━━━━━━<br/>檢查 mutually_exclusive_groups}
+
+    MUTUAL_EXCLUSIVE -->|是 - 互斥組 A| EXCLUSIVE_GROUP[互斥組內規則:<br/>━━━━━━━━━━━━<br/>Example:<br/>• 首存活動<br/>• 二存活動<br/>• 三存活動<br/>Rule: 只能選其一]
+
+    EXCLUSIVE_GROUP --> EXCLUSIVE_STRATEGY{互斥策略選擇}
+
+    EXCLUSIVE_STRATEGY -->|策略 1: 取最高| SELECT_MAX_EXCL[選擇 reward 金額最大的活動<br/>━━━━━━━━━━━━<br/>計算:<br/>• A: $200 × 100% = $200<br/>• B: $200 × 50% = $100<br/>• C: $200 × 30% = $60<br/>Result: 選擇 A (首存)]
+
+    EXCLUSIVE_STRATEGY -->|策略 2: 優先級| SELECT_PRIORITY_EXCL[選擇 priority 最高 (數字最小)<br/>━━━━━━━━━━━━<br/>• A: priority=1 ✓<br/>• B: priority=10<br/>• C: priority=5<br/>Result: 選擇 A]
+
+    EXCLUSIVE_STRATEGY -->|策略 3: 玩家選擇| SELECT_PLAYER_EXCL[展示所有互斥活動<br/>讓玩家手動選擇<br/>━━━━━━━━━━━━<br/>UI:<br/>☐ A: 100% 最高$200<br/>☐ B: 50% 無上限<br/>☐ C: 30% + 50 Free Spins<br/>Button: 立即領取]
+
+    MUTUAL_EXCLUSIVE -->|否 - 可疊加| STACKABLE{可疊加性檢查<br/>━━━━━━━━━━━━<br/>stackability_policy}
+
+    STACKABLE -->|全部可疊加| STACK_ALL[疊加所有獎勵<br/>━━━━━━━━━━━━<br/>Condition:<br/>• 活動配置 allow_stack=true<br/>• 總金額 < global_max_bonus<br/>Calculation:<br/>total_reward = SUM(all_rewards)]
+
+    STACK_ALL --> CHECK_CAP{3️⃣ 檢查總上限<br/>━━━━━━━━━━━━}
+
+    CHECK_CAP -->|超過上限| APPLY_CAP[應用上限限制<br/>━━━━━━━━━━━━<br/>Example:<br/>• total_reward = $350<br/>• global_max_bonus = $300<br/>Result: 限制為 $300<br/>Action: 按比例縮減各活動]
+
+    CHECK_CAP -->|未超過| CAP_OK[疊加金額合規<br/>全額發放]
+
+    STACKABLE -->|有條件疊加| CONDITIONAL_STACK{條件疊加規則}
+
+    CONDITIONAL_STACK -->|同類型不可疊加| SAME_TYPE_EXCL[同類型活動互斥<br/>━━━━━━━━━━━━<br/>Example:<br/>• 2 個 DEPOSIT_BONUS 不可疊加<br/>• 但 DEPOSIT_BONUS + CASHBACK 可疊加<br/>Action: 分組處理]
+
+    SAME_TYPE_EXCL --> GROUP_BY_TYPE[按類型分組<br/>━━━━━━━━━━━━<br/>Group 1: DEPOSIT_BONUS (A, B, C)<br/>→ 取最高 A: $200<br/>Group 2: CASHBACK (D)<br/>→ 保留 D: $2<br/>Total: $202]
+
+    CONDITIONAL_STACK -->|跨類別可疊加| CROSS_CATEGORY[跨類別疊加<br/>━━━━━━━━━━━━<br/>Example:<br/>• DEPOSIT_BONUS: $200 (A)<br/>• CASHBACK: $2 (D)<br/>• FREE_SPINS: 50 spins (E)<br/>Rule: 不同錢包類型可疊加]
+
+    SELECT_MAX_EXCL --> FINAL_DEPOSIT[DEPOSIT 最終獎勵: A]
+    SELECT_PRIORITY_EXCL --> FINAL_DEPOSIT
+    SELECT_PLAYER_EXCL --> FINAL_DEPOSIT
+
+    CAP_OK --> FINAL_STACK[疊加最終獎勵列表]
+    APPLY_CAP --> FINAL_STACK
+    GROUP_BY_TYPE --> FINAL_STACK
+    CROSS_CATEGORY --> FINAL_STACK
+
+    FINAL_DEPOSIT --> MERGE_CATEGORIES[4️⃣ 合併跨類別獎勵<br/>━━━━━━━━━━━━]
+    CB_LIST --> MERGE_CATEGORIES
+    FB_LIST --> MERGE_CATEGORIES
+    TOUR_LIST --> MERGE_CATEGORIES
+    FINAL_STACK --> MERGE_CATEGORIES
+
+    MERGE_CATEGORIES --> WALLET_SEPARATION{5️⃣ 錢包隔離檢查<br/>━━━━━━━━━━━━}
+
+    WALLET_SEPARATION --> WALLET_BONUS[Bonus Wallet<br/>━━━━━━━━━━━━<br/>• DEPOSIT_BONUS: $200<br/>• 需完成流水 25x<br/>• 有效期 14 天]
+
+    WALLET_SEPARATION --> WALLET_CASH[Cash Wallet<br/>━━━━━━━━━━━━<br/>• CASHBACK: $2<br/>• 無流水要求<br/>• 立即可提]
+
+    WALLET_SEPARATION --> WALLET_FREEBET[Free Bet Token<br/>━━━━━━━━━━━━<br/>• FREE_BET: (無)<br/>• Token ID: (N/A)]
+
+    WALLET_BONUS --> WAGERING_CONFLICT{6️⃣ 流水衝突處理<br/>━━━━━━━━━━━━}
+
+    WAGERING_CONFLICT -->|隔離模式 ISOLATED| ISOLATED_WAGER[各活動獨立追蹤流水<br/>━━━━━━━━━━━━<br/>Example:<br/>• Bonus A: 需完成 $5,000<br/>• Bonus B: 需完成 $2,500<br/>玩家投注 $100:<br/>• A 進度: +$100<br/>• B 進度: +$100<br/>兩者獨立計算]
+
+    WAGERING_CONFLICT -->|共用模式 SHARED| SHARED_WAGER[所有活動共用流水池<br/>━━━━━━━━━━━━<br/>Total Required: $7,500<br/>玩家投注 $100:<br/>• 共用進度: +$100<br/>完成優先級:<br/>• 先完成 priority 最高的]
+
+    WAGERING_CONFLICT -->|順序模式 SEQUENTIAL| SEQUENTIAL_WAGER[按順序依次完成<br/>━━━━━━━━━━━━<br/>Queue:<br/>1️⃣ Bonus A (priority=1)<br/>2️⃣ Bonus B (priority=10)<br/>玩家投注僅計入當前 Bonus<br/>完成 A 後才開始追蹤 B]
+
+    ISOLATED_WAGER --> GAME_CONTRIBUTION{7️⃣ 遊戲貢獻率衝突<br/>━━━━━━━━━━━━}
+    SHARED_WAGER --> GAME_CONTRIBUTION
+    SEQUENTIAL_WAGER --> GAME_CONTRIBUTION
+
+    GAME_CONTRIBUTION -->|統一貢獻率| UNIFIED_CONTRIB[所有活動使用全局貢獻率<br/>━━━━━━━━━━━━<br/>Game Weights:<br/>• Slots: 100%<br/>• Baccarat: 10%<br/>• Blackjack: 5%<br/>適用於所有活動]
+
+    GAME_CONTRIBUTION -->|活動專屬貢獻率| EXCLUSIVE_CONTRIB[各活動自定義貢獻率<br/>━━━━━━━━━━━━<br/>Example:<br/>• Bonus A (老虎機專屬):<br/>  Slots=100%, Others=0%<br/>• Bonus B (全遊戲):<br/>  All Games=100%<br/>玩家玩百家樂:<br/>• A 不計流水<br/>• B 計入流水]
+
+    GAME_CONTRIBUTION -->|取最低貢獻率| MIN_CONTRIB[衝突時取最嚴格限制<br/>━━━━━━━━━━━━<br/>Example:<br/>• Bonus A: Baccarat=10%<br/>• Bonus B: Baccarat=15%<br/>Result: 使用 10% (更嚴格)<br/>Reason: 防止濫用]
+
+    UNIFIED_CONTRIB --> FINAL_RESULT[8️⃣ 生成最終決策<br/>━━━━━━━━━━━━]
+    EXCLUSIVE_CONTRIB --> FINAL_RESULT
+    MIN_CONTRIB --> FINAL_RESULT
+    WALLET_CASH --> FINAL_RESULT
+    WALLET_FREEBET --> FINAL_RESULT
+
+    FINAL_RESULT --> RESULT_OUTPUT[最終獎勵方案<br/>━━━━━━━━━━━━<br/>RewardDecision:<br/>• selected_promotions: [A, D]<br/>• bonus_wallet: $200 (25x wager, 14d)<br/>• cash_wallet: $2 (no wager)<br/>• wagering_mode: ISOLATED<br/>• game_contrib: UNIFIED]
+
+    RESULT_OUTPUT --> NOTIFY_PLAYER[通知玩家<br/>━━━━━━━━━━━━<br/>• 彈窗展示獲得獎勵<br/>• 說明流水要求<br/>• 顯示有效期倒計時]
+
+    NOTIFY_PLAYER --> AUDIT_DECISION[審計決策記錄<br/>━━━━━━━━━━━━<br/>promotion_decisions:<br/>• matched_rules: [A,B,C,D]<br/>• selected_rules: [A,D]<br/>• rejection_reasons:<br/>  - B: 互斥組內落選<br/>  - C: 互斥組內落選<br/>• conflict_resolution: MAX_REWARD<br/>• operator: SYSTEM]
+
+    AUDIT_DECISION --> END[流程結束]
+
+    %% 樣式定義
+    style SELECT_MAX_EXCL fill:#C8E6C9
+    style SELECT_PRIORITY_EXCL fill:#C8E6C9
+    style CAP_OK fill:#C8E6C9
+    style RESULT_OUTPUT fill:#81C784
+    style APPLY_CAP fill:#FFD54F
+    style EXCLUSIVE_GROUP fill:#FFE082
+    style MIN_CONTRIB fill:#FFAB91
+```
+
+**衝突處理策略對比表**：
+
+| 策略類型 | 適用場景 | 優點 | 缺點 | 用戶體驗 | 實施複雜度 |
+|---------|---------|------|------|---------|-----------|
+| **取最高 (MAX_REWARD)** | 互斥首存活動 | 簡單明瞭,玩家獲益最大 | 可能浪費低價值活動配置 | ⭐⭐⭐⭐⭐ | 🟢 低 |
+| **按優先級 (PRIORITY)** | VIP 等級活動 | 可控性強,符合業務邏輯 | 玩家可能不理解為何被分配低獎勵 | ⭐⭐⭐ | 🟢 低 |
+| **玩家選擇 (PLAYER_CHOICE)** | 多樣化活動池 | 用戶自主權最高 | 決策疲勞,可能選錯後投訴 | ⭐⭐⭐⭐ | 🟡 中 |
+| **全部疊加 (STACK_ALL)** | 返水 + 簽到 | 用戶滿意度最高 | 成本失控風險,易被濫用 | ⭐⭐⭐⭐⭐ | 🟡 中 |
+| **同類型互斥 (TYPE_EXCLUSIVE)** | 混合活動組 | 平衡成本與體驗 | 規則複雜,需清晰說明 | ⭐⭐⭐⭐ | 🟡 中 |
+| **順序模式 (SEQUENTIAL)** | 新手任務鏈 | 引導用戶行為,延長留存 | 靈活性差,用戶可能放棄 | ⭐⭐⭐ | 🔴 高 |
+| **隔離流水 (ISOLATED_WAGER)** | 多紅利疊加 | 公平透明,易追蹤 | 用戶需理解多個流水池 | ⭐⭐⭐⭐ | 🟡 中 |
+| **共用流水 (SHARED_WAGER)** | 簡化用戶體驗 | 用戶理解成本低 | 後台邏輯複雜,易出錯 | ⭐⭐⭐⭐⭐ | 🔴 高 |
+
+**業界最佳實踐配置範例**：
+
+```json
+{
+  "conflict_resolution_config": {
+    "default_policy": "TYPE_EXCLUSIVE",
+    "rules": [
+      {
+        "conflict_group": "first_deposit_bonuses",
+        "type": "MUTUALLY_EXCLUSIVE",
+        "resolution_strategy": "MAX_REWARD",
+        "members": ["promo-first-deposit-100", "promo-first-deposit-200", "promo-vip-first-deposit"],
+        "reason": "首存活動互斥,自動選擇獎勵最高的"
+      },
+      {
+        "conflict_group": "cashback_programs",
+        "type": "STACKABLE",
+        "resolution_strategy": "STACK_ALL",
+        "max_total_percentage": 5.0,
+        "members": ["daily-cashback", "vip-cashback", "game-specific-cashback"],
+        "reason": "返水可疊加但總計不超過 5%"
+      },
+      {
+        "conflict_group": "free_spins_offers",
+        "type": "PLAYER_CHOICE",
+        "resolution_strategy": "PLAYER_SELECT",
+        "max_selections": 1,
+        "members": ["free-spins-50", "free-spins-100-wagered", "mega-spins-10"],
+        "reason": "免費旋轉類型差異大,讓玩家選擇"
+      }
+    ],
+    "wagering_mode": {
+      "default": "ISOLATED",
+      "cross_category_shared": false,
+      "completion_order": "PRIORITY_ASC"
+    },
+    "game_contribution_policy": {
+      "default": "UNIFIED",
+      "allow_activity_override": true,
+      "conflict_resolution": "MIN_CONTRIBUTION"
+    },
+    "global_limits": {
+      "max_active_bonuses_per_player": 5,
+      "max_total_bonus_balance": 10000,
+      "max_daily_claim_count": 3
+    }
+  }
+}
+```
+
+**典型衝突場景決策樹**：
+
+| 場景 | 匹配活動 | 衝突類型 | 決策策略 | 最終結果 |
+|------|---------|---------|---------|---------|
+| **新玩家首存 $100** | • 首存 100% (max $100)<br/>• 首存 50% (無上限)<br/>• VIP 銅牌 20% | 互斥組 | MAX_REWARD | 選擇 100% → $100 bonus |
+| **VIP 金牌週末存款 $500** | • 週末 50% (max $200)<br/>• VIP 金牌 30% (max $500)<br/>• 全站返水 1% | 同類型互斥 + 可疊加 | TYPE_EXCLUSIVE + STACK | 存款獎勵: $200 (取最高)<br/>返水: $5<br/>Total: $205 |
+| **玩家同時領取 3 個免費旋轉** | • 每日簽到 10 spins<br/>• 新遊戲推廣 50 spins<br/>• 損失補償 20 spins | 全部可疊加 | STACK_ALL | Total: 80 spins<br/>分別追蹤有效期 |
+| **二存玩家嘗試領取首存獎勵** | • 首存 100% (已領過)<br/>• 二存 50% | 使用次數限制 | ELIGIBILITY_CHECK | 拒絕首存 (maxClaims=1)<br/>允許二存 → $50 bonus (存 $100) |
+| **高風險玩家存款** | • 首存 100%<br/>• 週末 50% | 風控阻斷 | RISK_REJECTION | 全部拒絕<br/>標記: PENDING_MANUAL_REVIEW |
+
+**運營優化建議**：
+
+1. **避免過度複雜化**：
+   - 衝突規則不要超過 3 層
+   - 用戶應在 5 秒內理解為何獲得某獎勵
+
+2. **透明化決策**：
+   - 在活動條款明確說明互斥規則
+   - 被拒絕的活動應說明原因 (如：「您已選擇更高獎勵的活動」)
+
+3. **監控濫用模式**：
+   - 玩家頻繁在多活動間切換 → 疑似測試套利空間
+   - 大量玩家投訴「為何沒拿到 XX 活動」 → 衝突規則不清晰
+
+4. **A/B 測試策略效果**：
+   - 測試 MAX_REWARD vs PRIORITY 對玩家滿意度的影響
+   - 測試 ISOLATED_WAGER vs SHARED_WAGER 對完成率的影響
 
 ---
 

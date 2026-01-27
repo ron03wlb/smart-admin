@@ -64,6 +64,15 @@ out/
 # Other
 HELP.md
 
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+
 # AI / Tooling / IDE
 .gemini/
 .windsurf/
