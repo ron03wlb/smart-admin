@@ -1,9 +1,9 @@
 package net.lab1024.sa.base.module.support.codegenerator.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.vavr.control.Option;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeGeneratorConstant;
@@ -164,11 +164,12 @@ public class CodeGeneratorService {
     if (null != form.getDeleteInfo()
         && form.getDeleteInfo().getIsSupportDelete()
         && !form.getDeleteInfo().getIsPhysicallyDeleted()) {
-      Optional<TableColumnVO> any =
-          tableColumns.stream()
-              .filter(e -> CodeGeneratorConstant.DELETED_FLAG.equals(e.getColumnName()))
-              .findAny();
-      if (!any.isPresent()) {
+      Option<TableColumnVO> any =
+          Option.ofOptional(
+              tableColumns.stream()
+                  .filter(e -> CodeGeneratorConstant.DELETED_FLAG.equals(e.getColumnName()))
+                  .findAny());
+      if (any.isEmpty()) {
         return ResponseDTO.userErrorParam(
             "表结构中没有假删字段：" + CodeGeneratorConstant.DELETED_FLAG + ",请仔细排查");
       }

@@ -1,10 +1,12 @@
 package net.lab1024.sa.admin.module.business.goods.service;
 
 import cn.idev.excel.FastExcel;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.vavr.control.Option;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -152,7 +154,7 @@ public class GoodsService {
       return ResponseDTO.ok();
     }
 
-    goodsDao.batchUpdateDeleted(goodsIdList, Boolean.TRUE);
+    goodsManager.batchDeleteGoodsTransaction(goodsIdList);
     return ResponseDTO.ok();
   }
 
@@ -201,30 +203,56 @@ public class GoodsService {
     return ResponseDTO.okMsg("成功导入" + dataList.size() + "条，具体数据为：" + JsonUtil.toJson(dataList));
   }
 
-  /** 商品导出 */
+  /** 商品导出 - 優化版本：使用分頁查詢 + 批量載入分類 */
   public List<GoodsExcelVO> getAllGoods() {
-    List<GoodsEntity> goodsEntityList = goodsDao.selectList(null);
+    // 1. 分頁查詢商品（避免 OOM）
+    List<GoodsEntity> allGoods = new ArrayList<>();
+    int pageSize = 1000;
+    int pageNum = 1;
+
+    while (true) {
+      Page<GoodsEntity> page =
+          goodsDao.selectPage(
+              new Page<>(pageNum, pageSize),
+              new LambdaQueryWrapper<GoodsEntity>().eq(GoodsEntity::getDeletedFlag, false));
+      if (page.getRecords().isEmpty()) break;
+      allGoods.addAll(page.getRecords());
+      if (!page.hasNext()) break;
+      pageNum++;
+    }
+
+    // 2. 批量載入分類（解決 N+1 查詢）
+    List<Long> categoryIdList =
+        allGoods.stream().map(GoodsEntity::getCategoryId).distinct().collect(Collectors.toList());
+    Map<Long, CategoryEntity> categoryMap = this.queryCategoryList(categoryIdList);
+
+    // 3. 組裝結果（使用 Map 查詢）
     String dictCode = "GOODS_PLACE";
-    return goodsEntityList.stream()
+    return allGoods.stream()
         .map(
-            e ->
-                GoodsExcelVO.builder()
-                    .goodsStatus(
-                        SmartEnumUtil.getEnumDescByValue(e.getGoodsStatus(), GoodsStatusEnum.class))
-                    .categoryName(this.queryCategoryName(e.getCategoryId()))
-                    .place(
-                        // P0-3 Fix: 使用 Vavr Option 避免 NullPointerException
-                        Option.of(e.getPlace())
-                            .map(
-                                place ->
-                                    Arrays.stream(place.split(","))
-                                        .map(code -> dictService.getDictDataLabel(dictCode, code))
-                                        .collect(Collectors.joining(",")))
-                            .getOrElse(""))
-                    .price(e.getPrice())
-                    .goodsName(e.getGoodsName())
-                    .remark(e.getRemark())
-                    .build())
+            e -> {
+              String categoryName =
+                  Option.of(categoryMap.get(e.getCategoryId()))
+                      .map(CategoryEntity::getCategoryName)
+                      .getOrElse("");
+              return GoodsExcelVO.builder()
+                  .categoryName(categoryName)
+                  .goodsStatus(
+                      SmartEnumUtil.getEnumDescByValue(e.getGoodsStatus(), GoodsStatusEnum.class))
+                  .place(
+                      // P0-3 Fix: 使用 Vavr Option 避免 NullPointerException
+                      Option.of(e.getPlace())
+                          .map(
+                              place ->
+                                  Arrays.stream(place.split(","))
+                                      .map(code -> dictService.getDictDataLabel(dictCode, code))
+                                      .collect(Collectors.joining(",")))
+                          .getOrElse(""))
+                  .price(e.getPrice())
+                  .goodsName(e.getGoodsName())
+                  .remark(e.getRemark())
+                  .build();
+            })
         .collect(Collectors.toList());
   }
 }

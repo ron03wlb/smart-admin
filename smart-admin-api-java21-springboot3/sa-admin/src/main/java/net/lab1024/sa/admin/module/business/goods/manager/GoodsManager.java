@@ -50,4 +50,11 @@ public class GoodsManager {
     goodsDao.batchUpdateDeleted(Collections.singletonList(goodsId), Boolean.TRUE);
     dataTracerService.batchDelete(Collections.singletonList(goodsId), DataTracerTypeEnum.GOODS);
   }
+
+  /** 批量删除商品（事务方法） */
+  @Transactional(rollbackFor = Throwable.class)
+  public void batchDeleteGoodsTransaction(java.util.List<Long> goodsIdList) {
+    goodsDao.batchUpdateDeleted(goodsIdList, Boolean.TRUE);
+    dataTracerService.batchDelete(goodsIdList, DataTracerTypeEnum.GOODS);
+  }
 }

@@ -7,6 +7,7 @@ import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.google.common.base.CaseFormat;
+import io.vavr.control.Option;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.OutputStream;
@@ -15,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.base.module.support.codegenerator.domain.entity.CodeGeneratorConfigEntity;
@@ -191,9 +191,9 @@ public class CodeGeneratorTemplateService {
     // -------------------- 1 校验不支持的代码生成，比如增加、删除等 --------------------
 
     String finalFile = file;
-    Optional<String> optional =
-        map.keySet().stream().filter(e -> e.contains(finalFile)).findFirst();
-    if (!optional.isPresent()) {
+    Option<String> optional =
+        Option.ofOptional(map.keySet().stream().filter(e -> e.contains(finalFile)).findFirst());
+    if (optional.isEmpty()) {
       return "不存在此模板！";
     }
 

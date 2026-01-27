@@ -9,11 +9,11 @@ import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import io.lettuce.core.RedisClient;
+import io.vavr.control.Option;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -111,9 +111,9 @@ public class JetCacheServiceImpl implements CacheService {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <K, V> Optional<V> get(String cacheName, K key, Class<V> valueType) {
+  public <K, V> Option<V> get(String cacheName, K key, Class<V> valueType) {
     Cache<K, V> cache = getOrCreateCache(cacheName, (Class<K>) key.getClass(), valueType);
-    return Optional.ofNullable(cache.get(key));
+    return Option.of(cache.get(key));
   }
 
   @Override

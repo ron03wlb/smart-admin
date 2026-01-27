@@ -3,6 +3,7 @@ package net.lab1024.sa.admin.module.system.datascope;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,6 +46,14 @@ import org.springframework.stereotype.Component;
 public class MyBatisPlugin extends DataScopePlugin {
 
   private final ApplicationContext applicationContext;
+
+  // P1 Fix: 緩存 DataScopeSqlConfigService Bean，避免每次攔截都調用 getBean()
+  private DataScopeSqlConfigService dataScopeSqlConfigService;
+
+  @PostConstruct
+  public void init() {
+    this.dataScopeSqlConfigService = applicationContext.getBean(DataScopeSqlConfigService.class);
+  }
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
@@ -141,7 +150,8 @@ public class MyBatisPlugin extends DataScopePlugin {
   }
 
   public DataScopeSqlConfigService dataScopeSqlConfigService() {
-    return (DataScopeSqlConfigService) applicationContext.getBean("dataScopeSqlConfigService");
+    // P1 Fix: 返回緩存的實例，避免每次都調用 getBean()
+    return this.dataScopeSqlConfigService;
   }
 
   @SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})

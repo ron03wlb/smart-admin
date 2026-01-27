@@ -289,25 +289,19 @@ public class LoginService implements StpInterface {
     return loginResultVO;
   }
 
-  /** 根据登录token 获取员请求工信息 */
+  /** 根据登录token 获取员请求工信息 - P1 Fix: 使用 Vavr Option 處理 null 安全 */
   public RequestEmployee getLoginEmployee(String loginId, HttpServletRequest request) {
-    if (loginId == null) {
-      return null;
-    }
-
-    Long requestEmployeeId = getEmployeeIdByLoginId(loginId);
-    if (requestEmployeeId == null) {
-      return null;
-    }
-
-    RequestEmployee requestEmployee = loginManager.getRequestEmployee(requestEmployeeId);
-
-    // 更新请求ip和user agent
-    requestEmployee.setUserAgent(
-        JakartaServletUtil.getHeaderIgnoreCase(request, RequestHeaderConst.USER_AGENT));
-    requestEmployee.setIp(JakartaServletUtil.getClientIP(request));
-
-    return requestEmployee;
+    return Option.of(loginId)
+        .flatMap(id -> Option.of(getEmployeeIdByLoginId(id)))
+        .flatMap(employeeId -> Option.of(loginManager.getRequestEmployee(employeeId)))
+        .peek(
+            requestEmployee -> {
+              // 更新请求ip和user agent
+              requestEmployee.setUserAgent(
+                  JakartaServletUtil.getHeaderIgnoreCase(request, RequestHeaderConst.USER_AGENT));
+              requestEmployee.setIp(JakartaServletUtil.getClientIP(request));
+            })
+        .getOrNull();
   }
 
   /** 根据 loginId 获取 员工id */
@@ -420,6 +414,14 @@ public class LoginService implements StpInterface {
   /** 发送 邮箱 验证码 */
   public ResponseDTO<String> sendEmailCode(String loginName) {
 
+    // P1 Fix: 添加參數驗證，防止 SQL 注入和惡意輸入
+    if (SmartStringUtil.isBlank(loginName) || loginName.length() > 50) {
+      return ResponseDTO.userErrorParam("登錄名格式無效");
+    }
+    if (!loginName.matches("^[a-zA-Z0-9_-]{3,50}$")) {
+      return ResponseDTO.userErrorParam("登錄名只能包含字母、數字、下劃線和連字符");
+    }
+
     // 开启双因子登录
     if (!level3ProtectConfigService.isTwoFactorLoginEnabled()) {
       return ResponseDTO.userErrorParam("无需使用邮箱验证码");
@@ -456,7 +458,10 @@ public class LoginService implements StpInterface {
     if (!SmartStringUtil.isEmpty(emailCode)) {
       String[] codeParts = emailCode.split(StringConst.UNDERLINE);
       if (codeParts.length < 2) {
-        log.warn("Invalid email code format in cache: {}", emailCode);
+        // P1 Fix: 清除無效緩存並重置，允許重新發送
+        log.error("Invalid email code format in cache: {}", emailCode);
+        cacheService.remove(CacheKeyConst.Support.LOGIN_VERIFICATION_CODE, cacheKey);
+        sendCodeTimeMills = -1;
       } else {
         sendCodeTimeMills = NumberUtil.parseLong(codeParts[1]);
       }

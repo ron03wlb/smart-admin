@@ -1,10 +1,10 @@
 package net.lab1024.sa.foundation.securityprotect.service;
 
+import io.vavr.control.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
@@ -59,13 +59,13 @@ public class FileSecurityService {
    * @param file 待检测的文件
    * @return 检测失败时返回错误消息，检测通过返回 empty
    */
-  public Optional<String> checkFileType(MultipartFile file) {
+  public Option<String> checkFileType(MultipartFile file) {
     String fileType = getFileMimeType(file);
     if (ALLOWED_MIME_TYPES.stream()
         .noneMatch(allowedType -> matchesMimeType(fileType, allowedType))) {
-      return Optional.of("禁止上传此文件类型");
+      return Option.of("禁止上传此文件类型");
     }
-    return Optional.empty();
+    return Option.none();
   }
 
   /**
@@ -75,16 +75,16 @@ public class FileSecurityService {
    * @param maxSizeMb 最大文件大小（MB）
    * @return 检测失败时返回错误消息，检测通过返回 empty
    */
-  public Optional<String> checkFileSize(MultipartFile file, long maxSizeMb) {
+  public Option<String> checkFileSize(MultipartFile file, long maxSizeMb) {
     if (maxSizeMb <= 0) {
-      return Optional.empty();
+      return Option.none();
     }
 
     long maxSize = maxSizeMb * 1024 * 1024;
     if (file.getSize() > maxSize) {
-      return Optional.of("上传文件最大为:" + maxSizeMb + " mb");
+      return Option.of("上传文件最大为:" + maxSizeMb + " mb");
     }
-    return Optional.empty();
+    return Option.none();
   }
 
   /**

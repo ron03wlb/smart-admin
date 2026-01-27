@@ -1,7 +1,7 @@
 package net.lab1024.sa.base.module.support.helpdoc.service;
 
+import io.vavr.control.Option;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocCatalogDao;
 import net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao;
@@ -47,11 +47,12 @@ public class HelpDocCatalogService {
    */
   public synchronized ResponseDTO<String> add(final HelpDocCatalogAddForm helpDocCatalogAddForm) {
     final List<HelpDocCatalogVO> helpDocCatalogList = getAll();
-    final Optional<HelpDocCatalogVO> exist =
-        helpDocCatalogList.stream()
-            .filter(e -> helpDocCatalogAddForm.getName().equals(e.getName()))
-            .findFirst();
-    if (exist.isPresent()) {
+    final Option<HelpDocCatalogVO> exist =
+        Option.ofOptional(
+            helpDocCatalogList.stream()
+                .filter(e -> helpDocCatalogAddForm.getName().equals(e.getName()))
+                .findFirst());
+    if (exist.isDefined()) {
       return ResponseDTO.userErrorParam("存在相同名称的目录了");
     }
 
@@ -73,11 +74,12 @@ public class HelpDocCatalogService {
     }
 
     final List<HelpDocCatalogVO> helpDocCatalogList = getAll();
-    final Optional<HelpDocCatalogVO> exist =
-        helpDocCatalogList.stream()
-            .filter(e -> updateForm.getName().equals(e.getName()))
-            .findFirst();
-    if (exist.isPresent()
+    final Option<HelpDocCatalogVO> exist =
+        Option.ofOptional(
+            helpDocCatalogList.stream()
+                .filter(e -> updateForm.getName().equals(e.getName()))
+                .findFirst());
+    if (exist.isDefined()
         && !exist.get().getHelpDocCatalogId().equals(updateForm.getHelpDocCatalogId())) {
       return ResponseDTO.userErrorParam("存在相同名称的目录了");
     }
@@ -103,9 +105,10 @@ public class HelpDocCatalogService {
     }
 
     // 如果有子目录，则不能删除
-    final Optional<HelpDocCatalogVO> existOptional =
-        getAll().stream().filter(e -> helpDocCatalogId.equals(e.getParentId())).findFirst();
-    if (existOptional.isPresent()) {
+    final Option<HelpDocCatalogVO> existOptional =
+        Option.ofOptional(
+            getAll().stream().filter(e -> helpDocCatalogId.equals(e.getParentId())).findFirst());
+    if (existOptional.isDefined()) {
       return ResponseDTO.userErrorParam("存在子目录：" + existOptional.get().getName());
     }
 

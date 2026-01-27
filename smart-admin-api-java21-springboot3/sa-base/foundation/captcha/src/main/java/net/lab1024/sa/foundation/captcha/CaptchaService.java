@@ -5,10 +5,10 @@ import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import io.vavr.control.Option;
 import java.awt.Color;
 import java.awt.Image;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -128,9 +128,9 @@ public class CaptchaService {
     }
 
     // 从Redis获取验证码
-    Optional<String> captchaOpt =
+    Option<String> captchaOpt =
         cacheService.get(CacheKeyConst.Support.CAPTCHA, captchaForm.getCaptchaUuid(), String.class);
-    String redisCaptchaCode = captchaOpt.orElse(null);
+    String redisCaptchaCode = captchaOpt.getOrNull();
 
     if (StringUtils.isBlank(redisCaptchaCode)) {
       throw new CaptchaException("验证码已过期，请刷新重试");

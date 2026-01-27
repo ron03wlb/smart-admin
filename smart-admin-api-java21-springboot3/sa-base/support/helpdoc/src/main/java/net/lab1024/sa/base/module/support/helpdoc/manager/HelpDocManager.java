@@ -22,13 +22,13 @@ public class HelpDocManager {
   private final HelpDocDao helpDocDao;
 
   /**
-   * 保存
+   * 保存（事務方法）
    *
    * @param helpDocEntity
    * @param relationList
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void save(
+  public void saveTransaction(
       final HelpDocEntity helpDocEntity, final List<HelpDocRelationForm> relationList) {
     helpDocDao.insert(helpDocEntity);
     final Long helpDocId = helpDocEntity.getHelpDocId();
@@ -39,13 +39,13 @@ public class HelpDocManager {
   }
 
   /**
-   * 更新
+   * 更新（事務方法）
    *
    * @param helpDocEntity
    * @param relationList
    */
   @Transactional(rollbackFor = Throwable.class)
-  public void update(
+  public void updateTransaction(
       final HelpDocEntity helpDocEntity, final List<HelpDocRelationForm> relationList) {
     helpDocDao.updateById(helpDocEntity);
     final Long helpDocId = helpDocEntity.getHelpDocId();

@@ -51,7 +51,7 @@ public class HelpDocService {
    */
   public ResponseDTO<String> add(final HelpDocAddForm addForm) {
     final HelpDocEntity helpDaoEntity = SmartBeanUtil.copy(addForm, HelpDocEntity.class);
-    helpDaoManager.save(helpDaoEntity, addForm.getRelationList());
+    helpDaoManager.saveTransaction(helpDaoEntity, addForm.getRelationList());
     return ResponseDTO.ok();
   }
 
@@ -64,7 +64,7 @@ public class HelpDocService {
   public ResponseDTO<String> update(final HelpDocUpdateForm updateForm) {
     // 更新
     final HelpDocEntity helpDaoEntity = SmartBeanUtil.copy(updateForm, HelpDocEntity.class);
-    helpDaoManager.update(helpDaoEntity, updateForm.getRelationList());
+    helpDaoManager.updateTransaction(helpDaoEntity, updateForm.getRelationList());
     return ResponseDTO.ok();
   }
 

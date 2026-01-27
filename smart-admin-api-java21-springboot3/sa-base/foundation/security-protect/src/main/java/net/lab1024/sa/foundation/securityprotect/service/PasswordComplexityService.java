@@ -1,6 +1,6 @@
 package net.lab1024.sa.foundation.securityprotect.service;
 
-import java.util.Optional;
+import io.vavr.control.Option;
 import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,31 +37,31 @@ public class PasswordComplexityService {
    * @param complexityEnabled 是否开启复杂度校验
    * @return 校验失败时返回错误消息，校验通过返回 empty
    */
-  public Optional<String> validateComplexity(String password, boolean complexityEnabled) {
+  public Option<String> validateComplexity(String password, boolean complexityEnabled) {
     if (StringUtils.isEmpty(password)) {
-      return Optional.of(PASSWORD_FORMAT_MSG);
+      return Option.of(PASSWORD_FORMAT_MSG);
     }
 
     // 密码长度必须大于等于8位
     if (password.length() < PASSWORD_MIN_LENGTH) {
-      return Optional.of(PASSWORD_FORMAT_MSG);
+      return Option.of(PASSWORD_FORMAT_MSG);
     }
 
     // 密码长度必须小于等于20位
     if (password.length() > PASSWORD_MAX_LENGTH) {
-      return Optional.of(PASSWORD_FORMAT_MSG);
+      return Option.of(PASSWORD_FORMAT_MSG);
     }
 
     // 无需校验密码复杂度
     if (!complexityEnabled) {
-      return Optional.empty();
+      return Option.none();
     }
 
     if (!password.matches(PASSWORD_PATTERN)) {
-      return Optional.of(PASSWORD_FORMAT_MSG);
+      return Option.of(PASSWORD_FORMAT_MSG);
     }
 
-    return Optional.empty();
+    return Option.none();
   }
 
   /**

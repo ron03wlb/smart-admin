@@ -1,8 +1,8 @@
 package net.lab1024.sa.foundation.mq.kafka.core;
 
+import io.vavr.control.Option;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.lab1024.sa.foundation.mq.kafka.batch.BatchSendResult;
 import org.springframework.kafka.support.SendResult;
@@ -39,9 +39,9 @@ public interface KafkaProducerService {
    *
    * @param topic Topic 名称
    * @param message 消息内容
-   * @return 发送结果，发送失败返回 Optional.empty()
+   * @return 发送结果，发送失败返回 Option.none()
    */
-  Optional<SendResult<String, String>> sendSync(String topic, String message);
+  Option<SendResult<String, String>> sendSync(String topic, String message);
 
   /**
    * 同步发送消息（带 key，保证顺序）
@@ -49,9 +49,9 @@ public interface KafkaProducerService {
    * @param topic Topic 名称
    * @param key 消息 Key（相同 key 会路由到同一分区，保证顺序）
    * @param message 消息内容
-   * @return 发送结果，发送失败返回 Optional.empty()
+   * @return 发送结果，发送失败返回 Option.none()
    */
-  Optional<SendResult<String, String>> sendSync(String topic, String key, String message);
+  Option<SendResult<String, String>> sendSync(String topic, String key, String message);
 
   /**
    * 同步发送消息（带 key，保证顺序，指定超时）
@@ -60,9 +60,9 @@ public interface KafkaProducerService {
    * @param key 消息 Key
    * @param message 消息内容
    * @param timeoutMs 超时时间（毫秒）
-   * @return 发送结果，发送失败返回 Optional.empty()
+   * @return 发送结果，发送失败返回 Option.none()
    */
-  Optional<SendResult<String, String>> sendSync(
+  Option<SendResult<String, String>> sendSync(
       String topic, String key, String message, long timeoutMs);
 
   /**

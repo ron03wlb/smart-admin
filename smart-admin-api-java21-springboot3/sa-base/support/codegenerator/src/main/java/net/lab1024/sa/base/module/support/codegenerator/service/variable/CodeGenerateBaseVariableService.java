@@ -1,11 +1,11 @@
 package net.lab1024.sa.base.module.support.codegenerator.service.variable;
 
 import com.google.common.base.CaseFormat;
+import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.lab1024.sa.base.module.support.codegenerator.constant.CodeFrontComponentEnum;
@@ -108,9 +108,10 @@ public abstract class CodeGenerateBaseVariableService {
       return false;
     }
 
-    Optional<CodeInsertAndUpdateField> first =
-        fieldList.stream().filter(e -> columnName.equals(e.getColumnName())).findFirst();
-    if (!first.isPresent()) {
+    Option<CodeInsertAndUpdateField> first =
+        Option.ofOptional(
+            fieldList.stream().filter(e -> columnName.equals(e.getColumnName())).findFirst());
+    if (first.isEmpty()) {
       return false;
     }
 

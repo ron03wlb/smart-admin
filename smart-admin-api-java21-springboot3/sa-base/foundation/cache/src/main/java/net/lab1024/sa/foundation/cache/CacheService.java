@@ -3,10 +3,10 @@ package net.lab1024.sa.foundation.cache;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.MultiGetResult;
+import io.vavr.control.Option;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -86,7 +86,7 @@ public interface CacheService {
    * @param <V> Value泛型
    * @return 缓存值，不存在返回empty
    */
-  <K, V> Optional<V> get(String cacheName, K key, Class<V> valueType);
+  <K, V> Option<V> get(String cacheName, K key, Class<V> valueType);
 
   /**
    * 获取缓存值，带详细结果
