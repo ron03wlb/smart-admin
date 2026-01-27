@@ -113,7 +113,7 @@ Controller → Service → Manager → Dao → Entity
 - ✅ **Use instead**: `net.lab1024.sa.foundation.domain.*`
 - ℹ️ **Exception**: `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*`
 
-→ **[Complete Package Naming Guide](docs/migration/foundation-packages.md)**
+→ **[Complete Package Naming Guide](docs/archive/migration/foundation-packages.md)** (archived)
 → **[v4.0.0 Breaking Changes](#v40-breaking-changes)**
 
 ## SmartAdmin Patterns
@@ -242,7 +242,73 @@ cd smart-admin-api-java21-springboot3
 ./gradlew migrateToFoundation
 ```
 
-→ **[Complete Package Migration Guide](docs/migration/foundation-packages.md)**
+→ **[Complete Package Migration Guide](docs/archive/migration/foundation-packages.md)** (archived)
+
+---
+
+## Documentation Structure
+
+SmartAdmin 採用分層文檔組織結構，確保當前文檔和歷史資料清晰分離。
+
+### 📁 Active Documentation (當前有效文檔)
+
+```
+docs/
+├── migration/              # 遷移指南（當前有效）
+│   └── foundation-packages.md  # v4.0.0 包命名遷移
+├── testing/                # 測試文檔（當前有效）
+│   ├── testing-strategy.md
+│   ├── integration-testing-quick-reference.md
+│   └── architecture/
+├── plans/                  # 技術計畫（當前活躍）
+│   ├── job/               # Snail-Job 排程計畫
+│   ├── liteflow/          # LiteFlow 規則引擎計畫
+│   ├── minio/             # MinIO 對象存儲計畫
+│   └── tenant/            # 多租戶計畫
+├── iGame/                  # iGaming 業務模塊
+│   ├── architecture-decisions/  # ADR 記錄
+│   └── technical-specs/         # 技術規格
+└── audit/                  # 審計歷史追蹤
+    └── AUDIT_HISTORY.md    # 架構審計記錄
+```
+
+### 🗄️ Archived Documentation (已歸檔文檔)
+
+```
+docs/archive/
+├── INDEX.md                # 歸檔總索引
+├── 2026-01-audit/          # 2026-01 架構審計報告
+│   ├── README.md           # 審計報告版本說明
+│   ├── ARCHITECTURE-AUDIT-REPORT.md (v1.0.0)
+│   ├── ARCHITECTURE-AUDIT-REPORT-CORRECTED.md (v1.1.0)
+│   └── ARCHITECTURE-AUDIT-SUCCESS-REPORT.md (v2.0.0)
+├── legacy-kafka-v1/        # Kafka v1 文檔（46 個文件）
+│   ├── INDEX.md
+│   └── kafka/              # 架構、指南、範例、測試等
+├── legacy-planning/        # 舊計劃文檔（11 個文件）
+│   ├── INDEX.md
+│   ├── FEASIBILITY-ANALYSIS-CORRECTION.md
+│   ├── IMPLEMENTATION_PROGRESS.md
+│   └── ...
+├── evrete/                 # Evrete 規則引擎（已替換）
+├── migration/              # 舊遷移報告（已完成）
+└── testing/                # 舊測試文檔（已更新）
+```
+
+### 📝 Documentation Principles
+
+**歸檔原則**：
+- ✅ 已完成的階段性報告（審計、遷移等）
+- ✅ 被新版本替代的技術文檔
+- ✅ 已實施完成的計劃文檔
+- ✅ 保留完整 Git 歷史用於追溯
+
+**查找文檔**：
+- **當前開發**：直接查看 `docs/` 對應子目錄
+- **歷史追溯**：參考 [docs/archive/INDEX.md](docs/archive/INDEX.md)
+- **審計記錄**：查看 [docs/audit/AUDIT_HISTORY.md](docs/audit/AUDIT_HISTORY.md)
+
+→ **[Complete Archive Index](docs/archive/INDEX.md)** - 所有歸檔文檔的完整導航
 
 ---
 
@@ -250,7 +316,7 @@ cd smart-admin-api-java21-springboot3
 
 | Component | Version | Status | Metadata |
 |-----------|---------|--------|----------|
-| **This Document** | 3.2.0 | ✅ Universal AI Support | - |
+| **This Document** | 3.3.0 | ✅ Universal AI Support | - |
 | **AI Doc System** | 3.0.0 | ✅ Unified | [.claude/META.md](.claude/META.md) |
 | **.claude/** | 2.7.0 | ✅ Agent System | [.claude/README.md](.claude/README.md) |
 | **.agent/** | 1.0.0 | ✅ Production Ready | [.agent/VERSION.md](.agent/VERSION.md) |
@@ -261,6 +327,7 @@ cd smart-admin-api-java21-springboot3
 **Last Updated**: 2026-01-27
 
 **Change History**:
+- 3.3.0 (2026-01-27): Documentation structure update - Added "Documentation Structure" section with active/archived documentation organization, updated archive navigation with INDEX.md references
 - 3.2.0 (2026-01-27): P1 improvements - Enhanced reading priority guidance with decision-making note, clarified code comment language standard, expanded skills catalog from 6 to 15 (P0: 6, P1: 3, P2: 6)
 - 3.1.0 (2026-01-27): P0 critical fixes - Version synchronization (.agent/ v1.0.0 production release), fixed broken migration links
 - 3.0.0 (2026-01-24): Content deduplication, universal AI support, unified version management
