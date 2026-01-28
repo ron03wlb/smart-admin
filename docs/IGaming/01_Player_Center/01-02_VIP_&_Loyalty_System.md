@@ -22,132 +22,104 @@
 **概述**：VIP 等級系統採用狀態機模式，確保升降級邏輯清晰、可追溯，並提供降級保護機制。
 
 ```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#1f1f1f',
+      'primaryTextColor': '#f5f5f5',
+      'stateBorderColor': '#ffffff',
+      'transitionColor': '#a9a9a9',
+      'stateBg': '#2d2d2d',
+      'errorBkgColor': '#4a1919',
+      'errorTextColor': '#ff6b6b'
+    }
+  }
+}%%
 stateDiagram-v2
-    [*] --> Bronze: 新玩家註冊<br/>━━━━━━━━<br/>初始等級<br/>total_deposit = $0<br/>total_turnover = $0
+    [*] --> Bronze : 新玩家註冊
 
-    Bronze --> Silver: 升級至 Silver<br/>━━━━━━━━<br/>Conditions:<br/>• total_deposit >= $5K<br/>• total_turnover >= $30K<br/>Actions:<br/>• 發放升級禮金 $50<br/>• 開啟 Silver 權益<br/>• 記錄 vip_level_history
+    %% === 主要等級狀態 ===
+    state "Bronze (基礎等級)" as Bronze
+    state "Silver (Dep: $5K+ / TO: $30K+)" as Silver
+    state "Gold (Dep: $20K+ / TO: $150K+)" as Gold
+    state "Platinum (Dep: $100K+ / TO: $1M+)" as Platinum
+    state "Diamond (Dep: $500K+ / TO: $5M+)" as Diamond
 
-    Silver --> Gold: 升級至 Gold<br/>━━━━━━━━<br/>Conditions:<br/>• total_deposit >= $20K<br/>• total_turnover >= $150K<br/>Actions:<br/>• 發放升級禮金 $200<br/>• 分配 VIP 經理<br/>• 開啟月度紅利
+    %% === 升級路徑 ===
+    Bronze --> Silver : 升級 (累積存款 >= $5K)
+    Silver --> Gold : 升級 (累積存款 >= $20K)
+    Gold --> Platinum : 升級 (累積存款 >= $100K)
+    Platinum --> Diamond : 升級 (累積存款 >= $500K)
 
-    Gold --> Platinum: 升級至 Platinum<br/>━━━━━━━━<br/>Conditions:<br/>• total_deposit >= $100K<br/>• total_turnover >= $1M<br/>Actions:<br/>• 發放升級禮金 $1,000<br/>• 邀請專屬活動<br/>• 實體獎品資格
+    %% === 保級邏輯 ===
+    Bronze --> Bronze : 永久保持
+    Silver --> Silver : 保級 (上月 Dep $500 OR TO $5K)
+    Gold --> Gold : 保級 (上月 Dep $1K OR TO $10K)
+    Platinum --> Platinum : 保級 (上月 Dep $5K OR TO $50K)
+    Diamond --> Diamond : 保級 (上月 Dep $10K OR TO $100K)
 
-    Platinum --> Diamond: 升級至 Diamond<br/>━━━━━━━━<br/>Conditions:<br/>• total_deposit >= $500K<br/>• total_turnover >= $5M<br/>Actions:<br/>• 發放升級禮金 $5,000<br/>• 1對1 VIP 經理<br/>• 無限制提款額度
+    %% === 降級保護機制 (Warning States) ===
+    state "Silver Warning (未達標 x1)" as S_Warn
+    state "Gold Warning (未達標 x1)" as G_Warn
+    state "Platinum Warning (未達標 x1)" as P_Warn
+    state "Diamond Warning (未達標 x1)" as D_Warn
 
-    Diamond --> Diamond: 保持 Diamond 等級<br/>━━━━━━━━<br/>每月檢查 (1號 00:00 UTC):<br/>• 上月存款 >= $10K OR<br/>• 上月流水 >= $100K<br/>Result: 保持最高等級
+    Silver --> S_Warn : 未達保級條件
+    S_Warn --> Silver : 達標
+    S_Warn --> Bronze : 連續未達標 x2 (降級補償 $10)
 
-    Platinum --> Platinum: 保持 Platinum 等級<br/>━━━━━━━━<br/>Monthly Check:<br/>• 上月存款 >= $5K OR<br/>• 上月流水 >= $50K
+    Gold --> G_Warn : 未達保級條件
+    G_Warn --> Gold : 達標
+    G_Warn --> Silver : 連續未達標 x2 (降級補償 $50)
 
-    Gold --> Gold: 保持 Gold 等級<br/>━━━━━━━━<br/>Monthly Check:<br/>• 上月存款 >= $1K OR<br/>• 上月流水 >= $10K
+    Platinum --> P_Warn : 未達保級條件
+    P_Warn --> Platinum : 達標
+    P_Warn --> Gold : 連續未達標 x2 (降級補償 $200)
 
-    Silver --> Silver: 保持 Silver 等級<br/>━━━━━━━━<br/>Monthly Check:<br/>• 上月存款 >= $500 OR<br/>• 上月流水 >= $5K
+    Diamond --> D_Warn : 未達保級條件
+    D_Warn --> Diamond : 達標
+    D_Warn --> Platinum : 連續未達標 x2 (保留 50% 權益)
 
-    Bronze --> Bronze: 保持 Bronze 等級<br/>━━━━━━━━<br/>無保級要求<br/>永久保持基礎等級
+    %% === 風控凍結狀態 ===
+    state "Frozen (風控凍結)" as Frozen
+    state "Permanent Ban (永久封禁)" as PermBan
 
-    Diamond --> Diamond_Warning: 第1次未達保級條件<br/>━━━━━━━━<br/>Actions:<br/>• 發送警告郵件<br/>• grace_period = 1 month<br/>• 暫不降級 (保護期)<br/>• retention_warning_count = 1
+    Bronze --> Frozen : 風控系統標記
+    Silver --> Frozen : 風控系統標記
+    Gold --> Frozen : 風控系統標記
+    Platinum --> Frozen : 風控系統標記
+    Diamond --> Frozen : 風控系統標記
 
-    Diamond_Warning --> Diamond: 保級成功 (恢復)<br/>━━━━━━━━<br/>Conditions:<br/>• 當月達到保級條件<br/>Actions:<br/>• 清除警告狀態<br/>• retention_warning_count = 0<br/>• 發送恢復通知
+    Frozen --> Bronze : 解除凍結 (審核通過)
+    Frozen --> Silver : 解除凍結 (審核通過)
+    Frozen --> Gold : 解除凍結 (審核通過)
+    Frozen --> Platinum : 解除凍結 (審核通過)
+    Frozen --> Diamond : 解除凍結 (審核通過)
 
-    Diamond_Warning --> Diamond_Grace2: 第2次未達保級條件<br/>━━━━━━━━<br/>Actions:<br/>• 再次警告<br/>• retention_warning_count = 2<br/>• grace_period 即將結束
+    Frozen --> PermBan : 確認欺詐/嚴重違規
+    PermBan --> [*]
 
-    Diamond_Grace2 --> Diamond: 保級成功 (恢復)
-
-    Diamond_Grace2 --> Platinum: 連續2次未達標 → 降級<br/>━━━━━━━━<br/>Demotion Process:<br/>• 降級 1 級 (Diamond → Platinum)<br/>• 發送降級通知<br/>• 降級補償: 7天內保留50%權益<br/>• 提供回歸紅利 $500<br/>• retention_warning_count = 0
-
-    Platinum --> Platinum_Warning: 第1次未達保級條件<br/>━━━━━━━━<br/>Warning + Grace Period
-    Platinum_Warning --> Platinum: 保級成功
-    Platinum_Warning --> Platinum_Grace2: 第2次未達標
-    Platinum_Grace2 --> Platinum: 保級成功
-    Platinum_Grace2 --> Gold: 連續2次未達標 → 降級<br/>━━━━━━━━<br/>降級補償 $200
-
-    Gold --> Gold_Warning: 第1次未達保級條件
-    Gold_Warning --> Gold: 保級成功
-    Gold_Warning --> Gold_Grace2: 第2次未達標
-    Gold_Grace2 --> Gold: 保級成功
-    Gold_Grace2 --> Silver: 連續2次未達標 → 降級<br/>━━━━━━━━<br/>降級補償 $50
-
-    Silver --> Silver_Warning: 第1次未達保級條件
-    Silver_Warning --> Silver: 保級成功
-    Silver_Warning --> Silver_Grace2: 第2次未達標
-    Silver_Grace2 --> Silver: 保級成功
-    Silver_Grace2 --> Bronze: 連續2次未達標 → 降級<br/>━━━━━━━━<br/>降級補償 $10
-
-    Diamond --> Frozen_Diamond: 風控凍結<br/>━━━━━━━━<br/>Freeze Reasons:<br/>• Bonus Abuser 標記<br/>• VIP Farming 檢測<br/>• 多帳號關聯<br/>Actions:<br/>• is_frozen = true<br/>• 凍結權益獲取<br/>• 凍結積分累積<br/>• 保留現有等級
-
-    Platinum --> Frozen_Platinum: 風控凍結
-    Gold --> Frozen_Gold: 風控凍結
-    Silver --> Frozen_Silver: 風控凍結
-    Bronze --> Frozen_Bronze: 風控凍結
-
-    Frozen_Diamond --> Diamond: 解除凍結<br/>━━━━━━━━<br/>Conditions:<br/>• 風控審核通過<br/>• 申訴成功<br/>Actions:<br/>• is_frozen = false<br/>• 恢復權益獲取<br/>• 補發凍結期間應得積分
-
-    Frozen_Platinum --> Platinum: 解除凍結
-    Frozen_Gold --> Gold: 解除凍結
-    Frozen_Silver --> Silver: 解除凍結
-    Frozen_Bronze --> Bronze: 解除凍結
-
-    Frozen_Diamond --> Permanent_Ban: 永久封禁<br/>━━━━━━━━<br/>Conditions:<br/>• 確認欺詐行為<br/>• 違反服務條款<br/>Actions:<br/>• 帳戶永久封禁<br/>• 清零所有積分<br/>• 取消所有權益
-
-    Frozen_Platinum --> Permanent_Ban: 永久封禁
-    Frozen_Gold --> Permanent_Ban: 永久封禁
-    Frozen_Silver --> Permanent_Ban: 永久封禁
-    Frozen_Bronze --> Permanent_Ban: 永久封禁
-
-    Permanent_Ban --> [*]: 生命週期結束
-
-    note right of Bronze
-        基礎等級
-        ━━━━━━━━
-        • 無升級要求
-        • 無降級風險
-        • 永久保持
-
-        適用場景:
-        • 新註冊玩家
-        • 休閒玩家
-        • 低頻玩家
+    %% === 註釋說明 ===
+    note right of Diamond
+        鑽石等級保級條件最嚴格
+        但享有最高權益和優先服務
+        降級後仍保留 50% 特權
     end note
 
-    note right of Diamond_Warning
-        降級保護機制
-        ━━━━━━━━
-        Grace Period 設計:
-        • 第1次: 僅警告,不降級
-        • 第2次: 最後警告
-        • 第3次: 執行降級
-
-        用戶體驗考量:
-        • 避免突然降級衝擊
-        • 給予挽回時間
-        • 減少客訴糾紛
+    note right of Frozen
+        風控凍結期間:
+        - 保留等級不變
+        - 禁止積分獲取
+        - 禁止提款操作
+        - 可提交申訴
     end note
 
-    note left of Frozen_Diamond
-        風控凍結狀態
-        ━━━━━━━━
-        凍結範圍:
-        ✅ 保留現有等級
-        ✅ 允許積分兌換
-        ❌ 禁止權益獲取
-        ❌ 禁止積分累積
-
-        法律考量:
-        • 避免侵犯既得權益
-        • 保留申訴通道
-    end note
-
-    note left of Permanent_Ban
-        永久封禁
-        ━━━━━━━━
-        不可逆操作
-        需留存證據:
-        • 風控報告
-        • 違規記錄
-        • 審批流程
-
-        合規要求:
-        • 通知玩家原因
-        • 保留申訴權利
-        • 退還未使用存款
+    note right of D_Warn
+        降級保護機制:
+        1. 第一次: 發送警告通知
+        2. 第二次: 最後通知 (寬限期)
+        3. 第三次: 正式降級 (附補償)
     end note
 ```
 
@@ -490,139 +462,119 @@ gold_value = calculate_annual_vip_value(
 **概述**：積分系統採用事件驅動架構，實時追蹤玩家投注行為並計算積分獎勵，支援多種兌換方式。
 
 ```mermaid
-flowchart TD
-    START[玩家完成遊戲回合] --> EVENT_PUB[遊戲服務發布事件<br/>━━━━━━━━━━━━<br/>GameRoundCompleted:<br/>• player_id<br/>• game_type: SLOTS<br/>• bet_amount: $100<br/>• win_amount: $250<br/>• round_id<br/>• timestamp]
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#1f1f1f',
+      'primaryTextColor': '#f5f5f5',
+      'primaryBorderColor': '#ffffff',
+      'lineColor': '#a9a9a9',
+      'secondaryColor': '#006100',
+      'tertiaryColor': '#fff'
+    }
+  }
+}%%
+flowchart LR
+    %% --- CSS CLASSES --- %%
+    classDef default fill:#1f1f1f,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef success fill:#1b4d3e,stroke:#00ff00,stroke-width:2px;
+    classDef fail fill:#4a1919,stroke:#ff5252,stroke-width:2px,stroke-dasharray: 5 5;
+    classDef process fill:#2d2d2d,stroke:#ffd700,stroke-width:2px;
+    classDef startend fill:#000,stroke:#fff,stroke-width:4px;
 
-    EVENT_PUB --> KAFKA[Kafka Topic<br/>game.rounds.completed]
+    %% ==========================================
+    %% SUBGRAPH 1: EARNING PROCESS
+    %% ==========================================
+    subgraph "Process A: 積分獲取 (Earning)"
+        direction LR
+        
+        START((Start)) --> EVENT_PUB["遊戲服務發布事件<br/>━━━━━━━━━━━━<br/>GameRoundCompleted:<br/>• win_amount: $250"]
+        EVENT_PUB --> KAFKA[/"Kafka Topic<br/>game.rounds.completed"/]
+        KAFKA --> LP_CONSUMER(Loyalty Point Service)
+        
+        LP_CONSUMER --> VALIDATE{"1️⃣ 有效性驗證"}
+        
+        %% Validation Logic
+        VALIDATE --> VAL_FREEZE{"玩家狀態檢查"}
+        
+        VAL_FREEZE -->|Frozen| REJECT_FROZEN["拒絕: 玩家已凍結<br/>━━━━━━━━━━━━<br/>Reason: 'Bonus Abuser'<br/>Action: 不累積"]:::fail
+        VAL_FREEZE -->|Active| VAL_GAME{"遊戲類型檢查"}
+        
+        VAL_GAME -->|Invalid| REJECT_GAME["拒絕: 遊戲不符合<br/>━━━━━━━━━━━━<br/>Example: Poker Rake<br/>Action: 不累積"]:::fail
+        VAL_GAME -->|Valid| VAL_BONUS{"紅利投注檢查"}
+        
+        VAL_BONUS -->|Bonus Wallet| REJECT_BONUS["拒絕: 紅利投注不計分<br/>━━━━━━━━━━━━<br/>Rule: 僅 Cash 計分"]:::fail
+        VAL_BONUS -->|Cash Wallet| VAL_TURNOVER{"流水有效性檢查"}
+        
+        VAL_TURNOVER -->|Risk| REJECT_TURNOVER["拒絕: 無效流水<br/>━━━━━━━━━━━━<br/>Reason: 對沖/套利"]:::fail
+        VAL_TURNOVER -->|Valid| CALC_START["✅ 驗證通過<br/>開始計算"]:::success
 
-    KAFKA --> LP_CONSUMER[Loyalty Point Service<br/>消費事件]
+        %% Calculation Logic
+        CALC_START --> STEP1{"2️⃣ 權重"}
+        STEP1 --> GAME_WEIGHT["查表: SLOTS = 100%"]
+        GAME_WEIGHT --> STEP2{"3️⃣ VIP倍數"}
+        STEP2 --> VIP_MULT["查表: Gold = 1.5x"]
+        VIP_MULT --> STEP3{"4️⃣ 基礎分"}
+        STEP3 --> BASE_CALC["Base = Bet / Rate"]
+        BASE_CALC --> STEP4{"5️⃣ 應用權重"}
+        STEP4 --> STEP5{"6️⃣ 應用VIP"}
+        STEP5 --> FINAL_CALC["Final = Weighted × VIP"]
+        FINAL_CALC --> ROUND{"7️⃣ 四捨五入"}
+        ROUND --> PROMO_CHECK{"8️⃣ 促銷檢查"}
+        
+        PROMO_CHECK -->|Yes| PROMO_BOOST["應用促銷倍數 (2.0x)"]:::success
+        PROMO_CHECK -->|No| FINAL_POINTS["最終積分"]:::success
+        
+        PROMO_BOOST --> DB_UPDATE
+        FINAL_POINTS --> DB_UPDATE{"9️⃣ DB Update"}
+        
+        DB_UPDATE --> TRANSACTION["創建交易記錄<br/>(+Points)"]
+        TRANSACTION --> UPDATE_BALANCE["更新餘額"]:::process
+        
+        UPDATE_BALANCE --> CHECK_MILESTONE{"🔟 里程碑?"}
+        CHECK_MILESTONE -->|Yes| MILESTONE_NOTIFY["發送祝賀 & 獎勵"]:::success
+        CHECK_MILESTONE -->|No| NOTIFY_END["發送普通通知"]
+        
+        MILESTONE_NOTIFY --> END_EARN((End))
+        NOTIFY_END --> END_EARN
+    end
 
-    LP_CONSUMER --> VALIDATE{1️⃣ 有效性驗證<br/>━━━━━━━━━━━━}
+    %% ==========================================
+    %% SUBGRAPH 2: REDEMPTION PROCESS
+    %% ==========================================
+    subgraph "Process B: 積分兌換 (Redemption)"
+        direction LR
+        
+        START2((Start)) --> REDEEM_UI["選擇兌換項目<br/>(Cash/Spins/Goods)"]
+        REDEEM_UI --> REDEEM_REQ["提交兌換請求"]
+        REDEEM_REQ --> VAL_BALANCE{"餘額檢查"}
+        
+        VAL_BALANCE -->|不足| REJECT_INSUFFICIENT["拒絕: 積分不足"]:::fail
+        VAL_BALANCE -->|充足| VAL_STOCK{"庫存檢查"}
+        
+        VAL_STOCK -->|缺貨| REJECT_STOCK["拒絕: 庫存不足"]:::fail
+        VAL_STOCK -->|有貨| VAL_QUOTA{"限額檢查"}
+        
+        VAL_QUOTA -->|超限| REJECT_QUOTA["拒絕: 超過今日限額"]:::fail
+        VAL_QUOTA -->|OK| REDEEM_EXECUTE["✅ 執行兌換"]:::success
+        
+        REDEEM_EXECUTE --> LOCK_POINTS["鎖定並扣除積分<br/>(DB Transaction)"]
+        LOCK_POINTS --> CREATE_REDEEM_TX["創建兌換記錄"]
+        CREATE_REDEEM_TX --> FULFILL{"履行類型?"}
+        
+        FULFILL -->|Wallet| WALLET_CREDIT["錢包加款"]:::process
+        FULFILL -->|Spins| TOKEN_ISSUE["發放 Token"]:::process
+        FULFILL -->|Physical| ORDER_CREATE["創建物流訂單"]:::process
+        
+        WALLET_CREDIT & TOKEN_ISSUE & ORDER_CREATE --> COMMIT["COMMIT TX"]
+        COMMIT --> NOTIFY_REDEEM["發送成功通知"]:::success
+        NOTIFY_REDEEM --> END_REDEEM((End))
+    end
 
-    VALIDATE --> VAL_FREEZE{玩家狀態檢查}
-    VAL_FREEZE -->|is_frozen = true| REJECT_FROZEN[拒絕: 玩家已凍結<br/>━━━━━━━━━━━━<br/>freeze_reason:<br/>"Bonus Abuser"<br/>Actions:<br/>• 記錄拒絕日誌<br/>• 不累積積分]
-
-    VAL_FREEZE -->|is_frozen = false| VAL_GAME{遊戲類型檢查}
-    VAL_GAME -->|遊戲不在積分範圍| REJECT_GAME[拒絕: 遊戲不符合<br/>━━━━━━━━━━━━<br/>Example:<br/>• Poker Rake Games<br/>• 某些促銷遊戲<br/>Actions:<br/>• 不累積積分]
-
-    VAL_GAME -->|遊戲符合| VAL_BONUS{紅利投注檢查}
-    VAL_BONUS -->|使用 Bonus Wallet| REJECT_BONUS[拒絕: 紅利投注不計分<br/>━━━━━━━━━━━━<br/>Rule:<br/>僅 Cash Wallet 投注計分<br/>Actions:<br/>• 記錄但不累積]
-
-    VAL_BONUS -->|使用 Cash Wallet| VAL_TURNOVER{流水有效性檢查}
-    VAL_TURNOVER -->|風控標記無效| REJECT_TURNOVER[拒絕: 無效流水<br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 對沖投注<br/>• 套利投注<br/>• 低賠率投注<br/>Actions:<br/>• 不累積積分]
-
-    VAL_TURNOVER -->|有效流水| CALC_START[✅ 驗證通過<br/>開始計算積分]
-
-    CALC_START --> STEP1{2️⃣ 查詢遊戲權重<br/>━━━━━━━━━━━━}
-
-    STEP1 --> GAME_WEIGHT[Game Weight Table<br/>━━━━━━━━━━━━<br/>game_type: SLOTS<br/>→ weight: 1.0 (100%)]
-
-    GAME_WEIGHT --> STEP2{3️⃣ 查詢 VIP 等級倍數<br/>━━━━━━━━━━━━}
-
-    STEP2 --> VIP_MULT[VIP Level Config<br/>━━━━━━━━━━━━<br/>current_level: Gold<br/>→ multiplier: 1.5x]
-
-    VIP_MULT --> STEP3{4️⃣ 計算基礎積分<br/>━━━━━━━━━━━━}
-
-    STEP3 --> BASE_CALC[計算公式<br/>━━━━━━━━━━━━<br/>base_points = bet_amount ÷ earn_rate<br/>━━━━━━━━━━━━<br/>Example:<br/>• bet_amount = $100<br/>• earn_rate = $10 (每$10獲1分)<br/>• base_points = 100 ÷ 10 = 10]
-
-    BASE_CALC --> STEP4{5️⃣ 應用遊戲權重<br/>━━━━━━━━━━━━}
-
-    STEP4 --> WEIGHT_CALC[weighted_points = base_points × game_weight<br/>━━━━━━━━━━━━<br/>Example:<br/>• base_points = 10<br/>• game_weight = 1.0 (SLOTS)<br/>• weighted_points = 10 × 1.0 = 10]
-
-    STEP4 --> STEP5{6️⃣ 應用 VIP 倍數<br/>━━━━━━━━━━━━}
-
-    STEP5 --> FINAL_CALC[final_points = weighted_points × vip_multiplier<br/>━━━━━━━━━━━━<br/>Example:<br/>• weighted_points = 10<br/>• vip_multiplier = 1.5 (Gold)<br/>• final_points = 10 × 1.5 = 15]
-
-    FINAL_CALC --> ROUND{7️⃣ 積分四捨五入<br/>━━━━━━━━━━━━}
-
-    ROUND --> ROUNDED[rounded_points = ROUND(final_points)<br/>━━━━━━━━━━━━<br/>Example:<br/>• final_points = 15.0<br/>• rounded_points = 15]
-
-    ROUNDED --> PROMO_CHECK{8️⃣ 促銷加成檢查<br/>━━━━━━━━━━━━}
-
-    PROMO_CHECK -->|有活動加成| PROMO_BOOST[應用促銷倍數<br/>━━━━━━━━━━━━<br/>Example:<br/>• 週末雙倍積分活動<br/>• promo_multiplier = 2.0<br/>• boosted_points = 15 × 2 = 30]
-
-    PROMO_CHECK -->|無加成| FINAL_POINTS[最終積分: 15]
-
-    PROMO_BOOST --> FINAL_POINTS_BOOSTED[最終積分: 30 (含促銷)]
-
-    FINAL_POINTS --> DB_UPDATE{9️⃣ 更新資料庫<br/>━━━━━━━━━━━━}
-    FINAL_POINTS_BOOSTED --> DB_UPDATE
-
-    DB_UPDATE --> TRANSACTION[創建積分交易記錄<br/>━━━━━━━━━━━━<br/>loyalty_point_transactions:<br/>• type: 'earn'<br/>• points: +15 (or +30)<br/>• balance_before: 1,000<br/>• balance_after: 1,015 (or 1,030)<br/>• source_type: 'game'<br/>• source_id: round_id]
-
-    TRANSACTION --> UPDATE_BALANCE[更新玩家積分餘額<br/>━━━━━━━━━━━━<br/>player_vip_status:<br/>• loyalty_points += 15<br/>• updated_at = NOW()]
-
-    UPDATE_BALANCE --> CHECK_MILESTONE{🔟 里程碑檢查<br/>━━━━━━━━━━━━}
-
-    CHECK_MILESTONE -->|達到整千倍數| MILESTONE_NOTIFY[觸發里程碑通知<br/>━━━━━━━━━━━━<br/>Example:<br/>• 積分達到 10,000<br/>• 發送祝賀站內信<br/>• 推薦兌換商品]
-
-    CHECK_MILESTONE -->|未達里程碑| NOTIFY_END[發送積分獲得通知<br/>━━━━━━━━━━━━<br/>• Push Notification:<br/>  "您獲得 15 積分"<br/>• 站內信 (可選)]
-
-    MILESTONE_NOTIFY --> NOTIFY_END
-
-    NOTIFY_END --> END[積分獲取流程結束]
-
-    %% 兌換流程分支
-    START2[玩家發起積分兌換] --> REDEEM_UI[選擇兌換項目<br/>━━━━━━━━━━━━<br/>Options:<br/>• 現金紅利: 100 積分 = $1<br/>• 免費旋轉: 50 積分 = 10 spins<br/>• iPhone 15 Pro: 500,000 積分<br/>• 豪華旅遊: 1,000,000 積分]
-
-    REDEEM_UI --> REDEEM_REQ[提交兌換請求<br/>━━━━━━━━━━━━<br/>RedeemRequest:<br/>• player_id<br/>• item_id<br/>• required_points: 100<br/>• item_type: CASH_BONUS]
-
-    REDEEM_REQ --> REDEEM_VALIDATE{兌換驗證<br/>━━━━━━━━━━━━}
-
-    REDEEM_VALIDATE --> VAL_BALANCE{積分餘額檢查}
-    VAL_BALANCE -->|餘額不足| REJECT_INSUFFICIENT[拒絕: 積分不足<br/>━━━━━━━━━━━━<br/>current_balance: 80<br/>required: 100<br/>shortage: 20<br/>Actions:<br/>• 返回錯誤提示<br/>• 推薦其他商品]
-
-    VAL_BALANCE -->|餘額充足| VAL_STOCK{庫存檢查}
-    VAL_STOCK -->|實體商品缺貨| REJECT_STOCK[拒絕: 庫存不足<br/>━━━━━━━━━━━━<br/>Actions:<br/>• 返回缺貨提示<br/>• 推薦替代商品<br/>• 加入補貨通知]
-
-    VAL_STOCK -->|庫存充足| VAL_QUOTA{兌換限額檢查}
-    VAL_QUOTA -->|超過限額| REJECT_QUOTA[拒絕: 超過兌換限額<br/>━━━━━━━━━━━━<br/>Example:<br/>• 每日最多兌換 5 次<br/>• 已兌換 5 次<br/>Actions:<br/>• 返回限額提示]
-
-    VAL_QUOTA -->|未超限額| REDEEM_EXECUTE[✅ 執行兌換<br/>━━━━━━━━━━━━]
-
-    REDEEM_EXECUTE --> LOCK_POINTS[鎖定積分<br/>━━━━━━━━━━━━<br/>BEGIN TRANSACTION<br/>SELECT * FROM player_vip_status<br/>WHERE player_id = X<br/>FOR UPDATE]
-
-    LOCK_POINTS --> DEDUCT_POINTS[扣除積分<br/>━━━━━━━━━━━━<br/>UPDATE player_vip_status<br/>SET loyalty_points = loyalty_points - 100<br/>WHERE player_id = X]
-
-    DEDUCT_POINTS --> CREATE_REDEEM_TX[創建兌換記錄<br/>━━━━━━━━━━━━<br/>loyalty_point_transactions:<br/>• type: 'redeem'<br/>• points: -100<br/>• balance_before: 1,015<br/>• balance_after: 915<br/>• redeem_item_id<br/>• redeem_item_name: "現金紅利"<br/>• redeem_item_value: $1]
-
-    CREATE_REDEEM_TX --> FULFILL{兌換類型履行<br/>━━━━━━━━━━━━}
-
-    FULFILL -->|現金/紅利| WALLET_CREDIT[錢包加款<br/>━━━━━━━━━━━━<br/>wallet_service.creditBonus($1)<br/>或 creditCash($1)]
-
-    FULFILL -->|免費旋轉| TOKEN_ISSUE[發放 Token<br/>━━━━━━━━━━━━<br/>token_service.issueSpins(10)<br/>綁定遊戲 + 有效期]
-
-    FULFILL -->|實體獎品| ORDER_CREATE[創建訂單<br/>━━━━━━━━━━━━<br/>redemption_orders:<br/>• 收集收貨地址<br/>• 生成訂單號<br/>• 狀態: PENDING_SHIPMENT<br/>• 整合物流系統]
-
-    WALLET_CREDIT --> COMMIT[COMMIT TRANSACTION]
-    TOKEN_ISSUE --> COMMIT
-    ORDER_CREATE --> COMMIT
-
-    COMMIT --> NOTIFY_REDEEM[發送兌換成功通知<br/>━━━━━━━━━━━━<br/>• 站內信<br/>• Push Notification<br/>• Email (實體獎品)<br/>• SMS (實體獎品物流)]
-
-    NOTIFY_REDEEM --> END2[兌換流程結束]
-
-    REJECT_FROZEN --> END
-    REJECT_GAME --> END
-    REJECT_BONUS --> END
-    REJECT_TURNOVER --> END
-    REJECT_INSUFFICIENT --> END2
-    REJECT_STOCK --> END2
-    REJECT_QUOTA --> END2
-
-    %% 樣式定義
-    style CALC_START fill:#C8E6C9
-    style FINAL_POINTS fill:#81C784
-    style FINAL_POINTS_BOOSTED fill:#66BB6A
-    style REDEEM_EXECUTE fill:#C8E6C9
-    style COMMIT fill:#81C784
-    style REJECT_FROZEN fill:#FFCDD2
-    style REJECT_GAME fill:#FFCDD2
-    style REJECT_BONUS fill:#FFCDD2
-    style REJECT_TURNOVER fill:#FFCDD2
-    style REJECT_INSUFFICIENT fill:#FFCDD2
-    style REJECT_STOCK fill:#FFCDD2
-    style REJECT_QUOTA fill:#FFCDD2
+    %% Wiring End Points for Clean Layout
+    REJECT_FROZEN & REJECT_GAME & REJECT_BONUS & REJECT_TURNOVER -.-> END_EARN
+    REJECT_INSUFFICIENT & REJECT_STOCK & REJECT_QUOTA -.-> END_REDEEM
 ```
 
 **積分計算公式拆解**：
@@ -1025,7 +977,8 @@ CREATE TABLE vip_level_history (
 
 ### 技術架構參考
 - [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 數據庫設計
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 配置變更審批
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 配置變更審計
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 配置變更審批
 
 ---
 
