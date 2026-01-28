@@ -144,7 +144,13 @@
       "Bash(diff:*)",
       "Bash(tail:*)",
       "Bash(do if ! grep -q \"^\\\\*\\\\*文檔版本\\\\*\\\\*:\" \"$file\")",
-      "Bash(then echo \"$file\" fi done)"
+      "Bash(then echo \"$file\" fi done)",
+      "Bash(__NEW_LINE_7bc79ba3a7069787__ git commit -m \"$\\(cat <<''EOF''\nchore: cleanup local configs and update documentation\n\nConfiguration Updates:\n- Remove .claude/ralph-loop.local.md \\(local testing config\\)\n- Update .claude/settings.local.json \\(local IDE settings\\)\n- Update .gitignore: Add Python-specific ignore patterns \\(*.pyc, __pycache__, venv/\\)\n\nCode Updates:\n- Update automation/clawdbot/tools/file_access_guard.py: Minor refinements\n\nDocumentation Updates \\(IGaming\\):\n- Update 01_Player_Center/01-02_VIP_&_Loyalty_System.md\n- Update 02_Finance_Center/02-02_Payment_Gateway_Integration.md\n- Update 02_Finance_Center/02-03_Reconciliation_System.md\n- Update 02_Finance_Center/02-07_Transaction_Processing_Flow.md\n- Update 03_Game_Center/03-03_Seamless_Wallet_Analysis.md\n- Update 04_Activity_Center/04-01_Activity_System_Design.md\n- Update 05_Risk_Management/05-01_Risk_Control_System.md\n- Update 06_Agent_Center/06-02_Credit_Network_Logic.md\n- Update 07_Platform_Management/07-04_Data_Pipeline_Architecture.md\n\nContext: Cleanup and documentation refinements following Orchestrator implementation\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(__NEW_LINE_5844b91950f929a6__ echo \"Pushing all commits to remote...\")",
+      "Bash(__NEW_LINE_5844b91950f929a6__ echo \"\")",
+      "Bash(git check-ignore:*)",
+      "Bash(lsof:*)",
+      "Bash(git rebase:*)"
     ]
   },
   "allowedCommands": {
