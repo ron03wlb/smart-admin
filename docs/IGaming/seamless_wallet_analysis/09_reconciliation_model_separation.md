@@ -1,0 +1,129 @@
+# 對帳模型區分設計
+
+## 問題來源
+文檔第 5.2 節第 315-323 行將「遊戲交易對帳」和「存提款對帳」混為一談。
+
+**原文**:
+> 三方對帳模型：
+> - 方 1：營運商帳本
+> - 方 2：供應商報表
+> - 方 3：支付網關/銀行（針對存提款的實際資金流動）
+
+## 核心問題
+
+### 概念混淆
+將兩個**完全不同**的業務場景混在一起：
+
+| 對比項 | 遊戲交易對帳 | 存提款對帳 |
+|-------|------------|----------|
+| **涉及方數量** | 2 方 | 3 方 |
+| **對帳對象** | 營運商 ←→ GP | 營運商 ←→ 支付網關 ←→ 銀行 |
+| **資金性質** | 虛擬貨幣 | 真實貨幣（法幣） |
+| **對帳頻率** | 實時/每小時 | 每日/每週 |
+| **匹配欄位** | transaction_id | 金額 + 時間 |
+| **差異原因** | API 超時、掉單 | 銀行延遲、手續費 |
+
+## 正確的對帳模型
+
+### 模型 1: 遊戲交易對帳（雙方對帳）
+
+```mermaid
+graph LR
+    A[營運商<br/>Wallet Transactions] -->|比對| C{對帳引擎}
+    B[GP<br/>Provider Report] -->|比對| C
+    C -->|一致| D[✅ 對帳通過]
+    C -->|差異| E[❌ 差異報告]
+```
+
+**對帳邏輯**:
+```java
+public ReconciliationReport reconcileGameTransactions(LocalDate date) {
+    // 方 1: 營運商記錄
+    List<WalletTransaction> operatorTxns = db.query("...");
+
+    // 方 2: GP 報表
+    List<ProviderTransaction> providerTxns = fetchProviderReport(date);
+
+    // 比對 transaction_id
+    Set<String> operatorIds = operatorTxns.stream()
+        .map(WalletTransaction::getTransactionId)
+        .collect(Collectors.toSet());
+
+    Set<String> providerIds = providerTxns.stream()
+        .map(ProviderTransaction::getTransactionId)
+        .collect(Collectors.toSet());
+
+    // 找出差異
+    Set<String> missingInProvider = Sets.difference(operatorIds, providerIds);
+    Set<String> missingInOperator = Sets.difference(providerIds, operatorIds);
+
+    return ReconciliationReport.builder()
+        .date(date)
+        .missingInProvider(missingInProvider)  // 需要 Rollback
+        .missingInOperator(missingInOperator)  // 需要 Resettle
+        .build();
+}
+```
+
+### 模型 2: 存提款對帳（三方對帳）
+
+```mermaid
+graph TD
+    A[營運商<br/>財務系統] -->|比對| D{財務對帳引擎}
+    B[支付網關<br/>Stripe/Adyen] -->|比對| D
+    C[銀行對帳單<br/>Bank Statement] -->|比對| D
+    D -->|一致| E[✅ 財務結算]
+    D -->|差異| F[❌ 需人工查證]
+```
+
+**對帳邏輯**:
+```java
+public FinancialReconciliationReport reconcilePayments(LocalDate date) {
+    // 方 1: 營運商財務記錄
+    List<DepositWithdrawal> operatorRecords = db.query("...");
+
+    // 方 2: 支付網關報表
+    List<GatewayTransaction> gatewayRecords = stripeApi.fetchTransactions(date);
+
+    // 方 3: 銀行對帳單
+    List<BankStatement> bankStatements = importBankStatements(date);
+
+    // 三方比對（基於金額 + 時間）
+    // 比 transaction_id 複雜，因為可能沒有統一的 ID
+    // ...
+
+    return FinancialReconciliationReport.builder()
+        .date(date)
+        .totalDeposits(...)
+        .totalWithdrawals(...)
+        .discrepancies(...)
+        .build();
+}
+```
+
+## 正確的文檔結構
+
+文檔應該分成兩節：
+
+### 5.2.1 遊戲交易對帳（雙方對帳）
+- 涉及: 營運商 + GP
+- 資金: 虛擬貨幣（遊戲積分）
+- 頻率: 實時/每小時
+- 方法: transaction_id 匹配
+
+### 5.2.2 存提款對帳（三方對帳）
+- 涉及: 營運商 + 支付網關 + 銀行
+- 資金: 真實貨幣（法幣）
+- 頻率: 每日/每週
+- 方法: 金額 + 時間匹配
+
+## 決策總結
+
+✅ **正確理解**:
+- 遊戲交易 = 雙方對帳（不涉及銀行）
+- 存提款 = 三方對帳（涉及銀行）
+- 兩者是獨立的對帳流程
+
+❌ **錯誤理解**:
+- 將支付網關/銀行納入遊戲交易對帳
+- 混淆虛擬貨幣和真實貨幣的對帳邏輯

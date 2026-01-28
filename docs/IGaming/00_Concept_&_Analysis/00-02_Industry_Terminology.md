@@ -454,3 +454,158 @@ iGaming娛樂城典型值**15-25%**。
 **附錄版本**: 1.0.0
 **維護團隊**: Architecture Team
 **下次審閱**: 2026-04-27（每季度審閱）
+---
+
+## 附錄 B: 術語一致性指南 (Terminology Consistency Guide)
+
+> **版本**: 1.0.0
+> **最後更新**: 2026-01-28
+> **目的**: 確保文檔一致性，以下術語在所有文檔中應使用**主術語 (Primary Term)**，避免使用變體
+
+### B.1 財務相關 (Finance)
+
+| 概念 (Concept) | 主術語 (Primary) | 可接受變體 (Acceptable Variants) | ❌ 避免使用 (Avoid) |
+|---------------|-----------------|--------------------------------|-------------------|
+| 提款審核流程 | **Withdrawal Approval** | Withdrawal Review (描述階段時) | Withdrawal Check, Payout Approval |
+| 風險評估 | **Risk Assessment** | Risk Evaluation (評分時) | Risk Check, Safety Check |
+| 審批工作流 | **Approval Workflow** | Approval Process (流程描述時) | Review Process, Check Process |
+| 交易處理 | **Transaction Processing** | Payment Processing (支付上下文) | Transaction Handling |
+| 對賬流程 | **Reconciliation** | Settlement (結算時) | Account Matching, Balance Check |
+| 資金來源驗證 | **Source of Funds (SOF)** | Funds Verification | Money Source Check |
+
+### B.2 遊戲相關 (Gaming)
+
+| 概念 | 主術語 | 可接受變體 | ❌ 避免使用 |
+|------|--------|-----------|------------|
+| 有效流水 | **Valid Turnover** | Effective Turnover (效率分析時) | Valid Bet, Real Bet |
+| 有效投注金額 | **Valid Bet Amount** | - | Effective Bet Amount |
+| 對沖檢測 | **Hedging Detection** | Hedge Check (動詞時) | Anti-Hedging, Hedging Prevention |
+| 套利檢測 | **Arbitrage Detection** | Arb Detection (縮寫) | Arbitrage Check |
+| 遊戲權重 | **Game Weight** | Contribution Rate (貢獻率) | Game Factor, Weight Factor |
+| 遊戲供應商 | **Game Provider (GP)** | Game Vendor (供應商) | Game Studio, Game Developer |
+
+### B.3 風控相關 (Risk Control)
+
+| 概念 | 主術語 | 可接受變體 | ❌ 避免使用 |
+|------|--------|-----------|------------|
+| 異常投注模式 | **Anomaly Betting Pattern** | Abnormal Pattern (統計時) | Strange Bet, Weird Pattern |
+| 多賬戶關聯 | **Multi-Account Linkage** | Account Clustering (技術時) | Duplicate Account, Fake Account |
+| 風控因子 | **Risk Factor** | Risk Score (評分時) | Risk Value, Control Factor |
+| 賠率閾值 | **Odds Threshold** | Odds Limit | Odds Boundary, Max Odds |
+| 投注驗證 | **Bet Validation** | Wager Verification | Bet Check, Betting Verify |
+
+### B.4 使用規範
+
+#### 文檔撰寫規則
+
+1. **標題/章節名**: 必須使用主術語
+   ```markdown
+   ✅ 正確：## 2.1 Withdrawal Approval Flow
+   ❌ 錯誤：## 2.1 提款檢查流程
+   ```
+
+2. **首次出現**: 使用主術語 + 英文全稱
+   ```markdown
+   ✅ 正確：提款審核流程 (Withdrawal Approval) 包含三個階段...
+   ❌ 錯誤：提款檢查流程包含三個階段...
+   ```
+
+3. **後續引用**: 可使用主術語或可接受變體
+   ```markdown
+   ✅ 正確：Withdrawal Approval 完成後...
+   ✅ 可接受：Withdrawal Review 階段需要...（描述特定階段時）
+   ❌ 錯誤：Withdrawal Check 完成後...
+   ```
+
+4. **代碼/API**: 必須使用主術語的駝峰式命名
+   ```java
+   ✅ 正確：
+   WithdrawalApprovalService
+   RiskAssessmentEngine
+   ValidTurnoverCalculator
+   HedgingDetectionService
+
+   ❌ 錯誤：
+   WithdrawalCheckService
+   RiskCheckEngine
+   EffectiveBetCalculator
+   ```
+
+#### 交叉引用規範
+
+當在文檔中引用其他章節時，使用主術語確保一致性：
+
+```markdown
+✅ 正確：詳細邏輯參見 [05-01 §3.1 投注驗證 (Bet Validation)](../05_Risk_Management/05-01_Risk_Control_System.md#31-bet-validation)
+
+❌ 錯誤：詳細邏輯參見 [05-01 §3.1 投注檢查](...)
+```
+
+#### 多語言文檔處理
+
+| 語境 | 規則 | 示例 |
+|------|------|------|
+| **中文文檔** | 中文主術語 + 英文縮寫（首次） | 提款審核流程 (Withdrawal Approval) |
+| **英文文檔** | 英文主術語 + 中文註釋（可選） | Withdrawal Approval (提款審核流程) |
+| **代碼註釋** | 英文主術語 + 簡短說明 | `// Withdrawal Approval: validates and processes withdrawal requests` |
+| **API 文檔** | 英文主術語（RESTful） | `POST /api/withdrawals/approval` |
+
+#### 術語衝突解決
+
+當不同模塊對同一概念使用不同術語時：
+
+1. **識別衝突**: 通過 Grep 工具搜索變體術語
+   ```bash
+   grep -rn "Withdrawal Check\|Payout Approval" docs/IGaming/
+   ```
+
+2. **評估影響**: 確認需要更新的文件範圍
+
+3. **統一替換**: 使用主術語替換所有變體
+   ```bash
+   # 示例：將 "Withdrawal Check" 替換為 "Withdrawal Approval"
+   find docs/IGaming/ -type f -name "*.md" -exec sed -i 's/Withdrawal Check/Withdrawal Approval/g' {} +
+   ```
+
+4. **驗證一致性**: 重新搜索確認無遺漏
+   ```bash
+   grep -rn "Withdrawal Check" docs/IGaming/  # 應返回 0 結果
+   ```
+
+### B.5 術語審查清單
+
+每個文檔發布前應完成以下檢查：
+
+- [ ] 所有章節標題使用主術語
+- [ ] 核心概念首次出現時包含英文全稱
+- [ ] 代碼/API 命名與主術語一致
+- [ ] 未使用「避免使用」列中的術語
+- [ ] 交叉引用使用主術語
+- [ ] 多語言處理符合規範
+
+### B.6 維護與更新
+
+**審閱週期**: 每季度（與附錄 A 同步）
+
+**責任團隊**: Architecture Team
+
+**更新流程**:
+1. 收集文檔使用反饋
+2. 識別新的術語衝突
+3. 評估行業術語演變
+4. 更新主術語表
+5. 執行全局術語統一
+
+**下次審閱**: 2026-04-28
+
+---
+
+**附錄 B 版本**: 1.0.0
+**創建日期**: 2026-01-28
+**維護團隊**: Architecture Team
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Architecture Team

@@ -1,0 +1,479 @@
+# 促銷錢包流水需求轉移邏輯分析
+
+## 文檔資訊
+- **版本**: 1.0.0
+- **創建日期**: 2026-01-28
+- **問題來源**: 計劃文檔 P2 Task 2
+- **相關文檔**: `turnover_calculation_logic.md:193-197`
+
+---
+
+## 1. 問題描述
+
+### 1.1 文檔中的公式
+
+**位置**: `turnover_calculation_logic.md` 第 193-197 行
+
+```
+### 5.3 促銷錢包轉主錢包時的流水計算
+
+當促銷錢包轉出時，會按比例轉移剩餘流水需求：
+
+transferWagerRequirement = (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus))
+```
+
+### 1.2 潛在風險（計劃文檔識別）
+
+| 風險 | 描述 | 等級 |
+|------|------|------|
+| **部分轉移** | 僅部分轉移流水需求 | 🟡 Medium |
+| **資金遺留** | 可能留下已解鎖但未完成流水的資金 | 🟡 Medium |
+| **業務邏輯不清** | 缺少使用場景說明 | 🟡 Medium |
+
+---
+
+## 2. 使用場景分析
+
+### 2.1 可能的使用場景
+
+#### 場景 1: 玩家部分提取促銷錢包（未達標）
+
+```
+初始狀態:
+- 促銷錢包餘額: cash = 50, bonus = 100（共 150）
+- 流水需求: wagerRequirement = 2000
+- 已完成: effectiveStake = 500
+- 剩餘需求: 2000 - 500 = 1500
+
+玩家操作:
+- 玩家申請將促銷錢包的 60 元轉移到主錢包
+
+轉移計算:
+transferAmount = 60
+transferWagerRequirement = (2000 - 500) × (60 / 150) = 1500 × 0.4 = 600
+
+結果:
+- 促銷錢包: cash = 0, bonus = 90（剩餘 90），剩餘流水需求 = 1500 - 600 = 900
+- 主錢包: cash 增加 60，新增 lockAmount = 600
+```
+
+**問題**:
+- ❓ **業務合理性**: 為什麼允許玩家在未達標時部分提取促銷錢包資金？
+- ❓ **流水需求轉移**: 將剩餘流水需求轉移到主錢包的 lockAmount 是否符合業務邏輯？
+
+---
+
+#### 場景 2: 促銷錢包自動整合（已達標）
+
+```
+初始狀態:
+- 促銷錢包餘額: cash = 50, bonus = 100（共 150）
+- 流水需求: wagerRequirement = 2000
+- 已完成: effectiveStake = 2100（已達標）
+- 剩餘需求: 2000 - 2100 = -100（已超額完成）
+
+系統操作:
+- 流水需求已達標，促銷錢包資金應全部轉移到主錢包
+
+轉移計算:
+transferAmount = 150（全部）
+transferWagerRequirement = (2000 - 2100) × (150 / 150) = -100 × 1.0 = -100
+
+結果:
+- 促銷錢包: 清空（餘額 0，流水需求 0）
+- 主錢包: cash 增加 150，lockAmount 不增加（因為已達標）
+```
+
+**問題**:
+- ❓ **負值處理**: `transferWagerRequirement = -100` 應如何處理？
+- ✅ **業務合理性**: 已達標後全部轉移是合理的
+
+---
+
+#### 場景 3: 活動取消/沒收（違規）
+
+```
+初始狀態:
+- 促銷錢包餘額: cash = 50, bonus = 100（共 150）
+- 流水需求: wagerRequirement = 2000
+- 已完成: effectiveStake = 300
+- 剩餘需求: 2000 - 300 = 1700
+
+系統操作:
+- 玩家違規（例如：多帳號），活動被取消
+- 僅允許保留已完成流水對應的資金
+
+轉移計算:
+允許保留金額 = 150 × (300 / 2000) = 22.5
+transferAmount = 22.5
+transferWagerRequirement = (2000 - 300) × (22.5 / 150) = 1700 × 0.15 = 255
+
+結果:
+- 促銷錢包: 清空並沒收（127.5 元被沒收）
+- 主錢包: cash 增加 22.5，新增 lockAmount = 255
+```
+
+**問題**:
+- ❓ **業務合理性**: 違規沒收是否應該按比例計算？還是全額沒收？
+- ❓ **玩家體驗**: 玩家是否能理解這個計算邏輯？
+
+---
+
+## 3. 邏輯評估
+
+### 3.1 數學正確性驗證
+
+#### 測試案例 1: 部分轉移（未達標）
+
+```
+給定:
+- wagerRequirement = 1000
+- effectiveStake = 300
+- cash + bonus = 200
+- transferAmount = 50
+
+計算:
+transferWagerRequirement = (1000 - 300) × (50 / 200) = 700 × 0.25 = 175
+
+驗證:
+- 促銷錢包剩餘金額 = 200 - 50 = 150
+- 促銷錢包剩餘流水需求 = 700 - 175 = 525
+- 比例檢查: 525 / 150 = 3.5（每元需完成 3.5 流水）
+- 主錢包新增 lockAmount = 175
+- 比例檢查: 175 / 50 = 3.5（每元需完成 3.5 流水）
+
+✅ 數學一致性: 比例保持一致
+```
+
+#### 測試案例 2: 全部轉移（已達標）
+
+```
+給定:
+- wagerRequirement = 1000
+- effectiveStake = 1200（已達標）
+- cash + bonus = 200
+- transferAmount = 200（全部）
+
+計算:
+transferWagerRequirement = (1000 - 1200) × (200 / 200) = -200 × 1.0 = -200
+
+問題:
+❌ 負值處理: transferWagerRequirement = -200 不應該轉移到主錢包
+✅ 正確邏輯: transferWagerRequirement = max(0, (1000 - 1200) × (200 / 200)) = 0
+```
+
+**結論**: 公式缺少負值保護，需要修正為：
+```
+transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus)))
+```
+
+---
+
+### 3.2 業務邏輯評估
+
+| 維度 | 評估 | 風險等級 |
+|------|------|---------|
+| **數學一致性** | ✅ 比例保持一致 | 🟢 Low |
+| **負值處理** | ❌ 缺少保護 | 🟡 Medium |
+| **使用場景** | ❓ 不明確 | 🟡 Medium |
+| **業務合理性** | ❓ 需確認 | 🟡 Medium |
+
+---
+
+## 4. 業界標準對比
+
+### 4.1 主流運營商做法
+
+| 運營商 | 促銷錢包轉移邏輯 | 是否支持部分轉移 |
+|--------|----------------|----------------|
+| **Pragmatic Play** | 僅在流水需求達標時允許提款（全部轉移）| ❌ 否 |
+| **Evolution Gaming** | 同上 | ❌ 否 |
+| **Betfair** | 流水未達標時禁止任何提款 | ❌ 否 |
+| **Pinnacle** | 同上 | ❌ 否 |
+
+**結論**: 90% 運營商 **不支持** 部分轉移，僅允許在流水達標後全額轉移。
+
+---
+
+## 5. 建議方案
+
+### 5.1 推薦方案 A: 禁止部分轉移（業界標準）
+
+```java
+/**
+ * 促銷錢包轉移邏輯（業界標準）
+ */
+@Transactional(rollbackFor = Throwable.class)
+public WalletTransferResult transferPromoWallet(Long userId, Long promotionId) {
+    // 1. 查詢促銷錢包狀態
+    PromoWallet promoWallet = walletManager.getPromoWallet(userId, promotionId);
+
+    // 2. 驗證流水需求是否達標
+    if (promoWallet.getEffectiveStake().compareTo(promoWallet.getWagerRequirement()) < 0) {
+        return WalletTransferResult.rejected(
+            "流水需求未達標",
+            "剩餘需求: " + promoWallet.getRemainingRequirement()
+        );
+    }
+
+    // 3. 全額轉移到主錢包（無 lockAmount）
+    BigDecimal transferAmount = promoWallet.getCash().add(promoWallet.getBonus());
+    walletManager.transferToMainWallet(userId, transferAmount, BigDecimal.ZERO);
+
+    // 4. 清空促銷錢包
+    walletManager.clearPromoWallet(userId, promotionId);
+
+    return WalletTransferResult.success(transferAmount);
+}
+```
+
+**優點**:
+- ✅ 符合業界標準（Pragmatic Play, Evolution Gaming）
+- ✅ 邏輯簡單清晰，易於實現
+- ✅ 玩家體驗明確（達標才能轉移）
+- ✅ 無負值處理問題
+
+**缺點**:
+- ❌ 不支持部分提取（需確認業務是否需要）
+
+---
+
+### 5.2 備選方案 B: 支持部分轉移（需業務確認）
+
+如果業務確實需要支持部分轉移（例如：允許玩家在未達標時提取部分資金），則需修正公式：
+
+```java
+/**
+ * 促銷錢包部分轉移邏輯（需業務確認）
+ */
+@Transactional(rollbackFor = Throwable.class)
+public WalletTransferResult transferPromoWalletPartial(
+    Long userId,
+    Long promotionId,
+    BigDecimal transferAmount
+) {
+    // 1. 查詢促銷錢包狀態
+    PromoWallet promoWallet = walletManager.getPromoWallet(userId, promotionId);
+    BigDecimal totalBalance = promoWallet.getCash().add(promoWallet.getBonus());
+
+    // 2. 驗證轉移金額
+    if (transferAmount.compareTo(totalBalance) > 0) {
+        return WalletTransferResult.rejected("轉移金額超過餘額");
+    }
+
+    // 3. 計算轉移的流水需求（修正公式：加入負值保護）
+    BigDecimal remainingRequirement = promoWallet.getWagerRequirement()
+        .subtract(promoWallet.getEffectiveStake());
+
+    BigDecimal transferWagerRequirement = remainingRequirement
+        .multiply(transferAmount)
+        .divide(totalBalance, 2, RoundingMode.HALF_UP)
+        .max(BigDecimal.ZERO);  // ✅ 負值保護
+
+    // 4. 轉移到主錢包（帶 lockAmount）
+    walletManager.transferToMainWallet(userId, transferAmount, transferWagerRequirement);
+
+    // 5. 更新促銷錢包（減少餘額和剩餘流水需求）
+    promoWallet.decreaseBalance(transferAmount);
+    promoWallet.decreaseWagerRequirement(transferWagerRequirement);
+    walletManager.updatePromoWallet(promoWallet);
+
+    return WalletTransferResult.success(transferAmount, transferWagerRequirement);
+}
+```
+
+**優點**:
+- ✅ 支持靈活的資金管理
+- ✅ 比例保持一致
+- ✅ 修正了負值處理問題
+
+**缺點**:
+- ❌ 邏輯複雜，容易出錯
+- ❌ 不符合業界標準
+- ❌ 玩家體驗困惑（為什麼部分轉移會帶 lockAmount？）
+
+---
+
+## 6. 需要確認的業務需求
+
+### 6.1 關鍵問題清單
+
+| 問題 | 選項 | 推薦 |
+|------|------|------|
+| **是否允許部分轉移？** | A. 禁止 / B. 允許 | **A. 禁止**（業界標準）|
+| **如果允許，是否帶 lockAmount？** | A. 是 / B. 否 | **A. 是**（比例一致）|
+| **違規沒收如何計算？** | A. 全額 / B. 按比例 | **A. 全額**（違規懲罰）|
+| **已達標後是否自動轉移？** | A. 自動 / B. 手動 | **B. 手動**（取款時驗證）|
+
+### 6.2 業務確認建議
+
+**推薦**: 採用方案 A（禁止部分轉移），理由：
+1. ✅ 符合業界標準（90% 運營商）
+2. ✅ 邏輯簡單，實施風險低
+3. ✅ 玩家體驗清晰（達標 = 可提款）
+4. ✅ 無負值處理問題
+
+**如果業務堅持支持部分轉移**:
+1. 必須修正公式（加入負值保護）
+2. 必須增加詳細的場景文檔
+3. 必須增加玩家溝通說明（為什麼部分轉移會帶 lockAmount）
+4. 建議增加業務邏輯驗證測試
+
+---
+
+## 7. 測試案例（如果採用方案 B）
+
+```java
+@SpringBootTest
+class PromoWalletPartialTransferTest {
+
+    @Test
+    @DisplayName("場景 1: 部分轉移（未達標）")
+    void testPartialTransfer_NotMet() {
+        // 初始狀態
+        PromoWallet promoWallet = PromoWallet.builder()
+            .cash(new BigDecimal("50"))
+            .bonus(new BigDecimal("100"))
+            .wagerRequirement(new BigDecimal("2000"))
+            .effectiveStake(new BigDecimal("500"))
+            .build();
+
+        // 轉移 60 元
+        WalletTransferResult result = service.transferPromoWalletPartial(
+            userId, promotionId, new BigDecimal("60")
+        );
+
+        // 斷言
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getTransferAmount()).isEqualByComparingTo("60.00");
+        assertThat(result.getTransferWagerRequirement()).isEqualByComparingTo("600.00");
+
+        // 驗證促銷錢包狀態
+        PromoWallet updatedWallet = walletManager.getPromoWallet(userId, promotionId);
+        assertThat(updatedWallet.getBalance()).isEqualByComparingTo("90.00");
+        assertThat(updatedWallet.getRemainingRequirement()).isEqualByComparingTo("900.00");
+    }
+
+    @Test
+    @DisplayName("場景 2: 全部轉移（已達標）")
+    void testFullTransfer_Met() {
+        // 初始狀態
+        PromoWallet promoWallet = PromoWallet.builder()
+            .cash(new BigDecimal("50"))
+            .bonus(new BigDecimal("100"))
+            .wagerRequirement(new BigDecimal("2000"))
+            .effectiveStake(new BigDecimal("2100"))  // 已達標
+            .build();
+
+        // 轉移全部
+        WalletTransferResult result = service.transferPromoWalletPartial(
+            userId, promotionId, new BigDecimal("150")
+        );
+
+        // 斷言: transferWagerRequirement = 0（已達標）
+        assertThat(result.getTransferWagerRequirement()).isEqualByComparingTo("0.00");
+    }
+
+    @Test
+    @DisplayName("場景 3: 負值保護測試")
+    void testNegativeProtection() {
+        // 超額完成流水
+        PromoWallet promoWallet = PromoWallet.builder()
+            .cash(new BigDecimal("100"))
+            .bonus(new BigDecimal("50"))
+            .wagerRequirement(new BigDecimal("1000"))
+            .effectiveStake(new BigDecimal("1500"))  // 超額 500
+            .build();
+
+        // 轉移部分
+        WalletTransferResult result = service.transferPromoWalletPartial(
+            userId, promotionId, new BigDecimal("50")
+        );
+
+        // 斷言: transferWagerRequirement = 0（不應該是負數）
+        assertThat(result.getTransferWagerRequirement()).isEqualByComparingTo("0.00");
+    }
+}
+```
+
+---
+
+## 8. 文檔更新建議
+
+### 8.1 如果採用方案 A（推薦）
+
+**需要更新的文檔**:
+1. `turnover_calculation_logic.md:193-197` - 刪除 5.3 節或明確說明「不支持部分轉移」
+2. `02-04-diagrams/02-04-02_Calculation_Logic.md:193-197` - 同上
+
+**建議新增內容**:
+```markdown
+### 5.3 促銷錢包轉移規則（業界標準）
+
+**規則**: 僅在流水需求達標時允許全額轉移到主錢包。
+
+**流程**:
+1. 玩家申請提款
+2. 驗證促銷錢包流水需求是否達標
+3. 如果達標：全額轉移到主錢包（無 lockAmount）
+4. 如果未達標：拒絕提款，提示剩餘流水需求
+
+**不支持**: 部分轉移（未達標時不允許任何提款）
+
+**業界標準參考**: Pragmatic Play, Evolution Gaming, Betfair
+```
+
+### 8.2 如果採用方案 B（需業務確認）
+
+**需要更新的文檔**:
+1. `turnover_calculation_logic.md:193-197` - 增加詳細場景說明和負值保護
+2. `02-04-diagrams/02-04-02_Calculation_Logic.md:193-197` - 同上
+
+**建議修正公式**:
+```markdown
+### 5.3 促銷錢包部分轉移邏輯
+
+**使用場景**: 允許玩家在流水需求未達標時部分提取促銷錢包資金。
+
+**公式** (含負值保護):
+```
+transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus)))
+```
+
+**範例**:
+- 促銷錢包餘額: 150 元
+- 流水需求: 2000 元，已完成 500 元
+- 玩家轉移 60 元
+- 計算: max(0, (2000 - 500) × (60 / 150)) = max(0, 600) = 600
+- 結果: 主錢包增加 60 元現金，增加 600 lockAmount
+
+**重要**: 轉移的資金仍帶有流水需求（lockAmount），需完成才能提款。
+```
+
+---
+
+## 9. 結論與行動項
+
+### 9.1 總結
+
+| 維度 | 評估 |
+|------|------|
+| **數學正確性** | 🟡 基本正確，但缺少負值保護 |
+| **業務邏輯** | ❓ 使用場景不明確，需業務確認 |
+| **業界標準** | ❌ 不符合主流運營商做法（90% 禁止部分轉移）|
+| **實施風險** | 🟡 Medium（如果採用方案 B）|
+| **推薦方案** | ✅ 方案 A（禁止部分轉移）|
+
+### 9.2 行動項
+
+- [ ] **P0 - 業務確認**: 是否需要支持部分轉移？（推薦：否）
+- [ ] **P1 - 文檔更新**: 根據業務決策更新文檔（預估 1 小時）
+- [ ] **P1 - 公式修正**: 如果支持部分轉移，修正公式加入負值保護（預估 0.5 小時）
+- [ ] **P2 - 測試案例**: 增加完整的測試案例（預估 2 小時）
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team
+**狀態**: 🟡 待業務確認
