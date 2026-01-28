@@ -211,121 +211,68 @@
 
 ## 推薦實現方案
 
-### 方案 1: 標準本金法（推薦）
+### 方案 1: 標準本金法（推薦）- v2.0.0 簡化版
 
-```java
-/**
- * 體育博彩 Valid Bet 計算（標準本金法）
- */
-@Service
-public class SportsValidBetCalculator {
+**核心邏輯** (偽代碼):
+```
+function calculateValidBet(settlement):
+    // 步驟 1: 賠率門檻檢查
+    if odds < MIN_ODDS_THRESHOLD:
+        return 0  // 賠率太低不計入
 
-    public BigDecimal calculateValidBet(SportsBetSettlement settlement) {
-        // 步驟 1: 檢查賠率門檻
-        if (!meetsOddsThreshold(settlement.getOdds())) {
-            return BigDecimal.ZERO;  // 賠率太低，不計入 Valid Bet
-        }
+    // 步驟 2: 結算狀態檢查
+    if status in [VOID, CANCELLED, PUSH]:
+        return 0  // 無風險承擔
 
-        // 步驟 2: 檢查結算狀態
-        SettlementStatus status = settlement.getStatus();
-
-        if (status == SettlementStatus.VOID ||
-            status == SettlementStatus.CANCELLED ||
-            status == SettlementStatus.PUSH) {
-            // 作廢/取消/退款 → 沒有承擔風險
-            return BigDecimal.ZERO;
-        }
-
-        // 步驟 3: 所有其他狀態（WIN, LOSE, HALF_WIN, HALF_LOSE）
-        // Valid Bet = 投注本金
-        return settlement.getBetAmount();
-    }
-
-    /**
-     * 檢查賠率是否滿足門檻
-     */
-    private boolean meetsOddsThreshold(BigDecimal odds) {
-        // 歐洲盤最低賠率: 1.50
-        BigDecimal minOddsDecimal = new BigDecimal("1.50");
-
-        // 香港盤最低賠率: 0.50
-        BigDecimal minOddsHK = new BigDecimal("0.50");
-
-        // 根據賠率格式判斷
-        if (odds.compareTo(BigDecimal.ONE) > 0) {
-            // 歐洲盤（> 1.00）
-            return odds.compareTo(minOddsDecimal) >= 0;
-        } else {
-            // 香港盤（0-1 之間）
-            return odds.compareTo(minOddsHK) >= 0;
-        }
-    }
-}
+    // 步驟 3: 所有其他狀態 (WIN, LOSE, HALF_WIN, HALF_LOSE)
+    return betAmount  // ✅ 標準本金法: 100% 本金
 ```
 
-### 方案 2: 賠率調整法（進階）
-
-```java
-/**
- * 體育博彩 Valid Bet 計算（賠率調整法）
- * 適用於 VIP 計畫或精細化的流水計算
- */
-@Service
-public class AdvancedSportsValidBetCalculator {
-
-    /**
-     * 賠率係數表（根據賠率範圍調整 Valid Bet）
-     */
-    private static final Map<Range<BigDecimal>, BigDecimal> ODDS_MULTIPLIERS =
-        Map.of(
-            // 超低賠率（1.01 - 1.20）→ 不計入或極低權重
-            Range.closed(new BigDecimal("1.01"), new BigDecimal("1.20")),
-            BigDecimal.ZERO,
-
-            // 低賠率（1.21 - 1.50）→ 部分計入
-            Range.closed(new BigDecimal("1.21"), new BigDecimal("1.50")),
-            new BigDecimal("0.50"),
-
-            // 正常賠率（1.51 - 2.00）→ 全額計入
-            Range.closed(new BigDecimal("1.51"), new BigDecimal("2.00")),
-            BigDecimal.ONE,
-
-            // 高賠率（2.01 - 5.00）→ 超額計入
-            Range.closed(new BigDecimal("2.01"), new BigDecimal("5.00")),
-            new BigDecimal("1.25"),
-
-            // 超高賠率（> 5.00）→ 封頂
-            Range.atLeast(new BigDecimal("5.01")),
-            new BigDecimal("1.50")
-        );
-
-    public BigDecimal calculateValidBet(SportsBetSettlement settlement) {
-        // 檢查結算狀態（VOID/CANCELLED/PUSH → 0）
-        if (isInvalidStatus(settlement.getStatus())) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal betAmount = settlement.getBetAmount();
-        BigDecimal odds = settlement.getOdds();
-
-        // 查找賠率係數
-        BigDecimal multiplier = ODDS_MULTIPLIERS.entrySet().stream()
-            .filter(entry -> entry.getKey().contains(odds))
-            .map(Map.Entry::getValue)
-            .findFirst()
-            .orElse(BigDecimal.ONE);
-
-        // Valid Bet = 本金 × 賠率係數
-        return betAmount.multiply(multiplier);
-    }
-
-    private boolean isInvalidStatus(SettlementStatus status) {
-        return status == SettlementStatus.VOID ||
-               status == SettlementStatus.CANCELLED ||
-               status == SettlementStatus.PUSH;
-    }
-}
+**配置參數**:
+```yaml
+sports_betting:
+  valid_bet:
+    min_odds:
+      decimal: 1.50    # 歐洲盤最低賠率
+      hongkong: 0.50   # 香港盤最低賠率
+    excluded_status:
+      - VOID           # 作廢
+      - CANCELLED      # 取消
+      - PUSH           # 退款
 ```
+
+**完整實現**: 參考 `SportsValidBetService.java` (實際代碼庫)
+
+### 方案 2: 賠率調整法（進階）- v2.0.0 簡化版
+
+> ⚠️ **不推薦**: 此方案複雜度高,且可能被玩家利用(選擇高倍率賠率刷流水)
+
+**核心邏輯** (偽代碼):
+```
+function calculateAdjustedValidBet(settlement):
+    // 步驟 1: 狀態檢查
+    if status in [VOID, CANCELLED, PUSH]:
+        return 0
+
+    // 步驟 2: 查找賠率係數
+    multiplier = lookupOddsMultiplier(odds)
+
+    // 步驟 3: 調整計算
+    return betAmount * multiplier
+```
+
+**賠率係數表**:
+| 賠率範圍 | 係數 | 說明 |
+|---------|------|------|
+| 1.01 - 1.20 | 0.0 | 超低賠率,不計入 |
+| 1.21 - 1.50 | 0.5 | 低賠率,部分計入 |
+| 1.51 - 2.00 | 1.0 | 正常賠率,全額計入 |
+| 2.01 - 5.00 | 1.25 | 高賠率,超額計入 |
+| > 5.00 | 1.5 | 超高賠率,封頂 |
+
+**配置參考**: 參見下方 `odds_multipliers` 配置
+
+**完整實現**: 參考 `AdvancedSportsValidBetService.java` (實際代碼庫)
 
 ## 配置化管理
 

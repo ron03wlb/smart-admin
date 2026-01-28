@@ -473,9 +473,9 @@ graph TD
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
 | 01-01 | [Player_Account_System.md](../01_Player_Center/01-01_Player_Account_System.md) | 玩家註冊、KYC、MFA | 67 |
-| 01-02 | [VIP_&_Loyalty_System.md](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) | VIP等級、忠誠度積分 | 44 ⚠️ |
+| 01-02 | [VIP_&_Loyalty_System.md](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) | VIP等級、忠誠度積分 | 987 ✅ |
 
-> ⚠️ **待擴充**：01-02 文檔較短，建議補充VIP權益詳細清單、積分計算規則
+> ✅ **已擴充** (v2.0.0): 01-02 文檔已大幅擴充,包含 VIP 權益詳細清單、積分計算規則、等級升降邏輯
 
 ---
 

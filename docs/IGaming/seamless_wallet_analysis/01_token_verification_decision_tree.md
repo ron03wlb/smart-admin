@@ -25,7 +25,7 @@
 結論: Result API 需要特殊處理
 ```
 
-## 決策樹
+## 決策樹 (v2.0.0 增強版 - 完整錯誤處理)
 
 ```mermaid
 graph TD
@@ -36,25 +36,65 @@ graph TD
     B -->|Result| E{遊戲類型?}
     B -->|Rollback| F{原因?}
 
+    %% Balance API 驗證流程
+    C --> C1{Token 解析}
+    C1 -->|成功| C2{簽名驗證}
+    C1 -->|失敗| ERR1[Error: INVALID_TOKEN_FORMAT]
+    C2 -->|成功| C3{過期檢查}
+    C2 -->|失敗| ERR2[Error: INVALID_SIGNATURE]
+    C3 -->|有效| C4{玩家存在?}
+    C3 -->|過期| ERR3[Error: TOKEN_EXPIRED]
+    C4 -->|存在| O[返回餘額]
+    C4 -->|不存在| ERR4[Error: PLAYER_NOT_FOUND]
+
+    %% Bet API 驗證流程
+    D --> D1{Token 解析}
+    D1 -->|成功| D2{簽名驗證}
+    D1 -->|失敗| ERR1
+    D2 -->|成功| D3{過期檢查}
+    D2 -->|失敗| ERR2
+    D3 -->|有效| D4{玩家存在?}
+    D3 -->|過期| ERR3
+    D4 -->|存在| D5{GP 授權?}
+    D4 -->|不存在| ERR4
+    D5 -->|授權| D6{用戶匹配?}
+    D5 -->|未授權| ERR5[Error: UNAUTHORIZED_GAME_PROVIDER]
+    D6 -->|匹配| P[執行扣款]
+    D6 -->|不匹配| ERR6[Error: USER_MISMATCH]
+
+    %% Result API 驗證流程
     E -->|短週期<br/>老虎機/輪盤| G[必須驗證 Token]
     E -->|長週期<br/>體育/撲克| H{Token 狀態?}
 
-    H -->|有效| I[正常處理]
+    G --> G1{Token 解析}
+    G1 -->|成功| G2{簽名驗證}
+    G1 -->|失敗| ERR1
+    G2 -->|成功| I[正常處理]
+    G2 -->|失敗| ERR2
+
+    H -->|有效| I
     H -->|過期| J{檢查 Bet 記錄}
+    H -->|解析失敗| ERR1
 
     J -->|Bet 存在<br/>且未結算| K[放寬驗證<br/>使用 round_id 驗證]
     J -->|Bet 不存在| L[拒絕請求]
+    J -->|Bet 已結算| ERR7[Error: BET_ALREADY_SETTLED]
 
+    K --> Q[執行派彩]
+    L --> R[Error: Invalid Session]
+
+    %% Rollback API 驗證流程
     F -->|超時重試| M[放寬驗證<br/>使用 transaction_id 驗證]
     F -->|對帳補單| N[放寬驗證<br/>需要管理員權限]
 
-    C --> O[返回餘額]
-    D --> P[執行扣款]
-    G --> I
-    K --> Q[執行派彩]
-    L --> R[Error: Invalid Session]
     M --> S[執行回滾]
-    N --> S
+    N --> N1{管理員 Token?}
+    N1 -->|有效| S
+    N1 -->|無效| ERR8[Error: INSUFFICIENT_PRIVILEGES]
+
+    %% 樣式定義
+    classDef errorStyle fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    class ERR1,ERR2,ERR3,ERR4,ERR5,ERR6,ERR7,ERR8,R,L errorStyle
 ```
 
 ## 推薦方案
@@ -74,83 +114,294 @@ graph TD
 public class TokenVerificationService {
 
     /**
-     * Bet 請求的 Token 驗證（嚴格模式）
+     * Bet 請求的 Token 驗證（嚴格模式 - v2.0.0 增強錯誤處理）
      */
-    public TokenValidationResult validateBetToken(String token, Long userId) {
-        // 步驟 1: 解析 Token
-        TokenClaims claims = jwtService.parseToken(token);
+    public TokenValidationResult validateBetToken(String token, Long userId, String gameProviderId) {
+        // 步驟 1: 解析 Token（捕獲格式錯誤）
+        TokenClaims claims;
+        try {
+            claims = jwtService.parseToken(token);
+        } catch (MalformedJwtException e) {
+            log.error("Invalid token format: {}", e.getMessage());
+            return TokenValidationResult.failed("INVALID_TOKEN_FORMAT",
+                "Token format is malformed or corrupted");
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported token type: {}", e.getMessage());
+            return TokenValidationResult.failed("INVALID_TOKEN_FORMAT",
+                "Token type is not supported");
+        }
 
-        // 步驟 2: 檢查過期
+        // 步驟 2: 簽名驗證（捕獲簽名錯誤）
+        try {
+            if (!jwtService.verifySignature(token)) {
+                log.error("Invalid signature for token: {}", token.substring(0, 20));
+                return TokenValidationResult.failed("INVALID_SIGNATURE",
+                    "Token signature verification failed");
+            }
+        } catch (SignatureException e) {
+            log.error("Signature verification error: {}", e.getMessage());
+            return TokenValidationResult.failed("INVALID_SIGNATURE",
+                "Token signature is invalid or tampered");
+        }
+
+        // 步驟 3: 檢查過期
         if (claims.isExpired()) {
-            return TokenValidationResult.failed("TOKEN_EXPIRED");
+            log.warn("Token expired for user {}, expired at: {}", userId, claims.getExpiredAt());
+            return TokenValidationResult.failed("TOKEN_EXPIRED",
+                String.format("Token expired at %s", claims.getExpiredAt()));
         }
 
-        // 步驟 3: 檢查用戶匹配
+        // 步驟 4: 檢查玩家是否存在
+        Player player = playerRepository.findById(claims.getUserId()).orElse(null);
+        if (player == null) {
+            log.error("Player not found: {}", claims.getUserId());
+            return TokenValidationResult.failed("PLAYER_NOT_FOUND",
+                "Player account does not exist or has been deleted");
+        }
+
+        // 步驟 5: 檢查遊戲供應商授權
+        if (!gameProviderService.isAuthorized(gameProviderId, player.getId())) {
+            log.error("Unauthorized game provider {} for player {}", gameProviderId, player.getId());
+            return TokenValidationResult.failed("UNAUTHORIZED_GAME_PROVIDER",
+                String.format("Player is not authorized to play games from provider %s", gameProviderId));
+        }
+
+        // 步驟 6: 檢查用戶匹配
         if (!claims.getUserId().equals(userId)) {
-            return TokenValidationResult.failed("USER_MISMATCH");
+            log.error("User ID mismatch: token={}, request={}", claims.getUserId(), userId);
+            return TokenValidationResult.failed("USER_MISMATCH",
+                "Token user ID does not match request user ID");
         }
 
-        // 步驟 4: 檢查黑名單（Redis）
+        // 步驟 7: 檢查黑名單（Redis）
         if (redisService.isTokenBlacklisted(token)) {
-            return TokenValidationResult.failed("TOKEN_REVOKED");
+            log.warn("Token is blacklisted: {}", token.substring(0, 20));
+            return TokenValidationResult.failed("TOKEN_REVOKED",
+                "Token has been revoked by user or administrator");
         }
 
-        return TokenValidationResult.success(claims);
+        // 步驟 8: 檢查玩家狀態
+        if (player.getStatus() == PlayerStatus.BLOCKED) {
+            log.warn("Player account blocked: {}", player.getId());
+            return TokenValidationResult.failed("PLAYER_BLOCKED",
+                "Player account is blocked or suspended");
+        }
+
+        return TokenValidationResult.success(claims, player);
     }
 
     /**
-     * Result 請求的 Token 驗證（寬鬆模式）
+     * Result 請求的 Token 驗證（寬鬆模式 - v2.0.0 增強錯誤處理）
      */
     public TokenValidationResult validateResultToken(
         String token,
         String roundId,
         String betTransactionId,
-        GameType gameType
+        GameType gameType,
+        String gameProviderId
     ) {
         // 短週期遊戲：嚴格驗證
         if (gameType.isShortLived()) {
-            return validateBetToken(token, extractUserId(token));
+            Long userId;
+            try {
+                userId = extractUserId(token);
+            } catch (Exception e) {
+                log.error("Failed to extract user ID from token: {}", e.getMessage());
+                return TokenValidationResult.failed("INVALID_TOKEN_FORMAT",
+                    "Cannot extract user ID from token");
+            }
+            return validateBetToken(token, userId, gameProviderId);
         }
 
         // 長週期遊戲：嘗試驗證 Token
-        TokenClaims claims = jwtService.parseToken(token);
+        TokenClaims claims;
+        try {
+            claims = jwtService.parseToken(token);
+        } catch (MalformedJwtException e) {
+            // Token 格式錯誤 → 直接使用備用驗證
+            log.warn("Token format invalid for Result API, using fallback: {}", e.getMessage());
+            return fallbackVerificationByRound(roundId, betTransactionId, gameProviderId);
+        } catch (Exception e) {
+            log.error("Unexpected error parsing token: {}", e.getMessage());
+            return TokenValidationResult.failed("INVALID_TOKEN_FORMAT",
+                "Token parsing failed with unexpected error");
+        }
 
         if (!claims.isExpired()) {
-            // Token 仍然有效 → 正常驗證
-            return validateBetToken(token, claims.getUserId());
+            // Token 仍然有效 → 正常驗證（含簽名驗證）
+            try {
+                return validateBetToken(token, claims.getUserId(), gameProviderId);
+            } catch (Exception e) {
+                log.error("Token validation failed, falling back to round verification: {}", e.getMessage());
+                return fallbackVerificationByRound(roundId, betTransactionId, gameProviderId);
+            }
         }
 
         // Token 已過期 → 使用備用驗證
         log.warn("Token expired for Result API, fallback to round verification");
+        return fallbackVerificationByRound(roundId, betTransactionId, gameProviderId);
+    }
 
+    /**
+     * 備用驗證邏輯 - 基於 round_id 和 bet_transaction_id (v2.0.0 新增)
+     */
+    private TokenValidationResult fallbackVerificationByRound(
+        String roundId,
+        String betTransactionId,
+        String gameProviderId
+    ) {
         // 步驟 1: 檢查 Bet 記錄是否存在
         BetTransaction betTx = transactionRepository
             .findByTransactionId(betTransactionId)
             .orElse(null);
 
         if (betTx == null) {
-            return TokenValidationResult.failed("BET_NOT_FOUND");
+            log.error("Bet transaction not found: {}", betTransactionId);
+            return TokenValidationResult.failed("BET_NOT_FOUND",
+                String.format("Bet transaction %s does not exist", betTransactionId));
         }
 
         // 步驟 2: 驗證 round_id 匹配
         if (!betTx.getRoundId().equals(roundId)) {
-            return TokenValidationResult.failed("ROUND_MISMATCH");
+            log.error("Round ID mismatch: bet={}, request={}", betTx.getRoundId(), roundId);
+            return TokenValidationResult.failed("ROUND_MISMATCH",
+                String.format("Round ID mismatch: expected %s, got %s", betTx.getRoundId(), roundId));
         }
 
         // 步驟 3: 檢查 Bet 狀態（必須是未結算）
-        if (betTx.getStatus() != TransactionStatus.UNSETTLED) {
-            return TokenValidationResult.failed("BET_ALREADY_SETTLED");
+        if (betTx.getStatus() == TransactionStatus.SETTLED) {
+            log.error("Bet already settled: {}", betTransactionId);
+            return TokenValidationResult.failed("BET_ALREADY_SETTLED",
+                "Bet has already been settled, cannot process result again");
         }
 
-        // 步驟 4: 重建用戶上下文
+        if (betTx.getStatus() == TransactionStatus.CANCELLED) {
+            log.error("Bet was cancelled: {}", betTransactionId);
+            return TokenValidationResult.failed("BET_CANCELLED",
+                "Bet was cancelled, cannot process result");
+        }
+
+        // 步驟 4: 檢查玩家是否存在
+        Player player = playerRepository.findById(betTx.getUserId()).orElse(null);
+        if (player == null) {
+            log.error("Player not found for bet transaction: {}", betTx.getUserId());
+            return TokenValidationResult.failed("PLAYER_NOT_FOUND",
+                "Player account associated with this bet no longer exists");
+        }
+
+        // 步驟 5: 檢查遊戲供應商授權
+        if (!betTx.getGameProviderId().equals(gameProviderId)) {
+            log.error("Game provider mismatch: bet={}, request={}",
+                betTx.getGameProviderId(), gameProviderId);
+            return TokenValidationResult.failed("UNAUTHORIZED_GAME_PROVIDER",
+                "Game provider does not match the original bet");
+        }
+
+        // 步驟 6: 檢查 Bet 時效性（防止過期 Bet 被惡意結算）
+        long betAgeHours = ChronoUnit.HOURS.between(betTx.getCreatedAt(), Instant.now());
+        if (betAgeHours > maxBetAgeHours) {
+            log.error("Bet is too old: {} hours", betAgeHours);
+            return TokenValidationResult.failed("BET_EXPIRED",
+                String.format("Bet is %d hours old, exceeds maximum age of %d hours",
+                    betAgeHours, maxBetAgeHours));
+        }
+
+        // 步驟 7: 重建用戶上下文
+        log.info("Fallback verification succeeded for round {}, user {}", roundId, betTx.getUserId());
         return TokenValidationResult.successWithContext(
             betTx.getUserId(),
             betTx.getCurrency(),
+            player,
             "FALLBACK_VERIFICATION"
         );
     }
 }
 ```
+
+## 錯誤代碼完整列表 (v2.0.0 新增)
+
+### 錯誤代碼分類與處理策略
+
+| 錯誤代碼 | 嚴重性 | 觸發場景 | HTTP 狀態 | 建議處理 | 是否可重試 |
+|---------|--------|---------|----------|---------|----------|
+| **INVALID_TOKEN_FORMAT** | HIGH | JWT 格式錯誤、解析失敗 | 400 | 重新登入獲取新 Token | ❌ |
+| **INVALID_SIGNATURE** | CRITICAL | JWT 簽名驗證失敗 | 401 | 重新登入 + 安全審計 | ❌ |
+| **TOKEN_EXPIRED** | MEDIUM | Token 過期時間已過 | 401 | 刷新 Token 或重新登入 | ✅ (刷新後) |
+| **PLAYER_NOT_FOUND** | HIGH | 玩家賬戶不存在/已刪除 | 404 | 通知用戶聯繫客服 | ❌ |
+| **UNAUTHORIZED_GAME_PROVIDER** | HIGH | 玩家未授權該遊戲供應商 | 403 | 檢查玩家權限配置 | ❌ |
+| **USER_MISMATCH** | CRITICAL | Token user_id 與請求不符 | 403 | 安全審計 + 凍結賬戶 | ❌ |
+| **TOKEN_REVOKED** | MEDIUM | Token 已被加入黑名單 | 401 | 重新登入獲取新 Token | ❌ |
+| **PLAYER_BLOCKED** | HIGH | 玩家賬戶被凍結/封禁 | 403 | 顯示封禁原因 + 客服聯繫方式 | ❌ |
+| **BET_NOT_FOUND** | MEDIUM | Bet 記錄不存在 | 404 | 檢查交易 ID 是否正確 | ✅ (延遲重試) |
+| **ROUND_MISMATCH** | HIGH | Round ID 不匹配 | 400 | 檢查遊戲供應商數據 | ❌ |
+| **BET_ALREADY_SETTLED** | MEDIUM | Bet 已經結算過 | 409 | 檢查是否重複結算 | ❌ |
+| **BET_CANCELLED** | LOW | Bet 已被取消 | 400 | 通知 GP 該 Bet 已取消 | ❌ |
+| **BET_EXPIRED** | MEDIUM | Bet 超過最大時效性 | 410 | 人工介入處理 | ❌ |
+
+### 錯誤響應格式標準
+
+```json
+{
+  "success": false,
+  "error_code": "INVALID_TOKEN_FORMAT",
+  "error_message": "Token format is malformed or corrupted",
+  "details": {
+    "timestamp": "2026-01-28T10:30:00Z",
+    "request_id": "req_abc123",
+    "suggestions": [
+      "Please re-authenticate to obtain a new token"
+    ]
+  },
+  "metadata": {
+    "retryable": false,
+    "contact_support": false
+  }
+}
+```
+
+### 客戶端錯誤處理流程圖
+
+```mermaid
+graph TD
+    A[收到錯誤響應] --> B{檢查 error_code}
+
+    B -->|TOKEN_EXPIRED| C[嘗試刷新 Token]
+    B -->|INVALID_SIGNATURE| D[清除本地 Token<br/>強制重新登入]
+    B -->|PLAYER_BLOCKED| E[顯示封禁提示<br/>提供客服聯繫方式]
+    B -->|BET_NOT_FOUND| F{retryable?}
+    B -->|其他錯誤| G[顯示錯誤信息]
+
+    C --> H{刷新成功?}
+    H -->|是| I[重試原始請求]
+    H -->|否| D
+
+    F -->|true| J[延遲 3 秒後重試]
+    F -->|false| G
+
+    J --> K{重試次數?}
+    K -->|< 3 次| I
+    K -->|≥ 3 次| L[顯示錯誤<br/>建議聯繫客服]
+
+    G --> M[記錄錯誤日誌]
+    L --> M
+    D --> M
+    E --> M
+```
+
+### 監控告警規則
+
+**Critical 級別告警** (立即通知)：
+- `INVALID_SIGNATURE` 頻率 > 10/分鐘 → 可能遭受攻擊
+- `USER_MISMATCH` 單個 IP > 5 次/小時 → Session fixation 攻擊
+- `UNAUTHORIZED_GAME_PROVIDER` 特定 GP > 50 次/小時 → 配置錯誤或攻擊
+
+**High 級別告警** (5 分鐘內通知)：
+- `PLAYER_NOT_FOUND` 頻率 > 100/分鐘 → 數據同步問題
+- `BET_EXPIRED` 頻率 > 20/分鐘 → GP 延遲結算問題
+
+**Medium 級別告警** (15 分鐘內通知)：
+- `TOKEN_EXPIRED` 刷新失敗率 > 10% → Token 服務異常
+- `BET_ALREADY_SETTLED` 頻率 > 50/分鐘 → GP 重複發送 Result
 
 ## 安全性分析
 

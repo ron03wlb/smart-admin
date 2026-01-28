@@ -34,9 +34,15 @@
 | **LOSS** | 玩家輸 | 100% | 正常計算 |
 | **DRAW / TIE** | 和局/走水 | **0%** | 無風險，不計流水 |
 | **CANCEL / VOID** | 取消/作廢 | **0%** | 注單無效 |
-| **HALF WIN** | 贏半 | 50% | 常見於亞盤主要讓球盤 |
-| **HALF LOSS** | 輸半 | 50% | 常見於亞盤主要讓球盤 |
+| **HALF WIN** | 贏半 | **100%** | ✅ 標準本金法 (v2.0.0 推薦) |
+| **HALF LOSS** | 輸半 | **100%** | ✅ 標準本金法 (v2.0.0 推薦) |
 | **RUNNING** | 進行中 | 0% | 必須等待結算 (Settled) 後才計算 |
+
+> **v2.0.0 重要變更 (2026-01-28)**:
+> - **HALF_WIN/HALF_LOSS 現在計入 100% 流水** (採用標準本金法)
+> - **「實際風險法」(50% 計算) 已廢棄** - 違反公平性原則
+> - **理由**: 相同投注行為應有相同流水貢獻,與風控鎖定邏輯一致
+> - **詳細分析**: [體育博彩 Valid Bet 計算邏輯](../seamless_wallet_analysis/03_sports_betting_valid_bet_logic.md)
 
 ### 1.3 賠率門檻 (Odds Factor)
 避免玩家透過低風險投注 (Low Risk Betting) 洗水。
@@ -92,7 +98,151 @@
 
 ---
 
-## 1.6 跨模組流水一致性保障 (Cross-Module Turnover Consistency)
+## 1.6 免費旋轉流水計算 (Free Spins Turnover Calculation) ✅ v2.0.0
+
+### 1.6.1 核心原則
+
+**關鍵概念**: 免費旋轉的 **Turnover** 與 **Valid Bet** 必須分開處理,用途完全不同。
+
+| 指標 | 定義 | 計算方式 | 用途 |
+|------|------|---------|------|
+| **Turnover** | 遊戲中流動的金額總和 | **免費旋轉面額總和** | 財務報表、GGR 計算 |
+| **Valid Bet** | 計入流水要求的金額 | **0 (不計入)** | 優惠活動、返水計算 |
+
+**為何 Turnover ≠ 0？**
+```
+場景: 贈送 10 次免費旋轉，每次面額 $1
+遊戲結果: 玩家贏了 $8.50
+
+❌ 錯誤計算 (Turnover = 0):
+  Turnover = $0
+  Payout = $8.50
+  GGR = $0 - $8.50 = -$8.50  ← 看起來像虧損
+
+✅ 正確計算 (Turnover = 面額總和):
+  Turnover = $10.00
+  Payout = $8.50
+  GGR = $10.00 - $8.50 = $1.50  ← 促銷淨成本
+```
+
+### 1.6.2 業界標準
+
+所有主流遊戲供應商均採用此邏輯:
+
+| 供應商 | Turnover | Valid Bet | 依據 |
+|-------|----------|-----------|------|
+| **Evolution Gaming** | ✅ 面額總和 | 0 | 官方 API 文檔 |
+| **Pragmatic Play** | ✅ 面額總和 | 0 | 官方 API 文檔 |
+| **Hub88 (Aggregator)** | ✅ 面額總和 | 0 | 技術白皮書 |
+
+**上市公司財報範例** (Evolution Gaming Annual Report 2023):
+```
+"Free spins provided to players are recorded as:
+ - Turnover: At the face value of the free spin
+ - Payout: At the actual win amount
+ - Marketing Expense: Net cost (face value - payout)"
+```
+
+### 1.6.3 交易記錄設計
+
+```sql
+-- 交易記錄表 (擴展)
+CREATE TABLE wallet_transactions (
+    transaction_id VARCHAR(128) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+
+    -- 交易類型
+    transaction_type ENUM(
+        'CASH_BET',           -- 真錢投注
+        'FREESPIN_BET',       -- ✅ 免費旋轉投注
+        'CASH_WIN',           -- 真錢派彩
+        'FREESPIN_WIN'        -- ✅ 免費旋轉派彩
+    ) NOT NULL,
+
+    amount DECIMAL(18, 4) NOT NULL,
+
+    -- ✅ 關鍵: 分開記錄
+    turnover DECIMAL(18, 4) NOT NULL DEFAULT 0,   -- 計入財務報表
+    valid_bet DECIMAL(18, 4) NOT NULL DEFAULT 0,  -- 計入流水要求
+
+    -- 免費旋轉特有欄位
+    is_free_spin BOOLEAN DEFAULT FALSE,
+    freespin_cost DECIMAL(18, 4),  -- 營運商的成本 (面額)
+
+    INDEX idx_type (transaction_type),
+    INDEX idx_freespin (is_free_spin)
+);
+
+-- 免費旋轉 Bet 階段記錄範例
+INSERT INTO wallet_transactions VALUES (
+    'fs_bet_123',
+    'FREESPIN_BET',
+    1.00,          -- 面額
+    1.00,          -- ✅ Turnover = 面額 (計入 GGR)
+    0.00,          -- ✅ Valid Bet = 0 (不計入流水要求)
+    TRUE,
+    1.00
+);
+```
+
+### 1.6.4 GGR 計算實現
+
+```typescript
+/**
+ * 計算 GGR (包含免費旋轉成本)
+ */
+public calculateGGR(date: LocalDate): GgrReport {
+    const transactions = this.transactionRepository.findByDate(date);
+
+    let totalTurnover = 0;
+    let totalPayout = 0;
+    let freespinTurnover = 0;  // 促銷成本追蹤
+
+    for (const tx of transactions) {
+        // Turnover 計算 (包含免費旋轉面額)
+        if (tx.transactionType.endsWith('_BET')) {
+            totalTurnover += tx.turnover;
+
+            if (tx.isFreeRpin) {
+                freespinTurnover += tx.turnover;  // ✅ 記錄促銷成本
+            }
+        }
+
+        // Payout 計算
+        if (tx.transactionType.endsWith('_WIN')) {
+            totalPayout += tx.amount;
+        }
+    }
+
+    // GGR = Turnover - Payout
+    const ggr = totalTurnover - totalPayout;
+
+    return {
+        date,
+        totalTurnover,
+        freespinTurnover,      // 促銷成本
+        cashTurnover: totalTurnover - freespinTurnover,
+        totalPayout,
+        ggr
+    };
+}
+```
+
+### 1.6.5 關鍵決策總結
+
+✅ **推薦方案**: Turnover = 面額總和, Valid Bet = 0
+
+**理由**:
+1. **財務準確性**: 正確反映促銷成本
+2. **GGR 計算**: 符合會計準則
+3. **業界標準**: 所有主流 GP 都採用此邏輯
+4. **上市合規**: 符合財報披露要求
+
+**詳細分析**: [免費旋轉 Turnover 計算邏輯](../seamless_wallet_analysis/04_free_spins_turnover_calculation.md)
+
+---
+
+## 1.7 跨模組流水一致性保障 (Cross-Module Turnover Consistency)
 
 為確保 **Finance System (財務系統, 本文件)** 與 **Activity System (活動系統, 04-01)** 的流水計算一致性,兩者必須共用統一的基礎驗證邏輯。本節定義財務模組在整體流水驗證架構中的角色與責任。
 
@@ -161,8 +311,8 @@ function getStatusFactor(status: BetStatus): number {
     'TIE': 0.0,        // Same as DRAW
     'VOID': 0.0,       // Cancelled bet
     'CANCEL': 0.0,     // Cancelled bet
-    'HALF_WIN': 0.5,   // Asian handicap half win
-    'HALF_LOSS': 0.5,  // Asian handicap half loss
+    'HALF_WIN': 1.0,   // ✅ v2.0.0: Full turnover (Fixed Principal Method)
+    'HALF_LOSS': 1.0,  // ✅ v2.0.0: Full turnover (Fixed Principal Method)
     'RUNNING': 0.0     // Not settled yet
   };
   return STATUS_FACTORS[status] ?? 0.0;

@@ -208,15 +208,156 @@ public void addEffectiveStake(BigDecimal effectiveStake) {
 }
 ```
 
-**關鍵規則**:
-- **effectiveStake 增加時，lockAmount 減少相同金額**
-- 公式: `lockAmount -= effectiveStake` (當 effectiveStake >= 0)
-- 這確保玩家完成流水要求後，鎖定金額會相應解鎖
+> ⚠️ **Critical Issue 發現 (2026-01-28)**:
+> 上述實現**缺少邊界條件處理**,當 `effectiveStake > lockAmount` 時,超出部分沒有轉為 `cleanAmount`!
+>
+> **問題場景**:
+> ```
+> Before: lockAmount = 50, cleanAmount = 950, cash = 1000
+> 結算產生 effectiveStake = 100
+>
+> 當前邏輯:
+>   lockAmount = max(0, 50 - 100) = 0
+>   cleanAmount = 950  ← ❌ 錯誤!應該是 1000!
+>
+> 正確邏輯:
+>   releaseAmount = min(lockAmount, effectiveStake) = 50
+>   lockAmount = 0
+>   cleanAmount = 950 + (100 - 50) = 1000  ← ✅ 正確!
+> ```
+>
+> **修正建議**: 參見下方「修正版實現」
 
-**範例**:
+**關鍵規則**:
+- **effectiveStake 增加時,lockAmount 減少** (但不低於 0)
+- **超出部分自動轉為 cleanAmount** ← ✅ v2.0.0 新增
+- 公式:
+  ```
+  releaseAmount = min(lockAmount, effectiveStake)
+  lockAmount -= releaseAmount
+  cleanAmount += (effectiveStake - releaseAmount)  ← 關鍵修正
+  ```
+- 這確保玩家完成流水要求後,所有應釋放的金額都正確計入可提款餘額
+
+**範例 (正常情況)**:
 - Before: lockAmount=500, effectiveStake=100
 - 投注結算產生 effectiveStake=200
 - After: lockAmount=300, effectiveStake=300
+
+**範例 (邊界情況)**: ← v2.0.0 新增
+- Before: lockAmount=50, cleanAmount=950, effectiveStake=0
+- 投注結算產生 effectiveStake=100
+- 計算: releaseAmount = min(50, 100) = 50, excessRelease = 50
+- After: lockAmount=0, cleanAmount=1000, effectiveStake=100
+
+### 2.4.1 修正版實現 (v2.0.0 推薦) ✅
+
+```java
+/**
+ * 添加有效投注並處理 lockAmount 邊界條件
+ *
+ * @param effectiveStake 本次結算產生的有效投注金額
+ *
+ * v2.0.0 修正:
+ * - 添加邊界條件檢查 (effectiveStake > lockAmount)
+ * - 超出部分自動轉為 cleanAmount
+ * - 防止玩家完成流水後無法提款的問題
+ */
+public void addEffectiveStake(BigDecimal effectiveStake) {
+    // Step 1: 累加有效投注
+    this.addedEffectiveStake = this.addedEffectiveStake.add(effectiveStake);
+    this.effectiveStake = this.effectiveStake.add(effectiveStake);
+
+    if (effectiveStake.signum() >= 0) {
+        // Step 2: 獲取當前 lockAmount (需從數據庫或內存中讀取最新值)
+        BigDecimal currentLockAmount = this.getCurrentLockAmount();
+
+        // Step 3: 計算實際可釋放的金額
+        BigDecimal actualRelease = effectiveStake.min(currentLockAmount);
+        BigDecimal excessRelease = effectiveStake.subtract(actualRelease);
+
+        // Step 4: 減少 lockAmount
+        this.addedLockAmount = this.addedLockAmount.add(actualRelease.negate());
+
+        // Step 5: ✅ 關鍵修正 - 超出部分轉為 cleanAmount
+        if (excessRelease.compareTo(BigDecimal.ZERO) > 0) {
+            this.adjustCleanAmount = this.adjustCleanAmount.add(excessRelease);
+        }
+    }
+}
+
+/**
+ * 獲取當前錢包的 lockAmount (需確保為最新值)
+ *
+ * 注意: 如果 WalletTransaction 是從緩存或內存中構建,
+ * 必須重新查詢數據庫以獲取最新的 lockAmount 值
+ */
+private BigDecimal getCurrentLockAmount() {
+    // 實現方式 1: 從內部狀態讀取 (需確保已更新)
+    return this.lockAmount;
+
+    // 實現方式 2: 從數據庫重新查詢 (最安全,但有性能成本)
+    // return playerWalletRepository.findById(this.playerWalletId)
+    //     .map(PlayerWallet::getLockAmount)
+    //     .orElse(BigDecimal.ZERO);
+}
+```
+
+**關鍵改進點**:
+1. ✅ **邊界條件檢查**: 確保 lockAmount 不會變成負數
+2. ✅ **超出釋放**: 超過 lockAmount 的部分轉為 cleanAmount
+3. ✅ **數據一致性**: 需確保 getCurrentLockAmount() 返回最新值
+4. ✅ **提款準確**: 玩家完成流水後可立即提款全部可用餘額
+
+**單元測試建議**:
+```java
+@Test
+@DisplayName("effectiveStake 超出 lockAmount 時應正確轉為 cleanAmount")
+void testEffectiveStakeExceedsLockAmount() {
+    // Given
+    WalletTransaction tx = new WalletTransaction(wallet);
+    tx.setLockAmount(new BigDecimal("50"));
+    tx.setCleanAmount(new BigDecimal("950"));
+    tx.setEffectiveStake(BigDecimal.ZERO);
+
+    // When: 結算產生 100 元 effectiveStake
+    tx.addEffectiveStake(new BigDecimal("100"));
+
+    // Then
+    assertThat(tx.getAddedLockAmount())
+        .as("lockAmount 應減少 50")
+        .isEqualByComparingTo("-50");
+
+    assertThat(tx.getAdjustCleanAmount())
+        .as("超出的 50 應轉為 cleanAmount")
+        .isEqualByComparingTo("50");
+
+    assertThat(tx.getEffectiveStake())
+        .as("effectiveStake 應累加為 100")
+        .isEqualByComparingTo("100");
+}
+
+@Test
+@DisplayName("effectiveStake 小於 lockAmount 時僅減少 lockAmount")
+void testEffectiveStakeWithinLockAmount() {
+    // Given
+    WalletTransaction tx = new WalletTransaction(wallet);
+    tx.setLockAmount(new BigDecimal("500"));
+    tx.setCleanAmount(new BigDecimal("500"));
+
+    // When: 結算產生 100 元 effectiveStake
+    tx.addEffectiveStake(new BigDecimal("100"));
+
+    // Then
+    assertThat(tx.getAddedLockAmount())
+        .as("lockAmount 應減少 100")
+        .isEqualByComparingTo("-100");
+
+    assertThat(tx.getAdjustCleanAmount())
+        .as("cleanAmount 不應變化 (無超出部分)")
+        .isEqualByComparingTo("0");
+}
+```
 
 ---
 

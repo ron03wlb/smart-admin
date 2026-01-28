@@ -94,76 +94,193 @@ public class RouletteBetCodeParser {
     // 歐洲輪盤配置（37 個號碼：0-36）
     private static final int TOTAL_NUMBERS_EUROPEAN = 37;
 
-    // Bet Code 映射表（完整定義）
-    private static final Map<String, Set<Integer>> BET_CODE_MAPPINGS = Map.ofEntries(
-        // 單號（Straight Up）
-        entry("STRAIGHT_0", Set.of(0)),
-        entry("STRAIGHT_1", Set.of(1)),
-        // ... 省略其他單號
+    /**
+     * Bet Code 映射表（完整定義）
+     *
+     * v2.0.0 更新: 補充完整映射表，包含所有常見投注類型
+     * 參考: Evolution Gaming Roulette API v3.2
+     */
+    private static final Map<String, BetCodeInfo> BET_CODE_MAPPINGS = Map.ofEntries(
+        // ==================== 內註 (Inside Bets) ====================
 
-        // 顏色
-        entry("RED", Set.of(1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36)),
-        entry("BLACK", Set.of(2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35)),
+        // 單號 (Straight Up) - 37 個號碼 (0-36)
+        // 覆蓋率: 1/37 = 2.7%, 賠率: 35:1
+        entry("STRAIGHT_0", new BetCodeInfo(Set.of(0), 2.7, 35, "LOW")),
+        entry("STRAIGHT_1", new BetCodeInfo(Set.of(1), 2.7, 35, "LOW")),
+        // ... 可通過動態解析處理 STRAIGHT_{0-36}
 
-        // 奇偶
-        entry("ODD", Set.of(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35)),
-        entry("EVEN", Set.of(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36)),
+        // 分割 (Split) - 2 個相鄰號碼
+        // 覆蓋率: 2/37 = 5.4%, 賠率: 17:1
+        entry("SPLIT_1_2", new BetCodeInfo(Set.of(1,2), 5.4, 17, "LOW")),
+        entry("SPLIT_1_4", new BetCodeInfo(Set.of(1,4), 5.4, 17, "LOW")),
+        entry("SPLIT_2_3", new BetCodeInfo(Set.of(2,3), 5.4, 17, "LOW")),
+        // ... 共 60 種 Split 組合 (完整列表參見附錄 A)
 
-        // 高低
-        entry("LOW_1_18", Set.of(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)),
-        entry("HIGH_19_36", Set.of(19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36)),
+        // 街 (Street) - 3 個橫排號碼
+        // 覆蓋率: 3/37 = 8.1%, 賠率: 11:1
+        entry("STREET_1_2_3", new BetCodeInfo(Set.of(1,2,3), 8.1, 11, "LOW")),
+        entry("STREET_4_5_6", new BetCodeInfo(Set.of(4,5,6), 8.1, 11, "LOW")),
+        entry("STREET_7_8_9", new BetCodeInfo(Set.of(7,8,9), 8.1, 11, "LOW")),
+        // ... 共 12 種 Street 組合
 
-        // 打（Dozen）
-        entry("DOZEN_1", Set.of(1,2,3,4,5,6,7,8,9,10,11,12)),
-        entry("DOZEN_2", Set.of(13,14,15,16,17,18,19,20,21,22,23,24)),
-        entry("DOZEN_3", Set.of(25,26,27,28,29,30,31,32,33,34,35,36)),
+        // 角 (Corner) - 4 個號碼的方塊
+        // 覆蓋率: 4/37 = 10.8%, 賠率: 8:1
+        entry("CORNER_1_2_4_5", new BetCodeInfo(Set.of(1,2,4,5), 10.8, 8, "MEDIUM")),
+        entry("CORNER_2_3_5_6", new BetCodeInfo(Set.of(2,3,5,6), 10.8, 8, "MEDIUM")),
+        // ... 共 22 種 Corner 組合 (完整列表參見附錄 B)
 
-        // 列（Column）
-        entry("COLUMN_1", Set.of(1,4,7,10,13,16,19,22,25,28,31,34)),
-        entry("COLUMN_2", Set.of(2,5,8,11,14,17,20,23,26,29,32,35)),
-        entry("COLUMN_3", Set.of(3,6,9,12,15,18,21,24,27,30,33,36)),
+        // 線 (Line) - 6 個號碼 (兩個街)
+        // 覆蓋率: 6/37 = 16.2%, 賠率: 5:1
+        entry("LINE_1_2_3_4_5_6", new BetCodeInfo(Set.of(1,2,3,4,5,6), 16.2, 5, "MEDIUM")),
+        entry("LINE_4_5_6_7_8_9", new BetCodeInfo(Set.of(4,5,6,7,8,9), 16.2, 5, "MEDIUM")),
+        // ... 共 11 種 Line 組合
 
-        // 分割（Split）- 示例
-        entry("SPLIT_1_2", Set.of(1,2)),
-        entry("SPLIT_1_4", Set.of(1,4)),
-        // ... 省略其他分割
+        // ==================== 外註 (Outside Bets) ====================
 
-        // 街（Street）- 示例
-        entry("STREET_1_2_3", Set.of(1,2,3)),
-        entry("STREET_4_5_6", Set.of(4,5,6))
-        // ... 省略其他街
+        // 顏色 (Color)
+        // 覆蓋率: 18/37 = 48.6%, 賠率: 1:1
+        entry("RED", new BetCodeInfo(
+            Set.of(1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36),
+            48.6, 1, "HIGH"
+        )),
+        entry("BLACK", new BetCodeInfo(
+            Set.of(2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35),
+            48.6, 1, "HIGH"
+        )),
+
+        // 奇偶 (Odd/Even)
+        // 覆蓋率: 18/37 = 48.6%, 賠率: 1:1
+        entry("ODD", new BetCodeInfo(
+            Set.of(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35),
+            48.6, 1, "HIGH"
+        )),
+        entry("EVEN", new BetCodeInfo(
+            Set.of(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36),
+            48.6, 1, "HIGH"
+        )),
+
+        // 高低 (High/Low)
+        // 覆蓋率: 18/37 = 48.6%, 賠率: 1:1
+        entry("LOW_1_18", new BetCodeInfo(
+            Set.of(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18),
+            48.6, 1, "HIGH"
+        )),
+        entry("HIGH_19_36", new BetCodeInfo(
+            Set.of(19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36),
+            48.6, 1, "HIGH"
+        )),
+
+        // 打 (Dozen)
+        // 覆蓋率: 12/37 = 32.4%, 賠率: 2:1
+        entry("DOZEN_1", new BetCodeInfo(
+            Set.of(1,2,3,4,5,6,7,8,9,10,11,12),
+            32.4, 2, "MEDIUM"
+        )),
+        entry("DOZEN_2", new BetCodeInfo(
+            Set.of(13,14,15,16,17,18,19,20,21,22,23,24),
+            32.4, 2, "MEDIUM"
+        )),
+        entry("DOZEN_3", new BetCodeInfo(
+            Set.of(25,26,27,28,29,30,31,32,33,34,35,36),
+            32.4, 2, "MEDIUM"
+        )),
+
+        // 列 (Column)
+        // 覆蓋率: 12/37 = 32.4%, 賠率: 2:1
+        entry("COLUMN_1", new BetCodeInfo(
+            Set.of(1,4,7,10,13,16,19,22,25,28,31,34),
+            32.4, 2, "MEDIUM"
+        )),
+        entry("COLUMN_2", new BetCodeInfo(
+            Set.of(2,5,8,11,14,17,20,23,26,29,32,35),
+            32.4, 2, "MEDIUM"
+        )),
+        entry("COLUMN_3", new BetCodeInfo(
+            Set.of(3,6,9,12,15,18,21,24,27,30,33,36),
+            32.4, 2, "MEDIUM"
+        )),
+
+        // ==================== 特殊組合 (Special Bets) ====================
+
+        // 鄰居投注 (Neighbours) - 法式輪盤常見
+        entry("ORPHELINS", new BetCodeInfo(
+            Set.of(1,6,9,14,17,20,31,34),
+            21.6, -1, "MEDIUM"  // 賠率變動
+        )),
+        entry("VOISINS_DU_ZERO", new BetCodeInfo(
+            Set.of(22,18,29,7,28,12,35,3,26,0,32,15,19,4,21,2,25),
+            45.9, -1, "HIGH"
+        )),
+        entry("TIERS_DU_CYLINDRE", new BetCodeInfo(
+            Set.of(27,13,36,11,30,8,23,10,5,24,16,33),
+            32.4, -1, "MEDIUM"
+        ))
     );
 
     /**
-     * 解析 bet_code 到號碼集合
+     * Bet Code 信息數據類
      */
-    public Set<Integer> parseBetCode(String betCode) {
+    @Value
+    static class BetCodeInfo {
+        Set<Integer> coveredNumbers;  // 覆蓋的號碼集合
+        double coverageRate;           // 覆蓋率 (%)
+        int payoutRatio;               // 賠率 (-1 表示變動)
+        String riskLevel;              // 風險級別: LOW/MEDIUM/HIGH
+    }
+
+    /**
+     * 解析 bet_code 到號碼集合 (v2.0.0 增強版)
+     *
+     * @return BetCodeInfo 包含覆蓋號碼、覆蓋率、賠率、風險級別
+     */
+    public BetCodeInfo parseBetCode(String betCode) {
         // 1. 嘗試從映射表查找
-        Set<Integer> numbers = BET_CODE_MAPPINGS.get(betCode);
-        if (numbers != null) {
-            return numbers;
+        BetCodeInfo info = BET_CODE_MAPPINGS.get(betCode);
+        if (info != null) {
+            return info;
         }
 
-        // 2. 處理動態 bet_code（例如 STRAIGHT_25）
+        // 2. 處理動態 bet_code (STRAIGHT_0 到 STRAIGHT_36)
         if (betCode.startsWith("STRAIGHT_")) {
             int number = Integer.parseInt(betCode.substring(9));
             if (number >= 0 && number <= 36) {
-                return Set.of(number);
+                return new BetCodeInfo(Set.of(number), 2.7, 35, "LOW");
             }
         }
 
-        // 3. 處理自定義 bet_code（某些供應商）
+        // 3. 處理自定義 bet_code (某些供應商允許自定義組合)
         // 例如: "NUMBERS_1_2_3_4" → {1,2,3,4}
         if (betCode.startsWith("NUMBERS_")) {
             String[] parts = betCode.substring(8).split("_");
-            return Arrays.stream(parts)
+            Set<Integer> numbers = Arrays.stream(parts)
                 .map(Integer::parseInt)
                 .collect(Collectors.toSet());
+
+            double coverage = (double) numbers.size() / 37 * 100;
+            String risk = coverage > 40 ? "HIGH" : coverage > 20 ? "MEDIUM" : "LOW";
+
+            return new BetCodeInfo(numbers, coverage, -1, risk);
         }
 
         // 4. 未知 bet_code → 記錄警告並返回空集
-        log.warn("Unknown bet code: {}", betCode);
-        return Set.of();
+        log.warn("Unknown bet code: {}, treating as zero coverage", betCode);
+        return new BetCodeInfo(Set.of(), 0, 0, "UNKNOWN");
+    }
+
+    /**
+     * 獲取所有支持的 Bet Code (用於驗證)
+     */
+    public Set<String> getSupportedBetCodes() {
+        return BET_CODE_MAPPINGS.keySet();
+    }
+
+    /**
+     * 檢查 Bet Code 有效性
+     */
+    public boolean isValidBetCode(String betCode) {
+        return BET_CODE_MAPPINGS.containsKey(betCode)
+            || betCode.startsWith("STRAIGHT_")
+            || betCode.startsWith("NUMBERS_");
     }
 }
 ```
@@ -181,15 +298,17 @@ public class RouletteCoverageDetectionService {
     private final RouletteBetCodeParser betCodeParser;
 
     /**
-     * 計算實際覆蓋率
+     * 計算實際覆蓋率 (v2.0.0 增強版 - 使用 BetCodeInfo)
      */
     public CoverageAnalysisResult analyzeCoverage(List<RouletteBet> bets) {
         // 步驟 1: 收集所有覆蓋的號碼（集合合併）
         Set<Integer> coveredNumbers = new HashSet<>();
+        Map<String, BetCodeInfo> betDetails = new HashMap<>();
 
         for (RouletteBet bet : bets) {
-            Set<Integer> numbers = betCodeParser.parseBetCode(bet.getBetCode());
-            coveredNumbers.addAll(numbers);  // 集合並集
+            BetCodeInfo info = betCodeParser.parseBetCode(bet.getBetCode());
+            coveredNumbers.addAll(info.getCoveredNumbers());  // 集合並集
+            betDetails.put(bet.getBetCode(), info);  // 保存詳細信息用於風控分析
         }
 
         // 步驟 2: 計算覆蓋率
@@ -198,11 +317,44 @@ public class RouletteCoverageDetectionService {
         // 步驟 3: 檢測對沖模式
         boolean hasOpposite = detectOppositeBets(bets);
 
+        // 步驟 4: 計算綜合風險級別
+        String overallRiskLevel = calculateOverallRiskLevel(betDetails, coverageRate);
+
         return CoverageAnalysisResult.builder()
             .coveredNumbers(coveredNumbers)
             .coverageRate(coverageRate)
             .hasOppositeBets(hasOpposite)
+            .overallRiskLevel(overallRiskLevel)
+            .betDetails(betDetails)
             .build();
+    }
+
+    /**
+     * 計算綜合風險級別
+     */
+    private String calculateOverallRiskLevel(
+        Map<String, BetCodeInfo> betDetails,
+        double coverageRate
+    ) {
+        // 如果覆蓋率超過 70%，強制 HIGH 風險
+        if (coverageRate > 0.70) {
+            return "HIGH";
+        }
+
+        // 否則根據投注組合判斷
+        long highRiskCount = betDetails.values().stream()
+            .filter(info -> "HIGH".equals(info.getRiskLevel()))
+            .count();
+
+        if (highRiskCount > 0) {
+            return "HIGH";
+        }
+
+        long mediumRiskCount = betDetails.values().stream()
+            .filter(info -> "MEDIUM".equals(info.getRiskLevel()))
+            .count();
+
+        return mediumRiskCount > 0 ? "MEDIUM" : "LOW";
     }
 
     /**
@@ -253,7 +405,34 @@ public class RouletteCoverageDetectionService {
             .validBet(totalBetAmount)
             .reason("NORMAL_BET")
             .coverageRate(analysis.getCoverageRate())
+            .overallRiskLevel(analysis.getOverallRiskLevel())
             .build();
+    }
+
+    /**
+     * 覆蓋率分析結果 (v2.0.0 增強版)
+     */
+    @Value
+    @Builder
+    static class CoverageAnalysisResult {
+        Set<Integer> coveredNumbers;              // 覆蓋的號碼集合
+        double coverageRate;                       // 覆蓋率 (0.0 - 1.0)
+        boolean hasOppositeBets;                   // 是否檢測到對沖投注
+        String overallRiskLevel;                   // 綜合風險級別: LOW/MEDIUM/HIGH
+        Map<String, BetCodeInfo> betDetails;      // 每個投注的詳細信息
+    }
+
+    /**
+     * Valid Bet 決策結果
+     */
+    @Value
+    @Builder
+    static class ValidBetDecision {
+        BigDecimal validBet;        // 實際有效投注金額
+        String reason;              // 決策原因
+        String details;             // 詳細信息（可選）
+        Double coverageRate;        // 覆蓋率（可選）
+        String overallRiskLevel;    // 風險級別（可選）
     }
 }
 ```
