@@ -548,3 +548,9 @@ if (featureFlag) {
 *   **預設商戶**: 創建 `default_tenant` (ID: 1001)，用於平台測試。
 *   **遊戲配置**: 執行 `GameDiscoveryJob` 首次全量同步。
 
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: DevOps Team & SRE Team

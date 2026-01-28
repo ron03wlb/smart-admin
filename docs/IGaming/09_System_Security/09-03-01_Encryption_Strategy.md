@@ -491,7 +491,7 @@ def get_masked_phone(phone_plaintext: str, user_role: str) -> str:
     elif user_role == 'cs_level_2':
         return phone_plaintext[:4] + "****" + phone_plaintext[-2:]  # 0912****78
     elif user_role in ['risk_manager', 'finance']:
-        # 需要審批流程（引用 09-02 審批系統）
+        # 需要審批流程（引用 09-04 審批工作流系統）
         if has_approval(user_id, 'view_pii_phone'):
             return phone_plaintext
         else:
@@ -638,7 +638,7 @@ def emergency_key_rotation():
 
 ### 技術架構參考
 - [09-01 管理後台 RBAC](./09-01_Admin_RBAC.md) - 權限分級脫敏
-- [09-02 審計日誌與審批](./09-02_Audit_Log_&_Approval.md) - PII 存取審計
+- [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - PII 存取審計
 - [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - HTTPS 強制要求
 
 ### 業務邏輯參考

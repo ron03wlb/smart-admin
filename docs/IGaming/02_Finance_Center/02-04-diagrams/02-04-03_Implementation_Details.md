@@ -1108,4 +1108,9 @@ if (this.isMain()) {
 
 **文件版本**: 1.0
 **最後更新**: 2025-11-28
-**維護者**: Development Team
+**維護團隊**: Development Team
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team

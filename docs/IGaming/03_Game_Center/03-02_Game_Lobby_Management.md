@@ -369,4 +369,10 @@ Response:
 ---
 
 **最後更新**: 2026-01-27
-**維護者**: Game Team
+**維護團隊**: Game Team
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Integration Team & Backend Team

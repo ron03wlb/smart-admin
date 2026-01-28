@@ -684,3 +684,9 @@ CREATE TABLE notification_log (
 ## 5. 安全性
 *   **脫敏存儲**：`notification_log` 中的手機號與 Email 必須加密存儲。
 *   **內容過濾**：自動掃描內容是否包含敏感詞 (如 "必中", "穩贏" 等違規行銷詞彙)。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Platform Team & DevOps Team

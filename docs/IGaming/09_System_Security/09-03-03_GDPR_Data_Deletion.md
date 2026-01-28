@@ -824,7 +824,7 @@ ORDER BY 1 DESC;
 - [09-03-02 Blind Index 架構](./09-03-02_Blind_Index_Architecture.md) - 可檢索加密、索引刪除
 
 ### 技術架構參考
-- [09-02 審計日誌與審批](./09-02_Audit_Log_&_Approval.md) - 刪除操作審計
+- [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - 刪除操作審計
 - [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 帳號狀態管理
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 刪除事件通知
 

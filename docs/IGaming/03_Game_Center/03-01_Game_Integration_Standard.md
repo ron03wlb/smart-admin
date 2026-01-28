@@ -179,4 +179,10 @@ def check_circuit_breaker(game_id, bet, win):
 ---
 
 **最後更新**: 2026-01-27
-**維護者**: Game Integration Team
+**維護團隊**: Game Integration Team
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Integration Team & Backend Team

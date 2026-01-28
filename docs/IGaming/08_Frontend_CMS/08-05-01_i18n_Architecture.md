@@ -364,7 +364,7 @@ response_time = Histogram('translation_response_time_seconds', 'Response time')
 
 ### 技術架構參考
 - [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API規範
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 翻譯變更審計
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 翻譯變更審計
 
 ### 參考資料
 - [i18next Documentation](https://www.i18next.com/)

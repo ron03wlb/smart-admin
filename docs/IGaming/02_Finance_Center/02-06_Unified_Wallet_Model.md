@@ -40,11 +40,39 @@ Playable Balance = (Cash + Bonus) + (Credit Limit - Outstanding)
 
 ### 3.1 優先級配置 (Priority Configuration)
 
-預設優先級：**Bonus -> Cash -> Credit**
+**系統預設優先級**: **Bonus -> Cash -> Credit**
 
+**配置層級** (優先級從高到低):
+1.  **玩家特殊規則** (Player-Specific Rules): VIP 玩家、活動參與者可擁有自定義扣款順序
+2.  **遊戲廠商配置** (Game Provider Override): 特定遊戲廠商可配置自定義順序
+3.  **遊戲配置** (Game Configuration): 單一遊戲可覆蓋預設規則
+4.  **系統預設** (System Default): 如無特殊配置，使用 Bonus -> Cash -> Credit
+
+**配置範例**:
+*   **默認情境**: Bonus -> Cash -> Credit (適用於大部分遊戲)
+*   **老虎機遊戲覆蓋**: Cash -> Bonus -> Credit (優先扣現金以累積流水)
+*   **VIP 玩家特權**: Credit -> Cash -> Bonus (優先使用信用額度，保留現金權益)
+
+**實作邏輯** (Pseudo-code):
+```java
+DeductionSequence getDeductionSequence(Long playerId, String gameCode, String providerId) {
+    // 1. 檢查玩家特殊規則
+    return playerRuleEngine.getSequence(playerId)
+        // 2. 檢查遊戲配置
+        .orElse(gameConfigService.getSequence(gameCode))
+        // 3. 檢查廠商配置
+        .orElse(providerConfigService.getSequence(providerId))
+        // 4. 使用系統預設
+        .orElse(DEFAULT_SEQUENCE); // Bonus -> Cash -> Credit
+}
+```
+
+**預設流程**:
 1.  **Try Bonus**: 檢查是否有適用該遊戲的 Bonus Balance。
 2.  **Try Cash**: 若 Bonus 不足，扣除 Cash Balance。
 3.  **Try Credit**: 若 Cash 不足，增加 Outstanding (需檢查 Limit)。
+
+**關聯文檔**: 詳細遊戲配置邏輯參見 [03-03 無縫錢包分析 §4.1](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md#41-錢包扣款順序-wallet-deduction-order)
 
 ### 3.2 混合支付範例 (Hybrid Payment Example)
 

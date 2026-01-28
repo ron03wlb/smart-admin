@@ -385,3 +385,9 @@ onMounted(() => {
 *   **顯示內容**：同時顯示 Cash Balance 與 Available Credit。
 *   **支付選擇器**：在下注或購買道具時，允許玩家選擇 "優先扣除 Cash" 或 "使用 Credit"。
 
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Frontend Team & Product Team

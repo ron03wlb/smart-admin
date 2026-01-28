@@ -342,4 +342,10 @@ jobs:
 ---
 
 **最後更新**: 2026-01-27
-**維護者**: Frontend Team
+**維護團隊**: Frontend Team
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Frontend Team & Product Team

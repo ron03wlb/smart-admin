@@ -662,7 +662,7 @@ SELECT * FROM players WHERE phone_index_prefix_4 = HMAC('0912');
 - [09-03-03 GDPR 數據刪除](./09-03-03_GDPR_Data_Deletion.md) - Crypto-Shredding、數據遺忘權
 
 ### 技術架構參考
-- [09-02 審計日誌與審批](./09-02_Audit_Log_&_Approval.md) - Blind Index 查詢審計
+- [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - Blind Index 查詢審計
 - [11-01 客服中台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服 PII 查詢場景
 
 ---

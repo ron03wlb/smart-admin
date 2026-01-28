@@ -423,7 +423,7 @@ def get_player_list(request, tenant_id):
 
 ### 技術架構參考
 - [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 層級權限實現
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 租戶操作審計
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 租戶操作審計
 - [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 多租戶數據隔離策略
 
 ---

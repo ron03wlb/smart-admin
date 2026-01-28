@@ -468,7 +468,7 @@ graph TD
     F -->|否| H[待發布]
 ```
 
-**審批權限** (引用 [09-02 審批系統](../09_System_Security/09-02_Audit_Log_&_Approval.md)):
+**審批權限** (引用 [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md)):
 - **運營專員**: 提交 Banner、編輯草稿
 - **運營主管**: 審核 Banner 內容、批准上線
 - **CTO**: 緊急下架 Banner（如發現重大錯誤）
@@ -489,7 +489,7 @@ graph TD
 
 ### 技術架構參考
 - [08-05 本地化系統](./08-05_Localization_System.md) - 多語系實作架構
-- [09-02 審批工作流](../09_System_Security/09-02_Audit_Log_&_Approval.md) - Banner 審批流程
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - Banner 審批流程
 - [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - CDN 配置與緩存策略
 
 ---

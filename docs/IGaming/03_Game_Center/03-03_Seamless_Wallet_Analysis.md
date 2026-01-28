@@ -660,21 +660,25 @@ groups:
 根據業務確認，以下為無縫錢包核心邏輯標準：
 
 ### 4.1 錢包扣款順序 (Wallet Deduction Order)
-- **決策**：**基於遊戲配置 (Game Configuration)**。
+- **決策**：**基於遊戲配置 (Game Configuration)** + **系統預設**。
 - **邏輯**：
-    - 每個遊戲或遊戲廠商 (GP) 可獨立配置 `DeductionSequence`。
+    - **系統預設**: `Bonus -> Cash -> Credit` (參見 [02-06 統一錢包模型 §3.1](../../02_Finance_Center/02-06_Unified_Wallet_Model.md#31-優先級配置-priority-configuration))
+    - **遊戲覆蓋**: 每個遊戲或遊戲廠商 (GP) 可獨立配置 `DeductionSequence` 覆蓋預設值。
     - **資料結構示意**：
       ```json
       {
         "game_code": "slot_001",
-        "wallet_priority": ["BONUS_WALLET", "CASH_WALLET"]
+        "wallet_priority": ["BONUS_WALLET", "CASH_WALLET"], // 覆蓋預設
+        "use_system_default": false  // 明確標記覆蓋
       }
       ```
     - **執行流程**：
       1.  收到 Bet 請求。
-      2.  讀取該遊戲的 `wallet_priority`。
-      3.  依序檢查餘額並扣款。
-      4.  若第一順位餘額不足，是否允許混合扣款？(通常允許，需記錄 split details)。
+      2.  檢查 `game_config.wallet_priority` 是否存在。
+      3.  若存在且 `use_system_default = false` → 使用遊戲配置。
+      4.  若不存在 → 使用系統預設 (Bonus -> Cash -> Credit)。
+      5.  依序檢查餘額並扣款。
+      6.  若第一順位餘額不足，是否允許混合扣款？(通常允許，需記錄 split details)。
 
 ### 4.2 負餘額處理 (Negative Balance Handling)
 - **決策**：**允許負餘額 + 自動鎖定 + 人工介入**。
@@ -794,4 +798,10 @@ flowchart TD
 ---
 
 **最後更新**: 2026-01-27
-**維護者**: Game Integration Team
+**維護團隊**: Game Integration Team
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Integration Team & Backend Team

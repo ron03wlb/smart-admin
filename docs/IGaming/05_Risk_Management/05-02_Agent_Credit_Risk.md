@@ -38,79 +38,79 @@
 
 ```mermaid
 flowchart TD
-    START[信用評分計算開始<br/>Agent ID: 12345] --> COLLECT[收集歷史數據<br/>過去 12 週結算記錄]
+    CREDIT_START[信用評分計算開始<br/>Agent ID: 12345] --> CREDIT_COLLECT[收集歷史數據<br/>過去 12 週結算記錄]
 
-    COLLECT --> DIM1[維度 1: Payment Punctuality - 30%]
-    COLLECT --> DIM2[維度 2: Valid Active Ratio - 20%]
-    COLLECT --> DIM3[維度 3: Net Win/Loss Volatility - 20%]
-    COLLECT --> DIM4[維度 4: Tenure - 10%]
-    COLLECT --> DIM5[維度 5: Security Deposit - 20%]
+    CREDIT_COLLECT --> CREDIT_DIM1_ENTRY[維度 1: Payment Punctuality - 30%]
+    CREDIT_COLLECT --> CREDIT_DIM2_ENTRY[維度 2: Valid Active Ratio - 20%]
+    CREDIT_COLLECT --> CREDIT_DIM3_ENTRY[維度 3: Net Win/Loss Volatility - 20%]
+    CREDIT_COLLECT --> CREDIT_DIM4_ENTRY[維度 4: Tenure - 10%]
+    CREDIT_COLLECT --> CREDIT_DIM5_ENTRY[維度 5: Security Deposit - 20%]
 
-    DIM1 --> D1_CALC[計算結算準時率<br/>On-time settlements / Total settlements]
-    D1_CALC --> D1_SCORE{準時率?}
-    D1_SCORE -->|100% - 12/12 準時| D1_FULL[✅ 30 分<br/>Full score]
-    D1_SCORE -->|91.7% - 11/12 準時| D1_HIGH[⚠️ 20 分<br/>-10 分: 1 次遲繳]
-    D1_SCORE -->|83.3% - 10/12 準時| D1_MED[⚠️ 10 分<br/>-20 分: 2 次遲繳]
-    D1_SCORE -->|< 83.3%| D1_LOW[❌ 0 分<br/>≥ 3 次遲繳]
+    CREDIT_DIM1_ENTRY --> CREDIT_DIM1_CALC[計算結算準時率<br/>On-time settlements / Total settlements]
+    CREDIT_DIM1_CALC --> CREDIT_DIM1_JUDGE{準時率?}
+    CREDIT_DIM1_JUDGE -->|100% - 12/12 準時| CREDIT_DIM1_SCORE_FULL[✅ 30 分<br/>Full score]
+    CREDIT_DIM1_JUDGE -->|91.7% - 11/12 準時| CREDIT_DIM1_SCORE_HIGH[⚠️ 20 分<br/>-10 分: 1 次遲繳]
+    CREDIT_DIM1_JUDGE -->|83.3% - 10/12 準時| CREDIT_DIM1_SCORE_MED[⚠️ 10 分<br/>-20 分: 2 次遲繳]
+    CREDIT_DIM1_JUDGE -->|< 83.3%| CREDIT_DIM1_SCORE_LOW[❌ 0 分<br/>≥ 3 次遲繳]
 
-    DIM2 --> D2_CALC[計算活躍玩家佔比<br/>Active players / Total players]
-    D2_CALC --> D2_SCORE{活躍率?}
-    D2_SCORE -->|≥ 60%| D2_FULL[✅ 20 分<br/>健康代理]
-    D2_SCORE -->|40-59%| D2_MED[⚠️ 12 分<br/>中等活躍]
-    D2_SCORE -->|20-39%| D2_LOW[⚠️ 5 分<br/>低活躍]
-    D2_SCORE -->|< 20%| D2_ZERO[❌ 0 分<br/>死代理]
+    CREDIT_DIM2_ENTRY --> CREDIT_DIM2_CALC[計算活躍玩家佔比<br/>Active players / Total players]
+    CREDIT_DIM2_CALC --> CREDIT_DIM2_JUDGE{活躍率?}
+    CREDIT_DIM2_JUDGE -->|≥ 60%| CREDIT_DIM2_SCORE_FULL[✅ 20 分<br/>健康代理]
+    CREDIT_DIM2_JUDGE -->|40-59%| CREDIT_DIM2_SCORE_MED[⚠️ 12 分<br/>中等活躍]
+    CREDIT_DIM2_JUDGE -->|20-39%| CREDIT_DIM2_SCORE_LOW[⚠️ 5 分<br/>低活躍]
+    CREDIT_DIM2_JUDGE -->|< 20%| CREDIT_DIM2_SCORE_ZERO[❌ 0 分<br/>死代理]
 
-    DIM3 --> D3_CALC[計算輸贏波動率<br/>Std Dev of weekly P&L]
-    D3_CALC --> D3_SCORE{波動率?}
-    D3_SCORE -->|CV < 0.3| D3_FULL[✅ 20 分<br/>波動穩定]
-    D3_SCORE -->|CV 0.3-0.5| D3_MED[⚠️ 12 分<br/>中等波動]
-    D3_SCORE -->|CV 0.5-0.8| D3_LOW[⚠️ 5 分<br/>高波動]
-    D3_SCORE -->|CV > 0.8| D3_ZERO[❌ 0 分<br/>極不穩定]
+    CREDIT_DIM3_ENTRY --> CREDIT_DIM3_CALC[計算輸贏波動率<br/>Std Dev of weekly P&L]
+    CREDIT_DIM3_CALC --> CREDIT_DIM3_JUDGE{波動率?}
+    CREDIT_DIM3_JUDGE -->|CV < 0.3| CREDIT_DIM3_SCORE_FULL[✅ 20 分<br/>波動穩定]
+    CREDIT_DIM3_JUDGE -->|CV 0.3-0.5| CREDIT_DIM3_SCORE_MED[⚠️ 12 分<br/>中等波動]
+    CREDIT_DIM3_JUDGE -->|CV 0.5-0.8| CREDIT_DIM3_SCORE_LOW[⚠️ 5 分<br/>高波動]
+    CREDIT_DIM3_JUDGE -->|CV > 0.8| CREDIT_DIM3_SCORE_ZERO[❌ 0 分<br/>極不穩定]
 
-    DIM4 --> D4_CALC[計算合作時長<br/>Weeks since onboarding]
-    D4_CALC --> D4_SCORE{時長?}
-    D4_SCORE -->|≥ 52 週 - 1 年+| D4_FULL[✅ 10 分<br/>長期合作]
-    D4_SCORE -->|26-51 週| D4_HIGH[⚠️ 7 分<br/>半年+]
-    D4_SCORE -->|12-25 週| D4_MED[⚠️ 5 分<br/>3-6 月]
-    D4_SCORE -->|< 12 週| D4_LOW[⚠️ 2 分<br/>新代理]
+    CREDIT_DIM4_ENTRY --> CREDIT_DIM4_CALC[計算合作時長<br/>Weeks since onboarding]
+    CREDIT_DIM4_CALC --> CREDIT_DIM4_JUDGE{時長?}
+    CREDIT_DIM4_JUDGE -->|≥ 52 週 - 1 年+| CREDIT_DIM4_SCORE_FULL[✅ 10 分<br/>長期合作]
+    CREDIT_DIM4_JUDGE -->|26-51 週| CREDIT_DIM4_SCORE_HIGH[⚠️ 7 分<br/>半年+]
+    CREDIT_DIM4_JUDGE -->|12-25 週| CREDIT_DIM4_SCORE_MED[⚠️ 5 分<br/>3-6 月]
+    CREDIT_DIM4_JUDGE -->|< 12 週| CREDIT_DIM4_SCORE_LOW[⚠️ 2 分<br/>新代理]
 
-    DIM5 --> D5_CALC[計算保證金覆蓋率<br/>Deposit / Max weekly exposure]
-    D5_CALC --> D5_SCORE{覆蓋率?}
-    D5_SCORE -->|≥ 200%| D5_FULL[✅ 20 分<br/>充足保證金]
-    D5_SCORE -->|150-199%| D5_HIGH[⚠️ 15 分<br/>良好]
-    D5_SCORE -->|100-149%| D5_MED[⚠️ 10 分<br/>一般]
-    D5_SCORE -->|< 100%| D5_LOW[❌ 0 分<br/>保證金不足]
+    CREDIT_DIM5_ENTRY --> CREDIT_DIM5_CALC[計算保證金覆蓋率<br/>Deposit / Max weekly exposure]
+    CREDIT_DIM5_CALC --> CREDIT_DIM5_JUDGE{覆蓋率?}
+    CREDIT_DIM5_JUDGE -->|≥ 200%| CREDIT_DIM5_SCORE_FULL[✅ 20 分<br/>充足保證金]
+    CREDIT_DIM5_JUDGE -->|150-199%| CREDIT_DIM5_SCORE_HIGH[⚠️ 15 分<br/>良好]
+    CREDIT_DIM5_JUDGE -->|100-149%| CREDIT_DIM5_SCORE_MED[⚠️ 10 分<br/>一般]
+    CREDIT_DIM5_JUDGE -->|< 100%| CREDIT_DIM5_SCORE_LOW[❌ 0 分<br/>保證金不足]
 
-    D1_FULL --> AGG[聚合總分<br/>Sum of all dimensions]
-    D1_HIGH --> AGG
-    D1_MED --> AGG
-    D1_LOW --> AGG
+    CREDIT_DIM1_SCORE_FULL --> CREDIT_AGG[聚合總分<br/>Sum of all dimensions]
+    CREDIT_DIM1_SCORE_HIGH --> CREDIT_AGG
+    CREDIT_DIM1_SCORE_MED --> CREDIT_AGG
+    CREDIT_DIM1_SCORE_LOW --> CREDIT_AGG
 
-    D2_FULL --> AGG
-    D2_MED --> AGG
-    D2_LOW --> AGG
-    D2_ZERO --> AGG
+    CREDIT_DIM2_SCORE_FULL --> CREDIT_AGG
+    CREDIT_DIM2_SCORE_MED --> CREDIT_AGG
+    CREDIT_DIM2_SCORE_LOW --> CREDIT_AGG
+    CREDIT_DIM2_SCORE_ZERO --> CREDIT_AGG
 
-    D3_FULL --> AGG
-    D3_MED --> AGG
-    D3_LOW --> AGG
-    D3_ZERO --> AGG
+    CREDIT_DIM3_SCORE_FULL --> CREDIT_AGG
+    CREDIT_DIM3_SCORE_MED --> CREDIT_AGG
+    CREDIT_DIM3_SCORE_LOW --> CREDIT_AGG
+    CREDIT_DIM3_SCORE_ZERO --> CREDIT_AGG
 
-    D4_FULL --> AGG
-    D4_HIGH --> AGG
-    D4_MED --> AGG
-    D4_LOW --> AGG
+    CREDIT_DIM4_SCORE_FULL --> CREDIT_AGG
+    CREDIT_DIM4_SCORE_HIGH --> CREDIT_AGG
+    CREDIT_DIM4_SCORE_MED --> CREDIT_AGG
+    CREDIT_DIM4_SCORE_LOW --> CREDIT_AGG
 
-    D5_FULL --> AGG
-    D5_HIGH --> AGG
-    D5_MED --> AGG
-    D5_LOW --> AGG
+    CREDIT_DIM5_SCORE_FULL --> CREDIT_AGG
+    CREDIT_DIM5_SCORE_HIGH --> CREDIT_AGG
+    CREDIT_DIM5_SCORE_MED --> CREDIT_AGG
+    CREDIT_DIM5_SCORE_LOW --> CREDIT_AGG
 
-    AGG --> FINAL{最終評分?}
+    CREDIT_AGG --> CREDIT_FINAL_JUDGE{最終評分?}
 
-    FINAL -->|Score > 80| PREMIUM[🟢 優質代理<br/>Premium Tier]
-    FINAL -->|Score 50-80| STANDARD[🟡 一般代理<br/>Standard Tier]
-    FINAL -->|Score < 50| RISKY[🔴 高危代理<br/>Risky Tier]
+    CREDIT_FINAL_JUDGE -->|Score > 80| CREDIT_RESULT_PREMIUM[🟢 優質代理<br/>Premium Tier]
+    CREDIT_FINAL_JUDGE -->|Score 50-80| CREDIT_RESULT_STANDARD[🟡 一般代理<br/>Standard Tier]
+    CREDIT_FINAL_JUDGE -->|Score < 50| CREDIT_RESULT_RISKY[🔴 高危代理<br/>Risky Tier]
 
     PREMIUM --> ACTION1[✅ 每週自動恢復額度<br/>允許透支 10%<br/>Priority support]
     STANDARD --> ACTION2[⚠️ 人工審核後恢復額度<br/>需提交結算證明<br/>Standard support]
@@ -699,3 +699,9 @@ else:
 ## 7. 結論
 
 代理风控是信用网模式的生存基石。透過 **信用评分**、**實時曝險監控** 與 **保證金強平機制**，平台可將 B2B 違約風險控制在可承受範圍內，避免發生系統性金融災難。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Risk Team & Backend Team

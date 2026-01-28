@@ -64,3 +64,9 @@
 ## 5. 報表與審計
 - **Invoice PDF 生成**：包含詳細費用明細 (Breakdown)。
 - **Reconciliation Report**：展示 平台數據 vs 遊戲商數據 的差異調整。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team

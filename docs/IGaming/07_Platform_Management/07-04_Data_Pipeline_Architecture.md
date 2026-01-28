@@ -532,3 +532,9 @@ flowchart TD
     *   **ClickHouse**: 單表查詢極快，適合日誌分析。
     *   **StarRocks / Doris**: 支援 Join 較好，適合複雜報表。
 *   **Scheduler**: Apache Airflow (DAG 管理)。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Platform Team & DevOps Team

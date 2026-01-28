@@ -667,7 +667,7 @@ async def log_translation_change(action: str, key: str, lang: str, old_value: st
 
 ### 技術架構參考
 - [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 翻譯權限控制
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 翻譯變更審計
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 翻譯變更審計
 - [12-02 測試標準](../12_Technical_Operations/12-02_Testing_Standard.md) - 翻譯 QA 流程
 
 ---

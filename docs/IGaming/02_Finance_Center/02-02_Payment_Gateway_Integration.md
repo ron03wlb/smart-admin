@@ -1122,7 +1122,7 @@ Action Required:
 - **調整路由權重**：可能影響成本與成功率
 - **變更限額**：單筆/單日限額調整
 
-**審批流程**（引用 09-02 審批系統）：
+**審批流程**（引用 09-04 審批工作流系統）：
 ```
 1. 技術人員提交變更申請
    ↓
@@ -1201,7 +1201,8 @@ Authorization: Bearer <player_jwt_token>
 ### 技術架構參考
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 支付數據加密
 - [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API 規範
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 配置變更審批
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 配置變更審計
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 配置變更審批
 
 ---
 

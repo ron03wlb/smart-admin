@@ -423,3 +423,9 @@ jobs:
 2.  [ ] 壓力測試報告 (Load Test Report) 已簽核。
 3.  [ ] 資料庫變更腳本 (Migration Script) 已驗證可回滾。
 4.  [ ] 監控儀表板 (Grafana) 已配置完畢。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: DevOps Team & SRE Team

@@ -1156,3 +1156,9 @@ Warning: 299 - "API v1 is deprecated and will be removed on 2027-01-01. Please m
 *   **SQL Injection**: 攔截包含 `UNION SELECT`, `DROP TABLE` 的請求。
 *   **XSS**: 攔截包含 `<script>` 的 Payload。
 *   **Bot Protection**: 攔截 User-Agent 為 `curl`, `python-requests` 的非瀏覽器流量 (除非是授權的 Server-to-Server API)。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: DevOps Team & SRE Team

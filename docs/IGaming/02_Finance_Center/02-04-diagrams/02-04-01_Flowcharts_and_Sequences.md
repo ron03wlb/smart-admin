@@ -1,8 +1,20 @@
 # IGaming 流水計算流程圖與時序圖
 
 > **文檔目標**: 可視化展示 IGaming 平台流水計算的完整流程，包含三層驗證架構的詳細交互。
+>
+> **重要更新 (v2.0.0 - 2026-01-28)**:
+> - ✅ 修正 Layer 2 邏輯: 移除 status_factor 動態修改 valid_bet 的錯誤設計
+> - ✅ 採用「標準本金法」: valid_bet = bet_amount (不論結算狀態)
+> - ✅ 增加風控標記機制: risk_status, filter_reason, risk_rules_applied
+> - ✅ 增加審計追溯支持: calculation_version, 回推重算機制
+> - ✅ 術語標準化: 統一使用 Bet Amount, Valid Bet, Wagering Requirement
+>
 > **創建日期**: 2026-01-27
+> **最後更新**: 2026-01-28
+> **版本**: 2.0.0
+>
 > **參考文檔**:
+> - [00-03 術語標準化定義](../../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - **必讀**
 > - [05-01 風控系統](IGaming需求框架/05_Risk_Management/05-01_Risk_Control_System.md)
 > - [02-04 流水與對帳](IGaming需求框架/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 > - [04-01 活動系統](IGaming需求框架/04_Activity_Center/04-01_Activity_System_Design.md)
@@ -36,18 +48,18 @@ graph TB
         B[對沖檢測<br/>Hedge Detection]
         C[套利檢測<br/>Arbitrage Detection]
         D[低賠率過濾<br/>Low Odds Filter<br/>閾值: 1.5]
-        E[輸出: effective_turnover_base<br/>基礎有效流水]
+        E[輸出: valid_bet<br/>有效投注額<br/>+ risk_status<br/>+ filter_reason]
     end
 
     subgraph "Layer 2: 財務中心 (Finance Center - 02-04)"
         F[注單結算<br/>Bet Settlement]
-        G[狀態因子應用<br/>Status Factor]
+        G[記錄結算狀態<br/>Settlement Status]
         H{注單狀態?}
-        I[WIN/LOSS<br/>Factor: 1.0]
-        J[DRAW/TIE<br/>Factor: 0.0]
-        K[VOID/CANCEL<br/>Factor: 0.0]
-        L[HALF_WIN/LOSS<br/>Factor: 0.5]
-        M[輸出: valid_turnover_finance<br/>財務有效流水]
+        I[WIN/LOSS<br/>記錄狀態]
+        J[DRAW/TIE<br/>記錄狀態]
+        K[VOID/CANCEL<br/>記錄狀態]
+        L[HALF_WIN/LOSS<br/>記錄狀態]
+        M[輸出: valid_bet<br/>有效投注額 (不變)]
     end
 
     subgraph "Layer 3: 活動系統 (Activity System - 04-01)"
@@ -161,28 +173,28 @@ sequenceDiagram
     Risk->>Risk: 14a. 檢查賠率閾值<br/>(Odds Validation)
     Note over Risk: odds=1.95 >= 1.5 ✓
 
-    Risk-->>Platform: 15. 驗證通過<br/>{is_valid: true,<br/>effective_turnover_base: 100,<br/>risk_code: "VALID"}
+    Risk-->>Platform: 15. 驗證通過<br/>{is_valid: true,<br/>valid_bet: 100,<br/>risk_status: "PASSED",<br/>filter_reason: null,<br/>risk_rules_applied: []}
 
     rect rgb(255, 250, 250)
-        Note over Finance,Activity: ===== 階段4: 狀態因子應用 (Layer 2 - Finance) =====
+        Note over Finance,Activity: ===== 階段4: 財務狀態記錄 (Layer 2 - Finance) =====
     end
 
-    Platform->>Finance: 16. applyStatusFactor(bet_id)<br/>{effective_turnover_base: 100,<br/>status: WIN}
+    Platform->>Finance: 16. recordSettlement(bet_id)<br/>{valid_bet: 100,<br/>status: WIN}
 
-    Finance->>Finance: 17. 計算狀態因子<br/>status_factor = getStatusFactor("WIN")
-    Note over Finance: WIN → factor = 1.0<br/>LOSS → factor = 1.0<br/>DRAW → factor = 0.0
+    Finance->>Finance: 17. 記錄結算狀態<br/>settlement_status = "WIN"
+    Note over Finance: 僅記錄狀態<br/>不修改 valid_bet
 
-    Finance->>Finance: 18. 計算財務有效流水<br/>valid_turnover_finance =<br/>100 × 1.0 = $100
+    Finance->>Finance: 18. 計算賠付金額<br/>payout_amount = calculatePayout()
 
-    Finance->>DB: 19. 更新注單流水記錄<br/>UPDATE bets SET<br/>valid_turnover_finance=100
+    Finance->>DB: 19. 更新注單記錄<br/>UPDATE bets SET<br/>settlement_status='WIN',<br/>payout_amount=195
 
-    Finance-->>Platform: 20. 返回財務流水<br/>{valid_turnover_finance: 100}
+    Finance-->>Platform: 20. 返回結算結果<br/>{valid_bet: 100 (不變),<br/>settlement_status: 'WIN',<br/>payout_amount: 195}
 
     rect rgb(248, 240, 255)
         Note over Activity,Wallet: ===== 階段5: 遊戲權重應用 (Layer 3 - Activity) =====
     end
 
-    Platform->>Activity: 21. calculateActivityTurnover()<br/>{valid_turnover_finance: 100,<br/>game_type: BACCARAT}
+    Platform->>Activity: 21. applyGameWeight()<br/>{valid_bet: 100,<br/>game_type: BACCARAT}
 
     Activity->>DB: 22. 查詢玩家參與的活動<br/>SELECT * FROM player_bonuses<br/>WHERE player_id=xxx<br/>AND status='active'
     DB-->>Activity: 23. 返回活動列表<br/>[{bonus_id: B001,<br/>bonus_type: "DEPOSIT",<br/>wagering_requirement: 5000}]
@@ -190,13 +202,13 @@ sequenceDiagram
     Activity->>Activity: 24. 獲取遊戲權重<br/>game_weight = getGameWeight("BACCARAT")
     Note over Activity: Baccarat → 0.15 (15%)<br/>Slots → 1.0 (100%)<br/>Blackjack → 0.1 (10%)
 
-    Activity->>Activity: 25. 計算活動有效流水<br/>activity_valid_turnover =<br/>100 × 0.15 = $15
+    Activity->>Activity: 25. 計算活動貢獻金額<br/>contributed_amount =<br/>valid_bet × weight<br/>= 100 × 0.15 = $15
 
     Activity->>DB: 26. 更新流水進度<br/>UPDATE player_bonuses SET<br/>wagering_completed += 15,<br/>wagering_progress = 15/5000
 
     DB-->>Activity: 27. 更新成功
 
-    Activity-->>Platform: 28. 返回活動流水<br/>{activity_valid_turnover: 15,<br/>wagering_progress: "0.3%",<br/>remaining: 4985}
+    Activity-->>Platform: 28. 返回活動貢獻<br/>{contributed_amount: 15,<br/>wagering_progress: "0.3%",<br/>remaining: 4985}
 
     rect rgb(255, 245, 240)
         Note over Platform,Player: ===== 階段6: 派彩與通知 =====
@@ -237,22 +249,22 @@ flowchart TD
         F[拒絕<br/>effective_turnover_base<br/>= $0]
     end
 
-    subgraph Layer2["Layer 2: 財務狀態驗證 (02-04)"]
+    subgraph Layer2["Layer 2: 財務狀態記錄 (02-04)"]
         G{注單狀態?}
-        H[WIN/LOSS<br/>status_factor = 1.0]
-        I[DRAW/TIE<br/>status_factor = 0.0]
-        J[VOID/CANCEL<br/>status_factor = 0.0]
-        K[HALF_WIN/HALF_LOSS<br/>status_factor = 0.5]
-        L[計算財務流水<br/>valid_turnover_finance<br/>= base × factor<br/>= $100 × 1.0 = $100]
+        H[WIN/LOSS<br/>記錄狀態]
+        I[DRAW/TIE<br/>記錄狀態]
+        J[VOID/CANCEL<br/>記錄狀態]
+        K[HALF_WIN/HALF_LOSS<br/>記錄狀態]
+        L[valid_bet 保持不變<br/>= Layer 1 輸出<br/>= $100<br/>僅記錄 settlement_status]
     end
 
-    subgraph Layer3["Layer 3: 活動權重驗證 (04-01)"]
+    subgraph Layer3["Layer 3: 活動權重應用 (04-01)"]
         M{遊戲類型?}
         N[Slots/Sports<br/>game_weight = 1.0]
         O[Baccarat<br/>game_weight = 0.15]
         P[Blackjack<br/>game_weight = 0.1]
         Q[Roulette<br/>game_weight = 0.2]
-        R[計算活動流水<br/>activity_valid_turnover<br/>= finance × weight<br/>= $100 × 0.15 = $15]
+        R[計算活動貢獻<br/>contributed_amount<br/>= valid_bet × weight<br/>= $100 × 0.15 = $15]
     end
 
     subgraph Update["更新流水進度"]
@@ -406,37 +418,37 @@ flowchart TD
 
 ---
 
-## 5. Layer 2: 財務驗證流程
+## 5. Layer 2: 財務狀態記錄流程
 
-### 5.1 狀態因子應用流程 (Status Factor Application)
+### 5.1 結算狀態記錄流程 (Settlement Status Recording)
 
 ```mermaid
 flowchart TD
-    A[開始: 財務層驗證]
-    B[輸入: effective_turnover_base<br/>= $100]
+    A[開始: 財務層記錄]
+    B[輸入: valid_bet<br/>= $100<br/>來自 Layer 1,不可變]
     C[獲取注單狀態<br/>bet.status]
     D{注單狀態}
 
     E[WIN<br/>玩家贏]
-    F[status_factor = 1.0<br/>100% 計入流水]
+    F[記錄: settlement_status = WIN<br/>計算賠付金額]
 
     G[LOSS<br/>玩家輸]
-    H[status_factor = 1.0<br/>100% 計入流水]
+    H[記錄: settlement_status = LOSS<br/>計算賠付金額]
 
     I[DRAW/TIE<br/>和局]
-    J[status_factor = 0.0<br/>無風險,不計流水]
+    J[記錄: settlement_status = DRAW<br/>退還本金]
 
     K[VOID/CANCEL<br/>注單作廢]
-    L[status_factor = 0.0<br/>不計流水]
+    L[記錄: settlement_status = VOID<br/>退還本金]
 
     M[HALF_WIN/HALF_LOSS<br/>半贏半輸]
-    N[status_factor = 0.5<br/>50% 計入流水]
+    N[記錄: settlement_status = HALF_WIN/HALF_LOSS<br/>計算部分賠付]
 
-    O[計算財務流水<br/>valid_turnover_finance<br/>= base × factor]
+    O[更新數據庫<br/>settlement_status<br/>payout_amount]
 
-    P[更新數據庫<br/>bets.valid_turnover_finance]
+    P[valid_bet 保持不變<br/>= $100<br/>不受結算狀態影響]
 
-    End([返回: valid_turnover_finance])
+    End([返回: valid_bet $100<br/>+ settlement_status])
 
     A --> B
     B --> C
@@ -463,14 +475,17 @@ flowchart TD
     O --> P
     P --> End
 
-    style F fill:#d4edda
-    style H fill:#d4edda
+    style P fill:#d4edda
+    style F fill:#fff3cd
+    style H fill:#fff3cd
     style J fill:#fff3cd
     style L fill:#fff3cd
-    style N fill:#d1ecf1
+    style N fill:#fff3cd
 ```
 
-### 5.2 狀態因子對照表
+### 5.2 結算狀態與 Valid Bet 關係對照表
+
+> **重要原則**: Valid Bet 由 Layer 1 風控引擎一次性判定,Layer 2 僅記錄結算狀態,**不修改** Valid Bet 值。
 
 ```mermaid
 graph LR
@@ -486,28 +501,28 @@ graph LR
         A9[RUNNING<br/>進行中]
     end
 
-    subgraph "狀態因子 (Status Factor)"
-        B1[1.0]
-        B2[1.0]
-        B3[0.0]
-        B4[0.0]
-        B5[0.0]
-        B6[0.0]
-        B7[0.5]
-        B8[0.5]
-        B9[0.0]
+    subgraph "Valid Bet 處理"
+        B1[保持不變]
+        B2[保持不變]
+        B3[保持不變]
+        B4[保持不變]
+        B5[保持不變]
+        B6[保持不變]
+        B7[保持不變]
+        B8[保持不變]
+        B9[保持不變]
     end
 
-    subgraph "計入流水比例"
-        C1[100%]
-        C2[100%]
-        C3[0%]
-        C4[0%]
-        C5[0%]
-        C6[0%]
-        C7[50%]
-        C8[50%]
-        C9[0%]
+    subgraph "說明"
+        C1[僅記錄狀態<br/>計算賠付]
+        C2[僅記錄狀態<br/>計算賠付]
+        C3[僅記錄狀態<br/>退還本金]
+        C4[僅記錄狀態<br/>退還本金]
+        C5[僅記錄狀態<br/>退還本金]
+        C6[僅記錄狀態<br/>退還本金]
+        C7[僅記錄狀態<br/>計算部分賠付]
+        C8[僅記錄狀態<br/>計算部分賠付]
+        C9[等待結算<br/>暫不處理]
     end
 
     A1 --> B1 --> C1
@@ -522,13 +537,13 @@ graph LR
 
     style B1 fill:#d4edda
     style B2 fill:#d4edda
-    style B3 fill:#f8d7da
-    style B4 fill:#f8d7da
-    style B5 fill:#f8d7da
-    style B6 fill:#f8d7da
-    style B7 fill:#fff3cd
-    style B8 fill:#fff3cd
-    style B9 fill:#f8d7da
+    style B3 fill:#d4edda
+    style B4 fill:#d4edda
+    style B5 fill:#d4edda
+    style B6 fill:#d4edda
+    style B7 fill:#d4edda
+    style B8 fill:#d4edda
+    style B9 fill:#fff3cd
 ```
 
 ---
@@ -1004,34 +1019,312 @@ def is_hedge_pattern(amount1, amount2, odds1, odds2) -> bool:
 
 ---
 
-## 9. 總結
+## 9. Layer 2 不修改 Valid Bet 的設計原則
 
-### 9.1 核心設計原則
+### 9.1 核心原則
+
+> **關鍵設計決策**: Layer 2 (財務中心) 僅記錄結算狀態,**不修改** Layer 1 (風控引擎) 確定的 Valid Bet 值。
+
+### 9.2 為什麼財務層不應該修改 Valid Bet?
+
+#### 9.2.1 違反「風控完全獨立」原則
+
+**問題**:
+- 如果 Layer 1 已經確定了 valid_bet,為何 Layer 2 還要根據結算狀態動態修改?
+- 這意味著風控判定並非最終決策,存在邏輯矛盾
+
+**正確做法**:
+```
+Layer 1 (風控引擎): 一次性判定 valid_bet
+  ├─ 通過 → valid_bet = bet_amount, risk_status = "PASSED"
+  └─ 拒絕 → valid_bet = 0, risk_status = "FILTERED", reason = "對沖投注"
+
+Layer 2 (財務中心): 僅記錄結算狀態,不修改 valid_bet
+  ├─ settlement_status = "WIN/LOSS/HALF_WIN/HALF_LOSS/DRAW"
+  └─ payout_amount = calculatePayout(bet, status)
+```
+
+#### 9.2.2 違反公平性原則 (Error #3 - 實際風險法)
+
+**問題場景**:
+```
+兩位玩家都投注 100 元在體育博彩「讓 -0.25」:
+- 玩家 A 的比賽結果: 全贏 → valid_bet = 100 元 ✓
+- 玩家 B 的比賽結果: 平局(輸半) → valid_bet = 50 元 ❌ (錯誤)
+
+矛盾:
+- 相同的投注行為
+- 相同的風險暴露 (100 元)
+- 但 valid_bet 不同 → 違反公平性原則
+```
+
+**正確做法 (標準本金法 - 業界標準)**:
+```
+玩家 A: 投注 100 元 → 全贏 → valid_bet = 100 元
+玩家 B: 投注 100 元 → 輸半 → valid_bet = 100 元 (不是 50!)
+
+理由:
+- 玩家下注時承擔的風險都是 100 元
+- Valid Bet 應該反映投注行為,而非結算結果
+- 簡化計算,不需要等結算才知道 valid_bet
+```
+
+#### 9.2.3 業界標準對照
+
+| 營運商 | Valid Bet 計算方法 | 結算狀態影響 | 說明 |
+|-------|------------------|------------|------|
+| **Pinnacle** | 標準本金法 | 無影響 | Valid Bet = 投注本金 |
+| **Betfair** | 標準本金法 | 無影響 | 不論輸贏,全額計入 |
+| **Pragmatic Play** | 標準本金法 | 無影響 | 業界遊戲提供商標準 |
+| **Evolution Gaming** | 標準本金法 | 無影響 | 真人娛樂業界標準 |
+| **❌ 實際風險法** | 動態調整 | 受影響 | 已廢棄,違反公平性 |
+
+### 9.3 Settlement Status 與 Valid Bet 的分離
+
+```mermaid
+graph LR
+    subgraph "Layer 1 輸出"
+        A[valid_bet = $100]
+        B[risk_status = PASSED]
+        C[filter_reason = null]
+    end
+
+    subgraph "Layer 2 記錄"
+        D[settlement_status = HALF_WIN]
+        E[payout_amount = $145]
+        F[valid_bet 保持 $100]
+    end
+
+    subgraph "Layer 3 應用"
+        G[contributed_amount]
+        H[= valid_bet × weight]
+        I[= $100 × 0.15 = $15]
+    end
+
+    A --> F
+    F --> G
+    D -.僅用於計算賠付.-> E
+    G --> H --> I
+
+    style F fill:#d4edda
+    style A fill:#fff3cd
+```
+
+### 9.4 實施建議
+
+**數據庫設計**:
+```sql
+CREATE TABLE wagering_details (
+    -- 原始數據 (不可變)
+    bet_amount DECIMAL(18,2) NOT NULL,
+
+    -- Layer 1 風控判定結果 (一次性確定)
+    valid_bet DECIMAL(18,2) NOT NULL,
+    risk_status ENUM('PASSED', 'FILTERED', 'PENDING') NOT NULL,
+    filter_reason VARCHAR(200),
+
+    -- Layer 2 財務狀態 (不影響 valid_bet)
+    settlement_status ENUM('WIN', 'LOSS', 'DRAW', 'HALF_WIN', 'HALF_LOSS') NOT NULL,
+    payout_amount DECIMAL(18,2),
+
+    -- Layer 3 活動權重
+    game_contribution DECIMAL(5,4) NOT NULL,
+    contributed_amount DECIMAL(18,2) NOT NULL,  -- valid_bet × weight
+
+    -- 審計字段
+    calculation_version VARCHAR(20) NOT NULL
+);
+```
+
+---
+
+## 10. 風控標記機制
+
+### 10.1 為什麼需要風控標記?
+
+**問題**:
+- 當前設計僅記錄最終的 valid_bet 值
+- 缺失: 沒有記錄「為什麼」流水是這個值
+- **影響**: 無法審計追溯、無法回推重算
+
+**解決方案**:
+增加四個風控標記字段:
+1. `risk_status`: 風控檢查結果 (PASSED/FILTERED/PENDING)
+2. `filter_reason`: 過濾原因文字說明
+3. `risk_rules_applied`: 應用的風控規則 (JSON數組)
+4. `calculation_version`: 計算規則版本號
+
+### 10.2 風控標記字段定義
+
+#### 10.2.1 risk_status (風控狀態)
+
+| 狀態 | 說明 | valid_bet | 使用場景 |
+|------|------|-----------|---------|
+| **PASSED** | 風控檢查通過 | = bet_amount | 正常投注 |
+| **FILTERED** | 風控過濾拒絕 | = 0 | 對沖、套利、低賠率 |
+| **PENDING** | 等待人工審核 | = 0 (暫不計入) | 可疑交易、高額投注 |
+
+#### 10.2.2 filter_reason (過濾原因)
+
+| risk_status | filter_reason 範例 | 說明 |
+|-------------|------------------|------|
+| PASSED | null | 無過濾 |
+| FILTERED | "對沖投注: 同時投注 Banker/Player" | 具體原因 |
+| FILTERED | "低賠率投注: odds=1.30 < 閾值 1.50" | 具體原因 |
+| FILTERED | "套利投注: 跨平台賠率差異 > 5%" | 具體原因 |
+| PENDING | "高額投注需人工審核: 金額 > $10,000" | 等待審核 |
+
+#### 10.2.3 risk_rules_applied (應用的規則)
+
+**JSON 格式範例**:
+```json
+{
+  "risk_rules_applied": [
+    {
+      "rule_id": "HEDGE_001",
+      "rule_name": "百家樂對沖檢測",
+      "action": "FILTER",
+      "confidence": 0.95
+    },
+    {
+      "rule_id": "ODDS_001",
+      "rule_name": "賠率閾值檢查",
+      "action": "PASS",
+      "threshold": 1.5,
+      "actual_odds": 1.95
+    }
+  ]
+}
+```
+
+#### 10.2.4 calculation_version (計算版本)
+
+**用途**: 支持規則調整後的回推重算
+
+| 版本 | 變更內容 | 生效日期 |
+|------|---------|---------|
+| v1.0.0 | 初始版本,使用實際風險法 | 2026-01-01 |
+| v1.1.0 | 修正為標準本金法 | 2026-01-28 |
+| v1.2.0 | 調整賠率閾值 1.3 → 1.5 | 2026-02-01 |
+
+### 10.3 審計追溯示例
+
+**查詢: 為什麼這筆投注 valid_bet = 0?**
+
+```sql
+SELECT
+    bet_id,
+    bet_amount,
+    valid_bet,
+    risk_status,
+    filter_reason,
+    risk_rules_applied
+FROM wagering_details
+WHERE bet_id = 'BET_12345';
+```
+
+**結果**:
+```
+bet_id: BET_12345
+bet_amount: 100.00
+valid_bet: 0.00
+risk_status: FILTERED
+filter_reason: "對沖投注: 同時投注 Banker (1000元) 和 Player (950元)"
+risk_rules_applied: [{"rule_id": "HEDGE_001", "action": "FILTER"}]
+```
+
+**結論**: 該投注被風控系統識別為對沖投注,因此 valid_bet = 0。
+
+### 10.4 回推重算支持
+
+**場景**: 風控規則調整後,需要重新計算歷史數據
+
+```java
+// 回推重算服務
+@Service
+public class WageringRecalculationService {
+
+    public RecalculationResult recalculateValidBets(
+        Long userId,
+        Instant startTime,
+        Instant endTime,
+        String newRuleVersion
+    ) {
+        // 1. 查詢需要重算的交易
+        List<WageringDetail> details = detailRepository
+            .findByUserAndTimeBetween(userId, startTime, endTime);
+
+        // 2. 使用新規則重新計算
+        for (WageringDetail detail : details) {
+            ValidBetResult newCalculation = calculationService
+                .calculateValidBetWithVersion(
+                    detail.getBetAmount(),
+                    detail.getGameType(),
+                    detail.getOdds(),
+                    newRuleVersion  // 使用新版本規則
+                );
+
+            // 3. 更新記錄
+            detail.setValidBet(newCalculation.getValidBet());
+            detail.setCalculationVersion(newRuleVersion);
+            detail.setRecalculatedAt(Instant.now());
+            detailRepository.save(detail);
+        }
+
+        return RecalculationResult.builder()
+            .totalAffected(details.size())
+            .build();
+    }
+}
+```
+
+---
+
+## 11. 總結
+
+### 11.1 核心設計原則
 
 1. **三層驗證架構** (Three-Layer Architecture)
-   - Layer 1 (風控): 過濾惡意行為
-   - Layer 2 (財務): 確保財務準確性
-   - Layer 3 (活動): 應用業務規則
+   - Layer 1 (風控引擎): 一次性判定 valid_bet,標記 risk_status
+   - Layer 2 (財務中心): 僅記錄結算狀態,**不修改** valid_bet
+   - Layer 3 (活動系統): 應用遊戲權重,計算活動貢獻
 
-2. **單一數據源** (Single Source of Truth)
-   - 05-01 風控系統是風險驗證的權威來源
-   - 其他模塊通過 API 調用,不重複實現邏輯
+2. **風控完全獨立原則**
+   - Layer 1 確定 valid_bet 後,後續層級不再修改
+   - 採用「標準本金法」: valid_bet = bet_amount (不論結果)
+   - 結算狀態僅用於計算賠付金額,與流水計算分離
 
 3. **關注點分離** (Separation of Concerns)
-   - 風控關注: 對沖、套利、賠率
-   - 財務關注: 注單狀態
-   - 活動關注: 遊戲權重
+   - 風控關注: 對沖、套利、賠率過濾
+   - 財務關注: 結算狀態、賠付金額計算
+   - 活動關注: 遊戲權重應用
 
-### 9.2 關鍵指標
+4. **審計追溯支持**
+   - 記錄原始數據 + 計算結果 + 版本號
+   - 提供回推重算接口
+   - 完整的風控標記 (risk_status, filter_reason)
 
-| 指標 | 定義 | 計算公式 |
-|------|------|---------|
-| **effective_turnover_base** | 風控有效流水 | 通過風控驗證的投注金額 |
-| **valid_turnover_finance** | 財務有效流水 | base × status_factor |
-| **activity_valid_turnover** | 活動有效流水 | finance × game_weight |
-| **wagering_progress** | 流水完成進度 | completed / required × 100% |
+### 11.2 關鍵術語定義
 
-### 9.3 常見問題 (FAQ)
+> **術語標準化**: 見 [術語標準化定義](../../00_Concept_&_Analysis/00-03_Terminology_Standards.md)
+
+| 中文 | 英文 | 定義 | 單位 | 用途 |
+|------|------|------|------|------|
+| **投注額** | Bet Amount | 單筆原始投注金額 | 單筆 | API 交互、資金扣除 |
+| **流水** | Turnover | 投注額的時間累積總和 | 累積 | GGR 計算、財務報表 |
+| **有效投注額** | Valid Bet | 經風控過濾的單筆金額 | 單筆 | 流水要求、返水、VIP |
+| **流水要求** | Wagering Requirement | 必須達成的有效投注總額 | 累積 | 活動驗證、取款限制 |
+
+### 11.3 數據流關鍵指標
+
+| 階段 | 指標 | 計算公式 | 說明 |
+|------|------|---------|------|
+| **Layer 1 輸出** | valid_bet | 風控判定 (bet_amount or 0) | 一次性確定,不可變 |
+| **Layer 2 記錄** | settlement_status | 記錄結算狀態 | 不影響 valid_bet |
+| **Layer 3 輸出** | contributed_amount | valid_bet × game_weight | 活動貢獻金額 |
+| **進度追蹤** | wagering_progress | Σ contributed / requirement × 100% | 流水完成百分比 |
+
+### 11.4 常見問題 (FAQ)
 
 **Q1: 為什麼 DRAW/TIE 不計流水?**
 - A: 和局時玩家本金返還,無實際風險,因此不計入流水要求。

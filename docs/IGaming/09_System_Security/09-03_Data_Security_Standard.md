@@ -322,7 +322,7 @@ server {
 
 ### 技術架構參考
 - [09-01 管理後台 RBAC](./09-01_Admin_RBAC.md) - 權限分級脫敏
-- [09-02 審計日誌與審批](./09-02_Audit_Log_&_Approval.md) - PII 存取審計
+- [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - PII 存取審計
 - [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - HTTPS 強制要求
 
 ### 業務邏輯參考

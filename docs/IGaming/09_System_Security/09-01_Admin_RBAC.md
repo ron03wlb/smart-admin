@@ -963,4 +963,10 @@ def detect_permission_abuse(user_id, time_window='1h'):
 **文件版本**: V2.0 (Enhanced)
 **最後更新**: 2026-01-27
 **狀態**: Architecture-Level Complete
-**維護者**: Security Team
+**維護團隊**: Security Team
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Security Team & Backend Team

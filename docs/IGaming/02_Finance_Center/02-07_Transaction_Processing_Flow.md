@@ -381,3 +381,9 @@ VALUES (uuid(), player_id, 'WALLET_DEBITED', '{"amount": 100, "game": "slot"}', 
 ### 6.3 消息不丟失保證
 *   **CDC / Polling Publisher**: 獨立進程讀取 `outreach_event_outbox` -> 發送至 Kafka -> 更新 Status='SENT'。
 *   **Consumer Idempotency**: 下游服務 (Activity Service) 必須利用 `event_id` 實現冪等處理。
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team

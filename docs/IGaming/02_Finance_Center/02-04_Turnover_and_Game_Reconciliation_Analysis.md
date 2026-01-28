@@ -1,5 +1,10 @@
 # 02-04 流水計算與遊戲對帳分析 (Turnover & Game Reconciliation Analysis)
 
+> **三層風控架構定位**: **Layer 2 - 財務狀態因子**
+> 本模塊負責根據遊戲結果 (WIN/LOSS/DRAW) 計算有效流水的狀態因子。
+> 需依賴 Layer 1 (05-01) 完成風控驗證後才執行。
+> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
+
 本文件詳細定義「有效流水 (Valid Turnover)」的計算邏輯以及「遊戲商對帳 (Game Reconciliation)」的完整流程，確保數據精確度與資金安全。
 
 ## 📚 補充資料
@@ -17,7 +22,10 @@
 公式：`ValidTurnover = BetAmount * GameWeight * OddsFactor * StatusFactor * RiskFactor`
 - **RiskFactor**: `1` (Pass) 或 `0` (Reject, e.g. Hedge/Arbitrage)
 
-### 1.2 狀態判定 (Status Factor)
+### 1.2 狀態判定 (Status Factor) - Layer 2 核心邏輯
+
+**前置條件**: ✅ 必須先通過 Layer 1 風控驗證 (05-01 §3.1 ValidateBet)
+
 並非所有下注都算流水，需根據遊戲結果進行過濾：
 
 | 狀態 (Status) | 描述 | 流水計算 | 備註 |
@@ -543,3 +551,9 @@ flowchart TD
 
     Invalid --> EndNormal
 ```
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team

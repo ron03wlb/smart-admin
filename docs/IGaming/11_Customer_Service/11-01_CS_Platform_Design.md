@@ -78,7 +78,7 @@
 **內容管理**：
 - CMS 後台編輯知識庫文章
 - 版本控制：保留文章修改歷史
-- 發佈審批工作流（參考 09-02 審批系統）
+- 發佈審批工作流（參考 09-04 審批工作流系統）
 
 **有效性追蹤**：
 ```sql
@@ -369,7 +369,7 @@ const livechat = new LiveChatClient({
 
 ### 技術架構參考
 - [08-05 多語言系統](../08_Frontend_CMS/08-05_Localization_System.md) - 知識庫多語言支持
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 客服操作審計
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 客服操作審計
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 多渠道通知整合
 
 ---

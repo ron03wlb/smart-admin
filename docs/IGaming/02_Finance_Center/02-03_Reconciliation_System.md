@@ -744,7 +744,7 @@ ORDER BY net_cash_flow DESC;
 1. 財務人員發現差異，提交調帳申請
 2. 填寫調帳原因（必填，至少 20 字）
 3. 上傳佐證文件（如銀行截圖、PSP 郵件回覆）
-4. **強制審批**：調帳金額 > $0，必須經由財務主管審核通過（引用 09-02 審批系統）
+4. **強制審批**：調帳金額 > $0，必須經由財務主管審核通過（引用 09-04 審批工作流系統）
 
 **資料表設計**：
 ```sql
@@ -788,7 +788,8 @@ CREATE TABLE manual_adjustments (
 - [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 餘額調整邏輯
 
 ### 技術架構參考
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 調帳審批工作流
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 調帳操作審計
+- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 調帳審批工作流
 - [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 對帳系統權限控制
 - [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - PSP API 規範
 

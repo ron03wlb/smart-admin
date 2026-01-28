@@ -343,3 +343,9 @@ flowchart TB
 **文件版本**：1.0  
 **建立日期**：2026-01-27  
 **建立者**：System Analysis
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team

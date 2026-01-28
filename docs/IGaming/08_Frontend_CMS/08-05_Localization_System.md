@@ -316,7 +316,7 @@ async def get_translations(lang: str, namespace: str):
 
 ### 技術架構參考
 - [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API 規範
-- [09-02 審計日誌與審批](../09_System_Security/09-02_Audit_Log_&_Approval.md) - 翻譯變更審計
+- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 翻譯變更審計
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 多渠道通知整合
 
 ### 參考資料

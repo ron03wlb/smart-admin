@@ -481,5 +481,6 @@ POST {merchant_webhook_url}
 
 ---
 
-**最後更新**: 2026-01-27
-**維護者**: Finance Team & Risk Control Team
+**文檔版本**: 1.0.0
+**最後更新**: 2026-01-28
+**維護團隊**: Finance Team & Backend Team
