@@ -2,7 +2,7 @@
 
 > **版本**: 1.0.0
 > **最後更新**: 2026-01-27
-> **維護者**: Architecture Team
+> **維護團隊**: Architecture Team
 
 ---
 
@@ -100,7 +100,7 @@
     → 權限初始化
 [02-06 統一錢包模型]
     → 創建錢包
-[09-02 審計日誌與審批]
+[09-02 審計日誌系統]
     → 記錄註冊日誌
 ```
 
@@ -120,7 +120,7 @@
     → 交易事件處理
 [02-06 統一錢包模型]
     → 錢包入賬 (Cash餘額)
-[09-02 審計日誌與審批]
+[09-02 審計日誌系統]
     → 記錄交易日誌
 [04-01 活動系統設計]
     → 觸發存送紅利（如有）
@@ -163,7 +163,7 @@
     → 多層審核（L1/L2/L3）
 [05-01 風控系統]
     → 風控規則檢測
-[09-02 審計日誌與審批]
+[09-02 審計日誌系統]
     → Maker-Checker審批
 [02-02 支付網關集成]
     → PSP代付執行
@@ -657,21 +657,51 @@ graph TD
 **重要提示**: 流水計算採用**三層架構**，請勿合併！
 
 **理解架構** (必讀順序):
-1. **Layer 1 - 風控基礎驗證**: [05-01 風控系統 §3.1](../05_Risk_Management/05-01_Risk_Control_System.md#31-validatebet) - 對沖檢測、賠率閾值
-2. **Layer 2 - 財務狀態因子**: [02-04 流水計算 §1.6](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#16-跨模組流水一致性保障) - WIN/LOSS/DRAW狀態調整
-3. **Layer 3 - 活動遊戲權重**: [04-01 活動系統](../04_Activity_Center/04-01_Activity_System_Design.md) - 遊戲權重應用（老虎機100%、百家樂15%）
+1. **Layer 1 - 風控基礎驗證**: [05-01 風控系統 §3.1](../05_Risk_Management/05-01_Risk_Control_System.md#31-validatebet---投注驗證-layer-1-核心邏輯)
+   - **職責**: 對沖檢測、賠率閾值、異常投注模式識別
+   - **輸出**: RiskFactor (0 = Reject, 1 = Pass)
+   - **標記**: 文檔中明確標註 "Layer 1 核心邏輯"
 
-**實作流程**:
+2. **Layer 2 - 財務狀態因子**: [02-04 流水計算 §1.2](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#12-狀態判定-status-factor---layer-2-核心邏輯)
+   - **職責**: WIN/LOSS/DRAW 狀態調整、HALF WIN/LOSS 處理
+   - **輸出**: StatusFactor (0%, 50%, 100%)
+   - **標記**: 文檔中明確標註 "Layer 2 核心邏輯"
+   - **前置條件**: ✅ 必須先通過 Layer 1
+
+3. **Layer 3 - 活動遊戲權重**: [04-01 活動系統 §5.1](../04_Activity_Center/04-01_Activity_System_Design.md#51-遊戲權重應用-game-weight-application---layer-3-核心邏輯)
+   - **職責**: 遊戲權重應用 (老虎機 100%、百家樂 15%)
+   - **輸出**: GameWeight (5%-100%)
+   - **標記**: 文檔中明確標註 "Layer 3 核心邏輯"
+   - **前置條件**: ✅ Layer 1 + Layer 2 完成
+
+**實作流程** (嚴格順序):
 ```
 1. 玩家投注 → 調用 Layer 1 (05-01) 基礎驗證
+   ↓ (若 RiskFactor = 0，直接拒絕)
 2. 驗證通過 → 調用 Layer 2 (02-04) 狀態因子計算
+   ↓ (根據遊戲結果 WIN/LOSS/DRAW)
 3. 如涉及活動 → 調用 Layer 3 (04-01) 遊戲權重調整
+   ↓
+4. 最終流水 = BetAmount × Layer1 × Layer2 × Layer3
 ```
 
-**常見錯誤**:
-- ❌ 直接在活動系統計算流水（跳過風控驗證）
-- ❌ 將三層邏輯合併到單一模塊（破壞分離關注點）
-- ✅ 正確做法：遵循三層調用鏈，每層職責明確
+**完整公式**:
+```
+ValidTurnover = BetAmount
+                × Layer1_RiskFactor      (05-01: 0 or 1)
+                × Layer2_StatusFactor    (02-04: 0%, 50%, 100%)
+                × Layer3_GameWeight      (04-01: 5%-100%)
+```
+
+**驗證清單**:
+- ✅ 所有三個文檔開頭包含架構定位標記
+- ✅ Layer 2/3 明確標註前置條件依賴
+- ✅ 完整公式在所有相關章節可見
+
+**關鍵原則**:
+- ✅ **必須按順序執行**: Layer 1 → Layer 2 → Layer 3
+- ✅ **不可跳過**: 每層都必須執行（即使某層因子為 1）
+- ❌ **不可合併**: 三層邏輯不可合併到同一個 Service 中
 
 ---
 
@@ -739,7 +769,7 @@ graph TD
 
 #### 📈 ...報表與數據
 **導航路徑**:
-- **報表架構**: [10-01 報表與BI架構](../10_Reports_&_BI/10-01_Reporting_Architecture.md) - 數據分層、BI工具
+- **報表架構**: [10-01 報表與BI架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - 數據分層、BI工具
 - **數據管道**: [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - ODS→DWD→DWS→ADS
 - **數據模型**: [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 完整表設計
 
@@ -873,6 +903,6 @@ graph TD
 
 ---
 
-**文檔版本**: v1.0.0
+**文檔版本**: 1.0.0
 **生成日期**: 2026-01-27
 **下次審閱**: 2026-04-27（每季度審閱）

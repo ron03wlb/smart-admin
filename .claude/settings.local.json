@@ -140,7 +140,11 @@
       "Bash(__NEW_LINE_b9e53951332bec3c__ echo \"=== Commit Summary ===\")",
       "Bash(__NEW_LINE_b9e53951332bec3c__ echo \"\")",
       "Bash(__NEW_LINE_dd42368c7a448907__ echo \"Pushing to remote...\")",
-      "Bash(__NEW_LINE_dd42368c7a448907__ echo \"\")"
+      "Bash(__NEW_LINE_dd42368c7a448907__ echo \"\")",
+      "Bash(diff:*)",
+      "Bash(tail:*)",
+      "Bash(do if ! grep -q \"^\\\\*\\\\*文檔版本\\\\*\\\\*:\" \"$file\")",
+      "Bash(then echo \"$file\" fi done)"
     ]
   },
   "allowedCommands": {
