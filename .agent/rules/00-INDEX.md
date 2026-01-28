@@ -219,6 +219,10 @@ User Request Classification
 | "fraud detection", "multi-account", "bonus abuse", "risk control" | **fraud-detection-pattern-generator** | iGaming fraud patterns with real-time scoring | `/fraud multi-account-detection` |
 | **Quality Gate** ||||
 | "quality gate", "pre-merge check", "CI/CD validation" | **quality-gate-orchestrator** | Multi-tool orchestration (ArchUnit, Checkstyle, PMD, SpotBugs) | `/quality-gate check` |
+| **Plan Orchestration** ||||
+| "batch execute plans", "run multiple plans", "parallel execution", "orchestrate plans" | **batch-plan-executor** | Auto-detect plan types, conflict detection, parallel/serial execution | `/batch-execute --auto` |
+| "execute mixed plans", "CRUD + testing batch", "migration workflow" | **batch-plan-executor --scan-dir** | Scan directory and execute all plans with conflict analysis | `/batch-execute --scan-dir=docs/plans/liteflow/` |
+| "dry-run plans", "simulate execution", "check conflicts" | **batch-plan-executor --dry-run** | Pre-execution risk assessment without actual execution | `/batch-execute --dry-run plan1.md plan2.md` |
 
 ### 2.3 Skill Combination Patterns
 
@@ -238,6 +242,19 @@ User Request Classification
 ```bash
 /test EmployeeService --mode=integration
 # Generates: BaseIntegrationTest + fixtures + integration tests
+```
+
+#### Pattern 4: Batch Plan Execution
+```bash
+# Auto-scan and execute all plans in a directory
+/batch-execute --scan-dir=docs/plans/liteflow/
+
+# Execute specific plans with conflict detection
+/batch-execute plan1.md plan2.md plan3.md
+
+# Dry-run mode for risk assessment
+/batch-execute --dry-run --auto
+# Generates: Conflict analysis + execution plan + time estimation
 ```
 
 ---

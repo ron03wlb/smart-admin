@@ -1,0 +1,217 @@
+# Batch Plan Executor - Configuration File
+# Version: 1.0.0
+# Last Updated: 2026-01-29
+
+# ====================================================================
+# EXECUTION SETTINGS
+# ====================================================================
+execution:
+  # Maximum number of concurrent plan executions (recommended: 3-5)
+  max_concurrent: 5
+
+  # Failure strategy when a plan execution fails
+  # Options:
+  #   - CONTINUE: Continue executing other plans, skip failed ones
+  #   - ABORT_ALL: Stop all executions immediately and rollback completed plans
+  #   - PAUSE: Pause execution and wait for user decision
+  failure_strategy: CONTINUE
+
+  # Retry configuration for failed plan executions
+  retry:
+    enabled: true
+    max_attempts: 3
+    backoff: exponential  # exponential | linear | fixed
+    initial_delay_seconds: 1
+
+  # Timeout settings
+  timeout:
+    per_plan_seconds: 3600   # 60 minutes per plan
+    total_seconds: 14400     # 4 hours total execution time
+
+  # Quality gate checks after execution
+  quality_gates:
+    enabled: true
+    run_architecture_test: true
+    run_compilation_check: true
+    run_unit_tests: true
+
+# ====================================================================
+# CONFLICT DETECTION SETTINGS
+# ====================================================================
+conflict_detection:
+  # File-level conflict detection
+  file_level:
+    enabled: true
+    severity: HIGH
+    # File path patterns to ignore (e.g., test files, generated code)
+    ignore_patterns:
+      - "**/*Test.java"
+      - "**/target/**"
+      - "**/build/**"
+      - "**/.gradle/**"
+
+  # Module-level conflict detection
+  module_level:
+    enabled: true
+    severity: MEDIUM
+    # Java package prefixes to monitor
+    java_package_prefixes:
+      - "net.lab1024.sa.admin.module"
+      - "net.lab1024.sa.base.module"
+    # Vue module paths to monitor
+    vue_module_paths:
+      - "smart-admin-web/src/views"
+      - "smart-admin-web/src/api"
+
+  # Dependency relationship conflict detection
+  dependency_level:
+    enabled: true
+    severity: CRITICAL
+    # Automatically resolve circular dependencies (if possible)
+    auto_resolve_cycles: false
+
+# ====================================================================
+# REPORTING SETTINGS
+# ====================================================================
+reporting:
+  # Pre-execution report (before starting execution)
+  pre_execution:
+    enabled: true
+    include_conflict_analysis: true
+    include_execution_plan: true
+    include_risk_assessment: true
+    include_time_estimation: true
+
+  # Progress updates during execution
+  progress_updates:
+    enabled: true
+    interval_seconds: 60
+    show_real_time_logs: true
+
+  # Post-execution summary report
+  post_execution:
+    enabled: true
+    include_execution_stats: true
+    include_file_changes: true
+    include_quality_gate_results: true
+    include_recommendations: true
+
+  # Log storage
+  logs:
+    save_to_file: true
+    log_directory: ".claude/metrics/batch-executions"
+    log_format: "batch-exec-{timestamp}.log"
+
+# ====================================================================
+# PLAN DISCOVERY SETTINGS
+# ====================================================================
+plan_discovery:
+  # Directories to scan for plans
+  directories:
+    claude_code_plans: "~/.claude/plans/"
+    skill_phase_docs: ".claude/skills/*/phases/"
+    project_plans: "docs/plans/"
+
+  # File patterns for plan detection
+  file_patterns:
+    claude_code_plans: "*.md"
+    skill_phase_docs: "phase-*.md"
+    project_plans: "*.md"
+
+  # Scan depth (0 = current directory only, -1 = unlimited)
+  max_depth: 3
+
+  # Exclude patterns
+  exclude_patterns:
+    - "**/archive/**"
+    - "**/deprecated/**"
+    - "**/.git/**"
+    - "**/node_modules/**"
+
+# ====================================================================
+# SKILL MAPPING SETTINGS
+# ====================================================================
+skill_mapping:
+  # Auto-map plans to skills based on content analysis
+  auto_mapping:
+    enabled: true
+    confidence_threshold: 0.7  # Minimum confidence score (0.0-1.0)
+
+  # Fallback behavior when mapping fails
+  fallback:
+    ask_user: true           # Prompt user to select skill
+    suggest_manual: true     # Suggest manual execution for unknown plans
+
+  # Skill aliases for quick mapping
+  aliases:
+    crud: smartadmin-crud-generator
+    test: smartadmin-testing-suite
+    refactor: vavr-refactoring-assistant
+    liteflow: liteflow-rule-builder
+    job: scheduled-task-manager
+
+# ====================================================================
+# EXECUTION MODES
+# ====================================================================
+modes:
+  # Default mode when no mode is specified
+  default: auto
+
+  # Available modes
+  available:
+    - auto          # Fully automatic execution
+    - interactive   # Interactive confirmation mode
+    - dry-run       # Simulation mode (no actual execution)
+
+  # Mode-specific settings
+  auto:
+    confirm_before_start: false
+    stop_on_high_risk: true
+
+  interactive:
+    confirm_each_plan: true
+    show_conflict_details: true
+    allow_reorder: true
+
+  dry_run:
+    generate_full_report: true
+    estimate_execution_time: true
+    validate_skill_mappings: true
+
+# ====================================================================
+# ADVANCED SETTINGS
+# ====================================================================
+advanced:
+  # Parallel execution optimization
+  parallel_optimization:
+    enabled: true
+    use_dependency_graph: true
+    topological_sort: true
+
+  # Rollback mechanism
+  rollback:
+    enabled: true
+    create_git_snapshot: true
+    snapshot_branch_prefix: "batch-exec-snapshot"
+
+  # Performance tuning
+  performance:
+    cache_plan_analysis: true
+    cache_ttl_seconds: 3600
+    pre_load_skills: true
+
+# ====================================================================
+# NOTIFICATION SETTINGS (Future Extension)
+# ====================================================================
+notifications:
+  enabled: false
+  # Slack/Email/Webhook integration (TBD in future versions)
+
+# ====================================================================
+# DEBUG SETTINGS
+# ====================================================================
+debug:
+  enabled: false
+  verbose_logging: false
+  save_intermediate_results: false
+  debug_output_directory: ".claude/debug/batch-executor"

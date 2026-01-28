@@ -187,7 +187,7 @@ Controller → Service → Manager → Dao → Entity
 
 ## Specialized Skills
 
-**Quick Overview**: 15 skills across 3 priority levels (see [Complete Catalog](.claude/skills/README.md) for full details)
+**Quick Overview**: 16 skills across 3 priority levels (see [Complete Catalog](.claude/skills/README.md) for full details)
 
 **P0 Skills (Critical - Foundation)** - 6 skills:
 - **[smartadmin-crud-generator](.claude/skills/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution

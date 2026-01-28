@@ -9,6 +9,12 @@
     "removal": "Week 25+ (aliases removed)"
   },
   "aliases": {
+    "batch-execute": {
+      "target": "batch-plan-executor",
+      "deprecated": false,
+      "message": "✅ Active alias for batch-plan-executor skill.\n\nUsage:\n  /batch-execute --auto                      (Auto-scan and execute all plans)\n  /batch-execute plan1.md plan2.md plan3.md  (Execute specific plans)\n  /batch-execute --dry-run                   (Simulation mode)\n  /batch-execute --mode=interactive          (Interactive confirmation)\n\nDocumentation: .claude/skills/batch-plan-executor/SKILL.md",
+      "since": "2026-01-29"
+    },
     "mybatis": {
       "target": "smartadmin-crud-generator --backend-only",
       "deprecated": true,

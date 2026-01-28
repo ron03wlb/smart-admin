@@ -1,10 +1,11 @@
 ﻿# SmartAdmin Skills Catalog
 
-**Version**: 2.0.0
-**Last Updated**: 2026-01-27
-**Total Skills**: 15 (P0: 6, P1: 3, P2: 6)
+**Version**: 2.1.0
+**Last Updated**: 2026-01-29
+**Total Skills**: 16 (P0: 6, P1: 4, P2: 6)
 
-**Recent Changes** (v2.0.0):
+**Recent Changes** (v2.1.0):
+- ✅ **NEW**: batch-plan-executor added to P1 Skills (orchestration & productivity)
 - ✅ CRUD Pipeline Consolidated: 4 skills → 1 composite skill
 - ✅ Backward compatibility: Old commands route to new skill with deprecation warnings
 - ✅ Phase-based execution: `--backend-only`, `--frontend-only`, `--docs-only`, `--all-phases`
@@ -18,7 +19,7 @@ This directory contains specialized skills for SmartAdmin development. Skills ar
 | Priority | Skills | Purpose |
 |----------|--------|---------|
 | **P0** (Critical) | 6 skills | Foundation, core patterns, essential workflows |
-| **P1** (Important) | 3 skills | Business logic, quality gates, fraud detection |
+| **P1** (Important) | 4 skills | Business logic, quality gates, orchestration |
 | **P2** (Nice-to-have) | 6 skills | Productivity, testing, documentation |
 
 ---
@@ -219,6 +220,94 @@ This directory contains specialized skills for SmartAdmin development. Skills ar
 - [.agent/foundation/10-architecture-rules.md](../../.agent/foundation/10-architecture-rules.md)
 - [.agent/rules/quality-tools/11-checkstyle-rules.md](../../.agent/rules/quality-tools/11-checkstyle-rules.md)
 - [.agent/rules/quality-tools/12-pmd-rules.md](../../.agent/rules/quality-tools/12-pmd-rules.md)
+
+---
+
+### igaming-multi-tenant-wallet-pm
+**Description**: 資深 iGaming 產品經理專家，專注多商戶架構和無縫錢包設計，具備歐洲/亞洲/美洲/中國市場經驗。生成標準化 PRD 文檔，整合 13 個無縫錢包專題和多商戶技術指南，使用 Mermaid 生成流程圖、架構圖、時序圖，並進行 step by step 深度思考（Ultrathink 方法論）。
+
+**Trigger Keywords**:
+- "multi-tenant", "white-label", "多商戶", "白標", "包網"
+- "seamless wallet", "無縫錢包", "錢包整合", "遊戲錢包"
+- "歐洲牌照", "亞洲市場", "美洲合規", "中國博弈"
+- "KYC", "AML", "地區合規"
+- "產品需求文檔", "PRD 文檔"
+
+**Phase-Based Execution**:
+```bash
+# 完整流程（所有階段，55-75 分鐘）
+"設計多商戶 VIP 系統，支持白標定制，歐洲牌照合規"
+# 執行：需求收集 → 多商戶設計 → 無縫錢包設計 → 地區合規
+
+# 單階段執行（20-25 分鐘）
+"無縫錢包對接 Evolution Gaming"
+# 僅執行：無縫錢包設計階段（Phase 3）
+
+# 地區合規查詢（10-15 分鐘）
+"歐洲市場 KYC 合規要求對比表"
+# 僅執行：地區合規階段（Phase 4）
+```
+
+**Use Cases**:
+- 設計多商戶架構（Schema/行級/完全隔離策略）
+- 無縫錢包第三方遊戲對接（13 個核心模式整合）
+- 跨地區合規方案（歐洲/亞洲/美洲/中國）
+- 生成標準化繁體中文 PRD 文檔（6 章節結構 + Mermaid 圖表）
+
+**Documentation**: [igaming-multi-tenant-wallet-pm/](igaming-multi-tenant-wallet-pm/)
+
+**與 igame-pm-analyst 的關係**: **擴展（Extension）**
+- igame-pm-analyst: 通用 iGaming 需求分析
+- igaming-multi-tenant-wallet-pm: 專精多商戶 + 無縫錢包 + 跨地區合規
+- 自動觸發：檢測到 "multi-tenant" 或 "seamless wallet" 關鍵詞時優先使用此 Skill
+
+**Related Specs**:
+- [docs/IGaming/seamless_wallet_analysis/](../../docs/IGaming/seamless_wallet_analysis/) (13 個專題)
+- [docs/plans/tenant/](../../docs/plans/tenant/) (多商戶技術指南)
+- [docs/IGaming/02_Finance_Center/](../../docs/IGaming/02_Finance_Center/) (錢包模型)
+
+---
+
+### batch-plan-executor
+**Description**: Batch plan executor for automatically detecting, analyzing conflicts, and executing multiple implementation plans in parallel. Supports three plan types (Claude Code Plans, Skills Phase Docs, Project Plans) with intelligent conflict detection and execution orchestration.
+
+**Trigger Keywords**:
+- "batch execute plans"
+- "批量執行方案"
+- "execute multiple plans"
+- "並行執行計劃"
+- "run plans in parallel"
+- "orchestrate plan execution"
+
+**Use Cases**:
+- Executing multiple CRUD generation plans
+- Batch migration workflows (e.g., LiteFlow 8-phase migration)
+- Mixed plan type execution (backend + frontend + testing)
+- Pre-execution risk assessment with dry-run mode
+
+**Key Features** (v1.0.0 MVP):
+- ✅ Auto-detect plan types from multiple sources
+- ✅ File-level conflict detection (95%+ accuracy)
+- ✅ Serial execution groups for conflicting plans
+- ✅ Dry-run mode with comprehensive reports
+- ⏳ Parallel execution (v1.1.0 - planned)
+- ⏳ Module/dependency conflict detection (v1.2.0 - planned)
+
+**Execution Modes**:
+```bash
+# Auto mode (fully automatic)
+/batch-execute --auto
+
+# Interactive mode (confirm each plan)
+/batch-execute --mode=interactive plan1.md plan2.md
+
+# Dry-run mode (simulation only)
+/batch-execute --dry-run --scan-dir=docs/plans/liteflow/
+```
+
+**Documentation**: [batch-plan-executor/](batch-plan-executor/)
+
+**Configuration**: [batch-plan-executor/config.yml](batch-plan-executor/config.yml)
 
 ---
 
