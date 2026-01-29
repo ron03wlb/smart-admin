@@ -189,36 +189,47 @@ Controller → Service → Manager → Dao → Entity
 
 **Quick Overview**: 29 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
 
-**Skills Organization (v3.0.0)**:
+**Skills Organization (v4.0.0)**:
 ```
 .claude/skills/
-├── foundation/      (P0 - 6 skills: Backend, Full-stack, Testing)
-├── extended/        (P1 - 7 skills: Business Logic, Domain, Orchestration, Quality)
-├── productivity/    (P2 - 15 skills: Infrastructure, Composite, Analysis)
+├── foundation/      (P0 - 5 skills: Core fundamentals)
+│   └── core/        (Consolidated: backend, full-stack, testing)
+├── extended/        (P1 - 7 skills: Domain, Orchestration)
+│   ├── domain/      (5 skills: iGaming + LiteFlow)
+│   └── orchestration/ (2 skills: batch-plan, quality-gate)
+├── productivity/    (P2 - 14 skills: DevOps, Integration, Composite, Analysis, Refactoring)
+│   ├── devops/      (5 skills: APM, CI/CD, DB migration, scheduling, WebSocket)
+│   ├── integration/ (5 skills: Cache, Search, i18n, MQ, Reports)
+│   ├── composite/   (2 skills: Performance suite, Testing suite)
+│   ├── analysis/    (1 skill: Java performance profiler)
+│   └── refactoring/ (1 skill: Vavr refactoring)
 └── lifecycle/       (Deprecated - 3 skills with migration guides)
 ```
 
-**P0 Skills (Foundation)** - 6 skills:
-- **[smartadmin-crud-generator](.claude/skills/foundation/full-stack/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
-- **[vavr-refactoring-assistant](.claude/skills/foundation/backend/vavr-refactoring-assistant/)** - Refactor Service layer to Vavr Option/Try/Either patterns
-- **[archunit-test-generator](.claude/skills/foundation/backend/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
-- **[security-hardening-pro](.claude/skills/foundation/backend/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
-- **[smartadmin-integration-test](.claude/skills/foundation/full-stack/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
-- **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders for complex domain objects
+**P0 Skills (Foundation)** - 5 skills (Core):
+- **[smartadmin-crud-generator](.claude/skills/foundation/core/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
+- **[archunit-test-generator](.claude/skills/foundation/core/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
+- **[security-hardening-pro](.claude/skills/foundation/core/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
+- **[smartadmin-integration-test](.claude/skills/foundation/core/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
+- **[test-fixture-generator](.claude/skills/foundation/core/test-fixture-generator/)** - Test data builders for complex domain objects
 
 **P1 Skills (Extended)** - 7 skills:
-- **[liteflow-rule-builder](.claude/skills/extended/business-logic/liteflow-rule-builder/)** - Generate LiteFlow DSL (EL expressions, QLExpress scripts) for business workflows
-- **[fraud-detection-pattern-generator](.claude/skills/extended/domain/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
-- **[igame-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming domain features (VIP system, Wallet API, Bonus engine)
-- **[igame-pm-analyst](.claude/skills/extended/domain/igame-pm-analyst/)** - iGaming產品經理分析助手 (Ultrathink深度分析、PRD生成)
-- **[igaming-multi-tenant-wallet-pm](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/)** - Multi-tenant architecture & seamless wallet design (phase-based)
-- **[batch-plan-executor](.claude/skills/extended/orchestration/batch-plan-executor/)** - Batch plan execution orchestrator with conflict detection
-- **[quality-gate-orchestrator](.claude/skills/extended/quality/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
+- Domain (5 skills):
+  - **[fraud-detection-pattern-generator](.claude/skills/extended/domain/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
+  - **[igame-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming domain features (VIP system, Wallet API, Bonus engine)
+  - **[igame-pm-analyst](.claude/skills/extended/domain/igame-pm-analyst/)** - iGaming產品經理分析助手 (Ultrathink深度分析、PRD生成)
+  - **[igaming-multi-tenant-wallet-pm](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/)** - Multi-tenant architecture & seamless wallet design (phase-based)
+  - **[liteflow-rule-builder](.claude/skills/extended/domain/liteflow-rule-builder/)** - Generate LiteFlow DSL (EL expressions, QLExpress scripts) for business workflows
+- Orchestration (2 skills):
+  - **[batch-plan-executor](.claude/skills/extended/orchestration/batch-plan-executor/)** - Batch plan execution orchestrator with conflict detection
+  - **[quality-gate-orchestrator](.claude/skills/extended/orchestration/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
 
-**P2 Skills (Productivity)** - 15 skills:
-- Infrastructure (10): apm-integration, cache-strategy, cicd-pipeline, db-migration, search, i18n, message-queue, reports, scheduled-tasks, websocket
+**P2 Skills (Productivity)** - 14 skills:
+- DevOps (5): APM integration, CI/CD pipeline, DB migration, scheduled tasks, WebSocket/SSE
+- Integration (5): Cache strategy, Elasticsearch, i18n, message queue, report export
 - Composite (2): smartadmin-performance-suite, smartadmin-testing-suite
 - Analysis (1): java-performance-pro
+- Refactoring (1): vavr-refactoring-assistant (moved from foundation)
 
 → **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
 
