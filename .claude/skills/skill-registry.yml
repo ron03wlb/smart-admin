@@ -18,7 +18,7 @@ deprecated_skills: 3
 skills:
   # Backend Skills
   archunit-test-generator:
-    path: "foundation/core/archunit-test-generator"
+    path: "foundation/backend/archunit-test-generator"
     priority: "P0"
     type: "atomic"
     category: "backend"
@@ -31,7 +31,7 @@ skills:
     depended_by: []
 
   security-hardening-pro:
-    path: "foundation/core/security-hardening-pro"
+    path: "foundation/backend/security-hardening-pro"
     priority: "P0"
     type: "atomic"
     category: "backend"
@@ -44,7 +44,7 @@ skills:
     depended_by: []
 
   vavr-refactoring-assistant:
-    path: "productivity/refactoring/vavr-refactoring-assistant"
+    path: "foundation/backend/vavr-refactoring-assistant"
     priority: "P0"
     type: "atomic"
     category: "refactoring"
@@ -71,7 +71,7 @@ skills:
 
   # Full-stack Skills
   smartadmin-crud-generator:
-    path: "foundation/core/smartadmin-crud-generator"
+    path: "foundation/full-stack/smartadmin-crud-generator"
     priority: "P0"
     type: "composite"
     category: "full-stack"
@@ -89,7 +89,7 @@ skills:
     depended_by: ["batch-plan-executor", "igame-feature-builder"]
 
   smartadmin-integration-test:
-    path: "foundation/core/smartadmin-integration-test"
+    path: "foundation/full-stack/smartadmin-integration-test"
     priority: "P0"
     type: "atomic"
     category: "full-stack"
@@ -103,7 +103,7 @@ skills:
 
   # Testing Skills
   test-fixture-generator:
-    path: "foundation/core/test-fixture-generator"
+    path: "foundation/testing/test-fixture-generator"
     priority: "P0"
     type: "atomic"
     category: "testing"
