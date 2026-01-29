@@ -40,10 +40,10 @@ skills:
     depended_by: []
 
   vavr-refactoring-assistant:
-    path: "foundation/core/vavr-refactoring-assistant"
+    path: "productivity/refactoring/vavr-refactoring-assistant"
     priority: "P0"
     type: "atomic"
-    category: "backend"
+    category: "refactoring"
     aliases: ["vavr", "refactor-vavr"]
     status: "stable"
     description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
@@ -190,10 +190,10 @@ skills:
 
   # Infrastructure Skills
   apm-integration-skill:
-    path: "productivity/infrastructure/apm-integration-skill"
+    path: "productivity/devops/apm-integration-skill"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "devops"
     aliases: ["apm", "monitoring"]
     status: "stable"
     description: "Generate APM integration with Skywalking, Micrometer, Grafana dashboards"
@@ -201,10 +201,10 @@ skills:
     depended_by: ["smartadmin-performance-suite"]
 
   cache-strategy-generator:
-    path: "productivity/infrastructure/cache-strategy-generator"
+    path: "productivity/integration/cache-strategy-generator"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "integration"
     aliases: ["cache", "caching"]
     status: "stable"
     description: "Generate multi-level caching strategies (Caffeine L1 + Redis L2)"
@@ -212,10 +212,10 @@ skills:
     depended_by: ["smartadmin-performance-suite"]
 
   cicd-pipeline-builder:
-    path: "productivity/infrastructure/cicd-pipeline-builder"
+    path: "productivity/devops/cicd-pipeline-builder"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "devops"
     aliases: ["cicd", "pipeline"]
     status: "stable"
     description: "Automate CI/CD pipeline setup for SmartAdmin with GitHub Actions or GitLab CI"
@@ -223,10 +223,10 @@ skills:
     depended_by: []
 
   db-migration-manager:
-    path: "productivity/infrastructure/db-migration-manager"
+    path: "productivity/devops/db-migration-manager"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "devops"
     aliases: ["migration", "flyway", "liquibase"]
     status: "stable"
     description: "Generate and manage Flyway/Liquibase database migrations"
@@ -234,10 +234,10 @@ skills:
     depended_by: []
 
   full-text-search-integration:
-    path: "productivity/infrastructure/full-text-search-integration"
+    path: "productivity/integration/full-text-search-integration"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "integration"
     aliases: ["elasticsearch", "search"]
     status: "stable"
     description: "Generate Elasticsearch integration with document mapping, search APIs, aggregations"
@@ -245,10 +245,10 @@ skills:
     depended_by: []
 
   i18n-generator:
-    path: "productivity/infrastructure/i18n-generator"
+    path: "productivity/integration/i18n-generator"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "integration"
     aliases: ["i18n", "internationalization"]
     status: "stable"
     description: "Generate internationalization support (backend MessageSource + frontend Vue I18n)"
@@ -256,10 +256,10 @@ skills:
     depended_by: []
 
   message-queue-pattern-generator:
-    path: "productivity/infrastructure/message-queue-pattern-generator"
+    path: "productivity/integration/message-queue-pattern-generator"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "integration"
     aliases: ["kafka", "mq", "messaging"]
     status: "stable"
     description: "Generate Kafka/RocketMQ integration patterns (producer/consumer, event sourcing, CQRS, Saga)"
@@ -267,10 +267,10 @@ skills:
     depended_by: []
 
   report-generator-skill:
-    path: "productivity/infrastructure/report-generator-skill"
+    path: "productivity/integration/report-generator-skill"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "integration"
     aliases: ["report", "export"]
     status: "stable"
     description: "Generate business report export functionality (Excel, PDF, CSV)"
@@ -278,10 +278,10 @@ skills:
     depended_by: []
 
   scheduled-task-manager:
-    path: "productivity/infrastructure/scheduled-task-manager"
+    path: "productivity/devops/scheduled-task-manager"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "devops"
     aliases: ["schedule", "job", "xxl-job"]
     status: "stable"
     description: "Generate XXL-Job/Snail-Job integration for scheduled tasks"
@@ -289,10 +289,10 @@ skills:
     depended_by: []
 
   websocket-sse-realtime-generator:
-    path: "productivity/infrastructure/websocket-sse-realtime-generator"
+    path: "productivity/devops/websocket-sse-realtime-generator"
     priority: "P2"
     type: "atomic"
-    category: "infrastructure"
+    category: "devops"
     aliases: ["websocket", "sse", "realtime"]
     status: "stable"
     description: "Generate WebSocket/SSE real-time communication with STOMP, authentication, broadcasting"

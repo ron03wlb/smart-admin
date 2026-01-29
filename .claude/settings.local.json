@@ -174,7 +174,11 @@
       "Bash(do echo \"Moving full-stack/$skill...\")",
       "Bash(powershell.exe -Command \"Move-Item -Path ''full-stack/$skill'' -Destination ''core/$skill'' -Force\")",
       "Bash(powershell.exe -Command \"Move-Item -Path ''testing/test-fixture-generator'' -Destination ''core/test-fixture-generator'' -Force\")",
-      "Bash(powershell.exe -Command \"Move-Item -Path ''business-logic/liteflow-rule-builder'' -Destination ''domain/liteflow-rule-builder'' -Force\")"
+      "Bash(powershell.exe -Command \"Move-Item -Path ''business-logic/liteflow-rule-builder'' -Destination ''domain/liteflow-rule-builder'' -Force\")",
+      "Bash(for skill in apm-integration-skill cicd-pipeline-builder db-migration-manager scheduled-task-manager websocket-sse-realtime-generator)",
+      "Bash(do echo \"Moving $skill to devops/...\")",
+      "Bash(for skill in cache-strategy-generator full-text-search-integration i18n-generator message-queue-pattern-generator report-generator-skill)",
+      "Bash(do echo \"Moving $skill to integration/...\")"
     ]
   },
   "allowedCommands": {
