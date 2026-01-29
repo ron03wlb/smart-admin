@@ -7,9 +7,9 @@
 # ====================================================================
 
 version: "3.0.0"
-last_updated: "2026-01-29"
-total_skills: 29
-active_skills: 26
+last_updated: "2026-01-30"
+total_skills: 32
+active_skills: 29
 deprecated_skills: 3
 
 # ====================================================================
@@ -53,6 +53,19 @@ skills:
     aliases: ["vavr", "refactor-vavr"]
     status: "stable"
     description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
+    depends_on: []
+    depended_by: []
+
+  smartadmin-manager-extractor:
+    path: "productivity/refactoring/smartadmin-manager-extractor"
+    priority: "P2"
+    type: "atomic"
+    category: "refactoring"
+    visibility: "public"
+    preferred_via: "user_invoked"
+    aliases: ["manager-extract", "extract-to-manager", "fix-transactional-violation"]
+    status: "stable"
+    description: "Automatically extract @Transactional methods to Manager layer, fix ArchUnit violations (83% time saving: 30min → 5min)"
     depends_on: []
     depended_by: []
 
@@ -197,6 +210,19 @@ skills:
     depended_by: []
 
   # Quality Skills
+  concurrency-safety-auditor:
+    path: "extended/quality/concurrency-safety-auditor"
+    priority: "P1"
+    type: "atomic"
+    category: "quality"
+    visibility: "public"
+    preferred_via: "user_invoked"
+    aliases: ["concurrency-audit", "thread-safety-check", "race-condition-detection"]
+    status: "stable"
+    description: "Concurrency safety audit with SpotBugs pattern detection and ⭐⭐⭐⭐⭐ risk rating system (8 patterns: check-then-act, double-checked locking, etc.)"
+    depends_on: []
+    depended_by: []
+
   quality-gate-orchestrator:
     path: "extended/orchestration/quality-gate-orchestrator"
     priority: "P1"
@@ -316,6 +342,19 @@ skills:
     aliases: ["report", "export"]
     status: "stable"
     description: "Generate business report export functionality (Excel, PDF, CSV)"
+    depends_on: []
+    depended_by: []
+
+  postgresql-best-practices:
+    path: "productivity/integration/postgresql-best-practices"
+    priority: "P2"
+    type: "atomic"
+    category: "integration"
+    visibility: "public"
+    preferred_via: "user_invoked"
+    aliases: ["postgres-analyze", "database-performance", "hikaricp-tuning"]
+    status: "stable"
+    description: "PostgreSQL performance analysis and optimization (HikariCP tuning, N+1 detection, EXPLAIN ANALYZE, index recommendations)"
     depends_on: []
     depended_by: []
 

@@ -187,22 +187,23 @@ Controller → Service → Manager → Dao → Entity
 
 ## Specialized Skills
 
-**Quick Overview**: 29 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
+**Quick Overview**: 32 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
 
 **Skills Organization (v4.0.0)**:
 ```
 .claude/skills/
 ├── foundation/      (P0 - 5 skills: Core fundamentals)
 │   └── core/        (Consolidated: backend, full-stack, testing)
-├── extended/        (P1 - 7 skills: Domain, Orchestration)
+├── extended/        (P1 - 8 skills: Domain, Orchestration, Quality)
 │   ├── domain/      (5 skills: iGaming + LiteFlow)
-│   └── orchestration/ (2 skills: batch-plan, quality-gate)
-├── productivity/    (P2 - 14 skills: DevOps, Integration, Composite, Analysis, Refactoring)
+│   ├── orchestration/ (2 skills: batch-plan, quality-gate)
+│   └── quality/     (1 skill: concurrency-safety-auditor) ⭐ NEW
+├── productivity/    (P2 - 16 skills: DevOps, Integration, Composite, Analysis, Refactoring)
 │   ├── devops/      (5 skills: APM, CI/CD, DB migration, scheduling, WebSocket)
-│   ├── integration/ (5 skills: Cache, Search, i18n, MQ, Reports)
+│   ├── integration/ (6 skills: Cache, Search, i18n, MQ, Reports, PostgreSQL) ⭐ +1
 │   ├── composite/   (2 skills: Performance suite, Testing suite)
 │   ├── analysis/    (1 skill: Java performance profiler)
-│   └── refactoring/ (1 skill: Vavr refactoring)
+│   └── refactoring/ (2 skills: Vavr refactoring, Manager extractor) ⭐ +1
 └── lifecycle/       (Deprecated - 3 skills with migration guides)
 ```
 
@@ -213,7 +214,7 @@ Controller → Service → Manager → Dao → Entity
 - **[smartadmin-integration-test](.claude/skills/foundation/core/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
 - **[test-fixture-generator](.claude/skills/foundation/core/test-fixture-generator/)** - Test data builders for complex domain objects
 
-**P1 Skills (Extended)** - 7 skills:
+**P1 Skills (Extended)** - 8 skills:
 - Domain (5 skills):
   - **[fraud-detection-pattern-generator](.claude/skills/extended/domain/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
   - **[igame-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming domain features (VIP system, Wallet API, Bonus engine)
@@ -223,15 +224,56 @@ Controller → Service → Manager → Dao → Entity
 - Orchestration (2 skills):
   - **[batch-plan-executor](.claude/skills/extended/orchestration/batch-plan-executor/)** - Batch plan execution orchestrator with conflict detection
   - **[quality-gate-orchestrator](.claude/skills/extended/orchestration/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
+- Quality (1 skill): ⭐ NEW
+  - **[concurrency-safety-auditor](.claude/skills/extended/quality/concurrency-safety-auditor/)** - Concurrency safety audit with ⭐⭐⭐⭐⭐ risk rating, SpotBugs custom detectors, check-then-act pattern detection
 
-**P2 Skills (Productivity)** - 14 skills:
+**P2 Skills (Productivity)** - 16 skills:
 - DevOps (5): APM integration, CI/CD pipeline, DB migration, scheduled tasks, WebSocket/SSE
-- Integration (5): Cache strategy, Elasticsearch, i18n, message queue, report export
+- Integration (6): Cache strategy, Elasticsearch, i18n, message queue, report export, **PostgreSQL best practices** ⭐
 - Composite (2): smartadmin-performance-suite, smartadmin-testing-suite
 - Analysis (1): java-performance-pro
-- Refactoring (1): vavr-refactoring-assistant (moved from foundation)
+- Refactoring (2): vavr-refactoring-assistant, **smartadmin-manager-extractor** ⭐
 
 → **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
+
+### Week 4-5 New Skills (v3.0.0)
+
+**1. postgresql-best-practices (P2 - Integration)**
+- **Path**: `.claude/skills/productivity/integration/postgresql-best-practices/`
+- **Purpose**: PostgreSQL performance analysis and optimization
+- **Capabilities**:
+  - HikariCP connection pool analysis (utilization formula: `connections = (core_count × 2) + effective_spindle_count`)
+  - N+1 query detection via P6Spy log parsing
+  - EXPLAIN ANALYZE automation for slow queries
+  - Index recommendations from `pg_stat_user_tables`
+- **Triggers**: "database performance", "PostgreSQL optimization", "HikariCP tuning", "N+1 query"
+- **Output**: Comprehensive performance report (Markdown) with actionable recommendations
+- **Time Saving**: Identifies 97.6% timeout error reductions in production cases
+
+**2. smartadmin-manager-extractor (P2 - Refactoring)**
+- **Path**: `.claude/skills/productivity/refactoring/smartadmin-manager-extractor/`
+- **Purpose**: Auto-extract `@Transactional` methods from Service to Manager layer
+- **Capabilities**:
+  - JavaParser AST manipulation for code refactoring
+  - ArchUnit test integration for violation detection
+  - Triple validation: Compile + ArchUnit + Tests
+  - Git-safe rollback mechanism
+- **Triggers**: "extract to Manager", "transactionalMustUseRollbackForThrowable fails", "refactor transaction"
+- **Time Saving**: 83% reduction (30 minutes → 5 minutes per refactoring)
+- **Safety**: Creates Git stash before execution, auto-rollback on failure
+
+**3. concurrency-safety-auditor (P1 - Quality)**
+- **Path**: `.claude/skills/extended/quality/concurrency-safety-auditor/`
+- **Purpose**: Concurrency safety audit with risk rating system
+- **Capabilities**:
+  - SpotBugs custom detectors for 8 concurrency patterns
+  - ⭐⭐⭐⭐⭐ risk rating (Probability × Impact × Actual Harm)
+  - Check-then-act pattern detection (non-atomic operations)
+  - Double-checked locking detection
+  - ConcurrentHashMap misuse detection
+- **Triggers**: "concurrency", "thread safety", "race condition", "deadlock detection"
+- **Output**: Concurrency audit report with risk assessment and fix recommendations
+- **Risk Formula**: `Risk Score = (Probability × 0.4) + (Impact × 0.35) + (Actual Harm × 0.25)`
 
 ## Quality Tool Patterns
 

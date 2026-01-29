@@ -1,13 +1,16 @@
 # SmartAdmin Skills Catalog
 
 **Version**: 3.0.0
-**Last Updated**: 2026-01-29
-**Total Skills**: 29 (P0: 6, P1: 7, P2: 15, Deprecated: 3)
+**Last Updated**: 2026-01-30
+**Total Skills**: 32 (P0: 6, P1: 8, P2: 17, Deprecated: 3)
 
 **Major Changes** (v3.0.0):
 - ✅ **NEW**: Hierarchical directory structure (foundation/ → extended/ → productivity/ → lifecycle/)
-- ✅ **NEW**: 100% config.yml coverage (all 29 skills)
+- ✅ **NEW**: 100% config.yml coverage (all 32 skills)
 - ✅ **NEW**: Centralized skill-registry.yml (Single Source of Truth)
+- ✅ **NEW**: postgresql-best-practices skill (HikariCP tuning, N+1 detection, EXPLAIN ANALYZE)
+- ✅ **NEW**: smartadmin-manager-extractor skill (Auto-extract @Transactional to Manager, 83% time saving)
+- ✅ **NEW**: concurrency-safety-auditor skill (8 patterns, ⭐⭐⭐⭐⭐ risk rating, SpotBugs integration)
 - ✅ **batch-plan-executor**: Updated skill mapping for new paths
 - ✅ **Skills Organization**: Priority-based layering (P0/P1/P2) + Functional categorization
 
@@ -22,14 +25,15 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 │   ├── full-stack/      (CRUD, Integration Tests)
 │   └── testing/         (Test Fixtures)
 │
-├── extended/            (P1 - Important Business Logic, 7 skills)
+├── extended/            (P1 - Important Business Logic, 8 skills)
 │   ├── business-logic/  (LiteFlow)
 │   ├── domain/          (iGaming: Fraud, Features, PM, Wallet)
 │   ├── orchestration/   (Batch Plan Executor)
-│   └── quality/         (Quality Gate Orchestrator)
+│   └── quality/         (Concurrency Safety, Quality Gate Orchestrator)
 │
-├── productivity/        (P2 - Nice-to-have Tools, 15 skills)
-│   ├── infrastructure/  (APM, Cache, CI/CD, DB, Search, i18n, MQ, Reports, Jobs, WebSocket)
+├── productivity/        (P2 - Nice-to-have Tools, 17 skills)
+│   ├── infrastructure/  (APM, Cache, CI/CD, DB, PostgreSQL, Search, i18n, MQ, Reports, Jobs, WebSocket)
+│   ├── refactoring/     (Vavr, Manager Extractor)
 │   ├── composite/       (Performance Suite, Testing Suite)
 │   └── analysis/        (Java Performance Pro)
 │
@@ -42,8 +46,8 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 | Priority | Count | Categories | Purpose |
 |----------|-------|------------|---------|
 | **P0** (Foundation) | 6 skills | Backend, Full-stack, Testing | Critical foundation patterns, essential workflows |
-| **P1** (Extended) | 7 skills | Business Logic, Domain, Orchestration, Quality | Important business features, quality gates, orchestration |
-| **P2** (Productivity) | 15 skills | Infrastructure, Composite, Analysis | Productivity tools, optional enhancements |
+| **P1** (Extended) | 8 skills | Business Logic, Domain, Orchestration, Quality | Important business features, quality gates, orchestration |
+| **P2** (Productivity) | 17 skills | Infrastructure, Composite, Analysis, Refactoring | Productivity tools, optional enhancements |
 | **Deprecated** | 3 skills | Deprecated | Consolidated into composite skills, soft-deprecated until 2026-06-30 |
 
 ---
@@ -199,6 +203,7 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 - [**full-text-search-integration**](productivity/infrastructure/full-text-search-integration/) - Elasticsearch integration
 - [**i18n-generator**](productivity/infrastructure/i18n-generator/) - Internationalization (backend + frontend)
 - [**message-queue-pattern-generator**](productivity/infrastructure/message-queue-pattern-generator/) - Kafka/RocketMQ integration
+- [**postgresql-best-practices**](productivity/integration/postgresql-best-practices/) - PostgreSQL performance analysis (HikariCP, N+1 detection, EXPLAIN ANALYZE)
 - [**report-generator-skill**](productivity/infrastructure/report-generator-skill/) - Report export (Excel, PDF, CSV)
 - [**scheduled-task-manager**](productivity/infrastructure/scheduled-task-manager/) - Scheduled tasks (XXL-Job, Snail-Job)
 - [**websocket-sse-realtime-generator**](productivity/infrastructure/websocket-sse-realtime-generator/) - Real-time communication (WebSocket, SSE)

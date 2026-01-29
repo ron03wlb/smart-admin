@@ -124,21 +124,41 @@
     },
     "preCommit": {
       "enabled": true,
-      "description": "Pre-commit quality checks",
+      "description": "Pre-commit quality checks with skill registry validation",
       "steps": [
         {
           "id": "format-check",
           "type": "bash",
-          "command": "./gradlew spotlessCheck",
+          "command": "cd smart-admin-api-java21-springboot3 && ./gradlew spotlessCheck",
           "description": "Verify code formatting",
-          "continueOnError": false
+          "continueOnError": false,
+          "timeout": 60000
+        },
+        {
+          "id": "skill-registry-validation",
+          "type": "bash",
+          "command": "bash .claude/scripts/verify-skill-registry.sh --fast",
+          "description": "Validate skill registry consistency",
+          "continueOnError": false,
+          "condition": "changedFiles.some(f => f.includes('skill-registry.yml') || f.includes('.claude/skills/'))",
+          "timeout": 30000
+        },
+        {
+          "id": "skill-structure-check",
+          "type": "bash",
+          "command": "bash .claude/scripts/verify-skill-registry.sh",
+          "description": "Validate modified skill structures",
+          "continueOnError": false,
+          "condition": "changedFiles.some(f => f.includes('.claude/skills/') && !f.includes('skill-registry.yml'))",
+          "timeout": 60000
         },
         {
           "id": "architecture-validation",
           "type": "bash",
-          "command": "./gradlew :sa-admin:test --tests ArchitectureTest",
+          "command": "cd smart-admin-api-java21-springboot3 && ./gradlew :sa-admin:test --tests ArchitectureTest",
           "description": "Validate architecture rules",
-          "continueOnError": false
+          "continueOnError": false,
+          "timeout": 120000
         }
       ]
     }
