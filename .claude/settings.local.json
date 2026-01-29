@@ -150,7 +150,9 @@
       "Bash(__NEW_LINE_5844b91950f929a6__ echo \"\")",
       "Bash(git check-ignore:*)",
       "Bash(lsof:*)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Skill(igaming-multi-tenant-wallet-pm)",
+      "Skill(igaming-multi-tenant-wallet-pm:*)"
     ]
   },
   "allowedCommands": {
