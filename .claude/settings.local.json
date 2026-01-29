@@ -173,7 +173,8 @@
       "Bash(for skill in smartadmin-crud-generator smartadmin-integration-test)",
       "Bash(do echo \"Moving full-stack/$skill...\")",
       "Bash(powershell.exe -Command \"Move-Item -Path ''full-stack/$skill'' -Destination ''core/$skill'' -Force\")",
-      "Bash(powershell.exe -Command \"Move-Item -Path ''testing/test-fixture-generator'' -Destination ''core/test-fixture-generator'' -Force\")"
+      "Bash(powershell.exe -Command \"Move-Item -Path ''testing/test-fixture-generator'' -Destination ''core/test-fixture-generator'' -Force\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''business-logic/liteflow-rule-builder'' -Destination ''domain/liteflow-rule-builder'' -Force\")"
     ]
   },
   "allowedCommands": {

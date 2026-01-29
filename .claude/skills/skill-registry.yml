@@ -96,10 +96,10 @@ skills:
 
   # Business Logic Skills
   liteflow-rule-builder:
-    path: "extended/business-logic/liteflow-rule-builder"
+    path: "extended/domain/liteflow-rule-builder"
     priority: "P1"
     type: "atomic"
-    category: "business-logic"
+    category: "domain"
     aliases: ["liteflow", "rule-builder"]
     status: "stable"
     description: "Generate LiteFlow rule DSL (EL expressions and QLExpress scripts) for business workflows"
@@ -174,10 +174,10 @@ skills:
 
   # Quality Skills
   quality-gate-orchestrator:
-    path: "extended/quality/quality-gate-orchestrator"
+    path: "extended/orchestration/quality-gate-orchestrator"
     priority: "P1"
     type: "orchestrator"
-    category: "quality"
+    category: "orchestration"
     aliases: ["quality-gate", "quality"]
     status: "stable"
     description: "Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo, SonarQube"
