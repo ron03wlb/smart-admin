@@ -152,7 +152,21 @@
       "Bash(lsof:*)",
       "Bash(git rebase:*)",
       "Skill(igaming-multi-tenant-wallet-pm)",
-      "Skill(igaming-multi-tenant-wallet-pm:*)"
+      "Skill(igaming-multi-tenant-wallet-pm:*)",
+      "Bash(DRY_RUN=false bash:*)",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''apm-integration-skill'' -Destination ''_deprecated/root-layer-v3/apm-integration-skill'' -Force\")",
+      "Bash(for skill in batch-plan-executor cache-strategy-generator cicd-pipeline-builder db-migration-manager fraud-detection-pattern-generator full-text-search-integration i18n-generator igame-feature-builder igame-pm-analyst igaming-multi-tenant-wallet-pm java-performance-pro liteflow-rule-builder message-queue-pattern-generator quality-gate-orchestrator report-generator-skill scheduled-task-manager security-hardening-pro smartadmin-api-docs smartadmin-crud-generator smartadmin-integration-test smartadmin-mybatis smartadmin-performance-suite smartadmin-testing-suite smartadmin-vue-crud test-fixture-generator vavr-refactoring-assistant websocket-sse-realtime-generator)",
+      "Bash(do echo \"Moving $skill...\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''$skill'' -Destination ''_deprecated/root-layer-v3/$skill'' -Force\")",
+      "Bash(for file in cicd-pipeline-builder.skill db-migration-manager.skill igame-feature-builder.skill java-performance-pro.skill security-hardening-pro.skill smartadmin-api-docs.skill smartadmin-crud-generator.skill smartadmin-integration-test.skill smartadmin-vue-crud.skill)",
+      "Bash(do echo \"Moving $file...\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''$file'' -Destination ''_deprecated/skill-files-v3/$file'' -Force\")",
+      "Bash(for item in better-auth-best-practices brainstorming claude-settings-audit cloudflare design-md dispatching-parallel-agents executing-plans file-organizer find-bugs finishing-a-development-branch frontend-design git-pushing iterate-pr prompt-engineering receiving-code-review requesting-code-review review-implementing semgrep-rule-creator skill-creator subagent-driven-development supabase-postgres-best-practices test-driven-development tinybird verification-before-completion webapp-testing writing-plans writing-skills)",
+      "Bash(do echo \"Moving $item...\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''$item'' -Destination ''_deprecated/non-skill-items-v3/$item'' -Force\")",
+      "Bash(for doc in MIGRATION-REPORT-v3.0.0.md MONITORING-SYSTEM-DESIGN.md NEW-SKILLS-OVERVIEW.md P1-BASELINE-TEST-SUMMARY.md SPRINT1-PROGRESS.md skill-aliases.json)",
+      "Bash(do echo \"Moving $doc...\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''$doc'' -Destination ''_deprecated/non-skill-items-v3/$doc'' -Force\")"
     ]
   },
   "allowedCommands": {
