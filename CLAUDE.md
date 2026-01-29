@@ -192,8 +192,10 @@ Controller → Service → Manager → Dao → Entity
 **Skills Organization (v4.0.0)**:
 ```
 .claude/skills/
-├── foundation/      (P0 - 5 skills: Core fundamentals)
-│   └── core/        (Consolidated: backend, full-stack, testing)
+├── foundation/      (P0 - 6 skills: Critical foundation)
+│   ├── backend/     (3 skills: ArchUnit, Security, Vavr)
+│   ├── full-stack/  (2 skills: CRUD, Integration Test)
+│   └── testing/     (1 skill: Test Fixture)
 ├── extended/        (P1 - 8 skills: Domain, Orchestration, Quality)
 │   ├── domain/      (5 skills: iGaming + LiteFlow)
 │   ├── orchestration/ (2 skills: batch-plan, quality-gate)
@@ -207,12 +209,16 @@ Controller → Service → Manager → Dao → Entity
 └── lifecycle/       (Deprecated - 3 skills with migration guides)
 ```
 
-**P0 Skills (Foundation)** - 5 skills (Core):
-- **[smartadmin-crud-generator](.claude/skills/foundation/core/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
-- **[archunit-test-generator](.claude/skills/foundation/core/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
-- **[security-hardening-pro](.claude/skills/foundation/core/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
-- **[smartadmin-integration-test](.claude/skills/foundation/core/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
-- **[test-fixture-generator](.claude/skills/foundation/core/test-fixture-generator/)** - Test data builders for complex domain objects
+**P0 Skills (Foundation)** - 6 skills:
+- **Backend** (3 skills):
+  - **[archunit-test-generator](.claude/skills/foundation/backend/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
+  - **[security-hardening-pro](.claude/skills/foundation/backend/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
+  - **[vavr-refactoring-assistant](.claude/skills/foundation/backend/vavr-refactoring-assistant/)** - Refactor Service layer to use Vavr Option/Try/Either patterns (moved from productivity/)
+- **Full-stack** (2 skills):
+  - **[smartadmin-crud-generator](.claude/skills/foundation/full-stack/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
+  - **[smartadmin-integration-test](.claude/skills/foundation/full-stack/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
+- **Testing** (1 skill):
+  - **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders for complex domain objects
 
 **P1 Skills (Extended)** - 8 skills:
 - Domain (5 skills):
