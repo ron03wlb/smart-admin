@@ -22,6 +22,8 @@ skills:
     priority: "P0"
     type: "atomic"
     category: "backend"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["archunit", "arch-test"]
     status: "stable"
     description: "Generate ArchUnit tests to enforce architecture rules"
@@ -33,6 +35,8 @@ skills:
     priority: "P0"
     type: "atomic"
     category: "backend"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["security", "hardening"]
     status: "stable"
     description: "Implement security best practices (SM2/SM3/SM4, data masking, XSS/CSRF protection)"
@@ -44,6 +48,8 @@ skills:
     priority: "P0"
     type: "atomic"
     category: "refactoring"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["vavr", "refactor-vavr"]
     status: "stable"
     description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
@@ -56,6 +62,8 @@ skills:
     priority: "P0"
     type: "composite"
     category: "full-stack"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["crud", "gen-crud"]
     status: "stable"
     description: "Complete full-stack CRUD module generation (Backend + Frontend + API Docs + Tests)"
@@ -72,6 +80,8 @@ skills:
     priority: "P0"
     type: "atomic"
     category: "full-stack"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["integration-test", "testcontainers"]
     status: "stable"
     description: "Generate Spring Boot integration tests with Testcontainers"
@@ -84,6 +94,8 @@ skills:
     priority: "P0"
     type: "atomic"
     category: "testing"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["fixture", "test-fixture"]
     status: "stable"
     description: "Generate test data builders for complex domain objects"
@@ -100,6 +112,8 @@ skills:
     priority: "P1"
     type: "atomic"
     category: "domain"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["liteflow", "rule-builder"]
     status: "stable"
     description: "Generate LiteFlow rule DSL (EL expressions and QLExpress scripts) for business workflows"
@@ -112,6 +126,8 @@ skills:
     priority: "P1"
     type: "atomic"
     category: "domain"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["fraud", "risk-control"]
     status: "stable"
     description: "Generate fraud detection and risk control systems for iGaming platforms"
@@ -123,6 +139,8 @@ skills:
     priority: "P1"
     type: "atomic"
     category: "domain"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["igame", "igaming"]
     status: "stable"
     description: "Implement iGaming domain features (VIP system, Wallet API, Bonus engine, Risk control)"
@@ -134,6 +152,8 @@ skills:
     priority: "P1"
     type: "atomic"
     category: "domain"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["igame-pm"]
     status: "stable"
     description: "General iGaming product requirements analysis and PRD generation"
@@ -145,6 +165,8 @@ skills:
     priority: "P1"
     type: "atomic"
     category: "domain"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["multi-tenant-pm", "wallet-pm"]
     status: "stable"
     description: "iGaming PM expert for multi-tenant architecture and seamless wallet design"
@@ -162,6 +184,8 @@ skills:
     priority: "P1"
     type: "orchestrator"
     category: "orchestration"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["batch", "batch-exec"]
     status: "stable"
     description: "Batch plan executor for automatically detecting, analyzing conflicts, and executing multiple implementation plans"
@@ -178,6 +202,8 @@ skills:
     priority: "P1"
     type: "orchestrator"
     category: "orchestration"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["quality-gate", "quality"]
     status: "stable"
     description: "Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo, SonarQube"
@@ -194,6 +220,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "devops"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["apm", "monitoring"]
     status: "stable"
     description: "Generate APM integration with Skywalking, Micrometer, Grafana dashboards"
@@ -205,6 +233,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "integration"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["cache", "caching"]
     status: "stable"
     description: "Generate multi-level caching strategies (Caffeine L1 + Redis L2)"
@@ -216,6 +246,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "devops"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["cicd", "pipeline"]
     status: "stable"
     description: "Automate CI/CD pipeline setup for SmartAdmin with GitHub Actions or GitLab CI"
@@ -227,6 +259,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "devops"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["migration", "flyway", "liquibase"]
     status: "stable"
     description: "Generate and manage Flyway/Liquibase database migrations"
@@ -238,6 +272,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "integration"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["elasticsearch", "search"]
     status: "stable"
     description: "Generate Elasticsearch integration with document mapping, search APIs, aggregations"
@@ -249,6 +285,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "integration"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["i18n", "internationalization"]
     status: "stable"
     description: "Generate internationalization support (backend MessageSource + frontend Vue I18n)"
@@ -260,6 +298,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "integration"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["kafka", "mq", "messaging"]
     status: "stable"
     description: "Generate Kafka/RocketMQ integration patterns (producer/consumer, event sourcing, CQRS, Saga)"
@@ -271,6 +311,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "integration"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["report", "export"]
     status: "stable"
     description: "Generate business report export functionality (Excel, PDF, CSV)"
@@ -282,6 +324,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "devops"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["schedule", "job", "xxl-job"]
     status: "stable"
     description: "Generate XXL-Job/Snail-Job integration for scheduled tasks"
@@ -293,6 +337,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "devops"
+    visibility: "internal"
+    preferred_via: "agent_only"
     aliases: ["websocket", "sse", "realtime"]
     status: "stable"
     description: "Generate WebSocket/SSE real-time communication with STOMP, authentication, broadcasting"
@@ -305,6 +351,8 @@ skills:
     priority: "P2"
     type: "composite"
     category: "composite"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["performance", "perf"]
     status: "stable"
     description: "Comprehensive performance suite (diagnose → optimize → monitor workflow)"
@@ -323,6 +371,8 @@ skills:
     priority: "P2"
     type: "composite"
     category: "composite"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["test", "testing"]
     status: "stable"
     description: "Comprehensive testing suite (integration tests, test fixtures, unit tests, E2E tests)"
@@ -342,6 +392,8 @@ skills:
     priority: "P2"
     type: "atomic"
     category: "analysis"
+    visibility: "public"
+    preferred_via: "user_invoked"
     aliases: ["perf-analysis", "profiler"]
     status: "stable"
     description: "Profile and optimize Java application performance (N+1 detection, JVM tuning, CPU hotspot analysis)"
@@ -357,6 +409,8 @@ skills:
     priority: null
     type: "atomic"
     category: "backend"
+    visibility: "internal"
+    preferred_via: "never"
     aliases: ["mybatis"]
     status: "soft-deprecated"
     deprecated_since: "2026-01-27"
@@ -371,6 +425,8 @@ skills:
     priority: null
     type: "atomic"
     category: "frontend"
+    visibility: "internal"
+    preferred_via: "never"
     aliases: ["vue-crud"]
     status: "soft-deprecated"
     deprecated_since: "2026-01-27"
@@ -385,6 +441,8 @@ skills:
     priority: null
     type: "atomic"
     category: "backend"
+    visibility: "internal"
+    preferred_via: "never"
     aliases: ["api-docs", "swagger"]
     status: "soft-deprecated"
     deprecated_since: "2026-01-27"
