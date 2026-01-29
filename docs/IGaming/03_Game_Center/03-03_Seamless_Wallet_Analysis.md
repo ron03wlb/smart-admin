@@ -385,6 +385,257 @@ def check_pending_wins():
 
 ---
 
+#### 策略切換決策樹 (Strategy Switching Decision Tree) ✅ v2.0.0
+
+**問題**: 何時從 Strategy 3 (Pending Queue) 降級至 Strategy 1 (Immediate Reject)?
+
+**策略切換觸發條件矩陣**:
+
+| 觸發條件 | 檢測指標 | 閾值 | 切換策略 | 恢復條件 |
+|---------|---------|------|---------|---------|
+| **Pending Queue 積壓** | `pending_win_queue_size` | > 500 | S3 → S1 | Queue < 100 持續 10 分鐘 |
+| **Redis 不可用** | `redis_connection_status` | DISCONNECTED | S3 → S1 | Redis 恢復 + 5 分鐘穩定期 |
+| **數據庫延遲過高** | `db_query_latency_p99` | > 5s | S3 → S1 | Latency < 1s 持續 10 分鐘 |
+| **系統 CPU 使用率過高** | `system_cpu_usage` | > 90% | S3 → S1 | CPU < 70% 持續 10 分鐘 |
+| **GP 重試率過低** | `gp_retry_success_rate` | < 80% | S1 → S2 (緊急) | 手動恢復 (不自動) |
+
+**策略切換流程圖**:
+
+```mermaid
+flowchart TD
+    START[Win Request Received] --> CHECK_STRATEGY{當前策略?}
+
+    CHECK_STRATEGY -->|Strategy 3 Active| CHECK_CONDITIONS{檢查系統狀態}
+
+    CHECK_CONDITIONS -->|Queue Size > 500| DEGRADE_S1[⚠️ 降級至 Strategy 1<br/>━━━━━━━━━━━━━━<br/>發送告警<br/>返回 BET_NOT_FOUND]
+    CHECK_CONDITIONS -->|Redis Down| DEGRADE_S1
+    CHECK_CONDITIONS -->|DB Latency > 5s| DEGRADE_S1
+    CHECK_CONDITIONS -->|CPU > 90%| DEGRADE_S1
+
+    CHECK_CONDITIONS -->|All Healthy ✅| EXECUTE_S3[執行 Strategy 3<br/>━━━━━━━━━━━━━━<br/>存入 Pending Queue<br/>TTL: 30 min]
+
+    CHECK_STRATEGY -->|Strategy 1 Active| CHECK_RECOVERY{檢查恢復條件}
+
+    CHECK_RECOVERY -->|Queue < 100<br/>持續 10 min| UPGRADE_S3[✅ 升級至 Strategy 3<br/>━━━━━━━━━━━━━━<br/>發送通知<br/>重啟 Pending Queue]
+    CHECK_RECOVERY -->|Redis Healthy<br/>+ 5 min 穩定期| UPGRADE_S3
+    CHECK_RECOVERY -->|DB Latency < 1s<br/>持續 10 min| UPGRADE_S3
+    CHECK_RECOVERY -->|CPU < 70%<br/>持續 10 min| UPGRADE_S3
+
+    CHECK_RECOVERY -->|條件未滿足| EXECUTE_S1[執行 Strategy 1<br/>━━━━━━━━━━━━━━<br/>返回 BET_NOT_FOUND<br/>依賴 GP 重試]
+
+    DEGRADE_S1 --> NOTIFY_OPS[📢 告警通知<br/>━━━━━━━━━━━━━━<br/>Slack: #game-ops<br/>PagerDuty: On-Call]
+
+    EXECUTE_S3 --> CHECK_GP_RELIABILITY{GP 重試率<br/>< 80%?}
+    CHECK_GP_RELIABILITY -->|Yes - GP 不可靠| EMERGENCY_S2[🚨 緊急切換至 Strategy 2<br/>━━━━━━━━━━━━━━<br/>允許 Orphan Win<br/>標記人工審核]
+    CHECK_GP_RELIABILITY -->|No - GP 可靠| END_S3[結束 - S3 處理]
+
+    UPGRADE_S3 --> NOTIFY_RECOVERY[✅ 恢復通知<br/>━━━━━━━━━━━━━━<br/>Slack: #game-ops]
+
+    NOTIFY_OPS --> END_S1[結束 - S1 處理]
+    EXECUTE_S1 --> END_S1
+    EMERGENCY_S2 --> END_S2[結束 - S2 處理]
+    NOTIFY_RECOVERY --> END_S3
+
+    style DEGRADE_S1 fill:#FFB6C1
+    style UPGRADE_S3 fill:#90EE90
+    style EMERGENCY_S2 fill:#FF6B6B
+    style EXECUTE_S3 fill:#FFD93D
+    style EXECUTE_S1 fill:#E0E0E0
+    style NOTIFY_OPS fill:#FFA07A
+    style NOTIFY_RECOVERY fill:#98FB98
+```
+
+**策略切換實現**:
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.strategy;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * Out-of-Order 策略切換管理器
+ * 職責: 根據系統狀態動態切換 Strategy 1/2/3
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class OutOfOrderStrategyManager {
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private final AtomicReference<OutOfOrderStrategy> currentStrategy = new AtomicReference<>(OutOfOrderStrategy.STRATEGY_3);
+
+    /**
+     * 檢查並切換策略 (每 10 秒執行一次)
+     */
+    @Scheduled(fixedRate = 10000)
+    public void checkAndSwitchStrategy() {
+        OutOfOrderStrategy newStrategy = determineOptimalStrategy();
+
+        if (newStrategy != currentStrategy.get()) {
+            OutOfOrderStrategy oldStrategy = currentStrategy.getAndSet(newStrategy);
+
+            log.warn("[Strategy Switched] {} → {}, Reason: System Health Check",
+                oldStrategy, newStrategy);
+
+            // 發送告警通知
+            notifyStrategyChange(oldStrategy, newStrategy);
+        }
+    }
+
+    /**
+     * 決定最優策略
+     */
+    private OutOfOrderStrategy determineOptimalStrategy() {
+        // 1. 檢查 Pending Queue 大小
+        long queueSize = getPendingQueueSize();
+        if (queueSize > 500) {
+            log.warn("[Strategy Check] Pending Queue overloaded: size={}", queueSize);
+            return OutOfOrderStrategy.STRATEGY_1; // 降級
+        }
+
+        // 2. 檢查 Redis 連接
+        boolean redisHealthy = isRedisHealthy();
+        if (!redisHealthy) {
+            log.warn("[Strategy Check] Redis unhealthy");
+            return OutOfOrderStrategy.STRATEGY_1; // 降級
+        }
+
+        // 3. 檢查數據庫延遲
+        long dbLatency = getDatabaseLatencyP99();
+        if (dbLatency > 5000) { // > 5s
+            log.warn("[Strategy Check] Database latency too high: {}ms", dbLatency);
+            return OutOfOrderStrategy.STRATEGY_1; // 降級
+        }
+
+        // 4. 檢查 CPU 使用率
+        double cpuUsage = getSystemCpuUsage();
+        if (cpuUsage > 0.9) { // > 90%
+            log.warn("[Strategy Check] CPU usage too high: {}%", cpuUsage * 100);
+            return OutOfOrderStrategy.STRATEGY_1; // 降級
+        }
+
+        // 5. 檢查 GP 重試率
+        double gpRetryRate = getGpRetrySuccessRate();
+        if (gpRetryRate < 0.8) { // < 80%
+            log.error("[Strategy Check] GP retry rate too low: {}%, switching to EMERGENCY MODE",
+                gpRetryRate * 100);
+            return OutOfOrderStrategy.STRATEGY_2; // 緊急模式
+        }
+
+        // 6. 檢查恢復條件 (從 S1 升級至 S3)
+        if (currentStrategy.get() == OutOfOrderStrategy.STRATEGY_1) {
+            if (queueSize < 100 && redisHealthy && dbLatency < 1000 && cpuUsage < 0.7) {
+                log.info("[Strategy Check] System recovered, upgrading to Strategy 3");
+                return OutOfOrderStrategy.STRATEGY_3; // 升級
+            }
+        }
+
+        // 保持當前策略
+        return currentStrategy.get();
+    }
+
+    /**
+     * 獲取當前策略
+     */
+    public OutOfOrderStrategy getCurrentStrategy() {
+        return currentStrategy.get();
+    }
+
+    // ========== 私有輔助方法 ==========
+
+    private long getPendingQueueSize() {
+        // 查詢 pending_wins 表大小
+        return pendingWinDao.count();
+    }
+
+    private boolean isRedisHealthy() {
+        try {
+            redisTemplate.opsForValue().get("health_check");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private long getDatabaseLatencyP99() {
+        // 從 APM 監控獲取 P99 延遲
+        return metricsService.getDatabaseLatencyP99();
+    }
+
+    private double getSystemCpuUsage() {
+        // 從系統監控獲取 CPU 使用率
+        return metricsService.getSystemCpuUsage();
+    }
+
+    private double getGpRetrySuccessRate() {
+        // 從日誌統計獲取 GP 重試成功率
+        return metricsService.getGpRetrySuccessRate();
+    }
+
+    private void notifyStrategyChange(OutOfOrderStrategy oldStrategy, OutOfOrderStrategy newStrategy) {
+        // 發送 Slack 通知
+        slackService.sendAlert(String.format(
+            "⚠️ Out-of-Order Strategy Changed: %s → %s",
+            oldStrategy, newStrategy
+        ));
+
+        // 記錄審計日誌
+        auditLogService.log("OUT_OF_ORDER_STRATEGY_CHANGED", Map.of(
+            "old_strategy", oldStrategy,
+            "new_strategy", newStrategy,
+            "timestamp", LocalDateTime.now()
+        ));
+    }
+
+    public enum OutOfOrderStrategy {
+        STRATEGY_1, // Immediate Reject
+        STRATEGY_2, // Allow Orphan Win (緊急模式)
+        STRATEGY_3  // Pending Queue (正常模式)
+    }
+}
+```
+
+**策略切換告警配置**:
+
+```yaml
+# Prometheus AlertManager Rules
+alerts:
+  - name: out_of_order_strategy_degraded
+    expr: out_of_order_strategy != 3
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Out-of-Order 策略已降級至 Strategy {{ $value }}"
+      description: "當前策略: {{ if eq $value 1 }}Immediate Reject{{ else if eq $value 2 }}Orphan Win (緊急){{ end }}"
+
+  - name: out_of_order_emergency_mode
+    expr: out_of_order_strategy == 2
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "⚠️ Out-of-Order 進入緊急模式 (Strategy 2 - Orphan Win)"
+      description: "GP 重試率過低,允許孤兒 Win,需立即人工介入"
+```
+
+**實施建議**:
+1. **預設策略**: Strategy 3 (Pending Queue)
+2. **自動降級**: 當系統壓力過大時自動降級至 Strategy 1
+3. **緊急模式**: 當 GP 重試率 < 80% 時切換至 Strategy 2 (需手動恢復)
+4. **自動恢復**: 當系統狀態恢復穩定後自動升級至 Strategy 3
+5. **告警通知**: 所有策略切換必須發送 Slack 告警 + 記錄審計日誌
+
+---
+
 ### 2.4 極端場景綜合決策矩陣 (9 Extreme Scenarios Comprehensive Decision Matrix)
 
 **概述**：本圖表整合所有極端場景（A-I）的檢測、決策與處理邏輯，提供統一的異常處理視圖。
@@ -797,11 +1048,1235 @@ flowchart TD
 
 ---
 
-**最後更新**: 2026-01-27
-**維護團隊**: Game Integration Team
+## 7. SmartAdmin 架構映射 (Architecture Mapping) ✅ v2.0.0
+
+### 7.1 無縫錢包模組分層設計
+
+SmartAdmin 採用嚴格的五層架構,確保無縫錢包對接邏輯職責清晰、易於測試與維護。
+
+#### 分層職責表
+
+| 層級 | 類名模式 | 職責 | 註解限制 |
+|------|---------|------|---------|
+| **Controller** | `SeamlessWalletController` | 接收 GP HTTP 請求,參數校驗,返回 ResponseDTO | 無 @Transactional |
+| **Service** | `SeamlessWalletService` | 業務協調,冪等性檢查,調用 Manager | 無 @Transactional |
+| **Manager** | `SeamlessWalletTransactionManager` | 事務管理,分散式鎖,錢包扣款/加款 | ✅ @Transactional 僅此層 |
+| **Dao** | `GameTransactionRecordDao` | 數據庫 CRUD,MyBatis Mapper | 無業務邏輯 |
+| **Entity** | `GameTransactionRecordEntity` | 數據模型,與表結構一一對應 | 無業務邏輯 |
+
+#### 依賴規則 (ArchitectureTest 強制)
+
+```
+Controller → Service (✅ 允許)
+Service → Dao      (✅ 允許,查詢冪等性記錄)
+Service → Manager  (✅ 允許,需要 @Transactional 時)
+Manager → Dao      (✅ 允許)
+
+Controller → Dao   (❌ 禁止,違反分層)
+Controller → Manager (❌ 禁止,違反分層)
+```
 
 ---
 
-**文檔版本**: 1.0.0
-**最後更新**: 2026-01-28
-**維護團隊**: Integration Team & Backend Team
+### 7.2 實體層 (Entity Layer)
+
+#### GameTransactionRecordEntity.java
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.domain.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * 遊戲交易記錄實體 (Game Transaction Record Entity)
+ * 用途: 記錄 GP 與平台的所有交易請求 (Bet/Win/Rollback/Adjust)
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("t_game_transaction_record")
+public class GameTransactionRecordEntity {
+
+    /**
+     * 主鍵 ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * GP 提供的交易 ID (用於冪等性)
+     * UNIQUE INDEX (tx_id) - 防止重複處理
+     */
+    @TableField("tx_id")
+    private String txId;
+
+    /**
+     * 回合 ID (Round-Based GP 使用)
+     * 用於追蹤一個完整的遊戲回合
+     */
+    @TableField("round_id")
+    private String roundId;
+
+    /**
+     * 玩家 ID
+     */
+    @TableField("player_id")
+    private Long playerId;
+
+    /**
+     * GP 代碼 (PRAGMATIC/EVOLUTION/PGSOFT 等)
+     */
+    @TableField("gp_code")
+    private String gpCode;
+
+    /**
+     * 遊戲代碼
+     */
+    @TableField("game_code")
+    private String gameCode;
+
+    /**
+     * 交易類型 (BET/WIN/ROLLBACK/ADJUST)
+     */
+    @TableField("transaction_type")
+    private String transactionType;
+
+    /**
+     * 交易金額 (正數 = Credit, 負數 = Debit)
+     */
+    @TableField("amount")
+    private BigDecimal amount;
+
+    /**
+     * 交易前餘額
+     */
+    @TableField("balance_before")
+    private BigDecimal balanceBefore;
+
+    /**
+     * 交易後餘額
+     */
+    @TableField("balance_after")
+    private BigDecimal balanceAfter;
+
+    /**
+     * 關聯交易 ID (Win/Rollback 關聯的 Bet txId)
+     */
+    @TableField("ref_tx_id")
+    private String refTxId;
+
+    /**
+     * 交易狀態 (SUCCESS/PENDING/FAILED/ROLLED_BACK)
+     */
+    @TableField("status")
+    private String status;
+
+    /**
+     * 是否為免費遊戲 (Free Spin)
+     */
+    @TableField("is_free_spin")
+    private Boolean isFreeSpin;
+
+    /**
+     * 錢包扣款明細 JSON (記錄多錢包扣款細節)
+     * 範例: {"CASH_WALLET": 80, "BONUS_WALLET": 20}
+     */
+    @TableField("wallet_split_details")
+    private String walletSplitDetails;
+
+    /**
+     * GP 原始請求 JSON (用於審計與重放)
+     */
+    @TableField("gp_request_json")
+    private String gpRequestJson;
+
+    /**
+     * 平台響應 JSON (用於冪等性快取)
+     */
+    @TableField("platform_response_json")
+    private String platformResponseJson;
+
+    /**
+     * 處理時間 (毫秒)
+     */
+    @TableField("processing_time_ms")
+    private Long processingTimeMs;
+
+    /**
+     * 創建時間
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    /**
+     * 更新時間 (Rollback/Adjust 時更新)
+     */
+    @TableField("update_time")
+    private LocalDateTime updateTime;
+
+    /**
+     * 是否刪除 (0 = 否, 1 = 是)
+     * 注意: 欄位名為 deleted (NOT isDeleted)
+     */
+    @TableField("deleted")
+    private Boolean deleted;
+}
+```
+
+#### RoundStateEntity.java (Round-Based GP)
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.domain.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * Round 狀態實體 (Round State Entity)
+ * 用途: 追蹤 Round-Based GP (如 Evolution, Pragmatic) 的回合狀態
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("t_round_state")
+public class RoundStateEntity {
+
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * Round ID (GP 提供)
+     * UNIQUE INDEX (round_id)
+     */
+    @TableField("round_id")
+    private String roundId;
+
+    /**
+     * 玩家 ID
+     */
+    @TableField("player_id")
+    private Long playerId;
+
+    /**
+     * GP 代碼
+     */
+    @TableField("gp_code")
+    private String gpCode;
+
+    /**
+     * Round 狀態 (OPEN/CLOSED/TIMEOUT/PENDING_REVIEW/CANCELLED/ADJUSTED)
+     */
+    @TableField("status")
+    private String status;
+
+    /**
+     * 總投注金額
+     */
+    @TableField("total_bet_amount")
+    private BigDecimal totalBetAmount;
+
+    /**
+     * 總派彩金額
+     */
+    @TableField("total_win_amount")
+    private BigDecimal totalWinAmount;
+
+    /**
+     * Round 開啟時間
+     */
+    @TableField("opened_at")
+    private LocalDateTime openedAt;
+
+    /**
+     * Round 關閉時間
+     */
+    @TableField("closed_at")
+    private LocalDateTime closedAt;
+
+    /**
+     * 最後更新時間
+     */
+    @TableField("update_time")
+    private LocalDateTime updateTime;
+
+    /**
+     * 是否刪除
+     */
+    @TableField("deleted")
+    private Boolean deleted;
+}
+```
+
+---
+
+### 7.3 DAO 層 (Data Access Layer)
+
+#### GameTransactionRecordDao.java
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.dao;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.entity.GameTransactionRecordEntity;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 遊戲交易記錄 DAO
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Mapper
+public interface GameTransactionRecordDao extends BaseMapper<GameTransactionRecordEntity> {
+
+    /**
+     * 根據交易 ID 查詢記錄 (冪等性檢查)
+     *
+     * @param txId 交易 ID
+     * @return 交易記錄
+     */
+    GameTransactionRecordEntity selectByTxId(@Param("txId") String txId);
+
+    /**
+     * 根據 Round ID 查詢所有交易
+     *
+     * @param roundId Round ID
+     * @return 交易記錄列表
+     */
+    List<GameTransactionRecordEntity> selectByRoundId(@Param("roundId") String roundId);
+
+    /**
+     * 查詢關聯的 Bet 交易 (用於 Win/Rollback 驗證)
+     *
+     * @param refTxId 關聯交易 ID
+     * @return Bet 交易記錄
+     */
+    GameTransactionRecordEntity selectByRefTxId(@Param("refTxId") String refTxId);
+}
+```
+
+#### RoundStateDao.java
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.dao;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.entity.RoundStateEntity;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * Round 狀態 DAO
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Mapper
+public interface RoundStateDao extends BaseMapper<RoundStateEntity> {
+
+    /**
+     * 根據 Round ID 查詢狀態
+     *
+     * @param roundId Round ID
+     * @return Round 狀態記錄
+     */
+    RoundStateEntity selectByRoundId(@Param("roundId") String roundId);
+
+    /**
+     * 查詢超時的 OPEN Rounds (用於定時清理)
+     *
+     * @param timeoutThreshold 超時閾值 (e.g. 2 小時前)
+     * @return 超時的 Round 列表
+     */
+    List<RoundStateEntity> selectTimeoutOpenRounds(@Param("timeoutThreshold") LocalDateTime timeoutThreshold);
+}
+```
+
+---
+
+### 7.4 Manager 層 (Transaction Management Layer)
+
+#### SeamlessWalletTransactionManager.java
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.manager;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.admin.module.business.game.seamless.dao.GameTransactionRecordDao;
+import net.lab1024.sa.admin.module.business.game.seamless.dao.RoundStateDao;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.entity.GameTransactionRecordEntity;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.entity.RoundStateEntity;
+import net.lab1024.sa.admin.module.business.wallet.service.WalletService;
+import net.lab1024.sa.foundation.module.redislock.RedisLock;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 無縫錢包交易 Manager (事務與鎖層)
+ * 職責: 分散式鎖、事務管理、錢包扣款/加款
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class SeamlessWalletTransactionManager {
+
+    private final GameTransactionRecordDao gameTransactionRecordDao;
+    private final RoundStateDao roundStateDao;
+    private final WalletService walletService;
+    private final RedisLock redisLock;
+    private final ObjectMapper objectMapper;
+
+    /**
+     * 處理 Bet 請求 (扣款)
+     * 職責: 分散式鎖 + 事務管理 + 餘額檢查 + 扣款
+     *
+     * @param txId        交易 ID
+     * @param roundId     Round ID
+     * @param playerId    玩家 ID
+     * @param gpCode      GP 代碼
+     * @param gameCode    遊戲代碼
+     * @param betAmount   投注金額
+     * @param requestJson GP 請求 JSON
+     * @return Try<GameTransactionRecordEntity>
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public Try<GameTransactionRecordEntity> processBet(
+        String txId,
+        String roundId,
+        Long playerId,
+        String gpCode,
+        String gameCode,
+        BigDecimal betAmount,
+        String requestJson
+    ) {
+        String lockKey = "seamless:bet:" + playerId;
+
+        return redisLock.tryLock(lockKey, 5, TimeUnit.SECONDS)
+            .flatMap(lock -> {
+                try {
+                    log.info("[SeamlessWalletTransactionManager] Processing Bet: txId={}, playerId={}, amount={}",
+                        txId, playerId, betAmount);
+
+                    long startTime = System.currentTimeMillis();
+
+                    // ===== 1. 檢查餘額 =====
+                    BigDecimal currentBalance = walletService.getBalance(playerId)
+                        .getOrElseThrow(() -> new RuntimeException("Failed to get balance"));
+
+                    if (currentBalance.compareTo(betAmount) < 0) {
+                        log.warn("[Bet Rejected] Insufficient balance: playerId={}, balance={}, required={}",
+                            playerId, currentBalance, betAmount);
+                        throw new RuntimeException("INSUFFICIENT_FUNDS");
+                    }
+
+                    // ===== 2. 扣款 =====
+                    BigDecimal newBalance = walletService.debit(playerId, betAmount, "GAME_BET", txId)
+                        .getOrElseThrow(() -> new RuntimeException("Debit failed"));
+
+                    log.info("[Bet Success] Debit completed: playerId={}, amount={}, newBalance={}",
+                        playerId, betAmount, newBalance);
+
+                    // ===== 3. 記錄交易 =====
+                    GameTransactionRecordEntity record = GameTransactionRecordEntity.builder()
+                        .txId(txId)
+                        .roundId(roundId)
+                        .playerId(playerId)
+                        .gpCode(gpCode)
+                        .gameCode(gameCode)
+                        .transactionType("BET")
+                        .amount(betAmount.negate()) // 負數表示扣款
+                        .balanceBefore(currentBalance)
+                        .balanceAfter(newBalance)
+                        .status("SUCCESS")
+                        .gpRequestJson(requestJson)
+                        .processingTimeMs(System.currentTimeMillis() - startTime)
+                        .createTime(LocalDateTime.now())
+                        .deleted(false)
+                        .build();
+
+                    gameTransactionRecordDao.insert(record);
+
+                    // ===== 4. 更新/創建 Round 狀態 (僅 Round-Based GP) =====
+                    if (roundId != null) {
+                        updateOrCreateRound(roundId, playerId, gpCode, betAmount, BigDecimal.ZERO);
+                    }
+
+                    return Try.success(record);
+
+                } finally {
+                    lock.unlock();
+                }
+            });
+    }
+
+    /**
+     * 處理 Win 請求 (加款)
+     * 職責: 分散式鎖 + 事務管理 + 驗證 Bet 存在 + 加款
+     *
+     * @param txId        交易 ID
+     * @param refTxId     關聯的 Bet 交易 ID
+     * @param roundId     Round ID
+     * @param playerId    玩家 ID
+     * @param gpCode      GP 代碼
+     * @param winAmount   派彩金額
+     * @param requestJson GP 請求 JSON
+     * @return Try<GameTransactionRecordEntity>
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public Try<GameTransactionRecordEntity> processWin(
+        String txId,
+        String refTxId,
+        String roundId,
+        Long playerId,
+        String gpCode,
+        BigDecimal winAmount,
+        String requestJson
+    ) {
+        String lockKey = "seamless:win:" + playerId;
+
+        return redisLock.tryLock(lockKey, 5, TimeUnit.SECONDS)
+            .flatMap(lock -> {
+                try {
+                    log.info("[SeamlessWalletTransactionManager] Processing Win: txId={}, refTxId={}, playerId={}, amount={}",
+                        txId, refTxId, playerId, winAmount);
+
+                    long startTime = System.currentTimeMillis();
+
+                    // ===== 1. 驗證 Bet 存在 (防止 Out-of-Order) =====
+                    if (refTxId != null) {
+                        GameTransactionRecordEntity betRecord = gameTransactionRecordDao.selectByTxId(refTxId);
+                        if (betRecord == null) {
+                            log.warn("[Win Rejected] Bet not found: refTxId={}", refTxId);
+                            throw new RuntimeException("BET_NOT_FOUND");
+                        }
+                    }
+
+                    // ===== 2. 加款 =====
+                    BigDecimal currentBalance = walletService.getBalance(playerId)
+                        .getOrElseThrow(() -> new RuntimeException("Failed to get balance"));
+
+                    BigDecimal newBalance = walletService.credit(playerId, winAmount, "GAME_WIN", txId)
+                        .getOrElseThrow(() -> new RuntimeException("Credit failed"));
+
+                    log.info("[Win Success] Credit completed: playerId={}, amount={}, newBalance={}",
+                        playerId, winAmount, newBalance);
+
+                    // ===== 3. 記錄交易 =====
+                    GameTransactionRecordEntity record = GameTransactionRecordEntity.builder()
+                        .txId(txId)
+                        .roundId(roundId)
+                        .refTxId(refTxId)
+                        .playerId(playerId)
+                        .gpCode(gpCode)
+                        .gameCode(null) // Win 通常不帶 gameCode
+                        .transactionType("WIN")
+                        .amount(winAmount) // 正數表示加款
+                        .balanceBefore(currentBalance)
+                        .balanceAfter(newBalance)
+                        .status("SUCCESS")
+                        .gpRequestJson(requestJson)
+                        .processingTimeMs(System.currentTimeMillis() - startTime)
+                        .createTime(LocalDateTime.now())
+                        .deleted(false)
+                        .build();
+
+                    gameTransactionRecordDao.insert(record);
+
+                    // ===== 4. 更新 Round 狀態為 CLOSED (僅 Round-Based GP) =====
+                    if (roundId != null) {
+                        closeRound(roundId, winAmount);
+                    }
+
+                    return Try.success(record);
+
+                } finally {
+                    lock.unlock();
+                }
+            });
+    }
+
+    /**
+     * 處理 Rollback 請求 (退款)
+     * 職責: 分散式鎖 + 事務管理 + 驗證原交易 + 退款
+     *
+     * @param txId        新的 Rollback 交易 ID
+     * @param refTxId     要回滾的原交易 ID
+     * @param playerId    玩家 ID
+     * @param requestJson GP 請求 JSON
+     * @return Try<GameTransactionRecordEntity>
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public Try<GameTransactionRecordEntity> processRollback(
+        String txId,
+        String refTxId,
+        Long playerId,
+        String requestJson
+    ) {
+        String lockKey = "seamless:rollback:" + playerId;
+
+        return redisLock.tryLock(lockKey, 5, TimeUnit.SECONDS)
+            .flatMap(lock -> {
+                try {
+                    log.info("[SeamlessWalletTransactionManager] Processing Rollback: txId={}, refTxId={}, playerId={}",
+                        txId, refTxId, playerId);
+
+                    long startTime = System.currentTimeMillis();
+
+                    // ===== 1. 查詢原交易 =====
+                    GameTransactionRecordEntity originalTx = gameTransactionRecordDao.selectByTxId(refTxId);
+
+                    if (originalTx == null) {
+                        log.warn("[Rollback] Original transaction not found: refTxId={}", refTxId);
+                        // 如果原交易不存在,說明從未扣款,直接返回成功
+                        GameTransactionRecordEntity record = GameTransactionRecordEntity.builder()
+                            .txId(txId)
+                            .refTxId(refTxId)
+                            .playerId(playerId)
+                            .transactionType("ROLLBACK")
+                            .amount(BigDecimal.ZERO)
+                            .status("SUCCESS")
+                            .gpRequestJson(requestJson)
+                            .processingTimeMs(System.currentTimeMillis() - startTime)
+                            .createTime(LocalDateTime.now())
+                            .deleted(false)
+                            .build();
+
+                        gameTransactionRecordDao.insert(record);
+                        return Try.success(record);
+                    }
+
+                    // ===== 2. 執行反向操作 (Bet → Credit, Win → Debit) =====
+                    BigDecimal rollbackAmount = originalTx.getAmount().abs();
+                    BigDecimal currentBalance = walletService.getBalance(playerId)
+                        .getOrElseThrow(() -> new RuntimeException("Failed to get balance"));
+
+                    BigDecimal newBalance;
+                    if ("BET".equals(originalTx.getTransactionType())) {
+                        // Bet Rollback → 退款 (Credit)
+                        newBalance = walletService.credit(playerId, rollbackAmount, "GAME_ROLLBACK", txId)
+                            .getOrElseThrow(() -> new RuntimeException("Credit failed"));
+                    } else if ("WIN".equals(originalTx.getTransactionType())) {
+                        // Win Rollback → 扣款 (Debit),可能導致負餘額
+                        newBalance = walletService.debit(playerId, rollbackAmount, "GAME_ROLLBACK", txId)
+                            .getOrElse(BigDecimal.ZERO); // 允許負餘額
+                    } else {
+                        throw new RuntimeException("Invalid original transaction type: " + originalTx.getTransactionType());
+                    }
+
+                    log.info("[Rollback Success] Rollback completed: playerId={}, amount={}, newBalance={}",
+                        playerId, rollbackAmount, newBalance);
+
+                    // ===== 3. 記錄交易 + 標記原交易為 ROLLED_BACK =====
+                    GameTransactionRecordEntity record = GameTransactionRecordEntity.builder()
+                        .txId(txId)
+                        .refTxId(refTxId)
+                        .roundId(originalTx.getRoundId())
+                        .playerId(playerId)
+                        .gpCode(originalTx.getGpCode())
+                        .transactionType("ROLLBACK")
+                        .amount(rollbackAmount.negate()) // 與原交易方向相反
+                        .balanceBefore(currentBalance)
+                        .balanceAfter(newBalance)
+                        .status("SUCCESS")
+                        .gpRequestJson(requestJson)
+                        .processingTimeMs(System.currentTimeMillis() - startTime)
+                        .createTime(LocalDateTime.now())
+                        .deleted(false)
+                        .build();
+
+                    gameTransactionRecordDao.insert(record);
+
+                    // 標記原交易為 ROLLED_BACK
+                    originalTx.setStatus("ROLLED_BACK");
+                    originalTx.setUpdateTime(LocalDateTime.now());
+                    gameTransactionRecordDao.updateById(originalTx);
+
+                    // ===== 4. 更新 Round 狀態為 CANCELLED (僅 Round-Based GP) =====
+                    if (originalTx.getRoundId() != null) {
+                        cancelRound(originalTx.getRoundId());
+                    }
+
+                    return Try.success(record);
+
+                } finally {
+                    lock.unlock();
+                }
+            });
+    }
+
+    // ========== 私有輔助方法 (Round 狀態管理) ==========
+
+    private void updateOrCreateRound(String roundId, Long playerId, String gpCode, BigDecimal betAmount, BigDecimal winAmount) {
+        RoundStateEntity round = roundStateDao.selectByRoundId(roundId);
+
+        if (round == null) {
+            // 創建新 Round
+            round = RoundStateEntity.builder()
+                .roundId(roundId)
+                .playerId(playerId)
+                .gpCode(gpCode)
+                .status("OPEN")
+                .totalBetAmount(betAmount)
+                .totalWinAmount(winAmount)
+                .openedAt(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .deleted(false)
+                .build();
+
+            roundStateDao.insert(round);
+            log.info("[Round Created] roundId={}, status=OPEN", roundId);
+        } else {
+            // 更新已有 Round (累加投注)
+            round.setTotalBetAmount(round.getTotalBetAmount().add(betAmount));
+            round.setUpdateTime(LocalDateTime.now());
+            roundStateDao.updateById(round);
+            log.info("[Round Updated] roundId={}, totalBet={}", roundId, round.getTotalBetAmount());
+        }
+    }
+
+    private void closeRound(String roundId, BigDecimal winAmount) {
+        RoundStateEntity round = roundStateDao.selectByRoundId(roundId);
+
+        if (round != null) {
+            round.setStatus("CLOSED");
+            round.setTotalWinAmount(round.getTotalWinAmount().add(winAmount));
+            round.setClosedAt(LocalDateTime.now());
+            round.setUpdateTime(LocalDateTime.now());
+            roundStateDao.updateById(round);
+
+            log.info("[Round Closed] roundId={}, totalWin={}", roundId, round.getTotalWinAmount());
+        }
+    }
+
+    private void cancelRound(String roundId) {
+        RoundStateEntity round = roundStateDao.selectByRoundId(roundId);
+
+        if (round != null) {
+            round.setStatus("CANCELLED");
+            round.setUpdateTime(LocalDateTime.now());
+            roundStateDao.updateById(round);
+
+            log.info("[Round Cancelled] roundId={}", roundId);
+        }
+    }
+}
+```
+
+---
+
+### 7.5 Service 層 (Business Logic Layer)
+
+#### SeamlessWalletService.java
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.admin.module.business.game.seamless.dao.GameTransactionRecordDao;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.entity.GameTransactionRecordEntity;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.form.BetRequestForm;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.form.WinRequestForm;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.form.RollbackRequestForm;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.vo.TransactionResponseVO;
+import net.lab1024.sa.admin.module.business.game.seamless.manager.SeamlessWalletTransactionManager;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 無縫錢包 Service (業務協調層)
+ * 職責: 冪等性檢查,業務協調,調用 Manager 進行事務管理
+ *
+ * 注意: Service 層不允許 @Transactional,事務由 Manager 管理
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class SeamlessWalletService {
+
+    private final SeamlessWalletTransactionManager seamlessWalletTransactionManager;
+    private final GameTransactionRecordDao gameTransactionRecordDao;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
+
+    /**
+     * 處理 Bet 請求 (帶冪等性檢查)
+     *
+     * @param form Bet 請求表單
+     * @return Try<TransactionResponseVO>
+     */
+    public Try<TransactionResponseVO> processBet(BetRequestForm form) {
+        log.info("[SeamlessWalletService] Processing Bet: txId={}, playerId={}, amount={}",
+            form.getTxId(), form.getPlayerId(), form.getBetAmount());
+
+        // ===== 1. 冪等性檢查 (Redis + DB 雙重保障) =====
+        return checkIdempotency(form.getTxId())
+            .flatMap(cachedResponse -> {
+                if (cachedResponse.isDefined()) {
+                    log.info("[Idempotent] Returning cached Bet response: txId={}", form.getTxId());
+                    return Try.success(cachedResponse.get());
+                }
+
+                // ===== 2. 調用 Manager 處理交易 (帶事務與鎖) =====
+                return seamlessWalletTransactionManager.processBet(
+                    form.getTxId(),
+                    form.getRoundId(),
+                    form.getPlayerId(),
+                    form.getGpCode(),
+                    form.getGameCode(),
+                    form.getBetAmount(),
+                    toJson(form)
+                ).map(record -> {
+                    // ===== 3. 緩存響應 (Redis TTL = 3600s) =====
+                    TransactionResponseVO response = toResponseVO(record);
+                    cacheResponse(form.getTxId(), response, 3600);
+                    return response;
+                });
+            });
+    }
+
+    /**
+     * 處理 Win 請求 (帶冪等性檢查)
+     *
+     * @param form Win 請求表單
+     * @return Try<TransactionResponseVO>
+     */
+    public Try<TransactionResponseVO> processWin(WinRequestForm form) {
+        log.info("[SeamlessWalletService] Processing Win: txId={}, refTxId={}, playerId={}, amount={}",
+            form.getTxId(), form.getRefTxId(), form.getPlayerId(), form.getWinAmount());
+
+        // ===== 1. 冪等性檢查 =====
+        return checkIdempotency(form.getTxId())
+            .flatMap(cachedResponse -> {
+                if (cachedResponse.isDefined()) {
+                    log.info("[Idempotent] Returning cached Win response: txId={}", form.getTxId());
+                    return Try.success(cachedResponse.get());
+                }
+
+                // ===== 2. 調用 Manager 處理交易 =====
+                return seamlessWalletTransactionManager.processWin(
+                    form.getTxId(),
+                    form.getRefTxId(),
+                    form.getRoundId(),
+                    form.getPlayerId(),
+                    form.getGpCode(),
+                    form.getWinAmount(),
+                    toJson(form)
+                ).map(record -> {
+                    // ===== 3. 緩存響應 =====
+                    TransactionResponseVO response = toResponseVO(record);
+                    cacheResponse(form.getTxId(), response, 3600);
+                    return response;
+                });
+            });
+    }
+
+    /**
+     * 處理 Rollback 請求 (帶冪等性檢查)
+     *
+     * @param form Rollback 請求表單
+     * @return Try<TransactionResponseVO>
+     */
+    public Try<TransactionResponseVO> processRollback(RollbackRequestForm form) {
+        log.info("[SeamlessWalletService] Processing Rollback: txId={}, refTxId={}, playerId={}",
+            form.getTxId(), form.getRefTxId(), form.getPlayerId());
+
+        // ===== 1. 冪等性檢查 =====
+        return checkIdempotency(form.getTxId())
+            .flatMap(cachedResponse -> {
+                if (cachedResponse.isDefined()) {
+                    log.info("[Idempotent] Returning cached Rollback response: txId={}", form.getTxId());
+                    return Try.success(cachedResponse.get());
+                }
+
+                // ===== 2. 調用 Manager 處理交易 =====
+                return seamlessWalletTransactionManager.processRollback(
+                    form.getTxId(),
+                    form.getRefTxId(),
+                    form.getPlayerId(),
+                    toJson(form)
+                ).map(record -> {
+                    // ===== 3. 緩存響應 =====
+                    TransactionResponseVO response = toResponseVO(record);
+                    cacheResponse(form.getTxId(), response, 3600);
+                    return response;
+                });
+            });
+    }
+
+    // ========== 私有輔助方法 ==========
+
+    /**
+     * 冪等性檢查 (Redis + DB)
+     * 返回 Option.some(cachedResponse) 如果已處理
+     * 返回 Option.none() 如果未處理
+     */
+    private Try<Option<TransactionResponseVO>> checkIdempotency(String txId) {
+        return Try.of(() -> {
+            // 1. Redis 快取檢查
+            String cacheKey = "seamless:idempotency:" + txId;
+            String cachedJson = redisTemplate.opsForValue().get(cacheKey);
+
+            if (cachedJson != null) {
+                TransactionResponseVO cachedResponse = objectMapper.readValue(cachedJson, TransactionResponseVO.class);
+                return Option.of(cachedResponse);
+            }
+
+            // 2. DB 檢查 (Redis 失效時降級)
+            GameTransactionRecordEntity record = gameTransactionRecordDao.selectByTxId(txId);
+            if (record != null) {
+                TransactionResponseVO response = toResponseVO(record);
+                // 重建快取
+                cacheResponse(txId, response, 3600);
+                return Option.of(response);
+            }
+
+            return Option.none();
+        });
+    }
+
+    /**
+     * 緩存響應到 Redis
+     */
+    private void cacheResponse(String txId, TransactionResponseVO response, int ttlSeconds) {
+        try {
+            String cacheKey = "seamless:idempotency:" + txId;
+            String responseJson = objectMapper.writeValueAsString(response);
+            redisTemplate.opsForValue().set(cacheKey, responseJson, ttlSeconds, TimeUnit.SECONDS);
+            log.debug("[Cache] Cached response for txId={}, TTL={}s", txId, ttlSeconds);
+        } catch (Exception e) {
+            log.error("[Cache Error] Failed to cache response for txId={}", txId, e);
+        }
+    }
+
+    /**
+     * Entity → VO 轉換
+     */
+    private TransactionResponseVO toResponseVO(GameTransactionRecordEntity entity) {
+        return TransactionResponseVO.builder()
+            .txId(entity.getTxId())
+            .playerId(entity.getPlayerId())
+            .balanceBefore(entity.getBalanceBefore())
+            .balanceAfter(entity.getBalanceAfter())
+            .status(entity.getStatus())
+            .processingTimeMs(entity.getProcessingTimeMs())
+            .build();
+    }
+
+    /**
+     * 對象轉 JSON
+     */
+    private String toJson(Object obj) {
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            log.error("Failed to convert to JSON", e);
+            return "{}";
+        }
+    }
+}
+```
+
+---
+
+### 7.6 Controller 層 (HTTP Interface Layer)
+
+#### SeamlessWalletController.java
+
+```java
+package net.lab1024.sa.admin.module.business.game.seamless.controller;
+
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.form.BetRequestForm;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.form.WinRequestForm;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.form.RollbackRequestForm;
+import net.lab1024.sa.admin.module.business.game.seamless.domain.vo.TransactionResponseVO;
+import net.lab1024.sa.admin.module.business.game.seamless.service.SeamlessWalletService;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+/**
+ * 無縫錢包 Controller (HTTP 接口層)
+ * 職責: HTTP 請求處理,參數校驗,返回 ResponseDTO
+ *
+ * @author Game Integration Team
+ * @since 2026-01-29
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/seamless-wallet")
+@RequiredArgsConstructor
+@Tag(name = "無縫錢包管理", description = "Seamless Wallet Management - GP Integration")
+public class SeamlessWalletController {
+
+    private final SeamlessWalletService seamlessWalletService;
+
+    /**
+     * Bet 請求 (扣款)
+     *
+     * @param form Bet 請求表單
+     * @return ResponseDTO<TransactionResponseVO>
+     */
+    @PostMapping("/bet")
+    @Operation(summary = "Bet 請求", description = "GP 發送 Bet 請求,平台扣款")
+    public ResponseDTO<TransactionResponseVO> bet(@Valid @RequestBody BetRequestForm form) {
+        log.info("[SeamlessWalletController] POST /api/seamless-wallet/bet, txId={}, playerId={}, amount={}",
+            form.getTxId(), form.getPlayerId(), form.getBetAmount());
+
+        return seamlessWalletService.processBet(form)
+            .fold(
+                error -> {
+                    log.error("[Bet Failed] txId={}, error={}", form.getTxId(), error.getMessage());
+
+                    if ("INSUFFICIENT_FUNDS".equals(error.getMessage())) {
+                        return ResponseDTO.error(1001, "Insufficient balance");
+                    } else {
+                        return ResponseDTO.error(500, "Bet processing failed: " + error.getMessage());
+                    }
+                },
+                ResponseDTO::ok
+            );
+    }
+
+    /**
+     * Win 請求 (加款)
+     *
+     * @param form Win 請求表單
+     * @return ResponseDTO<TransactionResponseVO>
+     */
+    @PostMapping("/win")
+    @Operation(summary = "Win 請求", description = "GP 發送 Win 請求,平台加款")
+    public ResponseDTO<TransactionResponseVO> win(@Valid @RequestBody WinRequestForm form) {
+        log.info("[SeamlessWalletController] POST /api/seamless-wallet/win, txId={}, refTxId={}, playerId={}, amount={}",
+            form.getTxId(), form.getRefTxId(), form.getPlayerId(), form.getWinAmount());
+
+        return seamlessWalletService.processWin(form)
+            .fold(
+                error -> {
+                    log.error("[Win Failed] txId={}, error={}", form.getTxId(), error.getMessage());
+
+                    if ("BET_NOT_FOUND".equals(error.getMessage())) {
+                        return ResponseDTO.error(1002, "Bet transaction not found");
+                    } else {
+                        return ResponseDTO.error(500, "Win processing failed: " + error.getMessage());
+                    }
+                },
+                ResponseDTO::ok
+            );
+    }
+
+    /**
+     * Rollback 請求 (退款)
+     *
+     * @param form Rollback 請求表單
+     * @return ResponseDTO<TransactionResponseVO>
+     */
+    @PostMapping("/rollback")
+    @Operation(summary = "Rollback 請求", description = "GP 發送 Rollback 請求,平台退款")
+    public ResponseDTO<TransactionResponseVO> rollback(@Valid @RequestBody RollbackRequestForm form) {
+        log.info("[SeamlessWalletController] POST /api/seamless-wallet/rollback, txId={}, refTxId={}, playerId={}",
+            form.getTxId(), form.getRefTxId(), form.getPlayerId());
+
+        return seamlessWalletService.processRollback(form)
+            .fold(
+                error -> {
+                    log.error("[Rollback Failed] txId={}, error={}", form.getTxId(), error.getMessage());
+                    return ResponseDTO.error(500, "Rollback processing failed: " + error.getMessage());
+                },
+                ResponseDTO::ok
+            );
+    }
+}
+```
+
+---
+
+### 7.7 Foundation 模組依賴
+
+無縫錢包模組依賴以下 SmartAdmin Foundation 模組:
+
+| Foundation 模組 | 用途 | 引用位置 |
+|----------------|------|---------|
+| **foundation.redis-lock** | 分散式鎖,防止並發扣款 (場景 B) | SeamlessWalletTransactionManager.processBet/processWin/processRollback() |
+| **foundation.cache** | Caffeine + Redis 緩存,冪等性快取 | SeamlessWalletService.checkIdempotency() |
+| **foundation.audit-log** | 審計日誌記錄 | 所有交易完成後自動記錄 |
+| **foundation.retry** | 失敗重試策略 | GP API 調用失敗時重試 |
+
+#### 冪等性 TTL 標準化 (v2.0.0 ✅)
+
+從 v2.0.0 開始,統一冪等性 TTL 為 **3600 秒 (1 小時)**:
+
+```java
+// ✅ v2.0.0 標準
+redisTemplate.opsForValue().set(cacheKey, responseJson, 3600, TimeUnit.SECONDS);
+
+// ❌ 已廢棄: 不一致的 TTL (1-2h)
+```
+
+**理由**: 與 02-04 流水計算模組保持一致,便於運維與監控。
+
+---
+
+### 7.8 ArchitectureTest 驗證規則
+
+以下 ArchUnit 規則確保無縫錢包模組符合 SmartAdmin 架構規範:
+
+```java
+package net.lab1024.sa.admin;
+
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.lang.ArchRule;
+import org.junit.jupiter.api.Test;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
+
+public class SeamlessWalletModuleArchitectureTest {
+
+    private final JavaClasses importedClasses = new ClassFileImporter()
+        .importPackages("net.lab1024.sa.admin.module.business.game.seamless");
+
+    @Test
+    public void testLayeredArchitecture() {
+        layeredArchitecture()
+            .consideringAllDependencies()
+            .layer("Controller").definedBy("..seamless.controller..")
+            .layer("Service").definedBy("..seamless.service..")
+            .layer("Manager").definedBy("..seamless.manager..")
+            .layer("Dao").definedBy("..seamless.dao..")
+            .layer("Entity").definedBy("..seamless.domain.entity..")
+
+            .whereLayer("Controller").mayNotBeAccessedByAnyLayer()
+            .whereLayer("Controller").mayOnlyAccessLayers("Service")
+            .whereLayer("Service").mayOnlyAccessLayers("Manager", "Dao")
+            .whereLayer("Manager").mayOnlyAccessLayers("Dao", "Entity")
+            .whereLayer("Dao").mayOnlyAccessLayers("Entity")
+
+            .check(importedClasses);
+    }
+
+    @Test
+    public void testManagerTransactionalOnly() {
+        ArchRule rule = classes()
+            .that().resideInAPackage("..manager..")
+            .should().beAnnotatedWith(org.springframework.transaction.annotation.Transactional.class);
+
+        rule.check(importedClasses);
+    }
+
+    @Test
+    public void testServiceNoTransactional() {
+        ArchRule rule = classes()
+            .that().resideInAPackage("..service..")
+            .should().notBeAnnotatedWith(org.springframework.transaction.annotation.Transactional.class);
+
+        rule.check(importedClasses);
+    }
+
+    @Test
+    public void testRedisLockUsage() {
+        ArchRule rule = classes()
+            .that().resideInAPackage("..manager..")
+            .and().haveSimpleNameEndingWith("Manager")
+            .should().dependOnClassesThat().haveSimpleName("RedisLock");
+
+        rule.check(importedClasses);
+    }
+}
+```
+
+---
+
+## 8. 變更日誌 (Change Log)
+
+### v2.0.0 (2026-01-29)
+
+**重大變更**:
+1. ✅ **Major #3 修正**: 新增 SmartAdmin 架構映射 (§7)
+   - 完整五層架構代碼示例 (Entity/Dao/Manager/Service/Controller)
+   - 無縫錢包核心邏輯實現 (Bet/Win/Rollback)
+   - 分散式鎖 (RedisLock) 與冪等性 (Redis Cache) 集成
+   - Round 狀態管理 (Round-Based GP 支援)
+   - Foundation 模組依賴說明 (redis-lock, cache, audit-log, retry)
+   - ArchitectureTest 驗證規則
+
+2. ✅ **Minor #6 修正**: 統一冪等性 TTL 為 3600 秒 (1 小時)
+   - 與 02-04 流水計算模組保持一致
+   - 移除文檔中的不一致描述 (1-2h)
+
+**向下兼容**:
+- v1.x API 保持不變,僅新增實現細節
+
+### v1.0.0 (2026-01-28)
+
+**初始版本**:
+- 無縫錢包對接場景分析 (§1-2)
+- 9 種極端場景綜合決策矩陣 (§2.4)
+- 冪等性、並發控制、Out-of-Order 處理 (§2.3-2.4)
+- Round-Based 狀態機 (§1.2.1)
+- 負餘額處理、錢包扣款順序 (§4)
+
+---
+
+**文檔版本**: 2.0.0
+**最後更新**: 2026-01-29
+**維護團隊**: Game Integration Team & Backend Team
