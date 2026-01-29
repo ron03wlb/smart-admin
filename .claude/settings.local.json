@@ -166,7 +166,14 @@
       "Bash(powershell.exe -Command \"Move-Item -Path ''$item'' -Destination ''_deprecated/non-skill-items-v3/$item'' -Force\")",
       "Bash(for doc in MIGRATION-REPORT-v3.0.0.md MONITORING-SYSTEM-DESIGN.md NEW-SKILLS-OVERVIEW.md P1-BASELINE-TEST-SUMMARY.md SPRINT1-PROGRESS.md skill-aliases.json)",
       "Bash(do echo \"Moving $doc...\")",
-      "Bash(powershell.exe -Command \"Move-Item -Path ''$doc'' -Destination ''_deprecated/non-skill-items-v3/$doc'' -Force\")"
+      "Bash(powershell.exe -Command \"Move-Item -Path ''$doc'' -Destination ''_deprecated/non-skill-items-v3/$doc'' -Force\")",
+      "Bash(for skill in archunit-test-generator security-hardening-pro vavr-refactoring-assistant)",
+      "Bash(do echo \"Moving backend/$skill...\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''backend/$skill'' -Destination ''core/$skill'' -Force\")",
+      "Bash(for skill in smartadmin-crud-generator smartadmin-integration-test)",
+      "Bash(do echo \"Moving full-stack/$skill...\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''full-stack/$skill'' -Destination ''core/$skill'' -Force\")",
+      "Bash(powershell.exe -Command \"Move-Item -Path ''testing/test-fixture-generator'' -Destination ''core/test-fixture-generator'' -Force\")"
     ]
   },
   "allowedCommands": {
