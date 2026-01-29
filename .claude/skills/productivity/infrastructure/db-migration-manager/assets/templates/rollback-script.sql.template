@@ -1,0 +1,129 @@
+-- U{{VERSION}}__{{DESCRIPTION}}.sql
+-- Rollback Script for: V{{VERSION}}__{{DESCRIPTION}}.sql
+-- Description: {{ROLLBACK_DESCRIPTION}}
+-- Author: {{AUTHOR}}
+-- Date: {{DATE}}
+-- Database: PostgreSQL 15+ / MySQL 8.0+
+-- WARNING: {{WARNING_MESSAGE}}
+
+-- ============================================
+-- Pre-Rollback Validation
+-- ============================================
+
+-- Verify current schema state before rollback
+-- SELECT * FROM information_schema.tables WHERE table_name = '{{TABLE_NAME}}';
+-- SELECT * FROM information_schema.columns WHERE table_name = '{{TABLE_NAME}}';
+
+-- Check data that will be affected
+-- SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE {{CONDITION}};
+
+-- ============================================
+-- Data Backup (Optional but Recommended)
+-- ============================================
+
+-- Create backup table before destructive operations
+-- CREATE TABLE {{TABLE_NAME}}_backup_{{DATE}} AS
+-- SELECT * FROM {{TABLE_NAME}};
+
+-- Export data to archive table
+-- INSERT INTO {{ARCHIVE_TABLE}} ({{COLUMNS}})
+-- SELECT {{COLUMNS}}
+-- FROM {{TABLE_NAME}}
+-- WHERE {{CONDITION}};
+
+-- ============================================
+-- Drop Constraints and Indexes
+-- ============================================
+
+-- Drop foreign key constraints first
+ALTER TABLE {{TABLE_NAME}}
+DROP CONSTRAINT IF EXISTS {{FK_CONSTRAINT_NAME}};  -- PostgreSQL
+-- DROP FOREIGN KEY {{FK_CONSTRAINT_NAME}};  -- MySQL
+
+-- Drop check constraints
+-- ALTER TABLE {{TABLE_NAME}}
+-- DROP CONSTRAINT IF EXISTS {{CHECK_CONSTRAINT_NAME}};
+
+-- Drop indexes
+DROP INDEX IF EXISTS {{INDEX_NAME}};  -- PostgreSQL
+-- DROP INDEX {{INDEX_NAME}} ON {{TABLE_NAME}};  -- MySQL
+
+-- ============================================
+-- Revert Schema Changes
+-- ============================================
+
+-- Drop table (if migration created new table)
+DROP TABLE IF EXISTS {{TABLE_NAME}} CASCADE;  -- CASCADE drops dependent objects
+
+-- Drop column (if migration added column)
+-- ALTER TABLE {{TABLE_NAME}}
+-- DROP COLUMN IF EXISTS {{COLUMN_NAME}};  -- PostgreSQL
+-- -- DROP COLUMN {{COLUMN_NAME}};  -- MySQL
+
+-- Revert column type change
+-- ALTER TABLE {{TABLE_NAME}}
+-- ALTER COLUMN {{COLUMN_NAME}} TYPE {{ORIGINAL_TYPE}};  -- PostgreSQL
+-- -- MODIFY COLUMN {{COLUMN_NAME}} {{ORIGINAL_TYPE}};  -- MySQL
+
+-- Revert column constraint change
+-- ALTER TABLE {{TABLE_NAME}}
+-- ALTER COLUMN {{COLUMN_NAME}} DROP NOT NULL;  -- PostgreSQL
+-- -- MODIFY COLUMN {{COLUMN_NAME}} {{TYPE}} NULL;  -- MySQL
+
+-- ============================================
+-- Revert Data Changes (if applicable)
+-- ============================================
+
+-- Restore data to previous state
+-- UPDATE {{TABLE_NAME}}
+-- SET {{COLUMN_NAME}} = {{ORIGINAL_VALUE}}
+-- WHERE {{CONDITION}};
+
+-- Delete migrated data
+-- DELETE FROM {{TABLE_NAME}}
+-- WHERE {{CONDITION}};
+
+-- ============================================
+-- Post-Rollback Validation
+-- ============================================
+
+-- Verify schema reverted correctly
+-- SELECT column_name, data_type, is_nullable
+-- FROM information_schema.columns
+-- WHERE table_name = '{{TABLE_NAME}}';
+
+-- Verify data integrity after rollback
+-- SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE {{VALIDATION_CONDITION}};
+
+-- ============================================
+-- Cleanup
+-- ============================================
+
+-- Remove backup table (after validation)
+-- DROP TABLE IF EXISTS {{TABLE_NAME}}_backup_{{DATE}};
+
+-- Vacuum/analyze table (PostgreSQL)
+-- VACUUM ANALYZE {{TABLE_NAME}};
+
+-- Optimize table (MySQL)
+-- OPTIMIZE TABLE {{TABLE_NAME}};
+
+-- ============================================
+-- Manual Steps (if automatic rollback impossible)
+-- ============================================
+
+-- MANUAL STEP 1: {{MANUAL_INSTRUCTION_1}}
+-- MANUAL STEP 2: {{MANUAL_INSTRUCTION_2}}
+-- MANUAL STEP 3: {{MANUAL_INSTRUCTION_3}}
+
+-- ============================================
+-- Rollback Verification Checklist
+-- ============================================
+
+-- [ ] Database backup verified before rollback
+-- [ ] Dependent applications notified of rollback
+-- [ ] Schema matches pre-migration state
+-- [ ] Data integrity validated
+-- [ ] Application tests pass
+-- [ ] Monitoring metrics normal
+-- [ ] Backup tables cleaned up (after verification)

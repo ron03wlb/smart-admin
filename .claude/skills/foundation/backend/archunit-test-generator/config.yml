@@ -1,0 +1,138 @@
+# ====================================================================
+# ArchUnit Test Generator - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Backend
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "archunit-test-generator"
+  version: "1.0.0"
+  priority: "P0"
+  type: "atomic"
+  category: "backend"
+  description: "Auto-generate ArchUnit test methods from SmartAdmin architecture rules"
+  ai_description: |
+    Generates ArchUnit test methods from natural language architecture rules
+    defined in .agent/rules/*.md. Enforces SmartAdmin's layered architecture
+    constraints (Controller → Service → Manager → Dao), annotation restrictions
+    (@Transactional only in Manager), naming conventions, and dependency injection
+    patterns (constructor injection only).
+
+    Parses YAML frontmatter from rule files, maps natural language rules to
+    ArchUnit DSL using 6 core patterns, checks for conflicts/duplicates in
+    ArchitectureTest.java, and generates test methods with proper documentation.
+
+  tags:
+    - "archunit"
+    - "architecture-testing"
+    - "code-quality"
+    - "testing"
+    - "tdd"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "add ArchUnit test"
+    - "generate ArchUnit rule"
+    - "enforce architecture rule"
+    - "validate architecture"
+    - "architecture test"
+    - "ArchitectureTest.java"
+    - "layer dependency test"
+    - "annotation restriction test"
+
+  patterns:
+    - "add\\s+ArchUnit\\s+test\\s+for\\s+(\\w+)"
+    - "generate\\s+test\\s+to\\s+enforce\\s+(.*)"
+    - "create\\s+ArchUnit\\s+rule\\s+for\\s+(.*)"
+
+  exclude_keywords:
+    - "delete ArchUnit test"
+    - "remove architecture rule"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 15
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "archunit"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - ".agent/rules/foundation/10-architecture-rules.md"
+    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/ArchitectureTest.java"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.java"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "gradle_available"
+      rule: "Gradle 8.0+ must be available"
+      command: "gradle --version"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify test code compiles successfully"
+      command: "./gradlew :sa-admin:compileTestJava"
+
+    - check: "archunit"
+      description: "Run ArchitectureTest to verify new rule catches violations"
+      command: "./gradlew :sa-admin:test --tests ArchitectureTest"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: "README.md"
+  examples_dir: null
+  references_dir: null
+
+  external_links:
+    - title: "SmartAdmin Architecture Rules"
+      url: "../../../.agent/rules/foundation/10-architecture-rules.md"
+
+    - title: "ArchUnit Documentation"
+      url: "https://www.archunit.org/userguide/html/000_Index.html"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "test_coverage"

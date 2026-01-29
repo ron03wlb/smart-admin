@@ -1,0 +1,90 @@
+/**
+ * {{MODULE_TITLE}} Value Object
+ */
+export interface {{MODULE_CLASS}}VO {
+  /** {{MODULE_TITLE}} ID */
+  id: number;
+  {{#VO_FIELDS}}
+  /** {{FIELD_COMMENT}} */
+  {{FIELD_NAME}}{{#IF_OPTIONAL}}?{{/IF_OPTIONAL}}: {{FIELD_TYPE}};
+  {{/VO_FIELDS}}
+  /** Create time */
+  createTime: string;
+  /** Update time */
+  updateTime?: string;
+  /** Creator ID */
+  createUserId?: number;
+  /** Creator name */
+  createUserName?: string;
+}
+
+/**
+ * {{MODULE_TITLE}} Add Form
+ */
+export interface {{MODULE_CLASS}}AddForm {
+  {{#ADD_FORM_FIELDS}}
+  /** {{FIELD_COMMENT}} */
+  {{FIELD_NAME}}{{#IF_OPTIONAL}}?{{/IF_OPTIONAL}}: {{FIELD_TYPE}};
+  {{/ADD_FORM_FIELDS}}
+}
+
+/**
+ * {{MODULE_TITLE}} Update Form
+ */
+export interface {{MODULE_CLASS}}UpdateForm {
+  /** {{MODULE_TITLE}} ID */
+  id: number;
+  {{#UPDATE_FORM_FIELDS}}
+  /** {{FIELD_COMMENT}} */
+  {{FIELD_NAME}}{{#IF_OPTIONAL}}?{{/IF_OPTIONAL}}: {{FIELD_TYPE}};
+  {{/UPDATE_FORM_FIELDS}}
+}
+
+/**
+ * {{MODULE_TITLE}} Query Form
+ */
+export interface {{MODULE_CLASS}}QueryForm {
+  {{#QUERY_FORM_FIELDS}}
+  /** {{FIELD_COMMENT}} */
+  {{FIELD_NAME}}?: {{FIELD_TYPE}};
+  {{/QUERY_FORM_FIELDS}}
+  /** Page number */
+  pageNum: number;
+  /** Page size */
+  pageSize: number;
+  /** Sort field */
+  sortField?: string;
+  /** Sort order: asc/desc */
+  sortOrder?: 'asc' | 'desc';
+}
+
+{{#ENUMS}}
+/**
+ * {{ENUM_COMMENT}}
+ */
+export enum {{ENUM_NAME}} {
+  {{#ENUM_VALUES}}
+  /** {{VALUE_COMMENT}} */
+  {{VALUE_NAME}} = {{VALUE_CODE}},
+  {{/ENUM_VALUES}}
+}
+
+/**
+ * {{ENUM_NAME}} Labels
+ */
+export const {{ENUM_NAME}}_LABELS: Record<{{ENUM_NAME}}, string> = {
+  {{#ENUM_VALUES}}
+  [{{ENUM_NAME}}.{{VALUE_NAME}}]: '{{VALUE_LABEL}}',
+  {{/ENUM_VALUES}}
+};
+
+/**
+ * {{ENUM_NAME}} Colors (for Ant Design tags)
+ */
+export const {{ENUM_NAME}}_COLORS: Record<{{ENUM_NAME}}, string> = {
+  {{#ENUM_VALUES}}
+  [{{ENUM_NAME}}.{{VALUE_NAME}}]: '{{VALUE_COLOR}}',
+  {{/ENUM_VALUES}}
+};
+
+{{/ENUMS}}

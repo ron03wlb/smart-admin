@@ -1,0 +1,546 @@
+# ====================================================================
+# SmartAdmin Skills Registry v3.0.0
+# ====================================================================
+# Purpose: Central metadata registry for all SmartAdmin skills
+# Status: Single Source of Truth (SSOT) for skill discovery and routing
+# Last Updated: 2026-01-29
+# ====================================================================
+
+version: "3.0.0"
+last_updated: "2026-01-29"
+total_skills: 29
+active_skills: 26
+deprecated_skills: 3
+
+# ====================================================================
+# Foundation Skills (P0 - Critical)
+# ====================================================================
+skills:
+  # Backend Skills
+  archunit-test-generator:
+    path: "foundation/backend/archunit-test-generator"
+    priority: "P0"
+    type: "atomic"
+    category: "backend"
+    aliases: ["archunit", "arch-test"]
+    status: "stable"
+    description: "Generate ArchUnit tests to enforce architecture rules"
+    depends_on: []
+    depended_by: []
+
+  security-hardening-pro:
+    path: "foundation/backend/security-hardening-pro"
+    priority: "P0"
+    type: "atomic"
+    category: "backend"
+    aliases: ["security", "hardening"]
+    status: "stable"
+    description: "Implement security best practices (SM2/SM3/SM4, data masking, XSS/CSRF protection)"
+    depends_on: []
+    depended_by: []
+
+  vavr-refactoring-assistant:
+    path: "foundation/backend/vavr-refactoring-assistant"
+    priority: "P0"
+    type: "atomic"
+    category: "backend"
+    aliases: ["vavr", "refactor-vavr"]
+    status: "stable"
+    description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
+    depends_on: []
+    depended_by: []
+
+  # Full-stack Skills
+  smartadmin-crud-generator:
+    path: "foundation/full-stack/smartadmin-crud-generator"
+    priority: "P0"
+    type: "composite"
+    category: "full-stack"
+    aliases: ["crud", "gen-crud"]
+    status: "stable"
+    description: "Complete full-stack CRUD module generation (Backend + Frontend + API Docs + Tests)"
+    phases:
+      - "phase-1-backend"
+      - "phase-2-frontend"
+      - "phase-3-api-docs"
+      - "phase-4-tests"
+    depends_on: []
+    depended_by: ["batch-plan-executor", "igame-feature-builder"]
+
+  smartadmin-integration-test:
+    path: "foundation/full-stack/smartadmin-integration-test"
+    priority: "P0"
+    type: "atomic"
+    category: "full-stack"
+    aliases: ["integration-test", "testcontainers"]
+    status: "stable"
+    description: "Generate Spring Boot integration tests with Testcontainers"
+    depends_on: []
+    depended_by: ["smartadmin-testing-suite"]
+
+  # Testing Skills
+  test-fixture-generator:
+    path: "foundation/testing/test-fixture-generator"
+    priority: "P0"
+    type: "atomic"
+    category: "testing"
+    aliases: ["fixture", "test-fixture"]
+    status: "stable"
+    description: "Generate test data builders for complex domain objects"
+    depends_on: []
+    depended_by: ["smartadmin-testing-suite", "smartadmin-crud-generator"]
+
+# ====================================================================
+# Extended Skills (P1 - Important)
+# ====================================================================
+
+  # Business Logic Skills
+  liteflow-rule-builder:
+    path: "extended/business-logic/liteflow-rule-builder"
+    priority: "P1"
+    type: "atomic"
+    category: "business-logic"
+    aliases: ["liteflow", "rule-builder"]
+    status: "stable"
+    description: "Generate LiteFlow rule DSL (EL expressions and QLExpress scripts) for business workflows"
+    depends_on: []
+    depended_by: ["batch-plan-executor"]
+
+  # Domain Skills
+  fraud-detection-pattern-generator:
+    path: "extended/domain/fraud-detection-pattern-generator"
+    priority: "P1"
+    type: "atomic"
+    category: "domain"
+    aliases: ["fraud", "risk-control"]
+    status: "stable"
+    description: "Generate fraud detection and risk control systems for iGaming platforms"
+    depends_on: []
+    depended_by: []
+
+  igame-feature-builder:
+    path: "extended/domain/igame-feature-builder"
+    priority: "P1"
+    type: "atomic"
+    category: "domain"
+    aliases: ["igame", "igaming"]
+    status: "stable"
+    description: "Implement iGaming domain features (VIP system, Wallet API, Bonus engine, Risk control)"
+    depends_on: ["smartadmin-crud-generator"]
+    depended_by: []
+
+  igame-pm-analyst:
+    path: "extended/domain/igame-pm-analyst"
+    priority: "P1"
+    type: "atomic"
+    category: "domain"
+    aliases: ["igame-pm"]
+    status: "stable"
+    description: "General iGaming product requirements analysis and PRD generation"
+    depends_on: []
+    depended_by: []
+
+  igaming-multi-tenant-wallet-pm:
+    path: "extended/domain/igaming-multi-tenant-wallet-pm"
+    priority: "P1"
+    type: "atomic"
+    category: "domain"
+    aliases: ["multi-tenant-pm", "wallet-pm"]
+    status: "stable"
+    description: "iGaming PM expert for multi-tenant architecture and seamless wallet design"
+    phases:
+      - "phase-1-requirements"
+      - "phase-2-multi-tenant"
+      - "phase-3-seamless-wallet"
+      - "phase-4-regional-compliance"
+    depends_on: []
+    depended_by: []
+
+  # Orchestration Skills
+  batch-plan-executor:
+    path: "extended/orchestration/batch-plan-executor"
+    priority: "P1"
+    type: "orchestrator"
+    category: "orchestration"
+    aliases: ["batch", "batch-exec"]
+    status: "stable"
+    description: "Batch plan executor for automatically detecting, analyzing conflicts, and executing multiple implementation plans"
+    depends_on:
+      - "smartadmin-crud-generator"
+      - "liteflow-rule-builder"
+      - "smartadmin-testing-suite"
+      - "smartadmin-performance-suite"
+    depended_by: []
+
+  # Quality Skills
+  quality-gate-orchestrator:
+    path: "extended/quality/quality-gate-orchestrator"
+    priority: "P1"
+    type: "orchestrator"
+    category: "quality"
+    aliases: ["quality-gate", "quality"]
+    status: "stable"
+    description: "Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo, SonarQube"
+    depends_on: []
+    depended_by: []
+
+# ====================================================================
+# Productivity Skills (P2 - Nice-to-have)
+# ====================================================================
+
+  # Infrastructure Skills
+  apm-integration-skill:
+    path: "productivity/infrastructure/apm-integration-skill"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["apm", "monitoring"]
+    status: "stable"
+    description: "Generate APM integration with Skywalking, Micrometer, Grafana dashboards"
+    depends_on: []
+    depended_by: ["smartadmin-performance-suite"]
+
+  cache-strategy-generator:
+    path: "productivity/infrastructure/cache-strategy-generator"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["cache", "caching"]
+    status: "stable"
+    description: "Generate multi-level caching strategies (Caffeine L1 + Redis L2)"
+    depends_on: []
+    depended_by: ["smartadmin-performance-suite"]
+
+  cicd-pipeline-builder:
+    path: "productivity/infrastructure/cicd-pipeline-builder"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["cicd", "pipeline"]
+    status: "stable"
+    description: "Automate CI/CD pipeline setup for SmartAdmin with GitHub Actions or GitLab CI"
+    depends_on: []
+    depended_by: []
+
+  db-migration-manager:
+    path: "productivity/infrastructure/db-migration-manager"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["migration", "flyway", "liquibase"]
+    status: "stable"
+    description: "Generate and manage Flyway/Liquibase database migrations"
+    depends_on: []
+    depended_by: []
+
+  full-text-search-integration:
+    path: "productivity/infrastructure/full-text-search-integration"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["elasticsearch", "search"]
+    status: "stable"
+    description: "Generate Elasticsearch integration with document mapping, search APIs, aggregations"
+    depends_on: []
+    depended_by: []
+
+  i18n-generator:
+    path: "productivity/infrastructure/i18n-generator"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["i18n", "internationalization"]
+    status: "stable"
+    description: "Generate internationalization support (backend MessageSource + frontend Vue I18n)"
+    depends_on: []
+    depended_by: []
+
+  message-queue-pattern-generator:
+    path: "productivity/infrastructure/message-queue-pattern-generator"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["kafka", "mq", "messaging"]
+    status: "stable"
+    description: "Generate Kafka/RocketMQ integration patterns (producer/consumer, event sourcing, CQRS, Saga)"
+    depends_on: []
+    depended_by: []
+
+  report-generator-skill:
+    path: "productivity/infrastructure/report-generator-skill"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["report", "export"]
+    status: "stable"
+    description: "Generate business report export functionality (Excel, PDF, CSV)"
+    depends_on: []
+    depended_by: []
+
+  scheduled-task-manager:
+    path: "productivity/infrastructure/scheduled-task-manager"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["schedule", "job", "xxl-job"]
+    status: "stable"
+    description: "Generate XXL-Job/Snail-Job integration for scheduled tasks"
+    depends_on: []
+    depended_by: []
+
+  websocket-sse-realtime-generator:
+    path: "productivity/infrastructure/websocket-sse-realtime-generator"
+    priority: "P2"
+    type: "atomic"
+    category: "infrastructure"
+    aliases: ["websocket", "sse", "realtime"]
+    status: "stable"
+    description: "Generate WebSocket/SSE real-time communication with STOMP, authentication, broadcasting"
+    depends_on: []
+    depended_by: []
+
+  # Composite Skills
+  smartadmin-performance-suite:
+    path: "productivity/composite/smartadmin-performance-suite"
+    priority: "P2"
+    type: "composite"
+    category: "composite"
+    aliases: ["performance", "perf"]
+    status: "stable"
+    description: "Comprehensive performance suite (diagnose → optimize → monitor workflow)"
+    modes:
+      - "diagnose"
+      - "optimize"
+      - "monitor"
+    depends_on:
+      - "java-performance-pro"
+      - "cache-strategy-generator"
+      - "apm-integration-skill"
+    depended_by: ["batch-plan-executor"]
+
+  smartadmin-testing-suite:
+    path: "productivity/composite/smartadmin-testing-suite"
+    priority: "P2"
+    type: "composite"
+    category: "composite"
+    aliases: ["test", "testing"]
+    status: "stable"
+    description: "Comprehensive testing suite (integration tests, test fixtures, unit tests, E2E tests)"
+    modes:
+      - "integration"
+      - "fixtures"
+      - "unit"
+      - "e2e"
+    depends_on:
+      - "smartadmin-integration-test"
+      - "test-fixture-generator"
+    depended_by: ["batch-plan-executor"]
+
+  # Analysis Skills
+  java-performance-pro:
+    path: "productivity/analysis/java-performance-pro"
+    priority: "P2"
+    type: "atomic"
+    category: "analysis"
+    aliases: ["perf-analysis", "profiler"]
+    status: "stable"
+    description: "Profile and optimize Java application performance (N+1 detection, JVM tuning, CPU hotspot analysis)"
+    depends_on: []
+    depended_by: ["smartadmin-performance-suite"]
+
+# ====================================================================
+# Deprecated Skills (Lifecycle Management)
+# ====================================================================
+
+  smartadmin-mybatis:
+    path: "lifecycle/deprecated/smartadmin-mybatis"
+    priority: null
+    type: "atomic"
+    category: "backend"
+    aliases: ["mybatis"]
+    status: "soft-deprecated"
+    deprecated_since: "2026-01-27"
+    replacement: "smartadmin-crud-generator --backend-only"
+    removal_date: "2026-06-30"
+    description: "[DEPRECATED] Generate MyBatis Dao layer (use smartadmin-crud-generator --backend-only)"
+    depends_on: []
+    depended_by: []
+
+  smartadmin-vue-crud:
+    path: "lifecycle/deprecated/smartadmin-vue-crud"
+    priority: null
+    type: "atomic"
+    category: "frontend"
+    aliases: ["vue-crud"]
+    status: "soft-deprecated"
+    deprecated_since: "2026-01-27"
+    replacement: "smartadmin-crud-generator --frontend-only"
+    removal_date: "2026-06-30"
+    description: "[DEPRECATED] Generate Vue 3 CRUD components (use smartadmin-crud-generator --frontend-only)"
+    depends_on: []
+    depended_by: []
+
+  smartadmin-api-docs:
+    path: "lifecycle/deprecated/smartadmin-api-docs"
+    priority: null
+    type: "atomic"
+    category: "backend"
+    aliases: ["api-docs", "swagger"]
+    status: "soft-deprecated"
+    deprecated_since: "2026-01-27"
+    replacement: "smartadmin-crud-generator --docs-only"
+    removal_date: "2026-06-30"
+    description: "[DEPRECATED] Generate API documentation (use smartadmin-crud-generator --docs-only)"
+    depends_on: []
+    depended_by: []
+
+# ====================================================================
+# Dependency Graph (Topological Order)
+# ====================================================================
+dependency_graph:
+  # No dependencies (Tier 0)
+  tier_0:
+    - archunit-test-generator
+    - security-hardening-pro
+    - vavr-refactoring-assistant
+    - liteflow-rule-builder
+    - fraud-detection-pattern-generator
+    - quality-gate-orchestrator
+    - igame-pm-analyst
+    - igaming-multi-tenant-wallet-pm
+    - apm-integration-skill
+    - cicd-pipeline-builder
+    - db-migration-manager
+    - full-text-search-integration
+    - i18n-generator
+    - message-queue-pattern-generator
+    - report-generator-skill
+    - scheduled-task-manager
+    - websocket-sse-realtime-generator
+    - java-performance-pro
+
+  # Single dependency (Tier 1)
+  tier_1:
+    - smartadmin-crud-generator  # depended by: batch-plan-executor, igame-feature-builder
+    - smartadmin-integration-test  # depended by: smartadmin-testing-suite
+    - test-fixture-generator  # depended by: smartadmin-testing-suite, smartadmin-crud-generator
+    - cache-strategy-generator  # depended by: smartadmin-performance-suite
+
+  # Multiple dependencies (Tier 2)
+  tier_2:
+    - igame-feature-builder  # depends on: smartadmin-crud-generator
+    - smartadmin-performance-suite  # depends on: java-performance-pro, cache-strategy-generator, apm-integration-skill
+    - smartadmin-testing-suite  # depends on: smartadmin-integration-test, test-fixture-generator
+
+  # Orchestrators (Tier 3)
+  tier_3:
+    - batch-plan-executor  # depends on: smartadmin-crud-generator, liteflow-rule-builder, smartadmin-testing-suite, smartadmin-performance-suite
+
+# ====================================================================
+# Conflict Resolution Rules
+# ====================================================================
+conflicts:
+  - skills: ["smartadmin-mybatis", "smartadmin-crud-generator"]
+    resolution: "prefer smartadmin-crud-generator"
+    reason: "mybatis is deprecated"
+
+  - skills: ["smartadmin-vue-crud", "smartadmin-crud-generator"]
+    resolution: "prefer smartadmin-crud-generator"
+    reason: "vue-crud is deprecated"
+
+  - skills: ["smartadmin-api-docs", "smartadmin-crud-generator"]
+    resolution: "prefer smartadmin-crud-generator"
+    reason: "api-docs is deprecated"
+
+  - skills: ["java-performance-pro", "smartadmin-performance-suite"]
+    resolution: "prefer smartadmin-performance-suite"
+    reason: "performance-suite consolidates java-performance-pro"
+
+  - skills: ["cache-strategy-generator", "smartadmin-performance-suite"]
+    resolution: "prefer smartadmin-performance-suite"
+    reason: "performance-suite consolidates cache-strategy-generator"
+
+  - skills: ["apm-integration-skill", "smartadmin-performance-suite"]
+    resolution: "prefer smartadmin-performance-suite"
+    reason: "performance-suite consolidates apm-integration-skill"
+
+  - skills: ["smartadmin-integration-test", "smartadmin-testing-suite"]
+    resolution: "prefer smartadmin-testing-suite"
+    reason: "testing-suite consolidates integration-test"
+
+  - skills: ["test-fixture-generator", "smartadmin-testing-suite"]
+    resolution: "prefer smartadmin-testing-suite"
+    reason: "testing-suite consolidates test-fixture-generator"
+
+# ====================================================================
+# Skill Categories
+# ====================================================================
+categories:
+  backend:
+    description: "Java/Spring Boot backend skills"
+    skills:
+      - archunit-test-generator
+      - security-hardening-pro
+      - vavr-refactoring-assistant
+
+  frontend:
+    description: "Vue 3/TypeScript frontend skills"
+    skills: []
+
+  full-stack:
+    description: "Combined backend + frontend skills"
+    skills:
+      - smartadmin-crud-generator
+      - smartadmin-integration-test
+
+  domain:
+    description: "Business domain-specific skills (e.g., iGaming)"
+    skills:
+      - fraud-detection-pattern-generator
+      - igame-feature-builder
+      - igame-pm-analyst
+      - igaming-multi-tenant-wallet-pm
+
+  orchestration:
+    description: "Meta-orchestration skills"
+    skills:
+      - batch-plan-executor
+
+  infrastructure:
+    description: "Infrastructure/DevOps skills"
+    skills:
+      - apm-integration-skill
+      - cache-strategy-generator
+      - cicd-pipeline-builder
+      - db-migration-manager
+      - full-text-search-integration
+      - i18n-generator
+      - message-queue-pattern-generator
+      - report-generator-skill
+      - scheduled-task-manager
+      - websocket-sse-realtime-generator
+
+  quality:
+    description: "Code quality and testing skills"
+    skills:
+      - quality-gate-orchestrator
+
+  testing:
+    description: "Testing and quality assurance skills"
+    skills:
+      - test-fixture-generator
+
+  composite:
+    description: "Multi-phase or multi-mode composite skills"
+    skills:
+      - smartadmin-performance-suite
+      - smartadmin-testing-suite
+
+  analysis:
+    description: "Performance analysis and profiling"
+    skills:
+      - java-performance-pro
+
+# ====================================================================
+# END OF SKILL REGISTRY v3.0.0
+# ====================================================================

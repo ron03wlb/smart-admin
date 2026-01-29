@@ -1,0 +1,83 @@
+# Docker Compose for CI/CD Test Environment
+# Used for local testing and CI pipelines
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: smartadmin-postgres-test
+    environment:
+      POSTGRES_DB: smartadmin_test
+      POSTGRES_USER: smartadmin
+      POSTGRES_PASSWORD: smartadmin123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartadmin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartadmin-test
+
+  redis:
+    image: redis:7-alpine
+    container_name: smartadmin-redis-test
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-test-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartadmin-test
+
+  # Optional: Kafka for message queue testing
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: smartadmin-zookeeper-test
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - smartadmin-test
+    profiles:
+      - kafka
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: smartadmin-kafka-test
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - smartadmin-test
+    profiles:
+      - kafka
+
+volumes:
+  postgres-test-data:
+    driver: local
+  redis-test-data:
+    driver: local
+
+networks:
+  smartadmin-test:
+    driver: bridge

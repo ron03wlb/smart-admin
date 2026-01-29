@@ -1,0 +1,156 @@
+# ====================================================================
+# iGaming Feature Builder - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P1 (Important Business Logic)
+# Category: Domain
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "igame-feature-builder"
+  version: "1.0.0"
+  priority: "P1"
+  type: "atomic"
+  category: "domain"
+  description: "Implement iGaming domain features following technical specs (VIP system, Wallet API, Bonus engine, Risk control, Reporting)"
+  ai_description: |
+    Implements iGaming-specific business features with financial precision,
+    compliance requirements, and audit trails following technical specifications.
+
+    Core capabilities:
+    - VIP System: Tier calculation, point accumulation, benefit distribution
+    - Wallet API: Deposit/withdrawal with SERIALIZABLE isolation, balance management
+    - Bonus Engine: Distribution logic, wagering requirements, expiration
+    - Risk Control: Fraud detection integration, risk scoring
+    - Reporting: Financial reports, compliance reports, player activity
+
+    Generates:
+    - Service layer implementations with financial precision (BigDecimal)
+    - Manager layer with @Transactional(isolation = SERIALIZABLE) for critical operations
+    - Database schemas for financial records and audit trails
+    - Audit logging for all financial operations
+    - Compliance-ready documentation
+
+    Use when implementing financial operations, compliance features,
+    player management, VIP tiers, wallet transactions, bonus distribution,
+    KYC/AML validation, or iGaming business logic requiring precision and audit trails.
+
+  tags:
+    - "igaming"
+    - "vip-system"
+    - "wallet"
+    - "bonus-engine"
+    - "financial-precision"
+    - "audit-trail"
+    - "compliance"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "VIP tier"
+    - "wallet deposit"
+    - "wallet withdrawal"
+    - "bonus distribution"
+    - "financial operations"
+    - "compliance features"
+    - "player management"
+    - "audit trail"
+    - "transaction isolation"
+    - "BigDecimal precision"
+
+  patterns:
+    - "implement\\s+VIP\\s+(tier|system)"
+    - "create\\s+wallet\\s+(deposit|withdrawal)"
+    - "add\\s+bonus\\s+(distribution|engine)"
+    - "implement\\s+(financial|wallet)\\s+API"
+
+  exclude_keywords:
+    - "remove VIP system"
+    - "delete wallet"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 20
+    total_minutes: 20
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "unit-tests"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - ".agent/rules/foundation/10-architecture-rules.md"
+    - ".agent/rules/foundation/09-manager-layer.md"
+    - "docs/iGame/technical-specs/"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.java"
+    - "*.sql"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+    - "smart-admin-api-java21-springboot3/sa-admin/src/main/resources/db/migration"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "igaming_specs_exist"
+      rule: "iGaming technical specs must exist"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify iGaming feature code compiles successfully"
+      command: "./gradlew :sa-admin:compileJava"
+
+    - check: "unit-tests"
+      description: "Run iGaming feature unit tests"
+      command: "./gradlew :sa-admin:test --tests *Vip* --tests *Wallet* --tests *Bonus*"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: "references"
+
+  external_links:
+    - title: "iGaming Technical Specs"
+      url: "../../../docs/iGame/technical-specs/"
+
+    - title: "Manager Layer Transactions"
+      url: "../../../.agent/rules/foundation/09-manager-layer.md"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "features_generated"

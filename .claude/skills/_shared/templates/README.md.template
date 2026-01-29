@@ -1,0 +1,198 @@
+# {{Skill Name}} - Quick Start Guide
+
+> **Priority**: {{P0|P1|P2}} | **Type**: {{atomic|composite|orchestrator}} | **Category**: {{category}}
+
+[![Version](https://img.shields.io/badge/version-{{VERSION}}-blue)](./SKILL.md)
+[![Status](https://img.shields.io/badge/status-{{stable|experimental|deprecated}}-{{green|yellow|red}})](./SKILL.md)
+
+---
+
+## 📖 What Does This Do?
+
+{{
+Write 1-2 sentences in plain, conversational language explaining what this skill does.
+Focus on benefits and outcomes, not technical details.
+}}
+
+**Example**:
+```
+Generates a complete CRUD module for your SmartAdmin application in under 20 minutes.
+Includes backend (Entity/Dao/Service/Controller), frontend (Vue components), API docs,
+and integration tests—all following SmartAdmin best practices.
+```
+
+---
+
+## 🚀 Quick Example
+
+**The simplest way to use this skill:**
+
+```bash
+# {{One-line description of what this does}}
+/{{skill-command}} {{example-entity}}
+
+# Example output
+{{Brief description of result}}
+```
+
+**What you get:**
+- {{Artifact 1}}
+- {{Artifact 2}}
+- {{Artifact 3}}
+
+**Time saved**: {{~X minutes}} vs manual implementation
+
+---
+
+## ✅ When Should I Use This?
+
+Use this skill when you need to:
+
+- ✅ {{Common use case 1}}
+- ✅ {{Common use case 2}}
+- ✅ {{Common use case 3}}
+
+**Don't use this skill when:**
+
+- ❌ {{Anti-pattern 1}}
+- ❌ {{Anti-pattern 2}}
+
+---
+
+## 💻 Common Commands
+
+### Basic Usage
+
+```bash
+# {{Command description}}
+/{{skill-command}} {{args}}
+
+# Example
+/{{skill-command}} Employee
+```
+
+### Advanced Options
+
+```bash
+# {{Advanced option 1}}
+/{{skill-command}} {{args}} --{{option-1}}
+
+# {{Advanced option 2}}
+/{{skill-command}} {{args}} --{{option-2}}
+
+# {{Advanced option 3}}
+/{{skill-command}} {{args}} --{{option-3}}
+```
+
+---
+
+## ⚙️ Configuration
+
+{{If this skill has a config.yml, explain how to customize it}}
+
+Edit `config.yml` to customize behavior:
+
+```yaml
+# Example customization
+execution:
+  mode: {{default-mode}}  # Change to '{{alternative-mode}}' for different behavior
+
+quality_gates:
+  run_after_execution: true  # Set to false to skip auto-validation
+```
+
+**Common configurations:**
+- **{{Config 1}}**: {{What it does}}
+- **{{Config 2}}**: {{What it does}}
+
+---
+
+## 📦 What Gets Generated
+
+{{Simple list of output artifacts}}
+
+**Backend** ({{count}} files):
+- `{{file-1}}` - {{Purpose}}
+- `{{file-2}}` - {{Purpose}}
+- `{{file-3}}` - {{Purpose}}
+
+**Frontend** ({{count}} files):
+- `{{file-1}}` - {{Purpose}}
+- `{{file-2}}` - {{Purpose}}
+
+**Tests** ({{count}} files):
+- `{{file-1}}` - {{Purpose}}
+
+---
+
+## 🔧 Troubleshooting
+
+### Problem: {{Common Problem}}
+
+**Solution**: {{Quick fix}}
+
+```bash
+# Fix command
+{{command-to-fix}}
+```
+
+### Problem: {{Common Problem}}
+
+**Solution**: {{Quick fix}}
+
+---
+
+## 📚 Learn More
+
+- **Complete Documentation**: [SKILL.md](./SKILL.md) - Full reference with all options and edge cases
+- **Configuration Reference**: [config.yml](./config.yml) - All available settings
+- **Examples**: [examples/](./examples/) - Real-world usage examples
+
+**Related Skills**:
+- [{{related-skill-1}}](../{{path-1}}/) - {{Relationship}}
+- [{{related-skill-2}}](../{{path-2}}/) - {{Relationship}}
+
+---
+
+## 💡 Tips & Best Practices
+
+- **Tip 1**: {{Useful tip for better results}}
+- **Tip 2**: {{Useful tip for better results}}
+- **Tip 3**: {{Useful tip for better results}}
+
+---
+
+## 🤝 Need Help?
+
+- **Documentation Issues**: See [SKILL.md](./SKILL.md) for detailed troubleshooting
+- **Configuration Help**: Check [config.yml](./config.yml) for all available options
+- **Examples**: Browse [examples/](./examples/) for real-world use cases
+- **Bug Reports**: [GitHub Issues]({{project-issues-url}})
+
+---
+
+**Version**: {{VERSION}} | **Last Updated**: {{YYYY-MM-DD}} | **Maintainer**: SmartAdmin Team
+
+---
+
+## TEMPLATE USAGE NOTES
+
+**For Skill Creators**:
+1. Replace all `{{placeholders}}` with actual content
+2. Keep it concise - target 100-150 lines
+3. Use conversational, friendly tone
+4. Include only 1-2 examples (happy path)
+5. Link to SKILL.md for detailed information
+6. Focus on getting users started quickly
+7. Use emojis for visual clarity (📖 🚀 ✅ ⚙️ 📦 🔧 📚 💡 🤝)
+
+**Quality Checklist**:
+- [ ] Conversational tone (not formal)
+- [ ] 1-2 simple examples only
+- [ ] Links to SKILL.md for details
+- [ ] Common use cases listed
+- [ ] Quick troubleshooting tips
+- [ ] Total length < 150 lines
+
+**Remember**: This README is for humans who want to get started quickly.
+Keep it simple, friendly, and actionable. Save the technical details for SKILL.md.

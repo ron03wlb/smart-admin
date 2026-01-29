@@ -1,0 +1,106 @@
+# ====================================================================
+# Database Migration Manager - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P2 (Nice-to-have Tools)
+# Category: Infrastructure
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "db-migration-manager"
+  version: "1.0.0"
+  priority: "P2"
+  type: "atomic"
+  category: "infrastructure"
+  description: "Generate and manage Flyway/Liquibase database migrations for SmartAdmin"
+  ai_description: |
+    Generates and manages database migrations with Flyway or Liquibase for SmartAdmin projects,
+    supporting both PostgreSQL and MySQL schema versioning.
+
+    Core capabilities:
+    - Flyway Migration Generation: Versioned SQL scripts (V{version}__{description}.sql)
+    - Liquibase Changesets: XML/YAML/JSON changelogs
+    - Rollback Script Generation: Undo migrations for safe rollback
+    - Schema Change Analysis: Diff between current and target schema
+    - Migration Validation: Syntax checking and dry-run testing
+
+    Use when creating schema changes (new tables, columns, indexes),
+    modifying existing tables, handling data migrations, or managing database versioning.
+
+  tags:
+    - "database"
+    - "migration"
+    - "flyway"
+    - "liquibase"
+    - "schema-versioning"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "database migration"
+    - "Flyway"
+    - "Liquibase"
+    - "schema change"
+    - "add column"
+    - "create table"
+    - "database versioning"
+    - "rollback script"
+
+  patterns:
+    - "create.*migration"
+    - "add.*column"
+    - "generate.*Flyway"
+
+  exclude_keywords:
+    - "remove migration"
+
+execution:
+  type: "single-shot"
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 15
+  quality_gates:
+    run_after_execution: true
+
+dependencies:
+  skills: []
+  required_files: []
+  tools:
+    - name: "flyway"
+      version: ">=9.0"
+      required: false
+    - name: "liquibase"
+      version: ">=4.0"
+      required: false
+
+output:
+  generates:
+    - "*.sql"
+    - "*.xml"
+  target_directories:
+    - "smart-admin-api-java21-springboot3/sa-admin/src/main/resources/db/migration"
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+  post_execution:
+    - check: "migration_syntax"
+
+compatibility:
+  deprecated: false
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"

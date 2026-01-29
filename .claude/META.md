@@ -2,9 +2,9 @@
 
 **Purpose**: Unified version tracking and metadata for entire SmartAdmin AI documentation system (CLAUDE.md, .claude/, .agent/)
 
-**Last Updated**: 2026-01-27
+**Last Updated**: 2026-01-29
 **System Version**: 3.0.0
-**Current .claude/ Version**: 2.7.0
+**Current .claude/ Version**: 3.0.0
 
 ---
 
@@ -14,13 +14,14 @@
 
 | Component | Version | Last Updated | Status | Owner |
 |-----------|---------|-------------|--------|-------|
-| **CLAUDE.md** | 3.2.0 | 2026-01-27 | ✅ Universal AI Support | Root |
-| **.claude/ System** | 2.7.0 | 2026-01-27 | ✅ Production Ready | .claude/VERSION.md |
+| **CLAUDE.md** | 3.3.0 | 2026-01-29 | ✅ Universal AI Support | Root |
+| **.claude/ System** | 3.0.0 | 2026-01-29 | ✅ Production Ready | .claude/VERSION.md |
 | **.agent/ Rules** | 1.0.0 | 2026-01-27 | ✅ Production Ready | .agent/VERSION.md |
 | **.agents/skills/** | (external) | N/A | ✅ Active | Claude Code |
 
 **Version Notes**:
-- CLAUDE.md v3.0.0: Content deduplication complete, universal AI support added
+- CLAUDE.md v3.3.0: Skills catalog update (16 → 29 skills), hierarchical structure documentation
+- .claude/ v3.0.0: Skills architecture v3.0.0 - Hybrid layered structure (foundation/extended/productivity/lifecycle), 100% config.yml coverage (1/29 → 29/29), skill-registry.yml SSOT
 - .claude/ v2.7.0: Orchestration consolidation (3 → 1 file), version management established
 - .agent/ v1.0.0: Production release - Rules classification, PostgreSQL consolidation, unified decision center
 - .agents/skills/: External Claude Code skills, managed independently
@@ -101,8 +102,17 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 ├── VERSION.md                           # Version history
 ├── settings.local.json                  # Permissions (12 core patterns)
 ├── agents/                              # 9 specialized agents
+├── skills/                              # 29 specialized skills (v3.0.0)
+│   ├── README.md                        # Skills catalog (auto-generated)
+│   ├── skill-registry.yml               # SSOT for skill metadata
+│   ├── skill-aliases.json               # Backward compatibility
+│   ├── foundation/                      # P0 - 6 skills (Backend, Full-stack, Testing)
+│   ├── extended/                        # P1 - 7 skills (Business Logic, Domain, Orchestration, Quality)
+│   ├── productivity/                    # P2 - 15 skills (Infrastructure, Composite, Analysis)
+│   ├── lifecycle/                       # Deprecated & Experimental skills
+│   └── _shared/                         # Templates, scripts, references
 ├── shared/
-│   ├── knowledge/                       # Source of truth (3 files)
+│   ├── knowledge/                       # Source of truth (4 files)
 │   │   ├── smartadmin-patterns.md
 │   │   ├── smartadmin-frontend-patterns.md
 │   │   ├── project-architecture.md
@@ -191,6 +201,6 @@ For questions or issues with the .claude/ configuration:
 
 ---
 
-**Document Version**: 2.0.0
-**Last Updated**: 2026-01-27
+**Document Version**: 2.1.0
+**Last Updated**: 2026-01-29
 **Next Review**: 2026-04-27 (Quarterly)

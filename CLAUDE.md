@@ -187,25 +187,40 @@ Controller → Service → Manager → Dao → Entity
 
 ## Specialized Skills
 
-**Quick Overview**: 16 skills across 3 priority levels (see [Complete Catalog](.claude/skills/README.md) for full details)
+**Quick Overview**: 29 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
 
-**P0 Skills (Critical - Foundation)** - 6 skills:
-- **[smartadmin-crud-generator](.claude/skills/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
-- **[vavr-refactoring-assistant](.claude/skills/vavr-refactoring-assistant/)** - Refactor Service layer to Vavr Option/Try/Either patterns
-- **[archunit-test-generator](.claude/skills/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
-- **[security-hardening-pro](.claude/skills/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
-- **[smartadmin-integration-test](.claude/skills/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
-- **[test-fixture-generator](.claude/skills/test-fixture-generator/)** - Test data builders for complex domain objects
+**Skills Organization (v3.0.0)**:
+```
+.claude/skills/
+├── foundation/      (P0 - 6 skills: Backend, Full-stack, Testing)
+├── extended/        (P1 - 7 skills: Business Logic, Domain, Orchestration, Quality)
+├── productivity/    (P2 - 15 skills: Infrastructure, Composite, Analysis)
+└── lifecycle/       (Deprecated - 3 skills with migration guides)
+```
 
-**P1 Skills (Important - Business Logic & Quality)** - 3 skills:
-- **[liteflow-rule-builder](.claude/skills/liteflow-rule-builder/)** - Generate LiteFlow DSL (EL expressions, QLExpress scripts) for business workflows
-- **[fraud-detection-pattern-generator](.claude/skills/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
-- **[quality-gate-orchestrator](.claude/skills/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
+**P0 Skills (Foundation)** - 6 skills:
+- **[smartadmin-crud-generator](.claude/skills/foundation/full-stack/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
+- **[vavr-refactoring-assistant](.claude/skills/foundation/backend/vavr-refactoring-assistant/)** - Refactor Service layer to Vavr Option/Try/Either patterns
+- **[archunit-test-generator](.claude/skills/foundation/backend/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
+- **[security-hardening-pro](.claude/skills/foundation/backend/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
+- **[smartadmin-integration-test](.claude/skills/foundation/full-stack/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
+- **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders for complex domain objects
 
-**P2 Skills (Nice-to-have - Productivity)** - 6 skills:
-- smartadmin-performance-suite, smartadmin-testing-suite, db-migration-manager, igame-feature-builder, cicd-pipeline-builder, semgrep-rule-creator
+**P1 Skills (Extended)** - 7 skills:
+- **[liteflow-rule-builder](.claude/skills/extended/business-logic/liteflow-rule-builder/)** - Generate LiteFlow DSL (EL expressions, QLExpress scripts) for business workflows
+- **[fraud-detection-pattern-generator](.claude/skills/extended/domain/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
+- **[igame-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming domain features (VIP system, Wallet API, Bonus engine)
+- **[igame-pm-analyst](.claude/skills/extended/domain/igame-pm-analyst/)** - iGaming產品經理分析助手 (Ultrathink深度分析、PRD生成)
+- **[igaming-multi-tenant-wallet-pm](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/)** - Multi-tenant architecture & seamless wallet design (phase-based)
+- **[batch-plan-executor](.claude/skills/extended/orchestration/batch-plan-executor/)** - Batch plan execution orchestrator with conflict detection
+- **[quality-gate-orchestrator](.claude/skills/extended/quality/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
 
-→ **[Complete Skills Catalog](.claude/skills/README.md)** - Full descriptions, trigger keywords, use cases, and phase-based execution details
+**P2 Skills (Productivity)** - 15 skills:
+- Infrastructure (10): apm-integration, cache-strategy, cicd-pipeline, db-migration, search, i18n, message-queue, reports, scheduled-tasks, websocket
+- Composite (2): smartadmin-performance-suite, smartadmin-testing-suite
+- Analysis (1): java-performance-pro
+
+→ **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
 
 ## Quality Tool Patterns
 
