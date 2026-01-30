@@ -20,8 +20,11 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema.sql
+  # Disable features not needed in tests
+  threads:
+    virtual:
+      enabled: false  # Disable Virtual Threads in tests to avoid context issues
 
-# Disable features not needed in tests
 sa-token:
   token-name: x-access-token
   timeout: 3600

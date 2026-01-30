@@ -3,7 +3,6 @@ package net.lab1024.sa.admin.module.system.datascope;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,12 +47,8 @@ public class MyBatisPlugin extends DataScopePlugin {
   private final ApplicationContext applicationContext;
 
   // P1 Fix: 緩存 DataScopeSqlConfigService Bean，避免每次攔截都調用 getBean()
-  private DataScopeSqlConfigService dataScopeSqlConfigService;
-
-  @PostConstruct
-  public void init() {
-    this.dataScopeSqlConfigService = applicationContext.getBean(DataScopeSqlConfigService.class);
-  }
+  // P2 Fix: 使用惰性初始化避免循環依賴（在 @PostConstruct 中獲取會導致 SqlSessionFactory 循環引用）
+  private volatile DataScopeSqlConfigService dataScopeSqlConfigService;
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
@@ -151,6 +146,15 @@ public class MyBatisPlugin extends DataScopePlugin {
 
   public DataScopeSqlConfigService dataScopeSqlConfigService() {
     // P1 Fix: 返回緩存的實例，避免每次都調用 getBean()
+    // P2 Fix: 惰性初始化 - 第一次調用時才從 ApplicationContext 獲取 Bean（避免循環依賴）
+    if (this.dataScopeSqlConfigService == null) {
+      synchronized (this) {
+        if (this.dataScopeSqlConfigService == null) {
+          this.dataScopeSqlConfigService =
+              applicationContext.getBean(DataScopeSqlConfigService.class);
+        }
+      }
+    }
     return this.dataScopeSqlConfigService;
   }
 

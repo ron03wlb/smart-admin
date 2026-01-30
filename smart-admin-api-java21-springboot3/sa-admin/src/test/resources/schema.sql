@@ -155,3 +155,113 @@ COMMENT ON COLUMN t_brand.status IS '品牌狀態 (Status: 1=啟用 Enabled, 0=�
 COMMENT ON COLUMN t_brand.deleted_flag IS '軟刪除標誌 (Soft Delete Flag: true=已刪除, false=未刪除)';
 COMMENT ON COLUMN t_brand.update_time IS '更新時間 (Last Update Time)';
 COMMENT ON COLUMN t_brand.create_time IS '建立時間 (Create Time)';
+
+-- ============================================================================================================
+-- Support Module Tables
+-- ============================================================================================================
+
+-- Config Table (t_config)
+CREATE TABLE IF NOT EXISTS t_config (
+    config_id BIGSERIAL PRIMARY KEY,
+    config_name VARCHAR(255) NOT NULL,
+    config_key VARCHAR(255) NOT NULL,
+    config_value TEXT NOT NULL,
+    remark VARCHAR(255),
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_config_key ON t_config(config_key);
+
+COMMENT ON TABLE t_config IS '系統配置表 (System Configuration)';
+COMMENT ON COLUMN t_config.config_id IS '配置ID (主鍵, Primary Key)';
+COMMENT ON COLUMN t_config.config_name IS '參數名稱 (Configuration Name)';
+COMMENT ON COLUMN t_config.config_key IS '參數Key (Configuration Key, for lookup)';
+COMMENT ON COLUMN t_config.config_value IS '參數值 (Configuration Value)';
+COMMENT ON COLUMN t_config.remark IS '備註 (Remark)';
+COMMENT ON COLUMN t_config.update_time IS '更新時間 (Last Update Time)';
+COMMENT ON COLUMN t_config.create_time IS '建立時間 (Create Time)';
+
+-- ============================================================================================================
+-- Initial Data for Support Module
+-- ============================================================================================================
+
+-- Config Initial Data
+INSERT INTO t_config (config_id, config_name, config_key, config_value, remark, create_time, update_time)
+VALUES 
+  (1, '萬能密碼', 'super_password', '1024ok', 'For testing only', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  (2, '三級等保', 'level3_protect_config', 
+   '{"fileDetectFlag":true,"loginActiveTimeoutMinutes":30,"loginFailLockMinutes":30,"loginFailMaxTimes":3,"maxUploadFileSizeMb":30,"passwordComplexityEnabled":true,"regularChangePasswordMonths":3,"regularChangePasswordNotAllowRepeatTimes":3,"twoFactorLoginEnabled":false}', 
+   'Level 3 security protection configuration', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Reload Item Table (t_reload_item)
+CREATE TABLE IF NOT EXISTS t_reload_item (
+    tag VARCHAR(255) PRIMARY KEY,
+    args VARCHAR(255),
+    identification VARCHAR(255) NOT NULL,
+    update_time TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE t_reload_item IS 'Reload 項目表 (Reload Item Configuration)';
+COMMENT ON COLUMN t_reload_item.tag IS '項目名稱 (Item Tag, Primary Key)';
+COMMENT ON COLUMN t_reload_item.args IS '參數 (Arguments, Optional)';
+COMMENT ON COLUMN t_reload_item.identification IS '運行標識 (Runtime Identification)';
+COMMENT ON COLUMN t_reload_item.update_time IS '更新時間 (Last Update Time)';
+COMMENT ON COLUMN t_reload_item.create_time IS '建立時間 (Create Time)';
+
+-- Serial Number Table (t_serial_number)
+CREATE TABLE IF NOT EXISTS t_serial_number (
+    serial_number_id INTEGER PRIMARY KEY,
+    business_name VARCHAR(50) NOT NULL,
+    format VARCHAR(50),
+    rule_type VARCHAR(20) NOT NULL,
+    init_number INTEGER NOT NULL,
+    step_random_range INTEGER NOT NULL,
+    remark VARCHAR(255),
+    last_number BIGINT,
+    last_time TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_business_name ON t_serial_number(business_name);
+
+COMMENT ON TABLE t_serial_number IS '序列號生成器表 (Serial Number Generator)';
+COMMENT ON COLUMN t_serial_number.serial_number_id IS '序列號ID (Primary Key)';
+COMMENT ON COLUMN t_serial_number.business_name IS '業務名稱 (Business Name, Unique)';
+COMMENT ON COLUMN t_serial_number.format IS '格式 ([yyyy]=年,[mm]=月,[dd]=日,[nnn]=三位數字)';
+COMMENT ON COLUMN t_serial_number.rule_type IS '規則類型 (none=無周期, year=年, month=月, day=日)';
+COMMENT ON COLUMN t_serial_number.init_number IS '初始值 (Initial Number)';
+COMMENT ON COLUMN t_serial_number.step_random_range IS '步長隨機數 (Step Random Range)';
+COMMENT ON COLUMN t_serial_number.remark IS '備註 (Remark)';
+COMMENT ON COLUMN t_serial_number.last_number IS '上次產生的單號 (Last Generated Number)';
+COMMENT ON COLUMN t_serial_number.last_time IS '上次產生時間 (Last Generated Time)';
+COMMENT ON COLUMN t_serial_number.update_time IS '更新時間 (Last Update Time)';
+COMMENT ON COLUMN t_serial_number.create_time IS '建立時間 (Create Time)';
+
+-- Serial Number Record Table (t_serial_number_record)
+CREATE TABLE IF NOT EXISTS t_serial_number_record (
+    serial_number_id INTEGER NOT NULL,
+    record_date DATE NOT NULL,
+    last_number BIGINT NOT NULL DEFAULT 0,
+    last_time TIMESTAMP NOT NULL,
+    count BIGINT NOT NULL DEFAULT 0,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS uk_generator ON t_serial_number_record(serial_number_id, record_date);
+
+COMMENT ON TABLE t_serial_number_record IS '序列號記錄表 (Serial Number Records)';
+COMMENT ON COLUMN t_serial_number_record.serial_number_id IS '序列號ID (Foreign Key to t_serial_number)';
+COMMENT ON COLUMN t_serial_number_record.record_date IS '記錄日期 (Record Date)';
+COMMENT ON COLUMN t_serial_number_record.last_number IS '最後更新值 (Last Updated Number)';
+COMMENT ON COLUMN t_serial_number_record.last_time IS '最後更新時間 (Last Updated Time)';
+COMMENT ON COLUMN t_serial_number_record.count IS '更新次數 (Update Count)';
+COMMENT ON COLUMN t_serial_number_record.update_time IS '更新時間 (Last Update Time)';
+COMMENT ON COLUMN t_serial_number_record.create_time IS '建立時間 (Create Time)';
+
+-- Reload Item Initial Data
+INSERT INTO t_reload_item (tag, args, identification, create_time, update_time)
+VALUES ('system_config', '4', '234', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

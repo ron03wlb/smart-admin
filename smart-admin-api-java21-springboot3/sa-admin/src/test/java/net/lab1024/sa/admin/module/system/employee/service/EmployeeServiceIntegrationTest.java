@@ -23,8 +23,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * EmployeeService Integration Tests
@@ -44,8 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Claude Code (smartadmin-integration-test skill)
  * @since 2026-01-24
  */
-@SpringBootTest
-@Transactional
 @DisplayName("EmployeeService Integration Tests")
 class EmployeeServiceIntegrationTest extends BaseIntegrationTest {
 
