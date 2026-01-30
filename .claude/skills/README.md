@@ -26,10 +26,9 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 │   └── testing/         (Test Fixtures)
 │
 ├── extended/            (P1 - Important Business Logic, 8 skills)
-│   ├── business-logic/  (LiteFlow)
-│   ├── domain/          (iGaming: Fraud, Features, PM, Wallet)
-│   ├── orchestration/   (Batch Plan Executor)
-│   └── quality/         (Concurrency Safety, Quality Gate Orchestrator)
+│   ├── domain/          (iGaming: Fraud, Features, PM, Wallet, LiteFlow)
+│   ├── orchestration/   (Batch Plan Executor, Quality Gate Orchestrator)
+│   └── quality/         (Concurrency Safety Auditor)
 │
 ├── productivity/        (P2 - Nice-to-have Tools, 17 skills)
 │   ├── infrastructure/  (APM, Cache, CI/CD, DB, PostgreSQL, Search, i18n, MQ, Reports, Jobs, WebSocket)
@@ -125,9 +124,9 @@ Generate test data builders for complex domain objects (Entity, Form, VO) using 
 
 ## P1 Skills (Extended)
 
-### Business Logic (1 skill)
+### Domain (5 skills - iGaming + LiteFlow)
 
-#### [liteflow-rule-builder](extended/business-logic/liteflow-rule-builder/)
+#### [liteflow-rule-builder](extended/domain/liteflow-rule-builder/)
 Generate LiteFlow rule DSL (EL expressions, QLExpress scripts) from natural language for business workflows.
 
 **Trigger Keywords**: "create LiteFlow chain", "business workflow", "approval flow", "sequential execution", "parallel processing"
@@ -135,8 +134,6 @@ Generate LiteFlow rule DSL (EL expressions, QLExpress scripts) from natural lang
 **Related**: [docs/plans/liteflow/](../../docs/plans/liteflow/)
 
 ---
-
-### Domain (4 skills - iGaming)
 
 #### [fraud-detection-pattern-generator](extended/domain/fraud-detection-pattern-generator/)
 Generate fraud detection and risk control systems for iGaming (multi-account detection, bonus abuse, payment fraud, KYC).
@@ -277,7 +274,7 @@ Located in [`lifecycle/deprecated/`](lifecycle/deprecated/), these skills have b
 | **New CRUD Module** | `foundation/full-stack/smartadmin-crud-generator --all-phases` |
 | **Backend Only** | `foundation/full-stack/smartadmin-crud-generator --backend-only` |
 | **Frontend Only** | `foundation/full-stack/smartadmin-crud-generator --frontend-only` |
-| **Business Workflow** | `extended/business-logic/liteflow-rule-builder` |
+| **Business Workflow** | `extended/domain/liteflow-rule-builder` |
 | **Fraud Detection** | `extended/domain/fraud-detection-pattern-generator` |
 | **Code Quality** | `extended/quality/quality-gate-orchestrator` |
 | **Refactoring** | `foundation/backend/vavr-refactoring-assistant` |
@@ -292,7 +289,7 @@ Located in [`lifecycle/deprecated/`](lifecycle/deprecated/), these skills have b
 | User Says | Use Skill (New Path) |
 |-----------|-----------|
 | "Create a player management module" | `foundation/full-stack/smartadmin-crud-generator` |
-| "Add approval workflow for withdrawals" | `extended/business-logic/liteflow-rule-builder` |
+| "Add approval workflow for withdrawals" | `extended/domain/liteflow-rule-builder` |
 | "Detect bonus abuse" | `extended/domain/fraud-detection-pattern-generator` |
 | "Set up quality checks for PR" | `extended/quality/quality-gate-orchestrator` |
 | "Refactor Optional to Vavr" | `foundation/backend/vavr-refactoring-assistant` |
