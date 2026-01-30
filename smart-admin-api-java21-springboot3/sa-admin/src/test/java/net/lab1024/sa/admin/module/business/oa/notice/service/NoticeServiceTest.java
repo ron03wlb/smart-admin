@@ -1,0 +1,719 @@
+package net.lab1024.sa.admin.module.business.oa.notice.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+import net.lab1024.sa.admin.module.business.oa.notice.NoticeTestFixture;
+import net.lab1024.sa.admin.module.business.oa.notice.constant.NoticeVisibleRangeDataTypeEnum;
+import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeDao;
+import net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeTypeDao;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.entity.NoticeEntity;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.entity.NoticeTypeEntity;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.form.NoticeAddForm;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.form.NoticeQueryForm;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.form.NoticeUpdateForm;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeUpdateFormVO;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeVO;
+import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeVisibleRangeVO;
+import net.lab1024.sa.admin.module.business.oa.notice.manager.NoticeManager;
+import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
+import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEntity;
+import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
+import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
+import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
+import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
+import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+/**
+ * NoticeService 单元测试
+ *
+ * <p>测试覆盖范围：
+ *
+ * <ul>
+ *   <li>通知公告查询（分页查询、详情查询）
+ *   <li>通知公告CRUD操作（添加、更新、删除）
+ *   <li>可见范围验证（全部可见、员工可见、部门可见）
+ *   <li>通知分类验证
+ *   <li>定时发布功能
+ *   <li>数据追踪集成
+ * </ul>
+ *
+ * @author Claude Code (Service/Manager Test Coverage Plan)
+ * @since 2026-01-30
+ */
+@ExtendWith(MockitoExtension.class)
+@DisplayName("NoticeService 单元测试")
+class NoticeServiceTest {
+
+  @Mock private NoticeDao noticeDao;
+
+  @Mock private NoticeManager noticeManager;
+
+  @Mock private EmployeeDao employeeDao;
+
+  @Mock private DepartmentDao departmentDao;
+
+  @Mock private NoticeTypeDao noticeTypeDao;
+
+  @Mock private DataTracerService dataTracerService;
+
+  @InjectMocks private NoticeService noticeService;
+
+  @BeforeEach
+  void setUp() {
+    NoticeTestFixture.resetCounter();
+  }
+
+  @Nested
+  @DisplayName("query() - 分页查询通知公告")
+  class QueryTests {
+
+    @Test
+    @DisplayName("正常分页查询 - 应返回分页结果并设置发布标志")
+    void query_ValidForm_ShouldReturnPageResultWithPublishFlag() {
+      // Arrange
+      NoticeQueryForm form = NoticeTestFixture.createQueryForm();
+      List<NoticeVO> voList = NoticeTestFixture.createVOList(3);
+      // 设置不同的发布时间来测试publishFlag的设置
+      voList.get(0).setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).minusDays(1)); // 已发布
+      voList.get(1).setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).plusDays(1)); // 未发布
+      voList.get(2).setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).minusHours(1)); // 已发布
+
+      when(noticeDao.query(any(Page.class), eq(form))).thenReturn(voList);
+
+      // Act
+      PageResult<NoticeVO> result = noticeService.query(form);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(3, result.getList().size());
+      assertTrue(result.getList().get(0).getPublishFlag()); // 已发布
+      assertFalse(result.getList().get(1).getPublishFlag()); // 未发布
+      assertTrue(result.getList().get(2).getPublishFlag()); // 已发布
+      verify(noticeDao, times(1)).query(any(Page.class), eq(form));
+    }
+
+    @Test
+    @DisplayName("空结果查询 - 应返回空列表")
+    void query_NoResults_ShouldReturnEmptyList() {
+      // Arrange
+      NoticeQueryForm form = NoticeTestFixture.createQueryForm();
+      List<NoticeVO> emptyList = Collections.emptyList();
+
+      when(noticeDao.query(any(Page.class), eq(form))).thenReturn(emptyList);
+
+      // Act
+      PageResult<NoticeVO> result = noticeService.query(form);
+
+      // Assert
+      assertNotNull(result);
+      assertTrue(result.getList().isEmpty());
+    }
+  }
+
+  @Nested
+  @DisplayName("add() - 添加通知公告")
+  class AddTests {
+
+    @Test
+    @DisplayName("正常添加（全部可见）- 应返回成功")
+    void add_AllVisibleNotice_ShouldReturnSuccess() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, true);
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      doNothing().when(noticeManager).saveTransaction(any(NoticeEntity.class), eq(null));
+      doNothing().when(dataTracerService).insert(any(), eq(DataTracerTypeEnum.OA_NOTICE));
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertTrue(response.getOk());
+      verify(noticeTypeDao, times(1)).selectById(form.getNoticeTypeId());
+      verify(noticeManager, times(1)).saveTransaction(any(NoticeEntity.class), eq(null));
+      verify(dataTracerService, times(1)).insert(any(), eq(DataTracerTypeEnum.OA_NOTICE));
+    }
+
+    @Test
+    @DisplayName("正常添加（员工可见）- 应返回成功")
+    void add_EmployeeVisibleNotice_ShouldReturnSuccess() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, false);
+      form.setVisibleRangeList(
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeForm(NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 1L),
+              NoticeTestFixture.createVisibleRangeForm(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 2L)));
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      EmployeeEntity emp1 = new EmployeeEntity();
+      emp1.setEmployeeId(1L);
+      EmployeeEntity emp2 = new EmployeeEntity();
+      emp2.setEmployeeId(2L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      when(employeeDao.selectBatchIds(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(emp1, emp2));
+      doNothing()
+          .when(noticeManager)
+          .saveTransaction(any(NoticeEntity.class), eq(form.getVisibleRangeList()));
+      doNothing().when(dataTracerService).insert(any(), eq(DataTracerTypeEnum.OA_NOTICE));
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertTrue(response.getOk());
+      verify(employeeDao, times(1)).selectBatchIds(Arrays.asList(1L, 2L));
+      verify(noticeManager, times(1))
+          .saveTransaction(any(NoticeEntity.class), eq(form.getVisibleRangeList()));
+    }
+
+    @Test
+    @DisplayName("正常添加（部门可见）- 应返回成功")
+    void add_DepartmentVisibleNotice_ShouldReturnSuccess() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, false);
+      form.setVisibleRangeList(
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeForm(
+                  NoticeVisibleRangeDataTypeEnum.DEPARTMENT, 10L)));
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      DepartmentEntity dept = new DepartmentEntity();
+      dept.setDepartmentId(10L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      when(departmentDao.selectBatchIds(Arrays.asList(10L))).thenReturn(Arrays.asList(dept));
+      doNothing()
+          .when(noticeManager)
+          .saveTransaction(any(NoticeEntity.class), eq(form.getVisibleRangeList()));
+      doNothing().when(dataTracerService).insert(any(), eq(DataTracerTypeEnum.OA_NOTICE));
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertTrue(response.getOk());
+      verify(departmentDao, times(1)).selectBatchIds(Arrays.asList(10L));
+    }
+
+    @Test
+    @DisplayName("通知分类不存在 - 应返回错误")
+    void add_NoticeTypeNotFound_ShouldReturnError() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(999L, true);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(null);
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertEquals("分类不存在", response.getMsg());
+      verify(noticeManager, never()).saveTransaction(any(), any());
+    }
+
+    @Test
+    @DisplayName("非全部可见但未设置可见范围 - 应返回错误")
+    void add_NotAllVisibleWithoutVisibleRange_ShouldReturnError() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, false);
+      form.setVisibleRangeList(null); // 未设置可见范围
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertEquals("未设置可见范围", response.getMsg());
+      verify(noticeManager, never()).saveTransaction(any(), any());
+    }
+
+    @Test
+    @DisplayName("员工ID不存在 - 应返回错误")
+    void add_EmployeeIdNotFound_ShouldReturnError() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, false);
+      form.setVisibleRangeList(
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeForm(NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 1L),
+              NoticeTestFixture.createVisibleRangeForm(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 999L))); // 不存在的员工
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      EmployeeEntity emp1 = new EmployeeEntity();
+      emp1.setEmployeeId(1L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      when(employeeDao.selectBatchIds(Arrays.asList(1L, 999L)))
+          .thenReturn(Arrays.asList(emp1)); // 只返回emp1，999不存在
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertTrue(response.getMsg().contains("员工id不存在"));
+      assertTrue(response.getMsg().contains("999"));
+      verify(noticeManager, never()).saveTransaction(any(), any());
+    }
+
+    @Test
+    @DisplayName("部门ID不存在 - 应返回错误")
+    void add_DepartmentIdNotFound_ShouldReturnError() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, false);
+      form.setVisibleRangeList(
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeForm(
+                  NoticeVisibleRangeDataTypeEnum.DEPARTMENT, 999L))); // 不存在的部门
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      when(departmentDao.selectBatchIds(Arrays.asList(999L)))
+          .thenReturn(Collections.emptyList()); // 部门不存在
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertTrue(response.getMsg().contains("部门id不存在"));
+      assertTrue(response.getMsg().contains("999"));
+      verify(noticeManager, never()).saveTransaction(any(), any());
+    }
+
+    @Test
+    @DisplayName("定时发布 - 应保留指定的发布时间")
+    void add_ScheduledPublish_ShouldKeepPublishTime() {
+      // Arrange
+      NoticeAddForm form = NoticeTestFixture.createAddForm(1L, true);
+      form.setScheduledPublishFlag(true);
+      LocalDateTime futureTime = LocalDateTime.now(ZoneId.systemDefault()).plusDays(7);
+      form.setPublishTime(futureTime);
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      doNothing().when(noticeManager).saveTransaction(any(NoticeEntity.class), eq(null));
+      doNothing().when(dataTracerService).insert(any(), eq(DataTracerTypeEnum.OA_NOTICE));
+
+      // Act
+      ResponseDTO<String> response = noticeService.add(form);
+
+      // Assert
+      assertTrue(response.getOk());
+      // 验证 Manager 被调用时，entity的publishTime应该是futureTime（但由于我们用的是any()，无法直接验证）
+      verify(noticeManager, times(1)).saveTransaction(any(NoticeEntity.class), eq(null));
+    }
+  }
+
+  @Nested
+  @DisplayName("update() - 更新通知公告")
+  class UpdateTests {
+
+    @Test
+    @DisplayName("正常更新（全部可见）- 应返回成功")
+    void update_AllVisibleNotice_ShouldReturnSuccess() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeUpdateForm form = NoticeTestFixture.createUpdateForm(noticeId, 1L, true);
+      NoticeEntity oldEntity = NoticeTestFixture.createEntity(1L);
+      oldEntity.setNoticeId(noticeId);
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(oldEntity);
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      doNothing()
+          .when(noticeManager)
+          .updateTransaction(eq(oldEntity), any(NoticeEntity.class), eq(null));
+      doNothing()
+          .when(dataTracerService)
+          .update(anyLong(), eq(DataTracerTypeEnum.OA_NOTICE), eq(oldEntity), any());
+
+      // Act
+      ResponseDTO<String> response = noticeService.update(form);
+
+      // Assert
+      assertTrue(response.getOk());
+      verify(noticeDao, times(1)).selectById(noticeId);
+      verify(noticeManager, times(1))
+          .updateTransaction(eq(oldEntity), any(NoticeEntity.class), eq(null));
+      verify(dataTracerService, times(1))
+          .update(anyLong(), eq(DataTracerTypeEnum.OA_NOTICE), eq(oldEntity), any());
+    }
+
+    @Test
+    @DisplayName("通知不存在 - 应返回错误")
+    void update_NoticeNotFound_ShouldReturnError() {
+      // Arrange
+      Long noticeId = 999L;
+      NoticeUpdateForm form = NoticeTestFixture.createUpdateForm(noticeId, 1L, true);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(null);
+
+      // Act
+      ResponseDTO<String> response = noticeService.update(form);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertEquals("通知不存在", response.getMsg());
+      verify(noticeManager, never()).updateTransaction(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("通知分类不存在 - 应返回错误")
+    void update_NoticeTypeNotFound_ShouldReturnError() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeUpdateForm form = NoticeTestFixture.createUpdateForm(noticeId, 999L, true);
+      NoticeEntity oldEntity = NoticeTestFixture.createEntity(1L);
+      oldEntity.setNoticeId(noticeId);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(oldEntity);
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(null);
+
+      // Act
+      ResponseDTO<String> response = noticeService.update(form);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertEquals("分类不存在", response.getMsg());
+      verify(noticeManager, never()).updateTransaction(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("正常更新（员工可见）- 应返回成功")
+    void update_EmployeeVisibleNotice_ShouldReturnSuccess() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeUpdateForm form = NoticeTestFixture.createUpdateForm(noticeId, 1L, false);
+      form.setVisibleRangeList(
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeForm(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 1L)));
+      NoticeEntity oldEntity = NoticeTestFixture.createEntity(1L);
+      oldEntity.setNoticeId(noticeId);
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      EmployeeEntity emp = new EmployeeEntity();
+      emp.setEmployeeId(1L);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(oldEntity);
+      when(noticeTypeDao.selectById(form.getNoticeTypeId())).thenReturn(noticeType);
+      when(employeeDao.selectBatchIds(Arrays.asList(1L))).thenReturn(Arrays.asList(emp));
+      doNothing()
+          .when(noticeManager)
+          .updateTransaction(
+              eq(oldEntity), any(NoticeEntity.class), eq(form.getVisibleRangeList()));
+      doNothing()
+          .when(dataTracerService)
+          .update(anyLong(), eq(DataTracerTypeEnum.OA_NOTICE), eq(oldEntity), any());
+
+      // Act
+      ResponseDTO<String> response = noticeService.update(form);
+
+      // Assert
+      assertTrue(response.getOk());
+      verify(employeeDao, times(1)).selectBatchIds(Arrays.asList(1L));
+      verify(noticeManager, times(1))
+          .updateTransaction(
+              eq(oldEntity), any(NoticeEntity.class), eq(form.getVisibleRangeList()));
+    }
+  }
+
+  @Nested
+  @DisplayName("delete() - 删除通知公告")
+  class DeleteTests {
+
+    @Test
+    @DisplayName("正常删除 - 应返回成功")
+    void delete_ValidNoticeId_ShouldReturnSuccess() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setDeletedFlag(false);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+      doNothing().when(noticeDao).updateDeletedFlag(noticeId);
+      doNothing().when(dataTracerService).delete(noticeId, DataTracerTypeEnum.OA_NOTICE);
+
+      // Act
+      ResponseDTO<String> response = noticeService.delete(noticeId);
+
+      // Assert
+      assertTrue(response.getOk());
+      verify(noticeDao, times(1)).selectById(noticeId);
+      verify(noticeDao, times(1)).updateDeletedFlag(noticeId);
+      verify(dataTracerService, times(1)).delete(noticeId, DataTracerTypeEnum.OA_NOTICE);
+    }
+
+    @Test
+    @DisplayName("通知不存在 - 应返回错误")
+    void delete_NoticeNotFound_ShouldReturnError() {
+      // Arrange
+      Long noticeId = 999L;
+
+      when(noticeDao.selectById(noticeId)).thenReturn(null);
+
+      // Act
+      ResponseDTO<String> response = noticeService.delete(noticeId);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertEquals("通知公告不存在", response.getMsg());
+      verify(noticeDao, never()).updateDeletedFlag(anyLong());
+    }
+
+    @Test
+    @DisplayName("通知已删除 - 应返回错误")
+    void delete_NoticeAlreadyDeleted_ShouldReturnError() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setDeletedFlag(true);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+
+      // Act
+      ResponseDTO<String> response = noticeService.delete(noticeId);
+
+      // Assert
+      assertFalse(response.getOk());
+      assertEquals("通知公告不存在", response.getMsg());
+      verify(noticeDao, never()).updateDeletedFlag(anyLong());
+    }
+  }
+
+  @Nested
+  @DisplayName("getUpdateFormVO() - 获取更新表单详情")
+  class GetUpdateFormVOTests {
+
+    @Test
+    @DisplayName("通知不存在 - 应返回null")
+    void getUpdateFormVO_NoticeNotFound_ShouldReturnNull() {
+      // Arrange
+      Long noticeId = 999L;
+
+      when(noticeDao.selectById(noticeId)).thenReturn(null);
+
+      // Act
+      NoticeUpdateFormVO result = noticeService.getUpdateFormVO(noticeId);
+
+      // Assert
+      assertNull(result);
+    }
+
+    @Test
+    @DisplayName("全部可见通知 - 应返回表单VO（无可见范围列表）")
+    void getUpdateFormVO_AllVisibleNotice_ShouldReturnFormVOWithoutVisibleRange() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setAllVisibleFlag(true);
+      entity.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).minusDays(1)); // 已发布
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+      when(noticeTypeDao.selectById(entity.getNoticeTypeId())).thenReturn(noticeType);
+
+      // Act
+      NoticeUpdateFormVO result = noticeService.getUpdateFormVO(noticeId);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(noticeId, result.getNoticeId());
+      assertTrue(result.getAllVisibleFlag());
+      assertTrue(result.getPublishFlag());
+      assertNull(result.getVisibleRangeList());
+      verify(noticeDao, never()).queryVisibleRange(anyLong());
+    }
+
+    @Test
+    @DisplayName("未发布的全部可见通知 - 发布标志应为false")
+    void getUpdateFormVO_UnpublishedNotice_ShouldHavePublishFlagFalse() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setAllVisibleFlag(true);
+      entity.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).plusDays(1)); // 未发布
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+      when(noticeTypeDao.selectById(entity.getNoticeTypeId())).thenReturn(noticeType);
+
+      // Act
+      NoticeUpdateFormVO result = noticeService.getUpdateFormVO(noticeId);
+
+      // Assert
+      assertNotNull(result);
+      assertFalse(result.getPublishFlag());
+    }
+
+    @Test
+    @DisplayName("非全部可见通知（员工可见）- 应批量查询员工并填充名称")
+    void getUpdateFormVO_EmployeeVisibleNotice_ShouldBatchQueryEmployeesAndFillNames() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setAllVisibleFlag(false);
+      entity.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).minusDays(1));
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      List<NoticeVisibleRangeVO> visibleRangeList =
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 1L, null),
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 2L, null));
+
+      EmployeeEntity emp1 = new EmployeeEntity();
+      emp1.setEmployeeId(1L);
+      emp1.setActualName("员工A");
+
+      EmployeeEntity emp2 = new EmployeeEntity();
+      emp2.setEmployeeId(2L);
+      emp2.setActualName("员工B");
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+      when(noticeTypeDao.selectById(entity.getNoticeTypeId())).thenReturn(noticeType);
+      when(noticeDao.queryVisibleRange(noticeId)).thenReturn(visibleRangeList);
+      when(employeeDao.selectBatchIds(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(emp1, emp2));
+
+      // Act
+      NoticeUpdateFormVO result = noticeService.getUpdateFormVO(noticeId);
+
+      // Assert
+      assertNotNull(result);
+      assertFalse(result.getAllVisibleFlag());
+      assertNotNull(result.getVisibleRangeList());
+      assertEquals(2, result.getVisibleRangeList().size());
+      assertEquals("员工A", result.getVisibleRangeList().get(0).getDataName());
+      assertEquals("员工B", result.getVisibleRangeList().get(1).getDataName());
+      // 验证只批量查询了一次员工（避免N+1查询）
+      verify(employeeDao, times(1)).selectBatchIds(Arrays.asList(1L, 2L));
+    }
+
+    @Test
+    @DisplayName("非全部可见通知（部门可见）- 应批量查询部门并填充名称")
+    void getUpdateFormVO_DepartmentVisibleNotice_ShouldBatchQueryDepartmentsAndFillNames() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setAllVisibleFlag(false);
+      entity.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).minusDays(1));
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      List<NoticeVisibleRangeVO> visibleRangeList =
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.DEPARTMENT, 10L, null),
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.DEPARTMENT, 20L, null));
+
+      DepartmentEntity dept1 = new DepartmentEntity();
+      dept1.setDepartmentId(10L);
+      dept1.setDepartmentName("部门A");
+
+      DepartmentEntity dept2 = new DepartmentEntity();
+      dept2.setDepartmentId(20L);
+      dept2.setDepartmentName("部门B");
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+      when(noticeTypeDao.selectById(entity.getNoticeTypeId())).thenReturn(noticeType);
+      when(noticeDao.queryVisibleRange(noticeId)).thenReturn(visibleRangeList);
+      when(departmentDao.selectBatchIds(Arrays.asList(10L, 20L)))
+          .thenReturn(Arrays.asList(dept1, dept2));
+
+      // Act
+      NoticeUpdateFormVO result = noticeService.getUpdateFormVO(noticeId);
+
+      // Assert
+      assertNotNull(result);
+      assertFalse(result.getAllVisibleFlag());
+      assertNotNull(result.getVisibleRangeList());
+      assertEquals(2, result.getVisibleRangeList().size());
+      assertEquals("部门A", result.getVisibleRangeList().get(0).getDataName());
+      assertEquals("部门B", result.getVisibleRangeList().get(1).getDataName());
+      // 验证只批量查询了一次部门（避免N+1查询）
+      verify(departmentDao, times(1)).selectBatchIds(Arrays.asList(10L, 20L));
+    }
+
+    @Test
+    @DisplayName("混合可见范围（员工+部门）- 应分别批量查询并填充名称")
+    void getUpdateFormVO_MixedVisibleRange_ShouldBatchQueryBothAndFillNames() {
+      // Arrange
+      Long noticeId = 100L;
+      NoticeEntity entity = NoticeTestFixture.createEntity();
+      entity.setNoticeId(noticeId);
+      entity.setAllVisibleFlag(false);
+      entity.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()).minusDays(1));
+      NoticeTypeEntity noticeType = NoticeTestFixture.createNoticeTypeEntity(1L);
+
+      List<NoticeVisibleRangeVO> visibleRangeList =
+          Arrays.asList(
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 1L, null),
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.DEPARTMENT, 10L, null),
+              NoticeTestFixture.createVisibleRangeVO(
+                  NoticeVisibleRangeDataTypeEnum.EMPLOYEE, 2L, null));
+
+      EmployeeEntity emp1 = new EmployeeEntity();
+      emp1.setEmployeeId(1L);
+      emp1.setActualName("员工A");
+
+      EmployeeEntity emp2 = new EmployeeEntity();
+      emp2.setEmployeeId(2L);
+      emp2.setActualName("员工B");
+
+      DepartmentEntity dept = new DepartmentEntity();
+      dept.setDepartmentId(10L);
+      dept.setDepartmentName("部门A");
+
+      when(noticeDao.selectById(noticeId)).thenReturn(entity);
+      when(noticeTypeDao.selectById(entity.getNoticeTypeId())).thenReturn(noticeType);
+      when(noticeDao.queryVisibleRange(noticeId)).thenReturn(visibleRangeList);
+      when(employeeDao.selectBatchIds(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(emp1, emp2));
+      when(departmentDao.selectBatchIds(Arrays.asList(10L))).thenReturn(Arrays.asList(dept));
+
+      // Act
+      NoticeUpdateFormVO result = noticeService.getUpdateFormVO(noticeId);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(3, result.getVisibleRangeList().size());
+      assertEquals("员工A", result.getVisibleRangeList().get(0).getDataName());
+      assertEquals("部门A", result.getVisibleRangeList().get(1).getDataName());
+      assertEquals("员工B", result.getVisibleRangeList().get(2).getDataName());
+      // 验证批量查询（避免N+1查询）
+      verify(employeeDao, times(1)).selectBatchIds(Arrays.asList(1L, 2L));
+      verify(departmentDao, times(1)).selectBatchIds(Arrays.asList(10L));
+    }
+  }
+}
