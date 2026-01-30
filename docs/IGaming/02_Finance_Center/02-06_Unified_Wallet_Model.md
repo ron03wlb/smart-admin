@@ -1277,6 +1277,13 @@ public class WalletArchitectureTest {
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 曝光度監控、異常負債檢測、風險等級評估
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 遊戲投注與錢包扣款的極端場景處理
 
+### 深度技術分析
+- **[Seamless Wallet 專題索引](./seamless-wallet/00_INDEX.md)** - 13 個無縫錢包專題深度分析
+  - [Token 驗證](./seamless-wallet/01_token_verification.md) - API 身份驗證決策樹
+  - [冪等性設計](./seamless-wallet/02_idempotency_design.md) - 三層防護（Redis→DB→分散式鎖）
+  - [流水並發累積](./seamless-wallet/07_turnover_concurrency.md) - Lua 腳本原子性、TOCTOU 防護
+  - [錯誤恢復](./seamless-wallet/10_error_recovery.md) - 異常處理與補償事務
+
 ---
 
 **文檔版本**: 1.3.0

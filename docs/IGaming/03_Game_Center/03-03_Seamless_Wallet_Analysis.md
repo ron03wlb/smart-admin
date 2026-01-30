@@ -2246,6 +2246,27 @@ public class SeamlessWalletModuleArchitectureTest {
 
 ---
 
+## 📚 相關文檔
+
+### 上層架構
+- **[02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md)** - 錢包整體架構、可下注餘額公式
+- **[02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md)** - 事件驅動架構、Outbox Pattern
+
+### 深度技術分析
+詳細的無縫錢包專題分析（13 個專題），提供更細緻的實作指引：
+
+- **[Seamless Wallet 專題索引](../02_Finance_Center/seamless-wallet/00_INDEX.md)** - 完整導航與學習路徑
+  - [Token 驗證](../02_Finance_Center/seamless-wallet/01_token_verification.md) - API 身份驗證決策樹（Bet vs Result API 驗證策略）
+  - [冪等性設計](../02_Finance_Center/seamless-wallet/02_idempotency_design.md) - 三層防護（Redis→DB→分散式鎖）、防重複扣款
+  - [體育博彩邏輯](../02_Finance_Center/seamless-wallet/03_sports_betting_logic.md) - Valid Bet 計算、HALF WIN/LOSS 處理
+  - [流水並發累積](../02_Finance_Center/seamless-wallet/07_turnover_concurrency.md) - Lua 腳本原子性、TOCTOU 攻擊防護
+  - [錯誤恢復](../02_Finance_Center/seamless-wallet/10_error_recovery.md) - 異常處理、補償事務、回滾策略
+
+### 風控整合
+- **[05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md)** - 交易風控檢查、對沖檢測
+
+---
+
 ## 8. 變更日誌 (Change Log)
 
 ### v2.0.0 (2026-01-29)
