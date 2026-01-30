@@ -531,9 +531,9 @@ open http://localhost:7080/product
 - [examples/](examples/) - 完整的示例代碼（Product CRUD）
 
 ### SmartAdmin 文檔
-- [SmartAdmin Patterns](../../../.claude/shared/knowledge/smartadmin-patterns.md) - SmartAdmin 開發模式
-- [Architecture Rules](../../../../.agent/rules/foundation/10-architecture-rules.md) - 架構規則
-- [Manager Layer Rules](../../../../.agent/rules/foundation/09-manager-layer.md) - Manager 層規則
+- [SmartAdmin Patterns](../../../shared/knowledge/smartadmin-patterns.md) - SmartAdmin 開發模式
+- [Architecture Rules](../../../../../.agent/rules/foundation/10-architecture-rules.md) - 架構規則
+- [Manager Layer Rules](../../../../../.agent/rules/foundation/09-manager-layer.md) - Manager 層規則
 
 ### 外部文檔
 - [MyBatis-Plus Documentation](https://baomidou.com/) - MyBatis-Plus 官方文檔
@@ -561,7 +561,7 @@ open http://localhost:7080/product
 - **Weeks 13-24** (Hard Deprecation): 舊命令顯示錯誤 + 遷移指南
 - **Week 25+** (Removal): 舊命令永久移除
 
-詳見：[skill-aliases.json](../skill-aliases.json) 路由配置
+詳見：[skill-aliases.json](../../../skill-aliases.json) 路由配置
 
 ---
 

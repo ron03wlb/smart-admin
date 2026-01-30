@@ -250,7 +250,7 @@ vavr-refactoring-assistant/
 
 **Foundation Skills:**
 - `test-driven-development` - TDD methodology (required background)
-- `writing-skills` - Skill creation process
+<!-- writing-skills reference removed - skill not in current structure -->
 - `verification-before-completion` - Testing before claiming success
 
 ---

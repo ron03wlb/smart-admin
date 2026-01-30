@@ -204,7 +204,7 @@ PageResult<OperateLogVO> logs = operateLogService.queryByPage(queryForm);
 ## 相關資源
 
 - [SKILL.md](SKILL.md) - 詳細技術規格
-- [SmartAdmin Patterns](../../../.claude/shared/knowledge/smartadmin-patterns.md)
+- [SmartAdmin Patterns](../../../shared/knowledge/smartadmin-patterns.md)
 - [國密算法文檔](https://www.oscca.gov.cn/)
 
 ---

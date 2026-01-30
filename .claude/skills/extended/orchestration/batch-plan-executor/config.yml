@@ -150,13 +150,14 @@ skill_mapping:
       - "foundation/backend"
       - "foundation/full-stack"
       - "foundation/testing"
-      - "extended/business-logic"
       - "extended/domain"
       - "extended/orchestration"
       - "extended/quality"
-      - "productivity/infrastructure"
+      - "productivity/devops"
+      - "productivity/integration"
       - "productivity/composite"
       - "productivity/analysis"
+      - "productivity/refactoring"
 
   # Fallback behavior when mapping fails
   fallback:
@@ -175,27 +176,34 @@ skill_mapping:
     refactor: foundation/backend/vavr-refactoring-assistant
 
     # Extended Skills (P1)
-    liteflow: extended/business-logic/liteflow-rule-builder
+    liteflow: extended/domain/liteflow-rule-builder
     fraud: extended/domain/fraud-detection-pattern-generator
     igame: extended/domain/igame-feature-builder
     igame-pm: extended/domain/igame-pm-analyst
     wallet-pm: extended/domain/igaming-multi-tenant-wallet-pm
-    quality-gate: extended/quality/quality-gate-orchestrator
+    quality-gate: extended/orchestration/quality-gate-orchestrator
+    concurrency: extended/quality/concurrency-safety-auditor
 
     # Productivity Skills (P2)
     test: productivity/composite/smartadmin-testing-suite
     performance: productivity/composite/smartadmin-performance-suite
     java-perf: productivity/analysis/java-performance-pro
-    job: productivity/infrastructure/scheduled-task-manager
-    migration: productivity/infrastructure/db-migration-manager
-    cache: productivity/infrastructure/cache-strategy-generator
-    cicd: productivity/infrastructure/cicd-pipeline-builder
-    apm: productivity/infrastructure/apm-integration-skill
-    i18n: productivity/infrastructure/i18n-generator
-    mq: productivity/infrastructure/message-queue-pattern-generator
-    report: productivity/infrastructure/report-generator-skill
-    search: productivity/infrastructure/full-text-search-integration
-    websocket: productivity/infrastructure/websocket-sse-realtime-generator
+    manager-extract: productivity/refactoring/smartadmin-manager-extractor
+
+    # DevOps (5 skills)
+    job: productivity/devops/scheduled-task-manager
+    migration: productivity/devops/db-migration-manager
+    cicd: productivity/devops/cicd-pipeline-builder
+    apm: productivity/devops/apm-integration-skill
+    websocket: productivity/devops/websocket-sse-realtime-generator
+
+    # Integration (6 skills)
+    cache: productivity/integration/cache-strategy-generator
+    i18n: productivity/integration/i18n-generator
+    mq: productivity/integration/message-queue-pattern-generator
+    report: productivity/integration/report-generator-skill
+    search: productivity/integration/full-text-search-integration
+    postgres: productivity/integration/postgresql-best-practices
 
 # ====================================================================
 # EXECUTION MODES

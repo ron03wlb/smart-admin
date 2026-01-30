@@ -303,7 +303,7 @@ testcontainers.reuse.enable=true
 
 - [SKILL.md](SKILL.md) - 詳細技術規格
 - [Testcontainers Documentation](https://www.testcontainers.org/)
-- [Testing Strategy](../../../../docs/testing/testing-strategy.md)
+- [Testing Strategy](../../../../../docs/testing/testing-strategy.md)
 
 ---
 

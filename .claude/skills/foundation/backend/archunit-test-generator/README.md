@@ -279,7 +279,7 @@ Tests run automatically in GitHub Actions:
 - [ArchUnit API Javadoc](https://javadoc.io/doc/com.tngtech.archunit/archunit/latest/index.html)
 
 ### TDD Methodology
-- [writing-skills TDD](../.claude/skills/writing-skills/SKILL.md) - RED-GREEN-REFACTOR approach
+<!-- writing-skills reference removed - skill not in current structure -->
 
 ---
 

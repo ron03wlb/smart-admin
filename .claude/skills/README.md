@@ -132,7 +132,7 @@ Generate LiteFlow rule DSL (EL expressions, QLExpress scripts) from natural lang
 
 **Trigger Keywords**: "create LiteFlow chain", "business workflow", "approval flow", "sequential execution", "parallel processing"
 
-**Related**: [docs/plans/liteflow/](../../docs/plans/liteflow/)
+**Related**: [docs/plans/liteflow/](../../../docs/plans/liteflow/)
 
 ---
 
@@ -141,7 +141,7 @@ Generate fraud detection and risk control systems for iGaming (multi-account det
 
 **Trigger Keywords**: "fraud", "risk control", "bonus abuse", "multi-account", "KYC automation", "AML screening"
 
-**Related**: [docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md](../../docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md)
+**Related**: [docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md](../../../docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md)
 
 ---
 
@@ -351,8 +351,8 @@ All skills now have **config.yml** (100% coverage vs 3% before):
 ## Related Documentation
 
 - [.claude/README.md](../README.md) - AI agent system overview
-- [.agent/rules/00-INDEX.md](../../.agent/rules/00-INDEX.md) - Unified decision center (rules, skills, agents)
-- [CLAUDE.md](../../CLAUDE.md) - Primary AI assistant entry point
+- [.agent/rules/00-INDEX.md](../../../.agent/rules/00-INDEX.md) - Unified decision center (rules, skills, agents)
+- [CLAUDE.md](../../../CLAUDE.md) - Primary AI assistant entry point
 - [skill-registry.yml](skill-registry.yml) - Central skill metadata registry
 
 ---
