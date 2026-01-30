@@ -1,0 +1,196 @@
+# ====================================================================
+# iGaming Multi-Tenant Wallet PM - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P1 (Important Business Logic)
+# Category: Domain
+# Type: Composite (Phase-based)
+# ====================================================================
+
+metadata:
+  name: "igaming-multi-tenant-wallet-pm"
+  version: "1.0.0"
+  priority: "P1"
+  type: "composite"
+  category: "domain"
+  description: "資深 iGaming 產品經理專家,專注多商戶架構和無縫錢包設計"
+  ai_description: |
+    資深 iGaming 產品經理專家,專注多商戶架構和無縫錢包設計,
+    具備歐洲/亞洲/美洲/中國市場經驗,生成標準化 PRD 文檔,
+    使用 Mermaid 生成流程圖、架構圖、時序圖,並進行 step by step 深度思考。
+
+    核心模式 (7 個):
+    1. Regional Compliance Mapping - 地區合規映射（歐洲 MGA/亞洲 PAGCOR/美洲/中國）
+    2. Multi-Tenant Architecture Design - 多商戶隔離策略（Schema/行級/完全隔離）
+    3. Seamless Wallet Pattern Generation - 無縫錢包核心模式（13 個專題整合）
+    4. Ultrathink Methodology - 第一性原理深度分析框架
+    5. PRD Document Generation - 標準化繁體中文 PRD 生成（6 章節結構）
+    6. Mermaid Diagram Strategy - 5 種圖表類型的場景化應用
+    7. Risk Assessment Framework - 資金安全/性能/合規三維風險評估
+
+    輸出物:
+    - 標準化繁體中文 PRD 文檔（6 章節結構）
+    - 多種 Mermaid 圖表（flowchart, sequenceDiagram, erDiagram, architecture）
+    - SmartAdmin 分層設計方案（Controller → Service → Manager → Dao）
+    - 地區合規對比表（歐洲/亞洲/美洲/中國）
+    - 風險評估矩陣（資金安全/性能/合規三維）
+
+    Use when designing multi-tenant systems, seamless wallet integration,
+    white-label platforms, or regional compliance for iGaming.
+
+  tags:
+    - "igaming"
+    - "multi-tenant"
+    - "white-label"
+    - "seamless-wallet"
+    - "wallet-integration"
+    - "regional-compliance"
+    - "kyc-aml"
+    - "product-management"
+    - "traditional-chinese"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "multi-tenant"
+    - "white-label"
+    - "seamless wallet"
+    - "多商戶"
+    - "白標"
+    - "包網"
+    - "無縫錢包"
+    - "錢包整合"
+    - "遊戲錢包"
+    - "歐洲牌照"
+    - "亞洲市場"
+    - "美洲合規"
+    - "中國博弈"
+    - "KYC"
+    - "AML"
+    - "地區合規"
+
+  patterns:
+    - "設計.*多商戶.*系統"
+    - "無縫錢包.*整合"
+    - "白標.*定制"
+    - "(歐洲|亞洲|美洲|中國).*合規"
+
+  exclude_keywords:
+    - "刪除多商戶"
+    - "移除錢包"
+
+execution:
+  type: "phase-based"
+
+  phases:
+    - id: "phase-1"
+      name: "Requirement Gathering"
+      file: "phases/phase-1-requirement-gathering.md"
+      required: true
+      estimated_minutes: 10
+      description: "需求收集與深度分析（Ultrathink 方法論）"
+
+    - id: "phase-2"
+      name: "Multi-Tenant Design"
+      file: "phases/phase-2-multi-tenant-design.md"
+      required: false
+      estimated_minutes: 15
+      description: "多商戶架構設計（隔離策略、白標定制）"
+
+    - id: "phase-3"
+      name: "Seamless Wallet Design"
+      file: "phases/phase-3-seamless-wallet-design.md"
+      required: false
+      estimated_minutes: 15
+      description: "無縫錢包設計（13 個核心模式整合）"
+
+    - id: "phase-4"
+      name: "Regional Compliance"
+      file: "phases/phase-4-regional-compliance.md"
+      required: false
+      estimated_minutes: 10
+      description: "地區合規設計（歐洲/亞洲/美洲/中國對比）"
+
+  timeout:
+    per_phase_minutes: 20
+    total_minutes: 60
+
+  quality_gates:
+    run_after_execution: false  # PM analysis doesn't generate code
+
+dependencies:
+  skills:
+    - "igame-pm-analyst"  # General iGaming requirement analysis
+
+  required_files:
+    - "docs/iGame/technical-specs/"
+    - ".claude/shared/knowledge/smartadmin-patterns.md"
+
+  tools: []  # No build tools required for PM analysis
+
+output:
+  generates:
+    - "*.md"  # PRD, compliance reports, architecture diagrams
+
+  target_directories:
+    - "docs/requirements/"
+
+  templates:
+    prd: "knowledge/prd-template.md"
+    compliance: "knowledge/regional-requirements.md"
+    multi_tenant: "knowledge/multi-tenant-patterns.md"
+    wallet: "knowledge/wallet-patterns.md"
+
+validation:
+  pre_execution:
+    - check: "knowledge_base_complete"
+      rule: "PM knowledge base files must exist"
+
+  post_execution:
+    - check: "prd_completeness"
+      description: "Verify PRD contains all required sections"
+
+    - check: "mermaid_diagrams"
+      description: "Verify Mermaid diagrams are valid"
+
+    - check: "compliance_coverage"
+      description: "Verify regional compliance requirements are addressed"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: "README.md"
+  examples_dir: "examples"
+  references_dir: "references"
+
+  external_links:
+    - title: "iGaming Technical Specs"
+      url: "../../../docs/iGame/technical-specs/"
+
+    - title: "SmartAdmin Patterns"
+      url: "../../../.claude/shared/knowledge/smartadmin-patterns.md"
+
+    - title: "Regional Compliance Requirements"
+      url: "knowledge/regional-requirements.md"
+
+    - title: "Seamless Wallet Patterns"
+      url: "knowledge/wallet-patterns.md"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "prd_generated"
+    - "phases_executed"
+    - "compliance_regions_covered"

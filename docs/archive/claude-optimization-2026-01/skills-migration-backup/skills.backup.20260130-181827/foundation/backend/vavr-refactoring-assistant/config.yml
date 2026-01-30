@@ -1,0 +1,153 @@
+# ====================================================================
+# Vavr Refactoring Assistant - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Backend
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "vavr-refactoring-assistant"
+  version: "1.0.0"
+  priority: "P0"
+  type: "atomic"
+  category: "backend"
+  description: "Refactor Service layer methods to use Vavr Option/Try/Either instead of java.util.Optional/checked exceptions"
+  ai_description: |
+    Refactors Java code from java.util.Optional/try-catch/null checks to
+    io.vavr.control.Option/Try/Either patterns, enforcing SmartAdmin's
+    architectural standard: Service layer MUST use Vavr Option (NOT java.util.Optional).
+
+    Core refactoring patterns:
+    - Optional<T> → Option<T>
+    - null checks → Option.of() / Option.none()
+    - try-catch → Try.of() / Try.success() / Try.failure()
+    - Either for business errors (Either.left/right)
+
+    Identifies anti-patterns through ArchitectureTest violations (serviceUsesVavrOption),
+    preserves business logic correctness, updates imports and method signatures,
+    and verifies ArchUnit compliance after refactoring.
+
+  tags:
+    - "vavr"
+    - "functional-programming"
+    - "refactoring"
+    - "option"
+    - "try"
+    - "either"
+    - "architecture-compliance"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "refactor to Vavr"
+    - "convert Optional"
+    - "use Try"
+    - "functional exceptions"
+    - "Option pattern"
+    - "Either pattern"
+    - "serviceUsesVavrOption"
+    - "ArchitectureTest violation"
+    - "Vavr refactoring"
+
+  patterns:
+    - "refactor\\s+(\\w+)\\s+to\\s+use\\s+Vavr"
+    - "convert\\s+Optional\\s+to\\s+Option"
+    - "replace\\s+try-catch\\s+with\\s+Try"
+    - "fix\\s+serviceUsesVavrOption\\s+violation"
+
+  exclude_keywords:
+    - "remove Vavr"
+    - "revert to Optional"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 15
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "archunit"
+      - "unit-tests"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - ".agent/rules/foundation/10-architecture-rules.md"
+    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/ArchitectureTest.java"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.java"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "vavr_dependency"
+      rule: "Vavr dependency must exist in build.gradle.kts"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify refactored code compiles successfully"
+      command: "./gradlew :sa-admin:compileJava"
+
+    - check: "archunit"
+      description: "Verify ArchitectureTest.serviceUsesVavrOption passes"
+      command: "./gradlew :sa-admin:test --tests ArchitectureTest.serviceUsesVavrOption"
+
+    - check: "unit-tests"
+      description: "Run unit tests to verify business logic preserved"
+      command: "./gradlew :sa-admin:test"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: null
+
+  external_links:
+    - title: "SmartAdmin Architecture Rules"
+      url: "../../../.agent/rules/foundation/10-architecture-rules.md"
+
+    - title: "Vavr Documentation"
+      url: "https://www.vavr.io/vavr-docs/"
+
+    - title: "Vavr Option Javadoc"
+      url: "https://www.javadoc.io/doc/io.vavr/vavr/latest/io/vavr/control/Option.html"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "refactoring_count"

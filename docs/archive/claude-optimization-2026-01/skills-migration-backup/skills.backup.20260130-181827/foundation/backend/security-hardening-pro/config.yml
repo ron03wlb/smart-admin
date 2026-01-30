@@ -1,0 +1,152 @@
+# ====================================================================
+# Security Hardening Pro - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Backend
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "security-hardening-pro"
+  version: "1.0.0"
+  priority: "P0"
+  type: "atomic"
+  category: "backend"
+  description: "Implement security best practices (SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging)"
+  ai_description: |
+    Implements comprehensive security hardening for SmartAdmin applications,
+    with special focus on iGaming compliance requirements (KYC/AML).
+
+    Core capabilities:
+    - API Encryption: SM2/SM3/SM4 using SmartAdmin's api-encrypt foundation module
+    - Data Masking: Phone, email, ID card, bank account masking for PII protection
+    - Input Validation: SQL injection prevention, XSS/CSRF protection
+    - Rate Limiting: DDoS prevention, API throttling
+    - Audit Logging: Financial operation trails, compliance logging
+    - Authentication: Sa-Token integration, permission validation
+
+    Automatically applies SmartAdmin foundation modules and configures security
+    filters, interceptors, validators, and audit trails.
+
+  tags:
+    - "security"
+    - "encryption"
+    - "data-masking"
+    - "compliance"
+    - "kyc-aml"
+    - "audit-logging"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "security"
+    - "encryption"
+    - "data masking"
+    - "SQL injection"
+    - "XSS"
+    - "CSRF"
+    - "audit log"
+    - "compliance"
+    - "hardening"
+    - "KYC"
+    - "AML"
+    - "secure endpoint"
+    - "rate limiting"
+
+  patterns:
+    - "add\\s+encryption\\s+to\\s+(\\w+)"
+    - "implement\\s+data\\s+masking\\s+for\\s+(\\w+)"
+    - "secure\\s+(.*?)\\s+against\\s+(.*)"
+    - "add\\s+audit\\s+logging\\s+for\\s+(\\w+)"
+
+  exclude_keywords:
+    - "disable security"
+    - "remove encryption"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 20
+    total_minutes: 20
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "unit-tests"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - ".agent/rules/security/01-security-best-practices.md"
+    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/foundation/api-encrypt/"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.java"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "gradle_available"
+      rule: "Gradle 8.0+ must be available"
+      command: "gradle --version"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify security code compiles successfully"
+      command: "./gradlew :sa-admin:compileJava"
+
+    - check: "unit-tests"
+      description: "Run security-related unit tests"
+      command: "./gradlew :sa-admin:test --tests *Security*"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: "references"
+
+  external_links:
+    - title: "SmartAdmin Security Best Practices"
+      url: "../../../.agent/rules/security/01-security-best-practices.md"
+
+    - title: "Sa-Token Documentation"
+      url: "https://sa-token.cc/"
+
+    - title: "OWASP Top 10"
+      url: "https://owasp.org/www-project-top-ten/"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "security_issues_found"

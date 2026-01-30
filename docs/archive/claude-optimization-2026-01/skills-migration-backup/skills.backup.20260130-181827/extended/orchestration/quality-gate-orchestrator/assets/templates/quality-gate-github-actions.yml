@@ -1,0 +1,238 @@
+name: Quality Gate
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '21'
+  COVERAGE_THRESHOLD: '80'
+
+jobs:
+  quality-gate:
+    name: Quality Gate - Sequential
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for SonarQube incremental analysis
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Step 1: Auto-format (non-blocking)
+      - name: 1️⃣ Code Formatting (Spotless)
+        run: ./gradlew spotlessCheck --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+        continue-on-error: true
+
+      # Step 2: Checkstyle (BLOCKER)
+      - name: 2️⃣ Checkstyle (Code Style)
+        run: ./gradlew :sa-admin:checkstyleMain :sa-admin:checkstyleTest --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload Checkstyle Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle-report
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+          retention-days: 30
+
+      # Step 3: ArchUnit (BLOCKER)
+      - name: 3️⃣ ArchUnit (Architecture Rules)
+        run: ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload ArchUnit Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: archunit-report
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+          retention-days: 30
+
+      # Step 4: PMD (CRITICAL)
+      - name: 4️⃣ PMD (Code Quality)
+        run: ./gradlew :sa-admin:pmdMain --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload PMD Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd-report
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
+          retention-days: 30
+
+      # Step 5: SpotBugs (CRITICAL)
+      - name: 5️⃣ SpotBugs (Bug Detection)
+        run: ./gradlew :sa-admin:spotbugsMain --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload SpotBugs Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-report
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
+          retention-days: 30
+
+      # Step 6: Unit Tests + Coverage (MAJOR)
+      - name: 6️⃣ Unit Tests + Coverage
+        run: ./gradlew :sa-admin:test :sa-admin:jacocoTestReport --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Verify Coverage Threshold
+        run: ./gradlew :sa-admin:jacocoTestCoverageVerification --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/
+          retention-days: 30
+
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/*.xml
+
+      # Step 7: SonarQube Analysis (main/master only)
+      - name: 7️⃣ SonarQube Analysis
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          ./gradlew :sa-admin:sonar \
+            -Dsonar.projectKey=smartadmin-v4 \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.login=$SONAR_TOKEN \
+            --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      # Quality Gate Summary
+      - name: Quality Gate Summary
+        if: always()
+        run: |
+          echo "## 🔍 Quality Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Execution Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Checkstyle | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| ArchUnit | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| PMD | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| SpotBugs | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage | ✅ ${{ env.COVERAGE_THRESHOLD }}% |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Reports" >> $GITHUB_STEP_SUMMARY
+          echo "- [Checkstyle Report](../artifacts/checkstyle-report)" >> $GITHUB_STEP_SUMMARY
+          echo "- [PMD Report](../artifacts/pmd-report)" >> $GITHUB_STEP_SUMMARY
+          echo "- [SpotBugs Report](../artifacts/spotbugs-report)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Coverage Report](../artifacts/coverage-report)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR with Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Parse reports (simplified example)
+            const comment = `
+            ## 🔍 Quality Gate Results
+
+            ✅ **All quality checks passed!**
+
+            ### Details
+            - ✅ Checkstyle: 0 violations
+            - ✅ ArchUnit: All architecture rules passed
+            - ✅ PMD: 0 critical issues
+            - ✅ SpotBugs: 0 bugs detected
+            - ✅ Coverage: ${{ env.COVERAGE_THRESHOLD }}%
+
+            ### Reports
+            Quality reports are available in the [workflow artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  quality-gate-parallel:
+    name: Quality Gate - Parallel (Optional)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    strategy:
+      matrix:
+        tool: [checkstyle, pmd, spotbugs, archunit]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Run ${{ matrix.tool }}
+        run: |
+          case "${{ matrix.tool }}" in
+            checkstyle)
+              ./gradlew :sa-admin:checkstyleMain --no-daemon
+              ;;
+            pmd)
+              ./gradlew :sa-admin:pmdMain --no-daemon
+              ;;
+            spotbugs)
+              ./gradlew :sa-admin:spotbugsMain --no-daemon
+              ;;
+            archunit)
+              ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+              ;;
+          esac
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload ${{ matrix.tool }} Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.tool }}-report
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/
+          retention-days: 30

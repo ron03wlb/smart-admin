@@ -1,0 +1,248 @@
+<template>
+  <div class="{{MODULE_NAME}}-list">
+    <!-- Search Form -->
+    <a-card title="Search" :bordered="false" class="search-card">
+      <a-form layout="inline" :model="searchForm">
+        {{#SEARCH_FIELDS}}
+        <a-form-item label="{{FIELD_LABEL}}">
+          {{#IF_TEXT}}
+          <a-input v-model:value="searchForm.{{FIELD_NAME}}" placeholder="Enter {{FIELD_LABEL_LOWER}}" />
+          {{/IF_TEXT}}
+          {{#IF_SELECT}}
+          <a-select v-model:value="searchForm.{{FIELD_NAME}}" placeholder="Select {{FIELD_LABEL_LOWER}}" style="width: 120px">
+            {{#OPTIONS}}
+            <a-select-option :value="{{VALUE}}">{{LABEL}}</a-select-option>
+            {{/OPTIONS}}
+          </a-select>
+          {{/IF_SELECT}}
+          {{#IF_DATE_RANGE}}
+          <a-range-picker v-model:value="searchForm.{{FIELD_NAME}}" value-format="YYYY-MM-DD" />
+          {{/IF_DATE_RANGE}}
+        </a-form-item>
+        {{/SEARCH_FIELDS}}
+        <a-form-item>
+          <a-button type="primary" @click="handleSearch">
+            <SearchOutlined /> Search
+          </a-button>
+          <a-button style="margin-left: 8px" @click="handleReset">
+            <ReloadOutlined /> Reset
+          </a-button>
+        </a-form-item>
+      </a-form>
+    </a-card>
+
+    <!-- Action Bar -->
+    <a-card :bordered="false" style="margin-top: 16px">
+      <a-space style="margin-bottom: 16px">
+        <a-button type="primary" v-privilege="'{{MODULE_CODE}}:add'" @click="handleAdd">
+          <PlusOutlined /> Add {{MODULE_TITLE}}
+        </a-button>
+        <a-button v-privilege="'{{MODULE_CODE}}:export'" @click="handleExport">
+          <ExportOutlined /> Export
+        </a-button>
+      </a-space>
+
+      <!-- Data Table -->
+      <a-table
+        :columns="columns"
+        :data-source="tableData"
+        :loading="loading"
+        :pagination="pagination"
+        @change="handleTableChange"
+        row-key="id"
+      >
+        <template #bodyCell="{ column, record }">
+          {{#CUSTOM_COLUMNS}}
+          <template v-if="column.key === '{{COLUMN_KEY}}'">
+            {{#IF_STATUS}}
+            <a-tag :color="{{COLOR_MAP}}[record.{{COLUMN_KEY}}]">
+              {{ {{LABEL_MAP}}[record.{{COLUMN_KEY}}] }}
+            </a-tag>
+            {{/IF_STATUS}}
+            {{#IF_BOOLEAN}}
+            <a-tag :color="record.{{COLUMN_KEY}} ? 'green' : 'red'">
+              {{ record.{{COLUMN_KEY}} ? 'Yes' : 'No' }}
+            </a-tag>
+            {{/IF_BOOLEAN}}
+          </template>
+          {{/CUSTOM_COLUMNS}}
+          <template v-else-if="column.key === 'action'">
+            <a-space>
+              <a-button type="link" size="small" v-privilege="'{{MODULE_CODE}}:edit'" @click="handleEdit(record)">
+                Edit
+              </a-button>
+              <a-button type="link" size="small" danger v-privilege="'{{MODULE_CODE}}:delete'" @click="handleDelete(record)">
+                Delete
+              </a-button>
+            </a-space>
+          </template>
+        </template>
+      </a-table>
+    </a-card>
+
+    <!-- Form Modal -->
+    <{{MODULE_NAME}}-modal
+      v-model:visible="modalVisible"
+      :record="currentRecord"
+      @success="handleModalSuccess"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, onMounted } from 'vue';
+import { message, Modal } from 'ant-design-vue';
+import { SearchOutlined, ReloadOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons-vue';
+import type { TableColumnType, TableProps } from 'ant-design-vue';
+import { {{MODULE_NAME}}Api } from '@/api/{{MODULE_NAME}}-api';
+import type { {{MODULE_CLASS}}VO, {{MODULE_CLASS}}QueryForm } from '@/types/{{MODULE_NAME}}-types';
+import {{MODULE_CLASS}}Modal from './{{MODULE_NAME}}-modal.vue';
+
+// Search form
+const searchForm = reactive<{{MODULE_CLASS}}QueryForm>({
+  {{#DEFAULT_SEARCH_VALUES}}
+  {{FIELD_NAME}}: {{DEFAULT_VALUE}},
+  {{/DEFAULT_SEARCH_VALUES}}
+  pageNum: 1,
+  pageSize: 10,
+});
+
+// Table data
+const tableData = ref<{{MODULE_CLASS}}VO[]>([]);
+const loading = ref(false);
+const pagination = ref({
+  current: 1,
+  pageSize: 10,
+  total: 0,
+  showSizeChanger: true,
+  showQuickJumper: true,
+  showTotal: (total: number) => `Total ${total} items`,
+});
+
+// Modal state
+const modalVisible = ref(false);
+const currentRecord = ref<{{MODULE_CLASS}}VO | null>(null);
+
+// Table columns
+const columns: TableColumnType[] = [
+  {{#TABLE_COLUMNS}}
+  { title: '{{COLUMN_TITLE}}', dataIndex: '{{COLUMN_KEY}}', key: '{{COLUMN_KEY}}'{{#IF_WIDTH}}, width: {{WIDTH}}{{/IF_WIDTH}}{{#IF_FIXED}}, fixed: '{{FIXED}}'{{/IF_FIXED}} },
+  {{/TABLE_COLUMNS}}
+  { title: 'Action', key: 'action', width: 180, fixed: 'right' },
+];
+
+// Load data
+const loadData = async () => {
+  loading.value = true;
+  try {
+    const response = await {{MODULE_NAME}}Api.queryPage(searchForm);
+    if (response.ok) {
+      tableData.value = response.data.list;
+      pagination.value.total = response.data.total;
+      pagination.value.current = response.data.pageNum;
+    } else {
+      message.error(response.msg || 'Failed to load data');
+    }
+  } catch (error) {
+    message.error('Failed to load data');
+    console.error('Load data error:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Search handlers
+const handleSearch = () => {
+  searchForm.pageNum = 1;
+  pagination.value.current = 1;
+  loadData();
+};
+
+const handleReset = () => {
+  Object.assign(searchForm, {
+    {{#RESET_SEARCH_VALUES}}
+    {{FIELD_NAME}}: {{RESET_VALUE}},
+    {{/RESET_SEARCH_VALUES}}
+    pageNum: 1,
+    pageSize: 10,
+  });
+  loadData();
+};
+
+// Table change handler
+const handleTableChange: TableProps['onChange'] = (pag) => {
+  pagination.value.current = pag.current || 1;
+  pagination.value.pageSize = pag.pageSize || 10;
+  searchForm.pageNum = pag.current || 1;
+  searchForm.pageSize = pag.pageSize || 10;
+  loadData();
+};
+
+// Action handlers
+const handleAdd = () => {
+  currentRecord.value = null;
+  modalVisible.value = true;
+};
+
+const handleEdit = (record: {{MODULE_CLASS}}VO) => {
+  currentRecord.value = record;
+  modalVisible.value = true;
+};
+
+const handleDelete = (record: {{MODULE_CLASS}}VO) => {
+  Modal.confirm({
+    title: 'Confirm Delete',
+    content: `Are you sure you want to delete this {{MODULE_TITLE_LOWER}}?`,
+    okText: 'Delete',
+    okType: 'danger',
+    cancelText: 'Cancel',
+    onOk: async () => {
+      try {
+        const response = await {{MODULE_NAME}}Api.delete(record.id);
+        if (response.ok) {
+          message.success('Deleted successfully');
+          loadData();
+        } else {
+          message.error(response.msg || 'Delete failed');
+        }
+      } catch (error) {
+        message.error('Delete failed');
+        console.error('Delete error:', error);
+      }
+    },
+  });
+};
+
+const handleExport = async () => {
+  try {
+    message.loading('Exporting...', 0);
+    await {{MODULE_NAME}}Api.export(searchForm);
+    message.destroy();
+    message.success('Export successful');
+  } catch (error) {
+    message.destroy();
+    message.error('Export failed');
+    console.error('Export error:', error);
+  }
+};
+
+const handleModalSuccess = () => {
+  modalVisible.value = false;
+  loadData();
+};
+
+// Initialize
+onMounted(() => {
+  loadData();
+});
+</script>
+
+<style scoped lang="less">
+.{{MODULE_NAME}}-list {
+  .search-card {
+    :deep(.ant-card-body) {
+      padding-bottom: 0;
+    }
+  }
+}
+</style>

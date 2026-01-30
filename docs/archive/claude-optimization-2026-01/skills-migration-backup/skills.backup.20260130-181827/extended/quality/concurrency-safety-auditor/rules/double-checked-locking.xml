@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MessageCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="messagecollection.xsd">
+
+  <!--
+    SpotBugs Custom Detector: Double-Checked Locking Pattern
+    Detects broken double-checked locking (missing volatile keyword)
+
+    Valid only for Java 5+: requires volatile keyword on shared field
+  -->
+
+  <Detector class="net.lab1024.sa.spotbugs.DoubleCheckedLockingDetector">
+    <Details>
+      <![CDATA[
+        <p>Detects double-checked locking pattern that is broken due to missing
+        volatile keyword on the shared field.</p>
+
+        <p>Double-checked locking was broken in Java 1.4 and earlier. In Java 5+,
+        it requires the shared field to be declared as volatile to work correctly.</p>
+      ]]>
+    </Details>
+  </Detector>
+
+  <BugPattern type="DCL_MISSING_VOLATILE">
+    <ShortDescription>Double-checked locking without volatile</ShortDescription>
+    <LongDescription>
+      {0} uses double-checked locking pattern but field {1} is not declared volatile.
+      This can lead to partially constructed objects being published.
+    </LongDescription>
+    <Details>
+      <![CDATA[
+        <h3>Problem</h3>
+        <p>The double-checked locking pattern relies on the Java Memory Model's happens-before
+        guarantees. Without the volatile keyword, another thread may see a partially constructed
+        object due to instruction reordering.</p>
+
+        <h3>Example</h3>
+        <pre><code>
+// Bad: Missing volatile
+private static Singleton instance;  // ❌ Not volatile
+
+public static Singleton getInstance() {
+    if (instance == null) {  // First check (no lock)
+        synchronized (Singleton.class) {
+            if (instance == null) {  // Second check (with lock)
+                instance = new Singleton();  // ❌ Can publish partial object
+            }
+        }
+    }
+    return instance;
+}
+
+// Good: With volatile
+private static volatile Singleton instance;  // ✅ Volatile
+
+public static Singleton getInstance() {
+    if (instance == null) {
+        synchronized (Singleton.class) {
+            if (instance == null) {
+                instance = new Singleton();  // ✅ Safe publication
+            }
+        }
+    }
+    return instance;
+}
+
+// Better: Use initialization-on-demand holder idiom
+private static class Holder {
+    static final Singleton INSTANCE = new Singleton();
+}
+public static Singleton getInstance() {
+    return Holder.INSTANCE;  // Thread-safe lazy initialization
+}
+        </code></pre>
+
+        <h3>Solutions</h3>
+        <ol>
+          <li>Add volatile keyword to the shared field</li>
+          <li>Use initialization-on-demand holder idiom (preferred)</li>
+          <li>Use eager initialization if lazy loading is not required</li>
+          <li>Use enum singleton pattern (simplest and safest)</li>
+        </ol>
+
+        <h3>Why volatile is Required</h3>
+        <p>Without volatile, the JVM may reorder the instructions:</p>
+        <ol>
+          <li>Allocate memory for Singleton</li>
+          <li>Assign instance = memory address (before constructor completes!)</li>
+          <li>Call constructor to initialize fields</li>
+        </ol>
+        <p>Another thread may see instance != null but with uninitialized fields.</p>
+
+        <h3>References</h3>
+        <ul>
+          <li><a href="https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html">The "Double-Checked Locking is Broken" Declaration</a></li>
+          <li><a href="https://jcip.net/">Java Concurrency in Practice (Section 16.2.4)</a></li>
+        </ul>
+      ]]>
+    </Details>
+  </BugPattern>
+
+  <BugCode abbrev="DCL">Double-Checked Locking</BugCode>
+
+</MessageCollection>

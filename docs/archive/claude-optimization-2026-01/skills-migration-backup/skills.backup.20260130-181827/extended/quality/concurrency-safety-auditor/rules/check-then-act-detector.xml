@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MessageCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="messagecollection.xsd">
+
+  <!--
+    SpotBugs Custom Detector: Check-Then-Act Pattern
+    Detects non-atomic check-then-act operations in concurrent code
+
+    Examples:
+    - map.containsKey(key) then map.put(key, value)
+    - if (field == null) then field = new Object()
+    - if (!list.contains(item)) then list.add(item)
+  -->
+
+  <Detector class="net.lab1024.sa.spotbugs.ConcurrencyPatternDetector">
+    <Details>
+      <![CDATA[
+        <p>Detects check-then-act anti-patterns where separate check and action
+        operations should be combined into a single atomic operation.</p>
+
+        <p>This detector identifies code patterns like:</p>
+        <ul>
+          <li>containsKey() followed by put() - use putIfAbsent()</li>
+          <li>null check followed by assignment - use synchronized or volatile</li>
+          <li>contains() followed by add() - use concurrent collections</li>
+        </ul>
+      ]]>
+    </Details>
+  </Detector>
+
+  <BugPattern type="CPA_CHECK_THEN_ACT">
+    <ShortDescription>Check-then-act operation is not atomic</ShortDescription>
+    <LongDescription>
+      {0} performs a check-then-act operation that is not atomic. This can lead to race conditions
+      in multi-threaded environments.
+    </LongDescription>
+    <Details>
+      <![CDATA[
+        <h3>Problem</h3>
+        <p>The code performs a check operation (e.g., containsKey()) followed by an action
+        (e.g., put()) without proper synchronization. Between the check and the action, another
+        thread may modify the shared state, leading to race conditions.</p>
+
+        <h3>Example</h3>
+        <pre><code>
+// Bad: Non-atomic check-then-act
+if (map.containsKey(key)) {  // Thread A checks
+    // Thread B may insert key here
+    map.put(key, value);     // Thread A overwrites
+}
+
+// Good: Atomic operation
+map.putIfAbsent(key, value);  // Atomic CAS operation
+        </code></pre>
+
+        <h3>Solutions</h3>
+        <ol>
+          <li>Use atomic methods: putIfAbsent(), computeIfAbsent(), etc.</li>
+          <li>Use ConcurrentHashMap instead of synchronized HashMap</li>
+          <li>Synchronize the entire check-then-act block</li>
+        </ol>
+
+        <h3>References</h3>
+        <ul>
+          <li><a href="https://jcip.net/">Java Concurrency in Practice</a></li>
+          <li><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html">ConcurrentHashMap Documentation</a></li>
+        </ul>
+      ]]>
+    </Details>
+  </BugPattern>
+
+  <BugCode abbrev="CPA">Check-Then-Act Concurrency Anti-Pattern</BugCode>
+
+</MessageCollection>

@@ -1,0 +1,163 @@
+# ====================================================================
+# SmartAdmin Integration Test Generator - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Full-stack
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "smartadmin-integration-test"
+  version: "1.0.0"
+  priority: "P0"
+  type: "atomic"
+  category: "full-stack"
+  description: "Auto-generate Spring Boot integration tests with Testcontainers for SmartAdmin's layered architecture"
+  ai_description: |
+    Generates Spring Boot integration tests with Testcontainers for SmartAdmin's
+    strict layered architecture (Controller → Service → Manager → Dao).
+
+    Core test patterns:
+    - Service Layer Tests: Test business logic with real database and dependencies
+    - Manager Layer Tests: Test @Transactional behavior and cache operations
+    - Controller Layer Tests: Test full request/response cycles with MockMvc
+
+    All tests extend BaseIntegrationTest which provides:
+    - Testcontainers setup (PostgreSQL, Redis)
+    - @SpringBootTest configuration
+    - Common test utilities and assertions
+    - Transaction management (@Transactional for rollback)
+
+    Generates test fixtures (builders for test data) to avoid duplicate setup code,
+    and validates ResponseDTO patterns, database state changes, cache behavior,
+    and cross-layer integration correctness.
+
+  tags:
+    - "integration-testing"
+    - "testcontainers"
+    - "spring-boot-test"
+    - "testing"
+    - "database-testing"
+    - "redis-testing"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "create integration tests"
+    - "generate integration test"
+    - "test database operations"
+    - "test transactions"
+    - "test Redis cache"
+    - "Testcontainers setup"
+    - "integration test for"
+    - "test with real database"
+
+  patterns:
+    - "create\\s+integration\\s+test\\s+for\\s+(\\w+)"
+    - "generate\\s+integration\\s+test\\s+for\\s+(\\w+)Service"
+    - "test\\s+(\\w+)\\s+with\\s+database"
+
+  exclude_keywords:
+    - "delete integration test"
+    - "remove test"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 15
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "integration-tests"
+
+dependencies:
+  skills:
+    - "test-fixture-generator"  # For test data builders
+
+  required_files:
+    - ".agent/rules/foundation/10-architecture-rules.md"
+    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+    - name: "docker"
+      version: ">=20.0"
+      required: true
+      description: "Required for Testcontainers"
+
+output:
+  generates:
+    - "*IntegrationTest.java"
+    - "*TestFixture.java"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java"
+
+  templates:
+    service_test: "assets/ServiceIntegrationTest.java.template"
+    manager_test: "assets/ManagerIntegrationTest.java.template"
+    controller_test: "assets/ControllerIntegrationTest.java.template"
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "docker_available"
+      rule: "Docker must be running for Testcontainers"
+      command: "docker info"
+
+    - check: "base_test_exists"
+      rule: "BaseIntegrationTest.java must exist"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify test code compiles successfully"
+      command: "./gradlew :sa-admin:compileTestJava"
+
+    - check: "integration-tests"
+      description: "Run generated integration tests"
+      command: "./gradlew :sa-admin:test --tests *IntegrationTest"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: "references"
+
+  external_links:
+    - title: "SmartAdmin Testing Strategy"
+      url: "../../../docs/testing/testing-strategy.md"
+
+    - title: "Testcontainers Documentation"
+      url: "https://testcontainers.com/"
+
+    - title: "Spring Boot Testing Guide"
+      url: "https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "test_coverage"

@@ -1,0 +1,260 @@
+# iGame包網平台核心概念詞典
+
+## 金融概念
+financial_concepts:
+  GGR:
+    full_name: Gross Gaming Revenue
+    zh_name: 總博弈收入
+    definition: 玩家總下注額減去總贏款額
+    formula: GGR = 總下注 - 總贏款
+
+  NGR:
+    full_name: Net Gaming Revenue
+    zh_name: 淨博弈收入
+    definition: GGR扣除優惠成本後的淨收入
+    formula: NGR = GGR - Bonus
+
+  double_entry_ledger:
+    zh_name: 雙式記賬
+    definition: 每筆交易必須同時記錄借方和貸方，確保帳務平衡
+    principle: 有借必有貸，借貸必相等
+    benefit: 數學級別的資金安全保證
+    reference: docs/iGame/technical-specs/P0-critical/01-double-entry-ledger-schema.md
+
+  seamless_wallet:
+    zh_name: 無縫錢包
+    definition: API驅動的錢包系統，玩家無需手動轉帳即可遊戲
+    vs_transfer_wallet: 轉帳錢包需要玩家在不同遊戲間手動劃轉資金
+    benefit: 零摩擦用戶體驗，提升轉化率
+    reference: docs/iGame/technical-specs/P0-critical/03-seamless-wallet-implementation.md
+
+  idempotency:
+    zh_name: 冪等性
+    definition: 同一請求多次執行的結果與執行一次相同
+    use_case: 防止網路重試導致重複扣款
+    implementation: Redis冪等性鍵 + TransactionID
+    reference: docs/iGame/technical-specs/P0-critical/02-idempotency-architecture.md
+
+## 風控概念
+risk_control_concepts:
+  arbitrage:
+    zh_name: 套利
+    definition: 利用賠率差異或系統漏洞獲取無風險利潤
+    types:
+      - latency_arbitrage: 延遲套利（利用數據延遲下注）
+      - cross_platform: 跨平台對沖（打水）
+    detection: 行為分析、速度檢測、金額模式識別
+
+  device_fingerprint:
+    zh_name: 設備指紋
+    definition: 基於瀏覽器/設備特徵生成的唯一標識
+    use_case: 識別多帳號關聯、防止刷單
+    technology: Canvas Fingerprinting, WebGL, 瀏覽器特徵
+
+  behavioral_analysis:
+    zh_name: 行為分析
+    definition: 通過玩家下注模式識別異常行為
+    patterns:
+      - 非整數金額下注（如103.52元）
+      - 極短時間內多筆大額下注
+      - 總是在賠率變動前下注
+    reference: docs/iGame/technical-specs/P1-important/06-real-time-risk-engine.md
+
+  aml:
+    full_name: Anti-Money Laundering
+    zh_name: 反洗錢
+    definition: 防止利用平台進行非法資金清洗
+    red_flags:
+      - 存入後立即提款（無遊戲行為）
+      - 大額充值後小額投注
+      - 跨帳號資金轉移
+    reference: docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md
+
+## 技術架構概念
+technical_concepts:
+  oltp:
+    full_name: Online Transaction Processing
+    zh_name: 線上交易處理
+    use_case: 錢包餘額、訂單狀態、即時數據
+    database: PostgreSQL 16
+    characteristics: ACID特性、強一致性、高寫入壓力
+
+  olap:
+    full_name: Online Analytical Processing
+    zh_name: 線上分析處理
+    use_case: 報表查詢、歷史數據分析、經營報表
+    database: ClickHouse / Apache Doris
+    characteristics: 列式存儲、適合聚合查詢、可接受秒級延遲
+    reference: docs/iGame/technical-specs/P1-important/13-reporting-analytics.md
+
+  hd_wallet:
+    full_name: Hierarchical Deterministic Wallet
+    zh_name: 分層確定性錢包
+    definition: 從一個主密鑰派生出無限子密鑰的錢包系統
+    standard: BIP32, BIP44
+    benefit: 伺服器端無需存儲私鑰，安全隔離
+    reference: docs/iGame/technical-specs/P1-important/08-crypto-payment-gateway.md
+
+  cold_hot_wallet:
+    zh_name: 冷熱錢包隔離
+    definition: 將資金分為離線冷錢包（90%）和在線熱錢包（10%）
+    cold_wallet: 離線存儲，多重簽名，大額提款需人工授權
+    hot_wallet: 在線存儲，自動化小額提款，快速響應
+    benefit: 安全與便利性平衡
+
+  saga_pattern:
+    zh_name: Saga模式
+    definition: 分佈式事務的補償機制
+    use_case: 提款流程（風控→扣款→支付網關）
+    compensation: 當某步驟失敗時，自動執行反向補償操作
+    reference: docs/iGame/technical-specs/P1-important/05-distributed-transaction-patterns.md
+
+## 合規概念
+compliance_concepts:
+  kyc:
+    full_name: Know Your Customer
+    zh_name: 客戶身份驗證
+    levels:
+      level_0: 無驗證（僅基本註冊）
+      level_1: 手機號驗證
+      level_2: 身份證件上傳
+      level_3: 視訊認證 + 地址證明
+    progressive: 漸進式KYC（根據交易額自動升級要求）
+    reference: docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md
+
+  gdpr:
+    full_name: General Data Protection Regulation
+    zh_name: 歐盟通用資料保護規範
+    requirements:
+      - 數據最小化原則
+      - 用戶同意機制
+      - 被遺忘權（數據刪除）
+      - 數據可攜權
+    implementation: PII與交易數據分離、加密存儲
+
+  pii:
+    full_name: Personally Identifiable Information
+    zh_name: 個人敏感資訊
+    examples:
+      - 姓名、身份證號
+      - 手機號、Email
+      - 銀行卡號、地址
+    protection: 加密存儲、訪問控制、審計日誌
+
+## 業務功能概念
+business_concepts:
+  vip_system:
+    zh_name: VIP系統
+    levels: 5級（銅牌/銀牌/金牌/白金/鑽石）
+    calculation_basis:
+      - 累計存款額
+      - 累計投注額
+      - 活躍天數
+    benefits:
+      - 返水率提升
+      - 專屬客服
+      - 提款優先處理
+      - 生日禮金
+    grace_period: 降級寬限期（30-180天）
+    reference: docs/iGame/technical-specs/P1-important/11-vip-system-design.md
+
+  bonus_engine:
+    zh_name: 優惠引擎
+    types:
+      - 首存優惠（First Deposit Bonus）
+      - 返水優惠（Rebate）
+      - 救援金（Rescue Bonus）
+      - 推薦獎勵（Referral Bonus）
+      - VIP專屬優惠
+    wagering_requirement: 流水要求（需投注X倍才能提款）
+    game_weighting: 不同遊戲計入流水的權重不同
+    reference: docs/iGame/technical-specs/P1-important/12-bonus-engine.md
+
+  game_aggregator:
+    zh_name: 遊戲聚合器
+    definition: 統一對接多家遊戲供應商的中間層
+    providers:
+      - Evolution Gaming（真人）
+      - Pragmatic Play（老虎機）
+      - PG Soft（老虎機）
+      - NetEnt（老虎機）
+      - Microgaming（綜合）
+    adapter_pattern: 適配器模式統一異構API
+    reference: docs/iGame/technical-specs/P1-important/09-game-aggregator-sdk.md
+
+  multi_tenant:
+    zh_name: 多租戶
+    definition: 一套系統支撐多個獨立商戶品牌
+    isolation_levels:
+      - 數據隔離: tenant_id行級隔離
+      - 資源隔離: 獨立執行器組
+      - 配置隔離: 不同Logo/配色/規則
+    benefit: 零邊際成本複製商戶
+    reference: docs/iGame/technical-specs/P1-important/07-multi-tenant-isolation.md
+
+## SmartAdmin架構概念
+smartadmin_concepts:
+  layered_architecture:
+    zh_name: 分層架構
+    layers:
+      controller: API接口、參數驗證、權限控制
+      service: 業務邏輯協調、跨Manager調用
+      manager: 數據庫事務、緩存管理（唯一可用@Transactional）
+      dao: 數據庫訪問（MyBatis-Plus）
+    rules:
+      - Controller只能調用Service
+      - Service可調用Manager或Dao
+      - Manager只能調用Dao（不能調用其他Manager）
+      - "@Transactional僅在Manager層"
+    enforcement: ArchitectureTest.java強制驗證
+
+  foundation_modules:
+    zh_name: Foundation模組
+    location: sa-base/foundation/
+    modules:
+      cache: Redis緩存、本地緩存
+      mq: Kafka消息隊列
+      redis_lock: 分佈式鎖
+      repeat_submit: 防重複提交
+      captcha: 驗證碼
+      api_encrypt: API加密
+      data_masking: 數據脫敏
+      security_protect: 安全防護
+    naming: net.lab1024.sa.foundation.*
+
+  response_dto:
+    zh_name: 統一響應格式
+    usage: ResponseDTO.ok(data) / ResponseDTO.error()
+    structure:
+      code: 響應碼
+      message: 響應消息
+      data: 響應數據
+      ok: 是否成功
+    reference: .claude/shared/knowledge/smartadmin-patterns.md
+
+## 性能指標概念
+performance_metrics:
+  tps:
+    full_name: Transactions Per Second
+    zh_name: 每秒事務數
+    definition: 系統每秒可處理的數據庫寫入事務數量
+    igame_target: 10,000 TPS（持續）
+
+  qps:
+    full_name: Queries Per Second
+    zh_name: 每秒查詢數
+    definition: 系統每秒可處理的HTTP請求數量
+    igame_target: 50,000 QPS（峰值）
+
+  p95_latency:
+    zh_name: P95延遲
+    definition: 95%的請求在X毫秒內完成
+    wallet_api_target: "<200ms"
+    game_launch_target: "<2s"
+    risk_engine_target: "<100ms"
+
+  cache_hit_rate:
+    zh_name: 緩存命中率
+    definition: 從緩存而非數據庫獲取數據的比例
+    target: ">90%"
+    benefit: 減輕數據庫壓力、提升響應速度

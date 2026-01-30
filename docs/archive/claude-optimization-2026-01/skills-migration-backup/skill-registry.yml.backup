@@ -18,7 +18,7 @@ deprecated_skills: 3
 skills:
   # Backend Skills
   archunit-test-generator:
-    path: "backend/archunit-test-generator"
+    path: "foundation/backend/archunit-test-generator"
     priority: "P0"
     type: "atomic"
     category: "backend"
@@ -31,7 +31,7 @@ skills:
     depended_by: []
 
   security-hardening-pro:
-    path: "backend/security-hardening-pro"
+    path: "foundation/backend/security-hardening-pro"
     priority: "P0"
     type: "atomic"
     category: "backend"
@@ -44,7 +44,7 @@ skills:
     depended_by: []
 
   vavr-refactoring-assistant:
-    path: "backend/vavr-refactoring-assistant"
+    path: "foundation/backend/vavr-refactoring-assistant"
     priority: "P0"
     type: "atomic"
     category: "refactoring"
@@ -57,7 +57,7 @@ skills:
     depended_by: []
 
   smartadmin-manager-extractor:
-    path: "refactoring/smartadmin-manager-extractor"
+    path: "productivity/refactoring/smartadmin-manager-extractor"
     priority: "P2"
     type: "atomic"
     category: "refactoring"
@@ -71,7 +71,7 @@ skills:
 
   # Full-stack Skills
   smartadmin-crud-generator:
-    path: "full-stack/smartadmin-crud-generator"
+    path: "foundation/full-stack/smartadmin-crud-generator"
     priority: "P0"
     type: "composite"
     category: "full-stack"
@@ -89,7 +89,7 @@ skills:
     depended_by: ["batch-plan-executor", "igame-feature-builder"]
 
   smartadmin-integration-test:
-    path: "full-stack/smartadmin-integration-test"
+    path: "foundation/full-stack/smartadmin-integration-test"
     priority: "P0"
     type: "atomic"
     category: "full-stack"
@@ -103,7 +103,7 @@ skills:
 
   # Testing Skills
   test-fixture-generator:
-    path: "testing/test-fixture-generator"
+    path: "foundation/testing/test-fixture-generator"
     priority: "P0"
     type: "atomic"
     category: "testing"
@@ -121,7 +121,7 @@ skills:
 
   # Business Logic Skills
   liteflow-rule-builder:
-    path: "domain/liteflow-rule-builder"
+    path: "extended/domain/liteflow-rule-builder"
     priority: "P1"
     type: "atomic"
     category: "domain"
@@ -135,7 +135,7 @@ skills:
 
   # Domain Skills
   fraud-detection-pattern-generator:
-    path: "domain/fraud-detection-pattern-generator"
+    path: "extended/domain/fraud-detection-pattern-generator"
     priority: "P1"
     type: "atomic"
     category: "domain"
@@ -148,7 +148,7 @@ skills:
     depended_by: []
 
   igame-feature-builder:
-    path: "domain/igame-feature-builder"
+    path: "extended/domain/igame-feature-builder"
     priority: "P1"
     type: "atomic"
     category: "domain"
@@ -161,7 +161,7 @@ skills:
     depended_by: []
 
   igame-pm-analyst:
-    path: "domain/igame-pm-analyst"
+    path: "extended/domain/igame-pm-analyst"
     priority: "P1"
     type: "atomic"
     category: "domain"
@@ -174,7 +174,7 @@ skills:
     depended_by: []
 
   igaming-multi-tenant-wallet-pm:
-    path: "domain/igaming-multi-tenant-wallet-pm"
+    path: "extended/domain/igaming-multi-tenant-wallet-pm"
     priority: "P1"
     type: "atomic"
     category: "domain"
@@ -193,7 +193,7 @@ skills:
 
   # Orchestration Skills
   batch-plan-executor:
-    path: "orchestration/batch-plan-executor"
+    path: "extended/orchestration/batch-plan-executor"
     priority: "P1"
     type: "orchestrator"
     category: "orchestration"
@@ -211,7 +211,7 @@ skills:
 
   # Quality Skills
   concurrency-safety-auditor:
-    path: "quality/concurrency-safety-auditor"
+    path: "extended/quality/concurrency-safety-auditor"
     priority: "P1"
     type: "atomic"
     category: "quality"
@@ -224,7 +224,7 @@ skills:
     depended_by: []
 
   quality-gate-orchestrator:
-    path: "orchestration/quality-gate-orchestrator"
+    path: "extended/orchestration/quality-gate-orchestrator"
     priority: "P1"
     type: "orchestrator"
     category: "orchestration"
@@ -242,7 +242,7 @@ skills:
 
   # Infrastructure Skills
   apm-integration-skill:
-    path: "devops/apm-integration-skill"
+    path: "productivity/devops/apm-integration-skill"
     priority: "P2"
     type: "atomic"
     category: "devops"
@@ -255,7 +255,7 @@ skills:
     depended_by: ["smartadmin-performance-suite"]
 
   cache-strategy-generator:
-    path: "integration/cache-strategy-generator"
+    path: "productivity/integration/cache-strategy-generator"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -268,7 +268,7 @@ skills:
     depended_by: ["smartadmin-performance-suite"]
 
   cicd-pipeline-builder:
-    path: "devops/cicd-pipeline-builder"
+    path: "productivity/devops/cicd-pipeline-builder"
     priority: "P2"
     type: "atomic"
     category: "devops"
@@ -281,7 +281,7 @@ skills:
     depended_by: []
 
   db-migration-manager:
-    path: "devops/db-migration-manager"
+    path: "productivity/devops/db-migration-manager"
     priority: "P2"
     type: "atomic"
     category: "devops"
@@ -294,7 +294,7 @@ skills:
     depended_by: []
 
   full-text-search-integration:
-    path: "integration/full-text-search-integration"
+    path: "productivity/integration/full-text-search-integration"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -307,7 +307,7 @@ skills:
     depended_by: []
 
   i18n-generator:
-    path: "integration/i18n-generator"
+    path: "productivity/integration/i18n-generator"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -320,7 +320,7 @@ skills:
     depended_by: []
 
   message-queue-pattern-generator:
-    path: "integration/message-queue-pattern-generator"
+    path: "productivity/integration/message-queue-pattern-generator"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -333,7 +333,7 @@ skills:
     depended_by: []
 
   report-generator-skill:
-    path: "integration/report-generator-skill"
+    path: "productivity/integration/report-generator-skill"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -346,7 +346,7 @@ skills:
     depended_by: []
 
   postgresql-best-practices:
-    path: "integration/postgresql-best-practices"
+    path: "productivity/integration/postgresql-best-practices"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -359,7 +359,7 @@ skills:
     depended_by: []
 
   scheduled-task-manager:
-    path: "devops/scheduled-task-manager"
+    path: "productivity/devops/scheduled-task-manager"
     priority: "P2"
     type: "atomic"
     category: "devops"
@@ -372,7 +372,7 @@ skills:
     depended_by: []
 
   websocket-sse-realtime-generator:
-    path: "devops/websocket-sse-realtime-generator"
+    path: "productivity/devops/websocket-sse-realtime-generator"
     priority: "P2"
     type: "atomic"
     category: "devops"
@@ -386,7 +386,7 @@ skills:
 
   # Composite Skills
   smartadmin-performance-suite:
-    path: "composite/smartadmin-performance-suite"
+    path: "productivity/composite/smartadmin-performance-suite"
     priority: "P2"
     type: "composite"
     category: "composite"
@@ -406,7 +406,7 @@ skills:
     depended_by: ["batch-plan-executor"]
 
   smartadmin-testing-suite:
-    path: "composite/smartadmin-testing-suite"
+    path: "productivity/composite/smartadmin-testing-suite"
     priority: "P2"
     type: "composite"
     category: "composite"
@@ -427,7 +427,7 @@ skills:
 
   # Analysis Skills
   java-performance-pro:
-    path: "analysis/java-performance-pro"
+    path: "productivity/analysis/java-performance-pro"
     priority: "P2"
     type: "atomic"
     category: "analysis"
@@ -444,7 +444,7 @@ skills:
 # ====================================================================
 
   smartadmin-mybatis:
-    path: "_deprecated/smartadmin-mybatis"
+    path: "lifecycle/deprecated/smartadmin-mybatis"
     priority: null
     type: "atomic"
     category: "backend"
@@ -460,7 +460,7 @@ skills:
     depended_by: []
 
   smartadmin-vue-crud:
-    path: "_deprecated/smartadmin-vue-crud"
+    path: "lifecycle/deprecated/smartadmin-vue-crud"
     priority: null
     type: "atomic"
     category: "frontend"
@@ -476,7 +476,7 @@ skills:
     depended_by: []
 
   smartadmin-api-docs:
-    path: "_deprecated/smartadmin-api-docs"
+    path: "lifecycle/deprecated/smartadmin-api-docs"
     priority: null
     type: "atomic"
     category: "backend"

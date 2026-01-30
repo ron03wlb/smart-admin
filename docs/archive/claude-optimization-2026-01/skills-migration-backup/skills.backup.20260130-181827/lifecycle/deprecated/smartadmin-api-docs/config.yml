@@ -1,0 +1,55 @@
+# ====================================================================
+# SmartAdmin API Docs Generator - Skill Configuration (DEPRECATED)
+# ====================================================================
+# Version: 1.0.0
+# Priority: null (Deprecated)
+# Category: Full-stack
+# Type: Atomic
+# Status: soft-deprecated
+# ====================================================================
+
+metadata:
+  name: "smartadmin-api-docs"
+  version: "1.0.0"
+  priority: null
+  type: "atomic"
+  category: "full-stack"
+  description: "[DEPRECATED] Auto-generate and maintain Knife4j/OpenAPI API documentation for SmartAdmin"
+  ai_description: |
+    ⚠️ DEPRECATED: This skill has been consolidated into smartadmin-crud-generator Phase 3.
+
+    Use instead: smartadmin-crud-generator --api-docs-only
+
+    This skill generated Swagger/Knife4j API documentation annotations.
+    It has been superseded by the composite smartadmin-crud-generator skill which provides
+    unified backend + frontend + API docs + tests generation.
+
+  tags: ["deprecated", "api-docs", "swagger", "knife4j"]
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-27"
+  status: "soft-deprecated"
+
+triggers:
+  keywords: []  # No longer auto-triggered
+  patterns: []
+  exclude_keywords: []
+
+execution:
+  type: "single-shot"
+  timeout: { per_phase_minutes: 15, total_minutes: 15 }
+  quality_gates: { run_after_execution: false }
+
+dependencies: { skills: [], required_files: [], tools: [] }
+output: { generates: ["*.java"], target_directories: [], templates: {} }
+validation: { pre_execution: [], post_execution: [] }
+
+compatibility:
+  deprecated: true
+  deprecation_phase: "soft-deprecated"
+  deprecated_since: "2026-01-27"
+  removal_date: "2026-06-30"
+  replacement_skill: "foundation/full-stack/smartadmin-crud-generator"
+  migration_guide_url: "../../../docs/archive/migration/skill-consolidation.md"
+
+documentation: { skill_md: "SKILL.md", readme: null }
+monitoring: { track_usage: false, log_executions: false, metrics: [] }
