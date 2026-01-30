@@ -178,7 +178,21 @@
       "Bash(for skill in apm-integration-skill cicd-pipeline-builder db-migration-manager scheduled-task-manager websocket-sse-realtime-generator)",
       "Bash(do echo \"Moving $skill to devops/...\")",
       "Bash(for skill in cache-strategy-generator full-text-search-integration i18n-generator message-queue-pattern-generator report-generator-skill)",
-      "Bash(do echo \"Moving $skill to integration/...\")"
+      "Bash(do echo \"Moving $skill to integration/...\")",
+      "Bash(files=\"01_token_verification.md 02_idempotency_design.md 07_turnover_concurrency.md 99_SUMMARY.md 00_INDEX.md\")",
+      "Bash(for f in $files)",
+      "Bash(do if [ -f \"docs/IGaming/02_Finance_Center/seamless-wallet/$f\" ])",
+      "Bash(then echo \"✅ $f\")",
+      "Bash(else echo \"❌ $f \\(不存在\\)\")",
+      "Bash(for dir in skills/foundation/backend/*)",
+      "Bash([ -d \"$dir\" ])",
+      "Bash(for dir in skills/productivity/devops/* skills/productivity/integration/*)",
+      "Bash([ ! -f \"$dir/README.md\" ])",
+      "Bash(/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/verify-claude-optimization.sh)",
+      "WebSearch",
+      "Bash(./update-priority-tags.sh:*)",
+      "Bash(cd /Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.claude/skills echo \"=== 最終驗證 ===\" echo echo \"1. 目錄結構檢查：\" ls -d backend full-stack testing domain orchestration quality devops integration composite analysis refactoring _deprecated)",
+      "Bash(git -C /Users/zhangxuanrong/Documents/Workspace/Java/smart-admin status --short .claude/)"
     ]
   },
   "allowedCommands": {
