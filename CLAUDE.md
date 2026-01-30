@@ -187,7 +187,7 @@ Controller → Service → Manager → Dao → Entity
 
 ## Specialized Skills
 
-**Quick Overview**: 32 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
+**Quick Overview**: 33 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
 
 **Skills Organization (v4.0.0)**:
 ```
@@ -196,10 +196,10 @@ Controller → Service → Manager → Dao → Entity
 │   ├── backend/     (3 skills: ArchUnit, Security, Vavr)
 │   ├── full-stack/  (2 skills: CRUD, Integration Test)
 │   └── testing/     (1 skill: Test Fixture)
-├── extended/        (P1 - 8 skills: Domain, Orchestration, Quality)
+├── extended/        (P1 - 9 skills: Domain, Orchestration, Quality)
 │   ├── domain/      (5 skills: iGaming + LiteFlow)
 │   ├── orchestration/ (2 skills: batch-plan, quality-gate)
-│   └── quality/     (1 skill: concurrency-safety-auditor) ⭐ NEW
+│   └── quality/     (2 skills: concurrency, spring-pattern-checker) ⭐
 ├── productivity/    (P2 - 16 skills: DevOps, Integration, Composite, Analysis, Refactoring)
 │   ├── devops/      (5 skills: APM, CI/CD, DB migration, scheduling, WebSocket)
 │   ├── integration/ (6 skills: Cache, Search, i18n, MQ, Reports, PostgreSQL) ⭐ +1
@@ -220,7 +220,7 @@ Controller → Service → Manager → Dao → Entity
 - **Testing** (1 skill):
   - **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders for complex domain objects
 
-**P1 Skills (Extended)** - 8 skills:
+**P1 Skills (Extended)** - 9 skills:
 - Domain (5 skills):
   - **[fraud-detection-pattern-generator](.claude/skills/extended/domain/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
   - **[igame-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming domain features (VIP system, Wallet API, Bonus engine)
@@ -230,8 +230,9 @@ Controller → Service → Manager → Dao → Entity
 - Orchestration (2 skills):
   - **[batch-plan-executor](.claude/skills/extended/orchestration/batch-plan-executor/)** - Batch plan execution orchestrator with conflict detection
   - **[quality-gate-orchestrator](.claude/skills/extended/orchestration/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
-- Quality (1 skill): ⭐ NEW
+- Quality (2 skills):
   - **[concurrency-safety-auditor](.claude/skills/extended/quality/concurrency-safety-auditor/)** - Concurrency safety audit with ⭐⭐⭐⭐⭐ risk rating, SpotBugs custom detectors, check-then-act pattern detection
+  - **[spring-pattern-checker](.claude/skills/extended/quality/spring-pattern-checker/)** - Validate Spring patterns: @Transactional placement, dependency injection, layered architecture compliance
 
 **P2 Skills (Productivity)** - 16 skills:
 - DevOps (5): APM integration, CI/CD pipeline, DB migration, scheduled tasks, WebSocket/SSE

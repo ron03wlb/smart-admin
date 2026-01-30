@@ -1,0 +1,242 @@
+# ====================================================================
+# Keyword Conflict Resolution Matrix
+# ====================================================================
+# Purpose: Define priority-based routing rules for conflicting keywords
+# Version: 1.0.0
+# Last Updated: 2026-01-30
+# ====================================================================
+
+schema_version: "1.0.0"
+
+# ====================================================================
+# Conflict Groups
+# ====================================================================
+conflict_groups:
+
+  # Group 1: Performance Keywords
+  performance_group:
+    keywords: ["performance", "perf", "optimize", "optimization"]
+    description: "Performance analysis and optimization skills"
+
+    skills:
+      - skill: "smartadmin-performance-suite"
+        priority: 1
+        trigger_patterns:
+          - "performance optimization"
+          - "optimize performance"
+          - "全面性能分析"
+          - "性能診斷"
+        scope: "Comprehensive (12 tools: JVM, SQL, Redis, API, etc.)"
+        recommended_when: "Need full system performance analysis"
+
+      - skill: "postgresql-best-practices"
+        priority: 2
+        trigger_patterns:
+          - "database performance"
+          - "postgres performance"
+          - "PostgreSQL optimization"
+          - "HikariCP tuning"
+          - "N+1 query"
+        scope: "Database-focused (PostgreSQL, HikariCP, SQL)"
+        recommended_when: "Specific database performance issues"
+
+      - skill: "java-performance-pro"
+        priority: 3
+        trigger_patterns:
+          - "JVM optimization"
+          - "CPU hotspot"
+          - "memory leak"
+          - "GC tuning"
+        scope: "JVM-focused (soft-deprecated, use performance-suite instead)"
+        recommended_when: "Legacy JVM-specific analysis (prefer performance-suite)"
+
+    resolution_rule: |
+      Priority routing:
+      1. If mentions "database" OR "postgres" OR "SQL" → postgresql-best-practices
+      2. Else if comprehensive analysis needed → smartadmin-performance-suite
+      3. Else (legacy JVM-only) → java-performance-pro (with deprecation warning)
+
+    auto_routing:
+      enabled: true
+      strategy: "pattern_match_first"
+      fallback: "smartadmin-performance-suite"
+
+  # Group 2: Testing Keywords
+  testing_group:
+    keywords: ["test", "testing", "unit test", "integration test"]
+    description: "Testing and quality assurance skills"
+
+    skills:
+      - skill: "smartadmin-testing-suite"
+        priority: 1
+        trigger_patterns:
+          - "complete testing"
+          - "test coverage"
+          - "testing strategy"
+          - "全面測試"
+        scope: "Comprehensive (Unit + Integration + E2E + Performance)"
+        recommended_when: "Need complete testing solution"
+
+      - skill: "smartadmin-integration-test"
+        priority: 2
+        trigger_patterns:
+          - "integration test"
+          - "testcontainers"
+          - "database test"
+          - "整合測試"
+        scope: "Integration testing with Testcontainers"
+        recommended_when: "Specific integration test generation"
+
+      - skill: "test-fixture-generator"
+        priority: 3
+        trigger_patterns:
+          - "test data"
+          - "test fixture"
+          - "test builder"
+          - "測試資料"
+        scope: "Test data builders"
+        recommended_when: "Need test data generation patterns"
+
+      - skill: "archunit-test-generator"
+        priority: 4
+        trigger_patterns:
+          - "architecture test"
+          - "ArchUnit"
+          - "架構測試"
+        scope: "Architecture testing with ArchUnit"
+        recommended_when: "Architecture compliance testing"
+
+    resolution_rule: |
+      Priority routing:
+      1. If mentions "architecture" OR "ArchUnit" → archunit-test-generator
+      2. Else if mentions "integration" OR "testcontainers" → smartadmin-integration-test
+      3. Else if mentions "test data" OR "fixture" → test-fixture-generator
+      4. Else (comprehensive) → smartadmin-testing-suite
+
+    auto_routing:
+      enabled: true
+      strategy: "keyword_specificity"
+      fallback: "smartadmin-testing-suite"
+
+  # Group 3: Refactoring Keywords
+  refactoring_group:
+    keywords: ["refactor", "refactoring", "extract", "migration"]
+    description: "Code refactoring and migration skills"
+
+    skills:
+      - skill: "smartadmin-manager-extractor"
+        priority: 1
+        trigger_patterns:
+          - "extract to Manager"
+          - "Manager layer"
+          - "@Transactional violation"
+          - "transactionalMustUseRollbackForThrowable"
+          - "提取到 Manager"
+        scope: "Extract @Transactional methods to Manager layer"
+        recommended_when: "ArchUnit @Transactional violations"
+
+      - skill: "vavr-refactoring-assistant"
+        priority: 2
+        trigger_patterns:
+          - "vavr"
+          - "Option"
+          - "Try"
+          - "Either"
+          - "refactor to Vavr"
+          - "重構 Vavr"
+        scope: "Service layer Vavr pattern migration"
+        recommended_when: "Optional → Option migration or functional patterns"
+
+    resolution_rule: |
+      Priority routing:
+      1. If mentions "Manager" OR "@Transactional" → smartadmin-manager-extractor
+      2. Else if mentions "Vavr" OR "Option" OR "Try" → vavr-refactoring-assistant
+      3. Else (generic refactoring) → Ask user for clarification
+
+    auto_routing:
+      enabled: true
+      strategy: "exact_match_first"
+      fallback: null  # Require user clarification for generic "refactor"
+
+# ====================================================================
+# Routing Strategies
+# ====================================================================
+routing_strategies:
+  pattern_match_first:
+    description: "Match trigger patterns first, fallback to priority"
+    steps:
+      - "Check if user input matches any skill's trigger_patterns"
+      - "If match found, use that skill"
+      - "Else, use skill with priority: 1"
+
+  keyword_specificity:
+    description: "Route based on keyword specificity (more specific = higher priority)"
+    steps:
+      - "Count specific keywords in user input"
+      - "Rank skills by specificity score"
+      - "Use skill with highest specificity"
+
+  exact_match_first:
+    description: "Require exact keyword match, else fallback"
+    steps:
+      - "Check for exact keyword match in trigger_patterns"
+      - "If no exact match, use fallback (or ask user)"
+
+# ====================================================================
+# Usage Examples
+# ====================================================================
+examples:
+  - user_input: "優化數據庫性能"
+    matched_group: "performance_group"
+    selected_skill: "postgresql-best-practices"
+    reason: "Mentions '數據庫' (database)"
+
+  - user_input: "全面性能分析"
+    matched_group: "performance_group"
+    selected_skill: "smartadmin-performance-suite"
+    reason: "Comprehensive analysis keyword"
+
+  - user_input: "生成整合測試"
+    matched_group: "testing_group"
+    selected_skill: "smartadmin-integration-test"
+    reason: "Mentions '整合測試' (integration test)"
+
+  - user_input: "提取 @Transactional 到 Manager"
+    matched_group: "refactoring_group"
+    selected_skill: "smartadmin-manager-extractor"
+    reason: "Exact match for Manager extraction"
+
+  - user_input: "重構 Service 使用 Vavr Option"
+    matched_group: "refactoring_group"
+    selected_skill: "vavr-refactoring-assistant"
+    reason: "Mentions 'Vavr' and 'Option'"
+
+  - user_input: "生成架構測試"
+    matched_group: "testing_group"
+    selected_skill: "archunit-test-generator"
+    reason: "Mentions '架構測試' (architecture test)"
+
+# ====================================================================
+# Integration with skill-registry.yml
+# ====================================================================
+integration:
+  conflict_resolution:
+    matrix_file: "keyword-resolution-matrix.yml"
+    strategy: "priority_first"
+    enable_logging: true
+    log_path: ".claude/metrics/skill-routing.log"
+
+# ====================================================================
+# Monitoring and Metrics
+# ====================================================================
+monitoring:
+  track_routing_decisions: true
+  metrics:
+    - conflict_group_hits
+    - skill_selection_distribution
+    - fallback_usage_rate
+  report_interval: "weekly"
+
+# ====================================================================
+# END OF CONFIG
+# ====================================================================

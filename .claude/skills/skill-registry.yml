@@ -8,9 +8,21 @@
 
 version: "3.0.0"
 last_updated: "2026-01-30"
-total_skills: 32
-active_skills: 29
+total_skills: 33
+active_skills: 30
 deprecated_skills: 3
+
+# ====================================================================
+# Keyword Conflict Resolution
+# ====================================================================
+conflict_resolution:
+  matrix_file: "keyword-resolution-matrix.yml"
+  strategy: "priority_first"
+  description: |
+    Resolves conflicts when multiple skills share the same keywords:
+    - performance: 3 skills (performance-suite, postgresql, java-performance-pro)
+    - test: 4 skills (testing-suite, integration-test, fixture-generator, archunit)
+    - refactor: 2 skills (manager-extractor, vavr-refactoring-assistant)
 
 # ====================================================================
 # Foundation Skills (P0 - Critical)
@@ -220,6 +232,19 @@ skills:
     aliases: ["concurrency-audit", "thread-safety-check", "race-condition-detection"]
     status: "stable"
     description: "Concurrency safety audit with SpotBugs pattern detection and ⭐⭐⭐⭐⭐ risk rating system (8 patterns: check-then-act, double-checked locking, etc.)"
+    depends_on: []
+    depended_by: []
+
+  spring-pattern-checker:
+    path: "extended/quality/spring-pattern-checker"
+    priority: "P1"
+    type: "atomic"
+    category: "quality"
+    visibility: "public"
+    preferred_via: "agent_only"
+    aliases: ["spring", "spring-validation"]
+    status: "stable"
+    description: "Validate Spring patterns: @Transactional placement, dependency injection, layered architecture compliance"
     depends_on: []
     depended_by: []
 

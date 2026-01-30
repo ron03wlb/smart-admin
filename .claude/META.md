@@ -201,6 +201,33 @@ For questions or issues with the .claude/ configuration:
 
 ---
 
-**Document Version**: 2.1.0
-**Last Updated**: 2026-01-29
+## Skill Version Management
+
+**Central Version Registry**: `.claude/skills/VERSIONS.yml`
+
+**Purpose**: Single source of truth for all 33 skill versions across foundation/extended/productivity/lifecycle categories.
+
+**Usage**:
+```bash
+# Check version synchronization (dry-run)
+.claude/scripts/sync-skill-versions.sh --dry-run
+
+# Sync all config.yml versions with VERSIONS.yml
+.claude/scripts/sync-skill-versions.sh --update
+```
+
+**Version Sync Tool**: `.claude/scripts/sync-skill-versions.sh`
+- Automatically syncs versions between VERSIONS.yml and individual config.yml files
+- Supports dry-run mode for safe checking
+- Color-coded output for easy identification of sync status
+
+**Maintenance**:
+- Update VERSIONS.yml when releasing new skill versions
+- Run sync script after bulk version updates
+- VERSIONS.yml is the canonical source for all version numbers
+
+---
+
+**Document Version**: 2.2.0
+**Last Updated**: 2026-01-30
 **Next Review**: 2026-04-27 (Quarterly)
