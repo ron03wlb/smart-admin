@@ -75,21 +75,6 @@
 3. **Hash Chain**: 每條日誌包含前一條的哈希值，形成不可篡改鏈
 4. **定期驗證**: 每日檢查 Hash Chain 完整性
 
-```python
-# S3 Object Lock 配置
-s3_client.put_object_lock_configuration(
-    Bucket='audit-logs-bucket',
-    ObjectLockConfiguration={
-        'ObjectLockEnabled': 'Enabled',
-        'Rule': {
-            'DefaultRetention': {
-                'Mode': 'GOVERNANCE',  # 或 'COMPLIANCE' (更嚴格)
-                'Years': 7  # 保留 7 年
-            }
-        }
-    }
-)
-```
 
 ---
 
@@ -632,104 +617,11 @@ Response 200 OK (Completed):
 
 #### 3.5.2 實作程式碼
 
-```python
-import hashlib
-import json
-from datetime import datetime
-
-class TamperProofAuditLog:
-    def __init__(self, db_connection):
-        self.db = db_connection
-        self.previous_hash = self._get_latest_hash()
-
-    def _get_latest_hash(self):
-        """Get the hash of the most recent log entry"""
-        result = self.db.query("""
-            SELECT current_hash FROM audit_log_chain
-            ORDER BY sequence_id DESC LIMIT 1
-        """)
-        return result[0]['current_hash'] if result else '0' * 64  # Genesis hash
-
-    def append_log(self, log_entry):
-        """Append a new log entry to the chain"""
-        # Step 1: Serialize log data
-        log_data = json.dumps(log_entry, sort_keys=True)
-
-        # Step 2: Compute current hash (data + previous hash)
-        hash_input = log_data + self.previous_hash
-        current_hash = hashlib.sha256(hash_input.encode()).hexdigest()
-
-        # Step 3: Store in database
-        self.db.execute("""
-            INSERT INTO audit_log_chain
-            (log_data, previous_hash, current_hash, created_at)
-            VALUES (%s, %s, %s, %s)
-        """, (log_data, self.previous_hash, current_hash, datetime.now()))
-
-        # Step 4: Update previous hash for next entry
-        self.previous_hash = current_hash
-
-        return current_hash
-
-    def verify_integrity(self, from_sequence_id=None, to_sequence_id=None):
-        """Verify hash chain integrity"""
-        logs = self.db.query("""
-            SELECT sequence_id, log_data, previous_hash, current_hash
-            FROM audit_log_chain
-            WHERE sequence_id BETWEEN %s AND %s
-            ORDER BY sequence_id ASC
-        """, (from_sequence_id or 1, to_sequence_id or 999999999))
-
-        for i, log in enumerate(logs):
-            # Recompute hash
-            expected_hash = hashlib.sha256(
-                (log['log_data'] + log['previous_hash']).encode()
-            ).hexdigest()
-
-            if expected_hash != log['current_hash']:
-                return {
-                    'integrity': 'BROKEN',
-                    'tampered_log': log['sequence_id'],
-                    'message': f'Hash mismatch at sequence {log["sequence_id"]}'
-                }
-
-            # Check chain linkage
-            if i > 0 and logs[i-1]['current_hash'] != log['previous_hash']:
-                return {
-                    'integrity': 'BROKEN',
-                    'message': f'Chain broken between {logs[i-1]["sequence_id"]} and {log["sequence_id"]}'
-                }
-
-        return {
-            'integrity': 'INTACT',
-            'verified_logs': len(logs),
-            'message': 'All logs verified successfully'
-        }
-```
 
 ---
 
 #### 3.5.3 定期完整性驗證
 
-```python
-# Scheduled task (runs daily at 02:00)
-def daily_integrity_check():
-    verifier = TamperProofAuditLog(db)
-    result = verifier.verify_integrity()
-
-    if result['integrity'] == 'BROKEN':
-        # Alert security team immediately
-        send_alert(
-            severity='CRITICAL',
-            title='Audit Log Tampering Detected',
-            message=result['message'],
-            recipients=['security@company.com', 'cto@company.com']
-        )
-        # Log to separate immutable system
-        blockchain_logger.log_security_event(result)
-    else:
-        logger.info(f"Integrity check passed: {result['verified_logs']} logs verified")
-```
 
 ---
 
@@ -777,42 +669,6 @@ def daily_integrity_check():
 
 #### 3.7.2 異常模式檢測
 
-```python
-def detect_anomalies(tenant_id, time_window='1h'):
-    """Detect suspicious audit log patterns"""
-
-    # Pattern 1: Excessive failed login attempts
-    failed_logins = count_logs(
-        tenant_id=tenant_id,
-        action='LOGIN',
-        result='FAILURE',
-        time_window=time_window
-    )
-    if failed_logins > 100:
-        alert('Potential brute force attack')
-
-    # Pattern 2: Mass deletion
-    deletions = count_logs(
-        tenant_id=tenant_id,
-        action='DELETE',
-        time_window=time_window
-    )
-    if deletions > 1000:
-        alert('Mass deletion detected (potential data breach)')
-
-    # Pattern 3: Unusual time access
-    night_access = count_logs(
-        tenant_id=tenant_id,
-        time_range=('22:00', '06:00')
-    )
-    if night_access > baseline_night_access * 5:
-        alert('Unusual night-time activity')
-
-    # Pattern 4: Geographic anomaly
-    countries = get_unique_countries(tenant_id, time_window)
-    if len(countries) > 5:
-        alert('Admin accessed from multiple countries in short time')
-```
 
 ---
 

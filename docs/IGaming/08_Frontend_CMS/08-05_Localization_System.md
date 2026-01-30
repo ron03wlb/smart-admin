@@ -92,16 +92,6 @@ flowchart LR
 對於資料庫中的動態內容（如遊戲名稱、活動標題），採用 **PostgreSQL JSONB** 存儲多語言版本。
 
 **範例**：
-```sql
-CREATE TABLE promotions (
-    promotion_id BIGSERIAL PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    title JSONB NOT NULL,        -- {"en": "Welcome Bonus", "zh-TW": "歡迎禮金"}
-    description JSONB NOT NULL,  -- {"en": "Get 100%...", "zh-TW": "獲得100%..."}
-    start_time TIMESTAMP,
-    end_time TIMESTAMP
-);
-```
 
 ### 3.2 API 響應策略
 
@@ -250,23 +240,6 @@ function MyComponent() {
 
 ### 7.2 後端實現（Python + FastAPI）
 
-```python
-from fastapi import FastAPI, Request
-
-app = FastAPI()
-
-@app.get("/api/v1/i18n/translations")
-async def get_translations(lang: str, namespace: str):
-    translations = await db.fetchall(
-        "SELECT key, value FROM translations WHERE lang = $1 AND namespace = $2",
-        lang, namespace
-    )
-    return {
-        "lang": lang,
-        "namespace": namespace,
-        "translations": {t['key']: t['value'] for t in translations}
-    }
-```
 
 ---
 

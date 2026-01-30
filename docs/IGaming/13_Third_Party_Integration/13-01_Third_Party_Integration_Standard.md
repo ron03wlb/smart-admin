@@ -46,82 +46,8 @@
 | **ComplyAdvantage** | AML 名單篩查 | REST API | ~$0.5/次 |
 | **Sumsub** | 綜合 KYC | REST API + SDK | ~$3/次 |
 
-**整合流程範例** (Onfido):
-```python
-import requests
-
-def verify_player_kyc(player_id, id_document_photo, selfie_photo):
-    # Step 1: 創建 Onfido Applicant
-    applicant_response = requests.post(
-        "https://api.onfido.com/v3/applicants",
-        headers={"Authorization": f"Token token={ONFIDO_API_KEY}"},
-        json={
-            "first_name": player.first_name,
-            "last_name": player.last_name,
-            "email": player.email
-        }
-    )
-    applicant_id = applicant_response.json()["id"]
-
-    # Step 2: 上傳文件
-    document_response = requests.post(
-        "https://api.onfido.com/v3/documents",
-        headers={"Authorization": f"Token token={ONFIDO_API_KEY}"},
-        files={"file": id_document_photo},
-        data={"applicant_id": applicant_id, "type": "passport"}
-    )
-
-    # Step 3: 創建檢查（異步）
-    check_response = requests.post(
-        "https://api.onfido.com/v3/checks",
-        headers={"Authorization": f"Token token={ONFIDO_API_KEY}"},
-        json={
-            "applicant_id": applicant_id,
-            "report_names": ["document", "facial_similarity_photo"]
-        }
-    )
-    check_id = check_response.json()["id"]
-
-    # Step 4: 等待 Webhook 回調（異步處理）
-    # Webhook URL: https://platform.com/api/v1/webhooks/onfido
-    return {"check_id": check_id, "status": "pending"}
-```
 
 **Webhook 回調處理**：
-```python
-from fastapi import Request, HTTPException
-import hmac
-import hashlib
-
-@app.post("/api/v1/webhooks/onfido")
-async def onfido_webhook(request: Request):
-    # Step 1: 驗證 Webhook 簽名
-    signature = request.headers.get("X-Signature")
-    body = await request.body()
-
-    expected_signature = hmac.new(
-        ONFIDO_WEBHOOK_SECRET.encode(),
-        body,
-        hashlib.sha256
-    ).hexdigest()
-
-    if signature != expected_signature:
-        raise HTTPException(status_code=403, detail="Invalid signature")
-
-    # Step 2: 處理回調
-    payload = await request.json()
-    check_id = payload["object"]["id"]
-    result = payload["object"]["result"]  # "clear", "consider"
-
-    if result == "clear":
-        # 更新玩家 KYC 狀態為已驗證
-        update_player_kyc_status(check_id, status="approved")
-    else:
-        # 需要人工審核
-        create_manual_review_task(check_id, reason=payload["object"]["sub_result"])
-
-    return {"status": "ok"}
-```
 
 ---
 
@@ -135,30 +61,6 @@ async def onfido_webhook(request: Request):
 | **行銷自動化** | Braze, Customer.io | 玩家生命週期管理 | REST API + Webhook |
 
 **SendGrid 郵件發送範例**：
-```python
-import requests
-
-def send_withdrawal_approval_email(player_email, withdrawal_amount):
-    response = requests.post(
-        "https://api.sendgrid.com/v3/mail/send",
-        headers={
-            "Authorization": f"Bearer {SENDGRID_API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "personalizations": [{
-                "to": [{"email": player_email}],
-                "dynamic_template_data": {
-                    "amount": withdrawal_amount,
-                    "currency": "USD"
-                }
-            }],
-            "from": {"email": "noreply@platform.com", "name": "Platform Support"},
-            "template_id": "d-12345abc"  # SendGrid 模板 ID
-        }
-    )
-    return response.json()
-```
 
 ---
 
@@ -208,38 +110,6 @@ requests.post(
 **使用場景**: 同步請求-響應模式（如 KYC 驗證、支付請求）
 
 **標準實作**：
-```python
-import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
-
-def create_http_client():
-    """創建帶重試機制的 HTTP 客戶端"""
-    session = requests.Session()
-
-    # 配置重試策略
-    retry = Retry(
-        total=3,                          # 最多重試 3 次
-        backoff_factor=1,                 # 指數退避：1s, 2s, 4s
-        status_forcelist=[500, 502, 503, 504],  # 這些狀態碼才重試
-        method_whitelist=["GET", "POST"]  # 只重試冪等方法
-    )
-
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
-
-    return session
-
-# 使用範例
-http_client = create_http_client()
-response = http_client.post(
-    "https://api.kyc-provider.com/v1/verify",
-    headers={"Authorization": f"Bearer {API_KEY}"},
-    json={"player_id": "12345"},
-    timeout=10  # 10 秒超時
-)
-```
 
 ---
 
@@ -247,40 +117,6 @@ response = http_client.post(
 
 **使用場景**: 異步通知（如支付回調、KYC 結果回調）
 
-**安全驗證**:
-```python
-import hmac
-import hashlib
-from fastapi import Header, HTTPException
-
-def verify_webhook_signature(
-    body: bytes,
-    signature: str,
-    secret: str
-) -> bool:
-    """驗證 Webhook 簽名"""
-    expected_signature = hmac.new(
-        secret.encode(),
-        body,
-        hashlib.sha256
-    ).hexdigest()
-
-    return hmac.compare_digest(signature, expected_signature)
-
-@app.post("/webhooks/payment")
-async def payment_webhook(
-    request: Request,
-    x_signature: str = Header(...)
-):
-    body = await request.body()
-
-    if not verify_webhook_signature(body, x_signature, PAYMENT_WEBHOOK_SECRET):
-        raise HTTPException(status_code=403, detail="Invalid signature")
-
-    payload = await request.json()
-    # 處理支付回調...
-    return {"status": "ok"}
-```
 
 ---
 
@@ -326,159 +162,12 @@ messaging.requestPermission()
 
 **使用場景**: 通知外部系統平台事件（如通知運營商新玩家註冊）
 
-**配置數據模型**:
-```sql
-CREATE TABLE webhook_subscriptions (
-    subscription_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    tenant_id BIGINT NOT NULL,  -- 哪個租戶訂閱
-    webhook_url VARCHAR(500) NOT NULL,
-    events TEXT NOT NULL,  -- JSON array: ["player.registered", "player.deposited"]
-    secret_key VARCHAR(100) NOT NULL,  -- 用於簽名
 
-    -- 重試策略
-    max_retries TINYINT DEFAULT 3,
-    retry_backoff ENUM('linear', 'exponential') DEFAULT 'exponential',
-
-    -- 狀態
-    is_active BOOLEAN DEFAULT TRUE,
-    failed_count INT DEFAULT 0,
-
-    INDEX idx_tenant (tenant_id),
-    INDEX idx_active (is_active)
-);
-```
-
-**發送邏輯** (帶重試):
-```python
-import requests
-import time
-import hmac
-import hashlib
-
-def send_webhook(subscription_id, event_type, payload):
-    subscription = db.query(
-        "SELECT * FROM webhook_subscriptions WHERE subscription_id = %s",
-        (subscription_id,)
-    ).fetchone()
-
-    if not subscription['is_active']:
-        return
-
-    # 生成簽名
-    payload_json = json.dumps(payload)
-    signature = hmac.new(
-        subscription['secret_key'].encode(),
-        payload_json.encode(),
-        hashlib.sha256
-    ).hexdigest()
-
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Webhook-Signature': signature,
-        'X-Event-Type': event_type
-    }
-
-    # 重試邏輯
-    for attempt in range(subscription['max_retries']):
-        try:
-            response = requests.post(
-                subscription['webhook_url'],
-                data=payload_json,
-                headers=headers,
-                timeout=10
-            )
-
-            if response.status_code == 200:
-                # 成功，重置失敗計數
-                db.execute(
-                    "UPDATE webhook_subscriptions SET failed_count = 0 WHERE subscription_id = %s",
-                    (subscription_id,)
-                )
-                return True
-
-        except requests.RequestException as e:
-            logger.error(f"Webhook delivery failed (attempt {attempt + 1}): {e}")
-
-        # 指數退避
-        if subscription['retry_backoff'] == 'exponential':
-            time.sleep(2 ** attempt)  # 1s, 2s, 4s
-        else:
-            time.sleep(5)  # 固定 5 秒
-
-    # 所有重試失敗
-    db.execute(
-        "UPDATE webhook_subscriptions SET failed_count = failed_count + 1 WHERE subscription_id = %s",
-        (subscription_id,)
-    )
-
-    # 失敗次數 > 10 次，自動禁用
-    if subscription['failed_count'] + 1 > 10:
-        db.execute(
-            "UPDATE webhook_subscriptions SET is_active = FALSE WHERE subscription_id = %s",
-            (subscription_id,)
-        )
-        alert_to_ops_team(f"Webhook {subscription_id} disabled after 10 failures")
-
-    return False
-```
 
 ---
 
 ### 4.2 入站 Webhook (Inbound Webhooks)
 
-**集中式 Webhook 接收器**:
-```python
-from fastapi import FastAPI, Request, HTTPException
-
-app = FastAPI()
-
-# 支持的 Provider 及其驗證邏輯
-WEBHOOK_PROVIDERS = {
-    "nuvei": {
-        "secret_key": os.getenv("NUVEI_WEBHOOK_SECRET"),
-        "signature_header": "X-Nuvei-Signature"
-    },
-    "pragmatic": {
-        "secret_key": os.getenv("PRAGMATIC_WEBHOOK_SECRET"),
-        "signature_header": "X-GP-Signature"
-    },
-    "onfido": {
-        "secret_key": os.getenv("ONFIDO_WEBHOOK_SECRET"),
-        "signature_header": "X-Signature"
-    }
-}
-
-@app.post("/api/v1/webhooks/{provider}")
-async def unified_webhook_receiver(provider: str, request: Request):
-    if provider not in WEBHOOK_PROVIDERS:
-        raise HTTPException(status_code=404, detail="Unknown provider")
-
-    config = WEBHOOK_PROVIDERS[provider]
-    body = await request.body()
-    signature = request.headers.get(config["signature_header"])
-
-    # 驗證簽名
-    expected_signature = hmac.new(
-        config["secret_key"].encode(),
-        body,
-        hashlib.sha256
-    ).hexdigest()
-
-    if not hmac.compare_digest(signature or "", expected_signature):
-        raise HTTPException(status_code=403, detail="Invalid signature")
-
-    # 解析並路由到對應處理器
-    payload = await request.json()
-
-    if provider == "nuvei":
-        handle_payment_callback(payload)
-    elif provider == "pragmatic":
-        handle_game_callback(payload)
-    elif provider == "onfido":
-        handle_kyc_callback(payload)
-
-    return {"status": "ok"}
-```
 
 ---
 
@@ -501,23 +190,6 @@ Vault Secrets Engine:
    └─ api_key: "SG.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-**應用層讀取金鑰**:
-```python
-import hvac
-
-# 初始化 Vault 客戶端
-vault_client = hvac.Client(url='https://vault.internal:8200')
-vault_client.auth.approle.login(
-    role_id=os.getenv('VAULT_ROLE_ID'),
-    secret_id=os.getenv('VAULT_SECRET_ID')
-)
-
-# 讀取金鑰
-nuvei_secrets = vault_client.secrets.kv.v2.read_secret_version(
-    path='psp/nuvei'
-)
-NUVEI_SECRET_KEY = nuvei_secrets['data']['data']['secret_key']
-```
 
 ---
 
@@ -572,47 +244,6 @@ resource "random_password" "nuvei_secret" {
 | **GP 遊戲啟動** | 500 req/min | 60 秒 | 返回快取 URL |
 | **Google Analytics** | 無限制 | - | - |
 
-**Redis 實作** (Token Bucket 算法):
-```python
-import redis
-import time
-
-redis_client = redis.Redis(host='localhost', port=6379)
-
-def rate_limit(service_name, limit, window_seconds):
-    """
-    Token Bucket 限流算法
-    :param service_name: 服務名稱 (e.g. "onfido_kyc")
-    :param limit: 允許的最大請求數
-    :param window_seconds: 時間窗口（秒）
-    :return: True 允許請求，False 超限
-    """
-    key = f"rate_limit:{service_name}"
-    current_time = int(time.time())
-
-    # 使用 Redis Sorted Set 存儲請求時間戳
-    pipe = redis_client.pipeline()
-    pipe.zadd(key, {str(current_time): current_time})
-    pipe.zremrangebyscore(key, 0, current_time - window_seconds)  # 移除過期記錄
-    pipe.zcard(key)  # 計算當前請求數
-    pipe.expire(key, window_seconds)  # 設置過期時間
-    results = pipe.execute()
-
-    request_count = results[2]
-
-    if request_count <= limit:
-        return True
-    else:
-        return False
-
-# 使用範例
-if rate_limit("onfido_kyc", limit=100, window_seconds=60):
-    # 允許請求
-    make_onfido_api_call()
-else:
-    # 超限，返回 429
-    raise HTTPException(status_code=429, detail="Rate limit exceeded")
-```
 
 ---
 
@@ -632,34 +263,6 @@ else:
 └──────────────────────────────────────────────────┘
 ```
 
-**Prometheus 指標採集**:
-```python
-from prometheus_client import Counter, Histogram
-
-# 定義指標
-third_party_requests_total = Counter(
-    'third_party_requests_total',
-    'Total requests to third-party services',
-    ['service', 'status']
-)
-
-third_party_request_duration = Histogram(
-    'third_party_request_duration_seconds',
-    'Request duration to third-party services',
-    ['service']
-)
-
-# 使用範例
-def make_onfido_request():
-    with third_party_request_duration.labels(service='onfido').time():
-        try:
-            response = requests.post("https://api.onfido.com/...")
-            third_party_requests_total.labels(service='onfido', status='success').inc()
-            return response
-        except Exception as e:
-            third_party_requests_total.labels(service='onfido', status='error').inc()
-            raise
-```
 
 ---
 

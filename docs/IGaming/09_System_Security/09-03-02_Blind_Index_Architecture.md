@@ -64,71 +64,10 @@
 
 ### 3.2 資料庫 Schema 設計
 
-```sql
-CREATE TABLE players (
-    player_id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-
-    -- ========== 加密 PII（不可索引）==========
-    encrypted_phone VARCHAR(255),          -- AES-256-GCM 加密
-    encrypted_email VARCHAR(255),
-    encrypted_real_name VARCHAR(255),
-    encrypted_id_number VARCHAR(255),
-    encrypted_bank_account VARCHAR(255),
-
-    -- ========== Blind Indexes（可索引）==========
-    phone_index CHAR(64) UNIQUE,           -- HMAC-SHA256 輸出（Hex編碼）
-    email_index CHAR(64) UNIQUE,
-    id_number_index CHAR(64) UNIQUE,
-    bank_account_index CHAR(64),           -- 允許 NULL（未綁定銀行卡）
-
-    -- ========== 元數據 ==========
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-
-    -- ========== 索引定義 ==========
-    INDEX idx_phone_index (phone_index),   -- B-Tree 索引
-    INDEX idx_email_index (email_index),
-    INDEX idx_id_number_index (id_number_index)
-);
-
--- 約束說明
--- 1. phone_index/email_index/id_number_index 設為 UNIQUE：防止重複註冊
--- 2. bank_account_index 允許 NULL：玩家可能尚未綁定銀行卡
-```
 
 ### 3.3 Blind Index 生成算法
 
 **使用 HMAC-SHA256**：
-```python
-import hmac
-import hashlib
-
-def generate_blind_index(plaintext: str, blind_index_key: bytes) -> str:
-    """
-    生成 Blind Index
-    :param plaintext: 明文（如 "+886912345678"）
-    :param blind_index_key: Blind Index 專用金鑰（32 bytes，來自 KMS）
-    :return: 64 字符的 Hex 編碼 HMAC
-    """
-    # 1. 正規化輸入（統一格式，避免大小寫/空格導致不同 Index）
-    normalized_text = plaintext.strip().lower()
-
-    # 2. 計算 HMAC-SHA256
-    hmac_obj = hmac.new(
-        blind_index_key,
-        normalized_text.encode('utf-8'),
-        hashlib.sha256
-    )
-
-    # 3. 返回 Hex 編碼（64 個字符）
-    return hmac_obj.hexdigest()
-
-# 範例
-blind_key = kms_client.get_blind_index_key("alias/blind-index-key")
-phone_index = generate_blind_index("+886912345678", blind_key)
-# 輸出: "a3f8d9e2c1b4f7a6b5c8d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2"
-```
 
 **為何使用 HMAC 而非 SHA256？**
 | 算法 | 優勢 | 劣勢 |
@@ -138,74 +77,6 @@ phone_index = generate_blind_index("+886912345678", blind_key)
 
 ### 3.4 完整實現範例
 
-```python
-class BlindIndexManager:
-    def __init__(self, blind_index_key: bytes):
-        """
-        :param blind_index_key: 32 bytes Blind Index 專用金鑰
-        """
-        self.blind_key = blind_index_key
-
-    def generate_index(self, plaintext: str) -> str:
-        """生成 Blind Index"""
-        normalized = plaintext.strip().lower()
-        hmac_obj = hmac.new(self.blind_key, normalized.encode('utf-8'), hashlib.sha256)
-        return hmac_obj.hexdigest()
-
-    def store_player(self, phone: str, email: str, real_name: str):
-        """儲存玩家資料（加密 + Blind Index）"""
-        # 1. 加密 PII
-        encrypted_phone = encryptor.encrypt(phone)
-        encrypted_email = encryptor.encrypt(email)
-        encrypted_name = encryptor.encrypt(real_name)
-
-        # 2. 生成 Blind Indexes
-        phone_index = self.generate_index(phone)
-        email_index = self.generate_index(email)
-
-        # 3. 寫入資料庫
-        db.execute("""
-            INSERT INTO players (encrypted_phone, encrypted_email, encrypted_real_name,
-                                 phone_index, email_index)
-            VALUES ($1, $2, $3, $4, $5)
-        """, encrypted_phone, encrypted_email, encrypted_name, phone_index, email_index)
-
-    def search_by_phone(self, phone: str):
-        """透過手機號查詢玩家"""
-        # 1. 計算 Blind Index
-        phone_index = self.generate_index(phone)
-
-        # 2. 查詢資料庫
-        player = db.fetchrow("""
-            SELECT player_id, encrypted_phone, encrypted_email
-            FROM players
-            WHERE phone_index = $1
-        """, phone_index)
-
-        if not player:
-            return None
-
-        # 3. 解密 PII
-        return {
-            "player_id": player['player_id'],
-            "phone": encryptor.decrypt(player['encrypted_phone']),
-            "email": encryptor.decrypt(player['encrypted_email'])
-        }
-
-# 使用範例
-blind_manager = BlindIndexManager(kms_client.get_blind_index_key())
-
-# 儲存玩家
-blind_manager.store_player(
-    phone="+886912345678",
-    email="player@example.com",
-    real_name="王小明"
-)
-
-# 查詢玩家
-player = blind_manager.search_by_phone("+886912345678")
-# 輸出: {"player_id": 123, "phone": "+886912345678", "email": "player@example.com"}
-```
 
 ---
 
@@ -306,63 +177,6 @@ player = blind_manager.search_by_phone("+886912345678")
 ### 5.2 批次遷移實現
 
 **Python 批次處理腳本**：
-```python
-import asyncio
-import asyncpg
-
-async def migrate_blind_indexes(pool, new_blind_key: bytes, batch_size: int = 1000):
-    """批次遷移 Blind Indexes 到新金鑰"""
-    blind_manager_v2 = BlindIndexManager(new_blind_key)
-
-    offset = 0
-    total_migrated = 0
-
-    while True:
-        # 1. 批次讀取未遷移的資料
-        async with pool.acquire() as conn:
-            players = await conn.fetch("""
-                SELECT player_id, encrypted_phone, encrypted_email
-                FROM players
-                WHERE phone_index_v2 IS NULL
-                LIMIT $1 OFFSET $2
-            """, batch_size, offset)
-
-        if not players:
-            break  # 所有資料已遷移
-
-        # 2. 批次計算新 Blind Index
-        updates = []
-        for player in players:
-            # 解密 → 計算新 Index
-            phone_plaintext = encryptor.decrypt(player['encrypted_phone'])
-            email_plaintext = encryptor.decrypt(player['encrypted_email'])
-
-            phone_index_v2 = blind_manager_v2.generate_index(phone_plaintext)
-            email_index_v2 = blind_manager_v2.generate_index(email_plaintext)
-
-            updates.append((phone_index_v2, email_index_v2, player['player_id']))
-
-        # 3. 批次更新資料庫
-        async with pool.acquire() as conn:
-            await conn.executemany("""
-                UPDATE players
-                SET phone_index_v2 = $1, email_index_v2 = $2
-                WHERE player_id = $3
-            """, updates)
-
-        total_migrated += len(players)
-        offset += batch_size
-
-        print(f"Migrated {total_migrated} players...")
-        await asyncio.sleep(0.1)  # 避免壓垮資料庫
-
-    print(f"Migration complete! Total: {total_migrated}")
-
-# 執行遷移
-pool = await asyncpg.create_pool('postgresql://...')
-new_blind_key = vault_client.get_secret('blind-index-key-v2')
-await migrate_blind_indexes(pool, new_blind_key)
-```
 
 ---
 
@@ -382,67 +196,15 @@ await migrate_blind_indexes(pool, new_blind_key)
 
 #### 策略 1：資料庫層 UNIQUE 約束（推薦）
 
-```sql
--- 設定 UNIQUE 約束
-ALTER TABLE players ADD CONSTRAINT unique_phone_index UNIQUE (phone_index);
-ALTER TABLE players ADD CONSTRAINT unique_email_index UNIQUE (email_index);
-```
 
 **異常捕獲**：
-```python
-from asyncpg.exceptions import UniqueViolationError
-
-def register_player(phone: str, email: str):
-    phone_index = blind_manager.generate_index(phone)
-    email_index = blind_manager.generate_index(email)
-
-    try:
-        db.execute("""
-            INSERT INTO players (encrypted_phone, phone_index, encrypted_email, email_index)
-            VALUES ($1, $2, $3, $4)
-        """, encrypted_phone, phone_index, encrypted_email, email_index)
-
-    except UniqueViolationError as e:
-        # 檢查是否為真實重複註冊（極可能）或雜湊碰撞（極罕見）
-        existing_player = db.fetchrow("SELECT encrypted_phone FROM players WHERE phone_index = $1", phone_index)
-
-        # 解密現有玩家手機號
-        existing_phone = encryptor.decrypt(existing_player['encrypted_phone'])
-
-        if existing_phone == phone:
-            # 真實重複註冊
-            raise DuplicateAccountError("This phone number is already registered")
-        else:
-            # 雜湊碰撞（記錄 Alert）
-            logger.critical(f"HMAC collision detected! Phone: {phone}, Existing: {existing_phone}")
-            # 觸發人工審查或使用 Fallback 策略
-            raise SystemError("Hash collision detected. Please contact support.")
-```
 
 #### 策略 2：加鹽值（Salt）避免碰撞
 
 **在極罕見碰撞發生時，動態加入 Salt**：
-```python
-def generate_index_with_salt(plaintext: str, salt: str = "") -> str:
-    """帶 Salt 的 Blind Index 生成"""
-    salted_input = f"{plaintext}:{salt}"
-    return hmac.new(blind_key, salted_input.encode(), hashlib.sha256).hexdigest()
-
-# 若發生碰撞，使用玩家 ID 作為 Salt
-player_id = get_next_player_id()
-phone_index = generate_index_with_salt(phone, salt=str(player_id))
-```
 
 #### 策略 3：升級至 HMAC-SHA512（更大輸出空間）
 
-```python
-def generate_index_sha512(plaintext: str) -> str:
-    """使用 SHA512（128 字符輸出）"""
-    hmac_obj = hmac.new(blind_key, plaintext.encode(), hashlib.sha512)
-    return hmac_obj.hexdigest()  # 128 個字符
-
-# 碰撞機率降低至 < 10^-120
-```
 
 ---
 
@@ -457,17 +219,6 @@ def generate_index_sha512(plaintext: str) -> str:
 | **全表掃描解密** | O(n) - 逐行解密比對 | > 5000ms（1000倍慢）|
 
 **SQL 執行計劃分析**：
-```sql
--- 使用 Blind Index（快速）
-EXPLAIN ANALYZE
-SELECT * FROM players WHERE phone_index = 'a3f8d9e2...';
--- Output: Index Scan using idx_phone_index (cost=0.43..8.45 rows=1) (actual time=0.015..0.016 rows=1 loops=1)
-
--- 不使用 Blind Index（慢）
-EXPLAIN ANALYZE
-SELECT * FROM players WHERE encrypted_phone LIKE '%...%';
--- Output: Seq Scan on players (cost=0.00..250000.00 rows=1000000) (actual time=0.015..5234.567 rows=1)
-```
 
 ### 7.2 寫入效能
 
@@ -496,25 +247,6 @@ SELECT * FROM players WHERE encrypted_phone LIKE '%...%';
 ### 7.4 快取策略
 
 **不應快取 Blind Index 查詢結果**（安全風險）：
-```python
-# ❌ 錯誤：快取 Blind Index → PII 關聯（洩露風險）
-redis.setex(f"phone_index:{phone_index}", 3600, player_id)
-
-# ✅ 正確：快取解密後的 PII（短期，應用層記憶體）
-from cachetools import TTLCache
-
-pii_cache = TTLCache(maxsize=10000, ttl=300)  # 5 分鐘 TTL
-
-def get_player_phone_cached(player_id: int) -> str:
-    if player_id in pii_cache:
-        return pii_cache[player_id]
-
-    encrypted_phone = db.fetchval("SELECT encrypted_phone FROM players WHERE player_id = $1", player_id)
-    plaintext_phone = encryptor.decrypt(encrypted_phone)
-
-    pii_cache[player_id] = plaintext_phone
-    return plaintext_phone
-```
 
 ---
 
@@ -532,12 +264,6 @@ def get_player_phone_cached(player_id: int) -> str:
 **緩解措施**：
 1. **金鑰輪替**（每 2 年）：使 Rainbow Table 失效
 2. **加入應用上下文**（Application-Specific Context）：
-   ```python
-   def generate_index_with_context(phone: str, tenant_id: int) -> str:
-       """混入 Tenant ID，不同租戶的相同手機號產生不同 Index"""
-       context_data = f"{phone}:{tenant_id}"
-       return hmac.new(blind_key, context_data.encode(), hashlib.sha256).hexdigest()
-   ```
 3. **物理隔離 Blind Index Key**：存儲於不同 HSM
 
 #### 攻擊 2：Timing Attack（時序攻擊）
@@ -547,18 +273,6 @@ def get_player_phone_cached(player_id: int) -> str:
 - 若 HMAC 實現非 constant-time，可洩露部分資訊
 
 **緩解措施**：
-```python
-import hmac
-
-# ✅ 正確：使用 constant-time 比較
-def verify_blind_index(user_input: str, stored_index: str) -> bool:
-    computed_index = generate_blind_index(user_input)
-    return hmac.compare_digest(computed_index, stored_index)  # Constant-time
-
-# ❌ 錯誤：使用 == 比較（易受 Timing Attack）
-if computed_index == stored_index:  # 不安全
-    ...
-```
 
 #### 攻擊 3：Inference Attack（推論攻擊）
 
@@ -567,21 +281,6 @@ if computed_index == stored_index:  # 不安全
 - 範例：已知 `phone_index_A` 對應 `+886912345678`，若看到相同 Index 出現在其他資料，即可推斷
 
 **緩解措施**：
-```python
-# ❌ 禁止：在 API Response 中返回 Blind Index
-{
-  "player_id": 123,
-  "phone_index": "a3f8d9e2...",  # 洩露風險
-  "email_index": "b4c7e1f3..."
-}
-
-# ✅ 正確：僅返回脫敏 PII
-{
-  "player_id": 123,
-  "phone_masked": "091****678",
-  "email_masked": "da***@gmail.com"
-}
-```
 
 ### 8.2 合規性評估
 
@@ -619,32 +318,8 @@ if computed_index == stored_index:  # 不安全
 **原理**：為手機號的前綴建立多個 Blind Index
 
 **範例**：
-```python
-def generate_ngram_indexes(phone: str, n: int = 4) -> list:
-    """為手機號生成 N-Gram Blind Indexes"""
-    indexes = []
-
-    # 生成前4碼、前5碼、前6碼的 Index
-    for i in range(n, len(phone) + 1):
-        prefix = phone[:i]
-        index = generate_blind_index(prefix)
-        indexes.append((i, index))
-
-    return indexes
-
-# 範例：+886912345678
-# 生成：
-# - phone_index_prefix_4: HMAC("+886")
-# - phone_index_prefix_5: HMAC("+8869")
-# - phone_index_prefix_6: HMAC("+88691")
-# ...
-```
 
 **查詢範例**：
-```sql
--- 查詢所有 0912 開頭的手機號
-SELECT * FROM players WHERE phone_index_prefix_4 = HMAC('0912');
-```
 
 **權衡**：
 - ✅ 支援前綴模糊搜尋

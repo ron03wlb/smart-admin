@@ -106,22 +106,6 @@ function getBannerImage(banner: Banner, userLanguage: string): string {
 | Diamond (鑽石) | 頂級活動 + 個人客戶經理 |
 
 **實作範例**：
-```sql
--- 查詢目標玩家的 Banner 列表
-SELECT b.*
-FROM banners b
-LEFT JOIN banner_targeting bt ON b.banner_id = bt.banner_id
-WHERE b.status = 'active'
-  AND NOW() BETWEEN b.start_time AND b.end_time
-  AND (
-      bt.vip_level IS NULL OR bt.vip_level = :player_vip_level
-  )
-  AND (
-      bt.player_segment IS NULL OR bt.player_segment = :player_segment
-  )
-ORDER BY b.sort_order DESC
-LIMIT 5;
-```
 
 ---
 
@@ -156,20 +140,6 @@ const visibleBanners = allBanners.filter(banner => {
 - **歐洲**: 顯示 SEPA 轉帳 Banner
 
 **IP 地理位置判斷**：
-```python
-import geoip2.database
-
-def get_banner_by_country(player_ip):
-    reader = geoip2.database.Reader('/path/to/GeoLite2-Country.mmdb')
-    response = reader.country(player_ip)
-    country_code = response.country.iso_code  # e.g. 'CN', 'VN', 'TH'
-
-    # 查詢該國家專屬的 Banner
-    banners = Banner.objects.filter(
-        Q(geo_target=country_code) | Q(geo_target__isnull=True)
-    )
-    return banners
-```
 
 ---
 
@@ -181,23 +151,6 @@ def get_banner_by_country(player_ip):
 - **節日活動**: 農曆新年期間顯示「紅包雨」Banner
 
 **實作範例**：
-```sql
-CREATE TABLE banner_schedule (
-    schedule_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    banner_id BIGINT NOT NULL,
-
-    -- 時間規則
-    days_of_week SET('Mon','Tue','Wed','Thu','Fri','Sat','Sun'),  -- NULL = 全週
-    hour_start TIME,     -- e.g. '18:00:00'
-    hour_end TIME,       -- e.g. '23:00:00'
-
-    -- 日期範圍
-    date_start DATE,     -- e.g. '2026-01-24' (春節開始)
-    date_end DATE,       -- e.g. '2026-01-30' (春節結束)
-
-    FOREIGN KEY (banner_id) REFERENCES banners(banner_id)
-);
-```
 
 ---
 
@@ -215,67 +168,12 @@ CREATE TABLE banner_schedule (
 | 轉換率 | CVR (Conversion Rate) | 轉換次數 / 點擊次數 | (Conversions / Clicks) × 100% |
 
 **數據表設計**：
-```sql
-CREATE TABLE banner_analytics (
-    analytics_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    banner_id BIGINT NOT NULL,
-
-    -- 基礎指標
-    impressions INT DEFAULT 0,           -- 展示次數
-    clicks INT DEFAULT 0,                -- 點擊次數
-    ctr DECIMAL(5,4) AS (clicks / NULLIF(impressions, 0)) STORED,  -- CTR
-
-    -- 轉換追蹤
-    conversions INT DEFAULT 0,           -- 轉換次數（完成存款/註冊等）
-    conversion_rate DECIMAL(5,4) AS (conversions / NULLIF(clicks, 0)) STORED,
-
-    -- 分群維度
-    device_type ENUM('desktop', 'mobile', 'tablet'),
-    country_code CHAR(2),                -- e.g. 'CN', 'VN', 'TH'
-    user_segment VARCHAR(50),            -- e.g. 'new_player', 'vip_gold'
-
-    -- 時間維度
-    date DATE NOT NULL,
-    hour TINYINT,                        -- 0-23
-
-    INDEX idx_banner_date (banner_id, date),
-    INDEX idx_date (date),
-    INDEX idx_country (country_code, date),
-    FOREIGN KEY (banner_id) REFERENCES banners(banner_id)
-);
-```
 
 ---
 
 ### 4.2 轉換追蹤 (Conversion Tracking)
 
 **Banner 歸因邏輯**：
-```python
-# 玩家點擊 Banner 後 24 小時內完成存款，視為轉換
-def track_conversion(player_id, banner_id, click_time):
-    # 查詢 24 小時內的存款記錄
-    deposits = Deposit.objects.filter(
-        player_id=player_id,
-        created_at__gte=click_time,
-        created_at__lte=click_time + timedelta(hours=24)
-    )
-
-    if deposits.exists():
-        # 記錄轉換
-        BannerAnalytics.objects.filter(
-            banner_id=banner_id,
-            date=click_time.date()
-        ).update(conversions=F('conversions') + 1)
-
-        # 記錄歸因（用於後續分析）
-        ConversionAttribution.objects.create(
-            banner_id=banner_id,
-            player_id=player_id,
-            click_time=click_time,
-            conversion_time=deposits.first().created_at,
-            conversion_amount=deposits.first().amount
-        )
-```
 
 ---
 
@@ -306,20 +204,6 @@ def track_conversion(player_id, banner_id, click_time):
 ```
 
 **流量分配演算法**：
-```python
-import hashlib
-
-def get_ab_variant(player_id, experiment_id):
-    # 使用一致性哈希確保同一玩家始終看到同一版本
-    hash_input = f"{player_id}_{experiment_id}".encode('utf-8')
-    hash_value = int(hashlib.md5(hash_input).hexdigest(), 16)
-    bucket = hash_value % 100  # 0-99
-
-    if bucket < 50:
-        return "A"  # 紅色版本
-    else:
-        return "B"  # 藍色版本
-```
 
 ---
 
@@ -401,31 +285,6 @@ location /banners/ {
 ```
 
 **緩存失效 (Cache Invalidation)**：
-```python
-import requests
-
-def invalidate_banner_cache(banner_id, version):
-    # CloudFlare API: 清除特定 URL 緩存
-    url = f"https://api.cloudflare.com/client/v4/zones/{ZONE_ID}/purge_cache"
-    headers = {"Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}"}
-    payload = {
-        "files": [
-            f"https://cdn.platform.com/banners/{banner_id}_*_v{version}.webp"
-        ]
-    }
-    response = requests.post(url, json=payload, headers=headers)
-    return response.json()
-
-# 更新 Banner 時調用
-def update_banner(banner_id, new_image):
-    banner = Banner.objects.get(id=banner_id)
-    banner.version += 1  # 遞增版本號
-    banner.image_url = f"https://cdn.platform.com/banners/{banner_id}_v{banner.version}.webp"
-    banner.save()
-
-    # 清除舊版本緩存
-    invalidate_banner_cache(banner_id, banner.version - 1)
-```
 
 ---
 

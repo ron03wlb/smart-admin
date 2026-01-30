@@ -518,18 +518,6 @@ iGaming娛樂城典型值**15-25%**。
    ```
 
 4. **代碼/API**: 必須使用主術語的駝峰式命名
-   ```java
-   ✅ 正確：
-   WithdrawalApprovalService
-   RiskAssessmentEngine
-   ValidTurnoverCalculator
-   HedgingDetectionService
-
-   ❌ 錯誤：
-   WithdrawalCheckService
-   RiskCheckEngine
-   EffectiveBetCalculator
-   ```
 
 #### 交叉引用規範
 

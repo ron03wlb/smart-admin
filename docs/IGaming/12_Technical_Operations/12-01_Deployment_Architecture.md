@@ -223,37 +223,6 @@ spec:
 
 **自動決策邏輯**:
 
-```python
-def evaluate_canary_health(canary_metrics, stable_metrics):
-    """
-    Evaluate canary health and decide next action
-    """
-    # Rule 1: Error rate check
-    if canary_metrics.error_rate > stable_metrics.error_rate * 5:
-        return {"action": "ROLLBACK", "reason": "Error rate 5x higher than stable"}
-
-    # Rule 2: Latency degradation
-    if canary_metrics.latency_p99 > stable_metrics.latency_p99 * 2:
-        return {"action": "ROLLBACK", "reason": "Latency degraded by 2x"}
-
-    # Rule 3: HTTP 5xx spike
-    if canary_metrics.http_5xx_per_min > 50:
-        return {"action": "ROLLBACK", "reason": "Excessive 5xx errors"}
-
-    # Rule 4: Memory leak detection
-    if canary_metrics.memory_usage_percent > 90:
-        return {"action": "ROLLBACK", "reason": "Memory leak suspected"}
-
-    # Rule 5: Pod crash loop
-    if canary_metrics.pod_restart_count > 3:
-        return {"action": "ROLLBACK", "reason": "Pod crash loop detected"}
-
-    # All checks passed
-    if time_elapsed >= 30 * 60:  # 30 minutes
-        return {"action": "PROCEED", "reason": "Canary validation successful"}
-    else:
-        return {"action": "WAIT", "reason": "Monitoring in progress"}
-```
 
 **Phase 2: Gradual Ramp (T+30min → T+90min, 25% → 50%)**
 

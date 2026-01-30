@@ -250,15 +250,6 @@ turnoverRequired = main.lockAmount + Σ(promo.wagerRequirement - promo.effective
 
 ### 8.1 錢包更新 SQL
 
-```sql
-UPDATE player_wallet
-SET bonus = ?,
-    cash = ?,
-    clean_amount = GREATEST(clean_amount + ?, 0),
-    lock_amount = GREATEST(lock_amount + ?, 0),
-    effective_stake = ?
-WHERE id = ?
-```
 
 > **注意**：`GREATEST(..., 0)` 確保 `cleanAmount` 和 `lockAmount` 不會低於 0。
 

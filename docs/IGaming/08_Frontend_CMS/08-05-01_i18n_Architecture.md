@@ -90,32 +90,8 @@ flowchart LR
 ### 2.3 數據存儲層設計
 
 **PostgreSQL Schema**：
-```sql
-CREATE TABLE translations (
-    translation_id BIGSERIAL PRIMARY KEY,
-    key VARCHAR(255) NOT NULL,        -- e.g., "player.welcome"
-    lang VARCHAR(10) NOT NULL,        -- e.g., "th", "zh-TW"
-    namespace VARCHAR(50) NOT NULL,   -- e.g., "player", "game"
-    value TEXT NOT NULL,
-    context TEXT,                     -- 翻譯上下文說明
-    status VARCHAR(20) DEFAULT 'draft',  -- draft, in_review, approved, published
-    version INT DEFAULT 1,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    created_by VARCHAR(100),
-
-    UNIQUE (key, lang),
-    INDEX idx_lang_namespace (lang, namespace),
-    INDEX idx_status (status)
-);
-```
 
 **Redis 快取策略**：
-```python
-# Cache Key Format: i18n:{lang}:{namespace}:v{version}
-cache_key = f"i18n:{lang}:{namespace}:v{version}"
-redis.setex(cache_key, 3600, json.dumps(translations))  # 1 hour TTL
-```
 
 ---
 
@@ -289,15 +265,6 @@ Object.keys(localStorage)
 | Missing Key Rate | 0% | > 1% |
 
 **監控實現**：
-```python
-# Prometheus metrics
-from prometheus_client import Counter, Histogram
-
-translation_requests = Counter('translation_requests_total', 'Total translation requests', ['lang', 'namespace'])
-cache_hits = Counter('translation_cache_hits_total', 'Cache hits')
-cache_misses = Counter('translation_cache_misses_total', 'Cache misses')
-response_time = Histogram('translation_response_time_seconds', 'Response time')
-```
 
 ---
 

@@ -280,29 +280,6 @@ POST /ppp/api/v1/payment.do
 ```
 
 **Callback 處理**：
-```python
-def nuvei_callback(request):
-    # 1. 驗證簽名
-    expected_checksum = sha256(
-        f"{request['merchantId']}{request['totalAmount']}"
-        f"{request['currency']}{request['responseTimeStamp']}{MERCHANT_SECRET}"
-    ).hexdigest()
-
-    if request['checksum'] != expected_checksum:
-        return {"status": "error", "message": "Invalid signature"}
-
-    # 2. 更新訂單狀態
-    transaction = Transaction.objects.get(id=request['clientRequestId'])
-    if request['transactionStatus'] == 'APPROVED':
-        transaction.status = 'success'
-        transaction.psp_transaction_id = request['transactionId']
-        transaction.save()
-
-        # 3. 增加玩家餘額（引用 02-06 統一錢包模型）
-        wallet_service.credit(player_id=transaction.player_id, amount=transaction.amount)
-
-    return {"status": "ok"}
-```
 
 ### 4.2 Adyen 對接
 
@@ -342,31 +319,6 @@ POST /pal/servlet/Payout/v68/payout
 ### 5.1 路由決策矩陣
 
 **多維度評分模型**：
-```python
-def calculate_psp_score(psp, player, amount):
-    score = 0
-
-    # 1. 成功率權重（50%）
-    recent_success_rate = get_success_rate(psp, last_hours=24)
-    score += recent_success_rate * 50
-
-    # 2. 成本權重（30%）
-    fee_rate = psp.fee_percentage + (psp.fixed_fee / amount)
-    score += (1 - fee_rate) * 30
-
-    # 3. 速度權重（15%）
-    avg_settlement_time = psp.avg_settlement_minutes
-    score += (1 - min(avg_settlement_time / 60, 1)) * 15
-
-    # 4. VIP 專用通道加成（5%）
-    if player.vip_level >= 3 and psp.is_vip_channel:
-        score += 5
-
-    return score
-
-# 選擇最高分的 PSP
-best_psp = max(available_psps, key=lambda p: calculate_psp_score(p, player, amount))
-```
 
 #### 5.1.1 PSP 智能路由決策流程圖 (Smart Routing Decision Flow)
 
@@ -680,28 +632,8 @@ Stripe:
 ### 6.1 健康檢查機制
 
 **定時健康探測**（每 5 分鐘執行）：
-```sql
--- 計算過去 1 小時每個 PSP 的成功率
-SELECT
-    psp_code,
-    COUNT(*) AS total_transactions,
-    SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS successful_transactions,
-    (SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END)::DECIMAL / COUNT(*)) AS success_rate
-FROM transactions
-WHERE created_at > NOW() - INTERVAL '1 hour'
-GROUP BY psp_code;
-```
 
 **降級規則**：
-```python
-if success_rate < 0.80:  # 成功率低於 80%
-    psp.status = 'degraded'
-    alert_ops_team(f"PSP {psp.code} success rate dropped to {success_rate}")
-
-if success_rate < 0.50:  # 成功率低於 50%
-    psp.status = 'unavailable'
-    switch_to_backup_psp(psp)
-```
 
 ### 6.2 自動切換策略
 
@@ -764,29 +696,6 @@ Fallback PSP: Manual Bank Transfer（通知財務團隊）
 ### 8.1 主動對帳任務
 
 **Cron Job（每 15 分鐘執行）**：
-```python
-def reconcile_pending_transactions():
-    # 查詢超過 30 分鐘仍為 Pending 的訂單
-    pending_txns = Transaction.objects.filter(
-        status='pending',
-        created_at__lt=timezone.now() - timedelta(minutes=30)
-    )
-
-    for txn in pending_txns:
-        # 主動查詢 PSP 狀態
-        psp_response = psp_client.query_transaction(txn.psp_order_id)
-
-        if psp_response['status'] == 'SUCCESS':
-            # 補單：更新狀態並增加餘額
-            txn.status = 'success'
-            txn.save()
-            wallet_service.credit(txn.player_id, txn.amount)
-            logger.info(f"补单成功: {txn.id}")
-
-        elif psp_response['status'] == 'FAILED':
-            txn.status = 'failed'
-            txn.save()
-```
 
 ### 8.2 玩家申訴處理
 
@@ -1065,24 +974,6 @@ Layer 3: Wallet Service 冪等性
 
 **補單審計日誌範例**：
 
-```sql
-INSERT INTO payment_audit_log (
-    transaction_id, event, details, created_at, operator
-) VALUES (
-    'txn_20260127_001',
-    'RECONCILIATION_CREDITED',
-    JSON_BUILD_OBJECT(
-        'reason', 'Webhook not received',
-        'psp_status', 'SUCCESS',
-        'psp_txn_id', 'nuvei_12345',
-        'delay_minutes', 45,
-        'reconciliation_job_id', 'cron_20260127_1430',
-        'operator', 'SYSTEM_AUTO'
-    ),
-    NOW(),
-    'reconciliation_service'
-);
-```
 
 **每日對帳報告範例**：
 
@@ -1173,17 +1064,6 @@ Authorization: Bearer <player_jwt_token>
 
 **安全要求**：
 1. **簽名驗證**：
-   ```python
-   received_signature = request.headers['X-PSP-Signature']
-   expected_signature = hmac.new(
-       WEBHOOK_SECRET.encode(),
-       request.body,
-       hashlib.sha256
-   ).hexdigest()
-
-   if received_signature != expected_signature:
-       return Response(status=403)
-   ```
 
 2. **冪等性保護**：
    - 使用 `transaction_id` 作為唯一鍵，防止重複處理

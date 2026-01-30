@@ -186,13 +186,6 @@ Valid Bet = 0                   → 不計入流水要求
 - **返水爭議**: 玩家質疑和局投注為何無返水
 - **實現混亂**: 開發人員無法正確實現邏輯
 
-**解決方案**:
-```java
-if ((betType == BANKER || betType == PLAYER) && outcome == TIE) {
-    return BigDecimal.ZERO;  // Push 狀態
-}
-return betAmount;  // 所有其他情況（含和局投注）
-```
 
 **詳細分析**: [06_baccarat_tie_bet_valid_bet_logic.md](./06_baccarat_tie_bet_valid_bet_logic.md)
 
@@ -543,34 +536,6 @@ GGR = 博彩收入 - 博彩成本（自動計算）
 - ✅ **未來新活動**：直接採用新邏輯（取款時驗證）
 - ✅ **法務確認**：已確認符合信賴保護原則，無追溯風險
 
-**數據遷移腳本**（參考）:
-```sql
--- 為當前活動中的玩家生成 wagering_details 記錄
-INSERT INTO t_wagering_detail (
-    user_id, promotion_id, transaction_id,
-    bet_amount, game_type, valid_bet,
-    game_contribution, contributed_amount,
-    calculation_version, created_at
-)
-SELECT
-    wt.user_id,
-    ap.promotion_id,
-    wt.transaction_id,
-    wt.bet_amount,
-    wt.game_type,
-    COALESCE(wt.valid_bet, wt.bet_amount),
-    COALESCE(gc.contribution, 1.0000),
-    COALESCE(wt.valid_bet, wt.bet_amount) * COALESCE(gc.contribution, 1.0000),
-    'v1.0.0',
-    wt.created_at
-FROM t_wallet_transaction wt
-INNER JOIN t_active_promotion ap ON wt.user_id = ap.user_id
-LEFT JOIN t_game_contribution gc ON wt.game_type = gc.game_type
-WHERE ap.status = 'ACTIVE'
-  AND wt.created_at >= ap.started_at
-  AND wt.transaction_type = 'BET'
-  AND wt.deleted_flag = 0;
-```
 
 ---
 
@@ -665,21 +630,6 @@ WHERE ap.status = 'ACTIVE'
 
 **現狀**: 文檔未明確指定分散式鎖實現方式
 
-**推薦方案**:
-```java
-@Configuration
-public class RedissonConfig {
-    @Bean
-    public RedissonClient redissonClient() {
-        Config config = new Config();
-        config.useSingleServer()
-            .setAddress("redis://localhost:6379")
-            .setConnectionPoolSize(50)
-            .setConnectionMinimumIdleSize(10);
-        return Redisson.create(config);
-    }
-}
-```
 
 **理由**:
 - Redisson 提供 Redlock 算法實現
@@ -719,26 +669,6 @@ sharding:
 
 **現狀**: 文檔中同步處理可能成為性能瓶頸
 
-**推薦方案**:
-```java
-@Service
-public class BetEventPublisher {
-    private final ApplicationEventPublisher eventPublisher;
-
-    public void publishBetPlaced(WalletTransaction tx) {
-        eventPublisher.publishEvent(new BetPlacedEvent(tx));
-    }
-}
-
-@Component
-public class TurnoverAccumulationListener {
-    @EventListener
-    @Async("turnoverExecutor")
-    public void onBetPlaced(BetPlacedEvent event) {
-        turnoverService.accumulate(event.getUserId(), event.getValidBet());
-    }
-}
-```
 
 **理由**:
 - 解耦核心業務流程

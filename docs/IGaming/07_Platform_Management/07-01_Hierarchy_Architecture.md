@@ -56,43 +56,8 @@ Super Admin
 ### 4.2 權限檢查實現
 
 **Middleware 攔截器**：
-```python
-class TenantIsolationMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        user = request.user
-
-        # 提取用戶的 tenant_id
-        if user.role == 'super_admin':
-            request.accessible_tenants = Tenant.objects.all()
-        elif user.role == 'brand_admin':
-            request.accessible_tenants = Tenant.objects.filter(brand_id=user.brand_id)
-        elif user.role == 'tenant_admin':
-            request.accessible_tenants = Tenant.objects.filter(id=user.tenant_id)
-        else:
-            request.accessible_tenants = Tenant.objects.none()
-
-        response = self.get_response(request)
-        return response
-```
 
 **資料庫層級強制過濾（PostgreSQL RLS）**：
-```sql
--- 啟用 Row-Level Security
-ALTER TABLE players ENABLE ROW LEVEL SECURITY;
-
--- 創建策略：只能查詢所屬租戶的玩家
-CREATE POLICY tenant_isolation_policy ON players
-    FOR ALL
-    TO authenticated_users
-    USING (tenant_id = current_setting('app.current_tenant_id')::BIGINT);
-
--- 應用層設定當前租戶
-SET app.current_tenant_id = 123;
-SELECT * FROM players;  -- 自動過濾 tenant_id = 123
-```
 
 ---
 
@@ -103,49 +68,10 @@ SELECT * FROM players;  -- 自動過濾 tenant_id = 123
 **需求**：Brand Admin 需要查看旗下所有 Tenant 的財務彙總。
 
 **SQL 實現**：
-```sql
--- Brand 級財務彙總（過去 30 天）
-SELECT
-    b.brand_id,
-    b.brand_name,
-    COUNT(DISTINCT t.tenant_id) AS tenant_count,
-    COUNT(DISTINCT p.player_id) AS total_players,
-    SUM(CASE WHEN txn.type = 'deposit' THEN txn.amount ELSE 0 END) AS total_deposits,
-    SUM(CASE WHEN txn.type = 'withdrawal' THEN txn.amount ELSE 0 END) AS total_withdrawals,
-    SUM(CASE WHEN txn.type = 'deposit' THEN txn.amount ELSE -txn.amount END) AS net_revenue
-FROM brands b
-JOIN tenants t ON t.brand_id = b.brand_id
-JOIN players p ON p.tenant_id = t.tenant_id
-LEFT JOIN transactions txn ON txn.player_id = p.player_id
-    AND txn.created_at > NOW() - INTERVAL '30 days'
-    AND txn.status = 'success'
-WHERE b.brand_id = ? -- Brand Admin 的 brand_id
-GROUP BY b.brand_id, b.brand_name;
-```
 
 ### 5.2 Super Admin 全局監控
 
 **實時監控指標**：
-```python
-def get_platform_overview():
-    return {
-        'total_brands': Brand.objects.count(),
-        'total_tenants': Tenant.objects.count(),
-        'total_active_players': Player.objects.filter(
-            last_login__gte=timezone.now() - timedelta(days=7)
-        ).count(),
-        'total_deposits_today': Transaction.objects.filter(
-            type='deposit',
-            status='success',
-            created_at__date=timezone.now().date()
-        ).aggregate(Sum('amount'))['amount__sum'] or 0,
-        'total_withdrawals_today': Transaction.objects.filter(
-            type='withdrawal',
-            status='success',
-            created_at__date=timezone.now().date()
-        ).aggregate(Sum('amount'))['amount__sum'] or 0,
-    }
-```
 
 ---
 
@@ -156,31 +82,6 @@ def get_platform_overview():
 **功能**：Super Admin 可以"化身"為任意 Tenant Admin，進入其後台進行操作。
 
 **實現方案**：
-```python
-# 1. Super Admin 選擇要模擬的 Tenant
-def impersonate_tenant(request, tenant_id):
-    if not request.user.is_super_admin:
-        raise PermissionDenied("Only Super Admin can impersonate")
-
-    target_tenant = Tenant.objects.get(id=tenant_id)
-
-    # 2. 在 Session 中記錄原始身份與模擬身份
-    request.session['original_user_id'] = request.user.id
-    request.session['impersonated_tenant_id'] = tenant_id
-
-    # 3. 重定向至 Tenant 後台
-    return redirect(f'/tenant/{tenant_id}/dashboard')
-
-# 4. 退出模擬
-def stop_impersonation(request):
-    original_user_id = request.session.pop('original_user_id', None)
-    request.session.pop('impersonated_tenant_id', None)
-
-    if original_user_id:
-        request.user = User.objects.get(id=original_user_id)
-
-    return redirect('/super-admin/dashboard')
-```
 
 **前端顯示提示**：
 ```html
@@ -198,18 +99,6 @@ def stop_impersonation(request):
 **需求**：同一 Brand 下的多個 Tenant，玩家可以使用同一帳號登入。
 
 **實現方案**：
-```sql
--- 玩家表增加 brand_id 欄位
-ALTER TABLE players ADD COLUMN brand_id BIGINT;
-
--- 唯一索引：同一 Brand 下 username 唯一
-CREATE UNIQUE INDEX idx_brand_username ON players(brand_id, username);
-
--- 玩家登入邏輯
--- 允許玩家在同 Brand 的不同 Tenant 之間切換
-SELECT * FROM players
-WHERE brand_id = ? AND username = ?;
-```
 
 ---
 
@@ -233,68 +122,10 @@ WHERE brand_id = ? AND username = ?;
 ### 7.2 計費數據計算
 
 **SQL 查詢範例**（計算某 Tenant 本月應付費用）：
-```sql
--- 計算本月有效流水
-WITH monthly_turnover AS (
-    SELECT
-        SUM(valid_turnover) AS total_turnover
-    FROM game_bets
-    WHERE tenant_id = ?
-      AND DATE_TRUNC('month', created_at) = DATE_TRUNC('month', NOW())
-)
-SELECT
-    tc.tenant_id,
-    tc.billing_model,  -- 'subscription', 'revenue_share', 'hybrid'
-    tc.subscription_fee,
-    tc.revenue_share_percentage,
-    mt.total_turnover,
-    CASE
-        WHEN tc.billing_model = 'subscription' THEN tc.subscription_fee
-        WHEN tc.billing_model = 'revenue_share' THEN mt.total_turnover * tc.revenue_share_percentage / 100
-        WHEN tc.billing_model = 'hybrid' THEN tc.subscription_fee + (mt.total_turnover * tc.revenue_share_percentage / 100)
-    END AS amount_due
-FROM tenant_configs tc
-CROSS JOIN monthly_turnover mt
-WHERE tc.tenant_id = ?;
-```
 
 ### 7.3 自動扣費與欠費處理
 
 **定時任務（每月 1 號執行）**：
-```python
-def charge_monthly_fees():
-    for tenant in Tenant.objects.filter(status='active'):
-        billing_config = tenant.billing_config
-        amount_due = calculate_billing_amount(tenant, billing_config)
-
-        # 從 Tenant 錢包扣款
-        if tenant.wallet_balance >= amount_due:
-            tenant.wallet_balance -= amount_due
-            tenant.save()
-
-            Invoice.objects.create(
-                tenant=tenant,
-                amount=amount_due,
-                status='paid',
-                billing_period=get_last_month()
-            )
-        else:
-            # 欠費處理
-            Invoice.objects.create(
-                tenant=tenant,
-                amount=amount_due,
-                status='overdue',
-                billing_period=get_last_month()
-            )
-
-            # 通知 Tenant Admin
-            send_overdue_notice(tenant)
-
-            # 若連續 3 個月欠費，自動暫停服務
-            if tenant.overdue_months >= 3:
-                tenant.status = 'suspended'
-                tenant.save()
-```
 
 ---
 
@@ -306,63 +137,14 @@ def charge_monthly_fees():
 
 **遷移步驟**：
 1. **數據完整性檢查**：
-   ```sql
-   -- 檢查該 Tenant 是否有未結算的財務數據
-   SELECT COUNT(*) FROM transactions
-   WHERE tenant_id = ? AND status = 'pending';
-   ```
 
 2. **執行遷移**：
-   ```sql
-   BEGIN;
-
-   -- 更新 Tenant 的 brand_id
-   UPDATE tenants SET brand_id = ? WHERE tenant_id = ?;
-
-   -- 更新所有關聯數據的 brand_id
-   UPDATE players SET brand_id = ? WHERE tenant_id = ?;
-   UPDATE transactions SET brand_id = ? WHERE tenant_id = ?;
-   UPDATE agents SET brand_id = ? WHERE tenant_id = ?;
-
-   COMMIT;
-   ```
 
 3. **審計日誌記錄**（引用 09-02）：
-   ```python
-   AuditLog.create(
-       action='TENANT_MIGRATION',
-       operator_id=current_user.id,
-       details={
-           'tenant_id': tenant_id,
-           'from_brand_id': old_brand_id,
-           'to_brand_id': new_brand_id,
-           'reason': '併購案：Brand A 併入 Brand B'
-       }
-   )
-   ```
 
 ### 8.2 Tenant 數據導出（Data Portability）
 
 **符合 GDPR 數據可攜權**：
-```python
-def export_tenant_data(tenant_id):
-    tenant = Tenant.objects.get(id=tenant_id)
-
-    data_export = {
-        'tenant_info': model_to_dict(tenant),
-        'players': list(Player.objects.filter(tenant_id=tenant_id).values()),
-        'transactions': list(Transaction.objects.filter(tenant_id=tenant_id).values()),
-        'agents': list(Agent.objects.filter(tenant_id=tenant_id).values()),
-        'bonuses': list(Bonus.objects.filter(tenant_id=tenant_id).values()),
-    }
-
-    # 輸出為 JSON 檔案
-    output_path = f'/exports/tenant_{tenant_id}_export.json'
-    with open(output_path, 'w') as f:
-        json.dump(data_export, f, indent=2, default=str)
-
-    return output_path
-```
 
 ---
 
@@ -402,16 +184,6 @@ def export_tenant_data(tenant_id):
 ```
 
 **API 請求驗證**：
-```python
-@require_tenant_access
-def get_player_list(request, tenant_id):
-    # 自動驗證：request.user.tenant_id == tenant_id
-    if request.user.tenant_id != tenant_id and not request.user.is_super_admin:
-        raise PermissionDenied("Cannot access other tenant's data")
-
-    players = Player.objects.filter(tenant_id=tenant_id)
-    return JsonResponse({'players': list(players.values())})
-```
 
 ---
 

@@ -105,16 +105,6 @@ Transaction API 需區分獎金類型：
 | **Critical** | RTP > 200% AND Net Loss > $10,000 | **自動停用** 該遊戲/該 GP (HTTP 503) | **手動**：需 CTO/風控主管確認後解鎖 |
 
 ### 7.3 實作邏輯
-```python
-def check_circuit_breaker(game_id, bet, win):
-    metrics = redis.get_metrics(game_id, window="5min")
-    metrics.update(bet, win)
-    
-    if metrics.rtp > 200 and metrics.net_loss > 10000:
-        redis.set_flag(f"STOP_{game_id}", ttl=3600)
-        alert_system.send_critical(f"Game {game_id} RTP {metrics.rtp}%! Auto-stopped.")
-        raise ServiceUnavailable("Game is currently under maintenance.")
-```
 
 
 ### 7.4 人工介入與恢復 (Manual Recovery)

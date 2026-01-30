@@ -274,67 +274,11 @@ n = 2 × (Z_α/2 + Z_β)² × σ² / δ²
 - δ: 最小可檢測效應 (Minimum Detectable Effect)
 ```
 
-**範例計算**:
-```python
-from scipy.stats import norm
-import math
-
-def calculate_sample_size(baseline_rate, mde, alpha=0.05, power=0.8):
-    """
-    計算 A/B 測試所需樣本量
-
-    baseline_rate: 對照組轉化率 (如 0.30 = 30%)
-    mde: 最小可檢測效應 (如 0.05 = 5%)
-    alpha: 顯著性水平 (0.05 = 95% 置信度)
-    power: 統計功效 (0.8 = 80%)
-    """
-    Z_alpha = norm.ppf(1 - alpha / 2)  # 1.96
-    Z_beta = norm.ppf(power)            # 0.84
-
-    p1 = baseline_rate
-    p2 = baseline_rate * (1 + mde)
-
-    pooled_prob = (p1 + p2) / 2
-    effect_size = abs(p2 - p1)
-
-    n = 2 * ((Z_alpha + Z_beta) ** 2) * pooled_prob * (1 - pooled_prob) / (effect_size ** 2)
-
-    return math.ceil(n)
-
-# 範例: 首存轉化率從 30% 提升到 31.5% (5% 相對提升)
-sample_size = calculate_sample_size(
-    baseline_rate=0.30,
-    mde=0.05
-)
-# Result: 每組需要 ~6,300 用戶
-```
 
 ---
 
 ### 6.2 統計檢驗方法
 
-**卡方檢驗 (Chi-Square Test)** - 用於轉化率對比:
-```python
-from scipy.stats import chi2_contingency
-
-# 數據
-control = {'converted': 300, 'not_converted': 700}      # 30% 轉化率
-variant = {'converted': 330, 'not_converted': 670}      # 33% 轉化率
-
-# 構建列聯表
-observed = [
-    [control['converted'], control['not_converted']],
-    [variant['converted'], variant['not_converted']]
-]
-
-# 卡方檢驗
-chi2, p_value, dof, expected = chi2_contingency(observed)
-
-if p_value < 0.05:
-    print(f"統計顯著! p-value={p_value:.4f}")
-else:
-    print(f"無顯著差異. p-value={p_value:.4f}")
-```
 
 ---
 

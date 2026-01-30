@@ -392,57 +392,6 @@ Authorization: Bearer <jwt_token>
 ### 5.2 限流實現
 
 **使用 Redis Token Bucket 算法**：
-```python
-import redis
-import time
-
-redis_client = redis.Redis()
-
-def check_rate_limit(client_id: str, max_requests: int = 100, window_seconds: int = 60) -> bool:
-    """
-    檢查是否超過限流
-    :param client_id: 客戶端標識（IP 或 User ID）
-    :param max_requests: 允許的最大請求數
-    :param window_seconds: 時間窗口（秒）
-    :return: True（允許）或 False（拒絕）
-    """
-    key = f"rate_limit:{client_id}"
-    current_time = int(time.time())
-    window_start = current_time - window_seconds
-
-    # 移除過期的請求記錄
-    redis_client.zremrangebyscore(key, 0, window_start)
-
-    # 獲取當前窗口內的請求數
-    request_count = redis_client.zcard(key)
-
-    if request_count >= max_requests:
-        return False  # 超過限流
-
-    # 記錄本次請求
-    redis_client.zadd(key, {f"req_{current_time}": current_time})
-    redis_client.expire(key, window_seconds)
-
-    return True  # 允許請求
-
-# Middleware 整合
-@app.middleware("http")
-async def rate_limit_middleware(request: Request, call_next):
-    client_id = request.client.host  # 使用 IP 作為標識
-
-    if not check_rate_limit(client_id, max_requests=100, window_seconds=60):
-        return JSONResponse(
-            status_code=429,
-            content={
-                "code": 4029,
-                "message": "Too many requests. Please try again later.",
-                "retry_after": 60
-            }
-        )
-
-    response = await call_next(request)
-    return response
-```
 
 ### 5.3 限流響應頭
 
@@ -483,55 +432,6 @@ Retry-After: 60  # 秒數
 ### 6.2 Prometheus 監控實現
 
 **Metrics 定義**：
-```python
-from prometheus_client import Counter, Histogram, Gauge
-
-# API 請求計數器
-translation_requests_total = Counter(
-    'translation_requests_total',
-    'Total translation API requests',
-    ['method', 'endpoint', 'status_code']
-)
-
-# 響應時間直方圖
-translation_response_time = Histogram(
-    'translation_response_time_seconds',
-    'Translation API response time',
-    ['endpoint']
-)
-
-# 快取命中率
-cache_hits_total = Counter('translation_cache_hits_total', 'Cache hits')
-cache_misses_total = Counter('translation_cache_misses_total', 'Cache misses')
-
-# 翻譯覆蓋率
-translation_coverage = Gauge(
-    'translation_coverage_percentage',
-    'Translation coverage percentage',
-    ['lang']
-)
-
-# Middleware 整合
-@app.middleware("http")
-async def prometheus_middleware(request: Request, call_next):
-    start_time = time.time()
-
-    response = await call_next(request)
-
-    # 記錄請求
-    translation_requests_total.labels(
-        method=request.method,
-        endpoint=request.url.path,
-        status_code=response.status_code
-    ).inc()
-
-    # 記錄響應時間
-    translation_response_time.labels(
-        endpoint=request.url.path
-    ).observe(time.time() - start_time)
-
-    return response
-```
 
 ### 6.3 監控儀表板
 
@@ -634,35 +534,6 @@ groups:
 ### 7.2 事件發佈
 
 **當翻譯變更時發佈事件**（引用 07-03 通知架構）：
-```python
-import asyncio
-from kafka import KafkaProducer
-
-kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092')
-
-async def publish_translation_changed_event(translation_id: int, key: str, lang: str):
-    """發佈翻譯變更事件至 Kafka"""
-    event = {
-        "event_type": "translation.updated",
-        "translation_id": translation_id,
-        "key": key,
-        "lang": lang,
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-    kafka_producer.send('translation-events', value=json.dumps(event).encode())
-    logger.info(f"Published translation.updated event for {key}:{lang}")
-
-# 在更新翻譯後調用
-@app.put("/api/v1/i18n/translations/{key}")
-async def update_translation(...):
-    # ... 更新資料庫邏輯
-
-    # 發佈事件
-    asyncio.create_task(
-        publish_translation_changed_event(translation_id, key, lang)
-    )
-```
 
 ---
 

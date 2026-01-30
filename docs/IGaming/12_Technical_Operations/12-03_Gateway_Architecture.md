@@ -394,29 +394,6 @@ plugins:
 
 根據系統負載動態調整限流閾值：
 
-```python
-def calculate_dynamic_rate_limit():
-    """
-    Adjust rate limit based on system health
-    """
-    cpu_usage = get_cpu_usage_percent()
-    memory_usage = get_memory_usage_percent()
-    error_rate = get_error_rate_percent()
-
-    base_limit = 100  # requests per second
-
-    # Reduce limit if system under stress
-    if cpu_usage > 80 or memory_usage > 85 or error_rate > 5:
-        multiplier = 0.5  # Reduce to 50%
-    elif cpu_usage > 60 or memory_usage > 70:
-        multiplier = 0.7  # Reduce to 70%
-    else:
-        multiplier = 1.0  # Normal operation
-
-    adjusted_limit = int(base_limit * multiplier)
-    redis.setex('dynamic_rate_limit', 60, adjusted_limit)  # TTL 60s
-    return adjusted_limit
-```
 
 ## 3.4 熔斷器詳細配置 (Circuit Breaker Configuration)
 

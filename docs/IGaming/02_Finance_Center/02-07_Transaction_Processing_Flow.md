@@ -14,14 +14,6 @@
 
 *   **機制**：在 `player_wallet` 表中增加 `version` 欄位。
 *   **SQL 範例**：
-    ```sql
-    UPDATE player_wallet 
-    SET cash_balance = cash_balance - 100, 
-        version = version + 1 
-    WHERE player_id = 'uuid' 
-      AND version = 5 
-      AND cash_balance >= 100; -- 確保餘額足夠
-    ```
 *   **重試機制**：若 `Affected Rows = 0` (表示餘額不足或版本號過期)，Service 層應進行 **Backoff Retry** (最多 3 次)。
 
 #### 2.1.1 樂觀鎖併發處理流程圖
@@ -367,10 +359,6 @@ stateDiagram-v2
 
 ### 6.1 Outbox Table 設計
 在與 `wallet_transaction` 同一個 DB Transaction 中寫入：
-```sql
-INSERT INTO outreach_event_outbox (id, aggregate_id, type, payload, status)
-VALUES (uuid(), player_id, 'WALLET_DEBITED', '{"amount": 100, "game": "slot"}', 'PENDING');
-```
 
 ### 6.2 關鍵事件列表
 *   `WALLET_DEBITED`: 用於計算流水 (Turnover Contribution)、觸發 "投注任務"。

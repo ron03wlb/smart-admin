@@ -54,23 +54,6 @@
 - **存儲格式**：`[Version]:[IV]:[Ciphertext]:[AuthTag]`
 
 **資料庫 Schema 範例**：
-```sql
-CREATE TABLE players (
-    player_id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-
-    -- 加密 PII（不可索引）
-    encrypted_phone VARCHAR(255),
-    encrypted_email VARCHAR(255),
-    encrypted_real_name VARCHAR(255),
-
-    -- Blind Indexes（可索引）
-    phone_index CHAR(64) UNIQUE,
-    email_index CHAR(64) UNIQUE,
-
-    created_at TIMESTAMP DEFAULT NOW()
-);
-```
 
 **詳細內容**：[09-03-01 §3 存儲加密](./09-03-01_Encryption_Strategy.md#3-存儲加密-column-level-encryption)
 
@@ -132,19 +115,6 @@ DELETE FROM user_keys WHERE player_id = ?
 ### 4.1 密碼雜湊算法
 
 **使用 Argon2id**（優於 bcrypt/PBKDF2）：
-```python
-from argon2 import PasswordHasher
-
-ph = PasswordHasher(
-    time_cost=3,        # 迭代次數
-    memory_cost=65536,  # 64 MB（抗 GPU 攻擊）
-    parallelism=2,      # 並行執行緒數
-    hash_len=32         # 256-bit
-)
-
-password_hash = ph.hash("MySecurePassword123")
-# 輸出: $argon2id$v=19$m=65536,t=3,p=2$salt$hash
-```
 
 **為何選擇 Argon2id？**
 | 算法 | 優勢 | 劣勢 |
@@ -158,12 +128,6 @@ password_hash = ph.hash("MySecurePassword123")
 ### 4.2 登入保護
 
 **限制重試次數**（防止暴力破解）：
-```python
-# Redis 記錄失敗嘗試
-attempts = redis_client.incr(f"login_attempts:{username}")
-if attempts > 5:
-    raise TooManyAttemptsError("Please try again after 15 minutes")
-```
 
 **密碼複雜度要求**：
 - 最少 8 個字符

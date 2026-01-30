@@ -298,71 +298,6 @@ graph TD
 
 **年度預估價值計算邏輯**：
 
-```python
-def calculate_annual_vip_value(level, annual_deposit, annual_turnover):
-    """
-    計算玩家在特定 VIP 等級的年度預估價值
-    """
-    # 權益配置
-    level_config = {
-        'Bronze': {'cashback': 0.003, 'monthly_bonus': 0, 'birthday': 0, 'points_mult': 1.0},
-        'Silver': {'cashback': 0.005, 'monthly_bonus': 0, 'birthday': 20, 'points_mult': 1.2},
-        'Gold': {'cashback': 0.008, 'monthly_bonus': 100, 'birthday': 100, 'points_mult': 1.5},
-        'Platinum': {'cashback': 0.012, 'monthly_bonus': 1000, 'birthday': 500, 'points_mult': 2.0},
-        'Diamond': {'cashback': 0.015, 'monthly_bonus': 5000, 'birthday': 2000, 'points_mult': 3.0}
-    }
-
-    config = level_config[level]
-
-    # 1. 返水收益
-    cashback_value = annual_turnover * config['cashback']
-
-    # 2. 月度紅利
-    monthly_bonus_value = config['monthly_bonus'] * 12
-
-    # 3. 生日禮金
-    birthday_value = config['birthday']
-
-    # 4. 積分價值 (假設 100 積分 = $1)
-    # 每投注 $10 獲得 1 基礎積分
-    base_points = annual_turnover / 10
-    actual_points = base_points * config['points_mult']
-    points_value = actual_points / 100  # 100 積分兌換 $1
-
-    # 5. 總價值
-    total_value = cashback_value + monthly_bonus_value + birthday_value + points_value
-
-    return {
-        'cashback': cashback_value,
-        'monthly_bonus': monthly_bonus_value,
-        'birthday': birthday_value,
-        'points': points_value,
-        'total': total_value
-    }
-
-# 範例計算: Gold 玩家年度價值
-gold_value = calculate_annual_vip_value(
-    level='Gold',
-    annual_deposit=50000,    # 年度存款 $50K
-    annual_turnover=200000   # 年度流水 $200K (假設流水倍數 4x)
-)
-
-"""
-結果:
-{
-    'cashback': $1,600 (返水),
-    'monthly_bonus': $1,200 (月度紅利),
-    'birthday': $100 (生日禮金),
-    'points': $300 (積分價值),
-    'total': $3,200
-}
-
-投資回報率 (ROI):
-- 投入: $50,000 (年度存款)
-- 回報: $3,200 (VIP 權益價值)
-- ROI: 6.4%
-"""
-```
 
 **不同玩家類型的 VIP 價值分析**：
 
@@ -579,60 +514,6 @@ flowchart LR
 
 **積分計算公式拆解**：
 
-```python
-# 完整計算公式
-def calculate_loyalty_points(bet_amount, game_type, vip_level, has_promo=False):
-    # Step 1: 基礎積分
-    earn_rate = 10  # 每$10獲得1積分 (可配置)
-    base_points = bet_amount / earn_rate
-
-    # Step 2: 遊戲權重
-    game_weights = {
-        'SLOTS': 1.0,
-        'LIVE_CASINO': 0.5,
-        'POKER': 0.8,
-        'SPORTS': 0.3
-    }
-    game_weight = game_weights.get(game_type, 0.5)
-    weighted_points = base_points * game_weight
-
-    # Step 3: VIP 倍數
-    vip_multipliers = {
-        'Bronze': 1.0,
-        'Silver': 1.2,
-        'Gold': 1.5,
-        'Platinum': 2.0,
-        'Diamond': 3.0
-    }
-    vip_multiplier = vip_multipliers.get(vip_level, 1.0)
-    final_points = weighted_points * vip_multiplier
-
-    # Step 4: 促銷加成 (可選)
-    if has_promo:
-        promo_multiplier = 2.0  # 雙倍積分活動
-        final_points *= promo_multiplier
-
-    # Step 5: 四捨五入
-    return round(final_points)
-
-# 範例計算
-points = calculate_loyalty_points(
-    bet_amount=100,      # 投注 $100
-    game_type='SLOTS',   # 老虎機
-    vip_level='Gold',    # Gold 等級
-    has_promo=False      # 無促銷
-)
-# Result: 15 積分
-
-# 範例計算 (週末雙倍積分)
-points_promo = calculate_loyalty_points(
-    bet_amount=100,
-    game_type='SLOTS',
-    vip_level='Gold',
-    has_promo=True      # 週末雙倍積分
-)
-# Result: 30 積分
-```
 
 **兌換價值矩陣分析**：
 
@@ -767,24 +648,6 @@ ELSE 降級至Silver等級
 ```
 
 **變更影響試算範例**：
-```sql
--- 試算：將Gold升級條件從$20K降至$10K
-SELECT
-    '當前Gold玩家' AS category,
-    COUNT(*) AS player_count
-FROM players
-WHERE vip_level = 'Gold'
-
-UNION ALL
-
-SELECT
-    '新達標玩家' AS category,
-    COUNT(*) AS player_count
-FROM players
-WHERE vip_level = 'Silver'
-  AND total_deposit >= 10000
-  AND total_deposit < 20000;
-```
 
 ### 3.2 風控規則整合
 
@@ -821,152 +684,15 @@ THEN 標記為 "VIP Farming" → 人工審核
 
 ### 4.1 VIP Level Config Table (vip_level_configs)
 
-```sql
-CREATE TABLE vip_level_configs (
-    level_id INT PRIMARY KEY AUTO_INCREMENT,
-    tenant_id BIGINT NOT NULL,
-    level_name VARCHAR(50) NOT NULL,  -- Bronze, Silver, Gold...
-    level_order INT NOT NULL,         -- 排序：1, 2, 3...
-    level_icon_url VARCHAR(255),
-    level_color VARCHAR(7),           -- HEX顏色碼
-
-    -- 升級條件
-    required_total_deposit BIGINT NOT NULL,
-    required_total_turnover BIGINT NOT NULL,
-    required_loyalty_points INT DEFAULT 0,
-
-    -- 保級條件（每月）
-    retention_deposit BIGINT NOT NULL,
-    retention_turnover BIGINT NOT NULL,
-
-    -- 權益
-    cashback_percentage DECIMAL(5,4) NOT NULL,  -- 返水比例 (0.0050 = 0.5%)
-    withdrawal_limit_daily BIGINT NOT NULL,
-    withdrawal_speed_hours INT NOT NULL,       -- 處理時效（小時）
-    loyalty_point_multiplier DECIMAL(5,2) DEFAULT 1.0,
-
-    -- 紅利
-    level_up_bonus BIGINT DEFAULT 0,
-    birthday_bonus BIGINT DEFAULT 0,
-    monthly_bonus BIGINT DEFAULT 0,
-
-    -- 狀態
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    INDEX idx_tenant (tenant_id),
-    INDEX idx_order (level_order)
-);
-```
 
 ### 4.2 Player VIP Status Table (player_vip_status)
 
-```sql
-CREATE TABLE player_vip_status (
-    status_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    player_id BIGINT NOT NULL,
-    tenant_id BIGINT NOT NULL,
-
-    -- 當前VIP等級
-    current_level_id INT NOT NULL,
-    current_level_name VARCHAR(50),
-
-    -- 升級進度
-    total_deposit BIGINT DEFAULT 0,
-    total_turnover BIGINT DEFAULT 0,
-    loyalty_points INT DEFAULT 0,
-
-    -- 保級狀態
-    last_retention_check DATE,
-    retention_warning_count INT DEFAULT 0,
-    grace_period_end DATE,
-
-    -- 歷史
-    promoted_at TIMESTAMP,
-    last_demoted_at TIMESTAMP,
-
-    -- 狀態
-    is_frozen BOOLEAN DEFAULT FALSE,     -- 風控凍結
-    freeze_reason VARCHAR(255),
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    UNIQUE INDEX idx_player (player_id),
-    INDEX idx_tenant_level (tenant_id, current_level_id),
-    FOREIGN KEY (player_id) REFERENCES players(player_id) ON DELETE CASCADE,
-    FOREIGN KEY (current_level_id) REFERENCES vip_level_configs(level_id)
-);
-```
 
 ### 4.3 Loyalty Points Transactions Table (loyalty_point_transactions)
 
-```sql
-CREATE TABLE loyalty_point_transactions (
-    transaction_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    player_id BIGINT NOT NULL,
-    tenant_id BIGINT NOT NULL,
-
-    -- 交易類型
-    type ENUM('earn', 'redeem', 'expire', 'manual_adjust') NOT NULL,
-
-    -- 金額
-    points INT NOT NULL,              -- 正數為獲得，負數為消耗
-    balance_before INT NOT NULL,
-    balance_after INT NOT NULL,
-
-    -- 來源
-    source_type ENUM('game', 'deposit', 'promotion', 'birthday', 'manual'),
-    source_id BIGINT,                 -- 關聯的遊戲ID/交易ID
-
-    -- 兌換詳情（僅redeem類型）
-    redeem_item_id BIGINT,
-    redeem_item_name VARCHAR(255),
-    redeem_item_value BIGINT,
-
-    -- 審計
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(100),
-
-    INDEX idx_player (player_id, created_at DESC),
-    INDEX idx_tenant (tenant_id),
-    INDEX idx_type (type),
-    FOREIGN KEY (player_id) REFERENCES players(player_id) ON DELETE CASCADE
-);
-```
 
 ### 4.4 VIP Level History Table (vip_level_history)
 
-```sql
-CREATE TABLE vip_level_history (
-    history_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    player_id BIGINT NOT NULL,
-    tenant_id BIGINT NOT NULL,
-
-    -- 變更
-    from_level_id INT,
-    from_level_name VARCHAR(50),
-    to_level_id INT NOT NULL,
-    to_level_name VARCHAR(50) NOT NULL,
-
-    -- 原因
-    change_reason ENUM('promoted', 'demoted', 'manual_adjust') NOT NULL,
-    change_note TEXT,
-
-    -- 條件達成情況
-    deposit_at_change BIGINT,
-    turnover_at_change BIGINT,
-    points_at_change INT,
-
-    -- 審計
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(100),
-
-    INDEX idx_player (player_id, created_at DESC),
-    INDEX idx_tenant (tenant_id),
-    FOREIGN KEY (player_id) REFERENCES players(player_id) ON DELETE CASCADE
-);
-```
 
 ## 5. 相關文檔
 

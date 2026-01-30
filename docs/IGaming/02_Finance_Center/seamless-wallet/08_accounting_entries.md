@@ -49,25 +49,6 @@ GGR = +100（收入）
 
 ## 正確的科目設計
 
-```sql
--- 科目表
-CREATE TABLE chart_of_accounts (
-    account_code VARCHAR(20) PRIMARY KEY,
-    account_name VARCHAR(100) NOT NULL,
-    account_type ENUM('ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'),
-
-    -- 建議的科目設計
-    -- 負債類
-    -- 2001: 玩家現金負債
-    -- 2002: 未結算注單負債
-
-    -- 收入類
-    -- 4001: 博彩收入（Gaming Revenue）
-
-    -- 成本類
-    -- 5001: 博彩成本（Gaming Cost）
-);
-```
 
 ## GGR 計算
 

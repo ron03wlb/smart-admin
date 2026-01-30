@@ -78,20 +78,6 @@ NGR = GGR - Bonuses - Chargebacks - Refunds
 
 **目的**: 代理佣金計算與發放
 
-**計算邏輯**:
-```sql
--- 代理佣金 = (玩家淨輸 * 佣金比例) - 平台成本
-SELECT
-    agent_id,
-    SUM(ngr) AS total_ngr,
-    commission_rate,
-    SUM(ngr * commission_rate) AS gross_commission,
-    SUM(platform_cost) AS cost,
-    SUM(ngr * commission_rate - platform_cost) AS net_commission
-FROM dws.fact_agent_commission
-WHERE period = '2026-01'
-GROUP BY agent_id, commission_rate;
-```
 
 **刷新頻率**: 每日（T+1）
 
@@ -427,49 +413,6 @@ timeout: 1800  # 30 minutes
 7. 通知用戶 (郵件 / 站內信)
 ```
 
-**實現範例 (Java)**:
-```java
-@Service
-public class ReportExportService {
-
-    @Async("exportTaskExecutor")
-    public void exportLargeReport(ExportTaskDTO task) {
-        try (OutputStream os = s3Client.putObject(task.getS3Key())) {
-            ExcelWriter writer = EasyExcel.write(os).build();
-
-            long offset = 0;
-            int batchSize = 10000;
-
-            while (true) {
-                List<ReportRow> rows = clickHouseDao.queryWithPagination(
-                    task.getQuery(), offset, batchSize
-                );
-
-                if (rows.isEmpty()) break;
-
-                writer.write(rows);
-                offset += batchSize;
-
-                // 更新進度
-                updateProgress(task.getId(), offset);
-            }
-
-            writer.finish();
-
-            // 生成下載鏈接
-            String downloadUrl = s3Client.generatePresignedUrl(
-                task.getS3Key(), Duration.ofHours(24)
-            );
-
-            // 通知用戶
-            notifyUser(task.getUserId(), downloadUrl);
-
-        } catch (Exception e) {
-            updateTaskStatus(task.getId(), "FAILED", e.getMessage());
-        }
-    }
-}
-```
 
 ---
 
@@ -477,22 +420,6 @@ public class ReportExportService {
 
 ### 7.1 查詢優化
 
-**ClickHouse 優化**:
-```sql
--- 使用物化視圖 (Materialized View) 預聚合
-CREATE MATERIALIZED VIEW dws.mv_ggr_hourly
-ENGINE = SummingMergeTree()
-ORDER BY (game_id, hour)
-AS
-SELECT
-    game_id,
-    toStartOfHour(bet_time) AS hour,
-    sum(bet_amount) AS total_bets,
-    sum(win_amount) AS total_wins,
-    sum(bet_amount - win_amount) AS ggr
-FROM dwd.fact_bets
-GROUP BY game_id, hour;
-```
 
 ---
 

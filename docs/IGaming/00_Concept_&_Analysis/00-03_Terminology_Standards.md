@@ -268,47 +268,9 @@ Percentage = (Completed / Requirement) × 100%
 
 ### Java 類與字段命名
 
-```java
-// ✅ 正確命名
-public class WageringDetail {
-    private BigDecimal betAmount;           // 投注額
-    private BigDecimal validBet;            // 有效投注額
-    private BigDecimal gameContribution;    // 遊戲權重
-    private BigDecimal contributedAmount;   // 貢獻金額 (valid_bet × weight)
-}
-
-public class WageringProgress {
-    private BigDecimal totalRequirement;    // 流水要求
-    private BigDecimal completedAmount;     // 已完成金額
-    private BigDecimal remainingAmount;     // 剩餘要求
-}
-
-// ❌ 錯誤命名 (已廢棄)
-private BigDecimal effectiveTurnover;      // 應改為 validBet
-private BigDecimal turnoverRequirement;    // 應改為 wageringRequirement
-```
 
 ### 數據庫字段命名
 
-```sql
--- ✅ 正確命名
-CREATE TABLE wagering_details (
-    bet_amount DECIMAL(18,2) NOT NULL,        -- 投注額
-    valid_bet DECIMAL(18,2) NOT NULL,         -- 有效投注額
-    game_contribution DECIMAL(5,4),           -- 遊戲權重
-    contributed_amount DECIMAL(18,2)          -- 貢獻金額
-);
-
-CREATE TABLE wagering_progress (
-    total_requirement DECIMAL(18,2),          -- 流水要求
-    completed_amount DECIMAL(18,2),           -- 已完成金額
-    remaining_amount DECIMAL(18,2)            -- 剩餘要求
-);
-
--- ❌ 錯誤命名 (已廢棄)
-effective_turnover DECIMAL(18,2);            -- 應改為 valid_bet
-turnover_requirement DECIMAL(18,2);          -- 應改為 total_requirement
-```
 
 ### API 響應字段命名
 

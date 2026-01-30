@@ -61,106 +61,12 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 | AuthTag | 16 bytes | GCM 模式的認證標籤 |
 
 **Python 實現範例**：
-```python
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-import os
-import base64
-
-class PIIEncryption:
-    def __init__(self, encryption_key: bytes):
-        """
-        :param encryption_key: 32 bytes (256-bit) key from KMS
-        """
-        self.aesgcm = AESGCM(encryption_key)
-
-    def encrypt(self, plaintext: str) -> str:
-        """加密 PII 數據"""
-        # 1. 生成隨機 IV（每次加密唯一）
-        iv = os.urandom(12)
-
-        # 2. 加密（返回 ciphertext + auth_tag）
-        ciphertext = self.aesgcm.encrypt(
-            iv,
-            plaintext.encode('utf-8'),
-            associated_data=None
-        )
-
-        # 3. 組合格式：v1:iv:ciphertext
-        encrypted_data = b'v1:' + base64.b64encode(iv) + b':' + base64.b64encode(ciphertext)
-        return encrypted_data.decode('utf-8')
-
-    def decrypt(self, encrypted_data: str) -> str:
-        """解密 PII 數據"""
-        # 1. 解析格式
-        version, iv_b64, ciphertext_b64 = encrypted_data.split(':')
-
-        if version != 'v1':
-            raise ValueError(f"Unsupported encryption version: {version}")
-
-        # 2. Base64 解碼
-        iv = base64.b64decode(iv_b64)
-        ciphertext = base64.b64decode(ciphertext_b64)
-
-        # 3. 解密
-        plaintext = self.aesgcm.decrypt(iv, ciphertext, associated_data=None)
-        return plaintext.decode('utf-8')
-```
 
 **使用範例**：
-```python
-# 從 KMS 獲取加密金鑰
-encryption_key = kms_client.get_data_key("alias/player-pii-key")
-
-encryptor = PIIEncryption(encryption_key)
-
-# 加密
-encrypted_phone = encryptor.encrypt("+886912345678")
-# 結果: "v1:Y3J5cHRv:ZW5jcnlwdGVk..."
-
-# 存入資料庫
-db.execute(
-    "UPDATE players SET encrypted_phone = $1 WHERE player_id = $2",
-    encrypted_phone, player_id
-)
-
-# 從資料庫讀取並解密
-encrypted_data = db.fetchval("SELECT encrypted_phone FROM players WHERE player_id = $1", player_id)
-plaintext_phone = encryptor.decrypt(encrypted_data)
-# 結果: "+886912345678"
-```
 
 ### 3.3 資料庫 Schema 設計
 
 **範例**（玩家表）：
-```sql
-CREATE TABLE players (
-    player_id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,  -- 可明文（非 PII）
-
-    -- ❌ 禁止：明文存儲 PII
-    -- phone VARCHAR(20),
-    -- email VARCHAR(100),
-
-    -- ✅ 正確：加密存儲 PII
-    encrypted_phone VARCHAR(255),          -- 加密後的手機號
-    encrypted_email VARCHAR(255),          -- 加密後的 Email
-    encrypted_real_name VARCHAR(255),      -- 加密後的真實姓名
-    encrypted_id_number VARCHAR(255),      -- 加密後的身分證字號
-    encrypted_bank_account VARCHAR(255),   -- 加密後的銀行帳號
-
-    -- Blind Indexes（詳見 09-03-02）
-    phone_index CHAR(64) UNIQUE,           -- HMAC-SHA256(phone)
-    email_index CHAR(64) UNIQUE,           -- HMAC-SHA256(email)
-    id_number_index CHAR(64) UNIQUE,       -- HMAC-SHA256(id_number)
-
-    -- 其他欄位
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-
-    INDEX idx_phone_index (phone_index),
-    INDEX idx_email_index (email_index)
-);
-```
 
 ### 3.4 傳輸加密 (Data in Transit)
 
@@ -217,17 +123,6 @@ CREATE TABLE players (
 ### 4.2 參數配置
 
 **推薦參數**（基於 OWASP 建議）：
-```python
-from argon2 import PasswordHasher
-
-ph = PasswordHasher(
-    time_cost=3,        # 迭代次數（越高越安全，但越慢）
-    memory_cost=65536,  # 64 MB 記憶體（抗 GPU 攻擊）
-    parallelism=2,      # 並行執行緒數
-    hash_len=32,        # Hash 長度（256-bit）
-    salt_len=16         # Salt 長度（128-bit）
-)
-```
 
 **參數說明**：
 | 參數 | 建議值 | 說明 |
@@ -238,138 +133,22 @@ ph = PasswordHasher(
 | `salt_len` | 16 bytes | 每個用戶獨立隨機 Salt |
 
 **性能測試**（調整參數以達到目標時長）：
-```python
-import time
-
-ph = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=2)
-
-start = time.time()
-password_hash = ph.hash("MySecurePassword123")
-elapsed = time.time() - start
-
-print(f"Hash time: {elapsed:.3f}s")  # 目標：0.5-1.0秒
-```
 
 ### 4.3 實現範例
 
 **註冊時雜湊密碼**：
-```python
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-
-ph = PasswordHasher()
-
-def register_player(username: str, password: str):
-    # 1. 雜湊密碼（自動生成 Salt）
-    password_hash = ph.hash(password)
-
-    # 2. 存入資料庫
-    db.execute(
-        "INSERT INTO players (username, password_hash) VALUES ($1, $2)",
-        username, password_hash
-    )
-    # 存儲格式: $argon2id$v=19$m=65536,t=3,p=2$salt$hash
-
-# 範例輸出
-# $argon2id$v=19$m=65536,t=3,p=2$Y3J5cHRv$ZW5jcnlwdGVkc3RyaW5n
-```
 
 **登入時驗證密碼**：
-```python
-def authenticate_player(username: str, password: str) -> bool:
-    # 1. 從資料庫查詢用戶
-    user = db.fetchrow("SELECT password_hash FROM players WHERE username = $1", username)
-
-    if not user:
-        return False  # 用戶不存在
-
-    # 2. 驗證密碼
-    try:
-        ph.verify(user['password_hash'], password)
-        return True  # 密碼正確
-    except VerifyMismatchError:
-        return False  # 密碼錯誤
-```
 
 **自動重雜湊（Rehash）機制**：
-```python
-def login_and_rehash(username: str, password: str):
-    """登入成功後，檢查是否需要升級 Hash 參數"""
-    user = db.fetchrow("SELECT player_id, password_hash FROM players WHERE username = $1", username)
-
-    try:
-        ph.verify(user['password_hash'], password)
-
-        # 檢查 Hash 是否需要升級（參數變更）
-        if ph.check_needs_rehash(user['password_hash']):
-            new_hash = ph.hash(password)
-            db.execute(
-                "UPDATE players SET password_hash = $1 WHERE player_id = $2",
-                new_hash, user['player_id']
-            )
-            logger.info(f"Password rehashed for user {username}")
-
-        return True  # 登入成功
-    except VerifyMismatchError:
-        return False  # 密碼錯誤
-```
 
 ### 4.4 安全最佳實踐
 
 **1. 不要在 Hash 前對密碼進行額外處理**：
-```python
-# ❌ 錯誤：在 Hash 前 trim() 或 normalize()
-password = password.strip().lower()  # 會降低密碼熵
-password_hash = ph.hash(password)
-
-# ✅ 正確：直接 Hash 用戶輸入
-password_hash = ph.hash(password)
-```
 
 **2. 限制密碼重試次數**（防止暴力破解）：
-```python
-from redis import Redis
-
-redis_client = Redis()
-
-def check_login_attempts(username: str) -> bool:
-    """檢查是否超過登入嘗試次數"""
-    key = f"login_attempts:{username}"
-    attempts = redis_client.incr(key)
-
-    if attempts == 1:
-        redis_client.expire(key, 900)  # 15 分鐘過期
-
-    if attempts > 5:
-        logger.warning(f"User {username} exceeded login attempts")
-        return False  # 封鎖登入
-
-    return True
-```
 
 **3. 密碼複雜度要求**：
-```python
-import re
-
-def validate_password_strength(password: str) -> bool:
-    """驗證密碼強度"""
-    if len(password) < 8:
-        return False  # 至少 8 個字符
-
-    if not re.search(r'[A-Z]', password):
-        return False  # 至少 1 個大寫字母
-
-    if not re.search(r'[a-z]', password):
-        return False  # 至少 1 個小寫字母
-
-    if not re.search(r'[0-9]', password):
-        return False  # 至少 1 個數字
-
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        return False  # 至少 1 個特殊字符
-
-    return True
-```
 
 ---
 
@@ -394,78 +173,8 @@ def validate_password_strength(password: str) -> bool:
 **必須**：在 Backend DTO Converter 層或 Serializer 層處理
 
 **Python 實現範例**：
-```python
-def mask_phone(phone: str) -> str:
-    """脫敏手機號：保留前3後3"""
-    if not phone or len(phone) < 7:
-        return "***"
-    return phone[:3] + "****" + phone[-3:]
-
-def mask_email(email: str) -> str:
-    """脫敏 Email：保留前2與域名"""
-    if '@' not in email:
-        return "***@***"
-    local, domain = email.split('@')
-    return local[:2] + "***" + "@" + domain
-
-def mask_bank_account(account: str) -> str:
-    """脫敏銀行帳號：保留後4碼"""
-    if not account or len(account) < 4:
-        return "****"
-    return "*" * (len(account) - 4) + account[-4:]
-
-def mask_chinese_name(name: str) -> str:
-    """脫敏中文姓名：保留姓氏與最後一個字"""
-    if len(name) <= 2:
-        return name[0] + "*"
-    return name[0] + "*" * (len(name) - 2) + name[-1]
-
-def mask_english_name(name: str) -> str:
-    """脫敏英文姓名：保留首尾字母"""
-    if len(name) <= 2:
-        return name[0] + "*"
-    return name[0] + "*" * (len(name) - 2) + name[-1]
-```
 
 **API 層整合**：
-```python
-from pydantic import BaseModel
-
-class PlayerResponse(BaseModel):
-    player_id: int
-    username: str
-    phone_masked: str
-    email_masked: str
-
-    @classmethod
-    def from_db(cls, player_row):
-        """從資料庫記錄轉換為 API 響應（自動脫敏）"""
-        # 解密 PII
-        phone_plaintext = encryptor.decrypt(player_row['encrypted_phone'])
-        email_plaintext = encryptor.decrypt(player_row['encrypted_email'])
-
-        # 脫敏
-        return cls(
-            player_id=player_row['player_id'],
-            username=player_row['username'],
-            phone_masked=mask_phone(phone_plaintext),
-            email_masked=mask_email(email_plaintext)
-        )
-
-# 使用範例
-@app.get("/api/v1/players/{player_id}")
-async def get_player(player_id: int):
-    player_row = await db.fetchrow("SELECT * FROM players WHERE player_id = $1", player_id)
-    return PlayerResponse.from_db(player_row)
-
-# Response:
-# {
-#   "player_id": 123,
-#   "username": "player001",
-#   "phone_masked": "091****678",
-#   "email_masked": "da***@gmail.com"
-# }
-```
 
 ### 5.3 權限分級脫敏
 
@@ -481,24 +190,6 @@ async def get_player(player_id: int):
 | **DBA（資料庫管理員）** | 密文（無法解密）| 密文（無法解密）| 密文（無法解密）|
 
 **實現範例**：
-```python
-def get_masked_phone(phone_plaintext: str, user_role: str) -> str:
-    """根據角色返回不同級別的脫敏"""
-    if user_role == 'player_self':
-        return phone_plaintext  # 明文（需二次驗證）
-    elif user_role == 'cs_level_1':
-        return mask_phone(phone_plaintext)  # 091****678
-    elif user_role == 'cs_level_2':
-        return phone_plaintext[:4] + "****" + phone_plaintext[-2:]  # 0912****78
-    elif user_role in ['risk_manager', 'finance']:
-        # 需要審批流程（引用 09-04 審批工作流系統）
-        if has_approval(user_id, 'view_pii_phone'):
-            return phone_plaintext
-        else:
-            raise PermissionDenied("Approval required to view plaintext PII")
-    else:
-        return "***"  # 完全隱藏
-```
 
 ---
 
@@ -528,45 +219,8 @@ def get_masked_phone(phone_plaintext: str, user_role: str) -> str:
 ### 6.2 AWS KMS 整合
 
 **範例**（Python + Boto3）：
-```python
-import boto3
-
-kms_client = boto3.client('kms', region_name='us-east-1')
-
-def get_encryption_key(key_alias: str = 'alias/player-pii-key') -> bytes:
-    """從 KMS 獲取數據加密金鑰（DEK）"""
-    response = kms_client.generate_data_key(
-        KeyId=key_alias,
-        KeySpec='AES_256'  # 256-bit key
-    )
-
-    # response 包含：
-    # - Plaintext: 明文 DEK（用於加密，使用後立即銷毀）
-    # - CiphertextBlob: 加密後的 DEK（存入資料庫）
-
-    return response['Plaintext']  # 32 bytes
-```
 
 **金鑰快取策略**：
-```python
-from functools import lru_cache
-import time
-
-@lru_cache(maxsize=1)
-def get_cached_encryption_key():
-    """快取金鑰 1 小時，減少 KMS API 調用成本"""
-    return (get_encryption_key(), time.time())
-
-def get_current_key():
-    key, timestamp = get_cached_encryption_key()
-
-    # 如果快取超過 1 小時，清除並重新獲取
-    if time.time() - timestamp > 3600:
-        get_cached_encryption_key.cache_clear()
-        key, _ = get_cached_encryption_key()
-
-    return key
-```
 
 ### 6.3 金鑰輪替（Key Rotation）
 
@@ -576,28 +230,6 @@ def get_current_key():
 - **過渡期**：新舊金鑰共存 90 天（graceful migration）
 
 **手動觸發輪替**（緊急情況，如金鑰洩露）：
-```python
-def emergency_key_rotation():
-    """緊急金鑰輪替（需高權限）"""
-    # 1. 在 KMS 中創建新金鑰
-    new_key_response = kms_client.create_key(
-        Description='Emergency rotation - Player PII encryption',
-        KeyUsage='ENCRYPT_DECRYPT'
-    )
-
-    new_key_id = new_key_response['KeyMetadata']['KeyId']
-
-    # 2. 更新金鑰別名
-    kms_client.update_alias(
-        AliasName='alias/player-pii-key',
-        TargetKeyId=new_key_id
-    )
-
-    # 3. 觸發資料重新加密任務（批次處理）
-    trigger_reencryption_job(new_key_id)
-
-    logger.critical(f"Emergency key rotation completed. New key ID: {new_key_id}")
-```
 
 ### 6.4 金鑰存取控制
 

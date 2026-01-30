@@ -34,13 +34,6 @@
 
 **檔案**: `GridAbstractService.java` (行 116-168)
 
-```java
-protected List<WalletTransaction> deduct(
-    WalletHistoryType walletHistoryType,
-    String transactionId,
-    BigDecimal amount,
-    List<PlayerWallet> wallets)
-```
 
 **扣款優先順序**:
 1. **優先使用 Cash（現金）**: 先從錢包的 cash 扣除
@@ -48,28 +41,6 @@ protected List<WalletTransaction> deduct(
 3. **支援多錢包**: 按錢包優先順序依次扣款
 4. **主錢包保底**: 如果所有錢包餘額不足，允許主錢包透支（負值）
 
-**扣款計算邏輯** (行 129-151):
-```java
-// 錢包餘額 >= 下注金額
-if (wallet.getRemainBalance().subtract(remainAmount).compareTo(BigDecimal.ZERO) >= 0) {
-    // cash夠 則不扣 bonus
-    if (wallet.getRemainCash().subtract(remainAmount).compareTo(BigDecimal.ZERO) >= 0) {
-        deductCash = remainAmount.negate();
-        deductBonus = BigDecimal.ZERO;
-    } else {
-        deductCash = wallet.getRemainCash().negate();
-        deductBonus = remainAmount.subtract(wallet.getRemainCash()).negate();
-    }
-    remainAmount = BigDecimal.ZERO;
-}
-// 錢包餘額 < 下注金額
-else {
-    // 扣除部分下注金額
-    remainAmount = remainAmount.subtract(wallet.getRemainBalance());
-    deductCash = wallet.getRemainCash().negate();
-    deductBonus = wallet.getRemainBonus().negate();
-}
-```
 
 **範例**:
 
@@ -120,17 +91,6 @@ else {
 - **部分結算時（PARTIAL_PAYOUT）**: 計算差額並累加
 - **投注取消時（CANCEL）**: 扣除已累加的 effectiveStake
 
-**程式碼** (GridService.java, 行 384-389):
-```java
-if (result.getTxtype() == TxType.SETTLE) {
-    // Add effective stake when set unsettle/cancel to settle
-    if (bet.getTradeStatus() != Transaction.TradeStatus.SETTLE) {
-        rebateEffectiveStake = getRebateEffectiveStake(bet, effectiveStake);
-        wallet.addEffectiveStake(effectiveStake);  // 累加到錢包
-    }
-    bet.setTradeStatus(TransactionUtils.txTypeToTradeStatus(result.getTxtype()));
-}
-```
 
 ### 2.3 有效投注計算公式
 
@@ -140,11 +100,6 @@ if (result.getTxtype() == TxType.SETTLE) {
 
 #### 2.3.1 體育類（SPORTS / E-SPORTS）
 
-```java
-if ("SPORTS".equals(gameType) || "E-SPORTS".equals(gameType)) {
-    effectiveStake = winAmount.add(lossAmount).abs();
-}
-```
 
 **公式**: `effectiveStake = |winAmount + lossAmount|`
 
@@ -156,18 +111,6 @@ if ("SPORTS".equals(gameType) || "E-SPORTS".equals(gameType)) {
 
 #### 2.3.2 娛樂場類（CASINO）
 
-```java
-else if ("CASINO".equals(gameType)) {
-    if (payout.compareTo(betAmount) == 0) {
-        effectiveStake = BigDecimal.ZERO;  // 和局不計
-    } else if (winAmount.compareTo(BigDecimal.ZERO) > 0) {
-        // 贏錢時取小的
-        effectiveStake = winAmount.compareTo(betAmount) > 0 ? betAmount : winAmount;
-    } else {
-        effectiveStake = betAmount;  // 輸錢取投注額
-    }
-}
-```
 
 **公式**:
 - **和局** (payout == betAmount): `effectiveStake = 0`
@@ -186,11 +129,6 @@ else if ("CASINO".equals(gameType)) {
 
 #### 2.3.3 其他遊戲類型
 
-```java
-else {
-    effectiveStake = betAmount;  // 直接使用投注額
-}
-```
 
 **公式**: `effectiveStake = betAmount`
 
@@ -198,15 +136,6 @@ else {
 
 **檔案**: `WalletTransaction.java` (行 119-125)
 
-```java
-public void addEffectiveStake(BigDecimal effectiveStake) {
-    this.addedEffectiveStake = this.addedEffectiveStake.add(effectiveStake);
-    this.effectiveStake = this.effectiveStake.add(effectiveStake);
-    if (effectiveStake.signum() >= 0) {
-        this.addedLockAmount = this.addedLockAmount.add(effectiveStake.negate());
-    }
-}
-```
 
 **關鍵規則**:
 - **effectiveStake 增加時，lockAmount 減少相同金額**
@@ -230,21 +159,6 @@ public void addEffectiveStake(BigDecimal effectiveStake) {
 
 #### 投注下注
 
-```java
-@DistributedLock(param = "playerId")
-@Transactional
-public TransactionResponse bet(Transaction bet) {
-    List<PlayerWallet> wallets = getWallets(GamePlayerContext.getPlayer().getId(), GamePlayerContext.getGame());
-    PlayerBalance beforeBalance = checkBalance(bet.getAmount(), wallets);
-    // bet
-    List<WalletTransaction> betsResults = deduct(WalletHistoryType.TRANSACTION, bet.getId(), bet.getAmount(), wallets);
-    // 更新錢包
-    updateWallets(bet.getPlayerId(), betsResults);
-    // 更新訂單
-    updateTransactionStatus(bet, betsResults);
-    return buildResponse(beforeBalance, betsResults);
-}
-```
 
 **Before 狀態**:
 ```
@@ -381,18 +295,6 @@ public TransactionResponse bet(Transaction bet) {
 
 當主錢包收到存款、促銷等資金時，會增加 lockAmount：
 
-```java
-if (this.isMain()) {
-    if (deductCash.compareTo(BigDecimal.ZERO) > 0) {
-        if (type == WalletHistoryType.DEPOSIT || type == WalletHistoryType.PROMOTION ||
-            type == WalletHistoryType.WALLET_DEPOSIT || type == WalletHistoryType.VIP ||
-            type == WalletHistoryType.RED_ENVELOPES) {
-            this.adjustCleanAmount = deductCash;
-            this.addedLockAmount = deductCash;  // 增加 lockAmount
-        }
-    }
-}
-```
 
 **Before 狀態**:
 ```
@@ -523,11 +425,6 @@ if (this.isMain()) {
 4. **不計算 effectiveStake**
 5. **不更新 lockAmount**
 
-**程式碼關鍵**:
-```java
-List<WalletTransaction> betsResults = deduct(WalletHistoryType.TRANSACTION, bet.getId(), bet.getAmount(), wallets);
-updateWallets(bet.getPlayerId(), betsResults);
-```
 
 ### 4.2 投注結算 - 贏錢 (Settlement - Win)
 
@@ -543,19 +440,6 @@ updateWallets(bet.getPlayerId(), betsResults);
 5. **lockAmount -= effectiveStake** (通過 `wallet.addEffectiveStake`)
 6. 更新 winloss
 
-**程式碼關鍵** (GridService.java, 行 377-388):
-```java
-effectiveStake = result.getEffectiveStake() == null
-    ? getEffectiveStake(result.getGameType(), betAmount, payout, winAmount, lossAmount)
-    : result.getEffectiveStake();
-
-if (result.getTxtype() == TxType.SETTLE) {
-    if (bet.getTradeStatus() != Transaction.TradeStatus.SETTLE) {
-        rebateEffectiveStake = getRebateEffectiveStake(bet, effectiveStake);
-        wallet.addEffectiveStake(effectiveStake);  // 這裡會減少 lockAmount
-    }
-}
-```
 
 **範例**:
 - Before: cash=900, lockAmount=500, effectiveStake=0
@@ -591,17 +475,6 @@ if (result.getTxtype() == TxType.SETTLE) {
 3. **lockAmount += effectiveStake** (因為 effectiveStake 為負數)
 4. 更新訂單狀態為 CANCEL
 
-**程式碼關鍵** (GridService.java, 行 403-409):
-```java
-} else if (result.getTxtype() == TxType.CANCEL) {
-    if (bet.getTradeStatus() == Transaction.TradeStatus.SETTLE) {
-        wallet.addEffectiveStake(bet.getEffectiveStake().negate());  // 負數，會增加 lockAmount
-        payout = BigDecimal.ZERO;
-    }
-    effectiveStake = BigDecimal.ZERO;
-    bet.setTradeStatus(TransactionUtils.txTypeToTradeStatus(result.getTxtype()));
-}
-```
 
 **範例**:
 - Before (已結算): cash=1080, lockAmount=420, effectiveStake=80
@@ -623,37 +496,6 @@ if (result.getTxtype() == TxType.SETTLE) {
 - 如果投注使用的是**主錢包但有 lockAmount**，也可能需要扣除 lockAmount（取決於系統配置）
 - 目的是避免玩家在未完成流水要求前，就獲得返水
 
-**計算邏輯** (行 196-221):
-```java
-protected BigDecimal getRebateEffectiveStake(Transaction bet, BigDecimal effectiveStake) {
-    BigDecimal rebateEffectiveStake = BigDecimal.ZERO;
-    // 如果 BET IS PROMO = TRUE
-    if (bet.getIsPromotion()) {
-        // STEP 1. 透過history找出投注關聯的錢包
-        var betWallets = playerWalletService.getBetWallets(bet.getId());
-        Boolean openSts = Boolean.parseBoolean(
-            agentSystemConfigDefaultService.getValue(bet.getAgentId(), AgentSystemConfigKey.REBATE_BETTING_LOCKED));
-        // STEP 2. 加總wagerRequirement - effectiveStake 跟 lockAmount
-        var newRequirement = betWallets.parallelStream()
-            .map(tmp -> {
-                if (!tmp.isMain()) {
-                    return tmp.getWagerRequirement().subtract(tmp.getEffectiveStake());
-                } else {
-                    // 如果打開開關 不需扣除 lockamount
-                    return openSts ? BigDecimal.ZERO : tmp.getLockAmount();
-                }
-            })
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-        // STEP 3. 如果 加總金額 > 有效投注  rebate = 0 否則 rebate = 有效投注 - 加總金額
-        if (newRequirement.compareTo(effectiveStake) < 0)
-            rebateEffectiveStake = effectiveStake.subtract(newRequirement);
-    } else {
-        // 如果 BET IS PROMO = FALSE (主錢包投注 且 lockAmount = 0) 就有效投注 = REBATE EFFECTIVE STAKE
-        rebateEffectiveStake = effectiveStake;
-    }
-    return rebateEffectiveStake;
-}
-```
 
 **公式**:
 - **非促銷投注**: `rebateEffectiveStake = effectiveStake`
@@ -685,15 +527,6 @@ protected BigDecimal getRebateEffectiveStake(Transaction bet, BigDecimal effecti
 - tip: 小費
 - 這些費用**不影響 effectiveStake 的計算**，但會影響實際派彩金額
 
-**程式碼** (GridService.java, 行 391-396):
-```java
-if (result.getAnte() != null) {
-    bet.setAnte(result.getAnte()); // update ante
-}
-if (result.getTip() != null) {
-    bet.setTip(result.getTip()); // update tip
-}
-```
 
 ### 5.3 作廢投注 (Void Bets)
 
@@ -707,33 +540,6 @@ if (result.getTip() != null) {
 3. **lockAmount 增加** (因為 effectiveStake 減少)
 4. 設定訂單狀態為 CANCEL，但保留原 payout 和 winAmount
 
-**程式碼** (行 233-260):
-```java
-@DistributedLock(param = "playerId")
-@Transactional
-public TransactionResponse internalVoid(Transaction tx) {
-    PlayerBalance beforeBalance = getPlayerBalance(tx.getPlayerId(), GamePlayerContext.getGame());
-    PlayerWallet pw = getBetResultWallet(tx.getId(), tx.getPayout().negate().add(tx.getAmount()));
-    WalletTransaction wallet = new WalletTransaction(pw);
-    wallet.deduct(
-        WalletHistoryType.TRANSACTION,
-        tx.getId(),
-        tx.getPayout().negate().add(tx.getAmount()),  // 退回差額
-        BigDecimal.ZERO);
-    wallet.addEffectiveStake(tx.getEffectiveStake().negate());  // 扣除 effectiveStake
-
-    // 清空投注結果
-    var effectiveStake = BigDecimal.ZERO;
-    var payout = BigDecimal.ZERO;
-    var winAmount = BigDecimal.ZERO;
-    var lossAmount = BigDecimal.ZERO;
-
-    transactionService.updateBetResult(..., Transaction.TradeStatus.CANCEL, ...);
-    List<WalletTransaction> results = Collections.singletonList(wallet);
-    updateWallets(tx.getPlayerId(), results);
-    return buildResponse(beforeBalance, results);
-}
-```
 
 **範例**:
 - Before (已結算): cash=1080, lockAmount=420, effectiveStake=80, payout=180
@@ -748,24 +554,6 @@ public TransactionResponse internalVoid(Transaction tx) {
 
 **業務場景**: 一個投注可能分多次派彩（例如多關投注、分段結算）
 
-**關鍵邏輯** (行 456-472):
-```java
-BigDecimal effectiveStake = BigDecimal.ZERO;
-BigDecimal rebateEffectiveStake = BigDecimal.ZERO;
-if (!tradeStatus.equals(bet.getTradeStatus())) {
-    if (TradeStatus.SETTLE.equals(tradeStatus)) {
-        // 從 UNSETTLE 變為 SETTLE，累加 effectiveStake
-        effectiveStake = result.getEffectiveStake() == null
-            ? getEffectiveStake(result.getGameType(), betAmount, payout, winAmount, lossAmount)
-            : result.getEffectiveStake();
-        wallet.addEffectiveStake(effectiveStake.abs());  // lockAmount 減少
-        rebateEffectiveStake = getRebateEffectiveStake(bet, effectiveStake);
-    } else if (TradeStatus.SETTLE.equals(bet.getTradeStatus())) {
-        // 從 SETTLE 變為非 SETTLE，扣除 effectiveStake
-        wallet.addEffectiveStake(bet.getEffectiveStake().abs().negate());  // lockAmount 增加
-    }
-}
-```
 
 **範例**:
 - 第一次派彩: payout=50, 狀態仍為 UNSETTLE
@@ -781,15 +569,6 @@ if (!tradeStatus.equals(bet.getTradeStatus())) {
 
 **檔案**: `PlayerWalletServiceImpl.java` (行 69-86)
 
-```sql
-UPDATE player_wallet
-SET bonus = ?,
-    cash = ?,
-    clean_amount = GREATEST(clean_amount + ?, 0),
-    lock_amount = GREATEST(lock_amount + ?, 0),
-    effective_stake = ?
-WHERE id = ?
-```
 
 **關鍵點**:
 - **cleanAmount** 和 **lockAmount** 使用 `GREATEST(..., 0)` 確保不會低於 0
@@ -800,30 +579,6 @@ WHERE id = ?
 
 **檔案**: `GridAbstractService.java` (行 75-114)
 
-```java
-protected void updateWallets(long playerId, List<WalletTransaction> wallets) {
-    List<PlayerWallet> playerWallets = new ArrayList<>();
-    List<PlayerWalletHistory> walletHistories = new ArrayList<>();
-
-    wallets.forEach((wallet) -> {
-        PlayerWallet pw = PlayerWallet.builder().build();
-        pw.setId(wallet.getPlayerWalletId());
-        pw.setPlayerId(playerId);
-        pw.setBonus(wallet.getRemainBonus());
-        pw.setCash(wallet.getRemainCash());
-        pw.setCleanAmount(wallet.getAdjustCleanAmount());  // 累加值
-        pw.setLockAmount(wallet.getAddedLockAmount());      // 累加值
-        pw.setEffectiveStake(wallet.getEffectiveStake());   // 新值
-        playerWallets.add(pw);
-
-        // ... 建立 history
-    });
-
-    playerWalletService.updateWallets(playerId, playerWallets, walletHistories);
-    playerBalanceService.updateTotalTurnOver(playerId, addturnOver.get(), addWinLoss.get());
-    playerService.updatePlayerBalance(playerId);
-}
-```
 
 **注意**:
 - `cleanAmount` 和 `lockAmount` 傳入的是**增量**（+ 或 -）
@@ -860,17 +615,6 @@ protected void updateWallets(long playerId, List<WalletTransaction> wallets) {
 2. 主錢包 lockAmount += 200 (因為是 PROMOTION 類型的 deduct)
 3. 新建促銷錢包
 
-**程式碼** (WalletTransaction.java, 行 61-67):
-```java
-if (this.isMain()) {
-    if (deductCash.compareTo(BigDecimal.ZERO) > 0) {
-        if (type == WalletHistoryType.PROMOTION || ...) {
-            this.adjustCleanAmount = deductCash;
-            this.addedLockAmount = deductCash;  // lockAmount += 200
-        }
-    }
-}
-```
 
 **After 狀態**:
 ```

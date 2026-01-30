@@ -746,22 +746,6 @@ Result:
 
 3. **每日對帳報告 (Daily Reconciliation Report)**:
    - **執行時間**: 每日凌晨 03:00 (after daily settlement)
-   - **對帳邏輯**:
-     ```sql
-     -- Compare Finance vs Activity turnover calculations
-     SELECT
-       f.player_id,
-       f.date,
-       f.total_valid_turnover AS finance_turnover,
-       a.total_wagering_contribution AS activity_turnover,
-       a.total_wagering_contribution / f.total_valid_turnover AS expected_ratio,
-       ABS(a.total_wagering_contribution - (f.total_valid_turnover * a.weighted_avg_game_contribution)) AS deviation
-     FROM finance_daily_summary f
-     JOIN activity_daily_summary a ON f.player_id = a.player_id AND f.date = a.date
-     WHERE deviation > (f.total_valid_turnover * 0.0001)  -- Threshold: 0.01% deviation
-     ORDER BY deviation DESC
-     LIMIT 100;
-     ```
    - **警報觸發**: 若任何玩家的偏差 >0.01%,觸發 Slack/Email 警報至財務與風控團隊
    - **根因分析**: 常見原因包括:
      - 時區差異 (Finance 用 UTC, Activity 用 Local Time)

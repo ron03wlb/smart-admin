@@ -65,22 +65,6 @@
 | **VIP 用戶** | 高額投注遊戲 + 獨家遊戲 | 50% 高投注 + 30% 獨家 + 20% 新遊戲 |
 | **流失用戶** | 曾經喜愛的遊戲 + 新活動 | 60% 歷史偏好 + 40% 新活動 |
 
-**協同過濾實作** (User-Based Collaborative Filtering):
-```python
-# 簡化演算法邏輯
-def recommend_games(user_id):
-    # 1. 找到與目標用戶行為相似的用戶群
-    similar_users = find_similar_users(user_id, top_k=50)
-
-    # 2. 統計相似用戶喜愛的遊戲
-    candidate_games = get_games_played_by(similar_users)
-
-    # 3. 排除用戶已玩過的遊戲
-    new_games = exclude_played_games(user_id, candidate_games)
-
-    # 4. 依投注金額加權排序
-    return rank_by_weighted_score(new_games)
-```
 
 **實時行為追蹤**：
 - 點擊遊戲（+1 分）
@@ -131,20 +115,6 @@ def recommend_games(user_id):
 ### 5.2 智能分類引擎
 
 **基於內容的自動分類**：
-```python
-# 使用遊戲名稱、描述進行 NLP 分類
-def auto_categorize_game(game):
-    keywords = extract_keywords(game.name + game.description)
-
-    if "水果" in keywords or "fruit" in keywords.lower():
-        return "FRUIT_SLOT"
-    elif "埃及" in keywords or "egypt" in keywords.lower():
-        return "EGYPT_THEME"
-    elif "三國" in keywords:
-        return "CHINESE_HISTORY"
-    else:
-        return "GENERAL"
-```
 
 ---
 
@@ -205,55 +175,10 @@ Response:
 
 ### 7.1 核心表結構
 
-**game_metadata** (遊戲元數據表):
-```sql
-CREATE TABLE game_metadata (
-    game_id VARCHAR(50) PRIMARY KEY,
-    provider_id VARCHAR(50) NOT NULL,
-    game_name_en VARCHAR(200),
-    game_name_zh VARCHAR(200),
-    game_type ENUM('SLOT', 'LIVE', 'SPORT', 'LOTTERY'),
-    rtp DECIMAL(5,2), -- 96.50
-    volatility ENUM('LOW', 'MEDIUM', 'HIGH'),
-    min_bet DECIMAL(10,2),
-    max_bet DECIMAL(10,2),
-    thumbnail_url VARCHAR(500),
-    is_enabled BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    INDEX idx_provider_type (provider_id, game_type),
-    INDEX idx_rtp (rtp)
-);
-```
 
-**game_lobby_config** (大廳配置表):
-```sql
-CREATE TABLE game_lobby_config (
-    config_id BIGSERIAL PRIMARY KEY,
-    tenant_id BIGINT NOT NULL,
-    category VARCHAR(50), -- 'HOT', 'NEW', 'CUSTOM_001'
-    sort_order INT, -- 顯示順序
-    game_id VARCHAR(50),
-    is_pinned BOOLEAN DEFAULT FALSE, -- 是否置頂
-    FOREIGN KEY (game_id) REFERENCES game_metadata(game_id),
-    UNIQUE (tenant_id, category, game_id)
-);
-```
 
 ### 7.2 遊戲熱度計算表
 
-**game_popularity_stats** (熱度統計表):
-```sql
-CREATE TABLE game_popularity_stats (
-    stat_id BIGSERIAL PRIMARY KEY,
-    game_id VARCHAR(50),
-    stat_date DATE,
-    unique_players INT, -- 獨立玩家數
-    total_bets BIGINT, -- 總投注次數
-    total_bet_amount DECIMAL(15,2), -- 總投注金額
-    avg_session_duration INT, -- 平均遊戲時長 (秒)
-    INDEX idx_game_date (game_id, stat_date)
-);
-```
 
 ---
 

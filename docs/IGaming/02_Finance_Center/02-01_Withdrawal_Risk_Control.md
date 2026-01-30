@@ -239,24 +239,6 @@ flowchart TB
   - 記錄詳細審計日誌 (誰、何時、為何強制補償)
   - 觸發財務對帳警報
   - 24小時內需人工審查
-- 示例 SQL:
-  ```sql
-  -- 強制釋放鎖定資金 (繞過觸發器)
-  UPDATE t_player_wallet
-  SET locked_balance = locked_balance - #{amount},
-      available_balance = available_balance + #{amount},
-      update_time = NOW(),
-      force_compensation_flag = true
-  WHERE player_id = #{playerId};
-
-  -- 記錄強制補償日誌
-  INSERT INTO t_force_compensation_log (
-      player_id, withdrawal_id, amount, reason, operator, create_time
-  ) VALUES (
-      #{playerId}, #{withdrawalId}, #{amount},
-      'SAGA補償失敗-自動強制釋放', 'SYSTEM', NOW()
-  );
-  ```
 
 **Level 3: 人工介入 (Manual Intervention)**
 - 適用場景: 強制補償仍失敗 OR 涉及外部系統
@@ -277,53 +259,6 @@ flowchart TB
 
 **資料庫配置表** (t_saga_compensation_config):
 
-```sql
-CREATE TABLE t_saga_compensation_config (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    step_name VARCHAR(50) NOT NULL,           -- 步驟名稱 (risk_assessment, kyc_verification, etc.)
-    failure_type VARCHAR(50) NOT NULL,        -- 失敗類型 (business_reject, system_error, timeout, etc.)
-    compensation_action VARCHAR(100) NOT NULL, -- 補償動作 (release_funds, switch_channel, etc.)
-    retry_enabled BOOLEAN DEFAULT true,       -- 是否啟用重試
-    retry_max_attempts INT DEFAULT 3,         -- 最大重試次數
-    retry_interval_ms INT DEFAULT 1000,       -- 重試間隔 (毫秒)
-    retry_backoff_multiplier DECIMAL(3,1) DEFAULT 2.0, -- 退避倍數
-    force_compensation_enabled BOOLEAN DEFAULT false,   -- 是否允許強制補償
-    force_compensation_threshold_amount DECIMAL(15,2),  -- 強制補償金額閾值
-    manual_intervention_threshold_amount DECIMAL(15,2), -- 人工介入金額閾值
-    notification_channels VARCHAR(200),       -- 通知渠道 (email,slack,sms)
-    sla_response_minutes INT,                 -- SLA響應時間 (分鐘)
-    sla_resolution_minutes INT,               -- SLA解決時間 (分鐘)
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_step_failure (step_name, failure_type)
-);
-
--- 配置示例
-INSERT INTO t_saga_compensation_config (
-    step_name, failure_type, compensation_action,
-    retry_enabled, retry_max_attempts, retry_interval_ms, retry_backoff_multiplier,
-    force_compensation_enabled, force_compensation_threshold_amount,
-    manual_intervention_threshold_amount,
-    notification_channels, sla_response_minutes, sla_resolution_minutes
-) VALUES
-    ('risk_assessment', 'system_error', 'release_funds_and_log',
-     true, 3, 1000, 2.0,
-     true, 1000.00,
-     10000.00,
-     'email,slack', 30, 120),
-
-    ('kyc_verification', 'api_timeout', 'route_to_manual_review',
-     true, 5, 2000, 2.0,
-     false, NULL,
-     5000.00,
-     'email', 60, 240),
-
-    ('payment_execution', 'channel_failure', 'switch_to_backup_channel',
-     true, 3, 5000, 1.5,
-     true, 5000.00,
-     50000.00,
-     'email,slack,sms', 15, 60);
-```
 
 #### 補償事務監控 (Compensation Monitoring)
 
@@ -567,29 +502,6 @@ iGaming 平台根據監管要求定義 **4 級 KYC 驗證體系** (Level 0-3),�
 
 **配置示例** (t_kyc_level_config 表):
 
-```sql
-CREATE TABLE t_kyc_level_config (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    tenant_id BIGINT NOT NULL,          -- 租戶 ID (多租戶隔離)
-    region_code VARCHAR(10) NOT NULL,   -- 地區代碼 (UK, PH, BR, etc.)
-    kyc_level INT NOT NULL,             -- KYC 等級 (0-3)
-    daily_withdrawal_limit DECIMAL(15,2),   -- 每日限額
-    monthly_withdrawal_limit DECIMAL(15,2), -- 每月限額
-    required_documents VARCHAR(500),     -- 必需文件 (JSON Array)
-    approval_workflow VARCHAR(50),       -- 審批流程 (AUTO, L1, L1_L2, L1_L2_L3)
-    upgrade_trigger_amount DECIMAL(15,2), -- 自動升級觸發金額
-    effective_date DATE,
-    expired_date DATE,
-    UNIQUE KEY uk_tenant_region_level (tenant_id, region_code, kyc_level)
-);
-
--- 範例數據: 英國 UKGC 要求
-INSERT INTO t_kyc_level_config VALUES
-(NULL, 1001, 'UK', 0, 500.00, 2000.00, '["email", "mobile"]', 'AUTO', 500.00, '2026-01-01', '2099-12-31'),
-(NULL, 1001, 'UK', 1, 5000.00, 20000.00, '["passport", "address_proof"]', 'L1', 5000.00, '2026-01-01', '2099-12-31'),
-(NULL, 1001, 'UK', 2, 50000.00, 200000.00, '["passport", "address_proof", "source_of_funds", "facial_recognition"]', 'L1_L2', 50000.00, '2026-01-01', '2099-12-31'),
-(NULL, 1001, 'UK', 3, NULL, NULL, '["passport", "address_proof", "bank_statement", "due_diligence_report"]', 'L1_L2_L3_COMPLIANCE', NULL, '2026-01-01', '2099-12-31');
-```
 
 #### KYC 驗證 API 集成 (KYC Verification API Integration)
 
@@ -604,72 +516,6 @@ INSERT INTO t_kyc_level_config VALUES
 
 **API 調用示例** (Onfido):
 
-```java
-/**
- * KYC 驗證服務 (Service 層)
- */
-@Service
-@RequiredArgsConstructor
-public class KycVerificationService {
-
-    private final OnfidoApiClient onfidoClient;
-    private final KycRecordDao kycRecordDao;
-
-    /**
-     * 提交身份證驗證
-     *
-     * @param playerId 玩家 ID
-     * @param documentType 文件類型 (passport, id_card, driving_license)
-     * @param documentImageUrl 文件圖片 URL
-     * @return Try.Success(KycResult) if ok, Try.Failure(exception) otherwise
-     */
-    public Try<KycResult> submitDocument(
-        Long playerId,
-        String documentType,
-        String documentImageUrl
-    ) {
-        return Try.of(() -> {
-            // 1. 調用 Onfido API
-            OnfidoDocumentCheckResult result = onfidoClient.createDocumentCheck(
-                playerId.toString(),
-                documentType,
-                documentImageUrl
-            );
-
-            // 2. 保存驗證記錄
-            KycRecordEntity record = KycRecordEntity.builder()
-                .playerId(playerId)
-                .provider("ONFIDO")
-                .documentType(documentType)
-                .checkId(result.getCheckId())
-                .status(result.getStatus()) // "pending", "complete", "rejected"
-                .result(result.getResult()) // "clear", "consider", "unidentified"
-                .createTime(LocalDateTime.now())
-                .build();
-
-            kycRecordDao.insert(record);
-
-            // 3. 若驗證通過,自動升級 KYC 等級
-            if ("clear".equals(result.getResult())) {
-                playerService.upgradeKycLevel(playerId, 1); // 升至 Level 1
-            }
-
-            return KycResult.fromOnfidoResult(result);
-        });
-    }
-
-    /**
-     * 查詢 KYC 驗證狀態
-     *
-     * @param playerId 玩家 ID
-     * @return Option.Some(result) if exists, Option.None() otherwise
-     */
-    public Option<KycResult> getKycStatus(Long playerId) {
-        return kycRecordDao.selectLatestByPlayerId(playerId)
-            .map(KycResult::fromEntity);
-    }
-}
-```
 
 ---
 
@@ -695,137 +541,14 @@ public class KycVerificationService {
 
 **租戶基礎配置表** (t_tenant_config):
 
-```sql
-CREATE TABLE t_tenant_config (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    tenant_id BIGINT NOT NULL UNIQUE,      -- 租戶 ID
-    tenant_name VARCHAR(100) NOT NULL,     -- 租戶名稱 (White Label 品牌)
-    region_code VARCHAR(10) NOT NULL,      -- 主營地區 (UK, PH, BR, etc.)
-    license_type VARCHAR(50),              -- 牌照類型 (UKGC, MGA, PAGCOR, etc.)
-    isolation_level VARCHAR(20) NOT NULL,  -- 隔離級別 (PHYSICAL, LOGICAL, ROW_LEVEL)
-    database_instance VARCHAR(100),        -- 數據庫實例標識 (僅 PHYSICAL/LOGICAL)
-    schema_name VARCHAR(50),               -- Schema 名稱 (僅 LOGICAL)
-
-    -- KYC 配置
-    kyc_provider VARCHAR(50),              -- KYC 服務商 (ONFIDO, JUMIO, SUMSUB)
-    kyc_api_key VARCHAR(200),              -- API 密鑰 (加密存儲)
-    kyc_level_required INT DEFAULT 1,      -- 最低 KYC 要求 (0-3)
-
-    -- 出金配置
-    withdrawal_approval_mode VARCHAR(20),  -- 審批模式 (AUTO, MANUAL, HYBRID)
-    withdrawal_daily_limit DECIMAL(15,2),  -- 租戶級每日限額
-    withdrawal_monthly_limit DECIMAL(15,2), -- 租戶級每月限額
-
-    -- 支付通道配置
-    payment_channel_ids VARCHAR(500),      -- 可用支付通道 (JSON Array)
-
-    -- 合規配置
-    aml_threshold_amount DECIMAL(15,2),    -- AML 申報閾值
-    pep_check_enabled BOOLEAN DEFAULT true, -- 是否啟用 PEP 檢查
-    sanctions_check_enabled BOOLEAN DEFAULT true, -- 是否啟用制裁名單檢查
-
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted BOOLEAN DEFAULT false
-);
-
--- 範例數據: 英國白標品牌
-INSERT INTO t_tenant_config VALUES (
-    NULL, 1001, 'UK Casino White Label', 'UK', 'UKGC', 'LOGICAL',
-    'rds-prod-uk', 'tenant_1001',
-    'ONFIDO', 'encrypted_api_key_here', 1,
-    'HYBRID', 50000.00, 200000.00,
-    '["channel_001_bank_transfer", "channel_002_card", "channel_003_ewallets"]',
-    10000.00, true, true,
-    NOW(), NOW(), false
-);
-```
 
 #### Row-Level Security (RLS) 實現
 
 **PostgreSQL RLS 策略**:
 
-```sql
--- 啟用行級安全
-ALTER TABLE t_withdrawal_request ENABLE ROW LEVEL SECURITY;
-
--- 創建租戶隔離策略
-CREATE POLICY tenant_isolation_policy ON t_withdrawal_request
-    USING (tenant_id = current_setting('app.current_tenant')::bigint);
-
--- 應用層設置當前租戶
--- 每次請求前設置 session variable
-SET app.current_tenant = '1001';
-
--- 查詢自動過濾
-SELECT * FROM t_withdrawal_request;
--- 等價於: SELECT * FROM t_withdrawal_request WHERE tenant_id = 1001;
-```
 
 **SmartAdmin Interceptor 實現**:
 
-```java
-/**
- * 租戶隔離攔截器 (Tenant Isolation Interceptor)
- *
- * 職責:
- * - 自動注入 tenant_id 過濾條件
- * - 驗證跨租戶訪問
- * - 審計日誌記錄
- */
-@Slf4j
-@Component
-@Intercepts({
-    @Signature(
-        type = Executor.class,
-        method = "query",
-        args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}
-    ),
-    @Signature(
-        type = Executor.class,
-        method = "update",
-        args = {MappedStatement.class, Object.class}
-    )
-})
-public class TenantIsolationInterceptor implements Interceptor {
-
-    @Override
-    public Object intercept(Invocation invocation) throws Throwable {
-        // 1. 獲取當前租戶 ID (從 ThreadLocal / JWT)
-        Long currentTenantId = TenantContext.getCurrentTenantId();
-        if (currentTenantId == null) {
-            throw new IllegalStateException("當前請求未設置 tenant_id");
-        }
-
-        // 2. 注入 tenant_id 到 SQL
-        MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
-        Object parameter = invocation.getArgs()[1];
-
-        if (parameter instanceof Map) {
-            ((Map<String, Object>) parameter).put("tenant_id", currentTenantId);
-        }
-
-        // 3. 執行原始查詢
-        Object result = invocation.proceed();
-
-        // 4. 驗證返回結果的 tenant_id
-        if (result instanceof List) {
-            ((List<?>) result).forEach(item -> {
-                if (item instanceof TenantEntity) {
-                    TenantEntity entity = (TenantEntity) item;
-                    if (!currentTenantId.equals(entity.getTenantId())) {
-                        log.error("檢測到跨租戶數據洩露: CurrentTenant={}, DataTenant={}",
-                                  currentTenantId, entity.getTenantId());
-                        throw new SecurityException("跨租戶訪問被拒絕");
-                    }
-                }
-            });
-        }
-
-        return result;
-    }
-}
-```
 
 #### 租戶間數據共享 (Cross-Tenant Data Sharing)
 
@@ -836,37 +559,9 @@ public class TenantIsolationInterceptor implements Interceptor {
 
 **實現方案**:
 
-```sql
--- 創建共享數據表 (無 tenant_id 字段)
-CREATE TABLE t_shared_blacklist (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    player_email VARCHAR(100) NOT NULL,   -- 跨租戶唯一識別
-    player_ip VARCHAR(50),
-    reason VARCHAR(200),
-    blacklist_type VARCHAR(50),          -- FRAUD, MONEY_LAUNDERING, CHARGEBACK
-    created_by_tenant_id BIGINT,         -- 記錄哪個租戶添加
-    share_scope VARCHAR(20) DEFAULT 'ALL', -- ALL, REGION, CUSTOM
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_email (player_email)
-);
-
--- 所有租戶可查詢,僅創建者可修改
-```
 
 **權限控制**:
 
-```java
-// 查詢共享黑名單 (不需要 tenant_id 過濾)
-@Select("SELECT * FROM t_shared_blacklist WHERE player_email = #{email}")
-SharedBlacklistEntity selectByEmail(@Param("email") String email);
-
-// 添加黑名單 (自動記錄創建租戶)
-@Insert("INSERT INTO t_shared_blacklist (player_email, reason, created_by_tenant_id) " +
-        "VALUES (#{email}, #{reason}, #{tenantId})")
-int insert(@Param("email") String email,
-           @Param("reason") String reason,
-           @Param("tenantId") Long tenantId);
-```
 
 ---
 
@@ -1099,22 +794,56 @@ POST {merchant_webhook_url}
 
 ---
 
+## SmartAdmin 架構映射 (SmartAdmin Architecture Mapping)
+
+### 分層架構概述
+
+出金風控系統遵循 SmartAdmin **嚴格分層架構**，確保 SAGA 編排、補償事務、風控規則的職責分離：
+
+```
+Controller (API 端點) → Service (業務編排) → Manager (事務管理) → Dao (數據訪問)
+```
+
+**關鍵規則**:
+- ✅ `@Transactional` 只能在 Manager 層
+- ✅ Service 使用 Vavr `Option<T>` / `Try<T>` 處理錯誤
+- ✅ SAGA 編排邏輯在 Service 層,事務補償在 Manager 層
+- ❌ Controller 禁止直接調用 Dao/Manager
 
 ---
 
-## SmartAdmin 實作細節
+### 核心類別設計 (Core Classes)
 
-完整的 SmartAdmin 架構映射、代碼實作範例與 Foundation 模組依賴，請參考：
+#### Entity - 出金請求實體
 
-**[→ SmartAdmin 實作細節（補充文檔）](./diagrams/02-01-implementation.md)**
+**檔案**: `net.lab1024.sa.admin.module.business.withdrawal.domain.entity.WithdrawalRequestEntity`
 
-包含內容：
-- 分層架構概述（Controller → Service → Manager → Dao）
-- Entity 定義（WithdrawalRequestEntity）
-- Manager 層（SAGA 補償事務管理）
-- Service 層（SAGA 編排與重試策略）
-- Controller 層（API 端點）
-- Foundation 模組依賴（redis-lock, mq, audit-log, retry）
+
+#### Manager - SAGA 補償事務管理
+
+**檔案**: `net.lab1024.sa.admin.module.business.withdrawal.manager.WithdrawalSagaManager`
+
+
+#### Service - SAGA 編排
+
+**檔案**: `net.lab1024.sa.admin.module.business.withdrawal.service.WithdrawalSagaService`
+
+
+#### Controller - API 端點
+
+**檔案**: `net.lab1024.sa.admin.module.business.withdrawal.controller.WithdrawalController`
+
+
+### Foundation 模組依賴
+
+| 模組 | 用途 | 使用位置 |
+|------|------|---------|
+| **foundation.redis-lock** | 分佈式鎖 (防並發出金) | Manager 層行鎖操作 |
+| **foundation.mq** | SAGA 事件發佈 | Service 層步驟完成事件 |
+| **foundation.audit-log** | 審計日誌 (補償記錄) | Manager 層補償操作 |
+| **foundation.retry** | 補償重試策略 | Service 層 `@Retryable` |
+
+---
 
 ## 📚 相關文檔
 

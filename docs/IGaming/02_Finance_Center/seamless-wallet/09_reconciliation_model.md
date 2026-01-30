@@ -35,35 +35,6 @@ graph LR
     C -->|差異| E[❌ 差異報告]
 ```
 
-**對帳邏輯**:
-```java
-public ReconciliationReport reconcileGameTransactions(LocalDate date) {
-    // 方 1: 營運商記錄
-    List<WalletTransaction> operatorTxns = db.query("...");
-
-    // 方 2: GP 報表
-    List<ProviderTransaction> providerTxns = fetchProviderReport(date);
-
-    // 比對 transaction_id
-    Set<String> operatorIds = operatorTxns.stream()
-        .map(WalletTransaction::getTransactionId)
-        .collect(Collectors.toSet());
-
-    Set<String> providerIds = providerTxns.stream()
-        .map(ProviderTransaction::getTransactionId)
-        .collect(Collectors.toSet());
-
-    // 找出差異
-    Set<String> missingInProvider = Sets.difference(operatorIds, providerIds);
-    Set<String> missingInOperator = Sets.difference(providerIds, operatorIds);
-
-    return ReconciliationReport.builder()
-        .date(date)
-        .missingInProvider(missingInProvider)  // 需要 Rollback
-        .missingInOperator(missingInOperator)  // 需要 Resettle
-        .build();
-}
-```
 
 ### 模型 2: 存提款對帳（三方對帳）
 
@@ -76,30 +47,6 @@ graph TD
     D -->|差異| F[❌ 需人工查證]
 ```
 
-**對帳邏輯**:
-```java
-public FinancialReconciliationReport reconcilePayments(LocalDate date) {
-    // 方 1: 營運商財務記錄
-    List<DepositWithdrawal> operatorRecords = db.query("...");
-
-    // 方 2: 支付網關報表
-    List<GatewayTransaction> gatewayRecords = stripeApi.fetchTransactions(date);
-
-    // 方 3: 銀行對帳單
-    List<BankStatement> bankStatements = importBankStatements(date);
-
-    // 三方比對（基於金額 + 時間）
-    // 比 transaction_id 複雜，因為可能沒有統一的 ID
-    // ...
-
-    return FinancialReconciliationReport.builder()
-        .date(date)
-        .totalDeposits(...)
-        .totalWithdrawals(...)
-        .discrepancies(...)
-        .build();
-}
-```
 
 ## 正確的文檔結構
 

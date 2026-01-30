@@ -66,38 +66,8 @@ VIP 玩家 (1.5-3%)
 
 ### 3.1 RFM 指標定義
 
-**R (Recency) - 最近一次消費**:
-```sql
-R_Score = CASE
-    WHEN DATEDIFF(NOW(), last_bet_date) <= 7 THEN 5
-    WHEN DATEDIFF(NOW(), last_bet_date) <= 30 THEN 4
-    WHEN DATEDIFF(NOW(), last_bet_date) <= 90 THEN 3
-    WHEN DATEDIFF(NOW(), last_bet_date) <= 180 THEN 2
-    ELSE 1
-END
-```
 
-**F (Frequency) - 消費頻率**:
-```sql
-F_Score = CASE
-    WHEN bet_days_last_90 >= 60 THEN 5  -- 平均每天投注
-    WHEN bet_days_last_90 >= 30 THEN 4  -- 平均每 3 天投注
-    WHEN bet_days_last_90 >= 15 THEN 3  -- 平均每週投注
-    WHEN bet_days_last_90 >= 5 THEN 2   -- 偶爾投注
-    ELSE 1
-END
-```
 
-**M (Monetary) - 消費金額**:
-```sql
-M_Score = CASE
-    WHEN total_deposit_last_90 >= 50000 THEN 5  -- 鯨魚玩家
-    WHEN total_deposit_last_90 >= 10000 THEN 4  -- 高價值玩家
-    WHEN total_deposit_last_90 >= 1000 THEN 3   -- 中等玩家
-    WHEN total_deposit_last_90 >= 100 THEN 2    -- 小額玩家
-    ELSE 1
-END
-```
 
 ### 3.2 RFM 分群矩陣
 
@@ -153,49 +123,12 @@ END
 
 ### 5.1 高價值玩家識別
 
-```sql
--- 每日 02:00 UTC 執行
-UPDATE player_tags
-SET tag_value = CASE
-    WHEN total_deposit_last_30 >= 50000 THEN 'VIP_WHALE'
-    WHEN total_deposit_last_30 >= 10000 THEN 'HIGH_ROLLER'
-    WHEN total_deposit_last_30 >= 1000 THEN 'REGULAR'
-    ELSE 'CASUAL'
-END
-WHERE tag_type = 'VALUE';
-```
 
 ### 5.2 獎金獵人檢測
 
-```sql
--- 實時檢測 (Kafka Stream)
-IF player.bonus_count_last_30 >= 5
-   AND player.withdrawal_count_last_30 >= 5
-   AND player.avg_session_duration < 30  -- 平均會話 < 30 分鐘
-   AND player.high_rtp_game_ratio > 0.9  -- 90% 玩高 RTP 遊戲
-THEN
-   ADD_TAG('BONUS_HUNTER', confidence=0.8)
-   NOTIFY_RISK_TEAM()
-END
-```
 
 ### 5.3 對沖者檢測
 
-```sql
--- 每小時執行 (檢查同一玩家的對沖投注)
-SELECT
-    player_id,
-    COUNT(DISTINCT bet_type) AS bet_types,
-    SUM(bet_amount) AS total_bet,
-    SUM(win_amount) AS total_win,
-    (SUM(win_amount) - SUM(bet_amount)) AS net_win
-FROM bets
-WHERE player_id = :player_id
-  AND bet_time BETWEEN NOW() - INTERVAL 1 HOUR AND NOW()
-GROUP BY player_id
-HAVING bet_types >= 2  -- 至少 2 種投注類型
-   AND ABS(net_win) < total_bet * 0.05;  -- 淨贏虧 < 5% (對沖跡象)
-```
 
 ---
 

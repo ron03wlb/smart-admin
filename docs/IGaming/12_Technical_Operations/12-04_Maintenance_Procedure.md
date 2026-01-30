@@ -79,25 +79,6 @@ stateDiagram-v2
 
 **目標**: 讓玩家提前知悉，降低投訴率
 
-**執行動作**:
-```sql
--- 1. 建立維護排程記錄
-INSERT INTO maintenance_schedules (
-  schedule_id,
-  planned_start_time,
-  estimated_duration_minutes,
-  reason,
-  status
-) VALUES (
-  'maint-2026-01-27-001',
-  '2026-01-28 02:00:00 UTC',  -- 選擇低峰時段
-  120,                          -- 預估 2 小時
-  'Database migration and security patch',
-  'SCHEDULED'
-);
-
--- 2. 觸發多渠道通知
-```
 
 **通知渠道**:
 - **站內公告**: Banner 顯示於首頁 (所有語言版本)
@@ -131,31 +112,6 @@ Casino Team
 
 **T-30分鐘**: 啟動 Draining Mode
 
-```python
-# Pseudo-code
-def enter_draining_mode():
-    # 1. Update global status
-    redis.set('platform:status', 'DRAINING')
-    redis.set('platform:draining_start_time', current_timestamp())
-
-    # 2. Broadcast to all connected clients via WebSocket
-    websocket.broadcast({
-        'type': 'MAINTENANCE_ALERT',
-        'countdown_seconds': 1800,  # 30 minutes
-        'message': 'Platform will enter maintenance in 30 minutes. Please complete your bets.'
-    })
-
-    # 3. Frontend displays countdown banner
-    # 4. API Gateway starts rejecting new sessions
-    gateway.set_rule('block_new_logins', enabled=True)
-
-    # 5. Log draining event
-    audit_log.create({
-        'event': 'MAINTENANCE_DRAINING_START',
-        'initiated_by': 'admin@company.com',
-        'scheduled_time': '2026-01-28T02:00:00Z'
-    })
-```
 
 **T-30分鐘 → T-5分鐘**: 持續監控
 
@@ -189,30 +145,6 @@ if (countdown < 600) {  // < 10 minutes
 
 **T-5分鐘**: 查詢活躍回合
 
-```python
-# Call Game Integration API (defined in 03-01)
-def get_active_rounds():
-    """
-    Query all game providers for active rounds.
-    This API should be defined in 03-01_Game_Integration_Standard.md
-    """
-    active_rounds = []
-
-    for provider in game_providers:
-        try:
-            rounds = provider.api.get_active_rounds(timeout=30)
-            active_rounds.extend(rounds)
-        except TimeoutError:
-            logger.error(f"Provider {provider.name} timeout, assuming 0 active rounds")
-
-    return active_rounds
-
-# Result example:
-# [
-#   {'round_id': 'r12345', 'player_id': 10001, 'game_id': 'slot_001', 'bet_amount': 10.0, 'status': 'IN_PROGRESS'},
-#   {'round_id': 'r12346', 'player_id': 10002, 'game_id': 'blackjack', 'bet_amount': 50.0, 'status': 'PENDING_RESULT'}
-# ]
-```
 
 **處理策略**:
 
@@ -223,49 +155,9 @@ def get_active_rounds():
 | **體育博彩** (Sports Betting) | 保留未結算注單: 等賽事結果後處理 |
 | **撲克** (Poker) | Sit-out 玩家: 自動 Fold 並退還籌碼 |
 
-**強制結算範例** (Slots):
-```python
-def force_settle_rounds(rounds):
-    for round in rounds:
-        if round['game_type'] == 'slot':
-            # Auto-settle with minimum win (e.g., return bet * 0.5)
-            settle_result = {
-                'round_id': round['round_id'],
-                'player_id': round['player_id'],
-                'result': 'FORCE_SETTLED',
-                'payout': round['bet_amount'] * 0.5,  # Conservative settlement
-                'reason': 'MAINTENANCE_FORCE_SETTLE'
-            }
-            game_provider.api.force_settle(settle_result)
-            wallet_service.credit(round['player_id'], settle_result['payout'])
-
-            # Notify player via email
-            send_email(
-                player_id=round['player_id'],
-                template='force_settle_notification',
-                context=settle_result
-            )
-```
 
 **T+0**: 進入 MAINTENANCE 狀態
 
-```python
-def enter_maintenance_mode():
-    # 1. Update status
-    redis.set('platform:status', 'MAINTENANCE')
-
-    # 2. API Gateway returns 503 for all requests
-    gateway.set_rule('maintenance_mode', enabled=True)
-
-    # 3. Display maintenance page
-    cdn.update_route('/', maintenance_page_html)
-
-    # 4. Create database snapshot
-    db.create_snapshot('pre_maintenance_2026_01_28')
-
-    # 5. Notify monitoring system
-    prometheus.gauge('platform_status').set(0)  # 0 = maintenance
-```
 
 ### 6.4 Phase 4: 維護作業 (T+0 → T+120分鐘)
 
@@ -301,16 +193,6 @@ def enter_maintenance_mode():
    ansible-playbook playbooks/security_patch.yml --limit=production
    ```
 
-4. **Data Cleanup** (if needed):
-   ```sql
-   -- Archive old audit logs (> 1 year)
-   INSERT INTO audit_logs_archive
-   SELECT * FROM audit_logs
-   WHERE created_at < NOW() - INTERVAL '1 year';
-
-   DELETE FROM audit_logs
-   WHERE created_at < NOW() - INTERVAL '1 year';
-   ```
 
 ### 6.5 Phase 5: 驗證與恢復 (T+120分鐘 → T+135分鐘)
 
@@ -360,34 +242,6 @@ def enter_maintenance_mode():
 
 **Gradual Traffic Ramp** (Canary Release):
 
-```python
-def gradual_traffic_ramp():
-    """
-    Slowly increase traffic to avoid login storm overwhelming auth service
-    """
-    # Phase 1: 10% traffic (T+120 → T+125 min)
-    gateway.set_throttle_rate(0.1)  # Allow 10% of normal traffic
-    sleep(300)  # Wait 5 minutes
-
-    # Monitor error rate
-    if metrics.error_rate() > 5%:
-        logger.alert("High error rate detected, pausing ramp")
-        return ROLLBACK
-
-    # Phase 2: 50% traffic (T+125 → T+130 min)
-    gateway.set_throttle_rate(0.5)
-    sleep(300)
-
-    if metrics.error_rate() > 5%:
-        return ROLLBACK
-
-    # Phase 3: 100% traffic (T+130 → T+135 min)
-    gateway.set_throttle_rate(1.0)
-
-    # Full traffic restored
-    redis.set('platform:status', 'ACTIVE')
-    logger.info("Platform fully restored")
-```
 
 ---
 

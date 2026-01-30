@@ -652,24 +652,6 @@ routing_config:
 ---
 
 ## 4. 數據結構
-```sql
-CREATE TABLE notification_log (
-    id UUID PRIMARY KEY,
-    tenant_id INT,
-    user_id UUID,
-    
-    channel VARCHAR(20), -- SMS, EMAIL, TG
-    provider VARCHAR(20), -- TWILIO, AWS
-    template_code VARCHAR(50),
-    
-    destination VARCHAR(255), -- Phone or Email
-    status ENUM('PENDING', 'SENT', 'DELIVERED', 'FAILED'),
-    cost DECIMAL(10, 4), -- 預估費用
-    
-    sent_at TIMESTAMP,
-    created_at TIMESTAMP
-);
-```
 
 ### 4.2 站內信存儲 (Inbox Persistence)
 除了發送 Push，行銷訊息需持久化，供玩家在 "訊息中心" 查看。

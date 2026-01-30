@@ -240,64 +240,9 @@ export default function () {
 
 **推薦方案**: 使用生產數據備份，但進行敏感資料脫敏
 
-```sql
--- Anonymize player data for testing
-UPDATE players_test SET
-  email = CONCAT('testuser_', player_id, '@test.com'),
-  phone = CONCAT('+8869', LPAD(player_id::TEXT, 8, '0')),
-  real_name = CONCAT('Test User ', player_id),
-  id_number = NULL,
-  bank_account = NULL
-WHERE tenant_id = 'test_tenant';
-
--- Preserve statistical distribution (e.g., VIP tiers, deposit amounts)
--- but remove PII
-```
 
 #### 3.2.2 合成數據生成 (Synthetic Data)
 
-```python
-# Generate realistic test data using Faker
-from faker import Faker
-import random
-
-fake = Faker(['en_US', 'th_TH', 'vi_VN'])
-
-def generate_test_players(count=100000):
-    players = []
-    for i in range(count):
-        player = {
-            'player_id': i + 1,
-            'username': fake.user_name(),
-            'email': fake.email(),
-            'phone': fake.phone_number(),
-            'vip_tier': random.choices(
-                ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND'],
-                weights=[50, 30, 15, 4, 1]
-            )[0],
-            'balance': round(random.lognormvariate(5, 2), 2),  # Realistic distribution
-            'created_at': fake.date_time_between(start_date='-2y', end_date='now'),
-        }
-        players.append(player)
-    return players
-
-# Generate test bets with realistic patterns
-def generate_test_bets(player_id, count=100):
-    games = ['slots', 'baccarat', 'blackjack', 'roulette', 'poker']
-    bets = []
-    for _ in range(count):
-        bet = {
-            'player_id': player_id,
-            'game_type': random.choice(games),
-            'amount': round(random.uniform(1, 500), 2),
-            'result': random.choices(['WIN', 'LOSE'], weights=[45, 55])[0],
-            'payout': 0,  # Calculated based on result
-        }
-        if bet['result'] == 'WIN':
-            bet['payout'] = round(bet['amount'] * random.uniform(0.9, 3.0), 2)
-        bets.append(bet)
-    return bets
-```
 
 ### 3.3 測試腳本架構 (Test Script Structure)
 

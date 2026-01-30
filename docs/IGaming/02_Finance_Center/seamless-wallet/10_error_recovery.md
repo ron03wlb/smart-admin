@@ -24,37 +24,6 @@
 ✅ 暫存 Result，等待 Bet
 ```
 
-**解決方案**:
-```java
-public ResultResponse handleResultRequest(ResultRequest request) {
-    String betTxId = request.getReferTransactionId();
-
-    // 檢查 Bet 是否存在
-    Option<WalletTransaction> betTx = transactionRepository
-        .findByTransactionId(betTxId);
-
-    if (betTx.isEmpty()) {
-        // Bet 還沒到達 → 暫存 Result
-        String key = "pending_result:" + request.getTransactionId();
-
-        // 檢查是否已暫存
-        if (redisTemplate.hasKey(key)) {
-            return ResultResponse.pending("Waiting for bet");
-        }
-
-        // 首次遇到 → 暫存（TTL = 60 秒）
-        redisTemplate.opsForValue().set(key,
-            json(request),
-            Duration.ofSeconds(60)
-        );
-
-        return ResultResponse.retry("Bet not found, retry after 1s");
-    }
-
-    // Bet 存在 → 正常處理
-    return processResult(request, betTx.get());
-}
-```
 
 ### 場景 2: 預回滾（Pre-Rollback）
 
@@ -70,58 +39,6 @@ public ResultResponse handleResultRequest(ResultRequest request) {
 問題: 如何處理這個 Rollback？
 ```
 
-**解決方案**:
-```java
-public RollbackResponse handleRollback(RollbackRequest request) {
-    String betTxId = request.getOriginalTransactionId();
-
-    Option<WalletTransaction> betTx = transactionRepository
-        .findByTransactionId(betTxId);
-
-    if (betTx.isEmpty()) {
-        // Bet 還沒到達 → 標記為「預回滾」
-        String key = "pre_rollback:" + betTxId;
-        redisTemplate.opsForValue().set(key,
-            json(request),
-            Duration.ofMinutes(5)
-        );
-
-        log.warn("Pre-rollback for bet: {}", betTxId);
-
-        return RollbackResponse.accepted(
-            "Will be applied when Bet arrives"
-        );
-    }
-
-    // Bet 已存在 → 正常回滾
-    return executeRollback(request, betTx.get());
-}
-
-public BetResponse handleBet(BetRequest request) {
-    String txId = request.getTransactionId();
-
-    // 檢查是否有預回滾標記
-    String key = "pre_rollback:" + txId;
-    if (redisTemplate.hasKey(key)) {
-        log.info("Bet cancelled due to pre-rollback: {}", txId);
-
-        // 記錄為 CANCELLED 狀態
-        transactionRepository.save(
-            WalletTransaction.cancelled(txId)
-        );
-
-        // 清除標記
-        redisTemplate.delete(key);
-
-        return BetResponse.cancelled(
-            "Bet was rolled back before processing"
-        );
-    }
-
-    // 正常處理
-    return processBet(request);
-}
-```
 
 ### 場景 3: 部分失敗恢復（Two-Phase Commit）
 
@@ -143,33 +60,6 @@ T6: GP 重試（相同 transaction_id）
 - 但實際上數據不完整
 ```
 
-**解決方案**:
-```java
-@Transactional(rollbackFor = Throwable.class)
-public BetResponse processBet(BetRequest request) {
-    String txId = request.getTransactionId();
-
-    // 階段 1: Prepare（預留資源）
-    transactionRepository.save(
-        WalletTransaction.builder()
-            .transactionId(txId)
-            .status(TransactionStatus.PREPARED)  // 關鍵狀態
-            .build()
-    );
-
-    // 階段 2: 執行業務邏輯（全部完成或全部回滾）
-    BigDecimal newBalance = walletService.deductBalance(...);
-    betDetailsRepository.save(BetDetails.of(request));
-
-    // 階段 3: Commit（標記為成功）
-    transactionRepository.updateStatus(txId, TransactionStatus.SUCCESS);
-
-    // 如果上面任何一步失敗，整個事務回滾
-    // 確保要麼全部成功，要麼全部失敗
-
-    return BetResponse.success(newBalance);
-}
-```
 
 ## 監控與告警
 

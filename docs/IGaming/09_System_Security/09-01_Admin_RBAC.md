@@ -229,34 +229,6 @@ graph TD
 
 #### 5.2.3 循環檢測演算法
 
-```python
-def detect_circular_inheritance(roles):
-    """
-    Detect circular role inheritance using DFS (Depth-First Search)
-    """
-    visited = set()
-    recursion_stack = set()
-
-    def dfs(role_id):
-        if role_id in recursion_stack:
-            raise CircularInheritanceError(f"Circular dependency detected: {role_id}")
-        if role_id in visited:
-            return
-
-        visited.add(role_id)
-        recursion_stack.add(role_id)
-
-        role = roles.get(role_id)
-        for parent_id in role.inherits_from:
-            dfs(parent_id)
-
-        recursion_stack.remove(role_id)
-
-    for role_id in roles.keys():
-        dfs(role_id)
-
-    return True  # No cycles detected
-```
 
 ### 5.3 權限衝突矩陣 (Permission Conflict Resolution Matrix)
 
@@ -665,42 +637,6 @@ flowchart TD
 
 **Python 實作參考**:
 
-```python
-def evaluate_abac_conditions(policy, context):
-    """
-    Evaluate ABAC policy conditions against request context
-    """
-    conditions = policy.get('conditions', {})
-
-    # Time-based check
-    if 'time_range' in conditions:
-        current_time = context['current_time']
-        start = datetime.strptime(conditions['time_range']['start'], '%H:%M')
-        end = datetime.strptime(conditions['time_range']['end'], '%H:%M')
-        if not (start.time() <= current_time.time() <= end.time()):
-            return {'allowed': False, 'reason': 'Outside working hours'}
-
-    # Day of week check
-    if 'day_of_week' in conditions:
-        if context['day_of_week'] not in conditions['day_of_week']:
-            return {'allowed': False, 'reason': 'Weekend/Holiday restriction'}
-
-    # IP whitelist check
-    if 'ip_whitelist' in conditions:
-        if not ip_in_whitelist(context['source_ip'], conditions['ip_whitelist']):
-            return {'allowed': False, 'reason': 'IP not in whitelist'}
-
-    # MFA requirement check
-    if conditions.get('mfa_required') and not context.get('mfa_verified'):
-        return {'allowed': False, 'reason': 'MFA verification required'}
-
-    # Resource ownership check
-    if 'require_ownership' in conditions and conditions['require_ownership']:
-        if context['user_id'] != context['resource_owner']:
-            return {'allowed': False, 'reason': 'Not resource owner'}
-
-    return {'allowed': True, 'reason': 'All conditions satisfied'}
-```
 
 ### 5.5 Session 管理策略 (Session Management)
 
@@ -724,51 +660,6 @@ def evaluate_abac_conditions(policy, context):
 
 #### 5.5.3 Session 綁定與防劫持
 
-```python
-class SecureSession:
-    def __init__(self, user_id):
-        self.user_id = user_id
-        self.session_id = secrets.token_urlsafe(32)
-        self.created_at = datetime.now()
-        self.last_activity = datetime.now()
-        self.ip_address = request.remote_addr
-        self.user_agent = request.headers.get('User-Agent')
-        self.fingerprint = self._generate_fingerprint()
-
-    def _generate_fingerprint(self):
-        """
-        Generate session fingerprint to prevent session hijacking
-        """
-        components = [
-            self.ip_address,
-            self.user_agent,
-            request.headers.get('Accept-Language', ''),
-            request.headers.get('Accept-Encoding', '')
-        ]
-        return hashlib.sha256('|'.join(components).encode()).hexdigest()
-
-    def validate(self):
-        """
-        Validate session on each request
-        """
-        # Check idle timeout
-        if (datetime.now() - self.last_activity).seconds > IDLE_TIMEOUT:
-            raise SessionExpiredError("Session expired due to inactivity")
-
-        # Check absolute timeout
-        if (datetime.now() - self.created_at).seconds > ABSOLUTE_TIMEOUT:
-            raise SessionExpiredError("Session exceeded maximum duration")
-
-        # Check fingerprint (detect session hijacking)
-        current_fingerprint = self._generate_fingerprint()
-        if current_fingerprint != self.fingerprint:
-            logger.alert(f"Session hijacking detected for user {self.user_id}")
-            raise SecurityError("Session validation failed")
-
-        # Update last activity
-        self.last_activity = datetime.now()
-        return True
-```
 
 #### 5.5.4 Session 存儲架構
 
@@ -893,50 +784,9 @@ Response 200 OK:
 
 所有權限檢查結果必須記錄至審計日誌：
 
-```sql
-CREATE TABLE permission_audit_logs (
-  log_id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
-  action VARCHAR(100) NOT NULL,
-  resource VARCHAR(255) NOT NULL,
-  decision VARCHAR(10) NOT NULL,  -- ALLOW | DENY
-  reason TEXT,
-  context JSONB,                  -- IP, time, MFA status, etc.
-  evaluated_policies JSONB,       -- Which policies were evaluated
-  execution_time_ms INT,
-  created_at TIMESTAMP DEFAULT NOW(),
-
-  INDEX idx_user (user_id),
-  INDEX idx_decision (decision),
-  INDEX idx_created_at (created_at)
-) PARTITION BY RANGE (created_at);  -- 按月分區
-```
 
 #### 5.8.2 異常行為檢測
 
-```python
-# Alert on suspicious patterns
-def detect_permission_abuse(user_id, time_window='1h'):
-    logs = db.query("""
-        SELECT action, decision, COUNT(*) as attempts
-        FROM permission_audit_logs
-        WHERE user_id = %s AND created_at > NOW() - INTERVAL %s
-        GROUP BY action, decision
-    """, (user_id, time_window))
-
-    for log in logs:
-        # Alert if >50 DENY in 1 hour (potential privilege escalation attempt)
-        if log.decision == 'DENY' and log.attempts > 50:
-            alert_security_team(
-                f"User {user_id} attempted {log.action} {log.attempts} times (all denied)"
-            )
-
-        # Alert if accessing >100 different resources in 1 hour (data scraping)
-        if log.attempts > 100:
-            alert_security_team(
-                f"User {user_id} accessed {log.attempts} resources in 1 hour"
-            )
-```
 
 ---
 

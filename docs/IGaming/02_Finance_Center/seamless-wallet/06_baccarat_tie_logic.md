@@ -33,35 +33,6 @@ C. Valid Bet = 0（排除和局投注）？
 
 ## Evolution Gaming 標準規則
 
-```java
-/**
- * Evolution Gaming 的百家樂 Valid Bet 計算標準
- */
-public BigDecimal calculateBaccaratValidBet(
-    BaccaratBetType betType,
-    BaccaratOutcome outcome,
-    BigDecimal betAmount
-) {
-    // 莊閒投注遇到和局 → 退款 → Valid Bet = 0
-    if ((betType == BANKER || betType == PLAYER) && outcome == TIE) {
-        return BigDecimal.ZERO;  // ✅ Push 狀態
-    }
-
-    // 和局投注
-    if (betType == TIE) {
-        // 不論輸贏，Valid Bet = 投注本金
-        return betAmount;  // ✅ 承擔風險
-    }
-
-    // 對子投注
-    if (betType == BANKER_PAIR || betType == PLAYER_PAIR) {
-        return betAmount;  // ✅ 承擔風險
-    }
-
-    // 其他情況：莊贏/閒贏
-    return betAmount;
-}
-```
 
 ## 正確邏輯總結
 
@@ -94,67 +65,9 @@ Win/Lose 狀態:
 
 ## 實現代碼
 
-```java
-@Service
-@RequiredArgsConstructor
-public class BaccaratValidBetCalculator {
-
-    public BigDecimal calculateValidBet(BaccaratSettlement settlement) {
-        BaccaratBetType betType = settlement.getBetType();
-        BaccaratOutcome outcome = settlement.getOutcome();
-        BigDecimal betAmount = settlement.getBetAmount();
-
-        // 莊閒投注遇和局 → Push → Valid Bet = 0
-        if (isPushState(betType, outcome)) {
-            return BigDecimal.ZERO;
-        }
-
-        // 所有其他情況 → Valid Bet = 本金
-        return betAmount;
-    }
-
-    private boolean isPushState(BaccaratBetType betType, BaccaratOutcome outcome) {
-        return (betType == BaccaratBetType.BANKER || betType == BaccaratBetType.PLAYER)
-            && outcome == BaccaratOutcome.TIE;
-    }
-}
-```
 
 ## 測試案例
 
-```java
-@Test
-void testTieBet_ShouldCountFullAmount() {
-    // 場景: 投注和局 100 元，結果和局（贏 800 元）
-    BaccaratSettlement settlement = BaccaratSettlement.builder()
-        .betType(BaccaratBetType.TIE)
-        .betAmount(new BigDecimal("100.00"))
-        .outcome(BaccaratOutcome.TIE)
-        .payout(new BigDecimal("900.00"))  // 本金 100 + 贏金 800
-        .build();
-
-    BigDecimal validBet = calculator.calculateValidBet(settlement);
-
-    // 斷言: Valid Bet = 100（不是 800，不是 0）
-    assertThat(validBet).isEqualByComparingTo("100.00");
-}
-
-@Test
-void testBankerBet_TieOutcome_ShouldCountZero() {
-    // 場景: 投注莊 100 元，結果和局（退款）
-    BaccaratSettlement settlement = BaccaratSettlement.builder()
-        .betType(BaccaratBetType.BANKER)
-        .betAmount(new BigDecimal("100.00"))
-        .outcome(BaccaratOutcome.TIE)
-        .payout(new BigDecimal("100.00"))  // 退款
-        .build();
-
-    BigDecimal validBet = calculator.calculateValidBet(settlement);
-
-    // 斷言: Valid Bet = 0（Push 狀態）
-    assertThat(validBet).isEqualByComparingTo("0.00");
-}
-```
 
 ## 決策總結
 

@@ -199,33 +199,6 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 
 ### 5.1 推薦方案 A: 禁止部分轉移（業界標準）
 
-```java
-/**
- * 促銷錢包轉移邏輯（業界標準）
- */
-@Transactional(rollbackFor = Throwable.class)
-public WalletTransferResult transferPromoWallet(Long userId, Long promotionId) {
-    // 1. 查詢促銷錢包狀態
-    PromoWallet promoWallet = walletManager.getPromoWallet(userId, promotionId);
-
-    // 2. 驗證流水需求是否達標
-    if (promoWallet.getEffectiveStake().compareTo(promoWallet.getWagerRequirement()) < 0) {
-        return WalletTransferResult.rejected(
-            "流水需求未達標",
-            "剩餘需求: " + promoWallet.getRemainingRequirement()
-        );
-    }
-
-    // 3. 全額轉移到主錢包（無 lockAmount）
-    BigDecimal transferAmount = promoWallet.getCash().add(promoWallet.getBonus());
-    walletManager.transferToMainWallet(userId, transferAmount, BigDecimal.ZERO);
-
-    // 4. 清空促銷錢包
-    walletManager.clearPromoWallet(userId, promotionId);
-
-    return WalletTransferResult.success(transferAmount);
-}
-```
 
 **優點**:
 - ✅ 符合業界標準（Pragmatic Play, Evolution Gaming）
@@ -242,45 +215,6 @@ public WalletTransferResult transferPromoWallet(Long userId, Long promotionId) {
 
 如果業務確實需要支持部分轉移（例如：允許玩家在未達標時提取部分資金），則需修正公式：
 
-```java
-/**
- * 促銷錢包部分轉移邏輯（需業務確認）
- */
-@Transactional(rollbackFor = Throwable.class)
-public WalletTransferResult transferPromoWalletPartial(
-    Long userId,
-    Long promotionId,
-    BigDecimal transferAmount
-) {
-    // 1. 查詢促銷錢包狀態
-    PromoWallet promoWallet = walletManager.getPromoWallet(userId, promotionId);
-    BigDecimal totalBalance = promoWallet.getCash().add(promoWallet.getBonus());
-
-    // 2. 驗證轉移金額
-    if (transferAmount.compareTo(totalBalance) > 0) {
-        return WalletTransferResult.rejected("轉移金額超過餘額");
-    }
-
-    // 3. 計算轉移的流水需求（修正公式：加入負值保護）
-    BigDecimal remainingRequirement = promoWallet.getWagerRequirement()
-        .subtract(promoWallet.getEffectiveStake());
-
-    BigDecimal transferWagerRequirement = remainingRequirement
-        .multiply(transferAmount)
-        .divide(totalBalance, 2, RoundingMode.HALF_UP)
-        .max(BigDecimal.ZERO);  // ✅ 負值保護
-
-    // 4. 轉移到主錢包（帶 lockAmount）
-    walletManager.transferToMainWallet(userId, transferAmount, transferWagerRequirement);
-
-    // 5. 更新促銷錢包（減少餘額和剩餘流水需求）
-    promoWallet.decreaseBalance(transferAmount);
-    promoWallet.decreaseWagerRequirement(transferWagerRequirement);
-    walletManager.updatePromoWallet(promoWallet);
-
-    return WalletTransferResult.success(transferAmount, transferWagerRequirement);
-}
-```
 
 **優點**:
 - ✅ 支持靈活的資金管理
@@ -323,78 +257,6 @@ public WalletTransferResult transferPromoWalletPartial(
 
 ## 7. 測試案例（如果採用方案 B）
 
-```java
-@SpringBootTest
-class PromoWalletPartialTransferTest {
-
-    @Test
-    @DisplayName("場景 1: 部分轉移（未達標）")
-    void testPartialTransfer_NotMet() {
-        // 初始狀態
-        PromoWallet promoWallet = PromoWallet.builder()
-            .cash(new BigDecimal("50"))
-            .bonus(new BigDecimal("100"))
-            .wagerRequirement(new BigDecimal("2000"))
-            .effectiveStake(new BigDecimal("500"))
-            .build();
-
-        // 轉移 60 元
-        WalletTransferResult result = service.transferPromoWalletPartial(
-            userId, promotionId, new BigDecimal("60")
-        );
-
-        // 斷言
-        assertThat(result.isSuccess()).isTrue();
-        assertThat(result.getTransferAmount()).isEqualByComparingTo("60.00");
-        assertThat(result.getTransferWagerRequirement()).isEqualByComparingTo("600.00");
-
-        // 驗證促銷錢包狀態
-        PromoWallet updatedWallet = walletManager.getPromoWallet(userId, promotionId);
-        assertThat(updatedWallet.getBalance()).isEqualByComparingTo("90.00");
-        assertThat(updatedWallet.getRemainingRequirement()).isEqualByComparingTo("900.00");
-    }
-
-    @Test
-    @DisplayName("場景 2: 全部轉移（已達標）")
-    void testFullTransfer_Met() {
-        // 初始狀態
-        PromoWallet promoWallet = PromoWallet.builder()
-            .cash(new BigDecimal("50"))
-            .bonus(new BigDecimal("100"))
-            .wagerRequirement(new BigDecimal("2000"))
-            .effectiveStake(new BigDecimal("2100"))  // 已達標
-            .build();
-
-        // 轉移全部
-        WalletTransferResult result = service.transferPromoWalletPartial(
-            userId, promotionId, new BigDecimal("150")
-        );
-
-        // 斷言: transferWagerRequirement = 0（已達標）
-        assertThat(result.getTransferWagerRequirement()).isEqualByComparingTo("0.00");
-    }
-
-    @Test
-    @DisplayName("場景 3: 負值保護測試")
-    void testNegativeProtection() {
-        // 超額完成流水
-        PromoWallet promoWallet = PromoWallet.builder()
-            .cash(new BigDecimal("100"))
-            .bonus(new BigDecimal("50"))
-            .wagerRequirement(new BigDecimal("1000"))
-            .effectiveStake(new BigDecimal("1500"))  // 超額 500
-            .build();
-
-        // 轉移部分
-        WalletTransferResult result = service.transferPromoWalletPartial(
-            userId, promotionId, new BigDecimal("50")
-        );
-
-        // 斷言: transferWagerRequirement = 0（不應該是負數）
-        assertThat(result.getTransferWagerRequirement()).isEqualByComparingTo("0.00");
-    }
-}
-```
 
 ---
 

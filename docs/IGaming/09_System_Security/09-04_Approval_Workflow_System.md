@@ -45,45 +45,6 @@ sequenceDiagram
 
 ### 2.2 數據模型
 
-```sql
-CREATE TABLE approval_requests (
-    request_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    request_type ENUM(
-        'withdraw',               -- 提款審批
-        'config_change',          -- 配置變更
-        'vip_upgrade',            -- VIP 升級
-        'bonus_manual_issue',     -- 手動發放紅利
-        'player_data_correction', -- 玩家數據修正
-        'risk_label_change'       -- 風控標籤變更
-    ) NOT NULL,
-
-    -- Maker 信息
-    maker_id BIGINT NOT NULL,
-    maker_name VARCHAR(100) NOT NULL,
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    -- 變更內容
-    target_entity VARCHAR(100) NOT NULL,  -- 如: 'player_12345', 'game_config'
-    change_payload JSON NOT NULL,         -- 變更的詳細內容
-    change_reason TEXT NOT NULL,          -- Maker 提供的理由
-
-    -- 審批信息
-    checker_id BIGINT,
-    checker_name VARCHAR(100),
-    reviewed_at TIMESTAMP,
-    status ENUM('pending_approval', 'approved', 'rejected', 'cancelled') DEFAULT 'pending_approval',
-    review_comment TEXT,
-
-    -- 元數據
-    priority ENUM('low', 'normal', 'high', 'critical') DEFAULT 'normal',
-    auto_approve_at TIMESTAMP,  -- 超時自動審批時間（可選）
-    related_ticket_id BIGINT,   -- 關聯的工單 ID（如客服補單）
-
-    INDEX idx_status (status, submitted_at),
-    INDEX idx_maker (maker_id, submitted_at),
-    INDEX idx_checker (checker_id, reviewed_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
 
 ### 2.3 權限矩陣
 
@@ -116,69 +77,8 @@ CREATE TABLE approval_requests (
 **適用場景**：高風險操作需要兩個不同角色同時審批。
 
 **數據模型擴展**：
-```sql
-CREATE TABLE approval_chain (
-    chain_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    request_id BIGINT NOT NULL,
-    approval_level INT NOT NULL,          -- 審批層級 (1, 2, 3...)
-    required_approvers INT DEFAULT 1,     -- 需要的審批人數
-    approved_count INT DEFAULT 0,         -- 已審批人數
-
-    FOREIGN KEY (request_id) REFERENCES approval_requests(request_id),
-    UNIQUE KEY uk_request_level (request_id, approval_level)
-);
-
-CREATE TABLE approval_votes (
-    vote_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    chain_id BIGINT NOT NULL,
-    approver_id BIGINT NOT NULL,
-    approver_role VARCHAR(50) NOT NULL,   -- 如: 'finance_director', 'risk_manager'
-    vote ENUM('approve', 'reject') NOT NULL,
-    vote_comment TEXT,
-    voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (chain_id) REFERENCES approval_chain(chain_id),
-    UNIQUE KEY uk_chain_approver (chain_id, approver_id)
-);
-```
 
 **邏輯實現**：
-```python
-def process_approval_vote(chain_id: int, approver_id: int, vote: str):
-    """處理審批投票"""
-    chain = ApprovalChain.get(chain_id)
-
-    # 記錄投票
-    ApprovalVote.create(
-        chain_id=chain_id,
-        approver_id=approver_id,
-        vote=vote
-    )
-
-    if vote == 'reject':
-        # 任何一票否決，整個鏈結束
-        request = ApprovalRequest.get(chain.request_id)
-        request.update(status='rejected')
-        notify_maker_rejection(request)
-        return
-
-    # 統計已批准票數
-    approved_count = ApprovalVote.count(
-        chain_id=chain_id,
-        vote='approve'
-    )
-
-    if approved_count >= chain.required_approvers:
-        # 當前層級通過，檢查是否有下一層級
-        next_level = ApprovalChain.get_next_level(chain.request_id, chain.approval_level)
-
-        if next_level:
-            # 進入下一審批層級
-            notify_next_level_approvers(next_level)
-        else:
-            # 所有層級通過，執行變更
-            execute_approved_request(chain.request_id)
-```
 
 ---
 
@@ -216,79 +116,6 @@ stateDiagram-v2
 
 ### 4.2 狀態邏輯實現
 
-```python
-class ApprovalWorkflowEngine:
-    """審批工作流引擎"""
-
-    ALLOWED_TRANSITIONS = {
-        'draft': ['pending_approval', 'cancelled'],
-        'pending_approval': ['under_review', 'cancelled'],
-        'under_review': ['approved', 'rejected', 'pending_more_info'],
-        'pending_more_info': ['under_review', 'cancelled'],
-        'approved': ['executed', 'rollback_pending'],
-        'executed': ['rollback_pending'],
-        'rollback_pending': ['rolled_back'],
-    }
-
-    def transition(self, request_id: int, new_status: str, actor_id: int, comment: str = None):
-        """狀態轉換"""
-        request = ApprovalRequest.get(request_id)
-        current_status = request.status
-
-        # 驗證轉換合法性
-        if new_status not in self.ALLOWED_TRANSITIONS.get(current_status, []):
-            raise InvalidTransitionError(
-                f"Cannot transition from {current_status} to {new_status}"
-            )
-
-        # 驗證權限
-        if not self._has_permission(actor_id, current_status, new_status):
-            raise PermissionDeniedError(f"User {actor_id} cannot perform this transition")
-
-        # 執行狀態變更
-        old_status = request.status
-        request.update(
-            status=new_status,
-            updated_by=actor_id,
-            updated_at=datetime.utcnow()
-        )
-
-        # 記錄狀態變更日誌
-        AuditLog.create(
-            action='workflow_transition',
-            actor_id=actor_id,
-            resource_type='approval_request',
-            resource_id=request_id,
-            metadata={
-                'from_status': old_status,
-                'to_status': new_status,
-                'comment': comment
-            }
-        )
-
-        # 觸發副作用
-        self._trigger_side_effects(request, new_status)
-
-    def _trigger_side_effects(self, request: ApprovalRequest, new_status: str):
-        """狀態轉換的副作用"""
-        if new_status == 'pending_approval':
-            # 通知審批人
-            self._notify_approvers(request)
-
-        elif new_status == 'approved':
-            # 創建執行任務
-            self._schedule_execution(request)
-
-        elif new_status == 'executed':
-            # 創建配置快照
-            self._create_snapshot(request)
-            # 通知 Maker
-            self._notify_maker_success(request)
-
-        elif new_status == 'rejected':
-            # 通知 Maker 拒絕原因
-            self._notify_maker_rejection(request)
-```
 
 ---
 
@@ -299,63 +126,8 @@ class ApprovalWorkflowEngine:
 **目標**：在每次配置變更執行前，保存當前狀態快照，確保可回滾。
 
 **數據模型**：
-```sql
-CREATE TABLE config_snapshots (
-    snapshot_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    request_id BIGINT NOT NULL,           -- 關聯的審批請求
-    config_type VARCHAR(100) NOT NULL,    -- 配置類型: 'game_rtp', 'bonus_rule', 'withdrawal_limit'
-    target_entity VARCHAR(100) NOT NULL,  -- 目標實體: 'game_12345', 'bonus_rule_vip'
-
-    -- 快照數據
-    snapshot_before JSON NOT NULL,        -- 變更前的完整配置
-    snapshot_after JSON NOT NULL,         -- 變更後的完整配置
-    snapshot_diff JSON,                   -- 差異對比（可選）
-
-    -- 元數據
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT NOT NULL,
-    is_rolled_back BOOLEAN DEFAULT FALSE,
-    rolled_back_at TIMESTAMP,
-    rolled_back_by BIGINT,
-
-    FOREIGN KEY (request_id) REFERENCES approval_requests(request_id),
-    INDEX idx_target (config_type, target_entity),
-    INDEX idx_request (request_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
 
 **快照創建邏輯**：
-```python
-def create_config_snapshot(request: ApprovalRequest):
-    """創建配置快照"""
-    change_payload = request.change_payload
-    target_entity = request.target_entity
-
-    # 讀取當前配置
-    current_config = get_current_config(
-        config_type=request.request_type,
-        entity=target_entity
-    )
-
-    # 計算變更後的配置
-    new_config = apply_changes(current_config, change_payload)
-
-    # 計算差異（用於快速對比）
-    diff = calculate_diff(current_config, new_config)
-
-    # 保存快照
-    snapshot = ConfigSnapshot.create(
-        request_id=request.request_id,
-        config_type=request.request_type,
-        target_entity=target_entity,
-        snapshot_before=current_config,
-        snapshot_after=new_config,
-        snapshot_diff=diff,
-        created_by=request.maker_id
-    )
-
-    return snapshot
-```
 
 ### 5.2 回滾機制
 
@@ -365,108 +137,10 @@ def create_config_snapshot(request: ApprovalRequest):
 3. **時間窗口**：配置變更後 24 小時內可回滾
 
 **回滾流程**：
-```python
-class ConfigRollbackService:
-    """配置回滾服務"""
-
-    def rollback(self, snapshot_id: int, rollback_reason: str, actor_id: int):
-        """執行回滾"""
-        snapshot = ConfigSnapshot.get(snapshot_id)
-
-        # 驗證是否已回滾
-        if snapshot.is_rolled_back:
-            raise AlreadyRolledBackError("This snapshot has already been rolled back")
-
-        # 驗證時間窗口（24小時內）
-        if (datetime.utcnow() - snapshot.created_at).total_seconds() > 86400:
-            raise RollbackWindowExpiredError("Rollback window expired (>24 hours)")
-
-        # 執行回滾（恢復到 snapshot_before）
-        restore_config(
-            config_type=snapshot.config_type,
-            entity=snapshot.target_entity,
-            config_data=snapshot.snapshot_before
-        )
-
-        # 標記快照為已回滾
-        snapshot.update(
-            is_rolled_back=True,
-            rolled_back_at=datetime.utcnow(),
-            rolled_back_by=actor_id
-        )
-
-        # 更新關聯的審批請求狀態
-        request = ApprovalRequest.get(snapshot.request_id)
-        request.update(status='rolled_back')
-
-        # 記錄審計日誌
-        AuditLog.create(
-            action='config_rollback',
-            actor_id=actor_id,
-            resource_type='config_snapshot',
-            resource_id=snapshot_id,
-            metadata={
-                'rollback_reason': rollback_reason,
-                'config_type': snapshot.config_type,
-                'target_entity': snapshot.target_entity
-            }
-        )
-
-        # 發送告警通知
-        alert_critical_rollback(snapshot, rollback_reason)
-```
 
 ### 5.3 自動回滾觸發器
 
 **監控指標範例**：
-```python
-class AutoRollbackMonitor:
-    """自動回滾監控器"""
-
-    THRESHOLDS = {
-        'game_rtp': {
-            'metric': 'actual_rtp',
-            'deviation': 0.05,  # RTP 偏差超過 5% 觸發回滾
-            'time_window': 3600  # 1小時內
-        },
-        'bonus_rule': {
-            'metric': 'bonus_abuse_rate',
-            'threshold': 0.2,  # 濫用率超過 20% 觸發回滾
-            'time_window': 1800  # 30分鐘內
-        }
-    }
-
-    def check_rollback_conditions(self, snapshot: ConfigSnapshot):
-        """檢查是否需要自動回滾"""
-        config_type = snapshot.config_type
-        threshold_config = self.THRESHOLDS.get(config_type)
-
-        if not threshold_config:
-            return  # 該配置類型無自動回滾規則
-
-        # 計算實際指標
-        actual_metric = calculate_metric(
-            metric_name=threshold_config['metric'],
-            entity=snapshot.target_entity,
-            time_window=threshold_config['time_window']
-        )
-
-        # 判斷是否超過閾值
-        if self._is_anomaly(actual_metric, threshold_config):
-            # 觸發自動回滾
-            self.rollback(
-                snapshot_id=snapshot.snapshot_id,
-                rollback_reason=f"Auto-rollback: {threshold_config['metric']} = {actual_metric} exceeded threshold",
-                actor_id=SYSTEM_USER_ID
-            )
-
-            # 發送緊急告警
-            send_critical_alert(
-                title="自動回滾觸發",
-                message=f"配置 {snapshot.target_entity} 已自動回滾",
-                details=snapshot.snapshot_diff
-            )
-```
 
 ---
 
@@ -594,51 +268,6 @@ const REJECTION_TEMPLATES = [
 
 ### 7.2 Slack 整合範例
 
-```python
-def notify_approval_needed(request: ApprovalRequest, approvers: List[User]):
-    """Slack 通知審批人"""
-    slack_message = {
-        "channel": "#approval-queue",
-        "blocks": [
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"🔔 新審批請求 - {request.request_type}"
-                }
-            },
-            {
-                "type": "section",
-                "fields": [
-                    {"type": "mrkdwn", "text": f"*請求 ID:*\n{request.request_id}"},
-                    {"type": "mrkdwn", "text": f"*優先級:*\n{request.priority.upper()}"},
-                    {"type": "mrkdwn", "text": f"*提交人:*\n{request.maker_name}"},
-                    {"type": "mrkdwn", "text": f"*提交時間:*\n{request.submitted_at}"}
-                ]
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*變更理由:*\n{request.change_reason}"
-                }
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "查看詳情"},
-                        "url": f"https://admin.platform.com/approvals/{request.request_id}",
-                        "style": "primary"
-                    }
-                ]
-            }
-        ]
-    }
-
-    slack_client.chat_postMessage(**slack_message)
-```
 
 ---
 
@@ -649,58 +278,12 @@ def notify_approval_needed(request: ApprovalRequest, approvers: List[User]):
 **場景**：審批人在審查時，需要查看目標實體的歷史變更記錄。
 
 **查詢範例**：
-```python
-def get_entity_change_history(entity_type: str, entity_id: str, limit: int = 10):
-    """查詢實體的歷史變更記錄（審批請求 + 審計日誌）"""
-
-    # 從審批請求表查詢歷史審批
-    approval_history = db.session.query(ApprovalRequest).filter(
-        ApprovalRequest.target_entity == f"{entity_type}_{entity_id}",
-        ApprovalRequest.status.in_(['approved', 'executed'])
-    ).order_by(ApprovalRequest.reviewed_at.desc()).limit(limit).all()
-
-    # 從審計日誌查詢相關操作
-    audit_logs = AuditLog.search(
-        resource_type=entity_type,
-        resource_id=entity_id,
-        limit=limit
-    )
-
-    # 合併並按時間排序
-    combined_history = sorted(
-        approval_history + audit_logs,
-        key=lambda x: x.timestamp,
-        reverse=True
-    )
-
-    return combined_history
-```
 
 ### 8.2 審批鏈追蹤
 
 **場景**：合規審計需要追蹤特定配置的完整審批鏈。
 
 **查詢範例**：
-```sql
--- 查詢特定遊戲 RTP 的所有變更審批記錄
-SELECT
-    ar.request_id,
-    ar.submitted_at,
-    ar.maker_name,
-    ar.checker_name,
-    ar.reviewed_at,
-    ar.status,
-    ar.change_payload->>'$.rtp_before' AS rtp_before,
-    ar.change_payload->>'$.rtp_after' AS rtp_after,
-    cs.snapshot_before->>'$.rtp' AS verified_before,
-    cs.snapshot_after->>'$.rtp' AS verified_after
-FROM approval_requests ar
-LEFT JOIN config_snapshots cs ON ar.request_id = cs.request_id
-WHERE ar.request_type = 'config_change'
-  AND ar.target_entity = 'game_slot_dragon_gold'
-  AND ar.change_payload->>'$.field' = 'rtp'
-ORDER BY ar.submitted_at DESC;
-```
 
 ---
 
@@ -708,22 +291,6 @@ ORDER BY ar.submitted_at DESC;
 
 ### 9.1 關鍵指標 (KPI)
 
-```sql
--- 審批效率報表
-SELECT
-    DATE(reviewed_at) AS review_date,
-    request_type,
-    COUNT(*) AS total_requests,
-    AVG(TIMESTAMPDIFF(MINUTE, submitted_at, reviewed_at)) AS avg_review_time_minutes,
-    SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) AS approved_count,
-    SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS rejected_count,
-    (SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END)::DECIMAL / COUNT(*)) AS approval_rate
-FROM approval_requests
-WHERE reviewed_at >= CURRENT_DATE - INTERVAL '30 days'
-  AND status IN ('approved', 'rejected')
-GROUP BY DATE(reviewed_at), request_type
-ORDER BY review_date DESC, request_type;
-```
 
 ### 9.2 SLA 達成率
 
@@ -736,35 +303,6 @@ ORDER BY review_date DESC, request_type;
 
 ### 9.3 告警規則
 
-```python
-# 審批系統健康監控
-ALERT_RULES = [
-    {
-        'name': 'approval_queue_backlog',
-        'condition': 'pending_approval_count > 50',
-        'severity': 'warning',
-        'action': 'notify_approval_team'
-    },
-    {
-        'name': 'critical_request_timeout',
-        'condition': 'critical_request_pending > 5min',
-        'severity': 'critical',
-        'action': 'notify_management + sms'
-    },
-    {
-        'name': 'approval_rate_drop',
-        'condition': 'approval_rate < 70% (last 24h)',
-        'severity': 'warning',
-        'action': 'investigate_rejection_reasons'
-    },
-    {
-        'name': 'auto_rollback_triggered',
-        'condition': 'any auto-rollback event',
-        'severity': 'critical',
-        'action': 'notify_all_stakeholders'
-    }
-]
-```
 
 ---
 

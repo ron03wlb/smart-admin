@@ -1020,109 +1020,12 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 
 #### 範例 1：Activity System 驗證流水
 
-```python
-# Activity System (04-01) 在計算有效流水時調用
-from risk_client import RiskClient
-
-risk_client = RiskClient(endpoint="risk-engine.internal:50051")
-
-bet_data = {
-    "bet_id": "bet_2026_001",
-    "player_id": "u_12345",
-    "game_type": "BACCARAT",
-    "selection": "Banker",
-    "odds": 0.95,
-    "amount": 1000.00,
-    "ip": get_player_ip()
-}
-
-try:
-    result = risk_client.validateBet(bet_data, timeout=3)
-
-    if result.is_valid:
-        # 計入有效流水
-        effective_turnover = bet_data["amount"] * activity.game_weight("BACCARAT")
-        activity.add_turnover(player_id, effective_turnover)
-    else:
-        # 標記為無效流水
-        logger.warning(f"Bet rejected by risk: {result.risk_code}")
-        activity.mark_invalid(bet_id=bet_data["bet_id"], reason=result.reason)
-
-except RiskTimeoutError:
-    # 超時降級處理：先放行，後補驗證
-    logger.error("Risk check timeout, proceeding with review flag")
-    effective_turnover = bet_data["amount"] * activity.game_weight("BACCARAT")
-    activity.add_turnover(player_id, effective_turnover, flag="PENDING_RISK_REVIEW")
-```
 
 #### 範例 2：Finance System 提款風控檢查
 
-```python
-# Finance System (02-01) 在出款前調用
-withdrawal_request = {
-    "withdrawal_id": "wd_2026_999",
-    "player_id": "u_12345",
-    "amount": 5000.00,
-    "payment_method": "BANK_TRANSFER",
-    "account_hash": hash_bank_account(player.bank_account),
-    "ip": get_player_ip(),
-    "device_id": get_device_fingerprint()
-}
-
-risk_result = risk_client.checkWithdraw(withdrawal_request, timeout=5)
-
-if risk_result.approved:
-    # 直接出款
-    payment_gateway.process_withdrawal(withdrawal_request)
-
-elif risk_result.action == "MANUAL_REVIEW":
-    # 轉人工審核
-    cs_queue.add_task({
-        "type": "WITHDRAWAL_REVIEW",
-        "withdrawal_id": withdrawal_request["withdrawal_id"],
-        "risk_score": risk_result.risk_score,
-        "reasons": risk_result.reasons,
-        "estimated_time": risk_result.estimated_review_time_minutes
-    })
-    notify_player(player_id, "Your withdrawal is under review")
-
-else:
-    # 直接拒絕
-    withdrawal.update_status("REJECTED", reason=risk_result.reasons)
-    notify_player(player_id, "Withdrawal rejected", details=risk_result.reasons)
-```
 
 #### 範例 3：VIP System 訂閱風險事件
 
-```python
-# VIP System (01-02) 訂閱風險事件以調整玩家等級
-from kafka import KafkaConsumer
-
-consumer = KafkaConsumer(
-    'risk.player.flagged',
-    bootstrap_servers=['kafka-cluster.internal:9092'],
-    group_id='vip-management'
-)
-
-for message in consumer:
-    event = json.loads(message.value)
-
-    if event['risk_level'] == 'HIGH':
-        # 暫停 VIP 升級資格
-        vip_service.suspend_upgrade_eligibility(
-            player_id=event['player_id'],
-            reason="HIGH_RISK_FLAGGED",
-            duration_days=30
-        )
-        logger.info(f"Player {event['player_id']} VIP upgrade suspended due to risk")
-
-    elif event['risk_level'] == 'CRITICAL':
-        # 降級 VIP 等級
-        vip_service.downgrade_tier(
-            player_id=event['player_id'],
-            reason="CRITICAL_RISK_DETECTED"
-        )
-```
 
 ---
 
@@ -1130,67 +1033,9 @@ for message in consumer:
 
 ### 5.1 玩家風險檔案 (Player Risk Profile)
 
-```sql
-CREATE TABLE player_risk_profiles (
-    player_id BIGINT PRIMARY KEY,
-    risk_score INT DEFAULT 0,                    -- 綜合風險分數 (0-100)
-    risk_level VARCHAR(20) DEFAULT 'LOW',        -- LOW | MEDIUM | HIGH | CRITICAL
-
-    -- 設備維度
-    device_fingerprints JSONB,                   -- [{"device_id": "...", "first_seen": "...", "last_seen": "..."}]
-    suspected_emulator BOOLEAN DEFAULT FALSE,
-    suspected_vpn BOOLEAN DEFAULT FALSE,
-
-    -- 行為維度
-    login_failure_rate DECIMAL(5,2),             -- 登入失敗率 (%)
-    betting_velocity DECIMAL(10,2),              -- 平均投注速率 (bets/hour)
-    withdrawal_frequency INT,                    -- 提款頻率 (次/月)
-
-    -- 關聯維度
-    linked_accounts JSONB,                       -- [{"player_id": "...", "link_type": "DEVICE|IP|PAYMENT", "confidence": 0.85}]
-    graph_cluster_id VARCHAR(50),                -- 圖分析集群 ID
-
-    -- 歷史維度
-    total_fraud_incidents INT DEFAULT 0,
-    last_fraud_date TIMESTAMP,
-    blacklist_status VARCHAR(20) DEFAULT 'NONE', -- NONE | GREY | BLACK
-
-    -- 審計
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-
-    INDEX idx_risk_level (risk_level),
-    INDEX idx_blacklist (blacklist_status),
-    INDEX idx_cluster (graph_cluster_id)
-);
-```
 
 ### 5.2 風險事件日誌 (Risk Event Log)
 
-```sql
-CREATE TABLE risk_events (
-    event_id BIGSERIAL PRIMARY KEY,
-    player_id BIGINT NOT NULL,
-    event_type VARCHAR(50) NOT NULL,             -- BET_VALIDATED | WITHDRAWAL_CHECKED | FRAUD_DETECTED
-    risk_score INT,
-    risk_factors JSONB,                          -- [{"factor": "HEDGE_BET", "score": 30, "confidence": "HIGH"}]
-
-    action_taken VARCHAR(50),                    -- APPROVED | REJECTED | MANUAL_REVIEW | FLAGGED
-    decision_maker VARCHAR(50),                  -- RULE_ENGINE | ML_MODEL | HUMAN_AGENT
-
-    request_payload JSONB,                       -- 原始請求數據
-    response_payload JSONB,                      -- 風控響應數據
-
-    processing_time_ms INT,                      -- 處理耗時 (毫秒)
-    api_endpoint VARCHAR(100),                   -- /api/v1/risk/validateBet
-
-    created_at TIMESTAMP DEFAULT NOW(),
-
-    INDEX idx_player (player_id),
-    INDEX idx_event_type (event_type),
-    INDEX idx_created_at (created_at)
-) PARTITION BY RANGE (created_at);              -- 按月分區
-```
 
 ---
 

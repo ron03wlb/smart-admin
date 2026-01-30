@@ -81,18 +81,6 @@
 - 發佈審批工作流（參考 09-04 審批工作流系統）
 
 **有效性追蹤**：
-```sql
--- 追蹤知識庫文章點閱率與有效性
-SELECT
-    article_id,
-    article_title,
-    views_count,
-    helpful_votes,
-    unhelpful_votes,
-    (helpful_votes::DECIMAL / NULLIF(helpful_votes + unhelpful_votes, 0)) AS helpfulness_rate
-FROM kb_articles
-ORDER BY views_count DESC;
-```
 
 ---
 
@@ -150,13 +138,6 @@ Bot: 您的提款被拒原因是：【餘額不足完成流水要求】
 ### 6.1 自動分配規則
 
 **優先級計算公式**：
-```python
-priority_score = (
-    player_vip_level * 10 +        # VIP 5 = 50分
-    issue_severity * 5 +            # Critical = 25分
-    waiting_time_minutes * 0.1      # 每分鐘加 0.1 分
-)
-```
 
 **路由規則表**：
 | 工單類型 | VIP等級 | 分配規則 |
@@ -169,15 +150,6 @@ priority_score = (
 ### 6.2 負載均衡策略
 
 **Round-Robin + 負載感知**：
-```sql
--- 選擇當前處理工單數最少的客服
-SELECT agent_id, agent_name, current_tickets_count
-FROM cs_agents
-WHERE status = 'online'
-  AND language LIKE '%zh%'  -- 支持玩家語言
-ORDER BY current_tickets_count ASC
-LIMIT 1;
-```
 
 **技能匹配**：
 - 存款問題 → 需要 `payment_expert` 技能標籤
@@ -199,18 +171,6 @@ LIMIT 1;
 ### 7.2 自動升級機制
 
 **超時檢測定時任務**（每5分鐘執行）：
-```sql
--- 檢測超時工單並自動升級
-UPDATE tickets
-SET
-    escalation_level = escalation_level + 1,
-    assigned_to = (SELECT supervisor_id FROM cs_teams WHERE team_id = tickets.team_id)
-WHERE
-    status IN ('new', 'assigned')
-    AND priority IN ('P0', 'P1')
-    AND (NOW() - created_at) > INTERVAL '15 minutes'
-    AND escalation_level = 0;
-```
 
 **通知機制**：
 - **Level 1 升級**：通知團隊主管（Email + Slack）
@@ -304,18 +264,6 @@ WHERE
 ### 9.2 統一對話歷史
 
 **跨渠道追蹤**：
-```sql
-CREATE TABLE conversation_history (
-    conversation_id BIGINT PRIMARY KEY,
-    player_id BIGINT NOT NULL,
-    channel ENUM('live_chat', 'email', 'sms', 'phone', 'social'),
-    message_content TEXT,
-    sender_type ENUM('player', 'agent', 'bot'),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    INDEX idx_player (player_id, created_at DESC)
-);
-```
 
 **360度對話視圖**：
 - 客服打開玩家檔案時，自動顯示所有渠道的歷史對話

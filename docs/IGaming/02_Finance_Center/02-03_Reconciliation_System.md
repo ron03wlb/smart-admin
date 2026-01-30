@@ -176,101 +176,10 @@ sequenceDiagram
    - 狀態：❌ 標記為差異，觸發警報
 
 **SQL 實現範例**：
-```sql
--- 三方對帳主查詢
-WITH platform_txns AS (
-    SELECT
-        transaction_id,
-        order_id,
-        amount,
-        currency,
-        status,
-        created_at
-    FROM transactions
-    WHERE DATE(created_at) = '2026-01-26'  -- 前一日
-      AND type = 'deposit'
-),
-psp_txns AS (
-    SELECT
-        psp_transaction_id,
-        merchant_order_id,
-        amount AS psp_amount,
-        settlement_currency,
-        psp_status,
-        transaction_time
-    FROM psp_daily_report
-    WHERE DATE(transaction_time) = '2026-01-26'
-)
-SELECT
-    p.order_id,
-    p.amount AS platform_amount,
-    psp.psp_amount,
-    p.status AS platform_status,
-    psp.psp_status,
-    CASE
-        WHEN psp.merchant_order_id IS NULL THEN 'MISSING_IN_PSP'
-        WHEN ABS(p.amount - psp.psp_amount) > 0.01 THEN 'AMOUNT_MISMATCH'
-        WHEN p.status != psp.psp_status THEN 'STATUS_MISMATCH'
-        ELSE 'MATCHED'
-    END AS reconciliation_status
-FROM platform_txns p
-FULL OUTER JOIN psp_txns psp
-    ON p.order_id = psp.merchant_order_id;
-```
 
 ### 3.2 自動化對賬腳本
 
 **每日對帳定時任務（Cron: 0 2 * * *）**：
-```python
-import requests
-from datetime import datetime, timedelta
-
-def daily_reconciliation():
-    yesterday = datetime.now() - timedelta(days=1)
-    date_str = yesterday.strftime('%Y-%m-%d')
-
-    # Step 1: 下載 PSP 報表
-    psp_report = download_psp_report(date=date_str)
-    # 範例 API: GET https://api.nuvei.com/reports/transactions?date=2026-01-26
-
-    # Step 2: 解析 PSP 報表（CSV 或 JSON）
-    psp_data = parse_psp_report(psp_report)
-
-    # Step 3: 從資料庫提取平台交易
-    platform_data = db.query("""
-        SELECT order_id, amount, status
-        FROM transactions
-        WHERE DATE(created_at) = %s AND type = 'deposit'
-    """, (date_str,))
-
-    # Step 4: 比對數據
-    discrepancies = []
-    for platform_txn in platform_data:
-        psp_txn = find_matching_psp_txn(psp_data, platform_txn['order_id'])
-
-        if not psp_txn:
-            discrepancies.append({
-                'type': 'MISSING_IN_PSP',
-                'order_id': platform_txn['order_id'],
-                'amount': platform_txn['amount']
-            })
-        elif platform_txn['amount'] != psp_txn['amount']:
-            discrepancies.append({
-                'type': 'AMOUNT_MISMATCH',
-                'order_id': platform_txn['order_id'],
-                'platform_amount': platform_txn['amount'],
-                'psp_amount': psp_txn['amount']
-            })
-
-    # Step 5: 生成對帳報告
-    report = generate_reconciliation_report(date_str, discrepancies)
-
-    # Step 6: 發送通知
-    if len(discrepancies) > 0:
-        send_alert_to_finance_team(report)
-
-    return report
-```
 
 ---
 
@@ -291,40 +200,12 @@ def daily_reconciliation():
 ```
 
 **Step 3: 補單操作**
-```python
-# 若確認為掉單，執行補單
-def manual_credit(order_id, player_id, amount, reason):
-    transaction = Transaction.objects.create(
-        order_id=f"manual_{order_id}",
-        player_id=player_id,
-        amount=amount,
-        type='deposit',
-        status='success',
-        note=f"手動補單: {reason}"
-    )
-
-    # 增加玩家餘額（引用 02-06 統一錢包）
-    wallet_service.credit(player_id, amount)
-
-    # 記錄審計日誌（引用 09-02）
-    audit_log.create(
-        action='MANUAL_CREDIT',
-        operator=current_user.id,
-        details={'transaction_id': transaction.id, 'reason': reason}
-    )
-```
 
 ### 4.2 短款處理流程（平台有訂單，外部無錢）
 
 **🚨 高風險警報**：可能是偽造回調攻擊！
 
 **Step 1: 立即凍結**
-```sql
--- 凍結可疑玩家帳號
-UPDATE players
-SET status = 'frozen', freeze_reason = '短款風險'
-WHERE player_id = (SELECT player_id FROM transactions WHERE order_id = 'xxx');
-```
 
 **Step 2: 調查**
 ```
@@ -334,50 +215,12 @@ WHERE player_id = (SELECT player_id FROM transactions WHERE order_id = 'xxx');
 ```
 
 **Step 3: 回滾操作**
-```python
-def rollback_fraudulent_transaction(transaction_id):
-    txn = Transaction.objects.get(id=transaction_id)
-
-    # 扣除玩家餘額
-    wallet_service.debit(txn.player_id, txn.amount, reason='短款回滾')
-
-    # 更新交易狀態
-    txn.status = 'fraud_rollback'
-    txn.save()
-
-    # 通知風控團隊
-    risk_alert.create(
-        player_id=txn.player_id,
-        alert_type='FRAUDULENT_DEPOSIT',
-        severity='critical'
-    )
-```
 
 ### 4.3 金額不符處理（手續費差異）
 
 **容差範圍配置**：
-```python
-# 配置表：reconciliation_tolerance
-{
-    "psp_code": "nuvei",
-    "tolerance_type": "percentage",  # percentage 或 fixed_amount
-    "tolerance_value": 0.02,         # 2% 容差
-    "auto_approve": True             # 在容差範圍內自動通過
-}
-```
 
 **處理邏輯**：
-```python
-def check_amount_tolerance(platform_amount, psp_amount, psp_code):
-    tolerance = get_tolerance_config(psp_code)
-
-    if tolerance['tolerance_type'] == 'percentage':
-        diff_percentage = abs(platform_amount - psp_amount) / platform_amount
-        if diff_percentage <= tolerance['tolerance_value']:
-            return 'AUTO_APPROVED'
-
-    return 'REQUIRES_MANUAL_REVIEW'
-```
 
 ---
 
@@ -568,31 +411,6 @@ flowchart TD
 
 **審計追溯要求**：
 
-```python
-# 審計日誌必填欄位
-audit_log_schema = {
-    "timestamp": "2026-01-27T15:30:45Z",
-    "action": "MANUAL_ADJUSTMENT",  # 操作類型
-    "operator_id": 1001,
-    "operator_name": "張三 (Finance Manager)",
-    "discrepancy_type": "OVER_PAYMENT",  # 差異類型
-    "order_id": "ORD20260127001",
-    "original_amount": 100.00,
-    "adjusted_amount": 100.00,
-    "difference": 0.00,
-    "reason": "PSP 掉單，經 PSP 客服確認已收款，執行補單入帳",  # 必填，至少 20 字
-    "supporting_documents": [  # 佐證文件
-        {"type": "PSP_EMAIL", "url": "s3://reconciliation/proofs/email_20260127.pdf"},
-        {"type": "BANK_STATEMENT", "url": "s3://reconciliation/proofs/bank_20260127.csv"}
-    ],
-    "approval_chain": [  # 審批鏈
-        {"approver_id": 1002, "approver_name": "李四 (Finance Manager)", "approved_at": "2026-01-27T15:35:00Z", "status": "APPROVED"},
-        {"approver_id": 1003, "approver_name": "王五 (CFO)", "approved_at": "2026-01-27T15:40:00Z", "status": "APPROVED"}
-    ],
-    "ip_address": "192.168.1.100",
-    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
-}
-```
 
 **合規要求清單**：
 
@@ -617,24 +435,6 @@ audit_log_schema = {
 ```
 
 **解析器實現**：
-```python
-import csv
-
-def parse_bank_statement_cn(file_path):
-    transactions = []
-    with open(file_path, 'r', encoding='utf-8-sig') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            transactions.append({
-                'date': row['交易日期'],
-                'time': row['交易時間'],
-                'counterparty_name': row['對方戶名'],
-                'amount': float(row['交易金額']),
-                'type': 'credit' if row['交易類型'] == '轉入' else 'debit',
-                'note': row['備註']
-            })
-    return transactions
-```
 
 ### 5.2 SEPA 銀行報表解析（歐洲）
 
@@ -650,25 +450,6 @@ def parse_bank_statement_cn(file_path):
 ```
 
 **解析器（使用 mt940 庫）**：
-```python
-from mt940 import MT940
-
-def parse_sepa_statement(file_path):
-    with open(file_path, 'r') as f:
-        statements = MT940(f).statements
-
-    transactions = []
-    for stmt in statements:
-        for txn in stmt.transactions:
-            transactions.append({
-                'date': txn.date,
-                'amount': txn.amount,
-                'type': 'credit' if txn.amount > 0 else 'debit',
-                'reference': txn.id,
-                'description': txn.data.get('transaction_details', '')
-            })
-    return transactions
-```
 
 ---
 
@@ -677,38 +458,6 @@ def parse_sepa_statement(file_path):
 ### 6.1 每日對賬報表
 
 **Excel 輸出範例**：
-```python
-import pandas as pd
-
-def generate_daily_reconciliation_report(date):
-    # 查詢對帳數據
-    data = db.query("""
-        SELECT
-            order_id,
-            player_id,
-            amount,
-            platform_status,
-            psp_status,
-            reconciliation_status
-        FROM reconciliation_results
-        WHERE DATE(created_at) = %s
-    """, (date,))
-
-    df = pd.DataFrame(data)
-
-    # 彙總統計
-    summary = {
-        '總交易數': len(df),
-        '已對帳': len(df[df['reconciliation_status'] == 'MATCHED']),
-        '差異筆數': len(df[df['reconciliation_status'] != 'MATCHED']),
-        '差異金額': df[df['reconciliation_status'] != 'MATCHED']['amount'].sum()
-    }
-
-    # 輸出 Excel
-    with pd.ExcelWriter(f'reconciliation_{date}.xlsx') as writer:
-        df.to_excel(writer, sheet_name='明細', index=False)
-        pd.DataFrame([summary]).to_excel(writer, sheet_name='彙總', index=False)
-```
 
 ### 6.2 月度財務報表
 
@@ -718,21 +467,6 @@ def generate_daily_reconciliation_report(date):
 3. **按幣種分組**：USD、EUR、CNY等各幣種的資金流動
 
 **SQL 查詢範例**：
-```sql
--- 月度商戶財務報表
-SELECT
-    tenant_id,
-    tenant_name,
-    SUM(CASE WHEN type = 'deposit' THEN amount ELSE 0 END) AS total_deposits,
-    SUM(CASE WHEN type = 'withdrawal' THEN amount ELSE 0 END) AS total_withdrawals,
-    SUM(CASE WHEN type = 'deposit' THEN amount ELSE -amount END) AS net_cash_flow,
-    COUNT(DISTINCT player_id) AS active_players
-FROM transactions
-WHERE DATE_TRUNC('month', created_at) = '2026-01-01'
-  AND status = 'success'
-GROUP BY tenant_id, tenant_name
-ORDER BY net_cash_flow DESC;
-```
 
 ---
 
@@ -747,25 +481,6 @@ ORDER BY net_cash_flow DESC;
 4. **強制審批**：調帳金額 > $0，必須經由財務主管審核通過（引用 09-04 審批工作流系統）
 
 **資料表設計**：
-```sql
-CREATE TABLE manual_adjustments (
-    adjustment_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    transaction_id BIGINT,
-    adjustment_amount DECIMAL(15,2) NOT NULL,
-    adjustment_reason TEXT NOT NULL,
-    supporting_documents JSON,  -- [{"file_name": "proof.png", "url": "s3://..."}]
-
-    -- 審批流程
-    submitted_by BIGINT NOT NULL,
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    approved_by BIGINT,
-    approved_at TIMESTAMP,
-    approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-
-    INDEX idx_status (approval_status),
-    FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id)
-);
-```
 
 ### 7.2 權限控制（RBAC）
 

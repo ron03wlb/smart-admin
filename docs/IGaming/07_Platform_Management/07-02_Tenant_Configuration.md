@@ -90,24 +90,6 @@
 - 金額範圍檢查（最小/最大限額）
 
 **後端驗證**：
-```java
-@Validated
-public class TenantConfigForm {
-    @NotBlank(message = "站點名稱不可為空")
-    @Length(max = 100, message = "站點名稱不可超過 100 字元")
-    private String siteName;
-
-    @Pattern(regexp = "^[a-z0-9.-]+\\.[a-z]{2,}$", message = "域名格式錯誤")
-    private String primaryDomain;
-
-    @Min(value = 1, message = "最小充值金額必須 >= 1")
-    @Max(value = 1000000, message = "最小充值金額不可超過 1M")
-    private BigDecimal minDepositAmount;
-
-    @CurrencyCode // 自定義驗證器：檢查貨幣代碼是否合法（ISO 4217）
-    private String baseCurrency;
-}
-```
 
 ---
 

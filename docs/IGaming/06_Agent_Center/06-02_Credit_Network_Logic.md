@@ -169,36 +169,6 @@ Platform (Position 10%):
 
 **關鍵公式**:
 
-```python
-# 標準化佔成分配
-def normalize_position_distribution(player_loss, positions):
-    """
-    標準化佔成分配計算
-
-    Args:
-        player_loss: 玩家淨虧損金額
-        positions: 各級佔成百分比列表 [L2_pos, L1_pos, Master_pos, Platform_pos]
-
-    Returns:
-        標準化後的實際分配金額
-    """
-    total_position = sum(positions)  # 120%
-    normalization_factor = 1.0 / total_position  # 0.8333
-
-    normalized_amounts = []
-    for position in positions:
-        theoretical_amount = player_loss * position
-        actual_amount = theoretical_amount * normalization_factor
-        normalized_amounts.append(actual_amount)
-
-    return normalized_amounts
-
-# 範例調用
-positions = [0.50, 0.40, 0.20, 0.10]  # 50%, 40%, 20%, 10%
-player_loss = 100000
-amounts = normalize_position_distribution(player_loss, positions)
-# 結果: [$41,665, $33,332, $16,666, $8,333]
-```
 
 **信用額度級聯影響**：
 
@@ -587,15 +557,6 @@ flowchart TD
 
 **審計日誌範例** (credit_allocation_audit 表)：
 
-```sql
-INSERT INTO credit_allocation_audit (
-    id, parent_id, child_id, old_limit, new_limit, delta,
-    position_old, position_new, reason, operator, created_at
-) VALUES (
-    UUID(), 'agent_001', 'agent_002', 1000000, 1500000, 500000,
-    40.0, 45.0, 'Performance upgrade - 30% YoY growth', 'admin_123', NOW()
-);
-```
 
 **通知觸發規則**：
 
@@ -655,27 +616,6 @@ INSERT INTO credit_allocation_audit (
 
 **API 調用範例**：
 
-```python
-# 額度分配前調用風控 API
-risk_result = risk_client.assessAgentRisk({
-    "agent_id": child_id,
-    "parent_id": parent_id,
-    "action": "CREDIT_ALLOCATION",
-    "amount": requested_amount,
-    "position_percent": requested_position
-})
-
-if risk_result.risk_level == "HIGH":
-    # 觸發人工審核
-    manual_review_queue.add({
-        "type": "CREDIT_ALLOCATION_REVIEW",
-        "agent_id": child_id,
-        "amount": requested_amount,
-        "risk_score": risk_result.risk_score,
-        "reasons": risk_result.risk_factors
-    })
-    return {"approved": False, "reason": "PENDING_RISK_REVIEW"}
-```
 
 **風險場景矩陣**：
 
@@ -692,69 +632,9 @@ if risk_result.risk_level == "HIGH":
 
 ### 6.1 代理信用表 (agent_credit)
 
-```sql
-CREATE TABLE agent_credit (
-    agent_id BIGINT PRIMARY KEY,
-    parent_id BIGINT,                           -- 上級代理 ID
-    level INT NOT NULL,                         -- 層級: 1=Master, 2=L1, 3=L2, 4=Player
-
-    -- 額度管理
-    credit_limit DECIMAL(15,2) DEFAULT 0,       -- 授予的信用額度
-    used_credit DECIMAL(15,2) DEFAULT 0,        -- 當前已用額度 (未結算)
-    allocated_to_children DECIMAL(15,2) DEFAULT 0, -- 已分配給下級的總額度
-
-    -- 佔成管理
-    position_percent DECIMAL(5,2) DEFAULT 0,    -- 佔成百分比 (0-100)
-    max_position_limit DECIMAL(5,2) DEFAULT 50, -- 上級設定的最大佔成限制
-
-    -- 狀態管理
-    status VARCHAR(20) DEFAULT 'ACTIVE',        -- ACTIVE | FROZEN | SUSPENDED
-    settlement_status VARCHAR(20) DEFAULT 'NONE', -- NONE | PENDING | COMPLETED | OVERDUE
-    last_settlement_date TIMESTAMP,
-
-    -- 併發控制
-    version INT DEFAULT 0,                      -- 樂觀鎖版本號
-
-    -- 審計
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-
-    FOREIGN KEY (parent_id) REFERENCES agent_credit(agent_id),
-    INDEX idx_parent (parent_id),
-    INDEX idx_status (status),
-    INDEX idx_settlement (settlement_status)
-);
-```
 
 ### 6.2 結算記錄表 (settlement_records)
 
-```sql
-CREATE TABLE settlement_records (
-    id BIGSERIAL PRIMARY KEY,
-    agent_id BIGINT NOT NULL,
-    settlement_week VARCHAR(10) NOT NULL,       -- 格式: 2026-W04
-
-    -- 佔成計算
-    player_total_loss DECIMAL(15,2),            -- 玩家總輸 (or 總贏為負數)
-    own_position_amount DECIMAL(15,2),          -- 自己的佔成收入
-    to_parent_amount DECIMAL(15,2),             -- 上繳給上級的金額
-
-    -- 支付狀態
-    payment_status VARCHAR(20) DEFAULT 'PENDING', -- PENDING | PAID | VERIFIED | OVERDUE
-    payment_txn_id VARCHAR(100),                 -- 支付交易 ID
-    verified_at TIMESTAMP,
-
-    -- 額度恢復
-    credit_reset BOOLEAN DEFAULT FALSE,
-    reset_at TIMESTAMP,
-
-    created_at TIMESTAMP DEFAULT NOW(),
-
-    UNIQUE (agent_id, settlement_week),
-    INDEX idx_week (settlement_week),
-    INDEX idx_payment_status (payment_status)
-);
-```
 
 ---
 

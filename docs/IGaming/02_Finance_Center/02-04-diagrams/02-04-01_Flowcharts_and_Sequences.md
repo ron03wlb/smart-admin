@@ -980,37 +980,6 @@ graph TB
     style E3 fill:#f8d7da
 ```
 
-**風控邏輯**:
-```python
-# 偽代碼: 對沖檢測
-def detect_hedge_bet(bet: Bet) -> bool:
-    # 查詢同一局的其他投注
-    other_bets = query_bets_by_round(bet.round_id, bet.player_id)
-
-    for other_bet in other_bets:
-        if is_opposite_selection(bet.selection, other_bet.selection):
-            # 檢測到相反投注
-            if is_hedge_pattern(bet.amount, other_bet.amount, bet.odds, other_bet.odds):
-                return True  # 對沖投注
-
-    return False  # 無對沖
-
-def is_hedge_pattern(amount1, amount2, odds1, odds2) -> bool:
-    # 檢查是否為無風險套利
-    expected_return_1 = amount1 * odds1
-    expected_return_2 = amount2 * odds2
-    total_stake = amount1 + amount2
-
-    # 如果任一結果都能保本或盈利,則為對沖
-    if expected_return_1 >= total_stake and expected_return_2 >= total_stake:
-        return True
-
-    # 或者損失極小 (< 5%)
-    min_return = min(expected_return_1, expected_return_2)
-    loss_rate = (total_stake - min_return) / total_stake
-
-    return loss_rate < 0.05  # 損失小於5%視為對沖
-```
 
 **結論**:
 - ❌ 對沖投注被風控拒絕
@@ -1112,29 +1081,6 @@ graph LR
 
 ### 9.4 實施建議
 
-**數據庫設計**:
-```sql
-CREATE TABLE wagering_details (
-    -- 原始數據 (不可變)
-    bet_amount DECIMAL(18,2) NOT NULL,
-
-    -- Layer 1 風控判定結果 (一次性確定)
-    valid_bet DECIMAL(18,2) NOT NULL,
-    risk_status ENUM('PASSED', 'FILTERED', 'PENDING') NOT NULL,
-    filter_reason VARCHAR(200),
-
-    -- Layer 2 財務狀態 (不影響 valid_bet)
-    settlement_status ENUM('WIN', 'LOSS', 'DRAW', 'HALF_WIN', 'HALF_LOSS') NOT NULL,
-    payout_amount DECIMAL(18,2),
-
-    -- Layer 3 活動權重
-    game_contribution DECIMAL(5,4) NOT NULL,
-    contributed_amount DECIMAL(18,2) NOT NULL,  -- valid_bet × weight
-
-    -- 審計字段
-    calculation_version VARCHAR(20) NOT NULL
-);
-```
 
 ---
 
@@ -1211,17 +1157,6 @@ CREATE TABLE wagering_details (
 
 **查詢: 為什麼這筆投注 valid_bet = 0?**
 
-```sql
-SELECT
-    bet_id,
-    bet_amount,
-    valid_bet,
-    risk_status,
-    filter_reason,
-    risk_rules_applied
-FROM wagering_details
-WHERE bet_id = 'BET_12345';
-```
 
 **結果**:
 ```
@@ -1239,44 +1174,6 @@ risk_rules_applied: [{"rule_id": "HEDGE_001", "action": "FILTER"}]
 
 **場景**: 風控規則調整後,需要重新計算歷史數據
 
-```java
-// 回推重算服務
-@Service
-public class WageringRecalculationService {
-
-    public RecalculationResult recalculateValidBets(
-        Long userId,
-        Instant startTime,
-        Instant endTime,
-        String newRuleVersion
-    ) {
-        // 1. 查詢需要重算的交易
-        List<WageringDetail> details = detailRepository
-            .findByUserAndTimeBetween(userId, startTime, endTime);
-
-        // 2. 使用新規則重新計算
-        for (WageringDetail detail : details) {
-            ValidBetResult newCalculation = calculationService
-                .calculateValidBetWithVersion(
-                    detail.getBetAmount(),
-                    detail.getGameType(),
-                    detail.getOdds(),
-                    newRuleVersion  // 使用新版本規則
-                );
-
-            // 3. 更新記錄
-            detail.setValidBet(newCalculation.getValidBet());
-            detail.setCalculationVersion(newRuleVersion);
-            detail.setRecalculatedAt(Instant.now());
-            detailRepository.save(detail);
-        }
-
-        return RecalculationResult.builder()
-            .totalAffected(details.size())
-            .build();
-    }
-}
-```
 
 ---
 

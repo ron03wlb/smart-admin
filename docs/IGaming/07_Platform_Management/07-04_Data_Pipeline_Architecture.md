@@ -284,65 +284,6 @@ flowchart TD
 
 **典型 SQL 範例 (ClickHouse)**：
 
-```sql
--- ODS → DWD: 數據清洗 + 脫敏
-INSERT INTO dwd_player_profile
-SELECT
-    player_id,
-    concat(substring(name, 1, 1), '**') AS name_masked,  -- 脫敏
-    concat(substring(phone, 1, 4), '***', substring(phone, -3)) AS phone_masked,
-    email_domain,  -- 僅保留域名
-    country,
-    vip_level,
-    registration_date,
-    CASE WHEN is_test_account = 1 THEN NULL ELSE total_deposit END AS total_deposit,  -- 排除測試
-    date
-FROM ods_players
-WHERE date = '2026-01-27'
-  AND deleted = 0  -- 過濾已刪除
-  AND player_id NOT IN (SELECT player_id FROM blacklist);  -- 排除黑名單
-
--- DWD → DWS: 日度聚合
-INSERT INTO dws_daily_revenue
-SELECT
-    date,
-    tenant_id,
-    SUM(CASE WHEN type = 'deposit' THEN amount ELSE 0 END) AS total_deposit,
-    SUM(CASE WHEN type = 'withdrawal' THEN amount ELSE 0 END) AS total_withdrawal,
-    SUM(CASE WHEN type = 'bet' THEN amount ELSE 0 END) AS total_bet,
-    SUM(CASE WHEN type = 'win' THEN amount ELSE 0 END) AS total_win,
-    SUM(CASE WHEN type = 'bet' THEN amount ELSE 0 END) -
-    SUM(CASE WHEN type = 'win' THEN amount ELSE 0 END) AS ggr,  -- 毛博彩收入
-    COUNT(DISTINCT player_id) AS active_players,
-    COUNT(DISTINCT CASE WHEN is_first_deposit = 1 THEN player_id END) AS ftd_count
-FROM dwd_transaction_detail
-WHERE date = '2026-01-27'
-GROUP BY date, tenant_id;
-
--- DWS → ADS: 寬表構建
-INSERT INTO ads_daily_kpi
-SELECT
-    r.date,
-    r.tenant_id,
-    t.tenant_name,
-    r.total_deposit,
-    r.total_withdrawal,
-    r.ggr,
-    r.active_players,
-    r.ftd_count,
-    r.ggr / r.active_players AS arpu,  -- 人均收入
-    r.ftd_count / v.total_visits AS ftd_conversion_rate,  -- 首存轉化率
-    CASE
-        WHEN r.ggr > 1000000 THEN 'Excellent'
-        WHEN r.ggr > 500000 THEN 'Good'
-        WHEN r.ggr > 100000 THEN 'Average'
-        ELSE 'Poor'
-    END AS performance_level
-FROM dws_daily_revenue r
-LEFT JOIN dim_tenant t ON r.tenant_id = t.tenant_id
-LEFT JOIN dws_daily_visit v ON r.date = v.date AND r.tenant_id = v.tenant_id
-WHERE r.date = '2026-01-27';
-```
 
 **運營優化建議**：
 

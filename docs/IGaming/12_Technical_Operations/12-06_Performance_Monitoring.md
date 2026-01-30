@@ -73,27 +73,6 @@ JAVA_OPTS: >
   -Dskywalking.plugin.jdbc.trace_sql_parameters=true
 ```
 
-**自定義追蹤**:
-```java
-import org.apache.skywalking.apm.toolkit.trace.Trace;
-import org.apache.skywalking.apm.toolkit.trace.TraceContext;
-
-@Service
-@RequiredArgsConstructor
-public class DepositService {
-
-    @Trace(operationName = "processDeposit")
-    public ResponseDTO<DepositVO> processDeposit(DepositForm form) {
-        TraceContext.putCorrelation("player_id", form.getPlayerId().toString());
-        TraceContext.putCorrelation("amount", form.getAmount().toString());
-
-        // 業務邏輯
-        Wallet wallet = walletManager.increaseBalance(form.getPlayerId(), form.getAmount());
-
-        return ResponseDTO.ok(SmartBeanUtil.copy(wallet, DepositVO.class));
-    }
-}
-```
 
 ---
 
@@ -127,34 +106,6 @@ public class DepositService {
 
 ### 3.2 業務指標 (Business Metrics)
 
-**核心業務指標**:
-```java
-@Component
-@RequiredArgsConstructor
-public class BusinessMetricsCollector {
-
-    private final MeterRegistry meterRegistry;
-
-    @Scheduled(fixedRate = 60000) // 每分鐘採集一次
-    public void collectBusinessMetrics() {
-        // 存款成功率
-        double depositSuccessRate = calculateDepositSuccessRate();
-        meterRegistry.gauge("business.deposit.success_rate", depositSuccessRate);
-
-        // 提款審核時長 (P95)
-        double withdrawalReviewTimeP95 = calculateWithdrawalReviewTimeP95();
-        meterRegistry.gauge("business.withdrawal.review_time_p95", withdrawalReviewTimeP95);
-
-        // 實時 GGR (Gross Gaming Revenue)
-        BigDecimal realtimeGGR = calculateRealtimeGGR();
-        meterRegistry.gauge("business.ggr.realtime", realtimeGGR.doubleValue());
-
-        // 活躍玩家數
-        long activePlayers = countActivePlayers();
-        meterRegistry.gauge("business.players.active", activePlayers);
-    }
-}
-```
 
 **Prometheus Metrics 導出**:
 ```yaml
