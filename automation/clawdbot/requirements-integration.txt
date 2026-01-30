@@ -1,8 +1,0 @@
-pytest>=8.0.0
-pytest-mock>=3.12.0
-psycopg2-binary>=2.9.9
-anthropic>=0.34.0
-tenacity>=8.2.3
-crewai>=0.41.0
-requests>=2.31.0
-testcontainers>=4.0.0
