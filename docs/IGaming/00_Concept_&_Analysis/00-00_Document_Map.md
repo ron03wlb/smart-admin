@@ -456,6 +456,19 @@ graph TD
 
 ---
 
+## 🗄️ 歷史歸檔
+
+已完成的審計報告、技術分析、階段修正文件已移至歸檔目錄：
+
+- **[歸檔索引](../archive/INDEX.md)** - 完整的歷史文檔導航
+  - [審計報告](../archive/audit-reports/) - 4 個文檔審計與實作完成報告
+  - [技術分析](../archive/analysis/) - 8 個邏輯分析與錯誤審查報告
+  - [階段修正](../archive/corrections/) - 4 個階段性修正總結
+
+所有歸檔文件的 Git 歷史完整保留，可使用 `git log --follow` 追溯。
+
+---
+
 ## 📚 完整文檔清單
 
 ### 00 - 概念與分析 (Concept & Analysis)
