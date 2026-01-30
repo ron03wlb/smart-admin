@@ -37,6 +37,23 @@
 
 ---
 
+### skills-migration-v3/ - Skills v3.0.0 遷移記錄
+
+**歸檔日期**: 2026-01-30
+**原因**: v3.0.0 階層式架構遷移完成
+
+**內容**:
+- `non-skill-items-v3/README.md` - 非技能項目清理記錄
+- `root-layer-v3/README.md` - 根層級目錄重組記錄
+
+**相關文檔**:
+- [Skills README.md v3.0.0](../../.claude/skills/README.md)
+- [VERSION.md v3.0.0](../../.claude/VERSION.md)
+
+**查詢用途**: 了解 v3.0.0 目錄重組的歷史決策和遷移過程
+
+---
+
 ### Legacy Kafka v1 文檔
 **路徑**：`archive/legacy-kafka-v1/`
 **狀態**：🗄️ 已替代
