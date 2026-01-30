@@ -3,6 +3,8 @@ package net.lab1024.sa.foundation.domain.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import net.lab1024.sa.foundation.domain.code.ErrorCode;
+import net.lab1024.sa.foundation.domain.code.SystemErrorCode;
+import net.lab1024.sa.foundation.domain.code.UnexpectedErrorCode;
 import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.enumeration.DataTypeEnum;
 import org.apache.commons.lang3.StringUtils;
@@ -102,6 +104,26 @@ public class ResponseDTO<T> {
 
   public static <T> ResponseDTO<T> error(ErrorCode errorCode) {
     return new ResponseDTO<>(errorCode, false, null, null);
+  }
+
+  /**
+   * 根據錯誤碼等級生成帶有等級前綴的錯誤消息
+   *
+   * <p>Java 21 Switch Expression + Sealed Interface: 編譯器保證所有分支都已覆蓋（exhaustiveness check）
+   *
+   * @param errorCode 錯誤碼
+   * @param <T> 返回數據類型
+   * @return ResponseDTO 實例
+   */
+  public static <T> ResponseDTO<T> errorWithLevelPrefix(ErrorCode errorCode) {
+    String prefixedMsg =
+        switch (errorCode) {
+          case SystemErrorCode se -> "[系統錯誤] " + se.getMsg();
+          case UserErrorCode ue -> "[用戶錯誤] " + ue.getMsg();
+          case UnexpectedErrorCode une -> "[未預期錯誤] " + une.getMsg();
+            // 編譯器保證所有 ErrorCode 子類型都已處理，無需 default 分支
+        };
+    return new ResponseDTO<>(errorCode, false, prefixedMsg, null);
   }
 
   public static <T> ResponseDTO<T> error(ErrorCode errorCode, boolean success) {

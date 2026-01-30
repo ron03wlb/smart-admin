@@ -20,3 +20,7 @@ server:
 spring:
   profiles:
     active: '@profiles.active@'
+  # Java 21 Virtual Threads 配置（I/O 密集型任務性能提升 30-50%）
+  threads:
+    virtual:
+      enabled: true
