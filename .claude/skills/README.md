@@ -2,7 +2,7 @@
 
 **Version**: 3.0.0
 **Last Updated**: 2026-01-30
-**Total Skills**: 32 (P0: 6, P1: 8, P2: 17, Deprecated: 3)
+**Total Skills**: 32 (P0: 6, P1: 8, P2: 15, Deprecated: 3)
 
 **Major Changes** (v3.0.0):
 - ✅ **NEW**: Hierarchical directory structure (foundation/ → extended/ → productivity/ → lifecycle/)
@@ -30,11 +30,12 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 │   ├── orchestration/   (Batch Plan Executor, Quality Gate Orchestrator)
 │   └── quality/         (Concurrency Safety Auditor)
 │
-├── productivity/        (P2 - Nice-to-have Tools, 17 skills)
-│   ├── infrastructure/  (APM, Cache, CI/CD, DB, PostgreSQL, Search, i18n, MQ, Reports, Jobs, WebSocket)
-│   ├── refactoring/     (Vavr, Manager Extractor)
-│   ├── composite/       (Performance Suite, Testing Suite)
-│   └── analysis/        (Java Performance Pro)
+├── productivity/        (P2 - Nice-to-have Tools, 15 skills)
+│   ├── devops/          (5 skills: APM, CI/CD, DB Migration, Scheduled Tasks, WebSocket)
+│   ├── integration/     (6 skills: Cache, Elasticsearch, i18n, MQ, Reports, PostgreSQL)
+│   ├── composite/       (2 skills: Performance Suite, Testing Suite)
+│   ├── analysis/        (1 skill: Java Performance Pro - soft-deprecated)
+│   └── refactoring/     (1 skill: Manager Extractor)
 │
 └── lifecycle/           (Deprecated & Experimental)
     └── deprecated/      (Soft-deprecated skills with migration guides)
@@ -46,7 +47,7 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 |----------|-------|------------|---------|
 | **P0** (Foundation) | 6 skills | Backend, Full-stack, Testing | Critical foundation patterns, essential workflows |
 | **P1** (Extended) | 8 skills | Business Logic, Domain, Orchestration, Quality | Important business features, quality gates, orchestration |
-| **P2** (Productivity) | 17 skills | Infrastructure, Composite, Analysis, Refactoring | Productivity tools, optional enhancements |
+| **P2** (Productivity) | 15 skills | DevOps, Integration, Composite, Analysis, Refactoring | Productivity tools, optional enhancements |
 | **Deprecated** | 3 skills | Deprecated | Consolidated into composite skills, soft-deprecated until 2026-06-30 |
 
 ---
@@ -189,21 +190,26 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 
 ---
 
-## P2 Skills (Productivity)
+## P2 Skills (Productivity - 15 skills)
 
-### Infrastructure (10 skills)
+### DevOps (5 skills)
 
-- [**apm-integration-skill**](productivity/infrastructure/apm-integration-skill/) - APM integration (Skywalking, Micrometer, Grafana)
-- [**cache-strategy-generator**](productivity/infrastructure/cache-strategy-generator/) - Multi-level caching (Caffeine L1 + Redis L2)
-- [**cicd-pipeline-builder**](productivity/infrastructure/cicd-pipeline-builder/) - CI/CD pipeline setup (GitHub Actions, GitLab CI)
-- [**db-migration-manager**](productivity/infrastructure/db-migration-manager/) - Database migrations (Flyway, Liquibase)
-- [**full-text-search-integration**](productivity/infrastructure/full-text-search-integration/) - Elasticsearch integration
-- [**i18n-generator**](productivity/infrastructure/i18n-generator/) - Internationalization (backend + frontend)
-- [**message-queue-pattern-generator**](productivity/infrastructure/message-queue-pattern-generator/) - Kafka/RocketMQ integration
+- [**apm-integration-skill**](productivity/devops/apm-integration-skill/) - APM integration (Skywalking, Micrometer, Grafana)
+- [**cicd-pipeline-builder**](productivity/devops/cicd-pipeline-builder/) - CI/CD pipeline setup (GitHub Actions, GitLab CI)
+- [**db-migration-manager**](productivity/devops/db-migration-manager/) - Database migrations (Flyway, Liquibase)
+- [**scheduled-task-manager**](productivity/devops/scheduled-task-manager/) - Scheduled tasks (XXL-Job, Snail-Job)
+- [**websocket-sse-realtime-generator**](productivity/devops/websocket-sse-realtime-generator/) - Real-time communication (WebSocket, SSE)
+
+---
+
+### Integration (6 skills)
+
+- [**cache-strategy-generator**](productivity/integration/cache-strategy-generator/) - Multi-level caching (Caffeine L1 + Redis L2)
+- [**full-text-search-integration**](productivity/integration/full-text-search-integration/) - Elasticsearch integration
+- [**i18n-generator**](productivity/integration/i18n-generator/) - Internationalization (backend + frontend)
+- [**message-queue-pattern-generator**](productivity/integration/message-queue-pattern-generator/) - Kafka/RocketMQ integration
 - [**postgresql-best-practices**](productivity/integration/postgresql-best-practices/) - PostgreSQL performance analysis (HikariCP, N+1 detection, EXPLAIN ANALYZE)
-- [**report-generator-skill**](productivity/infrastructure/report-generator-skill/) - Report export (Excel, PDF, CSV)
-- [**scheduled-task-manager**](productivity/infrastructure/scheduled-task-manager/) - Scheduled tasks (XXL-Job, Snail-Job)
-- [**websocket-sse-realtime-generator**](productivity/infrastructure/websocket-sse-realtime-generator/) - Real-time communication (WebSocket, SSE)
+- [**report-generator-skill**](productivity/integration/report-generator-skill/) - Report export (Excel, PDF, CSV)
 
 ---
 
@@ -241,6 +247,17 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 Profile and optimize Java performance (N+1 query detection, JVM tuning, CPU hotspot analysis).
 
 **Status**: Soft-deprecated, use `smartadmin-performance-suite --mode=diagnose` instead
+
+---
+
+### Refactoring (1 skill)
+
+#### [smartadmin-manager-extractor](productivity/refactoring/smartadmin-manager-extractor/)
+Auto-extract `@Transactional` methods from Service to Manager layer with AST manipulation and ArchUnit validation.
+
+**Trigger Keywords**: "extract to Manager", "transactionalMustUseRollbackForThrowable fails", "refactor transaction"
+
+**Related**: vavr-refactoring-assistant (foundation/backend) for Service layer Option/Try/Either refactoring
 
 ---
 
