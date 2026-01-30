@@ -1068,3 +1068,19 @@ Controller → Manager (❌ 禁止,違反分層)
 **文檔版本**: 2.0.0
 **最後更新**: 2026-01-29
 **維護團隊**: Finance Team & Backend Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 錢包架構
+- [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+
+### 核心依賴
+- [02-04 流程圖](./02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - Mermaid 流程圖
+- [02-04 計算邏輯](./02-04-diagrams/02-04-02_Calculation_Logic.md) - 流水計算公式
+
+### 延伸閱讀
+- [Seamless Wallet 專題](./seamless-wallet/00_INDEX.md) - 深度技術分析
+- [02-03 對帳系統](./02-03_Reconciliation_System.md) - 財務對帳

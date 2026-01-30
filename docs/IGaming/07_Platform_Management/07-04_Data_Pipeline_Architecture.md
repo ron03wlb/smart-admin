@@ -479,3 +479,14 @@ flowchart TD
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Platform Team & DevOps Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [07-01 租戶層級架構](./07-01_Hierarchy_Architecture.md) - 多租戶模型
+
+### 業務整合
+- [02-03 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 數據管道應用
+- [10-01 報表架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - BI 數據管道

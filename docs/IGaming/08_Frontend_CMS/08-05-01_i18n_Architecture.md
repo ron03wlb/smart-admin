@@ -318,7 +318,7 @@ Object.keys(localStorage)
 
 ---
 
-## 8. 相關文檔
+## 📚 相關文檔
 
 ### 系列文檔
 - [08-05-02 動態內容本地化](./08-05-02_Dynamic_Content_L10n.md) - JSONB多語言字段、API響應策略

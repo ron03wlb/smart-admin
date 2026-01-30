@@ -672,3 +672,11 @@ routing_config:
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Platform Team & DevOps Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [07-01 租戶層級架構](./07-01_Hierarchy_Architecture.md) - 多租戶模型
+- [07-02 租戶配置](./07-02_Tenant_Configuration.md) - 配置管理

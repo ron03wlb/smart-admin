@@ -932,3 +932,18 @@ Response:
 - v1.0.0 (2026-01-28): 初始版本，識別流水驗證時機錯誤與回推機制缺失
 
 **作者**: Claude Code（基於用戶需求分析與業界標準）
+
+---
+
+## 📚 相關文檔
+
+### 上層導航
+- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+
+### 相關專題
+- [04 免費旋轉流水](./04_free_spins_turnover.md) - 活動流水計算
+- [07 流水並發累積](./07_turnover_concurrency.md) - Lua 腳本原子性
+
+### 架構文檔
+- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [04-01 活動系統設計](../../04_Activity_Center/04-01_Activity_System_Design.md) - 活動系統

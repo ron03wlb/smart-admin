@@ -705,3 +705,11 @@ else:
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Risk Team & Backend Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [05-01 風控系統](./05-01_Risk_Control_System.md) - 核心風控架構
+- [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - 代理信用體系

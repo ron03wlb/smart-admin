@@ -495,7 +495,7 @@ flowchart TD
 
 ---
 
-## 8. 相關文檔
+## 📚 相關文檔
 
 ### 業務邏輯參考
 - [02-02 支付網關集成](./02-02_Payment_Gateway_Integration.md) - PSP 交易數據來源

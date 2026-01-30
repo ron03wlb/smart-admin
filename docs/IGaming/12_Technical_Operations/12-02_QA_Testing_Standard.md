@@ -374,3 +374,11 @@ jobs:
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: DevOps Team & SRE Team
+
+---
+
+## 📚 相關文檔
+
+### 相關文檔
+- [12-01 部署架構](./12-01_Deployment_Architecture.md) - CI/CD 集成
+- [12-04 維護程序](./12-04_Maintenance_Procedure.md) - 運維流程

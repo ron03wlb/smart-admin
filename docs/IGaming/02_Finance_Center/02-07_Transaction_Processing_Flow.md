@@ -375,3 +375,16 @@ stateDiagram-v2
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Finance Team & Backend Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 錢包架構
+
+### 核心依賴
+- [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+
+### 延伸閱讀
+- [Seamless Wallet 專題](./seamless-wallet/00_INDEX.md) - 深度技術分析

@@ -70,3 +70,11 @@
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Finance Team & Backend Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 錢包架構
+- [07-01 租戶層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶模型

@@ -262,7 +262,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 
 ---
 
-## 7. 相關文檔
+## 📚 相關文檔
 
 ### 系列文檔
 - [09-03-02 Blind Index 架構](./09-03-02_Blind_Index_Architecture.md) - 可檢索加密、HMAC 索引

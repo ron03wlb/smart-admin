@@ -391,3 +391,14 @@ onMounted(() => {
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Frontend Team & Product Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [08-05 本地化系統](./08-05_Localization_System.md) - i18n 架構
+
+### 相關文檔
+- [08-02 橫幅與公告](./08-02_Banner_&_Announcement.md) - 動態內容
+- [08-03 SEO 與性能](./08-03_SEO_&_Performance.md) - 前端優化

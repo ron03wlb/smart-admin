@@ -163,7 +163,7 @@ VIP 玩家 (1.5-3%)
 
 ---
 
-## 7. 相關文檔
+## 📚 相關文檔
 
 ### 前置知識
 - [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - player_tags 表設計

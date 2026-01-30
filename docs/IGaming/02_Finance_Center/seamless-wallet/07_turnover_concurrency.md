@@ -338,3 +338,14 @@ alerts:
 - [術語標準化定義](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - 統一術語使用
 - [流水驗證時機](11_wagering_requirement_timing_and_traceability.md) - 取款時驗證與回推機制
 - [核心架構流程圖](../02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - 三層驗證架構
+
+---
+
+## 📚 相關文檔
+
+### 上層導航
+- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+
+### 架構文檔
+- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

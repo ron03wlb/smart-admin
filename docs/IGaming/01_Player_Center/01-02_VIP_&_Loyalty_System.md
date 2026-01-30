@@ -694,7 +694,7 @@ THEN 標記為 "VIP Farming" → 人工審核
 ### 4.4 VIP Level History Table (vip_level_history)
 
 
-## 5. 相關文檔
+## 📚 相關文檔
 
 ### 業務邏輯參考
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 紅利錢包集成

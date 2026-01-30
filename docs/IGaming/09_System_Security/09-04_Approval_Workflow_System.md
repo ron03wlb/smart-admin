@@ -335,7 +335,7 @@ const REJECTION_TEMPLATES = [
 
 ---
 
-## 11. 相關文檔
+## 📚 相關文檔
 
 ### 前置知識（必讀）
 - [09-02 審計日誌系統](09-02_Audit_Log_System.md) - 審批操作的審計追蹤

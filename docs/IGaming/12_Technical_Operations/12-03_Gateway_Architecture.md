@@ -1139,3 +1139,14 @@ Warning: 299 - "API v1 is deprecated and will be removed on 2027-01-01. Please m
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: DevOps Team & SRE Team
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [00-04 技術棧](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 技術選型
+
+### 相關文檔
+- [12-01 部署架構](./12-01_Deployment_Architecture.md) - 部署策略
+- [09-01 權限控制](../09_System_Security/09-01_Admin_RBAC.md) - 網關鑑權

@@ -64,3 +64,14 @@
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Product Team & Backend Team
+
+---
+
+## 📚 相關文檔
+
+### 核心依賴
+- [06-02 信用網絡邏輯](./06-02_Credit_Network_Logic.md) - 代理信用體系
+- [07-01 租戶層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶模型
+
+### 業務整合
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 代理風控

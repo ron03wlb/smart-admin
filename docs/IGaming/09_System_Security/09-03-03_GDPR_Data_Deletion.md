@@ -242,7 +242,7 @@ stateDiagram-v2
 
 ---
 
-## 9. 相關文檔
+## 📚 相關文檔
 
 ### 系列文檔
 - [09-03-01 加密策略](./09-03-01_Encryption_Strategy.md) - AES-256-GCM、金鑰管理

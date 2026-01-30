@@ -327,3 +327,11 @@ Percentage = (Completed / Requirement) × 100%
 ---
 
 **文檔結束**
+
+---
+
+## 📚 相關文檔
+
+### 前置依賴
+- [00-01 解決方案概覽](./00-01_Solution_Overview.md) - 系統架構基礎
+- [00-02 行業術語](./00-02_Industry_Terminology.md) - iGaming 術語

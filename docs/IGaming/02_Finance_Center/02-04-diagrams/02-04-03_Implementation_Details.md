@@ -858,3 +858,14 @@
 **文檔版本**: 1.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Finance Team & Backend Team
+
+---
+
+## 📚 相關文檔
+
+### 上層文檔
+- [02-04 流水與對帳分析](../02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 完整分析
+
+### 相關文檔
+- [02-04-01 流程圖](./02-04-01_Flowcharts_and_Sequences.md) - Mermaid 流程圖
+- [02-04-02 計算邏輯](./02-04-02_Calculation_Logic.md) - 流水計算公式

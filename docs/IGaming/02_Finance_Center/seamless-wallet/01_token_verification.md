@@ -312,3 +312,18 @@ token:
 - [ ] Result API 的最大容忍過期時間？（建議: 7 天）
 - [ ] 是否需要在 Token 中包含遊戲類型信息？
 - [ ] Rollback API 是否需要支持管理員手動補單？
+
+---
+
+## 📚 相關文檔
+
+### 上層導航
+- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+
+### 相關專題
+- [02 冪等性設計](./02_idempotency_design.md) - 防重複扣款
+- [10 錯誤恢復](./10_error_recovery.md) - 異常處理
+
+### 架構文檔
+- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

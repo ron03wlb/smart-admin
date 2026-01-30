@@ -68,3 +68,14 @@ GGR = 博彩收入 - 博彩成本
 ❌ **錯誤做法**:
 - 使用「收入抵減（GGR）」作為科目名稱
 - 分錄結構過於複雜
+
+---
+
+## 📚 相關文檔
+
+### 上層導航
+- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+
+### 架構文檔
+- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

@@ -339,3 +339,18 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 **最後更新**: 2026-01-28
 **維護團隊**: Finance Team & Backend Team
 **狀態**: 🟡 待業務確認
+
+---
+
+## 📚 相關文檔
+
+### 上層導航
+- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+
+### 相關專題
+- [11 投注要求追蹤](./11_wagering_requirement.md) - 流水要求時序
+- [04 免費旋轉流水](./04_free_spins_turnover.md) - 活動流水計算
+
+### 架構文檔
+- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [04-01 活動系統設計](../../04_Activity_Center/04-01_Activity_System_Design.md) - 促銷活動系統
