@@ -336,7 +336,7 @@ WHERE player_id = 12345 AND tenant_id = 1 AND deleted_flag = 0;
 
 ### iGaming 文檔
 
-- [無縫錢包分析（13 個專題）](docs/IGaming/seamless_wallet_analysis/)
+- [無縫錢包分析（13 個專題）](docs/IGaming/02_Finance_Center/seamless-wallet/)
 - [多商戶技術指南](docs/plans/tenant/)
 - [統一錢包模型](docs/IGaming/02_Finance_Center/02-06_Unified_Wallet_Model.md)
 

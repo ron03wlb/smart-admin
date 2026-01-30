@@ -330,7 +330,7 @@ void allDaoMethodsShouldUseTenantContext() {
 
 #### 模式描述
 
-整合 13 個無縫錢包核心模式（來自 `docs/IGaming/seamless_wallet_analysis/`）,生成完整的錢包 API 規格文檔。
+整合 13 個無縫錢包核心模式（來自 `docs/IGaming/02_Finance_Center/seamless-wallet/`）,生成完整的錢包 API 規格文檔。
 
 #### 核心模式索引
 
@@ -1331,7 +1331,7 @@ public class TurnoverAccumulationManager {
 
 ### 依賴知識庫
 
-- [docs/IGaming/seamless_wallet_analysis/](../../docs/IGaming/seamless_wallet_analysis/) - 13 個無縫錢包專題
+- [docs/IGaming/02_Finance_Center/seamless-wallet/](../../docs/IGaming/02_Finance_Center/seamless-wallet/) - 13 個無縫錢包專題
 - [docs/plans/tenant/](../../docs/plans/tenant/) - 多商戶技術指南
 - [docs/IGaming/02_Finance_Center/](../../docs/IGaming/02_Finance_Center/) - 錢包模型
 

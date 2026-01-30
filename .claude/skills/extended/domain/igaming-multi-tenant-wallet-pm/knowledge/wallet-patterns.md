@@ -2,7 +2,7 @@
 
 **文檔版本**: v1.0.0
 **創建日期**: 2026-01-29
-**來源**: `docs/IGaming/seamless_wallet_analysis/` (13 個專題文檔)
+**來源**: `docs/IGaming/02_Finance_Center/seamless-wallet/` (13 個專題文檔)
 **用途**: 為 igaming-multi-tenant-wallet-pm Skill 提供可複用的無縫錢包模式庫
 
 ---
@@ -24,19 +24,19 @@
 
 | 編號 | 專題 | 原始文檔 | 使用場景 | 優先級 | 章節 |
 |------|------|---------|---------|-------|------|
-| 01 | Token 驗證決策樹 | 01_token_verification_decision_tree.md | API 身份驗證 | P0 | [§1](#模式-01token-驗證決策樹) |
-| 02 | 冪等性分層設計 | 02_idempotency_layered_design.md | 防止重複扣款 | P0 | [§2](#模式-02冪等性分層設計) |
-| 03 | 體育博彩邏輯 | 03_sports_betting_valid_bet_logic.md | 體育遊戲流水計算 | P1 | [§3](#模式-03體育博彩-valid-bet-邏輯) |
-| 04 | 免費旋轉流水 | 04_free_spins_turnover_calculation.md | 老虎機活動 | P1 | [§4](#模式-04免費旋轉流水計算) |
-| 05 | 輪盤對沖檢測 | 05_roulette_coverage_detection_algorithm.md | 風控檢測 | P1 | [§5](#模式-05輪盤對沖檢測算法) |
-| 06 | 百家樂平局邏輯 | 06_baccarat_tie_bet_valid_bet_logic.md | 桌面遊戲流水 | P2 | [§6](#模式-06百家樂平局邏輯) |
-| 07 | 流水並發累積 | 07_turnover_accumulation_concurrency.md | 高併發場景 | P0 | [§7](#模式-07流水並發累積) |
-| 08 | 會計條目修正 | 08_accounting_entries_correction.md | 財務合規 | P1 | [§8](#模式-08會計條目修正) |
-| 09 | 對賬模型分離 | 09_reconciliation_model_separation.md | 財務對賬 | P1 | [§9](#模式-09對賬模型分離) |
-| 10 | 錯誤恢復場景 | 10_error_recovery_scenarios.md | 異常處理 | P0 | [§10](#模式-10錯誤恢復場景) |
-| 11 | 流水要求追蹤 | 11_wagering_requirement_timing_and_traceability.md | 紅利流水 | P1 | [§11](#模式-11流水要求追蹤) |
-| 12 | 紅利錢包轉賬 | 12_promo_wallet_transfer_logic_analysis.md | 錢包間轉賬 | P1 | [§12](#模式-12紅利錢包轉賬邏輯) |
-| 99 | 最終建議 | 99_FINAL_SUMMARY_AND_RECOMMENDATIONS.md | 綜合建議 | - | [參考資料](#參考資料) |
+| 01 | Token 驗證決策樹 | 01_token_verification.md | API 身份驗證 | P0 | [§1](#模式-01token-驗證決策樹) |
+| 02 | 冪等性分層設計 | 02_idempotency_design.md | 防止重複扣款 | P0 | [§2](#模式-02冪等性分層設計) |
+| 03 | 體育博彩邏輯 | 03_sports_betting_logic.md | 體育遊戲流水計算 | P1 | [§3](#模式-03體育博彩-valid-bet-邏輯) |
+| 04 | 免費旋轉流水 | 04_free_spins_turnover.md | 老虎機活動 | P1 | [§4](#模式-04免費旋轉流水計算) |
+| 05 | 輪盤對沖檢測 | 05_roulette_coverage.md | 風控檢測 | P1 | [§5](#模式-05輪盤對沖檢測算法) |
+| 06 | 百家樂平局邏輯 | 06_baccarat_tie_logic.md | 桌面遊戲流水 | P2 | [§6](#模式-06百家樂平局邏輯) |
+| 07 | 流水並發累積 | 07_turnover_concurrency.md | 高併發場景 | P0 | [§7](#模式-07流水並發累積) |
+| 08 | 會計條目修正 | 08_accounting_entries.md | 財務合規 | P1 | [§8](#模式-08會計條目修正) |
+| 09 | 對賬模型分離 | 09_reconciliation_model.md | 財務對賬 | P1 | [§9](#模式-09對賬模型分離) |
+| 10 | 錯誤恢復場景 | 10_error_recovery.md | 異常處理 | P0 | [§10](#模式-10錯誤恢復場景) |
+| 11 | 流水要求追蹤 | 11_wagering_requirement.md | 紅利流水 | P1 | [§11](#模式-11流水要求追蹤) |
+| 12 | 紅利錢包轉賬 | 12_promo_wallet_transfer.md | 錢包間轉賬 | P1 | [§12](#模式-12紅利錢包轉賬邏輯) |
+| 99 | 最終建議 | 99_SUMMARY.md | 綜合建議 | - | [參考資料](#參考資料) |
 
 ---
 
@@ -75,7 +75,7 @@
 
 ### 模式 01：Token 驗證決策樹
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/01_token_verification_decision_tree.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/01_token_verification.md`
 
 #### 問題描述
 
@@ -199,7 +199,7 @@ public class WalletService {
 
 ### 模式 02：冪等性分層設計
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/02_idempotency_layered_design.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/02_idempotency_design.md`
 
 #### 問題描述
 
@@ -375,7 +375,7 @@ CREATE TABLE t_wallet_transaction (
 
 ### 模式 07：流水並發累積
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/07_turnover_accumulation_concurrency.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/07_turnover_concurrency.md`
 
 #### 問題描述
 
@@ -537,7 +537,7 @@ public class RedisConfig {
 
 ### 模式 10：錯誤恢復場景
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/10_error_recovery_scenarios.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/10_error_recovery.md`
 
 #### 問題描述
 
@@ -796,7 +796,7 @@ public void recoverPreparedTransactions() {
 
 ### 模式 03：體育博彩 Valid Bet 邏輯
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/03_sports_betting_valid_bet_logic.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/03_sports_betting_logic.md`
 
 #### 問題描述
 
@@ -858,7 +858,7 @@ public class ValidBetCalculationService {
 
 ### 模式 04：免費旋轉流水計算
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/04_free_spins_turnover_calculation.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/04_free_spins_turnover.md`
 
 #### 問題描述
 
@@ -931,7 +931,7 @@ public class TurnoverCalculationService {
 
 ### 模式 05：輪盤對沖檢測算法
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/05_roulette_coverage_detection_algorithm.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/05_roulette_coverage.md`
 
 #### 問題描述
 
@@ -998,7 +998,7 @@ public class RouletteHedgingDetectionService {
 
 ### 模式 11：流水要求追蹤
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/11_wagering_requirement_timing_and_traceability.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/11_wagering_requirement.md`
 
 #### 問題描述
 
@@ -1216,7 +1216,7 @@ public class WageringRecalculationManager {
 
 ### 模式 06：百家樂平局邏輯
 
-**原始文檔**: `docs/IGaming/seamless_wallet_analysis/06_baccarat_tie_bet_valid_bet_logic.md`
+**原始文檔**: `docs/IGaming/02_Finance_Center/seamless-wallet/06_baccarat_tie_logic.md`
 
 #### 問題描述
 
@@ -1281,8 +1281,8 @@ void allManagerMethodsShouldHaveTransaction() {
 
 ### 原始文檔
 
-- [完整分析報告](../../../docs/IGaming/seamless_wallet_analysis/99_FINAL_SUMMARY_AND_RECOMMENDATIONS.md)
-- [13 個專題文檔](../../../docs/IGaming/seamless_wallet_analysis/)
+- [完整分析報告](../../../docs/IGaming/02_Finance_Center/seamless-wallet/99_SUMMARY.md)
+- [13 個專題文檔](../../../docs/IGaming/02_Finance_Center/seamless-wallet/)
 
 ### SmartAdmin 模式
 
