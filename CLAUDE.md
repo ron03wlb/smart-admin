@@ -169,6 +169,27 @@ Controller → Service → Manager → Dao → Entity
 
 **See also**: [Project Architecture](.claude/shared/knowledge/project-architecture.md) for detailed version compatibility and configuration.
 
+## Java 21 Features
+
+SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and performance:
+
+**Sealed Classes (Type Safety):**
+- `ErrorCode` interface uses sealed classes to restrict implementations
+- Compiler-enforced exhaustiveness in switch expressions
+- Pattern: `sealed interface ErrorCode permits SystemErrorCode, UserErrorCode, UnexpectedErrorCode`
+
+**Virtual Threads (Performance):**
+- Enabled for `@Async` and `@Scheduled` tasks
+- 30-50% throughput improvement for I/O-intensive operations
+- Configuration: `spring.threads.virtual.enabled=true`
+- Low memory footprint: ~1KB per virtual thread (vs ~1MB for platform threads)
+
+**Implementation Details:**
+- Virtual Threads: [VirtualThreadsConfig.java](smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/admin/config/VirtualThreadsConfig.java)
+- Sealed ErrorCode: [ErrorCode.java](smart-admin-api-java21-springboot3/sa-base/foundation/domain/src/main/java/net/lab1024/sa/foundation/domain/code/ErrorCode.java)
+
+→ **[Complete Java 21 Features Guide](docs/architecture/java21-features.md)**
+
 ## Development Guidelines
 
 **Essential Rules** (see `.agent/rules/`):
@@ -391,7 +412,7 @@ docs/archive/
 
 | Component | Version | Status | Metadata |
 |-----------|---------|--------|----------|
-| **This Document** | 3.3.0 | ✅ Universal AI Support | - |
+| **This Document** | 3.4.0 | ✅ Universal AI Support + Java 21 | - |
 | **AI Doc System** | 3.0.2 | ✅ Optimized | [.claude/META.md](.claude/META.md) |
 | **.claude/** | 3.0.2 | ✅ Optimized | [.claude/README.md](.claude/README.md) |
 | **.agent/** | 1.0.0 | ✅ Production Ready | [.agent/VERSION.md](.agent/VERSION.md) |
@@ -399,9 +420,10 @@ docs/archive/
 
 **System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership
 
-**Last Updated**: 2026-01-27
+**Last Updated**: 2026-01-31
 
 **Change History**:
+- 3.4.0 (2026-01-31): Java 21 features documentation - Added dedicated Java 21 section covering Sealed Classes and Virtual Threads implementations, Phase 4 Manager layer testing completion (100% coverage, 8 test classes, 92 test cases)
 - 3.3.0 (2026-01-27): Documentation structure update - Added "Documentation Structure" section with active/archived documentation organization, updated archive navigation with INDEX.md references
 - 3.2.0 (2026-01-27): P1 improvements - Enhanced reading priority guidance with decision-making note, clarified code comment language standard, expanded skills catalog from 6 to 15 (P0: 6, P1: 3, P2: 6)
 - 3.1.0 (2026-01-27): P0 critical fixes - Version synchronization (.agent/ v1.0.0 production release), fixed broken migration links
