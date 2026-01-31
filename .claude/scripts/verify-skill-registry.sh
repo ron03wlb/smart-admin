@@ -50,12 +50,12 @@ print_header() {
 
 print_success() {
     echo -e "${GREEN}✅ $1${NC}"
-    ((PASSED_CHECKS++))
+    : $((PASSED_CHECKS++))
 }
 
 print_error() {
     echo -e "${RED}❌ $1${NC}"
-    ((FAILED_CHECKS++))
+    : $((FAILED_CHECKS++))
 }
 
 print_warning() {
@@ -71,7 +71,7 @@ print_info() {
 # ====================================================================
 
 check_registry_file_exists() {
-    ((TOTAL_CHECKS++))
+    : $((TOTAL_CHECKS++))
     if [[ -f "$REGISTRY_FILE" ]]; then
         print_success "skill-registry.yml exists"
         return 0
@@ -82,7 +82,7 @@ check_registry_file_exists() {
 }
 
 check_registry_yaml_valid() {
-    ((TOTAL_CHECKS++))
+    : $((TOTAL_CHECKS++))
     if command -v yq &> /dev/null; then
         if yq eval '.' "$REGISTRY_FILE" &> /dev/null; then
             print_success "skill-registry.yml is valid YAML"
@@ -151,8 +151,8 @@ check_skill_paths_exist() {
     while IFS= read -r path; do
         echo "[DEBUG] Processing path: '$path'" >&2
         [[ -z "$path" ]] && continue
-        ((TOTAL_CHECKS++))
-        ((path_count++))
+        : $((TOTAL_CHECKS++))
+        : $((path_count++))
 
         local full_path="$SKILLS_DIR/$path"
         if [[ -d "$full_path" ]]; then
@@ -192,7 +192,7 @@ check_config_yml_exists() {
 
     while IFS= read -r path; do
         [[ -z "$path" ]] && continue
-        ((TOTAL_CHECKS++))
+        : $((TOTAL_CHECKS++))
 
         local config_file="$SKILLS_DIR/$path/config.yml"
         if [[ -f "$config_file" ]]; then
@@ -230,7 +230,7 @@ check_skill_md_exists() {
 
     while IFS= read -r path; do
         [[ -z "$path" ]] && continue
-        ((TOTAL_CHECKS++))
+        : $((TOTAL_CHECKS++))
 
         local skill_md="$SKILLS_DIR/$path/SKILL.md"
         if [[ -f "$skill_md" ]]; then
@@ -254,7 +254,7 @@ check_skill_md_exists() {
 }
 
 check_skill_counts() {
-    ((TOTAL_CHECKS++))
+    : $((TOTAL_CHECKS++))
 
     print_header "Checking Skill Counts"
 
