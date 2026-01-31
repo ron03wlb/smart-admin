@@ -73,15 +73,6 @@ public class GoodsService {
     return Option.of(entity);
   }
 
-  /** 查询类目名称（直接调用 Manager，避免 Service 互调） */
-  private String queryCategoryName(Long categoryId) {
-    CategoryEntity entity = categoryCacheManager.queryCategory(categoryId);
-    if (entity == null || entity.getDeletedFlag()) {
-      return null;
-    }
-    return entity.getCategoryName();
-  }
-
   /** 批量查询类目（直接调用 Manager，避免 Service 互调） */
   private Map<Long, CategoryEntity> queryCategoryList(List<Long> categoryIdList) {
     if (CollectionUtils.isEmpty(categoryIdList)) {
@@ -192,7 +183,9 @@ public class GoodsService {
     try (InputStream is = file.getInputStream()) {
       dataList = FastExcel.read(is).head(GoodsImportForm.class).sheet().doReadSync();
     } catch (IOException e) {
-      log.error(e.getMessage(), e);
+      if (log.isErrorEnabled()) {
+        log.error(e.getMessage(), e);
+      }
       throw new BusinessException("数据格式存在问题，无法读取", e);
     }
 
@@ -215,9 +208,13 @@ public class GoodsService {
           goodsDao.selectPage(
               new Page<>(pageNum, pageSize),
               new LambdaQueryWrapper<GoodsEntity>().eq(GoodsEntity::getDeletedFlag, false));
-      if (page.getRecords().isEmpty()) break;
+      if (page.getRecords().isEmpty()) {
+        break;
+      }
       allGoods.addAll(page.getRecords());
-      if (!page.hasNext()) break;
+      if (!page.hasNext()) {
+        break;
+      }
       pageNum++;
     }
 

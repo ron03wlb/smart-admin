@@ -59,6 +59,19 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 
+    <!--
+        @EqualsAndHashCode(callSuper = false) pattern
+        QueryForm classes intentionally override equals without calling super.equals()
+        This is by design for query parameter comparison (only compare own fields)
+    -->
+    <Match>
+        <Or>
+            <Class name="~.*QueryForm"/>
+            <Class name="~.*Form"/>
+        </Or>
+        <Bug code="Eq"/>
+    </Match>
+
     <!-- ============================================================ -->
     <!-- SPRING DEPENDENCY INJECTION PATTERNS -->
     <!-- ============================================================ -->
@@ -80,6 +93,21 @@
 
     <Match>
         <Class name="~.*Manager"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <Match>
+        <Class name="~.*Controller"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <Match>
+        <Class name="~.*Interceptor"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <Match>
+        <Class name="~.*Dao"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 
