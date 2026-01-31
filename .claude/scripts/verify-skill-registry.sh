@@ -10,6 +10,9 @@
 
 set -euo pipefail
 
+# Trap handler for debugging unexpected exits
+trap 'echo "❌ SCRIPT EXITED UNEXPECTEDLY at line $LINENO with exit code $?" >&2; echo "Last command: $BASH_COMMAND" >&2' ERR
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
