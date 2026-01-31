@@ -98,8 +98,8 @@ extract_skill_paths() {
     if command -v yq &> /dev/null; then
         yq eval '.skills.*.path' "$REGISTRY_FILE" 2>/dev/null || true
     else
-        # Fallback: use grep (less accurate)
-        grep -A 1 'path:' "$REGISTRY_FILE" | grep -v '^--$' | grep -v 'path:' | sed 's/.*"\(.*\)".*/\1/' || true
+        # Fallback: use grep (directly extract from path: line)
+        grep 'path:' "$REGISTRY_FILE" | sed 's/.*path: *"\([^"]*\)".*/\1/' || true
     fi
 }
 
