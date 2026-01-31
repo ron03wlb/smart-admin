@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -81,10 +82,13 @@ public class VirtualThreadsConfig {
    *
    * <p>此執行器將用於 {@code @Scheduled} 註解的定時任務。
    *
+   * <p>使用 {@code @Primary} 標記為默認調度器，避免與 Spring Boot 自動配置的 {@code taskScheduler} 衝突。
+   *
    * @return Virtual Thread 執行器
    */
-  @Bean(name = "taskScheduler")
-  public AsyncTaskExecutor taskScheduler() {
+  @Bean(name = "virtualThreadTaskScheduler")
+  @Primary
+  public AsyncTaskExecutor virtualThreadTaskScheduler() {
     return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
   }
 }
