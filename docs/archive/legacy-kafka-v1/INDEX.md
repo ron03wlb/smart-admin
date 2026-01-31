@@ -82,11 +82,34 @@
 
 ## 遷移至 Kafka v2
 
-**新文檔位置**：（待更新）
-**遷移指南**：（待創建）
+**文檔組織變更**: Kafka 文檔已從獨立的 VitePress 網站遷移至內嵌模組文檔
 
-**主要變更**：
-- （待填寫 v1 → v2 的主要變更）
+**新文檔位置**:
+```
+smart-admin-api-java21-springboot3/sa-base/foundation/mq/docs/
+├── kafka-batch-quickstart.md      - 快速開始指南
+├── kafka-batch-api-reference.md   - API 參考
+├── kafka-batch-examples.md        - 使用範例
+├── kafka-batch-testing-guide.md   - 測試指南
+└── VERIFICATION-REPORT.md         - 驗證報告
+```
+
+**主要變更**:
+- ✅ **文檔簡化**: 從 46 個文件 → 5 個核心文件
+- ✅ **位置變更**: 從獨立 VitePress 網站 → 內嵌在 foundation/mq 模組
+- ✅ **聚焦實用**: 保留核心 API、範例和測試指南,移除冗餘內容
+- ✅ **代碼同步**: 文檔與代碼在同一目錄,更易維護
+
+**為什麼歸檔 Kafka v1**:
+- 📚 舊文檔網站過於龐大 (46 個文件),維護成本高
+- 🎯 新文檔更聚焦實際使用場景 (批次處理、API、測試)
+- 🔄 文檔與代碼同步,避免不一致
+
+**代碼實現狀態**:
+- ✅ Kafka 集成仍在使用中
+- ✅ Foundation MQ 模組: `sa-base/foundation/mq/`
+- ✅ 核心類: `KafkaProducerServiceImpl`, `AbstractKafkaListener`
+- ✅ 範例代碼: `sa-admin/.../sample/kafka/`
 
 ---
 
