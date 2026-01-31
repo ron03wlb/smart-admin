@@ -249,36 +249,37 @@ check_skill_counts() {
     local deprecated_skills
 
     if command -v yq &> /dev/null; then
-        total_skills=$(yq eval '.total_skills' "$REGISTRY_FILE")
-        active_skills=$(yq eval '.active_skills' "$REGISTRY_FILE")
-        deprecated_skills=$(yq eval '.deprecated_skills' "$REGISTRY_FILE")
+        total_skills=$(yq eval '.total_skills' "$REGISTRY_FILE" 2>/dev/null || true)
+        active_skills=$(yq eval '.active_skills' "$REGISTRY_FILE" 2>/dev/null || true)
+        deprecated_skills=$(yq eval '.deprecated_skills' "$REGISTRY_FILE" 2>/dev/null || true)
     else
-        total_skills=$(grep "^total_skills:" "$REGISTRY_FILE" | awk '{print $2}')
-        active_skills=$(grep "^active_skills:" "$REGISTRY_FILE" | awk '{print $2}')
-        deprecated_skills=$(grep "^deprecated_skills:" "$REGISTRY_FILE" | awk '{print $2}')
+        total_skills=$(grep "^total_skills:" "$REGISTRY_FILE" | awk '{print $2}' || true)
+        active_skills=$(grep "^active_skills:" "$REGISTRY_FILE" | awk '{print $2}' || true)
+        deprecated_skills=$(grep "^deprecated_skills:" "$REGISTRY_FILE" | awk '{print $2}' || true)
     fi
 
     local actual_count
     actual_count=$(extract_skill_paths | grep -c . || echo 0)
 
     print_info "Registry metadata:"
-    echo "  - total_skills: $total_skills"
-    echo "  - active_skills: $active_skills"
-    echo "  - deprecated_skills: $deprecated_skills"
+    echo "  - total_skills: ${total_skills:-0}"
+    echo "  - active_skills: ${active_skills:-0}"
+    echo "  - deprecated_skills: ${deprecated_skills:-0}"
     echo "  - Actual skill paths: $actual_count"
 
-    if [[ "$total_skills" -eq "$actual_count" ]]; then
+    # Use default value of 0 if variables are empty
+    if [[ "${total_skills:-0}" -eq "$actual_count" ]]; then
         print_success "Skill count matches: $total_skills = $actual_count"
     else
         print_error "Skill count MISMATCH: registry=$total_skills, actual=$actual_count"
         return 1
     fi
 
-    local expected_total=$((active_skills + deprecated_skills))
-    if [[ "$total_skills" -eq "$expected_total" ]]; then
-        print_success "Skill count formula valid: $total_skills = $active_skills + $deprecated_skills"
+    local expected_total=$(( ${active_skills:-0} + ${deprecated_skills:-0} ))
+    if [[ "${total_skills:-0}" -eq "$expected_total" ]]; then
+        print_success "Skill count formula valid: ${total_skills:-0} = ${active_skills:-0} + ${deprecated_skills:-0}"
     else
-        print_error "Skill count formula INVALID: $total_skills ≠ $active_skills + $deprecated_skills"
+        print_error "Skill count formula INVALID: ${total_skills:-0} ≠ ${active_skills:-0} + ${deprecated_skills:-0}"
         return 1
     fi
 
