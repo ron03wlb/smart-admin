@@ -19,6 +19,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install yq v4
+        run: |
+          YQ_VERSION=v4.44.5
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /tmp/yq
+          sudo mv /tmp/yq /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+          echo "Installed yq version:"
+          yq --version
+
       - name: Validate skill structures
         run: bash .claude/scripts/verify-skill-registry.sh
 
