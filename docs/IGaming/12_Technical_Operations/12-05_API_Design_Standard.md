@@ -675,6 +675,9 @@ POST /api/v1/bonuses/batch-create
 
 ## 📚 相關文檔
 
+### API 設計參考
+- **[12-05-01 API 設計實踐示例](./12-05-01_API_Design_Examples.md)** - OpenAPI 3.0 完整示例、SmartAdmin 實際業務 API 實現 ⭐
+
 ### 技術參考
 - [00-04 技術選型標準](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 技術棧
 - [12-03 網關架構](./12-03_Gateway_Architecture.md) - API網關設計

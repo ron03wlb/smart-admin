@@ -22,11 +22,30 @@ jobs:
       - name: Install yq v4
         run: |
           YQ_VERSION=v4.44.5
-          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /tmp/yq
+          echo "Attempting to install yq v${YQ_VERSION}..."
+
+          # Remove existing yq to avoid conflicts
+          sudo rm -f /usr/bin/yq /usr/local/bin/yq
+
+          # Download and install yq v4
+          wget -q https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /tmp/yq || {
+            echo "❌ Failed to download yq, will use grep fallback"
+            exit 0
+          }
+
           sudo mv /tmp/yq /usr/local/bin/yq
           sudo chmod +x /usr/local/bin/yq
-          echo "Installed yq version:"
-          yq --version
+
+          # Verify installation
+          if /usr/local/bin/yq --version | grep -q "version v4"; then
+            echo "✅ Successfully installed yq v4"
+            /usr/local/bin/yq --version
+            # Add to PATH explicitly
+            echo "/usr/local/bin" >> $GITHUB_PATH
+          else
+            echo "❌ yq installation failed, will use grep fallback"
+            sudo rm -f /usr/local/bin/yq
+          fi
 
       - name: Validate skill structures
         run: bash .claude/scripts/verify-skill-registry.sh
