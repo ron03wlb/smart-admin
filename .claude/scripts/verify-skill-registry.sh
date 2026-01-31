@@ -154,8 +154,11 @@ check_skill_paths_exist() {
         : $((TOTAL_CHECKS++))
         : $((path_count++))
 
+        echo "[DEBUG] About to construct full_path for: '$path'" >&2
         local full_path="$SKILLS_DIR/$path"
+        echo "[DEBUG] full_path='$full_path', checking if directory exists..." >&2
         if [[ -d "$full_path" ]]; then
+            echo "[DEBUG] Directory exists!" >&2
             print_success "Path exists: $path"
         else
             print_error "Path NOT FOUND: $path"
