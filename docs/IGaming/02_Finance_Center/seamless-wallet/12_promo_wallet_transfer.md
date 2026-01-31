@@ -1,4 +1,4 @@
-# 促銷錢包流水需求轉移邏輯分析
+# 促銷錢包流水要求轉移邏輯分析
 
 ## 文檔資訊
 - **版本**: 1.0.0
@@ -17,7 +17,7 @@
 ```text
 ### 5.3 促銷錢包轉主錢包時的流水計算
 
-當促銷錢包轉出時，會按比例轉移剩餘流水需求：
+當促銷錢包轉出時，會按比例轉移剩餘流水要求：
 
 transferWagerRequirement = (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus))
 ```
@@ -26,7 +26,7 @@ transferWagerRequirement = (wagerRequirement - effectiveStake) × (transferAmoun
 
 | 風險 | 描述 | 等級 |
 |------|------|------|
-| **部分轉移** | 僅部分轉移流水需求 | 🟡 Medium |
+| **部分轉移** | 僅部分轉移流水要求 | 🟡 Medium |
 | **資金遺留** | 可能留下已解鎖但未完成流水的資金 | 🟡 Medium |
 | **業務邏輯不清** | 缺少使用場景說明 | 🟡 Medium |
 
@@ -41,7 +41,7 @@ transferWagerRequirement = (wagerRequirement - effectiveStake) × (transferAmoun
 ```yaml
 初始狀態:
 - 促銷錢包餘額: cash = 50, bonus = 100（共 150）
-- 流水需求: wagerRequirement = 2000
+- 流水要求: wagerRequirement = 2000
 - 已完成: effectiveStake = 500
 - 剩餘需求: 2000 - 500 = 1500
 
@@ -53,13 +53,13 @@ transferAmount = 60
 transferWagerRequirement = (2000 - 500) × (60 / 150) = 1500 × 0.4 = 600
 
 結果:
-- 促銷錢包: cash = 0, bonus = 90（剩餘 90），剩餘流水需求 = 1500 - 600 = 900
+- 促銷錢包: cash = 0, bonus = 90（剩餘 90），剩餘流水要求 = 1500 - 600 = 900
 - 主錢包: cash 增加 60，新增 lockAmount = 600
 ```markdown
 
 **問題**:
 - ❓ **業務合理性**: 為什麼允許玩家在未達標時部分提取促銷錢包資金？
-- ❓ **流水需求轉移**: 將剩餘流水需求轉移到主錢包的 lockAmount 是否符合業務邏輯？
+- ❓ **流水要求轉移**: 將剩餘流水要求轉移到主錢包的 lockAmount 是否符合業務邏輯？
 
 ---
 
@@ -68,19 +68,19 @@ transferWagerRequirement = (2000 - 500) × (60 / 150) = 1500 × 0.4 = 600
 ```yaml
 初始狀態:
 - 促銷錢包餘額: cash = 50, bonus = 100（共 150）
-- 流水需求: wagerRequirement = 2000
+- 流水要求: wagerRequirement = 2000
 - 已完成: effectiveStake = 2100（已達標）
 - 剩餘需求: 2000 - 2100 = -100（已超額完成）
 
 系統操作:
-- 流水需求已達標，促銷錢包資金應全部轉移到主錢包
+- 流水要求已達標，促銷錢包資金應全部轉移到主錢包
 
 轉移計算:
 transferAmount = 150（全部）
 transferWagerRequirement = (2000 - 2100) × (150 / 150) = -100 × 1.0 = -100
 
 結果:
-- 促銷錢包: 清空（餘額 0，流水需求 0）
+- 促銷錢包: 清空（餘額 0，流水要求 0）
 - 主錢包: cash 增加 150，lockAmount 不增加（因為已達標）
 ```markdown
 
@@ -95,7 +95,7 @@ transferWagerRequirement = (2000 - 2100) × (150 / 150) = -100 × 1.0 = -100
 ```yaml
 初始狀態:
 - 促銷錢包餘額: cash = 50, bonus = 100（共 150）
-- 流水需求: wagerRequirement = 2000
+- 流水要求: wagerRequirement = 2000
 - 已完成: effectiveStake = 300
 - 剩餘需求: 2000 - 300 = 1700
 
@@ -137,7 +137,7 @@ transferWagerRequirement = (1000 - 300) × (50 / 200) = 700 × 0.25 = 175
 
 驗證:
 - 促銷錢包剩餘金額 = 200 - 50 = 150
-- 促銷錢包剩餘流水需求 = 700 - 175 = 525
+- 促銷錢包剩餘流水要求 = 700 - 175 = 525
 - 比例檢查: 525 / 150 = 3.5（每元需完成 3.5 流水）
 - 主錢包新增 lockAmount = 175
 - 比例檢查: 175 / 50 = 3.5（每元需完成 3.5 流水）
@@ -186,7 +186,7 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 
 | 運營商 | 促銷錢包轉移邏輯 | 是否支持部分轉移 |
 |--------|----------------|----------------|
-| **Pragmatic Play** | 僅在流水需求達標時允許提款（全部轉移）| ❌ 否 |
+| **Pragmatic Play** | 僅在流水要求達標時允許提款（全部轉移）| ❌ 否 |
 | **Evolution Gaming** | 同上 | ❌ 否 |
 | **Betfair** | 流水未達標時禁止任何提款 | ❌ 否 |
 | **Pinnacle** | 同上 | ❌ 否 |
@@ -272,13 +272,13 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 ```markdown
 ### 5.3 促銷錢包轉移規則（業界標準）
 
-**規則**: 僅在流水需求達標時允許全額轉移到主錢包。
+**規則**: 僅在流水要求達標時允許全額轉移到主錢包。
 
 **流程**:
 1. 玩家申請提款
-2. 驗證促銷錢包流水需求是否達標
+2. 驗證促銷錢包流水要求是否達標
 3. 如果達標：全額轉移到主錢包（無 lockAmount）
-4. 如果未達標：拒絕提款，提示剩餘流水需求
+4. 如果未達標：拒絕提款，提示剩餘流水要求
 
 **不支持**: 部分轉移（未達標時不允許任何提款）
 
@@ -295,7 +295,7 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 ```markdown
 ### 5.3 促銷錢包部分轉移邏輯
 
-**使用場景**: 允許玩家在流水需求未達標時部分提取促銷錢包資金。
+**使用場景**: 允許玩家在流水要求未達標時部分提取促銷錢包資金。
 
 **公式** (含負值保護):
 ```text
@@ -304,12 +304,12 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 
 **範例**:
 - 促銷錢包餘額: 150 元
-- 流水需求: 2000 元，已完成 500 元
+- 流水要求: 2000 元，已完成 500 元
 - 玩家轉移 60 元
 - 計算: max(0, (2000 - 500) × (60 / 150)) = max(0, 600) = 600
 - 結果: 主錢包增加 60 元現金，增加 600 lockAmount
 
-**重要**: 轉移的資金仍帶有流水需求（lockAmount），需完成才能提款。
+**重要**: 轉移的資金仍帶有流水要求（lockAmount），需完成才能提款。
 ```
 
 ---

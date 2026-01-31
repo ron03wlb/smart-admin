@@ -258,7 +258,7 @@ Percentage = (Completed / Requirement) × 100%
 | ❌ 錯誤術語 | ✅ 正確術語 | 原因 |
 |-----------|-----------|------|
 | 有效流水 | 有效投注額 (單筆) / 有效投注總額 (累積) | 混淆單筆和累積概念 |
-| 剩餘流水需求 | 剩餘流水要求 | 術語不清晰 |
+| 剩餘流水要求 | 剩餘流水要求 | 術語不清晰 |
 | Effective Turnover | Valid Bet | 混淆 Turnover (累積) 和 Valid Bet (單筆) |
 | RemainingRollover | Remaining Wagering Requirement | 術語不標準 |
 

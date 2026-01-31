@@ -7,7 +7,7 @@
 | **effectiveStake（有效投注）** | 計算玩家是否滿足流水要求的關鍵指標 | `player_wallet.effective_stake` |
 | **lockAmount（鎖定金額）** | 主錢包中無法提款的金額，需透過有效投注解鎖 | `player_wallet.lock_amount`（僅主錢包） |
 | **wagerRequirement（流水要求）** | 優惠錢包需達成的投注流水門檻 | `player_wallet.wager_requirement`（僅促銷錢包） |
-| **turnoverRequired（提款流水需求）** | 玩家需達成的總流水 = 主錢包 lockAmount + Σ(促銷錢包 wagerRequirement - effectiveStake) | 計算值，非資料庫欄位 |
+| **turnoverRequired（提款流水要求）** | 玩家需達成的總流水 = 主錢包 lockAmount + Σ(促銷錢包 wagerRequirement - effectiveStake) | 計算值，非資料庫欄位 |
 | **rebateEffectiveStake（返水有效投注）** | 可參與返水計算的有效投注 | `transaction.rebate_effective_stake` |
 
 ---
@@ -53,7 +53,7 @@ flowchart TD
     subgraph REBATE["返水計算"]
         D1[計算 rebateEffectiveStake] --> D2{是否促銷投注?}
         D2 -->|否| D3["rebateEffectiveStake = effectiveStake"]
-        D2 -->|是| D4[計算剩餘流水需求]
+        D2 -->|是| D4[計算剩餘流水要求]
         D4 --> D5["totalRequirement = Σ(wagerRequirement - effectiveStake) + lockAmount"]
         D5 --> D6["rebateEffectiveStake = max(0, effectiveStake - totalRequirement)"]
     end
@@ -190,7 +190,7 @@ flowchart LR
 
 ### 5.3 促銷錢包轉主錢包時的流水計算
 
-當促銷錢包轉出時，會按比例轉移剩餘流水需求：
+當促銷錢包轉出時，會按比例轉移剩餘流水要求：
 
 ```
 transferWagerRequirement = (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus))
@@ -207,7 +207,7 @@ flowchart TD
     A[投注結算] --> B{isPromotion == true?}
     B -->|否| C["rebateEffectiveStake = effectiveStake"]
     B -->|是| D[取得投注相關錢包]
-    D --> E[計算剩餘流水需求]
+    D --> E[計算剩餘流水要求]
     E --> F["totalRequirement = Σ(wagerRequirement - effectiveStake) + (openSts ? 0 : lockAmount)"]
     F --> G{effectiveStake > totalRequirement?}
     G -->|是| H["rebateEffectiveStake = effectiveStake - totalRequirement"]
@@ -220,7 +220,7 @@ flowchart TD
 |----------|------|----------------------|
 | 非促銷投注 | isPromotion = false | `effectiveStake` |
 | 促銷投注 | 流水已完成 | `effectiveStake` |
-| 促銷投注 | 流水未完成 | `max(0, effectiveStake - 剩餘流水需求)` |
+| 促銷投注 | 流水未完成 | `max(0, effectiveStake - 剩餘流水要求)` |
 
 ### 6.3 程式碼位置
 
@@ -228,7 +228,7 @@ flowchart TD
 
 ---
 
-## 7. 提款流水需求 (turnoverRequired) 計算
+## 7. 提款流水要求 (turnoverRequired) 計算
 
 ### 7.1 計算公式
 
@@ -238,7 +238,7 @@ turnoverRequired = main.lockAmount + Σ(promo.wagerRequirement - promo.effective
 
 其中：
 - `main.lockAmount`：主錢包的鎖定金額
-- `Σ(...)`：所有**開啟中**促銷錢包的剩餘流水需求總和
+- `Σ(...)`：所有**開啟中**促銷錢包的剩餘流水要求總和
 
 ### 7.2 程式碼位置
 
