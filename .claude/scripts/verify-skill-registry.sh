@@ -130,15 +130,22 @@ check_skill_paths_exist() {
     local paths
     paths=$(extract_skill_paths)
 
+    echo "[DEBUG] Captured paths variable, length: ${#paths}" >&2
+    echo "[DEBUG] First 100 chars: ${paths:0:100}" >&2
+    echo "[DEBUG] Line count in paths: $(echo "$paths" | wc -l)" >&2
+
     if [[ -z "$paths" ]]; then
         print_error "No skill paths found in registry"
         return 1
     fi
 
+    echo "[DEBUG] Starting path validation loop..." >&2
+
     local path_count=0
     local missing_paths=()
 
     while IFS= read -r path; do
+        echo "[DEBUG] Processing path: '$path'" >&2
         [[ -z "$path" ]] && continue
         ((TOTAL_CHECKS++))
         ((path_count++))
