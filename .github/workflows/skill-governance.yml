@@ -47,6 +47,21 @@ jobs:
             sudo rm -f /usr/local/bin/yq
           fi
 
+      - name: Debug environment
+        run: |
+          echo "=== Environment Debug ==="
+          echo "Working directory: $(pwd)"
+          echo "yq location: $(command -v yq || echo 'not found')"
+          echo "yq version: $(yq --version 2>&1 || echo 'failed')"
+          echo "Registry file: $(ls -la .claude/skills/skill-registry.yml || echo 'not found')"
+          echo "Script file: $(ls -la .claude/scripts/verify-skill-registry.sh || echo 'not found')"
+          echo ""
+          echo "=== Testing yq extraction ==="
+          yq eval '.skills.*.path' .claude/skills/skill-registry.yml 2>&1 | head -5 || echo "yq failed"
+          echo ""
+          echo "=== Testing grep fallback ==="
+          grep 'path:' .claude/skills/skill-registry.yml | sed 's/.*path: *"\([^"]*\)".*/\1/' | head -5 || echo "grep failed"
+
       - name: Validate skill structures
         run: bash .claude/scripts/verify-skill-registry.sh
 
