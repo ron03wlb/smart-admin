@@ -98,7 +98,7 @@ extract_skill_paths() {
     # Try yq v4 first with validation, fallback to grep if anything fails
     if command -v yq &> /dev/null && yq --version 2>&1 | grep -q "version v4"; then
         local paths_from_yq
-        paths_from_yq=$(yq eval '.skills.*.path' "$REGISTRY_FILE" 2>/dev/null)
+        paths_from_yq=$(yq eval '.skills.*.path' "$REGISTRY_FILE" 2>/dev/null || true)
 
         # Only use yq output if it's not empty
         if [[ -n "$paths_from_yq" ]]; then
@@ -108,7 +108,8 @@ extract_skill_paths() {
     fi
 
     # Fallback: use grep (yq not found, not v4, or failed to extract)
-    grep 'path:' "$REGISTRY_FILE" | sed 's/.*path: *"\([^"]*\)".*/\1/'
+    # Add || true to prevent set -e from exiting if grep finds no matches
+    grep 'path:' "$REGISTRY_FILE" | sed 's/.*path: *"\([^"]*\)".*/\1/' || true
 }
 
 check_skill_paths_exist() {

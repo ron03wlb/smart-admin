@@ -38,6 +38,13 @@
 
 ### 1.1 三層驗證架構 (Three-Layer Validation Architecture)
 
+> **圖表複雜度**: 24 個節點（已使用 subgraph 分組優化）
+> **閱讀建議**: 按數據流順序閱讀（玩家投注 → Layer 1 → Layer 2 → Layer 3 → 應用場景）
+> **關鍵要點**:
+> - Layer 1 風控驗證決定 valid_bet
+> - Layer 2 僅記錄狀態，不修改 valid_bet
+> - Layer 3 應用遊戲權重計算活動貢獻
+
 ```mermaid
 graph TB
     subgraph "玩家投注"
@@ -232,6 +239,14 @@ sequenceDiagram
 ## 3. 詳細流程圖
 
 ### 3.1 流水計算主流程 (Main Turnover Calculation Flow)
+
+> **圖表複雜度**: 26 個節點（已使用 subgraph 分組優化）
+> **閱讀建議**: 按照三層架構順序閱讀（Input → Layer 1 → Layer 2 → Layer 3 → Update）
+> **關鍵決策點**:
+> - Layer 1: 是否對沖/套利/低賠率 → 決定 valid_bet 是否為 0
+> - Layer 2: 注單狀態分支（WIN/LOSS/DRAW/VOID/HALF）→ 僅記錄狀態
+> - Layer 3: 遊戲類型分支（Slots/Baccarat/Blackjack/Roulette）→ 應用對應權重
+> - Update: 流水是否達標 → 決定是否解鎖提款
 
 ```mermaid
 flowchart TD
