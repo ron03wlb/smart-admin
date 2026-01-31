@@ -72,6 +72,29 @@ dependencies {
 }
 
 tasks {
+    // Configure unit tests (CI default) - excludes integration tests
+    test {
+        useJUnitPlatform {
+            excludeTags("integration")
+        }
+    }
+
+    // Configure integration tests - requires Redis and PostgreSQL
+    register<Test>("integrationTest") {
+        description = "Runs integration tests (requires Redis, PostgreSQL via Testcontainers)"
+        group = "verification"
+
+        useJUnitPlatform {
+            includeTags("integration")
+        }
+
+        // Use test profile
+        systemProperty("spring.profiles.active", "test")
+
+        // Run after unit tests
+        shouldRunAfter(test)
+    }
+
     // Configure Spring Boot plugin
     springBoot {
         mainClass.set("net.lab1024.sa.admin.AdminApplication")

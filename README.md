@@ -70,6 +70,12 @@ cd smart-admin-api-java21-springboot3
 # Run backend (http://localhost:1024)
 ./gradlew :sa-admin:bootRun
 
+# Run unit tests (CI default - no Redis required)
+./gradlew :sa-admin:test
+
+# Run integration tests (requires Docker for Redis/PostgreSQL)
+./gradlew :sa-admin:integrationTest
+
 # Run architecture tests
 ./gradlew :sa-admin:test --tests ArchitectureTest
 

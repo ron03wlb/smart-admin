@@ -1,6 +1,7 @@
 package net.lab1024.sa.admin;
 
 import javax.sql.DataSource;
+import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @Transactional // Auto-rollback after each test
+@Tag("integration") // Exclude from default CI test execution
 public abstract class BaseIntegrationTest {
 
   @Autowired protected DataSource dataSource;
