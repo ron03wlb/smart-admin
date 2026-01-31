@@ -1,12 +1,33 @@
 # Skills 遷移備份（v3.0.0）
 
-## 備份資訊
+**⚠️ 備份已遷移至 Git Tags (2026-01-31)**
+
+**新位置**: Git tag `skills-v2.9.0-backup`
+**原因**: 空間優化（釋放 3.2 MB 工作區空間）
+**狀態**: ✅ 已推送至遠程倉庫
+
+**如何使用備份**:
+```bash
+# 查看備份信息
+git show skills-v2.9.0-backup
+
+# 恢復完整備份
+git checkout skills-v2.9.0-backup -- .claude/skills/
+
+# 查看特定文件
+git show skills-v2.9.0-backup:.claude/skills/foundation/backend/archunit-test-generator/SKILL.md
+```
+
+---
+
+## 備份資訊（歷史記錄）
 
 - **備份時間**: 2026-01-30 18:18 CST
+- **遷移至 Git Tag**: 2026-01-31
 - **遷移版本**: v3.0.0 (3 層 → 2 層扁平化)
-- **備份大小**: 3.2MB
-- **備份目錄**: `skills.backup.20260130-181827/`
-- **備份註冊表**: `skill-registry.yml.backup`
+- **備份大小**: 3.2MB (270 個文件)
+- **原備份目錄**: `skills.backup.20260130-181827/` (已刪除)
+- **備份註冊表**: `skill-registry.yml.backup` (已保留)
 
 ## 備份內容
 

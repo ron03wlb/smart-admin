@@ -41,13 +41,32 @@ docs/archive/claude-optimization-2026-01/
 
 ## 歸檔內容摘要
 
-### 1. Skills 遷移備份（3.2MB）
+### 1. Skills 遷移備份（已遷移至 Git Tags）
 
-**路徑**: `skills-migration-backup/`
-**內容**: Skills v3.0.0 遷移前的完整備份
-**文件數**: 完整技能目錄（32 個技能）+ 備份註冊表
+**狀態**: ✅ 已遷移至 Git tag（2026-01-31）
+**Git Tag**: `skills-v2.9.0-backup`
+**原路徑**: `skills-migration-backup/` (已刪除)
+**內容**: Skills v3.0.0 遷移前的完整備份（270 個文件，3.2MB）
 
-**詳細索引**: [skills-migration-backup/INDEX.md](skills-migration-backup/INDEX.md)
+**如何恢復備份**:
+```bash
+# 查看 tag 信息
+git show skills-v2.9.0-backup
+
+# 恢復備份到指定目錄
+git checkout skills-v2.9.0-backup -- .claude/skills/
+
+# 或查看特定文件
+git show skills-v2.9.0-backup:.claude/skills/README.md
+```
+
+**為何遷移至 Git Tags**:
+- ✅ **空間優化**: 釋放 3.2 MB 工作區空間（37% of docs/）
+- ✅ **Git 原生**: 利用版本控制系統原生功能
+- ✅ **永久保存**: Tag 已推送至遠程，永久可訪問
+- ✅ **易於恢復**: 單條命令即可恢復完整備份
+
+**詳細索引**: [skills-migration-backup/INDEX.md](skills-migration-backup/INDEX.md) (歷史記錄保留)
 
 **用途**:
 - 歷史追溯和緊急回滾

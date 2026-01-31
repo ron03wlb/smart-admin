@@ -24,7 +24,6 @@ import net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeVisibleRan
 import net.lab1024.sa.admin.module.business.oa.notice.manager.NoticeManager;
 import net.lab1024.sa.admin.module.system.department.dao.DepartmentDao;
 import net.lab1024.sa.admin.module.system.department.domain.entity.DepartmentEntity;
-import net.lab1024.sa.admin.module.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
 import net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
@@ -202,6 +201,8 @@ public class NoticeService {
 
     if (!updateFormVO.getAllVisibleFlag()) {
       List<NoticeVisibleRangeVO> noticeVisibleRangeList = noticeDao.queryVisibleRange(noticeId);
+
+      // 收集员工ID列表
       List<Long> employeeIdList =
           noticeVisibleRangeList.stream()
               .filter(
@@ -209,6 +210,15 @@ public class NoticeService {
               .map(NoticeVisibleRangeVO::getDataId)
               .collect(Collectors.toList());
 
+      // 收集部门ID列表
+      List<Long> departmentIdList =
+          noticeVisibleRangeList.stream()
+              .filter(
+                  e -> NoticeVisibleRangeDataTypeEnum.DEPARTMENT.getValue().equals(e.getDataType()))
+              .map(NoticeVisibleRangeVO::getDataId)
+              .collect(Collectors.toList());
+
+      // 批量查询员工并构建Map（避免N+1查询）
       Map<Long, EmployeeEntity> employeeMap;
       if (CollectionUtils.isNotEmpty(employeeIdList)) {
         employeeMap =
@@ -217,6 +227,18 @@ public class NoticeService {
       } else {
         employeeMap = Maps.newHashMap();
       }
+
+      // 批量查询部门并构建Map（避免N+1查询）
+      Map<Long, DepartmentEntity> departmentMap;
+      if (CollectionUtils.isNotEmpty(departmentIdList)) {
+        departmentMap =
+            departmentDao.selectBatchIds(departmentIdList).stream()
+                .collect(Collectors.toMap(DepartmentEntity::getDepartmentId, Function.identity()));
+      } else {
+        departmentMap = Maps.newHashMap();
+      }
+
+      // 填充可见范围数据名称
       for (NoticeVisibleRangeVO noticeVisibleRange : noticeVisibleRangeList) {
         if (noticeVisibleRange
             .getDataType()
@@ -225,10 +247,9 @@ public class NoticeService {
           noticeVisibleRange.setDataName(
               employeeEntity == null ? StringConst.EMPTY : employeeEntity.getActualName());
         } else {
-          DepartmentVO departmentVO =
-              departmentDao.selectDepartmentVO(noticeVisibleRange.getDataId());
+          DepartmentEntity departmentEntity = departmentMap.get(noticeVisibleRange.getDataId());
           noticeVisibleRange.setDataName(
-              departmentVO == null ? StringConst.EMPTY : departmentVO.getDepartmentName());
+              departmentEntity == null ? StringConst.EMPTY : departmentEntity.getDepartmentName());
         }
       }
       updateFormVO.setVisibleRangeList(noticeVisibleRangeList);
