@@ -97,19 +97,28 @@ check_registry_yaml_valid() {
 extract_skill_paths() {
     # Try yq v4 first with validation, fallback to grep if anything fails
     if command -v yq &> /dev/null && yq --version 2>&1 | grep -q "version v4"; then
+        echo "[DEBUG] Using yq v4 for extraction" >&2
         local paths_from_yq
         paths_from_yq=$(yq eval '.skills.*.path' "$REGISTRY_FILE" 2>/dev/null || true)
 
         # Only use yq output if it's not empty
         if [[ -n "$paths_from_yq" ]]; then
+            echo "[DEBUG] yq extracted $(echo "$paths_from_yq" | wc -l) paths" >&2
             echo "$paths_from_yq"
             return 0
+        else
+            echo "[DEBUG] yq output was empty, falling back to grep" >&2
         fi
+    else
+        echo "[DEBUG] yq v4 not found, using grep fallback" >&2
     fi
 
     # Fallback: use grep (yq not found, not v4, or failed to extract)
     # Add || true to prevent set -e from exiting if grep finds no matches
-    grep 'path:' "$REGISTRY_FILE" | sed 's/.*path: *"\([^"]*\)".*/\1/' || true
+    local paths_from_grep
+    paths_from_grep=$(grep 'path:' "$REGISTRY_FILE" | sed 's/.*path: *"\([^"]*\)".*/\1/' || true)
+    echo "[DEBUG] grep extracted $(echo "$paths_from_grep" | wc -l) paths" >&2
+    echo "$paths_from_grep"
 }
 
 check_skill_paths_exist() {
