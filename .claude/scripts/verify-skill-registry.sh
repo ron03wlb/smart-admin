@@ -108,6 +108,7 @@ extract_skill_paths() {
         if [[ -n "$paths_from_yq" ]]; then
             echo "[DEBUG] yq extracted $(echo "$paths_from_yq" | wc -l) paths" >&2
             echo "$paths_from_yq"
+            echo "[DEBUG] About to return from extract_skill_paths (yq path)" >&2
             return 0
         else
             echo "[DEBUG] yq output was empty, falling back to grep" >&2
@@ -122,13 +123,16 @@ extract_skill_paths() {
     paths_from_grep=$(grep 'path:' "$REGISTRY_FILE" | sed 's/.*path: *"\([^"]*\)".*/\1/' || true)
     echo "[DEBUG] grep extracted $(echo "$paths_from_grep" | wc -l) paths" >&2
     echo "$paths_from_grep"
+    echo "[DEBUG] About to return from extract_skill_paths (grep path)" >&2
 }
 
 check_skill_paths_exist() {
     print_header "Checking Skill Paths"
 
     local paths
+    echo "[DEBUG] About to call extract_skill_paths..." >&2
     paths=$(extract_skill_paths)
+    echo "[DEBUG] extract_skill_paths returned with exit code: $?" >&2
 
     echo "[DEBUG] Captured paths variable, length: ${#paths}" >&2
     echo "[DEBUG] First 100 chars: ${paths:0:100}" >&2
