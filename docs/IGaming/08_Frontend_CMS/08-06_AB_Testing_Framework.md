@@ -49,7 +49,7 @@ A/B 測試框架用於**數據驅動的產品優化**,通過對比不同版本(�
 
 ### 2.2 自建系統架構
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  Frontend (React/Vue)                                │
 │  - 實驗配置 UI                                       │
@@ -109,7 +109,7 @@ const variant = assignVariant(
     ]
 );
 // Result: 'variant_a' (根據玩家 ID 穩定分配)
-```
+```markdown
 
 **優勢**:
 - ✅ 同一玩家始終分配到同一變體 (體驗一致性)
@@ -127,7 +127,7 @@ Day 3: Control 90%, Variant A 10%
 Day 7: Control 80%, Variant A 20%
 ...
 Day 30: Variant A 100% (全量推送)
-```
+```text
 
 **策略 2: 多變體均等分配**
 ```
@@ -135,13 +135,13 @@ Control: 25%
 Variant A: 25%
 Variant B: 25%
 Variant C: 25%
-```
+```text
 
 **策略 3: 對照組 + 實驗組**
 ```
 Control: 50%
 Variant A: 50%
-```
+```markdown
 
 ---
 
@@ -184,7 +184,7 @@ analytics.track('First Deposit Completed', {
     player_id: '12345',
     deposit_amount: 100
 });
-```
+```text
 
 ---
 
@@ -219,7 +219,7 @@ analytics.track('First Deposit Completed', {
 7. 獲勝變體推全量 (Rollout)
    - 100% 流量
    - 下線對照組
-```
+```text
 
 ---
 
@@ -255,7 +255,7 @@ experiment:
   guardrail_metrics:
     - error_rate
     - page_load_time
-```
+```text
 
 ---
 
@@ -272,7 +272,7 @@ n = 2 × (Z_α/2 + Z_β)² × σ² / δ²
 - Z_β: 統計功效 (β=0.8 → Z=0.84)
 - σ: 標準差
 - δ: 最小可檢測效應 (Minimum Detectable Effect)
-```
+```text
 
 
 ---
@@ -288,13 +288,13 @@ n = 2 × (Z_α/2 + Z_β)² × σ² / δ²
 ```
 IF p_value < 0.05 AND sample_size >= min_sample_size
 THEN stop_experiment()
-```
+```text
 
 **規則 2: 樣本量上限**
 ```
 IF sample_size >= max_sample_size
 THEN stop_experiment()
-```
+```text
 
 **規則 3: 防護指標觸發**
 ```

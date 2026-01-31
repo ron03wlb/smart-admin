@@ -49,7 +49,7 @@
 
 - 解鎖： 當 RemainingRollover <= 0，系統自動觸發資金解鎖，
   將「紅利錢包」餘額轉入「現金錢包」。
-```
+```text
 
 ### 額外發現的問題（第 92-110 行）
 
@@ -62,7 +62,7 @@
 - 有效投注（Valid Bet / Effective Turnover）：
   定義： 經過風險過濾後的投注金額。它代表了玩家「真實承擔風險」的投入。
   用途： 用於計算「流水要求」（Rollover/Wagering Requirements）的達成進度
-```
+```markdown
 
 ---
 
@@ -104,7 +104,7 @@ graph TD
     J --> K{取款時驗證}
     K -->|達標| L[解鎖紅利錢包]
     K -->|未達標| M[拒絕取款]
-```
+```text
 
 **推薦術語標準化**:
 
@@ -125,7 +125,7 @@ graph TD
 ```
 解鎖：當 RemainingRollover <= 0，系統自動觸發資金解鎖，
 將「紅利錢包」餘額轉入「現金錢包」。
-```
+```text
 
 **時序圖**：
 ```mermaid
@@ -146,7 +146,7 @@ sequenceDiagram
     Player->>Wallet: 申請取款
     Wallet->>Player: 餘額不足，無法取款
     Note over Player: 營運商虧損 100 元紅利
-```
+```text
 
 #### 2.2 正確做法：取款時驗證
 
@@ -172,7 +172,7 @@ sequenceDiagram
     Wallet->>Wallet: 解鎖紅利：0 元（已虧損）
     Wallet->>Player: 允許取款：0 元（無餘額）
     Note over Player: 營運商保護成功
-```
+```text
 
 #### 2.3 兩種做法的對比分析
 
@@ -207,13 +207,13 @@ sequenceDiagram
 ```
 Wagering requirement is only cleared when player initiates withdrawal.
 System tracks real-time progress but does NOT auto-unlock bonus funds.
-```
+```text
 
 **Evolution Gaming - Wallet Integration Guide**：
 ```
 Bonus balance remains locked until wagering requirement is met AND
 player requests withdrawal or manual unlock by operator.
-```
+```markdown
 
 **結論**：業界主流營運商（Tier 1）均採用「取款時驗證」模式。
 
@@ -281,7 +281,7 @@ graph TD
 
     H --> N[完成]
     M --> N
-```
+```text
 
 ---
 
@@ -306,7 +306,7 @@ graph LR
     G -.->|玩家查詢| J[展示進度百分比]
     H -.->|回推重算| K[支持規則調整]
     I -.->|異常告警| L[風控預警]
-```
+```text
 
 #### 1.2 實現代碼
 
@@ -357,7 +357,7 @@ sequenceDiagram
         Withdrawal->>Wallet: 執行取款
         Wallet-->>Player: 取款成功
     end
-```
+```text
 
 #### 2.2 實現代碼
 
@@ -463,7 +463,7 @@ metrics:
       - condition: abs(total_difference) > 10000
         severity: warning
         message: "回推重算影響金額過大，需人工複核"
-```
+```text
 
 ---
 
@@ -501,7 +501,7 @@ metrics:
 │ 3. 解鎖紅利錢包                                   │
 │ 4. 執行取款                                       │
 └─────────────────────────────────────────────────┘
-```
+```text
 
 #### 實現代碼
 
@@ -545,7 +545,7 @@ metrics:
 │ 3. 驗證達標                                       │
 │ 4. 執行取款                                       │
 └─────────────────────────────────────────────────┘
-```
+```text
 
 #### 優點
 
@@ -590,7 +590,7 @@ metrics:
 規則調整:
   1. 使用回推機制重算歷史（異步任務）
   2. 不影響當前玩家體驗
-```
+```text
 
 #### Flink 對帳 Job 實現示例
 
@@ -725,7 +725,7 @@ Wagering Requirement Validation:
 - Bonus funds remain locked until requirement is met
 - Validation occurs ONLY when player initiates withdrawal
 - System MUST support recalculation if rules change
-```
+```text
 
 ### Evolution Gaming - Wallet Integration Guide
 
@@ -735,7 +735,7 @@ Bonus Balance Management:
 - Wagering progress updates after each bet settlement
 - Unlock ONLY when: requirement met AND withdrawal requested
 - Operator MUST log all bonus unlock events for audit
-```
+```text
 
 ### 業界最佳實踐總結
 
@@ -766,7 +766,7 @@ When: 玩家申請取款
 Then: 驗證流水達標，解鎖紅利 0 元（已虧損），允許取款現金 0 元
 
 Expected: 玩家無法提取紅利，營運商風險可控
-```
+```text
 
 **測試場景 2: 未達標嘗試取款**
 ```
@@ -778,7 +778,7 @@ When: 玩家申請取款 200 元
 Then: 系統拒絕，提示「活動 XXX 還需完成 500 元有效投注才可取款」
 
 Expected: 保護營運商資金，防止未達標提取
-```
+```text
 
 **測試場景 3: 規則調整後回推**
 ```
@@ -791,7 +791,7 @@ Expected:
 - 新的有效投注總額更新為 4000 元（假設）
 - 生成差異報告供審計
 - 更新玩家的流水要求達成度
-```
+```text
 
 ### 附錄 B: API 接口設計
 
@@ -813,7 +813,7 @@ Response:
     "isCompleted": false
   }
 }
-```
+```text
 
 **取款驗證 API**:
 ```http
@@ -839,7 +839,7 @@ Response (失敗):
   "code": 40001,
   "message": "以下活動的流水要求未達標：\n- 存100送100：還需 350 元有效投注（已完成 650/1000）"
 }
-```
+```text
 
 **回推重算 API**:
 ```http

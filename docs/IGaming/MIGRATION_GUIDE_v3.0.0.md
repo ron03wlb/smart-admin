@@ -23,7 +23,7 @@ iGame 文檔從 v2.0.0 遷移至 v3.0.0，核心變更為：
 ### 1. Seamless Wallet 路徑變更
 
 **舊路徑** → **新路徑**：
-```
+```text
 docs/IGaming/seamless_wallet_analysis/
   ↓
 docs/IGaming/02_Finance_Center/seamless-wallet/
@@ -136,7 +136,7 @@ docs/IGaming/02_Finance_Center/seamless-wallet/
 
 ### 延伸閱讀
 - [Seamless Wallet 專題](./seamless-wallet/00_INDEX.md)
-```
+```markdown
 
 **格式統一**：
 - 所有交叉引用使用 `## 📚 相關文檔` emoji 格式
@@ -152,7 +152,7 @@ docs/IGaming/02_Finance_Center/seamless-wallet/
 **路徑映射**：
 ```
 seamless_wallet_analysis/ → 02_Finance_Center/seamless-wallet/
-```
+```markdown
 
 **文件名映射**：
 - 所有專題文件名已更新為簡化版本
@@ -205,12 +205,12 @@ seamless_wallet_analysis/ → 02_Finance_Center/seamless-wallet/
 **舊鏈接**：
 ```
 docs/IGaming/seamless_wallet_analysis/01_token_verification_decision_tree.md
-```
+```text
 
 **新鏈接**：
 ```
 docs/IGaming/02_Finance_Center/seamless-wallet/01_token_verification.md
-```
+```text
 
 #### 2. 更新自動化腳本
 
@@ -222,7 +222,7 @@ SEAMLESS_WALLET_DIR="docs/IGaming/seamless_wallet_analysis"
 
 # 新路徑
 SEAMLESS_WALLET_DIR="docs/IGaming/02_Finance_Center/seamless-wallet"
-```
+```text
 
 #### 3. 查找歸檔文件
 
@@ -234,7 +234,7 @@ cat docs/IGaming/archive/INDEX.md
 
 # 查看具體文件
 cat docs/IGaming/archive/audit-reports/DOCUMENTATION_AUDIT_REPORT.md
-```
+```text
 
 #### 4. 使用新導航系統
 
@@ -260,7 +260,7 @@ cat docs/IGaming/archive/audit-reports/DOCUMENTATION_AUDIT_REPORT.md
 # 使用技能（路徑已自動更新）
 /igaming-multi-tenant-wallet-pm generate-wallet-api \
   --tenant-isolation database-per-tenant
-```
+```text
 
 **技能會自動讀取**：
 - `docs/IGaming/02_Finance_Center/seamless-wallet/` 下的 13 個專題
@@ -279,7 +279,7 @@ git log --follow docs/IGaming/02_Finance_Center/seamless-wallet/01_token_verific
 
 # 查看原始文件（Phase 2 之前）
 git show 27b77105~1:docs/IGaming/seamless_wallet_analysis/01_token_verification_decision_tree.md
-```
+```text
 
 **歸檔文件**：
 ```bash
@@ -288,7 +288,7 @@ git log --follow docs/IGaming/archive/analysis/seamless_wallet.md
 
 # 查看原始位置（Phase 1 之前）
 git show c55917b8~1:docs/IGaming/seamless_wallet.md
-```
+```text
 
 ---
 
@@ -301,7 +301,7 @@ git show c55917b8~1:docs/IGaming/seamless_wallet.md
 ls -1 docs/IGaming/02_Finance_Center/seamless-wallet/
 
 # 預期輸出：14 個 .md 文件（00_INDEX.md ~ 99_SUMMARY.md）
-```
+```text
 
 ### 2. 檢查歸檔文件
 
@@ -312,7 +312,7 @@ cat docs/IGaming/archive/INDEX.md
 # 驗證歸檔文件存在
 ls -1 docs/IGaming/archive/audit-reports/
 ls -1 docs/IGaming/archive/analysis/
-```
+```text
 
 ### 3. 檢查代碼清理
 
@@ -321,7 +321,7 @@ ls -1 docs/IGaming/archive/analysis/
 grep -r '```java$' docs/IGaming/ --include="*.md" --exclude-dir=archive | wc -l
 grep -r '```python$' docs/IGaming/ --include="*.md" --exclude-dir=archive | wc -l
 grep -r '```sql$' docs/IGaming/ --include="*.md" --exclude-dir=archive | wc -l
-```
+```text
 
 ### 4. 檢查交叉引用
 
@@ -332,7 +332,7 @@ total=$(find docs/IGaming/ -name "*.md" -not -path "*/archive/*" -not -name "*RE
 echo "覆蓋率: $refs / $total"
 
 # 預期：68 / 71 (95.7%)
-```
+```markdown
 
 ---
 
@@ -363,7 +363,7 @@ echo "覆蓋率: $refs / $total"
        ├── 00_INDEX.md (導航中心) ⭐
        ├── 01-13 (13 個專題)
        └── 99_SUMMARY.md
-   ```
+   ```text
 
 2. **使用 P0/P1 分類**：
    - 開啟 `00_INDEX.md`
@@ -381,12 +381,12 @@ echo "覆蓋率: $refs / $total"
 **舊路徑**（已失效）：
 ```
 docs/IGaming/seamless_wallet_analysis/01_token_verification_decision_tree.md
-```
+```text
 
 **新路徑**（正確）：
 ```
 docs/IGaming/02_Finance_Center/seamless-wallet/01_token_verification.md
-```
+```text
 
 **建議**：使用相對路徑或從 `00_INDEX.md` 導航。
 
@@ -403,7 +403,7 @@ cat docs/IGaming/archive/INDEX.md
 # 查看具體審計報告
 cat docs/IGaming/archive/audit-reports/DOCUMENTATION_AUDIT_REPORT.md
 cat docs/IGaming/archive/audit-reports/FINAL_DOCUMENTATION_REVIEW_REPORT.md
-```
+```text
 
 ---
 
@@ -417,7 +417,7 @@ cat docs/IGaming/archive/audit-reports/FINAL_DOCUMENTATION_REVIEW_REPORT.md
 cat .claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/wallet-patterns.md
 
 # 確認路徑為：docs/IGaming/02_Finance_Center/seamless-wallet/
-```
+```text
 
 ---
 

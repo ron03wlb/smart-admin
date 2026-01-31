@@ -38,7 +38,7 @@
 ### 4.1 權限繼承規則
 
 **向下繼承（Top-Down Inheritance）**：
-```
+```text
 Super Admin
   ├─ 可管理所有 Brand
   │   └─ 每個 Brand Admin 可管理其下所有 Tenant
@@ -92,7 +92,7 @@ Super Admin
     <button onclick="stopImpersonation()">退出模擬</button>
 </div>
 {% endif %}
-```
+```markdown
 
 ### 6.2 集團通帳（Brand-Wide SSO）
 

@@ -75,7 +75,7 @@ Transaction API 需區分獎金類型：
   "jackpot_type": "NETWORK", // 或 LOCAL
   "currency": "USD"
 }
-```
+```markdown
 
 ### 6.3 處理流程
 1. **識別 Jackpot**：收到 `is_jackpot: true`。

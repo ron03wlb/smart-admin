@@ -99,7 +99,7 @@ requests.post(
         }
     }
 )
-```
+```text
 
 ---
 
@@ -152,7 +152,7 @@ messaging.requestPermission()
     });
   });
 </script>
-```
+```text
 
 ---
 
@@ -188,7 +188,7 @@ Vault Secrets Engine:
 │
 └─ secret/email/sendgrid
    └─ api_key: "SG.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-```
+```text
 
 
 ---
@@ -229,7 +229,7 @@ resource "random_password" "nuvei_secret" {
     rotation_timestamp = timestamp()
   }
 }
-```
+```text
 
 ---
 
@@ -261,7 +261,7 @@ resource "random_password" "nuvei_secret" {
 │  Email: SendGrid     ✅ 100% 可用     P99: 0.5s  │
 │  GP: Pragmatic Play  ⚠️ 95.2% 可用    P99: 2.8s  │
 └──────────────────────────────────────────────────┘
-```
+```text
 
 
 ---

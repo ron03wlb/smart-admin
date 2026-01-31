@@ -121,7 +121,7 @@ stateDiagram-v2
         2. 第二次: 最後通知 (寬限期)
         3. 第三次: 正式降級 (附補償)
     end note
-```
+```yaml
 
 **VIP 等級轉換觸發條件矩陣**：
 
@@ -281,7 +281,7 @@ graph TD
     style COMPARISON fill:#E8F5E9
     style ROI_TABLE fill:#FFF9C4
     style VALUE_PROP fill:#E1BEE7
-```
+```yaml
 
 **權益價值量化分析表**：
 
@@ -365,9 +365,9 @@ graph TD
 ### 2.5 積分計算規則詳解
 
 **積分獲取公式**：
-```
+```text
 積分 = 有效投注額 × 遊戲權重 × VIP等級倍數
-```
+```yaml
 
 **遊戲權重表**：
 | 遊戲類型 | 權重 | 說明 |
@@ -510,7 +510,7 @@ flowchart LR
     %% Wiring End Points for Clean Layout
     REJECT_FROZEN & REJECT_GAME & REJECT_BONUS & REJECT_TURNOVER -.-> END_EARN
     REJECT_INSUFFICIENT & REJECT_STOCK & REJECT_QUOTA -.-> END_REDEEM
-```
+```text
 
 **積分計算公式拆解**：
 
@@ -585,7 +585,7 @@ flowchart LR
 IF 上月存款 >= $1,000 OR 上月流水 >= $10,000
 THEN 保持Gold等級
 ELSE 降級至Silver等級
-```
+```markdown
 
 **降級保護（Grace Period）**：
 - **首次未達標**: 發送警告郵件，暫不降級（保護期1個月）
@@ -645,7 +645,7 @@ ELSE 降級至Silver等級
    - 定時生效（次日 00:00 UTC）
    ↓
 5. 自動通知受影響玩家
-```
+```markdown
 
 **變更影響試算範例**：
 

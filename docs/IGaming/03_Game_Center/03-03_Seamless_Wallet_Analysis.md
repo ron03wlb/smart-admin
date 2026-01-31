@@ -87,7 +87,7 @@ stateDiagram-v2
         - Round Amount < $1000: MEDIUM Priority
         - SLA: 24 hours response
     end note
-```
+```sql
 
 **Round 狀態轉換關鍵邏輯**：
 
@@ -250,7 +250,7 @@ sequenceDiagram
     style Platform fill:#E6E6FA
     style Redis fill:#FFE4B5
     style DB fill:#ADD8E6
-```
+```sql
 
 **冪等性關鍵設計**：
 
@@ -323,7 +323,7 @@ flowchart TD
     style SUCCESS1 fill:#90EE90
     style SUCCESS2 fill:#90EE90
     style REVIEW fill:#DDA0DD
-```
+```text
 
 **策略比較與推薦**：
 
@@ -402,7 +402,7 @@ flowchart TD
     style EXECUTE_S1 fill:#E0E0E0
     style NOTIFY_OPS fill:#FFA07A
     style NOTIFY_RECOVERY fill:#98FB98
-```
+```text
 
 **策略切換實現**:
 
@@ -429,7 +429,7 @@ alerts:
     annotations:
       summary: "⚠️ Out-of-Order 進入緊急模式 (Strategy 2 - Orphan Win)"
       description: "GP 重試率過低,允許孤兒 Win,需立即人工介入"
-```
+```markdown
 
 **實施建議**:
 1. **預設策略**: Strategy 3 (Pending Queue)
@@ -556,7 +556,7 @@ flowchart TD
     style WIN_SUCCESS fill:#C8E6C9
     style ROLLBACK_SUCCESS fill:#C8E6C9
     style ADJUST_SUCCESS fill:#C8E6C9
-```
+```text
 
 **場景優先級矩陣**：
 
@@ -643,7 +643,7 @@ groups:
           severity: critical
         annotations:
           summary: "1 小時內 Jackpot 觸發 > 5 次，疑似遊戲邏輯異常或欺詐"
-```
+```text
 
 **關鍵實作要點**：
 
@@ -726,7 +726,7 @@ groups:
         "wallet_priority": ["BONUS_WALLET", "CASH_WALLET"], // 覆蓋預設
         "use_system_default": false  // 明確標記覆蓋
       }
-      ```
+      ```text
     - **執行流程**：
       1.  收到 Bet 請求。
       2.  檢查 `game_config.wallet_priority` 是否存在。
@@ -753,7 +753,7 @@ groups:
       }
       
       NegativeLocked --> Normal : Manual Deposit / Debt Cleared (Admin Unlock)
-  ```
+  ```sql
 - **處置細節**：
     - **帳號狀態**：立即變更為 `LOCKED` 或 `SUSPENDED`，阻止任何新的登入、投注或提款。
     - **通知**：發送高優先級 Alert 至風控後台。
@@ -828,7 +828,7 @@ flowchart TD
     SaveTx --> CacheRes["Cache Response to Redis"]
 
     CacheRes --> Resp["Return API Response"]
-```
+```java
 
 ---
 
@@ -870,7 +870,7 @@ SmartAdmin 採用嚴格的五層架構,確保無縫錢包對接邏輯職責清�
 
 #### 依賴規則 (ArchitectureTest 強制)
 
-```
+```text
 Controller → Service (✅ 允許)
 Service → Dao      (✅ 允許,查詢冪等性記錄)
 Service → Manager  (✅ 允許,需要 @Transactional 時)

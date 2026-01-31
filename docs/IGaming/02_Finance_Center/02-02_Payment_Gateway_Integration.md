@@ -191,7 +191,7 @@ sequenceDiagram
     style WalletService fill:#90EE90
     style PSP Router fill:#FFE4B5
     style Redis fill:#FFD93D
-```
+```text
 
 **充值流程關鍵設計要點**：
 
@@ -221,7 +221,7 @@ Layer 2: HMAC 簽名驗證
 Layer 3: 時間戳驗證 (防重放攻擊)
   ├─ NOW() - request_timestamp < 5 minutes
   └─ Expired → 400 Bad Request
-```
+```sql
 
 **冪等性保護機制**：
 
@@ -259,7 +259,7 @@ Layer 3: 時間戳驗證 (防重放攻擊)
 ### 4.1 Nuvei (Formerly SafeCharge) 對接
 
 **API 端點**：
-```
+```text
 Production: https://ppp.nuvei.com/ppp/api/v1/payment.do
 Sandbox: https://ppp-test.nuvei.com/ppp/api/v1/payment.do
 ```
@@ -277,7 +277,7 @@ POST /ppp/api/v1/payment.do
   "timeStamp": "2026-01-27 10:30:00",
   "checksum": "e7f8a1b2c3d4e5f6..."  // SHA256(merchantId + merchantSiteId + clientRequestId + amount + currency + timeStamp + secret)
 }
-```
+```markdown
 
 **Callback 處理**：
 
@@ -310,7 +310,7 @@ POST /pal/servlet/Payout/v68/payout
     "holderName": "John Doe"
   }
 }
-```
+```text
 
 ---
 
@@ -364,7 +364,7 @@ flowchart LR
     style ROUTE fill:#90EE90
     style FALLBACK fill:#FFD93D
     style DECISION fill:#FFD700
-```
+```markdown
 
 **主流程關鍵步驟**：
 - **Step 1**: 地理位置與支付方式過濾（減少候選 PSP 數量）
@@ -429,7 +429,7 @@ flowchart TD
     style DEGRADED fill:#FFD93D
     style UNAVAILABLE fill:#FFB6C1
     style CRYPTO fill:#DDA0DD
-```
+```markdown
 
 **過濾策略說明**：
 - **地理優先**：優先使用本地 PSP（降低跨境費率、提升成功率）
@@ -526,7 +526,7 @@ flowchart TD
     style EXAMPLE fill:#E6E6FA
     style ROUTE fill:#90EE90
     style RETRY fill:#FFD93D
-```
+```text
 
 **評分權重說明**：
 - **成功率 (50%)**：最重要指標，直接影響玩家體驗與平台損失
@@ -583,7 +583,7 @@ Stripe:
   VIP Bonus: No → 0
   Currency Match: USD → +3
   Total Score: 88.38
-```
+```text
 
 **故障轉移決策表**：
 
@@ -644,7 +644,7 @@ Primary PSP: Nuvei (Status: Unavailable)
 Backup PSP: Adyen (Status: Healthy)
     ↓ 如果也失敗
 Fallback PSP: Manual Bank Transfer（通知財務團隊）
-```
+```sql
 
 **恢復檢測**：
 - 每 10 分鐘測試一次已降級的 PSP
@@ -766,7 +766,7 @@ flowchart TD
     style PATH_NOT_FOUND fill:#FF6B6B
     style PATH_ERROR fill:#DDA0DD
     style SUMMARY fill:#E6E6FA
-```
+```markdown
 
 **對帳主流程關鍵節點**：
 - **觸發頻率**：每 15 分鐘掃描 Pending > 30 分鐘的訂單
@@ -832,7 +832,7 @@ flowchart TD
     style COMMIT fill:#ADD8E6
     style ROLLBACK fill:#FFD93D
     style ROLLBACK2 fill:#FFD93D
-```
+```markdown
 
 **自動補單關鍵設計**：
 - **冪等性保證**：通過 `補單_flag` 欄位防止重複加錢
@@ -907,7 +907,7 @@ flowchart TD
     style REJECT2 fill:#FFB6C1
     style ERROR fill:#FF6B6B
     style AUDIT fill:#E6E6FA
-```
+```text
 
 **人工審核關鍵流程**：
 - **嚴重性分級**：$1000 以上觸發 CRITICAL 告警（通知 CTO）
@@ -952,7 +952,7 @@ Layer 2: 資料庫狀態檢查
 Layer 3: Wallet Service 冪等性
   ├─ 使用 transaction_id 作為 ref_id
   └─ 若已存在相同 ref_id 的入帳記錄，拒絕重複入帳
-```
+```text
 
 **手動補單審批規則**：
 
@@ -1000,7 +1000,7 @@ Alerts:
 Action Required:
 - Review 5 manual review cases (Assigned: CS Team)
 - Investigate txn_20260127_045 (2.5h delay)
-```
+```markdown
 
 ---
 
@@ -1024,7 +1024,7 @@ Action Required:
    - 拒絕：返回修訂
    ↓
 4. 生效後自動通知運營團隊
-```
+```text
 
 ---
 
@@ -1045,7 +1045,7 @@ Authorization: Bearer <player_jwt_token>
   "psp_code": "nuvei",  // 可選：指定 PSP，否則自動路由
   "return_url": "https://platform.com/deposit/callback"
 }
-```
+```text
 
 **響應格式**：
 ```json

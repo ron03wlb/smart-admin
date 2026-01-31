@@ -80,7 +80,7 @@
     "auto_enable_bonus_on_deposit": true
   }
 }
-```
+```markdown
 
 ### 4.2 配置驗證規則
 
@@ -119,7 +119,7 @@
      ↓ 訂閱 Redis 'config:update' 事件
      ↓ 刷新本地快取 (Caffeine Cache)
      ↓ 生效時間：< 5 秒
-```
+```markdown
 
 ### 5.2 配置優先級
 
@@ -167,7 +167,7 @@ Response (200 OK):
     }
   }
 }
-```
+```text
 
 ### 6.2 更新配置 API
 
@@ -190,7 +190,7 @@ Response (200 OK):
     "updated_at": "2026-01-27T10:30:00Z"
   }
 }
-```
+```markdown
 
 ---
 

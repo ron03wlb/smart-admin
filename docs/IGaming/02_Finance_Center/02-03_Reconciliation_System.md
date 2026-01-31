@@ -95,7 +95,7 @@ sequenceDiagram
     FinanceTeam->>Platform: 19️⃣ 人工審核差異訂單<br/>處理流程:<br/>• 長款 → 補單入帳<br/>• 短款 → 回滾餘額 + 風控調查<br/>• 金額不符 → 聯繫 PSP 確認
 
     FinanceTeam->>Platform: 20️⃣ 提交調帳申請<br/>上傳佐證文件 → 財務主管審批
-```
+```text
 
 **三層對帳特性對比表**：
 
@@ -191,13 +191,13 @@ sequenceDiagram
 ```
 檢查 PSP 交易 ID → 查詢是否為測試交易
 若是測試環境數據誤入生產 → 忽略
-```
+```text
 
 **Step 2: 查詢玩家帳戶**
 ```
 根據 PSP 報表中的 player_email/phone 查找玩家
 若找到玩家 → 檢查是否有相同金額的 Pending 訂單
-```
+```text
 
 **Step 3: 補單操作**
 
@@ -212,7 +212,7 @@ sequenceDiagram
 1. 檢查 PSP Callback 日誌（IP、時間戳、簽名）
 2. 聯繫 PSP 客服確認是否收到款項
 3. 若 PSP 確認未收款 → 回滾玩家餘額
-```
+```text
 
 **Step 3: 回滾操作**
 
@@ -370,7 +370,7 @@ flowchart TD
     style FREEZE_ACCOUNT fill:#FF6B6B
     style ROLLBACK_FRAUD fill:#FF6B6B
     style REPORT_TO_POLICE fill:#B71C1C,color:#FFF
-```
+```markdown
 
 **異常處理分級矩陣表**：
 
@@ -432,7 +432,7 @@ flowchart TD
 交易日期,交易時間,對方帳號,對方戶名,交易金額,幣種,交易類型,備註
 2026-01-26,10:30:15,62170000012345,張三,1000.00,CNY,轉入,存款
 2026-01-26,14:22:33,62170000067890,李四,5000.00,CNY,轉出,提款
-```
+```text
 
 **解析器實現**：
 

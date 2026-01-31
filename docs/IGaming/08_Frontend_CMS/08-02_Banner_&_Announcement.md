@@ -60,7 +60,7 @@ function getBannerImage(banner: Banner, userLanguage: string): string {
     // 3. 最後回退到簡體中文版本（平台默認語言）
     return banner.images['zh-CN'] || banner.default_image;
 }
-```
+```text
 
 **多語系數據結構**：
 ```json
@@ -82,7 +82,7 @@ function getBannerImage(banner: Banner, userLanguage: string): string {
         "vi-VN": "/vi/khuyen-mai/nam-moi"
     }
 }
-```
+```text
 
 ---
 
@@ -127,7 +127,7 @@ const visibleBanners = allBanners.filter(banner => {
     if (banner.device_target === 'mobile' && !isMobile) return false;
     return true;
 });
-```
+```markdown
 
 ---
 
@@ -201,7 +201,7 @@ const visibleBanners = allBanners.filter(banner => {
     "start_time": "2026-01-27T00:00:00Z",
     "end_time": "2026-02-03T23:59:59Z"
 }
-```
+```text
 
 **流量分配演算法**：
 
@@ -218,7 +218,7 @@ const visibleBanners = allBanners.filter(banner => {
 2. 自動觸發 Lambda → 生成多種尺寸 (1920x600, 750x400, 600x600)
 3. 轉換為 WebP 格式（壓縮率更高）
 4. 推送至 CDN → https://cdn.platform.com/banners/{banner_id}_{size}.webp
-```
+```text
 
 **CDN URL 規範**：
 ```
@@ -229,7 +229,7 @@ CDN URL:
 - 彈窗: https://cdn.platform.com/banners/banner_001_zh-CN_600x600_v2.webp
 
 版本號 (v2): 用於緩存失效（更新圖片時遞增）
-```
+```text
 
 ---
 
@@ -262,7 +262,7 @@ CDN URL:
         alt="新年優惠活動"
         loading="lazy">
 </picture>
-```
+```text
 
 ---
 
@@ -282,7 +282,7 @@ location /banners/ {
     gzip on;
     gzip_types image/webp image/jpeg image/png;
 }
-```
+```text
 
 **緩存失效 (Cache Invalidation)**：
 
@@ -306,7 +306,7 @@ cwebp -q 80 input.png -o output.webp
 
 # 使用 ImageMagick 批量調整尺寸
 convert input.png -resize 1920x600 -quality 85 output.jpg
-```
+```text
 
 ---
 

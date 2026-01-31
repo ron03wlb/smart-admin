@@ -32,7 +32,7 @@
   "ar": "نص عربي",
   "fallback": "Default text if language not found"
 }
-```
+```markdown
 
 **必填字段**：
 - `en`（英文）作為預設回退語言
@@ -95,7 +95,7 @@ Response:
     }
   ]
 }
-```
+```text
 
 **Option B：多語言響應**（推薦用於 CMS 後台）
 ```json
@@ -121,7 +121,7 @@ Response:
     "end_time": "2026-12-31T23:59:59Z"
   }
 }
-```
+```text
 
 ---
 
@@ -171,7 +171,7 @@ Response:
 
   <button type="submit">Save Promotion</button>
 </form>
-```
+```text
 
 ### 4.2 CMS 後端保存邏輯
 
@@ -191,7 +191,7 @@ Response:
 │ 橫幅（10筆） │ 100%       │ 無           │
 │ FAQ（50筆）  │ 76% (38/50)│ 12筆缺越南文 │
 └──────────────┴────────────┴──────────────┘
-```
+```text
 
 ---
 
@@ -223,7 +223,7 @@ Response:
   ├── new_year_promo_zh-TW.jpg   // 繁體中文版橫幅
   ├── new_year_promo_th.jpg      // 泰文版橫幅
   └── new_year_promo_default.jpg // 預設回退圖片
-```
+```markdown
 
 ### 6.2 CDN URL 動態組合
 
@@ -262,7 +262,7 @@ function PromotionCard({ promotion }) {
     </div>
   );
 }
-```
+```text
 
 ### 7.2 Vue 組件範例
 

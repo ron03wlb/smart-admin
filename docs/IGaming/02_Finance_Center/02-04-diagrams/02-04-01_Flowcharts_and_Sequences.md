@@ -114,7 +114,7 @@ graph TB
     style U fill:#f8d7da
     style V fill:#f8d7da
     style W fill:#f8d7da
-```
+```text
 
 ---
 
@@ -225,7 +225,7 @@ sequenceDiagram
     end
 
     Platform->>DB: 33. 記錄審計日誌<br/>AuditLog.create({<br/>action: "TURNOVER_CALCULATED",<br/>details: {...}<br/>})
-```
+```text
 
 ---
 
@@ -333,7 +333,7 @@ flowchart TD
     style R fill:#d1ecf1
     style W fill:#d4edda
     style X fill:#fff3cd
-```
+```text
 
 ---
 
@@ -378,7 +378,7 @@ flowchart TD
     style F fill:#f8d7da
     style H fill:#f8d7da
     style I fill:#d4edda
-```
+```text
 
 ### 4.2 賠率閾值檢測 (Odds Threshold Check)
 
@@ -414,7 +414,7 @@ flowchart TD
     style E fill:#d4edda
     style F fill:#f8d7da
     style G fill:#f8d7da
-```
+```text
 
 ---
 
@@ -481,7 +481,7 @@ flowchart TD
     style J fill:#fff3cd
     style L fill:#fff3cd
     style N fill:#fff3cd
-```
+```text
 
 ### 5.2 結算狀態與 Valid Bet 關係對照表
 
@@ -544,7 +544,7 @@ graph LR
     style B7 fill:#d4edda
     style B8 fill:#d4edda
     style B9 fill:#fff3cd
-```
+```text
 
 ---
 
@@ -635,7 +635,7 @@ flowchart TD
     style P fill:#fff3cd
     style V fill:#d4edda
     style W fill:#d4edda
-```
+```text
 
 ### 6.2 遊戲權重配置表
 
@@ -668,7 +668,7 @@ graph TD
     style C1 fill:#f8d7da
     style C2 fill:#f8d7da
     style C3 fill:#f8d7da
-```
+```text
 
 ---
 
@@ -757,7 +757,7 @@ stateDiagram-v2
 
     TO_Yes --> [*]
     TO_No --> [*]
-```
+```markdown
 
 ---
 
@@ -824,7 +824,7 @@ graph TB
     style C3 fill:#d4edda
     style D3 fill:#d1ecf1
     style E2 fill:#f8d7da
-```
+```markdown
 
 **結論**:
 - ✅ 風控驗證通過
@@ -893,7 +893,7 @@ graph TB
     style C3 fill:#d4edda
     style D3 fill:#d4edda
     style E3 fill:#d1ecf1
-```
+```markdown
 
 **對比分析**:
 
@@ -978,7 +978,7 @@ graph TB
     style C2 fill:#f8d7da
     style D2 fill:#f8d7da
     style E3 fill:#f8d7da
-```
+```markdown
 
 
 **結論**:
@@ -1011,7 +1011,7 @@ Layer 1 (風控引擎): 一次性判定 valid_bet
 Layer 2 (財務中心): 僅記錄結算狀態,不修改 valid_bet
   ├─ settlement_status = "WIN/LOSS/HALF_WIN/HALF_LOSS/DRAW"
   └─ payout_amount = calculatePayout(bet, status)
-```
+```text
 
 #### 9.2.2 違反公平性原則 (Error #3 - 實際風險法)
 
@@ -1025,7 +1025,7 @@ Layer 2 (財務中心): 僅記錄結算狀態,不修改 valid_bet
 - 相同的投注行為
 - 相同的風險暴露 (100 元)
 - 但 valid_bet 不同 → 違反公平性原則
-```
+```text
 
 **正確做法 (標準本金法 - 業界標準)**:
 ```
@@ -1036,7 +1036,7 @@ Layer 2 (財務中心): 僅記錄結算狀態,不修改 valid_bet
 - 玩家下注時承擔的風險都是 100 元
 - Valid Bet 應該反映投注行為,而非結算結果
 - 簡化計算,不需要等結算才知道 valid_bet
-```
+```text
 
 #### 9.2.3 業界標準對照
 
@@ -1077,7 +1077,7 @@ graph LR
 
     style F fill:#d4edda
     style A fill:#fff3cd
-```
+```yaml
 
 ### 9.4 實施建議
 
@@ -1141,7 +1141,7 @@ graph LR
     }
   ]
 }
-```
+```text
 
 #### 10.2.4 calculation_version (計算版本)
 

@@ -68,7 +68,7 @@ flowchart TD
 
     DEPOSIT --> BET --> SETTLE --> REBATE
     SETTLE --> WITHDRAW
-```
+```text
 
 ---
 
@@ -93,7 +93,7 @@ sequenceDiagram
     WT->>WT: this.effectiveStake += effectiveStake
     WT->>WT: this.addedLockAmount -= effectiveStake
     GS->>DB: updateWallets()
-```
+```text
 
 ### 3.2 各遊戲類型計算公式
 
@@ -138,7 +138,7 @@ stateDiagram-v2
         每次結算減少
         lockAmount = max(0, lockAmount - effectiveStake)
     end note
-```
+```text
 
 ### 4.2 lockAmount 變化時機
 
@@ -180,13 +180,13 @@ flowchart LR
 
     M3 -.->|"主錢包用 lockAmount 控制流水"| M4
     P3 -.->|"促銷錢包用 wagerRequirement 控制流水"| P4
-```
+```text
 
 ### 5.2 促銷錢包流水達成判斷
 
 ```
 促銷錢包流水達成 = (effectiveStake >= wagerRequirement)
-```
+```text
 
 ### 5.3 促銷錢包轉主錢包時的流水計算
 
@@ -194,7 +194,7 @@ flowchart LR
 
 ```
 transferWagerRequirement = (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus))
-```
+```text
 
 ---
 
@@ -212,7 +212,7 @@ flowchart TD
     F --> G{effectiveStake > totalRequirement?}
     G -->|是| H["rebateEffectiveStake = effectiveStake - totalRequirement"]
     G -->|否| I["rebateEffectiveStake = 0"]
-```
+```text
 
 ### 6.2 關鍵邏輯
 
@@ -234,7 +234,7 @@ flowchart TD
 
 ```
 turnoverRequired = main.lockAmount + Σ(promo.wagerRequirement - promo.effectiveStake)
-```
+```text
 
 其中：
 - `main.lockAmount`：主錢包的鎖定金額

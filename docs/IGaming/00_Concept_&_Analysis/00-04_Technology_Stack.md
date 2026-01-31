@@ -45,7 +45,7 @@
 
 ### 3. 選型決策流程
 
-```
+```text
 1. 需求分析 → 2. 候選技術調研 → 3. POC驗證 → 4. 評分決策 → 5. 架構評審 → 6. 試點上線
 ```
 
@@ -55,7 +55,7 @@
 
 ### 技術架構全景圖
 
-```
+```text
 ┌────────────────────────────────────────────────────────┐
 │                   Frontend Layer                        │
 │   Web: React 18 + TypeScript + Vite                   │
@@ -126,7 +126,7 @@ API文檔: SpringDoc OpenAPI 2.3
 驗證: Jakarta Validation 3.0
 定時任務: Spring Scheduler + Quartz 2.3
 分佈式鎖: Redisson 3.26
-```
+```yaml
 
 **選型理由**：
 - ✅ 生態成熟、社區活躍、人才充足
@@ -163,7 +163,7 @@ ORM: Prisma 5.8 (推薦) / TypeORM 0.3
 消息隊列: kafkajs 2.2
 驗證: zod 3.22 / joi 17.12
 測試: Vitest 1.2 + Supertest 6.3
-```
+```yaml
 
 **選型理由**：
 - ✅ 單線程非阻塞I/O，適合高並發
@@ -195,7 +195,7 @@ ORM: GORM 1.25 + sqlx 1.3
 配置: Viper 1.18
 日誌: zap 1.26 + lumberjack 2.2
 測試: testify 1.8
-```
+```markdown
 
 **選型理由**：
 - ✅ 編譯型語言、原生並發（goroutine）
@@ -229,7 +229,7 @@ ML框架:
 數據處理: pandas 2.2 + NumPy 1.26
 ORM: SQLAlchemy 2.0
 緩存: redis-py 5.0
-```
+```markdown
 
 **選型理由**：
 - ✅ ML/AI生態最成熟
@@ -251,7 +251,7 @@ ORM: SQLAlchemy 2.0
 負載均衡: Spring Cloud LoadBalancer
 熔斷限流: Resilience4j 2.2
 鏈路追蹤: Micrometer Tracing + Zipkin 2.24
-```
+```sql
 
 **vs Kubernetes Service Mesh**：
 | 維度 | Spring Cloud | Istio Service Mesh |
@@ -287,7 +287,7 @@ ORM: SQLAlchemy 2.0
   "timestamp": "2026-01-27T10:00:00Z",
   "trace_id": "abc-123-def"
 }
-```
+```yaml
 
 **詳細規範**：參見 [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md)
 
@@ -331,7 +331,7 @@ UI庫:
 請求: TanStack Query 5.17 (React Query) + Axios 1.6
 SSR框架: Next.js 14.1 (SEO友好)
 測試: Vitest 1.2 + React Testing Library 14.1
-```
+```markdown
 
 **選型理由**：
 - ✅ 生態最成熟、社區最活躍
@@ -356,7 +356,7 @@ SSR框架: Next.js 14.1 (SEO友好)
 狀態管理: Pinia 2.1
 路由: Vue Router 4.2
 UI庫: Element Plus 2.5 / Ant Design Vue 4.1
-```
+```text
 
 ---
 
@@ -373,7 +373,7 @@ UI庫: Element Plus 2.5 / Ant Design Vue 4.1
 UI庫: React Native Paper 5.12 / NativeBase 3.4
 熱更新: CodePush (Microsoft)
 構建: EAS Build (Expo)
-```
+```markdown
 
 **選型理由**：
 - ✅ 代碼複用率高（與Web共享邏輯）
@@ -396,7 +396,7 @@ UI庫: React Native Paper 5.12 / NativeBase 3.4
 框架: Flutter 3.16
 語言: Dart 3.2
 狀態管理: Riverpod 2.4 / Bloc 8.1
-```
+```markdown
 
 **選型理由**：
 - ✅ 原生性能（編譯為機器碼）
@@ -425,7 +425,7 @@ UI庫: React Native Paper 5.12 / NativeBase 3.4
 後端: Next.js API Routes / tRPC 10.45
 認證: NextAuth.js 4.24
 部署: Vercel / Self-hosted
-```
+```markdown
 
 **選型理由**：
 - ✅ SEO友好（SSR/ISR）
@@ -454,7 +454,7 @@ UI庫: React Native Paper 5.12 / NativeBase 3.4
 備份: pgBackRest 2.49 + WAL-G 3.0
 監控: pg_stat_statements + Prometheus Exporter
 高可用: Patroni 3.2 + etcd 3.5
-```
+```yaml
 
 **選型理由**：
 - ✅ ACID事務完整性（金融級）
@@ -504,7 +504,7 @@ UI庫: React Native Paper 5.12 / NativeBase 3.4
   - Node.js: ioredis 5.3
   - Go: go-redis 9.4
 監控: RedisInsight + Prometheus Exporter
-```
+```text
 
 **配置建議**：
 ```yaml
@@ -513,7 +513,7 @@ maxmemory: 80% 系統內存
 maxmemory-policy: allkeys-lru
 appendonly: yes
 appendfsync: everysec
-```
+```markdown
 
 **選型理由**：
 - ✅ 單線程無鎖、性能極高（10萬+QPS）
@@ -541,7 +541,7 @@ Schema註冊: Confluent Schema Registry 7.5
 流處理: Kafka Streams 3.6 / Apache Flink 1.18
 監控: Kafka Exporter + Grafana
 管理工具: Conduktor / Kafka UI
-```
+```markdown
 
 **vs RabbitMQ / AWS SQS**：
 | 維度 | Kafka | RabbitMQ | AWS SQS |
@@ -572,7 +572,7 @@ Schema註冊: Confluent Schema Registry 7.5
 日誌收集: Logstash 8.11 / Filebeat 8.11
 可視化: Kibana 8.11
 客戶端: Official REST Client
-```
+```yaml
 
 **vs OpenSearch**：
 - Elasticsearch: 商業化更好、功能更全 ⭐
@@ -596,7 +596,7 @@ OLAP引擎: ClickHouse 23.12
   - CDC: Debezium + Kafka Connect
   - ETL: Apache Airflow 2.8
 可視化: Superset 3.0 / Metabase 0.48
-```
+```text
 
 **vs StarRocks / Apache Druid**：
 | 維度 | ClickHouse | StarRocks | Druid |
@@ -625,7 +625,7 @@ OLAP引擎: ClickHouse 23.12
 服務網格: Istio 1.20 (可選)
 Ingress: NGINX Ingress Controller 1.9
 存儲: Rook Ceph 1.13 / Longhorn 1.5
-```
+```text
 
 **vs 虛擬機 / Serverless**：
 | 維度 | Kubernetes | 虛擬機 | Serverless |
@@ -651,7 +651,7 @@ CI/CD: GitLab CI 16.8
 GitOps: ArgoCD 2.9
 容器倉庫: Harbor 2.10 (自託管) / Docker Hub
 鏡像掃描: Trivy 0.48
-```
+```text
 
 **vs Jenkins / GitHub Actions**：
 | 維度 | GitLab CI | GitHub Actions | Jenkins |
@@ -676,7 +676,7 @@ GitOps: ArgoCD 2.9
 鏈路追蹤: Jaeger 1.53 / Tempo 2.3
 日誌: Loki 2.9 (輕量) / Elasticsearch 8.11 (重度)
 APM: Datadog / New Relic (商業) / SkyWalking 9.7 (開源)
-```
+```text
 
 ---
 
@@ -694,7 +694,7 @@ IaC工具: Terraform 1.7
   - Azure: 完整支持 ⭐
   - Alibaba Cloud: 完整支持
 狀態後端: Terraform Cloud / S3 + DynamoDB
-```
+```text
 
 ---
 
@@ -710,7 +710,7 @@ IaC工具: Terraform 1.7
 密鑰管理: AWS KMS / Azure Key Vault / HashiCorp Vault
 密碼哈希: Argon2id (m=65536, t=3, p=4)
 盲索引: HMAC-SHA256
-```
+```text
 
 **詳細規範**：參見 [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)
 
@@ -725,7 +725,7 @@ JWT簽名: RS256 (RSA-SHA256)
 MFA: TOTP (Time-based OTP) - RFC 6238
 SSO: Keycloak 23.0 / Auth0 (商業)
 RBAC: 自研 (參見 09-01 Admin RBAC)
-```
+```text
 
 ---
 

@@ -45,7 +45,7 @@
 ### 3.2 加密實現
 
 **存儲格式**（Base64 Encoded）：
-```
+```text
 [Version]:[IV]:[Ciphertext]:[AuthTag]
 
 範例：
@@ -93,7 +93,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
        add_header X-Frame-Options "DENY" always;
        add_header X-Content-Type-Options "nosniff" always;
    }
-   ```
+   ```text
 
 3. **內部服務通訊**（微服務間）：
    - 使用 mTLS（Mutual TLS）雙向認證
@@ -214,7 +214,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 │  - Cached in application memory (ephemeral)│
 │  - Encrypted by CMK before storage        │
 └────────────────────────────────────────────┘
-```
+```markdown
 
 ### 6.2 AWS KMS 整合
 

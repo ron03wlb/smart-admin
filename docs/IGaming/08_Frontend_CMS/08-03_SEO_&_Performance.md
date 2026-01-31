@@ -59,7 +59,7 @@ iGaming 產業高度依賴有機流量 (Organic Traffic)，本模組定義如何
 <link rel="alternate" hreflang="th" href="https://www.casino.com/th/games/slot1" />
 <link rel="alternate" hreflang="vi" href="https://www.casino.com/vi/games/slot1" />
 <link rel="alternate" hreflang="x-default" href="https://www.casino.com/games/slot1" />
-```
+```text
 
 **Sitemap 整合**：
 ```xml
@@ -69,7 +69,7 @@ iGaming 產業高度依賴有機流量 (Organic Traffic)，本模組定義如何
   <xhtml:link rel="alternate" hreflang="th" href="https://www.casino.com/th/games/slot1" />
   <xhtml:link rel="alternate" hreflang="vi" href="https://www.casino.com/vi/games/slot1" />
 </url>
-```
+```text
 
 ### 4.2 URL 結構策略
 
@@ -112,7 +112,7 @@ export async function getStaticProps({ params }) {
     revalidate: 3600 // 每小時重新生成一次
   };
 }
-```
+```text
 
 ### 5.2 動態路由 SEO 最佳化
 
@@ -120,7 +120,7 @@ export async function getStaticProps({ params }) {
 ```html
 <!-- 防止參數污染 SEO -->
 <link rel="canonical" href="https://www.casino.com/games/pg-soft/mahjong-ways-2" />
-```
+```text
 
 **Open Graph 標籤**：
 ```html
@@ -129,7 +129,7 @@ export async function getStaticProps({ params }) {
 <meta property="og:image" content="https://cdn.casino.com/games/mahjong-ways-2.jpg" />
 <meta property="og:url" content="https://www.casino.com/games/pg-soft/mahjong-ways-2" />
 <meta property="og:type" content="website" />
-```
+```text
 
 ---
 
@@ -154,7 +154,7 @@ export async function getStaticProps({ params }) {
 ┌────────────────▼───────────────────────────┐
 │  Database (MySQL)                          │
 └────────────────────────────────────────────┘
-```
+```text
 
 ### 6.2 快取失效策略
 
@@ -169,7 +169,7 @@ async function purgeGameCache(gameSlug) {
 
   await redisDel(`game:${gameSlug}`);
 }
-```
+```text
 
 **Cache-Control Headers**：
 ```nginx
@@ -182,7 +182,7 @@ location /static/ {
 location / {
     add_header Cache-Control "public, max-age=60, s-maxage=60, stale-while-revalidate=120";
 }
-```
+```text
 
 ---
 
@@ -197,7 +197,7 @@ location / {
   <source srcset="/games/slot1.webp" type="image/webp" />
   <img src="/games/slot1.jpg" alt="Fortune Tiger Slot" loading="lazy" />
 </picture>
-```
+```text
 
 **響應式圖片**：
 ```html
@@ -213,14 +213,14 @@ location / {
   loading="lazy"
   decoding="async"
 />
-```
+```text
 
 ### 7.2 圖片 CDN 優化
 
 **Cloudflare Images / Imgix 整合**：
 ```
 https://cdn.casino.com/games/slot1.jpg?w=400&h=300&fit=cover&fm=webp&q=85
-```
+```markdown
 
 **參數說明**：
 - `w=400&h=400`: 指定尺寸（避免傳輸過大圖片）
@@ -251,7 +251,7 @@ function sendToAnalytics({ name, value, id }) {
 getCLS(sendToAnalytics);
 getFID(sendToAnalytics);
 getLCP(sendToAnalytics);
-```
+```text
 
 ### 8.2 Lighthouse CI
 
@@ -269,7 +269,7 @@ jobs:
       - run: npm install && npm run build
       - run: |
           npx lhci autorun --config=lighthouserc.json
-```
+```text
 
 **性能預算配置** (lighthouserc.json):
 ```json
@@ -285,7 +285,7 @@ jobs:
     }
   }
 }
-```
+```text
 
 ---
 

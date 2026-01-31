@@ -68,7 +68,7 @@ erDiagram
     %% 代理系統
     AGENT ||--o{ COMMISSION_RECORD : earns
     COMMISSION_RECORD }o--|| PLAYER : from_player
-```
+```text
 
 ---
 
@@ -82,7 +82,7 @@ Super Admin (系統級)
         └─ Tenant (租戶/運營商)
             └─ Agent (代理)
                 └─ Player (玩家)
-```
+```markdown
 
 **核心實體**:
 - `brands` - 品牌主體
@@ -99,7 +99,7 @@ Player Wallet (玩家錢包)
     ├─ Cash Balance (現金餘額)
     ├─ Bonus Balance (紅利餘額)
     └─ Credit Balance (信用額度)
-```
+```markdown
 
 **核心實體**:
 - `wallets` - 統一錢包主表
@@ -117,7 +117,7 @@ Game Provider
     └─ Game
         └─ Game Session
             └─ Bet Record (下注記錄)
-```
+```sql
 
 **核心實體**:
 - `game_providers` - 遊戲供應商 (GP)
@@ -204,7 +204,7 @@ Game Provider
 
 
 **可下注餘額公式**:
-```
+```text
 Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 ```
 
@@ -247,7 +247,7 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 
 
 **SAGA 分佈式事務流程**:
-```
+```text
 1. 創建提款申請 (Pending)
 2. 鎖定錢包餘額 (Locked)
 3. 風控檢測 (Risk Check)
@@ -269,7 +269,7 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 ### 2. 流水計算一致性
 
 **三層驗證架構**:
-```
+```text
 Layer 1: 風控引擎驗證 (實時)
     ↓ 有效投注標記
 Layer 2: 財務層驗證 (批次)
@@ -286,11 +286,11 @@ Layer 3: 活動層應用 (觸發)
 **隔離策略**:
 
 **Schema分離** (推薦用於大型租戶):
-```
+```text
 database_tenant_1
 database_tenant_2
 database_tenant_3
-```
+```sql
 
 
 **混合模式**:
@@ -341,7 +341,7 @@ database_tenant_3
 ### 盲索引 (Blind Index) 實現
 
 **原理**:
-```
+```text
 Blind Index = HMAC-SHA256(index_key, plaintext_value)
 ```
 
@@ -358,7 +358,7 @@ Blind Index = HMAC-SHA256(index_key, plaintext_value)
 ### GDPR Crypto-Shredding
 
 **數據刪除策略**:
-```
+```markdown
 Player Deletion Request
     ↓
 1. 刪除 Data Encryption Key (DEK)

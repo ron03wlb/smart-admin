@@ -137,7 +137,7 @@ flowchart TD
     style FINAL_DENY fill:#F44336,stroke:#B71C1C,stroke-width:3px,color:#FFF
 
     style END fill:#E0E0E0,stroke:#616161,stroke-width:2px
-```
+```markdown
 
 **流程說明**:
 
@@ -200,7 +200,7 @@ graph TD
     style CSA fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
     style RA fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
     style MS fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
-```
+```sql
 
 **圖表說明**:
 - **實線箭頭** (→): 繼承關係（子角色繼承父角色的所有權限）
@@ -309,7 +309,7 @@ flowchart TD
     style RESULT_ALLOW3 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
 
     style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
-```
+```sql
 
 **衝突解析優先級 (Priority Levels)**:
 
@@ -326,7 +326,7 @@ flowchart TD
 **範例解析過程**:
 
 **場景 1: 顯式拒絕優先**
-```
+```markdown
 User roles: [Finance, CS Manager]
 Finance: ALLOW players:view
 CS Manager: DENY players:view
@@ -338,7 +338,7 @@ Resolution:
 ```
 
 **場景 2: 資源特定性**
-```
+```markdown
 User roles: [Marketing]
 Marketing:
   - ALLOW /players/*
@@ -360,7 +360,7 @@ Resolution:
 ```
 
 **場景 3: 預設拒絕**
-```
+```markdown
 User roles: [Guest]
 Guest: (no permissions)
 
@@ -405,7 +405,7 @@ function matchesResource(pattern, target) {
   const regex = new RegExp('^' + pattern.replace(/\*/g, '.+') + '$');
   return regex.test(target);
 }
-```
+```text
 
 ### 5.4 ABAC 上下文屬性 (Attribute-Based Access Control Context)
 
@@ -445,7 +445,7 @@ function matchesResource(pattern, target) {
     "mfa_required": true
   }
 }
-```
+```text
 
 #### 5.4.3 動態上下文評估引擎
 
@@ -552,7 +552,7 @@ flowchart TD
     style SUCCESS fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
 
     style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
-```
+```text
 
 **ABAC 條件類型與範例**:
 
@@ -588,7 +588,7 @@ flowchart TD
 ✅ time_range: 14:30 in 09:00-18:00
 ❌ day_of_week: Saturday not in [Mon-Fri]
 結果: ❌ DENY (Reason: Weekend restriction)
-```
+```text
 
 **場景 2: 非辦公室 IP 訪問（被拒絕）**
 ```json
@@ -608,7 +608,7 @@ flowchart TD
 ✅ day_of_week: Monday in [Mon-Fri]
 ❌ ip_whitelist: 123.45.67.89 not in [192.168.1.0/24, 10.0.0.0/16]
 結果: ❌ DENY (Reason: IP not in whitelist)
-```
+```text
 
 **場景 3: 所有條件通過**
 ```json
@@ -633,7 +633,7 @@ flowchart TD
 ✅ department: Finance matches
 ✅ employment_status: ACTIVE
 結果: ✅ ALLOW (All conditions satisfied)
-```
+```text
 
 **Python 實作參考**:
 
@@ -679,7 +679,7 @@ flowchart TD
 │           ip, user_agent, logout_reason                      │
 │  Retention: 90 days                                          │
 └──────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 5.6 API 規格 (Permission Check API)
 
@@ -729,7 +729,7 @@ Response 200 OK (DENY):
   ],
   "execution_time_ms": 12
 }
-```
+```text
 
 #### 5.6.2 批次權限檢查 (效能優化)
 

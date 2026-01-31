@@ -26,7 +26,7 @@
 
 ```math
 Playable Balance = (Cash + Bonus) + (Credit Limit - Outstanding)
-```
+```markdown
 
 *   **Cash Mode 玩家**：Credit Limit = 0, Playable = Cash + Bonus
 *   **Credit Mode 玩家**：Cash = 0, Playable = Available Credit
@@ -94,7 +94,7 @@ flowchart TD
 
     I --> J[記錄使用的規則層級]
     J --> K[審計日誌]
-```
+```yaml
 
 **配置優先級範例**:
 
@@ -235,7 +235,7 @@ flowchart LR
     I --> K[UAT 環境驗證]
     K --> L[上線生產環境]
     L --> M[監控 7 天]
-```
+```text
 
 ---
 
@@ -261,7 +261,7 @@ dashboard:
     - title: "Config Layer Effectiveness"
       type: "bar"
       query: "SELECT priority_level, COUNT(*) FROM t_deduction_log WHERE create_time > NOW() - INTERVAL 7 DAY GROUP BY priority_level"
-```
+```sql
 
 ---
 
@@ -330,7 +330,7 @@ dashboard:
 **核心公式**:
 ```math
 Exposure Ratio = Outstanding / Credit Limit
-```
+```yaml
 
 **監控規則**:
 *   `Exposure Ratio > 90%`: 發送 **"瀕臨爆倉"** 警報 (Alert Level 1)
@@ -419,7 +419,7 @@ flowchart TD
     N -->|否| P{Outstanding < 99% 持續 60s?}
     P -->|是| Q[自動解鎖鎖定狀態]
     P -->|否| R[保持鎖定狀態]
-```
+```yaml
 
 #### 6.2.5 自動恢復機制 (Auto-Recovery Mechanism)
 
@@ -449,7 +449,7 @@ flowchart TD
   "recovery_trigger": "settlement_completed",
   "timestamp": "2026-01-29T10:30:45Z"
 }
-```
+```markdown
 
 #### 6.2.6 異常處理 (Exception Handling)
 
@@ -485,7 +485,7 @@ Manager (事務管理,含 @Transactional)
 Dao (數據訪問)
     ↓
 Entity (數據模型)
-```
+```markdown
 
 **關鍵規則** (ArchitectureTest 強制驗證):
 - ✅ Controller **只能**調用 Service

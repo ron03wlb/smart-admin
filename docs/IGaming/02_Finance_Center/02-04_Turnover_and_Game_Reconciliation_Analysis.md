@@ -102,7 +102,7 @@
 | **Valid Bet** | 計入流水要求的金額 | **0 (不計入)** | 優惠活動、返水計算 |
 
 **為何 Turnover ≠ 0？**
-```
+```yaml
 場景: 贈送 10 次免費旋轉，每次面額 $1
 遊戲結果: 玩家贏了 $8.50
 
@@ -115,7 +115,7 @@
   Turnover = $10.00
   Payout = $8.50
   GGR = $10.00 - $8.50 = $1.50  ← 促銷淨成本
-```
+```text
 
 ### 1.6.2 業界標準
 
@@ -128,12 +128,12 @@
 | **Hub88 (Aggregator)** | ✅ 面額總和 | 0 | 技術白皮書 |
 
 **上市公司財報範例** (Evolution Gaming Annual Report 2023):
-```
+```yaml
 "Free spins provided to players are recorded as:
  - Turnover: At the face value of the free spin
  - Payout: At the actual win amount
  - Marketing Expense: Net cost (face value - payout)"
-```
+```text
 
 ### 1.6.3 交易記錄設計
 
@@ -179,7 +179,7 @@ public calculateGGR(date: LocalDate): GgrReport {
         ggr
     };
 }
-```
+```text
 
 ### 1.6.5 關鍵決策總結
 
@@ -243,7 +243,7 @@ public calculateGGR(date: LocalDate): GgrReport {
 │  └─────────────────────────────────────────────────────────────┘           │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
-```
+```text
 
 **職責矩陣**:
 
@@ -271,7 +271,7 @@ if (!riskValidation.is_valid) {
   };
 }
 // 問題: Layer 2 不應參與拒絕決策,應該由 Layer 1 直接處理
-```
+```text
 
 **✅ 正確方式** (v2.0.0):
 ```typescript
@@ -293,7 +293,7 @@ const valid_turnover_finance = calculateFinanceTurnover(
   riskValidation.effective_turnover_base,
   bet.status
 );
-```
+```text
 
 #### Step 1: Layer 1 基礎驗證 (Risk Engine Validation)
 
@@ -334,7 +334,7 @@ if (!riskValidation.is_valid) {
 // ✅ Layer 1 通過,獲取基礎流水 (進入 Layer 2)
 const effective_turnover_base = riskValidation.effective_turnover_base;
 log.info(`[Layer 1 Passed] bet_id=${bet.id}, effective_turnover_base=${effective_turnover_base}`);
-```
+```text
 
 #### Step 2: Layer 2 狀態因子調整 (Finance Status Factor)
 
@@ -371,7 +371,7 @@ function getStatusFactor(status: BetStatus): number {
   };
   return STATUS_FACTORS[status] ?? 0.0;
 }
-```
+```text
 
 #### Step 3: 記錄三層流水 (Record All Layers)
 
@@ -413,7 +413,7 @@ await db.transaction(async (tx) => {
 });
 
 log.info(`[All Layers Recorded] bet_id=${bet.id}`);
-```
+```yaml
 
 #### 性能優化效果 (v2.0.0)
 
@@ -448,13 +448,13 @@ await kafkaProducer.send({
     })
   }]
 });
-```
+```text
 
 **活動系統訂閱此事件**後,在 `valid_turnover_finance` 基礎上應用遊戲權重 (Game Weight):
 ```typescript
 // Activity System consumes this event
 const activity_valid_turnover = message.valid_turnover_finance * GAME_WEIGHTS[message.game_type];
-```
+```text
 
 ### 1.6.4 每日對帳驗證程序 (Daily Reconciliation Procedure)
 
@@ -485,7 +485,7 @@ const activity_valid_turnover = message.valid_turnover_finance * GAME_WEIGHTS[me
 
 業界標準: 大部分 iGaming 平台採用 0.01%-0.1% 作為自動驗證閾值
 SmartAdmin 選擇: 0.01% (更嚴格,降低風險)
-```
+```markdown
 
 5. **自動修正流程** (Auto-Correction Workflow) ✅ v2.0.0:
 
@@ -542,7 +542,7 @@ async function autoCorrectDeviation(reconciliationRecord: ReconciliationRecord):
     log.warn('[Auto-Correction Failed] Root cause not auto-correctable, escalating to manual review');
     return false;
 }
-```
+```markdown
 
 **自動修正限制**:
 - **僅限低風險偏差** (0.01%-1%)
@@ -614,7 +614,7 @@ async function executeCompensation(deviation: DeviationRecord): Promise<Compensa
 
     return compensation;
 }
-```
+```text
 
 **補償監控指標**:
 - **補償觸發率**: `(compensations_count / total_reconciliations) × 100%` → 目標 < 0.1%
@@ -639,7 +639,7 @@ async function executeCompensation(deviation: DeviationRecord): Promise<Compensa
      }[];
      status: 'VERIFIED' | 'WARNING' | 'CRITICAL';
    }
-   ```
+   ```markdown
 
 ### 1.6.5 配置同步要求 (Configuration Synchronization)
 
@@ -655,7 +655,7 @@ async function executeCompensation(deviation: DeviationRecord): Promise<Compensa
        "ID": 1.2    // Indonesian odds
      }
    }
-   ```
+   ```markdown
 
 2. **遊戲權重表 (Game Weights)** - 由活動模組定義,財務模組需知曉用於驗證:
    ```json
@@ -671,7 +671,7 @@ async function executeCompensation(deviation: DeviationRecord): Promise<Compensa
        "PVP": 0.0
      }
    }
-   ```
+   ```markdown
 
 3. **狀態因子表 (Status Factors)** - 由財務模組定義與維護:
    ```json
@@ -688,7 +688,7 @@ async function executeCompensation(deviation: DeviationRecord): Promise<Compensa
        "RUNNING": 0.0
      }
    }
-   ```
+   ```markdown
 
 ### 1.6.6 監控指標與 SLA (Monitoring Metrics & SLA)
 
@@ -720,7 +720,7 @@ alerts:
     condition: finance.turnover.event_publish.success_rate < 99.9
     severity: CRITICAL
     notify: pagerduty:finance-oncall
-```
+```sql
 
 ---
 
@@ -831,7 +831,7 @@ graph TD
     SaveTx --> CacheRes[Update Redis Cache]:::process
 
     CacheRes --> Resp[Generate Admin Report/API]:::process
-```
+```text
 
 ---
 
@@ -915,7 +915,7 @@ flowchart TD
     UpdateProgress --> EndBonus([End Process]):::startend
 
     Invalid --> EndNormal
-```
+```java
 
 ---
 
@@ -937,7 +937,7 @@ SmartAdmin 採用嚴格的五層架構,確保代碼職責清晰、易於測試�
 
 #### 依賴規則 (ArchitectureTest 強制)
 
-```
+```text
 Controller → Service (✅ 允許)
 Service → Dao      (✅ 允許,單表 CRUD)
 Service → Manager  (✅ 允許,需要 @Transactional 時)

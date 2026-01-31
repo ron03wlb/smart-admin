@@ -106,7 +106,7 @@ graph TB
     style AC3 fill:#FFD93D
     style AC4 fill:#6BCF7F
     style D fill:#DDA0DD
-```
+```markdown
 
 **架構設計關鍵要點**：
 
@@ -205,7 +205,7 @@ flowchart LR
     style ACTION2 fill:#FFD93D
     style ACTION3 fill:#FFD93D
     style ACTION4 fill:#6BCF7F
-```
+```markdown
 
 **主架構說明**：
 - 4 個維度檢測可並行執行（Kafka Streams 並行消費）
@@ -253,7 +253,7 @@ flowchart TD
     style SCORE_LOW fill:#90EE90
     style RETURN_D1 fill:#E6E6FA
     style RETURN_BLOCK fill:#FF6B6B
-```
+```markdown
 
 **設備維度關鍵檢測點**：
 - **黑名單命中**：歷史欺詐設備、羊毛黨設備、內部測試設備
@@ -295,7 +295,7 @@ flowchart TD
     style WITH_CRIT fill:#FF6B6B
     style GEO_RISK fill:#FFB6C1
     style RETURN_D2 fill:#E6E6FA
-```
+```text
 
 **支付維度關鍵檢測點**：
 - **支付方式共享**：同一張卡關聯 ≥ 3 個帳號，極高欺詐概率（羊毛黨批量註冊）
@@ -362,7 +362,7 @@ flowchart TD
     style SYNC_BOT fill:#FFB6C1
     style FUND_RISK fill:#FF6B6B
     style RETURN_D34 fill:#E6E6FA
-```
+```sql
 
 **行為與圖譜維度關鍵檢測點**：
 - **ML 異常檢測**：基於 50+ 特徵（投注金額分佈、遊戲切換頻率、時段偏好等）
@@ -693,7 +693,7 @@ sequenceDiagram
     style ML Model fill:#ADD8E6
     style Neo4j Graph fill:#90EE90
     style CS Queue fill:#FFD93D
-```
+```text
 
 **時序圖關鍵設計要點**：
 
@@ -745,7 +745,7 @@ Layer 1: Risk Engine (05-01)     → 基礎驗證（對沖檢測、賠率閾值�
 Layer 2: Finance Center (02-04)  → 狀態因子應用（WIN/LOSS/DRAW）
          ↓ API調用
 Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家樂15%）
-```
+```yaml
 
 **跨模塊集成文檔參考**:
 - 財務模塊集成: [02-04 §1.6 跨模組流水一致性保障](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#16-跨模組流水一致性保障)
@@ -773,7 +773,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "amount": 1000.00,
       "ip": "1.1.1.1"
     }
-    ```
+    ```markdown
 *   **Response**:
     ```json
     {
@@ -781,7 +781,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "risk_code": "HEDGE_BET",
       "reason": "Detected opposite betting on same round"
     }
-    ```
+    ```markdown
 
 ### 3.2 `validateTurnover` (批量流水驗證)
 *   **用途**：Finance System 每日結算返水時，批量驗證注單有效性。
@@ -801,7 +801,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "ip": "1.1.1.1",
       "device_id": "dev_abc123"
     }
-    ```
+    ```markdown
 *   **Response**:
     ```json
     {
@@ -816,7 +816,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "action": "MANUAL_REVIEW",
       "estimated_review_time_minutes": 120
     }
-    ```
+    ```markdown
 *   **Logic**: 檢查 `TurnoverMet` (流水是否達標) + `RiskScore` (風險分) + `AuditStatus` (稽核狀態) + `PaymentMethodVerified` (支付方式驗證) + `GeolocationCheck` (地理位置檢查) + `VelocityCheck` (速率檢查)。
 
 ### 3.4 `assessPlayerRisk` (玩家綜合風險評估)
@@ -831,7 +831,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
         "target_tier": "GOLD"
       }
     }
-    ```
+    ```markdown
 *   **Response**:
     ```json
     {
@@ -852,7 +852,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "recommendation": "PROCEED_WITH_MONITORING",
       "monitoring_duration_days": 30
     }
-    ```
+    ```markdown
 
 ### 3.5 `reportFraudIncident` (欺詐事件上報)
 *   **用途**：CS Platform 或人工稽核發現欺詐行為時主動上報至風控系統，更新風險模型。
@@ -871,7 +871,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "reported_by": "cs_agent_123",
       "reported_at": "2026-01-27T10:30:00Z"
     }
-    ```
+    ```markdown
 *   **Response**:
     ```json
     {
@@ -884,7 +884,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       ],
       "estimated_impact_reduction": "15% reduction in similar fraud patterns"
     }
-    ```
+    ```text
 
 ---
 

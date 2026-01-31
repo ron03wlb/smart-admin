@@ -8,7 +8,7 @@
 ### 場景 1: 亂序請求（Out-of-Order Requests）
 
 **問題描述**:
-```
+```yaml
 正常順序:
 1. Bet Request (tx_id = "bet_123")
 2. Bet Response
@@ -22,13 +22,13 @@
 問題: 營運商如何處理？
 ❌ 直接拒絕 → 玩家贏錢丟失
 ✅ 暫存 Result，等待 Bet
-```
+```text
 
 
 ### 場景 2: 預回滾（Pre-Rollback）
 
 **問題描述**:
-```
+```yaml
 異常時序:
 1. GP 發送 Bet Request
 2. GP 超時（認為失敗）
@@ -37,13 +37,13 @@
 5. Bet Request 延遲 5 秒後才到達
 
 問題: 如何處理這個 Rollback？
-```
+```text
 
 
 ### 場景 3: 部分失敗恢復（Two-Phase Commit）
 
 **問題描述**:
-```
+```yaml
 場景: Bet 扣款成功，但在記錄注單時數據庫崩潰
 
 T1: Bet Request 到達
@@ -58,7 +58,7 @@ T6: GP 重試（相同 transaction_id）
 - bet_details 表沒有記錄（注單丟失）
 - 返回「已處理」→ GP 認為成功
 - 但實際上數據不完整
-```
+```text
 
 
 ## 監控與告警

@@ -67,7 +67,7 @@
 - 確定性：相同輸入永遠生成相同 Index
 
 **工作流程**：
-```
+```sql
 寫入路徑：
 1. 輸入：+886912345678
 2. AES-256-GCM(phone) → encrypted_phone
@@ -79,7 +79,7 @@
 2. HMAC-SHA256(phone, blind_key) → computed_index
 3. WHERE phone_index = computed_index
 4. 解密 encrypted_phone 顯示給客服
-```
+```text
 
 **詳細內容**：[09-03-02 Blind Index 架構](./09-03-02_Blind_Index_Architecture.md)
 
@@ -92,7 +92,7 @@
 - 軟刪除（`deleted_at`）資料仍可查詢
 
 **Crypto-Shredding 原理**：
-```
+```sql
 雙層加密架構：
 - Master Key (KEK) 存於 AWS KMS
   ↓ Encrypts
@@ -104,7 +104,7 @@
 DELETE FROM user_keys WHERE player_id = ?
 → DEK 銷毀
 → 所有 PII 永久不可恢復（即使有備份）
-```
+```text
 
 **完整流程**：[09-03-03 §5 詳細執行流程](./09-03-03_GDPR_Data_Deletion.md#5-詳細執行流程-step-by-step-workflow)
 
@@ -178,7 +178,7 @@ DELETE FROM user_keys WHERE player_id = ?
 4. 冷靜期結束 → 執行 Crypto-Shredding
    ↓
 5. 發送刪除證明書
-```
+```text
 
 **例外情況**（暫停刪除）：
 - ❌ 帳號調查中（AML/Fraud）

@@ -388,7 +388,7 @@ iGaming娛樂城典型值**15-25%**。
 ✅ 正確：支付服務商 (PSP) 提供多種支付通道。本系統集成了 3 家 PSP...
 ❌ 錯誤：Player Lifetime Value 是評估玩家質量的關鍵指標
 ❌ 錯誤：PSP提供多種支付通道（未在首次使用時給出完整中文）
-```
+```text
 
 #### 2. 術語一致性檢查
 
@@ -502,20 +502,20 @@ iGaming娛樂城典型值**15-25%**。
    ```markdown
    ✅ 正確：## 2.1 Withdrawal Approval Flow
    ❌ 錯誤：## 2.1 提款檢查流程
-   ```
+   ```markdown
 
 2. **首次出現**: 使用主術語 + 英文全稱
    ```markdown
    ✅ 正確：提款審核流程 (Withdrawal Approval) 包含三個階段...
    ❌ 錯誤：提款檢查流程包含三個階段...
-   ```
+   ```markdown
 
 3. **後續引用**: 可使用主術語或可接受變體
    ```markdown
    ✅ 正確：Withdrawal Approval 完成後...
    ✅ 可接受：Withdrawal Review 階段需要...（描述特定階段時）
    ❌ 錯誤：Withdrawal Check 完成後...
-   ```
+   ```markdown
 
 4. **代碼/API**: 必須使用主術語的駝峰式命名
 
@@ -527,7 +527,7 @@ iGaming娛樂城典型值**15-25%**。
 ✅ 正確：詳細邏輯參見 [05-01 §3.1 投注驗證 (Bet Validation)](../05_Risk_Management/05-01_Risk_Control_System.md#31-bet-validation)
 
 ❌ 錯誤：詳細邏輯參見 [05-01 §3.1 投注檢查](...)
-```
+```markdown
 
 #### 多語言文檔處理
 
@@ -545,7 +545,7 @@ iGaming娛樂城典型值**15-25%**。
 1. **識別衝突**: 通過 Grep 工具搜索變體術語
    ```bash
    grep -rn "Withdrawal Check\|Payout Approval" docs/IGaming/
-   ```
+   ```markdown
 
 2. **評估影響**: 確認需要更新的文件範圍
 
@@ -553,7 +553,7 @@ iGaming娛樂城典型值**15-25%**。
    ```bash
    # 示例：將 "Withdrawal Check" 替換為 "Withdrawal Approval"
    find docs/IGaming/ -type f -name "*.md" -exec sed -i 's/Withdrawal Check/Withdrawal Approval/g' {} +
-   ```
+   ```markdown
 
 4. **驗證一致性**: 重新搜索確認無遺漏
    ```bash

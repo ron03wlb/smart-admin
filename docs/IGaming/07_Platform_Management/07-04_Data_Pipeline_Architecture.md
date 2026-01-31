@@ -102,7 +102,7 @@ flowchart TD
     style CLICKHOUSE fill:#64B5F6
     style SUPERSET fill:#FFB74D
     style API fill:#4DB6AC
-```
+```sql
 
 **架構特點說明**：
 
@@ -230,7 +230,7 @@ flowchart TD
     style ADS fill:#FFE0B2
     style EXAMPLES fill:#F3E5F5
     style QUALITY fill:#FFCDD2
-```
+```sql
 
 **四層架構對比矩陣**：
 
@@ -249,13 +249,13 @@ flowchart TD
 
 **ETL 流程時間表 (Airflow DAG)**：
 
-```
+```text
 02:00 - 02:15  ODS → DWD (數據清洗 + 脫敏)
 02:15 - 02:45  DWD → DWS (聚合計算)
 02:45 - 03:00  DWS → ADS (寬表構建)
 03:00 - 03:05  數據質量檢查
 03:05         發送完成通知 + 報表可用
-```
+```sql
 
 **關鍵設計原則**：
 

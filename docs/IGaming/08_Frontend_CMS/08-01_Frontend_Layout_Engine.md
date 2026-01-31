@@ -106,7 +106,7 @@ flowchart TD
     style SHOW fill:#A5D6A7,stroke:#388E3C,stroke-width:2px
     style HIDE fill:#E0E0E0,stroke:#757575,stroke-width:1px
     style END fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-```
+```text
 
 **JSON Config 範例**:
 
@@ -173,7 +173,7 @@ flowchart TD
     }
   ]
 }
-```
+```markdown
 
 ## 4. 實驗與優化 (Experimentation)
 為提升轉換率 (CTR)，佈局引擎需支援 A/B 測試：
@@ -252,7 +252,7 @@ flowchart TD
     style WINNER_A fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
     style NO_WINNER fill:#FFC107,stroke:#F57F00,stroke-width:2px
     style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
-```
+```text
 
 **A/B 測試實施細節**:
 
@@ -291,7 +291,7 @@ const userId = '12345';
 const experimentId = 'EXP_HOME_V2';
 const variant = assignVariant(userId, experimentId);
 console.log(`User ${userId} assigned to Variant ${variant}`);
-```
+```text
 
 ### 4.2 曝光事件上報
 
@@ -326,7 +326,7 @@ function trackExperimentExposure(experimentId, variant, userId) {
 onMounted(() => {
   trackExperimentExposure('EXP_HOME_V2', variant, userId);
 });
-```
+```text
 
 ### 4.3 轉換指標追蹤
 

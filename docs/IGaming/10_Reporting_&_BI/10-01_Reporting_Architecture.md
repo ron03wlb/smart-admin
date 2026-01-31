@@ -40,7 +40,7 @@ IGaming 平台的報表與 BI 系統負責為不同角色提供**數據洞察**�
 **目的**: 核心營收指標，監管合規必備
 
 **計算公式**:
-```
+```text
 GGR = Total Bets - Total Wins
 NGR = GGR - Bonuses - Chargebacks - Refunds
 ```
@@ -225,7 +225,7 @@ NGR = GGR - Bonuses - Chargebacks - Refunds
 
 **分層使用策略**:
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  Grafana (實時監控)                                  │
 │  - GGR/NGR 實時儀表板                                │
@@ -262,7 +262,7 @@ NGR = GGR - Bonuses - Chargebacks - Refunds
 
 **ODS (Operational Data Store) → DWD (Data Warehouse Detail) → DWS (Data Warehouse Summary) → ADS (Application Data Service)**
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  ADS (Application Data Service)                      │
 │  - 即用報表 (Pre-aggregated)                         │
@@ -297,7 +297,7 @@ NGR = GGR - Bonuses - Chargebacks - Refunds
 ### 4.2 數據流轉
 
 **實時流 (Kafka CDC)**:
-```
+```text
 PostgreSQL (ODS)
     → Debezium CDC
     → Kafka Topic (bet_events, transaction_events)
@@ -306,7 +306,7 @@ PostgreSQL (ODS)
 ```
 
 **批次 ETL (Apache Airflow)**:
-```
+```text
 ODS (PostgreSQL)
     → (每小時 ETL)
     → DWD (ClickHouse)
@@ -348,7 +348,7 @@ params:
   date: yesterday
 retry: 3
 timeout: 1800  # 30 minutes
-```
+```text
 
 ---
 
@@ -366,7 +366,7 @@ timeout: 1800  # 30 minutes
 5. 緩存預熱 (Redis Cache Warm-up)
     ↓
 6. 通知推送 (Slack/Email Notification)
-```
+```yaml
 
 ---
 
@@ -397,7 +397,7 @@ timeout: 1800  # 30 minutes
 
 **大批量導出 (>10萬行)**:
 
-```
+```markdown
 1. 用戶發起導出請求
     ↓
 2. 創建導出任務 (export_tasks 表)
@@ -426,14 +426,14 @@ timeout: 1800  # 30 minutes
 ### 7.2 緩存策略
 
 **Redis 緩存**:
-```
+```markdown
 - 熱門報表 TTL: 5 分鐘
 - 歷史報表 TTL: 1 小時
 - 自定義查詢: 不緩存
 ```
 
 **緩存鍵設計**:
-```
+```text
 report:{report_type}:{date}:{filters_hash}
 例: report:ggr_hourly:2026-01-28:abc123
 ```

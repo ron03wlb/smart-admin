@@ -73,7 +73,7 @@ flowchart LR
     %% 跨區域連線 %%
     CMS -->|"2. Publish (PutObject)"| OSS
     OSS -.->|"3. Pull Origin"| CDN
-```
+```text
 
 **工作流程**：
 1. 運營人員在 CMS 後台編輯/審核翻譯
@@ -107,7 +107,7 @@ Response:
   "title": "歡迎禮金",  // 直接返回繁體中文
   "description": "首次存款獲得100%配對紅利..."
 }
-```
+```text
 
 **Option B**（推薦用於 CMS 後台）：
 ```json
@@ -122,7 +122,7 @@ Response:
     "th": "โบนัสต้อนรับ"
   }
 }
-```
+```text
 
 **詳細內容請參閱**：[08-05-02 動態內容本地化](./08-05-02_Dynamic_Content_L10n.md)
 
@@ -141,7 +141,7 @@ Response:
 
 ```
 Draft (草稿) → In Review (審核中) → Approved (已批准) → Published (已發佈)
-```
+```javascript
 
 | 狀態 | 說明 | 可執行操作 |
 |------|------|-----------|

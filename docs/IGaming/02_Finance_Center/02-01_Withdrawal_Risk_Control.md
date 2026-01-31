@@ -20,7 +20,7 @@
 
 系統架構必須在成本效率與合規隔離之間取得平衡，採用分層式多租戶模式：
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              API Gateway Layer                               │
 │    (租戶識別 • JWT 驗證 • 速率限制 • 請求路由)                                │
@@ -56,7 +56,7 @@
 
 從玩家發起提款到資金到帳，請求流經多個服務節點：
 
-```
+```text
 玩家發起提款 ────▶ API Gateway ────▶ 出金請求服務
      │                   │                  │
      │              租戶識別            創建請求事件
@@ -212,7 +212,7 @@ flowchart TB
     style C2_3 fill:#fff4cc
     style D3_4 fill:#ffcccc
     style D4_7 fill:#fff4cc
-```
+```yaml
 
 #### 補償失敗降級策略 (Compensation Failure Degradation)
 
@@ -296,7 +296,7 @@ dashboard:
       targets:
         - expr: "increase(saga_force_compensation_total[1h])"
       thresholds: "5,10,20"
-```
+```markdown
 
 ---
 
@@ -324,7 +324,7 @@ rule "first_withdrawal_enhanced_verification":
     - set_risk_score: +30
     - require_verification: "source_of_funds"
     - route_to: "L1_REVIEW"
-```
+```markdown
 
 **第二層：ML 模型即時評分**處理複雜模式，目標延遲 < 100ms：
 
@@ -366,7 +366,7 @@ rule "first_withdrawal_enhanced_verification":
 │  四眼原則：高價值交易需兩名獨立審核員簽核                               │
 │  利益衝突：系統自動檢測並重新分配涉及審核員關聯帳戶的案件               │
 └────────────────────────────────────────────────────────────────────────┘
-```
+```text
 
 **SLA 管理機制**：
 
@@ -405,7 +405,7 @@ rule "first_withdrawal_enhanced_verification":
 │  PIX     │  SPEI    │  GCash   │  SEPA    │  Crypto  │  Cards   │
 │ Adapter  │ Adapter  │ Adapter  │ Adapter  │ Adapter  │ Adapter  │
 └──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
-```
+```markdown
 
 **路由策略**：
 
@@ -427,7 +427,7 @@ CircuitBreakerConfig.custom()
   .failureRateThreshold(50)
   .waitDurationInOpenState(Duration.ofSeconds(30))
   .build();
-```
+```markdown
 
 ---
 
@@ -456,7 +456,7 @@ permit (
   resource in principal.Tenant &&
   resource.amount <= principal.approval_limit
 };
-```
+```sql
 
 **規則優先級管理**：
 
@@ -606,7 +606,7 @@ flowchart LR
 
     J -->|是| K
     J -->|否| O[拒絕出金]
-```
+```markdown
 
 ---
 
@@ -662,7 +662,7 @@ flowchart LR
   "outcome": "SUCCESS",
   "changes": {"status": {"from": "PENDING_REVIEW", "to": "APPROVED"}}
 }
-```
+```markdown
 
 **監控告警體系**：
 
@@ -701,7 +701,7 @@ compliance_profiles:
     prohibited_methods: ["credit_card", "crypto", "boleto"]
     tax_withholding_rate: 0.15
     cpf_verification: true
-```
+```markdown
 
 **地區特定處理邏輯**：
 
@@ -743,7 +743,7 @@ Response:
   "risk_score": null,
   "approval_path": null
 }
-```
+```text
 
 **Webhook 通知**：
 
@@ -762,7 +762,7 @@ POST {merchant_webhook_url}
     "processing_time_ms": 14280000
   }
 }
-```
+```markdown
 
 ---
 

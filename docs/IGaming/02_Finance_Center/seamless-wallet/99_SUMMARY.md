@@ -138,7 +138,7 @@
 - **監管風險**: 部分司法管轄區要求披露真實 GGR
 
 **解決方案**:
-```
+```text
 Turnover = 面額（例如 50 元）  → 計入 GGR 計算
 Valid Bet = 0                   → 不計入流水要求
 ```
@@ -235,7 +235,7 @@ Valid Bet = 0                   → 不計入流水要求
 - **監管問題**: 不符合 IFRS 15 收入確認準則
 
 **解決方案**:
-```
+```yaml
 下注:
   DR: 玩家現金負債    100
   CR: 未結算注單負債  100
@@ -250,7 +250,7 @@ Valid Bet = 0                   → 不計入流水要求
   CR: 博彩收入        100
 
 GGR = 博彩收入 - 博彩成本（自動計算）
-```
+```text
 
 **詳細分析**: [08_accounting_entries_correction.md](./08_accounting_entries_correction.md)
 
@@ -353,7 +353,7 @@ GGR = 博彩收入 - 博彩成本（自動計算）
 ```
 投注時：實時累積有效投注額，更新進度，但不解鎖
 取款時：驗證流水要求達標，才解鎖紅利錢包
-```
+```text
 
 **3. 回推機制實現**:
 - 創建 `wagering_details` 表記錄原始數據 + 計算結果
@@ -656,7 +656,7 @@ sharding:
         standard:
           sharding-column: created_at
           sharding-algorithm-name: by_month
-```
+```markdown
 
 **理由**:
 - 按 user_id 分表（避免熱點用戶）

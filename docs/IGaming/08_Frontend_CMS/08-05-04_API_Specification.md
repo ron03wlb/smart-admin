@@ -36,7 +36,7 @@ GET /api/v1/i18n/translations?lang=zh-TW&namespace=game&status=published&page=1&
 Headers:
 Accept-Language: zh-TW
 Authorization: Bearer <optional_jwt_token>
-```
+```text
 
 **查詢參數**：
 | 參數 | 類型 | 必填 | 說明 |
@@ -84,7 +84,7 @@ Authorization: Bearer <optional_jwt_token>
     }
   }
 }
-```
+```text
 
 **響應**（錯誤）：
 ```json
@@ -95,14 +95,14 @@ Authorization: Bearer <optional_jwt_token>
     "lang": "Language 'xyz' is not supported. Supported languages: en, zh-TW, zh-CN, th, vi, id, pt-BR, ar, he"
   }
 }
-```
+```text
 
 ### 3.2 獲取單個翻譯
 
 **請求**：
 ```http
 GET /api/v1/i18n/translations/game.slot.freespin_won?lang=zh-TW
-```
+```text
 
 **響應**：
 ```json
@@ -123,7 +123,7 @@ GET /api/v1/i18n/translations/game.slot.freespin_won?lang=zh-TW
     "updated_by": "bob@casino.com"
   }
 }
-```
+```text
 
 **錯誤響應**（404）：
 ```json
@@ -135,7 +135,7 @@ GET /api/v1/i18n/translations/game.slot.freespin_won?lang=zh-TW
     "lang": "zh-TW"
   }
 }
-```
+```text
 
 ### 3.3 創建新翻譯
 
@@ -153,7 +153,7 @@ Authorization: Bearer <jwt_token>
   "context": "Triggered when player enters bonus round",
   "status": "draft"
 }
-```
+```text
 
 **響應**（成功）：
 ```json
@@ -169,7 +169,7 @@ Authorization: Bearer <jwt_token>
     "created_at": "2026-01-27T15:00:00Z"
   }
 }
-```
+```text
 
 **錯誤響應**（409 - 鍵值已存在）：
 ```json
@@ -183,7 +183,7 @@ Authorization: Bearer <jwt_token>
   },
   "suggestion": "Use PUT /api/v1/i18n/translations/{key} to update existing translation"
 }
-```
+```text
 
 ### 3.4 更新翻譯
 
@@ -197,7 +197,7 @@ Authorization: Bearer <jwt_token>
   "value": "恭喜！您贏得了 {amount} 次免費旋轉！",
   "change_reason": "添加祝賀語以提升玩家體驗"
 }
-```
+```text
 
 **響應**：
 ```json
@@ -213,7 +213,7 @@ Authorization: Bearer <jwt_token>
     "updated_at": "2026-01-27T16:00:00Z"
   }
 }
-```
+```text
 
 ### 3.5 批量導入翻譯
 
@@ -233,7 +233,7 @@ Authorization: Bearer <jwt_token>
     "game.table.bet_placed": "วางเดิมพันสำเร็จ"
   }
 }
-```
+```text
 
 **響應**：
 ```json
@@ -248,7 +248,7 @@ Authorization: Bearer <jwt_token>
     "failed_keys": []
   }
 }
-```
+```text
 
 ### 3.6 導出翻譯
 
@@ -256,7 +256,7 @@ Authorization: Bearer <jwt_token>
 ```http
 GET /api/v1/i18n/export?lang=zh-TW&namespace=game&format=json
 Authorization: Bearer <jwt_token>
-```
+```text
 
 **響應**：
 ```json
@@ -265,19 +265,19 @@ Authorization: Bearer <jwt_token>
   "game.slot.jackpot_hit": "恭喜中大獎！",
   "game.table.bet_placed": "下注成功"
 }
-```
+```text
 
 **請求**（CSV 格式）：
 ```http
 GET /api/v1/i18n/export?lang=zh-TW&format=csv
-```
+```text
 
 **響應**：
 ```csv
 Key,Namespace,Chinese (Traditional),English (Fallback),Context,Status
 game.slot.freespin_won,game,您贏得了 {amount} 次免費旋轉！,You won {amount} Free Spins!,Slot game win notification,published
 game.slot.jackpot_hit,game,恭喜中大獎！,Jackpot Hit!,,published
-```
+```text
 
 ### 3.7 上報缺失鍵值
 
@@ -293,7 +293,7 @@ Content-Type: application/json
   "page_url": "https://casino.com/games/crash",
   "namespace": "game"
 }
-```
+```text
 
 **響應**：
 ```json
@@ -307,7 +307,7 @@ Content-Type: application/json
     "created_at": "2026-01-27T17:00:00Z"
   }
 }
-```
+```text
 
 ### 3.8 發佈翻譯至 CDN
 
@@ -322,7 +322,7 @@ Authorization: Bearer <jwt_token>
   "namespace": "game",  // 或 "*" 表示所有命名空間
   "status_filter": "approved"  // 只發佈已批准的翻譯
 }
-```
+```text
 
 **響應**：
 ```json
@@ -339,7 +339,7 @@ Authorization: Bearer <jwt_token>
     "cache_purged": true
   }
 }
-```
+```text
 
 ---
 
@@ -373,7 +373,7 @@ Authorization: Bearer <jwt_token>
   "timestamp": "2026-01-27T18:30:00Z",
   "request_id": "req_abc123def456"
 }
-```
+```text
 
 ---
 
@@ -412,7 +412,7 @@ Retry-After: 60  # 秒數
     "retry_after": 60
   }
 }
-```
+```text
 
 ---
 
@@ -442,7 +442,7 @@ Retry-After: 60  # 秒數
 histogram_quantile(0.99,
   rate(translation_response_time_seconds_bucket[5m])
 )
-```
+```text
 
 **2. 快取命中率**：
 ```promql
@@ -451,7 +451,7 @@ histogram_quantile(0.99,
   /
   (rate(translation_cache_hits_total[5m]) + rate(translation_cache_misses_total[5m]))
 ) * 100
-```
+```text
 
 **3. API 錯誤率**：
 ```promql
@@ -460,12 +460,12 @@ histogram_quantile(0.99,
   /
   rate(translation_requests_total[5m])
 ) * 100
-```
+```text
 
 **4. 每分鐘請求數（QPS）**：
 ```promql
 sum(rate(translation_requests_total[1m])) by (endpoint)
-```
+```text
 
 ### 6.4 告警規則
 

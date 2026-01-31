@@ -29,7 +29,7 @@
 | Reason | 失敗原因（如有）| INVALID_PASSWORD, ACCOUNT_LOCKED |
 
 **操作日誌**：
-```
+```text
 格式：[User A] 在 [Time T] 對 [Resource R] 執行了 [Action A]，
       將 [Field F] 從 [Old Value] 變更為 [New Value]
 
@@ -82,7 +82,7 @@
 
 ### 3.1 系統架構
 
-```
+```sql
 [Audit Log Architecture - Complete Data Pipeline]
 ┌──────────────────────────────────────────────────────────────────┐
 │  Write Path (Real-time Ingestion)                               │
@@ -126,7 +126,7 @@
 │  │  - Cold: Glacier restore → Athena query                  │  │
 │  └────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -175,7 +175,7 @@
     }
   }
 }
-```
+```text
 
 ---
 
@@ -239,7 +239,7 @@
     }
   }
 }
-```
+```sql
 
 **說明**:
 - **Hot Phase (0-30天)**: 高性能 SSD 節點，支援高頻查詢
@@ -253,7 +253,7 @@
 
 #### 3.3.1 基礎查詢 API
 
-```
+```markdown
 GET /api/v1/audit-logs
 Authorization: Bearer {admin_jwt}
 X-Tenant-ID: {tenant_id}
@@ -332,7 +332,7 @@ Response 503 Service Unavailable (Warm/Cold storage):
 
 #### 3.3.2 高級搜尋 API (Full-Text Search)
 
-```
+```text
 POST /api/v1/audit-logs/search
 Authorization: Bearer {admin_jwt}
 Content-Type: application/json
@@ -418,7 +418,7 @@ Response 200 OK:
 
 #### 3.3.3 匯出 API (Export to CSV/JSON)
 
-```
+```text
 POST /api/v1/audit-logs/export
 Authorization: Bearer {admin_jwt}
 Content-Type: application/json
@@ -527,7 +527,7 @@ Response 200 OK (Completed):
   "generated_at": "2026-02-01T09:00:00Z",
   "generated_by": "compliance_officer_jane"
 }
-```
+```text
 
 ---
 
@@ -581,7 +581,7 @@ Response 200 OK (Completed):
     }
   ]
 }
-```
+```text
 
 ---
 

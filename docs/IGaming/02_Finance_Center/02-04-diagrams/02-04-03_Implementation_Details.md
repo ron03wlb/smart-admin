@@ -161,38 +161,38 @@
 
 
 **Before 狀態**:
-```
+```yaml
 主錢包:
 - cash: 1000
 - bonus: 0
 - lockAmount: 0
 - effectiveStake: 0
 - cleanAmount: 1000
-```
+```markdown
 
 **步驟 1: 投注 100**
 - deductCash = -100
 - 更新: cash = 900
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 900
 - bonus: 0
 - lockAmount: 0  (不變)
 - effectiveStake: 0  (下注時不計算)
 - cleanAmount: 900
-```
+```text
 
 #### 投注結算（贏錢）
 
 **Before 狀態**:
-```
+```yaml
 主錢包:
 - cash: 900
 - lockAmount: 0
 - effectiveStake: 0
-```
+```markdown
 
 **步驟 2: 結算 payout=180 (贏 80)**
 - 計算: winAmount=80, lossAmount=0
@@ -202,25 +202,25 @@
 - 更新 lockAmount: lockAmount -= 80 (因為 effectiveStake 增加)
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 1080
 - lockAmount: 0 - 80 = -80 → max(0, -80) = 0  (不會低於 0)
 - effectiveStake: 80
 - cleanAmount: 1080
-```
+```text
 
 **注意**: 由於 lockAmount 初始為 0，減去 effectiveStake 後會變負數，但資料庫更新時使用 `GREATEST(lock_amount + ?, 0)` 確保不低於 0。
 
 #### 投注結算（輸錢）
 
 **Before 狀態**:
-```
+```yaml
 主錢包:
 - cash: 900
 - lockAmount: 0
 - effectiveStake: 0
-```
+```markdown
 
 **步驟 2: 結算 payout=0 (輸 100)**
 - 計算: winAmount=0, lossAmount=100
@@ -230,27 +230,27 @@
 - 更新 lockAmount: lockAmount -= 100
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 900
 - lockAmount: 0 - 100 = -100 → 0
 - effectiveStake: 100
 - cleanAmount: 900
-```
+```text
 
 ### 3.2 促銷錢包投注（有 wagerRequirement）
 
 **場景**: 玩家使用促銷錢包投注，需完成流水要求
 
 **Before 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 100
 - bonus: 200
 - wagerRequirement: 1500  (需完成 1500 的有效投注)
 - effectiveStake: 0
 - lockAmount: N/A  (促銷錢包沒有 lockAmount)
-```
+```markdown
 
 #### 投注下注
 
@@ -259,13 +259,13 @@
 - 更新: cash = 0
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 0
 - bonus: 200
 - wagerRequirement: 1500
 - effectiveStake: 0  (下注時不計算)
-```
+```markdown
 
 #### 投注結算
 
@@ -276,14 +276,14 @@
 - 累加 effectiveStake: effectiveStake += 50
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 150
 - bonus: 200
 - wagerRequirement: 1500
 - effectiveStake: 50
 - 剩餘流水: 1500 - 50 = 1450
-```
+```text
 
 **進度**: 玩家需要再累積 1450 的 effectiveStake 才能完成流水要求並將此錢包轉換為可提款的資金。
 
@@ -297,13 +297,13 @@
 
 
 **Before 狀態**:
-```
+```yaml
 主錢包:
 - cash: 1000
 - lockAmount: 500  (來自存款優惠)
 - cleanAmount: 500  (1000 - 500)
 - effectiveStake: 0
-```
+```markdown
 
 #### 投注下注
 
@@ -312,13 +312,13 @@
 - 更新: cash = 800
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 800
 - lockAmount: 500  (不變)
 - cleanAmount: 300  (800 - 500)
 - effectiveStake: 0
-```
+```markdown
 
 #### 投注結算
 
@@ -330,13 +330,13 @@
 - 更新 lockAmount: lockAmount -= 100
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 1100
 - lockAmount: 400  (500 - 100)
 - cleanAmount: 700  (1100 - 400)
 - effectiveStake: 100
-```
+```text
 
 **說明**: 每當玩家產生有效投注，lockAmount 就會減少，可提款金額（cleanAmount）就會增加。
 
@@ -345,7 +345,7 @@
 **場景**: 投注金額跨越多個錢包，同時扣除 cash 和 bonus
 
 **Before 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 50
 - bonus: 300
@@ -357,7 +357,7 @@
 - bonus: 0
 - lockAmount: 100
 - effectiveStake: 0
-```
+```markdown
 
 #### 投注下注
 
@@ -368,7 +368,7 @@
   - deductCash = -150, deductBonus = 0
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 0
 - bonus: 0
@@ -380,7 +380,7 @@
 - bonus: 0
 - lockAmount: 100
 - effectiveStake: 0
-```
+```markdown
 
 #### 投注結算
 
@@ -391,7 +391,7 @@
 - 累加 effectiveStake 到促銷錢包: effectiveStake += 100
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 600
 - bonus: 0
@@ -404,7 +404,7 @@
 - bonus: 0
 - lockAmount: 100
 - effectiveStake: 0
-```
+```text
 
 **注意**: 混合錢包投注的派彩分配邏輯較複雜，實際由 `getBetResultWallet` 方法決定。
 
@@ -596,13 +596,13 @@
 ### 初始狀態
 
 **主錢包**:
-```
+```yaml
 - cash: 500
 - bonus: 0
 - lockAmount: 0
 - cleanAmount: 500
 - effectiveStake: 0
-```
+```text
 
 **促銷申請**: 玩家存款 200，申請促銷獲得 100 紅利，流水要求 5 倍 (300 的 wagerRequirement)
 
@@ -617,7 +617,7 @@
 
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 300
 - lockAmount: 200  (新增)
@@ -630,34 +630,34 @@
 - wagerRequirement: 1500  (5 * 300)
 - effectiveStake: 0
 - isClosed: false
-```
+```text
 
 ### 步驟 2: 促銷錢包投注 #1
 
 **投注**: 使用促銷錢包投注 150
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 50
 - bonus: 100
 - wagerRequirement: 1500
 - effectiveStake: 0  (下注時不計算)
-```
+```text
 
 ### 步驟 3: 促銷錢包結算 #1
 
 **結算**: payout=200 (贏 50), effectiveStake=100 (假設 CASINO 遊戲，取 min(50, 150)=50 但這裡假設其他規則為 100)
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 250
 - bonus: 100
 - wagerRequirement: 1500
 - effectiveStake: 100
 - 剩餘流水: 1400
-```
+```markdown
 
 ### 步驟 4-15: 持續投注並結算
 
@@ -666,14 +666,14 @@
 - 總 effectiveStake: 1500
 
 **After 狀態**:
-```
+```yaml
 促銷錢包:
 - cash: 280  (假設最終餘額)
 - bonus: 120
 - wagerRequirement: 1500
 - effectiveStake: 1500  (已完成!)
 - 剩餘流水: 0
-```
+```markdown
 
 ### 步驟 16: 促銷錢包關閉並轉回主錢包
 
@@ -685,7 +685,7 @@
 3. 主錢包 lockAmount 減少 (因為流水已完成)
 
 **After 狀態**:
-```
+```yaml
 主錢包:
 - cash: 700  (300 + 400)
 - lockAmount: 0  (200 - 200，因為完成了流水)

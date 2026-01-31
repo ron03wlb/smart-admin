@@ -14,7 +14,7 @@ stateDiagram-v2
     ACTIVE --> DRAINING : Admin Trigger
     DRAINING --> MAINTENANCE : All rounds finished / Timeout
     MAINTENANCE --> ACTIVE : Admin Resume
-```
+```markdown
 
 | 狀態 | 描述 | 允許的操作 | 拒絕的操作 |
 |---|---|---|---|
@@ -104,7 +104,7 @@ We apologize for any inconvenience caused.
 
 Best regards,
 Casino Team
-```
+```text
 
 ### 6.2 Phase 2: 排水階段 (T-30分鐘 → T-5分鐘)
 
@@ -123,7 +123,7 @@ Casino Team
 │  Pending Withdrawals: 45 → 23 → 12 → 3                  │
 │  API Request Rate: 5000 QPS → 3000 QPS → 1000 QPS       │
 └──────────────────────────────────────────────────────────┘
-```
+```text
 
 **T-10分鐘**: 最後警告
 
@@ -137,7 +137,7 @@ if (countdown < 600) {  // < 10 minutes
     urgency: 'high'
   });
 }
-```
+```text
 
 ### 6.3 Phase 3: 強制結算階段 (T-5分鐘 → T+0)
 
@@ -173,7 +173,7 @@ if (countdown < 600) {  // < 10 minutes
 
    # Verify migration
    ./migrate.sh --verify
-   ```
+   ```markdown
 
 2. **Code Deployment**:
    ```bash
@@ -185,13 +185,13 @@ if (countdown < 600) {  // < 10 minutes
 
    # If rollout fails, auto-rollback
    kubectl rollout undo deployment/api-server
-   ```
+   ```markdown
 
 3. **Security Patches**:
    ```bash
    # Apply OS-level security updates
    ansible-playbook playbooks/security_patch.yml --limit=production
-   ```
+   ```text
 
 
 ### 6.5 Phase 5: 驗證與恢復 (T+120分鐘 → T+135分鐘)
@@ -238,7 +238,7 @@ if (countdown < 600) {  // < 10 minutes
     - Check: CDN serving latest assets
     - Check: i18n translations loaded
     - Check: All images loading (no 404s)
-```
+```text
 
 **Gradual Traffic Ramp** (Canary Release):
 
@@ -320,7 +320,7 @@ if (countdown < 600) {  // < 10 minutes
 }
 
 // Each service subscribes and reacts accordingly
-```
+```text
 
 ---
 
@@ -359,7 +359,7 @@ groups:
           severity: warning
         annotations:
           summary: "High error rate after maintenance restoration"
-```
+```text
 
 ---
 
@@ -401,7 +401,7 @@ curl -X POST "https://hooks.slack.com/services/XXX" \
   -d '{"text": "🚨 Maintenance rollback completed. System restored to pre-maintenance state."}'
 
 echo "✅ Rollback completed successfully"
-```
+```text
 
 ---
 
@@ -419,7 +419,7 @@ Duration: Approximately {{duration}} hours
 The platform will be temporarily unavailable during this period for system upgrades and security enhancements.
 
 Thank you for your patience and understanding.
-```
+```text
 
 **繁體中文**:
 ```
@@ -431,7 +431,7 @@ Thank you for your patience and understanding.
 維護期間平台將暫時無法使用，我們將進行系統升級與安全性強化。
 
 感謝您的耐心與理解。
-```
+```text
 
 **泰文**:
 ```

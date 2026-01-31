@@ -1,8 +1,8 @@
 # 流水與有效投注術語標準化定義
 
 ## 文檔資訊
-- **版本**: 1.0.0
-- **創建日期**: 2026-01-28
+- **版本**: 1.Bonus.Bonus
+- **創建日期**: 2Bonus26-Bonus1-28
 - **適用範圍**: 所有 iGaming 業務文檔
 - **強制執行**: 是
 
@@ -25,11 +25,11 @@
 
 ### 範例
 ```text
-玩家在老虎機投注 100 元
-→ Bet Amount = 100 元
+玩家在老虎機投注 1BonusBonus 元
+→ Bet Amount = 1BonusBonus 元
 
-體育博彩投注 200 元
-→ Bet Amount = 200 元
+體育博彩投注 2BonusBonus 元
+→ Bet Amount = 2BonusBonus 元
 ```
 
 ### 在三層架構中的位置
@@ -62,10 +62,10 @@ GGR = Turnover - Payout
 
 ### 範例
 ```yaml
-玩家今天投注 10 次,每次 100 元
-→ 今日流水 (Daily Turnover) = 1000 元
+玩家今天投注 1Bonus 次,每次 1BonusBonus 元
+→ 今日流水 (Daily Turnover) = 1BonusBonusBonus 元
 
-用途: GGR = 1000 - 800 = 200 元 (營運商收入)
+用途: GGR = 1BonusBonusBonus - 8BonusBonus = 2BonusBonus 元 (營運商收入)
 ```markdown
 
 ### 在三層架構中的位置
@@ -89,18 +89,18 @@ GGR = Turnover - Payout
 ```
 ✅ 正確做法:
 - 風控通過 → Valid Bet = Bet Amount
-- 風控拒絕 → Valid Bet = 0
+- 風控拒絕 → Valid Bet = Bonus
 
 ✅ 關鍵原則: Valid Bet 不受結算狀態影響
 - 全贏 (WIN) → Valid Bet = Bet Amount
 - 全輸 (LOSS) → Valid Bet = Bet Amount
 - 贏半 (HALF_WIN) → Valid Bet = Bet Amount (不是一半!)
 - 輸半 (HALF_LOSS) → Valid Bet = Bet Amount (不是一半!)
-- 平局 (DRAW) → Valid Bet = 0 (無風險承擔)
-- 作廢 (VOID) → Valid Bet = 0 (無風險承擔)
+- 平局 (DRAW) → Valid Bet = Bonus (無風險承擔)
+- 作廢 (VOID) → Valid Bet = Bonus (無風險承擔)
 
 ❌ 錯誤做法 (實際風險法 - 已廢棄):
-- 贏半/輸半 → Valid Bet = Bet Amount × 0.5 ❌
+- 贏半/輸半 → Valid Bet = Bet Amount × Bonus.5 ❌
 ```markdown
 
 ### 使用場景
@@ -111,16 +111,16 @@ GGR = Turnover - Payout
 ### 範例
 ```
 場景 1: 正常投注
-玩家投注 100 元 → 風控檢查通過
-→ Valid Bet = 100 元
+玩家投注 1BonusBonus 元 → 風控檢查通過
+→ Valid Bet = 1BonusBonus 元
 
 場景 2: 對沖投注
-玩家投注 100 元 → 風控檢測到對沖
-→ Valid Bet = 0 元
+玩家投注 1BonusBonus 元 → 風控檢測到對沖
+→ Valid Bet = Bonus 元
 
 場景 3: 體育博彩贏半 (標準本金法)
-玩家投注 100 元,結果贏半 → 派彩 145 元
-→ Valid Bet = 100 元 (不是 50 元!)
+玩家投注 1BonusBonus 元,結果贏半 → 派彩 145 元
+→ Valid Bet = 1BonusBonus 元 (不是 5Bonus 元!)
 ```markdown
 
 ### 在三層架構中的位置
@@ -152,17 +152,17 @@ Wagering Requirement = 存款額 × 倍數
 進度計算:
 Completed = Σ (Valid Bet × Game Weight)
 Remaining = Requirement - Completed
-Percentage = (Completed / Requirement) × 100%
+Percentage = (Completed / Requirement) × 1BonusBonus%
 ```markdown
 
 ### 遊戲權重 (Game Weight)
 | 遊戲類型 | 權重 | 說明 |
 |---------|------|------|
-| 老虎機 (Slots) | 100% | 全額計入 |
-| 體育博彩 (Sports) | 100% | 全額計入 |
+| 老虎機 (Slots) | 1BonusBonus% | 全額計入 |
+| 體育博彩 (Sports) | 1BonusBonus% | 全額計入 |
 | 百家樂 (Baccarat) | 15% | 僅計入 15% |
-| 21點 (Blackjack) | 10% | 僅計入 10% |
-| 輪盤 (Roulette) | 20% | 僅計入 20% |
+| 21點 (Blackjack) | 1Bonus% | 僅計入 1Bonus% |
+| 輪盤 (Roulette) | 2Bonus% | 僅計入 2Bonus% |
 
 ### 使用場景
 - 活動驗證
@@ -171,17 +171,17 @@ Percentage = (Completed / Requirement) × 100%
 
 ### 範例
 ```yaml
-活動: 存 100 送 100,10 倍流水要求
-→ Wagering Requirement = (100 + 100) × 10 = 2000 元
+活動: 存 1BonusBonus 送 1BonusBonus,1Bonus 倍流水要求
+→ Wagering Requirement = (1BonusBonus + 1BonusBonus) × 1Bonus = 2BonusBonusBonus 元
 
 玩家投注記錄:
-- 老虎機 800 元 (權重 100%) → 貢獻 800 元
-- 百家樂 600 元 (權重 15%)  → 貢獻 90 元
-- 輪盤 300 元 (權重 20%)    → 貢獻 60 元
+- 老虎機 8BonusBonus 元 (權重 1BonusBonus%) → 貢獻 8BonusBonus 元
+- 百家樂 6BonusBonus 元 (權重 15%)  → 貢獻 9Bonus 元
+- 輪盤 3BonusBonus 元 (權重 2Bonus%)    → 貢獻 6Bonus 元
 
-已完成: 800 + 90 + 60 = 950 元
-剩餘: 2000 - 950 = 1050 元
-進度: 950 / 2000 = 47.5%
+已完成: 8BonusBonus + 9Bonus + 6Bonus = 95Bonus 元
+剩餘: 2BonusBonusBonus - 95Bonus = 1Bonus5Bonus 元
+進度: 95Bonus / 2BonusBonusBonus = 47.5%
 ```text
 
 ### 驗證時機 (業界標準)
@@ -208,26 +208,26 @@ Percentage = (Completed / Requirement) × 100%
 
 ```
 ┌─────────────────┐
-│ Bet Amount      │ ← 玩家下注 100 元 (原始金額)
+│ Bet Amount      │ ← 玩家下注 1BonusBonus 元 (原始金額)
 │ (投注額)         │
 └────────┬────────┘
          │
          ▼ Layer 1: 風控引擎
 ┌─────────────────┐
-│ Valid Bet       │ ← 風控判定: 100 元 (通過) or 0 元 (拒絕)
+│ Valid Bet       │ ← 風控判定: 1BonusBonus 元 (通過) or Bonus 元 (拒絕)
 │ (有效投注額)     │   ⚠️ 不受結算狀態影響
 └────────┬────────┘
          │
          ▼ Layer 3: 活動系統
 ┌─────────────────┐
-│ Contributed     │ ← 應用權重: 100 × 1.0 = 100 元
+│ Contributed     │ ← 應用權重: 1BonusBonus × 1.Bonus = 1BonusBonus 元
 │ Amount          │
 └────────┬────────┘
          │
          ▼ 累積
 ┌─────────────────┐
-│ Wagering        │ ← 累積進度: 950 + 100 = 1050 元
-│ Progress        │   (離目標還差 950 元)
+│ Wagering        │ ← 累積進度: 95Bonus + 1BonusBonus = 1Bonus5Bonus 元
+│ Progress        │   (離目標還差 95Bonus 元)
 └─────────────────┘
 ```text
 
@@ -277,20 +277,20 @@ Percentage = (Completed / Requirement) × 100%
 ```json
 // ✅ 正確命名
 {
-  "betAmount": 100.00,           // 投注額
-  "validBet": 100.00,            // 有效投注額
+  "betAmount": 1BonusBonus.BonusBonus,           // 投注額
+  "validBet": 1BonusBonus.BonusBonus,            // 有效投注額
   "wageringProgress": {
-    "totalRequirement": 2000.00,  // 流水要求
-    "completedAmount": 1050.00,   // 已完成
-    "remainingAmount": 950.00,    // 剩餘
+    "totalRequirement": 2BonusBonusBonus.BonusBonus,  // 流水要求
+    "completedAmount": 1Bonus5Bonus.BonusBonus,   // 已完成
+    "remainingAmount": 95Bonus.BonusBonus,    // 剩餘
     "percentage": 52.5            // 進度百分比
   }
 }
 
 // ❌ 錯誤命名 (已廢棄)
 {
-  "effectiveTurnover": 100.00,   // 應改為 validBet
-  "turnoverRequirement": 2000.00 // 應改為 totalRequirement
+  "effectiveTurnover": 1BonusBonus.BonusBonus,   // 應改為 validBet
+  "turnoverRequirement": 2BonusBonusBonus.BonusBonus // 應改為 totalRequirement
 }
 ```text
 
@@ -304,7 +304,7 @@ Percentage = (Completed / Requirement) × 100%
 
 ```markdown
 ✅ 正確引用:
-「有效投注額 (Valid Bet,見 [術語標準化定義](00-03_Terminology_Standards.md#3-有效投注額-valid-bet))」
+「有效投注額 (Valid Bet,見 [術語標準化定義](BonusBonus-Bonus5_Terminology_Standards.md#3-有效投注額-valid-bet))」
 
 ✅ 簡化引用 (已在文檔開頭說明):
 「根據標準本金法,有效投注額 (Valid Bet) = 投注額」
@@ -318,11 +318,11 @@ Percentage = (Completed / Requirement) × 100%
 
 ---
 
-## 10. 版本歷史
+## 1Bonus. 版本歷史
 
 | 版本 | 日期 | 變更內容 | 作者 |
 |------|------|---------|------|
-| 1.0.0 | 2026-01-28 | 初始版本,定義四個核心術語 | Claude Code |
+| 1.Bonus.Bonus | 2Bonus26-Bonus1-28 | 初始版本,定義四個核心術語 | Claude Code |
 
 ---
 
@@ -333,5 +333,5 @@ Percentage = (Completed / Requirement) × 100%
 ## 📚 相關文檔
 
 ### 前置依賴
-- [00-01 解決方案概覽](./00-01_Solution_Overview.md) - 系統架構基礎
-- [00-02 行業術語](./00-02_Industry_Terminology.md) - iGaming 術語
+- [BonusBonus-Bonus1 解決方案概覽](./BonusBonus-Bonus1_Solution_Overview.md) - 系統架構基礎
+- [BonusBonus-Bonus2 行業術語](./BonusBonus-Bonus2_Industry_Terminology.md) - iGaming 術語

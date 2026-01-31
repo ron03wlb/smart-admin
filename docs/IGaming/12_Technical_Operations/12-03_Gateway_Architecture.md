@@ -99,7 +99,7 @@ graph TB
     style REDIS fill:#FFE082,stroke:#F57F00,stroke-width:2px
     style PG fill:#FFE082,stroke:#F57F00,stroke-width:2px
     style MONITOR fill:#FFE082,stroke:#F57F00,stroke-width:2px
-```
+```text
 
 **架構說明**:
 
@@ -135,7 +135,7 @@ routes:
       - name: gzip
         config:
           min_length: 1000
-```
+```text
 
 **Route 2: Public API (api.casino-brand.com)**
 ```yaml
@@ -158,7 +158,7 @@ routes:
       - name: request-id
         config:
           header_name: X-Request-ID
-```
+```text
 
 **Route 3: Mobile API (api.casino-brand.com/mobile)**
 ```yaml
@@ -184,7 +184,7 @@ routes:
       - name: rate-limiting
         config:
           minute: 50  # Stricter for mobile
-```
+```text
 
 **Route 4: Admin Backoffice (admin.casino-brand.com)**
 ```yaml
@@ -209,7 +209,7 @@ routes:
         config:
           status_code: 403
           message: "Access Denied - Admin only"
-```
+```text
 
 **流量分發邏輯**:
 
@@ -236,7 +236,7 @@ Request arrives at Cloudflare
 6. Response Transformation + Cache
   ↓
 7. Return to Client
-```
+```markdown
 
 ### 2.2 行動端專屬路由 (Mobile App Routing)
 App 流量需特殊處理，以支援 "熱更新" 與 "簽名驗證"。
@@ -312,7 +312,7 @@ App 流量需特殊處理，以支援 "熱更新" 與 "簽名驗證"。
 │  - Then throttles to 10 req/s sustained rate                │
 │  - Bucket refills: empty → full in 10 seconds               │
 └──────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Redis 實作 (Lua Script)**:
 
@@ -346,7 +346,7 @@ if tokens >= 1 then
 else
   return {0, 0}  -- Deny
 end
-```
+```text
 
 **API Gateway 整合 (Kong Plugin)**:
 
@@ -361,7 +361,7 @@ plugins:
       redis_database: 2
       fault_tolerant: true  # If Redis down, allow traffic (fail-open)
       hide_client_headers: false  # Expose X-RateLimit-* headers
-```
+```text
 
 ### 3.3.3 分層限流策略 (Tiered Rate Limiting)
 
@@ -388,7 +388,7 @@ plugins:
 │  - Bonus claim: Once per promotion per player               │
 │  - Action: Business rule validation, log to audit           │
 └──────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 3.3.4 動態限流 (Adaptive Rate Limiting)
 
@@ -460,7 +460,7 @@ stateDiagram-v2
         - 成功 → CLOSED
         - 失敗 → OPEN (重新跳閘)
     end note
-```
+```text
 
 **狀態轉換詳細說明**:
 
@@ -483,7 +483,7 @@ stateDiagram-v2
 - Error Rate = 7/10 = 70% > 50%
 
 結果: 🔴 觸發熔斷 (CLOSED → OPEN)
-```
+```text
 
 **場景 2: 超時率觸發 (Timeout Rate Trigger)**
 ```
@@ -496,7 +496,7 @@ stateDiagram-v2
 - Timeout Rate = 6/10 = 60% > 50%
 
 結果: 🔴 觸發熔斷 (CLOSED → OPEN)
-```
+```text
 
 **場景 3: 平均延遲觸發 (Average Latency Trigger)**
 ```
@@ -508,7 +508,7 @@ stateDiagram-v2
 - 閾值: 5000ms
 
 結果: 🟡 接近閾值（如果持續 > 5000ms 則觸發）
-```
+```text
 
 **場景 4: 探測成功恢復 (Probe Success → CLOSED)**
 ```
@@ -527,7 +527,7 @@ stateDiagram-v2
 重置計數器: Error Rate = 0%, Timeout Rate = 0%
 ↓
 恢復正常運營
-```
+```text
 
 **場景 5: 探測失敗重新跳閘 (Probe Failure → OPEN)**
 ```
@@ -546,7 +546,7 @@ stateDiagram-v2
 重新計時: 再等待 30 秒
 ↓
 循環直到探測成功
-```
+```text
 
 **配置參數**:
 
@@ -580,7 +580,7 @@ circuit_breaker:
         "retry_after_seconds": 30,
         "state": "OPEN"
       }
-```
+```text
 
 **監控指標與告警**:
 
@@ -607,7 +607,7 @@ circuit_breaker_trips_total{service="payment-gateway"} = 3
     severity: warning
   annotations:
     summary: "Circuit breaker tripping frequently for {{ $labels.service }}"
-```
+```text
 
 ### 3.4.2 熔斷器配置參數
 
@@ -633,7 +633,7 @@ plugins:
         status_code: 503
         content_type: application/json
         body: '{"error": "Service temporarily unavailable", "retry_after": 30}'
-```
+```text
 
 ### 3.4.3 熔斷器監控儀表板
 
@@ -654,7 +654,7 @@ plugins:
 │  Actions:                                                    │
 │  [Force Close] [Extend Open Duration] [View Error Logs]     │
 └──────────────────────────────────────────────────────────────┘
-```
+```text
 
 ## 3.5 DDoS 緩解策略 (DDoS Mitigation)
 
@@ -743,7 +743,7 @@ flowchart TD
     style REJECT1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
     style REJECT2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
     style REJECT3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-```
+```text
 
 **防禦層詳細說明**:
 
@@ -768,7 +768,7 @@ flowchart TD
 └─ Layer 4 (Origin): Auto-scaling 水平擴展，承受 0.2 Gbps
 
 結果: ✅ 源站安全（僅承受 0.2% 原始攻擊流量）
-```
+```text
 
 **攻擊場景 2: 慢速 HTTP DoS (Slowloris)**
 ```
@@ -780,7 +780,7 @@ flowchart TD
 └─ Layer 3: 不需要（已在 Layer 2 攔截）
 
 結果: ✅ 攻擊失敗（Layer 2 攔截）
-```
+```text
 
 **攻擊場景 3: 分散式爬蟲 (Distributed Scraping)**
 ```
@@ -795,7 +795,7 @@ flowchart TD
 └─ Layer 4: 剩餘 2% 通過（可接受範圍）
 
 結果: ✅ 爬蟲大量攔截（98%）
-```
+```text
 
 **攻擊場景 4: 繞過 CDN 直接攻擊源站**
 ```
@@ -807,7 +807,7 @@ flowchart TD
    └─ 結果: ❌ 攻擊失敗（源站拒絕連接）
 
 結果: ✅ 源站受保護（IP 白名單生效）
-```
+```text
 
 **配置範例**:
 
@@ -853,7 +853,7 @@ resource "cloudflare_rate_limit" "api_protection" {
     timeout = 60
   }
 }
-```
+```text
 
 **Origin Server 配置 (Layer 4)**:
 ```nginx
@@ -890,7 +890,7 @@ http {
         }
     }
 }
-```
+```text
 
 **監控與告警**:
 ```yaml
@@ -914,7 +914,7 @@ groups:
           severity: warning
         annotations:
           summary: "Origin receiving direct attack attempts"
-```
+```text
 
 **成本估算**:
 
@@ -981,7 +981,7 @@ resource "cloudflare_rate_limit" "api_global" {
     timeout = 60
   }
 }
-```
+```text
 
 ## 3.6 API 版本管理策略 (API Versioning Strategy)
 
@@ -1016,7 +1016,7 @@ resource "cloudflare_rate_limit" "api_global" {
 │  - No new features, security fixes only                      │
 │  - EOL: 2027-01-01 (6 months after deprecation)             │
 └──────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 3.6.3 版本路由配置
 
@@ -1053,7 +1053,7 @@ services:
           add:
             headers:
               - "X-API-Version: 2.0"
-```
+```text
 
 ### 3.6.4 廢棄通知機制
 
@@ -1078,7 +1078,7 @@ Warning: 299 - "API v1 is deprecated and will be removed on 2027-01-01. Please m
     }
   }
 }
-```
+```text
 
 ## 3.7 監控與告警 (Gateway Monitoring)
 

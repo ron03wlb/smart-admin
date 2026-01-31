@@ -75,7 +75,7 @@ flowchart TD
     style ROLLBACK2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
     style ROLLBACK3 fill:#FF6B6B,stroke:#C92A2A,stroke-width:3px,color:#FFF
     style FAIL_END fill:#B0BEC5,stroke:#455A64,stroke-width:2px
-```
+```markdown
 
 **藍綠部署優勢**:
 - ✅ **零停機**: 流量瞬間切換，無服務中斷
@@ -118,7 +118,7 @@ flowchart TD
 │  │  Alertmanager: Auto-rollback triggers                    │  │
 │  └────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
-```
+```text
 
 #### 3.2.2 完整部署流程 (Progressive Rollout)
 
@@ -208,7 +208,7 @@ spec:
         host: wallet-service
         subset: canary
       weight: 5
-```
+```text
 
 **監控指標 (Phase 1)**:
 
@@ -258,7 +258,7 @@ kubectl patch virtualservice wallet-service --type merge -p '
   }
 }
 '
-```
+```text
 
 **每個流量增加階段都重複監控評估，任何異常立即回滾。**
 
@@ -279,7 +279,7 @@ kubectl patch virtualservice wallet-service --type merge -p '
 '
 
 # Wait 30 minutes for final validation
-```
+```text
 
 **Phase 4: Cleanup (T+120min → T+24h)**
 
@@ -293,7 +293,7 @@ kubectl label deployment wallet-service-canary version=stable --overwrite
 
 # Remove canary resources
 kubectl delete virtualservice wallet-service-canary
-```
+```markdown
 
 **保留舊版本 24 小時**: 即使 100% 流量切換至新版本，舊版本 pods 仍保留 24 小時（縮減至 1 replica），以防發現隱藏問題需緊急回滾。
 
@@ -310,7 +310,7 @@ app.get('/health/live', (req, res) => {
   // Basic check: Is process responsive?
   res.status(200).json({ status: 'alive', timestamp: Date.now() });
 });
-```
+```markdown
 
 **Readiness Probe (就緒探針)**:
 - **目的**: 確認應用已準備好接收流量（DB 連接、外部依賴可用）
@@ -344,7 +344,7 @@ async function checkDatabaseConnection() {
     return false;
   }
 }
-```
+```markdown
 
 **Startup Probe (啟動探針 - Optional for slow-start apps)**:
 - **目的**: 給予應用更長的啟動時間（如 Java Spring Boot 需 60 秒）
@@ -359,7 +359,7 @@ startupProbe:
   initialDelaySeconds: 0
   periodSeconds: 10
   failureThreshold: 30  # 300 seconds total (10s * 30)
-```
+```text
 
 #### 3.2.4 自動回滾機制 (Automated Rollback)
 
@@ -415,7 +415,7 @@ curl -X POST "https://api.pagerduty.com/incidents" \
   }'
 
 echo "✅ Rollback completed. Investigate canary logs for root cause."
-```
+```text
 
 #### 3.2.5 Feature Flag 整合 (Progressive Feature Enablement)
 
@@ -432,7 +432,7 @@ if (featureFlag) {
   // Use stable algorithm
   processWithOldAlgorithm();
 }
-```
+```markdown
 
 **好處**:
 - 即使 100% 流量在新版本，仍可透過 Feature Flag 瞬間切回舊邏輯

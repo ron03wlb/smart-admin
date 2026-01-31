@@ -47,7 +47,7 @@
 
 **設計原理**：使用 **Per-Player Data Encryption Key (DEK)** 加密 PII，DEK 本身由 **Master Key (KEK)** 加密。刪除玩家時，僅需銷毀 DEK，即可使所有 PII 永久不可恢復。
 
-```
+```sql
 [Crypto-Shredding Architecture]
 ┌────────────────────────────────────────────────────────────┐
 │  Key Hierarchy                                             │
@@ -77,7 +77,7 @@
 │  → DEK destroyed, all PII becomes unrecoverable           │
 │  → Even with database backups, data cannot be decrypted   │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **為何傳統刪除不夠？**
 | 刪除方式 | 問題 | Crypto-Shredding 優勢 |
