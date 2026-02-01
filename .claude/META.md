@@ -14,7 +14,7 @@
 
 | Component | Version | Last Updated | Status | Owner |
 |-----------|---------|-------------|--------|-------|
-| **CLAUDE.md** | 3.3.0 | 2026-01-29 | ✅ Universal AI Support | Root |
+| **CLAUDE.md** | 3.4.0 | 2026-01-31 | ✅ Universal AI Support + Java 21 | Root |
 | **.claude/ System** | 3.0.2 | 2026-01-30 | ✅ Optimized | .claude/VERSION.md |
 | **.agent/ Rules** | 1.0.0 | 2026-01-27 | ✅ Production Ready | .agent/VERSION.md |
 | **.agents/skills/** | (external) | N/A | ✅ Active | Claude Code |
