@@ -27,6 +27,14 @@ PostgreSQL 性能分析和優化技能，專為 SmartAdmin 項目設計，提供
 
 ---
 
+## Version
+
+**Skill Version**: 1.0.0
+**Last Updated**: 2026-01-31
+**Compatible With**: SmartAdmin v4.0.0+, .claude/ system v3.0.2+
+
+---
+
 ## Trigger Keywords
 
 This skill is automatically activated when the user's request contains:

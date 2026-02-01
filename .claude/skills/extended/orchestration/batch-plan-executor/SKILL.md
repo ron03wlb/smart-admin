@@ -49,6 +49,16 @@ description: [P1 - Extended] Batch plan executor for automatically detecting, an
 - ✅ **Dry-run Simulation**: 模擬運行模式，零風險評估
 - ✅ **Zero Configuration**: 開箱即用，90% 場景無需配置
 
+---
+
+## Version
+
+**Skill Version**: 1.0.0
+**Last Updated**: 2026-01-31
+**Compatible With**: SmartAdmin v4.0.0+, .claude/ system v3.0.2+
+
+---
+
 ### When to Use This Skill
 
 **觸發關鍵詞**:
@@ -79,6 +89,26 @@ description: [P1 - Extended] Batch plan executor for automatically detecting, an
 - ⏳ Phase 2 (v1.1.0): 並行執行、模塊衝突檢測
 - ⏳ Phase 3 (v1.2.0): 依賴關係檢測、回滾機制
 - ⏳ Phase 4 (v1.3.0): 進度追蹤、實時日誌
+
+---
+
+## Skill Dependencies
+
+此編排 skill 協調多個 foundation/productivity skills：
+
+**Foundation Skills**:
+- `smartadmin-crud-generator` - CRUD 生成任務
+- `archunit-test-generator` - 測試生成任務
+
+**Productivity Skills**:
+- `cache-strategy-generator` - 快取實現任務
+- `db-migration-manager` - 資料庫遷移任務
+- 其他 skills 根據任務類型動態調用
+
+**依賴處理**:
+- Skills 根據 plan task 類型動態調用
+- 依賴 skill 失敗會觸發整個 batch 回滾
+- 完整映射見 `docs/skill-mapping.md`
 
 ---
 

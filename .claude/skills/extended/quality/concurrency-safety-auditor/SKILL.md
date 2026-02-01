@@ -29,6 +29,21 @@ description: [P1 - Extended] Concurrency safety audit with SpotBugs pattern dete
 
 ---
 
+## Related Skills & Boundaries
+
+**互補 Skills**:
+- `spring-pattern-checker` - 驗證 Spring 特定模式（@Transactional 位置、依賴注入）
+- `archunit-test-generator` - 生成架構強制測試
+
+**邊界澄清**:
+- **本 skill 專注**: 並發原語（鎖、原子操作、執行緒安全）
+- **spring-pattern-checker 專注**: Spring 框架模式（分層、註解）
+- **重疊部分**: 兩者都檢查 @Transactional 使用，但角度不同：
+  - concurrency-safety-auditor: 交易方法的執行緒安全性
+  - spring-pattern-checker: 正確的層級放置（Manager vs Service）
+
+---
+
 ## 觸發方式
 
 ```bash

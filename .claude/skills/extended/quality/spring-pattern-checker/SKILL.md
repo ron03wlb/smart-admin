@@ -61,6 +61,21 @@ User: "Check dependency injection patterns"
 
 **Note**: This skill can also be manually invoked via `/spring-pattern-checker` or `/spring` command.
 
+---
+
+## Related Skills & Boundaries
+
+**互補 Skills**:
+- `concurrency-safety-auditor` - 驗證執行緒安全和並發模式
+- `archunit-test-generator` - 生成架構強制測試
+
+**邊界澄清**:
+- **本 skill 專注**: Spring 框架合規性（分層、註解、依賴注入）
+- **concurrency-safety-auditor 專注**: 並發原語和執行緒安全
+- **無重疊**: 這些 skills 處理正交關注點，應同時使用以進行全面質量檢查
+
+---
+
 ## Core Rules
 
 SmartAdmin enforces 4 critical Spring patterns validated by this skill:

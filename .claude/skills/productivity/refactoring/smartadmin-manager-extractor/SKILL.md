@@ -32,6 +32,14 @@ description: [P2 - Productivity] Automatically extract @Transactional methods to
 
 ---
 
+## Version
+
+**Skill Version**: 1.0.0
+**Last Updated**: 2026-01-31
+**Compatible With**: SmartAdmin v4.0.0+, .claude/ system v3.0.2+
+
+---
+
 ## Trigger Keywords
 
 This skill is automatically activated when the user's request contains:
