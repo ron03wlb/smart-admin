@@ -248,6 +248,13 @@ Profile and optimize Java performance (N+1 query detection, JVM tuning, CPU hots
 
 **Status**: Soft-deprecated, use `smartadmin-performance-suite --mode=diagnose` instead
 
+**Note**: 此 skill 的功能已整合至 [smartadmin-performance-suite](productivity/composite/smartadmin-performance-suite/)。建議使用 composite skill 的相應模式：
+- N+1 查詢檢測 → `smartadmin-performance-suite --mode=diagnose`
+- JVM 調優 → `smartadmin-performance-suite --mode=optimize`
+- APM 監控 → `smartadmin-performance-suite --mode=monitor`
+
+`java-performance-pro` 仍可獨立使用，但 composite skill 提供更全面的性能分析工作流程。
+
 ---
 
 ### Refactoring (1 skill)
