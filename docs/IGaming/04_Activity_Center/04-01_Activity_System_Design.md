@@ -214,7 +214,7 @@ flowchart TD
     style RISK_REJECT fill:#FFCDD2
     style BUDGET_EXHAUSTED fill:#FF9800,color:#FFF
     style RISK_MANUAL fill:#FFF9C4
-```yaml
+```
 
 **規則引擎性能優化策略**：
 
@@ -381,7 +381,7 @@ stateDiagram-v2
         • 玩家有權申訴
         • 7 天內必須回覆
     end note
-```text
+```
 
 **狀態轉換觸發條件矩陣**：
 
@@ -625,7 +625,7 @@ sequenceDiagram
         PromotionService->>AuditLog: 5. Log "Risk Rejected"
         PromotionService->>Player: 6. Notify (Optional)
     end
-```text
+```
 
 ### 統一流水驗證架構 (Unified Turnover Validation Architecture)
 
@@ -940,7 +940,7 @@ flowchart TD
     style APPLY_CAP fill:#FFD54F
     style EXCLUSIVE_GROUP fill:#FFE082
     style MIN_CONTRIB fill:#FFAB91
-```text
+```
 
 **衝突處理策略對比表**：
 

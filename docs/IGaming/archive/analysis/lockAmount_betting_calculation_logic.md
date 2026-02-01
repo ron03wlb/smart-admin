@@ -1,5 +1,16 @@
 # LockAmount 投注計算邏輯詳細文件
 
+> ⚠️ **已廢棄 (Deprecated)**: 此文檔包含舊系統 (OGP) 的實際代碼,僅供歷史參考。新系統已採用三層驗證架構 (Layer 1/2/3),相關邏輯參見:
+> - [02-04 流水與對帳](../../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
+> - [02-04-01 流程圖與時序圖](../../02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
+> - [00-03 術語標準化](../../00_Concept_&_Analysis/00-03_Terminology_Standards.md)
+>
+> **術語變更說明**:
+> - 本文檔使用舊術語「Effective Stake (有效投注)」,新系統已統一為「Valid Bet (有效投注額)」
+> - lockAmount 邏輯已在 v2.0.0 中修正 (參見行 211-311 的 Critical Issue 說明)
+>
+> **代碼狀態**: 所有 Java 代碼為舊系統 (OGP) 實現,已被新系統取代,保留僅供參考
+
 ## 文件概述
 
 本文件詳細說明投注交易流程中，lockAmount（鎖定金額）如何隨著投注下注、結算、取消等不同階段變化，以及有效投注（effectiveStake）的計算邏輯和業務規則。

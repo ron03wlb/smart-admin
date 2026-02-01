@@ -121,7 +121,7 @@ graph TB
     style U fill:#f8d7da
     style V fill:#f8d7da
     style W fill:#f8d7da
-```text
+```
 
 ---
 
@@ -232,7 +232,7 @@ sequenceDiagram
     end
 
     Platform->>DB: 33. 記錄審計日誌<br/>AuditLog.create({<br/>action: "TURNOVER_CALCULATED",<br/>details: {...}<br/>})
-```text
+```
 
 ---
 
