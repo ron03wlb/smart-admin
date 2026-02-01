@@ -25,6 +25,26 @@ conflict_resolution:
     - refactor: 2 skills (manager-extractor, vavr-refactoring-assistant)
 
 # ====================================================================
+# Dependency Management Guidelines
+# ====================================================================
+#
+# SINGLE SOURCE OF TRUTH: depends_on
+#
+# Skills declare dependencies using TWO fields:
+# - depends_on: AUTHORITATIVE (what this skill depends on)
+# - depended_by: DERIVED (auto-calculated from reverse dependencies)
+#
+# CRITICAL RULES:
+# 1. Always update 'depends_on' when adding dependencies
+# 2. The 'depended_by' field is for documentation only
+# 3. Validation script enforces consistency between both fields
+#
+# To validate dependencies:
+#   $ python3 .claude/scripts/validate-dependency-graph.py
+#
+# ====================================================================
+
+# ====================================================================
 # Foundation Skills (P0 - Critical)
 # ====================================================================
 skills:
@@ -125,7 +145,7 @@ skills:
     status: "stable"
     description: "Generate test data builders for complex domain objects"
     depends_on: []
-    depended_by: ["smartadmin-testing-suite", "smartadmin-crud-generator"]
+    depended_by: ["smartadmin-testing-suite"]
 
 # ====================================================================
 # Extended Skills (P1 - Important)

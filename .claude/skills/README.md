@@ -346,6 +346,45 @@ All skills now have **config.yml** (100% coverage vs 3% before):
 
 **Central Registry**: [skill-registry.yml](skill-registry.yml) - Single Source of Truth for all skill metadata
 
+### Dependency Management
+
+**Single Source of Truth**: `depends_on` field
+
+Skills declare their dependencies using two fields:
+- **`depends_on`** (AUTHORITATIVE): List of skills this skill depends on
+- **`depended_by`** (DERIVED): List of skills that depend on this skill
+
+**CRITICAL**: Always update `depends_on` when adding dependencies. The `depended_by` field is auto-derived for documentation purposes.
+
+**Adding Dependencies**:
+
+1. Update the `depends_on` field in `skill-registry.yml`:
+   ```yaml
+   my-new-skill:
+     depends_on: ["smartadmin-crud-generator", "test-fixture-generator"]
+     depended_by: []  # Will be validated/derived automatically
+   ```
+
+2. Run validation to verify consistency:
+   ```bash
+   python3 .claude/scripts/validate-dependency-graph.py
+   ```
+
+3. Fix any circular dependency or reference errors
+
+4. Commit changes
+
+**Common Mistakes**:
+
+❌ **DON'T**: Manually edit `depended_by` fields
+✅ **DO**: Update `depends_on` and run validation
+
+❌ **DON'T**: Create circular dependencies (A → B → A)
+✅ **DO**: Design one-way dependency chains
+
+❌ **DON'T**: Reference non-existent skills
+✅ **DO**: Verify skill names in skill-registry.yml
+
 ---
 
 ## Related Documentation

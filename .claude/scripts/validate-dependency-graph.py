@@ -71,16 +71,19 @@ class SkillDependencyGraph:
         """Build dependency graph"""
         print_header("Building Dependency Graph")
 
+        # First pass: Build the graph
         for skill_name, skill_data in self.skills.items():
             depends_on = skill_data.get('depends_on', [])
-            depended_by = skill_data.get('depended_by', [])
 
             # Build forward graph (A depends on B)
             for dep in depends_on:
                 self.graph[skill_name].append(dep)
                 self.reverse_graph[dep].append(skill_name)
 
-            # Verify depended_by consistency
+        # Second pass: Verify depended_by consistency (after graph is fully built)
+        for skill_name, skill_data in self.skills.items():
+            depended_by = skill_data.get('depended_by', [])
+
             for dep in depended_by:
                 if skill_name not in self.graph.get(dep, []):
                     print_warning(f"{skill_name}: depended_by includes '{dep}', but '{dep}' doesn't depend on '{skill_name}'")
@@ -142,13 +145,10 @@ class SkillDependencyGraph:
         print_header("Topological Sort (Dependency Order)")
 
         # Calculate in-degrees
-        in_degree = {skill: 0 for skill in self.skills.keys()}
-        for skill in self.graph:
-            for dep in self.graph[skill]:
-                if dep in in_degree:
-                    in_degree[dep] += 1
+        # in_degree[A] = number of dependencies A has (i.e., len(self.graph[A]))
+        in_degree = {skill: len(self.graph.get(skill, [])) for skill in self.skills.keys()}
 
-        # Queue with zero in-degree nodes
+        # Queue with zero in-degree nodes (skills with no dependencies)
         queue = deque([skill for skill, degree in in_degree.items() if degree == 0])
         sorted_order = []
 
@@ -156,7 +156,7 @@ class SkillDependencyGraph:
             node = queue.popleft()
             sorted_order.append(node)
 
-            # Reduce in-degree for neighbors
+            # For each skill that depends on 'node', reduce its in-degree
             for neighbor in self.reverse_graph.get(node, []):
                 in_degree[neighbor] -= 1
                 if in_degree[neighbor] == 0:
