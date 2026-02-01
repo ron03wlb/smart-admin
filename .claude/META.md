@@ -228,6 +228,52 @@ For questions or issues with the .claude/ configuration:
 
 ---
 
+## Maintenance Protocol
+
+### 何時更新 META.md
+
+**觸發事件**:
+- 新增/移除 skill → 更新 "Content Inventory" 計數
+- CLAUDE.md 版本升級 → 更新版本表 + last updated 日期
+- `.claude/` 結構變更 → 更新 "Content Inventory" 路徑
+- 重大 skill 重構 → 更新變更歷史
+
+### 更新檢查清單
+
+1. **版本表** (Lines 13-16):
+   - 如有破壞性變更，升級版本
+   - 更新 "Last Updated" 日期以匹配最新變更
+   - 如有交叉引用，與 CLAUDE.md 同步日期
+
+2. **內容清單** (Lines 24-49):
+   - 驗證 skill 計數符合 `find .claude/skills -name SKILL.md | wc -l`
+   - 如結構變更，更新文件計數
+
+3. **變更歷史** (Lines 51-76):
+   - 添加新條目（日期、版本、摘要）
+   - 保持時間順序（最新在前）
+
+### 驗證命令
+
+```bash
+# 驗證 skill 計數
+find .claude/skills/foundation -name SKILL.md | wc -l  # 應符合 P0 計數
+find .claude/skills/extended -name SKILL.md | wc -l    # 應符合 P1 計數
+find .claude/skills/productivity -name SKILL.md | wc -l # 應符合 P2 計數
+
+# 檢查孤立的 backup
+find .claude -name "*.backup" -o -name "*~" -o -name "*.swp"
+
+# 驗證時間戳一致性
+grep -h "Last Updated\|2026-" CLAUDE.md .claude/META.md | sort -u
+```
+
+**時間戳**: 2026-01-31
+**驗證者**: Architecture review process
+**下次審查**: 2026-02-28（或當 CLAUDE.md 達到 v3.5.0）
+
+---
+
 **Document Version**: 2.2.0
 **Last Updated**: 2026-01-31
 **Next Review**: 2026-04-27 (Quarterly)

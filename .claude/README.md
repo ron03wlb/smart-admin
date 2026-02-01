@@ -118,3 +118,9 @@ Common patterns:
 - **Root Reference**: [CLAUDE.md](../CLAUDE.md) - Developer quick reference
 - **Technical Rules**: [.agent/rules/](.agent/rules/) - Detailed coding standards
 - **Architecture Docs**: [docs/](../docs/) - System architecture
+
+---
+
+**Last Validated**: 2026-01-31
+**Validation Scope**: Skill 計數、目錄結構、版本引用
+**Next Review Due**: 2026-02-28
