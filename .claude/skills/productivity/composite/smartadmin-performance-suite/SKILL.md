@@ -24,6 +24,37 @@ User: "The employee listing endpoint is slow, taking 5+ seconds"
 - Execution: Diagnose → Optimize → Monitor
 - Time: ~30 minutes (vs 60 minutes with separate skills)
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "slow" - Slow performance issue
+- "performance" - Performance optimization
+- "optimize" - Optimize application performance
+
+**Secondary Keywords** (Medium confidence):
+- "monitoring" - Context: performance monitoring setup
+- "APM" - Context: Application Performance Monitoring
+- "cache" - Context: caching optimization
+- "N+1" - Context: N+1 query detection
+- "Grafana" - Context: Grafana dashboard setup
+
+**Phrase Patterns**:
+- "[Component] is slow" - Example: "Employee listing endpoint is slow"
+- "Optimize [operation] performance" - Example: "Optimize database query performance"
+- "Monitor [system] performance" - Example: "Monitor API response times"
+
+**Example User Requests**:
+```
+User: "The employee listing endpoint is slow, taking 5+ seconds"
+User: "Optimize database query performance"
+User: "Monitor API response times with Grafana"
+User: "Detect and fix N+1 query problems"
+```
+
+**Note**: This skill can also be manually invoked via `/smartadmin-performance-suite` command. Supports modes: `--workflow` (default), `--diagnose-only`, `--optimize-only`, `--monitor-only`.
+
 ---
 
 ## v2.0.0 Performance Suite Consolidation

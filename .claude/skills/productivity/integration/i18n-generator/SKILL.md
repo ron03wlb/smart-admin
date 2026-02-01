@@ -13,6 +13,37 @@ description: [P2 - Productivity] Generate internationalization (i18n) support fo
 
 Enable global deployment by generating complete i18n infrastructure. Supports SmartAdmin deployment in 5+ languages with systematic translation management.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "i18n" - Internationalization infrastructure
+- "internationalization" - Multi-language support
+- "multi-language" - Multiple language support
+- "translation" - Translation management
+- "locale" - Locale configuration
+
+**Secondary Keywords** (Medium confidence):
+- "RTL" - Context: Right-to-left layout support
+- "global deployment" - Context: multi-region/language deployment
+- "language switch" - Context: dynamic language switching
+
+**Phrase Patterns**:
+- "Add i18n to [module]" - Example: "Add i18n to Employee module"
+- "Implement [language] support" - Example: "Implement French language support"
+- "Setup translation for [component]" - Example: "Setup translation for error messages"
+
+**Example User Requests**:
+```
+User: "Add i18n support to the Employee module"
+User: "Implement French and German language support"
+User: "Setup translation management for error messages"
+User: "Add RTL layout support for Arabic"
+```
+
+**Note**: This skill can also be manually invoked via `/i18n-generator` command.
+
 ## Problem Statement
 
 **User Roadmap Need:** "全球部署 (i18n)" (Global deployment with i18n)

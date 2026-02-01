@@ -42,6 +42,41 @@ description: [P1 - Extended] Concurrency safety audit with SpotBugs pattern dete
 /concurrency-audit --severity HIGH
 ```
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "concurrency" - Concurrency safety audit and analysis
+- "thread safety" - Thread-safe code validation
+- "race condition" - Race condition detection
+- "concurrency audit" - Explicit audit invocation
+- "thread-safe audit" - Comprehensive thread safety audit
+
+**Secondary Keywords** (Medium confidence):
+- "deadlock detection" - Context: deadlock pattern detection
+- "concurrent access" - Context: concurrent modification issues
+- "synchronization issues" - Context: sync pattern validation
+- "check-then-act" - Context: non-atomic operation detection
+- "double-checked locking" - Context: DCL pattern validation
+- "ConcurrentHashMap misuse" - Context: concurrent collection issues
+
+**Phrase Patterns**:
+- "Audit [component] for concurrency issues" - Example: "Audit Manager layer for concurrency issues"
+- "Detect [concurrency pattern]" - Example: "Detect race conditions in wallet operations"
+- "Check thread safety of [class]" - Example: "Check thread safety of UserManager"
+
+**Example User Requests**:
+```
+User: "Audit the codebase for concurrency issues"
+User: "Detect race conditions in financial operations"
+User: "Check thread safety of Manager layer classes"
+User: "Analyze deadlock risks in wallet transactions"
+User: "Run concurrency safety audit with HIGH severity only"
+```
+
+**Note**: This skill can also be manually invoked via `/concurrency-safety-auditor` or `/concurrency-audit` command. Supports severity filtering: `--severity HIGH|MEDIUM|LOW`.
+
 ---
 
 ## 風險評級系統

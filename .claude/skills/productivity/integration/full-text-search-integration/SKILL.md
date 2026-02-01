@@ -13,6 +13,38 @@ description: [P2 - Productivity] Generate Elasticsearch integration for SmartAdm
 
 Enable advanced search and analytics by generating Elasticsearch integration. Provides search 100x faster than MyBatis LIKE queries.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "Elasticsearch" - Elasticsearch integration
+- "full-text search" - Full-text search implementation
+- "search" - Advanced search capabilities (Context: beyond LIKE queries)
+- "aggregation" - Elasticsearch aggregation queries
+- "analytics" - Business analytics with Elasticsearch
+
+**Secondary Keywords** (Medium confidence):
+- "fuzzy search" - Context: fuzzy matching search
+- "autocomplete" - Context: search autocomplete
+- "phrase search" - Context: phrase matching
+- "log analysis" - Context: log aggregation and analysis
+
+**Phrase Patterns**:
+- "Integrate Elasticsearch with [entity]" - Example: "Integrate Elasticsearch with Product catalog"
+- "Add search to [module]" - Example: "Add full-text search to Employee module"
+- "Implement [search type]" - Example: "Implement fuzzy search for product names"
+
+**Example User Requests**:
+```
+User: "Integrate Elasticsearch with Product catalog for advanced search"
+User: "Add full-text search to Employee module"
+User: "Implement fuzzy search for product names"
+User: "Setup Elasticsearch aggregations for sales analytics"
+```
+
+**Note**: This skill can also be manually invoked via `/full-text-search-integration` command.
+
 ## Problem Statement
 
 **User Roadmap Need:** "高级搜索 (Elasticsearch)" (Advanced search)

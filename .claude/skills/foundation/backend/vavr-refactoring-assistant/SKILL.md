@@ -24,6 +24,39 @@ You will:
 4. Preserve business logic correctness
 5. Verify ArchUnit compliance
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "Vavr" - Vavr library usage or refactoring
+- "refactor to Vavr" - Convert code to use Vavr patterns
+- "Option pattern" - io.vavr.control.Option usage
+- "Try pattern" - io.vavr.control.Try usage
+- "Either pattern" - io.vavr.control.Either usage
+- "serviceUsesVavrOption" - ArchitectureTest violation fix
+
+**Secondary Keywords** (Medium confidence):
+- "convert Optional" - Context: from java.util.Optional to io.vavr.control.Option
+- "functional exceptions" - Context: replacing try-catch with Try.of()
+- "ArchitectureTest violation" - Context: Service layer Optional usage
+- "Vavr refactoring" - General Vavr refactoring request
+
+**Phrase Patterns**:
+- "Refactor [Service] to use Vavr Option" - Example: "Refactor UserService to use Vavr Option"
+- "Convert Optional to Option in [class]" - Example: "Convert Optional to Option in EmployeeService"
+- "Replace try-catch with Try.of() in [method]" - Example: "Replace try-catch with Try.of() in findById"
+
+**Example User Requests**:
+```
+User: "Refactor this Service to use Vavr Option"
+User: "Convert Optional to Option in EmployeeService"
+User: "Fix ArchitectureTest serviceUsesVavrOption violation"
+User: "Replace try-catch with Try.of() for error handling"
+```
+
+**Note**: This skill can also be manually invoked via `/vavr-refactoring-assistant` command.
+
 ## Prerequisites
 
 **IMPORTANT**: Before using this skill, verify Vavr dependency is in your project:

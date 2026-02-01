@@ -21,6 +21,46 @@ Validates code compliance with SmartAdmin's strict Spring Framework conventions 
 /spring path/to/files      # Check specific files
 ```
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "spring pattern" - Spring pattern validation
+- "spring validation" - Validate Spring code compliance
+- "transactional placement" - Validate @Transactional placement rules
+- "dependency injection" - Check dependency injection patterns
+- "architecture compliance" - SmartAdmin architecture compliance
+
+**Secondary Keywords** (Medium confidence):
+- "field injection" - Context: detect field injection anti-patterns
+- "constructor injection" - Context: validate constructor injection usage
+- "@Transactional" - Context: annotation placement validation
+- "@Cacheable" - Context: cacheable annotation placement
+- "layered architecture" - Context: layer dependency validation
+- "Spring Bean naming" - Context: bean naming convention validation
+
+**Phrase Patterns**:
+- "Check Spring patterns in [component]" - Example: "Check Spring patterns in Manager layer"
+- "Validate [Spring rule]" - Example: "Validate @Transactional placement"
+- "Detect [anti-pattern]" - Example: "Detect field injection in Service layer"
+
+**Example User Requests**:
+```
+User: "Check Spring patterns in the Employee module"
+User: "Validate @Transactional placement in Manager layer"
+User: "Detect field injection anti-patterns"
+User: "Verify layered architecture compliance"
+User: "Check dependency injection patterns"
+```
+
+**Automatic Activation** (Agent-triggered):
+- After `code-reviewer` agent completes (Spring-specific follow-up)
+- When `ArchitectureTest.java` execution fails
+- When modifying Spring Bean classes (`@Component`, `@Service`, `@Controller`, `@Repository`)
+
+**Note**: This skill can also be manually invoked via `/spring-pattern-checker` or `/spring` command.
+
 ## Core Rules
 
 SmartAdmin enforces 4 critical Spring patterns validated by this skill:

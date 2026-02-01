@@ -24,6 +24,37 @@ You will:
 4. Validate migration syntax
 5. Test migration in local environment
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "database migration" - Database schema migration
+- "Flyway" - Flyway migration tool
+- "Liquibase" - Liquibase migration tool
+- "migration script" - Migration script generation
+
+**Secondary Keywords** (Medium confidence):
+- "schema change" - Context: database schema modifications
+- "rollback script" - Context: migration rollback generation
+- "versioned migration" - Context: Flyway/Liquibase versioning
+- "add column" / "add table" - Context: schema alteration
+
+**Phrase Patterns**:
+- "Create migration to [action]" - Example: "Create migration to add brand table"
+- "Add [column/table] to [table]" - Example: "Add email column to employee table"
+- "Generate [tool] migration for [change]" - Example: "Generate Flyway migration for department structure"
+
+**Example User Requests**:
+```
+User: "Create a migration to add a brand table"
+User: "Add email column to employee table"
+User: "Generate Flyway migration for the new department structure"
+User: "Create rollback script for the last migration"
+```
+
+**Note**: This skill can also be manually invoked via `/db-migration-manager` command.
+
 ## Core Capabilities
 
 ### 1. Flyway Migration Generation

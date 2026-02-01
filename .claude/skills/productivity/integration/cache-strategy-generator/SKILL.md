@@ -13,6 +13,38 @@ description: [P2 - Productivity] Generate multi-level caching strategies (Caffei
 
 Eliminate slow query problems by generating systematic multi-level caching strategies. Reduces slow query incidents by 80% through intelligent caching patterns.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "caching" - Caching strategy implementation
+- "cache" - Cache layer generation
+- "Redis cache" - Redis caching integration
+- "Caffeine" - Caffeine local cache
+- "slow queries" - Slow query optimization with caching
+
+**Secondary Keywords** (Medium confidence):
+- "cache invalidation" - Context: cache invalidation strategy
+- "multi-level cache" - Context: L1/L2 caching hierarchy
+- "cache stampede" - Context: cache stampede prevention
+- "cache hit rate" - Context: cache monitoring
+
+**Phrase Patterns**:
+- "Add cache to [component]" - Example: "Add cache to product query"
+- "Implement caching for [operation]" - Example: "Implement caching for user lookup"
+- "Optimize [slow query] with cache" - Example: "Optimize employee search with Redis cache"
+
+**Example User Requests**:
+```
+User: "Add Redis cache to product catalog queries"
+User: "Implement multi-level caching for user authentication"
+User: "Optimize slow employee search queries with Caffeine cache"
+User: "Setup cache invalidation strategy for order updates"
+```
+
+**Note**: This skill can also be manually invoked via `/cache-strategy-generator` command.
+
 ## Problem Statement
 
 **User Pain Point:** "慢查询/缓存问题" (Slow queries/caching problems)

@@ -25,6 +25,41 @@ You will:
 4. Create database schemas for fraud tracking
 5. Add real-time monitoring and alerting
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "fraud" - Fraud detection system implementation
+- "fraud detection" - Explicit fraud detection feature request
+- "risk control" - Risk management and control systems
+- "bonus abuse" - Bonus abuse prevention patterns
+- "multi-account" - Multi-account detection algorithms
+
+**Secondary Keywords** (Medium confidence):
+- "suspicious transactions" - Context: transaction fraud detection
+- "KYC automation" - Context: automated KYC trigger rules
+- "AML" - Context: Anti-Money Laundering compliance
+- "arbitrage betting" - Context: betting pattern fraud detection
+- "device fingerprinting" - Context: multi-account detection
+- "chargeback prevention" - Context: payment fraud detection
+
+**Phrase Patterns**:
+- "Detect [fraud type]" - Example: "Detect players with multiple accounts"
+- "Prevent [abuse type]" - Example: "Prevent bonus abuse and arbitrage betting"
+- "Implement [risk feature]" - Example: "Implement real-time risk scoring for withdrawals"
+
+**Example User Requests**:
+```
+User: "Detect players with multiple accounts using device fingerprinting"
+User: "Prevent bonus abuse and arbitrage betting in my iGaming platform"
+User: "Implement real-time risk scoring for withdrawal requests"
+User: "Flag suspicious betting patterns and matched betting"
+User: "Automate KYC verification triggers based on risk scores"
+```
+
+**Note**: This skill can also be manually invoked via `/fraud-detection-pattern-generator` command.
+
 ## Core Fraud Detection Patterns
 
 ### 1. Multi-Account Detection (Device Fingerprinting + IP Analysis)

@@ -24,6 +24,38 @@ You will:
 4. Recommend optimizations with code examples
 5. Measure improvement with before/after metrics
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "slow" - Slow performance issue
+- "performance" - Performance analysis request
+- "optimize" - Performance optimization
+- "N+1" - N+1 query problem
+
+**Secondary Keywords** (Medium confidence):
+- "memory leak" - Context: memory leak detection
+- "CPU usage" - Context: high CPU usage analysis
+- "cache miss" - Context: cache performance issues
+- "query optimization" - Context: database query optimization
+- "OutOfMemoryError" - Context: JVM memory issues
+
+**Phrase Patterns**:
+- "[Component] is slow" - Example: "Employee listing endpoint is very slow"
+- "Getting [error]" - Example: "Getting OutOfMemoryError in production"
+- "Optimize [performance issue]" - Example: "Optimize N+1 query problem"
+
+**Example User Requests**:
+```
+User: "The employee listing endpoint is very slow, taking 5+ seconds"
+User: "We're getting OutOfMemoryError in production"
+User: "CPU usage is at 100% during peak hours"
+User: "How do I optimize this N+1 query?"
+```
+
+**Note**: This skill can also be manually invoked via `/java-performance-pro` command.
+
 ## Core Capabilities
 
 ### 1. N+1 Query Detection (MyBatis Plus)

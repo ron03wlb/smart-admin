@@ -25,6 +25,43 @@ You will:
 4. Add validation and sanitization
 5. Implement audit trails
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "security" - Security hardening or compliance implementation
+- "encryption" - API encryption (SM2/SM3/SM4)
+- "data masking" - PII protection (phone, email, ID card)
+- "audit log" - Financial operation audit trails
+- "secure endpoint" - Endpoint security hardening
+
+**Secondary Keywords** (Medium confidence):
+- "SQL injection" - Context: input validation and sanitization
+- "XSS" - Context: cross-site scripting protection
+- "CSRF" - Context: cross-site request forgery protection
+- "rate limiting" - Context: DDoS prevention
+- "compliance" - Context: KYC/AML/iGaming compliance
+- "KYC" - Context: Know Your Customer implementation
+- "AML" - Context: Anti-Money Laundering implementation
+- "hardening" - General security hardening request
+
+**Phrase Patterns**:
+- "Add [security feature] to [component]" - Example: "Add encryption to the payment API"
+- "Implement [protection] for [data]" - Example: "Implement data masking for phone numbers"
+- "Secure [component] against [threat]" - Example: "Secure this endpoint against SQL injection"
+
+**Example User Requests**:
+```
+User: "Add encryption to the payment API"
+User: "Implement data masking for phone numbers in user profile"
+User: "Secure this endpoint against SQL injection and XSS"
+User: "Add audit logging for financial operations"
+User: "Implement rate limiting to prevent DDoS attacks"
+```
+
+**Note**: This skill can also be manually invoked via `/security-hardening-pro` command.
+
 ## Core Capabilities
 
 ### 1. API Encryption (SM2/SM3/SM4)

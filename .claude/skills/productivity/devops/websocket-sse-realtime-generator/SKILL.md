@@ -13,6 +13,38 @@ description: [P2 - Productivity] Generate WebSocket/SSE (Server-Sent Events) rea
 
 Enable real-time communication by generating WebSocket/SSE integration. Delivers notifications and live updates with < 500ms latency.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "WebSocket" - WebSocket real-time communication
+- "SSE" - Server-Sent Events implementation
+- "real-time" - Real-time updates/notifications
+- "live updates" - Live data updates
+- "push notifications" - Server push notifications
+
+**Secondary Keywords** (Medium confidence):
+- "chat" - Context: real-time chat implementation
+- "notification system" - Context: real-time notification delivery
+- "dashboard updates" - Context: real-time dashboard data
+- "STOMP" - Context: STOMP over WebSocket protocol
+
+**Phrase Patterns**:
+- "Add WebSocket to [component]" - Example: "Add WebSocket to admin dashboard"
+- "Implement real-time [feature]" - Example: "Implement real-time notifications"
+- "Create [WebSocket/SSE] for [use case]" - Example: "Create SSE for order status updates"
+
+**Example User Requests**:
+```
+User: "Add WebSocket to admin dashboard for live updates"
+User: "Implement real-time notifications for user activities"
+User: "Create SSE endpoint for order status updates"
+User: "Build a chat system with WebSocket"
+```
+
+**Note**: This skill can also be manually invoked via `/websocket-sse-realtime-generator` command.
+
 ## Problem Statement
 
 **User Roadmap Need:** "实时更新 (WebSocket/SSE)" (Real-time updates)

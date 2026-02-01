@@ -27,21 +27,37 @@ PostgreSQL 性能分析和優化技能，專為 SmartAdmin 項目設計，提供
 
 ---
 
-## 觸發方式
+## Trigger Keywords
 
-### 關鍵字觸發
+This skill is automatically activated when the user's request contains:
 
-在對話中使用以下任意關鍵字：
+**Primary Keywords** (High confidence):
+- "database performance" - Database performance analysis
+- "PostgreSQL optimization" - PostgreSQL query optimization
+- "HikariCP tuning" - HikariCP connection pool tuning
+- "N+1 query detection" - Detect N+1 query patterns
+- "slow query analysis" - Analyze slow queries
 
+**Secondary Keywords** (Medium confidence):
+- "connection pool" - Context: HikariCP connection pooling
+- "index recommendation" - Context: database index optimization
+- "EXPLAIN ANALYZE" - Context: PostgreSQL execution plan analysis
+- "pg_stat" - Context: PostgreSQL statistics analysis
+
+**Phrase Patterns**:
+- "Analyze [database issue]" - Example: "Analyze database timeout errors"
+- "Optimize [query type]" - Example: "Optimize employee search queries"
+- "Tune [component]" - Example: "Tune HikariCP connection pool"
+
+**Example User Requests**:
 ```
-"database performance"
-"PostgreSQL optimization"
-"HikariCP tuning"
-"N+1 query detection"
-"slow query analysis"
-"connection pool"
-"index recommendation"
+User: "Analyze database performance issues causing timeouts"
+User: "Detect N+1 query patterns in Employee module"
+User: "Tune HikariCP connection pool configuration"
+User: "Optimize slow PostgreSQL queries with index recommendations"
 ```
+
+**Note**: This skill can also be manually invoked via `/postgresql-best-practices` or `/postgres-analyze` command.
 
 ### 命令觸發
 

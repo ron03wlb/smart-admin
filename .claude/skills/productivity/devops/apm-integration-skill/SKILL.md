@@ -49,6 +49,40 @@ You will:
 5. Enable distributed tracing
 6. Integrate log correlation
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "APM" - Application Performance Monitoring integration
+- "monitoring" - System monitoring setup
+- "Skywalking" - Skywalking APM integration
+- "Grafana" - Grafana dashboard generation
+- "metrics" - Custom metrics implementation
+
+**Secondary Keywords** (Medium confidence):
+- "distributed tracing" - Context: distributed system tracing setup
+- "Micrometer" - Context: Micrometer metrics library integration
+- "custom metrics" - Context: application-specific metrics
+- "dashboard" - Context: monitoring dashboard creation
+- "alert rules" - Context: monitoring alert configuration
+
+**Phrase Patterns**:
+- "Add APM monitoring to [component]" - Example: "Add APM monitoring to UserService"
+- "Setup [monitoring tool]" - Example: "Setup Skywalking for distributed tracing"
+- "Create [dashboard] for [metrics]" - Example: "Create Grafana dashboard for login metrics"
+
+**Example User Requests**:
+```
+User: "Add APM monitoring to UserService with custom metrics for login events"
+User: "Setup Skywalking distributed tracing for microservices"
+User: "Create Grafana dashboard for wallet transaction metrics"
+User: "Integrate Micrometer with custom business metrics"
+User: "Setup alert rules for high error rates"
+```
+
+**Note**: This skill can also be manually invoked via `/apm-integration-skill` command.
+
 ## Scope
 
 ### Included

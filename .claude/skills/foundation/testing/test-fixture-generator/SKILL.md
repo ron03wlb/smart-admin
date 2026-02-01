@@ -31,7 +31,38 @@ Generate reusable test fixture builders following SmartAdmin's **EmployeeTestFix
 5. Multiple tests need same domain object with different values
 6. User mentions: "test fixture", "test data builder", "integration test setup"
 
-**CSO Keywords**: integration test, test fixture, builder pattern, BaseIntegrationTest, test data, AtomicInteger, unique test values
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "test fixture" - Generate test fixture builder class
+- "test data builder" - Create reusable test data builders
+- "generate fixture" - Explicit fixture generation request
+- "EmployeeTestFixture" - Reference to SmartAdmin fixture pattern
+- "integration test setup" - Test data setup for integration tests
+
+**Secondary Keywords** (Medium confidence):
+- "create test data" - Context: for integration tests
+- "AtomicInteger" - Context: unique test values generation
+- "unique test values" - Context: avoiding constraint violations
+- "builder pattern" - Context: test data builders
+- "BaseIntegrationTest" - Context: SmartAdmin integration test base class
+
+**Phrase Patterns**:
+- "Generate test fixture for [Entity]" - Example: "Generate test fixture for Product"
+- "Create [Entity]TestFixture" - Example: "Create EmployeeTestFixture"
+- "I need test data builder for [Entity]" - Example: "I need test data builder for Order"
+
+**Example User Requests**:
+```
+User: "Generate test fixture for Product entity"
+User: "Create CustomerTestFixture following EmployeeTestFixture pattern"
+User: "I need a test data builder for Order with unique values"
+User: "Setup integration test data for Employee module"
+```
+
+**Note**: This skill can also be manually invoked via `/test-fixture-generator` command.
 
 ---
 

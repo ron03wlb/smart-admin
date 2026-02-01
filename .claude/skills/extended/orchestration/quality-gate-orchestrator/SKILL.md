@@ -39,21 +39,41 @@ generate-quality-gate --type pre-merge --fail-on blocker,critical
 
 ---
 
-## CSO Keywords
+## Trigger Keywords
 
-**Auto-trigger when user mentions**:
-- "quality gate"
-- "pre-commit checks"
-- "ArchUnit integration"
-- "Checkstyle pipeline"
-- "PMD automation"
-- "SpotBugs workflow"
-- "SonarQube integration"
-- "code quality checks"
-- "static analysis pipeline"
-- "quality orchestration"
-- "multi-tool validation"
-- "quality report aggregation"
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "quality gate" - Quality gate setup and orchestration
+- "quality orchestration" - Orchestrate multiple quality tools
+- "pre-commit checks" - Pre-commit quality validation setup
+- "code quality checks" - Comprehensive code quality validation
+
+**Secondary Keywords** (Medium confidence):
+- "ArchUnit integration" - Context: integrate ArchUnit with quality pipeline
+- "Checkstyle pipeline" - Context: Checkstyle automation in CI/CD
+- "PMD automation" - Context: automated PMD checks
+- "SpotBugs workflow" - Context: SpotBugs integration workflow
+- "SonarQube integration" - Context: SonarQube quality metrics
+- "static analysis pipeline" - Context: multi-tool static analysis
+- "multi-tool validation" - Context: orchestrating multiple quality tools
+- "quality report aggregation" - Context: unified quality reporting
+
+**Phrase Patterns**:
+- "Setup [quality tool] pipeline" - Example: "Setup ArchUnit quality gate pipeline"
+- "Generate [CI/CD] quality checks" - Example: "Generate GitHub Actions quality checks"
+- "Orchestrate [quality tools]" - Example: "Orchestrate Checkstyle, PMD, and SpotBugs"
+
+**Example User Requests**:
+```
+User: "Setup quality gate with ArchUnit, Checkstyle, and PMD"
+User: "Generate pre-commit checks for SmartAdmin project"
+User: "Create CI/CD quality pipeline with parallel execution"
+User: "Orchestrate all quality tools with fail-fast strategy"
+User: "Generate quality report aggregation for pull requests"
+```
+
+**Note**: This skill can also be manually invoked via `/quality-gate-orchestrator` command. Supports execution strategies: `sequential`, `parallel`, `hybrid`.
 
 ---
 

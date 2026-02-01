@@ -32,15 +32,35 @@ description: [P2 - Productivity] Automatically extract @Transactional methods to
 
 ---
 
-## 觸發方式
+## Trigger Keywords
 
-### 關鍵字
+This skill is automatically activated when the user's request contains:
 
+**Primary Keywords** (High confidence):
+- "extract to Manager" - Extract methods to Manager layer
+- "transactionalMustUseRollbackForThrowable fails" - ArchUnit test violation
+- "@Transactional must be in Manager" - Architecture rule enforcement
+- "refactor transaction" - Refactor transactional methods
+
+**Secondary Keywords** (Medium confidence):
+- "move method to Manager" - Context: layer refactoring
+- "ArchUnit violation" - Context: transactional placement violation
+- "Manager layer" - Context: refactoring to Manager
+
+**Phrase Patterns**:
+- "Extract [method] to Manager" - Example: "Extract saveEmployee to Manager layer"
+- "Fix [ArchUnit test] violation" - Example: "Fix transactionalMustUseRollbackForThrowable violation"
+- "Refactor [Service] to use Manager" - Example: "Refactor EmployeeService to use Manager"
+
+**Example User Requests**:
 ```
-"extract to Manager"
-"transactionalMustUseRollbackForThrowable fails"
-"@Transactional must be in Manager"
+User: "Extract @Transactional methods from EmployeeService to Manager layer"
+User: "Fix transactionalMustUseRollbackForThrowable ArchUnit violation"
+User: "Refactor EmployeeService transactions to Manager"
+User: "Move saveEmployee method to Manager layer"
 ```
+
+**Note**: This skill can also be manually invoked via `/smartadmin-manager-extractor` or `/manager-extract` command. Supports `--dry-run` mode.
 
 ### 命令
 

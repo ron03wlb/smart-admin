@@ -720,20 +720,46 @@ See [docs/plans/liteflow/migration-guide.md](../../../../docs/plans/liteflow/mig
 
 ---
 
-## CSO Keywords (Discoverability)
+## Trigger Keywords
 
-**Trigger phrases:**
-- "create flow", "create chain", "LiteFlow rule"
-- "business workflow", "approval flow", "validation chain"
-- "sequential execution", "parallel processing", "conditional logic"
-- "orchestration", "routing", "branching"
-- "migrate from Evrete", "rule engine"
+This skill is automatically activated when the user's request contains:
 
-**Context signals:**
-- User describes multi-step process
+**Primary Keywords** (High confidence):
+- "LiteFlow" - LiteFlow rule or chain generation
+- "create LiteFlow chain" - Explicit chain creation request
+- "create LiteFlow rule" - Explicit rule creation request
+- "flow orchestration" - Workflow orchestration design
+- "business workflow" - Business process workflow
+
+**Secondary Keywords** (Medium confidence):
+- "approval flow" - Context: multi-level approval workflows
+- "validation chain" - Context: sequential validation logic
+- "conditional logic" - Context: IF/SWITCH/CASE patterns
+- "parallel execution" / "parallel processing" - Context: WHEN pattern
+- "sequential execution" - Context: THEN pattern
+- "migrate from Evrete" - Context: Evrete to LiteFlow migration
+- "rule engine" - Context: business rule engine implementation
+
+**Phrase Patterns**:
+- "Create [flow type] with [logic]" - Example: "Create approval flow with conditional routing"
+- "Implement [workflow] using LiteFlow" - Example: "Implement employee validation using LiteFlow"
+- "Migrate [Evrete rule] to LiteFlow" - Example: "Migrate employee approval rule to LiteFlow"
+
+**Context Signals** (Auto-activation):
+- User describes multi-step process requiring orchestration
 - Mentions "if-then-else" or "parallel" operations
-- Talks about approval levels or routing
-- Wants database-backed rules with hot-reload
+- Talks about approval levels or routing logic
+- Wants database-backed rules with hot-reload capability
+
+**Example User Requests**:
+```
+User: "Create approval flow for employee salary above $100,000"
+User: "Implement validation chain with sequential checks"
+User: "Create LiteFlow rule for parallel invoice processing"
+User: "Migrate Evrete employee approval rule to LiteFlow"
+```
+
+**Note**: This skill can also be manually invoked via `/liteflow-rule-builder` command.
 
 ---
 

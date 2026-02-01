@@ -15,6 +15,40 @@ User: "Create wallet deposit/withdrawal API"
 User: "Add bonus distribution engine"
 ```
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "VIP tier" - VIP tier system implementation
+- "VIP system" - Complete VIP management features
+- "wallet deposit" - Deposit transaction processing
+- "wallet withdrawal" - Withdrawal transaction processing
+- "bonus distribution" - Bonus engine and distribution logic
+
+**Secondary Keywords** (Medium confidence):
+- "financial operations" - Context: iGaming financial transactions
+- "compliance features" - Context: iGaming compliance requirements
+- "player management" - Context: player account and tier management
+- "audit trail" - Context: financial operation logging
+- "wagering requirements" - Context: bonus engine rules
+
+**Phrase Patterns**:
+- "Implement [iGaming feature]" - Example: "Implement VIP tier upgrade logic"
+- "Create [wallet operation] API" - Example: "Create wallet deposit/withdrawal API"
+- "Add [bonus feature]" - Example: "Add bonus distribution engine"
+
+**Example User Requests**:
+```
+User: "Implement VIP tier upgrade logic based on wagering amount"
+User: "Create wallet deposit/withdrawal API with SERIALIZABLE isolation"
+User: "Add bonus distribution engine with wagering requirements"
+User: "Implement player risk scoring for withdrawal approval"
+User: "Create financial operations audit trail for compliance"
+```
+
+**Note**: This skill can also be manually invoked via `/igame-feature-builder` command.
+
 ## Core Capabilities
 
 ### 1. VIP System

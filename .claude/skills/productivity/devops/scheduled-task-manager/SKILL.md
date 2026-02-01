@@ -13,6 +13,38 @@ description: [P2 - Productivity] Generate XXL-Job/Snail-Job integration for Smar
 
 Enable automated workflows by generating XXL-Job/Snail-Job integration. Replaces manual cron/Timer tasks with distributed scheduled jobs.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "scheduled task" - Scheduled job creation
+- "cron job" - Cron-based job scheduling
+- "XXL-Job" - XXL-Job distributed scheduling
+- "Snail-Job" - Snail-Job distributed scheduling
+- "batch processing" - Batch job processing
+
+**Secondary Keywords** (Medium confidence):
+- "distributed job" - Context: distributed job scheduling
+- "job monitoring" - Context: scheduled job monitoring
+- "retry handling" - Context: job failure retry
+- "job dependency" - Context: job dependency management
+
+**Phrase Patterns**:
+- "Create scheduled task for [operation]" - Example: "Create scheduled task for daily report generation"
+- "Add cron job to [action]" - Example: "Add cron job to clean up expired data"
+- "Setup [XXL-Job/Snail-Job] for [task]" - Example: "Setup XXL-Job for user synchronization"
+
+**Example User Requests**:
+```
+User: "Create scheduled task for daily report generation"
+User: "Add cron job to clean up expired sessions every hour"
+User: "Setup XXL-Job for user data synchronization"
+User: "Implement batch processing for invoice generation"
+```
+
+**Note**: This skill can also be manually invoked via `/scheduled-task-manager` command.
+
 ## Problem Statement
 
 **User Roadmap Need:** "调度自动化 (XXL-Job/Snail-Job)" (Scheduled automation)

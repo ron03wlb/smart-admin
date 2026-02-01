@@ -13,6 +13,39 @@ description: [P2 - Productivity] Generate business report export functionality (
 
 Eliminate repetitive export code by generating complete report functionality. Reduces export feature development time from 4 hours to 15 minutes.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "export" - Data export functionality
+- "report" - Report generation
+- "Excel" - Excel export/generation
+- "PDF" - PDF report generation
+- "CSV" - CSV export
+- "download" - File download functionality
+
+**Secondary Keywords** (Medium confidence):
+- "template" - Context: export template creation
+- "scheduled report" - Context: automated report generation
+- "chart generation" - Context: chart/graph export
+- "large dataset export" - Context: async export for large data
+
+**Phrase Patterns**:
+- "Add export to [module]" - Example: "Add Excel export to Employee list"
+- "Generate [format] report" - Example: "Generate PDF report for sales data"
+- "Implement [data] export" - Example: "Implement user data CSV export"
+
+**Example User Requests**:
+```
+User: "Add Excel export to Employee list"
+User: "Generate PDF report for monthly sales data"
+User: "Implement CSV export for order history"
+User: "Create scheduled report generation for daily analytics"
+```
+
+**Note**: This skill can also be manually invoked via `/report-generator-skill` command.
+
 ## Problem Statement
 
 **User Pain Point:** "导出/报表生成" (Export/Report generation)

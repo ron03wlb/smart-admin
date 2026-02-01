@@ -28,11 +28,39 @@ Auto-invokes igame-pm-analyst
 Returns complete requirement analysis report
 ```
 
-**Trigger Keywords**:
-- iGame, 包網 (gaming platform), 博弈 (gaming), 遊戲平台 (game platform)
-- 錢包 (wallet), 存款 (deposit), 提款 (withdrawal), 風控 (risk control)
-- VIP, 優惠 (promotion), 返水 (rebate), 傭金 (commission)
-- 遊戲聚合 (game aggregation), 供應商 (provider), 多租戶 (multi-tenant)
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "iGame" - iGaming platform requirement analysis
+- "包網" - Gaming platform turnkey solution (Traditional Chinese)
+- "博弈" - Gaming/gambling (Traditional Chinese)
+- "遊戲平台" - Game platform (Traditional Chinese)
+
+**Secondary Keywords** (Medium confidence):
+- "錢包" (wallet) - Context: iGaming wallet operations
+- "存款" (deposit) / "提款" (withdrawal) - Context: financial transactions
+- "風控" (risk control) - Context: risk management features
+- "VIP" - Context: VIP tier system
+- "優惠" (promotion) / "返水" (rebate) / "傭金" (commission) - Context: bonus engine
+- "遊戲聚合" (game aggregation) / "供應商" (provider) - Context: game provider integration
+- "多租戶" (multi-tenant) - Context: multi-tenant architecture
+
+**Phrase Patterns**:
+- "需要開發 [iGaming功能]" - Example: "需要開發VIP自動升級功能"
+- "分析 [iGaming需求]" - Example: "分析玩家返水計算需求"
+- "設計 [iGaming模組]" - Example: "設計錢包存提款系統"
+
+**Example User Requests**:
+```
+User: "需要開發VIP自動升級功能" (Need to develop VIP auto-upgrade feature)
+User: "分析玩家返水計算需求" (Analyze player rebate calculation requirement)
+User: "設計錢包存提款系統的風控機制" (Design risk control for wallet deposit/withdrawal)
+User: "實作遊戲聚合供應商整合方案" (Implement game provider aggregation solution)
+```
+
+**Note**: This skill is typically auto-invoked by `business-analyst` when iGaming keywords detected. Manual invocation: `/igame-pm-analyst` command.
 
 ### Manual Invocation
 

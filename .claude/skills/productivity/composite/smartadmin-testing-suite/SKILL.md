@@ -24,6 +24,37 @@ User: "Create integration tests for EmployeeService"
 - Generates: Integration test class + Test fixtures + Testcontainers setup
 - Time: ~10 minutes
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "create tests" - Test generation request
+- "integration test" - Integration test creation
+- "test fixture" - Test fixture generation
+- "TDD" - Test-Driven Development
+- "E2E test" - End-to-end test creation
+
+**Secondary Keywords** (Medium confidence):
+- "Testcontainers" - Context: integration test with Testcontainers
+- "unit test" - Context: unit test generation
+- "test coverage" - Context: improve test coverage
+
+**Phrase Patterns**:
+- "Create [test type] for [component]" - Example: "Create integration tests for EmployeeService"
+- "Generate test fixture for [entity]" - Example: "Generate test fixture for Product"
+- "Add [test coverage] to [module]" - Example: "Add test coverage to Order module"
+
+**Example User Requests**:
+```
+User: "Create integration tests for EmployeeService"
+User: "Generate test fixture for Product entity"
+User: "Add unit tests to OrderManager"
+User: "Create E2E tests for checkout flow"
+```
+
+**Note**: This skill can also be manually invoked via `/smartadmin-testing-suite` command. Supports modes: `--integration`, `--unit`, `--e2e`, `--fixture`.
+
 ---
 
 ## v2.0.0 Testing Suite Consolidation

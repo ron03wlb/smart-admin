@@ -24,6 +24,38 @@ You will:
 5. Add quality gates (SpotBugs, PMD, Checkstyle)
 6. Configure deployment pipelines (dev, staging, production)
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "CI/CD" - CI/CD pipeline generation
+- "GitHub Actions" - GitHub Actions workflow generation
+- "GitLab CI" - GitLab CI pipeline generation
+- "deployment automation" - Automated deployment setup
+
+**Secondary Keywords** (Medium confidence):
+- "pipeline" - Context: CI/CD pipeline configuration
+- "workflow" - Context: GitHub Actions workflow
+- "continuous integration" - Context: CI setup
+- "continuous deployment" - Context: CD setup
+- "quality gates" - Context: pipeline quality checks
+
+**Phrase Patterns**:
+- "Setup [CI/CD platform]" - Example: "Setup GitHub Actions for SmartAdmin"
+- "Create [platform] pipeline" - Example: "Create GitLab CI pipeline with quality gates"
+- "Add deployment automation to [environment]" - Example: "Add deployment automation to dev/staging/prod"
+
+**Example User Requests**:
+```
+User: "Set up GitHub Actions for SmartAdmin"
+User: "Create GitLab CI pipeline with quality gates"
+User: "Add deployment automation to dev/staging/prod environments"
+User: "Generate CI/CD workflow with Docker support"
+```
+
+**Note**: This skill can also be manually invoked via `/cicd-pipeline-builder` command.
+
 ## Why This Skill Matters
 
 **Problem:** Manual integration validation is slow and error-prone, causing production issues.

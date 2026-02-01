@@ -13,6 +13,39 @@ description: [P2 - Productivity] Generate Kafka/RocketMQ integration patterns (p
 
 Enable event-driven architecture by generating Kafka/RocketMQ integration patterns. Unlocks scalability and loose coupling for SmartAdmin applications.
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "Kafka" - Apache Kafka integration
+- "RocketMQ" - Apache RocketMQ integration
+- "event-driven" - Event-driven architecture
+- "message queue" - Message queue integration
+- "CQRS" - Command Query Responsibility Segregation
+- "event sourcing" - Event sourcing pattern
+
+**Secondary Keywords** (Medium confidence):
+- "producer" / "consumer" - Context: Kafka/RocketMQ patterns
+- "distributed transaction" - Context: message-based saga patterns
+- "idempotency" - Context: idempotent message processing
+- "dead letter queue" - Context: DLQ handling
+
+**Phrase Patterns**:
+- "Add [MQ] to [module]" - Example: "Add Kafka to Order processing"
+- "Implement event-driven [pattern]" - Example: "Implement event-driven notifications"
+- "Setup [Kafka/RocketMQ] for [use case]" - Example: "Setup Kafka for audit logging"
+
+**Example User Requests**:
+```
+User: "Add Kafka integration to Order processing module"
+User: "Implement event-driven architecture for user notifications"
+User: "Setup RocketMQ for distributed transaction handling"
+User: "Create event sourcing pattern for wallet operations"
+```
+
+**Note**: This skill can also be manually invoked via `/message-queue-pattern-generator` command.
+
 ## Problem Statement
 
 **User Pain Point:** "事件驱动架构" (Event-driven architecture)

@@ -528,17 +528,37 @@ Before completing test generation:
 
 ---
 
-## CSO Keywords
+## Trigger Keywords
 
-Trigger this skill when encountering:
-- "ArchitectureTest", "ArchUnit", "architecture rule"
-- "layer dependency", "layered architecture"
-- "@Transactional restriction", "annotation constraint"
-- "field injection", "constructor injection"
-- "package migration", "deprecated package"
-- "naming convention", "class naming"
-- "Manager layer", "Service layer", "Controller layer"
-- "add architecture test", "enforce constraint"
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "ArchUnit" - ArchUnit test generation or architecture enforcement
+- "ArchitectureTest" - Direct reference to ArchitectureTest.java
+- "architecture test" - Generate tests for architecture validation
+- "add ArchUnit test" - Explicit skill invocation request
+- "enforce architecture rule" - Architecture constraint enforcement
+
+**Secondary Keywords** (Medium confidence):
+- "layer dependency" - Context: validating layered architecture (Controller → Service → Manager → Dao)
+- "@Transactional restriction" - Context: annotation placement validation
+- "field injection" - Context: detecting prohibited @Autowired field injection
+- "package migration" - Context: deprecated package detection rules
+- "naming convention" - Context: class/method naming validation
+
+**Phrase Patterns**:
+- "add ArchUnit test for [module/rule]" - Example: "add ArchUnit test for Manager layer"
+- "generate test to enforce [constraint]" - Example: "generate test to enforce @Transactional placement"
+- "create ArchUnit rule for [pattern]" - Example: "create ArchUnit rule for constructor injection"
+
+**Example User Requests**:
+```
+User: "Add ArchUnit test to enforce that Manager layer cannot call Service layer"
+User: "Generate test for the @Transactional restriction in Manager layer"
+User: "I need to validate layered architecture dependencies for the Employee module"
+```
+
+**Note**: This skill can also be manually invoked via `/archunit-test-generator` command.
 
 ---
 

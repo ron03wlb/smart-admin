@@ -22,6 +22,38 @@ You will:
 5. Generate test cases covering CRUD operations
 6. Add assertions for ResponseDTO, database state, cache behavior
 
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "integration test" - Generate Spring Boot integration tests
+- "create integration test" - Explicit integration test generation request
+- "Testcontainers" - Testcontainers-based integration tests
+- "test with real database" - Full database integration testing
+- "BaseIntegrationTest" - SmartAdmin integration test base class
+
+**Secondary Keywords** (Medium confidence):
+- "test database operations" - Context: CRUD operations testing
+- "test transactions" - Context: @Transactional behavior testing
+- "test Redis cache" - Context: cache layer integration testing
+- "integration test for" - Context: specific layer/module testing
+
+**Phrase Patterns**:
+- "Create integration test for [Service/Manager/Controller]" - Example: "Create integration test for EmployeeService"
+- "Generate [Layer] integration test" - Example: "Generate Manager integration test"
+- "I need to test [operation] with real database" - Example: "I need to test Employee CRUD with real database"
+
+**Example User Requests**:
+```
+User: "Create integration tests for EmployeeService"
+User: "Generate integration test for UserManager with transaction testing"
+User: "I need to test Employee CRUD operations with real database and Redis cache"
+User: "Setup Testcontainers integration test for Product module"
+```
+
+**Note**: This skill can also be manually invoked via `/smartadmin-integration-test` command.
+
 ## Core Test Patterns
 
 SmartAdmin has **three integration test patterns** based on the layer being tested:
