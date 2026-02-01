@@ -8,7 +8,7 @@
 # Category: Integration
 # ====================================================================
 
-skill_metadata:
+metadata:
   name: "postgresql-best-practices"
   version: "1.0.0"
   priority: "P2"

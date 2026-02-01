@@ -3,6 +3,17 @@
 # Last Updated: 2026-01-29
 
 # ====================================================================
+# METADATA
+# ====================================================================
+metadata:
+  name: batch-plan-executor
+  version: 1.0.0
+  priority: P1
+  type: orchestrator
+  category: extended/orchestration
+  status: stable
+
+# ====================================================================
 # EXECUTION SETTINGS
 # ====================================================================
 execution:

@@ -102,7 +102,7 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 ├── VERSION.md                           # Version history
 ├── settings.local.json                  # Permissions (12 core patterns)
 ├── agents/                              # 9 specialized agents
-├── skills/                              # 29 specialized skills (v3.0.0)
+├── skills/                              # 33 specialized skills (v3.0.0)
 │   ├── README.md                        # Skills catalog (auto-generated)
 │   ├── skill-registry.yml               # SSOT for skill metadata
 │   ├── skill-aliases.json               # Backward compatibility

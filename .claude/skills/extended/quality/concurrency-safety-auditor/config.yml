@@ -8,7 +8,7 @@
 # Category: Quality
 # ====================================================================
 
-skill_metadata:
+metadata:
   name: "concurrency-safety-auditor"
   version: "1.0.0"
   priority: "P1"

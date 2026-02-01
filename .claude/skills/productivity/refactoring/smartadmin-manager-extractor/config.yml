@@ -8,7 +8,7 @@
 # Category: Refactoring
 # ====================================================================
 
-skill_metadata:
+metadata:
   name: "smartadmin-manager-extractor"
   version: "1.0.0"
   priority: "P2"

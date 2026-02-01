@@ -203,8 +203,8 @@ productivity:
     java-performance-pro:
       version: "1.0.0"
       last_updated: "2026-01-29"
-      status: "soft-deprecated"
-      changelog: "JVM profiling (soft-deprecated, use performance-suite instead)"
+      status: "stable"
+      changelog: "JVM profiling (standalone or via smartadmin-performance-suite)"
 
   refactoring:
     smartadmin-manager-extractor:
@@ -221,8 +221,8 @@ lifecycle:
     smartadmin-api-docs:
       version: "1.0.0"
       last_updated: "2026-01-25"
-      status: "hard-deprecated"
-      deprecation_phase: "hard"
+      status: "soft-deprecated"
+      deprecation_phase: "soft"
       removal_date: "2026-06-30"
       replacement: "smartadmin-crud-generator (phase-3-api-docs)"
       changelog: "Replaced by CRUD generator API docs phase"
@@ -230,8 +230,8 @@ lifecycle:
     smartadmin-mybatis:
       version: "1.0.0"
       last_updated: "2026-01-25"
-      status: "hard-deprecated"
-      deprecation_phase: "hard"
+      status: "soft-deprecated"
+      deprecation_phase: "soft"
       removal_date: "2026-06-30"
       replacement: "smartadmin-crud-generator (phase-1-backend)"
       changelog: "Replaced by CRUD generator backend phase"
@@ -239,8 +239,8 @@ lifecycle:
     smartadmin-vue-crud:
       version: "1.0.0"
       last_updated: "2026-01-25"
-      status: "hard-deprecated"
-      deprecation_phase: "hard"
+      status: "soft-deprecated"
+      deprecation_phase: "soft"
       removal_date: "2026-06-30"
       replacement: "smartadmin-crud-generator (phase-2-frontend)"
       changelog: "Replaced by CRUD generator frontend phase"
