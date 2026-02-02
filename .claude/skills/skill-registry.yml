@@ -7,9 +7,9 @@
 # ====================================================================
 
 version: "3.0.0"
-last_updated: "2026-01-30"
-total_skills: 33
-active_skills: 30
+last_updated: "2026-02-02"
+total_skills: 35
+active_skills: 32
 deprecated_skills: 3
 
 # ====================================================================
@@ -98,6 +98,19 @@ skills:
     aliases: ["manager-extract", "extract-to-manager", "fix-transactional-violation"]
     status: "stable"
     description: "Automatically extract @Transactional methods to Manager layer, fix ArchUnit violations (83% time saving: 30min → 5min)"
+    depends_on: []
+    depended_by: []
+
+  markdown-quality-checker:
+    path: "productivity/refactoring/markdown-quality-checker"
+    priority: "P2"
+    type: "atomic"
+    category: "refactoring"
+    visibility: "public"
+    preferred_via: "both"
+    aliases: ["markdown-lint", "doc-quality", "mermaid-check"]
+    status: "stable"
+    description: "Detect and fix Markdown/Mermaid quality issues (closing fences, syntax, links)"
     depends_on: []
     depended_by: []
 
@@ -265,6 +278,19 @@ skills:
     aliases: ["spring", "spring-validation"]
     status: "stable"
     description: "Validate Spring patterns: @Transactional placement, dependency injection, layered architecture compliance"
+    depends_on: []
+    depended_by: []
+
+  naming-convention-checker:
+    path: "extended/quality/naming-convention-checker"
+    priority: "P1"
+    type: "atomic"
+    category: "quality"
+    visibility: "public"
+    preferred_via: "agent_only"
+    aliases: ["naming-check", "naming-validation"]
+    status: "stable"
+    description: "Validate SmartAdmin naming conventions (singular table names, class naming, field naming)"
     depends_on: []
     depended_by: []
 
@@ -548,6 +574,7 @@ dependency_graph:
     - liteflow-rule-builder
     - fraud-detection-pattern-generator
     - quality-gate-orchestrator
+    - naming-convention-checker
     - igame-pm-analyst
     - igaming-multi-tenant-wallet-pm
     - apm-integration-skill
@@ -560,6 +587,7 @@ dependency_graph:
     - scheduled-task-manager
     - websocket-sse-realtime-generator
     - java-performance-pro
+    - markdown-quality-checker
 
   # Single dependency (Tier 1)
   tier_1:

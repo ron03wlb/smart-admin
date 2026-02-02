@@ -1,0 +1,88 @@
+# ====================================================================
+# Metadata Section
+# ====================================================================
+metadata:
+  name: "markdown-quality-checker"
+  version: "1.0.0"
+  priority: "P2"
+  type: "atomic"
+  category: "refactoring"
+  visibility: "public"
+  preferred_via: "both"  # user_invoked + auto_trigger
+  status: "stable"
+  description: "Detect and fix Markdown/Mermaid quality issues (closing fences, syntax, links)"
+  ai_description: |
+    Automatically check and fix documentation quality issues:
+    - Mermaid closing fence errors (```text → ```)
+    - Markdown syntax violations (CommonMark spec)
+    - Broken internal links and image paths
+    Based on proven scripts from IGaming docs fix (467 errors, 100% success).
+  tags:
+    - "markdown"
+    - "mermaid"
+    - "documentation"
+    - "quality"
+    - "linting"
+    - "doc-validation"
+  author: "SmartAdmin Team"
+  last_updated: "2026-02-02"
+
+# ====================================================================
+# Trigger Configuration
+# ====================================================================
+triggers:
+  keywords:
+    - "check markdown quality"
+    - "validate mermaid"
+    - "fix mermaid closing"
+    - "scan documentation"
+    - "markdown lint"
+    - "doc quality"
+  patterns:
+    - "check\\s+.*\\s+quality"
+    - "fix\\s+mermaid\\s+.*\\s+errors"
+    - "validate\\s+.*\\s+syntax"
+  exclude_keywords:
+    - "java code"  # 避免與代碼檢查混淆
+
+# ====================================================================
+# Execution Configuration
+# ====================================================================
+execution:
+  type: "single-shot"
+  timeout_minutes: 10
+
+# ====================================================================
+# Dependencies
+# ====================================================================
+dependencies:
+  skills: []  # 無依賴其他 skills
+  required_files: []
+  tools:
+    - name: "bash"
+      version: ">=4.0"
+      required: true
+    - name: "grep"
+      required: true
+    - name: "find"
+      required: true
+
+# ====================================================================
+# Output Configuration
+# ====================================================================
+output:
+  generates:
+    - "SCAN_REPORT_*.txt"
+    - "FIX_LOG_*.txt"
+  target_directories:
+    - "/tmp/"
+    - "docs/*-backup-*/"
+
+# ====================================================================
+# Validation
+# ====================================================================
+validation:
+  post_execution:
+    - check: "scan_verification"
+      description: "Re-scan to verify 0 errors"
+      command: "bash scripts/scan-closing-errors-v2.sh"

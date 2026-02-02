@@ -7,8 +7,8 @@
 # ====================================================================
 
 schema_version: "1.0.0"
-registry_version: "3.0.2"
-last_updated: "2026-01-30"
+registry_version: "3.0.3"
+last_updated: "2026-02-02"
 
 # ====================================================================
 # Foundation Skills (P0 - Critical)
@@ -114,6 +114,12 @@ extended:
       status: "stable"
       changelog: "Spring pattern validation: @Transactional, DI, layered architecture"
 
+    naming-convention-checker:
+      version: "1.0.0"
+      last_updated: "2026-02-02"
+      status: "stable"
+      changelog: "Validate SmartAdmin naming conventions (singular table names, class naming, field naming)"
+
 # ====================================================================
 # Productivity Skills (P2 - Nice-to-have)
 # ====================================================================
@@ -213,6 +219,12 @@ productivity:
       status: "stable"
       changelog: "Extract @Transactional methods to Manager layer (83% time saving)"
 
+    markdown-quality-checker:
+      version: "1.0.0"
+      last_updated: "2026-02-02"
+      status: "stable"
+      changelog: "Detect and fix Markdown/Mermaid quality issues (closing fences, syntax, links)"
+
 # ====================================================================
 # Deprecated Skills (Lifecycle)
 # ====================================================================
@@ -249,11 +261,12 @@ lifecycle:
 # Version Sync Metadata
 # ====================================================================
 sync_metadata:
-  last_sync_time: "2026-01-30T22:30:00Z"
+  last_sync_time: "2026-02-02T12:00:00Z"
   sync_tool_version: "1.0.0"
-  total_skills: 33
-  synced_skills: 33
+  total_skills: 35
+  synced_skills: 35
   conflicts: 0
   notes: |
+    Registry consistency fix: Added naming-convention-checker and markdown-quality-checker.
     All skill versions synchronized with config.yml files.
     Use sync-skill-versions.sh to maintain consistency.
