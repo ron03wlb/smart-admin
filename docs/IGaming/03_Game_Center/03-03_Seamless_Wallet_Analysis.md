@@ -73,20 +73,9 @@ stateDiagram-v2
     CLOSED --> [*]
     CANCELLED --> [*]
 
-    note right of TIMEOUT
-        Scheduled Job:
-        - Run every 15 minutes
-        - Check Rounds WHERE status=OPEN
-          AND created_at < NOW() - 2 hours
-        - Query GP API for final status
-    end note
+    note right of TIMEOUT : Scheduled Job:\n- Run every 15 minutes\n- Check Rounds WHERE status=OPEN\n  AND created_at < NOW() - 2 hours\n- Query GP API for final status
 
-    note right of PENDING_REVIEW
-        Manual Review Criteria:
-        - Round Amount > $1000: HIGH Priority
-        - Round Amount < $1000: MEDIUM Priority
-        - SLA: 24 hours response
-    end note
+    note right of PENDING_REVIEW : Manual Review Criteria:\n- Round Amount > $1000: HIGH Priority\n- Round Amount < $1000: MEDIUM Priority\n- SLA: 24 hours response
 ```
 
 **Round 狀態轉換關鍵邏輯**：

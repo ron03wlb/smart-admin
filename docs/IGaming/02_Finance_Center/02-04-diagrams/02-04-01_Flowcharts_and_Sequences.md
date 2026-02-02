@@ -719,20 +719,12 @@ stateDiagram-v2
     [*] --> S_Pending : 玩家下注\n(扣除餘額)
 
     %% 修復點：將筆記移到 state 定義之外，並明確指向 S_Pending
-    note right of S_Pending
-        Status: PENDING
-        Turnover: 0
-        Reason: 等待GP確認
-    end note
+    note right of S_Pending : Status: PENDING\nTurnover: 0\nReason: 等待GP確認
 
     S_Pending --> S_Running : GP確認接受\n(遊戲開始)
 
     %% 2. 進行階段
-    note right of S_Running
-        Status: RUNNING
-        Turnover: 0
-        Reason: 賽果未出
-    end note
+    note right of S_Running : Status: RUNNING\nTurnover: 0\nReason: 賽果未出
 
     S_Running --> S_Settlement : 接收賽果
 

@@ -279,35 +279,13 @@ stateDiagram-v2
     CONFIRMED --> [*]: Settlement<br/>(T+1 Batch)
     CANCELLED --> [*]: Cleanup<br/>(Archive)
 
-    note right of PENDING
-        Status: PENDING
-        expires_at: NOW() + 5min
-        frozen_bonus: +20
-        frozen_cash: +30
-        frozen_credit: +50
-    end note
+    note right of PENDING : Status: PENDING\nexpires_at: NOW() + 5min\nfrozen_bonus: +20\nfrozen_cash: +30\nfrozen_credit: +50
 
-    note right of CONFIRMED
-        Status: CONFIRMED
-        confirmed_at: timestamp
-        balance updated
-        outbox event sent
-        version += 1
-    end note
+    note right of CONFIRMED : Status: CONFIRMED\nconfirmed_at: timestamp\nbalance updated\noutbox event sent\nversion += 1
 
-    note right of CANCELLED
-        Status: CANCELLED
-        cancelled_at: timestamp
-        reason: TIMEOUT | ROUND_FAILED
-        frozen resources released
-    end note
+    note right of CANCELLED : Status: CANCELLED\ncancelled_at: timestamp\nreason: TIMEOUT | ROUND_FAILED\nfrozen resources released
 
-    note right of EXPIRED
-        Scheduled Job Trigger:
-        SELECT * FROM tcc_transaction
-        WHERE status='PENDING'
-        AND expires_at < NOW()
-    end note
+    note right of EXPIRED : Scheduled Job Trigger:\nSELECT * FROM tcc_transaction\nWHERE status='PENDING'\nAND expires_at < NOW()
 ```
 
 **狀態轉換規則**:

@@ -330,76 +330,19 @@ stateDiagram-v2
     CANCELLED_BY_PLAYER --> [*]: 生命週期結束<br/>玩家主動放棄
     CANCELLED_BY_ADMIN --> [*]: 生命週期結束<br/>強制取消
 
-    note right of PENDING_ISSUE
-        初始狀態
-        ━━━━━━━━
-        風控審核窗口期
-        典型時長: < 5 秒
-    end note
+    note right of PENDING_ISSUE : 初始狀態\n━━━━━━━━\n風控審核窗口期\n典型時長: < 5 秒
 
-    note right of ACTIVE
-        激活狀態
-        ━━━━━━━━
-        玩家可使用紅利投注
-        但未開始追蹤流水
-        (某些活動需手動激活)
-    end note
+    note right of ACTIVE : 激活狀態\n━━━━━━━━\n玩家可使用紅利投注\n但未開始追蹤流水\n(某些活動需手動激活)
 
-    note right of WAGERING
-        流水累積階段
-        ━━━━━━━━
-        核心業務邏輯:
-        • 實時計算有效流水
-        • 檢測濫用行為
-        • 更新進度通知
+    note right of WAGERING : 流水累積階段\n━━━━━━━━\n核心業務邏輯:\n• 實時計算有效流水\n• 檢測濫用行為\n• 更新進度通知\n\n典型耗時:\n• 休閒玩家: 7-14 天\n• 高頻玩家: 1-3 天
 
-        典型耗時:
-        • 休閒玩家: 7-14 天
-        • 高頻玩家: 1-3 天
-    end note
+    note right of CLEARING_COMPLETED : 結算狀態\n━━━━━━━━\n流水達標後的臨界點\n需決定:\n• 是否超過 max_cashout\n• 最終可提現金額
 
-    note right of CLEARING_COMPLETED
-        結算狀態
-        ━━━━━━━━
-        流水達標後的臨界點
-        需決定:
-        • 是否超過 max_cashout
-        • 最終可提現金額
-    end note
+    note right of WITHDRAWABLE : 可提款狀態\n━━━━━━━━\n紅利已轉為現金\n玩家可自由支配\n此時才算 "真正獲利"
 
-    note right of WITHDRAWABLE
-        可提款狀態
-        ━━━━━━━━
-        紅利已轉為現金
-        玩家可自由支配
-        此時才算 "真正獲利"
-    end note
+    note left of EXPIRED : 超時失效\n━━━━━━━━\n常見原因:\n• 流水倍數設置過高\n• 玩家遊戲頻率低\n• 遊戲貢獻率設置過低\n\n運營優化:\n• 監控 expiry_rate\n• 調整 wager_multiplier
 
-    note left of EXPIRED
-        超時失效
-        ━━━━━━━━
-        常見原因:
-        • 流水倍數設置過高
-        • 玩家遊戲頻率低
-        • 遊戲貢獻率設置過低
-
-        運營優化:
-        • 監控 expiry_rate
-        • 調整 wager_multiplier
-    end note
-
-    note left of CANCELLED_BY_ADMIN
-        強制取消
-        ━━━━━━━━
-        需留存證據:
-        • 操作者 ID
-        • 取消原因
-        • 佐證文件
-
-        合規要求:
-        • 玩家有權申訴
-        • 7 天內必須回覆
-    end note
+    note left of CANCELLED_BY_ADMIN : 強制取消\n━━━━━━━━\n需留存證據:\n• 操作者 ID\n• 取消原因\n• 佐證文件\n\n合規要求:\n• 玩家有權申訴\n• 7 天內必須回覆
 ```
 
 ### 狀態轉換觸發條件矩陣

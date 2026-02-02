@@ -434,32 +434,11 @@ stateDiagram-v2
 
     CLOSED --> CLOSED: 錯誤率 < 50%<br/>持續監控
 
-    note right of CLOSED
-        正常狀態 (CLOSED):
-        - 所有請求轉發至上游
-        - 監控指標:
-          * Error Rate (5xx)
-          * Timeout Rate
-          * Avg Latency
-        - 滑動窗口: 最近 10 個請求
-    end note
+    note right of CLOSED : 正常狀態 (CLOSED):\n- 所有請求轉發至上游\n- 監控指標:\n  * Error Rate (5xx)\n  * Timeout Rate\n  * Avg Latency\n- 滑動窗口: 最近 10 個請求
 
-    note right of OPEN
-        跳閘狀態 (OPEN):
-        - 快速失敗 (Fail-Fast)
-        - 不調用上游服務
-        - 減輕上游壓力
-        - 防止雪崩效應
-        - 固定等待: 30 秒
-    end note
+    note right of OPEN : 跳閘狀態 (OPEN):\n- 快速失敗 (Fail-Fast)\n- 不調用上游服務\n- 減輕上游壓力\n- 防止雪崩效應\n- 固定等待: 30 秒
 
-    note right of HALF_OPEN
-        半開狀態 (HALF_OPEN):
-        - 發送探測請求
-        - 驗證上游是否恢復
-        - 成功 → CLOSED
-        - 失敗 → OPEN (重新跳閘)
-    end note
+    note right of HALF_OPEN : 半開狀態 (HALF_OPEN):\n- 發送探測請求\n- 驗證上游是否恢復\n- 成功 → CLOSED\n- 失敗 → OPEN (重新跳閘)
 ```
 
 **狀態轉換詳細說明**:

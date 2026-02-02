@@ -101,26 +101,11 @@ stateDiagram-v2
     PermBan --> [*]
 
     %% === 註釋說明 ===
-    note right of Diamond
-        鑽石等級保級條件最嚴格
-        但享有最高權益和優先服務
-        降級後仍保留 50% 特權
-    end note
+    note right of Diamond : 鑽石等級保級條件最嚴格\n但享有最高權益和優先服務\n降級後仍保留 50% 特權
 
-    note right of Frozen
-        風控凍結期間:
-        - 保留等級不變
-        - 禁止積分獲取
-        - 禁止提款操作
-        - 可提交申訴
-    end note
+    note right of Frozen : 風控凍結期間:\n- 保留等級不變\n- 禁止積分獲取\n- 禁止提款操作\n- 可提交申訴
 
-    note right of D_Warn
-        降級保護機制:
-        1. 第一次: 發送警告通知
-        2. 第二次: 最後通知 (寬限期)
-        3. 第三次: 正式降級 (附補償)
-    end note
+    note right of D_Warn : 降級保護機制:\n1. 第一次: 發送警告通知\n2. 第二次: 最後通知 (寬限期)\n3. 第三次: 正式降級 (附補償)
 ```
 
 **VIP 等級轉換觸發條件矩陣**：
