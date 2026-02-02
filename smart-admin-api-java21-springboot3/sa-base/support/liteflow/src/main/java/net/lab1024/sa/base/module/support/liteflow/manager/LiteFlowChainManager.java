@@ -10,6 +10,8 @@ import net.lab1024.sa.base.module.support.liteflow.dao.LiteFlowChainDao;
 import net.lab1024.sa.base.module.support.liteflow.domain.entity.LiteFlowChainEntity;
 import net.lab1024.sa.base.module.support.liteflow.domain.form.LiteFlowChainAddForm;
 import net.lab1024.sa.base.module.support.liteflow.domain.form.LiteFlowChainUpdateForm;
+import net.lab1024.sa.base.module.support.reload.constant.ReloadConst;
+import net.lab1024.sa.base.module.support.reload.core.annoation.SmartReload;
 import net.lab1024.sa.foundation.domain.code.UserErrorCode;
 import net.lab1024.sa.foundation.domain.response.ResponseDTO;
 import org.springframework.stereotype.Component;
@@ -169,5 +171,21 @@ public class LiteFlowChainManager {
     cacheManager.evictAll();
     flowExecutor.reloadRule();
     return ResponseDTO.ok();
+  }
+
+  /**
+   * SmartReload 集成 - 通過統一 Reload 接口重載 LiteFlow 規則
+   *
+   * <p>支持通過 POST /reload/execute 接口調用，參數 tag=liteflow
+   *
+   * @param args 重載參數（可選）
+   */
+  @SmartReload(ReloadConst.LITEFLOW_RELOAD)
+  public void liteflowReload(String args) {
+    if (log.isInfoEnabled()) {
+      log.info("SmartReload 觸發 LiteFlow 規則重載, args={}", args);
+    }
+    cacheManager.evictAll();
+    flowExecutor.reloadRule();
   }
 }
