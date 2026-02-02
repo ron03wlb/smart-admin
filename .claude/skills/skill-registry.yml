@@ -6,10 +6,10 @@
 # Last Updated: 2026-01-29
 # ====================================================================
 
-version: "3.0.1"
-last_updated: "2026-02-02"
-total_skills: 34
-active_skills: 31
+version: "3.0.0"
+last_updated: "2026-01-30"
+total_skills: 33
+active_skills: 30
 deprecated_skills: 3
 
 # ====================================================================
@@ -403,19 +403,6 @@ skills:
     depends_on: []
     depended_by: []
 
-  mermaid-syntax-checker:
-    path: "productivity/quality/mermaid-syntax-checker"
-    priority: "P2"
-    type: "atomic"
-    category: "quality"
-    visibility: "public"
-    preferred_via: "user_invoked"
-    aliases: ["mermaid-check", "mermaid-validate", "check-mermaid"]
-    status: "stable"
-    description: "Mermaid diagram syntax checker and auto-fixer with Pre-commit hook integration (scan/fix/rollback modes)"
-    depends_on: []
-    depended_by: []
-
   scheduled-task-manager:
     path: "productivity/devops/scheduled-task-manager"
     priority: "P2"
@@ -570,7 +557,6 @@ dependency_graph:
     - i18n-generator
     - message-queue-pattern-generator
     - report-generator-skill
-    - mermaid-syntax-checker
     - scheduled-task-manager
     - websocket-sse-realtime-generator
     - java-performance-pro
@@ -661,7 +647,6 @@ categories:
     description: "Meta-orchestration skills"
     skills:
       - batch-plan-executor
-      - quality-gate-orchestrator
 
   infrastructure:
     description: "Infrastructure/DevOps skills"
@@ -680,9 +665,7 @@ categories:
   quality:
     description: "Code quality and testing skills"
     skills:
-      - concurrency-safety-auditor
-      - spring-pattern-checker
-      - mermaid-syntax-checker
+      - quality-gate-orchestrator
 
   testing:
     description: "Testing and quality assurance skills"
@@ -700,31 +683,6 @@ categories:
     skills:
       - java-performance-pro
 
-  refactoring:
-    description: "Code refactoring and modernization"
-    skills:
-      - vavr-refactoring-assistant
-      - smartadmin-manager-extractor
-
-  devops:
-    description: "DevOps automation and infrastructure"
-    skills:
-      - apm-integration-skill
-      - cicd-pipeline-builder
-      - db-migration-manager
-      - scheduled-task-manager
-      - websocket-sse-realtime-generator
-
-  integration:
-    description: "Third-party system integration"
-    skills:
-      - cache-strategy-generator
-      - full-text-search-integration
-      - i18n-generator
-      - message-queue-pattern-generator
-      - report-generator-skill
-      - postgresql-best-practices
-
 # ====================================================================
-# END OF SKILL REGISTRY v3.0.1
+# END OF SKILL REGISTRY v3.0.0
 # ====================================================================
