@@ -267,25 +267,31 @@ public calculateGGR(date: LocalDate): GgrReport {
 if (!riskValidation.is_valid) {
   return {
     valid_turnover_finance: 0,      // Layer 2 返回拒絕結果
-    rejection_reason: riskValidation.risk_code
+    rejection_reason: riskValidation.matched_rules.join(', ')
   };
 }
 // 問題: Layer 2 不應參與拒絕決策,應該由 Layer 1 直接處理
 ```
 
-**✅ 正確方式** (v2.0.0):
+**✅ 正確方式** (v2.1.0):
 ```typescript
 // ✅ Layer 1 拒絕後直接短路,不調用 Layer 2
 const riskValidation = await RiskEngine.validateTurnover({...});
-if (!riskValidation.is_valid) {
-  // Layer 1 直接返回 0,不進入 Layer 2/3
+if (!riskValidation.is_valid && riskValidation.action_type === 'BLOCK') {
+  // Layer 1 BLOCK 規則直接返回 0,不進入 Layer 2/3
   return {
     effective_turnover_base: 0,
     valid_turnover_finance: 0,
     activity_valid_turnover: 0,
     rejected_by: 'RISK_ENGINE',
-    risk_code: riskValidation.risk_code
+    action_type: 'BLOCK',
+    matched_rules: riskValidation.matched_rules
   };
+}
+
+// FLAG 規則標記但繼續 (v2.1.0)
+if (riskValidation.action_type === 'FLAG') {
+  await recordRiskFlag(bet.id, riskValidation.risk_proposal_id);
 }
 
 // Layer 2 僅負責狀態因子調整 (信任 Layer 1 已通過驗證)
@@ -301,9 +307,15 @@ const valid_turnover_finance = calculateFinanceTurnover(
 
 ```typescript
 /**
- * Layer 1: Risk Engine 驗證
- * 負責: 拒絕決策 (Rejection Decision)
- * 返回: { is_valid: boolean, effective_turnover_base: number, risk_code: string }
+ * Layer 1: Risk Engine 驗證 (v2.1.0 配置驅動更新)
+ * 職責: 拒絕決策 + 風控標記
+ * 返回: {
+ *   is_valid: boolean,
+ *   action_type: 'BLOCK' | 'FLAG' | 'PASS',
+ *   matched_rules: string[],
+ *   risk_proposal_id: string | null,
+ *   effective_turnover_base: number
+ * }
  */
 const riskValidation = await RiskEngine.validateTurnover({
   bet_id: bet.id,
@@ -314,9 +326,9 @@ const riskValidation = await RiskEngine.validateTurnover({
   odds_type: bet.odds_type
 });
 
-// ✅ Layer 1 拒絕後直接短路返回 (不進入 Layer 2/3)
-if (!riskValidation.is_valid) {
-  log.info(`[Layer 1 Rejected] bet_id=${bet.id}, risk_code=${riskValidation.risk_code}`);
+// BLOCK 規則拒絕後直接短路返回 (不進入 Layer 2/3)
+if (!riskValidation.is_valid && riskValidation.action_type === 'BLOCK') {
+  log.info(`[BLOCK] bet_id=${bet.id}, rules=${riskValidation.matched_rules}`);
 
   // 直接返回全 0,不調用 Layer 2/3
   return {
@@ -326,14 +338,34 @@ if (!riskValidation.is_valid) {
     valid_turnover_finance: 0,
     activity_valid_turnover: 0,
     rejected_by: 'RISK_ENGINE',       // 標記拒絕來源
-    risk_code: riskValidation.risk_code,
+    action_type: 'BLOCK',
+    matched_rules: riskValidation.matched_rules,
     calculated_at: new Date()
   };
 }
 
-// ✅ Layer 1 通過,獲取基礎流水 (進入 Layer 2)
+// ✅ FLAG 規則標記但允許 (v2.1.0 核心功能)
+if (riskValidation.is_valid && riskValidation.action_type === 'FLAG') {
+  log.info(`[FLAG] bet_id=${bet.id}, proposal_id=${riskValidation.risk_proposal_id}`);
+
+  // FLAG 規則正常計算流水,但標記風控提案
+  const effective_turnover_base = riskValidation.effective_turnover_base;
+
+  // 記錄風控標記
+  await db.insert('bet_risk_flag').values({
+    bet_id: bet.id,
+    action_type: 'FLAG',
+    matched_rules: riskValidation.matched_rules,
+    risk_proposal_id: riskValidation.risk_proposal_id,
+    flagged_at: new Date()
+  });
+
+  // ✅ 繼續進入 Layer 2 (流水正常計算)
+}
+
+// PASS 規則正常流程,獲取基礎流水 (進入 Layer 2)
 const effective_turnover_base = riskValidation.effective_turnover_base;
-log.info(`[Layer 1 Passed] bet_id=${bet.id}, effective_turnover_base=${effective_turnover_base}`);
+log.info(`[Layer 1 Passed] bet_id=${bet.id}, action_type=${riskValidation.action_type}, effective_turnover_base=${effective_turnover_base}`);
 ```
 
 #### Step 2: Layer 2 狀態因子調整 (Finance Status Factor)
@@ -390,9 +422,11 @@ await db.transaction(async (tx) => {
     player_id: bet.player_id,
     game_type: bet.game_type,
 
-    // Layer 1 結果
+    // Layer 1 結果 (v2.1.0 更新)
     effective_turnover_base: effective_turnover_base,
-    risk_code: riskValidation.risk_code,
+    action_type: riskValidation.action_type,
+    matched_rules: riskValidation.matched_rules,
+    risk_proposal_id: riskValidation.risk_proposal_id,
 
     // Layer 2 結果
     status: bet.status,
@@ -405,7 +439,12 @@ await db.transaction(async (tx) => {
 
     calculated_at: new Date(),
     layer_breakdown: JSON.stringify({
-      layer1: { effective_turnover_base, risk_code: riskValidation.risk_code },
+      layer1: {
+        effective_turnover_base,
+        action_type: riskValidation.action_type,
+        matched_rules: riskValidation.matched_rules,
+        risk_proposal_id: riskValidation.risk_proposal_id
+      },
       layer2: { status_factor, valid_turnover_finance },
       layer3: { game_weight, activity_valid_turnover }
     })
@@ -1039,6 +1078,30 @@ Controller → Manager (❌ 禁止,違反分層)
 
 ## 6. 變更日誌 (Change Log)
 
+### v2.1.0 (2026-02-02)
+
+**重大變更**:
+1. ✅ **Major #5**: 更新 Layer 1 處理流程以支援配置驅動風控 (§1.6.2)
+   - 新增 action_type (BLOCK/FLAG/PASS) 支援
+   - BLOCK 規則實時阻斷（返回流水 = 0）
+   - FLAG 規則標記但允許（正常計算流水 + 生成風控提案）
+   - 更新返回結構：`matched_rules[]` 取代 `risk_code`
+   - 新增 `risk_proposal_id` 欄位用於追蹤風控提案
+
+2. ✅ **Integration**: 與 05-01 風控系統 v2.1.0 配置驅動架構集成
+   - 支援 t_risk_rule_config 配置表驅動規則
+   - 支援多維度風控規則（遊戲類型、個別遊戲、個別玩家）
+
+**資料模型變更**:
+- `bet_turnover_record` 表新增欄位：
+  - `action_type VARCHAR(20)` - 風控動作類型
+  - `matched_rules JSON` - 匹配的規則列表
+  - `risk_proposal_id VARCHAR(50)` - 風控提案 ID
+
+**向下相容**:
+- Layer 2/3 處理流程保持不變
+- 僅 Layer 1 API 變更（內部實現）
+
 ### v2.0.0 (2026-01-29)
 
 **重大變更**:
@@ -1065,9 +1128,10 @@ Controller → Manager (❌ 禁止,違反分層)
 
 ---
 
-**文檔版本**: 2.0.0
-**最後更新**: 2026-01-29
-**維護團隊**: Finance Team & Backend Team
+**文檔版本**: 2.1.0 (更新 Layer 1 處理流程支援配置驅動風控)
+**最後更新**: 2026-02-02
+**維護團隊**: Finance Team & Backend Team & Risk Team
+**重大變更**: v2.1.0 Layer 1 支援配置驅動風控（BLOCK/FLAG/PASS），與 05-01 風控系統 v2.1.0 集成
 
 ---
 

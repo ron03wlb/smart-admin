@@ -757,31 +757,82 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 
 為了確保各模組 (Finance, Activity, Payment) 在執行關鍵業務時能同步風控邏輯，`Risk Engine` 提供以下 gRPC/REST 內部接口：
 
-### 3.1 `validateBet` - 投注驗證 (Layer 1 核心邏輯)
+### 3.1 `validateBet` - 投注驗證 (Layer 1 核心邏輯) ✅ v2.1.0 配置驅動更新
 
-**職責**: 確保投注符合基礎風控要求，阻斷對沖、套利、異常投注。這是三層風控架構的第一道防線。
+**職責**: 基於配置驅動規則系統驗證投注，支持實時阻斷（BLOCK）和延遲檢查（FLAG）兩種模式。
 
-*   **用途**：Activity System 在計算流水前調用，確認該注單是否為 "有效流水"。
+**核心變更 (v2.1.0)**:
+- ✅ 配置驅動：action_type (BLOCK/FLAG/PASS) 由 t_risk_rule_config 表決定
+- ✅ 規則匹配：返回匹配的規則代碼列表 (matched_rules)
+- ✅ 風控提案：FLAG 規則生成 risk_proposal_id 用於延遲檢查
+- ✅ 流水記錄：FLAG 規則允許投注並正常記錄 effective_turnover_base
+
+*   **用途**：Activity System 在計算流水前調用，Finance System 日結算返水時批量驗證。
 *   **Request**:
     ```json
     {
       "bet_id": "tx_123456",
       "player_id": "u_999",
       "game_type": "BACCARAT",
-      "selection": "Banker", // 下注內容
+      "selection": "Banker",
       "odds": 0.95,
       "amount": 1000.00,
       "ip": "1.1.1.1"
     }
-    ```markdown
-*   **Response**:
+    ```
+
+*   **Response (BLOCK 規則匹配 - 實時阻斷)**:
     ```json
     {
       "is_valid": false,
-      "risk_code": "HEDGE_BET",
-      "reason": "Detected opposite betting on same round"
+      "action_type": "BLOCK",
+      "matched_rules": ["SAME_MATCH_HEDGE", "BOT_DETECTION"],
+      "rejection_reason": "同局反向投注, 機器人檢測",
+      "effective_turnover_base": 0
     }
-    ```markdown
+    ```
+
+*   **Response (FLAG 規則匹配 - 延遲檢查)**:
+    ```json
+    {
+      "is_valid": true,
+      "action_type": "FLAG",
+      "matched_rules": ["LOW_ODDS_WAGERING", "CROSS_MATCH_HEDGE"],
+      "risk_proposal_id": "RP-20260202-123456",
+      "effective_turnover_base": 1000.00,
+      "flagged_reasons": [
+        "低賠率洗水 (賠率 0.95 < 1.5 閾值)",
+        "跨局反向投注 (檢測到 24 小時內反向投注行為)"
+      ]
+    }
+    ```
+
+*   **Response (PASS - 無規則匹配)**:
+    ```json
+    {
+      "is_valid": true,
+      "action_type": "PASS",
+      "matched_rules": [],
+      "effective_turnover_base": 1000.00
+    }
+    ```
+
+**配置驅動決策邏輯** (v2.1.0):
+1. 加載所有啟用規則 (`SELECT * FROM t_risk_rule_config WHERE enabled = true AND game_types CONTAINS ${gameType}`)
+2. 執行規則檢查，收集匹配結果
+3. 決策：
+   - 若任一規則 `action_type = 'BLOCK'` 且匹配 → 返回 `is_valid = false, action_type = 'BLOCK'`
+   - 若任一規則 `action_type = 'FLAG'` 且匹配 → 返回 `is_valid = true, action_type = 'FLAG'` + 生成 Risk Proposal
+   - 若無規則匹配 → 返回 `is_valid = true, action_type = 'PASS'`
+
+**與舊版本差異** (v2.0.0 硬編碼 vs v2.1.0 配置驅動):
+
+| 維度 | v2.0.0 硬編碼分層 | v2.1.0 配置驅動 |
+|------|------------------|----------------|
+| 規則分類 | ❌ 固定 `risk_code` (如 HEDGE_BET) | ✅ 動態 `matched_rules` 列表（如 ["SAME_MATCH_HEDGE"]） |
+| 處理方式 | ❌ 固定拒絕 (`is_valid = false`) | ✅ 可配置 BLOCK/FLAG/PASS |
+| 流水記錄 | ❌ 風控拒絕則流水=0 | ✅ FLAG 規則正常記錄流水 |
+| 靈活性 | ❌ 修改策略需改代碼 | ✅ 僅需更新 t_risk_rule_config 表 |
 
 ### 3.2 `validateTurnover` (批量流水驗證)
 *   **用途**：Finance System 每日結算返水時，批量驗證注單有效性。
@@ -1156,6 +1207,231 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 
 ---
 
+## 9. 配置驅動風控模式 (Rule-Based Config Risk Control) ✅ v2.1.0
+
+### 9.1 模式概述
+
+SmartAdmin v2.1.0 引入「配置驅動風控模式」，讓運營方自行配置每條規則的處理方式（實時阻斷 vs 延遲檢查），無需修改代碼。
+
+**核心理念**:
+- ✅ **配置驅動**：每條規則的 `action_type` 由配置決定（BLOCK/FLAG/IGNORE）
+- ✅ **人工為主**：異常時生成風控提案，人工審核處理
+- ✅ **平等對待**：所有玩家都經過風控（無 VIP 豁免）
+- ✅ **客戶選擇**：運營方自行決定風控策略（無需修改代碼）
+
+**與硬編碼分層的差異**:
+
+| 維度 | 硬編碼分層 (v2.0.0) | 配置驅動 (v2.1.0) |
+|------|-------------------|------------------|
+| 規則分類 | ❌ 硬編碼 P0/P1/P2 (30%/50%/20%) | ✅ 配置驅動（客戶自選 BLOCK/FLAG） |
+| VIP 豁免 | ❌ VIP Level ≥3 豁免風控 | ✅ 所有玩家平等（無豁免） |
+| 異常處理 | ❌ 複雜自動化閾值判斷 | ✅ 人工審核為主 |
+| 策略調整 | ❌ 需要修改代碼 | ✅ 僅需更新配置表 |
+
+### 9.2 風控規則配置表設計
+
+**數據模型 (t_risk_rule_config)**:
+
+```sql
+CREATE TABLE t_risk_rule_config (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    rule_code VARCHAR(50) NOT NULL UNIQUE COMMENT '規則代碼',
+    rule_name VARCHAR(100) NOT NULL COMMENT '規則名稱',
+    rule_category VARCHAR(50) NOT NULL COMMENT '規則分類 (FRAUD/ARBITRAGE/WAGERING)',
+    action_type VARCHAR(20) NOT NULL COMMENT '處理方式 (BLOCK/FLAG/IGNORE)',
+    enabled BOOLEAN DEFAULT TRUE COMMENT '是否啟用',
+    rule_params JSON COMMENT '規則參數',
+    game_types JSON COMMENT '適用遊戲類型',
+    excluded_games JSON COMMENT '排除遊戲列表',
+    updated_by VARCHAR(50),
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_category_enabled (rule_category, enabled),
+    INDEX idx_action_type (action_type)
+) COMMENT='風控規則配置表';
+```
+
+**配置示例**:
+
+```sql
+-- BLOCK 規則（實時阻斷）
+INSERT INTO t_risk_rule_config VALUES
+(1, 'BLACKLIST_PLAYER', '黑名單玩家', 'FRAUD', 'BLOCK', true, '{}', NULL, NULL, NULL, NOW()),
+(2, 'BOT_DETECTION', '機器人檢測', 'FRAUD', 'BLOCK', true, '{"threshold": 0.95}', NULL, NULL, NULL, NOW()),
+(3, 'SAME_MATCH_HEDGE', '同局反向投注', 'ARBITRAGE', 'BLOCK', true, '{}', '["SPORTS"]', NULL, NULL, NOW()),
+
+-- FLAG 規則（延遲檢查） ← 客戶可調整為 BLOCK
+(5, 'CROSS_MATCH_HEDGE', '跨局反向投注', 'ARBITRAGE', 'FLAG', true, '{"window_hours": 24}', '["SPORTS"]', NULL, NULL, NOW()),
+(6, 'LOW_ODDS_WAGERING', '低賠率洗水', 'WAGERING', 'FLAG', true, '{"odds_threshold": 1.5}', '["SPORTS", "LIVE"]', NULL, NULL, NOW()),
+(7, 'ABNORMAL_PATTERN', '異常投注模式', 'FRAUD', 'FLAG', true, '{}', NULL, NULL, NULL, NOW());
+```
+
+### 9.3 規則執行流程
+
+**投注時**:
+1. 加載所有啟用的風控規則（`SELECT * FROM t_risk_rule_config WHERE enabled = true`）
+2. 執行所有規則檢查，記錄匹配結果
+3. 決策邏輯:
+   - IF 任一規則 `action_type = 'BLOCK'` 且匹配 → ❌ 拒絕投注
+   - ELSE IF 任一規則 `action_type = 'FLAG'` 且匹配 → ✅ 允許投注 + 生成風控提案
+   - ELSE → ✅ 正常流程
+
+**取款時**:
+1. SAGA Step 2.5 查詢歷史風控提案（`flagged_rules IS NOT NULL`）
+2. IF 可疑金額 > 0 → 生成人工審核提案 + 凍結可疑金額
+3. 人工審核員決定: 批准、拒絕或部分批准
+
+### 9.4 運營後台管理界面
+
+**風控規則配置頁面**:
+```
+┌───┬─────────────────┬──────────┬──────────┬──────┬─────────┐
+│ID │ 規則名稱        │ 分類     │ 處理方式  │ 狀態 │ 操作    │
+├───┼─────────────────┼──────────┼──────────┼──────┼─────────┤
+│ 1 │ 黑名單玩家      │ 欺詐檢測 │ 實時阻斷  │ 啟用 │ [編輯]  │
+│ 5 │ 跨局反向投注    │ 套利檢測 │ 延遲檢查  │ 啟用 │ [編輯] ← 可改為「實時阻斷」 │
+│ 6 │ 低賠率洗水      │ 洗水檢測 │ 延遲檢查  │ 啟用 │ [編輯] ← 可改為「實時阻斷」 │
+└───┴─────────────────┴──────────┴──────────┴──────┴─────────┘
+```
+
+**編輯規則頁面**:
+```
+規則名稱: [跨局反向投注]
+處理方式: ○ 實時阻斷 (BLOCK)  ← 客戶可選擇
+         ● 延遲檢查 (FLAG)
+         ○ 僅記錄 (IGNORE)
+
+規則參數:
+  檢測時間窗口: [24] 小時
+  最小投注間隔: [5] 分鐘
+
+適用遊戲類型: ☑ 體育博彩  ☐ 真人娛樂  ☐ 老虎機
+
+[保存配置]
+```
+
+### 9.5 多維度風控規則
+
+**遊戲類型維度配置**:
+- 規則可指定 `game_types` (如 `["SPORTS", "LIVE"]`)
+- 規則可排除特定遊戲 `excluded_games` (如 `["EVOLUTION_BACCARAT"]`)
+
+**個別玩家維度處理**:
+- ❌ 取消 VIP 豁免機制
+- ✅ 所有玩家平等對待（包括 VIP）
+- ⚠️ 黑名單玩家仍實時阻斷（BLACKLIST_PLAYER 規則）
+
+### 9.6 分地區策略（配置驅動）
+
+**嚴格監管地區（英國/馬耳他）**:
+- 配置更多 BLOCK 規則（減少 FLAG 規則）
+- 確保合規符合 UKGC/MGA 要求
+
+**寬鬆監管地區（菲律賓/巴西）**:
+- 配置更多 FLAG 規則（增加延遲檢查比例）
+- 優化用戶體驗，符合 PAGCOR/Lei 14.790/2023 要求
+
+### 9.7 配置驅動的優勢
+
+| 優勢 | 說明 | 業務價值 |
+|------|------|---------|
+| **靈活性** | 無需修改代碼，僅需更新配置 | 快速應對市場變化 |
+| **客戶自主** | 運營方自行決定風控策略 | 提升客戶滿意度 |
+| **A/B 測試** | 可針對不同市場測試不同策略 | 數據驅動決策 |
+| **審計追蹤** | 所有配置變更記錄 `updated_by` | 合規要求 |
+| **降低風險** | 避免硬編碼錯誤 | 提升系統穩定性 |
+
+### 9.8 SmartAdmin 架構映射
+
+**Entity**:
+```java
+@Entity
+@Table(name = "t_risk_rule_config")
+public class RiskRuleConfigEntity extends BaseEntity {
+    @Column(name = "rule_code", unique = true, nullable = false, length = 50)
+    private String ruleCode;
+
+    @Column(name = "rule_name", nullable = false, length = 100)
+    private String ruleName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rule_category", nullable = false, length = 50)
+    private RuleCategory ruleCategory;  // FRAUD, ARBITRAGE, WAGERING
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action_type", nullable = false, length = 20)
+    private ActionType actionType;  // BLOCK, FLAG, IGNORE
+
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled = true;
+
+    @Type(JsonStringType.class)
+    @Column(name = "rule_params", columnDefinition = "json")
+    private Map<String, Object> ruleParams;
+
+    @Type(JsonStringType.class)
+    @Column(name = "game_types", columnDefinition = "json")
+    private List<String> gameTypes;
+}
+```
+
+**Service** (含 Vavr Option):
+```java
+public class RiskRuleConfigService {
+
+    private final RiskRuleConfigManager riskRuleConfigManager;
+
+    /**
+     * 加載所有啟用的風控規則（遊戲類型過濾）
+     */
+    public Option<List<RiskRuleConfigVO>> loadEnabledRules(String gameType) {
+        return riskRuleConfigManager.findEnabledRulesByGameType(gameType)
+            .map(entities -> entities.stream()
+                .map(e -> SmartBeanUtil.copy(e, RiskRuleConfigVO.class))
+                .collect(Collectors.toList()));
+    }
+}
+```
+
+**Manager** (含 @Transactional):
+```java
+public class RiskRuleConfigManager {
+
+    private final RiskRuleConfigDao riskRuleConfigDao;
+
+    /**
+     * 查詢啟用的規則（遊戲類型過濾）
+     */
+    public Option<List<RiskRuleConfigEntity>> findEnabledRulesByGameType(String gameType) {
+        return Try.of(() -> riskRuleConfigDao.selectEnabledRulesByGameType(gameType))
+            .toOption();
+    }
+
+    /**
+     * 更新規則配置
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateRuleConfig(Long ruleId, RiskRuleConfigUpdateDTO updateDTO) {
+        RiskRuleConfigEntity entity = riskRuleConfigDao.selectById(ruleId);
+        if (entity == null) {
+            throw new BusinessException(ErrorCode.RISK_RULE_NOT_FOUND);
+        }
+
+        entity.setActionType(updateDTO.getActionType());
+        entity.setEnabled(updateDTO.getEnabled());
+        entity.setRuleParams(updateDTO.getRuleParams());
+        entity.setUpdatedBy(updateDTO.getOperatorId());
+
+        riskRuleConfigDao.updateById(entity);
+
+        // 清除緩存
+        redisTemplate.delete("risk:rules:" + entity.getRuleCategory());
+    }
+}
+```
+
+---
+
 ## 📚 相關文檔
 
 ### 核心依賴
@@ -1177,10 +1453,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 
 ---
 
-**最後更新**: 2026-01-27
-**維護團隊**: Risk Control Team
----
-
-**文檔版本**: 1.0.0
-**最後更新**: 2026-01-28
+**文檔版本**: 2.1.0 (新增 §9 配置驅動風控模式 + 更新 §3.1 validateBet API)
+**最後更新**: 2026-02-02
 **維護團隊**: Risk Team & Backend Team
+**重大變更**: v2.1.0 引入配置驅動規則系統，取消 VIP 豁免，簡化為人工審核為主

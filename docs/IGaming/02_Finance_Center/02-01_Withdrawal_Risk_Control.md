@@ -79,6 +79,15 @@
 │  │   • 交易監控規則                                             ││
 │  │   • 可疑活動標記                                             ││
 │  │                        ▼                                     ││
+│  │ ✅ Step 2.5: 延遲風控檢查 (NEW v2.1.0)                       ││
+│  │   • 查詢歷史 Risk Proposal (近 30 天)                        ││
+│  │   • 計算可疑金額總和                                         ││
+│  │   • 決策路由（v2.1.0 簡化 - 人工審核為主）:                 ││
+│  │     - 可疑金額 = 0        → 繼續 Step 3                      ││
+│  │     - 可疑金額 > 0        → 生成人工審核提案                ││
+│  │                           → 凍結可疑金額                    ││
+│  │                           → 路由至審核隊列                  ││
+│  │                        ▼                                     ││
 │  │ Step 3: 審批路由決策                                         ││
 │  │   ├── 低風險 (Score 0-30, <$1000) ──▶ 自動審批               ││
 │  │   ├── 中風險 (Score 31-50) ──────────▶ L1 人工審核           ││
@@ -109,6 +118,8 @@
 | **Step 1: 風險評估** | 規則引擎異常 | 釋放鎖定資金 + 返回錯誤 | 強制釋放 (DB直接更新) | 指數退避 (3次) | `FAILED` |
 | **Step 2: KYC驗證** | KYC狀態未通過 | 保留資金 + 轉待驗證 | 發送通知 + 48h超時釋放 | 無需重試 (等待玩家補件) | `PENDING_VERIFICATION` |
 | **Step 2: KYC驗證** | API超時 (>5s) | 保留資金 + 轉人工審核 | 記錄異常 + 分配審核員 | 指數退避 (5次) | `PENDING_MANUAL_REVIEW` |
+| **✅ Step 2.5: 延遲風控檢查** | 可疑金額查詢失敗 | 跳過風控檢查 + 記錄警報 | 人工事後審查 | 指數退避 (3次) | `SKIP_RISK_CHECK` → `PENDING_POST_REVIEW` |
+| **✅ Step 2.5: 延遲風控檢查** | 可疑金額 > 0 (v2.1.0 簡化) | 凍結可疑金額 + 生成人工審核提案 | 路由至審核隊列 | 無需重試 (轉人工審核) | `RISK_FLAGGED` → `PENDING_MANUAL_REVIEW` |
 | **Step 3: 審批路由** | 審批員不在線 | 轉備用審批員 | 升級至高級審批 | 無需重試 (自動路由) | `PENDING_APPROVAL` |
 | **Step 3: 審批路由** | 審批超時 (>24h) | 自動批准 (低風險) OR 拒絕 (高風險) | 記錄合規日誌 + 事後審查 | 無需重試 (SLA觸發) | `AUTO_APPROVED` / `AUTO_REJECTED` |
 | **Step 4: 支付執行** | 餘額不足 | 返回資金 + 通知玩家 | 強制返還 (忽略錯誤) | 同步重試 (10次) | `INSUFFICIENT_BALANCE` |
@@ -213,6 +224,133 @@ flowchart TB
     style D3_4 fill:#ffcccc
     style D4_7 fill:#fff4cc
 ```
+
+#### ✅ Step 2.5 實現細節 (Deferred Risk Check Implementation - v2.1.0)
+
+**查詢邏輯** (Query Logic):
+
+```sql
+SELECT
+    rp.id AS proposal_id,
+    rp.bet_id,
+    rp.player_id,
+    rp.matched_rules,
+    rp.suspicious_amount,
+    rp.created_at
+FROM t_risk_proposal rp
+WHERE rp.player_id = #{playerId}
+  AND rp.flagged_rules IS NOT NULL  -- FLAG 規則標記的提案
+  AND rp.status = 'PENDING_REVIEW'
+  AND rp.created_at >= NOW() - INTERVAL 30 DAY
+  AND rp.deleted = 0
+ORDER BY rp.created_at DESC;
+```
+
+**凍結金額計算 (v2.1.0 簡化)**:
+
+```java
+BigDecimal suspiciousAmount = riskProposals.stream()
+    .map(RiskProposal::getSuspiciousAmount)
+    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+if (suspiciousAmount.compareTo(BigDecimal.ZERO) == 0) {
+    // 無可疑金額 → 繼續 Step 3
+    return StepResult.proceed();
+}
+
+// 可疑金額 > 0 → 生成人工審核提案（v2.1.0 簡化 - 無閾值判斷）
+log.info("[Step 2.5] Manual review required, suspicious amount: {}", suspiciousAmount);
+String proposalId = riskProposalService.createManualReviewProposal(
+    RiskProposalCreateDTO.builder()
+        .playerId(withdrawalRequest.getPlayerId())
+        .suspiciousAmount(suspiciousAmount)
+        .historicalProposals(riskProposals)
+        .withdrawalRequestId(withdrawalRequest.getId())
+        .build()
+);
+
+// 凍結可疑金額，路由至審核隊列
+return StepResult.freeze(suspiciousAmount, proposalId);
+```
+
+**人工審核流程** (Manual Review Process):
+- ✅ 所有可疑金額 > 0 的情況都生成人工審核提案
+- ✅ 審核員決定：批准、拒絕或部分批准
+- ✅ 無需複雜的閾值判斷（v2.1.0 簡化）
+- ⚠️ 審核期間可疑金額凍結，正常金額可取款
+
+**SmartAdmin 架構映射**:
+
+```java
+// Service 層（SAGA 編排）
+public class WithdrawalSagaService {
+
+    private final RiskProposalService riskProposalService;
+
+    /**
+     * Step 2.5: 延遲風控檢查
+     */
+    public Option<StepResult> performDeferredRiskCheck(WithdrawalRequest request) {
+        return riskProposalService
+            .findPendingProposals(request.getPlayerId(), 30)
+            .map(proposals -> calculateSuspiciousAmount(proposals, request));
+    }
+
+    private StepResult calculateSuspiciousAmount(
+        List<RiskProposalVO> proposals,
+        WithdrawalRequest request
+    ) {
+        BigDecimal suspiciousAmount = proposals.stream()
+            .map(RiskProposalVO::getSuspiciousAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (suspiciousAmount.compareTo(BigDecimal.ZERO) == 0) {
+            return StepResult.proceed();
+        }
+
+        // v2.1.0 簡化：直接生成人工審核提案
+        String proposalId = riskProposalService.createManualReviewProposal(
+            request.getPlayerId(),
+            suspiciousAmount,
+            proposals,
+            request.getId()
+        );
+
+        return StepResult.freeze(suspiciousAmount, proposalId);
+    }
+}
+
+// Manager 層（含 @Transactional）
+public class RiskProposalManager {
+
+    private final RiskProposalDao riskProposalDao;
+
+    /**
+     * 創建人工審核提案
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public String createManualReviewProposal(
+        RiskProposalCreateDTO createDTO
+    ) {
+        RiskProposalEntity entity = RiskProposalEntity.builder()
+            .playerId(createDTO.getPlayerId())
+            .withdrawalRequestId(createDTO.getWithdrawalRequestId())
+            .suspiciousAmount(createDTO.getSuspiciousAmount())
+            .status(ProposalStatus.PENDING_MANUAL_REVIEW)
+            .historicalProposals(createDTO.getHistoricalProposals())
+            .build();
+
+        riskProposalDao.insert(entity);
+
+        // 發送審核隊列通知
+        kafkaTemplate.send("risk.proposal.created", entity.getId());
+
+        return entity.getId();
+    }
+}
+```
+
+---
 
 #### 補償失敗降級策略 (Compensation Failure Degradation)
 
@@ -975,6 +1113,29 @@ Controller (API 端點) → Service (業務編排) → Manager (事務管理) �
 
 ## 11. 變更日誌 (Change Log)
 
+### v2.1.0 (2026-02-02)
+
+**重大變更**:
+1. ✅ **Major #7**: 新增 SAGA Step 2.5 延遲風控檢查 (Deferred Risk Check)
+   - 查詢歷史 Risk Proposal（近 30 天）
+   - 計算可疑金額總和
+   - 簡化決策邏輯（v2.1.0 人工審核為主）
+   - 補償事務矩陣新增 Step 2.5 條目
+
+2. ✅ **Major #8**: Step 2.5 詳細實現
+   - SQL 查詢邏輯（flagged_rules 篩選）
+   - 凍結金額計算（v2.1.0 無閾值判斷）
+   - SmartAdmin 架構映射（Service/Manager/DAO）
+   - 人工審核流程說明
+
+3. ✅ **Architecture**: 配置驅動風控集成
+   - 支持 BLOCK/FLAG/PASS 規則類型
+   - 與 05-01 §9 配置驅動風控模式對接
+   - 取消 VIP 豁免機制
+   - 所有可疑金額 > 0 都生成人工審核提案
+
+---
+
 ### v2.0.0 (2026-01-29)
 
 **重大變更**:
@@ -1012,9 +1173,10 @@ Controller (API 端點) → Service (業務編排) → Manager (事務管理) �
 
 ---
 
-**文檔版本**: 2.0.0
-**最後更新**: 2026-01-29
-**維護團隊**: Finance Team & Backend Team
+**文檔版本**: 2.1.0 (新增 SAGA Step 2.5 延遲風控檢查)
+**最後更新**: 2026-02-02
+**維護團隊**: Finance Team & Backend Team & Risk Team
+**重大變更**: v2.1.0 引入配置驅動風控，簡化為人工審核為主
 
 **v1.2.0 變更記錄** (2026-01-29):
 - ✅ Major #6 修正: 新增 iGame 特定需求章節 (KYC 等級系統 Level 0-3)
