@@ -111,6 +111,16 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 
+    <Match>
+        <Class name="~.*Executor"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <Match>
+        <Class name="~.*Listener"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
     <!--
         Spring MVC Advice pattern (@ControllerAdvice, @RestControllerAdvice)
         Advice classes inject Spring-managed beans (ObjectMapper, etc.) via constructor.

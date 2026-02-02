@@ -46,6 +46,9 @@ include(
     "sa-base:support:job",
     "sa-base:support:heartbeat",
 
+    // Workflow and rules engine
+    "sa-base:support:liteflow",
+
     // Logging and auditing
     "sa-base:support:loginlog",
     "sa-base:support:operatelog",

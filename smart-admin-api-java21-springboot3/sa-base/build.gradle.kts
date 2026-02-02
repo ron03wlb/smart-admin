@@ -119,6 +119,7 @@ dependencies {
     api(project(":sa-base:support:dict"))           // Data dictionary with caching
     api(project(":sa-base:support:file"))           // File upload (local/S3)
     api(project(":sa-base:support:job"))            // Scheduled task management
+    api(project(":sa-base:support:liteflow"))       // LiteFlow workflow engine
     api(project(":sa-base:support:datatracer"))     // Data change tracking
     api(project(":sa-base:support:loginlog"))       // Login log
     api(project(":sa-base:support:operatelog"))     // Operation log

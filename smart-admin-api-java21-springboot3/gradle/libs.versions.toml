@@ -50,6 +50,9 @@ bcprov = "1.80"
 # AWS & Cloud
 awsSdkS3 = "2.31.78"
 
+# Workflow & Rules
+liteflow = "2.15.3"
+
 # Other
 smartdb = "1.2.0"
 reflections = "0.10.2"
@@ -137,6 +140,11 @@ commons-compress = { module = "org.apache.commons:commons-compress", version.ref
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commonsCodec" }
 commons-text = { module = "org.apache.commons:commons-text", version.ref = "commonsText" }
 commons-pool2 = { module = "org.apache.commons:commons-pool2" }
+
+# Workflow & Rules Engine
+liteflow-spring-boot-starter = { module = "com.yomahub:liteflow-spring-boot-starter", version.ref = "liteflow" }
+liteflow-script-qlexpress = { module = "com.yomahub:liteflow-script-qlexpress", version.ref = "liteflow" }
+liteflow-rule-sql = { module = "com.yomahub:liteflow-rule-sql", version.ref = "liteflow" }
 
 # Template Engines
 velocity-engine-core = { module = "org.apache.velocity:velocity-engine-core", version.ref = "velocity" }
