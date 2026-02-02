@@ -304,7 +304,7 @@ Unlock timing: ON_WITHDRAWAL_VALIDATION
 **風險**: 活動規則調整時,回推計算邏輯可能不一致。
 
 **建議**: 在 seamless_wallet.md 補充回推機制示例:
-```markdown
+```
 ### 回推機制 (Backtracking Mechanism)
 
 **場景**: 活動規則調整,需重算歷史有效投注額
@@ -339,7 +339,7 @@ WHERE activity_id = 'ACTIVITY_123';
 **預期收益**: 玩家困惑減少 50%,客服成本降低 30%
 
 **具體建議**:
-```markdown
+```
 ### 6.1 玩家流水進度查詢與提示
 
 **UI 設計**:
@@ -370,7 +370,7 @@ WHERE activity_id = 'ACTIVITY_123';
 **預期收益**: 審計追溯能力 100%,合規風險降低
 
 **具體建議**:
-```markdown
+```
 ### 6.1 回推機制實施細節 (Section 3 補充)
 
 **SQL 回推腳本**:

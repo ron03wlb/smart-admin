@@ -39,7 +39,7 @@ i18next
       }).catch(err => console.error('Failed to report missing key:', err));
     }
   });
-```text
+```
 
 ### 2.2 後端缺失鍵值記錄
 
@@ -60,7 +60,7 @@ i18next
 
 操作：
 [批量導出] [標記為已處理] [建立翻譯任務]
-```text
+```
 
 ---
 
@@ -78,7 +78,7 @@ Response:
   "game.slot.jackpot_hit": "恭喜中大獎！",
   "game.table.bet_placed": "下注成功"
 }
-```text
+```
 
 ### 3.2 導出格式：CSV
 
@@ -90,7 +90,7 @@ Response (CSV):
 Key,Namespace,Chinese (Traditional),English (Fallback),Context
 game.slot.freespin_won,game,您贏得了 {amount} 次免費旋轉！,You won {amount} Free Spins!,Slot game win notification
 game.slot.jackpot_hit,game,恭喜中大獎！,Jackpot Hit!,Big win celebration
-```text
+```
 
 ### 3.3 導出格式：XLIFF
 
@@ -112,7 +112,7 @@ game.slot.jackpot_hit,game,恭喜中大獎！,Jackpot Hit!,Big win celebration
     </body>
   </file>
 </xliff>
-```text
+```
 
 ### 3.4 批量導入 API
 
@@ -140,7 +140,7 @@ Response:
     "errors": 0
   }
 }
-```text
+```
 
 **後端處理邏輯（Python）**：
 
@@ -162,7 +162,7 @@ stateDiagram-v2
 
     InReview --> Flagged: 標記為有問題
     Flagged --> Draft: 修正後重新提交
-```text
+```
 
 **狀態說明**：
 | 狀態 | 說明 | 可執行操作 |
@@ -192,7 +192,7 @@ Response:
   "message": "Translation submitted for review",
   "new_status": "in_review"
 }
-```text
+```
 
 **審核批准**：
 ```http
@@ -210,7 +210,7 @@ Response:
   "message": "Translation approved",
   "new_status": "approved"
 }
-```text
+```
 
 **發佈至生產環境**：
 ```http
@@ -229,7 +229,7 @@ Response:
   "message": "Published 128 translations to CDN",
   "cdn_url": "https://cdn.casino.com/i18n/th/game.v6.json"
 }
-```text
+```
 
 ### 4.3 狀態追蹤資料表
 

@@ -38,7 +38,7 @@
 
 ✅ 正確: DELETE /api/v1/players/{id}
 ❌ 錯誤: POST /api/v1/deletePlayer
-```markdown
+```
 
 ---
 
@@ -67,7 +67,7 @@
 /api/v{version}/{resource}
 /api/v{version}/{resource}/{id}
 /api/v{version}/{resource}/{id}/{sub-resource}
-```markdown
+```
 
 **命名規則**：
 - ✅ 使用複數名詞（`players` not `player`）
@@ -76,7 +76,7 @@
 - ✅ 保持層級簡單（最多3層）
 
 **示例**：
-```sql
+```
 # 玩家相關
 GET    /api/v1/players                    # 獲取玩家列表
 GET    /api/v1/players/{id}               # 獲取單個玩家
@@ -93,7 +93,7 @@ POST   /api/v1/players/{id}/bonuses       # 給玩家發放紅利
 GET    /api/v1/games                      # 獲取遊戲列表
 GET    /api/v1/games/{id}/sessions        # 獲取遊戲會話列表
 POST   /api/v1/game-sessions              # 創建遊戲會話（不依賴遊戲ID）
-```text
+```
 
 ---
 
@@ -102,29 +102,29 @@ POST   /api/v1/game-sessions              # 創建遊戲會話（不依賴遊戲
 **過濾 (Filtering)**：
 ```http
 GET /api/v1/players?status=active&kyc_status=verified
-```text
+```
 
 **排序 (Sorting)**：
 ```http
 GET /api/v1/players?sort=created_at:desc
 GET /api/v1/players?sort=created_at:desc,username:asc
-```text
+```
 
 **分頁 (Pagination)**：
 ```http
 GET /api/v1/players?page=1&page_size=20
-```text
+```
 
 **字段選擇 (Field Selection)**：
 ```http
 GET /api/v1/players?fields=id,username,email
-```text
+```
 
 **搜索 (Search)**：
 ```http
 GET /api/v1/players?search=john
 GET /api/v1/games?q=blackjack
-```markdown
+```
 
 ---
 
@@ -278,7 +278,7 @@ GET /api/v1/games?q=blackjack
   "timestamp": "2026-01-27T10:00:00Z",
   "trace_id": "abc-123-def-456"
 }
-```text
+```
 
 **錯誤響應**：
 ```json
@@ -293,7 +293,7 @@ GET /api/v1/games?q=blackjack
   "timestamp": "2026-01-27T10:00:00Z",
   "trace_id": "abc-123-def-456"
 }
-```markdown
+```
 
 **字段說明**：
 - `code`: 業務錯誤碼（4位數字）
@@ -314,7 +314,7 @@ Authorization: Bearer {jwt_token}
 X-Request-ID: {uuid}
 X-Tenant-ID: {tenant_id}
 Accept-Language: en-US,zh-TW
-```text
+```
 
 **可選包含**：
 ```http
@@ -322,7 +322,7 @@ X-Device-ID: {device_fingerprint}
 X-IP-Address: {client_ip}
 User-Agent: {client_user_agent}
 X-Idempotency-Key: {uuid}  # 冪等性鍵（用於POST/PATCH）
-```text
+```
 
 ---
 
@@ -333,7 +333,7 @@ X-Idempotency-Key: {uuid}  # 冪等性鍵（用於POST/PATCH）
 **Offset分頁（推薦用於小數據集）**：
 ```
 GET /api/v1/players?page=1&page_size=20
-```text
+```
 
 **響應格式**：
 ```json
@@ -352,12 +352,12 @@ GET /api/v1/players?page=1&page_size=20
     }
   }
 }
-```text
+```
 
 **Cursor分頁（推薦用於大數據集/實時流）**：
 ```
 GET /api/v1/transactions?cursor=eyJpZCI6MTIzNDU2fQ&limit=50
-```text
+```
 
 **響應格式**：
 ```json
@@ -372,7 +372,7 @@ GET /api/v1/transactions?cursor=eyJpZCI6MTIzNDU2fQ&limit=50
     }
   }
 }
-```text
+```
 
 ---
 
@@ -390,7 +390,7 @@ GET /api/v1/players?sort=vip_level:desc,created_at:desc
 
 # 默認排序
 GET /api/v1/players  # 默認: created_at:desc
-```markdown
+```
 
 **排序方向**：
 - `asc`: 升序
@@ -403,30 +403,30 @@ GET /api/v1/players  # 默認: created_at:desc
 **精確匹配**：
 ```
 GET /api/v1/players?status=active&kyc_status=verified
-```text
+```
 
 **範圍查詢**：
 ```
 GET /api/v1/transactions?created_at_gte=2026-01-01&created_at_lte=2026-01-31
 GET /api/v1/players?balance_gt=1000&balance_lte=10000
-```text
+```
 
 **模糊搜索**：
 ```
 GET /api/v1/players?username_like=john
 GET /api/v1/games?name_contains=poker
-```text
+```
 
 **IN查詢**：
 ```
 GET /api/v1/players?status_in=active,suspended
 GET /api/v1/games?provider_id_in=1,2,3
-```text
+```
 
 **複雜過濾（使用JSON）**（可選高級功能）：
 ```
 GET /api/v1/players?filter={"and":[{"field":"status","op":"eq","value":"active"},{"field":"balance","op":"gt","value":1000}]}
-```text
+```
 
 ---
 
@@ -438,7 +438,7 @@ GET /api/v1/players?filter={"and":[{"field":"status","op":"eq","value":"active"}
 ```
 /api/v1/players
 /api/v2/players
-```markdown
+```
 
 **優點**：
 - ✅ 清晰直觀
@@ -454,7 +454,7 @@ GET /api/v1/players?filter={"and":[{"field":"status","op":"eq","value":"active"}
 ```
 GET /api/players
 Accept: application/vnd.igaming.v1+json
-```markdown
+```
 
 **優點**：
 - ✅ URL不變
@@ -495,14 +495,14 @@ v2 Released: 2026-01-01
 v1 Deprecated: 2026-01-01 (6個月通知期)
     ↓
 v1 Sunset: 2026-07-01 (停止服務)
-```text
+```
 
 **廢棄通知**（Response Header）：
 ```http
 Deprecation: true
 Sunset: Wed, 01 Jul 2026 00:00:00 GMT
 Link: </api/v2/players>; rel="alternate"
-```text
+```
 
 ---
 
@@ -513,7 +513,7 @@ Link: </api/v2/players>; rel="alternate"
 **JWT認證（推薦）** ⭐：
 ```http
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
-```text
+```
 
 **JWT結構**：
 ```json
@@ -530,7 +530,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
     "exp": 1706346000
   }
 }
-```markdown
+```
 
 **Token類型**：
 - **Access Token**: 15分鐘有效期
@@ -546,13 +546,13 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 2. 檢查租戶隔離（tenant_id）
 3. 檢查角色權限（roles）
 4. 檢查資源所有權（player_id）
-```text
+```
 
 **權限頭（可選）**：
 ```http
 X-Permission-Required: player:update
 X-Resource-Owner: player:123456
-```text
+```
 
 ---
 
@@ -568,7 +568,7 @@ X-Resource-Owner: player:123456
 
 # 端點限流
 POST /api/v1/withdrawals: 10 req/hour per Player
-```text
+```
 
 **限流響應頭**：
 ```http
@@ -576,7 +576,7 @@ X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
 X-RateLimit-Reset: 1706346000
 Retry-After: 60
-```text
+```
 
 ---
 
@@ -586,14 +586,14 @@ Retry-After: 60
 ```http
 POST /api/v1/transactions
 X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
-```text
+```
 
 **實現**：
 ```
 1. 檢查Redis: GET idempotency:{key}
 2. 如存在: 返回緩存響應
 3. 如不存在: 執行請求 → 緩存響應(24小時)
-```text
+```
 
 ---
 
@@ -612,7 +612,7 @@ ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 
 # 動態資源（玩家餘額、交易記錄）
 Cache-Control: no-cache, no-store, must-revalidate
-```text
+```
 
 ---
 
@@ -622,7 +622,7 @@ Cache-Control: no-cache, no-store, must-revalidate
 ```http
 Accept-Encoding: gzip, deflate
 Content-Encoding: gzip
-```yaml
+```
 
 **壓縮率**：
 - JSON: ~70-80%壓縮率
@@ -646,7 +646,7 @@ GET /api/v1/players/{id}?fields=id,username,balance
     "balance": 50000
   }
 }
-```text
+```
 
 ---
 
@@ -658,7 +658,7 @@ POST /api/v1/players/batch-get
 {
   "player_ids": [123, 456, 789]
 }
-```text
+```
 
 **批量創建**：
 ```

@@ -214,7 +214,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 │  - Cached in application memory (ephemeral)│
 │  - Encrypted by CMK before storage        │
 └────────────────────────────────────────────┘
-```markdown
+```
 
 ### 6.2 AWS KMS 整合
 

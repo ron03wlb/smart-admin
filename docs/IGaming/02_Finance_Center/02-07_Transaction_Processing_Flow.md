@@ -67,7 +67,7 @@ flowchart TD
     style ERR_VERSION fill:#FFD700
     style UPDATE_DB fill:#ADD8E6
     style COMMIT fill:#90EE90
-```sql
+```
 
 **關鍵路徑說明**:
 - 🟢 **成功路徑**: 冪等性檢查 → 鎖獲取 → 餘額驗證 → 樂觀鎖更新 → 提交事務
@@ -220,7 +220,7 @@ sequenceDiagram
     style PlayerWallet fill:#90EE90
     style TransactionLog fill:#FFE4B5
     style OutboxPublisher fill:#DDA0DD
-```sql
+```
 
 **關鍵設計要點**:
 

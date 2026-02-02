@@ -41,7 +41,7 @@ sequenceDiagram
     end
 
     System->>DB: 7. 記錄審計日誌
-```text
+```
 
 ### 2.2 數據模型
 
@@ -112,7 +112,7 @@ stateDiagram-v2
     Cancelled --> [*]
     Executed --> [*]
     RolledBack --> [*]
-```markdown
+```
 
 ### 4.2 狀態邏輯實現
 
@@ -174,7 +174,7 @@ stateDiagram-v2
 │   玩家: Player_456 | 理由: 客服補償                │
 │   [ 查看詳情 ] [ ✅ 批准 ] [ ❌ 拒絕 ]              │
 └─────────────────────────────────────────────────────┘
-```text
+```
 
 ### 6.2 變更對比視圖 (Diff View)
 
@@ -200,7 +200,7 @@ stateDiagram-v2
   "maker_comment": "VIP 玩家正常大額提款，已完成額外身份驗證",
   "suggested_action": "批准（風險分數: 12/100）"
 }
-```text
+```
 
 **配置變更範例**（Diff View）：
 ```diff
@@ -217,7 +217,7 @@ stateDiagram-v2
 - RTP 降低 1% 可能影響玩家滿意度
 - 預計月營收增加: +$25,000
 - 建議: 同步調整遊戲促銷力度
-```text
+```
 
 ### 6.3 快速操作模板
 

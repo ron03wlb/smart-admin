@@ -168,7 +168,7 @@ common.button.cancel          → "Cancel" / "取消" / "ยกเลิก"
 game.slot.freespin_won        → "You won {amount} Free Spins!"
 error.wallet.insufficient     → "Insufficient balance."
 activity.bonus.claim_success  → "Bonus claimed successfully!"
-```markdown
+```
 
 **命名原則**:
 - ✅ 使用小寫、點號分隔（lowercase.dot.notation）
@@ -190,7 +190,7 @@ flowchart LR
     style C fill:#8BonusBonusBonus8Bonus,stroke:#ffBonusBonusff,color:#fff
     style D fill:#BonusBonus66BonusBonus,stroke:#BonusBonusffBonusBonus,color:#fff
     style E fill:#333,stroke:#fff,color:#fff
-```text
+```
 
 **URL 格式**:
 ```

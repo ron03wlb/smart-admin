@@ -143,7 +143,7 @@ flowchart TD
     style ACTION3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
 
     style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
-```text
+```
 
 **評分計算範例**:
 
@@ -163,7 +163,7 @@ Agent ID: 10001
   ✅ 每週自動恢復額度（無需人工審核）
   ✅ 允許透支 10%（彈性額度）
   ✅ Priority support（專屬客服）
-```text
+```
 
 **範例 2: 一般代理 (Standard Tier)**
 ```
@@ -181,7 +181,7 @@ Agent ID: 20002
   ⚠️ 人工審核後恢復額度（需提交結算證明）
   ⚠️ 不允許透支
   ⚠️ Standard support
-```text
+```
 
 **範例 3: 高危代理 (Risky Tier)**
 ```
@@ -200,7 +200,7 @@ Agent ID: 30003
   ❌ 要求補繳保證金 (Margin Call): 至少 150% 覆蓋率
   ❌ Enhanced monitoring（每日監控）
   ❌ 暫停新增下級代理
-```markdown
+```
 
 **評分更新頻率**:
 - **每週結算後**: 自動重新計算評分
@@ -216,7 +216,7 @@ Agent ID: 30003
 
 ```math
 Line Exposure = Sum(Player Outstanding) - Sum(Player Cash Balance)
-```markdown
+```
 
 *   **Group Exposure Limit**：設定整條線的曝險上限 (e.g. $1M)。
 *   **Alert**：當 Line Exposure 達到 80% 時，通知 Risk Team 介入，詢問是否需要 "強平"。
@@ -322,7 +322,7 @@ graph TB
     style DASH1 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
     style DASH2 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
     style DASH3 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-```markdown
+```
 
 **架構說明**:
 
@@ -351,7 +351,7 @@ Agent A 旗下有 3 個玩家:
 Line Exposure = (5000 + 8000 + 2000) - (1000 + 500 + 3000)
               = 15,000 - 4,500
               = $10,500 (代理需承擔的風險)
-```markdown
+```
 
 2. **Margin Level (保證金水平)**:
 ```
@@ -368,7 +368,7 @@ Margin Level = (50,000 + 20,000) / 60,000
              = 116.7%
 
 判定: > 110% (安全，但接近 Margin Call 閾值)
-```markdown
+```
 
 3. **Exposure Ratio (曝險比例)**:
 ```
@@ -382,7 +382,7 @@ Agent C:
 Exposure Ratio = 800,000 / 1,000,000 = 80%
 
 判定: 達到告警閾值 (80%)，需通知風控團隊介入
-```yaml
+```
 
 **告警觸發條件**:
 
@@ -522,7 +522,7 @@ flowchart TD
     style LIQ_DEFICIT fill:#EF5350,stroke:#C62828,stroke-width:2px
 
     style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
-```text
+```
 
 **強制平倉機制詳細說明**:
 
@@ -544,7 +544,7 @@ flowchart TD
 2. 計算總債務 = Σ(所有玩家未結算虧損 + 代理欠款)
 3. 鎖定保證金（Deposit + Account Balance）
 4. 生成債務清單（Debt Statement）
-```text
+```
 
 **階段 2: 資金清算**
 ```
@@ -558,7 +558,7 @@ else:
     2. 計算虧空金額 = 總債務 - 保證金
     3. 代理帳號狀態: DEFAULTED（違約）
     4. 轉法務部門追償（Legal Debt Collection）
-```text
+```
 
 **階段 3: 審計記錄**
 ```
@@ -566,7 +566,7 @@ else:
 2. 通知平台管理員 + 財務團隊 + 法務團隊
 3. 更新代理信用分為 0（永久記錄）
 4. 生成事後分析報告（Post-mortem Report）
-```text
+```
 
 ### 5.4 實際案例
 
@@ -588,7 +588,7 @@ else:
   - 新 Deposit: $110,000
   - Margin Level = (110,000 + 15,000) / 110,000 = 113.6%
   - 狀態: 🟡 Watch Zone（解除追繳）
-```text
+```
 
 **案例 2: 軟停權未補繳 (Soft Stop → Hard Stop)**
 ```
@@ -608,7 +608,7 @@ else:
   - Current Loss: $75,000
   - Margin Level = 58,000 / 75,000 = 77.3%
   - 狀態: 🚨 Hard Stop（觸發平倉）
-```text
+```
 
 **案例 3: 強制平倉成功覆蓋 (Hard Stop → Liquidated)**
 ```
@@ -634,7 +634,7 @@ else:
   - 代理帳號狀態: DEFAULTED
   - 虧空 $50,000 轉法務追償
   - 信用分: 0（永久記錄）
-```text
+```
 
 **案例 4: 強制平倉有餘額 (Hard Stop → Liquidated with Refund)**
 ```

@@ -26,7 +26,7 @@
 
 // ✅ 正確示範：使用 Translation Key
 <button>{t('common.button.submit')}</button>
-```markdown
+```
 
 ### 2.2 翻譯服務 (Translation Service)
 
@@ -85,7 +85,7 @@ flowchart LR
     %% 跨區域連線 %%
     CMS -->|"2. Publish (PutObject)"| OSS
     OSS -.->|"3. Pull Origin"| CDN
-```text
+```
 
 ### 2.3 數據存儲層設計
 
@@ -126,7 +126,7 @@ dayjs().locale('th').format('DD MMMM YYYY');  // "27 มกราคม 2026"
 
 // ❌ 錯誤：手寫正則處理
 value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');  // 容易出錯
-```text
+```
 
 ---
 
@@ -167,7 +167,7 @@ if (isRTL) {
 [dir="rtl"] .back-arrow {
   transform: scaleX(-1);  // Flip horizontally
 }
-```text
+```
 
 ### 4.3 RTL 注意事項
 
@@ -206,7 +206,7 @@ https://cdn.casino.com/i18n/{lang}/{namespace}.v{version}.json
 範例：
 https://cdn.casino.com/i18n/th/player.v5.json
 https://cdn.casino.com/i18n/th/game.v5.json
-```markdown
+```
 
 **優點**：
 - CloudFront 全球分發 (<50ms latency)
@@ -234,7 +234,7 @@ https://cdn.casino.com/i18n/th/game.v5.json
     }
   ]
 }
-```text
+```
 
 ### 5.3 前端本地快取
 

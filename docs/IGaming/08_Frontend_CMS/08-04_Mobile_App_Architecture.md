@@ -67,7 +67,7 @@ const codePushOptions = {
 };
 
 export default codePush(codePushOptions)(App);
-```markdown
+```
 
 **分階段發佈策略**：
 - **Stage 1 (5% 用戶)**：灰度測試，監控崩潰率
@@ -93,7 +93,7 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-```text
+```
 
 **離線可用功能**：
 - ✅ 查看遊戲大廳（快取遊戲列表）
@@ -140,7 +140,7 @@ const pushConfig = {
   quietHours: { start: "23:00", end: "09:00" }, // 靜默時段
   userPreference: true, // 尊重用戶訂閱偏好
 };
-```text
+```
 
 ### 4.3 Deep Linking（深度連結）
 
@@ -161,7 +161,7 @@ messaging().onNotificationOpenedApp(remoteMessage => {
       break;
   }
 });
-```markdown
+```
 
 ---
 
@@ -200,7 +200,7 @@ messaging().onNotificationOpenedApp(remoteMessage => {
   removeClippedSubviews={true}
   maxToRenderPerBatch={10}
 />
-```markdown
+```
 
 ### 5.3 網路優化
 

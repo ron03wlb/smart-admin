@@ -33,7 +33,7 @@ graph LR
     B[GP<br/>Provider Report] -->|比對| C
     C -->|一致| D[✅ 對帳通過]
     C -->|差異| E[❌ 差異報告]
-```text
+```
 
 
 ### 模型 2: 存提款對帳（三方對帳）

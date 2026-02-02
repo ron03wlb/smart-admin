@@ -77,7 +77,7 @@
 │  → DEK destroyed, all PII becomes unrecoverable           │
 │  → Even with database backups, data cannot be decrypted   │
 └────────────────────────────────────────────────────────────┘
-```text
+```
 
 **為何傳統刪除不夠？**
 | 刪除方式 | 問題 | Crypto-Shredding 優勢 |

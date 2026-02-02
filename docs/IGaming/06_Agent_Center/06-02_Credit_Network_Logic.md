@@ -85,7 +85,7 @@ graph TB
     style RISK1 fill:#FF6B6B
     style RISK2 fill:#FF6B6B
     style RISK3 fill:#FFD93D
-```text
+```
 
 **信用網絡關鍵指標說明**：
 
@@ -126,7 +126,7 @@ graph TB
 - Platform: 10%
 
 佔成總計: 50% + 40% + 20% + 10% = 120% ⚠️ (超過 100%)
-```text
+```
 
 **Step 2: 標準化計算** (Normalization)
 
@@ -137,7 +137,7 @@ graph TB
           = $100,000 / ($100,000 × 120%)
           = $100,000 / $120,000
           = 0.8333
-```text
+```
 
 **Step 3: 實際分配金額**
 
@@ -165,7 +165,7 @@ Platform (Position 10%):
   最終平台收入: $8,333
 
 驗證總和: $41,665 + $33,332 + $16,666 + $8,333 = $99,996 ≈ $100,000 ✅
-```text
+```
 
 **關鍵公式**:
 
@@ -384,7 +384,7 @@ sequenceDiagram
     style MasterAgent fill:#FFE4B5
     style Platform fill:#E6E6FA
     style PaymentGateway fill:#DDA0DD
-```text
+```
 
 **結算流程關鍵階段說明**：
 
@@ -419,7 +419,7 @@ Step 4: Platform Revenue
   From Masters: $33,600
   Platform Position (10%): 已包含在上級分配中
   Total Revenue: $33,600
-```text
+```
 
 **逾期處理規則**：
 
@@ -532,7 +532,7 @@ flowchart TD
     style UPDATE_PARENT fill:#ADD8E6
     style COMMIT fill:#90EE90
     style LOCK fill:#DDA0DD
-```sql
+```
 
 **併發控制關鍵設計**：
 

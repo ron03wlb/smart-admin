@@ -55,7 +55,7 @@ transferWagerRequirement = (2000 - 500) × (60 / 150) = 1500 × 0.4 = 600
 結果:
 - 促銷錢包: cash = 0, bonus = 90（剩餘 90），剩餘流水要求 = 1500 - 600 = 900
 - 主錢包: cash 增加 60，新增 lockAmount = 600
-```markdown
+```
 
 **問題**:
 - ❓ **業務合理性**: 為什麼允許玩家在未達標時部分提取促銷錢包資金？
@@ -82,7 +82,7 @@ transferWagerRequirement = (2000 - 2100) × (150 / 150) = -100 × 1.0 = -100
 結果:
 - 促銷錢包: 清空（餘額 0，流水要求 0）
 - 主錢包: cash 增加 150，lockAmount 不增加（因為已達標）
-```markdown
+```
 
 **問題**:
 - ❓ **負值處理**: `transferWagerRequirement = -100` 應如何處理？
@@ -111,7 +111,7 @@ transferWagerRequirement = (2000 - 300) × (22.5 / 150) = 1700 × 0.15 = 255
 結果:
 - 促銷錢包: 清空並沒收（127.5 元被沒收）
 - 主錢包: cash 增加 22.5，新增 lockAmount = 255
-```markdown
+```
 
 **問題**:
 - ❓ **業務合理性**: 違規沒收是否應該按比例計算？還是全額沒收？
@@ -143,7 +143,7 @@ transferWagerRequirement = (1000 - 300) × (50 / 200) = 700 × 0.25 = 175
 - 比例檢查: 175 / 50 = 3.5（每元需完成 3.5 流水）
 
 ✅ 數學一致性: 比例保持一致
-```text
+```
 
 #### 測試案例 2: 全部轉移（已達標）
 
@@ -160,12 +160,12 @@ transferWagerRequirement = (1000 - 1200) × (200 / 200) = -200 × 1.0 = -200
 問題:
 ❌ 負值處理: transferWagerRequirement = -200 不應該轉移到主錢包
 ✅ 正確邏輯: transferWagerRequirement = max(0, (1000 - 1200) × (200 / 200)) = 0
-```text
+```
 
 **結論**: 公式缺少負值保護，需要修正為：
 ```
 transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transferAmount / (cash + bonus)))
-```text
+```
 
 ---
 
@@ -269,7 +269,7 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 2. `02-04-diagrams/02-04-02_Calculation_Logic.md:193-197` - 同上
 
 **建議新增內容**:
-```markdown
+```
 ### 5.3 促銷錢包轉移規則（業界標準）
 
 **規則**: 僅在流水要求達標時允許全額轉移到主錢包。
@@ -283,7 +283,7 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 **不支持**: 部分轉移（未達標時不允許任何提款）
 
 **業界標準參考**: Pragmatic Play, Evolution Gaming, Betfair
-```text
+```
 
 ### 8.2 如果採用方案 B（需業務確認）
 
@@ -292,7 +292,7 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 2. `02-04-diagrams/02-04-02_Calculation_Logic.md:193-197` - 同上
 
 **建議修正公式**:
-```markdown
+```
 ### 5.3 促銷錢包部分轉移邏輯
 
 **使用場景**: 允許玩家在流水要求未達標時部分提取促銷錢包資金。

@@ -678,7 +678,7 @@ GGR = 博彩收入 - 博彩成本
 ```
 
 **修正後邏輯** (seamless_wallet.md lines 372-387):
-```markdown
+```
 ### 對帳模型分離
 
 **模型 1: 遊戲交易對帳** (2-party, Virtual Currency)

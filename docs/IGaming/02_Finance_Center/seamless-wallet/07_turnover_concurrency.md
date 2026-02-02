@@ -51,7 +51,7 @@ T0: 玩家同時完成兩次投注（老虎機支持快速旋轉）
     - 投注 B: Valid Bet = 20 元
 
 T1: 兩個 Result 請求同時到達（並發處理）
-```text
+```
 
 **錯誤實現的執行流程**:
 
@@ -78,7 +78,7 @@ Thread A (恢復執行):
 - 紅利發放了 200 元（應該只發 100 元）
 - 玩家獲得額外 100 元（營運商損失）
 - 財務記錄不一致
-```text
+```
 
 **問題根源**: **TOCTOU 漏洞** (Time-of-Check Time-of-Use)
 
@@ -99,7 +99,7 @@ T9      set status → completed
 
 問題: T4 時，Thread B 檢查 status 仍為 incomplete
 原因: Thread A 尚未更新 status（在 T7 之後才更新）
-```text
+```
 
 ### 問題 2: `incr` 操作的原子性誤解
 
@@ -114,7 +114,7 @@ T9      set status → completed
 ❌ 非原子的部分:
   - incr + get + set (多個命令組合)
   - 檢查條件 + 執行動作 (Check-Then-Act pattern)
-```text
+```
 
 **類比說明**:
 
@@ -131,7 +131,7 @@ if (balance >= 100):
 
 ✅ 正確做法:
 deductIfSufficient(account, 100)  // 整個邏輯是原子的
-```markdown
+```
 
 ## 業界標準解決方案
 
@@ -177,7 +177,7 @@ else
     -- 未達成條件
     return {new_turnover, 'NOT_REACHED'}
 end
-```markdown
+```
 
 **關鍵設計點**:
 1. **INCRBYFLOAT**: 支持小數點（流水可能是 123.45 元）
@@ -268,7 +268,7 @@ metrics:
   - lua_script_execution_time{percentile=p99}
     target: < 10ms
     alert: > 50ms
-```text
+```
 
 ### 告警規則
 

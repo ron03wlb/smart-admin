@@ -93,7 +93,7 @@ ValidTurnover = BetAmount
     "requiredTotal": 3BonusBonusBonus.BonusBonus
   }
 }
-```text
+```
 
 ---
 
@@ -128,7 +128,7 @@ sequenceDiagram
         PromotionService->>AuditLog: 5. Log "Risk Rejected"
         PromotionService->>Player: 6. Notify (Optional)
     end
-```text
+```
 
 ---
 
@@ -175,7 +175,7 @@ sequenceDiagram
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```text
+```
 
 ### API 契約定義 (API Contract Definition)
 
@@ -210,7 +210,7 @@ const result = await RiskEngine.validateTurnover({
   odds_type: OddsType.EUR
 });
 // Returns: { is_valid: true, effective_turnover_base: 1BonusBonus, risk_code: "VALID" }
-```text
+```
 
 ### 計算鏈路示例 (Calculation Chain Example)
 
@@ -235,7 +235,7 @@ Step 3 (Activity Layer - Bonus4-Bonus2):
 Result:
   - Finance System records: $1BonusBonus valid turnover (for VIP/rebate)
   - Activity System records: $15 wagering progress (for bonus clearing)
-```yaml
+```
 
 ### 跨模組一致性保障機制 (Cross-Module Consistency Mechanisms)
 
@@ -294,7 +294,7 @@ Result:
     → 獎勵計算服務
     → 錢包服務（發放）
     → 通知服務（推播/站內信）
-```text
+```
 
 ### 關鍵 Topic 結構
 
@@ -309,7 +309,7 @@ Topics:
 ├── promotion.claims           # 活動領取
 ├── reward.distributions       # 獎勵發放
 └── wagering.updates           # 流水更新
-```text
+```
 
 ---
 
@@ -421,7 +421,7 @@ flowchart TD
     style APPLY_CAP fill:#FFD54F
     style EXCLUSIVE_GROUP fill:#FFEBonus82
     style MIN_CONTRIB fill:#FFAB91
-```text
+```
 
 ### 衝突處理策略對比表
 

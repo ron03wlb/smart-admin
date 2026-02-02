@@ -33,7 +33,7 @@ func ProcessBet(txId, amount) {
 1. Redis 重啟 → 緩存丟失 → 重複扣款
 2. TTL 過期 → 晚到的重試 → 重複扣款
 3. Redis 主從切換 → 數據未同步 → 重複扣款
-```text
+```
 
 ### 問題 2: 不同 API 的冪等性要求不同
 
@@ -66,7 +66,7 @@ graph TD
     C --> I
     G --> I
     H --> D
-```text
+```
 
 ## 詳細設計
 
@@ -92,7 +92,7 @@ graph TD
   "created_at": 1640000000,
   "version": 1
 }
-```text
+```
 
 # TTL 配置（根據 API 類型）- v2.0.0 調整建議
 Bet API: 3600 秒（1 小時）     # ✅ 從 15 分鐘調整為 1 小時（避免延遲重試失敗）
@@ -116,7 +116,7 @@ Balance API: 60 秒（1 分鐘）
 > - 優點: 覆蓋 99.9% 的延遲重試場景,更安全
 > - 成本: 每百萬 Bet 增加約 200MB Redis 內存 (可接受)
 > - 保障: Layer 2 (DB) 仍然是永久 Truth Source
-```text
+```
 
 **實現邏輯**:
 
@@ -148,7 +148,7 @@ Thread B: INSERT INTO wallet_transactions (tx_id) VALUES ('bet_123')
 → 只有一個線程進入業務邏輯
 → 其他線程等待鎖釋放後，直接查詢結果
 → 減少數據庫壓力和異常處理
-```text
+```
 
 **實現邏輯（Redisson）**:
 
@@ -210,7 +210,7 @@ sequenceDiagram
     API-->>GP: 200 OK<br/>{"status": "SUCCESS", "balance": 950.00}
 
     Note over GP,Wallet: ✅ 即使緩存過期,DB 作為 Truth Source 仍然保證冪等性
-```text
+```
 
 ### 配置文件範例
 
@@ -265,7 +265,7 @@ idempotency:
 
     # 內存使用率告警閾值
     memory_usage_threshold: 0.80  # 80%
-```text
+```
 
 ### 成本與收益分析
 
@@ -305,7 +305,7 @@ metrics:
   - db_idempotency_check_duration_seconds{percentile=p99}
     target: < 0.05s
     alert: > 0.1s
-```text
+```
 
 ### 告警規則
 ```yaml

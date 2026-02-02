@@ -95,7 +95,7 @@ flowchart TD
     style PERSIST fill:#90CAF9,stroke:#1565C0,stroke-width:2px
     style MONGO fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
     style END fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-```text
+```
 
 **流程說明**:
 
@@ -135,7 +135,7 @@ Content-Type: application/json
   "priority": "HIGH",  // HIGH = Transactional, LOW = Marketing
   "locale": "zh_TW"
 }
-```text
+```
 
 **Response: 成功發送 (Telegram)**
 ```json
@@ -148,7 +148,7 @@ Content-Type: application/json
   "sent_at": "2026-01-27T10:30:00Z",
   "delivery_time_ms": 350
 }
-```text
+```
 
 **Response: Fallback 到 SMS**
 ```json
@@ -162,7 +162,7 @@ Content-Type: application/json
   "sent_at": "2026-01-27T10:30:01Z",
   "delivery_time_ms": 1200
 }
-```text
+```
 
 **Response: 觸發頻率限制**
 ```json
@@ -174,7 +174,7 @@ Content-Type: application/json
   "limit": 5,
   "reset_at": "2026-01-27T11:30:00Z"
 }
-```markdown
+```
 
 ### 2.1 支援渠道 (Channels)
 1.  **Transactional (高優先)**：
@@ -270,7 +270,7 @@ graph TB
 
     style CB1 fill:#A5D6A7,stroke:#388E3C,stroke-width:2px
     style DLQ fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-```text
+```
 
 **架構組件詳細說明**:
 
@@ -339,7 +339,7 @@ graph TB
 10. 站內信持久化 (僅 Marketing 訊息):
    - MongoDB: inbox_messages 集合
    - TTL Index: 30 天自動清理
-```text
+```
 
 **故障處理與降級策略**:
 
@@ -459,7 +459,7 @@ flowchart TD
     style M_FAIL2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
 
     style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
-```text
+```
 
 **路由策略詳細說明**:
 
@@ -480,7 +480,7 @@ else if (user.whatsapp_id exists):
     try WhatsApp (免費) → if failed → SMS (付費)
 else:
     直接 SMS (付費，最高送達率)
-```text
+```
 
 ### Marketing Routing (低優先級)
 
@@ -498,7 +498,7 @@ if (user.app_installed AND user.push_enabled):
         send Email as reminder
 else:
     直接 Email → persist to Inbox
-```text
+```
 
 **成本比較分析**:
 
@@ -527,7 +527,7 @@ else:
 4. 記錄日誌: channel=TELEGRAM, cost=$0
 
 結果: 成本節省 $0.05 (相比 SMS)
-```text
+```
 
 **場景 2: OTP 發送 (Telegram 失敗 → SMS Fallback)**
 ```
@@ -547,7 +547,7 @@ else:
 6. 記錄日誌: channel=SMS, cost=$0.05, fallback_from=TELEGRAM
 
 結果: 總延遲 2.7秒 (Telegram 失敗 + SMS 成功)
-```text
+```
 
 **場景 3: Marketing 發送 (Push + Email 雙渠道)**
 ```
@@ -573,7 +573,7 @@ else:
 - 首次成本: $0 (Push)
 - 補發成本: $0.001 (Email)
 - 總成本: $0.001
-```text
+```
 
 **配置參數**:
 

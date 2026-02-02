@@ -68,7 +68,7 @@ class PromotionRulesEngine {
       .map(rule => rule.execute(context));
   }
 }
-```text
+```
 
 **規則類型分類：**
 
@@ -489,7 +489,7 @@ stateDiagram-v2
     "maxBet": 50
   }
 }
-```text
+```
 
 ### 多租戶架構下的活動管理
 
@@ -518,7 +518,7 @@ stateDiagram-v2
 │  │(Row-RLS)│     │           │     │            │           │
 │  └─────────┘     └───────────┘     └────────────┘           │
 └─────────────────────────────────────────────────────────────┘
-```markdown
+```
 
 **數據隔離策略：**
 
@@ -566,7 +566,7 @@ ValidTurnover = BetAmount
 - Layer 2: StatusFactor = 100% (WIN/LOSS)
 - Layer 3: GameWeight = 10%
 → ValidTurnover = $100 × 1 × 100% × 10% = $10 計入流水要求
-```text
+```
 
 ### 統一玩家活動追蹤事件結構
 
@@ -595,7 +595,7 @@ ValidTurnover = BetAmount
     "requiredTotal": 3000.00
   }
 }
-```text
+```
 
 ### 有效流水驗證邏輯 (Valid Turnover Validation)
 流水計算不應只看 "Bet Amount"，必須過濾 **無風險投注 (Risk-Free Bet)** 與 **對沖投注 (Hedge Betting)**。為避免影響遊戲即時性，此過程採用 **非同步驗證 (Asynchronous Validation)**。
@@ -670,7 +670,7 @@ sequenceDiagram
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```text
+```
 
 #### API 契約定義 (API Contract Definition)
 
@@ -705,7 +705,7 @@ const result = await RiskEngine.validateTurnover({
   odds_type: OddsType.EUR
 });
 // Returns: { is_valid: true, effective_turnover_base: 100, risk_code: "VALID" }
-```text
+```
 
 #### 計算鏈路示例 (Calculation Chain Example)
 
@@ -730,7 +730,7 @@ Step 3 (Activity Layer - 04-01):
 Result:
   - Finance System records: $100 valid turnover (for VIP/rebate)
   - Activity System records: $15 wagering progress (for bonus clearing)
-```yaml
+```
 
 #### 跨模組一致性保障機制 (Cross-Module Consistency Mechanisms)
 
@@ -789,7 +789,7 @@ Result:
     → 獎勵計算服務
     → 錢包服務（發放）
     → 通知服務（推播/站內信）
-```text
+```
 
 **關鍵 Topic 結構：**
 
@@ -804,7 +804,7 @@ Topics:
 ├── promotion.claims           # 活動領取
 ├── reward.distributions       # 獎勵發放
 └── wagering.updates           # 流水更新
-```text
+```
 
 ### 推薦技術棧
 
@@ -1003,7 +1003,7 @@ flowchart TD
     }
   }
 }
-```text
+```
 
 **典型衝突場景決策樹**：
 
@@ -1079,7 +1079,7 @@ flowchart TD
 損失型：返水 = (總投注 - 總派彩) × 返水比例
 流水型：返水 = 總投注額 × 返水比例
 範例（流水型）：0.5% × $10,000 投注 = $50 返水
-```markdown
+```
 
 ### VIP 階層系統設計
 
@@ -1216,7 +1216,7 @@ flowchart TD
 │  綜合風險評分 ──► 實時決策                         │
 │                                                    │
 └────────────────────────────────────────────────────┘
-```markdown
+```
 
 ### KYC 分層驗證策略
 
@@ -1310,7 +1310,7 @@ flowchart TD
     "validDays": 14
   }
 }
-```text
+```
 
 ### 每日簽到模板
 
@@ -1332,7 +1332,7 @@ flowchart TD
     "maxStreak": { "type": "integer" }
   }
 }
-```text
+```
 
 ### 排行榜活動模板
 

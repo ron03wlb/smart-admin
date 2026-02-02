@@ -22,7 +22,7 @@
 問題: 營運商如何處理？
 ❌ 直接拒絕 → 玩家贏錢丟失
 ✅ 暫存 Result，等待 Bet
-```text
+```
 
 
 ### 場景 2: 預回滾（Pre-Rollback）
@@ -37,7 +37,7 @@
 5. Bet Request 延遲 5 秒後才到達
 
 問題: 如何處理這個 Rollback？
-```text
+```
 
 
 ### 場景 3: 部分失敗恢復（Two-Phase Commit）
@@ -58,7 +58,7 @@ T6: GP 重試（相同 transaction_id）
 - bet_details 表沒有記錄（注單丟失）
 - 返回「已處理」→ GP 認為成功
 - 但實際上數據不完整
-```text
+```
 
 
 ## 監控與告警

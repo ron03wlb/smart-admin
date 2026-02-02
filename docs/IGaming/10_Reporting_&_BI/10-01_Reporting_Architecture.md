@@ -348,7 +348,7 @@ params:
   date: yesterday
 retry: 3
 timeout: 1800  # 30 minutes
-```text
+```
 
 ---
 
@@ -366,7 +366,7 @@ timeout: 1800  # 30 minutes
 5. 緩存預熱 (Redis Cache Warm-up)
     ↓
 6. 通知推送 (Slack/Email Notification)
-```yaml
+```
 
 ---
 

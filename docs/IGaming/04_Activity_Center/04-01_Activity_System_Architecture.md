@@ -85,7 +85,7 @@ class PromotionRulesEngine {
       .map(rule => rule.execute(context));
   }
 }
-```text
+```
 
 ### 規則類型分類
 
@@ -231,7 +231,7 @@ flowchart TD
     style RISK_REJECT fill:#FFCDD2
     style BUDGET_EXHAUSTED fill:#FF98BonusBonus,color:#FFF
     style RISK_MANUAL fill:#FFF9C4
-```yaml
+```
 
 ### 規則引擎性能優化策略
 
@@ -400,7 +400,7 @@ stateDiagram-v2
         • 玩家有權申訴
         • 7 天內必須回覆
     end note
-```yaml
+```
 
 ### 狀態轉換觸發條件矩陣
 
@@ -508,7 +508,7 @@ stateDiagram-v2
     "maxBet": 5Bonus
   }
 }
-```text
+```
 
 ### 多租戶架構下的活動管理
 

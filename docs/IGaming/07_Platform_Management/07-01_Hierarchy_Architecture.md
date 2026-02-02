@@ -92,7 +92,7 @@ Super Admin
     <button onclick="stopImpersonation()">退出模擬</button>
 </div>
 {% endif %}
-```markdown
+```
 
 ### 6.2 集團通帳（Brand-Wide SSO）
 

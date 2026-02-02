@@ -28,7 +28,7 @@ GGR = Turnover - Payout
 - Turnover: 玩家投入的金額（包括真錢和虛擬幣）
 - Payout: 玩家贏得的金額
 - GGR: 營運商的毛利
-```text
+```
 
 **免費旋轉的財務影響**:
 
@@ -57,7 +57,7 @@ GGR = $10.00 - $8.50 = $1.50  ← 正確！
 1. 成本: 贈送了價值 $10 的免費旋轉
 2. 回報: 玩家實際贏得 $8.50
 3. 淨成本: $10 - $8.50 = $1.50（營運商的促銷成本）
-```text
+```
 
 ## 業界標準調查
 
@@ -75,7 +75,7 @@ GGR = $10.00 - $8.50 = $1.50  ← 正確！
   "is_bonus_round": true,
   "bonus_wallet": true
 }
-```markdown
+```
 
 **關鍵欄位**:
 - `bet_amount`: 免費旋轉的面額（例如 $1）
@@ -86,7 +86,7 @@ GGR = $10.00 - $8.50 = $1.50  ← 正確！
 ```
 Turnover = bet_amount = $1.00  ← 計入財務報表
 Valid Bet = $0                 ← 不計入流水要求
-```text
+```
 
 ### Pragmatic Play 的規範
 
@@ -102,7 +102,7 @@ Valid Bet = $0                 ← 不計入流水要求
   <isFreeSpin>true</isFreeSpin>
   <freespinCost>100</freespinCost>  <!-- 成本記錄 -->
 </betRequest>
-```markdown
+```
 
 **關鍵欄位**:
 - `amount`: 免費旋轉的面額
@@ -131,7 +131,7 @@ Reporting:
 - Turnover: Include free spin face value
 - Valid Bet: Exclude free spins
 - GGR: Include free spin cost in calculation
-```text
+```
 
 ## 詳細設計
 

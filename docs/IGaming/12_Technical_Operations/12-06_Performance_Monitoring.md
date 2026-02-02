@@ -61,17 +61,17 @@
     <artifactId>apm-toolkit-logback-1.x</artifactId>
     <version>9.3.0</version>
 </dependency>
-```text
+```
 
 **啟動參數 (application.yml)**:
-```yaml
+```
 # Skywalking Agent 配置
 JAVA_OPTS: >
   -javaagent:/opt/skywalking-agent/skywalking-agent.jar
   -Dskywalking.agent.service_name=smart-admin-api
   -Dskywalking.collector.backend_service=skywalking-oap:11800
   -Dskywalking.plugin.jdbc.trace_sql_parameters=true
-```markdown
+```
 
 
 ---
@@ -121,7 +121,7 @@ management:
     tags:
       application: ${spring.application.name}
       environment: ${spring.profiles.active}
-```text
+```
 
 ---
 
@@ -190,7 +190,7 @@ groups:
         annotations:
           summary: "CPU 使用率超過 80%"
           description: "{{ $labels.instance }} CPU: {{ $value | humanizePercentage }}"
-```text
+```
 
 ---
 
@@ -240,7 +240,7 @@ receivers:
       - api_url: '<Slack_Webhook_URL>'
         channel: '#alerts-warning'
         title: '⚠️ {{ .GroupLabels.alertname }}'
-```text
+```
 
 ---
 
@@ -258,7 +258,7 @@ Logstash (Log Processing)
 Elasticsearch (Storage & Indexing)
     ↓
 Kibana (Visualization & Search)
-```text
+```
 
 ---
 
@@ -292,7 +292,7 @@ Kibana (Visualization & Search)
         <appender-ref ref="JSON_FILE"/>
     </root>
 </configuration>
-```text
+```
 
 **日誌輸出範例 (JSON)**:
 ```json
@@ -311,7 +311,7 @@ Kibana (Visualization & Search)
   "psp": "Stripe",
   "error_code": "PSP_TIMEOUT"
 }
-```sql
+```
 
 ---
 
@@ -341,7 +341,7 @@ Kibana (Visualization & Search)
     }
   }
 }
-```sql
+```
 
 **ILM 策略 (Index Lifecycle Management)**:
 ```json
@@ -370,7 +370,7 @@ Kibana (Visualization & Search)
     }
   }
 }
-```text
+```
 
 ---
 
@@ -406,7 +406,7 @@ Kibana (Visualization & Search)
 │  - Skywalking UI (Trace Analysis)                          │
 │  - AlertManager (Alert Routing)                            │
 └─────────────────────────────────────────────────────────────┘
-```text
+```
 
 ---
 

@@ -29,7 +29,7 @@ B. Valid Bet = 100（投注本金）？
 C. Valid Bet = 0（排除和局投注）？
 
 文檔沒有明確說明！
-```text
+```
 
 ## Evolution Gaming 標準規則
 

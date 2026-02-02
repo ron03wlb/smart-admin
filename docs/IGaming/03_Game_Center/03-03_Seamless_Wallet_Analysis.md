@@ -87,7 +87,7 @@ stateDiagram-v2
         - Round Amount < $1000: MEDIUM Priority
         - SLA: 24 hours response
     end note
-```sql
+```
 
 **Round 狀態轉換關鍵邏輯**：
 
@@ -250,7 +250,7 @@ sequenceDiagram
     style Platform fill:#E6E6FA
     style Redis fill:#FFE4B5
     style DB fill:#ADD8E6
-```sql
+```
 
 **冪等性關鍵設計**：
 
@@ -323,7 +323,7 @@ flowchart TD
     style SUCCESS1 fill:#90EE90
     style SUCCESS2 fill:#90EE90
     style REVIEW fill:#DDA0DD
-```text
+```
 
 **策略比較與推薦**：
 
@@ -402,7 +402,7 @@ flowchart TD
     style EXECUTE_S1 fill:#E0E0E0
     style NOTIFY_OPS fill:#FFA07A
     style NOTIFY_RECOVERY fill:#98FB98
-```text
+```
 
 **策略切換實現**:
 
@@ -429,7 +429,7 @@ alerts:
     annotations:
       summary: "⚠️ Out-of-Order 進入緊急模式 (Strategy 2 - Orphan Win)"
       description: "GP 重試率過低,允許孤兒 Win,需立即人工介入"
-```markdown
+```
 
 **實施建議**:
 1. **預設策略**: Strategy 3 (Pending Queue)
@@ -556,7 +556,7 @@ flowchart TD
     style WIN_SUCCESS fill:#C8E6C9
     style ROLLBACK_SUCCESS fill:#C8E6C9
     style ADJUST_SUCCESS fill:#C8E6C9
-```text
+```
 
 **場景優先級矩陣**：
 
@@ -643,7 +643,7 @@ groups:
           severity: critical
         annotations:
           summary: "1 小時內 Jackpot 觸發 > 5 次，疑似遊戲邏輯異常或欺詐"
-```text
+```
 
 **關鍵實作要點**：
 

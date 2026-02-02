@@ -118,7 +118,7 @@ export default function () {
 
   sleep(1);  // Think time: 1 second between actions
 }
-```text
+```
 
 **Expected Results**:
 ```
@@ -126,7 +126,7 @@ export default function () {
 ✓ http_req_failed...............: 0.03% (150 failed out of 500,000 requests)
 ✓ http_reqs.....................: 500,000 (1,666/s)
 ✓ vus...........................: 50,000 max
-```text
+```
 
 #### 3.1.3 Scenario 2: Bet Spike (投注高峰測試)
 
@@ -174,7 +174,7 @@ export default function () {
     </ResultCollector>
   </TestPlan>
 </jmeterTestPlan>
-```markdown
+```
 
 **Pass Criteria**:
 - P99 Latency: < 200ms
@@ -217,7 +217,7 @@ export default function () {
 
   sleep(randomBetween(5, 15));  // User think time: 5-15 seconds
 }
-```markdown
+```
 
 **Monitoring During Test**:
 - Memory Usage: Should remain stable (no upward trend)
@@ -275,7 +275,7 @@ tests/
 └── regression/
     ├── api_regression.postman_collection.json
     └── e2e_regression.cy.js   # Cypress E2E tests
-```text
+```
 
 ### 3.4 效能基準與回歸檢測 (Performance Baselines & Regression Detection)
 
@@ -291,7 +291,7 @@ k6-reporter --input baseline.json --output baseline_report.html
 
 # Store baseline in database for comparison
 python store_baseline.py --file baseline.json --version v1.0.0
-```text
+```
 
 **後續回歸測試**:
 ```bash
@@ -305,7 +305,7 @@ python compare_performance.py --baseline baseline.json --current current.json
 # - P99 Latency: 210ms → 350ms (+66% REGRESSION ❌)
 # - Error Rate: 0.02% → 0.05% (+150% REGRESSION ❌)
 # - Throughput: 1000 RPS → 950 RPS (-5% ACCEPTABLE ✅)
-```text
+```
 
 #### 3.4.2 自動化效能門檻檢查 (Automated Performance Gates)
 

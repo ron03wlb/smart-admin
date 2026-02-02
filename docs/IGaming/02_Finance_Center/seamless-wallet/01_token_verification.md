@@ -13,7 +13,7 @@
 - 風險: Token 在遊戲過程中過期的機率極低
 
 結論: 所有 API 都應該驗證 Token
-```text
+```
 
 ### 場景 2: 長生命週期遊戲（體育賽事、撲克錦標賽）
 ```yaml
@@ -23,7 +23,7 @@
 - 風險: Token 必然會在遊戲過程中過期
 
 結論: Result API 需要特殊處理
-```text
+```
 
 ## 決策樹 (v2.0.0 增強版 - 完整錯誤處理)
 
@@ -95,7 +95,7 @@ graph TD
     %% 樣式定義
     classDef errorStyle fill:#ff6b6b,stroke:#c92a2a,color:#fff
     class ERR1,ERR2,ERR3,ERR4,ERR5,ERR6,ERR7,ERR8,R,L errorStyle
-```text
+```
 
 ## 推薦方案
 
@@ -150,7 +150,7 @@ graph TD
     "contact_support": false
   }
 }
-```text
+```
 
 ### 客戶端錯誤處理流程圖
 
@@ -179,7 +179,7 @@ graph TD
     L --> M
     D --> M
     E --> M
-```text
+```
 
 ### 監控告警規則
 
@@ -211,7 +211,7 @@ T2: 攻擊者使用 Token 發起 Bet 請求
     - 如果驗證 Token 過期 → 攻擊被阻止
 
 結論: Bet API 必須嚴格驗證 Token 有效期
-```text
+```
 
 **攻擊場景 2: 會話固定攻擊**
 ```
@@ -224,7 +224,7 @@ T2: 攻擊者使用相同 Token 進行操作
     - 如果驗證 user_id 匹配 → 攻擊被阻止
 
 結論: 必須驗證 Token 中的 user_id 與請求中的 user_id 一致
-```text
+```
 
 ### 寬鬆驗證的合理性（Result API）
 
@@ -249,7 +249,7 @@ T3 (週三 22:00): 比賽結束，GP 發送 Result 請求
 → 確認 Bet 存在且未結算
 → 自動完成派彩
 → ✅ 推薦方案
-```text
+```
 
 ## 實現建議
 
