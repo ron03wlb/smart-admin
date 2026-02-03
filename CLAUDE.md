@@ -206,6 +206,24 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 → **[Unified Decision Center](.agent/rules/00-INDEX.md)** - Rules, Skills, and Agent Routing
 → **[Quality Standards](.claude/shared/knowledge/quality-standards.md)**
 
+### Mermaid Diagram Standards
+
+**CRITICAL RULE**: All Mermaid diagrams must use `\n` for line breaks, NOT `<br/>` HTML tags.
+
+```mermaid
+# ❌ 錯誤
+graph TD
+    A[Line 1<br/>Line 2]
+
+# ✅ 正確
+graph TD
+    A["Line 1\nLine 2"]
+```
+
+**Pre-commit Hook**: Automatically checks for `<br/>` tags in Mermaid blocks before commit.
+
+→ **[Complete Mermaid Best Practices](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md)**
+
 ## Specialized Skills
 
 **Quick Overview**: 35 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)

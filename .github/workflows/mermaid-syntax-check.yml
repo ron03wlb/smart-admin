@@ -1,0 +1,99 @@
+name: Mermaid Syntax Check
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**/*.md'
+      - '.claude/skills/**/*.md'
+  push:
+    branches:
+      - master
+      - feature/**
+    paths:
+      - 'docs/**/*.md'
+      - '.claude/skills/**/*.md'
+
+jobs:
+  mermaid-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check Mermaid <br/> tags
+        run: |
+          echo "檢查 Mermaid 圖表語法..."
+
+          # 找出所有包含 Mermaid 的 Markdown 檔案
+          md_files=$(find docs .claude/skills -name "*.md" -type f 2>/dev/null || echo "")
+
+          if [ -z "$md_files" ]; then
+            echo "✅ 未找到需要檢查的 Markdown 檔案"
+            exit 0
+          fi
+
+          has_errors=false
+
+          for file in $md_files; do
+            # 檢查 Mermaid 區塊是否包含 <br/>
+            if grep -q '```mermaid' "$file"; then
+              # 使用 Python 腳本進行精準檢查（如果存在）
+              if [ -f "scripts/replace_mermaid_br.py" ]; then
+                # 測試模式：僅檢查不修改
+                if python3 -c "
+import re
+from pathlib import Path
+
+content = Path('$file').read_text(encoding='utf-8')
+pattern = r'\`\`\`mermaid\n(.*?)\`\`\`'
+matches = re.findall(pattern, content, flags=re.DOTALL)
+
+for match in matches:
+    if '<br/>' in match:
+        exit(1)
+                "; then
+                  :  # 通過檢查
+                else
+                  echo "❌ $file: 發現 <br/> 標籤在 Mermaid 圖表中"
+                  has_errors=true
+                fi
+              else
+                # 降級為簡單檢查
+                if grep -A 100 '```mermaid' "$file" | grep -B 100 '```' | grep -q '<br/>'; then
+                  echo "❌ $file: 發現 <br/> 標籤在 Mermaid 圖表中"
+                  has_errors=true
+                fi
+              fi
+            fi
+          done
+
+          if [ "$has_errors" = true ]; then
+            echo ""
+            echo "錯誤: Mermaid 圖表不應使用 HTML <br/> 標籤"
+            echo "請使用 \\n 進行換行"
+            echo ""
+            echo "修復建議："
+            echo "  1. 本地運行: py scripts/replace_mermaid_br.py <檔案路徑>"
+            echo "  2. 或手動替換 <br/> 為 \\n"
+            exit 1
+          fi
+
+          echo "✅ 所有 Mermaid 圖表語法正確"
+
+      - name: Validate Mermaid syntax with mmdc (optional)
+        if: false  # 可選：啟用此步驟需要安裝 Mermaid CLI
+        run: |
+          npm install -g @mermaid-js/mermaid-cli
+          echo "使用 Mermaid CLI 驗證圖表語法..."
+
+          # 找出所有 Mermaid 檔案並驗證
+          find docs .claude/skills -name "*.md" -type f | while read -r file; do
+            if grep -q '```mermaid' "$file"; then
+              echo "驗證: $file"
+              # 提取 Mermaid 區塊並驗證（需要實現提取邏輯）
+            fi
+          done
