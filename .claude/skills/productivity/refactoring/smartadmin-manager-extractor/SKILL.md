@@ -252,3 +252,46 @@ dependencies {
 
 **維護者**: SmartAdmin Skills Team
 **最後更新**: 2026-01-29
+
+---
+
+## 相關規則
+
+本技能自動化以下 SmartAdmin 架構規範的重構：
+
+### 強制要求
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 本技能自動提取 Service 層的 @Transactional 方法至 Manager 層
+  - 確保 @Transactional 包含 `rollbackFor = Throwable.class`
+  - Manager 層命名規範（XXXManager）
+  - Manager 層事務管理職責
+
+- **[Architecture Rules - Transaction Management](./../../../.agent/rules/foundation/10-architecture-rules.md#transactionalMustBeInManagerLayer)**
+  - 自動修復 ArchUnit 測試違規：`transactionalMustBeInManagerLayer()`
+  - 確保分層架構合規：Controller → Service → Manager → Dao
+  - 構造器注入模式（@RequiredArgsConstructor）
+
+- **[Dependency Injection](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+  - 生成的 Manager 類使用構造器注入
+  - private final 欄位聲明
+  - @RequiredArgsConstructor 註解
+
+### 參考指引
+
+- **[Spring Pattern Checker](./../../../extended/quality/spring-pattern-checker/)**
+  - 配套技能：檢測 @Transactional 違規
+  - 本技能執行自動修復
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 事務回滾異常處理標準
+  - rollbackFor = Throwable.class 的重要性
+
+---
+
+## 參考資料
+
+- [Manager Layer Extraction Example](examples/extraction-example.md) - 完整提取範例
+- [Manager Layer Patterns](references/manager-layer-patterns.md) - Manager 層模式詳解
+- [ArchitectureTest.java](./../../../.agent/configs/ArchitectureTest.java) - 架構測試驗證
+- [JavaParser Documentation](https://javaparser.org/) - AST 操作庫

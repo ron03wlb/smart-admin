@@ -563,3 +563,48 @@ User: "I need to validate layered architecture dependencies for the Employee mod
 ---
 
 **Last Updated:** 2026-01-25 (v1.1 - Added Pattern 7 for annotation parameter verification and time estimates based on real-world testing)
+
+---
+
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 架構規則：
+
+### 強制要求
+
+- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 本技能為所有 ArchUnit 測試的生成器
+  - 涵蓋全部 21 條架構規則的測試生成
+  - 關鍵規則包含：
+    - `layeredArchitecture()` - Controller → Service → Manager → Dao 分層架構
+    - `transactionalMustBeInManagerLayer()` - @Transactional 僅允許在 Manager 層
+    - `serviceUsesVavrOption()` - Service 層必須使用 Vavr Option
+    - `noFieldInjection()` - 禁止使用 @Autowired 欄位注入
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - Manager 層事務管理規則
+  - @Transactional 必須包含 `rollbackFor = Throwable.class`
+  - Manager 層命名規範（XXXManager 而非 XXXManagerImpl）
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 類別命名驗證（Controller, Service, Manager, Dao 後綴）
+  - 布林欄位命名（`deleted` 不是 `isDeleted`）
+  - 包名結構驗證
+
+### 參考指引
+
+- **[Dependency Injection Rules](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+  - 構造器注入強制要求（@RequiredArgsConstructor + private final）
+  - 禁止欄位注入的 ArchUnit 驗證
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 異常處理層級驗證
+  - 禁止在 Controller 層使用 try-catch
+
+---
+
+## 參考資料
+
+- [ArchUnit User Guide](https://www.archunit.org/userguide/html/000_Index.html) - 官方文檔
+- [ArchitectureTest.java](./../../../.agent/configs/ArchitectureTest.java) - SmartAdmin 架構測試基準
+- [SmartAdmin Architecture Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md)

@@ -376,3 +376,44 @@ cd smart-admin-api-java21-springboot3
 **Skill Version**: 1.0.0
 **Last Updated**: 2026-01-23
 **Compatible with**: SmartAdmin v4.0.0+
+
+---
+
+## 相關規則
+
+本技能驗證以下 SmartAdmin 架構規則的實際代碼實現：
+
+### 強制要求
+
+- **[Architecture Rules - Transaction Management](./../../../.agent/rules/foundation/10-architecture-rules.md#transactionalMustBeInManagerLayer)**
+  - @Transactional 僅允許在 Manager 層
+  - 本技能檢測 Service 層的 @Transactional 違規（ArchUnit 補充）
+  - 檢測缺少 `rollbackFor = Throwable.class` 參數
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - Manager 層事務管理職責
+  - @Transactional 必須包含 rollbackFor 參數
+  - Service → Manager 重構指引
+
+- **[Dependency Injection Rules](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+  - 禁止 @Autowired 欄位注入
+  - 強制使用構造器注入（@RequiredArgsConstructor）
+  - 本技能檢測欄位注入違規
+
+### 參考指引
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - Controller 層禁止 try-catch（應由全局異常處理器）
+  - 本技能檢測 Controller 異常處理違規
+
+- **[SmartAdmin Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md)**
+  - Transaction Management Pattern
+  - Dependency Injection Pattern
+
+---
+
+## 參考資料
+
+- [ArchitectureTest.java](./../../../.agent/configs/ArchitectureTest.java) - 補充 ArchUnit 靜態測試
+- [Manager Layer Extraction Guide](./../../productivity/refactoring/smartadmin-manager-extractor/) - 自動重構工具
+- [Spring Framework Documentation](https://docs.spring.io/spring-framework/reference/data-access/transaction.html) - 事務管理官方文檔

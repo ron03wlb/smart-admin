@@ -271,3 +271,42 @@ dependencies {
 
 **維護者**: SmartAdmin Skills Team
 **最後更新**: 2026-01-29
+
+---
+
+## 相關規則
+
+本技能直接關聯以下並發安全規範：
+
+### 強制要求
+
+- **[Concurrency Safety Rules](./../../../.agent/rules/technology/patterns/05-concurrency-safety.md)**
+  - Check-then-act 模式檢測（Map.containsKey() + put()）
+  - Double-checked locking 驗證
+  - ConcurrentHashMap 誤用檢測（size() 用於條件判斷）
+  - 共享可變狀態的執行緒安全要求
+
+- **[SpotBugs Rules](./../../../.agent/rules/quality-tools/13-spotbugs-rules.md)**
+  - SpotBugs 並發相關檢測規則配置
+  - 自定義 Detector 實現標準
+  - 報告格式與嚴重性級別
+
+### 參考指引
+
+- **[Java Concurrency in Practice](https://jcip.net/)** - 經典並發模式
+  - 有效不可變性（Effectively Immutable）
+  - 安全發布（Safe Publication）
+  - 並發集合使用模式
+
+- **[Architecture Rules](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - Manager 層事務管理（與並發安全相關）
+  - Service 層無狀態要求（避免共享狀態）
+
+---
+
+## 參考資料
+
+- [SmartReloadManager 修復範例](examples/smartreloadmanager-fix.md) - Check-then-act 實際案例
+- [並發模式參考](references/concurrency-patterns.md) - 完整模式目錄
+- [SpotBugs Custom Detectors](https://spotbugs.readthedocs.io/en/latest/implement-plugin.html) - 自定義規則實現
+- [Java Memory Model](https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html#jls-17.4) - JVM 記憶體模型規範

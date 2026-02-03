@@ -481,3 +481,44 @@ echo "✅ Naming convention check passed"
 
 **Maintainer**: SmartAdmin Architecture Team
 **Last Updated**: 2026-02-02
+
+---
+
+## 相關規則
+
+本技能驗證以下 SmartAdmin 命名規範：
+
+### 強制要求
+
+- **[Naming Conventions - Table Names](./../../../.agent/rules/foundation/01-naming-conventions.md#table-naming)**
+  - 表名必須使用單數形式（`t_employee` 不是 `t_employees`）
+  - 本技能檢測所有 @TableName 註解中的複數命名
+  - 豁免清單：特殊複數名詞（LiteFlowExecutionMetrics）
+
+- **[Naming Conventions - Class Names](./../../../.agent/rules/foundation/01-naming-conventions.md#class-naming)**
+  - Entity 命名：XXXEntity（不是 XXXPO, XXXDO）
+  - Service 命名：XXXService（不是 XXXServiceImpl）
+  - Manager 命名：XXXManager（不是 XXXManagerImpl）
+  - Dao 命名：XXXDao（不是 XXXMapper）
+
+- **[Naming Conventions - Field Names](./../../../.agent/rules/foundation/01-naming-conventions.md#field-naming)**
+  - 布林欄位：`deleted` 不是 `isDeleted`
+  - 本技能檢測欄位命名違規（實驗性功能）
+
+### 參考指引
+
+- **[Architecture Rules - Entity Layer](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - Entity 類必須使用 @TableName 註解
+  - Entity 包結構：`..domain.entity`
+
+- **[Database Schema Design](./../../../../docs/database/schema-design.md)**
+  - 表命名規範（如適用）
+  - 外鍵命名規範
+
+---
+
+## 參考資料
+
+- [ArchitectureTest.java](./../../../.agent/configs/ArchitectureTest.java) - 命名規範的 ArchUnit 驗證
+- [Table Name Patterns](patterns/table-name-patterns.json) - 複數模式檢測規則
+- [Naming Conventions Complete Guide](./../../../.agent/rules/foundation/01-naming-conventions.md) - 完整命名規範

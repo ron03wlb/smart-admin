@@ -468,3 +468,45 @@ Before completing test generation:
 - [ ] Test fixtures in separate class
 - [ ] Unique test data (timestamps) to avoid collisions
 - [ ] Tests cover happy path and error cases
+
+---
+
+## 相關規則
+
+本技能生成的整合測試必須符合以下規範：
+
+### 強制要求
+
+- **[Testing Strategy](./../../../docs/testing/testing-strategy.md)**
+  - 整合測試定義：測試 Service + Dao + Database 的完整流程
+  - Testcontainers 使用規範（PostgreSQL 真實環境）
+  - 測試隔離策略（@Transactional 自動回滾）
+
+- **[Integration Testing Quick Reference](./../../../docs/testing/integration-testing-quick-reference.md)**
+  - BaseIntegrationTest 繼承規範
+  - Testcontainers 配置模式
+  - ResponseDTO 斷言模式
+
+- **[Architecture Rules](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 整合測試可直接注入 Service, Dao（@Autowired）
+  - 測試類不受分層架構限制（可同時注入多層）
+  - 測試使用構造器注入或欄位注入均可
+
+### 參考指引
+
+- **[Test Fixture Generator](./../testing/test-fixture-generator/)**
+  - 測試資料生成器（配套技能）
+  - AtomicInteger 計數器模式
+  - Factory method 模式
+
+- **[Dependency Injection](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+  - 測試類可使用 @Autowired 欄位注入（例外）
+  - 生產代碼必須使用構造器注入
+
+---
+
+## 參考資料
+
+- [Testcontainers Documentation](https://www.testcontainers.org/) - 官方文檔
+- [Spring Boot Testing](https://docs.spring.io/spring-boot/reference/testing/index.html) - 整合測試指南
+- [BaseIntegrationTest.java](./../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java) - SmartAdmin 測試基類

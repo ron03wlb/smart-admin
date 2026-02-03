@@ -705,3 +705,46 @@ When generating fixture, ensure:
 **Integration Test Example**: `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceIntegrationTest.java`
 
 **Base Class**: `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java`
+
+---
+
+## 相關規則
+
+本技能生成的測試固件必須符合以下規範：
+
+### 強制要求
+
+- **[Testing Strategy](./../../../docs/testing/testing-strategy.md)**
+  - 測試資料生成模式（Factory Method）
+  - AtomicInteger 計數器保證唯一性
+  - 測試隔離與資料清理策略
+
+- **[Integration Testing Quick Reference](./../../../docs/testing/integration-testing-quick-reference.md)**
+  - Fixture 使用場景（Service 測試、Controller 測試）
+  - @BeforeEach 中的 FK 依賴設置模式
+  - 參數化覆寫方法模式
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 測試固件類命名：`{Entity}TestFixture`（不是 `{Entity}Builder`）
+  - Factory 方法命名：`create{Entity}()`、`create{Form}()`
+  - 參數命名：具體業務名稱（`categoryId` 不是 `fkId`）
+
+### 參考指引
+
+- **[SmartAdmin Integration Test Skill](./../full-stack/smartadmin-integration-test/)**
+  - 整合測試框架（配套技能）
+  - Fixture 在整合測試中的使用範例
+  - BaseIntegrationTest 配置
+
+- **[Domain Objects Pattern](./../../../.claude/shared/knowledge/smartadmin-patterns.md#domain-object-pattern)**
+  - Entity, Form, VO 對象命名規範
+  - AddForm vs UpdateForm vs QueryForm 區別
+  - 布林欄位預設值規範
+
+---
+
+## 參考資料
+
+- [EmployeeTestFixture.java](./../../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeTestFixture.java) - 完整範例
+- [EmployeeServiceIntegrationTest.java](./../../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceIntegrationTest.java) - 使用範例
+- [Test Fixture Pattern](https://martinfowler.com/bliki/TestFixture.html) - Martin Fowler 文章

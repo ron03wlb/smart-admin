@@ -668,3 +668,46 @@ Detailed security guides:
 - ✅ Compliance-ready audit trails
 - ✅ Attack prevention best practices
 - ✅ SmartAdmin foundation modules leveraged
+
+---
+
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 安全規範：
+
+### 強制要求
+
+- **[Exception & Logging Rules](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 異常處理層級（Controller 禁止 try-catch）
+  - 敏感資訊不得記錄到日誌（密碼、Token、信用卡號）
+  - 審計日誌格式標準（操作類型、操作人、IP、時間戳）
+
+- **[中華人民共和國密碼法](https://www.gov.cn/xinwen/2019-10/26/content_5445331.htm)**
+  - 第二十七條：商用密碼服務使用單位應當使用商用密碼進行保護
+  - 本技能提供 SM2/SM3/SM4 國密算法實現（符合 GM/T 標準）
+
+- **[Architecture Rules - Data Security](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 禁止在代碼中硬編碼敏感資訊（密碼、API Key、證書）
+  - 配置文件敏感資訊必須使用環境變數或加密配置
+
+### 參考指引
+
+- **[iGaming Compliance](./../../../docs/iGame/igaming-compliance-checklist.md)**
+  - KYC/AML 合規要求（如適用）
+  - 支付安全標準（PCI-DSS）
+  - 資料保護與隱私（GDPR, PIPL）
+
+- **[OWASP Top 10](https://owasp.org/www-project-top-ten/)**
+  - SQL Injection 防禦（MyBatis 參數化查詢）
+  - XSS 防禦（Vue 自動轉義，避免 v-html）
+  - CSRF 防禦（Sa-Token 自動驗證）
+  - Broken Authentication（BCrypt + Salt）
+
+---
+
+## 參考資料
+
+- [BouncyCastle 官方文檔](https://www.bouncycastle.org/java.html) - 國密算法實現
+- [SM3 演算法規範](http://www.gmbz.org.cn/main/viewfile/2018011001400692565.html) - GM/T 0004-2012
+- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) - 安全最佳實踐
+- [SmartAdmin Security Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md#authentication-sa-token)

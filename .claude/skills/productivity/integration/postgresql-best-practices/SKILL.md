@@ -466,3 +466,46 @@ GRANT SELECT ON ALL TABLES IN SCHEMA public TO smartadmin_user;
 
 **維護者**: SmartAdmin Skills Team
 **最後更新**: 2026-01-29
+
+---
+
+## 相關規則
+
+本技能協助診斷和優化數據庫性能問題：
+
+### 強制要求
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - HikariCP 連接池由 Manager 層管理
+  - 事務方法在 Manager 層（避免連接洩漏）
+  - 長事務檢測與優化
+
+- **[Architecture Rules - Persistence Layer](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - Dao 層使用 MyBatis `#{}` 參數化查詢（防止 SQL 注入）
+  - 本技能檢測 N+1 查詢問題
+  - 慢查詢優化建議
+
+### 參考指引
+
+- **[Database Schema Design](./../../../../docs/database/schema-design.md)**
+  - 索引設計最佳實踐（如適用）
+  - 外鍵約束與性能平衡
+
+- **[SmartAdmin Integration Test](./../../../foundation/full-stack/smartadmin-integration-test/)**
+  - Testcontainers PostgreSQL 環境
+  - 整合測試性能基準
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 數據庫連接異常處理
+  - HikariCP 連接池異常監控
+
+---
+
+## 參考資料
+
+- [HikariCP Tuning Example](examples/hikaricp-tuning-example.md) - 完整調優範例
+- [PostgreSQL Best Practices](references/postgres-best-practices.md) - PostgreSQL 最佳實踐
+- [Performance Report Template](templates/performance-report.md.template) - 性能報告模板
+- [HikariCP About Pool Sizing](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing) - 連接池大小計算
+- [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html) - EXPLAIN 分析官方文檔
+- [P6Spy Documentation](https://p6spy.readthedocs.io/en/latest/) - SQL 日誌工具
