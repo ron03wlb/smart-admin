@@ -186,9 +186,9 @@ flowchart LR
     E[前端應用] -->|4. Fetch JSON| D
 
     style A fill:#333,stroke:#fff,color:#fff
-    style B fill:#BonusBonus3366,stroke:#BonusBonusccff,color:#fff
-    style C fill:#8BonusBonusBonus8Bonus,stroke:#ffBonusBonusff,color:#fff
-    style D fill:#BonusBonus66BonusBonus,stroke:#BonusBonusffBonusBonus,color:#fff
+    style B fill:#333366,stroke:#ccccff,color:#fff
+    style C fill:#888888,stroke:#ffffff,color:#fff
+    style D fill:#666666,stroke:#ffffff,color:#fff
     style E fill:#333,stroke:#fff,color:#fff
 ```
 

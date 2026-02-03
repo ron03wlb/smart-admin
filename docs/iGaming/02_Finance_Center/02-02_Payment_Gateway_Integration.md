@@ -187,9 +187,9 @@ sequenceDiagram
         end
     end
 
-    style Webhook Handler fill:#DDA0DD
+    style "Webhook Handler" fill:#DDA0DD
     style WalletService fill:#90EE90
-    style PSP Router fill:#FFE4B5
+    style "PSP Router" fill:#FFE4B5
     style Redis fill:#FFD93D
 ```
 
@@ -328,32 +328,32 @@ POST /pal/servlet/Payout/v68/payout
 
 ```mermaid
 flowchart LR
-    START[Player Deposit Request] --> INPUT["Input Parameters\n━━━━━━━━━━━━━━\n• Amount: $1000\n• Currency: USD\n• Country: US\n• Payment Method: Credit Card\n• VIP Level: 2"]
+    START[Player Deposit Request] --> INPUT["Input Parameters<br/>━━━━━━━━━━━━━━<br/>• Amount: $1000<br/>• Currency: USD<br/>• Country: US<br/>• Payment Method: Credit Card<br/>• VIP Level: 2"]
 
-    INPUT --> STEP1["🌍 Step 1\nCountry & Payment\nMethod Filtering\n━━━━━━━━━━━━━━\nFilter by Geography\n& Payment Type"]
+    INPUT --> STEP1["🌍 Step 1<br/>Country & Payment<br/>Method Filtering<br/>━━━━━━━━━━━━━━<br/>Filter by Geography<br/>& Payment Type"]
 
-    STEP1 --> CANDIDATES["Candidate PSPs\n━━━━━━━━━━━━━━\n• Nuvei\n• Adyen\n• Stripe\n(3 candidates)"]
+    STEP1 --> CANDIDATES["Candidate PSPs<br/>━━━━━━━━━━━━━━<br/>• Nuvei<br/>• Adyen<br/>• Stripe<br/>(3 candidates)"]
 
-    CANDIDATES --> STEP2["🏥 Step 2\nHealth Status Check\n━━━━━━━━━━━━━━\nFilter Unavailable PSPs"]
+    CANDIDATES --> STEP2["🏥 Step 2<br/>Health Status Check<br/>━━━━━━━━━━━━━━<br/>Filter Unavailable PSPs"]
 
-    STEP2 --> AVAILABLE["Available PSPs\n━━━━━━━━━━━━━━\n• Nuvei: Healthy\n• Adyen: Healthy\n• Stripe: Degraded\n(2 healthy)"]
+    STEP2 --> AVAILABLE["Available PSPs<br/>━━━━━━━━━━━━━━<br/>• Nuvei: Healthy<br/>• Adyen: Healthy<br/>• Stripe: Degraded<br/>(2 healthy)"]
 
-    AVAILABLE --> STEP3["📊 Step 3\nMulti-Dimensional\nScoring Algorithm\n━━━━━━━━━━━━━━\n5 Dimensions Evaluation"]
+    AVAILABLE --> STEP3["📊 Step 3<br/>Multi-Dimensional<br/>Scoring Algorithm<br/>━━━━━━━━━━━━━━<br/>5 Dimensions Evaluation"]
 
-    STEP3 --> RANKED["Ranked PSPs\n━━━━━━━━━━━━━━\n1️⃣ Nuvei: 92.25\n2️⃣ Adyen: 78.0\n3️⃣ Stripe: 72.0"]
+    STEP3 --> RANKED["Ranked PSPs<br/>━━━━━━━━━━━━━━<br/>1️⃣ Nuvei: 92.25<br/>2️⃣ Adyen: 78.0<br/>3️⃣ Stripe: 72.0"]
 
-    RANKED --> STEP4["🔍 Step 4\nFinal Health Check\n━━━━━━━━━━━━━━\nVerify Top PSP Status"]
+    RANKED --> STEP4["🔍 Step 4<br/>Final Health Check<br/>━━━━━━━━━━━━━━<br/>Verify Top PSP Status"]
 
     STEP4 --> DECISION{Top PSP Status?}
 
-    DECISION -->|Healthy| ROUTE["✅ Route to Nuvei\n━━━━━━━━━━━━━━\nPayment URL Generated\nSettlement ETA: 10 min"]
-    DECISION -->|Degraded/Down| FALLBACK["⚠️ Fallback to Adyen\n━━━━━━━━━━━━━━\nRetry with 2nd PSP"]
+    DECISION -->|Healthy| ROUTE["✅ Route to Nuvei<br/>━━━━━━━━━━━━━━<br/>Payment URL Generated<br/>Settlement ETA: 10 min"]
+    DECISION -->|Degraded/Down| FALLBACK["⚠️ Fallback to Adyen<br/>━━━━━━━━━━━━━━<br/>Retry with 2nd PSP"]
 
     FALLBACK --> DECISION
 
-    ROUTE --> LOG[📝 Log Routing Decision\n━━━━━━━━━━━━━━\nSelected: Nuvei\nScore: 92.25\nFallback Queue: [Adyen, Stripe]]
+    ROUTE --> LOG[📝 Log Routing Decision<br/>━━━━━━━━━━━━━━<br/>Selected: Nuvei<br/>Score: 92.25<br/>Fallback Queue: [Adyen, Stripe]]
 
-    LOG --> RETURN["Return to Gateway\n━━━━━━━━━━━━━━\nRedirect URL + ETA"]
+    LOG --> RETURN["Return to Gateway<br/>━━━━━━━━━━━━━━<br/>Redirect URL + ETA"]
 
     RETURN --> END1[End - Success]
 
@@ -382,13 +382,13 @@ flowchart TD
 
     INPUT --> COUNTRY{Country?}
 
-    COUNTRY -->|🇺🇸 US| US["US PSPs\n━━━━━━━━━━━━━━\n• Stripe\n• Nuvei\n• PayPal\n• Coinbase"]
-    COUNTRY -->|🇪🇺 EU| EU["EU PSPs\n━━━━━━━━━━━━━━\n• Adyen\n• Trustly\n• Klarna\n• Skrill"]
-    COUNTRY -->|🇨🇳 CN| CN["CN PSPs\n━━━━━━━━━━━━━━\n• Alipay\n• WeChat Pay\n• UnionPay"]
-    COUNTRY -->|🇵🇭 PH| PH["PH PSPs\n━━━━━━━━━━━━━━\n• GCash\n• PayMaya\n• GrabPay"]
-    COUNTRY -->|🇧🇷 BR| BR["BR PSPs\n━━━━━━━━━━━━━━\n• PagSeguro\n• MercadoPago\n• Pix"]
-    COUNTRY -->|🇯🇵 JP| JP["JP PSPs\n━━━━━━━━━━━━━━\n• PayPay\n• Line Pay\n• Rakuten Pay"]
-    COUNTRY -->|Other| GLOBAL["Global PSPs\n━━━━━━━━━━━━━━\n• Stripe\n• Adyen\n• Nuvei"]
+    COUNTRY -->|🇺🇸 US| US["US PSPs<br/>━━━━━━━━━━━━━━<br/>• Stripe<br/>• Nuvei<br/>• PayPal<br/>• Coinbase"]
+    COUNTRY -->|🇪🇺 EU| EU["EU PSPs<br/>━━━━━━━━━━━━━━<br/>• Adyen<br/>• Trustly<br/>• Klarna<br/>• Skrill"]
+    COUNTRY -->|🇨🇳 CN| CN["CN PSPs<br/>━━━━━━━━━━━━━━<br/>• Alipay<br/>• WeChat Pay<br/>• UnionPay"]
+    COUNTRY -->|🇵🇭 PH| PH["PH PSPs<br/>━━━━━━━━━━━━━━<br/>• GCash<br/>• PayMaya<br/>• GrabPay"]
+    COUNTRY -->|🇧🇷 BR| BR["BR PSPs<br/>━━━━━━━━━━━━━━<br/>• PagSeguro<br/>• MercadoPago<br/>• Pix"]
+    COUNTRY -->|🇯🇵 JP| JP["JP PSPs<br/>━━━━━━━━━━━━━━<br/>• PayPay<br/>• Line Pay<br/>• Rakuten Pay"]
+    COUNTRY -->|Other| GLOBAL["Global PSPs<br/>━━━━━━━━━━━━━━<br/>• Stripe<br/>• Adyen<br/>• Nuvei"]
 
     US --> METHOD
     EU --> METHOD
@@ -400,10 +400,10 @@ flowchart TD
 
     METHOD{Payment Method?}
 
-    METHOD -->|💳 Credit Card| CARD["PSPs Supporting Cards\n━━━━━━━━━━━━━━\nExample: Stripe, Adyen, Nuvei\nCard Networks: VISA, MC, AMEX"]
-    METHOD -->|📱 E-Wallet| EWALLET["PSPs Supporting E-Wallets\n━━━━━━━━━━━━━━\nExample: PayPal, Skrill, Neteller\nLocal: Alipay, WeChat, GCash"]
-    METHOD -->|🏦 Bank Transfer| BANK["PSPs Supporting Bank Transfers\n━━━━━━━━━━━━━━\nExample: Trustly, Klarna, Pix\nSettlement: T+1 to T+3"]
-    METHOD -->|₿ Crypto| CRYPTO["PSPs Supporting Crypto\n━━━━━━━━━━━━━━\nExample: Coinbase, BitPay\nCurrencies: USDT, BTC, ETH"]
+    METHOD -->|💳 Credit Card| CARD["PSPs Supporting Cards<br/>━━━━━━━━━━━━━━<br/>Example: Stripe, Adyen, Nuvei<br/>Card Networks: VISA, MC, AMEX"]
+    METHOD -->|📱 E-Wallet| EWALLET["PSPs Supporting E-Wallets<br/>━━━━━━━━━━━━━━<br/>Example: PayPal, Skrill, Neteller<br/>Local: Alipay, WeChat, GCash"]
+    METHOD -->|🏦 Bank Transfer| BANK["PSPs Supporting Bank Transfers<br/>━━━━━━━━━━━━━━<br/>Example: Trustly, Klarna, Pix<br/>Settlement: T+1 to T+3"]
+    METHOD -->|₿ Crypto| CRYPTO["PSPs Supporting Crypto<br/>━━━━━━━━━━━━━━<br/>Example: Coinbase, BitPay<br/>Currencies: USDT, BTC, ETH"]
 
     CARD --> STATUS_FILTER
     EWALLET --> STATUS_FILTER
@@ -412,13 +412,13 @@ flowchart TD
 
     STATUS_FILTER[Health Status Filtering] --> HEALTH{PSP Status?}
 
-    HEALTH -->|✅ Healthy<br/>Success >= 80%| HEALTHY["Available for Scoring\n━━━━━━━━━━━━━━\nPass to Step 3"]
-    HEALTH -->|⚠️ Degraded<br/>Success 50-79%| DEGRADED["Lower Priority\n━━━━━━━━━━━━━━\nScore Penalty: -20"]
-    HEALTH -->|❌ Unavailable<br/>Success < 50%| UNAVAILABLE["Skip\n━━━━━━━━━━━━━━\nUse Fallback"]
+    HEALTH -->|✅ Healthy<br/>Success >= 80%| HEALTHY["Available for Scoring<br/>━━━━━━━━━━━━━━<br/>Pass to Step 3"]
+    HEALTH -->|⚠️ Degraded<br/>Success 50-79%| DEGRADED["Lower Priority<br/>━━━━━━━━━━━━━━<br/>Score Penalty: -20"]
+    HEALTH -->|❌ Unavailable<br/>Success < 50%| UNAVAILABLE["Skip<br/>━━━━━━━━━━━━━━<br/>Use Fallback"]
 
     HEALTHY --> RETURN1[Return Filtered PSPs]
     DEGRADED --> RETURN1
-    UNAVAILABLE --> FALLBACK_OPTION["Manual Bank Transfer\n━━━━━━━━━━━━━━\nSettlement: T+2"]
+    UNAVAILABLE --> FALLBACK_OPTION["Manual Bank Transfer<br/>━━━━━━━━━━━━━━<br/>Settlement: T+2"]
 
     RETURN1 --> END1[Proceed to Step 3: Scoring]
     FALLBACK_OPTION --> END2[Notify Ops Team]
@@ -444,13 +444,13 @@ flowchart TD
 flowchart TD
     START[Step 3: Calculate Score for Each PSP] --> INIT[Initialize Score = 0]
 
-    INIT --> DIM1{"Dimension 1\nSuccess Rate (24h)\n━━━━━━━━━━━━━━\nWeight: 50%"}
+    INIT --> DIM1{"Dimension 1<br/>Success Rate (24h)<br/>━━━━━━━━━━━━━━<br/>Weight: 50%"}
 
-    DIM1 -->|>= 95%| S1A["Score += 50 × 0.95\n= 47.5"]
-    DIM1 -->|90-94%| S1B["Score += 50 × 0.92\n= 46.0"]
-    DIM1 -->|85-89%| S1C["Score += 50 × 0.88\n= 44.0"]
-    DIM1 -->|80-84%| S1D["Score += 50 × 0.85\n= 42.5"]
-    DIM1 -->|< 80%| S1E["Score += 50 × 0.75\n= 37.5"]
+    DIM1 -->|>= 95%| S1A["Score += 50 × 0.95<br/>= 47.5"]
+    DIM1 -->|90-94%| S1B["Score += 50 × 0.92<br/>= 46.0"]
+    DIM1 -->|85-89%| S1C["Score += 50 × 0.88<br/>= 44.0"]
+    DIM1 -->|80-84%| S1D["Score += 50 × 0.85<br/>= 42.5"]
+    DIM1 -->|< 80%| S1E["Score += 50 × 0.75<br/>= 37.5"]
 
     S1A --> DIM2
     S1B --> DIM2
@@ -458,13 +458,13 @@ flowchart TD
     S1D --> DIM2
     S1E --> DIM2
 
-    DIM2{"Dimension 2\nFee Rate\n━━━━━━━━━━━━━━\nWeight: 30%"}
+    DIM2{"Dimension 2<br/>Fee Rate<br/>━━━━━━━━━━━━━━<br/>Weight: 30%"}
 
-    DIM2 -->|< 2%| S2A["Score += 30 × 0.98\n= 29.4"]
-    DIM2 -->|2-3%| S2B["Score += 30 × 0.95\n= 28.5"]
-    DIM2 -->|3-4%| S2C["Score += 30 × 0.92\n= 27.6"]
-    DIM2 -->|4-5%| S2D["Score += 30 × 0.90\n= 27.0"]
-    DIM2 -->|> 5%| S2E["Score += 30 × 0.80\n= 24.0"]
+    DIM2 -->|< 2%| S2A["Score += 30 × 0.98<br/>= 29.4"]
+    DIM2 -->|2-3%| S2B["Score += 30 × 0.95<br/>= 28.5"]
+    DIM2 -->|3-4%| S2C["Score += 30 × 0.92<br/>= 27.6"]
+    DIM2 -->|4-5%| S2D["Score += 30 × 0.90<br/>= 27.0"]
+    DIM2 -->|> 5%| S2E["Score += 30 × 0.80<br/>= 24.0"]
 
     S2A --> DIM3
     S2B --> DIM3
@@ -472,13 +472,13 @@ flowchart TD
     S2D --> DIM3
     S2E --> DIM3
 
-    DIM3{"Dimension 3\nSettlement Speed\n━━━━━━━━━━━━━━\nWeight: 15%"}
+    DIM3{"Dimension 3<br/>Settlement Speed<br/>━━━━━━━━━━━━━━<br/>Weight: 15%"}
 
-    DIM3 -->|< 5 min| S3A["Score += 15 × 1.0\n= 15.0"]
-    DIM3 -->|5-15 min| S3B["Score += 15 × 0.8\n= 12.0"]
-    DIM3 -->|15-30 min| S3C["Score += 15 × 0.6\n= 9.0"]
-    DIM3 -->|30-60 min| S3D["Score += 15 × 0.5\n= 7.5"]
-    DIM3 -->|> 60 min| S3E["Score += 15 × 0.2\n= 3.0"]
+    DIM3 -->|< 5 min| S3A["Score += 15 × 1.0<br/>= 15.0"]
+    DIM3 -->|5-15 min| S3B["Score += 15 × 0.8<br/>= 12.0"]
+    DIM3 -->|15-30 min| S3C["Score += 15 × 0.6<br/>= 9.0"]
+    DIM3 -->|30-60 min| S3D["Score += 15 × 0.5<br/>= 7.5"]
+    DIM3 -->|> 60 min| S3E["Score += 15 × 0.2<br/>= 3.0"]
 
     S3A --> DIM4
     S3B --> DIM4
@@ -486,15 +486,15 @@ flowchart TD
     S3D --> DIM4
     S3E --> DIM4
 
-    DIM4{"Dimension 4\nVIP Channel\n━━━━━━━━━━━━━━\nWeight: 5%"}
+    DIM4{"Dimension 4<br/>VIP Channel<br/>━━━━━━━━━━━━━━<br/>Weight: 5%"}
 
-    DIM4 -->|VIP >= 3<br/>AND<br/>PSP has VIP channel| S4A["Score += 5.0\n🌟 VIP Bonus"]
+    DIM4 -->|VIP >= 3<br/>AND<br/>PSP has VIP channel| S4A["Score += 5.0<br/>🌟 VIP Bonus"]
     DIM4 -->|Otherwise| S4B[Score += 0]
 
     S4A --> DIM5
     S4B --> DIM5
 
-    DIM5{"Dimension 5\nCurrency Match\n━━━━━━━━━━━━━━\nWeight: 3%"}
+    DIM5{"Dimension 5<br/>Currency Match<br/>━━━━━━━━━━━━━━<br/>Weight: 3%"}
 
     DIM5 -->|Exact Match<br/>No FX Fee| S5A[Score += 3.0]
     DIM5 -->|Need Conversion<br/>FX Fee Applied| S5B[Score += 0]
@@ -502,7 +502,7 @@ flowchart TD
     S5A --> TOTAL
     S5B --> TOTAL
 
-    TOTAL["Calculate Total Score\n━━━━━━━━━━━━━━\nRange: 0-103\nTypical: 70-95"] --> EXAMPLE["Scoring Example:\n━━━━━━━━━━━━━━\nNuvei\nSuccess 95%: 47.5\nFee 2.5%: 28.5\nSpeed 10min: 12.0\nVIP: 0\nCurrency Match: 3.0\n━━━━━━━━━━━━━━\nTotal: 91.0 ✅"]
+    TOTAL["Calculate Total Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-103<br/>Typical: 70-95"] --> EXAMPLE["Scoring Example:<br/>━━━━━━━━━━━━━━<br/>Nuvei<br/>Success 95%: 47.5<br/>Fee 2.5%: 28.5<br/>Speed 10min: 12.0<br/>VIP: 0<br/>Currency Match: 3.0<br/>━━━━━━━━━━━━━━<br/>Total: 91.0 ✅"]
 
     EXAMPLE --> RANK[Rank All PSPs by Score DESC]
 
@@ -712,32 +712,32 @@ Fallback PSP: Manual Bank Transfer（通知財務團隊）
 
 ```mermaid
 flowchart TD
-    START["⏰ Cron Job\n━━━━━━━━━━━━━━\nTrigger: Every 15 minutes\nTarget: Pending > 30 min"] --> QUERY["Query Pending Transactions\n━━━━━━━━━━━━━━\nSELECT * FROM transactions\nWHERE status = 'PENDING'\nAND created_at < NOW() - 30min"]
+    START["⏰ Cron Job<br/>━━━━━━━━━━━━━━<br/>Trigger: Every 15 minutes<br/>Target: Pending > 30 min"] --> QUERY["Query Pending Transactions<br/>━━━━━━━━━━━━━━<br/>SELECT * FROM transactions<br/>WHERE status = 'PENDING'<br/>AND created_at < NOW() - 30min"]
 
-    QUERY --> CHECK{"Found Pending\nTransactions?"}
+    QUERY --> CHECK{"Found Pending<br/>Transactions?"}
 
-    CHECK -->|No| END1["✅ End\n━━━━━━━━━━━━━━\nNo Action Needed\nNext Run: 15 min"]
+    CHECK -->|No| END1["✅ End<br/>━━━━━━━━━━━━━━<br/>No Action Needed<br/>Next Run: 15 min"]
 
-    CHECK -->|Yes| COUNT["Pending Count: 25\n━━━━━━━━━━━━━━\nBegin Reconciliation Loop"]
+    CHECK -->|Yes| COUNT["Pending Count: 25<br/>━━━━━━━━━━━━━━<br/>Begin Reconciliation Loop"]
 
-    COUNT --> LOOP["For Each Transaction\n━━━━━━━━━━━━━━\nQuery PSP Status via API"]
+    COUNT --> LOOP["For Each Transaction<br/>━━━━━━━━━━━━━━<br/>Query PSP Status via API"]
 
-    LOOP --> PSP_API["PSP Query Result\n━━━━━━━━━━━━━━\nGET /api/v1/query\nHMAC Signature Auth"]
+    LOOP --> PSP_API["PSP Query Result<br/>━━━━━━━━━━━━━━<br/>GET /api/v1/query<br/>HMAC Signature Auth"]
 
     PSP_API --> ROUTE{PSP Status?}
 
-    ROUTE -->|✅ SUCCESS| PATH_SUCCESS["🔄 Auto补单 Flow\n━━━━━━━━━━━━━━\nPSP confirmed but not credited\n→ Proceed to补单 Process"]
+    ROUTE -->|✅ SUCCESS| PATH_SUCCESS["🔄 Auto补单 Flow<br/>━━━━━━━━━━━━━━<br/>PSP confirmed but not credited<br/>→ Proceed to补单 Process"]
 
-    ROUTE -->|❌ FAILED| PATH_FAILED["Update Status\n━━━━━━━━━━━━━━\nMark as FAILED\nNotify Player\nNo补单 Needed"]
+    ROUTE -->|❌ FAILED| PATH_FAILED["Update Status<br/>━━━━━━━━━━━━━━<br/>Mark as FAILED<br/>Notify Player<br/>No补单 Needed"]
 
-    ROUTE -->|⏳ PENDING| PATH_PENDING["Continue Waiting\n━━━━━━━━━━━━━━\nCheck Duration:\n< 2h: Wait\n>= 2h: Alert CS Team"]
+    ROUTE -->|⏳ PENDING| PATH_PENDING["Continue Waiting<br/>━━━━━━━━━━━━━━<br/>Check Duration:<br/>< 2h: Wait<br/>>= 2h: Alert CS Team"]
 
-    ROUTE -->|🔍 NOT_FOUND| PATH_NOT_FOUND["🚨 Manual Review Flow\n━━━━━━━━━━━━━━\nPSP has no record\n→ Proceed to Appeal Process"]
+    ROUTE -->|🔍 NOT_FOUND| PATH_NOT_FOUND["🚨 Manual Review Flow<br/>━━━━━━━━━━━━━━<br/>PSP has no record<br/>→ Proceed to Appeal Process"]
 
-    ROUTE -->|⚠️ API ERROR| PATH_ERROR["Retry Logic\n━━━━━━━━━━━━━━\nRetry < 3: Wait 5min\nRetry >= 3: Escalate"]
+    ROUTE -->|⚠️ API ERROR| PATH_ERROR["Retry Logic<br/>━━━━━━━━━━━━━━<br/>Retry < 3: Wait 5min<br/>Retry >= 3: Escalate"]
 
-    PATH_SUCCESS --> AUTO补单[See: Auto补单 Flow\n━━━━━━━━━━━━━━\nIdempotency + Lock + Credit]
-    PATH_NOT_FOUND --> MANUAL_REVIEW["See: Manual Review Flow\n━━━━━━━━━━━━━━\nAppeal + Verify + Approval"]
+    PATH_SUCCESS --> AUTO补单[See: Auto补单 Flow<br/>━━━━━━━━━━━━━━<br/>Idempotency + Lock + Credit]
+    PATH_NOT_FOUND --> MANUAL_REVIEW["See: Manual Review Flow<br/>━━━━━━━━━━━━━━<br/>Appeal + Verify + Approval"]
 
     AUTO补单 --> RESULT1[Result: 补单 Success/Failed]
     MANUAL_REVIEW --> RESULT2[Result: Approved/Rejected]
@@ -751,14 +751,14 @@ flowchart TD
     RESULT4 --> NEXT
     RESULT5 --> NEXT
 
-    NEXT{"More Pending\nTransactions?"}
+    NEXT{"More Pending<br/>Transactions?"}
 
     NEXT -->|Yes| LOOP
-    NEXT -->|No| SUMMARY["Generate Report\n━━━━━━━━━━━━━━\nTotal Checked: 25\n补单 Success: 5\nFailed: 3\nStill Pending: 15\nManual Review: 2"]
+    NEXT -->|No| SUMMARY["Generate Report<br/>━━━━━━━━━━━━━━<br/>Total Checked: 25<br/>补单 Success: 5<br/>Failed: 3<br/>Still Pending: 15<br/>Manual Review: 2"]
 
-    SUMMARY --> REPORT["Send to Finance Team\n━━━━━━━━━━━━━━\nDaily Report @ 08:00 AM\nEmail + Dashboard"]
+    SUMMARY --> REPORT["Send to Finance Team<br/>━━━━━━━━━━━━━━<br/>Daily Report @ 08:00 AM<br/>Email + Dashboard"]
 
-    REPORT --> END2["✅ End\n━━━━━━━━━━━━━━\nReconciliation Complete\nNext Run: 15 min"]
+    REPORT --> END2["✅ End<br/>━━━━━━━━━━━━━━<br/>Reconciliation Complete<br/>Next Run: 15 min"]
 
     style PATH_SUCCESS fill:#90EE90
     style PATH_FAILED fill:#FFB6C1
@@ -780,45 +780,45 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START["Auto补单 Trigger\n━━━━━━━━━━━━━━\nCondition: PSP Status = SUCCESS\nPlatform Status = PENDING"] --> IDEMPOTENT{"Idempotent Check\n━━━━━━━━━━━━━━\nAlready Credited?"}
+    START["Auto补单 Trigger<br/>━━━━━━━━━━━━━━<br/>Condition: PSP Status = SUCCESS<br/>Platform Status = PENDING"] --> IDEMPOTENT{"Idempotent Check<br/>━━━━━━━━━━━━━━<br/>Already Credited?"}
 
-    IDEMPOTENT -->|Yes| SKIP["Skip补单\n━━━━━━━━━━━━━━\nLog: Duplicate Attempt\nReason: Already Processed\nAction: None"]
+    IDEMPOTENT -->|Yes| SKIP["Skip补单<br/>━━━━━━━━━━━━━━<br/>Log: Duplicate Attempt<br/>Reason: Already Processed<br/>Action: None"]
 
-    IDEMPOTENT -->|No| LOCK["Acquire Redis Lock\n━━━━━━━━━━━━━━\nKey: reconcile:txn_{id}\nCommand: SET NX\nTTL: 300 seconds"]
+    IDEMPOTENT -->|No| LOCK["Acquire Redis Lock<br/>━━━━━━━━━━━━━━<br/>Key: reconcile:txn_{id}<br/>Command: SET NX<br/>TTL: 300 seconds"]
 
     LOCK --> LOCK_CHECK{Lock Acquired?}
 
-    LOCK_CHECK -->|No| SKIP2["Skip补单\n━━━━━━━━━━━━━━\nReason: Another Job Processing\nAction: Wait Next Cycle"]
+    LOCK_CHECK -->|No| SKIP2["Skip补单<br/>━━━━━━━━━━━━━━<br/>Reason: Another Job Processing<br/>Action: Wait Next Cycle"]
 
-    LOCK_CHECK -->|Yes| DB_TXN["BEGIN DB Transaction\n━━━━━━━━━━━━━━\nIsolation: READ_COMMITTED"]
+    LOCK_CHECK -->|Yes| DB_TXN["BEGIN DB Transaction<br/>━━━━━━━━━━━━━━<br/>Isolation: READ_COMMITTED"]
 
-    DB_TXN --> UPDATE_TXN["UPDATE transactions SET\n━━━━━━━━━━━━━━\nstatus = 'SUCCESS',\npsp_transaction_id = ?,\n补单_flag = TRUE,\n补单_at = NOW(),\ncompleted_at = NOW()\nWHERE id = ? AND status = 'PENDING'"]
+    DB_TXN --> UPDATE_TXN["UPDATE transactions SET<br/>━━━━━━━━━━━━━━<br/>status = 'SUCCESS',<br/>psp_transaction_id = ?,<br/>补单_flag = TRUE,<br/>补单_at = NOW(),<br/>completed_at = NOW()<br/>WHERE id = ? AND status = 'PENDING'"]
 
     UPDATE_TXN --> AFFECTED{Affected Rows?}
 
-    AFFECTED -->|0 rows| ROLLBACK["ROLLBACK Transaction\n━━━━━━━━━━━━━━\nReason: Already Updated\nRelease Lock"]
+    AFFECTED -->|0 rows| ROLLBACK["ROLLBACK Transaction<br/>━━━━━━━━━━━━━━<br/>Reason: Already Updated<br/>Release Lock"]
 
-    AFFECTED -->|1 row| CREDIT["Credit Player Balance\n━━━━━━━━━━━━━━\nwallet_service.credit(\n  player_id,\n  amount,\n  source: 'RECONCILIATION'\n)"]
+    AFFECTED -->|1 row| CREDIT["Credit Player Balance<br/>━━━━━━━━━━━━━━<br/>wallet_service.credit(<br/>  player_id,<br/>  amount,<br/>  source: 'RECONCILIATION'<br/>)"]
 
     CREDIT --> CREDIT_CHECK{Credit Success?}
 
-    CREDIT_CHECK -->|Failed| ROLLBACK2["ROLLBACK Transaction\n━━━━━━━━━━━━━━\nReason: Wallet Service Error\nAction: Retry Later"]
+    CREDIT_CHECK -->|Failed| ROLLBACK2["ROLLBACK Transaction<br/>━━━━━━━━━━━━━━<br/>Reason: Wallet Service Error<br/>Action: Retry Later"]
 
-    CREDIT_CHECK -->|Success| AUDIT["Insert Audit Log\n━━━━━━━━━━━━━━\nINSERT INTO payment_audit_log\n(transaction_id, event, operator, details)\nVALUES (?, 'RECONCILIATION_CREDITED',\n'SYSTEM', JSON)"]
+    CREDIT_CHECK -->|Success| AUDIT["Insert Audit Log<br/>━━━━━━━━━━━━━━<br/>INSERT INTO payment_audit_log<br/>(transaction_id, event, operator, details)<br/>VALUES (?, 'RECONCILIATION_CREDITED',<br/>'SYSTEM', JSON)"]
 
-    AUDIT --> COMMIT["COMMIT Transaction\n━━━━━━━━━━━━━━\nStatus: Success\nBalance Updated"]
+    AUDIT --> COMMIT["COMMIT Transaction<br/>━━━━━━━━━━━━━━<br/>Status: Success<br/>Balance Updated"]
 
-    COMMIT --> NOTIFY_PLAYER[Notify Player\n━━━━━━━━━━━━━━\nChannel: Email + SMS\nSubject: "Deposit Credited (Delayed)"\nContent: "Your $100 deposit has been credited"]
+    COMMIT --> NOTIFY_PLAYER[Notify Player<br/>━━━━━━━━━━━━━━<br/>Channel: Email + SMS<br/>Subject: "Deposit Credited (Delayed)"<br/>Content: "Your $100 deposit has been credited"]
 
-    NOTIFY_PLAYER --> NOTIFY_FINANCE["Alert Finance Team\n━━━━━━━━━━━━━━\nChannel: Slack + Email\nInfo: 补单 Success\nTransaction ID: ?\nReason: Webhook Not Received"]
+    NOTIFY_PLAYER --> NOTIFY_FINANCE["Alert Finance Team<br/>━━━━━━━━━━━━━━<br/>Channel: Slack + Email<br/>Info: 补单 Success<br/>Transaction ID: ?<br/>Reason: Webhook Not Received"]
 
-    NOTIFY_FINANCE --> RELEASE["Release Redis Lock\n━━━━━━━━━━━━━━\nCommand: DEL reconcile:txn_{id}"]
+    NOTIFY_FINANCE --> RELEASE["Release Redis Lock<br/>━━━━━━━━━━━━━━<br/>Command: DEL reconcile:txn_{id}"]
 
-    RELEASE --> SUCCESS["✅ 补单 Successful\n━━━━━━━━━━━━━━\nBalance: +$100\nStatus: SUCCESS\nFlag: 补单_flag = TRUE"]
+    RELEASE --> SUCCESS["✅ 补单 Successful<br/>━━━━━━━━━━━━━━<br/>Balance: +$100<br/>Status: SUCCESS<br/>Flag: 补单_flag = TRUE"]
 
-    ROLLBACK --> ERROR1["❌ 补单 Failed\n━━━━━━━━━━━━━━\nReason: Already Updated\nAction: Skip"]
+    ROLLBACK --> ERROR1["❌ 补单 Failed<br/>━━━━━━━━━━━━━━<br/>Reason: Already Updated<br/>Action: Skip"]
 
-    ROLLBACK2 --> ERROR2["❌ 补单 Failed\n━━━━━━━━━━━━━━\nReason: Wallet Error\nAction: Retry Next Cycle"]
+    ROLLBACK2 --> ERROR2["❌ 补单 Failed<br/>━━━━━━━━━━━━━━<br/>Reason: Wallet Error<br/>Action: Retry Next Cycle"]
 
     SKIP --> END1[End - Skipped]
     SKIP2 --> END1
@@ -846,53 +846,53 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START["Manual Review Trigger\n━━━━━━━━━━━━━━\nCondition: PSP Status = NOT_FOUND\nPSP has no transaction record"] --> SEVERITY{Amount Severity?}
+    START["Manual Review Trigger<br/>━━━━━━━━━━━━━━<br/>Condition: PSP Status = NOT_FOUND<br/>PSP has no transaction record"] --> SEVERITY{Amount Severity?}
 
-    SEVERITY -->|>= $1000<br/>High Value| CRITICAL["🔴 CRITICAL Alert\n━━━━━━━━━━━━━━\nNotify: Finance + Security + CTO\nPriority: HIGH\nSLA: 2 hours"]
+    SEVERITY -->|>= $1000<br/>High Value| CRITICAL["🔴 CRITICAL Alert<br/>━━━━━━━━━━━━━━<br/>Notify: Finance + Security + CTO<br/>Priority: HIGH<br/>SLA: 2 hours"]
 
-    SEVERITY -->|< $1000<br/>Low Value| STANDARD["🟡 STANDARD Alert\n━━━━━━━━━━━━━━\nNotify: CS Team\nPriority: MEDIUM\nSLA: 24 hours"]
+    SEVERITY -->|< $1000<br/>Low Value| STANDARD["🟡 STANDARD Alert<br/>━━━━━━━━━━━━━━<br/>Notify: CS Team<br/>Priority: MEDIUM<br/>SLA: 24 hours"]
 
-    CRITICAL --> TICKET["Create Review Ticket\n━━━━━━━━━━━━━━\nSystem: Jira\nType: Payment Investigation\nAssignee: Finance Team\nFields: {txn_id, amount, player_id, psp}"]
+    CRITICAL --> TICKET["Create Review Ticket<br/>━━━━━━━━━━━━━━<br/>System: Jira<br/>Type: Payment Investigation<br/>Assignee: Finance Team<br/>Fields: {txn_id, amount, player_id, psp}"]
 
     STANDARD --> TICKET
 
-    TICKET --> APPEAL{"Player Appeals?\n━━━━━━━━━━━━━━\nTimeout: 7 days"}
+    TICKET --> APPEAL{"Player Appeals?<br/>━━━━━━━━━━━━━━<br/>Timeout: 7 days"}
 
-    APPEAL -->|No - Timeout| TIMEOUT["Close Ticket\n━━━━━━━━━━━━━━\nStatus: EXPIRED\nReason: No Player Response\nAction: Mark as FAILED"]
+    APPEAL -->|No - Timeout| TIMEOUT["Close Ticket<br/>━━━━━━━━━━━━━━<br/>Status: EXPIRED<br/>Reason: No Player Response<br/>Action: Mark as FAILED"]
 
-    APPEAL -->|Yes - Upload Receipt| VERIFY["CS Agent Verifies Receipt\n━━━━━━━━━━━━━━\nCheck:\n• Bank Reference Number\n• Transaction Amount\n• Transaction Date\n• Payment Method"]
+    APPEAL -->|Yes - Upload Receipt| VERIFY["CS Agent Verifies Receipt<br/>━━━━━━━━━━━━━━<br/>Check:<br/>• Bank Reference Number<br/>• Transaction Amount<br/>• Transaction Date<br/>• Payment Method"]
 
-    VERIFY --> CONTACT_PSP["Contact PSP Support\n━━━━━━━━━━━━━━\nAction: Submit Ticket to PSP\nEvidence: Bank Receipt\nWait: 1-3 business days"]
+    VERIFY --> CONTACT_PSP["Contact PSP Support<br/>━━━━━━━━━━━━━━<br/>Action: Submit Ticket to PSP<br/>Evidence: Bank Receipt<br/>Wait: 1-3 business days"]
 
-    CONTACT_PSP --> PSP_CONFIRM{"PSP Confirms\nPayment?"}
+    CONTACT_PSP --> PSP_CONFIRM{"PSP Confirms<br/>Payment?"}
 
-    PSP_CONFIRM -->|No - Not Found| REJECT["Reject Appeal\n━━━━━━━━━━━━━━\nStatus: REJECTED\nReason: No Payment Proof from PSP\nNotify Player: Email"]
+    PSP_CONFIRM -->|No - Not Found| REJECT["Reject Appeal<br/>━━━━━━━━━━━━━━<br/>Status: REJECTED<br/>Reason: No Payment Proof from PSP<br/>Notify Player: Email"]
 
-    PSP_CONFIRM -->|Yes - Confirmed| MANUAL补单[Manual补单 Request\n━━━━━━━━━━━━━━\nOperator: CS Agent\nEvidence: PSP Confirmation Email\nAudit Trail: Logged]
+    PSP_CONFIRM -->|Yes - Confirmed| MANUAL补单[Manual补单 Request<br/>━━━━━━━━━━━━━━<br/>Operator: CS Agent<br/>Evidence: PSP Confirmation Email<br/>Audit Trail: Logged]
 
-    MANUAL补单 --> APPROVAL{"Approval Required?\n━━━━━━━━━━━━━━\nThreshold: $1000"}
+    MANUAL补单 --> APPROVAL{"Approval Required?<br/>━━━━━━━━━━━━━━<br/>Threshold: $1000"}
 
-    APPROVAL -->|No<br/>(Amount < $1000)| EXECUTE["Execute补单\n━━━━━━━━━━━━━━\nSame as Auto补单 Flow\nOperator: CS Agent"]
+    APPROVAL -->|No<br/>(Amount < $1000)| EXECUTE["Execute补单<br/>━━━━━━━━━━━━━━<br/>Same as Auto补单 Flow<br/>Operator: CS Agent"]
 
-    APPROVAL -->|Yes<br/>(Amount >= $1000)| AWAIT["Await CFO Approval\n━━━━━━━━━━━━━━\nApproval System: Workflow\nApprover: CFO\nSLA: 24 hours"]
+    APPROVAL -->|Yes<br/>(Amount >= $1000)| AWAIT["Await CFO Approval<br/>━━━━━━━━━━━━━━<br/>Approval System: Workflow<br/>Approver: CFO<br/>SLA: 24 hours"]
 
     AWAIT --> APPROVED{Approved?}
 
-    APPROVED -->|No - Rejected| REJECT2["Reject Appeal\n━━━━━━━━━━━━━━\nStatus: CFO_REJECTED\nReason: Insufficient Evidence\nNotify Player + CS"]
+    APPROVED -->|No - Rejected| REJECT2["Reject Appeal<br/>━━━━━━━━━━━━━━<br/>Status: CFO_REJECTED<br/>Reason: Insufficient Evidence<br/>Notify Player + CS"]
 
     APPROVED -->|Yes - Approved| EXECUTE
 
-    EXECUTE --> CREDIT["Credit Player Balance\n━━━━━━━━━━━━━━\nSource: MANUAL_CREDIT\nOperator: {cs_agent_id}\nApprover: {cfo_id if required}"]
+    EXECUTE --> CREDIT["Credit Player Balance<br/>━━━━━━━━━━━━━━<br/>Source: MANUAL_CREDIT<br/>Operator: {cs_agent_id}<br/>Approver: {cfo_id if required}"]
 
     CREDIT --> CREDIT_CHECK{Credit Success?}
 
-    CREDIT_CHECK -->|Failed| ERROR["❌ 补单 Failed\n━━━━━━━━━━━━━━\nReason: Wallet Service Error\nAction: Escalate to Tech Team"]
+    CREDIT_CHECK -->|Failed| ERROR["❌ 补单 Failed<br/>━━━━━━━━━━━━━━<br/>Reason: Wallet Service Error<br/>Action: Escalate to Tech Team"]
 
-    CREDIT_CHECK -->|Success| AUDIT["Insert Audit Log\n━━━━━━━━━━━━━━\nEvent: MANUAL_CREDIT\nEvidence: {psp_confirmation, bank_receipt}\nApprover: {cfo_id}\nCompliance: 7-year retention"]
+    CREDIT_CHECK -->|Success| AUDIT["Insert Audit Log<br/>━━━━━━━━━━━━━━<br/>Event: MANUAL_CREDIT<br/>Evidence: {psp_confirmation, bank_receipt}<br/>Approver: {cfo_id}<br/>Compliance: 7-year retention"]
 
-    AUDIT --> NOTIFY["Notify Stakeholders\n━━━━━━━━━━━━━━\nPlayer: Email + SMS\nFinance: Slack Alert\nAudit: Log to SIEM"]
+    AUDIT --> NOTIFY["Notify Stakeholders<br/>━━━━━━━━━━━━━━<br/>Player: Email + SMS<br/>Finance: Slack Alert<br/>Audit: Log to SIEM"]
 
-    NOTIFY --> SUCCESS["✅ Manual补单 Complete\n━━━━━━━━━━━━━━\nStatus: SUCCESS\nFlag: manual_credit = TRUE\nAudit Trail: Complete"]
+    NOTIFY --> SUCCESS["✅ Manual补单 Complete<br/>━━━━━━━━━━━━━━<br/>Status: SUCCESS<br/>Flag: manual_credit = TRUE<br/>Audit Trail: Complete"]
 
     TIMEOUT --> END1[End - Expired]
     REJECT --> END2[End - Rejected]

@@ -34,43 +34,43 @@ Grab 公司的 Griffin 反欺詐規則引擎每日處理數十億預測，峰值
 ```mermaid
 graph TB
     subgraph "Data Collection Layer - 數據採集層"
-        A1["Player Actions<br/>點擊流、會話、設備指紋"] --> K1["Kafka: player-events\nTPS: 10k+"]
-        A2["Transaction Events\n存提款、投注、獎金"] --> K2["Kafka: transaction-events\nTPS: 5k+"]
-        A3["Game Events\n遊戲回合、結果、RTP"] --> K3["Kafka: game-events\nTPS: 20k+"]
-        A4["Device Fingerprint\nCanvas、WebGL、Audio\n65k+ data points"] --> K1
+        A1["Player Actions<br/>點擊流、會話、設備指紋"] --> K1["Kafka: player-events<br/>TPS: 10k+"]
+        A2["Transaction Events<br/>存提款、投注、獎金"] --> K2["Kafka: transaction-events<br/>TPS: 5k+"]
+        A3["Game Events<br/>遊戲回合、結果、RTP"] --> K3["Kafka: game-events<br/>TPS: 20k+"]
+        A4["Device Fingerprint<br/>Canvas、WebGL、Audio<br/>65k+ data points"] --> K1
     end
 
     subgraph "Stream Processing Layer - 流處理層"
-        K1 --> F1["Flink Job: Behavior Aggregator\n5-min sliding window"]
-        K2 --> F2["Flink Job: Transaction Aggregator\nReal-time velocity check"]
-        K3 --> F3["Flink Job: Game Pattern Analyzer\nCEP - Complex Event Processing"]
+        K1 --> F1["Flink Job: Behavior Aggregator<br/>5-min sliding window"]
+        K2 --> F2["Flink Job: Transaction Aggregator<br/>Real-time velocity check"]
+        K3 --> F3["Flink Job: Game Pattern Analyzer<br/>CEP - Complex Event Processing"]
 
-        F1 --> R1["Redis Feature Store\nP99: < 1ms"]
+        F1 --> R1["Redis Feature Store<br/>P99: < 1ms"]
         F2 --> R1
         F3 --> R1
 
-        F1 --> DL["Delta Lake / Iceberg\nBatch Analytics"]
+        F1 --> DL["Delta Lake / Iceberg<br/>Batch Analytics"]
         F2 --> DL
         F3 --> DL
     end
 
     subgraph "Detection Layer - 檢測層"
-        R1 --> E1["Rule Engine - LiteFlow\nQPS: 100k+\n確定性規則"]
-        R1 --> E2["ML Model - Isolation Forest\n異常檢測\nP99: < 50ms"]
-        R1 --> E3["Graph Engine - Neo4j\n多帳號關聯分析\nBFS Depth: 3"]
+        R1 --> E1["Rule Engine - LiteFlow<br/>QPS: 100k+<br/>確定性規則"]
+        R1 --> E2["ML Model - Isolation Forest<br/>異常檢測<br/>P99: < 50ms"]
+        R1 --> E3["Graph Engine - Neo4j<br/>多帳號關聯分析<br/>BFS Depth: 3"]
 
-        E1 --> D["Decision Service\n加權融合 / 級聯決策"]
+        E1 --> D["Decision Service<br/>加權融合 / 級聯決策"]
         E2 --> D
         E3 --> D
 
-        D --> SCORE["Risk Score Aggregation\n0-100 分"]
+        D --> SCORE["Risk Score Aggregation<br/>0-100 分"]
     end
 
     subgraph "Action Layer - 行動層"
-        SCORE -->|Score >= 86| AC1["Auto Block\n凍結帳戶\n發送告警"]
-        SCORE -->|Score 61-85| AC2["Manual Review\n加入審核隊列\nETA: 2 hours"]
-        SCORE -->|Score 31-60| AC3["Enhanced Monitoring\n增強監控\n30 days"]
-        SCORE -->|Score 0-30| AC4["Normal Flow\n正常放行"]
+        SCORE -->|Score >= 86| AC1["Auto Block<br/>凍結帳戶<br/>發送告警"]
+        SCORE -->|Score 61-85| AC2["Manual Review<br/>加入審核隊列<br/>ETA: 2 hours"]
+        SCORE -->|Score 31-60| AC3["Enhanced Monitoring<br/>增強監控<br/>30 days"]
+        SCORE -->|Score 0-30| AC4["Normal Flow<br/>正常放行"]
 
         AC1 --> MQ1[Kafka: risk.fraud.detected]
         AC2 --> MQ2[Kafka: risk.manual.review]
@@ -79,23 +79,23 @@ graph TB
     end
 
     subgraph "Feedback Loop - 反饋迴路"
-        MQ1 --> FB1["CS Platform\n人工調查"]
+        MQ1 --> FB1["CS Platform<br/>人工調查"]
         MQ2 --> FB1
 
-        FB1 -->|False Positive| FB2["Update Whitelist\n調整規則權重"]
-        FB1 -->|True Positive| FB3["Model Retraining\nMLOps Pipeline"]
+        FB1 -->|False Positive| FB2["Update Whitelist<br/>調整規則權重"]
+        FB1 -->|True Positive| FB3["Model Retraining<br/>MLOps Pipeline"]
 
         FB2 --> E1
         FB3 --> E2
 
-        MQ1 --> AUDIT["Audit Log System\n7-year retention"]
+        MQ1 --> AUDIT["Audit Log System<br/>7-year retention"]
         MQ2 --> AUDIT
     end
 
     subgraph "External Integration - 外部整合"
-        EXT1["Cifas National Fraud DB\n1,100+ enterprises"] --> E1
-        EXT2["JuicyScore Device Intelligence\n65k data points"] --> A4
-        EXT3["Sift Global Network\n1T+ events/year"] --> E2
+        EXT1["Cifas National Fraud DB<br/>1,100+ enterprises"] --> E1
+        EXT2["JuicyScore Device Intelligence<br/>65k data points"] --> A4
+        EXT3["Sift Global Network<br/>1T+ events/year"] --> E2
     end
 
     style E1 fill:#FFE4B5
@@ -171,24 +171,24 @@ Multi-accounting 檢測需要多維度關聯分析。設備指紋維度（Device
 
 ```mermaid
 flowchart LR
-    START["Player Action Event\nDeposit / Bet / Withdraw"] --> INIT[Initialize Risk Score = 0]
+    START["Player Action Event<br/>Deposit / Bet / Withdraw"] --> INIT[Initialize Risk Score = 0]
 
-    INIT --> D1["🔍 Device Dimension\n設備維度檢測\nMax Score: +180"]
-    INIT --> D2["💳 Payment Dimension\n支付維度檢測\nMax Score: +210"]
-    INIT --> D3["📊 Behavior Dimension\n行為維度檢測\nMax Score: +110"]
-    INIT --> D4["🕸️ Graph Dimension\n圖譜維度檢測\nMax Score: +180"]
+    INIT --> D1["🔍 Device Dimension<br/>設備維度檢測<br/>Max Score: +180"]
+    INIT --> D2["💳 Payment Dimension<br/>支付維度檢測<br/>Max Score: +210"]
+    INIT --> D3["📊 Behavior Dimension<br/>行為維度檢測<br/>Max Score: +110"]
+    INIT --> D4["🕸️ Graph Dimension<br/>圖譜維度檢測<br/>Max Score: +180"]
 
-    D1 --> AGG["Aggregate Risk Score\n━━━━━━━━━━━━━━\nDevice + Payment + Behavior + Graph"]
+    D1 --> AGG["Aggregate Risk Score<br/>━━━━━━━━━━━━━━<br/>Device + Payment + Behavior + Graph"]
     D2 --> AGG
     D3 --> AGG
     D4 --> AGG
 
     AGG --> DECISION{Total Risk Score?}
 
-    DECISION -->|>= 86<br/>CRITICAL| ACTION1["🔴 Auto Block\n━━━━━━━━━━━━━━\n• Freeze Account\n• Notify CS Team\n• Log to Audit\n• Refund Investigation"]
-    DECISION -->|61-85<br/>HIGH| ACTION2["🟡 Manual Review\n━━━━━━━━━━━━━━\n• Add to Review Queue\n• ETA: 2 hours\n• Notify Player\n• Suspend High-Risk Actions"]
-    DECISION -->|31-60<br/>MEDIUM| ACTION3["🟡 Enhanced Monitoring\n━━━━━━━━━━━━━━\n• 30-day watch period\n• Velocity limits applied\n• Grey List\n• Daily threshold reduced"]
-    DECISION -->|0-30<br/>LOW| ACTION4["🟢 Allow\n━━━━━━━━━━━━━━\n• Normal Flow\n• Log Event\n• Update Player Profile"]
+    DECISION -->|>= 86<br/>CRITICAL| ACTION1["🔴 Auto Block<br/>━━━━━━━━━━━━━━<br/>• Freeze Account<br/>• Notify CS Team<br/>• Log to Audit<br/>• Refund Investigation"]
+    DECISION -->|61-85<br/>HIGH| ACTION2["🟡 Manual Review<br/>━━━━━━━━━━━━━━<br/>• Add to Review Queue<br/>• ETA: 2 hours<br/>• Notify Player<br/>• Suspend High-Risk Actions"]
+    DECISION -->|31-60<br/>MEDIUM| ACTION3["🟡 Enhanced Monitoring<br/>━━━━━━━━━━━━━━<br/>• 30-day watch period<br/>• Velocity limits applied<br/>• Grey List<br/>• Daily threshold reduced"]
+    DECISION -->|0-30<br/>LOW| ACTION4["🟢 Allow<br/>━━━━━━━━━━━━━━<br/>• Normal Flow<br/>• Log Event<br/>• Update Player Profile"]
 
     ACTION1 --> END1[End - Blocked]
     ACTION2 --> END2[End - Review]
@@ -219,33 +219,33 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    START_D1["Device Dimension\nInput: Device ID, User-Agent,\nCanvas Fingerprint"] --> BLACKLIST{"Device ID\nin Blacklist?"}
+    START_D1["Device Dimension<br/>Input: Device ID, User-Agent,<br/>Canvas Fingerprint"] --> BLACKLIST{"Device ID<br/>in Blacklist?"}
 
-    BLACKLIST -->|Yes ⛔| BLOCK1["❌ Auto Block\nScore = 100\n━━━━━━━━━━━━━━\nReason: BLACKLIST_MATCH\nAction: Immediate Freeze\n⚠️ Skip Remaining Checks"]
+    BLACKLIST -->|Yes ⛔| BLOCK1["❌ Auto Block<br/>Score = 100<br/>━━━━━━━━━━━━━━<br/>Reason: BLACKLIST_MATCH<br/>Action: Immediate Freeze<br/>⚠️ Skip Remaining Checks"]
 
-    BLACKLIST -->|No| SHARED{"Shared Device Count\n━━━━━━━━━━━━━━\nQuery: SELECT COUNT(*) FROM players\nWHERE device_id = ?"}
+    BLACKLIST -->|No| SHARED{"Shared Device Count<br/>━━━━━━━━━━━━━━<br/>Query: SELECT COUNT(*) FROM players<br/>WHERE device_id = ?"}
 
-    SHARED -->|>= 5 accounts| SCORE_HIGH["Score += 80\n━━━━━━━━━━━━━━\nRisk: HIGH\nPattern: Multi-Accounting"]
-    SHARED -->|3-4 accounts| SCORE_MED["Score += 40\n━━━━━━━━━━━━━━\nRisk: MEDIUM\nPattern: Shared Device"]
-    SHARED -->|1-2 accounts| SCORE_LOW["Score += 0\n━━━━━━━━━━━━━━\nRisk: LOW\nPattern: Normal"]
+    SHARED -->|>= 5 accounts| SCORE_HIGH["Score += 80<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Multi-Accounting"]
+    SHARED -->|3-4 accounts| SCORE_MED["Score += 40<br/>━━━━━━━━━━━━━━<br/>Risk: MEDIUM<br/>Pattern: Shared Device"]
+    SHARED -->|1-2 accounts| SCORE_LOW["Score += 0<br/>━━━━━━━━━━━━━━<br/>Risk: LOW<br/>Pattern: Normal"]
 
-    SCORE_HIGH --> EMULATOR{"Emulator / VM\nDetected?\n━━━━━━━━━━━━━━\nCheck: BlueStacks, NoxPlayer,\nVMware signatures"}
+    SCORE_HIGH --> EMULATOR{"Emulator / VM<br/>Detected?<br/>━━━━━━━━━━━━━━<br/>Check: BlueStacks, NoxPlayer,<br/>VMware signatures"}
     SCORE_MED --> EMULATOR
     SCORE_LOW --> EMULATOR
 
-    EMULATOR -->|Yes| EMU_SCORE["Score += 60\n━━━━━━━━━━━━━━\nRisk: Automation\nTool: Emulator/VM"]
+    EMULATOR -->|Yes| EMU_SCORE["Score += 60<br/>━━━━━━━━━━━━━━<br/>Risk: Automation<br/>Tool: Emulator/VM"]
     EMULATOR -->|No| EMU_NONE[Score += 0]
 
-    EMU_SCORE --> VPN{"VPN / Proxy\nDetected?\n━━━━━━━━━━━━━━\nCheck: IP Reputation DB,\nWebRTC Leak Test"}
+    EMU_SCORE --> VPN{"VPN / Proxy<br/>Detected?<br/>━━━━━━━━━━━━━━<br/>Check: IP Reputation DB,<br/>WebRTC Leak Test"}
     EMU_NONE --> VPN
 
-    VPN -->|Yes| VPN_SCORE["Score += 40\n━━━━━━━━━━━━━━\nRisk: Location Spoofing\nTool: VPN/Proxy"]
+    VPN -->|Yes| VPN_SCORE["Score += 40<br/>━━━━━━━━━━━━━━<br/>Risk: Location Spoofing<br/>Tool: VPN/Proxy"]
     VPN -->|No| VPN_NONE[Score += 0]
 
-    VPN_SCORE --> RETURN_D1["Return Device Score\n━━━━━━━━━━━━━━\nRange: 0-180\nTypical: 0, 40, 100, 180"]
+    VPN_SCORE --> RETURN_D1["Return Device Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-180<br/>Typical: 0, 40, 100, 180"]
     VPN_NONE --> RETURN_D1
 
-    BLOCK1 --> RETURN_BLOCK["Return Score = 100\n+ BLOCK Flag"]
+    BLOCK1 --> RETURN_BLOCK["Return Score = 100<br/>+ BLOCK Flag"]
 
     style BLOCK1 fill:#FF6B6B
     style SCORE_HIGH fill:#FFB6C1
@@ -267,26 +267,26 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START_D2["Payment Dimension\nInput: Payment Method,\nCard BIN, Withdrawal Account"] --> PAYMENT_SHARE{"Same Payment Method\nMultiple Accounts?\n━━━━━━━━━━━━━━\nQuery: Count distinct players\nwith same card_hash"}
+    START_D2["Payment Dimension<br/>Input: Payment Method,<br/>Card BIN, Withdrawal Account"] --> PAYMENT_SHARE{"Same Payment Method<br/>Multiple Accounts?<br/>━━━━━━━━━━━━━━<br/>Query: Count distinct players<br/>with same card_hash"}
 
-    PAYMENT_SHARE -->|>= 3 accounts| PAY_CRIT["Score += 90\n━━━━━━━━━━━━━━\nRisk: CRITICAL\nPattern: Payment Sharing"]
-    PAYMENT_SHARE -->|2 accounts| PAY_HIGH["Score += 50\n━━━━━━━━━━━━━━\nRisk: HIGH\nPattern: Payment Correlation"]
-    PAYMENT_SHARE -->|1 account| PAY_NORM["Score += 0\n━━━━━━━━━━━━━━\nRisk: LOW\nPattern: Normal"]
+    PAYMENT_SHARE -->|>= 3 accounts| PAY_CRIT["Score += 90<br/>━━━━━━━━━━━━━━<br/>Risk: CRITICAL<br/>Pattern: Payment Sharing"]
+    PAYMENT_SHARE -->|2 accounts| PAY_HIGH["Score += 50<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Payment Correlation"]
+    PAYMENT_SHARE -->|1 account| PAY_NORM["Score += 0<br/>━━━━━━━━━━━━━━<br/>Risk: LOW<br/>Pattern: Normal"]
 
-    PAY_CRIT --> WITHDRAWAL{"Same Withdrawal Account\nMultiple Players?\n━━━━━━━━━━━━━━\nCheck: Bank account number,\nUSDT wallet address"}
+    PAY_CRIT --> WITHDRAWAL{"Same Withdrawal Account<br/>Multiple Players?<br/>━━━━━━━━━━━━━━<br/>Check: Bank account number,<br/>USDT wallet address"}
     PAY_HIGH --> WITHDRAWAL
     PAY_NORM --> WITHDRAWAL
 
-    WITHDRAWAL -->|>= 2 accounts| WITH_CRIT["Score += 90\n━━━━━━━━━━━━━━\nRisk: CRITICAL\nPattern: Fund Aggregation\n⚠️ Money Laundering Suspected"]
+    WITHDRAWAL -->|>= 2 accounts| WITH_CRIT["Score += 90<br/>━━━━━━━━━━━━━━<br/>Risk: CRITICAL<br/>Pattern: Fund Aggregation<br/>⚠️ Money Laundering Suspected"]
     WITHDRAWAL -->|1 account| WITH_NORM[Score += 0]
 
-    WITH_CRIT --> GEO{"Card BIN Country\nvs IP Country Match?\n━━━━━━━━━━━━━━\nExample: US Card + CN IP"}
+    WITH_CRIT --> GEO{"Card BIN Country<br/>vs IP Country Match?<br/>━━━━━━━━━━━━━━<br/>Example: US Card + CN IP"}
     WITH_NORM --> GEO
 
-    GEO -->|Mismatch| GEO_RISK["Score += 30\n━━━━━━━━━━━━━━\nRisk: Geo Mismatch\nPattern: Stolen Card / VPN"]
+    GEO -->|Mismatch| GEO_RISK["Score += 30<br/>━━━━━━━━━━━━━━<br/>Risk: Geo Mismatch<br/>Pattern: Stolen Card / VPN"]
     GEO -->|Match| GEO_OK[Score += 0]
 
-    GEO_RISK --> RETURN_D2["Return Payment Score\n━━━━━━━━━━━━━━\nRange: 0-210\nTypical: 0, 50, 90, 210"]
+    GEO_RISK --> RETURN_D2["Return Payment Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-210<br/>Typical: 0, 50, 90, 210"]
     GEO_OK --> RETURN_D2
 
     style PAY_CRIT fill:#FF6B6B
@@ -309,50 +309,50 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START_D3["Behavior + Graph Dimension\nInput: Bet Pattern, Transaction History,\nAccount Network Graph"] --> ML{"ML Model Inference\nBet Pattern Anomaly?\n━━━━━━━━━━━━━━\nModel: Isolation Forest\nFeatures: 50+ behavioral metrics"}
+    START_D3["Behavior + Graph Dimension<br/>Input: Bet Pattern, Transaction History,<br/>Account Network Graph"] --> ML{"ML Model Inference<br/>Bet Pattern Anomaly?<br/>━━━━━━━━━━━━━━<br/>Model: Isolation Forest<br/>Features: 50+ behavioral metrics"}
 
-    ML -->|Fraud Prob > 0.8| ML_HIGH["Score += 50\n━━━━━━━━━━━━━━\nRisk: HIGH\nPattern: Anomaly Detected"]
-    ML -->|Fraud Prob 0.5-0.8| ML_MED["Score += 25\n━━━━━━━━━━━━━━\nRisk: MEDIUM\nPattern: Suspicious"]
-    ML -->|Fraud Prob < 0.5| ML_LOW["Score += 0\n━━━━━━━━━━━━━━\nRisk: LOW\nPattern: Normal"]
+    ML -->|Fraud Prob > 0.8| ML_HIGH["Score += 50<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Anomaly Detected"]
+    ML -->|Fraud Prob 0.5-0.8| ML_MED["Score += 25<br/>━━━━━━━━━━━━━━<br/>Risk: MEDIUM<br/>Pattern: Suspicious"]
+    ML -->|Fraud Prob < 0.5| ML_LOW["Score += 0<br/>━━━━━━━━━━━━━━<br/>Risk: LOW<br/>Pattern: Normal"]
 
-    ML_HIGH --> BONUS{"Bonus Abuse Pattern?\n━━━━━━━━━━━━━━\nCheck: Min bet + High rollover,\nOpposite betting (Hedge)"}
+    ML_HIGH --> BONUS{"Bonus Abuse Pattern?<br/>━━━━━━━━━━━━━━<br/>Check: Min bet + High rollover,<br/>Opposite betting (Hedge)"}
     ML_MED --> BONUS
     ML_LOW --> BONUS
 
-    BONUS -->|Min Bet → High Rollover| BONUS_CHASE["Score += 40\n━━━━━━━━━━━━━━\nPattern: Bonus Chasing"]
-    BONUS -->|Opposite Betting| BONUS_ARB["Score += 60\n━━━━━━━━━━━━━━\nPattern: Arbitrage Detected\n⚠️ Hedge Betting"]
+    BONUS -->|Min Bet → High Rollover| BONUS_CHASE["Score += 40<br/>━━━━━━━━━━━━━━<br/>Pattern: Bonus Chasing"]
+    BONUS -->|Opposite Betting| BONUS_ARB["Score += 60<br/>━━━━━━━━━━━━━━<br/>Pattern: Arbitrage Detected<br/>⚠️ Hedge Betting"]
     BONUS -->|Normal| BONUS_OK[Score += 0]
 
-    BONUS_CHASE --> VELOCITY{"Withdrawal Velocity?\n━━━━━━━━━━━━━━\nCount: Withdrawals per hour"}
+    BONUS_CHASE --> VELOCITY{"Withdrawal Velocity?<br/>━━━━━━━━━━━━━━<br/>Count: Withdrawals per hour"}
     BONUS_ARB --> VELOCITY
     BONUS_OK --> VELOCITY
 
-    VELOCITY -->|> 5 times/hour| VEL_HIGH["Score += 50\n━━━━━━━━━━━━━━\nRisk: HIGH\nPattern: Velocity Exceeded"]
-    VELOCITY -->|3-5 times/hour| VEL_MED["Score += 20\n━━━━━━━━━━━━━━\nRisk: MEDIUM\nPattern: Rapid Withdrawal"]
+    VELOCITY -->|> 5 times/hour| VEL_HIGH["Score += 50<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Velocity Exceeded"]
+    VELOCITY -->|3-5 times/hour| VEL_MED["Score += 20<br/>━━━━━━━━━━━━━━<br/>Risk: MEDIUM<br/>Pattern: Rapid Withdrawal"]
     VELOCITY -->|< 3 times/hour| VEL_LOW[Score += 0]
 
-    VEL_HIGH --> GRAPH{"Multi-Account Graph?\n━━━━━━━━━━━━━━\nNeo4j BFS Query (Depth: 3)\nEdges: Device, IP, Payment"}
+    VEL_HIGH --> GRAPH{"Multi-Account Graph?<br/>━━━━━━━━━━━━━━<br/>Neo4j BFS Query (Depth: 3)<br/>Edges: Device, IP, Payment"}
     VEL_MED --> GRAPH
     VEL_LOW --> GRAPH
 
-    GRAPH -->|Connected >= 5| GRAPH_CRIT["Score += 70\n━━━━━━━━━━━━━━\nRisk: CRITICAL\nPattern: Network Detected"]
-    GRAPH -->|Connected 3-4| GRAPH_HIGH["Score += 40\n━━━━━━━━━━━━━━\nRisk: HIGH\nPattern: Cluster Detected"]
+    GRAPH -->|Connected >= 5| GRAPH_CRIT["Score += 70<br/>━━━━━━━━━━━━━━<br/>Risk: CRITICAL<br/>Pattern: Network Detected"]
+    GRAPH -->|Connected 3-4| GRAPH_HIGH["Score += 40<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Cluster Detected"]
     GRAPH -->|Connected < 3| GRAPH_LOW[Score += 0]
 
-    GRAPH_CRIT --> SYNC{"Synchronized Behavior?\n━━━━━━━━━━━━━━\nCheck: 同時登入, 同步投注,\n相似遊戲路徑"}
+    GRAPH_CRIT --> SYNC{"Synchronized Behavior?<br/>━━━━━━━━━━━━━━<br/>Check: 同時登入, 同步投注,<br/>相似遊戲路徑"}
     GRAPH_HIGH --> SYNC
     GRAPH_LOW --> SYNC
 
-    SYNC -->|Yes| SYNC_BOT["Score += 50\n━━━━━━━━━━━━━━\nPattern: Bot/Farm Suspected\n⚠️ Automation Detected"]
+    SYNC -->|Yes| SYNC_BOT["Score += 50<br/>━━━━━━━━━━━━━━<br/>Pattern: Bot/Farm Suspected<br/>⚠️ Automation Detected"]
     SYNC -->|No| SYNC_OK[Score += 0]
 
-    SYNC_BOT --> FUND_FLOW{"Fund Flow Aggregation?\n━━━━━━━━━━━━━━\nCheck: 多帳號提款至同一帳戶"}
+    SYNC_BOT --> FUND_FLOW{"Fund Flow Aggregation?<br/>━━━━━━━━━━━━━━<br/>Check: 多帳號提款至同一帳戶"}
     SYNC_OK --> FUND_FLOW
 
-    FUND_FLOW -->|Yes| FUND_RISK["Score += 60\n━━━━━━━━━━━━━━\nPattern: Money Laundering Risk\n⚠️ AML Alert"]
+    FUND_FLOW -->|Yes| FUND_RISK["Score += 60<br/>━━━━━━━━━━━━━━<br/>Pattern: Money Laundering Risk<br/>⚠️ AML Alert"]
     FUND_FLOW -->|No| FUND_OK[Score += 0]
 
-    FUND_RISK --> RETURN_D34["Return Behavior + Graph Score\n━━━━━━━━━━━━━━\nRange: 0-290\nBehavior: 0-110\nGraph: 0-180"]
+    FUND_RISK --> RETURN_D34["Return Behavior + Graph Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-290<br/>Behavior: 0-110<br/>Graph: 0-180"]
     FUND_OK --> RETURN_D34
 
     style ML_HIGH fill:#FFB6C1
@@ -688,11 +688,11 @@ sequenceDiagram
     Risk Engine->>Kafka: publish(risk.event.logged, {event_type, processing_time_ms})
     Kafka->>Kafka: Store to Audit Log (7-year retention)
 
-    style Risk Engine fill:#DDA0DD
-    style Rule Engine (LiteFlow) fill:#FFE4B5
-    style ML Model fill:#ADD8E6
-    style Neo4j Graph fill:#90EE90
-    style CS Queue fill:#FFD93D
+    style "Risk Engine" fill:#DDA0DD
+    style "Rule Engine (LiteFlow)" fill:#FFE4B5
+    style "ML Model" fill:#ADD8E6
+    style "Neo4j Graph" fill:#90EE90
+    style "CS Queue" fill:#FFD93D
 ```
 
 **時序圖關鍵設計要點**：
@@ -852,7 +852,8 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "ip": "1.1.1.1",
       "device_id": "dev_abc123"
     }
-    ```markdown
+    ```
+    
 *   **Response**:
     ```json
     {
@@ -867,7 +868,9 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "action": "MANUAL_REVIEW",
       "estimated_review_time_minutes": 120
     }
-    ```markdown
+    
+    ```
+    
 *   **Logic**: 檢查 `TurnoverMet` (流水是否達標) + `RiskScore` (風險分) + `AuditStatus` (稽核狀態) + `PaymentMethodVerified` (支付方式驗證) + `GeolocationCheck` (地理位置檢查) + `VelocityCheck` (速率檢查)。
 
 ### 3.4 `assessPlayerRisk` (玩家綜合風險評估)
@@ -882,7 +885,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
         "target_tier": "GOLD"
       }
     }
-    ```markdown
+    ```
 *   **Response**:
     ```json
     {
@@ -903,7 +906,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "recommendation": "PROCEED_WITH_MONITORING",
       "monitoring_duration_days": 30
     }
-    ```markdown
+    ```
 
 ### 3.5 `reportFraudIncident` (欺詐事件上報)
 *   **用途**：CS Platform 或人工稽核發現欺詐行為時主動上報至風控系統，更新風險模型。
@@ -922,7 +925,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       "reported_by": "cs_agent_123",
       "reported_at": "2026-01-27T10:30:00Z"
     }
-    ```markdown
+    ```
 *   **Response**:
     ```json
     {
@@ -935,7 +938,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
       ],
       "estimated_impact_reduction": "15% reduction in similar fraud patterns"
     }
-    ```text
+    ```
 
 ---
 

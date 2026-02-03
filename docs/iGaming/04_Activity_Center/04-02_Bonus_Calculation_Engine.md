@@ -419,7 +419,7 @@ flowchart TD
     style CAP_OK fill:#C8E6C9
     style RESULT_OUTPUT fill:#81C784
     style APPLY_CAP fill:#FFD54F
-    style EXCLUSIVE_GROUP fill:#FFEBonus82
+    style EXCLUSIVE_GROUP fill:#FFEB82
     style MIN_CONTRIB fill:#FFAB91
 ```
 
