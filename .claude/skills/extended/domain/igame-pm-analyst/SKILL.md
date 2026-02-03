@@ -247,6 +247,25 @@ business-analyst → igame-pm-analyst → java-architect
 - Architecture recommendations comply with SmartAdmin patterns
 - Risk assessment covers all three tiers (Financial/Performance/Compliance)
 
+### Mermaid Diagram Standards
+
+**CRITICAL**: All Mermaid diagrams in generated PRDs must follow these syntax rules:
+
+- ✅ **Use `\n` for line breaks**, NOT `<br/>` HTML tags
+- ✅ **Wrap multi-line labels with double quotes**: `["Line 1\nLine 2"]`
+- ✅ **Avoid HTML tags**: `<b>`, `<i>`, `<span>` are not supported in Mermaid
+- ✅ **Use `note` blocks for complex annotations** in state/sequence diagrams
+
+**Example** (Correct Usage):
+```mermaid
+flowchart TD
+    START["Player Action\nDEPOSIT / BET / WIN"]
+    VALIDATE["Validation\n1. Amount Check\n2. Limit Check"]
+    START --> VALIDATE
+```
+
+**Reference**: See `../igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md` for complete guidelines
+
 ## References
 
 **Knowledge Base**:

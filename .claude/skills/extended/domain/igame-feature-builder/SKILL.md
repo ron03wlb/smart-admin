@@ -287,6 +287,13 @@ public class AuditLogService {
 - [ ] Rollback support for failed operations
 - [ ] Idempotency for duplicate requests
 
+**Mermaid Diagram Standards:**
+- [ ] Use `\n` for line breaks (NOT `<br/>` HTML tags)
+- [ ] Wrap multi-line labels with double quotes: `["Line 1\nLine 2"]`
+- [ ] Avoid all HTML tags (`<b>`, `<i>`, `<span>`) in Mermaid diagrams
+- [ ] Use `note` blocks for complex annotations in sequence/state diagrams
+- [ ] Reference: `../igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md`
+
 ---
 
 ## 相關規則

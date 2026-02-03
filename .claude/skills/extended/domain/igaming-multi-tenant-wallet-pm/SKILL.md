@@ -1153,6 +1153,27 @@ graph TB
 
 ---
 
+## Mermaid Diagram Standards
+
+**CRITICAL**: All Mermaid diagrams in generated documentation must follow these syntax rules:
+
+- ✅ **Use `\n` for line breaks**, NOT `<br/>` HTML tags
+- ✅ **Wrap multi-line labels with double quotes**: `["Line 1\nLine 2"]`
+- ✅ **Avoid HTML tags**: `<b>`, `<i>`, `<span>` are not supported in Mermaid
+- ✅ **Use `note` blocks for complex annotations** in state/sequence diagrams
+
+**Example** (Correct Usage):
+```mermaid
+flowchart TD
+    WALLET["Seamless Wallet\nUnified Balance Management"]
+    PLATFORM["Platform Layer\nMulti-Tenant Isolation"]
+    WALLET --> PLATFORM
+```
+
+**Reference**: See `knowledge/mermaid-best-practices.md` for complete guidelines and iGaming-specific examples.
+
+---
+
 **Version**: 1.1.0 (Optimized)
 **Last Updated**: 2026-02-01
 **Documentation Structure**: Main + Anti-Patterns Doc
