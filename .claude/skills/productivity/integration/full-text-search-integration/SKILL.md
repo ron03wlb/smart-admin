@@ -107,7 +107,7 @@ You will:
 
 - Syncs with MyBatis Plus entities
 - Works with `smartadmin-crud-generator` for search endpoints
-- Integrates with `apm-integration-skill` for logging
+- Integrates with `apm-integration` for logging
 - Compatible with `cache-strategy-generator` for search caching
 
 ## Success Criteria

@@ -1,12 +1,12 @@
 ---
 name: smartadmin-performance-suite
-description: [P2 - Productivity] Comprehensive performance suite with integrated diagnose → optimize → monitor workflow. Consolidates java-performance-pro (N+1 detection, JVM tuning), cache-strategy-generator (multi-level caching), and apm-integration-skill (Skywalking, Micrometer, Grafana) into a unified performance optimization orchestrator. Use when experiencing slow endpoints, high CPU usage, memory leaks, or setting up production observability. Triggers when user mentions "slow", "performance", "optimize", "monitoring", "APM", "cache", "N+1", or "Grafana".
+description: [P2 - Productivity] Comprehensive performance suite with integrated diagnose → optimize → monitor workflow. Consolidates java-performance-pro (N+1 detection, JVM tuning), cache-strategy-generator (multi-level caching), and apm-integration (Skywalking, Micrometer, Grafana) into a unified performance optimization orchestrator. Use when experiencing slow endpoints, high CPU usage, memory leaks, or setting up production observability. Triggers when user mentions "slow", "performance", "optimize", "monitoring", "APM", "cache", "N+1", or "Grafana".
 ---
 
 # SmartAdmin Performance Suite
 
 **Version**: 2.0.0 (Performance Suite Consolidation)
-**Consolidates**: java-performance-pro, cache-strategy-generator, apm-integration-skill
+**Consolidates**: java-performance-pro, cache-strategy-generator, apm-integration
 
 Unified performance optimization solution providing integrated diagnose → optimize → monitor workflow for SmartAdmin applications.
 
@@ -66,7 +66,7 @@ User: "Detect and fix N+1 query problems"
 This skill **replaces and consolidates**:
 - ✅ **java-performance-pro** (Mode 1: Diagnose) → `--mode=diagnose`
 - ✅ **cache-strategy-generator** (Mode 2: Optimize) → `--mode=optimize`
-- ✅ **apm-integration-skill** (Mode 3: Monitor) → `--mode=monitor`
+- ✅ **apm-integration** (Mode 3: Monitor) → `--mode=monitor`
 
 ### Mode-Based Execution
 
@@ -99,7 +99,7 @@ This skill **replaces and consolidates**:
 /performance OrderService --mode=monitor
 # Configures: Skywalking, Micrometer, Grafana dashboards, alerts
 # Time: ~8 minutes
-# Consolidates: former /apm-integration-skill
+# Consolidates: former /apm-integration
 ```
 
 ### Backward Compatibility
@@ -252,7 +252,7 @@ Monitoring Setup:
 ```
 
 **Time**: ~8 minutes
-**Consolidates**: apm-integration-skill
+**Consolidates**: apm-integration
 
 ---
 
@@ -348,7 +348,7 @@ When user makes a request, determine performance mode:
   - User says "add monitoring", "setup APM", "create dashboard", "alerts"
   - User mentions "Skywalking", "Grafana", "Micrometer", "distributed tracing"
   - User wants production observability
-  - Former `/apm-integration-skill` command users
+  - Former `/apm-integration` command users
 - **Time**: ~8 minutes
 
 **Integrated Workflow (--workflow)** [Default]
@@ -583,7 +583,7 @@ public class TraceIdFilter implements Filter {
 **Before Consolidation** (separate skills):
 - Diagnose (java-performance-pro): 15 minutes
 - Optimize (cache-strategy-generator): 20 minutes
-- Monitor (apm-integration-skill): 15 minutes
+- Monitor (apm-integration): 15 minutes
 - Manual coordination: 10 minutes
 - **Total: 60 minutes**
 
@@ -606,4 +606,4 @@ public class TraceIdFilter implements Filter {
 - Unified performance orchestration
 
 **v1.0.0** (2025-12-01):
-- Initial separate performance skills (java-performance-pro, cache-strategy-generator, apm-integration-skill)
+- Initial separate performance skills (java-performance-pro, cache-strategy-generator, apm-integration)

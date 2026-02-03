@@ -8,7 +8,7 @@
 # ====================================================================
 
 metadata:
-  name: "report-generator-skill"
+  name: "report-generator"
   version: "1.0.0"
   priority: "P2"
   type: "atomic"

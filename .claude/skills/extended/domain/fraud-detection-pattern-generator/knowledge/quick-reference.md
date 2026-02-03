@@ -588,18 +588,28 @@ public class RiskScoreManager {
     }
 
     /**
-     * Trigger action for high-risk player
+     * Trigger action for high-risk player (Flag mode, not Block)
      */
     private void triggerHighRiskAction(Long playerId, long score) {
-        if (score >= 90) {
-            // Critical: Freeze account
-            playerManager.freezeAccount(playerId, "HIGH_RISK_SCORE");
-            alertService.sendUrgentAlert("CRITICAL_RISK", playerId, score);
-        } else if (score >= 70) {
-            // High: Manual review
-            playerManager.flagForReview(playerId, "HIGH_RISK_SCORE");
-            alertService.sendAlert("HIGH_RISK", playerId, score);
+        if (score >= 80) {
+            // Critical/High: Generate proposal, not block betting
+            RiskProposal proposal = RiskProposal.builder()
+                .playerId(playerId)
+                .riskScore((int) score)
+                .status(ProposalStatus.PENDING_REVIEW)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+            riskProposalManager.saveAndNotify(proposal);
+
+            // Alert based on severity (2h for critical, 24h for high)
+            if (score >= 90) {
+                alertService.sendUrgentAlert("CRITICAL_RISK", playerId, score, Duration.ofHours(2));
+            } else {
+                alertService.sendAlert("HIGH_RISK", playerId, score, Duration.ofHours(24));
+            }
         }
+        // Note: Player can continue betting, proposals are reviewed at withdrawal
     }
 }
 ```
@@ -624,15 +634,35 @@ CREATE TABLE risk_events (
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- NEW: Risk proposals (async Flag mode)
+CREATE TABLE risk_proposals (
+    id BIGSERIAL PRIMARY KEY,
+    player_id BIGINT NOT NULL,
+    bet_id BIGINT,
+    risk_score INTEGER NOT NULL,
+    status VARCHAR(30) NOT NULL,  -- PENDING_REVIEW, APPROVED, REJECTED, EXECUTED, CLOSED
+    proposal_type VARCHAR(50),    -- MULTI_ACCOUNT, BONUS_ABUSE, ARBITRAGE, etc.
+    details JSONB,
+    sla_hours INTEGER NOT NULL,   -- 2 (critical) or 24 (standard)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMP,
+    reviewed_by BIGINT,
+    decision_notes TEXT
+);
+
 CREATE INDEX idx_risk_player_timestamp ON risk_scores(player_id, timestamp DESC);
 CREATE INDEX idx_risk_events_player ON risk_events(player_id, timestamp DESC);
+CREATE INDEX idx_risk_proposals_player_status ON risk_proposals(player_id, status, created_at DESC);
+CREATE INDEX idx_risk_proposals_pending ON risk_proposals(status, created_at) WHERE status = 'PENDING_REVIEW';
 ```
 
-**Risk Levels**:
-- 0-29: LOW (no action)
-- 30-49: MEDIUM (monitor)
-- 50-69: HIGH (require enhanced KYC)
-- 70+: CRITICAL (freeze account, manual review)
+**Risk Levels (Flag Mode, Not Block)**:
+- 0-49: LOW (no action, monitor only)
+- 50-79: MEDIUM (generate proposal, 24h SLA manual review)
+- 80-89: HIGH (generate proposal, 2h SLA manual review)
+- 90+: CRITICAL (generate urgent proposal, 2h SLA, require EDD for VIP)
+
+**Important**: Proposals do NOT block betting. Players can continue betting. Proposals are reviewed at withdrawal time.
 
 **Time to Implement**: 15-20 minutes
 
@@ -699,8 +729,48 @@ public class KycFraudIntegrationService {
 | Risk Score | KYC Tier | Actions |
 |------------|----------|---------|
 | 0-49 | Tier 1 (Basic) | Email verification only |
-| 50-69 | Tier 2 (Enhanced) | ID document + selfie |
-| 70+ | Tier 3 (Full) | Proof of address + source of funds |
+| 50-79 | Tier 2 (Enhanced) | ID document + selfie |
+| 80+ | Tier 3 (Full) | Proof of address + source of funds |
+
+**VIP Enhanced Due Diligence (EDD) - MGA Compliance**:
+| Player Type | Cumulative Deposit | Required Actions |
+|-------------|-------------------|------------------|
+| Regular Player | < €2,000 | Standard KYC (Tier 1-3 based on risk) |
+| VIP Player | ≥ €2,000 | **Mandatory EDD** (NO exemption) |
+
+**VIP EDD Requirements** (MGA compliance):
+```java
+// VIP players trigger EDD when cumulative deposits exceed €2,000
+@EventListener
+public void onDepositCompleted(DepositCompletedEvent event) {
+    Long playerId = event.getPlayerId();
+    BigDecimal cumulativeDeposit = depositDao.getCumulativeDeposit(playerId);
+
+    // MGA: VIP players (≥ €2,000) require Enhanced Due Diligence
+    if (cumulativeDeposit.compareTo(new BigDecimal("2000")) >= 0) {
+        Player player = playerDao.selectById(playerId);
+
+        // Force EDD if not already completed
+        if (!player.isEddCompleted()) {
+            kycService.forceUpgrade(playerId, KycTier.TIER_3_FULL, "VIP_EDD_REQUIRED");
+
+            // EDD specific checks
+            eddService.requireSourceOfFunds(playerId);        // SoF
+            eddService.requireSourceOfWealth(playerId);       // SoW
+            eddService.requireOccupationProof(playerId);      // Occupation
+            eddService.requireLegitimateIncome(playerId);     // Income proof
+
+            // Block withdrawals until EDD completed
+            withdrawalService.blockWithdrawals(playerId, "PENDING_VIP_EDD");
+
+            log.warn("[MGA] VIP EDD triggered: player={}, cumulativeDeposit={}",
+                    playerId, cumulativeDeposit);
+        }
+    }
+}
+```
+
+**Critical**: VIP players do NOT receive exemptions from fraud detection or KYC. They represent 60% of revenue but are the highest AML risk group (MGA data).
 
 **Time to Implement**: 8-10 minutes
 
@@ -838,6 +908,134 @@ public class AlertService {
 
 ---
 
+### Pattern 7: Withdrawal Risk Correlation (NEW)
+
+**Trigger Keywords**: "withdrawal review", "betting period analysis", "risk correlation", "proposal aggregation"
+
+**Use When**: Auto-correlate all risk proposals during the player's withdrawal request
+
+**Implementation**:
+```java
+@Service
+@RequiredArgsConstructor
+public class WithdrawalRiskCorrelationService {
+
+    private final RiskProposalDao riskProposalDao;
+    private final WithdrawalDao withdrawalDao;
+    private final PlayerDao playerDao;
+
+    /**
+     * Get all risk proposals since last withdrawal
+     * Time: ~12 min to implement
+     */
+    public List<RiskProposal> getRelatedProposals(Long playerId, WithdrawalRequest request) {
+        LocalDateTime lastWithdrawalTime = withdrawalDao.getLastWithdrawalTime(playerId);
+
+        // First-time withdrawal: fallback to 30 days or registration
+        if (lastWithdrawalTime == null) {
+            lastWithdrawalTime = getFirstWithdrawalFallbackTime(playerId);
+        }
+
+        // Find all pending proposals in the time range
+        List<RiskProposal> proposals = riskProposalDao.findPendingProposals(
+            playerId,
+            lastWithdrawalTime,
+            LocalDateTime.now()
+        );
+
+        log.info("[Withdrawal] Correlated proposals: player={}, count={}, period={} to {}",
+                playerId, proposals.size(), lastWithdrawalTime, LocalDateTime.now());
+
+        return proposals;
+    }
+
+    /**
+     * Fallback time for first-time withdrawal
+     */
+    private LocalDateTime getFirstWithdrawalFallbackTime(Long playerId) {
+        LocalDateTime registrationTime = playerDao.getRegistrationTime(playerId);
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+
+        // Use whichever is more recent (shorter period)
+        return registrationTime.isAfter(thirtyDaysAgo) ? registrationTime : thirtyDaysAgo;
+    }
+
+    /**
+     * Block withdrawal if high-risk proposals exist
+     * Time: ~8 min to implement
+     */
+    public WithdrawalDecision evaluateWithdrawal(Long playerId, WithdrawalRequest request) {
+        List<RiskProposal> proposals = getRelatedProposals(playerId, request);
+
+        // Filter high-risk proposals (score >= 80)
+        long highRiskCount = proposals.stream()
+                .filter(p -> p.getRiskScore() >= 80)
+                .count();
+
+        if (highRiskCount > 0) {
+            log.warn("[Withdrawal] Blocked: player={}, highRiskProposals={}",
+                    playerId, highRiskCount);
+
+            return WithdrawalDecision.builder()
+                    .approved(false)
+                    .reason("PENDING_RISK_REVIEW")
+                    .proposals(proposals)
+                    .requiresManualReview(true)
+                    .build();
+        }
+
+        // No high-risk proposals, approve
+        return WithdrawalDecision.approved();
+    }
+}
+```
+
+**Database Schema**:
+```sql
+-- Track withdrawal history for correlation
+CREATE TABLE withdrawal_risk_correlations (
+    id BIGSERIAL PRIMARY KEY,
+    withdrawal_id BIGINT NOT NULL,
+    player_id BIGINT NOT NULL,
+    correlated_proposals JSONB NOT NULL,  -- Array of risk_proposal IDs
+    high_risk_count INTEGER NOT NULL,
+    decision VARCHAR(20) NOT NULL,         -- APPROVED, BLOCKED, MANUAL_REVIEW
+    evaluated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_withdrawal_correlations_player ON withdrawal_risk_correlations(player_id, evaluated_at DESC);
+CREATE INDEX idx_withdrawal_correlations_decision ON withdrawal_risk_correlations(decision, evaluated_at DESC);
+```
+
+**Withdrawal Correlation Logic**:
+```
+Player requests withdrawal (2026-02-03 15:00)
+  ↓
+Query last withdrawal time (2026-01-15 10:00)
+  ↓
+Find all proposals between 2026-01-15 10:00 → 2026-02-03 15:00
+  - Proposal #12345: Late betting (score: 85, HIGH)
+  - Proposal #12346: Multi-account (score: 75, MEDIUM)
+  - Proposal #12347: Arbitrage (score: 90, CRITICAL)
+  ↓
+High-risk proposals exist (score >= 80) → Block withdrawal
+  ↓
+Require manual review (24h SLA for manual decision)
+  ↓
+Risk team reviews proposals → Approve or Reject withdrawal
+```
+
+**Time Range Examples**:
+| Scenario | Last Withdrawal | Registration | Time Range |
+|----------|----------------|--------------|------------|
+| Regular player (2nd withdrawal) | 2026-01-15 | 2025-12-01 | 2026-01-15 → Now |
+| First withdrawal (new player) | NULL | 2026-01-20 | 2026-01-20 → Now |
+| First withdrawal (old player) | NULL | 2025-10-01 | 2026-01-03 → Now (30 days) |
+
+**Time to Implement**: 12-15 minutes
+
+---
+
 ## Time Estimates (Production Data)
 
 | Pattern | Implementation | Testing | Total | Complexity |
@@ -848,8 +1046,9 @@ public class AlertService {
 | Payment Fraud | 10-12 min | 8 min | 18-20 min | Low |
 | Risk Scoring System | 15-20 min | 15 min | 30-35 min | High |
 | KYC/AML Integration | 8-10 min | 5 min | 13-15 min | Low |
+| **Withdrawal Risk Correlation** | **12-15 min** | **10 min** | **22-25 min** | **Medium** |
 
-**Full Fraud Detection System**: 2-3 hours (all 6 patterns)
+**Full Fraud Detection System**: 2.5-3.5 hours (all 7 patterns)
 
 ---
 
@@ -861,8 +1060,10 @@ public class AlertService {
 - ✅ Multi-account detection (mandatory)
 - ✅ Bonus abuse prevention (mandatory)
 - ✅ Progressive KYC (Tier 1 → Tier 2 → Tier 3)
+- ✅ **VIP EDD for cumulative deposits ≥ €2,000** (NO exemptions)
 - ✅ AML screening for withdrawals >€2,000
 - ✅ Suspicious transaction reporting (STR) within 24 hours
+- ✅ **Flag mode preferred over Block mode** (reduce false positives)
 
 ### Curacao License
 
@@ -878,15 +1079,29 @@ public class AlertService {
 
 Before deploying fraud detection system:
 
+### Core Patterns (P0)
 - [ ] Multi-account detection implemented and tested
 - [ ] Bonus abuse detection active
 - [ ] Real-time risk scoring integrated with Redis
+- [ ] **Async proposal generation (Flag mode, not Block)** ✅ NEW
+- [ ] **Withdrawal risk correlation** (auto-correlate proposals since last withdrawal) ✅ NEW
+
+### Compliance & KYC (P0)
 - [ ] KYC auto-trigger configured (risk score thresholds)
+- [ ] **VIP EDD for cumulative deposits ≥ €2,000** (MGA mandatory) ✅ NEW
+- [ ] ~~VIP whitelist~~ ❌ REMOVED (violates MGA compliance)
+
+### Infrastructure (P1)
 - [ ] Alert system connected to monitoring (Slack, email, SMS)
+- [ ] SLA monitoring: 2h for critical (score ≥ 90), 24h for standard (score 50-89)
 - [ ] Database indexes created for fraud tables
 - [ ] GDPR compliance: Hash PII, 7-year retention policy
-- [ ] Performance tested: Detection <100ms per transaction
-- [ ] False positive rate monitored and tuned
+
+### Performance (P1)
+- [ ] **Betting not blocked**: Async risk detection, betting delay < 50ms ✅ NEW
+- [ ] Risk detection performance: <200ms per transaction (async execution)
+- [ ] Withdrawal correlation query: <200ms (P95)
+- [ ] False positive rate monitored and tuned (<1%)
 
 ---
 

@@ -458,5 +458,5 @@ server:
 ---
 
 **See Also**:
-- [APM Integration](../apm-integration-skill/) - Monitor WebSocket connections
+- [APM Integration](../apm-integration/) - Monitor WebSocket connections
 - [SmartAdmin Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md) - Real-time patterns

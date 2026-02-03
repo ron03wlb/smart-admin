@@ -10,7 +10,7 @@ This directory contains execution modes for the Performance Suite. Each mode int
 |------|---------|------|--------------|
 | **Mode 1: Diagnose** | Identify performance bottlenecks | ~10 min | java-performance-pro |
 | **Mode 2: Optimize** | Implement caching and query optimizations | ~12 min | cache-strategy-generator |
-| **Mode 3: Monitor** | Set up APM and observability | ~8 min | apm-integration-skill |
+| **Mode 3: Monitor** | Set up APM and observability | ~8 min | apm-integration |
 | **Workflow** | Complete pipeline (all 3 modes) | ~30 min | All 3 skills |
 
 ---
@@ -81,7 +81,7 @@ Performance:
 
 **Purpose**: Set up production APM and observability
 
-**Detailed Content**: See [../../apm-integration-skill/SKILL.md](../../apm-integration-skill/SKILL.md)
+**Detailed Content**: See [../../apm-integration/SKILL.md](../../apm-integration/SKILL.md)
 
 **Key Capabilities**:
 - Skywalking Java agent configuration (auto-instrumentation)
@@ -146,7 +146,7 @@ Monitoring:
 
 - **[java-performance-pro](../../java-performance-pro/)**: Complete N+1 detection, JVM tuning, profiling guides
 - **[cache-strategy-generator](../../cache-strategy-generator/)**: Detailed caching patterns, invalidation strategies
-- **[apm-integration-skill](../../apm-integration-skill/)**: Skywalking, Micrometer, Grafana configuration guides
+- **[apm-integration](../../apm-integration/)**: Skywalking, Micrometer, Grafana configuration guides
 
 ---
 

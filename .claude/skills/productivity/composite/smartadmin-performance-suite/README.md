@@ -232,7 +232,7 @@ monitoring/
 **時間**：約 8 分鐘
 **適用場景**：生產環境可觀測性、SRE 監控體系、性能回歸測試
 
-**整合替代技能**：前 `apm-integration-skill`
+**整合替代技能**：前 `apm-integration`
 
 ---
 
@@ -325,7 +325,7 @@ monitoring/
 
 ---
 
-### 組合 Skill 3: apm-integration-skill（監控階段）
+### 組合 Skill 3: apm-integration（監控階段）
 
 **原技能功能**：
 - Skywalking APM 配置（分佈式追蹤）
@@ -561,7 +561,7 @@ public void onProductUpdated(ProductChangeEvent event) {
 ### 整合技能文檔
 - [java-performance-pro](../../analysis/java-performance-pro/SKILL.md) - 原診斷技能（已整合）
 - [cache-strategy-generator](../../integration/cache-strategy-generator/SKILL.md) - 原緩存技能（已整合）
-- [apm-integration-skill](../../devops/apm-integration-skill/SKILL.md) - 原監控技能（已整合）
+- [apm-integration](../../devops/apm-integration/SKILL.md) - 原監控技能（已整合）
 
 ### 外部文檔
 - [Skywalking Documentation](https://skywalking.apache.org/) - Skywalking 官方文檔
@@ -579,7 +579,7 @@ public void onProductUpdated(ProductChangeEvent event) {
 **Compatible with**: SmartAdmin v4.0.0+
 
 ### v2.0.0 變更（2026-01-29）
-- ✅ **整合 3 個技能**：將 `java-performance-pro`, `cache-strategy-generator`, `apm-integration-skill` 整合為統一的模式化工作流
+- ✅ **整合 3 個技能**：將 `java-performance-pro`, `cache-strategy-generator`, `apm-integration` 整合為統一的模式化工作流
 - ✅ **時間效率提升 50%**：從 60 分鐘（3 個獨立技能）降至 30 分鐘（統一工作流）
 - ✅ **支援 4 種模式**：`--workflow`, `--mode=diagnose`, `--mode=optimize`, `--mode=monitor`
 - ✅ **向後兼容**：舊命令（`/java-performance-pro`, `/cache-strategy`, `/apm-integration`）仍可使用，會顯示遷移警告

@@ -526,5 +526,5 @@ public class ReportGenerationTask {
 ---
 
 **See Also**:
-- [APM Integration](../apm-integration-skill/) - Monitor scheduled tasks
+- [APM Integration](../apm-integration/) - Monitor scheduled tasks
 - [SmartAdmin Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md) - Async task patterns

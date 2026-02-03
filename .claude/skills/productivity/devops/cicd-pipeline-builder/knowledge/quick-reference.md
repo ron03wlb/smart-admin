@@ -513,4 +513,4 @@ spec:
 
 **See Also**:
 - [DB Migration Manager](../db-migration-manager/) - Database migrations in CI/CD
-- [APM Integration](../apm-integration-skill/) - Monitor deployments
+- [APM Integration](../apm-integration/) - Monitor deployments

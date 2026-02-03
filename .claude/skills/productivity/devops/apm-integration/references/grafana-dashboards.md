@@ -1,6 +1,6 @@
 # Grafana Dashboards Guide
 
-**Skill:** apm-integration-skill
+**Skill:** apm-integration
 **Component:** Grafana + Prometheus
 **Purpose:** Visualization dashboards for metrics
 
@@ -280,7 +280,7 @@ annotations:
 
 ---
 
-**Full Templates:** Available in `.claude/skills/apm-integration-skill/assets/` directory
+**Full Templates:** Available in `.claude/skills/apm-integration/assets/` directory
 **Next:** [Alert Rules Configuration](alert-rules.md)
 **Version:** 1.0.0
 **Last Updated:** 2026-01-26

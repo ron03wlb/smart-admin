@@ -1,6 +1,6 @@
 # Excel Export Patterns Guide
 
-**Skill:** report-generator-skill
+**Skill:** report-generator
 **Component:** Apache POI / EasyExcel
 **Purpose:** Generate Excel reports with templates, styling, formulas, and charts
 

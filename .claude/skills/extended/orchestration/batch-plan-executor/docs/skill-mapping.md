@@ -34,9 +34,9 @@ Batch Plan Executor 自動將方案映射到對應的 Skill。
 | `security` | security-hardening-pro | 1.0 |
 | `migration` | db-migration-manager | 1.0 |
 | `i18n` | i18n-generator | 1.0 |
-| `report` | report-generator-skill | 1.0 |
+| `report` | report-generator | 1.0 |
 | `search` | full-text-search-integration | 1.0 |
-| `apm` | apm-integration-skill | 1.0 |
+| `apm` | apm-integration | 1.0 |
 | `tenant` | None (Manual) | 0.0 |
 | `custom` | None (Manual) | 0.0 |
 

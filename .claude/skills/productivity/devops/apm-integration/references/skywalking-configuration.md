@@ -1,6 +1,6 @@
 # Skywalking Configuration Guide
 
-**Skill:** apm-integration-skill
+**Skill:** apm-integration
 **Component:** Apache Skywalking Java Agent
 **Purpose:** Auto-instrumentation for distributed tracing
 

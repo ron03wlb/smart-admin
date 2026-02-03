@@ -31,7 +31,7 @@ User: "Create daily user statistics job at 2 AM"
 **Job execution reliability > 99.9%**
 
 ## Integration
-- Works with: `report-generator-skill`, `db-migration-manager`
+- Works with: `report-generator`, `db-migration-manager`
 - Uses: SmartAdmin logging
 - Compatible: All modules needing automation
 

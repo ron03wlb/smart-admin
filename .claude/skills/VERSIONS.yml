@@ -125,7 +125,7 @@ extended:
 # ====================================================================
 productivity:
   devops:
-    apm-integration-skill:
+    apm-integration:
       version: "1.0.0"
       last_updated: "2026-01-25"
       status: "stable"
@@ -186,7 +186,7 @@ productivity:
       status: "stable"
       changelog: "HikariCP tuning, N+1 detection, EXPLAIN ANALYZE automation"
 
-    report-generator-skill:
+    report-generator:
       version: "1.0.0"
       last_updated: "2026-01-25"
       status: "stable"

@@ -1,6 +1,6 @@
 # Micrometer Custom Metrics Guide
 
-**Skill:** apm-integration-skill
+**Skill:** apm-integration
 **Component:** Micrometer + Spring Boot Actuator + Prometheus
 **Purpose:** Custom business metrics and application monitoring
 

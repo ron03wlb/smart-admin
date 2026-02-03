@@ -105,7 +105,7 @@ You will:
 
 ## Integration Points
 
-- Works with `report-generator-skill` for scheduled reports
+- Works with `report-generator` for scheduled reports
 - Integrates with `db-migration-manager` for scheduled data cleanup
 - Uses SmartAdmin's logging infrastructure
 - Compatible with all SmartAdmin modules

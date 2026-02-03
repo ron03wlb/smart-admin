@@ -31,7 +31,7 @@ User: "Add Elasticsearch search to ProductEntity with autocomplete"
 **Search 100x faster than MyBatis LIKE queries**
 
 ## Integration
-- Works with: `smartadmin-crud-generator`, `apm-integration-skill`
+- Works with: `smartadmin-crud-generator`, `apm-integration`
 - Uses: MyBatis Plus entities
 - Compatible: All searchable modules
 

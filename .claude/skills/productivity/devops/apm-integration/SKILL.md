@@ -1,5 +1,5 @@
 ---
-name: apm-integration-skill
+name: apm-integration
 description: [P2 - Productivity] Generate APM (Application Performance Monitoring) integration with Skywalking, Micrometer, Grafana dashboards, and custom metrics for SmartAdmin applications. Use when setting up production monitoring, debugging performance issues, implementing distributed tracing, or creating custom business metrics. Triggers when user mentions "monitoring", "APM", "performance tracking", "Grafana dashboard", "metrics", "distributed tracing", "Skywalking", or "production observability".
 ---
 
@@ -81,7 +81,7 @@ User: "Integrate Micrometer with custom business metrics"
 User: "Setup alert rules for high error rates"
 ```
 
-**Note**: This skill can also be manually invoked via `/apm-integration-skill` command.
+**Note**: This skill can also be manually invoked via `/apm-integration` command.
 
 ## Scope
 

@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Last Updated**: 2026-02-02
-**Skill**: report-generator-skill (P2 - Productivity/Integration)
+**Skill**: report-generator (P2 - Productivity/Integration)
 
 ---
 

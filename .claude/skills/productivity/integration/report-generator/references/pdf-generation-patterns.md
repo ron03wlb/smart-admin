@@ -1,6 +1,6 @@
 # PDF Generation Patterns Guide
 
-**Skill:** report-generator-skill
+**Skill:** report-generator
 **Component:** iText / Flying Saucer
 **Purpose:** Generate PDF documents (invoices, certificates, statements)
 

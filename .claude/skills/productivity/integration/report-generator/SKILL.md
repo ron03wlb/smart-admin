@@ -1,5 +1,5 @@
 ---
-name: report-generator-skill
+name: report-generator
 description: [P2 - Productivity] Generate business report export functionality (Excel with POI/EasyExcel, PDF with iText/Flying Saucer, CSV streaming) with templates, charts, scheduled jobs, and asynchronous export for SmartAdmin applications. Use when implementing export features, creating scheduled reports, or generating business documents. Triggers when user mentions "export", "report", "Excel", "PDF", "CSV", "download", "scheduled report", or "business document".
 ---
 
@@ -44,7 +44,7 @@ User: "Implement CSV export for order history"
 User: "Create scheduled report generation for daily analytics"
 ```
 
-**Note**: This skill can also be manually invoked via `/report-generator-skill` command.
+**Note**: This skill can also be manually invoked via `/report-generator` command.
 
 ## Problem Statement
 

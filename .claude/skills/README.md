@@ -227,7 +227,7 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 
 ### DevOps (5 skills)
 
-- [**apm-integration-skill**](productivity/devops/apm-integration-skill/) - APM integration (Skywalking, Micrometer, Grafana)
+- [**apm-integration**](productivity/devops/apm-integration/) - APM integration (Skywalking, Micrometer, Grafana)
 - [**cicd-pipeline-builder**](productivity/devops/cicd-pipeline-builder/) - CI/CD pipeline setup (GitHub Actions, GitLab CI)
 - [**db-migration-manager**](productivity/devops/db-migration-manager/) - Database migrations (Flyway, Liquibase)
 - [**scheduled-task-manager**](productivity/devops/scheduled-task-manager/) - Scheduled tasks (XXL-Job, Snail-Job)
@@ -242,7 +242,7 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 - [**i18n-generator**](productivity/integration/i18n-generator/) - Internationalization (backend + frontend)
 - [**message-queue-pattern-generator**](productivity/integration/message-queue-pattern-generator/) - Kafka/RocketMQ integration
 - [**postgresql-best-practices**](productivity/integration/postgresql-best-practices/) - PostgreSQL performance analysis (HikariCP, N+1 detection, EXPLAIN ANALYZE)
-- [**report-generator-skill**](productivity/integration/report-generator-skill/) - Report export (Excel, PDF, CSV)
+- [**report-generator**](productivity/integration/report-generator/) - Report export (Excel, PDF, CSV)
 
 ---
 
@@ -257,7 +257,7 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 - `--mode=monitor`: APM setup (Skywalking, Grafana)
 - `--workflow`: Complete pipeline (~30 minutes)
 
-**Consolidates**: java-performance-pro, cache-strategy-generator, apm-integration-skill
+**Consolidates**: java-performance-pro, cache-strategy-generator, apm-integration
 
 ---
 

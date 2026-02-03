@@ -1,6 +1,6 @@
 # Scheduled Reports Guide
 
-**Skill:** report-generator-skill
+**Skill:** report-generator
 **Component:** XXL-Job / Spring @Scheduled
 **Purpose:** Automate periodic report generation and delivery
 

@@ -1,6 +1,6 @@
 # CSV Streaming Export Patterns
 
-**Skill:** report-generator-skill
+**Skill:** report-generator
 **Component:** OpenCSV / Apache Commons CSV
 **Purpose:** Stream large datasets to CSV without memory issues
 

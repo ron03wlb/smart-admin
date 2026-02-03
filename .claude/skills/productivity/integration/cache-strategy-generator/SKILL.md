@@ -103,7 +103,7 @@ You will:
 - Integrates with `smartadmin-crud-generator` for CRUD caching
 - Uses `foundation.cache` and `foundation.redis-lock` modules
 - Works with `java-performance-pro` for cache profiling
-- Compatible with `apm-integration-skill` for cache metrics
+- Compatible with `apm-integration` for cache metrics
 
 ## Success Criteria
 

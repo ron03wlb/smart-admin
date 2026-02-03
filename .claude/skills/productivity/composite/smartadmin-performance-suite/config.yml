@@ -17,7 +17,7 @@ metadata:
   ai_description: |
     Unified performance optimization solution providing integrated diagnose → optimize → monitor
     workflow for SmartAdmin applications. Consolidates java-performance-pro, cache-strategy-generator,
-    and apm-integration-skill into a single orchestrator.
+    and apm-integration into a single orchestrator.
 
     Modes:
     - diagnose: N+1 detection, JVM tuning, CPU hotspots, SQL slow queries
@@ -62,7 +62,7 @@ dependencies:
   consolidated_from:
     - java-performance-pro
     - cache-strategy-generator
-    - apm-integration-skill
+    - apm-integration
 
 output: { generates: ["*.java"], target_directories: ["smart-admin-api-java21-springboot3/sa-admin/src/main/java"], templates: {} }
 validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [{ check: "compilation" }] }

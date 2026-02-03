@@ -124,7 +124,7 @@ def map_migration_type(content: str) -> Tuple[str, float]:
 | `websocket`, `sse`, `real-time` | websocket-sse-realtime-generator | 0.9 |
 | `minio`, `s3`, `object storage` | (Future Skill) | 0.7 |
 | `i18n`, `internationalization` | i18n-generator | 0.9 |
-| `report`, `export`, `excel`, `pdf` | report-generator-skill | 0.9 |
+| `report`, `export`, `excel`, `pdf` | report-generator | 0.9 |
 | (No specific keywords) | None (Manual) | 0.5 |
 
 ---
@@ -231,11 +231,11 @@ def map_project_plan(plan: ProjectPlan) -> Tuple[str, float]:
 | `migration` | db-migration-manager | 1.0 | Flyway, Liquibase database migration |
 | `database` | db-migration-manager | 1.0 | Database schema changes, migrations |
 | `i18n` | i18n-generator | 1.0 | Internationalization, multi-language support |
-| `report` | report-generator-skill | 1.0 | Excel, PDF, CSV report generation |
+| `report` | report-generator | 1.0 | Excel, PDF, CSV report generation |
 | `search` | full-text-search-integration | 1.0 | Elasticsearch integration, full-text search |
 | `elasticsearch` | full-text-search-integration | 1.0 | Elasticsearch setup, indexing, search APIs |
-| `apm` | apm-integration-skill | 1.0 | Skywalking, Micrometer, Grafana monitoring |
-| `monitoring` | apm-integration-skill | 1.0 | APM, performance monitoring |
+| `apm` | apm-integration | 1.0 | Skywalking, Micrometer, Grafana monitoring |
+| `monitoring` | apm-integration | 1.0 | APM, performance monitoring |
 | `performance` | smartadmin-performance-suite | 1.0 | Performance optimization, profiling |
 | `testing` | smartadmin-testing-suite | 1.0 | Integration tests, E2E tests |
 | `quality` | quality-gate-orchestrator | 1.0 | Checkstyle, PMD, SpotBugs, ArchUnit |
@@ -258,9 +258,9 @@ def map_project_plan(plan: ProjectPlan) -> Tuple[str, float]:
 | `redis`, `caffeine`, `caching` | `cache` | cache-strategy-generator |
 | `sse`, `real-time`, `push` | `websocket` | websocket-sse-realtime-generator |
 | `encryption`, `masking`, `audit` | `security` | security-hardening-pro |
-| `excel`, `pdf`, `csv`, `export` | `report` | report-generator-skill |
+| `excel`, `pdf`, `csv`, `export` | `report` | report-generator |
 | `elk`, `full-text`, `lucene` | `search` | full-text-search-integration |
-| `skywalking`, `micrometer`, `grafana` | `apm` | apm-integration-skill |
+| `skywalking`, `micrometer`, `grafana` | `apm` | apm-integration |
 | `checkstyle`, `pmd`, `spotbugs` | `quality` | quality-gate-orchestrator |
 | `kyc`, `aml`, `risk` | `fraud` | fraud-detection-pattern-generator |
 | `github-actions`, `gitlab-ci`, `pipeline` | `cicd` | cicd-pipeline-builder |
@@ -353,7 +353,7 @@ CONTENT_KEYWORDS = {
         'i18n', 'internationalization', 'multi-language', 'locale',
         'translation', 'message source', 'rtl'
     ],
-    'report-generator-skill': [
+    'report-generator': [
         'report', 'export', 'excel', 'pdf', 'csv',
         'poi', 'itext', 'easyexcel', 'scheduled report'
     ],
@@ -361,7 +361,7 @@ CONTENT_KEYWORDS = {
         'elasticsearch', 'search', 'full-text', 'lucene',
         'indexing', 'aggregation', 'elk', 'kibana'
     ],
-    'apm-integration-skill': [
+    'apm-integration': [
         'apm', 'skywalking', 'micrometer', 'grafana',
         'monitoring', 'tracing', 'metrics', 'prometheus'
     ],
@@ -618,9 +618,9 @@ AVAILABLE_SKILLS = [
     'message-queue-pattern-generator',
     'websocket-sse-realtime-generator',
     'i18n-generator',
-    'report-generator-skill',
+    'report-generator',
     'full-text-search-integration',
-    'apm-integration-skill',
+    'apm-integration',
     'scheduled-task-manager',
 ]
 ```

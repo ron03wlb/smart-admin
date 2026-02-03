@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Last Updated**: 2026-02-02
-**Skill**: apm-integration-skill (P2 - Productivity/DevOps)
+**Skill**: apm-integration (P2 - Productivity/DevOps)
 
 ---
 

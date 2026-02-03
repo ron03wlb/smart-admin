@@ -107,7 +107,7 @@ You will:
 - Uses Spring WebSocket and SockJS
 - Integrates with `smartadmin-vue-crud` for real-time UI updates
 - Works with `message-queue-pattern-generator` for event broadcasting
-- Compatible with `apm-integration-skill` for real-time metrics
+- Compatible with `apm-integration` for real-time metrics
 
 ## Success Criteria
 

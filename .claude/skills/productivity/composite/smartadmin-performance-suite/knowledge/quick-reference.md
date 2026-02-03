@@ -24,7 +24,7 @@
 
 1. **[PostgreSQL Best Practices](../../integration/postgresql-best-practices/)** - Database optimization
 2. **[Java Performance Pro](../../analysis/java-performance-pro/)** - JVM profiling
-3. **[APM Integration](../../devops/apm-integration-skill/)** - Real-time monitoring
+3. **[APM Integration](../../devops/apm-integration/)** - Real-time monitoring
 
 **Selection Matrix**:
 
@@ -197,7 +197,7 @@ jmeter -n -t smartadmin-load-test.jmx -l results.jtl
 
 ### Step 5: APM Setup (Long-term Monitoring)
 
-**Use**: [APM Integration](../../devops/apm-integration-skill/)
+**Use**: [APM Integration](../../devops/apm-integration/)
 
 **SkyWalking + Prometheus + Grafana**:
 
@@ -458,4 +458,4 @@ try (Connection conn = dataSource.getConnection()) {
 **See Also**:
 - [PostgreSQL Best Practices](../../integration/postgresql-best-practices/) - Database optimization
 - [Java Performance Pro](../../analysis/java-performance-pro/) - JVM profiling
-- [APM Integration](../../devops/apm-integration-skill/) - Monitoring setup
+- [APM Integration](../../devops/apm-integration/) - Monitoring setup

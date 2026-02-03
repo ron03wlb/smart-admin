@@ -205,14 +205,14 @@ skill_mapping:
     job: productivity/devops/scheduled-task-manager
     migration: productivity/devops/db-migration-manager
     cicd: productivity/devops/cicd-pipeline-builder
-    apm: productivity/devops/apm-integration-skill
+    apm: productivity/devops/apm-integration
     websocket: productivity/devops/websocket-sse-realtime-generator
 
     # Integration (6 skills)
     cache: productivity/integration/cache-strategy-generator
     i18n: productivity/integration/i18n-generator
     mq: productivity/integration/message-queue-pattern-generator
-    report: productivity/integration/report-generator-skill
+    report: productivity/integration/report-generator
     search: productivity/integration/full-text-search-integration
     postgres: productivity/integration/postgresql-best-practices
 

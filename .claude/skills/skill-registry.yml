@@ -79,7 +79,7 @@ skills:
     path: "foundation/backend/vavr-refactoring-assistant"
     priority: "P0"
     type: "atomic"
-    category: "refactoring"
+    category: "backend"
     visibility: "public"
     preferred_via: "user_invoked"
     aliases: ["vavr", "refactor-vavr"]
@@ -312,8 +312,8 @@ skills:
 # ====================================================================
 
   # Infrastructure Skills
-  apm-integration-skill:
-    path: "productivity/devops/apm-integration-skill"
+  apm-integration:
+    path: "productivity/devops/apm-integration"
     priority: "P2"
     type: "atomic"
     category: "devops"
@@ -403,8 +403,8 @@ skills:
     depends_on: []
     depended_by: []
 
-  report-generator-skill:
-    path: "productivity/integration/report-generator-skill"
+  report-generator:
+    path: "productivity/integration/report-generator"
     priority: "P2"
     type: "atomic"
     category: "integration"
@@ -473,7 +473,7 @@ skills:
     depends_on:
       - "java-performance-pro"
       - "cache-strategy-generator"
-      - "apm-integration-skill"
+      - "apm-integration"
     depended_by: ["batch-plan-executor"]
 
   smartadmin-testing-suite:
@@ -577,13 +577,13 @@ dependency_graph:
     - naming-convention-checker
     - igame-pm-analyst
     - igaming-multi-tenant-wallet-pm
-    - apm-integration-skill
+    - apm-integration
     - cicd-pipeline-builder
     - db-migration-manager
     - full-text-search-integration
     - i18n-generator
     - message-queue-pattern-generator
-    - report-generator-skill
+    - report-generator
     - scheduled-task-manager
     - websocket-sse-realtime-generator
     - java-performance-pro
@@ -599,7 +599,7 @@ dependency_graph:
   # Multiple dependencies (Tier 2)
   tier_2:
     - igame-feature-builder  # depends on: smartadmin-crud-generator
-    - smartadmin-performance-suite  # depends on: java-performance-pro, cache-strategy-generator, apm-integration-skill
+    - smartadmin-performance-suite  # depends on: java-performance-pro, cache-strategy-generator, apm-integration
     - smartadmin-testing-suite  # depends on: smartadmin-integration-test, test-fixture-generator
 
   # Orchestrators (Tier 3)
@@ -630,9 +630,9 @@ conflicts:
     resolution: "prefer smartadmin-performance-suite"
     reason: "performance-suite consolidates cache-strategy-generator"
 
-  - skills: ["apm-integration-skill", "smartadmin-performance-suite"]
+  - skills: ["apm-integration", "smartadmin-performance-suite"]
     resolution: "prefer smartadmin-performance-suite"
-    reason: "performance-suite consolidates apm-integration-skill"
+    reason: "performance-suite consolidates apm-integration"
 
   - skills: ["smartadmin-integration-test", "smartadmin-testing-suite"]
     resolution: "prefer smartadmin-testing-suite"
@@ -679,14 +679,14 @@ categories:
   infrastructure:
     description: "Infrastructure/DevOps skills"
     skills:
-      - apm-integration-skill
+      - apm-integration
       - cache-strategy-generator
       - cicd-pipeline-builder
       - db-migration-manager
       - full-text-search-integration
       - i18n-generator
       - message-queue-pattern-generator
-      - report-generator-skill
+      - report-generator
       - scheduled-task-manager
       - websocket-sse-realtime-generator
 
