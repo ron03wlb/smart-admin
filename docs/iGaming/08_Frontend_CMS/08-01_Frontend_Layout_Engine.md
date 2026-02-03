@@ -35,48 +35,48 @@
 
 ```mermaid
 flowchart TD
-    START[運營人員登入\nLayout CMS Admin] --> EDITOR[頁面編輯器\nDrag & Drop Interface]
+    START[運營人員登入<br/>Layout CMS Admin] --> EDITOR[頁面編輯器<br/>Drag & Drop Interface]
 
     EDITOR --> COMP[組件庫選擇]
-    COMP --> C1[Banner 輪播\n上傳圖片 + 鏈接]
-    COMP --> C2[遊戲網格\n選擇遊戲 + 排序]
-    COMP --> C3[跑馬燈\n輸入公告文字]
-    COMP --> C4[存款按鈕\n設置樣式 + CTA]
+    COMP --> C1[Banner 輪播<br/>上傳圖片 + 鏈接]
+    COMP --> C2[遊戲網格<br/>選擇遊戲 + 排序]
+    COMP --> C3[跑馬燈<br/>輸入公告文字]
+    COMP --> C4[存款按鈕<br/>設置樣式 + CTA]
 
-    C1 --> ARRANGE[拖動排序\n調整組件位置]
+    C1 --> ARRANGE[拖動排序<br/>調整組件位置]
     C2 --> ARRANGE
     C3 --> ARRANGE
     C4 --> ARRANGE
 
-    ARRANGE --> CONFIG[配置參數\nTitle, Display Rules]
+    ARRANGE --> CONFIG[配置參數<br/>Title, Display Rules]
 
     CONFIG --> TARGET{客群定向?}
     TARGET -->|All Users| PREVIEW
-    TARGET -->|VIP Only| VIP_RULE[設置規則\nplayer.vip_level >= 3]
-    TARGET -->|New Users Only| NEW_RULE[設置規則\nplayer.registration_days <= 7]
+    TARGET -->|VIP Only| VIP_RULE[設置規則<br/>player.vip_level >= 3]
+    TARGET -->|New Users Only| NEW_RULE[設置規則<br/>player.registration_days <= 7]
 
     VIP_RULE --> PREVIEW
-    NEW_RULE --> PREVIEW[生成預覽\nPreview URL]
+    NEW_RULE --> PREVIEW[生成預覽<br/>Preview URL]
 
     PREVIEW --> TEST{測試驗收?}
     TEST -->|需修改| EDITOR
-    TEST -->|通過| PUBLISH[點擊發布\nPublish Button]
+    TEST -->|通過| PUBLISH[點擊發布<br/>Publish Button]
 
-    PUBLISH --> VERSION[生成版本\nv1.0.1\ntimestamp: 2026-01-27T10:30:00Z]
+    PUBLISH --> VERSION[生成版本<br/>v1.0.1<br/>timestamp: 2026-01-27T10:30:00Z]
 
-    VERSION --> SAVE[保存至數據庫\nlayout_configs table\nstatus: PUBLISHED]
+    VERSION --> SAVE[保存至數據庫<br/>layout_configs table<br/>status: PUBLISHED]
 
-    SAVE --> CDN[推送至 CDN\nCloudFront/Cloudflare\nJSON Config File]
+    SAVE --> CDN[推送至 CDN<br/>CloudFront/Cloudflare<br/>JSON Config File]
 
-    CDN --> CACHE[CDN 緩存\nTTL: 5 minutes\nEdge Locations: Global]
+    CDN --> CACHE[CDN 緩存<br/>TTL: 5 minutes<br/>Edge Locations: Global]
 
-    CACHE --> API[前端 API 請求\nGET /api/v1/layout/config\nversion: latest]
+    CACHE --> API[前端 API 請求<br/>GET /api/v1/layout/config<br/>version: latest]
 
     API --> FETCH{版本檢查}
-    FETCH -->|本地版本過期| DOWNLOAD[下載新配置\nJSON Config from CDN]
+    FETCH -->|本地版本過期| DOWNLOAD[下載新配置<br/>JSON Config from CDN]
     FETCH -->|本地版本最新| RENDER
 
-    DOWNLOAD --> RENDER[Vue 3 渲染引擎\nDynamic Component Rendering]
+    DOWNLOAD --> RENDER[Vue 3 渲染引擎<br/>Dynamic Component Rendering]
 
     RENDER --> COMP_RENDER[組件渲染]
     COMP_RENDER --> R1[Banner: Swiper.js]
@@ -92,7 +92,7 @@ flowchart TD
     RULE_CHECK -->|匹配用戶| SHOW[顯示組件]
     RULE_CHECK -->|不匹配| HIDE[隱藏組件]
 
-    SHOW --> TRACKING[埋點追蹤\nEvent: component_exposure\ncomponent_id, user_id]
+    SHOW --> TRACKING[埋點追蹤<br/>Event: component_exposure<br/>component_id, user_id]
     HIDE --> END
 
     TRACKING --> END[前端頁面展示完成]
@@ -191,53 +191,53 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START[用戶訪問首頁\nUser visits homepage] --> ID{用戶識別?}
+    START[用戶訪問首頁<br/>User visits homepage] --> ID{用戶識別?}
 
-    ID -->|已登入| PLAYER_ID[使用 player_id\n穩定識別]
-    ID -->|未登入| DEVICE_ID[使用 device_id\n瀏覽器指紋]
+    ID -->|已登入| PLAYER_ID[使用 player_id<br/>穩定識別]
+    ID -->|未登入| DEVICE_ID[使用 device_id<br/>瀏覽器指紋]
 
-    PLAYER_ID --> HASH1[計算 Hash\nhash = murmur3 - player_id]
-    DEVICE_ID --> HASH2[計算 Hash\nhash = murmur3 - device_id]
+    PLAYER_ID --> HASH1[計算 Hash<br/>hash = murmur3 - player_id]
+    DEVICE_ID --> HASH2[計算 Hash<br/>hash = murmur3 - device_id]
 
-    HASH1 --> MOD[取模運算\nvariant = hash % 100]
+    HASH1 --> MOD[取模運算<br/>variant = hash % 100]
     HASH2 --> MOD
 
-    MOD --> SPLIT{分流決策\nvariant 值?}
+    MOD --> SPLIT{分流決策<br/>variant 值?}
 
-    SPLIT -->|0-49 - 50% 流量| VARIANT_A[Variant A\nControl Group\n原版佈局]
-    SPLIT -->|50-99 - 50% 流量| VARIANT_B[Variant B\nTest Group\n實驗佈局]
+    SPLIT -->|0-49 - 50% 流量| VARIANT_A[Variant A<br/>Control Group<br/>原版佈局]
+    SPLIT -->|50-99 - 50% 流量| VARIANT_B[Variant B<br/>Test Group<br/>實驗佈局]
 
-    VARIANT_A --> FETCH_A[拉取配置\nGET /api/v1/layout/config\nvariant=A]
-    VARIANT_B --> FETCH_B[拉取配置\nGET /api/v1/layout/config\nvariant=B]
+    VARIANT_A --> FETCH_A[拉取配置<br/>GET /api/v1/layout/config<br/>variant=A]
+    VARIANT_B --> FETCH_B[拉取配置<br/>GET /api/v1/layout/config<br/>variant=B]
 
-    FETCH_A --> CONFIG_A[Variant A 配置\nBanner → Game Grid - Hot → Deposit]
-    FETCH_B --> CONFIG_B[Variant B 配置\nGame Grid - Hot → Banner → Deposit]
+    FETCH_A --> CONFIG_A[Variant A 配置<br/>Banner → Game Grid - Hot → Deposit]
+    FETCH_B --> CONFIG_B[Variant B 配置<br/>Game Grid - Hot → Banner → Deposit]
 
-    CONFIG_A --> RENDER_A[渲染 Variant A\n組件順序: 1, 2, 3]
-    CONFIG_B --> RENDER_B[渲染 Variant B\n組件順序: 2, 1, 3]
+    CONFIG_A --> RENDER_A[渲染 Variant A<br/>組件順序: 1, 2, 3]
+    CONFIG_B --> RENDER_B[渲染 Variant B<br/>組件順序: 2, 1, 3]
 
-    RENDER_A --> EXPOSURE_A[上報曝光事件\nEvent: experiment_exposure\nexperiment_id: EXP_HOME_V2\nvariant: A\nuser_id: 12345\ntimestamp: 2026-01-27T10:30:00Z]
+    RENDER_A --> EXPOSURE_A[上報曝光事件<br/>Event: experiment_exposure<br/>experiment_id: EXP_HOME_V2<br/>variant: A<br/>user_id: 12345<br/>timestamp: 2026-01-27T10:30:00Z]
 
-    RENDER_B --> EXPOSURE_B[上報曝光事件\nEvent: experiment_exposure\nexperiment_id: EXP_HOME_V2\nvariant: B\nuser_id: 67890\ntimestamp: 2026-01-27T10:30:05Z]
+    RENDER_B --> EXPOSURE_B[上報曝光事件<br/>Event: experiment_exposure<br/>experiment_id: EXP_HOME_V2<br/>variant: B<br/>user_id: 67890<br/>timestamp: 2026-01-27T10:30:05Z]
 
-    EXPOSURE_A --> TRACK_A[追蹤轉換指標\n- Click on Game\n- Deposit Button Click\n- First Deposit Amount]
+    EXPOSURE_A --> TRACK_A[追蹤轉換指標<br/>- Click on Game<br/>- Deposit Button Click<br/>- First Deposit Amount]
 
-    EXPOSURE_B --> TRACK_B[追蹤轉換指標\n- Click on Game\n- Deposit Button Click\n- First Deposit Amount]
+    EXPOSURE_B --> TRACK_B[追蹤轉換指標<br/>- Click on Game<br/>- Deposit Button Click<br/>- First Deposit Amount]
 
-    TRACK_A --> ANALYTICS[數據分析\nConversion Rate Comparison]
+    TRACK_A --> ANALYTICS[數據分析<br/>Conversion Rate Comparison]
     TRACK_B --> ANALYTICS
 
-    ANALYTICS --> COMPARE{統計顯著性?\np-value < 0.05}
+    ANALYTICS --> COMPARE{統計顯著性?<br/>p-value < 0.05}
 
-    COMPARE -->|是 + Variant B 更好| WINNER_B[🏆 Variant B 獲勝\nCTR: 8.5% vs 6.2% - A\n提升: +37%]
-    COMPARE -->|是 + Variant A 更好| WINNER_A[🏆 Variant A 獲勝\n保持原版佈局]
-    COMPARE -->|否 - 無顯著差異| NO_WINNER[⚠️ 無明顯差異\n需延長實驗時間]
+    COMPARE -->|是 + Variant B 更好| WINNER_B[🏆 Variant B 獲勝<br/>CTR: 8.5% vs 6.2% - A<br/>提升: +37%]
+    COMPARE -->|是 + Variant A 更好| WINNER_A[🏆 Variant A 獲勝<br/>保持原版佈局]
+    COMPARE -->|否 - 無顯著差異| NO_WINNER[⚠️ 無明顯差異<br/>需延長實驗時間]
 
-    WINNER_B --> ROLLOUT[全量推廣\n100% 流量使用 Variant B]
-    WINNER_A --> KEEP[維持現狀\n100% 流量使用 Variant A]
-    NO_WINNER --> CONTINUE[繼續實驗\n擴大樣本量]
+    WINNER_B --> ROLLOUT[全量推廣<br/>100% 流量使用 Variant B]
+    WINNER_A --> KEEP[維持現狀<br/>100% 流量使用 Variant A]
+    NO_WINNER --> CONTINUE[繼續實驗<br/>擴大樣本量]
 
-    ROLLOUT --> END[實驗結束\n發布新版佈局]
+    ROLLOUT --> END[實驗結束<br/>發布新版佈局]
     KEEP --> END
     CONTINUE --> SPLIT
 

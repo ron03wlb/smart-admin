@@ -37,33 +37,33 @@
 
 ```mermaid
 flowchart TD
-    START[開始部署\nCurrent: Green v1.9.0] --> PREPARE[準備 Blue 環境\nBlue: Empty / Idle]
+    START[開始部署<br/>Current: Green v1.9.0] --> PREPARE[準備 Blue 環境<br/>Blue: Empty / Idle]
 
-    PREPARE --> DEPLOY[部署新版本至 Blue\nBlue: v1.10.0\nReplicas: 3]
+    PREPARE --> DEPLOY[部署新版本至 Blue<br/>Blue: v1.10.0<br/>Replicas: 3]
 
-    DEPLOY --> HEALTH{Blue 健康檢查?\nAll pods ready?}
-    HEALTH -->|失敗| ROLLBACK1[❌ 部署失敗\n銷毀 Blue 環境\n保持 Green 運行]
-    HEALTH -->|成功| SMOKE[QA 冒煙測試\nInternal URL:\nblue.internal.svc.cluster.local]
+    DEPLOY --> HEALTH{Blue 健康檢查?<br/>All pods ready?}
+    HEALTH -->|失敗| ROLLBACK1[❌ 部署失敗<br/>銷毀 Blue 環境<br/>保持 Green 運行]
+    HEALTH -->|成功| SMOKE[QA 冒煙測試<br/>Internal URL:<br/>blue.internal.svc.cluster.local]
 
     SMOKE --> SMOKE_TEST{測試結果?}
-    SMOKE_TEST -->|失敗| ROLLBACK2[❌ 測試失敗\n銷毀 Blue 環境\n分析日誌]
-    SMOKE_TEST -->|通過| SWITCH[Load Balancer 切換\nTraffic: Green → Blue\nInstant switchover]
+    SMOKE_TEST -->|失敗| ROLLBACK2[❌ 測試失敗<br/>銷毀 Blue 環境<br/>分析日誌]
+    SMOKE_TEST -->|通過| SWITCH[Load Balancer 切換<br/>Traffic: Green → Blue<br/>Instant switchover]
 
-    SWITCH --> MONITOR[監控 Blue 環境\nDuration: 10 minutes\nMetrics: Error rate, Latency]
+    SWITCH --> MONITOR[監控 Blue 環境<br/>Duration: 10 minutes<br/>Metrics: Error rate, Latency]
 
     MONITOR --> METRICS{監控指標正常?}
-    METRICS -->|異常| ROLLBACK3[🚨 緊急回滾\nTraffic: Blue → Green\nRollback time: < 30s]
-    METRICS -->|正常| VALIDATE[驗證完成\nBlue 穩定運行]
+    METRICS -->|異常| ROLLBACK3[🚨 緊急回滾<br/>Traffic: Blue → Green<br/>Rollback time: < 30s]
+    METRICS -->|正常| VALIDATE[驗證完成<br/>Blue 穩定運行]
 
-    VALIDATE --> CLEANUP[清理 Green 環境\nScale down Green to 0\n保留 24h 以防回滾]
+    VALIDATE --> CLEANUP[清理 Green 環境<br/>Scale down Green to 0<br/>保留 24h 以防回滾]
 
-    CLEANUP --> PROMOTE[提升 Blue 為 Green\nRelabel: Blue → Green\n版本: v1.10.0]
+    CLEANUP --> PROMOTE[提升 Blue 為 Green<br/>Relabel: Blue → Green<br/>版本: v1.10.0]
 
-    PROMOTE --> END[✅ 部署成功\nCurrent: Green v1.10.0\nBlue: Empty]
+    PROMOTE --> END[✅ 部署成功<br/>Current: Green v1.10.0<br/>Blue: Empty]
 
     ROLLBACK1 --> FAIL_END[部署終止]
     ROLLBACK2 --> FAIL_END
-    ROLLBACK3 --> INCIDENT[創建故障事件\nPagerDuty + PostMortem]
+    ROLLBACK3 --> INCIDENT[創建故障事件<br/>PagerDuty + PostMortem]
     INCIDENT --> FAIL_END
 
     style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px

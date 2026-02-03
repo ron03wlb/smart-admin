@@ -29,7 +29,7 @@ flowchart TD
     IDEMPOTENT -->|No| ACQUIRE_LOCK[Acquire Redis Lock: player:$id]
 
     ACQUIRE_LOCK --> LOCK_CHECK{Lock acquired?}
-    LOCK_CHECK -->|No - Retry < 3| WAIT["Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms<br/>Retry 2: 100ms<br/>Retry 3: 200ms"]
+    LOCK_CHECK -->|No - Retry < 3| WAIT["Wait - Exponential Backoff<br/>━━━━━━━━━━━━━━<br/>Retry 1: 50ms<br/>Retry 2: 100ms<br/>Retry 3: 200ms"]
     WAIT --> ACQUIRE_LOCK
     LOCK_CHECK -->|No - Retry >= 3| ERR_LOCK["Error: Lock Timeout<br/>━━━━━━━━━━━━━━<br/>Total Wait: 350ms"]
 
@@ -41,7 +41,7 @@ flowchart TD
 
     UPDATE_DB --> AFFECTED_CHECK{Affected Rows > 0?}
     AFFECTED_CHECK -->|No - Version Conflict| VERSION_RETRY{Retry Count < 3?}
-    VERSION_RETRY -->|Yes| BACKOFF["Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 20ms<br/>Retry 2: 40ms<br/>Retry 3: 60ms"]
+    VERSION_RETRY -->|Yes| BACKOFF["Wait - Linear Backoff<br/>━━━━━━━━━━━━━━<br/>Retry 1: 20ms<br/>Retry 2: 40ms<br/>Retry 3: 60ms"]
     BACKOFF --> READ_BALANCE
     VERSION_RETRY -->|No| ERR_VERSION["Error: Concurrent Update Conflict<br/>━━━━━━━━━━━━━━<br/>Total Wait: 120ms<br/>Suggest: Use queue"]
 

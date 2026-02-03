@@ -253,42 +253,42 @@ flowchart TD
     Start([開始: 注單結算])
 
     subgraph Input["輸入數據"]
-        A[注單信息\nbet_id, player_id\nbet_amount: $100\nodds: 1.95\ngame_type: BACCARAT\nstatus: WIN]
+        A[注單信息<br/>bet_id, player_id<br/>bet_amount: $100<br/>odds: 1.95<br/>game_type: BACCARAT<br/>status: WIN]
     end
 
     subgraph Layer1["Layer 1: 風控引擎驗證 (05-01)"]
         B{是否對沖投注?}
         C{是否套利投注?}
         D{賠率是否≥1.5?}
-        E[有效流水基數\neffective_turnover_base\n= $100]
-        F[拒絕\neffective_turnover_base\n= $0]
+        E[有效流水基數<br/>effective_turnover_base<br/>= $100]
+        F[拒絕<br/>effective_turnover_base<br/>= $0]
     end
 
     subgraph Layer2["Layer 2: 財務狀態記錄 (02-04)"]
         G{注單狀態?}
-        H[WIN/LOSS\n記錄狀態]
-        I[DRAW/TIE\n記錄狀態]
-        J[VOID/CANCEL\n記錄狀態]
-        K[HALF_WIN/HALF_LOSS\n記錄狀態]
-        L[valid_bet 保持不變\n= Layer 1 輸出\n= $100\n僅記錄 settlement_status]
+        H[WIN/LOSS<br/>記錄狀態]
+        I[DRAW/TIE<br/>記錄狀態]
+        J[VOID/CANCEL<br/>記錄狀態]
+        K[HALF_WIN/HALF_LOSS<br/>記錄狀態]
+        L[valid_bet 保持不變<br/>= Layer 1 輸出<br/>= $100<br/>僅記錄 settlement_status]
     end
 
     subgraph Layer3["Layer 3: 活動權重應用 (04-01)"]
         M{遊戲類型?}
-        N[Slots/Sports\ngame_weight = 1.0]
-        O[Baccarat\ngame_weight = 0.15]
-        P[Blackjack\ngame_weight = 0.1]
-        Q[Roulette\ngame_weight = 0.2]
-        R[計算活動貢獻\ncontributed_amount\n= valid_bet × weight\n= $100 × 0.15 = $15]
+        N[Slots/Sports<br/>game_weight = 1.0]
+        O[Baccarat<br/>game_weight = 0.15]
+        P[Blackjack<br/>game_weight = 0.1]
+        Q[Roulette<br/>game_weight = 0.2]
+        R[計算活動貢獻<br/>contributed_amount<br/>= valid_bet × weight<br/>= $100 × 0.15 = $15]
     end
 
     subgraph Update["更新流水進度"]
         S[更新數據庫]
-        T[計算流水進度\nprogress = 15/5000\n= 0.3%]
+        T[計算流水進度<br/>progress = 15/5000<br/>= 0.3%]
         U[檢查是否完成流水]
         V{流水是否達標?}
-        W[解鎖提款權限\n可提現餘額增加]
-        X[保持流水鎖定\n繼續追蹤進度]
+        W[解鎖提款權限<br/>可提現餘額增加]
+        X[保持流水鎖定<br/>繼續追蹤進度]
     end
 
     End([結束])
@@ -463,7 +463,7 @@ flowchart TD
 
     P["valid_bet 保持不變\n= $100\n不受結算狀態影響"]
 
-    End([返回: valid_bet $100\n+ settlement_status])
+    End([返回: valid_bet $100<br/>+ settlement_status])
 
     A --> B
     B --> C

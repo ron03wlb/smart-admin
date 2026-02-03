@@ -843,7 +843,7 @@ graph TD
 
     classDef success fill:#006600,stroke:#00ff00,stroke-width:2px,color:#fff;
 
-    GP_API[Game Provider API/File]:::process -->|1. Fetch/Download| Staging[Staging Area\nRaw Data]:::process
+    GP_API[Game Provider API/File]:::process -->|1. Fetch/Download| Staging[Staging Area<br/>Raw Data]:::process
 
     Platform_DB[(Platform Ledger)]:::database -->|2. Extract| Reconciliation_Engine[Reconciliation Engine]:::process
 
@@ -917,27 +917,27 @@ flowchart TD
 
     classDef success fill:#006600,stroke:#00ff00,stroke-width:2px,color:#fff;
 
-    Bet([Bet Settle Trigger]):::startend --> CheckStatus{1. Status Valid?\nNo Draw/Cancel}:::decision
+    Bet([Bet Settle Trigger]):::startend --> CheckStatus{1. Status Valid?<br/>No Draw/Cancel}:::decision
 
   
 
-    CheckStatus -- No --> Invalid[Turnover = 0\nEffective = 0]:::fail
+    CheckStatus -- No --> Invalid[Turnover = 0<br/>Effective = 0]:::fail
 
-    CheckStatus -- Yes --> CheckOdds{2. Odds >= 0.5?\nAnti-Arbitrage}:::decision
+    CheckStatus -- Yes --> CheckOdds{2. Odds >= 0.5?<br/>Anti-Arbitrage}:::decision
 
     CheckOdds -- No --> Invalid
 
-    CheckOdds -- Yes --> RiskCheck{3. Risk Engine\nValidate?}:::decision
+    CheckOdds -- Yes --> RiskCheck{3. Risk Engine<br/>Validate?}:::decision
 
     RiskCheck -- No (Hedge) --> Invalid
 
-    RiskCheck -- Yes --> GeneralCalc[4. Calc General Turnover\n= Bet * GameWeight]:::process
+    RiskCheck -- Yes --> GeneralCalc[4. Calc General Turnover<br/>= Bet * GameWeight]:::process
 
     GeneralCalc --> HasBonus{5. Has Active Bonus?}:::decision
 
     HasBonus -- No --> EndNormal([End Process]):::startend
 
-    HasBonus -- Yes --> BonusRule[Load Bonus Rules\nWhitelist, Cap, Contribution]:::process
+    HasBonus -- Yes --> BonusRule[Load Bonus Rules<br/>Whitelist, Cap, Contribution]:::process
 
     BonusRule --> CheckWhite{Game Allowed?}:::decision
 
@@ -945,7 +945,7 @@ flowchart TD
 
     CheckWhite -- Yes --> CalcCap[Apply Max Contribution Cap]:::process
 
-    CalcCap --> CalcBonusTO[6. Calc Activity Turnover\n= CappedBet * BonusWeight]:::success
+    CalcCap --> CalcBonusTO[6. Calc Activity Turnover<br/>= CappedBet * BonusWeight]:::success
 
     BonusZero --> UpdateProgress
 
