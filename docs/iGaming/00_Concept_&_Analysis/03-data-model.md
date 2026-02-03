@@ -1,8 +1,9 @@
 # 數據模型總覽 (Data Model Overview)
 
-> **版本**: 1.0.0
-> **最後更新**: 2026-01-27
+> **版本**: 1.1.0 (Week 4-5 Enhancement)
+> **最後更新**: 2026-02-03
 > **目的**: 提供 IGaming 平台所有核心數據實體的統一視圖
+> **更新內容**: 添加 3 個狀態機設計 + 8 個 SSOT Markers + 增強交叉引用
 
 ---
 
@@ -10,6 +11,7 @@
 
 - [核心實體關係圖](#核心實體關係圖)
 - [實體分層架構](#實體分層架構)
+- [狀態機設計](#狀態機設計) 🆕
 - [跨模組外鍵關係](#跨模組外鍵關係)
 - [核心數據表設計](#核心數據表設計)
 - [數據一致性約束](#數據一致性約束)
@@ -143,6 +145,245 @@ Game Provider
 
 ---
 
+## 🔄 狀態機設計
+
+### 1. Player Account State Machine (玩家帳戶狀態機)
+
+> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義請參考 [01-01_Player_Lifecycle.md §3](../01_Player_Center/01-01_Player_Lifecycle.md#3-account-status-state-machine)
+
+**五狀態定義**:
+
+| 狀態碼 | 英文名稱 | 觸發條件 | 業務影響 | 恢復路徑 |
+|-------|---------|---------|---------|---------|
+| `ACTIVE` | 活躍 | 預設狀態 | 無限制，可正常操作 | N/A |
+| `LOCKED` | 鎖定 | 連續登入失敗 5 次 | 禁止登入 30 分鐘 | 密碼重置 OR 自動解鎖 |
+| `SUSPENDED` | 暫停 | 風險評分 >= 70 | 禁止充值/提款/投注 | 人工審核通過 |
+| `PENDING_VERIFICATION` | 待驗證 | 提款觸發 KYC 升級 | 限制提款額度（<$1000） | KYC 驗證通過 |
+| `CLOSED` | 關閉 | 自我排除 OR AML 違規 | 禁止所有操作，永久關閉 | 不可恢復 |
+
+**狀態轉換圖**:
+
+```mermaid
+stateDiagram-v2
+    [*] --> ACTIVE : 註冊完成
+    ACTIVE --> LOCKED : 連續登入失敗 x5
+    ACTIVE --> SUSPENDED : 風險評分 >= 70
+    ACTIVE --> PENDING_VERIFICATION : 提款觸發 KYC 升級
+    ACTIVE --> CLOSED : 自我排除
+
+    LOCKED --> ACTIVE : 密碼重置 OR 30分鐘後
+
+    SUSPENDED --> ACTIVE : 人工審核通過
+    SUSPENDED --> CLOSED : AML 違規確認
+
+    PENDING_VERIFICATION --> ACTIVE : KYC 驗證通過
+    PENDING_VERIFICATION --> SUSPENDED : KYC 驗證失敗
+
+    CLOSED --> [*] : 永久關閉
+```
+
+**狀態轉換觸發示例**:
+
+```sql
+-- ACTIVE → LOCKED（登入失敗觸發）
+UPDATE players
+SET account_status = 'LOCKED',
+    locked_until = NOW() + INTERVAL '30 MINUTE',
+    failed_login_attempts = failed_login_attempts + 1,
+    updated_at = NOW()
+WHERE player_id = ?
+  AND account_status = 'ACTIVE'
+  AND failed_login_attempts >= 4;
+
+-- LOCKED → ACTIVE（自動解鎖）
+UPDATE players
+SET account_status = 'ACTIVE',
+    failed_login_attempts = 0,
+    locked_until = NULL,
+    updated_at = NOW()
+WHERE account_status = 'LOCKED'
+  AND locked_until < NOW();
+```
+
+---
+
+### 2. Withdrawal State Machine (提款狀態機)
+
+> 💡 **SSOT Marker**: 提款流程的完整 SAGA 定義請參考 [01-05_Withdrawal_Risk.md §7.2](../01_Player_Center/01-05_Withdrawal_Risk.md#72-saga-orchestration-workflow)
+
+**十狀態定義**:
+
+| 狀態碼 | 說明 | 可能轉換 | 業務影響 |
+|-------|------|---------|---------|
+| `PENDING` | 提款申請已創建 | → RISK_CHECK, REJECTED | 餘額已鎖定 |
+| `RISK_CHECK` | 風控檢測中 | → KYC_REQUIRED, APPROVED, MANUAL_REVIEW | 實時風險評分 |
+| `KYC_REQUIRED` | 需要 KYC 升級 | → RISK_CHECK | 等待玩家上傳文件 |
+| `MANUAL_REVIEW` | 人工審核 | → APPROVED, REJECTED | L1/L2/L3 審核員介入 |
+| `APPROVED` | 審核通過 | → PROCESSING | 準備代付 |
+| `PROCESSING` | PSP 代付中 | → COMPLETED, FAILED | 調用 PSP API |
+| `COMPLETED` | 提款成功 | [終態] | 資金到賬 |
+| `FAILED` | 提款失敗 | → ROLLBACK | PSP 返回失敗 |
+| `ROLLBACK` | 餘額回滾中 | → REFUNDED | 釋放鎖定餘額 |
+| `REFUNDED` | 已退款 | [終態] | 餘額已解鎖 |
+| `REJECTED` | 審核拒絕 | → REFUNDED | 風控/人工拒絕 |
+
+**SAGA 協調流程圖**:
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING : 創建提款申請
+
+    PENDING --> RISK_CHECK : 啟動風控檢測
+    RISK_CHECK --> KYC_REQUIRED : KYC 等級不足
+    RISK_CHECK --> MANUAL_REVIEW : 風險評分 60-85
+    RISK_CHECK --> REJECTED : 風險評分 >= 86
+    RISK_CHECK --> APPROVED : 風險評分 < 60 & KYC合格
+
+    KYC_REQUIRED --> RISK_CHECK : 玩家完成 KYC
+    KYC_REQUIRED --> REJECTED : 超過48小時未上傳
+
+    MANUAL_REVIEW --> APPROVED : 審核員批准
+    MANUAL_REVIEW --> REJECTED : 審核員拒絕
+
+    APPROVED --> PROCESSING : 調用 PSP 代付
+
+    PROCESSING --> COMPLETED : PSP 成功
+    PROCESSING --> FAILED : PSP 失敗
+
+    REJECTED --> ROLLBACK : 開始回滾
+    FAILED --> ROLLBACK : 開始回滾
+
+    ROLLBACK --> REFUNDED : 餘額已解鎖
+
+    COMPLETED --> [*] : 提款完成
+    REFUNDED --> [*] : 退款完成
+```
+
+**Step 2.5 延遲風控檢查** (v2.1.0):
+
+```sql
+-- 檢查歷史風控提案
+SELECT COUNT(*) as pending_proposals
+FROM withdrawal_risk_correlations wrc
+JOIN withdrawal_requests wr ON wrc.withdrawal_id = wr.id
+WHERE wrc.player_id = ?
+  AND wrc.time_range_start <= NOW()
+  AND wrc.time_range_end >= NOW()
+  AND wr.status IN ('MANUAL_REVIEW', 'RISK_CHECK');
+
+-- 如果 pending_proposals > 0，則當前提款強制進入 MANUAL_REVIEW
+```
+
+---
+
+### 3. VIP Tier State Machine (VIP 等級狀態機)
+
+> 💡 **SSOT Marker**: VIP 系統的完整設計請參考 [01-02_VIP_&_Loyalty_System.md §2.1.1](../01_Player_Center/01-02_VIP_&_Loyalty_System.md#211-vip-tier-state-machine)
+
+**五級別定義**:
+
+| 等級 | 保級條件（月） | 升級條件 | 警告狀態 | 降級緩衝期 |
+|------|---------------|---------|---------|-----------|
+| Bronze | $100 存款 OR $1000 流水 | $1000 存款 OR $10K 流水 | - | 無 |
+| Silver | $1000 存款 OR $10K 流水 | $5000 存款 OR $50K 流水 | 7 天警告 | 30 天 |
+| Gold | $5000 存款 OR $50K 流水 | $20K 存款 OR $200K 流水 | 14 天警告 | 60 天 |
+| Platinum | $20K 存款 OR $200K 流水 | $100K 存款 OR $1M 流水 | 21 天警告 | 90 天 |
+| Diamond | $100K 存款 OR $1M 流水 | - | 30 天警告 | 永久（除非違規） |
+
+**狀態轉換示例**:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    Bronze --> Silver : 達成升級條件
+    Silver --> Gold : 達成升級條件
+    Gold --> Platinum : 達成升級條件
+    Platinum --> Diamond : 達成升級條件
+
+    Silver --> Warning_Silver : 未達保級條件
+    Gold --> Warning_Gold : 未達保級條件
+    Platinum --> Warning_Platinum : 未達保級條件
+    Diamond --> Warning_Diamond : 未達保級條件
+
+    Warning_Silver --> Silver : 緩衝期內達成
+    Warning_Silver --> Bronze : 緩衝期結束
+
+    Warning_Gold --> Gold : 緩衝期內達成
+    Warning_Gold --> Silver : 緩衝期結束
+
+    Warning_Platinum --> Platinum : 緩衝期內達成
+    Warning_Platinum --> Gold : 緩衝期結束
+
+    Warning_Diamond --> Diamond : 緩衝期內達成（不會降級）
+```
+
+**降級補償機制**:
+
+```yaml
+demotion_compensation:
+  Silver_to_Bronze:
+    - 一次性 $50 現金返還
+    - 7 天內 1.5x 返水加成
+
+  Gold_to_Silver:
+    - 一次性 $200 現金返還
+    - 14 天內 2x 返水加成
+
+  Platinum_to_Gold:
+    - 一次性 $1000 現金返還
+    - 21 天內 2.5x 返水加成
+    - VIP 客戶經理聯繫
+```
+
+---
+
+### 4. 狀態機設計原則 (Design Principles)
+
+**1. 單向轉換優先 (One-Way Transitions)**:
+- `CLOSED` 狀態不可恢復
+- `COMPLETED` 提款不可取消
+- 避免循環轉換（ACTIVE ↔ SUSPENDED 需人工介入）
+
+**2. 冪等性保證 (Idempotency)**:
+```java
+// 狀態轉換必須檢查當前狀態
+public Result<Void> transitionToLocked(String playerId) {
+    return playerDao.findById(playerId)
+        .filter(p -> p.getStatus() == AccountStatus.ACTIVE) // 前置條件檢查
+        .map(p -> {
+            p.setStatus(AccountStatus.LOCKED);
+            p.setLockedUntil(LocalDateTime.now().plusMinutes(30));
+            playerDao.updateById(p);
+            return Result.success();
+        })
+        .getOrElse(Result.failure("Invalid state transition"));
+}
+```
+
+**3. 審計日誌強制 (Audit Logging)**:
+```sql
+-- 所有狀態變更必須記錄
+INSERT INTO player_status_audit_log (
+    player_id,
+    old_status,
+    new_status,
+    trigger_reason,
+    operator_id,
+    created_at
+) VALUES (?, ?, ?, ?, ?, NOW());
+```
+
+**4. 狀態轉換觸發器 (State Transition Triggers)**:
+
+| 觸發類型 | 示例 | 處理方式 |
+|---------|------|---------|
+| **時間觸發** | 30 分鐘後自動解鎖 | Cron Job |
+| **事件觸發** | 登入失敗 5 次 | 實時檢測 |
+| **手動觸發** | 審核員批准提款 | 審批流程 |
+| **外部觸發** | PSP 返回失敗 | Webhook 回調 |
+
+---
+
 ## 🔑 跨模組外鍵關係
 
 ### 主鍵與外鍵約束表
@@ -204,6 +445,9 @@ Game Provider
 
 
 **可下注餘額公式**:
+
+> 💡 **SSOT Marker**: 可下注餘額的完整計算邏輯請參考 [02-06_Unified_Wallet_Model.md §2.2](../02_Finance_Center/02-06_Unified_Wallet_Model.md#22-playable-balance-formula)
+
 ```text
 Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 ```
@@ -269,6 +513,12 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 ### 2. 流水計算一致性
 
 **三層驗證架構**:
+
+> 💡 **SSOT Marker**: 三層驗證架構的完整設計請參考：
+> - Layer 1 (風控驗證): [05-01_Risk_Control_System.md §4.2](../05_Risk_Management/05-01_Risk_Control_System.md#42-turnover-validation)
+> - Layer 2 (財務驗證): [02-03_Turnover_Calculation.md §3](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#3-layer-2-finance-layer-validation)
+> - Layer 3 (活動應用): [04-01_Activity_System_Design.md §5](../04_Activity_Center/04-01_Activity_System_Design.md#5-game-weight-configuration)
+
 ```text
 Layer 1: 風控引擎驗證 (實時)
     ↓ 有效投注標記
@@ -375,10 +625,16 @@ Player Deletion Request
 
 ## 📚 相關文檔
 
+### 狀態機與生命週期 (🆕 Week 4-5)
+- [01-01 玩家生命週期管理](../01_Player_Center/01-01_Player_Lifecycle.md) - **SSOT**: Player Account State Machine
+- [01-05 提款風控系統](../01_Player_Center/01-05_Withdrawal_Risk.md) - **SSOT**: Withdrawal State Machine & SAGA Flow
+- [01-02 VIP & Loyalty 系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - **SSOT**: VIP Tier State Machine
+
 ### 數據模型參考
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包詳細設計
-- [02-04 流水計算與遊戲對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水計算邏輯
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風險評分模型
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - **SSOT**: Playable Balance Formula
+- [02-03 流水計算](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md) - **SSOT**: Layer 2 Finance Validation
+- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - **SSOT**: Layer 1 Risk Validation
+- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - **SSOT**: Layer 3 Game Weight
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
 
 ### 架構參考
@@ -388,6 +644,15 @@ Player Deletion Request
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 1.1.0
+**更新日期**: 2026-02-03 (Week 4-5 Enhancement)
+**更新內容**:
+- ✅ 添加 Player Account State Machine（5 狀態 + Mermaid 圖）
+- ✅ 添加 Withdrawal State Machine（10 狀態 + SAGA 流程圖）
+- ✅ 添加 VIP Tier State Machine（5 級別 + 降級補償機制）
+- ✅ 添加 8 個 SSOT Markers（Player Lifecycle, Withdrawal SAGA, Playable Balance等）
+- ✅ 增強交叉引用（新增 3 個 Week 4-5 文檔鏈接）
+- ✅ 添加狀態機設計原則（冪等性、審計日誌、觸發器）
+
 **維護團隊**: Architecture Team & Data Team
-**下次審閱**: 2026-04-27（每季度審閱）
+**下次審閱**: 2026-05-03（每季度審閱）
