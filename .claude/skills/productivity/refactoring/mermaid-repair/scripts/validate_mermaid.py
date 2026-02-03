@@ -41,23 +41,33 @@ def validate_block(block: Dict) -> List[Dict]:
     for line_num, line in enumerate(lines, 1):
         absolute_line = block['start_line'] + line_num
 
-        # 檢查節點名空格未加引號
+        # 檢查節點名空格未加引號（Type A）
         if re.search(r'^\s*style\s+[^"]*\s[^"]*fill:', line):
             errors.append({
                 'line': absolute_line,
                 'type': 'style_quote',
                 'severity': '🔴',
-                'message': '節點名包含空格但未加引號',
+                'message': 'Type A: 節點名包含空格但未加引號',
                 'content': line.strip()
             })
 
-        # 檢查顏色碼污染
+        # 檢查顏色碼污染（Type B）
         if re.search(r'fill:#[0-9A-Fa-f]*Bonus', line):
             errors.append({
                 'line': absolute_line,
                 'type': 'color_pollution',
                 'severity': '🔴',
-                'message': '顏色碼被 "Bonus" 污染',
+                'message': 'Type B: 顏色碼被 "Bonus" 污染',
+                'content': line.strip()
+            })
+
+        # 檢查逗號分隔的樣式屬性（Type D）
+        if re.search(r'^\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+,', line):
+            errors.append({
+                'line': absolute_line,
+                'type': 'comma_separated_properties',
+                'severity': '🔴',
+                'message': 'Type D: 逗號分隔的樣式屬性（Mermaid 不支持）',
                 'content': line.strip()
             })
 

@@ -120,29 +120,29 @@ flowchart TD
     ACTION2 --> END
     ACTION3 --> END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style COLLECT fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style START fill:#E3F2FD
+    style COLLECT fill:#FFF9C4
 
-    style D1_FULL fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style D2_FULL fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style D3_FULL fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style D4_FULL fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style D5_FULL fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style D1_FULL fill:#C8E6C9
+    style D2_FULL fill:#C8E6C9
+    style D3_FULL fill:#C8E6C9
+    style D4_FULL fill:#C8E6C9
+    style D5_FULL fill:#C8E6C9
 
-    style D1_LOW fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style D2_ZERO fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style D3_ZERO fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style D5_LOW fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style D1_LOW fill:#FFCDD2
+    style D2_ZERO fill:#FFCDD2
+    style D3_ZERO fill:#FFCDD2
+    style D5_LOW fill:#FFCDD2
 
-    style PREMIUM fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-    style STANDARD fill:#FFC107,stroke:#F57F00,stroke-width:2px
-    style RISKY fill:#F44336,stroke:#B71C1C,stroke-width:3px,color:#FFF
+    style PREMIUM fill:#4CAF50
+    style STANDARD fill:#FFC107
+    style RISKY fill:#F44336
 
-    style ACTION1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style ACTION2 fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style ACTION3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style ACTION1 fill:#C8E6C9
+    style ACTION2 fill:#FFE082
+    style ACTION3 fill:#FFCDD2
 
-    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+    style END fill:#90A4AE
 ```
 
 **評分計算範例**:
@@ -295,33 +295,33 @@ graph TB
         CLICKHOUSE --> DASH3
     end
 
-    style DC1 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style DC2 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style DC3 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style DC1 fill:#E3F2FD
+    style DC2 fill:#E3F2FD
+    style DC3 fill:#E3F2FD
 
-    style SP1 fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style SP2 fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style SP3 fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style FLINK fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style SP1 fill:#FFF9C4
+    style SP2 fill:#FFF9C4
+    style SP3 fill:#FFF9C4
+    style FLINK fill:#FFE082
 
-    style CALC1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style CALC2 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style CALC3 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style CALC1 fill:#C8E6C9
+    style CALC2 fill:#C8E6C9
+    style CALC3 fill:#C8E6C9
 
-    style REDIS fill:#B3E5FC,stroke:#0277BD,stroke-width:2px
-    style CLICKHOUSE fill:#B3E5FC,stroke:#0277BD,stroke-width:2px
+    style REDIS fill:#B3E5FC
+    style CLICKHOUSE fill:#B3E5FC
 
-    style RULE1 fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style RULE2 fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style RULE3 fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style RULE1 fill:#FFE082
+    style RULE2 fill:#FFE082
+    style RULE3 fill:#FFE082
 
-    style ALERT1 fill:#FFD54F,stroke:#F9A825,stroke-width:2px
-    style ALERT2 fill:#FFA726,stroke:#E65100,stroke-width:2px
-    style ALERT3 fill:#EF5350,stroke:#C62828,stroke-width:2px
+    style ALERT1 fill:#FFD54F
+    style ALERT2 fill:#FFA726
+    style ALERT3 fill:#EF5350
 
-    style DASH1 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style DASH2 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style DASH3 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
+    style DASH1 fill:#CE93D8
+    style DASH2 fill:#CE93D8
+    style DASH3 fill:#CE93D8
 ```
 
 **架構說明**:
@@ -494,34 +494,34 @@ flowchart TD
     WATCH_ACTION --> MONITOR
     MONITOR --> CALC
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style CALC fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style START fill:#E3F2FD
+    style CALC fill:#FFF9C4
 
-    style SAFE fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-    style WATCH fill:#FFC107,stroke:#F57F00,stroke-width:2px
-    style CALL fill:#FF9800,stroke:#E65100,stroke-width:2px
-    style SOFT fill:#F44336,stroke:#B71C1C,stroke-width:2px,color:#FFF
-    style HARD fill:#B71C1C,stroke:#4A0000,stroke-width:3px,color:#FFF
+    style SAFE fill:#4CAF50
+    style WATCH fill:#FFC107
+    style CALL fill:#FF9800
+    style SOFT fill:#F44336
+    style HARD fill:#B71C1C
 
-    style SAFE_ACTION fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style WATCH_ACTION fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style CALL_NOTIFY fill:#FFCC80,stroke:#E65100,stroke-width:2px
+    style SAFE_ACTION fill:#C8E6C9
+    style WATCH_ACTION fill:#FFE082
+    style CALL_NOTIFY fill:#FFCC80
 
-    style SOFT_ACTION1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style SOFT_ACTION2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style SOFT_ACTION3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style SOFT_ACTION1 fill:#FFCDD2
+    style SOFT_ACTION2 fill:#FFCDD2
+    style SOFT_ACTION3 fill:#FFCDD2
 
-    style HARD_ACTION1 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
-    style HARD_ACTION2 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
-    style HARD_ACTION3 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
-    style HARD_ACTION4 fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#FFF
+    style HARD_ACTION1 fill:#D32F2F
+    style HARD_ACTION2 fill:#D32F2F
+    style HARD_ACTION3 fill:#D32F2F
+    style HARD_ACTION4 fill:#D32F2F
 
-    style LIQUIDATION fill:#E91E63,stroke:#880E4F,stroke-width:2px,color:#FFF
+    style LIQUIDATION fill:#E91E63
 
-    style LIQ_COVER fill:#66BB6A,stroke:#2E7D32,stroke-width:2px
-    style LIQ_DEFICIT fill:#EF5350,stroke:#C62828,stroke-width:2px
+    style LIQ_COVER fill:#66BB6A
+    style LIQ_DEFICIT fill:#EF5350
 
-    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+    style END fill:#90A4AE
 ```
 
 **強制平倉機制詳細說明**:

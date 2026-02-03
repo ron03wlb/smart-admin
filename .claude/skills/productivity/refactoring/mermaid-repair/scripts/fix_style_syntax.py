@@ -44,13 +44,26 @@ def clean_color_pollution(line: str) -> Tuple[str, bool]:
 
     return line, False
 
-def fix_file(file_path: Path) -> Tuple[int, int]:
-    """修復單個文件，返回 (quote_fixes, color_fixes)"""
+def fix_comma_separated_properties(line: str) -> Tuple[str, bool]:
+    """移除逗號分隔的樣式屬性（Type D 錯誤）"""
+    pattern = r'^(\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+),.*$'
+    match = re.match(pattern, line)
+
+    if match:
+        # 只保留 fill 屬性
+        fixed_line = match.group(1)
+        return fixed_line, True
+
+    return line, False
+
+def fix_file(file_path: Path) -> Tuple[int, int, int]:
+    """修復單個文件，返回 (quote_fixes, color_fixes, comma_fixes)"""
     content = file_path.read_text(encoding='utf-8')
     lines = content.split('\n')
 
     quote_fixes = 0
     color_fixes = 0
+    comma_fixes = 0
     fixed_lines = []
 
     for line in lines:
@@ -66,12 +79,18 @@ def fix_file(file_path: Path) -> Tuple[int, int]:
             color_fixes += 1
             line = fixed_line
 
+        # 嘗試修復逗號分隔屬性（Type D）
+        fixed_line, comma_fixed = fix_comma_separated_properties(line)
+        if comma_fixed:
+            comma_fixes += 1
+            line = fixed_line
+
         fixed_lines.append(line)
 
     # 寫回文件
     file_path.write_text('\n'.join(fixed_lines), encoding='utf-8')
 
-    return quote_fixes, color_fixes
+    return quote_fixes, color_fixes, comma_fixes
 
 def main():
     if len(sys.argv) != 2:
@@ -84,12 +103,13 @@ def main():
         print(f"錯誤: 文件不存在 - {file_path}")
         sys.exit(1)
 
-    quote_fixes, color_fixes = fix_file(file_path)
+    quote_fixes, color_fixes, comma_fixes = fix_file(file_path)
 
     print(f"處理文件: {file_path}")
     print(f"  節點引號修復: {quote_fixes} 處")
     print(f"  顏色碼清理: {color_fixes} 處")
-    print(f"  總計修復: {quote_fixes + color_fixes} 處")
+    print(f"  逗號分隔修復: {comma_fixes} 處")
+    print(f"  總計修復: {quote_fixes + color_fixes + comma_fixes} 處")
 
 if __name__ == '__main__':
     main()

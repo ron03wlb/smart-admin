@@ -73,28 +73,28 @@ flowchart TD
 
     QUEUE_DELAY --> END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style API fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style TEMPLATE fill:#E1BEE7,stroke:#6A1B9A,stroke-width:2px
-    style DEDUP fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style RATELIMIT fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style ROUTER fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style START fill:#E3F2FD
+    style API fill:#FFF9C4
+    style TEMPLATE fill:#E1BEE7
+    style DEDUP fill:#B2DFDB
+    style RATELIMIT fill:#B2DFDB
+    style ROUTER fill:#FFE082
 
-    style ERR1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style ERR2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style ERR3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style ERR1 fill:#FFCDD2
+    style ERR2 fill:#FFCDD2
+    style ERR3 fill:#FFCDD2
 
-    style LOG1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style LOG3 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style LOG4 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style LOG6 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style LOG1 fill:#C8E6C9
+    style LOG3 fill:#C8E6C9
+    style LOG4 fill:#C8E6C9
+    style LOG6 fill:#C8E6C9
 
-    style LOG2 fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style LOG5 fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style LOG2 fill:#FFE082
+    style LOG5 fill:#FFE082
 
-    style PERSIST fill:#90CAF9,stroke:#1565C0,stroke-width:2px
-    style MONGO fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style END fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+    style PERSIST fill:#90CAF9
+    style MONGO fill:#CE93D8
+    style END fill:#4CAF50
 ```
 
 **流程說明**:
@@ -242,34 +242,34 @@ graph TB
         WORKER --> DLQ[Dead Letter Queue<br/>Failed messages<br/>Manual review required]
     end
 
-    style API fill:#FFC107,stroke:#F57F00,stroke-width:3px,color:#000
-    style QUEUE fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style WORKER fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style API fill:#FFC107
+    style QUEUE fill:#FFE082
+    style WORKER fill:#FFE082
 
-    style A1 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style A2 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style A3 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style A4 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style A5 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style A6 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style A1 fill:#E3F2FD
+    style A2 fill:#E3F2FD
+    style A3 fill:#E3F2FD
+    style A4 fill:#E3F2FD
+    style A5 fill:#E3F2FD
+    style A6 fill:#E3F2FD
 
-    style P1_1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style P2_1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style P3_1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style P4 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style P5 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style P6 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style P1_1 fill:#C8E6C9
+    style P2_1 fill:#C8E6C9
+    style P3_1 fill:#C8E6C9
+    style P4 fill:#C8E6C9
+    style P5 fill:#C8E6C9
+    style P6 fill:#C8E6C9
 
-    style M1 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style M2 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style M3 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style M4 fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
+    style M1 fill:#CE93D8
+    style M2 fill:#CE93D8
+    style M3 fill:#CE93D8
+    style M4 fill:#CE93D8
 
-    style S1 fill:#90CAF9,stroke:#1565C0,stroke-width:2px
-    style S2 fill:#90CAF9,stroke:#1565C0,stroke-width:2px
+    style S1 fill:#90CAF9
+    style S2 fill:#90CAF9
 
-    style CB1 fill:#A5D6A7,stroke:#388E3C,stroke-width:2px
-    style DLQ fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style CB1 fill:#A5D6A7
+    style DLQ fill:#FFCDD2
 ```
 
 **架構組件詳細說明**:
@@ -438,27 +438,27 @@ flowchart TD
     M_SUCCESS2 --> END
     M_FAIL2 --> END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style TRANS fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style MARKET fill:#E1BEE7,stroke:#6A1B9A,stroke-width:2px
+    style START fill:#E3F2FD
+    style TRANS fill:#FFE082
+    style MARKET fill:#E1BEE7
 
-    style T_TG fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style T_WA fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style T_SMS fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style T_TG fill:#B2DFDB
+    style T_WA fill:#B2DFDB
+    style T_SMS fill:#FFE082
 
-    style M_PUSH fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style M_EMAIL fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style M_PUSH fill:#B2DFDB
+    style M_EMAIL fill:#FFE082
 
-    style T_SUCCESS1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style T_SUCCESS2 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style T_SUCCESS3 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style M_SUCCESS1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style M_SUCCESS2 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style T_SUCCESS1 fill:#C8E6C9
+    style T_SUCCESS2 fill:#C8E6C9
+    style T_SUCCESS3 fill:#C8E6C9
+    style M_SUCCESS1 fill:#C8E6C9
+    style M_SUCCESS2 fill:#C8E6C9
 
-    style T_FAIL fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style M_FAIL2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style T_FAIL fill:#FFCDD2
+    style M_FAIL2 fill:#FFCDD2
 
-    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+    style END fill:#90A4AE
 ```
 
 **路由策略詳細說明**:

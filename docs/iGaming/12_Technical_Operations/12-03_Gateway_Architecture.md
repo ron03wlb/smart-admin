@@ -82,23 +82,23 @@ graph TB
     KONG --> PG
     KONG --> MONITOR
 
-    style CF fill:#FF9800,stroke:#E65100,stroke-width:3px,color:#000
-    style KONG fill:#FFC107,stroke:#F57F00,stroke-width:3px,color:#000
+    style CF fill:#FF9800
+    style KONG fill:#FFC107
 
-    style R1 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style R2 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style R3 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style R4 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style R1 fill:#E3F2FD
+    style R2 fill:#E3F2FD
+    style R3 fill:#E3F2FD
+    style R4 fill:#E3F2FD
 
-    style CDN_SSR fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style API_V1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style API_V2 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style MOBILE_API fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style BACKOFFICE fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style CDN_SSR fill:#C8E6C9
+    style API_V1 fill:#C8E6C9
+    style API_V2 fill:#C8E6C9
+    style MOBILE_API fill:#C8E6C9
+    style BACKOFFICE fill:#C8E6C9
 
-    style REDIS fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style PG fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style MONITOR fill:#FFE082,stroke:#F57F00,stroke-width:2px
+    style REDIS fill:#FFE082
+    style PG fill:#FFE082
+    style MONITOR fill:#FFE082
 ```
 
 **架構說明**:
@@ -713,15 +713,15 @@ flowchart TD
     L2_CAPTCHA -->|驗證失敗| REJECT2[🚫 拒絕<br/>CAPTCHA Failed]
     L1_RATE -->|超過限流| REJECT3[🚫 丟棄<br/>Silently Drop]
 
-    style ATTACKER fill:#FF6B6B,stroke:#C92A2A,stroke-width:3px,color:#000
-    style LAYER1 fill:#FFF3E0,stroke:#E65100,stroke-width:2px
-    style LAYER2 fill:#E1F5FE,stroke:#0277BD,stroke-width:2px
-    style LAYER3 fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px
-    style LAYER4 fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
-    style ORIGIN fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-    style REJECT1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style REJECT2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style REJECT3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style ATTACKER fill:#FF6B6B
+    style LAYER1 fill:#FFF3E0
+    style LAYER2 fill:#E1F5FE
+    style LAYER3 fill:#F3E5F5
+    style LAYER4 fill:#E8F5E9
+    style ORIGIN fill:#4CAF50
+    style REJECT1 fill:#FFCDD2
+    style REJECT2 fill:#FFCDD2
+    style REJECT3 fill:#FFCDD2
 ```
 
 **防禦層詳細說明**:

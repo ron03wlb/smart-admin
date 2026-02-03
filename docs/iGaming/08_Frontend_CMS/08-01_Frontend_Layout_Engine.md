@@ -97,15 +97,15 @@ flowchart TD
 
     TRACKING --> END[前端頁面展示完成]
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style EDITOR fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style PUBLISH fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style VERSION fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style CDN fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style RENDER fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style SHOW fill:#A5D6A7,stroke:#388E3C,stroke-width:2px
-    style HIDE fill:#E0E0E0,stroke:#757575,stroke-width:1px
-    style END fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+    style START fill:#E3F2FD
+    style EDITOR fill:#FFF9C4
+    style PUBLISH fill:#FFE082
+    style VERSION fill:#C8E6C9
+    style CDN fill:#B2DFDB
+    style RENDER fill:#CE93D8
+    style SHOW fill:#A5D6A7
+    style HIDE fill:#E0E0E0
+    style END fill:#4CAF50
 ```
 
 **JSON Config 範例**:
@@ -241,17 +241,17 @@ flowchart TD
     KEEP --> END
     CONTINUE --> SPLIT
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style SPLIT fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style VARIANT_A fill:#B2DFDB,stroke:#00796B,stroke-width:2px
-    style VARIANT_B fill:#FFE082,stroke:#F57F00,stroke-width:2px
-    style EXPOSURE_A fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style EXPOSURE_B fill:#FFE0B2,stroke:#E65100,stroke-width:2px
-    style ANALYTICS fill:#CE93D8,stroke:#7B1FA2,stroke-width:2px
-    style WINNER_B fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-    style WINNER_A fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-    style NO_WINNER fill:#FFC107,stroke:#F57F00,stroke-width:2px
-    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+    style START fill:#E3F2FD
+    style SPLIT fill:#FFF9C4
+    style VARIANT_A fill:#B2DFDB
+    style VARIANT_B fill:#FFE082
+    style EXPOSURE_A fill:#C8E6C9
+    style EXPOSURE_B fill:#FFE0B2
+    style ANALYTICS fill:#CE93D8
+    style WINNER_B fill:#4CAF50
+    style WINNER_A fill:#4CAF50
+    style NO_WINNER fill:#FFC107
+    style END fill:#90A4AE
 ```
 
 **A/B 測試實施細節**:

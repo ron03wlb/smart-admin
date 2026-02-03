@@ -115,28 +115,28 @@ flowchart TD
 
     L1_ERROR --> END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style L1_START fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style L2_START fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style L3_START fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
-    style L4_START fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style START fill:#E3F2FD
+    style L1_START fill:#FFF9C4
+    style L2_START fill:#FFF9C4
+    style L3_START fill:#FFF9C4
+    style L4_START fill:#FFF9C4
 
-    style L1_OUTPUT fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style L2_OUTPUT fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style L3_ALLOW fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style FINAL_ALLOW fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+    style L1_OUTPUT fill:#C8E6C9
+    style L2_OUTPUT fill:#C8E6C9
+    style L3_ALLOW fill:#C8E6C9
+    style FINAL_ALLOW fill:#4CAF50
 
-    style L1_ERROR fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L3_DENY1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L3_DENY2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L3_DENY3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L4_DENY1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L4_DENY2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L4_DENY3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style L4_DENY4 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style FINAL_DENY fill:#F44336,stroke:#B71C1C,stroke-width:3px,color:#FFF
+    style L1_ERROR fill:#FFCDD2
+    style L3_DENY1 fill:#FFCDD2
+    style L3_DENY2 fill:#FFCDD2
+    style L3_DENY3 fill:#FFCDD2
+    style L4_DENY1 fill:#FFCDD2
+    style L4_DENY2 fill:#FFCDD2
+    style L4_DENY3 fill:#FFCDD2
+    style L4_DENY4 fill:#FFCDD2
+    style FINAL_DENY fill:#F44336
 
-    style END fill:#E0E0E0,stroke:#616161,stroke-width:2px
+    style END fill:#E0E0E0
 ```
 
 **流程說明**:
@@ -189,17 +189,17 @@ graph TD
     RM --> RA
     MM --> MS
 
-    style SA fill:#FF6B6B,stroke:#C92A2A,stroke-width:3px,color:#FFF
-    style PA fill:#FFA94D,stroke:#E67700,stroke-width:2px,color:#000
-    style TO fill:#FFD93D,stroke:#E8B600,stroke-width:2px,color:#000
-    style FM fill:#6BCF7F,stroke:#37B24D,stroke-width:2px,color:#000
-    style CSM fill:#6BCF7F,stroke:#37B24D,stroke-width:2px,color:#000
-    style RM fill:#6BCF7F,stroke:#37B24D,stroke-width:2px,color:#000
-    style MM fill:#6BCF7F,stroke:#37B24D,stroke-width:2px,color:#000
-    style F fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
-    style CSA fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
-    style RA fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
-    style MS fill:#A3E4D7,stroke:#16A085,stroke-width:1px,color:#000
+    style SA fill:#FF6B6B
+    style PA fill:#FFA94D
+    style TO fill:#FFD93D
+    style FM fill:#6BCF7F
+    style CSM fill:#6BCF7F
+    style RM fill:#6BCF7F
+    style MM fill:#6BCF7F
+    style F fill:#A3E4D7
+    style CSA fill:#A3E4D7
+    style RA fill:#A3E4D7
+    style MS fill:#A3E4D7
 ```
 
 **圖表說明**:
@@ -295,20 +295,20 @@ flowchart TD
     RESULT_ALLOW2 --> END
     RESULT_ALLOW3 --> END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style COLLECT fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style START fill:#E3F2FD
+    style COLLECT fill:#FFF9C4
 
-    style RESULT_DENY1 fill:#FFCDD2,stroke:#C62828,stroke-width:3px,color:#000
-    style RESULT_DENY2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style RESULT_DENY3 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style RESULT_DENY4 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style RESULT_DENY5 fill:#E0E0E0,stroke:#757575,stroke-width:2px
+    style RESULT_DENY1 fill:#FFCDD2
+    style RESULT_DENY2 fill:#FFCDD2
+    style RESULT_DENY3 fill:#FFCDD2
+    style RESULT_DENY4 fill:#FFCDD2
+    style RESULT_DENY5 fill:#E0E0E0
 
-    style RESULT_ALLOW1 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style RESULT_ALLOW2 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style RESULT_ALLOW3 fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    style RESULT_ALLOW1 fill:#C8E6C9
+    style RESULT_ALLOW2 fill:#C8E6C9
+    style RESULT_ALLOW3 fill:#C8E6C9
 
-    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+    style END fill:#90A4AE
 ```
 
 **衝突解析優先級 (Priority Levels)**:
@@ -534,24 +534,24 @@ flowchart TD
     DENY_SENSITIVITY --> END
     SUCCESS --> END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style LOAD fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+    style START fill:#E3F2FD
+    style LOAD fill:#FFF9C4
 
-    style DENY_TIME fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_DAY fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_IP fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_GEO fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_MFA fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_OWNERSHIP fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_DEPT fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_EMPLOYMENT fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_SOURCE fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style DENY_SENSITIVITY fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    style DENY_TIME fill:#FFCDD2
+    style DENY_DAY fill:#FFCDD2
+    style DENY_IP fill:#FFCDD2
+    style DENY_GEO fill:#FFCDD2
+    style DENY_MFA fill:#FFCDD2
+    style DENY_OWNERSHIP fill:#FFCDD2
+    style DENY_DEPT fill:#FFCDD2
+    style DENY_EMPLOYMENT fill:#FFCDD2
+    style DENY_SOURCE fill:#FFCDD2
+    style DENY_SENSITIVITY fill:#FFCDD2
 
-    style ALL_PASSED fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style SUCCESS fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+    style ALL_PASSED fill:#C8E6C9
+    style SUCCESS fill:#4CAF50
 
-    style END fill:#90A4AE,stroke:#455A64,stroke-width:2px
+    style END fill:#90A4AE
 ```
 
 **ABAC 條件類型與範例**:

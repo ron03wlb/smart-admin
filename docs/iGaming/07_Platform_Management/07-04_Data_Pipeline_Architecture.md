@@ -343,7 +343,7 @@ flowchart TD
     style NRT_HYBRID fill:#FFF9C4
     style BATCH_SPARK fill:#BBDEFB
     style BATCH_OPTIMIZE fill:#B2DFDB
-    style RT_REJECT fill:#FF5252,color:#FFF
+    style RT_REJECT fill:#FF5252
     style IMPL_EXAMPLE fill:#E8F5E9
 ```
 

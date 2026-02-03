@@ -185,11 +185,11 @@ flowchart LR
     C -->|3. Pull Origin| D[Cloudflare CDN]
     E[前端應用] -->|4. Fetch JSON| D
 
-    style A fill:#333,stroke:#fff,color:#fff
-    style B fill:#333366,stroke:#ccccff,color:#fff
-    style C fill:#888888,stroke:#ffffff,color:#fff
-    style D fill:#666666,stroke:#ffffff,color:#fff
-    style E fill:#333,stroke:#fff,color:#fff
+    style A fill:#333
+    style B fill:#333366
+    style C fill:#888888
+    style D fill:#666666
+    style E fill:#333
 ```
 
 **URL 格式**:

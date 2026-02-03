@@ -66,15 +66,15 @@ flowchart TD
     ROLLBACK3 --> INCIDENT[創建故障事件<br/>PagerDuty + PostMortem]
     INCIDENT --> FAIL_END
 
-    style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style DEPLOY fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style SWITCH fill:#FFC107,stroke:#F57F00,stroke-width:3px,color:#000
-    style VALIDATE fill:#4CAF50,stroke:#1B5E20,stroke-width:2px
-    style END fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
-    style ROLLBACK1 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style ROLLBACK2 fill:#FFCDD2,stroke:#C62828,stroke-width:2px
-    style ROLLBACK3 fill:#FF6B6B,stroke:#C92A2A,stroke-width:3px,color:#FFF
-    style FAIL_END fill:#B0BEC5,stroke:#455A64,stroke-width:2px
+    style START fill:#E3F2FD
+    style DEPLOY fill:#C8E6C9
+    style SWITCH fill:#FFC107
+    style VALIDATE fill:#4CAF50
+    style END fill:#4CAF50
+    style ROLLBACK1 fill:#FFCDD2
+    style ROLLBACK2 fill:#FFCDD2
+    style ROLLBACK3 fill:#FF6B6B
+    style FAIL_END fill:#B0BEC5
 ```
 
 **藍綠部署優勢**:

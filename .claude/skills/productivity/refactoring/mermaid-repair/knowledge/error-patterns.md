@@ -330,20 +330,174 @@ sequenceDiagram
 
 ---
 
-## Type D: 換行符錯誤（SmartAdmin 特殊）
+## Type D: 逗號分隔的樣式屬性
 
 ### 基本信息
 
 | 項目 | 詳情 |
 |------|------|
-| **嚴重性** | 🔴 高（SmartAdmin 環境）|
+| **嚴重性** | 🔴 高 |
+| **影響圖表** | flowchart, graph, sequenceDiagram |
+| **發現日期** | 2026-02-03 |
+| **修復難度** | 低（自動化修復） |
+
+### 錯誤描述
+
+Mermaid 不支持在單個 `style` 語句中使用逗號分隔多個樣式屬性。雖然 CSS 允許這種寫法，但 Mermaid 解析器無法正確處理，導致樣式完全失效或解析錯誤。
+
+### 錯誤模式
+
+```mermaid
+# ❌ 錯誤模式 1: fill + stroke + stroke-width
+style NODE fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+
+# ❌ 錯誤模式 2: fill + color
+style PREMIUM fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+
+# ❌ 錯誤模式 3: 多個逗號分隔屬性
+style ACTION fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+```
+
+### 正確寫法
+
+```mermaid
+# ✅ 正確模式 1: 只保留 fill（推薦）
+style NODE fill:#E3F2FD
+
+# ✅ 正確模式 2: 只保留 fill
+style PREMIUM fill:#4CAF50
+
+# ✅ 正確模式 3: 只保留 fill
+style ACTION fill:#C8E6C9
+```
+
+### 為什麼只保留 fill
+
+根據 Mermaid 文檔和實際測試：
+- `stroke` 和 `stroke-width` 屬性在大多數情況下不被支持或效果不一致
+- `color` 屬性可能與 `fill` 衝突
+- **最佳實踐**：只使用 `fill` 屬性設置節點背景色，簡單且可靠
+
+### 檢測正則表達式
+
+**基礎版**：
+```regex
+^\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+,
+```
+
+**精確版**（匹配所有逗號分隔屬性）：
+```regex
+^\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+,(\w+:[^,\s]+,?)*
+```
+
+### 自動修復算法
+
+```python
+import re
+
+def fix_comma_separated_properties(line: str) -> str:
+    """移除逗號分隔的樣式屬性"""
+    pattern = r'^(\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+),.*$'
+    match = re.match(pattern, line)
+
+    if match:
+        # 只保留 fill 屬性
+        return match.group(1)
+
+    return line
+```
+
+### 真實案例
+
+#### 案例 1: 05-02_Agent_Credit_Risk.md（60 處）
+
+**文件**: `docs/iGaming/05_Risk_Management/05-02_Agent_Credit_Risk.md`
+**行號**: 123-524（分散在多個 Mermaid 圖表中）
+
+**修復前**:
+```mermaid
+style START fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+style COLLECT fill:#FFF9C4,stroke:#F57F17,stroke-width:2px
+style D1_FULL fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+style PREMIUM fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#FFF
+```
+
+**修復後**:
+```mermaid
+style START fill:#E3F2FD
+style COLLECT fill:#FFF9C4
+style D1_FULL fill:#C8E6C9
+style PREMIUM fill:#4CAF50
+```
+
+**影響**: 修復前樣式可能不生效或顯示不一致
+
+---
+
+#### 案例 2: 07-03_Notification_Architecture.md（57 處）
+
+**文件**: `docs/iGaming/07_Platform_Management/07-03_Notification_Architecture.md`
+**錯誤數**: 57
+
+**典型模式**:
+```mermaid
+# 修復前
+style KAFKA fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px
+style REDIS fill:#339AF0,stroke:#1864AB,stroke-width:2px
+
+# 修復後
+style KAFKA fill:#FF6B6B
+style REDIS fill:#339AF0
+```
+
+---
+
+#### 案例 3: 09-01_Admin_RBAC.md（56 處）
+
+**文件**: `docs/iGaming/09_System_Security/09-01_Admin_RBAC.md`
+**錯誤數**: 56
+
+**複雜模式**:
+```mermaid
+# 修復前
+style ADMIN fill:#E91E63,stroke:#880E4F,stroke-width:2px,color:#FFF
+style USER fill:#2196F3,stroke:#0D47A1,stroke-width:2px
+
+# 修復後
+style ADMIN fill:#E91E63
+style USER fill:#2196F3
+```
+
+---
+
+### 統計數據（Phase 6 修復）
+
+| 文件優先級 | 文件數 | 錯誤數 | 狀態 |
+|-----------|-------|-------|------|
+| 高優先級 | 3 | 173 | ✅ 已修復 |
+| 中優先級 | 3 | 52 | ✅ 已修復 |
+| 低優先級 | 5 | 15 | ✅ 已修復 |
+| **總計** | **11** | **240** | ✅ 已修復 |
+
+**修復日期**: 2026-02-03
+**修復工具**: fix_style_syntax.py v1.1.0（添加 Type D 支持）
+
+---
+
+## Type E: 換行符規範（SmartAdmin 特殊）
+
+### 基本信息
+
+| 項目 | 詳情 |
+|------|------|
+| **嚴重性** | 🟢 低（環境特殊性，非錯誤）|
 | **影響圖表** | 所有圖表類型 |
 | **發現日期** | 2026-02-03 |
 | **修復難度** | 低（全域替換） |
 
-### 錯誤描述
+### 錯誤描述（注意：這不是錯誤，而是環境差異）
 
-SmartAdmin 的渲染環境需要 `<br/>` HTML 標籤進行換行，而非標準 Mermaid 的 `\n` 轉義字符。這與標準 Mermaid 規範相反。
+SmartAdmin 的渲染環境需要 `<br/>` HTML 標籤進行換行，而非標準 Mermaid 的 `\n` 轉義字符。這與標準 Mermaid 規範相反，但對 SmartAdmin 項目來說是**正確的寫法**。
 
 ### 錯誤模式（在 SmartAdmin 中）
 
@@ -419,6 +573,17 @@ def detect_all_errors(content: str) -> List[Dict]:
                 'content': line.strip()
             })
 
+    # Type D: 逗號分隔的樣式屬性
+    for line_num, line in enumerate(content.split('\n'), 1):
+        if re.search(r'^\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+,', line):
+            errors.append({
+                'type': 'D',
+                'line': line_num,
+                'severity': '🔴',
+                'description': '逗號分隔的樣式屬性（Mermaid 不支持）',
+                'content': line.strip()
+            })
+
     return errors
 ```
 
@@ -428,13 +593,35 @@ def detect_all_errors(content: str) -> List[Dict]:
 
 ### 2026-02-03 修復統計
 
+#### Phase 1-4（已完成）
+
 | 錯誤類型 | 實例數 | 文件數 | 修復成功率 |
 |---------|-------|-------|-----------|
 | Type A | 7 | 2 | 100% |
 | Type B | 5 | 3 | 100% |
 | Type C | 0 | 0 | N/A |
-| Type D | 0 | 0 | 已遵循規範 |
-| **總計** | **12** | **4** | **100%** |
+| **Phase 1-4 小計** | **12** | **4** | **100%** |
+
+#### Phase 6（已完成）
+
+| 錯誤類型 | 實例數 | 文件數 | 修復成功率 |
+|---------|-------|-------|-----------|
+| Type D | 240 | 11 | 100% |
+
+#### 總計（Phase 1-6）
+
+| 階段 | 錯誤數 | 文件數 | 修復成功率 |
+|------|-------|-------|-----------|
+| Phase 1-4 | 12 | 4 | 100% |
+| Phase 6 | 240 | 11 | 100% |
+| **總計** | **252** | **15**（不含重複） | **100%** |
+
+#### Type E（SmartAdmin 環境差異）
+
+| 項目 | 數值 | 狀態 |
+|------|------|------|
+| `<br/>` 使用實例 | 1,421 | ✅ 符合 SmartAdmin 規範 |
+| `\n` 錯誤實例 | 0 | ✅ 無違規 |
 
 ---
 
@@ -455,9 +642,9 @@ def detect_all_errors(content: str) -> List[Dict]:
 
 ### 3. 修復優先級
 
-1. 🔴 高優先級：Type A, B（阻塞渲染）
+1. 🔴 高優先級：Type A, B, D（阻塞渲染或樣式失效）
 2. 🟡 中優先級：Type C（潛在問題）
-3. 🟢 低優先級：格式化優化
+3. 🟢 低優先級：Type E（環境差異，格式化優化）
 
 ---
 

@@ -363,13 +363,13 @@ flowchart TD
     style OVER_PAYMENT fill:#FFF9C4
     style SHORT_PAYMENT fill:#FFCDD2
     style AMOUNT_DIFF fill:#E1BEE7
-    style CRITICAL_ALERT fill:#FF5252,color:#FFF
-    style CONFIRMED_FRAUD fill:#D32F2F,color:#FFF
+    style CRITICAL_ALERT fill:#FF5252
+    style CONFIRMED_FRAUD fill:#D32F2F
     style AUTO_APPROVE_AMOUNT fill:#C8E6C9
     style AUTO_SUPPLEMENT fill:#C8E6C9
     style FREEZE_ACCOUNT fill:#FF6B6B
     style ROLLBACK_FRAUD fill:#FF6B6B
-    style REPORT_TO_POLICE fill:#B71C1C,color:#FFF
+    style REPORT_TO_POLICE fill:#B71C1C
 ```
 
 **異常處理分級矩陣表**：

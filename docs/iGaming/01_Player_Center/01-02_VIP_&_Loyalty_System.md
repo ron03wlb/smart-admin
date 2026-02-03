@@ -258,11 +258,11 @@ graph TD
 
     COMPARISON --> VALUE_PROP[核心價值主張<br/>━━━━━━━━━━━━━━━━━━<br/>Bronze: 基礎體驗,低門檻<br/>Silver: 開始感受 VIP 待遇<br/>Gold: 顯著權益提升,VIP 經理<br/>Platinum: 頂級服務,優先通道<br/>Diamond: 極致奢華,無限可能]
 
-    style BRONZE fill:#CD7F32,color:#FFF
-    style SILVER fill:#C0C0C0,color:#000
-    style GOLD fill:#FFD700,color:#000
-    style PLATINUM fill:#E5E4E2,color:#000
-    style DIAMOND fill:#B9F2FF,color:#000
+    style BRONZE fill:#CD7F32
+    style SILVER fill:#C0C0C0
+    style GOLD fill:#FFD700
+    style PLATINUM fill:#E5E4E2
+    style DIAMOND fill:#B9F2FF
     style COMPARISON fill:#E8F5E9
     style ROI_TABLE fill:#FFF9C4
     style VALUE_PROP fill:#E1BEE7

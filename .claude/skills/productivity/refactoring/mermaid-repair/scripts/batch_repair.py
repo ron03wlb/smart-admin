@@ -39,15 +39,18 @@ def repair_file(file_path: Path, script_path: Path) -> Dict:
             import re
             quote_match = re.search(r'節點引號修復: (\d+)', result.stdout)
             color_match = re.search(r'顏色碼清理: (\d+)', result.stdout)
+            comma_match = re.search(r'逗號分隔修復: (\d+)', result.stdout)
 
             quote_fixes = int(quote_match.group(1)) if quote_match else 0
             color_fixes = int(color_match.group(1)) if color_match else 0
+            comma_fixes = int(comma_match.group(1)) if comma_match else 0
 
-            if quote_fixes + color_fixes > 0:
+            if quote_fixes + color_fixes + comma_fixes > 0:
                 return {
                     'status': 'modified',
                     'quote_fixes': quote_fixes,
                     'color_fixes': color_fixes,
+                    'comma_fixes': comma_fixes,
                     'file': file_path
                 }
             else:
@@ -92,6 +95,7 @@ def main():
 
     total_quote_fixes = 0
     total_color_fixes = 0
+    total_comma_fixes = 0
 
     for idx, file_path in enumerate(all_files, 1):
         print(f"[{idx}/{total_files}] 處理: {file_path.relative_to(directory)}")
@@ -102,7 +106,8 @@ def main():
             results['modified'].append(result)
             total_quote_fixes += result['quote_fixes']
             total_color_fixes += result['color_fixes']
-            print(f"  [OK] {result['quote_fixes']} 引號 + {result['color_fixes']} 顏色")
+            total_comma_fixes += result['comma_fixes']
+            print(f"  [OK] {result['quote_fixes']} 引號 + {result['color_fixes']} 顏色 + {result['comma_fixes']} 逗號")
         elif result['status'] == 'error':
             results['errors'].append(result)
             print(f"  [ERROR] {result['error']}")
@@ -119,6 +124,7 @@ def main():
     print(f"已修改檔案: {len(results['modified'])}")
     print(f"  節點引號修復: {total_quote_fixes} 處")
     print(f"  顏色碼清理: {total_color_fixes} 處")
+    print(f"  逗號分隔修復: {total_comma_fixes} 處")
     print(f"無需修改: {len(results['skipped'])}")
     print(f"錯誤: {len(results['errors'])}\n")
 
@@ -126,7 +132,7 @@ def main():
         print("修改的檔案清單:")
         for result in results['modified']:
             rel_path = result['file'].relative_to(directory)
-            print(f"  - {rel_path} ({result['quote_fixes']} 引號 + {result['color_fixes']} 顏色)")
+            print(f"  - {rel_path} ({result['quote_fixes']} 引號 + {result['color_fixes']} 顏色 + {result['comma_fixes']} 逗號)")
 
     if results['errors']:
         print("\n錯誤檔案清單:")

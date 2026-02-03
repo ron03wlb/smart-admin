@@ -212,7 +212,7 @@ flowchart TD
     style SUCCESS fill:#C8E6C9
     style SKIP_RULE fill:#FFE082
     style RISK_REJECT fill:#FFCDD2
-    style BUDGET_EXHAUSTED fill:#FF9800,color:#FFF
+    style BUDGET_EXHAUSTED fill:#FF9800
     style RISK_MANUAL fill:#FFF9C4
 ```
 
