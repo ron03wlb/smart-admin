@@ -46,6 +46,7 @@ dependencies {
 
         // JetCache - Multi-level cache
         api("com.alicp.jetcache:jetcache-starter-redis:2.7.7")
+        api("com.alicp.jetcache:jetcache-starter-redis-lettuce:2.7.7")
         api("com.alicp.jetcache:jetcache-anno:2.7.7")
 
         // ===================================================================
@@ -97,6 +98,9 @@ dependencies {
 
         // Apache Commons IO
         api("commons-io:commons-io:2.18.0")
+
+        // Apache Tika (MIME type detection)
+        api("org.apache.tika:tika-core:3.1.0")
 
         // Guava
         api("com.google.guava:guava:33.4.0-jre")

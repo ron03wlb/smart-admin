@@ -37,7 +37,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ConditionalOnClass(GlobalCacheConfig.class)
 @EnableMethodCache(basePackages = "net.lab1024.sa")
 @EnableCreateCacheAnnotation
-@ComponentScan(basePackages = "net.lab1024.sa.foundation.cache")
+@ComponentScan(basePackages = "net.lab1024.sa.common.cache")
 public class JetCacheAutoConfiguration {
 
   @Value("${spring.data.redis.host:127.0.0.1}")

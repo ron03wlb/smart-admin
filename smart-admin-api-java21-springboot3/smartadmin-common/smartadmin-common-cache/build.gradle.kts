@@ -2,31 +2,33 @@ plugins {
     `java-library`
 }
 
-description = "SmartAdmin Common Cache - Cache abstraction and JetCache integration"
+description = "SmartAdmin Common Cache - Multi-level cache utilities (JetCache + Caffeine)"
 
 dependencies {
     // BOM 依賴管理
     api(platform(project(":smartadmin-common:smartadmin-common-bom")))
 
-    // Core utilities
-    api(project(":smartadmin-common:smartadmin-common-core"))
+    // Spring Boot Autoconfigure
+    api("org.springframework.boot:spring-boot-autoconfigure")
 
-    // JetCache - Multi-level cache
-    api("com.alicp.jetcache:jetcache-starter-redis")
-    api("com.alicp.jetcache:jetcache-anno")
+    // JetCache - Redis with Lettuce (recommended for Spring Boot 3)
+    api("com.alicp.jetcache:jetcache-starter-redis-lettuce")
 
-    // Spring Context
-    compileOnly("org.springframework:spring-context")
-    compileOnly("org.springframework.boot:spring-boot")
+    // Vavr (for Option)
+    api("io.vavr:vavr")
+
+    // Caffeine - Local cache for two-level caching (version managed by Spring Boot BOM)
+    api("com.github.ben-manes.caffeine:caffeine") {
+        exclude(group = "com.google.errorprone", module = "error_prone_annotations")
+    }
 
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    // SLF4J Logging
-    api("org.slf4j:slf4j-api")
+    // SpotBugs Annotations
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.6")
 
     // Testing
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

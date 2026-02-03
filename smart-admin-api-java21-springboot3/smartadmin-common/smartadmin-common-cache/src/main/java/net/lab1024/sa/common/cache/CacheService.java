@@ -1,4 +1,4 @@
-package net.lab1024.sa.foundation.cache;
+package net.lab1024.sa.common.cache;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
