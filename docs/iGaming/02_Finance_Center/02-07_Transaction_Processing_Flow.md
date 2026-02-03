@@ -261,31 +261,31 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING: Try Phase\n(Freeze Resources)
+    [*] --> PENDING: Try Phase<br/>(Freeze Resources)
 
-    PENDING --> CONFIRMING: Confirm Request\n(Game Round Completed)
-    CONFIRMING --> CONFIRMED: Debit Success\n(Update Balance + Log)
+    PENDING --> CONFIRMING: Confirm Request<br/>(Game Round Completed)
+    CONFIRMING --> CONFIRMED: Debit Success<br/>(Update Balance + Log)
 
-    PENDING --> CANCELLING: Cancel Request\n(Timeout / Round Failed)
-    CANCELLING --> CANCELLED: Rollback Success\n(Release Frozen)
+    PENDING --> CANCELLING: Cancel Request<br/>(Timeout / Round Failed)
+    CANCELLING --> CANCELLED: Rollback Success<br/>(Release Frozen)
 
-    PENDING --> EXPIRED: Timeout\n(expires_at < NOW)
-    EXPIRED --> CANCELLING: Recovery Job\n(Auto Cancel)
+    PENDING --> EXPIRED: Timeout<br/>(expires_at < NOW)
+    EXPIRED --> CANCELLING: Recovery Job<br/>(Auto Cancel)
 
-    PENDING --> PENDING: Retry Try\n(Idempotent - Same UUID)
-    CONFIRMING --> CONFIRMED: Retry Confirm\n(Idempotent)
-    CANCELLING --> CANCELLED: Retry Cancel\n(Idempotent)
+    PENDING --> PENDING: Retry Try<br/>(Idempotent - Same UUID)
+    CONFIRMING --> CONFIRMED: Retry Confirm<br/>(Idempotent)
+    CANCELLING --> CANCELLED: Retry Cancel<br/>(Idempotent)
 
-    CONFIRMED --> [*]: Settlement\n(T+1 Batch)
-    CANCELLED --> [*]: Cleanup\n(Archive)
+    CONFIRMED --> [*]: Settlement<br/>(T+1 Batch)
+    CANCELLED --> [*]: Cleanup<br/>(Archive)
 
-    note right of PENDING : Status: PENDING\nexpires_at: NOW() + 5min\nfrozen_bonus: +20\nfrozen_cash: +30\nfrozen_credit: +50
+    note right of PENDING : Status: PENDING<br/>expires_at: NOW() + 5min<br/>frozen_bonus: +20<br/>frozen_cash: +30<br/>frozen_credit: +50
 
-    note right of CONFIRMED : Status: CONFIRMED\nconfirmed_at: timestamp\nbalance updated\noutbox event sent\nversion += 1
+    note right of CONFIRMED : Status: CONFIRMED<br/>confirmed_at: timestamp<br/>balance updated<br/>outbox event sent<br/>version += 1
 
-    note right of CANCELLED : Status: CANCELLED\ncancelled_at: timestamp\nreason: TIMEOUT | ROUND_FAILED\nfrozen resources released
+    note right of CANCELLED : Status: CANCELLED<br/>cancelled_at: timestamp<br/>reason: TIMEOUT | ROUND_FAILED<br/>frozen resources released
 
-    note right of EXPIRED : Scheduled Job Trigger:\nSELECT * FROM tcc_transaction\nWHERE status='PENDING'\nAND expires_at < NOW()
+    note right of EXPIRED : Scheduled Job Trigger:<br/>SELECT * FROM tcc_transaction<br/>WHERE status='PENDING'<br/>AND expires_at < NOW()
 ```
 
 **狀態轉換規則**:

@@ -34,7 +34,7 @@ Grab 公司的 Griffin 反欺詐規則引擎每日處理數十億預測，峰值
 ```mermaid
 graph TB
     subgraph "Data Collection Layer - 數據採集層"
-        A1["Player Actions\n點擊流、會話、設備指紋"] --> K1["Kafka: player-events\nTPS: 10k+"]
+        A1["Player Actions<br/>點擊流、會話、設備指紋"] --> K1["Kafka: player-events\nTPS: 10k+"]
         A2["Transaction Events\n存提款、投注、獎金"] --> K2["Kafka: transaction-events\nTPS: 5k+"]
         A3["Game Events\n遊戲回合、結果、RTP"] --> K3["Kafka: game-events\nTPS: 20k+"]
         A4["Device Fingerprint\nCanvas、WebGL、Audio\n65k+ data points"] --> K1
@@ -185,10 +185,10 @@ flowchart LR
 
     AGG --> DECISION{Total Risk Score?}
 
-    DECISION -->|>= 86\nCRITICAL| ACTION1["🔴 Auto Block\n━━━━━━━━━━━━━━\n• Freeze Account\n• Notify CS Team\n• Log to Audit\n• Refund Investigation"]
-    DECISION -->|61-85\nHIGH| ACTION2["🟡 Manual Review\n━━━━━━━━━━━━━━\n• Add to Review Queue\n• ETA: 2 hours\n• Notify Player\n• Suspend High-Risk Actions"]
-    DECISION -->|31-60\nMEDIUM| ACTION3["🟡 Enhanced Monitoring\n━━━━━━━━━━━━━━\n• 30-day watch period\n• Velocity limits applied\n• Grey List\n• Daily threshold reduced"]
-    DECISION -->|0-30\nLOW| ACTION4["🟢 Allow\n━━━━━━━━━━━━━━\n• Normal Flow\n• Log Event\n• Update Player Profile"]
+    DECISION -->|>= 86<br/>CRITICAL| ACTION1["🔴 Auto Block\n━━━━━━━━━━━━━━\n• Freeze Account\n• Notify CS Team\n• Log to Audit\n• Refund Investigation"]
+    DECISION -->|61-85<br/>HIGH| ACTION2["🟡 Manual Review\n━━━━━━━━━━━━━━\n• Add to Review Queue\n• ETA: 2 hours\n• Notify Player\n• Suspend High-Risk Actions"]
+    DECISION -->|31-60<br/>MEDIUM| ACTION3["🟡 Enhanced Monitoring\n━━━━━━━━━━━━━━\n• 30-day watch period\n• Velocity limits applied\n• Grey List\n• Daily threshold reduced"]
+    DECISION -->|0-30<br/>LOW| ACTION4["🟢 Allow\n━━━━━━━━━━━━━━\n• Normal Flow\n• Log Event\n• Update Player Profile"]
 
     ACTION1 --> END1[End - Blocked]
     ACTION2 --> END2[End - Review]
@@ -612,26 +612,26 @@ sequenceDiagram
         Risk Engine->>Rule Engine (LiteFlow): executeChain(WITHDRAWAL_CHECK)
         activate Rule Engine (LiteFlow)
 
-        Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Check Blacklist\n(Redis lookup)
+        Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Check Blacklist<br/>(Redis lookup)
         alt Blacklist Hit
             Rule Engine (LiteFlow)-->>Risk Engine: {blocked: true, score: 100, reason: BLACKLIST}
         else Not in Blacklist
-            Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Velocity Check\n(5 withdrawals/hour?)
-            Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Turnover Check\n(Met 1x requirement?)
-            Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Device Check\n(Shared device > 5?)
+            Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Velocity Check<br/>(5 withdrawals/hour?)
+            Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Turnover Check<br/>(Met 1x requirement?)
+            Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Device Check<br/>(Shared device > 5?)
             Rule Engine (LiteFlow)-->>Risk Engine: {rule_score: 45, factors: [...]}
         end
         deactivate Rule Engine (LiteFlow)
 
         Risk Engine->>ML Model: predictFraud(features)
         activate ML Model
-        ML Model->>ML Model: Isolation Forest\nAnomaly Detection
+        ML Model->>ML Model: Isolation Forest<br/>Anomaly Detection
         ML Model-->>Risk Engine: {ml_score: 65, probability: 0.72}
         deactivate ML Model
 
         Risk Engine->>Neo4j Graph: MATCH (p:Player {id: $playerId})-[:SHARES*1..3]-(linked)
         activate Neo4j Graph
-        Neo4j Graph->>Neo4j Graph: BFS Depth 3\nFind Connected Accounts
+        Neo4j Graph->>Neo4j Graph: BFS Depth 3<br/>Find Connected Accounts
         Neo4j Graph-->>Risk Engine: {cluster_size: 4, graph_score: 40}
         deactivate Neo4j Graph
     end
@@ -650,7 +650,7 @@ sequenceDiagram
 
         Finance Service->>Finance Service: UPDATE withdrawal SET status=REJECTED
         Finance Service-->>API Gateway: 403 Forbidden {message: "High Risk Detected"}
-        API Gateway-->>Player: ❌ Withdrawal Rejected\n(Under Investigation)
+        API Gateway-->>Player: ❌ Withdrawal Rejected<br/>(Under Investigation)
 
         Kafka->>CS Queue: Add Manual Review Task (High Priority)
 
@@ -660,7 +660,7 @@ sequenceDiagram
 
         Finance Service->>Finance Service: UPDATE withdrawal SET status=PENDING_REVIEW
         Finance Service-->>API Gateway: 202 Accepted {message: "Under Manual Review"}
-        API Gateway-->>Player: 🟡 Withdrawal Pending\n(ETA: 2 hours)
+        API Gateway-->>Player: 🟡 Withdrawal Pending<br/>(ETA: 2 hours)
 
         Kafka->>CS Queue: Add Review Task (Normal Priority)
 
@@ -668,9 +668,9 @@ sequenceDiagram
         Risk Engine->>Kafka: publish(risk.player.flagged, {playerId, score: 45})
         Risk Engine-->>Finance Service: {approved: true, risk_level: MEDIUM, action: MONITOR, monitoring_days: 30}
 
-        Finance Service->>Finance Service: UPDATE withdrawal SET status=APPROVED\nADD player_monitoring (duration: 30 days)
+        Finance Service->>Finance Service: UPDATE withdrawal SET status=APPROVED<br/>ADD player_monitoring (duration: 30 days)
         Finance Service-->>API Gateway: 200 OK {message: "Withdrawal Approved"}
-        API Gateway-->>Player: 🟢 Withdrawal Approved\n(Enhanced Monitoring)
+        API Gateway-->>Player: 🟢 Withdrawal Approved<br/>(Enhanced Monitoring)
 
     else Score 0-30 (Allow)
         Risk Engine->>Kafka: publish(risk.validation.passed, {playerId, score: 15})

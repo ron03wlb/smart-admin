@@ -70,8 +70,8 @@ graph TD
     D6 -->|不匹配| ERR6[Error: USER_MISMATCH]
 
     %% Result API 驗證流程
-    E -->|短週期\n老虎機/輪盤| G[必須驗證 Token]
-    E -->|長週期\n體育/撲克| H{Token 狀態?}
+    E -->|短週期<br/>老虎機/輪盤| G[必須驗證 Token]
+    E -->|長週期<br/>體育/撲克| H{Token 狀態?}
 
     G --> G1{Token 解析}
     G1 -->|成功| G2{簽名驗證}
@@ -83,7 +83,7 @@ graph TD
     H -->|過期| J{檢查 Bet 記錄}
     H -->|解析失敗| ERR1
 
-    J -->|Bet 存在\n且未結算| K["放寬驗證\n使用 round_id 驗證"]
+    J -->|Bet 存在<br/>且未結算| K["放寬驗證\n使用 round_id 驗證"]
     J -->|Bet 不存在| L[拒絕請求]
     J -->|Bet 已結算| ERR7[Error: BET_ALREADY_SETTLED]
 
@@ -536,18 +536,18 @@ sequenceDiagram
 
     Note over API: Layer 1 失效,進入 Layer 2
 
-    API->>DB: SELECT * FROM wallet_transactions\nWHERE transaction_id = 'bet_123'
+    API->>DB: SELECT * FROM wallet_transactions<br/>WHERE transaction_id = 'bet_123'
     DB-->>API: 返回已處理記錄 (status = SUCCESS)
 
     Note over API: 從 DB 重建響應
 
     API->>API: 構建響應: balance = 950.00
-    API->>Redis: SET idempotency:bet:bet_123\nTTL = 1 hour
+    API->>Redis: SET idempotency:bet:bet_123<br/>TTL = 1 hour
     Redis-->>API: OK
 
     Note over API: 緩存已恢復
 
-    API-->>GP: 200 OK\n{"status": "SUCCESS", "balance": 950.00}
+    API-->>GP: 200 OK<br/>{"status": "SUCCESS", "balance": 950.00}
 
     Note over GP,Wallet: ✅ 即使緩存過期,DB 作為 Truth Source 仍然保證冪等性
 ```

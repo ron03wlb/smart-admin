@@ -46,7 +46,7 @@ flowchart TD
         SPARK[Spark Batch Jobs\n━━━━━━━━\n排程: Airflow\n執行時間: 02:00 AM\n處理邏輯:\n• 數據清洗\n• 脫敏處理\n• 聚合計算]
     end
 
-    KAFKA -->|Kafka Connect\n批次落盤| S3
+    KAFKA -->|Kafka Connect<br/>批次落盤| S3
     S3 -->|讀取前一日數據| SPARK
 
     subgraph DWH[數據倉庫層 Data Warehouse]
@@ -197,9 +197,9 @@ flowchart TD
         ADS_TABLES[典型表結構\n━━━━━━━━\n• ads_daily_kpi (運營 KPI)\n• ads_merchant_revenue (商戶收入)\n• ads_player_ltv (玩家 LTV)\n• ads_game_performance (遊戲表現)\n━━━━━━━━\n命名規則: ads_{application}_{metric}]
     end
 
-    ODS -->|Spark ETL\n數據清洗 + 脫敏| DWD
-    DWD -->|Spark SQL\n聚合計算| DWS
-    DWS -->|Spark SQL\n寬表構建| ADS
+    ODS -->|Spark ETL<br/>數據清洗 + 脫敏| DWD
+    DWD -->|Spark SQL<br/>聚合計算| DWS
+    DWS -->|Spark SQL<br/>寬表構建| ADS
 
     DWD -.->|某些場景直接聚合| ADS
 
@@ -305,16 +305,16 @@ flowchart TD
 flowchart TD
     START[新增報表需求] --> LATENCY{延遲要求?\n━━━━━━━━}
 
-    LATENCY -->|< 5 秒\n實時監控| REALTIME_PATH[實時處理路徑\nReal-time Path]
-    LATENCY -->|5 秒 - 1 分鐘\n準實時| NEAR_REALTIME_PATH[準實時路徑\nNear Real-time Path]
-    LATENCY -->|> 1 分鐘\n可接受 T+1| BATCH_PATH[批次處理路徑\nBatch Path]
+    LATENCY -->|< 5 秒<br/>實時監控| REALTIME_PATH[實時處理路徑\nReal-time Path]
+    LATENCY -->|5 秒 - 1 分鐘<br/>準實時| NEAR_REALTIME_PATH[準實時路徑\nNear Real-time Path]
+    LATENCY -->|> 1 分鐘<br/>可接受 T+1| BATCH_PATH[批次處理路徑\nBatch Path]
 
     REALTIME_PATH --> RT_COMPLEX{查詢複雜度?}
-    RT_COMPLEX -->|簡單聚合\nSUM/COUNT/AVG| RT_REDIS[方案 A: Redis\n━━━━━━━━\n技術棧:\n• Redis Counter/Hash\n• Lua Script 原子操作\n• TTL: 5 min\n━━━━━━━━\n優勢:\n• 延遲 < 1ms\n• 支援高並發 (10K+ QPS)\n缺點:\n• 僅簡單聚合\n• 內存成本高\n━━━━━━━━\n適用場景:\n• 在線人數\n• 今日存款總額\n• 風控告警計數]
+    RT_COMPLEX -->|簡單聚合<br/>SUM/COUNT/AVG| RT_REDIS[方案 A: Redis\n━━━━━━━━\n技術棧:\n• Redis Counter/Hash\n• Lua Script 原子操作\n• TTL: 5 min\n━━━━━━━━\n優勢:\n• 延遲 < 1ms\n• 支援高並發 (10K+ QPS)\n缺點:\n• 僅簡單聚合\n• 內存成本高\n━━━━━━━━\n適用場景:\n• 在線人數\n• 今日存款總額\n• 風控告警計數]
 
-    RT_COMPLEX -->|中等複雜\nGROUP BY + JOIN| RT_FLINK[方案 B: Flink SQL\n━━━━━━━━\n技術棧:\n• Flink Streaming SQL\n• 滑動視窗 (5s/1min)\n• State Backend: RocksDB\n━━━━━━━━\n優勢:\n• 支援複雜聚合\n• 支援 JOIN\n• 可擴展\n缺點:\n• 運維複雜\n• 資源消耗高\n━━━━━━━━\n適用場景:\n• 實時遊戲排行榜\n• 實時交易監控\n• 異常行為檢測]
+    RT_COMPLEX -->|中等複雜<br/>GROUP BY + JOIN| RT_FLINK[方案 B: Flink SQL\n━━━━━━━━\n技術棧:\n• Flink Streaming SQL\n• 滑動視窗 (5s/1min)\n• State Backend: RocksDB\n━━━━━━━━\n優勢:\n• 支援複雜聚合\n• 支援 JOIN\n• 可擴展\n缺點:\n• 運維複雜\n• 資源消耗高\n━━━━━━━━\n適用場景:\n• 實時遊戲排行榜\n• 實時交易監控\n• 異常行為檢測]
 
-    RT_COMPLEX -->|極高複雜\n多表 JOIN + 子查詢| RT_REJECT[❌ 不適合實時\n━━━━━━━━\n建議:\n1️⃣ 降低複雜度\n2️⃣ 預計算部分結果\n3️⃣ 改用準實時/批次\n━━━━━━━━\n原因:\n• 實時複雜查詢成本極高\n• 延遲不可控\n• 資源消耗巨大]
+    RT_COMPLEX -->|極高複雜<br/>多表 JOIN + 子查詢| RT_REJECT[❌ 不適合實時\n━━━━━━━━\n建議:\n1️⃣ 降低複雜度\n2️⃣ 預計算部分結果\n3️⃣ 改用準實時/批次\n━━━━━━━━\n原因:\n• 實時複雜查詢成本極高\n• 延遲不可控\n• 資源消耗巨大]
 
     NEAR_REALTIME_PATH --> NRT_COMPLETE{數據完整性要求?}
     NRT_COMPLETE -->|可接受少量遺漏| NRT_STREAM[方案 C: Flink → ClickHouse\n━━━━━━━━\n技術棧:\n• Flink 消費 Kafka\n• 寫入 ClickHouse 實時表\n• 更新頻率: 10s-1min\n━━━━━━━━\n優勢:\n• 低延遲 (5-60s)\n• 支援複雜查詢\n• 可鑽取分析\n缺點:\n• 可能丟失少量數據\n• 需處理重複/亂序\n━━━━━━━━\n適用場景:\n• 運營儀表板\n• 實時 KPI 追蹤\n• 玩家實時行為分析]
@@ -322,9 +322,9 @@ flowchart TD
     NRT_COMPLETE -->|必須 100% 完整| NRT_HYBRID[方案 D: 混合模式\n━━━━━━━━\n技術棧:\n• Flink 實時 (初步結果)\n• Spark 批次 (修正補全)\n• 雙寫 ClickHouse\n━━━━━━━━\n優勢:\n• 兼顧實時性與準確性\n• 最終一致性保證\n缺點:\n• 架構複雜\n• 需處理數據修正\n━━━━━━━━\n適用場景:\n• 財務報表 (需最終準確)\n• 合規報表\n• 結算對帳]
 
     BATCH_PATH --> BATCH_VOLUME{數據量級?}
-    BATCH_VOLUME -->|< 1 億條\n中小數據量| BATCH_SPARK[方案 E: Spark Batch\n━━━━━━━━\n技術棧:\n• Spark SQL\n• 從 S3 讀 Parquet\n• 寫入 ClickHouse\n• 排程: Airflow\n━━━━━━━━\n優勢:\n• 支援複雜 ETL\n• 數據 100% 完整\n• 成本可控\n缺點:\n• T+1 延遲\n• 不支援實時\n━━━━━━━━\n適用場景:\n• 經營報表\n• 月度損益表\n• 代理結算]
+    BATCH_VOLUME -->|< 1 億條<br/>中小數據量| BATCH_SPARK[方案 E: Spark Batch\n━━━━━━━━\n技術棧:\n• Spark SQL\n• 從 S3 讀 Parquet\n• 寫入 ClickHouse\n• 排程: Airflow\n━━━━━━━━\n優勢:\n• 支援複雜 ETL\n• 數據 100% 完整\n• 成本可控\n缺點:\n• T+1 延遲\n• 不支援實時\n━━━━━━━━\n適用場景:\n• 經營報表\n• 月度損益表\n• 代理結算]
 
-    BATCH_VOLUME -->|> 1 億條\n大數據量| BATCH_OPTIMIZE[方案 F: 優化批次處理\n━━━━━━━━\n技術棧:\n• Spark 分區並行\n• ClickHouse 分布式表\n• 增量計算 (僅處理變化)\n• 物化視圖預聚合\n━━━━━━━━\n優勢:\n• 處理 PB 級數據\n• 高度可擴展\n缺點:\n• 硬件成本高\n• 運維複雜\n━━━━━━━━\n適用場景:\n• 全平台數據分析\n• 機器學習訓練\n• 歷史數據回溯]
+    BATCH_VOLUME -->|> 1 億條<br/>大數據量| BATCH_OPTIMIZE[方案 F: 優化批次處理\n━━━━━━━━\n技術棧:\n• Spark 分區並行\n• ClickHouse 分布式表\n• 增量計算 (僅處理變化)\n• 物化視圖預聚合\n━━━━━━━━\n優勢:\n• 處理 PB 級數據\n• 高度可擴展\n缺點:\n• 硬件成本高\n• 運維複雜\n━━━━━━━━\n適用場景:\n• 全平台數據分析\n• 機器學習訓練\n• 歷史數據回溯]
 
     RT_REDIS --> IMPL_EXAMPLE
     RT_FLINK --> IMPL_EXAMPLE

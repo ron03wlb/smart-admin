@@ -35,33 +35,33 @@ graph TB
     end
 
     subgraph "Master Agent Level - 總代層"
-        P -->|Allocate $5M\nPosition: 20%| M1["Master Agent A 總代A\n━━━━━━━━━━━━━━\nCredit Limit: $5M\nUsed Credit: $3.5M\nAvailable: $1.5M\nUsage: 70% 🟢\n━━━━━━━━━━━━━━\nOwn Position: 20%\nTo Sub-Agents: $4M"]
+        P -->|Allocate $5M<br/>Position: 20%| M1["Master Agent A 總代A\n━━━━━━━━━━━━━━\nCredit Limit: $5M\nUsed Credit: $3.5M\nAvailable: $1.5M\nUsage: 70% 🟢\n━━━━━━━━━━━━━━\nOwn Position: 20%\nTo Sub-Agents: $4M"]
 
-        P -->|Allocate $3M\nPosition: 15%| M2["Master Agent B 總代B\n━━━━━━━━━━━━━━\nCredit Limit: $3M\nUsed Credit: $2.85M\nAvailable: $150k\nUsage: 95% 🔴 ALERT\n━━━━━━━━━━━━━━\nOwn Position: 15%\nTo Sub-Agents: $2.8M"]
+        P -->|Allocate $3M<br/>Position: 15%| M2["Master Agent B 總代B\n━━━━━━━━━━━━━━\nCredit Limit: $3M\nUsed Credit: $2.85M\nAvailable: $150k\nUsage: 95% 🔴 ALERT\n━━━━━━━━━━━━━━\nOwn Position: 15%\nTo Sub-Agents: $2.8M"]
     end
 
     subgraph "Agent L1 Level - 一級代理層"
-        M1 -->|Allocate $2M\nPosition: 40%| A1["Agent L1-A1\n━━━━━━━━━━━━━━\nLimit: $2M\nUsed: $1.2M\nAvailable: $800k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 40%"]
+        M1 -->|Allocate $2M<br/>Position: 40%| A1["Agent L1-A1\n━━━━━━━━━━━━━━\nLimit: $2M\nUsed: $1.2M\nAvailable: $800k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 40%"]
 
-        M1 -->|Allocate $1.5M\nPosition: 35%| A2["Agent L1-A2\n━━━━━━━━━━━━━━\nLimit: $1.5M\nUsed: $1.5M\nAvailable: $0\nUsage: 100% 🔴 FROZEN\n━━━━━━━━━━━━━━\nPosition: 35%\n⚠️ Auto-Suspended"]
+        M1 -->|Allocate $1.5M<br/>Position: 35%| A2["Agent L1-A2\n━━━━━━━━━━━━━━\nLimit: $1.5M\nUsed: $1.5M\nAvailable: $0\nUsage: 100% 🔴 FROZEN\n━━━━━━━━━━━━━━\nPosition: 35%\n⚠️ Auto-Suspended"]
 
-        M1 -->|Allocate $500k\nPosition: 30%| A3["Agent L1-A3\n━━━━━━━━━━━━━━\nLimit: $500k\nUsed: $300k\nAvailable: $200k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 30%"]
+        M1 -->|Allocate $500k<br/>Position: 30%| A3["Agent L1-A3\n━━━━━━━━━━━━━━\nLimit: $500k\nUsed: $300k\nAvailable: $200k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 30%"]
 
-        M2 -->|Allocate $2.8M\nPosition: 45%| A4["Agent L1-A4\n━━━━━━━━━━━━━━\nLimit: $2.8M\nUsed: $2.6M\nAvailable: $200k\nUsage: 93% 🟡 WARNING\n━━━━━━━━━━━━━━\nPosition: 45%"]
+        M2 -->|Allocate $2.8M<br/>Position: 45%| A4["Agent L1-A4\n━━━━━━━━━━━━━━\nLimit: $2.8M\nUsed: $2.6M\nAvailable: $200k\nUsage: 93% 🟡 WARNING\n━━━━━━━━━━━━━━\nPosition: 45%"]
     end
 
     subgraph "Agent L2 Level - 二級代理層"
-        A1 -->|Allocate $800k\nPosition: 50%| A5["Agent L2-A5\n━━━━━━━━━━━━━━\nLimit: $800k\nUsed: $500k\nAvailable: $300k\nUsage: 62.5% 🟢\n━━━━━━━━━━━━━━\nPosition: 50%"]
+        A1 -->|Allocate $800k<br/>Position: 50%| A5["Agent L2-A5\n━━━━━━━━━━━━━━\nLimit: $800k\nUsed: $500k\nAvailable: $300k\nUsage: 62.5% 🟢\n━━━━━━━━━━━━━━\nPosition: 50%"]
 
-        A3 -->|Allocate $200k\nPosition: 45%| A6["Agent L2-A6\n━━━━━━━━━━━━━━\nLimit: $200k\nUsed: $150k\nAvailable: $50k\nUsage: 75% 🟢\n━━━━━━━━━━━━━━\nPosition: 45%"]
+        A3 -->|Allocate $200k<br/>Position: 45%| A6["Agent L2-A6\n━━━━━━━━━━━━━━\nLimit: $200k\nUsed: $150k\nAvailable: $50k\nUsage: 75% 🟢\n━━━━━━━━━━━━━━\nPosition: 45%"]
     end
 
     subgraph "Player Level - 玩家層"
-        A5 -->|Allocate $300k\nTotal Players: 50| PG1["Player Group 1\n━━━━━━━━━━━━━━\nTotal Bets: $500k\nTotal Wins: $400k\nNet Loss: $100k 💰\n━━━━━━━━━━━━━━\nSettlement Status: Pending"]
+        A5 -->|Allocate $300k<br/>Total Players: 50| PG1["Player Group 1\n━━━━━━━━━━━━━━\nTotal Bets: $500k\nTotal Wins: $400k\nNet Loss: $100k 💰\n━━━━━━━━━━━━━━\nSettlement Status: Pending"]
 
-        A6 -->|Allocate $50k\nTotal Players: 20| PG2["Player Group 2\n━━━━━━━━━━━━━━\nTotal Bets: $200k\nTotal Wins: $250k\nNet Win: $50k 📈\n━━━━━━━━━━━━━━\nSettlement Status: Pending"]
+        A6 -->|Allocate $50k<br/>Total Players: 20| PG2["Player Group 2\n━━━━━━━━━━━━━━\nTotal Bets: $200k\nTotal Wins: $250k\nNet Win: $50k 📈\n━━━━━━━━━━━━━━\nSettlement Status: Pending"]
 
-        A4 -->|Allocate $200k\nTotal Players: 100| PG3["Player Group 3\n━━━━━━━━━━━━━━\nTotal Bets: $2.8M\nTotal Wins: $200k\nNet Loss: $2.6M 💰\n━━━━━━━━━━━━━━\n⚠️ High Turnover"]
+        A4 -->|Allocate $200k<br/>Total Players: 100| PG3["Player Group 3\n━━━━━━━━━━━━━━\nTotal Bets: $2.8M\nTotal Wins: $200k\nNet Loss: $2.6M 💰\n━━━━━━━━━━━━━━\n⚠️ High Turnover"]
     end
 
     subgraph "Risk Alerts - 風險告警"
@@ -243,23 +243,23 @@ sequenceDiagram
         CronJob->>SettlementService: triggerWeeklySettlement(week=W-1)
         SettlementService->>DB: BEGIN TRANSACTION (Isolation: SERIALIZABLE)
 
-        SettlementService->>DB: UPDATE credit_accounts\nSET status='FROZEN', frozen_at=NOW()\nWHERE settlement_week = W-1
+        SettlementService->>DB: UPDATE credit_accounts<br/>SET status='FROZEN', frozen_at=NOW()<br/>WHERE settlement_week = W-1
 
-        SettlementService->>DB: SELECT * FROM agents\nORDER BY level DESC (Leaf nodes first)
+        SettlementService->>DB: SELECT * FROM agents<br/>ORDER BY level DESC (Leaf nodes first)
         DB-->>SettlementService: [AgentL2, AgentL1, Master, ...]
 
         loop For each Agent L2 (Bottom-Up)
             SettlementService->>AgentL2: calculatePosition(week=W-1)
 
-            AgentL2->>DB: SELECT SUM(player_bets - player_wins)\nFROM player_transactions\nWHERE agent_id = L2 AND week = W-1
+            AgentL2->>DB: SELECT SUM(player_bets - player_wins)<br/>FROM player_transactions<br/>WHERE agent_id = L2 AND week = W-1
             DB-->>AgentL2: net_player_loss = $100,000
 
             AgentL2->>AgentL2: own_position = $100k × 50% (Position %) = $50,000
             AgentL2->>AgentL2: to_parent = $100k - $50k = $50,000
 
-            AgentL2->>DB: INSERT INTO settlement_records\n(agent_id, week, player_loss, own_share, to_parent)\nVALUES (L2, W-1, $100k, $50k, $50k)
+            AgentL2->>DB: INSERT INTO settlement_records<br/>(agent_id, week, player_loss, own_share, to_parent)<br/>VALUES (L2, W-1, $100k, $50k, $50k)
 
-            AgentL2->>DB: UPDATE agent_credit\nSET used_credit += $50k,\nsettlement_status = 'PENDING'
+            AgentL2->>DB: UPDATE agent_credit<br/>SET used_credit += $50k,<br/>settlement_status = 'PENDING'
 
             AgentL2->>NotificationService: sendSettlementNotice(agentId=L2, amount=$50k)
         end
@@ -267,17 +267,17 @@ sequenceDiagram
         loop For each Agent L1
             SettlementService->>AgentL1: aggregateChildPositions()
 
-            AgentL1->>DB: SELECT SUM(to_parent) FROM settlement_records\nWHERE parent_id = L1 AND week = W-1
+            AgentL1->>DB: SELECT SUM(to_parent) FROM settlement_records<br/>WHERE parent_id = L1 AND week = W-1
             DB-->>AgentL1: total_from_children = $50,000
 
-            AgentL1->>DB: SELECT SUM(direct_player_loss) FROM player_transactions\nWHERE agent_id = L1 AND week = W-1
+            AgentL1->>DB: SELECT SUM(direct_player_loss) FROM player_transactions<br/>WHERE agent_id = L1 AND week = W-1
             DB-->>AgentL1: direct_player_loss = $20,000
 
             AgentL1->>AgentL1: total_player_loss = $50k + $20k = $70k
             AgentL1->>AgentL1: own_position = $70k × 40% = $28,000
             AgentL1->>AgentL1: to_parent = $70k - $28k = $42,000
 
-            AgentL1->>DB: INSERT INTO settlement_records\n(agent_id, week, total_loss, own_share, to_parent)\nVALUES (L1, W-1, $70k, $28k, $42k)
+            AgentL1->>DB: INSERT INTO settlement_records<br/>(agent_id, week, total_loss, own_share, to_parent)<br/>VALUES (L1, W-1, $70k, $28k, $42k)
 
             AgentL1->>NotificationService: sendSettlementNotice(agentId=L1, amount=$28k)
         end
@@ -285,22 +285,22 @@ sequenceDiagram
         loop For each Master Agent
             SettlementService->>MasterAgent: aggregateChildPositions()
 
-            MasterAgent->>DB: SELECT SUM(to_parent) FROM settlement_records\nWHERE parent_id = Master AND week = W-1
+            MasterAgent->>DB: SELECT SUM(to_parent) FROM settlement_records<br/>WHERE parent_id = Master AND week = W-1
             DB-->>MasterAgent: total_from_children = $42,000
 
             MasterAgent->>MasterAgent: own_position = $42k × 20% = $8,400
             MasterAgent->>MasterAgent: to_platform = $42k - $8.4k = $33,600
 
-            MasterAgent->>DB: INSERT INTO settlement_records\n(agent_id, week, total_loss, own_share, to_platform)\nVALUES (Master, W-1, $42k, $8.4k, $33.6k)
+            MasterAgent->>DB: INSERT INTO settlement_records<br/>(agent_id, week, total_loss, own_share, to_platform)<br/>VALUES (Master, W-1, $42k, $8.4k, $33.6k)
 
             MasterAgent->>NotificationService: sendSettlementNotice(agentId=Master, amount=$8.4k)
         end
 
         SettlementService->>Platform: aggregateMasterPositions()
-        Platform->>DB: SELECT SUM(to_platform) FROM settlement_records\nWHERE parent_id = Platform AND week = W-1
+        Platform->>DB: SELECT SUM(to_platform) FROM settlement_records<br/>WHERE parent_id = Platform AND week = W-1
         DB-->>Platform: total_platform_revenue = $33,600 + ... = $50,000
 
-        Platform->>DB: INSERT INTO platform_revenue\n(week, total_revenue, source)\nVALUES (W-1, $50k, 'CREDIT_SETTLEMENT')
+        Platform->>DB: INSERT INTO platform_revenue<br/>(week, total_revenue, source)<br/>VALUES (W-1, $50k, 'CREDIT_SETTLEMENT')
 
         SettlementService->>DB: COMMIT
 
@@ -318,7 +318,7 @@ sequenceDiagram
                 PaymentGateway-->>AgentL2: Transfer Completed (Reference: TXN_12345)
 
                 AgentL2->>SettlementService: submitPaymentProof(txn_id=TXN_12345, amount=$50k)
-                SettlementService->>DB: INSERT INTO settlement_payments\n(agent_id, week, amount, txn_id, status)\nVALUES (L2, W-1, $50k, TXN_12345, 'PENDING_VERIFY')
+                SettlementService->>DB: INSERT INTO settlement_payments<br/>(agent_id, week, amount, txn_id, status)<br/>VALUES (L2, W-1, $50k, TXN_12345, 'PENDING_VERIFY')
 
                 SettlementService->>AgentL1: notifyPaymentReceived(child=L2, amount=$50k)
 
@@ -341,20 +341,20 @@ sequenceDiagram
             PaymentGateway-->>AgentL1: {status: CONFIRMED, amount: $50k, from: AgentL2}
 
             alt Payment Verified
-                AgentL1->>DB: UPDATE settlement_payments\nSET status='VERIFIED', verified_at=NOW()\nWHERE txn_id = TXN_12345
+                AgentL1->>DB: UPDATE settlement_payments<br/>SET status='VERIFIED', verified_at=NOW()<br/>WHERE txn_id = TXN_12345
 
-                AgentL1->>DB: UPDATE settlement_records\nSET payment_status='COMPLETED'\nWHERE agent_id = L2 AND week = W-1
+                AgentL1->>DB: UPDATE settlement_records<br/>SET payment_status='COMPLETED'<br/>WHERE agent_id = L2 AND week = W-1
 
                 AgentL1->>SettlementService: confirmSettlementComplete(child=L2)
 
-                SettlementService->>DB: UPDATE agent_credit\nSET used_credit = 0,\nstatus = 'ACTIVE',\nlast_settlement = NOW()\nWHERE agent_id = L2
+                SettlementService->>DB: UPDATE agent_credit<br/>SET used_credit = 0,<br/>status = 'ACTIVE',<br/>last_settlement = NOW()<br/>WHERE agent_id = L2
 
                 SettlementService->>NotificationService: sendCreditResetNotice(agentId=L2)
 
             else Payment Not Received (Deadline Passed)
-                AgentL1->>DB: UPDATE settlement_payments\nSET status='OVERDUE'\nWHERE txn_id = TXN_12345
+                AgentL1->>DB: UPDATE settlement_payments<br/>SET status='OVERDUE'<br/>WHERE txn_id = TXN_12345
 
-                AgentL1->>DB: UPDATE agent_credit\nSET status='SUSPENDED',\ncredit_limit = 0\nWHERE agent_id = L2
+                AgentL1->>DB: UPDATE agent_credit<br/>SET status='SUSPENDED',<br/>credit_limit = 0<br/>WHERE agent_id = L2
 
                 AgentL1->>NotificationService: sendSuspensionNotice(agentId=L2, reason='OVERDUE_PAYMENT')
 
@@ -366,15 +366,15 @@ sequenceDiagram
     rect rgb(255, 255, 230)
         Note over SettlementService,Platform: Phase 4: Final Report & Audit (Saturday 12:00)
 
-        SettlementService->>DB: SELECT * FROM settlement_records\nWHERE week = W-1
+        SettlementService->>DB: SELECT * FROM settlement_records<br/>WHERE week = W-1
 
         SettlementService->>SettlementService: generateSettlementReport(week=W-1)
 
-        SettlementService->>Platform: publishWeeklyReport({\ntotal_volume: $5M,\ntotal_platform_revenue: $50k,\ncompleted_agents: 95%,\noverdue_agents: 5%\n})
+        SettlementService->>Platform: publishWeeklyReport({<br/>total_volume: $5M,<br/>total_platform_revenue: $50k,<br/>completed_agents: 95%,<br/>overdue_agents: 5%<br/>})
 
         Platform->>NotificationService: sendExecutiveSummary(recipients=[CFO, CEO])
 
-        SettlementService->>DB: UPDATE settlement_batches\nSET status='COMPLETED', completed_at=NOW()\nWHERE week = W-1
+        SettlementService->>DB: UPDATE settlement_batches<br/>SET status='COMPLETED', completed_at=NOW()<br/>WHERE week = W-1
 
         Note over Platform: Settlement Cycle Complete ✅
     end

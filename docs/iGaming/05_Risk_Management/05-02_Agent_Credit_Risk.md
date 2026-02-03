@@ -465,7 +465,7 @@ flowchart TD
     SOFT_WAIT -->|已補繳至 ≥ 110%| SOFT_RELEASE[解除軟停權\nResume normal operations]
     SOFT_RELEASE --> CALC
 
-    SOFT_WAIT -->|48h 內未補繳 OR\nMargin Level < 80%| SOFT_ESCALATE[升級為 Hard Stop]
+    SOFT_WAIT -->|48h 內未補繳 OR<br/>Margin Level < 80%| SOFT_ESCALATE[升級為 Hard Stop]
     SOFT_ESCALATE --> HARD
 
     HARD --> HARD_ACTION1[🚨 全線停權\nSuspend all players under agent]

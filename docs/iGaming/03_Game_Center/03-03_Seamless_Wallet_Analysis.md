@@ -32,29 +32,29 @@
 stateDiagram-v2
     [*] --> IDLE: No Active Round
 
-    IDLE --> OPEN: Bet Request Received\n━━━━━━━━━━━━━━\nAction: Debit Balance\nCreate Round Record\nStatus = OPEN
+    IDLE --> OPEN: Bet Request Received<br/>━━━━━━━━━━━━━━<br/>Action: Debit Balance<br/>Create Round Record<br/>Status = OPEN
 
     state OPEN {
         [*] --> WaitingWin: Bet Success
-        WaitingWin --> WaitingWin: Additional Bet (Same Round)\n累加投注額
+        WaitingWin --> WaitingWin: Additional Bet (Same Round)<br/>累加投注額
     }
 
-    OPEN --> CLOSED: Win Request Received\n━━━━━━━━━━━━━━\nAction: Credit Balance\nUpdate Round\nStatus = CLOSED
+    OPEN --> CLOSED: Win Request Received<br/>━━━━━━━━━━━━━━<br/>Action: Credit Balance<br/>Update Round<br/>Status = CLOSED
 
-    OPEN --> CANCELLED: Rollback Request\n━━━━━━━━━━━━━━\nAction: Refund Bet\nStatus = CANCELLED
+    OPEN --> CANCELLED: Rollback Request<br/>━━━━━━━━━━━━━━<br/>Action: Refund Bet<br/>Status = CANCELLED
 
-    OPEN --> TIMEOUT: No Win After 2 Hours\n━━━━━━━━━━━━━━\n⚠️ Orphaned Round\nTrigger: Scheduled Job
+    OPEN --> TIMEOUT: No Win After 2 Hours<br/>━━━━━━━━━━━━━━<br/>⚠️ Orphaned Round<br/>Trigger: Scheduled Job
 
     state TIMEOUT {
-        [*] --> QueryGP: Query GP API\nGET /round/{id}/status
+        [*] --> QueryGP: Query GP API<br/>GET /round/{id}/status
         QueryGP --> GPClosed: GP Status = CLOSED
         QueryGP --> GPPending: GP Status = PENDING
         QueryGP --> GPError: GP API Error
     }
 
-    GPClosed --> CLOSED: Auto Close Round\n━━━━━━━━━━━━━━\nCredit Win Amount\nSource: GP Query
+    GPClosed --> CLOSED: Auto Close Round<br/>━━━━━━━━━━━━━━<br/>Credit Win Amount<br/>Source: GP Query
 
-    GPPending --> PENDING_REVIEW: Manual Review Required\n━━━━━━━━━━━━━━\nNotify CS Team\nEscalate if > $1000
+    GPPending --> PENDING_REVIEW: Manual Review Required<br/>━━━━━━━━━━━━━━<br/>Notify CS Team<br/>Escalate if > $1000
 
     GPError --> PENDING_REVIEW
 
@@ -67,15 +67,15 @@ stateDiagram-v2
     ManualClose --> CLOSED
     ManualCancel --> CANCELLED
 
-    CLOSED --> ADJUSTED: Resettlement Request\n━━━━━━━━━━━━━━\nAction: Adjust Balance\nStatus = ADJUSTED
+    CLOSED --> ADJUSTED: Resettlement Request<br/>━━━━━━━━━━━━━━<br/>Action: Adjust Balance<br/>Status = ADJUSTED
 
     ADJUSTED --> [*]
     CLOSED --> [*]
     CANCELLED --> [*]
 
-    note right of TIMEOUT : Scheduled Job:\n- Run every 15 minutes\n- Check Rounds WHERE status=OPEN\n  AND created_at < NOW() - 2 hours\n- Query GP API for final status
+    note right of TIMEOUT : Scheduled Job:<br/>- Run every 15 minutes<br/>- Check Rounds WHERE status=OPEN<br/>  AND created_at < NOW() - 2 hours<br/>- Query GP API for final status
 
-    note right of PENDING_REVIEW : Manual Review Criteria:\n- Round Amount > $1000: HIGH Priority\n- Round Amount < $1000: MEDIUM Priority\n- SLA: 24 hours response
+    note right of PENDING_REVIEW : Manual Review Criteria:<br/>- Round Amount > $1000: HIGH Priority<br/>- Round Amount < $1000: MEDIUM Priority<br/>- SLA: 24 hours response
 ```
 
 **Round 狀態轉換關鍵邏輯**：
@@ -155,7 +155,7 @@ sequenceDiagram
     rect rgb(255, 230, 230)
         Note over GP,DB: First Attempt - Timeout Occurs
 
-        GP->>GW: POST /debit\n{txId: "TX001", amount: 100}
+        GP->>GW: POST /debit<br/>{txId: "TX001", amount: 100}
         GW->>Platform: validateRequest(txId, amount)
 
         Platform->>Redis: GET idempotency:TX001
@@ -163,18 +163,18 @@ sequenceDiagram
 
         Platform->>DB: BEGIN TRANSACTION
 
-        Platform->>DB: SELECT balance FROM wallet\nWHERE player_id = ? FOR UPDATE
+        Platform->>DB: SELECT balance FROM wallet<br/>WHERE player_id = ? FOR UPDATE
         DB-->>Platform: balance = 500
 
-        Platform->>DB: UPDATE wallet\nSET balance = 400\nWHERE player_id = ?
+        Platform->>DB: UPDATE wallet<br/>SET balance = 400<br/>WHERE player_id = ?
         DB-->>Platform: OK (1 row affected)
 
-        Platform->>DB: INSERT INTO transactions\n(tx_id, type, amount, balance_after)\nVALUES ('TX001', 'DEBIT', 100, 400)
+        Platform->>DB: INSERT INTO transactions<br/>(tx_id, type, amount, balance_after)<br/>VALUES ('TX001', 'DEBIT', 100, 400)
         DB-->>Platform: OK
 
         Platform->>DB: COMMIT
 
-        Platform->>Redis: SETEX idempotency:TX001\nvalue: {status: SUCCESS, balance: 400}\nTTL: 3600
+        Platform->>Redis: SETEX idempotency:TX001<br/>value: {status: SUCCESS, balance: 400}<br/>TTL: 3600
         Redis-->>Platform: OK
 
         Platform->>GW: Response: {status: SUCCESS, balance: 400}
@@ -188,16 +188,16 @@ sequenceDiagram
     rect rgb(230, 255, 230)
         Note over GP,DB: Second Attempt - Idempotent Retry (Same txId)
 
-        GP->>GW: POST /debit\n{txId: "TX001", amount: 100}\n⚠️ SAME txId
+        GP->>GW: POST /debit<br/>{txId: "TX001", amount: 100}<br/>⚠️ SAME txId
 
         GW->>Platform: validateRequest(txId, amount)
 
         Platform->>Redis: GET idempotency:TX001
-        Redis-->>Platform: {status: SUCCESS, balance: 400}\n✅ EXISTS!
+        Redis-->>Platform: {status: SUCCESS, balance: 400}<br/>✅ EXISTS!
 
         Note over Platform: Idempotency Check PASSED<br/>Return Cached Response<br/>NO Database Operation!
 
-        Platform-->>GW: Response: {status: SUCCESS, balance: 400}\nSource: CACHED
+        Platform-->>GW: Response: {status: SUCCESS, balance: 400}<br/>Source: CACHED
 
         GW-->>GP: Response: {status: SUCCESS, balance: 400}
 
@@ -207,7 +207,7 @@ sequenceDiagram
     rect rgb(230, 230, 255)
         Note over GP,DB: Third Attempt - Different txId (New Transaction)
 
-        GP->>GW: POST /debit\n{txId: "TX002", amount: 50}\n✅ NEW txId
+        GP->>GW: POST /debit<br/>{txId: "TX002", amount: 50}<br/>✅ NEW txId
 
         GW->>Platform: validateRequest(txId, amount)
 
@@ -216,18 +216,18 @@ sequenceDiagram
 
         Platform->>DB: BEGIN TRANSACTION
 
-        Platform->>DB: SELECT balance FROM wallet\nWHERE player_id = ? FOR UPDATE
+        Platform->>DB: SELECT balance FROM wallet<br/>WHERE player_id = ? FOR UPDATE
         DB-->>Platform: balance = 400
 
-        Platform->>DB: UPDATE wallet\nSET balance = 350\nWHERE player_id = ?
+        Platform->>DB: UPDATE wallet<br/>SET balance = 350<br/>WHERE player_id = ?
         DB-->>Platform: OK
 
-        Platform->>DB: INSERT INTO transactions\n(tx_id, type, amount, balance_after)\nVALUES ('TX002', 'DEBIT', 50, 350)
+        Platform->>DB: INSERT INTO transactions<br/>(tx_id, type, amount, balance_after)<br/>VALUES ('TX002', 'DEBIT', 50, 350)
         DB-->>Platform: OK
 
         Platform->>DB: COMMIT
 
-        Platform->>Redis: SETEX idempotency:TX002\nvalue: {status: SUCCESS, balance: 350}\nTTL: 3600
+        Platform->>Redis: SETEX idempotency:TX002<br/>value: {status: SUCCESS, balance: 350}<br/>TTL: 3600
         Redis-->>Platform: OK
 
         Platform->>GW: Response: {status: SUCCESS, balance: 350}
@@ -275,19 +275,19 @@ flowchart TD
 
     CHECK -->|Bet NOT Found ❌| STRATEGY{Choose Strategy}
 
-    STRATEGY -->|Strategy 1\nImmediate Reject| S1["Return Error:\nBET_NOT_FOUND\n━━━━━━━━━━━━━━\nHTTP 400\nError Code: 1001"]
+    STRATEGY -->|Strategy 1<br/>Immediate Reject| S1["Return Error:\nBET_NOT_FOUND\n━━━━━━━━━━━━━━\nHTTP 400\nError Code: 1001"]
 
     S1 --> S1A{GP Retries Win?}
     S1A -->|Yes - After Bet Arrives| S1B["Next Retry:\nBet Exists → SUCCESS"]
     S1A -->|No - GP Gives Up| S1C["⚠️ Player Lost Win\nRequires Manual Investigation"]
 
-    STRATEGY -->|Strategy 2\nAllow Orphan Win| S2["Allow Win Without Bet\n━━━━━━━━━━━━━━\nCredit Amount\nMark: ORPHAN_WIN\nFlag for Review"]
+    STRATEGY -->|Strategy 2<br/>Allow Orphan Win| S2["Allow Win Without Bet\n━━━━━━━━━━━━━━\nCredit Amount\nMark: ORPHAN_WIN\nFlag for Review"]
 
     S2 --> S2A{Bet Arrives Later?}
     S2A -->|Yes| S2B["❌ Problem:\nDouble Credit Risk\nPlayer got Win twice"]
     S2A -->|No| S2C["⚠️ Reconciliation Mismatch\nGP has Bet, Platform has only Win"]
 
-    STRATEGY -->|Strategy 3\nPending Queue| S3["Store Win in Pending Queue\n━━━━━━━━━━━━━━\nINSERT INTO pending_wins\n(ref_tx_id, amount, expires_at)\nTTL: 30 minutes"]
+    STRATEGY -->|Strategy 3<br/>Pending Queue| S3["Store Win in Pending Queue\n━━━━━━━━━━━━━━\nINSERT INTO pending_wins\n(ref_tx_id, amount, expires_at)\nTTL: 30 minutes"]
 
     S3 --> S3A{Bet Arrives Within 30 min?}
     S3A -->|Yes ✅| S3B["Auto Process:\n━━━━━━━━━━━━━━\n1. Process Bet → Debit\n2. Process Pending Win → Credit\n3. Remove from Queue"]
@@ -364,10 +364,10 @@ flowchart TD
 
     CHECK_STRATEGY -->|Strategy 1 Active| CHECK_RECOVERY{檢查恢復條件}
 
-    CHECK_RECOVERY -->|Queue < 100\n持續 10 min| UPGRADE_S3["✅ 升級至 Strategy 3\n━━━━━━━━━━━━━━\n發送通知\n重啟 Pending Queue"]
-    CHECK_RECOVERY -->|Redis Healthy\n+ 5 min 穩定期| UPGRADE_S3
-    CHECK_RECOVERY -->|DB Latency < 1s\n持續 10 min| UPGRADE_S3
-    CHECK_RECOVERY -->|CPU < 70%\n持續 10 min| UPGRADE_S3
+    CHECK_RECOVERY -->|Queue < 100<br/>持續 10 min| UPGRADE_S3["✅ 升級至 Strategy 3\n━━━━━━━━━━━━━━\n發送通知\n重啟 Pending Queue"]
+    CHECK_RECOVERY -->|Redis Healthy<br/>+ 5 min 穩定期| UPGRADE_S3
+    CHECK_RECOVERY -->|DB Latency < 1s<br/>持續 10 min| UPGRADE_S3
+    CHECK_RECOVERY -->|CPU < 70%<br/>持續 10 min| UPGRADE_S3
 
     CHECK_RECOVERY -->|條件未滿足| EXECUTE_S1["執行 Strategy 1\n━━━━━━━━━━━━━━\n返回 BET_NOT_FOUND\n依賴 GP 重試"]
 

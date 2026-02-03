@@ -134,12 +134,12 @@ sequenceDiagram
     autonumber
 
     participant Player as 👤 玩家
-    participant Game as 🎮 遊戲提供商\n(Game Provider)
-    participant Platform as 🖥️ 平台核心\n(Platform Core)
-    participant Risk as 🛡️ 風控引擎\n(Risk Engine)\n05-01
-    participant Finance as 💰 財務中心\n(Finance Center)\n02-04
-    participant Activity as 🎁 活動系統\n(Activity System)\n04-01
-    participant Wallet as 💳 錢包系統\n(Wallet System)\n02-06
+    participant Game as 🎮 遊戲提供商<br/>(Game Provider)
+    participant Platform as 🖥️ 平台核心<br/>(Platform Core)
+    participant Risk as 🛡️ 風控引擎<br/>(Risk Engine)<br/>05-01
+    participant Finance as 💰 財務中心<br/>(Finance Center)<br/>02-04
+    participant Activity as 🎁 活動系統<br/>(Activity System)<br/>04-01
+    participant Wallet as 💳 錢包系統<br/>(Wallet System)<br/>02-06
     participant DB as 💾 數據庫
 
     rect rgb(240, 248, 255)
@@ -301,7 +301,7 @@ flowchart TD
     B -->|否| C
     C -->|是| F
     C -->|否| D
-    D -->|否\n低賠率| F
+    D -->|否<br/>低賠率| F
     D -->|是| E
 
     F --> End
@@ -334,7 +334,7 @@ flowchart TD
     T --> U
     U --> V
 
-    V -->|是\ncompleted ≥ required| W
+    V -->|是<br/>completed ≥ required| W
     V -->|否| X
 
     W --> End
@@ -635,7 +635,7 @@ flowchart TD
     S --> T
     T --> U
 
-    U -->|是\ncompleted ≥ required| V
+    U -->|是<br/>completed ≥ required| V
     U -->|否| X
 
     V --> W
@@ -716,15 +716,15 @@ stateDiagram-v2
     state "Turnover Calc (流水計算)" as S_Turnover
 
     %% 1. 初始階段
-    [*] --> S_Pending : 玩家下注\n(扣除餘額)
+    [*] --> S_Pending : 玩家下注<br/>(扣除餘額)
 
     %% 修復點：將筆記移到 state 定義之外，並明確指向 S_Pending
-    note right of S_Pending : Status: PENDING\nTurnover: 0\nReason: 等待GP確認
+    note right of S_Pending : Status: PENDING<br/>Turnover: 0<br/>Reason: 等待GP確認
 
-    S_Pending --> S_Running : GP確認接受\n(遊戲開始)
+    S_Pending --> S_Running : GP確認接受<br/>(遊戲開始)
 
     %% 2. 進行階段
-    note right of S_Running : Status: RUNNING\nTurnover: 0\nReason: 賽果未出
+    note right of S_Running : Status: RUNNING<br/>Turnover: 0<br/>Reason: 賽果未出
 
     S_Running --> S_Settlement : 接收賽果
 
@@ -744,8 +744,8 @@ stateDiagram-v2
         [*] --> Res_Cancel
         
         %% 內部狀態的筆記
-        note right of Res_Win : 賠付因子 > 1.0\n流水 100%
-        note right of Res_Draw : 賠付因子 1.0\n流水 0%
+        note right of Res_Win : 賠付因子 > 1.0<br/>流水 100%
+        note right of Res_Draw : 賠付因子 1.0<br/>流水 0%
     }
 
     %% 4. 資金流向與流水計算

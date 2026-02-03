@@ -323,7 +323,7 @@ sequenceDiagram
         SAGA->>Manual: Create Critical Ticket
         Manual-->>SAGA: Ticket #12345 Created
 
-        SAGA->>SAGA: Mark SAGA as FAILED\nRequire Human Intervention
+        SAGA->>SAGA: Mark SAGA as FAILED<br/>Require Human Intervention
     end
 ```
 
@@ -1208,7 +1208,7 @@ sequenceDiagram
         L2-->>Caller: Exception (Rejected)
         Note over Caller: Catch & Log<br/>No Turnover Calculated
     else Risk Engine Approved
-        L1-->>L2: is_valid = true\neffective_turnover_base = 100
+        L1-->>L2: is_valid = true<br/>effective_turnover_base = 100
         L2->>L2: Apply Status Factor (WIN = 1.0)
         L2->>L2: Calculate: 100 × 1.0 = 100
         L2->>DB: Save Turnover Record

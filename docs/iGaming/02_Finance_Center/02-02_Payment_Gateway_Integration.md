@@ -412,9 +412,9 @@ flowchart TD
 
     STATUS_FILTER[Health Status Filtering] --> HEALTH{PSP Status?}
 
-    HEALTH -->|✅ Healthy\nSuccess >= 80%| HEALTHY["Available for Scoring\n━━━━━━━━━━━━━━\nPass to Step 3"]
-    HEALTH -->|⚠️ Degraded\nSuccess 50-79%| DEGRADED["Lower Priority\n━━━━━━━━━━━━━━\nScore Penalty: -20"]
-    HEALTH -->|❌ Unavailable\nSuccess < 50%| UNAVAILABLE["Skip\n━━━━━━━━━━━━━━\nUse Fallback"]
+    HEALTH -->|✅ Healthy<br/>Success >= 80%| HEALTHY["Available for Scoring\n━━━━━━━━━━━━━━\nPass to Step 3"]
+    HEALTH -->|⚠️ Degraded<br/>Success 50-79%| DEGRADED["Lower Priority\n━━━━━━━━━━━━━━\nScore Penalty: -20"]
+    HEALTH -->|❌ Unavailable<br/>Success < 50%| UNAVAILABLE["Skip\n━━━━━━━━━━━━━━\nUse Fallback"]
 
     HEALTHY --> RETURN1[Return Filtered PSPs]
     DEGRADED --> RETURN1
@@ -488,7 +488,7 @@ flowchart TD
 
     DIM4{"Dimension 4\nVIP Channel\n━━━━━━━━━━━━━━\nWeight: 5%"}
 
-    DIM4 -->|VIP >= 3\nAND\nPSP has VIP channel| S4A["Score += 5.0\n🌟 VIP Bonus"]
+    DIM4 -->|VIP >= 3<br/>AND<br/>PSP has VIP channel| S4A["Score += 5.0\n🌟 VIP Bonus"]
     DIM4 -->|Otherwise| S4B[Score += 0]
 
     S4A --> DIM5
@@ -496,8 +496,8 @@ flowchart TD
 
     DIM5{"Dimension 5\nCurrency Match\n━━━━━━━━━━━━━━\nWeight: 3%"}
 
-    DIM5 -->|Exact Match\nNo FX Fee| S5A[Score += 3.0]
-    DIM5 -->|Need Conversion\nFX Fee Applied| S5B[Score += 0]
+    DIM5 -->|Exact Match<br/>No FX Fee| S5A[Score += 3.0]
+    DIM5 -->|Need Conversion<br/>FX Fee Applied| S5B[Score += 0]
 
     S5A --> TOTAL
     S5B --> TOTAL
@@ -848,9 +848,9 @@ flowchart TD
 flowchart TD
     START["Manual Review Trigger\n━━━━━━━━━━━━━━\nCondition: PSP Status = NOT_FOUND\nPSP has no transaction record"] --> SEVERITY{Amount Severity?}
 
-    SEVERITY -->|>= $1000\nHigh Value| CRITICAL["🔴 CRITICAL Alert\n━━━━━━━━━━━━━━\nNotify: Finance + Security + CTO\nPriority: HIGH\nSLA: 2 hours"]
+    SEVERITY -->|>= $1000<br/>High Value| CRITICAL["🔴 CRITICAL Alert\n━━━━━━━━━━━━━━\nNotify: Finance + Security + CTO\nPriority: HIGH\nSLA: 2 hours"]
 
-    SEVERITY -->|< $1000\nLow Value| STANDARD["🟡 STANDARD Alert\n━━━━━━━━━━━━━━\nNotify: CS Team\nPriority: MEDIUM\nSLA: 24 hours"]
+    SEVERITY -->|< $1000<br/>Low Value| STANDARD["🟡 STANDARD Alert\n━━━━━━━━━━━━━━\nNotify: CS Team\nPriority: MEDIUM\nSLA: 24 hours"]
 
     CRITICAL --> TICKET["Create Review Ticket\n━━━━━━━━━━━━━━\nSystem: Jira\nType: Payment Investigation\nAssignee: Finance Team\nFields: {txn_id, amount, player_id, psp}"]
 
@@ -872,9 +872,9 @@ flowchart TD
 
     MANUAL补单 --> APPROVAL{"Approval Required?\n━━━━━━━━━━━━━━\nThreshold: $1000"}
 
-    APPROVAL -->|No\n(Amount < $1000)| EXECUTE["Execute补单\n━━━━━━━━━━━━━━\nSame as Auto补单 Flow\nOperator: CS Agent"]
+    APPROVAL -->|No<br/>(Amount < $1000)| EXECUTE["Execute补单\n━━━━━━━━━━━━━━\nSame as Auto补单 Flow\nOperator: CS Agent"]
 
-    APPROVAL -->|Yes\n(Amount >= $1000)| AWAIT["Await CFO Approval\n━━━━━━━━━━━━━━\nApproval System: Workflow\nApprover: CFO\nSLA: 24 hours"]
+    APPROVAL -->|Yes<br/>(Amount >= $1000)| AWAIT["Await CFO Approval\n━━━━━━━━━━━━━━\nApproval System: Workflow\nApprover: CFO\nSLA: 24 hours"]
 
     AWAIT --> APPROVED{Approved?}
 
