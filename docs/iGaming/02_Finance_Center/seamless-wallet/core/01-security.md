@@ -83,7 +83,7 @@ graph TD
     H -->|過期| J{檢查 Bet 記錄}
     H -->|解析失敗| ERR1
 
-    J -->|Bet 存在\n且未結算| K[放寬驗證\n使用 round_id 驗證]
+    J -->|Bet 存在\n且未結算| K["放寬驗證\n使用 round_id 驗證"]
     J -->|Bet 不存在| L[拒絕請求]
     J -->|Bet 已結算| ERR7[Error: BET_ALREADY_SETTLED]
 
@@ -91,8 +91,8 @@ graph TD
     L --> R[Error: Invalid Session]
 
     %% Rollback API 驗證流程
-    F -->|超時重試| M[放寬驗證\n使用 transaction_id 驗證]
-    F -->|對帳補單| N[放寬驗證\n需要管理員權限]
+    F -->|超時重試| M["放寬驗證\n使用 transaction_id 驗證"]
+    F -->|對帳補單| N["放寬驗證\n需要管理員權限"]
 
     M --> S[執行回滾]
     N --> N1{管理員 Token?}
@@ -166,8 +166,8 @@ graph TD
     A[收到錯誤響應] --> B{檢查 error_code}
 
     B -->|TOKEN_EXPIRED| C[嘗試刷新 Token]
-    B -->|INVALID_SIGNATURE| D[清除本地 Token\n強制重新登入]
-    B -->|PLAYER_BLOCKED| E[顯示封禁提示\n提供客服聯繫方式]
+    B -->|INVALID_SIGNATURE| D["清除本地 Token\n強制重新登入"]
+    B -->|PLAYER_BLOCKED| E["顯示封禁提示\n提供客服聯繫方式"]
     B -->|BET_NOT_FOUND| F{retryable?}
     B -->|其他錯誤| G[顯示錯誤信息]
 
@@ -180,7 +180,7 @@ graph TD
 
     J --> K{重試次數?}
     K -->|< 3 次| I
-    K -->|≥ 3 次| L[顯示錯誤\n建議聯繫客服]
+    K -->|≥ 3 次| L["顯示錯誤\n建議聯繫客服"]
 
     G --> M[記錄錯誤日誌]
     L --> M
@@ -388,19 +388,19 @@ func ProcessBet(txId, amount) {
 
 ```mermaid
 graph TD
-    A[GP Request] --> B{Layer 1\nRedis 緩存}
+    A[GP Request] --> B{"Layer 1\nRedis 緩存"}
 
-    B -->|Cache Hit| C[返回緩存結果\n耗時: 1-5ms]
+    B -->|Cache Hit| C["返回緩存結果\n耗時: 1-5ms"]
 
-    B -->|Cache Miss| D{Layer 2\n數據庫檢查}
+    B -->|Cache Miss| D{"Layer 2\n數據庫檢查"}
 
-    D -->|已處理| E[從 DB 構建響應\n更新 Redis\n耗時: 10-50ms]
+    D -->|已處理| E["從 DB 構建響應\n更新 Redis\n耗時: 10-50ms"]
 
-    D -->|未處理| F{Layer 3\n分布式鎖}
+    D -->|未處理| F{"Layer 3\n分布式鎖"}
 
-    F -->|獲取鎖成功| G[執行業務邏輯\n寫入 DB\n更新 Redis\n耗時: 50-200ms]
+    F -->|獲取鎖成功| G["執行業務邏輯\n寫入 DB\n更新 Redis\n耗時: 50-200ms"]
 
-    F -->|鎖等待| H[等待並重新檢查\nDB 狀態]
+    F -->|鎖等待| H["等待並重新檢查\nDB 狀態"]
 
     E --> I[返回結果]
     C --> I

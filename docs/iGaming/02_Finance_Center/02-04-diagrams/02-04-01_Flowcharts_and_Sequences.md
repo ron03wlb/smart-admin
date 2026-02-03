@@ -48,41 +48,41 @@
 ```mermaid
 graph TB
     subgraph "玩家投注"
-        A[玩家下注\nAmount: $100\nGame: Baccarat\nOdds: 1.95]
+        A["玩家下注\nAmount: $100\nGame: Baccarat\nOdds: 1.95"]
     end
 
     subgraph "Layer 1: 風控引擎 (Risk Engine - 05-01)"
-        B[對沖檢測\nHedge Detection]
-        C[套利檢測\nArbitrage Detection]
-        D[低賠率過濾\nLow Odds Filter\n閾值: 1.5]
-        E[輸出: valid_bet\n有效投注額\n+ risk_status\n+ filter_reason]
+        B["對沖檢測\nHedge Detection"]
+        C["套利檢測\nArbitrage Detection"]
+        D["低賠率過濾\nLow Odds Filter\n閾值: 1.5"]
+        E["輸出: valid_bet\n有效投注額\n+ risk_status\n+ filter_reason"]
     end
 
     subgraph "Layer 2: 財務中心 (Finance Center - 02-04)"
-        F[注單結算\nBet Settlement]
-        G[記錄結算狀態\nSettlement Status]
+        F["注單結算\nBet Settlement"]
+        G["記錄結算狀態\nSettlement Status"]
         H{注單狀態?}
-        I[WIN/LOSS\n記錄狀態]
-        J[DRAW/TIE\n記錄狀態]
-        K[VOID/CANCEL\n記錄狀態]
-        L[HALF_WIN/LOSS\n記錄狀態]
-        M[輸出: valid_bet\n有效投注額 (不變)]
+        I["WIN/LOSS\n記錄狀態"]
+        J["DRAW/TIE\n記錄狀態"]
+        K["VOID/CANCEL\n記錄狀態"]
+        L["HALF_WIN/LOSS\n記錄狀態"]
+        M["輸出: valid_bet\n有效投注額 (不變)"]
     end
 
     subgraph "Layer 3: 活動系統 (Activity System - 04-01)"
-        N[遊戲權重應用\nGame Weight]
+        N["遊戲權重應用\nGame Weight"]
         O{遊戲類型?}
-        P[Slots/Sports\nWeight: 1.0]
-        Q[Baccarat\nWeight: 0.15]
-        R[Blackjack\nWeight: 0.1]
-        S[Roulette\nWeight: 0.2]
-        T[輸出: activity_valid_turnover\n活動有效流水]
+        P["Slots/Sports\nWeight: 1.0"]
+        Q["Baccarat\nWeight: 0.15"]
+        R["Blackjack\nWeight: 0.1"]
+        S["Roulette\nWeight: 0.2"]
+        T["輸出: activity_valid_turnover\n活動有效流水"]
     end
 
     subgraph "應用場景"
-        U[返水計算\nRebate Calculation]
-        V[流水進度追蹤\nWagering Progress]
-        W[VIP升級\nVIP Upgrade]
+        U["返水計算\nRebate Calculation"]
+        V["流水進度追蹤\nWagering Progress"]
+        W["VIP升級\nVIP Upgrade"]
     end
 
     A --> B
@@ -170,12 +170,12 @@ sequenceDiagram
     Platform->>Risk: 11. validateTurnover(bet_id)\n{bet_amount: 100, odds: 1.95, game: BACCARAT}
 
     Risk->>Risk: 12a. 檢查對沖投注\n(Hedge Detection)
-    Note over Risk: 查詢同一玩家、同一Round\n是否有相反投注
+    Note over Risk: 查詢同一玩家、同一Round<br/>是否有相反投注
     Risk->>DB: 12b. Query同局對沖注單
     DB-->>Risk: 12c. 無對沖注單
 
     Risk->>Risk: 13a. 檢查套利投注\n(Arbitrage Detection)
-    Note over Risk: 檢查跨平台/跨市場\n是否存在套利機會
+    Note over Risk: 檢查跨平台/跨市場<br/>是否存在套利機會
 
     Risk->>Risk: 14a. 檢查賠率閾值\n(Odds Validation)
     Note over Risk: odds=1.95 >= 1.5 ✓
@@ -189,7 +189,7 @@ sequenceDiagram
     Platform->>Finance: 16. recordSettlement(bet_id)\n{valid_bet: 100,\nstatus: WIN}
 
     Finance->>Finance: 17. 記錄結算狀態\nsettlement_status = "WIN"
-    Note over Finance: 僅記錄狀態\n不修改 valid_bet
+    Note over Finance: 僅記錄狀態<br/>不修改 valid_bet
 
     Finance->>Finance: 18. 計算賠付金額\npayout_amount = calculatePayout()
 
@@ -207,7 +207,7 @@ sequenceDiagram
     DB-->>Activity: 23. 返回活動列表\n[{bonus_id: B001,\nbonus_type: "DEPOSIT",\nwagering_requirement: 5000}]
 
     Activity->>Activity: 24. 獲取遊戲權重\ngame_weight = getGameWeight("BACCARAT")
-    Note over Activity: Baccarat → 0.15 (15%)\nSlots → 1.0 (100%)\nBlackjack → 0.1 (10%)
+    Note over Activity: Baccarat → 0.15 (15%)<br/>Slots → 1.0 (100%)<br/>Blackjack → 0.1 (10%)
 
     Activity->>Activity: 25. 計算活動貢獻金額\ncontributed_amount =\nvalid_bet × weight\n= 100 × 0.15 = $15
 
@@ -359,14 +359,14 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[開始: 對沖檢測]
-    B[獲取注單信息\nplayer_id, round_id\nselection, amount]
-    C[查詢同一Round\n該玩家的所有注單]
-    D{是否存在\n相反投注?}
+    B["獲取注單信息\nplayer_id, round_id\nselection, amount"]
+    C["查詢同一Round\n該玩家的所有注單"]
+    D{"是否存在\n相反投注?"}
 
     subgraph Example["範例: 百家樂"]
         E1[投注 Banker $1000]
         E2[投注 Player $950]
-        E3[對沖檢測: ✓\n相反投注]
+        E3["對沖檢測: ✓\n相反投注"]
     end
 
     F[標記為對沖投注]
@@ -400,11 +400,11 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[開始: 賠率驗證]
-    B[讀取配置\nMIN_ODDS_THRESHOLD = 1.5]
-    C[獲取注單賠率\nodds = 1.95]
+    B["讀取配置\nMIN_ODDS_THRESHOLD = 1.5"]
+    C["獲取注單賠率\nodds = 1.95"]
     D{odds ≥ threshold?}
-    E[賠率合格\n通過驗證]
-    F[低賠率投注\nrisk_code = LOW_ODDS]
+    E["賠率合格\n通過驗證"]
+    F["低賠率投注\nrisk_code = LOW_ODDS"]
     G[effective_turnover = 0]
 
     subgraph Examples["賠率範例"]
@@ -440,28 +440,28 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[開始: 財務層記錄]
-    B[輸入: valid_bet\n= $100\n來自 Layer 1,不可變]
-    C[獲取注單狀態\nbet.status]
+    B["輸入: valid_bet\n= $100\n來自 Layer 1,不可變"]
+    C["獲取注單狀態\nbet.status"]
     D{注單狀態}
 
-    E[WIN\n玩家贏]
-    F[記錄: settlement_status = WIN\n計算賠付金額]
+    E["WIN\n玩家贏"]
+    F["記錄: settlement_status = WIN\n計算賠付金額"]
 
-    G[LOSS\n玩家輸]
-    H[記錄: settlement_status = LOSS\n計算賠付金額]
+    G["LOSS\n玩家輸"]
+    H["記錄: settlement_status = LOSS\n計算賠付金額"]
 
-    I[DRAW/TIE\n和局]
-    J[記錄: settlement_status = DRAW\n退還本金]
+    I["DRAW/TIE\n和局"]
+    J["記錄: settlement_status = DRAW\n退還本金"]
 
-    K[VOID/CANCEL\n注單作廢]
-    L[記錄: settlement_status = VOID\n退還本金]
+    K["VOID/CANCEL\n注單作廢"]
+    L["記錄: settlement_status = VOID\n退還本金"]
 
-    M[HALF_WIN/HALF_LOSS\n半贏半輸]
-    N[記錄: settlement_status = HALF_WIN/HALF_LOSS\n計算部分賠付]
+    M["HALF_WIN/HALF_LOSS\n半贏半輸"]
+    N["記錄: settlement_status = HALF_WIN/HALF_LOSS\n計算部分賠付"]
 
-    O[更新數據庫\nsettlement_status\npayout_amount]
+    O["更新數據庫\nsettlement_status\npayout_amount"]
 
-    P[valid_bet 保持不變\n= $100\n不受結算狀態影響]
+    P["valid_bet 保持不變\n= $100\n不受結算狀態影響"]
 
     End([返回: valid_bet $100\n+ settlement_status])
 
@@ -505,15 +505,15 @@ flowchart TD
 ```mermaid
 graph LR
     subgraph "注單狀態 (Bet Status)"
-        A1[WIN\n玩家贏]
-        A2[LOSS\n玩家輸]
-        A3[DRAW\n和局]
-        A4[TIE\n平局]
-        A5[VOID\n作廢]
-        A6[CANCEL\n取消]
-        A7[HALF_WIN\n半贏]
-        A8[HALF_LOSS\n半輸]
-        A9[RUNNING\n進行中]
+        A1["WIN\n玩家贏"]
+        A2["LOSS\n玩家輸"]
+        A3["DRAW\n和局"]
+        A4["TIE\n平局"]
+        A5["VOID\n作廢"]
+        A6["CANCEL\n取消"]
+        A7["HALF_WIN\n半贏"]
+        A8["HALF_LOSS\n半輸"]
+        A9["RUNNING\n進行中"]
     end
 
     subgraph "Valid Bet 處理"
@@ -529,15 +529,15 @@ graph LR
     end
 
     subgraph "說明"
-        C1[僅記錄狀態\n計算賠付]
-        C2[僅記錄狀態\n計算賠付]
-        C3[僅記錄狀態\n退還本金]
-        C4[僅記錄狀態\n退還本金]
-        C5[僅記錄狀態\n退還本金]
-        C6[僅記錄狀態\n退還本金]
-        C7[僅記錄狀態\n計算部分賠付]
-        C8[僅記錄狀態\n計算部分賠付]
-        C9[等待結算\n暫不處理]
+        C1["僅記錄狀態\n計算賠付"]
+        C2["僅記錄狀態\n計算賠付"]
+        C3["僅記錄狀態\n退還本金"]
+        C4["僅記錄狀態\n退還本金"]
+        C5["僅記錄狀態\n退還本金"]
+        C6["僅記錄狀態\n退還本金"]
+        C7["僅記錄狀態\n計算部分賠付"]
+        C8["僅記錄狀態\n計算部分賠付"]
+        C9["等待結算\n暫不處理"]
     end
 
     A1 --> B1 --> C1
@@ -570,38 +570,38 @@ graph LR
 ```mermaid
 flowchart TD
     A[開始: 活動層驗證]
-    B[輸入: valid_turnover_finance\n= $100]
-    C[獲取遊戲類型\ngame_type]
+    B["輸入: valid_turnover_finance\n= $100"]
+    C["獲取遊戲類型\ngame_type"]
     D{遊戲類型}
 
-    E[Slots\n老虎機]
-    F[game_weight = 1.0\n100% 貢獻]
+    E["Slots\n老虎機"]
+    F["game_weight = 1.0\n100% 貢獻"]
 
-    G[Sports\n體育博彩]
-    H[game_weight = 1.0\n100% 貢獻]
+    G["Sports\n體育博彩"]
+    H["game_weight = 1.0\n100% 貢獻"]
 
-    I[Baccarat\n百家樂]
-    J[game_weight = 0.15\n15% 貢獻]
+    I["Baccarat\n百家樂"]
+    J["game_weight = 0.15\n15% 貢獻"]
 
-    K[Blackjack\n二十一點]
-    L[game_weight = 0.1\n10% 貢獻]
+    K["Blackjack\n二十一點"]
+    L["game_weight = 0.1\n10% 貢獻"]
 
-    M[Roulette\n輪盤]
-    N[game_weight = 0.2\n20% 貢獻]
+    M["Roulette\n輪盤"]
+    N["game_weight = 0.2\n20% 貢獻"]
 
-    O[Live Casino\n真人娛樂場]
-    P[game_weight = 0.15\n15% 貢獻]
+    O["Live Casino\n真人娛樂場"]
+    P["game_weight = 0.15\n15% 貢獻"]
 
-    Q[計算活動流水\nactivity_valid_turnover\n= finance × weight]
+    Q["計算活動流水\nactivity_valid_turnover\n= finance × weight"]
 
-    R[查詢玩家活動\nplayer_bonuses]
-    S[更新流水進度\nwagering_completed += activity_valid_turnover]
-    T[計算完成百分比\nprogress = completed / required]
+    R["查詢玩家活動\nplayer_bonuses"]
+    S["更新流水進度\nwagering_completed += activity_valid_turnover"]
+    T["計算完成百分比\nprogress = completed / required"]
 
     U{流水是否達標?}
-    V[標記活動完成\nstatus = 'completed']
-    W[解鎖提款\n可提現餘額更新]
-    X[保持追蹤\nstatus = 'active']
+    V["標記活動完成\nstatus = 'completed'"]
+    W["解鎖提款\n可提現餘額更新"]
+    X["保持追蹤\nstatus = 'active'"]
 
     End([返回: 流水進度])
 
