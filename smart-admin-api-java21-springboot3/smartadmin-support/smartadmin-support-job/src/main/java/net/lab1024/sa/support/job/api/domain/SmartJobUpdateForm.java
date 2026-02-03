@@ -1,0 +1,21 @@
+package net.lab1024.sa.support.job.api.domain;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 定时任务 更新
+ *
+ * @author huke
+ * @since 2024/6/17 21:30
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class SmartJobUpdateForm extends SmartJobAddForm {
+
+  @Schema(description = "任务id")
+  @NotNull(message = "任务id不能为空")
+  private Integer jobId;
+}

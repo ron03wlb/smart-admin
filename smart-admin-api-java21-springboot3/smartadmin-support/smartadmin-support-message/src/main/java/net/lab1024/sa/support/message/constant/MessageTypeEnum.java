@@ -1,0 +1,24 @@
+package net.lab1024.sa.support.message.constant;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import net.lab1024.sa.common.core.domain.enumeration.BaseEnum;
+
+/**
+ * 消息类型
+ *
+ * @author luoyi
+ * @since 2024/06/22 20:20
+ */
+@Getter
+@AllArgsConstructor
+public enum MessageTypeEnum implements BaseEnum {
+  MAIL(1, "站内信"),
+
+  ORDER(2, "订单"),
+  ;
+
+  private final Integer value;
+
+  private final String desc;
+}
