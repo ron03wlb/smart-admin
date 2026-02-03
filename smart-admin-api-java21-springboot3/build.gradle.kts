@@ -20,6 +20,11 @@ allprojects {
 }
 
 subprojects {
+    // Exclude BOM module from applying java plugin (BOM uses java-platform instead)
+    if (name == "smartadmin-common-bom") {
+        return@subprojects
+    }
+
     apply(plugin = "java")
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "checkstyle")
