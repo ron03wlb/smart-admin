@@ -17,13 +17,13 @@ API Gateway 是所有外部流量進入平台的唯一入口。
 ```mermaid
 graph TB
     subgraph "CDN & DDoS Protection Layer - CDN 與 DDoS 防護層"
-        CF[Cloudflare / Akamai<br/>Global CDN + WAF<br/>DDoS Protection<br/>Rate Limit: 1000 req/s per IP]
+        CF[Cloudflare / Akamai\nGlobal CDN + WAF\nDDoS Protection\nRate Limit: 1000 req/s per IP]
     end
 
     subgraph "Client Layer - 客戶端層"
-        WEB[Web Browser<br/>www.casino-brand.com]
-        MOBILE[Mobile App<br/>api.casino-brand.com/mobile]
-        ADMIN[Admin Panel<br/>admin.casino-brand.com]
+        WEB[Web Browser\nwww.casino-brand.com]
+        MOBILE[Mobile App\napi.casino-brand.com/mobile]
+        ADMIN[Admin Panel\nadmin.casino-brand.com]
     end
 
     WEB --> CF
@@ -31,16 +31,16 @@ graph TB
     ADMIN --> CF
 
     subgraph "API Gateway Layer - API 閘道層"
-        KONG[Kong / Apache APISIX<br/>Port: 443 - HTTPS<br/>Rate Limit: 100 req/s per IP<br/>Circuit Breaker Enabled]
+        KONG[Kong / Apache APISIX\nPort: 443 - HTTPS\nRate Limit: 100 req/s per IP\nCircuit Breaker Enabled]
     end
 
     CF --> KONG
 
     subgraph "Routing & Plugin Layer - 路由與插件層"
-        R1[Route: www.casino-brand.com<br/>Plugins: Cache, Compression]
-        R2[Route: api.casino-brand.com<br/>Plugins: JWT Auth, Rate Limit]
-        R3[Route: api.casino-brand.com/mobile<br/>Plugins: Signature Auth, Device Context]
-        R4[Route: admin.casino-brand.com<br/>Plugins: JWT Auth, IP Whitelist]
+        R1[Route: www.casino-brand.com\nPlugins: Cache, Compression]
+        R2[Route: api.casino-brand.com\nPlugins: JWT Auth, Rate Limit]
+        R3[Route: api.casino-brand.com/mobile\nPlugins: Signature Auth, Device Context]
+        R4[Route: admin.casino-brand.com\nPlugins: JWT Auth, IP Whitelist]
 
         KONG --> R1
         KONG --> R2
@@ -49,11 +49,11 @@ graph TB
     end
 
     subgraph "Upstream Services - 上游服務層"
-        CDN_SSR[Frontend CDN / SSR Server<br/>Static Assets + SSR<br/>Port: 3000]
-        API_V1[Backend API Cluster - v1<br/>Player/Wallet/Game APIs<br/>Port: 8080]
-        API_V2[Backend API Cluster - v2<br/>New APIs<br/>Port: 8081]
-        MOBILE_API[Mobile API Cluster<br/>Dedicated for App<br/>Port: 8082]
-        BACKOFFICE[Backoffice Cluster<br/>Admin APIs<br/>Port: 9090]
+        CDN_SSR[Frontend CDN / SSR Server\nStatic Assets + SSR\nPort: 3000]
+        API_V1[Backend API Cluster - v1\nPlayer/Wallet/Game APIs\nPort: 8080]
+        API_V2[Backend API Cluster - v2\nNew APIs\nPort: 8081]
+        MOBILE_API[Mobile API Cluster\nDedicated for App\nPort: 8082]
+        BACKOFFICE[Backoffice Cluster\nAdmin APIs\nPort: 9090]
     end
 
     R1 --> CDN_SSR
@@ -63,19 +63,19 @@ graph TB
     R4 --> BACKOFFICE
 
     subgraph "Service Mesh Layer - 服務網格層"
-        API_V1 --> SVC1[Player Service<br/>Port: 8001]
-        API_V1 --> SVC2[Wallet Service<br/>Port: 8002]
-        API_V1 --> SVC3[Game Service<br/>Port: 8003]
+        API_V1 --> SVC1[Player Service\nPort: 8001]
+        API_V1 --> SVC2[Wallet Service\nPort: 8002]
+        API_V1 --> SVC3[Game Service\nPort: 8003]
 
-        BACKOFFICE --> ADMIN1[User Management<br/>Port: 9001]
-        BACKOFFICE --> ADMIN2[Finance Management<br/>Port: 9002]
-        BACKOFFICE --> ADMIN3[Risk Management<br/>Port: 9003]
+        BACKOFFICE --> ADMIN1[User Management\nPort: 9001]
+        BACKOFFICE --> ADMIN2[Finance Management\nPort: 9002]
+        BACKOFFICE --> ADMIN3[Risk Management\nPort: 9003]
     end
 
     subgraph "Shared Infrastructure - 共享基礎設施"
-        REDIS[Redis Cluster<br/>Rate Limit State<br/>Session Cache]
-        PG[PostgreSQL<br/>Gateway Logs<br/>Audit Trail]
-        MONITOR[Prometheus + Grafana<br/>Metrics + Alerts]
+        REDIS[Redis Cluster\nRate Limit State\nSession Cache]
+        PG[PostgreSQL\nGateway Logs\nAudit Trail]
+        MONITOR[Prometheus + Grafana\nMetrics + Alerts]
     end
 
     KONG --> REDIS
@@ -403,7 +403,7 @@ plugins:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> CLOSED: 系統啟動<br/>Initial State
+    [*] --> CLOSED: 系統啟動\nInitial State
 
     state CLOSED {
         [*] --> Monitoring
@@ -412,27 +412,27 @@ stateDiagram-v2
         ErrorTracking --> Monitoring
     }
 
-    CLOSED --> OPEN: 觸發條件:<br/>- Error Rate > 50% (last 10 requests)<br/>- OR Timeout Rate > 50%<br/>- OR Avg Latency > 5000ms
+    CLOSED --> OPEN: 觸發條件:\n- Error Rate > 50% (last 10 requests)\n- OR Timeout Rate > 50%\n- OR Avg Latency > 5000ms
 
     state OPEN {
         [*] --> FailFast
-        FailFast --> ReturnError: 立即返回<br/>503 Service Unavailable<br/>(不調用上游)
+        FailFast --> ReturnError: 立即返回\n503 Service Unavailable\n(不調用上游)
         ReturnError --> Timer: 等待 30 秒
         Timer --> FailFast
     }
 
-    OPEN --> HALF_OPEN: 30 秒後<br/>嘗試探測
+    OPEN --> HALF_OPEN: 30 秒後\n嘗試探測
 
     state HALF_OPEN {
         [*] --> ProbeRequest
-        ProbeRequest --> WaitResponse: 發送 1 個探測請求<br/>到上游服務
+        ProbeRequest --> WaitResponse: 發送 1 個探測請求\n到上游服務
     }
 
-    HALF_OPEN --> CLOSED: ✅ 探測成功<br/>- Status Code: 2xx<br/>- Latency < 2000ms<br/>→ 重置計數器<br/>→ 恢復正常運營
+    HALF_OPEN --> CLOSED: ✅ 探測成功\n- Status Code: 2xx\n- Latency < 2000ms\n→ 重置計數器\n→ 恢復正常運營
 
-    HALF_OPEN --> OPEN: ❌ 探測失敗<br/>- Status Code: 5xx<br/>- OR Timeout<br/>→ 重新跳閘<br/>→ 回到 30 秒等待
+    HALF_OPEN --> OPEN: ❌ 探測失敗\n- Status Code: 5xx\n- OR Timeout\n→ 重新跳閘\n→ 回到 30 秒等待
 
-    CLOSED --> CLOSED: 錯誤率 < 50%<br/>持續監控
+    CLOSED --> CLOSED: 錯誤率 < 50%\n持續監控
 
     note right of CLOSED : 正常狀態 (CLOSED):\n- 所有請求轉發至上游\n- 監控指標:\n  * Error Rate (5xx)\n  * Timeout Rate\n  * Avg Latency\n- 滑動窗口: 最近 10 個請求
 
@@ -643,16 +643,16 @@ plugins:
 
 ```mermaid
 flowchart TD
-    ATTACKER[攻擊者<br/>DDoS Attack Source<br/>Botnet / Script Kiddie]
+    ATTACKER[攻擊者\nDDoS Attack Source\nBotnet / Script Kiddie]
 
-    ATTACKER -->|大量惡意請求<br/>100k+ req/s| LAYER1
+    ATTACKER -->|大量惡意請求\n100k+ req/s| LAYER1
 
     subgraph LAYER1["Layer 1: Network Layer (L3/L4) - 網絡層防禦"]
-        L1_PROVIDER[Cloudflare / Akamai / AWS Shield<br/>Global Anycast Network]
-        L1_SYN[SYN Flood Protection<br/>SYN Cookie 驗證]
-        L1_UDP[UDP Amplification Protection<br/>NTP/DNS Reflection 緩解]
-        L1_RATE[Rate Limit: 100K pps per IP<br/>超過直接丟棄]
-        L1_ANYCAST[Anycast Routing<br/>分散流量至全球節點]
+        L1_PROVIDER[Cloudflare / Akamai / AWS Shield\nGlobal Anycast Network]
+        L1_SYN[SYN Flood Protection\nSYN Cookie 驗證]
+        L1_UDP[UDP Amplification Protection\nNTP/DNS Reflection 緩解]
+        L1_RATE[Rate Limit: 100K pps per IP\n超過直接丟棄]
+        L1_ANYCAST[Anycast Routing\n分散流量至全球節點]
 
         L1_PROVIDER --> L1_SYN
         L1_PROVIDER --> L1_UDP
@@ -660,14 +660,14 @@ flowchart TD
         L1_PROVIDER --> L1_ANYCAST
     end
 
-    L1_ANYCAST -->|合法流量<br/>< 1000 req/s per IP| LAYER2
+    L1_ANYCAST -->|合法流量\n< 1000 req/s per IP| LAYER2
 
     subgraph LAYER2["Layer 2: Application Layer (L7) - 應用層防禦"]
-        L2_WAF[Cloudflare WAF<br/>Web Application Firewall]
-        L2_HTTP[HTTP Flood Protection<br/>識別 HTTP Flood 模式]
-        L2_SLOWLORIS[Slowloris Protection<br/>檢測慢速 HTTP DoS]
-        L2_CHALLENGE[JavaScript Challenge<br/>疑似 IP 需完成 JS 驗證]
-        L2_CAPTCHA[CAPTCHA 挑戰<br/>高風險請求需人工驗證]
+        L2_WAF[Cloudflare WAF\nWeb Application Firewall]
+        L2_HTTP[HTTP Flood Protection\n識別 HTTP Flood 模式]
+        L2_SLOWLORIS[Slowloris Protection\n檢測慢速 HTTP DoS]
+        L2_CHALLENGE[JavaScript Challenge\n疑似 IP 需完成 JS 驗證]
+        L2_CAPTCHA[CAPTCHA 挑戰\n高風險請求需人工驗證]
 
         L2_WAF --> L2_HTTP
         L2_WAF --> L2_SLOWLORIS
@@ -676,14 +676,14 @@ flowchart TD
         L2_CHALLENGE --> L2_CAPTCHA
     end
 
-    LAYER2 -->|驗證通過<br/>< 100 req/s per IP| LAYER3
+    LAYER2 -->|驗證通過\n< 100 req/s per IP| LAYER3
 
     subgraph LAYER3["Layer 3: Behavioral Analysis (ML-based) - 行為分析層"]
-        L3_BOT[Cloudflare Bot Management<br/>Imperva Advanced Bot Protection]
-        L3_PATTERN[Bot Pattern Detection<br/>時序、Header、行為分析]
-        L3_GOODBOT[Good Bot Whitelist<br/>Googlebot, Bingbot]
-        L3_BADBOT[Bad Bot Detection<br/>Scraper, Credential Stuffing]
-        L3_BLOCK[Block Suspicious Bots<br/>403 Forbidden]
+        L3_BOT[Cloudflare Bot Management\nImperva Advanced Bot Protection]
+        L3_PATTERN[Bot Pattern Detection\n時序、Header、行為分析]
+        L3_GOODBOT[Good Bot Whitelist\nGooglebot, Bingbot]
+        L3_BADBOT[Bad Bot Detection\nScraper, Credential Stuffing]
+        L3_BLOCK[Block Suspicious Bots\n403 Forbidden]
 
         L3_BOT --> L3_PATTERN
         L3_PATTERN --> L3_GOODBOT
@@ -691,15 +691,15 @@ flowchart TD
         L3_BADBOT --> L3_BLOCK
     end
 
-    L3_GOODBOT -->|合法爬蟲<br/>允許通過| LAYER4
-    L3_PATTERN -->|人類用戶<br/>正常流量| LAYER4
+    L3_GOODBOT -->|合法爬蟲\n允許通過| LAYER4
+    L3_PATTERN -->|人類用戶\n正常流量| LAYER4
 
     subgraph LAYER4["Layer 4: Origin Protection - 源站保護層"]
-        L4_HIDE[Hide Origin IP<br/>僅允許 Cloudflare IP 訪問]
-        L4_WHITELIST[IP Whitelist<br/>Cloudflare IP Range Only]
-        L4_AUTOSCALE[Health-based Auto-scaling<br/>攻擊時水平擴展]
-        L4_BACKUP[Backup Origin<br/>不同區域的備份源站]
-        L4_MONITOR[Real-time Monitoring<br/>攻擊檢測與自動切換]
+        L4_HIDE[Hide Origin IP\n僅允許 Cloudflare IP 訪問]
+        L4_WHITELIST[IP Whitelist\nCloudflare IP Range Only]
+        L4_AUTOSCALE[Health-based Auto-scaling\n攻擊時水平擴展]
+        L4_BACKUP[Backup Origin\n不同區域的備份源站]
+        L4_MONITOR[Real-time Monitoring\n攻擊檢測與自動切換]
 
         L4_HIDE --> L4_WHITELIST
         L4_WHITELIST --> L4_AUTOSCALE
@@ -707,11 +707,11 @@ flowchart TD
         L4_BACKUP --> L4_MONITOR
     end
 
-    L4_MONITOR -->|清潔流量<br/>< 50 req/s per IP| ORIGIN[Origin Server<br/>Kong/APISIX Gateway<br/>Backend API Cluster]
+    L4_MONITOR -->|清潔流量\n< 50 req/s per IP| ORIGIN[Origin Server\nKong/APISIX Gateway\nBackend API Cluster]
 
-    L3_BLOCK --> REJECT1[🚫 拒絕<br/>403 Forbidden]
-    L2_CAPTCHA -->|驗證失敗| REJECT2[🚫 拒絕<br/>CAPTCHA Failed]
-    L1_RATE -->|超過限流| REJECT3[🚫 丟棄<br/>Silently Drop]
+    L3_BLOCK --> REJECT1[🚫 拒絕\n403 Forbidden]
+    L2_CAPTCHA -->|驗證失敗| REJECT2[🚫 拒絕\nCAPTCHA Failed]
+    L1_RATE -->|超過限流| REJECT3[🚫 丟棄\nSilently Drop]
 
     style ATTACKER fill:#FF6B6B,stroke:#C92A2A,stroke-width:3px,color:#000
     style LAYER1 fill:#FFF3E0,stroke:#E65100,stroke-width:2px

@@ -28,7 +28,7 @@
 1. [00-01 方案概覽](./00-01_Solution_Overview.md) - 了解整體架構
 2. [00-02 行業術語](./00-02_Industry_Terminology.md) - 掌握行業術語
 3. [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 玩家管理
-4. [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動規則
+4. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動規則
 5. [06-01 代理系統設計](../06_Agent_Center/06-01_Affiliate_System_Design.md) - 代理架構
 
 #### 架構師
@@ -57,7 +57,7 @@
 **風控開發**：
 1. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 規則引擎
 2. [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 出金風控規則
-3. [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動風控
+3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動風控
 
 #### 前端開發工程師
 **建議閱讀路徑**：
@@ -130,7 +130,7 @@
 - [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 支付通道
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - Kafka事件
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額更新
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利發放
+- [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 紅利發放
 
 ---
 
@@ -196,7 +196,7 @@
 ```
 
 **相關文檔**：
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動規則
+- [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動規則
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 紅利發放
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 濫用防護
@@ -258,7 +258,7 @@
 9. **[03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md)**
    GP API規格、安全設計
 
-10. **[04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md)**
+10. **[04-01 活動系統設計](../04_Activity_Center/01-system-design.md)**
     紅利系統、流水要求
 
 ---
@@ -447,9 +447,9 @@ graph TD
 |---------|---------|-------------|
 | [02-06 統一錢包](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | [02-07 交易處理](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 交易處理依賴錢包模型定義 |
 | [02-06 統一錢包](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | [03-03 無縫錢包](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | GP對接使用錢包API |
-| [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../04_Activity_Center/04-01_Activity_System_Design.md) | 活動使用流水驗證數據 |
+| [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動使用流水驗證數據 |
 | [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金引用風控引擎API |
-| [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [04-01 活動系統](../04_Activity_Center/04-01_Activity_System_Design.md) | 活動引用風控檢測 |
+| [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
 | [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) | [09-01 RBAC](../09_System_Security/09-01_Admin_RBAC.md) | RBAC基於層級架構 |
 | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金審批使用審批工作流 |
 | [09-02 審計日誌](../09_System_Security/09-02_Audit_Log_System.md) | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | 審批操作記錄在審計日誌 |
@@ -526,7 +526,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 04-01 | [Activity_System_Design.md](../04_Activity_Center/04-01_Activity_System_Design.md) | 紅利系統、流水要求、風控整合 | 80+ |
+| 04-01 | [Activity_System_Design.md](../04_Activity_Center/01-system-design.md) | 紅利系統、流水要求、風控整合 | 80+ |
 
 ---
 
@@ -681,7 +681,7 @@ graph TD
    - **標記**: 文檔中明確標註 "Layer 2 核心邏輯"
    - **前置條件**: ✅ 必須先通過 Layer 1
 
-3. **Layer 3 - 活動遊戲權重**: [04-01 活動系統 §5.1](../04_Activity_Center/04-01_Activity_System_Design.md#51-遊戲權重應用-game-weight-application---layer-3-核心邏輯)
+3. **Layer 3 - 活動遊戲權重**: [04-01 活動系統 §5.1](../04_Activity_Center/01-system-design.md#51-遊戲權重應用-game-weight-application---layer-3-核心邏輯)
    - **職責**: 遊戲權重應用 (老虎機 100%、百家樂 15%)
    - **輸出**: GameWeight (5%-100%)
    - **標記**: 文檔中明確標註 "Layer 3 核心邏輯"
@@ -720,7 +720,7 @@ ValidTurnover = BetAmount
 
 #### 🎁 ...新的獎金類型
 **導航路徑**:
-1. **業務邏輯**: [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 獎金引擎架構
+1. **業務邏輯**: [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎架構
 2. **錢包整合**: [02-06 統一錢包 - 獎金餘額](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 可下注餘額公式
 3. **風控檢測**: [05-01 風控系統 - 獎金濫用檢測](../05_Risk_Management/05-01_Risk_Control_System.md) - 防刷獎金規則
 
@@ -838,7 +838,7 @@ ValidTurnover = BetAmount
 **必讀清單**:
 1. [00-01 解決方案總覽](../00_Concept_&_Analysis/00-01_Solution_Overview.md) - 商業模式
 2. [01-02 VIP忠誠系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - 玩家運營
-3. [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 獎金引擎
+3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎
 4. [11-01 客服平台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服工具
 
 ---
