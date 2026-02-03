@@ -1535,12 +1535,14 @@ def generate_deletion_certificate(player_id: int, verification_token: str) -> st
 - [05-06 Approval_Workflow](./05-06_Approval_Workflow.md) - GDPR 刪除審批流程
 
 ### 業務邏輯參考
-- [01-01 Player_Lifecycle](../01_Core_Financial_Loop_NEW/01-01_Player_Lifecycle.md) - 玩家生命週期管理
-- [01-02 Wallet_Architecture](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md) - 錢包數據加密
-- [01-05 Withdrawal_Risk](../01_Core_Financial_Loop_NEW/01-05_Withdrawal_Risk.md) - 銀行帳號驗證
+<!-- TODO: 待創建文檔 - Week 4-5 -->
+<!-- - [01-01 Player_Lifecycle](../01_Core_Financial_Loop_NEW/01-01_Player_Lifecycle.md) - 玩家生命週期管理 -->
+- [01-02 Wallet_Architecture](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md) - 錢包數據加密、API安全設計
+<!-- - [01-05 Withdrawal_Risk](../01_Core_Financial_Loop_NEW/01-05_Withdrawal_Risk.md) - 銀行帳號驗證 -->
 
 ### 技術基礎設施
-- [07-03-01 Design_Principles](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API 安全標準
+<!-- TODO: 待創建文檔 - Week 5-6 -->
+<!-- - [07-03-01 Design_Principles](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API 安全標準 -->
 
 ---
 

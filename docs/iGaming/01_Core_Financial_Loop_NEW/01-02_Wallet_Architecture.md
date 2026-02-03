@@ -2079,14 +2079,16 @@ alerts:
 ## 10. 相關文檔 (Related Documentation)
 
 ### 前置知識（必讀）
-- [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計
+<!-- TODO: 待創建文檔 - Week 4-5 -->
+<!-- - [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計 -->
 
 ### 核心依賴
 - [02-03 流水計算與對帳](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md) - 從錢包交易記錄計算流水、三層驗證架構
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 錢包餘額更新的事務處理機制、TCC模式、冪等性設計
 
 ### 相關實作
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 獎金錢包整合、流水要求計算、獎金餘額扣除優先級
+<!-- TODO: 待創建文檔 - Week 4-5 -->
+<!-- - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 獎金錢包整合、流水要求計算、獎金餘額扣除優先級 -->
 - [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - Credit錢包使用、額度轉移、信用結算流程
 - [02-01 提款風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 可提餘額驗證、鎖定餘額處理
 
