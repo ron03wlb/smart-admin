@@ -918,4 +918,43 @@ public Optional<EmployeeEntity> findById(Long id) {
 
 ---
 
-**Last Updated:** 2026-01-25 (v1.1 - Added Prerequisites and Migration Strategy sections based on real-world testing)
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 架構規則：
+
+### 強制要求
+
+- **[Architecture Rules - Service Layer Vavr Option](./../../../.agent/rules/foundation/10-architecture-rules.md#serviceusesvavroption)**
+  - Service 層必須使用 `io.vavr.control.Option`（禁止 `java.util.Optional`）
+  - ArchUnit 測試驗證: `serviceUsesVavrOption()`
+  - 違規時本技能自動觸發重構
+
+- **[Manager Layer Transaction Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 當 Service 需要 @Transactional 時，應提取至 Manager 層
+  - 本技能不處理事務重構（請使用 smartadmin-manager-extractor）
+  - Manager 層同樣必須使用 Vavr Option
+
+### 參考指引
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 布林欄位命名: `deleted` 不是 `isDeleted`
+  - 類別命名: `UserService` 不是 `UserServiceImpl`
+  - Vavr 重構時確保遵循命名規範
+
+- **[Exception and Logging Rules](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - Try.Failure 應記錄到日誌
+  - Either.Left 錯誤應包含完整堆棧跟蹤
+  - 使用 Vavr 後異常處理模式的最佳實踐
+
+---
+
+## 參考資料
+
+- [Vavr Option 官方文檔](https://docs.vavr.io/#_option)
+- [Vavr Try 官方文檔](https://docs.vavr.io/#_try)
+- [Vavr Either 官方文檔](https://docs.vavr.io/#_either)
+- [SmartAdmin Patterns - Domain Objects](./../../../.claude/shared/knowledge/smartadmin-patterns.md#domain-object-pattern)
+
+---
+
+**Last Updated:** 2026-02-03 (v1.2 - Added cross-references to .agent/rules)
