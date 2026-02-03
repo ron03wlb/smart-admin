@@ -208,9 +208,14 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 
 ## Specialized Skills
 
-**Quick Overview**: 35 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
+SmartAdmin 提供兩套並行的技能系統：
 
-**Skills Organization (v4.0.0)**:
+### 1. Claude Code 技能系統 (`.claude/skills/`)
+**適用對象**：Claude Code CLI 使用者
+**技能數量**：35個（P0:6, P1:10, P2:17）
+**詳細說明**：[.claude/skills/README.md](.claude/skills/README.md)
+
+**組織結構**:
 ```
 .claude/skills/
 ├── foundation/      (P0 - 6 skills: Critical foundation)
@@ -264,6 +269,30 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 - Refactoring (3): vavr-refactoring-assistant, smartadmin-manager-extractor, **markdown-quality-checker** ⭐
 
 → **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
+
+---
+
+### 2. Antigravity/通用AI 技能系統 (`.agent/skills/`)
+**適用對象**：Antigravity, Gemini, 及其他AI助手
+**技能數量**：3個（SmartAdmin專用）
+**詳細說明**：[.agent/skills/README.md](.agent/skills/README.md)
+
+**當前技能**：
+1. **smartadmin-crud-generator** - 完整CRUD模塊生成
+2. **quality-gate-orchestrator** - 多工具品質門檻編排
+3. **smartadmin-testing-suite** - 測試套件執行
+
+**系統分界**：
+- `.claude/skills/` 使用 Claude Code 特定的技能調用機制
+- `.agent/skills/` 使用通用的AI指令格式
+- 兩者**不應重複**，各有專門用途
+
+**選擇指南**：
+- 使用 Claude Code CLI → 參考 `.claude/skills/`
+- 使用 Antigravity 或其他AI → 參考 `.agent/skills/`
+- 架構規則統一在 `.agent/rules/` 中
+
+---
 
 ### Week 4-5 New Skills (v3.0.0)
 
