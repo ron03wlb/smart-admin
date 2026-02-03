@@ -1,0 +1,59 @@
+package net.lab1024.sa.system.support;
+
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
+import net.lab1024.sa.base.web.base.SupportBaseController;
+import net.lab1024.sa.common.web.util.SmartRequestUtil;
+import net.lab1024.sa.common.core.domain.request.RequestUser;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.support.operatelog.OperateLogService;
+import net.lab1024.sa.support.operatelog.domain.OperateLogQueryForm;
+import net.lab1024.sa.support.operatelog.domain.OperateLogVO;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 操作日志
+ *
+ * @author 1024创新实验室: 罗伊
+ * @since 2021-12-08 20:48:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@RequiredArgsConstructor
+@RestController
+@Tag(name = SwaggerTagConst.Support.OPERATE_LOG)
+public class AdminOperateLogController extends SupportBaseController {
+
+  private final OperateLogService operateLogService;
+
+  @Operation(summary = "分页查询 @author 罗伊")
+  @PostMapping("/operateLog/page/query")
+  @SaCheckPermission("support:operateLog:query")
+  public ResponseDTO<PageResult<OperateLogVO>> queryByPage(
+      @RequestBody OperateLogQueryForm queryForm) {
+    return operateLogService.queryByPage(queryForm);
+  }
+
+  @Operation(summary = "详情 @author 罗伊")
+  @GetMapping("/operateLog/detail/{operateLogId}")
+  @SaCheckPermission("support:operateLog:detail")
+  public ResponseDTO<OperateLogVO> detail(@PathVariable Long operateLogId) {
+    return operateLogService.detail(operateLogId);
+  }
+
+  @Operation(summary = "分页查询当前登录人信息 @author 善逸")
+  @PostMapping("/operateLog/page/query/login")
+  public ResponseDTO<PageResult<OperateLogVO>> queryByPageLogin(
+      @RequestBody OperateLogQueryForm queryForm) {
+    RequestUser requestUser = SmartRequestUtil.getRequestUser();
+    queryForm.setOperateUserId(requestUser.getUserId());
+    queryForm.setOperateUserType(requestUser.getUserType().getValue());
+    return operateLogService.queryByPage(queryForm);
+  }
+}

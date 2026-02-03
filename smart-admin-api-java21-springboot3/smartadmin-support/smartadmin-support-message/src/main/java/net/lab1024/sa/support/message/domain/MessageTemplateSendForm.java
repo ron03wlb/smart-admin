@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
-import net.lab1024.sa.support.message.constant.MessageTemplateEnum;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
+import net.lab1024.sa.support.message.constant.MessageTemplateEnum;
 
 /**
  * 消息发送form

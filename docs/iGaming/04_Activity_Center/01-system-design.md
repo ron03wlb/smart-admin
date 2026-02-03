@@ -769,7 +769,7 @@ Topics:
 
 ```mermaid
 flowchart TD
-    START["玩家觸發動作\n例: 存款 $200"] --> QUERY_RULES["查詢所有匹配規則\n━━━━━━━━━━━━\nResult: 找到 4 個活動\n• A: 首存 100% bonus\n• B: 週末充值 50% bonus\n• C: VIP 專屬 30% bonus\n• D: 全站返水 1% cashback"]
+    START["玩家觸發動作<br/>例: 存款 $200"] --> QUERY_RULES["查詢所有匹配規則<br/>━━━━━━━━━━━━<br/>Result: 找到 4 個活動<br/>• A: 首存 100% bonus<br/>• B: 週末充值 50% bonus<br/>• C: VIP 專屬 30% bonus<br/>• D: 全站返水 1% cashback"]
 
     QUERY_RULES --> CLASSIFY{"1️⃣ 活動類型分類<br/>━━━━━━━━━━━━"}
 

@@ -205,46 +205,46 @@ stateDiagram-v2
 
 ```mermaid
 graph TD
-    TITLE[VIP 等級權益對比矩陣\n━━━━━━━━━━━━━━━━━━━━━━]
+    TITLE[VIP 等級權益對比矩陣<br/>━━━━━━━━━━━━━━━━━━━━━━]
 
     subgraph BRONZE[🥉 Bronze 青銅級]
-        B1[門檻條件\n━━━━━━━━\n累積存款: $1K\n累積流水: $5K\n難度: ⭐]
-        B2[金錢權益\n━━━━━━━━\n升級禮金: $10\n生日禮金: $0\n月度紅利: $0\n返水比例: 0.3%]
-        B3[提款權益\n━━━━━━━━\n單日限額: $5K\n處理速度: 24h\n手續費: 收取]
-        B4[服務權益\n━━━━━━━━\n客服: 在線客服\nVIP經理: ❌\n專屬活動: ❌]
-        B5[積分權益\n━━━━━━━━\n積分倍數: 1.0x\n兌換優惠: ❌\n優先兌換: ❌]
+        B1[門檻條件<br/>━━━━━━━━<br/>累積存款: $1K<br/>累積流水: $5K<br/>難度: ⭐]
+        B2[金錢權益<br/>━━━━━━━━<br/>升級禮金: $10<br/>生日禮金: $0<br/>月度紅利: $0<br/>返水比例: 0.3%]
+        B3[提款權益<br/>━━━━━━━━<br/>單日限額: $5K<br/>處理速度: 24h<br/>手續費: 收取]
+        B4[服務權益<br/>━━━━━━━━<br/>客服: 在線客服<br/>VIP經理: ❌<br/>專屬活動: ❌]
+        B5[積分權益<br/>━━━━━━━━<br/>積分倍數: 1.0x<br/>兌換優惠: ❌<br/>優先兌換: ❌]
     end
 
     subgraph SILVER[🥈 Silver 白銀級]
-        S1[門檻條件\n━━━━━━━━\n累積存款: $5K\n累積流水: $30K\n難度: ⭐⭐]
-        S2[金錢權益\n━━━━━━━━\n升級禮金: $50 ⬆️ 5x\n生日禮金: $20\n月度紅利: $0\n返水比例: 0.5% ⬆️ 1.67x]
-        S3[提款權益\n━━━━━━━━\n單日限額: $10K ⬆️ 2x\n處理速度: 12h ⬆️ 2x\n手續費: 收取]
-        S4[服務權益\n━━━━━━━━\n客服: 在線客服\nVIP經理: ❌\n專屬活動: 週度紅利]
-        S5[積分權益\n━━━━━━━━\n積分倍數: 1.2x ⬆️\n兌換優惠: ❌\n優先兌換: ❌]
+        S1[門檻條件<br/>━━━━━━━━<br/>累積存款: $5K<br/>累積流水: $30K<br/>難度: ⭐⭐]
+        S2[金錢權益<br/>━━━━━━━━<br/>升級禮金: $50 ⬆️ 5x<br/>生日禮金: $20<br/>月度紅利: $0<br/>返水比例: 0.5% ⬆️ 1.67x]
+        S3[提款權益<br/>━━━━━━━━<br/>單日限額: $10K ⬆️ 2x<br/>處理速度: 12h ⬆️ 2x<br/>手續費: 收取]
+        S4[服務權益<br/>━━━━━━━━<br/>客服: 在線客服<br/>VIP經理: ❌<br/>專屬活動: 週度紅利]
+        S5[積分權益<br/>━━━━━━━━<br/>積分倍數: 1.2x ⬆️<br/>兌換優惠: ❌<br/>優先兌換: ❌]
     end
 
     subgraph GOLD[🥇 Gold 黃金級]
-        G1[門檻條件\n━━━━━━━━\n累積存款: $20K\n累積流水: $150K\n難度: ⭐⭐⭐]
-        G2[金錢權益\n━━━━━━━━\n升級禮金: $200 ⬆️ 20x\n生日禮金: $100 ⬆️ 10x\n月度紅利: $50-200\n返水比例: 0.8% ⬆️ 2.67x]
-        G3[提款權益\n━━━━━━━━\n單日限額: $30K ⬆️ 6x\n處理速度: 6h ⬆️ 4x\n手續費: 部分免除]
-        G4[服務權益\n━━━━━━━━\n客服: VIP 經理 ✅\n專屬郵箱: ✅\n專屬活動: 月度錦標賽]
-        G5[積分權益\n━━━━━━━━\n積分倍數: 1.5x ⬆️\n兌換優惠: 9折\n優先兌換: ✅]
+        G1[門檻條件<br/>━━━━━━━━<br/>累積存款: $20K<br/>累積流水: $150K<br/>難度: ⭐⭐⭐]
+        G2[金錢權益<br/>━━━━━━━━<br/>升級禮金: $200 ⬆️ 20x<br/>生日禮金: $100 ⬆️ 10x<br/>月度紅利: $50-200<br/>返水比例: 0.8% ⬆️ 2.67x]
+        G3[提款權益<br/>━━━━━━━━<br/>單日限額: $30K ⬆️ 6x<br/>處理速度: 6h ⬆️ 4x<br/>手續費: 部分免除]
+        G4[服務權益<br/>━━━━━━━━<br/>客服: VIP 經理 ✅<br/>專屬郵箱: ✅<br/>專屬活動: 月度錦標賽]
+        G5[積分權益<br/>━━━━━━━━<br/>積分倍數: 1.5x ⬆️<br/>兌換優惠: 9折<br/>優先兌換: ✅]
     end
 
     subgraph PLATINUM[💎 Platinum 白金級]
-        P1[門檻條件\n━━━━━━━━\n累積存款: $100K\n累積流水: $1M\n難度: ⭐⭐⭐⭐]
-        P2[金錢權益\n━━━━━━━━\n升級禮金: $1,000 ⬆️ 100x\n生日禮金: $500 ⬆️ 50x\n月度紅利: $500-2000\n返水比例: 1.2% ⬆️ 4x]
-        P3[提款權益\n━━━━━━━━\n單日限額: $100K ⬆️ 20x\n處理速度: 2h ⬆️ 12x\n手續費: 全免 ✅]
-        P4[服務權益\n━━━━━━━━\n客服: VIP 經理 ✅\n專線電話: ✅\n專屬活動: 季度私密賽]
-        P5[積分權益\n━━━━━━━━\n積分倍數: 2.0x ⬆️\n兌換優惠: 85折\n實體獎品: ✅]
+        P1[門檻條件<br/>━━━━━━━━<br/>累積存款: $100K<br/>累積流水: $1M<br/>難度: ⭐⭐⭐⭐]
+        P2[金錢權益<br/>━━━━━━━━<br/>升級禮金: $1,000 ⬆️ 100x<br/>生日禮金: $500 ⬆️ 50x<br/>月度紅利: $500-2000<br/>返水比例: 1.2% ⬆️ 4x]
+        P3[提款權益<br/>━━━━━━━━<br/>單日限額: $100K ⬆️ 20x<br/>處理速度: 2h ⬆️ 12x<br/>手續費: 全免 ✅]
+        P4[服務權益<br/>━━━━━━━━<br/>客服: VIP 經理 ✅<br/>專線電話: ✅<br/>專屬活動: 季度私密賽]
+        P5[積分權益<br/>━━━━━━━━<br/>積分倍數: 2.0x ⬆️<br/>兌換優惠: 85折<br/>實體獎品: ✅]
     end
 
     subgraph DIAMOND[💠 Diamond 鑽石級]
-        D1[門檻條件\n━━━━━━━━\n累積存款: $500K\n累積流水: $5M\n難度: ⭐⭐⭐⭐⭐]
-        D2[金錢權益\n━━━━━━━━\n升級禮金: $5,000 ⬆️ 500x\n生日禮金: $2,000 ⬆️ 200x\n月度紅利: $5,000+\n返水比例: 1.5% ⬆️ 5x]
-        D3[提款權益\n━━━━━━━━\n單日限額: 無限制 ⬆️ ∞\n處理速度: 30min ⬆️ 48x\n手續費: 全免 ✅\n優先通道: ✅]
-        D4[服務權益\n━━━━━━━━\n客服: 1對1 VIP經理 ✅\n24/7專線: ✅\n專屬活動: 私人定制]
-        D5[積分權益\n━━━━━━━━\n積分倍數: 3.0x ⬆️\n兌換優惠: 8折\n豪華獎品: 旅遊/汽車]
+        D1[門檻條件<br/>━━━━━━━━<br/>累積存款: $500K<br/>累積流水: $5M<br/>難度: ⭐⭐⭐⭐⭐]
+        D2[金錢權益<br/>━━━━━━━━<br/>升級禮金: $5,000 ⬆️ 500x<br/>生日禮金: $2,000 ⬆️ 200x<br/>月度紅利: $5,000+<br/>返水比例: 1.5% ⬆️ 5x]
+        D3[提款權益<br/>━━━━━━━━<br/>單日限額: 無限制 ⬆️ ∞<br/>處理速度: 30min ⬆️ 48x<br/>手續費: 全免 ✅<br/>優先通道: ✅]
+        D4[服務權益<br/>━━━━━━━━<br/>客服: 1對1 VIP經理 ✅<br/>24/7專線: ✅<br/>專屬活動: 私人定制]
+        D5[積分權益<br/>━━━━━━━━<br/>積分倍數: 3.0x ⬆️<br/>兌換優惠: 8折<br/>豪華獎品: 旅遊/汽車]
     end
 
     BRONZE -.-> SILVER
@@ -252,11 +252,11 @@ graph TD
     GOLD -.-> PLATINUM
     PLATINUM -.-> DIAMOND
 
-    COMPARISON[權益價值對比分析\n━━━━━━━━━━━━━━━━━━━━━━\n📊 升級回報倍數 ROI]
+    COMPARISON[權益價值對比分析<br/>━━━━━━━━━━━━━━━━━━━━━━<br/>📊 升級回報倍數 ROI]
 
-    COMPARISON --> ROI_TABLE[Bronze → Silver: 5x 升級禮金\nSilver → Gold: 4x 升級禮金\nGold → Platinum: 5x 升級禮金\nPlatinum → Diamond: 5x 升級禮金\n━━━━━━━━━━━━━━━━━━\n💡 最大提升階段: Bronze → Silver\n💰 最大絕對價值: Diamond]
+    COMPARISON --> ROI_TABLE[Bronze → Silver: 5x 升級禮金<br/>Silver → Gold: 4x 升級禮金<br/>Gold → Platinum: 5x 升級禮金<br/>Platinum → Diamond: 5x 升級禮金<br/>━━━━━━━━━━━━━━━━━━<br/>💡 最大提升階段: Bronze → Silver<br/>💰 最大絕對價值: Diamond]
 
-    COMPARISON --> VALUE_PROP[核心價值主張\n━━━━━━━━━━━━━━━━━━\nBronze: 基礎體驗,低門檻\nSilver: 開始感受 VIP 待遇\nGold: 顯著權益提升,VIP 經理\nPlatinum: 頂級服務,優先通道\nDiamond: 極致奢華,無限可能]
+    COMPARISON --> VALUE_PROP[核心價值主張<br/>━━━━━━━━━━━━━━━━━━<br/>Bronze: 基礎體驗,低門檻<br/>Silver: 開始感受 VIP 待遇<br/>Gold: 顯著權益提升,VIP 經理<br/>Platinum: 頂級服務,優先通道<br/>Diamond: 極致奢華,無限可能]
 
     style BRONZE fill:#CD7F32,color:#FFF
     style SILVER fill:#C0C0C0,color:#000
@@ -409,8 +409,8 @@ flowchart LR
     subgraph "Process A: 積分獲取 (Earning)"
         direction LR
         
-        START((Start)) --> EVENT_PUB["遊戲服務發布事件\n━━━━━━━━━━━━\nGameRoundCompleted:\n• win_amount: $250"]
-        EVENT_PUB --> KAFKA[/"Kafka Topic\ngame.rounds.completed"/]
+        START((Start)) --> EVENT_PUB["遊戲服務發布事件<br/>━━━━━━━━━━━━<br/>GameRoundCompleted:<br/>• win_amount: $250"]
+        EVENT_PUB --> KAFKA[/"Kafka Topic<br/>game.rounds.completed"/]
         KAFKA --> LP_CONSUMER(Loyalty Point Service)
         
         LP_CONSUMER --> VALIDATE{"1️⃣ 有效性驗證"}
@@ -418,17 +418,17 @@ flowchart LR
         %% Validation Logic
         VALIDATE --> VAL_FREEZE{"玩家狀態檢查"}
         
-        VAL_FREEZE -->|Frozen| REJECT_FROZEN["拒絕: 玩家已凍結\n━━━━━━━━━━━━\nReason: 'Bonus Abuser'\nAction: 不累積"]:::fail
+        VAL_FREEZE -->|Frozen| REJECT_FROZEN["拒絕: 玩家已凍結<br/>━━━━━━━━━━━━<br/>Reason: 'Bonus Abuser'<br/>Action: 不累積"]:::fail
         VAL_FREEZE -->|Active| VAL_GAME{"遊戲類型檢查"}
         
-        VAL_GAME -->|Invalid| REJECT_GAME["拒絕: 遊戲不符合\n━━━━━━━━━━━━\nExample: Poker Rake\nAction: 不累積"]:::fail
+        VAL_GAME -->|Invalid| REJECT_GAME["拒絕: 遊戲不符合<br/>━━━━━━━━━━━━<br/>Example: Poker Rake<br/>Action: 不累積"]:::fail
         VAL_GAME -->|Valid| VAL_BONUS{"紅利投注檢查"}
         
-        VAL_BONUS -->|Bonus Wallet| REJECT_BONUS["拒絕: 紅利投注不計分\n━━━━━━━━━━━━\nRule: 僅 Cash 計分"]:::fail
+        VAL_BONUS -->|Bonus Wallet| REJECT_BONUS["拒絕: 紅利投注不計分<br/>━━━━━━━━━━━━<br/>Rule: 僅 Cash 計分"]:::fail
         VAL_BONUS -->|Cash Wallet| VAL_TURNOVER{"流水有效性檢查"}
         
-        VAL_TURNOVER -->|Risk| REJECT_TURNOVER["拒絕: 無效流水\n━━━━━━━━━━━━\nReason: 對沖/套利"]:::fail
-        VAL_TURNOVER -->|Valid| CALC_START["✅ 驗證通過\n開始計算"]:::success
+        VAL_TURNOVER -->|Risk| REJECT_TURNOVER["拒絕: 無效流水<br/>━━━━━━━━━━━━<br/>Reason: 對沖/套利"]:::fail
+        VAL_TURNOVER -->|Valid| CALC_START["✅ 驗證通過<br/>開始計算"]:::success
 
         %% Calculation Logic
         CALC_START --> STEP1{"2️⃣ 權重"}
@@ -449,7 +449,7 @@ flowchart LR
         PROMO_BOOST --> DB_UPDATE
         FINAL_POINTS --> DB_UPDATE{"9️⃣ DB Update"}
         
-        DB_UPDATE --> TRANSACTION["創建交易記錄\n(+Points)"]
+        DB_UPDATE --> TRANSACTION["創建交易記錄<br/>(+Points)"]
         TRANSACTION --> UPDATE_BALANCE["更新餘額"]:::process
         
         UPDATE_BALANCE --> CHECK_MILESTONE{"🔟 里程碑?"}
@@ -466,7 +466,7 @@ flowchart LR
     subgraph "Process B: 積分兌換 (Redemption)"
         direction LR
         
-        START2((Start)) --> REDEEM_UI["選擇兌換項目\n(Cash/Spins/Goods)"]
+        START2((Start)) --> REDEEM_UI["選擇兌換項目<br/>(Cash/Spins/Goods)"]
         REDEEM_UI --> REDEEM_REQ["提交兌換請求"]
         REDEEM_REQ --> VAL_BALANCE{"餘額檢查"}
         
@@ -479,7 +479,7 @@ flowchart LR
         VAL_QUOTA -->|超限| REJECT_QUOTA["拒絕: 超過今日限額"]:::fail
         VAL_QUOTA -->|OK| REDEEM_EXECUTE["✅ 執行兌換"]:::success
         
-        REDEEM_EXECUTE --> LOCK_POINTS["鎖定並扣除積分\n(DB Transaction)"]
+        REDEEM_EXECUTE --> LOCK_POINTS["鎖定並扣除積分<br/>(DB Transaction)"]
         LOCK_POINTS --> CREATE_REDEEM_TX["創建兌換記錄"]
         CREATE_REDEEM_TX --> FULFILL{"履行類型?"}
         

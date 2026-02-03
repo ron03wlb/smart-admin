@@ -3,9 +3,9 @@ package net.lab1024.sa.support.message.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
-import net.lab1024.sa.support.message.constant.MessageTypeEnum;
-import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
+import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.support.message.constant.MessageTypeEnum;
 
 /**
  * 消息

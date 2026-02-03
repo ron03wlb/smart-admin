@@ -36,8 +36,8 @@
 
 ```mermaid
 graph LR
-    A["營運商\nWallet Transactions"] -->|比對| C{對帳引擎}
-    B["GP\nProvider Report"] -->|比對| C
+    A["營運商<br/>Wallet Transactions"] -->|比對| C{對帳引擎}
+    B["GP<br/>Provider Report"] -->|比對| C
     C -->|一致| D[✅ 對帳通過]
     C -->|差異| E[❌ 差異報告]
 ```
@@ -47,9 +47,9 @@ graph LR
 
 ```mermaid
 graph TD
-    A["營運商\n財務系統"] -->|比對| D{財務對帳引擎}
-    B["支付網關\nStripe/Adyen"] -->|比對| D
-    C["銀行對帳單\nBank Statement"] -->|比對| D
+    A["營運商<br/>財務系統"] -->|比對| D{財務對帳引擎}
+    B["支付網關<br/>Stripe/Adyen"] -->|比對| D
+    C["銀行對帳單<br/>Bank Statement"] -->|比對| D
     D -->|一致| E[✅ 財務結算]
     D -->|差異| F[❌ 需人工查證]
 ```

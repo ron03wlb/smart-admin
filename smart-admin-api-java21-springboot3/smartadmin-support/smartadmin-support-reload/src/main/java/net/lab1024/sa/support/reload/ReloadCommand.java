@@ -2,6 +2,7 @@ package net.lab1024.sa.support.reload;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.support.reload.core.AbstractSmartReloadCommand;
 import net.lab1024.sa.support.reload.core.domain.SmartReloadItem;
 import net.lab1024.sa.support.reload.core.domain.SmartReloadResult;
@@ -9,7 +10,6 @@ import net.lab1024.sa.support.reload.dao.ReloadItemDao;
 import net.lab1024.sa.support.reload.dao.ReloadResultDao;
 import net.lab1024.sa.support.reload.domain.ReloadItemEntity;
 import net.lab1024.sa.support.reload.domain.ReloadResultEntity;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Component;
 
 /**

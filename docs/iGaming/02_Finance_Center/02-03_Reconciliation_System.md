@@ -230,109 +230,109 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    START[對帳比對完成] --> ANALYZE{"差異分析\n━━━━━━━━"}
+    START[對帳比對完成] --> ANALYZE{"差異分析<br/>━━━━━━━━"}
 
-    ANALYZE -->|無差異| PERFECT_MATCH["✅ 完全匹配\norder_id 一致\namount 一致\nstatus 一致"]
-    PERFECT_MATCH --> AUTO_MARK["自動標記: RECONCILED\n更新 reconciliation_status"]
+    ANALYZE -->|無差異| PERFECT_MATCH["✅ 完全匹配<br/>order_id 一致<br/>amount 一致<br/>status 一致"]
+    PERFECT_MATCH --> AUTO_MARK["自動標記: RECONCILED<br/>更新 reconciliation_status"]
     AUTO_MARK --> REPORT_OK[計入對帳成功統計]
 
     ANALYZE -->|有差異| CLASSIFY{差異類型分類}
 
     %% 差異類型 A: 長款 (Over)
-    CLASSIFY -->|類型 A: 長款| OVER_PAYMENT["✓ 長款檢測\n━━━━━━━━━━━━\nPSP 有交易記錄\n平台無對應訂單"]
+    CLASSIFY -->|類型 A: 長款| OVER_PAYMENT["✓ 長款檢測<br/>━━━━━━━━━━━━<br/>PSP 有交易記錄<br/>平台無對應訂單"]
 
     OVER_PAYMENT --> OVER_AMOUNT{金額檢查}
-    OVER_AMOUNT -->|金額 < $10| OVER_SMALL["小額長款\n可能是測試交易"]
+    OVER_AMOUNT -->|金額 < $10| OVER_SMALL["小額長款<br/>可能是測試交易"]
     OVER_SMALL --> VERIFY_TEST{驗證測試環境?}
-    VERIFY_TEST -->|是測試交易| IGNORE["忽略 + 標記 TEST\n不計入財務報表"]
+    VERIFY_TEST -->|是測試交易| IGNORE["忽略 + 標記 TEST<br/>不計入財務報表"]
     VERIFY_TEST -->|非測試交易| OVER_SMALL_REAL[真實小額長款]
 
-    OVER_AMOUNT -->|$10 ≤ 金額 < $1000| OVER_MEDIUM["中額長款\n需調查但非緊急"]
-    OVER_AMOUNT -->|金額 ≥ $1000| OVER_LARGE["大額長款\n高優先級調查"]
+    OVER_AMOUNT -->|$10 ≤ 金額 < $1000| OVER_MEDIUM["中額長款<br/>需調查但非緊急"]
+    OVER_AMOUNT -->|金額 ≥ $1000| OVER_LARGE["大額長款<br/>高優先級調查"]
 
     OVER_SMALL_REAL --> FIND_PLAYER{查詢玩家資訊}
     OVER_MEDIUM --> FIND_PLAYER
     OVER_LARGE --> FIND_PLAYER
 
     FIND_PLAYER -->|找到玩家| CHECK_PENDING{檢查 Pending 訂單?}
-    CHECK_PENDING -->|有相同金額 Pending| LIKELY_DROPPED["✓ 疑似掉單\n時間窗口: ±30 分鐘\n金額匹配"]
+    CHECK_PENDING -->|有相同金額 Pending| LIKELY_DROPPED["✓ 疑似掉單<br/>時間窗口: ±30 分鐘<br/>金額匹配"]
     CHECK_PENDING -->|無匹配訂單| MANUAL_CREDIT_NEEDED[需財務判斷是否補單]
 
-    FIND_PLAYER -->|找不到玩家| UNKNOWN_SOURCE["來源不明\n可能是誤轉帳"]
+    FIND_PLAYER -->|找不到玩家| UNKNOWN_SOURCE["來源不明<br/>可能是誤轉帳"]
 
     LIKELY_DROPPED --> AUTO_CREDIT{自動補單條件檢查}
-    AUTO_CREDIT -->|金額 < $100 且玩家可信| AUTO_SUPPLEMENT["✅ 自動補單\n創建 manual_order\n增加玩家餘額\n標記: AUTO_CREDITED"]
-    AUTO_CREDIT -->|金額 ≥ $100 或玩家風險| MANUAL_REVIEW_OVER["提交人工審核\n需佐證文件"]
+    AUTO_CREDIT -->|金額 < $100 且玩家可信| AUTO_SUPPLEMENT["✅ 自動補單<br/>創建 manual_order<br/>增加玩家餘額<br/>標記: AUTO_CREDITED"]
+    AUTO_CREDIT -->|金額 ≥ $100 或玩家風險| MANUAL_REVIEW_OVER["提交人工審核<br/>需佐證文件"]
 
     MANUAL_CREDIT_NEEDED --> MANUAL_REVIEW_OVER
     UNKNOWN_SOURCE --> MANUAL_REVIEW_OVER
 
-    MANUAL_REVIEW_OVER --> FINANCE_REVIEW_OVER["財務專員審核\n━━━━━━━━━━━━\n1️⃣ 聯繫 PSP 查詢來源\n2️⃣ 檢查玩家歷史記錄\n3️⃣ 上傳佐證文件"]
+    MANUAL_REVIEW_OVER --> FINANCE_REVIEW_OVER["財務專員審核<br/>━━━━━━━━━━━━<br/>1️⃣ 聯繫 PSP 查詢來源<br/>2️⃣ 檢查玩家歷史記錄<br/>3️⃣ 上傳佐證文件"]
 
     FINANCE_REVIEW_OVER --> APPROVAL_OVER{審批流程}
     APPROVAL_OVER -->|金額 < $1000| MANAGER_APPROVE_OVER[財務主管審批]
     APPROVAL_OVER -->|金額 ≥ $1000| CFO_APPROVE_OVER[CFO 審批]
 
-    MANAGER_APPROVE_OVER -->|通過| EXECUTE_CREDIT["執行補單\nwallet_service.credit"]
+    MANAGER_APPROVE_OVER -->|通過| EXECUTE_CREDIT["執行補單<br/>wallet_service.credit"]
     CFO_APPROVE_OVER -->|通過| EXECUTE_CREDIT
-    EXECUTE_CREDIT --> AUDIT_LOG_OVER["記錄審計日誌\n包含操作者、原因、佐證"]
+    EXECUTE_CREDIT --> AUDIT_LOG_OVER["記錄審計日誌<br/>包含操作者、原因、佐證"]
 
-    MANAGER_APPROVE_OVER -->|拒絕| REJECT_OVER["拒絕補單\n標記: REJECTED\n原因: 無法確認來源"]
+    MANAGER_APPROVE_OVER -->|拒絕| REJECT_OVER["拒絕補單<br/>標記: REJECTED<br/>原因: 無法確認來源"]
     CFO_APPROVE_OVER -->|拒絕| REJECT_OVER
 
     %% 差異類型 B: 短款 (Short)
-    CLASSIFY -->|類型 B: 短款| SHORT_PAYMENT["✓ 短款檢測\n━━━━━━━━━━━━\n平台有成功訂單\nPSP 無交易記錄"]
+    CLASSIFY -->|類型 B: 短款| SHORT_PAYMENT["✓ 短款檢測<br/>━━━━━━━━━━━━<br/>平台有成功訂單<br/>PSP 無交易記錄"]
 
-    SHORT_PAYMENT --> CRITICAL_ALERT["🚨 嚴重告警\n━━━━━━━━━━━━\n可能是偽造回調攻擊\n立即觸發 P0 告警"]
+    SHORT_PAYMENT --> CRITICAL_ALERT["🚨 嚴重告警<br/>━━━━━━━━━━━━<br/>可能是偽造回調攻擊<br/>立即觸發 P0 告警"]
 
-    CRITICAL_ALERT --> FREEZE_ACCOUNT["1️⃣ 凍結玩家帳戶\nUPDATE players SET status='frozen'"]
+    CRITICAL_ALERT --> FREEZE_ACCOUNT["1️⃣ 凍結玩家帳戶<br/>UPDATE players SET status='frozen'"]
     FREEZE_ACCOUNT --> CHECK_CALLBACK{2️⃣ 檢查回調日誌}
 
-    CHECK_CALLBACK --> CALLBACK_ANALYSIS["分析回調數據\n━━━━━━━━━━━━\n• IP 來源\n• 簽名驗證結果\n• Timestamp\n• Request Body"]
+    CHECK_CALLBACK --> CALLBACK_ANALYSIS["分析回調數據<br/>━━━━━━━━━━━━<br/>• IP 來源<br/>• 簽名驗證結果<br/>• Timestamp<br/>• Request Body"]
 
-    CALLBACK_ANALYSIS --> CONTACT_PSP["3️⃣ 緊急聯繫 PSP\nEmail + 電話\n查詢訂單真實狀態"]
+    CALLBACK_ANALYSIS --> CONTACT_PSP["3️⃣ 緊急聯繫 PSP<br/>Email + 電話<br/>查詢訂單真實狀態"]
 
     CONTACT_PSP --> PSP_RESPONSE{PSP 回覆?}
-    PSP_RESPONSE -->|確認未收款| CONFIRMED_FRAUD["✓ 確認欺詐\n偽造回調攻擊"]
-    PSP_RESPONSE -->|確認已收款| PSP_DATA_ISSUE["PSP 數據延遲\n需同步報表"]
-    PSP_RESPONSE -->|48h 無回應| TIMEOUT_ESCALATE["升級至高級管理層\nCTO + CFO 介入"]
+    PSP_RESPONSE -->|確認未收款| CONFIRMED_FRAUD["✓ 確認欺詐<br/>偽造回調攻擊"]
+    PSP_RESPONSE -->|確認已收款| PSP_DATA_ISSUE["PSP 數據延遲<br/>需同步報表"]
+    PSP_RESPONSE -->|48h 無回應| TIMEOUT_ESCALATE["升級至高級管理層<br/>CTO + CFO 介入"]
 
-    CONFIRMED_FRAUD --> ROLLBACK_FRAUD["4️⃣ 執行回滾\nwallet_service.debit\n扣除已入帳金額"]
-    ROLLBACK_FRAUD --> RISK_ALERT_FRAUD["5️⃣ 觸發風控調查\nrisk_alert.create\nseverity: CRITICAL"]
+    CONFIRMED_FRAUD --> ROLLBACK_FRAUD["4️⃣ 執行回滾<br/>wallet_service.debit<br/>扣除已入帳金額"]
+    ROLLBACK_FRAUD --> RISK_ALERT_FRAUD["5️⃣ 觸發風控調查<br/>risk_alert.create<br/>severity: CRITICAL"]
     RISK_ALERT_FRAUD --> POLICE_REPORT{金額 > $10,000?}
-    POLICE_REPORT -->|是| REPORT_TO_POLICE["6️⃣ 報案處理\n準備法律文件"]
-    POLICE_REPORT -->|否| BAN_PLAYER["6️⃣ 永久封禁玩家\n加入黑名單"]
+    POLICE_REPORT -->|是| REPORT_TO_POLICE["6️⃣ 報案處理<br/>準備法律文件"]
+    POLICE_REPORT -->|否| BAN_PLAYER["6️⃣ 永久封禁玩家<br/>加入黑名單"]
 
-    PSP_DATA_ISSUE --> WAIT_SYNC["等待 PSP 數據同步\n24-48 小時"]
-    WAIT_SYNC --> RECHECK["重新比對\n若仍短款 → 升級處理"]
+    PSP_DATA_ISSUE --> WAIT_SYNC["等待 PSP 數據同步<br/>24-48 小時"]
+    WAIT_SYNC --> RECHECK["重新比對<br/>若仍短款 → 升級處理"]
 
     %% 差異類型 C: 金額不符 (Amount Mismatch)
-    CLASSIFY -->|類型 C: 金額不符| AMOUNT_DIFF["✓ 金額不符檢測\n━━━━━━━━━━━━\nplatform_amount ≠ psp_amount"]
+    CLASSIFY -->|類型 C: 金額不符| AMOUNT_DIFF["✓ 金額不符檢測<br/>━━━━━━━━━━━━<br/>platform_amount ≠ psp_amount"]
 
-    AMOUNT_DIFF --> CALC_DIFF["計算差異\n━━━━━━━━━━━━\ndiff = |platform - psp|\ndiff_pct = diff / platform × 100%"]
+    AMOUNT_DIFF --> CALC_DIFF["計算差異<br/>━━━━━━━━━━━━<br/>diff = |platform - psp|<br/>diff_pct = diff / platform × 100%"]
 
     CALC_DIFF --> TOLERANCE_CHECK{容差範圍檢查}
 
-    TOLERANCE_CHECK -->|diff < $1 OR diff_pct < 2%| WITHIN_TOLERANCE["✓ 差異在容差內\n可能是匯率波動/手續費"]
-    WITHIN_TOLERANCE --> AUTO_APPROVE_AMOUNT["自動通過\n標記: AUTO_APPROVED\n記錄差異金額"]
-    AUTO_APPROVE_AMOUNT --> REPORT_APPROVED["計入財務報表\n註記: 手續費差異"]
+    TOLERANCE_CHECK -->|diff < $1 OR diff_pct < 2%| WITHIN_TOLERANCE["✓ 差異在容差內<br/>可能是匯率波動/手續費"]
+    WITHIN_TOLERANCE --> AUTO_APPROVE_AMOUNT["自動通過<br/>標記: AUTO_APPROVED<br/>記錄差異金額"]
+    AUTO_APPROVE_AMOUNT --> REPORT_APPROVED["計入財務報表<br/>註記: 手續費差異"]
 
-    TOLERANCE_CHECK -->|$1 ≤ diff < $10| SMALL_DIFF["小額差異\n需記錄但可自動調整"]
-    TOLERANCE_CHECK -->|$10 ≤ diff < $100| MEDIUM_DIFF["中額差異\n需人工審核"]
-    TOLERANCE_CHECK -->|diff ≥ $100| LARGE_DIFF["大額差異\n需詳細調查"]
+    TOLERANCE_CHECK -->|$1 ≤ diff < $10| SMALL_DIFF["小額差異<br/>需記錄但可自動調整"]
+    TOLERANCE_CHECK -->|$10 ≤ diff < $100| MEDIUM_DIFF["中額差異<br/>需人工審核"]
+    TOLERANCE_CHECK -->|diff ≥ $100| LARGE_DIFF["大額差異<br/>需詳細調查"]
 
     SMALL_DIFF --> AUTO_ADJUST{自動調整規則}
-    AUTO_ADJUST -->|平台多 (platform > psp)| ADJUST_DOWN["自動調減\nUPDATE amount = psp_amount\n記錄調整原因"]
-    AUTO_ADJUST -->|平台少 (platform < psp)| ADJUST_UP["自動調增\n補發差額給玩家"]
+    AUTO_ADJUST -->|平台多 (platform > psp)| ADJUST_DOWN["自動調減<br/>UPDATE amount = psp_amount<br/>記錄調整原因"]
+    AUTO_ADJUST -->|平台少 (platform < psp)| ADJUST_UP["自動調增<br/>補發差額給玩家"]
 
-    MEDIUM_DIFF --> MANUAL_REVIEW_AMOUNT["財務專員審核\n━━━━━━━━━━━━\n1️⃣ 對照 PSP 原始憑證\n2️⃣ 檢查匯率/手續費設定\n3️⃣ 聯繫 PSP 確認"]
+    MEDIUM_DIFF --> MANUAL_REVIEW_AMOUNT["財務專員審核<br/>━━━━━━━━━━━━<br/>1️⃣ 對照 PSP 原始憑證<br/>2️⃣ 檢查匯率/手續費設定<br/>3️⃣ 聯繫 PSP 確認"]
     LARGE_DIFF --> MANUAL_REVIEW_AMOUNT
 
     MANUAL_REVIEW_AMOUNT --> DETERMINE_CAUSE{確定原因}
-    DETERMINE_CAUSE -->|手續費扣除| FEE_ADJUST["標記: 手續費差異\n調整財務科目\n不影響玩家餘額"]
-    DETERMINE_CAUSE -->|匯率換算| FOREX_ADJUST["標記: 匯率差異\n重新計算實際金額"]
-    DETERMINE_CAUSE -->|PSP 錯誤| PSP_ERROR["聯繫 PSP 修正\n等待對方調帳"]
-    DETERMINE_CAUSE -->|平台錯誤| PLATFORM_ERROR["內部系統錯誤\n需技術團隊修復"]
+    DETERMINE_CAUSE -->|手續費扣除| FEE_ADJUST["標記: 手續費差異<br/>調整財務科目<br/>不影響玩家餘額"]
+    DETERMINE_CAUSE -->|匯率換算| FOREX_ADJUST["標記: 匯率差異<br/>重新計算實際金額"]
+    DETERMINE_CAUSE -->|PSP 錯誤| PSP_ERROR["聯繫 PSP 修正<br/>等待對方調帳"]
+    DETERMINE_CAUSE -->|平台錯誤| PLATFORM_ERROR["內部系統錯誤<br/>需技術團隊修復"]
 
     FEE_ADJUST --> APPROVAL_AMOUNT{審批流程}
     FOREX_ADJUST --> APPROVAL_AMOUNT
@@ -342,9 +342,9 @@ flowchart TD
     APPROVAL_AMOUNT -->|diff < $100| MANAGER_APPROVE_AMOUNT[財務主管審批]
     APPROVAL_AMOUNT -->|diff ≥ $100| CFO_APPROVE_AMOUNT[CFO 審批]
 
-    MANAGER_APPROVE_AMOUNT -->|通過| EXECUTE_ADJUSTMENT["執行調帳\nmanual_adjustment.create\n上傳佐證文件"]
+    MANAGER_APPROVE_AMOUNT -->|通過| EXECUTE_ADJUSTMENT["執行調帳<br/>manual_adjustment.create<br/>上傳佐證文件"]
     CFO_APPROVE_AMOUNT -->|通過| EXECUTE_ADJUSTMENT
-    EXECUTE_ADJUSTMENT --> AUDIT_LOG_AMOUNT["記錄審計日誌\n包含調整金額、原因、審批人"]
+    EXECUTE_ADJUSTMENT --> AUDIT_LOG_AMOUNT["記錄審計日誌<br/>包含調整金額、原因、審批人"]
 
     %% 最終匯總
     REPORT_OK --> DAILY_SUMMARY[每日對帳彙總報告]
@@ -356,7 +356,7 @@ flowchart TD
     AUDIT_LOG_AMOUNT --> DAILY_SUMMARY
     IGNORE --> DAILY_SUMMARY
 
-    DAILY_SUMMARY --> EMAIL_FINANCE["發送財務團隊\n━━━━━━━━━━━━\n• 總交易數: 5,235\n• 對帳成功: 5,220 (99.7%)\n• 長款待處理: 3 筆\n• 短款調查中: 2 筆\n• 金額差異: 10 筆"]
+    DAILY_SUMMARY --> EMAIL_FINANCE["發送財務團隊<br/>━━━━━━━━━━━━<br/>• 總交易數: 5,235<br/>• 對帳成功: 5,220 (99.7%)<br/>• 長款待處理: 3 筆<br/>• 短款調查中: 2 筆<br/>• 金額差異: 10 筆"]
 
     %% 樣式定義
     style PERFECT_MATCH fill:#C8E6C9

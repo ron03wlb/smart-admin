@@ -113,6 +113,7 @@ include(
     "smartadmin-support:smartadmin-support-table",
     "smartadmin-support:smartadmin-support-mail",
     "smartadmin-support:smartadmin-support-serialnumber",
+    "smartadmin-support:smartadmin-support-securityprotect",
     "smartadmin-support:smartadmin-support-codegenerator",
 
     // === smartadmin-modules: Business Modules (3 modules) ===
