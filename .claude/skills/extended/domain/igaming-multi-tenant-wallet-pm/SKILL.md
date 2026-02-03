@@ -1157,17 +1157,30 @@ graph TB
 
 **CRITICAL**: All Mermaid diagrams in generated documentation must follow these syntax rules:
 
-- ✅ **Use `\n` for line breaks**, NOT `<br/>` HTML tags
-- ✅ **Wrap multi-line labels with double quotes**: `["Line 1\nLine 2"]`
+**Graph/Flowchart Nodes:**
+- ✅ Use `\n` for line breaks with double quotes: `["Line 1\nLine 2"]`
+- ❌ DO NOT use `<br/>` HTML tags in graph/flowchart nodes
+
+**SequenceDiagram Note Blocks:**
+- ✅ Use `<br/>` for line breaks: `Note over A: Line 1<br/>Line 2`
+- ❌ DO NOT use `\n` in Note blocks (不支援)
+- ℹ️ Participant/arrow labels CAN use `\n` with double quotes
+
+**Other Rules:**
 - ✅ **Avoid HTML tags**: `<b>`, `<i>`, `<span>` are not supported in Mermaid
-- ✅ **Use `note` blocks for complex annotations** in state/sequence diagrams
+- ✅ **Use `note` blocks** for complex annotations in state diagrams
 
 **Example** (Correct Usage):
 ```mermaid
+# Graph nodes - use \n
 flowchart TD
     WALLET["Seamless Wallet\nUnified Balance Management"]
     PLATFORM["Platform Layer\nMulti-Tenant Isolation"]
     WALLET --> PLATFORM
+
+# Sequence notes - use <br/>
+sequenceDiagram
+    Note over Wallet: Balance Update<br/>Cash +100<br/>Bonus -50
 ```
 
 **Reference**: See `knowledge/mermaid-best-practices.md` for complete guidelines and iGaming-specific examples.

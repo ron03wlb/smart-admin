@@ -288,10 +288,12 @@ public class AuditLogService {
 - [ ] Idempotency for duplicate requests
 
 **Mermaid Diagram Standards:**
-- [ ] Use `\n` for line breaks (NOT `<br/>` HTML tags)
-- [ ] Wrap multi-line labels with double quotes: `["Line 1\nLine 2"]`
-- [ ] Avoid all HTML tags (`<b>`, `<i>`, `<span>`) in Mermaid diagrams
-- [ ] Use `note` blocks for complex annotations in sequence/state diagrams
+- [ ] **Graph/Flowchart nodes**: Use `\n` with double quotes: `["Line 1\nLine 2"]`
+- [ ] **SequenceDiagram Note blocks**: Use `<br/>` for line breaks: `Note over A: Line 1<br/>Line 2`
+- [ ] **SequenceDiagram Note blocks**: DO NOT use `\n` (不支援)
+- [ ] **Participant/Arrow labels**: CAN use `\n` with double quotes
+- [ ] Avoid HTML tags (`<b>`, `<i>`, `<span>`) in graph/flowchart nodes
+- [ ] Use `note` blocks for complex annotations in state diagrams
 - [ ] Reference: `../igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md`
 
 ---

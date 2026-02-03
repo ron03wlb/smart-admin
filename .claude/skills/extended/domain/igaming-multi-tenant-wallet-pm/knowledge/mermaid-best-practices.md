@@ -162,6 +162,33 @@ sequenceDiagram
     Gateway-->>-Client: 10. 200 OK
 ```
 
+#### ⚠️ 6.3 Note 區塊特殊規則
+
+**CRITICAL**：sequenceDiagram 的 Note 區塊**不支持 `\n` 換行**，必須使用 `<br/>`。
+
+**❌ 錯誤** - Note 區塊使用 `\n`：
+```mermaid
+sequenceDiagram
+    Note over API: Validate Request\nAmount, Player ID\nIdempotency Key
+```
+
+**✅ 正確** - Note 區塊使用 `<br/>`：
+```mermaid
+sequenceDiagram
+    Note over API: Validate Request<br/>Amount, Player ID<br/>Idempotency Key
+```
+
+**原因**：Mermaid 官方規範限制，sequenceDiagram Note 區塊採用不同的解析邏輯，不支持 `\n` 轉義字符。
+
+**適用範圍**：
+- ✅ `Note over <participant>: Text<br/>More`
+- ✅ `Note left of <participant>: Text<br/>More`
+- ✅ `Note right of <participant>: Text<br/>More`
+
+**不適用**：
+- ❌ 參與者標籤：`participant A as "Name\nRole"` ← 可使用 `\n`
+- ❌ 箭頭標籤：`A->>B: "Text\nMore"` ← 可使用 `\n`
+
 ---
 
 ## 🚫 禁止模式
