@@ -47,7 +47,7 @@ sequenceDiagram
     Note over Player,Notification: Deposit Flow - From Request to Credit
 
     Player->>Frontend: Click "Deposit" (Amount: $100, Method: Credit Card)
-    Frontend->>API Gateway: POST /api/v1/payments/deposit\n{amount: 100, currency: USD, payment_method: credit_card}
+    Frontend->>API Gateway: POST /api/v1/payments/deposit<br/>{amount: 100, currency: USD, payment_method: credit_card}
 
     API Gateway->>PaymentService: createDepositOrder(playerId, amount, method)
     activate PaymentService
@@ -57,19 +57,19 @@ sequenceDiagram
 
     Note over PSP Router: Smart Routing Algorithm (詳見 2.3.2 圖表)
 
-    PSP Router->>PSP Router: Calculate PSP Scores:\nNuvei: 85, Adyen: 78, Stripe: 72
+    PSP Router->>PSP Router: Calculate PSP Scores:<br/>Nuvei: 85, Adyen: 78, Stripe: 72
     PSP Router-->>PaymentService: Selected PSP: Nuvei (Score: 85)
     deactivate PSP Router
 
     PaymentService->>DB: BEGIN TRANSACTION
-    PaymentService->>DB: INSERT INTO transactions\n(id, player_id, amount, status, psp_code, created_at)\nVALUES (txn_20260127_001, player_123, 100, 'PENDING', 'nuvei', NOW())
+    PaymentService->>DB: INSERT INTO transactions<br/>(id, player_id, amount, status, psp_code, created_at)<br/>VALUES (txn_20260127_001, player_123, 100, 'PENDING', 'nuvei', NOW())
 
-    PaymentService->>PaymentService: Generate Checksum:\nSHA256(merchantId + amount + currency + timestamp + secret)
+    PaymentService->>PaymentService: Generate Checksum:<br/>SHA256(merchantId + amount + currency + timestamp + secret)
 
-    PaymentService->>PSP (Nuvei): POST /ppp/api/v1/payment.do\n{merchantId, amount, currency, checksum, returnUrl}
+    PaymentService->>PSP (Nuvei): POST /ppp/api/v1/payment.do<br/>{merchantId, amount, currency, checksum, returnUrl}
     PSP (Nuvei)-->>PaymentService: {status: OK, redirect_url, payment_token, expires_at}
 
-    PaymentService->>DB: UPDATE transactions SET\npsp_order_id = payment_token,\nredirect_url = redirect_url,\nexpires_at = NOW() + 15min
+    PaymentService->>DB: UPDATE transactions SET<br/>psp_order_id = payment_token,<br/>redirect_url = redirect_url,<br/>expires_at = NOW() + 15min
 
     PaymentService->>DB: COMMIT
     PaymentService-->>API Gateway: {transaction_id, redirect_url, expires_at}
@@ -84,25 +84,25 @@ sequenceDiagram
     PSP (Nuvei)->>PSP (Nuvei): Process Payment (3-30 seconds)
 
     alt Payment Success
-        PSP (Nuvei)->>Webhook Handler: POST /webhook/deposit\nX-PSP-Signature: HMAC-SHA256\nBody: {transaction_id, status: APPROVED, psp_txn_id, amount}
+        PSP (Nuvei)->>Webhook Handler: POST /webhook/deposit<br/>X-PSP-Signature: HMAC-SHA256<br/>Body: {transaction_id, status: APPROVED, psp_txn_id, amount}
 
         activate Webhook Handler
 
-        Webhook Handler->>Webhook Handler: Step 1: Verify IP Whitelist\n(Request IP in PSP_IPS?)
+        Webhook Handler->>Webhook Handler: Step 1: Verify IP Whitelist<br/>(Request IP in PSP_IPS?)
 
         alt IP Not Whitelisted
             Webhook Handler-->>PSP (Nuvei): 403 Forbidden
             Webhook Handler->>Notification: Alert Security Team (Suspicious IP)
         end
 
-        Webhook Handler->>Webhook Handler: Step 2: Verify HMAC Signature\nExpected = HMAC(body, webhook_secret)\nReceived = X-PSP-Signature
+        Webhook Handler->>Webhook Handler: Step 2: Verify HMAC Signature<br/>Expected = HMAC(body, webhook_secret)<br/>Received = X-PSP-Signature
 
         alt Signature Mismatch
             Webhook Handler-->>PSP (Nuvei): 403 Forbidden (Invalid Signature)
             Webhook Handler->>Notification: Alert Security Team (Signature Forgery)
         end
 
-        Webhook Handler->>Webhook Handler: Step 3: Verify Timestamp\n(NOW() - request_timestamp < 5min?)
+        Webhook Handler->>Webhook Handler: Step 3: Verify Timestamp<br/>(NOW() - request_timestamp < 5min?)
 
         alt Timestamp Expired
             Webhook Handler-->>PSP (Nuvei): 400 Bad Request (Replay Attack)
@@ -116,7 +116,7 @@ sequenceDiagram
             Webhook Handler-->>PSP (Nuvei): 200 OK {status: ALREADY_PROCESSED}
         end
 
-        Webhook Handler->>DB: SELECT * FROM transactions\nWHERE id = txn_20260127_001 FOR UPDATE
+        Webhook Handler->>DB: SELECT * FROM transactions<br/>WHERE id = txn_20260127_001 FOR UPDATE
         DB-->>Webhook Handler: {status: PENDING, player_id: player_123, amount: 100}
 
         alt Status != PENDING (Idempotent Check)
@@ -124,16 +124,16 @@ sequenceDiagram
         else Status = PENDING (Normal Path)
             Webhook Handler->>DB: BEGIN TRANSACTION
 
-            Webhook Handler->>DB: UPDATE transactions SET\nstatus = 'SUCCESS',\npsp_transaction_id = psp_txn_id,\ncompleted_at = NOW()
+            Webhook Handler->>DB: UPDATE transactions SET<br/>status = 'SUCCESS',<br/>psp_transaction_id = psp_txn_id,<br/>completed_at = NOW()
 
             Webhook Handler->>WalletService: creditBalance(player_id: player_123, amount: 100, ref_id: txn_20260127_001)
             activate WalletService
-            WalletService->>DB: UPDATE player_wallet SET\nbalance = balance + 100,\nversion = version + 1\nWHERE player_id = player_123 AND version = current_version
-            WalletService->>DB: INSERT INTO wallet_transactions\n(player_id, type, amount, ref_id, created_at)\nVALUES (player_123, 'DEPOSIT', 100, txn_20260127_001, NOW())
+            WalletService->>DB: UPDATE player_wallet SET<br/>balance = balance + 100,<br/>version = version + 1<br/>WHERE player_id = player_123 AND version = current_version
+            WalletService->>DB: INSERT INTO wallet_transactions<br/>(player_id, type, amount, ref_id, created_at)<br/>VALUES (player_123, 'DEPOSIT', 100, txn_20260127_001, NOW())
             WalletService-->>Webhook Handler: {status: OK, new_balance: 1100}
             deactivate WalletService
 
-            Webhook Handler->>DB: INSERT INTO payment_audit_log\n(transaction_id, event, details, created_at)\nVALUES (txn_20260127_001, 'WEBHOOK_RECEIVED', {...}, NOW())
+            Webhook Handler->>DB: INSERT INTO payment_audit_log<br/>(transaction_id, event, details, created_at)<br/>VALUES (txn_20260127_001, 'WEBHOOK_RECEIVED', {...}, NOW())
 
             Webhook Handler->>DB: COMMIT
 
@@ -150,9 +150,9 @@ sequenceDiagram
         Frontend->>Player: Display "Deposit Successful" + New Balance
 
     else Payment Failed
-        PSP (Nuvei)->>Webhook Handler: POST /webhook/deposit\nBody: {transaction_id, status: DECLINED, error_code: INSUFFICIENT_FUNDS}
+        PSP (Nuvei)->>Webhook Handler: POST /webhook/deposit<br/>Body: {transaction_id, status: DECLINED, error_code: INSUFFICIENT_FUNDS}
 
-        Webhook Handler->>DB: UPDATE transactions SET\nstatus = 'FAILED',\nerror_code = 'INSUFFICIENT_FUNDS',\ncompleted_at = NOW()
+        Webhook Handler->>DB: UPDATE transactions SET<br/>status = 'FAILED',<br/>error_code = 'INSUFFICIENT_FUNDS',<br/>completed_at = NOW()
 
         Webhook Handler->>Notification: sendDepositFailedNotification(player_123, reason: INSUFFICIENT_FUNDS)
         Notification->>Player: Email: "Deposit Failed. Please try another card."
@@ -165,11 +165,11 @@ sequenceDiagram
     else Payment Timeout (No Callback Received)
         Note over PaymentService,DB: Scheduled Job - Reconciliation (Every 15 min)
 
-        PaymentService->>DB: SELECT * FROM transactions\nWHERE status = 'PENDING'\nAND created_at < NOW() - INTERVAL '30 minutes'
+        PaymentService->>DB: SELECT * FROM transactions<br/>WHERE status = 'PENDING'<br/>AND created_at < NOW() - INTERVAL '30 minutes'
         DB-->>PaymentService: [txn_20260127_001, ...]
 
         loop For each Pending Transaction
-            PaymentService->>PSP (Nuvei): GET /api/v1/query?transaction_id=txn_20260127_001\nAuthorization: HMAC-SHA256
+            PaymentService->>PSP (Nuvei): GET /api/v1/query?transaction_id=txn_20260127_001<br/>Authorization: HMAC-SHA256
 
             alt PSP Status: APPROVED
                 PSP (Nuvei)-->>PaymentService: {status: APPROVED, psp_txn_id, amount: 100}

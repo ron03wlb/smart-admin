@@ -34,12 +34,12 @@ sequenceDiagram
     Platform->>PSP: 2️⃣ 創建訂單 (order_id: ORD001)
     PSP-->>Platform: 3️⃣ 返回支付 URL
     Player->>PSP: 4️⃣ 完成支付
-    PSP->>Platform: 5️⃣ 支付回調 (Webhook)\nPayload: {order_id: ORD001, amount: $100, status: SUCCESS}
+    PSP->>Platform: 5️⃣ 支付回調 (Webhook)<br/>Payload: {order_id: ORD001, amount: $100, status: SUCCESS}
 
-    Platform->>RealtimeRecon: 6️⃣ 觸發實時驗證\n檢查項:\n• 簽名驗證 (HMAC-SHA256)\n• IP 白名單驗證\n• Timestamp 驗證 (< 5min)
+    Platform->>RealtimeRecon: 6️⃣ 觸發實時驗證<br/>檢查項:<br/>• 簽名驗證 (HMAC-SHA256)<br/>• IP 白名單驗證<br/>• Timestamp 驗證 (< 5min)
 
-    RealtimeRecon->>PSP: 7️⃣ 主動查詢確認\nGET /api/query?order_id=ORD001
-    PSP-->>RealtimeRecon: 8️⃣ 返回實際狀態\n{status: SUCCESS, amount: $100}
+    RealtimeRecon->>PSP: 7️⃣ 主動查詢確認<br/>GET /api/query?order_id=ORD001
+    PSP-->>RealtimeRecon: 8️⃣ 返回實際狀態<br/>{status: SUCCESS, amount: $100}
 
     alt 實時驗證通過
         RealtimeRecon->>Platform: ✅ 驗證通過 - 允許入帳
@@ -53,13 +53,13 @@ sequenceDiagram
     Note over BatchRecon,DailyRecon: 第二層：批次對帳 (Batch Reconciliation)<br/>━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>時機: 每小時整點執行<br/>目的: 發現延遲回調或掉單
 
     loop 每小時一次 (Cron: 0 * * * *)
-        BatchRecon->>Platform: 10️⃣ 查詢過去 1 小時訂單\nWHERE created_at BETWEEN NOW()-1h AND NOW()
+        BatchRecon->>Platform: 10️⃣ 查詢過去 1 小時訂單<br/>WHERE created_at BETWEEN NOW()-1h AND NOW()
         Platform-->>BatchRecon: 返回 120 筆訂單
 
-        BatchRecon->>PSP: 11️⃣ 批次查詢 PSP 狀態\nPOST /api/batch_query\nBody: [ORD001, ORD002, ..., ORD120]
+        BatchRecon->>PSP: 11️⃣ 批次查詢 PSP 狀態<br/>POST /api/batch_query<br/>Body: [ORD001, ORD002, ..., ORD120]
         PSP-->>BatchRecon: 返回 118 筆 (2 筆查無記錄)
 
-        BatchRecon->>BatchRecon: 12️⃣ 比對分析\n• 精確匹配: 115 筆 ✅\n• 狀態不符: 3 筆 ⚠️\n• PSP 缺失: 2 筆 ❌
+        BatchRecon->>BatchRecon: 12️⃣ 比對分析<br/>• 精確匹配: 115 筆 ✅<br/>• 狀態不符: 3 筆 ⚠️<br/>• PSP 缺失: 2 筆 ❌
 
         alt 發現異常
             BatchRecon->>AlertSystem: ⚠️ 批次告警: 2 筆 PSP 缺失
@@ -70,31 +70,31 @@ sequenceDiagram
 
     Note over DailyRecon,Bank: 第三層：T+1 日終對帳 (Daily Reconciliation)<br/>━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>時機: 每日 02:00 AM<br/>目的: 完整三方比對 + 生成財務報表
 
-    DailyRecon->>PSP: 13️⃣ 下載 T-1 日報表\nGET /api/reports/transactions?date=2026-01-26\n格式: CSV / JSON
+    DailyRecon->>PSP: 13️⃣ 下載 T-1 日報表<br/>GET /api/reports/transactions?date=2026-01-26<br/>格式: CSV / JSON
     PSP-->>DailyRecon: 返回完整流水 (5,230 筆)
 
-    DailyRecon->>Bank: 14️⃣ 解析銀行對帳單\n來源: FTP / Email / API\n格式: MT940 (SEPA) / CSV (中國)
+    DailyRecon->>Bank: 14️⃣ 解析銀行對帳單<br/>來源: FTP / Email / API<br/>格式: MT940 (SEPA) / CSV (中國)
     Bank-->>DailyRecon: 返回實際入帳記錄 (5,228 筆)
 
-    DailyRecon->>Platform: 15️⃣ 查詢 T-1 日平台訂單\nSELECT * FROM transactions\nWHERE DATE(created_at) = '2026-01-26'
+    DailyRecon->>Platform: 15️⃣ 查詢 T-1 日平台訂單<br/>SELECT * FROM transactions<br/>WHERE DATE(created_at) = '2026-01-26'
     Platform-->>DailyRecon: 返回 5,235 筆訂單
 
-    DailyRecon->>DailyRecon: 16️⃣ 三方比對邏輯\n━━━━━━━━━━━━━━━━\n• 平台 vs PSP: 精確匹配 (order_id)\n• PSP vs Bank: 金額+時間模糊匹配\n• 容差範圍: ±2% 或 ±$1
+    DailyRecon->>DailyRecon: 16️⃣ 三方比對邏輯<br/>━━━━━━━━━━━━━━━━<br/>• 平台 vs PSP: 精確匹配 (order_id)<br/>• PSP vs Bank: 金額+時間模糊匹配<br/>• 容差範圍: ±2% 或 ±$1
 
-    DailyRecon->>DailyRecon: 17️⃣ 差異分類\n━━━━━━━━━━━━━━━━\n• 完全匹配: 5,220 筆 (99.6%) ✅\n• 長款 (PSP 有/平台無): 3 筆 💰\n• 短款 (平台有/PSP 無): 5 筆 🚨\n• 金額不符: 7 筆 ⚠️
+    DailyRecon->>DailyRecon: 17️⃣ 差異分類<br/>━━━━━━━━━━━━━━━━<br/>• 完全匹配: 5,220 筆 (99.6%) ✅<br/>• 長款 (PSP 有/平台無): 3 筆 💰<br/>• 短款 (平台有/PSP 無): 5 筆 🚨<br/>• 金額不符: 7 筆 ⚠️
 
     alt 差異在容差範圍內
-        DailyRecon->>Platform: ✅ 自動標記為已對帳\n差異金額 < $10 → 自動通過
+        DailyRecon->>Platform: ✅ 自動標記為已對帳<br/>差異金額 < $10 → 自動通過
     else 超出容差範圍
         DailyRecon->>AlertSystem: ⚠️ 日終告警: 15 筆差異需人工審核
-        AlertSystem->>FinanceTeam: 📊 每日對帳報告\n• 總交易: 5,235 筆\n• 對帳率: 99.6%\n• 待處理: 15 筆
+        AlertSystem->>FinanceTeam: 📊 每日對帳報告<br/>• 總交易: 5,235 筆<br/>• 對帳率: 99.6%<br/>• 待處理: 15 筆
     end
 
-    DailyRecon->>Platform: 18️⃣ 生成財務報表\n• 存款總額: $523,400\n• 提款總額: $487,200\n• 手續費: $3,680\n• 淨充值: $36,200
+    DailyRecon->>Platform: 18️⃣ 生成財務報表<br/>• 存款總額: $523,400<br/>• 提款總額: $487,200<br/>• 手續費: $3,680<br/>• 淨充值: $36,200
 
-    FinanceTeam->>Platform: 19️⃣ 人工審核差異訂單\n處理流程:\n• 長款 → 補單入帳\n• 短款 → 回滾餘額 + 風控調查\n• 金額不符 → 聯繫 PSP 確認
+    FinanceTeam->>Platform: 19️⃣ 人工審核差異訂單<br/>處理流程:<br/>• 長款 → 補單入帳<br/>• 短款 → 回滾餘額 + 風控調查<br/>• 金額不符 → 聯繫 PSP 確認
 
-    FinanceTeam->>Platform: 20️⃣ 提交調帳申請\n上傳佐證文件 → 財務主管審批
+    FinanceTeam->>Platform: 20️⃣ 提交調帳申請<br/>上傳佐證文件 → 財務主管審批
 ```
 
 **三層對帳特性對比表**：

@@ -146,92 +146,92 @@ sequenceDiagram
         Note over Player,Game: ===== 階段1: 投注階段 (Betting Phase) =====
     end
 
-    Player->>Game: 1. 發起投注 (Place Bet)\nAmount: $100, Game: Baccarat, Odds: 1.95
+    Player->>Game: 1. 發起投注 (Place Bet)<br/>Amount: $100, Game: Baccarat, Odds: 1.95
     Game->>Platform: 2. Debit 請求 (扣除餘額)
     Platform->>Wallet: 3. Lock 玩家資金
-    Wallet->>DB: 4. 更新錢包狀態\nplayable_balance -= 100
+    Wallet->>DB: 4. 更新錢包狀態<br/>playable_balance -= 100
     DB-->>Wallet: 5. 確認扣款成功
     Wallet-->>Platform: 6. 返回 Transaction ID
     Platform-->>Game: 7. Debit Success
-    Game-->>Player: 8. 投注確認 (Bet Confirmed)\nRound ID: round_12345
+    Game-->>Player: 8. 投注確認 (Bet Confirmed)<br/>Round ID: round_12345
 
     rect rgb(255, 250, 240)
         Note over Player,DB: ===== 階段2: 遊戲結算階段 (Settlement Phase) =====
     end
 
     Note over Game: 遊戲結果：玩家贏 $195
-    Game->>Platform: 9. Credit 請求 (派彩)\nAmount: $195, Status: WIN
-    Platform->>DB: 10. 記錄注單結果\nbet_id, status=WIN, win_amount=195
+    Game->>Platform: 9. Credit 請求 (派彩)<br/>Amount: $195, Status: WIN
+    Platform->>DB: 10. 記錄注單結果<br/>bet_id, status=WIN, win_amount=195
 
     rect rgb(240, 255, 240)
         Note over Risk,Activity: ===== 階段3: 流水驗證 (Layer 1 - Risk Engine) =====
     end
 
-    Platform->>Risk: 11. validateTurnover(bet_id)\n{bet_amount: 100, odds: 1.95, game: BACCARAT}
+    Platform->>Risk: 11. validateTurnover(bet_id)<br/>{bet_amount: 100, odds: 1.95, game: BACCARAT}
 
-    Risk->>Risk: 12a. 檢查對沖投注\n(Hedge Detection)
+    Risk->>Risk: 12a. 檢查對沖投注<br/>(Hedge Detection)
     Note over Risk: 查詢同一玩家、同一Round<br/>是否有相反投注
     Risk->>DB: 12b. Query同局對沖注單
     DB-->>Risk: 12c. 無對沖注單
 
-    Risk->>Risk: 13a. 檢查套利投注\n(Arbitrage Detection)
+    Risk->>Risk: 13a. 檢查套利投注<br/>(Arbitrage Detection)
     Note over Risk: 檢查跨平台/跨市場<br/>是否存在套利機會
 
-    Risk->>Risk: 14a. 檢查賠率閾值\n(Odds Validation)
+    Risk->>Risk: 14a. 檢查賠率閾值<br/>(Odds Validation)
     Note over Risk: odds=1.95 >= 1.5 ✓
 
-    Risk-->>Platform: 15. 驗證通過\n{is_valid: true,\nvalid_bet: 100,\nrisk_status: "PASSED",\nfilter_reason: null,\nrisk_rules_applied: []}
+    Risk-->>Platform: 15. 驗證通過<br/>{is_valid: true,<br/>valid_bet: 100,<br/>risk_status: "PASSED",<br/>filter_reason: null,<br/>risk_rules_applied: []}
 
     rect rgb(255, 250, 250)
         Note over Finance,Activity: ===== 階段4: 財務狀態記錄 (Layer 2 - Finance) =====
     end
 
-    Platform->>Finance: 16. recordSettlement(bet_id)\n{valid_bet: 100,\nstatus: WIN}
+    Platform->>Finance: 16. recordSettlement(bet_id)<br/>{valid_bet: 100,<br/>status: WIN}
 
-    Finance->>Finance: 17. 記錄結算狀態\nsettlement_status = "WIN"
+    Finance->>Finance: 17. 記錄結算狀態<br/>settlement_status = "WIN"
     Note over Finance: 僅記錄狀態<br/>不修改 valid_bet
 
-    Finance->>Finance: 18. 計算賠付金額\npayout_amount = calculatePayout()
+    Finance->>Finance: 18. 計算賠付金額<br/>payout_amount = calculatePayout()
 
-    Finance->>DB: 19. 更新注單記錄\nUPDATE bets SET\nsettlement_status='WIN',\npayout_amount=195
+    Finance->>DB: 19. 更新注單記錄<br/>UPDATE bets SET<br/>settlement_status='WIN',<br/>payout_amount=195
 
-    Finance-->>Platform: 20. 返回結算結果\n{valid_bet: 100 (不變),\nsettlement_status: 'WIN',\npayout_amount: 195}
+    Finance-->>Platform: 20. 返回結算結果<br/>{valid_bet: 100 (不變),<br/>settlement_status: 'WIN',<br/>payout_amount: 195}
 
     rect rgb(248, 240, 255)
         Note over Activity,Wallet: ===== 階段5: 遊戲權重應用 (Layer 3 - Activity) =====
     end
 
-    Platform->>Activity: 21. applyGameWeight()\n{valid_bet: 100,\ngame_type: BACCARAT}
+    Platform->>Activity: 21. applyGameWeight()<br/>{valid_bet: 100,<br/>game_type: BACCARAT}
 
-    Activity->>DB: 22. 查詢玩家參與的活動\nSELECT * FROM player_bonuses\nWHERE player_id=xxx\nAND status='active'
-    DB-->>Activity: 23. 返回活動列表\n[{bonus_id: B001,\nbonus_type: "DEPOSIT",\nwagering_requirement: 5000}]
+    Activity->>DB: 22. 查詢玩家參與的活動<br/>SELECT * FROM player_bonuses<br/>WHERE player_id=xxx<br/>AND status='active'
+    DB-->>Activity: 23. 返回活動列表<br/>[{bonus_id: B001,<br/>bonus_type: "DEPOSIT",<br/>wagering_requirement: 5000}]
 
-    Activity->>Activity: 24. 獲取遊戲權重\ngame_weight = getGameWeight("BACCARAT")
+    Activity->>Activity: 24. 獲取遊戲權重<br/>game_weight = getGameWeight("BACCARAT")
     Note over Activity: Baccarat → 0.15 (15%)<br/>Slots → 1.0 (100%)<br/>Blackjack → 0.1 (10%)
 
-    Activity->>Activity: 25. 計算活動貢獻金額\ncontributed_amount =\nvalid_bet × weight\n= 100 × 0.15 = $15
+    Activity->>Activity: 25. 計算活動貢獻金額<br/>contributed_amount =<br/>valid_bet × weight<br/>= 100 × 0.15 = $15
 
-    Activity->>DB: 26. 更新流水進度\nUPDATE player_bonuses SET\nwagering_completed += 15,\nwagering_progress = 15/5000
+    Activity->>DB: 26. 更新流水進度<br/>UPDATE player_bonuses SET<br/>wagering_completed += 15,<br/>wagering_progress = 15/5000
 
     DB-->>Activity: 27. 更新成功
 
-    Activity-->>Platform: 28. 返回活動貢獻\n{contributed_amount: 15,\nwagering_progress: "0.3%",\nremaining: 4985}
+    Activity-->>Platform: 28. 返回活動貢獻<br/>{contributed_amount: 15,<br/>wagering_progress: "0.3%",<br/>remaining: 4985}
 
     rect rgb(255, 245, 240)
         Note over Platform,Player: ===== 階段6: 派彩與通知 =====
     end
 
-    Platform->>Wallet: 29. 派彩到錢包\nCredit $195 to player
-    Wallet->>DB: 30. 更新錢包餘額\nplayable_balance += 195
+    Platform->>Wallet: 29. 派彩到錢包<br/>Credit $195 to player
+    Wallet->>DB: 30. 更新錢包餘額<br/>playable_balance += 195
     Wallet-->>Platform: 31. 派彩成功
 
-    Platform->>Player: 32. 推送通知\n✅ 贏得 $195\n💰 流水進度: +$15 (0.3%)
+    Platform->>Player: 32. 推送通知<br/>✅ 贏得 $195<br/>💰 流水進度: +$15 (0.3%)
 
     rect rgb(245, 245, 245)
         Note over Platform,DB: ===== 階段7: 審計日誌 =====
     end
 
-    Platform->>DB: 33. 記錄審計日誌\nAuditLog.create({\naction: "TURNOVER_CALCULATED",\ndetails: {...}\n})
+    Platform->>DB: 33. 記錄審計日誌<br/>AuditLog.create({<br/>action: "TURNOVER_CALCULATED",<br/>details: {...}<br/>})
 ```
 
 ---
