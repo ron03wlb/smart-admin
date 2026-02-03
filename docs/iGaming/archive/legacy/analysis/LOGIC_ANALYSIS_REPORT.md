@@ -323,7 +323,7 @@ sequenceDiagram
         SAGA->>Manual: Create Critical Ticket
         Manual-->>SAGA: Ticket #12345 Created
 
-        SAGA->>SAGA: Mark SAGA as FAILED<br/>Require Human Intervention
+        SAGA->>SAGA: Mark SAGA as FAILED\nRequire Human Intervention
     end
 ```
 
@@ -510,21 +510,21 @@ DeductionSequence getDeductionSequence(Long playerId, String gameCode, String pr
 flowchart TD
     START[收到 Bet 請求] --> CHECK_PLAYER{玩家特殊規則存在?}
 
-    CHECK_PLAYER -->|是| USE_PLAYER[使用玩家規則<br/>L1: 最高優先級]
+    CHECK_PLAYER -->|是| USE_PLAYER[使用玩家規則\nL1: 最高優先級]
     CHECK_PLAYER -->|否| CHECK_GAME{遊戲配置存在?}
 
-    CHECK_GAME -->|是| USE_GAME[使用遊戲配置<br/>L3: 中高優先級]
+    CHECK_GAME -->|是| USE_GAME[使用遊戲配置\nL3: 中高優先級]
     CHECK_GAME -->|否| CHECK_PROVIDER{廠商配置存在?}
 
-    CHECK_PROVIDER -->|是| USE_PROVIDER[使用廠商配置<br/>L2: 中優先級]
-    CHECK_PROVIDER -->|否| USE_DEFAULT[使用系統預設<br/>L4: 最低優先級]
+    CHECK_PROVIDER -->|是| USE_PROVIDER[使用廠商配置\nL2: 中優先級]
+    CHECK_PROVIDER -->|否| USE_DEFAULT[使用系統預設\nL4: 最低優先級]
 
     USE_PLAYER --> EXECUTE[執行扣款邏輯]
     USE_GAME --> EXECUTE
     USE_PROVIDER --> EXECUTE
     USE_DEFAULT --> EXECUTE
 
-    EXECUTE --> LOG[記錄配置來源<br/>審計日誌]
+    EXECUTE --> LOG[記錄配置來源\n審計日誌]
 
     style USE_PLAYER fill:#FFD700
     style USE_GAME fill:#87CEEB
@@ -1206,9 +1206,9 @@ sequenceDiagram
         L1-->>L2: is_valid = false
         L2->>L2: throw TurnoverRejectionException
         L2-->>Caller: Exception (Rejected)
-        Note over Caller: Catch & Log<br/>No Turnover Calculated
+        Note over Caller: Catch & Log\nNo Turnover Calculated
     else Risk Engine Approved
-        L1-->>L2: is_valid = true<br/>effective_turnover_base = 100
+        L1-->>L2: is_valid = true\neffective_turnover_base = 100
         L2->>L2: Apply Status Factor (WIN = 1.0)
         L2->>L2: Calculate: 100 × 1.0 = 100
         L2->>DB: Save Turnover Record

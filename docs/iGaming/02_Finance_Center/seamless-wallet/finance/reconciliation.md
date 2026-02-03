@@ -36,8 +36,8 @@
 
 ```mermaid
 graph LR
-    A[營運商<br/>Wallet Transactions] -->|比對| C{對帳引擎}
-    B[GP<br/>Provider Report] -->|比對| C
+    A[營運商\nWallet Transactions] -->|比對| C{對帳引擎}
+    B[GP\nProvider Report] -->|比對| C
     C -->|一致| D[✅ 對帳通過]
     C -->|差異| E[❌ 差異報告]
 ```
@@ -47,9 +47,9 @@ graph LR
 
 ```mermaid
 graph TD
-    A[營運商<br/>財務系統] -->|比對| D{財務對帳引擎}
-    B[支付網關<br/>Stripe/Adyen] -->|比對| D
-    C[銀行對帳單<br/>Bank Statement] -->|比對| D
+    A[營運商\n財務系統] -->|比對| D{財務對帳引擎}
+    B[支付網關\nStripe/Adyen] -->|比對| D
+    C[銀行對帳單\nBank Statement] -->|比對| D
     D -->|一致| E[✅ 財務結算]
     D -->|差異| F[❌ 需人工查證]
 ```
@@ -251,10 +251,10 @@ sequenceDiagram
     Wallet->>Promotion: 有效投注 +100
     Promotion->>Promotion: 檢查達成度：1000/1000
     Promotion->>Wallet: ❌ 自動解鎖紅利 100 元
-    Note over Wallet: 現金錢包 +100<br/>紅利錢包 -100
+    Note over Wallet: 現金錢包 +100\n紅利錢包 -100
 
     Player->>Wallet: 繼續投注並輸光 150 元
-    Note over Wallet: 現金錢包 -150<br/>（紅利已解鎖，無法保護）
+    Note over Wallet: 現金錢包 -150\n（紅利已解鎖，無法保護）
 
     Player->>Wallet: 申請取款
     Wallet->>Player: 餘額不足，無法取款
@@ -274,10 +274,10 @@ sequenceDiagram
     Player->>Wallet: 投注 100 元（第 10 筆）
     Wallet->>Promotion: 有效投注 +100
     Promotion->>Promotion: 更新達成度：1000/1000
-    Note over Promotion: ✅ 僅記錄進度<br/>不自動解鎖
+    Note over Promotion: ✅ 僅記錄進度\n不自動解鎖
 
     Player->>Wallet: 繼續投注並輸光 150 元
-    Note over Wallet: 現金錢包 -50<br/>紅利錢包 -100<br/>（紅利未解鎖，營運商風險可控）
+    Note over Wallet: 現金錢包 -50\n紅利錢包 -100\n（紅利未解鎖，營運商風險可控）
 
     Player->>Wallet: 申請取款 50 元
     Wallet->>Promotion: 驗證流水要求

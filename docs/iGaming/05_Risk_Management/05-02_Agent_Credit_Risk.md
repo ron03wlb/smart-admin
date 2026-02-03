@@ -38,7 +38,7 @@
 
 ```mermaid
 flowchart TD
-    CREDIT_START[信用評分計算開始<br/>Agent ID: 12345] --> CREDIT_COLLECT[收集歷史數據<br/>過去 12 週結算記錄]
+    CREDIT_START[信用評分計算開始\nAgent ID: 12345] --> CREDIT_COLLECT[收集歷史數據\n過去 12 週結算記錄]
 
     CREDIT_COLLECT --> CREDIT_DIM1_ENTRY[維度 1: Payment Punctuality - 30%]
     CREDIT_COLLECT --> CREDIT_DIM2_ENTRY[維度 2: Valid Active Ratio - 20%]
@@ -46,42 +46,42 @@ flowchart TD
     CREDIT_COLLECT --> CREDIT_DIM4_ENTRY[維度 4: Tenure - 10%]
     CREDIT_COLLECT --> CREDIT_DIM5_ENTRY[維度 5: Security Deposit - 20%]
 
-    CREDIT_DIM1_ENTRY --> CREDIT_DIM1_CALC[計算結算準時率<br/>On-time settlements / Total settlements]
+    CREDIT_DIM1_ENTRY --> CREDIT_DIM1_CALC[計算結算準時率\nOn-time settlements / Total settlements]
     CREDIT_DIM1_CALC --> CREDIT_DIM1_JUDGE{準時率?}
-    CREDIT_DIM1_JUDGE -->|100% - 12/12 準時| CREDIT_DIM1_SCORE_FULL[✅ 30 分<br/>Full score]
-    CREDIT_DIM1_JUDGE -->|91.7% - 11/12 準時| CREDIT_DIM1_SCORE_HIGH[⚠️ 20 分<br/>-10 分: 1 次遲繳]
-    CREDIT_DIM1_JUDGE -->|83.3% - 10/12 準時| CREDIT_DIM1_SCORE_MED[⚠️ 10 分<br/>-20 分: 2 次遲繳]
-    CREDIT_DIM1_JUDGE -->|< 83.3%| CREDIT_DIM1_SCORE_LOW[❌ 0 分<br/>≥ 3 次遲繳]
+    CREDIT_DIM1_JUDGE -->|100% - 12/12 準時| CREDIT_DIM1_SCORE_FULL[✅ 30 分\nFull score]
+    CREDIT_DIM1_JUDGE -->|91.7% - 11/12 準時| CREDIT_DIM1_SCORE_HIGH[⚠️ 20 分\n-10 分: 1 次遲繳]
+    CREDIT_DIM1_JUDGE -->|83.3% - 10/12 準時| CREDIT_DIM1_SCORE_MED[⚠️ 10 分\n-20 分: 2 次遲繳]
+    CREDIT_DIM1_JUDGE -->|< 83.3%| CREDIT_DIM1_SCORE_LOW[❌ 0 分\n≥ 3 次遲繳]
 
-    CREDIT_DIM2_ENTRY --> CREDIT_DIM2_CALC[計算活躍玩家佔比<br/>Active players / Total players]
+    CREDIT_DIM2_ENTRY --> CREDIT_DIM2_CALC[計算活躍玩家佔比\nActive players / Total players]
     CREDIT_DIM2_CALC --> CREDIT_DIM2_JUDGE{活躍率?}
-    CREDIT_DIM2_JUDGE -->|≥ 60%| CREDIT_DIM2_SCORE_FULL[✅ 20 分<br/>健康代理]
-    CREDIT_DIM2_JUDGE -->|40-59%| CREDIT_DIM2_SCORE_MED[⚠️ 12 分<br/>中等活躍]
-    CREDIT_DIM2_JUDGE -->|20-39%| CREDIT_DIM2_SCORE_LOW[⚠️ 5 分<br/>低活躍]
-    CREDIT_DIM2_JUDGE -->|< 20%| CREDIT_DIM2_SCORE_ZERO[❌ 0 分<br/>死代理]
+    CREDIT_DIM2_JUDGE -->|≥ 60%| CREDIT_DIM2_SCORE_FULL[✅ 20 分\n健康代理]
+    CREDIT_DIM2_JUDGE -->|40-59%| CREDIT_DIM2_SCORE_MED[⚠️ 12 分\n中等活躍]
+    CREDIT_DIM2_JUDGE -->|20-39%| CREDIT_DIM2_SCORE_LOW[⚠️ 5 分\n低活躍]
+    CREDIT_DIM2_JUDGE -->|< 20%| CREDIT_DIM2_SCORE_ZERO[❌ 0 分\n死代理]
 
-    CREDIT_DIM3_ENTRY --> CREDIT_DIM3_CALC[計算輸贏波動率<br/>Std Dev of weekly P&L]
+    CREDIT_DIM3_ENTRY --> CREDIT_DIM3_CALC[計算輸贏波動率\nStd Dev of weekly P&L]
     CREDIT_DIM3_CALC --> CREDIT_DIM3_JUDGE{波動率?}
-    CREDIT_DIM3_JUDGE -->|CV < 0.3| CREDIT_DIM3_SCORE_FULL[✅ 20 分<br/>波動穩定]
-    CREDIT_DIM3_JUDGE -->|CV 0.3-0.5| CREDIT_DIM3_SCORE_MED[⚠️ 12 分<br/>中等波動]
-    CREDIT_DIM3_JUDGE -->|CV 0.5-0.8| CREDIT_DIM3_SCORE_LOW[⚠️ 5 分<br/>高波動]
-    CREDIT_DIM3_JUDGE -->|CV > 0.8| CREDIT_DIM3_SCORE_ZERO[❌ 0 分<br/>極不穩定]
+    CREDIT_DIM3_JUDGE -->|CV < 0.3| CREDIT_DIM3_SCORE_FULL[✅ 20 分\n波動穩定]
+    CREDIT_DIM3_JUDGE -->|CV 0.3-0.5| CREDIT_DIM3_SCORE_MED[⚠️ 12 分\n中等波動]
+    CREDIT_DIM3_JUDGE -->|CV 0.5-0.8| CREDIT_DIM3_SCORE_LOW[⚠️ 5 分\n高波動]
+    CREDIT_DIM3_JUDGE -->|CV > 0.8| CREDIT_DIM3_SCORE_ZERO[❌ 0 分\n極不穩定]
 
-    CREDIT_DIM4_ENTRY --> CREDIT_DIM4_CALC[計算合作時長<br/>Weeks since onboarding]
+    CREDIT_DIM4_ENTRY --> CREDIT_DIM4_CALC[計算合作時長\nWeeks since onboarding]
     CREDIT_DIM4_CALC --> CREDIT_DIM4_JUDGE{時長?}
-    CREDIT_DIM4_JUDGE -->|≥ 52 週 - 1 年+| CREDIT_DIM4_SCORE_FULL[✅ 10 分<br/>長期合作]
-    CREDIT_DIM4_JUDGE -->|26-51 週| CREDIT_DIM4_SCORE_HIGH[⚠️ 7 分<br/>半年+]
-    CREDIT_DIM4_JUDGE -->|12-25 週| CREDIT_DIM4_SCORE_MED[⚠️ 5 分<br/>3-6 月]
-    CREDIT_DIM4_JUDGE -->|< 12 週| CREDIT_DIM4_SCORE_LOW[⚠️ 2 分<br/>新代理]
+    CREDIT_DIM4_JUDGE -->|≥ 52 週 - 1 年+| CREDIT_DIM4_SCORE_FULL[✅ 10 分\n長期合作]
+    CREDIT_DIM4_JUDGE -->|26-51 週| CREDIT_DIM4_SCORE_HIGH[⚠️ 7 分\n半年+]
+    CREDIT_DIM4_JUDGE -->|12-25 週| CREDIT_DIM4_SCORE_MED[⚠️ 5 分\n3-6 月]
+    CREDIT_DIM4_JUDGE -->|< 12 週| CREDIT_DIM4_SCORE_LOW[⚠️ 2 分\n新代理]
 
-    CREDIT_DIM5_ENTRY --> CREDIT_DIM5_CALC[計算保證金覆蓋率<br/>Deposit / Max weekly exposure]
+    CREDIT_DIM5_ENTRY --> CREDIT_DIM5_CALC[計算保證金覆蓋率\nDeposit / Max weekly exposure]
     CREDIT_DIM5_CALC --> CREDIT_DIM5_JUDGE{覆蓋率?}
-    CREDIT_DIM5_JUDGE -->|≥ 200%| CREDIT_DIM5_SCORE_FULL[✅ 20 分<br/>充足保證金]
-    CREDIT_DIM5_JUDGE -->|150-199%| CREDIT_DIM5_SCORE_HIGH[⚠️ 15 分<br/>良好]
-    CREDIT_DIM5_JUDGE -->|100-149%| CREDIT_DIM5_SCORE_MED[⚠️ 10 分<br/>一般]
-    CREDIT_DIM5_JUDGE -->|< 100%| CREDIT_DIM5_SCORE_LOW[❌ 0 分<br/>保證金不足]
+    CREDIT_DIM5_JUDGE -->|≥ 200%| CREDIT_DIM5_SCORE_FULL[✅ 20 分\n充足保證金]
+    CREDIT_DIM5_JUDGE -->|150-199%| CREDIT_DIM5_SCORE_HIGH[⚠️ 15 分\n良好]
+    CREDIT_DIM5_JUDGE -->|100-149%| CREDIT_DIM5_SCORE_MED[⚠️ 10 分\n一般]
+    CREDIT_DIM5_JUDGE -->|< 100%| CREDIT_DIM5_SCORE_LOW[❌ 0 分\n保證金不足]
 
-    CREDIT_DIM1_SCORE_FULL --> CREDIT_AGG[聚合總分<br/>Sum of all dimensions]
+    CREDIT_DIM1_SCORE_FULL --> CREDIT_AGG[聚合總分\nSum of all dimensions]
     CREDIT_DIM1_SCORE_HIGH --> CREDIT_AGG
     CREDIT_DIM1_SCORE_MED --> CREDIT_AGG
     CREDIT_DIM1_SCORE_LOW --> CREDIT_AGG
@@ -108,15 +108,15 @@ flowchart TD
 
     CREDIT_AGG --> CREDIT_FINAL_JUDGE{最終評分?}
 
-    CREDIT_FINAL_JUDGE -->|Score > 80| CREDIT_RESULT_PREMIUM[🟢 優質代理<br/>Premium Tier]
-    CREDIT_FINAL_JUDGE -->|Score 50-80| CREDIT_RESULT_STANDARD[🟡 一般代理<br/>Standard Tier]
-    CREDIT_FINAL_JUDGE -->|Score < 50| CREDIT_RESULT_RISKY[🔴 高危代理<br/>Risky Tier]
+    CREDIT_FINAL_JUDGE -->|Score > 80| CREDIT_RESULT_PREMIUM[🟢 優質代理\nPremium Tier]
+    CREDIT_FINAL_JUDGE -->|Score 50-80| CREDIT_RESULT_STANDARD[🟡 一般代理\nStandard Tier]
+    CREDIT_FINAL_JUDGE -->|Score < 50| CREDIT_RESULT_RISKY[🔴 高危代理\nRisky Tier]
 
-    PREMIUM --> ACTION1[✅ 每週自動恢復額度<br/>允許透支 10%<br/>Priority support]
-    STANDARD --> ACTION2[⚠️ 人工審核後恢復額度<br/>需提交結算證明<br/>Standard support]
-    RISKY --> ACTION3[❌ 凍結額度 - Credit Freeze<br/>要求補繳保證金 - Margin Call<br/>Enhanced monitoring]
+    PREMIUM --> ACTION1[✅ 每週自動恢復額度\n允許透支 10%\nPriority support]
+    STANDARD --> ACTION2[⚠️ 人工審核後恢復額度\n需提交結算證明\nStandard support]
+    RISKY --> ACTION3[❌ 凍結額度 - Credit Freeze\n要求補繳保證金 - Margin Call\nEnhanced monitoring]
 
-    ACTION1 --> END[更新代理信用等級<br/>記錄審計日誌]
+    ACTION1 --> END[更新代理信用等級\n記錄審計日誌]
     ACTION2 --> END
     ACTION3 --> END
 
@@ -226,21 +226,21 @@ Line Exposure = Sum(Player Outstanding) - Sum(Player Cash Balance)
 ```mermaid
 graph TB
     subgraph "Data Collection Layer - 數據收集層"
-        DC1[Player Wallet Events<br/>玩家錢包事件<br/>Bet, Win, Deposit, Withdrawal]
-        DC2[Agent Credit Events<br/>代理信用事件<br/>Credit Grant, Settlement, Transfer]
-        DC3[Position Changes<br/>佔成變更事件<br/>Position % Adjustments]
+        DC1[Player Wallet Events\n玩家錢包事件\nBet, Win, Deposit, Withdrawal]
+        DC2[Agent Credit Events\n代理信用事件\nCredit Grant, Settlement, Transfer]
+        DC3[Position Changes\n佔成變更事件\nPosition % Adjustments]
     end
 
     subgraph "Stream Processing Layer - 流處理層"
-        SP1[Kafka Topic:<br/>player-wallet-events]
-        SP2[Kafka Topic:<br/>agent-credit-events]
-        SP3[Kafka Topic:<br/>position-change-events]
+        SP1[Kafka Topic:\nplayer-wallet-events]
+        SP2[Kafka Topic:\nagent-credit-events]
+        SP3[Kafka Topic:\nposition-change-events]
 
         DC1 --> SP1
         DC2 --> SP2
         DC3 --> SP3
 
-        FLINK[Flink Stream Job:<br/>Exposure Aggregator<br/>5-minute tumbling window]
+        FLINK[Flink Stream Job:\nExposure Aggregator\n5-minute tumbling window]
 
         SP1 --> FLINK
         SP2 --> FLINK
@@ -248,9 +248,9 @@ graph TB
     end
 
     subgraph "Calculation Engine - 計算引擎"
-        CALC1[Line Exposure Calculator<br/>Sum - Player Outstanding<br/>- Player Cash Balance]
-        CALC2[Agent Tree Aggregator<br/>Recursive aggregation<br/>from leaf to root]
-        CALC3[Margin Level Calculator<br/>Deposit + Balance / Current Loss]
+        CALC1[Line Exposure Calculator\nSum - Player Outstanding\n- Player Cash Balance]
+        CALC2[Agent Tree Aggregator\nRecursive aggregation\nfrom leaf to root]
+        CALC3[Margin Level Calculator\nDeposit + Balance / Current Loss]
 
         FLINK --> CALC1
         CALC1 --> CALC2
@@ -258,17 +258,17 @@ graph TB
     end
 
     subgraph "Storage Layer - 存儲層"
-        REDIS[Redis:<br/>Real-time Metrics<br/>agent:exposure:{id}<br/>TTL: 10 minutes]
-        CLICKHOUSE[ClickHouse:<br/>Historical Exposure Data<br/>Time-series analytics]
+        REDIS[Redis:\nReal-time Metrics\nagent:exposure:{id}\nTTL: 10 minutes]
+        CLICKHOUSE[ClickHouse:\nHistorical Exposure Data\nTime-series analytics]
 
         CALC3 --> REDIS
         CALC3 --> CLICKHOUSE
     end
 
     subgraph "Risk Monitoring Layer - 風險監控層"
-        RULE1[Rule Engine:<br/>Exposure Threshold Check<br/>80% → Warning<br/>90% → Critical]
-        RULE2[Abnormal Position Detector:<br/>Detect 0% → 100% jump<br/>within 1 hour]
-        RULE3[Margin Level Monitor:<br/>< 110% → Margin Call<br/>< 100% → Soft Stop<br/>< 80% → Hard Stop]
+        RULE1[Rule Engine:\nExposure Threshold Check\n80% → Warning\n90% → Critical]
+        RULE2[Abnormal Position Detector:\nDetect 0% → 100% jump\nwithin 1 hour]
+        RULE3[Margin Level Monitor:\n< 110% → Margin Call\n< 100% → Soft Stop\n< 80% → Hard Stop]
 
         REDIS --> RULE1
         REDIS --> RULE2
@@ -276,9 +276,9 @@ graph TB
     end
 
     subgraph "Alert & Action Layer - 告警與執行層"
-        ALERT1[Slack/Email Alert<br/>Risk Team notification]
-        ALERT2[Auto Actions:<br/>Freeze credit allocation<br/>Lock position modification]
-        ALERT3[Forced Liquidation:<br/>Suspend all players<br/>Execute settlement]
+        ALERT1[Slack/Email Alert\nRisk Team notification]
+        ALERT2[Auto Actions:\nFreeze credit allocation\nLock position modification]
+        ALERT3[Forced Liquidation:\nSuspend all players\nExecute settlement]
 
         RULE1 -->|Exposure ≥ 80%| ALERT1
         RULE2 -->|Abnormal detected| ALERT2
@@ -286,9 +286,9 @@ graph TB
     end
 
     subgraph "Dashboard Layer - 儀表板層"
-        DASH1[Risk Dashboard:<br/>Agent Exposure Heatmap]
-        DASH2[Real-time Alert Feed:<br/>Last 24h alerts]
-        DASH3[Agent Credit Scorecard:<br/>Credit score trends]
+        DASH1[Risk Dashboard:\nAgent Exposure Heatmap]
+        DASH2[Real-time Alert Feed:\nLast 24h alerts]
+        DASH3[Agent Credit Scorecard:\nCredit score trends]
 
         REDIS --> DASH1
         ALERT1 --> DASH2
@@ -431,22 +431,22 @@ Exposure Ratio = 800,000 / 1,000,000 = 80%
 
 ```mermaid
 flowchart TD
-    START[實時監控<br/>Agent Margin Level] --> CALC[計算保證金水平<br/>Margin Level = Deposit + Balance / Current Loss]
+    START[實時監控\nAgent Margin Level] --> CALC[計算保證金水平\nMargin Level = Deposit + Balance / Current Loss]
 
-    CALC --> CHECK{Margin Level<br/>閾值檢查}
+    CALC --> CHECK{Margin Level\n閾值檢查}
 
-    CHECK -->|≥ 150%| SAFE[🟢 安全區<br/>Safe Zone]
-    CHECK -->|110% - 149%| WATCH[🟡 觀察區<br/>Watch Zone]
-    CHECK -->|100% - 109%| CALL[🟠 追繳區<br/>Margin Call]
-    CHECK -->|80% - 99%| SOFT[🔴 軟停權<br/>Soft Stop]
-    CHECK -->|< 80%| HARD[🚨 硬停權<br/>Hard Stop - Liquidation]
+    CHECK -->|≥ 150%| SAFE[🟢 安全區\nSafe Zone]
+    CHECK -->|110% - 149%| WATCH[🟡 觀察區\nWatch Zone]
+    CHECK -->|100% - 109%| CALL[🟠 追繳區\nMargin Call]
+    CHECK -->|80% - 99%| SOFT[🔴 軟停權\nSoft Stop]
+    CHECK -->|< 80%| HARD[🚨 硬停權\nHard Stop - Liquidation]
 
-    SAFE --> SAFE_ACTION[✅ 正常運營<br/>Actions allowed:<br/>- 新增玩家<br/>- 發放額度<br/>- 調整佔成<br/>- 正常結算]
+    SAFE --> SAFE_ACTION[✅ 正常運營\nActions allowed:\n- 新增玩家\n- 發放額度\n- 調整佔成\n- 正常結算]
 
-    WATCH --> WATCH_ACTION[⚠️ 增強監控<br/>Actions:<br/>- 監控頻率: 10s → 5s<br/>- 發送預警郵件<br/>- 建議補繳保證金<br/>- 所有操作正常]
+    WATCH --> WATCH_ACTION[⚠️ 增強監控\nActions:\n- 監控頻率: 10s → 5s\n- 發送預警郵件\n- 建議補繳保證金\n- 所有操作正常]
 
-    CALL --> CALL_NOTIFY[📧 發送追繳通知<br/>Margin Call Notification]
-    CALL_NOTIFY --> CALL_WAIT{等待 24 小時<br/>代理是否補繳?}
+    CALL --> CALL_NOTIFY[📧 發送追繳通知\nMargin Call Notification]
+    CALL_NOTIFY --> CALL_WAIT{等待 24 小時\n代理是否補繳?}
 
     CALL_WAIT -->|已補繳| CALC_RECHECK[重新計算 Margin Level]
     CALC_RECHECK --> CHECK
@@ -454,40 +454,40 @@ flowchart TD
     CALL_WAIT -->|24h 內未補繳| CALL_ESCALATE[升級為 Soft Stop]
     CALL_ESCALATE --> SOFT
 
-    SOFT --> SOFT_ACTION1[🔒 禁止新增玩家<br/>Disable: Add new players]
-    SOFT --> SOFT_ACTION2[🔒 禁止發放新額度<br/>Disable: Grant new credit]
-    SOFT --> SOFT_ACTION3[🔒 鎖定佔成修改<br/>Lock: Position % changes]
+    SOFT --> SOFT_ACTION1[🔒 禁止新增玩家\nDisable: Add new players]
+    SOFT --> SOFT_ACTION2[🔒 禁止發放新額度\nDisable: Grant new credit]
+    SOFT --> SOFT_ACTION3[🔒 鎖定佔成修改\nLock: Position % changes]
 
-    SOFT_ACTION1 --> SOFT_WAIT{等待 48 小時<br/>代理是否補繳?}
+    SOFT_ACTION1 --> SOFT_WAIT{等待 48 小時\n代理是否補繳?}
     SOFT_ACTION2 --> SOFT_WAIT
     SOFT_ACTION3 --> SOFT_WAIT
 
-    SOFT_WAIT -->|已補繳至 ≥ 110%| SOFT_RELEASE[解除軟停權<br/>Resume normal operations]
+    SOFT_WAIT -->|已補繳至 ≥ 110%| SOFT_RELEASE[解除軟停權\nResume normal operations]
     SOFT_RELEASE --> CALC
 
-    SOFT_WAIT -->|48h 內未補繳 OR<br/>Margin Level < 80%| SOFT_ESCALATE[升級為 Hard Stop]
+    SOFT_WAIT -->|48h 內未補繳 OR\nMargin Level < 80%| SOFT_ESCALATE[升級為 Hard Stop]
     SOFT_ESCALATE --> HARD
 
-    HARD --> HARD_ACTION1[🚨 全線停權<br/>Suspend all players under agent]
-    HARD --> HARD_ACTION2[🚨 強制結算<br/>Execute immediate settlement]
-    HARD --> HARD_ACTION3[🚨 凍結資金<br/>Freeze all funds]
-    HARD --> HARD_ACTION4[🚨 通知法務<br/>Notify legal team]
+    HARD --> HARD_ACTION1[🚨 全線停權\nSuspend all players under agent]
+    HARD --> HARD_ACTION2[🚨 強制結算\nExecute immediate settlement]
+    HARD --> HARD_ACTION3[🚨 凍結資金\nFreeze all funds]
+    HARD --> HARD_ACTION4[🚨 通知法務\nNotify legal team]
 
-    HARD_ACTION1 --> LIQUIDATION[強制平倉流程<br/>Forced Liquidation Process]
+    HARD_ACTION1 --> LIQUIDATION[強制平倉流程\nForced Liquidation Process]
     HARD_ACTION2 --> LIQUIDATION
     HARD_ACTION3 --> LIQUIDATION
     HARD_ACTION4 --> LIQUIDATION
 
-    LIQUIDATION --> LIQ1[計算總債務<br/>Total debt = Σ Player losses]
-    LIQ1 --> LIQ2{保證金是否足夠?<br/>Deposit ≥ Total debt?}
+    LIQUIDATION --> LIQ1[計算總債務\nTotal debt = Σ Player losses]
+    LIQ1 --> LIQ2{保證金是否足夠?\nDeposit ≥ Total debt?}
 
-    LIQ2 -->|是| LIQ_COVER[✅ 保證金覆蓋債務<br/>Deduct from deposit<br/>Return remaining balance]
-    LIQ2 -->|否| LIQ_DEFICIT[❌ 保證金不足<br/>Deficit = Total debt - Deposit]
+    LIQ2 -->|是| LIQ_COVER[✅ 保證金覆蓋債務\nDeduct from deposit\nReturn remaining balance]
+    LIQ2 -->|否| LIQ_DEFICIT[❌ 保證金不足\nDeficit = Total debt - Deposit]
 
-    LIQ_COVER --> LIQ_SETTLE[結算完成<br/>代理帳號狀態: LIQUIDATED]
-    LIQ_DEFICIT --> LIQ_LEGAL[法務追償<br/>Legal debt collection<br/>代理帳號狀態: DEFAULTED]
+    LIQ_COVER --> LIQ_SETTLE[結算完成\n代理帳號狀態: LIQUIDATED]
+    LIQ_DEFICIT --> LIQ_LEGAL[法務追償\nLegal debt collection\n代理帳號狀態: DEFAULTED]
 
-    LIQ_SETTLE --> END[記錄審計日誌<br/>通知所有相關方<br/>更新代理信用分為 0]
+    LIQ_SETTLE --> END[記錄審計日誌\n通知所有相關方\n更新代理信用分為 0]
     LIQ_LEGAL --> END
 
     SAFE_ACTION --> MONITOR[持續監控]

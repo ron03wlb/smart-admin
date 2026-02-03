@@ -10,66 +10,66 @@ Notification Service 是平台對外的唯一發信通道，負責管理所有�
 
 ```mermaid
 flowchart TD
-    START[Business Service<br/>觸發通知事件] --> API[Notification API<br/>POST /api/v1/notifications/send]
+    START[Business Service\n觸發通知事件] --> API[Notification API\nPOST /api/v1/notifications/send]
 
     API --> VALIDATE{請求驗證}
     VALIDATE -->|失敗| ERR1[400 Bad Request]
-    VALIDATE -->|成功| TEMPLATE[Template Engine<br/>模板渲染]
+    VALIDATE -->|成功| TEMPLATE[Template Engine\n模板渲染]
 
-    TEMPLATE --> T1[載入模板<br/>template_code: OTP_REGISTER]
-    T1 --> T2[多語言解析<br/>i18n: zh_TW, en_US]
-    T2 --> T3[變數替換<br/>code=123456, expire=5min]
-    T3 --> DEDUP[Deduplication Check<br/>Redis 去重檢查]
+    TEMPLATE --> T1[載入模板\ntemplate_code: OTP_REGISTER]
+    T1 --> T2[多語言解析\ni18n: zh_TW, en_US]
+    T2 --> T3[變數替換\ncode=123456, expire=5min]
+    T3 --> DEDUP[Deduplication Check\nRedis 去重檢查]
 
-    DEDUP --> D1{是否重複發送?<br/>Redis: sent:{{user_id}}:{{template}}}
-    D1 -->|是 - 60秒內已發送| ERR2[429 Too Many Requests<br/>Cool-down period]
-    D1 -->|否| RATELIMIT[Rate Limiting<br/>頻率限制檢查]
+    DEDUP --> D1{是否重複發送?\nRedis: sent:{{user_id}}:{{template}}}
+    D1 -->|是 - 60秒內已發送| ERR2[429 Too Many Requests\nCool-down period]
+    D1 -->|否| RATELIMIT[Rate Limiting\n頻率限制檢查]
 
-    RATELIMIT --> R1{是否超過限額?<br/>1 小時內最多 5 條}
-    R1 -->|是| ERR3[429 Rate Limit Exceeded<br/>1h 限額: 5 條]
-    R1 -->|否| DND{DND 檢查<br/>Do Not Disturb}
+    RATELIMIT --> R1{是否超過限額?\n1 小時內最多 5 條}
+    R1 -->|是| ERR3[429 Rate Limit Exceeded\n1h 限額: 5 條]
+    R1 -->|否| DND{DND 檢查\nDo Not Disturb}
 
-    DND --> DND1{是否在靜默時段?<br/>22:00 - 08:00}
-    DND1 -->|是 + Marketing| QUEUE_DELAY[延遲至 08:00 發送<br/>Queue with delay]
-    DND1 -->|否 OR Transactional| ROUTER[Smart Routing<br/>智選路由]
+    DND --> DND1{是否在靜默時段?\n22:00 - 08:00}
+    DND1 -->|是 + Marketing| QUEUE_DELAY[延遲至 08:00 發送\nQueue with delay]
+    DND1 -->|否 OR Transactional| ROUTER[Smart Routing\n智選路由]
 
     ROUTER --> ROUTE_DECIDE{路由決策}
-    ROUTE_DECIDE -->|OTP - 高優先| ROUTE_OTP[優先渠道:<br/>1. Telegram/WhatsApp - 免費<br/>2. SMS - 付費]
-    ROUTE_DECIDE -->|Marketing - 低優先| ROUTE_MKT[優先渠道:<br/>1. App Push - 免費<br/>2. Email - 低費用]
+    ROUTE_DECIDE -->|OTP - 高優先| ROUTE_OTP[優先渠道:\n1. Telegram/WhatsApp - 免費\n2. SMS - 付費]
+    ROUTE_DECIDE -->|Marketing - 低優先| ROUTE_MKT[優先渠道:\n1. App Push - 免費\n2. Email - 低費用]
 
-    ROUTE_OTP --> ADAPTER1[Provider Adapter<br/>Telegram Bot API]
-    ROUTE_MKT --> ADAPTER2[Provider Adapter<br/>Firebase FCM]
+    ROUTE_OTP --> ADAPTER1[Provider Adapter\nTelegram Bot API]
+    ROUTE_MKT --> ADAPTER2[Provider Adapter\nFirebase FCM]
 
     ADAPTER1 --> SEND1{發送成功?}
-    SEND1 -->|失敗| FALLBACK1[Fallback to SMS<br/>Twilio API]
-    SEND1 -->|成功| LOG1[記錄日誌<br/>status: DELIVERED<br/>cost: $0]
+    SEND1 -->|失敗| FALLBACK1[Fallback to SMS\nTwilio API]
+    SEND1 -->|成功| LOG1[記錄日誌\nstatus: DELIVERED\ncost: $0]
 
     FALLBACK1 --> SEND2{SMS 發送成功?}
-    SEND2 -->|失敗| LOG2[記錄日誌<br/>status: FAILED<br/>cost: $0.05]
-    SEND2 -->|成功| LOG3[記錄日誌<br/>status: DELIVERED<br/>cost: $0.05]
+    SEND2 -->|失敗| LOG2[記錄日誌\nstatus: FAILED\ncost: $0.05]
+    SEND2 -->|成功| LOG3[記錄日誌\nstatus: DELIVERED\ncost: $0.05]
 
     ADAPTER2 --> SEND3{Push 發送成功?}
-    SEND3 -->|失敗| FALLBACK2[Fallback to Email<br/>AWS SES]
-    SEND3 -->|成功| LOG4[記錄日誌<br/>status: DELIVERED<br/>cost: $0]
+    SEND3 -->|失敗| FALLBACK2[Fallback to Email\nAWS SES]
+    SEND3 -->|成功| LOG4[記錄日誌\nstatus: DELIVERED\ncost: $0]
 
     FALLBACK2 --> SEND4{Email 發送成功?}
-    SEND4 -->|失敗| LOG5[記錄日誌<br/>status: FAILED<br/>cost: $0.001]
-    SEND4 -->|成功| LOG6[記錄日誌<br/>status: DELIVERED<br/>cost: $0.001]
+    SEND4 -->|失敗| LOG5[記錄日誌\nstatus: FAILED\ncost: $0.001]
+    SEND4 -->|成功| LOG6[記錄日誌\nstatus: DELIVERED\ncost: $0.001]
 
-    LOG1 --> PERSIST[持久化存儲<br/>notification_log 表]
+    LOG1 --> PERSIST[持久化存儲\nnotification_log 表]
     LOG2 --> PERSIST
     LOG3 --> PERSIST
     LOG4 --> PERSIST
     LOG5 --> PERSIST
     LOG6 --> PERSIST
 
-    PERSIST --> INBOX{需要站內信?<br/>Marketing 訊息}
-    INBOX -->|是| MONGO[MongoDB 存儲<br/>inbox_messages 集合<br/>TTL: 30 天]
-    INBOX -->|否| CALLBACK[Webhook Callback<br/>通知業務系統結果]
+    PERSIST --> INBOX{需要站內信?\nMarketing 訊息}
+    INBOX -->|是| MONGO[MongoDB 存儲\ninbox_messages 集合\nTTL: 30 天]
+    INBOX -->|否| CALLBACK[Webhook Callback\n通知業務系統結果]
 
     MONGO --> CALLBACK
 
-    CALLBACK --> END[返回響應<br/>notification_id, status]
+    CALLBACK --> END[返回響應\nnotification_id, status]
 
     QUEUE_DELAY --> END
 
@@ -190,9 +190,9 @@ Content-Type: application/json
 ```mermaid
 graph TB
     subgraph "Notification Service Core - 通知服務核心"
-        API[Notification API<br/>統一入口]
-        QUEUE[Message Queue<br/>Kafka / RabbitMQ<br/>Topic: notifications]
-        WORKER[Worker Pool<br/>Async Consumers<br/>Concurrency: 50]
+        API[Notification API\n統一入口]
+        QUEUE[Message Queue\nKafka / RabbitMQ\nTopic: notifications]
+        WORKER[Worker Pool\nAsync Consumers\nConcurrency: 50]
     end
 
     API --> QUEUE
@@ -208,38 +208,38 @@ graph TB
     end
 
     subgraph "External Providers - 外部服務商"
-        A1 --> P1_1[Twilio SMS<br/>Cost: $0.05/msg<br/>Delivery: 99.5%]
-        A1 --> P1_2[AWS SNS<br/>Cost: $0.02/msg<br/>Delivery: 98%]
-        A1 --> P1_3[Backup: Local Gateway<br/>Cost: $0.08/msg<br/>Delivery: 97%]
+        A1 --> P1_1[Twilio SMS\nCost: $0.05/msg\nDelivery: 99.5%]
+        A1 --> P1_2[AWS SNS\nCost: $0.02/msg\nDelivery: 98%]
+        A1 --> P1_3[Backup: Local Gateway\nCost: $0.08/msg\nDelivery: 97%]
 
-        A2 --> P2_1[AWS SES<br/>Cost: $0.001/msg<br/>Delivery: 92%]
-        A2 --> P2_2[SendGrid<br/>Cost: $0.003/msg<br/>Delivery: 95%]
+        A2 --> P2_1[AWS SES\nCost: $0.001/msg\nDelivery: 92%]
+        A2 --> P2_2[SendGrid\nCost: $0.003/msg\nDelivery: 95%]
 
-        A3 --> P3_1[Firebase FCM<br/>Cost: $0<br/>Delivery: 85%]
-        A3 --> P3_2[Apple APNS<br/>Cost: $0<br/>Delivery: 90%]
+        A3 --> P3_1[Firebase FCM\nCost: $0\nDelivery: 85%]
+        A3 --> P3_2[Apple APNS\nCost: $0\nDelivery: 90%]
 
-        A4 --> P4[Telegram Bot API<br/>Cost: $0<br/>Delivery: 95%]
+        A4 --> P4[Telegram Bot API\nCost: $0\nDelivery: 95%]
 
-        A5 --> P5[WhatsApp Business API<br/>Cost: $0.005/msg<br/>Delivery: 98%]
+        A5 --> P5[WhatsApp Business API\nCost: $0.005/msg\nDelivery: 98%]
 
-        A6 --> P6[Internal WebSocket Server<br/>Cost: $0<br/>Delivery: Real-time]
+        A6 --> P6[Internal WebSocket Server\nCost: $0\nDelivery: Real-time]
     end
 
     subgraph "Monitoring & Analytics - 監控與分析"
-        WORKER --> M1[Prometheus Metrics<br/>Delivery rate, Latency, Cost]
-        WORKER --> M2[Audit Log - PostgreSQL<br/>notification_log table]
-        WORKER --> M3[Cost Analytics - ClickHouse<br/>Daily cost aggregation]
-        WORKER --> M4[Alert Manager<br/>Delivery failure > 5%]
+        WORKER --> M1[Prometheus Metrics\nDelivery rate, Latency, Cost]
+        WORKER --> M2[Audit Log - PostgreSQL\nnotification_log table]
+        WORKER --> M3[Cost Analytics - ClickHouse\nDaily cost aggregation]
+        WORKER --> M4[Alert Manager\nDelivery failure > 5%]
     end
 
     subgraph "Persistent Storage - 持久化存儲"
-        WORKER --> S1[MongoDB<br/>inbox_messages collection<br/>Marketing 站內信<br/>TTL: 30 days]
-        WORKER --> S2[Redis Cache<br/>Deduplication keys<br/>Rate limit counters<br/>TTL: 1 hour]
+        WORKER --> S1[MongoDB\ninbox_messages collection\nMarketing 站內信\nTTL: 30 days]
+        WORKER --> S2[Redis Cache\nDeduplication keys\nRate limit counters\nTTL: 1 hour]
     end
 
     subgraph "Callback & Retry - 回調與重試"
-        WORKER --> CB1[Webhook Callback<br/>Notify business services<br/>POST /webhook/notification]
-        WORKER --> DLQ[Dead Letter Queue<br/>Failed messages<br/>Manual review required]
+        WORKER --> CB1[Webhook Callback\nNotify business services\nPOST /webhook/notification]
+        WORKER --> DLQ[Dead Letter Queue\nFailed messages\nManual review required]
     end
 
     style API fill:#FFC107,stroke:#F57F00,stroke-width:3px,color:#000
@@ -370,25 +370,25 @@ graph TB
 
 ```mermaid
 flowchart TD
-    START[Smart Routing 開始<br/>Input: notification_request] --> PRIORITY{檢查優先級?}
+    START[Smart Routing 開始\nInput: notification_request] --> PRIORITY{檢查優先級?}
 
-    PRIORITY -->|HIGH - Transactional| TRANS[Transactional Routing<br/>OTP, Password Reset, 交易確認]
-    PRIORITY -->|LOW - Marketing| MARKET[Marketing Routing<br/>促銷活動, 獎金通知]
+    PRIORITY -->|HIGH - Transactional| TRANS[Transactional Routing\nOTP, Password Reset, 交易確認]
+    PRIORITY -->|LOW - Marketing| MARKET[Marketing Routing\n促銷活動, 獎金通知]
 
-    TRANS --> T_CHECK{用戶偏好渠道?<br/>User preference}
+    TRANS --> T_CHECK{用戶偏好渠道?\nUser preference}
 
-    T_CHECK -->|Telegram ID 已綁定| T_TG[渠道 1: Telegram Bot<br/>Cost: $0<br/>Delivery Rate: 95%<br/>Avg Latency: 300ms]
-    T_CHECK -->|WhatsApp 已綁定| T_WA[渠道 1: WhatsApp Business<br/>Cost: $0<br/>Delivery Rate: 98%<br/>Avg Latency: 500ms]
-    T_CHECK -->|無 IM 綁定| T_SMS[渠道 1: SMS<br/>Cost: $0.05<br/>Delivery Rate: 99.5%<br/>Avg Latency: 1000ms]
+    T_CHECK -->|Telegram ID 已綁定| T_TG[渠道 1: Telegram Bot\nCost: $0\nDelivery Rate: 95%\nAvg Latency: 300ms]
+    T_CHECK -->|WhatsApp 已綁定| T_WA[渠道 1: WhatsApp Business\nCost: $0\nDelivery Rate: 98%\nAvg Latency: 500ms]
+    T_CHECK -->|無 IM 綁定| T_SMS[渠道 1: SMS\nCost: $0.05\nDelivery Rate: 99.5%\nAvg Latency: 1000ms]
 
     T_TG --> T_SEND1{發送成功?}
     T_WA --> T_SEND2{發送成功?}
 
-    T_SEND1 -->|成功| T_SUCCESS1[✅ 完成<br/>Channel: Telegram<br/>Cost: $0]
+    T_SEND1 -->|成功| T_SUCCESS1[✅ 完成\nChannel: Telegram\nCost: $0]
     T_SEND1 -->|失敗 - User not found| T_FALLBACK1[Fallback to SMS]
     T_SEND1 -->|失敗 - API timeout| T_RETRY1[重試 Telegram - 1 次]
 
-    T_SEND2 -->|成功| T_SUCCESS2[✅ 完成<br/>Channel: WhatsApp<br/>Cost: $0]
+    T_SEND2 -->|成功| T_SUCCESS2[✅ 完成\nChannel: WhatsApp\nCost: $0]
     T_SEND2 -->|失敗| T_FALLBACK2[Fallback to SMS]
 
     T_RETRY1 -->|仍失敗| T_FALLBACK1
@@ -398,16 +398,16 @@ flowchart TD
     T_FALLBACK2 --> T_SMS
 
     T_SMS --> T_SEND3{SMS 發送成功?}
-    T_SEND3 -->|成功| T_SUCCESS3[✅ 完成<br/>Channel: SMS<br/>Cost: $0.05]
-    T_SEND3 -->|失敗| T_FAIL[❌ 完全失敗<br/>所有渠道均失敗<br/>Trigger manual review]
+    T_SEND3 -->|成功| T_SUCCESS3[✅ 完成\nChannel: SMS\nCost: $0.05]
+    T_SEND3 -->|失敗| T_FAIL[❌ 完全失敗\n所有渠道均失敗\nTrigger manual review]
 
-    MARKET --> M_CHECK{用戶活躍渠道?<br/>User active channels}
+    MARKET --> M_CHECK{用戶活躍渠道?\nUser active channels}
 
-    M_CHECK -->|App 已安裝 + Push 啟用| M_PUSH[渠道 1: App Push - FCM<br/>Cost: $0<br/>Delivery Rate: 85%<br/>Avg Latency: 200ms]
-    M_CHECK -->|App 未安裝 OR Push 禁用| M_EMAIL[渠道 1: Email<br/>Cost: $0.001<br/>Delivery Rate: 92%<br/>Avg Latency: 800ms]
+    M_CHECK -->|App 已安裝 + Push 啟用| M_PUSH[渠道 1: App Push - FCM\nCost: $0\nDelivery Rate: 85%\nAvg Latency: 200ms]
+    M_CHECK -->|App 未安裝 OR Push 禁用| M_EMAIL[渠道 1: Email\nCost: $0.001\nDelivery Rate: 92%\nAvg Latency: 800ms]
 
     M_PUSH --> M_SEND1{Push 發送成功?}
-    M_SEND1 -->|成功| M_INBOX1[存儲至站內信<br/>MongoDB inbox_messages]
+    M_SEND1 -->|成功| M_INBOX1[存儲至站內信\nMongoDB inbox_messages]
     M_SEND1 -->|失敗 - Token invalid| M_FALLBACK1[Fallback to Email]
     M_SEND1 -->|失敗 - FCM timeout| M_RETRY1[重試 Push - 1 次]
 
@@ -415,18 +415,18 @@ flowchart TD
     M_RETRY1 -->|成功| M_INBOX1
 
     M_INBOX1 --> M_CHECK_READ{24h 內已讀?}
-    M_CHECK_READ -->|是| M_SUCCESS1[✅ 完成<br/>Channel: Push + Inbox<br/>Cost: $0]
-    M_CHECK_READ -->|否| M_FALLBACK2[Fallback to Email<br/>24h 後補發]
+    M_CHECK_READ -->|是| M_SUCCESS1[✅ 完成\nChannel: Push + Inbox\nCost: $0]
+    M_CHECK_READ -->|否| M_FALLBACK2[Fallback to Email\n24h 後補發]
 
     M_FALLBACK1 --> M_EMAIL
     M_FALLBACK2 --> M_EMAIL
 
     M_EMAIL --> M_SEND2{Email 發送成功?}
-    M_SEND2 -->|成功| M_INBOX2[存儲至站內信<br/>MongoDB inbox_messages]
-    M_SEND2 -->|失敗 - Invalid email| M_FAIL2[❌ 完全失敗<br/>Email invalid<br/>Mark user for verification]
-    M_SEND2 -->|失敗 - SES quota| M_QUEUE[延遲至配額重置<br/>Queue with delay]
+    M_SEND2 -->|成功| M_INBOX2[存儲至站內信\nMongoDB inbox_messages]
+    M_SEND2 -->|失敗 - Invalid email| M_FAIL2[❌ 完全失敗\nEmail invalid\nMark user for verification]
+    M_SEND2 -->|失敗 - SES quota| M_QUEUE[延遲至配額重置\nQueue with delay]
 
-    M_INBOX2 --> M_SUCCESS2[✅ 完成<br/>Channel: Email + Inbox<br/>Cost: $0.001]
+    M_INBOX2 --> M_SUCCESS2[✅ 完成\nChannel: Email + Inbox\nCost: $0.001]
 
     M_QUEUE --> M_SUCCESS2
 

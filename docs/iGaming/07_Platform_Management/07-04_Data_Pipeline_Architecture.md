@@ -13,14 +13,14 @@
 ```mermaid
 flowchart TD
     subgraph SOURCES[數據源層 Data Sources]
-        DB1[(MySQL OLTP<br/>━━━━━━━━<br/>• 玩家資料<br/>• 交易記錄<br/>• 遊戲流水<br/>• VIP 等級)]
-        DB2[(MongoDB<br/>━━━━━━━━<br/>• 遊戲日誌<br/>• 事件追蹤<br/>• 非結構化數據)]
-        KAFKA_SRC[Kafka Topics<br/>━━━━━━━━<br/>• 業務事件流<br/>• 即時交易]
+        DB1[(MySQL OLTP\n━━━━━━━━\n• 玩家資料\n• 交易記錄\n• 遊戲流水\n• VIP 等級)]
+        DB2[(MongoDB\n━━━━━━━━\n• 遊戲日誌\n• 事件追蹤\n• 非結構化數據)]
+        KAFKA_SRC[Kafka Topics\n━━━━━━━━\n• 業務事件流\n• 即時交易]
     end
 
     subgraph CDC[數據捕獲層 Change Data Capture]
-        DEBEZIUM[Debezium<br/>━━━━━━━━<br/>MySQL Binlog 監聽<br/>Mongo Oplog 監聽]
-        DIRECT[Direct Publish<br/>━━━━━━━━<br/>應用層直接發布]
+        DEBEZIUM[Debezium\n━━━━━━━━\nMySQL Binlog 監聽\nMongo Oplog 監聽]
+        DIRECT[Direct Publish\n━━━━━━━━\n應用層直接發布]
     end
 
     DB1 -->|Binlog| DEBEZIUM
@@ -28,11 +28,11 @@ flowchart TD
     KAFKA_SRC -->|已在 Kafka| DIRECT
 
     subgraph STREAMING[流處理層 Stream Processing]
-        KAFKA[(Kafka<br/>━━━━━━━━<br/>Topics:<br/>• db.transactions<br/>• db.players<br/>• game.rounds<br/>Retention: 7 days)]
+        KAFKA[(Kafka\n━━━━━━━━\nTopics:\n• db.transactions\n• db.players\n• game.rounds\nRetention: 7 days)]
 
-        FLINK[Flink Streaming<br/>━━━━━━━━<br/>• 實時聚合<br/>• 視窗計算<br/>• CEP 規則]
+        FLINK[Flink Streaming\n━━━━━━━━\n• 實時聚合\n• 視窗計算\n• CEP 規則]
 
-        REDIS[(Redis<br/>━━━━━━━━<br/>實時指標快取:<br/>• 在線人數<br/>• 今日存款<br/>• 風控告警<br/>TTL: 5 min)]
+        REDIS[(Redis\n━━━━━━━━\n實時指標快取:\n• 在線人數\n• 今日存款\n• 風控告警\nTTL: 5 min)]
     end
 
     DEBEZIUM -->|Publish| KAFKA
@@ -41,27 +41,27 @@ flowchart TD
     FLINK -->|寫入實時指標| REDIS
 
     subgraph BATCH[批次處理層 Batch Processing]
-        S3[(S3 Data Lake<br/>━━━━━━━━<br/>格式: Parquet<br/>分區: date/tenant_id<br/>保留: 永久)]
+        S3[(S3 Data Lake\n━━━━━━━━\n格式: Parquet\n分區: date/tenant_id\n保留: 永久)]
 
-        SPARK[Spark Batch Jobs<br/>━━━━━━━━<br/>排程: Airflow<br/>執行時間: 02:00 AM<br/>處理邏輯:<br/>• 數據清洗<br/>• 脫敏處理<br/>• 聚合計算]
+        SPARK[Spark Batch Jobs\n━━━━━━━━\n排程: Airflow\n執行時間: 02:00 AM\n處理邏輯:\n• 數據清洗\n• 脫敏處理\n• 聚合計算]
     end
 
-    KAFKA -->|Kafka Connect<br/>批次落盤| S3
+    KAFKA -->|Kafka Connect\n批次落盤| S3
     S3 -->|讀取前一日數據| SPARK
 
     subgraph DWH[數據倉庫層 Data Warehouse]
-        CLICKHOUSE[(ClickHouse / Doris<br/>━━━━━━━━<br/>數據分層:<br/>• ODS 原始層<br/>• DWD 明細層<br/>• DWS 匯總層<br/>• ADS 應用層<br/>分區: date + tenant_id)]
+        CLICKHOUSE[(ClickHouse / Doris\n━━━━━━━━\n數據分層:\n• ODS 原始層\n• DWD 明細層\n• DWS 匯總層\n• ADS 應用層\n分區: date + tenant_id)]
     end
 
     SPARK -->|寫入分層表| CLICKHOUSE
     FLINK -->|寫入實時表| CLICKHOUSE
 
     subgraph PRESENTATION[展示層 Presentation Layer]
-        SUPERSET[Apache Superset<br/>━━━━━━━━<br/>• T+1 經營報表<br/>• 自助查詢<br/>• 儀表板]
+        SUPERSET[Apache Superset\n━━━━━━━━\n• T+1 經營報表\n• 自助查詢\n• 儀表板]
 
-        TABLEAU[Tableau / Metabase<br/>━━━━━━━━<br/>• 高管報表<br/>• 可視化分析]
+        TABLEAU[Tableau / Metabase\n━━━━━━━━\n• 高管報表\n• 可視化分析]
 
-        API[報表 API<br/>━━━━━━━━<br/>RESTful API<br/>直接查詢 ADS 層<br/>緩存: Redis]
+        API[報表 API\n━━━━━━━━\nRESTful API\n直接查詢 ADS 層\n緩存: Redis]
     end
 
     CLICKHOUSE -->|SQL 查詢| SUPERSET
@@ -70,11 +70,11 @@ flowchart TD
     REDIS -->|實時數據| API
 
     subgraph APPS[應用層 Applications]
-        DASHBOARD[運營儀表板<br/>━━━━━━━━<br/>• 實時監控<br/>• KPI 追蹤]
+        DASHBOARD[運營儀表板\n━━━━━━━━\n• 實時監控\n• KPI 追蹤]
 
-        REPORT[報表中心<br/>━━━━━━━━<br/>• 經營報表<br/>• 代理結算<br/>• 遊戲對帳]
+        REPORT[報表中心\n━━━━━━━━\n• 經營報表\n• 代理結算\n• 遊戲對帳]
 
-        ALERT[告警系統<br/>━━━━━━━━<br/>• 風控告警<br/>• 異常檢測<br/>• 閾值監控]
+        ALERT[告警系統\n━━━━━━━━\n• 風控告警\n• 異常檢測\n• 閾值監控]
     end
 
     API --> DASHBOARD
@@ -82,11 +82,11 @@ flowchart TD
     REDIS --> ALERT
 
     subgraph GOVERNANCE[數據治理 Data Governance]
-        MASKING[數據脫敏<br/>━━━━━━━━<br/>• PII 遮罩<br/>• 敏感字段加密]
+        MASKING[數據脫敏\n━━━━━━━━\n• PII 遮罩\n• 敏感字段加密]
 
-        QUALITY[數據質量<br/>━━━━━━━━<br/>• 完整性檢查<br/>• 一致性驗證<br/>• 準確性監控]
+        QUALITY[數據質量\n━━━━━━━━\n• 完整性檢查\n• 一致性驗證\n• 準確性監控]
 
-        LINEAGE[數據血緣<br/>━━━━━━━━<br/>• 來源追蹤<br/>• 影響分析<br/>• 合規審計]
+        LINEAGE[數據血緣\n━━━━━━━━\n• 來源追蹤\n• 影響分析\n• 合規審計]
     end
 
     SPARK -.-> MASKING
@@ -167,56 +167,56 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    subgraph ODS[📦 ODS 層 - Operational Data Store<br/>原始數據層]
-        ODS_DESC[特性:<br/>━━━━━━━━<br/>• 與業務庫 1:1 映射<br/>• 不做任何轉換<br/>• 保留完整歷史<br/>• 支援數據回溯<br/>━━━━━━━━<br/>更新頻率: 準實時 (CDC)<br/>保留期限: 永久<br/>分區策略: date + tenant_id]
+    subgraph ODS[📦 ODS 層 - Operational Data Store\n原始數據層]
+        ODS_DESC[特性:\n━━━━━━━━\n• 與業務庫 1:1 映射\n• 不做任何轉換\n• 保留完整歷史\n• 支援數據回溯\n━━━━━━━━\n更新頻率: 準實時 (CDC)\n保留期限: 永久\n分區策略: date + tenant_id]
 
-        ODS_TABLES[典型表結構<br/>━━━━━━━━<br/>• ods_players<br/>• ods_transactions<br/>• ods_game_rounds<br/>• ods_deposits<br/>• ods_withdrawals<br/>━━━━━━━━<br/>命名規則: ods_{table_name}]
+        ODS_TABLES[典型表結構\n━━━━━━━━\n• ods_players\n• ods_transactions\n• ods_game_rounds\n• ods_deposits\n• ods_withdrawals\n━━━━━━━━\n命名規則: ods_{table_name}]
     end
 
-    subgraph DWD[🔧 DWD 層 - Data Warehouse Detail<br/>明細數據層]
-        DWD_DESC[特性:<br/>━━━━━━━━<br/>• 數據清洗<br/>• PII 脫敏<br/>• 字段標準化<br/>• 維度關聯<br/>• 業務規則過濾<br/>━━━━━━━━<br/>更新頻率: T+1 批次<br/>保留期限: 2 年<br/>分區策略: date + tenant_id]
+    subgraph DWD[🔧 DWD 層 - Data Warehouse Detail\n明細數據層]
+        DWD_DESC[特性:\n━━━━━━━━\n• 數據清洗\n• PII 脫敏\n• 字段標準化\n• 維度關聯\n• 業務規則過濾\n━━━━━━━━\n更新頻率: T+1 批次\n保留期限: 2 年\n分區策略: date + tenant_id]
 
-        DWD_PROCESS[處理邏輯<br/>━━━━━━━━<br/>1️⃣ 數據清洗:<br/>  • NULL 處理<br/>  • 異常值過濾<br/>  • 重複記錄去重<br/>2️⃣ 脫敏處理:<br/>  • phone: 0912***789<br/>  • email: r***@gmail.com<br/>  • name: R** C**<br/>3️⃣ 維度關聯:<br/>  • JOIN dim_vip_level<br/>  • JOIN dim_game_category<br/>4️⃣ 業務過濾:<br/>  • 排除測試帳號<br/>  • 排除無效交易]
+        DWD_PROCESS[處理邏輯\n━━━━━━━━\n1️⃣ 數據清洗:\n  • NULL 處理\n  • 異常值過濾\n  • 重複記錄去重\n2️⃣ 脫敏處理:\n  • phone: 0912***789\n  • email: r***@gmail.com\n  • name: R** C**\n3️⃣ 維度關聯:\n  • JOIN dim_vip_level\n  • JOIN dim_game_category\n4️⃣ 業務過濾:\n  • 排除測試帳號\n  • 排除無效交易]
 
-        DWD_TABLES[典型表結構<br/>━━━━━━━━<br/>• dwd_player_profile<br/>• dwd_transaction_detail<br/>• dwd_game_round_detail<br/>• dwd_deposit_detail<br/>• dwd_withdrawal_detail<br/>━━━━━━━━<br/>命名規則: dwd_{domain}_detail]
+        DWD_TABLES[典型表結構\n━━━━━━━━\n• dwd_player_profile\n• dwd_transaction_detail\n• dwd_game_round_detail\n• dwd_deposit_detail\n• dwd_withdrawal_detail\n━━━━━━━━\n命名規則: dwd_{domain}_detail]
     end
 
-    subgraph DWS[📊 DWS 層 - Data Warehouse Summary<br/>匯總數據層]
-        DWS_DESC[特性:<br/>━━━━━━━━<br/>• 按時間維度聚合<br/>• 按業務維度聚合<br/>• 預計算指標<br/>• 支援鑽取分析<br/>━━━━━━━━<br/>更新頻率: T+1 批次<br/>保留期限: 3 年<br/>分區策略: date]
+    subgraph DWS[📊 DWS 層 - Data Warehouse Summary\n匯總數據層]
+        DWS_DESC[特性:\n━━━━━━━━\n• 按時間維度聚合\n• 按業務維度聚合\n• 預計算指標\n• 支援鑽取分析\n━━━━━━━━\n更新頻率: T+1 批次\n保留期限: 3 年\n分區策略: date]
 
-        DWS_AGG[聚合維度<br/>━━━━━━━━<br/>• 時間維度:<br/>  - 日 (day)<br/>  - 週 (week)<br/>  - 月 (month)<br/>  - 年 (year)<br/>• 業務維度:<br/>  - 租戶 (tenant)<br/>  - 遊戲類型 (game_type)<br/>  - VIP 等級 (vip_level)<br/>  - 國家 (country)<br/>  - 代理 (agent)]
+        DWS_AGG[聚合維度\n━━━━━━━━\n• 時間維度:\n  - 日 (day)\n  - 週 (week)\n  - 月 (month)\n  - 年 (year)\n• 業務維度:\n  - 租戶 (tenant)\n  - 遊戲類型 (game_type)\n  - VIP 等級 (vip_level)\n  - 國家 (country)\n  - 代理 (agent)]
 
-        DWS_TABLES[典型表結構<br/>━━━━━━━━<br/>• dws_daily_revenue<br/>• dws_daily_player_summary<br/>• dws_daily_game_summary<br/>• dws_monthly_tenant_pnl<br/>• dws_weekly_agent_settlement<br/>━━━━━━━━<br/>命名規則: dws_{period}_{domain}_summary]
+        DWS_TABLES[典型表結構\n━━━━━━━━\n• dws_daily_revenue\n• dws_daily_player_summary\n• dws_daily_game_summary\n• dws_monthly_tenant_pnl\n• dws_weekly_agent_settlement\n━━━━━━━━\n命名規則: dws_{period}_{domain}_summary]
     end
 
-    subgraph ADS[🎯 ADS 層 - Application Data Service<br/>應用數據層]
-        ADS_DESC[特性:<br/>━━━━━━━━<br/>• 面向特定應用<br/>• 寬表設計<br/>• 高度優化<br/>• 直接查詢<br/>━━━━━━━━<br/>更新頻率: T+1 批次 或 實時<br/>保留期限: 6 個月<br/>索引策略: 優化查詢性能]
+    subgraph ADS[🎯 ADS 層 - Application Data Service\n應用數據層]
+        ADS_DESC[特性:\n━━━━━━━━\n• 面向特定應用\n• 寬表設計\n• 高度優化\n• 直接查詢\n━━━━━━━━\n更新頻率: T+1 批次 或 實時\n保留期限: 6 個月\n索引策略: 優化查詢性能]
 
-        ADS_APPS[應用場景<br/>━━━━━━━━<br/>• 運營儀表板:<br/>  - ads_daily_kpi_dashboard<br/>• 經營報表:<br/>  - ads_monthly_financial_report<br/>• 代理結算:<br/>  - ads_agent_settlement_report<br/>• 玩家分析:<br/>  - ads_player_segmentation<br/>• 風控監控:<br/>  - ads_risk_alert_summary]
+        ADS_APPS[應用場景\n━━━━━━━━\n• 運營儀表板:\n  - ads_daily_kpi_dashboard\n• 經營報表:\n  - ads_monthly_financial_report\n• 代理結算:\n  - ads_agent_settlement_report\n• 玩家分析:\n  - ads_player_segmentation\n• 風控監控:\n  - ads_risk_alert_summary]
 
-        ADS_TABLES[典型表結構<br/>━━━━━━━━<br/>• ads_daily_kpi (運營 KPI)<br/>• ads_merchant_revenue (商戶收入)<br/>• ads_player_ltv (玩家 LTV)<br/>• ads_game_performance (遊戲表現)<br/>━━━━━━━━<br/>命名規則: ads_{application}_{metric}]
+        ADS_TABLES[典型表結構\n━━━━━━━━\n• ads_daily_kpi (運營 KPI)\n• ads_merchant_revenue (商戶收入)\n• ads_player_ltv (玩家 LTV)\n• ads_game_performance (遊戲表現)\n━━━━━━━━\n命名規則: ads_{application}_{metric}]
     end
 
-    ODS -->|Spark ETL<br/>數據清洗 + 脫敏| DWD
-    DWD -->|Spark SQL<br/>聚合計算| DWS
-    DWS -->|Spark SQL<br/>寬表構建| ADS
+    ODS -->|Spark ETL\n數據清洗 + 脫敏| DWD
+    DWD -->|Spark SQL\n聚合計算| DWS
+    DWS -->|Spark SQL\n寬表構建| ADS
 
     DWD -.->|某些場景直接聚合| ADS
 
     subgraph EXAMPLES[典型 ETL 範例]
-        EX1[範例 1: 每日收入報表<br/>━━━━━━━━━━━━━━━━<br/>ODS:<br/>  SELECT * FROM ods_transactions<br/>  WHERE date = '2026-01-27'<br/>↓<br/>DWD:<br/>  清洗無效交易 + 脫敏玩家資訊<br/>  INSERT INTO dwd_transaction_detail<br/>↓<br/>DWS:<br/>  SELECT date, tenant_id,<br/>    SUM(amount) as total_revenue,<br/>    COUNT(DISTINCT player_id) as active_players<br/>  FROM dwd_transaction_detail<br/>  GROUP BY date, tenant_id<br/>  INSERT INTO dws_daily_revenue<br/>↓<br/>ADS:<br/>  JOIN 維度表 + 計算衍生指標<br/>  INSERT INTO ads_daily_kpi]
+        EX1[範例 1: 每日收入報表\n━━━━━━━━━━━━━━━━\nODS:\n  SELECT * FROM ods_transactions\n  WHERE date = '2026-01-27'\n↓\nDWD:\n  清洗無效交易 + 脫敏玩家資訊\n  INSERT INTO dwd_transaction_detail\n↓\nDWS:\n  SELECT date, tenant_id,\n    SUM(amount) as total_revenue,\n    COUNT(DISTINCT player_id) as active_players\n  FROM dwd_transaction_detail\n  GROUP BY date, tenant_id\n  INSERT INTO dws_daily_revenue\n↓\nADS:\n  JOIN 維度表 + 計算衍生指標\n  INSERT INTO ads_daily_kpi]
 
-        EX2[範例 2: 玩家 LTV 分析<br/>━━━━━━━━━━━━━━━━<br/>DWD:<br/>  dwd_player_profile (基礎資料)<br/>  dwd_transaction_detail (交易明細)<br/>↓<br/>DWS:<br/>  按玩家聚合生命週期指標<br/>  - 首存日期<br/>  - 累計存款<br/>  - 累計提款<br/>  - 遊戲頻率<br/>↓<br/>ADS:<br/>  應用 LTV 預測模型<br/>  分群標籤 (高價值/中價值/低價值)<br/>  INSERT INTO ads_player_ltv]
+        EX2[範例 2: 玩家 LTV 分析\n━━━━━━━━━━━━━━━━\nDWD:\n  dwd_player_profile (基礎資料)\n  dwd_transaction_detail (交易明細)\n↓\nDWS:\n  按玩家聚合生命週期指標\n  - 首存日期\n  - 累計存款\n  - 累計提款\n  - 遊戲頻率\n↓\nADS:\n  應用 LTV 預測模型\n  分群標籤 (高價值/中價值/低價值)\n  INSERT INTO ads_player_ltv]
     end
 
     ADS -.-> EXAMPLES
 
     subgraph QUALITY[數據質量檢查]
-        Q1[ODS → DWD 檢查<br/>━━━━━━━━<br/>• 記錄數一致性<br/>• 主鍵重複檢查<br/>• NULL 值比例<br/>• 異常值檢測]
+        Q1[ODS → DWD 檢查\n━━━━━━━━\n• 記錄數一致性\n• 主鍵重複檢查\n• NULL 值比例\n• 異常值檢測]
 
-        Q2[DWD → DWS 檢查<br/>━━━━━━━━<br/>• 聚合結果準確性<br/>• 分組完整性<br/>• 時間連續性<br/>• 維度覆蓋率]
+        Q2[DWD → DWS 檢查\n━━━━━━━━\n• 聚合結果準確性\n• 分組完整性\n• 時間連續性\n• 維度覆蓋率]
 
-        Q3[DWS → ADS 檢查<br/>━━━━━━━━<br/>• 業務邏輯正確性<br/>• KPI 指標合理性<br/>• 報表數據一致性<br/>• 查詢性能達標]
+        Q3[DWS → ADS 檢查\n━━━━━━━━\n• 業務邏輯正確性\n• KPI 指標合理性\n• 報表數據一致性\n• 查詢性能達標]
     end
 
     DWD -.-> Q1
@@ -303,28 +303,28 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START[新增報表需求] --> LATENCY{延遲要求?<br/>━━━━━━━━}
+    START[新增報表需求] --> LATENCY{延遲要求?\n━━━━━━━━}
 
-    LATENCY -->|< 5 秒<br/>實時監控| REALTIME_PATH[實時處理路徑<br/>Real-time Path]
-    LATENCY -->|5 秒 - 1 分鐘<br/>準實時| NEAR_REALTIME_PATH[準實時路徑<br/>Near Real-time Path]
-    LATENCY -->|> 1 分鐘<br/>可接受 T+1| BATCH_PATH[批次處理路徑<br/>Batch Path]
+    LATENCY -->|< 5 秒\n實時監控| REALTIME_PATH[實時處理路徑\nReal-time Path]
+    LATENCY -->|5 秒 - 1 分鐘\n準實時| NEAR_REALTIME_PATH[準實時路徑\nNear Real-time Path]
+    LATENCY -->|> 1 分鐘\n可接受 T+1| BATCH_PATH[批次處理路徑\nBatch Path]
 
     REALTIME_PATH --> RT_COMPLEX{查詢複雜度?}
-    RT_COMPLEX -->|簡單聚合<br/>SUM/COUNT/AVG| RT_REDIS[方案 A: Redis<br/>━━━━━━━━<br/>技術棧:<br/>• Redis Counter/Hash<br/>• Lua Script 原子操作<br/>• TTL: 5 min<br/>━━━━━━━━<br/>優勢:<br/>• 延遲 < 1ms<br/>• 支援高並發 (10K+ QPS)<br/>缺點:<br/>• 僅簡單聚合<br/>• 內存成本高<br/>━━━━━━━━<br/>適用場景:<br/>• 在線人數<br/>• 今日存款總額<br/>• 風控告警計數]
+    RT_COMPLEX -->|簡單聚合\nSUM/COUNT/AVG| RT_REDIS[方案 A: Redis\n━━━━━━━━\n技術棧:\n• Redis Counter/Hash\n• Lua Script 原子操作\n• TTL: 5 min\n━━━━━━━━\n優勢:\n• 延遲 < 1ms\n• 支援高並發 (10K+ QPS)\n缺點:\n• 僅簡單聚合\n• 內存成本高\n━━━━━━━━\n適用場景:\n• 在線人數\n• 今日存款總額\n• 風控告警計數]
 
-    RT_COMPLEX -->|中等複雜<br/>GROUP BY + JOIN| RT_FLINK[方案 B: Flink SQL<br/>━━━━━━━━<br/>技術棧:<br/>• Flink Streaming SQL<br/>• 滑動視窗 (5s/1min)<br/>• State Backend: RocksDB<br/>━━━━━━━━<br/>優勢:<br/>• 支援複雜聚合<br/>• 支援 JOIN<br/>• 可擴展<br/>缺點:<br/>• 運維複雜<br/>• 資源消耗高<br/>━━━━━━━━<br/>適用場景:<br/>• 實時遊戲排行榜<br/>• 實時交易監控<br/>• 異常行為檢測]
+    RT_COMPLEX -->|中等複雜\nGROUP BY + JOIN| RT_FLINK[方案 B: Flink SQL\n━━━━━━━━\n技術棧:\n• Flink Streaming SQL\n• 滑動視窗 (5s/1min)\n• State Backend: RocksDB\n━━━━━━━━\n優勢:\n• 支援複雜聚合\n• 支援 JOIN\n• 可擴展\n缺點:\n• 運維複雜\n• 資源消耗高\n━━━━━━━━\n適用場景:\n• 實時遊戲排行榜\n• 實時交易監控\n• 異常行為檢測]
 
-    RT_COMPLEX -->|極高複雜<br/>多表 JOIN + 子查詢| RT_REJECT[❌ 不適合實時<br/>━━━━━━━━<br/>建議:<br/>1️⃣ 降低複雜度<br/>2️⃣ 預計算部分結果<br/>3️⃣ 改用準實時/批次<br/>━━━━━━━━<br/>原因:<br/>• 實時複雜查詢成本極高<br/>• 延遲不可控<br/>• 資源消耗巨大]
+    RT_COMPLEX -->|極高複雜\n多表 JOIN + 子查詢| RT_REJECT[❌ 不適合實時\n━━━━━━━━\n建議:\n1️⃣ 降低複雜度\n2️⃣ 預計算部分結果\n3️⃣ 改用準實時/批次\n━━━━━━━━\n原因:\n• 實時複雜查詢成本極高\n• 延遲不可控\n• 資源消耗巨大]
 
     NEAR_REALTIME_PATH --> NRT_COMPLETE{數據完整性要求?}
-    NRT_COMPLETE -->|可接受少量遺漏| NRT_STREAM[方案 C: Flink → ClickHouse<br/>━━━━━━━━<br/>技術棧:<br/>• Flink 消費 Kafka<br/>• 寫入 ClickHouse 實時表<br/>• 更新頻率: 10s-1min<br/>━━━━━━━━<br/>優勢:<br/>• 低延遲 (5-60s)<br/>• 支援複雜查詢<br/>• 可鑽取分析<br/>缺點:<br/>• 可能丟失少量數據<br/>• 需處理重複/亂序<br/>━━━━━━━━<br/>適用場景:<br/>• 運營儀表板<br/>• 實時 KPI 追蹤<br/>• 玩家實時行為分析]
+    NRT_COMPLETE -->|可接受少量遺漏| NRT_STREAM[方案 C: Flink → ClickHouse\n━━━━━━━━\n技術棧:\n• Flink 消費 Kafka\n• 寫入 ClickHouse 實時表\n• 更新頻率: 10s-1min\n━━━━━━━━\n優勢:\n• 低延遲 (5-60s)\n• 支援複雜查詢\n• 可鑽取分析\n缺點:\n• 可能丟失少量數據\n• 需處理重複/亂序\n━━━━━━━━\n適用場景:\n• 運營儀表板\n• 實時 KPI 追蹤\n• 玩家實時行為分析]
 
-    NRT_COMPLETE -->|必須 100% 完整| NRT_HYBRID[方案 D: 混合模式<br/>━━━━━━━━<br/>技術棧:<br/>• Flink 實時 (初步結果)<br/>• Spark 批次 (修正補全)<br/>• 雙寫 ClickHouse<br/>━━━━━━━━<br/>優勢:<br/>• 兼顧實時性與準確性<br/>• 最終一致性保證<br/>缺點:<br/>• 架構複雜<br/>• 需處理數據修正<br/>━━━━━━━━<br/>適用場景:<br/>• 財務報表 (需最終準確)<br/>• 合規報表<br/>• 結算對帳]
+    NRT_COMPLETE -->|必須 100% 完整| NRT_HYBRID[方案 D: 混合模式\n━━━━━━━━\n技術棧:\n• Flink 實時 (初步結果)\n• Spark 批次 (修正補全)\n• 雙寫 ClickHouse\n━━━━━━━━\n優勢:\n• 兼顧實時性與準確性\n• 最終一致性保證\n缺點:\n• 架構複雜\n• 需處理數據修正\n━━━━━━━━\n適用場景:\n• 財務報表 (需最終準確)\n• 合規報表\n• 結算對帳]
 
     BATCH_PATH --> BATCH_VOLUME{數據量級?}
-    BATCH_VOLUME -->|< 1 億條<br/>中小數據量| BATCH_SPARK[方案 E: Spark Batch<br/>━━━━━━━━<br/>技術棧:<br/>• Spark SQL<br/>• 從 S3 讀 Parquet<br/>• 寫入 ClickHouse<br/>• 排程: Airflow<br/>━━━━━━━━<br/>優勢:<br/>• 支援複雜 ETL<br/>• 數據 100% 完整<br/>• 成本可控<br/>缺點:<br/>• T+1 延遲<br/>• 不支援實時<br/>━━━━━━━━<br/>適用場景:<br/>• 經營報表<br/>• 月度損益表<br/>• 代理結算]
+    BATCH_VOLUME -->|< 1 億條\n中小數據量| BATCH_SPARK[方案 E: Spark Batch\n━━━━━━━━\n技術棧:\n• Spark SQL\n• 從 S3 讀 Parquet\n• 寫入 ClickHouse\n• 排程: Airflow\n━━━━━━━━\n優勢:\n• 支援複雜 ETL\n• 數據 100% 完整\n• 成本可控\n缺點:\n• T+1 延遲\n• 不支援實時\n━━━━━━━━\n適用場景:\n• 經營報表\n• 月度損益表\n• 代理結算]
 
-    BATCH_VOLUME -->|> 1 億條<br/>大數據量| BATCH_OPTIMIZE[方案 F: 優化批次處理<br/>━━━━━━━━<br/>技術棧:<br/>• Spark 分區並行<br/>• ClickHouse 分布式表<br/>• 增量計算 (僅處理變化)<br/>• 物化視圖預聚合<br/>━━━━━━━━<br/>優勢:<br/>• 處理 PB 級數據<br/>• 高度可擴展<br/>缺點:<br/>• 硬件成本高<br/>• 運維複雜<br/>━━━━━━━━<br/>適用場景:<br/>• 全平台數據分析<br/>• 機器學習訓練<br/>• 歷史數據回溯]
+    BATCH_VOLUME -->|> 1 億條\n大數據量| BATCH_OPTIMIZE[方案 F: 優化批次處理\n━━━━━━━━\n技術棧:\n• Spark 分區並行\n• ClickHouse 分布式表\n• 增量計算 (僅處理變化)\n• 物化視圖預聚合\n━━━━━━━━\n優勢:\n• 處理 PB 級數據\n• 高度可擴展\n缺點:\n• 硬件成本高\n• 運維複雜\n━━━━━━━━\n適用場景:\n• 全平台數據分析\n• 機器學習訓練\n• 歷史數據回溯]
 
     RT_REDIS --> IMPL_EXAMPLE
     RT_FLINK --> IMPL_EXAMPLE
@@ -334,7 +334,7 @@ flowchart TD
     BATCH_OPTIMIZE --> IMPL_EXAMPLE
     RT_REJECT --> START
 
-    IMPL_EXAMPLE[實施檢查清單<br/>━━━━━━━━━━━━<br/>✅ 成本評估 (CPU/內存/存儲)<br/>✅ SLA 定義 (延遲/可用性)<br/>✅ 監控告警配置<br/>✅ 數據質量檢查<br/>✅ 故障恢復方案<br/>✅ 擴展性驗證]
+    IMPL_EXAMPLE[實施檢查清單\n━━━━━━━━━━━━\n✅ 成本評估 (CPU/內存/存儲)\n✅ SLA 定義 (延遲/可用性)\n✅ 監控告警配置\n✅ 數據質量檢查\n✅ 故障恢復方案\n✅ 擴展性驗證]
 
     %% 樣式定義
     style RT_REDIS fill:#FFCDD2

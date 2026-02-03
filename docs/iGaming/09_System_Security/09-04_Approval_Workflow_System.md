@@ -26,17 +26,17 @@ sequenceDiagram
     participant Checker as 🔍 Checker (審批人)
     participant DB as 💾 數據庫
 
-    Maker->>System: 1. 提交操作請求<br/>(如: 修改 RTP 配置)
-    System->>DB: 2. 保存草稿狀態<br/>status = 'pending_approval'
-    System->>Checker: 3. 發送審批通知<br/>(Email + Slack)
+    Maker->>System: 1. 提交操作請求\n(如: 修改 RTP 配置)
+    System->>DB: 2. 保存草稿狀態\nstatus = 'pending_approval'
+    System->>Checker: 3. 發送審批通知\n(Email + Slack)
 
     alt 審批通過
         Checker->>System: 4a. Approve (附理由)
-        System->>DB: 5a. 執行變更<br/>status = 'approved'
+        System->>DB: 5a. 執行變更\nstatus = 'approved'
         System->>Maker: 6a. 通知變更已生效
     else 審批拒絕
         Checker->>System: 4b. Reject (附理由)
-        System->>DB: 5b. 標記拒絕<br/>status = 'rejected'
+        System->>DB: 5b. 標記拒絕\nstatus = 'rejected'
         System->>Maker: 6b. 通知拒絕原因
     end
 

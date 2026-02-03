@@ -29,21 +29,21 @@ flowchart TD
     IDEMPOTENT -->|No| ACQUIRE_LOCK[Acquire Redis Lock: player:$id]
 
     ACQUIRE_LOCK --> LOCK_CHECK{Lock acquired?}
-    LOCK_CHECK -->|No - Retry < 3| WAIT[Wait - Exponential Backoff<br/>━━━━━━━━━━━━━━<br/>Retry 1: 50ms<br/>Retry 2: 100ms<br/>Retry 3: 200ms]
+    LOCK_CHECK -->|No - Retry < 3| WAIT[Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms\nRetry 2: 100ms\nRetry 3: 200ms]
     WAIT --> ACQUIRE_LOCK
-    LOCK_CHECK -->|No - Retry >= 3| ERR_LOCK[Error: Lock Timeout<br/>━━━━━━━━━━━━━━<br/>Total Wait: 350ms]
+    LOCK_CHECK -->|No - Retry >= 3| ERR_LOCK[Error: Lock Timeout\n━━━━━━━━━━━━━━\nTotal Wait: 350ms]
 
     LOCK_CHECK -->|Yes| READ_BALANCE[Read Current Balance & Version]
     READ_BALANCE --> BALANCE_CHECK{Balance >= amount?}
     BALANCE_CHECK -->|No| ERR_INSUFFICIENT[Error: Insufficient Funds]
 
-    BALANCE_CHECK -->|Yes| UPDATE_DB[Execute Optimistic Lock Update:<br/>SET balance = balance - amount,<br/>version = version + 1<br/>WHERE player_id = ? AND version = ?]
+    BALANCE_CHECK -->|Yes| UPDATE_DB[Execute Optimistic Lock Update:\nSET balance = balance - amount,\nversion = version + 1\nWHERE player_id = ? AND version = ?]
 
     UPDATE_DB --> AFFECTED_CHECK{Affected Rows > 0?}
     AFFECTED_CHECK -->|No - Version Conflict| VERSION_RETRY{Retry Count < 3?}
-    VERSION_RETRY -->|Yes| BACKOFF[Wait - Linear Backoff<br/>━━━━━━━━━━━━━━<br/>Retry 1: 20ms<br/>Retry 2: 40ms<br/>Retry 3: 60ms]
+    VERSION_RETRY -->|Yes| BACKOFF[Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 20ms\nRetry 2: 40ms\nRetry 3: 60ms]
     BACKOFF --> READ_BALANCE
-    VERSION_RETRY -->|No| ERR_VERSION[Error: Concurrent Update Conflict<br/>━━━━━━━━━━━━━━<br/>Total Wait: 120ms<br/>Suggest: Use queue]
+    VERSION_RETRY -->|No| ERR_VERSION[Error: Concurrent Update Conflict\n━━━━━━━━━━━━━━\nTotal Wait: 120ms\nSuggest: Use queue]
 
     AFFECTED_CHECK -->|Yes| INSERT_TX[Insert Transaction Log]
     INSERT_TX --> INSERT_OUTBOX[Insert Outbox Event: WALLET_DEBITED]
@@ -131,14 +131,14 @@ sequenceDiagram
     GameService->>WalletService: tryTransaction(transaction_id, player_id, breakdown)
     WalletService->>PlayerWallet: BEGIN TRANSACTION
 
-    WalletService->>PlayerWallet: SELECT balance, bonus, outstanding, credit_limit<br/>WHERE player_id = ? FOR UPDATE
+    WalletService->>PlayerWallet: SELECT balance, bonus, outstanding, credit_limit\nWHERE player_id = ? FOR UPDATE
     PlayerWallet-->>WalletService: {bonus: 50, cash: 100, outstanding: 200, limit: 1000}
 
-    WalletService->>WalletService: Validate:<br/>✓ bonus(50) >= 20<br/>✓ cash(100) >= 30<br/>✓ (limit-outstanding) >= 50
+    WalletService->>WalletService: Validate:\n✓ bonus(50) >= 20\n✓ cash(100) >= 30\n✓ (limit-outstanding) >= 50
 
-    WalletService->>PlayerWallet: UPDATE player_wallet SET<br/>frozen_bonus = frozen_bonus + 20,<br/>frozen_cash = frozen_cash + 30,<br/>frozen_credit = frozen_credit + 50,<br/>version = version + 1
+    WalletService->>PlayerWallet: UPDATE player_wallet SET\nfrozen_bonus = frozen_bonus + 20,\nfrozen_cash = frozen_cash + 30,\nfrozen_credit = frozen_credit + 50,\nversion = version + 1
 
-    WalletService->>TransactionLog: INSERT tcc_transaction (id, status, phase, expires_at)<br/>VALUES (transaction_id, 'PENDING', 'TRY', NOW() + 5min)
+    WalletService->>TransactionLog: INSERT tcc_transaction (id, status, phase, expires_at)\nVALUES (transaction_id, 'PENDING', 'TRY', NOW() + 5min)
 
     WalletService->>PlayerWallet: COMMIT
     WalletService-->>GameService: {status: TRY_SUCCESS, try_token: transaction_id}
@@ -148,22 +148,22 @@ sequenceDiagram
 
     Note over Player,Kafka: TCC Phase 2: Confirm (實際扣款) - Happy Path
 
-    GameService->>GameService: Game round completed<br/>(Player loses: amount=100)
+    GameService->>GameService: Game round completed\n(Player loses: amount=100)
 
     GameService->>WalletService: confirmTransaction(try_token, round_result)
     WalletService->>PlayerWallet: BEGIN TRANSACTION
 
-    WalletService->>TransactionLog: SELECT status FROM tcc_transaction<br/>WHERE id = try_token FOR UPDATE
+    WalletService->>TransactionLog: SELECT status FROM tcc_transaction\nWHERE id = try_token FOR UPDATE
     TransactionLog-->>WalletService: {status: 'PENDING'}
 
     alt Status = PENDING (Normal Path)
-        WalletService->>PlayerWallet: UPDATE player_wallet SET<br/>bonus = bonus - 20,<br/>frozen_bonus = frozen_bonus - 20,<br/>cash = cash - 30,<br/>frozen_cash = frozen_cash - 30,<br/>outstanding = outstanding + 50,<br/>frozen_credit = frozen_credit - 50,<br/>version = version + 1
+        WalletService->>PlayerWallet: UPDATE player_wallet SET\nbonus = bonus - 20,\nfrozen_bonus = frozen_bonus - 20,\ncash = cash - 30,\nfrozen_cash = frozen_cash - 30,\noutstanding = outstanding + 50,\nfrozen_credit = frozen_credit - 50,\nversion = version + 1
 
-        WalletService->>TransactionLog: UPDATE tcc_transaction SET<br/>status = 'CONFIRMED',<br/>confirmed_at = NOW()
+        WalletService->>TransactionLog: UPDATE tcc_transaction SET\nstatus = 'CONFIRMED',\nconfirmed_at = NOW()
 
-        WalletService->>TransactionLog: INSERT wallet_transaction<br/>(player_id, type, amount, balance_after, ref_id)<br/>VALUES (?, 'BET', -100, new_balance, try_token)
+        WalletService->>TransactionLog: INSERT wallet_transaction\n(player_id, type, amount, balance_after, ref_id)\nVALUES (?, 'BET', -100, new_balance, try_token)
 
-        WalletService->>OutboxPublisher: INSERT outbox_event<br/>(aggregate_id, type, payload, status)<br/>VALUES (player_id, 'WALLET_DEBITED', {amount: 100}, 'PENDING')
+        WalletService->>OutboxPublisher: INSERT outbox_event\n(aggregate_id, type, payload, status)\nVALUES (player_id, 'WALLET_DEBITED', {amount: 100}, 'PENDING')
 
         WalletService->>PlayerWallet: COMMIT
         WalletService-->>GameService: {status: CONFIRMED}
@@ -184,12 +184,12 @@ sequenceDiagram
         GameService->>WalletService: cancelTransaction(try_token, reason)
         WalletService->>PlayerWallet: BEGIN TRANSACTION
 
-        WalletService->>TransactionLog: SELECT status FROM tcc_transaction<br/>WHERE id = try_token FOR UPDATE
+        WalletService->>TransactionLog: SELECT status FROM tcc_transaction\nWHERE id = try_token FOR UPDATE
         TransactionLog-->>WalletService: {status: 'PENDING'}
 
-        WalletService->>PlayerWallet: UPDATE player_wallet SET<br/>frozen_bonus = frozen_bonus - 20,<br/>frozen_cash = frozen_cash - 30,<br/>frozen_credit = frozen_credit - 50,<br/>version = version + 1<br/>(Release frozen resources)
+        WalletService->>PlayerWallet: UPDATE player_wallet SET\nfrozen_bonus = frozen_bonus - 20,\nfrozen_cash = frozen_cash - 30,\nfrozen_credit = frozen_credit - 50,\nversion = version + 1\n(Release frozen resources)
 
-        WalletService->>TransactionLog: UPDATE tcc_transaction SET<br/>status = 'CANCELLED',<br/>cancelled_at = NOW(),<br/>reason = ?
+        WalletService->>TransactionLog: UPDATE tcc_transaction SET\nstatus = 'CANCELLED',\ncancelled_at = NOW(),\nreason = ?
 
         WalletService->>PlayerWallet: COMMIT
         WalletService-->>GameService: {status: CANCELLED}
@@ -200,7 +200,7 @@ sequenceDiagram
     Note over WalletService,Kafka: Scheduled Job: Timeout Recovery (每分鐘執行)
 
     rect rgb(255, 230, 230)
-        WalletService->>TransactionLog: SELECT * FROM tcc_transaction<br/>WHERE status='PENDING'<br/>AND expires_at < NOW()
+        WalletService->>TransactionLog: SELECT * FROM tcc_transaction\nWHERE status='PENDING'\nAND expires_at < NOW()
         TransactionLog-->>WalletService: [expired_tx_1, expired_tx_2, ...]
 
         loop For each expired transaction
@@ -208,10 +208,10 @@ sequenceDiagram
 
             alt Round exists and completed
                 GameService-->>WalletService: {status: COMPLETED, result: WIN/LOSE}
-                WalletService->>WalletService: Retry confirmTransaction()<br/>(Compensation)
+                WalletService->>WalletService: Retry confirmTransaction()\n(Compensation)
             else Round not found or failed
                 GameService-->>WalletService: {status: NOT_FOUND}
-                WalletService->>WalletService: Execute cancelTransaction()<br/>(Rollback)
+                WalletService->>WalletService: Execute cancelTransaction()\n(Rollback)
             end
         end
     end
@@ -261,23 +261,23 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING: Try Phase<br/>(Freeze Resources)
+    [*] --> PENDING: Try Phase\n(Freeze Resources)
 
-    PENDING --> CONFIRMING: Confirm Request<br/>(Game Round Completed)
-    CONFIRMING --> CONFIRMED: Debit Success<br/>(Update Balance + Log)
+    PENDING --> CONFIRMING: Confirm Request\n(Game Round Completed)
+    CONFIRMING --> CONFIRMED: Debit Success\n(Update Balance + Log)
 
-    PENDING --> CANCELLING: Cancel Request<br/>(Timeout / Round Failed)
-    CANCELLING --> CANCELLED: Rollback Success<br/>(Release Frozen)
+    PENDING --> CANCELLING: Cancel Request\n(Timeout / Round Failed)
+    CANCELLING --> CANCELLED: Rollback Success\n(Release Frozen)
 
-    PENDING --> EXPIRED: Timeout<br/>(expires_at < NOW)
-    EXPIRED --> CANCELLING: Recovery Job<br/>(Auto Cancel)
+    PENDING --> EXPIRED: Timeout\n(expires_at < NOW)
+    EXPIRED --> CANCELLING: Recovery Job\n(Auto Cancel)
 
-    PENDING --> PENDING: Retry Try<br/>(Idempotent - Same UUID)
-    CONFIRMING --> CONFIRMED: Retry Confirm<br/>(Idempotent)
-    CANCELLING --> CANCELLED: Retry Cancel<br/>(Idempotent)
+    PENDING --> PENDING: Retry Try\n(Idempotent - Same UUID)
+    CONFIRMING --> CONFIRMED: Retry Confirm\n(Idempotent)
+    CANCELLING --> CANCELLED: Retry Cancel\n(Idempotent)
 
-    CONFIRMED --> [*]: Settlement<br/>(T+1 Batch)
-    CANCELLED --> [*]: Cleanup<br/>(Archive)
+    CONFIRMED --> [*]: Settlement\n(T+1 Batch)
+    CANCELLED --> [*]: Cleanup\n(Archive)
 
     note right of PENDING : Status: PENDING\nexpires_at: NOW() + 5min\nfrozen_bonus: +20\nfrozen_cash: +30\nfrozen_credit: +50
 

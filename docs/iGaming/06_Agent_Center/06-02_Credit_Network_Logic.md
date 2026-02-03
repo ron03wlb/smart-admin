@@ -31,43 +31,43 @@
 ```mermaid
 graph TB
     subgraph "Platform Level - 平台層"
-        P[Platform 平台<br/>━━━━━━━━━━━━━━<br/>Total Credit Pool: $10M<br/>Allocated: $8M<br/>Available: $2M<br/>━━━━━━━━━━━━━━<br/>Company Position: 10%]
+        P[Platform 平台\n━━━━━━━━━━━━━━\nTotal Credit Pool: $10M\nAllocated: $8M\nAvailable: $2M\n━━━━━━━━━━━━━━\nCompany Position: 10%]
     end
 
     subgraph "Master Agent Level - 總代層"
-        P -->|Allocate $5M<br/>Position: 20%| M1[Master Agent A 總代A<br/>━━━━━━━━━━━━━━<br/>Credit Limit: $5M<br/>Used Credit: $3.5M<br/>Available: $1.5M<br/>Usage: 70% 🟢<br/>━━━━━━━━━━━━━━<br/>Own Position: 20%<br/>To Sub-Agents: $4M]
+        P -->|Allocate $5M\nPosition: 20%| M1[Master Agent A 總代A\n━━━━━━━━━━━━━━\nCredit Limit: $5M\nUsed Credit: $3.5M\nAvailable: $1.5M\nUsage: 70% 🟢\n━━━━━━━━━━━━━━\nOwn Position: 20%\nTo Sub-Agents: $4M]
 
-        P -->|Allocate $3M<br/>Position: 15%| M2[Master Agent B 總代B<br/>━━━━━━━━━━━━━━<br/>Credit Limit: $3M<br/>Used Credit: $2.85M<br/>Available: $150k<br/>Usage: 95% 🔴 ALERT<br/>━━━━━━━━━━━━━━<br/>Own Position: 15%<br/>To Sub-Agents: $2.8M]
+        P -->|Allocate $3M\nPosition: 15%| M2[Master Agent B 總代B\n━━━━━━━━━━━━━━\nCredit Limit: $3M\nUsed Credit: $2.85M\nAvailable: $150k\nUsage: 95% 🔴 ALERT\n━━━━━━━━━━━━━━\nOwn Position: 15%\nTo Sub-Agents: $2.8M]
     end
 
     subgraph "Agent L1 Level - 一級代理層"
-        M1 -->|Allocate $2M<br/>Position: 40%| A1[Agent L1-A1<br/>━━━━━━━━━━━━━━<br/>Limit: $2M<br/>Used: $1.2M<br/>Available: $800k<br/>Usage: 60% 🟢<br/>━━━━━━━━━━━━━━<br/>Position: 40%]
+        M1 -->|Allocate $2M\nPosition: 40%| A1[Agent L1-A1\n━━━━━━━━━━━━━━\nLimit: $2M\nUsed: $1.2M\nAvailable: $800k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 40%]
 
-        M1 -->|Allocate $1.5M<br/>Position: 35%| A2[Agent L1-A2<br/>━━━━━━━━━━━━━━<br/>Limit: $1.5M<br/>Used: $1.5M<br/>Available: $0<br/>Usage: 100% 🔴 FROZEN<br/>━━━━━━━━━━━━━━<br/>Position: 35%<br/>⚠️ Auto-Suspended]
+        M1 -->|Allocate $1.5M\nPosition: 35%| A2[Agent L1-A2\n━━━━━━━━━━━━━━\nLimit: $1.5M\nUsed: $1.5M\nAvailable: $0\nUsage: 100% 🔴 FROZEN\n━━━━━━━━━━━━━━\nPosition: 35%\n⚠️ Auto-Suspended]
 
-        M1 -->|Allocate $500k<br/>Position: 30%| A3[Agent L1-A3<br/>━━━━━━━━━━━━━━<br/>Limit: $500k<br/>Used: $300k<br/>Available: $200k<br/>Usage: 60% 🟢<br/>━━━━━━━━━━━━━━<br/>Position: 30%]
+        M1 -->|Allocate $500k\nPosition: 30%| A3[Agent L1-A3\n━━━━━━━━━━━━━━\nLimit: $500k\nUsed: $300k\nAvailable: $200k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 30%]
 
-        M2 -->|Allocate $2.8M<br/>Position: 45%| A4[Agent L1-A4<br/>━━━━━━━━━━━━━━<br/>Limit: $2.8M<br/>Used: $2.6M<br/>Available: $200k<br/>Usage: 93% 🟡 WARNING<br/>━━━━━━━━━━━━━━<br/>Position: 45%]
+        M2 -->|Allocate $2.8M\nPosition: 45%| A4[Agent L1-A4\n━━━━━━━━━━━━━━\nLimit: $2.8M\nUsed: $2.6M\nAvailable: $200k\nUsage: 93% 🟡 WARNING\n━━━━━━━━━━━━━━\nPosition: 45%]
     end
 
     subgraph "Agent L2 Level - 二級代理層"
-        A1 -->|Allocate $800k<br/>Position: 50%| A5[Agent L2-A5<br/>━━━━━━━━━━━━━━<br/>Limit: $800k<br/>Used: $500k<br/>Available: $300k<br/>Usage: 62.5% 🟢<br/>━━━━━━━━━━━━━━<br/>Position: 50%]
+        A1 -->|Allocate $800k\nPosition: 50%| A5[Agent L2-A5\n━━━━━━━━━━━━━━\nLimit: $800k\nUsed: $500k\nAvailable: $300k\nUsage: 62.5% 🟢\n━━━━━━━━━━━━━━\nPosition: 50%]
 
-        A3 -->|Allocate $200k<br/>Position: 45%| A6[Agent L2-A6<br/>━━━━━━━━━━━━━━<br/>Limit: $200k<br/>Used: $150k<br/>Available: $50k<br/>Usage: 75% 🟢<br/>━━━━━━━━━━━━━━<br/>Position: 45%]
+        A3 -->|Allocate $200k\nPosition: 45%| A6[Agent L2-A6\n━━━━━━━━━━━━━━\nLimit: $200k\nUsed: $150k\nAvailable: $50k\nUsage: 75% 🟢\n━━━━━━━━━━━━━━\nPosition: 45%]
     end
 
     subgraph "Player Level - 玩家層"
-        A5 -->|Allocate $300k<br/>Total Players: 50| PG1[Player Group 1<br/>━━━━━━━━━━━━━━<br/>Total Bets: $500k<br/>Total Wins: $400k<br/>Net Loss: $100k 💰<br/>━━━━━━━━━━━━━━<br/>Settlement Status: Pending]
+        A5 -->|Allocate $300k\nTotal Players: 50| PG1[Player Group 1\n━━━━━━━━━━━━━━\nTotal Bets: $500k\nTotal Wins: $400k\nNet Loss: $100k 💰\n━━━━━━━━━━━━━━\nSettlement Status: Pending]
 
-        A6 -->|Allocate $50k<br/>Total Players: 20| PG2[Player Group 2<br/>━━━━━━━━━━━━━━<br/>Total Bets: $200k<br/>Total Wins: $250k<br/>Net Win: $50k 📈<br/>━━━━━━━━━━━━━━<br/>Settlement Status: Pending]
+        A6 -->|Allocate $50k\nTotal Players: 20| PG2[Player Group 2\n━━━━━━━━━━━━━━\nTotal Bets: $200k\nTotal Wins: $250k\nNet Win: $50k 📈\n━━━━━━━━━━━━━━\nSettlement Status: Pending]
 
-        A4 -->|Allocate $200k<br/>Total Players: 100| PG3[Player Group 3<br/>━━━━━━━━━━━━━━<br/>Total Bets: $2.8M<br/>Total Wins: $200k<br/>Net Loss: $2.6M 💰<br/>━━━━━━━━━━━━━━<br/>⚠️ High Turnover]
+        A4 -->|Allocate $200k\nTotal Players: 100| PG3[Player Group 3\n━━━━━━━━━━━━━━\nTotal Bets: $2.8M\nTotal Wins: $200k\nNet Loss: $2.6M 💰\n━━━━━━━━━━━━━━\n⚠️ High Turnover]
     end
 
     subgraph "Risk Alerts - 風險告警"
-        RISK1[🔴 Critical Risk<br/>Master B: 95% Usage<br/>Action: Margin Call]
-        RISK2[🔴 Frozen<br/>Agent L1-A2: 100% Usage<br/>Action: Auto-Suspend]
-        RISK3[🟡 Warning<br/>Agent L1-A4: 93% Usage<br/>Action: Monitor]
+        RISK1[🔴 Critical Risk\nMaster B: 95% Usage\nAction: Margin Call]
+        RISK2[🔴 Frozen\nAgent L1-A2: 100% Usage\nAction: Auto-Suspend]
+        RISK3[🟡 Warning\nAgent L1-A4: 93% Usage\nAction: Monitor]
     end
 
     M2 -.->|Trigger| RISK1
@@ -243,23 +243,23 @@ sequenceDiagram
         CronJob->>SettlementService: triggerWeeklySettlement(week=W-1)
         SettlementService->>DB: BEGIN TRANSACTION (Isolation: SERIALIZABLE)
 
-        SettlementService->>DB: UPDATE credit_accounts<br/>SET status='FROZEN', frozen_at=NOW()<br/>WHERE settlement_week = W-1
+        SettlementService->>DB: UPDATE credit_accounts\nSET status='FROZEN', frozen_at=NOW()\nWHERE settlement_week = W-1
 
-        SettlementService->>DB: SELECT * FROM agents<br/>ORDER BY level DESC (Leaf nodes first)
+        SettlementService->>DB: SELECT * FROM agents\nORDER BY level DESC (Leaf nodes first)
         DB-->>SettlementService: [AgentL2, AgentL1, Master, ...]
 
         loop For each Agent L2 (Bottom-Up)
             SettlementService->>AgentL2: calculatePosition(week=W-1)
 
-            AgentL2->>DB: SELECT SUM(player_bets - player_wins)<br/>FROM player_transactions<br/>WHERE agent_id = L2 AND week = W-1
+            AgentL2->>DB: SELECT SUM(player_bets - player_wins)\nFROM player_transactions\nWHERE agent_id = L2 AND week = W-1
             DB-->>AgentL2: net_player_loss = $100,000
 
             AgentL2->>AgentL2: own_position = $100k × 50% (Position %) = $50,000
             AgentL2->>AgentL2: to_parent = $100k - $50k = $50,000
 
-            AgentL2->>DB: INSERT INTO settlement_records<br/>(agent_id, week, player_loss, own_share, to_parent)<br/>VALUES (L2, W-1, $100k, $50k, $50k)
+            AgentL2->>DB: INSERT INTO settlement_records\n(agent_id, week, player_loss, own_share, to_parent)\nVALUES (L2, W-1, $100k, $50k, $50k)
 
-            AgentL2->>DB: UPDATE agent_credit<br/>SET used_credit += $50k,<br/>settlement_status = 'PENDING'
+            AgentL2->>DB: UPDATE agent_credit\nSET used_credit += $50k,\nsettlement_status = 'PENDING'
 
             AgentL2->>NotificationService: sendSettlementNotice(agentId=L2, amount=$50k)
         end
@@ -267,17 +267,17 @@ sequenceDiagram
         loop For each Agent L1
             SettlementService->>AgentL1: aggregateChildPositions()
 
-            AgentL1->>DB: SELECT SUM(to_parent) FROM settlement_records<br/>WHERE parent_id = L1 AND week = W-1
+            AgentL1->>DB: SELECT SUM(to_parent) FROM settlement_records\nWHERE parent_id = L1 AND week = W-1
             DB-->>AgentL1: total_from_children = $50,000
 
-            AgentL1->>DB: SELECT SUM(direct_player_loss) FROM player_transactions<br/>WHERE agent_id = L1 AND week = W-1
+            AgentL1->>DB: SELECT SUM(direct_player_loss) FROM player_transactions\nWHERE agent_id = L1 AND week = W-1
             DB-->>AgentL1: direct_player_loss = $20,000
 
             AgentL1->>AgentL1: total_player_loss = $50k + $20k = $70k
             AgentL1->>AgentL1: own_position = $70k × 40% = $28,000
             AgentL1->>AgentL1: to_parent = $70k - $28k = $42,000
 
-            AgentL1->>DB: INSERT INTO settlement_records<br/>(agent_id, week, total_loss, own_share, to_parent)<br/>VALUES (L1, W-1, $70k, $28k, $42k)
+            AgentL1->>DB: INSERT INTO settlement_records\n(agent_id, week, total_loss, own_share, to_parent)\nVALUES (L1, W-1, $70k, $28k, $42k)
 
             AgentL1->>NotificationService: sendSettlementNotice(agentId=L1, amount=$28k)
         end
@@ -285,22 +285,22 @@ sequenceDiagram
         loop For each Master Agent
             SettlementService->>MasterAgent: aggregateChildPositions()
 
-            MasterAgent->>DB: SELECT SUM(to_parent) FROM settlement_records<br/>WHERE parent_id = Master AND week = W-1
+            MasterAgent->>DB: SELECT SUM(to_parent) FROM settlement_records\nWHERE parent_id = Master AND week = W-1
             DB-->>MasterAgent: total_from_children = $42,000
 
             MasterAgent->>MasterAgent: own_position = $42k × 20% = $8,400
             MasterAgent->>MasterAgent: to_platform = $42k - $8.4k = $33,600
 
-            MasterAgent->>DB: INSERT INTO settlement_records<br/>(agent_id, week, total_loss, own_share, to_platform)<br/>VALUES (Master, W-1, $42k, $8.4k, $33.6k)
+            MasterAgent->>DB: INSERT INTO settlement_records\n(agent_id, week, total_loss, own_share, to_platform)\nVALUES (Master, W-1, $42k, $8.4k, $33.6k)
 
             MasterAgent->>NotificationService: sendSettlementNotice(agentId=Master, amount=$8.4k)
         end
 
         SettlementService->>Platform: aggregateMasterPositions()
-        Platform->>DB: SELECT SUM(to_platform) FROM settlement_records<br/>WHERE parent_id = Platform AND week = W-1
+        Platform->>DB: SELECT SUM(to_platform) FROM settlement_records\nWHERE parent_id = Platform AND week = W-1
         DB-->>Platform: total_platform_revenue = $33,600 + ... = $50,000
 
-        Platform->>DB: INSERT INTO platform_revenue<br/>(week, total_revenue, source)<br/>VALUES (W-1, $50k, 'CREDIT_SETTLEMENT')
+        Platform->>DB: INSERT INTO platform_revenue\n(week, total_revenue, source)\nVALUES (W-1, $50k, 'CREDIT_SETTLEMENT')
 
         SettlementService->>DB: COMMIT
 
@@ -318,7 +318,7 @@ sequenceDiagram
                 PaymentGateway-->>AgentL2: Transfer Completed (Reference: TXN_12345)
 
                 AgentL2->>SettlementService: submitPaymentProof(txn_id=TXN_12345, amount=$50k)
-                SettlementService->>DB: INSERT INTO settlement_payments<br/>(agent_id, week, amount, txn_id, status)<br/>VALUES (L2, W-1, $50k, TXN_12345, 'PENDING_VERIFY')
+                SettlementService->>DB: INSERT INTO settlement_payments\n(agent_id, week, amount, txn_id, status)\nVALUES (L2, W-1, $50k, TXN_12345, 'PENDING_VERIFY')
 
                 SettlementService->>AgentL1: notifyPaymentReceived(child=L2, amount=$50k)
 
@@ -341,20 +341,20 @@ sequenceDiagram
             PaymentGateway-->>AgentL1: {status: CONFIRMED, amount: $50k, from: AgentL2}
 
             alt Payment Verified
-                AgentL1->>DB: UPDATE settlement_payments<br/>SET status='VERIFIED', verified_at=NOW()<br/>WHERE txn_id = TXN_12345
+                AgentL1->>DB: UPDATE settlement_payments\nSET status='VERIFIED', verified_at=NOW()\nWHERE txn_id = TXN_12345
 
-                AgentL1->>DB: UPDATE settlement_records<br/>SET payment_status='COMPLETED'<br/>WHERE agent_id = L2 AND week = W-1
+                AgentL1->>DB: UPDATE settlement_records\nSET payment_status='COMPLETED'\nWHERE agent_id = L2 AND week = W-1
 
                 AgentL1->>SettlementService: confirmSettlementComplete(child=L2)
 
-                SettlementService->>DB: UPDATE agent_credit<br/>SET used_credit = 0,<br/>status = 'ACTIVE',<br/>last_settlement = NOW()<br/>WHERE agent_id = L2
+                SettlementService->>DB: UPDATE agent_credit\nSET used_credit = 0,\nstatus = 'ACTIVE',\nlast_settlement = NOW()\nWHERE agent_id = L2
 
                 SettlementService->>NotificationService: sendCreditResetNotice(agentId=L2)
 
             else Payment Not Received (Deadline Passed)
-                AgentL1->>DB: UPDATE settlement_payments<br/>SET status='OVERDUE'<br/>WHERE txn_id = TXN_12345
+                AgentL1->>DB: UPDATE settlement_payments\nSET status='OVERDUE'\nWHERE txn_id = TXN_12345
 
-                AgentL1->>DB: UPDATE agent_credit<br/>SET status='SUSPENDED',<br/>credit_limit = 0<br/>WHERE agent_id = L2
+                AgentL1->>DB: UPDATE agent_credit\nSET status='SUSPENDED',\ncredit_limit = 0\nWHERE agent_id = L2
 
                 AgentL1->>NotificationService: sendSuspensionNotice(agentId=L2, reason='OVERDUE_PAYMENT')
 
@@ -366,15 +366,15 @@ sequenceDiagram
     rect rgb(255, 255, 230)
         Note over SettlementService,Platform: Phase 4: Final Report & Audit (Saturday 12:00)
 
-        SettlementService->>DB: SELECT * FROM settlement_records<br/>WHERE week = W-1
+        SettlementService->>DB: SELECT * FROM settlement_records\nWHERE week = W-1
 
         SettlementService->>SettlementService: generateSettlementReport(week=W-1)
 
-        SettlementService->>Platform: publishWeeklyReport({<br/>total_volume: $5M,<br/>total_platform_revenue: $50k,<br/>completed_agents: 95%,<br/>overdue_agents: 5%<br/>})
+        SettlementService->>Platform: publishWeeklyReport({\ntotal_volume: $5M,\ntotal_platform_revenue: $50k,\ncompleted_agents: 95%,\noverdue_agents: 5%\n})
 
         Platform->>NotificationService: sendExecutiveSummary(recipients=[CFO, CEO])
 
-        SettlementService->>DB: UPDATE settlement_batches<br/>SET status='COMPLETED', completed_at=NOW()<br/>WHERE week = W-1
+        SettlementService->>DB: UPDATE settlement_batches\nSET status='COMPLETED', completed_at=NOW()\nWHERE week = W-1
 
         Note over Platform: Settlement Cycle Complete ✅
     end
@@ -453,60 +453,60 @@ flowchart TD
     VALIDATE1 -->|position_% > parent_max_position| ERR3[Error: Exceeds Parent Limit]
     VALIDATE1 -->|OK| LOCK
 
-    LOCK[Acquire Distributed Lock<br/>Redis: SET NX credit:parent:$id TTL=30s] --> LOCK_CHECK{Lock Acquired?}
-    LOCK_CHECK -->|No - Retry < 3| WAIT[Wait - Exponential Backoff<br/>━━━━━━━━━━━━━━<br/>Retry 1: 100ms<br/>Retry 2: 200ms<br/>Retry 3: 400ms]
+    LOCK[Acquire Distributed Lock\nRedis: SET NX credit:parent:$id TTL=30s] --> LOCK_CHECK{Lock Acquired?}
+    LOCK_CHECK -->|No - Retry < 3| WAIT[Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 100ms\nRetry 2: 200ms\nRetry 3: 400ms]
     WAIT --> LOCK
-    LOCK_CHECK -->|No - Retry >= 3| ERR4[Error: Lock Timeout<br/>━━━━━━━━━━━━━━<br/>Concurrent Allocation Conflict<br/>Total Wait: 700ms]
+    LOCK_CHECK -->|No - Retry >= 3| ERR4[Error: Lock Timeout\n━━━━━━━━━━━━━━\nConcurrent Allocation Conflict\nTotal Wait: 700ms]
     LOCK_CHECK -->|Yes| READ_PARENT
 
-    READ_PARENT[Read Parent Credit Record<br/>SELECT * FROM agent_credit<br/>WHERE agent_id = parent FOR UPDATE] --> VERSION_CHECK{Version Matches?}
+    READ_PARENT[Read Parent Credit Record\nSELECT * FROM agent_credit\nWHERE agent_id = parent FOR UPDATE] --> VERSION_CHECK{Version Matches?}
     VERSION_CHECK -->|No| RETRY_VERSION{Retry Count < 3?}
-    RETRY_VERSION -->|Yes| BACKOFF[Wait - Linear Backoff<br/>━━━━━━━━━━━━━━<br/>Retry 1: 50ms<br/>Retry 2: 100ms<br/>Retry 3: 150ms]
+    RETRY_VERSION -->|Yes| BACKOFF[Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms\nRetry 2: 100ms\nRetry 3: 150ms]
     BACKOFF --> READ_PARENT
-    RETRY_VERSION -->|No| ERR5[Error: Optimistic Lock Conflict<br/>━━━━━━━━━━━━━━<br/>Too Many Concurrent Updates<br/>Total Wait: 300ms]
+    RETRY_VERSION -->|No| ERR5[Error: Optimistic Lock Conflict\n━━━━━━━━━━━━━━\nToo Many Concurrent Updates\nTotal Wait: 300ms]
 
     VERSION_CHECK -->|Yes| CALC_AVAILABLE
-    CALC_AVAILABLE[Calculate Available Credit:<br/>available = parent.limit - parent.used - parent.allocated_to_children]
+    CALC_AVAILABLE[Calculate Available Credit:\navailable = parent.limit - parent.used - parent.allocated_to_children]
 
     CALC_AVAILABLE --> AVAILABLE_CHECK{available >= amount?}
-    AVAILABLE_CHECK -->|No| ERR6[Error: Insufficient Parent Credit<br/>Available: $available<br/>Requested: $amount]
+    AVAILABLE_CHECK -->|No| ERR6[Error: Insufficient Parent Credit\nAvailable: $available\nRequested: $amount]
 
     AVAILABLE_CHECK -->|Yes| CHECK_CHILD_EXISTS{Child Credit Record Exists?}
 
-    CHECK_CHILD_EXISTS -->|No - New Allocation| CREATE_CHILD[Create Child Credit Record:<br/>INSERT INTO agent_credit<br/>(agent_id, parent_id, limit, position_%)]
-    CHECK_CHILD_EXISTS -->|Yes - Adjust Existing| READ_CHILD[Read Child Credit Record<br/>SELECT * FROM agent_credit<br/>WHERE agent_id = child FOR UPDATE]
+    CHECK_CHILD_EXISTS -->|No - New Allocation| CREATE_CHILD[Create Child Credit Record:\nINSERT INTO agent_credit\n(agent_id, parent_id, limit, position_%)]
+    CHECK_CHILD_EXISTS -->|Yes - Adjust Existing| READ_CHILD[Read Child Credit Record\nSELECT * FROM agent_credit\nWHERE agent_id = child FOR UPDATE]
 
     CREATE_CHILD --> UPDATE_PARENT
     READ_CHILD --> CALC_DELTA
 
-    CALC_DELTA[Calculate Delta:<br/>delta = new_amount - child.current_limit] --> DELTA_CHECK{delta > 0?}
+    CALC_DELTA[Calculate Delta:\ndelta = new_amount - child.current_limit] --> DELTA_CHECK{delta > 0?}
     DELTA_CHECK -->|Yes - Increase| UPDATE_PARENT
     DELTA_CHECK -->|No - Decrease| CHECK_CHILD_USED
 
     CHECK_CHILD_USED{child.used_credit <= new_amount?}
-    CHECK_CHILD_USED -->|No| ERR7[Error: Cannot Reduce Below Used Credit<br/>Used: $child.used<br/>New Limit: $new_amount]
+    CHECK_CHILD_USED -->|No| ERR7[Error: Cannot Reduce Below Used Credit\nUsed: $child.used\nNew Limit: $new_amount]
     CHECK_CHILD_USED -->|Yes| UPDATE_PARENT
 
-    UPDATE_PARENT[UPDATE agent_credit SET<br/>allocated_to_children += amount,<br/>version = version + 1<br/>WHERE agent_id = parent AND version = $current_version]
+    UPDATE_PARENT[UPDATE agent_credit SET\nallocated_to_children += amount,\nversion = version + 1\nWHERE agent_id = parent AND version = $current_version]
 
     UPDATE_PARENT --> UPDATE_CHECK{Affected Rows > 0?}
     UPDATE_CHECK -->|No| RETRY_VERSION
     UPDATE_CHECK -->|Yes| UPDATE_CHILD
 
-    UPDATE_CHILD[UPDATE agent_credit SET<br/>credit_limit = new_amount,<br/>position_percent = new_position,<br/>updated_at = NOW(),<br/>version = version + 1<br/>WHERE agent_id = child]
+    UPDATE_CHILD[UPDATE agent_credit SET\ncredit_limit = new_amount,\nposition_percent = new_position,\nupdated_at = NOW(),\nversion = version + 1\nWHERE agent_id = child]
 
-    UPDATE_CHILD --> INSERT_AUDIT[INSERT INTO credit_allocation_audit<br/>(parent_id, child_id, old_limit, new_limit, delta, reason, operator)]
+    UPDATE_CHILD --> INSERT_AUDIT[INSERT INTO credit_allocation_audit\n(parent_id, child_id, old_limit, new_limit, delta, reason, operator)]
 
-    INSERT_AUDIT --> NOTIFY_CHECK{Significant Change?<br/>(delta > $10k OR position change > 10%)}
-    NOTIFY_CHECK -->|Yes| SEND_NOTIFICATION[Send Notification:<br/>Email to Child Agent + Parent + Risk Team]
+    INSERT_AUDIT --> NOTIFY_CHECK{Significant Change?\n(delta > $10k OR position change > 10%)}
+    NOTIFY_CHECK -->|Yes| SEND_NOTIFICATION[Send Notification:\nEmail to Child Agent + Parent + Risk Team]
     NOTIFY_CHECK -->|No| COMMIT
 
     SEND_NOTIFICATION --> COMMIT[COMMIT Transaction]
-    COMMIT --> RELEASE_LOCK[Release Redis Lock<br/>DEL credit:parent:$id]
+    COMMIT --> RELEASE_LOCK[Release Redis Lock\nDEL credit:parent:$id]
 
-    RELEASE_LOCK --> PUBLISH_EVENT[Publish Event to Kafka:<br/>topic: agent.credit.allocated<br/>payload: {parent_id, child_id, new_limit, delta}]
+    RELEASE_LOCK --> PUBLISH_EVENT[Publish Event to Kafka:\ntopic: agent.credit.allocated\npayload: {parent_id, child_id, new_limit, delta}]
 
-    PUBLISH_EVENT --> SUCCESS[Return Success:<br/>{status: OK, new_limit: $amount, available: $new_available}]
+    PUBLISH_EVENT --> SUCCESS[Return Success:\n{status: OK, new_limit: $amount, available: $new_available}]
 
     ERR1 --> RELEASE_LOCK_ERR[Release Lock if Held]
     ERR2 --> RELEASE_LOCK_ERR
