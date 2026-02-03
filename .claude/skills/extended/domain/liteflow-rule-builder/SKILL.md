@@ -822,6 +822,41 @@ INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_dat
 
 ---
 
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 規範與 LiteFlow 工作流引擎實踐：
+
+### 強制要求
+
+- **[Architecture Rules - Service Layer](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - LiteFlow 規則鏈調用放置在 Service 層（業務編排）
+  - 複雜鏈路執行（涉及多表事務）委託 Manager 層
+  - 構造器注入（@RequiredArgsConstructor + private final）
+
+- **[Dependency Injection Rules](./../../../.agent/rules/technology/patterns/07-dependency-injection.md)**
+  - LiteFlow 節點（@LiteflowComponent）依賴注入模式
+  - 節點獲取 Spring Bean：通過構造器注入（禁止 @Autowired 字段注入）
+  - 節點內部調用 Service/Manager 層
+
+### 參考指引
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - LiteFlow 節點異常處理（CATCH 節點捕獲異常）
+  - 異常日誌記錄（@Slf4j + 上下文信息）
+  - 鏈路執行失敗回滾策略
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 節點命名：ApprovalValidationNode, TierSelectionNode
+  - 鏈路命名：approvalChain, userUpgradeChain
+
+### 相關技能
+
+- **[evrete-rule-engine](./../../../lifecycle/deprecated/evrete-rule-engine/SKILL.md)** - 已棄用的規則引擎（本技能為替代方案，參見 § Migration from Evrete）
+- **[scheduled-task-manager](./../../productivity/devops/scheduled-task-manager/SKILL.md)** - XXL-Job 排程任務執行 LiteFlow 鏈（定時觸發工作流）
+- **[smartadmin-crud-generator](./../../foundation/full-stack/smartadmin-crud-generator/SKILL.md)** - Controller 層調用 LiteFlow Service 執行業務鏈路
+
+---
+
 ## Version Information
 
 **Skill Version:** 1.0.0

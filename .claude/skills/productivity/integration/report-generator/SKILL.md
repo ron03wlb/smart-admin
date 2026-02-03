@@ -404,6 +404,41 @@ try (ExcelWriter excelWriter = EasyExcel.write(filePath).build()) {
 
 ---
 
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 規範與報表導出實踐：
+
+### 強制要求
+
+- **[Architecture Rules - Service Layer](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 報表導出邏輯放置在 Service 層（業務查詢 + 數據轉換）
+  - 大數據導出（涉及分頁事務）委託 Manager 層
+  - 構造器注入（@RequiredArgsConstructor + private final）
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 報表數據查詢（跨表 JOIN）使用 Manager 層
+  - 報表歷史記錄（審計日誌）使用 Manager 層事務
+
+### 參考指引
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 導出異常處理（捕獲 IOException、內存溢出）
+  - 異常日誌記錄（包含導出參數、數據量）
+  - 導出失敗通知機制（郵件、系統消息）
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - Service 命名：EmployeeReportService, OrderReportService
+  - VO 命名：EmployeeReportVO, OrderReportVO
+  - Controller 命名：EmployeeReportController
+
+### 相關技能
+
+- **[scheduled-task-manager](./../../../productivity/devops/scheduled-task-manager/SKILL.md)** - 定時生成報表（XXL-Job 排程導出）
+- **[smartadmin-crud-generator](./../../../foundation/full-stack/smartadmin-crud-generator/SKILL.md)** - CRUD 生成包含導出功能（基礎模板）
+- **[smartadmin-integration-test](./../../../foundation/full-stack/smartadmin-integration-test/SKILL.md)** - 報表導出整合測試（Testcontainers）
+
+---
+
 **Version:** 1.0.0
 **Created:** 2026-01-26
 **Sprint:** 2 (Weeks 5-8)

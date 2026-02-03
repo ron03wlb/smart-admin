@@ -368,6 +368,41 @@ snail-job:
 
 ---
 
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 規範與 Snail-Job 排程任務實踐：
+
+### 強制要求
+
+- **[Architecture Rules - Manager Layer](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 排程任務邏輯放置在 Manager 層（跨表事務、複雜業務邏輯）
+  - XXL-Job Handler 調用 Manager.executeTask() 方法
+  - 構造器注入（@RequiredArgsConstructor + private final）
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 排程任務 Manager 方法必須包含 @Transactional(rollbackFor = Throwable.class)
+  - 任務執行失敗使用異常回滾（不使用返回碼）
+  - 任務執行歷史記錄（審計日誌）
+
+### 參考指引
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 排程任務異常處理（捕獲異常 + 日誌記錄 + 重試策略）
+  - XXL-Job Handler 返回值：XxlJobHelper.SUCCESS / XxlJobHelper.FAIL
+  - 異常通知機制（郵件、Webhook）
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - Handler 命名：DataSyncJobHandler, ReportGenerationJobHandler
+  - Manager 命名：DataSyncManager, ReportManager
+
+### 相關技能
+
+- **[liteflow-rule-builder](./../../../extended/domain/liteflow-rule-builder/SKILL.md)** - 定時執行 LiteFlow 規則鏈（XXL-Job 觸發工作流）
+- **[report-generator](./../../../productivity/integration/report-generator/SKILL.md)** - 定時生成報表任務（排程導出）
+- **[smartadmin-integration-test](./../../../foundation/full-stack/smartadmin-integration-test/SKILL.md)** - 排程任務整合測試（Testcontainers）
+
+---
+
 **Version:** 1.0.0
 **Created:** 2026-01-26
 **Sprint:** 3 (Weeks 9-11)

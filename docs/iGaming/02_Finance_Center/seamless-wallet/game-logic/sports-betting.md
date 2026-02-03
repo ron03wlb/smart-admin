@@ -262,6 +262,7 @@ function calculateAdjustedValidBet(settlement):
 ```
 
 **賠率係數表**:
+
 | 賠率範圍 | 係數 | 說明 |
 |---------|------|------|
 | 1.01 - 1.20 | 0.0 | 超低賠率,不計入 |

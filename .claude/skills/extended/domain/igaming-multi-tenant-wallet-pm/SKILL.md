@@ -1100,7 +1100,60 @@ graph TB
 
 ---
 
-**Version**: 1.1.0 (Optimized)  
-**Last Updated**: 2026-02-01  
+## 🔗 交叉引用與技能協作
+
+本技能作為多租戶錢包架構 PM 專家，需遵循以下 SmartAdmin 規範：
+
+### 相關規則文件
+
+- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 多租戶隔離架構設計（MyBatis 攔截器自動注入 tenant_id）
+  - Controller → Service → Manager → Dao 分層架構
+  - @Transactional 僅在 Manager 層使用
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 租戶相關實體命名：TenantEntity, TenantConfigEntity
+  - 錢包相關實體命名：WalletEntity, WalletTransactionEntity
+  - Manager 命名：TenantManager, WalletManager（不是 XXXManagerImpl）
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 跨租戶查詢使用 Manager 層處理事務
+  - @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Throwable.class)
+  - Manager 層處理分佈式鎖（Redis）和樂觀鎖（version 欄位）
+
+- **[Concurrency Safety Rules](./../../../.agent/rules/technology/patterns/05-concurrency-safety.md)**
+  - 並發扣款使用 Lua 腳本保證原子性
+  - 分佈式鎖防止重複扣款（Redisson RLock）
+  - Redis 快取包含租戶隔離（key 前綴：tenant:{tenantId}:）
+
+### 相關技能
+
+- **前置技能**:
+  - `igame-pm-analyst` - PRD 需求分析（自動觸發本技能）
+
+- **後續技能**:
+  - **[igame-feature-builder](./../igame-feature-builder/SKILL.md)** - 多租戶錢包功能實現
+  - `java-architect` - 技術架構設計
+
+- **並行技能**:
+  - **[fraud-detection-pattern-generator](./../fraud-detection-pattern-generator/SKILL.md)** - 跨租戶風控隔離
+  - **[liteflow-rule-builder](./../liteflow-rule-builder/SKILL.md)** - 租戶配置驅動工作流
+
+### 技能定位
+
+本技能是 **PM 專家技能**（產品經理視角），不調用其他技能，專注於：
+- 多租戶架構設計
+- 無縫錢包設計
+- 地區合規要求
+- PRD 文檔生成
+
+**與 igame-feature-builder 的區別**：
+- `igaming-multi-tenant-wallet-pm`: PM 視角，輸出 PRD 文檔
+- `igame-feature-builder`: 開發視角，輸出代碼實現
+
+---
+
+**Version**: 1.1.0 (Optimized)
+**Last Updated**: 2026-02-01
 **Documentation Structure**: Main + Anti-Patterns Doc
 

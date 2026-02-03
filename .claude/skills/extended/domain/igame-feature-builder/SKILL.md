@@ -287,6 +287,50 @@ public class AuditLogService {
 - [ ] Rollback support for failed operations
 - [ ] Idempotency for duplicate requests
 
+---
+
+## 相關規則
+
+本技能生成的 iGaming 功能代碼必須符合以下 SmartAdmin 規範：
+
+### 強制要求
+
+- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 錢包 API 嚴格遵循 Controller → Service → Manager → Dao
+  - Service 層禁止使用 @Transactional（委託給 Manager 層）
+  - Service 層使用 `io.vavr.control.Option`（禁止 `java.util.Optional`）
+  - 構造器注入（@RequiredArgsConstructor + private final）
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 錢包扣款/加款必須使用 Manager 層
+  - @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Throwable.class)
+  - Manager 層處理分佈式鎖（Redisson）和樂觀鎖（version 欄位）
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 實體命名：WalletEntity, VipTierEntity, BonusRuleEntity
+  - Service 命名：WalletService, VipService, BonusService
+  - Manager 命名：WalletManager（不是 WalletManagerImpl）
+  - Form 命名：DepositForm, WithdrawalForm（不是 DepositRequest）
+
+### 參考指引
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 餘額不足使用 ResponseDTO.userErrorParam()
+  - KYC 驗證失敗使用明確錯誤碼
+  - 業務異常不使用 try-catch（Service 層返回 ResponseDTO）
+
+- **[Dependency Injection](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+  - 所有 Service/Manager 使用構造器注入
+  - 禁止 @Autowired 欄位注入
+
+### 相關技能
+
+- **[fraud-detection-pattern-generator](./../fraud-detection-pattern-generator/SKILL.md)** - 風控檢測整合（支付/提款風控）
+- **[igame-pm-analyst](./../igame-pm-analyst/SKILL.md)** - iGaming 功能需求分析
+- **[archunit-test-generator](./../../foundation/backend/archunit-test-generator/SKILL.md)** - 生成 ArchUnit 測試驗證架構規則
+
+---
+
 ## References
 
 See references/ for detailed patterns:

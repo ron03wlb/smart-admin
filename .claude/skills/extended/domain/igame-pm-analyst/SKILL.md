@@ -262,6 +262,50 @@ business-analyst → igame-pm-analyst → java-architect
 **iGaming Technical Specs**:
 - [iGame Technical Specs](../../../docs/iGame/technical-specs/)
 
+---
+
+## 相關規則與技能協作
+
+本技能作為 iGaming 產品管理分析助手，需遵循以下規範：
+
+### 相關規則文件
+
+- **[Architecture Rules](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - SmartAdmin 分層設計驗證（PRD 中的架構建議必須符合）
+  - 確保 PRD 推薦的技術方案遵循 Controller → Service → Manager → Dao
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - PRD 中的類/方法命名建議必須遵循 SmartAdmin 標準
+  - Entity/Form/VO 命名規範驗證
+
+- **[OOP Principles](./../../../.agent/rules/foundation/02-oop-principles.md)**
+  - PRD 中的設計原則（SOLID）驗證
+  - 確保業務邏輯設計符合物件導向最佳實踐
+
+### 協作技能（技能管道）
+
+```
+business-analyst (需求收集)
+    ↓
+[igame-pm-analyst] (本技能：PRD 生成 + 架構分析)
+    ↓
+java-architect (技術設計)
+    ↓
+igame-feature-builder (功能實現)
+```
+
+**上游技能**:
+- `business-analyst` - 自動觸發本技能（需求分析完成後）
+
+**下游技能**:
+- `java-architect` - 接收本技能的 PRD 輸出進行技術設計
+- **[igame-feature-builder](./../igame-feature-builder/SKILL.md)** - 實現 PRD 分析的功能
+
+**並行技能**:
+- **[fraud-detection-pattern-generator](./../fraud-detection-pattern-generator/SKILL.md)** - 風控需求分析（當 PRD 涉及風控時）
+
+---
+
 ## Notes
 
 - **Language**: All PRD outputs are in Traditional Chinese (繁體中文)

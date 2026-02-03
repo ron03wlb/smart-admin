@@ -883,6 +883,23 @@ pmd-ruleset.xml: Exclude UnusedImports rule
 - `.agent/rules/quality-tools/16-jacoco-coverage-rules.md` - Coverage thresholds
 - `.agent/workflows/quality-gates-local-ci.md` - Local validation workflow
 
+### 協調的質量技能
+
+本技能作為質量門協調器，整合以下質量檢查技能：
+
+- **[concurrency-safety-auditor](./../../extended/quality/concurrency-safety-auditor/SKILL.md)** - 並發安全審計（SpotBugs 定制檢測器）
+- **[spring-pattern-checker](./../../extended/quality/spring-pattern-checker/SKILL.md)** - Spring 模式驗證（@Transactional 位置檢查）
+- **[naming-convention-checker](./../../extended/quality/naming-convention-checker/SKILL.md)** - 命名規範檢查（SmartAdmin 標準）
+- **[archunit-test-generator](./../../foundation/backend/archunit-test-generator/SKILL.md)** - 架構測試生成（分層架構驗證）
+
+### 協調模式
+
+- **Sequential**: Checkstyle → PMD → SpotBugs → ArchUnit（順序執行，快速失敗）
+- **Parallel**: 4 工具並行執行（CI/CD 環境，最大化吞吐量）
+- **Selective**: 依據變更範圍選擇性執行（Git diff 增量檢查）
+
+**技能定位**: 本技能是**質量門協調器**（Quality Gate Orchestrator），不執行檢查，僅協調質量工具執行。
+
 ---
 
 ## Template Files

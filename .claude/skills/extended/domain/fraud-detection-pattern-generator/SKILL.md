@@ -925,6 +925,49 @@ HAVING COUNT(*) > 2;
 
 ---
 
+## 相關規則
+
+本技能直接關聯以下 SmartAdmin 規範與 iGaming 業務邏輯：
+
+### 強制要求
+
+- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+  - 嚴格遵循 Controller → Service → Manager → Dao 分層架構
+  - 風控檢測邏輯放置在 Service 層（業務邏輯編排）
+  - 多賬戶檢測事務管理使用 Manager 層（@Transactional）
+  - 構造器注入（@RequiredArgsConstructor + private final）
+
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+  - 風險評分計算使用 Manager 層處理跨表事務
+  - RiskScoreManager.addRiskPoints() 必須包含 @Transactional(rollbackFor = Throwable.class)
+  - Manager 層處理分佈式鎖（Redisson）協調
+
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+  - 實體命名：LinkedAccountEntity, RiskScoreEntity
+  - Service 命名：MultiAccountDetectionService, BonusAbuseDetectionService
+  - Manager 命名：RiskScoreManager（不是 RiskScoreManagerImpl）
+  - DAO 命名：LinkedAccountDao, RiskEventDao
+
+### 參考指引
+
+- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
+  - 風控異常處理（阻斷支付、凍結賬戶）
+  - 高風險事件日誌記錄（log.warn, log.error）
+  - 業務異常使用 ResponseDTO.error() 封裝
+
+- **[Concurrency Safety Rules](./../../../.agent/rules/technology/patterns/05-concurrency-safety.md)**
+  - 並發風險評分累積（Lua 腳本原子性）
+  - 分佈式鎖防止重複扣款（Redisson RLock）
+  - Redis 快取防止快取擊穿（布隆過濾器）
+
+### 相關技能
+
+- **[igame-feature-builder](./../igame-feature-builder/SKILL.md)** - VIP 系統、錢包 API 實現（風控整合點）
+- **[igame-pm-analyst](./../igame-pm-analyst/SKILL.md)** - 風控需求分析與 PRD 生成
+- **[smartadmin-integration-test](./../../foundation/full-stack/smartadmin-integration-test/SKILL.md)** - 風控邏輯整合測試
+
+---
+
 ## References
 
 **iGaming Compliance:**

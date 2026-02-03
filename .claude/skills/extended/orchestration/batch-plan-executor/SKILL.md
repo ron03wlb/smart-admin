@@ -433,7 +433,40 @@ Migrate existing Evrete rules to LiteFlow DSL...
 
 ---
 
-**Version**: 2.0.0 (Restructured)  
-**Last Updated**: 2026-02-01  
+## 相關規則與協調技能
+
+本技能作為批量計劃執行協調器，整合以下 SmartAdmin 技能與規範：
+
+### 協調的核心技能（Foundation）
+
+- **[smartadmin-crud-generator](./../../foundation/full-stack/smartadmin-crud-generator/SKILL.md)** - 批量 CRUD 生成（最常見使用場景）
+- **[archunit-test-generator](./../../foundation/backend/archunit-test-generator/SKILL.md)** - 架構測試生成（驗證階段）
+- **[test-fixture-generator](./../../foundation/testing/test-fixture-generator/SKILL.md)** - 測試數據生成（測試階段）
+- **[smartadmin-integration-test](./../../foundation/full-stack/smartadmin-integration-test/SKILL.md)** - 整合測試（驗證階段）
+
+### 協調的擴展技能（Extended）
+
+- **[igame-feature-builder](./../../extended/domain/igame-feature-builder/SKILL.md)** - iGaming 功能批量生成
+- **[liteflow-rule-builder](./../../extended/domain/liteflow-rule-builder/SKILL.md)** - LiteFlow 規則鏈批量生成
+- **[quality-gate-orchestrator](./../../extended/orchestration/quality-gate-orchestrator/SKILL.md)** - 質量門檢查（執行後驗證）
+
+### 架構規範遵循
+
+- **[Architecture Rules](./../../../.agent/rules/foundation/10-architecture-rules.md)** - 確保生成的代碼符合分層架構
+- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)** - 確保批量生成的類名一致
+
+### 協調模式
+
+- **衝突檢測**: 自動檢測批量計劃間的資源衝突（文件、數據庫表）
+- **依賴排序**: 根據技能依賴關係自動排序執行順序
+- **並行執行**: 無衝突的計劃並行執行（提升效率）
+- **失敗回滾**: 單個計劃失敗不影響其他計劃（隔離性）
+
+**技能定位**: 本技能是**協調器技能**（Orchestrator），不生成代碼，僅協調其他技能執行。
+
+---
+
+**Version**: 2.0.0 (Restructured)
+**Last Updated**: 2026-02-01
 **Documentation Structure**: Main + Detailed Docs
 
