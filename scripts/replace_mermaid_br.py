@@ -12,6 +12,9 @@ from pathlib import Path
 def fix_mermaid_br_tags(content: str) -> tuple:
     """
     修復 Mermaid 程式碼區塊中的 <br/> 標籤
+    特殊處理：
+    1. Graph/Flowchart 節點：<br/> → \\n
+    2. SequenceDiagram Note：保留 <br/>（不修改）
 
     返回: (修復後的內容, 替換次數)
     """
@@ -21,12 +24,26 @@ def fix_mermaid_br_tags(content: str) -> tuple:
         nonlocal replacements
         mermaid_block = match.group(1)
 
-        # 計算替換次數
-        br_count = mermaid_block.count('<br/>')
-        replacements += br_count
-
-        # 替換 <br/> 為 \\n
-        fixed_block = mermaid_block.replace('<br/>', '\\n')
+        # 檢查是否為 sequenceDiagram
+        if 'sequenceDiagram' in mermaid_block:
+            # 特殊處理：只修改非 Note 行
+            lines = mermaid_block.split('\n')
+            fixed_lines = []
+            for line in lines:
+                # Note 行保留 <br/>
+                if re.match(r'\s*Note (over|left of|right of)', line):
+                    fixed_lines.append(line)
+                else:
+                    # 其他行替換 <br/> → \\n
+                    if '<br/>' in line:
+                        replacements += line.count('<br/>')
+                    fixed_lines.append(line.replace('<br/>', '\\n'))
+            fixed_block = '\n'.join(fixed_lines)
+        else:
+            # Graph/Flowchart：全量替換
+            br_count = mermaid_block.count('<br/>')
+            replacements += br_count
+            fixed_block = mermaid_block.replace('<br/>', '\\n')
 
         return f'```mermaid\n{fixed_block}```'
 
