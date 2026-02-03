@@ -290,7 +290,22 @@ Profile and optimize Java performance (N+1 query detection, JVM tuning, CPU hots
 
 ---
 
-### Refactoring (1 skill)
+### Refactoring (2 skills)
+
+#### [mermaid-repair](productivity/refactoring/mermaid-repair/)
+Automated Mermaid diagram syntax validation and repair for SmartAdmin's special rendering environment (`<br/>` tags).
+
+**Trigger Keywords**: "mermaid 修復", "mermaid 語法錯誤", "style 語法", "圖表渲染失敗"
+
+**Core Features**:
+- Style syntax error detection (node IDs with spaces, color code pollution)
+- SmartAdmin environment adaptation (`<br/>` instead of `\n`)
+- Automated repair scripts (fix_style_syntax.py, validate_mermaid.py, batch_repair.py)
+- Pre-commit hook integration guide
+
+**Related**: igaming-multi-tenant-wallet-pm (extended/domain) for mermaid-best-practices.md knowledge base
+
+---
 
 #### [smartadmin-manager-extractor](productivity/refactoring/smartadmin-manager-extractor/)
 Auto-extract `@Transactional` methods from Service to Manager layer with AST manipulation and ArchUnit validation.
