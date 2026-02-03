@@ -208,19 +208,25 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 
 ### Mermaid Diagram Standards
 
-**CRITICAL RULE**: All Mermaid diagrams must use `\n` for line breaks, NOT `<br/>` HTML tags.
+**CRITICAL RULE**: All Mermaid diagrams in SmartAdmin project must use `<br/>` HTML tags for line breaks, NOT `\n` escape sequences.
+
+**SmartAdmin Environment Requirement**:
+- ✅ Use `<br/>` tags: `A[Line 1<br/>Line 2]`
+- ❌ Do NOT use `\n`: `A["Line 1\nLine 2"]` (not supported in our rendering environment)
 
 ```mermaid
 # ❌ 錯誤
 graph TD
-    A[Line 1<br/>Line 2]
+    A["Line 1\nLine 2"]
 
 # ✅ 正確
 graph TD
-    A["Line 1\nLine 2"]
+    A[Line 1<br/>Line 2]
 ```
 
-**Pre-commit Hook**: Automatically checks for `<br/>` tags in Mermaid blocks before commit.
+**Note**: This differs from standard Mermaid specification, which recommends `\n`. SmartAdmin's rendering environment requires HTML tags.
+
+**Pre-commit Hook**: Automatically validates Mermaid syntax before commit.
 
 → **[Complete Mermaid Best Practices](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md)**
 

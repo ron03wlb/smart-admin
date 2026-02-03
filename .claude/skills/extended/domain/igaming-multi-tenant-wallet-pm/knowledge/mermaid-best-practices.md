@@ -8,22 +8,25 @@
 
 ### 1. 文字換行
 
-**❌ 錯誤** - 使用 HTML 標籤：
-```mermaid
-graph TD
-    A[Title Line 1<br/>Line 2<br/>Line 3]
-```
+**IMPORTANT**: SmartAdmin 項目使用的渲染環境需要 `<br/>` 標籤，而非標準 Mermaid 的 `\n`。
 
-**✅ 正確** - 使用 `\n` 換行符：
+**❌ 錯誤** - 使用 `\n` 換行符：
 ```mermaid
 graph TD
     A["Title Line 1\nLine 2\nLine 3"]
 ```
 
+**✅ 正確** - 使用 `<br/>` HTML 標籤：
+```mermaid
+graph TD
+    A[Title Line 1<br/>Line 2<br/>Line 3]
+```
+
 **重要規則**：
-- Mermaid 不支援 HTML 標籤（`<br/>`, `<b>`, `<i>`, `<span>` 等）
-- 多行文字必須使用雙引號包圍：`["Text\nLine 2"]`
-- 使用 `\n` 進行換行（字面上的反斜線 + n，非實際換行符）
+- SmartAdmin 環境：**必須使用 `<br/>`**（本項目標準）
+- 標準 Mermaid：使用 `\n`（官方規範，但不適用於本項目）
+- 多行文字**不需要**雙引號包圍：`[Text<br/>Line 2]`（`<br/>` 模式）
+- 使用 `<br/>` 進行換行（HTML 標籤，實際渲染有效）
 
 ---
 
@@ -193,14 +196,16 @@ sequenceDiagram
 
 ## 🚫 禁止模式
 
-### 1. HTML 標籤在 Mermaid 中
+### 1. 換行符規範（SmartAdmin 環境）
 
-| ❌ 禁止使用 | ✅ 正確替代 |
-|-----------|-----------|
-| `<br/>` | `\n` |
-| `<b>Bold</b>` | 使用大寫或 emoji 強調 |
-| `<i>Italic</i>` | 使用引號或底線 |
-| `<span style="...">` | 不支援自定義樣式 |
+**⚠️ SmartAdmin 特殊要求**：本項目使用 `<br/>` 進行換行，與標準 Mermaid 不同。
+
+| ❌ 禁止使用 | ✅ 正確替代 | 說明 |
+|-----------|-----------|------|
+| `\n` | `<br/>` | SmartAdmin 渲染環境不支持 `\n` |
+| `<b>Bold</b>` | 使用大寫或 emoji 強調 | 不支持粗體標籤 |
+| `<i>Italic</i>` | 使用引號或底線 | 不支持斜體標籤 |
+| `<span style="...">` | 不支援自定義樣式 | 僅 `<br/>` 例外 |
 
 ### 2. 過度複雜的節點
 
