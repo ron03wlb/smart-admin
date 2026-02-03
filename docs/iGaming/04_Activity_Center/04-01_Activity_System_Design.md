@@ -1,8 +1,12 @@
 # 04-01 活動系統設計 (Activity System Design)
 
+> **RENAMED FROM**: `01-system-design.md` (Week 4-5 Standardization)
+> **Version**: 2.0.0 (Enhanced with SSOT Markers + SmartAdmin Mapping)
+> **Last Updated**: 2026-02-03
+>
 > **三層風控架構定位**: **Layer 3 - 活動遊戲權重**
 > 本模塊負責應用活動特定的遊戲權重規則到流水計算。
-> 需依賴 Layer 1 (05-01) 風控驗證 + Layer 2 (02-04) 狀態因子計算後才執行。
+> 需依賴 Layer 1 ([05-01](../05_Risk_Management/05-01_Risk_Control_System.md)) 風控驗證 + Layer 2 ([02-03](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md)) 狀態因子計算後才執行。
 > 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
 
 博彩包網平台的活動系統（Promotion System）是玩家獲取與留存的核心引擎。本指南提供一套完整的系統架構設計與運營策略框架，涵蓋規則引擎、獎勵計算、多租戶架構、跨遊戲整合，以及針對東南亞、拉丁美洲、歐洲、中國四大市場的本地化策略。**關鍵發現：獎金濫用佔 iGaming 詐騙的 63.8%**，因此風控機制必須與活動系統深度整合。
@@ -1360,6 +1364,525 @@ flowchart TD
 
 ---
 
+## 🏗️ SmartAdmin 架構映射 (SmartAdmin Architecture Mapping)
+
+> 💡 **SSOT Marker**: 本節定義活動系統在 SmartAdmin 分層架構中的實現模式
+
+### 1. 分層架構概述
+
+SmartAdmin 活動系統遵循嚴格的 **Controller → Service → Manager → Dao** 四層架構：
+
+| 層級 | 職責 | 事務管理 | 返回類型 |
+|------|------|---------|---------|
+| **Controller** | API 端點、參數驗證 | 禁止 | `ResponseDTO<T>` |
+| **Service** | 業務邏輯編排、規則評估 | 禁止 | `Option<T>` (Vavr) |
+| **Manager** | 事務管理、跨服務協調 | **@Transactional** | `Option<T>` OR void |
+| **Dao** | 數據訪問、SQL 執行 | 禁止 | Entity / List |
+
+**架構規則**：
+- ✅ Service 可直接調用 Dao（單表 CRUD，無需事務）
+- ✅ Service 需 `@Transactional` 時，必須提取邏輯到 Manager
+- ❌ Controller 絕對不可直接調用 Dao/Manager
+
+---
+
+### 2. 核心類別設計
+
+#### 2.1 Entity - ActivityEntity
+
+```java
+package net.lab1024.sa.admin.module.activity.domain.entity;
+
+import lombok.Data;
+import com.baomidou.mybatisplus.annotation.*;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
+
+@Data
+@TableName("t_activity")
+public class ActivityEntity {
+
+    @TableId(type = IdType.AUTO)
+    private Long activityId;
+
+    private Long tenantId;  // 多租戶隔離
+
+    private String activityName;
+    private String activityType;  // DEPOSIT_MATCH, CASHBACK, FREE_SPINS
+    private String triggerType;   // FIRST_DEPOSIT, ACCUMULATED, MANUAL_CLAIM
+
+    // 活動參數配置（JSON 存儲）
+    @TableField(typeHandler = JsonTypeHandler.class)
+    private ActivityConfig config;
+
+    // 預算控制
+    private BigDecimal budgetTotal;
+    private BigDecimal budgetUsed;
+    private String budgetStatus;  // ACTIVE, PAUSED, EXHAUSTED
+
+    // 時間控制
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    // 資格條件
+    private String eligibilityRules;  // VIP_LEVEL >= 2 AND COUNTRY IN ('PH','TH')
+
+    // 狀態控制
+    private String status;  // DRAFT, ACTIVE, PAUSED, ENDED
+
+    // 審計字段
+    private String createdBy;
+    private LocalDateTime createdAt;
+    private String updatedBy;
+    private LocalDateTime updatedAt;
+
+    @Version  // 樂觀鎖
+    private Integer version;
+
+    private Boolean deleted;  // 邏輯刪除
+}
+
+// 活動配置 VO
+@Data
+class ActivityConfig {
+    private BigDecimal matchPercentage;  // 存款匹配百分比
+    private BigDecimal maxBonusAmount;   // 最大紅利金額
+    private Integer wageringMultiplier;  // 流水倍數
+    private List<String> applicableGames; // 適用遊戲列表
+    private Map<String, BigDecimal> gameWeights; // 遊戲權重（Layer 3）
+}
+```
+
+**設計亮點**：
+- 使用 `@Version` 實現樂觀鎖，防止並發修改衝突
+- JSON 欄位存儲複雜配置，避免表結構頻繁變更
+- `tenantId` 實現行級多租戶隔離
+
+---
+
+#### 2.2 Manager - ActivityRuleManager
+
+```java
+package net.lab1024.sa.admin.module.activity.manager;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
+@Service
+@RequiredArgsConstructor  // 構造器注入
+public class ActivityRuleManager {
+
+    private final ActivityDao activityDao;
+    private final BonusWalletDao bonusWalletDao;
+    private final WageringProgressDao wageringProgressDao;
+    private final net.lab1024.sa.foundation.mq.MessageProducer mqProducer;
+    private final net.lab1024.sa.foundation.lock.DistributedLock redisLock;
+
+    /**
+     * 發放活動獎勵（需事務保證原子性）
+     *
+     * @param playerId 玩家 ID
+     * @param activityId 活動 ID
+     * @param bonusAmount 獎勵金額
+     * @return 發放結果
+     */
+    @Transactional(rollbackFor = Throwable.class)  // ← SmartAdmin 必須模式
+    public Try<BonusIssueResult> issueActivityBonus(
+        Long playerId,
+        Long activityId,
+        BigDecimal bonusAmount
+    ) {
+        return Try.of(() -> {
+            // Step 1: 檢查預算並扣減（需原子性）
+            String lockKey = "activity:budget:" + activityId;
+            return redisLock.executeWithLock(lockKey, 5, TimeUnit.SECONDS, () -> {
+
+                ActivityEntity activity = activityDao.selectById(activityId);
+                if (activity.getBudgetUsed().add(bonusAmount)
+                    .compareTo(activity.getBudgetTotal()) > 0) {
+                    throw new BusinessException(ErrorCode.ACTIVITY_BUDGET_EXHAUSTED);
+                }
+
+                // Step 2: 更新預算（樂觀鎖）
+                activity.setBudgetUsed(activity.getBudgetUsed().add(bonusAmount));
+                int rows = activityDao.updateById(activity);
+                if (rows == 0) {
+                    throw new BusinessException(ErrorCode.CONCURRENT_UPDATE_CONFLICT);
+                }
+
+                // Step 3: 創建紅利記錄
+                BonusEntity bonus = new BonusEntity();
+                bonus.setPlayerId(playerId);
+                bonus.setActivityId(activityId);
+                bonus.setAmount(bonusAmount);
+                bonus.setWageringRequired(
+                    bonusAmount.multiply(activity.getConfig().getWageringMultiplier())
+                );
+                bonus.setStatus("PENDING");
+                bonusWalletDao.insert(bonus);
+
+                // Step 4: 初始化流水進度
+                WageringProgressEntity progress = new WageringProgressEntity();
+                progress.setBonusId(bonus.getBonusId());
+                progress.setRequiredTurnover(bonus.getWageringRequired());
+                progress.setCurrentProgress(BigDecimal.ZERO);
+                wageringProgressDao.insert(progress);
+
+                // Step 5: 發送 MQ 事件（異步通知）
+                mqProducer.send("activity.bonus.issued", new BonusIssuedEvent(
+                    playerId, activityId, bonus.getBonusId(), bonusAmount
+                ));
+
+                return new BonusIssueResult(bonus.getBonusId(), "SUCCESS");
+            });
+        });
+    }
+
+    /**
+     * 取消活動（級聯處理）
+     *
+     * @param activityId 活動 ID
+     * @return 取消結果
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public Try<Void> cancelActivity(Long activityId) {
+        return Try.run(() -> {
+            // Step 1: 更新活動狀態
+            ActivityEntity activity = activityDao.selectById(activityId);
+            activity.setStatus("CANCELLED");
+            activityDao.updateById(activity);
+
+            // Step 2: 處理未使用的紅利（回滾或清零）
+            List<BonusEntity> pendingBonuses = bonusWalletDao.selectList(
+                new QueryWrapper<BonusEntity>()
+                    .eq("activity_id", activityId)
+                    .eq("status", "PENDING")
+            );
+
+            pendingBonuses.forEach(bonus -> {
+                bonus.setStatus("CANCELLED");
+                bonusWalletDao.updateById(bonus);
+            });
+
+            // Step 3: 記錄審計日誌
+            mqProducer.send("activity.cancelled", new ActivityCancelledEvent(activityId));
+        });
+    }
+}
+```
+
+**Manager 層責任**：
+- ✅ 事務邊界管理（`@Transactional` 唯一使用位置）
+- ✅ 跨 Dao 協調（activity + bonus + wagering）
+- ✅ 分佈式鎖協調（防止預算超支）
+- ✅ MQ 事件發送（異步解耦）
+
+---
+
+#### 2.3 Service - ActivityRuleService
+
+```java
+package net.lab1024.sa.admin.module.activity.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
+@Service
+@RequiredArgsConstructor  // 構造器注入（SmartAdmin 標準）
+public class ActivityRuleService {
+
+    private final ActivityDao activityDao;
+    private final ActivityRuleManager activityRuleManager;  // 需事務時委託給 Manager
+    private final RiskControlService riskControlService;
+
+    /**
+     * 評估玩家是否符合活動資格（無需事務）
+     *
+     * @param playerId 玩家 ID
+     * @param activityId 活動 ID
+     * @return 資格評估結果（使用 Vavr Option）
+     */
+    public Option<EligibilityResult> evaluateEligibility(Long playerId, Long activityId) {
+        return activityDao.findById(activityId)  // 返回 Option<ActivityEntity>
+            .filter(activity -> "ACTIVE".equals(activity.getStatus()))
+            .filter(activity -> isWithinTimeRange(activity))
+            .filter(activity -> hasSufficientBudget(activity))
+            .flatMap(activity -> checkPlayerEligibility(playerId, activity))
+            .map(activity -> new EligibilityResult(true, activity.getActivityId()));
+    }
+
+    /**
+     * 玩家領取活動（委託給 Manager 處理事務）
+     *
+     * @param playerId 玩家 ID
+     * @param activityId 活動 ID
+     * @param claimAmount 領取金額
+     * @return 領取結果
+     */
+    public Try<BonusIssueResult> claimActivity(
+        Long playerId,
+        Long activityId,
+        BigDecimal claimAmount
+    ) {
+        // Step 1: 風控前置檢查（無事務）
+        return riskControlService.validateBonusClaim(playerId, activityId, claimAmount)
+            .filter(riskResult -> "APPROVED".equals(riskResult.getDecision()))
+            .map(riskResult -> {
+                // Step 2: 委託給 Manager 執行事務操作
+                return activityRuleManager.issueActivityBonus(playerId, activityId, claimAmount);
+            })
+            .getOrElse(Try.failure(new BusinessException(ErrorCode.RISK_BLOCKED)));
+    }
+
+    /**
+     * 計算活動遊戲權重（Layer 3）
+     *
+     * @param activityId 活動 ID
+     * @param gameId 遊戲 ID
+     * @return 遊戲權重（0.0-1.0）
+     */
+    public Option<BigDecimal> calculateGameWeight(Long activityId, String gameId) {
+        return activityDao.findById(activityId)
+            .map(activity -> activity.getConfig().getGameWeights())
+            .flatMap(weights -> Option.of(weights.get(gameId)))
+            .orElse(Option.of(BigDecimal.ONE));  // 默認 100%
+    }
+
+    // === 私有輔助方法 ===
+
+    private boolean isWithinTimeRange(ActivityEntity activity) {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(activity.getStartTime()) && now.isBefore(activity.getEndTime());
+    }
+
+    private boolean hasSufficientBudget(ActivityEntity activity) {
+        return activity.getBudgetUsed().compareTo(activity.getBudgetTotal()) < 0;
+    }
+
+    private Option<ActivityEntity> checkPlayerEligibility(Long playerId, ActivityEntity activity) {
+        // 解析 eligibilityRules（例如：VIP_LEVEL >= 2 AND COUNTRY IN ('PH','TH')）
+        // 查詢玩家信息並驗證
+        // 簡化示例，實際應使用規則引擎
+        return Option.some(activity);  // 假設通過
+    }
+}
+```
+
+**Service 層職責**：
+- ✅ 業務邏輯編排（規則評估）
+- ✅ 使用 Vavr `Option<T>` 處理可選值（SmartAdmin 強制要求）
+- ✅ **無 `@Transactional`**，需事務時委託給 Manager
+- ✅ 直接調用 Dao 進行單表查詢（無事務需求）
+
+---
+
+#### 2.4 Controller - ActivityController
+
+```java
+package net.lab1024.sa.admin.module.activity.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Activity Management")
+@RestController
+@RequestMapping("/api/admin/activity")
+@RequiredArgsConstructor  // 構造器注入
+public class ActivityController {
+
+    private final ActivityRuleService activityRuleService;
+
+    /**
+     * 玩家領取活動
+     */
+    @Operation(summary = "Claim Activity Bonus")
+    @PostMapping("/claim")
+    public ResponseDTO<BonusIssueResult> claimActivity(@RequestBody @Valid ClaimActivityForm form) {
+
+        // Step 1: 參數驗證（Controller 層職責）
+        if (form.getClaimAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseDTO.userErrorParam("Claim amount must be positive");
+        }
+
+        // Step 2: 資格檢查
+        return activityRuleService.evaluateEligibility(form.getPlayerId(), form.getActivityId())
+            .filter(result -> result.isEligible())
+            .map(result -> {
+                // Step 3: 執行領取（委託給 Service）
+                return activityRuleService.claimActivity(
+                    form.getPlayerId(),
+                    form.getActivityId(),
+                    form.getClaimAmount()
+                )
+                .map(ResponseDTO::ok)  // 成功返回
+                .getOrElseGet(ex -> ResponseDTO.error(
+                    UserErrorCode.ACTIVITY_CLAIM_FAILED,
+                    ex.getMessage()
+                ));
+            })
+            .getOrElse(ResponseDTO.userErrorParam("Player not eligible for this activity"));
+    }
+
+    /**
+     * 查詢玩家可參與的活動列表
+     */
+    @Operation(summary = "List Available Activities")
+    @GetMapping("/available/{playerId}")
+    public ResponseDTO<List<ActivityVO>> listAvailableActivities(@PathVariable Long playerId) {
+
+        List<ActivityVO> activities = activityRuleService.findAvailableActivitiesForPlayer(playerId);
+        return ResponseDTO.ok(activities);
+    }
+}
+```
+
+**Controller 層職責**：
+- ✅ API 端點定義（RESTful）
+- ✅ 參數驗證（`@Valid`）
+- ✅ 返回 `ResponseDTO<T>`（SmartAdmin 統一響應格式）
+- ❌ 不包含業務邏輯（委託給 Service）
+
+---
+
+### 3. Foundation 模組依賴
+
+SmartAdmin 活動系統依賴以下 Foundation 模組：
+
+| Foundation 模組 | 用途 | 使用位置 | 配置示例 |
+|----------------|------|---------|---------|
+| **foundation.redis-lock** | 分佈式鎖（防並發領取） | Manager 層 | `@RedisLock(key = "activity:claim:{playerId}")` |
+| **foundation.mq** | 消息隊列（異步解耦） | Manager 層 | `mqProducer.send("activity.bonus.issued", event)` |
+| **foundation.cache** | 規則緩存（減少 DB 查詢） | Service 層 | `@Cacheable(key = "activity:rules:{activityId}")` |
+| **foundation.audit-log** | 審計日誌（操作追蹤） | Manager 層 | `auditLogger.log("ACTIVITY_CLAIMED", playerId)` |
+
+**配置示例** (application.yml):
+
+```yaml
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 20
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: activity-service-group
+      auto-offset-reset: earliest
+
+# SmartAdmin Foundation Config
+smartadmin:
+  lock:
+    type: redis
+    timeout: 5000  # 分佈式鎖超時時間（毫秒）
+
+  mq:
+    type: kafka
+    topics:
+      - activity.bonus.issued
+      - activity.cancelled
+```
+
+---
+
+### 4. 架構驗證（ArchitectureTest）
+
+SmartAdmin 使用 ArchUnit 強制架構規則，活動系統必須通過以下測試：
+
+```java
+package net.lab1024.sa.admin.module.activity;
+
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+
+@AnalyzeClasses(packages = "net.lab1024.sa.admin.module.activity")
+public class ActivityArchitectureTest {
+
+    // Rule 1: Controller 不可直接訪問 Dao
+    @ArchTest
+    static final ArchRule controllersShould
+
+NotAccessDaoDirectly =
+        noClasses().that().resideInAPackage("..controller..")
+            .should().dependOnClassesThat().resideInAPackage("..dao..");
+
+    // Rule 2: @Transactional 僅限 Manager 層
+    @ArchTest
+    static final ArchRule transactionalOnlyInManager =
+        methods().that().areAnnotatedWith(Transactional.class)
+            .should().beDeclaredInClassesThat().resideInAPackage("..manager..");
+
+    // Rule 3: Service 必須使用 Vavr Option (不可用 java.util.Optional)
+    @ArchTest
+    static final ArchRule serviceMustUseVavrOption =
+        noMethods().that().areDeclaredInClassesThat().resideInAPackage("..service..")
+            .should().haveRawReturnType(java.util.Optional.class);
+}
+```
+
+---
+
+### 5. 完整調用鏈示例
+
+**用戶領取首存匹配活動的完整流程**：
+
+```text
+1. 玩家點擊"領取活動"按鈕
+   ↓
+2. Frontend 調用 API
+   POST /api/admin/activity/claim
+   Body: { playerId: 12345, activityId: 101, claimAmount: 50.00 }
+   ↓
+3. ActivityController.claimActivity()
+   - 參數驗證
+   - 返回 ResponseDTO
+   ↓
+4. ActivityRuleService.evaluateEligibility()
+   - 檢查活動狀態（ACTIVE）
+   - 檢查時間範圍
+   - 檢查玩家資格
+   - 【Vavr Option 鏈式操作】
+   ↓
+5. RiskControlService.validateBonusClaim()
+   - 多帳號檢測
+   - 歷史濫用檢測
+   - 【返回風控決策】
+   ↓
+6. ActivityRuleManager.issueActivityBonus()  ← @Transactional 開始
+   - Redis 分佈式鎖（防並發）
+   - 更新活動預算（樂觀鎖）
+   - 創建紅利記錄
+   - 初始化流水進度
+   - 發送 MQ 事件
+   ← @Transactional 提交
+   ↓
+7. Kafka Consumer 處理後續流程
+   - 發送推送通知
+   - 更新玩家標籤
+   - 記錄審計日誌
+   ↓
+8. Frontend 收到響應
+   { code: 1, msg: "Success", data: { bonusId: 99912, status: "ISSUED" } }
+```
+
+---
+
 ## 📚 相關文檔
 
 ### 核心依賴
@@ -1381,10 +1904,15 @@ flowchart TD
 
 ---
 
-**最後更新**: 2026-01-27
-**維護團隊**: Activity Team
----
+**文檔版本**: 2.0.0 (Week 4-5 Enhancement)
+**更新日期**: 2026-02-03
+**更新內容**:
+- ✅ 重命名：`01-system-design.md` → `04-01_Activity_System_Design.md`
+- ✅ 添加 SmartAdmin 架構映射章節（Entity, Manager, Service, Controller 完整代碼範例）
+- ✅ 添加 Foundation 模組依賴說明（redis-lock, mq, cache, audit-log）
+- ✅ 添加 ArchUnit 架構驗證規則
+- ✅ 添加完整調用鏈示例（8 步驟流程）
+- ✅ 更新交叉引用鏈接（Layer 1/2/3 架構）
 
-**文檔版本**: 1.0.0
-**最後更新**: 2026-01-28
 **維護團隊**: Product Team & Backend Team
+**下次審閱**: 2026-05-03（每季度審閱）
