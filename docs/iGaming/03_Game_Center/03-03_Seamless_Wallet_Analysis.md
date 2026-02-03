@@ -182,7 +182,7 @@ sequenceDiagram
         Note over GW,GP: ⚠️ Network Error - Response Lost!
         GW-xGP: TCP Connection Reset / Timeout
 
-        Note over GP: GP receives TIMEOUT\nStatus Unknown\nDecide to RETRY
+        Note over GP: GP receives TIMEOUT<br/>Status Unknown<br/>Decide to RETRY
     end
 
     rect rgb(230, 255, 230)
@@ -195,13 +195,13 @@ sequenceDiagram
         Platform->>Redis: GET idempotency:TX001
         Redis-->>Platform: {status: SUCCESS, balance: 400}\n✅ EXISTS!
 
-        Note over Platform: Idempotency Check PASSED\nReturn Cached Response\nNO Database Operation!
+        Note over Platform: Idempotency Check PASSED<br/>Return Cached Response<br/>NO Database Operation!
 
         Platform-->>GW: Response: {status: SUCCESS, balance: 400}\nSource: CACHED
 
         GW-->>GP: Response: {status: SUCCESS, balance: 400}
 
-        Note over GP: Retry SUCCESS\nReceived Response\nPlayer Balance: 400 ✅
+        Note over GP: Retry SUCCESS<br/>Received Response<br/>Player Balance: 400 ✅
     end
 
     rect rgb(230, 230, 255)
@@ -233,7 +233,7 @@ sequenceDiagram
         Platform->>GW: Response: {status: SUCCESS, balance: 350}
         GW-->>GP: Response: {status: SUCCESS, balance: 350}
 
-        Note over GP: New Transaction SUCCESS\nPlayer Balance: 350 ✅
+        Note over GP: New Transaction SUCCESS<br/>Player Balance: 350 ✅
     end
 
     style Platform fill:#E6E6FA
@@ -269,32 +269,32 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    START[Receive Win Request] --> CHECK{Check refTxId\n━━━━━━━━━━━━━━\nSELECT * FROM transactions\nWHERE tx_id = refTxId}
+    START[Receive Win Request] --> CHECK{"Check refTxId\n━━━━━━━━━━━━━━\nSELECT * FROM transactions\nWHERE tx_id = refTxId"}
 
-    CHECK -->|Bet Found ✅| NORMAL[Normal Flow\n━━━━━━━━━━━━━━\nCredit Win Amount\nLink to Bet\nReturn SUCCESS]
+    CHECK -->|Bet Found ✅| NORMAL["Normal Flow\n━━━━━━━━━━━━━━\nCredit Win Amount\nLink to Bet\nReturn SUCCESS"]
 
     CHECK -->|Bet NOT Found ❌| STRATEGY{Choose Strategy}
 
-    STRATEGY -->|Strategy 1\nImmediate Reject| S1[Return Error:\nBET_NOT_FOUND\n━━━━━━━━━━━━━━\nHTTP 400\nError Code: 1001]
+    STRATEGY -->|Strategy 1\nImmediate Reject| S1["Return Error:\nBET_NOT_FOUND\n━━━━━━━━━━━━━━\nHTTP 400\nError Code: 1001"]
 
     S1 --> S1A{GP Retries Win?}
-    S1A -->|Yes - After Bet Arrives| S1B[Next Retry:\nBet Exists → SUCCESS]
-    S1A -->|No - GP Gives Up| S1C[⚠️ Player Lost Win\nRequires Manual Investigation]
+    S1A -->|Yes - After Bet Arrives| S1B["Next Retry:\nBet Exists → SUCCESS"]
+    S1A -->|No - GP Gives Up| S1C["⚠️ Player Lost Win\nRequires Manual Investigation"]
 
-    STRATEGY -->|Strategy 2\nAllow Orphan Win| S2[Allow Win Without Bet\n━━━━━━━━━━━━━━\nCredit Amount\nMark: ORPHAN_WIN\nFlag for Review]
+    STRATEGY -->|Strategy 2\nAllow Orphan Win| S2["Allow Win Without Bet\n━━━━━━━━━━━━━━\nCredit Amount\nMark: ORPHAN_WIN\nFlag for Review"]
 
     S2 --> S2A{Bet Arrives Later?}
-    S2A -->|Yes| S2B[❌ Problem:\nDouble Credit Risk\nPlayer got Win twice]
-    S2A -->|No| S2C[⚠️ Reconciliation Mismatch\nGP has Bet, Platform has only Win]
+    S2A -->|Yes| S2B["❌ Problem:\nDouble Credit Risk\nPlayer got Win twice"]
+    S2A -->|No| S2C["⚠️ Reconciliation Mismatch\nGP has Bet, Platform has only Win"]
 
-    STRATEGY -->|Strategy 3\nPending Queue| S3[Store Win in Pending Queue\n━━━━━━━━━━━━━━\nINSERT INTO pending_wins\n(ref_tx_id, amount, expires_at)\nTTL: 30 minutes]
+    STRATEGY -->|Strategy 3\nPending Queue| S3["Store Win in Pending Queue\n━━━━━━━━━━━━━━\nINSERT INTO pending_wins\n(ref_tx_id, amount, expires_at)\nTTL: 30 minutes"]
 
     S3 --> S3A{Bet Arrives Within 30 min?}
-    S3A -->|Yes ✅| S3B[Auto Process:\n━━━━━━━━━━━━━━\n1. Process Bet → Debit\n2. Process Pending Win → Credit\n3. Remove from Queue]
-    S3A -->|No - Timeout| S3C[Escalate to Manual Review\n━━━━━━━━━━━━━━\nCreate Ticket\nPriority: HIGH]
+    S3A -->|Yes ✅| S3B["Auto Process:\n━━━━━━━━━━━━━━\n1. Process Bet → Debit\n2. Process Pending Win → Credit\n3. Remove from Queue"]
+    S3A -->|No - Timeout| S3C["Escalate to Manual Review\n━━━━━━━━━━━━━━\nCreate Ticket\nPriority: HIGH"]
 
-    S3B --> SUCCESS1[✅ Complete\nBoth Bet & Win Processed]
-    S1B --> SUCCESS2[✅ Complete\nAfter Retry]
+    S3B --> SUCCESS1["✅ Complete\nBoth Bet & Win Processed"]
+    S1B --> SUCCESS2["✅ Complete\nAfter Retry"]
     S3C --> REVIEW[Manual Review Required]
     S1C --> REVIEW
     S2B --> REVIEW
@@ -355,29 +355,29 @@ flowchart TD
 
     CHECK_STRATEGY -->|Strategy 3 Active| CHECK_CONDITIONS{檢查系統狀態}
 
-    CHECK_CONDITIONS -->|Queue Size > 500| DEGRADE_S1[⚠️ 降級至 Strategy 1\n━━━━━━━━━━━━━━\n發送告警\n返回 BET_NOT_FOUND]
+    CHECK_CONDITIONS -->|Queue Size > 500| DEGRADE_S1["⚠️ 降級至 Strategy 1\n━━━━━━━━━━━━━━\n發送告警\n返回 BET_NOT_FOUND"]
     CHECK_CONDITIONS -->|Redis Down| DEGRADE_S1
     CHECK_CONDITIONS -->|DB Latency > 5s| DEGRADE_S1
     CHECK_CONDITIONS -->|CPU > 90%| DEGRADE_S1
 
-    CHECK_CONDITIONS -->|All Healthy ✅| EXECUTE_S3[執行 Strategy 3\n━━━━━━━━━━━━━━\n存入 Pending Queue\nTTL: 30 min]
+    CHECK_CONDITIONS -->|All Healthy ✅| EXECUTE_S3["執行 Strategy 3\n━━━━━━━━━━━━━━\n存入 Pending Queue\nTTL: 30 min"]
 
     CHECK_STRATEGY -->|Strategy 1 Active| CHECK_RECOVERY{檢查恢復條件}
 
-    CHECK_RECOVERY -->|Queue < 100\n持續 10 min| UPGRADE_S3[✅ 升級至 Strategy 3\n━━━━━━━━━━━━━━\n發送通知\n重啟 Pending Queue]
+    CHECK_RECOVERY -->|Queue < 100\n持續 10 min| UPGRADE_S3["✅ 升級至 Strategy 3\n━━━━━━━━━━━━━━\n發送通知\n重啟 Pending Queue"]
     CHECK_RECOVERY -->|Redis Healthy\n+ 5 min 穩定期| UPGRADE_S3
     CHECK_RECOVERY -->|DB Latency < 1s\n持續 10 min| UPGRADE_S3
     CHECK_RECOVERY -->|CPU < 70%\n持續 10 min| UPGRADE_S3
 
-    CHECK_RECOVERY -->|條件未滿足| EXECUTE_S1[執行 Strategy 1\n━━━━━━━━━━━━━━\n返回 BET_NOT_FOUND\n依賴 GP 重試]
+    CHECK_RECOVERY -->|條件未滿足| EXECUTE_S1["執行 Strategy 1\n━━━━━━━━━━━━━━\n返回 BET_NOT_FOUND\n依賴 GP 重試"]
 
-    DEGRADE_S1 --> NOTIFY_OPS[📢 告警通知\n━━━━━━━━━━━━━━\nSlack: #game-ops\nPagerDuty: On-Call]
+    DEGRADE_S1 --> NOTIFY_OPS["📢 告警通知\n━━━━━━━━━━━━━━\nSlack: #game-ops\nPagerDuty: On-Call"]
 
-    EXECUTE_S3 --> CHECK_GP_RELIABILITY{GP 重試率\n< 80%?}
-    CHECK_GP_RELIABILITY -->|Yes - GP 不可靠| EMERGENCY_S2[🚨 緊急切換至 Strategy 2\n━━━━━━━━━━━━━━\n允許 Orphan Win\n標記人工審核]
+    EXECUTE_S3 --> CHECK_GP_RELIABILITY{"GP 重試率\n< 80%?"}
+    CHECK_GP_RELIABILITY -->|Yes - GP 不可靠| EMERGENCY_S2["🚨 緊急切換至 Strategy 2\n━━━━━━━━━━━━━━\n允許 Orphan Win\n標記人工審核"]
     CHECK_GP_RELIABILITY -->|No - GP 可靠| END_S3[結束 - S3 處理]
 
-    UPGRADE_S3 --> NOTIFY_RECOVERY[✅ 恢復通知\n━━━━━━━━━━━━━━\nSlack: #game-ops]
+    UPGRADE_S3 --> NOTIFY_RECOVERY["✅ 恢復通知\n━━━━━━━━━━━━━━\nSlack: #game-ops"]
 
     NOTIFY_OPS --> END_S1[結束 - S1 處理]
     EXECUTE_S1 --> END_S1
@@ -438,26 +438,26 @@ flowchart TD
     START[接收 GP 請求] --> TYPE{請求類型?}
 
     %% Bet 請求分支
-    TYPE -->|Bet Request| SCENARIO_CHECK_BET{場景檢測\n━━━━━━━━}
+    TYPE -->|Bet Request| SCENARIO_CHECK_BET{"場景檢測\n━━━━━━━━"}
 
-    SCENARIO_CHECK_BET -->|場景 G: Free Spin| FREE_SPIN[✓ Free Spin Detected\namount = 0]
+    SCENARIO_CHECK_BET -->|場景 G: Free Spin| FREE_SPIN["✓ Free Spin Detected\namount = 0"]
     FREE_SPIN --> VALIDATE_FREE[驗證 Free Spin 配額]
-    VALIDATE_FREE -->|配額有效| ACCEPT_FREE[接受 amount=0 交易\n記錄 Free Spin 標記]
+    VALIDATE_FREE -->|配額有效| ACCEPT_FREE["接受 amount=0 交易\n記錄 Free Spin 標記"]
     VALIDATE_FREE -->|配額無效/耗盡| REJECT_FREE[拒絕: Free Spin Quota Exceeded]
 
     SCENARIO_CHECK_BET -->|場景 H: Bonus Wallet| BONUS_WALLET[✓ Bonus Wallet Check]
     BONUS_WALLET --> GAME_TYPE{遊戲類型支援紅利?}
-    GAME_TYPE -->|支援| DUAL_WALLET[雙錢包扣款策略\n1️⃣ 先扣 Cash\n2️⃣ 不足時扣 Bonus]
-    GAME_TYPE -->|不支援| CASH_ONLY[僅扣 Cash 錢包\n忽略 Bonus 餘額]
+    GAME_TYPE -->|支援| DUAL_WALLET["雙錢包扣款策略\n1️⃣ 先扣 Cash\n2️⃣ 不足時扣 Bonus"]
+    GAME_TYPE -->|不支援| CASH_ONLY["僅扣 Cash 錢包\n忽略 Bonus 餘額"]
 
     SCENARIO_CHECK_BET -->|場景 A: 正常 Bet| NORMAL_BET[正常 Bet 流程]
     NORMAL_BET --> CONCURRENCY_CHECK{場景 B: 併發檢測}
 
     %% 併發競態檢測
     CONCURRENCY_CHECK -->|檢測到併發| RACE_CONDITION[✓ Race Condition Detected]
-    RACE_CONDITION --> ACQUIRE_LOCK[獲取分散式鎖\nRedis: SETNX lock:player:{id}]
+    RACE_CONDITION --> ACQUIRE_LOCK["獲取分散式鎖\nRedis: SETNX lock:player:{id}"]
     ACQUIRE_LOCK -->|成功| BALANCE_CHECK
-    ACQUIRE_LOCK -->|失敗 - 重試 3 次| RETRY_LOCK[指數退避重試\n50ms → 100ms → 200ms]
+    ACQUIRE_LOCK -->|失敗 - 重試 3 次| RETRY_LOCK["指數退避重試\n50ms → 100ms → 200ms"]
     RETRY_LOCK -->|仍失敗| REJECT_CONCURRENCY[拒絕: System Busy - Retry Later]
 
     CONCURRENCY_CHECK -->|無併發| BALANCE_CHECK{場景 A: 餘額檢查}
@@ -466,9 +466,9 @@ flowchart TD
     BALANCE_CHECK -->|餘額不足| INSUFFICIENT_FUNDS[✓ Insufficient Funds Detected]
     INSUFFICIENT_FUNDS --> CHECK_BONUS_ELIGIBLE{紅利可用?}
     CHECK_BONUS_ELIGIBLE -->|可用| DUAL_WALLET
-    CHECK_BONUS_ELIGIBLE -->|不可用| REJECT_INSUFFICIENT[拒絕: Insufficient Balance\n返回 errorCode: INSUFFICIENT_FUNDS]
+    CHECK_BONUS_ELIGIBLE -->|不可用| REJECT_INSUFFICIENT["拒絕: Insufficient Balance\n返回 errorCode: INSUFFICIENT_FUNDS"]
 
-    BALANCE_CHECK -->|餘額充足| OPTIMISTIC_LOCK[樂觀鎖扣款\nUPDATE balance WHERE version={v}]
+    BALANCE_CHECK -->|餘額充足| OPTIMISTIC_LOCK["樂觀鎖扣款\nUPDATE balance WHERE version={v}"]
     OPTIMISTIC_LOCK -->|成功| BET_SUCCESS[返回 Success + txId]
     OPTIMISTIC_LOCK -->|版本衝突| RETRY_LOCK
 
@@ -477,53 +477,53 @@ flowchart TD
     ACCEPT_FREE --> BET_SUCCESS
 
     %% Win 請求分支
-    TYPE -->|Win Request| SCENARIO_CHECK_WIN{場景檢測\n━━━━━━━━}
+    TYPE -->|Win Request| SCENARIO_CHECK_WIN{"場景檢測\n━━━━━━━━"}
 
-    SCENARIO_CHECK_WIN -->|場景 I: Jackpot| JACKPOT[✓ Jackpot Detected\namount > $10,000]
+    SCENARIO_CHECK_WIN -->|場景 I: Jackpot| JACKPOT["✓ Jackpot Detected\namount > $10,000"]
     JACKPOT --> JACKPOT_MODE{GP 協議模式?}
-    JACKPOT_MODE -->|Manual Approval| JACKPOT_NOTIFY[發送通知 NotifyWin\n等待人工審核]
-    JACKPOT_NOTIFY --> JACKPOT_PENDING[狀態: PENDING_APPROVAL\n不立即入帳]
-    JACKPOT_MODE -->|Auto Credit| JACKPOT_AUTO[自動入帳 + 凍結帳戶\n觸發風控審核]
+    JACKPOT_MODE -->|Manual Approval| JACKPOT_NOTIFY["發送通知 NotifyWin\n等待人工審核"]
+    JACKPOT_NOTIFY --> JACKPOT_PENDING["狀態: PENDING_APPROVAL\n不立即入帳"]
+    JACKPOT_MODE -->|Auto Credit| JACKPOT_AUTO["自動入帳 + 凍結帳戶\n觸發風控審核"]
 
-    SCENARIO_CHECK_WIN -->|場景 D: Out-of-Order| OUT_OF_ORDER[✓ Out-of-Order Detected\nWin 先於 Bet 到達]
-    OUT_OF_ORDER --> PENDING_QUEUE[存入 Pending Win Queue\n等待 Bet 請求\nTTL: 2 小時]
+    SCENARIO_CHECK_WIN -->|場景 D: Out-of-Order| OUT_OF_ORDER["✓ Out-of-Order Detected\nWin 先於 Bet 到達"]
+    OUT_OF_ORDER --> PENDING_QUEUE["存入 Pending Win Queue\n等待 Bet 請求\nTTL: 2 小時"]
 
     SCENARIO_CHECK_WIN -->|場景 C: 正常 Win| NORMAL_WIN[正常 Win 流程]
-    NORMAL_WIN --> IDEMPOTENCY_CHECK{冪等性檢查\ntxId 是否已處理?}
-    IDEMPOTENCY_CHECK -->|已處理| IDEMPOTENT_RESPONSE[返回快取結果\nRedis: idempotency:{txId}]
-    IDEMPOTENCY_CHECK -->|未處理| CREDIT_BALANCE[加款到錢包\nUPDATE balance += amount]
-    CREDIT_BALANCE --> WIN_SUCCESS[返回 Success\n快取結果 TTL=1h]
+    NORMAL_WIN --> IDEMPOTENCY_CHECK{"冪等性檢查\ntxId 是否已處理?"}
+    IDEMPOTENCY_CHECK -->|已處理| IDEMPOTENT_RESPONSE["返回快取結果\nRedis: idempotency:{txId}"]
+    IDEMPOTENCY_CHECK -->|未處理| CREDIT_BALANCE["加款到錢包\nUPDATE balance += amount"]
+    CREDIT_BALANCE --> WIN_SUCCESS["返回 Success\n快取結果 TTL=1h"]
 
     %% Rollback 請求分支
     TYPE -->|Rollback/Refund Request| SCENARIO_E[場景 E: 回滾補償]
     SCENARIO_E --> FIND_ORIGINAL_TX{查詢原交易 txId}
-    FIND_ORIGINAL_TX -->|找到| ROLLBACK_EXECUTE[執行反向操作\nDebit → Credit\nCredit → Debit]
-    ROLLBACK_EXECUTE --> MARK_ROLLED_BACK[標記原交易 ROLLED_BACK\n記錄審計日誌]
+    FIND_ORIGINAL_TX -->|找到| ROLLBACK_EXECUTE["執行反向操作\nDebit → Credit\nCredit → Debit"]
+    ROLLBACK_EXECUTE --> MARK_ROLLED_BACK["標記原交易 ROLLED_BACK\n記錄審計日誌"]
     MARK_ROLLED_BACK --> ROLLBACK_SUCCESS[返回 Success]
 
-    FIND_ORIGINAL_TX -->|找不到| ROLLBACK_NOT_FOUND[原交易不存在\n推測: Bet 請求從未到達]
-    ROLLBACK_NOT_FOUND --> ROLLBACK_SUCCESS_ANYWAY[返回 Success\n邏輯: 目標已達成 - 未扣款]
+    FIND_ORIGINAL_TX -->|找不到| ROLLBACK_NOT_FOUND["原交易不存在\n推測: Bet 請求從未到達"]
+    ROLLBACK_NOT_FOUND --> ROLLBACK_SUCCESS_ANYWAY["返回 Success\n邏輯: 目標已達成 - 未扣款"]
 
     %% Adjust/Resettlement 請求分支
     TYPE -->|Adjust/Resettlement Request| SCENARIO_F[場景 F: 重新結算]
     SCENARIO_F --> ADJUST_TYPE{調整類型?}
-    ADJUST_TYPE -->|多發需扣回| NEGATIVE_ADJUST[執行負數 Credit\nbalance -= adjustment_amount]
+    ADJUST_TYPE -->|多發需扣回| NEGATIVE_ADJUST["執行負數 Credit\nbalance -= adjustment_amount"]
     NEGATIVE_ADJUST --> CHECK_NEGATIVE{扣款後餘額 < 0?}
-    CHECK_NEGATIVE -->|是| ALLOW_NEGATIVE[✓ 允許負餘額\n觸發風控警報\n標記: MANUAL_RECOVERY]
+    CHECK_NEGATIVE -->|是| ALLOW_NEGATIVE["✓ 允許負餘額\n觸發風控警報\n標記: MANUAL_RECOVERY"]
     CHECK_NEGATIVE -->|否| ADJUST_SUCCESS[返回 Success]
 
-    ADJUST_TYPE -->|少發需補發| POSITIVE_ADJUST[執行正數 Credit\nbalance += adjustment_amount]
+    ADJUST_TYPE -->|少發需補發| POSITIVE_ADJUST["執行正數 Credit\nbalance += adjustment_amount"]
     POSITIVE_ADJUST --> ADJUST_SUCCESS
 
-    ALLOW_NEGATIVE --> MANUAL_REVIEW[人工介入追討\n1️⃣ 凍結提款\n2️⃣ 聯繫玩家\n3️⃣ 分期扣回]
+    ALLOW_NEGATIVE --> MANUAL_REVIEW["人工介入追討\n1️⃣ 凍結提款\n2️⃣ 聯繫玩家\n3️⃣ 分期扣回"]
 
     %% 超時重試場景 (參考 2.3 時序圖)
     BET_SUCCESS --> TIMEOUT_MONITOR{場景 C: 超時監控}
     TIMEOUT_MONITOR -->|GP 2小時未回應| TIMEOUT_DETECTED[✓ Timeout Detected]
-    TIMEOUT_DETECTED --> QUERY_GP[主動查詢 GP 狀態\nGET /query?roundId={id}]
-    QUERY_GP -->|GP 已結算| COMPENSATE_WIN[補償性入帳\n避免資金卡住]
-    QUERY_GP -->|GP 仍處理中| EXTEND_TIMEOUT[延長超時時間\n繼續等待]
-    QUERY_GP -->|GP 無此記錄| ROUND_CANCELLED[標記 Round CANCELLED\n退款給玩家]
+    TIMEOUT_DETECTED --> QUERY_GP["主動查詢 GP 狀態\nGET /query?roundId={id}"]
+    QUERY_GP -->|GP 已結算| COMPENSATE_WIN["補償性入帳\n避免資金卡住"]
+    QUERY_GP -->|GP 仍處理中| EXTEND_TIMEOUT["延長超時時間\n繼續等待"]
+    QUERY_GP -->|GP 無此記錄| ROUND_CANCELLED["標記 Round CANCELLED\n退款給玩家"]
 
     %% 樣式定義
     style FREE_SPIN fill:#E8F5E9

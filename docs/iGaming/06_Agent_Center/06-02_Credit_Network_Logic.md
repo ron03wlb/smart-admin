@@ -31,43 +31,43 @@
 ```mermaid
 graph TB
     subgraph "Platform Level - 平台層"
-        P[Platform 平台\n━━━━━━━━━━━━━━\nTotal Credit Pool: $10M\nAllocated: $8M\nAvailable: $2M\n━━━━━━━━━━━━━━\nCompany Position: 10%]
+        P["Platform 平台\n━━━━━━━━━━━━━━\nTotal Credit Pool: $10M\nAllocated: $8M\nAvailable: $2M\n━━━━━━━━━━━━━━\nCompany Position: 10%"]
     end
 
     subgraph "Master Agent Level - 總代層"
-        P -->|Allocate $5M\nPosition: 20%| M1[Master Agent A 總代A\n━━━━━━━━━━━━━━\nCredit Limit: $5M\nUsed Credit: $3.5M\nAvailable: $1.5M\nUsage: 70% 🟢\n━━━━━━━━━━━━━━\nOwn Position: 20%\nTo Sub-Agents: $4M]
+        P -->|Allocate $5M\nPosition: 20%| M1["Master Agent A 總代A\n━━━━━━━━━━━━━━\nCredit Limit: $5M\nUsed Credit: $3.5M\nAvailable: $1.5M\nUsage: 70% 🟢\n━━━━━━━━━━━━━━\nOwn Position: 20%\nTo Sub-Agents: $4M"]
 
-        P -->|Allocate $3M\nPosition: 15%| M2[Master Agent B 總代B\n━━━━━━━━━━━━━━\nCredit Limit: $3M\nUsed Credit: $2.85M\nAvailable: $150k\nUsage: 95% 🔴 ALERT\n━━━━━━━━━━━━━━\nOwn Position: 15%\nTo Sub-Agents: $2.8M]
+        P -->|Allocate $3M\nPosition: 15%| M2["Master Agent B 總代B\n━━━━━━━━━━━━━━\nCredit Limit: $3M\nUsed Credit: $2.85M\nAvailable: $150k\nUsage: 95% 🔴 ALERT\n━━━━━━━━━━━━━━\nOwn Position: 15%\nTo Sub-Agents: $2.8M"]
     end
 
     subgraph "Agent L1 Level - 一級代理層"
-        M1 -->|Allocate $2M\nPosition: 40%| A1[Agent L1-A1\n━━━━━━━━━━━━━━\nLimit: $2M\nUsed: $1.2M\nAvailable: $800k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 40%]
+        M1 -->|Allocate $2M\nPosition: 40%| A1["Agent L1-A1\n━━━━━━━━━━━━━━\nLimit: $2M\nUsed: $1.2M\nAvailable: $800k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 40%"]
 
-        M1 -->|Allocate $1.5M\nPosition: 35%| A2[Agent L1-A2\n━━━━━━━━━━━━━━\nLimit: $1.5M\nUsed: $1.5M\nAvailable: $0\nUsage: 100% 🔴 FROZEN\n━━━━━━━━━━━━━━\nPosition: 35%\n⚠️ Auto-Suspended]
+        M1 -->|Allocate $1.5M\nPosition: 35%| A2["Agent L1-A2\n━━━━━━━━━━━━━━\nLimit: $1.5M\nUsed: $1.5M\nAvailable: $0\nUsage: 100% 🔴 FROZEN\n━━━━━━━━━━━━━━\nPosition: 35%\n⚠️ Auto-Suspended"]
 
-        M1 -->|Allocate $500k\nPosition: 30%| A3[Agent L1-A3\n━━━━━━━━━━━━━━\nLimit: $500k\nUsed: $300k\nAvailable: $200k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 30%]
+        M1 -->|Allocate $500k\nPosition: 30%| A3["Agent L1-A3\n━━━━━━━━━━━━━━\nLimit: $500k\nUsed: $300k\nAvailable: $200k\nUsage: 60% 🟢\n━━━━━━━━━━━━━━\nPosition: 30%"]
 
-        M2 -->|Allocate $2.8M\nPosition: 45%| A4[Agent L1-A4\n━━━━━━━━━━━━━━\nLimit: $2.8M\nUsed: $2.6M\nAvailable: $200k\nUsage: 93% 🟡 WARNING\n━━━━━━━━━━━━━━\nPosition: 45%]
+        M2 -->|Allocate $2.8M\nPosition: 45%| A4["Agent L1-A4\n━━━━━━━━━━━━━━\nLimit: $2.8M\nUsed: $2.6M\nAvailable: $200k\nUsage: 93% 🟡 WARNING\n━━━━━━━━━━━━━━\nPosition: 45%"]
     end
 
     subgraph "Agent L2 Level - 二級代理層"
-        A1 -->|Allocate $800k\nPosition: 50%| A5[Agent L2-A5\n━━━━━━━━━━━━━━\nLimit: $800k\nUsed: $500k\nAvailable: $300k\nUsage: 62.5% 🟢\n━━━━━━━━━━━━━━\nPosition: 50%]
+        A1 -->|Allocate $800k\nPosition: 50%| A5["Agent L2-A5\n━━━━━━━━━━━━━━\nLimit: $800k\nUsed: $500k\nAvailable: $300k\nUsage: 62.5% 🟢\n━━━━━━━━━━━━━━\nPosition: 50%"]
 
-        A3 -->|Allocate $200k\nPosition: 45%| A6[Agent L2-A6\n━━━━━━━━━━━━━━\nLimit: $200k\nUsed: $150k\nAvailable: $50k\nUsage: 75% 🟢\n━━━━━━━━━━━━━━\nPosition: 45%]
+        A3 -->|Allocate $200k\nPosition: 45%| A6["Agent L2-A6\n━━━━━━━━━━━━━━\nLimit: $200k\nUsed: $150k\nAvailable: $50k\nUsage: 75% 🟢\n━━━━━━━━━━━━━━\nPosition: 45%"]
     end
 
     subgraph "Player Level - 玩家層"
-        A5 -->|Allocate $300k\nTotal Players: 50| PG1[Player Group 1\n━━━━━━━━━━━━━━\nTotal Bets: $500k\nTotal Wins: $400k\nNet Loss: $100k 💰\n━━━━━━━━━━━━━━\nSettlement Status: Pending]
+        A5 -->|Allocate $300k\nTotal Players: 50| PG1["Player Group 1\n━━━━━━━━━━━━━━\nTotal Bets: $500k\nTotal Wins: $400k\nNet Loss: $100k 💰\n━━━━━━━━━━━━━━\nSettlement Status: Pending"]
 
-        A6 -->|Allocate $50k\nTotal Players: 20| PG2[Player Group 2\n━━━━━━━━━━━━━━\nTotal Bets: $200k\nTotal Wins: $250k\nNet Win: $50k 📈\n━━━━━━━━━━━━━━\nSettlement Status: Pending]
+        A6 -->|Allocate $50k\nTotal Players: 20| PG2["Player Group 2\n━━━━━━━━━━━━━━\nTotal Bets: $200k\nTotal Wins: $250k\nNet Win: $50k 📈\n━━━━━━━━━━━━━━\nSettlement Status: Pending"]
 
-        A4 -->|Allocate $200k\nTotal Players: 100| PG3[Player Group 3\n━━━━━━━━━━━━━━\nTotal Bets: $2.8M\nTotal Wins: $200k\nNet Loss: $2.6M 💰\n━━━━━━━━━━━━━━\n⚠️ High Turnover]
+        A4 -->|Allocate $200k\nTotal Players: 100| PG3["Player Group 3\n━━━━━━━━━━━━━━\nTotal Bets: $2.8M\nTotal Wins: $200k\nNet Loss: $2.6M 💰\n━━━━━━━━━━━━━━\n⚠️ High Turnover"]
     end
 
     subgraph "Risk Alerts - 風險告警"
-        RISK1[🔴 Critical Risk\nMaster B: 95% Usage\nAction: Margin Call]
-        RISK2[🔴 Frozen\nAgent L1-A2: 100% Usage\nAction: Auto-Suspend]
-        RISK3[🟡 Warning\nAgent L1-A4: 93% Usage\nAction: Monitor]
+        RISK1["🔴 Critical Risk\nMaster B: 95% Usage\nAction: Margin Call"]
+        RISK2["🔴 Frozen\nAgent L1-A2: 100% Usage\nAction: Auto-Suspend"]
+        RISK3["🟡 Warning\nAgent L1-A4: 93% Usage\nAction: Monitor"]
     end
 
     M2 -.->|Trigger| RISK1
@@ -453,60 +453,60 @@ flowchart TD
     VALIDATE1 -->|position_% > parent_max_position| ERR3[Error: Exceeds Parent Limit]
     VALIDATE1 -->|OK| LOCK
 
-    LOCK[Acquire Distributed Lock\nRedis: SET NX credit:parent:$id TTL=30s] --> LOCK_CHECK{Lock Acquired?}
-    LOCK_CHECK -->|No - Retry < 3| WAIT[Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 100ms\nRetry 2: 200ms\nRetry 3: 400ms]
+    LOCK["Acquire Distributed Lock\nRedis: SET NX credit:parent:$id TTL=30s"] --> LOCK_CHECK{Lock Acquired?}
+    LOCK_CHECK -->|No - Retry < 3| WAIT["Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 100ms\nRetry 2: 200ms\nRetry 3: 400ms"]
     WAIT --> LOCK
-    LOCK_CHECK -->|No - Retry >= 3| ERR4[Error: Lock Timeout\n━━━━━━━━━━━━━━\nConcurrent Allocation Conflict\nTotal Wait: 700ms]
+    LOCK_CHECK -->|No - Retry >= 3| ERR4["Error: Lock Timeout\n━━━━━━━━━━━━━━\nConcurrent Allocation Conflict\nTotal Wait: 700ms"]
     LOCK_CHECK -->|Yes| READ_PARENT
 
-    READ_PARENT[Read Parent Credit Record\nSELECT * FROM agent_credit\nWHERE agent_id = parent FOR UPDATE] --> VERSION_CHECK{Version Matches?}
+    READ_PARENT["Read Parent Credit Record\nSELECT * FROM agent_credit\nWHERE agent_id = parent FOR UPDATE"] --> VERSION_CHECK{Version Matches?}
     VERSION_CHECK -->|No| RETRY_VERSION{Retry Count < 3?}
-    RETRY_VERSION -->|Yes| BACKOFF[Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms\nRetry 2: 100ms\nRetry 3: 150ms]
+    RETRY_VERSION -->|Yes| BACKOFF["Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms\nRetry 2: 100ms\nRetry 3: 150ms"]
     BACKOFF --> READ_PARENT
-    RETRY_VERSION -->|No| ERR5[Error: Optimistic Lock Conflict\n━━━━━━━━━━━━━━\nToo Many Concurrent Updates\nTotal Wait: 300ms]
+    RETRY_VERSION -->|No| ERR5["Error: Optimistic Lock Conflict\n━━━━━━━━━━━━━━\nToo Many Concurrent Updates\nTotal Wait: 300ms"]
 
     VERSION_CHECK -->|Yes| CALC_AVAILABLE
-    CALC_AVAILABLE[Calculate Available Credit:\navailable = parent.limit - parent.used - parent.allocated_to_children]
+    CALC_AVAILABLE["Calculate Available Credit:\navailable = parent.limit - parent.used - parent.allocated_to_children"]
 
     CALC_AVAILABLE --> AVAILABLE_CHECK{available >= amount?}
-    AVAILABLE_CHECK -->|No| ERR6[Error: Insufficient Parent Credit\nAvailable: $available\nRequested: $amount]
+    AVAILABLE_CHECK -->|No| ERR6["Error: Insufficient Parent Credit\nAvailable: $available\nRequested: $amount"]
 
     AVAILABLE_CHECK -->|Yes| CHECK_CHILD_EXISTS{Child Credit Record Exists?}
 
-    CHECK_CHILD_EXISTS -->|No - New Allocation| CREATE_CHILD[Create Child Credit Record:\nINSERT INTO agent_credit\n(agent_id, parent_id, limit, position_%)]
-    CHECK_CHILD_EXISTS -->|Yes - Adjust Existing| READ_CHILD[Read Child Credit Record\nSELECT * FROM agent_credit\nWHERE agent_id = child FOR UPDATE]
+    CHECK_CHILD_EXISTS -->|No - New Allocation| CREATE_CHILD["Create Child Credit Record:\nINSERT INTO agent_credit\n(agent_id, parent_id, limit, position_%)"]
+    CHECK_CHILD_EXISTS -->|Yes - Adjust Existing| READ_CHILD["Read Child Credit Record\nSELECT * FROM agent_credit\nWHERE agent_id = child FOR UPDATE"]
 
     CREATE_CHILD --> UPDATE_PARENT
     READ_CHILD --> CALC_DELTA
 
-    CALC_DELTA[Calculate Delta:\ndelta = new_amount - child.current_limit] --> DELTA_CHECK{delta > 0?}
+    CALC_DELTA["Calculate Delta:\ndelta = new_amount - child.current_limit"] --> DELTA_CHECK{delta > 0?}
     DELTA_CHECK -->|Yes - Increase| UPDATE_PARENT
     DELTA_CHECK -->|No - Decrease| CHECK_CHILD_USED
 
     CHECK_CHILD_USED{child.used_credit <= new_amount?}
-    CHECK_CHILD_USED -->|No| ERR7[Error: Cannot Reduce Below Used Credit\nUsed: $child.used\nNew Limit: $new_amount]
+    CHECK_CHILD_USED -->|No| ERR7["Error: Cannot Reduce Below Used Credit\nUsed: $child.used\nNew Limit: $new_amount"]
     CHECK_CHILD_USED -->|Yes| UPDATE_PARENT
 
-    UPDATE_PARENT[UPDATE agent_credit SET\nallocated_to_children += amount,\nversion = version + 1\nWHERE agent_id = parent AND version = $current_version]
+    UPDATE_PARENT["UPDATE agent_credit SET\nallocated_to_children += amount,\nversion = version + 1\nWHERE agent_id = parent AND version = $current_version"]
 
     UPDATE_PARENT --> UPDATE_CHECK{Affected Rows > 0?}
     UPDATE_CHECK -->|No| RETRY_VERSION
     UPDATE_CHECK -->|Yes| UPDATE_CHILD
 
-    UPDATE_CHILD[UPDATE agent_credit SET\ncredit_limit = new_amount,\nposition_percent = new_position,\nupdated_at = NOW(),\nversion = version + 1\nWHERE agent_id = child]
+    UPDATE_CHILD["UPDATE agent_credit SET\ncredit_limit = new_amount,\nposition_percent = new_position,\nupdated_at = NOW(),\nversion = version + 1\nWHERE agent_id = child"]
 
-    UPDATE_CHILD --> INSERT_AUDIT[INSERT INTO credit_allocation_audit\n(parent_id, child_id, old_limit, new_limit, delta, reason, operator)]
+    UPDATE_CHILD --> INSERT_AUDIT["INSERT INTO credit_allocation_audit\n(parent_id, child_id, old_limit, new_limit, delta, reason, operator)"]
 
-    INSERT_AUDIT --> NOTIFY_CHECK{Significant Change?\n(delta > $10k OR position change > 10%)}
-    NOTIFY_CHECK -->|Yes| SEND_NOTIFICATION[Send Notification:\nEmail to Child Agent + Parent + Risk Team]
+    INSERT_AUDIT --> NOTIFY_CHECK{"Significant Change?\n(delta > $10k OR position change > 10%)"}
+    NOTIFY_CHECK -->|Yes| SEND_NOTIFICATION["Send Notification:\nEmail to Child Agent + Parent + Risk Team"]
     NOTIFY_CHECK -->|No| COMMIT
 
     SEND_NOTIFICATION --> COMMIT[COMMIT Transaction]
-    COMMIT --> RELEASE_LOCK[Release Redis Lock\nDEL credit:parent:$id]
+    COMMIT --> RELEASE_LOCK["Release Redis Lock\nDEL credit:parent:$id"]
 
-    RELEASE_LOCK --> PUBLISH_EVENT[Publish Event to Kafka:\ntopic: agent.credit.allocated\npayload: {parent_id, child_id, new_limit, delta}]
+    RELEASE_LOCK --> PUBLISH_EVENT["Publish Event to Kafka:\ntopic: agent.credit.allocated\npayload: {parent_id, child_id, new_limit, delta}"]
 
-    PUBLISH_EVENT --> SUCCESS[Return Success:\n{status: OK, new_limit: $amount, available: $new_available}]
+    PUBLISH_EVENT --> SUCCESS["Return Success:\n{status: OK, new_limit: $amount, available: $new_available}"]
 
     ERR1 --> RELEASE_LOCK_ERR[Release Lock if Held]
     ERR2 --> RELEASE_LOCK_ERR

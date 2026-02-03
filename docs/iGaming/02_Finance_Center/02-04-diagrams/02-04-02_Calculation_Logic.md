@@ -20,8 +20,8 @@
 flowchart TD
     subgraph DEPOSIT["存款/優惠入帳"]
         A1[玩家存款/領取優惠] --> A2{入帳至哪種錢包?}
-        A2 -->|主錢包| A3[cash 增加\nlockAmount 同步增加]
-        A2 -->|促銷錢包| A4[cash/bonus 增加\n設定 wagerRequirement]
+        A2 -->|主錢包| A3["cash 增加\nlockAmount 同步增加"]
+        A2 -->|促銷錢包| A4["cash/bonus 增加\n設定 wagerRequirement"]
     end
 
     subgraph BET["投注扣款"]
@@ -47,7 +47,7 @@ flowchart TD
         C7 --> C10
         C8 --> C10
         C9 --> C10
-        C10 --> C11[lockAmount 減少\nlockAmount -= effectiveStake]
+        C10 --> C11["lockAmount 減少\nlockAmount -= effectiveStake"]
     end
 
     subgraph REBATE["返水計算"]

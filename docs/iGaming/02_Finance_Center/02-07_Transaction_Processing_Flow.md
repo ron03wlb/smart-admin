@@ -29,21 +29,21 @@ flowchart TD
     IDEMPOTENT -->|No| ACQUIRE_LOCK[Acquire Redis Lock: player:$id]
 
     ACQUIRE_LOCK --> LOCK_CHECK{Lock acquired?}
-    LOCK_CHECK -->|No - Retry < 3| WAIT[Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms\nRetry 2: 100ms\nRetry 3: 200ms]
+    LOCK_CHECK -->|No - Retry < 3| WAIT["Wait - Exponential Backoff\n━━━━━━━━━━━━━━\nRetry 1: 50ms\nRetry 2: 100ms\nRetry 3: 200ms"]
     WAIT --> ACQUIRE_LOCK
-    LOCK_CHECK -->|No - Retry >= 3| ERR_LOCK[Error: Lock Timeout\n━━━━━━━━━━━━━━\nTotal Wait: 350ms]
+    LOCK_CHECK -->|No - Retry >= 3| ERR_LOCK["Error: Lock Timeout\n━━━━━━━━━━━━━━\nTotal Wait: 350ms"]
 
     LOCK_CHECK -->|Yes| READ_BALANCE[Read Current Balance & Version]
     READ_BALANCE --> BALANCE_CHECK{Balance >= amount?}
     BALANCE_CHECK -->|No| ERR_INSUFFICIENT[Error: Insufficient Funds]
 
-    BALANCE_CHECK -->|Yes| UPDATE_DB[Execute Optimistic Lock Update:\nSET balance = balance - amount,\nversion = version + 1\nWHERE player_id = ? AND version = ?]
+    BALANCE_CHECK -->|Yes| UPDATE_DB["Execute Optimistic Lock Update:\nSET balance = balance - amount,\nversion = version + 1\nWHERE player_id = ? AND version = ?"]
 
     UPDATE_DB --> AFFECTED_CHECK{Affected Rows > 0?}
     AFFECTED_CHECK -->|No - Version Conflict| VERSION_RETRY{Retry Count < 3?}
-    VERSION_RETRY -->|Yes| BACKOFF[Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 20ms\nRetry 2: 40ms\nRetry 3: 60ms]
+    VERSION_RETRY -->|Yes| BACKOFF["Wait - Linear Backoff\n━━━━━━━━━━━━━━\nRetry 1: 20ms\nRetry 2: 40ms\nRetry 3: 60ms"]
     BACKOFF --> READ_BALANCE
-    VERSION_RETRY -->|No| ERR_VERSION[Error: Concurrent Update Conflict\n━━━━━━━━━━━━━━\nTotal Wait: 120ms\nSuggest: Use queue]
+    VERSION_RETRY -->|No| ERR_VERSION["Error: Concurrent Update Conflict\n━━━━━━━━━━━━━━\nTotal Wait: 120ms\nSuggest: Use queue"]
 
     AFFECTED_CHECK -->|Yes| INSERT_TX[Insert Transaction Log]
     INSERT_TX --> INSERT_OUTBOX[Insert Outbox Event: WALLET_DEBITED]

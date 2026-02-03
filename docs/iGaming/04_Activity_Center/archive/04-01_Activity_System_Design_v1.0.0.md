@@ -85,40 +85,40 @@ class PromotionRulesEngine {
 
 ```mermaid
 flowchart TD
-    START[玩家動作事件觸發] --> EVENT_PARSE[解析事件類型\n━━━━━━━━━━━━\nDEPOSIT / BET / WIN / LOGIN]
+    START[玩家動作事件觸發] --> EVENT_PARSE["解析事件類型\n━━━━━━━━━━━━\nDEPOSIT / BET / WIN / LOGIN"]
 
-    EVENT_PARSE --> LOAD_CONTEXT[構建玩家上下文\n━━━━━━━━━━━━\nPlayerContext:\n• playerId, tenantId\n• VIP Level\n• Country, Currency\n• Registration Date\n• Recent Activity History]
+    EVENT_PARSE --> LOAD_CONTEXT["構建玩家上下文\n━━━━━━━━━━━━\nPlayerContext:\n• playerId, tenantId\n• VIP Level\n• Country, Currency\n• Registration Date\n• Recent Activity History"]
 
-    LOAD_CONTEXT --> FETCH_RULES[查詢適用規則\n━━━━━━━━━━━━\nWHERE status = ACTIVE\nAND event_type = {type}\nAND tenant_id IN (platform, {tenantId})\nORDER BY priority ASC]
+    LOAD_CONTEXT --> FETCH_RULES["查詢適用規則\n━━━━━━━━━━━━\nWHERE status = ACTIVE\nAND event_type = {type}\nAND tenant_id IN (platform, {tenantId})\nORDER BY priority ASC"]
 
     FETCH_RULES --> RULES_FOUND{找到規則?}
-    RULES_FOUND -->|否| NO_PROMO[無適用活動\n返回空結果]
+    RULES_FOUND -->|否| NO_PROMO["無適用活動\n返回空結果"]
 
-    RULES_FOUND -->|是| CHAIN_START[規則鏈開始\n按 Priority 遞增順序]
+    RULES_FOUND -->|是| CHAIN_START["規則鏈開始\n按 Priority 遞增順序"]
 
     CHAIN_START --> LOOP_RULES[遍歷規則列表]
 
-    LOOP_RULES --> CHECK_SCHEDULE{1️⃣ 時間窗口檢查\n━━━━━━━━━━━━\nNOW() BETWEEN\nstartDate AND endDate?}
-    CHECK_SCHEDULE -->|否| SKIP_RULE[跳過此規則\n繼續下一個]
+    LOOP_RULES --> CHECK_SCHEDULE{"1️⃣ 時間窗口檢查\n━━━━━━━━━━━━\nNOW() BETWEEN\nstartDate AND endDate?"}
+    CHECK_SCHEDULE -->|否| SKIP_RULE["跳過此規則\n繼續下一個"]
 
-    CHECK_SCHEDULE -->|是| CHECK_ELIGIBILITY{2️⃣ 資格條件評估\n━━━━━━━━━━━━}
+    CHECK_SCHEDULE -->|是| CHECK_ELIGIBILITY{"2️⃣ 資格條件評估\n━━━━━━━━━━━━"}
 
     CHECK_ELIGIBILITY --> ELIG_VIP{VIP 等級符合?}
     ELIG_VIP -->|否| SKIP_RULE
     ELIG_VIP -->|是| ELIG_COUNTRY{國家/地區符合?}
     ELIG_COUNTRY -->|否| SKIP_RULE
-    ELIG_COUNTRY -->|是| ELIG_SEGMENT{玩家分群符合?\nNEW_PLAYER /\nRETURNING /\nHIGH_ROLLER}
+    ELIG_COUNTRY -->|是| ELIG_SEGMENT{"玩家分群符合?\nNEW_PLAYER /\nRETURNING /\nHIGH_ROLLER"}
     ELIG_SEGMENT -->|否| SKIP_RULE
-    ELIG_SEGMENT -->|是| ELIG_BLACKLIST{黑名單檢查\nis_excluded = false?}
+    ELIG_SEGMENT -->|是| ELIG_BLACKLIST{"黑名單檢查\nis_excluded = false?"}
     ELIG_BLACKLIST -->|是黑名單| SKIP_RULE
 
-    ELIG_BLACKLIST -->|通過| CHECK_TRIGGER{3️⃣ 觸發條件匹配\n━━━━━━━━━━━━}
+    ELIG_BLACKLIST -->|通過| CHECK_TRIGGER{"3️⃣ 觸發條件匹配\n━━━━━━━━━━━━"}
 
     CHECK_TRIGGER --> TRIGGER_TYPE{觸發類型?}
-    TRIGGER_TYPE -->|首存 FIRST_DEPOSIT| FIRST_DEP_CHECK[檢查:\n• 是否首次存款?\n• 金額 >= minDeposit?]
-    TRIGGER_TYPE -->|累積存款 ACCUMULATED| ACCUM_CHECK[檢查:\n• 週期內累計金額 >= threshold?]
-    TRIGGER_TYPE -->|流水達標 TURNOVER| TURNOVER_CHECK[檢查:\n• 有效流水 >= required?]
-    TRIGGER_TYPE -->|手動領取 MANUAL_CLAIM| MANUAL_CHECK[檢查:\n• 玩家是否手動觸發?]
+    TRIGGER_TYPE -->|首存 FIRST_DEPOSIT| FIRST_DEP_CHECK["檢查:\n• 是否首次存款?\n• 金額 >= minDeposit?"]
+    TRIGGER_TYPE -->|累積存款 ACCUMULATED| ACCUM_CHECK["檢查:\n• 週期內累計金額 >= threshold?"]
+    TRIGGER_TYPE -->|流水達標 TURNOVER| TURNOVER_CHECK["檢查:\n• 有效流水 >= required?"]
+    TRIGGER_TYPE -->|手動領取 MANUAL_CLAIM| MANUAL_CHECK["檢查:\n• 玩家是否手動觸發?"]
 
     FIRST_DEP_CHECK --> TRIGGER_RESULT{觸發成功?}
     ACCUM_CHECK --> TRIGGER_RESULT
@@ -126,78 +126,78 @@ flowchart TD
     MANUAL_CHECK --> TRIGGER_RESULT
 
     TRIGGER_RESULT -->|否| SKIP_RULE
-    TRIGGER_RESULT -->|是| CHECK_CONSTRAINTS{4️⃣ 限制條件檢查\n━━━━━━━━━━━━}
+    TRIGGER_RESULT -->|是| CHECK_CONSTRAINTS{"4️⃣ 限制條件檢查\n━━━━━━━━━━━━"}
 
-    CHECK_CONSTRAINTS --> CONST_QUOTA{使用次數限制\nplayer_claims < maxClaims?}
+    CHECK_CONSTRAINTS --> CONST_QUOTA{"使用次數限制\nplayer_claims < maxClaims?"}
     CONST_QUOTA -->|否| SKIP_RULE
-    CONST_QUOTA -->|是| CONST_COOLDOWN{冷卻時間\nlastClaim + cooldown < NOW()?}
+    CONST_QUOTA -->|是| CONST_COOLDOWN{"冷卻時間\nlastClaim + cooldown < NOW()?"}
     CONST_COOLDOWN -->|否| SKIP_RULE
-    CONST_COOLDOWN -->|是| CONST_BUDGET{活動預算檢查\ntotalCost + rewardAmount <= budget?}
-    CONST_BUDGET -->|否| BUDGET_EXHAUSTED[活動預算耗盡\n自動暫停活動\n發送運營告警]
+    CONST_COOLDOWN -->|是| CONST_BUDGET{"活動預算檢查\ntotalCost + rewardAmount <= budget?"}
+    CONST_BUDGET -->|否| BUDGET_EXHAUSTED["活動預算耗盡\n自動暫停活動\n發送運營告警"]
 
-    CONST_BUDGET -->|是| PASSED_RULE[✅ 規則匹配成功\n記錄匹配規則 ID]
+    CONST_BUDGET -->|是| PASSED_RULE["✅ 規則匹配成功\n記錄匹配規則 ID"]
 
-    PASSED_RULE --> CALC_REWARD{5️⃣ 獎勵計算\n━━━━━━━━━━━━}
+    PASSED_RULE --> CALC_REWARD{"5️⃣ 獎勵計算\n━━━━━━━━━━━━"}
 
     CALC_REWARD --> REWARD_TYPE{獎勵類型?}
-    REWARD_TYPE -->|百分比匹配\nPERCENTAGE_MATCH| CALC_PERCENTAGE[計算:\nreward = depositAmount × matchPercentage\nreward = MIN(reward, maxReward)]
-    REWARD_TYPE -->|固定金額\nFIXED_AMOUNT| CALC_FIXED[直接使用配置金額\nreward = fixedAmount]
-    REWARD_TYPE -->|階梯式\nTIERED| CALC_TIERED[根據存款區間匹配:\n$100-$500 → 100% bonus\n$501-$1000 → 150% bonus]
-    REWARD_TYPE -->|免費旋轉\nFREE_SPINS| CALC_SPINS[生成 Token:\nspins_count = configured_spins\ngame_id = eligible_game]
+    REWARD_TYPE -->|百分比匹配\nPERCENTAGE_MATCH| CALC_PERCENTAGE["計算:\nreward = depositAmount × matchPercentage\nreward = MIN(reward, maxReward)"]
+    REWARD_TYPE -->|固定金額\nFIXED_AMOUNT| CALC_FIXED["直接使用配置金額\nreward = fixedAmount"]
+    REWARD_TYPE -->|階梯式\nTIERED| CALC_TIERED["根據存款區間匹配:\n$100-$500 → 100% bonus\n$501-$1000 → 150% bonus"]
+    REWARD_TYPE -->|免費旋轉\nFREE_SPINS| CALC_SPINS["生成 Token:\nspins_count = configured_spins\ngame_id = eligible_game"]
 
-    CALC_PERCENTAGE --> REWARD_RESULT[獲得獎勵結果\nRewardResult]
+    CALC_PERCENTAGE --> REWARD_RESULT["獲得獎勵結果\nRewardResult"]
     CALC_FIXED --> REWARD_RESULT
     CALC_TIERED --> REWARD_RESULT
     CALC_SPINS --> REWARD_RESULT
 
     REWARD_RESULT --> MULTI_MATCH{6️⃣ 多規則處理策略}
 
-    MULTI_MATCH -->|策略 A: 取最高| SELECT_MAX[選擇 reward 金額最大的規則\n忽略其他匹配規則]
-    MULTI_MATCH -->|策略 B: 累加| SELECT_SUM[累加所有匹配規則的 reward\n需配置總上限]
-    MULTI_MATCH -->|策略 C: 優先級| SELECT_FIRST[僅執行 priority 最高 (數字最小) 的規則\n忽略其他]
-    MULTI_MATCH -->|策略 D: 玩家選擇| SELECT_PLAYER[展示所有匹配規則\n讓玩家手動選擇領取]
+    MULTI_MATCH -->|策略 A: 取最高| SELECT_MAX["選擇 reward 金額最大的規則\n忽略其他匹配規則"]
+    MULTI_MATCH -->|策略 B: 累加| SELECT_SUM["累加所有匹配規則的 reward\n需配置總上限"]
+    MULTI_MATCH -->|策略 C: 優先級| SELECT_FIRST["僅執行 priority 最高 (數字最小) 的規則\n忽略其他"]
+    MULTI_MATCH -->|策略 D: 玩家選擇| SELECT_PLAYER["展示所有匹配規則\n讓玩家手動選擇領取"]
 
     SELECT_MAX --> FINAL_REWARD[最終獎勵決策]
     SELECT_SUM --> FINAL_REWARD
     SELECT_FIRST --> FINAL_REWARD
     SELECT_PLAYER --> FINAL_REWARD
 
-    FINAL_REWARD --> RISK_CHECK{7️⃣ 風控最終審核\n━━━━━━━━━━━━}
+    FINAL_REWARD --> RISK_CHECK{"7️⃣ 風控最終審核\n━━━━━━━━━━━━"}
 
-    RISK_CHECK --> RISK_MULTI_ACCOUNT{多帳號檢測\n共享 IP/Device/Payment?}
-    RISK_MULTI_ACCOUNT -->|檢測到| RISK_REJECT[拒絕發放\n標記: RISK_REJECTED\n觸發人工審核]
-    RISK_MULTI_ACCOUNT -->|通過| RISK_BONUS_HUNTER{獎金獵人模式檢測\n高頻領取 + 快速提款?}
+    RISK_CHECK --> RISK_MULTI_ACCOUNT{"多帳號檢測\n共享 IP/Device/Payment?"}
+    RISK_MULTI_ACCOUNT -->|檢測到| RISK_REJECT["拒絕發放\n標記: RISK_REJECTED\n觸發人工審核"]
+    RISK_MULTI_ACCOUNT -->|通過| RISK_BONUS_HUNTER{"獎金獵人模式檢測\n高頻領取 + 快速提款?"}
     RISK_BONUS_HUNTER -->|檢測到| RISK_REJECT
-    RISK_BONUS_HUNTER -->|通過| RISK_VELOCITY{存款速度異常?\n短時間大量存款}
-    RISK_VELOCITY -->|異常| RISK_MANUAL[標記: PENDING_MANUAL_REVIEW\n暫緩發放,等待審核]
+    RISK_BONUS_HUNTER -->|通過| RISK_VELOCITY{"存款速度異常?\n短時間大量存款"}
+    RISK_VELOCITY -->|異常| RISK_MANUAL["標記: PENDING_MANUAL_REVIEW\n暫緩發放,等待審核"]
     RISK_VELOCITY -->|正常| RISK_PASS[✅ 風控通過]
 
-    RISK_PASS --> EXECUTE_REWARD{8️⃣ 執行獎勵發放\n━━━━━━━━━━━━}
+    RISK_PASS --> EXECUTE_REWARD{"8️⃣ 執行獎勵發放\n━━━━━━━━━━━━"}
 
     EXECUTE_REWARD --> WALLET_TYPE{錢包類型選擇}
-    WALLET_TYPE -->|現金\nCASH| CREDIT_CASH[直接入現金錢包\nwallet_service.creditCash\n可立即提款]
-    WALLET_TYPE -->|紅利\nBONUS| CREDIT_BONUS[入紅利錢包\nwallet_service.creditBonus\n創建流水追蹤記錄]
-    WALLET_TYPE -->|免費旋轉\nFREE_SPINS| ISSUE_TOKEN[發放 Token\ntoken_service.issueSpins\n綁定遊戲 + 有效期]
+    WALLET_TYPE -->|現金\nCASH| CREDIT_CASH["直接入現金錢包\nwallet_service.creditCash\n可立即提款"]
+    WALLET_TYPE -->|紅利\nBONUS| CREDIT_BONUS["入紅利錢包\nwallet_service.creditBonus\n創建流水追蹤記錄"]
+    WALLET_TYPE -->|免費旋轉\nFREE_SPINS| ISSUE_TOKEN["發放 Token\ntoken_service.issueSpins\n綁定遊戲 + 有效期"]
 
-    CREDIT_CASH --> CREATE_RECORD[創建獎勵記錄\n━━━━━━━━━━━━\nreward_distributions:\n• player_id, promotion_id\n• amount, wallet_type\n• status: COMPLETED\n• created_at, expires_at]
+    CREDIT_CASH --> CREATE_RECORD["創建獎勵記錄\n━━━━━━━━━━━━\nreward_distributions:\n• player_id, promotion_id\n• amount, wallet_type\n• status: COMPLETED\n• created_at, expires_at"]
 
-    CREDIT_BONUS --> CREATE_WAGER[創建流水要求\n━━━━━━━━━━━━\nwagering_requirements:\n• bonus_id\n• required_turnover = amount × multiplier\n• current_progress = 0\n• status: ACTIVE\n• expires_at = NOW() + validDays]
+    CREDIT_BONUS --> CREATE_WAGER["創建流水要求\n━━━━━━━━━━━━\nwagering_requirements:\n• bonus_id\n• required_turnover = amount × multiplier\n• current_progress = 0\n• status: ACTIVE\n• expires_at = NOW() + validDays"]
 
     ISSUE_TOKEN --> CREATE_RECORD
 
     CREATE_WAGER --> CREATE_RECORD
 
-    CREATE_RECORD --> NOTIFY_PLAYER[9️⃣ 通知玩家\n━━━━━━━━━━━━\n• 站內信 (Inbox)\n• Push Notification\n• Email (Optional)]
+    CREATE_RECORD --> NOTIFY_PLAYER["9️⃣ 通知玩家\n━━━━━━━━━━━━\n• 站內信 (Inbox)\n• Push Notification\n• Email (Optional)"]
 
-    NOTIFY_PLAYER --> AUDIT_LOG[🔟 審計日誌\n━━━━━━━━━━━━\n記錄完整執行軌跡:\n• 規則評估路徑\n• 匹配/拒絕原因\n• 獎勵計算明細\n• 風控決策依據]
+    NOTIFY_PLAYER --> AUDIT_LOG["🔟 審計日誌\n━━━━━━━━━━━━\n記錄完整執行軌跡:\n• 規則評估路徑\n• 匹配/拒絕原因\n• 獎勵計算明細\n• 風控決策依據"]
 
     AUDIT_LOG --> SUCCESS[返回成功結果\nRewardResult[]\n包含獎勵 ID、金額、類型]
 
     SKIP_RULE --> MORE_RULES{還有更多規則?}
     MORE_RULES -->|是| LOOP_RULES
-    MORE_RULES -->|否| NO_MATCH[無規則匹配\n返回空結果]
+    MORE_RULES -->|否| NO_MATCH["無規則匹配\n返回空結果"]
 
-    BUDGET_EXHAUSTED --> ALERT_OPS[發送運營告警\nSlack/Email\n活動預算耗盡]
+    BUDGET_EXHAUSTED --> ALERT_OPS["發送運營告警\nSlack/Email\n活動預算耗盡"]
     ALERT_OPS --> NO_PROMO
 
     RISK_REJECT --> AUDIT_LOG
@@ -769,56 +769,56 @@ Topics:
 
 ```mermaid
 flowchart TD
-    START[玩家觸發動作\n例: 存款 $200] --> QUERY_RULES[查詢所有匹配規則\n━━━━━━━━━━━━\nResult: 找到 4 個活動\n• A: 首存 100% bonus\n• B: 週末充值 50% bonus\n• C: VIP 專屬 30% bonus\n• D: 全站返水 1% cashback]
+    START["玩家觸發動作\n例: 存款 $200"] --> QUERY_RULES["查詢所有匹配規則\n━━━━━━━━━━━━\nResult: 找到 4 個活動\n• A: 首存 100% bonus\n• B: 週末充值 50% bonus\n• C: VIP 專屬 30% bonus\n• D: 全站返水 1% cashback"]
 
-    QUERY_RULES --> CLASSIFY{1️⃣ 活動類型分類\n━━━━━━━━━━━━}
+    QUERY_RULES --> CLASSIFY{"1️⃣ 活動類型分類\n━━━━━━━━━━━━"}
 
-    CLASSIFY --> CAT_DEPOSIT[存款類活動\nCategory: DEPOSIT_BONUS]
-    CLASSIFY --> CAT_CASHBACK[返水類活動\nCategory: CASHBACK]
-    CLASSIFY --> CAT_FREEBET[免費投注類\nCategory: FREE_BET]
-    CLASSIFY --> CAT_TOURNAMENT[錦標賽類\nCategory: TOURNAMENT]
+    CLASSIFY --> CAT_DEPOSIT["存款類活動\nCategory: DEPOSIT_BONUS"]
+    CLASSIFY --> CAT_CASHBACK["返水類活動\nCategory: CASHBACK"]
+    CLASSIFY --> CAT_FREEBET["免費投注類\nCategory: FREE_BET"]
+    CLASSIFY --> CAT_TOURNAMENT["錦標賽類\nCategory: TOURNAMENT"]
 
-    CAT_DEPOSIT --> DEP_LIST[DEPOSIT_BONUS 列表:\n• A: 首存 100% (priority=1)\n• B: 週末 50% (priority=10)\n• C: VIP 30% (priority=5)]
+    CAT_DEPOSIT --> DEP_LIST["DEPOSIT_BONUS 列表:\n• A: 首存 100% (priority=1)\n• B: 週末 50% (priority=10)\n• C: VIP 30% (priority=5)"]
 
-    CAT_CASHBACK --> CB_LIST[CASHBACK 列表:\n• D: 全站返水 1% (priority=20)]
+    CAT_CASHBACK --> CB_LIST["CASHBACK 列表:\n• D: 全站返水 1% (priority=20)"]
 
-    CAT_FREEBET --> FB_LIST[FREE_BET 列表:\n• (無匹配)]
+    CAT_FREEBET --> FB_LIST["FREE_BET 列表:\n• (無匹配)"]
 
-    CAT_TOURNAMENT --> TOUR_LIST[TOURNAMENT 列表:\n• (無匹配)]
+    CAT_TOURNAMENT --> TOUR_LIST["TOURNAMENT 列表:\n• (無匹配)"]
 
-    DEP_LIST --> CHECK_RULE{2️⃣ 檢查衝突規則\n━━━━━━━━━━━━}
+    DEP_LIST --> CHECK_RULE{"2️⃣ 檢查衝突規則\n━━━━━━━━━━━━"}
 
-    CHECK_RULE --> RULE_CONFIG[讀取活動配置\n━━━━━━━━━━━━\nactivity_conflict_rules:\n• mutually_exclusive_groups\n• stackability_policy\n• priority_override]
+    CHECK_RULE --> RULE_CONFIG["讀取活動配置\n━━━━━━━━━━━━\nactivity_conflict_rules:\n• mutually_exclusive_groups\n• stackability_policy\n• priority_override"]
 
-    RULE_CONFIG --> MUTUAL_EXCLUSIVE{是否互斥?\n━━━━━━━━━━━━\n檢查 mutually_exclusive_groups}
+    RULE_CONFIG --> MUTUAL_EXCLUSIVE{"是否互斥?\n━━━━━━━━━━━━\n檢查 mutually_exclusive_groups"}
 
-    MUTUAL_EXCLUSIVE -->|是 - 互斥組 A| EXCLUSIVE_GROUP[互斥組內規則:\n━━━━━━━━━━━━\nExample:\n• 首存活動\n• 二存活動\n• 三存活動\nRule: 只能選其一]
+    MUTUAL_EXCLUSIVE -->|是 - 互斥組 A| EXCLUSIVE_GROUP["互斥組內規則:\n━━━━━━━━━━━━\nExample:\n• 首存活動\n• 二存活動\n• 三存活動\nRule: 只能選其一"]
 
     EXCLUSIVE_GROUP --> EXCLUSIVE_STRATEGY{互斥策略選擇}
 
-    EXCLUSIVE_STRATEGY -->|策略 1: 取最高| SELECT_MAX_EXCL[選擇 reward 金額最大的活動\n━━━━━━━━━━━━\n計算:\n• A: $200 × 100% = $200\n• B: $200 × 50% = $100\n• C: $200 × 30% = $60\nResult: 選擇 A (首存)]
+    EXCLUSIVE_STRATEGY -->|策略 1: 取最高| SELECT_MAX_EXCL["選擇 reward 金額最大的活動\n━━━━━━━━━━━━\n計算:\n• A: $200 × 100% = $200\n• B: $200 × 50% = $100\n• C: $200 × 30% = $60\nResult: 選擇 A (首存)"]
 
-    EXCLUSIVE_STRATEGY -->|策略 2: 優先級| SELECT_PRIORITY_EXCL[選擇 priority 最高 (數字最小)\n━━━━━━━━━━━━\n• A: priority=1 ✓\n• B: priority=10\n• C: priority=5\nResult: 選擇 A]
+    EXCLUSIVE_STRATEGY -->|策略 2: 優先級| SELECT_PRIORITY_EXCL["選擇 priority 最高 (數字最小)\n━━━━━━━━━━━━\n• A: priority=1 ✓\n• B: priority=10\n• C: priority=5\nResult: 選擇 A"]
 
-    EXCLUSIVE_STRATEGY -->|策略 3: 玩家選擇| SELECT_PLAYER_EXCL[展示所有互斥活動\n讓玩家手動選擇\n━━━━━━━━━━━━\nUI:\n☐ A: 100% 最高$200\n☐ B: 50% 無上限\n☐ C: 30% + 50 Free Spins\nButton: 立即領取]
+    EXCLUSIVE_STRATEGY -->|策略 3: 玩家選擇| SELECT_PLAYER_EXCL["展示所有互斥活動\n讓玩家手動選擇\n━━━━━━━━━━━━\nUI:\n☐ A: 100% 最高$200\n☐ B: 50% 無上限\n☐ C: 30% + 50 Free Spins\nButton: 立即領取"]
 
-    MUTUAL_EXCLUSIVE -->|否 - 可疊加| STACKABLE{可疊加性檢查\n━━━━━━━━━━━━\nstackability_policy}
+    MUTUAL_EXCLUSIVE -->|否 - 可疊加| STACKABLE{"可疊加性檢查\n━━━━━━━━━━━━\nstackability_policy"}
 
-    STACKABLE -->|全部可疊加| STACK_ALL[疊加所有獎勵\n━━━━━━━━━━━━\nCondition:\n• 活動配置 allow_stack=true\n• 總金額 < global_max_bonus\nCalculation:\ntotal_reward = SUM(all_rewards)]
+    STACKABLE -->|全部可疊加| STACK_ALL["疊加所有獎勵\n━━━━━━━━━━━━\nCondition:\n• 活動配置 allow_stack=true\n• 總金額 < global_max_bonus\nCalculation:\ntotal_reward = SUM(all_rewards)"]
 
-    STACK_ALL --> CHECK_CAP{3️⃣ 檢查總上限\n━━━━━━━━━━━━}
+    STACK_ALL --> CHECK_CAP{"3️⃣ 檢查總上限\n━━━━━━━━━━━━"}
 
-    CHECK_CAP -->|超過上限| APPLY_CAP[應用上限限制\n━━━━━━━━━━━━\nExample:\n• total_reward = $350\n• global_max_bonus = $300\nResult: 限制為 $300\nAction: 按比例縮減各活動]
+    CHECK_CAP -->|超過上限| APPLY_CAP["應用上限限制\n━━━━━━━━━━━━\nExample:\n• total_reward = $350\n• global_max_bonus = $300\nResult: 限制為 $300\nAction: 按比例縮減各活動"]
 
-    CHECK_CAP -->|未超過| CAP_OK[疊加金額合規\n全額發放]
+    CHECK_CAP -->|未超過| CAP_OK["疊加金額合規\n全額發放"]
 
     STACKABLE -->|有條件疊加| CONDITIONAL_STACK{條件疊加規則}
 
-    CONDITIONAL_STACK -->|同類型不可疊加| SAME_TYPE_EXCL[同類型活動互斥\n━━━━━━━━━━━━\nExample:\n• 2 個 DEPOSIT_BONUS 不可疊加\n• 但 DEPOSIT_BONUS + CASHBACK 可疊加\nAction: 分組處理]
+    CONDITIONAL_STACK -->|同類型不可疊加| SAME_TYPE_EXCL["同類型活動互斥\n━━━━━━━━━━━━\nExample:\n• 2 個 DEPOSIT_BONUS 不可疊加\n• 但 DEPOSIT_BONUS + CASHBACK 可疊加\nAction: 分組處理"]
 
-    SAME_TYPE_EXCL --> GROUP_BY_TYPE[按類型分組\n━━━━━━━━━━━━\nGroup 1: DEPOSIT_BONUS (A, B, C)\n→ 取最高 A: $200\nGroup 2: CASHBACK (D)\n→ 保留 D: $2\nTotal: $202]
+    SAME_TYPE_EXCL --> GROUP_BY_TYPE["按類型分組\n━━━━━━━━━━━━\nGroup 1: DEPOSIT_BONUS (A, B, C)\n→ 取最高 A: $200\nGroup 2: CASHBACK (D)\n→ 保留 D: $2\nTotal: $202"]
 
-    CONDITIONAL_STACK -->|跨類別可疊加| CROSS_CATEGORY[跨類別疊加\n━━━━━━━━━━━━\nExample:\n• DEPOSIT_BONUS: $200 (A)\n• CASHBACK: $2 (D)\n• FREE_SPINS: 50 spins (E)\nRule: 不同錢包類型可疊加]
+    CONDITIONAL_STACK -->|跨類別可疊加| CROSS_CATEGORY["跨類別疊加\n━━━━━━━━━━━━\nExample:\n• DEPOSIT_BONUS: $200 (A)\n• CASHBACK: $2 (D)\n• FREE_SPINS: 50 spins (E)\nRule: 不同錢包類型可疊加"]
 
     SELECT_MAX_EXCL --> FINAL_DEPOSIT[DEPOSIT 最終獎勵: A]
     SELECT_PRIORITY_EXCL --> FINAL_DEPOSIT
@@ -829,39 +829,39 @@ flowchart TD
     GROUP_BY_TYPE --> FINAL_STACK
     CROSS_CATEGORY --> FINAL_STACK
 
-    FINAL_DEPOSIT --> MERGE_CATEGORIES[4️⃣ 合併跨類別獎勵\n━━━━━━━━━━━━]
+    FINAL_DEPOSIT --> MERGE_CATEGORIES["4️⃣ 合併跨類別獎勵\n━━━━━━━━━━━━"]
     CB_LIST --> MERGE_CATEGORIES
     FB_LIST --> MERGE_CATEGORIES
     TOUR_LIST --> MERGE_CATEGORIES
     FINAL_STACK --> MERGE_CATEGORIES
 
-    MERGE_CATEGORIES --> WALLET_SEPARATION{5️⃣ 錢包隔離檢查\n━━━━━━━━━━━━}
+    MERGE_CATEGORIES --> WALLET_SEPARATION{"5️⃣ 錢包隔離檢查\n━━━━━━━━━━━━"}
 
-    WALLET_SEPARATION --> WALLET_BONUS[Bonus Wallet\n━━━━━━━━━━━━\n• DEPOSIT_BONUS: $200\n• 需完成流水 25x\n• 有效期 14 天]
+    WALLET_SEPARATION --> WALLET_BONUS["Bonus Wallet\n━━━━━━━━━━━━\n• DEPOSIT_BONUS: $200\n• 需完成流水 25x\n• 有效期 14 天"]
 
-    WALLET_SEPARATION --> WALLET_CASH[Cash Wallet\n━━━━━━━━━━━━\n• CASHBACK: $2\n• 無流水要求\n• 立即可提]
+    WALLET_SEPARATION --> WALLET_CASH["Cash Wallet\n━━━━━━━━━━━━\n• CASHBACK: $2\n• 無流水要求\n• 立即可提"]
 
-    WALLET_SEPARATION --> WALLET_FREEBET[Free Bet Token\n━━━━━━━━━━━━\n• FREE_BET: (無)\n• Token ID: (N/A)]
+    WALLET_SEPARATION --> WALLET_FREEBET["Free Bet Token\n━━━━━━━━━━━━\n• FREE_BET: (無)\n• Token ID: (N/A)"]
 
-    WALLET_BONUS --> WAGERING_CONFLICT{6️⃣ 流水衝突處理\n━━━━━━━━━━━━}
+    WALLET_BONUS --> WAGERING_CONFLICT{"6️⃣ 流水衝突處理\n━━━━━━━━━━━━"}
 
-    WAGERING_CONFLICT -->|隔離模式 ISOLATED| ISOLATED_WAGER[各活動獨立追蹤流水\n━━━━━━━━━━━━\nExample:\n• Bonus A: 需完成 $5,000\n• Bonus B: 需完成 $2,500\n玩家投注 $100:\n• A 進度: +$100\n• B 進度: +$100\n兩者獨立計算]
+    WAGERING_CONFLICT -->|隔離模式 ISOLATED| ISOLATED_WAGER["各活動獨立追蹤流水\n━━━━━━━━━━━━\nExample:\n• Bonus A: 需完成 $5,000\n• Bonus B: 需完成 $2,500\n玩家投注 $100:\n• A 進度: +$100\n• B 進度: +$100\n兩者獨立計算"]
 
-    WAGERING_CONFLICT -->|共用模式 SHARED| SHARED_WAGER[所有活動共用流水池\n━━━━━━━━━━━━\nTotal Required: $7,500\n玩家投注 $100:\n• 共用進度: +$100\n完成優先級:\n• 先完成 priority 最高的]
+    WAGERING_CONFLICT -->|共用模式 SHARED| SHARED_WAGER["所有活動共用流水池\n━━━━━━━━━━━━\nTotal Required: $7,500\n玩家投注 $100:\n• 共用進度: +$100\n完成優先級:\n• 先完成 priority 最高的"]
 
-    WAGERING_CONFLICT -->|順序模式 SEQUENTIAL| SEQUENTIAL_WAGER[按順序依次完成\n━━━━━━━━━━━━\nQueue:\n1️⃣ Bonus A (priority=1)\n2️⃣ Bonus B (priority=10)\n玩家投注僅計入當前 Bonus\n完成 A 後才開始追蹤 B]
+    WAGERING_CONFLICT -->|順序模式 SEQUENTIAL| SEQUENTIAL_WAGER["按順序依次完成\n━━━━━━━━━━━━\nQueue:\n1️⃣ Bonus A (priority=1)\n2️⃣ Bonus B (priority=10)\n玩家投注僅計入當前 Bonus\n完成 A 後才開始追蹤 B"]
 
-    ISOLATED_WAGER --> GAME_CONTRIBUTION{7️⃣ 遊戲貢獻率衝突\n━━━━━━━━━━━━}
+    ISOLATED_WAGER --> GAME_CONTRIBUTION{"7️⃣ 遊戲貢獻率衝突\n━━━━━━━━━━━━"}
     SHARED_WAGER --> GAME_CONTRIBUTION
     SEQUENTIAL_WAGER --> GAME_CONTRIBUTION
 
-    GAME_CONTRIBUTION -->|統一貢獻率| UNIFIED_CONTRIB[所有活動使用全局貢獻率\n━━━━━━━━━━━━\nGame Weights:\n• Slots: 100%\n• Baccarat: 10%\n• Blackjack: 5%\n適用於所有活動]
+    GAME_CONTRIBUTION -->|統一貢獻率| UNIFIED_CONTRIB["所有活動使用全局貢獻率\n━━━━━━━━━━━━\nGame Weights:\n• Slots: 100%\n• Baccarat: 10%\n• Blackjack: 5%\n適用於所有活動"]
 
-    GAME_CONTRIBUTION -->|活動專屬貢獻率| EXCLUSIVE_CONTRIB[各活動自定義貢獻率\n━━━━━━━━━━━━\nExample:\n• Bonus A (老虎機專屬):\n  Slots=100%, Others=0%\n• Bonus B (全遊戲):\n  All Games=100%\n玩家玩百家樂:\n• A 不計流水\n• B 計入流水]
+    GAME_CONTRIBUTION -->|活動專屬貢獻率| EXCLUSIVE_CONTRIB["各活動自定義貢獻率\n━━━━━━━━━━━━\nExample:\n• Bonus A (老虎機專屬):\n  Slots=100%, Others=0%\n• Bonus B (全遊戲):\n  All Games=100%\n玩家玩百家樂:\n• A 不計流水\n• B 計入流水"]
 
-    GAME_CONTRIBUTION -->|取最低貢獻率| MIN_CONTRIB[衝突時取最嚴格限制\n━━━━━━━━━━━━\nExample:\n• Bonus A: Baccarat=10%\n• Bonus B: Baccarat=15%\nResult: 使用 10% (更嚴格)\nReason: 防止濫用]
+    GAME_CONTRIBUTION -->|取最低貢獻率| MIN_CONTRIB["衝突時取最嚴格限制\n━━━━━━━━━━━━\nExample:\n• Bonus A: Baccarat=10%\n• Bonus B: Baccarat=15%\nResult: 使用 10% (更嚴格)\nReason: 防止濫用"]
 
-    UNIFIED_CONTRIB --> FINAL_RESULT[8️⃣ 生成最終決策\n━━━━━━━━━━━━]
+    UNIFIED_CONTRIB --> FINAL_RESULT["8️⃣ 生成最終決策\n━━━━━━━━━━━━"]
     EXCLUSIVE_CONTRIB --> FINAL_RESULT
     MIN_CONTRIB --> FINAL_RESULT
     WALLET_CASH --> FINAL_RESULT
@@ -869,7 +869,7 @@ flowchart TD
 
     FINAL_RESULT --> RESULT_OUTPUT[最終獎勵方案\n━━━━━━━━━━━━\nRewardDecision:\n• selected_promotions: [A, D]\n• bonus_wallet: $200 (25x wager, 14d)\n• cash_wallet: $2 (no wager)\n• wagering_mode: ISOLATED\n• game_contrib: UNIFIED]
 
-    RESULT_OUTPUT --> NOTIFY_PLAYER[通知玩家\n━━━━━━━━━━━━\n• 彈窗展示獲得獎勵\n• 說明流水要求\n• 顯示有效期倒計時]
+    RESULT_OUTPUT --> NOTIFY_PLAYER["通知玩家\n━━━━━━━━━━━━\n• 彈窗展示獲得獎勵\n• 說明流水要求\n• 顯示有效期倒計時"]
 
     NOTIFY_PLAYER --> AUDIT_DECISION[審計決策記錄\n━━━━━━━━━━━━\npromotion_decisions:\n• matched_rules: [A,B,C,D]\n• selected_rules: [A,D]\n• rejection_reasons:\n  - B: 互斥組內落選\n  - C: 互斥組內落選\n• conflict_resolution: MAX_REWARD\n• operator: SYSTEM]
 
