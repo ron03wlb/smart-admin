@@ -7,12 +7,12 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: true
 prerequisites:
-  - foundation/01-naming-conventions.md
-  - foundation/02-oop-principles.md
+  - foundation/F01-naming-conventions.md
+  - foundation/F02-oop-principles.md
 related_rules:
-  - technology/functional/08-vavr-fundamentals.md
-  - technology/database/09-mybatis-plus-core.md
-  - foundation/09-manager-layer.md
+  - technology/functional/P01-vavr-fundamentals.md
+  - technology/database/D04-mybatis-plus-core.md
+  - foundation/F03-manager-layer.md
 archunit_test: ArchitectureTest#layerDependencies
 last_updated: 2025-01-17
 ---

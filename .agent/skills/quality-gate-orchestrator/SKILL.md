@@ -62,11 +62,11 @@ Generates unified report at `build/reports/quality-gate-report.md`:
 
 ## Related Rules
 
-- [quality-tools/11-checkstyle-rules.md](../../rules/quality-tools/11-checkstyle-rules.md)
-- [quality-tools/12-pmd-rules.md](../../rules/quality-tools/12-pmd-rules.md)
-- [quality-tools/13-spotbugs-rules.md](../../rules/quality-tools/13-spotbugs-rules.md)
-- [quality-tools/14-spotless-rules.md](../../rules/quality-tools/14-spotless-rules.md)
-- [quality-tools/16-jacoco-coverage-rules.md](../../rules/quality-tools/16-jacoco-coverage-rules.md)
+- [quality-tools/Q01-checkstyle-rules.md](../../rules/quality-tools/Q01-checkstyle-rules.md)
+- [quality-tools/Q02-pmd-rules.md](../../rules/quality-tools/Q02-pmd-rules.md)
+- [quality-tools/Q03-spotbugs-rules.md](../../rules/quality-tools/Q03-spotbugs-rules.md)
+- [quality-tools/Q04-spotless-rules.md](../../rules/quality-tools/Q04-spotless-rules.md)
+- [quality-tools/Q06-jacoco-coverage-rules.md](../../rules/quality-tools/Q06-jacoco-coverage-rules.md)
 
 ## Example Session
 

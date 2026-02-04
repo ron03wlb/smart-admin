@@ -220,7 +220,7 @@ WHERE a = 1 AND c = 3 -- Skip b, only uses a
 
 ## Related Rules
 
-- **Advanced Features**: [technology/database/05-postgresql-advanced.md](./05-postgresql-advanced.md) - JSONB, Array, CTE, Window Functions
-- **MyBatis Integration**: [technology/database/05-postgresql-mybatis.md](./05-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
+- **Advanced Features**: [technology/database/D02-postgresql-advanced.md](./D02-postgresql-advanced.md) - JSONB, Array, CTE, Window Functions
+- **MyBatis Integration**: [technology/database/D03-postgresql-mybatis.md](./D03-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
 - **MyBatis Plus**: [technology/database/09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - Core Configuration
-- **Vavr Integration**: [technology/functional/08-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md) - Functional Query
+- **Vavr Integration**: [technology/functional/P03-vavr-mybatis-integration.md](./08-vavr-mybatis-integration.md) - Functional Query

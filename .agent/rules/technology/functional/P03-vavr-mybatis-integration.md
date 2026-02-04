@@ -4,10 +4,10 @@ description: Vavr and MyBatis Plus Integration
 tags: [vavr, mybatis-plus, integration, functional-programming]
 positioning: ideal
 prerequisites:
-  - technology/functional/08-vavr-fundamentals.md
+  - technology/functional/P01-vavr-fundamentals.md
   - technology/database/09-mybatis-plus-core.md
 related_rules:
-  - technology/database/05-postgresql-mybatis.md
+  - technology/database/D03-postgresql-mybatis.md
 last_updated: 2025-01-12
 ---
 
@@ -358,4 +358,4 @@ public io.vavr.collection.List<UserVO> getActiveUsers_Vavr() {
 - [08-vavr-fundamentals.md](./08-vavr-fundamentals.md) - Option, Try fundamentals
 - [08-vavr-advanced.md](./08-vavr-advanced.md) - Either, collections, pattern matching
 - [09-mybatis-plus-core.md](../database/09-mybatis-plus-core.md) - MyBatis Plus core usage
-- [05-postgresql-mybatis.md](../database/05-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
+- [05-postgresql-mybatis.md](../database/D03-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration

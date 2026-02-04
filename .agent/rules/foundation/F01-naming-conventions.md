@@ -9,8 +9,8 @@ ask_before_fix: false
 prerequisites: []
 conflicts_with: []
 related_rules:
-  - foundation/10-architecture-rules.md
-  - foundation/02-oop-principles.md
+  - foundation/F04-architecture-rules.md
+  - foundation/F02-oop-principles.md
 archunit_test: ArchitectureTest#controllerNaming,ArchitectureTest#noBooleanFieldWithIsPrefix
 checkstyle_rule: TypeName,MethodName,ConstantName
 spotbugs_rule: none

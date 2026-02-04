@@ -24,7 +24,7 @@ Controller → Service → Dao → Database
 
 **❌ 禁止** Controller 直接呼叫 Dao！
 
-**詳細規範**: [rules/10-architecture-rules.md](../rules/10-architecture-rules.md)
+**詳細規範**: [rules/10-architecture-rules.md](../rules/foundation/F04-architecture-rules.md)
 
 ### 1.2 領域物件層次
 
@@ -155,8 +155,8 @@ public Try<User> createUser(UserCreateDTO dto) {
 ```
 
 **詳細規範**:
-- [rules/08-vavr-fundamentals.md](../rules/08-vavr-fundamentals.md) - Option、Try 基礎
-- [rules/08-vavr-advanced.md](../rules/08-vavr-advanced.md) - Either、集合、模式匹配
+- [rules/08-vavr-fundamentals.md](../rules/technology/functional/P01-vavr-fundamentals.md) - Option、Try 基礎
+- [rules/08-vavr-advanced.md](../rules/technology/functional/P01-vavr-advanced.md) - Either、集合、模式匹配
 
 ### 1.10 PostgreSQL 特性
 
@@ -183,8 +183,8 @@ public class Article {
 ```
 
 **詳細規範**:
-- [rules/05-postgresql-advanced.md](../rules/technology/database/05-postgresql-advanced.md)
-- [rules/05-postgresql-mybatis.md](../rules/technology/database/05-postgresql-mybatis.md)
+- [rules/05-postgresql-advanced.md](../rules/technology/database/D01-postgresql-advanced.md)
+- [rules/05-postgresql-mybatis.md](../rules/technology/database/D01-postgresql-mybatis.md)
 
 ---
 
@@ -263,7 +263,7 @@ export interface CategoryAddForm {
    - 布林值以 is/has/can 開頭
    - 集合以複數形式命名
 
-**詳細規範**: [rules/01-naming-conventions.md](../rules/01-naming-conventions.md)
+**詳細規範**: [rules/01-naming-conventions.md](../rules/foundation/F01-naming-conventions.md)
 
 ### 3.2 Java 規範
 
@@ -332,7 +332,7 @@ deleted_flag TINYINT(1) DEFAULT 0
 - 使用自增主鍵: `{table_name}_id BIGINT PRIMARY KEY AUTO_INCREMENT`
 - Entity 中使用 `@TableId(type = IdType.AUTO)`
 
-**詳細規範**: [rules/05-postgresql-basics.md](../rules/05-postgresql-basics.md)
+**詳細規範**: [rules/05-postgresql-basics.md](../rules/technology/database/D01-postgresql-basics.md)
 
 ---
 

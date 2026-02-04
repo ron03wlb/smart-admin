@@ -24,8 +24,8 @@
 **觸發詞**：「生成CRUD」、「新增模塊」
 
 **相關規則**：
-- [10-architecture-rules.md](../rules/foundation/10-architecture-rules.md)
-- [01-naming-conventions.md](../rules/foundation/01-naming-conventions.md)
+- [10-architecture-rules.md](../rules/foundation/F04-architecture-rules.md)
+- [01-naming-conventions.md](../rules/foundation/F01-naming-conventions.md)
 
 ### 2. quality-gate-orchestrator
 **用途**：多工具品質門檻編排（Checkstyle, PMD, SpotBugs, ArchUnit）
@@ -33,8 +33,8 @@
 **觸發詞**：「品質檢查」、「SonarQube本地」
 
 **相關規則**：
-- [11-checkstyle-rules.md](../rules/quality-tools/11-checkstyle-rules.md)
-- [12-pmd-rules.md](../rules/quality-tools/12-pmd-rules.md)
+- [11-checkstyle-rules.md](../rules/quality-tools/Q01-checkstyle-rules.md)
+- [12-pmd-rules.md](../rules/quality-tools/Q02-pmd-rules.md)
 
 ### 3. smartadmin-testing-suite
 **用途**：SmartAdmin測試套件（單元測試+整合測試+ArchUnit）
@@ -42,7 +42,7 @@
 **觸發詞**：「執行測試」、「測試套件」
 
 **相關規則**：
-- [16-jacoco-coverage-rules.md](../rules/quality-tools/16-jacoco-coverage-rules.md)
+- [16-jacoco-coverage-rules.md](../rules/quality-tools/Q06-jacoco-coverage-rules.md)
 - [ArchitectureTest.java](../configs/ArchitectureTest.java)
 
 ## 新增技能指南

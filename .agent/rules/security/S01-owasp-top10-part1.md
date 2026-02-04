@@ -244,6 +244,6 @@ public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO dto) {
 
 ## Related Standards
 
-- **Part 2**: `security/07-owasp-top10-part2.md` - A05-A10 Security Configuration, Authentication, SSRF
+- **Part 2**: `security/S02-owasp-top10-part2.md` - A05-A10 Security Configuration, Authentication, SSRF
 - **MyBatis Plus**: `technology/database/09-mybatis-plus-core.md` - Lambda Query for SQL Injection Protection
 - **CI/CD Pipeline**: `workflows/java-ci-cd-pipeline.md` - Integrate SpotBugs + FindSecBugs

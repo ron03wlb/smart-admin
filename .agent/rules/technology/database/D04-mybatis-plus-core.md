@@ -7,9 +7,9 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - technology/database/05-postgresql-mybatis.md
-  - technology/functional/08-vavr-mybatis-integration.md
-  - foundation/10-architecture-rules.md
+  - technology/database/D03-postgresql-mybatis.md
+  - technology/functional/P03-vavr-mybatis-integration.md
+  - foundation/F04-architecture-rules.md
 last_updated: 2025-01-21
 ---
 
@@ -221,6 +221,6 @@ WHERE deleted_at IS NULL;
 - [ ] Pagination query max limit set to 500
 
 ## Related Specifications
-- **PostgreSQL + MyBatis Integration**: [05-postgresql-mybatis.md](./05-postgresql-mybatis.md)
-- **PostgreSQL Advanced Features**: [05-postgresql-advanced.md](./05-postgresql-advanced.md)
+- **PostgreSQL + MyBatis Integration**: [05-postgresql-mybatis.md](./D03-postgresql-mybatis.md)
+- **PostgreSQL Advanced Features**: [05-postgresql-advanced.md](./D02-postgresql-advanced.md)
 - **Database Design**: [04-database-design.md](./04-database-design.md)

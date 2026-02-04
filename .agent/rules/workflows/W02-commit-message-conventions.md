@@ -357,4 +357,4 @@ npx commitlint --from origin/main --to HEAD
 ## Related Specifications
 
 - **AI Decision Matrix**: [00-INDEX.md](./00-ai-decision-matrix.md)
-- **Naming Conventions**: [foundation/01-naming-conventions.md](./01-naming-conventions.md)
+- **Naming Conventions**: [foundation/F01-naming-conventions.md](./01-naming-conventions.md)

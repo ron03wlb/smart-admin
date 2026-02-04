@@ -165,7 +165,7 @@ public class ArchitectureTest {
      * }
      * </pre>
      *
-     * <p>规则来源：.agent/rules/foundation/10-architecture-rules.md
+     * <p>规则来源：.agent/rules/foundation/F04-architecture-rules.md
      *
      * @since 4.1.0
      */
@@ -174,7 +174,7 @@ public class ArchitectureTest {
         .that().areDeclaredInClassesThat()
         .resideInAnyPackage("..controller..", "..service..", "..manager..")
         .should().notBeAnnotatedWith(jakarta.annotation.Resource.class)
-        .as("禁止@Resource字段注入，使用@RequiredArgsConstructor构造函数注入（规则：foundation/10-architecture-rules.md）");
+        .as("禁止@Resource字段注入，使用@RequiredArgsConstructor构造函数注入（规则：foundation/F04-architecture-rules.md）");
 
     // ========== 分层访问约束 ==========
 
@@ -188,14 +188,14 @@ public class ArchitectureTest {
      * 【嚴格執行】Service 層禁止使用 @Transactional
      * P0-4 Fix: 所有事務操作必須在 Manager 層
      *
-     * 規則來源：foundation/10-architecture-rules.md
+     * 規則來源：foundation/F04-architecture-rules.md
      */
     @ArchTest
     static final ArchRule serviceShouldNotUseTransactional = methods()
         .that().areDeclaredInClassesThat().resideInAPackage("..service..")
         .and().areAnnotatedWith(org.springframework.transaction.annotation.Transactional.class)
         .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
-        .as("Service 層方法不能使用 @Transactional，所有事務操作必須在 Manager 層（規則：foundation/10-architecture-rules.md）");
+        .as("Service 層方法不能使用 @Transactional，所有事務操作必須在 Manager 層（規則：foundation/F04-architecture-rules.md）");
 
     /**
      * 【嚴格執行】Manager 層禁止調用業務 Service 層

@@ -7,8 +7,8 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - foundation/02-oop-principles.md
-  - foundation/10-architecture-rules.md
+  - foundation/F02-oop-principles.md
+  - foundation/F04-architecture-rules.md
 archunit_test: ArchitectureTest#useSLF4JFacade
 last_updated: 2025-01-25
 ---

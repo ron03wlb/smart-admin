@@ -7,8 +7,8 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - foundation/02-oop-principles.md
-  - technology/patterns/03-concurrency-rules.md
+  - foundation/F02-oop-principles.md
+  - technology/patterns/P04-concurrency-rules.md
 last_updated: 2025-01-21
 ---
 

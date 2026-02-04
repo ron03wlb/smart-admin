@@ -4,7 +4,7 @@ description: Vavr Advanced - Either, Collections, Pattern Matching
 tags: [vavr, functional-programming, either, collections, pattern-matching]
 positioning: ideal
 prerequisites:
-  - technology/functional/08-vavr-fundamentals.md
+  - technology/functional/P01-vavr-fundamentals.md
 last_updated: 2025-01-12
 ---
 

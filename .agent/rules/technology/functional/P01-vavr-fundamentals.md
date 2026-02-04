@@ -7,12 +7,12 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 prerequisites:
-  - foundation/01-naming-conventions.md
-  - foundation/10-architecture-rules.md
+  - foundation/F01-naming-conventions.md
+  - foundation/F04-architecture-rules.md
 conflicts_with: []
 related_rules:
-  - technology/functional/08-vavr-advanced.md
-  - technology/functional/08-vavr-mybatis-integration.md
+  - technology/functional/P02-vavr-advanced.md
+  - technology/functional/P03-vavr-mybatis-integration.md
 archunit_test: ArchitectureTest#serviceUsesVavrOption
 checkstyle_rule: none
 spotbugs_rule: none

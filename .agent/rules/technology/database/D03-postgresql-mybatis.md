@@ -4,11 +4,11 @@ description: PostgreSQL + MyBatis Plus Integration - Configuration, TypeHandlers
 tags: [postgresql, mybatis-plus, typehandler, jsonb, arrays, vavr, migration, performance, optimization]
 positioning: comprehensive
 prerequisites:
-  - technology/database/05-postgresql-basics.md
+  - technology/database/D01-postgresql-basics.md
   - technology/database/09-mybatis-plus-core.md
-  - technology/database/05-postgresql-advanced.md
+  - technology/database/D02-postgresql-advanced.md
 related_rules:
-  - technology/functional/08-vavr-mybatis-integration.md
+  - technology/functional/P03-vavr-mybatis-integration.md
 last_updated: 2025-01-27
 ---
 
@@ -17,9 +17,9 @@ last_updated: 2025-01-27
 **TL;DR**: Complete guide for PostgreSQL + MyBatis Plus integration covering configuration, custom TypeHandlers (JSONB/arrays), SQL optimization (prohibit SELECT *, pagination optimization), MySQL→PostgreSQL migration (type mapping, syntax differences), Vavr functional patterns (Option/Try/Either), and performance tuning (VACUUM, connection pool, GIN indexes).
 
 **Prerequisites**:
-- [05-postgresql-basics.md](./05-postgresql-basics.md) - PostgreSQL Basic Rules
+- [05-postgresql-basics.md](./D01-postgresql-basics.md) - PostgreSQL Basic Rules
 - [09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - MyBatis Plus Core Configuration
-- [05-postgresql-advanced.md](./05-postgresql-advanced.md) - JSONB and Advanced Features
+- [05-postgresql-advanced.md](./D02-postgresql-advanced.md) - JSONB and Advanced Features
 
 ---
 
@@ -168,7 +168,7 @@ public class Order {
 </select>
 ```
 
-> **Reference**: For JSONB operators and indexes, see [05-postgresql-advanced.md](./05-postgresql-advanced.md#jsonb-operations)
+> **Reference**: For JSONB operators and indexes, see [05-postgresql-advanced.md](./D02-postgresql-advanced.md#jsonb-operations)
 
 ---
 
@@ -516,7 +516,7 @@ public class UserRegistrationService {
 }
 ```
 
-> **Reference**: For detailed Vavr usage, see [08-vavr-mybatis-integration.md](../functional/08-vavr-mybatis-integration.md)
+> **Reference**: For detailed Vavr usage, see [P03-vavr-mybatis-integration.md](../functional/P03-vavr-mybatis-integration.md)
 
 ---
 
@@ -771,7 +771,7 @@ private OffsetDateTime createdAt;
 
 ## Related Rules
 
-- **Basic Rules**: [05-postgresql-basics.md](./05-postgresql-basics.md) - Table Creation and Indexing
-- **Advanced Features**: [05-postgresql-advanced.md](./05-postgresql-advanced.md) - JSONB, CTE, Window Functions
+- **Basic Rules**: [05-postgresql-basics.md](./D01-postgresql-basics.md) - Table Creation and Indexing
+- **Advanced Features**: [05-postgresql-advanced.md](./D02-postgresql-advanced.md) - JSONB, CTE, Window Functions
 - **MyBatis Plus Core**: [09-mybatis-plus-core.md](./09-mybatis-plus-core.md) - Basic Configuration
-- **Vavr Integration**: [../functional/08-vavr-mybatis-integration.md](../functional/08-vavr-mybatis-integration.md) - Functional Query
+- **Vavr Integration**: [../functional/P03-vavr-mybatis-integration.md](../functional/P03-vavr-mybatis-integration.md) - Functional Query

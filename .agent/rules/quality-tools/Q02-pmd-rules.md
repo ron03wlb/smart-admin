@@ -7,8 +7,8 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - foundation/02-oop-principles.md
-  - technology/patterns/04-exception-logging.md
+  - foundation/F02-oop-principles.md
+  - technology/patterns/P05-exception-logging.md
 last_updated: 2026-01-22
 ---
 

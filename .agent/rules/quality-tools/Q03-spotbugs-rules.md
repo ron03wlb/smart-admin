@@ -7,8 +7,8 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - technology/patterns/03-concurrency-rules.md
-  - security/07-owasp-top10-part1.md
+  - technology/patterns/P04-concurrency-rules.md
+  - security/S01-owasp-top10-part1.md
 spotbugs_rule: NP_NULL_ON_SOME_PATH,DM_STRING_CTOR,SQL_INJECTION,EI_EXPOSE_REP,EI_EXPOSE_REP2,ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD,CT_CONSTRUCTOR_THROW
 last_updated: 2026-01-22
 ---

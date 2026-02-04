@@ -7,10 +7,10 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - security/07-owasp-top10-part1.md
-  - quality-tools/11-checkstyle-rules.md
-  - quality-tools/12-pmd-rules.md
-  - quality-tools/13-spotbugs-rules.md
+  - security/S01-owasp-top10-part1.md
+  - quality-tools/Q01-checkstyle-rules.md
+  - quality-tools/Q02-pmd-rules.md
+  - quality-tools/Q03-spotbugs-rules.md
 last_updated: 2025-01-21
 ---
 

@@ -7,10 +7,10 @@ ai_role: orchestrator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - foundation/01-naming-conventions.md
-  - foundation/10-architecture-rules.md
-  - technology/functional/08-vavr-fundamentals.md
-  - quality-tools/11-checkstyle-rules.md
+  - foundation/F01-naming-conventions.md
+  - foundation/F04-architecture-rules.md
+  - technology/functional/P01-vavr-fundamentals.md
+  - quality-tools/Q01-checkstyle-rules.md
 last_updated: 2026-01-27
 ---
 
@@ -62,64 +62,64 @@ Before responding to user requests, must:
 ```
 User Request Classification
 ├─ 1️⃣ Generate New Code
-│   ├─ Controller: [foundation/01-naming, foundation/10-architecture, technology/patterns/04-exception-logging]
-│   ├─ Service: [foundation/01-naming, foundation/02-oop, technology/functional/08-vavr, foundation/10-architecture]
-│   ├─ Repository/Mapper: [foundation/01-naming, technology/database/09-mybatis-plus, technology/database/05-postgresql]
-│   └─ Entity: [foundation/01-naming, technology/database/05-postgresql, technology/database/09-mybatis-plus]
+│   ├─ Controller: [foundation/F01-naming-conventions, foundation/F04-architecture-rules, technology/patterns/P05-exception-logging]
+│   ├─ Service: [foundation/F01-naming-conventions, foundation/F02-oop-principles, technology/functional/P01-vavr-fundamentals, foundation/F04-architecture-rules]
+│   ├─ Repository/Mapper: [foundation/F01-naming-conventions, technology/database/D04-mybatis-plus, technology/database/D01-postgresql]
+│   └─ Entity: [foundation/F01-naming-conventions, technology/database/D01-postgresql-basics, technology/database/D04-mybatis-plus]
 │
 ├─ 2️⃣ Code Review
-│   ├─ Architecture Violation: [foundation/10-architecture-rules] → ArchUnit
-│   ├─ Naming Convention: [foundation/01-naming] → Checkstyle
-│   ├─ Vavr Usage: [technology/functional/08-vavr-*] → Option/Try checks
-│   ├─ OOP Principles: [foundation/02-oop-principles]
-│   ├─ Concurrency Safety: [technology/patterns/03-concurrency-rules]
-│   └─ Security Check: [security/07-owasp-top10-*]
+│   ├─ Architecture Violation: [foundation/F04-architecture-rules] → ArchUnit
+│   ├─ Naming Convention: [foundation/F01-naming-conventions] → Checkstyle
+│   ├─ Vavr Usage: [technology/functional/P01-vavr-fundamentals-*] → Option/Try checks
+│   ├─ OOP Principles: [foundation/F02-oop-principles]
+│   ├─ Concurrency Safety: [technology/patterns/P04-concurrency-rules]
+│   └─ Security Check: [security/S01-owasp-top10-*]
 │
 ├─ 3️⃣ Database Operations
-│   ├─ Table Creation: [technology/database/05-postgresql-basics]
-│   ├─ JSONB/CTE/Window Functions: [technology/database/05-postgresql-advanced]
-│   ├─ MyBatis Mapper: [technology/database/09-mybatis-plus-*]
-│   └─ MySQL to PG Migration: [technology/database/05-postgresql-mybatis]
+│   ├─ Table Creation: [technology/database/D01-postgresql-basics]
+│   ├─ JSONB/CTE/Window Functions: [technology/database/D02-postgresql-advanced]
+│   ├─ MyBatis Mapper: [technology/database/D04-mybatis-plus-*]
+│   └─ MySQL to PG Migration: [technology/database/D03-postgresql-mybatis]
 │
 ├─ 4️⃣ Error Diagnosis
 │   ├─ Compilation Error: Workflow [java-failure-recovery]
-│   ├─ ArchUnit Failure: [foundation/10-architecture] + corresponding rules
+│   ├─ ArchUnit Failure: [foundation/F04-architecture-rules] + corresponding rules
 │   ├─ Quality Gate Failure: Workflow [quality-gates-local-ci]
-│   └─ Runtime Error: [technology/functional/08-vavr (Try), technology/patterns/04-exception-logging]
+│   └─ Runtime Error: [technology/functional/P01-vavr-fundamentals (Try), technology/patterns/P05-exception-logging]
 │
 ├─ 5️⃣ Static Analysis Tools
-│   ├─ Checkstyle: [quality-tools/11-checkstyle-rules] → ./gradlew checkstyleMain
-│   ├─ PMD: [quality-tools/12-pmd-rules] → ./gradlew pmdMain
-│   ├─ SpotBugs: [quality-tools/13-spotbugs-rules] → ./gradlew spotbugsMain
-│   ├─ Spotless: [quality-tools/14-spotless-rules] → ./gradlew spotlessApply
-│   ├─ Error Prone: [quality-tools/15-error-prone-rules]
-│   └─ JaCoCo: [quality-tools/16-jacoco-coverage-rules]
+│   ├─ Checkstyle: [quality-tools/Q01-checkstyle-rules] → ./gradlew checkstyleMain
+│   ├─ PMD: [quality-tools/Q02-pmd-rules] → ./gradlew pmdMain
+│   ├─ SpotBugs: [quality-tools/Q03-spotbugs-rules] → ./gradlew spotbugsMain
+│   ├─ Spotless: [quality-tools/Q04-spotless-rules] → ./gradlew spotlessApply
+│   ├─ Error Prone: [quality-tools/Q05-error-prone-rules]
+│   └─ JaCoCo: [quality-tools/Q06-jacoco-coverage-rules]
 │
 └─ 6️⃣ Knowledge Query
-    ├─ PostgreSQL: [technology/database/05-postgresql-*]
-    ├─ Vavr: [technology/functional/08-vavr-*]
-    ├─ MyBatis Plus: [technology/database/09-mybatis-plus-*]
-    └─ Architecture Design: [foundation/10-architecture-rules]
+    ├─ PostgreSQL: [technology/database/D01-postgresql-*]
+    ├─ Vavr: [technology/functional/P01-vavr-fundamentals-*]
+    ├─ MyBatis Plus: [technology/database/D04-mybatis-plus-*]
+    └─ Architecture Design: [foundation/F04-architecture-rules]
 ```
 
 ### 1.2 Rule Routing by Task Type
 
 | Task | Rule Files | Path |
 |------|-----------|------|
-| **Create Controller** | Naming, Architecture, Exception | [foundation/01-naming](foundation/01-naming-conventions.md)<br>[foundation/10-architecture](foundation/10-architecture-rules.md)<br>[technology/patterns/04-exception-logging](technology/patterns/04-exception-logging.md) |
-| **Create Service** | Naming, OOP, Vavr, Architecture | [foundation/01-naming](foundation/01-naming-conventions.md)<br>[foundation/02-oop](foundation/02-oop-principles.md)<br>[technology/functional/08-vavr](technology/functional/08-vavr-fundamentals.md)<br>[foundation/10-architecture](foundation/10-architecture-rules.md) |
-| **Create Mapper/Dao** | Naming, MyBatis Plus, PostgreSQL | [foundation/01-naming](foundation/01-naming-conventions.md)<br>[technology/database/09-mybatis-plus-core](technology/database/09-mybatis-plus-core.md)<br>[technology/database/05-postgresql-basics](technology/database/05-postgresql-basics.md) |
-| **Create Entity** | Naming, PostgreSQL, MyBatis Plus | [foundation/01-naming](foundation/01-naming-conventions.md)<br>[technology/database/05-postgresql-basics](technology/database/05-postgresql-basics.md)<br>[technology/database/09-mybatis-plus-core](technology/database/09-mybatis-plus-core.md) |
-| **PostgreSQL Table** | PostgreSQL Basics | [technology/database/05-postgresql-basics](technology/database/05-postgresql-basics.md) |
-| **JSONB Operations** | PostgreSQL Advanced | [technology/database/05-postgresql-advanced](technology/database/05-postgresql-advanced.md) |
-| **MyBatis TypeHandlers** | PostgreSQL MyBatis Integration | [technology/database/05-postgresql-mybatis](technology/database/05-postgresql-mybatis.md) |
-| **Optimize Queries** | PostgreSQL Advanced, MyBatis Integration | [technology/database/05-postgresql-advanced](technology/database/05-postgresql-advanced.md)<br>[technology/database/05-postgresql-mybatis](technology/database/05-postgresql-mybatis.md) |
-| **Vavr Refactoring** | Vavr Fundamentals, Vavr MyBatis | [technology/functional/08-vavr-fundamentals](technology/functional/08-vavr-fundamentals.md)<br>[technology/functional/08-vavr-mybatis-integration](technology/functional/08-vavr-mybatis-integration.md) |
-| **Concurrency Issues** | Concurrency Rules | [technology/patterns/03-concurrency-rules](technology/patterns/03-concurrency-rules.md) |
-| **Exception Handling** | Exception Logging, Vavr | [technology/patterns/04-exception-logging](technology/patterns/04-exception-logging.md)<br>[technology/functional/08-vavr-fundamentals](technology/functional/08-vavr-fundamentals.md) |
-| **Security Audit** | OWASP Top 10 | [security/07-owasp-top10-part1](security/07-owasp-top10-part1.md)<br>[security/07-owasp-top10-part2](security/07-owasp-top10-part2.md) |
-| **Manager Layer** | Manager Layer Patterns | [foundation/09-manager-layer](foundation/09-manager-layer.md) |
-| **Commit Message** | Commit Conventions | [workflows/17-commit-message-conventions](workflows/17-commit-message-conventions.md) |
+| **Create Controller** | Naming, Architecture, Exception | [foundation/F01-naming-conventions](foundation/F01-naming-conventions.md)<br>[foundation/F04-architecture-rules](foundation/F04-architecture-rules.md)<br>[technology/patterns/P05-exception-logging](technology/patterns/P05-exception-logging.md) |
+| **Create Service** | Naming, OOP, Vavr, Architecture | [foundation/F01-naming-conventions](foundation/F01-naming-conventions.md)<br>[foundation/F02-oop-principles](foundation/F02-oop-principles.md)<br>[technology/functional/P01-vavr-fundamentals](technology/functional/P01-vavr-fundamentals.md)<br>[foundation/F04-architecture-rules](foundation/F04-architecture-rules.md) |
+| **Create Mapper/Dao** | Naming, MyBatis Plus, PostgreSQL | [foundation/F01-naming-conventions](foundation/F01-naming-conventions.md)<br>[technology/database/D04-mybatis-plus-core](technology/database/D04-mybatis-plus-core.md)<br>[technology/database/D01-postgresql-basics](technology/database/D01-postgresql-basics.md) |
+| **Create Entity** | Naming, PostgreSQL, MyBatis Plus | [foundation/F01-naming-conventions](foundation/F01-naming-conventions.md)<br>[technology/database/D01-postgresql-basics](technology/database/D01-postgresql-basics.md)<br>[technology/database/D04-mybatis-plus-core](technology/database/D04-mybatis-plus-core.md) |
+| **PostgreSQL Table** | PostgreSQL Basics | [technology/database/D01-postgresql-basics](technology/database/D01-postgresql-basics.md) |
+| **JSONB Operations** | PostgreSQL Advanced | [technology/database/D02-postgresql-advanced](technology/database/D02-postgresql-advanced.md) |
+| **MyBatis TypeHandlers** | PostgreSQL MyBatis Integration | [technology/database/D03-postgresql-mybatis](technology/database/D03-postgresql-mybatis.md) |
+| **Optimize Queries** | PostgreSQL Advanced, MyBatis Integration | [technology/database/D02-postgresql-advanced](technology/database/D02-postgresql-advanced.md)<br>[technology/database/D03-postgresql-mybatis](technology/database/D03-postgresql-mybatis.md) |
+| **Vavr Refactoring** | Vavr Fundamentals, Vavr MyBatis | [technology/functional/P01-vavr-fundamentals](technology/functional/P01-vavr-fundamentals.md)<br>[technology/functional/P03-vavr-mybatis-integration](technology/functional/P03-vavr-mybatis-integration.md) |
+| **Concurrency Issues** | Concurrency Rules | [technology/patterns/P04-concurrency-rules](technology/patterns/P04-concurrency-rules.md) |
+| **Exception Handling** | Exception Logging, Vavr | [technology/patterns/P05-exception-logging](technology/patterns/P05-exception-logging.md)<br>[technology/functional/P01-vavr-fundamentals](technology/functional/P01-vavr-fundamentals.md) |
+| **Security Audit** | OWASP Top 10 | [security/S01-owasp-top10-part1](security/S01-owasp-top10-part1.md)<br>[security/S02-owasp-top10-part2](security/S02-owasp-top10-part2.md) |
+| **Manager Layer** | Manager Layer Patterns | [foundation/F03-manager-layer](foundation/F03-manager-layer.md) |
+| **Commit Message** | Commit Conventions | [workflows/W02-commit-message-conventions](workflows/W02-commit-message-conventions.md) |
 | **Quality Gate** | All Quality Tools | [quality-tools/](quality-tools/) |
 
 ### 1.3 Rule Files by Category
@@ -127,55 +127,55 @@ User Request Classification
 #### Foundation (Core Architecture)
 | File | Description | Path |
 |------|-------------|------|
-| 01-naming-conventions.md | Naming rules for classes, methods, variables | [foundation/01-naming-conventions.md](foundation/01-naming-conventions.md) |
-| 02-oop-principles.md | OOP best practices and SOLID principles | [foundation/02-oop-principles.md](foundation/02-oop-principles.md) |
-| 09-manager-layer.md | Manager layer transaction patterns | [foundation/09-manager-layer.md](foundation/09-manager-layer.md) |
-| 10-architecture-rules.md | Layered architecture constraints (ArchUnit) | [foundation/10-architecture-rules.md](foundation/10-architecture-rules.md) |
+| F01-naming-conventions.md | Naming rules for classes, methods, variables | [foundation/F01-naming-conventions.md](foundation/F01-naming-conventions.md) |
+| F02-oop-principles.md | OOP best practices and SOLID principles | [foundation/F02-oop-principles.md](foundation/F02-oop-principles.md) |
+| F03-manager-layer.md | Manager layer transaction patterns | [foundation/F03-manager-layer.md](foundation/F03-manager-layer.md) |
+| F04-architecture-rules.md | Layered architecture constraints (ArchUnit) | [foundation/F04-architecture-rules.md](foundation/F04-architecture-rules.md) |
 
 #### Technology/Database
 | File | Description | Path |
 |------|-------------|------|
-| 05-postgresql-basics.md | Table creation, types, indexes | [technology/database/05-postgresql-basics.md](technology/database/05-postgresql-basics.md) |
-| 05-postgresql-advanced.md | JSONB, arrays, CTE, window functions | [technology/database/05-postgresql-advanced.md](technology/database/05-postgresql-advanced.md) |
-| 05-postgresql-mybatis.md | **PostgreSQL + MyBatis Plus Integration**: Configuration, TypeHandlers (JSONB/Arrays), SQL Optimization, MySQL Migration, Vavr Integration, Performance Tuning | [technology/database/05-postgresql-mybatis.md](technology/database/05-postgresql-mybatis.md) |
-| 09-mybatis-plus-core.md | LambdaQueryWrapper, pagination, IEnum | [technology/database/09-mybatis-plus-core.md](technology/database/09-mybatis-plus-core.md) |
-| ~~05-postgresql-mybatis-integration.md~~ | ⚠️ Deprecated → Redirects to 05-postgresql-mybatis.md | [technology/database/05-postgresql-mybatis-integration.md](technology/database/05-postgresql-mybatis-integration.md) |
-| ~~09-mybatis-plus-postgresql.md~~ | ⚠️ Deprecated → Redirects to 05-postgresql-mybatis.md | [technology/database/09-mybatis-plus-postgresql.md](technology/database/09-mybatis-plus-postgresql.md) |
+| D01-postgresql-basics.md | Table creation, types, indexes | [technology/database/D01-postgresql-basics.md](technology/database/D01-postgresql-basics.md) |
+| D02-postgresql-advanced.md | JSONB, arrays, CTE, window functions | [technology/database/D02-postgresql-advanced.md](technology/database/D02-postgresql-advanced.md) |
+| D03-postgresql-mybatis.md | **PostgreSQL + MyBatis Plus Integration**: Configuration, TypeHandlers (JSONB/Arrays), SQL Optimization, MySQL Migration, Vavr Integration, Performance Tuning | [technology/database/D03-postgresql-mybatis.md](technology/database/D03-postgresql-mybatis.md) |
+| D04-mybatis-plus-core.md | LambdaQueryWrapper, pagination, IEnum | [technology/database/D04-mybatis-plus-core.md](technology/database/D04-mybatis-plus-core.md) |
+| ~~D05-postgresql-mybatis-integration.md~~ | ⚠️ Deprecated → Redirects to D03-postgresql-mybatis.md | [technology/database/D05-postgresql-mybatis-integration.md](technology/database/D05-postgresql-mybatis-integration.md) |
+| ~~D06-mybatis-plus-postgresql.md~~ | ⚠️ Deprecated → Redirects to D03-postgresql-mybatis.md | [technology/database/D06-mybatis-plus-postgresql.md](technology/database/D06-mybatis-plus-postgresql.md) |
 
 #### Technology/Functional
 | File | Description | Path |
 |------|-------------|------|
-| 08-vavr-fundamentals.md | Option, Try, functional patterns | [technology/functional/08-vavr-fundamentals.md](technology/functional/08-vavr-fundamentals.md) |
-| 08-vavr-advanced.md | Either, collections, pattern matching | [technology/functional/08-vavr-advanced.md](technology/functional/08-vavr-advanced.md) |
-| 08-vavr-mybatis-integration.md | Vavr + MyBatis Plus integration | [technology/functional/08-vavr-mybatis-integration.md](technology/functional/08-vavr-mybatis-integration.md) |
+| P01-vavr-fundamentals.md | Option, Try, functional patterns | [technology/functional/P01-vavr-fundamentals.md](technology/functional/P01-vavr-fundamentals.md) |
+| P02-vavr-advanced.md | Either, collections, pattern matching | [technology/functional/P02-vavr-advanced.md](technology/functional/P02-vavr-advanced.md) |
+| P03-vavr-mybatis-integration.md | Vavr + MyBatis Plus integration | [technology/functional/P03-vavr-mybatis-integration.md](technology/functional/P03-vavr-mybatis-integration.md) |
 
 #### Technology/Patterns
 | File | Description | Path |
 |------|-------------|------|
-| 03-concurrency-rules.md | Thread safety, concurrent collections | [technology/patterns/03-concurrency-rules.md](technology/patterns/03-concurrency-rules.md) |
-| 04-exception-logging.md | Exception handling and logging patterns | [technology/patterns/04-exception-logging.md](technology/patterns/04-exception-logging.md) |
+| P04-concurrency-rules.md | Thread safety, concurrent collections | [technology/patterns/P04-concurrency-rules.md](technology/patterns/P04-concurrency-rules.md) |
+| P05-exception-logging.md | Exception handling and logging patterns | [technology/patterns/P05-exception-logging.md](technology/patterns/P05-exception-logging.md) |
 
 #### Security
 | File | Description | Path |
 |------|-------------|------|
-| 07-owasp-top10-part1.md | OWASP Top 10 (1-5) | [security/07-owasp-top10-part1.md](security/07-owasp-top10-part1.md) |
-| 07-owasp-top10-part2.md | OWASP Top 10 (6-10) | [security/07-owasp-top10-part2.md](security/07-owasp-top10-part2.md) |
+| S01-owasp-top10-part1.md | OWASP Top 10 (1-5) | [security/S01-owasp-top10-part1.md](security/S01-owasp-top10-part1.md) |
+| S02-owasp-top10-part2.md | OWASP Top 10 (6-10) | [security/S02-owasp-top10-part2.md](security/S02-owasp-top10-part2.md) |
 
 #### Quality Tools
 | File | Description | Path |
 |------|-------------|------|
-| 11-checkstyle-rules.md | Checkstyle configuration and patterns | [quality-tools/11-checkstyle-rules.md](quality-tools/11-checkstyle-rules.md) |
-| 12-pmd-rules.md | PMD rules and suppressions | [quality-tools/12-pmd-rules.md](quality-tools/12-pmd-rules.md) |
-| 13-spotbugs-rules.md | SpotBugs exclusions and patterns | [quality-tools/13-spotbugs-rules.md](quality-tools/13-spotbugs-rules.md) |
-| 14-spotless-rules.md | Code formatting standards | [quality-tools/14-spotless-rules.md](quality-tools/14-spotless-rules.md) |
-| 15-error-prone-rules.md | Error Prone patterns | [quality-tools/15-error-prone-rules.md](quality-tools/15-error-prone-rules.md) |
-| 16-jacoco-coverage-rules.md | Test coverage requirements | [quality-tools/16-jacoco-coverage-rules.md](quality-tools/16-jacoco-coverage-rules.md) |
+| Q01-checkstyle-rules.md | Checkstyle configuration and patterns | [quality-tools/Q01-checkstyle-rules.md](quality-tools/Q01-checkstyle-rules.md) |
+| Q02-pmd-rules.md | PMD rules and suppressions | [quality-tools/Q02-pmd-rules.md](quality-tools/Q02-pmd-rules.md) |
+| Q03-spotbugs-rules.md | SpotBugs exclusions and patterns | [quality-tools/Q03-spotbugs-rules.md](quality-tools/Q03-spotbugs-rules.md) |
+| Q04-spotless-rules.md | Code formatting standards | [quality-tools/Q04-spotless-rules.md](quality-tools/Q04-spotless-rules.md) |
+| Q05-error-prone-rules.md | Error Prone patterns | [quality-tools/Q05-error-prone-rules.md](quality-tools/Q05-error-prone-rules.md) |
+| Q06-jacoco-coverage-rules.md | Test coverage requirements | [quality-tools/Q06-jacoco-coverage-rules.md](quality-tools/Q06-jacoco-coverage-rules.md) |
 
 #### Workflows
 | File | Description | Path |
 |------|-------------|------|
-| 06-sonarqube-rules.md | SonarQube quality gate rules | [workflows/06-sonarqube-rules.md](workflows/06-sonarqube-rules.md) |
-| 17-commit-message-conventions.md | Conventional Commits format | [workflows/17-commit-message-conventions.md](workflows/17-commit-message-conventions.md) |
+| W01-sonarqube-rules.md | SonarQube quality gate rules | [workflows/W01-sonarqube-rules.md](workflows/W01-sonarqube-rules.md) |
+| W02-commit-message-conventions.md | Conventional Commits format | [workflows/W02-commit-message-conventions.md](workflows/W02-commit-message-conventions.md) |
 
 ---
 
@@ -364,10 +364,10 @@ Use general-purpose or ask user for clarification
 
 | Code Type         | Required Rules                       | Automation Tool | Blocking Level |
 | ----------------- | ------------------------------------ | --------------- | -------------- |
-| Service New Method | [technology/functional/08-vavr](technology/functional/08-vavr-fundamentals.md) (Option/Try) | ArchUnit | 🚫 Block PR |
-| Service New Method | [foundation/10-architecture](foundation/10-architecture-rules.md) (Constructor Injection) | ArchUnit | 🚫 Block PR |
-| Controller New Method | [foundation/10-architecture](foundation/10-architecture-rules.md) (No Direct Repo Access) | ArchUnit | 🚫 Block PR |
-| Any New Code      | [foundation/01-naming](foundation/01-naming-conventions.md) (Naming Convention) | Checkstyle | 🚫 Block PR |
+| Service New Method | [technology/functional/P01-vavr-fundamentals](technology/functional/P01-vavr-fundamentals.md) (Option/Try) | ArchUnit | 🚫 Block PR |
+| Service New Method | [foundation/F04-architecture-rules](foundation/F04-architecture-rules.md) (Constructor Injection) | ArchUnit | 🚫 Block PR |
+| Controller New Method | [foundation/F04-architecture-rules](foundation/F04-architecture-rules.md) (No Direct Repo Access) | ArchUnit | 🚫 Block PR |
+| Any New Code      | [foundation/F01-naming-conventions](foundation/F01-naming-conventions.md) (Naming Convention) | Checkstyle | 🚫 Block PR |
 | Any New Code      | Test Coverage ≥ 80%                  | JaCoCo | 🚫 Block PR |
 
 ### Quality Gate Pass Criteria
@@ -416,10 +416,10 @@ mvn test -Dtest=ArchitectureTest   # Architecture test
 
 | Priority    | Rule Type                     | Description          | Rules |
 | ----------- | ----------------------------- | -------------------- | ----- |
-| P0 Highest  | Architecture, Security        | Architecture/Security | [foundation/10-architecture](foundation/10-architecture-rules.md)<br>[security/07-owasp-*](security/) |
-| P1 High     | Functional, Naming, OOP       | Code Quality         | [technology/functional/08-vavr](technology/functional/08-vavr-fundamentals.md)<br>[foundation/01-naming](foundation/01-naming-conventions.md)<br>[foundation/02-oop](foundation/02-oop-principles.md) |
-| P2 Medium   | Database, Best Practices      | Best Practices       | [technology/database/09-mybatis](technology/database/09-mybatis-plus-core.md)<br>[technology/database/05-postgresql](technology/database/05-postgresql-basics.md) |
-| P3 Low      | Concurrency, Quality Tools    | Optimization Tips    | [technology/patterns/03-concurrency](technology/patterns/03-concurrency-rules.md)<br>[workflows/06-sonarqube](workflows/06-sonarqube-rules.md) |
+| P0 Highest  | Architecture, Security        | Architecture/Security | [foundation/F04-architecture-rules](foundation/F04-architecture-rules.md)<br>[security/S01-owasp-*](security/) |
+| P1 High     | Functional, Naming, OOP       | Code Quality         | [technology/functional/P01-vavr-fundamentals](technology/functional/P01-vavr-fundamentals.md)<br>[foundation/F01-naming-conventions](foundation/F01-naming-conventions.md)<br>[foundation/F02-oop-principles](foundation/F02-oop-principles.md) |
+| P2 Medium   | Database, Best Practices      | Best Practices       | [technology/database/D04-mybatis](technology/database/D04-mybatis-plus-core.md)<br>[technology/database/D01-postgresql](technology/database/D01-postgresql-basics.md) |
+| P3 Low      | Concurrency, Quality Tools    | Optimization Tips    | [technology/patterns/P04-concurrency](technology/patterns/P04-concurrency-rules.md)<br>[workflows/W01-sonarqube](workflows/W01-sonarqube-rules.md) |
 
 ### Conflict Resolution Principles
 1. **Security > Performance > Readability**
@@ -432,21 +432,21 @@ mvn test -Dtest=ArchitectureTest   # Architecture test
 
 | Keyword               | Apply Rules/Skills/Agents          | Checkpoint                         |
 | --------------------- | ---------------------------------- | ---------------------------------- |
-| "Create Controller"   | Rules: [01](foundation/01-naming-conventions.md), [10](foundation/10-architecture-rules.md), [04](technology/patterns/04-exception-logging.md) | RESTful, No Direct Repo Access |
-| "Create Service"      | Rules: [01](foundation/01-naming-conventions.md), [02](foundation/02-oop-principles.md), [08-vavr](technology/functional/08-vavr-fundamentals.md), [10](foundation/10-architecture-rules.md) | Option/Try, Constructor Injection |
-| "Create Mapper"       | Rules: [01](foundation/01-naming-conventions.md), [09](technology/database/09-mybatis-plus-core.md), [05](technology/database/05-postgresql-basics.md) | LambdaQueryWrapper |
-| "Create Entity"       | Rules: [01](foundation/01-naming-conventions.md), [05](technology/database/05-postgresql-basics.md) | @TableName, JSONB/Array |
+| "Create Controller"   | Rules: [01](foundation/F01-naming-conventions.md), [10](foundation/F04-architecture-rules.md), [04](technology/patterns/P05-exception-logging.md) | RESTful, No Direct Repo Access |
+| "Create Service"      | Rules: [01](foundation/F01-naming-conventions.md), [02](foundation/F02-oop-principles.md), [P01-vavr](technology/functional/P01-vavr-fundamentals.md), [10](foundation/F04-architecture-rules.md) | Option/Try, Constructor Injection |
+| "Create Mapper"       | Rules: [01](foundation/F01-naming-conventions.md), [09](technology/database/D04-mybatis-plus-core.md), [05](technology/database/D01-postgresql-basics.md) | LambdaQueryWrapper |
+| "Create Entity"       | Rules: [01](foundation/F01-naming-conventions.md), [05](technology/database/D01-postgresql-basics.md) | @TableName, JSONB/Array |
 | "CRUD module"         | Skill: **smartadmin-crud-generator** | `/crud Product --all-phases` |
 | "integration test"    | Skill: **smartadmin-testing-suite** | `/test EmployeeService --mode=integration` |
 | "slow query"          | Skill: **smartadmin-performance-suite** | `/performance /api/orders --workflow` |
-| "Code Review"         | Agent: **code-reviewer** → Rules: [10](foundation/10-architecture-rules.md), [08](technology/functional/08-vavr-fundamentals.md), [01](foundation/01-naming-conventions.md) | ArchUnit, Vavr, Naming |
+| "Code Review"         | Agent: **code-reviewer** → Rules: [10](foundation/F04-architecture-rules.md), [08](technology/functional/P01-vavr-fundamentals.md), [01](foundation/F01-naming-conventions.md) | ArchUnit, Vavr, Naming |
 | "Architecture Review" | Agent: **architect-reviewer** | Layer boundaries, dependencies |
 | "Java implementation" | Agent: **java-architect** | Spring Boot patterns |
 | "Vue component"       | Agent: **vue-expert** | Vue 3 + Ant Design Vue |
-| "JSONB"               | Rules: [05-advanced](technology/database/05-postgresql-advanced.md), [05-mybatis](technology/database/05-postgresql-mybatis.md) | TypeHandler, SQL Optimization |
-| "Exception Handling"  | Rules: [08-vavr](technology/functional/08-vavr-fundamentals.md), [04](technology/patterns/04-exception-logging.md) | Try.of(), Logging |
-| "Transaction"         | Rules: [09-manager](foundation/09-manager-layer.md) | @Transactional in Manager |
-| "commit"              | Rules: [17-commit](workflows/17-commit-message-conventions.md) | Conventional Commits Format |
+| "JSONB"               | Rules: [D02-advanced](technology/database/D02-postgresql-advanced.md), [D03-mybatis](technology/database/D03-postgresql-mybatis.md) | TypeHandler, SQL Optimization |
+| "Exception Handling"  | Rules: [P01-vavr](technology/functional/P01-vavr-fundamentals.md), [P05](technology/patterns/P05-exception-logging.md) | Try.of(), Logging |
+| "Transaction"         | Rules: [F03-manager](foundation/F03-manager-layer.md) | @Transactional in Manager |
+| "commit"              | Rules: [W02-commit](workflows/W02-commit-message-conventions.md) | Conventional Commits Format |
 | "workflow"            | Skill: **liteflow-rule-builder** | LiteFlow EL + QLExpress |
 | "fraud detection"     | Skill: **fraud-detection-pattern-generator** | Multi-account, Bonus abuse |
 | "quality gate"        | Skill: **quality-gate-orchestrator** | ArchUnit, Checkstyle, PMD, SpotBugs |

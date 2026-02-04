@@ -4,7 +4,7 @@ description: PostgreSQL Advanced Features - JSONB, Array, CTE, Window Function
 tags: [postgresql, jsonb, array, cte, window-function]
 positioning: ideal
 prerequisites:
-  - technology/database/05-postgresql-basics.md
+  - technology/database/D01-postgresql-basics.md
 last_updated: 2025-01-12
 ---
 
@@ -12,7 +12,7 @@ last_updated: 2025-01-12
 
 **TL;DR**: Master PostgreSQL-specific features: JSONB for dynamic data storage (supports GIN index queries), Array Type (tag system), CTE improves complex query readability, Window Functions for ranking/cumulative statistics, Full-Text Search (Chinese requires jieba plugin).
 
-**Prerequisites**: Read [05-postgresql-basics.md](./05-postgresql-basics.md) for basic table creation and index rules.
+**Prerequisites**: Read [05-postgresql-basics.md](./D01-postgresql-basics.md) for basic table creation and index rules.
 
 ---
 
@@ -442,5 +442,5 @@ EXECUTE FUNCTION article_search_trigger();
 
 ## Related Rules
 
-- **Basic Rules**: [technology/database/05-postgresql-basics.md](./05-postgresql-basics.md) - Table Creation and Indexing
-- **MyBatis Integration**: [technology/database/05-postgresql-mybatis.md](./05-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
+- **Basic Rules**: [technology/database/D01-postgresql-basics.md](./D01-postgresql-basics.md) - Table Creation and Indexing
+- **MyBatis Integration**: [technology/database/D03-postgresql-mybatis.md](./D03-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration

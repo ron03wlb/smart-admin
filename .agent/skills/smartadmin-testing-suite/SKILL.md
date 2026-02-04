@@ -136,8 +136,8 @@ public class EmployeeFixture {
 
 ## Related Rules
 
-- [quality-tools/16-jacoco-coverage-rules.md](../../rules/quality-tools/16-jacoco-coverage-rules.md)
-- [technology/functional/08-vavr-mybatis-integration.md](../../rules/technology/functional/08-vavr-mybatis-integration.md)
+- [quality-tools/Q06-jacoco-coverage-rules.md](../../rules/quality-tools/Q06-jacoco-coverage-rules.md)
+- [technology/functional/P03-vavr-mybatis-integration.md](../../rules/technology/functional/P03-vavr-mybatis-integration.md)
 
 ## Example Session
 

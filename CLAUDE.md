@@ -33,7 +33,7 @@ When working with SmartAdmin codebase, read documentation in this order:
 
 1. **CLAUDE.md** (this file) - Quick reference and navigation hub
 2. **[.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md)** - Unified decision center (630 lines: rules routing, skill selection, agent orchestration) ⭐
-3. **[.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md)** - Mandatory architectural constraints (enforced by ArchUnit)
+3. **[.agent/rules/foundation/F04-architecture-rules.md](.agent/rules/foundation/F04-architecture-rules.md)** - Mandatory architectural constraints (enforced by ArchUnit)
 4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
 5. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks (optional, for Claude Code)
 6. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
@@ -97,7 +97,7 @@ Controller → Service → Manager → Dao → Entity
 - `@Transactional` / `@Cacheable`: Manager layer ONLY (NEVER in Service/Controller)
 - `@Autowired` field injection: FORBIDDEN
 
-→ **[Complete Architecture Rules](.agent/rules/foundation/10-architecture-rules.md)**
+→ **[Complete Architecture Rules](.agent/rules/foundation/F04-architecture-rules.md)**
 → **[SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)**
 → **[Project Architecture](.claude/shared/knowledge/project-architecture.md)**
 
@@ -141,8 +141,8 @@ Controller → Service → Manager → Dao → Entity
 
 **Commit Format:** `<type>(<scope>): <subject>`
 
-→ **[Complete Naming Conventions](.agent/rules/foundation/01-naming-conventions.md)**
-→ **[Commit Message Guide](.agent/rules/workflows/17-commit-message-conventions.md)**
+→ **[Complete Naming Conventions](.agent/rules/foundation/F01-naming-conventions.md)**
+→ **[Commit Message Guide](.agent/rules/workflows/W02-commit-message-conventions.md)**
 
 ## Anti-Patterns to Avoid
 
@@ -193,9 +193,9 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 ## Development Guidelines
 
 **Essential Rules** (see `.agent/rules/`):
-- Architecture: [`foundation/10-architecture-rules.md`](.agent/rules/foundation/10-architecture-rules.md)
-- Manager Layer: [`foundation/09-manager-layer.md`](.agent/rules/foundation/09-manager-layer.md)
-- Naming: [`foundation/01-naming-conventions.md`](.agent/rules/foundation/01-naming-conventions.md)
+- Architecture: [`foundation/F04-architecture-rules.md`](.agent/rules/foundation/F04-architecture-rules.md)
+- Manager Layer: [`foundation/F03-manager-layer.md`](.agent/rules/foundation/F03-manager-layer.md)
+- Naming: [`foundation/F01-naming-conventions.md`](.agent/rules/foundation/F01-naming-conventions.md)
 - Exceptions: [`technology/patterns/04-exception-logging.md`](.agent/rules/technology/patterns/04-exception-logging.md)
 
 **Validation**:
@@ -349,7 +349,7 @@ Common quality tool violations and approved solutions:
 - **ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD**: @PostConstruct static field initialization pattern
 - **CT_CONSTRUCTOR_THROW**: Constructor validation pattern is safe for internal classes
 
-Detailed rules: See [.agent/rules/quality-tools/12-pmd-rules.md](.agent/rules/quality-tools/12-pmd-rules.md) and [.agent/rules/quality-tools/13-spotbugs-rules.md](.agent/rules/quality-tools/13-spotbugs-rules.md)
+Detailed rules: See [.agent/rules/quality-tools/Q02-pmd-rules.md](.agent/rules/quality-tools/Q02-pmd-rules.md) and [.agent/rules/quality-tools/Q03-spotbugs-rules.md](.agent/rules/quality-tools/Q03-spotbugs-rules.md)
 
 ---
 

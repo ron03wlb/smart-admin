@@ -7,8 +7,8 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - foundation/01-naming-conventions.md
-  - quality-tools/11-checkstyle-rules.md
+  - foundation/F01-naming-conventions.md
+  - quality-tools/Q01-checkstyle-rules.md
 last_updated: 2025-01-21
 ---
 

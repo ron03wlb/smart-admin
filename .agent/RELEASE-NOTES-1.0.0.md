@@ -284,8 +284,8 @@ cd .claude/scripts
 
 - `.agent/RELEASE-NOTES-1.0.0.md` (this file)
 - `.agent/rules/technology/database/05-postgresql-mybatis.md` (merged file)
-- `.agent/rules/technology/database/05-postgresql-mybatis-integration.md` (redirect)
-- `.agent/rules/technology/database/09-mybatis-plus-postgresql.md` (redirect)
+- `.agent/rules/technology/database/D05-postgresql-mybatis-integration.md` (redirect)
+- `.agent/rules/technology/database/D06-mybatis-plus-postgresql.md` (redirect)
 - `.claude/metrics/reports/week-8-completion-report.md`
 - `.claude/metrics/reports/week-9-completion-report-2026-01-27.md`
 

@@ -7,7 +7,7 @@ ai_role: test_generator
 auto_apply: false
 ask_before_fix: true
 related_rules:
-  - foundation/10-architecture-rules.md
+  - foundation/F04-architecture-rules.md
 prerequisites:
   - workflows/tdd-workflow.md
 last_updated: 2025-01-21

@@ -4,7 +4,7 @@ description: OWASP Top 10 Security Standards Part 2 (A05-A10)
 tags: [security, owasp, authentication, ssrf, logging]
 positioning: current-standard
 prerequisites:
-  - security/07-owasp-top10-part1.md
+  - security/S01-owasp-top10-part1.md
 last_updated: 2025-01-12
 ---
 
@@ -315,6 +315,6 @@ public String fetchUrl(String urlString) throws IOException {
 
 ## Related Standards
 
-- **Part 1**: `security/07-owasp-top10-part1.md` - A01-A04 Access Control, Encryption, Injection
+- **Part 1**: `security/S01-owasp-top10-part1.md` - A01-A04 Access Control, Encryption, Injection
 - **CI/CD Pipeline**: `workflows/java-ci-cd-pipeline.md` - Automated Security Scanning
 - **MyBatis Plus**: `technology/database/09-mybatis-plus-core.md` - SQL Injection Protection

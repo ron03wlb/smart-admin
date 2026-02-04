@@ -7,7 +7,7 @@ ai_role: code_reviewer_and_generator
 auto_apply: true
 ask_before_fix: false
 related_rules:
-  - foundation/01-naming-conventions.md
+  - foundation/F01-naming-conventions.md
 checkstyle_rule: TypeName,MethodName,ConstantName,AvoidStarImport
 last_updated: 2025-01-21
 ---

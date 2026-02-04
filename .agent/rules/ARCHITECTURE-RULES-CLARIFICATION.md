@@ -150,10 +150,10 @@ Code Review: Service class detected
 
 ## 📚 Reference Documentation
 
-1. **Primary Source**: [.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md)
+1. **Primary Source**: [foundation/F04-architecture-rules.md](./foundation/F04-architecture-rules.md)
    - Lines 90-164: "Service Layer Can Directly Access Dao/Mapper"
 
-2. **Secondary Source**: [.agent/rules/foundation/09-manager-layer.md](.agent/rules/foundation/09-manager-layer.md)
+2. **Secondary Source**: [foundation/F03-manager-layer.md](./foundation/F03-manager-layer.md)
    - Lines 47-70: "When Manager Layer is NOT NEEDED"
 
 3. **Quick Reference**: [CLAUDE.md](../../CLAUDE.md)
@@ -189,7 +189,7 @@ Code Review: Service class detected
 
 1. ❌ This is **INCORRECT**
 2. ✅ Refer agent to **this document**
-3. ✅ Refer agent to [10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md) lines 90-164
+3. ✅ Refer agent to [F04-architecture-rules.md](./foundation/F04-architecture-rules.md) lines 90-164
 4. ✅ Only flag as violation if Service uses `@Transactional` or `@Cacheable`
 
 **The ONLY constraint is**: Service layer CANNOT use `@Transactional` or `@Cacheable` annotations.

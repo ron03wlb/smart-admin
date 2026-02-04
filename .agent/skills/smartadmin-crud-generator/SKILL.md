@@ -91,9 +91,9 @@ sa-admin/src/test/java/net/lab1024/sa/admin/module/{module}/
 
 ## Related Rules
 
-- [foundation/01-naming-conventions.md](../../rules/foundation/01-naming-conventions.md)
-- [foundation/10-architecture-rules.md](../../rules/foundation/10-architecture-rules.md)
-- [technology/functional/08-vavr-fundamentals.md](../../rules/technology/functional/08-vavr-fundamentals.md)
+- [foundation/F01-naming-conventions.md](../../rules/foundation/F01-naming-conventions.md)
+- [foundation/F04-architecture-rules.md](../../rules/foundation/F04-architecture-rules.md)
+- [technology/functional/P01-vavr-fundamentals.md](../../rules/technology/functional/P01-vavr-fundamentals.md)
 - [technology/database/09-mybatis-plus-core.md](../../rules/technology/database/09-mybatis-plus-core.md)
 
 ## Example Session

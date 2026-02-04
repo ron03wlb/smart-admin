@@ -3,9 +3,9 @@ trigger: on_demand
 description: SmartAdmin development environment initialization
 tags: [setup, environment, java-21, postgresql, vavr, docker]
 required_rules:
-  - rules/05-postgresql-basics.md
-  - rules/08-vavr-fundamentals.md
-  - rules/09-mybatis-plus-core.md
+  - rules/technology/database/D01-postgresql-basics.md
+  - rules/technology/functional/P01-vavr-fundamentals.md
+  - rules/technology/database/D04-mybatis-plus-core.md
 
 execution_order:
   - step: verify_prerequisites
@@ -376,9 +376,9 @@ After successful initialization:
 
 1. **Read Development Standards**
    - `.agent/README.md` - Development standards and navigation overview
-   - `.agent/rules/08-vavr-fundamentals.md` - Vavr functional programming standards
-   - `.agent/rules/05-postgresql-advanced.md` - PostgreSQL database standards
-   - `.agent/rules/09-mybatis-plus-core.md` - MyBatis Plus integration standards
+   - `.agent/rules/technology/functional/P01-vavr-fundamentals.md` - Vavr functional programming standards
+   - `.agent/rules/technology/database/D02-postgresql-advanced.md` - PostgreSQL database standards
+   - `.agent/rules/technology/database/D04-mybatis-plus-core.md` - MyBatis Plus integration standards
 
 2. **Explore Codebase**
    - `sa-base/module/support/` - Reusable support modules
