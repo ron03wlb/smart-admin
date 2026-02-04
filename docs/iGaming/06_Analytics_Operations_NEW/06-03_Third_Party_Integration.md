@@ -1,16 +1,8 @@
-# 13-01 第三方整合標準 (Third-Party Integration Standard)
+# 06-03 第三方整合標準 (Third-Party Integration Standard)
 
-> **⚠️ DEPRECATED**: 本文檔已於 2026-02-04 遷移至新位置
->
-> **新位置**: [06-03 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md)
->
-> **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊）
->
-> **過渡期**: 本文件將保留至 2026-03-06（30 天），之後將被刪除
->
-> **建議行動**: 請更新所有引用鏈接至新位置
-
----
+> **MIGRATED FROM**: 13-01_Third_Party_Integration_Standard.md (Phase 4 Module Merge)
+> **Version**: 2.0.0
+> **Last Updated**: 2026-02-04
 
 ## 1. 系統概述
 
@@ -28,7 +20,7 @@
 
 ### 2.1 遊戲提供商 (Game Providers)
 
-**詳細規範**: 參考 [03-01 遊戲整合標準](../03_Game_Center/03-01_Game_Integration_Standard.md)
+**詳細規範**: 參考 [02-01 遊戲整合標準](../02_Game_Operations/02-01_Game_Integration_Standard.md)
 
 **關鍵特性**：
 - Seamless Wallet 整合
@@ -39,7 +31,7 @@
 
 ### 2.2 支付服務商 (Payment Service Providers)
 
-**詳細規範**: 參考 [02-02 支付網關整合](../02_Finance_Center/02-02_Payment_Gateway_Integration.md)
+**詳細規範**: 參考 [01-03 支付網關整合](../01_Core_Financial_Loop/01-03_Payment_Gateway_Integration.md)
 
 **關鍵特性**：
 - 支付請求 API
@@ -183,6 +175,44 @@ messaging.requestPermission()
 
 ---
 
+### 4.3 Webhook 重試策略 (NEW)
+
+**指數退避演算法 (Exponential Backoff)**：
+
+| 重試次數 | 延遲時間 | 累計等待 |
+|---------|---------|---------|
+| 1st retry | 5 秒 | 5 秒 |
+| 2nd retry | 10 秒 | 15 秒 |
+| 3rd retry | 20 秒 | 35 秒 |
+| 4th retry | 40 秒 | 1 分 15 秒 |
+| 5th retry | 80 秒 | 2 分 35 秒 |
+| 6th retry（最後） | 160 秒 | 5 分 15 秒 |
+
+**死信隊列 (Dead Letter Queue)**：
+- 重試 6 次後仍失敗的 Webhook 事件自動進入 DLQ
+- DLQ 保留 7 天，可手動重放或分析失敗原因
+- 告警觸發條件：DLQ 累積超過 100 條事件
+
+**重試次數限制與告警**：
+```yaml
+# Webhook Retry Configuration
+webhook:
+  max_retries: 6
+  initial_delay: 5s
+  max_delay: 160s
+  backoff_multiplier: 2.0
+
+  dlq:
+    retention_days: 7
+    alert_threshold: 100
+
+  alerting:
+    slack_channel: '#integrations-ops'
+    pagerduty_severity: high
+```
+
+---
+
 ## 5. API 金鑰管理
 
 ### 5.1 HashiCorp Vault 整合
@@ -281,7 +311,7 @@ resource "random_password" "nuvei_secret" {
 ### 7.2 告警規則
 
 **Prometheus AlertManager 配置**:
-```
+```yaml
 # alerts/third_party.yml
 groups:
   - name: third_party_services
@@ -329,20 +359,72 @@ receivers:
 
 ---
 
-## 📚 相關文檔
+### 7.3 第三方服務降級策略 (NEW)
 
-### 已整合模塊參考
-- [02-02 支付網關整合](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP 整合詳細規範
-- [03-01 遊戲整合標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - GP 整合協議
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC 驗證流程
+**降級優先級矩陣**：
 
-### 技術基礎設施參考
-- [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - RESTful 規範
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - API 金鑰加密存儲
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 速率限制實作
+| 服務類型 | 優先級 | 降級後影響 | Fallback 機制 |
+|---------|--------|-----------|--------------|
+| **支付網關 (PSP)** | Critical | 無法充值/提款 | 切換備用 PSP |
+| **KYC 供應商** | Important | 無法完成身份驗證 | 手動審核流程 |
+| **遊戲提供商 (GP)** | Important | 特定遊戲不可用 | 顯示維護通知 |
+| **Email 服務** | Optional | 郵件延遲發送 | 排隊 + 稍後重試 |
+| **數據分析工具** | Optional | 無法追蹤事件 | 本地日誌記錄 |
+
+**降級時的 Fallback 機制**：
+```java
+// SmartAdmin Pattern: Manager Layer with Fallback
+@Manager
+@RequiredArgsConstructor
+public class ThirdPartyServiceManager {
+    private final OnfidoKycClient primaryKycClient;
+    private final JumioKycClient fallbackKycClient;
+    private final ThirdPartyHealthMonitor healthMonitor;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public Option<KycResult> performKycVerification(PlayerId playerId, DocumentUpload document) {
+        // Check primary service health
+        if (healthMonitor.isHealthy("onfido")) {
+            return Try.of(() -> primaryKycClient.verify(playerId, document))
+                .onFailure(e -> log.warn("Onfido verification failed, switching to fallback", e))
+                .toOption();
+        }
+
+        // Fallback to secondary provider
+        log.info("Using fallback KYC provider: Jumio");
+        return Try.of(() -> fallbackKycClient.verify(playerId, document))
+            .onFailure(e -> log.error("Both KYC providers failed", e))
+            .toOption();
+    }
+}
+```
+
+**服務恢復自動檢測**：
+- Health Check 間隔：30 秒
+- 恢復條件：連續 3 次 Health Check 通過（可用性 > 95%）
+- 自動切回主服務，記錄恢復事件至告警頻道
 
 ---
 
-**文檔版本**: 1.0.0
-**最後更新**: 2026-01-27
+## 📚 相關文檔
+
+### 已整合模塊參考
+- [01-03 支付網關整合](../01_Core_Financial_Loop/01-03_Payment_Gateway_Integration.md) - PSP 整合詳細規範
+- [02-01 遊戲整合標準](../02_Game_Operations/02-01_Game_Integration_Standard.md) - GP 整合協議
+- [01-01 玩家生命週期](../01_Player_Center/01-01_Player_Lifecycle.md) - KYC 驗證流程
+
+### 技術基礎設施參考
+- [07-03 API 設計標準](../07_Technical_Infrastructure/07-03_API_Design_Standard.md) - RESTful 規範
+- [05-05 數據安全標準](../05_Platform_Governance/05-05_Data_Security.md) - API 金鑰加密存儲
+- [07-02 網關架構](../07_Technical_Infrastructure/07-02_Gateway_Architecture.md) - 速率限制實作
+
+### Analytics & Operations
+- [06-01 報表與 BI](../06_Analytics_Operations/06-01_Reporting_BI.md) - 第三方數據整合至 BI 平台
+- [06-02 客戶服務](../06_Analytics_Operations/06-02_Customer_Service.md) - 第三方工單系統整合
+
+---
+
+**文檔版本**: 2.0.0
+**最後更新**: 2026-02-04
 **維護團隊**: Integration Team & Infrastructure Team
+**遷移歷史**: 從 13-01 遷移至 06-03（Phase 4 Module Merge）
