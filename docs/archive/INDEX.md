@@ -87,6 +87,39 @@
 
 ---
 
+### Snail-Job 排程整合計劃
+**路徑**：`archive/plans/job/`
+**狀態**：✅ 已完成並發布
+**版本**：v1.0.0 (2026-01-22)
+**歸檔原因**：Snail-Job 整合已實施完成，所有8個文檔內容已完整
+
+**包含文檔**：
+- README.md - 計劃總覽與導航
+- 01-quick-start.md - 快速開始指南
+- 02-configuration.md - 配置說明
+- 03-api-usage.md - API 使用指南
+- 04-troubleshooting.md - 故障排除
+- 05-architecture.md - 架構設計
+- 06-monitoring.md - 監控方案
+- 07-migration.md - 遷移指南
+- 08-dag-workflows.md - DAG 工作流
+
+**關鍵成果**：
+- ✅ Snail-Job v1.6.0 整合完成
+- ✅ Spring Boot 3.5.4 相容性驗證
+- ✅ Redis/MySQL 雙重支援
+- ✅ 管理後台整合完成
+- ✅ 監控與告警機制建立
+
+**當前狀態**：Snail-Job 已投入生產使用，計劃文檔歸檔以保持活躍計劃目錄整潔
+
+**相關代碼**：
+- [smartadmin-support-job](../../smart-admin-api-java21-springboot3/smartadmin-support/smartadmin-support-job/)
+
+**歸檔日期**：2026-02-04
+
+---
+
 ## 歸檔操作記錄
 
 | 日期 | 操作 | 文件數 | 執行人 |
@@ -96,6 +129,7 @@
 | 2026-01-27 | 歸檔 Kafka v1 文檔 | 46 | Claude Code |
 | 2026-01-27 | 歸檔舊計劃文檔 | 11 | Claude Code |
 | 2026-01-27 | 刪除 docs/bak/ 目錄 | - | Claude Code |
+| 2026-02-04 | 歸檔 Snail-Job 計劃（Week 9） | 8 | Claude Code |
 
 ---
 
