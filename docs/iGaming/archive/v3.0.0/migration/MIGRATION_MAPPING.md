@@ -32,7 +32,7 @@
 | 00-00 | Document_Map.md | 00-00 | Document_Map.md | **簡化** | 移除冗長導航，新增 3 個核心路徑文檔 |
 | 00-01 | Solution_Overview.md | 00-01 | Solution_Overview.md | 直接遷移 | 無變更 |
 | 00-02 | Industry_Terminology.md | 00-02 | Industry_Terminology.md | 直接遷移 | 無變更 |
-| 03-data-model | **03-data-model.md** ⚠️ | 00-03 | Data_Model.md | 重命名 | 修正編號規範 |
+| 03-data-model | **00-05_Data_Model.md** ⚠️ | 00-03 | Data_Model.md | 重命名 | 修正編號規範 |
 | 00-04 | Technology_Stack.md | 00-04 | Technology_Stack.md | 直接遷移 | 無變更 |
 | - | - | **00-00** | **QUICKSTART.md** | **新建** | 10 分鐘快速入門 |
 | - | - | **00-00** | **BUSINESS_FLOWS.md** | **新建** | 業務流程圖集 |
@@ -268,7 +268,7 @@
 
 | 文件 | 問題 | 修正 |
 |------|------|------|
-| 00_Concept_&_Analysis/03-data-model.md | 編號不規範 | 重命名為 00-03_Data_Model.md |
+| 00_Concept_&_Analysis/00-05_Data_Model.md | 編號不規範 | 重命名為 00-03_Data_Model.md |
 | 04_Activity_Center/01-system-design.md | 編號不規範 | 重命名為 03-01_Bonus_Engine.md |
 | 08_Frontend_CMS/01-localization/ | 編號不規範 | 重命名為 08-05-localization/ |
 

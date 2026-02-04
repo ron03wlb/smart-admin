@@ -24,7 +24,7 @@
 |---------|---------|------|------|
 | 00-01 | Solution_Overview.md | 00_Concept_&_Analysis/00-01 | ⏳ 待遷移 |
 | 00-02 | Industry_Terminology.md | 00_Concept_&_Analysis/00-02 | ⏳ 待遷移 |
-| 00-03 | Data_Model.md | 00_Concept_&_Analysis/03-data-model.md | ⏳ 待遷移（需重命名）|
+| 00-03 | Data_Model.md | 00_Concept_&_Analysis/00-05_Data_Model.md | ⏳ 待遷移（需重命名）|
 | 00-04 | Technology_Stack.md | 00_Concept_&_Analysis/00-04 | ⏳ 待遷移 |
 
 ---
