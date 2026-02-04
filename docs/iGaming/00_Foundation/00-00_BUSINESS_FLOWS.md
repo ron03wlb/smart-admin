@@ -672,7 +672,7 @@ if (riskScore.getTotal() <= 30) {
 | 新註冊用戶 | +20 | 註冊 <7 天 |
 | IP 異常 | +30 | IP 頻繁變更 |
 
-👉 **深入閱讀**: [04-01 風控引擎 §2](../04_Risk_Control_NEW/04-01_Risk_Engine.md#規則引擎) ⭐ SSOT
+👉 **深入閱讀**: [04-01 風控引擎 §2](../04_Risk_Control/04-01_Risk_Framework.md#規則引擎) ⭐ SSOT
 
 #### Step 3: SAGA 補償事務
 
@@ -739,7 +739,7 @@ public void processWithdrawal(WithdrawalRequest request) {
 ### 4.5 相關文檔
 
 - 🔗 [01-05 出金風控](../01_Core_Financial_Loop/01-05_Withdrawal_Risk.md) ⭐
-- 🔗 [04-01 風控引擎](../04_Risk_Control_NEW/04-01_Risk_Engine.md) ⭐
+- 🔗 [04-01 風控引擎](../04_Risk_Control/04-01_Risk_Framework.md) ⭐
 - 🔗 [05-06 審批工作流](../05_Platform_Governance/05-06_Approval_Workflow.md)
 
 ---

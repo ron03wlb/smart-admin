@@ -76,7 +76,7 @@
 ### 業務整合
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 多帳號檢測、設備指紋、風險評分
 - [03-02 VIP 忠誠度系統](./03-02_VIP_Loyalty.md) - VIP 等級初始化、積分系統
-- [04-02 出金風控](../04_Risk_Control_NEW/04-02_Fraud_Detection.md) - KYC 等級與提款限額
+- [04-02 出金風控](../04_Risk_Control/04-02_Fraud_Detection.md) - KYC 等級與提款限額
 
 ### 技術參考
 - [05-05 數據安全策略](../05_Platform_Governance/05-05_Data_Security.md) - 個人資料加密、Blind Index

@@ -772,8 +772,8 @@ public class WithdrawalService {
 |------|------|------|---------|---------|
 | 1 | [00-00 BUSINESS_FLOWS](./00-00_BUSINESS_FLOWS.md) | §4 出金審核流程 | 12 分鐘 | 完整業務流程 |
 | 2 | [01-05 Withdrawal_Risk](../01_Core_Financial_Loop/01-05_Withdrawal_Risk.md) | §4 風控流程 | 15 分鐘 | 規則引擎設計 |
-| 3 | [04-01 Risk_Engine](../04_Risk_Control_NEW/04-01_Risk_Engine.md) | §2 規則引擎 | 12 分鐘 | LiteFlow 實作 |
-| 4 | [04-04 Risk_Workflow](../04_Risk_Control_NEW/04-04_Risk_Workflow.md) | §2 工作流狀態機 | 10 分鐘 | 審核流程狀態 |
+| 3 | [04-01 Risk_Engine](../04_Risk_Control/04-01_Risk_Framework.md) | §2 規則引擎 | 12 分鐘 | LiteFlow 實作 |
+| 4 | ~~04-04 Risk_Workflow~~ 🚧 計劃中 | §2 工作流狀態機 | 10 分鐘 | 審核流程狀態 |
 
 ### 🎯 實作目標
 

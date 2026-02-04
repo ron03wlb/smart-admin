@@ -169,7 +169,7 @@ iGaming 平台是一個複雜的系統，但核心邏輯圍繞 **5 個關鍵概�
 - ⚖️ **合規**: 滿足反洗錢（AML）監管要求
 
 **深入閱讀**:
-👉 [04-01 風控引擎 §2 規則引擎](../04_Risk_Control_NEW/04-01_Risk_Engine.md#規則引擎) ⭐ SSOT
+👉 [04-01 風控引擎 §2 規則引擎](../04_Risk_Control/04-01_Risk_Framework.md#規則引擎) ⭐ SSOT
 
 **關鍵場景**:
 - 玩家出金：風控檢查 → KYC 驗證 → 流水檢查 → 決策（通過/審核/拒絕）
@@ -241,7 +241,7 @@ flowchart LR
 | 🔴 P0 | 錢包架構 | [01-02 Wallet_Architecture](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) ⭐ |
 | 🔴 P0 | Seamless Wallet API | [02-02 Seamless_Wallet_API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) ⭐ |
 | 🔴 P0 | 流水計算 | [02-03 Turnover_Calculation](../02_Game_Operations/02-03_Turnover_Calculation.md) ⭐ |
-| 🟠 P1 | 風控引擎 | [04-01 Risk_Engine](../04_Risk_Control_NEW/04-01_Risk_Engine.md) |
+| 🟠 P1 | 風控引擎 | [04-01 Risk_Engine](../04_Risk_Control/04-01_Risk_Framework.md) |
 | 🟠 P1 | 多租戶架構 | [05-01 Multi_Tenant_Arch](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md) |
 
 ### 🏛️ 架構師
@@ -262,7 +262,7 @@ flowchart LR
 |-------|------|------|
 | 🔴 P0 | QA 測試標準 | [07-04 QA_Standards](../07_Technical_Infrastructure/07-04_QA_Standards.md) |
 | 🔴 P0 | 錢包極端場景 | [02-04 Game_Provider_Cases](../02_Game_Operations/02-04_Game_Provider_Cases.md) |
-| 🟠 P1 | 風控測試場景 | [04-02 Fraud_Detection](../04_Risk_Control_NEW/04-02_Fraud_Detection.md) |
+| 🟠 P1 | 風控測試場景 | [04-02 Fraud_Detection](../04_Risk_Control/04-02_Fraud_Detection.md) |
 
 ### 👨‍💼 運維工程師
 **首要理解**：部署、監控、維護
