@@ -13,7 +13,14 @@
 archive/
 ├── INDEX.md                                           # 本索引文件
 ├── v3.0.0/
-│   └── migration/V3.0.0_FINAL_SUMMARY.md            # 完整歷史記錄（733 行）
+│   └── migration/
+│       ├── V3.0.0_FINAL_SUMMARY.md                   # 完整歷史記錄（733 行）
+│       ├── MIGRATION_COMPLETION_REPORT.md            # Week 3-4 遷移完成報告
+│       ├── PHASE3_COMPLETION_REPORT.md               # Phase 3 完成報告
+│       ├── WEEK_3-4_COMPLETION_REPORT.md             # Week 3-4 完成報告
+│       ├── WEEK_8_COMPLETION_REPORT.md               # Week 8 完成報告
+│       ├── MIGRATION_MAPPING.md                      # 遷移映射表
+│       └── SSOT_MAPPING.md                           # SSOT 映射表
 └── legacy/
     └── analysis/seamless_wallet.md                   # 原始深度分析（560 行）
 ```
@@ -21,6 +28,12 @@ archive/
 | 文件 | 大小 | 說明 |
 |------|------|------|
 | **V3.0.0_FINAL_SUMMARY.md** | 733 行 | 包含所有 Phase 3-6 報告、審計報告、遷移指南的完整總結 |
+| **MIGRATION_COMPLETION_REPORT.md** | - | Week 3-4 遷移完成報告（已歸檔） |
+| **PHASE3_COMPLETION_REPORT.md** | - | Phase 3 完成報告（已歸檔） |
+| **WEEK_3-4_COMPLETION_REPORT.md** | - | Week 3-4 完成報告（已歸檔） |
+| **WEEK_8_COMPLETION_REPORT.md** | - | Week 8 自動化維護完成報告（已歸檔） |
+| **MIGRATION_MAPPING.md** | - | 文件遷移路徑映射表（已歸檔） |
+| **SSOT_MAPPING.md** | - | 單一真實來源映射表（已歸檔） |
 | **seamless_wallet.md** | 560 行 | 原始無縫錢包深度分析（已拆分為 10 個專題，保留供參考） |
 
 ---
@@ -67,6 +80,25 @@ V3.0.0_FINAL_SUMMARY.md 是完整歷史記錄，包含：
 | 錯誤恢復 | [02_Finance_Center/seamless-wallet/core/03-recovery.md](../02_Finance_Center/seamless-wallet/core/03-recovery.md) |
 | 遊戲邏輯 | [02_Finance_Center/seamless-wallet/game-logic/](../02_Finance_Center/seamless-wallet/game-logic/) |
 | 財務對帳 | [02_Finance_Center/seamless-wallet/finance/reconciliation.md](../02_Finance_Center/seamless-wallet/finance/reconciliation.md) |
+
+---
+
+## Week 9 新增歸檔（2026-02-04）
+
+本次歸檔包含 6 個根目錄完成報告，這些報告記錄了 v3.0.0 文檔重組的關鍵里程碑：
+
+| 文件 | 內容說明 |
+|------|---------|
+| **MIGRATION_COMPLETION_REPORT.md** | Week 3-4 模塊遷移完成報告，記錄 24 個模塊 → 8 個模塊的整合過程 |
+| **PHASE3_COMPLETION_REPORT.md** | Phase 3 階段完成報告，涵蓋錢包架構、流水計算、數據安全的合併工作 |
+| **WEEK_3-4_COMPLETION_REPORT.md** | Week 3-4 週期總結，包含內容去重與 SSOT 驗證結果 |
+| **WEEK_8_COMPLETION_REPORT.md** | Week 8 自動化維護機制完成報告，涵蓋 CI/CD workflows、驗證腳本、Pre-commit hooks |
+| **MIGRATION_MAPPING.md** | 舊路徑 → 新路徑映射表，用於追溯文件遷移歷史 |
+| **SSOT_MAPPING.md** | 單一真實來源（Single Source of Truth）概念映射表，記錄 10 個核心概念的權威定義位置 |
+
+**歸檔原因**: 這些報告屬於已完成的階段性里程碑文檔，其內容已整合至當前模塊文檔中，移至歸檔以保持根目錄整潔。
+
+**Git 歷史**: 所有文件使用 `git mv` 移動，完整保留提交歷史，可通過 `git log --follow` 追溯。
 
 ---
 
