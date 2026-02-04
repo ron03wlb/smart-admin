@@ -317,7 +317,7 @@ export default {
 ### 業務邏輯參考
 - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動多語言內容
 - [08-02 Banner 管理](./08-02_Banner_&_Announcement.md) - 橫幅多語言
-- [11-01 客服中台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 通知模板本地化
+- [11-01 客服中台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 通知模板本地化
 
 ### 技術架構參考
 - [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API規範

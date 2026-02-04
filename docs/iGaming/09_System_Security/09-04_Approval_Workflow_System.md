@@ -347,7 +347,7 @@ const REJECTION_TEMPLATES = [
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 審批通知實現
 
 ### 相關實作
-- [11-01 客服平台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服操作審批（補單、踢線）
+- [11-01 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 客服操作審批（補單、踢線）
 - [08-01 配置管理系統](../08_Frontend_CMS/08-01_Config_Management_System.md) - 配置變更審批
 - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利發放審批
 

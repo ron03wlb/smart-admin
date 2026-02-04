@@ -1828,8 +1828,8 @@ class PlayerLifecycleArchitectureTest {
 
 **運營優化**:
 - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 基於生命週期的精準營銷
-- [10-01 報表與 BI 架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - 玩家生命週期分析報表
-- [11-01 客服平台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 玩家 360 視圖整合
+- [10-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 玩家生命週期分析報表
+- [11-01 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 玩家 360 視圖整合
 
 **平台配置**:
 - [07-01 多租戶架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 租戶級配置

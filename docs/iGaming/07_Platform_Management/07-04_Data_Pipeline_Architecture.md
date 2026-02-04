@@ -503,4 +503,4 @@ flowchart TD
 
 ### 業務整合
 - [02-03 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 數據管道應用
-- [10-01 報表架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - BI 數據管道
+- [06-01 報表架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - BI 數據管道

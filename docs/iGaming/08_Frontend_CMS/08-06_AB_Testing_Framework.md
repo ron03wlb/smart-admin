@@ -311,7 +311,7 @@ THEN stop_experiment() AND rollback()
 
 ### 核心依賴
 - [01-03 玩家分群與標籤](../01_Player_Center/01-03_Player_Segmentation.md) - 基於分群的 A/B 測試
-- [10-01 報表與 BI 架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - 實驗結果分析儀表板
+- [10-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 實驗結果分析儀表板
 
 ### 延伸閱讀
 - [08-01 前端佈局引擎](./08-01_Frontend_Layout_Engine.md) - 動態佈局與 A/B 測試集成

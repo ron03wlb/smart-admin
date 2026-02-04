@@ -175,7 +175,7 @@ VIP 玩家 (1.5-3%)
 
 ### 延伸閱讀
 - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 基於分群的精準營銷
-- [10-01 報表與 BI 架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - 玩家分群分析報表
+- [10-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 玩家分群分析報表
 
 ---
 

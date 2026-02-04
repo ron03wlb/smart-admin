@@ -601,7 +601,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 11-01 | [CS_Platform_Design.md](../11_Customer_Service/11-01_CS_Platform_Design.md) | 客服平台、Player 360 View | 57 ⚠️ |
+| 06-02 | [Customer_Service.md](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) | 客服平台、Player 360 View、AI 客服 | 520 ✅ |
 
 > ⚠️ **待擴充**：建議補充知識庫管理、智能客服機器人、SLA監控
 
@@ -737,7 +737,7 @@ ValidTurnover = BetAmount
 #### 👤 ...玩家KYC驗證流程
 **導航路徑**:
 1. **帳戶系統**: [01-01 玩家帳戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC等級設計
-2. **第三方整合**: [13-01 第三方整合標準](../13_Third_Party_Integration/13-01_Third_Party_Integration_Standard.md) - Onfido/Jumio集成
+2. **第三方整合**: [06-03 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) - Onfido/Jumio集成
 3. **數據安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 身份證件加密存儲
 4. **審批流程**: [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC人工審核
 
@@ -782,7 +782,7 @@ ValidTurnover = BetAmount
 
 #### 📈 ...報表與數據
 **導航路徑**:
-- **報表架構**: [10-01 報表與BI架構](../10_Reporting_&_BI/10-01_Reporting_Architecture.md) - 數據分層、BI工具
+- **報表架構**: [06-01 報表與BI架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 數據分層、BI工具
 - **數據管道**: [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - ODS→DWD→DWS→ADS
 - **數據模型**: [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 完整表設計
 
@@ -839,7 +839,7 @@ ValidTurnover = BetAmount
 1. [00-01 解決方案總覽](../00_Concept_&_Analysis/00-01_Solution_Overview.md) - 商業模式
 2. [01-02 VIP忠誠系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - 玩家運營
 3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎
-4. [11-01 客服平台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服工具
+4. [06-02 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 客服工具、AI 客服機器人
 
 ---
 

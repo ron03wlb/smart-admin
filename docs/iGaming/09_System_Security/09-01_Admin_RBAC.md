@@ -806,7 +806,7 @@ Response 200 OK:
 
 ### 延伸閱讀
 - [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 商戶權限配置
-- [11-01 客服平台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服權限管理
+- [11-01 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 客服權限管理
 
 ---
 
