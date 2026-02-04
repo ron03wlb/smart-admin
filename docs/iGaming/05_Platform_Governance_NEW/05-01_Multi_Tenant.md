@@ -1,4 +1,4 @@
-# 07-01 平台層級架構 (Hierarchy Architecture)
+# 05-01 多租戶架構 (Multi-Tenant Architecture)
 
 ## 1. 架構定義
 本系統採用 **SaaS (Software as a Service)** 多租戶架構，層級定義如下：
@@ -194,8 +194,8 @@ Super Admin
 - [06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md) - 層級結構延伸
 
 ### 技術架構參考
-- [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 層級權限實現
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 租戶操作審計
+- [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 層級權限實現
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 租戶操作審計
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 多租戶數據隔離策略
 
 ---

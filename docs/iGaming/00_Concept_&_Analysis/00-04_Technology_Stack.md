@@ -289,7 +289,7 @@ ORM: SQLAlchemy 2.0
 }
 ```
 
-**詳細規範**：參見 [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md)
+**詳細規範**：參見 [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md)
 
 ---
 
@@ -820,13 +820,13 @@ DAST: OWASP ZAP 2.14
 
 ### 技術參考
 - [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
-- [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API規範
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 網關設計
-- [12-01 部署架構](../12_Technical_Operations/12-01_Deployment_Architecture.md) - CI/CD
+- [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API規範
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 網關設計
+- [12-01 部署架構](../07_Technical_Infrastructure_NEW/07-01_Deployment.md) - CI/CD
 
 ### 安全參考
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密規範
-- [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 權限設計
+- [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 權限設計
 
 ---
 

@@ -722,11 +722,11 @@ END;
 
 ### 技術參考
 - [05-05 數據安全策略](../05_Platform_Governance_NEW/05-05_Data_Security.md) - 個人資料加密、審計日誌
-- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC 人工審核流程
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 安全、暴力破解防護
+- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - KYC 人工審核流程
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 安全、暴力破解防護
 
 ### 延伸閱讀
-- [13-01 第三方整合標準](../13_Third_Party_Integration/13-01_Third_Party_Integration_Standard.md) - Sumsub/Jumio 整合指南
+- [13-01 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) - Sumsub/Jumio 整合指南
 - FATF Guidance: [www.fatf-gafi.org](https://www.fatf-gafi.org)
 - UKGC AML Guide: [www.gamblingcommission.gov.uk](https://www.gamblingcommission.gov.uk)
 

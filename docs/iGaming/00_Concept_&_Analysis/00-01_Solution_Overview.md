@@ -450,7 +450,7 @@ AI/ML 方法已達到 **AUC 0.729**（隨機森林）的預測準確度，最具
 ### 業務模塊
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包架構
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控架構
-- [09-01 權限控制](../09_System_Security/09-01_Admin_RBAC.md) - RBAC 架構
+- [09-01 權限控制](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - RBAC 架構
 
 ### 延伸閱讀
 - [00-02 行業術語](./00-02_Industry_Terminology.md) - iGaming 專業術語

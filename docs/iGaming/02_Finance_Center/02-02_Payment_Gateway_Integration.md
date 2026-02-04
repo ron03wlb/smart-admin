@@ -1080,9 +1080,9 @@ Authorization: Bearer <player_jwt_token>
 
 ### 技術架構參考
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 支付數據加密
-- [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API 規範
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 配置變更審計
-- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 配置變更審批
+- [12-05 API 設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API 規範
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 配置變更審計
+- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 配置變更審批
 
 ---
 

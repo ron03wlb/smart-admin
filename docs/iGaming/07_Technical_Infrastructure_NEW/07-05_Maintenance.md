@@ -1,4 +1,4 @@
-# 12-04 系統維護與優雅停機 (System Maintenance & Graceful Shutdown)
+# 07-05 系統維護與優雅停機 (System Maintenance & Graceful Shutdown)
 
 ## 1. 系統概述
 為確保平台在更新或緊急維護時，玩家資產不丟失、進行中的注單不卡死 (Stick Rounds)，必須定義標準的 **"優雅停機 (Graceful Shutdown)"** 流程。
@@ -474,6 +474,6 @@ Thank you for your patience and understanding.
 ## 📚 相關文檔
 
 ### 相關文檔
-- [12-01 部署架構](./12-01_Deployment_Architecture.md) - 部署策略
-- [12-02 QA 測試標準](./12-02_QA_Testing_Standard.md) - 測試流程
-- [12-06 性能監控](./12-06_Performance_Monitoring.md) - 監控告警
+- [12-01 部署架構](./07-01_Deployment.md) - 部署策略
+- [12-02 QA 測試標準](./07-04_QA_Standards.md) - 測試流程
+- [12-06 性能監控](./07-06_Performance_Monitoring.md) - 監控告警

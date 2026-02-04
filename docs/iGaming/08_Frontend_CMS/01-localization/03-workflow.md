@@ -323,8 +323,8 @@ sequenceDiagram
 - [08-05-04 API規格](./08-05-04_API_Specification.md) - 完整API文檔、監控
 
 ### 技術架構參考
-- [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 翻譯權限控制
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 翻譯變更審計
+- [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 翻譯權限控制
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 翻譯變更審計
 - [12-02 測試標準](../12_Technical_Operations/12-02_Testing_Standard.md) - 翻譯 QA 流程
 
 ---

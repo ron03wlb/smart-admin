@@ -1,4 +1,4 @@
-# 09-02 審計日誌系統 (Audit Log System)
+# 05-03 審計日誌 (Audit Log)
 
 > **相關文檔**: [09-04 審批工作流系統](./09-04_Approval_Workflow_System.md) - 高風險操作的 Maker-Checker 審批流程
 
@@ -682,7 +682,7 @@ Response 200 OK (Completed):
 - [09-03 數據安全標準](./09-03_Data_Security_Standard.md) - 敏感數據脫敏要求
 
 ### 技術架構參考
-- [12-01 部署架構](../12_Technical_Operations/12-01_Deployment_Architecture.md) - Elasticsearch 集群部署
+- [12-01 部署架構](../07_Technical_Infrastructure_NEW/07-01_Deployment.md) - Elasticsearch 集群部署
 - [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - Kafka 數據流配置
 
 ---

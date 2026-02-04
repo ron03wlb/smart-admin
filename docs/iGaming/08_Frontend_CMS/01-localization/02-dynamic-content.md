@@ -320,7 +320,7 @@ export default {
 - [11-01 客服中台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 通知模板本地化
 
 ### 技術架構參考
-- [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API規範
+- [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API規範
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - JSONB 加密
 
 ---

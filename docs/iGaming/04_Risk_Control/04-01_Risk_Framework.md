@@ -995,7 +995,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 | **02-01 提款系統** | `checkWithdraw()` | 提款請求提交時 | 檢測異常提款行為、多帳號提款 | [02-01 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) |
 | **01-02 VIP系統** | 訂閱 `risk.player.flagged` 事件 | 玩家被標記為高風險時 | 降級VIP等級或暫停VIP權益 | [01-02 VIP忠誠系統](../03_Player_Journey/03-02_VIP_Loyalty.md) |
 | **11-01 客服平台** | `assessPlayerRisk()` | 客服查看玩家360視圖時 | 顯示玩家風險評分和標記 | [11-01 客服平台](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) |
-| **07-01 租戶管理** | 訂閱 `risk.fraud.detected` 事件 | 檢測到欺詐時 | 通知租戶運營團隊 | [07-01 多租戶架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) |
+| **07-01 租戶管理** | 訂閱 `risk.fraud.detected` 事件 | 檢測到欺詐時 | 通知租戶運營團隊 | [07-01 多租戶架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) |
 
 **關鍵設計決策**:
 - ✅ **單一數據源**: 所有風控邏輯集中在本模塊，消費者僅調用 API
@@ -1447,8 +1447,8 @@ public class RiskRuleConfigManager {
 - [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 多帳號檢測、設備指紋
 
 ### 技術參考
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 風控決策審計記錄
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流、熔斷機制
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 風控決策審計記錄
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 限流、熔斷機制
 
 ### 延伸閱讀
 - [05-02 代理信用風控](./05-02_Agent_Credit_Risk.md) - 代理信用評分、Margin Call

@@ -39,9 +39,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [12-03 Gateway Architecture](../../12_Technical_Operations/12-03_Gateway_Architecture.md) | §2 路由配置 | 動態路由 |
-| 2 | [12-03 Gateway Architecture](../../12_Technical_Operations/12-03_Gateway_Architecture.md) | §3 過濾器鏈 | 鑑權、限流 |
-| 3 | [12-03 Gateway Architecture](../../12_Technical_Operations/12-03_Gateway_Architecture.md) | §4 熔斷器 | Resilience4j |
+| 1 | [12-03 Gateway Architecture](../../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) | §2 路由配置 | 動態路由 |
+| 2 | [12-03 Gateway Architecture](../../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) | §3 過濾器鏈 | 鑑權、限流 |
+| 3 | [12-03 Gateway Architecture](../../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) | §4 熔斷器 | Resilience4j |
 
 ### 驗證清單
 - [ ] 路由規則正確
@@ -69,9 +69,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [12-01 Deployment Architecture](../../12_Technical_Operations/12-01_Deployment_Architecture.md) | §3 部署策略 | Blue-Green |
-| 2 | [12-01 Deployment Architecture](../../12_Technical_Operations/12-01_Deployment_Architecture.md) | §4 流量管理 | Istio/Nginx |
-| 3 | [12-01 Deployment Architecture](../../12_Technical_Operations/12-01_Deployment_Architecture.md) | §5 監控驗證 | Smoke Test |
+| 1 | [12-01 Deployment Architecture](../../07_Technical_Infrastructure_NEW/07-01_Deployment.md) | §3 部署策略 | Blue-Green |
+| 2 | [12-01 Deployment Architecture](../../07_Technical_Infrastructure_NEW/07-01_Deployment.md) | §4 流量管理 | Istio/Nginx |
+| 3 | [12-01 Deployment Architecture](../../07_Technical_Infrastructure_NEW/07-01_Deployment.md) | §5 監控驗證 | Smoke Test |
 
 ### 驗證清單
 - [ ] Blue/Green 環境獨立
@@ -99,9 +99,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [12-05 API Design](../../12_Technical_Operations/12-05_API_Design_Standard.md) | §6 限流策略 | 令牌桶/漏桶 |
+| 1 | [12-05 API Design](../../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) | §6 限流策略 | 令牌桶/漏桶 |
 | 2 | Foundation Redis Limiter | - | Redisson 限流器 |
-| 3 | [12-03 Gateway](../../12_Technical_Operations/12-03_Gateway_Architecture.md) | §3.4 限流過濾器 | 閘道限流 |
+| 3 | [12-03 Gateway](../../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) | §3.4 限流過濾器 | 閘道限流 |
 
 ### 驗證清單
 - [ ] 限流閾值正確

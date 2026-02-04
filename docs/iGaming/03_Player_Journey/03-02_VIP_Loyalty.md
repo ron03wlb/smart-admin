@@ -688,8 +688,8 @@ THEN 標記為 "VIP Farming" → 人工審核
 
 ### 技術架構參考
 - [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 數據庫設計
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 配置變更審計
-- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 配置變更審批
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 配置變更審計
+- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 配置變更審批
 
 ---
 

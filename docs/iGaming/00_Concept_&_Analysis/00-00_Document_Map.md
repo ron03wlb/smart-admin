@@ -34,10 +34,10 @@
 #### 架構師
 **建議閱讀路徑**：
 1. [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
-2. [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶架構
+2. [07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶架構
 3. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心錢包設計
 4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控架構
-5. [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API網關設計
+5. [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API網關設計
 6. [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - 數據架構
 
 #### 後端開發工程師
@@ -68,24 +68,24 @@
 
 #### 測試工程師
 **建議閱讀路徑**：
-1. [12-02 QA測試標準](../12_Technical_Operations/12-02_QA_Testing_Standard.md) - 測試規範
+1. [12-02 QA測試標準](../07_Technical_Infrastructure_NEW/07-04_QA_Standards.md) - 測試規範
 2. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心業務邏輯
 3. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控測試場景
 4. [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 極端場景測試
 
 #### 運維工程師
 **建議閱讀路徑**：
-1. [12-01 部署架構](../12_Technical_Operations/12-01_Deployment_Architecture.md) - CI/CD流程
-2. [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 流量控制
-3. [12-04 維護程序](../12_Technical_Operations/12-04_Maintenance_Procedure.md) - 維護SOP
+1. [12-01 部署架構](../07_Technical_Infrastructure_NEW/07-01_Deployment.md) - CI/CD流程
+2. [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 流量控制
+3. [12-04 維護程序](../07_Technical_Infrastructure_NEW/07-05_Maintenance.md) - 維護SOP
 4. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 安全運維
 
 #### 信息安全工程師
 **建議閱讀路徑**：
 1. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
-2. [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 權限管理
-3. [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 審計日誌記錄與檢索
-4. [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - Maker-Checker 審批
+2. [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 權限管理
+3. [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 審計日誌記錄與檢索
+4. [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - Maker-Checker 審批
 5. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 反欺詐
 
 ---
@@ -106,9 +106,9 @@
 
 **相關文檔**：
 - [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 註冊邏輯、KYC、MFA
-- [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 玩家權限
+- [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 玩家權限
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包初始化
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 日誌記錄
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 日誌記錄
 
 ---
 
@@ -176,7 +176,7 @@
 **相關文檔**：
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 審核流程
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控引擎
-- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 審批工作流
+- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 審批工作流
 - [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 代付
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額扣減
 - [02-03 對賬系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 對賬
@@ -239,7 +239,7 @@
 4. **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)**
    平台級風控引擎、規則引擎架構
 
-5. **[09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md)**
+5. **[09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md)**
    權限管理、多租戶隔離
 
 ---
@@ -271,22 +271,22 @@
 12. **[03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md)**
     GP對接極端場景
 
-13. **[07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md)**
+13. **[07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md)**
     四層多租戶架構
 
-14. **[09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md)**
+14. **[09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md)**
     Elasticsearch審計日誌、檢索與導出
 
-15. **[09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md)**
+15. **[09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md)**
     Maker-Checker 審批、多級審批鏈
 
 15. **[09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)**
     加密、盲索引、GDPR Crypto-Shredding
 
-16. **[12-01 部署架構](../12_Technical_Operations/12-01_Deployment_Architecture.md)**
+16. **[12-01 部署架構](../07_Technical_Infrastructure_NEW/07-01_Deployment.md)**
     Blue-Green、Canary、回滾流程
 
-17. **[12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md)**
+17. **[12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md)**
     限流、熔斷、DDoS防護
 
 ---
@@ -450,9 +450,9 @@ graph TD
 | [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動使用流水驗證數據 |
 | [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
 | [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
-| [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) | [09-01 RBAC](../09_System_Security/09-01_Admin_RBAC.md) | RBAC基於層級架構 |
-| [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
-| [09-02 審計日誌](../09_System_Security/09-02_Audit_Log_System.md) | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | 審批操作記錄在審計日誌 |
+| [07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) | [09-01 RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | RBAC基於層級架構 |
+| [09-04 審批工作流](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
+| [09-02 審計日誌](../05_Platform_Governance_NEW/05-03_Audit_Log.md) | [09-04 審批工作流](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) | 審批操作記錄在審計日誌 |
 
 ---
 
@@ -552,7 +552,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 07-01 | [Hierarchy_Architecture.md](../07_Platform_Management/07-01_Hierarchy_Architecture.md) | 四層多租戶架構 | 39 ⚠️ |
+| 07-01 | [Hierarchy_Architecture.md](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) | 四層多租戶架構 | 39 ⚠️ |
 | 07-02 | [Tenant_Configuration.md](../07_Platform_Management/07-02_Tenant_Configuration.md) | 租戶自助配置 | 55 |
 | 07-03 | [Notification_Architecture.md](../07_Platform_Management/07-03_Notification_Architecture.md) | 多渠道通知系統 | 80 |
 | 07-04 | [Data_Pipeline_Architecture.md](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) | ODS→DWD→DWS→ADS 數據分層 | 82 |
@@ -579,10 +579,10 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 09-01 | [Admin_RBAC.md](../09_System_Security/09-01_Admin_RBAC.md) | 管理後台權限管理 | 80+ |
-| 09-02 | [Audit_Log_System.md](../09_System_Security/09-02_Audit_Log_System.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
+| 09-01 | [Admin_RBAC.md](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | 管理後台權限管理 | 80+ |
+| 09-02 | [Audit_Log_System.md](../05_Platform_Governance_NEW/05-03_Audit_Log.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
 | 09-03 | [Data_Security_Standard.md](../09_System_Security/09-03_Data_Security_Standard.md) | 加密、盲索引、GDPR Crypto-Shredding | 676 📏 |
-| 09-04 | [Approval_Workflow_System.md](../09_System_Security/09-04_Approval_Workflow_System.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
+| 09-04 | [Approval_Workflow_System.md](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
 
 > 📏 **考慮拆分**：09-02（832行）、09-03（676行）、09-04（833行）文檔較長
 > ✅ **內容去重完成**：09-02 專注審計日誌，09-04 專注審批流程，已移除重複的合併版文件
@@ -611,10 +611,10 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 12-01 | [Deployment_Architecture.md](../12_Technical_Operations/12-01_Deployment_Architecture.md) | Blue-Green、Canary、回滾 | 501 |
-| 12-02 | [QA_Testing_Standard.md](../12_Technical_Operations/12-02_QA_Testing_Standard.md) | 測試金字塔、K6性能測試 | 426 |
-| 12-03 | [Gateway_Architecture.md](../12_Technical_Operations/12-03_Gateway_Architecture.md) | 限流、熔斷、DDoS防護 | 511 |
-| 12-04 | [Maintenance_Procedure.md](../12_Technical_Operations/12-04_Maintenance_Procedure.md) | Graceful Shutdown、維護SOP | 611 |
+| 12-01 | [Deployment_Architecture.md](../07_Technical_Infrastructure_NEW/07-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 |
+| 12-02 | [QA_Testing_Standard.md](../07_Technical_Infrastructure_NEW/07-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 |
+| 12-03 | [Gateway_Architecture.md](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 |
+| 12-04 | [Maintenance_Procedure.md](../07_Technical_Infrastructure_NEW/07-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 |
 
 ---
 
@@ -655,7 +655,7 @@ graph TD
 **導航路徑**：
 1. **開始**: [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 理解PSP集成標準
 2. **然後**: [02-03 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 設計對帳流程
-3. **參考**: [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - 確保API規範一致性
+3. **參考**: [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - 確保API規範一致性
 4. **安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 敏感數據加密要求
 
 **關鍵檢查點**：
@@ -739,15 +739,15 @@ ValidTurnover = BetAmount
 1. **帳戶系統**: [01-01 玩家帳戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC等級設計
 2. **第三方整合**: [06-03 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) - Onfido/Jumio集成
 3. **數據安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 身份證件加密存儲
-4. **審批流程**: [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC人工審核
+4. **審批流程**: [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - KYC人工審核
 
 ---
 
 #### 📊 ...後台管理功能
 **導航路徑**:
-1. **權限控制**: [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 角色權限設計
-2. **審計日誌**: [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 操作記錄要求
-3. **API標準**: [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - RESTful規範
+1. **權限控制**: [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 角色權限設計
+2. **審計日誌**: [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 操作記錄要求
+3. **API標準**: [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - RESTful規範
 
 ---
 
@@ -761,7 +761,7 @@ ValidTurnover = BetAmount
 
 #### 🔌 ...API規範
 **依類型查找**:
-- **通用標準**: [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - RESTful、響應格式
+- **通用標準**: [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - RESTful、響應格式
 - **風控API**: [05-01 風控系統 §3](../04_Risk_Control/04-01_Risk_Framework.md) - 第204-334行
 - **支付API**: [02-02 支付網關 §10](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP集成規範
 - **遊戲API**: [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - GP接入協議
@@ -771,7 +771,7 @@ ValidTurnover = BetAmount
 - **數據加密**: [09-03 數據安全標準 §2](../09_System_Security/09-03_Data_Security_Standard.md) - AES-256、盲索引
 - **GDPR合規**: [09-03 §6](../09_System_Security/09-03_Data_Security_Standard.md) - Crypto-Shredding、數據刪除
 - **密碼策略**: [01-01 玩家帳戶 §2.3](../03_Player_Journey/03-01_Player_Lifecycle.md) - Argon2、MFA
-- **API安全**: [12-03 網關架構 §5](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 限流、防DDoS
+- **API安全**: [12-03 網關架構 §5](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 限流、防DDoS
 
 #### 🎨 ...前端實作
 **按功能查找**:
@@ -806,7 +806,7 @@ ValidTurnover = BetAmount
 **診斷流程**:
 1. 檢查 [02-02 支付網關 §4](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 簽名驗證邏輯
 2. 確認 [09-03 數據安全 §3](../09_System_Security/09-03_Data_Security_Standard.md) - 密鑰管理是否正確
-3. 查看 [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - IP白名單配置
+3. 查看 [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - IP白名單配置
 
 ---
 
@@ -818,20 +818,20 @@ ValidTurnover = BetAmount
 2. [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 完整ER圖
 3. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心業務邏輯
 4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - API契約規範
-5. [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - 開發規範
+5. [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - 開發規範
 
 #### 🎨 前端工程師
 **必讀清單**:
 1. [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - 組件架構
 2. [08-05 本地化系統](../08_Frontend_CMS/08-05_Localization_System.md) - i18n實作
 3. [08-03 SEO與效能](../08_Frontend_CMS/08-03_SEO_&_Performance.md) - 效能優化
-4. [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API調用規範
+4. [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API調用規範
 
 #### 🔒 安全工程師
 **必讀清單**:
-1. [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 權限模型
+1. [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 權限模型
 2. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密、GDPR
-3. [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - DDoS防護
+3. [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - DDoS防護
 4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 欺詐檢測
 
 #### 💼 產品經理

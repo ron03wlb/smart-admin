@@ -1,4 +1,4 @@
-# 12-01 部署架構與 DevOps 規範 (Deployment Architecture)
+# 07-01 部署架構與 DevOps 規範 (Deployment Architecture)
 
 ## 1. 系統概述
 為確保平台 **99.99% 高可用性**，必須建立標準化的 CI/CD 流程與環境隔離策略。
@@ -532,5 +532,5 @@ if (featureFlag) {
 - [00-04 技術棧](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 技術選型
 
 ### 相關文檔
-- [12-03 網關架構](./12-03_Gateway_Architecture.md) - API Gateway
-- [12-06 性能監控](./12-06_Performance_Monitoring.md) - APM 集成
+- [12-03 網關架構](./07-02-01_Gateway_Core.md) - API Gateway
+- [12-06 性能監控](./07-06_Performance_Monitoring.md) - APM 集成

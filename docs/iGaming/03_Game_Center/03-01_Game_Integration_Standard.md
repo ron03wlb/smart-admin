@@ -159,8 +159,8 @@ Transaction API 需區分獎金類型：
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 遊戲風控檢測、熔斷機制
 
 ### 技術參考
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 安全、HMAC 簽名驗證
-- [12-04 維護程序](../12_Technical_Operations/12-04_Maintenance_Procedure.md) - 遊戲維護流程
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 安全、HMAC 簽名驗證
+- [12-04 維護程序](../07_Technical_Infrastructure_NEW/07-05_Maintenance.md) - 遊戲維護流程
 
 ### 延伸閱讀
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 敏感數據加密規範

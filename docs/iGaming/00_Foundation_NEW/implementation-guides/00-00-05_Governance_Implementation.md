@@ -40,8 +40,8 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [07-01 Hierarchy Architecture](../../07_Platform_Management/07-01_Hierarchy_Architecture.md) | §2 租戶模型 | Schema 隔離 |
-| 2 | [07-01 Hierarchy Architecture](../../07_Platform_Management/07-01_Hierarchy_Architecture.md) | §3 數據隔離 | 分片策略 |
+| 1 | [07-01 Hierarchy Architecture](../../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) | §2 租戶模型 | Schema 隔離 |
+| 2 | [07-01 Hierarchy Architecture](../../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) | §3 數據隔離 | 分片策略 |
 | 3 | [02-05 Billing](../../02_Finance_Center/02-05_Billing_&_Invoicing.md) | §2 租戶計費 | 商戶管理 |
 
 ### 驗證清單
@@ -70,9 +70,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [09-01 Admin RBAC](../../09_System_Security/09-01_Admin_RBAC.md) | §2 權限模型 | RBAC 設計 |
-| 2 | [09-01 Admin RBAC](../../09_System_Security/09-01_Admin_RBAC.md) | §3 角色管理 | 角色繼承 |
-| 3 | [09-01 Admin RBAC](../../09_System_Security/09-01_Admin_RBAC.md) | §4 權限驗證 | Sa-Token 整合 |
+| 1 | [09-01 Admin RBAC](../../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | §2 權限模型 | RBAC 設計 |
+| 2 | [09-01 Admin RBAC](../../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | §3 角色管理 | 角色繼承 |
+| 3 | [09-01 Admin RBAC](../../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | §4 權限驗證 | Sa-Token 整合 |
 
 ### 驗證清單
 - [ ] 角色權限正確配置
@@ -100,9 +100,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [09-02 Audit Log System](../../09_System_Security/09-02_Audit_Log_System.md) | §2 日誌模型 | 事件定義 |
-| 2 | [09-02 Audit Log System](../../09_System_Security/09-02_Audit_Log_System.md) | §3 AOP 攔截 | 自動記錄 |
-| 3 | [09-02 Audit Log System](../../09_System_Security/09-02_Audit_Log_System.md) | §4 查詢分析 | 審計報表 |
+| 1 | [09-02 Audit Log System](../../05_Platform_Governance_NEW/05-03_Audit_Log.md) | §2 日誌模型 | 事件定義 |
+| 2 | [09-02 Audit Log System](../../05_Platform_Governance_NEW/05-03_Audit_Log.md) | §3 AOP 攔截 | 自動記錄 |
+| 3 | [09-02 Audit Log System](../../05_Platform_Governance_NEW/05-03_Audit_Log.md) | §4 查詢分析 | 審計報表 |
 
 ### 驗證清單
 - [ ] 關鍵操作被記錄

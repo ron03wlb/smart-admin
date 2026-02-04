@@ -1,4 +1,4 @@
-# 12-02 測試驗收標準 (QA Testing Standard)
+# 07-04 測試驗收標準 (QA Testing Standard)
 
 ## 1. 系統概述
 金融類系統對錯誤的容忍度為零。本標準定義了各階段測試的 **"通過條件 (Exit Criteria)"**。
@@ -380,5 +380,5 @@ jobs:
 ## 📚 相關文檔
 
 ### 相關文檔
-- [12-01 部署架構](./12-01_Deployment_Architecture.md) - CI/CD 集成
-- [12-04 維護程序](./12-04_Maintenance_Procedure.md) - 運維流程
+- [12-01 部署架構](./07-01_Deployment.md) - CI/CD 集成
+- [12-04 維護程序](./07-05_Maintenance.md) - 運維流程

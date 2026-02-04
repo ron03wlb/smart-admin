@@ -545,7 +545,7 @@ groups:
 - [08-05-03 翻譯工作流](./08-05-03_Translation_Workflow.md) - 狀態機、Crowdin整合
 
 ### 技術架構參考
-- [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - API 規範
+- [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API 規範
 - [12-04 監控體系](../12_Technical_Operations/12-04_Monitoring_System.md) - Prometheus/Grafana 監控
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 事件驅動整合
 

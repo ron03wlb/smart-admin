@@ -640,7 +640,7 @@ Player Deletion Request
 ### 架構參考
 - [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
 - [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
-- [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶設計
+- [07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶設計
 
 ---
 

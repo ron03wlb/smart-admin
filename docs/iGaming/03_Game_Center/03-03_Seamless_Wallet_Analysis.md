@@ -833,11 +833,11 @@ flowchart TD
 
 ### 技術參考
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 分散式事務、TCC 模式
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流、冪等性保證
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 限流、冪等性保證
 
 ### 延伸閱讀
 - [03-02 遊戲大廳管理](./03-02_Game_Lobby_Management.md) - 遊戲入口管理
-- [12-04 維護程序](../12_Technical_Operations/12-04_Maintenance_Procedure.md) - 遊戲維護與餘額同步
+- [12-04 維護程序](../07_Technical_Infrastructure_NEW/07-05_Maintenance.md) - 遊戲維護與餘額同步
 
 ---
 

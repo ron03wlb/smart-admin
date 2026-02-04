@@ -1,4 +1,4 @@
-# 12-06 性能監控與告警 (Performance Monitoring & Alerting)
+# 07-06 性能監控與告警 (Performance Monitoring & Alerting)
 
 > **版本**: 1.0.0
 > **最後更新**: 2026-01-28
@@ -447,11 +447,11 @@ Kibana (Visualization & Search)
 - [00-04 技術選型標準](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - APM 工具選型依據
 
 ### 核心依賴
-- [12-01 部署架構](./12-01_Deployment_Architecture.md) - 監控基礎設施部署
-- [12-04 維護程序](./12-04_Maintenance_Procedure.md) - 告警響應流程
+- [12-01 部署架構](./07-01_Deployment.md) - 監控基礎設施部署
+- [12-04 維護程序](./07-05_Maintenance.md) - 告警響應流程
 
 ### 延伸閱讀
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 日誌聚合與審計日誌整合
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 日誌聚合與審計日誌整合
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控指標監控
 
 ---

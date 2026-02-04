@@ -1,4 +1,4 @@
-# 09-01 管理員權限系統 (Admin RBAC)
+# 05-02 RBAC 權限系統 (RBAC Permissions)
 
 ## 1. 系統概述
 基於 **RBAC (Role-Based Access Control)** 模型設計，嚴格控制後台人員的數據訪問權限。
@@ -793,7 +793,7 @@ Response 200 OK:
 ## 📚 相關文檔
 
 ### 核心依賴
-- [07-01 系統層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶架構、層級設計
+- [07-01 系統層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶架構、層級設計
 - [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - 操作日誌記錄
 
 ### 業務整合
@@ -802,7 +802,7 @@ Response 200 OK:
 
 ### 技術參考
 - [09-03 數據安全標準](./09-03_Data_Security_Standard.md) - 權限數據加密
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 權限驗證
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 權限驗證
 
 ### 延伸閱讀
 - [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 商戶權限配置

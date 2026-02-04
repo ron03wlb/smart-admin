@@ -281,7 +281,7 @@ class ErrorBoundary extends React.Component {
 - [08-05 本地化系統](./08-05_Localization_System.md) - 多語言實作
 
 ### 技術參考
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流與安全
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 限流與安全
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密規範
 
 ### 業務整合

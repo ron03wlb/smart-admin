@@ -475,7 +475,7 @@ report:{report_type}:{date}:{filters_hash}
 
 ### 延伸閱讀
 - [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - CDC、ETL 流程
-- [12-06 性能監控](../12_Technical_Operations/12-06_Performance_Monitoring.md) - Grafana 儀表板設計
+- [12-06 性能監控](../07_Technical_Infrastructure_NEW/07-06_Performance_Monitoring.md) - Grafana 儀表板設計
 
 ---
 

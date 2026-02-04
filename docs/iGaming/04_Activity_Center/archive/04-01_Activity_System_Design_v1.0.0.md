@@ -1372,7 +1372,7 @@ flowchart TD
 - [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 流水未達標提款限制
 
 ### 技術參考
-- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 活動發布 Maker-Checker 審批
+- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 活動發布 Maker-Checker 審批
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 活動推送通知
 
 ### 延伸閱讀

@@ -235,11 +235,11 @@ Response (200 OK):
 
 ### 核心依賴
 - [07-01 系統層級架構](./07-01_Hierarchy_Architecture.md) - 多租戶架構設計
-- [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 高危操作審批
+- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 高危操作審批
 
 ### 技術參考
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 配置同步機制
-- [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 配置變更記錄
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 配置同步機制
+- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 配置變更記錄
 
 ### 業務整合
 - [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 支付方式配置

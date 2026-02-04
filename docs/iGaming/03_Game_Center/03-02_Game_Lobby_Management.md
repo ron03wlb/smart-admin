@@ -285,7 +285,7 @@ Response:
 
 ### 技術架構
 - [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - 大廳頁面設計
-- [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 限流
+- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 限流
 
 ### 業務整合
 - [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 活動遊戲推薦
