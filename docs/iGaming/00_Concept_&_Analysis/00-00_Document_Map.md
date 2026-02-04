@@ -1,9 +1,15 @@
 # IGaming需求框架 - 文檔導航地圖
 
-> **版本**: 1.0.0
-> **最後更新**: 2026-01-27
+> **版本**: 1.1.0
+> **最後更新**: 2026-02-04
 > **維護團隊**: Architecture Team
-
+>
+> 📢 **v1.1.0 變更通知**:
+> - 本文檔已從「詳細導航」轉變為「高層索引」
+> - 詳細閱讀路徑已遷移至專門的導航文檔:
+>   - 角色導航 → [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md)
+>   - 業務流程 → [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
+>   - 實作指南 → [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
 ---
 
 ## 📋 目錄
@@ -23,292 +29,47 @@
 
 ### 按角色導航
 
-#### 產品經理
-**建議閱讀路徑**：
-1. [00-01 方案概覽](./00-01_Solution_Overview.md) - 了解整體架構
-2. [00-02 行業術語](./00-02_Industry_Terminology.md) - 掌握行業術語
-3. [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 玩家管理
-4. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動規則
-5. [06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md) - 代理架構
+> 📌 **完整角色導航**: [QUICKSTART §2.2](../00_Foundation_NEW/00-00_QUICKSTART.md#按角色快速導航)
 
-#### 架構師
-**建議閱讀路徑**：
-1. [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
-2. [07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶架構
-3. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心錢包設計
-4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控架構
-5. [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API網關設計
-6. [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - 數據架構
-
-#### 後端開發工程師
-**建議閱讀路徑**：
-
-**財務中心開發**：
-1. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包核心邏輯
-2. [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 事件驅動架構
-3. [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 出金流程
-4. [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水算法
-
-**遊戲集成開發**：
-1. [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - API規格
-2. [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 特殊場景處理
-3. [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對賬
-
-**風控開發**：
-1. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 規則引擎
-2. [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 出金風控規則
-3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動風控
-
-#### 前端開發工程師
-**建議閱讀路徑**：
-1. [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - Layout設計
-2. [08-05 多語言系統](../08_Frontend_CMS/08-05_Localization_System.md) - i18n架構
-3. [08-03 SEO與性能](../08_Frontend_CMS/08-03_SEO_&_Performance.md) - 性能優化
-4. [08-04 移動應用架構](../08_Frontend_CMS/08-04_Mobile_App_Architecture.md) - 移動端
-
-#### 測試工程師
-**建議閱讀路徑**：
-1. [12-02 QA測試標準](../07_Technical_Infrastructure_NEW/07-04_QA_Standards.md) - 測試規範
-2. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心業務邏輯
-3. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控測試場景
-4. [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 極端場景測試
-
-#### 運維工程師
-**建議閱讀路徑**：
-1. [12-01 部署架構](../07_Technical_Infrastructure_NEW/07-01_Deployment.md) - CI/CD流程
-2. [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 流量控制
-3. [12-04 維護程序](../07_Technical_Infrastructure_NEW/07-05_Maintenance.md) - 維護SOP
-4. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 安全運維
-
-#### 信息安全工程師
-**建議閱讀路徑**：
-1. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
-2. [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 權限管理
-3. [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 審計日誌記錄與檢索
-4. [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - Maker-Checker 審批
-5. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 反欺詐
+| 角色 | 核心關注點 | 必讀文檔 (P0) | 完整路徑 |
+|------|-----------|-------------|---------|
+| 產品經理 | 業務邏輯、規則設計 | 方案概覽, 玩家生命週期, 活動系統 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#產品經理) |
+| 架構師 | 整體架構、技術選型 | 多租戶架構, 統一錢包, 網關設計 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#架構師) |
+| 後端工程師 | 技術實現、API設計 | 錢包邏輯, Seamless API, 流水計算 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#後端開發工程師) |
+| 前端工程師 | 介面設計、性能優化 | Layout引擎, 多語言, SEO優化 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#前端開發工程師) |
+| 測試工程師 | 測試場景、邊界情況 | QA標準, 核心業務邏輯, 極端場景 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#測試工程師) |
+| 運維工程師 | 部署、監控、維護 | 部署流程, 網關流控, 維護SOP | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#運維工程師) |
+| 安全工程師 | 數據安全、合規 | 數據加密, RBAC, 審計日誌 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#信息安全工程師) |
 
 ---
 
 ### 按業務流程導航
 
-#### 🎮 玩家註冊流程
-```text
-[01-01 玩家賬戶系統]
-    → 註冊 & KYC驗證
-[09-01 管理後台RBAC]
-    → 權限初始化
-[02-06 統一錢包模型]
-    → 創建錢包
-[09-02 審計日誌系統]
-    → 記錄註冊日誌
-```
+> 📌 **完整流程圖集**: [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
 
-**相關文檔**：
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 註冊邏輯、KYC、MFA
-- [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 玩家權限
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包初始化
-- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 日誌記錄
-
----
-
-#### 💰 存款流程
-```text
-[02-02 支付網關集成]
-    → PSP支付請求
-[02-07 交易處理流程]
-    → 交易事件處理
-[02-06 統一錢包模型]
-    → 錢包入賬 (Cash餘額)
-[09-02 審計日誌系統]
-    → 記錄交易日誌
-[04-01 活動系統設計]
-    → 觸發存送紅利（如有）
-```
-
-**相關文檔**：
-- [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 支付通道
-- [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - Kafka事件
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額更新
-- [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 紅利發放
-
----
-
-#### 🎲 遊戲流程
-```text
-[03-01 遊戲集成標準]
-    → GP API調用
-[03-03 無縫錢包對接分析]
-    → 下注扣款 / 結算入賬
-[02-06 統一錢包模型]
-    → 更新可下注餘額
-[02-04 流水計算與對賬]
-    → 計算有效流水
-[05-01 風控系統]
-    → 異常流水檢測（對沖/套利）
-```
-
-**相關文檔**：
-- [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - API規格
-- [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 極端場景
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包邏輯
-- [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水算法
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控檢測
-
----
-
-#### 💸 提款流程
-```text
-[02-01 出金風控]
-    → 多層審核（L1/L2/L3）
-[05-01 風控系統]
-    → 風控規則檢測
-[09-02 審計日誌系統]
-    → Maker-Checker審批
-[02-02 支付網關集成]
-    → PSP代付執行
-[02-06 統一錢包模型]
-    → 錢包扣款
-[02-03 對賬系統]
-    → 三方對賬
-```
-
-**相關文檔**：
-- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 審核流程
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控引擎
-- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 審批工作流
-- [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 代付
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額扣減
-- [02-03 對賬系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 對賬
-
----
-
-#### 🎁 活動領取流程
-```text
-[04-01 活動系統設計]
-    → 檢查領取條件
-[02-04 流水計算與對賬]
-    → 驗證流水是否達標
-[02-06 統一錢包模型]
-    → 發放紅利（Bonus餘額）
-[05-01 風控系統]
-    → 紅利濫用檢測
-```
-
-**相關文檔**：
-- [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動規則
-- [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 紅利發放
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 濫用防護
-
----
-
-#### 👥 代理佣金結算流程
-```text
-[06-01 代理系統設計]
-    → 計算佣金
-[02-04 流水計算與對賬]
-    → 下級有效流水彙總
-[06-02 信用網絡邏輯]
-    → 處理信用額度結算
-[02-05 賬單與發票]
-    → 生成佣金賬單
-```
-
-**相關文檔**：
-- [06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md) - 佣金算法
-- [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水數據
-- [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - 信用結算
-- [02-05 賬單與發票](../02_Finance_Center/02-05_Billing_&_Invoicing.md) - 賬單生成
+| 流程 | 涉及模塊 | 關鍵難點 | 詳細文檔 |
+|------|---------|---------|---------|
+| 玩家註冊與KYC | 玩家、權限、錢包 | 多租戶分配、KYC驗證 | [BUSINESS_FLOWS §1](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-1-玩家註冊與kyc) |
+| 存款與活動發放 | 支付、錢包、活動 | PSP整合、紅利觸發 | [BUSINESS_FLOWS §2](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-2-存款與活動發放) |
+| 遊戲對接與Token | 遊戲、錢包、流水 | Token安全、冪等性 | [BUSINESS_FLOWS §3](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-3-遊戲對接與token) |
+| 出金審核與風控 | 風控、審批、支付 | 多層審核、SAGA補償 | [BUSINESS_FLOWS §4](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-4-出金審核與風控) |
+| 流水計算與對帳 | 流水、對賬、風控 | 三層驗證、一致性 | [BUSINESS_FLOWS §5](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-5-流水計算與對帳) |
+| 代理佣金結算 | 代理、流水、賬單 | 佣金算法、信用結算 | [BUSINESS_FLOWS §6](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-6-代理佣金結算) |
 
 ---
 
 ### 按優先級閱讀
 
-#### 🔴 P0 - 必讀文檔（理解整體架構）
+> 📌 **完整閱讀路徑**: [QUICKSTART §2.3](../00_Foundation_NEW/00-00_QUICKSTART.md#按優先級閱讀)
 
-1. **[00-01 方案概覽](./00-01_Solution_Overview.md)**
-   全局架構、技術選型、市場分析
+| 優先級 | 主題 | 文檔數 | 關鍵文檔 |
+|-------|------|-------|---------|
+| 🔴 P0 | 整體架構、核心邏輯 | 5 | 方案概覽, 行業術語, 統一錢包, 風控, RBAC |
+| 🟠 P1 | 核心業務邏輯 | 5 | 玩家賬戶, 出金風控, 流水計算, 遊戲集成, 活動系統 |
+| 🟡 P2 | 專項技術 | 8 | 交易處理, 無縫錢包, 多租戶, 審計日誌, 數據安全, 部署, 網關 |
+| 🟢 P3 | 支撐系統 | 6+ | 支付網關, 對賬, 賬單, 代理系統, 多語言, 其他 |
 
-2. **[00-02 行業術語](./00-02_Industry_Terminology.md)**
-   200+行業術語標準化定義
-
-3. **[02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md)**
-   核心錢包邏輯、可下注餘額公式
-
-4. **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)**
-   平台級風控引擎、規則引擎架構
-
-5. **[09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md)**
-   權限管理、多租戶隔離
-
----
-
-#### 🟠 P1 - 核心業務文檔（理解業務邏輯）
-
-6. **[01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md)**
-   註冊、KYC、MFA
-
-7. **[02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md)**
-   多層審核、SAGA事務、多地區合規
-
-8. **[02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)**
-   三層驗證架構、流水算法
-
-9. **[03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md)**
-   GP API規格、安全設計
-
-10. **[04-01 活動系統設計](../04_Activity_Center/01-system-design.md)**
-    紅利系統、流水要求
-
----
-
-#### 🟡 P2 - 專項技術文檔（深入實現細節）
-
-11. **[02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md)**
-    事件驅動、Outbox Pattern
-
-12. **[03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md)**
-    GP對接極端場景
-
-13. **[07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md)**
-    四層多租戶架構
-
-14. **[09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md)**
-    Elasticsearch審計日誌、檢索與導出
-
-15. **[09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md)**
-    Maker-Checker 審批、多級審批鏈
-
-15. **[09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)**
-    加密、盲索引、GDPR Crypto-Shredding
-
-16. **[12-01 部署架構](../07_Technical_Infrastructure_NEW/07-01_Deployment.md)**
-    Blue-Green、Canary、回滾流程
-
-17. **[12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md)**
-    限流、熔斷、DDoS防護
-
----
-
-#### 🟢 P3 - 支撐系統文檔（可選閱讀）
-
-18. **[02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md)**
-    PSP集成、智能路由
-
-19. **[02-03 對賬系統](../02_Finance_Center/02-03_Reconciliation_System.md)**
-    三方對賬流程
-
-20. **[02-05 賬單與發票](../02_Finance_Center/02-05_Billing_&_Invoicing.md)**
-    B2B租戶計費
-
-21. **[06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md)**
-    無限層級代理
-
-22. **[08-05 多語言系統](../08_Frontend_CMS/08-05_Localization_System.md)**
-    i18n完整架構
-
-23. **其他前端、運維文檔** - 按需閱讀
+**總計**: 24+ 核心文檔，涵蓋 iGaming 平台全棧架構
 
 ---
 
@@ -647,203 +408,80 @@ graph TD
 
 ---
 
-## 🔧 故障排除指南 (Troubleshooting Guide)
+## 🔍 快速查找索引 (Quick Reference Index)
 
-### "我需要實作..." (Implementation Scenarios)
+### 按開發任務查找
 
-#### 💳 ...新的支付方式
-**導航路徑**：
-1. **開始**: [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 理解PSP集成標準
-2. **然後**: [02-03 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 設計對帳流程
-3. **參考**: [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - 確保API規範一致性
-4. **安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 敏感數據加密要求
+> 📌 **完整實作指南**: [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
 
-**關鍵檢查點**：
-- ✅ PSP回調簽名驗證（防止偽造）
-- ✅ 冪等性處理（防止重複到賬）
-- ✅ 對帳差異處理流程
-- ✅ 手續費計算邏輯
+| 任務類型 | 範例 | 參考章節 |
+|---------|------|---------|
+| 財務系統 | 新支付方式、錢包系統 | IMPLEMENTATION_GUIDE §1-4 |
+| 遊戲對接 | 新GP對接、Seamless API | IMPLEMENTATION_GUIDE §5-7 |
+| 活動系統 | Bonus引擎、VIP系統 | IMPLEMENTATION_GUIDE §8-10 |
+| 風控系統 | 規則引擎、欺詐檢測 | IMPLEMENTATION_GUIDE §11-13 |
+| 平台治理 | 多租戶、RBAC、審計 | IMPLEMENTATION_GUIDE §14-17 |
 
----
+### 按技術主題查找 (SSOT 快速索引)
 
-#### 🎲 ...流水計算邏輯
-**重要提示**: 流水計算採用**三層架構**，請勿合併！
+> ⭐ **SSOT (Single Source of Truth)** - 唯一權威定義
 
-**理解架構** (必讀順序):
-1. **Layer 1 - 風控基礎驗證**: [05-01 風控系統 §3.1](../04_Risk_Control/04-01_Risk_Framework.md#31-validatebet---投注驗證-layer-1-核心邏輯)
-   - **職責**: 對沖檢測、賠率閾值、異常投注模式識別
-   - **輸出**: RiskFactor (0 = Reject, 1 = Pass)
-   - **標記**: 文檔中明確標註 "Layer 1 核心邏輯"
+| 主題 | 關鍵文檔 | SSOT |
+|------|---------|------|
+| **可下注餘額公式** | [01-02 Wallet_Architecture §2.3](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md#23-可下注餘額計算) | ⭐ |
+| **有效投注算法** | [02-03 Turnover_Calculation §1](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#1-有效投注-valid-turnover-核心算法) | ⭐ |
+| **Token驗證流程** | [02-02 Seamless_Wallet_API §4.2](../02_Game_Operations_NEW/02-02_Seamless_Wallet_API.md#42-token-驗證) | ⭐ |
+| **風控規則引擎** | [04-01 Risk_Engine §2](../04_Risk_Control/04-01_Risk_Framework.md#2-規則引擎架構) | ⭐ |
+| **SAGA補償事務** | [01-05 Withdrawal_Risk §4.3](../01_Player_Center/01-05_Withdrawal_Risk.md#43-saga-補償事務) | ⭐ |
+| **PII加密標準** | [05-05 Data_Security §2](../05_Platform_Governance_NEW/05-05_Data_Security.md#2-pii-加密策略) | ⭐ |
+| **多租戶隔離** | [05-01 Multi_Tenant §3](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md#3-數據隔離策略) | ⭐ |
 
-2. **Layer 2 - 財務狀態因子**: [02-04 流水計算 §1.2](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#12-狀態判定-status-factor---layer-2-核心邏輯)
-   - **職責**: WIN/LOSS/DRAW 狀態調整、HALF WIN/LOSS 處理
-   - **輸出**: StatusFactor (0%, 50%, 100%)
-   - **標記**: 文檔中明確標註 "Layer 2 核心邏輯"
-   - **前置條件**: ✅ 必須先通過 Layer 1
+### 按問題類型查找
 
-3. **Layer 3 - 活動遊戲權重**: [04-01 活動系統 §5.1](../04_Activity_Center/01-system-design.md#51-遊戲權重應用-game-weight-application---layer-3-核心邏輯)
-   - **職責**: 遊戲權重應用 (老虎機 100%、百家樂 15%)
-   - **輸出**: GameWeight (5%-100%)
-   - **標記**: 文檔中明確標註 "Layer 3 核心邏輯"
-   - **前置條件**: ✅ Layer 1 + Layer 2 完成
+| 問題類型 | 診斷文檔 | 關鍵檢查點 |
+|---------|---------|-----------|
+| 錢包餘額不一致 | [01-02 §2.3](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md#23-可下注餘額計算), [01-04 §3](../01_Core_Financial_Loop_NEW/01-04_Settlement.md#3-對賬流程) | 三方對賬、事務補償 |
+| 流水計算錯誤 | [02-03 §1.6](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#16-故障排除), [04-01 §3](../04_Risk_Control/04-01_Risk_Framework.md#3-流水驗證) | 三層架構、風控因子 |
+| 支付回調失敗 | [02-02 §4](../02_Finance_Center/02-02_Payment_Gateway_Integration.md#4-回調處理), [05-05 §3](../05_Platform_Governance_NEW/05-05_Data_Security.md#3-簽名驗證) | 簽名驗證、冪等性 |
+| GP對接異常 | [02-02 §5](../02_Game_Operations_NEW/02-02_Seamless_Wallet_API.md#5-極端場景), [02-03 §2](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#2-對賬驗證) | Token過期、重試機制 |
+| 權限異常 | [05-02 §4](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md#4-故障排除), [05-01 §4](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md#4-Context傳播) | RBAC評估、Context丟失 |
 
-**實作流程** (嚴格順序):
-```text
-1. 玩家投注 → 調用 Layer 1 (05-01) 基礎驗證
-   ↓ (若 RiskFactor = 0，直接拒絕)
-2. 驗證通過 → 調用 Layer 2 (02-04) 狀態因子計算
-   ↓ (根據遊戲結果 WIN/LOSS/DRAW)
-3. 如涉及活動 → 調用 Layer 3 (04-01) 遊戲權重調整
-   ↓
-4. 最終流水 = BetAmount × Layer1 × Layer2 × Layer3
-```
-
-**完整公式**:
-```text
-ValidTurnover = BetAmount
-                × Layer1_RiskFactor      (05-01: 0 or 1)
-                × Layer2_StatusFactor    (02-04: 0%, 50%, 100%)
-                × Layer3_GameWeight      (04-01: 5%-100%)
-```
-
-**驗證清單**:
-- ✅ 所有三個文檔開頭包含架構定位標記
-- ✅ Layer 2/3 明確標註前置條件依賴
-- ✅ 完整公式在所有相關章節可見
-
-**關鍵原則**:
-- ✅ **必須按順序執行**: Layer 1 → Layer 2 → Layer 3
-- ✅ **不可跳過**: 每層都必須執行（即使某層因子為 1）
-- ❌ **不可合併**: 三層邏輯不可合併到同一個 Service 中
-
----
-
-#### 🎁 ...新的獎金類型
-**導航路徑**:
-1. **業務邏輯**: [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎架構
-2. **錢包整合**: [02-06 統一錢包 - 獎金餘額](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 可下注餘額公式
-3. **風控檢測**: [05-01 風控系統 - 獎金濫用檢測](../04_Risk_Control/04-01_Risk_Framework.md) - 防刷獎金規則
-
-**關鍵決策點**:
-| 問題 | 參考章節 |
-|------|---------|
-| 獎金是否計入可下注餘額？ | 02-06 §2.3 可下注餘額公式 |
-| 流水要求如何計算？ | 04-01 §流水驗證架構 |
-| 如何防止多帳號領取？ | 05-01 §多帳號檢測 |
-| 獎金過期如何處理？ | 02-06 §餘額調整邏輯 |
-
----
-
-#### 👤 ...玩家KYC驗證流程
-**導航路徑**:
-1. **帳戶系統**: [01-01 玩家帳戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC等級設計
-2. **第三方整合**: [06-03 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) - Onfido/Jumio集成
-3. **數據安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 身份證件加密存儲
-4. **審批流程**: [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - KYC人工審核
-
----
-
-#### 📊 ...後台管理功能
-**導航路徑**:
-1. **權限控制**: [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 角色權限設計
-2. **審計日誌**: [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 操作記錄要求
-3. **API標準**: [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - RESTful規範
-
----
-
-### "我要找..." (Quick Reference)
-
-#### 📐 ...數據庫設計
-**單一來源**: [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md)
-- 完整ER圖
-- 所有表結構定義
-- 索引設計規範
-
-#### 🔌 ...API規範
-**依類型查找**:
-- **通用標準**: [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - RESTful、響應格式
-- **風控API**: [05-01 風控系統 §3](../04_Risk_Control/04-01_Risk_Framework.md) - 第204-334行
-- **支付API**: [02-02 支付網關 §10](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP集成規範
-- **遊戲API**: [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - GP接入協議
-
-#### 🔒 ...安全要求
-**按場景查找**:
-- **數據加密**: [09-03 數據安全標準 §2](../09_System_Security/09-03_Data_Security_Standard.md) - AES-256、盲索引
-- **GDPR合規**: [09-03 §6](../09_System_Security/09-03_Data_Security_Standard.md) - Crypto-Shredding、數據刪除
-- **密碼策略**: [01-01 玩家帳戶 §2.3](../03_Player_Journey/03-01_Player_Lifecycle.md) - Argon2、MFA
-- **API安全**: [12-03 網關架構 §5](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 限流、防DDoS
-
-#### 🎨 ...前端實作
-**按功能查找**:
-- **佈局引擎**: [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - 拖拽式CMS
-- **多語系**: [08-05 本地化系統](../08_Frontend_CMS/08-05_Localization_System.md) - i18n完整架構
-- **SEO**: [08-03 SEO與效能](../08_Frontend_CMS/08-03_SEO_&_Performance.md) - SSR/ISR、Core Web Vitals
-- **移動端**: [08-04 移動應用架構](../08_Frontend_CMS/08-04_Mobile_App_Architecture.md) - Flutter/React Native
-
-#### 📈 ...報表與數據
-**導航路徑**:
-- **報表架構**: [06-01 報表與BI架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 數據分層、BI工具
-- **數據管道**: [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - ODS→DWD→DWS→ADS
-- **數據模型**: [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 完整表設計
-
----
-
-### "出現錯誤..." (Error Resolution)
-
-#### ❌ 錢包餘額不一致
-**診斷流程**:
-1. 檢查 [02-06 統一錢包 §2.3](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 可下注餘額公式是否正確
-2. 查詢 [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - TCC事務是否回滾
-3. 執行 [02-03 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 三方對帳驗證
-
-#### ❌ 流水計算錯誤
-**診斷流程**:
-1. 驗證三層架構調用順序（05-01 → 02-04 → 04-01）
-2. 檢查 [02-04 §1.6](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 跨模組一致性保障
-3. 查看 [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 是否被風控規則攔截
-
-#### ❌ 支付回調驗證失敗
-**診斷流程**:
-1. 檢查 [02-02 支付網關 §4](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 簽名驗證邏輯
-2. 確認 [09-03 數據安全 §3](../09_System_Security/09-03_Data_Security_Standard.md) - 密鑰管理是否正確
-3. 查看 [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - IP白名單配置
-
----
-
-### "我是..." (Role-Based Quick Start)
-
-#### 👨‍💻 後端工程師
-**必讀清單** (按順序):
-1. [00-02 行業術語表](../00_Concept_&_Analysis/00-02_Industry_Terminology.md) - 200+標準術語
-2. [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 完整ER圖
-3. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心業務邏輯
-4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - API契約規範
-5. [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - 開發規範
-
-#### 🎨 前端工程師
-**必讀清單**:
-1. [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - 組件架構
-2. [08-05 本地化系統](../08_Frontend_CMS/08-05_Localization_System.md) - i18n實作
-3. [08-03 SEO與效能](../08_Frontend_CMS/08-03_SEO_&_Performance.md) - 效能優化
-4. [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API調用規範
-
-#### 🔒 安全工程師
-**必讀清單**:
-1. [09-01 管理後台RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 權限模型
-2. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密、GDPR
-3. [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - DDoS防護
-4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 欺詐檢測
-
-#### 💼 產品經理
-**必讀清單**:
-1. [00-01 解決方案總覽](../00_Concept_&_Analysis/00-01_Solution_Overview.md) - 商業模式
-2. [01-02 VIP忠誠系統](../03_Player_Journey/03-02_VIP_Loyalty.md) - 玩家運營
-3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎
-4. [06-02 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 客服工具、AI 客服機器人
-
----
 
 ## 📝 變更日誌 (CHANGELOG)
+
+### v1.1.0 (2026-02-04)
+
+#### ♻️ Restructured (Breaking Change)
+
+**Document_Map 角色轉變**: 從詳細導航 → 高層元導航索引
+
+**移除的章節**:
+- ❌ 故障排除指南 (196 lines) → 內容重定向至 [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
+
+**簡化的章節**:
+- ⚠️ 按角色導航 (67 → 13 lines) → 詳細路徑遷移至 [QUICKSTART §2.2](../00_Foundation_NEW/00-00_QUICKSTART.md#按角色快速導航)
+- ⚠️ 按業務流程導航 (132 → 14 lines) → 詳細流程圖遷移至 [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
+- ⚠️ 按優先級閱讀 (88 → 13 lines) → 完整閱讀路徑遷移至 [QUICKSTART §2.3](../00_Foundation_NEW/00-00_QUICKSTART.md#按優先級閱讀)
+
+**新增的章節**:
+- ✅ 快速查找索引 (50 lines) - 整合開發任務查找、SSOT 技術主題索引、問題診斷查找
+
+**改進成果**:
+- 📉 文檔長度: 921 → ~450 lines (**51% reduction**)
+- 🎯 定位更清晰: Meta-navigation hub，指向專門導航文檔
+- 🔗 減少冗余: 與 QUICKSTART、BUSINESS_FLOWS、IMPLEMENTATION_GUIDE 的重複內容移除
+- ⭐ SSOT 索引: 新增 7 個核心技術主題的權威定義快速索引
+
+#### 📋 Migration Guide
+
+**如何查找內容（v1.1.0 更新後）**:
+- **按角色查找** → [QUICKSTART §2.2](../00_Foundation_NEW/00-00_QUICKSTART.md#按角色快速導航)
+- **按流程查找** → [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
+- **按優先級查找** → [QUICKSTART §2.3](../00_Foundation_NEW/00-00_QUICKSTART.md#按優先級閱讀)
+- **實作指南** → [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
+- **SSOT 定義** → 本文檔 §快速查找索引 > 按技術主題查找
+
+---
 
 ### v1.0.0 (2026-01-27)
 
