@@ -1,3 +1,14 @@
+# 01-05 提款風控系統 (Withdrawal Risk Control System)
+
+> **MOVED FROM**: `02-01_Withdrawal_Risk_Control.md` (Week 4-5 Restructure)
+> **Reason**: 提款風控與玩家生命週期緊密相關,歸類至 Player Center 更合理
+> **Version**: v2.2.0 (Post-migration Enhancement)
+> **Last Updated**: 2026-02-03
+
+---
+
+## 系統概述 (System Overview)
+
 全球 iGaming 出金審核系統需要整合 **四大洲合規要求**、**微服務架構**與**多層風控機制**，在 120 毫秒內完成風險決策，同時滿足從菲律賓 PAGCOR 的 3 天 KYC 時限到英國 UKGC 的即時提款禁止取消規則等差異化監管要求。本設計採用事件驅動架構配合 SAGA 分佈式事務模式，支援 99.99% 可用性目標。
 
 ---
@@ -983,6 +994,509 @@ Controller (API 端點) → Service (業務編排) → Manager (事務管理) �
 
 ---
 
+## 8. 提款風控增強機制 (Enhanced Withdrawal Risk Controls)
+
+> **NEW in v2.2.0**: 本章節整合玩家生命週期管理、風險提案關聯、狀態機設計等增強功能
+
+### 8.1 鎖定餘額計算 (Locked Balance Calculation)
+
+> 💡 **SSOT Marker**: 可下注餘額公式詳見 [02-06 §2.2](../02_Finance_Center/02-06_Unified_Wallet_Model.md#22-playable-balance-formula)
+
+**概述**: 鎖定餘額 (Locked Balance) 是錢包餘額的一部分,在特定條件下暫時不可用於投注或提款,用於保障系統資金安全與合規性。
+
+**鎖定觸發條件**:
+
+| 觸發場景 | 鎖定金額 | 鎖定時長 | 解鎖條件 | 優先級 |
+|---------|---------|---------|---------|--------|
+| **提款申請** | 提款金額 | 直到提款完成或取消 | 提款成功/取消/拒絕 | P0 |
+| **紅利流水未完成** | 紅利金額 + 贏利 | 直到流水達標 | 流水達標 OR 紅利過期 | P0 |
+| **風控凍結** | 可疑交易金額 | 人工審核期間 | 審核通過 | P1 |
+| **系統升級** | 全部餘額 | 維護期間 (< 2 小時) | 維護完成 | P2 |
+
+**可下注餘額公式** (SSOT 引用):
+
+```text
+Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
+
+其中:
+- Cash: 現金餘額
+- Bonus: 紅利餘額
+- Credit Limit: 信用額度 (代理模式)
+- Credit Used: 已使用信用
+- Locked Balance: 鎖定餘額 (本章節定義)
+```
+
+**PostgreSQL 鎖定餘額計算** (樂觀鎖):
+
+```sql
+-- Step 1: 提款時鎖定餘額 (Optimistic Locking)
+UPDATE player_wallets
+SET locked_balance = locked_balance + ?,  -- 增加鎖定金額
+    version = version + 1,  -- 樂觀鎖版本號
+    updated_at = NOW()
+WHERE player_id = ?
+  AND version = ?  -- 樂觀鎖檢查
+  AND (cash_balance + bonus_balance - locked_balance) >= ?;  -- 確保餘額足夠
+
+-- 若 UPDATE 影響行數 = 0,則:
+--   1. version 不匹配 → 並發衝突,重試
+--   2. 餘額不足 → 拒絕提款
+
+-- Step 2: 提款完成時解鎖餘額
+UPDATE player_wallets
+SET locked_balance = locked_balance - ?,
+    cash_balance = cash_balance - ?,  -- 扣除現金
+    version = version + 1,
+    updated_at = NOW()
+WHERE player_id = ?
+  AND version = ?;
+```
+
+**Java 實現** (SmartAdmin 模式):
+
+```java
+@Service
+@RequiredArgsConstructor
+public class WalletBalanceLockService {
+    private final PlayerWalletDao walletDao;
+
+    /**
+     * 鎖定提款金額 (樂觀鎖)
+     *
+     * @param playerId 玩家 ID
+     * @param amount 鎖定金額
+     * @return Try<Void> 成功或失敗
+     */
+    public Try<Void> lockWithdrawalAmount(Long playerId, BigDecimal amount) {
+        return Try.of(() -> {
+            for (int retry = 0; retry < 3; retry++) {
+                PlayerWalletEntity wallet = walletDao.selectById(playerId);
+                if (wallet == null) {
+                    throw new IllegalArgumentException("錢包不存在");
+                }
+
+                // 檢查可用餘額
+                BigDecimal availableBalance = wallet.getCashBalance()
+                    .add(wallet.getBonusBalance())
+                    .subtract(wallet.getLockedBalance());
+
+                if (availableBalance.compareTo(amount) < 0) {
+                    throw new InsufficientBalanceException("餘額不足");
+                }
+
+                // 樂觀鎖更新
+                wallet.setLockedBalance(wallet.getLockedBalance().add(amount));
+                wallet.setVersion(wallet.getVersion() + 1);
+                wallet.setUpdatedAt(LocalDateTime.now());
+
+                int updated = walletDao.updateById(wallet);
+                if (updated > 0) {
+                    return null;  // 成功
+                }
+
+                // version 不匹配,重試
+                Thread.sleep(50);
+            }
+
+            throw new ConcurrentModificationException("樂觀鎖衝突,請稍後重試");
+        });
+    }
+}
+```
+
+---
+
+### 8.2 提款速率檢測 (Withdrawal Velocity Detection)
+
+**概述**: 速率檢測 (Velocity Detection) 是識別異常提款行為的關鍵機制,通過分析提款頻率、金額模式、時間分佈等維度,檢測潛在的洗錢、套利、盜號等風險。
+
+**速率規則矩陣**:
+
+| 規則類型 | 閾值條件 | 風險評分 | 處理動作 | 應用範圍 |
+|---------|---------|---------|---------|---------|
+| **頻率限制** | 24 小時內 > 3 次提款 | +30 | 人工審核 | 所有玩家 |
+| **金額異常** | 單次提款 > 近 30 天平均充值 × 1.5 | +40 | L2 審核 | 非 VIP |
+| **時段異常** | 凌晨 2-6 點提款 (非常規時段) | +20 | 增強監控 | 所有玩家 |
+| **固定金額** | 3 次提款金額相同 (±5%) | +50 | L3 審核 | 所有玩家 |
+| **快速提款** | 充值後 < 30 分鐘提款 | +35 | KYC 升級 | L0/L1 玩家 |
+
+**PostgreSQL 速率檢測查詢**:
+
+```sql
+-- 查詢近 24 小時提款次數
+SELECT COUNT(*) AS withdrawal_count_24h
+FROM withdrawal_requests
+WHERE player_id = ?
+  AND created_at >= NOW() - INTERVAL '24 HOUR'
+  AND status IN ('COMPLETED', 'PROCESSING', 'PENDING');
+
+-- 查詢近 30 天平均充值金額
+SELECT AVG(amount) AS avg_deposit_30d
+FROM deposit_requests
+WHERE player_id = ?
+  AND created_at >= NOW() - INTERVAL '30 DAY'
+  AND status = 'COMPLETED';
+
+-- 查詢固定金額模式 (3 次提款金額相差 < 5%)
+WITH recent_withdrawals AS (
+  SELECT amount
+  FROM withdrawal_requests
+  WHERE player_id = ?
+    AND created_at >= NOW() - INTERVAL '7 DAY'
+    AND status = 'COMPLETED'
+  ORDER BY created_at DESC
+  LIMIT 3
+)
+SELECT
+  MAX(amount) - MIN(amount) AS amount_diff,
+  AVG(amount) AS avg_amount
+FROM recent_withdrawals
+HAVING (MAX(amount) - MIN(amount)) / AVG(amount) < 0.05;  -- 差異 < 5%
+```
+
+**ML 模型整合** (異常檢測):
+
+```java
+@Service
+@RequiredArgsConstructor
+public class WithdrawalVelocityDetector {
+    private final WithdrawalDao withdrawalDao;
+    private final MachineLearningService mlService;
+
+    /**
+     * 檢測提款速率異常
+     *
+     * @param playerId 玩家 ID
+     * @param amount 提款金額
+     * @return Try<VelocityCheckResult> 檢測結果 (含風險評分)
+     */
+    public Try<VelocityCheckResult> detectAnomalies(Long playerId, BigDecimal amount) {
+        return Try.of(() -> {
+            // Step 1: 規則引擎檢查
+            int ruleScore = 0;
+
+            // 頻率檢查
+            long count24h = withdrawalDao.countWithdrawals24h(playerId);
+            if (count24h > 3) {
+                ruleScore += 30;
+            }
+
+            // 金額異常檢查
+            BigDecimal avgDeposit = withdrawalDao.getAvgDeposit30d(playerId);
+            if (avgDeposit != null && amount.compareTo(avgDeposit.multiply(BigDecimal.valueOf(1.5))) > 0) {
+                ruleScore += 40;
+            }
+
+            // 時段異常檢查
+            int hour = LocalDateTime.now().getHour();
+            if (hour >= 2 && hour <= 6) {
+                ruleScore += 20;
+            }
+
+            // Step 2: ML 模型評分
+            Map<String, Object> features = buildFeatures(playerId, amount);
+            double mlScore = mlService.predictFraudProbability(features);  // 0-1 範圍
+
+            // Step 3: 綜合評分
+            int finalScore = ruleScore + (int) (mlScore * 100);
+
+            VelocityCheckResult result = new VelocityCheckResult();
+            result.setRuleScore(ruleScore);
+            result.setMlScore(mlScore);
+            result.setFinalScore(finalScore);
+            result.setRiskLevel(calculateRiskLevel(finalScore));
+
+            return result;
+        });
+    }
+
+    private Map<String, Object> buildFeatures(Long playerId, BigDecimal amount) {
+        // 構建 ML 模型特徵向量 (50+ 特徵)
+        return Map.of(
+            "withdrawal_amount", amount,
+            "withdrawal_count_24h", withdrawalDao.countWithdrawals24h(playerId),
+            "withdrawal_count_7d", withdrawalDao.countWithdrawals7d(playerId),
+            "avg_deposit_30d", withdrawalDao.getAvgDeposit30d(playerId),
+            "time_since_last_deposit_minutes", withdrawalDao.getMinutesSinceLastDeposit(playerId),
+            "hour_of_day", LocalDateTime.now().getHour(),
+            "day_of_week", LocalDateTime.now().getDayOfWeek().getValue()
+            // ... 更多特徵
+        );
+    }
+}
+```
+
+---
+
+### 8.3 風險提案關聯 (Risk Proposal Correlation)
+
+> **NEW in v2.1.0**: 完整整合 `07-withdrawal-risk-correlation.md` 時間範圍計算邏輯
+
+**概述**: 風險提案關聯 (Risk Proposal Correlation) 是 v2.1.0 引入的機制 (SAGA Step 2.5),用於檢測玩家提款是否與近期風險提案存在關聯,防止玩家在風險調查期間快速提款轉移資金。
+
+**時間範圍計算規則** (3 種玩家類型):
+
+| 玩家類型 | VIP 等級 | 時間範圍 | 計算邏輯 | 說明 |
+|---------|---------|---------|---------|------|
+| **高價值玩家** | Diamond/Platinum | 近 **7 天** | `time_range_end >= NOW() - INTERVAL '7 DAY'` | 快速處理,減少等待 |
+| **普通玩家** | Gold/Silver/Bronze | 近 **30 天** | `time_range_end >= NOW() - INTERVAL '30 DAY'` | 標準風險窗口 |
+| **高風險玩家** | 任何等級 + `risk_level >= 70` | 近 **90 天** | `time_range_end >= NOW() - INTERVAL '90 DAY'` | 延長監控期 |
+
+**SQL 查詢邏輯** (FLAG 規則篩選):
+
+```sql
+-- Step 1: 確定玩家類型與時間範圍
+WITH player_profile AS (
+  SELECT
+    player_id,
+    vip_tier,
+    risk_score,
+    CASE
+      WHEN vip_tier IN ('DIAMOND', 'PLATINUM') THEN 7
+      WHEN risk_score >= 70 THEN 90
+      ELSE 30
+    END AS time_range_days
+  FROM players
+  WHERE player_id = ?
+)
+-- Step 2: 查詢關聯的風險提案
+SELECT
+  wrc.withdrawal_id,
+  wrc.flagged_rules,
+  wrc.suspicious_amount,
+  wrc.time_range_start,
+  wrc.time_range_end,
+  wr.status AS withdrawal_status
+FROM withdrawal_risk_correlations wrc
+JOIN withdrawal_requests wr ON wrc.withdrawal_id = wr.id
+JOIN player_profile pp ON wrc.player_id = pp.player_id
+WHERE wrc.player_id = ?
+  AND wrc.time_range_end >= (NOW() - INTERVAL '1 DAY' * pp.time_range_days)
+  AND wr.status IN ('MANUAL_REVIEW', 'RISK_CHECK')  -- 未完成的提款
+  AND wrc.flagged_rules IS NOT NULL  -- 僅 FLAG 規則
+ORDER BY wrc.created_at DESC;
+```
+
+**決策路由 (v2.1.0 簡化版)**:
+
+```yaml
+decision_logic:
+  # 情況 1: 無關聯風險提案
+  no_pending_proposals:
+    condition: pending_proposals = 0
+    action: 繼續 SAGA Step 3 (審批路由)
+    risk_adjustment: 0
+
+  # 情況 2: 存在關聯風險提案 (v2.1.0 簡化 - 全部人工審核)
+  has_pending_proposals:
+    condition: pending_proposals > 0
+    action:
+      - 生成人工審核提案 (Manual Review Proposal)
+      - 凍結可疑金額 (suspicious_amount_total)
+      - 路由至 L2 審核隊列 (優先級 P1)
+      - 通知玩家 (預計審核時間 2-24 小時)
+    risk_adjustment: +50 (強制人工審核)
+```
+
+**Java 實現** (SmartAdmin 模式):
+
+```java
+@Service
+@RequiredArgsConstructor
+public class RiskProposalCorrelationService {
+    private final WithdrawalRiskCorrelationDao correlationDao;
+    private final PlayerDao playerDao;
+
+    /**
+     * 檢查風險提案關聯 (SAGA Step 2.5)
+     *
+     * @param playerId 玩家 ID
+     * @param withdrawalId 當前提款 ID
+     * @return Try<CorrelationCheckResult> 檢查結果
+     */
+    public Try<CorrelationCheckResult> checkRiskProposalCorrelation(
+        Long playerId,
+        Long withdrawalId
+    ) {
+        return Try.of(() -> {
+            // Step 1: 確定時間範圍
+            PlayerEntity player = playerDao.selectById(playerId);
+            int timeRangeDays = calculateTimeRange(player);
+
+            // Step 2: 查詢關聯提案
+            List<WithdrawalRiskCorrelationEntity> pendingProposals =
+                correlationDao.findPendingProposals(playerId, timeRangeDays);
+
+            // Step 3: 計算可疑金額總和
+            BigDecimal suspiciousAmountTotal = pendingProposals.stream()
+                .map(WithdrawalRiskCorrelationEntity::getSuspiciousAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // Step 4: 決策路由 (v2.1.0 簡化)
+            CorrelationCheckResult result = new CorrelationCheckResult();
+            result.setPendingProposalsCount(pendingProposals.size());
+            result.setSuspiciousAmountTotal(suspiciousAmountTotal);
+
+            if (pendingProposals.isEmpty()) {
+                // 無關聯提案 → 繼續正常流程
+                result.setAction("CONTINUE");
+                result.setRiskAdjustment(0);
+            } else {
+                // 存在關聯提案 → 強制人工審核
+                result.setAction("MANUAL_REVIEW");
+                result.setRiskAdjustment(50);
+                result.setReviewQueue("L2_PRIORITY");
+                result.setEstimatedReviewTime("2-24 hours");
+            }
+
+            return result;
+        });
+    }
+
+    private int calculateTimeRange(PlayerEntity player) {
+        String vipTier = player.getVipTier();
+        int riskScore = player.getRiskScore();
+
+        if ("DIAMOND".equals(vipTier) || "PLATINUM".equals(vipTier)) {
+            return 7;  // 高價值玩家: 7 天
+        } else if (riskScore >= 70) {
+            return 90;  // 高風險玩家: 90 天
+        } else {
+            return 30;  // 普通玩家: 30 天
+        }
+    }
+}
+```
+
+---
+
+### 8.4 提款狀態機 (Withdrawal State Machine)
+
+> 💡 **SSOT Marker**: 完整的 SAGA Orchestration Workflow 詳見本文檔 [§7.2](#72-saga-補償事務流程-saga-compensation-workflow)
+
+**概述**: 提款狀態機定義了提款請求從創建到完成的完整狀態轉換路徑,確保每個狀態轉換的條件明確、可追溯,並支持 SAGA 補償流程。
+
+**十狀態定義表**:
+
+| 狀態碼 | 中文名稱 | 說明 | 可能轉換 | 業務影響 | SLA |
+|-------|---------|------|---------|---------|-----|
+| `PENDING` | 待處理 | 提款申請已創建 | → RISK_CHECK, REJECTED | 餘額已鎖定 | < 1 分鐘 |
+| `RISK_CHECK` | 風控檢測中 | 風控引擎評估中 | → KYC_REQUIRED, APPROVED, MANUAL_REVIEW, REJECTED | 實時風險評分 | < 2 分鐘 |
+| `KYC_REQUIRED` | 需要 KYC 升級 | 觸發 KYC 等級升級 | → RISK_CHECK | 等待玩家上傳文件 | 48 小時 |
+| `MANUAL_REVIEW` | 人工審核 | L1/L2/L3 審核員介入 | → APPROVED, REJECTED | 審核隊列排隊 | 2-24 小時 |
+| `APPROVED` | 審核通過 | 風控 + KYC + 審批通過 | → PROCESSING | 準備代付 | < 5 分鐘 |
+| `PROCESSING` | 代付處理中 | PSP 代付中 | → COMPLETED, FAILED | 調用 PSP API | < 30 分鐘 |
+| `COMPLETED` | 提款成功 | 資金已到賬 | [終態] | 餘額已扣除 | N/A |
+| `FAILED` | 提款失敗 | PSP 返回失敗 | → ROLLBACK | PSP 錯誤 | < 10 分鐘 |
+| `ROLLBACK` | 餘額回滾中 | 解鎖餘額 + 補償 | → REFUNDED | 釋放鎖定餘額 | < 5 分鐘 |
+| `REFUNDED` | 已退款 | 餘額已解鎖 | [終態] | 玩家可重新提款 | N/A |
+| `REJECTED` | 審核拒絕 | 風控/審核拒絕 | → REFUNDED | 風控/人工拒絕 | < 5 分鐘 |
+
+**Mermaid 狀態機圖**:
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING : 創建提款申請
+
+    PENDING --> RISK_CHECK : 啟動風控檢測 (SAGA Step 1-2)
+
+    RISK_CHECK --> KYC_REQUIRED : KYC 等級不足
+    RISK_CHECK --> MANUAL_REVIEW : 風險評分 60-85
+    RISK_CHECK --> REJECTED : 風險評分 >= 86
+    RISK_CHECK --> APPROVED : 風險評分 < 60 & KYC 合格
+
+    KYC_REQUIRED --> RISK_CHECK : 玩家完成 KYC 升級
+    KYC_REQUIRED --> REJECTED : 超過 48 小時未上傳
+
+    MANUAL_REVIEW --> APPROVED : 審核員批准
+    MANUAL_REVIEW --> REJECTED : 審核員拒絕
+
+    APPROVED --> PROCESSING : 調用 PSP 代付 (SAGA Step 4)
+
+    PROCESSING --> COMPLETED : PSP 成功
+    PROCESSING --> FAILED : PSP 失敗
+
+    REJECTED --> ROLLBACK : 開始補償流程
+    FAILED --> ROLLBACK : 開始補償流程
+
+    ROLLBACK --> REFUNDED : 餘額已解鎖
+
+    COMPLETED --> [*] : 提款完成
+    REFUNDED --> [*] : 退款完成
+
+    note right of RISK_CHECK : SAGA Step 1: 風險評估<br/>SAGA Step 2: KYC/AML 驗證<br/>SAGA Step 2.5: 延遲風控檢查
+
+    note right of PROCESSING : SAGA Step 4: 支付執行<br/>包含重試機制 (最多 3 次)
+
+    note right of ROLLBACK : SAGA 補償流程:<br/>- 解鎖餘額<br/>- 回滾交易<br/>- 發送通知
+```
+
+**狀態轉換觸發示例** (PostgreSQL):
+
+```sql
+-- PENDING → RISK_CHECK
+UPDATE withdrawal_requests
+SET status = 'RISK_CHECK',
+    risk_check_started_at = NOW(),
+    updated_at = NOW()
+WHERE id = ?
+  AND status = 'PENDING';
+
+-- RISK_CHECK → MANUAL_REVIEW (風險評分 60-85)
+UPDATE withdrawal_requests
+SET status = 'MANUAL_REVIEW',
+    risk_score = ?,
+    review_queue = CASE
+      WHEN ? BETWEEN 60 AND 70 THEN 'L1'
+      WHEN ? BETWEEN 71 AND 85 THEN 'L2'
+      ELSE 'L3'
+    END,
+    manual_review_started_at = NOW(),
+    updated_at = NOW()
+WHERE id = ?
+  AND status = 'RISK_CHECK';
+
+-- PROCESSING → FAILED → ROLLBACK (PSP 失敗補償)
+BEGIN;
+  -- Step 1: 更新提款狀態
+  UPDATE withdrawal_requests
+  SET status = 'ROLLBACK',
+      psp_error_code = ?,
+      psp_error_message = ?,
+      rollback_started_at = NOW(),
+      updated_at = NOW()
+  WHERE id = ?
+    AND status = 'PROCESSING';
+
+  -- Step 2: 解鎖錢包餘額
+  UPDATE player_wallets
+  SET locked_balance = locked_balance - ?,
+      version = version + 1,
+      updated_at = NOW()
+  WHERE player_id = ?;
+
+  -- Step 3: 記錄補償日誌
+  INSERT INTO saga_compensation_logs (
+    withdrawal_id,
+    step_name,
+    compensation_action,
+    created_at
+  ) VALUES (?, 'STEP_4_PSP_PAYMENT', 'UNLOCK_BALANCE', NOW());
+COMMIT;
+```
+
+**SAGA 狀態轉換關聯**:
+
+| SAGA Step | 對應狀態 | 補償狀態 | 補償動作 |
+|-----------|---------|---------|---------|
+| **Step 1: 風險評估** | RISK_CHECK | REJECTED | 無需補償 (未扣款) |
+| **Step 2: KYC/AML** | RISK_CHECK | REJECTED | 無需補償 (未扣款) |
+| **Step 2.5: 延遲風控** | MANUAL_REVIEW | REJECTED | 無需補償 (未扣款) |
+| **Step 3: 審批路由** | APPROVED | ROLLBACK | 解鎖餘額 |
+| **Step 4: 支付執行** | PROCESSING → COMPLETED/FAILED | ROLLBACK → REFUNDED | 解鎖餘額 + PSP 退款 |
+
+---
+
 ## 📚 相關文檔
 
 ### 核心依賴
@@ -1113,6 +1627,50 @@ Controller (API 端點) → Service (業務編排) → Manager (事務管理) �
 
 ## 11. 變更日誌 (Change Log)
 
+### v2.2.0 (2026-02-03)
+
+**重大變更**:
+1. ✅ **File Relocation**: 將文檔從 Finance Center 遷移至 Player Center
+   - **舊路徑**: `02_Finance_Center/02-01_Withdrawal_Risk_Control.md`
+   - **新路徑**: `01_Player_Center/01-05_Withdrawal_Risk.md`
+   - **理由**: 提款風控與玩家生命週期緊密相關，歸類至 Player Center 更合理
+   - **Git 歷史**: 使用 `git mv` 保留完整版本歷史
+
+2. ✅ **Major #9**: 新增 §8.1 鎖定餘額計算 (Locked Balance Calculation)
+   - Playable Balance 公式定義（SSOT: [02-06 §2.2]）
+   - 三種餘額鎖定觸發場景（提款、獎金流水、風控凍結）
+   - PostgreSQL + Java 實現（樂觀鎖 @Version）
+   - 錯誤處理與並發控制（3 次重試機制）
+
+3. ✅ **Major #10**: 新增 §8.2 提款速率檢測 (Withdrawal Velocity Detection)
+   - 速率規則矩陣（頻率、金額、時段、固定金額、快速提款）
+   - PostgreSQL 速率檢測查詢（24h 提款次數、30d 平均充值、固定金額模式）
+   - ML 模型整合（異常檢測，0-1 概率評分）
+   - Vavr Try<T> 錯誤處理模式
+
+4. ✅ **Major #11**: 新增 §8.3 風險提案關聯 (Risk Proposal Correlation)
+   - 時間範圍動態計算（高價值玩家 7 天、高風險玩家 90 天、普通玩家 30 天）
+   - SQL 查詢邏輯（WITH player_profile CTE + FLAG 規則篩選）
+   - v2.1.0 決策路由整合（所有可疑金額 > 0 觸發人工審核）
+   - Cross-reference: [07-withdrawal-risk-correlation.md] 完整整合
+
+5. ✅ **Major #12**: 新增 §8.4 提款狀態狀態機 (Withdrawal State Machine)
+   - 10 狀態定義表（PENDING → COMPLETED/REJECTED 等）
+   - Enhanced Mermaid 狀態圖（包含所有轉換路徑）
+   - SAGA 流程關聯（Cross-reference to §7.2）
+   - PostgreSQL 狀態轉換實現（帶觸發器）
+
+**SSOT Markers 新增**:
+- 💡 **[01-01 §3]** - KYC Level Matrix (L0/L1/L2 definition)
+- 💡 **[02-06 §2.2]** - Playable Balance Formula
+- 💡 **[05-01 §4.2]** - Risk Scoring Model
+- 💡 **[§7.2]** - SAGA Step 2.5 (Internal reference)
+
+**向下兼容**:
+- v2.1.x API 保持不變，僅新增實現細節與增強型檢測機制
+
+---
+
 ### v2.1.0 (2026-02-02)
 
 **重大變更**:
@@ -1173,10 +1731,10 @@ Controller (API 端點) → Service (業務編排) → Manager (事務管理) �
 
 ---
 
-**文檔版本**: 2.1.0 (新增 SAGA Step 2.5 延遲風控檢查)
-**最後更新**: 2026-02-02
+**文檔版本**: v2.2.0 (Post-migration Enhancement - 遷移至 Player Center + 新增 4 個核心章節)
+**最後更新**: 2026-02-03
 **維護團隊**: Finance Team & Backend Team & Risk Team
-**重大變更**: v2.1.0 引入配置驅動風控，簡化為人工審核為主
+**重大變更**: v2.2.0 文檔遷移至 01_Player_Center + 新增鎖定餘額計算、速率檢測、風險關聯、狀態機章節
 
 **v1.2.0 變更記錄** (2026-01-29):
 - ✅ Major #6 修正: 新增 iGame 特定需求章節 (KYC 等級系統 Level 0-3)

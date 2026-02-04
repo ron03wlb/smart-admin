@@ -452,7 +452,7 @@ sum(player_status_count{status="ACTIVE"})
 
 ## 4. KYC 驗證工作流 (KYC Verification Workflow)
 
-> 💡 **SSOT Marker**: KYC 分級認證體系在本章節定義。提款限額整合詳見 [02-01 §3.1](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md#31-kyc-等級與提款限額)。
+> 💡 **SSOT Marker**: KYC 分級認證體系在本章節定義。提款限額整合詳見 [01-05 §3.1](./01-05_Withdrawal_Risk.md#31-kyc-等級與提款限額)。
 
 ### 4.1 系統概述
 
@@ -1816,7 +1816,7 @@ class PlayerLifecycleArchitectureTest {
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 註冊時錢包創建
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風險評分、多帳號檢測、設備指紋
 - [01-02 VIP 系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級初始化、積分系統
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - KYC 等級與提款限額
+- [01-05 提款風控](./01-05_Withdrawal_Risk.md) - KYC 等級與提款限額
 
 **技術實現**:
 - [09-01 管理後台 RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 玩家權限初始化、角色分配

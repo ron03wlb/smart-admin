@@ -1892,7 +1892,7 @@ NotAccessDaoDirectly =
 ### 業務整合
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 紅利濫用檢測、多帳號風控
 - [01-02 VIP 系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - VIP 專屬活動、等級權益
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 流水未達標提款限制
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 流水未達標提款限制
 
 ### 技術參考
 - [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 活動發布 Maker-Checker 審批

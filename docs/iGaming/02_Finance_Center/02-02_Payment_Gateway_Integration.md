@@ -1075,7 +1075,7 @@ Authorization: Bearer <player_jwt_token>
 
 ### 業務邏輯參考
 - [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 存款入帳錢包邏輯
-- [02-01 出金風控](./02-01_Withdrawal_Risk_Control.md) - 提款流程與風控
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 提款流程與風控
 - [02-03 對賬系統](./02-03_Reconciliation_System.md) - PSP 對賬流程
 
 ### 技術架構參考

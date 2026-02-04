@@ -992,7 +992,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 |---------|-----------|---------|------|---------|
 | **02-04 財務中心** | `validateTurnover()` | 日結算返水時 | Layer 2: 基於風控驗證結果應用狀態因子調整 | [02-04 §1.6](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#16-跨模組流水一致性保障) |
 | **04-01 活動系統** | `validateBet()` | 計算活動流水前 | Layer 3: 基於風控驗證結果應用遊戲權重 | [04-01 統一流水驗證](../04_Activity_Center/04-01_Activity_System_Design.md#統一流水驗證架構) |
-| **02-01 提款系統** | `checkWithdraw()` | 提款請求提交時 | 檢測異常提款行為、多帳號提款 | [02-01 提款風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) |
+| **02-01 提款系統** | `checkWithdraw()` | 提款請求提交時 | 檢測異常提款行為、多帳號提款 | [02-01 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) |
 | **01-02 VIP系統** | 訂閱 `risk.player.flagged` 事件 | 玩家被標記為高風險時 | 降級VIP等級或暫停VIP權益 | [01-02 VIP忠誠系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) |
 | **11-01 客服平台** | `assessPlayerRisk()` | 客服查看玩家360視圖時 | 顯示玩家風險評分和標記 | [11-01 客服平台](../11_Customer_Service/11-01_CS_Platform_Design.md) |
 | **07-01 租戶管理** | 訂閱 `risk.fraud.detected` 事件 | 檢測到欺詐時 | 通知租戶運營團隊 | [07-01 多租戶架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) |
@@ -1442,7 +1442,7 @@ public class RiskRuleConfigManager {
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證、對沖檢測（Layer 1）
 
 ### 業務整合
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 提款風控規則引擎整合
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 提款風控規則引擎整合
 - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利濫用檢測、流水作弊識別
 - [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 多帳號檢測、設備指紋
 

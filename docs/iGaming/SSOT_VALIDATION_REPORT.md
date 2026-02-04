@@ -46,7 +46,7 @@
 **01-02_Wallet_Architecture.md**:
 - ✅ `../02_Game_Operations_NEW/02-03_Turnover_Calculation.md` - 指向新合併文檔
 - ✅ `../02_Finance_Center/02-07_Transaction_Processing_Flow.md` - 舊文檔仍存在
-- ✅ `../02_Finance_Center/02-01_Withdrawal_Risk_Control.md` - 舊文檔仍存在
+- ✅ `../01_Player_Center/01-05_Withdrawal_Risk.md` - **已遷移** (Week 4-5 完成)
 - ✅ `../06_Agent_Center/06-02_Credit_Network_Logic.md` - 舊文檔仍存在
 - ✅ `../05_Risk_Management/05-01_Risk_Control_System.md` - 舊文檔仍存在
 - ✅ `../03_Game_Center/03-03_Seamless_Wallet_Analysis.md` - 舊文檔仍存在

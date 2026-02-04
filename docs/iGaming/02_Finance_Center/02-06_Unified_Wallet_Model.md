@@ -589,7 +589,7 @@ foundation:
 ### 相關實作
 - [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 獎金錢包整合、流水要求計算、獎金餘額扣除優先級
 - [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - Credit錢包使用、額度轉移、信用結算流程
-- [02-01 提款風控](./02-01_Withdrawal_Risk_Control.md) - 可提餘額驗證、鎖定餘額處理
+- [02-01 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 可提餘額驗證、鎖定餘額處理
 
 ### 延伸閱讀
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 曝光度監控、異常負債檢測、風險等級評估

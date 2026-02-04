@@ -56,7 +56,7 @@
 
 - **[02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md)** - 錢包整體架構、可下注餘額公式
 - **[02-07 交易處理流程](../02-07_Transaction_Processing_Flow.md)** - 事件驅動架構、Outbox Pattern
-- **[02-01 出金風控](../02-01_Withdrawal_Risk_Control.md)** - 多層審核、SAGA 事務
+- **[02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md)** - 多層審核、SAGA 事務
 
 ### 遊戲整合
 

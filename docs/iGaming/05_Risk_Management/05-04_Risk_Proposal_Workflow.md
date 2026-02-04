@@ -8,7 +8,7 @@
 **前置依賴**:
 - [05-03 配置驅動風控系統](./05-03_Passive_Risk_Control_System.md) - 風控提案服務實現
 - [05-01 風控系統架構](./05-01_Risk_Control_System.md) - 配置驅動規則引擎
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - SAGA Step 2.5 延遲檢查
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 延遲檢查
 
 ---
 
@@ -1507,4 +1507,4 @@ groups:
 **相關文檔**:
 - [05-03 配置驅動風控系統](./05-03_Passive_Risk_Control_System.md)
 - [05-01 風控系統架構](./05-01_Risk_Control_System.md)
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md)
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md)

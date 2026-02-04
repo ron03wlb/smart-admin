@@ -291,7 +291,7 @@ server {
 
 ### 業務邏輯參考
 - [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 密碼重置流程
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 銀行帳號驗證
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 銀行帳號驗證
 - [11-01 客服中台設計](../11_Customer_Service/11-01_CS_Platform_Design.md) - 客服 PII 查詢場景
 
 ---

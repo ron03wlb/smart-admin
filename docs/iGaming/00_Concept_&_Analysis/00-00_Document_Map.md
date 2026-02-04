@@ -46,7 +46,7 @@
 **財務中心開發**：
 1. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包核心邏輯
 2. [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 事件驅動架構
-3. [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 出金流程
+3. [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 出金流程
 4. [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水算法
 
 **遊戲集成開發**：
@@ -56,7 +56,7 @@
 
 **風控開發**：
 1. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 規則引擎
-2. [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 出金風控規則
+2. [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 出金風控規則
 3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動風控
 
 #### 前端開發工程師
@@ -174,7 +174,7 @@
 ```
 
 **相關文檔**：
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 審核流程
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 審核流程
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控引擎
 - [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 審批工作流
 - [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 代付
@@ -249,7 +249,7 @@
 6. **[01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md)**
    註冊、KYC、MFA
 
-7. **[02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md)**
+7. **[02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md)**
    多層審核、SAGA事務、多地區合規
 
 8. **[02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)**
@@ -448,10 +448,10 @@ graph TD
 | [02-06 統一錢包](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | [02-07 交易處理](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 交易處理依賴錢包模型定義 |
 | [02-06 統一錢包](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | [03-03 無縫錢包](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | GP對接使用錢包API |
 | [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動使用流水驗證數據 |
-| [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金引用風控引擎API |
+| [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
 | [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
 | [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) | [09-01 RBAC](../09_System_Security/09-01_Admin_RBAC.md) | RBAC基於層級架構 |
-| [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金審批使用審批工作流 |
+| [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
 | [09-02 審計日誌](../09_System_Security/09-02_Audit_Log_System.md) | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | 審批操作記錄在審計日誌 |
 
 ---
@@ -496,7 +496,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 02-01 | [Withdrawal_Risk_Control.md](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | 出金風控、多層審核、SAGA | 430+ |
+| 02-01 | [Withdrawal_Risk_Control.md](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金風控、多層審核、SAGA | 430+ |
 | 02-02 | [Payment_Gateway_Integration.md](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) | PSP集成、智能路由 | 44 ⚠️ |
 | 02-03 | [Reconciliation_System.md](../02_Finance_Center/02-03_Reconciliation_System.md) | 三方對賬系統 | 47 ⚠️ |
 | 02-04 | [Turnover_and_Game_Reconciliation_Analysis.md](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | **核心** - 流水計算三層驗證（含補充圖表） | 538 |

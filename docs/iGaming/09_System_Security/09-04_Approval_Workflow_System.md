@@ -342,7 +342,7 @@ const REJECTION_TEMPLATES = [
 - [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 玩家數據結構
 
 ### 核心依賴
-- [02-01 提款風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 提款審批規則
+- [02-01 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 提款審批規則
 - [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風險評分邏輯
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 審批通知實現
 

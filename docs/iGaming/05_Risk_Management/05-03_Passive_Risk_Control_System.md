@@ -7,7 +7,7 @@
 **維護團隊**: Risk Team & Backend Team
 **前置依賴**:
 - [05-01 風控系統架構](./05-01_Risk_Control_System.md) - 配置驅動風控規則引擎 (§9)
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - SAGA Step 2.5 延遲風控檢查
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 延遲風控檢查
 - [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Layer 1 處理流程
 
 ---
@@ -388,7 +388,7 @@ public interface RiskProposalDao extends BaseMapper<RiskProposalEntity> {
 
 ### 3.1 取款時觸發邏輯
 
-**SAGA Step 2.5 實現** (參考 02-01_Withdrawal_Risk_Control.md §5):
+**SAGA Step 2.5 實現** (參考 01-05_Withdrawal_Risk.md §5):
 
 ```java
 /**
@@ -1886,5 +1886,5 @@ class WithdrawalDeferredRiskCheckIntegrationTest {
 **維護團隊**: Risk Team & Backend Team
 **相關文檔**:
 - [05-01 風控系統架構](./05-01_Risk_Control_System.md)
-- [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md)
+- [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md)
 - [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
