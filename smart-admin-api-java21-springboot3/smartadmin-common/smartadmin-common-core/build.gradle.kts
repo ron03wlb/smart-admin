@@ -20,12 +20,12 @@ dependencies {
     // Spring Boot (for @ConfigurationProperties)
     compileOnly("org.springframework.boot:spring-boot")
 
-    // EasyExcel (for Excel utilities) - TODO: 將 SmartExcelUtil 移到 smartadmin-common-excel 模塊
-    // compileOnly("com.alibaba:easyexcel")
+    // FastExcel (for Excel utilities) - TODO: 將 SmartExcelUtil 移到 smartadmin-common-excel 模塊
+    compileOnly("cn.idev.excel:fastexcel:1.2.0")
 
     // Apache POI (for Excel operations) - TODO: 將 SmartExcelUtil 移到 smartadmin-common-excel 模塊
-    // compileOnly("org.apache.poi:poi")
-    // compileOnly("org.apache.poi:poi-ooxml")
+    compileOnly("org.apache.poi:poi:5.2.5")
+    compileOnly("org.apache.poi:poi-ooxml:5.2.5")
 
     // Jakarta Validation API
     api("jakarta.validation:jakarta.validation-api")

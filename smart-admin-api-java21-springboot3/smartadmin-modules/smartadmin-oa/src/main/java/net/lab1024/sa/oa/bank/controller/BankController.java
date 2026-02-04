@@ -1,0 +1,82 @@
+package net.lab1024.sa.oa.bank.controller;
+
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.domain.request.RequestUser;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.web.web.util.SmartRequestUtil;
+import net.lab1024.sa.oa.bank.domain.BankCreateForm;
+import net.lab1024.sa.oa.bank.domain.BankQueryForm;
+import net.lab1024.sa.oa.bank.domain.BankUpdateForm;
+import net.lab1024.sa.oa.bank.domain.BankVO;
+import net.lab1024.sa.oa.bank.service.BankService;
+import net.lab1024.sa.oa.constant.SwaggerTagConst;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * OA办公-OA银行信息
+ *
+ * @author 1024创新实验室:善逸
+ * @since 2022/6/23 21:59:22 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@RestController
+@Tag(name = SwaggerTagConst.Business.OA_BANK)
+@RequiredArgsConstructor
+public class BankController {
+
+  private final BankService bankService;
+
+  @Operation(summary = "分页查询银行信息 @author 善逸")
+  @PostMapping("/oa/bank/page/query")
+  @SaCheckPermission("oa:bank:query")
+  public ResponseDTO<PageResult<BankVO>> queryByPage(@RequestBody @Valid BankQueryForm queryForm) {
+    return bankService.queryByPage(queryForm);
+  }
+
+  @Operation(summary = "根据企业ID查询银行信息列表 @author 善逸")
+  @GetMapping("/oa/bank/query/list/{enterpriseId}")
+  @SaCheckPermission("oa:bank:query")
+  public ResponseDTO<List<BankVO>> queryList(@PathVariable Long enterpriseId) {
+    return bankService.queryList(enterpriseId);
+  }
+
+  @Operation(summary = "查询银行信息详情 @author 善逸")
+  @GetMapping("/oa/bank/get/{bankId}")
+  @SaCheckPermission("oa:bank:query")
+  public ResponseDTO<BankVO> getDetail(@PathVariable Long bankId) {
+    return bankService.getDetail(bankId);
+  }
+
+  @Operation(summary = "新建银行信息 @author 善逸")
+  @PostMapping("/oa/bank/create")
+  @SaCheckPermission("oa:bank:add")
+  public ResponseDTO<String> createBank(@RequestBody @Valid BankCreateForm createVO) {
+    RequestUser requestUser = SmartRequestUtil.getRequestUser();
+    createVO.setCreateUserId(requestUser.getUserId());
+    createVO.setCreateUserName(requestUser.getUserName());
+    return bankService.createBank(createVO);
+  }
+
+  @Operation(summary = "编辑银行信息 @author 善逸")
+  @PostMapping("/oa/bank/update")
+  @SaCheckPermission("oa:bank:update")
+  public ResponseDTO<String> updateBank(@RequestBody @Valid BankUpdateForm updateVO) {
+    return bankService.updateBank(updateVO);
+  }
+
+  @Operation(summary = "删除银行信息 @author 善逸")
+  @GetMapping("/oa/bank/delete/{bankId}")
+  @SaCheckPermission("oa:bank:delete")
+  public ResponseDTO<String> deleteBank(@PathVariable Long bankId) {
+    return bankService.deleteBank(bankId);
+  }
+}

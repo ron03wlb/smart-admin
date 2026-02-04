@@ -1,0 +1,21 @@
+package net.lab1024.sa.oa.invoice.domain;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * OA发票信息编辑
+ *
+ * @author 1024创新实验室: 善逸
+ * @since 2022-06-23 19:32:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class InvoiceUpdateForm extends InvoiceAddForm {
+
+  @Schema(description = "发票信息ID")
+  @NotNull(message = "发票信息ID不能为空")
+  private Long invoiceId;
+}

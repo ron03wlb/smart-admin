@@ -37,11 +37,17 @@ dependencies {
     api(project(":smartadmin-support:smartadmin-support-changelog"))
     api(project(":smartadmin-support:smartadmin-support-heartbeat"))
     api(project(":smartadmin-support:smartadmin-support-securityprotect"))
+    api(project(":smartadmin-support:smartadmin-support-helpdoc"))
+    api(project(":smartadmin-support:smartadmin-support-job"))
+    api(project(":smartadmin-support:smartadmin-support-serialnumber"))
 
     // SA Common - Additional modules needed
     api(project(":smartadmin-common:smartadmin-common-captcha"))
     api(project(":smartadmin-common:smartadmin-common-cache"))
     api(project(":smartadmin-common:smartadmin-common-api-encrypt"))
+    api(project(":smartadmin-common:smartadmin-common-repeat-submit"))
+    api(project(":smartadmin-common:smartadmin-common-data-masking"))
+    api(project(":smartadmin-common:smartadmin-common-ip-geolocation"))
 
     // Temporary: Security-protect module (not yet fully migrated)
     // TODO: Remove this after security-protect is fully migrated to smartadmin-common-security
@@ -53,6 +59,9 @@ dependencies {
     // ArchUnit for architecture testing
     testImplementation(libs.archunit.junit5)
 
+    // JUnit Platform Launcher (required for Gradle to run JUnit 5 tests)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
     // Lombok
     api(libs.lombok)
     annotationProcessor(libs.lombok)
@@ -62,4 +71,10 @@ dependencies {
 
     // Test
     testImplementation(libs.spring.boot.starter.test)
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform {
+        excludeTags("integration")
+    }
 }
