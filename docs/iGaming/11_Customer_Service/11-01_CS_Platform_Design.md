@@ -1,5 +1,21 @@
 # 11-01 客服中台設計 (CS Platform Design)
 
+> **⚠️ DEPRECATED**: 本文檔已於 2026-02-04 遷移至新位置
+>
+> **新位置**: [06-02 客戶服務平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md)
+>
+> **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊），11_Customer_Service → 06_Analytics_Operations
+>
+> **內容增強**:
+> - §2: Player 360° 視圖去重（引用 01-03 玩家分群邏輯，避免重複）
+> - §4: 新增知識庫管理系統（FAQ、遊戲指南、合規政策、內部手冊）
+> - §5: 新增 AI 客服機器人整合（NLU 引擎、自動回覆、人工接管）
+> - §10: SmartAdmin 架構映射（Entity、Manager、Service 代碼範例）
+>
+> **過渡期**: 本文件將保留至 2026-03-06（30 天），之後將被刪除
+>
+> ---
+
 ## 1. 系統概述
 客服是平台與玩家的第一線接觸點。本系統旨在提供 "全視角 (Single View)" 的玩家數據，賦能客服快速解決問題 (First Contact Resolution)。
 
