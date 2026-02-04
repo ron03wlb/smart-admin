@@ -332,7 +332,7 @@ jobs:
 - [08-05 本地化系統](./08-05_Localization_System.md) - 多語言 SEO
 
 ### 技術參考
-- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - CDN 配置
+- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - CDN 配置
 - [03-02 遊戲大廳管理](../03_Game_Center/03-02_Game_Lobby_Management.md) - 遊戲列表渲染
 
 ### 業務整合

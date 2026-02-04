@@ -338,7 +338,7 @@
 
 ### 技術架構參考
 - [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - Blind Index 查詢審計
-- [11-01 客服中台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 客服 PII 查詢場景
+- [11-01 客服中台設計](../06_Analytics_Operations/06-02_Customer_Service.md) - 客服 PII 查詢場景
 
 ---
 

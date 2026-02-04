@@ -70,8 +70,8 @@
 ## 📚 相關文檔
 
 ### 核心依賴
-- [09-01 管理後台 RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 玩家權限初始化、角色分配
-- [01-02 錢包架構](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md) - 註冊時錢包創建
+- [09-01 管理後台 RBAC](../05_Platform_Governance/05-02_RBAC_Permissions.md) - 玩家權限初始化、角色分配
+- [01-02 錢包架構](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) - 註冊時錢包創建
 
 ### 業務整合
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 多帳號檢測、設備指紋、風險評分
@@ -79,9 +79,9 @@
 - [04-02 出金風控](../04_Risk_Control_NEW/04-02_Fraud_Detection.md) - KYC 等級與提款限額
 
 ### 技術參考
-- [05-05 數據安全策略](../05_Platform_Governance_NEW/05-05_Data_Security.md) - 個人資料加密、Blind Index
-- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - KYC 人工審核流程
-- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 登入 API 安全、暴力破解防護
+- [05-05 數據安全策略](../05_Platform_Governance/05-05_Data_Security.md) - 個人資料加密、Blind Index
+- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - KYC 人工審核流程
+- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - 登入 API 安全、暴力破解防護
 
 ### 延伸閱讀
 - [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 註冊開關、IP 限制配置

@@ -9,7 +9,7 @@
 - [04-01 風控框架](./04-01_Risk_Framework.md) - AML 監控、風險評分模型 (§7, §11)
 - [04-02 欺詐檢測](./04-02_Fraud_Detection.md) - 資金流聚集檢測、洗錢風險 (§5)
 - [03-01 玩家生命週期](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 分級認證體系 (§2.3)
-- [05-05 數據安全策略](../05_Platform_Governance_NEW/05-05_Data_Security.md) - 個人資料加密、審計日誌 (§3, §8)
+- [05-05 數據安全策略](../05_Platform_Governance/05-05_Data_Security.md) - 個人資料加密、審計日誌 (§3, §8)
 
 ---
 
@@ -721,12 +721,12 @@ END;
 - [03-01 玩家生命週期](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 觸發邏輯、註冊流程
 
 ### 技術參考
-- [05-05 數據安全策略](../05_Platform_Governance_NEW/05-05_Data_Security.md) - 個人資料加密、審計日誌
-- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - KYC 人工審核流程
-- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 安全、暴力破解防護
+- [05-05 數據安全策略](../05_Platform_Governance/05-05_Data_Security.md) - 個人資料加密、審計日誌
+- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - KYC 人工審核流程
+- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - API 安全、暴力破解防護
 
 ### 延伸閱讀
-- [13-01 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) - Sumsub/Jumio 整合指南
+- [13-01 第三方整合標準](../06_Analytics_Operations/06-03_Third_Party_Integration.md) - Sumsub/Jumio 整合指南
 - FATF Guidance: [www.fatf-gafi.org](https://www.fatf-gafi.org)
 - UKGC AML Guide: [www.gamblingcommission.gov.uk](https://www.gamblingcommission.gov.uk)
 

@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.support.liteflow.config.LiteFlowProperties;
 import net.lab1024.sa.support.liteflow.constant.LiteFlowConst;
 import net.lab1024.sa.support.liteflow.dao.LiteFlowExecutionLogDao;
 import net.lab1024.sa.support.liteflow.domain.entity.LiteFlowExecutionLogEntity;
 import net.lab1024.sa.support.liteflow.manager.LiteFlowMetricsManager;
-import net.lab1024.sa.common.json.util.JsonUtil;
 import org.springframework.stereotype.Component;
 
 /**

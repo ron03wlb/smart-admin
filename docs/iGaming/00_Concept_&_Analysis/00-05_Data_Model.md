@@ -516,7 +516,7 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 
 > 💡 **SSOT Marker**: 三層驗證架構的完整設計請參考：
 > - Layer 1 (風控驗證): [05-01_Risk_Control_System.md §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-turnover-validation)
-> - Layer 2 (財務驗證): [02-03_Turnover_Calculation.md §3](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#3-layer-2-finance-layer-validation)
+> - Layer 2 (財務驗證): [02-03_Turnover_Calculation.md §3](../02_Game_Operations/02-03_Turnover_Calculation.md#3-layer-2-finance-layer-validation)
 > - Layer 3 (活動應用): [04-01_Activity_System_Design.md §5](../03_Player_Journey/03-03_Activity_Bonus.md#5-game-weight-configuration)
 
 ```text
@@ -632,7 +632,7 @@ Player Deletion Request
 
 ### 數據模型參考
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - **SSOT**: Playable Balance Formula
-- [02-03 流水計算](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md) - **SSOT**: Layer 2 Finance Validation
+- [02-03 流水計算](../02_Game_Operations/02-03_Turnover_Calculation.md) - **SSOT**: Layer 2 Finance Validation
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - **SSOT**: Layer 1 Risk Validation
 - [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - **SSOT**: Layer 3 Game Weight
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
@@ -640,7 +640,7 @@ Player Deletion Request
 ### 架構參考
 - [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
 - [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
-- [07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶設計
+- [07-01 層級架構](../05_Platform_Governance/05-01_Multi_Tenant.md) - 多租戶設計
 
 ---
 

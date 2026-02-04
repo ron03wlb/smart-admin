@@ -2,7 +2,7 @@
 
 > **DEPRECATED**: 本模塊已於 2026-02-04 合併至新位置
 >
-> **新位置**: [06_Analytics_Operations_NEW/](../06_Analytics_Operations_NEW/)
+> **新位置**: [06_Analytics_Operations/](../06_Analytics_Operations/)
 >
 > **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊）
 
@@ -12,7 +12,7 @@
 
 | 舊文件 | 新位置 | 狀態 |
 |--------|--------|------|
-| [13-01_Third_Party_Integration_Standard.md](./13-01_Third_Party_Integration_Standard.md) | [06-03_Third_Party_Integration.md](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) | ✅ 已遷移 + 增強 |
+| [13-01_Third_Party_Integration_Standard.md](./13-01_Third_Party_Integration_Standard.md) | [06-03_Third_Party_Integration.md](../06_Analytics_Operations/06-03_Third_Party_Integration.md) | ✅ 已遷移 + 增強 |
 
 ---
 
@@ -53,7 +53,7 @@
 
 ## 📚 相關資源
 
-- **新模塊首頁**: [06_Analytics_Operations_NEW/README.md](../06_Analytics_Operations_NEW/README.md)
+- **新模塊首頁**: [06_Analytics_Operations/README.md](../06_Analytics_Operations/README.md)
 - **API 設計標準**: [07-03 API 設計標準](../07_Technical_Infrastructure/07-03_API_Design_Standard.md)
 - **數據安全標準**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)
 - **完整文檔地圖**: [00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)

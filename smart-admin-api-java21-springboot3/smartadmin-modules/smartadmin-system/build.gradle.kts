@@ -13,6 +13,9 @@ dependencies {
     // MyBatis Plus
     api(libs.mybatis.plus.spring.boot.starter)
 
+    // SA API (Contract layer)
+    api(project(":smartadmin-api:smartadmin-api-system"))
+
     // SA Common Core
     api(project(":smartadmin-common:smartadmin-common-core"))
     api(project(":smartadmin-common:smartadmin-common-validation"))

@@ -2,7 +2,7 @@
 
 > **⚠️ DEPRECATED**: 本文檔的數據管道架構部分已於 2026-02-04 遷移至新位置
 >
-> **新位置**: [06-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md)
+> **新位置**: [06-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md)
 >
 > **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊）
 >
@@ -503,4 +503,4 @@ flowchart TD
 
 ### 業務整合
 - [02-03 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md) - 數據管道應用
-- [06-01 報表架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - BI 數據管道
+- [06-01 報表架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - BI 數據管道

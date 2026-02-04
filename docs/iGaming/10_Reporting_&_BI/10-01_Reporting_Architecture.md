@@ -2,7 +2,7 @@
 
 > **⚠️ DEPRECATED**: 本文檔已於 2026-02-04 遷移至新位置
 >
-> **新位置**: [06-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md)
+> **新位置**: [06-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md)
 >
 > **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊）
 >
@@ -475,7 +475,7 @@ report:{report_type}:{date}:{filters_hash}
 
 ### 延伸閱讀
 - [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - CDC、ETL 流程
-- [12-06 性能監控](../07_Technical_Infrastructure_NEW/07-06_Performance_Monitoring.md) - Grafana 儀表板設計
+- [12-06 性能監控](../07_Technical_Infrastructure/07-06_Performance_Monitoring.md) - Grafana 儀表板設計
 
 ---
 

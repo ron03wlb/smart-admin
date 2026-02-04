@@ -2,7 +2,7 @@
 
 > **DEPRECATED**: 本模塊已於 2026-02-04 合併至新位置
 >
-> **新位置**: [06_Analytics_Operations_NEW/](../06_Analytics_Operations_NEW/)
+> **新位置**: [06_Analytics_Operations/](../06_Analytics_Operations/)
 >
 > **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊）
 
@@ -12,7 +12,7 @@
 
 | 舊文件 | 新位置 | 狀態 |
 |--------|--------|------|
-| [11-01_CS_Platform_Design.md](./11-01_CS_Platform_Design.md) | [06-02_Customer_Service.md](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) | ✅ 已遷移 + 增強 |
+| [11-01_CS_Platform_Design.md](./11-01_CS_Platform_Design.md) | [06-02_Customer_Service.md](../06_Analytics_Operations/06-02_Customer_Service.md) | ✅ 已遷移 + 增強 |
 
 ---
 
@@ -59,7 +59,7 @@
 
 ## 📚 相關資源
 
-- **新模塊首頁**: [06_Analytics_Operations_NEW/README.md](../06_Analytics_Operations_NEW/README.md)
+- **新模塊首頁**: [06_Analytics_Operations/README.md](../06_Analytics_Operations/README.md)
 - **玩家分群參考**: [01-03 玩家分群與標籤](../01_Player_Center/01-03_Player_Segmentation.md)
 - **完整文檔地圖**: [00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
 

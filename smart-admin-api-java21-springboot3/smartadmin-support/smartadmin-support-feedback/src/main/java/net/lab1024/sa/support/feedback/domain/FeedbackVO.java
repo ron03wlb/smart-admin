@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
-import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
+import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.support.file.json.deserializer.FileKeyVoDeserializer;
 import net.lab1024.sa.support.file.json.serializer.FileKeyVoSerializer;
 

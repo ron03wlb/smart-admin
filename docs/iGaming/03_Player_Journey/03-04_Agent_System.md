@@ -840,7 +840,7 @@ avg(affiliate_commission_calculation_duration_seconds) by (agent_id)
 
 ### 核心依賴
 - [06-02 信用網絡邏輯](./06-02_Credit_Network_Logic.md) - 代理信用體系
-- [07-01 租戶層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶模型
+- [07-01 租戶層級架構](../05_Platform_Governance/05-01_Multi_Tenant.md) - 多租戶模型
 
 ### 業務整合
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 代理風控

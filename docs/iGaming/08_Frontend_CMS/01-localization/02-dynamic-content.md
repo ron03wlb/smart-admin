@@ -317,10 +317,10 @@ export default {
 ### 業務邏輯參考
 - [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 活動多語言內容
 - [08-02 Banner 管理](./08-02_Banner_&_Announcement.md) - 橫幅多語言
-- [11-01 客服中台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 通知模板本地化
+- [11-01 客服中台設計](../06_Analytics_Operations/06-02_Customer_Service.md) - 通知模板本地化
 
 ### 技術架構參考
-- [12-05 API設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - API規範
+- [12-05 API設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - API規範
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - JSONB 加密
 
 ---

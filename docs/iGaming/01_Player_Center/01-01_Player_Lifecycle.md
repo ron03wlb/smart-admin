@@ -1819,20 +1819,20 @@ class PlayerLifecycleArchitectureTest {
 - [01-05 提款風控](./01-05_Withdrawal_Risk.md) - KYC 等級與提款限額
 
 **技術實現**:
-- [09-01 管理後台 RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) - 玩家權限初始化、角色分配
+- [09-01 管理後台 RBAC](../05_Platform_Governance/05-02_RBAC_Permissions.md) - 玩家權限初始化、角色分配
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 個人資料加密、Blind Index
-- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - KYC 人工審核流程
-- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - 登入 API 安全、暴力破解防護
+- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - KYC 人工審核流程
+- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - 登入 API 安全、暴力破解防護
 
 ### 8.3 延伸閱讀
 
 **運營優化**:
 - [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 基於生命週期的精準營銷
-- [10-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 玩家生命週期分析報表
-- [11-01 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 玩家 360 視圖整合
+- [10-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - 玩家生命週期分析報表
+- [11-01 客服平台設計](../06_Analytics_Operations/06-02_Customer_Service.md) - 玩家 360 視圖整合
 
 **平台配置**:
-- [07-01 多租戶架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 租戶級配置
+- [07-01 多租戶架構](../05_Platform_Governance/05-01_Multi_Tenant.md) - 租戶級配置
 - [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 註冊開關、IP 限制配置
 - [08-05 本地化系統](../08_Frontend_CMS/08-05_Localization_System.md) - 多語言註冊頁面
 

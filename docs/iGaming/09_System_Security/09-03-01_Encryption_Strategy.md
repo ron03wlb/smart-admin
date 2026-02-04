@@ -271,7 +271,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 ### 技術架構參考
 - [09-01 管理後台 RBAC](./09-01_Admin_RBAC.md) - 權限分級脫敏
 - [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - PII 存取審計
-- [12-05 API 設計標準](../07_Technical_Infrastructure_NEW/07-03-01_Design_Principles.md) - HTTPS 強制要求
+- [12-05 API 設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - HTTPS 強制要求
 
 ### 業務邏輯參考
 - [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 密碼重置流程

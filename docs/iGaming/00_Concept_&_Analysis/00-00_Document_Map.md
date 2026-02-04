@@ -7,9 +7,9 @@
 > 📢 **v1.1.0 變更通知**:
 > - 本文檔已從「詳細導航」轉變為「高層索引」
 > - 詳細閱讀路徑已遷移至專門的導航文檔:
->   - 角色導航 → [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md)
->   - 業務流程 → [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
->   - 實作指南 → [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
+>   - 角色導航 → [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md)
+>   - 業務流程 → [BUSINESS_FLOWS](../00_Foundation/00-00_BUSINESS_FLOWS.md)
+>   - 實作指南 → [IMPLEMENTATION_GUIDE](../00_Foundation/00-00_IMPLEMENTATION_GUIDE.md)
 ---
 
 ## 📋 目錄
@@ -29,38 +29,38 @@
 
 ### 按角色導航
 
-> 📌 **完整角色導航**: [QUICKSTART §2.2](../00_Foundation_NEW/00-00_QUICKSTART.md#按角色快速導航)
+> 📌 **完整角色導航**: [QUICKSTART §2.2](../00_Foundation/00-00_QUICKSTART.md#按角色快速導航)
 
 | 角色 | 核心關注點 | 必讀文檔 (P0) | 完整路徑 |
 |------|-----------|-------------|---------|
-| 產品經理 | 業務邏輯、規則設計 | 方案概覽, 玩家生命週期, 活動系統 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#產品經理) |
-| 架構師 | 整體架構、技術選型 | 多租戶架構, 統一錢包, 網關設計 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#架構師) |
-| 後端工程師 | 技術實現、API設計 | 錢包邏輯, Seamless API, 流水計算 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#後端開發工程師) |
-| 前端工程師 | 介面設計、性能優化 | Layout引擎, 多語言, SEO優化 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#前端開發工程師) |
-| 測試工程師 | 測試場景、邊界情況 | QA標準, 核心業務邏輯, 極端場景 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#測試工程師) |
-| 運維工程師 | 部署、監控、維護 | 部署流程, 網關流控, 維護SOP | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#運維工程師) |
-| 安全工程師 | 數據安全、合規 | 數據加密, RBAC, 審計日誌 | [QUICKSTART](../00_Foundation_NEW/00-00_QUICKSTART.md#信息安全工程師) |
+| 產品經理 | 業務邏輯、規則設計 | 方案概覽, 玩家生命週期, 活動系統 | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#產品經理) |
+| 架構師 | 整體架構、技術選型 | 多租戶架構, 統一錢包, 網關設計 | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#架構師) |
+| 後端工程師 | 技術實現、API設計 | 錢包邏輯, Seamless API, 流水計算 | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#後端開發工程師) |
+| 前端工程師 | 介面設計、性能優化 | Layout引擎, 多語言, SEO優化 | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#前端開發工程師) |
+| 測試工程師 | 測試場景、邊界情況 | QA標準, 核心業務邏輯, 極端場景 | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#測試工程師) |
+| 運維工程師 | 部署、監控、維護 | 部署流程, 網關流控, 維護SOP | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#運維工程師) |
+| 安全工程師 | 數據安全、合規 | 數據加密, RBAC, 審計日誌 | [QUICKSTART](../00_Foundation/00-00_QUICKSTART.md#信息安全工程師) |
 
 ---
 
 ### 按業務流程導航
 
-> 📌 **完整流程圖集**: [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
+> 📌 **完整流程圖集**: [BUSINESS_FLOWS](../00_Foundation/00-00_BUSINESS_FLOWS.md)
 
 | 流程 | 涉及模塊 | 關鍵難點 | 詳細文檔 |
 |------|---------|---------|---------|
-| 玩家註冊與KYC | 玩家、權限、錢包 | 多租戶分配、KYC驗證 | [BUSINESS_FLOWS §1](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-1-玩家註冊與kyc) |
-| 存款與活動發放 | 支付、錢包、活動 | PSP整合、紅利觸發 | [BUSINESS_FLOWS §2](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-2-存款與活動發放) |
-| 遊戲對接與Token | 遊戲、錢包、流水 | Token安全、冪等性 | [BUSINESS_FLOWS §3](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-3-遊戲對接與token) |
-| 出金審核與風控 | 風控、審批、支付 | 多層審核、SAGA補償 | [BUSINESS_FLOWS §4](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-4-出金審核與風控) |
-| 流水計算與對帳 | 流水、對賬、風控 | 三層驗證、一致性 | [BUSINESS_FLOWS §5](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-5-流水計算與對帳) |
-| 代理佣金結算 | 代理、流水、賬單 | 佣金算法、信用結算 | [BUSINESS_FLOWS §6](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md#flow-6-代理佣金結算) |
+| 玩家註冊與KYC | 玩家、權限、錢包 | 多租戶分配、KYC驗證 | [BUSINESS_FLOWS §1](../00_Foundation/00-00_BUSINESS_FLOWS.md#flow-1-玩家註冊與kyc) |
+| 存款與活動發放 | 支付、錢包、活動 | PSP整合、紅利觸發 | [BUSINESS_FLOWS §2](../00_Foundation/00-00_BUSINESS_FLOWS.md#flow-2-存款與活動發放) |
+| 遊戲對接與Token | 遊戲、錢包、流水 | Token安全、冪等性 | [BUSINESS_FLOWS §3](../00_Foundation/00-00_BUSINESS_FLOWS.md#flow-3-遊戲對接與token) |
+| 出金審核與風控 | 風控、審批、支付 | 多層審核、SAGA補償 | [BUSINESS_FLOWS §4](../00_Foundation/00-00_BUSINESS_FLOWS.md#flow-4-出金審核與風控) |
+| 流水計算與對帳 | 流水、對賬、風控 | 三層驗證、一致性 | [BUSINESS_FLOWS §5](../00_Foundation/00-00_BUSINESS_FLOWS.md#flow-5-流水計算與對帳) |
+| 代理佣金結算 | 代理、流水、賬單 | 佣金算法、信用結算 | [BUSINESS_FLOWS §6](../00_Foundation/00-00_BUSINESS_FLOWS.md#flow-6-代理佣金結算) |
 
 ---
 
 ### 按優先級閱讀
 
-> 📌 **完整閱讀路徑**: [QUICKSTART §2.3](../00_Foundation_NEW/00-00_QUICKSTART.md#按優先級閱讀)
+> 📌 **完整閱讀路徑**: [QUICKSTART §2.3](../00_Foundation/00-00_QUICKSTART.md#按優先級閱讀)
 
 | 優先級 | 主題 | 文檔數 | 關鍵文檔 |
 |-------|------|-------|---------|
@@ -211,9 +211,9 @@ graph TD
 | [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動使用流水驗證數據 |
 | [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
 | [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
-| [07-01 層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) | [09-01 RBAC](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | RBAC基於層級架構 |
-| [09-04 審批工作流](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
-| [09-02 審計日誌](../05_Platform_Governance_NEW/05-03_Audit_Log.md) | [09-04 審批工作流](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) | 審批操作記錄在審計日誌 |
+| [07-01 層級架構](../05_Platform_Governance/05-01_Multi_Tenant.md) | [09-01 RBAC](../05_Platform_Governance/05-02_RBAC_Permissions.md) | RBAC基於層級架構 |
+| [09-04 審批工作流](../05_Platform_Governance/05-04_Approval_Workflow.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
+| [09-02 審計日誌](../05_Platform_Governance/05-03_Audit_Log.md) | [09-04 審批工作流](../05_Platform_Governance/05-04_Approval_Workflow.md) | 審批操作記錄在審計日誌 |
 
 ---
 
@@ -313,7 +313,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 07-01 | [Hierarchy_Architecture.md](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) | 四層多租戶架構 | 39 ⚠️ |
+| 07-01 | [Hierarchy_Architecture.md](../05_Platform_Governance/05-01_Multi_Tenant.md) | 四層多租戶架構 | 39 ⚠️ |
 | 07-02 | [Tenant_Configuration.md](../07_Platform_Management/07-02_Tenant_Configuration.md) | 租戶自助配置 | 55 |
 | 07-03 | [Notification_Architecture.md](../07_Platform_Management/07-03_Notification_Architecture.md) | 多渠道通知系統 | 80 |
 | 07-04 | [Data_Pipeline_Architecture.md](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) | ODS→DWD→DWS→ADS 數據分層 | 82 |
@@ -340,10 +340,10 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 09-01 | [Admin_RBAC.md](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md) | 管理後台權限管理 | 80+ |
-| 09-02 | [Audit_Log_System.md](../05_Platform_Governance_NEW/05-03_Audit_Log.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
+| 09-01 | [Admin_RBAC.md](../05_Platform_Governance/05-02_RBAC_Permissions.md) | 管理後台權限管理 | 80+ |
+| 09-02 | [Audit_Log_System.md](../05_Platform_Governance/05-03_Audit_Log.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
 | 09-03 | [Data_Security_Standard.md](../09_System_Security/09-03_Data_Security_Standard.md) | 加密、盲索引、GDPR Crypto-Shredding | 676 📏 |
-| 09-04 | [Approval_Workflow_System.md](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
+| 09-04 | [Approval_Workflow_System.md](../05_Platform_Governance/05-04_Approval_Workflow.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
 
 > 📏 **考慮拆分**：09-02（832行）、09-03（676行）、09-04（833行）文檔較長
 > ✅ **內容去重完成**：09-02 專注審計日誌，09-04 專注審批流程，已移除重複的合併版文件
@@ -362,7 +362,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 06-02 | [Customer_Service.md](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) | 客服平台、Player 360 View、AI 客服 | 520 ✅ |
+| 06-02 | [Customer_Service.md](../06_Analytics_Operations/06-02_Customer_Service.md) | 客服平台、Player 360 View、AI 客服 | 520 ✅ |
 
 > ⚠️ **待擴充**：建議補充知識庫管理、智能客服機器人、SLA監控
 
@@ -372,10 +372,10 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 12-01 | [Deployment_Architecture.md](../07_Technical_Infrastructure_NEW/07-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 |
-| 12-02 | [QA_Testing_Standard.md](../07_Technical_Infrastructure_NEW/07-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 |
-| 12-03 | [Gateway_Architecture.md](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 |
-| 12-04 | [Maintenance_Procedure.md](../07_Technical_Infrastructure_NEW/07-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 |
+| 12-01 | [Deployment_Architecture.md](../07_Technical_Infrastructure/07-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 |
+| 12-02 | [QA_Testing_Standard.md](../07_Technical_Infrastructure/07-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 |
+| 12-03 | [Gateway_Architecture.md](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 |
+| 12-04 | [Maintenance_Procedure.md](../07_Technical_Infrastructure/07-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 |
 
 ---
 
@@ -412,7 +412,7 @@ graph TD
 
 ### 按開發任務查找
 
-> 📌 **完整實作指南**: [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
+> 📌 **完整實作指南**: [IMPLEMENTATION_GUIDE](../00_Foundation/00-00_IMPLEMENTATION_GUIDE.md)
 
 | 任務類型 | 範例 | 參考章節 |
 |---------|------|---------|
@@ -428,23 +428,23 @@ graph TD
 
 | 主題 | 關鍵文檔 | SSOT |
 |------|---------|------|
-| **可下注餘額公式** | [01-02 Wallet_Architecture §2.3](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md#23-可下注餘額計算) | ⭐ |
-| **有效投注算法** | [02-03 Turnover_Calculation §1](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#1-有效投注-valid-turnover-核心算法) | ⭐ |
-| **Token驗證流程** | [02-02 Seamless_Wallet_API §4.2](../02_Game_Operations_NEW/02-02_Seamless_Wallet_API.md#42-token-驗證) | ⭐ |
+| **可下注餘額公式** | [01-02 Wallet_Architecture §2.3](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md#23-可下注餘額計算) | ⭐ |
+| **有效投注算法** | [02-03 Turnover_Calculation §1](../02_Game_Operations/02-03_Turnover_Calculation.md#1-有效投注-valid-turnover-核心算法) | ⭐ |
+| **Token驗證流程** | [02-02 Seamless_Wallet_API §4.2](../02_Game_Operations/02-02_Seamless_Wallet_API.md#42-token-驗證) | ⭐ |
 | **風控規則引擎** | [04-01 Risk_Engine §2](../04_Risk_Control/04-01_Risk_Framework.md#2-規則引擎架構) | ⭐ |
 | **SAGA補償事務** | [01-05 Withdrawal_Risk §4.3](../01_Player_Center/01-05_Withdrawal_Risk.md#43-saga-補償事務) | ⭐ |
-| **PII加密標準** | [05-05 Data_Security §2](../05_Platform_Governance_NEW/05-05_Data_Security.md#2-pii-加密策略) | ⭐ |
-| **多租戶隔離** | [05-01 Multi_Tenant §3](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md#3-數據隔離策略) | ⭐ |
+| **PII加密標準** | [05-05 Data_Security §2](../05_Platform_Governance/05-05_Data_Security.md#2-pii-加密策略) | ⭐ |
+| **多租戶隔離** | [05-01 Multi_Tenant §3](../05_Platform_Governance/05-01_Multi_Tenant.md#3-數據隔離策略) | ⭐ |
 
 ### 按問題類型查找
 
 | 問題類型 | 診斷文檔 | 關鍵檢查點 |
 |---------|---------|-----------|
-| 錢包餘額不一致 | [01-02 §2.3](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md#23-可下注餘額計算), [01-04 §3](../01_Core_Financial_Loop_NEW/01-04_Settlement.md#3-對賬流程) | 三方對賬、事務補償 |
-| 流水計算錯誤 | [02-03 §1.6](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#16-故障排除), [04-01 §3](../04_Risk_Control/04-01_Risk_Framework.md#3-流水驗證) | 三層架構、風控因子 |
-| 支付回調失敗 | [02-02 §4](../02_Finance_Center/02-02_Payment_Gateway_Integration.md#4-回調處理), [05-05 §3](../05_Platform_Governance_NEW/05-05_Data_Security.md#3-簽名驗證) | 簽名驗證、冪等性 |
-| GP對接異常 | [02-02 §5](../02_Game_Operations_NEW/02-02_Seamless_Wallet_API.md#5-極端場景), [02-03 §2](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md#2-對賬驗證) | Token過期、重試機制 |
-| 權限異常 | [05-02 §4](../05_Platform_Governance_NEW/05-02_RBAC_Permissions.md#4-故障排除), [05-01 §4](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md#4-Context傳播) | RBAC評估、Context丟失 |
+| 錢包餘額不一致 | [01-02 §2.3](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md#23-可下注餘額計算), [01-04 §3](../01_Core_Financial_Loop/01-04_Settlement.md#3-對賬流程) | 三方對賬、事務補償 |
+| 流水計算錯誤 | [02-03 §1.6](../02_Game_Operations/02-03_Turnover_Calculation.md#16-故障排除), [04-01 §3](../04_Risk_Control/04-01_Risk_Framework.md#3-流水驗證) | 三層架構、風控因子 |
+| 支付回調失敗 | [02-02 §4](../02_Finance_Center/02-02_Payment_Gateway_Integration.md#4-回調處理), [05-05 §3](../05_Platform_Governance/05-05_Data_Security.md#3-簽名驗證) | 簽名驗證、冪等性 |
+| GP對接異常 | [02-02 §5](../02_Game_Operations/02-02_Seamless_Wallet_API.md#5-極端場景), [02-03 §2](../02_Game_Operations/02-03_Turnover_Calculation.md#2-對賬驗證) | Token過期、重試機制 |
+| 權限異常 | [05-02 §4](../05_Platform_Governance/05-02_RBAC_Permissions.md#4-故障排除), [05-01 §4](../05_Platform_Governance/05-01_Multi_Tenant.md#4-Context傳播) | RBAC評估、Context丟失 |
 
 
 ## 📝 變更日誌 (CHANGELOG)
@@ -456,12 +456,12 @@ graph TD
 **Document_Map 角色轉變**: 從詳細導航 → 高層元導航索引
 
 **移除的章節**:
-- ❌ 故障排除指南 (196 lines) → 內容重定向至 [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
+- ❌ 故障排除指南 (196 lines) → 內容重定向至 [IMPLEMENTATION_GUIDE](../00_Foundation/00-00_IMPLEMENTATION_GUIDE.md)
 
 **簡化的章節**:
-- ⚠️ 按角色導航 (67 → 13 lines) → 詳細路徑遷移至 [QUICKSTART §2.2](../00_Foundation_NEW/00-00_QUICKSTART.md#按角色快速導航)
-- ⚠️ 按業務流程導航 (132 → 14 lines) → 詳細流程圖遷移至 [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
-- ⚠️ 按優先級閱讀 (88 → 13 lines) → 完整閱讀路徑遷移至 [QUICKSTART §2.3](../00_Foundation_NEW/00-00_QUICKSTART.md#按優先級閱讀)
+- ⚠️ 按角色導航 (67 → 13 lines) → 詳細路徑遷移至 [QUICKSTART §2.2](../00_Foundation/00-00_QUICKSTART.md#按角色快速導航)
+- ⚠️ 按業務流程導航 (132 → 14 lines) → 詳細流程圖遷移至 [BUSINESS_FLOWS](../00_Foundation/00-00_BUSINESS_FLOWS.md)
+- ⚠️ 按優先級閱讀 (88 → 13 lines) → 完整閱讀路徑遷移至 [QUICKSTART §2.3](../00_Foundation/00-00_QUICKSTART.md#按優先級閱讀)
 
 **新增的章節**:
 - ✅ 快速查找索引 (50 lines) - 整合開發任務查找、SSOT 技術主題索引、問題診斷查找
@@ -475,10 +475,10 @@ graph TD
 #### 📋 Migration Guide
 
 **如何查找內容（v1.1.0 更新後）**:
-- **按角色查找** → [QUICKSTART §2.2](../00_Foundation_NEW/00-00_QUICKSTART.md#按角色快速導航)
-- **按流程查找** → [BUSINESS_FLOWS](../00_Foundation_NEW/00-00_BUSINESS_FLOWS.md)
-- **按優先級查找** → [QUICKSTART §2.3](../00_Foundation_NEW/00-00_QUICKSTART.md#按優先級閱讀)
-- **實作指南** → [IMPLEMENTATION_GUIDE](../00_Foundation_NEW/00-00_IMPLEMENTATION_GUIDE.md)
+- **按角色查找** → [QUICKSTART §2.2](../00_Foundation/00-00_QUICKSTART.md#按角色快速導航)
+- **按流程查找** → [BUSINESS_FLOWS](../00_Foundation/00-00_BUSINESS_FLOWS.md)
+- **按優先級查找** → [QUICKSTART §2.3](../00_Foundation/00-00_QUICKSTART.md#按優先級閱讀)
+- **實作指南** → [IMPLEMENTATION_GUIDE](../00_Foundation/00-00_IMPLEMENTATION_GUIDE.md)
 - **SSOT 定義** → 本文檔 §快速查找索引 > 按技術主題查找
 
 ---

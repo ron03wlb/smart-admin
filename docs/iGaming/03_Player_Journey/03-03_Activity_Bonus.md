@@ -6,7 +6,7 @@
 >
 > **三層風控架構定位**: **Layer 3 - 活動遊戲權重**
 > 本模塊負責應用活動特定的遊戲權重規則到流水計算。
-> 需依賴 Layer 1 ([04-01 風控框架](../04_Risk_Control/04-01_Risk_Framework.md)) 風控驗證 + Layer 2 ([02-03 流水計算](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md)) 狀態因子計算後才執行。
+> 需依賴 Layer 1 ([04-01 風控框架](../04_Risk_Control/04-01_Risk_Framework.md)) 風控驗證 + Layer 2 ([02-03 流水計算](../02_Game_Operations/02-03_Turnover_Calculation.md)) 狀態因子計算後才執行。
 > 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
 
 博彩包網平台的活動系統（Promotion System）是玩家獲取與留存的核心引擎。本指南提供一套完整的系統架構設計與運營策略框架，涵蓋規則引擎、獎勵計算、多租戶架構、跨遊戲整合，以及針對東南亞、拉丁美洲、歐洲、中國四大市場的本地化策略。**關鍵發現：獎金濫用佔 iGaming 詐騙的 63.8%**，因此風控機制必須與活動系統深度整合。
@@ -1895,7 +1895,7 @@ NotAccessDaoDirectly =
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 流水未達標提款限制
 
 ### 技術參考
-- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 活動發布 Maker-Checker 審批
+- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 活動發布 Maker-Checker 審批
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 活動推送通知
 
 ### 延伸閱讀

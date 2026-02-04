@@ -1509,14 +1509,14 @@ COMMIT;
 - [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利流水要求驗證
 
 ### 技術參考
-- [09-04 審批工作流系統](../05_Platform_Governance_NEW/05-04_Approval_Workflow.md) - 多層審批 Maker-Checker
-- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 提款審批日誌記錄
+- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 多層審批 Maker-Checker
+- [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 提款審批日誌記錄
 - [02-07 交易處理流程](./02-07_Transaction_Processing_Flow.md) - SAGA 分散式事務
 
 ### 延伸閱讀
 - [02-02 支付網關集成](./02-02_Payment_Gateway_Integration.md) - 代付通道整合
 - [02-03 對賬系統](./02-03_Reconciliation_System.md) - 三方對賬流程
-- [12-03 網關架構](../07_Technical_Infrastructure_NEW/07-02-01_Gateway_Core.md) - API 限流、熔斷
+- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - API 限流、熔斷
 
 ---
 

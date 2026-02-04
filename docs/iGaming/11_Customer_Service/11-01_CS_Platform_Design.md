@@ -2,7 +2,7 @@
 
 > **⚠️ DEPRECATED**: 本文檔已於 2026-02-04 遷移至新位置
 >
-> **新位置**: [06-02 客戶服務平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md)
+> **新位置**: [06-02 客戶服務平台設計](../06_Analytics_Operations/06-02_Customer_Service.md)
 >
 > **遷移原因**: Phase 4 模塊合併計劃（14 模塊 → 8 模塊），11_Customer_Service → 06_Analytics_Operations
 >
@@ -334,7 +334,7 @@ const livechat = new LiveChatClient({
 
 ### 技術架構參考
 - [08-05 多語言系統](../08_Frontend_CMS/08-05_Localization_System.md) - 知識庫多語言支持
-- [09-02 審計日誌系統](../05_Platform_Governance_NEW/05-03_Audit_Log.md) - 客服操作審計
+- [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 客服操作審計
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 多渠道通知整合
 
 ---

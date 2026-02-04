@@ -77,4 +77,4 @@
 
 ### 前置依賴
 - [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 錢包架構
-- [07-01 租戶層級架構](../05_Platform_Governance_NEW/05-01_Multi_Tenant.md) - 多租戶模型
+- [07-01 租戶層級架構](../05_Platform_Governance/05-01_Multi_Tenant.md) - 多租戶模型

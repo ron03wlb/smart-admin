@@ -22,17 +22,17 @@
 
 ### 2.1 已合併文檔（3 個）
 
-1. **[01-02_Wallet_Architecture.md](./01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md)**
+1. **[01-02_Wallet_Architecture.md](./01_Core_Financial_Loop/01-02_Wallet_Architecture.md)**
    - 行數: 2,172 行
    - SSOT 標記: 9 個
    - 引用鏈接: 8 個
 
-2. **[02-03_Turnover_Calculation.md](./02_Game_Operations_NEW/02-03_Turnover_Calculation.md)**
+2. **[02-03_Turnover_Calculation.md](./02_Game_Operations/02-03_Turnover_Calculation.md)**
    - 行數: ~1,850 行
    - SSOT 標記: 9 個
    - 引用鏈接: 8 個
 
-3. **[05-05_Data_Security.md](./05_Platform_Governance_NEW/05-05_Data_Security.md)**
+3. **[05-05_Data_Security.md](./05_Platform_Governance/05-05_Data_Security.md)**
    - 行數: 1,556 行
    - SSOT 標記: 9 個
    - 引用鏈接: 8 個
@@ -44,7 +44,7 @@
 ### 3.1 ✅ 有效鏈接（19 個）
 
 **01-02_Wallet_Architecture.md**:
-- ✅ `../02_Game_Operations_NEW/02-03_Turnover_Calculation.md` - 指向新合併文檔
+- ✅ `../02_Game_Operations/02-03_Turnover_Calculation.md` - 指向新合併文檔
 - ✅ `../02_Finance_Center/02-07_Transaction_Processing_Flow.md` - 舊文檔仍存在
 - ✅ `../01_Player_Center/01-05_Withdrawal_Risk.md` - **已遷移** (Week 4-5 完成)
 - ✅ `../06_Agent_Center/06-02_Credit_Network_Logic.md` - 舊文檔仍存在
@@ -58,13 +58,13 @@
 - ✅ `../03_Game_Center/03-03_Seamless_Wallet_Analysis.md` - 舊文檔仍存在
 
 **05-05_Data_Security.md**:
-- ✅ `../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md` - 指向新合併文檔
+- ✅ `../01_Core_Financial_Loop/01-02_Wallet_Architecture.md` - 指向新合併文檔
 
 ### 3.2 ⚠️ 需要更新的鏈接（1 個）
 
 | 文檔 | 行號 | 當前鏈接 | 應該更新為 | 理由 |
 |------|------|---------|-----------|------|
-| **02-03_Turnover_Calculation.md** | 2316 | `../02_Finance_Center/02-06_Unified_Wallet_Model.md` | `../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md` | 02-06 已合併至 01-02 |
+| **02-03_Turnover_Calculation.md** | 2316 | `../02_Finance_Center/02-06_Unified_Wallet_Model.md` | `../01_Core_Financial_Loop/01-02_Wallet_Architecture.md` | 02-06 已合併至 01-02 |
 
 **修復狀態**: ⏳ 待修復（P0 - 高優先級）
 
@@ -76,8 +76,8 @@
 |---------|---------|---------|--------|
 | **00_Concept_&_Analysis/00-03_Data_Model_Overview.md** | 01-02 | Wallet表結構設計、索引策略 | P1 |
 | **03_Player_Journey/03-03_Activity_Bonus.md** | 01-02, 02-03 | 獎金錢包整合、流水要求計算 | P1 |
-| **01_Core_Financial_Loop_NEW/01-01_Player_Lifecycle.md** | 05-05 | 玩家生命週期管理 | P2 |
-| **01_Core_Financial_Loop_NEW/01-05_Withdrawal_Risk.md** | 05-05 | 可提餘額驗證、鎖定餘額處理 | P2 |
+| **01_Core_Financial_Loop/01-01_Player_Lifecycle.md** | 05-05 | 玩家生命週期管理 | P2 |
+| **01_Core_Financial_Loop/01-05_Withdrawal_Risk.md** | 05-05 | 可提餘額驗證、鎖定餘額處理 | P2 |
 
 **處理建議**:
 - **選項 A（推薦）**: 在文檔中添加註釋 `<!-- TODO: 待創建文檔 -->`，保留鏈接以便追蹤
@@ -95,11 +95,11 @@
 **步驟**:
 ```bash
 # 1. 在 02-03_Turnover_Calculation.md 中替換
-sed -i 's|02_Finance_Center/02-06_Unified_Wallet_Model.md|01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md|g' \
-  docs/iGaming/02_Game_Operations_NEW/02-03_Turnover_Calculation.md
+sed -i 's|02_Finance_Center/02-06_Unified_Wallet_Model.md|01_Core_Financial_Loop/01-02_Wallet_Architecture.md|g' \
+  docs/iGaming/02_Game_Operations/02-03_Turnover_Calculation.md
 
 # 2. 驗證修復
-grep "02-06" docs/iGaming/02_Game_Operations_NEW/02-03_Turnover_Calculation.md
+grep "02-06" docs/iGaming/02_Game_Operations/02-03_Turnover_Calculation.md
 ```
 
 **預期結果**: 所有 02-06 引用更新為 01-02
@@ -146,15 +146,15 @@ grep "02-06" docs/iGaming/02_Game_Operations_NEW/02-03_Turnover_Calculation.md
 
 ```mermaid
 graph LR
-    subgraph Core["01_Core_Financial_Loop_NEW"]
+    subgraph Core["01_Core_Financial_Loop"]
         W["01-02<br/>Wallet Architecture<br/>(2,172 lines)"]
     end
 
-    subgraph Game["02_Game_Operations_NEW"]
+    subgraph Game["02_Game_Operations"]
         T["02-03<br/>Turnover Calculation<br/>(1,850 lines)"]
     end
 
-    subgraph Governance["05_Platform_Governance_NEW"]
+    subgraph Governance["05_Platform_Governance"]
         S["05-05<br/>Data Security<br/>(1,556 lines)"]
     end
 
