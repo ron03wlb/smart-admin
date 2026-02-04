@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.common.web.util.SmartRequestUtil;
+import net.lab1024.sa.common.web.web.util.SmartRequestUtil;
 import net.lab1024.sa.system.datascope.DataScope;
 import net.lab1024.sa.system.datascope.constant.DataScopeTypeEnum;
 import net.lab1024.sa.system.datascope.constant.DataScopeViewTypeEnum;
@@ -60,7 +60,7 @@ public class DataScopeSqlConfigService {
     Reflections reflections =
         new Reflections(
             new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forPackage(AdminApplication.COMPONENT_SCAN))
+                .setUrls(ClasspathHelper.forPackage("net.lab1024.sa.system"))
                 .setScanners(new MethodAnnotationsScanner()));
     Set<Method> methods = reflections.getMethodsAnnotatedWith(DataScope.class);
     for (Method method : methods) {

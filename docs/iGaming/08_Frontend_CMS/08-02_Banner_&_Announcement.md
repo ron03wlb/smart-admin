@@ -343,8 +343,8 @@ graph TD
 ## 📚 相關文檔
 
 ### 業務邏輯參考
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - Banner 跳轉活動頁邏輯
-- [01-02 VIP 忠誠系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - VIP 等級定向規則
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - Banner 跳轉活動頁邏輯
+- [01-02 VIP 忠誠系統](../03_Player_Journey/03-02_VIP_Loyalty.md) - VIP 等級定向規則
 
 ### 技術架構參考
 - [08-05 本地化系統](./08-05_Localization_System.md) - 多語系實作架構

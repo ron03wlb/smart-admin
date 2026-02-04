@@ -47,7 +47,7 @@
 
 **單一數據源 (SSOT)**：
 - 玩家帳戶狀態狀態機在本文檔定義，其他模組僅引用
-- 風險評分維度定義在 [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md)
+- 風險評分維度定義在 [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)
 - 錢包創建邏輯定義在 [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md)
 
 **事件驅動架構**：
@@ -145,7 +145,7 @@ END
 - `REGULAR` - 普通玩家 (月存款 $1K-$10K)
 - `CASUAL` - 休閒玩家 (月存款 < $1K)
 
-**風控標籤 (Risk Tags)** (詳見 [05-01 §4.2](../05_Risk_Management/05-01_Risk_Control_System.md#42-風險標籤)):
+**風控標籤 (Risk Tags)** (詳見 [05-01 §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-風險標籤)):
 - `BONUS_HUNTER` - 獎金獵人 (僅玩高 RTP 遊戲,完成流水後立即提款)
 - `ARBITRAGE` - 套利者 (在多平台對沖投注)
 - `HEDGER` - 對沖者 (同一平台多賬戶對沖)
@@ -283,7 +283,7 @@ WHERE player_id = ?
 
 #### 3.3.2 ACTIVE → SUSPENDED (風險評分觸發)
 
-**觸發條件** (詳見 [05-01 §4.6](../05_Risk_Management/05-01_Risk_Control_System.md#46-風險評分規則)):
+**觸發條件** (詳見 [05-01 §4.6](../04_Risk_Control/04-01_Risk_Framework.md#46-風險評分規則)):
 ```java
 IF risk_score >= 70 AND risk_level IN ('HIGH', 'CRITICAL')
 THEN TRANSITION TO SUSPENDED
@@ -703,7 +703,7 @@ flowchart TD
 
 ## 5. 設備指紋與風險評估 (Device Fingerprinting & Risk Assessment)
 
-> 💡 **SSOT Marker**: 設備指紋採集方案在本章節定義。風險評分邏輯詳見 [05-01 §4.2](../05_Risk_Management/05-01_Risk_Control_System.md#42-多維欺詐檢測決策樹)。
+> 💡 **SSOT Marker**: 設備指紋採集方案在本章節定義。風險評分邏輯詳見 [05-01 §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-多維欺詐檢測決策樹)。
 
 ### 5.1 設備指紋技術
 
@@ -812,7 +812,7 @@ ORDER BY relationship_depth ASC
 LIMIT 50
 ```
 
-**風險評分規則** (詳見 [05-01 §4.2](../05_Risk_Management/05-01_Risk_Control_System.md#42-多維欺詐檢測決策樹)):
+**風險評分規則** (詳見 [05-01 §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-多維欺詐檢測決策樹)):
 
 | 檢測項目 | 低風險 (0-30) | 中風險 (31-60) | 高風險 (61-85) | 嚴重 (86-100) |
 |---------|--------------|---------------|--------------|--------------|
@@ -1814,7 +1814,7 @@ class PlayerLifecycleArchitectureTest {
 
 **業務整合**:
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 註冊時錢包創建
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風險評分、多帳號檢測、設備指紋
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風險評分、多帳號檢測、設備指紋
 - [01-02 VIP 系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級初始化、積分系統
 - [01-05 提款風控](./01-05_Withdrawal_Risk.md) - KYC 等級與提款限額
 
@@ -1827,7 +1827,7 @@ class PlayerLifecycleArchitectureTest {
 ### 8.3 延伸閱讀
 
 **運營優化**:
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 基於生命週期的精準營銷
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 基於生命週期的精準營銷
 - [10-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 玩家生命週期分析報表
 - [11-01 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 玩家 360 視圖整合
 

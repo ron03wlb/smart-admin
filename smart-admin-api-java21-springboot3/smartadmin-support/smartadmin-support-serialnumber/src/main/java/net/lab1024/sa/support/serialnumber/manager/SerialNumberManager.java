@@ -2,10 +2,10 @@ package net.lab1024.sa.support.serialnumber.manager;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.domain.exception.BusinessException;
 import net.lab1024.sa.support.serialnumber.constant.SerialNumberIdEnum;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.support.serialnumber.service.SerialNumberBaseService;
-import net.lab1024.sa.common.core.domain.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

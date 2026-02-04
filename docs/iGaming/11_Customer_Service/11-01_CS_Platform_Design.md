@@ -328,9 +328,9 @@ const livechat = new LiveChatClient({
 ## 📚 相關文檔
 
 ### 業務邏輯參考
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 玩家資料來源
+- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 玩家資料來源
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包數據展示
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利問題處理
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利問題處理
 
 ### 技術架構參考
 - [08-05 多語言系統](../08_Frontend_CMS/08-05_Localization_System.md) - 知識庫多語言支持

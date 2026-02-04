@@ -27,8 +27,8 @@
 
 **參考文檔**:
 - [00-03 術語標準化](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - **必讀**
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - Layer 1依賴
-- [04-01 活動系統](../04_Activity_Center/04-01_Activity_System_Design.md) - Layer 3依賴
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - Layer 1依賴
+- [04-01 活動系統](../03_Player_Journey/03-03_Activity_Bonus.md) - Layer 3依賴
 
 ---
 
@@ -2316,9 +2316,9 @@ alerts:
 - [01-02 錢包架構](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md) - 統一錢包模型、可下注餘額公式、扣款優先級
 
 ### 核心依賴
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - Layer 1 風控引擎
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - Layer 1 風控引擎
 <!-- TODO: 待創建文檔 - Week 4-5 -->
-<!-- - [04-01 活動系統](../04_Activity_Center/04-01_Activity_System_Design.md) - Layer 3 活動系統 -->
+<!-- - [04-01 活動系統](../03_Player_Journey/03-03_Activity_Bonus.md) - Layer 3 活動系統 -->
 
 ### 延伸閱讀
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

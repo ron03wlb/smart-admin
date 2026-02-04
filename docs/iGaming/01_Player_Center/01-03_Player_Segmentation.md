@@ -171,10 +171,10 @@ VIP 玩家 (1.5-3%)
 
 ### 核心依賴
 - [01-02 VIP 與忠誠度系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級與玩家價值關聯
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控標籤與規則引擎
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控標籤與規則引擎
 
 ### 延伸閱讀
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 基於分群的精準營銷
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 基於分群的精準營銷
 - [10-01 報表與 BI 架構](../06_Analytics_Operations_NEW/06-01_Reporting_BI.md) - 玩家分群分析報表
 
 ---

@@ -179,7 +179,7 @@ archive/
 - ✅ 所有審計報告（4 個）**已合併**至 `V3.0.0_FINAL_SUMMARY.md`
 - ✅ 所有遷移指南（8 個）**已合併**至 `V3.0.0_FINAL_SUMMARY.md`
 - ✅ 技術修復報告（8 個）**已刪除**（一次性修復，歷史價值低，Git 歷史可追溯）
-- ✅ 活動中心歷史（2 個）**已刪除**（已整合至 `04_Activity_Center/04-01_Activity_System_Design.md`）
+- ✅ 活動中心歷史（2 個）**已刪除**（已整合至 `03_Player_Journey/03-03_Activity_Bonus.md`）
 - ✅ 深度分析（6 個）**已刪除**（除 seamless_wallet.md，內容已整合至模塊文檔）
 
 **保留的 3 個關鍵文件**（89% 減少率）:

@@ -471,7 +471,7 @@ report:{report_type}:{date}:{filters_hash}
 
 ### 核心依賴
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - GGR/NGR 計算邏輯
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控報表數據來源
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控報表數據來源
 
 ### 延伸閱讀
 - [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - CDC、ETL 流程

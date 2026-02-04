@@ -315,7 +315,7 @@ THEN stop_experiment() AND rollback()
 
 ### 延伸閱讀
 - [08-01 前端佈局引擎](./08-01_Frontend_Layout_Engine.md) - 動態佈局與 A/B 測試集成
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動效果 A/B 測試
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 活動效果 A/B 測試
 
 ---
 

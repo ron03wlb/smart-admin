@@ -1922,7 +1922,7 @@ class PlayerControllerTest {
 
 ### 業務參考
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包 API
-- [04-02 紅利計算引擎](../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) - 紅利發放邏輯
+- [04-02 紅利計算引擎](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利發放邏輯
 - [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - GP API
 
 ---

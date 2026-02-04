@@ -1059,7 +1059,7 @@ Response:
 
 ### 架構文檔
 - [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
-- [04-01 活動系統設計](../../04_Activity_Center/04-01_Activity_System_Design.md) - 活動系統
+- [04-01 活動系統設計](../../03_Player_Journey/03-03_Activity_Bonus.md) - 活動系統
 
 
 ---
@@ -1420,4 +1420,4 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 
 ### 架構文檔
 - [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
-- [04-01 活動系統設計](../../04_Activity_Center/04-01_Activity_System_Design.md) - 促銷活動系統
+- [04-01 活動系統設計](../../03_Player_Journey/03-03_Activity_Bonus.md) - 促銷活動系統

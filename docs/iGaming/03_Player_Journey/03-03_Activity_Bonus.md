@@ -1,12 +1,12 @@
-# 04-01 活動系統設計 (Activity System Design)
+# 03-03 活動獎金系統 (Activity & Bonus System)
 
-> **RENAMED FROM**: `01-system-design.md` (Week 4-5 Standardization)
-> **Version**: 2.0.0 (Enhanced with SSOT Markers + SmartAdmin Mapping)
-> **Last Updated**: 2026-02-03
+> **MERGED FROM**: `04-01_Activity_System_Design.md` + `04-02_Bonus_Calculation_Engine.md` (Week 5 Consolidation)
+> **Version**: 3.0.0 (Merged Activity + Bonus Engine)
+> **Last Updated**: 2026-02-04
 >
 > **三層風控架構定位**: **Layer 3 - 活動遊戲權重**
 > 本模塊負責應用活動特定的遊戲權重規則到流水計算。
-> 需依賴 Layer 1 ([05-01](../05_Risk_Management/05-01_Risk_Control_System.md)) 風控驗證 + Layer 2 ([02-03](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md)) 狀態因子計算後才執行。
+> 需依賴 Layer 1 ([04-01 風控框架](../04_Risk_Control/04-01_Risk_Framework.md)) 風控驗證 + Layer 2 ([02-03 流水計算](../02_Game_Operations_NEW/02-03_Turnover_Calculation.md)) 狀態因子計算後才執行。
 > 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
 
 博彩包網平台的活動系統（Promotion System）是玩家獲取與留存的核心引擎。本指南提供一套完整的系統架構設計與運營策略框架，涵蓋規則引擎、獎勵計算、多租戶架構、跨遊戲整合，以及針對東南亞、拉丁美洲、歐洲、中國四大市場的本地化策略。**關鍵發現：獎金濫用佔 iGaming 詐騙的 63.8%**，因此風控機制必須與活動系統深度整合。
@@ -1890,8 +1890,8 @@ NotAccessDaoDirectly =
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 3 遊戲權重）
 
 ### 業務整合
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 紅利濫用檢測、多帳號風控
-- [01-02 VIP 系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - VIP 專屬活動、等級權益
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 紅利濫用檢測、多帳號風控
+- [01-02 VIP 系統](../03_Player_Journey/03-02_VIP_Loyalty.md) - VIP 專屬活動、等級權益
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 流水未達標提款限制
 
 ### 技術參考

@@ -829,7 +829,7 @@ flowchart TD
 
 ### 業務整合
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳、注單驗證
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 異常投注檢測、負餘額告警
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 異常投注檢測、負餘額告警
 
 ### 技術參考
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 分散式事務、TCC 模式
@@ -956,7 +956,7 @@ Controller → Manager (❌ 禁止,違反分層)
   - [錯誤恢復](../02_Finance_Center/seamless-wallet/10_error_recovery.md) - 異常處理、補償事務、回滾策略
 
 ### 風控整合
-- **[05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md)** - 交易風控檢查、對沖檢測
+- **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)** - 交易風控檢查、對沖檢測
 
 ---
 

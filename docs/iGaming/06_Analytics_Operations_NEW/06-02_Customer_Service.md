@@ -91,7 +91,7 @@
 
 #### F. 風控與合規信息
 
-💡 **SSOT Marker**: 風險評分邏輯詳見 **[05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md §4.2)**
+💡 **SSOT Marker**: 風險評分邏輯詳見 **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md §4.2)**
 
 - **風險評分**: 實時風險分數（0-100）
 - **AML 狀態**: 待審核 / 通過 / 可疑交易標記
@@ -649,7 +649,7 @@ public class TicketService {
 
 ### 核心依賴
 - **[01-03 玩家分群與標籤](../01_Player_Center/01-03_Player_Segmentation.md)** - 玩家生命週期、RFM 模型、風控標籤
-- **[05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md)** - 風險評分、異常檢測
+- **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)** - 風險評分、異常檢測
 
 ### 技術基礎設施
 - **[07-02 網關架構](../07_Technical_Infrastructure/07-02_Gateway_Architecture.md)** - WebSocket 即時通訊

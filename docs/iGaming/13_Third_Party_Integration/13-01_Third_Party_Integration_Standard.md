@@ -334,7 +334,7 @@ receivers:
 ### 已整合模塊參考
 - [02-02 支付網關整合](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP 整合詳細規範
 - [03-01 遊戲整合標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - GP 整合協議
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC 驗證流程
+- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 驗證流程
 
 ### 技術基礎設施參考
 - [12-05 API 設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - RESTful 規範

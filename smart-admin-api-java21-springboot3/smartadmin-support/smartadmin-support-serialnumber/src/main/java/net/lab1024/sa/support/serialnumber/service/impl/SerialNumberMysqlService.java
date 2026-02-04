@@ -2,6 +2,7 @@ package net.lab1024.sa.support.serialnumber.service.impl;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.domain.exception.BusinessException;
 import net.lab1024.sa.support.serialnumber.dao.SerialNumberDao;
 import net.lab1024.sa.support.serialnumber.dao.SerialNumberRecordDao;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberEntity;
@@ -9,7 +10,6 @@ import net.lab1024.sa.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberLastGenerateBO;
 import net.lab1024.sa.support.serialnumber.service.SerialNumberBaseService;
-import net.lab1024.sa.common.core.domain.exception.BusinessException;
 
 /**
  * 单据序列号 基于mysql锁实现

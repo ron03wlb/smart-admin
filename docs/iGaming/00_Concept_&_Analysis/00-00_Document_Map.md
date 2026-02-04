@@ -27,16 +27,16 @@
 **建議閱讀路徑**：
 1. [00-01 方案概覽](./00-01_Solution_Overview.md) - 了解整體架構
 2. [00-02 行業術語](./00-02_Industry_Terminology.md) - 掌握行業術語
-3. [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 玩家管理
+3. [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 玩家管理
 4. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動規則
-5. [06-01 代理系統設計](../06_Agent_Center/06-01_Affiliate_System_Design.md) - 代理架構
+5. [06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md) - 代理架構
 
 #### 架構師
 **建議閱讀路徑**：
 1. [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
 2. [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶架構
 3. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心錢包設計
-4. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控架構
+4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控架構
 5. [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API網關設計
 6. [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - 數據架構
 
@@ -55,7 +55,7 @@
 3. [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對賬
 
 **風控開發**：
-1. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 規則引擎
+1. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 規則引擎
 2. [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 出金風控規則
 3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動風控
 
@@ -70,7 +70,7 @@
 **建議閱讀路徑**：
 1. [12-02 QA測試標準](../12_Technical_Operations/12-02_QA_Testing_Standard.md) - 測試規範
 2. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心業務邏輯
-3. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控測試場景
+3. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控測試場景
 4. [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 極端場景測試
 
 #### 運維工程師
@@ -86,7 +86,7 @@
 2. [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 權限管理
 3. [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 審計日誌記錄與檢索
 4. [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - Maker-Checker 審批
-5. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 反欺詐
+5. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 反欺詐
 
 ---
 
@@ -105,7 +105,7 @@
 ```
 
 **相關文檔**：
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 註冊邏輯、KYC、MFA
+- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 註冊邏輯、KYC、MFA
 - [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 玩家權限
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包初始化
 - [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 日誌記錄
@@ -153,7 +153,7 @@
 - [03-03 無縫錢包對接分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 極端場景
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包邏輯
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水算法
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控檢測
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控檢測
 
 ---
 
@@ -175,7 +175,7 @@
 
 **相關文檔**：
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 審核流程
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控引擎
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控引擎
 - [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 審批工作流
 - [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - 代付
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額扣減
@@ -199,7 +199,7 @@
 - [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 活動規則
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 紅利發放
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 濫用防護
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 濫用防護
 
 ---
 
@@ -216,7 +216,7 @@
 ```
 
 **相關文檔**：
-- [06-01 代理系統設計](../06_Agent_Center/06-01_Affiliate_System_Design.md) - 佣金算法
+- [06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md) - 佣金算法
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水數據
 - [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - 信用結算
 - [02-05 賬單與發票](../02_Finance_Center/02-05_Billing_&_Invoicing.md) - 賬單生成
@@ -236,7 +236,7 @@
 3. **[02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md)**
    核心錢包邏輯、可下注餘額公式
 
-4. **[05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md)**
+4. **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)**
    平台級風控引擎、規則引擎架構
 
 5. **[09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md)**
@@ -246,7 +246,7 @@
 
 #### 🟠 P1 - 核心業務文檔（理解業務邏輯）
 
-6. **[01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md)**
+6. **[01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md)**
    註冊、KYC、MFA
 
 7. **[02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md)**
@@ -302,7 +302,7 @@
 20. **[02-05 賬單與發票](../02_Finance_Center/02-05_Billing_&_Invoicing.md)**
     B2B租戶計費
 
-21. **[06-01 代理系統設計](../06_Agent_Center/06-01_Affiliate_System_Design.md)**
+21. **[06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md)**
     無限層級代理
 
 22. **[08-05 多語言系統](../08_Frontend_CMS/08-05_Localization_System.md)**
@@ -448,8 +448,8 @@ graph TD
 | [02-06 統一錢包](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | [02-07 交易處理](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 交易處理依賴錢包模型定義 |
 | [02-06 統一錢包](../02_Finance_Center/02-06_Unified_Wallet_Model.md) | [03-03 無縫錢包](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | GP對接使用錢包API |
 | [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動使用流水驗證數據 |
-| [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
-| [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
+| [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
+| [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) | [04-01 活動系統](../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
 | [07-01 層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) | [09-01 RBAC](../09_System_Security/09-01_Admin_RBAC.md) | RBAC基於層級架構 |
 | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
 | [09-02 審計日誌](../09_System_Security/09-02_Audit_Log_System.md) | [09-04 審批工作流](../09_System_Security/09-04_Approval_Workflow_System.md) | 審批操作記錄在審計日誌 |
@@ -485,8 +485,8 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 01-01 | [Player_Account_System.md](../01_Player_Center/01-01_Player_Account_System.md) | 玩家註冊、KYC、MFA | 67 |
-| 01-02 | [VIP_&_Loyalty_System.md](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) | VIP等級、忠誠度積分 | 987 ✅ |
+| 01-01 | [Player_Account_System.md](../03_Player_Journey/03-01_Player_Lifecycle.md) | 玩家註冊、KYC、MFA | 67 |
+| 01-02 | [VIP_&_Loyalty_System.md](../03_Player_Journey/03-02_VIP_Loyalty.md) | VIP等級、忠誠度積分 | 987 ✅ |
 
 > ✅ **已擴充** (v2.0.0): 01-02 文檔已大幅擴充,包含 VIP 權益詳細清單、積分計算規則、等級升降邏輯
 
@@ -534,7 +534,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 05-01 | [Risk_Control_System.md](../05_Risk_Management/05-01_Risk_Control_System.md) | **核心** - 平台級風控引擎、ML模型 | 80+ |
+| 05-01 | [Risk_Control_System.md](../04_Risk_Control/04-01_Risk_Framework.md) | **核心** - 平台級風控引擎、ML模型 | 80+ |
 | 05-02 | [Agent_Credit_Risk.md](../05_Risk_Management/05-02_Agent_Credit_Risk.md) | 代理信用評分、Margin Call | 86 |
 
 ---
@@ -543,7 +543,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 06-01 | [Affiliate_System_Design.md](../06_Agent_Center/06-01_Affiliate_System_Design.md) | 無限層級代理系統 | 61 |
+| 06-01 | [Affiliate_System_Design.md](../03_Player_Journey/03-04_Agent_System.md) | 無限層級代理系統 | 61 |
 | 06-02 | [Credit_Network_Logic.md](../06_Agent_Center/06-02_Credit_Network_Logic.md) | 信用額度網絡、持倉 | 70 |
 
 ---
@@ -670,7 +670,7 @@ graph TD
 **重要提示**: 流水計算採用**三層架構**，請勿合併！
 
 **理解架構** (必讀順序):
-1. **Layer 1 - 風控基礎驗證**: [05-01 風控系統 §3.1](../05_Risk_Management/05-01_Risk_Control_System.md#31-validatebet---投注驗證-layer-1-核心邏輯)
+1. **Layer 1 - 風控基礎驗證**: [05-01 風控系統 §3.1](../04_Risk_Control/04-01_Risk_Framework.md#31-validatebet---投注驗證-layer-1-核心邏輯)
    - **職責**: 對沖檢測、賠率閾值、異常投注模式識別
    - **輸出**: RiskFactor (0 = Reject, 1 = Pass)
    - **標記**: 文檔中明確標註 "Layer 1 核心邏輯"
@@ -722,7 +722,7 @@ ValidTurnover = BetAmount
 **導航路徑**:
 1. **業務邏輯**: [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎架構
 2. **錢包整合**: [02-06 統一錢包 - 獎金餘額](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 可下注餘額公式
-3. **風控檢測**: [05-01 風控系統 - 獎金濫用檢測](../05_Risk_Management/05-01_Risk_Control_System.md) - 防刷獎金規則
+3. **風控檢測**: [05-01 風控系統 - 獎金濫用檢測](../04_Risk_Control/04-01_Risk_Framework.md) - 防刷獎金規則
 
 **關鍵決策點**:
 | 問題 | 參考章節 |
@@ -736,7 +736,7 @@ ValidTurnover = BetAmount
 
 #### 👤 ...玩家KYC驗證流程
 **導航路徑**:
-1. **帳戶系統**: [01-01 玩家帳戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC等級設計
+1. **帳戶系統**: [01-01 玩家帳戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC等級設計
 2. **第三方整合**: [06-03 第三方整合標準](../06_Analytics_Operations_NEW/06-03_Third_Party_Integration.md) - Onfido/Jumio集成
 3. **數據安全**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 身份證件加密存儲
 4. **審批流程**: [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC人工審核
@@ -762,7 +762,7 @@ ValidTurnover = BetAmount
 #### 🔌 ...API規範
 **依類型查找**:
 - **通用標準**: [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - RESTful、響應格式
-- **風控API**: [05-01 風控系統 §3](../05_Risk_Management/05-01_Risk_Control_System.md) - 第204-334行
+- **風控API**: [05-01 風控系統 §3](../04_Risk_Control/04-01_Risk_Framework.md) - 第204-334行
 - **支付API**: [02-02 支付網關 §10](../02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP集成規範
 - **遊戲API**: [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md) - GP接入協議
 
@@ -770,7 +770,7 @@ ValidTurnover = BetAmount
 **按場景查找**:
 - **數據加密**: [09-03 數據安全標準 §2](../09_System_Security/09-03_Data_Security_Standard.md) - AES-256、盲索引
 - **GDPR合規**: [09-03 §6](../09_System_Security/09-03_Data_Security_Standard.md) - Crypto-Shredding、數據刪除
-- **密碼策略**: [01-01 玩家帳戶 §2.3](../01_Player_Center/01-01_Player_Account_System.md) - Argon2、MFA
+- **密碼策略**: [01-01 玩家帳戶 §2.3](../03_Player_Journey/03-01_Player_Lifecycle.md) - Argon2、MFA
 - **API安全**: [12-03 網關架構 §5](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 限流、防DDoS
 
 #### 🎨 ...前端實作
@@ -800,7 +800,7 @@ ValidTurnover = BetAmount
 **診斷流程**:
 1. 驗證三層架構調用順序（05-01 → 02-04 → 04-01）
 2. 檢查 [02-04 §1.6](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 跨模組一致性保障
-3. 查看 [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 是否被風控規則攔截
+3. 查看 [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 是否被風控規則攔截
 
 #### ❌ 支付回調驗證失敗
 **診斷流程**:
@@ -817,7 +817,7 @@ ValidTurnover = BetAmount
 1. [00-02 行業術語表](../00_Concept_&_Analysis/00-02_Industry_Terminology.md) - 200+標準術語
 2. [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 完整ER圖
 3. [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 核心業務邏輯
-4. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - API契約規範
+4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - API契約規範
 5. [12-05 API設計標準](../12_Technical_Operations/12-05_API_Design_Standard.md) - 開發規範
 
 #### 🎨 前端工程師
@@ -832,12 +832,12 @@ ValidTurnover = BetAmount
 1. [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 權限模型
 2. [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密、GDPR
 3. [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - DDoS防護
-4. [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 欺詐檢測
+4. [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 欺詐檢測
 
 #### 💼 產品經理
 **必讀清單**:
 1. [00-01 解決方案總覽](../00_Concept_&_Analysis/00-01_Solution_Overview.md) - 商業模式
-2. [01-02 VIP忠誠系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - 玩家運營
+2. [01-02 VIP忠誠系統](../03_Player_Journey/03-02_VIP_Loyalty.md) - 玩家運營
 3. [04-01 活動系統設計](../04_Activity_Center/01-system-design.md) - 獎金引擎
 4. [06-02 客服平台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 客服工具、AI 客服機器人
 

@@ -1,4 +1,4 @@
-# 06-01 代理系統設計 (Affiliate System Design)
+# 03-04 代理系統 (Agent System)
 
 ## 1. 系統概述
 代理系統 (Affiliate/Agent System) 是 iGaming 平台獲客的核心。
@@ -843,7 +843,7 @@ avg(affiliate_commission_calculation_duration_seconds) by (agent_id)
 - [07-01 租戶層級架構](../07_Platform_Management/07-01_Hierarchy_Architecture.md) - 多租戶模型
 
 ### 業務整合
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 代理風控
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 代理風控
 
 ### 技術參考
 - [SmartAdmin 架構規則](../../.agent/rules/foundation/10-architecture-rules.md) - Manager 層事務規範

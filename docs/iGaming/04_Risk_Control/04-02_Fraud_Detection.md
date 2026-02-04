@@ -1,4 +1,4 @@
-# 05-03 配置驅動風控系統設計 (Configuration-Driven Risk Control System)
+# 04-02 欺詐檢測 (Fraud Detection)
 
 ## 📋 文檔信息
 
@@ -6,7 +6,7 @@
 **最後更新**: 2026-02-02
 **維護團隊**: Risk Team & Backend Team
 **前置依賴**:
-- [05-01 風控系統架構](./05-01_Risk_Control_System.md) - 配置驅動風控規則引擎 (§9)
+- [04-01 風控框架](./04-01_Risk_Framework.md) - 配置驅動風控規則引擎 (§9)
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 延遲風控檢查
 - [02-04 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Layer 1 處理流程
 

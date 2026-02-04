@@ -1,4 +1,4 @@
-# 01-02 VIP 與忠誠度系統 (VIP & Loyalty System)
+# 03-02 VIP 忠誠度系統 (VIP & Loyalty System)
 
 ## 1. 系統概述 (Overview)
 旨在透過獎勵機制提升玩家留存率 (Retention) 與終身價值 (LTV)。系統需具備高度靈活性，允許不同商戶自定義其 VIP 層級規則與權益。
@@ -683,7 +683,7 @@ THEN 標記為 "VIP Farming" → 人工審核
 
 ### 業務邏輯參考
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 紅利錢包集成
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - VIP專屬活動
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - VIP專屬活動
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 有效流水定義
 
 ### 技術架構參考

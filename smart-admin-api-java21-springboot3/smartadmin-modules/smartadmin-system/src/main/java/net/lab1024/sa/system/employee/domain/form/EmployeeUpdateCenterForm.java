@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.common.core.domain.enumeration.GenderEnum;
 import net.lab1024.sa.common.core.util.SmartVerificationUtil;
-import net.lab1024.sa.common.core.validation.annotation.CheckEnum;
+import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
+import net.lab1024.sa.common.validation.annotation.CheckEnum;
 import org.hibernate.validator.constraints.Length;
 
 /**

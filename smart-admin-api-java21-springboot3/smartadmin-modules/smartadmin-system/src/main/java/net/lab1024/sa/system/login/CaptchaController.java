@@ -3,11 +3,11 @@ package net.lab1024.sa.system.login;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.base.swagger.constant.SwaggerTagConst;
-import net.lab1024.sa.base.web.base.SupportBaseController;
 import net.lab1024.sa.common.captcha.CaptchaService;
 import net.lab1024.sa.common.captcha.CaptchaVO;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.swagger.constant.SwaggerTagConst;
+import net.lab1024.sa.common.web.web.base.SupportBaseController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

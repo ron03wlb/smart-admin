@@ -315,7 +315,7 @@ export default {
 - [08-05-04 API規格](./08-05-04_API_Specification.md) - 完整API文檔、監控
 
 ### 業務邏輯參考
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 活動多語言內容
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 活動多語言內容
 - [08-02 Banner 管理](./08-02_Banner_&_Announcement.md) - 橫幅多語言
 - [11-01 客服中台設計](../06_Analytics_Operations_NEW/06-02_Customer_Service.md) - 通知模板本地化
 

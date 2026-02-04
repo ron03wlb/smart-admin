@@ -250,7 +250,7 @@ stateDiagram-v2
 
 ### 技術架構參考
 - [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - 刪除操作審計
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 帳號狀態管理
+- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 帳號狀態管理
 - [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 刪除事件通知
 
 ---

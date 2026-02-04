@@ -7,16 +7,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.system.constant.AdminSwaggerTagConst;
-import net.lab1024.sa.admin.module.support.securityprotect.service.Level3ProtectConfigService;
-import net.lab1024.sa.admin.util.AdminRequestUtil;
-import net.lab1024.sa.annotation.NoNeedLogin;
-import net.lab1024.sa.common.web.util.SmartRequestUtil;
 import net.lab1024.sa.common.captcha.CaptchaVO;
+import net.lab1024.sa.common.core.annotation.NoNeedLogin;
 import net.lab1024.sa.common.core.domain.constant.RequestHeaderConst;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.web.web.util.SmartRequestUtil;
+import net.lab1024.sa.support.securityprotect.service.Level3ProtectConfigService;
+import net.lab1024.sa.system.constant.AdminSwaggerTagConst;
 import net.lab1024.sa.system.login.domain.LoginForm;
 import net.lab1024.sa.system.login.domain.LoginResultVO;
+import net.lab1024.sa.system.login.domain.RequestEmployee;
 import net.lab1024.sa.system.login.service.LoginService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,7 +55,8 @@ public class LoginController {
   public ResponseDTO<LoginResultVO> getLoginInfo() {
     String tokenValue = StpUtil.getTokenValue();
     LoginResultVO loginResult =
-        loginService.getLoginResult(AdminRequestUtil.getRequestUser(), tokenValue);
+        loginService.getLoginResult(
+            (RequestEmployee) SmartRequestUtil.getRequestUser(), tokenValue);
     loginResult.setToken(tokenValue);
     return ResponseDTO.ok(loginResult);
   }

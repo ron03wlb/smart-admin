@@ -1,4 +1,4 @@
-# 01-01 玩家帳戶系統設計 (Player Account System)
+# 03-01 玩家生命週期 (Player Lifecycle)
 
 ## 1. 系統概述 (System Overview)
 玩家帳戶管理系統 (PAM) 是整個 iGaming 平台的基石，負責處理玩家從註冊、登入、身份驗證到個人資料管理的全生命週期。
@@ -71,15 +71,15 @@
 
 ### 核心依賴
 - [09-01 管理後台 RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 玩家權限初始化、角色分配
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 註冊時錢包創建
+- [01-02 錢包架構](../01_Core_Financial_Loop_NEW/01-02_Wallet_Architecture.md) - 註冊時錢包創建
 
 ### 業務整合
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 多帳號檢測、設備指紋、風險評分
-- [01-02 VIP 系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級初始化、積分系統
-- [01-05 提款風控](./01-05_Withdrawal_Risk.md) - KYC 等級與提款限額
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 多帳號檢測、設備指紋、風險評分
+- [03-02 VIP 忠誠度系統](./03-02_VIP_Loyalty.md) - VIP 等級初始化、積分系統
+- [04-02 出金風控](../04_Risk_Control_NEW/04-02_Fraud_Detection.md) - KYC 等級與提款限額
 
 ### 技術參考
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 個人資料加密、Blind Index
+- [05-05 數據安全策略](../05_Platform_Governance_NEW/05-05_Data_Security.md) - 個人資料加密、Blind Index
 - [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - KYC 人工審核流程
 - [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - 登入 API 安全、暴力破解防護
 

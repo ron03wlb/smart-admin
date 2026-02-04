@@ -2,10 +2,10 @@ package net.lab1024.sa.support.job.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import net.lab1024.sa.foundation.redislock.LockService;
 import net.lab1024.sa.support.job.core.SmartJob;
 import net.lab1024.sa.support.job.core.SmartJobLauncher;
 import net.lab1024.sa.support.job.repository.SmartJobRepository;
-import net.lab1024.sa.foundation.redislock.LockService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

@@ -588,7 +588,7 @@ public class GameTransactionRecoveryService {
 |------|------|------|---------|---------|
 | 1 | [02-03 Turnover Calculation](../../02_Game_Operations_NEW/02-03_Turnover_Calculation.md) | §1 三層驗證 | 20 分鐘 | Layer 1/2/3 架構 |
 | 2 | [02-03 Turnover Calculation](../../02_Game_Operations_NEW/02-03_Turnover_Calculation.md) | §5 遊戲權重 | 10 分鐘 | 免費旋轉處理 |
-| 3 | [04-01 Activity System](../../04_Activity_Center/04-01_Activity_System_Design.md) | §5 流水要求 | 15 分鐘 | Wagering 計算 |
+| 3 | [04-01 Activity System](../../03_Player_Journey/03-03_Activity_Bonus.md) | §5 流水要求 | 15 分鐘 | Wagering 計算 |
 
 ### 實作步驟
 [待補充：包含三層驗證架構實作、有效投注計算、遊戲權重配置等]

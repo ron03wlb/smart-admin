@@ -797,7 +797,7 @@ Response 200 OK:
 - [09-02 審計日誌系統](./09-02_Audit_Log_System.md) - 操作日誌記錄
 
 ### 業務整合
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - 玩家權限初始化
+- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 玩家權限初始化
 - [09-04 審批工作流系統](./09-04_Approval_Workflow_System.md) - 敏感操作審批
 
 ### 技術參考

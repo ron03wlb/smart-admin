@@ -3,6 +3,8 @@ package net.lab1024.sa.support.helpdoc.service;
 import io.vavr.control.Option;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.support.helpdoc.dao.HelpDocCatalogDao;
 import net.lab1024.sa.support.helpdoc.dao.HelpDocDao;
 import net.lab1024.sa.support.helpdoc.domain.entity.HelpDocCatalogEntity;
@@ -10,8 +12,6 @@ import net.lab1024.sa.support.helpdoc.domain.form.HelpDocCatalogAddForm;
 import net.lab1024.sa.support.helpdoc.domain.form.HelpDocCatalogUpdateForm;
 import net.lab1024.sa.support.helpdoc.domain.vo.HelpDocCatalogVO;
 import net.lab1024.sa.support.helpdoc.domain.vo.HelpDocVO;
-import net.lab1024.sa.common.core.domain.response.ResponseDTO;
-import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 

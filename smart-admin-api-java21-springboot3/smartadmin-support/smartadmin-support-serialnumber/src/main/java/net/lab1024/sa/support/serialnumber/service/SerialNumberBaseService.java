@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import net.lab1024.sa.common.core.domain.exception.BusinessException;
+import net.lab1024.sa.common.validation.util.SmartEnumUtil;
 import net.lab1024.sa.support.serialnumber.constant.SerialNumberIdEnum;
 import net.lab1024.sa.support.serialnumber.constant.SerialNumberRuleTypeEnum;
 import net.lab1024.sa.support.serialnumber.dao.SerialNumberDao;
@@ -16,8 +18,6 @@ import net.lab1024.sa.support.serialnumber.domain.SerialNumberGenerateResultBO;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberInfoBO;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberLastGenerateBO;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberRecordEntity;
-import net.lab1024.sa.common.core.domain.exception.BusinessException;
-import net.lab1024.sa.common.validation.util.SmartEnumUtil;
 import org.apache.commons.lang3.RandomUtils;
 
 /**

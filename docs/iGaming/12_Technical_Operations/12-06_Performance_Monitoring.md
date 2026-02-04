@@ -452,7 +452,7 @@ Kibana (Visualization & Search)
 
 ### 延伸閱讀
 - [09-02 審計日誌系統](../09_System_Security/09-02_Audit_Log_System.md) - 日誌聚合與審計日誌整合
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控指標監控
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控指標監控
 
 ---
 

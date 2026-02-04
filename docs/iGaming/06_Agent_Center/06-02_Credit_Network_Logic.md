@@ -612,7 +612,7 @@ flowchart TD
 
 ### 5.1 風控規則引擎整合
 
-信用網絡的風控檢測必須與 [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) 深度整合，實現實時監控與異常攔截。
+信用網絡的風控檢測必須與 [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) 深度整合，實現實時監控與異常攔截。
 
 **API 調用範例**：
 
@@ -621,10 +621,10 @@ flowchart TD
 
 | 風險場景 | 檢測指標 | 閾值 | 處置動作 | 參考文檔 |
 |---------|---------|------|---------|---------|
-| **聯合套利** | 佔成突增 + 下級大贏 | Position 變化 > 50% AND 玩家淨贏 > $100k | 凍結額度 + 人工審核 | [05-01 §3.2](../05_Risk_Management/05-01_Risk_Control_System.md#32-优惠滥用是最大风险来源) |
-| **信用詐騙** | 新代理高額申請 | 註冊 < 30 天 AND 申請額度 > $50k | 降低額度 + 加強 KYC | [05-01 §3.3](../05_Risk_Management/05-01_Risk_Control_System.md#33-帳號安全面臨大規模自動化攻擊) |
-| **結算逾期** | 歷史逾期率高 | 逾期次數 >= 3 次/年 | 降低信用評分 + 限制額度 | [05-01 §4.1](../05_Risk_Management/05-01_Risk_Control_System.md#41-整合點總覽-integration-points-overview) |
-| **多帳號濫用** | 同設備多代理 | 設備指紋關聯 >= 3 個代理 | 阻擋分配 + 調查 | [05-01 §2.2](../05_Risk_Management/05-01_Risk_Control_System.md#多維欺詐檢測決策樹-multi-dimensional-fraud-detection-decision-tree) |
+| **聯合套利** | 佔成突增 + 下級大贏 | Position 變化 > 50% AND 玩家淨贏 > $100k | 凍結額度 + 人工審核 | [05-01 §3.2](../04_Risk_Control/04-01_Risk_Framework.md#32-优惠滥用是最大风险来源) |
+| **信用詐騙** | 新代理高額申請 | 註冊 < 30 天 AND 申請額度 > $50k | 降低額度 + 加強 KYC | [05-01 §3.3](../04_Risk_Control/04-01_Risk_Framework.md#33-帳號安全面臨大規模自動化攻擊) |
+| **結算逾期** | 歷史逾期率高 | 逾期次數 >= 3 次/年 | 降低信用評分 + 限制額度 | [05-01 §4.1](../04_Risk_Control/04-01_Risk_Framework.md#41-整合點總覽-integration-points-overview) |
+| **多帳號濫用** | 同設備多代理 | 設備指紋關聯 >= 3 個代理 | 阻擋分配 + 調查 | [05-01 §2.2](../04_Risk_Control/04-01_Risk_Framework.md#多維欺詐檢測決策樹-multi-dimensional-fraud-detection-decision-tree) |
 
 ---
 
@@ -640,7 +640,7 @@ flowchart TD
 
 ## 📚 相關文檔
 
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 代理風險評估、異常佔成檢測
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 代理風險評估、異常佔成檢測
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 雙錢包體系、Credit Wallet 實現
 - [06-01 代理管理系統](./06-01_Agent_Management_System.md) - 代理層級架構、權限管理
 

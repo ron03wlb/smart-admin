@@ -1501,12 +1501,12 @@ COMMIT;
 
 ### 核心依賴
 - [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 可提餘額計算、鎖定餘額處理
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 風控規則引擎、ML 模型整合
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控規則引擎、ML 模型整合
 
 ### 業務整合
-- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Account_System.md) - KYC 等級驗證
+- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 等級驗證
 - [02-04 流水計算與對帳](./02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證、對沖檢測
-- [04-01 活動系統設計](../04_Activity_Center/04-01_Activity_System_Design.md) - 紅利流水要求驗證
+- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利流水要求驗證
 
 ### 技術參考
 - [09-04 審批工作流系統](../09_System_Security/09-04_Approval_Workflow_System.md) - 多層審批 Maker-Checker

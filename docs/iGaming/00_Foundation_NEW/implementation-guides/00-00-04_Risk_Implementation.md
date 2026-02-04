@@ -39,7 +39,7 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [05-01 Risk Control System](../../05_Risk_Management/05-01_Risk_Control_System.md) | §2 規則引擎 | Drools 整合 |
+| 1 | [05-01 Risk Control System](../../04_Risk_Control/04-01_Risk_Framework.md) | §2 規則引擎 | Drools 整合 |
 | 2 | [05-04 Risk Workflow](../../05_Risk_Management/05-04_Risk_Workflow.md) | §3 審批流程 | 工作流設計 |
 | 3 | [02-01 Withdrawal Risk](../../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | §4 風控規則 | 實際案例 |
 
@@ -71,7 +71,7 @@
 |------|------|------|----------|
 | 1 | [05-03 Fraud Detection](../../05_Risk_Management/05-03_Fraud_Detection.md) | §2 設備指紋 | FingerprintJS |
 | 2 | [05-03 Fraud Detection](../../05_Risk_Management/05-03_Fraud_Detection.md) | §3 行為分析 | 異常檢測 |
-| 3 | [01-01 Player Account](../../01_Player_Center/01-01_Player_Account_System.md) | §5 風險評分 | 玩家分級 |
+| 3 | [01-01 Player Account](../../03_Player_Journey/03-01_Player_Lifecycle.md) | §5 風險評分 | 玩家分級 |
 
 ### 驗證清單
 - [ ] 設備指紋正確生成
@@ -101,7 +101,7 @@
 |------|------|------|----------|
 | 1 | [06-02 Credit Network Logic](../../06_Agent_Center/06-02_Credit_Network_Logic.md) | §2 信用網絡 | 佔成模式 |
 | 2 | [05-02 Agent Credit Risk](../../05_Risk_Management/05-02_Agent_Credit_Risk.md) | §3 風險控制 | 額度計算 |
-| 3 | [06-01 Affiliate System](../../06_Agent_Center/06-01_Affiliate_System_Design.md) | §4 風控整合 | 代理風控 |
+| 3 | [06-01 Affiliate System](../../03_Player_Journey/03-04_Agent_System.md) | §4 風控整合 | 代理風控 |
 
 ### 驗證清單
 - [ ] 信用額度計算正確

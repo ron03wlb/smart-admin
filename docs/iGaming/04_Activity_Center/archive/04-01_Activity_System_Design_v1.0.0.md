@@ -1367,8 +1367,8 @@ flowchart TD
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 3 遊戲權重）
 
 ### 業務整合
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 紅利濫用檢測、多帳號風控
-- [01-02 VIP 系統](../01_Player_Center/01-02_VIP_&_Loyalty_System.md) - VIP 專屬活動、等級權益
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 紅利濫用檢測、多帳號風控
+- [01-02 VIP 系統](../03_Player_Journey/03-02_VIP_Loyalty.md) - VIP 專屬活動、等級權益
 - [02-01 出金風控](../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) - 流水未達標提款限制
 
 ### 技術參考

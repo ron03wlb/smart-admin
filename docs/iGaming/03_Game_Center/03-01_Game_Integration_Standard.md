@@ -156,7 +156,7 @@ Transaction API 需區分獎金類型：
 ### 業務整合
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳、流水計算
 - [03-02 遊戲大廳管理](./03-02_Game_Lobby_Management.md) - 遊戲元數據同步、大廳配置
-- [05-01 風控系統](../05_Risk_Management/05-01_Risk_Control_System.md) - 遊戲風控檢測、熔斷機制
+- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 遊戲風控檢測、熔斷機制
 
 ### 技術參考
 - [12-03 網關架構](../12_Technical_Operations/12-03_Gateway_Architecture.md) - API 安全、HMAC 簽名驗證

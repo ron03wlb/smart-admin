@@ -191,7 +191,7 @@ Super Admin
 
 ### 業務邏輯參考
 - [02-05 賬單與發票](../02_Finance_Center/02-05_Billing_&_Invoicing.md) - 多租戶計費模型
-- [06-01 代理系統設計](../06_Agent_Center/06-01_Affiliate_System_Design.md) - 層級結構延伸
+- [06-01 代理系統設計](../03_Player_Journey/03-04_Agent_System.md) - 層級結構延伸
 
 ### 技術架構參考
 - [09-01 管理後台RBAC](../09_System_Security/09-01_Admin_RBAC.md) - 層級權限實現
