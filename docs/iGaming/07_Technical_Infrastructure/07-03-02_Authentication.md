@@ -45,6 +45,37 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
+## 🔐 Refresh Token 詳細實施方案
+
+**⚠️ 重要安全提示**：
+
+如果您的系統中存在「根據交易 ID 生成 token」的邏輯，請立即停止使用並遷移到 OAuth 2.0 Refresh Token 機制。
+
+**問題說明**：
+- ❌ **Critical 級別漏洞**：任何人知道交易 ID 即可冒充用戶
+- ✅ **正確方案**：使用 OAuth 2.0 Refresh Token + Device Fingerprint 驗證
+
+**完整實施方案**：
+- 📘 [07-03-02-01 OAuth 2.0 Refresh Token 實施方案](./07-03-02-01_OAuth_Refresh_Token_Implementation.md)
+  - 包含完整的代碼設計、測試計劃、實施路線圖
+  - ROI 分析：$24k 投入 vs $650k-$2.3M 損失避免（1448% ROI）
+  - 符合 GDPR、等保三級、MGA/UKGC 合規要求
+
+**快速參考**：
+
+| Token 類型 | 有效期 | 存儲位置 | 用途 | 刷新機制 |
+|-----------|--------|---------|------|---------|
+| **Access Token** | 15 分鐘 | LocalStorage | API 訪問 | 通過 Refresh Token 刷新 |
+| **Refresh Token** | 30 天 | Redis (HttpOnly) | 刷新 Access Token | Token Rotation（舊 Token 失效） |
+
+**核心安全特性**：
+- ✅ Token Rotation：刷新後舊 Refresh Token 立即失效
+- ✅ Device Fingerprint：FingerprintJS 設備識別（99.5% 準確率）
+- ✅ 輪換次數限制：最多刷新 10 次後強制重新登入
+- ✅ Redis 高可用：主從 + Sentinel 架構
+
+---
+
 ### 2. 授權
 
 **RBAC權限檢查**：

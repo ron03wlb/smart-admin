@@ -322,6 +322,34 @@ token:
 
 ---
 
+---
+
+## 📚 相關深度實施方案
+
+### OAuth 2.0 Refresh Token 詳細實施
+
+如果您需要實施完整的 OAuth 2.0 Refresh Token 機制（包含 SmartAdmin 後端整合），請參考：
+
+- 📘 [07-03-02-01 OAuth 2.0 Refresh Token 實施方案](../../../07_Technical_Infrastructure/07-03-02-01_OAuth_Refresh_Token_Implementation.md)
+  - **適用場景**：SmartAdmin 後端 + iGaming 前端整合
+  - **包含內容**：
+    - RefreshTokenManager 完整代碼設計（Java 21 + Spring Boot 3）
+    - LoginService 整合方案（Sa-Token 兼容）
+    - 32 個單元測試用例（JUnit 5 + Mockito）
+    - 10 天實施路線圖（4 個階段）
+    - 安全性分析與合規性檢查（GDPR、等保三級、MGA/UKGC）
+    - ROI 分析：$24k 投入 vs $650k-$2.3M 損失避免（1448% ROI）
+
+**⚠️ 重要安全警告**：
+- ❌ **Critical 級別漏洞**：如果您的系統中存在「根據交易 ID 生成 token」的邏輯，請立即停止使用並遷移到 OAuth 2.0 Refresh Token 機制
+- ✅ **正確方案**：使用 OAuth 2.0 Refresh Token + Device Fingerprint 驗證
+
+**本文檔 vs 深度實施方案的區別**：
+- **本文檔**：專注於 Token 驗證邏輯和冪等性設計（業務層面）
+- **深度實施方案**：完整的後端實施細節（代碼 + 測試 + 部署）
+
+---
+
 ## 📚 相關文檔
 
 ### 上層導航
