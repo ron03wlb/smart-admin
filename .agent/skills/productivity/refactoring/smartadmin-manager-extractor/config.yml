@@ -1,0 +1,30 @@
+name: smartadmin-manager-extractor
+version: "2.0.0"
+priority: P2
+category: refactoring
+status: stable
+description: "自動提取 @Transactional 到 Manager 層"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "ArchUnit 測試失敗"
+  - "Service 層有 @Transactional"
+  - "架構規範重構"
+
+archunit_rule: "transactionalMustUseRollbackForThrowable"
+
+safety_features:
+  - "Git stash 備份"
+  - "失敗自動回滾"
+  - "三重驗證"
+
+validation_steps:
+  - "編譯通過"
+  - "ArchUnit 測試通過"
+  - "業務測試通過"
+
+outputs:
+  - "Manager 類"
+  - "更新的 Service"
+  - "驗證報告"

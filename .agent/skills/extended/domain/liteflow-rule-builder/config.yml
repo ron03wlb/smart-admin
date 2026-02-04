@@ -1,0 +1,18 @@
+name: liteflow-rule-builder
+version: "2.0.0"
+priority: P1
+category: domain
+status: stable
+description: "Generate LiteFlow rule DSL for business workflows"
+
+liteflow_concepts:
+  - "Chain: Workflow definition"
+  - "Node: Processing unit"
+  - "EL Expression: THEN, WHEN, SWITCH, IF"
+  - "QLExpress: Embedded scripting"
+
+outputs:
+  - "EL expression chain definitions"
+  - "Node component classes"
+  - "SQL INSERT statements"
+  - "Service integration code"

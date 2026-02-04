@@ -14,6 +14,7 @@
 |-----------|---------|--------|----------|
 | **Rules System** | 2.0.0 | ✅ Production | English |
 | **Workflows** | 2.0.0 | ✅ Production | English |
+| **Skills System** | 2.0.0 | ✅ Production | English/Chinese |
 | **Documentation** | 2.0.0 | Active | Mixed (English + Chinese summaries) |
 | **Configs** | 2.0.0 | Stable | N/A (YAML/Java) |
 
@@ -27,6 +28,15 @@
 - ✅ Style guide established (naming, linking, Markdown standards)
 - ✅ Legacy skills directories removed (27 directories)
 - 📊 Quality improvement: 8.3/10 → 9.2/10
+
+**v2.0.0 Skills System Upgrade** (2026-02-04):
+- ✅ Adopted P0/P1/P2 hierarchical structure from .claude/skills/
+- ✅ Expanded from 3 skills to 14 skills (P0: 6, P1: 8)
+- ✅ Added skill-registry.yml as Single Source of Truth (SSOT)
+- ✅ Added VERSIONS.yml for centralized version tracking
+- ✅ Each skill now has config.yml + knowledge/ directory
+- ✅ Standardized Antigravity SKILL.md format
+- 📊 Skills coverage: 3 → 14 (367% increase, P2 pending)
 
 **v1.0.0 Achievements** (2026-01-27):
 - ✅ All 25 rule files in English (foundation, technology, security, quality-tools, workflows)

@@ -1,0 +1,51 @@
+# Quality Gate Orchestrator Configuration
+name: quality-gate-orchestrator
+version: "2.0.0"
+priority: P1
+category: orchestration
+status: stable
+
+description: "Orchestrate multi-tool quality gates (ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo)"
+
+when_to_use:
+  - "Running comprehensive quality checks"
+  - "Pre-commit validation"
+  - "CI/CD quality gates"
+
+tools_orchestrated:
+  - name: Spotless
+    purpose: "Code formatting"
+    command: "./gradlew spotlessApply"
+
+  - name: Checkstyle
+    purpose: "Code style validation"
+    command: "./gradlew checkstyleMain"
+
+  - name: PMD
+    purpose: "Code quality analysis"
+    command: "./gradlew pmdMain"
+
+  - name: SpotBugs
+    purpose: "Bug pattern detection"
+    command: "./gradlew spotbugsMain"
+
+  - name: ArchUnit
+    purpose: "Architecture validation"
+    command: "./gradlew test --tests ArchitectureTest"
+
+  - name: JaCoCo
+    purpose: "Code coverage"
+    command: "./gradlew jacocoTestReport"
+
+pass_criteria:
+  checkstyle: "0 errors"
+  pmd: "0 violations"
+  spotbugs: "0 bugs"
+  archunit: "All tests pass"
+  jacoco: ">= 80% coverage"
+
+related_rules:
+  - "quality-tools/Q01-checkstyle-rules.md"
+  - "quality-tools/Q02-pmd-rules.md"
+  - "quality-tools/Q03-spotbugs-rules.md"
+  - "quality-tools/Q06-jacoco-coverage-rules.md"

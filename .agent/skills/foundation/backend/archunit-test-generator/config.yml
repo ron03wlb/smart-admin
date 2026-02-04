@@ -1,0 +1,38 @@
+# ArchUnit Test Generator Configuration
+name: archunit-test-generator
+version: "2.0.0"
+priority: P0
+category: backend
+status: stable
+
+description: "Generate ArchUnit tests to enforce SmartAdmin architecture rules"
+
+when_to_use:
+  - "Need to validate layered architecture"
+  - "Ensure @Transactional only in Manager layer"
+  - "Enforce Vavr Option usage in Service"
+  - "Validate naming conventions"
+
+rules_enforced:
+  - rule: "Layer Access Control"
+    pattern: "Controller → Service → Manager → Dao"
+    archunit: "onlyDependOnClassesThat()"
+
+  - rule: "Vavr Option"
+    pattern: "Service returns io.vavr.control.Option"
+    archunit: "noClasses().should().dependOnClassesThat()"
+
+  - rule: "Transaction Placement"
+    pattern: "@Transactional only in Manager"
+    archunit: "methods().should().beAnnotatedWith()"
+
+  - rule: "Constructor Injection"
+    pattern: "No @Autowired field injection"
+    archunit: "noFields().should().beAnnotatedWith()"
+
+related_rules:
+  - "foundation/F04-architecture-rules.md"
+  - "foundation/F01-naming-conventions.md"
+  - "foundation/F03-manager-layer.md"
+
+reference_config: "../../../configs/ArchitectureTest.java"

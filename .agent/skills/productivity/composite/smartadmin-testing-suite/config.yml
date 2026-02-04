@@ -1,0 +1,39 @@
+# SmartAdmin Testing Suite Configuration
+name: smartadmin-testing-suite
+version: "2.0.0"
+priority: P2
+category: composite
+status: stable
+
+description: "Comprehensive testing suite (integration + fixtures + unit + E2E)"
+
+when_to_use:
+  - "Running comprehensive tests"
+  - "Setting up test infrastructure"
+  - "Generating test coverage"
+
+modes:
+  integration:
+    description: "Run Testcontainers integration tests"
+    command: "./gradlew integrationTest"
+
+  fixtures:
+    description: "Generate test data builders"
+    related_skill: "test-fixture-generator"
+
+  unit:
+    description: "Run unit tests with TDD workflow"
+    command: "./gradlew test"
+
+  e2e:
+    description: "End-to-end API tests"
+    status: "future"
+
+consolidates:
+  - "smartadmin-integration-test"
+  - "test-fixture-generator"
+
+related_rules:
+  - "quality-tools/Q06-jacoco-coverage-rules.md"
+
+coverage_target: ">= 80%"
