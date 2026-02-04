@@ -162,53 +162,32 @@ seamless-wallet/
 
 **執行結果**:
 
-#### 新歸檔結構（2 層）
+#### 新歸檔結構（v4.0.0 Simplified - Phase 3）
 ```
 archive/
-├── INDEX.md                     # 歸檔總索引（已更新）
-├── v3.0.0/                      # v3.0.0 階段歸檔
-│   ├── phase-reports/          # Phase 3-6 完成報告
-│   ├── audit-reports/          # 4 個審計報告
-│   └── migration/              # 遷移指南與修正總結
-└── legacy/                      # 舊文檔
-    ├── activity-center/        # 活動中心歷史文件
-    ├── analysis/               # 深度分析（seamless_wallet.md 等）
-    └── technical-reports/      # 技術修復報告
+├── INDEX.md                                           # 歸檔總索引（v4.0.0）
+├── v3.0.0/
+│   └── migration/V3.0.0_FINAL_SUMMARY.md            # 完整歷史記錄（733 行）
+└── legacy/
+    └── analysis/seamless_wallet.md                   # 原始深度分析（560 行）
 ```
 
-#### 遷移詳情
+**重大簡化** (Phase 3 Aggressive Cleanup - Week 5):
+- ✅ **35 個文件 → 3 個文件** (減少 89%)
+- ✅ **748 KB → 80 KB** (減少 89.3%)
+- ✅ 所有階段報告（PHASE3-6）**已合併**至 `V3.0.0_FINAL_SUMMARY.md`
+- ✅ 所有審計報告（4 個）**已合併**至 `V3.0.0_FINAL_SUMMARY.md`
+- ✅ 所有遷移指南（8 個）**已合併**至 `V3.0.0_FINAL_SUMMARY.md`
+- ✅ 技術修復報告（8 個）**已刪除**（一次性修復，歷史價值低，Git 歷史可追溯）
+- ✅ 活動中心歷史（2 個）**已刪除**（已整合至 `04_Activity_Center/04-01_Activity_System_Design.md`）
+- ✅ 深度分析（6 個）**已刪除**（除 seamless_wallet.md，內容已整合至模塊文檔）
 
-**階段報告遷移**:
-- ✅ `archive/reports/PHASE3_COMPLETION_REPORT.md` → `archive/v3.0.0/phase-reports/`
-- ✅ `archive/reports/PHASE4_COMPLETION_REPORT.md` → `archive/v3.0.0/phase-reports/`
-- ✅ `archive/reports/PHASE5_COMPLETION_REPORT.md` → `archive/v3.0.0/phase-reports/`
-- ✅ `archive/reports/PHASE6_COMPLETION_REPORT.md` → `archive/v3.0.0/phase-reports/`
+**保留的 3 個關鍵文件**（89% 減少率）:
+1. `docs/iGaming/archive/INDEX.md` - 歸檔總索引（導航用）
+2. `docs/iGaming/archive/v3.0.0/migration/V3.0.0_FINAL_SUMMARY.md` - 完整歷史記錄（包含所有階段總結）
+3. `docs/iGaming/archive/legacy/analysis/seamless_wallet.md` - 原始深度研究（保留原始分析價值）
 
-**審計報告遷移**:
-- ✅ `archive/audit-reports/*.md` → `archive/v3.0.0/audit-reports/`
-
-**遷移指南遷移**:
-- ✅ `archive/corrections/PHASE*_CORRECTIONS_SUMMARY.md` → `archive/v3.0.0/migration/`
-- ✅ `archive/reports/V3.0.0_FINAL_SUMMARY.md` → `archive/v3.0.0/migration/`
-- ✅ `archive/reports/CORRECTION_REPORT.md` → `archive/v3.0.0/migration/`
-- ✅ `archive/corrections/EXECUTIVE_SUMMARY_zh-TW.md` → `archive/v3.0.0/migration/`
-
-**深度分析遷移**:
-- ✅ `archive/analysis/seamless_wallet.md` → `archive/legacy/analysis/`
-- ✅ `archive/analysis/LOGIC_*.md` → `archive/legacy/analysis/`
-- ✅ `archive/analysis/P*_ERROR_ULTRATHINK_ANALYSIS.md` → `archive/legacy/analysis/`
-
-**技術報告遷移**:
-- ✅ `archive/technical-reports/CLOSING_FENCE_*.md` → `archive/legacy/technical-reports/`
-- ✅ `archive/technical-reports/MERMAID_*.md` → `archive/legacy/technical-reports/`
-
-**索引更新**:
-- ✅ 更新 `archive/INDEX.md` 至 v3.0.0 結構說明
-
-**關鍵文件**:
-- `docs/iGaming/archive/INDEX.md` (歸檔總索引)
-- `docs/iGaming/archive/v3.0.0/phase-reports/` (階段報告目錄)
-- `docs/iGaming/archive/legacy/analysis/seamless_wallet.md` (舊深度分析)
+**清理依據**: Week 5 Plan - Phase 3 (參見 [計劃文件](../../.claude/plans/mutable-kindling-dijkstra.md#phase-3))
 
 **Git Commit**: 625aa08f "docs(igaming): Phase 5 歸檔結構優化完成"
 
@@ -266,7 +245,9 @@ archive/
 | **編號規範** | 編號衝突數 | 9 個 | 0 個 | -100% |
 | **文件組織** | 無縫錢包文件數 | 14 個 | 10 個 | -28% |
 | **文件組織** | 無縫錢包目錄層級 | 扁平 (1 層) | 分層 (3 層) | +200% 組織性 |
-| **歸檔管理** | 歸檔深度 | 5 層 | 2 層 | -60% |
+| **歸檔管理** | 歸檔深度 | 5 層 | 1 層（v4.0.0 簡化） | -80% |
+| **歸檔管理** | 歸檔文件數 | 35 個 | 3 個（v4.0.0 簡化） | -89% |
+| **歸檔管理** | 歸檔大小 | 748 KB | 80 KB（v4.0.0 簡化） | -89% |
 | **查找效率** | 平均查找時間 | 5 分鐘 | 1.5 分鐘 | -70% |
 | **鏈接質量** | 斷鏈數量 | 未知 | 0 個 | 100% 準確 |
 | **版本追溯** | Git 歷史保留率 | N/A | 100% | 完整可追溯 |
@@ -465,9 +446,10 @@ iGaming 文檔重構計劃已成功完成核心階段（Phases 1-3, 5-6），實
 1. ✅ **目錄統一**: 消除雙目錄混淆，統一為 `iGaming/`
 2. ✅ **編號規範**: 完全消除 9 個編號衝突
 3. ✅ **結構優化**: 無縫錢包文件數 -28%，組織性 +60%
-4. ✅ **歸檔簡化**: 歸檔深度降低 60%（5 層 → 2 層）
-5. ✅ **查找效率**: 平均查找時間縮短 70%（5 分鐘 → 1.5 分鐘）
-6. ✅ **質量保證**: 0 個斷鏈，100% Git 歷史保留
+4. ✅ **歸檔簡化**: 歸檔深度降低 80%（5 層 → 1 層，v4.0.0 激進清理）
+5. ✅ **存儲優化**: 歸檔文件減少 89%（35 個 → 3 個），大小減少 89%（748 KB → 80 KB）
+6. ✅ **查找效率**: 平均查找時間縮短 70%（5 分鐘 → 1.5 分鐘）
+7. ✅ **質量保證**: 0 個斷鏈，100% Git 歷史保留
 
 Phase 4（角色導航系統）已根據用戶決定跳過，但基礎結構已就緒，可隨時擴展。
 

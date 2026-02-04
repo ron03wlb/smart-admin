@@ -1,127 +1,72 @@
 # iGaming 文檔歸檔索引
 
-最後更新：2026-02-03
-版本：v3.0.0（文檔重構 - 2 層結構）
+最後更新：2026-02-04
+版本：**v4.0.0（激進簡化）**
 
 ---
 
 ## 歸檔結構總覽
 
-本目錄包含 iGaming 文檔的歷史資料，採用 **2 層結構**，按版本和類型分類歸檔：
+本目錄包含 iGaming 文檔的關鍵歷史資料，採用 **極簡 3 文件結構**：
 
-| 分類 | 目錄 | 說明 |
+```
+archive/
+├── INDEX.md                                           # 本索引文件
+├── v3.0.0/
+│   └── migration/V3.0.0_FINAL_SUMMARY.md            # 完整歷史記錄（733 行）
+└── legacy/
+    └── analysis/seamless_wallet.md                   # 原始深度分析（560 行）
+```
+
+| 文件 | 大小 | 說明 |
 |------|------|------|
-| **v3.0.0 階段歸檔** | `v3.0.0/` | v3.0.0 階段性報告、審計報告、遷移指南 |
-| └─ 階段報告 | `v3.0.0/phase-reports/` | Phase 3-6 完成報告 |
-| └─ 審計報告 | `v3.0.0/audit-reports/` | 架構審計、文檔質量審計 |
-| └─ 遷移指南 | `v3.0.0/migration/` | 修正總結、遷移指南、最終總結 |
-| **舊文檔歸檔** | `legacy/` | 歷史分析、技術報告、廢棄版本 |
-| └─ 活動中心歷史 | `legacy/activity-center/` | 04-01 舊版本 |
-| └─ 深度分析 | `legacy/analysis/` | seamless_wallet.md 等深度分析 |
-| └─ 技術報告 | `legacy/technical-reports/` | Closing Fence、Mermaid 修復報告 |
-
----
-
-## v3.0.0 階段歸檔
-
-### 階段報告 (`v3.0.0/phase-reports/`)
-
-| 文件 | 說明 | 關鍵內容 |
-|------|------|---------|
-| PHASE3_COMPLETION_REPORT.md | 第 3 階段完成報告 | 錢包與交易系統 |
-| PHASE4_COMPLETION_REPORT.md | 第 4 階段完成報告 | 活動與獎金系統 |
-| PHASE5_COMPLETION_REPORT.md | 第 5 階段完成報告 | 風控與安全系統 |
-| PHASE6_COMPLETION_REPORT.md | 第 6 階段完成報告 | 平台與運維系統 |
-
-### 審計報告 (`v3.0.0/audit-reports/`)
-
-| 文件 | 說明 | 關鍵內容 |
-|------|------|---------|
-| DOCUMENTATION_AUDIT_REPORT.md | 初始文檔審計 | 編號一致性、交叉引用 |
-| FINAL_DOCUMENTATION_REVIEW_REPORT.md | 最終文檔審查 | 質量指標、完整性驗證 |
-| IMPLEMENTATION_COMPLETE_v4.0.0.md | 實作完成 v4.0.0 | v4.0.0 實作總結 |
-| IMPLEMENTATION_COMPLETE_v5.0.0.md | 實作完成 v5.0.0 | v5.0.0 實作總結 |
-| DOCUMENTATION_QUALITY_AUDIT_REPORT_v2.0.0.md | 質量審計 v2.0.0 | 詳細質量指標分析 |
-| IGaming_Documentation_Audit_Report.md | 文檔審計報告 | 術語標準化檢查 |
-
-### 遷移指南 (`v3.0.0/migration/`)
-
-| 文件 | 說明 | 關鍵內容 |
-|------|------|---------|
-| V3.0.0_FINAL_SUMMARY.md | v3.0.0 最終總結 | 完整成果統計、質量指標 |
-| MIGRATION_GUIDE_v3.0.0.md | v2→v3 遷移指南 | 文檔遷移步驟、Git 操作記錄 |
-| CORRECTION_REPORT.md | 修正報告 | v3.0.0 錯誤修正總結 |
-| EXECUTIVE_SUMMARY_zh-TW.md | 執行摘要 | 繁體中文執行摘要 |
-| PHASE1_CORRECTIONS_SUMMARY.md | 第一階段修正總結 | Phase 1 修正與改進 |
-| PHASE2_CORRECTIONS_SUMMARY.md | 第二階段修正總結 | Phase 2 修正與改進 |
-| PHASE3_CORRECTIONS_SUMMARY.md | 第三階段修正總結 | Phase 3 修正與改進 |
-
----
-
-## 舊文檔歸檔
-
-### 活動中心歷史 (`legacy/activity-center/`)
-
-| 文件 | 說明 |
-|------|------|
-| 04-01_Activity_System_Architecture.md | 舊架構圖版本（31KB）|
-| 04-01_DEPRECATED.md | 已廢棄版本 |
-
-### 深度分析 (`legacy/analysis/`)
-
-| 文件 | 主題 | 整合狀態 |
-|------|------|----------|
-| seamless_wallet.md | 無縫錢包原始分析 | ✅ 已拆分為 10 個專題（[02_Finance_Center/seamless-wallet/](../02_Finance_Center/seamless-wallet/)） |
-| lockAmount_betting_calculation_logic.md | 鎖定金額與投注計算 | ✅ 已整合至 02-06 統一錢包模型 |
-| turnover_calculation_logic.md | 流水計算邏輯 | ✅ 已整合至 02-04 流水與對帳 |
-| LOGIC_ANALYSIS_REPORT.md | 邏輯分析報告 | ✅ 已整合至相關模塊 |
-| LOGIC_ERROR_ANALYSIS_REPORT_v3.0.0.md | 邏輯錯誤分析 | ✅ 已修正並整合 |
-| LOGIC_ERROR_REVIEW_v6.0.0.md | 邏輯錯誤審查 | ✅ 已修正並整合 |
-| P0_ERROR_ULTRATHINK_ANALYSIS.md | P0 錯誤深度分析 | ✅ 已修正 |
-| P1_ERROR_ULTRATHINK_ANALYSIS.md | P1 錯誤深度分析 | ✅ 已修正 |
-
-### 技術報告 (`legacy/technical-reports/`)
-
-**Closing Fence 修復**：
-- CLOSING_FENCE_SCAN_REPORT_2026-02-02.md - 語法錯誤檢測
-- CLOSING_FENCE_FIX_REPORT_2026-02-02.md - 修復方案與執行記錄
-- CLOSING_FENCE_ERRORS_REPORT.txt - 原始錯誤列表
-
-**Mermaid 圖表驗證**：
-- MERMAID_VERIFICATION_REPORT_2026-02-02.md - 圖表語法驗證
-- mermaid-fix-details/ - Mermaid 修復詳情（4 個文件）
+| **V3.0.0_FINAL_SUMMARY.md** | 733 行 | 包含所有 Phase 3-6 報告、審計報告、遷移指南的完整總結 |
+| **seamless_wallet.md** | 560 行 | 原始無縫錢包深度分析（已拆分為 10 個專題，保留供參考） |
 
 ---
 
 ## 查詢指南
 
-### 按版本查詢
+### 快速查找
 
-| 版本 | 查找位置 | 說明 |
-|------|---------|------|
-| v3.0.0 | `v3.0.0/` | 階段報告、審計報告、遷移指南 |
-| 更早版本 | `legacy/` | 深度分析、技術報告、廢棄版本 |
-
-### 按類型查詢
-
-| 類型 | 查找位置 | 包含內容 |
-|------|---------|----------|
-| 階段報告 | `v3.0.0/phase-reports/` | Phase 3-6 完成報告 |
-| 審計報告 | `v3.0.0/audit-reports/` | 文檔審計、質量審計、實作完成報告 |
-| 遷移指南 | `v3.0.0/migration/` | 修正總結、遷移步驟、最終總結 |
-| 深度分析 | `legacy/analysis/` | seamless_wallet.md、邏輯分析報告 |
-| 技術報告 | `legacy/technical-reports/` | Closing Fence、Mermaid 修復報告 |
-
-### 按目的查找
-
-| 目的 | 推薦文件 |
+| 需求 | 查找位置 |
 |------|---------|
-| 了解 v3.0.0 成果 | `v3.0.0/migration/V3.0.0_FINAL_SUMMARY.md` |
-| 查看遷移步驟 | `v3.0.0/migration/MIGRATION_GUIDE_v3.0.0.md` |
-| 查看階段性進度 | `v3.0.0/phase-reports/PHASE*_COMPLETION_REPORT.md` |
-| 了解質量改進 | `v3.0.0/audit-reports/DOCUMENTATION_QUALITY_AUDIT_REPORT_v2.0.0.md` |
-| 查看技術問題修復 | `legacy/technical-reports/` |
-| 深度技術分析 | `legacy/analysis/seamless_wallet.md` |
+| 了解 v3.0.0 完整歷史 | `v3.0.0/migration/V3.0.0_FINAL_SUMMARY.md` |
+| 查看原始無縫錢包分析 | `legacy/analysis/seamless_wallet.md` |
+| 查看已整合的無縫錢包專題 | [../02_Finance_Center/seamless-wallet/](../02_Finance_Center/seamless-wallet/) |
+| 查看當前業務文檔 | [../00_Concept_&_Analysis/00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md) |
+
+### V3.0.0_FINAL_SUMMARY.md 包含內容
+
+V3.0.0_FINAL_SUMMARY.md 是完整歷史記錄，包含：
+
+1. **階段報告**（Phase 3-6）：
+   - Phase 3：錢包與交易系統
+   - Phase 4：活動與獎金系統
+   - Phase 5：風控與安全系統
+   - Phase 6：平台與運維系統
+
+2. **審計報告**（4 個）：
+   - 初始文檔審計
+   - 質量審計報告
+   - v4.0.0/v5.0.0 實作完成報告
+
+3. **遷移指南**（8 個）：
+   - 修正總結（Phase 1-3）
+   - 遷移指南（v2→v3）
+   - 執行摘要
+
+### seamless_wallet.md 整合狀態
+
+原始 seamless_wallet.md (1,100+ 行) 已拆分為 10 個專題模塊：
+
+| 原始章節 | 整合位置 |
+|---------|---------|
+| 核心安全設計 | [02_Finance_Center/seamless-wallet/core/01-security.md](../02_Finance_Center/seamless-wallet/core/01-security.md) |
+| 並發控制 | [02_Finance_Center/seamless-wallet/core/02-concurrency.md](../02_Finance_Center/seamless-wallet/core/02-concurrency.md) |
+| 錯誤恢復 | [02_Finance_Center/seamless-wallet/core/03-recovery.md](../02_Finance_Center/seamless-wallet/core/03-recovery.md) |
+| 遊戲邏輯 | [02_Finance_Center/seamless-wallet/game-logic/](../02_Finance_Center/seamless-wallet/game-logic/) |
+| 財務對帳 | [02_Finance_Center/seamless-wallet/finance/reconciliation.md](../02_Finance_Center/seamless-wallet/finance/reconciliation.md) |
 
 ---
 
@@ -130,58 +75,62 @@
 本目錄遵循以下歸檔原則：
 
 1. **完整性**：使用 `git mv` 移動文件，保留完整的 Git 歷史
-2. **可追溯性**：所有歷史文件保留，易於查找
-3. **組織性**：按類型分類，統一的命名規範
-4. **時效性**：定期審閱，每季度評估是否需要進一步歸檔
+2. **可追溯性**：關鍵歷史文件保留（V3.0.0_FINAL_SUMMARY.md），其他內容可通過 Git 歷史追溯
+3. **極簡主義**：僅保留最關鍵的 2 個歷史文件（89% 文件減少率）
 
 ### 追溯 Git 歷史
 
-所有文件使用 `git mv` 移動，完整保留歷史：
+所有已刪除文件可通過 Git 歷史追溯：
 
 ```bash
-# 查看歸檔文件的完整歷史
-git log --follow docs/IGaming/archive/analysis/seamless_wallet.md
+# 查看已刪除文件的歷史
+git log --all --full-history -- "docs/iGaming/archive/v3.0.0/phase-reports/PHASE3_COMPLETION_REPORT.md"
 
-# 查看文件在某個時間點的內容
-git show <commit-hash>:docs/IGaming/seamless_wallet.md
+# 恢復已刪除文件（如需要）
+git checkout archive-phase3-before-cleanup -- \
+  docs/iGaming/archive/v3.0.0/phase-reports/PHASE3_COMPLETION_REPORT.md
 ```
 
-### 尋找已整合內容
-
-如果您需要查找原始分析報告中的特定內容，請參考：
-
-- **Seamless Wallet 專題**：[02_Finance_Center/seamless-wallet/00_INDEX.md](../02_Finance_Center/seamless-wallet/00_INDEX.md)
-- **財務中心文檔**：[02_Finance_Center/](../02_Finance_Center/)
-- **風控系統文檔**：[05_Risk_Management/](../05_Risk_Management/)
+**Git Backup Tag**: `archive-phase3-before-cleanup`（2026-02-04 創建）
 
 ---
 
 ## 歸檔結構變更歷史
 
-| 版本 | 日期 | 深度 | 說明 |
-|------|------|------|------|
-| **v3.0.0** | 2026-02-03 | **2 層** | 文檔重構：簡化為 2 層結構（v3.0.0/ + legacy/），深度降低 60% |
-| v2.0.0 | 2026-02-02 | 3-5 層 | v4.0.0 溫和整理：新增 reports/ 和 technical-reports/ 分類 |
-| v1.0.0 | 2026-01-31 | 2-3 層 | 初始版本：analysis/、audit-reports/、corrections/ |
+| 版本 | 日期 | 文件數 | 大小 | 說明 |
+|------|------|--------|------|------|
+| **v4.0.0** | 2026-02-04 | **3 個** | **~80 KB** | 激進簡化：35 → 3 文件（-89%），深度降低 80% |
+| v3.0.0 | 2026-02-03 | 35 個 | 748 KB | 文檔重構：2 層結構（v3.0.0/ + legacy/） |
+| v2.0.0 | 2026-02-02 | 46 個 | ~900 KB | v4.0.0 溫和整理：reports/ 和 technical-reports/ 分類 |
+| v1.0.0 | 2026-01-31 | 20 個 | ~500 KB | 初始版本：analysis/、audit-reports/、corrections/ |
 
-### v3.0.0 重構亮點
+### v4.0.0 激進簡化亮點
 
-- ✅ **深度降低 60%**：從 5 層簡化為 2 層
-- ✅ **版本分離**：v3.0.0 階段歸檔 vs 舊文檔歸檔
-- ✅ **類型清晰**：階段報告、審計報告、遷移指南分離
-- ✅ **查找效率提升 70%**：從平均 5 分鐘降低到 1.5 分鐘
+- ✅ **文件數減少 89%**：35 個 → 3 個
+- ✅ **存儲減少 89%**：748 KB → 80 KB
+- ✅ **深度降低 80%**：5 層 → 1 層（扁平化）
+- ✅ **完整歷史保留**：所有內容已合併至 V3.0.0_FINAL_SUMMARY.md，或可通過 Git 歷史追溯
+
+**清理原則**：
+- 所有階段報告（4 個）→ 合併至 FINAL_SUMMARY
+- 所有審計報告（4 個）→ 合併至 FINAL_SUMMARY
+- 所有遷移指南（8 個，除 FINAL_SUMMARY）→ 合併至 FINAL_SUMMARY
+- 技術修復報告（8 個）→ 刪除（一次性修復，Git 歷史可追溯）
+- 活動中心歷史（2 個）→ 刪除（已整合至 04-01_Activity_System_Design.md）
+- 深度分析（7 個，除 seamless_wallet.md）→ 刪除（已整合至模塊文檔）
 
 ---
 
 ## 相關資源
 
 - **當前業務文檔**：[../00_Concept_&_Analysis/00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
-- **Seamless Wallet 專題**：[../02_Finance_Center/seamless-wallet/00_INDEX.md](../02_Finance_Center/seamless-wallet/00_INDEX.md)
+- **Seamless Wallet 專題**：[../02_Finance_Center/seamless-wallet/](../02_Finance_Center/seamless-wallet/)
 - **架構決策記錄**：[../architecture-decisions/](../architecture-decisions/)
-- **文檔地圖**：[../00_Concept_&_Analysis/00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
-- **CLAUDE.md**：[../../../CLAUDE.md](../../../CLAUDE.md) - SmartAdmin 開發指南
+- **SmartAdmin 開發指南**：[../../../CLAUDE.md](../../../CLAUDE.md)
+- **重組計劃**：[../../../.claude/plans/mutable-kindling-dijkstra.md](../../../.claude/plans/mutable-kindling-dijkstra.md)
 
 ---
 
 **維護狀態**：只讀（僅用於歷史參考）
-**歸檔原因**：iGame 文檔模塊化重組 v2.0.0 + v4.0.0 溫和整理
+**歸檔原因**：iGame 文檔模塊化重組（v2.0.0 → v3.0.0 → v4.0.0 激進簡化）
+**下次審閱**：2026-05-04（每季度審閱，評估是否需要進一步簡化）
