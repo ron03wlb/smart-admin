@@ -368,14 +368,22 @@ graph TD
 
 ---
 
-### 12 - 技術運維 (Technical Operations)
+### 07 - 技術基礎設施 (Technical Infrastructure)
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 12-01 | [Deployment_Architecture.md](../07_Technical_Infrastructure/07-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 |
-| 12-02 | [QA_Testing_Standard.md](../07_Technical_Infrastructure/07-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 |
-| 12-03 | [Gateway_Architecture.md](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 |
-| 12-04 | [Maintenance_Procedure.md](../07_Technical_Infrastructure/07-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 |
+| 07-01 | [Deployment_Architecture.md](../07_Technical_Infrastructure/07-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 ✅ |
+| 07-02 | [Gateway_Architecture/](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 ✅ |
+| 07-03 | [API_Design/](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) | RESTful API 設計標準 | 400 ✅ |
+| 07-04 | [QA_Testing_Standard.md](../07_Technical_Infrastructure/07-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 ✅ |
+| 07-05 | [Maintenance_Procedure.md](../07_Technical_Infrastructure/07-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 ✅ |
+| 07-06 | [Performance_Monitoring.md](../07_Technical_Infrastructure/07-06_Performance_Monitoring.md) | APM、指標、告警 | 450 ✅ |
+| 07-07 | [Performance_Optimization.md](../07_Technical_Infrastructure/07-07_Performance_Optimization.md) | 性能瓶頸分析與優化策略 | 633 ✅ |
+| 07-08 | [Stream_Processing_Architecture.md](../07_Technical_Infrastructure/07-08_Stream_Processing_Architecture.md) | Flink CDC、Flink SQL、CEP | 510 🆕 |
+| 07-09 | [Caching_Strategy.md](../07_Technical_Infrastructure/07-09_Caching_Strategy.md) | JetCache + Redisson 多級緩存 | 440 🆕 |
+| 07-10 | [Cost_Optimization.md](../07_Technical_Infrastructure/07-10_Cost_Optimization.md) | 成本優化與 ROI 分析 | 390 🆕 |
+
+> ⚠️ **v2.0.0 重組**: 原 12-XX 編號已統一為 07-XX (Technical Infrastructure)
 
 ---
 

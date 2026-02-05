@@ -339,10 +339,77 @@ stateDiagram-v2
 在與 `wallet_transaction` 同一個 DB Transaction 中寫入：
 
 ### 6.2 關鍵事件列表
-*   `WALLET_DEBITED`: 用於計算流水 (Turnover Contribution)、觸發 "投注任務"。
-*   `WALLET_CREDITED`: 用於觸發 "贏分任務"、更新排行榜。
-*   `DEPOSIT_SUCCESS`: 用於觸發 "首存紅利"。
-*   `WITHDRAW_REQUESTED`: 用於觸發 "提款審核"。
+
+*   **`WALLET_DEBITED`**: 用於計算流水 (Turnover Contribution)、觸發 "投注任務"、**觸發異步風控分析**。
+*   **`WALLET_CREDITED`**: 用於觸發 "贏分任務"、更新排行榜。
+*   **`DEPOSIT_SUCCESS`**: 用於觸發 "首存紅利"。
+*   **`WITHDRAW_REQUESTED`**: 用於觸發 "提款審核"、**觸發延遲風控檢查（SAGA Step 2.5）**。
+
+#### 風控事件流（Risk Control Event Flow）
+
+```mermaid
+sequenceDiagram
+    participant BetService as 投注服務<br/>Bet Service
+    participant DB as PostgreSQL<br/>Transaction + Outbox
+    participant Kafka as Kafka Topic<br/>wallet.debited
+    participant RiskEngine as 風控引擎<br/>Risk Engine<br/>(Flink Consumer)
+    participant RiskDB as t_risk_proposal<br/>提案表
+
+    BetService->>DB: TCC Confirm<br/>實際扣款 + 寫 outbox_event
+    Note over DB: Outbox Event:<br/>event_type=WALLET_DEBITED<br/>event_id=evt-xxx
+
+    DB-->>Kafka: CDC/Polling Publisher<br/>發布事件
+    Note over Kafka: Partition Key: player_id<br/>保證同一玩家事件有序
+
+    Kafka->>RiskEngine: Consumer 接收事件
+    Note over RiskEngine: Payload: {<br/>event_id, player_id,<br/>bet_id, amount,<br/>game_type, timestamp<br/>}
+
+    RiskEngine->>RiskEngine: 窗口聚合（5 秒）<br/>執行所有風控規則<br/>計算風險評分
+
+    alt 匹配 BLOCK/FLAG 規則
+        RiskEngine->>RiskDB: 寫入 Risk Proposal<br/>status=PENDING_REVIEW<br/>priority=HIGH/MEDIUM
+        Note over RiskDB: 標記 matched_rules<br/>計算 suspicious_amount
+    else 無匹配或 IGNORE
+        RiskEngine->>RiskEngine: 僅記錄日誌<br/>不創建提案
+    end
+
+    Note over RiskEngine: 冪等性保證：<br/>使用 event_id 去重
+```
+
+**事件 Payload 範例**：
+
+```json
+{
+  "event_id": "evt-20260202-123456",
+  "event_type": "WALLET_DEBITED",
+  "player_id": 1001,
+  "bet_id": "BET-20260202-123456",
+  "amount": 100.00,
+  "balance_breakdown": {
+    "bonus": 20.00,
+    "cash": 30.00,
+    "credit": 50.00
+  },
+  "game_type": "SPORTS",
+  "game_id": "CS2_MATCH_12345",
+  "timestamp": "2026-02-02T10:30:45Z"
+}
+```
+
+**冪等性保證**：
+- Risk Engine 使用 `event_id` 實現冪等消費
+- 若 `event_id` 已處理過，直接跳過（避免重複分析）
+
+**錯誤處理**：
+- 風控分析失敗不影響投注結果（投注已經成功）
+- 失敗事件寫入死信隊列（DLQ），人工介入處理
+
+**與 WITHDRAW_REQUESTED 事件的關聯**：
+- 提款時，SAGA Step 2.5 查詢歷史 Risk Proposal（30 天）
+- 若可疑金額 > 0，凍結提款並路由至人工審核隊列
+- 詳細流程參考：[01-05_Withdrawal_Risk.md](../01_Player_Center/01-05_Withdrawal_Risk.md)
+
+---
 
 ### 6.3 消息不丟失保證
 *   **CDC / Polling Publisher**: 獨立進程讀取 `outreach_event_outbox` -> 發送至 Kafka -> 更新 Status='SENT'。
@@ -350,8 +417,43 @@ stateDiagram-v2
 
 ---
 
-**文檔版本**: 1.0.0
-**最後更新**: 2026-01-28
+## 變更日誌 (Change Log)
+
+### v1.1.0 (2026-02-04)
+
+**新增內容**：
+1. ✅ **§6.2 關鍵事件列表 - 風控事件流文檔**
+   - 更新 `WALLET_DEBITED` 事件描述：添加「觸發異步風控分析」
+   - 更新 `WITHDRAW_REQUESTED` 事件描述：添加「觸發延遲風控檢查（SAGA Step 2.5）」
+   - 新增完整風控事件流 Mermaid 序列圖
+   - 新增事件 Payload 範例（JSON 格式）
+   - 新增冪等性保證說明（使用 `event_id` 去重）
+   - 新增錯誤處理機制（DLQ 死信隊列）
+
+**與風控系統集成**：
+- 明確 WALLET_DEBITED 事件觸發 Kafka Consumer（風控引擎）
+- 說明風控分析失敗不影響投注結果（投注已成功）
+- 關聯 SAGA Step 2.5 延遲風控檢查（參考 01-05_Withdrawal_Risk.md）
+
+**兼容性**：
+- ✅ 向下兼容：原有 TCC 交易處理流程不變
+- ✅ 新增事件用途：不影響現有功能
+
+---
+
+### v1.0.0 (2026-01-28)
+
+**初始版本**：
+- 完整 TCC 兩階段事務處理流程
+- Outbox Pattern 事件發布機制
+- 狀態機設計（PENDING/CONFIRMING/CONFIRMED/CANCELLING/CANCELLED/EXPIRED）
+- 性能優化（樂觀鎖、Redis 分佈式鎖、Connection Pooling）
+- 監控告警與故障恢復
+
+---
+
+**文檔版本**: 1.1.0
+**最後更新**: 2026-02-04
 **維護團隊**: Finance Team & Backend Team
 
 ---

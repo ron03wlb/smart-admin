@@ -523,6 +523,206 @@ appendfsync: everysec
 
 ---
 
+#### JetCache 2.7 + Redisson 3.26 ⭐ 推薦
+
+**使用場景**：
+- ✅ **多級緩存**：L1 (Caffeine JVM 緩存) + L2 (Redis 分佈式緩存)
+- ✅ **分佈式鎖**：玩家錢包並發更新（取代 `SELECT ... FOR UPDATE`）
+- ✅ **限流器**：Token Bucket / 滑動窗口（API 限流）
+- ✅ **布隆過濾器**：防止緩存穿透（檢查玩家/訂單是否存在）
+
+**技術棧**：
+```yaml
+緩存框架: JetCache 2.7.5
+  - 本地緩存: Caffeine 3.1.8 (L1)
+  - 遠程緩存: Lettuce 6.3.0 (Redis L2)
+  - 序列化: Kryo 5.5.0 (高性能)
+  - 註解支持: @Cached, @CacheInvalidate, @CacheUpdate
+
+分佈式工具: Redisson 3.26.0
+  - 分佈式鎖: RLock (Watchdog 自動續期)
+  - 限流器: RRateLimiter (Token Bucket)
+  - 布隆過濾器: RBloomFilter (Guava 兼容)
+  - 發布訂閱: RTopic (緩存失效通知)
+```
+
+**雙層緩存架構**：
+
+```mermaid
+flowchart LR
+    A[Request] --> B{L1 Caffeine<br/>95% Hit}
+    B -->|Hit| C[Return<br/>< 1ms]
+    B -->|Miss| D{L2 Redis<br/>4.5% Hit}
+    D -->|Hit| E[Return<br/>2-5ms]
+    D -->|Miss| F{Database<br/>0.5% Miss}
+    F --> G[Load Data<br/>20-50ms]
+    G --> H[Update L2]
+    H --> I[Update L1]
+    I --> C
+```
+
+**JetCache 配置示例**：
+
+```yaml
+# application.yml
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson2  # JSON 序列化
+      expireAfterWriteInMillis: 100000  # L1 TTL: 100s
+      limit: 10000  # 最大 10000 條
+  remote:
+    default:
+      type: redis.lettuce
+      keyConvertor: fastjson2
+      valueEncoder: kryo  # Kryo 序列化
+      valueDecoder: kryo
+      expireAfterWriteInMillis: 3600000  # L2 TTL: 1h
+      uri: redis://redis-master:6379
+```
+
+**代碼示例** - JetCache @Cached 註解：
+
+```java
+// Service 層使用 JetCache 雙層緩存
+@Cached(
+    name = "wallet:balance:",
+    key = "#tenantId + ':' + #playerId",
+    expire = 3600,      // L2 TTL: 1h
+    localExpire = 100,  // L1 TTL: 100s
+    cacheType = CacheType.BOTH  // L1 + L2 雙層緩存
+)
+public Option<WalletBalanceVO> getBalance(
+    String tenantId,
+    String playerId
+) {
+    return walletDao.selectById(tenantId, playerId)
+        .map(WalletBalanceVO::from);
+}
+
+// 更新餘額時失效緩存
+@CacheInvalidate(
+    name = "wallet:balance:",
+    key = "#tenantId + ':' + #playerId"
+)
+public void updateBalance(
+    String tenantId,
+    String playerId,
+    BigDecimal amount
+) {
+    walletDao.updateBalance(tenantId, playerId, amount);
+}
+```
+
+**代碼示例** - Redisson 分佈式鎖：
+
+```java
+// Manager 層使用 Redisson 分佈式鎖
+@Service
+@RequiredArgsConstructor
+public class WalletManager {
+    private final RedissonClient redissonClient;
+    private final WalletDao walletDao;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> deduct(
+        String tenantId,
+        String playerId,
+        BigDecimal amount
+    ) {
+        String lockKey = "wallet:lock:" + tenantId + ":" + playerId;
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            // tryLock: wait 3s, lease 5s, Watchdog 自動續期
+            boolean acquired = lock.tryLock(3, 5, TimeUnit.SECONDS);
+
+            if (!acquired) {
+                return ResponseDTO.userErrorParam("獲取鎖超時，請稍後重試");
+            }
+
+            // 樂觀鎖重試 (version 欄位)
+            int retryCount = 0;
+            while (retryCount < 3) {
+                Wallet wallet = walletDao.selectById(tenantId, playerId);
+
+                if (wallet.getBalance().compareTo(amount) < 0) {
+                    return ResponseDTO.userErrorParam("餘額不足");
+                }
+
+                int affected = walletDao.updateBalanceWithVersion(
+                    tenantId, playerId, amount.negate(), wallet.getVersion()
+                );
+
+                if (affected > 0) {
+                    return ResponseDTO.ok();
+                }
+
+                retryCount++;
+                Thread.sleep(20 * retryCount); // 線性退避
+            }
+
+            return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "並發更新失敗");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "操作被中斷");
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+}
+```
+
+**選型理由**：
+- ✅ **JetCache 優勢**：
+  - 聲明式緩存（@Cached 註解）- 減少樣板代碼
+  - 雙層緩存架構（L1+L2）- P99 延遲 <1ms
+  - 自動序列化（Kryo）- 性能優於 JSON
+  - 緩存預熱/失效/更新 - 完整生命週期管理
+- ✅ **Redisson 優勢**：
+  - 分佈式鎖（RLock）- Watchdog 自動續期（30s）
+  - 限流器（RRateLimiter）- Token Bucket 算法
+  - 布隆過濾器（RBloomFilter）- 防止緩存穿透
+  - 豐富數據結構（RMap, RList, RSet）- 與 JDK 集合 API 兼容
+
+**vs Spring Cache / Guava Cache**：
+
+| 維度 | JetCache | Spring Cache | Guava Cache |
+|------|---------|--------------|-------------|
+| 多級緩存 | L1+L2 ⭐ | 單層 | 單層 (本地) |
+| 註解支持 | @Cached ⭐ | @Cacheable | 無 |
+| 序列化 | Kryo ⭐ | JSON | Java |
+| TTL 控制 | L1/L2 獨立 ⭐ | 全局 | 統一 |
+| 緩存預熱 | 支持 ⭐ | 無 | 無 |
+| 監控 | Metrics ⭐ | 有限 | 無 |
+| 分佈式鎖 | Redisson ⭐ | 無 | 無 |
+
+**性能提升數據**：
+
+| 指標 | 優化前 | 優化後 (JetCache) | 提升 |
+|------|--------|------------------|------|
+| P99 延遲 | 1,240ms | ≤200ms | -84% ⭐ |
+| Cache Hit Rate | 65% | 95% | +30pp ⭐ |
+| Redis QPS | 50,000 | 5,000 | -90% (L1 攔截) ⭐ |
+| 並發 TPS | 87 | ≥450 | +418% ⭐ |
+
+**相關文檔**：
+- [07-09 緩存策略](../07_Technical_Infrastructure/07-09_Caching_Strategy.md) - JetCache + Redisson 完整實現
+- [07-07 性能優化](../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §10 多級緩存架構
+
+**版本要求**：
+- JetCache: ≥ 2.7.0
+- Caffeine: ≥ 3.1.0
+- Redisson: ≥ 3.26.0
+- Redis: ≥ 7.0
+
+---
+
 ### 3. 消息隊列
 
 #### Apache Kafka 3.6 ⭐ 推薦
@@ -557,7 +757,143 @@ Schema註冊: Confluent Schema Registry 7.5
 
 ---
 
-### 4. 搜索引擎
+### 4. 流處理引擎
+
+#### Apache Flink 1.18 ⭐ 推薦
+
+**使用場景**：
+- ✅ **實時 OLAP**：代理報表查詢延遲從 5-10s 降至 <1s
+- ✅ **實時風控**：套利偵測、異常投注頻率檢測（<100ms）
+- ✅ **CDC 數據管道**：PostgreSQL → Kafka → ClickHouse/Redis
+- ✅ **流式 ETL**：實時數據清洗、轉換、聚合
+
+**技術棧**：
+```yaml
+流處理引擎: Apache Flink 1.18.0
+CDC: Flink CDC 3.0.1 + Debezium 2.5.0
+State Backend: RocksDB + S3 Checkpoint
+流處理 API:
+  - Flink SQL (聲明式流處理)
+  - Flink CEP (Complex Event Processing)
+  - DataStream API (底層API)
+運行時: Kubernetes FlinkDeployment
+監控: Prometheus Metrics Reporter + Grafana
+```
+
+**架構示例**：
+
+```mermaid
+flowchart LR
+    A[PostgreSQL WAL] -->|Flink CDC 3.0.1| B[Kafka Topic]
+    B -->|Flink Job| C{Flink SQL<br/>Aggregation}
+    C -->|預聚合結果| D[ClickHouse<br/>OLAP]
+    C -->|熱點數據| E[Redis<br/>Cache]
+    C -->|告警事件| F[Kafka Alert<br/>Topic]
+```
+
+**配置示例** - PostgreSQL CDC Table 定義：
+
+```sql
+-- Flink SQL: 定義 CDC Source Table
+CREATE TABLE player_wallet_cdc (
+    tenant_id STRING,
+    player_id STRING,
+    agent_id STRING,
+    balance DECIMAL(20, 2),
+    lock_amount DECIMAL(20, 2),
+    version BIGINT,
+    create_time TIMESTAMP(3),
+    update_time TIMESTAMP(3) METADATA FROM 'source.timestamp' VIRTUAL,
+    op_type STRING METADATA FROM 'op' VIRTUAL,
+    PRIMARY KEY (tenant_id, player_id) NOT ENFORCED
+) WITH (
+    'connector' = 'postgres-cdc',
+    'hostname' = 'postgres-master',
+    'port' = '5432',
+    'username' = 'cdc_user',
+    'password' = '${CDC_PASSWORD}',
+    'database-name' = 'igaming',
+    'schema-name' = 'public',
+    'table-name' = 'player_wallet',
+    'slot.name' = 'flink_slot',
+    'decoding.plugin.name' = 'pgoutput',
+    'debezium.snapshot.mode' = 'initial'
+);
+
+-- 實時彙總代理餘額 (5 秒視窗)
+CREATE VIEW agent_balance_realtime AS
+SELECT
+    tenant_id,
+    agent_id,
+    SUM(balance) as total_balance,
+    COUNT(DISTINCT player_id) as player_count,
+    TUMBLE_END(update_time, INTERVAL '5' SECOND) as window_end
+FROM player_wallet_cdc
+WHERE agent_id IS NOT NULL
+GROUP BY tenant_id, agent_id, TUMBLE(update_time, INTERVAL '5' SECOND);
+```
+
+**選型理由**：
+- ✅ 真正的流處理（非微批處理）- 毫秒級延遲
+- ✅ Exactly-Once 語義保證（Checkpoint 機制）
+- ✅ 強大的狀態管理（RocksDB State Backend）
+- ✅ 豐富的窗口函數（TUMBLE/HOP/SESSION）
+- ✅ CEP 支持（複雜事件處理）
+- ✅ Flink CDC 生態成熟（Debezium 集成）
+- ✅ Kubernetes 原生支持（FlinkDeployment CRD）
+
+**vs Spark Streaming / Kafka Streams**：
+
+| 維度 | Flink | Spark Streaming | Kafka Streams |
+|------|-------|----------------|---------------|
+| 處理模型 | 真流處理 ⭐ | 微批處理 | 真流處理 ⭐ |
+| 延遲 | <100ms ⭐ | 500ms-1s | <10ms ⭐ |
+| 狀態管理 | RocksDB ⭐ | 內存 | RocksDB ⭐ |
+| SQL 支持 | 完整 ⭐ | Spark SQL | KSQL (有限) |
+| CEP 支持 | 原生 ⭐ | 無 | 無 |
+| CDC 集成 | Flink CDC ⭐ | Spark-CDC | Kafka Connect |
+| 部署複雜度 | 中 | 中 | 低 ⭐ |
+| 社區 | 活躍 ⭐ | 活躍 ⭐ | 活躍 |
+
+**推薦策略**：
+- **Flink**：需要 SQL/CEP/複雜狀態管理 ⭐
+- **Kafka Streams**：簡單流處理、Kafka 生態
+- **Spark Streaming**：批流統一處理、已有 Spark 集群
+
+**性能基準**：
+- 吞吐量：100,000 events/s（單 TaskManager）
+- 延遲：P99 <100ms（含 CDC → ClickHouse 端到端）
+- Checkpoint 間隔：60 秒（EXACTLY_ONCE 模式）
+- 狀態大小：支持 TB 級狀態（RocksDB + S3）
+
+**成本估算**：
+```yaml
+Flink Cluster 配置:
+  JobManager: 2 × 4GB (HA) = $80/月
+  TaskManager: 4 × 8GB = $472/月
+  Total: $552/月
+
+ROI 分析:
+  成本增加: $552/月 (Flink Cluster)
+  收益:
+    - RDS 降級 50%: -$600/月 (OLAP 查詢分流至 ClickHouse)
+    - Redis QPS 降低: -$290.4/月 (JetCache L1 緩存命中率提升)
+  淨收益: $338.4/月 (+61% ROI)
+```
+
+**相關文檔**：
+- [07-08 流處理架構](../07_Technical_Infrastructure/07-08_Stream_Processing_Architecture.md) - Flink CDC, SQL, CEP 完整實現
+- [07-07 性能優化](../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §9 Flink 集成
+
+**版本要求**：
+- Flink: ≥ 1.18.0
+- Flink CDC: ≥ 3.0.0
+- Debezium: ≥ 2.5.0
+- PostgreSQL: ≥ 14（支持 WAL logical replication）
+
+---
+
+### 5. 搜索引擎
 
 #### Elasticsearch 8.11 ⭐ 推薦
 

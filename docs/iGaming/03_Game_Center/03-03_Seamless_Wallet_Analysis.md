@@ -32,30 +32,26 @@
 stateDiagram-v2
     [*] --> IDLE: No Active Round
 
-    IDLE --> OPEN: Bet Request Received<br/>━━━━━━━━━━━━━━<br/>Action: Debit Balance<br/>Create Round Record<br/>Status = OPEN
+    IDLE --> OPEN: Bet Request Received
 
     state OPEN {
         [*] --> WaitingWin: Bet Success
-        WaitingWin --> WaitingWin: Additional Bet (Same Round)<br/>累加投注額
+        WaitingWin --> WaitingWin: Additional Bet (Same Round)
     }
 
-    OPEN --> CLOSED: Win Request Received<br/>━━━━━━━━━━━━━━<br/>Action: Credit Balance<br/>Update Round<br/>Status = CLOSED
-
-    OPEN --> CANCELLED: Rollback Request<br/>━━━━━━━━━━━━━━<br/>Action: Refund Bet<br/>Status = CANCELLED
-
-    OPEN --> TIMEOUT: No Win After 2 Hours<br/>━━━━━━━━━━━━━━<br/>⚠️ Orphaned Round<br/>Trigger: Scheduled Job
+    OPEN --> CLOSED: Win Request Received
+    OPEN --> CANCELLED: Rollback Request
+    OPEN --> TIMEOUT: No Win After 2 Hours
 
     state TIMEOUT {
-        [*] --> QueryGP: Query GP API<br/>GET /round/{id}/status
+        [*] --> QueryGP: Query GP API
         QueryGP --> GPClosed: GP Status = CLOSED
         QueryGP --> GPPending: GP Status = PENDING
         QueryGP --> GPError: GP API Error
     }
 
-    GPClosed --> CLOSED: Auto Close Round<br/>━━━━━━━━━━━━━━<br/>Credit Win Amount<br/>Source: GP Query
-
-    GPPending --> PENDING_REVIEW: Manual Review Required<br/>━━━━━━━━━━━━━━<br/>Notify CS Team<br/>Escalate if > $1000
-
+    GPClosed --> CLOSED: Auto Close Round
+    GPPending --> PENDING_REVIEW: Manual Review Required
     GPError --> PENDING_REVIEW
 
     state PENDING_REVIEW {
@@ -66,16 +62,76 @@ stateDiagram-v2
 
     ManualClose --> CLOSED
     ManualCancel --> CANCELLED
-
-    CLOSED --> ADJUSTED: Resettlement Request<br/>━━━━━━━━━━━━━━<br/>Action: Adjust Balance<br/>Status = ADJUSTED
+    CLOSED --> ADJUSTED: Resettlement Request
 
     ADJUSTED --> [*]
     CLOSED --> [*]
     CANCELLED --> [*]
 
-    note right of TIMEOUT : Scheduled Job:<br/>- Run every 15 minutes<br/>- Check Rounds WHERE status=OPEN<br/>  AND created_at < NOW() - 2 hours<br/>- Query GP API for final status
+    note right of OPEN
+        Bet Request Received
+        ━━━━━━━━━━━━━━
+        Action: Debit Balance
+        Create Round Record
+        Status = OPEN
 
-    note right of PENDING_REVIEW : Manual Review Criteria:<br/>- Round Amount > $1000: HIGH Priority<br/>- Round Amount < $1000: MEDIUM Priority<br/>- SLA: 24 hours response
+        Additional Bet:
+        累加投注額
+    end note
+
+    note right of CLOSED
+        Win Request Received
+        ━━━━━━━━━━━━━━
+        Action: Credit Balance
+        Update Round
+        Status = CLOSED
+
+        Auto Close:
+        Credit Win Amount
+        Source: GP Query
+    end note
+
+    note right of CANCELLED
+        Rollback Request
+        ━━━━━━━━━━━━━━
+        Action: Refund Bet
+        Status = CANCELLED
+    end note
+
+    note right of TIMEOUT
+        No Win After 2 Hours
+        ━━━━━━━━━━━━━━
+        ⚠️ Orphaned Round
+        Trigger: Scheduled Job
+
+        Scheduled Job:
+        - Run every 15 minutes
+        - Check Rounds WHERE status=OPEN
+          AND created_at < NOW() - 2 hours
+        - Query GP API for final status
+
+        Query GP API:
+        GET /round/{id}/status
+    end note
+
+    note right of PENDING_REVIEW
+        Manual Review Required
+        ━━━━━━━━━━━━━━
+        Notify CS Team
+        Escalate if > $1000
+
+        Manual Review Criteria:
+        - Round Amount > $1000: HIGH Priority
+        - Round Amount < $1000: MEDIUM Priority
+        - SLA: 24 hours response
+    end note
+
+    note right of ADJUSTED
+        Resettlement Request
+        ━━━━━━━━━━━━━━
+        Action: Adjust Balance
+        Status = ADJUSTED
+    end note
 ```
 
 **Round 狀態轉換關鍵邏輯**：
@@ -105,8 +161,6 @@ stateDiagram-v2
 ---
 
 ## 2. 無縫錢包投注場景矩陣 (Betting Scenario Matrix)
-
-以下是 "Step by Step" 推演的各種情況，從正常流程到極端異常。
 
 ### 2.1 正常交易流程 (Happy Path)
 1. **Bet (Debit)**:
@@ -715,7 +769,7 @@ groups:
         "wallet_priority": ["BONUS_WALLET", "CASH_WALLET"], // 覆蓋預設
         "use_system_default": false  // 明確標記覆蓋
       }
-      ```text
+      ```
     - **執行流程**：
       1.  收到 Bet 請求。
       2.  檢查 `game_config.wallet_priority` 是否存在。
@@ -742,7 +796,7 @@ groups:
       }
       
       NegativeLocked --> Normal : Manual Deposit / Debt Cleared (Admin Unlock)
-  ```sql
+  ```
 - **處置細節**：
     - **帳號狀態**：立即變更為 `LOCKED` 或 `SUSPENDED`，阻止任何新的登入、投注或提款。
     - **通知**：發送高優先級 Alert 至風控後台。

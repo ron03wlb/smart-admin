@@ -226,9 +226,43 @@ graph TD
 
 **Note**: This differs from standard Mermaid specification, which recommends `\n`. SmartAdmin's rendering environment requires HTML tags.
 
-**Pre-commit Hook**: Automatically validates Mermaid syntax before commit.
+**⚠️ IMPORTANT EXCEPTION**: stateDiagram-v2 does NOT support `<br/>` tags.
 
-→ **[Complete Mermaid Best Practices](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md)**
+### stateDiagram-v2 Specific Rules
+
+**CRITICAL**: stateDiagram-v2 has different syntax requirements than other Mermaid diagram types.
+
+**❌ Do NOT use `<br/>` in stateDiagram-v2:**
+- ❌ Transition labels: `A --> B: Event<br/>Action` (will fail)
+- ❌ Note blocks: `note right of A : Text<br/>More` (will fail)
+
+**✅ Correct stateDiagram-v2 syntax:**
+```mermaid
+# ✅ Correct - Simplified transition labels
+stateDiagram-v2
+    A --> B: Event
+
+# ✅ Correct - Multi-line note blocks
+stateDiagram-v2
+    note right of A
+        Event Triggered
+        Action Executed
+        Result Achieved
+    end note
+```
+
+**When to use which approach:**
+- **P0/P1 core documents**: Use multi-line note blocks to preserve detailed information
+- **P2 supporting documents**: Simplify transition labels for quick fixes
+
+**Automatic fix tools:**
+- Detection: `./scripts/detect-statediagram-br.sh docs/iGaming/`
+- Fix: `./scripts/batch-fix-statediagram-br.sh --verify`
+- Validation: `./scripts/validate-mermaid.sh docs/iGaming/`
+
+**Pre-commit Hook**: Automatically validates Mermaid syntax before commit (detects stateDiagram `<br/>` errors).
+
+→ **[Complete Mermaid Best Practices](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md)** (v1.1.0 - Added stateDiagram error guide)
 
 ## Specialized Skills
 

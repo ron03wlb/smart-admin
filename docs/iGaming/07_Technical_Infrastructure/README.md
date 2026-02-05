@@ -25,12 +25,17 @@
 
 | 文檔編號 | 文檔名稱 | 來源 | 拆分說明 |
 |---------|---------|------|---------|
-| 07-01 | Deployment.md | 12-01 | 直接遷移 |
-| 07-02 | Gateway_Architecture/ | 12-03（1131 行）| **拆分為 3 個子文件** |
-| 07-03 | API_Design/ | 12-05 系列（1933 行）| **拆分為 4 個子文件** |
-| **07-03-02-01** ⭐ | **OAuth_Refresh_Token_Implementation.md** | **新增（2500 行）** | **替代「交易 ID 生成 token」方案** |
-| 07-04 | QA_Standards.md | 12-02 | 直接遷移 |
-| 07-05 | Maintenance.md | 12-04 | 直接遷移 |
+| 07-01 | Deployment.md | 12-01 | 直接遷移 ✅ |
+| 07-02 | Gateway_Architecture/ | 12-03（1131 行）| **拆分為 3 個子文件** ✅ |
+| 07-03 | API_Design/ | 12-05 系列（1933 行）| **拆分為 4 個子文件** ✅ |
+| **07-03-02-01** ⭐ | **OAuth_Refresh_Token_Implementation.md** | **新增（2500 行）** | **替代「交易 ID 生成 token」方案** ✅ |
+| 07-04 | QA_Standards.md | 12-02 | 直接遷移 ✅ |
+| 07-05 | Maintenance.md | 12-04 | 直接遷移 ✅ |
+| 07-06 | Performance_Monitoring.md | 新增 | 性能監控架構 ✅ |
+| 07-07 | Performance_Optimization.md | 新增 | 性能優化規範（v1.1.0）✅ |
+| **07-08** ⭐ | **Stream_Processing_Architecture.md** | **新增（510 行）** | **Flink 流處理架構** 🆕 |
+| **07-09** ⭐ | **Caching_Strategy.md** | **新增（440 行）** | **JetCache + Redisson 緩存策略** 🆕 |
+| **07-10** ⭐ | **Cost_Optimization.md** | **新增（390 行）** | **成本優化與 ROI 分析** 🆕 |
 
 ---
 

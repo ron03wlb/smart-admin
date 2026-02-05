@@ -1158,8 +1158,9 @@ graph TB
 **CRITICAL**: All Mermaid diagrams in generated documentation must follow these syntax rules:
 
 **Graph/Flowchart Nodes:**
-- ✅ Use `\n` for line breaks with double quotes: `["Line 1\nLine 2"]`
-- ❌ DO NOT use `<br/>` HTML tags in graph/flowchart nodes
+- ✅ Use `<br/>` for line breaks (SmartAdmin standard): `[Line 1<br/>Line 2]`
+- Ⓘ Standard Mermaid uses `\n` with double quotes `["Line\nText"]`, but SmartAdmin environment requires `<br/>`
+- ❌ DO NOT use `\n` in SmartAdmin projects (rendering environment incompatibility)
 
 **SequenceDiagram Note Blocks:**
 - ✅ Use `<br/>` for line breaks: `Note over A: Line 1<br/>Line 2`

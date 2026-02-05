@@ -130,6 +130,7 @@ VALUES (:playerId, :tenantId, 0, 0, 0);
 #### Step 3: KYC 驗證
 
 **KYC 等級**:
+
 | 等級 | 要求 | 出金限額 |
 |------|------|---------|
 | L0 | 無 KYC | 禁止出金 |
@@ -295,6 +296,7 @@ try (DistributedLock lock = redisson.getLock("lock:" + requestId)) {
 ```
 
 **範例**:
+
 | 項目 | 金額 |
 |------|------|
 | 現金餘額 | $1,000 |
@@ -457,6 +459,7 @@ BigDecimal wageringRequirement = depositAmount.add(bonusAmount).multiply(multipl
 ```
 
 **範例**:
+
 | 遊戲類型 | 下注金額 | 遊戲權重 | 有效投注 | 累積流水 |
 |---------|---------|---------|---------|---------|
 | 老虎機 | $100 | 100% | $100 | $100 |
@@ -664,6 +667,7 @@ if (riskScore.getTotal() <= 30) {
 ```
 
 **風險評分表**:
+
 | 風險因子 | 分數 | 說明 |
 |---------|------|------|
 | 高頻出金 | +30 | 單日出金 >3 次 |

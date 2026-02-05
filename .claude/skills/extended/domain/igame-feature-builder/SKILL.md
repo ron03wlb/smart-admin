@@ -287,11 +287,11 @@ public class AuditLogService {
 - [ ] Rollback support for failed operations
 - [ ] Idempotency for duplicate requests
 
-**Mermaid Diagram Standards:**
-- [ ] **Graph/Flowchart nodes**: Use `\n` with double quotes: `["Line 1\nLine 2"]`
+**Mermaid Diagram Standards (SmartAdmin Environment):**
+- [ ] **Graph/Flowchart nodes**: Use `<br/>` tags: `[Line 1<br/>Line 2]` (SmartAdmin standard)
+- [ ] **DO NOT use `\n`**: Standard Mermaid `["Line\nText"]` syntax not supported in SmartAdmin
 - [ ] **SequenceDiagram Note blocks**: Use `<br/>` for line breaks: `Note over A: Line 1<br/>Line 2`
-- [ ] **SequenceDiagram Note blocks**: DO NOT use `\n` (不支援)
-- [ ] **Participant/Arrow labels**: CAN use `\n` with double quotes
+- [ ] **Participant/Arrow labels**: Use `<br/>` (recommended for consistency, though `\n` works in standard Mermaid)
 - [ ] Avoid HTML tags (`<b>`, `<i>`, `<span>`) in graph/flowchart nodes
 - [ ] Use `note` blocks for complex annotations in state diagrams
 - [ ] Reference: `../igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md`

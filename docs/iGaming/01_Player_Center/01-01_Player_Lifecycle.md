@@ -232,15 +232,40 @@ stateDiagram-v2
     CLOSED --> [*]
 
     %% === 註釋說明 ===
-    note right of ACTIVE : 預設狀態<br/>無任何限制<br/>可進行所有操作
+    note right of ACTIVE
+        預設狀態
+        無任何限制
+        可進行所有操作
+    end note
 
-    note right of LOCKED : 安全保護機制<br/>- 防暴力破解<br/>- 自動解鎖<br/>- 玩家可重置密碼
+    note right of LOCKED
+        安全保護機制
+        - 防暴力破解
+        - 自動解鎖
+        - 玩家可重置密碼
+    end note
 
-    note right of SUSPENDED : 風控凍結狀態<br/>- 禁止資金操作<br/>- 需人工審核<br/>- 可提交申訴
+    note right of SUSPENDED
+        風控凍結狀態
+        - 禁止資金操作
+        - 需人工審核
+        - 可提交申訴
+    end note
 
-    note right of PENDING_VERIFICATION : 提款觸發 KYC 升級<br/>- 限制提款額度<br/>- L0 → L1 (上傳證件)<br/>- L1 → L2 (地址驗證)
+    note right of PENDING_VERIFICATION
+        提款觸發 KYC 升級
+        - 限制提款額度
+        - L0 → L1 (上傳證件)
+        - L1 → L2 (地址驗證)
+    end note
 
-    note right of CLOSED : 不可逆終止狀態<br/>- 自我排除 (賭博成癮)<br/>- AML 違規<br/>- 確認欺詐<br/>- 退還未使用餘額
+    note right of CLOSED
+        不可逆終止狀態
+        - 自我排除 (賭博成癮)
+        - AML 違規
+        - 確認欺詐
+        - 退還未使用餘額
+    end note
 ```
 
 ### 3.3 狀態轉換詳細邏輯

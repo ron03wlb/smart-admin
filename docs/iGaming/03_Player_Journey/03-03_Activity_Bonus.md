@@ -275,11 +275,11 @@ flowchart TD
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING_ISSUE: 規則引擎匹配成功<br/>創建獎勵記錄
+    [*] --> PENDING_ISSUE: 規則引擎匹配成功 <br/>創建獎勵記錄
 
     PENDING_ISSUE --> ISSUED: 風控審核通過<br/>錢包服務執行發放<br/>━━━━━━━━━━━━<br/>Actions:<br/>• wallet.creditBonus(amount)<br/>• 創建 wagering_requirement<br/>• 發送通知
 
-    PENDING_ISSUE --> REJECTED: 風控審核拒絕<br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 多帳號檢測<br/>• 獎金獵人模式<br/>• 預算耗盡<br/>Actions:<br/>• 標記 status=REJECTED<br/>• 記錄拒絕原因<br/>• 通知運營團隊
+    PENDING_ISSUE --> REJECTED: 風控審核拒絕 <br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 多帳號檢測<br/>• 獎金獵人模式 <br/>• 預算耗盡<br/>Actions:<br/>• 標記 status=REJECTED<br/>• 記錄拒絕原因<br/>• 通知運營團隊
 
     ISSUED --> ACTIVE: 玩家首次使用紅利投注<br/>或手動激活<br/>━━━━━━━━━━━━<br/>Actions:<br/>• 開始流水追蹤<br/>• activated_at = NOW()<br/>• 計時器開始 (有效期倒計時)
 
@@ -719,7 +719,7 @@ Result:
          "ID": 1.2
        }
      }
-     ```text
+     ```
 
 ---
 
