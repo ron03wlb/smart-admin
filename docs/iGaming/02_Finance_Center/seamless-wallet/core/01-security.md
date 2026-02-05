@@ -365,6 +365,301 @@ token:
 
 ---
 
+## Part 1.5: HMAC-SHA256 簽名驗證
+
+> **新增日期**: 2026-02-05
+> **目的**: 為遊戲商（Game Provider）API 請求提供完整性和真實性驗證
+> **相關文檔**: [07-03-02-02 多主體 Token 安全方案](../../../07_Technical_Infrastructure/07-03-02-02_Multi_Actor_Token_Security.md#遊戲商-token-方案)
+
+### 1.5.1 簽名驗證流程概覽
+
+所有遊戲商（Game Provider）的 API 請求都必須包含 HMAC-SHA256 簽名，以確保請求的完整性和真實性。簽名驗證與 Token 驗證是兩層獨立的安全措施：
+
+```
+安全層級：
+Layer 1: HMAC 簽名驗證（驗證請求來源 + 完整性）
+    ↓
+Layer 2: Token 驗證（驗證玩家身份 + 授權）
+    ↓
+Layer 3: 業務邏輯（冪等性檢查 + 錢包操作）
+```
+
+### 1.5.2 簽名生成（遊戲商端）
+
+**步驟 1：構建簽名字符串**
+
+```
+簽名字符串格式：
+HTTP_METHOD + "\n" +
+REQUEST_PATH + "\n" +
+TIMESTAMP + "\n" +
+NONCE + "\n" +
+REQUEST_BODY
+
+範例：
+POST
+/api/seamless-wallet/bet
+1675267200000
+a1b2c3d4-e5f6-7890-1234-567890abcdef
+{"player_id":"50001","amount":100.00,"currency":"USD","transaction_id":"TX123456"}
+```
+
+**步驟 2：計算 HMAC-SHA256 簽名**
+
+```
+概念流程：
+1. 獲取 API Secret（從環境變量）
+2. 使用 HMAC-SHA256 算法計算簽名：
+   Signature = HMAC-SHA256(API_SECRET, SigningString)
+3. 輸出十六進制字符串（64 字符）
+
+範例輸出：
+a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456
+```
+
+**步驟 3：添加到 HTTP Headers**
+
+```http
+POST /api/seamless-wallet/bet HTTP/1.1
+Host: igaming-api.example.com
+X-GP-API-Key: GP_1001_PRAGMATIC_PLAY_a1b2c3d4e5f6_ab12cd34
+X-GP-Timestamp: 1675267200000
+X-GP-Nonce: a1b2c3d4-e5f6-7890-1234-567890abcdef
+X-GP-Signature: a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456
+Content-Type: application/json
+
+{"player_id":"50001","amount":100.00,"currency":"USD","transaction_id":"TX123456"}
+```
+
+### 1.5.3 簽名驗證（平台端）
+
+**完整驗證流程（5 個步驟）**：
+
+```mermaid
+sequenceDiagram
+    participant GP as Game Provider
+    participant GW as API Gateway
+    participant Cache as Redis Cache
+    participant DB as Database
+    participant Wallet as Wallet Service
+
+    GP->>GW: POST /api/seamless-wallet/bet<br/>Headers: X-GP-API-Key, X-GP-Signature<br/>Body: {player_id, amount, tx_id}
+
+    Note over GW: Step 1: 提取並驗證 API Key
+
+    GW->>GW: 從 Header 提取 X-GP-API-Key
+    GW->>Cache: GET gp:api_key:{apiKey}
+
+    alt Cache Hit
+        Cache-->>GW: {tenant_id, provider_code, api_secret}
+    else Cache Miss
+        GW->>DB: SELECT * FROM t_gp_api_key WHERE api_key = ?
+        DB-->>GW: {api_secret_encrypted, tenant_id}
+        GW->>GW: 解密 API Secret<br/>(AES-256-GCM with DEK)
+        GW->>Cache: SET gp:api_key:{apiKey}<br/>TTL=1h
+    end
+
+    Note over GW: Step 2: 驗證 Timestamp（5分鐘窗口）
+
+    GW->>GW: currentTime = System.currentTimeMillis()
+    GW->>GW: timestampDiff = abs(currentTime - requestTimestamp)
+
+    alt Timestamp 過期（>5分鐘）
+        GW-->>GP: 401 Unauthorized<br/>TIMESTAMP_EXPIRED<br/>(請求時間戳超出5分鐘窗口)
+    end
+
+    Note over GW: Step 3: 檢查 Nonce（防重放）
+
+    GW->>Cache: EXISTS nonce:{nonce}
+
+    alt Nonce 已使用
+        GW-->>GP: 401 Unauthorized<br/>NONCE_REUSED<br/>(檢測到重放攻擊)
+    end
+
+    GW->>Cache: SET nonce:{nonce} TTL=5min
+
+    Note over GW: Step 4: 驗證 HMAC-SHA256 簽名
+
+    GW->>GW: 重建簽名字符串<br/>(method + path + timestamp + nonce + body)
+    GW->>GW: expectedSig = HMAC-SHA256(signingString, apiSecret)
+    GW->>GW: 比對簽名（constant-time comparison）
+
+    alt 簽名不匹配
+        GW-->>GP: 401 Unauthorized<br/>INVALID_SIGNATURE<br/>(HMAC 簽名驗證失敗)
+    end
+
+    Note over GW: Step 5: 驗證 Tenant ID 匹配
+
+    GW->>GW: 從 body 提取 player_id
+    GW->>DB: SELECT tenant_id FROM t_player WHERE player_id = ?
+    DB-->>GW: player_tenant_id
+
+    alt Tenant ID 不匹配
+        GW-->>GP: 403 Forbidden<br/>TENANT_MISMATCH<br/>(遊戲商未授權訪問該租戶)
+    end
+
+    Note over GW: Step 6: 執行業務邏輯
+
+    GW->>Wallet: processBet(playerId, amount, transactionId)
+    Wallet-->>GW: {success: true, balance: 950.00}
+    GW-->>GP: 200 OK<br/>{status: "SUCCESS", balance: 950.00}
+```
+
+### 1.5.4 錯誤處理
+
+| 錯誤代碼 | 錯誤原因 | HTTP 狀態碼 | 緩解措施 | 是否可重試 |
+|---------|---------|------------|---------|----------|
+| `INVALID_API_KEY_FORMAT` | API Key 格式錯誤 | 400 | 檢查 API Key 格式規範<br/>（格式：GP_{tenant}_{provider}_{uuid}_{checksum}） | ❌ |
+| `API_KEY_NOT_FOUND` | API Key 不存在或已撤銷 | 401 | 聯繫平台管理員重新生成 API Key | ❌ |
+| `TIMESTAMP_EXPIRED` | 請求時間戳過期（>5min） | 401 | 同步服務器時間，使用 NTP | ✅ |
+| `NONCE_REUSED` | Nonce 已使用（重放攻擊） | 401 | 生成隨機 UUID Nonce（每個請求唯一） | ❌ |
+| `INVALID_SIGNATURE` | HMAC 簽名不匹配 | 401 | 檢查簽名字符串構建順序<br/>（method, path, timestamp, nonce, body） | ❌ |
+| `TENANT_MISMATCH` | GP 未授權訪問該租戶 | 403 | 聯繫平台管理員授權 | ❌ |
+
+**錯誤響應格式**：
+
+```json
+{
+  "success": false,
+  "error_code": "INVALID_SIGNATURE",
+  "error_message": "HMAC-SHA256 signature verification failed",
+  "details": {
+    "timestamp": "2026-02-05T10:30:00Z",
+    "request_id": "req_abc123",
+    "suggestions": [
+      "Verify signing string construction order (method, path, timestamp, nonce, body)",
+      "Ensure API Secret is correctly configured",
+      "Check that body content matches exactly (no whitespace changes)"
+    ]
+  },
+  "metadata": {
+    "retryable": false,
+    "contact_support": true
+  }
+}
+```
+
+### 1.5.5 安全最佳實踐
+
+#### 1. API Secret 保護
+
+**禁止事項**：
+- ❌ 在日誌中記錄 API Secret（包括調試日誌）
+- ❌ 在 URL 參數中傳遞 API Secret
+- ❌ 在前端代碼中暴露 API Secret
+- ❌ 在版本控制系統中提交 API Secret
+
+**推薦做法**：
+- ✅ 使用環境變量存儲 Secret（`export GP_API_SECRET=...`）
+- ✅ 使用密鑰管理服務（AWS KMS、HashiCorp Vault）
+- ✅ 定期輪換 API Key（每 90 天）
+- ✅ 生產和測試環境使用不同的 API Key
+
+#### 2. 時間同步
+
+**時間戳驗證窗口設計**：
+
+```
+窗口大小：5 分鐘（平衡安全性與時間漂移容忍度）
+
+安全性考量：
+- 窗口太小（<1min）→ 正常請求可能因時鐘漂移被拒絕
+- 窗口太大（>10min）→ 重放攻擊窗口增大
+
+推薦配置：
+- 使用 NTP 確保服務器時間準確（誤差 <500ms）
+- 監控時間漂移告警（誤差 >1 秒 → 告警）
+```
+
+#### 3. Nonce 管理
+
+**Nonce 設計**：
+
+```
+生成：UUID v4（隨機生成，128-bit 熵值）
+範例：a1b2c3d4-e5f6-7890-1234-567890abcdef
+
+存儲：Redis（Key: nonce:{nonce}， TTL: 5 分鐘）
+清理：TTL 自動過期（不需要手動清理）
+
+為何需要 Nonce：
+防止攻擊者在 5 分鐘窗口內重放相同的請求：
+- 即使時間戳相同，Nonce 不同 → 簽名不同 → 重放失敗
+```
+
+#### 4. Rate Limiting（防止暴力破解）
+
+**限流策略**：
+
+| 限流維度 | 限制 | 時間窗口 | 超限行為 |
+|---------|------|---------|---------|
+| **單個 API Key** | 500 請求 | 1 分鐘 | 429 Too Many Requests |
+| **簽名錯誤（同一 API Key）** | 10 次失敗 | 1 分鐘 | 臨時封禁 IP 15 分鐘<br/>+ 安全告警 |
+| **Nonce 重複（同一 IP）** | 5 次檢測 | 1 分鐘 | 臨時封禁 IP 1 小時<br/>+ 高級別安全告警 |
+
+**目的**：
+- 防止攻擊者暴力破解 HMAC 簽名
+- 防止分布式重放攻擊（不同 IP 使用相同 Nonce）
+
+### 1.5.6 與 Token 驗證的集成
+
+#### 驗證順序（雙重防護）
+
+所有 Seamless Wallet API 請求必須同時滿足：
+
+```
+1. HMAC 簽名驗證通過（驗證請求來源 + 完整性）
+2. Token 驗證通過（驗證玩家身份 + 授權）
+   - Balance/Bet API：嚴格驗證
+   - Result API：條件驗證（長週期遊戲允許放寬）
+   - Rollback API：條件驗證（管理員操作允許放寬）
+```
+
+**為何需要雙重驗證？**
+
+| 驗證層級 | 目的 | 防護對象 | 獨立性 |
+|---------|------|---------|-------|
+| **HMAC 簽名** | 驗證請求來源和完整性 | 中間人攻擊、請求篡改、偽造 GP 請求 | ✅ 獨立於 Token |
+| **Token 驗證** | 驗證玩家身份和授權 | Token 竊取、會話固定、跨用戶攻擊 | ✅ 獨立於 HMAC |
+
+**攻擊場景示例**：
+
+```
+場景 1：攻擊者竊取玩家 Token（但無 GP API Secret）
+- HMAC 簽名驗證 → 失敗（無法生成有效簽名）
+- 結果：✅ 攻擊被阻止
+
+場景 2：攻擊者竊取 GP API Secret（但無玩家 Token）
+- HMAC 簽名驗證 → 成功
+- Token 驗證 → 失敗（Token 無效或不屬於該玩家）
+- 結果：✅ 攻擊被阻止
+
+結論：雙重驗證提供深度防禦，任一層失效仍能保護系統
+```
+
+#### 驗證流程整合
+
+**完整流程**：
+
+```
+HTTP Request 到達
+    ↓
+Step 1: 提取 Headers（API Key、Timestamp、Nonce、Signature）
+    ↓
+Step 2: HMAC 簽名驗證（快速失敗，防止無效請求消耗資源）
+    ↓ 驗證失敗 → 401 Unauthorized (INVALID_SIGNATURE)
+    ↓ 驗證成功 ↓
+Step 3: Token 驗證（確認玩家身份）
+    ↓ 根據 API 類型執行不同策略（參見 Part 1: Token 驗證機制）
+    ↓ 驗證失敗 → 401 Unauthorized (TOKEN_EXPIRED / INVALID_TOKEN)
+    ↓ 驗證成功 ↓
+Step 4: 執行業務邏輯（冪等性檢查 + 錢包操作）
+    ↓
+Step 5: 返回響應
+```
+
+---
+
 ## Part 2: 冪等性設計
 
 

@@ -178,7 +178,6 @@ flowchart TD
 
 ✅ **Token Rotation**：刷新後舊 Refresh Token 立即失效，防止重放攻擊
 ✅ **Device Fingerprint**：FingerprintJS 設備識別（99.5% 準確率）
-✅ **輪換次數限制**：最多刷新 10 次後強制重新登入
 ✅ **Redis 存儲**：30 天 TTL，高可用架構（主從 + Sentinel）
 
 ---
