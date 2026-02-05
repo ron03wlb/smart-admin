@@ -195,7 +195,18 @@ public calculateGGR(date: LocalDate): GgrReport {
 
 ---
 
-## 1.7 跨模組流水一致性保障 (Cross-Module Turnover Consistency)
+## 1.7 流水驗證集成 (Turnover Validation Integration) ✅ v2.1.0
+
+本模塊計算出的 `valid_turnover_finance` 是「增量值」，最終服務於 **方案 A: 存取款快照法**。
+
+- **數據流向**: `valid_turnover_finance` -> `t_player_statistics.total_valid_turnover` (累加)。
+- **驗證時機**: 玩家取款時。
+- **驗證邏輯**: 讀取 `total_valid_turnover`，減去 `Last_Snapshot`，與目標值比對。
+- **詳情參考**: [08-turnover-validation-scheme (流水驗證方案)](../technical-specs/P1-important/08-turnover-validation-scheme.md)。
+
+---
+
+## 1.8 跨模組流水一致性保障 (Cross-Module Turnover Consistency)
 
 為確保 **Finance System (財務系統, 本文件)** 與 **Activity System (活動系統, 04-01)** 的流水計算一致性,兩者必須共用統一的基礎驗證邏輯。本節定義財務模組在整體流水驗證架構中的角色與責任。
 

@@ -233,20 +233,20 @@ graph TD
     A --> C{維度 2：用戶體驗}
     A --> D{維度 3：實施成本}
 
-    B --> B1[TOTP ⭐⭐⭐⭐⭐]
-    B --> B2[Hardware Token ⭐⭐⭐⭐⭐]
-    B --> B3[SMS OTP ⭐⭐⭐]
-    B --> B4[Email OTP ⭐⭐⭐]
+    B --> B1[TOTP: 5/5]
+    B --> B2[Hardware Token: 5/5]
+    B --> B3[SMS OTP: 3/5]
+    B --> B4[Email OTP: 3/5]
 
-    C --> C1[SMS OTP ⭐⭐⭐⭐⭐]
-    C --> C2[TOTP ⭐⭐⭐⭐]
-    C --> C3[Email OTP ⭐⭐⭐]
-    C --> C4[Hardware Token ⭐⭐]
+    C --> C1[SMS OTP: 5/5]
+    C --> C2[TOTP: 4/5]
+    C --> C3[Email OTP: 3/5]
+    C --> C4[Hardware Token: 2/5]
 
-    D --> D1[TOTP ⭐⭐⭐⭐⭐]
-    D --> D2[Email OTP ⭐⭐⭐⭐]
-    D --> D3[SMS OTP ⭐⭐⭐]
-    D --> D4[Hardware Token ⭐⭐]
+    D --> D1[TOTP: 5/5]
+    D --> D2[Email OTP: 4/5]
+    D --> D3[SMS OTP: 3/5]
+    D --> D4[Hardware Token: 2/5]
 ```
 
 **Option A：僅使用 TOTP**
@@ -327,8 +327,8 @@ graph TD
     D --> F
     E --> F
 
-    F -->|✅ Yes| G[頒發 Access Token + Refresh Token]
-    F -->|❌ No| H[錯誤計數 + 1<br/>3 次失敗鎖定 15 分鐘]
+    F -->|PASS| G[頒發 Access Token + Refresh Token]
+    F -->|FAIL| H[錯誤計數 + 1<br/>3 次失敗鎖定 15 分鐘]
 
     H --> I{錯誤次數 >= 3?}
     I -->|Yes| J[帳號暫時鎖定<br/>觸發安全警報]
@@ -834,8 +834,8 @@ Content-Type: application/json
 ```mermaid
 graph TD
     A[用戶登入] --> B{密碼驗證}
-    B -->|✅ 成功| C{檢查設備是否受信任}
-    B -->|❌ 失敗| Z[返回錯誤]
+    B -->|PASS| C{檢查設備是否受信任}
+    B -->|FAIL| Z[返回錯誤]
 
     C -->|是| D[跳過 MFA，直接頒發 Token]
     C -->|否| E{MFA 已啟用?}
@@ -1456,7 +1456,7 @@ sequenceDiagram
         M->>D: 記錄審計日誌（BACKUP_CODE_USED）
 
         alt 剩餘備份碼 <= 2
-            M->>U: ⚠️ 警告：僅剩 X 個備份碼<br/>建議重新生成
+            M->>U: WARNING: 僅剩 X 個備份碼<br/>建議重新生成
         end
 
         M-->>C: 驗證成功
@@ -1536,8 +1536,8 @@ graph TD
     D --> E[安全問題驗證<br/>3 個預設問題]
     E --> F{所有驗證通過?}
 
-    F -->|✅ Yes| G[人工審核<br/>Security Team 批准]
-    F -->|❌ No| H[拒絕恢復請求<br/>聯繫客服]
+    F -->|PASS| G[人工審核<br/>Security Team 批准]
+    F -->|FAIL| H[拒絕恢復請求<br/>聯繫客服]
 
     G --> I[Security Team 登入<br/>強制重置 MFA]
     I --> J[生成新的 TOTP Secret<br/>發送給用戶]
@@ -1752,7 +1752,7 @@ public class MfaPolicyService {
 ```mermaid
 graph TD
     A[用戶登入] --> B{密碼驗證}
-    B -->|✅ 成功| C{檢查角色}
+    B -->|PASS| C{檢查角色}
 
     C -->|高風險角色| D{MFA 已啟用?}
     C -->|低風險角色| G[直接登入]
@@ -1765,8 +1765,8 @@ graph TD
     I --> E
 
     E --> J{TOTP 驗證}
-    J -->|✅ 成功| G
-    J -->|❌ 失敗| K[重新輸入]
+    J -->|PASS| G
+    J -->|FAIL| K[重新輸入]
 ```
 
 ---
@@ -1833,17 +1833,17 @@ graph TD
     A --> C{維度 2：操作可逆性}
     A --> D{維度 3：合規要求}
 
-    B --> B1[Super Admin ⭐⭐⭐⭐⭐<br/>可修改系統配置]
-    B --> B2[Finance ⭐⭐⭐⭐⭐<br/>可調整玩家餘額]
-    B --> B3[Customer Service ⭐⭐⭐<br/>僅查詢權限]
+    B --> B1[Super Admin: 5/5<br/>可修改系統配置]
+    B --> B2[Finance: 5/5<br/>可調整玩家餘額]
+    B --> B3[Customer Service: 3/5<br/>僅查詢權限]
 
-    C --> C1[Super Admin ❌<br/>不可逆]
-    C --> C2[Finance ❌<br/>不可逆]
-    C --> C3[Customer Service ✅<br/>可審計追蹤]
+    C --> C1[Super Admin: NO<br/>不可逆]
+    C --> C2[Finance: NO<br/>不可逆]
+    C --> C3[Customer Service: YES<br/>可審計追蹤]
 
-    D --> D1[Super Admin ✅<br/>PCI DSS 要求]
-    D --> D2[Finance ✅<br/>PCI DSS 要求]
-    D --> D3[Customer Service ⚠️<br/>GDPR 建議]
+    D --> D1[Super Admin: REQUIRED<br/>PCI DSS 要求]
+    D --> D2[Finance: REQUIRED<br/>PCI DSS 要求]
+    D --> D3[Customer Service: RECOMMENDED<br/>GDPR 建議]
 ```
 
 **Option A：所有角色強制 MFA** ⭐⭐⭐

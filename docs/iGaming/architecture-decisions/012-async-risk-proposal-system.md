@@ -65,6 +65,192 @@ SmartAdmin v3.x 的風控系統採用**實時阻斷模式**，存在以下關鍵
 
 ---
 
+## 規則獨立觸發模式（v2.0.0）
+
+### 核心概念
+
+**定義**：每條風控規則匹配時，可以直接決定審批流程，不依賴其他規則的分數累加。
+
+**核心特徵**：
+1. ✅ 每條規則有自己的觸發模式（BLOCK / FLAG / IGNORE）
+2. ✅ 每條規則有自己的優先級（URGENT / HIGH / MEDIUM / LOW）
+3. ✅ 規則之間不累加分數，獨立決策
+4. ✅ 取款時按「最高優先級」提案決定審批流程
+
+### 為什麼不使用分數累加？
+
+**問題 1: 關鍵違規被稀釋**
+```
+規則A: 黑名單玩家 → 如果累加模式，可能只貢獻 +30 分
+規則B: 異常賠率   → 貢獻 +25 分
+規則C: 低賠率洗水 → 貢獻 +20 分
+
+累加總分 = 75 分（中風險，24h SLA）
+
+✅ 正確邏輯：黑名單玩家本身就是 URGENT 優先級（1h SLA），不應該被其他規則稀釋
+```
+
+**問題 2: 不同風險類型混合**
+```
+欺詐風險（FRAUD）+ 套利風險（ARBITRAGE）+ 洗錢風險（AML）
+→ 累加分數 → 難以追溯哪個風險最嚴重
+
+✅ 正確邏輯：每種風險獨立判斷，記錄明確的觸發規則
+```
+
+**問題 3: 監管合規性**
+```
+MGA/UKGC 要求：
+- 黑名單玩家必須立即阻斷
+- 未成年人必須立即阻斷
+- 自我排除必須立即阻斷
+
+如果用分數累加，可能因為「總分不夠高」而延遲處理 ❌
+```
+
+### 配置驅動設計
+
+**規則配置表** (`t_risk_rule_config`):
+```sql
+CREATE TABLE t_risk_rule_config (
+    rule_code VARCHAR(50) PRIMARY KEY,
+    rule_name VARCHAR(100),
+
+    -- 核心欄位
+    action_type VARCHAR(20),         -- BLOCK / FLAG / IGNORE
+    trigger_priority VARCHAR(20),    -- URGENT / HIGH / MEDIUM / LOW
+
+    enabled BOOLEAN,
+    rule_params JSONB,
+    game_types JSON
+);
+```
+
+**優先級映射**:
+| 優先級 | SLA 時效 | 適用場景 | 取款決策 |
+|-------|---------|---------|---------|
+| URGENT | 1 小時 | 黑名單、IP封禁、未成年人 | 立即阻斷 |
+| HIGH | 2 小時 | 機器人檢測、同局對沖 | 立即阻斷 |
+| MEDIUM | 24 小時 | 異常投注、低賠率洗水 | 人工審核 |
+| LOW | 48 小時 | 數據收集、實驗性規則 | 正常放行 |
+
+### 投注風控決策邏輯
+
+```java
+/**
+ * 投注成功後異步風控檢測
+ */
+public void processRiskRules(BetPlacedEvent event) {
+    // 1. 加載所有啟用的規則
+    List<RiskRuleConfig> enabledRules = riskRuleDao.loadEnabledRules(event.getGameType());
+
+    // 2. 遍歷每條規則，獨立檢測
+    for (RiskRuleConfig rule : enabledRules) {
+        RuleCheckResult result = rule.execute(event);
+
+        if (result.isMatched()) {
+            // ✅ 規則匹配，立即生成提案
+            RiskProposal proposal = RiskProposal.builder()
+                .playerId(event.getPlayerId())
+                .betId(event.getBetId())
+                .matchedRules(List.of(rule.getRuleCode()))  // 記錄觸發規則
+                .flaggedReasons(List.of(result.getMatchedReason()))
+                .suspiciousAmount(event.getAmount())
+                .status(ProposalStatus.PENDING_REVIEW)
+                .priority(rule.getTriggerPriority())  // ← 使用規則的優先級
+                .slaHours(calculateSlaHours(rule.getTriggerPriority()))
+                .build();
+
+            riskProposalManager.saveAndNotify(proposal);
+
+            log.info("[Risk] Rule triggered: rule={}, priority={}",
+                rule.getRuleCode(), rule.getTriggerPriority());
+        }
+    }
+}
+```
+
+### 取款審核決策邏輯
+
+```java
+/**
+ * 取款時關聯風控提案並決策
+ */
+public WithdrawalRiskEvaluationVO evaluate(WithdrawalRiskEvaluationForm form) {
+    // 1. 取得關聯的所有風控提案（近30天）
+    List<RiskProposal> proposals = correlationService.getRelatedProposals(
+        form.getPlayerId(),
+        new WithdrawalRequest(form.getWithdrawalId(), form.getAmount())
+    );
+
+    // 2. 按優先級分類
+    long urgentCount = proposals.stream()
+        .filter(p -> "URGENT".equals(p.getPriority()))
+        .count();
+
+    long highCount = proposals.stream()
+        .filter(p -> "HIGH".equals(p.getPriority()))
+        .count();
+
+    long mediumCount = proposals.stream()
+        .filter(p -> "MEDIUM".equals(p.getPriority()))
+        .count();
+
+    // 3. ✅ 按優先級決策（不累加分數）
+    String decision;
+    String reason;
+
+    if (urgentCount > 0) {
+        decision = "BLOCKED";
+        reason = "URGENT_PRIORITY_PROPOSALS_PENDING (黑名單/IP封禁)";
+        log.error("[Withdrawal] BLOCKED due to URGENT proposals: count={}", urgentCount);
+    } else if (highCount > 0) {
+        decision = "BLOCKED";
+        reason = "HIGH_PRIORITY_PROPOSALS_PENDING (機器人檢測)";
+        log.warn("[Withdrawal] BLOCKED due to HIGH proposals: count={}", highCount);
+    } else if (mediumCount > 0) {
+        decision = "MANUAL_REVIEW";
+        reason = "MEDIUM_PRIORITY_PROPOSALS_PENDING (異常投注)";
+        log.info("[Withdrawal] MANUAL_REVIEW due to MEDIUM proposals: count={}", mediumCount);
+    } else {
+        decision = "APPROVED";
+        reason = "NO_RISK_PROPOSALS";
+        log.info("[Withdrawal] APPROVED, no risk proposals");
+    }
+
+    // 4. 持久化關聯記錄
+    WithdrawalRiskCorrelation correlation = manager.saveCorrelation(
+        form, proposals, decision, urgentCount, highCount, mediumCount
+    );
+
+    return buildEvaluationVO(correlation, proposals, reason);
+}
+```
+
+### 審計追溯性提升
+
+**舊模式（分數累加）**：
+```
+玩家取款被阻斷
+審計日誌：總風險分數 = 85 分
+問題：無法追溯具體哪條規則導致阻斷 ❌
+```
+
+**新模式（規則獨立觸發）**：
+```
+玩家取款被阻斷
+審計日誌：
+  - 提案ID: RP-20260205-001
+  - 觸發規則: BLACKLIST_PLAYER
+  - 優先級: URGENT
+  - SLA: 1 小時
+  - 原因: 玩家已列入黑名單 (理由: 多次欺詐行為)
+
+✅ 明確追溯到具體規則，審計清晰
+```
+
+---
+
 ## 架構設計
 
 ### 系統架構圖
@@ -271,7 +457,7 @@ public class BetController {
 }
 ```
 
-#### Service 層
+#### Service 層（v2.0.0 - 規則獨立觸發模式）
 
 ```java
 @Service
@@ -279,34 +465,47 @@ public class BetController {
 @Slf4j
 public class RiskService {
 
-    private final DeviceManager deviceManager;
-    private final BehaviorManager behaviorManager;
-    private final IpManager ipManager;
-    private final GameTypeManager gameTypeManager;
+    private final RiskRuleConfigDao riskRuleConfigDao;
     private final RiskProposalManager riskProposalManager;
-    private final LiteFlowExecutor liteFlowExecutor;
 
     /**
      * 異步風控檢測（不阻斷投注）
+     * v2.0.0: 改為規則獨立觸發模式
      */
     @Async("riskExecutor")
     @EventListener
     public void onBetPlaced(BetPlacedEvent event) {
         try {
-            // 1. 並行檢測 4 個維度
-            DeviceFingerprintScore deviceScore = deviceManager.checkFingerprint(event.getForm());
-            BehaviorScore behaviorScore = behaviorManager.analyzeBehavior(event.getForm());
-            IpLocationScore ipScore = ipManager.checkLocation(event.getForm());
-            GameTypeScore gameScore = gameTypeManager.checkGameRule(event.getForm());
+            // 1. 加載所有啟用的規則（按遊戲類型過濾）
+            List<RiskRuleConfig> enabledRules = riskRuleConfigDao.loadEnabledRules(
+                event.getForm().getGameType()
+            );
 
-            // 2. 聚合風險評分
-            int totalScore = aggregateScore(deviceScore, behaviorScore, ipScore, gameScore);
+            // 2. 遍歷每條規則，獨立檢測
+            for (RiskRuleConfig rule : enabledRules) {
+                RuleCheckResult result = rule.execute(event);
 
-            // 3. LiteFlow 規則引擎判定
-            if (totalScore >= 50) {
-                // 生成風控提案（不阻斷投注）
-                RiskProposal proposal = createProposal(event, totalScore);
-                riskProposalManager.saveAndNotify(proposal);
+                if (result.isMatched()) {
+                    // ✅ 規則匹配，立即生成獨立提案
+                    RiskProposal proposal = RiskProposal.builder()
+                        .playerId(event.getForm().getPlayerId())
+                        .betId(event.getBetId())
+                        .matchedRules(List.of(rule.getRuleCode()))
+                        .flaggedReasons(List.of(result.getMatchedReason()))
+                        .suspiciousAmount(event.getForm().getAmount())
+                        .status(ProposalStatus.PENDING_REVIEW)
+                        .priority(rule.getTriggerPriority())  // ← 使用規則的優先級
+                        .slaHours(calculateSlaHours(rule.getTriggerPriority()))
+                        .gameType(event.getForm().getGameType())
+                        .gameCode(event.getForm().getGameCode())
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                    riskProposalManager.saveAndNotify(proposal);
+
+                    log.info("[Risk] Rule triggered: rule={}, priority={}, playerId={}",
+                        rule.getRuleCode(), rule.getTriggerPriority(), event.getForm().getPlayerId());
+                }
             }
         } catch (Exception e) {
             log.error("[Risk] Async detection failed: betId={}", event.getBetId(), e);
@@ -315,41 +514,26 @@ public class RiskService {
     }
 
     /**
-     * 聚合風險評分
+     * 計算 SLA 時效（v2.0.0）
      */
-    private int aggregateScore(
-            DeviceFingerprintScore device,
-            BehaviorScore behavior,
-            IpLocationScore ip,
-            GameTypeScore game) {
-
-        // 加權計算
-        return (int) (
-            device.getScore() * 0.3 +
-            behavior.getScore() * 0.3 +
-            ip.getScore() * 0.2 +
-            game.getScore() * 0.2
-        );
-    }
-
-    /**
-     * 創建風控提案
-     */
-    private RiskProposal createProposal(BetPlacedEvent event, int totalScore) {
-        return RiskProposal.builder()
-                .playerId(event.getForm().getPlayerId())
-                .betId(event.getBetId())
-                .riskScore(totalScore)
-                .status(ProposalStatus.PENDING_REVIEW)
-                .proposalType(determineProposalType(totalScore))
-                .gameType(event.getForm().getGameType())
-                .gameCode(event.getForm().getGameCode())
-                .slaHours(totalScore >= 80 ? 2 : 24)  // 高風險 2h，標準 24h
-                .createdAt(LocalDateTime.now())
-                .build();
+    private int calculateSlaHours(String priority) {
+        return switch (priority) {
+            case "URGENT" -> 1;   // 黑名單、IP封禁 → 1小時
+            case "HIGH" -> 2;     // 機器人檢測 → 2小時
+            case "MEDIUM" -> 24;  // 異常投注 → 24小時
+            case "LOW" -> 48;     // 低風險行為 → 48小時
+            default -> 24;
+        };
     }
 }
 ```
+
+**關鍵差異（v1.0.0 → v2.0.0）**：
+- ❌ **移除**：`aggregateScore()` 加權聚合方法（30% + 30% + 20% + 20%）
+- ❌ **移除**：`createProposal()` 基於總分創建提案
+- ✅ **新增**：規則獨立檢測循環（每條規則獨立執行）
+- ✅ **新增**：每條規則匹配時立即生成獨立提案
+- ✅ **新增**：`calculateSlaHours()` 根據優先級計算 SLA（URGENT=1h, HIGH=2h, MEDIUM=24h, LOW=48h）
 
 #### Manager 層
 
@@ -399,60 +583,79 @@ public class RiskProposalManager {
 
 ---
 
-### LiteFlow 規則配置
+### 規則配置驅動設計（v2.0.0）
 
-#### 規則定義（YAML）
+#### 規則配置表（t_risk_rule_config）
 
-```yaml
-# config/risk-rules.yml
-risk-rules:
-  # 體育博彩：延遲投注檢測
-  - rule-id: LATE_BETTING_SPORTS
-    game-type: SPORTS_BETTING
-    blocking-enabled: false          # 不實時阻斷
-    alert-enabled: true              # 生成提案
-    require-manual-review: true      # 人工審核
-    risk-threshold: 80               # 風險閾值
-    sla-hours: 2                     # 高風險 SLA
+```sql
+CREATE TABLE t_risk_rule_config (
+    rule_code VARCHAR(50) PRIMARY KEY,
+    rule_name VARCHAR(100),
 
-  # 老虎機：獎金濫用檢測
-  - rule-id: BONUS_ABUSE_SLOTS
-    game-type: SLOTS
-    game-code: "MEGA_FORTUNE"        # 個別遊戲
-    blocking-enabled: false
-    alert-enabled: true
-    require-manual-review: true
-    risk-threshold: 70
-    sla-hours: 24
+    -- 核心欄位（v2.0.0）
+    action_type VARCHAR(20),         -- BLOCK / FLAG / IGNORE
+    trigger_priority VARCHAR(20),    -- URGENT / HIGH / MEDIUM / LOW
 
-  # VIP 玩家：大額取款檢測
-  - rule-id: VIP_LARGE_WITHDRAWAL
-    player-id: 123456                # 個別玩家
-    blocking-enabled: false
-    alert-enabled: true
-    require-manual-review: true
-    edd-required: true               # VIP EDD
-    risk-threshold: 50
-    sla-hours: 24
+    enabled BOOLEAN,
+    rule_params JSONB,
+    game_types JSON,
+    excluded_games JSON,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 索引
+CREATE INDEX idx_rule_enabled ON t_risk_rule_config(enabled, deleted);
 ```
 
-#### LiteFlow EL 表達式
+#### 規則配置示例（v2.0.0）
+
+```sql
+-- 黑名單玩家：BLOCK + URGENT
+INSERT INTO t_risk_rule_config VALUES
+('BLACKLIST_PLAYER', '黑名單玩家', 'BLOCK', 'URGENT', true, NULL, NULL, NULL);
+
+-- 機器人檢測：BLOCK + HIGH
+INSERT INTO t_risk_rule_config VALUES
+('BOT_DETECTION', '機器人檢測', 'BLOCK', 'HIGH', true, NULL, NULL, NULL);
+
+-- 低賠率洗水：FLAG + MEDIUM（體育博彩）
+INSERT INTO t_risk_rule_config VALUES
+('LOW_ODDS_WAGERING', '低賠率洗水', 'FLAG', 'MEDIUM', true, '{"threshold": 1.5}', '["SPORTS"]', NULL);
+
+-- 同局反向投注：BLOCK + HIGH（體育博彩）
+INSERT INTO t_risk_rule_config VALUES
+('SAME_MATCH_HEDGE', '同局反向投注', 'BLOCK', 'HIGH', true, NULL, '["SPORTS"]', NULL);
+
+-- 異常投注模式：FLAG + LOW（數據收集）
+INSERT INTO t_risk_rule_config VALUES
+('ABNORMAL_PATTERN', '異常投注模式', 'FLAG', 'LOW', true, NULL, NULL, NULL);
+```
+
+#### LiteFlow 規則執行流程（v2.0.0）
 
 ```java
-// 風控檢測流程
-THEN(
-    checkDeviceFingerprint,
-    checkBehaviorPattern,
-    checkIpLocation,
-    checkGameTypeRule,
-    aggregateRiskScore,
-    SWITCH(riskScore).to(
-        IF(riskScore >= 80, THEN(createHighRiskProposal)),
-        IF(riskScore >= 50, THEN(createMediumRiskProposal)),
-        DEFAULT(markNormal)
+// 規則獨立觸發流程（移除 aggregateRiskScore）
+FOR(ruleConfig IN enabledRules).DO(
+    THEN(
+        executeRule,                          // 執行單條規則檢測
+        IF(ruleMatched).THEN(
+            createIndependentProposal,        // 生成獨立提案
+            setPriorityFromConfig,            // 使用規則配置的優先級
+            notifyReviewQueue                 // 通知審核隊列
+        )
     )
 );
 ```
+
+**關鍵差異（v1.0.0 → v2.0.0）**：
+- ❌ **移除**：`aggregateRiskScore` 聚合風險評分步驟
+- ❌ **移除**：`SWITCH(riskScore)` 基於總分的決策分支
+- ❌ **移除**：`risk-threshold` 風險閾值配置（不再累加分數）
+- ✅ **新增**：`FOR` 循環遍歷所有規則（規則獨立執行）
+- ✅ **新增**：`action_type` 和 `trigger_priority` 配置欄位
+- ✅ **新增**：每條規則獨立生成提案
 
 ---
 
@@ -657,6 +860,57 @@ public void cleanupOldRiskData() {
 
 ---
 
-**文檔版本**: 1.0.0
-**最後更新**: 2026-02-03
-**下一步行動**: 開始實施異步風控提案系統（預估 10 人天）
+## 變更日誌
+
+### v2.0.0 (2026-02-05)
+
+**重大變更 - 規則獨立觸發模式**：
+
+1. ✅ **Service 層邏輯變更**：從「分數累加」改為「規則獨立觸發」
+   - 移除 `aggregateScore()` 加權聚合方法（設備 30% + 行為 30% + IP 20% + 遊戲 20%）
+   - 改為規則獨立檢測循環：每條規則匹配時立即生成獨立提案
+   - 新增 `calculateSlaHours()` 方法：根據優先級計算 SLA（URGENT=1h, HIGH=2h, MEDIUM=24h, LOW=48h）
+
+2. ✅ **規則配置表設計**：新增配置驅動欄位
+   - 新增 `action_type` 欄位：BLOCK / FLAG / IGNORE（規則處理方式）
+   - 新增 `trigger_priority` 欄位：URGENT / HIGH / MEDIUM / LOW（規則優先級）
+   - 移除 `risk_threshold` 欄位：不再需要分數閾值
+
+3. ✅ **LiteFlow 規則引擎變更**：移除聚合評分步驟
+   - 移除 `aggregateRiskScore` 節點
+   - 移除 `SWITCH(riskScore)` 決策分支
+   - 改為 `FOR` 循環遍歷所有規則（規則獨立執行）
+
+4. ✅ **新增章節**：規則獨立觸發模式設計
+   - §規則獨立觸發模式：核心概念、為什麼不使用分數累加、配置驅動設計
+   - 投注風控決策邏輯：規則獨立檢測流程
+   - 取款審核決策邏輯：按優先級判斷（URGENT > HIGH > MEDIUM > LOW）
+   - 審計追溯性提升：明確記錄觸發規則
+
+**業務價值**：
+- **精準決策**：關鍵違規（黑名單、IP封禁）不會被其他低風險規則稀釋
+- **合規性提升**：符合 MGA/UKGC 監管要求（關鍵違規立即處理）
+- **審計清晰**：明確追溯到具體規則，而非模糊的總分
+
+**設計原則**：
+- 每條規則獨立觸發，不依賴其他規則的分數
+- 規則優先級由配置表 `t_risk_rule_config.trigger_priority` 決定
+- 取款審核按最高優先級提案決策，不累加分數
+
+---
+
+### v1.0.0 (2026-02-03)
+
+**初始版本**：
+- 異步風控提案系統設計
+- Flag 模式替代實時阻斷模式
+- VIP EDD 強制（無豁免）
+- 取款時關聯投注時段
+- LiteFlow 規則引擎集成
+- MGA/UKGC 合規性設計
+
+---
+
+**文檔版本**: 2.0.0
+**最後更新**: 2026-02-05
+**下一步行動**: 更新相關技術規格文檔（P1-07 withdrawal、風控系統架構）

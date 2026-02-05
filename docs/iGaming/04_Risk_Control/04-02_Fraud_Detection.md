@@ -2,8 +2,8 @@
 
 ## 📋 文檔信息
 
-**文檔版本**: 2.0.0
-**最後更新**: 2026-02-04
+**文檔版本**: 3.0.0
+**最後更新**: 2026-02-05
 **維護團隊**: Risk Team & Backend Team
 **前置依賴**:
 - [04-01 風控框架](./04-01_Risk_Framework.md) - 配置驅動風控規則引擎 (§9)
@@ -529,19 +529,58 @@ public class WithdrawalSagaService {
         return riskProposalService
             .findPendingProposals(withdrawalRequest.getPlayerId(), 30)
             .flatMap(proposals -> {
-                // 2. 計算可疑金額總和
-                BigDecimal suspiciousAmount = proposals.stream()
-                    .map(RiskProposalVO::getSuspiciousAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 2. 按優先級分類計數（v3.0.0 規則獨立觸發模式）
+                long urgentCount = proposals.stream()
+                    .filter(p -> "URGENT".equals(p.getPriority()))
+                    .count();
 
-                // 3. 決策邏輯 (v2.1.0 簡化 - 人工審核為主)
-                if (suspiciousAmount.compareTo(BigDecimal.ZERO) == 0) {
-                    // 無可疑金額 → 繼續 Step 3
+                long highCount = proposals.stream()
+                    .filter(p -> "HIGH".equals(p.getPriority()))
+                    .count();
+
+                long mediumCount = proposals.stream()
+                    .filter(p -> "MEDIUM".equals(p.getPriority()))
+                    .count();
+
+                // 3. ✅ 按優先級決策（不累加分數）
+                String decision;
+                String reason;
+                BigDecimal suspiciousAmount = BigDecimal.ZERO;
+
+                if (urgentCount > 0) {
+                    decision = "BLOCKED";
+                    reason = "URGENT_PRIORITY_PROPOSALS_PENDING (黑名單/IP封禁)";
+                    // 計算 URGENT 優先級提案的總金額
+                    suspiciousAmount = proposals.stream()
+                        .filter(p -> "URGENT".equals(p.getPriority()))
+                        .map(RiskProposalVO::getSuspiciousAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    log.error("[Step 2.5] BLOCKED due to URGENT proposals: count={}", urgentCount);
+                } else if (highCount > 0) {
+                    decision = "BLOCKED";
+                    reason = "HIGH_PRIORITY_PROPOSALS_PENDING (機器人檢測)";
+                    // 計算 HIGH 優先級提案的總金額
+                    suspiciousAmount = proposals.stream()
+                        .filter(p -> "HIGH".equals(p.getPriority()))
+                        .map(RiskProposalVO::getSuspiciousAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    log.warn("[Step 2.5] BLOCKED due to HIGH proposals: count={}", highCount);
+                } else if (mediumCount > 0) {
+                    decision = "MANUAL_REVIEW";
+                    reason = "MEDIUM_PRIORITY_PROPOSALS_PENDING (異常投注)";
+                    // 計算 MEDIUM 優先級提案的總金額
+                    suspiciousAmount = proposals.stream()
+                        .filter(p -> "MEDIUM".equals(p.getPriority()))
+                        .map(RiskProposalVO::getSuspiciousAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    log.info("[Step 2.5] MANUAL_REVIEW due to MEDIUM proposals: count={}", mediumCount);
+                } else {
+                    // 無待審核提案 → 繼續 Step 3
                     return Option.of(StepResult.proceed());
                 }
 
-                // 可疑金額 > 0 → 生成人工審核提案
-                log.info("[Step 2.5] Manual review required, suspicious amount: {}", suspiciousAmount);
+                // 4. 生成人工審核提案
+                log.info("[Step 2.5] Decision: {}, Reason: {}, Amount: {}", decision, reason, suspiciousAmount);
 
                 String proposalId = riskProposalService.createManualReviewProposal(
                     RiskProposalCreateDTO.builder()
@@ -549,11 +588,13 @@ public class WithdrawalSagaService {
                         .suspiciousAmount(suspiciousAmount)
                         .historicalProposals(proposals)
                         .withdrawalRequestId(withdrawalRequest.getId())
+                        .decision(decision)
+                        .reason(reason)
                         .build()
                 ).getOrNull();
 
-                // 4. 凍結可疑金額,路由至審核隊列
-                return Option.of(StepResult.freeze(suspiciousAmount, proposalId));
+                // 5. 凍結可疑金額,路由至審核隊列
+                return Option.of(StepResult.freeze(suspiciousAmount, proposalId, decision, reason));
             });
     }
 }
@@ -614,53 +655,129 @@ public class RiskProposalService {
 }
 ```
 
-### 3.3 可疑金額計算規則
+### 3.3 按優先級決策規則（v3.0.0）
 
-**計算邏輯**:
+**核心概念**：
+- ❌ **不再累加分數**：移除所有提案的分數累加邏輯
+- ✅ **按優先級判斷**：URGENT > HIGH > MEDIUM > LOW
+- ✅ **明確決策原因**：記錄具體哪個優先級的提案觸發了阻斷
+
+**決策邏輯**:
 
 ```java
 /**
- * Service 層 - 可疑金額計算
+ * Service 層 - 按優先級決策（v3.0.0 規則獨立觸發模式）
  */
-public class RiskProposalService {
+public class WithdrawalRiskEvaluationService {
 
     /**
-     * 計算玩家的總可疑金額
+     * 評估取款風險並決策
+     *
+     * @param proposals 待審核提案列表
+     * @return WithdrawalDecision 決策結果
+     */
+    public WithdrawalDecision evaluateWithdrawalRisk(List<RiskProposalVO> proposals) {
+        // 1. 按優先級分類計數
+        long urgentCount = proposals.stream()
+            .filter(p -> "URGENT".equals(p.getPriority()))
+            .count();
+
+        long highCount = proposals.stream()
+            .filter(p -> "HIGH".equals(p.getPriority()))
+            .count();
+
+        long mediumCount = proposals.stream()
+            .filter(p -> "MEDIUM".equals(p.getPriority()))
+            .count();
+
+        // 2. ✅ 按優先級決策（不累加分數）
+        String decision;
+        String reason;
+        List<String> matchedRules = new ArrayList<>();
+
+        if (urgentCount > 0) {
+            decision = "BLOCKED";
+            reason = "URGENT_PRIORITY_PROPOSALS_PENDING (黑名單/IP封禁)";
+            // 記錄 URGENT 優先級提案觸發的規則
+            matchedRules = proposals.stream()
+                .filter(p -> "URGENT".equals(p.getPriority()))
+                .flatMap(p -> p.getMatchedRules().stream())
+                .distinct()
+                .collect(Collectors.toList());
+            log.error("[Withdrawal] BLOCKED due to URGENT proposals: count={}, rules={}", urgentCount, matchedRules);
+        } else if (highCount > 0) {
+            decision = "BLOCKED";
+            reason = "HIGH_PRIORITY_PROPOSALS_PENDING (機器人檢測)";
+            matchedRules = proposals.stream()
+                .filter(p -> "HIGH".equals(p.getPriority()))
+                .flatMap(p -> p.getMatchedRules().stream())
+                .distinct()
+                .collect(Collectors.toList());
+            log.warn("[Withdrawal] BLOCKED due to HIGH proposals: count={}, rules={}", highCount, matchedRules);
+        } else if (mediumCount > 0) {
+            decision = "MANUAL_REVIEW";
+            reason = "MEDIUM_PRIORITY_PROPOSALS_PENDING (異常投注)";
+            matchedRules = proposals.stream()
+                .filter(p -> "MEDIUM".equals(p.getPriority()))
+                .flatMap(p -> p.getMatchedRules().stream())
+                .distinct()
+                .collect(Collectors.toList());
+            log.info("[Withdrawal] MANUAL_REVIEW due to MEDIUM proposals: count={}, rules={}", mediumCount, matchedRules);
+        } else {
+            decision = "APPROVED";
+            reason = "NO_RISK_PROPOSALS";
+            log.info("[Withdrawal] APPROVED, no risk proposals");
+        }
+
+        // 3. 返回決策結果（包含明確的觸發規則）
+        return WithdrawalDecision.builder()
+            .decision(decision)
+            .reason(reason)
+            .matchedRules(matchedRules)
+            .urgentCount(urgentCount)
+            .highCount(highCount)
+            .mediumCount(mediumCount)
+            .build();
+    }
+
+    /**
+     * 計算指定優先級的可疑金額總和
      *
      * @param proposals 風控提案列表
-     * @return BigDecimal 總可疑金額
+     * @param priority 優先級 (URGENT/HIGH/MEDIUM/LOW)
+     * @return BigDecimal 該優先級的可疑金額總和
      */
-    public BigDecimal calculateTotalSuspiciousAmount(List<RiskProposalVO> proposals) {
-        // v2.1.0 簡化邏輯: 直接累加所有待審核提案的可疑金額
+    public BigDecimal calculateSuspiciousAmountByPriority(
+        List<RiskProposalVO> proposals,
+        String priority
+    ) {
         return proposals.stream()
-            .filter(proposal -> ProposalStatus.PENDING_REVIEW.equals(proposal.getStatus()))
+            .filter(p -> priority.equals(p.getPriority()))
+            .filter(p -> "PENDING_REVIEW".equals(p.getStatus()))
             .map(RiskProposalVO::getSuspiciousAmount)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
-    /**
-     * 計算去重後的可疑金額（避免重複計算同一注單）
-     *
-     * @param proposals 風控提案列表
-     * @return BigDecimal 去重後可疑金額
-     */
-    public BigDecimal calculateDeduplicatedSuspiciousAmount(List<RiskProposalVO> proposals) {
-        // 按 bet_id 分組,取最大可疑金額
-        Map<String, BigDecimal> betAmountMap = proposals.stream()
-            .filter(proposal -> ProposalStatus.PENDING_REVIEW.equals(proposal.getStatus()))
-            .collect(Collectors.groupingBy(
-                RiskProposalVO::getBetId,
-                Collectors.mapping(
-                    RiskProposalVO::getSuspiciousAmount,
-                    Collectors.reducing(BigDecimal.ZERO, BigDecimal::max)
-                )
-            ));
-
-        // 累加各注單的最大可疑金額
-        return betAmountMap.values().stream()
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }
+```
+
+**審計追溯性提升**:
+
+```
+❌ 舊模式（分數累加）：
+玩家取款被阻斷
+審計日誌：總風險分數 = 85 分
+問題：無法追溯具體哪條規則導致阻斷
+
+✅ 新模式（規則獨立觸發）：
+玩家取款被阻斷
+審計日誌：
+  - 決策: BLOCKED
+  - 原因: URGENT_PRIORITY_PROPOSALS_PENDING
+  - URGENT 提案數量: 2
+  - 觸發規則: [BLACKLIST_PLAYER, IP_BLOCKED]
+  - 可疑金額: $3,500 (URGENT 優先級提案總和)
+
+明確追溯到具體規則，審計清晰
 ```
 
 ---
@@ -1981,6 +2098,42 @@ class WithdrawalDeferredRiskCheckIntegrationTest {
 ---
 
 ## 9. 變更日誌 (Change Log)
+
+### v3.0.0 (2026-02-05)
+
+**重大變更 - 規則獨立觸發模式**：
+
+1. ✅ **取款審核決策邏輯變更**：從「分數累加」改為「按優先級判斷」
+   - 更新 §3.1 取款時觸發邏輯：改為按優先級分類計數（urgentCount, highCount, mediumCount）
+   - 決策規則：URGENT > HIGH > MEDIUM > LOW（按最高優先級判斷，不累加分數）
+   - 明確記錄決策原因：哪個優先級的提案觸發了阻斷
+
+2. ✅ **可疑金額計算邏輯變更**：從「累加所有提案」改為「按優先級分別計算」
+   - 更新 §3.3 可疑金額計算規則：移除 `calculateTotalSuspiciousAmount()` 累加方法
+   - 新增 `evaluateWithdrawalRisk()` 方法：按優先級決策
+   - 新增 `calculateSuspiciousAmountByPriority()` 方法：計算指定優先級的可疑金額
+
+3. ✅ **審計追溯性提升**：
+   - 記錄具體觸發規則：明確顯示哪些規則導致阻斷（如 [BLACKLIST_PLAYER, IP_BLOCKED]）
+   - 優先級計數：清晰顯示各優先級的提案數量
+   - 決策原因：明確記錄 URGENT_PRIORITY_PROPOSALS_PENDING 等原因
+
+**業務價值**：
+- **精準決策**：關鍵違規（黑名單、IP封禁）不會被其他低風險規則稀釋
+- **合規性提升**：符合 MGA/UKGC 監管要求（關鍵違規立即處理）
+- **審計清晰**：明確追溯到具體規則，而非模糊的總分
+
+**兼容性**：
+- ✅ API 接口保持兼容：Service 方法簽名不變
+- ⚠️ **行為變更**：決策邏輯從分數累加改為優先級判斷（重大行為變更）
+- ⚠️ **需同步更新**：ADR 012、P1-07 withdrawal 等相關文檔
+
+**設計原則**：
+- 每條規則獨立觸發，不依賴其他規則的分數
+- 規則優先級由配置表 `t_risk_rule_config.trigger_priority` 決定
+- 取款審核按最高優先級提案決策，不累加分數
+
+---
 
 ### v2.0.0 (2026-02-04)
 

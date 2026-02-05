@@ -89,3 +89,5 @@ venv/
 # Environment variables (contains sensitive data)
 .env.local
 *.local.env
+
+backup/

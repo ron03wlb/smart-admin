@@ -66,16 +66,18 @@ graph TB
         D --> SCORE["Risk Score Aggregation<br/>0-100 分"]
     end
 
-    subgraph "Action Layer - 行動層"
-        SCORE -->|Score >= 86| AC1["Auto Block<br/>凍結帳戶<br/>發送告警"]
-        SCORE -->|Score 61-85| AC2["Manual Review<br/>加入審核隊列<br/>ETA: 2 hours"]
-        SCORE -->|Score 31-60| AC3["Enhanced Monitoring<br/>增強監控<br/>30 days"]
-        SCORE -->|Score 0-30| AC4["Normal Flow<br/>正常放行"]
+    subgraph "Action Layer - 行動層 (Priority Based)"
+        D --> PRIORITY["Risk Level Classification<br/>URGENT / HIGH / MEDIUM / LOW"]
+        
+        PRIORITY -->|URGENT| AC1["🔴 Auto Block<br/>凍結帳戶<br/>發送告警"]
+        PRIORITY -->|HIGH| AC2["🟡 Auto Block / Review<br/>自動阻擋"]
+        PRIORITY -->|MEDIUM| AC3["🟡 Manual Review<br/>人工審核隊列"]
+        PRIORITY -->|LOW| AC4["🟢 Normal Flow<br/>正常放行"]
 
-        AC1 --> MQ1[Kafka: risk.fraud.detected]
-        AC2 --> MQ2[Kafka: risk.manual.review]
-        AC3 --> MQ3[Kafka: risk.player.flagged]
-        AC4 --> MQ4[Kafka: risk.validation.passed]
+        AC1 --> MQ1[Kafka: risk.priority.urgent]
+        AC2 --> MQ2[Kafka: risk.priority.high]
+        AC3 --> MQ3[Kafka: risk.priority.medium]
+        AC4 --> MQ4[Kafka: risk.priority.low]
     end
 
     subgraph "Feedback Loop - 反饋迴路"
@@ -127,8 +129,8 @@ graph TB
    - **決策服務**：加權融合或級聯決策，輸出 0-100 風險分數
 
 4. **行動層 (Action Layer)**：
-   - **分級處置**：根據風險分數自動路由（自動阻擋、人工審核、增強監控、正常放行）
-   - **事件發布**：發送 Kafka 事件通知下游系統（Finance、CS、VIP）
+   - **優先級路由**：基於 `URGENT/HIGH/MEDIUM/LOW` 進行處置 (v2.1.0 去除分數機制)
+   - **事件發布**：發送 Kafka 事件通知下游系統
 
 5. **反饋迴路 (Feedback Loop)**：
    - 人工審核結果回饋至規則引擎（調整權重）和 ML 模型（重訓練）
@@ -391,21 +393,19 @@ flowchart TD
 | **圖譜** | 同步行為 | 否 (+0) | - | 是 (+50) | - |
 | **圖譜** | 資金流聚集 | 否 (+0) | - | 是 (+60) | - |
 
-**處置動作決策矩陣**：
+**處置動作決策矩陣 (Priority Matrix)**：
 
-| 總分區間 | 風險等級 | 自動化動作 | 人工干預 | 通知 | 典型場景 |
-|---------|---------|-----------|---------|------|---------|
-| **0-30** | 🟢 LOW | 正常放行 | 無需 | 無 | 正常玩家 |
-| **31-60** | 🟡 MEDIUM | 增強監控 30 天 | 可選 | 內部告警 | VPN 用戶、共用設備 |
-| **61-85** | 🟡 HIGH | 加入人工審核隊列 | 必須 | 玩家 + CS | 疑似多帳號、異常投注 |
-| **86-100** | 🔴 CRITICAL | 立即凍結帳戶 | 緊急 | 玩家 + CS + 管理層 | 黑名單、確認欺詐 |
+| 風險等級 | 優先級代碼 | 自動化動作 | 人工干預 | 通知 | 典型場景 |
+|---------|-----------|-----------|---------|------|---------|
+| **CRITICAL** | 🔴 **URGENT** | **立即凍結** | 最高優先級審核 | 管理層 + CS | 黑名單、確認欺詐、資金流聚集 |
+| **HIGH** | 🔴 **HIGH** | **自動阻擋** | 優先審核 | 玩家 + CS | 機器人行為、高頻提款 |
+| **MEDIUM** | 🟡 **MEDIUM** | **人工審核** | 必須 | 內部告警 | 異常投注、IP 關聯 |
+| **LOW** | 🟢 **LOW** | **正常放行** | 無需 | 無 | 正常玩家 (含輕微異常) |
 
-**關鍵設計決策**：
-- ✅ **黑名單直接阻擋**：設備 ID 在黑名單中直接給予 100 分，跳過後續檢查
-- ✅ **多維度加權**：設備與支付維度權重最高（80-90 分），行為與圖譜次之（40-70 分）
-- ✅ **ML 模型輔助**：行為維度使用 ML 模型（Isolation Forest）進行異常檢測
-- ✅ **圖分析深度限制**：Neo4j BFS 深度限制為 3，避免查詢超時（> 3 秒）
-- ✅ **超時降級策略**：若圖分析超時，該維度分數記為 0，但標記為待覆核
+**關鍵設計決策 (v2.1.0)**：
+- ✅ **棄用分數制**：不再使用 0-100 分數，避免 "59分 vs 60分" 的邊界模糊問題。
+- ✅ **規則直接定級**：每條規則直接對應一個優先級 (如：`BLACKLIST -> URGENT`, `VELOCITY -> HIGH`)。
+- ✅ **最高優先級原則**：若觸發多條規則，取最高優先級 (e.g., HIGH + LOW = HIGH)。
 
 ### 帳號安全面臨大規模自動化攻擊
 

@@ -170,7 +170,7 @@ public class WithdrawalRiskCorrelationService {
 
 ---
 
-#### 取款風控關聯表（withdrawal_risk_correlations）
+#### 取款風控關聯表（withdrawal_risk_correlations v2.0.0）
 
 ```sql
 CREATE TABLE withdrawal_risk_correlations (
@@ -178,10 +178,16 @@ CREATE TABLE withdrawal_risk_correlations (
     withdrawal_id BIGINT NOT NULL,
     player_id BIGINT NOT NULL,
     correlated_proposals JSONB NOT NULL,  -- Array of proposal IDs
-    high_risk_count INTEGER NOT NULL,     -- 高風險提案數量
-    medium_risk_count INTEGER NOT NULL,   -- 中風險提案數量
-    total_risk_score INTEGER NOT NULL,    -- 總風險評分
+
+    -- v2.0.0: 按優先級分類計數（不再使用總風險評分）
+    urgent_count INTEGER NOT NULL,        -- URGENT 優先級提案數量
+    high_count INTEGER NOT NULL,          -- HIGH 優先級提案數量
+    medium_count INTEGER NOT NULL,        -- MEDIUM 優先級提案數量
+    low_count INTEGER NOT NULL,           -- LOW 優先級提案數量
+    highest_priority VARCHAR(20),         -- 最高優先級（URGENT/HIGH/MEDIUM/LOW）
+
     decision VARCHAR(20) NOT NULL,        -- APPROVED, BLOCKED, MANUAL_REVIEW
+    decision_reason VARCHAR(200),         -- 決策原因（如 URGENT_PRIORITY_PROPOSALS_PENDING）
     correlation_start_time TIMESTAMP NOT NULL,  -- 關聯時間範圍起點
     correlation_end_time TIMESTAMP NOT NULL,    -- 關聯時間範圍終點
     evaluated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -198,6 +204,9 @@ CREATE TABLE withdrawal_risk_correlations (
     ),
     CONSTRAINT chk_correlation_time CHECK (
         correlation_end_time > correlation_start_time
+    ),
+    CONSTRAINT chk_highest_priority CHECK (
+        highest_priority IN ('URGENT', 'HIGH', 'MEDIUM', 'LOW') OR highest_priority IS NULL
     )
 );
 
@@ -295,35 +304,49 @@ public ResponseDTO<WithdrawalRiskEvaluationVO> evaluateWithdrawalRisk(
 }
 ```
 
-**響應體**（WithdrawalRiskEvaluationVO）：
+**響應體**（WithdrawalRiskEvaluationVO v2.0.0）：
 ```json
 {
   "decision": "BLOCKED",
   "correlatedProposals": [
     {
       "proposalId": 12345,
-      "riskScore": 85,
+      "priority": "HIGH",
+      "matchedRules": ["BOT_DETECTION", "ABNORMAL_PATTERN"],
       "proposalType": "LATE_BETTING",
       "gameType": "SPORTS_BETTING",
       "createdAt": "2026-01-20T14:30:00"
     },
     {
       "proposalId": 12346,
-      "riskScore": 75,
+      "priority": "MEDIUM",
+      "matchedRules": ["MULTI_ACCOUNT"],
       "proposalType": "MULTI_ACCOUNT",
       "gameType": "SLOTS",
       "createdAt": "2026-01-28T09:15:00"
     }
   ],
-  "highRiskCount": 1,
-  "mediumRiskCount": 1,
-  "totalRiskScore": 160,
+  "urgentCount": 0,
+  "highCount": 1,
+  "mediumCount": 1,
+  "lowCount": 0,
+  "highestPriority": "HIGH",
   "correlationStartTime": "2026-01-15T10:00:00",
   "correlationEndTime": "2026-02-03T15:00:00",
   "requiresManualReview": true,
-  "reason": "HIGH_RISK_PROPOSALS_PENDING"
+  "reason": "HIGH_PRIORITY_PROPOSALS_PENDING (機器人檢測)"
 }
 ```
+
+**變更說明（v1.0.0 → v2.0.0）**：
+- ❌ **移除**：`totalRiskScore` 欄位（不再累加分數）
+- ❌ **移除**：`riskScore` 欄位（在 correlatedProposals 中）
+- ✅ **新增**：`urgentCount` 欄位（URGENT 優先級提案數量）
+- ✅ **新增**：`lowCount` 欄位（LOW 優先級提案數量）
+- ✅ **新增**：`highestPriority` 欄位（最高優先級：URGENT/HIGH/MEDIUM/LOW）
+- ✅ **新增**：`priority` 欄位（在 correlatedProposals 中，替代 riskScore）
+- ✅ **新增**：`matchedRules` 欄位（觸發的規則列表，審計追溯性提升）
+- ✅ **增強**：`reason` 欄位更明確（包含具體風險類型說明）
 
 ---
 
@@ -391,7 +414,7 @@ public ResponseDTO<Void> reviewWithdrawalRisk(
 
 ---
 
-### Service 層實現
+### Service 層實現（v2.0.0 - 按優先級判斷）
 
 ```java
 @Service
@@ -405,54 +428,91 @@ public class WithdrawalRiskService {
 
     /**
      * 評估取款風控狀態
+     * v2.0.0: 改為按優先級判斷（不累加分數）
      */
     public WithdrawalRiskEvaluationVO evaluate(WithdrawalRiskEvaluationForm form) {
-        // 1. 取得關聯風控提案
+        // 1. 取得關聯風控提案（近30天）
         List<RiskProposal> proposals = correlationService.getRelatedProposals(
                 form.getPlayerId(),
                 new WithdrawalRequest(form.getWithdrawalId(), form.getAmount())
         );
 
-        // 2. 統計風險提案
-        long highRiskCount = proposals.stream()
-                .filter(p -> p.getRiskScore() >= 80)
+        // 2. ✅ 按優先級分類計數（v2.0.0 規則獨立觸發模式）
+        long urgentCount = proposals.stream()
+                .filter(p -> "URGENT".equals(p.getPriority()))
                 .count();
 
-        long mediumRiskCount = proposals.stream()
-                .filter(p -> p.getRiskScore() >= 50 && p.getRiskScore() < 80)
+        long highCount = proposals.stream()
+                .filter(p -> "HIGH".equals(p.getPriority()))
                 .count();
 
-        int totalRiskScore = proposals.stream()
-                .mapToInt(RiskProposal::getRiskScore)
-                .sum();
+        long mediumCount = proposals.stream()
+                .filter(p -> "MEDIUM".equals(p.getPriority()))
+                .count();
 
-        // 3. 決策邏輯
+        long lowCount = proposals.stream()
+                .filter(p -> "LOW".equals(p.getPriority()))
+                .count();
+
+        // 3. ✅ 按優先級決策（不累加分數）
         String decision;
         boolean requiresManualReview = false;
         String reason = null;
+        String highestPriority = null;
 
-        if (highRiskCount > 0) {
+        if (urgentCount > 0) {
             decision = "BLOCKED";
             requiresManualReview = true;
-            reason = "HIGH_RISK_PROPOSALS_PENDING";
-        } else if (mediumRiskCount > 0) {
+            reason = "URGENT_PRIORITY_PROPOSALS_PENDING (黑名單/IP封禁)";
+            highestPriority = "URGENT";
+            log.error("[Withdrawal] BLOCKED due to URGENT proposals: count={}, playerId={}",
+                urgentCount, form.getPlayerId());
+        } else if (highCount > 0) {
+            decision = "BLOCKED";
+            requiresManualReview = true;
+            reason = "HIGH_PRIORITY_PROPOSALS_PENDING (機器人檢測)";
+            highestPriority = "HIGH";
+            log.warn("[Withdrawal] BLOCKED due to HIGH proposals: count={}, playerId={}",
+                highCount, form.getPlayerId());
+        } else if (mediumCount > 0) {
             decision = "MANUAL_REVIEW";
             requiresManualReview = true;
-            reason = "MEDIUM_RISK_PROPOSALS_PENDING";
+            reason = "MEDIUM_PRIORITY_PROPOSALS_PENDING (異常投注)";
+            highestPriority = "MEDIUM";
+            log.info("[Withdrawal] MANUAL_REVIEW due to MEDIUM proposals: count={}, playerId={}",
+                mediumCount, form.getPlayerId());
+        } else if (lowCount > 0) {
+            decision = "APPROVED";
+            requiresManualReview = false;
+            reason = "LOW_PRIORITY_PROPOSALS_EXIST (風險可控)";
+            highestPriority = "LOW";
+            log.info("[Withdrawal] APPROVED with LOW proposals: count={}, playerId={}",
+                lowCount, form.getPlayerId());
         } else {
             decision = "APPROVED";
+            requiresManualReview = false;
+            reason = "NO_RISK_PROPOSALS";
+            highestPriority = null;
+            log.info("[Withdrawal] APPROVED, no risk proposals: playerId={}", form.getPlayerId());
         }
 
-        // 4. 持久化關聯記錄
+        // 4. 持久化關聯記錄（v2.0.0 移除 totalRiskScore）
         WithdrawalRiskCorrelation correlation = manager.saveCorrelation(
-                form, proposals, decision, highRiskCount, mediumRiskCount, totalRiskScore
+                form, proposals, decision, urgentCount, highCount, mediumCount, lowCount, highestPriority
         );
 
         // 5. 構建響應
-        return buildEvaluationVO(correlation, proposals, requiresManualReview, reason);
+        return buildEvaluationVO(correlation, proposals, requiresManualReview, reason, highestPriority);
     }
 }
 ```
+
+**關鍵差異（v1.0.0 → v2.0.0）**：
+- ❌ **移除**：`totalRiskScore` 累加（`proposals.stream().mapToInt(RiskProposal::getRiskScore).sum()`）
+- ❌ **移除**：基於分數閾值的分類（≥80, 50-79）
+- ✅ **新增**：按優先級分類計數（urgentCount, highCount, mediumCount, lowCount）
+- ✅ **新增**：`highestPriority` 欄位（記錄最高優先級）
+- ✅ **新增**：明確的決策原因（URGENT_PRIORITY_PROPOSALS_PENDING 等）
 
 ---
 
@@ -818,6 +878,63 @@ groups:
 
 ---
 
-**文檔版本**: 1.0.0
-**最後更新**: 2026-02-03
-**下一步行動**: 開始實施取款風控關聯系統（預估 3 人天）
+## 變更日誌
+
+### v2.0.0 (2026-02-05)
+
+**重大變更 - 按優先級判斷模式**：
+
+1. ✅ **Service 層決策邏輯變更**：從「基於分數」改為「按優先級判斷」
+   - 移除 `totalRiskScore` 累加（`proposals.stream().mapToInt(RiskProposal::getRiskScore).sum()`）
+   - 移除基於分數閾值的分類（≥80, 50-79）
+   - 改為按優先級分類計數：urgentCount, highCount, mediumCount, lowCount
+   - 決策邏輯：URGENT > HIGH > MEDIUM > LOW（按最高優先級判斷）
+
+2. ✅ **API 響應體變更**（WithdrawalRiskEvaluationVO）：
+   - 移除 `totalRiskScore` 欄位
+   - 移除 `correlatedProposals[].riskScore` 欄位
+   - 新增 `urgentCount` 欄位（URGENT 優先級提案數量）
+   - 新增 `lowCount` 欄位（LOW 優先級提案數量）
+   - 新增 `highestPriority` 欄位（最高優先級：URGENT/HIGH/MEDIUM/LOW）
+   - 新增 `correlatedProposals[].priority` 欄位（替代 riskScore）
+   - 新增 `correlatedProposals[].matchedRules` 欄位（觸發的規則列表）
+   - 增強 `reason` 欄位：更明確的決策原因（如 URGENT_PRIORITY_PROPOSALS_PENDING）
+
+3. ✅ **數據庫表結構變更**（withdrawal_risk_correlations）：
+   - 移除 `total_risk_score` 欄位
+   - 移除 `high_risk_count`, `medium_risk_count` 欄位（基於分數閾值）
+   - 新增 `urgent_count` 欄位（URGENT 優先級提案數量）
+   - 新增 `high_count` 欄位（HIGH 優先級提案數量）
+   - 新增 `medium_count` 欄位（MEDIUM 優先級提案數量）
+   - 新增 `low_count` 欄位（LOW 優先級提案數量）
+   - 新增 `highest_priority` 欄位（最高優先級）
+   - 新增 `decision_reason` 欄位（決策原因）
+
+**業務價值**：
+- **精準決策**：關鍵違規（黑名單、IP封禁）不會被其他低風險規則稀釋
+- **審計清晰**：明確記錄觸發規則和最高優先級，而非模糊的總分
+- **合規性提升**：符合 MGA/UKGC 監管要求（關鍵違規立即處理）
+
+**兼容性**：
+- ⚠️ **API 不兼容**：響應體結構變更（移除 totalRiskScore，新增優先級欄位）
+- ⚠️ **數據庫遷移**：需要執行 DDL 變更（移除舊欄位，新增新欄位）
+- ✅ **業務邏輯兼容**：決策邏輯升級，但決策結果（BLOCKED/MANUAL_REVIEW/APPROVED）保持一致
+
+---
+
+### v1.0.0 (2026-02-03)
+
+**初始版本**：
+- 取款風控關聯系統設計
+- 時間範圍邏輯（正常用戶、首次取款用戶）
+- 基於分數閾值的決策邏輯（≥80, 50-79）
+- 數據庫表結構設計
+- API 接口設計
+- LiteFlow 規則配置
+- 性能優化策略
+
+---
+
+**文檔版本**: 2.0.0
+**最後更新**: 2026-02-05
+**下一步行動**: 更新風控系統架構文檔，完成文檔系列更新

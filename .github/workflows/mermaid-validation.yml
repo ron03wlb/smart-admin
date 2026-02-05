@@ -1,0 +1,131 @@
+name: Mermaid Syntax Validation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/iGaming/**/*.md'
+      - 'docs/plans/**/*.md'
+      - '.claude/**/*.md'
+
+jobs:
+  validate-mermaid:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Check stateDiagram <br/> tags
+        run: |
+          set -e
+
+          echo "檢查 stateDiagram 中的 <br/> 標籤..."
+
+          # 查找所有包含 stateDiagram-v2 的 Markdown 文件
+          FILES=$(find docs/iGaming docs/plans .claude -name "*.md" -type f 2>/dev/null || true)
+
+          if [ -z "$FILES" ]; then
+            echo "✓ 未找到 Markdown 文件"
+            exit 0
+          fi
+
+          ERROR_COUNT=0
+
+          # 檢查每個文件
+          for file in $FILES; do
+            # 提取 stateDiagram 代碼塊並檢查 <br/> 標籤
+            if grep -q "stateDiagram-v2" "$file"; then
+              if awk '/```mermaid/,/```/ {
+                    if (/stateDiagram-v2/) { in_state=1 }
+                    if (in_state && /<br\/?>/) { exit 1 }
+                    if (/```/) { in_state=0 }
+                  }' "$file"; then
+                : # 無錯誤
+              else
+                echo "❌ $file contains stateDiagram with <br/> tags"
+                ERROR_COUNT=$((ERROR_COUNT + 1))
+              fi
+            fi
+          done
+
+          if [ $ERROR_COUNT -gt 0 ]; then
+            echo ""
+            echo "❌ Found $ERROR_COUNT file(s) with stateDiagram <br/> errors"
+            echo ""
+            echo "Fix guide: .claude/skills/.../mermaid-best-practices.md §6"
+            echo "Auto-fix: ./scripts/batch-fix-statediagram-br.sh"
+            exit 1
+          fi
+
+          echo "✓ No stateDiagram <br/> tags found"
+
+      - name: Validate Mermaid Syntax (Sample Check)
+        run: |
+          set -e
+
+          echo "驗證 Mermaid 語法（抽樣檢查）..."
+
+          # 創建臨時目錄
+          mkdir -p /tmp/mermaid-validation
+
+          # 抽樣檢查前 5 個包含 Mermaid 的文件
+          FILES=$(grep -rl "```mermaid" docs/iGaming --include="*.md" | head -5 || true)
+
+          if [ -z "$FILES" ]; then
+            echo "✓ 未找到 Mermaid 圖表"
+            exit 0
+          fi
+
+          VALIDATED=0
+          FAILED=0
+
+          for file in $FILES; do
+            echo "驗證: $file"
+
+            # 提取第一個 Mermaid 代碼塊
+            awk '/```mermaid/,/```/ {
+              if (!/```mermaid/ && !/```/) print
+            }' "$file" > /tmp/mermaid-validation/temp.mmd
+
+            # 跳過空文件
+            if [ ! -s /tmp/mermaid-validation/temp.mmd ]; then
+              continue
+            fi
+
+            # 驗證語法（生成 SVG）
+            if mmdc -i /tmp/mermaid-validation/temp.mmd \
+                     -o /tmp/mermaid-validation/output.svg \
+                     -q 2>/tmp/mermaid-validation/error.log; then
+              VALIDATED=$((VALIDATED + 1))
+              echo "  ✓ 驗證通過"
+            else
+              FAILED=$((FAILED + 1))
+              echo "  ✗ 驗證失敗"
+              cat /tmp/mermaid-validation/error.log | head -5
+            fi
+          done
+
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "驗證完成"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "驗證通過: $VALIDATED"
+          echo "驗證失敗: $FAILED"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+          if [ $FAILED -gt 0 ]; then
+            echo ""
+            echo "❌ Mermaid 語法驗證失敗"
+            echo "請在 https://mermaid.live/ 中測試修復"
+            exit 1
+          fi
+
+          echo "✓ 所有抽樣文件驗證通過"
