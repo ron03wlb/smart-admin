@@ -49,7 +49,7 @@ class PositionContractAdapterTest {
     PositionEntity entity = new PositionEntity();
     entity.setPositionId(positionId);
     entity.setPositionName("軟體工程師");
-    entity.setPositionLevel(2);
+    entity.setPositionLevel("2");
     entity.setRemark("負責系統開發");
 
     when(positionDao.selectById(positionId)).thenReturn(entity);
@@ -61,7 +61,7 @@ class PositionContractAdapterTest {
     assertThat(result.isDefined()).isTrue();
     assertThat(result.get().getPositionId()).isEqualTo(positionId);
     assertThat(result.get().getPositionName()).isEqualTo("軟體工程師");
-    assertThat(result.get().getPositionLevel()).isEqualTo(2);
+    assertThat(result.get().getPositionLevel()).isEqualTo("2");
     assertThat(result.get().getRemark()).isEqualTo("負責系統開發");
     verify(positionDao).selectById(positionId);
   }
@@ -95,17 +95,17 @@ class PositionContractAdapterTest {
     PositionEntity entity1 = new PositionEntity();
     entity1.setPositionId(1L);
     entity1.setPositionName("軟體工程師");
-    entity1.setPositionLevel(2);
+    entity1.setPositionLevel("2");
 
     PositionEntity entity2 = new PositionEntity();
     entity2.setPositionId(2L);
     entity2.setPositionName("高級工程師");
-    entity2.setPositionLevel(3);
+    entity2.setPositionLevel("3");
 
     PositionEntity entity3 = new PositionEntity();
     entity3.setPositionId(3L);
     entity3.setPositionName("架構師");
-    entity3.setPositionLevel(4);
+    entity3.setPositionLevel("4");
 
     List<PositionEntity> entities = Arrays.asList(entity1, entity2, entity3);
     when(positionDao.selectList(null)).thenReturn(entities);
@@ -118,7 +118,7 @@ class PositionContractAdapterTest {
     assertThat(result).hasSize(3);
     assertThat(result.get(0).getPositionId()).isEqualTo(1L);
     assertThat(result.get(0).getPositionName()).isEqualTo("軟體工程師");
-    assertThat(result.get(0).getPositionLevel()).isEqualTo(2);
+    assertThat(result.get(0).getPositionLevel()).isEqualTo("2");
     assertThat(result.get(1).getPositionId()).isEqualTo(2L);
     assertThat(result.get(2).getPositionId()).isEqualTo(3L);
     verify(positionDao).selectList(null);
@@ -143,7 +143,7 @@ class PositionContractAdapterTest {
     PositionEntity entity = new PositionEntity();
     entity.setPositionId(1L);
     entity.setPositionName("實習生");
-    entity.setPositionLevel(1);
+    entity.setPositionLevel("1");
 
     List<PositionEntity> entities = Collections.singletonList(entity);
     when(positionDao.selectList(null)).thenReturn(entities);

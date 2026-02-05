@@ -51,10 +51,7 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-repeat-submit"))
     api(project(":smartadmin-common:smartadmin-common-data-masking"))
     api(project(":smartadmin-common:smartadmin-common-ip-geolocation"))
-
-    // Temporary: Security-protect module (not yet fully migrated)
-    // TODO: Remove this after security-protect is fully migrated to smartadmin-common-security
-    api(project(":sa-base:foundation:security-protect"))
+    api(project(":smartadmin-common:smartadmin-common-security"))
 
     // API Documentation
     compileOnly(libs.knife4j.openapi3.jakarta)

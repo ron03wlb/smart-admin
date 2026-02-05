@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
-import net.lab1024.sa.foundation.repeatsubmit.annotation.RepeatSubmit;
+import net.lab1024.sa.common.repeatsubmit.annotation.RepeatSubmit;
 import net.lab1024.sa.support.liteflow.domain.form.LiteFlowExecutionForm;
 import net.lab1024.sa.support.liteflow.domain.form.LiteFlowExecutionLogQueryForm;
 import net.lab1024.sa.support.liteflow.domain.vo.LiteFlowExecutionLogVO;

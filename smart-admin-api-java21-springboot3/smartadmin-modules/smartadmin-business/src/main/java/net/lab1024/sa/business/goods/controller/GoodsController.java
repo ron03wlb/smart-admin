@@ -17,7 +17,7 @@ import net.lab1024.sa.business.goods.domain.vo.GoodsVO;
 import net.lab1024.sa.business.goods.service.GoodsService;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
-import net.lab1024.sa.util.SmartExcelUtil;
+import net.lab1024.sa.common.web.web.util.SmartExcelUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

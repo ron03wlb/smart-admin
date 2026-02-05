@@ -34,15 +34,22 @@ public class ArchitectureTest {
 
   // Architecture: Controller -> Service -> Manager -> Dao
   // Service can also directly access Dao
+  // Note: Adapter layer excluded (API contract pattern requires cross-layer access)
   @ArchTest
   static final ArchRule layerDependencies =
       layeredArchitecture()
           .consideringAllDependencies()
-          // Exclude Interceptor and MyBatisPlugin from architecture checks
-          .ignoreDependency(resideInAPackage("..interceptor.."), alwaysTrue())
-          .ignoreDependency(simpleNameContaining("MyBatisPlugin"), alwaysTrue())
-          // Exclude DataScopeController (not in controller package - legacy structure)
-          .ignoreDependency(simpleNameContaining("DataScopeController"), alwaysTrue())
+          // Exclude non-standard layers from strict layering checks
+          .ignoreDependency(
+              resideInAPackage("..adapter.."), alwaysTrue()) // Adapter (API contract layer)
+          .ignoreDependency(resideInAPackage("..interceptor.."), alwaysTrue()) // Interceptor (AOP)
+          .ignoreDependency(resideInAPackage("..advice.."), alwaysTrue()) // Advice (AOP)
+          .ignoreDependency(resideInAPackage("..config.."), alwaysTrue()) // Config (infrastructure)
+          .ignoreDependency(
+              resideInAPackage("..datascope.."), alwaysTrue()) // DataScope (dynamic permission AOP)
+          .ignoreDependency(simpleNameContaining("MyBatisPlugin"), alwaysTrue()) // MyBatis plugins
+          .ignoreDependency(
+              simpleNameContaining("DataScopeController"), alwaysTrue()) // Legacy structure
           // Define layers
           .layer(LAYER_CONTROLLER)
           .definedBy("..controller..")

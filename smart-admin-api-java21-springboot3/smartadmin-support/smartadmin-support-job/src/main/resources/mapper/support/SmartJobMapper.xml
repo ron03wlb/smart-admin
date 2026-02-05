@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.job.repository.SmartJobDao">
+<mapper namespace="net.lab1024.sa.support.job.repository.SmartJobDao">
 
     <update id="updateDeletedFlag">
         update t_smart_job
@@ -9,7 +9,7 @@
     </update>
 
     <!-- 定时任务-分页查询 -->
-    <select id="query" resultType="net.lab1024.sa.base.module.support.job.api.domain.SmartJobVO">
+    <select id="query" resultType="net.lab1024.sa.support.job.api.domain.SmartJobVO">
         SELECT *
         FROM t_smart_job
         <where>
@@ -34,7 +34,7 @@
         </if>
     </select>
 
-    <select id="selectByJobClass" resultType="net.lab1024.sa.base.module.support.job.repository.domain.SmartJobEntity">
+    <select id="selectByJobClass" resultType="net.lab1024.sa.support.job.repository.domain.SmartJobEntity">
         SELECT *
         FROM t_smart_job
         WHERE job_class = #{jobClass}

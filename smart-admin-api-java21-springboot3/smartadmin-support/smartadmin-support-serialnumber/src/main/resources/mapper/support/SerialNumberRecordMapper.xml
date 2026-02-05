@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.serialnumber.dao.SerialNumberRecordDao">
+<mapper namespace="net.lab1024.sa.support.serialnumber.dao.SerialNumberRecordDao">
 
     <update id="updateRecord">
         update t_serial_number_record
@@ -23,7 +23,7 @@
     </select>
 
     <select id="query"
-            resultType="net.lab1024.sa.base.module.support.serialnumber.domain.SerialNumberRecordEntity">
+            resultType="net.lab1024.sa.support.serialnumber.domain.SerialNumberRecordEntity">
         select * from t_serial_number_record
         where serial_number_id = #{queryForm.serialNumberId}
         order by last_time desc

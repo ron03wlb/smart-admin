@@ -6,6 +6,9 @@ plugins {
 description = "SmartAdmin Business Module - Business"
 
 dependencies {
+    // API Contract Layer
+    api(project(":smartadmin-api:smartadmin-api-business"))
+
     // Spring Boot
     api(libs.spring.boot.starter.web)
     api(libs.spring.boot.starter.validation)
@@ -32,9 +35,6 @@ dependencies {
 
     // SA Common - Additional modules needed
     api(project(":smartadmin-common:smartadmin-common-cache"))
-
-    // Temporary: Foundation core for SmartExcelUtil (TODO: migrate to smartadmin-common-excel)
-    api(project(":sa-base:foundation:core"))
 
     // FastExcel library (needed for goods module Excel import/export)
     api("cn.idev.excel:fastexcel:1.2.0")

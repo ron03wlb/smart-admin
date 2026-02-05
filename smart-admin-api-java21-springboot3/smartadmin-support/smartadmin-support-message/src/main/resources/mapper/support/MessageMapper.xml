@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.message.dao.MessageDao">
+<mapper namespace="net.lab1024.sa.support.message.dao.MessageDao">
 
     <!-- 更新已读状态 -->
     <update id="updateReadFlag">
@@ -14,7 +14,7 @@
     </update>
 
     <!-- 分页查询消息 -->
-    <select id="query" resultType="net.lab1024.sa.base.module.support.message.domain.MessageVO">
+    <select id="query" resultType="net.lab1024.sa.support.message.domain.MessageVO">
         SELECT * FROM t_message
         <where>
             <if test="query.receiverUserType != null">

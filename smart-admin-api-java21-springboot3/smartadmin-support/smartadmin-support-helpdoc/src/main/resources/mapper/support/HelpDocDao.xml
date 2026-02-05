@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.helpdoc.dao.HelpDocDao">
+<mapper namespace="net.lab1024.sa.support.helpdoc.dao.HelpDocDao">
 
 
     <!-- ================================== 帮助文档【主表 t_help_doc 】 ================================== -->
-    <select id="queryAllHelpDocList" resultType="net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO">
+    <select id="queryAllHelpDocList" resultType="net.lab1024.sa.support.helpdoc.domain.vo.HelpDocVO">
         SELECT t_help_doc.*,
                t_help_doc_catalog.name as helpDocCatalogName
         FROM t_help_doc
                  left join t_help_doc_catalog on t_help_doc_catalog.help_doc_catalog_id = t_help_doc.help_doc_catalog_id
     </select>
 
-    <select id="query" resultType="net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO">
+    <select id="query" resultType="net.lab1024.sa.support.helpdoc.domain.vo.HelpDocVO">
         SELECT
         t_help_doc.* ,
         t_help_doc_catalog.name as helpDocCatalogName
@@ -46,14 +46,14 @@
     </update>
 
     <select id="queryHelpDocByCatalogId"
-            resultType="net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO">
+            resultType="net.lab1024.sa.support.helpdoc.domain.vo.HelpDocVO">
         select *
         from t_help_doc
         where help_doc_catalog_id = #{helpDocCatalogId}
     </select>
 
     <select id="queryHelpDocByRelationId"
-            resultType="net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocVO">
+            resultType="net.lab1024.sa.support.helpdoc.domain.vo.HelpDocVO">
         select t_help_doc.*
         from t_help_doc_relation
                  left join t_help_doc on t_help_doc.help_doc_id = t_help_doc_relation.help_doc_id
@@ -78,7 +78,7 @@
     </delete>
 
     <select id="queryRelationByHelpDoc"
-            resultType="net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocRelationVO">
+            resultType="net.lab1024.sa.support.helpdoc.domain.vo.HelpDocRelationVO">
         select *
         from t_help_doc_relation
         where help_doc_id = #{helpDocId}
@@ -104,7 +104,7 @@
           and user_id = #{userId}
     </update>
     <select id="queryViewRecordList"
-            resultType="net.lab1024.sa.base.module.support.helpdoc.domain.vo.HelpDocViewRecordVO">
+            resultType="net.lab1024.sa.support.helpdoc.domain.vo.HelpDocViewRecordVO">
         select *
         from t_help_doc_view_record
         where

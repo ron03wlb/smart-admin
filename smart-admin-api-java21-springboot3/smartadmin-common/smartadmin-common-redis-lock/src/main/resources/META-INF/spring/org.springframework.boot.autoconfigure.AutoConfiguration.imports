@@ -1,1 +1,1 @@
-net.lab1024.sa.foundation.redislock.config.Lock4jAutoConfiguration
+net.lab1024.sa.common.redislock.config.Lock4jAutoConfiguration

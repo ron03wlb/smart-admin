@@ -13,6 +13,9 @@ dependencies {
     // MyBatis Plus
     api(libs.mybatis.plus.spring.boot.starter)
 
+    // SA API (Contract layer)
+    api(project(":smartadmin-api:smartadmin-api-oa"))
+
     // SA Common Core
     api(project(":smartadmin-common:smartadmin-common-core"))
     api(project(":smartadmin-common:smartadmin-common-validation"))
@@ -32,9 +35,6 @@ dependencies {
 
     // SA Common - Additional modules needed
     api(project(":smartadmin-common:smartadmin-common-cache"))
-
-    // Temporary: Foundation core for SmartExcelUtil (TODO: migrate to smartadmin-common-excel)
-    api(project(":sa-base:foundation:core"))
 
     // FastExcel library (needed for enterprise module Excel export)
     api("cn.idev.excel:fastexcel:1.2.0")

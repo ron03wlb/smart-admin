@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.dict.dao.DictDao">
+<mapper namespace="net.lab1024.sa.support.dict.dao.DictDao">
 
     <!-- 查询结果列 -->
     <sql id="base_columns">
@@ -14,7 +14,7 @@
     </sql>
 
     <!-- 分页查询 -->
-    <select id="queryPage" resultType="net.lab1024.sa.base.module.support.dict.domain.vo.DictVO">
+    <select id="queryPage" resultType="net.lab1024.sa.support.dict.domain.vo.DictVO">
         SELECT
         <include refid="base_columns"/>
         FROM t_dict
@@ -37,7 +37,7 @@
         </if>
     </select>
 
-    <select id="selectByCode" resultType="net.lab1024.sa.base.module.support.dict.domain.entity.DictEntity">
+    <select id="selectByCode" resultType="net.lab1024.sa.support.dict.domain.entity.DictEntity">
         select * from t_dict where dict_code = #{code}
     </select>
 

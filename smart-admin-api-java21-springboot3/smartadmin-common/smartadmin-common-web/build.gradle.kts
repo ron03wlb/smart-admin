@@ -22,6 +22,11 @@ dependencies {
     // Apache HttpClient 5 (for RestClient configuration)
     api("org.apache.httpcomponents.client5:httpclient5")
 
+    // FastExcel library (needed for SmartExcelUtil)
+    api("cn.idev.excel:fastexcel:1.2.0")
+    api("org.apache.poi:poi:5.2.5")
+    api("org.apache.poi:poi-ooxml:5.2.5")
+
     // Sa-Token (for NotPermissionException)
     api("cn.dev33:sa-token-spring-boot3-starter")
 

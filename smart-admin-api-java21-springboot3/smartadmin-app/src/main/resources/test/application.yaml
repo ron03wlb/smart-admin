@@ -1,0 +1,63 @@
+#############################################################################################################
+#                                                                                                           #
+# SmartAdmin v4.1.0 測試環境配置                                                                              #
+# 使用 H2 內存數據庫和 Testcontainers (Redis, PostgreSQL)                                                     #
+#                                                                                                           #
+#############################################################################################################
+
+# 項目配置
+project:
+  name: smartadmin-app
+  log-directory: ${user.home}/logs/smart_admin_v4/${project.name}/${spring.profiles.active}
+
+# 項目端口
+server:
+  port: 0  # 隨機端口用於測試
+
+# 環境
+spring:
+  profiles:
+    active: '@profiles.active@'
+
+  # Java 21 Virtual Threads
+  threads:
+    virtual:
+      enabled: true
+
+  # H2 內存數據庫（單元測試用）
+  datasource:
+    url: jdbc:h2:mem:smart_admin_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 5
+
+  # Redis（集成測試時由 Testcontainers 提供）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# Sa-Token
+sa-token:
+  token-name: satoken
+  timeout: 86400  # 1 天（測試用）
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  is-log: false
+
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: net.lab1024.sa.**.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+# Knife4j（測試環境關閉）
+knife4j:
+  enable: false

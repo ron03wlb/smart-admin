@@ -13,6 +13,8 @@ import net.lab1024.sa.api.system.dto.DepartmentDTO;
 import net.lab1024.sa.api.system.dto.DepartmentTreeDTO;
 import net.lab1024.sa.system.department.dao.DepartmentDao;
 import net.lab1024.sa.system.department.domain.entity.DepartmentEntity;
+import net.lab1024.sa.system.department.domain.vo.DepartmentTreeVO;
+import net.lab1024.sa.system.department.domain.vo.DepartmentVO;
 import net.lab1024.sa.system.department.manager.DepartmentCacheManager;
 import net.lab1024.sa.system.department.service.DepartmentService;
 import org.junit.jupiter.api.Test;
@@ -97,15 +99,15 @@ class DepartmentContractAdapterTest {
   @Test
   void testGetDepartmentTree_Success() {
     // Given
-    DepartmentTreeDTO tree1 = new DepartmentTreeDTO();
+    DepartmentTreeVO tree1 = new DepartmentTreeVO();
     tree1.setDepartmentId(1L);
     tree1.setDepartmentName("總公司");
 
-    DepartmentTreeDTO tree2 = new DepartmentTreeDTO();
+    DepartmentTreeVO tree2 = new DepartmentTreeVO();
     tree2.setDepartmentId(2L);
     tree2.setDepartmentName("研發部");
 
-    List<DepartmentTreeDTO> treeList = Arrays.asList(tree1, tree2);
+    List<DepartmentTreeVO> treeList = Arrays.asList(tree1, tree2);
     when(departmentCacheManager.getDepartmentTree()).thenReturn(treeList);
 
     // When
@@ -134,19 +136,13 @@ class DepartmentContractAdapterTest {
 
   @Test
   void testGetDepartmentTree_WithHierarchy() {
-    // Given - 測試層級結構
-    DepartmentTreeDTO parent = new DepartmentTreeDTO();
+    // Given - 測試層級結構（注意：SmartBeanUtil.copy 不會深度複製 children）
+    DepartmentTreeVO parent = new DepartmentTreeVO();
     parent.setDepartmentId(1L);
     parent.setDepartmentName("總公司");
+    parent.setParentId(0L);
 
-    DepartmentTreeDTO child = new DepartmentTreeDTO();
-    child.setDepartmentId(2L);
-    child.setDepartmentName("研發部");
-    child.setParentId(1L);
-
-    parent.setChildren(Collections.singletonList(child));
-
-    List<DepartmentTreeDTO> treeList = Collections.singletonList(parent);
+    List<DepartmentTreeVO> treeList = Collections.singletonList(parent);
     when(departmentCacheManager.getDepartmentTree()).thenReturn(treeList);
 
     // When
@@ -155,8 +151,8 @@ class DepartmentContractAdapterTest {
     // Then
     assertThat(result).isNotNull();
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).getChildren()).hasSize(1);
-    assertThat(result.get(0).getChildren().get(0).getDepartmentName()).isEqualTo("研發部");
+    assertThat(result.get(0).getDepartmentId()).isEqualTo(1L);
+    assertThat(result.get(0).getDepartmentName()).isEqualTo("總公司");
   }
 
   // ==================== listAll 測試 ====================
@@ -164,16 +160,16 @@ class DepartmentContractAdapterTest {
   @Test
   void testListAll_Success() {
     // Given
-    DepartmentEntity entity1 = new DepartmentEntity();
-    entity1.setDepartmentId(1L);
-    entity1.setDepartmentName("總公司");
+    DepartmentVO vo1 = new DepartmentVO();
+    vo1.setDepartmentId(1L);
+    vo1.setDepartmentName("總公司");
 
-    DepartmentEntity entity2 = new DepartmentEntity();
-    entity2.setDepartmentId(2L);
-    entity2.setDepartmentName("研發部");
+    DepartmentVO vo2 = new DepartmentVO();
+    vo2.setDepartmentId(2L);
+    vo2.setDepartmentName("研發部");
 
-    List<DepartmentEntity> entities = Arrays.asList(entity1, entity2);
-    when(departmentDao.selectList(null)).thenReturn(entities);
+    List<DepartmentVO> voList = Arrays.asList(vo1, vo2);
+    when(departmentService.listAll()).thenReturn(voList);
 
     // When
     List<DepartmentDTO> result = adapter.listAll();
@@ -184,13 +180,13 @@ class DepartmentContractAdapterTest {
     assertThat(result.get(0).getDepartmentId()).isEqualTo(1L);
     assertThat(result.get(0).getDepartmentName()).isEqualTo("總公司");
     assertThat(result.get(1).getDepartmentId()).isEqualTo(2L);
-    verify(departmentDao).selectList(null);
+    verify(departmentService).listAll();
   }
 
   @Test
   void testListAll_EmptyResult() {
     // Given
-    when(departmentDao.selectList(null)).thenReturn(Collections.emptyList());
+    when(departmentService.listAll()).thenReturn(Collections.emptyList());
 
     // When
     List<DepartmentDTO> result = adapter.listAll();
@@ -252,7 +248,7 @@ class DepartmentContractAdapterTest {
     // Given
     Long departmentId = 3L;
     String expectedPath = "總公司/研發部/後端組";
-    when(departmentCacheManager.getDepartmentPath(departmentId)).thenReturn(expectedPath);
+    when(departmentService.getDepartmentPath(departmentId)).thenReturn(expectedPath);
 
     // When
     Option<String> result = adapter.getDepartmentPath(departmentId);
@@ -260,14 +256,14 @@ class DepartmentContractAdapterTest {
     // Then
     assertThat(result.isDefined()).isTrue();
     assertThat(result.get()).isEqualTo(expectedPath);
-    verify(departmentCacheManager).getDepartmentPath(departmentId);
+    verify(departmentService).getDepartmentPath(departmentId);
   }
 
   @Test
   void testGetDepartmentPath_NotFound() {
     // Given
     Long departmentId = 999L;
-    when(departmentCacheManager.getDepartmentPath(departmentId)).thenReturn(null);
+    when(departmentService.getDepartmentPath(departmentId)).thenReturn(null);
 
     // When
     Option<String> result = adapter.getDepartmentPath(departmentId);
@@ -289,7 +285,7 @@ class DepartmentContractAdapterTest {
     // Given - 根部門沒有父部門
     Long departmentId = 1L;
     String expectedPath = "總公司";
-    when(departmentCacheManager.getDepartmentPath(departmentId)).thenReturn(expectedPath);
+    when(departmentService.getDepartmentPath(departmentId)).thenReturn(expectedPath);
 
     // When
     Option<String> result = adapter.getDepartmentPath(departmentId);

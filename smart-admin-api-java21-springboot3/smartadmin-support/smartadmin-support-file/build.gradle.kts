@@ -34,7 +34,7 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-cache"))
 
     // SA Common - Security Protect (for FileSecurityService, SecurityConfigProvider)
-    api(project(":sa-base:foundation:security-protect"))
+    api(project(":smartadmin-common:smartadmin-common-security"))
 
     // SA Common Repeat Submit
     api(project(":smartadmin-common:smartadmin-common-repeat-submit"))

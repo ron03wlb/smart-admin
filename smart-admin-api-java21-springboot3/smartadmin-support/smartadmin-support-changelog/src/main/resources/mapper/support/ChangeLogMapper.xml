@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.changelog.dao.ChangeLogDao">
+<mapper namespace="net.lab1024.sa.support.changelog.dao.ChangeLogDao">
 
     <!-- 分页查询 -->
-    <select id="queryPage" resultType="net.lab1024.sa.base.module.support.changelog.domain.vo.ChangeLogVO">
+    <select id="queryPage" resultType="net.lab1024.sa.support.changelog.domain.vo.ChangeLogVO">
         SELECT
         *
         FROM t_change_log
@@ -39,7 +39,7 @@
     </select>
 
     <select id="selectByVersion"
-            resultType="net.lab1024.sa.base.module.support.changelog.domain.entity.ChangeLogEntity">
+            resultType="net.lab1024.sa.support.changelog.domain.entity.ChangeLogEntity">
         select * from t_change_log where update_version = #{version}
     </select>
 

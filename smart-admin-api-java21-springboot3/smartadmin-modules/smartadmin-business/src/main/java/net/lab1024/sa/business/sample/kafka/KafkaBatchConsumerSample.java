@@ -48,6 +48,17 @@ import org.springframework.stereotype.Component;
 public class KafkaBatchConsumerSample extends AbstractBatchKafkaListener<String> {
 
   /**
+   * 構造函數
+   *
+   * @param deadLetterService DLQ 服務（可選）
+   */
+  public KafkaBatchConsumerSample(
+      @org.springframework.lang.Nullable
+          net.lab1024.sa.common.mq.kafka.dlq.DeadLetterService deadLetterService) {
+    super(deadLetterService);
+  }
+
+  /**
    * 批量监听通知 Topic
    *
    * <p>使用 batchKafkaListenerContainerFactory 启用批量消费模式

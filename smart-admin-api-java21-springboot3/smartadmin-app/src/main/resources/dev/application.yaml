@@ -1,0 +1,94 @@
+#############################################################################################################
+#                                                                                                           #
+# SmartAdmin v4.1.0 統一應用配置文件（開發環境）                                                                 #
+# 此配置繼承 smartadmin-common 和 smartadmin-support 各模塊的 AutoConfiguration                                #
+#                                                                                                           #
+#############################################################################################################
+
+# 項目配置: 名稱、日誌目錄
+project:
+  name: smartadmin-app
+  log-directory: ${user.home}/logs/smart_admin_v4/${project.name}/${spring.profiles.active}
+
+# 項目端口和 URL 根路徑
+server:
+  port: 1024
+  servlet:
+    context-path: /
+
+# 環境
+spring:
+  profiles:
+    active: '@profiles.active@'
+
+  # Java 21 Virtual Threads 配置（I/O 密集型任務性能提升 30-50%）
+  threads:
+    virtual:
+      enabled: true
+
+  # 數據源配置（PostgreSQL）
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smart_admin
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+    # HikariCP 連接池配置
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 6000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# Sa-Token 配置
+sa-token:
+  token-name: satoken
+  timeout: 2592000  # 30 天
+  active-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  is-log: false
+
+# MyBatis Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: net.lab1024.sa.**.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+# Knife4j API 文檔配置
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
+
+# SmartAdmin Support 模塊配置
+# 心跳配置
+heart-beat:
+  interval-seconds: 300
+
+# 熱加載配置
+reload:
+  interval-seconds: 300
+
+# 跨域配置
+access-control-allow-origin: '*'

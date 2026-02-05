@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.support.job.repository.domain.SmartJobEntity;
 import net.lab1024.sa.support.job.repository.domain.SmartJobLogEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * job 持久化业务
@@ -31,10 +30,11 @@ public class SmartJobRepository {
   /**
    * 保存执行记录
    *
+   * <p>注意：此方法不包含事务，调用方需要确保事务管理
+   *
    * @param logEntity
    * @param jobEntity
    */
-  @Transactional(rollbackFor = Throwable.class)
   public void saveLog(SmartJobLogEntity logEntity, SmartJobEntity jobEntity) {
     jobLogDao.insert(logEntity);
 

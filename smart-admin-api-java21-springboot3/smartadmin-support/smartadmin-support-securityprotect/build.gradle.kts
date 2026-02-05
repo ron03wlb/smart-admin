@@ -27,8 +27,8 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-web"))
     api(project(":smartadmin-common:smartadmin-common-mybatis"))
 
-    // SA Base Security-Protect (foundation module)
-    api(project(":sa-base:foundation:security-protect"))
+    // SA Common Security (foundation module)
+    api(project(":smartadmin-common:smartadmin-common-security"))
 
     // SA Support - Config service dependency
     api(project(":smartadmin-support:smartadmin-support-config"))

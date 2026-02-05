@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import net.lab1024.sa.api.system.dto.EmployeeDTO;
-import net.lab1024.sa.common.core.domain.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.system.employee.dao.EmployeeDao;
 import net.lab1024.sa.system.employee.domain.entity.EmployeeEntity;
 import net.lab1024.sa.system.employee.domain.vo.EmployeeVO;

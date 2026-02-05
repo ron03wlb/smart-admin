@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.admin.module.business.oa.notice.dao.NoticeDao">
+<mapper namespace="net.lab1024.sa.oa.notice.dao.NoticeDao">
 
     <!-- 查询结果列 -->
     <sql id="base_columns">
@@ -41,7 +41,7 @@
     </delete>
 
     <select id="queryVisibleRange"
-            resultType="net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeVisibleRangeVO">
+            resultType="net.lab1024.sa.oa.notice.domain.vo.NoticeVisibleRangeVO">
         select *
         from t_notice_visible_range
         where notice_id = #{noticeId}
@@ -55,7 +55,7 @@
     </update>
 
     <!-- 后管分页查询资讯 -->
-    <select id="query" resultType="net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeVO">
+    <select id="query" resultType="net.lab1024.sa.oa.notice.domain.vo.NoticeVO">
         SELECT
         <include refid="base_columns"/>,
         t_notice_type.notice_type_name as noticeTypeName,
@@ -101,7 +101,7 @@
     </select>
 
     <!-- ================================== 通知公告【员工查看】相关 ================================== -->
-    <select id="queryEmployeeNotice" resultType="net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeEmployeeVO">
+    <select id="queryEmployeeNotice" resultType="net.lab1024.sa.oa.notice.domain.vo.NoticeEmployeeVO">
         select
         <include refid="base_columns"/>,
         t_notice_type.notice_type_name,
@@ -156,7 +156,7 @@
         </where>
         order by t_notice.publish_time desc
     </select>
-    <select id="queryEmployeeNotViewNotice" resultType="net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeEmployeeVO">
+    <select id="queryEmployeeNotViewNotice" resultType="net.lab1024.sa.oa.notice.domain.vo.NoticeEmployeeVO">
         select * from
         (
         select
@@ -209,7 +209,7 @@
         ) t where viewFlag = 0
         order by t.publish_time desc
     </select>
-    <select id="queryNoticeViewRecordList" resultType="net.lab1024.sa.admin.module.business.oa.notice.domain.vo.NoticeViewRecordVO">
+    <select id="queryNoticeViewRecordList" resultType="net.lab1024.sa.oa.notice.domain.vo.NoticeViewRecordVO">
         select t_notice_view_record.*,
         t_employee.actual_name as employeeName,
         t_department.department_name

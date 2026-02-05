@@ -196,13 +196,12 @@ class MenuContractAdapterTest {
 
   @Test
   void testQueryByRoleId_ExcludeDeletedMenus() {
-    // Given - 測試排除已刪除的菜單
+    // Given - 測試排除已刪除的菜單（通過參數 deletedFlag=FALSE）
     Long roleId = 1L;
 
     MenuEntity activeMenu = new MenuEntity();
     activeMenu.setMenuId(1L);
     activeMenu.setMenuName("系統管理");
-    activeMenu.setDeletedFlag(false);
 
     List<MenuEntity> entities = Collections.singletonList(activeMenu);
     when(roleMenuDao.selectMenuListByRoleIdList(List.of(roleId), Boolean.FALSE))
@@ -214,7 +213,7 @@ class MenuContractAdapterTest {
     // Then
     assertThat(result).isNotNull();
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).getDeletedFlag()).isFalse();
+    assertThat(result.get(0).getMenuName()).isEqualTo("系統管理");
     verify(roleMenuDao).selectMenuListByRoleIdList(List.of(roleId), Boolean.FALSE);
   }
 }

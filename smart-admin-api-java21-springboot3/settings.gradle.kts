@@ -5,71 +5,8 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 // Include subprojects
 include(
-    // === Layer 0: Foundation - Cross-cutting concerns (14 modules, formerly sa-common) ===
-    "sa-base",
-    "sa-base:foundation:domain",
-    "sa-base:foundation:validation",
-    "sa-base:foundation:json",
-    "sa-base:foundation:ip-geolocation",
-    "sa-base:foundation:excel",
-    "sa-base:foundation:core",
-    "sa-base:foundation:mq",
-    "sa-base:foundation:cache",
-    "sa-base:foundation:redis-lock",
-    "sa-base:foundation:api-encrypt",
-    "sa-base:foundation:captcha",
-    "sa-base:foundation:repeat-submit",
-    "sa-base:foundation:data-masking",
-    "sa-base:foundation:security-protect",
-
-    // === Layer 1: Infrastructure (7 modules, formerly sa-base-*) ===
-    // Note: infrastructure:core merged into foundation:core to resolve Gradle circular dependency
-    "sa-base:infrastructure:web",
-    "sa-base:infrastructure:mybatis",
-    "sa-base:infrastructure:redis",
-    "sa-base:infrastructure:token",
-    "sa-base:infrastructure:datasource",
-    "sa-base:infrastructure:swagger",
-    "sa-base:infrastructure:devtools",
-
-    // === Layer 2: Business Support (17 modules, formerly sa-base-support) ===
-    // Configuration and system management
-    "sa-base:support:config",
-    "sa-base:support:dict",
-    "sa-base:support:reload",
-
-    // File and document management
-    "sa-base:support:file",
-    "sa-base:support:helpdoc",
-
-    // Job scheduling and monitoring
-    "sa-base:support:job",
-    "sa-base:support:heartbeat",
-
-    // Workflow and rules engine
-    "sa-base:support:liteflow",
-
-    // Logging and auditing
-    "sa-base:support:loginlog",
-    "sa-base:support:operatelog",
-    "sa-base:support:datatracer",
-
-    // User interaction
-    "sa-base:support:feedback",
-    "sa-base:support:message",
-    "sa-base:support:changelog",
-
-    // Utilities
-    "sa-base:support:table",
-    "sa-base:support:mail",
-    "sa-base:support:serialnumber",
-    "sa-base:support:codegenerator",
-
-    // === Application Layer ===
-    "sa-admin",
-
     // =========================================================================
-    // NEW STRUCTURE (v4.1.0 Directory Restructure - Week 1)
+    // SmartAdmin v4.1.0 Directory Structure
     // =========================================================================
 
     // === smartadmin-common: Public Foundation (21 modules) ===
@@ -126,8 +63,9 @@ include(
     "smartadmin-api:smartadmin-api-business",
     "smartadmin-api:smartadmin-api-oa",
 
-    // === smartadmin-starter: Starter Combinations (1 module) ===
-    "smartadmin-starter",
+    // === smartadmin-starter: Starter Combinations (2 modules) ===
+    "smartadmin-starter:smartadmin-starter-web",
+    "smartadmin-starter:smartadmin-starter-all",
 
     // === smartadmin-app: Unified Application Entry (1 module) ===
     "smartadmin-app"

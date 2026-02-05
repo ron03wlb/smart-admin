@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.ipgeo.util.IpGeolocationUtil;
-import net.lab1024.sa.foundation.redislock.LockService;
+import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.support.job.constant.SmartJobConst;
 import net.lab1024.sa.support.job.constant.SmartJobUtil;
 import net.lab1024.sa.support.job.repository.SmartJobRepository;

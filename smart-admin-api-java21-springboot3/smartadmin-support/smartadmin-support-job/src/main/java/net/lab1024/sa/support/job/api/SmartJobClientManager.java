@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.foundation.redislock.LockService;
+import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.support.job.api.domain.SmartJobMsg;
 import net.lab1024.sa.support.job.config.SmartJobAutoConfiguration;
 import net.lab1024.sa.support.job.core.SmartJob;

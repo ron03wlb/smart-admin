@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.dlq.DeadLetterService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.lang.Nullable;
 
 /**
  * Kafka 批量消费者抽象基类
@@ -53,8 +53,16 @@ import org.springframework.kafka.support.Acknowledgment;
 @SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public abstract class AbstractBatchKafkaListener<T> {
 
-  @Autowired(required = false)
-  private DeadLetterService deadLetterService;
+  @Nullable private final DeadLetterService deadLetterService;
+
+  /**
+   * 構造函數
+   *
+   * @param deadLetterService DLQ 服務（可選，為 null 時將不發送失敗消息到死信隊列）
+   */
+  protected AbstractBatchKafkaListener(@Nullable DeadLetterService deadLetterService) {
+    this.deadLetterService = deadLetterService;
+  }
 
   /**
    * 处理批量消息的模板方法

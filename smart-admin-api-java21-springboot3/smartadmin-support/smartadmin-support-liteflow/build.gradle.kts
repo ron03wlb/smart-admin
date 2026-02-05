@@ -31,7 +31,7 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-mybatis"))
 
     // SA Infrastructure - Token (Sa-Token for permission control)
-    api(project(":sa-base:infrastructure:token"))
+    api(project(":smartadmin-common:smartadmin-common-token"))
 
     // SA Infrastructure - Web (for RequestUser)
     api(project(":smartadmin-common:smartadmin-common-web"))

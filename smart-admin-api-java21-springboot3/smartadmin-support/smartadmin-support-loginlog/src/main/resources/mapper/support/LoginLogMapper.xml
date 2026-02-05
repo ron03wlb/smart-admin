@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.base.module.support.loginlog.LoginLogDao">
+<mapper namespace="net.lab1024.sa.support.loginlog.LoginLogDao">
 
-    <select id="queryByPage" resultType="net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO">
+    <select id="queryByPage" resultType="net.lab1024.sa.support.loginlog.domain.LoginLogVO">
         select
         *
         from t_login_log
@@ -29,7 +29,7 @@
         order by create_time desc
     </select>
 
-    <select id="queryLastByUserId" resultType="net.lab1024.sa.base.module.support.loginlog.domain.LoginLogVO">
+    <select id="queryLastByUserId" resultType="net.lab1024.sa.support.loginlog.domain.LoginLogVO">
         select
         *
         from t_login_log

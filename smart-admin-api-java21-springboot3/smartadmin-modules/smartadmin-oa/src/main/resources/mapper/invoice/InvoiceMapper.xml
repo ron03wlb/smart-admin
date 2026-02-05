@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.admin.module.business.oa.invoice.dao.InvoiceDao">
+<mapper namespace="net.lab1024.sa.oa.invoice.dao.InvoiceDao">
     <update id="deleteInvoice">
         UPDATE t_oa_invoice
         SET deleted_flag = #{deletedFlag}
         WHERE invoice_id = #{invoiceId}
     </update>
     <select id="queryByAccountNumber"
-            resultType="net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceEntity">
+            resultType="net.lab1024.sa.oa.invoice.domain.InvoiceEntity">
         SELECT *
         FROM t_oa_invoice
         WHERE enterprise_id = #{enterpriseId}
@@ -17,7 +17,7 @@
             AND invoice_id != #{excludeInvoiceId}
         </if>
     </select>
-    <select id="queryPage" resultType="net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceVO">
+    <select id="queryPage" resultType="net.lab1024.sa.oa.invoice.domain.InvoiceVO">
         SELECT t_oa_invoice.*,
         t_oa_enterprise.enterprise_name
         FROM t_oa_invoice 
@@ -45,7 +45,7 @@
             ORDER BY t_oa_invoice.create_time DESC
         </if>
     </select>
-    <select id="getDetail" resultType="net.lab1024.sa.admin.module.business.oa.invoice.domain.InvoiceVO">
+    <select id="getDetail" resultType="net.lab1024.sa.oa.invoice.domain.InvoiceVO">
         SELECT t_oa_invoice.*,
                t_oa_enterprise.enterprise_name
         FROM t_oa_invoice 
