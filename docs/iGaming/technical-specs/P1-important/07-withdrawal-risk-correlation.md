@@ -9,7 +9,7 @@
 
 ## 功能概述
 
-在玩家發起取款請求時，系統自動抓取「自上次取款以來」投注時段內的所有風控提案，並根據提案風險評分決定是否批准取款。
+在玩家發起取款請求時，系統自動抓取「自上次快照時間以來」的所有未結案風控提案，並根據提案最高優先級（URGENT/HIGH/MEDIUM/LOW）決定是否批准取款。
 
 ### 核心目標
 
@@ -23,22 +23,24 @@
 ```
 玩家發起取款
     ↓
-查詢上次取款時間
+查詢上次快照時間（t_player_turnover_snapshot）
     ↓
-計算時間範圍（since → now）
+計算時間範圍（snapshot_time → now）
     ↓
-查詢該時段所有風控提案
+查詢該時段所有未結案風控提案
     ↓
-┌──────────────────┐
-│ 存在高風險提案？   │ (score ≥ 80)
-└──────────────────┘
-    YES │      │ NO
-        ↓      ↓
-    阻斷取款  批准取款
-        ↓
-    人工審核
-        ↓
-    決策執行
+┌──────────────────────────┐
+│ 按最高優先級決策            │
+│ URGENT/HIGH → 阻斷取款    │
+│ MEDIUM → 人工審核          │
+│ LOW/無 → 批准取款          │
+└──────────────────────────┘
+    ↓             ↓
+  阻斷/審核     批准取款
+    ↓
+  人工審核
+    ↓
+  決策執行
 ```
 
 ---
@@ -245,7 +247,7 @@ WHERE player_id = :playerId
   AND status = 'PENDING_REVIEW'
   AND created_at >= :startTime
   AND created_at <= :endTime
-ORDER BY risk_score DESC, created_at DESC;
+ORDER BY created_at DESC;
 
 -- 執行計劃分析
 EXPLAIN ANALYZE
@@ -255,7 +257,7 @@ WHERE player_id = 123456
   AND status = 'PENDING_REVIEW'
   AND created_at >= '2026-01-15 10:00'
   AND created_at <= '2026-02-03 15:00'
-ORDER BY risk_score DESC, created_at DESC;
+ORDER BY created_at DESC;
 ```
 
 #### 索引優化建議
@@ -263,8 +265,8 @@ ORDER BY risk_score DESC, created_at DESC;
 ```sql
 -- 複合索引（覆蓋查詢）
 CREATE INDEX idx_risk_proposals_correlation_query
-    ON risk_proposals(player_id, status, created_at DESC, risk_score DESC)
-    INCLUDE (proposal_type, game_type, details);
+    ON risk_proposals(player_id, status, created_at DESC)
+    INCLUDE (proposal_type, game_type, priority, details);
 
 -- 部分索引（僅索引 PENDING_REVIEW）
 CREATE INDEX idx_risk_proposals_pending_review
@@ -366,7 +368,7 @@ public ResponseDTO<WithdrawalRiskCorrelationVO> getWithdrawalRiskCorrelation(
 }
 ```
 
-**響應體**（WithdrawalRiskCorrelationVO）：
+**響應體**（WithdrawalRiskCorrelationVO v2.0.0）：
 ```json
 {
   "correlationId": 567890,
@@ -374,9 +376,11 @@ public ResponseDTO<WithdrawalRiskCorrelationVO> getWithdrawalRiskCorrelation(
   "playerId": 123456,
   "decision": "BLOCKED",
   "correlatedProposals": [...],
-  "highRiskCount": 1,
-  "mediumRiskCount": 1,
-  "totalRiskScore": 160,
+  "urgentCount": 0,
+  "highCount": 1,
+  "mediumCount": 1,
+  "lowCount": 0,
+  "highestPriority": "HIGH",
   "evaluatedAt": "2026-02-03T15:00:00",
   "reviewedAt": null,
   "reviewedBy": null,
@@ -529,13 +533,13 @@ THEN(
     // 2. 查詢風控提案
     queryPendingProposals,
 
-    // 3. 統計風險級別
-    classifyProposalsByRiskLevel,
+    // 3. 按優先級分類計數
+    classifyProposalsByPriority,
 
-    // 4. 決策判定
+    // 4. 決策判定（按最高優先級）
     SWITCH(decisionRule).to(
-        IF(highRiskCount > 0, THEN(blockWithdrawal)),
-        IF(mediumRiskCount > 0, THEN(requireManualReview)),
+        IF(urgentCount > 0 OR highCount > 0, THEN(blockWithdrawal)),
+        IF(mediumCount > 0, THEN(requireManualReview)),
         DEFAULT(approveWithdrawal)
     ),
 
@@ -593,8 +597,8 @@ public class CalculateCorrelationTimeRangeComponent extends NodeComponent {
 ```sql
 -- 複合索引（覆蓋查詢）
 CREATE INDEX idx_risk_proposals_correlation_query
-    ON risk_proposals(player_id, status, created_at DESC, risk_score DESC)
-    INCLUDE (proposal_type, game_type, details);
+    ON risk_proposals(player_id, status, created_at DESC)
+    INCLUDE (proposal_type, game_type, priority, details);
 ```
 
 #### 2. Redis 緩存
@@ -688,13 +692,13 @@ void testCalculateTimeRange_FirstTimeOldUser() {
 
 ```java
 @Test
-@DisplayName("存在高風險提案（score ≥ 80）應阻斷取款")
-void testEvaluate_HighRiskProposals_ShouldBlock() {
+@DisplayName("存在 HIGH 優先級提案應阻斷取款")
+void testEvaluate_HighPriorityProposals_ShouldBlock() {
     // Given
     WithdrawalRiskEvaluationForm form = createForm();
     List<RiskProposal> proposals = List.of(
-            createProposal(85, ProposalType.LATE_BETTING),
-            createProposal(75, ProposalType.MULTI_ACCOUNT)
+            createProposal("HIGH", ProposalType.LATE_BETTING),
+            createProposal("MEDIUM", ProposalType.MULTI_ACCOUNT)
     );
     when(correlationService.getRelatedProposals(any(), any())).thenReturn(proposals);
 
@@ -703,8 +707,9 @@ void testEvaluate_HighRiskProposals_ShouldBlock() {
 
     // Then
     assertThat(result.getDecision()).isEqualTo("BLOCKED");
-    assertThat(result.getHighRiskCount()).isEqualTo(1);
-    assertThat(result.getMediumRiskCount()).isEqualTo(1);
+    assertThat(result.getHighestPriority()).isEqualTo("HIGH");
+    assertThat(result.getHighCount()).isEqualTo(1);
+    assertThat(result.getMediumCount()).isEqualTo(1);
     assertThat(result.isRequiresManualReview()).isTrue();
 }
 ```
@@ -738,8 +743,8 @@ class WithdrawalRiskCorrelationIntegrationTest {
         createPlayer(playerId, LocalDateTime.now().minusDays(14));  // 註冊 14 天前
 
         // 創建風控提案
-        createRiskProposal(playerId, 85, LocalDateTime.now().minusDays(5));  // 高風險
-        createRiskProposal(playerId, 70, LocalDateTime.now().minusDays(2));  // 中風險
+        createRiskProposal(playerId, "HIGH", LocalDateTime.now().minusDays(5));  // HIGH 優先級
+        createRiskProposal(playerId, "MEDIUM", LocalDateTime.now().minusDays(2));  // MEDIUM 優先級
 
         // 2. 執行取款風控評估
         WithdrawalRiskEvaluationForm form = WithdrawalRiskEvaluationForm.builder()
@@ -754,9 +759,9 @@ class WithdrawalRiskCorrelationIntegrationTest {
         // 3. 驗證結果
         assertThat(result.getDecision()).isEqualTo("BLOCKED");
         assertThat(result.getCorrelatedProposals()).hasSize(2);
-        assertThat(result.getHighRiskCount()).isEqualTo(1);
-        assertThat(result.getMediumRiskCount()).isEqualTo(1);
-        assertThat(result.getTotalRiskScore()).isEqualTo(155);
+        assertThat(result.getHighCount()).isEqualTo(1);
+        assertThat(result.getMediumCount()).isEqualTo(1);
+        assertThat(result.getHighestPriority()).isEqualTo("HIGH");
 
         // 4. 驗證資料庫記錄
         WithdrawalRiskCorrelation correlation = withdrawalRiskCorrelationDao
@@ -806,9 +811,9 @@ class WithdrawalRiskCorrelationIntegrationTest {
 - [ ] 正常用戶時間範圍計算正確（自上次取款以來）
 - [ ] 首次取款用戶時間範圍計算正確（註冊 < 30 天）
 - [ ] 首次取款用戶時間範圍計算正確（註冊 ≥ 30 天，回溯 30 天）
-- [ ] 高風險提案（score ≥ 80）成功阻斷取款
-- [ ] 中風險提案（50 ≤ score < 80）標記為人工審核
-- [ ] 無風險提案成功批准取款
+- [ ] URGENT/HIGH 優先級提案成功阻斷取款
+- [ ] MEDIUM 優先級提案標記為人工審核
+- [ ] LOW/無提案成功批准取款
 - [ ] 關聯記錄成功持久化到 `withdrawal_risk_correlations`
 
 ### 性能驗收

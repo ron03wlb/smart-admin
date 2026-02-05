@@ -47,7 +47,7 @@ archive/
 | 了解 v3.0.0 完整歷史 | `v3.0.0/migration/V3.0.0_FINAL_SUMMARY.md` |
 | 查看原始無縫錢包分析 | `legacy/analysis/seamless_wallet.md` |
 | 查看已整合的無縫錢包專題 | [../02_Finance_Center/seamless-wallet/](../02_Finance_Center/seamless-wallet/) |
-| 查看當前業務文檔 | [../00_Concept_&_Analysis/00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md) |
+| 查看當前業務文檔 | [../00_Foundation/concepts/00-00_Document_Map.md](../00_Foundation/concepts/00-00_Document_Map.md) |
 
 ### V3.0.0_FINAL_SUMMARY.md 包含內容
 
@@ -179,7 +179,7 @@ git checkout archive-phase3-before-cleanup -- \
 
 ## 相關資源
 
-- **當前業務文檔**：[../00_Concept_&_Analysis/00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
+- **當前業務文檔**：[../00_Foundation/concepts/00-00_Document_Map.md](../00_Foundation/concepts/00-00_Document_Map.md)
 - **Seamless Wallet 專題**：[../02_Finance_Center/seamless-wallet/](../02_Finance_Center/seamless-wallet/)
 - **架構決策記錄**：[../architecture-decisions/](../architecture-decisions/)
 - **SmartAdmin 開發指南**：[../../../CLAUDE.md](../../../CLAUDE.md)

@@ -3,7 +3,7 @@
 > **三層風控架構定位**: **Layer 1 - 風控基礎驗證**
 > 本模塊負責所有投注的初始風控驗證，包括對沖檢測、賠率閾值、異常投注模式識別。
 > 這是流水計算的第一道防線，確保只有通過風控驗證的投注才能進入後續計算。
-> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
+> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Foundation/concepts/00-00_Document_Map.md#-流水計算邏輯)
 
 **線上博彩平台每年因欺詐損失超過 12 億美元**，其中 Bonus Abuse（獎金濫用）佔據 **63.8%** 的欺詐案件。2022 至 2024 年間 iGaming 欺詐增長達 **64%**，使得風控系統成為平台存亡的關鍵。本報告提供完整的技術架構設計原則，涵蓋數據採集、實時引擎、漏洞防護到處置策略的端到端設計方案。
 
@@ -63,11 +63,10 @@ graph TB
         E2 --> D
         E3 --> D
 
-        D --> SCORE["Risk Score Aggregation<br/>0-100 分"]
     end
 
     subgraph "Action Layer - 行動層 (Priority Based)"
-        D --> PRIORITY["Risk Level Classification<br/>URGENT / HIGH / MEDIUM / LOW"]
+        D --> PRIORITY["風險優先級判定<br/>規則直接定級<br/>取最高優先級<br/>URGENT / HIGH / MEDIUM / LOW"]
         
         PRIORITY -->|URGENT| AC1["🔴 Auto Block<br/>凍結帳戶<br/>發送告警"]
         PRIORITY -->|HIGH| AC2["🟡 Auto Block / Review<br/>自動阻擋"]
@@ -126,10 +125,10 @@ graph TB
    - **規則引擎 (LiteFlow)**：處理確定性邏輯（黑名單匹配、速度檢查），QPS 100k+
    - **ML 模型 (Isolation Forest)**：異常檢測與模式發現，P99 延遲 < 50ms
    - **圖引擎 (Neo4j)**：多帳號關聯分析，BFS 深度限制為 3（避免超時）
-   - **決策服務**：加權融合或級聯決策，輸出 0-100 風險分數
+   - **決策服務**：規則直接定級，取最高優先級輸出風險等級 (URGENT/HIGH/MEDIUM/LOW)
 
 4. **行動層 (Action Layer)**：
-   - **優先級路由**：基於 `URGENT/HIGH/MEDIUM/LOW` 進行處置 (v2.1.0 去除分數機制)
+   - **優先級路由**：基於 `URGENT/HIGH/MEDIUM/LOW` 進行處置（每條規則直接對應一個優先級）
    - **事件發布**：發送 Kafka 事件通知下游系統
 
 5. **反饋迴路 (Feedback Loop)**：
@@ -159,7 +158,7 @@ graph TB
 
 **2024 年第一季度數據顯示，Bonus Abuse 佔 iGaming 欺詐的 69.9%**，是運營商面臨的首要威脅。攻擊手法包括 Multi-accounting（創建多帳號重複領取新手獎金）、套利投注（同時下注相反結果鎖定收益）、籌碼傾倒（在撲克遊戲中故意輸給同夥帳號）。
 
-Multi-accounting 檢測需要多維度關聯分析。設備指紋維度（Device ID、硬件特徵）關聯強度最高，同一設備關聯超過 3 個帳號即為高風險；支付關聯維度（銀行卡 BIN、提款帳戶）同樣關鍵，同一提款帳戶關聯超過 2 個帳號應立即阻擋；行為模式維度（滑鼠軌跡、打字節奏）可識別相同操作者。一個實用的風控規則評分示例：同一設備 ID +80 分、同一 IP +40 分、相似 Email 模式 +30 分、同一提款帳戶 +90 分、註冊時間差小於 5 分鐘 +50 分、偵測到 VPN +60 分，總分超過 100 觸發阻擋。
+Multi-accounting 檢測需要多維度關聯分析。設備指紋維度（Device ID、硬件特徵）關聯強度最高，同一設備關聯超過 3 個帳號即為高風險；支付關聯維度（銀行卡 BIN、提款帳戶）同樣關鍵，同一提款帳戶關聯超過 2 個帳號應立即阻擋；行為模式維度（滑鼠軌跡、打字節奏）可識別相同操作者。一個實用的風控規則優先級映射示例：同一設備 ID → URGENT（直接阻擋）、同一提款帳戶 → URGENT（洗錢嫌疑）、偵測到 VPN + 相似 Email 模式 → HIGH（機器人嫌疑）、同一 IP → MEDIUM（人工審核）、註冊時間差小於 5 分鐘 → HIGH（批量註冊）。多規則觸發時取最高優先級。
 
 設備指紋技術進階能力包括：Canvas 指紋（HTML5 Canvas 渲染差異）、WebGL 指紋（圖形處理特徵）、Audio 指紋（音頻處理特徵）。**EFF Panopticlick 研究顯示 94% 瀏覽器可通過指紋唯一識別**。反規避措施需偵測模擬器、虛擬機、GPS 欺騙工具、App Cloner、GoLogin 等反指紋工具。
 
@@ -167,30 +166,30 @@ Multi-accounting 檢測需要多維度關聯分析。設備指紋維度（Device
 
 #### 多維欺詐檢測決策樹 (Multi-Dimensional Fraud Detection Decision Tree)
 
-以下分層圖表展示了如何從設備、支付、行為、圖譜四個維度進行風險評分，並根據總分決定處置動作。為提升可讀性，將複雜決策樹拆分為 **主架構圖 + 3 個維度子圖**。
+以下分層圖表展示了如何從設備、支付、行為、圖譜四個維度進行風險定級，並根據最高優先級決定處置動作。為提升可讀性，將複雜決策樹拆分為 **主架構圖 + 3 個維度子圖**。
 
 ##### 主架構圖：風險檢測整體流程 (Overview Architecture)
 
 ```mermaid
 flowchart LR
-    START["Player Action Event<br/>Deposit / Bet / Withdraw"] --> INIT[Initialize Risk Score = 0]
+    START["Player Action Event<br/>Deposit / Bet / Withdraw"] --> EVAL[規則評估引擎<br/>Rule Evaluation Engine]
 
-    INIT --> D1["🔍 Device Dimension<br/>設備維度檢測<br/>Max Score: +180"]
-    INIT --> D2["💳 Payment Dimension<br/>支付維度檢測<br/>Max Score: +210"]
-    INIT --> D3["📊 Behavior Dimension<br/>行為維度檢測<br/>Max Score: +110"]
-    INIT --> D4["🕸️ Graph Dimension<br/>圖譜維度檢測<br/>Max Score: +180"]
+    EVAL --> D1["🔍 Device Dimension<br/>設備維度檢測<br/>規則觸發 → 優先級"]
+    EVAL --> D2["💳 Payment Dimension<br/>支付維度檢測<br/>規則觸發 → 優先級"]
+    EVAL --> D3["📊 Behavior Dimension<br/>行為維度檢測<br/>規則觸發 → 優先級"]
+    EVAL --> D4["🕸️ Graph Dimension<br/>圖譜維度檢測<br/>規則觸發 → 優先級"]
 
-    D1 --> AGG["Aggregate Risk Score<br/>━━━━━━━━━━━━━━<br/>Device + Payment + Behavior + Graph"]
+    D1 --> AGG["取最高優先級<br/>━━━━━━━━━━━━━━<br/>Highest Priority Wins<br/>多規則觸發 → 取最高"]
     D2 --> AGG
     D3 --> AGG
     D4 --> AGG
 
-    AGG --> DECISION{Total Risk Score?}
+    AGG --> DECISION{最終優先級?}
 
-    DECISION -->|>= 86<br/>CRITICAL| ACTION1["🔴 Auto Block<br/>━━━━━━━━━━━━━━<br/>• Freeze Account<br/>• Notify CS Team<br/>• Log to Audit<br/>• Refund Investigation"]
-    DECISION -->|61-85<br/>HIGH| ACTION2["🟡 Manual Review<br/>━━━━━━━━━━━━━━<br/>• Add to Review Queue<br/>• ETA: 2 hours<br/>• Notify Player<br/>• Suspend High-Risk Actions"]
-    DECISION -->|31-60<br/>MEDIUM| ACTION3["🟡 Enhanced Monitoring<br/>━━━━━━━━━━━━━━<br/>• 30-day watch period<br/>• Velocity limits applied<br/>• Grey List<br/>• Daily threshold reduced"]
-    DECISION -->|0-30<br/>LOW| ACTION4["🟢 Allow<br/>━━━━━━━━━━━━━━<br/>• Normal Flow<br/>• Log Event<br/>• Update Player Profile"]
+    DECISION -->|URGENT| ACTION1["🔴 立即阻斷<br/>━━━━━━━━━━━━━━<br/>• 凍結帳戶<br/>• 通知 CS 團隊<br/>• 審計日誌<br/>• SLA: 1 小時"]
+    DECISION -->|HIGH| ACTION2["🔴 自動阻擋<br/>━━━━━━━━━━━━━━<br/>• 加入審核隊列<br/>• 優先審核<br/>• 通知玩家<br/>• SLA: 2 小時"]
+    DECISION -->|MEDIUM| ACTION3["🟡 人工審核<br/>━━━━━━━━━━━━━━<br/>• 轉人工審核隊列<br/>• 標準審核流程<br/>• 內部告警<br/>• SLA: 24 小時"]
+    DECISION -->|LOW| ACTION4["🟢 正常放行<br/>━━━━━━━━━━━━━━<br/>• 正常流程<br/>• 記錄事件<br/>• 更新玩家檔案<br/>• SLA: 48 小時"]
 
     ACTION1 --> END1[End - Blocked]
     ACTION2 --> END2[End - Review]
@@ -212,8 +211,8 @@ flowchart LR
 **主架構說明**：
 - 4 個維度檢測可並行執行（Kafka Streams 並行消費）
 - 黑名單命中直接阻擋（bypass 後續檢測）
-- 總分上限：180 + 210 + 110 + 180 = **680 分**（實際多數場景不超過 200 分）
-- 決策閾值基於歷史數據標定（P95 正常用戶 < 30 分）
+- 每條規則獨立定級（URGENT/HIGH/MEDIUM/LOW），多規則觸發時取最高優先級
+- 決策基於優先級矩陣：URGENT → 立即阻斷，HIGH → 自動阻擋，MEDIUM → 人工審核，LOW → 放行
 
 ---
 
@@ -223,31 +222,31 @@ flowchart LR
 flowchart TD
     START_D1["Device Dimension<br/>Input: Device ID, User-Agent,<br/>Canvas Fingerprint"] --> BLACKLIST{"Device ID<br/>in Blacklist?"}
 
-    BLACKLIST -->|Yes ⛔| BLOCK1["❌ Auto Block<br/>Score = 100<br/>━━━━━━━━━━━━━━<br/>Reason: BLACKLIST_MATCH<br/>Action: Immediate Freeze<br/>⚠️ Skip Remaining Checks"]
+    BLACKLIST -->|Yes ⛔| BLOCK1["❌ Auto Block<br/>🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Reason: BLACKLIST_MATCH<br/>Action: Immediate Freeze<br/>⚠️ Skip Remaining Checks"]
 
     BLACKLIST -->|No| SHARED{"Shared Device Count<br/>━━━━━━━━━━━━━━<br/>Query: SELECT COUNT(*) FROM players<br/>WHERE device_id = ?"}
 
-    SHARED -->|>= 5 accounts| SCORE_HIGH["Score += 80<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Multi-Accounting"]
-    SHARED -->|3-4 accounts| SCORE_MED["Score += 40<br/>━━━━━━━━━━━━━━<br/>Risk: MEDIUM<br/>Pattern: Shared Device"]
-    SHARED -->|1-2 accounts| SCORE_LOW["Score += 0<br/>━━━━━━━━━━━━━━<br/>Risk: LOW<br/>Pattern: Normal"]
+    SHARED -->|>= 5 accounts| SCORE_HIGH["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Multi-Accounting<br/>SLA: 2h"]
+    SHARED -->|3-4 accounts| SCORE_MED["🟡 MEDIUM<br/>━━━━━━━━━━━━━━<br/>Pattern: Shared Device<br/>SLA: 24h"]
+    SHARED -->|1-2 accounts| SCORE_LOW["🟢 LOW<br/>━━━━━━━━━━━━━━<br/>Pattern: Normal<br/>放行"]
 
     SCORE_HIGH --> EMULATOR{"Emulator / VM<br/>Detected?<br/>━━━━━━━━━━━━━━<br/>Check: BlueStacks, NoxPlayer,<br/>VMware signatures"}
     SCORE_MED --> EMULATOR
     SCORE_LOW --> EMULATOR
 
-    EMULATOR -->|Yes| EMU_SCORE["Score += 60<br/>━━━━━━━━━━━━━━<br/>Risk: Automation<br/>Tool: Emulator/VM"]
-    EMULATOR -->|No| EMU_NONE[Score += 0]
+    EMULATOR -->|Yes| EMU_SCORE["🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Pattern: Automation<br/>Tool: Emulator/VM<br/>SLA: 1h"]
+    EMULATOR -->|No| EMU_NONE["🟢 Pass"]
 
     EMU_SCORE --> VPN{"VPN / Proxy<br/>Detected?<br/>━━━━━━━━━━━━━━<br/>Check: IP Reputation DB,<br/>WebRTC Leak Test"}
     EMU_NONE --> VPN
 
-    VPN -->|Yes| VPN_SCORE["Score += 40<br/>━━━━━━━━━━━━━━<br/>Risk: Location Spoofing<br/>Tool: VPN/Proxy"]
-    VPN -->|No| VPN_NONE[Score += 0]
+    VPN -->|Yes| VPN_SCORE["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Location Spoofing<br/>Tool: VPN/Proxy<br/>SLA: 2h"]
+    VPN -->|No| VPN_NONE["🟢 Pass"]
 
-    VPN_SCORE --> RETURN_D1["Return Device Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-180<br/>Typical: 0, 40, 100, 180"]
+    VPN_SCORE --> RETURN_D1["Return Device Priority<br/>━━━━━━━━━━━━━━<br/>取最高優先級<br/>URGENT > HIGH > MEDIUM > LOW"]
     VPN_NONE --> RETURN_D1
 
-    BLOCK1 --> RETURN_BLOCK["Return Score = 100<br/>+ BLOCK Flag"]
+    BLOCK1 --> RETURN_BLOCK["Return URGENT<br/>+ BLOCK Flag"]
 
     style BLOCK1 fill:#FF6B6B
     style SCORE_HIGH fill:#FFB6C1
@@ -271,24 +270,24 @@ flowchart TD
 flowchart TD
     START_D2["Payment Dimension<br/>Input: Payment Method,<br/>Card BIN, Withdrawal Account"] --> PAYMENT_SHARE{"Same Payment Method<br/>Multiple Accounts?<br/>━━━━━━━━━━━━━━<br/>Query: Count distinct players<br/>with same card_hash"}
 
-    PAYMENT_SHARE -->|>= 3 accounts| PAY_CRIT["Score += 90<br/>━━━━━━━━━━━━━━<br/>Risk: CRITICAL<br/>Pattern: Payment Sharing"]
-    PAYMENT_SHARE -->|2 accounts| PAY_HIGH["Score += 50<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Payment Correlation"]
-    PAYMENT_SHARE -->|1 account| PAY_NORM["Score += 0<br/>━━━━━━━━━━━━━━<br/>Risk: LOW<br/>Pattern: Normal"]
+    PAYMENT_SHARE -->|>= 3 accounts| PAY_CRIT["🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Pattern: Payment Sharing<br/>SLA: 1h"]
+    PAYMENT_SHARE -->|2 accounts| PAY_HIGH["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Payment Correlation<br/>SLA: 2h"]
+    PAYMENT_SHARE -->|1 account| PAY_NORM["🟢 LOW<br/>━━━━━━━━━━━━━━<br/>Pattern: Normal<br/>放行"]
 
     PAY_CRIT --> WITHDRAWAL{"Same Withdrawal Account<br/>Multiple Players?<br/>━━━━━━━━━━━━━━<br/>Check: Bank account number,<br/>USDT wallet address"}
     PAY_HIGH --> WITHDRAWAL
     PAY_NORM --> WITHDRAWAL
 
-    WITHDRAWAL -->|>= 2 accounts| WITH_CRIT["Score += 90<br/>━━━━━━━━━━━━━━<br/>Risk: CRITICAL<br/>Pattern: Fund Aggregation<br/>⚠️ Money Laundering Suspected"]
-    WITHDRAWAL -->|1 account| WITH_NORM[Score += 0]
+    WITHDRAWAL -->|>= 2 accounts| WITH_CRIT["🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Pattern: Fund Aggregation<br/>⚠️ Money Laundering Suspected<br/>SLA: 1h"]
+    WITHDRAWAL -->|1 account| WITH_NORM["🟢 Pass"]
 
     WITH_CRIT --> GEO{"Card BIN Country<br/>vs IP Country Match?<br/>━━━━━━━━━━━━━━<br/>Example: US Card + CN IP"}
     WITH_NORM --> GEO
 
-    GEO -->|Mismatch| GEO_RISK["Score += 30<br/>━━━━━━━━━━━━━━<br/>Risk: Geo Mismatch<br/>Pattern: Stolen Card / VPN"]
-    GEO -->|Match| GEO_OK[Score += 0]
+    GEO -->|Mismatch| GEO_RISK["🟡 MEDIUM<br/>━━━━━━━━━━━━━━<br/>Pattern: Stolen Card / VPN<br/>SLA: 24h"]
+    GEO -->|Match| GEO_OK["🟢 Pass"]
 
-    GEO_RISK --> RETURN_D2["Return Payment Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-210<br/>Typical: 0, 50, 90, 210"]
+    GEO_RISK --> RETURN_D2["Return Payment Priority<br/>━━━━━━━━━━━━━━<br/>取最高優先級<br/>URGENT > HIGH > MEDIUM > LOW"]
     GEO_OK --> RETURN_D2
 
     style PAY_CRIT fill:#FF6B6B
@@ -313,48 +312,48 @@ flowchart TD
 flowchart TD
     START_D3["Behavior + Graph Dimension<br/>Input: Bet Pattern, Transaction History,<br/>Account Network Graph"] --> ML{"ML Model Inference<br/>Bet Pattern Anomaly?<br/>━━━━━━━━━━━━━━<br/>Model: Isolation Forest<br/>Features: 50+ behavioral metrics"}
 
-    ML -->|Fraud Prob > 0.8| ML_HIGH["Score += 50<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Anomaly Detected"]
-    ML -->|Fraud Prob 0.5-0.8| ML_MED["Score += 25<br/>━━━━━━━━━━━━━━<br/>Risk: MEDIUM<br/>Pattern: Suspicious"]
-    ML -->|Fraud Prob < 0.5| ML_LOW["Score += 0<br/>━━━━━━━━━━━━━━<br/>Risk: LOW<br/>Pattern: Normal"]
+    ML -->|Fraud Prob > 0.8| ML_HIGH["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Anomaly Detected<br/>SLA: 2h"]
+    ML -->|Fraud Prob 0.5-0.8| ML_MED["🟡 MEDIUM<br/>━━━━━━━━━━━━━━<br/>Pattern: Suspicious<br/>SLA: 24h"]
+    ML -->|Fraud Prob < 0.5| ML_LOW["🟢 LOW<br/>━━━━━━━━━━━━━━<br/>Pattern: Normal<br/>放行"]
 
     ML_HIGH --> BONUS{"Bonus Abuse Pattern?<br/>━━━━━━━━━━━━━━<br/>Check: Min bet + High rollover,<br/>Opposite betting (Hedge)"}
     ML_MED --> BONUS
     ML_LOW --> BONUS
 
-    BONUS -->|Min Bet → High Rollover| BONUS_CHASE["Score += 40<br/>━━━━━━━━━━━━━━<br/>Pattern: Bonus Chasing"]
-    BONUS -->|Opposite Betting| BONUS_ARB["Score += 60<br/>━━━━━━━━━━━━━━<br/>Pattern: Arbitrage Detected<br/>⚠️ Hedge Betting"]
-    BONUS -->|Normal| BONUS_OK[Score += 0]
+    BONUS -->|Min Bet → High Rollover| BONUS_CHASE["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Bonus Chasing<br/>SLA: 2h"]
+    BONUS -->|Opposite Betting| BONUS_ARB["🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Pattern: Arbitrage Detected<br/>⚠️ Hedge Betting<br/>SLA: 1h"]
+    BONUS -->|Normal| BONUS_OK["🟢 Pass"]
 
     BONUS_CHASE --> VELOCITY{"Withdrawal Velocity?<br/>━━━━━━━━━━━━━━<br/>Count: Withdrawals per hour"}
     BONUS_ARB --> VELOCITY
     BONUS_OK --> VELOCITY
 
-    VELOCITY -->|> 5 times/hour| VEL_HIGH["Score += 50<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Velocity Exceeded"]
-    VELOCITY -->|3-5 times/hour| VEL_MED["Score += 20<br/>━━━━━━━━━━━━━━<br/>Risk: MEDIUM<br/>Pattern: Rapid Withdrawal"]
-    VELOCITY -->|< 3 times/hour| VEL_LOW[Score += 0]
+    VELOCITY -->|> 5 times/hour| VEL_HIGH["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Velocity Exceeded<br/>SLA: 2h"]
+    VELOCITY -->|3-5 times/hour| VEL_MED["🟡 MEDIUM<br/>━━━━━━━━━━━━━━<br/>Pattern: Rapid Withdrawal<br/>SLA: 24h"]
+    VELOCITY -->|< 3 times/hour| VEL_LOW["🟢 Pass"]
 
     VEL_HIGH --> GRAPH{"Multi-Account Graph?<br/>━━━━━━━━━━━━━━<br/>Neo4j BFS Query (Depth: 3)<br/>Edges: Device, IP, Payment"}
     VEL_MED --> GRAPH
     VEL_LOW --> GRAPH
 
-    GRAPH -->|Connected >= 5| GRAPH_CRIT["Score += 70<br/>━━━━━━━━━━━━━━<br/>Risk: CRITICAL<br/>Pattern: Network Detected"]
-    GRAPH -->|Connected 3-4| GRAPH_HIGH["Score += 40<br/>━━━━━━━━━━━━━━<br/>Risk: HIGH<br/>Pattern: Cluster Detected"]
-    GRAPH -->|Connected < 3| GRAPH_LOW[Score += 0]
+    GRAPH -->|Connected >= 5| GRAPH_CRIT["🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Pattern: Network Detected<br/>SLA: 1h"]
+    GRAPH -->|Connected 3-4| GRAPH_HIGH["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Cluster Detected<br/>SLA: 2h"]
+    GRAPH -->|Connected < 3| GRAPH_LOW["🟢 Pass"]
 
     GRAPH_CRIT --> SYNC{"Synchronized Behavior?<br/>━━━━━━━━━━━━━━<br/>Check: 同時登入, 同步投注,<br/>相似遊戲路徑"}
     GRAPH_HIGH --> SYNC
     GRAPH_LOW --> SYNC
 
-    SYNC -->|Yes| SYNC_BOT["Score += 50<br/>━━━━━━━━━━━━━━<br/>Pattern: Bot/Farm Suspected<br/>⚠️ Automation Detected"]
-    SYNC -->|No| SYNC_OK[Score += 0]
+    SYNC -->|Yes| SYNC_BOT["🔴 HIGH<br/>━━━━━━━━━━━━━━<br/>Pattern: Bot/Farm Suspected<br/>⚠️ Automation Detected<br/>SLA: 2h"]
+    SYNC -->|No| SYNC_OK["🟢 Pass"]
 
     SYNC_BOT --> FUND_FLOW{"Fund Flow Aggregation?<br/>━━━━━━━━━━━━━━<br/>Check: 多帳號提款至同一帳戶"}
     SYNC_OK --> FUND_FLOW
 
-    FUND_FLOW -->|Yes| FUND_RISK["Score += 60<br/>━━━━━━━━━━━━━━<br/>Pattern: Money Laundering Risk<br/>⚠️ AML Alert"]
-    FUND_FLOW -->|No| FUND_OK[Score += 0]
+    FUND_FLOW -->|Yes| FUND_RISK["🔴 URGENT<br/>━━━━━━━━━━━━━━<br/>Pattern: Money Laundering Risk<br/>⚠️ AML Alert<br/>SLA: 1h"]
+    FUND_FLOW -->|No| FUND_OK["🟢 Pass"]
 
-    FUND_RISK --> RETURN_D34["Return Behavior + Graph Score<br/>━━━━━━━━━━━━━━<br/>Range: 0-290<br/>Behavior: 0-110<br/>Graph: 0-180"]
+    FUND_RISK --> RETURN_D34["Return Max Priority<br/>━━━━━━━━━━━━━━<br/>取最高優先級<br/>URGENT > HIGH > MEDIUM > LOW"]
     FUND_OK --> RETURN_D34
 
     style ML_HIGH fill:#FFB6C1
@@ -376,22 +375,22 @@ flowchart TD
 
 ---
 
-**風險評分規則示例**：
+**風控規則優先級映射表 (v2.1.0)**：
 
-| 維度 | 檢測項目 | 低風險 (0-30) | 中風險 (31-60) | 高風險 (61-85) | 嚴重 (86-100) |
-|------|---------|--------------|---------------|--------------|--------------|
-| **設備** | 同設備帳號數 | 1-2 個 (+0) | 3-4 個 (+40) | 5+ 個 (+80) | 黑名單 (+100) |
-| **設備** | 模擬器/VM | 否 (+0) | - | - | 是 (+60) |
-| **設備** | VPN/代理 | 否 (+0) | - | 是 (+40) | - |
-| **支付** | 同支付方式帳號數 | 1 個 (+0) | 2 個 (+50) | 3+ 個 (+90) | - |
-| **支付** | 同提款帳戶玩家數 | 1 個 (+0) | - | 2+ 個 (+90) | - |
-| **支付** | 卡 BIN 地區 vs IP | 匹配 (+0) | 不匹配 (+30) | - | - |
-| **行為** | ML 欺詐概率 | < 0.5 (+0) | 0.5-0.8 (+25) | > 0.8 (+50) | - |
-| **行為** | 獎金濫用模式 | 否 (+0) | - | 最小注額+高流水 (+40) | 對沖投注 (+60) |
-| **行為** | 提款速率 (次/小時) | < 3 (+0) | 3-5 (+20) | > 5 (+50) | - |
-| **圖譜** | 關聯帳號數 (BFS-3) | < 3 (+0) | 3-4 (+40) | 5+ (+70) | - |
-| **圖譜** | 同步行為 | 否 (+0) | - | 是 (+50) | - |
-| **圖譜** | 資金流聚集 | 否 (+0) | - | 是 (+60) | - |
+| 維度 | 檢測項目 | 🟢 LOW | 🟡 MEDIUM | 🔴 HIGH | 🔴 URGENT |
+|------|---------|--------|----------|---------|----------|
+| **設備** | 同設備帳號數 | 1-2 個 | 3-4 個 | 5+ 個 | 黑名單命中 |
+| **設備** | 模擬器/VM | 否 | - | - | 是 |
+| **設備** | VPN/代理 | 否 | - | 是 | - |
+| **支付** | 同支付方式帳號數 | 1 個 | - | 2 個 | 3+ 個 |
+| **支付** | 同提款帳戶玩家數 | 1 個 | - | - | 2+ 個 |
+| **支付** | 卡 BIN 地區 vs IP | 匹配 | 不匹配 | - | - |
+| **行為** | ML 欺詐概率 | < 0.5 | 0.5-0.8 | > 0.8 | - |
+| **行為** | 獎金濫用模式 | 正常 | - | 最小注額+高流水 | 對沖投注 |
+| **行為** | 提款速率 (次/小時) | < 3 | 3-5 | > 5 | - |
+| **圖譜** | 關聯帳號數 (BFS-3) | < 3 | - | 3-4 | 5+ |
+| **圖譜** | 同步行為 | 否 | - | 是 | - |
+| **圖譜** | 資金流聚集 | 否 | - | - | 是 |
 
 **處置動作決策矩陣 (Priority Matrix)**：
 
@@ -413,7 +412,7 @@ Akamai 2024 報告顯示每月發生 **260 億次撞庫嘗試**，IBM 報告指�
 
 撞庫攻擊檢測指標包括：登入失敗率（正常低於 5%，異常高於 20%）、單 IP 登入嘗試（正常低於 10 次/分鐘，異常高於 50 次/分鐘）、新設備登入頻率。防護採用三層架構：被動檢測層（IP 信譽評分、Email 年齡、設備指紋驗證）、主動防護層（智能 CAPTCHA、速率限制、地理異常檢測）、事後保護層（暗網監控已洩露憑證、主動重置已洩露密碼）。**Microsoft 數據顯示 MFA 可阻擋 99.9% 自動化帳號入侵**。
 
-帳號接管（ATO）防護採用多階段策略：登入前進行設備信譽評估和 IP 風險評分，登入時執行 MFA 和行為生物識別，登入後持續會話監控，敏感操作變更時發送通知並設定冷卻期。風險評分模型示例：新設備登入 +30 分、IP 地理位置異常 +40 分、登入時間異常 +20 分、短時間內密碼變更 +50 分、新提款帳戶添加 +40 分，總分超過 80 阻擋並強制身份驗證。
+帳號接管（ATO）防護採用多階段策略：登入前進行設備信譽評估和 IP 風險評分，登入時執行 MFA 和行為生物識別，登入後持續會話監控，敏感操作變更時發送通知並設定冷卻期。風控規則優先級示例：短時間內密碼變更 + 新提款帳戶添加 → URGENT（帳號接管嫌疑）、IP 地理位置異常 + 新設備登入 → HIGH（強制 MFA 驗證）、登入時間異常 → MEDIUM（加強監控）。多規則觸發時取最高優先級。
 
 ---
 
@@ -463,9 +462,9 @@ ThreatMark 的行為智能平台案例顯示，優化後可將平均偵測時間
 
 ### 四級風險分層實現精準處置
 
-風險評分模型聚合多維度信號：身份維度（KYC 文件真實性、人臉匹配）權重高，設備維度（設備指紋、模擬器/VPN 偵測）權重高，行為維度（投注模式、會話時長）權重中至高，交易維度（存取款模式、高額交易）權重高，網絡維度（IP 地理位置、ASN 類型）權重中。
+風控規則引擎聚合多維度信號：身份維度（KYC 文件真實性、人臉匹配）、設備維度（設備指紋、模擬器/VPN 偵測）、行為維度（投注模式、會話時長）、交易維度（存取款模式、高額交易）、網絡維度（IP 地理位置、ASN 類型）。每條規則獨立觸發並直接對應優先級。
 
-分層處置策略為：低風險（0-30 分）正常放行，中風險（31-60 分）增強監控和軟性限制，高風險（615 分）人工審核和帳戶限制，極高風險（86-100 分）即時阻斷和帳戶凍結。Tipsport 案例顯示複雜欺詐案件調查時間可從約 5 小時縮減至 **30 分鐘**（縮減 90%）。
+分層處置策略為：🟢 LOW 正常放行（SLA 48h），🟡 MEDIUM 人工審核和增強監控（SLA 24h），🔴 HIGH 自動阻擋和優先審核（SLA 2h），🔴 URGENT 即時阻斷和帳戶凍結（SLA 1h）。超時未處理的 URGENT/HIGH/MEDIUM 提案自動拒絕出金，LOW 提案自動放行。Tipsport 案例顯示複雜欺詐案件調查時間可從約 5 小時縮減至 **30 分鐘**（縮減 90%）。
 
 處置動作類型包括：限額（存款/提款/投注上限，適用於可疑資金來源或問題賭博跡象）、凍結（暫停帳戶功能，適用於調查期間或 AML 觸發）、驗證（額外 KYC/SOF 要求，適用於高額交易或身份疑慮）、封禁（永久關閉帳戶，適用於確認欺詐或嚴重違規）、監控（增強行為追蹤，適用於灰名單用戶）。
 
@@ -549,8 +548,8 @@ MGM Resorts 2023 年 9 月遭受 Scattered Spider 勒索軟體集團攻擊，黑
 - **規則熱加載**：所有風控閾值 (Thresholds)、評分權重 (Weights)、黑/灰名單 (Lists) 必須支援熱加載，無需重啟服務。
 - **配置範疇**：
   - **驗證規則**：單日提款次數上限、大額提款觸發金額。
-  - **評分模型**：各項風險特徵的加減分值 (如：同 IP +10分 -> 可調整為 +20分)。
-  - **處置策略**：High Risk 分數區間對應的動作 (如：>80分 自動凍結 -> 可調整為 >90分)。
+  - **規則優先級映射**：各項風險規則對應的優先級 (如：VELOCITY_CHECK → HIGH，可調整為 MEDIUM)。
+  - **處置策略**：各優先級對應的動作與 SLA (如：URGENT → 1h 自動拒絕，HIGH → 2h 自動拒絕)。
 
 ### 2. 審批工作流 (Approval Workflow)
 - **規則變更審批**：
@@ -614,66 +613,64 @@ sequenceDiagram
 
         Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Check Blacklist<br/>(Redis lookup)
         alt Blacklist Hit
-            Rule Engine (LiteFlow)-->>Risk Engine: {blocked: true, score: 100, reason: BLACKLIST}
+            Rule Engine (LiteFlow)-->>Risk Engine: {blocked: true, priority: URGENT, reason: BLACKLIST}
         else Not in Blacklist
             Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Velocity Check<br/>(5 withdrawals/hour?)
             Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Turnover Check<br/>(Met 1x requirement?)
             Rule Engine (LiteFlow)->>Rule Engine (LiteFlow): Device Check<br/>(Shared device > 5?)
-            Rule Engine (LiteFlow)-->>Risk Engine: {rule_score: 45, factors: [...]}
+            Rule Engine (LiteFlow)-->>Risk Engine: {priority: MEDIUM, factors: [...]}
         end
         deactivate Rule Engine (LiteFlow)
 
         Risk Engine->>ML Model: predictFraud(features)
         activate ML Model
         ML Model->>ML Model: Isolation Forest<br/>Anomaly Detection
-        ML Model-->>Risk Engine: {ml_score: 65, probability: 0.72}
+        ML Model-->>Risk Engine: {priority: HIGH, probability: 0.72}
         deactivate ML Model
 
         Risk Engine->>Neo4j Graph: MATCH (p:Player {id: $playerId})-[:SHARES*1..3]-(linked)
         activate Neo4j Graph
         Neo4j Graph->>Neo4j Graph: BFS Depth 3<br/>Find Connected Accounts
-        Neo4j Graph-->>Risk Engine: {cluster_size: 4, graph_score: 40}
+        Neo4j Graph-->>Risk Engine: {cluster_size: 4, priority: MEDIUM}
         deactivate Neo4j Graph
     end
 
-    Note over Risk Engine: Step 3: Score Aggregation & Decision (< 50ms)
+    Note over Risk Engine: Step 3: 優先級判定 & 決策 (< 50ms)
 
-    Risk Engine->>Risk Engine: Total Score = rule(45) + ml(65) + graph(40) = 150
-    Risk Engine->>Risk Engine: Normalize Score = min(150, 100) = 100
+    Risk Engine->>Risk Engine: 取最高優先級 = max(MEDIUM, HIGH, MEDIUM) = HIGH
+    Risk Engine->>Risk Engine: 套用決策規則 (Priority-Based)
 
-    Risk Engine->>Risk Engine: Apply Decision Rules
-
-    alt Score >= 86 (Auto Block)
-        Risk Engine->>Kafka: publish(risk.fraud.detected, {playerId, score: 100})
+    alt URGENT (立即阻斷, SLA: 1h)
+        Risk Engine->>Kafka: publish(risk.fraud.detected, {playerId, priority: URGENT})
         Risk Engine->>Kafka: publish(risk.withdrawal.rejected, {withdrawalId, reason})
-        Risk Engine-->>Finance Service: {approved: false, risk_level: CRITICAL, action: AUTO_BLOCK}
+        Risk Engine-->>Finance Service: {approved: false, risk_level: URGENT, action: AUTO_BLOCK}
 
         Finance Service->>Finance Service: UPDATE withdrawal SET status=REJECTED
         Finance Service-->>API Gateway: 403 Forbidden {message: "High Risk Detected"}
         API Gateway-->>Player: ❌ Withdrawal Rejected<br/>(Under Investigation)
 
-        Kafka->>CS Queue: Add Manual Review Task (High Priority)
+        Kafka->>CS Queue: Add Manual Review Task (URGENT Priority)
 
-    else Score 61-85 (Manual Review)
-        Risk Engine->>Kafka: publish(risk.manual.review, {playerId, score: 75})
-        Risk Engine-->>Finance Service: {approved: false, risk_level: HIGH, action: MANUAL_REVIEW, eta_minutes: 120}
+    else HIGH (自動阻擋, SLA: 2h)
+        Risk Engine->>Kafka: publish(risk.manual.review, {playerId, priority: HIGH})
+        Risk Engine-->>Finance Service: {approved: false, risk_level: HIGH, action: MANUAL_REVIEW, sla_hours: 2}
 
         Finance Service->>Finance Service: UPDATE withdrawal SET status=PENDING_REVIEW
         Finance Service-->>API Gateway: 202 Accepted {message: "Under Manual Review"}
-        API Gateway-->>Player: 🟡 Withdrawal Pending<br/>(ETA: 2 hours)
+        API Gateway-->>Player: 🟡 Withdrawal Pending<br/>(SLA: 2 hours)
 
-        Kafka->>CS Queue: Add Review Task (Normal Priority)
+        Kafka->>CS Queue: Add Review Task (HIGH Priority)
 
-    else Score 31-60 (Enhanced Monitoring)
-        Risk Engine->>Kafka: publish(risk.player.flagged, {playerId, score: 45})
-        Risk Engine-->>Finance Service: {approved: true, risk_level: MEDIUM, action: MONITOR, monitoring_days: 30}
+    else MEDIUM (人工審核, SLA: 24h)
+        Risk Engine->>Kafka: publish(risk.player.flagged, {playerId, priority: MEDIUM})
+        Risk Engine-->>Finance Service: {approved: false, risk_level: MEDIUM, action: MANUAL_REVIEW, sla_hours: 24}
 
-        Finance Service->>Finance Service: UPDATE withdrawal SET status=APPROVED<br/>ADD player_monitoring (duration: 30 days)
-        Finance Service-->>API Gateway: 200 OK {message: "Withdrawal Approved"}
-        API Gateway-->>Player: 🟢 Withdrawal Approved<br/>(Enhanced Monitoring)
+        Finance Service->>Finance Service: UPDATE withdrawal SET status=PENDING_REVIEW
+        Finance Service-->>API Gateway: 202 Accepted {message: "Under Review"}
+        API Gateway-->>Player: 🟡 Withdrawal Pending<br/>(SLA: 24 hours)
 
-    else Score 0-30 (Allow)
-        Risk Engine->>Kafka: publish(risk.validation.passed, {playerId, score: 15})
+    else LOW (正常放行, SLA: 48h)
+        Risk Engine->>Kafka: publish(risk.validation.passed, {playerId, priority: LOW})
         Risk Engine-->>Finance Service: {approved: true, risk_level: LOW, action: ALLOW}
 
         Finance Service->>Finance Service: UPDATE withdrawal SET status=APPROVED
@@ -702,7 +699,7 @@ sequenceDiagram
    - 🎯 **P50 延遲 < 200ms**（中位數）
    - 📊 **特徵收集 < 50ms**（Redis 並行查詢）
    - 📊 **規則+ML+圖譜 < 200ms**（並行執行）
-   - 📊 **決策聚合 < 50ms**（分數計算與路由）
+   - 📊 **決策聚合 < 50ms**（優先級判定與路由）
 
 2. **並行化策略**：
    - ✅ **Step 1 並行**：同時查詢 3 個 Redis Feature Store（玩家指標、設備指紋、支付歷史）
@@ -710,8 +707,8 @@ sequenceDiagram
    - ✅ **降低延遲**：總耗時 = MAX(rule_time, ml_time, graph_time)，而非 SUM
 
 3. **早期熔斷 (Circuit Breaker)**：
-   - ⚡ **黑名單命中**：直接返回 `score: 100`，跳過 ML 與圖分析（節省 150ms）
-   - ⚡ **超時保護**：Neo4j 查詢超過 3 秒自動終止，該維度分數記為 0
+   - ⚡ **黑名單命中**：直接返回 `priority: URGENT`，跳過 ML 與圖分析（節省 150ms）
+   - ⚡ **超時保護**：Neo4j 查詢超過 3 秒自動終止，該維度結果標記 `graph_check_failed`
 
 4. **分級處置邏輯**：
    - 🔴 **Score >= 86**：自動阻擋 → 凍結帳戶 → 發送高優先級 CS 任務
@@ -725,7 +722,7 @@ sequenceDiagram
    - 📢 審計日誌異步寫入，不影響主流程延遲
 
 6. **超時降級策略**：
-   - ⚠️ **Neo4j 超時**（> 3s）：跳過圖分析，該維度分數為 0，但標記 `graph_check_failed`
+   - ⚠️ **Neo4j 超時**（> 3s）：跳過圖分析，該維度結果忽略，標記 `graph_check_failed`
    - ⚠️ **ML 模型超時**（> 1s）：使用上一次緩存結果（TTL 5 分鐘）
    - ⚠️ **整體超時**（> 5s）：返回 `503 Service Unavailable`，轉人工審核（保守策略）
 
@@ -749,7 +746,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 
 **跨模塊集成文檔參考**:
 - 財務模塊集成: [02-04 §1.6 跨模組流水一致性保障](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#16-跨模組流水一致性保障)
-- 活動模塊集成: [04-01 統一流水驗證架構](../03_Player_Journey/03-03_Activity_Bonus.md#統一流水驗證架構)
+- 活動模塊集成: [04-01 統一流水驗證架構](../04_Activity_Center/04-04_Activity_Bonus.md#統一流水驗證架構)
 
 ---
 
@@ -859,19 +856,18 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
     {
       "approved": false,
       "risk_level": "HIGH",
-      "risk_score": 85,
       "reasons": [
         "TURNOVER_NOT_MET",
         "NEW_PAYMENT_METHOD",
         "SUSPICIOUS_IP"
       ],
       "action": "MANUAL_REVIEW",
-      "estimated_review_time_minutes": 120
+      "sla_hours": 2
     }
     
     ```
     
-*   **Logic**: 檢查 `TurnoverMet` (流水是否達標) + `RiskScore` (風險分) + `AuditStatus` (稽核狀態) + `PaymentMethodVerified` (支付方式驗證) + `GeolocationCheck` (地理位置檢查) + `VelocityCheck` (速率檢查)。
+*   **Logic**: 檢查 `TurnoverMet` (流水是否達標) + `RiskLevel` (風險優先級) + `AuditStatus` (稽核狀態) + `PaymentMethodVerified` (支付方式驗證) + `GeolocationCheck` (地理位置檢查) + `VelocityCheck` (速率檢查)。
 
 ### 3.4 `assessPlayerRisk` (玩家綜合風險評估)
 *   **用途**：CRM System 或 VIP Management 在進行玩家升級或特殊優惠發放前調用。
@@ -890,16 +886,15 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
     ```json
     {
       "risk_level": "MEDIUM",
-      "risk_score": 45,
       "risk_factors": [
         {
           "factor": "MULTI_ACCOUNT_SUSPICION",
-          "score": 30,
+          "priority": "MEDIUM",
           "confidence": "MEDIUM"
         },
         {
           "factor": "NORMAL_BETTING_PATTERN",
-          "score": -15,
+          "priority": "LOW",
           "confidence": "HIGH"
         }
       ],
@@ -975,7 +970,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 │                                                                      │
 │  Events Consumed (Kafka):                                            │
 │  ├─ player.registered            → Initialize risk profile           │
-│  ├─ player.kyc.completed         → Update risk score                 │
+│  ├─ player.kyc.completed         → Update risk level                 │
 │  ├─ vip.tier.changed             → Re-assess risk level              │
 │  ├─ wallet.deposit.completed     → Velocity check                    │
 │  └─ game.bet.placed              → Real-time pattern analysis        │
@@ -991,10 +986,10 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 | 調用模塊 | 使用的 API | 調用時機 | 用途 | 文檔參考 |
 |---------|-----------|---------|------|---------|
 | **02-04 財務中心** | `validateTurnover()` | 日結算返水時 | Layer 2: 基於風控驗證結果應用狀態因子調整 | [02-04 §1.6](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md#16-跨模組流水一致性保障) |
-| **04-01 活動系統** | `validateBet()` | 計算活動流水前 | Layer 3: 基於風控驗證結果應用遊戲權重 | [04-01 統一流水驗證](../03_Player_Journey/03-03_Activity_Bonus.md#統一流水驗證架構) |
+| **04-01 活動系統** | `validateBet()` | 計算活動流水前 | Layer 3: 基於風控驗證結果應用遊戲權重 | [04-01 統一流水驗證](../04_Activity_Center/04-04_Activity_Bonus.md#統一流水驗證架構) |
 | **02-01 提款系統** | `checkWithdraw()` | 提款請求提交時 | 檢測異常提款行為、多帳號提款 | [02-01 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) |
-| **01-02 VIP系統** | 訂閱 `risk.player.flagged` 事件 | 玩家被標記為高風險時 | 降級VIP等級或暫停VIP權益 | [01-02 VIP忠誠系統](../03_Player_Journey/03-02_VIP_Loyalty.md) |
-| **11-01 客服平台** | `assessPlayerRisk()` | 客服查看玩家360視圖時 | 顯示玩家風險評分和標記 | [11-01 客服平台](../06_Analytics_Operations/06-02_Customer_Service.md) |
+| **01-02 VIP系統** | 訂閱 `risk.player.flagged` 事件 | 玩家被標記為高風險時 | 降級VIP等級或暫停VIP權益 | [01-02 VIP忠誠系統](../01_Player_Center/01-06_VIP_Loyalty.md) |
+| **11-01 客服平台** | `assessPlayerRisk()` | 客服查看玩家360視圖時 | 顯示玩家風險等級和標記 | [11-01 客服平台](../06_Analytics_Operations/06-02_Customer_Service.md) |
 | **07-01 租戶管理** | 訂閱 `risk.fraud.detected` 事件 | 檢測到欺詐時 | 通知租戶運營團隊 | [07-01 多租戶架構](../05_Platform_Governance/05-01_Multi_Tenant.md) |
 
 **關鍵設計決策**:
@@ -1028,7 +1023,7 @@ Layer 3: Activity System (04-01) → 遊戲權重應用（老虎機100%、百家
 | `RISK_005` | MULTI_ACCOUNT | 多帳號關聯 | 403 | 凍結所有關聯帳號 |
 | `RISK_006` | VELOCITY_EXCEEDED | 速率限制超標 | 429 | 冷卻期後重試 |
 | `RISK_007` | BLACKLIST_MATCH | 黑名單匹配 | 403 | 永久阻擋 |
-| `RISK_008` | HIGH_RISK_SCORE | 高風險分數 | 200 | 轉人工審核 |
+| `RISK_008` | HIGH_RISK_LEVEL | 高風險優先級 (HIGH/URGENT) | 200 | 轉人工審核 |
 | `RISK_009` | AML_TRIGGERED | AML 規則觸發 | 200 | 合規團隊介入 |
 | `RISK_010` | BOT_DETECTED | 機器人檢測 | 403 | 要求 CAPTCHA 驗證 |
 
@@ -1438,13 +1433,13 @@ public class RiskRuleConfigManager {
 ## 📚 相關文檔
 
 ### 核心依賴
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額曝光度監控、可下注餘額計算
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 餘額曝光度監控、可下注餘額計算
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證、對沖檢測（Layer 1）
 
 ### 業務整合
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 提款風控規則引擎整合
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利濫用檢測、流水作弊識別
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 多帳號檢測、設備指紋
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 紅利濫用檢測、流水作弊識別
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Lifecycle.md) - 多帳號檢測、設備指紋
 
 ### 技術參考
 - [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 風控決策審計記錄

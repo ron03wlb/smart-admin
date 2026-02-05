@@ -20,7 +20,7 @@
           {
             "id": "run-architecture-test",
             "type": "bash",
-            "command": "./gradlew :sa-admin:test --tests ArchitectureTest",
+            "command": "./gradlew :smartadmin-app:test --tests ArchitectureTest",
             "description": "Validate architecture constraints",
             "continueOnError": false,
             "timeout": 120000
@@ -79,7 +79,7 @@
               {
                 "id": "rerun-architecture-test",
                 "type": "bash",
-                "command": "./gradlew :sa-admin:test --tests ArchitectureTest",
+                "command": "./gradlew :smartadmin-app:test --tests ArchitectureTest",
                 "description": "Revalidate architecture"
               },
               {
@@ -155,7 +155,7 @@
         {
           "id": "architecture-validation",
           "type": "bash",
-          "command": "cd smart-admin-api-java21-springboot3 && ./gradlew :sa-admin:test --tests ArchitectureTest",
+          "command": "cd smart-admin-api-java21-springboot3 && ./gradlew :smartadmin-app:test --tests ArchitectureTest",
           "description": "Validate architecture rules",
           "continueOnError": false,
           "timeout": 120000

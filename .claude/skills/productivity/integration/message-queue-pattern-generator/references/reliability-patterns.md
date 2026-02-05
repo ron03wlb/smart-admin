@@ -22,12 +22,12 @@
 ### Implementation
 
 ```java
-package net.lab1024.sa.admin.module.business.order.consumer;
+package net.lab1024.sa.business.order.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
-import net.lab1024.sa.admin.module.business.notification.manager.NotificationManager;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.notification.manager.NotificationManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -87,12 +87,12 @@ public class IdempotentOrderConsumer {
 ### Alternative: Database-based Idempotency
 
 ```java
-package net.lab1024.sa.admin.module.business.order.consumer;
+package net.lab1024.sa.business.order.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.dao.ProcessedEventDao;
-import net.lab1024.sa.admin.module.business.order.domain.entity.ProcessedEventEntity;
+import net.lab1024.sa.business.order.dao.ProcessedEventDao;
+import net.lab1024.sa.business.order.domain.entity.ProcessedEventEntity;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
@@ -175,11 +175,11 @@ spring:
 ### DLQ Implementation
 
 ```java
-package net.lab1024.sa.admin.module.business.order.consumer;
+package net.lab1024.sa.business.order.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
@@ -276,11 +276,11 @@ public class OrderConsumerWithDLQ {
 ### DLQ Monitoring and Recovery
 
 ```java
-package net.lab1024.sa.admin.module.business.order.dlq;
+package net.lab1024.sa.business.order.dlq;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -363,7 +363,7 @@ dependencies {
 ```json
 // order-created-event.avsc
 {
-  "namespace": "net.lab1024.sa.admin.module.business.order.domain.event.avro",
+  "namespace": "net.lab1024.sa.business.order.domain.event.avro",
   "type": "record",
   "name": "OrderCreatedEvent",
   "fields": [
@@ -400,11 +400,11 @@ spring:
 ### Producer with Avro
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.avro.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.avro.OrderCreatedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -438,7 +438,7 @@ public class AvroEventProducer {
 ```json
 // order-created-event-v2.avsc (with new field)
 {
-  "namespace": "net.lab1024.sa.admin.module.business.order.domain.event.avro",
+  "namespace": "net.lab1024.sa.business.order.domain.event.avro",
   "type": "record",
   "name": "OrderCreatedEvent",
   "fields": [
@@ -462,7 +462,7 @@ public class AvroEventProducer {
 ## Pattern 4: Retry with Exponential Backoff
 
 ```java
-package net.lab1024.sa.admin.module.business.order.consumer;
+package net.lab1024.sa.business.order.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -512,7 +512,7 @@ public class RetryableOrderConsumer {
 ## Pattern 5: Circuit Breaker for External Services
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;

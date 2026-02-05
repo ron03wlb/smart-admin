@@ -58,13 +58,13 @@ public class EmployeeControllerIntegrationTest {
 ## Commands
 
 ### Run Integration Tests
-./gradlew :sa-admin:integrationTest
+./gradlew :smartadmin-app:integrationTest
 
 ### Run Specific Test
-./gradlew :sa-admin:integrationTest --tests EmployeeControllerIT
+./gradlew :smartadmin-app:integrationTest --tests EmployeeControllerIT
 
 ### With Coverage
-./gradlew :sa-admin:integrationTest jacocoTestReport
+./gradlew :smartadmin-app:integrationTest jacocoTestReport
 
 ---
 

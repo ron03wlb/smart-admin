@@ -48,7 +48,7 @@ description: SmartAdmin Spring Pattern Checker - Validates code compliance...
 /spring
 
 # Check specific module
-/spring sa-admin/src/main/java/net/lab1024/sa/admin/module/system/
+/spring smartadmin-modules/smartadmin-system/src/main/java/net/lab1024/sa/system/
 
 # Check specific file
 /spring path/to/UserService.java
@@ -113,7 +113,7 @@ This skill complements `ArchitectureTest.java`:
 
 ```bash
 # 1. Run ArchUnit tests
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # 2. If failures, run /spring for detailed fixes
 /spring
@@ -168,7 +168,7 @@ head -5 .agents/skills/spring/SKILL.md
 2. Review `.agent/rules/` for official standards
 3. Run ArchitectureTest to confirm:
    ```bash
-   ./gradlew :sa-admin:test --tests ArchitectureTest
+   ./gradlew :smartadmin-app:test --tests ArchitectureTest
    ```
 4. If ArchUnit passes but /spring fails, report issue
 

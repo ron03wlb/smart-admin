@@ -29,13 +29,13 @@
 ### SSE Controller
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.controller;
+package net.lab1024.sa.business.notification.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
-import net.lab1024.sa.admin.module.business.notification.service.SseEmitterService;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.business.notification.service.SseEmitterService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -97,10 +97,10 @@ public class SseController {
 ### SSE Emitter Service
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.service;
+package net.lab1024.sa.business.notification.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -192,7 +192,7 @@ public class SseEmitterService {
 ### Scheduled Heartbeat
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.service;
+package net.lab1024.sa.business.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -283,11 +283,11 @@ public void sendSystemAlert(Long userId, String message) {
 ### System Metrics SSE
 
 ```java
-package net.lab1024.sa.admin.module.system.monitor.service;
+package net.lab1024.sa.system.monitor.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.system.monitor.domain.vo.SystemMetricsVO;
+import net.lab1024.sa.system.monitor.domain.vo.SystemMetricsVO;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

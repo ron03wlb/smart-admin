@@ -465,7 +465,7 @@ mybatis-plus:
 
 logging:
   level:
-    net.lab1024.sa.admin.module.system.employee.dao: DEBUG
+    net.lab1024.sa.system.employee.dao: DEBUG
 ```
 
 **Output:**

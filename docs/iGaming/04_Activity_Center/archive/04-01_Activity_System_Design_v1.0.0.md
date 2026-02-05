@@ -3,7 +3,7 @@
 > **三層風控架構定位**: **Layer 3 - 活動遊戲權重**
 > 本模塊負責應用活動特定的遊戲權重規則到流水計算。
 > 需依賴 Layer 1 (05-01) 風控驗證 + Layer 2 (02-04) 狀態因子計算後才執行。
-> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
+> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../../00_Foundation/concepts/00-00_Document_Map.md#-流水計算邏輯)
 
 博彩包網平台的活動系統（Promotion System）是玩家獲取與留存的核心引擎。本指南提供一套完整的系統架構設計與運營策略框架，涵蓋規則引擎、獎勵計算、多租戶架構、跨遊戲整合，以及針對東南亞、拉丁美洲、歐洲、中國四大市場的本地化策略。**關鍵發現：獎金濫用佔 iGaming 詐騙的 63.8%**，因此風控機制必須與活動系統深度整合。
 
@@ -1363,7 +1363,7 @@ flowchart TD
 ## 📚 相關文檔
 
 ### 核心依賴
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - Bonus 錢包整合、可下注餘額計算
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - Bonus 錢包整合、可下注餘額計算
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 3 遊戲權重）
 
 ### 業務整合

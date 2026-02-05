@@ -16,7 +16,7 @@ User: "Run quality gate before merging PR"
 # 1. ./gradlew checkstyleMain
 # 2. ./gradlew pmdMain
 # 3. ./gradlew spotbugsMain
-# 4. ./gradlew :sa-admin:test --tests ArchitectureTest
+# 4. ./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 ## Expected Result

@@ -46,7 +46,7 @@ Estimated time: ~8 minutes
 
 ### Generated Files
 
-**Package**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/goods/`
+**Package**: `smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/goods/`
 
 ```
 goods/
@@ -111,7 +111,7 @@ goods/
 ### Run ArchitectureTest
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **Expected**: Pass ✅

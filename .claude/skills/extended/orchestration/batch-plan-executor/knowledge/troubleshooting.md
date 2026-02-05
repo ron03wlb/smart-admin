@@ -284,7 +284,7 @@ Error: Cannot find SM2 encryption library
 cat .claude/skills/foundation/backend/security-hardening-pro/README.md
 
 # Verify dependencies
-./gradlew :sa-admin:dependencies | grep -i "sm2\|sm3\|sm4"
+./gradlew :smartadmin-app:dependencies | grep -i "sm2\|sm3\|sm4"
 ```
 
 **Solution 2: Execute Skill Manually for Debugging**

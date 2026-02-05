@@ -624,9 +624,9 @@ Before committing Manager extraction:
 - [ ] All @Transactional moved to Manager
 - [ ] Service delegates to Manager (no direct Dao calls)
 - [ ] Dependencies (Dao) moved to Manager
-- [ ] Compilation succeeds: `./gradlew :sa-admin:compileJava`
-- [ ] ArchUnit tests pass: `./gradlew :sa-admin:test --tests ArchitectureTest`
-- [ ] Unit tests pass: `./gradlew :sa-admin:test`
+- [ ] Compilation succeeds: `./gradlew :smartadmin-app:compileJava`
+- [ ] ArchUnit tests pass: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
+- [ ] Unit tests pass: `./gradlew :smartadmin-app:test`
 - [ ] Git stash dropped (changes committed)
 
 ---

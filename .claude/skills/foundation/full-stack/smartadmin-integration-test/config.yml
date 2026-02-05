@@ -84,7 +84,7 @@ dependencies:
 
   required_files:
     - ".agent/rules/foundation/10-architecture-rules.md"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java"
 
   tools:
     - name: "gradle"
@@ -102,7 +102,7 @@ output:
     - "*TestFixture.java"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java"
 
   templates:
     service_test: "assets/ServiceIntegrationTest.java.template"
@@ -124,11 +124,11 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify test code compiles successfully"
-      command: "./gradlew :sa-admin:compileTestJava"
+      command: "./gradlew :smartadmin-app:compileTestJava"
 
     - check: "integration-tests"
       description: "Run generated integration tests"
-      command: "./gradlew :sa-admin:test --tests *IntegrationTest"
+      command: "./gradlew :smartadmin-app:test --tests *IntegrationTest"
 
 compatibility:
   deprecated: false

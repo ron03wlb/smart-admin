@@ -16,21 +16,21 @@
 
 ## 1. Generate Integration Test
 
-**File**: `sa-admin/src/test/java/net/lab1024/sa/admin/module/business/{module}/{Entity}IntegrationTest.java`
+**File**: `smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/{module}/{Entity}IntegrationTest.java`
 
 **Pattern**:
 ```java
-package net.lab1024.sa.admin.module.business.{module};
+package net.lab1024.sa.business.{module};
 
-import net.lab1024.sa.admin.BaseIntegrationTest;
-import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}Dao;
-import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.business.{module}.domain.form.*;
-import net.lab1024.sa.admin.module.business.{module}.domain.vo.{Entity}VO;
-import net.lab1024.sa.admin.module.business.{module}.manager.{Entity}Manager;
-import net.lab1024.sa.admin.module.business.{module}.service.{Entity}Service;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.app.BaseIntegrationTest;
+import net.lab1024.sa.business.{module}.dao.{Entity}Dao;
+import net.lab1024.sa.business.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.business.{module}.domain.form.*;
+import net.lab1024.sa.business.{module}.domain.vo.{Entity}VO;
+import net.lab1024.sa.business.{module}.manager.{Entity}Manager;
+import net.lab1024.sa.business.{module}.service.{Entity}Service;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -229,11 +229,11 @@ class {Entity}IntegrationTest extends BaseIntegrationTest {
 
 ## 2. Architecture Test Validation
 
-**File**: `sa-admin/src/test/java/net/lab1024/sa/admin/ArchitectureTest.java` (Already exists)
+**File**: `smartadmin-app/src/test/java/net/lab1024/sa/app/ArchitectureTest.java` (Already exists)
 
 **Verify Generated Code Compliance**:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **Expected Validations** (for newly generated code):
@@ -250,14 +250,14 @@ class {Entity}IntegrationTest extends BaseIntegrationTest {
 
 ## 3. Test Data Fixtures (Optional)
 
-**File**: `sa-admin/src/test/java/net/lab1024/sa/admin/module/business/{module}/fixture/{Entity}Fixture.java`
+**File**: `smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/{module}/fixture/{Entity}Fixture.java`
 
 **Pattern** (if complex test data needed):
 ```java
-package net.lab1024.sa.admin.module.business.{module}.fixture;
+package net.lab1024.sa.business.{module}.fixture;
 
-import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.business.{module}.domain.form.*;
+import net.lab1024.sa.business.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.business.{module}.domain.form.*;
 
 import java.time.LocalDateTime;
 
@@ -307,15 +307,15 @@ public class {Entity}Fixture {
 
 ## 4. Controller Test (Optional - if REST layer testing needed)
 
-**File**: `sa-admin/src/test/java/net/lab1024/sa/admin/module/business/{module}/{Entity}ControllerTest.java`
+**File**: `smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/{module}/{Entity}ControllerTest.java`
 
 **Pattern** (using MockMvc):
 ```java
-package net.lab1024.sa.admin.module.business.{module};
+package net.lab1024.sa.business.{module};
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.lab1024.sa.admin.BaseIntegrationTest;
-import net.lab1024.sa.admin.module.business.{module}.domain.form.{Entity}AddForm;
+import net.lab1024.sa.app.BaseIntegrationTest;
+import net.lab1024.sa.business.{module}.domain.form.{Entity}AddForm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -372,18 +372,18 @@ class {Entity}ControllerTest extends BaseIntegrationTest {
 
 **Run All Tests**:
 ```bash
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 ```
 
 **Run Specific Test**:
 ```bash
-./gradlew :sa-admin:test --tests {Entity}IntegrationTest
+./gradlew :smartadmin-app:test --tests {Entity}IntegrationTest
 ```
 
 **Run with Coverage**:
 ```bash
-./gradlew :sa-admin:test jacocoTestReport
-# View: sa-admin/build/reports/jacoco/test/html/index.html
+./gradlew :smartadmin-app:test jacocoTestReport
+# View: smartadmin-app/build/reports/jacoco/test/html/index.html
 ```
 
 ---
@@ -391,7 +391,7 @@ class {Entity}ControllerTest extends BaseIntegrationTest {
 ## Test Structure
 
 ```
-sa-admin/src/test/java/net/lab1024/sa/admin/
+smartadmin-app/src/test/java/net/lab1024/sa/app/
 ├── BaseIntegrationTest.java (base class, already exists)
 └── module/
     └── business/
@@ -435,8 +435,8 @@ public abstract class BaseIntegrationTest {
 
 After generation, verify:
 - [ ] Integration test exists for CRUD operations
-- [ ] All test methods pass: `./gradlew :sa-admin:test --tests {Entity}IntegrationTest`
-- [ ] ArchitectureTest passes: `./gradlew :sa-admin:test --tests ArchitectureTest`
+- [ ] All test methods pass: `./gradlew :smartadmin-app:test --tests {Entity}IntegrationTest`
+- [ ] ArchitectureTest passes: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 - [ ] Test coverage > 80% for Service layer
 - [ ] Tests use realistic data (not just "test" or "string")
 - [ ] Tests verify database persistence

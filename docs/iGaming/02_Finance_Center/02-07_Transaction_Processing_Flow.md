@@ -461,7 +461,7 @@ sequenceDiagram
 ## 📚 相關文檔
 
 ### 前置依賴
-- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 錢包架構
+- [02-06 統一錢包模型](./02-06_Wallet_Architecture.md) - 錢包架構
 
 ### 核心依賴
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

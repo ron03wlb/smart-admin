@@ -313,7 +313,7 @@ AdminSwaggerTagConst.System.SYSTEM_DEPARTMENT     // 部门管理
 ```
 
 **Where to find tags:**
-- Check `AdminSwaggerTagConst.java` in `sa-admin/src/main/java/.../constant/`
+- Check `AdminSwaggerTagConst.java` in `smartadmin-app/src/main/java/.../constant/`
 - If tag doesn't exist, add it to the appropriate inner class
 
 **Example:**

@@ -182,9 +182,9 @@
 ## 🔗 相關文檔
 
 ### 核心參考
-- [00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md) - 完整文檔地圖
-- [00-01_Solution_Overview.md](../00_Concept_&_Analysis/00-01_Solution_Overview.md) - 解決方案總覽
-- [00-04_Technology_Stack.md](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 技術棧說明
+- [00-00_Document_Map.md](concepts/00-00_Document_Map.md) - 完整文檔地圖
+- [00-01_Solution_Overview.md](concepts/00-01_Solution_Overview.md) - 解決方案總覽
+- [00-04_Technology_Stack.md](concepts/00-04_Technology_Stack.md) - 技術棧說明
 
 ### 架構文檔
 - [10-architecture-rules.md](../../.agent/rules/foundation/10-architecture-rules.md) - SmartAdmin 架構規則
@@ -210,4 +210,4 @@
 **最後更新**: 2026-02-04
 **維護團隊**: Product Team & Backend Team
 
-**📚 返回**: [Foundation 首頁](../README.md) | [文檔地圖](../00_Concept_&_Analysis/00-00_Document_Map.md)
+**📚 返回**: [Foundation 首頁](../README.md) | [文檔地圖](concepts/00-00_Document_Map.md)

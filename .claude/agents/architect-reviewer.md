@@ -27,7 +27,7 @@ You are a senior architecture reviewer with deep expertise in evaluating system 
 
 2. **`.claude/shared/knowledge/project-architecture.md`**
    - Technology stack: Java 21, Spring Boot 3.5.4, MyBatis Plus 3.5.12
-   - Module structure: sa-base, sa-admin, sa-common
+   - Module structure: smartadmin-app, smartadmin-modules, smartadmin-common, smartadmin-support, smartadmin-api, smartadmin-starter
    - Build commands and ArchitectureTest validation
 
 3. **`.claude/shared/knowledge/quality-standards.md`**
@@ -160,7 +160,7 @@ Suggested path for architectural improvements aligned with SmartAdmin patterns
 
 Always recommend running architecture validation:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 You prioritize long-term sustainability, scalability, and maintainability while providing pragmatic recommendations that balance ideal architecture with practical constraints and SmartAdmin's established patterns.
@@ -188,7 +188,7 @@ After completing the architecture review, output a JSON block with this structur
       "severity": "major",
       "category": "Layer Architecture",
       "module": "employee",
-      "file": "src/main/java/net/lab1024/sa/admin/module/employee/service/EmployeeService.java",
+      "file": "src/main/java/net/lab1024/sa/business/employee/service/EmployeeService.java",
       "line": 67,
       "rule": "Controller → Service → Manager → Dao",
       "violation": "Service directly depends on Dao, bypassing Manager layer",
@@ -201,7 +201,7 @@ After completing the architecture review, output a JSON block with this structur
       "severity": "minor",
       "category": "Dependency Injection",
       "module": "department",
-      "file": "src/main/java/net/lab1024/sa/admin/module/department/controller/DepartmentController.java",
+      "file": "src/main/java/net/lab1024/sa/business/department/controller/DepartmentController.java",
       "line": 23,
       "rule": "Constructor injection only",
       "violation": "@Autowired field injection used",

@@ -62,7 +62,7 @@ public interface EmployeeDao extends BaseMapper<EmployeeEntity> {
 |---------|---------|-----------|
 | **Interface** | `EmployeeDao` | `EmployeeDaoImpl`, `IEmployeeDao` |
 | **XML Mapper** | `EmployeeMapper.xml` | `EmployeeDaoMapper.xml` |
-| **Package** | `net.lab1024.sa.admin.module.system.employee.dao` | `net.lab1024.sa.admin.dao` |
+| **Package** | `net.lab1024.sa.system.employee.dao` | `net.lab1024.sa.dao` |
 
 ### Method Naming
 
@@ -262,7 +262,7 @@ public void daoLayerRules() {
 
 **Run validation:**
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 ## Anti-Patterns

@@ -26,8 +26,8 @@ You are a senior Java architect with deep expertise in Java 21, Spring Boot 3.x,
 
 2. **`.claude/shared/knowledge/project-architecture.md`**
    - Technology stack (Java 21, Spring Boot 3.5.4, MyBatis Plus, Sa-Token, Redisson)
-   - Module structure (sa-admin, sa-base, sa-common)
-   - Build commands (`./gradlew clean build`, `./gradlew :sa-admin:bootRun`)
+   - Module structure (smartadmin-app, smartadmin-modules, smartadmin-common, smartadmin-support, smartadmin-api, smartadmin-starter)
+   - Build commands (`./gradlew clean build`, `./gradlew :smartadmin-app:bootRun`)
    - Test commands (especially `ArchitectureTest`)
    - Application configuration and profiles
 
@@ -159,7 +159,7 @@ Your specialized skills that differentiate you from other agents:
 ### 1. Architecture Design Phase
 
 **Before writing code:**
-- Review existing module structure in `sa-admin/` and `sa-base/`
+- Review existing module structure in `smartadmin-modules/` and `smartadmin-common/`
 - Analyze current Spring configurations
 - Verify database schema matches requirements
 - Check for existing similar implementations
@@ -390,10 +390,10 @@ class EmployeeServiceTest {
 **Before marking work complete:**
 ```bash
 # CRITICAL: Run architecture test
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Run all tests
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 
 # Verify build succeeds
 ./gradlew clean build

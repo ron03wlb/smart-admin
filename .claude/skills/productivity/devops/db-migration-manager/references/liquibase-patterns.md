@@ -630,7 +630,7 @@ For complex migrations, create custom change classes.
 ### Java Custom Change
 
 ```java
-package net.lab1024.sa.base.migration;
+package net.lab1024.sa.common.migration;
 
 import liquibase.change.custom.CustomTaskChange;
 import liquibase.database.Database;
@@ -683,7 +683,7 @@ public class EmployeeDataMigration implements CustomTaskChange {
 
 ```xml
 <changeSet id="1.14.0-custom-employee-migration" author="developer">
-    <customChange class="net.lab1024.sa.base.migration.EmployeeDataMigration"/>
+    <customChange class="net.lab1024.sa.common.migration.EmployeeDataMigration"/>
 </changeSet>
 ```
 

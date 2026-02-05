@@ -13,7 +13,11 @@
 ### 1. ArchitectureTest.java
 **用途**：ArchUnit架構約束測試
 **檔案大小**：18.5 KB
-**部署位置**：`{project}/sa-admin/src/test/java/net/lab1024/sa/admin/ArchitectureTest.java`
+**部署位置**（v4.1.0 多模組架構）：
+- `{project}/smartadmin-modules/smartadmin-system/src/test/java/net/lab1024/sa/system/ArchitectureTest.java`
+- `{project}/smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/ArchitectureTest.java`
+- `{project}/smartadmin-modules/smartadmin-oa/src/test/java/net/lab1024/sa/oa/ArchitectureTest.java`
+- `{project}/smartadmin-app/src/test/java/net/lab1024/sa/app/ArchitectureTest.java`
 
 **測試內容**：
 - Controller只能呼叫Service（不能直接呼叫Dao）
@@ -26,7 +30,7 @@
 **執行命令**：
 ```bash
 cd smart-admin-api-java21-springboot3/
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **相關規則**：
@@ -185,7 +189,7 @@ cp .agent/configs/checkstyle.xml smart-admin-api-java21-springboot3/config/check
 cp .agent/configs/pmd-ruleset.xml smart-admin-api-java21-springboot3/config/pmd/
 cp .agent/configs/spotbugs-exclude.xml smart-admin-api-java21-springboot3/config/spotbugs/
 cp .agent/configs/sonar-project.properties smart-admin-api-java21-springboot3/
-cp .agent/configs/ArchitectureTest.java smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/
+cp .agent/configs/ArchitectureTest.java smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/
 ```
 
 **2. 啟動本地環境**：

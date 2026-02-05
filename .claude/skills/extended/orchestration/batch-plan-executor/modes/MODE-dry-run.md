@@ -624,7 +624,7 @@ NOTE: This is a simulated summary. No actual changes were made to the codebase.
 ║   - Dependency Conflicts: 0 (CRITICAL) [v1.0.0 - Not implemented]
 ║
 ║   File-level Conflicts:
-║     1. smart-admin-api/sa-admin/.../ProductController.java
+║     1. smart-admin-api/smartadmin-modules/smartadmin-business/.../ProductController.java
 ║        Conflicting Plans: 2
 ║     2. smart-admin-web/src/api/product/product-api.ts
 ║        Conflicting Plans: 2

@@ -1,4 +1,6 @@
-﻿# P0 Skills Deployment Complete - Final Report
+﻿> [Historical: References v4.0.0 module structure] Module names such as `sa-admin` and `sa-base` in this report correspond to the v4.0.0 directory layout. They have since been renamed to `smartadmin-app`, `smartadmin-common`, and `smartadmin-support` respectively.
+
+# P0 Skills Deployment Complete - Final Report
 
 **Date**: 2026-01-25
 **Session**: Complete SmartAdmin Skills Development Cycle

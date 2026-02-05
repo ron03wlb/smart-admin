@@ -20,7 +20,7 @@ Generates complete CRUD modules following SmartAdmin architecture patterns.
 ### Backend (Java 21 + Spring Boot 3)
 
 ```
-sa-admin/src/main/java/net/lab1024/sa/admin/module/{module}/
+smartadmin-modules/smartadmin-{module}/src/main/java/net/lab1024/sa/{module}/{feature}/
 ├── controller/
 │   └── {Entity}Controller.java      # REST API endpoints
 ├── service/
@@ -52,7 +52,7 @@ smart-admin-web/src/views/{module}/{entity}/
 ### Tests
 
 ```
-sa-admin/src/test/java/net/lab1024/sa/admin/module/{module}/
+smartadmin-app/src/test/java/net/lab1024/sa/{module}/{feature}/
 ├── {Entity}ServiceTest.java         # Unit tests
 └── {Entity}IntegrationTest.java     # Integration tests with Testcontainers
 ```

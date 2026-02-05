@@ -39,9 +39,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [04-01 Activity System](../../03_Player_Journey/03-03_Activity_Bonus.md) | §3 規則引擎 | Bonus 發放邏輯 |
-| 2 | [04-02 Bonus Calculation](../../03_Player_Journey/03-03_Activity_Bonus.md) | 全文 | 計算公式 |
-| 3 | [01-02 Wallet Architecture](../../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) | §2 Bonus 錢包 | 錢包整合 |
+| 1 | [04-01 Activity System](../../04_Activity_Center/04-04_Activity_Bonus.md) | §3 規則引擎 | Bonus 發放邏輯 |
+| 2 | [04-02 Bonus Calculation](../../04_Activity_Center/04-04_Activity_Bonus.md) | 全文 | 計算公式 |
+| 3 | [01-02 Wallet Architecture](../../02_Finance_Center/02-06_Wallet_Architecture.md) | §2 Bonus 錢包 | 錢包整合 |
 
 ### 驗證清單
 - [ ] Bonus 類型配置正確（首存、流水、活動等）
@@ -69,9 +69,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [02-03 Turnover Calculation](../../02_Game_Operations/02-03_Turnover_Calculation.md) | §1 三層驗證 | 有效投注算法 |
-| 2 | [04-01 Activity System](../../03_Player_Journey/03-03_Activity_Bonus.md) | §5 流水要求 | Wagering 計算 |
-| 3 | [04-02 Bonus Calculation](../../03_Player_Journey/03-03_Activity_Bonus.md) | §4 流水追蹤 | 進度記錄 |
+| 1 | [02-03 Turnover Calculation](../../03_Game_Center/03-04_Turnover_Calculation.md) | §1 三層驗證 | 有效投注算法 |
+| 2 | [04-01 Activity System](../../04_Activity_Center/04-04_Activity_Bonus.md) | §5 流水要求 | Wagering 計算 |
+| 3 | [04-02 Bonus Calculation](../../04_Activity_Center/04-04_Activity_Bonus.md) | §4 流水追蹤 | 進度記錄 |
 
 ### 驗證清單
 - [ ] 有效投注計算準確
@@ -99,9 +99,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [01-02 VIP & Loyalty](../../03_Player_Journey/03-02_VIP_Loyalty.md) | §2 等級體系 | VIP 定義 |
-| 2 | [01-02 VIP & Loyalty](../../03_Player_Journey/03-02_VIP_Loyalty.md) | §3 升級規則 | 積分計算 |
-| 3 | [01-02 VIP & Loyalty](../../03_Player_Journey/03-02_VIP_Loyalty.md) | §4 權益配置 | 專屬福利 |
+| 1 | [01-02 VIP & Loyalty](../../01_Player_Center/01-06_VIP_Loyalty.md) | §2 等級體系 | VIP 定義 |
+| 2 | [01-02 VIP & Loyalty](../../01_Player_Center/01-06_VIP_Loyalty.md) | §3 升級規則 | 積分計算 |
+| 3 | [01-02 VIP & Loyalty](../../01_Player_Center/01-06_VIP_Loyalty.md) | §4 權益配置 | 專屬福利 |
 
 ### 驗證清單
 - [ ] VIP 等級正確計算

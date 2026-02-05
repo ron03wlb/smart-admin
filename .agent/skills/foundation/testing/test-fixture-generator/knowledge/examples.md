@@ -3,10 +3,10 @@
 ## 範例 1: 完整 Employee Fixture
 
 ```java
-package net.lab1024.sa.admin.module.employee.support;
+package net.lab1024.sa.system.employee.support;
 
-import net.lab1024.sa.admin.module.employee.domain.entity.EmployeeEntity;
-import net.lab1024.sa.admin.module.employee.domain.form.*;
+import net.lab1024.sa.system.employee.domain.entity.EmployeeEntity;
+import net.lab1024.sa.system.employee.domain.form.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

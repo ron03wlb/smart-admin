@@ -18,7 +18,7 @@ User: "Generate ArchUnit test to enforce @Transactional only in Manager layer"
 **File:** `src/test/java/net/lab1024/sa/admin/ArchitectureTest.java`
 
 ```java
-@AnalyzeClasses(packages = "net.lab1024.sa.admin")
+@AnalyzeClasses(packages = "net.lab1024.sa")
 class AnnotationRestrictionTest {
 
     @ArchTest
@@ -73,7 +73,7 @@ class AnnotationRestrictionTest {
 ## Validation
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Example violation output:
 ❌ AnnotationRestrictionTest > transactionalMustBeInManagerLayer FAILED

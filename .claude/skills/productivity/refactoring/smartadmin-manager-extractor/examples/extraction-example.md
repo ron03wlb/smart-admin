@@ -5,7 +5,7 @@
 ### 問題：ArchUnit 測試失敗
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 ❌ FAILED
 EmployeeService.saveEmployee() violates rule:
@@ -27,12 +27,12 @@ EmployeeService.saveEmployee() violates rule:
 #### EmployeeService.java（違規）
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.service;
+package net.lab1024.sa.business.employee.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.employee.dao.EmployeeDao;
-import net.lab1024.sa.admin.module.business.department.dao.DepartmentDao;
-import net.lab1024.sa.admin.module.business.employee.domain.entity.EmployeeEntity;
+import net.lab1024.sa.business.employee.dao.EmployeeDao;
+import net.lab1024.sa.business.department.dao.DepartmentDao;
+import net.lab1024.sa.business.employee.domain.entity.EmployeeEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,12 +70,12 @@ public class EmployeeService {
 #### EmployeeService.java（符合規則）
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.service;
+package net.lab1024.sa.business.employee.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.employee.dao.EmployeeDao;
-import net.lab1024.sa.admin.module.business.employee.domain.entity.EmployeeEntity;
-import net.lab1024.sa.admin.module.business.employee.manager.EmployeeManager;
+import net.lab1024.sa.business.employee.dao.EmployeeDao;
+import net.lab1024.sa.business.employee.domain.entity.EmployeeEntity;
+import net.lab1024.sa.business.employee.manager.EmployeeManager;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -106,12 +106,12 @@ public class EmployeeService {
 #### EmployeeManager.java（自動生成）
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.manager;
+package net.lab1024.sa.business.employee.manager;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.employee.dao.EmployeeDao;
-import net.lab1024.sa.admin.module.business.department.dao.DepartmentDao;
-import net.lab1024.sa.admin.module.business.employee.domain.entity.EmployeeEntity;
+import net.lab1024.sa.business.employee.dao.EmployeeDao;
+import net.lab1024.sa.business.department.dao.DepartmentDao;
+import net.lab1024.sa.business.employee.domain.entity.EmployeeEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -159,7 +159,7 @@ public class EmployeeManager {
 
 ✅ Phase 2: Generate Manager Class - COMPLETED
    - Created: EmployeeManager.java
-   - Package: net.lab1024.sa.admin.module.business.employee.manager
+   - Package: net.lab1024.sa.business.employee.manager
 
 ✅ Phase 3: Extract Methods - COMPLETED
    - Extracted: saveEmployee() → saveEmployeeTransaction()
@@ -187,7 +187,7 @@ public class EmployeeManager {
 ### ArchUnit 驗證通過
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 ✅ PASSED
 All architecture rules compliant:

@@ -157,7 +157,7 @@ public EmployeeEntity getById(Long id) {
 **CI/CD Integration:**
 ```bash
 # Pre-deployment chaos test
-./gradlew :sa-admin:chaosTest
+./gradlew :smartadmin-app:chaosTest
 
 # Simulates:
 # - Database connection failures

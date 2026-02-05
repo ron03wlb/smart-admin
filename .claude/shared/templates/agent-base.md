@@ -20,7 +20,7 @@
 
 2. **Project Architecture**: `.claude/shared/knowledge/project-architecture.md`
    - Technology stack (Java 21, Spring Boot 3.5.4, MyBatis Plus, Sa-Token)
-   - Module structure (sa-admin, sa-base, sa-common)
+   - Module structure (smartadmin-app, smartadmin-modules, smartadmin-common, smartadmin-support, smartadmin-api, smartadmin-starter)
    - Build commands (Gradle)
    - Test commands
    - Application configuration
@@ -312,7 +312,7 @@ Always refer to the root CLAUDE.md file for:
 
 Before every commit, verify:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 This test enforces:

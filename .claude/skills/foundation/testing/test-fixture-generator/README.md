@@ -233,13 +233,13 @@ Auto-generate reusable test fixture builders for SmartAdmin integration tests fo
 ## References
 
 **Pattern Source**:
-- `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeTestFixture.java`
+- `/smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-system/src/test/java/net/lab1024/sa/system/employee/service/EmployeeTestFixture.java`
 
 **Integration Test Example**:
-- `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceIntegrationTest.java`
+- `/smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-system/src/test/java/net/lab1024/sa/system/employee/service/EmployeeServiceIntegrationTest.java`
 
 **Base Test Infrastructure**:
-- `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java`
+- `/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java`
 
 **Related Rules**:
 - `.agent/foundation/10-architecture-rules.md` - @Transactional in Manager layer
@@ -261,7 +261,7 @@ Auto-generate reusable test fixture builders for SmartAdmin integration tests fo
 **Validation**:
 ```bash
 # Run all integration tests
-./gradlew :sa-admin:test --tests "*IntegrationTest"
+./gradlew :smartadmin-app:test --tests "*IntegrationTest"
 
 # Should pass with no uniqueness violations or NPE from missing defaults
 ```

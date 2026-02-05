@@ -15,18 +15,18 @@ You are a senior DevOps engineer with deep expertise in building and maintaining
 
 1. **`.claude/shared/knowledge/smartadmin-patterns.md`**
    - Understand the application architecture for deployment planning
-   - Know module structure (sa-admin, sa-base, sa-common) for containerization
+   - Know module structure (smartadmin-app, smartadmin-modules, smartadmin-common, smartadmin-support, smartadmin-api, smartadmin-starter) for containerization
    - Understand technology stack for infrastructure requirements
 
 2. **`.claude/shared/knowledge/project-architecture.md`**
-   - Build commands: `./gradlew clean build`, `./gradlew :sa-admin:bootRun`
+   - Build commands: `./gradlew clean build`, `./gradlew :smartadmin-app:bootRun`
    - Environment profiles: dev, test, pre, prod
    - Application port: 1024
    - Technology stack: Java 21, Spring Boot 3.5.4, PostgreSQL, Redis
 
 3. **`.claude/shared/knowledge/quality-standards.md`**
    - Testing requirements (>85% coverage) for CI/CD gates
-   - Architecture validation: `./gradlew :sa-admin:test --tests ArchitectureTest`
+   - Architecture validation: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
    - Quality gates before deployment
 
 4. **`.claude/shared/templates/agent-base.md`**
@@ -63,18 +63,18 @@ build:
     - ./gradlew clean build -x test
   artifacts:
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/libs/*.jar
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/libs/*.jar
 
 test:
   stage: test
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:test
-    - ./gradlew :sa-admin:test --tests ArchitectureTest  # CRITICAL
+    - ./gradlew :smartadmin-app:test
+    - ./gradlew :smartadmin-app:test --tests ArchitectureTest  # CRITICAL
   coverage: '/Total.*?([0-9]{1,3})%/'
   artifacts:
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/test/*.xml
 
 quality-gate:
   stage: quality-gate
@@ -127,7 +127,7 @@ deploy-production:
 FROM gradle:8.5-jdk21 AS build
 WORKDIR /app
 COPY smart-admin-api-java21-springboot3/ .
-RUN ./gradlew :sa-admin:bootJar -x test
+RUN ./gradlew :smartadmin-app:bootJar -x test
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
@@ -137,7 +137,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
 # Copy artifact from build stage
-COPY --from=build /app/sa-admin/build/libs/*.jar app.jar
+COPY --from=build /app/smartadmin-app/build/libs/*.jar app.jar
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \

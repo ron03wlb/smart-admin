@@ -149,7 +149,7 @@ This skill **replaces and consolidates**:
 
 **Output**:
 ```
-sa-admin/src/test/java/net/lab1024/sa/admin/module/{module}/service/
+smartadmin-app/src/test/java/net/lab1024/sa/app/{module}/service/
 ├── {Entity}ServiceIntegrationTest.java
 └── {Entity}TestFixture.java (if not exists)
 ```
@@ -180,7 +180,7 @@ sa-admin/src/test/java/net/lab1024/sa/admin/module/{module}/service/
 
 **Output**:
 ```
-sa-admin/src/test/java/net/lab1024/sa/admin/module/{module}/domain/
+smartadmin-app/src/test/java/net/lab1024/sa/app/{module}/domain/
 └── {Entity}TestFixture.java
 ```
 
@@ -388,7 +388,7 @@ public class EmployeeTestFixture {
 - [ ] Verifies both ResponseDTO and database state
 - [ ] Test fixtures used for test data
 - [ ] FK dependencies set up in @BeforeEach
-- [ ] Tests pass: `./gradlew :sa-admin:test --tests {Entity}ServiceIntegrationTest`
+- [ ] Tests pass: `./gradlew :smartadmin-app:test --tests {Entity}ServiceIntegrationTest`
 
 ### Mode 2 Validation (Test Fixtures)
 

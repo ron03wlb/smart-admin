@@ -196,7 +196,7 @@ tasks.withType<JacocoReport> {
 
 ### Report Location
 ```
-sa-admin/build/reports/jacoco/test/html/index.html
+smartadmin-app/build/reports/jacoco/test/html/index.html
 ```
 
 ### Color Meaning
@@ -253,17 +253,13 @@ void findById_shouldThrow_whenUserNotFound() {
 ./gradlew test jacocoTestReport
 
 # View coverage report
-open sa-admin/build/reports/jacoco/test/html/index.html
+open smartadmin-app/build/reports/jacoco/test/html/index.html
 
 # Verify coverage threshold
 ./gradlew jacocoTestCoverageVerification
 
 # Full verification
 ./gradlew check
-
-# Maven (if used)
-mvn clean test jacoco:report
-mvn jacoco:check -Djacoco.minimum=0.80
 ```
 
 ---

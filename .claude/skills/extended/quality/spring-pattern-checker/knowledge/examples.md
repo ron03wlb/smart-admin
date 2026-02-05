@@ -19,10 +19,10 @@ This document provides complete, production-ready examples of Spring pattern vio
 ### Original Code (Violating)
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.service;
+package net.lab1024.sa.business.employee.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,14 +84,14 @@ public class EmployeeService {
 **Step 1: Create EmployeeManager.java**
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.manager;
+package net.lab1024.sa.business.employee.manager;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.employee.dao.EmployeeDao;
-import net.lab1024.sa.admin.module.business.employee.domain.entity.EmployeeEntity;
-import net.lab1024.sa.admin.module.business.employee.domain.form.EmployeeAddForm;
-import net.lab1024.sa.admin.module.system.role.dao.RoleDao;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.employee.dao.EmployeeDao;
+import net.lab1024.sa.business.employee.domain.entity.EmployeeEntity;
+import net.lab1024.sa.business.employee.domain.form.EmployeeAddForm;
+import net.lab1024.sa.system.role.dao.RoleDao;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,12 +126,12 @@ public class EmployeeManager {
 **Step 2: Update EmployeeService.java**
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.service;
+package net.lab1024.sa.business.employee.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.employee.domain.form.EmployeeAddForm;
-import net.lab1024.sa.admin.module.business.employee.manager.EmployeeManager;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.employee.domain.form.EmployeeAddForm;
+import net.lab1024.sa.business.employee.manager.EmployeeManager;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -154,7 +154,7 @@ public class EmployeeService {
 
 ```bash
 # Run ArchUnit tests
-./gradlew :sa-admin:test --tests ArchitectureTest#managerLayerRules
+./gradlew :smartadmin-app:test --tests ArchitectureTest#managerLayerRules
 
 # Expected output:
 ✅ ArchitectureTest > managerLayerRules() PASSED
@@ -186,10 +186,10 @@ public class EmployeeService {
 ### Original Code (Violating)
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
-import net.lab1024.sa.admin.module.business.user.dao.UserDao;
-import net.lab1024.sa.admin.module.business.user.manager.UserManager;
+import net.lab1024.sa.business.user.dao.UserDao;
+import net.lab1024.sa.business.user.manager.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -243,11 +243,11 @@ public class UserService {
 ### Fixed Code
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.user.dao.UserDao;
-import net.lab1024.sa.admin.module.business.user.manager.UserManager;
+import net.lab1024.sa.business.user.dao.UserDao;
+import net.lab1024.sa.business.user.manager.UserManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -272,7 +272,7 @@ public class UserService {
 
 ```bash
 # Run ArchUnit tests
-./gradlew :sa-admin:test --tests ArchitectureTest#noFieldInjection
+./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection
 
 # Expected output:
 ✅ ArchitectureTest > noFieldInjection() PASSED
@@ -303,12 +303,12 @@ public class UserService {
 ### Original Code (Violating)
 
 ```java
-package net.lab1024.sa.admin.module.business.user.controller;
+package net.lab1024.sa.business.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.user.domain.form.UserAddForm;
-import net.lab1024.sa.admin.module.business.user.manager.UserManager;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.user.domain.form.UserAddForm;
+import net.lab1024.sa.business.user.manager.UserManager;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -358,12 +358,12 @@ public class UserController {
 **Step 1: Create/Update UserService.java**
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.user.domain.form.UserAddForm;
-import net.lab1024.sa.admin.module.business.user.manager.UserManager;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.user.domain.form.UserAddForm;
+import net.lab1024.sa.business.user.manager.UserManager;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 /**
@@ -384,12 +384,12 @@ public class UserService {
 **Step 2: Update UserController.java**
 
 ```java
-package net.lab1024.sa.admin.module.business.user.controller;
+package net.lab1024.sa.business.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.user.domain.form.UserAddForm;
-import net.lab1024.sa.admin.module.business.user.service.UserService;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.user.domain.form.UserAddForm;
+import net.lab1024.sa.business.user.service.UserService;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -413,7 +413,7 @@ public class UserController {
 
 ```bash
 # Run ArchUnit tests
-./gradlew :sa-admin:test --tests ArchitectureTest#layerDependencyRules
+./gradlew :smartadmin-app:test --tests ArchitectureTest#layerDependencyRules
 
 # Expected output:
 ✅ ArchitectureTest > layerDependencyRules() PASSED
@@ -446,11 +446,11 @@ public class UserController {
 ### Original Code (Violating)
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.product.service.ProductService;
-import net.lab1024.sa.admin.module.business.user.service.UserService;
+import net.lab1024.sa.business.product.service.ProductService;
+import net.lab1024.sa.business.user.service.UserService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -500,10 +500,10 @@ public class OrderService {
 **Step 1: Update OrderService.java**
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.order.manager.OrderManager;
+import net.lab1024.sa.business.order.manager.OrderManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -524,15 +524,15 @@ public class OrderService {
 **Step 2: Create/Update OrderManager.java**
 
 ```java
-package net.lab1024.sa.admin.module.business.order.manager;
+package net.lab1024.sa.business.order.manager;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.order.dao.OrderDao;
-import net.lab1024.sa.admin.module.business.product.dao.ProductDao;
-import net.lab1024.sa.admin.module.business.user.dao.UserDao;
-import net.lab1024.sa.foundation.domain.code.UserErrorCode;
-import net.lab1024.sa.foundation.domain.code.ProductErrorCode;
-import net.lab1024.sa.foundation.domain.exception.BusinessException;
+import net.lab1024.sa.business.order.dao.OrderDao;
+import net.lab1024.sa.business.product.dao.ProductDao;
+import net.lab1024.sa.business.user.dao.UserDao;
+import net.lab1024.sa.common.core.domain.code.UserErrorCode;
+import net.lab1024.sa.common.core.domain.code.ProductErrorCode;
+import net.lab1024.sa.common.core.domain.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -574,7 +574,7 @@ public class OrderManager {
 
 ```bash
 # Run ArchUnit tests
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Expected output:
 ✅ ArchitectureTest > layerDependencyRules() PASSED
@@ -614,7 +614,7 @@ public class OrderManager {
 ### Testing Strategy
 
 All fixes should be verified with:
-1. ArchUnit tests (`./gradlew :sa-admin:test --tests ArchitectureTest`)
+1. ArchUnit tests (`./gradlew :smartadmin-app:test --tests ArchitectureTest`)
 2. Spring Pattern Check (`/spring`)
 3. Full build (`./gradlew clean build`)
 4. Manual code review (checklist in quick-reference.md)

@@ -117,7 +117,7 @@ curl -X POST https://api.example.com/api/payment/process \
 ### MyBatis Type Handler
 
 ```java
-package net.lab1024.sa.base.module.support.security;
+package net.lab1024.sa.support.security;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.type.BaseTypeHandler;
@@ -226,7 +226,7 @@ System.out.println(result.getSsn());  // "123-45-6789" (decrypted)
 ### Implementation
 
 ```java
-package net.lab1024.sa.base.module.support.security;
+package net.lab1024.sa.support.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -12,9 +12,9 @@ execution_order:
     description: Verify prerequisites
     commands:
       - java -version
-      - mvn -version
+      - ./gradlew --version
       - docker --version
-    expected_output: Java 21, Maven 3.8+, Docker installed
+    expected_output: Java 21, Gradle 8.x+, Docker installed
     validation: All commands return correct versions
 
   - step: start_databases
@@ -34,14 +34,14 @@ execution_order:
   - step: compile_project
     description: Compile project
     commands:
-      - cd smart-admin-api-java21-springboot3 && mvn clean compile
-    expected_output: BUILD SUCCESS
-    validation: target/ directory created
+      - cd smart-admin-api-java21-springboot3 && ./gradlew clean compileJava
+    expected_output: BUILD SUCCESSFUL
+    validation: build/ directory created
 
   - step: run_arch_tests
     description: Run architecture tests
     commands:
-      - mvn test -Dtest=ArchitectureTest
+      - ./gradlew :smartadmin-app:test --tests ArchitectureTest
     expected_output: Tests run, 0 failures
     validation: All ArchUnit rules passed
 
@@ -65,7 +65,7 @@ This guide will walk you through setting up the SmartAdmin (Java 21 + Spring Boo
 ### Execution Checklist
 Automate all steps, confirm after each step:
 - [ ] Java 21 installed and configured
-- [ ] Maven recognizes Java 21
+- [ ] Gradle recognizes Java 21
 - [ ] Docker service running normally
 - [ ] PostgreSQL container started successfully
 - [ ] Redis container started successfully
@@ -80,8 +80,8 @@ User request: "initialize development environment"
   │   ├─ Java 21 installed?
   │   │   ├─ NO → Prompt installation commands
   │   │   └─ YES → Continue
-  │   ├─ Maven installed?
-  │   │   ├─ NO → Prompt installation commands
+  │   ├─ Gradle installed? (or use Gradle Wrapper)
+  │   │   ├─ NO → Use ./gradlew wrapper
   │   │   └─ YES → Continue
   │   └─ Docker installed?
   │       ├─ NO → Prompt installation commands
@@ -98,12 +98,12 @@ User request: "initialize development environment"
   │   └─ Verify: table structure created successfully
   │
   ├─ 4️⃣ Compile project
-  │   ├─ Execute: mvn clean compile
+  │   ├─ Execute: ./gradlew clean compileJava
   │   ├─ Verify dependencies: Vavr, PostgreSQL Driver
-  │   └─ Confirm: BUILD SUCCESS
+  │   └─ Confirm: BUILD SUCCESSFUL
   │
   └─ 5️⃣ Run architecture tests
-      ├─ Execute: mvn test -Dtest=ArchitectureTest
+      ├─ Execute: ./gradlew :smartadmin-app:test --tests ArchitectureTest
       ├─ Verify: layered architecture correct
       ├─ Verify: Vavr dependencies correct
       └─ Confirm: 0 failures
@@ -128,11 +128,11 @@ java -version
 ```
 **Expected Output**: Java 21 or higher
 
-### 2. Check Maven Installation
+### 2. Check Gradle Installation
 ```bash
-mvn -version
+./gradlew --version
 ```
-**Expected Output**: Maven 3.8+ and Java version 21
+**Expected Output**: Gradle 8.x+ and Java version 21
 
 ### 3. Check Docker (Recommended)
 ```bash
@@ -153,17 +153,18 @@ cd smart-admin-api-java21-springboot3
 ### Key Directories
 ```
 smart-admin-api-java21-springboot3/
-├── sa-base/          # Shared base library
-│   ├── common/       # Core DTOs, utilities
-│   ├── config/       # Spring configuration
-│   └── module/       # Reusable support modules
-└── sa-admin/         # Main application
-    ├── module/
-    │   ├── business/ # Business logic modules
-    │   └── system/   # System modules
+├── smartadmin-common/          # Public Foundation (DTOs, utilities, config)
+├── smartadmin-support/         # Business Support modules (file, dict, login, etc.)
+├── smartadmin-modules/         # Business Domain
+│   ├── smartadmin-system/     # System modules (employee, role, etc.)
+│   ├── smartadmin-business/   # Business logic modules
+│   └── smartadmin-oa/         # OA modules (notice, enterprise, etc.)
+├── smartadmin-api/             # API Contract Layer
+├── smartadmin-starter/         # Starter Combinations
+└── smartadmin-app/             # Unified Application Entry
     └── src/main/resources/
         ├── application.yaml
-        └── dev/sa-base.yaml
+        └── dev/
 ```
 
 ---
@@ -205,7 +206,7 @@ psql postgres -c "GRANT ALL ON DATABASE smart_admin_v3 TO smartadmin;"
 
 ## IV. Application Configuration
 
-### Database Configuration (sa-base/src/main/resources/dev/sa-base.yaml)
+### Database Configuration (smartadmin-app/src/main/resources/dev/application.yaml)
 
 ```yaml
 spring:
@@ -228,7 +229,7 @@ mybatis-plus:
 ### Verify Dependencies
 
 ```bash
-mvn dependency:tree | grep -E "(postgresql|vavr)"
+./gradlew dependencies | grep -E "(postgresql|vavr)"
 # Confirm: postgresql:42.7.5, vavr:0.10.4
 ```
 
@@ -239,14 +240,14 @@ mvn dependency:tree | grep -E "(postgresql|vavr)"
 ```bash
 # Compile
 cd smart-admin-api-java21-springboot3
-mvn clean compile
+./gradlew clean compileJava
 
 # Package (skip tests)
-mvn clean package -DskipTests
+./gradlew clean build -x test
 
 # Start
-cd sa-admin && mvn spring-boot:run
-# or: java -jar sa-admin/target/sa-admin-3.28.3.jar
+./gradlew :smartadmin-app:bootRun
+# or: java -jar smartadmin-app/build/libs/smartadmin-app-*.jar
 ```
 
 **Verify**: http://localhost:1024, Swagger: http://localhost:1024/swagger-ui.html
@@ -257,23 +258,23 @@ cd sa-admin && mvn spring-boot:run
 
 ```bash
 # Architecture tests
-mvn test -Dtest=ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Complete verification (tests + coverage)
-mvn verify
+./gradlew check
 ```
 
 ### Run Code Style Checks
 ```bash
-mvn checkstyle:check
+./gradlew checkstyleMain checkstyleTest
 ```
 
 ### Generate Test Coverage Report
 ```bash
-mvn clean test jacoco:report
+./gradlew test jacocoTestReport
 ```
 
-**Report Location**: `target/site/jacoco/index.html`
+**Report Location**: `smartadmin-app/build/reports/jacoco/test/html/index.html`
 
 **Coverage Requirement**: ≥ 80%
 
@@ -302,7 +303,7 @@ npm run dev
 
 
 ### Q1: Port 1024 Already in Use
-**Solution**: Modify `sa-admin/src/main/resources/dev/application.yaml`
+**Solution**: Modify `smartadmin-app/src/main/resources/dev/application.yaml`
 ```yaml
 server:
   port: 8080  # Change to other port
@@ -321,7 +322,7 @@ docker-compose logs postgres
 docker exec -it smartadmin-postgres psql -U smartadmin -d smart_admin_v3
 
 # 4. Verify configuration file
-grep -A 5 "datasource:" sa-base/src/main/resources/dev/sa-base.yaml
+grep -A 5 "datasource:" smartadmin-app/src/main/resources/dev/application.yaml
 ```
 
 ### Q3: Redis Connection Failed
@@ -334,18 +335,16 @@ grep -A 5 "datasource:" sa-base/src/main/resources/dev/sa-base.yaml
 - Or disable Redis in configuration
 
 ### Q4: Dependency Download Slow
-**Solution**: Configure Maven mirror (Aliyun)
+**Solution**: Configure Gradle mirror (Aliyun)
 
-**File**: `~/.m2/settings.xml`
-```xml
-<mirrors>
-  <mirror>
-    <id>aliyun</id>
-    <mirrorOf>central</mirrorOf>
-    <name>Aliyun Maven</name>
-    <url>https://maven.aliyun.com/repository/public</url>
-  </mirror>
-</mirrors>
+**File**: `~/.gradle/init.gradle`
+```groovy
+allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        mavenCentral()
+    }
+}
 ```
 
 ### Q5: ArchUnit Test Failed
@@ -381,8 +380,8 @@ After successful initialization:
    - `.agent/rules/technology/database/D04-mybatis-plus-core.md` - MyBatis Plus integration standards
 
 2. **Explore Codebase**
-   - `sa-base/module/support/` - Reusable support modules
-   - `sa-admin/module/business/` - Business logic modules
+   - `smartadmin-support/module/support/` - Reusable support modules
+   - `smartadmin-modules/smartadmin-business/` - Business logic modules
    - `.agent/configs/ArchitectureTest.java` - Architecture test rules
 
 3. **Development Practice**
@@ -419,12 +418,11 @@ sleep 5
 
 # 3. Compile project
 cd ../../smart-admin-api-java21-springboot3
-mvn clean compile -DskipTests
+./gradlew clean compileJava
 echo "✅ Project compiled"
 
 # 4. Start application
-cd sa-admin
-mvn spring-boot:run
+./gradlew :smartadmin-app:bootRun
 ```
 
 **Run**:
@@ -454,6 +452,6 @@ docker-compose down -v
 
 Reference Documentation:
 - Development Standards & Navigation: `.agent/README.md`
-- Maven Dependencies: `.agent/configs/maven-dependencies.md`
+- Gradle Dependencies: See `build.gradle.kts` and `libs.versions.toml`
 - Docker Environment: `.agent/configs/docker-compose.yml`
 - Architecture Tests: `.agent/configs/ArchitectureTest.java`

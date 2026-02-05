@@ -699,12 +699,12 @@ THEN 標記為 "VIP Farming" → 人工審核
 ## 📚 相關文檔
 
 ### 業務邏輯參考
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 紅利錢包集成
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - VIP專屬活動
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 紅利錢包集成
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - VIP專屬活動
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 有效流水定義
 
 ### 技術架構參考
-- [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 數據庫設計
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - 數據庫設計
 - [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 配置變更審計
 - [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 配置變更審批
 

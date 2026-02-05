@@ -83,7 +83,7 @@ dependencies:
 
   required_files:
     - ".agent/rules/foundation/10-architecture-rules.md"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/ArchitectureTest.java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java"
 
   tools:
     - name: "gradle"
@@ -95,7 +95,7 @@ output:
     - "*.java"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java"
 
   templates: {}
 
@@ -110,15 +110,15 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify refactored code compiles successfully"
-      command: "./gradlew :sa-admin:compileJava"
+      command: "./gradlew :smartadmin-app:compileJava"
 
     - check: "archunit"
       description: "Verify ArchitectureTest.serviceUsesVavrOption passes"
-      command: "./gradlew :sa-admin:test --tests ArchitectureTest.serviceUsesVavrOption"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest.serviceUsesVavrOption"
 
     - check: "unit-tests"
       description: "Run unit tests to verify business logic preserved"
-      command: "./gradlew :sa-admin:test"
+      command: "./gradlew :smartadmin-app:test"
 
 compatibility:
   deprecated: false

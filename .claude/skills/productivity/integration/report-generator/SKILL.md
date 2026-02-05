@@ -173,7 +173,7 @@ dependencies {
 ### Step 2: Create Export Service (10 minutes)
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
 import com.alibaba.excel.EasyExcel;
 import lombok.RequiredArgsConstructor;
@@ -269,9 +269,9 @@ curl -X POST http://localhost:1024/api/user/export/excel \
 ### Complete Export Service with Async Support
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import com.alibaba.excel.EasyExcel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

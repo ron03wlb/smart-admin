@@ -12,9 +12,9 @@
 ## 測試結構
 
 ```
-sa-admin/src/test/java/
-├── net/lab1024/sa/admin/module/
-│   └── {module}/
+smartadmin-app/src/test/java/
+├── net/lab1024/sa/{module}/
+│   └── {feature}/
 │       ├── {Entity}ServiceTest.java       # 單元測試
 │       ├── {Entity}IntegrationTest.java   # 整合測試
 │       └── {Entity}TestFixture.java       # 測試數據

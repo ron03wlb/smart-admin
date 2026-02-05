@@ -64,7 +64,7 @@ dependencies:
     - cache-strategy-generator
     - apm-integration
 
-output: { generates: ["*.java"], target_directories: ["smart-admin-api-java21-springboot3/sa-admin/src/main/java"], templates: {} }
+output: { generates: ["*.java"], target_directories: ["smart-admin-api-java21-springboot3/smartadmin-app/src/main/java"], templates: {} }
 validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [{ check: "compilation" }] }
 compatibility: { deprecated: false }
 documentation: { skill_md: "SKILL.md", readme: null }

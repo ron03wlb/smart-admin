@@ -336,7 +336,7 @@ jobs:
 - [03-02 遊戲大廳管理](../03_Game_Center/03-02_Game_Lobby_Management.md) - 遊戲列表渲染
 
 ### 業務整合
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 用戶體驗優化
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Lifecycle.md) - 用戶體驗優化
 - [07-04 數據管道架構](../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) - 性能數據分析
 
 ---

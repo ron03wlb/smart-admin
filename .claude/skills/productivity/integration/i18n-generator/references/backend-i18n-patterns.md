@@ -221,7 +221,7 @@ public class I18nService {
 ## Pattern 3: ResponseDTO with i18n
 
 ```java
-package net.lab1024.sa.foundation.domain.response;
+package net.lab1024.sa.common.core.domain.response;
 
 import lombok.Data;
 import net.lab1024.sa.foundation.i18n.service.I18nService;
@@ -291,7 +291,7 @@ validation.order.amount.positive=Order amount must be positive
 ### Step 2: Custom Validator with i18n
 
 ```java
-package net.lab1024.sa.admin.module.business.user.validator;
+package net.lab1024.sa.business.user.validator;
 
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.foundation.i18n.service.I18nService;
@@ -336,7 +336,7 @@ public class UsernameValidator implements ConstraintValidator<ValidUsername, Str
 ### Step 1: Enum with i18n Keys
 
 ```java
-package net.lab1024.sa.admin.module.business.order.domain.enumeration;
+package net.lab1024.sa.business.order.domain.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -414,12 +414,12 @@ public class EnumI18nService {
 ## Pattern 6: SmartAdmin Service Integration
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.user.domain.form.UserAddForm;
-import net.lab1024.sa.admin.module.business.user.manager.UserManager;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.user.domain.form.UserAddForm;
+import net.lab1024.sa.business.user.manager.UserManager;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.foundation.i18n.service.I18nService;
 import org.springframework.stereotype.Service;
 
@@ -465,7 +465,7 @@ public class UserService {
 package net.lab1024.sa.foundation.i18n.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.foundation.domain.request.RequestUser;
+import net.lab1024.sa.common.core.domain.request.RequestUser;
 import net.lab1024.sa.foundation.sa.token.SmartRequestUserService;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -529,7 +529,7 @@ public class UserEntity {
 ## Pattern 8: Localized Email Templates
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.service;
+package net.lab1024.sa.business.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.foundation.i18n.service.I18nService;

@@ -85,7 +85,7 @@ dependencies:
 
   required_files:
     - ".agent/rules/security/01-security-best-practices.md"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/foundation/api-encrypt/"
+    - "smart-admin-api-java21-springboot3/smartadmin-common/foundation/api-encrypt/"
 
   tools:
     - name: "gradle"
@@ -97,7 +97,7 @@ output:
     - "*.java"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java"
 
   templates: {}
 
@@ -113,11 +113,11 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify security code compiles successfully"
-      command: "./gradlew :sa-admin:compileJava"
+      command: "./gradlew :smartadmin-app:compileJava"
 
     - check: "unit-tests"
       description: "Run security-related unit tests"
-      command: "./gradlew :sa-admin:test --tests *Security*"
+      command: "./gradlew :smartadmin-app:test --tests *Security*"
 
 compatibility:
   deprecated: false

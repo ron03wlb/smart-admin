@@ -248,7 +248,7 @@ Add required imports to each file:
 ```java
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
+import net.lab1024.sa.system.constant.AdminSwaggerTagConst;
 ```
 
 **Form/VO**:
@@ -262,18 +262,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 **BrandController.java** (Fully Annotated):
 ```java
-package net.lab1024.sa.admin.module.business.goods.controller;
+package net.lab1024.sa.business.goods.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.constant.AdminSwaggerTagConst;
-import net.lab1024.sa.admin.module.business.goods.domain.form.*;
-import net.lab1024.sa.admin.module.business.goods.domain.vo.BrandVO;
-import net.lab1024.sa.admin.module.business.goods.service.BrandService;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.system.constant.AdminSwaggerTagConst;
+import net.lab1024.sa.business.goods.domain.form.*;
+import net.lab1024.sa.business.goods.domain.vo.BrandVO;
+import net.lab1024.sa.business.goods.service.BrandService;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;

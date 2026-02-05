@@ -91,7 +91,7 @@ static final ArchRule transactionalOnlyInManager =
 static final ArchRule managerShouldNotAccessBusinessService =
     noClasses()
         .that().resideInAPackage("..manager..")
-        .should().dependOnClassesThat().resideInAPackage("net.lab1024.sa.admin..service..")
+        .should().dependOnClassesThat().resideInAPackage("net.lab1024.sa..service..")
         .because("Manager 層禁止調用業務 Service 層（嚴格執行，規則：09-manager-layer.md）");
 ```
 
@@ -409,7 +409,7 @@ static final ArchRule managerNoService =
 **✅ CORRECT:**
 ```java
 // Specific to business code
-.resideInAnyPackage("net.lab1024.sa.admin..service..")
+.resideInAnyPackage("net.lab1024.sa..service..")
 ```
 
 **Why:** Broad patterns catch framework classes (e.g., MyBatis-Plus ServiceImpl). Use full package path for business rules.
@@ -459,7 +459,7 @@ private static final String LAYER_DAO = "Dao";
 
 ```java
 // Business code (admin module)
-"net.lab1024.sa.admin.."
+"net.lab1024.sa.."
 
 // Foundation modules
 "net.lab1024.sa.foundation.."
@@ -507,8 +507,8 @@ Before completing test generation:
 - [ ] Uses class constants where applicable
 - [ ] `.because()` clause references rule file (e.g., "rule: 09-manager-layer.md")
 - [ ] Javadoc explains rule and exemptions
-- [ ] Test compiles: `./gradlew :sa-admin:compileTestJava`
-- [ ] Test runs: `./gradlew :sa-admin:test --tests ArchitectureTest`
+- [ ] Test compiles: `./gradlew :smartadmin-app:compileTestJava`
+- [ ] Test runs: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 - [ ] Created violation example to verify test catches bad code
 - [ ] Updated rule file frontmatter with `archunit_test` field
 

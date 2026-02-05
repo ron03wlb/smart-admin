@@ -32,7 +32,7 @@ noFields().that().areDeclaredInClassesThat()
 ## 完整測試範本
 
 ```java
-@AnalyzeClasses(packages = "net.lab1024.sa.admin")
+@AnalyzeClasses(packages = "net.lab1024.sa")
 public class ArchitectureTest {
 
     // 分層規則

@@ -157,7 +157,7 @@ static final ArchRule noBooleanFieldWithIsPrefix =
 ### Compilation Check
 
 ```bash
-./gradlew :sa-admin:compileTestJava
+./gradlew :smartadmin-app:compileTestJava
 # Result: BUILD SUCCESSFUL in 33s
 ```
 
@@ -168,7 +168,7 @@ static final ArchRule noBooleanFieldWithIsPrefix =
 ### Execution Check (Clean Codebase)
 
 ```bash
-./gradlew :sa-admin:test --tests "net.lab1024.sa.admin.ArchitectureTest"
+./gradlew :smartadmin-app:test --tests "net.lab1024.sa.ArchitectureTest"
 # Result: BUILD SUCCESSFUL in 1m 8s
 # Tests run: 10 (including 2 new tests)
 # Failures: 0
@@ -232,7 +232,7 @@ Boolean field ViolationTestEntity.isActive starts with 'is' prefix, should use '
 
 After removing violation files:
 ```bash
-./gradlew :sa-admin:test --tests "net.lab1024.sa.admin.ArchitectureTest"
+./gradlew :smartadmin-app:test --tests "net.lab1024.sa.ArchitectureTest"
 # Result: BUILD SUCCESSFUL
 ```
 
@@ -258,7 +258,7 @@ After removing violation files:
 
 **Issue**: SmartAdmin has TWO `ArchitectureTest.java` files:
 - `.agent/configs/ArchitectureTest.java` (reference/template)
-- `sa-admin/src/test/java/.../ArchitectureTest.java` (actual test)
+- `smartadmin-app/src/test/java/.../ArchitectureTest.java` (actual test)
 
 **Impact**: Initially edited wrong file (reference copy)
 
@@ -436,7 +436,7 @@ not reference copies in .agent/configs/
 
 ### Test 1: SLF4J Logger Usage
 
-**File**: `sa-admin/src/test/java/net/lab1024/sa/admin/ArchitectureTest.java`
+**File**: `smartadmin-app/src/test/java/net/lab1024/sa/admin/ArchitectureTest.java`
 
 ```java
 /**
@@ -540,7 +540,7 @@ static final ArchRule noBooleanFieldWithIsPrefix =
 ### Violation 1: SLF4J Direct Import
 
 ```java
-package net.lab1024.sa.admin.module.system.employee.service;
+package net.lab1024.sa.system.employee.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -566,7 +566,7 @@ public class ViolationTestService {
 ### Violation 2: Boolean Field with "is" Prefix
 
 ```java
-package net.lab1024.sa.admin.module.system.employee.domain.entity;
+package net.lab1024.sa.system.employee.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

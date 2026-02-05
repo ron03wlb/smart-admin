@@ -79,7 +79,7 @@ Skill: [生成代码，遵循 ArchitectureTest 规则]
        3. QueryForm 包含 deletedFlag 条件（hidden = true）
 
        建议验证步骤：
-       1. 运行 ./gradlew :sa-admin:test --tests ArchitectureTest
+       1. 运行 ./gradlew :smartadmin-app:test --tests ArchitectureTest
        2. 检查 Mapper.xml SQL 的 WHERE 条件
        3. 在 Service 层调用 Dao 方法测试"
 ```
@@ -245,9 +245,9 @@ public class OrderQueryForm extends PageParam {
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.admin.module.business.order.dao.OrderDao">
+<mapper namespace="net.lab1024.sa.business.order.dao.OrderDao">
 
-    <select id="queryOrder" resultType="net.lab1024.sa.admin.module.business.order.domain.vo.OrderVO">
+    <select id="queryOrder" resultType="net.lab1024.sa.business.order.domain.vo.OrderVO">
         SELECT *
         FROM t_order
         <where>
@@ -267,7 +267,7 @@ public class OrderQueryForm extends PageParam {
         ORDER BY create_time DESC
     </select>
 
-    <select id="getByOrderNo" resultType="net.lab1024.sa.admin.module.business.order.domain.entity.OrderEntity">
+    <select id="getByOrderNo" resultType="net.lab1024.sa.business.order.domain.entity.OrderEntity">
         SELECT *
         FROM t_order
         WHERE order_no = #{orderNo}
@@ -401,8 +401,8 @@ After code generation, the skill automatically:
 **Manual Verification (Recommended):**
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest
-./gradlew :sa-admin:bootRun  # Test in running application
+./gradlew :smartadmin-app:test --tests ArchitectureTest
+./gradlew :smartadmin-app:bootRun  # Test in running application
 ```
 
 ## Troubleshooting

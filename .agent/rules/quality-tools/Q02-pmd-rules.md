@@ -23,7 +23,7 @@ last_updated: 2026-01-22
 ### When to Apply This Rule
 - ✅ When generating any Java code
 - ✅ During Code Review to check code quality
-- ✅ When `./gradlew pmdMain` or `mvn pmd:check` fails
+- ✅ When `./gradlew pmdMain` fails
 - ✅ User asks about code smell issues
 
 ### Mandatory Enforcement Checklist
@@ -271,13 +271,10 @@ Based on actual project violation analysis:
 ./gradlew pmdMain pmdTest
 
 # View report
-open sa-admin/build/reports/pmd/main.html
-
-# Maven (if used)
-mvn pmd:check
+open smartadmin-app/build/reports/pmd/main.html
 
 # Check specific module only
-./gradlew :sa-admin:pmdMain
+./gradlew :smartadmin-app:pmdMain
 ```
 
 ---

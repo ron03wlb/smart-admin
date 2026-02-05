@@ -289,7 +289,7 @@ ORM: SQLAlchemy 2.0
 }
 ```
 
-**詳細規範**：參見 [12-05 API設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md)
+**詳細規範**：參見 [12-05 API設計標準](../../07_Technical_Infrastructure/07-03-01_Design_Principles.md)
 
 ---
 
@@ -712,8 +712,8 @@ public class WalletManager {
 | 並發 TPS | 87 | ≥450 | +418% ⭐ |
 
 **相關文檔**：
-- [07-09 緩存策略](../07_Technical_Infrastructure/07-09_Caching_Strategy.md) - JetCache + Redisson 完整實現
-- [07-07 性能優化](../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §10 多級緩存架構
+- [07-09 緩存策略](../../07_Technical_Infrastructure/07-09_Caching_Strategy.md) - JetCache + Redisson 完整實現
+- [07-07 性能優化](../../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §10 多級緩存架構
 
 **版本要求**：
 - JetCache: ≥ 2.7.0
@@ -882,8 +882,8 @@ ROI 分析:
 ```
 
 **相關文檔**：
-- [07-08 流處理架構](../07_Technical_Infrastructure/07-08_Stream_Processing_Architecture.md) - Flink CDC, SQL, CEP 完整實現
-- [07-07 性能優化](../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §9 Flink 集成
+- [07-08 流處理架構](../../07_Technical_Infrastructure/07-08_Stream_Processing_Architecture.md) - Flink CDC, SQL, CEP 完整實現
+- [07-07 性能優化](../../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §9 Flink 集成
 
 **版本要求**：
 - Flink: ≥ 1.18.0
@@ -1048,7 +1048,7 @@ IaC工具: Terraform 1.7
 盲索引: HMAC-SHA256
 ```
 
-**詳細規範**：參見 [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)
+**詳細規範**：參見 [09-03 數據安全標準](../../09_System_Security/09-03_Data_Security_Standard.md)
 
 ---
 
@@ -1088,7 +1088,7 @@ DAST: OWASP ZAP 2.14
 - **Adyen** (全球化)
 - **Stripe** (開發者友好)
 
-**集成標準**：參見 [02-02 支付網關集成](../02_Finance_Center/02-02_Payment_Gateway_Integration.md)
+**集成標準**：參見 [02-02 支付網關集成](../../02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 
 ---
 
@@ -1099,7 +1099,7 @@ DAST: OWASP ZAP 2.14
 - **Hub88** (100+ 供應商)
 - **Groove Gaming** (快速集成)
 
-**集成標準**：參見 [03-01 遊戲集成標準](../03_Game_Center/03-01_Game_Integration_Standard.md)
+**集成標準**：參見 [03-01 遊戲集成標準](../../03_Game_Center/03-01_Game_Integration_Standard.md)
 
 ---
 
@@ -1156,13 +1156,13 @@ DAST: OWASP ZAP 2.14
 
 ### 技術參考
 - [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
-- [12-05 API設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - API規範
-- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - 網關設計
-- [12-01 部署架構](../07_Technical_Infrastructure/07-01_Deployment.md) - CI/CD
+- [12-05 API設計標準](../../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - API規範
+- [12-03 網關架構](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - 網關設計
+- [12-01 部署架構](../../07_Technical_Infrastructure/07-01_Deployment.md) - CI/CD
 
 ### 安全參考
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密規範
-- [09-01 管理後台RBAC](../05_Platform_Governance/05-02_RBAC_Permissions.md) - 權限設計
+- [09-03 數據安全標準](../../09_System_Security/09-03_Data_Security_Standard.md) - 加密規範
+- [09-01 管理後台RBAC](../../05_Platform_Governance/05-02_RBAC_Permissions.md) - 權限設計
 
 ---
 

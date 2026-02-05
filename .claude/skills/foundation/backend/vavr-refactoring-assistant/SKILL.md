@@ -63,7 +63,7 @@ User: "Replace try-catch with Try.of() for error handling"
 
 ### 1. Check build.gradle.kts
 
-Vavr must be added to `sa-base/foundation/core/build.gradle.kts`:
+Vavr must be added to `smartadmin-common/foundation/core/build.gradle.kts`:
 
 ```kotlin
 dependencies {
@@ -78,7 +78,7 @@ dependencies {
 
 **Verification command:**
 ```bash
-./gradlew :sa-base:foundation:core:dependencies --configuration api | grep vavr
+./gradlew :smartadmin-common:foundation:core:dependencies --configuration api | grep vavr
 ```
 
 **Expected output:**
@@ -90,14 +90,14 @@ dependencies {
 
 **Symptom**: Compilation error `package io.vavr.control does not exist`
 
-**Fix**: Add dependency to `sa-base/foundation/core/build.gradle.kts` (see above), then:
+**Fix**: Add dependency to `smartadmin-common/foundation/core/build.gradle.kts` (see above), then:
 ```bash
-./gradlew :sa-admin:compileJava
+./gradlew :smartadmin-app:compileJava
 ```
 
 ### 3. Create verification test (optional)
 
-Create `sa-admin/src/test/java/net/lab1024/sa/admin/VavrDependencyTest.java`:
+Create `smartadmin-app/src/test/java/net/lab1024/sa/admin/VavrDependencyTest.java`:
 ```java
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -801,11 +801,11 @@ public Try<Employee> updateEmployee(EmployeeUpdateForm form) {
 2. Change method signature (Optional → Option)
 3. Refactor method body (apply patterns from this skill)
 4. Update Controller layer to handle Option/Try
-5. Verify compilation: `./gradlew :sa-admin:compileJava`
+5. Verify compilation: `./gradlew :smartadmin-app:compileJava`
 
 ### Phase 3: Validation (3-5 minutes)
-1. Run integration tests: `./gradlew :sa-admin:test --tests {ServiceIntegrationTest}`
-2. Run ArchUnit test: `./gradlew :sa-admin:test --tests ArchitectureTest#serviceUsesVavrOption`
+1. Run integration tests: `./gradlew :smartadmin-app:test --tests {ServiceIntegrationTest}`
+2. Run ArchUnit test: `./gradlew :smartadmin-app:test --tests ArchitectureTest#serviceUsesVavrOption`
 3. Verify business logic correctness (manually test endpoints if needed)
 
 **Total Time Estimate**: 10-15 minutes per Service class
@@ -830,7 +830,7 @@ public Try<Employee> updateEmployee(EmployeeUpdateForm form) {
 
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest#serviceUsesVavrOption
+./gradlew :smartadmin-app:test --tests ArchitectureTest#serviceUsesVavrOption
 ```
 
 **Expected output:**

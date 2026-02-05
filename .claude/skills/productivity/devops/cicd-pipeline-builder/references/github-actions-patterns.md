@@ -130,7 +130,7 @@ env:
 
 ```yaml
 - name: Run Unit Tests
-  run: ./gradlew :sa-admin:test -x integrationTest --no-daemon
+  run: ./gradlew :smartadmin-app:test -x integrationTest --no-daemon
   working-directory: smart-admin-api-java21-springboot3
 ```
 
@@ -138,7 +138,7 @@ env:
 
 ```yaml
 - name: Run Integration Tests
-  run: ./gradlew :sa-admin:integrationTest --no-daemon
+  run: ./gradlew :smartadmin-app:integrationTest --no-daemon
   working-directory: smart-admin-api-java21-springboot3
   env:
     SPRING_PROFILES_ACTIVE: test
@@ -153,7 +153,7 @@ env:
 
 ```yaml
 - name: Run Architecture Tests
-  run: ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+  run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
   working-directory: smart-admin-api-java21-springboot3
 ```
 
@@ -166,8 +166,8 @@ env:
   with:
     name: test-results
     path: |
-      smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
-      smart-admin-api-java21-springboot3/sa-admin/build/test-results/
+      smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
+      smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/
     retention-days: 30
 ```
 
@@ -179,7 +179,7 @@ env:
 
 ```yaml
 - name: Run SpotBugs
-  run: ./gradlew :sa-admin:spotbugsMain --no-daemon
+  run: ./gradlew :smartadmin-app:spotbugsMain --no-daemon
   working-directory: smart-admin-api-java21-springboot3
   continue-on-error: true  # Don't fail build on warnings
 ```
@@ -188,7 +188,7 @@ env:
 
 ```yaml
 - name: Run PMD
-  run: ./gradlew :sa-admin:pmdMain --no-daemon
+  run: ./gradlew :smartadmin-app:pmdMain --no-daemon
   working-directory: smart-admin-api-java21-springboot3
   continue-on-error: true
 ```
@@ -197,7 +197,7 @@ env:
 
 ```yaml
 - name: Run Checkstyle
-  run: ./gradlew :sa-admin:checkstyleMain --no-daemon
+  run: ./gradlew :smartadmin-app:checkstyleMain --no-daemon
   working-directory: smart-admin-api-java21-springboot3
   continue-on-error: true
 ```
@@ -211,9 +211,9 @@ env:
   with:
     name: quality-reports
     path: |
-      smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
-      smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
-      smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+      smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
+      smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
+      smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
     retention-days: 30
 ```
 

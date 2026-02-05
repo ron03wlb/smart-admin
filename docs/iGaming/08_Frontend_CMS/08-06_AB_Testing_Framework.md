@@ -307,7 +307,7 @@ THEN stop_experiment() AND rollback()
 ## 📚 相關文檔
 
 ### 前置知識
-- [00-04 技術選型標準](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 前端技術棧、分析工具選型
+- [00-04 技術選型標準](../00_Foundation/concepts/00-04_Technology_Stack.md) - 前端技術棧、分析工具選型
 
 ### 核心依賴
 - [01-03 玩家分群與標籤](../01_Player_Center/01-03_Player_Segmentation.md) - 基於分群的 A/B 測試
@@ -315,7 +315,7 @@ THEN stop_experiment() AND rollback()
 
 ### 延伸閱讀
 - [08-01 前端佈局引擎](./08-01_Frontend_Layout_Engine.md) - 動態佈局與 A/B 測試集成
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 活動效果 A/B 測試
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 活動效果 A/B 測試
 
 ---
 

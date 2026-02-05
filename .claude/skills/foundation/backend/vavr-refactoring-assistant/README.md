@@ -101,7 +101,7 @@ public static final ArchRule serviceUsesVavrOption = methods()
 
 **Validation:**
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest#serviceUsesVavrOption
+./gradlew :smartadmin-app:test --tests ArchitectureTest#serviceUsesVavrOption
 ```
 
 ---

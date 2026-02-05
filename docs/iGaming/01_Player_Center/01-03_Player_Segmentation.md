@@ -166,15 +166,15 @@ VIP 玩家 (1.5-3%)
 ## 📚 相關文檔
 
 ### 前置知識
-- [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - player_tags 表設計
-- [00-02 行業術語表](../00_Concept_&_Analysis/00-02_Industry_Terminology.md) - RFM、生命週期等術語定義
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - player_tags 表設計
+- [00-02 行業術語表](../00_Foundation/concepts/00-02_Industry_Terminology.md) - RFM、生命週期等術語定義
 
 ### 核心依賴
 - [01-02 VIP 與忠誠度系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級與玩家價值關聯
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控標籤與規則引擎
 
 ### 延伸閱讀
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 基於分群的精準營銷
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 基於分群的精準營銷
 - [10-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - 玩家分群分析報表
 
 ---

@@ -3,7 +3,7 @@
 > **三層風控架構定位**: **Layer 2 - 財務狀態因子**
 > 本模塊負責根據遊戲結果 (WIN/LOSS/DRAW) 計算有效流水的狀態因子。
 > 需依賴 Layer 1 (05-01) 完成風控驗證後才執行。
-> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Concept_&_Analysis/00-00_Document_Map.md#-流水計算邏輯)
+> 完整架構參見: [00-00 文檔地圖 §流水計算邏輯](../00_Foundation/concepts/00-00_Document_Map.md#-流水計算邏輯)
 
 本文件詳細定義「有效流水 (Valid Turnover)」的計算邏輯以及「遊戲商對帳 (Game Reconciliation)」的完整流程，確保數據精確度與資金安全。
 
@@ -1149,7 +1149,7 @@ Controller → Manager (❌ 禁止,違反分層)
 ## 📚 相關文檔
 
 ### 前置依賴
-- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 錢包架構
+- [02-06 統一錢包模型](./02-06_Wallet_Architecture.md) - 錢包架構
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
 
 ### 核心依賴

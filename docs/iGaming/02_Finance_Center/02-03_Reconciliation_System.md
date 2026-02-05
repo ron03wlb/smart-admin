@@ -500,7 +500,7 @@ flowchart TD
 ### 業務邏輯參考
 - [02-02 支付網關集成](./02-02_Payment_Gateway_Integration.md) - PSP 交易數據來源
 - [02-04 流水計算與對賬](./02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳流程
-- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 餘額調整邏輯
+- [02-06 統一錢包模型](./02-06_Wallet_Architecture.md) - 餘額調整邏輯
 
 ### 技術架構參考
 - [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 調帳操作審計

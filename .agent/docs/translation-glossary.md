@@ -175,10 +175,10 @@
 | 繁體中文 | English | Context / Notes |
 |---------|---------|-----------------|
 | 配置管理 | Configuration Management | Application settings |
-| 基礎配置 | Base Configuration | sa-base.yaml settings |
-| 應用配置 | Application Configuration | application.yaml settings |
+| 基礎配置 | Base Configuration | smartadmin-common / smartadmin-support settings |
+| 應用配置 | Application Configuration | smartadmin-app application.yaml settings |
 | 環境 | Environment | dev, test, pre, prod |
-| 建置命令 / 構建命令 | Build Command | mvn/gradle commands |
+| 建置命令 / 構建命令 | Build Command | ./gradlew commands |
 | 套件 / 包 | Package | Java package namespace |
 | 模組 | Module | Gradle/Maven module |
 | 依賴 | Dependency | Library dependencies |

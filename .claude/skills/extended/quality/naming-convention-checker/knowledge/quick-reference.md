@@ -241,7 +241,7 @@ public class PlayerMetricsEntity { }
 **Validation**:
 ```bash
 # Verify exemption rule is applied
-grep -r "t_.*_metrics" sa-admin/src/main/java/*/entity/
+grep -r "t_.*_metrics" smartadmin-modules/src/main/java/*/entity/
 # Expected: No violations reported
 ```
 
@@ -386,7 +386,7 @@ public class PlayerEntity { }
 ### Test Implementation
 
 ```java
-package net.lab1024.sa.admin.test.architecture;
+package net.lab1024.sa.test.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -455,7 +455,7 @@ class TableNameSingularCondition extends ArchCondition<JavaClass> {
 
 ```bash
 # Run ArchUnit test
-./gradlew :sa-admin:test --tests NamingConventionTest
+./gradlew :smartadmin-app:test --tests NamingConventionTest
 
 # Expected output (compliant):
 # NamingConventionTest > tableName_shouldBeSingular() PASSED

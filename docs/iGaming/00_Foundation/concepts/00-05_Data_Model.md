@@ -149,7 +149,7 @@ Game Provider
 
 ### 1. Player Account State Machine (玩家帳戶狀態機)
 
-> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義請參考 [01-01_Player_Lifecycle.md §3](../01_Player_Center/01-01_Player_Lifecycle.md#3-account-status-state-machine)
+> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義請參考 [01-01_Player_Lifecycle.md §3](../../01_Player_Center/01-01_Player_Lifecycle.md#3-account-status-state-machine)
 
 **五狀態定義**:
 
@@ -209,7 +209,7 @@ WHERE account_status = 'LOCKED'
 
 ### 2. Withdrawal State Machine (提款狀態機)
 
-> 💡 **SSOT Marker**: 提款流程的完整 SAGA 定義請參考 [01-05_Withdrawal_Risk.md §7.2](../01_Player_Center/01-05_Withdrawal_Risk.md#72-saga-orchestration-workflow)
+> 💡 **SSOT Marker**: 提款流程的完整 SAGA 定義請參考 [01-05_Withdrawal_Risk.md §7.2](../../01_Player_Center/01-05_Withdrawal_Risk.md#72-saga-orchestration-workflow)
 
 **十狀態定義**:
 
@@ -278,7 +278,7 @@ WHERE wrc.player_id = ?
 
 ### 3. VIP Tier State Machine (VIP 等級狀態機)
 
-> 💡 **SSOT Marker**: VIP 系統的完整設計請參考 [01-02_VIP_&_Loyalty_System.md §2.1.1](../03_Player_Journey/03-02_VIP_Loyalty.md#211-vip-tier-state-machine)
+> 💡 **SSOT Marker**: VIP 系統的完整設計請參考 [01-02_VIP_&_Loyalty_System.md §2.1.1](../../01_Player_Center/01-06_VIP_Loyalty.md#211-vip-tier-state-machine)
 
 **五級別定義**:
 
@@ -446,7 +446,7 @@ INSERT INTO player_status_audit_log (
 
 **可下注餘額公式**:
 
-> 💡 **SSOT Marker**: 可下注餘額的完整計算邏輯請參考 [02-06_Unified_Wallet_Model.md §2.2](../02_Finance_Center/02-06_Unified_Wallet_Model.md#22-playable-balance-formula)
+> 💡 **SSOT Marker**: 可下注餘額的完整計算邏輯請參考 [02-06_Wallet_Architecture.md §2.2](../../02_Finance_Center/02-06_Wallet_Architecture.md#22-playable-balance-formula)
 
 ```text
 Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
@@ -515,9 +515,9 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 **三層驗證架構**:
 
 > 💡 **SSOT Marker**: 三層驗證架構的完整設計請參考：
-> - Layer 1 (風控驗證): [05-01_Risk_Control_System.md §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-turnover-validation)
-> - Layer 2 (財務驗證): [02-03_Turnover_Calculation.md §3](../02_Game_Operations/02-03_Turnover_Calculation.md#3-layer-2-finance-layer-validation)
-> - Layer 3 (活動應用): [04-01_Activity_System_Design.md §5](../03_Player_Journey/03-03_Activity_Bonus.md#5-game-weight-configuration)
+> - Layer 1 (風控驗證): [05-01_Risk_Control_System.md §4.2](../../04_Risk_Control/04-01_Risk_Framework.md#42-turnover-validation)
+> - Layer 2 (財務驗證): [02-03_Turnover_Calculation.md §3](../../03_Game_Center/03-04_Turnover_Calculation.md#3-layer-2-finance-layer-validation)
+> - Layer 3 (活動應用): [04-01_Activity_System_Design.md §5](../../04_Activity_Center/04-04_Activity_Bonus.md#5-game-weight-configuration)
 
 ```text
 Layer 1: 風控引擎驗證 (實時)
@@ -626,21 +626,21 @@ Player Deletion Request
 ## 📚 相關文檔
 
 ### 狀態機與生命週期 (🆕 Week 4-5)
-- [01-01 玩家生命週期管理](../01_Player_Center/01-01_Player_Lifecycle.md) - **SSOT**: Player Account State Machine
-- [01-05 提款風控系統](../01_Player_Center/01-05_Withdrawal_Risk.md) - **SSOT**: Withdrawal State Machine & SAGA Flow
-- [01-02 VIP & Loyalty 系統](../03_Player_Journey/03-02_VIP_Loyalty.md) - **SSOT**: VIP Tier State Machine
+- [01-01 玩家生命週期管理](../../01_Player_Center/01-01_Player_Lifecycle.md) - **SSOT**: Player Account State Machine
+- [01-05 提款風控系統](../../01_Player_Center/01-05_Withdrawal_Risk.md) - **SSOT**: Withdrawal State Machine & SAGA Flow
+- [01-02 VIP & Loyalty 系統](../../01_Player_Center/01-06_VIP_Loyalty.md) - **SSOT**: VIP Tier State Machine
 
 ### 數據模型參考
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - **SSOT**: Playable Balance Formula
-- [02-03 流水計算](../02_Game_Operations/02-03_Turnover_Calculation.md) - **SSOT**: Layer 2 Finance Validation
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - **SSOT**: Layer 1 Risk Validation
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - **SSOT**: Layer 3 Game Weight
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
+- [02-06 統一錢包模型](../../02_Finance_Center/02-06_Wallet_Architecture.md) - **SSOT**: Playable Balance Formula
+- [02-03 流水計算](../../03_Game_Center/03-04_Turnover_Calculation.md) - **SSOT**: Layer 2 Finance Validation
+- [05-01 風控系統](../../04_Risk_Control/04-01_Risk_Framework.md) - **SSOT**: Layer 1 Risk Validation
+- [04-01 活動系統設計](../../04_Activity_Center/04-04_Activity_Bonus.md) - **SSOT**: Layer 3 Game Weight
+- [09-03 數據安全標準](../../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
 
 ### 架構參考
 - [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
 - [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
-- [07-01 層級架構](../05_Platform_Governance/05-01_Multi_Tenant.md) - 多租戶設計
+- [07-01 層級架構](../../05_Platform_Governance/05-01_Multi_Tenant.md) - 多租戶設計
 
 ---
 

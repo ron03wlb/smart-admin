@@ -31,7 +31,7 @@ Request → L1 Cache (Caffeine) → L2 Cache (Redis) → Database
 ### Basic Implementation
 
 ```java
-package net.lab1024.sa.admin.module.business.product.manager;
+package net.lab1024.sa.business.product.manager;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -108,9 +108,9 @@ public class ProductCacheManager {
 ### SmartAdmin Service Integration
 
 ```java
-package net.lab1024.sa.admin.module.business.product.service;
+package net.lab1024.sa.business.product.service;
 
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

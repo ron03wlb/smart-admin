@@ -76,7 +76,7 @@ Generates unified report at `build/reports/quality-gate-report.md`:
 1. Run `./gradlew spotlessApply`
 2. Run `./gradlew check`
 3. If Checkstyle fails:
-   - View `sa-admin/build/reports/checkstyle/main.html`
+   - View `smartadmin-app/build/reports/checkstyle/main.html`
    - Read rule 11-checkstyle-rules.md
    - Fix violations following the patterns
 4. Re-run until all pass

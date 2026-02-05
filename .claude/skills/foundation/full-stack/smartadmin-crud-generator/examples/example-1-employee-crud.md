@@ -42,7 +42,7 @@ CREATE TABLE t_employee (
 ## 生成的代碼結構
 
 ```
-sa-admin/src/main/java/net/lab1024/sa/admin/module/business/employee/
+smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/employee/
 ├── controller/
 │   └── EmployeeController.java        # REST API 端點
 ├── service/
@@ -59,10 +59,10 @@ sa-admin/src/main/java/net/lab1024/sa/admin/module/business/employee/
 │   └── vo/
 │       └── EmployeeVO.java            # 視圖對象
 
-sa-admin/src/main/resources/mapper/business/employee/
+smartadmin-modules/smartadmin-business/src/main/resources/mapper/business/employee/
 └── EmployeeMapper.xml                  # MyBatis XML
 
-sa-admin/src/test/java/net/lab1024/sa/admin/module/business/employee/
+smartadmin-app/src/test/java/net/lab1024/sa/app/business/employee/
 ├── EmployeeServiceTest.java            # 單元測試
 └── EmployeeControllerTest.java         # 整合測試
 ```

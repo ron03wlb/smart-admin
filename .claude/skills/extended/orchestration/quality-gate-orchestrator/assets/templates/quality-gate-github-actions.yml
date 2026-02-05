@@ -51,7 +51,7 @@ jobs:
 
       # Step 2: Checkstyle (BLOCKER)
       - name: 2️⃣ Checkstyle (Code Style)
-        run: ./gradlew :sa-admin:checkstyleMain :sa-admin:checkstyleTest --no-daemon
+        run: ./gradlew :smartadmin-app:checkstyleMain :smartadmin-app:checkstyleTest --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload Checkstyle Report
@@ -59,12 +59,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
-          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+          path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
           retention-days: 30
 
       # Step 3: ArchUnit (BLOCKER)
       - name: 3️⃣ ArchUnit (Architecture Rules)
-        run: ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+        run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload ArchUnit Report
@@ -72,12 +72,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: archunit-report
-          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+          path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
           retention-days: 30
 
       # Step 4: PMD (CRITICAL)
       - name: 4️⃣ PMD (Code Quality)
-        run: ./gradlew :sa-admin:pmdMain --no-daemon
+        run: ./gradlew :smartadmin-app:pmdMain --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload PMD Report
@@ -85,12 +85,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pmd-report
-          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
+          path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
           retention-days: 30
 
       # Step 5: SpotBugs (CRITICAL)
       - name: 5️⃣ SpotBugs (Bug Detection)
-        run: ./gradlew :sa-admin:spotbugsMain --no-daemon
+        run: ./gradlew :smartadmin-app:spotbugsMain --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload SpotBugs Report
@@ -98,16 +98,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: spotbugs-report
-          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
+          path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
           retention-days: 30
 
       # Step 6: Unit Tests + Coverage (MAJOR)
       - name: 6️⃣ Unit Tests + Coverage
-        run: ./gradlew :sa-admin:test :sa-admin:jacocoTestReport --no-daemon
+        run: ./gradlew :smartadmin-app:test :smartadmin-app:jacocoTestReport --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Verify Coverage Threshold
-        run: ./gradlew :sa-admin:jacocoTestCoverageVerification --no-daemon
+        run: ./gradlew :smartadmin-app:jacocoTestCoverageVerification --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload Coverage Report
@@ -115,7 +115,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/
+          path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/jacoco/
           retention-days: 30
 
       - name: Publish Test Results
@@ -123,7 +123,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: |
-            smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/*.xml
+            smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/test/*.xml
 
       # Step 7: SonarQube Analysis (main/master only)
       - name: 7️⃣ SonarQube Analysis
@@ -132,7 +132,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          ./gradlew :sa-admin:sonar \
+          ./gradlew :smartadmin-app:sonar \
             -Dsonar.projectKey=smartadmin-v4 \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN \
@@ -215,16 +215,16 @@ jobs:
         run: |
           case "${{ matrix.tool }}" in
             checkstyle)
-              ./gradlew :sa-admin:checkstyleMain --no-daemon
+              ./gradlew :smartadmin-app:checkstyleMain --no-daemon
               ;;
             pmd)
-              ./gradlew :sa-admin:pmdMain --no-daemon
+              ./gradlew :smartadmin-app:pmdMain --no-daemon
               ;;
             spotbugs)
-              ./gradlew :sa-admin:spotbugsMain --no-daemon
+              ./gradlew :smartadmin-app:spotbugsMain --no-daemon
               ;;
             archunit)
-              ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+              ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
               ;;
           esac
         working-directory: smart-admin-api-java21-springboot3
@@ -234,5 +234,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.tool }}-report
-          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/
+          path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/
           retention-days: 30

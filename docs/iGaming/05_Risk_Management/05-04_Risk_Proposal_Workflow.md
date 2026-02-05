@@ -112,15 +112,22 @@ public class RiskProposalPriorityService {
 }
 ```
 
-### 1.2 SLA 管理機制（v2.1.0 簡化）
+### 1.2 SLA 精細化管理（v3.0.0 優先級制）
 
-**統一 SLA 標準**: 所有提案統一 SLA 48 小時（取消 L1/L2 分層）
+**按優先級設定不同 SLA，超時自動處置**：
 
-**SLA 監控服務**:
+| 優先級 | SLA | 超時行為 | 適用場景 |
+|--------|-----|---------|---------|
+| **URGENT** | 1h | 🔴 自動拒絕出金 | 黑名單 / IP 封禁 |
+| **HIGH** | 2h | 🔴 自動拒絕出金 | 機器人檢測 |
+| **MEDIUM** | 24h | 🔴 自動拒絕出金 | 異常投注 |
+| **LOW** | 48h | 🟢 自動放行 | 資料收集 |
+
+**SLA 監控與超時處理服務**:
 
 ```java
 /**
- * Service 層 - SLA 監控（v2.1.0 簡化）
+ * Service 層 - SLA 監控與超時處理（v3.0.0 優先級制）
  */
 @Service
 @RequiredArgsConstructor
@@ -128,47 +135,59 @@ public class RiskProposalSLAService {
 
     private final RiskProposalDao riskProposalDao;
     private final NotificationService notificationService;
+    private final WithdrawalService withdrawalService;
 
     /**
-     * 統一 SLA: 48 小時（取消 L1/L2 分層）
+     * 按優先級配置不同 SLA（單位：小時）
      */
-    private static final int UNIFIED_SLA_HOURS = 48;
+    private static final Map<String, Integer> PRIORITY_SLA_HOURS = Map.of(
+        "URGENT", 1,
+        "HIGH", 2,
+        "MEDIUM", 24,
+        "LOW", 48
+    );
 
     /**
-     * 檢查 SLA 違規（定時任務，每小時執行一次）
+     * 處理超時提案（定時任務，每 5 分鐘執行一次）
+     * URGENT/HIGH/MEDIUM 超時 → 自動拒絕出金
+     * LOW 超時 → 自動放行
      */
-    @Scheduled(fixedDelay = 3600000)
-    public void checkSLAViolations() {
-        LocalDateTime slaThreshold = LocalDateTime.now().minusHours(UNIFIED_SLA_HOURS);
+    @Scheduled(fixedDelay = 300_000)
+    public void processExpiredProposals() {
+        for (Map.Entry<String, Integer> entry : PRIORITY_SLA_HOURS.entrySet()) {
+            String priority = entry.getKey();
+            int slaHours = entry.getValue();
+            LocalDateTime slaThreshold = LocalDateTime.now().minusHours(slaHours);
 
-        // 查詢超過 SLA 的待審核提案
-        List<RiskProposalEntity> overdueProposals = riskProposalDao.selectList(
-            new LambdaQueryWrapper<RiskProposalEntity>()
-                .eq(RiskProposalEntity::getStatus, "PENDING_REVIEW")
-                .lt(RiskProposalEntity::getCreatedAt, slaThreshold)
-                .eq(RiskProposalEntity::getDeleted, false)
-        );
+            List<RiskProposalEntity> expired = riskProposalDao.selectList(
+                new LambdaQueryWrapper<RiskProposalEntity>()
+                    .eq(RiskProposalEntity::getStatus, "PENDING_REVIEW")
+                    .eq(RiskProposalEntity::getPriority, priority)
+                    .lt(RiskProposalEntity::getCreatedAt, slaThreshold)
+                    .eq(RiskProposalEntity::getDeleted, false)
+            );
 
-        if (overdueProposals.isEmpty()) {
-            return;
+            for (RiskProposalEntity p : expired) {
+                if ("LOW".equals(p.getPriority())) {
+                    // LOW: 超時自動放行
+                    withdrawalService.approveWithdrawal(p.getWithdrawalRequestId());
+                    p.setStatus("APPROVED");
+                    log.info("[SLA Auto-Approve] Proposal {} (LOW) auto-approved after {} hours",
+                        p.getId(), slaHours);
+                } else {
+                    // URGENT/HIGH/MEDIUM: 超時自動拒絕
+                    withdrawalService.rejectWithdrawal(p.getWithdrawalRequestId());
+                    p.setStatus("REJECTED");
+                    log.warn("[SLA Auto-Reject] Proposal {} ({}) auto-rejected after {} hours",
+                        p.getId(), p.getPriority(), slaHours);
+                }
+                riskProposalDao.updateById(p);
+            }
         }
-
-        // 發送告警通知
-        notificationService.sendSLAViolationAlert(
-            String.format("[SLA Violation] %d proposals overdue (SLA: %d hours)",
-                overdueProposals.size(), UNIFIED_SLA_HOURS),
-            overdueProposals
-        );
-
-        log.error("[SLA Violation] {} proposals overdue, SLA: {} hours",
-            overdueProposals.size(), UNIFIED_SLA_HOURS);
     }
 
     /**
-     * 計算提案剩餘時間
-     *
-     * @param proposalId 提案 ID
-     * @return Duration 剩餘時間
+     * 計算提案剩餘時間（根據優先級查找 SLA）
      */
     public Duration calculateRemainingTime(Long proposalId) {
         RiskProposalEntity proposal = riskProposalDao.selectById(proposalId);
@@ -176,29 +195,37 @@ public class RiskProposalSLAService {
             return Duration.ZERO;
         }
 
-        LocalDateTime slaDeadline = proposal.getCreatedAt().plusHours(UNIFIED_SLA_HOURS);
+        int slaHours = PRIORITY_SLA_HOURS.getOrDefault(proposal.getPriority(), 48);
+        LocalDateTime slaDeadline = proposal.getCreatedAt().plusHours(slaHours);
         return Duration.between(LocalDateTime.now(), slaDeadline);
     }
 
     /**
-     * 查詢即將超過 SLA 的提案（未來 6 小時內）
-     *
-     * @return List<RiskProposalVO> 提案列表
+     * 查詢即將超過 SLA 的提案（剩餘時間 < 警告閾值）
      */
     public List<RiskProposalVO> findApproachingSLA() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime warningThreshold = now.minusHours(UNIFIED_SLA_HOURS - 6);  // 剩餘 6 小時
+        List<RiskProposalEntity> results = new ArrayList<>();
 
-        List<RiskProposalEntity> entities = riskProposalDao.selectList(
-            new LambdaQueryWrapper<RiskProposalEntity>()
-                .eq(RiskProposalEntity::getStatus, "PENDING_REVIEW")
-                .lt(RiskProposalEntity::getCreatedAt, warningThreshold)
-                .ge(RiskProposalEntity::getCreatedAt, now.minusHours(UNIFIED_SLA_HOURS))
-                .eq(RiskProposalEntity::getDeleted, false)
-                .orderByAsc(RiskProposalEntity::getCreatedAt)
-        );
+        for (Map.Entry<String, Integer> entry : PRIORITY_SLA_HOURS.entrySet()) {
+            String priority = entry.getKey();
+            int slaHours = entry.getValue();
+            int warningHours = Math.max(1, slaHours / 4);  // 警告閾值 = SLA 的 1/4
 
-        return entities.stream()
+            LocalDateTime warningThreshold = now.minusHours(slaHours - warningHours);
+
+            results.addAll(riskProposalDao.selectList(
+                new LambdaQueryWrapper<RiskProposalEntity>()
+                    .eq(RiskProposalEntity::getStatus, "PENDING_REVIEW")
+                    .eq(RiskProposalEntity::getPriority, priority)
+                    .lt(RiskProposalEntity::getCreatedAt, warningThreshold)
+                    .ge(RiskProposalEntity::getCreatedAt, now.minusHours(slaHours))
+                    .eq(RiskProposalEntity::getDeleted, false)
+            ));
+        }
+
+        return results.stream()
+            .sorted(Comparator.comparing(RiskProposalEntity::getCreatedAt))
             .map(entity -> SmartBeanUtil.copy(entity, RiskProposalVO.class))
             .collect(Collectors.toList());
     }

@@ -13,7 +13,7 @@
 
 ```bash
 # N+1 檢測 (P6Spy 日誌)
-./gradlew :sa-admin:test --tests *IntegrationTest -Pspy=true
+./gradlew :smartadmin-app:test --tests *IntegrationTest -Pspy=true
 grep -E "SELECT.*WHERE" logs/spy.log | sort | uniq -c | sort -rn
 
 # JVM 堆分析

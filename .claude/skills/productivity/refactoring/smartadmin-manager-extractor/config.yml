@@ -217,12 +217,12 @@ validation:
 
     - id: "archunit"
       description: "Verify ArchUnit rules pass"
-      command: "./gradlew :sa-admin:test --tests ArchitectureTest"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest"
       failure_action: "rollback"
 
     - id: "unit_tests"
       description: "Ensure tests pass"
-      command: "./gradlew :sa-admin:test"
+      command: "./gradlew :smartadmin-app:test"
       failure_action: "rollback"
       allow_failure: false
 

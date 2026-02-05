@@ -555,7 +555,7 @@ public class GameTransactionRecoveryService {
 |------|------|------|---------|---------|
 | 1 | [02-02 Seamless Wallet API](../../02_Game_Operations/02-02_Seamless_Wallet_API.md) | §1 API 設計 | 15 分鐘 | Token 驗證、冪等性 |
 | 2 | [02-02 Seamless Wallet API](../../02_Game_Operations/02-02_Seamless_Wallet_API.md) | §3 並發控制 | 10 分鐘 | Redis 分佈式鎖 |
-| 3 | [01-02 Wallet Architecture](../../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) | §4 錯誤恢復 | 12 分鐘 | Saga 模式 |
+| 3 | [01-02 Wallet Architecture](../../02_Finance_Center/02-06_Wallet_Architecture.md) | §4 錯誤恢復 | 12 分鐘 | Saga 模式 |
 
 ### 實作步驟
 [待補充：包含 API 端點實作、Token 驗證機制、並發控制、錯誤恢復等]
@@ -586,9 +586,9 @@ public class GameTransactionRecoveryService {
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [02-03 Turnover Calculation](../../02_Game_Operations/02-03_Turnover_Calculation.md) | §1 三層驗證 | 20 分鐘 | Layer 1/2/3 架構 |
-| 2 | [02-03 Turnover Calculation](../../02_Game_Operations/02-03_Turnover_Calculation.md) | §5 遊戲權重 | 10 分鐘 | 免費旋轉處理 |
-| 3 | [04-01 Activity System](../../03_Player_Journey/03-03_Activity_Bonus.md) | §5 流水要求 | 15 分鐘 | Wagering 計算 |
+| 1 | [02-03 Turnover Calculation](../../03_Game_Center/03-04_Turnover_Calculation.md) | §1 三層驗證 | 20 分鐘 | Layer 1/2/3 架構 |
+| 2 | [02-03 Turnover Calculation](../../03_Game_Center/03-04_Turnover_Calculation.md) | §5 遊戲權重 | 10 分鐘 | 免費旋轉處理 |
+| 3 | [04-01 Activity System](../../04_Activity_Center/04-04_Activity_Bonus.md) | §5 流水要求 | 15 分鐘 | Wagering 計算 |
 
 ### 實作步驟
 [待補充：包含三層驗證架構實作、有效投注計算、遊戲權重配置等]

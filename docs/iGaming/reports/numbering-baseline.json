@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-02-05T14:16:21Z",
+  "script_version": "2.0.0",
+  "docs_dir": "docs/iGaming",
+  "total_files": 121,
+  "total_modules": 23,
+  "violations": 16,
+  "warnings": 4
+}

@@ -27,7 +27,7 @@ AI: [Generates ArchUnit test class with architecture validation rules]
 ## Generated Output
 
 ```java
-@AnalyzeClasses(packages = "net.lab1024.sa.admin.module.employee")
+@AnalyzeClasses(packages = "net.lab1024.sa.system.employee")
 public class EmployeeArchitectureTest {
 
     @ArchTest

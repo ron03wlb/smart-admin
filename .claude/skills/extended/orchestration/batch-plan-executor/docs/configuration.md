@@ -55,7 +55,7 @@ conflict_detection:
     enabled: true
     severity: MEDIUM
     java_package_prefixes:
-      - "net.lab1024.sa.admin.module"
+      - "net.lab1024.sa"
     vue_module_paths:
       - "smart-admin-web/src/views"
 

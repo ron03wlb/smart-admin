@@ -30,7 +30,7 @@
 ### Basic Export
 
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
@@ -474,9 +474,9 @@ public class AsyncExportService {
 ## SmartAdmin Integration Example
 
 ```java
-package net.lab1024.sa.admin.module.business.user.controller;
+package net.lab1024.sa.business.user.controller;
 
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

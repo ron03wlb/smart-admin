@@ -25,13 +25,13 @@ dependencies {
 ### Match Query (Single Field)
 
 ```java
-package net.lab1024.sa.admin.module.business.product.service;
+package net.lab1024.sa.business.product.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -690,14 +690,14 @@ public class ProductSearchResult {
 ## Pattern 10: SmartAdmin Controller Integration
 
 ```java
-package net.lab1024.sa.admin.module.business.product.controller;
+package net.lab1024.sa.business.product.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
-import net.lab1024.sa.admin.module.business.product.domain.form.ProductSearchForm;
-import net.lab1024.sa.admin.module.business.product.service.ProductSearchService;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.form.ProductSearchForm;
+import net.lab1024.sa.business.product.service.ProductSearchService;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

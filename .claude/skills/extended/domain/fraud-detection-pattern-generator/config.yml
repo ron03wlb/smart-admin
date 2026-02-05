@@ -112,8 +112,8 @@ output:
     - "*.sql"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/resources/db/migration"
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/main/resources/db/migration"
 
   templates: {}
 
@@ -128,11 +128,11 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify fraud detection code compiles successfully"
-      command: "./gradlew :sa-admin:compileJava"
+      command: "./gradlew :smartadmin-app:compileJava"
 
     - check: "unit-tests"
       description: "Run fraud detection unit tests"
-      command: "./gradlew :sa-admin:test --tests *Fraud*"
+      command: "./gradlew :smartadmin-app:test --tests *Fraud*"
 
 compatibility:
   deprecated: false

@@ -98,7 +98,7 @@ jobs:
         run: ./gradlew spotbugsMain
 
       - name: ArchUnit
-        run: ./gradlew :sa-admin:test --tests ArchitectureTest
+        run: ./gradlew :smartadmin-app:test --tests ArchitectureTest
 
   docker:
     runs-on: ubuntu-latest
@@ -213,7 +213,7 @@ archunit:
   stage: quality
   image: eclipse-temurin:21-jdk
   script:
-    - ./gradlew :sa-admin:test --tests ArchitectureTest
+    - ./gradlew :smartadmin-app:test --tests ArchitectureTest
   allow_failure: false
 
 docker:
@@ -252,7 +252,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Copy only the JAR
-COPY --from=builder /app/sa-admin/build/libs/sa-admin.jar app.jar
+COPY --from=builder /app/smartadmin-app/build/libs/smartadmin-app.jar app.jar
 
 # Create non-root user
 RUN groupadd -r smartadmin && useradd -r -g smartadmin smartadmin

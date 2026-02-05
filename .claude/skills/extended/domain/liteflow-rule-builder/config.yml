@@ -97,8 +97,8 @@ output:
     - "*.java"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/resources/db/migration"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/main/resources/db/migration"
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/src/main/java"
 
   templates: {}
 

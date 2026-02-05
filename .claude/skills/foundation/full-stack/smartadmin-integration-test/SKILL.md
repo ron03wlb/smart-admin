@@ -196,8 +196,8 @@ Read the target class to understand:
 
 **File location pattern:**
 ```
-Source: sa-admin/src/main/java/.../service/EmployeeService.java
-Test:   sa-admin/src/test/java/.../service/EmployeeServiceIntegrationTest.java
+Source: smartadmin-modules/smartadmin-system/src/main/java/.../service/EmployeeService.java
+Test:   smartadmin-app/src/test/java/.../service/EmployeeServiceIntegrationTest.java
 ```
 
 **Class structure:**
@@ -273,7 +273,7 @@ public class EmployeeTestFixture {
 
 **File location:**
 ```
-Fixture: sa-admin/src/test/java/.../EmployeeTestFixture.java
+Fixture: smartadmin-app/src/test/java/.../EmployeeTestFixture.java
 ```
 
 ## Common Test Scenarios
@@ -509,4 +509,4 @@ Before completing test generation:
 
 - [Testcontainers Documentation](https://www.testcontainers.org/) - 官方文檔
 - [Spring Boot Testing](https://docs.spring.io/spring-boot/reference/testing/index.html) - 整合測試指南
-- [BaseIntegrationTest.java](./../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java) - SmartAdmin 測試基類
+- [BaseIntegrationTest.java](./../../../smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java) - SmartAdmin 測試基類

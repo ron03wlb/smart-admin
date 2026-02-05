@@ -1056,7 +1056,7 @@ All 5 agents now operate with ultrathink step-by-step analysis reasoning:
 
 - `project-architecture.md` - Project structure and build information
   - Technology stack (Java 21, Spring Boot 3.5.4, etc.)
-  - Module structure (sa-admin, sa-base, sa-common)
+  - Module structure (smartadmin-app, smartadmin-common, smartadmin-support, smartadmin-modules)
   - Build commands (Gradle)
   - Test commands
   - Application configuration

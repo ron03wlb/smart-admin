@@ -48,9 +48,9 @@ git checkout -b new-feature
 **Typical Usage:**
 ```bash
 ./gradlew clean build
-./gradlew :sa-admin:test
-./gradlew :sa-admin:bootRun
-./gradlew :sa-base:compileJava
+./gradlew :smartadmin-app:test
+./gradlew :smartadmin-app:bootRun
+./gradlew :smartadmin-common:compileJava
 ./gradlew test --tests ArchitectureTest
 ```
 
@@ -64,7 +64,7 @@ git checkout -b new-feature
 **Typical Usage:**
 ```bash
 gradlew.bat clean build
-gradlew.bat :sa-admin:bootRun
+gradlew.bat :smartadmin-app:bootRun
 gradlew.bat test
 ```
 

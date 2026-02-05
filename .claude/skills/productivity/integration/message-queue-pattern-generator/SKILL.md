@@ -198,13 +198,13 @@ spring:
       enable-auto-commit: false
       auto-offset-reset: earliest
       properties:
-        spring.json.trusted.packages: "net.lab1024.sa.admin.module.business.*.domain.event"
+        spring.json.trusted.packages: "net.lab1024.sa.business.*.domain.event"
 ```
 
 ### Step 3: Create Event Schema (3 minutes)
 
 ```java
-package net.lab1024.sa.admin.module.business.order.domain.event;
+package net.lab1024.sa.business.order.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -232,11 +232,11 @@ public class OrderCreatedEvent {
 ### Step 4: Implement Producer (10 minutes)
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -275,12 +275,12 @@ public class OrderEventProducer {
 ### Step 5: Implement Consumer with Idempotency (15 minutes)
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.consumer;
+package net.lab1024.sa.business.notification.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.manager.NotificationManager;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.notification.manager.NotificationManager;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;

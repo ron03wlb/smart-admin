@@ -203,6 +203,10 @@ private String calculateByAmount(BigDecimal amount, Map<String, Integer> thresho
 
 ## 9. 第二階段：供應商與遊戲風控 (Phase 2: Provider & Game Risk)
 
+<!-- TODO: Phase 2 暫緩執行 — 前置依賴 000-03_Gap_Analysis_Provider_Game_Risk.md 尚未建立。
+     待完成 Gap Analysis 後再實施本節內容。
+     追蹤: 000-02_Documentation_Restructure_Plan.md Phase 5+ -->
+
 根據 [000-03_Gap_Analysis_Provider_Game_Risk.md](./000-03_Gap_Analysis_Provider_Game_Risk.md)，填補 "重玩家、輕平台" 的風控盲區。
 
 ### 9.1 問題陳述
@@ -228,6 +232,10 @@ private String calculateByAmount(BigDecimal amount, Map<String, Integer> thresho
 
 ## 10. 第三階段：財務整合與對帳深化 (Phase 3: Financial Integrity & Reconciliation)
 
+<!-- TODO: Phase 3 暫緩執行 — 前置依賴 000-04_Gap_Analysis_Reconciliation.md 尚未建立。
+     待完成 Gap Analysis 後再實施本節內容。
+     追蹤: 000-02_Documentation_Restructure_Plan.md Phase 5+ -->
+
 根據 [000-04_Gap_Analysis_Reconciliation.md](./000-04_Gap_Analysis_Reconciliation.md)，強化 "內部總帳" 與 "佣金" 的精確性。
 
 ### 10.1 問題陳述
@@ -252,6 +260,10 @@ private String calculateByAmount(BigDecimal amount, Map<String, Integer> thresho
 ---
 
 ## 11. 第四階段：合規與運營韌性 (Phase 4: Compliance & Operational Resilience)
+
+<!-- TODO: Phase 4 暫緩執行 — 前置依賴 000-05_Final_Gap_Analysis_Compliance_Infra.md 尚未建立。
+     待完成 Gap Analysis 後再實施本節內容。
+     追蹤: 000-02_Documentation_Restructure_Plan.md Phase 5+ -->
 
 根據 [000-05_Final_Gap_Analysis_Compliance_Infra.md](./000-05_Final_Gap_Analysis_Compliance_Infra.md)，補全 "責任博彩" 與 "基礎設施高可用"。
 

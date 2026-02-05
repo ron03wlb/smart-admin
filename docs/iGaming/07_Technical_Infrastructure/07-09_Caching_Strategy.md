@@ -869,4 +869,4 @@ public class JetCacheMetricsCollector {
 - [07-07 性能優化規範](./07-07_Performance_Optimization.md) - §10 JetCache + Redisson 總覽
 - [07-08 流處理架構](./07-08_Stream_Processing_Architecture.md) - Flink CDC 緩存失效
 - [07-10 成本優化](./07-10_Cost_Optimization.md) - §4.2 Redis 成本優化
-- [00-04 技術選型](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - JetCache + Redisson 技術棧
+- [00-04 技術選型](../00_Foundation/concepts/00-04_Technology_Stack.md) - JetCache + Redisson 技術棧

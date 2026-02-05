@@ -46,7 +46,7 @@
 
 - **新模塊首頁**: [06_Analytics_Operations/README.md](../06_Analytics_Operations/README.md)
 - **遷移計劃**: [PHASE4_COMPLETION_REPORT.md](../PHASE4_COMPLETION_REPORT.md)（待創建）
-- **完整文檔地圖**: [00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
+- **完整文檔地圖**: [00-00_Document_Map.md](../00_Foundation/concepts/00-00_Document_Map.md)
 
 ---
 

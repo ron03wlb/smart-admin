@@ -444,7 +444,7 @@ Kibana (Visualization & Search)
 ## 📚 相關文檔
 
 ### 前置知識
-- [00-04 技術選型標準](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - APM 工具選型依據
+- [00-04 技術選型標準](../00_Foundation/concepts/00-04_Technology_Stack.md) - APM 工具選型依據
 
 ### 核心依賴
 - [12-01 部署架構](./07-01_Deployment.md) - 監控基礎設施部署

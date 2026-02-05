@@ -84,7 +84,7 @@ dependencies:
   skills: []
 
   required_files:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java"
 
   tools:
     - name: "gradle"
@@ -96,7 +96,7 @@ output:
     - "*TestFixture.java"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java"
 
   templates: {}
 
@@ -111,7 +111,7 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify test fixture code compiles successfully"
-      command: "./gradlew :sa-admin:compileTestJava"
+      command: "./gradlew :smartadmin-app:compileTestJava"
 
 compatibility:
   deprecated: false

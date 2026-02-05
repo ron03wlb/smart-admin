@@ -23,8 +23,8 @@ User: "Create a Product CRUD module with name, price, category, and stock fields
 
 生成的檔案結構：
 ```
-smart-admin-api-java21-springboot3/sa-admin/src/main/java/
-└── net/lab1024/sa/admin/module/business/product/
+smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java/
+└── net/lab1024/sa/business/product/
     ├── domain/
     │   ├── entity/ProductEntity.java
     │   ├── form/ProductAddForm.java
@@ -42,8 +42,8 @@ smart-admin-web/src/
 │   └── product-form-modal.vue    # 表單彈窗（新增/編輯）
 └── api/product-api.ts             # API 客戶端
 
-smart-admin-api-java21-springboot3/sa-admin/src/test/java/
-└── net/lab1024/sa/admin/module/business/product/
+smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/
+└── net/lab1024/sa/business/product/
     ├── service/ProductServiceTest.java
     └── integration/ProductControllerIntegrationTest.java
 ```
@@ -243,8 +243,8 @@ smart-admin-api-java21-springboot3/sa-admin/src/test/java/
 
 **後端路徑**：
 ```
-smart-admin-api-java21-springboot3/sa-admin/src/main/java/
-net/lab1024/sa/admin/module/business/{module-name}/
+smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java/
+net/lab1024/sa/business/{module-name}/
 ```
 
 **前端路徑**：
@@ -257,7 +257,7 @@ smart-admin-web/src/api/{module-name}-api.ts
 ```bash
 # 使用自定義模組路徑
 /crud Order --module-path=business.order.management
-# 生成路徑：net/lab1024/sa/admin/module/business/order/management/
+# 生成路徑：net/lab1024/sa/business/order/management/
 ```
 
 ---
@@ -273,7 +273,7 @@ smart-admin-web/src/api/{module-name}-api.ts
 2. 手動添加依賴關係（例如，在 OrderService 中注入 CustomerService）
 3. 運行 ArchitectureTest 驗證架構合規性：
    ```bash
-   ./gradlew :sa-admin:test --tests ArchitectureTest
+   ./gradlew :smartadmin-app:test --tests ArchitectureTest
    ```
 
 ### 2. 自定義業務邏輯擴展
@@ -412,7 +412,7 @@ public class ProductService {
 **A**: 執行 ArchitectureTest：
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **常見違規**：
@@ -486,18 +486,18 @@ const rules = {
 **1. 編譯驗證**：
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:compileJava
+./gradlew :smartadmin-app:compileJava
 ```
 
 **2. 架構驗證**：
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **3. 功能驗證**：
 ```bash
 # 啟動後端
-./gradlew :sa-admin:bootRun
+./gradlew :smartadmin-app:bootRun
 
 # 訪問 API 文檔
 open http://localhost:1024/doc.html

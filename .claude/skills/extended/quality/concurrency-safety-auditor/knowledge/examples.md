@@ -19,7 +19,7 @@ This document provides complete, production-ready examples of concurrency issues
 ### Original Code (Vulnerable)
 
 ```java
-package net.lab1024.sa.base.module.support.reload;
+package net.lab1024.sa.support.reload;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -89,7 +89,7 @@ T6   |                              | put("config", objB)  ← Overwrites objA!
 ### Fix Solution 1: putIfAbsent() (Recommended)
 
 ```java
-package net.lab1024.sa.base.module.support.reload;
+package net.lab1024.sa.support.reload;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -184,7 +184,7 @@ private synchronized void register(String tag, SmartReloadObject obj) {
 #### Concurrency Test
 
 ```java
-package net.lab1024.sa.base.module.support.reload;
+package net.lab1024.sa.support.reload;
 
 import org.junit.jupiter.api.Test;
 
@@ -253,7 +253,7 @@ vi sa-base/foundation/reload/src/main/java/net/lab1024/sa/base/module/support/re
 
 **Step 3: Verify ArchUnit Tests**
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **Step 4: Run Full Test Suite**
@@ -346,7 +346,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ### Code Review
 
 ```java
-package net.lab1024.sa.base.module.support.serialnumber;
+package net.lab1024.sa.support.serialnumber;
 
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
@@ -393,7 +393,7 @@ public class SerialNumberInternService {
 ### Code Review
 
 ```java
-package net.lab1024.sa.base.module.support.repeatsubmit;
+package net.lab1024.sa.support.repeatsubmit;
 
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;

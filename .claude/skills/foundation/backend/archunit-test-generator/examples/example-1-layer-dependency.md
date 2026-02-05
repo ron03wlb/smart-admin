@@ -19,7 +19,7 @@ User: "Generate ArchUnit test to validate layer dependencies"
 **File:** `src/test/java/net/lab1024/sa/admin/ArchitectureTest.java`
 
 ```java
-@AnalyzeClasses(packages = "net.lab1024.sa.admin")
+@AnalyzeClasses(packages = "net.lab1024.sa")
 class LayerDependencyTest {
 
     @ArchTest
@@ -62,7 +62,7 @@ class LayerDependencyTest {
 ## Validation
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Expected Output:
 ✅ LayerDependencyTest > controllerShouldOnlyAccessService PASSED

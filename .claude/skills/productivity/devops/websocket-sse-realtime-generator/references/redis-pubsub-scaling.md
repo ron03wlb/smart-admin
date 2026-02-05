@@ -72,7 +72,7 @@ spring:
 ### Redis Pub/Sub Configuration
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -144,12 +144,12 @@ public class RedisPubSubConfiguration {
 ### Redis Message Publisher
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -219,7 +219,7 @@ class WebSocketMessage {
 ### Redis Message Subscriber
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -278,12 +278,12 @@ public class WebSocketMessageSubscriber {
 ### Service Layer Integration
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.service;
+package net.lab1024.sa.business.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
-import net.lab1024.sa.base.module.support.websocket.WebSocketMessagePublisher;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.support.websocket.WebSocketMessagePublisher;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -320,11 +320,11 @@ public class NotificationService {
 ### SSE with Redis
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.service;
+package net.lab1024.sa.business.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -439,12 +439,12 @@ class SseMessage {
 ### SSE Redis Subscriber
 
 ```java
-package net.lab1024.sa.base.module.support.sse;
+package net.lab1024.sa.support.sse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.service.SseWithRedisService;
+import net.lab1024.sa.business.notification.service.SseWithRedisService;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
@@ -551,7 +551,7 @@ server {
 ### Redis Pub/Sub Metrics
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;

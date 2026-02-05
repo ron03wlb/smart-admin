@@ -736,11 +736,11 @@ public Result<Void> updateBalanceWithLock(
 
 ## 相關文檔
 
-- [01-02 錢包架構](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md)
+- [01-02 錢包架構](../02_Finance_Center/02-06_Wallet_Architecture.md)
 - [07-06 性能監控](./07-06_Performance_Monitoring.md)
 - [07-08 流處理架構](./07-08_Stream_Processing_Architecture.md) ⭐ 新增
 - [07-09 緩存策略](./07-09_Caching_Strategy.md) ⭐ 新增
 - [07-10 成本優化](./07-10_Cost_Optimization.md) ⭐ 新增
-- [00-04 技術選型](../00_Concept_&_Analysis/00-04_Technology_Stack.md)
+- [00-04 技術選型](../00_Foundation/concepts/00-04_Technology_Stack.md)
 - [風控系統架構](../風控系統架構.md)
 - [k6官方文檔](https://k6.io/docs/)

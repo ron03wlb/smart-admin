@@ -1,4 +1,6 @@
-﻿# Quality Gate Orchestrator - Deployment Summary
+﻿> [Historical: References v4.0.0 module structure] Module names such as `sa-admin` and `sa-base` in this report correspond to the v4.0.0 directory layout. They have since been renamed to `smartadmin-app`, `smartadmin-common`, and `smartadmin-support` respectively.
+
+# Quality Gate Orchestrator - Deployment Summary
 
 **Date**: 2026-01-26
 **Status**: ⚠️ **95% Complete** (Production Ready - Final Validation Pending)

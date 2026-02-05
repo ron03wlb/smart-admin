@@ -136,7 +136,7 @@ class EmployeeServiceIntegrationTest extends BaseIntegrationTest {
 ## 執行結果
 
 ```bash
-./gradlew :sa-admin:test --tests EmployeeServiceIntegrationTest
+./gradlew :smartadmin-app:test --tests EmployeeServiceIntegrationTest
 ```
 
 **輸出**:

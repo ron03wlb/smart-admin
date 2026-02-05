@@ -9,14 +9,14 @@
 
 **Generated Output:**
 ```java
-package net.lab1024.sa.admin.module.employee;
+package net.lab1024.sa.system.employee;
 
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 
-@AnalyzeClasses(packages = "net.lab1024.sa.admin.module.employee")
+@AnalyzeClasses(packages = "net.lab1024.sa.system.employee")
 public class EmployeeArchitectureTest {
 
     @ArchTest

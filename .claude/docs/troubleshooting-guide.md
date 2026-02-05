@@ -176,7 +176,7 @@ curl http://localhost:1024/actuator/health
 # Expected: {"status":"UP"}
 
 # Check backend logs for startup errors
-tail -f smart-admin-api-java21-springboot3/sa-admin/logs/smart-admin.log
+tail -f smart-admin-api-java21-springboot3/smartadmin-app/logs/smart-admin.log
 
 # Check CORS configuration
 grep -r "CorsConfiguration" smart-admin-api-java21-springboot3/
@@ -188,7 +188,7 @@ grep -r "CorsConfiguration" smart-admin-api-java21-springboot3/
 ```bash
 # Solution: Start backend
 cd smart-admin-api-java21-springboot3/
-./gradlew :sa-admin:bootRun
+./gradlew :smartadmin-app:bootRun
 
 # Verify backend started
 curl http://localhost:1024/actuator/health
@@ -209,7 +209,7 @@ const API_URL = 'http://localhost:1024'
 **Cause 3: CORS Not Configured**
 ```java
 // Backend CORS configuration
-// File: sa-admin/src/main/java/net/lab1024/sa/admin/config/WebMvcConfig.java
+// File: smartadmin-app/src/main/java/net/lab1024/sa/admin/config/WebMvcConfig.java
 
 @Override
 public void addCorsMappings(CorsRegistry registry) {
@@ -238,7 +238,7 @@ public void addCorsMappings(CorsRegistry registry) {
 
 ```bash
 # Extract backend permission strings
-grep -r "@SaCheckPermission" smart-admin-api-java21-springboot3/sa-admin/ | grep -o '"[^"]*"'
+grep -r "@SaCheckPermission" smart-admin-api-java21-springboot3/smartadmin-app/ | grep -o '"[^"]*"'
 
 # Search frontend permission strings
 grep -r "v-privilege" smart-admin-web/src/ | grep -o '"[^"]*"'
@@ -262,7 +262,7 @@ Permission strings don't match exactly.
 ```bash
 # Step 1: java-architect extracts exact permission strings
 cd smart-admin-api-java21-springboot3/
-grep -r "@SaCheckPermission" sa-admin/src/main/java/net/lab1024/sa/admin/module/employee/ \
+grep -r "@SaCheckPermission" smartadmin-app/src/main/java/net/lab1024/sa/admin/module/employee/ \
   | grep -o '"[^"]*"' \
   | sort -u
 
@@ -1013,7 +1013,7 @@ is used instead of constructor injection"
 
 # FAST:
 "Update the employee API in
-smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/admin/module/employee/controller/EmployeeController.java"
+smart-admin-api-java21-springboot3/smartadmin-app/src/main/java/net/lab1024/sa/admin/module/employee/controller/EmployeeController.java"
 ```
 
 **Solution C: Use Appropriate Agent for Task**
@@ -1034,7 +1034,7 @@ Ask Explore agent (specialized for codebase exploration)
 
 # FAST:
 "Review code in the employee module:
-smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/admin/module/employee/"
+smart-admin-api-java21-springboot3/smartadmin-app/src/main/java/net/lab1024/sa/admin/module/employee/"
 ```
 
 **Prevention**:

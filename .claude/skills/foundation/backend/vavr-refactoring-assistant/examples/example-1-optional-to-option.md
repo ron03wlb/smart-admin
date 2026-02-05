@@ -15,7 +15,7 @@
 ## ❌ 違規代碼（使用 java.util.Optional）
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.service;
+package net.lab1024.sa.business.employee.service;
 
 import java.util.Optional; // ❌ Service 層禁止使用 java.util.Optional
 
@@ -50,7 +50,7 @@ Method <EmployeeService.getById(Long)> uses java.util.Optional in (EmployeeServi
 ## ✅ 正確代碼（使用 Vavr Option）
 
 ```java
-package net.lab1024.sa.admin.module.business.employee.service;
+package net.lab1024.sa.business.employee.service;
 
 import io.vavr.control.Option; // ✅ Service 層使用 Vavr Option
 
@@ -86,7 +86,7 @@ public class EmployeeService {
 ## 驗證測試通過
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest.serviceUsesVavrOption
+./gradlew :smartadmin-app:test --tests ArchitectureTest.serviceUsesVavrOption
 ```
 
 **輸出**:

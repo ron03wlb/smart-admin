@@ -60,7 +60,7 @@ static final ArchRule noServiceInController =
 static final ArchRule noServiceInController =
     noClasses().that().resideInAPackage("..controller..")
         .should().dependOnClassesThat()
-        .resideInAPackage("net.lab1024.sa.admin..service..");
+        .resideInAPackage("net.lab1024.sa..service..");
 ```
 
 ---
@@ -71,8 +71,8 @@ static final ArchRule noServiceInController =
 
 **Verification Workflow**:
 1. Write test
-2. Compile: `./gradlew :sa-admin:compileTestJava`
-3. Run test: `./gradlew :sa-admin:test --tests ArchitectureTest#yourTest`
+2. Compile: `./gradlew :smartadmin-app:compileTestJava`
+3. Run test: `./gradlew :smartadmin-app:test --tests ArchitectureTest#yourTest`
 4. Create intentional violation
 5. Verify test fails
 6. Remove violation
@@ -87,13 +87,13 @@ public class TestController {
 }
 
 // Step 5: Run test
-./gradlew :sa-admin:test --tests ArchitectureTest#noFieldInjection
+./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection
 // Expected: FAIL
 
 // Step 6: Fix violation (remove @Autowired)
 
 // Step 7: Run test again
-./gradlew :sa-admin:test --tests ArchitectureTest#noFieldInjection
+./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection
 // Expected: PASS
 ```
 

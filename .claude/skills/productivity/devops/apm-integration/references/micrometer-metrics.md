@@ -10,7 +10,7 @@
 
 ### 1. Add Dependencies
 
-**sa-admin/build.gradle:**
+**smartadmin-app/build.gradle:**
 ```gradle
 dependencies {
     // Spring Boot Actuator (includes Micrometer)
@@ -75,7 +75,7 @@ curl http://localhost:1024/actuator/prometheus
 ### Basic Counter
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -575,7 +575,7 @@ public class UserActivityMetrics {
 ### Central Metrics Configuration
 
 ```java
-package net.lab1024.sa.base.config;
+package net.lab1024.sa.common.config;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;

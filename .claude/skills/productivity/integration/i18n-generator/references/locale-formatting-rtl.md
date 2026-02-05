@@ -642,7 +642,7 @@ public class UserEntity {
 package net.lab1024.sa.foundation.i18n.format;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.foundation.domain.request.RequestUser;
+import net.lab1024.sa.common.core.domain.request.RequestUser;
 import net.lab1024.sa.foundation.sa.token.SmartRequestUserService;
 import org.springframework.stereotype.Component;
 

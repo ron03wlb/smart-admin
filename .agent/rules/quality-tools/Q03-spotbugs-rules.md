@@ -169,7 +169,7 @@ private String dbPassword;
 **Solution**: Exclude specific method
 ```xml
 <Match>
-    <Class name="net.lab1024.sa.base.core.json.JsonUtil"/>
+    <Class name="net.lab1024.sa.common.json.util.JsonUtil"/>
     <Method name="init"/>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
 </Match>
@@ -300,13 +300,10 @@ Based on actual project violation analysis:
 ./gradlew spotbugsMain spotbugsTest
 
 # View report
-open sa-admin/build/reports/spotbugs/main.html
-
-# Maven (if used)
-mvn spotbugs:check
+open smartadmin-app/build/reports/spotbugs/main.html
 
 # Check specific module only
-./gradlew :sa-admin:spotbugsMain
+./gradlew :smartadmin-app:spotbugsMain
 ```
 
 ---

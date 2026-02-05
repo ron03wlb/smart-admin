@@ -153,7 +153,7 @@ def infer_file_path_from_class_name(class_name: str, plan_file_path: str) -> Opt
     Infer file path from class name based on SmartAdmin conventions.
 
     Examples:
-        ProductEntity -> smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/admin/module/business/product/domain/entity/ProductEntity.java
+        ProductEntity -> smart-admin-api/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/business/product/domain/entity/ProductEntity.java
         ProductController -> .../controller/ProductController.java
         ProductService -> .../service/ProductService.java
     """
@@ -187,7 +187,7 @@ def infer_file_path_from_class_name(class_name: str, plan_file_path: str) -> Opt
         return None
 
     # Construct file path
-    base_path = "smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/admin/module"
+    base_path = "smart-admin-api/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business"
     file_path = f"{base_path}/business/{module}/{layer}/{class_name}.java"
 
     return file_path
@@ -207,7 +207,7 @@ def detect_module_conflicts(plans: List[Plan]) -> List[ModuleConflict]:
     Detect module-level conflicts across plans.
 
     Module identification:
-    - Java package: net.lab1024.sa.admin.module.business.{module}.*
+    - Java package: net.lab1024.sa.business.{module}.*
     - Vue module: smart-admin-web/src/views/{module}/*
     """
     module_map = defaultdict(list)  # module_name -> [plan_ids]
@@ -425,7 +425,7 @@ def generate_conflict_report(
 ╠══════════════════════════════════════════════════════════════════
 ║ File-Level Conflicts (2):
 ║
-║ Conflict #1: smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/admin/module/business/product/controller/ProductController.java
+║ Conflict #1: smart-admin-api/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/business/product/controller/ProductController.java
 ║   Conflicting Plans:
 ║     - [crud] product-crud
 ║     - [refactoring] controller-vavr-migration
@@ -571,7 +571,7 @@ def extract_affected_modules(content: str, plan_file_path: str) -> Set[str]:
     Extract affected modules from plan content.
 
     Strategies:
-    1. Java package analysis: net.lab1024.sa.admin.module.business.{module}.*
+    1. Java package analysis: net.lab1024.sa.business.{module}.*
     2. Vue path analysis: smart-admin-web/src/views/{module}/*
     3. Explicit module metadata in YAML frontmatter
     """

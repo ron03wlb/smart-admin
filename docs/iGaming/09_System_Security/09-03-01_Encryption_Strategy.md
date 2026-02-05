@@ -274,7 +274,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 - [12-05 API 設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - HTTPS 強制要求
 
 ### 業務邏輯參考
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 密碼重置流程
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Lifecycle.md) - 密碼重置流程
 - [02-01 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 銀行帳號驗證
 
 ---

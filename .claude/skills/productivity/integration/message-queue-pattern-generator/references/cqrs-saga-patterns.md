@@ -27,16 +27,16 @@ Commands (Write) → Event Store → Events → Projections (Read Models)
 ### Step 1: Command Side (Write Model)
 
 ```java
-package net.lab1024.sa.admin.module.business.order.command;
+package net.lab1024.sa.business.order.command;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.command.CreateOrderCommand;
-import net.lab1024.sa.admin.module.business.order.domain.command.PayOrderCommand;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderPaidEvent;
-import net.lab1024.sa.admin.module.business.eventsourcing.service.EventStoreService;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.order.domain.command.CreateOrderCommand;
+import net.lab1024.sa.business.order.domain.command.PayOrderCommand;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderPaidEvent;
+import net.lab1024.sa.business.eventsourcing.service.EventStoreService;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -134,17 +134,17 @@ public class OrderCommandService {
 ### Step 2: Query Side (Read Model)
 
 ```java
-package net.lab1024.sa.admin.module.business.order.query;
+package net.lab1024.sa.business.order.query;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.dao.OrderReadModelDao;
-import net.lab1024.sa.admin.module.business.order.domain.entity.OrderReadModelEntity;
-import net.lab1024.sa.admin.module.business.order.domain.form.OrderQueryForm;
-import net.lab1024.sa.admin.module.business.order.domain.vo.OrderVO;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.order.dao.OrderReadModelDao;
+import net.lab1024.sa.business.order.domain.entity.OrderReadModelEntity;
+import net.lab1024.sa.business.order.domain.form.OrderQueryForm;
+import net.lab1024.sa.business.order.domain.vo.OrderVO;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -342,11 +342,11 @@ OrderCreated → PaymentProcessed → InventoryReserved → OrderShipped
 ### Step 1: Saga Orchestrator (Choreography)
 
 ```java
-package net.lab1024.sa.admin.module.business.order.saga;
+package net.lab1024.sa.business.order.saga;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.*;
+import net.lab1024.sa.business.order.domain.event.*;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -475,12 +475,12 @@ public class OrderPaymentSagaChoreography {
 **Centralized Saga Orchestrator:**
 
 ```java
-package net.lab1024.sa.admin.module.business.order.saga;
+package net.lab1024.sa.business.order.saga;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.entity.SagaStateEntity;
-import net.lab1024.sa.admin.module.business.order.dao.SagaStateDao;
+import net.lab1024.sa.business.order.domain.entity.SagaStateEntity;
+import net.lab1024.sa.business.order.dao.SagaStateDao;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

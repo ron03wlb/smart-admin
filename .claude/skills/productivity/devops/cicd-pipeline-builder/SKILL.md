@@ -118,7 +118,7 @@ Automated CI/CD pipelines ensure **every commit is validated** before merge:
 
 1. Copy `assets/templates/docker-compose-ci.yml`
 2. Start services: `docker-compose -f docker-compose-ci.yml up -d`
-3. Run tests: `./gradlew :sa-admin:integrationTest`
+3. Run tests: `./gradlew :smartadmin-app:integrationTest`
 4. Stop services: `docker-compose -f docker-compose-ci.yml down`
 
 ---
@@ -166,7 +166,7 @@ Automated CI/CD pipelines ensure **every commit is validated** before merge:
 ```yaml
 # Must run to validate layered architecture
 - name: Run Architecture Tests
-  run: ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+  run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
   working-directory: smart-admin-api-java21-springboot3
 ```
 

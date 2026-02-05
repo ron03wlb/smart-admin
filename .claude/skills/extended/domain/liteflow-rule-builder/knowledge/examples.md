@@ -71,13 +71,13 @@ INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_dat
 **Step 2: Service Layer Integration**
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.base.module.support.liteflow.service.LiteFlowExecutionService;
-import net.lab1024.sa.base.module.support.liteflow.domain.form.LiteFlowExecutionForm;
-import net.lab1024.sa.base.module.support.liteflow.domain.vo.LiteFlowExecutionResultVO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.support.liteflow.service.LiteFlowExecutionService;
+import net.lab1024.sa.support.liteflow.domain.form.LiteFlowExecutionForm;
+import net.lab1024.sa.support.liteflow.domain.vo.LiteFlowExecutionResultVO;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

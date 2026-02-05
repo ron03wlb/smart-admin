@@ -177,14 +177,14 @@ open build/reports/quality-gate/quality-report.html
 
 **Solution**: Force report generation with `--rerun-tasks`:
 ```bash
-./gradlew :sa-admin:checkstyleMain --rerun-tasks
+./gradlew :smartadmin-app:checkstyleMain --rerun-tasks
 ```
 
 ### Issue: Coverage verification fails unexpectedly
 
 **Solution**: Check exclusion patterns in `build.gradle.kts`:
 ```bash
-./gradlew :sa-admin:jacocoTestCoverageVerification --info
+./gradlew :smartadmin-app:jacocoTestCoverageVerification --info
 ```
 
 ## Version History

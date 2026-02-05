@@ -259,10 +259,10 @@ curl http://localhost:1024/actuator/metrics/smartadmin.cache.hit_rate
 ### Service Layer with Caching
 
 ```java
-package net.lab1024.sa.admin.module.business.product.service;
+package net.lab1024.sa.business.product.service;
 
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.foundation.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

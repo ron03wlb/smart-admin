@@ -710,7 +710,7 @@ spec:
 - [07-07 性能優化規範](./07-07_Performance_Optimization.md) - §9 Flink 流式計算集成總覽
 - [07-09 緩存策略](./07-09_Caching_Strategy.md) - Binlog 監聽失效 (Flink CDC 應用)
 - [07-10 成本優化](./07-10_Cost_Optimization.md) - §3 Flink Cluster 成本分析
-- [00-04 技術選型](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - Flink 技術棧
+- [00-04 技術選型](../00_Foundation/concepts/00-04_Technology_Stack.md) - Flink 技術棧
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - Flink CDC 數據源
 - [04-02 欺詐檢測](../04_Risk_Control/04-02_Fraud_Detection.md) - Flink CEP 風控應用
 - [06-01 報表架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - Flink SQL 實時報表

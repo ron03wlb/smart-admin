@@ -62,7 +62,7 @@ export SW_AGENT_COLLECTOR_BACKEND_SERVICES=skywalking-oap:11800
 # 3. Run application with agent
 java -javaagent:/path/to/skywalking-agent.jar \
      -Dskywalking.agent.service_name=smartadmin-api \
-     -jar sa-admin.jar
+     -jar smartadmin-app.jar
 ```
 
 **Time to Setup**: 10-15 minutes
@@ -194,7 +194,7 @@ plugin.redis.trace_redis_commands=true
 java -javaagent:/opt/skywalking-agent/skywalking-agent.jar \
      -Dskywalking.agent.service_name=smartadmin-api \
      -Dskywalking.collector.backend_service=localhost:11800 \
-     -jar sa-admin.jar
+     -jar smartadmin-app.jar
 ```
 
 **Access UI**: http://localhost:8080

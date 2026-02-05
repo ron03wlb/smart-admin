@@ -66,7 +66,7 @@ When user makes a request, determine execution mode:
 
 **Output**:
 ```
-sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/
+smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/
 ├── controller/{Entity}Controller.java
 ├── service/{Entity}Service.java
 ├── manager/{Entity}Manager.java
@@ -150,7 +150,7 @@ smart-admin-web/src/
 
 **Output**:
 ```
-sa-admin/src/test/java/net/lab1024/sa/admin/module/business/{module}/
+smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/{module}/
 └── service/{Entity}IntegrationTest.java
 ```
 
@@ -265,7 +265,7 @@ Execution: Phase 3 only
 - [ ] Tests use @SpringBootTest and @TestMethodOrder
 - [ ] Testcontainers configured for PostgreSQL + Redis
 - [ ] All CRUD operations have test methods
-- [ ] Tests pass: `./gradlew :sa-admin:test --tests {Entity}IntegrationTest`
+- [ ] Tests pass: `./gradlew :smartadmin-app:test --tests {Entity}IntegrationTest`
 
 ---
 

@@ -48,8 +48,8 @@ Create a complete CRUD module for Product management with full-stack implementat
 ## Entity Definition
 
 ```java
-// File: smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/admin/module/business/product/domain/entity/ProductEntity.java
-package net.lab1024.sa.admin.module.business.product.domain.entity;
+// File: smart-admin-api/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/product/domain/entity/ProductEntity.java
+package net.lab1024.sa.business.product.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -82,15 +82,15 @@ public class ProductEntity {
 ## Controller Implementation
 
 ```java
-// File: smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/admin/module/business/product/controller/ProductController.java
-package net.lab1024.sa.admin.module.business.product.controller;
+// File: smart-admin-api/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/product/controller/ProductController.java
+package net.lab1024.sa.business.product.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.foundation.domain.response.PageResponseDTO;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.PageResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -166,10 +166,10 @@ This phase implements Spring Boot integration tests with Testcontainers for the 
 ## Test Setup
 
 ```java
-// File: smart-admin-api/sa-admin/src/test/java/net/lab1024/sa/admin/module/business/product/ProductServiceIntegrationTest.java
-package net.lab1024.sa.admin.module.business.product;
+// File: smart-admin-api/smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/product/ProductServiceIntegrationTest.java
+package net.lab1024.sa.business.product;
 
-import net.lab1024.sa.admin.BaseIntegrationTest;
+import net.lab1024.sa.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -197,10 +197,10 @@ class ProductServiceIntegrationTest extends BaseIntegrationTest {
 ## Controller Test
 
 ```java
-// File: smart-admin-api/sa-admin/src/test/java/net/lab1024/sa/admin/module/business/product/ProductControllerIntegrationTest.java
-package net.lab1024.sa.admin.module.business.product;
+// File: smart-admin-api/smartadmin-modules/smartadmin-business/src/test/java/net/lab1024/sa/business/product/ProductControllerIntegrationTest.java
+package net.lab1024.sa.business.product;
 
-import net.lab1024.sa.admin.BaseControllerTest;
+import net.lab1024.sa.BaseControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -256,7 +256,7 @@ Implement multi-tenant architecture for Product module with tenant isolation.
 ## Database Schema
 
 ```sql
--- File: smart-admin-api/sa-admin/src/main/resources/db/migration/V1_1__add_tenant_support.sql
+-- File: smart-admin-api/smartadmin-app/src/main/resources/db/migration/V1_1__add_tenant_support.sql
 ALTER TABLE t_product ADD COLUMN tenant_id BIGINT NOT NULL DEFAULT 0;
 CREATE INDEX idx_tenant_product ON t_product(tenant_id);
 ```
@@ -264,8 +264,8 @@ CREATE INDEX idx_tenant_product ON t_product(tenant_id);
 ## Tenant Interceptor
 
 ```java
-// File: smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/base/module/support/tenant/TenantInterceptor.java
-package net.lab1024.sa.base.module.support.tenant;
+// File: smart-admin-api/smartadmin-support/src/main/java/net/lab1024/sa/base/module/support/tenant/TenantInterceptor.java
+package net.lab1024.sa.support.tenant;
 
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import net.sf.jsqlparser.expression.Expression;
@@ -289,7 +289,7 @@ public class TenantInterceptor extends TenantLineInnerInterceptor {
 ## Update Product Entity
 
 ```java
-// File: smart-admin-api/sa-admin/src/main/java/net/lab1024/sa/admin/module/business/product/domain/entity/ProductEntity.java
+// File: smart-admin-api/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/product/domain/entity/ProductEntity.java
 // (Modify existing file)
 
 @Data
@@ -421,7 +421,7 @@ public class ProductEntity {
 ╠══════════════════════════════════════════════════════════════════
 ║ Conflict Details:
 ║
-║ Conflict #1: smart-admin-api/sa-admin/.../ProductEntity.java
+║ Conflict #1: smart-admin-api/smartadmin-modules/smartadmin-business/.../ProductEntity.java
 ║   Conflicting Plans:
 ║     - [crud] product-crud
 ║     - [custom] multi-tenant-setup
@@ -583,7 +583,7 @@ public class ProductEntity {
 ║   - Dependency Conflicts: 0 (CRITICAL)
 ║
 ║   File-level Conflicts:
-║     1. smart-admin-api/sa-admin/.../ProductEntity.java
+║     1. smart-admin-api/smartadmin-modules/smartadmin-business/.../ProductEntity.java
 ║        Conflicting Plans: product-crud, multi-tenant-setup
 ║        Resolution: Serialize (product-crud → multi-tenant-setup)
 ╠══════════════════════════════════════════════════════════════════

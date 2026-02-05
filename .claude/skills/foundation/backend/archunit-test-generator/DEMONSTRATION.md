@@ -203,7 +203,7 @@ last_updated: 2025-01-25
 **File:** `BooleanFieldViolationExample.java`
 
 ```java
-package net.lab1024.sa.admin.module.business.example.entity;
+package net.lab1024.sa.business.example.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -234,20 +234,20 @@ public class BooleanFieldViolationExample {
 
 ```bash
 # Compile test
-$ ./gradlew :sa-admin:compileTestJava
+$ ./gradlew :smartadmin-app:compileTestJava
 BUILD SUCCESSFUL in 2s
 
 # Run specific test
-$ ./gradlew :sa-admin:test --tests 'ArchitectureTest#booleanFieldsNoIsPrefix'
+$ ./gradlew :smartadmin-app:test --tests 'ArchitectureTest#booleanFieldsNoIsPrefix'
 
-> Task :sa-admin:test FAILED
+> Task :smartadmin-app:test FAILED
 
 ArchitectureTest > booleanFieldsNoIsPrefix FAILED
     java.lang.AssertionError: Architecture Violation [Priority: MEDIUM] - Rule 'fields that have boolean type and are declared in classes that reside in any package ['..entity..', '..domain..', '..vo..', '..dto..', '..form..'] should not start with 'is' followed by uppercase letter' was violated (2 times):
 
-    Field net.lab1024.sa.admin.module.business.example.entity.BooleanFieldViolationExample.isDeleted in BooleanFieldViolationExample should be named 'deleted' instead of 'isDeleted' (Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md) in (BooleanFieldViolationExample.java:14)
+    Field net.lab1024.sa.business.example.entity.BooleanFieldViolationExample.isDeleted in BooleanFieldViolationExample should be named 'deleted' instead of 'isDeleted' (Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md) in (BooleanFieldViolationExample.java:14)
 
-    Field net.lab1024.sa.admin.module.business.example.entity.BooleanFieldViolationExample.isActive in BooleanFieldViolationExample should be named 'active' instead of 'isActive' (Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md) in (BooleanFieldViolationExample.java:20)
+    Field net.lab1024.sa.business.example.entity.BooleanFieldViolationExample.isActive in BooleanFieldViolationExample should be named 'active' instead of 'isActive' (Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md) in (BooleanFieldViolationExample.java:20)
 ```
 
 **✅ SUCCESS:** Test correctly catches both violations!
@@ -259,7 +259,7 @@ ArchitectureTest > booleanFieldsNoIsPrefix FAILED
 **File:** `BooleanFieldFixedExample.java`
 
 ```java
-package net.lab1024.sa.admin.module.business.example.entity;
+package net.lab1024.sa.business.example.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -291,7 +291,7 @@ public class BooleanFieldFixedExample {
 
 **Verify Fix:**
 ```bash
-$ ./gradlew :sa-admin:test --tests 'ArchitectureTest#booleanFieldsNoIsPrefix'
+$ ./gradlew :smartadmin-app:test --tests 'ArchitectureTest#booleanFieldsNoIsPrefix'
 BUILD SUCCESSFUL in 3s
 ```
 
@@ -389,7 +389,7 @@ public Boolean isDeleted() {    // ✅ Getter method allowed
 
 ```bash
 # Test execution time
-./gradlew :sa-admin:test --tests 'ArchitectureTest#booleanFieldsNoIsPrefix'
+./gradlew :smartadmin-app:test --tests 'ArchitectureTest#booleanFieldsNoIsPrefix'
 BUILD SUCCESSFUL in 3s
 
 # Single test: <3s (acceptable)

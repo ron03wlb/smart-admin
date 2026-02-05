@@ -61,7 +61,7 @@
 
 - **新模塊首頁**: [06_Analytics_Operations/README.md](../06_Analytics_Operations/README.md)
 - **玩家分群參考**: [01-03 玩家分群與標籤](../01_Player_Center/01-03_Player_Segmentation.md)
-- **完整文檔地圖**: [00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
+- **完整文檔地圖**: [00-00_Document_Map.md](../00_Foundation/concepts/00-00_Document_Map.md)
 
 ---
 

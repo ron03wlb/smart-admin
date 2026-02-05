@@ -1,39 +1,56 @@
 #!/bin/bash
-# 掃描所有 Markdown 文件中的斷裂鏈接
+# validate_links.sh v2.0.0
+# 掃描所有 Markdown 文件中的斷裂鏈接 (bash 3.2 / macOS 兼容)
 
-DOCS_DIR="docs/iGaming"
+DOCS_DIR="${1:-docs/iGaming}"
 BROKEN_LINKS=0
+LINKS_TMP=$(mktemp)
+trap "rm -f '$LINKS_TMP'" EXIT
 
-echo "🔍 掃描 iGaming 文檔鏈接..."
+echo "=========================================="
+echo "  iGaming 文檔連結驗證 v2.0.0"
+echo "  掃描目錄: $DOCS_DIR"
+echo "=========================================="
+echo ""
 
-find "$DOCS_DIR" -name "*.md" | while read file; do
-    # 提取所有 Markdown 鏈接
-    grep -oP '\[.*?\]\(\K[^)]+' "$file" 2>/dev/null | while read link; do
-        # 忽略外部鏈接和錨點
-        if [[ $link == http* ]] || [[ $link == #* ]]; then
-            continue
-        fi
+while IFS= read -r file; do
+    # 使用 python3 提取所有內部 Markdown 連結
+    python3 -c "
+import re
+with open('${file}', 'r', encoding='utf-8') as f:
+    content = f.read()
+links = re.findall(r'\[.*?\]\(([^)]+)\)', content)
+for link in links:
+    if not link.startswith('http') and not link.startswith('#'):
+        # 移除錨點和查詢參數
+        clean = link.split('#')[0].split('?')[0]
+        if clean:
+            print(clean)
+" > "$LINKS_TMP" 2>/dev/null
 
-        # 解析相對路徑
-        dir=$(dirname "$file")
+    dir=$(dirname "$file")
+
+    while IFS= read -r link; do
         target="$dir/$link"
 
-        # 移除錨點
-        target="${target%%#*}"
-
-        # 檢查文件是否存在
-        if [[ ! -f "$target" ]]; then
-            echo "❌ 斷裂鏈接: $file -> $link"
+        if [ ! -f "$target" ] && [ ! -d "$target" ]; then
+            echo "  [BROKEN] $file"
+            echo "    -> $link"
             BROKEN_LINKS=$((BROKEN_LINKS + 1))
         fi
-    done
-done
+    done < "$LINKS_TMP"
 
-# 輸出結果
-if [ $BROKEN_LINKS -eq 0 ]; then
-    echo "✅ 所有鏈接有效"
-    exit 0
-else
-    echo "❌ 發現 $BROKEN_LINKS 個斷裂鏈接"
+done < <(find "$DOCS_DIR" -name "*.md" -not -path "*/archive/*" 2>/dev/null | sort)
+
+echo ""
+echo "=========================================="
+echo "  結果摘要"
+echo "=========================================="
+echo "  Broken Links: $BROKEN_LINKS"
+echo "=========================================="
+
+if [ $BROKEN_LINKS -gt 0 ]; then
     exit 1
+else
+    exit 0
 fi

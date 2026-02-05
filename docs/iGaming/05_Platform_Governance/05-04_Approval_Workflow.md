@@ -339,7 +339,7 @@ const REJECTION_TEMPLATES = [
 
 ### 前置知識（必讀）
 - [09-02 審計日誌系統](09-02_Audit_Log_System.md) - 審批操作的審計追蹤
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 玩家數據結構
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Lifecycle.md) - 玩家數據結構
 
 ### 核心依賴
 - [02-01 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 提款審批規則
@@ -349,7 +349,7 @@ const REJECTION_TEMPLATES = [
 ### 相關實作
 - [11-01 客服平台設計](../06_Analytics_Operations/06-02_Customer_Service.md) - 客服操作審批（補單、踢線）
 - [08-01 配置管理系統](../08_Frontend_CMS/08-01_Config_Management_System.md) - 配置變更審批
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利發放審批
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 紅利發放審批
 
 ### 延伸閱讀
 - [09-03 權限與認證](../09_System_Security/09-03_Authentication_Authorization.md) - RBAC 權限控制

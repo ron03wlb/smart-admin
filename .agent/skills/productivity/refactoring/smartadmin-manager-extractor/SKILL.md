@@ -73,5 +73,5 @@ AI: [Create Manager class, move methods, update Service to delegate]
 2. 創建 `EmployeeManager` 類
 3. 移動 `createEmployee()` 方法到 Manager
 4. 更新 Service 委派: `employeeManager.createEmployee(...)`
-5. 運行 `./gradlew :sa-admin:test --tests ArchitectureTest`
+5. 運行 `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 6. 確認測試通過

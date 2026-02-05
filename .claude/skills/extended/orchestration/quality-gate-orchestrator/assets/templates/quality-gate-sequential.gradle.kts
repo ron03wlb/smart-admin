@@ -39,7 +39,7 @@ tasks.register("qualityGateSequential") {
         try {
             exec {
                 workingDir = file("smart-admin-api-java21-springboot3")
-                commandLine("./gradlew", ":sa-admin:checkstyleMain", ":sa-admin:checkstyleTest", "--no-daemon")
+                commandLine("./gradlew", ":smartadmin-app:checkstyleMain", ":smartadmin-app:checkstyleTest", "--no-daemon")
                 isIgnoreExitValue = false
             }
             val checkstyleDuration = System.currentTimeMillis() - checkstyleStart
@@ -61,7 +61,7 @@ tasks.register("qualityGateSequential") {
         try {
             exec {
                 workingDir = file("smart-admin-api-java21-springboot3")
-                commandLine("./gradlew", ":sa-admin:test", "--tests", "*ArchitectureTest", "--no-daemon")
+                commandLine("./gradlew", ":smartadmin-app:test", "--tests", "*ArchitectureTest", "--no-daemon")
                 isIgnoreExitValue = false
             }
             val archunitDuration = System.currentTimeMillis() - archunitStart
@@ -83,7 +83,7 @@ tasks.register("qualityGateSequential") {
         try {
             exec {
                 workingDir = file("smart-admin-api-java21-springboot3")
-                commandLine("./gradlew", ":sa-admin:pmdMain", "--no-daemon")
+                commandLine("./gradlew", ":smartadmin-app:pmdMain", "--no-daemon")
                 isIgnoreExitValue = false
             }
             val pmdDuration = System.currentTimeMillis() - pmdStart
@@ -105,7 +105,7 @@ tasks.register("qualityGateSequential") {
         try {
             exec {
                 workingDir = file("smart-admin-api-java21-springboot3")
-                commandLine("./gradlew", ":sa-admin:spotbugsMain", "--no-daemon")
+                commandLine("./gradlew", ":smartadmin-app:spotbugsMain", "--no-daemon")
                 isIgnoreExitValue = false
             }
             val spotbugsDuration = System.currentTimeMillis() - spotbugsStart
@@ -127,7 +127,7 @@ tasks.register("qualityGateSequential") {
         try {
             exec {
                 workingDir = file("smart-admin-api-java21-springboot3")
-                commandLine("./gradlew", ":sa-admin:test", ":sa-admin:jacocoTestReport", ":sa-admin:jacocoTestCoverageVerification", "--no-daemon")
+                commandLine("./gradlew", ":smartadmin-app:test", ":smartadmin-app:jacocoTestReport", ":smartadmin-app:jacocoTestCoverageVerification", "--no-daemon")
                 isIgnoreExitValue = false
             }
             val jacocoDuration = System.currentTimeMillis() - jacocoStart
@@ -170,11 +170,11 @@ fun printFailureSummary(
     }
     println()
     println("View detailed reports:")
-    println("  - Checkstyle: sa-admin/build/reports/checkstyle/main.html")
-    println("  - PMD: sa-admin/build/reports/pmd/main.html")
-    println("  - SpotBugs: sa-admin/build/reports/spotbugs/main.html")
-    println("  - Tests: sa-admin/build/reports/tests/test/index.html")
-    println("  - Coverage: sa-admin/build/reports/jacoco/test/html/index.html")
+    println("  - Checkstyle: smartadmin-app/build/reports/checkstyle/main.html")
+    println("  - PMD: smartadmin-app/build/reports/pmd/main.html")
+    println("  - SpotBugs: smartadmin-app/build/reports/spotbugs/main.html")
+    println("  - Tests: smartadmin-app/build/reports/tests/test/index.html")
+    println("  - Coverage: smartadmin-app/build/reports/jacoco/test/html/index.html")
     println("=" .repeat(80))
 }
 
@@ -196,10 +196,10 @@ fun printSuccessSummary(results: Map<String, Pair<Int, Long>>, startTime: Long) 
     println("Total execution time: ${totalDuration}ms")
     println()
     println("Quality reports available at:")
-    println("  - Checkstyle: sa-admin/build/reports/checkstyle/main.html")
-    println("  - PMD: sa-admin/build/reports/pmd/main.html")
-    println("  - SpotBugs: sa-admin/build/reports/spotbugs/main.html")
-    println("  - Tests: sa-admin/build/reports/tests/test/index.html")
-    println("  - Coverage: sa-admin/build/reports/jacoco/test/html/index.html")
+    println("  - Checkstyle: smartadmin-app/build/reports/checkstyle/main.html")
+    println("  - PMD: smartadmin-app/build/reports/pmd/main.html")
+    println("  - SpotBugs: smartadmin-app/build/reports/spotbugs/main.html")
+    println("  - Tests: smartadmin-app/build/reports/tests/test/index.html")
+    println("  - Coverage: smartadmin-app/build/reports/jacoco/test/html/index.html")
     println("=" .repeat(80))
 }

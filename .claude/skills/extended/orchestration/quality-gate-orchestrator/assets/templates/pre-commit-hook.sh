@@ -41,7 +41,7 @@ echo ""
 # Step 2: Checkstyle (BLOCKER)
 echo "2️⃣  Running Checkstyle (code style)..."
 STEP_START=$(date +%s)
-if ./gradlew :sa-admin:checkstyleMain --quiet --no-daemon; then
+if ./gradlew :smartadmin-app:checkstyleMain --quiet --no-daemon; then
     print_status 0 "Checkstyle passed"
     print_duration $STEP_START
     echo ""
@@ -50,7 +50,7 @@ else
     print_duration $STEP_START
     echo ""
     echo "⚠️  Fix Checkstyle violations before committing."
-    echo "   View report: sa-admin/build/reports/checkstyle/main.html"
+    echo "   View report: smartadmin-app/build/reports/checkstyle/main.html"
     echo ""
     exit 1
 fi
@@ -58,7 +58,7 @@ fi
 # Step 3: ArchUnit (BLOCKER - critical architecture rules only)
 echo "3️⃣  Running ArchUnit (architecture rules)..."
 STEP_START=$(date +%s)
-if ./gradlew :sa-admin:test --tests "*ArchitectureTest" --quiet --no-daemon; then
+if ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --quiet --no-daemon; then
     print_status 0 "ArchUnit tests passed"
     print_duration $STEP_START
     echo ""
@@ -67,7 +67,7 @@ else
     print_duration $STEP_START
     echo ""
     echo "⚠️  Fix architecture violations before committing."
-    echo "   View report: sa-admin/build/reports/tests/test/index.html"
+    echo "   View report: smartadmin-app/build/reports/tests/test/index.html"
     echo ""
     exit 1
 fi

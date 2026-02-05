@@ -20,10 +20,10 @@
 ### ❌ 錯誤代碼（架構違規）
 
 ```java
-package net.lab1024.sa.admin.module.business.user.controller;
+package net.lab1024.sa.business.user.controller;
 
-import net.lab1024.sa.admin.module.business.user.dao.UserDao;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.user.dao.UserDao;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +62,7 @@ User: "Generate ArchUnit test for layered architecture"
 或在 ArchitectureTest.java 中添加：
 
 ```java
-@AnalyzeClasses(packages = "net.lab1024.sa.admin.module", importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(packages = "net.lab1024.sa", importOptions = ImportOption.DoNotIncludeTests.class)
 public class ArchitectureTest {
 
     @ArchTest
@@ -88,7 +88,7 @@ public class ArchitectureTest {
 
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest.controllerShouldNotAccessDao
+./gradlew :smartadmin-app:test --tests ArchitectureTest.controllerShouldNotAccessDao
 ```
 
 ---
@@ -100,8 +100,8 @@ Architecture Violation [Priority: MEDIUM] - Rule 'classes that reside in a packa
 should only depend on classes that reside in any package ['..service..', '..domain..', 'java..',
 'org.springframework..', 'lombok..']' was violated (1 times):
 
-Method <net.lab1024.sa.admin.module.business.user.controller.UserController.getUser(java.lang.Long)>
-depends on class <net.lab1024.sa.admin.module.business.user.dao.UserDao> in
+Method <net.lab1024.sa.business.user.controller.UserController.getUser(java.lang.Long)>
+depends on class <net.lab1024.sa.business.user.dao.UserDao> in
 (UserController.java:15)
 ```
 
@@ -112,10 +112,10 @@ depends on class <net.lab1024.sa.admin.module.business.user.dao.UserDao> in
 ### ✅ 正確代碼（符合架構規範）
 
 ```java
-package net.lab1024.sa.admin.module.business.user.controller;
+package net.lab1024.sa.business.user.controller;
 
-import net.lab1024.sa.admin.module.business.user.service.UserService;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.user.service.UserService;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -137,9 +137,9 @@ public class UserController {
 
 **Service 層**:
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
-import net.lab1024.sa.admin.module.business.user.dao.UserDao;
+import net.lab1024.sa.business.user.dao.UserDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import io.vavr.control.Option;
@@ -163,12 +163,12 @@ public class UserService {
 ## 驗證測試通過
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest.controllerShouldNotAccessDao
+./gradlew :smartadmin-app:test --tests ArchitectureTest.controllerShouldNotAccessDao
 ```
 
 **輸出**:
 ```
-> Task :sa-admin:test
+> Task :smartadmin-app:test
 
 ArchitectureTest > controllerShouldNotAccessDao() PASSED
 
@@ -272,4 +272,4 @@ public static final ArchRule domainShouldNotDependOnLayers =
 
 - [ArchUnit 官方文檔](https://www.archunit.org/userguide/html/000_Index.html)
 - [SmartAdmin Architecture Rules](../../../../../.agent/rules/foundation/10-architecture-rules.md)
-- [ArchitectureTest.java](../../../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/ArchitectureTest.java)
+- [ArchitectureTest.java](../../../../../smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java)

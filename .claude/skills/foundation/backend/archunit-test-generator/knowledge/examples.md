@@ -11,7 +11,7 @@ static final ArchRule managerShouldNotAccessBusinessService =
     noClasses()
         .that().resideInAPackage("..manager..")
         .should().dependOnClassesThat()
-        .resideInAPackage("net.lab1024.sa.admin..service..")
+        .resideInAPackage("net.lab1024.sa..service..")
         .because("Manager 層禁止調用業務 Service 層 (rule: 09-manager-layer.md)");
 ```
 
@@ -121,13 +121,13 @@ public class EmployeeController {
 
 ```bash
 # Compile
-./gradlew :sa-admin:compileTestJava
+./gradlew :smartadmin-app:compileTestJava
 
 # Run all tests
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Run specific test
-./gradlew :sa-admin:test --tests ArchitectureTest#noFieldInjection
+./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection
 ```
 
 ---

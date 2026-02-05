@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 {{/if}}
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.lab1024.sa.foundation.domain.request.PageParam;
+import net.lab1024.sa.common.core.domain.request.PageParam;
 import org.hibernate.validator.constraints.Length;
 {{#if has_list_field}}
 import java.util.List;

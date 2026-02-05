@@ -198,7 +198,7 @@ public class SmartAdminApplication {
 ### Step 4: Create Job Handler (10 minutes)
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;

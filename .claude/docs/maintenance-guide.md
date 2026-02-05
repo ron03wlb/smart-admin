@@ -765,7 +765,7 @@ git commit -m "revert(java-architect): rollback to previous version - [reason]"
 2. Verify CLAUDE.md quick reference links still work
 3. All agents automatically reference updated pattern
 4. Update version in META.md
-5. Test with `./gradlew :sa-admin:test --tests ArchitectureTest`
+5. Test with `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 6. Commit all changes together
 
 **Time:** ~5 minutes

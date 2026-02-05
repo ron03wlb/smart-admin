@@ -25,7 +25,7 @@ dependencies {
 ### STOMP Configuration
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -77,7 +77,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 ### Authentication Interceptor (Sa-Token)
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -136,11 +136,11 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 ### Topic-Based Broadcasting (One-to-Many)
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.controller;
+package net.lab1024.sa.business.notification.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -219,12 +219,12 @@ public void sendToUser(Long userId, NotificationVO notification) {
 ### Role-Based Broadcasting
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.service;
+package net.lab1024.sa.business.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
-import net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.system.employee.dao.EmployeeDao;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -277,7 +277,7 @@ spring:
 ### Connection Tracking
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -340,10 +340,10 @@ public class WebSocketConnectionTracker {
 ### Message Queue with Overflow Protection
 
 ```java
-package net.lab1024.sa.base.module.support.websocket;
+package net.lab1024.sa.support.websocket;
 
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.domain.vo.NotificationVO;
+import net.lab1024.sa.business.notification.domain.vo.NotificationVO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -426,12 +426,12 @@ public class BackpressureWebSocketSender {
 ### Order Status WebSocket
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.entity.OrderEntity;
-import net.lab1024.sa.admin.module.business.order.domain.vo.OrderStatusVO;
+import net.lab1024.sa.business.order.domain.entity.OrderEntity;
+import net.lab1024.sa.business.order.domain.vo.OrderStatusVO;
 import net.lab1024.sa.foundation.core.util.SmartBeanUtil;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -499,11 +499,11 @@ public class OrderManager {
 ### Metrics Broadcasting
 
 ```java
-package net.lab1024.sa.admin.module.system.monitor.service;
+package net.lab1024.sa.system.monitor.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.system.monitor.domain.vo.SystemMetricsVO;
+import net.lab1024.sa.system.monitor.domain.vo.SystemMetricsVO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

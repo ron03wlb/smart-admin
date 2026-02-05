@@ -489,7 +489,7 @@ Warning: 299 - "API v1 is deprecated and will be removed on 2027-01-01. Please m
 ## 📚 相關文檔
 
 ### 前置依賴
-- [00-04 技術棧](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 技術選型
+- [00-04 技術棧](../00_Foundation/concepts/00-04_Technology_Stack.md) - 技術選型
 
 ### 相關文檔
 - [12-01 部署架構](./07-01_Deployment.md) - 部署策略

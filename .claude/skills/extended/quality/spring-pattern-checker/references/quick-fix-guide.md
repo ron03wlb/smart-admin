@@ -65,7 +65,7 @@ public class EmployeeService {
 
 **Step 3**: Verify
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest#managerLayerRules
+./gradlew :smartadmin-app:test --tests ArchitectureTest#managerLayerRules
 ```
 
 ---
@@ -450,7 +450,7 @@ After fixing violations, run these checks:
 ### 1. ArchUnit Tests
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 Should see:
@@ -475,7 +475,7 @@ No violations found
 ### 3. Build & Run
 ```bash
 ./gradlew clean build
-./gradlew :sa-admin:bootRun
+./gradlew :smartadmin-app:bootRun
 ```
 
 ### 4. Manual Code Review
@@ -492,7 +492,7 @@ For batch fixing `@Autowired` field injection:
 
 ```bash
 # Find files with @Autowired field injection
-grep -r "@Autowired" --include="*.java" sa-admin/src/main/java/ \
+grep -r "@Autowired" --include="*.java" smartadmin-modules/src/main/java/ \
   | grep "private" \
   | cut -d: -f1 \
   | sort -u

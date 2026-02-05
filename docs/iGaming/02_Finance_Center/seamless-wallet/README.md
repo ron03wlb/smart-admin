@@ -54,7 +54,7 @@
 
 這些文檔提供無縫錢包的整體架構視角：
 
-- **[02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md)** - 錢包整體架構、可下注餘額公式
+- **[02-06 統一錢包模型](../02-06_Wallet_Architecture.md)** - 錢包整體架構、可下注餘額公式
 - **[02-07 交易處理流程](../02-07_Transaction_Processing_Flow.md)** - 事件驅動架構、Outbox Pattern
 - **[02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md)** - 多層審核、SAGA 事務
 
@@ -80,7 +80,7 @@
 
 如果您是第一次接觸無縫錢包，建議按以下順序閱讀：
 
-1. **理解整體架構**: [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md)
+1. **理解整體架構**: [02-06 統一錢包模型](../02-06_Wallet_Architecture.md)
 2. **學習安全設計**: [core/01-security.md](core/01-security.md) - Token 驗證 + 冪等性
 3. **掌握並發控制**: [core/02-concurrency.md](core/02-concurrency.md) - 流水並發累積
 4. **理解錯誤恢復**: [core/03-recovery.md](core/03-recovery.md) - 補償事務

@@ -267,7 +267,7 @@ export interface CategoryAddForm {
 
 ### 3.2 Java 規範
 
-1. **套件命名**: `net.lab1024.sa.admin.module.{business|system}.{模組名}`
+1. **套件命名**: `net.lab1024.sa.{business|system|oa}.{模組名}`
 2. **類別命名**:
    - Controller: `{Module}Controller`
    - Service: `{Module}Service`
@@ -290,16 +290,16 @@ export interface CategoryAddForm {
 
 採用兩層配置系統：
 
-1. **基礎配置**: `sa-base/src/main/resources/{env}/sa-base.yaml`
+1. **公共配置**: `smartadmin-common/` 及 `smartadmin-support/` 中的基礎配置
    - 資料庫、Redis、郵件、快取設定
 
-2. **應用配置**: `sa-admin/src/main/resources/{env}/application.yaml`
+2. **應用配置**: `smartadmin-app/src/main/resources/{env}/application.yaml`
    - 應用專屬設定
    - 覆寫基礎配置
 
 **環境**: dev (預設), test, pre, prod
 
-建置命令: `mvn clean package -P {env}`
+建置命令: `./gradlew clean build -x test`
 
 ### 4.2 前端配置
 

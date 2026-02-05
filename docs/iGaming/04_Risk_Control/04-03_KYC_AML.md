@@ -8,7 +8,7 @@
 **前置依賴**:
 - [04-01 風控框架](./04-01_Risk_Framework.md) - AML 監控、風險評分模型 (§7, §11)
 - [04-02 欺詐檢測](./04-02_Fraud_Detection.md) - 資金流聚集檢測、洗錢風險 (§5)
-- [03-01 玩家生命週期](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 分級認證體系 (§2.3)
+- [03-01 玩家生命週期](../01_Player_Center/01-01_Player_Lifecycle.md) - KYC 分級認證體系 (§2.3)
 - [05-05 數據安全策略](../05_Platform_Governance/05-05_Data_Security.md) - 個人資料加密、審計日誌 (§3, §8)
 
 ---
@@ -718,7 +718,7 @@ END;
 ### 業務參考
 - [04-01 風控框架](./04-01_Risk_Framework.md) - AML 監控、風險評分模型
 - [04-02 欺詐檢測](./04-02_Fraud_Detection.md) - 資金流聚集檢測、洗錢風險
-- [03-01 玩家生命週期](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 觸發邏輯、註冊流程
+- [03-01 玩家生命週期](../01_Player_Center/01-01_Player_Lifecycle.md) - KYC 觸發邏輯、註冊流程
 
 ### 技術參考
 - [05-05 數據安全策略](../05_Platform_Governance/05-05_Data_Security.md) - 個人資料加密、審計日誌

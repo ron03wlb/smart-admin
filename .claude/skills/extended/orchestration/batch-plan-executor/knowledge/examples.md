@@ -170,10 +170,10 @@ After all phases complete:
 
 ```bash
 # Verify all services running
-./gradlew :sa-admin:bootRun
+./gradlew :smartadmin-app:bootRun
 
 # Run full test suite
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 
 # Check git history
 git log --oneline -8
@@ -463,7 +463,7 @@ cp -r src/ src.backup.$(date +%Y%m%d-%H%M%S)/
 **Step 4: Fix Issue and Retry**
 ```bash
 # Fix dependency issue
-./gradlew :sa-admin:dependencies --add "org.bouncycastle:bcprov-jdk15on:1.70"
+./gradlew :smartadmin-app:dependencies --add "org.bouncycastle:bcprov-jdk15on:1.70"
 
 # Retry only failed plans
 /batch-execute --retry-failed=batch-exec-20260202-153000

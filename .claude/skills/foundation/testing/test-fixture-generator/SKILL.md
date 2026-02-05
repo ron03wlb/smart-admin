@@ -170,15 +170,15 @@ public class GoodsEntity {
 **Example**: `business/goods/service/GoodsTestFixture.java`
 
 ```java
-package net.lab1024.sa.admin.module.business.goods.service;
+package net.lab1024.sa.business.goods.service;
 
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.lab1024.sa.admin.module.business.category.domain.entity.CategoryEntity;
-import net.lab1024.sa.admin.module.business.goods.domain.entity.GoodsEntity;
-import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsAddForm;
-import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsQueryForm;
-import net.lab1024.sa.admin.module.business.goods.domain.form.GoodsUpdateForm;
+import net.lab1024.sa.business.category.domain.entity.CategoryEntity;
+import net.lab1024.sa.business.goods.domain.entity.GoodsEntity;
+import net.lab1024.sa.business.goods.domain.form.GoodsAddForm;
+import net.lab1024.sa.business.goods.domain.form.GoodsQueryForm;
+import net.lab1024.sa.business.goods.domain.form.GoodsUpdateForm;
 
 /**
  * Test fixtures for Goods integration tests
@@ -700,11 +700,11 @@ When generating fixture, ensure:
 
 ## References
 
-**Pattern Source**: `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeTestFixture.java`
+**Pattern Source**: `/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/system/employee/service/EmployeeTestFixture.java`
 
-**Integration Test Example**: `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceIntegrationTest.java`
+**Integration Test Example**: `/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/system/employee/service/EmployeeServiceIntegrationTest.java`
 
-**Base Class**: `/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java`
+**Base Class**: `/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java`
 
 ---
 
@@ -745,6 +745,6 @@ When generating fixture, ensure:
 
 ## 參考資料
 
-- [EmployeeTestFixture.java](./../../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeTestFixture.java) - 完整範例
-- [EmployeeServiceIntegrationTest.java](./../../../../smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/system/employee/service/EmployeeServiceIntegrationTest.java) - 使用範例
+- [EmployeeTestFixture.java](./../../../../smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/system/employee/service/EmployeeTestFixture.java) - 完整範例
+- [EmployeeServiceIntegrationTest.java](./../../../../smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/system/employee/service/EmployeeServiceIntegrationTest.java) - 使用範例
 - [Test Fixture Pattern](https://martinfowler.com/bliki/TestFixture.html) - Martin Fowler 文章

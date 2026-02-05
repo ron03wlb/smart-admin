@@ -138,13 +138,13 @@ git stash push -m "Before manager extraction"
 # (AI 生成代碼)
 
 # 3. 編譯檢查
-./gradlew :sa-admin:compileJava
+./gradlew :smartadmin-app:compileJava
 
 # 4. ArchUnit 驗證
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # 5. 完整測試
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 
 # 6. 如果失敗，回滾
 git stash pop

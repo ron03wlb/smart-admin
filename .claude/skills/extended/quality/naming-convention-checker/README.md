@@ -94,7 +94,7 @@ static final ArchRule tableNameMustBeSingular = classes()
 
 運行測試：
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest#tableNameMustBeSingular
+./gradlew :smartadmin-app:test --tests ArchitectureTest#tableNameMustBeSingular
 ```
 
 ### CI/CD 集成

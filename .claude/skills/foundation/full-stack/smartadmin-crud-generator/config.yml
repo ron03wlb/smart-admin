@@ -135,8 +135,8 @@ output:
     - "*.ts"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java"
     - "smart-admin-web/src/views"
     - "smart-admin-web/src/api"
 
@@ -168,15 +168,15 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify generated code compiles successfully"
-      command: "./gradlew :sa-admin:compileJava"
+      command: "./gradlew :smartadmin-app:compileJava"
 
     - check: "archunit"
       description: "Verify ArchitectureTest passes for generated code"
-      command: "./gradlew :sa-admin:test --tests ArchitectureTest"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest"
 
     - check: "unit-tests"
       description: "Run unit tests for generated code"
-      command: "./gradlew :sa-admin:test --tests *ServiceTest"
+      command: "./gradlew :smartadmin-app:test --tests *ServiceTest"
 
 compatibility:
   deprecated: false

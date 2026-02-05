@@ -1536,9 +1536,9 @@ def generate_deletion_certificate(player_id: int, verification_token: str) -> st
 
 ### 業務邏輯參考
 <!-- TODO: 待創建文檔 - Week 4-5 -->
-<!-- - [01-01 Player_Lifecycle](../01_Core_Financial_Loop/01-01_Player_Lifecycle.md) - 玩家生命週期管理 -->
-- [01-02 Wallet_Architecture](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) - 錢包數據加密、API安全設計
-<!-- - [01-05 Withdrawal_Risk](../01_Core_Financial_Loop/01-05_Withdrawal_Risk.md) - 銀行帳號驗證 -->
+<!-- - [01-01 Player_Lifecycle](../01_Player_Center/01-01_Player_Lifecycle.md) - 玩家生命週期管理 -->
+- [01-02 Wallet_Architecture](../02_Finance_Center/02-06_Wallet_Architecture.md) - 錢包數據加密、API安全設計
+<!-- - [01-05 Withdrawal_Risk](../01_Player_Center/01-05_Withdrawal_Risk.md) - 銀行帳號驗證 -->
 
 ### 技術基礎設施
 <!-- TODO: 待創建文檔 - Week 5-6 -->

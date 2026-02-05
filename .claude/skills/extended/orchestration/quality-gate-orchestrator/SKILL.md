@@ -108,31 +108,31 @@ tasks.register("qualityGateSequential") {
 
         // Step 2: Code style
         exec {
-            commandLine("./gradlew", ":sa-admin:checkstyleMain", ":sa-admin:checkstyleTest")
+            commandLine("./gradlew", ":smartadmin-app:checkstyleMain", ":smartadmin-app:checkstyleTest")
             isIgnoreExitValue = false  // Fail-fast
         }
 
         // Step 3: Architecture rules (CRITICAL)
         exec {
-            commandLine("./gradlew", ":sa-admin:test", "--tests", "*ArchitectureTest")
+            commandLine("./gradlew", ":smartadmin-app:test", "--tests", "*ArchitectureTest")
             isIgnoreExitValue = false
         }
 
         // Step 4: Code smells
         exec {
-            commandLine("./gradlew", ":sa-admin:pmdMain")
+            commandLine("./gradlew", ":smartadmin-app:pmdMain")
             isIgnoreExitValue = false
         }
 
         // Step 5: Bug patterns
         exec {
-            commandLine("./gradlew", ":sa-admin:spotbugsMain")
+            commandLine("./gradlew", ":smartadmin-app:spotbugsMain")
             isIgnoreExitValue = false
         }
 
         // Step 6: Coverage threshold
         exec {
-            commandLine("./gradlew", ":sa-admin:jacocoTestCoverageVerification")
+            commandLine("./gradlew", ":smartadmin-app:jacocoTestCoverageVerification")
             isIgnoreExitValue = false
         }
 
@@ -173,44 +173,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Checkstyle
-        run: ./gradlew :sa-admin:checkstyleMain
+        run: ./gradlew :smartadmin-app:checkstyleMain
       - uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
-          path: sa-admin/build/reports/checkstyle/
+          path: smartadmin-app/build/reports/checkstyle/
 
   pmd:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run PMD
-        run: ./gradlew :sa-admin:pmdMain
+        run: ./gradlew :smartadmin-app:pmdMain
       - uses: actions/upload-artifact@v4
         with:
           name: pmd-report
-          path: sa-admin/build/reports/pmd/
+          path: smartadmin-app/build/reports/pmd/
 
   spotbugs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run SpotBugs
-        run: ./gradlew :sa-admin:spotbugsMain
+        run: ./gradlew :smartadmin-app:spotbugsMain
       - uses: actions/upload-artifact@v4
         with:
           name: spotbugs-report
-          path: sa-admin/build/reports/spotbugs/
+          path: smartadmin-app/build/reports/spotbugs/
 
   archunit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run ArchUnit Tests
-        run: ./gradlew :sa-admin:test --tests "*ArchitectureTest"
+        run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
       - uses: actions/upload-artifact@v4
         with:
           name: archunit-report
-          path: sa-admin/build/reports/tests/
+          path: smartadmin-app/build/reports/tests/
 
   aggregate:
     needs: [checkstyle, pmd, spotbugs, archunit]
@@ -259,7 +259,7 @@ tasks.register("qualityGateFailFast") {
             "jacocoTestCoverageVerification" to "MAJOR"
         ).forEach { (task, severity) ->
             val result = exec {
-                commandLine("./gradlew", ":sa-admin:$task")
+                commandLine("./gradlew", ":smartadmin-app:$task")
                 isIgnoreExitValue = true
             }
 
@@ -312,11 +312,11 @@ tasks.register("generateQualityReport") {
     group = "reporting"
 
     dependsOn(
-        ":sa-admin:checkstyleMain",
-        ":sa-admin:pmdMain",
-        ":sa-admin:spotbugsMain",
-        ":sa-admin:test",
-        ":sa-admin:jacocoTestReport"
+        ":smartadmin-app:checkstyleMain",
+        ":smartadmin-app:pmdMain",
+        ":smartadmin-app:spotbugsMain",
+        ":smartadmin-app:test",
+        ":smartadmin-app:jacocoTestReport"
     )
 
     doLast {
@@ -404,27 +404,27 @@ jobs:
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 2️⃣ Checkstyle
-        run: ./gradlew :sa-admin:checkstyleMain :sa-admin:checkstyleTest
+        run: ./gradlew :smartadmin-app:checkstyleMain :smartadmin-app:checkstyleTest
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 3️⃣ Architecture Tests (CRITICAL)
-        run: ./gradlew :sa-admin:test --tests "*ArchitectureTest"
+        run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 4️⃣ PMD
-        run: ./gradlew :sa-admin:pmdMain
+        run: ./gradlew :smartadmin-app:pmdMain
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 5️⃣ SpotBugs
-        run: ./gradlew :sa-admin:spotbugsMain
+        run: ./gradlew :smartadmin-app:spotbugsMain
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 6️⃣ Unit Tests + Coverage
-        run: ./gradlew :sa-admin:test :sa-admin:jacocoTestReport
+        run: ./gradlew :smartadmin-app:test :smartadmin-app:jacocoTestReport
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 7️⃣ Coverage Verification (≥80%)
-        run: ./gradlew :sa-admin:jacocoTestCoverageVerification
+        run: ./gradlew :smartadmin-app:jacocoTestCoverageVerification
         working-directory: smart-admin-api-java21-springboot3
 
       - name: 8️⃣ SonarQube Analysis
@@ -432,7 +432,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew :sa-admin:sonar
+        run: ./gradlew :smartadmin-app:sonar
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload Quality Reports
@@ -441,7 +441,7 @@ jobs:
         with:
           name: quality-reports
           path: |
-            smart-admin-api-java21-springboot3/sa-admin/build/reports/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/
           retention-days: 30
 
       - name: Comment PR with Results
@@ -451,7 +451,7 @@ jobs:
           script: |
             // Parse reports and comment on PR
             const fs = require('fs');
-            const checkstyle = fs.readFileSync('sa-admin/build/reports/checkstyle/main.xml');
+            const checkstyle = fs.readFileSync('smartadmin-app/build/reports/checkstyle/main.xml');
             // ... aggregate and format results
 ```
 
@@ -493,60 +493,60 @@ checkstyle:
   stage: style
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:checkstyleMain :sa-admin:checkstyleTest
+    - ./gradlew :smartadmin-app:checkstyleMain :smartadmin-app:checkstyleTest
   artifacts:
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/*.xml
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
     expire_in: 1 week
 
 archunit:
   stage: architecture
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:test --tests "*ArchitectureTest"
+    - ./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
   artifacts:
     when: always
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/test/*.xml
 
 pmd:
   stage: analysis
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:pmdMain
+    - ./gradlew :smartadmin-app:pmdMain
   artifacts:
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
 
 spotbugs:
   stage: analysis
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:spotbugsMain
+    - ./gradlew :smartadmin-app:spotbugsMain
   artifacts:
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
 
 jacoco:
   stage: coverage
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:test :sa-admin:jacocoTestReport
-    - ./gradlew :sa-admin:jacocoTestCoverageVerification
+    - ./gradlew :smartadmin-app:test :smartadmin-app:jacocoTestReport
+    - ./gradlew :smartadmin-app:jacocoTestCoverageVerification
   coverage: '/Total.*?([0-9]{1,3})%/'
   artifacts:
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/test/jacocoTestReport.xml
+        path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/jacoco/test/jacocoTestReport.xml
 
 sonarqube:
   stage: sonar
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:sonar -Dsonar.projectKey=smart-admin
+    - ./gradlew :smartadmin-app:sonar -Dsonar.projectKey=smart-admin
   only:
     - main
     - master
@@ -644,7 +644,7 @@ configure<PmdExtension> {
 
 ### ArchUnit Configuration
 
-**Location**: `smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/ArchitectureTest.java`
+**Location**: `smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java`
 
 **Critical Rules** (BLOCKER severity):
 - Layer dependency violations (Controller → Service → Manager → Dao)
@@ -655,7 +655,7 @@ configure<PmdExtension> {
 
 **Execution**:
 ```bash
-./gradlew :sa-admin:test --tests "*ArchitectureTest"
+./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
 ```
 
 ### JaCoCo Configuration

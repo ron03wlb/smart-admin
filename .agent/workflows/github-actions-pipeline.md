@@ -46,18 +46,18 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: 'maven'
+          cache: 'gradle'
 
       - name: Checkstyle
-        run: mvn checkstyle:check
+        run: ./gradlew checkstyleMain checkstyleTest
         working-directory: ./smart-admin-api-java21-springboot3
 
       - name: PMD
-        run: mvn pmd:check
+        run: ./gradlew pmdMain pmdTest
         working-directory: ./smart-admin-api-java21-springboot3
 
       - name: SpotBugs
-        run: mvn spotbugs:check
+        run: ./gradlew spotbugsMain spotbugsTest
         working-directory: ./smart-admin-api-java21-springboot3
 
   # Stage 2: Tests (including Architecture Tests)
@@ -102,10 +102,10 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: 'maven'
+          cache: 'gradle'
 
       - name: Run ArchUnit Tests
-        run: mvn test -Dtest=ArchitectureTest
+        run: ./gradlew :smartadmin-app:test --tests ArchitectureTest
         working-directory: ./smart-admin-api-java21-springboot3
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/test_db
@@ -113,7 +113,7 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: test
 
       - name: Run Unit Tests with Coverage
-        run: mvn clean verify
+        run: ./gradlew clean check
         working-directory: ./smart-admin-api-java21-springboot3
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/test_db
@@ -123,19 +123,19 @@ jobs:
           SPRING_DATA_REDIS_PORT: 6379
 
       - name: Generate JaCoCo Report
-        run: mvn jacoco:report
+        run: ./gradlew jacocoTestReport
         working-directory: ./smart-admin-api-java21-springboot3
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./smart-admin-api-java21-springboot3/target/site/jacoco/jacoco.xml
+          files: ./smart-admin-api-java21-springboot3/smartadmin-app/build/reports/jacoco/test/jacocoTestReport.xml
           flags: unittests
           name: codecov-smartadmin
 
       - name: Check Coverage Threshold
         run: |
-          mvn jacoco:check -Djacoco.minimum=0.80
+          ./gradlew jacocoTestCoverageVerification
         working-directory: ./smart-admin-api-java21-springboot3
 
   # Stage 3: SonarQube Analysis
@@ -155,19 +155,19 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: 'maven'
+          cache: 'gradle'
 
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          mvn clean verify sonar:sonar \
+          ./gradlew clean check sonar \
             -Dsonar.projectKey=smart-admin \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.java.source=21 \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=smartadmin-app/build/reports/jacoco/test/jacocoTestReport.xml
         working-directory: ./smart-admin-api-java21-springboot3
 
   # Stage 4: Quality Gate Check
@@ -243,17 +243,17 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: 'maven'
+          cache: 'gradle'
 
       - name: Build JAR
-        run: mvn clean package -DskipTests
+        run: ./gradlew clean build -x test
         working-directory: ./smart-admin-api-java21-springboot3
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smart-admin-${{ github.sha }}
-          path: ./smart-admin-api-java21-springboot3/sa-admin/target/*.jar
+          path: ./smart-admin-api-java21-springboot3/smartadmin-app/build/libs/*.jar
           retention-days: 30
 ```
 

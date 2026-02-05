@@ -56,7 +56,7 @@
 - **新模塊首頁**: [06_Analytics_Operations/README.md](../06_Analytics_Operations/README.md)
 - **API 設計標準**: [07-03 API 設計標準](../07_Technical_Infrastructure/07-03_API_Design_Standard.md)
 - **數據安全標準**: [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md)
-- **完整文檔地圖**: [00-00_Document_Map.md](../00_Concept_&_Analysis/00-00_Document_Map.md)
+- **完整文檔地圖**: [00-00_Document_Map.md](../00_Foundation/concepts/00-00_Document_Map.md)
 
 ---
 

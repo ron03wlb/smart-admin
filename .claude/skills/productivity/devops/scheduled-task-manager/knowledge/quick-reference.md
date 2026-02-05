@@ -101,7 +101,7 @@ dependencies {
 ```yaml
 snail-job:
   namespace: smartadmin
-  app-name: sa-admin
+  app-name: smartadmin-app
   server:
     host: localhost
     port: 1788

@@ -529,7 +529,7 @@ if (featureFlag) {
 ## 📚 相關文檔
 
 ### 前置依賴
-- [00-04 技術棧](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 技術選型
+- [00-04 技術棧](../00_Foundation/concepts/00-04_Technology_Stack.md) - 技術選型
 
 ### 相關文檔
 - [12-03 網關架構](./07-02-01_Gateway_Core.md) - API Gateway

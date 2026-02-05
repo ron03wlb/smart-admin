@@ -11,7 +11,7 @@
 ## 原始代碼（存在風險）
 
 ```java
-package net.lab1024.sa.base.module.support.reload;
+package net.lab1024.sa.support.reload;
 
 @Service
 public class SmartReloadManager {
@@ -184,7 +184,7 @@ void testConcurrentRegistration() throws Exception {
 
 3. **驗證 ArchUnit**:
    ```bash
-   ./gradlew :sa-admin:test --tests ArchitectureTest
+   ./gradlew :smartadmin-app:test --tests ArchitectureTest
    ```
 
 4. **提交變更**:

@@ -150,7 +150,7 @@ Transaction API 需區分獎金類型：
 ## 📚 相關文檔
 
 ### 核心依賴
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 遊戲錢包轉入轉出邏輯
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 遊戲錢包轉入轉出邏輯
 - [03-03 無縫錢包對接分析](./03-03_Seamless_Wallet_Analysis.md) - GP 對接極端場景處理
 
 ### 業務整合

@@ -36,7 +36,7 @@ jobs:
         run: ./gradlew build
 
       - name: Run ArchUnit Tests
-        run: ./gradlew :sa-admin:test --tests ArchitectureTest
+        run: ./gradlew :smartadmin-app:test --tests ArchitectureTest
 
       - name: Quality Gate
         run: ./gradlew checkstyleMain pmdMain spotbugsMain

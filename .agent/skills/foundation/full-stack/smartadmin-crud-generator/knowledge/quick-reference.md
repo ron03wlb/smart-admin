@@ -45,10 +45,10 @@ VO.java
 
 ```java
 // Foundation v4.0.0 imports
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
-import net.lab1024.sa.util.SmartBeanUtil;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import io.vavr.control.Option;
 ```
 

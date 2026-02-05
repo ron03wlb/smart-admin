@@ -2081,15 +2081,15 @@ alerts:
 
 ### 前置知識（必讀）
 <!-- TODO: 待創建文檔 - Week 4-5 -->
-<!-- - [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計 -->
+<!-- - [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計 -->
 
 ### 核心依賴
-- [02-03 流水計算與對帳](../02_Game_Operations/02-03_Turnover_Calculation.md) - 從錢包交易記錄計算流水、三層驗證架構
+- [02-03 流水計算與對帳](../03_Game_Center/03-04_Turnover_Calculation.md) - 從錢包交易記錄計算流水、三層驗證架構
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 錢包餘額更新的事務處理機制、TCC模式、冪等性設計
 
 ### 相關實作
 <!-- TODO: 待創建文檔 - Week 4-5 -->
-<!-- - [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 獎金錢包整合、流水要求計算、獎金餘額扣除優先級 -->
+<!-- - [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 獎金錢包整合、流水要求計算、獎金餘額扣除優先級 -->
 - [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - Credit錢包使用、額度轉移、信用結算流程
 - [01-05 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 可提餘額驗證、鎖定餘額處理
 
@@ -2104,7 +2104,7 @@ alerts:
 **維護團隊**: Finance Team & Architecture Team
 
 **v1.0.0 創建記錄** (2026-02-03):
-- ✅ 合併 02-06_Unified_Wallet_Model.md (統一錢包模型、4層扣款優先級、風控整合)
+- ✅ 合併 02-06_Wallet_Architecture.md (統一錢包模型、4層扣款優先級、風控整合)
 - ✅ 合併 seamless-wallet/core/01-security.md (Token驗證機制、冪等性設計、三層防護)
 - ✅ 合併 seamless-wallet/core/02-concurrency.md (TOCTOU漏洞、Lua腳本原子性解決方案)
 - ✅ 合併 seamless-wallet/core/03-recovery.md (錯誤恢復場景：亂序請求、預回滾、部分失敗)

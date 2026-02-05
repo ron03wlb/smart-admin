@@ -66,7 +66,7 @@ checkstyle {
 
 **Quick Config**:
 ```bash
-./gradlew :sa-admin:test --tests "*ArchitectureTest"
+./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
 ```
 
 **Critical Rules**:
@@ -204,11 +204,11 @@ tasks.register("qualityGateSequential") {
     description = "Sequential quality gate (fail-fast)"
     doLast {
         exec { commandLine("./gradlew", "spotlessApply") }
-        exec { commandLine("./gradlew", ":sa-admin:checkstyleMain") }
-        exec { commandLine("./gradlew", ":sa-admin:test", "--tests", "*ArchitectureTest") }
-        exec { commandLine("./gradlew", ":sa-admin:pmdMain") }
-        exec { commandLine("./gradlew", ":sa-admin:spotbugsMain") }
-        exec { commandLine("./gradlew", ":sa-admin:jacocoTestCoverageVerification") }
+        exec { commandLine("./gradlew", ":smartadmin-app:checkstyleMain") }
+        exec { commandLine("./gradlew", ":smartadmin-app:test", "--tests", "*ArchitectureTest") }
+        exec { commandLine("./gradlew", ":smartadmin-app:pmdMain") }
+        exec { commandLine("./gradlew", ":smartadmin-app:spotbugsMain") }
+        exec { commandLine("./gradlew", ":smartadmin-app:jacocoTestCoverageVerification") }
     }
 }
 ```
@@ -232,22 +232,22 @@ jobs:
   checkstyle:
     runs-on: ubuntu-latest
     steps:
-      - run: ./gradlew :sa-admin:checkstyleMain
+      - run: ./gradlew :smartadmin-app:checkstyleMain
 
   pmd:
     runs-on: ubuntu-latest
     steps:
-      - run: ./gradlew :sa-admin:pmdMain
+      - run: ./gradlew :smartadmin-app:pmdMain
 
   spotbugs:
     runs-on: ubuntu-latest
     steps:
-      - run: ./gradlew :sa-admin:spotbugsMain
+      - run: ./gradlew :smartadmin-app:spotbugsMain
 
   archunit:
     runs-on: ubuntu-latest
     steps:
-      - run: ./gradlew :sa-admin:test --tests "*ArchitectureTest"
+      - run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
 ```
 
 ---
@@ -276,7 +276,7 @@ val failFastTools = mapOf(
 
 failFastTools.forEach { (task, severity) ->
     val result = exec {
-        commandLine("./gradlew", ":sa-admin:$task")
+        commandLine("./gradlew", ":smartadmin-app:$task")
         isIgnoreExitValue = true
     }
     if (result.exitValue != 0 && severity in listOf("BLOCKER", "CRITICAL")) {
@@ -299,7 +299,7 @@ failFastTools.forEach { (task, severity) ->
 ./gradlew spotlessApply
 
 # Run Checkstyle again
-./gradlew :sa-admin:checkstyleMain
+./gradlew :smartadmin-app:checkstyleMain
 ```
 
 **Time to Fix**: 1-2 minutes
@@ -314,7 +314,7 @@ failFastTools.forEach { (task, severity) ->
 ```bash
 /spring  # Diagnose violations
 # Apply quick fixes from spring-pattern-checker
-./gradlew :sa-admin:test --tests "*ArchitectureTest"
+./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
 ```
 
 **Time to Fix**: 5-20 minutes
@@ -328,7 +328,7 @@ failFastTools.forEach { (task, severity) ->
 **Quick Fix**:
 1. Identify uncovered classes: Check `build/reports/jacoco/test/html/index.html`
 2. Write missing tests for critical classes
-3. Re-run coverage: `./gradlew :sa-admin:test :sa-admin:jacocoTestReport`
+3. Re-run coverage: `./gradlew :smartadmin-app:test :smartadmin-app:jacocoTestReport`
 
 **Time to Fix**: 30-60 minutes
 
@@ -341,10 +341,10 @@ failFastTools.forEach { (task, severity) ->
 **Quick Fix**: See concurrency-safety-auditor skill for concurrency issues
 ```bash
 # Review SpotBugs report
-open sa-admin/build/reports/spotbugs/main.html
+open smartadmin-app/build/reports/spotbugs/main.html
 
 # Apply fixes based on pattern type
-# Re-run: ./gradlew :sa-admin:spotbugsMain
+# Re-run: ./gradlew :smartadmin-app:spotbugsMain
 ```
 
 **Time to Fix**: 10-30 minutes per bug
@@ -387,26 +387,26 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Checkstyle
-        run: ./gradlew :sa-admin:checkstyleMain
+        run: ./gradlew :smartadmin-app:checkstyleMain
 
       - name: ArchUnit
-        run: ./gradlew :sa-admin:test --tests "*ArchitectureTest"
+        run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
 
       - name: PMD
-        run: ./gradlew :sa-admin:pmdMain
+        run: ./gradlew :smartadmin-app:pmdMain
 
       - name: SpotBugs
-        run: ./gradlew :sa-admin:spotbugsMain
+        run: ./gradlew :smartadmin-app:spotbugsMain
 
       - name: Coverage
-        run: ./gradlew :sa-admin:test :sa-admin:jacocoTestCoverageVerification
+        run: ./gradlew :smartadmin-app:test :smartadmin-app:jacocoTestCoverageVerification
 
       - name: Upload Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: quality-reports
-          path: sa-admin/build/reports/
+          path: smartadmin-app/build/reports/
 ```
 
 ---
@@ -427,29 +427,29 @@ spotless:
 
 checkstyle:
   stage: style
-  script: ./gradlew :sa-admin:checkstyleMain
+  script: ./gradlew :smartadmin-app:checkstyleMain
   artifacts:
-    paths: [sa-admin/build/reports/checkstyle/]
+    paths: [smartadmin-app/build/reports/checkstyle/]
 
 archunit:
   stage: architecture
-  script: ./gradlew :sa-admin:test --tests "*ArchitectureTest"
+  script: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest"
 
 pmd:
   stage: analysis
-  script: ./gradlew :sa-admin:pmdMain
+  script: ./gradlew :smartadmin-app:pmdMain
   artifacts:
-    paths: [sa-admin/build/reports/pmd/]
+    paths: [smartadmin-app/build/reports/pmd/]
 
 spotbugs:
   stage: analysis
-  script: ./gradlew :sa-admin:spotbugsMain
+  script: ./gradlew :smartadmin-app:spotbugsMain
   artifacts:
-    paths: [sa-admin/build/reports/spotbugs/]
+    paths: [smartadmin-app/build/reports/spotbugs/]
 
 jacoco:
   stage: coverage
-  script: ./gradlew :sa-admin:test :sa-admin:jacocoTestCoverageVerification
+  script: ./gradlew :smartadmin-app:test :smartadmin-app:jacocoTestCoverageVerification
   coverage: '/Total.*?([0-9]{1,3})%/'
 ```
 

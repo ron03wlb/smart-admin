@@ -48,7 +48,7 @@
 **單一數據源 (SSOT)**：
 - 玩家帳戶狀態狀態機在本文檔定義，其他模組僅引用
 - 風險評分維度定義在 [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)
-- 錢包創建邏輯定義在 [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md)
+- 錢包創建邏輯定義在 [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md)
 
 **事件驅動架構**：
 - 發布事件: `player.registered`, `player.kyc.completed`, `player.status.changed`, `player.risk.flagged`
@@ -167,7 +167,7 @@ END
 
 ## 3. 帳戶狀態狀態機 (Account Status State Machine)
 
-> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義在本章節。數據模型設計詳見 [00-03 §3.1](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md#31-player-account-state-machine)。
+> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義在本章節。數據模型設計詳見 [00-03 §3.1](../00_Foundation/concepts/00-03_Data_Model_Overview.md#31-player-account-state-machine)。
 
 ### 3.1 五狀態定義表
 
@@ -1832,13 +1832,13 @@ class PlayerLifecycleArchitectureTest {
 ### 8.1 前置知識
 
 **核心概念**:
-- [00-02 行業術語表](../00_Concept_&_Analysis/00-02_Industry_Terminology.md) - KYC, AML, RFM 等術語定義
-- [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - Player State Machine 數據模型
+- [00-02 行業術語表](../00_Foundation/concepts/00-02_Industry_Terminology.md) - KYC, AML, RFM 等術語定義
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - Player State Machine 數據模型
 
 ### 8.2 核心依賴
 
 **業務整合**:
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 註冊時錢包創建
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 註冊時錢包創建
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風險評分、多帳號檢測、設備指紋
 - [01-02 VIP 系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級初始化、積分系統
 - [01-05 提款風控](./01-05_Withdrawal_Risk.md) - KYC 等級與提款限額
@@ -1852,7 +1852,7 @@ class PlayerLifecycleArchitectureTest {
 ### 8.3 延伸閱讀
 
 **運營優化**:
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 基於生命週期的精準營銷
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 基於生命週期的精準營銷
 - [10-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - 玩家生命週期分析報表
 - [11-01 客服平台設計](../06_Analytics_Operations/06-02_Customer_Service.md) - 玩家 360 視圖整合
 

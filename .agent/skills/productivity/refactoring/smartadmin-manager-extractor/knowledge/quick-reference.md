@@ -75,13 +75,13 @@ public class EmployeeService {
 
 ```bash
 # 編譯檢查
-./gradlew :sa-admin:compileJava
+./gradlew :smartadmin-app:compileJava
 
 # ArchUnit 測試
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # 完整測試
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 ```
 
 ## ArchUnit 規則源碼

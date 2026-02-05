@@ -24,16 +24,16 @@
 
 ```bash
 # Verify prerequisites
-java -version      # Expected: Java 21+
-mvn -version       # Expected: Maven 3.8+, Java 21
-docker --version   # Expected: Docker installed
+java -version          # Expected: Java 21+
+./gradlew --version    # Expected: Gradle 8.x+, Java 21
+docker --version       # Expected: Docker installed
 
 # Start development environment
 cd .agent/configs && docker-compose up -d postgres redis
 
 # Verify architecture tests
 cd smart-admin-api-java21-springboot3
-mvn test -Dtest=ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 ---
@@ -97,19 +97,24 @@ Fundamental coding standards (always apply):
 ### Backend Structure
 ```
 smart-admin-api-java21-springboot3/
-├── sa-base/                          # Infrastructure library (357 Java files)
-│   ├── common/                       # Core framework code
-│   │   ├── domain/                  # Base DTOs (ResponseDTO, PageParam, etc.)
-│   │   ├── util/                    # Utility classes (SmartBeanUtil, SmartPageUtil, etc.)
-│   │   ├── constant/                # System constants
-│   │   └── config/                  # 26+ Spring configuration classes
-│   └── module/support/              # 26 support modules
+├── smartadmin-common/                # Public Foundation (21 modules)
+│   ├── foundation/domain/           # Base DTOs (ResponseDTO, PageParam, etc.)
+│   ├── foundation/util/             # Utility classes (SmartBeanUtil, SmartPageUtil, etc.)
+│   └── foundation/config/           # Core framework configurations
 │
-└── sa-admin/                         # Main application (202 Java files)
-    ├── module/
-    │   ├── business/                # Business modules (your code goes here)
-    │   └── system/                  # System modules (employee, role, etc.)
-    └── config/                      # Application-specific configuration
+├── smartadmin-support/               # Business Support (17 modules)
+│   └── module/support/              # Support modules (file, dict, login, etc.)
+│
+├── smartadmin-modules/               # Business Domain (3 modules)
+│   ├── smartadmin-system/           # System modules (employee, role, etc.)
+│   ├── smartadmin-business/         # Business modules (your code goes here)
+│   └── smartadmin-oa/               # OA modules (notice, enterprise, etc.)
+│
+├── smartadmin-api/                   # API Contract Layer (3 modules)
+│
+├── smartadmin-starter/               # Starter Combinations (2 modules)
+│
+└── smartadmin-app/                   # Unified Application Entry (1 module)
 ```
 
 ### Frontend Structure
@@ -195,11 +200,11 @@ Entry point for all AI rules: [rules/00-INDEX.md](rules/00-INDEX.md)
 
 ```bash
 # Run complete architecture tests
-mvn test -Dtest=ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Run specific tests
-mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
-mvn test -Dtest=ArchitectureTest#layerDependencies
+./gradlew :smartadmin-app:test --tests "ArchitectureTest.serviceUsesVavrOption"
+./gradlew :smartadmin-app:test --tests "ArchitectureTest.layerDependencies"
 ```
 
 **Mandatory Rules (PR Blocking)**:

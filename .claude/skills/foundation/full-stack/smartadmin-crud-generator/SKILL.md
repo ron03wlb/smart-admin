@@ -203,7 +203,7 @@ For a Product CRUD module, generate:
 Before completing generation:
 
 **Backend:**
-- [ ] **Package imports use v4.0.0 paths** (`net.lab1024.sa.util.*`, `net.lab1024.sa.base.mybatis.util.*`, `net.lab1024.sa.foundation.domain.*`)
+- [ ] **Package imports use v4.1.0 paths** (`net.lab1024.sa.common.core.util.*`, `net.lab1024.sa.common.mybatis.util.*`, `net.lab1024.sa.common.core.domain.*`)
 - [ ] **QueryForm has `@EqualsAndHashCode(callSuper = false)`** when extending PageParam
 - [ ] Entity has `@TableName` and `@TableId`
 - [ ] Forms have proper `@NotNull`, `@Length` validations
@@ -326,7 +326,7 @@ For detailed implementation patterns:
 
 **Problem**: "SmartBeanUtil not found"
 - **Cause**: Wrong import path (using deprecated `common.core.util.*`)
-- **Solution**: Use `import net.lab1024.sa.util.SmartBeanUtil;`
+- **Solution**: Use `import net.lab1024.sa.common.core.util.SmartBeanUtil;`
 
 **Problem**: "ArchitectureTest fails: Service uses java.util.Optional"
 - **Cause**: Using Optional instead of Vavr Option

@@ -18,11 +18,11 @@
 
 ## 1. Generate Entity
 
-**File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/domain/entity/{Entity}Entity.java`
+**File**: `smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/domain/entity/{Entity}Entity.java`
 
 **Pattern** (from smartadmin-mybatis):
 ```java
-package net.lab1024.sa.admin.module.business.{module}.domain.entity;
+package net.lab1024.sa.business.{module}.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -85,17 +85,17 @@ public class {Entity}Entity {
 
 ## 2. Generate Dao
 
-**File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/dao/{Entity}Dao.java`
+**File**: `smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/dao/{Entity}Dao.java`
 
 **Pattern** (from smartadmin-mybatis):
 ```java
-package net.lab1024.sa.admin.module.business.{module}.dao;
+package net.lab1024.sa.business.{module}.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.business.{module}.domain.form.{Entity}QueryForm;
-import net.lab1024.sa.admin.module.business.{module}.domain.vo.{Entity}VO;
+import net.lab1024.sa.business.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.business.{module}.domain.form.{Entity}QueryForm;
+import net.lab1024.sa.business.{module}.domain.vo.{Entity}VO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -153,9 +153,9 @@ List<{Entity}VO> query(
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.admin.module.business.{module}.dao.{Entity}Dao">
+<mapper namespace="net.lab1024.sa.business.{module}.dao.{Entity}Dao">
 
-    <select id="query" resultType="net.lab1024.sa.admin.module.business.{module}.domain.vo.{Entity}VO">
+    <select id="query" resultType="net.lab1024.sa.business.{module}.domain.vo.{Entity}VO">
         SELECT
             t.{entity}_id,
             t.{field_name},
@@ -194,17 +194,17 @@ List<{Entity}VO> query(
 
 ### Pattern A: Manager for Multi-Table Operations (REQUIRED)
 
-**File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/manager/{Entity}Manager.java`
+**File**: `smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/manager/{Entity}Manager.java`
 
 ```java
-package net.lab1024.sa.admin.module.business.{module}.manager;
+package net.lab1024.sa.business.{module}.manager;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}Dao;
-import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}RelationDao;
-import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}RelationEntity;
+import net.lab1024.sa.business.{module}.dao.{Entity}Dao;
+import net.lab1024.sa.business.{module}.dao.{Entity}RelationDao;
+import net.lab1024.sa.business.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.business.{module}.domain.entity.{Entity}RelationEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -270,23 +270,23 @@ See Service section below for examples.
 
 **Use when**: All operations are single-table CRUD with no @Transactional needed.
 
-**File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/service/{Entity}Service.java`
+**File**: `smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/service/{Entity}Service.java`
 
 ```java
-package net.lab1024.sa.admin.module.business.{module}.service;
+package net.lab1024.sa.business.{module}.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.admin.module.business.{module}.dao.{Entity}Dao;
-import net.lab1024.sa.admin.module.business.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.business.{module}.domain.form.*;
-import net.lab1024.sa.admin.module.business.{module}.domain.vo.{Entity}VO;
-import net.lab1024.sa.util.SmartBeanUtil;
-import net.lab1024.sa.base.mybatis.util.SmartPageUtil;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.business.{module}.dao.{Entity}Dao;
+import net.lab1024.sa.business.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.business.{module}.domain.form.*;
+import net.lab1024.sa.business.{module}.domain.vo.{Entity}VO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -423,19 +423,19 @@ public class {Entity}Service {
 
 ## 5. Generate Controller
 
-**File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/controller/{Entity}Controller.java`
+**File**: `smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/controller/{Entity}Controller.java`
 
 **Pattern**:
 ```java
-package net.lab1024.sa.admin.module.business.{module}.controller;
+package net.lab1024.sa.business.{module}.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.admin.module.business.{module}.domain.form.*;
-import net.lab1024.sa.admin.module.business.{module}.domain.vo.{Entity}VO;
-import net.lab1024.sa.admin.module.business.{module}.service.{Entity}Service;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.business.{module}.domain.form.*;
+import net.lab1024.sa.business.{module}.domain.vo.{Entity}VO;
+import net.lab1024.sa.business.{module}.service.{Entity}Service;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -563,7 +563,7 @@ public class {Entity}VO {
 ## Package Structure
 
 ```
-sa-admin/src/main/java/net/lab1024/sa/admin/module/business/{module}/
+smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/{module}/
 ├── controller/
 │   └── {Entity}Controller.java
 ├── service/
@@ -595,7 +595,7 @@ After generation, verify:
 - [ ] Manager has `@Transactional(rollbackFor = Throwable.class)`
 - [ ] Controller has `@SaCheckPermission` on all endpoints
 - [ ] Boolean field is `deletedFlag` (NOT `isDeleted`)
-- [ ] Run: `./gradlew :sa-admin:test --tests ArchitectureTest`
+- [ ] Run: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 
 ---
 

@@ -10,7 +10,7 @@
 
 ### 1. Add Skywalking Agent Dependency
 
-**Gradle (sa-admin/build.gradle):**
+**Gradle (smartadmin-app/build.gradle):**
 ```gradle
 dependencies {
     // Skywalking Java agent (auto-instrumentation)
@@ -30,7 +30,7 @@ tar -xzf apache-skywalking-java-agent-9.2.0.tgz
 
 ### 3. Configure Agent Properties
 
-**Create:** `sa-admin/src/main/resources/skywalking-agent.config`
+**Create:** `smartadmin-app/src/main/resources/skywalking-agent.config`
 
 ```properties
 # Service name (appears in Skywalking UI)
@@ -76,7 +76,7 @@ java -javaagent:${SKYWALKING_AGENT_PATH} \
      -Dskywalking.agent.service_name=smartadmin-api \
      -Dskywalking.collector.backend_service=skywalking-oap:11800 \
      -Dskywalking.logging.level=INFO \
-     -jar sa-admin.jar
+     -jar smartadmin-app.jar
 ```
 
 **Docker Compose:**
@@ -94,7 +94,7 @@ services:
       - /opt/skywalking-agent:/skywalking-agent
     command: >
       java -javaagent:/skywalking-agent/skywalking-agent.jar
-           -jar /app/sa-admin.jar
+           -jar /app/smartadmin-app.jar
 ```
 
 ---
@@ -437,9 +437,9 @@ plugin.http.trace.ignore_path=/actuator/**,/metrics/**,/health/**
 ### Service Layer Example
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.apache.skywalking.apm.toolkit.trace.ActiveSpan;
 import org.apache.skywalking.apm.toolkit.trace.Trace;
 import lombok.RequiredArgsConstructor;

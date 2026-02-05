@@ -12,7 +12,7 @@
 
 **解決方案**:
 ```yaml
-# 修改 sa-admin/src/main/resources/dev/application.yaml
+# 修改 smartadmin-app/src/main/resources/dev/application.yaml
 server:
   port: 8080  # 改為其他可用埠號
 ```
@@ -91,24 +91,20 @@ spring:
 
 ---
 
-### Q4: Maven 依賴下載緩慢
+### Q4: Gradle 依賴下載緩慢
 
-**問題描述**: Maven 下載依賴非常慢或超時
+**問題描述**: Gradle 下載依賴非常慢或超時
 
 **解決方案**: 配置阿里雲鏡像
 
-```xml
-<!-- 檔案: ~/.m2/settings.xml -->
-<settings>
-  <mirrors>
-    <mirror>
-      <id>aliyun</id>
-      <mirrorOf>central</mirrorOf>
-      <name>Aliyun Maven</name>
-      <url>https://maven.aliyun.com/repository/public</url>
-    </mirror>
-  </mirrors>
-</settings>
+```groovy
+// 檔案: ~/.gradle/init.gradle
+allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        mavenCentral()
+    }
+}
 ```
 
 ---
@@ -117,7 +113,7 @@ spring:
 
 ### Q5: ArchUnit 測試失敗
 
-**問題描述**: `mvn test -Dtest=ArchitectureTest` 報告違規
+**問題描述**: `./gradlew :smartadmin-app:test --tests ArchitectureTest` 報告違規
 
 **常見違規類型與解決方案**:
 
@@ -174,27 +170,27 @@ public class UserService {
 **完整診斷**:
 ```bash
 # 查看詳細違規報告
-mvn test -Dtest=ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # 查看具體測試方法
-mvn test -Dtest=ArchitectureTest#layerDependencies
-mvn test -Dtest=ArchitectureTest#serviceUsesVavrOption
-mvn test -Dtest=ArchitectureTest#noFieldInjection
+./gradlew :smartadmin-app:test --tests "ArchitectureTest.layerDependencies"
+./gradlew :smartadmin-app:test --tests "ArchitectureTest.serviceUsesVavrOption"
+./gradlew :smartadmin-app:test --tests "ArchitectureTest.noFieldInjection"
 ```
 
 ---
 
 ### Q6: JaCoCo 覆蓋率不足
 
-**問題描述**: `mvn jacoco:check` 報告覆蓋率低於 80%
+**問題描述**: `./gradlew jacocoTestCoverageVerification` 報告覆蓋率低於 80%
 
 **解決方案**:
 ```bash
 # 1. 生成覆蓋率報告
-mvn clean test jacoco:report
+./gradlew test jacocoTestReport
 
 # 2. 查看報告
-open target/site/jacoco/index.html
+open smartadmin-app/build/reports/jacoco/test/html/index.html
 
 # 3. 補充測試用例
 # 針對未覆蓋的類和方法編寫測試
@@ -208,7 +204,7 @@ open target/site/jacoco/index.html
 
 ### Q7: Checkstyle 檢查失敗
 
-**問題描述**: `mvn checkstyle:check` 報告格式錯誤
+**問題描述**: `./gradlew checkstyleMain` 報告格式錯誤
 
 **常見問題**:
 1. 類名不符合 UpperCamelCase
@@ -220,7 +216,7 @@ open target/site/jacoco/index.html
 **解決方案**:
 ```bash
 # 查看詳細報告
-mvn checkstyle:check
+./gradlew checkstyleMain checkstyleTest
 
 # 使用 IDE 自動格式化
 # IDEA: Ctrl+Alt+L (Windows/Linux) 或 Cmd+Opt+L (macOS)

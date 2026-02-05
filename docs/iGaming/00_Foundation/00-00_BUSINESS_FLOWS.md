@@ -125,7 +125,7 @@ VALUES (:playerId, :tenantId, 0, 0, 0);
 - 鎖定金額: 0
 - 可下注餘額: 0
 
-👉 **深入閱讀**: [01-02 錢包架構 §2.1](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md#錢包初始化)
+👉 **深入閱讀**: [01-02 錢包架構 §2.1](../02_Finance_Center/02-06_Wallet_Architecture.md#錢包初始化)
 
 #### Step 3: KYC 驗證
 
@@ -143,7 +143,7 @@ VALUES (:playerId, :tenantId, 0, 0, 0);
 - 人工審核: 高風險用戶
 - 第三方服務: Jumio、Onfido
 
-👉 **深入閱讀**: [01-01 玩家生命週期 §3](../01_Core_Financial_Loop/01-01_Player_Lifecycle.md#kyc-驗證)
+👉 **深入閱讀**: [01-01 玩家生命週期 §3](../01_Player_Center/01-01_Player_Lifecycle.md#kyc-驗證)
 
 ### 1.4 異常處理
 
@@ -156,7 +156,7 @@ VALUES (:playerId, :tenantId, 0, 0, 0);
 
 ### 1.5 相關文檔
 
-- 🔗 [01-01 玩家生命週期](../01_Core_Financial_Loop/01-01_Player_Lifecycle.md)
+- 🔗 [01-01 玩家生命週期](../01_Player_Center/01-01_Player_Lifecycle.md)
 - 🔗 [05-01 多租戶架構](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md)
 - 🔗 [05-05 數據安全（身份證加密）](../05_Platform_Governance/05-05_Data_Security.md)
 
@@ -311,7 +311,7 @@ if (availableBalance < betAmount) {
 }
 ```
 
-👉 **深入閱讀**: [01-02 錢包架構 §2.3](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md#可下注餘額計算) ⭐ SSOT
+👉 **深入閱讀**: [01-02 錢包架構 §2.3](../02_Finance_Center/02-06_Wallet_Architecture.md#可下注餘額計算) ⭐ SSOT
 
 ### 2.4 API 規範
 
@@ -358,7 +358,7 @@ Content-Type: application/json
 ### 2.5 相關文檔
 
 - 🔗 [02-02 Seamless Wallet API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) ⭐
-- 🔗 [01-02 錢包架構](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) ⭐
+- 🔗 [01-02 錢包架構](../02_Finance_Center/02-06_Wallet_Architecture.md) ⭐
 - 🔗 [07-03-02 API 認證](../07_Technical_Infrastructure/07-03-02_Authentication.md)
 
 ---
@@ -444,7 +444,7 @@ if (bonusAmount.compareTo(maxBonus) > 0) {
 BigDecimal wageringRequirement = depositAmount.add(bonusAmount).multiply(multiplier);
 ```
 
-👉 **深入閱讀**: [03-01 Bonus 引擎 §2](../03_Promotion_System/03-01_Bonus_Engine.md#bonus-計算)
+👉 **深入閱讀**: [03-01 Bonus 引擎 §2](../04_Activity_Center/04-02_Bonus_Calculation_Engine.md#bonus-計算)
 
 #### Step 2: 流水累積
 
@@ -478,7 +478,7 @@ if (wageringProgress.compareTo(wageringRequirement) >= 0) {
 }
 ```
 
-👉 **深入閱讀**: [02-03 流水計算 §3.1](../02_Game_Operations/02-03_Turnover_Calculation.md#有效投注算法) ⭐ SSOT
+👉 **深入閱讀**: [02-03 流水計算 §3.1](../03_Game_Center/03-04_Turnover_Calculation.md#有效投注算法) ⭐ SSOT
 
 #### Step 3: Bonus 轉現金
 
@@ -506,7 +506,7 @@ COMMIT;
 - ✅ 最多轉帳的現金 = Bonus 金額（不包含贏利）
 - ❌ 超過有效期的 Bonus 清零，不能轉帳
 
-👉 **深入閱讀**: [03-03 流水規則 §3.2](../03_Promotion_System/03-03_Wagering_Rules.md#bonus-轉現金)
+👉 **深入閱讀**: [03-03 流水規則 §3.2](../04_Activity_Center/04-04_Activity_Bonus.md#bonus-轉現金)
 
 ### 3.4 異常處理
 
@@ -519,9 +519,9 @@ COMMIT;
 
 ### 3.5 相關文檔
 
-- 🔗 [03-01 Bonus 引擎](../03_Promotion_System/03-01_Bonus_Engine.md)
-- 🔗 [03-03 流水規則](../03_Promotion_System/03-03_Wagering_Rules.md)
-- 🔗 [02-03 流水計算](../02_Game_Operations/02-03_Turnover_Calculation.md) ⭐
+- 🔗 [03-01 Bonus 引擎](../04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
+- 🔗 [03-03 流水規則](../04_Activity_Center/04-04_Activity_Bonus.md)
+- 🔗 [02-03 流水計算](../03_Game_Center/03-04_Turnover_Calculation.md) ⭐
 
 ---
 
@@ -621,7 +621,7 @@ WHERE player_id = :playerId
 - 人工審核: 鎖定 1-24 小時
 - 審核拒絕: 立即釋放鎖定
 
-👉 **深入閱讀**: [01-02 錢包架構 §2.4](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md#資金鎖定邏輯)
+👉 **深入閱讀**: [01-02 錢包架構 §2.4](../02_Finance_Center/02-06_Wallet_Architecture.md#資金鎖定邏輯)
 
 #### Step 2: 多層風控檢查
 
@@ -725,7 +725,7 @@ public void processWithdrawal(WithdrawalRequest request) {
 }
 ```
 
-👉 **深入閱讀**: [01-05 出金風控 §4.3](../01_Core_Financial_Loop/01-05_Withdrawal_Risk.md#saga-補償)
+👉 **深入閱讀**: [01-05 出金風控 §4.3](../01_Player_Center/01-05_Withdrawal_Risk.md#saga-補償)
 
 ### 4.4 人工審核流程
 
@@ -742,7 +742,7 @@ public void processWithdrawal(WithdrawalRequest request) {
 
 ### 4.5 相關文檔
 
-- 🔗 [01-05 出金風控](../01_Core_Financial_Loop/01-05_Withdrawal_Risk.md) ⭐
+- 🔗 [01-05 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) ⭐
 - 🔗 [04-01 風控引擎](../04_Risk_Control/04-01_Risk_Framework.md) ⭐
 - 🔗 [05-06 審批工作流](../05_Platform_Governance/05-06_Approval_Workflow.md)
 
@@ -899,7 +899,7 @@ GROUP BY player_id, DATE(bet_time);
 
 ### 5.5 相關文檔
 
-- 🔗 [02-03 流水計算](../02_Game_Operations/02-03_Turnover_Calculation.md) ⭐
+- 🔗 [02-03 流水計算](../03_Game_Center/03-04_Turnover_Calculation.md) ⭐
 - 🔗 [01-06 對帳系統](../01_Core_Financial_Loop/01-06_Reconciliation.md)
 - 🔗 [06-01 報表 BI](../06_Analytics_Operations/06-01_Reporting_BI.md)
 

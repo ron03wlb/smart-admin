@@ -641,7 +641,7 @@ flowchart TD
 ## 📚 相關文檔
 
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 代理風險評估、異常佔成檢測
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 雙錢包體系、Credit Wallet 實現
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 雙錢包體系、Credit Wallet 實現
 - [06-01 代理管理系統](./06-01_Agent_Management_System.md) - 代理層級架構、權限管理
 
 ---

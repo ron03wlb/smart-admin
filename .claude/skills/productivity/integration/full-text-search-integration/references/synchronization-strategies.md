@@ -22,15 +22,15 @@
 ### Synchronous Dual-Write
 
 ```java
-package net.lab1024.sa.admin.module.business.product.manager;
+package net.lab1024.sa.business.product.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.dao.ProductDao;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
-import net.lab1024.sa.admin.module.business.product.domain.entity.ProductEntity;
-import net.lab1024.sa.admin.module.business.product.repository.ProductSearchRepository;
+import net.lab1024.sa.business.product.dao.ProductDao;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.entity.ProductEntity;
+import net.lab1024.sa.business.product.repository.ProductSearchRepository;
 import net.lab1024.sa.foundation.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,12 +106,12 @@ public class ProductManager {
 ### Asynchronous Dual-Write (Event-Driven)
 
 ```java
-package net.lab1024.sa.admin.module.business.product.event;
+package net.lab1024.sa.business.product.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.lab1024.sa.admin.module.business.product.domain.entity.ProductEntity;
+import net.lab1024.sa.business.product.domain.entity.ProductEntity;
 
 @Data
 @NoArgsConstructor
@@ -127,13 +127,13 @@ public class ProductChangedEvent {
 ```
 
 ```java
-package net.lab1024.sa.admin.module.business.product.manager;
+package net.lab1024.sa.business.product.manager;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.dao.ProductDao;
-import net.lab1024.sa.admin.module.business.product.domain.entity.ProductEntity;
-import net.lab1024.sa.admin.module.business.product.event.ProductChangedEvent;
+import net.lab1024.sa.business.product.dao.ProductDao;
+import net.lab1024.sa.business.product.domain.entity.ProductEntity;
+import net.lab1024.sa.business.product.event.ProductChangedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,13 +179,13 @@ public class ProductManager {
 ```
 
 ```java
-package net.lab1024.sa.admin.module.business.product.listener;
+package net.lab1024.sa.business.product.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
-import net.lab1024.sa.admin.module.business.product.event.ProductChangedEvent;
-import net.lab1024.sa.admin.module.business.product.repository.ProductSearchRepository;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.event.ProductChangedEvent;
+import net.lab1024.sa.business.product.repository.ProductSearchRepository;
 import net.lab1024.sa.foundation.core.util.SmartBeanUtil;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -339,14 +339,14 @@ services:
 ### Kafka Consumer for ES Sync
 
 ```java
-package net.lab1024.sa.admin.module.business.product.consumer;
+package net.lab1024.sa.business.product.consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
-import net.lab1024.sa.admin.module.business.product.repository.ProductSearchRepository;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.repository.ProductSearchRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -489,16 +489,16 @@ services:
 ### Batch Resync Service
 
 ```java
-package net.lab1024.sa.admin.module.business.product.service;
+package net.lab1024.sa.business.product.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.dao.ProductDao;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
-import net.lab1024.sa.admin.module.business.product.domain.entity.ProductEntity;
-import net.lab1024.sa.admin.module.business.product.repository.ProductSearchRepository;
+import net.lab1024.sa.business.product.dao.ProductDao;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.entity.ProductEntity;
+import net.lab1024.sa.business.product.repository.ProductSearchRepository;
 import net.lab1024.sa.foundation.core.util.SmartBeanUtil;
 import org.springframework.stereotype.Service;
 
@@ -582,13 +582,13 @@ public class ProductResyncService {
 ### Scheduled Resync Job
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.service.ProductResyncService;
+import net.lab1024.sa.business.product.service.ProductResyncService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

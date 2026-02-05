@@ -53,7 +53,8 @@ Commit Message Generation Flow:
   │   └─ Revert? → revert
   │
   ├─ 2️⃣ Determine Scope (Module)
-  │   ├─ sa-admin, sa-base, sa-common
+  │   ├─ smartadmin-system, smartadmin-business, smartadmin-oa, smartadmin-app
+  │   ├─ smartadmin-common, smartadmin-support
   │   ├─ smart-admin-web, smart-app
   │   └─ docker, docs
   │
@@ -80,25 +81,28 @@ Commit Message Generation Flow:
 
 | Type | Description | Example |
 |------|-------------|---------|
-| `feat` | New feature (Feature) | `feat(sa-admin): add user login validation` |
-| `fix` | Bug fix | `fix(sa-base): resolve null pointer in UserService` |
-| `docs` | Documentation only changes | `docs(sa-admin): update API documentation` |
-| `style` | Formatting changes (not affecting code execution) | `style(sa-base): format code with spotless` |
-| `refactor` | Refactoring (not new feature, not bug fix) | `refactor(sa-common): extract validation logic` |
-| `perf` | Performance optimization | `perf(sa-admin): optimize database query` |
-| `test` | Adding or modifying tests | `test(sa-base): add unit tests for UserService` |
-| `build` | Build system or dependency changes | `build(sa-admin): upgrade spring boot to 3.2` |
+| `feat` | New feature (Feature) | `feat(smartadmin-system): add user login validation` |
+| `fix` | Bug fix | `fix(smartadmin-common): resolve null pointer in UserService` |
+| `docs` | Documentation only changes | `docs(smartadmin-app): update API documentation` |
+| `style` | Formatting changes (not affecting code execution) | `style(smartadmin-common): format code with spotless` |
+| `refactor` | Refactoring (not new feature, not bug fix) | `refactor(smartadmin-common): extract validation logic` |
+| `perf` | Performance optimization | `perf(smartadmin-business): optimize database query` |
+| `test` | Adding or modifying tests | `test(smartadmin-system): add unit tests for UserService` |
+| `build` | Build system or dependency changes | `build(smartadmin-app): upgrade spring boot to 3.5` |
 | `ci` | CI configuration changes | `ci: add github actions workflow` |
 | `chore` | Miscellaneous (not modifying src or test) | `chore: update .gitignore` |
-| `revert` | Reverting previous commit | `revert: revert "feat(sa-admin): add login"` |
+| `revert` | Reverting previous commit | `revert: revert "feat(smartadmin-system): add login"` |
 
 ### Scope Definition (Modules)
 
 | Scope | Description |
 |-------|-------------|
-| `sa-admin` | Admin management module |
-| `sa-base` | Base module |
-| `sa-common` | Common module |
+| `smartadmin-system` | System modules (employee, role, menu, etc.) |
+| `smartadmin-business` | Business modules (your custom business logic) |
+| `smartadmin-oa` | OA modules (notice, enterprise, etc.) |
+| `smartadmin-app` | Unified application entry |
+| `smartadmin-common` | Public foundation (DTOs, utilities, config) |
+| `smartadmin-support` | Business support modules (file, dict, login, etc.) |
 | `smart-admin-web` | Frontend web application |
 | `smart-app` | Mobile application |
 | `docker` | Docker configuration |
@@ -107,7 +111,7 @@ Commit Message Generation Flow:
 **Cross-module changes**: Omit scope or use comma-separated
 ```
 feat: add global error handling
-feat(sa-admin,sa-base): add shared validation
+feat(smartadmin-system,smartadmin-common): add shared validation
 ```
 
 ---
@@ -140,7 +144,7 @@ feat(sa-admin,sa-base): add shared validation
 - Use `-` for bullet points
 
 ```
-fix(sa-base): resolve null pointer in UserService
+fix(smartadmin-common): resolve null pointer in UserService
 
 - Add null check before accessing user object
 - Update unit tests to cover edge cases
@@ -162,7 +166,7 @@ fix(sa-base): resolve null pointer in UserService
 ### Breaking Change
 
 ```
-feat(sa-admin)!: change user API response format
+feat(smartadmin-system)!: change user API response format
 
 BREAKING CHANGE: The user API now returns camelCase instead of snake_case.
 
@@ -178,20 +182,20 @@ Closes #456
 # ❌ Wrong
 git commit -m "Fix: resolve login issue"      # Capitalized
 git commit -m "fixed login issue"             # Missing type
-git commit -m "feature(sa-admin): add login"  # Wrong type
+git commit -m "feature(smartadmin-system): add login"  # Wrong type
 
 # ✅ Correct
-git commit -m "fix(sa-admin): resolve login issue"
+git commit -m "fix(smartadmin-system): resolve login issue"
 ```
 
 ### Pattern 2: Subject Format Error
 ```bash
 # ❌ Wrong
-git commit -m "feat(sa-admin): Add user login."   # Capitalized start, period ending
-git commit -m "feat(sa-admin): added user login"  # Past tense
+git commit -m "feat(smartadmin-system): Add user login."   # Capitalized start, period ending
+git commit -m "feat(smartadmin-system): added user login"  # Past tense
 
 # ✅ Correct
-git commit -m "feat(sa-admin): add user login"
+git commit -m "feat(smartadmin-system): add user login"
 ```
 
 ### Pattern 3: Scope Error
@@ -201,7 +205,7 @@ git commit -m "feat(admin): add login"      # Wrong module name
 git commit -m "feat(SA-ADMIN): add login"   # Capitalized
 
 # ✅ Correct
-git commit -m "feat(sa-admin): add user login"
+git commit -m "feat(smartadmin-system): add user login"
 ```
 
 ---
@@ -210,14 +214,14 @@ git commit -m "feat(sa-admin): add user login"
 
 ### Simple Change
 ```
-feat(sa-admin): add user login validation
+feat(smartadmin-system): add user login validation
 
 Closes #123
 ```
 
 ### Complex Change
 ```
-fix(sa-base): resolve null pointer in UserService
+fix(smartadmin-common): resolve null pointer in UserService
 
 - Add null check before accessing user object
 - Update unit tests to cover edge cases
@@ -229,7 +233,7 @@ Refs #789
 
 ### Breaking Change
 ```
-feat(sa-admin)!: migrate to new authentication flow
+feat(smartadmin-system)!: migrate to new authentication flow
 
 BREAKING CHANGE: JWT token format has been updated.
 Old tokens will be invalidated after deployment.
@@ -281,9 +285,12 @@ module.exports = {
       2,
       'always',
       [
-        'sa-admin',
-        'sa-base',
-        'sa-common',
+        'smartadmin-system',
+        'smartadmin-business',
+        'smartadmin-oa',
+        'smartadmin-app',
+        'smartadmin-common',
+        'smartadmin-support',
         'smart-admin-web',
         'smart-app',
         'docker',
@@ -322,7 +329,7 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 
 ```bash
 # Test commitlint
-echo "feat(sa-admin): add login" | npx commitlint
+echo "feat(smartadmin-system): add login" | npx commitlint
 
 # Test wrong format
 echo "Add login feature" | npx commitlint  # Should fail

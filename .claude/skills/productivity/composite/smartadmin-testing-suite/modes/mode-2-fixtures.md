@@ -30,11 +30,11 @@ Use Mode 2 when:
 ### Test Fixture Class Structure
 
 ```java
-package net.lab1024.sa.admin.module.{module}.domain;
+package net.lab1024.sa.{module}.domain;
 
-import net.lab1024.sa.admin.module.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.{module}.domain.form.{Entity}AddForm;
-import net.lab1024.sa.admin.module.{module}.domain.form.{Entity}UpdateForm;
+import net.lab1024.sa.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.{module}.domain.form.{Entity}AddForm;
+import net.lab1024.sa.{module}.domain.form.{Entity}UpdateForm;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicInteger;

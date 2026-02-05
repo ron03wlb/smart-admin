@@ -75,13 +75,13 @@ jobs:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g -Dorg.gradle.daemon=false"
 
       - name: Run Unit Tests
-        run: ./gradlew :sa-admin:test -x integrationTest --no-daemon
+        run: ./gradlew :smartadmin-app:test -x integrationTest --no-daemon
         working-directory: smart-admin-api-java21-springboot3
         env:
           SPRING_PROFILES_ACTIVE: test
 
       - name: Run Integration Tests
-        run: ./gradlew :sa-admin:integrationTest --no-daemon
+        run: ./gradlew :smartadmin-app:integrationTest --no-daemon
         working-directory: smart-admin-api-java21-springboot3
         env:
           SPRING_PROFILES_ACTIVE: test
@@ -92,12 +92,12 @@ jobs:
           REDIS_PORT: 6379
 
       - name: Run Architecture Tests
-        run: ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+        run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Generate Test Report
         if: always()
-        run: ./gradlew :sa-admin:testReport --no-daemon
+        run: ./gradlew :smartadmin-app:testReport --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Upload Test Results
@@ -106,8 +106,8 @@ jobs:
         with:
           name: test-results
           path: |
-            smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
-            smart-admin-api-java21-springboot3/sa-admin/build/test-results/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/
           retention-days: 30
 
   code-quality:
@@ -131,17 +131,17 @@ jobs:
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Run SpotBugs
-        run: ./gradlew :sa-admin:spotbugsMain --no-daemon
+        run: ./gradlew :smartadmin-app:spotbugsMain --no-daemon
         working-directory: smart-admin-api-java21-springboot3
         continue-on-error: true
 
       - name: Run PMD
-        run: ./gradlew :sa-admin:pmdMain --no-daemon
+        run: ./gradlew :smartadmin-app:pmdMain --no-daemon
         working-directory: smart-admin-api-java21-springboot3
         continue-on-error: true
 
       - name: Run Checkstyle
-        run: ./gradlew :sa-admin:checkstyleMain --no-daemon
+        run: ./gradlew :smartadmin-app:checkstyleMain --no-daemon
         working-directory: smart-admin-api-java21-springboot3
         continue-on-error: true
 
@@ -151,9 +151,9 @@ jobs:
         with:
           name: quality-reports
           path: |
-            smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
-            smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
-            smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
           retention-days: 30
 
   build-docker:
@@ -174,7 +174,7 @@ jobs:
           cache: 'gradle'
 
       - name: Build JAR
-        run: ./gradlew :sa-admin:bootJar --no-daemon
+        run: ./gradlew :smartadmin-app:bootJar --no-daemon
         working-directory: smart-admin-api-java21-springboot3
 
       - name: Set up Docker Buildx

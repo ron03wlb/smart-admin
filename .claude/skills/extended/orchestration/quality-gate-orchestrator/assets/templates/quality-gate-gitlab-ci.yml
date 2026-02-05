@@ -41,13 +41,13 @@ checkstyle:
   stage: style
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:checkstyleMain :sa-admin:checkstyleTest --no-daemon
+    - ./gradlew :smartadmin-app:checkstyleMain :smartadmin-app:checkstyleTest --no-daemon
   artifacts:
     when: always
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/*.xml
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
     expire_in: 1 week
   only:
     - merge_requests
@@ -60,13 +60,13 @@ archunit:
   stage: architecture
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+    - ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
   artifacts:
     when: always
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/test/*.xml
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
     expire_in: 1 week
   only:
     - merge_requests
@@ -79,11 +79,11 @@ pmd:
   stage: analysis
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:pmdMain --no-daemon
+    - ./gradlew :smartadmin-app:pmdMain --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
     expire_in: 1 week
   only:
     - merge_requests
@@ -95,11 +95,11 @@ spotbugs:
   stage: analysis
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:spotbugsMain --no-daemon
+    - ./gradlew :smartadmin-app:spotbugsMain --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
     expire_in: 1 week
   only:
     - merge_requests
@@ -112,13 +112,13 @@ unit-tests:
   stage: coverage
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:test --no-daemon
+    - ./gradlew :smartadmin-app:test --no-daemon
   artifacts:
     when: always
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/test/*.xml
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/test-results/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/
     expire_in: 1 week
   only:
     - merge_requests
@@ -130,17 +130,17 @@ jacoco-coverage:
   stage: coverage
   script:
     - cd smart-admin-api-java21-springboot3
-    - ./gradlew :sa-admin:jacocoTestReport --no-daemon
-    - ./gradlew :sa-admin:jacocoTestCoverageVerification --no-daemon
+    - ./gradlew :smartadmin-app:jacocoTestReport --no-daemon
+    - ./gradlew :smartadmin-app:jacocoTestCoverageVerification --no-daemon
   coverage: '/Total.*?([0-9]{1,3})%/'
   artifacts:
     when: always
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/test/jacocoTestReport.xml
+        path: smart-admin-api-java21-springboot3/smartadmin-app/build/reports/jacoco/test/jacocoTestReport.xml
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/jacoco/
     expire_in: 1 week
   only:
     - merge_requests
@@ -154,7 +154,7 @@ sonarqube:
   script:
     - cd smart-admin-api-java21-springboot3
     - |
-      ./gradlew :sa-admin:sonar \
+      ./gradlew :smartadmin-app:sonar \
         -Dsonar.projectKey=smartadmin-v4 \
         -Dsonar.host.url=$SONAR_HOST_URL \
         -Dsonar.login=$SONAR_TOKEN \
@@ -200,19 +200,19 @@ quality-gate-summary:
     - |
       case "$TOOL" in
         checkstyle)
-          ./gradlew :sa-admin:checkstyleMain --no-daemon
+          ./gradlew :smartadmin-app:checkstyleMain --no-daemon
           ;;
         pmd)
-          ./gradlew :sa-admin:pmdMain --no-daemon
+          ./gradlew :smartadmin-app:pmdMain --no-daemon
           ;;
         spotbugs)
-          ./gradlew :sa-admin:spotbugsMain --no-daemon
+          ./gradlew :smartadmin-app:spotbugsMain --no-daemon
           ;;
       esac
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/
     expire_in: 1 week
 
 # Uncomment to enable parallel execution

@@ -78,7 +78,7 @@ Automatically formats all Java code according to project standards.
 #### Step 2: Architecture Validation (30-60 seconds)
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 Validates:
@@ -749,7 +749,7 @@ git commit -m "test: invalid patterns"
 echo "Running performance benchmarks..."
 
 # Run performance tests
-./gradlew :sa-admin:performanceTest --tests "*Benchmark*"
+./gradlew :smartadmin-app:performanceTest --tests "*Benchmark*"
 
 # Extract results
 RESULTS_FILE="build/reports/performance/benchmark-results.json"
@@ -796,7 +796,7 @@ tasks.register('performanceTest', Test) {
 
 ```bash
 # Run benchmarks to establish baseline
-./gradlew :sa-admin:performanceTest
+./gradlew :smartadmin-app:performanceTest
 # Save results as baseline
 cp build/reports/performance/benchmark-results.json \
    .claude/baselines/performance-baseline.json
@@ -974,7 +974,7 @@ cp build/reports/performance/benchmark-results.json \
       "steps": [
         {
           "name": "backend-tests",
-          "command": "./gradlew :sa-admin:test",
+          "command": "./gradlew :smartadmin-app:test",
           "condition": "hasChanges('**/*.java')",
           "timeout": 60000
         },

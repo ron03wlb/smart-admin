@@ -419,10 +419,12 @@ log.info("Processing employee, id=" + id + ", name=" + name);
 Before committing code, run architecture validation:
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 This test enforces all architectural rules and will fail if patterns are violated.
+
+**Note**: ArchitectureTest exists in each business module (`smartadmin-system`, `smartadmin-business`, `smartadmin-oa`) and in `smartadmin-app` (which transitively validates all modules).
 
 ## References
 

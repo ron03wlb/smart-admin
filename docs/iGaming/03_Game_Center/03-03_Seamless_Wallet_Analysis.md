@@ -760,7 +760,7 @@ groups:
 ### 4.1 錢包扣款順序 (Wallet Deduction Order)
 - **決策**：**基於遊戲配置 (Game Configuration)** + **系統預設**。
 - **邏輯**：
-    - **系統預設**: `Bonus -> Cash -> Credit` (參見 [02-06 統一錢包模型 §3.1](../../02_Finance_Center/02-06_Unified_Wallet_Model.md#31-優先級配置-priority-configuration))
+    - **系統預設**: `Bonus -> Cash -> Credit` (參見 [02-06 統一錢包模型 §3.1](../../02_Finance_Center/02-06_Wallet_Architecture.md#31-優先級配置-priority-configuration))
     - **遊戲覆蓋**: 每個遊戲或遊戲廠商 (GP) 可獨立配置 `DeductionSequence` 覆蓋預設值。
     - **資料結構示意**：
       ```json
@@ -878,7 +878,7 @@ flowchart TD
 ## 📚 相關文檔
 
 ### 核心依賴
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 錢包餘額更新、鎖定機制
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 錢包餘額更新、鎖定機制
 - [03-01 遊戲集成標準](./03-01_Game_Integration_Standard.md) - GP API 規格、安全設計
 
 ### 業務整合
@@ -996,7 +996,7 @@ Controller → Manager (❌ 禁止,違反分層)
 ## 📚 相關文檔
 
 ### 上層架構
-- **[02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md)** - 錢包整體架構、可下注餘額公式
+- **[02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md)** - 錢包整體架構、可下注餘額公式
 - **[02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md)** - 事件驅動架構、Outbox Pattern
 
 ### 深度技術分析

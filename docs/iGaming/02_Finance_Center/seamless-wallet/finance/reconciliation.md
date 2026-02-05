@@ -90,7 +90,7 @@ graph TD
 - [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
 - [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
 
 ---
@@ -126,7 +126,7 @@ graph TD
 
 ### 重大變更
 
-本文檔已根據術語標準化文檔 ([00-03_Terminology_Standards.md](../00_Concept_&_Analysis/00-03_Terminology_Standards.md)) 進行全面修正:
+本文檔已根據術語標準化文檔 ([00-03_Terminology_Standards.md](../../../00_Foundation/concepts/00-03_Terminology_Standards.md)) 進行全面修正:
 
 **核心修正**:
 1. ✅ **修正驗證時機**: 從「投注時自動解鎖」修正為「取款時驗證」(業界標準)
@@ -140,7 +140,7 @@ graph TD
 - **審計追溯**: 每筆交易可追溯完整計算邏輯
 
 **參考文檔**:
-- [術語標準化定義](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - 統一術語使用
+- [術語標準化定義](../../../00_Foundation/concepts/00-03_Terminology_Standards.md) - 統一術語使用
 - [核心架構流程圖](../02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - 三層驗證架構
 
 ---
@@ -747,7 +747,7 @@ metrics:
 
 | 決策點 | 推薦做法 | 理由 |
 |-------|---------|------|
-| **術語統一** | 「流水（Turnover）」僅用於財務統計<br/>「有效投注（Valid Bet）」用於單筆計算<br/>「流水要求（Wagering Requirement）」用於活動驗證<br/>**詳見**: [術語標準化定義](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) | 避免概念混淆，與業界標準對齊 |
+| **術語統一** | 「流水（Turnover）」僅用於財務統計<br/>「有效投注（Valid Bet）」用於單筆計算<br/>「流水要求（Wagering Requirement）」用於活動驗證<br/>**詳見**: [術語標準化定義](../../../00_Foundation/concepts/00-03_Terminology_Standards.md) | 避免概念混淆，與業界標準對齊 |
 | **驗證時機** | 取款時驗證流水要求達標才解鎖紅利 | 保護營運商資金，符合業界標準 |
 | **累積方式** | 投注時實時累積（Redis + DB 雙寫） | 平衡查詢性能與數據可靠性 |
 | **回推機制** | 記錄原始數據 + 計算版本號 + 提供重算接口 | 支持審計合規與規則調整 |
@@ -1040,7 +1040,7 @@ Response:
 **文檔版本**: 2.0.0
 **最後更新**: 2026-01-28
 **變更記錄**:
-- v2.0.0 (2026-01-28): 根據[術語標準化文檔](../00_Concept_&_Analysis/00-03_Terminology_Standards.md)進行全面修正 - 添加功能特性對比表格、風險場景分析、回推機制實施優先級(P0/P1/P2)、業界標準參考
+- v2.0.0 (2026-01-28): 根據[術語標準化文檔](../../../00_Foundation/concepts/00-03_Terminology_Standards.md)進行全面修正 - 添加功能特性對比表格、風險場景分析、回推機制實施優先級(P0/P1/P2)、業界標準參考
 - v1.1.0 (2026-01-28): 新增「決策確認總結」章節，記錄8個已確認決策
 - v1.0.0 (2026-01-28): 初始版本，識別流水驗證時機錯誤與回推機制缺失
 
@@ -1058,7 +1058,7 @@ Response:
 - [07 流水並發累積](./07_turnover_concurrency.md) - Lua 腳本原子性
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
 - [04-01 活動系統設計](../../03_Player_Journey/03-03_Activity_Bonus.md) - 活動系統
 
 
@@ -1419,5 +1419,5 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 - [04 免費旋轉流水](./04_free_spins_turnover.md) - 活動流水計算
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Unified_Wallet_Model.md) - 錢包整體架構
+- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
 - [04-01 活動系統設計](../../03_Player_Journey/03-03_Activity_Bonus.md) - 促銷活動系統

@@ -69,10 +69,10 @@ Proceed with generation?
 
 ### 2.1 Entity
 
-**File**: `sa-admin/src/main/java/net/lab1024/sa/admin/module/system/employee/domain/entity/EmployeeEntity.java`
+**File**: `smartadmin-modules/smartadmin-system/src/main/java/net/lab1024/sa/system/employee/domain/entity/EmployeeEntity.java`
 
 ```java
-package net.lab1024.sa.admin.module.system.employee.domain.entity;
+package net.lab1024.sa.system.employee.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -274,7 +274,7 @@ public interface EmployeeDao extends BaseMapper<EmployeeEntity> {
 
 **File**: `EmployeeDao.xml`
 ```xml
-<select id="query" resultType="net.lab1024.sa.admin.module.system.employee.domain.vo.EmployeeVO">
+<select id="query" resultType="net.lab1024.sa.system.employee.domain.vo.EmployeeVO">
     SELECT
         e.employee_id,
         e.employee_name,
@@ -736,20 +736,20 @@ class EmployeeIntegrationTest extends BaseIntegrationTest {
 
 ### Run ArchitectureTest
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **Expected**: All tests pass ✅
 
 ### Run Integration Tests
 ```bash
-./gradlew :sa-admin:test --tests EmployeeIntegrationTest
+./gradlew :smartadmin-app:test --tests EmployeeIntegrationTest
 ```
 
 **Expected**: All tests pass ✅
 
 ### Verify Knife4j UI
-1. Start application: `./gradlew :sa-admin:bootRun`
+1. Start application: `./gradlew :smartadmin-app:bootRun`
 2. Visit: http://localhost:1024/doc.html
 3. Navigate to: System → Employee Management
 4. Verify all endpoints documented ✅

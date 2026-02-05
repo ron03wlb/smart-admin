@@ -23,7 +23,7 @@ last_updated: 2025-01-21
 ### When to Apply This Rule
 - ✅ When generating any Java code
 - ✅ During Code Review to check code style
-- ✅ When `./gradlew checkstyleMain` or `mvn checkstyle:check` fails
+- ✅ When `./gradlew checkstyleMain` fails
 - ✅ User asks about code formatting issues
 
 ### Mandatory Enforcement Checklist
@@ -204,10 +204,7 @@ configure<CheckstyleExtension> {
 ./gradlew checkstyleMain checkstyleTest
 
 # View report
-open sa-admin/build/reports/checkstyle/main.html
-
-# Maven (if used)
-mvn checkstyle:check
+open smartadmin-app/build/reports/checkstyle/main.html
 ```
 
 ---

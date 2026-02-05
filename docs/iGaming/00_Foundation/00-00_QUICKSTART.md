@@ -28,7 +28,7 @@ iGaming 平台是一個複雜的系統，但核心邏輯圍繞 **5 個關鍵概�
 - ✅ 正確計算 → 資金安全 + 用戶滿意
 
 **深入閱讀**:
-👉 [01-02 錢包架構 §2.3 可下注餘額](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md#可下注餘額計算) ⭐ SSOT
+👉 [01-02 錢包架構 §2.3 可下注餘額](../02_Finance_Center/02-06_Wallet_Architecture.md#可下注餘額計算) ⭐ SSOT
 
 **關鍵場景**:
 - 玩家下注時：檢查可下注餘額 → 鎖定資金 → 扣款
@@ -57,7 +57,7 @@ iGaming 平台是一個複雜的系統，但核心邏輯圍繞 **5 個關鍵概�
 - 🛡️ **反洗錢**: 充值後必須打 1 倍流水才能出金
 
 **深入閱讀**:
-👉 [02-03 流水計算 §3.1 有效投注算法](../02_Game_Operations/02-03_Turnover_Calculation.md#有效投注算法) ⭐ SSOT
+👉 [02-03 流水計算 §3.1 有效投注算法](../03_Game_Center/03-04_Turnover_Calculation.md#有效投注算法) ⭐ SSOT
 
 **關鍵場景**:
 - 活動發放：玩家領取 Bonus → 綁定流水要求
@@ -228,9 +228,9 @@ flowchart LR
 
 | 優先級 | 主題 | 文檔 |
 |-------|------|------|
-| 🔴 P0 | 玩家生命週期 | [01-01 Player_Lifecycle](../01_Core_Financial_Loop/01-01_Player_Lifecycle.md) |
-| 🔴 P0 | 活動系統規則 | [03-01 Bonus_Engine](../03_Promotion_System/03-01_Bonus_Engine.md) |
-| 🟠 P1 | VIP 系統 | [03-04 VIP_Loyalty](../03_Promotion_System/03-04_VIP_Loyalty.md) |
+| 🔴 P0 | 玩家生命週期 | [01-01 Player_Lifecycle](../01_Player_Center/01-01_Player_Lifecycle.md) |
+| 🔴 P0 | 活動系統規則 | [03-01 Bonus_Engine](../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) |
+| 🟠 P1 | VIP 系統 | [03-04 VIP_Loyalty](../01_Player_Center/01-06_VIP_Loyalty.md) |
 | 🟠 P1 | 代理系統 | [05-02 Agent_System](../05_Platform_Governance/05-02_Agent_System.md) |
 
 ### 👨‍💻 後端開發工程師
@@ -238,9 +238,9 @@ flowchart LR
 
 | 優先級 | 主題 | 文檔 |
 |-------|------|------|
-| 🔴 P0 | 錢包架構 | [01-02 Wallet_Architecture](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) ⭐ |
+| 🔴 P0 | 錢包架構 | [01-02 Wallet_Architecture](../02_Finance_Center/02-06_Wallet_Architecture.md) ⭐ |
 | 🔴 P0 | Seamless Wallet API | [02-02 Seamless_Wallet_API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) ⭐ |
-| 🔴 P0 | 流水計算 | [02-03 Turnover_Calculation](../02_Game_Operations/02-03_Turnover_Calculation.md) ⭐ |
+| 🔴 P0 | 流水計算 | [02-03 Turnover_Calculation](../03_Game_Center/03-04_Turnover_Calculation.md) ⭐ |
 | 🟠 P1 | 風控引擎 | [04-01 Risk_Engine](../04_Risk_Control/04-01_Risk_Framework.md) |
 | 🟠 P1 | 多租戶架構 | [05-01 Multi_Tenant_Arch](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md) |
 

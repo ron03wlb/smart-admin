@@ -39,7 +39,7 @@ build:
     - ./gradlew clean build -x test --no-daemon --stacktrace
   artifacts:
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/libs/*.jar
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/libs/*.jar
     expire_in: 1 week
   only:
     - branches
@@ -53,14 +53,14 @@ unit-tests:
     - postgres:15
     - redis:7-alpine
   script:
-    - ./gradlew :sa-admin:test -x integrationTest --no-daemon
+    - ./gradlew :smartadmin-app:test -x integrationTest --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
-      - smart-admin-api-java21-springboot3/sa-admin/build/test-results/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/test/TEST-*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/test/TEST-*.xml
     expire_in: 1 week
   coverage: '/Total.*?([0-9]{1,3})%/'
   only:
@@ -79,14 +79,14 @@ integration-tests:
   variables:
     SPRING_PROFILES_ACTIVE: test
   script:
-    - ./gradlew :sa-admin:integrationTest --no-daemon
+    - ./gradlew :smartadmin-app:integrationTest --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/integrationTest/
-      - smart-admin-api-java21-springboot3/sa-admin/build/test-results/integrationTest/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/integrationTest/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/integrationTest/
     reports:
-      junit: smart-admin-api-java21-springboot3/sa-admin/build/test-results/integrationTest/TEST-*.xml
+      junit: smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/integrationTest/TEST-*.xml
     expire_in: 1 week
   only:
     - branches
@@ -97,11 +97,11 @@ architecture-tests:
   stage: test
   image: gradle:8.11-jdk21
   script:
-    - ./gradlew :sa-admin:test --tests "*ArchitectureTest" --no-daemon
+    - ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
     expire_in: 1 week
   only:
     - branches
@@ -112,11 +112,11 @@ spotbugs:
   stage: quality
   image: gradle:8.11-jdk21
   script:
-    - ./gradlew :sa-admin:spotbugsMain --no-daemon
+    - ./gradlew :smartadmin-app:spotbugsMain --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/spotbugs/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
     expire_in: 1 week
   allow_failure: true
   only:
@@ -128,11 +128,11 @@ pmd:
   stage: quality
   image: gradle:8.11-jdk21
   script:
-    - ./gradlew :sa-admin:pmdMain --no-daemon
+    - ./gradlew :smartadmin-app:pmdMain --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/pmd/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
     expire_in: 1 week
   allow_failure: true
   only:
@@ -144,11 +144,11 @@ checkstyle:
   stage: quality
   image: gradle:8.11-jdk21
   script:
-    - ./gradlew :sa-admin:checkstyleMain --no-daemon
+    - ./gradlew :smartadmin-app:checkstyleMain --no-daemon
   artifacts:
     when: always
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/build/reports/checkstyle/
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
     expire_in: 1 week
   allow_failure: true
   only:

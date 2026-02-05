@@ -313,8 +313,8 @@ When reviewing code, prioritize:
 
 ### Before Committing
 
-1. Run architecture tests: `./gradlew :sa-admin:test --tests ArchitectureTest`
-2. Run all tests: `./gradlew :sa-admin:test`
+1. Run architecture tests: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
+2. Run all tests: `./gradlew :smartadmin-app:test`
 3. Verify build succeeds: `./gradlew build`
 4. Review your own changes
 5. Ensure commit message follows convention
@@ -330,7 +330,7 @@ When reviewing code, prioritize:
 ```
 
 Types: `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `perf`, `chore`
-Scopes: `sa-admin`, `sa-base`, `sa-common`
+Scopes: `smartadmin-system`, `smartadmin-business`, `smartadmin-oa`, `smartadmin-app`, `smartadmin-common`, `smartadmin-support`
 
 ## Documentation Requirements
 

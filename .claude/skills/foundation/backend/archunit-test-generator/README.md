@@ -127,7 +127,7 @@ static final ArchRule serviceNaming =
 
 **Verification:**
 ```bash
-$ ./gradlew :sa-admin:test --tests 'ArchitectureTest#serviceNaming'
+$ ./gradlew :smartadmin-app:test --tests 'ArchitectureTest#serviceNaming'
 BUILD SUCCESSFUL
 ```
 
@@ -164,7 +164,7 @@ static final ArchRule serviceUsesVavrOption =
 # Create violation example
 public Optional<User> findUser() { ... }  // ❌ Should fail
 
-$ ./gradlew :sa-admin:test --tests 'ArchitectureTest#serviceUsesVavrOption'
+$ ./gradlew :smartadmin-app:test --tests 'ArchitectureTest#serviceUsesVavrOption'
 FAILED - Method findUser() must return io.vavr.control.Option
 ```
 
@@ -201,13 +201,13 @@ SmartAdmin has **23 architecture rule files** totaling 6,530+ lines:
 
 ```bash
 # Compile all tests
-./gradlew :sa-admin:compileTestJava
+./gradlew :smartadmin-app:compileTestJava
 
 # Run architecture tests
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # Run specific test
-./gradlew :sa-admin:test --tests 'ArchitectureTest#serviceUsesVavrOption'
+./gradlew :smartadmin-app:test --tests 'ArchitectureTest#serviceUsesVavrOption'
 ```
 
 ### CI/CD Integration
@@ -215,7 +215,7 @@ SmartAdmin has **23 architecture rule files** totaling 6,530+ lines:
 Tests run automatically in GitHub Actions:
 ```yaml
 - name: Run Architecture Tests
-  run: ./gradlew :sa-admin:test --tests ArchitectureTest
+  run: ./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 ---
@@ -271,7 +271,7 @@ Tests run automatically in GitHub Actions:
 
 ### SmartAdmin Architecture
 - [CLAUDE.md](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/CLAUDE.md) - Project conventions
-- [ArchitectureTest.java](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/ArchitectureTest.java) - Existing tests
+- [ArchitectureTest.java](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java) - Existing tests
 - [.agent/rules/](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.agent/rules/) - 23 architecture rule files
 
 ### ArchUnit Documentation

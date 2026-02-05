@@ -172,7 +172,7 @@ public class UserEntity {
 
 **UserService.java**:
 ```java
-package net.lab1024.sa.admin.module.business.user.service;
+package net.lab1024.sa.business.user.service;
 
 import net.lab1024.sa.foundation.security.crypto.SM3Util;
 import lombok.RequiredArgsConstructor;

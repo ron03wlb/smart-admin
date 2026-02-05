@@ -73,8 +73,8 @@ When working with SmartAdmin codebase, read documentation in this order:
 **Location**: `smart-admin-api-java21-springboot3/`
 
 ```bash
-./gradlew :sa-admin:bootRun    # Run (http://localhost:1024)
-./gradlew :sa-admin:test       # Test
+./gradlew :smartadmin-app:bootRun    # Run (http://localhost:1024)
+./gradlew :smartadmin-app:test       # Test
 ```
 
 → **[All Build Commands](.claude/shared/knowledge/project-architecture.md#build-commands)**
@@ -103,15 +103,17 @@ Controller → Service → Manager → Dao → Entity
 
 ## Foundation Package Naming
 
-**v3.6.0+ Standard Pattern:**
-- Foundation: `net.lab1024.sa.foundation.{module}.*`
-- Infrastructure: `net.lab1024.sa.base.{module}.*`
-- Support: `net.lab1024.sa.base.module.support.{module}.*`
+**v4.1.0 Standard Pattern:**
+- Common: `net.lab1024.sa.common.{module}.*` (e.g., `common.core`, `common.mybatis`, `common.json`)
+- Support: `net.lab1024.sa.support.{module}.*`
+- Business: `net.lab1024.sa.{system|business|oa}.{module}.*`
+- API: `net.lab1024.sa.api.{system|business|oa}.*`
 
-**v4.0.0 Breaking Change:**
-- ❌ **REMOVED**: `net.lab1024.sa.common.core.*` bridge classes
-- ✅ **Use instead**: `net.lab1024.sa.foundation.domain.*`
-- ℹ️ **Exception**: `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*`
+**Key Classes (v4.1.0 verified):**
+- `net.lab1024.sa.common.core.domain.response.ResponseDTO`
+- `net.lab1024.sa.common.core.domain.response.PageResult`
+- `net.lab1024.sa.common.core.util.SmartBeanUtil`
+- `net.lab1024.sa.common.mybatis.util.SmartPageUtil`
 
 → **[Complete Package Naming Guide](docs/archive/migration/foundation-packages.md)** (archived)
 → **[v4.0.0 Breaking Changes](#v40-breaking-changes)**
@@ -185,8 +187,8 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 - Low memory footprint: ~1KB per virtual thread (vs ~1MB for platform threads)
 
 **Implementation Details:**
-- Virtual Threads: [VirtualThreadsConfig.java](smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/admin/config/VirtualThreadsConfig.java)
-- Sealed ErrorCode: [ErrorCode.java](smart-admin-api-java21-springboot3/sa-base/foundation/domain/src/main/java/net/lab1024/sa/foundation/domain/code/ErrorCode.java)
+- Virtual Threads: [VirtualThreadsConfig.java](smart-admin-api-java21-springboot3/smartadmin-app/src/main/java/net/lab1024/sa/config/VirtualThreadsConfig.java)
+- Sealed ErrorCode: [ErrorCode.java](smart-admin-api-java21-springboot3/smartadmin-common/smartadmin-common-core/src/main/java/net/lab1024/sa/common/core/domain/code/ErrorCode.java)
 
 → **[Complete Java 21 Features Guide](docs/architecture/java21-features.md)**
 
@@ -200,7 +202,7 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 
 **Validation**:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 → **[Unified Decision Center](.agent/rules/00-INDEX.md)** - Rules, Skills, and Agent Routing
@@ -411,20 +413,19 @@ Detailed rules: See [.agent/rules/quality-tools/Q02-pmd-rules.md](.agent/rules/q
 
 ---
 
-## v4.0.0 Breaking Changes
+## v4.0.0 → v4.1.0 Breaking Changes
 
-**Bridge Class Removal**: All `net.lab1024.sa.common.core.*` bridge classes permanently removed.
+**v4.1.0 Module Restructure**: Migrated from `sa-admin`/`sa-base` to 6-layer modular architecture.
 
 **Key Changes:**
-- ❌ OLD: `net.lab1024.sa.common.core.domain.ResponseDTO`
-- ✅ NEW: `net.lab1024.sa.foundation.domain.response.ResponseDTO`
-- ℹ️ **Exception**: `SmartBeanUtil` remains in `common.core.util.*`
-
-**Migration Tool:**
-```bash
-cd smart-admin-api-java21-springboot3
-./gradlew migrateToFoundation
-```
+- ❌ OLD: `net.lab1024.sa.admin.module.{system|business|oa}.{module}.*`
+- ✅ NEW: `net.lab1024.sa.{system|business|oa}.{module}.*`
+- ❌ OLD module path: `sa-admin/src/main/java/`
+- ✅ NEW module path: `smartadmin-modules/smartadmin-{system|business|oa}/src/main/java/`
+- ❌ OLD build: `./gradlew :sa-admin:test`
+- ✅ NEW build: `./gradlew :smartadmin-app:test`
+- ℹ️ `ResponseDTO` is at `net.lab1024.sa.common.core.domain.response.ResponseDTO`
+- ℹ️ `SmartBeanUtil` remains in `net.lab1024.sa.common.core.util.*`
 
 → **[Complete Package Migration Guide](docs/archive/migration/foundation-packages.md)** (archived)
 
@@ -500,17 +501,18 @@ docs/archive/
 
 | Component | Version | Status | Metadata |
 |-----------|---------|--------|----------|
-| **This Document** | 3.4.0 | ✅ Universal AI Support + Java 21 | - |
+| **This Document** | 3.5.0 | ✅ v4.1.0 Module Structure Sync | - |
 | **AI Doc System** | 3.0.2 | ✅ Optimized | [.claude/META.md](.claude/META.md) |
 | **.claude/** | 3.0.2 | ✅ Optimized | [.claude/README.md](.claude/README.md) |
 | **.agent/** | 1.0.0 | ✅ Production Ready | [.agent/VERSION.md](.agent/VERSION.md) |
-| **SmartAdmin** | v4.0.0 | ✅ Production | - |
+| **SmartAdmin** | v4.1.0 | ✅ Production | - |
 
 **System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership
 
-**Last Updated**: 2026-01-31
+**Last Updated**: 2026-02-05
 
 **Change History**:
+- 3.5.0 (2026-02-05): v4.1.0 documentation sync - Updated all ~159 documentation files (.claude/, .agent/) to reflect new 6-layer modular architecture (sa-admin/sa-base → smartadmin-common/smartadmin-support/smartadmin-modules/smartadmin-api/smartadmin-starter/smartadmin-app). Updated build commands, package names, commit scopes, CRUD generator paths, ArchUnit test references.
 - 3.4.0 (2026-01-31): Java 21 features documentation - Added dedicated Java 21 section covering Sealed Classes and Virtual Threads implementations, Phase 4 Manager layer testing completion (100% coverage, 8 test classes, 92 test cases)
 - 3.3.0 (2026-01-27): Documentation structure update - Added "Documentation Structure" section with active/archived documentation organization, updated archive navigation with INDEX.md references
 - 3.2.0 (2026-01-27): P1 improvements - Enhanced reading priority guidance with decision-making note, clarified code comment language standard, expanded skills catalog from 6 to 15 (P0: 6, P1: 3, P2: 6)

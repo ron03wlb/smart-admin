@@ -285,8 +285,8 @@ class ErrorBoundary extends React.Component {
 - [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 加密規範
 
 ### 業務整合
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - 登入與 MFA
-- [02-06 統一錢包模型](../02_Finance_Center/02-06_Unified_Wallet_Model.md) - 餘額顯示
+- [01-01 玩家賬戶系統](../01_Player_Center/01-01_Player_Lifecycle.md) - 登入與 MFA
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 餘額顯示
 
 ---
 

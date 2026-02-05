@@ -154,11 +154,11 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify generated quality gate tasks compile"
-      command: "./gradlew :sa-admin:compileJava"
+      command: "./gradlew :smartadmin-app:compileJava"
 
     - check: "archunit"
       description: "Verify ArchitectureTest passes"
-      command: "./gradlew :sa-admin:test --tests ArchitectureTest"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest"
 
 compatibility:
   deprecated: false

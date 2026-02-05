@@ -8,7 +8,7 @@
 
 ### Issue 2: Test Catches Too Much
 **Symptom**: Framework classes caught
-**Fix**: Use specific package patterns (net.lab1024.sa.admin..)
+**Fix**: Use specific package patterns (net.lab1024.sa..)
 
 ### Issue 3: Test Passes But Violation Exists
 **Symptom**: Missing violations
@@ -25,13 +25,13 @@
 ## Debug Commands
 
 # Compile only
-./gradlew :sa-admin:compileTestJava
+./gradlew :smartadmin-app:compileTestJava
 
 # Run specific test
-./gradlew :sa-admin:test --tests ArchitectureTest#yourTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest#yourTest
 
 # Verbose output
-./gradlew :sa-admin:test --tests ArchitectureTest --info
+./gradlew :smartadmin-app:test --tests ArchitectureTest --info
 
 ## Verification Workflow
 

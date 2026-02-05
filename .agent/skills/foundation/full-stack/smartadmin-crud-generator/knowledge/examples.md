@@ -14,7 +14,7 @@
 4. 創建 `EmployeeService.java` (含 Vavr Option)
 5. 創建 `EmployeeController.java`
 6. 創建 Form/VO 類
-7. 運行 `./gradlew :sa-admin:test --tests ArchitectureTest`
+7. 運行 `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 
 ## 範例 2: Entity 生成
 
@@ -149,6 +149,6 @@ public Option<EmployeeVO> getById(Long id) { ... }
 
 **解決:**
 ```java
-// v4.0.0 正確 import
-import net.lab1024.sa.util.SmartBeanUtil;
+// v4.1.0 正確 import
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
 ```

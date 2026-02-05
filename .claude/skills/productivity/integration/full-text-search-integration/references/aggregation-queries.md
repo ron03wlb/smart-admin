@@ -24,14 +24,14 @@
 ### Category Facets
 
 ```java
-package net.lab1024.sa.admin.module.business.product.service;
+package net.lab1024.sa.business.product.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -650,14 +650,14 @@ public ProductSegmentation getProductSegmentation() {
 ## Pattern 8: SmartAdmin Controller Integration
 
 ```java
-package net.lab1024.sa.admin.module.business.product.controller;
+package net.lab1024.sa.business.product.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.product.domain.vo.CategoryStats;
-import net.lab1024.sa.admin.module.business.product.domain.vo.PriceStatistics;
-import net.lab1024.sa.admin.module.business.product.domain.vo.ProductSegmentation;
-import net.lab1024.sa.admin.module.business.product.service.ProductAggregationService;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.product.domain.vo.CategoryStats;
+import net.lab1024.sa.business.product.domain.vo.PriceStatistics;
+import net.lab1024.sa.business.product.domain.vo.ProductSegmentation;
+import net.lab1024.sa.business.product.service.ProductAggregationService;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

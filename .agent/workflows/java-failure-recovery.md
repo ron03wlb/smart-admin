@@ -27,8 +27,8 @@ execution_order:
   - step: verify_fix
     description: Verify fix
     commands:
-      - mvn verify
-    validation: BUILD SUCCESS
+      - ./gradlew check
+    validation: BUILD SUCCESSFUL
 
 last_updated: 2025-01-13
 ---
@@ -87,7 +87,7 @@ Error detected → Identify error type
 #### Diagnosis Commands
 ```bash
 java -version    # Expected: openjdk version "21.x.x"
-mvn -version     # Expected: Java version: 21.x.x
+./gradlew --version  # Expected: JVM: 21.x.x
 echo $JAVA_HOME  # Expected: /path/to/jdk-21
 ```
 
@@ -101,7 +101,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 export PATH=$JAVA_HOME/bin:$PATH
 
 # Verify
-java -version && mvn clean compile
+java -version && ./gradlew clean compileJava
 ```
 
 ---
@@ -117,13 +117,13 @@ java -version && mvn clean compile
 #### Diagnosis and Fix
 ```bash
 # Check dependency tree
-mvn dependency:tree | grep vavr
+./gradlew dependencies | grep vavr
 
 # Clean and re-download
-mvn clean install -U
+./gradlew clean compileJava --refresh-dependencies
 
 # Verify
-mvn clean compile
+./gradlew clean compileJava
 ```
 
 ---
@@ -135,7 +135,7 @@ mvn clean compile
 #### AI Auto-Diagnosis Process
 ```bash
 # 1. Run test to see detailed violations
-mvn test -Dtest=ArchitectureTest#controllerNotAccessRepository -X
+./gradlew :smartadmin-app:test --tests "ArchitectureTest.controllerNotAccessRepository" --info
 
 # 2. Locate violating code
 grep -r "Repository" --include="*Controller.java" src/
@@ -230,10 +230,10 @@ public class UserService {
 #### Diagnosis
 ```bash
 # Generate coverage report
-mvn clean test jacoco:report
+./gradlew test jacocoTestReport
 
 # Open report
-open target/site/jacoco/index.html
+open smartadmin-app/build/reports/jacoco/test/html/index.html
 ```
 
 #### Fix: Add Tests
@@ -257,10 +257,10 @@ void shouldReturnNone_whenUserIsInactive() {
 #### AI Batch Fix
 ```bash
 # View all errors
-mvn checkstyle:check -Dcheckstyle.console=true
+./gradlew checkstyleMain checkstyleTest
 
 # Auto-format
-mvn spotless:apply
+./gradlew spotlessApply
 ```
 
 ---
@@ -315,10 +315,10 @@ public String getUserCity(Long id) {
 
 ```bash
 # Complete diagnosis process
-mvn clean verify                              # Full build
-mvn test -Dtest=ArchitectureTest              # Architecture tests
-mvn jacoco:report && open target/site/jacoco/index.html  # Coverage
-mvn checkstyle:check                          # Code style
+./gradlew clean check                                              # Full build
+./gradlew :smartadmin-app:test --tests ArchitectureTest            # Architecture tests
+./gradlew jacocoTestReport && open smartadmin-app/build/reports/jacoco/test/html/index.html  # Coverage
+./gradlew checkstyleMain checkstyleTest                            # Code style
 ```
 
 ---

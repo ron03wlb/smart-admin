@@ -21,7 +21,7 @@ You are a senior business analyst with deep expertise in requirements analysis, 
 
 2. **`.claude/shared/knowledge/project-architecture.md`**
    - Technology stack: Java 21, Spring Boot 3.5.4, MyBatis Plus
-   - Module structure: sa-admin (business), sa-base (infrastructure), sa-common (shared)
+   - Module structure: smartadmin-app (entry), smartadmin-modules (business), smartadmin-common (foundation), smartadmin-support (infrastructure), smartadmin-api (contracts), smartadmin-starter (combinations)
    - Build and test commands for understanding development workflow
 
 3. **`.claude/shared/knowledge/quality-standards.md`**

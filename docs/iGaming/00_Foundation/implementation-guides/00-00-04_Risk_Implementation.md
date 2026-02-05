@@ -71,7 +71,7 @@
 |------|------|------|----------|
 | 1 | [05-03 Fraud Detection](../../05_Risk_Management/05-03_Fraud_Detection.md) | §2 設備指紋 | FingerprintJS |
 | 2 | [05-03 Fraud Detection](../../05_Risk_Management/05-03_Fraud_Detection.md) | §3 行為分析 | 異常檢測 |
-| 3 | [01-01 Player Account](../../03_Player_Journey/03-01_Player_Lifecycle.md) | §5 風險評分 | 玩家分級 |
+| 3 | [01-01 Player Account](../../01_Player_Center/01-01_Player_Lifecycle.md) | §5 風險評分 | 玩家分級 |
 
 ### 驗證清單
 - [ ] 設備指紋正確生成
@@ -101,7 +101,7 @@
 |------|------|------|----------|
 | 1 | [06-02 Credit Network Logic](../../06_Agent_Center/06-02_Credit_Network_Logic.md) | §2 信用網絡 | 佔成模式 |
 | 2 | [05-02 Agent Credit Risk](../../05_Risk_Management/05-02_Agent_Credit_Risk.md) | §3 風險控制 | 額度計算 |
-| 3 | [06-01 Affiliate System](../../03_Player_Journey/03-04_Agent_System.md) | §4 風控整合 | 代理風控 |
+| 3 | [06-01 Affiliate System](../../06_Agent_Center/06-03_Agent_System.md) | §4 風控整合 | 代理風控 |
 
 ### 驗證清單
 - [ ] 信用額度計算正確

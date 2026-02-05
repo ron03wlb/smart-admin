@@ -571,7 +571,7 @@ Fix implementation:
 - [ ] Re-run audit to verify fixes
 
 Post-fix verification:
-- [ ] Run ArchUnit tests: `./gradlew :sa-admin:test --tests ArchitectureTest`
+- [ ] Run ArchUnit tests: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 - [ ] Run full test suite: `./gradlew test`
 - [ ] Update risk assessment with new ratings
 - [ ] Document lessons learned

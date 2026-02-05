@@ -65,7 +65,7 @@ top -p $(pgrep -f sa-admin)
 
 ```bash
 # 1. HikariCP utilization
-./gradlew :sa-admin:test --tests HikariCPAnalyzerTest
+./gradlew :smartadmin-app:test --tests HikariCPAnalyzerTest
 
 # Expected output:
 # - Utilization: 45% ✅ (target: <80%)
@@ -208,7 +208,7 @@ docker-compose up -d skywalking-oap skywalking-ui
 # 2. Run app with agent
 java -javaagent:/opt/skywalking-agent/skywalking-agent.jar \
      -Dskywalking.agent.service_name=smartadmin-api \
-     -jar sa-admin.jar
+     -jar smartadmin-app.jar
 
 # 3. Setup Grafana dashboard
 # Import dashboard ID: 12900 (Spring Boot 2.1 System Monitor)

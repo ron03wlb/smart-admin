@@ -116,7 +116,7 @@ public class SmartAdminApplication {
 ### Simple Job Handler
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -157,7 +157,7 @@ public class UserStatisticsJob {
 ### Job with Parameters
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -212,7 +212,7 @@ public class DataCleanupJob {
 ## Pattern 3: Sharding Job
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -271,7 +271,7 @@ public class OrderProcessingShardingJob {
 ## Pattern 4: Broadcast Job
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -314,7 +314,7 @@ public class CacheClearJob {
 ## Pattern 5: Workflow Job (Job Chain)
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -442,7 +442,7 @@ public ExecuteResult execute(String param) {
 ### Custom Metrics
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -542,7 +542,7 @@ services:
 ## Pattern 9: Health Check
 
 ```java
-package net.lab1024.sa.admin.module.system.health;
+package net.lab1024.sa.system.health;
 
 import com.aizuda.snailjob.client.core.SnailJobClient;
 import lombok.RequiredArgsConstructor;

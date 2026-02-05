@@ -1000,7 +1000,7 @@ Controller (API 端點) → Service (業務編排) → Manager (事務管理) �
 
 ### 8.1 鎖定餘額計算 (Locked Balance Calculation)
 
-> 💡 **SSOT Marker**: 可下注餘額公式詳見 [02-06 §2.2](../02_Finance_Center/02-06_Unified_Wallet_Model.md#22-playable-balance-formula)
+> 💡 **SSOT Marker**: 可下注餘額公式詳見 [02-06 §2.2](../02_Finance_Center/02-06_Wallet_Architecture.md#22-playable-balance-formula)
 
 **概述**: 鎖定餘額 (Locked Balance) 是錢包餘額的一部分,在特定條件下暫時不可用於投注或提款,用於保障系統資金安全與合規性。
 
@@ -1500,13 +1500,13 @@ COMMIT;
 ## 📚 相關文檔
 
 ### 核心依賴
-- [02-06 統一錢包模型](./02-06_Unified_Wallet_Model.md) - 可提餘額計算、鎖定餘額處理
+- [02-06 統一錢包模型](./02-06_Wallet_Architecture.md) - 可提餘額計算、鎖定餘額處理
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控規則引擎、ML 模型整合
 
 ### 業務整合
-- [01-01 玩家賬戶系統](../03_Player_Journey/03-01_Player_Lifecycle.md) - KYC 等級驗證
+- [01-01 玩家賬戶系統](01-01_Player_Lifecycle.md) - KYC 等級驗證
 - [02-04 流水計算與對帳](./02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證、對沖檢測
-- [04-01 活動系統設計](../03_Player_Journey/03-03_Activity_Bonus.md) - 紅利流水要求驗證
+- [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 紅利流水要求驗證
 
 ### 技術參考
 - [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 多層審批 Maker-Checker

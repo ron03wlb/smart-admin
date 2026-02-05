@@ -34,30 +34,30 @@ cd smart-admin-api-java21-springboot3
 
 # 1. Code style checks
 echo "1️⃣ Checkstyle..."
-mvn checkstyle:check || exit 1
+./gradlew checkstyleMain checkstyleTest || exit 1
 
 echo "2️⃣ PMD..."
-mvn pmd:check || exit 1
+./gradlew pmdMain pmdTest || exit 1
 
 echo "3️⃣ SpotBugs..."
-mvn spotbugs:check || exit 1
+./gradlew spotbugsMain spotbugsTest || exit 1
 
 # 2. Architecture tests
 echo "4️⃣ ArchUnit Tests..."
-mvn test -Dtest=ArchitectureTest || exit 1
+./gradlew :smartadmin-app:test --tests ArchitectureTest || exit 1
 
 # 3. Unit tests + coverage
 echo "5️⃣ Unit Tests + Coverage..."
-mvn clean verify || exit 1
+./gradlew clean check || exit 1
 
 # 4. Check coverage threshold
 echo "6️⃣ Coverage Threshold (≥80%)..."
-mvn jacoco:check -Djacoco.minimum=0.80 || exit 1
+./gradlew jacocoTestCoverageVerification || exit 1
 
 # 5. SonarQube analysis (optional)
 if [ -n "$SONAR_TOKEN" ]; then
   echo "7️⃣ SonarQube Scan..."
-  mvn sonar:sonar \
+  ./gradlew sonar \
     -Dsonar.projectKey=smart-admin \
     -Dsonar.host.url=$SONAR_HOST_URL \
     -Dsonar.login=$SONAR_TOKEN
@@ -76,10 +76,10 @@ chmod +x run-ci-checks.sh
 
 ```bash
 # Run core checks only
-mvn clean verify checkstyle:check
+./gradlew clean check checkstyleMain
 
 # View coverage report
-open target/site/jacoco/index.html
+open smartadmin-app/build/reports/jacoco/test/html/index.html
 ```
 
 ## II. Incremental vs Full Analysis
@@ -102,7 +102,7 @@ open target/site/jacoco/index.html
 
 **Solution**:
 ```bash
-mvn test -Dtest=ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 # Review test report and fix according to specifications
 ```
 
@@ -110,8 +110,8 @@ mvn test -Dtest=ArchitectureTest
 
 **View Report**:
 ```bash
-mvn jacoco:report
-open target/site/jacoco/index.html
+./gradlew jacocoTestReport
+open smartadmin-app/build/reports/jacoco/test/html/index.html
 ```
 
 **Strategies to Improve Coverage**:
@@ -156,17 +156,16 @@ class IntegrationTest {
 }
 ```
 
-### Q5: Maven Dependency Download Slow
+### Q5: Gradle Dependency Download Slow
 
-**Configure China Mirror** (`~/.m2/settings.xml`):
-```xml
-<mirrors>
-  <mirror>
-    <id>aliyun</id>
-    <mirrorOf>central</mirrorOf>
-    <url>https://maven.aliyun.com/repository/public</url>
-  </mirror>
-</mirrors>
+**Configure China Mirror** (`~/.gradle/init.gradle`):
+```groovy
+allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        mavenCentral()
+    }
+}
 ```
 
 ## IV. GitLab CI/CD Configuration
@@ -175,14 +174,15 @@ class IntegrationTest {
 
 ```yaml
 # .gitlab-ci.yml
-image: maven:3.9-eclipse-temurin-21
+image: eclipse-temurin:21-jdk
 
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 cache:
   paths:
-    - .m2/repository
+    - .gradle/caches
+    - .gradle/wrapper
 
 stages:
   - quality
@@ -194,7 +194,7 @@ quality-check:
   stage: quality
   script:
     - cd smart-admin-api-java21-springboot3
-    - mvn checkstyle:check pmd:check spotbugs:check
+    - ./gradlew checkstyleMain pmdMain spotbugsMain
 
 test:
   stage: test
@@ -206,18 +206,18 @@ test:
     POSTGRES_PASSWORD: test
   script:
     - cd smart-admin-api-java21-springboot3
-    - mvn clean verify
+    - ./gradlew clean check
   artifacts:
     reports:
-      junit: target/surefire-reports/TEST-*.xml
+      junit: smartadmin-app/build/test-results/test/TEST-*.xml
     paths:
-      - target/site/jacoco
+      - smartadmin-app/build/reports/jacoco
 
 sonarqube:
   stage: sonar
   script:
     - cd smart-admin-api-java21-springboot3
-    - mvn sonar:sonar -Dsonar.projectKey=smart-admin
+    - ./gradlew sonar -Dsonar.projectKey=smart-admin
   only:
     - main
     - develop
@@ -226,10 +226,10 @@ build:
   stage: build
   script:
     - cd smart-admin-api-java21-springboot3
-    - mvn clean package -DskipTests
+    - ./gradlew clean build -x test
   artifacts:
     paths:
-      - smart-admin-api-java21-springboot3/sa-admin/target/*.jar
+      - smart-admin-api-java21-springboot3/smartadmin-app/build/libs/*.jar
     expire_in: 30 days
   only:
     - main

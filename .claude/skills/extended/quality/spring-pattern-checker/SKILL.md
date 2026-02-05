@@ -314,7 +314,7 @@ Provide actionable next steps:
 ### 🚨 CRITICAL Violations
 
 #### 1. @Transactional in Service Layer
-**File**: `sa-admin/.../EmployeeService.java:87`
+**File**: `smartadmin-modules/smartadmin-business/.../EmployeeService.java:87`
 **Severity**: CRITICAL
 **Rule**: @Transactional ONLY in Manager layer
 
@@ -349,7 +349,7 @@ public class EmployeeManager {
 **Run ArchitectureTest:**
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **Documentation:**

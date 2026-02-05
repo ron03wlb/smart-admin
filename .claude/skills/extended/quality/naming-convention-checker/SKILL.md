@@ -272,8 +272,8 @@ if (tableName.endsWith("_metrics") ||
 
 | # | Entity Class | Current Table Name | Suggested Name | File Path | Line |
 |---|--------------|-------------------|----------------|-----------|------|
-| 1 | `GoodsEntity` | `t_goods` | `t_good` | `sa-admin/.../GoodsEntity.java` | 17 |
-| 2 | `PlayerEntity` | `t_players` | `t_player` | `sa-admin/.../PlayerEntity.java` | 23 |
+| 1 | `GoodsEntity` | `t_goods` | `t_good` | `smartadmin-modules/smartadmin-business/.../GoodsEntity.java` | 17 |
+| 2 | `PlayerEntity` | `t_players` | `t_player` | `smartadmin-modules/smartadmin-business/.../PlayerEntity.java` | 23 |
 
 ---
 
@@ -281,7 +281,7 @@ if (tableName.endsWith("_metrics") ||
 
 ### 1. GoodsEntity
 
-**File**: `smart-admin-api-java21-springboot3/sa-admin/src/main/java/net/lab1024/sa/admin/module/business/goods/domain/entity/GoodsEntity.java:17`
+**File**: `smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java/net/lab1024/sa/business/goods/domain/entity/GoodsEntity.java:17`
 
 **Current Code**:
 ```java
@@ -320,7 +320,7 @@ public class GoodsEntity {
 2. Create database migration scripts if needed
 3. Update Entity @TableName annotations
 4. Update Mapper XML files
-5. Run ArchUnit tests: `./gradlew :sa-admin:test --tests ArchitectureTest#tableNameMustBeSingular`
+5. Run ArchUnit tests: `./gradlew :smartadmin-app:test --tests ArchitectureTest#tableNameMustBeSingular`
 
 ---
 
@@ -364,7 +364,7 @@ jobs:
           claude-code skills run naming-convention-checker
       - name: Run ArchUnit Tests
         run: |
-          ./gradlew :sa-admin:test --tests ArchitectureTest#tableNameMustBeSingular
+          ./gradlew :smartadmin-app:test --tests ArchitectureTest#tableNameMustBeSingular
 ```
 
 ### 3. Pre-commit Hook Integration

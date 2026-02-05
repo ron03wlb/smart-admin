@@ -1,4 +1,5 @@
-package net.lab1024.sa.admin;
+// Template: Adjust package per module (net.lab1024.sa.system, net.lab1024.sa.business, net.lab1024.sa.oa, net.lab1024.sa.app)
+package net.lab1024.sa.app;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -32,8 +33,13 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
  * @version 2.0
  * @since 2025-01-13
  */
+// Template: Adjust scan package per module:
+//   smartadmin-system:   packages = "net.lab1024.sa.system"
+//   smartadmin-business: packages = "net.lab1024.sa.business"
+//   smartadmin-oa:       packages = "net.lab1024.sa.oa"
+//   smartadmin-app:      packages = "net.lab1024.sa"
 @AnalyzeClasses(
-    packages = "net.lab1024.sa.admin",
+    packages = "net.lab1024.sa",
     importOptions = ImportOption.DoNotIncludeTests.class
 )
 public class ArchitectureTest {
@@ -211,7 +217,14 @@ public class ArchitectureTest {
     @ArchTest
     static final ArchRule managerShouldNotAccessBusinessService = noClasses()
         .that().resideInAPackage("..manager..")
-        .should().dependOnClassesThat().resideInAPackage("net.lab1024.sa.admin..service..")
+        .should().dependOnClassesThat(new DescribedPredicate<JavaClass>("reside in business service packages") {
+            @Override
+            public boolean test(JavaClass javaClass) {
+                String pkg = javaClass.getPackageName();
+                return (pkg.contains(".system.") || pkg.contains(".business.") || pkg.contains(".oa."))
+                    && pkg.contains(".service.");
+            }
+        })
         .as("Manager 層禁止調用業務 Service 層（嚴格執行，規則：09-manager-layer.md）");
 
     // ========== Vavr 函数式编程约束（强制执行）==========
@@ -376,9 +389,13 @@ public class ArchitectureTest {
 
     // ========== 循环依赖检测 ==========
 
+    // Template: Adjust slice pattern per module:
+    //   smartadmin-system:   "net.lab1024.sa.system.(*).."
+    //   smartadmin-business: "net.lab1024.sa.business.(*).."
+    //   smartadmin-oa:       "net.lab1024.sa.oa.(*).."
     @ArchTest
     static final ArchRule noCycles = slices()
-        .matching("net.lab1024.sa.admin.module.(*)..")
+        .matching("net.lab1024.sa.(*)..")
         .should().beFreeOfCycles()
         .as("模块间不应有循环依赖");
 

@@ -74,7 +74,7 @@ dependencies:
 
   required_files:
     - ".agent/rules/foundation/10-architecture-rules.md"
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module/ArchitectureTest.java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java"
 
   tools:
     - name: "gradle"
@@ -86,7 +86,7 @@ output:
     - "*.java"
 
   target_directories:
-    - "smart-admin-api-java21-springboot3/sa-admin/src/test/java/net/lab1024/sa/admin/module"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa"
 
   templates: {}
 
@@ -102,11 +102,11 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify test code compiles successfully"
-      command: "./gradlew :sa-admin:compileTestJava"
+      command: "./gradlew :smartadmin-app:compileTestJava"
 
     - check: "archunit"
       description: "Run ArchitectureTest to verify new rule catches violations"
-      command: "./gradlew :sa-admin:test --tests ArchitectureTest"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest"
 
 compatibility:
   deprecated: false

@@ -57,7 +57,7 @@ public class ProductEntity {
 ### Elasticsearch Document
 
 ```java
-package net.lab1024.sa.admin.module.business.product.domain.document;
+package net.lab1024.sa.business.product.domain.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -110,9 +110,9 @@ public class ProductDocument {
 ## Pattern 2: ES Repository
 
 ```java
-package net.lab1024.sa.admin.module.business.product.repository;
+package net.lab1024.sa.business.product.repository;
 
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
@@ -143,14 +143,14 @@ public interface ProductSearchRepository extends ElasticsearchRepository<Product
 ## Pattern 3: Search Service
 
 ```java
-package net.lab1024.sa.admin.module.business.product.service;
+package net.lab1024.sa.business.product.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.product.domain.document.ProductDocument;
+import net.lab1024.sa.business.product.domain.document.ProductDocument;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

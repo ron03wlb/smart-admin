@@ -44,7 +44,7 @@ Complete implementation guide for VIP tier system with automatic upgrades/downgr
 ### Entity: VipTierEntity
 
 ```java
-package net.lab1024.sa.admin.module.business.vip.domain.entity;
+package net.lab1024.sa.business.vip.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -93,7 +93,7 @@ public class VipTierEntity {
 ### Entity: VipTierConfigEntity
 
 ```java
-package net.lab1024.sa.admin.module.business.vip.domain.entity;
+package net.lab1024.sa.business.vip.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -140,7 +140,7 @@ public class VipTierConfigEntity {
 ### Entity: PlayerStatsEntity
 
 ```java
-package net.lab1024.sa.admin.module.business.vip.domain.entity;
+package net.lab1024.sa.business.vip.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -182,17 +182,17 @@ public class PlayerStatsEntity {
 ### Manager: VipTierEvaluationManager
 
 ```java
-package net.lab1024.sa.admin.module.business.vip.manager;
+package net.lab1024.sa.business.vip.manager;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.vip.dao.VipTierDao;
-import net.lab1024.sa.admin.module.business.vip.dao.VipTierConfigDao;
-import net.lab1024.sa.admin.module.business.vip.dao.PlayerStatsDao;
-import net.lab1024.sa.admin.module.business.vip.domain.entity.VipTierEntity;
-import net.lab1024.sa.admin.module.business.vip.domain.entity.VipTierConfigEntity;
-import net.lab1024.sa.admin.module.business.vip.domain.entity.PlayerStatsEntity;
-import net.lab1024.sa.admin.module.business.vip.domain.enums.VipTier;
-import net.lab1024.sa.foundation.domain.exception.BusinessException;
+import net.lab1024.sa.business.vip.dao.VipTierDao;
+import net.lab1024.sa.business.vip.dao.VipTierConfigDao;
+import net.lab1024.sa.business.vip.dao.PlayerStatsDao;
+import net.lab1024.sa.business.vip.domain.entity.VipTierEntity;
+import net.lab1024.sa.business.vip.domain.entity.VipTierConfigEntity;
+import net.lab1024.sa.business.vip.domain.entity.PlayerStatsEntity;
+import net.lab1024.sa.business.vip.domain.enums.VipTier;
+import net.lab1024.sa.common.core.domain.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;

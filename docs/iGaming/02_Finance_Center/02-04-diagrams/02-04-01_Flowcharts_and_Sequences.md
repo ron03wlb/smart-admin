@@ -14,7 +14,7 @@
 > **版本**: 2.0.0
 >
 > **參考文檔**:
-> - [00-03 術語標準化定義](../../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - **必讀**
+> - [00-03 術語標準化定義](../../00_Foundation/concepts/00-03_Terminology_Standards.md) - **必讀**
 > - [05-01 風控系統](IGaming需求框架/04_Risk_Control/04-01_Risk_Framework.md)
 > - [02-04 流水與對帳](IGaming需求框架/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 > - [04-01 活動系統](IGaming需求框架/03_Player_Journey/03-03_Activity_Bonus.md)
@@ -1210,7 +1210,7 @@ risk_rules_applied: [{"rule_id": "HEDGE_001", "action": "FILTER"}]
 
 ### 11.2 關鍵術語定義
 
-> **術語標準化**: 見 [術語標準化定義](../../00_Concept_&_Analysis/00-03_Terminology_Standards.md)
+> **術語標準化**: 見 [術語標準化定義](../../00_Foundation/concepts/00-03_Terminology_Standards.md)
 
 | 中文 | 英文 | 定義 | 單位 | 用途 |
 |------|------|------|------|------|
@@ -1252,7 +1252,7 @@ risk_rules_applied: [{"rule_id": "HEDGE_001", "action": "FILTER"}]
 - [04-01 活動系統](IGaming需求框架/03_Player_Journey/03-03_Activity_Bonus.md) - Layer 3 遊戲權重
 
 ### 相關系統
-- [02-06 統一錢包](IGaming需求框架/02_Finance_Center/02-06_Unified_Wallet_Model.md) - 流水鎖定機制
+- [02-06 統一錢包](IGaming需求框架/02_Finance_Center/02-06_Wallet_Architecture.md) - 流水鎖定機制
 - [03-01 遊戲整合](IGaming需求框架/03_Game_Center/03-01_Game_Integration_Standard.md) - 注單結算流程
 
 ---

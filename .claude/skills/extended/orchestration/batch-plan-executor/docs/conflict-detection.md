@@ -105,7 +105,7 @@ conflicts = [
 ```python
 # Extract affected modules from plan content
 modules = extract_affected_modules(plan)
-# Example: net.lab1024.sa.admin.module.business.product.*
+# Example: net.lab1024.sa.business.product.*
 #          smart-admin-web/src/views/product/*
 
 # Detect module conflicts

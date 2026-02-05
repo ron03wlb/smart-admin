@@ -56,24 +56,25 @@ Business Rules:
 
 Generate in order (bottom-up):
 
-**CRITICAL: Package Imports (v4.0.0+)**
+**CRITICAL: Package Imports (v4.1.0+)**
 
-Always use the correct package paths per SmartAdmin v4.0.0:
+Always use the correct package paths per SmartAdmin v4.1.0:
 
 ```java
-// Foundation domain objects
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.request.PageParam;
+// Domain objects
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.request.PageParam;
 
-// Utilities (documented exceptions to foundation.* naming)
-import net.lab1024.sa.util.SmartBeanUtil;              // NOT common.core.util!
-import net.lab1024.sa.base.mybatis.util.SmartPageUtil; // NOT common.core.util!
+// Utilities
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 ```
 
-**Never use deprecated packages:**
-- ❌ `net.lab1024.sa.common.core.util.*` (removed in v4.0.0)
-- ❌ `net.lab1024.sa.common.core.domain.*` (removed in v4.0.0)
+**Always use current packages:**
+- ✅ `net.lab1024.sa.common.core.util.SmartBeanUtil`
+- ✅ `net.lab1024.sa.common.core.domain.*`
+- ✅ `net.lab1024.sa.common.mybatis.util.SmartPageUtil`
 
 **QueryForm extends PageParam - Add @EqualsAndHashCode:**
 
@@ -108,7 +109,7 @@ public class ProductEntity {
 }
 ```
 
-**File:** `sa-admin/src/main/java/.../product/domain/entity/ProductEntity.java`
+**File:** `smartadmin-modules/smartadmin-business/src/main/java/.../product/domain/entity/ProductEntity.java`
 
 #### 2.2 Forms (Add/Update/Query)
 
@@ -837,6 +838,6 @@ Add Swagger annotations (already included in Controller above).
 Run ArchitectureTest to ensure layering rules are followed:
 
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 

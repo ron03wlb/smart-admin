@@ -199,8 +199,8 @@ Result: All APIs documented in ~30 minutes (10 controllers × 3 min each)
 After using any example, validate:
 
 ### Backend Validation
-- [ ] Run `./gradlew :sa-admin:test --tests ArchitectureTest` → Pass
-- [ ] Check imports use `net.lab1024.sa.foundation.*` (not deprecated packages)
+- [ ] Run `./gradlew :smartadmin-app:test --tests ArchitectureTest` → Pass
+- [ ] Check imports use `net.lab1024.sa.common.core.*` (not deprecated packages)
 - [ ] Verify Service uses `io.vavr.control.Option` (not `java.util.Optional`)
 - [ ] Confirm Manager has `@Transactional(rollbackFor = Throwable.class)`
 - [ ] Validate Controller has `@SaCheckPermission` on all endpoints
@@ -234,8 +234,7 @@ See [SKILL.md](../SKILL.md#troubleshooting) for detailed phase-specific troubles
 **Common Issues**:
 
 **"SmartBeanUtil not found"**
-- Use: `import net.lab1024.sa.util.SmartBeanUtil;`
-- NOT: `import net.lab1024.sa.common.core.util.SmartBeanUtil;` (deprecated)
+- Use: `import net.lab1024.sa.common.core.util.SmartBeanUtil;`
 
 **"ArchitectureTest fails: Service uses Optional"**
 - Change: `Optional<T>` → `io.vavr.control.Option<T>`

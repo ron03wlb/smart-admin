@@ -21,7 +21,7 @@
 ### Structured Logging
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -63,7 +63,7 @@ public class MonitoredJob {
 ### Job Execution Record
 
 ```java
-package net.lab1024.sa.admin.module.business.job.domain.entity;
+package net.lab1024.sa.business.job.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -110,12 +110,12 @@ public class JobExecutionLogEntity {
 ### Job Execution Logger Service
 
 ```java
-package net.lab1024.sa.admin.module.business.job.service;
+package net.lab1024.sa.business.job.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.job.dao.JobExecutionLogDao;
-import net.lab1024.sa.admin.module.business.job.domain.entity.JobExecutionLogEntity;
+import net.lab1024.sa.business.job.dao.JobExecutionLogDao;
+import net.lab1024.sa.business.job.domain.entity.JobExecutionLogEntity;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -227,7 +227,7 @@ public class LoggedJob {
 ### Micrometer Metrics
 
 ```java
-package net.lab1024.sa.admin.module.business.job;
+package net.lab1024.sa.business.job;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.model.ExecuteResult;
@@ -413,7 +413,7 @@ groups:
 ### Email Alert Service
 
 ```java
-package net.lab1024.sa.admin.module.business.job.alert;
+package net.lab1024.sa.business.job.alert;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -525,11 +525,11 @@ public class AlertedJob {
 ### Job Execution Statistics API
 
 ```java
-package net.lab1024.sa.admin.module.business.job.controller;
+package net.lab1024.sa.business.job.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.job.dao.JobExecutionLogDao;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.job.dao.JobExecutionLogDao;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

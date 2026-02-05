@@ -744,13 +744,13 @@ return result;
 #### 驗證方式
 ```bash
 # 架構合規驗證
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # 代碼質量檢查
-./gradlew :sa-admin:pmdMain :sa-admin:spotbugsMain
+./gradlew :smartadmin-app:pmdMain :smartadmin-app:spotbugsMain
 
 # 單元測試
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 ```
 
 ---

@@ -41,7 +41,7 @@ execution:
   quality_gates: { run_after_execution: false }
 
 dependencies: { skills: [], required_files: [], tools: [] }
-output: { generates: ["*.md", "*.java"], target_directories: ["docs/performance", "smart-admin-api-java21-springboot3/sa-admin/src/main/java"], templates: {} }
+output: { generates: ["*.md", "*.java"], target_directories: ["docs/performance", "smart-admin-api-java21-springboot3/smartadmin-app/src/main/java"], templates: {} }
 validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [] }
 compatibility:
   deprecated: false

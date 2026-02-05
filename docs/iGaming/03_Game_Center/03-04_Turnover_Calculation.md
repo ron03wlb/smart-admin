@@ -26,9 +26,9 @@
 - **監控告警**: 關鍵指標、SLA定義
 
 **參考文檔**:
-- [00-03 術語標準化](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - **必讀**
+- [00-03 術語標準化](../00_Foundation/concepts/00-03_Terminology_Standards.md) - **必讀**
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - Layer 1依賴
-- [04-01 活動系統](../03_Player_Journey/03-03_Activity_Bonus.md) - Layer 3依賴
+- [04-01 活動系統](../04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3依賴
 
 ---
 
@@ -138,7 +138,7 @@ graph TB
 | **有效投注額** | Valid Bet | 經風控過濾的單筆金額 | 單筆 | 流水要求、返水、VIP |
 | **流水要求** | Wagering Requirement | 必須達成的有效投注總額 | 累積 | 活動驗證、取款限制 |
 
-**詳細定義**: [術語標準化文檔](../00_Concept_&_Analysis/00-03_Terminology_Standards.md)
+**詳細定義**: [術語標準化文檔](../00_Foundation/concepts/00-03_Terminology_Standards.md)
 
 ---
 
@@ -2312,13 +2312,13 @@ alerts:
 ## 📚 相關文檔
 
 ### 前置依賴
-- [00-03 術語標準化](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - **必讀**
-- [01-02 錢包架構](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) - 統一錢包模型、可下注餘額公式、扣款優先級
+- [00-03 術語標準化](../00_Foundation/concepts/00-03_Terminology_Standards.md) - **必讀**
+- [01-02 錢包架構](../02_Finance_Center/02-06_Wallet_Architecture.md) - 統一錢包模型、可下注餘額公式、扣款優先級
 
 ### 核心依賴
 - [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - Layer 1 風控引擎
 <!-- TODO: 待創建文檔 - Week 4-5 -->
-<!-- - [04-01 活動系統](../03_Player_Journey/03-03_Activity_Bonus.md) - Layer 3 活動系統 -->
+<!-- - [04-01 活動系統](../04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3 活動系統 -->
 
 ### 延伸閱讀
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

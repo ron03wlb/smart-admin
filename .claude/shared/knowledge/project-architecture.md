@@ -57,51 +57,79 @@ This document provides essential context about the SmartAdmin project structure,
 
 ## Module Structure
 
-The project follows a modular monolith architecture with strict layering:
+The project follows a modular monolith architecture (v4.1.0) with 47 modules organized in 6 layers:
 
 ```
 smart-admin-api-java21-springboot3/
-├── sa-admin/           # Business modules and system functionality
-│   ├── controller/     # API endpoints
-│   ├── service/        # Business logic
-│   ├── manager/        # Transaction and cache layer
-│   ├── dao/            # Data access
-│   └── domain/         # Domain objects (entity, form, vo)
+├── smartadmin-common/       # Public Foundation (21 modules)
+│   ├── smartadmin-common-bom           # Bill of Materials
+│   ├── smartadmin-common-core          # Core utilities (SmartBeanUtil, ResponseDTO)
+│   ├── smartadmin-common-web           # Web framework base
+│   ├── smartadmin-common-mybatis       # ORM layer
+│   ├── smartadmin-common-redis         # Cache provider
+│   ├── smartadmin-common-token         # Sa-Token integration
+│   └── ... (15 more modules)
 │
-├── sa-base/            # Infrastructure and support modules
-│   ├── base-common/    # Common utilities, constants
-│   ├── base-support/   # Support features (config, codegen, etc.)
-│   └── base-security/  # Security configuration
+├── smartadmin-support/      # Business Support (17 modules)
+│   ├── smartadmin-support-config       # Config management
+│   ├── smartadmin-support-dict         # Dictionary data
+│   ├── smartadmin-support-job          # Job scheduling (Snail-Job)
+│   ├── smartadmin-support-liteflow     # LiteFlow rule engine
+│   └── ... (13 more modules)
 │
-├── sa-common/          # Shared cross-cutting concerns
-│   ├── api-encrypt/    # API encryption/decryption
-│   ├── cache/          # Caching abstractions
-│   ├── mq/             # Message queue integration
-│   └── redis-lock/     # Distributed locking
+├── smartadmin-modules/      # Business Domain (3 modules)
+│   ├── smartadmin-system               # System management (User, Role, Menu, Dept)
+│   ├── smartadmin-business             # Business features
+│   └── smartadmin-oa                   # Office automation
 │
-└── settings.gradle.kts # Gradle module configuration
+├── smartadmin-api/          # API Contract Layer (3 modules)
+│   ├── smartadmin-api-system           # System API contracts/DTOs
+│   ├── smartadmin-api-business         # Business API contracts/DTOs
+│   └── smartadmin-api-oa              # OA API contracts/DTOs
+│
+├── smartadmin-starter/      # Starter Combinations (2 modules)
+│   ├── smartadmin-starter-web          # Spring Boot web starter
+│   └── smartadmin-starter-all          # Complete starter with all features
+│
+├── smartadmin-app/          # Unified Application Entry (1 module)
+│   └── SmartAdminApplication           # Main class: net.lab1024.sa.SmartAdminApplication
+│
+└── settings.gradle.kts      # Gradle module configuration (47 modules)
 ```
 
 ### Module Responsibilities
 
-**sa-admin/**
-- Core business functionality
-- System management features
-- User-facing business modules
-- Extends sa-base infrastructure
+**smartadmin-common/** (21 modules)
+- Public foundation libraries shared across all modules
+- Core utilities: SmartBeanUtil, SmartPageUtil, ResponseDTO
+- Infrastructure integrations: Redis, MyBatis, Sa-Token, Swagger
+- Cross-cutting features: validation, caching, MQ, security
 
-**sa-base/**
-- Framework infrastructure
-- Common utilities and helpers
-- Support features (file upload, config management)
-- Authentication and authorization setup
-- No business logic - pure infrastructure
+**smartadmin-support/** (17 modules)
+- Business support services not tied to specific domains
+- Support features: file upload, config management, code generation
+- Job scheduling, heartbeat monitoring, LiteFlow rule engine
+- Audit logging, data tracing, serial number generation
 
-**sa-common/**
-- Cross-cutting concerns
-- Reusable services (caching, messaging, locking)
-- Shared across multiple projects
-- Technology-specific integrations
+**smartadmin-modules/** (3 modules)
+- Core business domain logic
+- Each module follows layered architecture: controller/service/manager/dao/domain
+- Packages: `net.lab1024.sa.{system|business|oa}.{feature}.*`
+
+**smartadmin-api/** (3 modules)
+- API contract layer with DTOs for cross-module communication
+- Adapter pattern for service interface contracts
+- Packages: `net.lab1024.sa.api.{system|business|oa}.*`
+
+**smartadmin-starter/** (2 modules)
+- Spring Boot auto-configuration starters
+- Bundles common and support modules for easy dependency management
+
+**smartadmin-app/** (1 module)
+- Unified application entry point
+- Depends on all business modules via starters
+- Main class: `net.lab1024.sa.SmartAdminApplication`
+- Contains integration tests and ArchitectureTest
 
 ## Build Commands
 
@@ -127,7 +155,7 @@ All build commands run from the project root: `smart-admin-api-java21-springboot
 
 ```bash
 # Run application
-./gradlew :sa-admin:bootRun
+./gradlew :smartadmin-app:bootRun
 
 # Application starts on: http://localhost:1024
 # Swagger UI available at: http://localhost:1024/swagger-ui.html
@@ -137,17 +165,21 @@ All build commands run from the project root: `smart-admin-api-java21-springboot
 
 ```bash
 # Run all tests
-./gradlew :sa-admin:test
+./gradlew :smartadmin-app:test
 
 # Run specific test class
-./gradlew :sa-admin:test --tests ArchitectureTest
-./gradlew :sa-admin:test --tests AdminApplicationTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
+
+# Run per-module architecture tests
+./gradlew :smartadmin-modules:smartadmin-system:test --tests ArchitectureTest
+./gradlew :smartadmin-modules:smartadmin-business:test --tests ArchitectureTest
+./gradlew :smartadmin-modules:smartadmin-oa:test --tests ArchitectureTest
 
 # Run architecture validation (CRITICAL before commits)
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
-**Important:** `ArchitectureTest` enforces all architectural rules using ArchUnit. This test MUST pass before committing code.
+**Important:** `ArchitectureTest` exists in each business module and in `smartadmin-app`. The `smartadmin-app` test transitively validates all modules. This test MUST pass before committing code.
 
 ## Frontend Commands
 
@@ -216,7 +248,7 @@ npm run build:app
 **Swagger UI:** `http://localhost:1024/swagger-ui.html`
 
 **Typical Development Workflow:**
-1. Start backend: `cd smart-admin-api-java21-springboot3 && ./gradlew :sa-admin:bootRun`
+1. Start backend: `cd smart-admin-api-java21-springboot3 && ./gradlew :smartadmin-app:bootRun`
 2. Start frontend: `cd smart-admin-web && npm run dev`
 3. Access frontend: `http://localhost:5173`
 4. Test APIs: `http://localhost:1024/swagger-ui.html`
@@ -278,7 +310,7 @@ The project uses ArchUnit to enforce architectural rules at build time:
 
 Run before committing:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 ### Code Quality Rules
@@ -311,12 +343,12 @@ Follow Conventional Commits format:
 <type>(<scope>): <subject>
 
 Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-Scopes: sa-admin, sa-base, sa-common, smart-admin-web, smart-app, docker, docs
+Scopes: smartadmin-system, smartadmin-business, smartadmin-oa, smartadmin-app, smartadmin-common, smartadmin-support, smart-admin-web, smart-app, docker, docs
 
 Examples:
-feat(sa-admin): add employee performance review module
-fix(sa-base): resolve NPE in file upload service
-refactor(sa-common): optimize cache key generation strategy
+feat(smartadmin-system): add employee performance review module
+fix(smartadmin-support): resolve NPE in file upload service
+refactor(smartadmin-common): optimize cache key generation strategy
 ```
 
 ## Database
@@ -351,7 +383,7 @@ src/main/resources/mapper/    # MyBatis XML mappers
 
 Before every commit:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 If test fails, fix architectural violations before committing.

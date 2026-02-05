@@ -291,7 +291,7 @@ package net.lab1024.sa.admin.module.business.players.domain.entities;
 ### 內部文檔
 
 - [.agent/rules/foundation/01-naming-conventions.md](.agent/rules/foundation/01-naming-conventions.md) - SmartAdmin 命名規範
-- [docs/IGaming/00_Concept_&_Analysis/00-03_Terminology_Standards.md](../00_Concept_&_Analysis/00-03_Terminology_Standards.md) - iGaming 術語標準
+- [docs/IGaming/../00_Foundation/concepts/00-03_Terminology_Standards.md](../00_Foundation/concepts/00-03_Terminology_Standards.md) - iGaming 術語標準
 - [docs/IGaming/07_Technical_Infrastructure/07-03-01_Design_Principles.md](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - API 設計標準
 
 ### 外部參考

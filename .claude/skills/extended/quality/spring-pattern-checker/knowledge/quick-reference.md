@@ -337,7 +337,7 @@ public class EmployeeService {
 }
 ```
 
-**Verification**: `./gradlew :sa-admin:test --tests ArchitectureTest#managerLayerRules`
+**Verification**: `./gradlew :smartadmin-app:test --tests ArchitectureTest#managerLayerRules`
 
 ---
 
@@ -367,13 +367,13 @@ public class UserService {
 **Batch Fix Script**:
 ```bash
 # Find files with field injection
-grep -r "@Autowired" --include="*.java" sa-admin/src/main/java/ \
+grep -r "@Autowired" --include="*.java" smartadmin-modules/src/main/java/ \
   | grep "private" \
   | cut -d: -f1 \
   | sort -u
 ```
 
-**Verification**: `./gradlew :sa-admin:test --tests ArchitectureTest#noFieldInjection`
+**Verification**: `./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection`
 
 ---
 
@@ -409,7 +409,7 @@ public class UserController {
 }
 ```
 
-**Verification**: `./gradlew :sa-admin:test --tests ArchitectureTest#layerDependencyRules`
+**Verification**: `./gradlew :smartadmin-app:test --tests ArchitectureTest#layerDependencyRules`
 
 ---
 
@@ -449,7 +449,7 @@ public class OrderManager {
 }
 ```
 
-**Verification**: `./gradlew :sa-admin:test --tests ArchitectureTest`
+**Verification**: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 
 ---
 
@@ -490,7 +490,7 @@ public class OrderManager {
 }
 ```
 
-**Verification**: `./gradlew :sa-admin:test --tests ArchitectureTest`
+**Verification**: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 
 ---
 
@@ -620,7 +620,7 @@ Before committing, verify all checks pass:
 ### 1. ArchUnit Tests
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 **Expected Results**:
@@ -641,7 +641,7 @@ cd smart-admin-api-java21-springboot3
 ### 3. Build & Test
 ```bash
 ./gradlew clean build
-./gradlew :sa-admin:bootRun
+./gradlew :smartadmin-app:bootRun
 ```
 
 ### 4. Manual Code Review Checklist

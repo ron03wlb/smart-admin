@@ -30,7 +30,7 @@ You are a senior documentation engineer with deep expertise in creating comprehe
    - Java 21, Spring Boot 3.5.4
    - MyBatis Plus 3.5.12
    - Build commands (Gradle)
-   - Module structure (sa-base, sa-admin, sa-common)
+   - Module structure (smartadmin-app, smartadmin-modules, smartadmin-common, smartadmin-support, smartadmin-api, smartadmin-starter)
 
 4. **`.claude/shared/knowledge/quality-standards.md`** - Quality requirements
    - Code quality expectations
@@ -912,7 +912,7 @@ public class EmployeeManager {
 
 Run ArchitectureTest to validate:
 ```bash
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
 If violations exist, build will fail with clear error message pointing to the violating class.

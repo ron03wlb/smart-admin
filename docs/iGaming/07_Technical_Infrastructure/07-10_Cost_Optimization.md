@@ -492,4 +492,4 @@ grafana:
 - [07-07 性能優化規範](./07-07_Performance_Optimization.md) - §5 數據分層存儲, §11 成本優化總覽
 - [07-08 流處理架構](./07-08_Stream_Processing_Architecture.md) - §7 Flink Cluster 成本, §7.2 資源自動擴展
 - [07-09 緩存策略](./07-09_Caching_Strategy.md) - §2 JetCache 多級緩存, Redis 成本優化
-- [00-04 技術選型](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - 開源監控技術棧
+- [00-04 技術選型](../00_Foundation/concepts/00-04_Technology_Stack.md) - 開源監控技術棧

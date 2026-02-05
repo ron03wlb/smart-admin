@@ -60,7 +60,7 @@ CREATE TABLE event_snapshots (
 ### Step 2: Event Store Entity
 
 ```java
-package net.lab1024.sa.admin.module.business.eventsourcing.domain.entity;
+package net.lab1024.sa.business.eventsourcing.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -101,10 +101,10 @@ public class EventStoreEntity {
 ### Step 3: Event Store Dao
 
 ```java
-package net.lab1024.sa.admin.module.business.eventsourcing.dao;
+package net.lab1024.sa.business.eventsourcing.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import net.lab1024.sa.admin.module.business.eventsourcing.domain.entity.EventStoreEntity;
+import net.lab1024.sa.business.eventsourcing.domain.entity.EventStoreEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -137,16 +137,16 @@ public interface EventStoreDao extends BaseMapper<EventStoreEntity> {
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatisPlus.org//DTD Mapper 3.0//EN"
         "http://mybatisPlus.org/dtd/mybatisPlus-mapper.dtd">
-<mapper namespace="net.lab1024.sa.admin.module.business.eventsourcing.dao.EventStoreDao">
+<mapper namespace="net.lab1024.sa.business.eventsourcing.dao.EventStoreDao">
 
-    <select id="selectByAggregate" resultType="net.lab1024.sa.admin.module.business.eventsourcing.domain.entity.EventStoreEntity">
+    <select id="selectByAggregate" resultType="net.lab1024.sa.business.eventsourcing.domain.entity.EventStoreEntity">
         SELECT * FROM event_store
         WHERE aggregate_type = #{aggregateType}
           AND aggregate_id = #{aggregateId}
         ORDER BY event_id ASC
     </select>
 
-    <select id="selectByAggregateAfterVersion" resultType="net.lab1024.sa.admin.module.business.eventsourcing.domain.entity.EventStoreEntity">
+    <select id="selectByAggregateAfterVersion" resultType="net.lab1024.sa.business.eventsourcing.domain.entity.EventStoreEntity">
         SELECT * FROM event_store
         WHERE aggregate_type = #{aggregateType}
           AND aggregate_id = #{aggregateId}
@@ -160,14 +160,14 @@ public interface EventStoreDao extends BaseMapper<EventStoreEntity> {
 ### Step 4: Event Store Service
 
 ```java
-package net.lab1024.sa.admin.module.business.eventsourcing.service;
+package net.lab1024.sa.business.eventsourcing.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.eventsourcing.dao.EventStoreDao;
-import net.lab1024.sa.admin.module.business.eventsourcing.domain.entity.EventStoreEntity;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderEvent;
+import net.lab1024.sa.business.eventsourcing.dao.EventStoreDao;
+import net.lab1024.sa.business.eventsourcing.domain.entity.EventStoreEntity;
+import net.lab1024.sa.business.order.domain.event.OrderEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -243,11 +243,11 @@ public class EventStoreService {
 ## Pattern 2: Aggregate Rebuilding from Events
 
 ```java
-package net.lab1024.sa.admin.module.business.order.aggregate;
+package net.lab1024.sa.business.order.aggregate;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.*;
+import net.lab1024.sa.business.order.domain.event.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -321,13 +321,13 @@ public class OrderAggregate {
 ### Projection Handler
 
 ```java
-package net.lab1024.sa.admin.module.business.order.projection;
+package net.lab1024.sa.business.order.projection;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.dao.OrderReadModelDao;
-import net.lab1024.sa.admin.module.business.order.domain.entity.OrderReadModelEntity;
-import net.lab1024.sa.admin.module.business.order.domain.event.*;
+import net.lab1024.sa.business.order.dao.OrderReadModelDao;
+import net.lab1024.sa.business.order.domain.entity.OrderReadModelEntity;
+import net.lab1024.sa.business.order.domain.event.*;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -396,14 +396,14 @@ public class OrderProjectionHandler {
 ## Pattern 4: Snapshots for Performance
 
 ```java
-package net.lab1024.sa.admin.module.business.eventsourcing.service;
+package net.lab1024.sa.business.eventsourcing.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.eventsourcing.dao.EventSnapshotDao;
-import net.lab1024.sa.admin.module.business.eventsourcing.domain.entity.EventSnapshotEntity;
-import net.lab1024.sa.admin.module.business.order.aggregate.OrderAggregate;
+import net.lab1024.sa.business.eventsourcing.dao.EventSnapshotDao;
+import net.lab1024.sa.business.eventsourcing.domain.entity.EventSnapshotEntity;
+import net.lab1024.sa.business.order.aggregate.OrderAggregate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -475,7 +475,7 @@ public class SnapshotService {
             try {
                 OrderEvent event = objectMapper.readValue(
                     eventEntity.getEventData(),
-                    Class.forName("net.lab1024.sa.admin.module.business.order.domain.event." + eventEntity.getEventType())
+                    Class.forName("net.lab1024.sa.business.order.domain.event." + eventEntity.getEventType())
                 );
                 aggregate.apply(event);
             } catch (Exception e) {
@@ -498,14 +498,14 @@ public class SnapshotService {
 ## Pattern 5: Temporal Queries
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.eventsourcing.dao.EventStoreDao;
-import net.lab1024.sa.admin.module.business.eventsourcing.domain.entity.EventStoreEntity;
-import net.lab1024.sa.admin.module.business.order.aggregate.OrderAggregate;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderEvent;
+import net.lab1024.sa.business.eventsourcing.dao.EventStoreDao;
+import net.lab1024.sa.business.eventsourcing.domain.entity.EventStoreEntity;
+import net.lab1024.sa.business.order.aggregate.OrderAggregate;
+import net.lab1024.sa.business.order.domain.event.OrderEvent;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

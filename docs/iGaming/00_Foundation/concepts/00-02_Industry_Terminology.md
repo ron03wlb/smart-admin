@@ -524,7 +524,7 @@ iGaming娛樂城典型值**15-25%**。
 當在文檔中引用其他章節時，使用主術語確保一致性：
 
 ```markdown
-✅ 正確：詳細邏輯參見 [05-01 §3.1 投注驗證 (Bet Validation)](../04_Risk_Control/04-01_Risk_Framework.md#31-bet-validation)
+✅ 正確：詳細邏輯參見 [05-01 §3.1 投注驗證 (Bet Validation)](../../04_Risk_Control/04-01_Risk_Framework.md#31-bet-validation)
 
 ❌ 錯誤：詳細邏輯參見 [05-01 §3.1 投注檢查](...)
 ```

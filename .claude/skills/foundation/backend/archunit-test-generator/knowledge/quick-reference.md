@@ -12,9 +12,9 @@
 
 | Command | Purpose | Example |
 |---------|---------|---------|
-| Compile Tests | Verify syntax without running | ./gradlew :sa-admin:compileTestJava |
-| Run All Tests | Execute ArchitectureTest suite | ./gradlew :sa-admin:test --tests ArchitectureTest |
-| Run Specific Test | Execute single test method | ./gradlew :sa-admin:test --tests ArchitectureTest#noFieldInjection |
+| Compile Tests | Verify syntax without running | ./gradlew :smartadmin-app:compileTestJava |
+| Run All Tests | Execute ArchitectureTest suite | ./gradlew :smartadmin-app:test --tests ArchitectureTest |
+| Run Specific Test | Execute single test method | ./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection |
 | Search Tests | Find existing test methods | grep -n "static final ArchRule" ArchitectureTest.java |
 | Check Rule Coverage | List archunit_test fields | grep -r "archunit_test:" .agent/rules/ |
 
@@ -149,7 +149,7 @@ private static final String LAYER_DAO = "Dao";
 ### Package Patterns
 
 // Business code (admin module)
-"net.lab1024.sa.admin.."
+"net.lab1024.sa.."
 
 // Foundation modules
 "net.lab1024.sa.foundation.."
@@ -183,7 +183,7 @@ Architecture Violation: Class <com.baomidou.mybatisplus.extension.service.IServi
 .resideInAnyPackage("..service..")
 
 // ✅ GOOD
-.resideInAnyPackage("net.lab1024.sa.admin..service..")
+.resideInAnyPackage("net.lab1024.sa..service..")
 
 ---
 
@@ -254,8 +254,8 @@ Before completing test generation:
 - [ ] Uses class constants where applicable
 - [ ] .because() clause references rule file
 - [ ] Javadoc explains rule and exemptions
-- [ ] Test compiles: ./gradlew :sa-admin:compileTestJava
-- [ ] Test runs: ./gradlew :sa-admin:test --tests ArchitectureTest
+- [ ] Test compiles: ./gradlew :smartadmin-app:compileTestJava
+- [ ] Test runs: ./gradlew :smartadmin-app:test --tests ArchitectureTest
 - [ ] Created violation example to verify test catches bad code
 - [ ] Updated rule file frontmatter with archunit_test field
 

@@ -32,16 +32,16 @@ Use Mode 1 when:
 ### Test Class Structure
 
 ```java
-package net.lab1024.sa.admin.module.{module}.service;
+package net.lab1024.sa.{module}.service;
 
-import net.lab1024.sa.admin.BaseIntegrationTest;
-import net.lab1024.sa.admin.module.{module}.domain.entity.{Entity}Entity;
-import net.lab1024.sa.admin.module.{module}.domain.form.{Entity}AddForm;
-import net.lab1024.sa.admin.module.{module}.domain.form.{Entity}UpdateForm;
-import net.lab1024.sa.admin.module.{module}.domain.form.{Entity}QueryForm;
-import net.lab1024.sa.admin.module.{module}.domain.vo.{Entity}VO;
-import net.lab1024.sa.foundation.domain.response.PageResult;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.BaseIntegrationTest;
+import net.lab1024.sa.{module}.domain.entity.{Entity}Entity;
+import net.lab1024.sa.{module}.domain.form.{Entity}AddForm;
+import net.lab1024.sa.{module}.domain.form.{Entity}UpdateForm;
+import net.lab1024.sa.{module}.domain.form.{Entity}QueryForm;
+import net.lab1024.sa.{module}.domain.vo.{Entity}VO;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -492,7 +492,7 @@ After generating integration tests, verify:
 - [ ] Tests cover: Add, Query, Update, Delete, Batch Delete, Validation
 - [ ] Soft delete verification includes `deletedFlag` check
 - [ ] Transaction rollback test included
-- [ ] Tests pass: `./gradlew :sa-admin:test --tests {Entity}ServiceIntegrationTest`
+- [ ] Tests pass: `./gradlew :smartadmin-app:test --tests {Entity}ServiceIntegrationTest`
 
 ---
 
@@ -582,7 +582,7 @@ private {Entity}Service {entity}Service;  // Ensure @Autowired is present
 
 - **[SKILL.md](../SKILL.md)** - Testing suite overview
 - **[mode-2-fixtures.md](mode-2-fixtures.md)** - Test fixture patterns
-- **[BaseIntegrationTest](../../../sa-admin/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java)** - Base test class
+- **[BaseIntegrationTest](../../../smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java)** - Base test class
 
 ---
 

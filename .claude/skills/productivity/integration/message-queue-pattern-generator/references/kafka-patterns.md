@@ -59,7 +59,7 @@ spring:
 ### Step 2: Event Schema
 
 ```java
-package net.lab1024.sa.admin.module.business.order.domain.event;
+package net.lab1024.sa.business.order.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -87,11 +87,11 @@ public class OrderCreatedEvent {
 ### Step 3: Producer Service
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -162,15 +162,15 @@ public class OrderEventProducer {
 ### Step 4: SmartAdmin Service Integration
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
-import net.lab1024.sa.admin.module.business.order.domain.entity.OrderEntity;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
-import net.lab1024.sa.admin.module.business.order.domain.form.OrderAddForm;
-import net.lab1024.sa.admin.module.business.order.domain.vo.OrderVO;
-import net.lab1024.sa.admin.module.business.order.manager.OrderManager;
-import net.lab1024.sa.foundation.domain.response.ResponseDTO;
+import net.lab1024.sa.business.order.domain.entity.OrderEntity;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.form.OrderAddForm;
+import net.lab1024.sa.business.order.domain.vo.OrderVO;
+import net.lab1024.sa.business.order.manager.OrderManager;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -222,19 +222,19 @@ spring:
       enable-auto-commit: false  # Manual commit for reliability
       auto-offset-reset: earliest  # Start from beginning if no offset
       properties:
-        spring.json.trusted.packages: "net.lab1024.sa.admin.module.business.order.domain.event"
+        spring.json.trusted.packages: "net.lab1024.sa.business.order.domain.event"
         isolation.level: read_committed  # Only read committed messages (transactional)
 ```
 
 ### Step 2: Consumer Service
 
 ```java
-package net.lab1024.sa.admin.module.business.notification.consumer;
+package net.lab1024.sa.business.notification.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.notification.manager.NotificationManager;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.notification.manager.NotificationManager;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -287,12 +287,12 @@ public class OrderEventConsumer {
 ## Pattern 3: Batch Consumer (High Throughput)
 
 ```java
-package net.lab1024.sa.admin.module.business.analytics.consumer;
+package net.lab1024.sa.business.analytics.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.analytics.manager.AnalyticsManager;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.analytics.manager.AnalyticsManager;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
@@ -380,14 +380,14 @@ spring:
 ### Transactional Service
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.entity.OrderEntity;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
-import net.lab1024.sa.admin.module.business.order.domain.event.PaymentRequestedEvent;
-import net.lab1024.sa.admin.module.business.order.manager.OrderManager;
+import net.lab1024.sa.business.order.domain.entity.OrderEntity;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.PaymentRequestedEvent;
+import net.lab1024.sa.business.order.manager.OrderManager;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -439,10 +439,10 @@ public class OrderTransactionalService {
 ## Pattern 5: Kafka Streams (Stateful Processing)
 
 ```java
-package net.lab1024.sa.admin.module.business.analytics.stream;
+package net.lab1024.sa.business.analytics.stream;
 
 import lombok.extern.slf4j.Slf4j;
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.*;
@@ -580,9 +580,9 @@ public class NotificationConsumer {
 ## Testing with Testcontainers
 
 ```java
-package net.lab1024.sa.admin.module.business.order.service;
+package net.lab1024.sa.business.order.service;
 
-import net.lab1024.sa.admin.module.business.order.domain.event.OrderCreatedEvent;
+import net.lab1024.sa.business.order.domain.event.OrderCreatedEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

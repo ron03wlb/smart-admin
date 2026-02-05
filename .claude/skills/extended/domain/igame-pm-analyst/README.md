@@ -313,10 +313,10 @@ sequenceDiagram
 
 ```bash
 # 架構規範檢查
-./gradlew :sa-admin:test --tests ArchitectureTest
+./gradlew :smartadmin-app:test --tests ArchitectureTest
 
 # 代碼質量檢查
-./gradlew :sa-admin:pmdMain :sa-admin:spotbugsMain
+./gradlew :smartadmin-app:pmdMain :smartadmin-app:spotbugsMain
 ```
 
 ---

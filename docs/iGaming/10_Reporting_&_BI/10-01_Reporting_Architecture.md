@@ -466,8 +466,8 @@ report:{report_type}:{date}:{filters_hash}
 ## 📚 相關文檔
 
 ### 前置知識
-- [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - 數據分層架構、表結構設計
-- [00-04 技術選型標準](../00_Concept_&_Analysis/00-04_Technology_Stack.md) - ClickHouse、Kafka、Airflow 技術棧
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - 數據分層架構、表結構設計
+- [00-04 技術選型標準](../00_Foundation/concepts/00-04_Technology_Stack.md) - ClickHouse、Kafka、Airflow 技術棧
 
 ### 核心依賴
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - GGR/NGR 計算邏輯

@@ -44,7 +44,7 @@ resources/mapper/
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.lab1024.sa.admin.module.system.employee.dao.EmployeeDao">
+<mapper namespace="net.lab1024.sa.system.employee.dao.EmployeeDao">
 
     <!-- SQL statements here -->
 
@@ -56,7 +56,7 @@ resources/mapper/
 ### Simple SELECT
 
 ```xml
-<select id="getByLoginName" resultType="net.lab1024.sa.admin.module.system.employee.domain.entity.EmployeeEntity">
+<select id="getByLoginName" resultType="net.lab1024.sa.system.employee.domain.entity.EmployeeEntity">
     SELECT *
     FROM t_employee
     WHERE login_name = #{loginName}
@@ -67,7 +67,7 @@ resources/mapper/
 ### SELECT with Multiple Parameters
 
 ```xml
-<select id="queryEmployee" resultType="net.lab1024.sa.admin.module.system.employee.domain.vo.EmployeeVO">
+<select id="queryEmployee" resultType="net.lab1024.sa.system.employee.domain.vo.EmployeeVO">
     SELECT
         e.*,
         d.department_name
@@ -254,7 +254,7 @@ resources/mapper/
 ### Basic ResultMap
 
 ```xml
-<resultMap id="EmployeeResultMap" type="net.lab1024.sa.admin.module.system.employee.domain.vo.EmployeeVO">
+<resultMap id="EmployeeResultMap" type="net.lab1024.sa.system.employee.domain.vo.EmployeeVO">
     <id property="employeeId" column="employee_id"/>
     <result property="actualName" column="actual_name"/>
     <result property="departmentName" column="department_name"/>
@@ -554,7 +554,7 @@ if (!Arrays.asList("ASC", "DESC").contains(sortOrder)) {
 </select>
 
 <!-- ✅ Good - Type-safe VO -->
-<select id="getEmployee" resultType="net.lab1024.sa.admin.module.system.employee.domain.vo.EmployeeVO">
+<select id="getEmployee" resultType="net.lab1024.sa.system.employee.domain.vo.EmployeeVO">
     SELECT * FROM t_employee
 </select>
 ```

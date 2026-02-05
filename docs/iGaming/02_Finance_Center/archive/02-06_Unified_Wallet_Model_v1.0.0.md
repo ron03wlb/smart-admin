@@ -580,7 +580,7 @@ foundation:
 ## 📚 相關文檔
 
 ### 前置知識（必讀）
-- [00-03 數據模型總覽](../00_Concept_&_Analysis/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計
 
 ### 核心依賴
 - [02-07 交易處理流程](./02-07_Transaction_Processing_Flow.md) - 錢包餘額更新的事務處理機制、TCC模式、冪等性設計

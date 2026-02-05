@@ -26,8 +26,8 @@ User: "Create integration tests for EmployeeService"
 
 生成的檔案結構：
 ```
-smart-admin-api-java21-springboot3/sa-admin/src/test/java/
-└── net/lab1024/sa/admin/module/business/employee/
+smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/
+└── net/lab1024/sa/business/employee/
     ├── EmployeeServiceIntegrationTest.java    # 整合測試類
     ├── fixture/
     │   └── EmployeeTestFixture.java           # 測試夾具（Test Data Builder）
@@ -544,12 +544,12 @@ INSERT INTO t_employee (id, name, department_id, phone) VALUES (1, '張三', 1, 
 **方式 1: Gradle（單個測試類）**：
 ```bash
 cd smart-admin-api-java21-springboot3
-./gradlew :sa-admin:test --tests EmployeeServiceIntegrationTest
+./gradlew :smartadmin-app:test --tests EmployeeServiceIntegrationTest
 ```
 
 **方式 2: Gradle（所有整合測試）**：
 ```bash
-./gradlew :sa-admin:test --tests '*IntegrationTest'
+./gradlew :smartadmin-app:test --tests '*IntegrationTest'
 ```
 
 **方式 3: IDE（IntelliJ IDEA）**：
