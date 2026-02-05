@@ -11,13 +11,13 @@
 >
 > **創建日期**: 2026-01-27
 > **最後更新**: 2026-01-28
-> **版本**: 2.0.0
+> **版本**: 4.0.0
 >
 > **參考文檔**:
 > - [00-03 術語標準化定義](../../00_Foundation/concepts/00-03_Terminology_Standards.md) - **必讀**
-> - [05-01 風控系統](IGaming需求框架/04_Risk_Control/04-01_Risk_Framework.md)
-> - [02-04 流水與對帳](IGaming需求框架/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
-> - [04-01 活動系統](IGaming需求框架/03_Player_Journey/03-03_Activity_Bonus.md)
+> - [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md)
+> - [02-04 流水與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
+> - [04-01 活動系統](../../04_Activity_Center/04-04_Activity_Bonus.md)
 
 ---
 
@@ -1247,16 +1247,16 @@ risk_rules_applied: [{"rule_id": "HEDGE_001", "action": "FILTER"}]
 ## 📚 相關文檔
 
 ### 核心參考
-- [05-01 風控系統](IGaming需求框架/04_Risk_Control/04-01_Risk_Framework.md) - Layer 1 基礎驗證
-- [02-04 流水與對帳](IGaming需求框架/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Layer 2 狀態因子
-- [04-01 活動系統](IGaming需求框架/03_Player_Journey/03-03_Activity_Bonus.md) - Layer 3 遊戲權重
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - Layer 1 基礎驗證
+- [02-04 流水與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Layer 2 狀態因子
+- [04-01 活動系統](../../04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3 遊戲權重
 
 ### 相關系統
-- [02-06 統一錢包](IGaming需求框架/02_Finance_Center/02-06_Wallet_Architecture.md) - 流水鎖定機制
-- [03-01 遊戲整合](IGaming需求框架/03_Game_Center/03-01_Game_Integration_Standard.md) - 注單結算流程
+- [02-06 統一錢包](../02_Finance_Center/02-06_Wallet_Architecture.md) - 流水鎖定機制
+- [03-01 遊戲整合](../03_Game_Center/03-01_Game_Integration_Standard.md) - 注單結算流程
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **創建日期**: 2026-01-27
 **維護團隊**: Product Team & Tech Architecture Team

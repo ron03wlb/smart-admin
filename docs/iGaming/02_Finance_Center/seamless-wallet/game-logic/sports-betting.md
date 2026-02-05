@@ -9,7 +9,7 @@
 >
 > **參考文檔**:
 > - [術語標準化定義](../../../00_Foundation/concepts/00-03_Terminology_Standards.md)
-> - [三層驗證架構流程圖](../02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
+> - [三層驗證架構流程圖](../../02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
 
 ## 問題來源
 文檔第 3.2.1 節稱：「贏半/輸半時，Valid Bet = 50元（即實際輸贏的金額絕對值）」
@@ -354,8 +354,8 @@ sports:
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

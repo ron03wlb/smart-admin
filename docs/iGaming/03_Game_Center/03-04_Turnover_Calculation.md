@@ -12,7 +12,7 @@
 >
 > **創建日期**: 2026-01-27
 > **最後更新**: 2026-02-02
-> **版本**: 2.1.0
+> **版本**: 4.0.0
 
 ---
 
@@ -27,7 +27,7 @@
 
 **參考文檔**:
 - [00-03 術語標準化](../00_Foundation/concepts/00-03_Terminology_Standards.md) - **必讀**
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - Layer 1依賴
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - Layer 1依賴
 - [04-01 活動系統](../04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3依賴
 
 ---
@@ -2316,7 +2316,7 @@ alerts:
 - [01-02 錢包架構](../02_Finance_Center/02-06_Wallet_Architecture.md) - 統一錢包模型、可下注餘額公式、扣款優先級
 
 ### 核心依賴
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - Layer 1 風控引擎
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - Layer 1 風控引擎
 <!-- TODO: 待創建文檔 - Week 4-5 -->
 <!-- - [04-01 活動系統](../04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3 活動系統 -->
 
@@ -2326,7 +2326,7 @@ alerts:
 
 ---
 
-**文檔版本**: 2.1.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-02
 **維護團隊**: Finance Team & Backend Team & Risk Team
 **重大變更**: v2.1.0 Layer 1 支援配置驅動風控（BLOCK/FLAG/PASS），與 05-01 風控系統 v2.1.0 集成

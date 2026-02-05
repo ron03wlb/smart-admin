@@ -19,7 +19,7 @@
 
 **參考文檔**:
 - [術語標準化定義](../../../00_Foundation/concepts/00-03_Terminology_Standards.md) - 統一術語使用
-- [流水驗證時機](11_wagering_requirement_timing_and_traceability.md) - 取款時驗證機制
+- [流水驗證時機](../../../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) - 取款時驗證機制
 
 ---
 
@@ -326,7 +326,7 @@ alerts:
 
 ## 文檔版本信息
 
-**文檔版本**: 2.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **變更記錄**:
 - v2.0.0 (2026-01-28): 根據[術語標準化文檔](../../../00_Foundation/concepts/00-03_Terminology_Standards.md)進行全面修正 - 強化Lua腳本原子性解決方案推薦標記、添加業界最佳實踐參考(Pragmatic Play、Evolution Gaming、Betfair)、完善監控指標與測試案例
@@ -336,16 +336,16 @@ alerts:
 
 **參考文檔**:
 - [術語標準化定義](../../../00_Foundation/concepts/00-03_Terminology_Standards.md) - 統一術語使用
-- [流水驗證時機](11_wagering_requirement_timing_and_traceability.md) - 取款時驗證與回推機制
-- [核心架構流程圖](../02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - 三層驗證架構
+- [流水驗證時機](../../../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) - 取款時驗證與回推機制
+- [核心架構流程圖](../../02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - 三層驗證架構
 
 ---
 
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

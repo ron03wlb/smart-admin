@@ -1079,13 +1079,13 @@ Authorization: Bearer <player_jwt_token>
 - [02-03 對賬系統](./02-03_Reconciliation_System.md) - PSP 對賬流程
 
 ### 技術架構參考
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 支付數據加密
-- [12-05 API 設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - API 規範
-- [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 配置變更審計
-- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 配置變更審批
+- [09-03 數據安全標準](../12_System_Security/12-03_Data_Security_Standard.md) - 支付數據加密
+- [12-05 API 設計標準](../09_Technical_Infrastructure/09-03-01_Design_Principles.md) - API 規範
+- [09-02 審計日誌系統](../06_Platform_Governance/06-03_Audit_Log.md) - 配置變更審計
+- [09-04 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - 配置變更審批
 
 ---
 
-**文檔版本**: 1.1.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-27
 **維護團隊**: Finance Team & Backend Team

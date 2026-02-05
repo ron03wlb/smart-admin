@@ -1,6 +1,6 @@
 # 00-00-02 遊戲營運實作指南 (Game Integration Implementation Guide)
 
-**版本**: 1.0.0
+**版本**: 4.0.0
 **創建日期**: 2026-02-04
 **來源**: 從 00-00_IMPLEMENTATION_GUIDE.md 拆分（§5-7）
 **狀態**: 🔄 部分完成（§5 ✅ 完整，§6-7 📝 PLANNED）
@@ -45,10 +45,10 @@
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [00-00 BUSINESS_FLOWS](./00-00_BUSINESS_FLOWS.md) | §2 遊戲對接流程 | 10 分鐘 | 完整業務流程 |
-| 2 | [02-02 Seamless_Wallet_API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) | §4 Token 驗證 | 10 分鐘 | 安全機制 |
-| 3 | [02-02 Seamless_Wallet_API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) | §4.3 冪等性設計 | 8 分鐘 | 請求去重 |
-| 4 | [02-04 Game_Provider_Cases](../02_Game_Operations/02-04_Game_Provider_Cases.md) | 全文 | 15 分鐘 | 廠商案例 |
+| 1 | [00-00 BUSINESS_FLOWS](../00-00_BUSINESS_FLOWS.md) | §2 遊戲對接流程 | 10 分鐘 | 完整業務流程 |
+| 2 | [02-02 Seamless_Wallet_API](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | §4 Token 驗證 | 10 分鐘 | 安全機制 |
+| 3 | [02-02 Seamless_Wallet_API](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | §4.3 冪等性設計 | 8 分鐘 | 請求去重 |
+| 4 | [02-04 Game_Provider_Cases](../../03_Game_Center/03-01_Game_Integration_Standard.md) | 全文 | 15 分鐘 | 廠商案例 |
 
 ### 🎯 實作目標
 
@@ -553,8 +553,8 @@ public class GameTransactionRecoveryService {
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [02-02 Seamless Wallet API](../../02_Game_Operations/02-02_Seamless_Wallet_API.md) | §1 API 設計 | 15 分鐘 | Token 驗證、冪等性 |
-| 2 | [02-02 Seamless Wallet API](../../02_Game_Operations/02-02_Seamless_Wallet_API.md) | §3 並發控制 | 10 分鐘 | Redis 分佈式鎖 |
+| 1 | [02-02 Seamless Wallet API](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | §1 API 設計 | 15 分鐘 | Token 驗證、冪等性 |
+| 2 | [02-02 Seamless Wallet API](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | §3 並發控制 | 10 分鐘 | Redis 分佈式鎖 |
 | 3 | [01-02 Wallet Architecture](../../02_Finance_Center/02-06_Wallet_Architecture.md) | §4 錯誤恢復 | 12 分鐘 | Saga 模式 |
 
 ### 實作步驟
@@ -606,7 +606,7 @@ public class GameTransactionRecoveryService {
 
 ---
 
-**文檔版本**: 1.0.0  
+**文檔版本**: 4.0.0  
 **最後更新**: 2026-02-04  
 **維護團隊**: Game Integration Team & Backend Team
 

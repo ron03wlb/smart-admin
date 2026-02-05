@@ -503,13 +503,13 @@ flowchart TD
 - [02-06 統一錢包模型](./02-06_Wallet_Architecture.md) - 餘額調整邏輯
 
 ### 技術架構參考
-- [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 調帳操作審計
-- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 調帳審批工作流
-- [09-01 管理後台RBAC](../05_Platform_Governance/05-02_RBAC_Permissions.md) - 對帳系統權限控制
-- [12-05 API 設計標準](../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - PSP API 規範
+- [09-02 審計日誌系統](../06_Platform_Governance/06-03_Audit_Log.md) - 調帳操作審計
+- [09-04 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - 調帳審批工作流
+- [09-01 管理後台RBAC](../06_Platform_Governance/06-02_RBAC_Permissions.md) - 對帳系統權限控制
+- [12-05 API 設計標準](../09_Technical_Infrastructure/09-03-01_Design_Principles.md) - PSP API 規範
 
 ---
 
-**文檔版本**: 1.1.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-27
 **維護團隊**: Finance Team & Backend Team

@@ -47,7 +47,7 @@
 
 **單一數據源 (SSOT)**：
 - 玩家帳戶狀態狀態機在本文檔定義，其他模組僅引用
-- 風險評分維度定義在 [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)
+- 風險評分維度定義在 [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md)
 - 錢包創建邏輯定義在 [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md)
 
 **事件驅動架構**：
@@ -145,7 +145,7 @@ END
 - `REGULAR` - 普通玩家 (月存款 $1K-$10K)
 - `CASUAL` - 休閒玩家 (月存款 < $1K)
 
-**風控標籤 (Risk Tags)** (詳見 [05-01 §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-風險標籤)):
+**風控標籤 (Risk Tags)** (詳見 [05-01 §4.2](../05_Risk_Control/05-01_Risk_Framework.md#42-風險標籤)):
 - `BONUS_HUNTER` - 獎金獵人 (僅玩高 RTP 遊戲,完成流水後立即提款)
 - `ARBITRAGE` - 套利者 (在多平台對沖投注)
 - `HEDGER` - 對沖者 (同一平台多賬戶對沖)
@@ -167,7 +167,7 @@ END
 
 ## 3. 帳戶狀態狀態機 (Account Status State Machine)
 
-> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義在本章節。數據模型設計詳見 [00-03 §3.1](../00_Foundation/concepts/00-03_Data_Model_Overview.md#31-player-account-state-machine)。
+> 💡 **SSOT Marker**: 玩家帳戶狀態的完整定義在本章節。數據模型設計詳見 [00-03 §3.1](../00_Foundation/concepts/00-05_Data_Model.md#31-player-account-state-machine)。
 
 ### 3.1 五狀態定義表
 
@@ -308,7 +308,7 @@ WHERE player_id = ?
 
 #### 3.3.2 ACTIVE → SUSPENDED (風險評分觸發)
 
-**觸發條件** (詳見 [05-01 §4.6](../04_Risk_Control/04-01_Risk_Framework.md#46-風險評分規則)):
+**觸發條件** (詳見 [05-01 §4.6](../05_Risk_Control/05-01_Risk_Framework.md#46-風險評分規則)):
 ```java
 IF risk_score >= 70 AND risk_level IN ('HIGH', 'CRITICAL')
 THEN TRANSITION TO SUSPENDED
@@ -728,7 +728,7 @@ flowchart TD
 
 ## 5. 設備指紋與風險評估 (Device Fingerprinting & Risk Assessment)
 
-> 💡 **SSOT Marker**: 設備指紋採集方案在本章節定義。風險評分邏輯詳見 [05-01 §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-多維欺詐檢測決策樹)。
+> 💡 **SSOT Marker**: 設備指紋採集方案在本章節定義。風險評分邏輯詳見 [05-01 §4.2](../05_Risk_Control/05-01_Risk_Framework.md#42-多維欺詐檢測決策樹)。
 
 ### 5.1 設備指紋技術
 
@@ -837,7 +837,7 @@ ORDER BY relationship_depth ASC
 LIMIT 50
 ```
 
-**風險評分規則** (詳見 [05-01 §4.2](../04_Risk_Control/04-01_Risk_Framework.md#42-多維欺詐檢測決策樹)):
+**風險評分規則** (詳見 [05-01 §4.2](../05_Risk_Control/05-01_Risk_Framework.md#42-多維欺詐檢測決策樹)):
 
 | 檢測項目 | 低風險 (0-30) | 中風險 (31-60) | 高風險 (61-85) | 嚴重 (86-100) |
 |---------|--------------|---------------|--------------|--------------|
@@ -1833,37 +1833,37 @@ class PlayerLifecycleArchitectureTest {
 
 **核心概念**:
 - [00-02 行業術語表](../00_Foundation/concepts/00-02_Industry_Terminology.md) - KYC, AML, RFM 等術語定義
-- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - Player State Machine 數據模型
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-05_Data_Model.md) - Player State Machine 數據模型
 
 ### 8.2 核心依賴
 
 **業務整合**:
 - [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - 註冊時錢包創建
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風險評分、多帳號檢測、設備指紋
-- [01-02 VIP 系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級初始化、積分系統
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 風險評分、多帳號檢測、設備指紋
+- [01-02 VIP 系統](./01-06_VIP_Loyalty.md) - VIP 等級初始化、積分系統
 - [01-05 提款風控](./01-05_Withdrawal_Risk.md) - KYC 等級與提款限額
 
 **技術實現**:
-- [09-01 管理後台 RBAC](../05_Platform_Governance/05-02_RBAC_Permissions.md) - 玩家權限初始化、角色分配
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 個人資料加密、Blind Index
-- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - KYC 人工審核流程
-- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - 登入 API 安全、暴力破解防護
+- [09-01 管理後台 RBAC](../06_Platform_Governance/06-02_RBAC_Permissions.md) - 玩家權限初始化、角色分配
+- [09-03 數據安全標準](../12_System_Security/12-03_Data_Security_Standard.md) - 個人資料加密、Blind Index
+- [09-04 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - KYC 人工審核流程
+- [12-03 網關架構](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - 登入 API 安全、暴力破解防護
 
 ### 8.3 延伸閱讀
 
 **運營優化**:
 - [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 基於生命週期的精準營銷
-- [10-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - 玩家生命週期分析報表
-- [11-01 客服平台設計](../06_Analytics_Operations/06-02_Customer_Service.md) - 玩家 360 視圖整合
+- [10-01 報表與 BI 架構](../08_Analytics_BI/08-01_Reporting_BI.md) - 玩家生命週期分析報表
+- [11-01 客服平台設計](../13_Customer_Service/13-01_CS_Platform_Design.md) - 玩家 360 視圖整合
 
 **平台配置**:
-- [07-01 多租戶架構](../05_Platform_Governance/05-01_Multi_Tenant.md) - 租戶級配置
-- [07-02 租戶配置管理](../07_Platform_Management/07-02_Tenant_Configuration.md) - 註冊開關、IP 限制配置
-- [08-05 本地化系統](../08_Frontend_CMS/08-05_Localization_System.md) - 多語言註冊頁面
+- [07-01 多租戶架構](../06_Platform_Governance/06-01_Multi_Tenant.md) - 租戶級配置
+- [07-02 租戶配置管理](../10_Platform_Management/10-02_Tenant_Configuration.md) - 註冊開關、IP 限制配置
+- [08-05 本地化系統](../11_Frontend_CMS/11-07_i18n_Localization.md) - 多語言註冊頁面
 
 ---
 
-**文檔版本**: 1.0.0 (Week 4-5 Creation)
+**文檔版本**: 4.0.0 (Week 4-5 Creation)
 **創建日期**: 2026-02-03
 **最後更新**: 2026-02-03
 **維護團隊**: Player Center Team & Backend Team

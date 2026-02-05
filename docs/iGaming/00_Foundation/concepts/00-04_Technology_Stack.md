@@ -1,6 +1,6 @@
 # 技術選型標準 (Technology Stack)
 
-> **版本**: 1.0.0
+> **版本**: 4.0.0
 > **最後更新**: 2026-01-27
 > **目的**: 定義 IGaming 平台的統一技術棧與架構標準
 
@@ -289,7 +289,7 @@ ORM: SQLAlchemy 2.0
 }
 ```
 
-**詳細規範**：參見 [12-05 API設計標準](../../07_Technical_Infrastructure/07-03-01_Design_Principles.md)
+**詳細規範**：參見 [12-05 API設計標準](../../09_Technical_Infrastructure/09-03-01_Design_Principles.md)
 
 ---
 
@@ -712,8 +712,8 @@ public class WalletManager {
 | 並發 TPS | 87 | ≥450 | +418% ⭐ |
 
 **相關文檔**：
-- [07-09 緩存策略](../../07_Technical_Infrastructure/07-09_Caching_Strategy.md) - JetCache + Redisson 完整實現
-- [07-07 性能優化](../../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §10 多級緩存架構
+- [07-09 緩存策略](../../09_Technical_Infrastructure/09-09_Caching_Strategy.md) - JetCache + Redisson 完整實現
+- [07-07 性能優化](../../09_Technical_Infrastructure/09-07_Performance_Optimization.md) - §10 多級緩存架構
 
 **版本要求**：
 - JetCache: ≥ 2.7.0
@@ -882,8 +882,8 @@ ROI 分析:
 ```
 
 **相關文檔**：
-- [07-08 流處理架構](../../07_Technical_Infrastructure/07-08_Stream_Processing_Architecture.md) - Flink CDC, SQL, CEP 完整實現
-- [07-07 性能優化](../../07_Technical_Infrastructure/07-07_Performance_Optimization.md) - §9 Flink 集成
+- [07-08 流處理架構](../../09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md) - Flink CDC, SQL, CEP 完整實現
+- [07-07 性能優化](../../09_Technical_Infrastructure/09-07_Performance_Optimization.md) - §9 Flink 集成
 
 **版本要求**：
 - Flink: ≥ 1.18.0
@@ -1048,7 +1048,7 @@ IaC工具: Terraform 1.7
 盲索引: HMAC-SHA256
 ```
 
-**詳細規範**：參見 [09-03 數據安全標準](../../09_System_Security/09-03_Data_Security_Standard.md)
+**詳細規範**：參見 [09-03 數據安全標準](../../12_System_Security/12-03_Data_Security_Standard.md)
 
 ---
 
@@ -1155,17 +1155,17 @@ DAST: OWASP ZAP 2.14
 ## 📚 相關文檔
 
 ### 技術參考
-- [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
-- [12-05 API設計標準](../../07_Technical_Infrastructure/07-03-01_Design_Principles.md) - API規範
-- [12-03 網關架構](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - 網關設計
-- [12-01 部署架構](../../07_Technical_Infrastructure/07-01_Deployment.md) - CI/CD
+- [00-00 文檔導航地圖](./concepts/00-00_Document_Map.md) - 全局導航
+- [12-05 API設計標準](../../09_Technical_Infrastructure/09-03-01_Design_Principles.md) - API規範
+- [12-03 網關架構](../../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - 網關設計
+- [12-01 部署架構](../../09_Technical_Infrastructure/09-01_Deployment.md) - CI/CD
 
 ### 安全參考
-- [09-03 數據安全標準](../../09_System_Security/09-03_Data_Security_Standard.md) - 加密規範
-- [09-01 管理後台RBAC](../../05_Platform_Governance/05-02_RBAC_Permissions.md) - 權限設計
+- [09-03 數據安全標準](../../12_System_Security/12-03_Data_Security_Standard.md) - 加密規範
+- [09-01 管理後台RBAC](../../06_Platform_Governance/06-02_RBAC_Permissions.md) - 權限設計
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **維護團隊**: Architecture Team & Platform Team
 **下次審閱**: 2026-04-27（每季度審閱）

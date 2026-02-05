@@ -1,6 +1,6 @@
 # 00-00-05 平台治理實作指南 (Platform Governance Implementation Guide)
 
-**版本**: 1.0.0
+**版本**: 4.0.0
 **創建日期**: 2026-02-04
 **來源**: 從 00-00_IMPLEMENTATION_GUIDE.md 拆分（§14-17）
 **狀態**: 📝 PLANNED - 內容開發中
@@ -31,7 +31,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 07_Platform_Management, 所有業務模塊
+> **涉及模塊**: 10_Platform_Management, 所有業務模塊
 
 ### 實作目標
 [待補充：包含租戶隔離、數據分片、租戶配置管理等]
@@ -40,8 +40,8 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [07-01 Hierarchy Architecture](../../05_Platform_Governance/05-01_Multi_Tenant.md) | §2 租戶模型 | Schema 隔離 |
-| 2 | [07-01 Hierarchy Architecture](../../05_Platform_Governance/05-01_Multi_Tenant.md) | §3 數據隔離 | 分片策略 |
+| 1 | [07-01 Hierarchy Architecture](../../06_Platform_Governance/06-01_Multi_Tenant.md) | §2 租戶模型 | Schema 隔離 |
+| 2 | [07-01 Hierarchy Architecture](../../06_Platform_Governance/06-01_Multi_Tenant.md) | §3 數據隔離 | 分片策略 |
 | 3 | [02-05 Billing](../../02_Finance_Center/02-05_Billing_&_Invoicing.md) | §2 租戶計費 | 商戶管理 |
 
 ### 驗證清單
@@ -61,7 +61,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 09_System_Security, 07_Platform_Management
+> **涉及模塊**: 12_System_Security, 10_Platform_Management
 
 ### 實作目標
 [待補充：包含角色定義、權限矩陣、動態授權等]
@@ -70,9 +70,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [09-01 Admin RBAC](../../05_Platform_Governance/05-02_RBAC_Permissions.md) | §2 權限模型 | RBAC 設計 |
-| 2 | [09-01 Admin RBAC](../../05_Platform_Governance/05-02_RBAC_Permissions.md) | §3 角色管理 | 角色繼承 |
-| 3 | [09-01 Admin RBAC](../../05_Platform_Governance/05-02_RBAC_Permissions.md) | §4 權限驗證 | Sa-Token 整合 |
+| 1 | [09-01 Admin RBAC](../../06_Platform_Governance/06-02_RBAC_Permissions.md) | §2 權限模型 | RBAC 設計 |
+| 2 | [09-01 Admin RBAC](../../06_Platform_Governance/06-02_RBAC_Permissions.md) | §3 角色管理 | 角色繼承 |
+| 3 | [09-01 Admin RBAC](../../06_Platform_Governance/06-02_RBAC_Permissions.md) | §4 權限驗證 | Sa-Token 整合 |
 
 ### 驗證清單
 - [ ] 角色權限正確配置
@@ -91,7 +91,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 09_System_Security, 所有業務模塊
+> **涉及模塊**: 12_System_Security, 所有業務模塊
 
 ### 實作目標
 [待補充：包含操作日誌、變更追蹤、合規報表等]
@@ -100,9 +100,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [09-02 Audit Log System](../../05_Platform_Governance/05-03_Audit_Log.md) | §2 日誌模型 | 事件定義 |
-| 2 | [09-02 Audit Log System](../../05_Platform_Governance/05-03_Audit_Log.md) | §3 AOP 攔截 | 自動記錄 |
-| 3 | [09-02 Audit Log System](../../05_Platform_Governance/05-03_Audit_Log.md) | §4 查詢分析 | 審計報表 |
+| 1 | [09-02 Audit Log System](../../06_Platform_Governance/06-03_Audit_Log.md) | §2 日誌模型 | 事件定義 |
+| 2 | [09-02 Audit Log System](../../06_Platform_Governance/06-03_Audit_Log.md) | §3 AOP 攔截 | 自動記錄 |
+| 3 | [09-02 Audit Log System](../../06_Platform_Governance/06-03_Audit_Log.md) | §4 查詢分析 | 審計報表 |
 
 ### 驗證清單
 - [ ] 關鍵操作被記錄
@@ -121,7 +121,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 09_System_Security, 所有業務模塊
+> **涉及模塊**: 12_System_Security, 所有業務模塊
 
 ### 實作目標
 [待補充：包含字段加密、KMS 整合、密鑰輪換等]
@@ -130,9 +130,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [09-03 Data Security](../../09_System_Security/09-03_Data_Security_Standard.md) | §2 加密標準 | AES-256-GCM |
-| 2 | [09-03-01 Encryption](../../09_System_Security/09-03-01_Encryption_Strategy.md) | §3 字段加密 | MyBatis 攔截器 |
-| 3 | [09-03-02 Blind Index](../../09_System_Security/09-03-02_Blind_Index_Architecture.md) | §2 盲索引 | 可搜索加密 |
+| 1 | [09-03 Data Security](../../12_System_Security/12-03_Data_Security_Standard.md) | §2 加密標準 | AES-256-GCM |
+| 2 | [09-03-01 Encryption](../../12_System_Security/12-03-01_Encryption_Strategy.md) | §3 字段加密 | MyBatis 攔截器 |
+| 3 | [09-03-02 Blind Index](../../12_System_Security/12-03-02_Blind_Index_Architecture.md) | §2 盲索引 | 可搜索加密 |
 
 ### 驗證清單
 - [ ] 敏感字段已加密
@@ -147,7 +147,7 @@
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-04
 **維護團隊**: Security Team & Architecture Team
 

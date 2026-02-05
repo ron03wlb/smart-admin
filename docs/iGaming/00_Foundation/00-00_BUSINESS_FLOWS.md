@@ -1,6 +1,6 @@
 # iGaming 業務流程圖集
 
-**版本**: 2.0.0 (v2 重組版)
+**版本**: 4.0.0 (v2 重組版)
 **最後更新**: 2026-02-03
 **狀態**: ✅ 完整版
 
@@ -109,7 +109,7 @@ String tenantId = claims.get("tenant_id", String.class);
 
 **為什麼重要**: 確保玩家註冊到正確的品牌，數據不會混淆。
 
-👉 **深入閱讀**: [05-01 多租戶架構 §2.1](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md#tenant-context-注入)
+👉 **深入閱讀**: [05-01 多租戶架構 §2.1](../06_Platform_Governance/06-01_Multi_Tenant.md#tenant-context-注入)
 
 #### Step 2: 初始化錢包
 
@@ -157,8 +157,8 @@ VALUES (:playerId, :tenantId, 0, 0, 0);
 ### 1.5 相關文檔
 
 - 🔗 [01-01 玩家生命週期](../01_Player_Center/01-01_Player_Lifecycle.md)
-- 🔗 [05-01 多租戶架構](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md)
-- 🔗 [05-05 數據安全（身份證加密）](../05_Platform_Governance/05-05_Data_Security.md)
+- 🔗 [05-01 多租戶架構](../06_Platform_Governance/06-01_Multi_Tenant.md)
+- 🔗 [05-05 數據安全（身份證加密）](../06_Platform_Governance/06-05_Data_Security.md)
 
 ---
 
@@ -258,7 +258,7 @@ String signature = HmacUtils.hmacSha256Hex(secretKey, data);
 - ✅ 一次性: Token 使用後標記為已消費
 - ✅ 綁定 IP: 可選，防止 Token 被竊取
 
-👉 **深入閱讀**: [02-02 Seamless Wallet API §4.2](../02_Game_Operations/02-02_Seamless_Wallet_API.md#token-驗證流程) ⭐ SSOT
+👉 **深入閱讀**: [02-02 Seamless Wallet API §4.2](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-驗證流程) ⭐ SSOT
 
 #### Step 2: 冪等性設計
 
@@ -286,7 +286,7 @@ try (DistributedLock lock = redisson.getLock("lock:" + requestId)) {
 }
 ```
 
-👉 **深入閱讀**: [02-02 Seamless Wallet API §4.3](../02_Game_Operations/02-02_Seamless_Wallet_API.md#冪等性設計) ⭐ SSOT
+👉 **深入閱讀**: [02-02 Seamless Wallet API §4.3](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md#冪等性設計) ⭐ SSOT
 
 #### Step 3: 可下注餘額檢查
 
@@ -353,13 +353,13 @@ Content-Type: application/json
 }
 ```
 
-👉 **深入閱讀**: [02-01 遊戲集成](../02_Game_Operations/02-01_Game_Integration.md)
+👉 **深入閱讀**: [02-01 遊戲集成](../03_Game_Center/03-01_Game_Integration_Standard.md)
 
 ### 2.5 相關文檔
 
-- 🔗 [02-02 Seamless Wallet API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) ⭐
+- 🔗 [02-02 Seamless Wallet API](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) ⭐
 - 🔗 [01-02 錢包架構](../02_Finance_Center/02-06_Wallet_Architecture.md) ⭐
-- 🔗 [07-03-02 API 認證](../07_Technical_Infrastructure/07-03-02_Authentication.md)
+- 🔗 [07-03-02 API 認證](../09_Technical_Infrastructure/09-03-02_Authentication.md)
 
 ---
 
@@ -676,7 +676,7 @@ if (riskScore.getTotal() <= 30) {
 | 新註冊用戶 | +20 | 註冊 <7 天 |
 | IP 異常 | +30 | IP 頻繁變更 |
 
-👉 **深入閱讀**: [04-01 風控引擎 §2](../04_Risk_Control/04-01_Risk_Framework.md#規則引擎) ⭐ SSOT
+👉 **深入閱讀**: [04-01 風控引擎 §2](../05_Risk_Control/05-01_Risk_Framework.md#規則引擎) ⭐ SSOT
 
 #### Step 3: SAGA 補償事務
 
@@ -743,8 +743,8 @@ public void processWithdrawal(WithdrawalRequest request) {
 ### 4.5 相關文檔
 
 - 🔗 [01-05 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) ⭐
-- 🔗 [04-01 風控引擎](../04_Risk_Control/04-01_Risk_Framework.md) ⭐
-- 🔗 [05-06 審批工作流](../05_Platform_Governance/05-06_Approval_Workflow.md)
+- 🔗 [04-01 風控引擎](../05_Risk_Control/05-01_Risk_Framework.md) ⭐
+- 🔗 [05-06 審批工作流](../06_Platform_Governance/06-04_Approval_Workflow.md)
 
 ---
 
@@ -900,8 +900,8 @@ GROUP BY player_id, DATE(bet_time);
 ### 5.5 相關文檔
 
 - 🔗 [02-03 流水計算](../03_Game_Center/03-04_Turnover_Calculation.md) ⭐
-- 🔗 [01-06 對帳系統](../01_Core_Financial_Loop/01-06_Reconciliation.md)
-- 🔗 [06-01 報表 BI](../06_Analytics_Operations/06-01_Reporting_BI.md)
+- 🔗 [01-06 對帳系統](../02_Finance_Center/02-03_Reconciliation_System.md)
+- 🔗 [06-01 報表 BI](../08_Analytics_BI/08-01_Reporting_BI.md)
 
 ---
 
@@ -1141,9 +1141,9 @@ public void testTenantIsolation() {
 
 ### 6.5 相關文檔
 
-- 🔗 [05-01 多租戶架構](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md) ⭐
-- 🔗 [05-03 RBAC 安全](../05_Platform_Governance/05-03_RBAC_Security.md)
-- 🔗 [07-02 API 網關](../07_Technical_Infrastructure/07-02_Gateway_Architecture/)
+- 🔗 [05-01 多租戶架構](../06_Platform_Governance/06-01_Multi_Tenant.md) ⭐
+- 🔗 [05-03 RBAC 安全](../06_Platform_Governance/06-02_RBAC_Permissions.md)
+- 🔗 [07-02 API 網關](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
 
 ---
 

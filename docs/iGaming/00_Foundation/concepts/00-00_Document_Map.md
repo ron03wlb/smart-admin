@@ -1,6 +1,6 @@
 # IGaming需求框架 - 文檔導航地圖
 
-> **版本**: 1.1.0
+> **版本**: 4.0.0
 > **最後更新**: 2026-02-04
 > **維護團隊**: Architecture Team
 >
@@ -208,12 +208,12 @@ graph TD
 |---------|---------|-------------|
 | [02-06 統一錢包](../../02_Finance_Center/02-06_Wallet_Architecture.md) | [02-07 交易處理](../../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 交易處理依賴錢包模型定義 |
 | [02-06 統一錢包](../../02_Finance_Center/02-06_Wallet_Architecture.md) | [03-03 無縫錢包](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | GP對接使用錢包API |
-| [02-04 流水計算](../../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../../04_Activity_Center/01-system-design.md) | 活動使用流水驗證數據 |
-| [05-01 風控系統](../../04_Risk_Control/04-01_Risk_Framework.md) | [02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
-| [05-01 風控系統](../../04_Risk_Control/04-01_Risk_Framework.md) | [04-01 活動系統](../../04_Activity_Center/01-system-design.md) | 活動引用風控檢測 |
-| [07-01 層級架構](../../05_Platform_Governance/05-01_Multi_Tenant.md) | [09-01 RBAC](../../05_Platform_Governance/05-02_RBAC_Permissions.md) | RBAC基於層級架構 |
-| [09-04 審批工作流](../../05_Platform_Governance/05-04_Approval_Workflow.md) | [02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
-| [09-02 審計日誌](../../05_Platform_Governance/05-03_Audit_Log.md) | [09-04 審批工作流](../../05_Platform_Governance/05-04_Approval_Workflow.md) | 審批操作記錄在審計日誌 |
+| [02-04 流水計算](../../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../../04_Activity_Center/04-00_INDEX.md) | 活動使用流水驗證數據 |
+| [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) | [02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
+| [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) | [04-01 活動系統](../../04_Activity_Center/04-00_INDEX.md) | 活動引用風控檢測 |
+| [07-01 層級架構](../../06_Platform_Governance/06-01_Multi_Tenant.md) | [09-01 RBAC](../../06_Platform_Governance/06-02_RBAC_Permissions.md) | RBAC基於層級架構 |
+| [09-04 審批工作流](../../06_Platform_Governance/06-04_Approval_Workflow.md) | [02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
+| [09-02 審計日誌](../../06_Platform_Governance/06-03_Audit_Log.md) | [09-04 審批工作流](../../06_Platform_Governance/06-04_Approval_Workflow.md) | 審批操作記錄在審計日誌 |
 
 ---
 
@@ -222,9 +222,9 @@ graph TD
 已完成的審計報告、技術分析、階段修正文件已移至歸檔目錄：
 
 - **[歸檔索引](../../archive/INDEX.md)** - 完整的歷史文檔導航
-  - [審計報告](../../archive/audit-reports/) - 4 個文檔審計與實作完成報告
-  - [技術分析](../../archive/analysis/) - 8 個邏輯分析與錯誤審查報告
-  - [階段修正](../../archive/corrections/) - 4 個階段性修正總結
+  - [審計報告](../archive/) - 4 個文檔審計與實作完成報告
+  - [技術分析](../archive/) - 8 個邏輯分析與錯誤審查報告
+  - [階段修正](../archive/) - 4 個階段性修正總結
 
 所有歸檔文件的 Git 歷史完整保留，可使用 `git log --follow` 追溯。
 
@@ -236,7 +236,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 00-00 | [Document_Map.md](./00-00_Document_Map.md) | **本文檔** - 導航地圖 | - |
+| 00-00 | [Document_Map.md](./concepts/00-00_Document_Map.md) | **本文檔** - 導航地圖 | - |
 | 00-01 | [Solution_Overview.md](./00-01_Solution_Overview.md) | 全局方案概覽、市場分析 | 440 |
 | 00-02 | [Industry_Terminology.md](./00-02_Industry_Terminology.md) | 200+行業術語標準化 | 336 |
 
@@ -287,7 +287,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 04-01 | [Activity_System_Design.md](../../04_Activity_Center/01-system-design.md) | 紅利系統、流水要求、風控整合 | 80+ |
+| 04-01 | [Activity_System_Design.md](../../04_Activity_Center/04-00_INDEX.md) | 紅利系統、流水要求、風控整合 | 80+ |
 
 ---
 
@@ -295,8 +295,8 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 05-01 | [Risk_Control_System.md](../../04_Risk_Control/04-01_Risk_Framework.md) | **核心** - 平台級風控引擎、ML模型 | 80+ |
-| 05-02 | [Agent_Credit_Risk.md](../../05_Risk_Management/05-02_Agent_Credit_Risk.md) | 代理信用評分、Margin Call | 86 |
+| 05-01 | [Risk_Control_System.md](../../05_Risk_Control/05-01_Risk_Framework.md) | **核心** - 平台級風控引擎、ML模型 | 80+ |
+| 05-02 | [Agent_Credit_Risk.md](../../05_Risk_Control/05-04_Agent_Credit_Risk.md) | 代理信用評分、Margin Call | 86 |
 
 ---
 
@@ -304,8 +304,8 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 06-01 | [Affiliate_System_Design.md](../../06_Agent_Center/06-03_Agent_System.md) | 無限層級代理系統 | 61 |
-| 06-02 | [Credit_Network_Logic.md](../../06_Agent_Center/06-02_Credit_Network_Logic.md) | 信用額度網絡、持倉 | 70 |
+| 06-01 | [Affiliate_System_Design.md](../../07_Agent_Center/07-03_Agent_System.md) | 無限層級代理系統 | 61 |
+| 06-02 | [Credit_Network_Logic.md](../../07_Agent_Center/07-02_Credit_Network_Logic.md) | 信用額度網絡、持倉 | 70 |
 
 ---
 
@@ -313,10 +313,10 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 07-01 | [Hierarchy_Architecture.md](../../05_Platform_Governance/05-01_Multi_Tenant.md) | 四層多租戶架構 | 39 ⚠️ |
-| 07-02 | [Tenant_Configuration.md](../../07_Platform_Management/07-02_Tenant_Configuration.md) | 租戶自助配置 | 55 |
-| 07-03 | [Notification_Architecture.md](../../07_Platform_Management/07-03_Notification_Architecture.md) | 多渠道通知系統 | 80 |
-| 07-04 | [Data_Pipeline_Architecture.md](../../07_Platform_Management/07-04_Data_Pipeline_Architecture.md) | ODS→DWD→DWS→ADS 數據分層 | 82 |
+| 07-01 | [Hierarchy_Architecture.md](../../06_Platform_Governance/06-01_Multi_Tenant.md) | 四層多租戶架構 | 39 ⚠️ |
+| 07-02 | [Tenant_Configuration.md](../../10_Platform_Management/10-02_Tenant_Configuration.md) | 租戶自助配置 | 55 |
+| 07-03 | [Notification_Architecture.md](../../10_Platform_Management/10-03_Notification_Architecture.md) | 多渠道通知系統 | 80 |
+| 07-04 | [Data_Pipeline_Architecture.md](../../10_Platform_Management/10-04_Data_Pipeline_Architecture.md) | ODS→DWD→DWS→ADS 數據分層 | 82 |
 
 > ⚠️ **待擴充**：07-01 文檔較短
 
@@ -326,11 +326,11 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 08-01 | [Frontend_Layout_Engine.md](../../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) | 拖拽式佈局引擎 | 71 |
-| 08-02 | [Banner_&_Announcement.md](../../08_Frontend_CMS/08-02_Banner_&_Announcement.md) | Banner管理 | 35 |
-| 08-03 | [SEO_&_Performance.md](../../08_Frontend_CMS/08-03_SEO_&_Performance.md) | SSR/ISR、Core Web Vitals | 58 |
-| 08-04 | [Mobile_App_Architecture.md](../../08_Frontend_CMS/08-04_Mobile_App_Architecture.md) | Flutter/React Native | 49 |
-| 08-05 | [Localization_System.md](../../08_Frontend_CMS/08-05_Localization_System.md) | i18n完整架構、Crowdin集成 | 590 📏 |
+| 08-01 | [Frontend_Layout_Engine.md](../../11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) | 拖拽式佈局引擎 | 71 |
+| 08-02 | [Banner_&_Announcement.md](../../11_Frontend_CMS/11-02_Banner_&_Announcement.md) | Banner管理 | 35 |
+| 08-03 | [SEO_&_Performance.md](../../11_Frontend_CMS/11-03_SEO_&_Performance.md) | SSR/ISR、Core Web Vitals | 58 |
+| 08-04 | [Mobile_App_Architecture.md](../../11_Frontend_CMS/11-04_Mobile_App_Architecture.md) | Flutter/React Native | 49 |
+| 08-05 | [Localization_System.md](../../11_Frontend_CMS/11-07_i18n_Localization.md) | i18n完整架構、Crowdin集成 | 590 📏 |
 
 > 📏 **考慮拆分**：08-05 文檔較長（590行），可拆分為多個子文檔
 
@@ -340,10 +340,10 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 09-01 | [Admin_RBAC.md](../../05_Platform_Governance/05-02_RBAC_Permissions.md) | 管理後台權限管理 | 80+ |
-| 09-02 | [Audit_Log_System.md](../../05_Platform_Governance/05-03_Audit_Log.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
-| 09-03 | [Data_Security_Standard.md](../../09_System_Security/09-03_Data_Security_Standard.md) | 加密、盲索引、GDPR Crypto-Shredding | 676 📏 |
-| 09-04 | [Approval_Workflow_System.md](../../05_Platform_Governance/05-04_Approval_Workflow.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
+| 09-01 | [Admin_RBAC.md](../../06_Platform_Governance/06-02_RBAC_Permissions.md) | 管理後台權限管理 | 80+ |
+| 09-02 | [Audit_Log_System.md](../../06_Platform_Governance/06-03_Audit_Log.md) | **核心** - 審計日誌記錄與檢索系統 | 832 📏 |
+| 09-03 | [Data_Security_Standard.md](../../12_System_Security/12-03_Data_Security_Standard.md) | 加密、盲索引、GDPR Crypto-Shredding | 676 📏 |
+| 09-04 | [Approval_Workflow_System.md](../../06_Platform_Governance/06-04_Approval_Workflow.md) | **核心** - Maker-Checker 審批工作流 | 833 📏 |
 
 > 📏 **考慮拆分**：09-02（832行）、09-03（676行）、09-04（833行）文檔較長
 > ✅ **內容去重完成**：09-02 專注審計日誌，09-04 專注審批流程，已移除重複的合併版文件
@@ -362,7 +362,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 06-02 | [Customer_Service.md](../../06_Analytics_Operations/06-02_Customer_Service.md) | 客服平台、Player 360 View、AI 客服 | 520 ✅ |
+| 06-02 | [Customer_Service.md](../../13_Customer_Service/13-01_CS_Platform_Design.md) | 客服平台、Player 360 View、AI 客服 | 520 ✅ |
 
 > ⚠️ **待擴充**：建議補充知識庫管理、智能客服機器人、SLA監控
 
@@ -372,16 +372,16 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 07-01 | [Deployment_Architecture.md](../../07_Technical_Infrastructure/07-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 ✅ |
-| 07-02 | [Gateway_Architecture/](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 ✅ |
-| 07-03 | [API_Design/](../../07_Technical_Infrastructure/07-03-01_Design_Principles.md) | RESTful API 設計標準 | 400 ✅ |
-| 07-04 | [QA_Testing_Standard.md](../../07_Technical_Infrastructure/07-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 ✅ |
-| 07-05 | [Maintenance_Procedure.md](../../07_Technical_Infrastructure/07-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 ✅ |
-| 07-06 | [Performance_Monitoring.md](../../07_Technical_Infrastructure/07-06_Performance_Monitoring.md) | APM、指標、告警 | 450 ✅ |
-| 07-07 | [Performance_Optimization.md](../../07_Technical_Infrastructure/07-07_Performance_Optimization.md) | 性能瓶頸分析與優化策略 | 633 ✅ |
-| 07-08 | [Stream_Processing_Architecture.md](../../07_Technical_Infrastructure/07-08_Stream_Processing_Architecture.md) | Flink CDC、Flink SQL、CEP | 510 🆕 |
-| 07-09 | [Caching_Strategy.md](../../07_Technical_Infrastructure/07-09_Caching_Strategy.md) | JetCache + Redisson 多級緩存 | 440 🆕 |
-| 07-10 | [Cost_Optimization.md](../../07_Technical_Infrastructure/07-10_Cost_Optimization.md) | 成本優化與 ROI 分析 | 390 🆕 |
+| 07-01 | [Deployment_Architecture.md](../../09_Technical_Infrastructure/09-01_Deployment.md) | Blue-Green、Canary、回滾 | 501 ✅ |
+| 07-02 | [Gateway_Architecture/](../../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | 限流、熔斷、DDoS防護 | 511 ✅ |
+| 07-03 | [API_Design/](../../09_Technical_Infrastructure/09-03-01_Design_Principles.md) | RESTful API 設計標準 | 400 ✅ |
+| 07-04 | [QA_Testing_Standard.md](../../09_Technical_Infrastructure/09-04_QA_Standards.md) | 測試金字塔、K6性能測試 | 426 ✅ |
+| 07-05 | [Maintenance_Procedure.md](../../09_Technical_Infrastructure/09-05_Maintenance.md) | Graceful Shutdown、維護SOP | 611 ✅ |
+| 07-06 | [Performance_Monitoring.md](../../09_Technical_Infrastructure/09-06_Performance_Monitoring.md) | APM、指標、告警 | 450 ✅ |
+| 07-07 | [Performance_Optimization.md](../../09_Technical_Infrastructure/09-07_Performance_Optimization.md) | 性能瓶頸分析與優化策略 | 633 ✅ |
+| 07-08 | [Stream_Processing_Architecture.md](../../09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md) | Flink CDC、Flink SQL、CEP | 510 🆕 |
+| 07-09 | [Caching_Strategy.md](../../09_Technical_Infrastructure/09-09_Caching_Strategy.md) | JetCache + Redisson 多級緩存 | 440 🆕 |
+| 07-10 | [Cost_Optimization.md](../../09_Technical_Infrastructure/09-10_Cost_Optimization.md) | 成本優化與 ROI 分析 | 390 🆕 |
 
 > ⚠️ **v2.0.0 重組**: 原 12-XX 編號已統一為 07-XX (Technical Infrastructure)
 
@@ -438,21 +438,21 @@ graph TD
 |------|---------|------|
 | **可下注餘額公式** | [01-02 Wallet_Architecture §2.3](../../02_Finance_Center/02-06_Wallet_Architecture.md#23-可下注餘額計算) | ⭐ |
 | **有效投注算法** | [02-03 Turnover_Calculation §1](../../03_Game_Center/03-04_Turnover_Calculation.md#1-有效投注-valid-turnover-核心算法) | ⭐ |
-| **Token驗證流程** | [02-02 Seamless_Wallet_API §4.2](../../02_Game_Operations/02-02_Seamless_Wallet_API.md#42-token-驗證) | ⭐ |
-| **風控規則引擎** | [04-01 Risk_Engine §2](../../04_Risk_Control/04-01_Risk_Framework.md#2-規則引擎架構) | ⭐ |
+| **Token驗證流程** | [02-02 Seamless_Wallet_API §4.2](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md#42-token-驗證) | ⭐ |
+| **風控規則引擎** | [04-01 Risk_Engine §2](../../05_Risk_Control/05-01_Risk_Framework.md#2-規則引擎架構) | ⭐ |
 | **SAGA補償事務** | [01-05 Withdrawal_Risk §4.3](../../01_Player_Center/01-05_Withdrawal_Risk.md#43-saga-補償事務) | ⭐ |
-| **PII加密標準** | [05-05 Data_Security §2](../../05_Platform_Governance/05-05_Data_Security.md#2-pii-加密策略) | ⭐ |
-| **多租戶隔離** | [05-01 Multi_Tenant §3](../../05_Platform_Governance/05-01_Multi_Tenant.md#3-數據隔離策略) | ⭐ |
+| **PII加密標準** | [05-05 Data_Security §2](../../06_Platform_Governance/06-05_Data_Security.md#2-pii-加密策略) | ⭐ |
+| **多租戶隔離** | [05-01 Multi_Tenant §3](../../06_Platform_Governance/06-01_Multi_Tenant.md#3-數據隔離策略) | ⭐ |
 
 ### 按問題類型查找
 
 | 問題類型 | 診斷文檔 | 關鍵檢查點 |
 |---------|---------|-----------|
-| 錢包餘額不一致 | [01-02 §2.3](../../02_Finance_Center/02-06_Wallet_Architecture.md#23-可下注餘額計算), [01-04 §3](../../01_Core_Financial_Loop/01-04_Settlement.md#3-對賬流程) | 三方對賬、事務補償 |
-| 流水計算錯誤 | [02-03 §1.6](../../03_Game_Center/03-04_Turnover_Calculation.md#16-故障排除), [04-01 §3](../../04_Risk_Control/04-01_Risk_Framework.md#3-流水驗證) | 三層架構、風控因子 |
-| 支付回調失敗 | [02-02 §4](../../02_Finance_Center/02-02_Payment_Gateway_Integration.md#4-回調處理), [05-05 §3](../../05_Platform_Governance/05-05_Data_Security.md#3-簽名驗證) | 簽名驗證、冪等性 |
-| GP對接異常 | [02-02 §5](../../02_Game_Operations/02-02_Seamless_Wallet_API.md#5-極端場景), [02-03 §2](../../03_Game_Center/03-04_Turnover_Calculation.md#2-對賬驗證) | Token過期、重試機制 |
-| 權限異常 | [05-02 §4](../../05_Platform_Governance/05-02_RBAC_Permissions.md#4-故障排除), [05-01 §4](../../05_Platform_Governance/05-01_Multi_Tenant.md#4-Context傳播) | RBAC評估、Context丟失 |
+| 錢包餘額不一致 | [01-02 §2.3](../../02_Finance_Center/02-06_Wallet_Architecture.md#23-可下注餘額計算), [01-04 §3](../../02_Finance_Center/02-03_Reconciliation_System.md#3-對賬流程) | 三方對賬、事務補償 |
+| 流水計算錯誤 | [02-03 §1.6](../../03_Game_Center/03-04_Turnover_Calculation.md#16-故障排除), [04-01 §3](../../05_Risk_Control/05-01_Risk_Framework.md#3-流水驗證) | 三層架構、風控因子 |
+| 支付回調失敗 | [02-02 §4](../../02_Finance_Center/02-02_Payment_Gateway_Integration.md#4-回調處理), [05-05 §3](../../06_Platform_Governance/06-05_Data_Security.md#3-簽名驗證) | 簽名驗證、冪等性 |
+| GP對接異常 | [02-02 §5](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md#5-極端場景), [02-03 §2](../../03_Game_Center/03-04_Turnover_Calculation.md#2-對賬驗證) | Token過期、重試機制 |
+| 權限異常 | [05-02 §4](../../06_Platform_Governance/06-02_RBAC_Permissions.md#4-故障排除), [05-01 §4](../../06_Platform_Governance/06-01_Multi_Tenant.md#4-Context傳播) | RBAC評估、Context丟失 |
 
 
 ## 📝 變更日誌 (CHANGELOG)
@@ -520,7 +520,7 @@ graph TD
 - **交叉引用**：為核心文檔添加"相關文檔"章節
 - **文件優化**：拆分超長文件（08-05, 09-02, 09-03），擴充簡短文件
 - **新增文檔**：
-  - `00-03_Data_Model_Overview.md` - 數據模型總覽
+  - `00-05_Data_Model.md` - 數據模型總覽
   - `00-04_Technology_Stack.md` - 技術選型標準
   - `12-05_API_Design_Standard.md` - API設計規範
 
@@ -562,6 +562,6 @@ graph TD
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **生成日期**: 2026-01-27
 **下次審閱**: 2026-04-27（每季度審閱）

@@ -1,6 +1,6 @@
 # 00-00-06 技術基礎設施實作指南 (Technical Infrastructure Implementation Guide)
 
-**版本**: 1.0.0
+**版本**: 4.0.0
 **創建日期**: 2026-02-04
 **來源**: 從 00-00_IMPLEMENTATION_GUIDE.md 拆分（§18-20）
 **狀態**: 📝 PLANNED - 內容開發中
@@ -30,7 +30,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 12_Technical_Operations, 07_Platform_Management
+> **涉及模塊**: 12_Technical_Operations, 10_Platform_Management
 
 ### 實作目標
 [待補充：包含 Spring Cloud Gateway 配置、路由規則、熔斷器等]
@@ -39,9 +39,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [12-03 Gateway Architecture](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | §2 路由配置 | 動態路由 |
-| 2 | [12-03 Gateway Architecture](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | §3 過濾器鏈 | 鑑權、限流 |
-| 3 | [12-03 Gateway Architecture](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | §4 熔斷器 | Resilience4j |
+| 1 | [12-03 Gateway Architecture](../../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | §2 路由配置 | 動態路由 |
+| 2 | [12-03 Gateway Architecture](../../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | §3 過濾器鏈 | 鑑權、限流 |
+| 3 | [12-03 Gateway Architecture](../../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | §4 熔斷器 | Resilience4j |
 
 ### 驗證清單
 - [ ] 路由規則正確
@@ -69,9 +69,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [12-01 Deployment Architecture](../../07_Technical_Infrastructure/07-01_Deployment.md) | §3 部署策略 | Blue-Green |
-| 2 | [12-01 Deployment Architecture](../../07_Technical_Infrastructure/07-01_Deployment.md) | §4 流量管理 | Istio/Nginx |
-| 3 | [12-01 Deployment Architecture](../../07_Technical_Infrastructure/07-01_Deployment.md) | §5 監控驗證 | Smoke Test |
+| 1 | [12-01 Deployment Architecture](../../09_Technical_Infrastructure/09-01_Deployment.md) | §3 部署策略 | Blue-Green |
+| 2 | [12-01 Deployment Architecture](../../09_Technical_Infrastructure/09-01_Deployment.md) | §4 流量管理 | Istio/Nginx |
+| 3 | [12-01 Deployment Architecture](../../09_Technical_Infrastructure/09-01_Deployment.md) | §5 監控驗證 | Smoke Test |
 
 ### 驗證清單
 - [ ] Blue/Green 環境獨立
@@ -99,9 +99,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [12-05 API Design](../../07_Technical_Infrastructure/07-03-01_Design_Principles.md) | §6 限流策略 | 令牌桶/漏桶 |
+| 1 | [12-05 API Design](../../09_Technical_Infrastructure/09-03-01_Design_Principles.md) | §6 限流策略 | 令牌桶/漏桶 |
 | 2 | Foundation Redis Limiter | - | Redisson 限流器 |
-| 3 | [12-03 Gateway](../../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) | §3.4 限流過濾器 | 閘道限流 |
+| 3 | [12-03 Gateway](../../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | §3.4 限流過濾器 | 閘道限流 |
 
 ### 驗證清單
 - [ ] 限流閾值正確
@@ -116,7 +116,7 @@
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-04
 **維護團隊**: Infrastructure Team & DevOps Team
 

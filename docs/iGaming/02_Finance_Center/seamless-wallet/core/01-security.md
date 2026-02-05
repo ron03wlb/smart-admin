@@ -330,7 +330,7 @@ token:
 
 如果您需要實施完整的 OAuth 2.0 Refresh Token 機制（包含 SmartAdmin 後端整合），請參考：
 
-- 📘 [07-03-02-01 OAuth 2.0 Refresh Token 實施方案](../../../07_Technical_Infrastructure/07-03-02-01_OAuth_Refresh_Token_Implementation.md)
+- 📘 [07-03-02-01 OAuth 2.0 Refresh Token 實施方案](../../../09_Technical_Infrastructure/09-11_OAuth_Refresh_Token_Implementation.md)
   - **適用場景**：SmartAdmin 後端 + iGaming 前端整合
   - **包含內容**：
     - RefreshTokenManager 完整代碼設計（Java 21 + Spring Boot 3）
@@ -353,15 +353,15 @@ token:
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 相關專題
 - [02 冪等性設計](./02_idempotency_design.md) - 防重複扣款
 - [10 錯誤恢復](./10_error_recovery.md) - 異常處理
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
 
 ---
 
@@ -369,7 +369,7 @@ token:
 
 > **新增日期**: 2026-02-05
 > **目的**: 為遊戲商（Game Provider）API 請求提供完整性和真實性驗證
-> **相關文檔**: [07-03-02-02 多主體 Token 安全方案](../../../07_Technical_Infrastructure/07-03-02-02_Multi_Actor_Token_Security.md#遊戲商-token-方案)
+> **相關文檔**: [07-03-02-02 多主體 Token 安全方案](../../../09_Technical_Infrastructure/09-12_Multi_Actor_Token_Security.md#遊戲商-token-方案)
 
 ### 1.5.1 簽名驗證流程概覽
 
@@ -1022,8 +1022,8 @@ alerts:
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範

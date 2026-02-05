@@ -452,7 +452,7 @@ sequenceDiagram
 
 ---
 
-**文檔版本**: 1.1.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-04
 **維護團隊**: Finance Team & Backend Team
 
@@ -467,4 +467,4 @@ sequenceDiagram
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
 
 ### 延伸閱讀
-- [Seamless Wallet 專題](./seamless-wallet/00_INDEX.md) - 深度技術分析
+- [Seamless Wallet 專題](./seamless-wallet/README.md) - 深度技術分析

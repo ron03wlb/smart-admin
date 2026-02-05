@@ -1,6 +1,6 @@
 # 00-00-04 風控系統實作指南 (Risk Control Implementation Guide)
 
-**版本**: 1.0.0
+**版本**: 4.0.0
 **創建日期**: 2026-02-04
 **來源**: 從 00-00_IMPLEMENTATION_GUIDE.md 拆分（§11-13）
 **狀態**: 📝 PLANNED - 內容開發中
@@ -30,7 +30,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 05_Risk_Management, 01_Core_Financial_Loop
+> **涉及模塊**: 05_Risk_Control, 01_Core_Financial_Loop
 
 ### 實作目標
 [待補充：包含規則引擎架構、Drools/LiteFlow 整合、動態規則配置等]
@@ -39,9 +39,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [05-01 Risk Control System](../../04_Risk_Control/04-01_Risk_Framework.md) | §2 規則引擎 | Drools 整合 |
-| 2 | [05-04 Risk Workflow](../../05_Risk_Management/05-04_Risk_Workflow.md) | §3 審批流程 | 工作流設計 |
-| 3 | [02-01 Withdrawal Risk](../../02_Finance_Center/02-01_Withdrawal_Risk_Control.md) | §4 風控規則 | 實際案例 |
+| 1 | [05-01 Risk Control System](../../05_Risk_Control/05-01_Risk_Framework.md) | §2 規則引擎 | Drools 整合 |
+| 2 | [05-04 Risk Workflow](../../05_Risk_Control/05-05_Risk_Proposal_Workflow.md) | §3 審批流程 | 工作流設計 |
+| 3 | [02-01 Withdrawal Risk](../../02_Finance_Center/../01_Player_Center/01-05_Withdrawal_Risk.md) | §4 風控規則 | 實際案例 |
 
 ### 驗證清單
 - [ ] 規則引擎正確執行
@@ -60,7 +60,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 05_Risk_Management, 01_Player_Center
+> **涉及模塊**: 05_Risk_Control, 01_Player_Center
 
 ### 實作目標
 [待補充：包含設備指紋、行為分析、機器學習模型等]
@@ -69,8 +69,8 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [05-03 Fraud Detection](../../05_Risk_Management/05-03_Fraud_Detection.md) | §2 設備指紋 | FingerprintJS |
-| 2 | [05-03 Fraud Detection](../../05_Risk_Management/05-03_Fraud_Detection.md) | §3 行為分析 | 異常檢測 |
+| 1 | [05-03 Fraud Detection](../../05_Risk_Control/05-02_Fraud_Detection.md) | §2 設備指紋 | FingerprintJS |
+| 2 | [05-03 Fraud Detection](../../05_Risk_Control/05-02_Fraud_Detection.md) | §3 行為分析 | 異常檢測 |
 | 3 | [01-01 Player Account](../../01_Player_Center/01-01_Player_Lifecycle.md) | §5 風險評分 | 玩家分級 |
 
 ### 驗證清單
@@ -90,7 +90,7 @@
 
 > **📝 STATUS**: PLANNED
 > **預計完成**: Phase 5 後續
-> **涉及模塊**: 06_Agent_Center, 05_Risk_Management
+> **涉及模塊**: 07_Agent_Center, 05_Risk_Control
 
 ### 實作目標
 [待補充：包含信用額度計算、風險預警、佔成模式等]
@@ -99,9 +99,9 @@
 
 | 順序 | 文檔 | 章節 | 重點內容 |
 |------|------|------|----------|
-| 1 | [06-02 Credit Network Logic](../../06_Agent_Center/06-02_Credit_Network_Logic.md) | §2 信用網絡 | 佔成模式 |
-| 2 | [05-02 Agent Credit Risk](../../05_Risk_Management/05-02_Agent_Credit_Risk.md) | §3 風險控制 | 額度計算 |
-| 3 | [06-01 Affiliate System](../../06_Agent_Center/06-03_Agent_System.md) | §4 風控整合 | 代理風控 |
+| 1 | [06-02 Credit Network Logic](../../07_Agent_Center/07-02_Credit_Network_Logic.md) | §2 信用網絡 | 佔成模式 |
+| 2 | [05-02 Agent Credit Risk](../../05_Risk_Control/05-04_Agent_Credit_Risk.md) | §3 風險控制 | 額度計算 |
+| 3 | [06-01 Affiliate System](../../07_Agent_Center/07-03_Agent_System.md) | §4 風控整合 | 代理風控 |
 
 ### 驗證清單
 - [ ] 信用額度計算正確
@@ -116,7 +116,7 @@
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-04
 **維護團隊**: Risk Control Team & Backend Team
 

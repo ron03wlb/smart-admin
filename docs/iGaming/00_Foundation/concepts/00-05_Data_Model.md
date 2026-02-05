@@ -1,6 +1,6 @@
 # 數據模型總覽 (Data Model Overview)
 
-> **版本**: 1.1.0 (Week 4-5 Enhancement)
+> **版本**: 4.0.0 (Week 4-5 Enhancement)
 > **最後更新**: 2026-02-03
 > **目的**: 提供 IGaming 平台所有核心數據實體的統一視圖
 > **更新內容**: 添加 3 個狀態機設計 + 8 個 SSOT Markers + 增強交叉引用
@@ -515,7 +515,7 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 **三層驗證架構**:
 
 > 💡 **SSOT Marker**: 三層驗證架構的完整設計請參考：
-> - Layer 1 (風控驗證): [05-01_Risk_Control_System.md §4.2](../../04_Risk_Control/04-01_Risk_Framework.md#42-turnover-validation)
+> - Layer 1 (風控驗證): [05-01_Risk_Control_System.md §4.2](../../05_Risk_Control/05-01_Risk_Framework.md#42-turnover-validation)
 > - Layer 2 (財務驗證): [02-03_Turnover_Calculation.md §3](../../03_Game_Center/03-04_Turnover_Calculation.md#3-layer-2-finance-layer-validation)
 > - Layer 3 (活動應用): [04-01_Activity_System_Design.md §5](../../04_Activity_Center/04-04_Activity_Bonus.md#5-game-weight-configuration)
 
@@ -633,18 +633,18 @@ Player Deletion Request
 ### 數據模型參考
 - [02-06 統一錢包模型](../../02_Finance_Center/02-06_Wallet_Architecture.md) - **SSOT**: Playable Balance Formula
 - [02-03 流水計算](../../03_Game_Center/03-04_Turnover_Calculation.md) - **SSOT**: Layer 2 Finance Validation
-- [05-01 風控系統](../../04_Risk_Control/04-01_Risk_Framework.md) - **SSOT**: Layer 1 Risk Validation
+- [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) - **SSOT**: Layer 1 Risk Validation
 - [04-01 活動系統設計](../../04_Activity_Center/04-04_Activity_Bonus.md) - **SSOT**: Layer 3 Game Weight
-- [09-03 數據安全標準](../../09_System_Security/09-03_Data_Security_Standard.md) - 加密與盲索引
+- [09-03 數據安全標準](../../12_System_Security/12-03_Data_Security_Standard.md) - 加密與盲索引
 
 ### 架構參考
-- [00-00 文檔導航地圖](./00-00_Document_Map.md) - 全局導航
+- [00-00 文檔導航地圖](./concepts/00-00_Document_Map.md) - 全局導航
 - [00-01 方案概覽](./00-01_Solution_Overview.md) - 整體架構
-- [07-01 層級架構](../../05_Platform_Governance/05-01_Multi_Tenant.md) - 多租戶設計
+- [07-01 層級架構](../../06_Platform_Governance/06-01_Multi_Tenant.md) - 多租戶設計
 
 ---
 
-**文檔版本**: 1.1.0
+**文檔版本**: 4.0.0
 **更新日期**: 2026-02-03 (Week 4-5 Enhancement)
 **更新內容**:
 - ✅ 添加 Player Account State Machine（5 狀態 + Mermaid 圖）

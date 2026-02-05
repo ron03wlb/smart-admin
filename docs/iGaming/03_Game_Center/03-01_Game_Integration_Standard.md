@@ -156,15 +156,15 @@ Transaction API 需區分獎金類型：
 ### 業務整合
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳、流水計算
 - [03-02 遊戲大廳管理](./03-02_Game_Lobby_Management.md) - 遊戲元數據同步、大廳配置
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 遊戲風控檢測、熔斷機制
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 遊戲風控檢測、熔斷機制
 
 ### 技術參考
-- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - API 安全、HMAC 簽名驗證
-- [12-04 維護程序](../07_Technical_Infrastructure/07-05_Maintenance.md) - 遊戲維護流程
+- [12-03 網關架構](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API 安全、HMAC 簽名驗證
+- [12-04 維護程序](../09_Technical_Infrastructure/09-05_Maintenance.md) - 遊戲維護流程
 
 ### 延伸閱讀
-- [09-03 數據安全標準](../09_System_Security/09-03_Data_Security_Standard.md) - 敏感數據加密規範
-- [07-03 通知架構](../07_Platform_Management/07-03_Notification_Architecture.md) - 遊戲維護通知
+- [09-03 數據安全標準](../12_System_Security/12-03_Data_Security_Standard.md) - 敏感數據加密規範
+- [07-03 通知架構](../10_Platform_Management/10-03_Notification_Architecture.md) - 遊戲維護通知
 
 ---
 
@@ -173,6 +173,6 @@ Transaction API 需區分獎金類型：
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Integration Team & Backend Team

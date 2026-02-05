@@ -11,7 +11,7 @@
 ### PBonus 核心主題（必讀）
 
 **基礎架構與規則引擎**
-- **[Bonus4-Bonus1 活動系統架構](Bonus4-Bonus1_Activity_System_Architecture.md)** (5BonusBonus 行)
+- **[Bonus4-Bonus1 活動系統架構](04-00_INDEX.md)** (5BonusBonus 行)
   - 模組化活動引擎核心架構
   - 規則引擎設計與執行流程
   - 獎勵類型與紅利生命週期狀態機
@@ -19,7 +19,7 @@
   - 後台配置系統（JSON Schema 驅動）
 
 **獎金計算與流水追蹤**
-- **[Bonus4-Bonus2 獎金計算引擎](Bonus4-Bonus2_Bonus_Calculation_Engine.md)** (5BonusBonus 行)
+- **[Bonus4-Bonus2 獎金計算引擎](04-02_Bonus_Calculation_Engine.md)** (5BonusBonus 行)
   - 跨遊戲類型統一流水計算框架（Layer 3 核心邏輯）
   - 遊戲權重應用與有效流水驗證
   - 統一流水驗證架構（與 Bonus2-Bonus4 Finance 整合）
@@ -29,7 +29,7 @@
 ### P1 進階主題（運營優化）
 
 **風控與本地化策略**
-- **[Bonus4-Bonus3 活動風控與本地化](Bonus4-Bonus3_Activity_Risk_Control.md)** (45Bonus 行)
+- **[Bonus4-Bonus3 活動風控與本地化](04-03_Activity_Risk_Control.md)** (45Bonus 行)
   - 玩家生命週期活動設計策略
   - 區域市場本地化策略（東南亞、拉美、歐洲、中國）
   - 風控與反欺詐機制設計
@@ -56,8 +56,8 @@
 ## 🎯 快速參考
 
 ### 三層風控架構位置
-- **Layer 1**: 風控驗證 → 參見 [Bonus5-Bonus1 風控系統](../Bonus5_Risk_Management/Bonus5-Bonus1_Risk_Control_System.md)
-- **Layer 2**: 狀態因子計算 → 參見 [Bonus2-Bonus4 流水計算](../Bonus2_Finance_Center/Bonus2-Bonus4_Turnover_and_Game_Reconciliation_Analysis.md)
+- **Layer 1**: 風控驗證 → 參見 [Bonus5-Bonus1 風控系統](../05_Risk_Control/05-01_Risk_Framework.md)
+- **Layer 2**: 狀態因子計算 → 參見 [Bonus2-Bonus4 流水計算](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 - **Layer 3**: 活動遊戲權重 → 本模塊 (Bonus4-Bonus2 §5.1)
 
 ### 流水計算完整公式
@@ -156,19 +156,19 @@ ValidTurnover = BetAmount
 ## 📖 相關文檔
 
 ### 核心依賴
-- [Bonus2-Bonus6 統一錢包模型](../Bonus2_Finance_Center/Bonus2-Bonus6_Unified_Wallet_Model.md) - Bonus 錢包整合、可下注餘額計算
-- [Bonus2-Bonus4 流水計算與對帳](../Bonus2_Finance_Center/Bonus2-Bonus4_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 2）
-- [Bonus5-Bonus1 風控系統](../Bonus5_Risk_Management/Bonus5-Bonus1_Risk_Control_System.md) - 紅利濫用檢測、多帳號風控
+- [Bonus2-Bonus6 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - Bonus 錢包整合、可下注餘額計算
+- [Bonus2-Bonus4 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 2）
+- [Bonus5-Bonus1 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 紅利濫用檢測、多帳號風控
 
 ### 業務整合
-- [Bonus1-Bonus2 VIP 系統](../Bonus1_Player_Center/Bonus1-Bonus2_VIP_&_Loyalty_System.md) - VIP 專屬活動、等級權益
-- [Bonus2-Bonus1 出金風控](../Bonus2_Finance_Center/Bonus2-Bonus1_Withdrawal_Risk_Control.md) - 流水未達標提款限制
-- [Bonus9-Bonus4 審批工作流系統](../Bonus9_System_Security/Bonus9-Bonus4_Approval_Workflow_System.md) - 活動發布 Maker-Checker 審批
+- [Bonus1-Bonus2 VIP 系統](../01_Player_Center/01-06_VIP_Loyalty.md) - VIP 專屬活動、等級權益
+- [Bonus2-Bonus1 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 流水未達標提款限制
+- [Bonus9-Bonus4 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - 活動發布 Maker-Checker 審批
 
 ### 技術參考
-- [Bonus7-Bonus3 通知架構](../Bonus7_Platform_Management/Bonus7-Bonus3_Notification_Architecture.md) - 活動推送通知
-- [Bonus3-Bonus2 遊戲大廳管理](../Bonus3_Game_Center/Bonus3-Bonus2_Game_Lobby_Management.md) - 活動遊戲標籤推薦
-- [Bonus8-Bonus2 Banner 與公告](../Bonus8_Frontend_CMS/Bonus8-Bonus2_Banner_&_Announcement.md) - 活動橫幅配置
+- [Bonus7-Bonus3 通知架構](../10_Platform_Management/10-03_Notification_Architecture.md) - 活動推送通知
+- [Bonus3-Bonus2 遊戲大廳管理](../03_Game_Center/03-02_Game_Lobby_Management.md) - 活動遊戲標籤推薦
+- [Bonus8-Bonus2 Banner 與公告](../11_Frontend_CMS/11-02_Banner_&_Announcement.md) - 活動橫幅配置
 
 ---
 

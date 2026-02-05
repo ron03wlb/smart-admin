@@ -2081,7 +2081,7 @@ alerts:
 
 ### 前置知識（必讀）
 <!-- TODO: 待創建文檔 - Week 4-5 -->
-<!-- - [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - Wallet表結構設計、索引策略、數據庫層設計 -->
+<!-- - [00-03 數據模型總覽](../00_Foundation/concepts/00-05_Data_Model.md) - Wallet表結構設計、索引策略、數據庫層設計 -->
 
 ### 核心依賴
 - [02-03 流水計算與對帳](../03_Game_Center/03-04_Turnover_Calculation.md) - 從錢包交易記錄計算流水、三層驗證架構
@@ -2090,16 +2090,16 @@ alerts:
 ### 相關實作
 <!-- TODO: 待創建文檔 - Week 4-5 -->
 <!-- - [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 獎金錢包整合、流水要求計算、獎金餘額扣除優先級 -->
-- [06-02 信用網絡邏輯](../06_Agent_Center/06-02_Credit_Network_Logic.md) - Credit錢包使用、額度轉移、信用結算流程
+- [06-02 信用網絡邏輯](../07_Agent_Center/07-02_Credit_Network_Logic.md) - Credit錢包使用、額度轉移、信用結算流程
 - [01-05 提款風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 可提餘額驗證、鎖定餘額處理
 
 ### 延伸閱讀
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 曝光度監控、異常負債檢測、風險等級評估
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 曝光度監控、異常負債檢測、風險等級評估
 - [03-03 無縫錢包分析](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - 遊戲投注與錢包扣款的極端場景處理
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-03
 **維護團隊**: Finance Team & Architecture Team
 

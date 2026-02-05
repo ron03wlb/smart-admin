@@ -284,8 +284,8 @@ Response:
 - [03-03 無縫錢包對接分析](./03-03_Seamless_Wallet_Analysis.md) - 遊戲啟動流程
 
 ### 技術架構
-- [08-01 前端佈局引擎](../08_Frontend_CMS/08-01_Frontend_Layout_Engine.md) - 大廳頁面設計
-- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - API 限流
+- [08-01 前端佈局引擎](../11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) - 大廳頁面設計
+- [12-03 網關架構](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API 限流
 
 ### 業務整合
 - [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 活動遊戲推薦
@@ -298,6 +298,6 @@ Response:
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Integration Team & Backend Team

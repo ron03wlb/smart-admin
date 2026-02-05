@@ -32,7 +32,7 @@
    - SSOT 標記: 9 個
    - 引用鏈接: 8 個
 
-3. **[05-05_Data_Security.md](./05_Platform_Governance/05-05_Data_Security.md)**
+3. **[06-05_Data_Security.md](./06_Platform_Governance/06-05_Data_Security.md)**
    - 行數: 1,556 行
    - SSOT 標記: 9 個
    - 引用鏈接: 8 個
@@ -47,17 +47,17 @@
 - ✅ `../03_Game_Center/03-04_Turnover_Calculation.md` - 指向新合併文檔
 - ✅ `../02_Finance_Center/02-07_Transaction_Processing_Flow.md` - 舊文檔仍存在
 - ✅ `../01_Player_Center/01-05_Withdrawal_Risk.md` - **已遷移** (Week 4-5 完成)
-- ✅ `../06_Agent_Center/06-02_Credit_Network_Logic.md` - 舊文檔仍存在
-- ✅ `../04_Risk_Control/04-01_Risk_Framework.md` - 舊文檔仍存在
+- ✅ `../07_Agent_Center/07-02_Credit_Network_Logic.md` - 舊文檔仍存在
+- ✅ `../05_Risk_Control/05-01_Risk_Framework.md` - 舊文檔仍存在
 - ✅ `../03_Game_Center/03-03_Seamless_Wallet_Analysis.md` - 舊文檔仍存在
 
 **02-03_Turnover_Calculation.md**:
 - ✅ `00_Foundation/concepts/00-03_Terminology_Standards.md` - 舊文檔仍存在
-- ✅ `../04_Risk_Control/04-01_Risk_Framework.md` - 舊文檔仍存在
+- ✅ `../05_Risk_Control/05-01_Risk_Framework.md` - 舊文檔仍存在
 - ✅ `../02_Finance_Center/02-03_Reconciliation_System.md` - 舊文檔仍存在
 - ✅ `../03_Game_Center/03-03_Seamless_Wallet_Analysis.md` - 舊文檔仍存在
 
-**05-05_Data_Security.md**:
+**06-05_Data_Security.md**:
 - ✅ `../02_Finance_Center/02-06_Wallet_Architecture.md` - 指向新合併文檔
 
 ### 3.2 ⚠️ 需要更新的鏈接（1 個）
@@ -74,7 +74,7 @@
 
 | 文檔路徑 | 引用來源 | 預期內容 | 優先級 |
 |---------|---------|---------|--------|
-| **00_Foundation/concepts/00-03_Data_Model_Overview.md** | 01-02 | Wallet表結構設計、索引策略 | P1 |
+| **00_Foundation/concepts/00-05_Data_Model.md** | 01-02 | Wallet表結構設計、索引策略 | P1 |
 | **04_Activity_Center/04-04_Activity_Bonus.md** | 01-02, 02-03 | 獎金錢包整合、流水要求計算 | P1 |
 | **01_Player_Center/01-01_Player_Lifecycle.md** | 05-05 | 玩家生命週期管理 | P2 |
 | **01_Player_Center/01-05_Withdrawal_Risk.md** | 05-05 | 可提餘額驗證、鎖定餘額處理 | P2 |
@@ -154,14 +154,14 @@ graph LR
         T["02-03<br/>Turnover Calculation<br/>(1,850 lines)"]
     end
 
-    subgraph Governance["05_Platform_Governance"]
+    subgraph Governance["06_Platform_Governance"]
         S["05-05<br/>Data Security<br/>(1,556 lines)"]
     end
 
     subgraph Old["舊文檔（保持舊路徑）"]
         F1["02_Finance_Center/<br/>02-07, 02-01, 02-03"]
-        F2["05_Risk_Management/<br/>05-01"]
-        F3["06_Agent_Center/<br/>06-02"]
+        F2["05_Risk_Control/<br/>04-01"]
+        F3["07_Agent_Center/<br/>06-02"]
         F4["03_Game_Center/<br/>03-03"]
         F5["00_Foundation/concepts/<br/>00-03 Terminology"]
     end
@@ -221,7 +221,7 @@ graph LR
 
 ### 7.2 Week 4-5 計劃
 
-- [ ] 創建 **00-03_Data_Model_Overview.md**（P1 - 數據模型總覽）
+- [ ] 創建 **00-05_Data_Model.md**（P1 - 數據模型總覽）
 - [ ] 創建 **04-01_Activity_System_Design.md**（P1 - 活動系統設計）
 - [ ] 創建 **01-01_Player_Lifecycle.md**（P2 - 玩家生命週期）
 - [ ] 創建 **01-05_Withdrawal_Risk.md**（P2 - 提款風控）
@@ -307,7 +307,7 @@ chmod +x scripts/validate_ssot_references.sh
 ---
 
 **報告生成時間**: 2026-02-03
-**驗證工具版本**: v1.0.0
+**驗證工具版本**: v4.0.0
 **報告作者**: Claude Code
 
 **附錄**:

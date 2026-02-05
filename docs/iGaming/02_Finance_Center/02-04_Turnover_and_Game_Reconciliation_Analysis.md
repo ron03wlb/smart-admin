@@ -202,7 +202,7 @@ public calculateGGR(date: LocalDate): GgrReport {
 - **數據流向**: `valid_turnover_finance` -> `t_player_statistics.total_valid_turnover` (累加)。
 - **驗證時機**: 玩家取款時。
 - **驗證邏輯**: 讀取 `total_valid_turnover`，減去 `Last_Snapshot`，與目標值比對。
-- **詳情參考**: [08-turnover-validation-scheme (流水驗證方案)](../technical-specs/P1-important/08-turnover-validation-scheme.md)。
+- **詳情參考**: [08-turnover-validation-scheme (流水驗證方案)](../05_Risk_Control/05-07_Turnover_Validation_Scheme.md)。
 
 ---
 
@@ -1139,7 +1139,7 @@ Controller → Manager (❌ 禁止,違反分層)
 
 ---
 
-**文檔版本**: 2.1.0 (更新 Layer 1 處理流程支援配置驅動風控)
+**文檔版本**: 4.0.0 (更新 Layer 1 處理流程支援配置驅動風控)
 **最後更新**: 2026-02-02
 **維護團隊**: Finance Team & Backend Team & Risk Team
 **重大變更**: v2.1.0 Layer 1 支援配置驅動風控（BLOCK/FLAG/PASS），與 05-01 風控系統 v2.1.0 集成
@@ -1157,5 +1157,5 @@ Controller → Manager (❌ 禁止,違反分層)
 - [02-04 計算邏輯](./02-04-diagrams/02-04-02_Calculation_Logic.md) - 流水計算公式
 
 ### 延伸閱讀
-- [Seamless Wallet 專題](./seamless-wallet/00_INDEX.md) - 深度技術分析
+- [Seamless Wallet 專題](./seamless-wallet/README.md) - 深度技術分析
 - [02-03 對帳系統](./02-03_Reconciliation_System.md) - 財務對帳

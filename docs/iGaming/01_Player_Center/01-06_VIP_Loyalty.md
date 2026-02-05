@@ -704,12 +704,12 @@ THEN 標記為 "VIP Farming" → 人工審核
 - [02-04 流水計算與對賬](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 有效流水定義
 
 ### 技術架構參考
-- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - 數據庫設計
-- [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 配置變更審計
-- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 配置變更審批
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-05_Data_Model.md) - 數據庫設計
+- [09-02 審計日誌系統](../06_Platform_Governance/06-03_Audit_Log.md) - 配置變更審計
+- [09-04 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - 配置變更審批
 
 ---
 
-**文檔版本**: 1.1.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-27
 **維護團隊**: Product Team & Backend Team

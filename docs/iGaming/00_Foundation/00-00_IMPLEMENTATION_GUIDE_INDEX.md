@@ -1,6 +1,6 @@
 # 00-00 iGaming 實作指南總索引 (Implementation Guide Index)
 
-**版本**: 2.0.0
+**版本**: 4.0.0
 **創建日期**: 2026-02-04
 **重組說明**: 原 IMPLEMENTATION_GUIDE.md (2,379 行) 拆分為 6 個主題文件
 **狀態**: ✅ 索引完成 | 📝 內容開發中（5/20 章節完成）
@@ -69,7 +69,7 @@
 12. 實作欺詐檢測算法（設備指紋、行為分析、機器學習）
 13. 設計代理信用管理（信用額度、風險預警、佔成模式）
 
-**關鍵模塊**: 05_Risk_Management, 06_Agent_Center
+**關鍵模塊**: 05_Risk_Control, 07_Agent_Center
 
 ---
 
@@ -83,7 +83,7 @@
 16. 建立審計日誌系統（操作日誌、變更追蹤、合規報表）
 17. 實作數據加密策略（字段加密、KMS 整合、密鑰輪換）
 
-**關鍵模塊**: 07_Platform_Management, 09_System_Security
+**關鍵模塊**: 10_Platform_Management, 12_System_Security
 
 ---
 
@@ -187,7 +187,7 @@
 - [00-04_Technology_Stack.md](concepts/00-04_Technology_Stack.md) - 技術棧說明
 
 ### 架構文檔
-- [10-architecture-rules.md](../../.agent/rules/foundation/10-architecture-rules.md) - SmartAdmin 架構規則
+- [10-architecture-rules.md](../../.agent/rules/foundation/F04-architecture-rules.md) - SmartAdmin 架構規則
 - [smartadmin-patterns.md](../../.claude/shared/knowledge/smartadmin-patterns.md) - SmartAdmin 設計模式
 
 ---
@@ -206,7 +206,7 @@
 
 ---
 
-**文檔版本**: 2.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-02-04
 **維護團隊**: Product Team & Backend Team
 

@@ -17,10 +17,10 @@
 ### 違規明細
 
 **深度超過 3 層 (6 個)**:
-- `07-03-02-01_OAuth_Refresh_Token_Implementation.md`
-- `07-03-02-02_Multi_Actor_Token_Security.md`
-- `012-async-risk-proposal-system.md`
-- `ADR-001-Naming-Convention-Singular-Standard.md`
+- `09-11_OAuth_Refresh_Token_Implementation.md`
+- `09-12_Multi_Actor_Token_Security.md`
+- `ADR-012_Async_Risk_Proposal_System.md`
+- `ADR-001_Naming_Convention_Singular_Standard.md`
 - `07-withdrawal-risk-correlation.md`
 - `08-turnover-validation-scheme.md`
 
@@ -66,7 +66,7 @@
 
 **主要原因**:
 - 跨模組引用（模組重組後路徑改變）
-- 不存在的文件引用（如 `08-05_Localization_System.md`）
+- 不存在的文件引用（如 `11-07_i18n_Localization.md`）
 - 歸檔文件引用（已移動到 archive/）
 - 外部文件引用（`.agent/`, `.claude/`）
 

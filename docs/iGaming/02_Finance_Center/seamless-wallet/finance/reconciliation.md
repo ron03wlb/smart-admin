@@ -87,11 +87,11 @@ graph TD
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [03-03 無縫錢包分析](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [03-03 無縫錢包分析](../../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP API 規範
 
 ---
 
@@ -141,7 +141,7 @@ graph TD
 
 **參考文檔**:
 - [術語標準化定義](../../../00_Foundation/concepts/00-03_Terminology_Standards.md) - 統一術語使用
-- [核心架構流程圖](../02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - 三層驗證架構
+- [核心架構流程圖](../../02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) - 三層驗證架構
 
 ---
 
@@ -1037,7 +1037,7 @@ Response:
 
 ---
 
-**文檔版本**: 2.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **變更記錄**:
 - v2.0.0 (2026-01-28): 根據[術語標準化文檔](../../../00_Foundation/concepts/00-03_Terminology_Standards.md)進行全面修正 - 添加功能特性對比表格、風險場景分析、回推機制實施優先級(P0/P1/P2)、業界標準參考
@@ -1051,15 +1051,15 @@ Response:
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 相關專題
-- [04 免費旋轉流水](./04_free_spins_turnover.md) - 活動流水計算
+- [04 免費旋轉流水](../../../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) - 活動流水計算
 - [07 流水並發累積](./07_turnover_concurrency.md) - Lua 腳本原子性
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [04-01 活動系統設計](../../03_Player_Journey/03-03_Activity_Bonus.md) - 活動系統
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [04-01 活動系統設計](../../../04_Activity_Center/04-04_Activity_Bonus.md) - 活動系統
 
 
 ---
@@ -1068,7 +1068,7 @@ Response:
 
 
 ## 文檔資訊
-- **版本**: 1.0.0
+- **版本**: 4.0.0
 - **創建日期**: 2026-01-28
 - **問題來源**: 計劃文檔 P2 Task 2
 - **相關文檔**: `turnover_calculation_logic.md:193-197`
@@ -1402,7 +1402,7 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Finance Team & Backend Team
 **狀態**: 🟡 待業務確認
@@ -1412,12 +1412,12 @@ transferWagerRequirement = max(0, (wagerRequirement - effectiveStake) × (transf
 ## 📚 相關文檔
 
 ### 上層導航
-- [Seamless Wallet 索引](./00_INDEX.md) - 專題導航（P0/P1 分類）
+- [Seamless Wallet 索引](../README.md) - 專題導航（P0/P1 分類）
 
 ### 相關專題
 - [11 投注要求追蹤](./11_wagering_requirement.md) - 流水要求時序
-- [04 免費旋轉流水](./04_free_spins_turnover.md) - 活動流水計算
+- [04 免費旋轉流水](../../../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) - 活動流水計算
 
 ### 架構文檔
-- [02-06 統一錢包模型](../02-06_Wallet_Architecture.md) - 錢包整體架構
-- [04-01 活動系統設計](../../03_Player_Journey/03-03_Activity_Bonus.md) - 促銷活動系統
+- [02-06 統一錢包模型](../../02-06_Wallet_Architecture.md) - 錢包整體架構
+- [04-01 活動系統設計](../../../04_Activity_Center/04-04_Activity_Bonus.md) - 促銷活動系統

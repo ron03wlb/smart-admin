@@ -39,26 +39,26 @@
 ### 我想了解...
 
 **玩家相關**:
-- 玩家註冊與 KYC → [02_Player_Center](../../02_Player_Center/)
-- 玩家標籤與分群 → [02_Player_Center/02-04_Player_Tags_System.md](../../02_Player_Center/02-04_Player_Tags_System.md)
+- 玩家註冊與 KYC → [02_Player_Center](../../01_Player_Center/)
+- 玩家標籤與分群 → [02_Player_Center/01-03_Player_Segmentation.md](../../01_Player_Center/01-03_Player_Segmentation.md)
 
 **財務相關**:
 - 存款/出金流程 → [出金流程全路徑](by-task/withdrawal-flow.md)
 - 無縫錢包設計 → [02_Finance_Center/seamless-wallet/](../../02_Finance_Center/seamless-wallet/)
-- 交易對帳 → [02_Finance_Center/02-04_Transaction_Reconciliation.md](../../02_Finance_Center/02-04_Transaction_Reconciliation.md)
+- 交易對帳 → [02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md](../../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 
 **風控相關**:
-- 風控規則引擎 → [05_Risk_Management/](../../05_Risk_Management/)
-- 異步風控提案 → [architecture-decisions/012-async-risk-proposal-system.md](../../architecture-decisions/012-async-risk-proposal-system.md)
-- 出金風控關聯 → [technical-specs/P1-important/07-withdrawal-risk-correlation.md](../../technical-specs/P1-important/07-withdrawal-risk-correlation.md)
+- 風控規則引擎 → [05_Risk_Control/](../../05_Risk_Control/)
+- 異步風控提案 → [architecture-decisions/ADR-012_Async_Risk_Proposal_System.md](../../architecture-decisions/ADR-012_Async_Risk_Proposal_System.md)
+- 出金風控關聯 → [technical-specs/P1-important/07-withdrawal-risk-correlation.md](../../05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md)
 
 **活動相關**:
-- 活動系統設計 → [04_Activity_Center/01-system-design.md](../../04_Activity_Center/01-system-design.md)
+- 活動系統設計 → [04_Activity_Center/04-00_INDEX.md](../../04_Activity_Center/04-00_INDEX.md)
 - Bonus 引擎 → [04_Activity_Center/](../../04_Activity_Center/)
 
 **技術架構**:
-- 架構決策記錄 (ADR) → [architecture-decisions/](../architecture-decisions/)
-- 技術規格 → [technical-specs/](../technical-specs/)
+- 架構決策記錄 (ADR) → [architecture-decisions/](../../architecture-decisions/)
+- 技術規格 → [technical-specs/](../../05_Risk_Control/)
 
 ---
 

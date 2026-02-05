@@ -1,6 +1,6 @@
 # 00-00-01 財務流程實作指南 (Financial Implementation Guide)
 
-**版本**: 1.0.0  
+**版本**: 4.0.0  
 **創建日期**: 2026-02-04  
 **來源**: 從 00-00_IMPLEMENTATION_GUIDE.md 拆分（§1-4）  
 **狀態**: ✅ 完整內容
@@ -38,10 +38,10 @@
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [00-00 QUICKSTART](./00-00_QUICKSTART.md) | §1 錢包模型 | 5 分鐘 | 可下注餘額公式 |
-| 2 | [01-02 Wallet_Architecture](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) | §2 錢包架構 | 15 分鐘 | 多錢包設計、鎖定邏輯 |
-| 3 | [01-02 Wallet_Architecture](../01_Core_Financial_Loop/01-02_Wallet_Architecture.md) | §3 並發控制 | 10 分鐘 | Redis Lua 原子性 |
-| 4 | [01-04 Transaction_Flow](../01_Core_Financial_Loop/01-04_Transaction_Flow.md) | §3 事件驅動 | 12 分鐘 | Outbox Pattern |
+| 1 | [00-00 QUICKSTART](../00-00_QUICKSTART.md) | §1 錢包模型 | 5 分鐘 | 可下注餘額公式 |
+| 2 | [01-02 Wallet_Architecture](../../02_Finance_Center/02-06_Wallet_Architecture.md) | §2 錢包架構 | 15 分鐘 | 多錢包設計、鎖定邏輯 |
+| 3 | [01-02 Wallet_Architecture](../../02_Finance_Center/02-06_Wallet_Architecture.md) | §3 並發控制 | 10 分鐘 | Redis Lua 原子性 |
+| 4 | [01-04 Transaction_Flow](../../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | §3 事件驅動 | 12 分鐘 | Outbox Pattern |
 
 ### 🎯 實作目標
 
@@ -358,9 +358,9 @@ public void relayOutboxEvents() {
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [01-03 Payment_Integration](../01_Core_Financial_Loop/01-03_Payment_Integration.md) | §2 對接流程 | 10 分鐘 | 入金/出金 API |
-| 2 | [07-03-02 Authentication](../07_Technical_Infrastructure/07-03-02_Authentication.md) | §2 HMAC 簽名 | 8 分鐘 | 簽名驗證機制 |
-| 3 | [01-04 Transaction_Flow](../01_Core_Financial_Loop/01-04_Transaction_Flow.md) | §2 交易狀態機 | 10 分鐘 | 支付狀態轉換 |
+| 1 | [01-03 Payment_Integration](../../02_Finance_Center/02-02_Payment_Gateway_Integration.md) | §2 對接流程 | 10 分鐘 | 入金/出金 API |
+| 2 | [07-03-02 Authentication](../../09_Technical_Infrastructure/09-03-02_Authentication.md) | §2 HMAC 簽名 | 8 分鐘 | 簽名驗證機制 |
+| 3 | [01-04 Transaction_Flow](../../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | §2 交易狀態機 | 10 分鐘 | 支付狀態轉換 |
 
 ### 🎯 實作目標
 
@@ -770,9 +770,9 @@ public class WithdrawalService {
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [00-00 BUSINESS_FLOWS](./00-00_BUSINESS_FLOWS.md) | §4 出金審核流程 | 12 分鐘 | 完整業務流程 |
-| 2 | [01-05 Withdrawal_Risk](../01_Core_Financial_Loop/01-05_Withdrawal_Risk.md) | §4 風控流程 | 15 分鐘 | 規則引擎設計 |
-| 3 | [04-01 Risk_Engine](../04_Risk_Control/04-01_Risk_Framework.md) | §2 規則引擎 | 12 分鐘 | LiteFlow 實作 |
+| 1 | [00-00 BUSINESS_FLOWS](../00-00_BUSINESS_FLOWS.md) | §4 出金審核流程 | 12 分鐘 | 完整業務流程 |
+| 2 | [01-05 Withdrawal_Risk](../../01_Player_Center/01-05_Withdrawal_Risk.md) | §4 風控流程 | 15 分鐘 | 規則引擎設計 |
+| 3 | [04-01 Risk_Engine](../../05_Risk_Control/05-01_Risk_Framework.md) | §2 規則引擎 | 12 分鐘 | LiteFlow 實作 |
 | 4 | ~~04-04 Risk_Workflow~~ 🚧 計劃中 | §2 工作流狀態機 | 10 分鐘 | 審核流程狀態 |
 
 ### 🎯 實作目標
@@ -1296,9 +1296,9 @@ interface CompensationAction {
 
 | 順序 | 文檔 | 章節 | 閱讀時間 | 重點內容 |
 |------|------|------|---------|---------|
-| 1 | [01-06 Reconciliation](../01_Core_Financial_Loop/01-06_Reconciliation.md) | §2 對帳模型 | 15 分鐘 | 三方對帳邏輯 |
-| 2 | [02-03 Turnover_Calculation](../02_Game_Operations/02-03_Turnover_Calculation.md) | §2 三層驗證 | 10 分鐘 | 流水對帳 |
-| 3 | [00-00 BUSINESS_FLOWS](./00-00_BUSINESS_FLOWS.md) | §5 流水對帳流程 | 10 分鐘 | 端到端流程 |
+| 1 | [01-06 Reconciliation](../../02_Finance_Center/02-03_Reconciliation_System.md) | §2 對帳模型 | 15 分鐘 | 三方對帳邏輯 |
+| 2 | [02-03 Turnover_Calculation](../../03_Game_Center/03-04_Turnover_Calculation.md) | §2 三層驗證 | 10 分鐘 | 流水對帳 |
+| 3 | [00-00 BUSINESS_FLOWS](../00-00_BUSINESS_FLOWS.md) | §5 流水對帳流程 | 10 分鐘 | 端到端流程 |
 
 ### 🎯 實作目標
 

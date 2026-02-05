@@ -883,15 +883,15 @@ flowchart TD
 
 ### 業務整合
 - [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳、注單驗證
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 異常投注檢測、負餘額告警
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 異常投注檢測、負餘額告警
 
 ### 技術參考
 - [02-07 交易處理流程](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) - 分散式事務、TCC 模式
-- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - API 限流、冪等性保證
+- [12-03 網關架構](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API 限流、冪等性保證
 
 ### 延伸閱讀
 - [03-02 遊戲大廳管理](./03-02_Game_Lobby_Management.md) - 遊戲入口管理
-- [12-04 維護程序](../07_Technical_Infrastructure/07-05_Maintenance.md) - 遊戲維護與餘額同步
+- [12-04 維護程序](../09_Technical_Infrastructure/09-05_Maintenance.md) - 遊戲維護與餘額同步
 
 ---
 
@@ -1002,7 +1002,7 @@ Controller → Manager (❌ 禁止,違反分層)
 ### 深度技術分析
 詳細的無縫錢包專題分析（13 個專題），提供更細緻的實作指引：
 
-- **[Seamless Wallet 專題索引](../02_Finance_Center/seamless-wallet/00_INDEX.md)** - 完整導航與學習路徑
+- **[Seamless Wallet 專題索引](../02_Finance_Center/seamless-wallet/README.md)** - 完整導航與學習路徑
   - [Token 驗證](../02_Finance_Center/seamless-wallet/01_token_verification.md) - API 身份驗證決策樹（Bet vs Result API 驗證策略）
   - [冪等性設計](../02_Finance_Center/seamless-wallet/02_idempotency_design.md) - 三層防護（Redis→DB→分散式鎖）、防重複扣款
   - [體育博彩邏輯](../02_Finance_Center/seamless-wallet/03_sports_betting_logic.md) - Valid Bet 計算、HALF WIN/LOSS 處理
@@ -1010,7 +1010,7 @@ Controller → Manager (❌ 禁止,違反分層)
   - [錯誤恢復](../02_Finance_Center/seamless-wallet/10_error_recovery.md) - 異常處理、補償事務、回滾策略
 
 ### 風控整合
-- **[05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md)** - 交易風控檢查、對沖檢測
+- **[05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md)** - 交易風控檢查、對沖檢測
 
 ---
 
@@ -1045,6 +1045,6 @@ Controller → Manager (❌ 禁止,違反分層)
 
 ---
 
-**文檔版本**: 2.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-29
 **維護團隊**: Game Integration Team & Backend Team

@@ -12,9 +12,9 @@
 **當前位置**: Bonus4-Bonus2 獎金計算引擎（流水計算與多獎金衝突處理）
 
 **相關文檔**:
-- **[← 返回活動中心索引](Bonus4-BonusBonus_INDEX.md)**
-- **[← Bonus4-Bonus1 活動系統架構](Bonus4-Bonus1_Activity_System_Architecture.md)** - 系統架構與規則引擎設計
-- **[→ Bonus4-Bonus3 活動風控與本地化](Bonus4-Bonus3_Activity_Risk_Control.md)** - 風控機制與區域市場策略
+- **[← 返回活動中心索引](04-00_INDEX.md)**
+- **[← Bonus4-Bonus1 活動系統架構](04-00_INDEX.md)** - 系統架構與規則引擎設計
+- **[→ Bonus4-Bonus3 活動風控與本地化](04-03_Activity_Risk_Control.md)** - 風控機制與區域市場策略
 
 ---
 
@@ -519,20 +519,20 @@ flowchart TD
 ## 📚 相關文檔
 
 ### 核心依賴
-- [Bonus2-Bonus6 統一錢包模型](../Bonus2_Finance_Center/Bonus2-Bonus6_Unified_Wallet_Model.md) - Bonus 錢包整合、可下注餘額計算
-- [Bonus2-Bonus4 流水計算與對帳](../Bonus2_Finance_Center/Bonus2-Bonus4_Turnover_and_Game_Reconciliation_Analysis.md) - Layer 2 狀態因子計算
-- [Bonus5-Bonus1 風控系統](../Bonus5_Risk_Management/Bonus5-Bonus1_Risk_Control_System.md) - Layer 1 風控驗證、對沖檢測
+- [Bonus2-Bonus6 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - Bonus 錢包整合、可下注餘額計算
+- [Bonus2-Bonus4 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Layer 2 狀態因子計算
+- [Bonus5-Bonus1 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - Layer 1 風控驗證、對沖檢測
 
 ### 業務整合
-- [Bonus1-Bonus2 VIP 系統](../Bonus1_Player_Center/Bonus1-Bonus2_VIP_&_Loyalty_System.md) - VIP 專屬活動、等級權益
-- [Bonus2-Bonus1 出金風控](../Bonus2_Finance_Center/Bonus2-Bonus1_Withdrawal_Risk_Control.md) - 流水未達標提款限制
+- [Bonus1-Bonus2 VIP 系統](../01_Player_Center/01-06_VIP_Loyalty.md) - VIP 專屬活動、等級權益
+- [Bonus2-Bonus1 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 流水未達標提款限制
 
 ### 技術參考
-- [Bonus7-Bonus3 通知架構](../Bonus7_Platform_Management/Bonus7-Bonus3_Notification_Architecture.md) - 活動推送通知
+- [Bonus7-Bonus3 通知架構](../10_Platform_Management/10-03_Notification_Architecture.md) - 活動推送通知
 
 ### 相關主題
-- **[← Bonus4-Bonus1 活動系統架構](Bonus4-Bonus1_Activity_System_Architecture.md)** - 系統架構與規則引擎
-- **[→ Bonus4-Bonus3 活動風控與本地化](Bonus4-Bonus3_Activity_Risk_Control.md)** - 風控機制、區域市場策略
+- **[← Bonus4-Bonus1 活動系統架構](04-00_INDEX.md)** - 系統架構與規則引擎
+- **[→ Bonus4-Bonus3 活動風控與本地化](04-03_Activity_Risk_Control.md)** - 風控機制、區域市場策略
 
 ---
 

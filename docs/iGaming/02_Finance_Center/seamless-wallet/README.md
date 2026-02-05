@@ -3,7 +3,7 @@
 無縫錢包是 iGaming 平台的核心財務系統，本專題深入探討其技術實現和業務邏輯。
 
 **最後更新**: 2026-02-03
-**版本**: 3.0.0 (重構版 - 3 層結構)
+**版本**: 4.0.0 (重構版 - 3 層結構)
 **狀態**: ✅ 已整合完成
 
 ---
@@ -69,8 +69,8 @@
 
 無縫錢包交易的風控檢查點：
 
-- **[05-01 風控系統](../../04_Risk_Control/04-01_Risk_Framework.md)** - 交易風控檢查、對沖檢測
-- **[04_Activity_Center/01-system-design.md](../../04_Activity_Center/01-system-design.md)** - Bonus 發放與流水要求
+- **[05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md)** - 交易風控檢查、對沖檢測
+- **[04_Activity_Center/04-00_INDEX.md](../../04_Activity_Center/04-00_INDEX.md)** - Bonus 發放與流水要求
 
 ---
 

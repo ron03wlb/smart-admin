@@ -1,6 +1,6 @@
 # 01-05 提款風控系統 (Withdrawal Risk Control System)
 
-> **MOVED FROM**: `02-01_Withdrawal_Risk_Control.md` (Week 4-5 Restructure)
+> **MOVED FROM**: `../01_Player_Center/01-05_Withdrawal_Risk.md` (Week 4-5 Restructure)
 > **Reason**: 提款風控與玩家生命週期緊密相關,歸類至 Player Center 更合理
 > **Version**: v2.2.0 (Post-migration Enhancement)
 > **Last Updated**: 2026-02-03
@@ -1501,7 +1501,7 @@ COMMIT;
 
 ### 核心依賴
 - [02-06 統一錢包模型](./02-06_Wallet_Architecture.md) - 可提餘額計算、鎖定餘額處理
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控規則引擎、ML 模型整合
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 風控規則引擎、ML 模型整合
 
 ### 業務整合
 - [01-01 玩家賬戶系統](01-01_Player_Lifecycle.md) - KYC 等級驗證
@@ -1509,14 +1509,14 @@ COMMIT;
 - [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 紅利流水要求驗證
 
 ### 技術參考
-- [09-04 審批工作流系統](../05_Platform_Governance/05-04_Approval_Workflow.md) - 多層審批 Maker-Checker
-- [09-02 審計日誌系統](../05_Platform_Governance/05-03_Audit_Log.md) - 提款審批日誌記錄
+- [09-04 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - 多層審批 Maker-Checker
+- [09-02 審計日誌系統](../06_Platform_Governance/06-03_Audit_Log.md) - 提款審批日誌記錄
 - [02-07 交易處理流程](./02-07_Transaction_Processing_Flow.md) - SAGA 分散式事務
 
 ### 延伸閱讀
 - [02-02 支付網關集成](./02-02_Payment_Gateway_Integration.md) - 代付通道整合
 - [02-03 對賬系統](./02-03_Reconciliation_System.md) - 三方對賬流程
-- [12-03 網關架構](../07_Technical_Infrastructure/07-02-01_Gateway_Core.md) - API 限流、熔斷
+- [12-03 網關架構](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API 限流、熔斷
 
 ---
 
@@ -1629,7 +1629,7 @@ COMMIT;
 
 ### X.1 提款風控與投注風控的關係
 
-本文檔（01-05_Withdrawal_Risk.md）描述的提款風控系統，與投注風控系統（[04-02_Fraud_Detection.md](../04_Risk_Control/04-02_Fraud_Detection.md)）共同構成 SmartAdmin iGaming 平台的完整風控體系。
+本文檔（01-05_Withdrawal_Risk.md）描述的提款風控系統，與投注風控系統（[05-02_Fraud_Detection.md](../05_Risk_Control/05-02_Fraud_Detection.md)）共同構成 SmartAdmin iGaming 平台的完整風控體系。
 
 **投注階段（異步風控）**：
 - **時機**：投注成功後，`WALLET_DEBITED` 事件發布至 Kafka
@@ -1791,9 +1791,9 @@ WHERE player_id = ?
    - X.4 架構優勢總結（對比表：同步阻斷 vs 異步風控）
 
 **與其他文檔的整合**：
-- 與 [04-02_Fraud_Detection.md](../04_Risk_Control/04-02_Fraud_Detection.md) 投注風控系統完全對齊
+- 與 [05-02_Fraud_Detection.md](../05_Risk_Control/05-02_Fraud_Detection.md) 投注風控系統完全對齊
 - 與 [02-07_Transaction_Processing_Flow.md](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) 事件流一致
-- 與 [風控系統架構.md](../風控系統架構.md) 理論框架吻合
+- 與 [風控系統架構.md](../archive/legacy-cn/風控系統架構.md) 理論框架吻合
 
 **業務價值**：
 - 明確提款風控在整體風控體系中的定位（事後資金攔截）
@@ -1810,7 +1810,7 @@ WHERE player_id = ?
 
 **重大變更**:
 1. ✅ **File Relocation**: 將文檔從 Finance Center 遷移至 Player Center
-   - **舊路徑**: `02_Finance_Center/02-01_Withdrawal_Risk_Control.md`
+   - **舊路徑**: `02_Finance_Center/../01_Player_Center/01-05_Withdrawal_Risk.md`
    - **新路徑**: `01_Player_Center/01-05_Withdrawal_Risk.md`
    - **理由**: 提款風控與玩家生命週期緊密相關，歸類至 Player Center 更合理
    - **Git 歷史**: 使用 `git mv` 保留完整版本歷史
@@ -1910,7 +1910,7 @@ WHERE player_id = ?
 
 ---
 
-**文檔版本**: v2.3.0 (Risk Control System Integration - 與投注風控系統一致性整合)
+**文檔版本**: v4.0.0 (Risk Control System Integration - 與投注風控系統一致性整合)
 **最後更新**: 2026-02-04
 **維護團隊**: Finance Team & Backend Team & Risk Team
 **重大變更**: v2.2.0 文檔遷移至 01_Player_Center + 新增鎖定餘額計算、速率檢測、風險關聯、狀態機章節

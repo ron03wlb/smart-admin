@@ -1,7 +1,7 @@
 # stateDiagram-v2 模板 (SmartAdmin iGaming Documentation)
 
 > **用途**: 為 SmartAdmin iGaming 文檔提供標準的 stateDiagram-v2 範本
-> **版本**: 1.0.0
+> **版本**: 4.0.0
 > **最後更新**: 2026-02-04
 > **維護者**: iGaming Documentation Team
 
@@ -415,7 +415,7 @@ stateDiagram-v2
 
 ---
 
-**版本**: 1.0.0
+**版本**: 4.0.0
 **最後更新**: 2026-02-04
 **維護者**: iGaming Documentation Team
 **狀態**: Production Ready

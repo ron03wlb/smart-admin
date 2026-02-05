@@ -2,7 +2,7 @@
 
 **目標讀者**: 新加入團隊的開發者、產品經理、架構師
 **閱讀時間**: ⏱️ 10 分鐘
-**版本**: 2.0.0 (v2 重組版)
+**版本**: 4.0.0 (v2 重組版)
 **最後更新**: 2026-02-03
 
 ---
@@ -95,7 +95,7 @@ iGaming 平台是一個複雜的系統，但核心邏輯圍繞 **5 個關鍵概�
 - ⚡ **性能**: Redis 快取避免每次查 DB
 
 **深入閱讀**:
-👉 [02-02 Seamless Wallet API §4.2 Token 驗證](../02_Game_Operations/02-02_Seamless_Wallet_API.md#token-驗證流程) ⭐ SSOT
+👉 [02-02 Seamless Wallet API §4.2 Token 驗證](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-驗證流程) ⭐ SSOT
 
 **關鍵場景**:
 - 玩家進入遊戲：GP 請求 Token → 驗證身份 → 返回餘額
@@ -127,7 +127,7 @@ iGaming 平台是一個複雜的系統，但核心邏輯圍繞 **5 個關鍵概�
 - 📊 **合規性**: 不同地區品牌可以滿足不同的監管要求
 
 **深入閱讀**:
-👉 [05-01 多租戶架構 §2.1 隔離策略](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md#隔離策略) ⭐ SSOT
+👉 [05-01 多租戶架構 §2.1 隔離策略](../06_Platform_Governance/06-01_Multi_Tenant.md#隔離策略) ⭐ SSOT
 
 **關鍵場景**:
 - 品牌創建：創建新 Tenant → 初始化 Schema → 配置遊戲
@@ -169,7 +169,7 @@ iGaming 平台是一個複雜的系統，但核心邏輯圍繞 **5 個關鍵概�
 - ⚖️ **合規**: 滿足反洗錢（AML）監管要求
 
 **深入閱讀**:
-👉 [04-01 風控引擎 §2 規則引擎](../04_Risk_Control/04-01_Risk_Framework.md#規則引擎) ⭐ SSOT
+👉 [04-01 風控引擎 §2 規則引擎](../05_Risk_Control/05-01_Risk_Framework.md#規則引擎) ⭐ SSOT
 
 **關鍵場景**:
 - 玩家出金：風控檢查 → KYC 驗證 → 流水檢查 → 決策（通過/審核/拒絕）
@@ -231,7 +231,7 @@ flowchart LR
 | 🔴 P0 | 玩家生命週期 | [01-01 Player_Lifecycle](../01_Player_Center/01-01_Player_Lifecycle.md) |
 | 🔴 P0 | 活動系統規則 | [03-01 Bonus_Engine](../04_Activity_Center/04-02_Bonus_Calculation_Engine.md) |
 | 🟠 P1 | VIP 系統 | [03-04 VIP_Loyalty](../01_Player_Center/01-06_VIP_Loyalty.md) |
-| 🟠 P1 | 代理系統 | [05-02 Agent_System](../05_Platform_Governance/05-02_Agent_System.md) |
+| 🟠 P1 | 代理系統 | [05-02 Agent_System](../07_Agent_Center/07-03_Agent_System.md) |
 
 ### 👨‍💻 後端開發工程師
 **首要理解**：技術實現、API 設計
@@ -239,39 +239,39 @@ flowchart LR
 | 優先級 | 主題 | 文檔 |
 |-------|------|------|
 | 🔴 P0 | 錢包架構 | [01-02 Wallet_Architecture](../02_Finance_Center/02-06_Wallet_Architecture.md) ⭐ |
-| 🔴 P0 | Seamless Wallet API | [02-02 Seamless_Wallet_API](../02_Game_Operations/02-02_Seamless_Wallet_API.md) ⭐ |
+| 🔴 P0 | Seamless Wallet API | [02-02 Seamless_Wallet_API](../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) ⭐ |
 | 🔴 P0 | 流水計算 | [02-03 Turnover_Calculation](../03_Game_Center/03-04_Turnover_Calculation.md) ⭐ |
-| 🟠 P1 | 風控引擎 | [04-01 Risk_Engine](../04_Risk_Control/04-01_Risk_Framework.md) |
-| 🟠 P1 | 多租戶架構 | [05-01 Multi_Tenant_Arch](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md) |
+| 🟠 P1 | 風控引擎 | [04-01 Risk_Engine](../05_Risk_Control/05-01_Risk_Framework.md) |
+| 🟠 P1 | 多租戶架構 | [05-01 Multi_Tenant_Arch](../06_Platform_Governance/06-01_Multi_Tenant.md) |
 
 ### 🏛️ 架構師
 **首要理解**：整體架構、技術選型
 
 | 優先級 | 主題 | 文檔 |
 |-------|------|------|
-| 🔴 P0 | 方案總覽 | [00-01 Solution_Overview](./00-01_Solution_Overview.md) |
-| 🔴 P0 | 多租戶架構 | [05-01 Multi_Tenant_Arch](../05_Platform_Governance/05-01_Multi_Tenant_Arch.md) ⭐ |
-| 🔴 P0 | 數據安全 | [05-05 Data_Security](../05_Platform_Governance/05-05_Data_Security.md) |
-| 🟠 P1 | 部署架構 | [07-01 Deployment](../07_Technical_Infrastructure/07-01_Deployment.md) |
-| 🟠 P1 | API 網關 | [07-02 Gateway_Architecture](../07_Technical_Infrastructure/07-02_Gateway_Architecture/) |
+| 🔴 P0 | 方案總覽 | [00-01 Solution_Overview](./concepts/00-01_Solution_Overview.md) |
+| 🔴 P0 | 多租戶架構 | [05-01 Multi_Tenant_Arch](../06_Platform_Governance/06-01_Multi_Tenant.md) ⭐ |
+| 🔴 P0 | 數據安全 | [05-05 Data_Security](../06_Platform_Governance/06-05_Data_Security.md) |
+| 🟠 P1 | 部署架構 | [07-01 Deployment](../09_Technical_Infrastructure/09-01_Deployment.md) |
+| 🟠 P1 | API 網關 | [07-02 Gateway_Architecture](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
 
 ### 🔬 測試工程師
 **首要理解**：測試場景、邊界情況
 
 | 優先級 | 主題 | 文檔 |
 |-------|------|------|
-| 🔴 P0 | QA 測試標準 | [07-04 QA_Standards](../07_Technical_Infrastructure/07-04_QA_Standards.md) |
-| 🔴 P0 | 錢包極端場景 | [02-04 Game_Provider_Cases](../02_Game_Operations/02-04_Game_Provider_Cases.md) |
-| 🟠 P1 | 風控測試場景 | [04-02 Fraud_Detection](../04_Risk_Control/04-02_Fraud_Detection.md) |
+| 🔴 P0 | QA 測試標準 | [07-04 QA_Standards](../09_Technical_Infrastructure/09-04_QA_Standards.md) |
+| 🔴 P0 | 錢包極端場景 | [02-04 Game_Provider_Cases](../03_Game_Center/03-01_Game_Integration_Standard.md) |
+| 🟠 P1 | 風控測試場景 | [04-02 Fraud_Detection](../05_Risk_Control/05-02_Fraud_Detection.md) |
 
 ### 👨‍💼 運維工程師
 **首要理解**：部署、監控、維護
 
 | 優先級 | 主題 | 文檔 |
 |-------|------|------|
-| 🔴 P0 | 部署流程 | [07-01 Deployment](../07_Technical_Infrastructure/07-01_Deployment.md) |
-| 🔴 P0 | 維護程序 | [07-05 Maintenance](../07_Technical_Infrastructure/07-05_Maintenance.md) |
-| 🟠 P1 | API 網關配置 | [07-02 Gateway_Architecture](../07_Technical_Infrastructure/07-02_Gateway_Architecture/) |
+| 🔴 P0 | 部署流程 | [07-01 Deployment](../09_Technical_Infrastructure/09-01_Deployment.md) |
+| 🔴 P0 | 維護程序 | [07-05 Maintenance](../09_Technical_Infrastructure/09-05_Maintenance.md) |
+| 🟠 P1 | API 網關配置 | [07-02 Gateway_Architecture](../09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
 
 ---
 
@@ -284,7 +284,7 @@ flowchart LR
 👉 [00-00_IMPLEMENTATION_GUIDE.md](./00-00_IMPLEMENTATION_GUIDE.md) - 按開發任務分類的實作指南
 
 ### 3️⃣ 完整文檔索引
-👉 [00-00_Document_Map.md](./00-00_Document_Map.md) - 8 個模塊的完整文檔樹
+👉 [00-00_Document_Map.md](./concepts/00-00_Document_Map.md) - 8 個模塊的完整文檔樹
 
 ### 4️⃣ SSOT 映射表
 👉 [SSOT_MAPPING.md](../SSOT_MAPPING.md) - 34 個核心概念的權威定義索引

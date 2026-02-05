@@ -1,6 +1,6 @@
 # 01-03 玩家分群與標籤 (Player Segmentation & Tagging)
 
-> **版本**: 1.0.0
+> **版本**: 4.0.0
 > **最後更新**: 2026-01-28
 > **維護團隊**: Data Team & Product Team
 
@@ -166,19 +166,19 @@ VIP 玩家 (1.5-3%)
 ## 📚 相關文檔
 
 ### 前置知識
-- [00-03 數據模型總覽](../00_Foundation/concepts/00-03_Data_Model_Overview.md) - player_tags 表設計
+- [00-03 數據模型總覽](../00_Foundation/concepts/00-05_Data_Model.md) - player_tags 表設計
 - [00-02 行業術語表](../00_Foundation/concepts/00-02_Industry_Terminology.md) - RFM、生命週期等術語定義
 
 ### 核心依賴
-- [01-02 VIP 與忠誠度系統](./01-02_VIP_&_Loyalty_System.md) - VIP 等級與玩家價值關聯
-- [05-01 風控系統](../04_Risk_Control/04-01_Risk_Framework.md) - 風控標籤與規則引擎
+- [01-02 VIP 與忠誠度系統](./01-06_VIP_Loyalty.md) - VIP 等級與玩家價值關聯
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 風控標籤與規則引擎
 
 ### 延伸閱讀
 - [04-01 活動系統設計](../04_Activity_Center/04-04_Activity_Bonus.md) - 基於分群的精準營銷
-- [10-01 報表與 BI 架構](../06_Analytics_Operations/06-01_Reporting_BI.md) - 玩家分群分析報表
+- [10-01 報表與 BI 架構](../08_Analytics_BI/08-01_Reporting_BI.md) - 玩家分群分析報表
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Data Team & Product Team

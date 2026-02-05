@@ -439,7 +439,7 @@ AI/ML 方法已達到 **AUC 0.729**（隨機森林）的預測準確度，最具
 市場預計將以 **7-12% CAGR** 持續成長至 2030 年代，但成功營運商必須在快速擴張與合規嚴謹性之間找到平衡——這不僅是法規要求，更是建立長期品牌信譽與玩家信任的基礎。
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 4.0.0
 **最後更新**: 2026-01-28
 **維護團隊**: Architecture Team
 
@@ -449,10 +449,10 @@ AI/ML 方法已達到 **AUC 0.729**（隨機森林）的預測準確度，最具
 
 ### 業務模塊
 - [02-06 統一錢包模型](../../02_Finance_Center/02-06_Wallet_Architecture.md) - 錢包架構
-- [05-01 風控系統](../../04_Risk_Control/04-01_Risk_Framework.md) - 風控架構
-- [09-01 權限控制](../../05_Platform_Governance/05-02_RBAC_Permissions.md) - RBAC 架構
+- [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) - 風控架構
+- [09-01 權限控制](../../06_Platform_Governance/06-02_RBAC_Permissions.md) - RBAC 架構
 
 ### 延伸閱讀
 - [00-02 行業術語](./00-02_Industry_Terminology.md) - iGaming 專業術語
-- [00-03 數據模型](./00-03_Data_Model_Overview.md) - 核心數據模型
+- [00-03 數據模型](./00-05_Data_Model.md) - 核心數據模型
 - [00-04 技術棧](./00-04_Technology_Stack.md) - 技術選型
