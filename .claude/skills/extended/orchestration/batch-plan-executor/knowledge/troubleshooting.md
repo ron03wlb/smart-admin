@@ -454,6 +454,81 @@ cat skipped-plan.md | head -50
 
 ---
 
+## Quality Gate Failures
+
+### Problem 11: ArchUnit Test Failure After Execution
+
+**Symptoms**:
+```
+ERROR: ArchUnit test failed after plan execution
+Plan: product-crud
+Test: transactionalMustUseRollbackForThrowable
+```
+
+**Root Causes**:
+1. Generated code violates SmartAdmin architecture rules
+2. Skill implementation does not conform to SmartAdmin conventions
+3. `@Transactional` placed in Service instead of Manager layer
+
+**Solutions**:
+
+**Solution 1: Check Detailed Error Information**
+```bash
+# View execution logs
+cat .claude/metrics/batch-executions/batch-exec-*.log
+```
+
+**Solution 2: Fix Architecture Violations**
+- Review generated code
+- Fix violations (e.g., replace `@Autowired` field injection with constructor injection)
+- Move `@Transactional` annotations from Service to Manager layer
+
+**Solution 3: Temporarily Disable Quality Gate** (Not recommended):
+```yaml
+execution:
+  quality_gates:
+    enabled: false  # Only for testing
+```
+
+---
+
+### Problem 12: Inaccurate Time Estimates
+
+**Symptoms**:
+```
+WARNING: Actual execution time differs from estimate by > 50%
+Estimated: 20 minutes
+Actual: 45 minutes
+```
+
+**Root Causes**:
+1. Default time estimates not calibrated
+2. Large variance in plan complexity
+3. System resource fluctuations
+
+**Solutions**:
+
+**Solution 1: Calibrate Time Estimates**
+```yaml
+# config.yml - Add custom estimates
+time_estimation:
+  plan_type_estimates:
+    crud: 30  # Adjust from default 25
+    testing: 25  # Adjust from default 20
+```
+
+**Solution 2: Provide Plan Size Hints**
+```yaml
+---
+estimated_duration_minutes: 45
+---
+```
+
+**Solution 3: Use Historical Data**
+- After several executions, the system will auto-calibrate estimates
+
+---
+
 ## Getting Help
 
 ### Debug Mode
@@ -478,4 +553,3 @@ If issues persist:
 **See Also**:
 - [Quick Reference](quick-reference.md) - Command reference and decision matrix
 - [Examples](examples.md) - Real-world batch execution cases
-- [FAQ](../docs/faq.md) - Frequently asked questions

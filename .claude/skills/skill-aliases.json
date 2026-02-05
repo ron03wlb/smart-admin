@@ -1,0 +1,13 @@
+{
+  "$schema": "skill-aliases-schema",
+  "description": "Skill alias mappings for deprecated skills redirecting to their replacements",
+  "version": "1.0.0",
+  "last_updated": "2026-02-06",
+  "aliases": {
+    "java-performance-pro": {
+      "redirect_to": "smartadmin-performance-suite",
+      "reason": "java-performance-pro deprecated since 2026-02-06; consolidated into smartadmin-performance-suite",
+      "removal_date": "2026-06-30"
+    }
+  }
+}

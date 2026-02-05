@@ -173,13 +173,13 @@ void testConcurrentRegistration() throws Exception {
 
 1. **修改代碼**:
    ```bash
-   vi sa-base/foundation/reload/src/main/java/.../SmartReloadManager.java
+   vi smartadmin-support/src/main/java/net/lab1024/sa/support/reload/SmartReloadManager.java
    # 替換 register() 方法為方案 1
    ```
 
 2. **運行測試**:
    ```bash
-   ./gradlew :sa-base:foundation:reload:test
+   ./gradlew :smartadmin-app:test --tests "*ReloadTest*"
    ```
 
 3. **驗證 ArchUnit**:
@@ -189,7 +189,7 @@ void testConcurrentRegistration() throws Exception {
 
 4. **提交變更**:
    ```bash
-   git add sa-base/foundation/reload/src/main/java/.../SmartReloadManager.java
+   git add smartadmin-support/src/main/java/net/lab1024/sa/support/reload/SmartReloadManager.java
    git commit -m "fix(reload): fix check-then-act race condition in register()
 
    - Replace containsKey() + put() with putIfAbsent()

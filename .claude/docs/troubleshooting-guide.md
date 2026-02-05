@@ -145,7 +145,7 @@ Sequence:
 1. business-analyst → Requirements, API contract, approval workflow design
 2. java-architect → Backend implementation (REST API, service logic, workflows)
 3. vue-expert → Frontend implementation (forms, approval UI)
-4. code-reviewer → Pre-merge quality gate
+4. quality-reviewer → Pre-merge quality gate
 5. devops-engineer → Deployment
 6. chaos-engineer → Resilience validation
 ```
@@ -384,7 +384,7 @@ Each agent optimizes for their specialty:
 - java-architect: Code maintainability, performance
 - devops-engineer: Operability, deployment simplicity
 - postgres-pro: Database efficiency, query performance
-- architect-reviewer: Long-term architecture, scalability
+- quality-reviewer: Code quality, long-term architecture, scalability
 
 All perspectives are valid, need to balance trade-offs.
 ```
@@ -392,14 +392,14 @@ All perspectives are valid, need to balance trade-offs.
 **Solution B: Hierarchy of Authority**
 ```markdown
 For conflicting architectural advice:
-1. architect-reviewer (final authority on architecture)
+1. quality-reviewer --mode=architecture (final authority on architecture)
 2. Specialist agent (authority in their domain)
 3. business-analyst (for business requirements)
 
 Example:
 - postgres-pro recommends denormalization for performance
 - java-architect recommends normalization for maintainability
-- architect-reviewer makes final call based on system requirements
+- quality-reviewer (--mode=architecture) makes final call based on system requirements
 ```
 
 **Solution C: Escalate for Decision**
@@ -416,14 +416,14 @@ Rationale: [Reason]
 
 Context: [What we're trying to accomplish]
 
-Request: @architect-reviewer to make final decision
+Request: @quality-reviewer (--mode=architecture) to make final decision
 
 Timeline: Decision needed by [date] to avoid blocking [task]
 ```
 
 **Prevention**:
 - Provide complete context to all agents
-- Consult architect-reviewer for major architectural decisions upfront
+- Consult quality-reviewer (--mode=architecture) for major architectural decisions upfront
 - Document decisions and rationale
 - Create decision log for future reference
 
@@ -756,7 +756,7 @@ cat .claude/settings.local.json | jq '.hooks'
         // DISABLE architecture-review for local commits
         // {
         //   "name": "architecture-review",
-        //   "agent": "code-reviewer",
+        //   "agent": "quality-reviewer",
         //   "autoFix": true
         // },
 
@@ -865,8 +865,8 @@ Example: "Extract complex method into multiple methods"
   }
 }
 
-# Step 2: Fix manually with code-reviewer guidance
-# code-reviewer will provide specific steps
+# Step 2: Fix manually with quality-reviewer guidance
+# quality-reviewer will provide specific steps
 
 # Step 3: Re-enable auto-fix after fixing
 ```
@@ -883,7 +883,7 @@ Example: Auto-fix tries to satisfy:
 
 **Pattern**: Complex validation method exceeds line limit
 **Rationale**: Business requirements necessitate comprehensive validation
-**Approved By**: architect-reviewer
+**Approved By**: quality-reviewer
 **Date**: 2026-01-21
 
 Auto-fix will fail on this pattern. Suppress warnings:

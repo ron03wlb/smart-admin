@@ -596,9 +596,9 @@ Total: 5 files, ~493 lines of code
 **Example**:
 ```bash
 # Post-execution validation sequence
-./gradlew :sa-admin:compileJava      # Must compile successfully
-./gradlew :sa-admin:test --tests ArchitectureTest  # Must pass ArchUnit rules
-./gradlew :sa-admin:test --tests *ServiceIntegrationTest  # Must pass integration tests
+./gradlew :smartadmin-app:compileJava      # Must compile successfully
+./gradlew :smartadmin-app:test --tests ArchitectureTest  # Must pass ArchUnit rules
+./gradlew :smartadmin-app:test --tests *ServiceIntegrationTest  # Must pass integration tests
 ```
 
 ---

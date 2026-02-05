@@ -475,9 +475,63 @@ Before executing batch:
 
 ---
 
+## Execution History and Logs
+
+### Viewing Execution History
+
+```bash
+# View log directory
+ls -la .claude/metrics/batch-executions/
+
+# File naming convention:
+# batch-exec-{timestamp}.log      - Full execution log
+# batch-exec-{timestamp}-pre.md   - Pre-execution report
+# batch-exec-{timestamp}-post.md  - Post-execution summary
+# batch-exec-{timestamp}.json     - Machine-readable data
+```
+
+### Machine-Readable JSON Format
+
+```json
+{
+  "batch_id": "batch-exec-20260129-153000",
+  "total_plans": 8,
+  "successful": 7,
+  "failed": 1,
+  "execution_time_minutes": 125,
+  "plans": [
+    {
+      "name": "product-crud",
+      "status": "success",
+      "duration_minutes": 25,
+      "skill": "smartadmin-crud-generator"
+    }
+  ]
+}
+```
+
+### Quality Gate Failure Handling
+
+Quality gates run after each plan execution. Behavior depends on failure strategy:
+
+| Strategy | Quality Gate Fails | Behavior |
+|----------|-------------------|----------|
+| `CONTINUE` | Log failure, continue | Next plan executes |
+| `ABORT_ALL` | Stop immediately | Remaining plans skipped |
+| `PAUSE` | Pause execution | Wait for user decision |
+
+```yaml
+execution:
+  failure_strategy: CONTINUE  # Default
+  quality_gates:
+    enabled: true
+    run_architecture_test: true
+    run_unit_tests: true
+```
+
+---
+
 **See Also**:
-- [Troubleshooting Guide](../docs/troubleshooting.md) - Detailed error resolution
+- [Troubleshooting Guide](troubleshooting.md) - Detailed error resolution
 - [Examples](examples.md) - Real-world batch execution cases
-- [Skill Mapping Guide](../docs/skill-mapping.md) - Automatic mapping rules
-- [Configuration](../docs/configuration.md) - Advanced configuration options
-- [Execution Reports](../docs/execution-reports.md) - Report format and interpretation
+- [Skill Mapping Reference](../references/skill-mapping.md) - Complete mapping rules

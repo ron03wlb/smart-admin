@@ -1010,11 +1010,11 @@ redis-cli FLUSHDB
 - [Manager層規範](.agent/foundation/09-manager-layer.md)
 - [命名規範](.agent/foundation/01-naming-conventions.md)
 
-#### Foundation模組
-- [Foundation模組總覽](sa-base/foundation/README.md)
-- [Cache模組](sa-base/foundation/cache/README.md)
-- [MQ模組](sa-base/foundation/mq/README.md)
-- [Redis Lock模組](sa-base/foundation/redis-lock/README.md)
+#### Support模組（原Foundation）
+- [Support模組總覽](smartadmin-support/README.md)
+- [Cache模組](smartadmin-support/src/main/java/net/lab1024/sa/support/cache/)
+- [MQ模組](smartadmin-support/src/main/java/net/lab1024/sa/support/mq/)
+- [Redis Lock模組](smartadmin-support/src/main/java/net/lab1024/sa/support/redis-lock/)
 
 ---
 

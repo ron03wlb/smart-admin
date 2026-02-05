@@ -45,7 +45,7 @@
     "igame_docs": "docs/iGame/**/*.md",
     "smartadmin_patterns": ".claude/shared/knowledge/smartadmin-patterns.md",
     "architecture_rules": ".agent/rules/*.md",
-    "foundation_modules": "sa-base/foundation/**/README.md"
+    "foundation_modules": "smartadmin-support/src/main/java/**/README.md"
   },
 
   "quality_gates": [

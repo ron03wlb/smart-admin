@@ -108,7 +108,7 @@ description: [P1 - Extended] Batch plan executor for automatically detecting, an
 **依賴處理**:
 - Skills 根據 plan task 類型動態調用
 - 依賴 skill 失敗會觸發整個 batch 回滾
-- 完整映射見 `docs/skill-mapping.md`
+- 完整映射見 `references/skill-mapping.md`
 
 ---
 
@@ -361,75 +361,45 @@ Migrate existing Evrete rules to LiteFlow DSL...
 
 ## 📚 詳細文檔
 
-以下章節已提取至單獨文檔以提高可讀性：
+以下章節分布於各子目錄中：
 
-### 核心功能
+### 核心功能 (phases/)
 
-1. **[Plan Identification Mechanism](docs/plan-identification.md)** - 方案識別機制
+1. **[Phase 1: Plan Discovery](phases/phase-1-discovery.md)** - 方案識別機制
    - 4 階段識別流程：Directory Scanning → Type Detection → Metadata Extraction → Validation
    - 支持 3 種計劃類型：Claude Code Plans, Skills Phase Docs, Project Plans
-   
-2. **[Conflict Detection](docs/conflict-detection.md)** - 衝突檢測
+
+2. **[Phase 2: Conflict Detection](phases/phase-2-conflict-detection.md)** - 衝突檢測
    - File-level 檢測（HIGH 嚴重性）
    - Module-level 檢測（MEDIUM 嚴重性）
-   - Skill-level 檢測（LOW 嚴重性）
-   
-3. **[Execution Modes](docs/execution-modes.md)** - 執行模式
-   - Sequential Mode（串行執行，fail-fast）
-   - Parallel Mode（並行執行，未來支持）
-   - Interactive Mode（交互式確認）
-   - Dry-run Mode（風險評估）
+   - Dependency-level 檢測（CRITICAL 嚴重性）
 
-### 配置和命令
+### 執行模式 (modes/)
 
-4. **[Configuration](docs/configuration.md)** - 配置說明
-   - Execution settings（max_concurrent, failure_strategy, retry）
-   - Conflict detection settings
-   - Notification settings
-   - Logging settings
+3. **[Dry-run Mode](modes/MODE-dry-run.md)** - 模擬運行模式（風險評估）
 
-5. **[Command Reference](docs/command-reference.md)** - 命令參考
-   - 完整命令語法和參數說明
-   - 常用命令示例
+### 參考資料 (references/)
 
-### 執行和監控
+4. **[Skill Mapping](references/skill-mapping.md)** - 完整 Skill 映射規則
+   - 自動 Skill 映射規則、Type → Skill 映射表、手動 Skill 指定
 
-6. **[Execution Reports](docs/execution-reports.md)** - 執行報告
-   - Summary Report（執行摘要）
-   - Detailed Report（詳細報告）
-   - Conflict Report（衝突報告）
-   - Performance Metrics（性能指標）
+### 知識庫 (knowledge/)
 
-7. **[Skill Mapping](docs/skill-mapping.md)** - Skill 映射
-   - 自動 Skill 映射規則
-   - Type → Skill 映射表
-   - 手動 Skill 指定
+5. **[Quick Reference](knowledge/quick-reference.md)** - 命令參考、決策矩陣、配置指南
+6. **[Examples](knowledge/examples.md)** - 真實場景批量執行範例
+7. **[Troubleshooting](knowledge/troubleshooting.md)** - 故障排除（12 個常見問題）
 
-### 使用指南
+### 範例 (examples/)
 
-8. **[Use Cases](docs/use-cases.md)** - 使用案例
-   - LiteFlow 遷移（8 階段）
-   - 批量 CRUD 生成
-   - 混合類型執行
+8. **[Mixed Plans Example](examples/EXAMPLE-mixed-plans.md)** - 混合類型方案執行完整範例
 
-9. **[FAQ](docs/faq.md)** - 常見問題
-   - 執行相關問題
-   - 衝突檢測問題
-   - Skill 映射問題
+### 配置 (config.yml)
 
-10. **[Troubleshooting](docs/troubleshooting.md)** - 故障排除
-    - 常見錯誤和解決方案
-    - 調試技巧
+9. **[config.yml](config.yml)** - 完整配置文件（執行、衝突檢測、報告、映射）
 
-### 參考信息
+### 概覽 (README.md)
 
-11. **[Limitations](docs/limitations.md)** - 限制
-    - 當前版本限制
-    - 不支持的場景
-
-12. **[Roadmap](docs/roadmap.md)** - 開發路線圖
-    - v1.1.0 計劃功能
-    - v2.0.0 長期規劃
+10. **[README.md](README.md)** - 快速入門、限制、路線圖
 
 ---
 
@@ -466,7 +436,7 @@ Migrate existing Evrete rules to LiteFlow DSL...
 
 ---
 
-**Version**: 2.0.0 (Restructured)
-**Last Updated**: 2026-02-01
-**Documentation Structure**: Main + Detailed Docs
+**Version**: 2.1.0 (Consolidated - docs/ merged)
+**Last Updated**: 2026-02-06
+**Documentation Structure**: Main + Subdirectory Docs (phases/, modes/, references/, knowledge/, examples/)
 

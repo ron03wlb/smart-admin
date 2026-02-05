@@ -171,7 +171,7 @@ output:
 
   # Output locations (OPTIONAL)
   target_directories:
-    - "{{target-dir-1}}"  # e.g., "smart-admin-api-java21-springboot3/sa-admin/src/main/java"
+    - "{{target-dir-1}}"  # e.g., "smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-{module}/src/main/java"
     - "{{target-dir-2}}"  # e.g., "smart-admin-web/src/views"
 
   # Artifact templates (OPTIONAL)
@@ -197,15 +197,15 @@ validation:
   post_execution:
     - check: "compilation"
       description: "Verify code compiles successfully"
-      command: "./gradlew :sa-admin:compileJava"
+      command: "./gradlew :smartadmin-app:compileJava"
 
     - check: "archunit"
       description: "Verify architecture constraints"
-      command: "./gradlew :sa-admin:test --tests ArchitectureTest"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest"
 
     - check: "unit-tests"
       description: "Run unit tests"
-      command: "./gradlew :sa-admin:test"
+      command: "./gradlew :smartadmin-app:test"
 
 # ====================================================================
 # Backward Compatibility (OPTIONAL)

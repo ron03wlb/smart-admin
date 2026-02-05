@@ -555,4 +555,4 @@ Total Time: 8 minutes (80% time reduction)
 **See Also**:
 - [Quick Reference](quick-reference.md) - Command reference and decision matrix
 - [Troubleshooting Guide](troubleshooting.md) - Error resolution
-- [Skill Mapping Guide](../docs/skill-mapping.md) - Automatic mapping rules
+- [Skill Mapping Reference](../references/skill-mapping.md) - Complete mapping rules

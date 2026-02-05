@@ -210,7 +210,7 @@ smartadmin_concepts:
 
   foundation_modules:
     zh_name: Foundation模組
-    location: sa-base/foundation/
+    location: smartadmin-support/src/main/java/net/lab1024/sa/support/
     modules:
       cache: Redis緩存、本地緩存
       mq: Kafka消息隊列

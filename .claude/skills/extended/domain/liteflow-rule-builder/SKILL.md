@@ -5,7 +5,7 @@ description: [P1 - Extended] Generate LiteFlow rule DSL (EL expressions and QLEx
 
 # LiteFlow Rule Builder
 
-Generate complete LiteFlow flow orchestration rules from natural language descriptions - automatically creates EL expression chains, QLExpress scripts, database configurations, and integration code following SmartAdmin patterns.
+Generate complete LiteFlow flow orchestration rules from natural language descriptions -- automatically creates EL expression chains, QLExpress scripts, database configurations, and integration code following SmartAdmin patterns.
 
 ## Quick Start
 
@@ -24,665 +24,128 @@ You will:
 
 ## Why This Skill Exists
 
-**Problem:** Complex business workflows are hard to implement and maintain
-- Sequential steps mixed with conditional branching
-- Parallel operations (send email + SMS + update cache)
-- Dynamic rule changes requiring code redeployment
-- Difficult to visualize and debug flow execution
+**Problem:** Complex business workflows are hard to implement and maintain -- sequential steps mixed with conditional branching, parallel operations, dynamic rule changes requiring redeployment.
 
-**Solution:**
-LiteFlow provides declarative flow orchestration with:
-- ✅ EL expressions for clear workflow structure
-- ✅ Database-backed storage with hot-reload
-- ✅ QLExpress scripts for dynamic business logic
-- ✅ Execution logging and monitoring
-- ✅ Visual flow representation
+**Solution:** LiteFlow provides declarative flow orchestration with EL expressions, database-backed hot-reload, QLExpress scripts for dynamic logic, and execution logging/monitoring.
+
+## Trigger Keywords
+
+This skill is automatically activated when the user's request contains:
+
+**Primary Keywords** (High confidence):
+- "LiteFlow" - LiteFlow rule or chain generation
+- "create LiteFlow chain/rule" - Explicit creation request
+- "flow orchestration" - Workflow orchestration design
+- "business workflow" - Business process workflow
+
+**Secondary Keywords** (Medium confidence):
+- "approval flow" - Multi-level approval workflows
+- "validation chain" - Sequential validation logic
+- "conditional logic" - IF/SWITCH/CASE patterns
+- "parallel execution" / "parallel processing" - WHEN pattern
+- "migrate from Evrete" - Evrete to LiteFlow migration
+- "rule engine" - Business rule engine implementation
+
+**Note**: This skill can also be manually invoked via `/liteflow-rule-builder` command.
+
+---
 
 ## Core LiteFlow Patterns
 
 ### Pattern 1: Sequential Execution (THEN)
 
-**Use Case:** Execute nodes in strict order (A → B → C)
+Execute nodes in strict order (A -> B -> C). Use when operations are dependent or require strict ordering.
 
-**EL Expression:**
-```javascript
-THEN(nodeA, nodeB, nodeC)
-```
+**EL Expression:** `THEN(nodeA, nodeB, nodeC)`
 
-**Example: Order Processing**
-```javascript
-THEN(
-  validateOrder,
-  checkInventory,
-  calculatePrice,
-  createOrder,
-  sendNotification
-)
-```
-
-**Database Insert:**
-```sql
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('订单处理流程', 'order-process-chain', 1,
- 'THEN(validateOrder, checkInventory, calculatePrice, createOrder, sendNotification)');
-```
-
-**QLExpress Script Example (validateOrder):**
-```sql
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('验证订单', 'validateOrder', 'qlexpress',
-'// Get order from context
-order = context.getData("order");
-
-// Validation rules
-if (order == null) {
-    throw new Exception("Order cannot be null");
-}
-if (order.amount == null || order.amount <= 0) {
-    throw new Exception("Invalid order amount: " + order.amount);
-}
-if (order.productId == null) {
-    throw new Exception("Product ID is required");
-}
-
-// Log success
-log.info("Order validated: orderId=" + order.orderId);
-return true;');
-```
-
-**When to Use:**
-- Multi-step processes requiring strict order
-- Dependent operations (B needs result from A)
-- Audit trails with sequential logging
-
-**SmartAdmin Integration:**
-```java
-@Service
-@RequiredArgsConstructor
-public class OrderService {
-
-    private final LiteFlowExecutionService liteFlowExecutionService;
-
-    public ResponseDTO<OrderVO> processOrder(OrderAddForm form) {
-        LiteFlowExecutionForm executionForm = new LiteFlowExecutionForm();
-        executionForm.setChainCode("order-process-chain");
-        executionForm.setInputParams(Map.of(
-            "order", SmartBeanUtil.copy(form, Order.class)
-        ));
-
-        ResponseDTO<LiteFlowExecutionResultVO> result =
-            liteFlowExecutionService.execute(executionForm);
-
-        if (!result.getOk()) {
-            return ResponseDTO.error(UserErrorCode.BUSINESS_ERROR, result.getMsg());
-        }
-
-        Order order = (Order) result.getData().getOutputResult().get("order");
-        return ResponseDTO.ok(SmartBeanUtil.copy(order, OrderVO.class));
-    }
-}
-```
-
----
+See [dsl-examples.md](examples/dsl-examples.md#pattern-1-sequential-execution-then) for complete example with order processing chain, QLExpress script, database insert, and SmartAdmin Service integration.
 
 ### Pattern 2: Parallel Execution (WHEN)
 
-**Use Case:** Execute nodes concurrently (all must complete)
+Execute nodes concurrently (all must complete). Total time = max(nodeA, nodeB, nodeC) instead of sum.
 
-**EL Expression:**
-```javascript
-WHEN(nodeA, nodeB, nodeC)
-```
+**EL Expression:** `WHEN(nodeA, nodeB, nodeC)`
 
-**Example: Multi-Channel Notification**
-```javascript
-THEN(
-  processOrder,
-  WHEN(sendEmail, sendSMS, sendPushNotification, updateCache)
-)
-```
-
-**Database Insert:**
-```sql
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('通知发送流程', 'notification-chain', 1,
- 'WHEN(sendEmail, sendSMS, sendPushNotification)');
-```
-
-**QLExpress Scripts:**
-```sql
--- Send Email Script
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('发送邮件', 'sendEmail', 'qlexpress',
-'user = context.getData("user");
-emailService = context.getBean("emailService");
-emailService.send(user.email, "Order Confirmed", "Your order has been confirmed");
-log.info("Email sent to: " + user.email);
-return true;');
-
--- Send SMS Script
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('发送短信', 'sendSMS', 'qlexpress',
-'user = context.getData("user");
-smsService = context.getBean("smsService");
-smsService.send(user.phone, "Order confirmed. Track at: example.com/orders");
-log.info("SMS sent to: " + user.phone);
-return true;');
-```
-
-**When to Use:**
-- Independent operations that can run concurrently
-- Performance optimization (parallel API calls)
-- Broadcasting to multiple channels
-
-**Performance Note:**
-- All WHEN nodes execute in parallel threads
-- Total execution time = max(nodeA, nodeB, nodeC) instead of sum
-
----
+See [dsl-examples.md](examples/dsl-examples.md#pattern-2-parallel-execution-when) for multi-channel notification example with QLExpress scripts.
 
 ### Pattern 3: Conditional Logic (IF)
 
-**Use Case:** Branch execution based on condition
+Branch execution based on condition. Condition script returns boolean: true = THEN branch, false = ELSE branch.
 
-**EL Expression:**
-```javascript
-IF(conditionNode, thenNode, elseNode)
-```
+**EL Expression:** `IF(conditionNode, thenNode, elseNode)`
 
-**Example: VIP Discount Logic**
-```javascript
-THEN(
-  validateOrder,
-  checkInventory,
-  IF(
-    isVipMember,
-    THEN(calculateVipDiscount, applyDiscount),
-    calculateRegularPrice
-  ),
-  createOrder
-)
-```
-
-**Database Insert:**
-```sql
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('VIP订单处理', 'vip-order-chain', 2,
- 'THEN(validateOrder, checkInventory, IF(isVipMember, THEN(calculateVipDiscount, applyDiscount), calculateRegularPrice), createOrder)');
-```
-
-**Condition Script (isVipMember):**
-```sql
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('检查VIP会员', 'isVipMember', 'qlexpress',
-'user = context.getData("user");
-memberService = context.getBean("memberService");
-vipLevel = memberService.getVipLevel(user.userId);
-
-// Return boolean for IF condition
-if (vipLevel != null && vipLevel >= 1) {
-    context.setData("vipLevel", vipLevel);
-    return true;  // Execute THEN branch
-} else {
-    return false; // Execute ELSE branch
-}');
-```
-
-**When to Use:**
-- Business rule branching (different paths for different user types)
-- Conditional validations
-- Feature flags (A/B testing flows)
-
-**Nested IF Example:**
-```javascript
-IF(
-  isHighValue,
-  IF(requiresApproval, manualReview, autoApprove),
-  fastTrack
-)
-```
-
----
+See [dsl-examples.md](examples/dsl-examples.md#pattern-3-conditional-logic-if) for VIP discount logic with nested IF example.
 
 ### Pattern 4: Switch Routing (SWITCH)
 
-**Use Case:** Route to different nodes based on value
+Route to different nodes based on value. Cleaner than multiple IF for 3+ branches.
 
-**EL Expression:**
-```javascript
-SWITCH(routerNode).to(caseA, caseB, caseC)
-```
+**EL Expression:** `SWITCH(routerNode).to(caseA, caseB, caseC)`
 
-**Example: Multi-Level Approval**
-```javascript
-THEN(
-  submitRequest,
-  SWITCH(getApprovalLevel).to(
-    level1Approval,
-    level2Approval,
-    level3Approval,
-    ceoApproval
-  )
-)
-```
+**IMPORTANT**: Router script must return node ID as String, NOT integer index.
 
-**Database Insert:**
-```sql
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('审批流程', 'approval-chain', 2,
- 'THEN(submitRequest, SWITCH(getApprovalLevel).to(level1Approval, level2Approval, level3Approval, ceoApproval))');
-```
-
-**Router Script (getApprovalLevel):**
-```sql
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('获取审批级别', 'getApprovalLevel', 'qlexpress',
-'request = context.getData("request");
-amount = request.amount;
-
-// Return node ID to execute (index-based: 0=level1, 1=level2, etc.)
-if (amount < 10000) {
-    return "level1Approval";  // Auto approve
-} else if (amount < 100000) {
-    return "level2Approval";  // Manager approval
-} else if (amount < 1000000) {
-    return "level3Approval";  // Director approval
-} else {
-    return "ceoApproval";     // CEO approval
-}');
-```
-
-**When to Use:**
-- Multi-tier workflows (approval levels, escalation)
-- Dynamic routing based on runtime values
-- Strategy pattern implementation
-
-**SWITCH vs Multiple IF:**
-- SWITCH: Cleaner for 3+ branches, value-based routing
-- IF: Better for boolean conditions, binary decisions
-
----
+See [dsl-examples.md](examples/dsl-examples.md#pattern-4-switch-routing-switch) for multi-level approval example.
 
 ### Pattern 5: Loop Iteration (FOR)
 
-**Use Case:** Execute node for each item in collection
+Execute node for each item in collection. Large loops (1000+ items) should use async execution.
 
-**EL Expression:**
-```javascript
-FOR(iteratorNode).DO(processingNode).BREAK(breakConditionNode)
-```
+**EL Expression:** `FOR(iteratorNode).DO(processingNode).BREAK(breakConditionNode)`
 
-**Example: Batch Order Processing**
-```javascript
-FOR(getNextOrder).DO(
-  THEN(validateOrder, processPayment, shipOrder)
-).BREAK(noMoreOrders)
-```
-
-**Database Insert:**
-```sql
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('批量订单处理', 'batch-order-chain', 3,
- 'FOR(getNextOrder).DO(THEN(validateOrder, processPayment, shipOrder)).BREAK(noMoreOrders)');
-```
-
-**Iterator Script (getNextOrder):**
-```sql
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('获取下一个订单', 'getNextOrder', 'qlexpress',
-'orderQueue = context.getData("orderQueue");
-
-if (orderQueue == null || orderQueue.isEmpty()) {
-    return null;  // Trigger BREAK condition
-}
-
-// Get next order
-nextOrder = orderQueue.poll();
-context.setData("currentOrder", nextOrder);
-return nextOrder;');
-```
-
-**Break Condition Script:**
-```sql
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('检查队列是否为空', 'noMoreOrders', 'qlexpress',
-'orderQueue = context.getData("orderQueue");
-return orderQueue == null || orderQueue.isEmpty();');
-```
-
-**When to Use:**
-- Batch processing (multiple records)
-- Iterative workflows (retry logic, polling)
-- Dynamic loop count (process until condition met)
-
-**Performance Warning:**
-- Large loops (1000+ items) should use async execution
-- Consider database pagination for very large datasets
-
----
-
-## Advanced Patterns
+See [dsl-examples.md](examples/dsl-examples.md#pattern-5-loop-iteration-for) for batch order processing example.
 
 ### Pattern 6: Nested Chains (Sub-flows)
 
-**Use Case:** Reusable sub-workflows
+Reusable sub-workflows referenced by chain code. Separate chain definitions in database.
 
-**Main Chain:**
-```javascript
-THEN(
-  validateInput,
-  processData,
-  THEN(auditLog, cleanup)  // Reusable sub-chain
-)
-```
-
-**Database Insert:**
-```sql
--- Main chain
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('主流程', 'main-chain', 1,
- 'THEN(validateInput, processData, auditCleanupChain)');
-
--- Sub-chain
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('审计清理子流程', 'auditCleanupChain', 1,
- 'THEN(auditLog, cleanup)');
-```
-
----
+See [dsl-examples.md](examples/dsl-examples.md#pattern-6-nested-chains-sub-flows) for main chain + sub-chain example.
 
 ### Pattern 7: Exception Handling (CATCH)
 
-**Use Case:** Handle errors gracefully
+**EL Expression:** `THEN(nodeA, nodeB).CATCH(errorHandler)`
 
-**EL Expression:**
-```javascript
-THEN(
-  riskCheck,
-  processPayment
-).CATCH(handlePaymentError)
-```
-
-**Error Handler Script:**
-```sql
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('支付错误处理', 'handlePaymentError', 'qlexpress',
-'exception = context.getData("exception");
-log.error("Payment failed: " + exception.getMessage());
-
-// Rollback logic
-order = context.getData("order");
-orderService = context.getBean("orderService");
-orderService.cancelOrder(order.orderId);
-
-// Notify user
-notificationService = context.getBean("notificationService");
-notificationService.sendPaymentFailedEmail(order.userId);
-
-return false;  // Mark chain as failed
-');
-```
+See [dsl-examples.md](examples/dsl-examples.md#pattern-7-exception-handling-catch) for payment error handling with rollback and notification.
 
 ---
 
-## SmartAdmin Integration Patterns
+## SmartAdmin Integration
 
 ### Database Storage Pattern
 
-**Step 1: Insert Chain Definition**
-```sql
-INSERT INTO t_liteflow_chain (
-  chain_name,
-  chain_code,
-  chain_type,
-  chain_data,
-  status,
-  create_user_id,
-  create_user_name
-) VALUES (
-  '员工审批流程',           -- Display name
-  'employee-approval-chain', -- Unique code
-  2,                         -- Type: 1=普通, 2=条件, 3=循环
-  'THEN(validateEmployee, SWITCH(getApprovalLevel).to(hrApproval, managerApproval, ceoApproval))',
-  1,                         -- Status: 1=启用, 0=禁用
-  1,                         -- Creator user ID
-  'admin'                    -- Creator username
-);
-```
-
-**Step 2: Insert Script Nodes**
-```sql
-INSERT INTO t_liteflow_script (
-  script_name,
-  script_code,
-  script_type,
-  script_data,
-  status
-) VALUES (
-  '验证员工信息',
-  'validateEmployee',
-  'qlexpress',
-  'employee = context.getData("employee");
-   if (employee == null || employee.name == null) {
-       throw new Exception("Invalid employee data");
-   }
-   return true;',
-  1
-);
-```
-
-**Step 3: Reload Flow Engine**
-```bash
-POST /liteflow/chain/reloadAll
-```
-
----
+1. Insert chain definition into `t_liteflow_chain`
+2. Insert script nodes into `t_liteflow_script`
+3. Reload flow engine: `POST /liteflow/chain/reloadAll`
 
 ### Service Layer Integration
 
-**Standard Pattern:**
-```java
-@Service
-@RequiredArgsConstructor
-public class EmployeeService {
+Standard pattern: Load data -> Create `LiteFlowExecutionForm` -> Call `liteFlowExecutionService.execute()` -> Extract result -> Update database.
 
-    private final LiteFlowExecutionService liteFlowExecutionService;
-    private final EmployeeDao employeeDao;
+See [dsl-examples.md](examples/dsl-examples.md#smartadmin-service-layer-integration) for complete EmployeeService approval example.
 
-    public ResponseDTO<EmployeeVO> approveEmployee(Long employeeId) {
-        // Load employee data
-        EmployeeEntity employee = employeeDao.selectById(employeeId);
-        if (employee == null) {
-            return ResponseDTO.userErrorParam("Employee not found");
-        }
+### QLExpress Script Best Practices
 
-        // Execute LiteFlow chain
-        LiteFlowExecutionForm form = new LiteFlowExecutionForm();
-        form.setChainCode("employee-approval-chain");
-        form.setInputParams(Map.of(
-            "employee", employee,
-            "approver", RequestContext.getRequestUser()
-        ));
+- **Context data**: `context.getData("key")` / `context.setData("key", value)`
+- **Spring beans**: `context.getBean("serviceName")`
+- **Logging**: `log.info()`, `log.warn()`, `log.error()`
+- **Conditions**: Return `true`/`false` for IF, return node ID String for SWITCH
 
-        ResponseDTO<LiteFlowExecutionResultVO> result =
-            liteFlowExecutionService.execute(form);
-
-        if (!result.getOk()) {
-            return ResponseDTO.error(UserErrorCode.BUSINESS_ERROR, result.getMsg());
-        }
-
-        // Extract result
-        Map<String, Object> output = result.getData().getOutputResult();
-        String approvalStatus = (String) output.get("approvalStatus");
-
-        // Update database
-        employee.setApprovalStatus(approvalStatus);
-        employeeDao.updateById(employee);
-
-        return ResponseDTO.ok(SmartBeanUtil.copy(employee, EmployeeVO.class));
-    }
-}
-```
-
----
-
-## QLExpress Script Best Practices
-
-### Accessing Context Data
-
-```javascript
-// Get data from context
-order = context.getData("order");
-user = context.getData("user");
-
-// Set data to context (pass to next node)
-context.setData("calculatedPrice", finalPrice);
-context.setData("discountApplied", true);
-```
-
-### Calling Spring Beans
-
-```javascript
-// Get bean from Spring context
-orderService = context.getBean("orderService");
-emailService = context.getBean("emailService");
-
-// Call bean methods
-result = orderService.createOrder(order);
-emailService.send(user.email, "Order Confirmed", emailBody);
-```
-
-### Logging
-
-```javascript
-// Use LiteFlow's logger
-log.info("Processing order: " + order.orderId);
-log.warn("Low inventory: " + inventory.stock);
-log.error("Payment failed: " + exception.getMessage());
-```
-
-### Exception Handling
-
-```javascript
-// Throw exception to fail chain
-if (order.amount <= 0) {
-    throw new Exception("Invalid order amount: " + order.amount);
-}
-
-// Return boolean for IF conditions
-if (user.vipLevel >= 3) {
-    return true;   // THEN branch
-} else {
-    return false;  // ELSE branch
-}
-```
-
-### Variable Types
-
-```javascript
-// Supported types
-stringVar = "hello";
-intVar = 123;
-longVar = 123L;
-doubleVar = 123.45;
-boolVar = true;
-listVar = new ArrayList();
-mapVar = new HashMap();
-
-// Type casting
-amount = (BigDecimal) context.getData("amount");
-userId = (Long) context.getData("userId");
-```
+See [dsl-examples.md](examples/dsl-examples.md#qlexpress-script-best-practices) for detailed examples.
 
 ---
 
 ## Common Mistakes and Fixes
 
-### ❌ Mistake 1: Forgetting to Return Value
-
-**Wrong:**
-```javascript
-// Condition script without return
-user = context.getData("user");
-user.vipLevel >= 3;  // No return statement
-```
-
-**Fixed:**
-```javascript
-user = context.getData("user");
-return user.vipLevel >= 3;  // Return boolean for IF
-```
+| Mistake | Problem | Fix |
+|---------|---------|-----|
+| No return value | Condition script without `return` | Always `return true/false` for IF |
+| Not setting output data | Next node can't access calculated value | Use `context.setData("key", value)` |
+| WHEN for dependent ops | Both run in parallel but B needs A's result | Use THEN for sequential dependencies |
+| Missing null check | NullPointerException on `context.getData()` | Always check `if (data == null)` |
+| Wrong SWITCH return | Return integer index instead of node ID | Return `"nodeName"` as String |
 
 ---
 
-### ❌ Mistake 2: Not Setting Output Data
-
-**Wrong:**
-```javascript
-// Calculate but don't save to context
-finalPrice = order.price * 0.8;
-// Next node can't access finalPrice
-```
-
-**Fixed:**
-```javascript
-finalPrice = order.price * 0.8;
-context.setData("finalPrice", finalPrice);  // Pass to next node
-```
-
----
-
-### ❌ Mistake 3: Using WHEN for Dependent Operations
-
-**Wrong:**
-```javascript
-// checkInventory needs result from validateOrder
-WHEN(validateOrder, checkInventory)  // Both run in parallel!
-```
-
-**Fixed:**
-```javascript
-THEN(validateOrder, checkInventory)  // Sequential execution
-```
-
----
-
-### ❌ Mistake 4: Missing Exception Handling
-
-**Wrong:**
-```javascript
-// No null check
-user = context.getData("user");
-email = user.email;  // NullPointerException if user is null
-```
-
-**Fixed:**
-```javascript
-user = context.getData("user");
-if (user == null) {
-    throw new Exception("User not found in context");
-}
-email = user.email;
-```
-
----
-
-### ❌ Mistake 5: Incorrect SWITCH Return Type
-
-**Wrong:**
-```javascript
-// SWITCH expects node ID (String), not index (int)
-return 0;  // Will cause routing error
-```
-
-**Fixed:**
-```javascript
-return "level1Approval";  // Return node ID as String
-```
-
----
-
-## Rationalization Table
+## Pattern Complexity Table
 
 | Pattern | Use Case | Complexity | Time Estimate |
 |---------|----------|------------|---------------|
@@ -700,8 +163,6 @@ return "level1Approval";  // Return node ID as String
 
 ## Migration from Evrete
 
-### Conversion Table
-
 | Evrete Pattern | LiteFlow Equivalent | Notes |
 |----------------|---------------------|-------|
 | `@Rule(salience=100)` | `THEN(nodeA, nodeB)` | Order by THEN sequence |
@@ -714,52 +175,9 @@ return "level1Approval";  // Return node ID as String
 1. Identify rule dependencies (which rules depend on others)
 2. Map to LiteFlow patterns (THEN for sequential, WHEN for parallel)
 3. Convert @Where conditions to QLExpress scripts
-4. Test functional equivalence (same input → same output)
+4. Test functional equivalence (same input -> same output)
 
 See [docs/plans/liteflow/migration-guide.md](../../../../docs/plans/liteflow/migration-guide.md) for complete migration guide.
-
----
-
-## Trigger Keywords
-
-This skill is automatically activated when the user's request contains:
-
-**Primary Keywords** (High confidence):
-- "LiteFlow" - LiteFlow rule or chain generation
-- "create LiteFlow chain" - Explicit chain creation request
-- "create LiteFlow rule" - Explicit rule creation request
-- "flow orchestration" - Workflow orchestration design
-- "business workflow" - Business process workflow
-
-**Secondary Keywords** (Medium confidence):
-- "approval flow" - Context: multi-level approval workflows
-- "validation chain" - Context: sequential validation logic
-- "conditional logic" - Context: IF/SWITCH/CASE patterns
-- "parallel execution" / "parallel processing" - Context: WHEN pattern
-- "sequential execution" - Context: THEN pattern
-- "migrate from Evrete" - Context: Evrete to LiteFlow migration
-- "rule engine" - Context: business rule engine implementation
-
-**Phrase Patterns**:
-- "Create [flow type] with [logic]" - Example: "Create approval flow with conditional routing"
-- "Implement [workflow] using LiteFlow" - Example: "Implement employee validation using LiteFlow"
-- "Migrate [Evrete rule] to LiteFlow" - Example: "Migrate employee approval rule to LiteFlow"
-
-**Context Signals** (Auto-activation):
-- User describes multi-step process requiring orchestration
-- Mentions "if-then-else" or "parallel" operations
-- Talks about approval levels or routing logic
-- Wants database-backed rules with hot-reload capability
-
-**Example User Requests**:
-```
-User: "Create approval flow for employee salary above $100,000"
-User: "Implement validation chain with sequential checks"
-User: "Create LiteFlow rule for parallel invoice processing"
-User: "Migrate Evrete employee approval rule to LiteFlow"
-```
-
-**Note**: This skill can also be manually invoked via `/liteflow-rule-builder` command.
 
 ---
 
@@ -767,93 +185,40 @@ User: "Migrate Evrete employee approval rule to LiteFlow"
 
 ### RED Phase: Baseline Test
 
-**Scenario:** Employee approval workflow
-- Validate employee data
-- Route to approval tier based on salary
-- Send notification on approval
+**Scenario:** Employee approval workflow -- validate data, route to approval tier by salary, send notification.
 
-**Expected LiteFlow Output:**
-
-**Chain:**
-```sql
-INSERT INTO t_liteflow_chain (chain_name, chain_code, chain_type, chain_data) VALUES
-('员工审批流程', 'employee-approval-chain', 2,
- 'THEN(validateEmployee, SWITCH(getApprovalTier).to(hrApproval, managerApproval, ceoApproval), sendNotification)');
-```
-
-**Scripts:**
-```sql
--- Validate employee
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('验证员工', 'validateEmployee', 'qlexpress',
- 'employee = context.getData("employee");
-  if (employee == null || employee.name == null) {
-      throw new Exception("Invalid employee data");
-  }
-  return true;');
-
--- Route to approval tier
-INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_data) VALUES
-('获取审批层级', 'getApprovalTier', 'qlexpress',
- 'employee = context.getData("employee");
-  salary = employee.salary;
-  if (salary < 50000) {
-      return "hrApproval";
-  } else if (salary < 150000) {
-      return "managerApproval";
-  } else {
-      return "ceoApproval";
-  }');
-```
+See [dsl-examples.md](examples/dsl-examples.md#red-phase-baseline-test) for expected chain, scripts, and verification steps.
 
 ### GREEN Phase: Verification
-
 1. Insert chain and scripts into database
-2. Reload flow engine: `POST /liteflow/chain/reloadAll`
-3. Execute test: `POST /liteflow/execution/execute`
-4. Verify execution log: `GET /liteflow/execution/queryLog`
+2. Reload: `POST /liteflow/chain/reloadAll`
+3. Execute: `POST /liteflow/execution/execute`
+4. Verify log: `GET /liteflow/execution/queryLog`
 5. Check output: Correct approval tier selected
 
 ### REFACTOR Phase: Optimize
-
-- Extract common validation logic to reusable sub-chain
+- Extract common validation to reusable sub-chain
 - Add exception handling for edge cases
 - Add execution metrics monitoring
 
 ---
 
-## 相關規則
+## Related Rules
 
-本技能直接關聯以下 SmartAdmin 規範與 LiteFlow 工作流引擎實踐：
+### Mandatory Requirements
 
-### 強制要求
+- **[Architecture Rules](../../../.agent/rules/foundation/F04-architecture-rules.md)** - LiteFlow chain calls in Service layer, complex execution (multi-table transactions) in Manager layer, constructor injection
+- **[Dependency Injection](../../../.agent/rules/technology/patterns/07-dependency-injection.md)** - LiteFlow nodes (@LiteflowComponent) use constructor injection (no @Autowired field injection)
 
-- **[Architecture Rules - Service Layer](./../../../.agent/rules/foundation/10-architecture-rules.md)**
-  - LiteFlow 規則鏈調用放置在 Service 層（業務編排）
-  - 複雜鏈路執行（涉及多表事務）委託 Manager 層
-  - 構造器注入（@RequiredArgsConstructor + private final）
+### Reference Guidelines
 
-- **[Dependency Injection Rules](./../../../.agent/rules/technology/patterns/07-dependency-injection.md)**
-  - LiteFlow 節點（@LiteflowComponent）依賴注入模式
-  - 節點獲取 Spring Bean：通過構造器注入（禁止 @Autowired 字段注入）
-  - 節點內部調用 Service/Manager 層
+- **[Exception Handling](../../../.agent/rules/technology/patterns/04-exception-logging.md)** - CATCH node exception handling, execution failure rollback
+- **[Naming Conventions](../../../.agent/rules/foundation/F01-naming-conventions.md)** - Node: ApprovalValidationNode; Chain: approvalChain
 
-### 參考指引
+### Related Skills
 
-- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
-  - LiteFlow 節點異常處理（CATCH 節點捕獲異常）
-  - 異常日誌記錄（@Slf4j + 上下文信息）
-  - 鏈路執行失敗回滾策略
-
-- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
-  - 節點命名：ApprovalValidationNode, TierSelectionNode
-  - 鏈路命名：approvalChain, userUpgradeChain
-
-### 相關技能
-
-- **[evrete-rule-engine](./../../../lifecycle/deprecated/evrete-rule-engine/SKILL.md)** - 已棄用的規則引擎（本技能為替代方案，參見 § Migration from Evrete）
-- **[scheduled-task-manager](./../../productivity/devops/scheduled-task-manager/SKILL.md)** - XXL-Job 排程任務執行 LiteFlow 鏈（定時觸發工作流）
-- **[smartadmin-crud-generator](./../../foundation/full-stack/smartadmin-crud-generator/SKILL.md)** - Controller 層調用 LiteFlow Service 執行業務鏈路
+- **[scheduled-task-manager](../../productivity/devops/scheduled-task-manager/SKILL.md)** - XXL-Job scheduled tasks triggering LiteFlow chains
+- **[smartadmin-crud-generator](../../foundation/full-stack/smartadmin-crud-generator/SKILL.md)** - Controller calling LiteFlow Service for business chains
 
 ---
 
@@ -862,7 +227,7 @@ INSERT INTO t_liteflow_script (script_name, script_code, script_type, script_dat
 **Skill Version:** 1.0.0
 **LiteFlow Version:** 2.15.3
 **SmartAdmin Compatibility:** v4.0.0+
-**Last Updated:** 2026-01-25
+**Last Updated:** 2026-02-06
 
 **Related Documentation:**
 - [LiteFlow Module README](../../../../docs/plans/liteflow/README.md)

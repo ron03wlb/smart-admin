@@ -242,13 +242,13 @@ class SmartReloadManagerTest {
 
 **Step 1: Modify Code**
 ```bash
-vi sa-base/foundation/reload/src/main/java/net/lab1024/sa/base/module/support/reload/SmartReloadManager.java
+vi smartadmin-support/src/main/java/net/lab1024/sa/support/reload/SmartReloadManager.java
 # Replace register() method with Solution 1 (putIfAbsent)
 ```
 
 **Step 2: Run Unit Tests**
 ```bash
-./gradlew :sa-base:foundation:reload:test
+./gradlew :smartadmin-app:test --tests "*ReloadTest*"
 ```
 
 **Step 3: Verify ArchUnit Tests**
@@ -263,7 +263,7 @@ vi sa-base/foundation/reload/src/main/java/net/lab1024/sa/base/module/support/re
 
 **Step 5: Commit Changes**
 ```bash
-git add sa-base/foundation/reload/src/main/java/net/lab1024/sa/base/module/support/reload/SmartReloadManager.java
+git add smartadmin-support/src/main/java/net/lab1024/sa/support/reload/SmartReloadManager.java
 git commit -m "fix(reload): fix check-then-act race condition in register()
 
 - Replace containsKey() + put() with putIfAbsent()

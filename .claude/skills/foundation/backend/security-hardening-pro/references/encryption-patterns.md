@@ -510,7 +510,7 @@ ALTER TABLE players DROP COLUMN ssn;
 
 ## SmartAdmin Foundation Module
 
-**Location**: `sa-base/foundation/api-encrypt/`
+**Location**: `smartadmin-support/src/main/java/net/lab1024/sa/support/apiencrypt/`
 
 **Key Classes:**
 - `ApiEncryptService` - Encryption interface

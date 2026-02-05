@@ -181,7 +181,7 @@ Dao層:
 - [CLAUDE.md快速參考](CLAUDE.md)
 - [SmartAdmin模式](.claude/shared/knowledge/smartadmin-patterns.md)
 - [架構規則](.agent/foundation/10-architecture-rules.md)
-- [Foundation模組](sa-base/foundation/)
+- [Support模組](smartadmin-support/)
 
 ## 協作流程
 

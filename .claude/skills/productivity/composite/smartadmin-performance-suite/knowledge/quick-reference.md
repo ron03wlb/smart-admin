@@ -48,7 +48,7 @@ curl http://localhost:1024/actuator/health
 curl http://localhost:1024/actuator/metrics
 
 # Check current load
-top -p $(pgrep -f sa-admin)
+top -p $(pgrep -f smartadmin-app)
 ```
 
 **Decision Tree**:
@@ -98,7 +98,7 @@ psql -c "SELECT query, calls, total_time/calls as avg_time
 **CPU Profiling**:
 ```bash
 # Profile CPU for 60 seconds
-./profiler.sh -d 60 -e cpu -f flamegraph.html $(pgrep -f sa-admin)
+./profiler.sh -d 60 -e cpu -f flamegraph.html $(pgrep -f smartadmin-app)
 
 # Analyze flame graph
 open flamegraph.html
@@ -112,7 +112,7 @@ open flamegraph.html
 **Memory Analysis**:
 ```bash
 # Heap dump
-jmap -dump:live,format=b,file=heap.hprof $(pgrep -f sa-admin)
+jmap -dump:live,format=b,file=heap.hprof $(pgrep -f smartadmin-app)
 
 # Analyze with Eclipse MAT
 ./mat heap.hprof

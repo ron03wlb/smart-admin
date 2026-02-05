@@ -18,7 +18,7 @@ Complete guide for implementing PII (Personally Identifiable Information) maskin
 
 ## SmartAdmin Data Masking Module
 
-**Location**: `sa-base/foundation/data-masking/`
+**Location**: `smartadmin-support/src/main/java/net/lab1024/sa/support/datamasking/`
 
 **Key Classes:**
 - `@DataMasking` - Annotation for field-level masking
@@ -542,7 +542,7 @@ public void testIdCardMasking() {
 
 ## SmartAdmin Foundation Module
 
-**Location**: `sa-base/foundation/data-masking/`
+**Location**: `smartadmin-support/src/main/java/net/lab1024/sa/support/datamasking/`
 
 **Key Classes:**
 - `@DataMasking` - Annotation for field-level masking

@@ -16,56 +16,56 @@ Legend:
 - 📝 **Document** - Documents implementation/decisions
 - ❌ **Not Involved** - Outside agent's scope
 
-| Capability | java-architect | vue-expert | postgres-pro | devops-engineer | business-analyst | chaos-engineer | architect-reviewer | code-reviewer | documentation-engineer |
-|------------|:--------------:|:----------:|:------------:|:---------------:|:----------------:|:--------------:|:------------------:|:-------------:|:----------------------:|
+| Capability | java-architect | vue-expert | postgres-pro | devops-engineer | business-analyst | chaos-engineer | quality-reviewer | documentation-engineer |
+|------------|:--------------:|:----------:|:------------:|:---------------:|:----------------:|:--------------:|:----------------:|:----------------------:|
 | **Backend Development** |
-| Implement REST API | ✅ | ❌ | ❌ | ❌ | 📝 | ❌ | 🔍 | 🔍 | 📝 |
-| Service Layer Logic | ✅ | ❌ | ❌ | ❌ | 🤝 | ❌ | 🔍 | 🔍 | 📝 |
-| Manager Layer (Transactions) | ✅ | ❌ | ❌ | ❌ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
-| Exception Handling | ✅ | ❌ | ❌ | 🤝 | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
-| Sa-Token Integration | ✅ | ❌ | ❌ | ❌ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
+| Implement REST API | ✅ | ❌ | ❌ | ❌ | 📝 | ❌ | 🔍 | 📝 |
+| Service Layer Logic | ✅ | ❌ | ❌ | ❌ | 🤝 | ❌ | 🔍 | 📝 |
+| Manager Layer (Transactions) | ✅ | ❌ | ❌ | ❌ | ❌ | 🤝 | 🔍 | 📝 |
+| Exception Handling | ✅ | ❌ | ❌ | 🤝 | ❌ | 🤝 | 🔍 | 📝 |
+| Sa-Token Integration | ✅ | ❌ | ❌ | ❌ | ❌ | 🤝 | 🔍 | 📝 |
 | **Frontend Development** |
-| Vue 3 Components | ❌ | ✅ | ❌ | ❌ | 📝 | ❌ | 🔍 | 🔍 | 📝 |
-| TypeScript Integration | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | 🔍 | 🔍 | 📝 |
-| State Management (Pinia) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | 🔍 | 🔍 | 📝 |
-| API Integration | 🤝 | ✅ | ❌ | ❌ | ❌ | ❌ | 🔍 | 🔍 | 📝 |
-| UI/UX Implementation | ❌ | ✅ | ❌ | ❌ | 🤝 | ❌ | 🔍 | 🔍 | 📝 |
+| Vue 3 Components | ❌ | ✅ | ❌ | ❌ | 📝 | ❌ | 🔍 | 📝 |
+| TypeScript Integration | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | 🔍 | 📝 |
+| State Management (Pinia) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | 🔍 | 📝 |
+| API Integration | 🤝 | ✅ | ❌ | ❌ | ❌ | ❌ | 🔍 | 📝 |
+| UI/UX Implementation | ❌ | ✅ | ❌ | ❌ | 🤝 | ❌ | 🔍 | 📝 |
 | **Database Operations** |
-| Write SQL Queries | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | 🔍 | 🔍 | 📝 |
-| Optimize Query Performance | 🤝 | ❌ | ✅ | ❌ | ❌ | ❌ | 🔍 | 🔍 | 📝 |
-| Database Schema Design | 🤝 | ❌ | ✅ | ❌ | 🤝 | ❌ | 🔍 | 🔍 | 📝 |
-| Index Management | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | 🔍 | 🔍 | 📝 |
-| Replication Setup | ❌ | ❌ | ✅ | 🤝 | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
+| Write SQL Queries | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | 🔍 | 📝 |
+| Optimize Query Performance | 🤝 | ❌ | ✅ | ❌ | ❌ | ❌ | 🔍 | 📝 |
+| Database Schema Design | 🤝 | ❌ | ✅ | ❌ | 🤝 | ❌ | 🔍 | 📝 |
+| Index Management | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | 🔍 | 📝 |
+| Replication Setup | ❌ | ❌ | ✅ | 🤝 | ❌ | 🤝 | 🔍 | 📝 |
 | **Infrastructure & Deployment** |
-| CI/CD Pipeline | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
-| Docker Configuration | ❌ | ❌ | 🤝 | ✅ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
-| Kubernetes Deployment | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
-| Monitoring Setup | ❌ | ❌ | 🤝 | ✅ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
-| Log Aggregation | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 🔍 | 🔍 | 📝 |
+| CI/CD Pipeline | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 🔍 | 📝 |
+| Docker Configuration | ❌ | ❌ | 🤝 | ✅ | ❌ | 🤝 | 🔍 | 📝 |
+| Kubernetes Deployment | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 🔍 | 📝 |
+| Monitoring Setup | ❌ | ❌ | 🤝 | ✅ | ❌ | 🤝 | 🔍 | 📝 |
+| Log Aggregation | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 🔍 | 📝 |
 | **Analysis & Planning** |
-| Requirements Gathering | 🤝 | 🤝 | ❌ | ❌ | ✅ | ❌ | 🤝 | ❌ | 📝 |
-| User Story Creation | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | ❌ | 📝 |
-| API Contract Design | 🤝 | 🤝 | ❌ | ❌ | ✅ | ❌ | 🔍 | 🔍 | 📝 |
-| Business Logic Analysis | 🤝 | ❌ | ❌ | ❌ | ✅ | ❌ | 🔍 | 🔍 | 📝 |
-| Stakeholder Communication | 🤝 | 🤝 | ❌ | 🤝 | ✅ | ❌ | 🤝 | 🤝 | 🤝 |
+| Requirements Gathering | 🤝 | 🤝 | ❌ | ❌ | ✅ | ❌ | 🤝 | 📝 |
+| User Story Creation | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | 🤝 | 📝 |
+| API Contract Design | 🤝 | 🤝 | ❌ | ❌ | ✅ | ❌ | 🔍 | 📝 |
+| Business Logic Analysis | 🤝 | ❌ | ❌ | ❌ | ✅ | ❌ | 🔍 | 📝 |
+| Stakeholder Communication | 🤝 | 🤝 | ❌ | 🤝 | ✅ | ❌ | 🤝 | 🤝 |
 | **Testing & Quality** |
-| Unit Testing | ✅ | ✅ | ❌ | 🤝 | ❌ | 🤝 | 🔍 | ✅ | 📝 |
-| Integration Testing | ✅ | ✅ | 🤝 | 🤝 | ❌ | 🤝 | 🔍 | ✅ | 📝 |
-| Resilience Testing | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 🔍 | 🔍 | 📝 |
-| Performance Testing | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 🔍 | 🔍 | 📝 |
-| Code Quality Review | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ❌ | 🤝 | ✅ | 📝 |
+| Unit Testing | ✅ | ✅ | ❌ | 🤝 | ❌ | 🤝 | ✅ | 📝 |
+| Integration Testing | ✅ | ✅ | 🤝 | 🤝 | ❌ | 🤝 | ✅ | 📝 |
+| Resilience Testing | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 🔍 | 📝 |
+| Performance Testing | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 🔍 | 📝 |
+| Code Quality Review | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ❌ | ✅ | 📝 |
 | **Architecture & Design** |
-| System Architecture | 🤝 | ❌ | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 🤝 | 📝 |
-| Design Patterns | ✅ | ✅ | 🤝 | 🤝 | ❌ | ❌ | ✅ | 🔍 | 📝 |
-| Scalability Analysis | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ✅ | 🔍 | 📝 |
-| Technical Debt Assessment | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 🤝 | 📝 |
-| Architecture Documentation | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | 🤝 | ❌ | ✅ |
+| System Architecture | 🤝 | ❌ | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 📝 |
+| Design Patterns | ✅ | ✅ | 🤝 | 🤝 | ❌ | ❌ | ✅ | 📝 |
+| Scalability Analysis | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ✅ | 📝 |
+| Technical Debt Assessment | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | ✅ | 📝 |
+| Architecture Documentation | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ❌ | 🤝 | ✅ |
 | **Documentation** |
-| API Documentation | 🤝 | 🤝 | ❌ | ❌ | 🤝 | ❌ | ❌ | ❌ | ✅ |
-| Technical Guides | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ✅ |
-| Architecture Diagrams | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ✅ |
-| User Documentation | ❌ | 🤝 | ❌ | ❌ | 🤝 | ❌ | ❌ | ❌ | ✅ |
-| Code Comments | ✅ | ✅ | 🤝 | 🤝 | ❌ | 🤝 | 🤝 | 🤝 | 📝 |
+| API Documentation | 🤝 | 🤝 | ❌ | ❌ | 🤝 | ❌ | ❌ | ✅ |
+| Technical Guides | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ✅ |
+| Architecture Diagrams | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | 🤝 | ✅ |
+| User Documentation | ❌ | 🤝 | ❌ | ❌ | 🤝 | ❌ | ❌ | ✅ |
+| Code Comments | ✅ | ✅ | 🤝 | 🤝 | ❌ | 🤝 | 🤝 | 📝 |
 
 ---
 
@@ -73,15 +73,15 @@ Legend:
 
 Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = Deep expertise
 
-| Skill Dimension | java-architect | vue-expert | postgres-pro | devops-engineer | business-analyst | chaos-engineer | architect-reviewer | code-reviewer | documentation-engineer |
-|-----------------|:--------------:|:----------:|:------------:|:---------------:|:----------------:|:--------------:|:------------------:|:-------------:|:----------------------:|
-| **Backend Development** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
-| **Frontend Development** | ⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
-| **Database Expertise** | ⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| **Infrastructure & DevOps** | ⭐⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| **Business Analysis** | ⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| **Testing & Quality** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| **System Architecture** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Skill Dimension | java-architect | vue-expert | postgres-pro | devops-engineer | business-analyst | chaos-engineer | quality-reviewer | documentation-engineer |
+|-----------------|:--------------:|:----------:|:------------:|:---------------:|:----------------:|:--------------:|:----------------:|:----------------------:|
+| **Backend Development** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| **Frontend Development** | ⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| **Database Expertise** | ⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| **Infrastructure & DevOps** | ⭐⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| **Business Analysis** | ⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| **Testing & Quality** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
+| **System Architecture** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
 
 ---
 
@@ -151,25 +151,20 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 | Recovery Validation | Medium | 2-4 hours | Recovery procedures, validation steps |
 | Chaos Report | Low-Medium | 1-2 hours | Findings count, recommendations |
 
-#### architect-reviewer
+#### quality-reviewer
 
-| Task Type | Complexity | Typical Duration | Complexity Factors |
-|-----------|------------|------------------|-------------------|
-| Architecture Review | High | 4-8 hours | System size, architectural decisions |
-| Design Pattern Validation | Medium | 2-4 hours | Patterns count, complexity |
-| Scalability Assessment | High | 6-10 hours | Load requirements, bottlenecks |
-| Technical Debt Analysis | Medium-High | 4-8 hours | Codebase size, debt severity |
-| Architecture Documentation | Medium-High | 4-6 hours | System complexity, diagram count |
-
-#### code-reviewer
-
-| Task Type | Complexity | Typical Duration | Complexity Factors |
-|-----------|------------|------------------|-------------------|
-| Code Quality Review | Medium | 2-4 hours | Lines of code, issue density |
-| Security Review | High | 4-6 hours | Security requirements, risk level |
-| Performance Review | Medium-High | 3-5 hours | Performance targets, bottlenecks |
-| Pre-Merge Gate | Medium | 2-3 hours | Change size, test coverage |
-| Refactoring Validation | Medium-High | 3-5 hours | Refactoring scope, test coverage |
+| Task Type | Complexity | Typical Duration | Mode | Complexity Factors |
+|-----------|------------|------------------|------|-------------------|
+| Code Quality Review | Medium | 2-4 hours | code | Lines of code, issue density |
+| Security Review | High | 4-6 hours | code | Security requirements, risk level |
+| Performance Review | Medium-High | 3-5 hours | code | Performance targets, bottlenecks |
+| Pre-Merge Gate | Medium | 2-3 hours | code | Change size, test coverage |
+| Refactoring Validation | Medium-High | 3-5 hours | code | Refactoring scope, test coverage |
+| Architecture Review | High | 4-8 hours | architecture | System size, architectural decisions |
+| Design Pattern Validation | Medium | 2-4 hours | architecture | Patterns count, complexity |
+| Scalability Assessment | High | 6-10 hours | architecture | Load requirements, bottlenecks |
+| Technical Debt Analysis | Medium-High | 4-8 hours | architecture | Codebase size, debt severity |
+| Architecture Documentation | Medium-High | 4-6 hours | architecture | System complexity, diagram count |
 
 #### documentation-engineer
 
@@ -188,15 +183,15 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 ### Sequential Workflows
 
 #### 1. Full-Stack Feature Implementation
-**Flow**: business-analyst → java-architect → vue-expert → code-reviewer → devops-engineer → chaos-engineer → documentation-engineer
+**Flow**: business-analyst → java-architect → vue-expert → quality-reviewer → devops-engineer → chaos-engineer → documentation-engineer
 
 **When to Use**: New feature requires backend + frontend + deployment
 
 **Handoff Points**:
 - BA → Java: Requirements, user stories, API contract
 - Java → Vue: Backend running, Swagger docs, sample JSON
-- Vue → Code: Frontend complete, tests passing
-- Code → DevOps: Review complete, quality gate passed
+- Vue → Quality: Frontend complete, tests passing
+- Quality → DevOps: Review complete, quality gate passed
 - DevOps → Chaos: Deployed to staging, smoke tests passing
 - Chaos → Doc: Resilience validated, production ready
 
@@ -205,7 +200,7 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 ---
 
 #### 2. Database-First Implementation
-**Flow**: postgres-pro → java-architect → vue-expert → code-reviewer
+**Flow**: postgres-pro → java-architect → vue-expert → quality-reviewer
 
 **When to Use**: Database changes drive application logic
 
@@ -221,11 +216,11 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 ### Parallel Workflows
 
 #### 3. Performance Optimization
-**Flow**: java-architect + postgres-pro + vue-expert (parallel) → architect-reviewer (consolidate) → devops-engineer
+**Flow**: java-architect + postgres-pro + vue-expert (parallel) → quality-reviewer --mode=architecture (consolidate) → devops-engineer
 
 **When to Use**: Performance issues require investigation across layers
 
-**Coordination**: architect-reviewer consolidates findings and prioritizes optimizations
+**Coordination**: quality-reviewer (--mode=architecture) consolidates findings and prioritizes optimizations
 
 **Example**: "Application is slow, improve response time"
 
@@ -245,22 +240,22 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 ### Hub-and-Spoke Workflows
 
 #### 5. Pre-Merge Quality Gate
-**Flow**: code-reviewer (hub) → [java-architect | vue-expert | architect-reviewer] (spokes) → code-reviewer (consolidate)
+**Flow**: quality-reviewer (hub) → [java-architect | vue-expert] (spokes) → quality-reviewer (consolidate)
 
 **When to Use**: Large PR requires multiple specialist reviews
 
-**Coordination**: code-reviewer orchestrates specialist reviews, makes final decision
+**Coordination**: quality-reviewer orchestrates specialist reviews (running both --mode=code and --mode=architecture), makes final decision
 
 **Example**: "Review PR: Major refactoring of authentication system"
 
 ---
 
 #### 6. Architecture Evolution
-**Flow**: architect-reviewer (hub) → [business-analyst | java-architect | postgres-pro | devops-engineer] (gather input) → architect-reviewer (design) → documentation-engineer (document)
+**Flow**: quality-reviewer --mode=architecture (hub) → [business-analyst | java-architect | postgres-pro | devops-engineer] (gather input) → quality-reviewer (design) → documentation-engineer (document)
 
 **When to Use**: Significant architectural changes needed
 
-**Coordination**: architect-reviewer gathers requirements and designs solution
+**Coordination**: quality-reviewer (--mode=architecture) gathers requirements and designs solution
 
 **Example**: "Transition from monolith to microservices"
 
@@ -290,10 +285,10 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 
 ### Q3: Review - What aspect?
 
-**A) Architecture/design** → **architect-reviewer**
-**B) Code quality/security/performance** → **code-reviewer**
+**A) Architecture/design** → **quality-reviewer** (`--mode=architecture`)
+**B) Code quality/security/performance** → **quality-reviewer** (`--mode=code`)
 **C) Resilience/failure handling** → **chaos-engineer**
-**D) All of the above (pre-merge)** → **code-reviewer** (orchestrates specialist reviews)
+**D) All of the above (pre-merge)** → **quality-reviewer** (run both modes, orchestrates specialist reviews)
 
 ---
 
@@ -310,7 +305,7 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 ### Q5: Analyze/Plan - What focus?
 
 **A) Business requirements** → **business-analyst**
-**B) Architecture planning** → **architect-reviewer**
+**B) Architecture planning** → **quality-reviewer** (`--mode=architecture`)
 **C) Performance analysis** → **java-architect** + **postgres-pro** (parallel)
 **D) Failure analysis** → **chaos-engineer**
 **E) Stakeholder needs** → **business-analyst**
@@ -349,11 +344,11 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 
 ### Pattern 2: Review → Fix → Re-review Cycle
 
-**Flow**: Developer → code-reviewer → Developer (fix) → code-reviewer (verify)
+**Flow**: Developer → quality-reviewer → Developer (fix) → quality-reviewer (verify)
 
 **Critical Success Factor**: Clear, actionable feedback
 
-**code-reviewer provides**:
+**quality-reviewer provides**:
 - File path and line numbers: `EmployeeService.java:45`
 - Issue severity: Critical, Major, Minor
 - Specific violation: "Uses @Autowired field injection"
@@ -364,7 +359,7 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 - "Fixed @Autowired in EmployeeService.java:45, EmployeeController.java:23"
 - "All ArchitectureTest tests now passing"
 
-**code-reviewer verifies**:
+**quality-reviewer verifies**:
 - Issue resolved correctly
 - No new issues introduced
 - Tests still passing
@@ -416,13 +411,13 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 
 ---
 
-### ❌ Anti-Pattern 3: Merging Without code-reviewer
+### ❌ Anti-Pattern 3: Merging Without quality-reviewer
 
 **Mistake**: "Tests pass, looks good" → Merge
 
 **Impact**: Quality issues in production, security vulnerabilities, performance problems
 
-**Correct**: Always gate merges with code-reviewer, especially for:
+**Correct**: Always gate merges with quality-reviewer, especially for:
 - Security-sensitive code (authentication, authorization)
 - Performance-critical paths
 - Architecture changes
@@ -462,13 +457,13 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 
 ---
 
-### ❌ Anti-Pattern 7: Ignoring architect-reviewer for Major Changes
+### ❌ Anti-Pattern 7: Ignoring quality-reviewer for Major Changes
 
-**Mistake**: "Let's just refactor to microservices" → Skip architect-reviewer
+**Mistake**: "Let's just refactor to microservices" → Skip quality-reviewer
 
 **Impact**: Poor architectural decisions, technical debt, scalability issues
 
-**Correct**: architect-reviewer designs solution → Team implements → architect-reviewer validates
+**Correct**: quality-reviewer (--mode=architecture) designs solution → Team implements → quality-reviewer validates
 
 ---
 
@@ -489,11 +484,11 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 
 | Task | Primary Agent | Supporting Agents |
 |------|--------------|-------------------|
-| Architecture review | architect-reviewer | - |
-| Code quality review | code-reviewer | - |
-| Security review | code-reviewer | java-architect, vue-expert (context) |
-| Performance review | code-reviewer | java-architect, postgres-pro |
-| Pre-merge quality gate | code-reviewer | architect-reviewer (if architecture changes) |
+| Architecture review | quality-reviewer (--mode=architecture) | - |
+| Code quality review | quality-reviewer (--mode=code) | - |
+| Security review | quality-reviewer (--mode=code) | java-architect, vue-expert (context) |
+| Performance review | quality-reviewer (--mode=code) | java-architect, postgres-pro |
+| Pre-merge quality gate | quality-reviewer (both modes) | - |
 
 ### Deployment Phase
 
@@ -512,7 +507,7 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 | Business analysis | business-analyst | - |
 | Performance analysis | java-architect, postgres-pro | - |
 | Failure analysis | chaos-engineer | devops-engineer (logs, metrics) |
-| Architecture planning | architect-reviewer | All agents (gather requirements) |
+| Architecture planning | quality-reviewer (--mode=architecture) | All agents (gather requirements) |
 | Impact analysis | business-analyst | Affected agents |
 
 ### Documentation Phase
@@ -520,7 +515,7 @@ Rating Scale: ⭐ (1 star) = Basic familiarity → ⭐⭐⭐⭐⭐ (5 stars) = D
 | Task | Primary Agent | Supporting Agents |
 |------|--------------|-------------------|
 | API documentation | documentation-engineer | java-architect (technical details) |
-| Architecture guide | documentation-engineer | architect-reviewer (design rationale) |
+| Architecture guide | documentation-engineer | quality-reviewer (design rationale) |
 | User guide | documentation-engineer | business-analyst (user perspective) |
 | Runbook | documentation-engineer | devops-engineer (operational details) |
 | Code comments | [Implementation agent] | - |

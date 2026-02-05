@@ -28,10 +28,10 @@ metadata:
   tags: ["performance", "profiling", "n+1", "jvm", "optimization"]
   author: "SmartAdmin Team"
   last_updated: "2026-01-29"
-  status: "stable"
+  status: "deprecated"
 
 triggers:
-  keywords: ["slow", "performance", "optimize", "N+1", "memory leak", "CPU usage", "cache miss", "query optimization"]
+  keywords: []
   patterns: ["profile.*performance", "optimize.*endpoint"]
   exclude_keywords: []
 
@@ -44,9 +44,10 @@ dependencies: { skills: [], required_files: [], tools: [] }
 output: { generates: ["*.md", "*.java"], target_directories: ["docs/performance", "smart-admin-api-java21-springboot3/smartadmin-app/src/main/java"], templates: {} }
 validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [] }
 compatibility:
-  deprecated: false
-  soft_deprecated: true
+  deprecated: true
+  deprecation_phase: "soft"
   replacement_skill: "smartadmin-performance-suite"
-  migration_date: "2026-01-27"
+  deprecated_since: "2026-02-06"
+  removal_date: "2026-06-30"
 documentation: { skill_md: "SKILL.md", readme: null }
 monitoring: { track_usage: true, log_executions: true, metrics: ["execution_time", "success_rate"] }

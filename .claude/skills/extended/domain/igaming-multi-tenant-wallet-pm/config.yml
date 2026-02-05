@@ -85,31 +85,28 @@ triggers:
 execution:
   type: "phase-based"
 
+  # Phase content is embedded in SKILL.md (phase files were empty stubs, removed in v4.0.0 optimization)
   phases:
     - id: "phase-1"
       name: "Requirement Gathering"
-      file: "phases/phase-1-requirement-gathering.md"
       required: true
       estimated_minutes: 10
       description: "需求收集與深度分析（Ultrathink 方法論）"
 
     - id: "phase-2"
       name: "Multi-Tenant Design"
-      file: "phases/phase-2-multi-tenant-design.md"
       required: false
       estimated_minutes: 15
       description: "多商戶架構設計（隔離策略、白標定制）"
 
     - id: "phase-3"
       name: "Seamless Wallet Design"
-      file: "phases/phase-3-seamless-wallet-design.md"
       required: false
       estimated_minutes: 15
       description: "無縫錢包設計（13 個核心模式整合）"
 
     - id: "phase-4"
       name: "Regional Compliance"
-      file: "phases/phase-4-regional-compliance.md"
       required: false
       estimated_minutes: 10
       description: "地區合規設計（歐洲/亞洲/美洲/中國對比）"
@@ -140,8 +137,6 @@ output:
 
   templates:
     prd: "knowledge/prd-template.md"
-    compliance: "knowledge/regional-requirements.md"
-    multi_tenant: "knowledge/multi-tenant-patterns.md"
     wallet: "knowledge/wallet-patterns.md"
 
 validation:
@@ -170,8 +165,7 @@ compatibility:
 documentation:
   skill_md: "SKILL.md"
   readme: "README.md"
-  examples_dir: "examples"
-  references_dir: "references"
+  # examples/ and references/ directories removed (were empty stubs)
 
   external_links:
     - title: "iGaming Technical Specs"
@@ -179,9 +173,6 @@ documentation:
 
     - title: "SmartAdmin Patterns"
       url: "../../../.claude/shared/knowledge/smartadmin-patterns.md"
-
-    - title: "Regional Compliance Requirements"
-      url: "knowledge/regional-requirements.md"
 
     - title: "Seamless Wallet Patterns"
       url: "knowledge/wallet-patterns.md"

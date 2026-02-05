@@ -9,8 +9,8 @@
 version: "3.0.0"
 last_updated: "2026-02-02"
 total_skills: 35
-active_skills: 32
-deprecated_skills: 3
+active_skills: 31
+deprecated_skills: 4
 
 # ====================================================================
 # Keyword Conflict Resolution
@@ -496,17 +496,20 @@ skills:
       - "test-fixture-generator"
     depended_by: ["batch-plan-executor"]
 
-  # Analysis Skills
+  # Analysis Skills (deprecated → lifecycle/deprecated/)
   java-performance-pro:
-    path: "productivity/analysis/java-performance-pro"
-    priority: "P2"
+    path: "lifecycle/deprecated/java-performance-pro"
+    priority: null
     type: "atomic"
     category: "analysis"
-    visibility: "public"
-    preferred_via: "user_invoked"
+    visibility: "internal"
+    preferred_via: "never"
     aliases: ["perf-analysis", "profiler"]
-    status: "stable"
-    description: "Profile and optimize Java application performance (N+1 detection, JVM tuning, CPU hotspot analysis)"
+    status: "deprecated"
+    deprecated_since: "2026-02-06"
+    replacement: "smartadmin-performance-suite"
+    removal_date: "2026-06-30"
+    description: "[DEPRECATED] Profile and optimize Java application performance (use smartadmin-performance-suite)"
     depends_on: []
     depended_by: ["smartadmin-performance-suite"]
 
@@ -707,9 +710,8 @@ categories:
       - smartadmin-testing-suite
 
   analysis:
-    description: "Performance analysis and profiling"
-    skills:
-      - java-performance-pro
+    description: "Performance analysis and profiling (all deprecated)"
+    skills: []
 
 # ====================================================================
 # END OF SKILL REGISTRY v3.0.0
