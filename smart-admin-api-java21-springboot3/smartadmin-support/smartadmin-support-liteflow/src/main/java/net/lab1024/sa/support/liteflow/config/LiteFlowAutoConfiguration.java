@@ -2,13 +2,15 @@ package net.lab1024.sa.support.liteflow.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * LiteFlow 自動配置
  *
  * <p>條件啟用：當 smart.liteflow.enabled = true 時生效
+ *
+ * <p>注意：LiteFlowProperties bean 由 LiteFlowPropertiesConfiguration 無條件註冊， 以確保依賴它的 @Component 類（如
+ * LiteFlowExecutionListener）能正常創建。
  *
  * <p>使用 LiteFlow SQL 配置源，需要在 application.yaml 配置：
  *
@@ -36,7 +38,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@EnableConfigurationProperties(LiteFlowProperties.class)
 @ConditionalOnProperty(prefix = "smart.liteflow", name = "enabled", havingValue = "true")
 public class LiteFlowAutoConfiguration {
 

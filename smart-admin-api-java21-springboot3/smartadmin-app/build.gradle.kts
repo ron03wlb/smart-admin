@@ -22,7 +22,10 @@ configurations {
 
 dependencies {
     // ==================== Starter 依賴 ====================
-    implementation(project(":smartadmin-starter:smartadmin-starter-all"))
+    implementation(project(":smartadmin-starter:smartadmin-starter-all")) {
+        // Temporarily exclude LiteFlow - requires additional SQL database configuration
+        exclude(group = "net.lab1024", module = "smartadmin-support-liteflow")
+    }
 
     // ==================== Business Modules ====================
     implementation(project(":smartadmin-modules:smartadmin-system"))
