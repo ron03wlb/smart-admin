@@ -33,7 +33,7 @@ When working with SmartAdmin codebase, read documentation in this order:
 
 1. **CLAUDE.md** (this file) - Quick reference and navigation hub
 2. **[.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md)** - Unified decision center (630 lines: rules routing, skill selection, agent orchestration) ⭐
-3. **[.agent/rules/foundation/10-architecture-rules.md](.agent/rules/foundation/10-architecture-rules.md)** - Mandatory architectural constraints (enforced by ArchUnit)
+3. **[.agent/rules/foundation/F04-architecture-rules.md](.agent/rules/foundation/F04-architecture-rules.md)** - Mandatory architectural constraints (enforced by ArchUnit)
 4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
 5. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks (optional, for Claude Code)
 6. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
@@ -97,7 +97,7 @@ Controller → Service → Manager → Dao → Entity
 - `@Transactional` / `@Cacheable`: Manager layer ONLY (NEVER in Service/Controller)
 - `@Autowired` field injection: FORBIDDEN
 
-→ **[Complete Architecture Rules](.agent/rules/foundation/10-architecture-rules.md)**
+→ **[Complete Architecture Rules](.agent/rules/foundation/F04-architecture-rules.md)**
 → **[SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)**
 → **[Project Architecture](.claude/shared/knowledge/project-architecture.md)**
 
@@ -141,8 +141,8 @@ Controller → Service → Manager → Dao → Entity
 
 **Commit Format:** `<type>(<scope>): <subject>`
 
-→ **[Complete Naming Conventions](.agent/rules/foundation/01-naming-conventions.md)**
-→ **[Commit Message Guide](.agent/rules/workflows/17-commit-message-conventions.md)**
+→ **[Complete Naming Conventions](.agent/rules/foundation/F01-naming-conventions.md)**
+→ **[Commit Message Guide](.agent/rules/workflows/W02-commit-message-conventions.md)**
 
 ## Anti-Patterns to Avoid
 
@@ -193,9 +193,9 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 ## Development Guidelines
 
 **Essential Rules** (see `.agent/rules/`):
-- Architecture: [`foundation/10-architecture-rules.md`](.agent/rules/foundation/10-architecture-rules.md)
-- Manager Layer: [`foundation/09-manager-layer.md`](.agent/rules/foundation/09-manager-layer.md)
-- Naming: [`foundation/01-naming-conventions.md`](.agent/rules/foundation/01-naming-conventions.md)
+- Architecture: [`foundation/F04-architecture-rules.md`](.agent/rules/foundation/F04-architecture-rules.md)
+- Manager Layer: [`foundation/F03-manager-layer.md`](.agent/rules/foundation/F03-manager-layer.md)
+- Naming: [`foundation/F01-naming-conventions.md`](.agent/rules/foundation/F01-naming-conventions.md)
 - Exceptions: [`technology/patterns/04-exception-logging.md`](.agent/rules/technology/patterns/04-exception-logging.md)
 
 **Validation**:
@@ -266,9 +266,14 @@ stateDiagram-v2
 
 ## Specialized Skills
 
-**Quick Overview**: 35 skills in hierarchical structure (see [Complete Catalog](.claude/skills/README.md) for full details)
+SmartAdmin 提供兩套並行的技能系統：
 
-**Skills Organization (v4.0.0)**:
+### 1. Claude Code 技能系統 (`.claude/skills/`)
+**適用對象**：Claude Code CLI 使用者
+**技能數量**：35個（P0:6, P1:10, P2:17）
+**詳細說明**：[.claude/skills/README.md](.claude/skills/README.md)
+
+**組織結構**:
 ```
 .claude/skills/
 ├── foundation/      (P0 - 6 skills: Critical foundation)
@@ -322,6 +327,30 @@ stateDiagram-v2
 - Refactoring (3): vavr-refactoring-assistant, smartadmin-manager-extractor, **markdown-quality-checker** ⭐
 
 → **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
+
+---
+
+### 2. Antigravity/通用AI 技能系統 (`.agent/skills/`)
+**適用對象**：Antigravity, Gemini, 及其他AI助手
+**技能數量**：3個（SmartAdmin專用）
+**詳細說明**：[.agent/skills/README.md](.agent/skills/README.md)
+
+**當前技能**：
+1. **smartadmin-crud-generator** - 完整CRUD模塊生成
+2. **quality-gate-orchestrator** - 多工具品質門檻編排
+3. **smartadmin-testing-suite** - 測試套件執行
+
+**系統分界**：
+- `.claude/skills/` 使用 Claude Code 特定的技能調用機制
+- `.agent/skills/` 使用通用的AI指令格式
+- 兩者**不應重複**，各有專門用途
+
+**選擇指南**：
+- 使用 Claude Code CLI → 參考 `.claude/skills/`
+- 使用 Antigravity 或其他AI → 參考 `.agent/skills/`
+- 架構規則統一在 `.agent/rules/` 中
+
+---
 
 ### Week 4-5 New Skills (v3.0.0)
 
@@ -378,7 +407,7 @@ Common quality tool violations and approved solutions:
 - **ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD**: @PostConstruct static field initialization pattern
 - **CT_CONSTRUCTOR_THROW**: Constructor validation pattern is safe for internal classes
 
-Detailed rules: See [.agent/rules/quality-tools/12-pmd-rules.md](.agent/rules/quality-tools/12-pmd-rules.md) and [.agent/rules/quality-tools/13-spotbugs-rules.md](.agent/rules/quality-tools/13-spotbugs-rules.md)
+Detailed rules: See [.agent/rules/quality-tools/Q02-pmd-rules.md](.agent/rules/quality-tools/Q02-pmd-rules.md) and [.agent/rules/quality-tools/Q03-spotbugs-rules.md](.agent/rules/quality-tools/Q03-spotbugs-rules.md)
 
 ---
 

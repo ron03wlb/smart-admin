@@ -14,10 +14,10 @@
 
 ### New Developer Onboarding
 
-1. **Environment Setup**: Start with [workflows/init.md](workflows/init.md) to complete Java 21 + PostgreSQL + Redis environment configuration
-2. **Architecture Understanding**: Read [rules/10-architecture-rules.md](rules/10-architecture-rules.md) to understand layered architecture
-3. **Learn Vavr**: Begin functional programming with [rules/08-vavr-fundamentals.md](rules/08-vavr-fundamentals.md)
-4. **PostgreSQL Features**: Refer to [rules/05-postgresql-advanced.md](rules/05-postgresql-advanced.md) to learn JSONB and arrays
+1. **Environment Setup**: Start with [workflows/01-environment-setup.md](workflows/01-environment-setup.md) to complete Java 21 + PostgreSQL + Redis environment configuration
+2. **Architecture Understanding**: Read [rules/foundation/F04-architecture-rules.md](rules/foundation/F04-architecture-rules.md) to understand layered architecture
+3. **Learn Vavr**: Begin functional programming with [rules/technology/functional/P01-vavr-fundamentals.md](rules/technology/functional/P01-vavr-fundamentals.md)
+4. **PostgreSQL Features**: Refer to [rules/technology/database/D02-postgresql-advanced.md](rules/technology/database/D02-postgresql-advanced.md) to learn JSONB and arrays
 5. **Development Practices**: Read [Coding Standards Summary](docs/coding-standards-summary.md) for specific coding standards
 
 ### Environment Setup Verification
@@ -42,45 +42,45 @@ mvn test -Dtest=ArchitectureTest
 
 ### 🏗️ Core Coding Standards
 Fundamental coding standards (always apply):
-- [01-naming-conventions.md](rules/01-naming-conventions.md) - Naming conventions
-- [02-oop-principles.md](rules/02-oop-principles.md) - OOP principles
-- [03-concurrency-rules.md](rules/03-concurrency-rules.md) - Concurrency rules
-- [04-exception-logging.md](rules/04-exception-logging.md) - Exception and logging
-- [06-sonarqube-rules.md](rules/06-sonarqube-rules.md) - SonarQube rules
-- [10-architecture-rules.md](rules/10-architecture-rules.md) - Layered architecture
+- [01-naming-conventions.md](rules/foundation/F01-naming-conventions.md) - Naming conventions
+- [02-oop-principles.md](rules/foundation/F02-oop-principles.md) - OOP principles
+- [03-concurrency-rules.md](rules/technology/patterns/P04-concurrency-rules.md) - Concurrency rules
+- [04-exception-logging.md](rules/technology/patterns/P05-exception-logging.md) - Exception and logging
+- [06-sonarqube-rules.md](rules/workflows/W01-sonarqube-rules.md) - SonarQube rules
+- [10-architecture-rules.md](rules/foundation/F04-architecture-rules.md) - Layered architecture
 
 ### 🗄️ PostgreSQL Database Standards (Ideal Architecture)
-- [05-postgresql-basics.md](rules/technology/database/05-postgresql-basics.md) - Table creation and indexing
-- [05-postgresql-advanced.md](rules/technology/database/05-postgresql-advanced.md) - JSONB, arrays, CTE, window functions
-- [05-postgresql-mybatis.md](rules/technology/database/05-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
+- [D01-postgresql-basics.md](rules/technology/database/D01-postgresql-basics.md) - Table creation and indexing
+- [D02-postgresql-advanced.md](rules/technology/database/D02-postgresql-advanced.md) - JSONB, arrays, CTE, window functions
+- [D03-postgresql-mybatis.md](rules/technology/database/D03-postgresql-mybatis.md) - Complete PostgreSQL + MyBatis Plus Integration
 
 ### 🔒 Security Standards (OWASP Top 10)
-- [07-owasp-top10-part1.md](rules/07-owasp-top10-part1.md) - A01-A04
-- [07-owasp-top10-part2.md](rules/07-owasp-top10-part2.md) - A05-A10
+- [07-owasp-top10-part1.md](rules/security/S01-owasp-top10-part1.md) - A01-A04
+- [07-owasp-top10-part2.md](rules/security/S02-owasp-top10-part2.md) - A05-A10
 
 ### 🎯 Vavr Functional Programming (Ideal Architecture)
-- [08-vavr-fundamentals.md](rules/08-vavr-fundamentals.md) - Option, Try fundamentals
-- [08-vavr-advanced.md](rules/08-vavr-advanced.md) - Either, collections, pattern matching
-- [08-vavr-mybatis-integration.md](rules/08-vavr-mybatis-integration.md) - Vavr + MyBatis Plus
+- [08-vavr-fundamentals.md](rules/technology/functional/P01-vavr-fundamentals.md) - Option, Try fundamentals
+- [08-vavr-advanced.md](rules/technology/functional/P02-vavr-advanced.md) - Either, collections, pattern matching
+- [08-vavr-mybatis-integration.md](rules/technology/functional/P03-vavr-mybatis-integration.md) - Vavr + MyBatis Plus
 
 ### 💾 MyBatis Plus Persistence Layer (Ideal Architecture: LambdaQueryWrapper)
 - [09-mybatis-plus-core.md](rules/technology/database/09-mybatis-plus-core.md) - LambdaQueryWrapper, pagination, IEnum
-- [05-postgresql-mybatis.md](rules/technology/database/05-postgresql-mybatis.md) - PostgreSQL + MyBatis Plus Integration (TypeHandlers, SQL Optimization, Migration)
-- [09-manager-layer.md](rules/foundation/09-manager-layer.md) - Manager layer standards
+- [D03-postgresql-mybatis.md](rules/technology/database/D03-postgresql-mybatis.md) - PostgreSQL + MyBatis Plus Integration (TypeHandlers, SQL Optimization, Migration)
+- [09-manager-layer.md](rules/foundation/F03-manager-layer.md) - Manager layer standards
 
 ### 🔧 Static Analysis Tool Standards
-- [11-checkstyle-rules.md](rules/11-checkstyle-rules.md) - Checkstyle code style
-- [12-pmd-rules.md](rules/12-pmd-rules.md) - PMD code quality
-- [13-spotbugs-rules.md](rules/13-spotbugs-rules.md) - SpotBugs bug detection
-- [14-spotless-rules.md](rules/14-spotless-rules.md) - Spotless formatting
-- [15-error-prone-rules.md](rules/15-error-prone-rules.md) - Error Prone compile-time checks
-- [16-jacoco-coverage-rules.md](rules/16-jacoco-coverage-rules.md) - JaCoCo test coverage
+- [11-checkstyle-rules.md](rules/quality-tools/Q01-checkstyle-rules.md) - Checkstyle code style
+- [12-pmd-rules.md](rules/quality-tools/Q02-pmd-rules.md) - PMD code quality
+- [13-spotbugs-rules.md](rules/quality-tools/Q03-spotbugs-rules.md) - SpotBugs bug detection
+- [14-spotless-rules.md](rules/quality-tools/Q04-spotless-rules.md) - Spotless formatting
+- [15-error-prone-rules.md](rules/quality-tools/Q05-error-prone-rules.md) - Error Prone compile-time checks
+- [16-jacoco-coverage-rules.md](rules/quality-tools/Q06-jacoco-coverage-rules.md) - JaCoCo test coverage
 
 ### 📝 Git Standards
-- [17-commit-message-conventions.md](rules/17-commit-message-conventions.md) - Commit message conventions
+- [17-commit-message-conventions.md](rules/workflows/W02-commit-message-conventions.md) - Commit message conventions
 
 ### 🔄 Development Workflows
-- [init.md](workflows/init.md) - Environment initialization
+- [init.md](workflows/01-environment-setup.md) - Environment initialization
 - [github-actions-pipeline.md](workflows/github-actions-pipeline.md) - GitHub Actions CI/CD
 - [quality-gates-local-ci.md](workflows/quality-gates-local-ci.md) - Local Quality Gate, GitLab CI
 - [tdd-workflow.md](workflows/tdd-workflow.md) - Test-Driven Development
@@ -177,7 +177,7 @@ return ResponseDTO.error(ErrorCode.XXX);
 
 ### AI Decision Matrix
 
-Entry point for all AI rules: [rules/00-ai-decision-matrix.md](rules/00-ai-decision-matrix.md)
+Entry point for all AI rules: [rules/00-INDEX.md](rules/00-INDEX.md)
 
 **Core Checklist**:
 - ✅ Service layer must use `io.vavr.control.Option` instead of `java.util.Optional`
@@ -233,7 +233,7 @@ Quality Gate Pass Criteria:
 
 ### Workflow Index
 - **Workflow Overview**: [workflows/00-workflow-index.md](workflows/00-workflow-index.md)
-- **AI Decision Matrix**: [rules/00-ai-decision-matrix.md](rules/00-ai-decision-matrix.md)
+- **AI Decision Matrix**: [rules/00-INDEX.md](rules/00-INDEX.md)
 
 ---
 

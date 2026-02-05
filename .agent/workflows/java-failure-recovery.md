@@ -3,13 +3,13 @@ trigger: on_demand
 description: Java error diagnosis and recovery procedures
 tags: [troubleshooting, debugging, error-recovery, archunit, quality-gate]
 required_rules:
-  - rules/10-architecture-rules.md
-  - rules/11-checkstyle-rules.md
-  - rules/12-pmd-rules.md
-  - rules/13-spotbugs-rules.md
-  - rules/14-spotless-rules.md
-  - rules/15-error-prone-rules.md
-  - rules/16-jacoco-coverage-rules.md
+  - rules/foundation/F04-architecture-rules.md
+  - rules/quality-tools/Q01-checkstyle-rules.md
+  - rules/quality-tools/Q02-pmd-rules.md
+  - rules/quality-tools/Q03-spotbugs-rules.md
+  - rules/quality-tools/Q04-spotless-rules.md
+  - rules/quality-tools/Q05-error-prone-rules.md
+  - rules/quality-tools/Q06-jacoco-coverage-rules.md
 
 execution_order:
   - step: identify_error_type

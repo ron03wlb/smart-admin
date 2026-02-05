@@ -3,9 +3,9 @@ trigger: on_demand
 description: Test-Driven Development (TDD) workflow
 tags: [tdd, testing, junit5, mockito, test-driven-development]
 required_rules:
-  - rules/10-architecture-rules.md
-  - rules/01-naming-conventions.md
-  - rules/08-vavr-fundamentals.md
+  - rules/foundation/F04-architecture-rules.md
+  - rules/foundation/F01-naming-conventions.md
+  - rules/technology/functional/P01-vavr-fundamentals.md
 
 execution_order:
   - step: write_failing_test
@@ -54,7 +54,7 @@ last_updated: 2025-01-13
 
 ### Execution Checklist
 Confirm before starting:
-- [ ] Development environment initialized (reference init.md)
+- [ ] Development environment initialized (reference 01-environment-setup.md)
 - [ ] Understand user requirements (functionality, boundary conditions, exceptional cases)
 - [ ] Determine test scope (unit test/integration test)
 

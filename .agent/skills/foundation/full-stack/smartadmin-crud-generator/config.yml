@@ -1,0 +1,43 @@
+# SmartAdmin CRUD Generator Configuration
+name: smartadmin-crud-generator
+version: "2.0.0"
+priority: P0
+category: full-stack
+status: stable
+
+description: "Generate complete CRUD module (Backend + Frontend + Tests + Docs)"
+
+when_to_use:
+  - "Creating new business module"
+  - "Need full-stack CRUD operations"
+  - "Scaffolding Entity/Dao/Service/Controller"
+
+phases:
+  - backend
+  - frontend
+  - tests
+  - docs
+
+related_rules:
+  - "foundation/F04-architecture-rules.md"
+  - "foundation/F01-naming-conventions.md"
+  - "foundation/F03-manager-layer.md"
+
+outputs:
+  backend:
+    - "Entity.java"
+    - "Dao.java"
+    - "Manager.java"
+    - "Service.java"
+    - "Controller.java"
+    - "AddForm.java"
+    - "UpdateForm.java"
+    - "QueryForm.java"
+    - "VO.java"
+  frontend:
+    - "list.vue"
+    - "form-modal.vue"
+    - "api.ts"
+  tests:
+    - "ServiceTest.java"
+    - "IntegrationTest.java"

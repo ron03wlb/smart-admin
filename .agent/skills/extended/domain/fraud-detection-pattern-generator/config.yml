@@ -1,0 +1,12 @@
+name: fraud-detection-pattern-generator
+version: "2.0.0"
+priority: P1
+category: domain
+status: stable
+description: "Generate fraud detection systems for iGaming"
+
+detection_patterns:
+  - "Multi-account detection"
+  - "Bonus abuse prevention"
+  - "Payment fraud detection"
+  - "Money laundering detection"

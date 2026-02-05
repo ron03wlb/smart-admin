@@ -1,0 +1,525 @@
+# ====================================================================
+# SmartAdmin Antigravity Skills Registry v2.0.0
+# ====================================================================
+# Purpose: Central metadata registry for all Antigravity AI skills
+# Target Audience: Antigravity, Gemini, and other generic AI assistants
+# Status: Single Source of Truth (SSOT) for skill discovery and routing
+# Last Updated: 2026-02-04
+# ====================================================================
+
+version: "2.0.0"
+last_updated: "2026-02-05"
+total_skills: 29        # All skills with SKILL.md files
+active_skills: 29       # P0 (6) + P1 (8) + P2 (15)
+deprecated_skills: 0
+pending_migration: 0    # ✅ All P2 Productivity skills migrated
+
+# ====================================================================
+# System Positioning
+# ====================================================================
+positioning:
+  target_audience: "Antigravity, Gemini, and generic AI assistants"
+  relationship_with_claude:
+    description: |
+      This registry is SEPARATE from .claude/skills/.
+      - .claude/skills/: 35 skills for Claude Code CLI
+      - .agent/skills/: 29 skills adapted for generic AI assistants
+    format_difference: |
+      - .agent/ uses simplified SKILL.md format (no Claude Code-specific syntax)
+      - .agent/ uses "When to Use" conditions instead of "Trigger Keywords"
+      - .agent/ references rules via full paths (not [skill:name] syntax)
+
+# ====================================================================
+# Foundation Skills (P0 - Critical)
+# ====================================================================
+skills:
+  # Backend Skills (3)
+  archunit-test-generator:
+    path: "foundation/backend/archunit-test-generator"
+    priority: "P0"
+    category: "backend"
+    status: "stable"
+    description: "Generate ArchUnit tests to enforce SmartAdmin architecture rules"
+    when_to_use:
+      - "Need to validate Controller → Service → Manager → Dao layering"
+      - "Want to ensure @Transactional only in Manager layer"
+      - "Enforce Vavr Option usage in Service layer"
+    related_rules:
+      - "foundation/F04-architecture-rules.md"
+      - "foundation/F01-naming-conventions.md"
+
+  security-hardening-pro:
+    path: "foundation/backend/security-hardening-pro"
+    priority: "P0"
+    category: "backend"
+    status: "stable"
+    description: "Implement security best practices (SM2/SM3/SM4, data masking, XSS/CSRF)"
+    when_to_use:
+      - "Implementing encryption or data protection"
+      - "Adding XSS/CSRF protection"
+      - "Need audit logging for sensitive operations"
+    related_rules:
+      - "security/S01-owasp-top10-part1.md"
+      - "security/S02-owasp-top10-part2.md"
+
+  vavr-refactoring-assistant:
+    path: "foundation/backend/vavr-refactoring-assistant"
+    priority: "P0"
+    category: "backend"
+    status: "stable"
+    description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
+    when_to_use:
+      - "Service uses java.util.Optional (ArchUnit violation)"
+      - "Want to adopt functional error handling"
+      - "Refactoring to Vavr patterns"
+    related_rules:
+      - "technology/functional/P01-vavr-fundamentals.md"
+      - "technology/functional/P02-vavr-advanced.md"
+
+  # Full-stack Skills (2)
+  smartadmin-crud-generator:
+    path: "foundation/full-stack/smartadmin-crud-generator"
+    priority: "P0"
+    category: "full-stack"
+    status: "stable"
+    description: "Generate complete CRUD module (Backend + Frontend + Tests + Docs)"
+    when_to_use:
+      - "Creating new business module"
+      - "Need full-stack CRUD operations"
+      - "Scaffolding Entity/Dao/Service/Controller"
+    phases:
+      - "backend: Entity, Dao, Manager, Service, Controller"
+      - "frontend: Vue list, form modal, API client"
+      - "tests: Unit + Integration tests"
+      - "docs: Swagger/Knife4j annotations"
+    related_rules:
+      - "foundation/F04-architecture-rules.md"
+      - "foundation/F01-naming-conventions.md"
+      - "foundation/F03-manager-layer.md"
+
+  smartadmin-integration-test:
+    path: "foundation/full-stack/smartadmin-integration-test"
+    priority: "P0"
+    category: "full-stack"
+    status: "stable"
+    description: "Generate Spring Boot integration tests with Testcontainers"
+    when_to_use:
+      - "Need database integration tests"
+      - "Testing with real PostgreSQL/Redis containers"
+      - "Validating API endpoints end-to-end"
+    related_rules:
+      - "quality-tools/Q06-jacoco-coverage-rules.md"
+
+  # Testing Skills (1)
+  test-fixture-generator:
+    path: "foundation/testing/test-fixture-generator"
+    priority: "P0"
+    category: "testing"
+    status: "stable"
+    description: "Generate test data builders for complex domain objects"
+    when_to_use:
+      - "Need test data for Entity/Form/VO"
+      - "Creating reusable test fixtures"
+      - "Avoiding hardcoded test values"
+    related_rules:
+      - "quality-tools/Q06-jacoco-coverage-rules.md"
+
+# ====================================================================
+# Extended Skills (P1 - Important)
+# ====================================================================
+
+  # Domain Skills (4)
+  liteflow-rule-builder:
+    path: "extended/domain/liteflow-rule-builder"
+    priority: "P1"
+    category: "domain"
+    status: "stable"
+    description: "Generate LiteFlow rule DSL (EL expressions, QLExpress scripts)"
+    when_to_use:
+      - "Building business workflow rules"
+      - "Need approval flow or validation chains"
+      - "Creating conditional business logic"
+    related_rules: []
+
+  fraud-detection-pattern-generator:
+    path: "extended/domain/fraud-detection-pattern-generator"
+    priority: "P1"
+    category: "domain"
+    status: "stable"
+    description: "Generate fraud detection and risk control systems for iGaming"
+    when_to_use:
+      - "Implementing risk control systems"
+      - "Multi-account detection"
+      - "Bonus abuse prevention"
+    related_rules: []
+
+  igame-feature-builder:
+    path: "extended/domain/igame-feature-builder"
+    priority: "P1"
+    category: "domain"
+    status: "stable"
+    description: "Implement iGaming domain features (VIP, Wallet, Bonus, Risk)"
+    when_to_use:
+      - "Building VIP system"
+      - "Implementing wallet API"
+      - "Creating bonus engine"
+    related_rules:
+      - "foundation/F04-architecture-rules.md"
+
+  igame-pm-analyst:
+    path: "extended/domain/igame-pm-analyst"
+    priority: "P1"
+    category: "domain"
+    status: "stable"
+    description: "iGaming product analysis and PRD generation (繁體中文輸出)"
+    when_to_use:
+      - "Analyzing iGaming requirements"
+      - "Generating PRD documents"
+      - "Risk assessment for features"
+    related_rules: []
+
+  # Orchestration Skills (1)
+  quality-gate-orchestrator:
+    path: "extended/orchestration/quality-gate-orchestrator"
+    priority: "P1"
+    category: "orchestration"
+    status: "stable"
+    description: "Orchestrate quality gates (ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo)"
+    when_to_use:
+      - "Running comprehensive quality checks"
+      - "Pre-commit validation"
+      - "CI/CD quality gates"
+    tools_orchestrated:
+      - "Checkstyle → Code style"
+      - "PMD → Code quality"
+      - "SpotBugs → Bug detection"
+      - "ArchUnit → Architecture validation"
+      - "JaCoCo → Code coverage"
+    related_rules:
+      - "quality-tools/Q01-checkstyle-rules.md"
+      - "quality-tools/Q02-pmd-rules.md"
+      - "quality-tools/Q03-spotbugs-rules.md"
+
+  # Quality Skills (3)
+  concurrency-safety-auditor:
+    path: "extended/quality/concurrency-safety-auditor"
+    priority: "P1"
+    category: "quality"
+    status: "stable"
+    description: "Concurrency safety audit with risk rating (8 patterns detection)"
+    when_to_use:
+      - "Checking for race conditions"
+      - "Auditing thread safety"
+      - "Detecting deadlock patterns"
+    patterns_detected:
+      - "Check-then-act (non-atomic operations)"
+      - "Double-checked locking"
+      - "ConcurrentHashMap misuse"
+      - "Unsafe publication"
+    related_rules:
+      - "technology/patterns/P04-concurrency-rules.md"
+
+  spring-pattern-checker:
+    path: "extended/quality/spring-pattern-checker"
+    priority: "P1"
+    category: "quality"
+    status: "stable"
+    description: "Validate Spring patterns (@Transactional placement, DI, layering)"
+    when_to_use:
+      - "Validating @Transactional usage"
+      - "Checking dependency injection patterns"
+      - "Ensuring layered architecture compliance"
+    checks_performed:
+      - "@Transactional only in Manager layer"
+      - "Constructor injection (no @Autowired fields)"
+      - "Controller → Service → Manager → Dao"
+    related_rules:
+      - "foundation/F04-architecture-rules.md"
+      - "foundation/F03-manager-layer.md"
+
+  naming-convention-checker:
+    path: "extended/quality/naming-convention-checker"
+    priority: "P1"
+    category: "quality"
+    status: "stable"
+    description: "Validate SmartAdmin naming conventions"
+    when_to_use:
+      - "Checking class naming (XXXController, XXXService)"
+      - "Validating table naming (singular form)"
+      - "Ensuring boolean field naming (deleted, not isDeleted)"
+    related_rules:
+      - "foundation/F01-naming-conventions.md"
+
+# ====================================================================
+# Productivity Skills (P2 - Infrastructure)
+# ====================================================================
+
+  # DevOps Skills (5)
+  apm-integration:
+    path: "productivity/devops/apm-integration"
+    priority: "P2"
+    category: "devops"
+    status: "stable"
+    description: "Generate APM integration (Skywalking, Micrometer, Grafana)"
+    when_to_use:
+      - "Setting up application monitoring"
+      - "Creating Grafana dashboards"
+      - "Adding custom metrics"
+    related_rules: []
+
+  cicd-pipeline-builder:
+    path: "productivity/devops/cicd-pipeline-builder"
+    priority: "P2"
+    category: "devops"
+    status: "stable"
+    description: "Generate CI/CD pipeline (GitHub Actions, GitLab CI)"
+    when_to_use:
+      - "Setting up automated builds"
+      - "Creating deployment pipelines"
+      - "Configuring quality gates in CI"
+    related_rules:
+      - "workflows/W01-sonarqube-rules.md"
+
+  db-migration-manager:
+    path: "productivity/devops/db-migration-manager"
+    priority: "P2"
+    category: "devops"
+    status: "stable"
+    description: "Generate Flyway/Liquibase database migrations"
+    when_to_use:
+      - "Creating database schema changes"
+      - "Managing migration versions"
+      - "Rolling back database changes"
+    related_rules:
+      - "technology/database/D01-postgresql-basics.md"
+
+  scheduled-task-manager:
+    path: "productivity/devops/scheduled-task-manager"
+    priority: "P2"
+    category: "devops"
+    status: "stable"
+    description: "Generate XXL-Job/Snail-Job scheduled tasks"
+    when_to_use:
+      - "Creating scheduled jobs"
+      - "Distributed task scheduling"
+      - "Job monitoring and retry"
+    related_rules: []
+
+  websocket-sse-realtime-generator:
+    path: "productivity/devops/websocket-sse-realtime-generator"
+    priority: "P2"
+    category: "devops"
+    status: "stable"
+    description: "Generate WebSocket/SSE real-time communication"
+    when_to_use:
+      - "Implementing real-time updates"
+      - "Building chat or notification systems"
+      - "Server-sent events streaming"
+    related_rules: []
+
+  # Integration Skills (6)
+  cache-strategy-generator:
+    path: "productivity/integration/cache-strategy-generator"
+    priority: "P2"
+    category: "integration"
+    status: "stable"
+    description: "Generate multi-level caching (Caffeine L1 + Redis L2)"
+    when_to_use:
+      - "Implementing caching strategy"
+      - "Optimizing read performance"
+      - "Managing cache invalidation"
+    related_rules: []
+
+  full-text-search-integration:
+    path: "productivity/integration/full-text-search-integration"
+    priority: "P2"
+    category: "integration"
+    status: "stable"
+    description: "Generate Elasticsearch integration"
+    when_to_use:
+      - "Adding full-text search"
+      - "Creating search APIs"
+      - "Implementing aggregations"
+    related_rules: []
+
+  i18n-generator:
+    path: "productivity/integration/i18n-generator"
+    priority: "P2"
+    category: "integration"
+    status: "stable"
+    description: "Generate internationalization (backend + frontend)"
+    when_to_use:
+      - "Adding multi-language support"
+      - "Creating translation files"
+      - "Implementing Vue I18n"
+    related_rules: []
+
+  message-queue-pattern-generator:
+    path: "productivity/integration/message-queue-pattern-generator"
+    priority: "P2"
+    category: "integration"
+    status: "stable"
+    description: "Generate Kafka/RocketMQ integration patterns"
+    when_to_use:
+      - "Implementing async messaging"
+      - "Event sourcing patterns"
+      - "CQRS or Saga patterns"
+    related_rules: []
+
+  postgresql-best-practices:
+    path: "productivity/integration/postgresql-best-practices"
+    priority: "P2"
+    category: "integration"
+    status: "stable"
+    description: "PostgreSQL performance analysis and optimization"
+    when_to_use:
+      - "Optimizing database queries"
+      - "Tuning HikariCP connection pool"
+      - "Detecting N+1 queries"
+    modes:
+      - "full: Complete analysis"
+      - "hikaricp-only: Connection pool tuning"
+      - "n1-detection: N+1 query detection"
+      - "explain-analyze: Query plan analysis"
+    related_rules:
+      - "technology/database/D01-postgresql-basics.md"
+      - "technology/database/D02-postgresql-advanced.md"
+
+  report-generator:
+    path: "productivity/integration/report-generator"
+    priority: "P2"
+    category: "integration"
+    status: "stable"
+    description: "Generate report export (Excel, PDF, CSV)"
+    when_to_use:
+      - "Creating export functionality"
+      - "Generating business reports"
+      - "Data extraction features"
+    related_rules: []
+
+  # Composite Skills (2)
+  smartadmin-performance-suite:
+    path: "productivity/composite/smartadmin-performance-suite"
+    priority: "P2"
+    category: "composite"
+    status: "stable"
+    description: "Comprehensive performance suite (diagnose → optimize → monitor)"
+    when_to_use:
+      - "Performance optimization workflow"
+      - "Diagnosing performance issues"
+      - "Setting up monitoring"
+    modes:
+      - "diagnose: N+1, JVM, hotspots"
+      - "optimize: Multi-level caching"
+      - "monitor: APM/Grafana setup"
+    consolidates:
+      - "java-performance-pro"
+      - "cache-strategy-generator"
+      - "apm-integration"
+    related_rules: []
+
+  smartadmin-testing-suite:
+    path: "productivity/composite/smartadmin-testing-suite"
+    priority: "P2"
+    category: "composite"
+    status: "stable"
+    description: "Comprehensive testing suite (integration + fixtures + unit + E2E)"
+    when_to_use:
+      - "Running comprehensive tests"
+      - "Setting up test infrastructure"
+      - "Generating test coverage"
+    modes:
+      - "integration: Testcontainers tests"
+      - "fixtures: Test data builders"
+      - "unit: TDD workflow"
+      - "e2e: End-to-end tests"
+    consolidates:
+      - "smartadmin-integration-test"
+      - "test-fixture-generator"
+    related_rules:
+      - "quality-tools/Q06-jacoco-coverage-rules.md"
+
+  # Refactoring Skills (2)
+  smartadmin-manager-extractor:
+    path: "productivity/refactoring/smartadmin-manager-extractor"
+    priority: "P2"
+    category: "refactoring"
+    status: "stable"
+    description: "Extract @Transactional methods to Manager layer"
+    when_to_use:
+      - "ArchUnit violation: @Transactional in Service"
+      - "Refactoring to Manager layer"
+      - "Fixing architecture test failures"
+    related_rules:
+      - "foundation/F03-manager-layer.md"
+      - "foundation/F04-architecture-rules.md"
+
+  markdown-quality-checker:
+    path: "productivity/refactoring/markdown-quality-checker"
+    priority: "P2"
+    category: "refactoring"
+    status: "stable"
+    description: "Detect and fix Markdown/Mermaid quality issues"
+    when_to_use:
+      - "Checking documentation quality"
+      - "Validating Mermaid diagrams"
+      - "Fixing broken links"
+    related_rules: []
+
+# ====================================================================
+# Category Summary
+# ====================================================================
+categories:
+  backend:
+    description: "Java/Spring Boot backend skills"
+    count: 3
+    skills: ["archunit-test-generator", "security-hardening-pro", "vavr-refactoring-assistant"]
+
+  full-stack:
+    description: "Combined backend + frontend skills"
+    count: 2
+    skills: ["smartadmin-crud-generator", "smartadmin-integration-test"]
+
+  testing:
+    description: "Testing and test data generation"
+    count: 1
+    skills: ["test-fixture-generator"]
+
+  domain:
+    description: "Business domain-specific skills (iGaming, LiteFlow)"
+    count: 4
+    skills: ["liteflow-rule-builder", "fraud-detection-pattern-generator", "igame-feature-builder", "igame-pm-analyst"]
+
+  orchestration:
+    description: "Quality gate and workflow orchestration"
+    count: 1
+    skills: ["quality-gate-orchestrator"]
+
+  quality:
+    description: "Code quality validation"
+    count: 3
+    skills: ["concurrency-safety-auditor", "spring-pattern-checker", "naming-convention-checker"]
+
+  devops:
+    description: "DevOps and infrastructure"
+    count: 5
+    skills: ["apm-integration", "cicd-pipeline-builder", "db-migration-manager", "scheduled-task-manager", "websocket-sse-realtime-generator"]
+
+  integration:
+    description: "External system integration"
+    count: 6
+    skills: ["cache-strategy-generator", "full-text-search-integration", "i18n-generator", "message-queue-pattern-generator", "postgresql-best-practices", "report-generator"]
+
+  composite:
+    description: "Multi-mode composite skills"
+    count: 2
+    skills: ["smartadmin-performance-suite", "smartadmin-testing-suite"]
+
+  refactoring:
+    description: "Code refactoring and cleanup"
+    count: 2
+    skills: ["smartadmin-manager-extractor", "markdown-quality-checker"]
+
+# ====================================================================
+# END OF SKILL REGISTRY v2.0.0
+# ====================================================================

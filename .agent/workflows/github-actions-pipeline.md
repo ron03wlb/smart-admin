@@ -3,10 +3,10 @@ trigger: on_demand
 description: GitHub Actions CI/CD pipeline configuration
 tags: [ci-cd, github-actions, sonarqube, archunit, jacoco]
 required_rules:
-  - rules/10-architecture-rules.md
-  - rules/06-sonarqube-rules.md
-  - rules/05-postgresql-basics.md
-  - rules/09-mybatis-plus-core.md
+  - rules/foundation/F04-architecture-rules.md
+  - rules/workflows/W01-sonarqube-rules.md
+  - rules/technology/database/D01-postgresql-basics.md
+  - rules/technology/database/D04-mybatis-plus-core.md
 last_updated: 2025-01-12
 ---
 

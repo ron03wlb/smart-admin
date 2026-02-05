@@ -1,0 +1,30 @@
+name: scheduled-task-manager
+version: "2.0.0"
+priority: P2
+category: devops
+status: stable
+description: "排程任務管理 (XXL-Job/Snail-Job)"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "實現排程任務"
+  - "批次處理作業"
+  - "定時資料同步"
+  - "過期資料清理"
+
+schedulers_supported:
+  - "XXL-Job"
+  - "Snail-Job"
+
+job_types:
+  - "simple: 簡單任務"
+  - "sharding: 分片任務"
+  - "broadcast: 廣播任務"
+  - "mapreduce: MapReduce 任務"
+
+outputs:
+  - "Job Handler 類"
+  - "Cron 表達式"
+  - "重試配置"
+  - "監控告警"

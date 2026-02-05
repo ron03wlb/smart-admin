@@ -164,7 +164,7 @@ public class UserService {
 **違規 3: Controller 直接訪問 Repository**
 - 錯誤：Controller 直接注入 Mapper/Dao
 - 正確：必須通過 Service 層訪問
-- 詳細修正方案：[10-architecture-rules.md §錯誤模式檢測](../rules/10-architecture-rules.md)
+- 詳細修正方案：[10-architecture-rules.md §錯誤模式檢測](../rules/foundation/F04-architecture-rules.md)
 
 **違規 4: @Transactional 位置錯誤**
 - 錯誤：在 Controller 或 Service 層使用 @Transactional
@@ -226,7 +226,7 @@ mvn checkstyle:check
 # IDEA: Ctrl+Alt+L (Windows/Linux) 或 Cmd+Opt+L (macOS)
 ```
 
-**參考**: [rules/01-naming-conventions.md](../rules/01-naming-conventions.md)
+**參考**: [rules/01-naming-conventions.md](../rules/foundation/F01-naming-conventions.md)
 
 ---
 
@@ -249,7 +249,7 @@ String name = userOpt
     .getOrElse("未知用戶");
 ```
 
-**參考**: [rules/08-vavr-fundamentals.md](../rules/08-vavr-fundamentals.md)
+**參考**: [rules/08-vavr-fundamentals.md](../rules/technology/functional/P01-vavr-fundamentals.md)
 
 ---
 
@@ -325,7 +325,7 @@ LambdaQueryWrapper<User> wrapper = Wrappers.<User>lambdaQuery()
 List<User> users = userMapper.selectList(wrapper);
 ```
 
-**參考**: [rules/09-mybatis-plus-core.md](../rules/09-mybatis-plus-core.md)
+**參考**: [rules/09-mybatis-plus-core.md](../rules/technology/database/D04-mybatis-plus-core.md)
 
 ---
 

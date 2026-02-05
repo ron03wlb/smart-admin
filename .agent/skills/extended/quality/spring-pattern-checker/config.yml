@@ -1,0 +1,24 @@
+name: spring-pattern-checker
+version: "2.0.0"
+priority: P1
+category: quality
+status: stable
+description: "Validate Spring patterns: @Transactional, DI, layered architecture"
+
+checks:
+  transactional:
+    rule: "Only in Manager layer"
+    required: "rollbackFor = Throwable.class"
+
+  dependency_injection:
+    allowed: "Constructor injection"
+    forbidden: "@Autowired field injection"
+
+  layer_dependencies:
+    controller: "→ Service only"
+    service: "→ Manager/Dao"
+    manager: "→ Dao only"
+
+related_rules:
+  - "foundation/F04-architecture-rules.md"
+  - "foundation/F03-manager-layer.md"

@@ -1,0 +1,31 @@
+name: websocket-sse-realtime-generator
+version: "2.0.0"
+priority: P2
+category: devops
+status: stable
+description: "即時通訊生成 (WebSocket/SSE)"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "即時儀表板更新"
+  - "推送通知系統"
+  - "即時聊天功能"
+  - "訂單狀態推送"
+
+protocols_supported:
+  - "WebSocket (STOMP)"
+  - "SSE (Server-Sent Events)"
+
+features:
+  - "Sa-Token 身份驗證"
+  - "Topic/User/Role 廣播模式"
+  - "心跳和自動重連"
+  - "背壓處理"
+  - "Redis Pub/Sub 水平擴展"
+
+outputs:
+  - "WebSocket 端點配置"
+  - "訊息處理器"
+  - "Vue 前端組件"
+  - "Redis 配置"

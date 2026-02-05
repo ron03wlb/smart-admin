@@ -1,0 +1,31 @@
+# Vavr Refactoring Assistant Configuration
+name: vavr-refactoring-assistant
+version: "2.0.0"
+priority: P0
+category: backend
+status: stable
+
+description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
+
+when_to_use:
+  - "Service uses java.util.Optional (ArchUnit violation)"
+  - "Want to adopt functional error handling"
+  - "Refactoring to Vavr patterns"
+
+vavr_patterns:
+  - pattern: "Option<T>"
+    replaces: "Optional<T>"
+    use_case: "Nullable results"
+
+  - pattern: "Try<T>"
+    replaces: "try-catch"
+    use_case: "Operations that may fail"
+
+  - pattern: "Either<L, R>"
+    replaces: "Exception or result"
+    use_case: "Typed error handling"
+
+related_rules:
+  - "technology/functional/P01-vavr-fundamentals.md"
+  - "technology/functional/P02-vavr-advanced.md"
+  - "technology/functional/P03-vavr-mybatis-integration.md"
