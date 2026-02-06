@@ -4,10 +4,10 @@
 
 | 目錄 | 目標使用者 | 技能數量 | 格式 |
 |------|-----------|---------|------|
-| **.claude/skills/** | Claude Code CLI | 35個 | Claude Code 專用語法 |
-| **.agent/skills/** | Antigravity, Gemini 等 | **29個** ✅ | 通用 AI 指令格式 |
+| **.claude/skills/** | Claude Code CLI | 36個 | Claude Code 專用語法 |
+| **.agent/skills/** | Antigravity, Gemini 等 | **32個** ✅ | 通用 AI 指令格式 |
 
-> **Note**: 全部 29 個技能已完成遷移 (P0: 6個, P1: 8個, P2: 15個)。
+> **Note**: 全部 32 個技能已完成遷移 (P0: 6個, P1: 10個, P2: 16個)。
 
 **為什麼分開？**
 - Claude Code 有特定的技能調用機制 (`[skill:name]` 語法)
@@ -29,7 +29,7 @@
 | **smartadmin-integration-test** | Testcontainers 整合測試 | [foundation/full-stack/](foundation/full-stack/smartadmin-integration-test/) |
 | **test-fixture-generator** | 測試數據建構器 | [foundation/testing/](foundation/testing/test-fixture-generator/) |
 
-### P1 Extended (8 skills) - 擴展技能
+### P1 Extended (10 skills) - 擴展技能
 
 | 技能 | 用途 | 路徑 |
 |------|------|------|
@@ -42,7 +42,7 @@
 | **spring-pattern-checker** | Spring 模式驗證 | [extended/quality/](extended/quality/spring-pattern-checker/) |
 | **naming-convention-checker** | 命名規範檢查 | [extended/quality/](extended/quality/naming-convention-checker/) |
 
-### P2 Productivity (15 skills) - 生產力技能
+### P2 Productivity (16 skills) - 生產力技能
 
 | 類別 | 技能 | 用途 |
 |------|------|------|

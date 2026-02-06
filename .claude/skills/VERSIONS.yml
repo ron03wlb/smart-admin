@@ -205,13 +205,6 @@ productivity:
       status: "stable"
       changelog: "Complete testing solution (Unit + Integration + E2E + Performance)"
 
-  analysis:
-    java-performance-pro:
-      version: "1.0.0"
-      last_updated: "2026-01-29"
-      status: "stable"
-      changelog: "JVM profiling (standalone or via smartadmin-performance-suite)"
-
   refactoring:
     smartadmin-manager-extractor:
       version: "1.0.0"
@@ -225,11 +218,26 @@ productivity:
       status: "stable"
       changelog: "Detect and fix Markdown/Mermaid quality issues (closing fences, syntax, links)"
 
+    mermaid-repair:
+      version: "1.0.0"
+      last_updated: "2026-02-06"
+      status: "stable"
+      changelog: "Mermaid diagram syntax validation and repair for SmartAdmin <br/> environment"
+
 # ====================================================================
 # Deprecated Skills (Lifecycle)
 # ====================================================================
 lifecycle:
   deprecated:
+    java-performance-pro:
+      version: "1.0.0"
+      last_updated: "2026-02-06"
+      status: "soft-deprecated"
+      deprecation_phase: "soft"
+      removal_date: "2026-06-30"
+      replacement: "smartadmin-performance-suite (--mode=diagnose)"
+      changelog: "JVM profiling - DEPRECATED, use smartadmin-performance-suite"
+
     smartadmin-api-docs:
       version: "1.0.0"
       last_updated: "2026-01-25"
@@ -261,12 +269,12 @@ lifecycle:
 # Version Sync Metadata
 # ====================================================================
 sync_metadata:
-  last_sync_time: "2026-02-02T12:00:00Z"
+  last_sync_time: "2026-02-07T18:00:00Z"
   sync_tool_version: "1.0.0"
-  total_skills: 35
-  synced_skills: 35
+  total_skills: 36
+  synced_skills: 36
   conflicts: 0
   notes: |
-    Registry consistency fix: Added naming-convention-checker and markdown-quality-checker.
-    All skill versions synchronized with config.yml files.
+    Registry consistency fix: Added mermaid-repair, unified java-performance-pro
+    deprecation status, fixed all category mappings.
     Use sync-skill-versions.sh to maintain consistency.

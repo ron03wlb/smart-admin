@@ -75,24 +75,24 @@ else
     ((ERRORS++))
 fi
 
-echo "Extended (P1): $EXTENDED_COUNT skills (expected: 8)"
-if [ "$EXTENDED_COUNT" -eq 8 ]; then
+echo "Extended (P1): $EXTENDED_COUNT skills (expected: 10)"
+if [ "$EXTENDED_COUNT" -eq 10 ]; then
     echo -e "${GREEN}✓${NC} Extended count correct"
 else
     echo -e "${RED}✗${NC} Extended count mismatch!"
     ((ERRORS++))
 fi
 
-echo "Productivity (P2): $PRODUCTIVITY_COUNT skills (expected: 15)"
-if [ "$PRODUCTIVITY_COUNT" -eq 15 ]; then
+echo "Productivity (P2): $PRODUCTIVITY_COUNT skills (expected: 16)"
+if [ "$PRODUCTIVITY_COUNT" -eq 16 ]; then
     echo -e "${GREEN}✓${NC} Productivity count correct"
 else
     echo -e "${RED}✗${NC} Productivity count mismatch!"
     ((ERRORS++))
 fi
 
-echo "Deprecated: $DEPRECATED_COUNT skills (expected: 3)"
-if [ "$DEPRECATED_COUNT" -eq 3 ]; then
+echo "Deprecated: $DEPRECATED_COUNT skills (expected: 4)"
+if [ "$DEPRECATED_COUNT" -eq 4 ]; then
     echo -e "${GREEN}✓${NC} Deprecated count correct"
 else
     echo -e "${RED}✗${NC} Deprecated count mismatch!"
@@ -101,8 +101,8 @@ fi
 
 TOTAL_COUNT=$((FOUNDATION_COUNT + EXTENDED_COUNT + PRODUCTIVITY_COUNT + DEPRECATED_COUNT))
 echo ""
-echo "Total: $TOTAL_COUNT skills (expected: 32)"
-if [ "$TOTAL_COUNT" -eq 32 ]; then
+echo "Total: $TOTAL_COUNT skills (expected: 36)"
+if [ "$TOTAL_COUNT" -eq 36 ]; then
     echo -e "${GREEN}✓${NC} Total count correct"
 else
     echo -e "${RED}✗${NC} Total count mismatch!"
@@ -129,7 +129,7 @@ while IFS= read -r path; do
 done <<< "$REGISTRY_PATHS"
 
 if [ "$REGISTRY_ERRORS" -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} All registry paths exist (32/32)"
+    echo -e "${GREEN}✓${NC} All registry paths exist (36/36)"
 else
     echo -e "${RED}✗${NC} Found $REGISTRY_ERRORS invalid paths"
 fi

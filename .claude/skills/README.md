@@ -30,16 +30,15 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 │   ├── full-stack/      (CRUD, Integration Tests)
 │   └── testing/         (Test Fixtures)
 │
-├── extended/            (P1 - Important Business Logic, 8 skills)
-│   ├── domain/          (iGaming: Fraud, Features, PM, Wallet, LiteFlow)
-│   ├── orchestration/   (Batch Plan Executor, Quality Gate Orchestrator)
-│   └── quality/         (Concurrency Safety Auditor)
+├── extended/            (P1 - Important Business Logic, 10 skills)
+│   ├── domain/          (5 skills: iGaming Fraud, Features, PM, Wallet, LiteFlow)
+│   ├── orchestration/   (2 skills: Batch Plan Executor, Quality Gate Orchestrator)
+│   └── quality/         (3 skills: Concurrency Safety, Spring Pattern, Naming Convention)
 │
 ├── productivity/        (P2 - Nice-to-have Tools, 16 skills)
 │   ├── devops/          (5 skills: APM, CI/CD, DB Migration, Scheduled Tasks, WebSocket)
 │   ├── integration/     (6 skills: Cache, Elasticsearch, i18n, MQ, Reports, PostgreSQL)
 │   ├── composite/       (2 skills: Performance Suite, Testing Suite)
-│   ├── analysis/        (1 skill: Java Performance Pro - soft-deprecated)
 │   └── refactoring/     (3 skills: Manager Extractor, Markdown Quality Checker, Mermaid Repair)
 │
 └── lifecycle/           (Deprecated & Experimental)
@@ -52,7 +51,7 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 |----------|-------|------------|---------|
 | **P0** (Foundation) | 6 skills | Backend, Full-stack, Testing | Critical foundation patterns, essential workflows |
 | **P1** (Extended) | 10 skills | Domain, Orchestration, Quality | Important business features, quality gates, orchestration |
-| **P2** (Productivity) | 16 skills | DevOps, Integration, Composite, Analysis, Refactoring | Productivity tools, optional enhancements |
+| **P2** (Productivity) | 16 skills | DevOps, Integration, Composite, Refactoring | Productivity tools, optional enhancements |
 | **Deprecated** | 4 skills | Deprecated | Consolidated into composite skills, soft-deprecated until 2026-06-30 |
 
 ---

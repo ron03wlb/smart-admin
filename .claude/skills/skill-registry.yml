@@ -6,10 +6,10 @@
 # Last Updated: 2026-01-29
 # ====================================================================
 
-version: "3.0.0"
-last_updated: "2026-02-02"
-total_skills: 35
-active_skills: 31
+version: "3.1.0"
+last_updated: "2026-02-07"
+total_skills: 36
+active_skills: 32
 deprecated_skills: 4
 
 # ====================================================================
@@ -111,6 +111,19 @@ skills:
     aliases: ["markdown-lint", "doc-quality", "mermaid-check"]
     status: "stable"
     description: "Detect and fix Markdown/Mermaid quality issues (closing fences, syntax, links)"
+    depends_on: []
+    depended_by: []
+
+  mermaid-repair:
+    path: "productivity/refactoring/mermaid-repair"
+    priority: "P2"
+    type: "atomic"
+    category: "refactoring"
+    visibility: "public"
+    preferred_via: "user_invoked"
+    aliases: ["fix-mermaid", "mermaid-fix", "diagram-repair"]
+    status: "stable"
+    description: "Automated Mermaid diagram syntax validation and repair for SmartAdmin's <br/> rendering environment"
     depends_on: []
     depended_by: []
 
@@ -673,11 +686,13 @@ categories:
       - igame-feature-builder
       - igame-pm-analyst
       - igaming-multi-tenant-wallet-pm
+      - liteflow-rule-builder
 
   orchestration:
     description: "Meta-orchestration skills"
     skills:
       - batch-plan-executor
+      - quality-gate-orchestrator
 
   infrastructure:
     description: "Infrastructure/DevOps skills"
@@ -696,7 +711,9 @@ categories:
   quality:
     description: "Code quality and testing skills"
     skills:
-      - quality-gate-orchestrator
+      - concurrency-safety-auditor
+      - naming-convention-checker
+      - spring-pattern-checker
 
   testing:
     description: "Testing and quality assurance skills"
@@ -709,10 +726,21 @@ categories:
       - smartadmin-performance-suite
       - smartadmin-testing-suite
 
-  analysis:
-    description: "Performance analysis and profiling (all deprecated)"
-    skills: []
+  refactoring:
+    description: "Code refactoring and documentation quality"
+    skills:
+      - markdown-quality-checker
+      - mermaid-repair
+      - smartadmin-manager-extractor
+
+  lifecycle:
+    description: "Deprecated skills with migration guides"
+    skills:
+      - java-performance-pro
+      - smartadmin-api-docs
+      - smartadmin-mybatis
+      - smartadmin-vue-crud
 
 # ====================================================================
-# END OF SKILL REGISTRY v3.0.0
+# END OF SKILL REGISTRY v3.1.0
 # ====================================================================

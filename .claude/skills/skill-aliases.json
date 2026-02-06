@@ -1,12 +1,31 @@
 {
   "$schema": "skill-aliases-schema",
   "description": "Skill alias mappings for deprecated skills redirecting to their replacements",
-  "version": "1.0.0",
-  "last_updated": "2026-02-06",
+  "version": "1.1.0",
+  "last_updated": "2026-02-07",
   "aliases": {
     "java-performance-pro": {
       "redirect_to": "smartadmin-performance-suite",
+      "args": "--mode=diagnose",
       "reason": "java-performance-pro deprecated since 2026-02-06; consolidated into smartadmin-performance-suite",
+      "removal_date": "2026-06-30"
+    },
+    "smartadmin-mybatis": {
+      "redirect_to": "smartadmin-crud-generator",
+      "args": "--backend-only",
+      "reason": "smartadmin-mybatis deprecated since 2026-01-27; consolidated into smartadmin-crud-generator",
+      "removal_date": "2026-06-30"
+    },
+    "smartadmin-vue-crud": {
+      "redirect_to": "smartadmin-crud-generator",
+      "args": "--frontend-only",
+      "reason": "smartadmin-vue-crud deprecated since 2026-01-27; consolidated into smartadmin-crud-generator",
+      "removal_date": "2026-06-30"
+    },
+    "smartadmin-api-docs": {
+      "redirect_to": "smartadmin-crud-generator",
+      "args": "--docs-only",
+      "reason": "smartadmin-api-docs deprecated since 2026-01-27; consolidated into smartadmin-crud-generator",
       "removal_date": "2026-06-30"
     }
   }

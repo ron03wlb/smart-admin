@@ -286,12 +286,11 @@ SmartAdmin 提供兩套並行的技能系統：
 │   ├── domain/      (5 skills: iGaming + LiteFlow)
 │   ├── orchestration/ (2 skills: batch-plan, quality-gate)
 │   └── quality/     (3 skills: concurrency, spring-pattern, naming-checker)
-├── productivity/    (P2 - 16 skills: DevOps, Integration, Composite, Analysis, Refactoring)
+├── productivity/    (P2 - 16 skills: DevOps, Integration, Composite, Refactoring)
 │   ├── devops/      (5 skills: APM, CI/CD, DB migration, scheduling, WebSocket)
 │   ├── integration/ (6 skills: Cache, Search, i18n, MQ, Reports, PostgreSQL)
 │   ├── composite/   (2 skills: Performance suite, Testing suite)
-│   ├── analysis/    (1 skill: Java performance profiler - soft-deprecated)
-│   └── refactoring/ (3 skills: Manager extractor, Markdown quality, Mermaid repair) ⭐ NEW
+│   └── refactoring/ (3 skills: Manager extractor, Markdown quality, Mermaid repair)
 └── lifecycle/       (Deprecated - 4 skills with migration guides)
 ```
 
