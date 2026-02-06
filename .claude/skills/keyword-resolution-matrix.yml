@@ -2,11 +2,11 @@
 # Keyword Conflict Resolution Matrix
 # ====================================================================
 # Purpose: Define priority-based routing rules for conflicting keywords
-# Version: 1.0.0
-# Last Updated: 2026-01-30
+# Version: 1.1.0
+# Last Updated: 2026-02-07
 # ====================================================================
 
-schema_version: "1.0.0"
+schema_version: "1.1.0"
 
 # ====================================================================
 # Conflict Groups
@@ -157,6 +157,146 @@ conflict_groups:
       enabled: true
       strategy: "exact_match_first"
       fallback: null  # Require user clarification for generic "refactor"
+
+  # Group 4: Cache Keywords
+  cache_group:
+    keywords: ["cache", "caching", "Redis", "Caffeine", "L1", "L2"]
+    description: "Caching strategy and optimization skills"
+
+    skills:
+      - skill: "smartadmin-performance-suite"
+        priority: 1
+        trigger_patterns:
+          - "cache optimization"
+          - "caching strategy"
+          - "multi-level cache"
+          - "緩存優化"
+        scope: "Comprehensive caching as part of performance suite"
+        recommended_when: "Need comprehensive performance optimization including caching"
+
+      - skill: "cache-strategy-generator"
+        priority: 2
+        trigger_patterns:
+          - "generate cache"
+          - "create cache config"
+          - "Caffeine config"
+          - "Redis cache setup"
+          - "生成緩存配置"
+        scope: "Dedicated L1/L2 cache configuration generation"
+        recommended_when: "Need specific cache configuration generation only"
+
+    resolution_rule: |
+      Priority routing:
+      1. If mentions "optimization" OR "performance" → smartadmin-performance-suite
+      2. Else if mentions "generate" OR "create" OR "config" → cache-strategy-generator
+      3. Else (generic cache question) → smartadmin-performance-suite (more comprehensive)
+
+    auto_routing:
+      enabled: true
+      strategy: "pattern_match_first"
+      fallback: "smartadmin-performance-suite"
+
+  # Group 5: Quality Keywords
+  quality_group:
+    keywords: ["quality", "code quality", "check", "validate", "audit"]
+    description: "Code quality validation and audit skills"
+
+    skills:
+      - skill: "quality-gate-orchestrator"
+        priority: 1
+        trigger_patterns:
+          - "quality gate"
+          - "pre-commit check"
+          - "CI/CD quality"
+          - "全面品質檢查"
+          - "quality validation"
+        scope: "Orchestrates multiple quality tools (Checkstyle, PMD, SpotBugs, ArchUnit, JaCoCo)"
+        recommended_when: "Need comprehensive quality checks across multiple dimensions"
+
+      - skill: "concurrency-safety-auditor"
+        priority: 2
+        trigger_patterns:
+          - "thread safety"
+          - "race condition"
+          - "concurrent"
+          - "deadlock"
+          - "並發安全"
+        scope: "Concurrency-focused safety audit (8 patterns detection)"
+        recommended_when: "Specific concurrency or threading issues"
+
+      - skill: "spring-pattern-checker"
+        priority: 3
+        trigger_patterns:
+          - "@Transactional"
+          - "Spring pattern"
+          - "DI pattern"
+          - "layered architecture"
+          - "Spring 模式"
+        scope: "Spring-specific pattern validation"
+        recommended_when: "Spring framework pattern compliance checking"
+
+      - skill: "naming-convention-checker"
+        priority: 4
+        trigger_patterns:
+          - "naming"
+          - "convention check"
+          - "class name"
+          - "table name"
+          - "命名規範"
+        scope: "SmartAdmin naming convention validation"
+        recommended_when: "Class/table/field naming validation only"
+
+    resolution_rule: |
+      Priority routing:
+      1. If mentions "thread" OR "concurrent" OR "deadlock" → concurrency-safety-auditor
+      2. Else if mentions "@Transactional" OR "Spring" OR "DI" → spring-pattern-checker
+      3. Else if mentions "naming" OR "convention" → naming-convention-checker
+      4. Else (comprehensive quality check) → quality-gate-orchestrator
+
+    auto_routing:
+      enabled: true
+      strategy: "keyword_specificity"
+      fallback: "quality-gate-orchestrator"
+
+  # Group 6: Documentation Quality Keywords
+  documentation_quality_group:
+    keywords: ["markdown", "mermaid", "diagram", "doc quality", "documentation"]
+    description: "Documentation and diagram quality skills"
+
+    skills:
+      - skill: "mermaid-repair"
+        priority: 1
+        trigger_patterns:
+          - "mermaid repair"
+          - "mermaid fix"
+          - "diagram syntax error"
+          - "style syntax"
+          - "mermaid 修復"
+        scope: "Mermaid diagram syntax repair (SmartAdmin <br/> environment)"
+        recommended_when: "Mermaid rendering fails, style syntax errors"
+
+      - skill: "markdown-quality-checker"
+        priority: 2
+        trigger_patterns:
+          - "markdown quality"
+          - "markdown lint"
+          - "doc quality"
+          - "closing fence"
+          - "markdown validation"
+          - "文檔品質"
+        scope: "General Markdown/Mermaid quality (closing fences, syntax, links)"
+        recommended_when: "Comprehensive documentation quality check"
+
+    resolution_rule: |
+      Priority routing:
+      1. If mentions "mermaid" AND ("repair" OR "fix" OR "syntax error") → mermaid-repair
+      2. Else if mentions "style" OR "diagram" → mermaid-repair
+      3. Else (general markdown/doc quality) → markdown-quality-checker
+
+    auto_routing:
+      enabled: true
+      strategy: "keyword_specificity"
+      fallback: "markdown-quality-checker"
 
 # ====================================================================
 # Routing Strategies

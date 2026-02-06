@@ -58,6 +58,104 @@ Controller → Service → Manager → Dao → Entity
 → **[Complete Architecture Rules & ArchUnit Tests](../../../.agent/foundation/10-architecture-rules.md)**
 → **[Manager Layer Constraints](../../../.agent/foundation/09-manager-layer.md)**
 
+## API Layer Pattern (v4.1.0)
+
+SmartAdmin v4.1.0 introduces an **API Layer** for cross-module communication:
+
+```
+Controller → Service → Manager → Dao → Entity
+                 ↑
+    API Layer (Contract + DTO) ← For cross-module calls
+```
+
+### API Layer Structure
+
+```
+smartadmin-api/
+├── smartadmin-api-system/   (contract/ + dto/)
+├── smartadmin-api-business/ (contract/ + dto/)
+└── smartadmin-api-oa/       (contract/ + dto/)
+```
+
+### Contract Interface Pattern
+
+```java
+/**
+ * API Contract for cross-module communication
+ *
+ * Design principles:
+ * - Use Vavr Option for type safety (NEVER return null)
+ * - Read-only query operations only (no side effects)
+ * - High reusability methods
+ * - Adapts to future Feign remote calls
+ */
+public interface EmployeeContract {
+
+    Option<EmployeeDTO> getById(@NotNull Long employeeId);
+
+    List<EmployeeDTO> queryByDepartmentId(@NotNull Long departmentId);
+
+    Option<EmployeeDTO> getByLoginName(@NotNull String loginName);
+}
+```
+
+### API DTO Pattern
+
+```java
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "Employee DTO")
+public class EmployeeDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Schema(description = "Employee ID")
+    private Long employeeId;
+
+    @Schema(description = "Login name")
+    private String loginName;
+
+    @Schema(description = "Real name")
+    private String actualName;
+}
+```
+
+### When to Use API Layer
+
+| Scenario | Use API Layer? | Reason |
+|----------|---------------|--------|
+| Same module Service → Dao | No | Direct call is simpler |
+| Cross-module Service → Service | **Yes** | Use Contract + DTO |
+| Future microservices migration | **Yes** | Contract → Feign Client |
+| External API exposure | **Yes** | DTO isolates Entity |
+
+### Cross-Module Communication Example
+
+```java
+// Module A: OA module needs employee info from System module
+@Service
+@RequiredArgsConstructor
+public class NoticeService {
+    private final EmployeeContract employeeContract;  // From API layer
+
+    public NoticeVO getNoticeWithAuthor(Long noticeId) {
+        Notice notice = noticeDao.selectById(noticeId);
+        // Cross-module call via Contract
+        Option<EmployeeDTO> author = employeeContract.getById(notice.getAuthorId());
+        return buildVO(notice, author.getOrNull());
+    }
+}
+```
+
+**Key Rules**:
+- ✅ Service can depend on Contract interfaces (from api module)
+- ✅ Contract returns DTO (never Entity)
+- ✅ Contract uses Vavr Option (never null)
+- ❌ Service cannot directly call another module's Service
+- ❌ Contract cannot have @Transactional (stateless)
+
 ## Service → Dao vs Service → Manager Pattern
 
 ### Pattern Decision Rule

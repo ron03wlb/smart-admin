@@ -272,7 +272,7 @@ SmartAdmin 提供兩套並行的技能系統：
 
 ### 1. Claude Code 技能系統 (`.claude/skills/`)
 **適用對象**：Claude Code CLI 使用者
-**技能數量**：35個（P0:6, P1:10, P2:17）
+**技能數量**：36個（P0:6, P1:10, P2:16, Deprecated:4）
 **詳細說明**：[.claude/skills/README.md](.claude/skills/README.md)
 
 **組織結構**:
@@ -285,14 +285,14 @@ SmartAdmin 提供兩套並行的技能系統：
 ├── extended/        (P1 - 10 skills: Domain, Orchestration, Quality)
 │   ├── domain/      (5 skills: iGaming + LiteFlow)
 │   ├── orchestration/ (2 skills: batch-plan, quality-gate)
-│   └── quality/     (3 skills: concurrency, spring-pattern, naming-checker) ⭐
-├── productivity/    (P2 - 17 skills: DevOps, Integration, Composite, Analysis, Refactoring)
+│   └── quality/     (3 skills: concurrency, spring-pattern, naming-checker)
+├── productivity/    (P2 - 16 skills: DevOps, Integration, Composite, Analysis, Refactoring)
 │   ├── devops/      (5 skills: APM, CI/CD, DB migration, scheduling, WebSocket)
-│   ├── integration/ (6 skills: Cache, Search, i18n, MQ, Reports, PostgreSQL) ⭐ +1
+│   ├── integration/ (6 skills: Cache, Search, i18n, MQ, Reports, PostgreSQL)
 │   ├── composite/   (2 skills: Performance suite, Testing suite)
-│   ├── analysis/    (1 skill: Java performance profiler)
-│   └── refactoring/ (3 skills: Vavr refactoring, Manager extractor, Markdown quality) ⭐ +1
-└── lifecycle/       (Deprecated - 3 skills with migration guides)
+│   ├── analysis/    (1 skill: Java performance profiler - soft-deprecated)
+│   └── refactoring/ (3 skills: Manager extractor, Markdown quality, Mermaid repair) ⭐ NEW
+└── lifecycle/       (Deprecated - 4 skills with migration guides)
 ```
 
 **P0 Skills (Foundation)** - 6 skills:
@@ -321,12 +321,12 @@ SmartAdmin 提供兩套並行的技能系統：
   - **[spring-pattern-checker](.claude/skills/extended/quality/spring-pattern-checker/)** - Validate Spring patterns: @Transactional placement, dependency injection, layered architecture compliance
   - **[naming-convention-checker](.claude/skills/extended/quality/naming-convention-checker/)** - Validate SmartAdmin naming conventions (singular table names, class naming, field naming)
 
-**P2 Skills (Productivity)** - 17 skills:
+**P2 Skills (Productivity)** - 16 skills:
 - DevOps (5): APM integration, CI/CD pipeline, DB migration, scheduled tasks, WebSocket/SSE
-- Integration (6): Cache strategy, Elasticsearch, i18n, message queue, report export, **PostgreSQL best practices** ⭐
+- Integration (6): Cache strategy, Elasticsearch, i18n, message queue, report export, PostgreSQL best practices
 - Composite (2): smartadmin-performance-suite, smartadmin-testing-suite
-- Analysis (1): java-performance-pro
-- Refactoring (3): vavr-refactoring-assistant, smartadmin-manager-extractor, **markdown-quality-checker** ⭐
+- Analysis (1): java-performance-pro (soft-deprecated)
+- Refactoring (3): smartadmin-manager-extractor, markdown-quality-checker, **mermaid-repair** ⭐ NEW
 
 → **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
 
@@ -334,13 +334,10 @@ SmartAdmin 提供兩套並行的技能系統：
 
 ### 2. Antigravity/通用AI 技能系統 (`.agent/skills/`)
 **適用對象**：Antigravity, Gemini, 及其他AI助手
-**技能數量**：3個（SmartAdmin專用）
+**技能數量**：32個（P0:6, P1:10, P2:16）
 **詳細說明**：[.agent/skills/README.md](.agent/skills/README.md)
 
-**當前技能**：
-1. **smartadmin-crud-generator** - 完整CRUD模塊生成
-2. **quality-gate-orchestrator** - 多工具品質門檻編排
-3. **smartadmin-testing-suite** - 測試套件執行
+**與 .claude/ 同步**：使用 `scripts/sync-skill-registries.py` 驗證同步狀態
 
 **系統分界**：
 - `.claude/skills/` 使用 Claude Code 特定的技能調用機制

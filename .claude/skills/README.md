@@ -1,8 +1,8 @@
 # SmartAdmin Skills Catalog
 
-**Version**: 3.1.0
-**Last Updated**: 2026-02-03
-**Total Skills**: 35 (P0: 6, P1: 10, P2: 17, Deprecated: 3)
+**Version**: 3.2.0
+**Last Updated**: 2026-02-07
+**Total Skills**: 36 (P0: 6, P1: 10, P2: 16, Deprecated: 4)
 **Knowledge Base Coverage**: 100% (32/32 skills)
 
 **Major Changes** (v3.1.0):
@@ -35,12 +35,12 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 │   ├── orchestration/   (Batch Plan Executor, Quality Gate Orchestrator)
 │   └── quality/         (Concurrency Safety Auditor)
 │
-├── productivity/        (P2 - Nice-to-have Tools, 15 skills)
+├── productivity/        (P2 - Nice-to-have Tools, 16 skills)
 │   ├── devops/          (5 skills: APM, CI/CD, DB Migration, Scheduled Tasks, WebSocket)
 │   ├── integration/     (6 skills: Cache, Elasticsearch, i18n, MQ, Reports, PostgreSQL)
 │   ├── composite/       (2 skills: Performance Suite, Testing Suite)
 │   ├── analysis/        (1 skill: Java Performance Pro - soft-deprecated)
-│   └── refactoring/     (1 skill: Manager Extractor)
+│   └── refactoring/     (3 skills: Manager Extractor, Markdown Quality Checker, Mermaid Repair)
 │
 └── lifecycle/           (Deprecated & Experimental)
     └── deprecated/      (Soft-deprecated skills with migration guides)
@@ -51,9 +51,9 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 | Priority | Count | Categories | Purpose |
 |----------|-------|------------|---------|
 | **P0** (Foundation) | 6 skills | Backend, Full-stack, Testing | Critical foundation patterns, essential workflows |
-| **P1** (Extended) | 8 skills | Business Logic, Domain, Orchestration, Quality | Important business features, quality gates, orchestration |
-| **P2** (Productivity) | 15 skills | DevOps, Integration, Composite, Analysis, Refactoring | Productivity tools, optional enhancements |
-| **Deprecated** | 3 skills | Deprecated | Consolidated into composite skills, soft-deprecated until 2026-06-30 |
+| **P1** (Extended) | 10 skills | Domain, Orchestration, Quality | Important business features, quality gates, orchestration |
+| **P2** (Productivity) | 16 skills | DevOps, Integration, Composite, Analysis, Refactoring | Productivity tools, optional enhancements |
+| **Deprecated** | 4 skills | Deprecated | Consolidated into composite skills, soft-deprecated until 2026-06-30 |
 
 ---
 
@@ -67,7 +67,7 @@ Skills are now organized in a **Hybrid Layered Architecture** combining priority
 |----------|--------|----------------|-------------------|--------|
 | **P0 (Foundation)** | 6 | 6/6 (100%) | 6/6 (100%) | ✅ Complete |
 | **P1 (Extended)** | 10 | 10/10 (100%) | 8/10 (80%) | ✅ Complete |
-| **P2 (Productivity)** | 17 | 17/17 (100%) | 16/17 (94%) | ✅ Complete |
+| **P2 (Productivity)** | 16 | 16/16 (100%) | 15/16 (94%) | ✅ Complete |
 | **Total (Active)** | **32** | **32/32 (100%)** | **29/32 (90.6%)** | ✅ Complete |
 
 **Phase 2 Week 3-4 Achievement**: 23/23 skills standardized (100%)
@@ -223,7 +223,7 @@ Automate quality gates orchestrating ArchUnit, Checkstyle, PMD, SpotBugs, JaCoCo
 
 ---
 
-## P2 Skills (Productivity - 15 skills)
+## P2 Skills (Productivity - 16 skills)
 
 ### DevOps (5 skills)
 
@@ -290,7 +290,16 @@ Profile and optimize Java performance (N+1 query detection, JVM tuning, CPU hots
 
 ---
 
-### Refactoring (2 skills)
+### Refactoring (3 skills)
+
+#### [markdown-quality-checker](productivity/refactoring/markdown-quality-checker/)
+Automatically detect and fix Markdown/Mermaid quality issues (closing fences, syntax validation, broken links).
+
+**Trigger Keywords**: "markdown quality", "mermaid closing", "doc quality", "markdown lint"
+
+**Proven Results**: 467 errors fixed, 100% success rate (IGaming docs)
+
+---
 
 #### [mermaid-repair](productivity/refactoring/mermaid-repair/)
 Automated Mermaid diagram syntax validation and repair for SmartAdmin's special rendering environment (`<br/>` tags).

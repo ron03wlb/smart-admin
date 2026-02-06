@@ -70,8 +70,34 @@ com.example.myapp/
 ├── manager/             # Manager Layer - Transactions, Cache
 ├── mapper/              # Persistence Layer - Data Access
 ├── domain/entity/       # Domain Layer - Entities
-└── common/              # exception, util
+├── common/              # exception, util
+└── api/                 # API Layer (v4.1.0) - Cross-module contracts
+    ├── contract/        # Service interfaces for cross-module calls
+    └── dto/             # Data transfer objects for API
 ```
+
+### 【v4.1.0】API Layer for Cross-Module Communication
+
+The API layer provides stable interfaces for cross-module communication:
+
+```
+Module A              Module B
+─────────             ─────────
+Controller            Controller
+    ↓                     ↓
+Service  ──────→  Contract (API)  ←────── Service
+    ↓                     ↓
+Manager               Manager
+    ↓                     ↓
+Dao                   Dao
+```
+
+**Key Rules**:
+- ✅ Service can depend on Contract interfaces (from api module)
+- ✅ Contract returns DTO (never Entity)
+- ✅ Contract uses Vavr Option (never null)
+- ❌ Service cannot directly call another module's Service
+- ❌ Contract cannot have @Transactional (stateless)
 
 ### 【Mandatory】Layer Dependency Direction
 ```
