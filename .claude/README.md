@@ -108,8 +108,8 @@ Common patterns:
 
 ## Version
 
-**Current Version**: 3.0.2
-**Last Updated**: 2026-01-30
+**Current Version**: 3.2.0
+**Last Updated**: 2026-02-07
 **Status**: Production Ready (95-100% Complete)
 
 ---
@@ -122,6 +122,6 @@ Common patterns:
 
 ---
 
-**Last Validated**: 2026-01-31
+**Last Validated**: 2026-02-07
 **Validation Scope**: Skill 計數、目錄結構、版本引用
 **Next Review Due**: 2026-02-28

@@ -1,8 +1,8 @@
 # .claude/ System Version History
 
-**Current Version**: 3.0.2
+**Current Version**: 3.2.0
 **Status**: ✅ Production Ready
-**Last Updated**: 2026-01-30
+**Last Updated**: 2026-02-07
 
 ---
 
@@ -10,14 +10,37 @@
 
 | Component | Version | Status | Last Updated |
 |-----------|---------|--------|--------------|
-| **CLAUDE.md** | 3.3.0 | ✅ Production | 2026-01-29 |
-| **.claude/** | 3.0.2 | ✅ Optimized | 2026-01-30 |
+| **CLAUDE.md** | 3.5.0 | ✅ Production | 2026-02-07 |
+| **.claude/** | 3.2.0 | ✅ Optimized | 2026-02-07 |
 | **.agent/** | 1.0.0 | ✅ Production | 2026-01-27 |
 | **SmartAdmin** | v4.0.0 | ✅ Production | 2026-01-20 |
 
 ---
 
 ## Recent Releases
+
+### v3.2.0 (2026-02-07)
+**Focus**: Skill System Optimization - P0-P2 Fixes + Mermaid Integration
+
+**Changes**:
+- ✅ P0: Fixed spring-pattern-checker frontmatter (name: spring → spring-pattern-checker)
+- ✅ P1: Added naming-convention-checker YAML frontmatter
+- ✅ P1: Created 3 .agent/ config.yml (batch-plan-executor, igaming-multi-tenant-wallet-pm, mermaid-repair)
+- ✅ P2: Added 8 shorthand aliases (spring, naming, mermaid, crud, vavr, archunit, security, perf)
+- ✅ P2: Updated META.md to v3.2.0, .agent/skills/skill-registry.yml to v2.3.0
+- ✅ Mermaid: Added Type F (stateDiagram-v2 `<br/>` exception) to error-patterns.md
+- ✅ Mermaid: Created docs/technical/MERMAID_CONTRADICTION_FIX_REPORT.md
+
+**Impact**:
+- Skill routing: Fixed potential conflicts from incorrect frontmatter naming
+- Registry sync: 32/32 skills synchronized between .claude/ and .agent/
+- Aliases: 12 total (4 deprecated + 8 shorthand) for easier skill invocation
+- Documentation: Mermaid stateDiagram exception fully documented
+
+**Related Commits**:
+- 54fa4ef5: fix(skills): optimize skill system P0-P2 + Mermaid integration
+
+---
 
 ### v3.0.2 (2026-01-30)
 **Focus**: Directory Cleanup and Optimization

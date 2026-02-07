@@ -505,9 +505,10 @@ docs/archive/
 
 **System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership
 
-**Last Updated**: 2026-02-05
+**Last Updated**: 2026-02-07
 
 **Change History**:
+- 3.6.0 (2026-02-07): Skill system optimization - P0 frontmatter fix (spring-pattern-checker), P1 naming-convention-checker + 3 .agent/ config.yml, P2 8 shorthand aliases, Mermaid Type F (stateDiagram exception), version sync across all documentation files
 - 3.5.0 (2026-02-05): v4.1.0 documentation sync - Updated all ~159 documentation files (.claude/, .agent/) to reflect new 6-layer modular architecture (sa-admin/sa-base → smartadmin-common/smartadmin-support/smartadmin-modules/smartadmin-api/smartadmin-starter/smartadmin-app). Updated build commands, package names, commit scopes, CRUD generator paths, ArchUnit test references.
 - 3.4.0 (2026-01-31): Java 21 features documentation - Added dedicated Java 21 section covering Sealed Classes and Virtual Threads implementations, Phase 4 Manager layer testing completion (100% coverage, 8 test classes, 92 test cases)
 - 3.3.0 (2026-01-27): Documentation structure update - Added "Documentation Structure" section with active/archived documentation organization, updated archive navigation with INDEX.md references

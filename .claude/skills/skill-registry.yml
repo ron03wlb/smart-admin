@@ -1,12 +1,12 @@
 # ====================================================================
-# SmartAdmin Skills Registry v3.0.0
+# SmartAdmin Skills Registry v3.2.0
 # ====================================================================
 # Purpose: Central metadata registry for all SmartAdmin skills
 # Status: Single Source of Truth (SSOT) for skill discovery and routing
 # Last Updated: 2026-01-29
 # ====================================================================
 
-version: "3.1.0"
+version: "3.2.0"
 last_updated: "2026-02-07"
 total_skills: 36
 active_skills: 32
