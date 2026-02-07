@@ -1,3 +1,8 @@
+---
+name: naming-convention-checker
+description: SmartAdmin Naming Convention Checker - Validates code compliance with SmartAdmin's singular naming standards for database tables (@TableName annotations), class naming (XXXController, XXXService, XXXManager, XXXDao), and field naming (deleted not isDeleted). Use when creating Entity classes, during code review, or when ArchitectureTest tableNameMustBeSingular fails.
+---
+
 # Naming Convention Checker - Detailed Skill Documentation
 
 **Version**: 1.0.0

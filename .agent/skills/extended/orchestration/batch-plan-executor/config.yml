@@ -1,0 +1,24 @@
+name: batch-plan-executor
+version: "1.0.0"
+priority: P1
+category: orchestration
+status: stable
+description: "Batch plan executor for detecting conflicts and executing multiple plans"
+
+execution:
+  type: orchestrator
+  timeout_minutes: 60
+  modes:
+    - auto: "Automatically detect and execute plans"
+    - interactive: "Ask for confirmation before each step"
+    - dry-run: "Show what would be executed"
+
+dependencies:
+  depends_on:
+    - smartadmin-crud-generator
+    - liteflow-rule-builder
+    - smartadmin-testing-suite
+    - smartadmin-performance-suite
+
+related_rules:
+  - "foundation/F04-architecture-rules.md"

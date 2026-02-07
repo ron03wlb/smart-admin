@@ -7,7 +7,7 @@
 # Last Updated: 2026-02-04
 # ====================================================================
 
-version: "2.2.0"
+version: "2.3.0"
 last_updated: "2026-02-07"
 total_skills: 32        # All skills with SKILL.md files
 active_skills: 32       # P0 (6) + P1 (10) + P2 (16)

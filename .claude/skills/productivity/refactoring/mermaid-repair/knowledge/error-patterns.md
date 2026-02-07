@@ -625,6 +625,106 @@ def detect_all_errors(content: str) -> List[Dict]:
 
 ---
 
+## Type F: stateDiagram-v2 不支持 `<br/>` 標籤
+
+### 基本信息
+
+| 項目 | 詳情 |
+|------|------|
+| **嚴重性** | 🔴 高 |
+| **影響圖表** | stateDiagram-v2 |
+| **發現日期** | 2026-02-07 |
+| **修復難度** | 中（需重構 Note 區塊） |
+
+### 錯誤描述
+
+stateDiagram-v2 是 SmartAdmin Mermaid 規範的**唯一例外**。雖然 SmartAdmin 規範要求使用 `<br/>` 標籤進行換行，但 **stateDiagram-v2 不支持 `<br/>` 標籤**，在 stateDiagram-v2 中使用 `<br/>` 會導致解析失敗。
+
+這是 SmartAdmin `<br/>` 規範與 Mermaid 原生限制之間的**矛盾**，必須特別處理。
+
+### 錯誤模式
+
+```mermaid
+# ❌ 錯誤：stateDiagram 中使用 <br/>
+stateDiagram-v2
+    A --> B: Event<br/>Action
+    note right of A : Text<br/>More
+```
+
+**解析錯誤**：`Parse error on line X: ...`
+
+### 正確寫法
+
+```mermaid
+# ✅ 正確模式 1：簡化 transition label
+stateDiagram-v2
+    A --> B: Event
+
+# ✅ 正確模式 2：使用多行 note 區塊
+stateDiagram-v2
+    note right of A
+        Text Line 1
+        Text Line 2
+        Text Line 3
+    end note
+```
+
+### 規則對照表
+
+| 圖表類型 | `<br/>` 支持 | 正確換行方式 |
+|----------|-------------|-------------|
+| flowchart | ✅ 支持 | `<br/>` |
+| sequenceDiagram | ✅ 支持 | `<br/>` |
+| graph | ✅ 支持 | `<br/>` |
+| classDiagram | ✅ 支持 | `<br/>` |
+| **stateDiagram-v2** | ❌ **不支持** | 多行 note 區塊 |
+
+### 檢測正則表達式
+
+```regex
+# 檢測 stateDiagram 中的 <br/>
+(?:stateDiagram-v2[\s\S]*?)(-->.*<br/>|note.*<br/>)
+```
+
+### 自動修復策略
+
+1. **Transition labels**: 簡化為單行，移除 `<br/>`
+2. **Note blocks**: 轉換為多行 `note ... end note` 格式
+3. **P0/P1 documents**: 保留詳細信息使用多行格式
+4. **P2 documents**: 可簡化 transition labels
+
+### 真實案例
+
+#### 案例 1: docs/iGaming/README.md
+
+**修復前**:
+```mermaid
+stateDiagram-v2
+    [*] --> System: Initialize<br/>Components
+    note right of System : Health Check<br/>Monitoring
+```
+
+**修復後**:
+```mermaid
+stateDiagram-v2
+    [*] --> System: Initialize
+    note right of System
+        Health Check
+        Monitoring
+    end note
+```
+
+---
+
+### 統計數據（2026-02-07 修復）
+
+| 項目 | 數值 | 狀態 |
+|------|------|------|
+| 受影響文件數 | TBD | ⏳ 待掃描 |
+| `<br/>` in stateDiagram | TBD | ⏳ 待修復 |
+
+---
+
 ## 🎓 經驗總結
 
 ### 1. 常見錯誤來源
@@ -642,9 +742,11 @@ def detect_all_errors(content: str) -> List[Dict]:
 
 ### 3. 修復優先級
 
-1. 🔴 高優先級：Type A, B, D（阻塞渲染或樣式失效）
+1. 🔴 高優先級：Type A, B, D, F（阻塞渲染或樣式失效）
 2. 🟡 中優先級：Type C（潛在問題）
 3. 🟢 低優先級：Type E（環境差異，格式化優化）
+
+**Note**: Type F (stateDiagram `<br/>`) 是 SmartAdmin 規範的唯一例外，需特別注意。
 
 ---
 
@@ -656,7 +758,11 @@ def detect_all_errors(content: str) -> List[Dict]:
 
 ---
 
-**Version**: 1.0.0
-**Last Updated**: 2026-02-03
+**Version**: 1.1.0
+**Last Updated**: 2026-02-07
 **Maintained By**: SmartAdmin Team
+
+**Change Log**:
+- v1.1.0 (2026-02-07): Added Type F (stateDiagram-v2 `<br/>` exception)
+- v1.0.0 (2026-02-03): Initial release with Type A-E
 
