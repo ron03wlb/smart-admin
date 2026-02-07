@@ -18,7 +18,7 @@
 
 ```
 .claude/
-├── agents/              # 9 specialized agents (java-architect, vue-expert, etc.)
+├── agents/              # 8 specialized agents (java-architect, vue-expert, quality-reviewer, etc.)
 ├── shared/              # Shared knowledge, templates, orchestration
 │   ├── knowledge/       # SmartAdmin patterns (single source of truth)
 │   ├── templates/       # Agent base templates (DRY)
@@ -39,14 +39,14 @@ Understanding where information lives:
 |---------|----------|---------|
 | **Quick Reference** | [CLAUDE.md](../CLAUDE.md) | Developer cheat sheet, most common patterns |
 | **SmartAdmin Patterns** | [shared/knowledge/smartadmin-patterns.md](shared/knowledge/smartadmin-patterns.md) | Complete backend patterns (source of truth) |
-| **Agent Definitions** | [agents/](agents/) | 9 specialized AI agents with expertise |
+| **Agent Definitions** | [agents/](agents/) | 8 specialized AI agents with expertise |
 | **Workflow Patterns** | [shared/orchestration/workflow-patterns.md](shared/orchestration/workflow-patterns.md) | Multi-agent collaboration patterns |
 | **Quality Standards** | [shared/knowledge/quality-standards.md](shared/knowledge/quality-standards.md) | Code quality rules and conventions |
 | **Troubleshooting** | [docs/troubleshooting-guide.md](docs/troubleshooting-guide.md) | Problem resolution |
 
 ---
 
-## 9 Specialized Agents
+## 8 Specialized Agents
 
 | Agent | Expertise | When to Use |
 |-------|-----------|-------------|
@@ -56,9 +56,10 @@ Understanding where information lives:
 | [devops-engineer](agents/devops-engineer.md) | CI/CD, Docker, K8s | Deployment, infrastructure |
 | [business-analyst](agents/business-analyst.md) | Requirements, process | Clarifying requirements, API contracts |
 | [chaos-engineer](agents/chaos-engineer.md) | Resilience testing | Failure injection, chaos experiments |
-| [architect-reviewer](agents/architect-reviewer.md) | Architecture validation | Design review, scalability analysis |
-| [code-reviewer](agents/code-reviewer.md) | Pre-merge quality gate | Code quality, security, performance |
+| [quality-reviewer](agents/quality-reviewer.md) | Code & Architecture review | Pre-merge quality gate, design validation, scalability analysis |
 | [documentation-engineer](agents/documentation-engineer.md) | Technical docs | API docs, guides, architecture docs |
+
+> **Note**: `quality-reviewer` consolidates the former `architect-reviewer` and `code-reviewer` agents. Use `--mode=code` for code quality review, `--mode=architecture` for design validation.
 
 **See**: [Agent Capability Matrix](docs/agent-capability-matrix.md) for detailed comparison
 
@@ -84,8 +85,8 @@ Understanding where information lives:
 
 Common patterns:
 
-- **New Feature**: business-analyst → java-architect → vue-expert → code-reviewer → devops-engineer
-- **Performance**: java-architect + postgres-pro (parallel) → architect-reviewer
+- **New Feature**: business-analyst → java-architect → vue-expert → quality-reviewer → devops-engineer
+- **Performance**: java-architect + postgres-pro (parallel) → quality-reviewer --mode=architecture
 - **Production Incident**: devops-engineer (hub) → specialists as needed
 
 **See**: [Orchestration Playbook](shared/orchestration/orchestration-playbook.md) for complete workflows, collaboration patterns, and handoff protocols

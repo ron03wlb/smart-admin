@@ -219,6 +219,14 @@ User Request Classification
 | "fraud detection", "multi-account", "bonus abuse", "risk control" | **fraud-detection-pattern-generator** | iGaming fraud patterns with real-time scoring | `/fraud multi-account-detection` |
 | **Quality Gate** ||||
 | "quality gate", "pre-merge check", "CI/CD validation" | **quality-gate-orchestrator** | Multi-tool orchestration (ArchUnit, Checkstyle, PMD, SpotBugs) | `/quality-gate check` |
+| "thread safety", "race condition", "concurrency audit" | **concurrency-safety-auditor** | 8-pattern concurrency detection with risk rating | `/concurrency-audit ThreadPool` |
+| "@Transactional placement", "Spring patterns", "DI check" | **spring-pattern-checker** | Spring-specific pattern validation | `/spring-check Service layer` |
+| "naming conventions", "class naming", "table naming" | **naming-convention-checker** | SmartAdmin naming validation | `/naming-check Employee` |
+| **iGaming Domain** ||||
+| "iGaming requirements", "PRD generation", "feature analysis" | **igame-pm-analyst** | iGaming product analysis (繁體中文 PRD) | `/igame-pm VIP system` |
+| "multi-tenant", "white-label", "seamless wallet" | **igaming-multi-tenant-wallet-pm** | Phase-based architecture design | `/wallet-pm --phase=3` |
+| **Documentation Repair** ||||
+| "mermaid syntax error", "diagram repair", "style fix" | **mermaid-repair** | SmartAdmin Mermaid syntax validation and repair | `/mermaid-repair docs/iGaming/` |
 | **Plan Orchestration** ||||
 | "batch execute plans", "run multiple plans", "parallel execution", "orchestrate plans" | **batch-plan-executor** | Auto-detect plan types, conflict detection, parallel/serial execution | `/batch-execute --auto` |
 | "execute mixed plans", "CRUD + testing batch", "migration workflow" | **batch-plan-executor --scan-dir** | Scan directory and execute all plans with conflict analysis | `/batch-execute --scan-dir=docs/plans/liteflow/` |

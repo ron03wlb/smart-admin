@@ -264,7 +264,7 @@ stateDiagram-v2
 
 **Pre-commit Hook**: Automatically validates Mermaid syntax before commit (detects stateDiagram `<br/>` errors).
 
-→ **[Complete Mermaid Best Practices](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md)** (v1.1.0 - Added stateDiagram error guide)
+→ **[Complete Mermaid Best Practices](.claude/shared/knowledge/mermaid-best-practices.md)** (v1.1.0 - Added stateDiagram error guide)
 
 ## Specialized Skills
 

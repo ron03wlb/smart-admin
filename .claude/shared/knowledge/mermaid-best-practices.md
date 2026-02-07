@@ -1,0 +1,1 @@
+../skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md

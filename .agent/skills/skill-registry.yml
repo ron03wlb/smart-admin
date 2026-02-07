@@ -7,10 +7,10 @@
 # Last Updated: 2026-02-04
 # ====================================================================
 
-version: "2.0.0"
-last_updated: "2026-02-05"
-total_skills: 29        # All skills with SKILL.md files
-active_skills: 29       # P0 (6) + P1 (8) + P2 (15)
+version: "2.2.0"
+last_updated: "2026-02-07"
+total_skills: 32        # All skills with SKILL.md files
+active_skills: 32       # P0 (6) + P1 (10) + P2 (16)
 deprecated_skills: 0
 pending_migration: 0    # ✅ All P2 Productivity skills migrated
 
@@ -178,7 +178,44 @@ skills:
       - "Risk assessment for features"
     related_rules: []
 
-  # Orchestration Skills (1)
+  igaming-multi-tenant-wallet-pm:
+    path: "extended/domain/igaming-multi-tenant-wallet-pm"
+    priority: "P1"
+    category: "domain"
+    status: "stable"
+    description: "iGaming PM expert for multi-tenant architecture and seamless wallet design"
+    when_to_use:
+      - "Designing multi-tenant architecture"
+      - "Planning seamless wallet integration"
+      - "Regional compliance analysis"
+      - "Game provider integration strategy"
+    phases:
+      - "requirements: Product requirements clarification"
+      - "multi-tenant: Multi-tenancy architecture design"
+      - "seamless-wallet: Wallet API design"
+      - "regional-compliance: GDPR/CCPA compliance"
+    related_rules:
+      - "foundation/F04-architecture-rules.md"
+
+  # Orchestration Skills (2)
+  batch-plan-executor:
+    path: "extended/orchestration/batch-plan-executor"
+    priority: "P1"
+    category: "orchestration"
+    status: "stable"
+    description: "Batch plan executor for multi-plan conflict detection and execution"
+    when_to_use:
+      - "Executing multiple implementation plans"
+      - "Detecting conflicts between plans"
+      - "Orchestrating skill combinations"
+    depends_on:
+      - "smartadmin-crud-generator"
+      - "liteflow-rule-builder"
+      - "smartadmin-testing-suite"
+      - "smartadmin-performance-suite"
+    related_rules:
+      - "foundation/F04-architecture-rules.md"
+
   quality-gate-orchestrator:
     path: "extended/orchestration/quality-gate-orchestrator"
     priority: "P1"
@@ -466,6 +503,19 @@ skills:
       - "Fixing broken links"
     related_rules: []
 
+  mermaid-repair:
+    path: "productivity/refactoring/mermaid-repair"
+    priority: "P2"
+    category: "refactoring"
+    status: "stable"
+    description: "Mermaid diagram syntax validation and repair for SmartAdmin's <br/> environment"
+    when_to_use:
+      - "Mermaid diagrams not rendering"
+      - "Style syntax errors (node ID quoting, color codes)"
+      - "Batch validation of markdown files"
+      - "Pre-commit diagram validation"
+    related_rules: []
+
 # ====================================================================
 # Category Summary
 # ====================================================================
@@ -487,13 +537,13 @@ categories:
 
   domain:
     description: "Business domain-specific skills (iGaming, LiteFlow)"
-    count: 4
-    skills: ["liteflow-rule-builder", "fraud-detection-pattern-generator", "igame-feature-builder", "igame-pm-analyst"]
+    count: 5
+    skills: ["liteflow-rule-builder", "fraud-detection-pattern-generator", "igame-feature-builder", "igame-pm-analyst", "igaming-multi-tenant-wallet-pm"]
 
   orchestration:
     description: "Quality gate and workflow orchestration"
-    count: 1
-    skills: ["quality-gate-orchestrator"]
+    count: 2
+    skills: ["batch-plan-executor", "quality-gate-orchestrator"]
 
   quality:
     description: "Code quality validation"
@@ -517,8 +567,8 @@ categories:
 
   refactoring:
     description: "Code refactoring and cleanup"
-    count: 2
-    skills: ["smartadmin-manager-extractor", "markdown-quality-checker"]
+    count: 3
+    skills: ["smartadmin-manager-extractor", "markdown-quality-checker", "mermaid-repair"]
 
 # ====================================================================
 # END OF SKILL REGISTRY v2.0.0

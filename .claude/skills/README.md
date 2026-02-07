@@ -337,6 +337,7 @@ Located in [`lifecycle/deprecated/`](lifecycle/deprecated/), these skills have b
 
 | Skill | Replacement | Status |
 |-------|-------------|--------|
+| [java-performance-pro](lifecycle/deprecated/java-performance-pro/) | `smartadmin-performance-suite --mode=diagnose` | ⚠️ Soft-deprecated |
 | [smartadmin-mybatis](lifecycle/deprecated/smartadmin-mybatis/) | `smartadmin-crud-generator --backend-only` | ⚠️ Soft-deprecated |
 | [smartadmin-vue-crud](lifecycle/deprecated/smartadmin-vue-crud/) | `smartadmin-crud-generator --frontend-only` | ⚠️ Soft-deprecated |
 | [smartadmin-api-docs](lifecycle/deprecated/smartadmin-api-docs/) | `smartadmin-crud-generator --docs-only` | ⚠️ Soft-deprecated |
