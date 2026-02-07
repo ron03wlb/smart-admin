@@ -1796,7 +1796,7 @@ WHERE player_id = ?
 **與其他文檔的整合**：
 - 與 [05-02_Fraud_Detection.md](../05_Risk_Control/05-02_Fraud_Detection.md) 投注風控系統完全對齊
 - 與 [02-07_Transaction_Processing_Flow.md](../02_Finance_Center/02-07_Transaction_Processing_Flow.md) 事件流一致
-- 與 [風控系統架構.md](../archive/legacy-cn/風控系統架構.md) 理論框架吻合
+- 與 [風控系統架構.md](../../archive/iGaming/legacy-cn/風控系統架構.md) 理論框架吻合
 
 **業務價值**：
 - 明確提款風控在整體風控體系中的定位（事後資金攔截）

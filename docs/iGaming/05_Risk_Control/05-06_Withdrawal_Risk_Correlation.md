@@ -3,7 +3,7 @@
 **優先級**: P1 重要
 **預估工作量**: 3 人天
 **風險等級**: 🟡 中
-**相關 ADR**: [ADR 012: 異步風控提案系統](../architecture-decisions/ADR-012_Async_Risk_Proposal_System.md)
+**相關 ADR**: [ADR 012: 異步風控提案系統](../adr/ADR-012_Async_Risk_Proposal_System.md)
 
 ---
 
@@ -168,7 +168,7 @@ public class WithdrawalRiskCorrelationService {
 
 #### 風控提案表（risk_proposals）
 
-已在 [ADR 012](../architecture-decisions/ADR-012_Async_Risk_Proposal_System.md) 定義。
+已在 [ADR 012](../adr/ADR-012_Async_Risk_Proposal_System.md) 定義。
 
 ---
 
@@ -874,7 +874,7 @@ groups:
 ## 參考資料
 
 ### 相關文檔
-- [ADR 012: 異步風控提案系統](../architecture-decisions/ADR-012_Async_Risk_Proposal_System.md)
+- [ADR 012: 異步風控提案系統](../adr/ADR-012_Async_Risk_Proposal_System.md)
 - [SmartAdmin 分層架構](./../../../.agent/rules/foundation/F04-architecture-rules.md)
 
 ### 業界標準

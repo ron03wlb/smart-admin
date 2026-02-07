@@ -13,7 +13,7 @@
 
 **相關文檔**:
 - **[← 返回活動中心索引](README.md)**
-- **[← 04-01 活動系統架構](archive/04-01_Activity_System_Design_v1.0.0.md)** - 系統架構與規則引擎設計
+- **[← 04-01 活動系統架構](../../archive/iGaming/deprecated/04-01_Activity_System_Design_v1.0.0.md)** - 系統架構與規則引擎設計
 - **[→ 04-03 活動風控與本地化](04-03_Activity_Risk_Control.md)** - 風控機制與區域市場策略
 
 ---

@@ -87,6 +87,22 @@
 
 ---
 
+### iGaming 文檔歸檔
+**路徑**：`archive/iGaming/`
+**狀態**：🗄️ 歷史版本
+**歸檔原因**：v3.0.0 舊版文檔、中文舊版、已廢棄文檔
+
+**目錄結構**：
+- `v3.0.0/` - v3.0.0 版本完整備份
+- `legacy-cn/` - 中文版舊文檔
+- `deprecated/` - 已廢棄的設計文檔
+
+**包含文檔**：14 個歸檔文件
+**當前版本**：[docs/iGaming/](../iGaming/) (v4.0.0)
+**歸檔日期**：2026-02-07
+
+---
+
 ### Snail-Job 排程整合計劃
 **路徑**：`archive/plans/job/`
 **狀態**：✅ 已完成並發布
@@ -130,6 +146,7 @@
 | 2026-01-27 | 歸檔舊計劃文檔 | 11 | Claude Code |
 | 2026-01-27 | 刪除 docs/bak/ 目錄 | - | Claude Code |
 | 2026-02-04 | 歸檔 Snail-Job 計劃（Week 9） | 8 | Claude Code |
+| 2026-02-07 | 遷移 iGaming 歸檔至 archive/ | 14 | Claude Code |
 
 ---
 

@@ -21,9 +21,9 @@
 
 | 文檔 | 位置 | 說明 |
 |------|------|------|
-| **實施指南** | [00-00_IMPLEMENTATION_GUIDE](00_Foundation/00-00_IMPLEMENTATION_GUIDE.md) | 完整實施路線圖 |
-| **業務流程** | [00-00_BUSINESS_FLOWS](00_Foundation/00-00_BUSINESS_FLOWS.md) | 核心業務流程圖 |
-| **快速入門** | [00-00_QUICKSTART](00_Foundation/00-00_QUICKSTART.md) | 開發環境設置 |
+| **快速入門** | [00-01_Quickstart](00_Foundation/00-01_Quickstart.md) | 10 分鐘快速入門 |
+| **業務流程** | [00-02_Business_Flows](00_Foundation/00-02_Business_Flows.md) | 核心業務流程圖 |
+| **實施指南** | [00-03_Implementation_Guide](00_Foundation/00-03_Implementation_Guide.md) | 完整實施路線圖 |
 
 ---
 
@@ -78,6 +78,26 @@
 |------|---------|------|--------|
 | **13** | [Customer_Service](13_Customer_Service/) | 客服平台、運營流程 | 2 |
 | **14** | [Third_Party_Integration](14_Third_Party_Integration/) | 第三方整合標準 | 1 |
+
+---
+
+## 👤 按角色快速訪問
+
+| 角色 | 核心文檔 |
+|------|---------|
+| **風控人員** | [05-01 風控框架](05_Risk_Control/05-01_Risk_Framework.md), [05-02 欺詐檢測](05_Risk_Control/05-02_Fraud_Detection.md) |
+| **支付運營** | [02-02 支付閘道](02_Finance_Center/02-02_Payment_Gateway_Integration.md), [02-03 對帳系統](02_Finance_Center/02-03_Reconciliation_System.md) |
+| **活動運營** | [04-02 獎金引擎](04_Activity_Center/04-02_Bonus_Calculation_Engine.md), [04-03 活動風控](04_Activity_Center/04-03_Activity_Risk_Control.md) |
+| **開發人員** | [09-02 API 閘道](09_Technical_Infrastructure/09-02_API_Gateway.md), [00-03 實施指南](00_Foundation/00-03_Implementation_Guide.md) |
+
+### 核心業務流程
+
+| 流程 | 相關文檔路徑 |
+|------|-------------|
+| **存款** | 02-02 支付閘道 → 02-03 對帳系統 → 02-06 錢包架構 |
+| **出金** | 01-05 提款風控 → 06-04 審批工作流 → 02-02 支付閘道 |
+| **投注** | 03-01 遊戲整合 → 03-04 流水計算 → 05-01 風控框架 |
+| **Bonus** | 04-02 獎金引擎 → 04-03 活動風控 → 02-06 錢包架構 |
 
 ---
 

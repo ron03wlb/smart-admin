@@ -93,9 +93,9 @@
 
 ## 🔗 相關文檔
 
-- **快速開始**: [00-00_QUICKSTART.md](./00-00_QUICKSTART.md)
-- **概念文檔**: [concepts/](./concepts/)
-- **架構決策**: [../architecture-decisions/](../architecture-decisions/)
+- **快速開始**: [00-01_Quickstart.md](./00-01_Quickstart.md)
+- **概念與指南**: [guides/](./guides/)
+- **架構決策**: [../adr/](../adr/)
 
 ---
 

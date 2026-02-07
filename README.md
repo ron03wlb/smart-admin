@@ -30,6 +30,7 @@ Choose your role to get started:
 | **Follow coding standards** | [.agent/rules/](.agent/rules/) - Architecture, naming, PMD, SpotBugs rules |
 | **Set up Kafka integration** | [docs/kafka/](docs/kafka/getting-started/quick-start.md) - Complete Kafka guide |
 | **Configure MinIO storage** | [docs/minio/](docs/minio/01-quick-start.md) - Object storage setup |
+| **Learn iGaming platform** | [docs/iGaming/](docs/iGaming/README.md) - Player, Finance, Risk, Activity modules |
 | **Run architecture tests** | [CLAUDE.md](CLAUDE.md#test-commands) - `./gradlew :sa-admin:test --tests ArchitectureTest` |
 | **Commit code properly** | [Commit Conventions](.agent/rules/workflows/17-commit-message-conventions.md) - Conventional Commits format |
 
@@ -45,6 +46,7 @@ smart-admin/
 │   └── sa-common/                         # Shared services (cache, MQ, redis-lock)
 ├── smart-admin-web/                       # Frontend (Vue 3 + Vite + TypeScript)
 ├── docs/                                  # Infrastructure documentation
+│   ├── iGaming/                           # iGaming platform docs (133+ files)
 │   ├── kafka/                             # Kafka integration guide (46 docs)
 │   ├── minio/                             # MinIO object storage guide (8 docs)
 │   ├── multi-tenant/                      # Multi-tenant architecture (5 docs)

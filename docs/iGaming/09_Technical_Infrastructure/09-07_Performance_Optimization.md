@@ -742,5 +742,5 @@ public Result<Void> updateBalanceWithLock(
 - [07-09 緩存策略](./09-09_Caching_Strategy.md) ⭐ 新增
 - [07-10 成本優化](./09-10_Cost_Optimization.md) ⭐ 新增
 - [00-04 技術選型](../00_Foundation/concepts/00-04_Technology_Stack.md)
-- [風控系統架構](../archive/legacy-cn/風控系統架構.md)
+- [風控系統架構](../../archive/iGaming/legacy-cn/風控系統架構.md)
 - [k6官方文檔](https://k6.io/docs/)
