@@ -44,17 +44,11 @@ jobs:
               # 使用 Python 腳本進行精準檢查（如果存在）
               if [ -f "scripts/replace_mermaid_br.py" ]; then
                 # 測試模式：僅檢查不修改
-                if python3 -c "
-import re
-from pathlib import Path
-
-content = Path('$file').read_text(encoding='utf-8')
-pattern = r'\`\`\`mermaid\n(.*?)\`\`\`'
-matches = re.findall(pattern, content, flags=re.DOTALL)
-
-for match in matches:
-    if '<br/>' in match:
-        exit(1)
+                if CHECK_FILE="$file" python3 -c "
+                  import re, os
+                  from pathlib import Path
+                  c = Path(os.environ['CHECK_FILE']).read_text()
+                  exit(1 if any('<br/>' in m for m in re.findall(r'\`\`\`mermaid\n(.*?)\`\`\`', c, re.DOTALL)) else 0)
                 "; then
                   :  # 通過檢查
                 else
