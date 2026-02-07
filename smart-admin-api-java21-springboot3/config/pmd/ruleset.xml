@@ -24,7 +24,10 @@
     <exclude-pattern>.*/module/business/sample/.*</exclude-pattern>
 
     <!-- ==================== Best Practices ==================== -->
-    <rule ref="category/java/bestpractices.xml"/>
+    <rule ref="category/java/bestpractices.xml">
+        <!-- 排除日誌級別檢查規則 - SmartAdmin 使用 SLF4J 佔位符已優化延遲格式化 -->
+        <exclude name="GuardLogStatement"/>
+    </rule>
 
     <!-- ==================== Code Style ==================== -->
     <!-- 只保留严重影响可读性的规则 -->

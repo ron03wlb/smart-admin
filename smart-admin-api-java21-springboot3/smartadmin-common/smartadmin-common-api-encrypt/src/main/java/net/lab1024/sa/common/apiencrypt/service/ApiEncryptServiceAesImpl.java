@@ -32,9 +32,7 @@ public class ApiEncryptServiceAesImpl implements ApiEncryptService {
       return aes.encryptBase64(data);
 
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       return EncryptConst.EMPTY;
     }
   }
@@ -51,9 +49,7 @@ public class ApiEncryptServiceAesImpl implements ApiEncryptService {
       return new String(decryptedBytes, EncryptConst.CHARSET_UTF8);
 
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       return EncryptConst.EMPTY;
     }
   }

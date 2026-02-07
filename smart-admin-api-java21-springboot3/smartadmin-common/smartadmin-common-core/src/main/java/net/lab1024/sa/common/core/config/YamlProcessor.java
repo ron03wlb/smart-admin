@@ -51,9 +51,7 @@ public class YamlProcessor implements EnvironmentPostProcessor {
         return;
       }
       for (Resource resource : resources) {
-        if (log.isInfoEnabled()) {
-          log.info("初始化系统配置：{}", resource.getFilename());
-        }
+        log.info("初始化系统配置：{}", resource.getFilename());
         List<PropertySource<?>> load = loader.load(resource.getFilename(), resource);
         load.forEach(propertySources::addLast);
       }

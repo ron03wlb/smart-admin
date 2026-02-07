@@ -32,9 +32,7 @@ public class SmartResponseUtil {
       response.getWriter().write(JsonUtil.toJson(responseDTO));
       response.flushBuffer();
     } catch (IOException ex) {
-      if (log.isErrorEnabled()) {
-        log.error(ex.getMessage(), ex);
-      }
+      log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
   }

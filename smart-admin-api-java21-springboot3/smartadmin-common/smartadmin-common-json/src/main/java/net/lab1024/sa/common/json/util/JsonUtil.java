@@ -48,9 +48,7 @@ public class JsonUtil {
     try {
       return staticMapper.writeValueAsString(obj);
     } catch (JsonProcessingException e) {
-      if (log.isErrorEnabled()) {
-        log.error("JSON序列化失败: {}", e.getMessage(), e);
-      }
+      log.error("JSON序列化失败: {}", e.getMessage(), e);
       return null;
     }
   }
@@ -68,9 +66,7 @@ public class JsonUtil {
     try {
       return staticMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
     } catch (JsonProcessingException e) {
-      if (log.isErrorEnabled()) {
-        log.error("JSON序列化失败: {}", e.getMessage(), e);
-      }
+      log.error("JSON序列化失败: {}", e.getMessage(), e);
       return null;
     }
   }
@@ -90,9 +86,7 @@ public class JsonUtil {
     try {
       return staticMapper.readValue(json, clazz);
     } catch (JsonProcessingException e) {
-      if (log.isErrorEnabled()) {
-        log.error("JSON反序列化失败: {}", e.getMessage(), e);
-      }
+      log.error("JSON反序列化失败: {}", e.getMessage(), e);
       return null;
     }
   }
@@ -113,9 +107,7 @@ public class JsonUtil {
       return staticMapper.readValue(
           json, staticMapper.getTypeFactory().constructCollectionType(List.class, elementClass));
     } catch (JsonProcessingException e) {
-      if (log.isErrorEnabled()) {
-        log.error("JSON数组反序列化失败: {}", e.getMessage(), e);
-      }
+      log.error("JSON数组反序列化失败: {}", e.getMessage(), e);
       return Collections.emptyList();
     }
   }
@@ -135,9 +127,7 @@ public class JsonUtil {
     try {
       return staticMapper.readValue(json, typeReference);
     } catch (JsonProcessingException e) {
-      if (log.isErrorEnabled()) {
-        log.error("JSON反序列化失败: {}", e.getMessage(), e);
-      }
+      log.error("JSON反序列化失败: {}", e.getMessage(), e);
       return null;
     }
   }

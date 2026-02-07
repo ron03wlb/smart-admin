@@ -36,9 +36,7 @@ public class DictDataDeserializer extends JsonDeserializer<String> {
       }
       deserialize = String.join(",", list);
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       deserialize = listOrObjectNode.asText();
     }
     return deserialize;

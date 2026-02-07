@@ -25,7 +25,6 @@ import org.springframework.kafka.support.SendResult;
  */
 @Slf4j
 @RequiredArgsConstructor
-@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public class KafkaProducerServiceImpl implements KafkaProducerService {
 
   /** 默认同步发送超时时间（毫秒） */
@@ -53,7 +52,7 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
                 ex.getClass().getSimpleName(),
                 ex.getMessage(),
                 ex);
-          } else if (log.isDebugEnabled()) {
+          } else {
             log.debug(
                 "Kafka 消息发送成功: topic={}, key={}, partition={}, offset={}",
                 topic,
@@ -82,14 +81,12 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
           kafkaTemplate.send(topic, key, message);
       SendResult<String, String> result = future.get(timeoutMs, TimeUnit.MILLISECONDS);
 
-      if (log.isDebugEnabled()) {
-        log.debug(
-            "Kafka 消息同步发送成功: topic={}, key={}, partition={}, offset={}",
-            topic,
-            key,
-            result.getRecordMetadata().partition(),
-            result.getRecordMetadata().offset());
-      }
+      log.debug(
+          "Kafka 消息同步发送成功: topic={}, key={}, partition={}, offset={}",
+          topic,
+          key,
+          result.getRecordMetadata().partition(),
+          result.getRecordMetadata().offset());
       return Option.of(result);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
@@ -207,15 +204,13 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
                           .build());
                   failureCount++;
 
-                  if (log.isDebugEnabled()) {
-                    log.debug(
-                        "Kafka 批量发送单条消息失败: topic={}, index={}, key={}, errorType={}",
-                        topic,
-                        i,
-                        originalMessage.getKey(),
-                        actualException.getClass().getSimpleName(),
-                        actualException);
-                  }
+                  log.debug(
+                      "Kafka 批量发送单条消息失败: topic={}, index={}, key={}, errorType={}",
+                      topic,
+                      i,
+                      originalMessage.getKey(),
+                      actualException.getClass().getSimpleName(),
+                      actualException);
                 }
               }
 

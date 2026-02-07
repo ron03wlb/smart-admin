@@ -68,12 +68,8 @@ public class LiteFlowScriptManager {
 
     scriptDao.insert(entity);
 
-    if (log.isInfoEnabled()) {
-      log.info(
-          "創建 LiteFlow 腳本成功: scriptCode={}, scriptId={}",
-          form.getScriptCode(),
-          entity.getScriptId());
-    }
+    log.info(
+        "創建 LiteFlow 腳本成功: scriptCode={}, scriptId={}", form.getScriptCode(), entity.getScriptId());
 
     // 3. 緩存刷新
     cacheManager.evictScript(form.getScriptCode());
@@ -111,12 +107,8 @@ public class LiteFlowScriptManager {
 
     scriptDao.updateById(entity);
 
-    if (log.isInfoEnabled()) {
-      log.info(
-          "更新 LiteFlow 腳本成功: scriptCode={}, version={}",
-          entity.getScriptCode(),
-          entity.getVersion());
-    }
+    log.info(
+        "更新 LiteFlow 腳本成功: scriptCode={}, version={}", entity.getScriptCode(), entity.getVersion());
 
     // 3. 緩存失效
     cacheManager.evictScript(entity.getScriptCode());
@@ -150,9 +142,7 @@ public class LiteFlowScriptManager {
 
     scriptDao.updateById(entity);
 
-    if (log.isInfoEnabled()) {
-      log.info("刪除 LiteFlow 腳本成功: scriptCode={}", entity.getScriptCode());
-    }
+    log.info("刪除 LiteFlow 腳本成功: scriptCode={}", entity.getScriptCode());
 
     // 緩存失效 + 重載
     cacheManager.evictScript(entity.getScriptCode());

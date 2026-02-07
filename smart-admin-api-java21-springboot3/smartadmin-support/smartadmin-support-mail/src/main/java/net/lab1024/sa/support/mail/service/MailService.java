@@ -91,9 +91,7 @@ public class MailService {
           mailTemplateEntity.getTemplateSubject(), content, fileList, receiverUserList, true);
 
     } catch (MessagingException e) {
-      if (log.isErrorEnabled()) {
-        log.error("邮件发送失败", e);
-      }
+      log.error("邮件发送失败", e);
       return ResponseDTO.userErrorParam("邮件发送失败");
     }
     return ResponseDTO.ok();
@@ -181,9 +179,7 @@ public class MailService {
       template.process(templateParamsMap, out);
       return out.toString();
     } catch (IOException | TemplateException e) {
-      if (log.isErrorEnabled()) {
-        log.error("freemarkerResolverContent error: ", e);
-      }
+      log.error("freemarkerResolverContent error: ", e);
     }
     return "";
   }

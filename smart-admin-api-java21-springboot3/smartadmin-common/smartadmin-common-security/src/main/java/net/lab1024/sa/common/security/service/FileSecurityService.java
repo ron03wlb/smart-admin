@@ -104,9 +104,7 @@ public class FileSecurityService {
       MediaType mimetype = tika.getDetector().detect(stream, metadata);
       return mimetype.toString();
     } catch (IOException | TikaException e) {
-      if (log.isErrorEnabled()) {
-        log.error("获取文件MIME类型失败: {}", e.getMessage(), e);
-      }
+      log.error("获取文件MIME类型失败: {}", e.getMessage(), e);
       return MimeTypes.OCTET_STREAM;
     }
   }

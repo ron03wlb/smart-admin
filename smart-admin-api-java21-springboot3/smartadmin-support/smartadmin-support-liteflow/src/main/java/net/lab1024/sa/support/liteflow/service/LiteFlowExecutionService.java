@@ -89,9 +89,7 @@ public class LiteFlowExecutionService {
       return ResponseDTO.ok(resultVO);
 
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error("執行 LiteFlow 流程異常: chainCode={}", form.getChainCode(), e);
-      }
+      log.error("執行 LiteFlow 流程異常: chainCode={}", form.getChainCode(), e);
       return ResponseDTO.userErrorParam("流程執行異常: " + e.getMessage());
     }
   }

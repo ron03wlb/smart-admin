@@ -15,6 +15,7 @@ import net.lab1024.sa.common.core.domain.enumeration.BaseEnum;
 public enum SystemEnvironmentEnum implements BaseEnum {
   /** dev */
   DEV(SystemEnvironmentNameConst.DEV, "开发环境"),
+  SUPABASE(SystemEnvironmentNameConst.SUPABASE, "开发环境"),
 
   /** test */
   TEST(SystemEnvironmentNameConst.TEST, "测试环境"),
@@ -30,6 +31,7 @@ public enum SystemEnvironmentEnum implements BaseEnum {
   private final String desc;
 
   public static final class SystemEnvironmentNameConst {
+    public static final String SUPABASE = "supabase";
     public static final String DEV = "dev";
     public static final String TEST = "test";
     public static final String PRE = "pre";

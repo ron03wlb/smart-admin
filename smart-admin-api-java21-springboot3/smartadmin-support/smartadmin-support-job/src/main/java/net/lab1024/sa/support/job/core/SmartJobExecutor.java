@@ -77,16 +77,12 @@ public class SmartJobExecutor implements Runnable {
       }
       // 执行任务
       SmartJobLogEntity logEntity = this.execute(SmartJobConst.SYSTEM_NAME);
-      if (log.isInfoEnabled()) {
-        log.info(
-            "==== SmartJob ==== execute job->{}, time-millis->{}ms",
-            jobEntity.getJobName(),
-            logEntity.getExecuteTimeMillis());
-      }
+      log.info(
+          "==== SmartJob ==== execute job->{}, time-millis->{}ms",
+          jobEntity.getJobName(),
+          logEntity.getExecuteTimeMillis());
     } catch (Exception t) {
-      if (log.isErrorEnabled()) {
-        log.error("==== SmartJob ==== execute err:", t);
-      }
+      log.error("==== SmartJob ==== execute err:", t);
     } finally {
       lockService.releaseLock(lockInfo);
     }
@@ -117,9 +113,7 @@ public class SmartJobExecutor implements Runnable {
       successFlag = 0;
       // ps:异常信息不大于数据库字段长度限制
       executeResult = ExceptionUtil.stacktraceToString(t, 1800);
-      if (log.isErrorEnabled()) {
-        log.error("==== SmartJob ==== execute err:", t);
-      }
+      log.error("==== SmartJob ==== execute err:", t);
     }
 
     // 更新执行记录

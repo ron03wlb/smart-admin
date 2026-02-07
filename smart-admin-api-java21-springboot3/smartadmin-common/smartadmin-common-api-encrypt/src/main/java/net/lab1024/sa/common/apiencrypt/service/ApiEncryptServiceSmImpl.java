@@ -39,9 +39,7 @@ public class ApiEncryptServiceSmImpl implements ApiEncryptService {
           EncryptConst.CHARSET_UTF8);
 
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       return EncryptConst.EMPTY;
     }
   }
@@ -58,9 +56,7 @@ public class ApiEncryptServiceSmImpl implements ApiEncryptService {
       return sm4.decryptStr(new String(base64Decode, StandardCharsets.UTF_8));
 
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       return EncryptConst.EMPTY;
     }
   }

@@ -42,9 +42,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({HttpMessageNotReadableException.class})
   public ResponseDTO<?> jsonFormatExceptionHandler(Exception e) {
     if (!systemEnvironment.isProd()) {
-      if (log.isErrorEnabled()) {
-        log.error("全局JSON格式错误异常, URL:{}", getCurrentRequestUrl(), e);
-      }
+      log.error("全局JSON格式错误异常, URL:{}", getCurrentRequestUrl(), e);
     }
     return ResponseDTO.error(UserErrorCode.PARAM_ERROR, "参数JSON格式错误");
   }
@@ -94,9 +92,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BusinessException.class)
   public ResponseDTO<?> businessExceptionHandler(BusinessException e) {
     if (!systemEnvironment.isProd()) {
-      if (log.isErrorEnabled()) {
-        log.error("全局业务异常, URL:{}", getCurrentRequestUrl(), e);
-      }
+      log.error("全局业务异常, URL:{}", getCurrentRequestUrl(), e);
     }
     return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, e.getMessage());
   }
@@ -117,9 +113,7 @@ public class GlobalExceptionHandler {
   @ResponseBody
   @ExceptionHandler({Exception.class, Error.class})
   public ResponseDTO<?> errorHandler(Throwable e) {
-    if (log.isErrorEnabled()) {
-      log.error("捕获全局异常, URL:{}", getCurrentRequestUrl(), e);
-    }
+    log.error("捕获全局异常, URL:{}", getCurrentRequestUrl(), e);
     return ResponseDTO.error(
         SystemErrorCode.SYSTEM_ERROR, systemEnvironment.isProd() ? null : e.toString());
   }

@@ -95,17 +95,30 @@ import org.apache.log4j.Logger;
 
 ### 2. Placeholder Style
 ```java
-// ✅ Correct - Use placeholders
+// ✅ Correct - Use placeholders (SLF4J lazy evaluation)
 log.debug("Processing trade id={}, symbol={}", id, symbol);
 
-// ✅ Correct - Conditional output (performance sensitive scenario)
+// ✅ Correct - Complex computation with Supplier
+log.debug("Heavy operation result: {}", () -> computeExpensive());
+
+// ❌ Incorrect - Guard check (unnecessary with SLF4J placeholders)
 if (log.isDebugEnabled()) {
-    log.debug("Heavy operation result: " + computeExpensive());
+    log.debug("Processing id={}", id);
 }
 
 // ❌ Incorrect - String concatenation
 log.debug("Processing trade id=" + id + ", symbol=" + symbol);
 ```
+
+### SmartAdmin Decision (v4.1.0)
+
+SmartAdmin 統一**不使用** `log.isXxxEnabled()` 檢查，原因如下：
+
+1. **SLF4J 延遲格式化**：使用 `{}` 佔位符時，字串格式化只在日誌級別啟用時才執行
+2. **程式碼簡潔性**：移除冗餘的 if 包裹可提高可讀性
+3. **一致性**：專案統一採用同一風格
+
+**PMD 規則**：`GuardLogStatement` 已在 ruleset.xml 中排除
 
 ### 3. Exception Log Completeness
 ```java

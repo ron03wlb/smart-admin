@@ -66,24 +66,22 @@ public class WebServerListener implements ApplicationListener<WebServerInitializ
     String knife4jUrl =
         URLUtil.normalize(
             String.format("http://localhost:%d%s/doc.html", port, contextPath), false, true);
-    if (log.isWarnEnabled()) {
-      log.warn(
-          "\n{}\n"
-              + "\t当前启动环境:\t{} , {}"
-              + "\n\t返回码初始化:\t完成{}个返回码初始化"
-              + "\n\t服务本机地址:\t{}"
-              + "\n\t服务外网地址:\t{}"
-              + "\n\tSwagger地址:\t{}"
-              + "\n\tknife4j地址:\t{}"
-              + "\n-------------------------------------------------------------------------------------\n",
-          title,
-          profile,
-          environmentEnum.getDesc(),
-          codeCount,
-          localhostUrl,
-          externalUrl,
-          swaggerUrl,
-          knife4jUrl);
-    }
+    log.warn(
+        "\n{}\n"
+            + "\t当前启动环境:\t{} , {}"
+            + "\n\t返回码初始化:\t完成{}个返回码初始化"
+            + "\n\t服务本机地址:\t{}"
+            + "\n\t服务外网地址:\t{}"
+            + "\n\tSwagger地址:\t{}"
+            + "\n\tknife4j地址:\t{}"
+            + "\n-------------------------------------------------------------------------------------\n",
+        title,
+        profile,
+        environmentEnum.getDesc(),
+        codeCount,
+        localhostUrl,
+        externalUrl,
+        swaggerUrl,
+        knife4jUrl);
   }
 }

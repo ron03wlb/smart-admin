@@ -111,9 +111,7 @@ public class FileStorageLocalServiceImpl implements IFileStorageService {
           log.warn("delete temp file failed: {}", fileTemp.getAbsolutePath());
         }
       }
-      if (log.isErrorEnabled()) {
-        log.error("", e);
-      }
+      log.error("", e);
       return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, "上传失败");
     }
     return ResponseDTO.ok(fileUploadVO);

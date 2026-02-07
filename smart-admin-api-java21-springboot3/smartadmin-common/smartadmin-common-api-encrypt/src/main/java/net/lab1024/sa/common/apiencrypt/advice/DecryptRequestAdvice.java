@@ -61,9 +61,7 @@ public class DecryptRequestAdvice extends RequestBodyAdviceAdapter {
       return new DecryptHttpInputMessage(
           inputMessage.getHeaders(), IOUtils.toInputStream(decrypt, EncryptConst.CHARSET_UTF8));
     } catch (IOException e) {
-      if (log.isErrorEnabled()) {
-        log.error("", e);
-      }
+      log.error("", e);
       return inputMessage;
     }
   }

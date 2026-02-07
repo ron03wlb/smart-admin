@@ -252,6 +252,31 @@ public class EmployeeManager { }  // CORRECT
 - `.agent/foundation/01-naming-conventions.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md#layer-responsibilities`
 
+### Rule 5: Logging Best Practices (v4.1.0)
+**MEDIUM**: SLF4J placeholder style, no guard checks
+
+```java
+// ✅ CORRECT - SLF4J placeholder (lazy evaluation)
+log.info("Processing user: id={}, name={}", user.getId(), user.getName());
+log.error("Operation failed: context={}", context, exception);
+
+// ❌ WRONG - Guard check (unnecessary with SLF4J)
+if (log.isInfoEnabled()) {
+    log.info("Processing user: {}", user);
+}
+
+// ❌ WRONG - String concatenation
+log.info("Processing user: " + user.toString());
+```
+
+**Why**: SLF4J placeholders provide lazy evaluation - string formatting only occurs when the log level is enabled. Guard checks are redundant and add unnecessary code complexity.
+
+**SmartAdmin Decision**: PMD `GuardLogStatement` rule is **excluded** in `config/pmd/ruleset.xml`
+
+**References**:
+- `.agent/rules/technology/patterns/P05-exception-logging.md`
+- `.agent/rules/quality-tools/Q02-pmd-rules.md`
+
 ## Implementation Steps
 
 When `/spring` is invoked:

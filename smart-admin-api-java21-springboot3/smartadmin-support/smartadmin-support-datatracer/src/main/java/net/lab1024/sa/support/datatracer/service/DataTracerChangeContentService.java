@@ -299,9 +299,7 @@ public class DataTracerChangeContentService {
       Method get = pd.getReadMethod();
       fieldValue = get.invoke(object);
     } catch (IntrospectionException | ReflectiveOperationException e) {
-      if (log.isErrorEnabled()) {
-        log.error("bean operate log: reflect field value error {}", field.getName(), e);
-      }
+      log.error("bean operate log: reflect field value error {}", field.getName(), e);
       return null;
     }
     if (fieldValue == null) {

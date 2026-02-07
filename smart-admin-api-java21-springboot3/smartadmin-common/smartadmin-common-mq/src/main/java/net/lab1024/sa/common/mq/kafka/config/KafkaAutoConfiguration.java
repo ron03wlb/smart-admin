@@ -39,7 +39,6 @@ import org.springframework.util.backoff.ExponentialBackOff;
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
 @ConditionalOnProperty(prefix = "smart.kafka", name = "enabled", havingValue = "true")
-@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public class KafkaAutoConfiguration {
 
   /**

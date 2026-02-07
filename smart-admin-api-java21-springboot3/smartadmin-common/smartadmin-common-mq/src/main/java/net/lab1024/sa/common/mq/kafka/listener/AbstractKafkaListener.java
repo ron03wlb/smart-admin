@@ -34,7 +34,6 @@ import org.springframework.kafka.support.Acknowledgment;
  * @since 2024-01-01
  */
 @Slf4j
-@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public abstract class AbstractKafkaListener<T> {
 
   /**
@@ -52,14 +51,8 @@ public abstract class AbstractKafkaListener<T> {
     String key = record.key();
 
     try {
-      if (log.isDebugEnabled()) {
-        log.debug(
-            "Kafka 开始处理消息: topic={}, partition={}, offset={}, key={}",
-            topic,
-            partition,
-            offset,
-            key);
-      }
+      log.debug(
+          "Kafka 开始处理消息: topic={}, partition={}, offset={}, key={}", topic, partition, offset, key);
 
       // 调用子类实现的业务处理方法
       doHandle(record);
@@ -67,14 +60,12 @@ public abstract class AbstractKafkaListener<T> {
       // 处理成功，手动确认
       ack.acknowledge();
 
-      if (log.isDebugEnabled()) {
-        log.debug(
-            "Kafka 消息处理成功并已确认: topic={}, partition={}, offset={}, key={}",
-            topic,
-            partition,
-            offset,
-            key);
-      }
+      log.debug(
+          "Kafka 消息处理成功并已确认: topic={}, partition={}, offset={}, key={}",
+          topic,
+          partition,
+          offset,
+          key);
     } catch (Exception ex) {
       handleException(record, ex);
       // 异常处理后也确认消息，避免消息堆积

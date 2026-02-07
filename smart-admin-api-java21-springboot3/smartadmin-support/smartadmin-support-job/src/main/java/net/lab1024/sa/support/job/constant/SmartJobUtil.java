@@ -56,9 +56,7 @@ public class SmartJobUtil {
    * @param info
    */
   public static void printInfo(String info) {
-    if (log.isInfoEnabled()) {
-      log.info("{}", info);
-    }
+    log.info("{}", info);
   }
 
   /**

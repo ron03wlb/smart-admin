@@ -47,9 +47,7 @@ public class LiteFlowCacheManager {
    * @param chainCode 流程編碼
    */
   public void evictChain(String chainCode) {
-    if (log.isDebugEnabled()) {
-      log.debug("清除 Chain 緩存: chainCode={}", chainCode);
-    }
+    log.debug("清除 Chain 緩存: chainCode={}", chainCode);
     chainCache.remove(chainCode);
   }
 
@@ -59,9 +57,7 @@ public class LiteFlowCacheManager {
    * @param scriptCode 腳本編碼
    */
   public void evictScript(String scriptCode) {
-    if (log.isDebugEnabled()) {
-      log.debug("清除 Script 緩存: scriptCode={}", scriptCode);
-    }
+    log.debug("清除 Script 緩存: scriptCode={}", scriptCode);
     scriptCache.remove(scriptCode);
   }
 
@@ -71,9 +67,7 @@ public class LiteFlowCacheManager {
    * <p>用於流程規則重載時清空所有緩存
    */
   public void evictAll() {
-    if (log.isInfoEnabled()) {
-      log.info("清除所有 LiteFlow 緩存");
-    }
+    log.info("清除所有 LiteFlow 緩存");
     chainCache.unwrap(com.github.benmanes.caffeine.cache.Cache.class).invalidateAll();
     scriptCache.unwrap(com.github.benmanes.caffeine.cache.Cache.class).invalidateAll();
   }

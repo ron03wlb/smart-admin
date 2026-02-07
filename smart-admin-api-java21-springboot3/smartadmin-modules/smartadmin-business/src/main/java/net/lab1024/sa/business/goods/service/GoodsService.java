@@ -183,9 +183,7 @@ public class GoodsService {
     try (InputStream is = file.getInputStream()) {
       dataList = FastExcel.read(is).head(GoodsImportForm.class).sheet().doReadSync();
     } catch (IOException e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       throw new BusinessException("数据格式存在问题，无法读取", e);
     }
 

@@ -62,9 +62,7 @@ public class SmartJobLauncher {
             List<SmartJobEntity> smartJobList = this.queryJob();
             this.startOrRefreshJob(smartJobList);
           } catch (Exception t) {
-            if (log.isErrorEnabled()) {
-              log.error("SmartJob Error:", t);
-            }
+            log.error("SmartJob Error:", t);
           }
           // 只在启动时 执行一次
           if (!refreshEnabled) {
@@ -85,9 +83,7 @@ public class SmartJobLauncher {
   public void startOrRefreshJob(List<SmartJobEntity> smartJobList) {
     // 查询任务配置
     if (CollectionUtils.isEmpty(smartJobList) || CollectionUtils.isEmpty(jobInterfaceList)) {
-      if (log.isInfoEnabled()) {
-        log.info("==== SmartJob ==== job list empty");
-      }
+      log.info("==== SmartJob ==== job list empty");
       return;
     }
 
@@ -128,9 +124,7 @@ public class SmartJobLauncher {
     List<SmartJobEntity> runjJobList = SmartJobScheduler.getJobInfo();
     List<String> jobNameList =
         runjJobList.stream().map(SmartJobEntity::getJobName).collect(Collectors.toList());
-    if (log.isInfoEnabled()) {
-      log.info("==== SmartJob ==== start/refresh job num:{}->{}", runjJobList.size(), jobNameList);
-    }
+    log.info("==== SmartJob ==== start/refresh job num:{}->{}", runjJobList.size(), jobNameList);
   }
 
   /**
@@ -163,8 +157,6 @@ public class SmartJobLauncher {
       this.launcherExecutor.shutdown();
     }
 
-    if (log.isInfoEnabled()) {
-      log.info("==== SmartJob ==== destroy job");
-    }
+    log.info("==== SmartJob ==== destroy job");
   }
 }

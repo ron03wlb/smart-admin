@@ -55,13 +55,11 @@ public class AsyncConfig {
   public static class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
     @Override
     public void handleUncaughtException(Throwable throwable, Method method, Object... objects) {
-      if (log.isErrorEnabled()) {
-        log.error(
-            "异步任务发生异常:{}, 参数:{}, ",
-            method.getDeclaringClass().getSimpleName() + "." + method.getName(),
-            Arrays.toString(objects),
-            throwable);
-      }
+      log.error(
+          "异步任务发生异常:{}, 参数:{}, ",
+          method.getDeclaringClass().getSimpleName() + "." + method.getName(),
+          Arrays.toString(objects),
+          throwable);
     }
   }
 }

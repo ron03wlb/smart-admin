@@ -80,8 +80,6 @@ public class LiteFlowMetricsManager {
       metricsDao.updateById(metrics);
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("LiteFlow 指標已更新: chainCode={}, totalCount={}", chainCode, metrics.getTotalCount());
-    }
+    log.debug("LiteFlow 指標已更新: chainCode={}, totalCount={}", chainCode, metrics.getTotalCount());
   }
 }

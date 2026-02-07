@@ -36,14 +36,10 @@ public class IpGeolocationUtil {
       IP_SEARCHER.set(Searcher.newWithBuffer(cBuff));
 
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error("初始化ip2region.xdb文件失败,报错信息:[{}]", e.getMessage(), e);
-      }
+      log.error("初始化ip2region.xdb文件失败,报错信息:[{}]", e.getMessage(), e);
       throw new RuntimeException("系统异常!", e);
     } catch (Error e) {
-      if (log.isErrorEnabled()) {
-        log.error("初始化ip2region.xdb文件失败,报错信息:[{}]", e.getMessage(), e);
-      }
+      log.error("初始化ip2region.xdb文件失败,报错信息:[{}]", e.getMessage(), e);
       throw e;
     }
   }

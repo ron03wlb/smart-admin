@@ -67,9 +67,7 @@ public class SecurityPasswordService {
             .map(userType -> userType.getValue())
             .getOrElse(
                 () -> {
-                  if (log.isErrorEnabled()) {
-                    log.error("User type is null for user: {}", requestUser.getUserId());
-                  }
+                  log.error("User type is null for user: {}", requestUser.getUserId());
                   // 默認使用管理員員工類型
                   return UserTypeEnum.ADMIN_EMPLOYEE.getValue();
                 });

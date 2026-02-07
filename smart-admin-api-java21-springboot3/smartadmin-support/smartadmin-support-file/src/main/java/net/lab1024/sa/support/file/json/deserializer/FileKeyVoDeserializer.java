@@ -40,9 +40,7 @@ public class FileKeyVoDeserializer extends JsonDeserializer<String> {
       }
       deserialize = list.stream().map(FileVO::getFileKey).collect(Collectors.joining(","));
     } catch (Exception e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       deserialize = listOrObjectNode.asText();
     }
     return deserialize;

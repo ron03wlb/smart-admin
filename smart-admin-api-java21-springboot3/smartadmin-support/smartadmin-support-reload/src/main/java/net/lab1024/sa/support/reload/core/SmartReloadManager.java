@@ -92,12 +92,10 @@ public class SmartReloadManager implements BeanPostProcessor, BeanFactoryAware {
       }
       int paramCount = method.getParameterCount();
       if (paramCount > MAX_RELOAD_PARAMS) {
-        if (log.isErrorEnabled()) {
-          log.error(
-              "<<SmartReloadManager>> register tag reload : "
-                  + smartReload.value()
-                  + " , param count cannot greater than one !");
-        }
+        log.error(
+            "<<SmartReloadManager>> register tag reload : "
+                + smartReload.value()
+                + " , param count cannot greater than one !");
         continue;
       }
       String reloadTag = smartReload.value();
@@ -114,12 +112,10 @@ public class SmartReloadManager implements BeanPostProcessor, BeanFactoryAware {
    */
   private void register(String tag, SmartReloadObject smartReloadObject) {
     if (reloadObjectMap.containsKey(tag)) {
-      if (log.isErrorEnabled()) {
-        log.error(
-            "<<SmartReloadManager>> register duplicated tag reload : "
-                + tag
-                + " , and it will be cover!");
-      }
+      log.error(
+          "<<SmartReloadManager>> register duplicated tag reload : "
+              + tag
+              + " , and it will be cover!");
     }
     reloadObjectMap.put(tag, smartReloadObject);
   }

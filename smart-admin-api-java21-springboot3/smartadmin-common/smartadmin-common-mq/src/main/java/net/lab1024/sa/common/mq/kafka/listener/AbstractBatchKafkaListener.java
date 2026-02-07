@@ -50,7 +50,6 @@ import org.springframework.lang.Nullable;
  * @since 2024-01-01
  */
 @Slf4j
-@SuppressWarnings("PMD.GuardLogStatement") // SLF4J 占位符已优化性能
 public abstract class AbstractBatchKafkaListener<T> {
 
   @Nullable private final DeadLetterService deadLetterService;
@@ -83,16 +82,12 @@ public abstract class AbstractBatchKafkaListener<T> {
     int batchSize = records.size();
 
     try {
-      if (log.isDebugEnabled()) {
-        log.debug("Kafka 批量处理开始: topic={}, batchSize={}", topic, batchSize);
-      }
+      log.debug("Kafka 批量处理开始: topic={}, batchSize={}", topic, batchSize);
 
       // 尝试批量处理
       doBatchHandle(records);
 
-      if (log.isDebugEnabled()) {
-        log.debug("Kafka 批量处理成功: topic={}, batchSize={}", topic, batchSize);
-      }
+      log.debug("Kafka 批量处理成功: topic={}, batchSize={}", topic, batchSize);
     } catch (Exception batchEx) {
       log.warn(
           "Kafka 批量处理失败，降级为逐条处理: topic={}, batchSize={}, error={}",

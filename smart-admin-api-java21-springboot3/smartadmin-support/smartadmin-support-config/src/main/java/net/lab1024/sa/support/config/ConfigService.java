@@ -57,9 +57,7 @@ public class ConfigService {
     entityList.forEach(
         entity ->
             this.configCache.put(entity.getConfigKey().toLowerCase(java.util.Locale.ROOT), entity));
-    if (log.isInfoEnabled()) {
-      log.info("################# 系统配置缓存初始化完毕:{} ###################", configCache.size());
-    }
+    log.info("################# 系统配置缓存初始化完毕:{} ###################", configCache.size());
   }
 
   /** 刷新系统设置缓存 */

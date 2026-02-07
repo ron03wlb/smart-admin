@@ -47,9 +47,7 @@ public class LiteFlowExecutionListener {
     REQUEST_ID_HOLDER.set(UUID.randomUUID().toString());
     INPUT_PARAMS_HOLDER.set(inputParams);
 
-    if (log.isDebugEnabled()) {
-      log.debug("LiteFlow 執行開始: chainCode={}, requestId={}", chainCode, REQUEST_ID_HOLDER.get());
-    }
+    log.debug("LiteFlow 執行開始: chainCode={}, requestId={}", chainCode, REQUEST_ID_HOLDER.get());
   }
 
   /**
@@ -129,14 +127,12 @@ public class LiteFlowExecutionListener {
       log.setCreateTime(LocalDateTime.now());
       logDao.insert(log);
 
-      if (LiteFlowExecutionListener.log.isInfoEnabled()) {
-        LiteFlowExecutionListener.log.info(
-            "LiteFlow 執行日誌已記錄: chainCode={}, requestId={}, success={}, time={}ms",
-            chainCode,
-            requestId,
-            success,
-            executionTime);
-      }
+      LiteFlowExecutionListener.log.info(
+          "LiteFlow 執行日誌已記錄: chainCode={}, requestId={}, success={}, time={}ms",
+          chainCode,
+          requestId,
+          success,
+          executionTime);
 
     } catch (Exception e) {
       LiteFlowExecutionListener.log.error("寫入 LiteFlow 執行日誌失敗", e);

@@ -108,9 +108,7 @@ public abstract class OperateLogAspect {
       }
       this.submitLog(joinPoint, e, responseDTO);
     } catch (Exception exp) {
-      if (log.isErrorEnabled()) {
-        log.error("保存操作日志异常:{}", exp.getMessage());
-      }
+      log.error("保存操作日志异常:{}", exp.getMessage());
     }
   }
 

@@ -520,6 +520,10 @@ echo "✅ Naming convention check passed"
   - 表命名規範（如適用）
   - 外鍵命名規範
 
+- **[Logging Best Practices](./../../../.agent/rules/technology/patterns/P05-exception-logging.md)**
+  - SLF4J 佔位符風格（禁止 `if (log.isXxxEnabled())` 檢查）
+  - PMD `GuardLogStatement` 規則已排除
+
 ---
 
 ## 參考資料

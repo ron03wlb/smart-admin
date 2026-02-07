@@ -70,10 +70,8 @@ public class LiteFlowChainManager {
 
     chainDao.insert(entity);
 
-    if (log.isInfoEnabled()) {
-      log.info(
-          "創建 LiteFlow 流程成功: chainCode={}, chainId={}", form.getChainCode(), entity.getChainId());
-    }
+    log.info(
+        "創建 LiteFlow 流程成功: chainCode={}, chainId={}", form.getChainCode(), entity.getChainId());
 
     // 3. 緩存刷新
     cacheManager.evictChain(form.getChainCode());
@@ -111,10 +109,8 @@ public class LiteFlowChainManager {
 
     chainDao.updateById(entity);
 
-    if (log.isInfoEnabled()) {
-      log.info(
-          "更新 LiteFlow 流程成功: chainCode={}, version={}", entity.getChainCode(), entity.getVersion());
-    }
+    log.info(
+        "更新 LiteFlow 流程成功: chainCode={}, version={}", entity.getChainCode(), entity.getVersion());
 
     // 3. 緩存失效
     cacheManager.evictChain(entity.getChainCode());
@@ -148,9 +144,7 @@ public class LiteFlowChainManager {
 
     chainDao.updateById(entity);
 
-    if (log.isInfoEnabled()) {
-      log.info("刪除 LiteFlow 流程成功: chainCode={}", entity.getChainCode());
-    }
+    log.info("刪除 LiteFlow 流程成功: chainCode={}", entity.getChainCode());
 
     // 緩存失效 + 重載
     cacheManager.evictChain(entity.getChainCode());
@@ -165,9 +159,7 @@ public class LiteFlowChainManager {
    * @return 操作結果
    */
   public ResponseDTO<String> reloadAll() {
-    if (log.isInfoEnabled()) {
-      log.info("手動重載所有 LiteFlow 規則");
-    }
+    log.info("手動重載所有 LiteFlow 規則");
     cacheManager.evictAll();
     flowExecutor.reloadRule();
     return ResponseDTO.ok();
@@ -182,9 +174,7 @@ public class LiteFlowChainManager {
    */
   @SmartReload(ReloadConst.LITEFLOW_RELOAD)
   public void liteflowReload(String args) {
-    if (log.isInfoEnabled()) {
-      log.info("SmartReload 觸發 LiteFlow 規則重載, args={}", args);
-    }
+    log.info("SmartReload 觸發 LiteFlow 規則重載, args={}", args);
     cacheManager.evictAll();
     flowExecutor.reloadRule();
   }

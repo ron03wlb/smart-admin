@@ -45,9 +45,7 @@ public class SmartPageUtil {
       }
 
       if (SqlInjectionUtils.check(sortItem.getColumn())) {
-        if (log.isErrorEnabled()) {
-          log.error("《存在SQL注入：》 : {}", sortItem.getColumn());
-        }
+        log.error("《存在SQL注入：》 : {}", sortItem.getColumn());
         throw new BusinessException("存在SQL注入风险，请联系技术工作人员！");
       }
       orderItemList.add(

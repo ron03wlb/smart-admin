@@ -30,7 +30,7 @@ last_updated: 2026-01-22
 - [ ] Use interface types instead of implementation types (LooseCoupling)
 - [ ] No duplicate string literals (AvoidDuplicateLiterals)
 - [ ] No unused variable assignments (UnusedAssignment)
-- [ ] Log statements have guard (GuardLogStatement)
+- [ ] Use SLF4J placeholders for logging (GuardLogStatement **excluded**)
 - [ ] Serializable classes have serialVersionUID
 
 ### AI Decision Tree
@@ -43,7 +43,7 @@ PMD Violation → Identify Rule Type
   ├─ UnusedAssignment
   │   └─ Remove unused initialization
   ├─ GuardLogStatement
-  │   └─ Add log level check or use placeholders
+  │   └─ EXCLUDED in SmartAdmin - use SLF4J placeholders
   └─ MissingSerialVersionUID
       └─ Add serialVersionUID field
 ```
@@ -97,19 +97,25 @@ if (condition) {
 }
 ```
 
-#### GuardLogStatement - Log Guard
-```java
-// ❌ Violation - Debug log without guard
-log.debug("Processing user: " + user.toString());
+#### GuardLogStatement - Log Guard (EXCLUDED)
 
-// ✅ Fix Option 1 - Use placeholder
+**SmartAdmin Decision (v4.1.0)**: This rule is **excluded** in `config/pmd/ruleset.xml`.
+
+SLF4J placeholders provide lazy evaluation, making guard checks unnecessary:
+```java
+// ✅ Correct - SLF4J placeholder (lazy evaluation)
 log.debug("Processing user: {}", user);
 
-// ✅ Fix Option 2 - Add guard
+// ❌ Incorrect - Guard check (unnecessary)
 if (log.isDebugEnabled()) {
-    log.debug("Processing user: " + user.toString());
+    log.debug("Processing user: {}", user);
 }
+
+// ❌ Incorrect - String concatenation
+log.debug("Processing user: " + user.toString());
 ```
+
+See: [P05-exception-logging.md](../technology/patterns/P05-exception-logging.md#smartadmin-decision-v410)
 
 #### MissingSerialVersionUID
 ```java
@@ -198,7 +204,7 @@ public final class CacheKeyConst {
 | ----------------------- | -------- | ------------------------------------- |
 | `LooseCoupling`         | P3       | Use interface types not implementation |
 | `UnusedAssignment`      | P3       | Avoid unused variable assignments     |
-| `GuardLogStatement`     | P2       | Log statements need guard             |
+| ~~`GuardLogStatement`~~ | ~~P2~~   | **EXCLUDED** - Use SLF4J placeholders |
 | `UnusedFormalParameter` | P3       | Avoid unused method parameters        |
 | `UnusedLocalVariable`   | P3       | Avoid unused local variables          |
 | `UnusedPrivateField`    | P3       | Avoid unused private fields           |
@@ -255,7 +261,7 @@ Based on actual project violation analysis:
 | `LooseCoupling`                               | ~10   | Controller/Service         | Use interface type   |
 | `AvoidDuplicateLiterals`                      | ~8    | DAO/Mapper                 | Extract constant     |
 | `UnusedAssignment`                            | ~4    | Service                    | Remove unused init   |
-| `GuardLogStatement`                           | ~2    | Manager                    | Use log placeholder  |
+| ~~`GuardLogStatement`~~                       | N/A   | **EXCLUDED**               | Use SLF4J placeholder |
 | `MissingSerialVersionUID`                     | ~1    | VO/DTO                     | Add serialVersionUID |
 | `CallSuperInConstructor`                      | 3     | BusinessException.java     | @SuppressWarnings    |
 | `AvoidReassigningParameters`                  | 11    | SmartPageUtil.java         | Create local variable |

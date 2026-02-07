@@ -80,9 +80,7 @@ public class RepeatSubmitAspect {
     try {
       return point.proceed();
     } catch (Throwable throwable) {
-      if (log.isErrorEnabled()) {
-        log.error(throwable.getMessage(), throwable);
-      }
+      log.error(throwable.getMessage(), throwable);
       throw throwable;
     } finally {
       this.repeatSubmitTicket.unLock(ticket, intervalMilliSecond);

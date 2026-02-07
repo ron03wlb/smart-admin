@@ -106,9 +106,7 @@ public class DataScopeSqlConfigService {
     if (DataScopeWhereInTypeEnum.CUSTOM_STRATEGY == sqlConfigDTO.getDataScopeWhereInType()) {
       Class<?> strategyClass = sqlConfigDTO.getJoinSqlImplClazz();
       if (strategyClass == null) {
-        if (log.isWarnEnabled()) {
-          log.warn("data scope custom strategy class is null");
-        }
+        log.warn("data scope custom strategy class is null");
         return "";
       }
       AbstractDataScopeStrategy powerStrategy =

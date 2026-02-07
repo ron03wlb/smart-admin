@@ -158,9 +158,7 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
       super.saveRecord(serialNumberGenerateResult);
       return formatNumberList(serialNumberGenerateResult, serialNumberInfo);
     } catch (Exception | Error e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage(), e);
-      }
+      log.error(e.getMessage(), e);
       throw e;
     }
   }
