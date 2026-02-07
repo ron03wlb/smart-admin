@@ -50,6 +50,8 @@ dependencies {
     // SpotBugs annotations
     api(libs.spotbugs.annotations)
 
-    // Test
+    // Test - JUnit BOM and platform launcher for version alignment
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(libs.spring.boot.starter.test)
 }
