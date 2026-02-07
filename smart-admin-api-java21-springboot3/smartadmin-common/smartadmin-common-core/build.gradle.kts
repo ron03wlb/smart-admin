@@ -58,7 +58,15 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    // Testing
+    // Testing - JUnit BOM and platform launcher for version alignment
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core")
+    testCompileOnly("org.projectlombok:lombok")
+    testAnnotationProcessor("org.projectlombok:lombok")
+    // Hibernate Validator requires Expression Language at runtime
+    testRuntimeOnly("org.glassfish.expressly:expressly:5.0.0")
+    // Spring Beans for BeanUtils (required by SmartBeanUtil)
+    testImplementation("org.springframework:spring-beans")
 }

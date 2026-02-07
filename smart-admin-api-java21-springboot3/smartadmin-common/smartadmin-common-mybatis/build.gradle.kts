@@ -32,6 +32,8 @@ dependencies {
     // SpotBugs Annotations
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.6")
 
-    // Testing
+    // Testing - JUnit BOM and platform launcher for version alignment
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
