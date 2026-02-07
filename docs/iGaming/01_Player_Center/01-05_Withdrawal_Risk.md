@@ -1,5 +1,8 @@
 # 01-05 提款風控系統 (Withdrawal Risk Control System)
 
+> ⚠️ **超大文檔警告**: 本文檔共 1,929 行，建議拆分為 3 個子文檔
+> **拆分建議**: 1) 全球合規要求 2) SAGA 工作流設計 3) SmartAdmin 映射
+
 > **MOVED FROM**: `../01_Player_Center/01-05_Withdrawal_Risk.md` (Week 4-5 Restructure)
 > **Reason**: 提款風控與玩家生命週期緊密相關,歸類至 Player Center 更合理
 > **Version**: v2.2.0 (Post-migration Enhancement)

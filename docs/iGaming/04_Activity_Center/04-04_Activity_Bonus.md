@@ -1,5 +1,8 @@
 # 03-03 活動獎金系統 (Activity & Bonus System)
 
+> ⚠️ **超大文檔警告**: 本文檔共 1,918 行，建議拆分為 3 個子文檔
+> **拆分建議**: 1) 活動引擎架構 2) 獎金計算邏輯 3) 本地化策略
+
 > **MERGED FROM**: `04-01_Activity_System_Design.md` + `04-02_Bonus_Calculation_Engine.md` (Week 5 Consolidation)
 > **Version**: 3.0.0 (Merged Activity + Bonus Engine)
 > **Last Updated**: 2026-02-04

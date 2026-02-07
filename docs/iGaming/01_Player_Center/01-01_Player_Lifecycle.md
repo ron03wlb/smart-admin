@@ -1,5 +1,8 @@
 # 01-01 玩家生命週期管理 (Player Lifecycle Management)
 
+> ⚠️ **超大文檔警告**: 本文檔共 1,876 行，建議拆分為 3 個子文檔
+> **拆分建議**: 1) 生命週期狀態機 2) KYC 驗證流程 3) 設備指紋與風險
+
 > **Version**: 1.0.0 (Week 4-5 Creation)
 > **Created From**: Consolidation of 4 source documents
 > **Creation Date**: 2026-02-03

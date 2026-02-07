@@ -208,9 +208,9 @@ graph TD
 |---------|---------|-------------|
 | [02-06 統一錢包](../../02_Finance_Center/02-06_Wallet_Architecture.md) | [02-07 交易處理](../../02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 交易處理依賴錢包模型定義 |
 | [02-06 統一錢包](../../02_Finance_Center/02-06_Wallet_Architecture.md) | [03-03 無縫錢包](../../03_Game_Center/03-03_Seamless_Wallet_Analysis.md) | GP對接使用錢包API |
-| [02-04 流水計算](../../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../../04_Activity_Center/04-00_INDEX.md) | 活動使用流水驗證數據 |
+| [02-04 流水計算](../../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) | [04-01 活動系統](../../04_Activity_Center/README.md) | 活動使用流水驗證數據 |
 | [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) | [02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金引用風控引擎API |
-| [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) | [04-01 活動系統](../../04_Activity_Center/04-00_INDEX.md) | 活動引用風控檢測 |
+| [05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md) | [04-01 活動系統](../../04_Activity_Center/README.md) | 活動引用風控檢測 |
 | [07-01 層級架構](../../06_Platform_Governance/06-01_Multi_Tenant.md) | [09-01 RBAC](../../06_Platform_Governance/06-02_RBAC_Permissions.md) | RBAC基於層級架構 |
 | [09-04 審批工作流](../../06_Platform_Governance/06-04_Approval_Workflow.md) | [02-01 出金風控](../../01_Player_Center/01-05_Withdrawal_Risk.md) | 出金審批使用審批工作流 |
 | [09-02 審計日誌](../../06_Platform_Governance/06-03_Audit_Log.md) | [09-04 審批工作流](../../06_Platform_Governance/06-04_Approval_Workflow.md) | 審批操作記錄在審計日誌 |
@@ -287,7 +287,7 @@ graph TD
 
 | 編號 | 文檔名稱 | 簡介 | 行數 |
 |------|---------|------|------|
-| 04-01 | [Activity_System_Design.md](../../04_Activity_Center/04-00_INDEX.md) | 紅利系統、流水要求、風控整合 | 80+ |
+| 04-01 | [Activity_System_Design.md](../../04_Activity_Center/README.md) | 紅利系統、流水要求、風控整合 | 80+ |
 
 ---
 

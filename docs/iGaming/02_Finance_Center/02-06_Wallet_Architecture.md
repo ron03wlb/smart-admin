@@ -1,5 +1,8 @@
 # 01-02 錢包架構 (Wallet Architecture)
 
+> ⚠️ **超大文檔警告**: 本文檔共 2,125 行，建議拆分為 4 個子文檔
+> **拆分建議**: 1) 錢包模型設計 2) 並發控制 3) 錯誤恢復 4) API 安全
+
 <!-- SSOT: Authoritative definition of Unified Wallet Model, Playable Balance Formula, Deduction Priority, API Security, Concurrency Control, Error Recovery -->
 
 ## 1. 系統概述 (System Overview)

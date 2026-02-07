@@ -70,7 +70,7 @@
 無縫錢包交易的風控檢查點：
 
 - **[05-01 風控系統](../../05_Risk_Control/05-01_Risk_Framework.md)** - 交易風控檢查、對沖檢測
-- **[04_Activity_Center/04-00_INDEX.md](../../04_Activity_Center/04-00_INDEX.md)** - Bonus 發放與流水要求
+- **[04_Activity_Center/README.md](../../04_Activity_Center/README.md)** - Bonus 發放與流水要求
 
 ---
 

@@ -53,7 +53,7 @@
 - 出金風控關聯 → [technical-specs/P1-important/07-withdrawal-risk-correlation.md](../../05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md)
 
 **活動相關**:
-- 活動系統設計 → [04_Activity_Center/04-00_INDEX.md](../../04_Activity_Center/04-00_INDEX.md)
+- 活動系統設計 → [04_Activity_Center/README.md](../../04_Activity_Center/README.md)
 - Bonus 引擎 → [04_Activity_Center/](../../04_Activity_Center/)
 
 **技術架構**:
