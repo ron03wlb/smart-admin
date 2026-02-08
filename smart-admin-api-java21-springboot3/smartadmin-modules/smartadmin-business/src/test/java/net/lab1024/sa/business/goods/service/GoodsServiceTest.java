@@ -1,13 +1,16 @@
 package net.lab1024.sa.business.goods.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +25,7 @@ import net.lab1024.sa.business.goods.domain.form.GoodsQueryForm;
 import net.lab1024.sa.business.goods.domain.form.GoodsUpdateForm;
 import net.lab1024.sa.business.goods.domain.vo.GoodsVO;
 import net.lab1024.sa.business.goods.manager.GoodsManager;
+import net.lab1024.sa.common.core.domain.exception.BusinessException;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.support.datatracer.service.DataTracerService;
@@ -33,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * GoodsService 單元測試
@@ -339,6 +344,26 @@ class GoodsServiceTest {
       // Then
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getList()).isEmpty();
+    }
+  }
+
+  // ==================== importGoods 測試 ====================
+
+  @Nested
+  @DisplayName("importGoods 商品導入測試")
+  class ImportGoodsTest {
+
+    @Test
+    @DisplayName("異常情況：文件讀取失敗應拋出 BusinessException")
+    void shouldThrowBusinessExceptionWhenIOError() throws IOException {
+      // Given
+      MultipartFile mockFile = mock(MultipartFile.class);
+      when(mockFile.getInputStream()).thenThrow(new IOException("File corrupted"));
+
+      // When & Then
+      assertThatThrownBy(() -> goodsService.importGoods(mockFile))
+          .isInstanceOf(BusinessException.class)
+          .hasMessageContaining("数据格式存在问题");
     }
   }
 
