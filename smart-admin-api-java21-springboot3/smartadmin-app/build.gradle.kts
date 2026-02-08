@@ -11,14 +11,7 @@ val activeEnv: String by lazy {
     (project.findProperty("env") as? String) ?: "dev"
 }
 
-configurations {
-    // Exclude Logback and log4j-to-slf4j globally - using Log4j2 with log4j-slf4j2-impl
-    all {
-        exclude(group = "ch.qos.logback", module = "logback-classic")
-        exclude(group = "ch.qos.logback", module = "logback-core")
-        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
-    }
-}
+// 使用 Spring Boot 默認的 Logback logging
 
 dependencies {
     // ==================== Starter 依賴 ====================
@@ -89,11 +82,11 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
         // Exclude all environment directories first
-        exclude("dev/**", "test/**", "pre/**", "prod/**")
+        exclude("dev/**", "test/**", "pre/**", "prod/**", "supabase/**")
 
         // Include base resources (mapper/, banner.txt, etc.)
         from("src/main/resources") {
-            exclude("dev/**", "test/**", "pre/**", "prod/**")
+            exclude("dev/**", "test/**", "pre/**", "prod/**", "supabase/**")
         }
 
         // Include environment-specific resources with filtering

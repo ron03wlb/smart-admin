@@ -1,0 +1,35 @@
+# 11 Frontend
+
+> **Audience**: Architects, Frontend Developers, DevOps
+> **Status**: Index created - links to source/
+
+---
+
+## Core Architecture Documents
+
+| Document | Description | Source |
+|----------|-------------|--------|
+| [Frontend Layout Engine](../../source/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) | Layout engine architecture and component system | [source](../../source/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) |
+| [SEO and Performance](../../source/11_Frontend_CMS/11-03_SEO_and_Performance.md) | SEO optimization and performance strategies | [source](../../source/11_Frontend_CMS/11-03_SEO_and_Performance.md) |
+| [Mobile App Architecture](../../source/11_Frontend_CMS/11-04_Mobile_App_Architecture.md) | Mobile application architecture patterns | [source](../../source/11_Frontend_CMS/11-04_Mobile_App_Architecture.md) |
+
+## Localization Architecture
+
+| Document | Description | Source |
+|----------|-------------|--------|
+| [i18n Localization](../../source/11_Frontend_CMS/11-07_i18n_Localization.md) | Internationalization framework | [source](../../source/11_Frontend_CMS/11-07_i18n_Localization.md) |
+| [Dynamic Content Localization](../../source/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md) | Dynamic content translation system | [source](../../source/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md) |
+| [Localization Workflow](../../source/11_Frontend_CMS/11-09_Localization_Workflow.md) | Translation workflow and processes | [source](../../source/11_Frontend_CMS/11-09_Localization_Workflow.md) |
+| [Localization API](../../source/11_Frontend_CMS/11-10_Localization_API.md) | Localization API specifications | [source](../../source/11_Frontend_CMS/11-10_Localization_API.md) |
+
+## Content Management
+
+| Document | Description | Source |
+|----------|-------------|--------|
+| [Banner and Announcement](../../source/11_Frontend_CMS/11-02_Banner_and_Announcement.md) | Banner and announcement management | [source](../../source/11_Frontend_CMS/11-02_Banner_and_Announcement.md) |
+| [Marketing Compliance](../../source/11_Frontend_CMS/11-05_Marketing_Compliance.md) | Marketing content compliance | [source](../../source/11_Frontend_CMS/11-05_Marketing_Compliance.md) |
+| [A/B Testing Framework](../../source/11_Frontend_CMS/11-06_AB_Testing_Framework.md) | A/B testing framework architecture | [source](../../source/11_Frontend_CMS/11-06_AB_Testing_Framework.md) |
+
+---
+
+**Last Updated**: 2026-02-08

@@ -1,0 +1,860 @@
+# 04-03 活動風控與本地化 (Activity Risk Control & Localization)
+
+> **文檔定位**: 活動中心 P1 進階 - 風控機制與區域市場策略
+> **覆蓋範圍**: 玩家生命週期活動、區域本地化、風控反欺詐、數據驅動優化
+> **最後更新**: 2026-02-07
+> **拆分說明**: 原 04-01 文檔已拆分為 3 個獨立主題，本文檔專注於風控機制與區域市場策略
+
+---
+
+## 文檔導航
+
+**當前位置**: 04-03 活動風控與本地化（風控機制與區域市場策略）
+
+**相關文檔**:
+- **[← 返回活動中心索引](README.md)**
+- **[← 04-01 活動系統架構](../../archive/iGaming/deprecated/04-01_Activity_System_Design_v1.0.0.md)** - 系統架構與規則引擎設計
+- **[← 04-02 獎金計算引擎](04-02_Bonus_Calculation_Engine.md)** - 流水計算與多獎金衝突處理
+
+---
+
+## 概述
+
+本文檔提供活動系統的風控策略、區域市場本地化方案、數據驅動優化框架與實施建議。**關鍵發現：獎金濫用佔 iGaming 詐騙的 63.8%**，2022-2024 年詐騙率上升 64%，因此風控機制必須與活動系統深度整合。
+
+---
+
+## 玩家生命週期活動設計策略
+
+### 各階段活動框架
+
+|階段|目標|核心活動類型|關鍵指標|
+|---|---|---|---|
+|**拉新**|轉化註冊|首存獎勵、無存款獎勵|FTD 轉化率、CAC|
+|**激活**|首次體驗|任務系統、新手引導|首日留存、遊戲嘗試數|
+|**留存**|長期黏著|每日簽到、VIP、連續登入|MAU、流失率、LTV|
+|**召回**|喚醒流失|專屬回歸禮、限時優惠|召回成本、再存款率|
+
+### 首存獎勵設計最佳實踐
+
+**業界標準參數範圍：**
+
+|參數|低端|平均|高端|
+|---|---|---|---|
+|匹配比例|50%|100%|200%+|
+|最高金額|$100|$500|$2,000+|
+|流水倍數|15x|35x|50x|
+|完成期限|7 天|14 天|30 天|
+
+**進階首存包設計（多筆存款）：**
+
+- 首存：100% 最高 $500 + 50 免費旋轉
+- 二存：50% 最高 $300 + 30 免費旋轉
+- 三存：25% 最高 $200 + 20 免費旋轉
+
+### 返水/反水系統設計
+
+**損失型返水 vs 流水型返水：**
+
+|類型|計算基礎|典型比例|適用對象|
+|---|---|---|---|
+|損失型 Cashback|淨輸額|5-25%|休閒玩家|
+|流水型 Rebate|總投注額|0.2-0.8%|高頻玩家|
+|VIP Rakeback|投注額（分層）|10-25%|頂級 VIP|
+
+**返水計算公式：**
+
+```
+損失型：返水 = (總投注 - 總派彩) × 返水比例
+流水型：返水 = 總投注額 × 返水比例
+範例（流水型）：0.5% × $10,000 投注 = $50 返水
+```
+
+### VIP 階層系統設計
+
+**標準五級架構：**
+
+|等級|積分門檻|核心權益|
+|---|---|---|
+|銅牌|0|基礎返水、標準客服|
+|銀牌|1,000|10% 返水加成、生日禮金|
+|金牌|5,000|15% 返水、快速提款、專屬獎勵|
+|白金|20,000|20% 返水、VIP 經理、專屬活動|
+|鑽石|50,000|25% 返水、豪華禮品、旅遊獎勵|
+
+**進階 VIP 機制：**
+
+- **等級匹配**：匹配競爭對手的 VIP 等級
+- **負數不結轉**：上月未完成流水不影響本月
+- **專屬經理**：白金以上提供 24/7 專屬服務
+
+---
+
+## 區域市場本地化策略
+
+### 東南亞市場（泰國、越南、印尼、菲律賓、馬來西亞）
+
+**核心策略：移動優先 + 節慶驅動 + 遊戲化**
+
+**重要節慶活動日曆：**
+
+|節慶|時間|活動設計建議|
+|---|---|---|
+|農曆新年/Tet|1-2月|紅包獎勵、888 幸運數字、龍主題老虎機|
+|潑水節 Songkran|4月13-15日|「清涼」獎勵、水主題遊戲、刷新彩金|
+|開齋節|齋戒月後|慶祝獎勵、家庭團聚主題|
+|中秋節|8-9月|月餅主題、燈籠活動|
+
+**支付與技術要點：**
+
+- **支付**：GCash（菲）、PromptPay（泰）、電子錢包為主
+- **遊戲**：捕魚遊戲極受歡迎、真人娛樂為核心期待
+- **技術**：App 必須 <5MB、直式畫面設計、75%+ 收入來自移動端
+
+### 拉丁美洲市場（巴西、墨西哥、阿根廷、哥倫比亞）
+
+**核心策略：足球整合 + PIX 支付 + 低門檻**
+
+**足球是王道：** 81% 的巴西投注者偏好足球投注，活動必須深度整合當地聯賽（Liga MX、Copa Libertadores）與歐洲聯賽。
+
+**重要節慶：**
+
+|節慶|時間|活動設計|
+|---|---|---|
+|嘉年華|2-3月|派對主題、桑巴老虎機、延長促銷|
+|亡靈節|11月1-2日|骷髏/萬壽菊主題老虎機|
+|世界盃/美洲盃|定期|全區超級活動、支持國家隊|
+
+**巴西支付核心：** PIX 佔 iGaming 交易 81-90%，即時、免費、24/7 運作。**信用卡已被禁止**用於博彩交易。
+
+### 歐洲市場（英國、德國、西班牙、義大利）
+
+**核心策略：合規優先 + 負責任博彩整合**
+
+**英國 2026 年 1 月新規（重大變更）：**
+
+- **流水倍數上限 10x**（從 50x+ 大幅下調）
+- **禁止混合產品促銷**（不能將博彩+娛樂場合併為單一優惠）
+- **老虎機投注上限**：£5/旋（25歲以上）、£2/旋（18-24歲）
+- **財務脆弱性檢查**：30 天內淨存款 £500 觸發審查
+
+**德國限制：**
+
+- 老虎機每次旋轉**最高 €1**
+- 6am-9pm **禁止電視/網路廣告**
+- **禁止公開獎金促銷**
+
+**GDPR 營銷要求：**
+
+- 必須**明確同意 (opt-in)** 接收營銷
+- 按產品類型分開同意（博彩 vs 娛樂場）
+- 提供簡易退訂機制
+
+### 中國/華人市場
+
+**核心策略：幸運數字 + 紅包機制 + 社交分享**
+
+**重要節慶：**
+
+|節慶|活動設計|
+|---|---|
+|春節|紅包獎勵、888 彩金、龍鳳主題|
+|中秋節|月餅主題老虎機、團圓獎勵|
+|雙十一|購物節跨界促銷|
+|國慶黃金周|七日連續活動|
+
+**數字與顏色象徵：**
+
+- **幸運數字**：8（發）、88、888、9（長久）、6（順利）
+- **禁忌數字**：4（死）— 獎金金額絕對避免
+- **幸運顏色**：紅色（主色調）、金色（財富）
+- **禁忌**：白色/黑色組合（喪禮聯想）
+
+**遊戲偏好**：百家樂佔據絕對主導地位（澳門 95% 賭桌）、骰寶、麻將、龍虎。
+
+---
+
+## 風控與反欺詐機制設計
+
+**獎金濫用佔 iGaming 詐騙的 63.8%**，2022-2024 年詐騙率上升 64%。風控必須與活動系統深度整合。
+
+### 常見獎金濫用手法與防範
+
+|濫用類型|手法說明|檢測方法|
+|---|---|---|
+|多重帳號|使用不同身份重複領取歡迎獎勵|設備指紋、IP 關聯、行為分析|
+|獎金獵人|系統性鎖定低流水要求平台|投注模式分析、快速提款監控|
+|套利投注|跨平台對沖所有可能結果|異常賠率投注、多平台數據共享|
+|籌碼傾倒|撲克中故意輸給同夥帳號|同桌頻率分析、輸贏模式追蹤|
+
+### 多層風險評估系統
+
+```
+┌────────────────────────────────────────────────────┐
+│              多層風控架構                           │
+├────────────────────────────────────────────────────┤
+│                                                    │
+│  設備層 ──► 設備指紋、模擬器檢測、GPS 欺騙檢測      │
+│     ↓                                              │
+│  身份層 ──► KYC 驗證狀態、文件真實性、生物識別      │
+│     ↓                                              │
+│  行為層 ──► 投注模式、存取款行為、遊戲偏好          │
+│     ↓                                              │
+│  網絡層 ──► 已知欺詐者關聯、共享屬性檢測            │
+│     ↓                                              │
+│  綜合風險評分 ──► 實時決策                         │
+│                                                    │
+└────────────────────────────────────────────────────┘
+```
+
+### KYC 分層驗證策略
+
+|階段|觸發點|驗證內容|
+|---|---|---|
+|輕量 KYC|註冊時|Email/電話驗證、基本身份|
+|增強 KYC|首次存款|文件驗證、活體檢測|
+|完整 KYC|首次提款|資金來源、生物識別再驗證|
+|持續監控|全生命週期|行為異常檢測|
+
+### 負責任博彩整合要點
+
+活動系統必須尊重玩家設定的保護機制：
+
+- **存款限額檢查**：獎金激活前驗證不會超過玩家限額
+- **自我排除整合**：排除名單中的玩家禁止接收任何促銷
+- **冷卻期遵守**：暫停期間停止所有營銷通訊
+- **問題賭博識別**：當觸發風險指標時自動停止促銷推送
+
+---
+
+## 獎金套利檢測系統 (Bonus Abuse Detection) - v1.1.0 新增
+
+### 概述
+
+獎金套利 (Bonus Arbitrage / Bonus Abuse) 是 iGaming 行業最大的欺詐類型，佔所有詐騙的 **63.8%**。本章節詳細說明套利檢測的技術實現。
+
+### 常見套利模式分析
+
+```yaml
+套利模式分類:
+
+  1. 多帳戶套利 (Multi-Account):
+     手法:
+       - 同一人使用多個身份註冊
+       - 每個帳戶領取首存獎勵
+       - 完成最低流水後提款
+     檢測:
+       - 設備指紋關聯
+       - IP 地址分析
+       - 銀行帳戶重複
+     詳細實現: → [05-02-05 多帳戶檢測](../05_Risk_Control/05-02-05_Multi_Account_Detection.md)
+
+  2. 配對投注 (Matched Betting):
+     手法:
+       - 在 A 平台投注「主隊勝」(使用獎金)
+       - 在 B 平台投注「客隊勝或平」(使用現金)
+       - 無論結果如何都能獲利
+     檢測:
+       - 異常投注時機 (開賽前)
+       - 高賠率低風險投注
+       - 快速完成流水後立即提款
+
+  3. 獎金獵人 (Bonus Hunter):
+     手法:
+       - 專門尋找低流水倍數活動
+       - 使用最優策略完成流水
+       - 完成後立即提款，不再活躍
+     檢測:
+       - 玩家行為模式分析
+       - 活動參與 → 流水完成 → 提款時間極短
+       - 缺乏自然遊戲行為
+
+  4. 籌碼傾倒 (Chip Dumping):
+     手法:
+       - P2P 遊戲中故意輸給同夥
+       - 將獎金餘額轉移給主帳戶
+     檢測:
+       - 同桌頻率分析
+       - 輸贏模式異常
+       - 玩家關聯圖分析
+```
+
+### 配對投注檢測
+
+```java
+/**
+ * 配對投注檢測服務
+ * SmartAdmin 架構: Service 層
+ */
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class MatchedBettingDetectionService {
+
+    private final BetHistoryDao betHistoryDao;
+    private final RiskProposalManager riskProposalManager;
+
+    /**
+     * 檢測配對投注模式
+     */
+    public MatchedBettingAnalysis analyzePlayer(Long playerId, LocalDate startDate) {
+        MatchedBettingAnalysis analysis = new MatchedBettingAnalysis(playerId);
+
+        // 1. 獲取獎金投注歷史
+        List<BetHistoryEntity> bonusBets = betHistoryDao
+            .selectByPlayerIdAndWalletType(playerId, WalletType.BONUS, startDate);
+
+        for (BetHistoryEntity bet : bonusBets) {
+            // 2. 檢測可疑特徵
+            MatchedBettingIndicator indicator = analyzebet(bet);
+
+            if (indicator.getRiskScore() >= 70) {
+                analysis.addSuspiciousBet(bet, indicator);
+            }
+        }
+
+        // 3. 計算綜合風險分數
+        analysis.calculateOverallRisk();
+
+        return analysis;
+    }
+
+    private MatchedBettingIndicator analyzebet(BetHistoryEntity bet) {
+        MatchedBettingIndicator indicator = new MatchedBettingIndicator();
+
+        // 指標 1: 投注時機 (開賽前 15 分鐘內)
+        if (isPreMatchWindow(bet.getMatchStartTime(), bet.getBetTime())) {
+            indicator.addFlag("PRE_MATCH_TIMING", 20);
+        }
+
+        // 指標 2: 賠率異常 (高賠率但低風險)
+        if (isHighOddsLowRisk(bet)) {
+            indicator.addFlag("HIGH_ODDS_LOW_RISK", 30);
+        }
+
+        // 指標 3: 投注金額接近限額
+        if (isNearMaxBet(bet)) {
+            indicator.addFlag("NEAR_MAX_BET", 15);
+        }
+
+        // 指標 4: 快速流水完成
+        if (isRapidTurnover(bet.getPlayerId())) {
+            indicator.addFlag("RAPID_TURNOVER", 25);
+        }
+
+        // 指標 5: 缺乏娛樂投注
+        if (lacksRecreationalBetting(bet.getPlayerId())) {
+            indicator.addFlag("NO_RECREATIONAL", 20);
+        }
+
+        indicator.calculateRiskScore();
+        return indicator;
+    }
+
+    /**
+     * 檢測快速流水完成模式
+     */
+    private boolean isRapidTurnover(Long playerId) {
+        // 計算獎金領取到流水完成的時間
+        BonusClaimHistory claim = bonusClaimDao.selectLatestClaim(playerId);
+        if (claim == null || claim.getCompletedAt() == null) {
+            return false;
+        }
+
+        long hoursToComplete = ChronoUnit.HOURS.between(
+            claim.getClaimedAt(),
+            claim.getCompletedAt()
+        );
+
+        // 12 小時內完成 35x 流水 = 高度可疑
+        return hoursToComplete < 12 &&
+               claim.getWageringMultiplier() >= 35;
+    }
+}
+```
+
+### 獎金獵人檢測
+
+```yaml
+獎金獵人行為特徵:
+
+  註冊模式:
+    - 僅在有獎金活動時註冊
+    - 使用 bonus code 或 affiliate link
+    - 註冊時間與活動發布時間高度相關
+
+  存款模式:
+    - 僅存款剛好達到最低要求
+    - 存款後立即激活獎金
+    - 無後續存款行為
+
+  投注模式:
+    - 選擇 RTP 最高的遊戲
+    - 投注金額接近最低要求
+    - 無娛樂性投注 (小額、高風險)
+    - 無遊戲探索行為
+
+  提款模式:
+    - 流水完成後立即申請提款
+    - 提款後帳戶沉寂
+    - 無回頭存款
+
+  風險評分公式:
+    Score = (DepositPattern × 0.2) +
+            (BettingPattern × 0.3) +
+            (WithdrawalPattern × 0.3) +
+            (AccountActivity × 0.2)
+```
+
+```java
+/**
+ * 獎金獵人檢測服務
+ */
+@Service
+@RequiredArgsConstructor
+public class BonusHunterDetectionService {
+
+    /**
+     * 計算玩家獎金獵人風險分數
+     */
+    public BonusHunterRiskScore calculateRiskScore(Long playerId) {
+        BonusHunterRiskScore score = new BonusHunterRiskScore(playerId);
+
+        // 1. 存款模式分析 (權重 20%)
+        DepositPattern depositPattern = analyzeDepositPattern(playerId);
+        score.setDepositScore(depositPattern.getScore());
+
+        // 2. 投注模式分析 (權重 30%)
+        BettingPattern bettingPattern = analyzeBettingPattern(playerId);
+        score.setBettingScore(bettingPattern.getScore());
+
+        // 3. 提款模式分析 (權重 30%)
+        WithdrawalPattern withdrawalPattern = analyzeWithdrawalPattern(playerId);
+        score.setWithdrawalScore(withdrawalPattern.getScore());
+
+        // 4. 帳戶活動分析 (權重 20%)
+        AccountActivity activity = analyzeAccountActivity(playerId);
+        score.setActivityScore(activity.getScore());
+
+        // 計算綜合分數
+        score.calculateTotal();
+
+        return score;
+    }
+
+    private BettingPattern analyzeBettingPattern(Long playerId) {
+        BettingPattern pattern = new BettingPattern();
+
+        // 檢查遊戲選擇
+        List<GamePlayStats> gameStats = betHistoryDao
+            .getGamePlayStatsByPlayer(playerId);
+
+        // 計算 RTP 偏好分數
+        double avgRtp = gameStats.stream()
+            .mapToDouble(s -> s.getRtp() * s.getPlayCount())
+            .sum() / gameStats.stream().mapToInt(GamePlayStats::getPlayCount).sum();
+
+        if (avgRtp > 97.0) {
+            pattern.addFlag("HIGH_RTP_PREFERENCE", 30);
+        }
+
+        // 檢查投注金額模式
+        List<BigDecimal> betAmounts = betHistoryDao
+            .getBetAmountsByPlayer(playerId);
+
+        double variance = calculateVariance(betAmounts);
+        if (variance < 10.0) {
+            // 投注金額極度一致 = 機械化行為
+            pattern.addFlag("UNIFORM_BET_AMOUNTS", 25);
+        }
+
+        // 檢查遊戲探索多樣性
+        if (gameStats.size() < 3) {
+            pattern.addFlag("LOW_GAME_DIVERSITY", 20);
+        }
+
+        pattern.calculateScore();
+        return pattern;
+    }
+}
+```
+
+### 即時檢測規則
+
+```yaml
+即時阻斷規則 (BLOCK):
+
+  1. 多帳戶強關聯:
+     條件: 同設備 + 同銀行帳戶
+     動作: 阻止獎金激活
+     代碼: BLOCK_MULTI_ACCOUNT
+
+  2. 已知獎金獵人:
+     條件: 風險分數 ≥90
+     動作: 阻止獎金激活
+     代碼: BLOCK_BONUS_HUNTER
+
+  3. 黑名單銀行:
+     條件: 銀行帳戶在黑名單中
+     動作: 阻止存款和獎金
+     代碼: BLOCK_BLACKLISTED_BANK
+
+延遲檢測規則 (FLAG):
+
+  1. 快速流水完成:
+     條件: 流水完成時間 < 預期 50%
+     動作: 提款時人工審核
+     代碼: FLAG_RAPID_TURNOVER
+
+  2. 配對投注嫌疑:
+     條件: 3+ 個可疑指標
+     動作: 標記待審核
+     代碼: FLAG_MATCHED_BETTING
+
+  3. 獎金獵人嫌疑:
+     條件: 風險分數 60-89
+     動作: 限制未來獎金
+     代碼: FLAG_BONUS_HUNTER_SUSPECT
+```
+
+### 處置流程
+
+```mermaid
+stateDiagram-v2
+    [*] --> BonusClaimed: 玩家領取獎金
+
+    BonusClaimed --> RealTimeCheck: 即時風控檢查
+    RealTimeCheck --> Blocked: 觸發阻斷規則
+    RealTimeCheck --> Flagged: 觸發標記規則
+    RealTimeCheck --> Normal: 通過檢查
+
+    Blocked --> [*]: 獎金取消
+
+    Flagged --> TurnoverTracking: 流水追蹤
+    TurnoverTracking --> WithdrawalReview: 提款審核
+    WithdrawalReview --> Approved: 審核通過
+    WithdrawalReview --> Forfeited: 獎金沒收
+
+    Normal --> TurnoverCompleted: 流水完成
+    TurnoverCompleted --> BonusConverted: 獎金轉現金
+
+    Approved --> [*]
+    Forfeited --> [*]
+    BonusConverted --> [*]
+
+    note right of Blocked
+        即時阻斷
+        無需人工介入
+    end note
+
+    note right of WithdrawalReview
+        人工審核
+        24小時內完成
+    end note
+```
+
+### 獎金沒收規則
+
+```yaml
+獎金沒收條件:
+
+  自動沒收 (無需審核):
+    - 確認多帳戶違規
+    - 配對投注證據確鑿
+    - 違反活動條款 (遊戲限制等)
+
+  審核後沒收:
+    - 獎金獵人行為確認
+    - AML 調查相關
+    - 異常投注模式
+
+  資金處理:
+    獎金餘額: 全額沒收
+    現金餘額: 保留 (除非涉及 AML)
+    待處理投注:
+      - 使用獎金: 取消並沒收
+      - 使用現金: 正常結算
+
+  通知玩家:
+    - 發送沒收通知郵件
+    - 說明違規原因
+    - 提供申訴渠道
+    - 保留審計記錄
+```
+
+### 監控指標
+
+| 指標 | 計算方式 | 告警閾值 | 說明 |
+|------|---------|---------|------|
+| `bonus_abuse_rate` | 沒收數 / 領取數 | >5% | 獎金濫用率 |
+| `matched_betting_detected` | 檢測案例 / 日 | >10 | 配對投注檢測 |
+| `bonus_hunter_score_avg` | 平均風險分數 | >50 | 獎金獵人風險 |
+| `turnover_completion_time_avg` | 平均完成時間 | <24h | 異常快速完成 |
+| `bonus_roi` | 增量NGR / 獎金成本 | <1.0 | 獎金投資回報 |
+
+### 數據表結構
+
+```sql
+-- 獎金風險評估表
+CREATE TABLE t_bonus_risk_assessment (
+    id                      BIGINT PRIMARY KEY,
+    player_id               BIGINT NOT NULL,
+    bonus_id                BIGINT NOT NULL,
+    assessment_type         VARCHAR(32) NOT NULL,  -- CLAIM, TURNOVER, WITHDRAWAL
+    risk_score              INT NOT NULL,
+    risk_level              VARCHAR(16) NOT NULL,  -- LOW, MEDIUM, HIGH, CRITICAL
+    indicators              JSONB NOT NULL,
+    decision                VARCHAR(32) NOT NULL,  -- ALLOW, BLOCK, FLAG
+    decision_reason         VARCHAR(256),
+    reviewed_by             BIGINT,
+    reviewed_at             TIMESTAMP,
+    created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_player_bonus (player_id, bonus_id),
+    INDEX idx_risk_level (risk_level, created_at)
+);
+
+-- 配對投注檢測記錄表
+CREATE TABLE t_matched_betting_detection (
+    id                      BIGINT PRIMARY KEY,
+    player_id               BIGINT NOT NULL,
+    bet_id                  BIGINT NOT NULL,
+    match_id                VARCHAR(64) NOT NULL,
+    detection_indicators    JSONB NOT NULL,
+    risk_score              INT NOT NULL,
+    status                  VARCHAR(32) DEFAULT 'PENDING',
+    reviewed_by             BIGINT,
+    reviewed_at             TIMESTAMP,
+    action_taken            VARCHAR(64),
+    created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_player_detection (player_id, created_at DESC),
+    INDEX idx_status (status)
+);
+
+-- 獎金沒收記錄表
+CREATE TABLE t_bonus_forfeiture (
+    id                      BIGINT PRIMARY KEY,
+    player_id               BIGINT NOT NULL,
+    bonus_id                BIGINT NOT NULL,
+    forfeiture_reason       VARCHAR(64) NOT NULL,
+    forfeited_amount        DECIMAL(18,2) NOT NULL,
+    cash_retained           DECIMAL(18,2) NOT NULL,
+    pending_bets_cancelled  INT DEFAULT 0,
+    evidence                JSONB,
+    forfeited_by            BIGINT NOT NULL,
+    forfeited_at            TIMESTAMP NOT NULL,
+    player_notified_at      TIMESTAMP,
+    appeal_deadline         TIMESTAMP,
+    appeal_status           VARCHAR(32),
+    created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_player_forfeiture (player_id, forfeited_at DESC)
+);
+```
+
+---
+
+## 數據驅動的活動優化框架
+
+### 核心 KPI 指標體系
+
+**獲客指標：**
+
+|指標|公式|用途|
+|---|---|---|
+|玩家獲取率 (PAR)|新玩家 ÷ 獨立訪客 × 100|轉化效率|
+|首存轉化率 (FTD)|首存玩家 ÷ 註冊數 × 100|激活效率|
+|獲客成本 (CAC)|營銷總支出 ÷ 新客數|成本效益|
+
+**營收指標：**
+
+|指標|公式|說明|
+|---|---|---|
+|毛博彩收入 (GGR)|總投注 - 總派彩|頂線收入|
+|淨博彩收入 (NGR)|GGR - 獎金 - 稅費|真實利潤|
+|玩家終身價值 (LTV)|預測總收入|1% 玩家 = 40% GGR|
+
+**活動專屬指標：**
+
+|指標|說明|
+|---|---|
+|獎金清償率|成功完成流水的獎金比例|
+|獎金率|獎金支出 ÷ 總存款|
+|獎金玩家佔比|使用獎金的活躍玩家比例|
+|獎金 ROI|(增量 NGR - 獎金成本) ÷ 獎金成本|
+
+### A/B 測試框架
+
+**可測試元素：**
+
+- 獎金金額與結構
+- 流水倍數
+- 促銷文案與 CTA
+- 落地頁設計
+- Email 標題與發送時間
+- 獎金解鎖機制
+
+**測試最佳實踐：**
+
+1. 定義清晰、可量測的目標
+2. 一次只測試一個變量
+3. 確保足夠樣本量達統計顯著性
+4. 運行足夠長時間涵蓋週期變化
+5. 同時追蹤短期（轉化）與長期（LTV）指標
+
+---
+
+## 活動模板庫設計參考
+
+### 存款獎勵模板
+
+```json
+{
+  "templateId": "DEPOSIT_BONUS_V1",
+  "name": "標準存款獎勵",
+  "category": "DEPOSIT",
+  "configSchema": {
+    "matchPercentage": { "type": "number", "min": 10, "max": 500 },
+    "maxBonus": { "type": "number", "min": 10 },
+    "minDeposit": { "type": "number", "min": 1 },
+    "wageringMultiplier": { "type": "number", "min": 1, "max": 100 },
+    "validDays": { "type": "integer", "min": 1, "max": 90 }
+  },
+  "defaultValues": {
+    "matchPercentage": 100,
+    "wageringMultiplier": 30,
+    "validDays": 14
+  }
+}
+```
+
+### 每日簽到模板
+
+```json
+{
+  "templateId": "DAILY_LOGIN_V1",
+  "name": "連續簽到獎勵",
+  "category": "ENGAGEMENT",
+  "configSchema": {
+    "rewards": {
+      "type": "array",
+      "items": {
+        "day": "integer",
+        "rewardType": "enum[CASH, BONUS, FREE_SPINS, POINTS]",
+        "amount": "number"
+      }
+    },
+    "streakReset": { "type": "boolean" },
+    "maxStreak": { "type": "integer" }
+  }
+}
+```
+
+### 排行榜活動模板
+
+```json
+{
+  "templateId": "LEADERBOARD_V1",
+  "name": "競賽排行榜",
+  "category": "TOURNAMENT",
+  "configSchema": {
+    "scoringMethod": {
+      "type": "enum",
+      "options": ["MULTIPLIER", "TOTAL_WAGER", "BIGGEST_WIN", "POINTS"]
+    },
+    "prizePool": { "type": "number" },
+    "prizeDistribution": {
+      "type": "array",
+      "items": { "rank": "integer", "percentage": "number" }
+    },
+    "eligibleGames": { "type": "array", "items": "gameId" },
+    "duration": { "type": "enum", "options": ["DAILY", "WEEKLY", "MONTHLY"] }
+  }
+}
+```
+
+---
+
+## 動態配置與審批 (Dynamic Config & Approval)
+
+為確保活動運營靈活性與資金安全，系統內所有規則必須可配置，且關鍵變更需經審批。
+
+### 1. 動態配置項 (Dynamic Configuration)
+
+- **硬編碼禁止**：嚴禁將 "Deposit > 100" 或 "Bonus = 50%" 等規則寫死在代碼中。所有變數必須來自後台配置。
+- **可配置範疇**：
+  - **觸發條件**：存款金額、流水倍數、遊戲列表、有效時間。
+  - **獎勵參數**：紅利百分比、最大上限、派發錢包類型。
+  - **客群定向**：適用國家、VIP 等級、排除名單。
+
+### 2. 審批工作流 (Approval Workflow)
+
+- **活動發布審批**：
+  - **Maker**：運營人員創建活動草稿 (Draft)，配置所有參數。
+  - **Checker**：運營主管或財務 (視預算規模) 複核活動成本與條款。
+  - **Action**：批准後，活動狀態轉為 "Ready/Active"。
+- **敏感變更審批**：
+  - **定義**：若活動進行中需 "增加預算" 或 "降低流水要求"，視為高風險操作。
+  - **流程**：需觸發二級審批 (財務總監或更高層級)，確保變更不會導致預算失控。
+
+---
+
+## 實施優先順序建議
+
+### 第一階段：核心基礎（1-3 個月）
+
+1. 規則引擎框架與基礎活動模板
+2. 多租戶活動隔離機制
+3. 統一流水追蹤服務
+4. 基礎 KYC 與風控整合
+
+### 第二階段：功能擴展（3-6 個月）
+
+1. 事件驅動即時觸發
+2. VIP 階層系統
+3. 返水/返傭自動化
+4. 排行榜與錦標賽功能
+
+### 第三階段：智能優化（6-12 個月）
+
+1. A/B 測試平台
+2. AI 驅動的玩家分群
+3. 個性化活動推薦
+4. 預測性分析與 LTV 建模
+
+### 關鍵成功因素
+
+- **從模板開始**：先建立常見活動類型的標準模板
+- **事件優先設計**：所有玩家行為從第一天就以事件形式記錄
+- **Schema 驗證**：所有配置使用 JSON Schema 驗證
+- **冪等操作**：分散式處理中的關鍵保障
+- **全面審計**：不可變日誌確保合規
+- **區域合規**：歐洲市場的負責任博彩不是選項，是必要條件
+
+---
+
+## 相關文檔
+
+### 核心依賴
+- [02-06 統一錢包模型](../02_Finance_Center/02-06_Wallet_Architecture.md) - Bonus 錢包整合、可下注餘額計算
+- [02-04 流水計算與對帳](../02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 流水驗證架構（Layer 2）
+- [05-01 風控系統](../05_Risk_Control/05-01_Risk_Framework.md) - 紅利濫用檢測、多帳號風控
+
+### 業務整合
+- [04-00 活動中心索引](README.md) - 模塊導航
+- [04-02 獎金計算引擎](04-02_Bonus_Calculation_Engine.md) - 流水計算
+- [01-06 VIP 系統](../01_Player_Center/01-06_VIP_Loyalty.md) - VIP 專屬活動、等級權益
+- [01-05 出金風控](../01_Player_Center/01-05_Withdrawal_Risk.md) - 流水未達標提款限制
+- [06-04 審批工作流系統](../06_Platform_Governance/06-04_Approval_Workflow.md) - 活動發布 Maker-Checker 審批
+
+### 技術參考
+- [10-03 通知架構](../10_Platform_Management/10-03_Notification_Architecture.md) - 活動推送通知
+- [03-02 遊戲大廳管理](../03_Game_Center/03-02_Game_Lobby_Management.md) - 活動遊戲標籤推薦
+- [11-02 Banner 與公告](../11_Frontend_CMS/11-02_Banner_&_Announcement.md) - 活動橫幅配置
+
+---
+
+**文檔版本**: 1.1.0
+**創建日期**: 2026-02-07
+**維護團隊**: Activity Team & Product Team
