@@ -158,3 +158,131 @@ Compared to unencrypted write (~0.2ms): **2.8x overhead** (acceptable).
 | **GDPR** | PII irreversible encryption | Compliant (one-way hash) |
 | **PCI-DSS** | Bank account hashed/truncated | Compliant (HMAC) |
 | **CCPA** | Searchable for Data Subject Request | Compliant (index lookup) |
+
+## 10. BlindIndexService Java Implementation
+
+### 10.1 HMAC-SHA256 Index Generation
+
+```java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * Generates deterministic blind indexes using HMAC-SHA256.
+ * Thread-safe: Mac instances are created per invocation.
+ */
+public class BlindIndexService {
+
+    private static final String HMAC_ALGORITHM = "HmacSHA256";
+    private final byte[] blindIndexKey;
+
+    public BlindIndexService(byte[] blindIndexKey) {
+        if (blindIndexKey.length < 32) {
+            throw new IllegalArgumentException(
+                "Blind index key must be at least 256 bits");
+        }
+        this.blindIndexKey = blindIndexKey.clone();
+    }
+
+    /**
+     * Generate a blind index for the given plaintext PII value.
+     * Output is a 64-character lowercase hex string.
+     */
+    public String generateIndex(String plaintext) {
+        try {
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            SecretKeySpec keySpec = new SecretKeySpec(
+                blindIndexKey, HMAC_ALGORITHM);
+            mac.init(keySpec);
+
+            byte[] hash = mac.doFinal(
+                plaintext.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(hash);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Blind index generation failed", e);
+        }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}
+```
+
+### 10.2 MyBatis Mapper for Blind Index Queries
+
+```xml
+<!-- PlayerMapper.xml -->
+<mapper namespace="net.lab1024.sa.business.player.dao.PlayerMapper">
+
+    <!-- Exact match via blind index (O(1) with B-Tree) -->
+    <select id="findByPhoneIndex" resultType="PlayerEntity">
+        SELECT id, encrypted_phone, encrypted_email, encrypted_name,
+               phone_index, email_index, status, created_at
+        FROM t_player
+        WHERE phone_index = #{phoneIndex}
+          AND deleted = 0
+    </select>
+
+    <!-- Duplicate check across multiple PII indexes -->
+    <select id="checkDuplicatePii" resultType="int">
+        SELECT COUNT(1)
+        FROM t_player
+        WHERE (phone_index = #{phoneIndex}
+            OR email_index = #{emailIndex})
+          AND deleted = 0
+    </select>
+
+    <!-- Batch re-index during key rotation (Phase 3) -->
+    <update id="batchUpdateBlindIndex">
+        UPDATE t_player
+        SET phone_index = #{newPhoneIndex},
+            email_index = #{newEmailIndex},
+            updated_at = NOW()
+        WHERE id = #{playerId}
+    </update>
+
+</mapper>
+```
+
+### 10.3 Search Flow Diagram
+
+```mermaid
+flowchart TD
+    A[CS Agent enters<br/>phone number] --> B[Backend: BlindIndexService<br/>.generateIndex phone]
+    B --> C[Computed index:<br/>a3f8d9e2c1b4...]
+    C --> D[MyBatis: findByPhoneIndex<br/>WHERE phone_index = ?]
+    D --> E{Match found?}
+    E -->|Yes| F[Decrypt encrypted_phone<br/>via AesGcmEncryptionService]
+    F --> G[Apply data masking<br/>based on agent role]
+    G --> H[Return masked result<br/>to CS interface]
+    E -->|No| I[Return: Player not found]
+```
+
+### 10.4 Database Schema (DDL)
+
+```sql
+CREATE TABLE t_player (
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
+    encrypted_name  VARCHAR(512)  NOT NULL COMMENT 'AES-256-GCM encrypted name',
+    encrypted_phone VARCHAR(512)  NOT NULL COMMENT 'AES-256-GCM encrypted phone',
+    encrypted_email VARCHAR(512)  NOT NULL COMMENT 'AES-256-GCM encrypted email',
+    phone_index     CHAR(64)      NOT NULL COMMENT 'HMAC-SHA256 blind index for phone',
+    email_index     CHAR(64)      NOT NULL COMMENT 'HMAC-SHA256 blind index for email',
+    id_number_index CHAR(64)      NULL     COMMENT 'HMAC-SHA256 blind index for ID number',
+    status          TINYINT       NOT NULL DEFAULT 1 COMMENT '1=active, 0=disabled',
+    deleted         TINYINT       NOT NULL DEFAULT 0,
+    created_at      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE INDEX uk_phone_index (phone_index),
+    UNIQUE INDEX uk_email_index (email_index),
+    INDEX idx_id_number_index (id_number_index)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player PII with blind index';
+```

@@ -147,3 +147,122 @@ public class CryptoAMLService {
 | UK | Cautious | Full AML required |
 | Malta | Allowed | Regulatory framework required |
 | Curacao | Allowed | More relaxed |
+
+## 6. Transaction Screening Flow
+
+```mermaid
+flowchart TD
+    A[Deposit / Withdrawal Request] --> B{Jurisdiction<br/>Check}
+    B -->|Blocked Region| C[Reject: REGION_BLOCKED]
+    B -->|Allowed| D{Payment Method<br/>Allowed?}
+    D -->|Not Allowed| E[Reject: METHOD_BLOCKED]
+    D -->|Allowed| F{Velocity<br/>Check}
+    F -->|Exceeded| G[Reject: VELOCITY_EXCEEDED]
+    F -->|Pass| H{AML<br/>Screening}
+    H -->|Flagged| I[Hold for Manual Review]
+    H -->|Clear| J{Amount<br/>Threshold?}
+    J -->|Above Threshold| K[Enhanced Due Diligence]
+    J -->|Below Threshold| L[Approve Transaction]
+    K --> L
+
+    style C fill:#FF5252,color:#fff
+    style E fill:#FF5252,color:#fff
+    style G fill:#FF9800,color:#fff
+    style I fill:#FFC107
+    style L fill:#4CAF50,color:#fff
+```
+
+## 7. Velocity Check Implementation
+
+```java
+@Service
+@RequiredArgsConstructor
+public class VelocityCheckService {
+
+    private final RedissonClient redissonClient;
+    private final VelocityRuleDao velocityRuleDao;
+
+    /**
+     * Check deposit/withdrawal velocity against configurable thresholds.
+     * Uses Redis sliding window counters per player per action.
+     */
+    public VelocityCheckResult checkVelocity(Long playerId, String action, BigDecimal amount) {
+        List<VelocityRule> rules = velocityRuleDao.selectByAction(action);
+
+        for (VelocityRule rule : rules) {
+            String key = String.format("velocity:%s:%d:%s", action, playerId, rule.getWindow());
+            RAtomicLong counter = redissonClient.getAtomicLong(key + ":count");
+            RAtomicLong totalAmount = redissonClient.getAtomicLong(key + ":amount");
+
+            // Check transaction count limit
+            if (counter.get() >= rule.getMaxCount()) {
+                return VelocityCheckResult.exceeded(
+                    "MAX_COUNT_EXCEEDED",
+                    String.format("Max %d transactions per %s", rule.getMaxCount(), rule.getWindow())
+                );
+            }
+
+            // Check cumulative amount limit
+            if (totalAmount.get() + amount.longValue() > rule.getMaxAmount().longValue()) {
+                return VelocityCheckResult.exceeded(
+                    "MAX_AMOUNT_EXCEEDED",
+                    String.format("Max %s per %s", rule.getMaxAmount(), rule.getWindow())
+                );
+            }
+
+            // Increment counters with TTL matching the window
+            counter.incrementAndGet();
+            counter.expire(Duration.ofSeconds(rule.getWindowSeconds()));
+            totalAmount.addAndGet(amount.longValue());
+            totalAmount.expire(Duration.ofSeconds(rule.getWindowSeconds()));
+        }
+
+        return VelocityCheckResult.passed();
+    }
+}
+```
+
+### Velocity Rule Configuration
+
+| Window | Max Count | Max Amount (USD) | Action | Notes |
+|--------|-----------|-----------------|--------|-------|
+| 1 hour | 5 | 2,000 | Deposit | Standard player |
+| 24 hours | 15 | 10,000 | Deposit | Standard player |
+| 7 days | 50 | 50,000 | Deposit | Standard player |
+| 1 hour | 3 | 5,000 | Withdrawal | Standard player |
+| 24 hours | 5 | 20,000 | Withdrawal | Standard player |
+| 1 hour | 20 | 50,000 | Deposit | VIP player |
+| 24 hours | 50 | 200,000 | Deposit | VIP player |
+
+## 8. Jurisdiction-Based Payment Rules
+
+```sql
+CREATE TABLE t_jurisdiction_payment_rule (
+    id              BIGSERIAL PRIMARY KEY,
+    jurisdiction    VARCHAR(10) NOT NULL,
+    payment_method  VARCHAR(50) NOT NULL,
+    allowed         BOOLEAN NOT NULL DEFAULT TRUE,
+    min_amount      DECIMAL(18,2),
+    max_amount      DECIMAL(18,2),
+    requires_kyc    VARCHAR(20) DEFAULT 'BASIC',
+    effective_from  TIMESTAMP NOT NULL,
+    effective_to    TIMESTAMP,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(jurisdiction, payment_method, effective_from)
+);
+
+-- UK: Block credit cards, allow debit
+INSERT INTO t_jurisdiction_payment_rule (jurisdiction, payment_method, allowed, effective_from)
+VALUES ('UK', 'CREDIT_CARD', FALSE, '2020-04-14');
+INSERT INTO t_jurisdiction_payment_rule (jurisdiction, payment_method, allowed, min_amount, max_amount, effective_from)
+VALUES ('UK', 'DEBIT_CARD', TRUE, 5.00, 10000.00, '2020-04-14');
+
+-- Brazil: PIX mandatory, low minimum
+INSERT INTO t_jurisdiction_payment_rule (jurisdiction, payment_method, allowed, min_amount, max_amount, effective_from)
+VALUES ('BR', 'PIX', TRUE, 1.00, 50000.00, '2024-01-01');
+```
+
+---
+
+<!-- End of Document -->

@@ -109,8 +109,226 @@ flowchart LR
 
 ---
 
-## 相關文檔
+## 7. Validation Pipeline Architecture
 
-- [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - 多主體 Token 安全
-- [OAuth Refresh Token](./OAuth_Refresh_Token.md) - OAuth Refresh Token
-- [Authentication Architecture](./Authentication_Architecture.md) - 認證架構
+```mermaid
+flowchart TD
+    A[Incoming Request<br/>with Token] --> B[Extract Token<br/>from Header]
+    B --> C{Token Format<br/>Valid?}
+    C -->|No| D[400 TOKEN_MALFORMED]
+    C -->|Yes| E{L1 Cache<br/>Caffeine Lookup}
+    E -->|Hit| F[Return Cached<br/>ValidationResult]
+    E -->|Miss| G{L2 Cache<br/>Redis Lookup}
+    G -->|Hit| H[Populate L1<br/>Return Result]
+    G -->|Miss| I{Detect Token Type}
+
+    I -->|JWT| J[JWT Signature<br/>Verification]
+    I -->|Opaque| K[Redis Session<br/>Lookup]
+    I -->|HMAC| L[HMAC Signature<br/>Recomputation]
+
+    J --> M{Signature<br/>Valid?}
+    K --> M
+    L --> M
+    M -->|No| N[401 TOKEN_INVALID_SIGNATURE]
+    M -->|Yes| O{Check Blacklist}
+    O -->|Blacklisted| P[401 TOKEN_BLACKLISTED]
+    O -->|Clear| Q{Check Expiry}
+    Q -->|Expired| R[401 TOKEN_EXPIRED]
+    Q -->|Valid| S[Build ValidationResult]
+    S --> T[Write to L1 + L2 Cache]
+    T --> U[Return ValidationResult]
+
+    style D fill:#FF5252,color:#fff
+    style N fill:#FF5252,color:#fff
+    style P fill:#FF5252,color:#fff
+    style R fill:#FF5252,color:#fff
+    style F fill:#4CAF50,color:#fff
+    style U fill:#4CAF50,color:#fff
+```
+
+## 8. Token Validation Service Implementation
+
+```java
+@Service
+@RequiredArgsConstructor
+public class TokenValidationService {
+
+    private final Cache<String, ValidationResult> l1Cache;  // Caffeine
+    private final RedissonClient redissonClient;
+    private final JwtTokenValidator jwtValidator;
+    private final HmacTokenValidator hmacValidator;
+    private final TokenBlacklistDao tokenBlacklistDao;
+
+    /**
+     * Validate token with 3-tier cache strategy.
+     * L1 (Caffeine): ~1ms, L2 (Redis): ~5ms, L3 (DB): ~50ms
+     */
+    public ValidationResult validate(TokenValidationRequest request) {
+        String token = request.getToken();
+
+        // L1: Caffeine local cache
+        ValidationResult cached = l1Cache.getIfPresent(token);
+        if (cached != null) {
+            return cached;
+        }
+
+        // L2: Redis distributed cache
+        RBucket<ValidationResult> bucket = redissonClient.getBucket(
+            "token:validated:" + hashToken(token)
+        );
+        cached = bucket.get();
+        if (cached != null) {
+            l1Cache.put(token, cached);
+            return cached;
+        }
+
+        // L3: Full validation pipeline
+        ValidationResult result = performFullValidation(token);
+
+        // Populate caches on success
+        if (result.isValid()) {
+            long ttlSeconds = result.getRemainingTtlSeconds();
+            l1Cache.put(token, result);
+            bucket.set(result, Duration.ofSeconds(Math.min(ttlSeconds, 300)));
+        }
+
+        return result;
+    }
+
+    private ValidationResult performFullValidation(String token) {
+        TokenType type = TokenTypeDetector.detect(token);
+
+        return switch (type) {
+            case JWT -> jwtValidator.validate(token);
+            case OPAQUE -> validateOpaqueToken(token);
+            case HMAC -> hmacValidator.validate(token);
+        };
+    }
+
+    private ValidationResult validateOpaqueToken(String token) {
+        RBucket<TokenSession> session = redissonClient.getBucket("session:" + token);
+        TokenSession data = session.get();
+        if (data == null) {
+            return ValidationResult.invalid("TOKEN_EXPIRED");
+        }
+        if (tokenBlacklistDao.existsByToken(token)) {
+            return ValidationResult.invalid("TOKEN_BLACKLISTED");
+        }
+        return ValidationResult.valid(data.getActorId(), data.getActorType(), data.getPermissions());
+    }
+
+    private String hashToken(String token) {
+        return Hashing.sha256().hashString(token, StandardCharsets.UTF_8).toString();
+    }
+}
+```
+
+## 9. Redis Token Cache Strategy
+
+### Cache Key Design
+
+| Key Pattern | TTL | Purpose |
+|-------------|-----|---------|
+| `token:validated:{hash}` | min(remaining_ttl, 300s) | L2 validation result cache |
+| `session:{opaque_token}` | 24h (player), 8h (admin) | Opaque token session data |
+| `token:blacklist:{hash}` | Original token TTL | Revoked token tracking |
+| `token:nonce:{nonce}` | 60s | Replay attack prevention |
+| `token:rate:{actor_id}` | 60s (sliding window) | Per-actor rate limiting |
+
+### Cache Eviction on Token Revocation
+
+```java
+@Manager
+@RequiredArgsConstructor
+public class TokenRevocationManager {
+
+    private final Cache<String, ValidationResult> l1Cache;
+    private final RedissonClient redissonClient;
+    private final TokenBlacklistDao tokenBlacklistDao;
+
+    /**
+     * Revoke token across all cache layers.
+     * Uses Redis Pub/Sub to invalidate L1 caches on all instances.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void revokeToken(String token, String reason) {
+        String hash = hashToken(token);
+
+        // L3: Persist to blacklist table
+        tokenBlacklistDao.insert(TokenBlacklist.builder()
+            .tokenHash(hash)
+            .reason(reason)
+            .revokedAt(LocalDateTime.now())
+            .build());
+
+        // L2: Remove from Redis cache
+        redissonClient.getBucket("token:validated:" + hash).delete();
+        redissonClient.getBucket("session:" + token).delete();
+
+        // L1: Publish invalidation event for all instances
+        redissonClient.getTopic("token:invalidation")
+            .publish(new TokenInvalidationEvent(hash));
+    }
+}
+```
+
+## 10. gRPC Validation Endpoint
+
+For internal service-to-service token validation, a gRPC endpoint provides lower latency than REST.
+
+```protobuf
+syntax = "proto3";
+
+package net.lab1024.sa.token;
+
+service TokenValidationGrpc {
+    // Validate a single token (P99 < 5ms with L1 hit)
+    rpc Validate (ValidateRequest) returns (ValidateResponse);
+
+    // Batch validate tokens (for bulk operations)
+    rpc ValidateBatch (ValidateBatchRequest) returns (ValidateBatchResponse);
+
+    // Revoke a token across all cache layers
+    rpc Revoke (RevokeRequest) returns (RevokeResponse);
+}
+
+message ValidateRequest {
+    string token = 1;
+    string expected_actor_type = 2;  // PLAYER, GP, THIRD_PARTY, ADMIN
+    repeated string required_permissions = 3;
+}
+
+message ValidateResponse {
+    bool valid = 1;
+    string actor_id = 2;
+    string actor_type = 3;
+    repeated string permissions = 4;
+    string error_code = 5;
+    int64 remaining_ttl_seconds = 6;
+}
+
+message ValidateBatchRequest {
+    repeated ValidateRequest requests = 1;
+}
+
+message ValidateBatchResponse {
+    repeated ValidateResponse responses = 1;
+}
+
+message RevokeRequest {
+    string token = 1;
+    string reason = 2;
+}
+
+message RevokeResponse {
+    bool success = 1;
+}
+```
+
+---
+
+## Related Documentation
+
+- [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - Multi-actor token security model
+- [OAuth Refresh Token](./OAuth_Refresh_Token.md) - OAuth refresh token implementation
+- [Authentication Architecture](./Authentication_Architecture.md) - Authentication architecture overview

@@ -114,3 +114,156 @@ class ErrorBoundary extends React.Component {
 - **API Signature**: Request signing for tamper prevention
 - **Local Encryption**: AES-256 for AsyncStorage
 - **Keychain/KeyStore**: Token storage in system-level secure storage
+
+## 7. App Lifecycle Management
+
+```mermaid
+flowchart TD
+    A[App Launch] --> B{First Launch?}
+    B -->|Yes| C[Show Onboarding]
+    B -->|No| D{Token Valid?}
+    C --> E[Login / Register]
+    E --> D
+    D -->|Yes| F[Load Cached Data<br/>from AsyncStorage]
+    D -->|No| G[Refresh Token<br/>via /auth/refresh]
+    G -->|Success| F
+    G -->|Fail| E
+    F --> H[Fetch Remote Config<br/>Feature Flags + AB Tests]
+    H --> I[Initialize WebSocket<br/>Connection Pool]
+    I --> J[Home Screen Ready]
+    J --> K{App State Change}
+    K -->|Background| L[Pause WebSocket<br/>Save State to Disk]
+    K -->|Resume| M[Restore WebSocket<br/>Delta Sync from Server]
+    K -->|Terminate| N[Persist Critical State<br/>Close Connections]
+    L --> K
+    M --> K
+```
+
+### 7.1 Background-to-Foreground Delta Sync
+
+When a player returns from background, the app performs a delta sync rather than a full reload:
+
+```javascript
+const DeltaSyncManager = {
+  lastSyncTimestamp: null,
+
+  async onAppResume() {
+    const delta = await api.get('/sync/delta', {
+      params: { since: this.lastSyncTimestamp }
+    });
+
+    // Apply incremental updates
+    if (delta.walletBalance !== undefined) {
+      store.dispatch(updateBalance(delta.walletBalance));
+    }
+    if (delta.activeBets?.length > 0) {
+      store.dispatch(updateActiveBets(delta.activeBets));
+    }
+    if (delta.notifications?.length > 0) {
+      store.dispatch(appendNotifications(delta.notifications));
+    }
+
+    this.lastSyncTimestamp = Date.now();
+  },
+};
+```
+
+## 8. WebSocket Real-Time Updates for Live Betting
+
+### 8.1 Connection Architecture
+
+```mermaid
+flowchart LR
+    subgraph Mobile App
+        A[WebSocket Client] --> B[Message Router]
+        B --> C[Odds Update Handler]
+        B --> D[Bet Settlement Handler]
+        B --> E[Live Score Handler]
+        B --> F[Wallet Balance Handler]
+    end
+
+    subgraph Backend
+        G[WS Gateway<br/>Nginx + sticky session] --> H[WS Server Cluster]
+        H --> I[Redis Pub/Sub<br/>Channel per match]
+    end
+
+    A <-->|wss://ws.platform.com| G
+```
+
+### 8.2 WebSocket Client Implementation
+
+```javascript
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
+const WS_URL = 'wss://ws.platform.com/live';
+
+class LiveBettingSocket {
+  constructor() {
+    this.ws = new ReconnectingWebSocket(WS_URL, [], {
+      maxRetries: 10,
+      reconnectionDelayGrowFactor: 1.5,
+      maxReconnectionDelay: 30000,
+      connectionTimeout: 5000,
+    });
+
+    this.ws.onmessage = this.handleMessage.bind(this);
+  }
+
+  subscribe(matchId) {
+    this.ws.send(JSON.stringify({
+      action: 'subscribe',
+      channel: `match:${matchId}`,
+      token: getAuthToken(),
+    }));
+  }
+
+  handleMessage(event) {
+    const msg = JSON.parse(event.data);
+    switch (msg.type) {
+      case 'odds_update':
+        store.dispatch(updateOdds(msg.matchId, msg.markets));
+        break;
+      case 'score_update':
+        store.dispatch(updateScore(msg.matchId, msg.score));
+        break;
+      case 'bet_settled':
+        store.dispatch(settleBet(msg.betId, msg.result));
+        HapticFeedback.trigger('notificationSuccess');
+        break;
+      case 'wallet_update':
+        store.dispatch(updateBalance(msg.balance));
+        break;
+    }
+  }
+}
+```
+
+### 8.3 Offline Queue for Bet Placement
+
+When network is unstable, bet requests are queued locally and retried:
+
+```javascript
+const BetQueue = {
+  queue: [],
+
+  async placeBet(betRequest) {
+    if (!navigator.onLine) {
+      this.queue.push({ ...betRequest, timestamp: Date.now() });
+      showToast('Bet queued - will submit when online');
+      return;
+    }
+    return this.submitBet(betRequest);
+  },
+
+  async flushQueue() {
+    const expired = 30000; // 30s max staleness for odds
+    const validBets = this.queue.filter(
+      b => Date.now() - b.timestamp < expired
+    );
+    for (const bet of validBets) {
+      await this.submitBet(bet);
+    }
+    this.queue = [];
+  },
+};
+```

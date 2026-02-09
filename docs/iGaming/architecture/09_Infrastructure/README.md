@@ -1,67 +1,67 @@
 # 09 Infrastructure
 
 > **Audience**: Architects, Backend Developers, DevOps
-> **Status**: Phase 6 Complete - 1 split document + source index
+> **Status**: 21 architecture documents
 
 ---
 
 ## Split Documents
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Infrastructure Implementation](Infrastructure_Implementation.md) | API Gateway config, Blue-Green K8s/Istio deployment, Redisson rate limiting | [source](../../source-archive/00_Foundation/guides/00-16_Infrastructure_Implementation.md) |
+| Document | Description |
+|----------|-------------|
+| [Infrastructure Implementation](Infrastructure_Implementation.md) | API Gateway config, Blue-Green K8s/Istio deployment, Redisson rate limiting |
 
 ## Deployment and Operations
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | Infrastructure deployment architecture | [source](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) |
-| [QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md) | Quality assurance standards and testing | [source](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md) |
-| [Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md) | System maintenance procedures | [source](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md) |
+| Document | Description |
+|----------|-------------|
+| [Deployment Architecture](Deployment_Architecture.md) | Infrastructure deployment architecture |
+| [QA Standards](QA_Standards.md) | Quality assurance standards and testing |
+| [Maintenance Architecture](Maintenance_Architecture.md) | System maintenance procedures |
 
 ## API Gateway
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | API gateway core architecture | [source](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
-| [Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md) | Rate limiting and throttling | [source](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md) |
-| [Gateway Security](../../source-archive/09_Technical_Infrastructure/09-02-03_Security.md) | Gateway security configuration | [source](../../source-archive/09_Technical_Infrastructure/09-02-03_Security.md) |
+| Document | Description |
+|----------|-------------|
+| [Gateway Core](Gateway_Core.md) | API gateway core architecture |
+| [Gateway Rate Limiting](Gateway_Rate_Limiting.md) | Rate limiting and throttling |
+| [Gateway Security](Gateway_Security.md) | Gateway security configuration |
 
 ## API Design
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) | API design principles and standards | [source](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) |
-| [Authentication](../../source-archive/09_Technical_Infrastructure/09-03-02_Authentication.md) | API authentication mechanisms | [source](../../source-archive/09_Technical_Infrastructure/09-03-02_Authentication.md) |
-| [Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md) | Common API patterns and conventions | [source](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md) |
-| [Domain APIs](../../source-archive/09_Technical_Infrastructure/09-03-04_Domain_APIs.md) | Domain-specific API specifications | [source](../../source-archive/09_Technical_Infrastructure/09-03-04_Domain_APIs.md) |
+| Document | Description |
+|----------|-------------|
+| [API Design Principles](API_Design_Principles.md) | API design principles and standards |
+| [Authentication Architecture](Authentication_Architecture.md) | API authentication mechanisms |
+| [Common Patterns](Common_Patterns.md) | Common API patterns and conventions |
+| [Domain APIs](Domain_APIs.md) | Domain-specific API specifications |
 
 ## Performance and Optimization
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md) | System performance monitoring | [source](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md) |
-| [Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md) | Performance tuning guidelines | [source](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md) |
-| [Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md) | Stream processing architecture | [source](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md) |
-| [Caching Strategy](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md) | Caching architecture and strategies | [source](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md) |
-| [Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md) | Infrastructure cost optimization | [source](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md) |
+| Document | Description |
+|----------|-------------|
+| [Performance Monitoring](Performance_Monitoring.md) | System performance monitoring |
+| [Performance Optimization](Performance_Optimization.md) | Performance tuning guidelines |
+| [Stream Processing Architecture](Stream_Processing_Architecture.md) | Stream processing architecture |
+| [Caching Strategy](Caching_Strategy.md) | Caching architecture and strategies |
+| [Cost Optimization Architecture](Cost_Optimization_Architecture.md) | Infrastructure cost optimization |
 
 ## Security and Token Management
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [OAuth Refresh Token](../../source-archive/09_Technical_Infrastructure/09-11_OAuth_Refresh_Token_Implementation.md) | OAuth refresh token implementation | [source](../../source-archive/09_Technical_Infrastructure/09-11_OAuth_Refresh_Token_Implementation.md) |
-| [Multi-Actor Token Security](../../source-archive/09_Technical_Infrastructure/09-12_Multi_Actor_Token_Security.md) | Multi-actor token security model | [source](../../source-archive/09_Technical_Infrastructure/09-12_Multi_Actor_Token_Security.md) |
+| Document | Description |
+|----------|-------------|
+| [OAuth Refresh Token](OAuth_Refresh_Token.md) | OAuth refresh token implementation |
+| [Multi-Actor Token Security](Multi_Actor_Token_Security.md) | Multi-actor token security model |
 
 ## Token Validation Service
 
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Validation Architecture](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md) | Token validation service architecture | [source](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md) |
-| [Cache Performance](../../source-archive/09_Technical_Infrastructure/09-13-02_Cache_Performance.md) | Token cache performance optimization | [source](../../source-archive/09_Technical_Infrastructure/09-13-02_Cache_Performance.md) |
-| [Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md) | Edge deployment patterns | [source](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md) |
-| [Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md) | Token validation service overview | [source](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md) |
+| Document | Description |
+|----------|-------------|
+| [Token Validation Service](Token_Validation_Service.md) | Token validation service overview |
+| [Token Validation Architecture](Token_Validation_Architecture.md) | Token validation service architecture |
+| [Token Cache Performance](Token_Cache_Performance.md) | Token cache performance optimization |
+| [Token Edge Deployment](Token_Edge_Deployment.md) | Edge deployment patterns |
 
 ---
 
-**Last Updated**: 2026-02-08
+**Last Updated**: 2026-02-09

@@ -153,3 +153,150 @@ Auto-generated and emailed to player after deletion:
 | **Event Bus** | Kafka / RabbitMQ | Cross-module notifications |
 | **Audit Log** | Elasticsearch | Compliance tracking |
 | **Email Service** | SendGrid / AWS SES | Confirmation notifications |
+
+## 9. Data Deletion Pipeline
+
+### 9.1 Cross-Service Cascade Flow
+
+```mermaid
+flowchart TD
+    A[Cron Job triggers<br/>SCHEDULED_FOR_DELETION batch] --> B[DataDeletionManager<br/>.executeDeletion playerId]
+    B --> C[Pre-flight checks:<br/>no active investigation<br/>no pending balance]
+    C --> D{Checks passed?}
+    D -->|No| E[Move to DELETION_BLOCKED<br/>Create incident ticket]
+    D -->|Yes| F[Publish DeletionEvent<br/>to Kafka topic]
+    F --> G[Wallet Service:<br/>zero out balance<br/>archive transactions]
+    F --> H[Bonus Service:<br/>forfeit active bonuses<br/>anonymize history]
+    F --> I[KYC Service:<br/>delete uploaded documents<br/>destroy verification records]
+    F --> J[Notification Service:<br/>unsubscribe all channels<br/>delete push tokens]
+    G --> K[Await all ACKs<br/>with 60s timeout]
+    H --> K
+    I --> K
+    J --> K
+    K --> L{All services<br/>acknowledged?}
+    L -->|Yes| M[Crypto-Shredding:<br/>DELETE FROM user_keys<br/>WHERE player_id = ?]
+    L -->|No| N[Partial deletion:<br/>retry failed services<br/>alert ops team]
+    M --> O[Write tombstone record<br/>Generate deletion certificate]
+    O --> P[Send confirmation email<br/>via SES]
+```
+
+### 9.2 DataDeletionManager (Java)
+
+```java
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Manager layer: owns @Transactional for GDPR deletion pipeline.
+ * Coordinates crypto-shredding across multiple data stores.
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class DataDeletionManager {
+
+    private final UserKeyDao userKeyDao;
+    private final PlayerDao playerDao;
+    private final DeletionAuditDao deletionAuditDao;
+    private final DeletionEventPublisher eventPublisher;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public DeletionCertificate executeDeletion(Long playerId) {
+        // 1. Pre-flight: verify no holds
+        PlayerEntity player = playerDao.selectById(playerId);
+        if (player.getStatus() != PlayerStatus.SCHEDULED_FOR_DELETION) {
+            throw new BusinessException(
+                "Player not in SCHEDULED_FOR_DELETION state");
+        }
+
+        // 2. Publish event for cross-service cleanup
+        eventPublisher.publishDeletionEvent(playerId);
+
+        // 3. Crypto-shredding: destroy the per-player DEK
+        int deleted = userKeyDao.deleteByPlayerId(playerId);
+        if (deleted == 0) {
+            log.warn("No DEK found for player {}", playerId);
+        }
+
+        // 4. Anonymize retained records (AML/Tax)
+        playerDao.anonymizePlayer(playerId);
+
+        // 5. Write tombstone + audit trail
+        DeletionAuditEntity audit = DeletionAuditEntity.builder()
+            .playerId(playerId)
+            .deletionType("CRYPTO_SHREDDING")
+            .deletedFields("name,phone,email,address,id_number")
+            .retainedFields("transaction_records,fraud_flags")
+            .executedAt(LocalDateTime.now())
+            .certificateHash(generateCertificateHash(playerId))
+            .build();
+        deletionAuditDao.insert(audit);
+
+        return DeletionCertificate.from(audit);
+    }
+
+    private String generateCertificateHash(Long playerId) {
+        String input = playerId + ":" + System.currentTimeMillis();
+        return DigestUtils.sha256Hex(input);
+    }
+}
+```
+
+### 9.3 Anonymization SQL
+
+Records that must be retained for legal reasons (AML, tax) are anonymized rather than deleted:
+
+```sql
+-- Anonymize player identity while retaining transaction records
+UPDATE t_player
+SET encrypted_name  = 'REDACTED',
+    encrypted_phone = 'REDACTED',
+    encrypted_email = 'REDACTED',
+    phone_index     = CONCAT('DELETED:', id),
+    email_index     = CONCAT('DELETED:', id),
+    id_number_index = NULL,
+    status          = 6,  -- DELETED status
+    updated_at      = NOW()
+WHERE id = #{playerId};
+
+-- Transaction records: replace player_id with anonymous UUID
+UPDATE t_transaction
+SET player_id    = NULL,
+    anonymous_id = #{anonymousUuid},
+    updated_at   = NOW()
+WHERE player_id = #{playerId};
+
+-- Tombstone record for audit trail
+INSERT INTO t_deletion_tombstone (
+    original_player_id, anonymous_id,
+    deletion_type, certificate_hash,
+    deleted_at
+) VALUES (
+    #{playerId}, #{anonymousUuid},
+    'CRYPTO_SHREDDING', #{certificateHash},
+    NOW()
+);
+```
+
+### 9.4 Deletion Audit Trail Schema
+
+```sql
+CREATE TABLE t_deletion_audit (
+    id                BIGINT PRIMARY KEY AUTO_INCREMENT,
+    player_id         BIGINT       NOT NULL COMMENT 'Original player ID',
+    request_id        VARCHAR(32)  NOT NULL COMMENT 'GDPR request tracking ID',
+    deletion_type     VARCHAR(32)  NOT NULL COMMENT 'CRYPTO_SHREDDING or PHYSICAL',
+    deleted_fields    TEXT         NOT NULL COMMENT 'Comma-separated list of deleted PII fields',
+    retained_fields   TEXT         NULL     COMMENT 'Fields retained for legal reasons',
+    executed_at       DATETIME     NOT NULL,
+    certificate_hash  CHAR(64)     NOT NULL COMMENT 'SHA-256 hash of deletion certificate',
+    operator_id       BIGINT       NULL     COMMENT 'System or manual operator',
+    created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_player_id (player_id),
+    INDEX idx_request_id (request_id),
+    INDEX idx_executed_at (executed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='GDPR deletion audit trail';
+```

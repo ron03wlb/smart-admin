@@ -132,8 +132,150 @@ Masking MUST be implemented at the Backend DTO Converter / Serializer layer. Fro
 }
 ```
 
-## 6. Key Rotation
+## 6. Key Rotation Flow
+
+### 6.1 Automated Rotation Lifecycle
+
+```mermaid
+flowchart TD
+    A[T-30: Generate New DEK<br/>via KMS GenerateDataKey] --> B[T-0: Activate New Key<br/>Update key_version in config]
+    B --> C[Dual-Key Window<br/>Encrypt with NEW key<br/>Decrypt with ANY key via version prefix]
+    C --> D{All active sessions<br/>migrated?}
+    D -->|No| E[Background Job:<br/>Re-encrypt records<br/>batch of 5000/min]
+    E --> D
+    D -->|Yes| F[T+90: Disable Old Key<br/>Mark as DECRYPT_ONLY]
+    F --> G[T+180: Archive Old Key<br/>Move to cold storage]
+    G --> H[T+365: Delete Old Key<br/>After full backup cycle]
+```
 
 - **Frequency**: Auto-rotate CMK every 365 days (AWS KMS managed)
 - **Transition**: Old and new keys coexist for 90 days (graceful migration)
 - **Emergency**: Manual rotation triggered on suspected key compromise
+
+### 6.2 Version-Aware Decryption
+
+The version prefix in the ciphertext format (`v1:`, `v2:`) enables seamless key rotation without downtime:
+
+```text
+Decryption Logic:
+1. Parse version from ciphertext prefix
+2. Lookup corresponding DEK by version
+3. Decrypt using the matched key
+4. If version < current, schedule re-encryption
+```
+
+## 7. AES-256-GCM Encryption Service (Java)
+
+```java
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import java.security.SecureRandom;
+import java.util.Base64;
+
+/**
+ * AES-256-GCM encryption service for PII field protection.
+ * Thread-safe: each call generates a unique IV.
+ */
+public class AesGcmEncryptionService {
+
+    private static final int GCM_IV_LENGTH = 12;
+    private static final int GCM_TAG_LENGTH = 128;
+    private static final String ALGORITHM = "AES/GCM/NoPadding";
+    private static final String CURRENT_VERSION = "v1";
+
+    private final SecretKey dataEncryptionKey;
+    private final SecureRandom secureRandom = new SecureRandom();
+
+    public AesGcmEncryptionService(SecretKey dataEncryptionKey) {
+        this.dataEncryptionKey = dataEncryptionKey;
+    }
+
+    public String encrypt(String plaintext) throws Exception {
+        byte[] iv = new byte[GCM_IV_LENGTH];
+        secureRandom.nextBytes(iv);
+
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+        cipher.init(Cipher.ENCRYPT_MODE, dataEncryptionKey, spec);
+
+        byte[] ciphertext = cipher.doFinal(plaintext.getBytes("UTF-8"));
+
+        String ivBase64 = Base64.getEncoder().encodeToString(iv);
+        String ctBase64 = Base64.getEncoder().encodeToString(ciphertext);
+
+        // Format: version:iv:ciphertext (AuthTag appended by GCM)
+        return CURRENT_VERSION + ":" + ivBase64 + ":" + ctBase64;
+    }
+
+    public String decrypt(String encryptedValue) throws Exception {
+        String[] parts = encryptedValue.split(":", 3);
+        // parts[0] = version, parts[1] = IV, parts[2] = ciphertext+tag
+        byte[] iv = Base64.getDecoder().decode(parts[1]);
+        byte[] ciphertext = Base64.getDecoder().decode(parts[2]);
+
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+        cipher.init(Cipher.DECRYPT_MODE, dataEncryptionKey, spec);
+
+        byte[] plaintext = cipher.doFinal(ciphertext);
+        return new String(plaintext, "UTF-8");
+    }
+}
+```
+
+## 8. HSM Integration Pattern
+
+### 8.1 Envelope Encryption for PII
+
+Envelope encryption separates the data key from the master key. The master key never leaves the HSM boundary.
+
+```mermaid
+flowchart LR
+    subgraph HSM Boundary
+        A[Master Key CMK<br/>Never exported]
+    end
+
+    subgraph Application Server
+        B[Request: GenerateDataKey] -->|API call| A
+        A -->|Returns plaintext DEK<br/>+ encrypted DEK| C[Encrypt PII<br/>with plaintext DEK]
+        C --> D[Store encrypted PII<br/>+ encrypted DEK<br/>in database]
+        D --> E[Discard plaintext DEK<br/>from memory]
+    end
+
+    subgraph Decryption Path
+        F[Read encrypted DEK<br/>from database] -->|Decrypt API call| A
+        A -->|Returns plaintext DEK| G[Decrypt PII<br/>with plaintext DEK]
+        G --> H[Discard plaintext DEK<br/>after use]
+    end
+```
+
+### 8.2 HSM Configuration (YAML)
+
+```yaml
+encryption:
+  provider: aws-kms  # or hashicorp-vault
+  aws-kms:
+    region: us-east-1
+    cmk-arn: arn:aws:kms:us-east-1:123456789:key/abc-123
+    key-cache:
+      enabled: true
+      max-age-seconds: 300
+      max-entries: 100
+  envelope:
+    algorithm: AES-256-GCM
+    dek-rotation-days: 90
+    re-encryption-batch-size: 5000
+    re-encryption-rate-per-minute: 5000
+```
+
+### 8.3 DEK Cache Strategy
+
+To avoid calling KMS for every decrypt operation, DEKs are cached in-memory with strict TTL:
+
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| Cache TTL | 300 seconds | Balance between performance and security |
+| Max entries | 100 | Limit memory footprint (~3.2 KB) |
+| Eviction | LRU | Least recently used keys evicted first |
+| On rotation | Invalidate all | Force fresh DEK fetch after key rotation |

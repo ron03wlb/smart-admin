@@ -145,3 +145,161 @@ server {
 | Bank account encrypted | Compliant | AES-256-GCM + Blind Index |
 | Password hashing | Compliant | Argon2id |
 | Access control | Compliant | RBAC + IP whitelist |
+
+## 9. Data Classification Service
+
+```mermaid
+flowchart TD
+    A[Incoming Data Field] --> B{Classify Field}
+    B -->|Critical| C[AES-256-GCM + Blind Index<br/>Bank Account, ID Number,<br/>Email, Phone]
+    B -->|High| D[AES-256-GCM Only<br/>Real Name, Date of Birth]
+    B -->|Medium| E[HMAC-SHA256 Pseudonymization<br/>IP Address, Device ID]
+    B -->|Low| F[No Encryption<br/>Preferred Language, Timezone]
+
+    C --> G[Encrypted Storage<br/>encrypted_* columns]
+    D --> G
+    E --> H[Pseudonymized Storage<br/>*_hash columns]
+    F --> I[Plaintext Storage]
+
+    G --> J[Access Audit Log]
+    H --> J
+    I --> J
+
+    style C fill:#FF5252,color:#fff
+    style D fill:#FF9800,color:#fff
+    style E fill:#FFC107
+    style F fill:#4CAF50,color:#fff
+```
+
+```java
+@Service
+@RequiredArgsConstructor
+public class DataClassificationService {
+
+    private final EncryptionManager encryptionManager;
+    private final AuditLogDao auditLogDao;
+
+    /**
+     * Classification levels aligned with ISO 27001 Annex A.8
+     */
+    public enum Classification {
+        CRITICAL,  // PCI-DSS scope: bank accounts, card tokens, ID numbers
+        HIGH,      // PII requiring encryption: real name, DOB
+        MEDIUM,    // Pseudonymizable: IP address, device fingerprint
+        LOW        // Non-sensitive: language preference, timezone
+    }
+
+    private static final Map<String, Classification> FIELD_CLASSIFICATION = Map.ofEntries(
+        Map.entry("bank_account", Classification.CRITICAL),
+        Map.entry("id_number", Classification.CRITICAL),
+        Map.entry("email", Classification.CRITICAL),
+        Map.entry("phone", Classification.CRITICAL),
+        Map.entry("real_name", Classification.HIGH),
+        Map.entry("date_of_birth", Classification.HIGH),
+        Map.entry("ip_address", Classification.MEDIUM),
+        Map.entry("device_id", Classification.MEDIUM),
+        Map.entry("language", Classification.LOW),
+        Map.entry("timezone", Classification.LOW)
+    );
+
+    public Classification classifyField(String fieldName) {
+        return FIELD_CLASSIFICATION.getOrDefault(fieldName, Classification.HIGH);
+    }
+}
+```
+
+## 10. Field-Level Encryption Patterns
+
+```java
+@Component
+@RequiredArgsConstructor
+public class FieldEncryptionHandler implements TypeHandler<String> {
+
+    private final KeyManagementManager keyManager;
+
+    /**
+     * Encrypt sensitive field before database write.
+     * Format: v1:{iv}:{ciphertext}:{authTag}
+     */
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i,
+                                     String value, JdbcType jdbcType) throws SQLException {
+        DataEncryptionKey dek = keyManager.getCurrentDEK();
+        byte[] iv = SecureRandom.getInstanceStrong().generateSeed(12);
+
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec spec = new GCMParameterSpec(128, iv);
+        cipher.init(Cipher.ENCRYPT_MODE, dek.getSecretKey(), spec);
+
+        byte[] ciphertext = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
+        String encoded = String.format("v1:%s:%s:%s",
+            Base64.getEncoder().encodeToString(iv),
+            Base64.getEncoder().encodeToString(Arrays.copyOf(ciphertext, ciphertext.length - 16)),
+            Base64.getEncoder().encodeToString(Arrays.copyOfRange(ciphertext, ciphertext.length - 16, ciphertext.length))
+        );
+        ps.setString(i, encoded);
+    }
+
+    @Override
+    public String getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        String encrypted = rs.getString(columnName);
+        if (encrypted == null || !encrypted.startsWith("v1:")) {
+            return encrypted;
+        }
+        return decrypt(encrypted);
+    }
+
+    private String decrypt(String encoded) {
+        String[] parts = encoded.split(":");
+        byte[] iv = Base64.getDecoder().decode(parts[1]);
+        byte[] ciphertext = Base64.getDecoder().decode(parts[2]);
+        byte[] authTag = Base64.getDecoder().decode(parts[3]);
+
+        DataEncryptionKey dek = keyManager.getDEKForVersion(parts[0]);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, dek.getSecretKey(), new GCMParameterSpec(128, iv));
+
+        byte[] combined = new byte[ciphertext.length + authTag.length];
+        System.arraycopy(ciphertext, 0, combined, 0, ciphertext.length);
+        System.arraycopy(authTag, 0, combined, ciphertext.length, authTag.length);
+
+        return new String(cipher.doFinal(combined), StandardCharsets.UTF_8);
+    }
+}
+```
+
+## 11. Access Control Matrix for Sensitive Data
+
+| Data Category | Player (Self) | CS Level 1 | CS Level 2 | Risk Control | Finance | DBA | System Admin |
+|---------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Bank Account** | Last 4 | No Access | Last 4 | Full (Approval) | Full (Approval) | Ciphertext | No Access |
+| **ID Number** | Masked | No Access | Last 4 | Full (Approval) | No Access | Ciphertext | No Access |
+| **Phone** | Full (2FA) | Masked | Full (Approval) | Full (Approval) | No Access | Ciphertext | No Access |
+| **Email** | Full | Masked | Full | Full | No Access | Ciphertext | No Access |
+| **Real Name** | Full | Masked | Full | Full | Full | Ciphertext | No Access |
+| **IP Address** | No Access | No Access | Hashed | Full | No Access | Hashed | Hashed |
+| **Transaction History** | Own Only | Read (Masked) | Read | Full | Full | No Access | No Access |
+
+### Access Enforcement via Annotations
+
+```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RequiresDataAccess {
+    DataClassificationService.Classification level();
+    boolean requiresApproval() default false;
+    boolean auditLog() default true;
+}
+
+// Usage in Controller
+@GetMapping("/player/{id}/bank-account")
+@RequiresDataAccess(level = Classification.CRITICAL, requiresApproval = true)
+@SaCheckPermission("player:pii:bank-account")
+public ResponseDTO<BankAccountVO> getBankAccount(@PathVariable Long id) {
+    return ResponseDTO.ok(playerService.getBankAccount(id));
+}
+```
+
+---
+
+<!-- End of Document -->
