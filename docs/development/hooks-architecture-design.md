@@ -1,9 +1,9 @@
 # Git Hooks 架構設計文檔
 
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **設計日期**: 2026-02-09
 > **設計者**: Phase 8 Implementation Team
-> **狀態**: 📐 Architecture Design (Pre-development)
+> **狀態**: ✅ Implemented (P0 + P1 Complete)
 
 ---
 
@@ -497,16 +497,38 @@ wait $PID1 $PID2 $PID3
 
 ---
 
-## 🔜 下一步
+## ✅ 實施狀態
 
-**Step 1 完成後** → 進入 **Step 2: P0 Development** (2.5 小時)
-1. 開發 `install-hooks.sh`（1 小時）
-2. 開發 `pre-commit`（0.75 小時）
-3. 開發 `pre-push`（0.5 小時）
-4. 基礎測試（0.25 小時）
+### P0: Core Hooks (2026-02-09) — COMPLETED
+
+| 組件 | 狀態 | 說明 |
+|------|------|------|
+| `scripts/install-hooks.sh` | ✅ | ~380 lines, 生成 pre-commit + pre-push |
+| `scripts/uninstall-hooks.sh` | ✅ | ~85 lines, 備份恢復機制 |
+| `build.gradle.kts` | ✅ | installGitHooks task 委派至 install-hooks.sh |
+| Pre-commit hook | ✅ | Spotless + 並行 Markdown 驗證 |
+| Pre-push hook | ✅ | 並行質量門禁 |
+
+### P1: Validation Scripts (2026-02-09) — COMPLETED
+
+| 腳本 | 狀態 | Pre-commit | Pre-push |
+|------|------|-----------|----------|
+| `detect-statediagram-br.sh` | ✅ | ✓ | |
+| `validate-mermaid.sh` | ✅ | ✓ | |
+| `detect-mermaid-emoji.sh` | ✅ | ✓ | |
+| `validate-requirements-purity.sh` | ✅ | | ✓ |
+| `validate-architecture-completeness.sh` | ✅ | | ✓ |
+
+### 實施備註
+
+1. **Symlink 處理**: 發現原始 pre-commit 是 symlink → pre-commit-igaming.sh，
+   `cat >` 會寫穿 symlink 覆蓋原文件。修復為先 `rm -f` 再寫入。
+2. **Forward-compatible 設計**: 使用 `run_if_exists()` 函數，不存在的腳本自動跳過不阻塞。
+3. **現有腳本整合**: detect-bonus-corruption.sh、validate-file-numbering.sh 等 5 個
+   iGaming 專用腳本直接整合到 hooks 中。
 
 ---
 
-**文檔版本**: 1.0.0
+**文檔版本**: 1.1.0
 **最後更新**: 2026-02-09
 **作者**: Phase 8 Implementation Team
