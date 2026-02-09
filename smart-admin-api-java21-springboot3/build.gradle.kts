@@ -178,29 +178,17 @@ subprojects {
     }
 }
 
-// Git Hooks Task
+// Git Hooks Task - delegates to scripts/install-hooks.sh
 tasks.register("installGitHooks") {
     doLast {
-        val hooksSourceDir = file("config/git")
-        val gitHooksDir = file("../.git/hooks")
-        
-        if (hooksSourceDir.exists()) {
-            hooksSourceDir.listFiles()?.forEach { hookFile ->
-                val targetFile = File(gitHooksDir, hookFile.name)
-                hookFile.copyTo(targetFile, overwrite = true)
-                targetFile.setExecutable(true)
+        val installScript = file("../scripts/install-hooks.sh")
+        if (installScript.exists()) {
+            exec {
+                commandLine("bash", installScript.absolutePath)
+                workingDir = file("..")
             }
-            println("Git hooks installed successfully.")
         } else {
-             // Create pre-commit hook if it doesn't exist
-            val preCommitHook = File(gitHooksDir, "pre-commit")
-            preCommitHook.writeText("""
-                #!/bin/sh
-                echo "Running Spotless in smart-admin-api-java21-springboot3..."
-                cd smart-admin-api-java21-springboot3 && ./gradlew spotlessApply
-            """.trimIndent())
-            preCommitHook.setExecutable(true)
-            println("Default pre-commit hook created.")
+            println("⚠️  scripts/install-hooks.sh not found, skipping hook installation")
         }
     }
 }
