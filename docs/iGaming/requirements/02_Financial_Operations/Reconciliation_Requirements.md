@@ -1,6 +1,6 @@
 # Reconciliation Requirements
 
-> **Canonical Source**: [02-03_Reconciliation_System.md](../../source/02_Finance_Center/02-03_Reconciliation_System.md)
+> **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
 > **Audience**: Executives, Compliance Officers, Finance Team, Operations Managers
 > **Related Doc**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
 > **Last Synced**: 2026-02-09
@@ -573,9 +573,9 @@ Different payment methods have different settlement cycles and reconciliation re
 ## Related Documents
 
 ### Business Logic Reference
-- [02-02 Payment Gateway Integration](../../source/02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP transaction data source
-- [02-04 Turnover and Game Reconciliation Analysis](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation process
-- [02-06 Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) - Balance adjustment logic
+- [02-02 Payment Gateway Integration](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP transaction data source
+- [02-04 Turnover and Game Reconciliation Analysis](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation process
+- [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Balance adjustment logic
 
 ### Technical Architecture Reference
 - [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md) - Technical implementation details

@@ -1,6 +1,6 @@
 # Turnover Calculation Flowcharts and Sequence Diagrams
 
-> **Canonical Source**: [source/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md](../../source/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
+> **Canonical Source**: [source/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
 > **Audience**: Architects, Backend Developers, Data Engineers
 > **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 > **Last Synced**: 2026-02-08
@@ -21,10 +21,10 @@ This document provides the technical visualization of the iGaming platform's tur
 - Layer 3 (Activity System) applies game weights for activity contribution calculation
 
 **Reference Documents**:
-- [Terminology Standards](../../source/00_Foundation/concepts/00-03_Terminology_Standards.md)
-- [Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md)
-- [Turnover and Reconciliation Analysis](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
-- [Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md)
+- [Terminology Standards](../../source-archive/00_Foundation/concepts/00-03_Terminology_Standards.md)
+- [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
+- [Turnover and Reconciliation Analysis](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
+- [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
 
 ---
 

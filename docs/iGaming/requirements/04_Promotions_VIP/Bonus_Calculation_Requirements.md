@@ -1,6 +1,6 @@
 # 獎金計算引擎業務需求 (Bonus Calculation Engine Requirements)
 
-> **Canonical Source**: [source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
+> **Canonical Source**: [source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 > **Audience**: Executives, Product Managers
 > **Related Doc**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
 > **Last Synced**: 2026-02-08

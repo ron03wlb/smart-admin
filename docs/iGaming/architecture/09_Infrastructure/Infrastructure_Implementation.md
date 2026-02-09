@@ -1,7 +1,7 @@
 # Infrastructure Implementation
 
 > **Note**: This is a pure technical implementation document with no corresponding business requirements.
-> **Canonical Source**: [00-16_Infrastructure_Implementation.md](../../source/00_Foundation/guides/00-16_Infrastructure_Implementation.md)
+> **Canonical Source**: [00-16_Infrastructure_Implementation.md](../../source-archive/00_Foundation/guides/00-16_Infrastructure_Implementation.md)
 > **Audience**: Architects, DevOps Engineers, Backend Engineers
 > **Last Synced**: 2026-02-09
 
@@ -28,9 +28,9 @@ Configure Spring Cloud Gateway with dynamic routing, filter chains (authenticati
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S2 Route Config | Dynamic routing |
-| 2 | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3 Filter Chain | Auth, rate limiting |
-| 3 | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S4 Circuit Breaker | Resilience4j |
+| 1 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S2 Route Config | Dynamic routing |
+| 2 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3 Filter Chain | Auth, rate limiting |
+| 3 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S4 Circuit Breaker | Resilience4j |
 
 ### Gateway Architecture
 
@@ -134,9 +134,9 @@ Configure Kubernetes-based Blue-Green deployment with Istio/Nginx traffic switch
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [09-01 Deployment](../../source/09_Technical_Infrastructure/09-01_Deployment.md) | S3 Deployment Strategy | Blue-Green |
-| 2 | [09-01 Deployment](../../source/09_Technical_Infrastructure/09-01_Deployment.md) | S4 Traffic Management | Istio/Nginx |
-| 3 | [09-01 Deployment](../../source/09_Technical_Infrastructure/09-01_Deployment.md) | S5 Monitoring Validation | Smoke Test |
+| 1 | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | S3 Deployment Strategy | Blue-Green |
+| 2 | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | S4 Traffic Management | Istio/Nginx |
+| 3 | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | S5 Monitoring Validation | Smoke Test |
 
 ### Deployment Architecture
 
@@ -266,9 +266,9 @@ Implement token bucket rate limiting with Redis backend, supporting multi-layer 
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [09-03-01 Design Principles](../../source/09_Technical_Infrastructure/09-03-01_Design_Principles.md) | S6 Rate Limiting | Token bucket / leaky bucket |
+| 1 | [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) | S6 Rate Limiting | Token bucket / leaky bucket |
 | 2 | Foundation Redis Limiter | - | Redisson rate limiter |
-| 3 | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3.4 Rate Limiting Filter | Gateway rate limiting |
+| 3 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3.4 Rate Limiting Filter | Gateway rate limiting |
 
 ### Rate Limiting Architecture
 
@@ -367,10 +367,10 @@ public class RateLimitFilter implements GlobalFilter {
 
 | Area | Document |
 |------|----------|
-| Gateway Core | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
-| Deployment | [09-01 Deployment](../../source/09_Technical_Infrastructure/09-01_Deployment.md) |
-| API Design Principles | [09-03-01 Design Principles](../../source/09_Technical_Infrastructure/09-03-01_Design_Principles.md) |
-| Rate Limiting | [09-02-02 Rate Limiting](../../source/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md) |
+| Gateway Core | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
+| Deployment | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) |
+| API Design Principles | [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) |
+| Rate Limiting | [09-02-02 Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md) |
 
 ---
 

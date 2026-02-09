@@ -1,6 +1,6 @@
 # Detection Model Specification
 
-> **Canonical Source**: [05-02-01_Detection_Model.md](../../source/05_Risk_Control/05-02-01_Detection_Model.md)
+> **Canonical Source**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
 > **Audience**: Executives, Risk Operations, Compliance Officers, Product Managers
 > **Related Doc**: [Detection_Model_Implementation.md](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md)
 > **Last Synced**: 2026-02-09
@@ -180,6 +180,6 @@ The system does not use a composite risk score for per-bet decisions. Instead, e
 
 ## 9. Related Documents
 
-- [05-02-02 Rule Configuration](../../source/05_Risk_Control/05-02-02_Rule_Configuration.md) -- Risk proposal service and deferred checks
-- [05-02-03 ML Integration](../../source/05_Risk_Control/05-02-03_ML_Integration.md) -- Multi-dimensional risk rules
-- [05-02-04 Operations Tools](../../source/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin architecture mapping and monitoring
+- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) -- Risk proposal service and deferred checks
+- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) -- Multi-dimensional risk rules
+- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin architecture mapping and monitoring

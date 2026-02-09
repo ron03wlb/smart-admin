@@ -1,6 +1,6 @@
 # Multi-Tenant Requirements
 
-> **Canonical Source**: [`docs/iGaming/source/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source/06_Platform_Governance/06-01_Multi_Tenant.md)
+> **Canonical Source**: [`docs/iGaming/source-archive/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
 >
 > **Related Architecture**: [`architecture/06_Platform_Core/Multi_Tenant_Architecture.md`](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md)
 

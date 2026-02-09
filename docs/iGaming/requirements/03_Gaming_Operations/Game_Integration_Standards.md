@@ -1,6 +1,6 @@
 # Game Integration Standards
 
-> **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source/03_Game_Center/03-01_Game_Integration_Standard.md)
+> **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: Executives, Product Managers, Operations Leads, Compliance Officers
 > **Related Doc**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
 > **Last Synced**: 2026-02-09
@@ -129,9 +129,9 @@ Network Jackpots (e.g., accumulated prize pools of USD 10M) are funded by the Ga
 
 ---
 
-## 7. RTP Circuit Breaker - Business Rules
+## 7. RTP Automatic Suspension - Business Rules
 
-To protect against GP bugs (e.g., guaranteed-win glitches) or incorrect odds causing rapid platform losses, the integration layer implements real-time circuit breaking.
+To protect against GP bugs (e.g., guaranteed-win glitches) or incorrect odds causing rapid platform losses, the integration layer implements real-time automatic game suspension.
 
 ### 7.1 Monitoring Metrics
 
@@ -144,18 +144,18 @@ The system monitors each game provider and game ID using a 5-minute sliding wind
 | RTP (Return To Player) | Total Win / Total Bet x 100% |
 | Net Loss | Total Win - Total Bet |
 
-### 7.2 Circuit Breaker Thresholds
+### 7.2 Automatic Suspension Thresholds
 
 | Alert Level | Trigger Condition (5-min window) | Automated Action | Recovery Method |
 |-------------|----------------------------------|-------------------|-----------------|
 | **Warning** | RTP > 120% AND Net Loss > $5,000 | Send alert to risk control team (Slack/Telegram) | Automatic (if next period normalizes) |
 | **Critical** | RTP > 200% AND Net Loss > $10,000 | Auto-disable the game/provider | Manual: requires CTO/Risk Director confirmation to unlock |
 
-→ **[Circuit Breaker Implementation](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#6-rtp-circuit-breaker-implementation)** - HTTP status codes, alert payloads, monitoring architecture
+→ **[Suspension Implementation](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#6-rtp-circuit-breaker-implementation)** - See architecture layer for technical implementation details
 
 ### 7.3 Manual Recovery Process
 
-After a critical circuit breaker event:
+After a critical automatic suspension event:
 
 | Step | Action | Responsible Party |
 |------|--------|-------------------|
@@ -205,13 +205,13 @@ Before a game provider goes live, the following must be verified:
 ## Related Documents
 
 ### Core Dependencies
-- [Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) - Game wallet transfer logic
-- [Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP edge case handling
+- [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Game wallet transfer logic
+- [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP edge case handling
 
 ### Business Integration
-- [Turnover and Reconciliation](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation and turnover calculation
-- [Game Lobby Management](../../source/03_Game_Center/03-02_Game_Lobby_Management.md) - Game metadata sync and lobby configuration
-- [Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) - Game risk detection and circuit breaker
+- [Turnover and Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation and turnover calculation
+- [Game Lobby Management](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) - Game metadata sync and lobby configuration
+- [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Game risk detection and circuit breaker
 
 ---
 

@@ -1,6 +1,6 @@
 # KYC Verification API Architecture
 
-> **Canonical Source**: [source/05_Risk_Control/05-03_KYC_AML.md](../../source/05_Risk_Control/05-03_KYC_AML.md)
+> **Canonical Source**: [source/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Business Requirements**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/KYC_AML_Requirements.md)
 > **Last Synced**: 2026-02-08
@@ -896,12 +896,12 @@ WHERE (single_transaction >= 10000 OR cumulative_deposit >= 50000)
 ## Related Documentation
 
 ### Technical References
-- [06-05 Data Security Strategy](../../source/06_Platform_Governance/06-05_Data_Security.md) - Personal data encryption, audit logs
-- [06-04 Approval Workflow System](../../source/06_Platform_Governance/06-04_Approval_Workflow.md) - KYC manual review process
-- [09-02-01 Gateway Architecture](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API security, brute force protection
+- [06-05 Data Security Strategy](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) - Personal data encryption, audit logs
+- [06-04 Approval Workflow System](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - KYC manual review process
+- [09-02-01 Gateway Architecture](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API security, brute force protection
 
 ### Third-Party Integration
-- [14-01 Third-Party Integration Standards](../../source/14_Third_Party_Integration/14-01_Third_Party_Integration.md) - Sumsub/Jumio integration guide
+- [14-01 Third-Party Integration Standards](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md) - Sumsub/Jumio integration guide
 
 ---
 

@@ -1,6 +1,6 @@
 # Risk Requirements Summary
 
-> **Canonical Source**: [00-14_Risk_Implementation.md](../../source/00_Foundation/guides/00-14_Risk_Implementation.md)
+> **Canonical Source**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
 > **Audience**: Executives, Risk Officers, Compliance Managers
 > **Related Doc**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
 > **Last Synced**: 2026-02-08

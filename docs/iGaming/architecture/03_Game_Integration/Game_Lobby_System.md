@@ -1,6 +1,6 @@
 # Game Lobby System
 
-> **Canonical Source**: [03-02_Game_Lobby_Management.md](../../source/03_Game_Center/03-02_Game_Lobby_Management.md)
+> **Canonical Source**: [03-02_Game_Lobby_Management.md](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md)
 > **Audience**: Architects, Backend Engineers, Frontend Engineers, Search Engineers
 > **Business Requirements**: [Game Lobby Requirements](../../requirements/03_Gaming_Operations/Game_Lobby_Requirements.md)
 > **Last Synced**: 2026-02-08
@@ -345,16 +345,16 @@ All lobby elements (banners, game grids, menus, tags) are driven by JSON configu
 ## Related Documents
 
 ### Core Dependencies
-- [Game Integration Standards](../../source/03_Game_Center/03-01_Game_Integration_Standard.md) - GP API specifications
-- [Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - Game launch flow
+- [Game Integration Standards](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) - GP API specifications
+- [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - Game launch flow
 
 ### Technical Architecture
-- [Frontend Layout Engine](../../source/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) - Lobby page design patterns
-- [Gateway Architecture](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API rate limiting
+- [Frontend Layout Engine](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) - Lobby page design patterns
+- [Gateway Architecture](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API rate limiting
 
 ### Business Integration
-- [Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) - Activity-based game recommendations
-- [VIP Loyalty](../../source/01_Player_Center/01-06_VIP_Loyalty.md) - VIP exclusive game access
+- [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) - Activity-based game recommendations
+- [VIP Loyalty](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md) - VIP exclusive game access
 
 ---
 

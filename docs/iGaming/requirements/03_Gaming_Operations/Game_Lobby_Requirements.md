@@ -1,6 +1,6 @@
 # Game Lobby Requirements
 
-> **Canonical Source**: [03-02_Game_Lobby_Management.md](../../source/03_Game_Center/03-02_Game_Lobby_Management.md)
+> **Canonical Source**: [03-02_Game_Lobby_Management.md](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md)
 > **Audience**: Executives, Product Managers, Operations Leads, UX Designers
 > **Related Doc**: [Game Lobby System (Architecture)](../../architecture/03_Game_Integration/Game_Lobby_System.md)
 > **Last Synced**: 2026-02-08
@@ -222,16 +222,16 @@ Player interactions with games are scored to drive recommendations:
 ## Related Documents
 
 ### Core Dependencies
-- [Game Integration Standards](../../source/03_Game_Center/03-01_Game_Integration_Standard.md) - GP API specifications
-- [Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - Game launch flow
+- [Game Integration Standards](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) - GP API specifications
+- [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - Game launch flow
 
 ### Business Integration
-- [Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) - Activity-based game recommendations
-- [VIP Loyalty](../../source/01_Player_Center/01-06_VIP_Loyalty.md) - VIP exclusive games
+- [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) - Activity-based game recommendations
+- [VIP Loyalty](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md) - VIP exclusive games
 
 ### UX and Design
-- [Frontend Layout Engine](../../source/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) - Lobby page design
-- [Gateway Architecture](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API rate limiting
+- [Frontend Layout Engine](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) - Lobby page design
+- [Gateway Architecture](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API rate limiting
 
 ### Technical Implementation
 

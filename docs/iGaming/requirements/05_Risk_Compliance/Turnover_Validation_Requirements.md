@@ -1,6 +1,6 @@
 # Turnover Validation Requirements
 
-> **Canonical Source**: [05-07_Turnover_Validation_Scheme.md](../../source/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
+> **Canonical Source**: [05-07_Turnover_Validation_Scheme.md](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
 > **Audience**: Executives, Product Managers, Risk Operations, Compliance Officers
 > **Related Doc**: [Turnover_Validation_Architecture.md](../../architecture/05_Risk_Engine/Turnover_Validation_Architecture.md)
 > **Last Synced**: 2026-02-08
@@ -157,9 +157,9 @@ The following betting behaviours contribute zero to valid turnover:
 
 ## 9. Related Documents
 
-- [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) -- Configuration-driven risk rule engine
-- [05-05 Risk Proposal Workflow](../../source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) -- Proposal lifecycle management
-- [05-06 Withdrawal Risk Correlation](../../source/05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md) -- Withdrawal risk scoring
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) -- Configuration-driven risk rule engine
+- [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) -- Proposal lifecycle management
+- [05-06 Withdrawal Risk Correlation](../../source-archive/05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md) -- Withdrawal risk scoring
 
 ### Technical Implementation
 

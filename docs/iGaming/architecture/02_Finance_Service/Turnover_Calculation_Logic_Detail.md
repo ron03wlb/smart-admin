@@ -1,6 +1,6 @@
 # Turnover Calculation Logic Detail
 
-> **Canonical Source**: [02-04-02_Calculation_Logic.md](../../source/02_Finance_Center/02-04-diagrams/02-04-02_Calculation_Logic.md)
+> **Canonical Source**: [02-04-02_Calculation_Logic.md](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-02_Calculation_Logic.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: None
 > **Last Synced**: 2026-02-08

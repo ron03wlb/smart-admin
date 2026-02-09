@@ -1,6 +1,6 @@
 # Detection Model Implementation
 
-> **Canonical Source**: [05-02-01_Detection_Model.md](../../source/05_Risk_Control/05-02-01_Detection_Model.md)
+> **Canonical Source**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
 > **Audience**: Architects, Backend Engineers, Risk Team Engineers
 > **Business Requirements**: [Detection_Model_Spec.md](../../requirements/05_Risk_Compliance/Detection_Model_Spec.md)
 > **Last Synced**: 2026-02-09
@@ -15,9 +15,9 @@ SmartAdmin iGaming v2.1.0 introduces a Configuration-Driven Risk Control System 
 
 ### Prerequisites
 
-- [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) -- Configuration-driven rule engine (Section 9)
-- [01-05 Withdrawal Risk](../../source/01_Player_Center/01-05_Withdrawal_Risk.md) -- SAGA Step 2.5 deferred risk check
-- [02-04 Turnover Reconciliation](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) -- Layer 1 processing flow
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) -- Configuration-driven rule engine (Section 9)
+- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) -- SAGA Step 2.5 deferred risk check
+- [02-04 Turnover Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) -- Layer 1 processing flow
 
 ---
 
@@ -286,6 +286,6 @@ Review outcomes and their system actions:
 
 ## 8. Related Documents
 
-- [05-02-02 Rule Configuration](../../source/05_Risk_Control/05-02-02_Rule_Configuration.md) -- Risk proposal service and deferred checks
-- [05-02-03 ML Integration](../../source/05_Risk_Control/05-02-03_ML_Integration.md) -- Multi-dimensional risk rules
-- [05-02-04 Operations Tools](../../source/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin architecture mapping and monitoring
+- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) -- Risk proposal service and deferred checks
+- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) -- Multi-dimensional risk rules
+- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin architecture mapping and monitoring

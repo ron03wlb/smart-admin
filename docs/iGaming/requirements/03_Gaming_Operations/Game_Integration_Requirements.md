@@ -1,6 +1,6 @@
 # Game Integration Requirements
 
-> **Canonical Source**: [source/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
+> **Canonical Source**: [source/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
 > **Audience**: Executives, Product Managers
 > **Related Doc**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
 > **Last Synced**: 2026-02-09

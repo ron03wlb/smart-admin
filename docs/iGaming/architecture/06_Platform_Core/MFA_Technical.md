@@ -13,13 +13,13 @@
 - Owner: Security Team + Backend Team
 - View Type: Technical Architecture
 
-**Canonical Source**: [docs/iGaming/source/06_Platform_Governance/06-06_MFA_Implementation.md](../../source/06_Platform_Governance/06-06_MFA_Implementation.md)
+**Canonical Source**: [docs/iGaming/source-archive/06_Platform_Governance/06-06_MFA_Implementation.md](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
 
 **Related Documents**:
 - Business Requirements: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Requirements.md)
 - Source Sub-documents:
-  - [06-06-02 TOTP & WebAuthn Implementation](../../source/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
-  - [06-06-03 Login & Recovery Flow](../../source/06_Platform_Governance/06-06-03_Recovery_Flow.md)
+  - [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
+  - [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 
 ---
 

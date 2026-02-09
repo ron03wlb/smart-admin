@@ -1,6 +1,6 @@
 # Governance Requirements
 
-> **Canonical Source**: [00-15_Governance_Implementation.md](../../source/00_Foundation/guides/00-15_Governance_Implementation.md)
+> **Canonical Source**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
 > **Related Doc**: [Governance_Implementation.md](../../architecture/06_Platform_Core/Governance_Implementation.md)
 > **Last Synced**: 2026-02-08
@@ -124,9 +124,7 @@ This document defines the governance requirements for the iGaming platform, cove
 | Financial Data | NIST-Approved 256-bit Encryption | Account balances, transaction amounts |
 | Search Indexes | Blind Index (HMAC) | Searchable encrypted fields |
 
-**Note**: AES-256-GCM is the approved implementation algorithm for this requirement.
-
-→ **[Encryption Algorithm Selection](../../architecture/06_Platform_Core/Governance_Implementation.md#encryption-algorithms)**
+→ **[Encryption Algorithm Selection](../../architecture/06_Platform_Core/Governance_Implementation.md#encryption-algorithms)** — See architecture layer for approved algorithm details
 
 ### Compliance Checklist
 
@@ -140,7 +138,7 @@ This document defines the governance requirements for the iGaming platform, cove
 | Risk | Description | Mitigation |
 |------|-------------|------------|
 | Key Management Chaos | Hardcoded keys or key leakage | Use centralized KMS; never store keys in code |
-| Weak Algorithms | Using outdated encryption standards | Enforce AES-256-GCM minimum standard |
+| Weak Algorithms | Using outdated encryption standards | Enforce NIST-approved 256-bit minimum standard |
 | Blind Index Collision | Hash collisions cause incorrect query results | Use high-entropy hash functions with sufficient output length |
 
 ---

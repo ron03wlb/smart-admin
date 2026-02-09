@@ -1,6 +1,6 @@
 # Risk Implementation
 
-> **Canonical Source**: [00-14_Risk_Implementation.md](../../source/00_Foundation/guides/00-14_Risk_Implementation.md)
+> **Canonical Source**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
 > **Audience**: Architects, Backend Engineers, Data Engineers
 > **Business Requirements**: [Risk_Requirements_Summary.md](../../requirements/05_Risk_Compliance/Risk_Requirements_Summary.md)
 > **Last Synced**: 2026-02-08
@@ -26,9 +26,9 @@ Design and implement a rule engine architecture integrating Drools/LiteFlow, wit
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) | S2 Rule Engine | Drools integration |
-| 2 | [05-05 Risk Proposal Workflow](../../source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) | S3 Approval Flow | Workflow design |
-| 3 | [01-05 Withdrawal Risk](../../source/01_Player_Center/01-05_Withdrawal_Risk.md) | S4 Risk Rules | Real-world cases |
+| 1 | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) | S2 Rule Engine | Drools integration |
+| 2 | [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) | S3 Approval Flow | Workflow design |
+| 3 | [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) | S4 Risk Rules | Real-world cases |
 
 ### SmartAdmin Layer Mapping
 
@@ -96,9 +96,9 @@ Implement device fingerprinting, behavioral analysis, and machine learning model
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [05-02 Fraud Detection](../../source/05_Risk_Control/05-02_Fraud_Detection.md) | S2 Device Fingerprint | FingerprintJS |
-| 2 | [05-02 Fraud Detection](../../source/05_Risk_Control/05-02_Fraud_Detection.md) | S3 Behavioral Analysis | Anomaly detection |
-| 3 | [01-01 Player Lifecycle](../../source/01_Player_Center/01-01_Player_Lifecycle.md) | S5 Risk Scoring | Player classification |
+| 1 | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) | S2 Device Fingerprint | FingerprintJS |
+| 2 | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) | S3 Behavioral Analysis | Anomaly detection |
+| 3 | [01-01 Player Lifecycle](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) | S5 Risk Scoring | Player classification |
 
 ### SmartAdmin Layer Mapping
 
@@ -165,9 +165,9 @@ Implement credit line calculation, risk alerts, commission settlement (share mod
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [07-02 Credit Network Logic](../../source/07_Agent_Center/07-02_Credit_Network_Logic.md) | S2 Credit Network | Share mode |
-| 2 | [05-04 Agent Credit Risk](../../source/05_Risk_Control/05-04_Agent_Credit_Risk.md) | S3 Risk Control | Credit calculation |
-| 3 | [07-03 Agent System](../../source/07_Agent_Center/07-03_Agent_System.md) | S4 Risk Integration | Agent risk controls |
+| 1 | [07-02 Credit Network Logic](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) | S2 Credit Network | Share mode |
+| 2 | [05-04 Agent Credit Risk](../../source-archive/05_Risk_Control/05-04_Agent_Credit_Risk.md) | S3 Risk Control | Credit calculation |
+| 3 | [07-03 Agent System](../../source-archive/07_Agent_Center/07-03_Agent_System.md) | S4 Risk Integration | Agent risk controls |
 
 ### SmartAdmin Layer Mapping
 
@@ -240,12 +240,12 @@ public void processSettlement(Long agentId, SettlementPeriod period) {
 
 | Area | Document |
 |------|----------|
-| Risk Framework | [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) |
-| Fraud Detection | [05-02 Fraud Detection](../../source/05_Risk_Control/05-02_Fraud_Detection.md) |
-| Risk Proposal Workflow | [05-05 Risk Proposal Workflow](../../source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
-| Agent Credit Risk | [05-04 Agent Credit Risk](../../source/05_Risk_Control/05-04_Agent_Credit_Risk.md) |
-| Credit Network Logic | [07-02 Credit Network Logic](../../source/07_Agent_Center/07-02_Credit_Network_Logic.md) |
-| Agent System | [07-03 Agent System](../../source/07_Agent_Center/07-03_Agent_System.md) |
+| Risk Framework | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) |
+| Fraud Detection | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
+| Risk Proposal Workflow | [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
+| Agent Credit Risk | [05-04 Agent Credit Risk](../../source-archive/05_Risk_Control/05-04_Agent_Credit_Risk.md) |
+| Credit Network Logic | [07-02 Credit Network Logic](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) |
+| Agent System | [07-03 Agent System](../../source-archive/07_Agent_Center/07-03_Agent_System.md) |
 
 ---
 

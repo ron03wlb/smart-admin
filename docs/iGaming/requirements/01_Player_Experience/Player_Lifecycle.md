@@ -1,6 +1,6 @@
 # Player Lifecycle - Business Requirements
 
-> **Canonical Source**: [docs/iGaming/source/01_Player_Center/01-01_Player_Lifecycle.md](../../source/01_Player_Center/01-01_Player_Lifecycle.md)
+> **Canonical Source**: [docs/iGaming/source-archive/01_Player_Center/01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
 > **View**: Business Requirements (Product & Operations)
 > **Technical Implementation**: [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)
 

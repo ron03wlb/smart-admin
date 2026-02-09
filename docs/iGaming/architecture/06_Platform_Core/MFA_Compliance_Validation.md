@@ -1,6 +1,6 @@
 # MFA Compliance Validation - Technical Architecture
 
-> **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source/06_Platform_Governance/06-06-04_Compliance_Audit.md)
+> **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 > **Audience**: Architects, Backend Developers, DevOps
 > **Business Requirements**: [MFA Compliance Requirements](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
 > **Last Synced**: 2026-02-08
@@ -652,6 +652,6 @@ class MfaIntegrationTest {
 
 ## 10. Related Documents
 
-- [06-06-01 MFA Architecture Design](../../source/06_Platform_Governance/06-06-01_MFA_Architecture.md) - Business requirements and method selection
-- [06-06-02 TOTP & WebAuthn Implementation](../../source/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md) - TOTP algorithm details
-- [06-06-03 Login & Recovery Flow](../../source/06_Platform_Governance/06-06-03_Recovery_Flow.md) - Authentication flow design
+- [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) - Business requirements and method selection
+- [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md) - TOTP algorithm details
+- [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) - Authentication flow design

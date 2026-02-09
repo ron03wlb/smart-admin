@@ -1,6 +1,6 @@
 # Payment Operations
 
-> **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
+> **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
 > **Related Doc**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
 > **Last Synced**: 2026-02-09
@@ -243,14 +243,14 @@ The payment operations module is responsible for all interactions with external 
 ## 11. Related Documentation
 
 ### Business References
-- [Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) - Deposit crediting logic
-- [Withdrawal Risk Control](../../source/01_Player_Center/01-05_Withdrawal_Risk.md) - Withdrawal process and risk control
-- [Reconciliation System](../../source/02_Finance_Center/02-03_Reconciliation_System.md) - PSP reconciliation process
+- [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Deposit crediting logic
+- [Withdrawal Risk Control](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - Withdrawal process and risk control
+- [Reconciliation System](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) - PSP reconciliation process
 
 ### Compliance References
-- [Payment Restrictions](../../source/12_System_Security/12-06_Payment_Restrictions.md) - Credit card ban and crypto compliance
-- [Multi-Jurisdiction Framework](../../source/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md) - Multi-license payment configuration
-- [UKGC Compliance](../../source/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK credit card ban details
+- [Payment Restrictions](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md) - Credit card ban and crypto compliance
+- [Multi-Jurisdiction Framework](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md) - Multi-license payment configuration
+- [UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK credit card ban details
 
 ### Technical Implementation
 

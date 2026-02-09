@@ -1,6 +1,6 @@
 # ML Risk Detection Requirements (機器學習風控業務需求)
 
-> **Canonical Source**: [05-02-03_ML_Integration.md](../../source/05_Risk_Control/05-02-03_ML_Integration.md)
+> **Canonical Source**: [05-02-03_ML_Integration.md](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md)
 > **Audience**: Executives, Product Managers
 > **Related Doc**: [ML_Integration_Architecture.md](../../architecture/05_Risk_Engine/ML_Integration_Architecture.md)
 > **Last Synced**: 2026-02-08

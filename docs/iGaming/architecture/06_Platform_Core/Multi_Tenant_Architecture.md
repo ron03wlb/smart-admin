@@ -1,7 +1,7 @@
 # Multi-Tenant Architecture
 
 > **Business Requirements**: [Multi_Tenant_Requirements.md](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md)
-> **Canonical Source**: [`docs/iGaming/source/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source/06_Platform_Governance/06-01_Multi_Tenant.md)
+> **Canonical Source**: [`docs/iGaming/source-archive/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Last Synced**: 2026-02-09
 

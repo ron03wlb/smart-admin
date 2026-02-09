@@ -1,0 +1,191 @@
+# Marketing Compliance Architecture
+
+> **Business Requirements**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
+> **Canonical Source**: [source-archive/11_Frontend_CMS/11-05](../../source-archive/11_Frontend_CMS/11-05_Marketing_Compliance.md)
+> **View Type**: Technical Architecture
+> **Target Audience**: Architects, Backend Developers, Compliance Engineers
+
+---
+
+## 1. Advertising Review Workflow
+
+```mermaid
+graph TD
+    A[Marketing Team Submits Material] --> B{Content Review}
+    B -->|Pass| C[Compliance Team Review]
+    B -->|Fail| D[Return for Edit]
+    C -->|Pass| E{Target Market Check}
+    C -->|Fail| D
+    E -->|UK| F[UKGC Compliance Check]
+    E -->|Malta| G[MGA Compliance Check]
+    E -->|Other| H[General Compliance Check]
+    F --> I{Final Approval}
+    G --> I
+    H --> I
+    I -->|Approved| J[Publish]
+    I -->|Rejected| D
+    J --> K[Post-Publish Monitoring]
+    K -->|Issue Found| L[Immediate Takedown]
+```
+
+## 2. Marketing Consent Matrix (LCCP 5.1.12)
+
+### 2.1 Database Schema
+
+```sql
+CREATE TABLE t_player_marketing_consent (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    player_id BIGINT NOT NULL,
+    product_type ENUM('SPORTS', 'CASINO', 'POKER', 'BINGO', 'ALL') NOT NULL,
+    channel_type ENUM('EMAIL', 'SMS', 'PUSH', 'PHONE', 'ALL') NOT NULL,
+    consent_status BOOLEAN NOT NULL DEFAULT FALSE,
+    consent_date DATETIME,
+    consent_source ENUM('REGISTRATION', 'PREFERENCE_CENTER', 'API', 'SUPPORT', 'SELF_EXCLUSION_END') NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent VARCHAR(500),
+    device_fingerprint VARCHAR(100),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_player_product_channel (player_id, product_type, channel_type),
+    INDEX idx_player_id (player_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE t_marketing_consent_audit (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    player_id BIGINT NOT NULL,
+    product_type VARCHAR(20) NOT NULL,
+    channel_type VARCHAR(20) NOT NULL,
+    old_status BOOLEAN,
+    new_status BOOLEAN NOT NULL,
+    change_reason VARCHAR(200),
+    changed_by_type ENUM('PLAYER', 'SYSTEM', 'SUPPORT') NOT NULL,
+    changed_by_id BIGINT,
+    ip_address VARCHAR(45),
+    changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_player_changed (player_id, changed_at)
+) ENGINE=InnoDB COMMENT='7-year retention';
+```
+
+### 2.2 Consent API
+
+```java
+@RestController
+@RequestMapping("/api/v1/player/marketing-consent")
+@RequiredArgsConstructor
+public class MarketingConsentController {
+
+    private final MarketingConsentService service;
+
+    @GetMapping
+    @SaCheckLogin
+    public ResponseDTO<MarketingConsentMatrixVO> getConsentMatrix() {
+        Long playerId = StpUtil.getLoginIdAsLong();
+        return ResponseDTO.ok(service.getConsentMatrix(playerId));
+    }
+
+    @PutMapping
+    @SaCheckLogin
+    public ResponseDTO<Void> updateConsent(
+            @RequestBody @Valid MarketingConsentUpdateForm form,
+            HttpServletRequest request) {
+        Long playerId = StpUtil.getLoginIdAsLong();
+        service.updateConsent(playerId, form, getMetadata(request));
+        return ResponseDTO.ok();
+    }
+
+    @PostMapping("/opt-out-all")
+    @SaCheckLogin
+    public ResponseDTO<Void> optOutAll(HttpServletRequest request) {
+        Long playerId = StpUtil.getLoginIdAsLong();
+        service.optOutAll(playerId, getMetadata(request));
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 2.3 Self-Exclusion End Handler
+
+```java
+@Service
+@RequiredArgsConstructor
+public class SelfExclusionEndHandler {
+    private final MarketingConsentService consentService;
+
+    @EventListener
+    public void onSelfExclusionEnd(SelfExclusionEndEvent event) {
+        Long playerId = event.getPlayerId();
+        consentService.resetAllConsent(playerId, ConsentSource.SELF_EXCLUSION_END);
+        consentService.logAudit(playerId, "ALL", "ALL",
+            true, false, "Self-exclusion ended - consent reset");
+        playerService.setForcePreferenceConfirm(playerId, true);
+    }
+}
+```
+
+## 3. Marketing Exclusion Query
+
+```sql
+SELECT p.id, p.email
+FROM t_player p
+JOIN t_player_marketing_preference pmp ON p.id = pmp.player_id
+WHERE pmp.email_opt_in = TRUE
+  AND pmp.promotional_opt_in = TRUE
+  AND pmp.is_self_excluded = FALSE
+  AND pmp.is_cooling_off = FALSE
+  AND NOT EXISTS (
+    SELECT 1 FROM t_gamstop_check gc
+    WHERE gc.player_id = p.id AND gc.is_excluded = TRUE
+  );
+```
+
+## 4. CRM Integration
+
+```java
+@Service
+@RequiredArgsConstructor
+public class MarketingCampaignService {
+    private final MarketingConsentService consentService;
+
+    public List<Long> filterEligiblePlayers(
+            List<Long> playerIds, ProductType product, ChannelType channel) {
+        return playerIds.stream()
+            .filter(playerId -> consentService.hasConsent(playerId, product, channel))
+            .filter(playerId -> !selfExclusionService.isExcluded(playerId))
+            .filter(playerId -> !coolingOffService.isInCoolingOff(playerId))
+            .collect(Collectors.toList());
+    }
+}
+```
+
+## 5. Compliance Training Tracking
+
+```sql
+CREATE TABLE t_compliance_training_record (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    employee_id BIGINT NOT NULL,
+    training_type VARCHAR(100) NOT NULL,
+    training_date DATE NOT NULL,
+    passed BOOLEAN DEFAULT FALSE,
+    score DECIMAL(5,2),
+    certificate_url VARCHAR(500),
+    expiry_date DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_employee_id (employee_id),
+    INDEX idx_expiry_date (expiry_date)
+);
+```
+
+## 6. Monthly Compliance Report
+
+```sql
+SELECT
+    DATE_FORMAT(created_at, '%Y-%m') AS report_month,
+    COUNT(*) AS total_campaigns,
+    SUM(CASE WHEN status = 'APPROVED' THEN 1 ELSE 0 END) AS approved,
+    SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END) AS rejected,
+    ROUND(SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS rejection_rate
+FROM t_marketing_campaign_review
+WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+ORDER BY report_month DESC;
+```

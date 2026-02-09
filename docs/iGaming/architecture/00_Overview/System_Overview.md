@@ -1,6 +1,6 @@
 # iGaming System Overview
 
-> **Canonical Source**: [00-01_Quickstart.md](../../source/00_Foundation/00-01_Quickstart.md)
+> **Canonical Source**: [00-01_Quickstart.md](../../source-archive/00_Foundation/00-01_Quickstart.md)
 > **Audience**: Architects, Backend Engineers, DevOps Engineers
 > **Business Requirements**: [Platform_Overview.md](../../requirements/01_Player_Experience/Platform_Overview.md)
 > **Last Synced**: 2026-02-08
@@ -28,7 +28,7 @@ Bettable Balance = Cash Balance - Locked Amount - In-Progress Bets
 
 ### 2.3 References
 
-- SSOT: [02-06 Wallet Architecture -- Bettable Balance](../../source/02_Finance_Center/02-06_Wallet_Architecture.md#可下注餘額計算)
+- SSOT: [02-06 Wallet Architecture -- Bettable Balance](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#可下注餘額計算)
 
 ---
 
@@ -61,7 +61,7 @@ Examples:
 
 ### 3.4 References
 
-- SSOT: [03-04 Turnover Calculation -- Valid Bet Algorithm](../../source/03_Game_Center/03-04_Turnover_Calculation.md#有效投注算法)
+- SSOT: [03-04 Turnover Calculation -- Valid Bet Algorithm](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md#有效投注算法)
 
 ---
 
@@ -100,7 +100,7 @@ This is defensive programming -- even if Redis fails, fund safety is guaranteed.
 
 ### 4.4 References
 
-- SSOT: [03-03 Seamless Wallet Analysis -- Token Verification](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-驗證流程)
+- SSOT: [03-03 Seamless Wallet Analysis -- Token Verification](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-驗證流程)
 
 ---
 
@@ -141,7 +141,7 @@ Level 1: Platform
 
 ### 5.5 References
 
-- SSOT: [06-01 Multi-Tenant -- Isolation Strategy](../../source/06_Platform_Governance/06-01_Multi_Tenant.md#隔離策略)
+- SSOT: [06-01 Multi-Tenant -- Isolation Strategy](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md#隔離策略)
 
 ---
 
@@ -174,7 +174,7 @@ Trigger Check --> Rule Engine calculates risk score --> Decision
 
 ### 6.3 References
 
-- SSOT: [05-01 Risk Framework -- Rule Engine](../../source/05_Risk_Control/05-01_Risk_Framework.md#規則引擎)
+- SSOT: [05-01 Risk Framework -- Rule Engine](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md#規則引擎)
 
 ---
 
@@ -219,37 +219,37 @@ flowchart LR
 
 | Priority | Topic | Document |
 |----------|-------|----------|
-| P0 | Wallet Architecture | [02-06 Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) |
-| P0 | Seamless Wallet API | [03-03 Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) |
-| P0 | Turnover Calculation | [03-04 Turnover Calculation](../../source/03_Game_Center/03-04_Turnover_Calculation.md) |
-| P1 | Risk Engine | [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) |
-| P1 | Multi-Tenant Architecture | [06-01 Multi-Tenant](../../source/06_Platform_Governance/06-01_Multi_Tenant.md) |
+| P0 | Wallet Architecture | [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) |
+| P0 | Seamless Wallet API | [03-03 Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) |
+| P0 | Turnover Calculation | [03-04 Turnover Calculation](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) |
+| P1 | Risk Engine | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) |
+| P1 | Multi-Tenant Architecture | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
 
 ### Architects
 
 | Priority | Topic | Document |
 |----------|-------|----------|
-| P0 | Solution Overview | [00-01 Solution Overview](../../source/00_Foundation/concepts/00-01_Solution_Overview.md) |
-| P0 | Multi-Tenant Architecture | [06-01 Multi-Tenant](../../source/06_Platform_Governance/06-01_Multi_Tenant.md) |
-| P0 | Data Security | [06-05 Data Security](../../source/06_Platform_Governance/06-05_Data_Security.md) |
-| P1 | Deployment Architecture | [09-01 Deployment](../../source/09_Technical_Infrastructure/09-01_Deployment.md) |
-| P1 | API Gateway | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
+| P0 | Solution Overview | [00-01 Solution Overview](../../source-archive/00_Foundation/concepts/00-01_Solution_Overview.md) |
+| P0 | Multi-Tenant Architecture | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
+| P0 | Data Security | [06-05 Data Security](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) |
+| P1 | Deployment Architecture | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) |
+| P1 | API Gateway | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
 
 ### DevOps Engineers
 
 | Priority | Topic | Document |
 |----------|-------|----------|
-| P0 | Deployment | [09-01 Deployment](../../source/09_Technical_Infrastructure/09-01_Deployment.md) |
-| P0 | Maintenance | [09-05 Maintenance](../../source/09_Technical_Infrastructure/09-05_Maintenance.md) |
-| P1 | API Gateway Config | [09-02-01 Gateway Core](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
+| P0 | Deployment | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) |
+| P0 | Maintenance | [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md) |
+| P1 | API Gateway Config | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
 
 ### QA Engineers
 
 | Priority | Topic | Document |
 |----------|-------|----------|
-| P0 | QA Standards | [09-04 QA Standards](../../source/09_Technical_Infrastructure/09-04_QA_Standards.md) |
-| P0 | Wallet Edge Cases | [03-01 Game Integration Standard](../../source/03_Game_Center/03-01_Game_Integration_Standard.md) |
-| P1 | Risk Test Scenarios | [05-02 Fraud Detection](../../source/05_Risk_Control/05-02_Fraud_Detection.md) |
+| P0 | QA Standards | [09-04 QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md) |
+| P0 | Wallet Edge Cases | [03-01 Game Integration Standard](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) |
+| P1 | Risk Test Scenarios | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
 
 ---
 

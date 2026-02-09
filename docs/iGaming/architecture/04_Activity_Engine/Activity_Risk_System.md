@@ -1,6 +1,6 @@
 # Activity Risk Control System Architecture
 
-> **Canonical Source**: [04-03_Activity_Risk_Control.md](../../source/04_Activity_Center/04-03_Activity_Risk_Control.md)
+> **Canonical Source**: [04-03_Activity_Risk_Control.md](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md)
 > **Audience**: Architects, Backend Developers, DevOps
 > **Business Requirements**: [Activity_Risk_Requirements.md](../../requirements/04_Promotions_VIP/Activity_Risk_Requirements.md)
 > **Last Synced**: 2026-02-08

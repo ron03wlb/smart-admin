@@ -1,6 +1,6 @@
 # Business Logic Flows -- Technical Implementation
 
-> **Canonical Source**: [source/00_Foundation/00-02_Business_Flows.md](../../source/00_Foundation/00-02_Business_Flows.md)
+> **Canonical Source**: [source/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Business Requirements**: [Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md)
 > **Last Synced**: 2026-02-08
@@ -44,7 +44,7 @@ String tenantId = claims.get("tenant_id", String.class);
 
 **Design Rationale**: ThreadLocal ensures tenant isolation per request thread. The `finally` block in the filter must always call `TenantContext.clear()` to prevent memory leaks.
 
-Reference: [Multi-Tenant Architecture](../../source/06_Platform_Governance/06-01_Multi_Tenant.md#tenant-context)
+Reference: [Multi-Tenant Architecture](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md#tenant-context)
 
 ### 1.2 Wallet Initialization Schema
 
@@ -59,7 +59,7 @@ VALUES (:playerId, :tenantId, 0, 0, 0);
 - `locked_amount`: Funds reserved for pending withdrawals or in-progress bets
 - All monetary fields use `DECIMAL(18,2)` for precision
 
-Reference: [Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md)
+Reference: [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ---
 
@@ -148,7 +148,7 @@ String signature = HmacUtils.hmacSha256Hex(secretKey, data);
 - One-time use: Token is marked as consumed after first use
 - Optional IP binding: Prevents token theft via IP validation
 
-Reference: [Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-verification)
+Reference: [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-verification)
 
 ### 2.3 Three-Tier Idempotency Implementation
 
@@ -176,7 +176,7 @@ try (DistributedLock lock = redisson.getLock("lock:" + requestId)) {
 - Database serves as durable backup when Redis is unavailable
 - Distributed lock (Redisson) handles the edge case where two identical requests arrive simultaneously before either is persisted
 
-Reference: [Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#idempotency)
+Reference: [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#idempotency)
 
 ### 2.4 Playable Balance Check
 
@@ -188,7 +188,7 @@ if (availableBalance < betAmount) {
 
 **Formula**: `playable_balance = cash_balance - locked_amount - in_progress_bets`
 
-Reference: [Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md#playable-balance)
+Reference: [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#playable-balance)
 
 ### 2.5 API Specifications
 
@@ -230,7 +230,7 @@ Content-Type: application/json
 }
 ```
 
-Reference: [Game Integration Standard](../../source/03_Game_Center/03-01_Game_Integration_Standard.md)
+Reference: [Game Integration Standard](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 
 ---
 
@@ -252,7 +252,7 @@ BigDecimal wageringRequirement = depositAmount.add(bonusAmount).multiply(multipl
 - `maxBonus`: Maximum bonus cap (e.g., $500)
 - `multiplier`: Wagering multiplier (e.g., 20x)
 
-Reference: [Bonus Calculation Engine](../../source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
+Reference: [Bonus Calculation Engine](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 
 ### 3.2 Wagering Accumulation Logic
 
@@ -267,7 +267,7 @@ if (wageringProgress.compareTo(wageringRequirement) >= 0) {
 }
 ```
 
-Reference: [Turnover Calculation](../../source/03_Game_Center/03-04_Turnover_Calculation.md)
+Reference: [Turnover Calculation](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 
 ### 3.3 Bonus-to-Cash Conversion (Atomic Transaction)
 
@@ -294,7 +294,7 @@ COMMIT;
 - Both updates must succeed atomically (wrapped in a single transaction)
 - The Manager layer handles `@Transactional(rollbackFor = Throwable.class)` per SmartAdmin architecture rules
 
-Reference: [Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md)
+Reference: [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
 
 ---
 
@@ -313,7 +313,7 @@ WHERE player_id = :playerId
 - The `WHERE` clause ensures atomic check-and-lock (no race condition)
 - If the available balance is insufficient, the UPDATE affects 0 rows, and the application returns an error
 
-Reference: [Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md#fund-locking)
+Reference: [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#fund-locking)
 
 ### 4.2 Multi-Layer Risk Engine Implementation
 
@@ -357,7 +357,7 @@ if (riskScore.getTotal() <= 30) {
 }
 ```
 
-Reference: [Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md)
+Reference: [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
 
 ### 4.3 SAGA Compensation Transaction
 
@@ -399,7 +399,7 @@ Compensate: Delete Order <- Release Lock <- Cancel Payment <- Rollback Balance
 
 **Architecture Note**: Per SmartAdmin rules, `@Transactional` must be placed in the Manager layer, not the Service layer. The code above should reside in a `WithdrawalManager` class.
 
-Reference: [Withdrawal Risk](../../source/01_Player_Center/01-05_Withdrawal_Risk.md#saga-compensation)
+Reference: [Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md#saga-compensation)
 
 ---
 

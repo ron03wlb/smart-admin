@@ -1,6 +1,6 @@
 # Payment Gateway API
 
-> **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
+> **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
 > **Last Synced**: 2026-02-08
@@ -754,10 +754,10 @@ Fallback PSP: Manual Bank Transfer (Notify Finance Team)
 
 ## 10. Related Technical Documentation
 
-- [Data Security Standard](../../source/12_System_Security/12-03_Data_Security_Standard.md) - Payment data encryption
-- [API Design Principles](../../source/09_Technical_Infrastructure/09-03-01_Design_Principles.md) - API specifications
-- [Audit Log System](../../source/06_Platform_Governance/06-03_Audit_Log.md) - Configuration change audit
-- [Approval Workflow](../../source/06_Platform_Governance/06-04_Approval_Workflow.md) - Configuration change approval
+- [Data Security Standard](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md) - Payment data encryption
+- [API Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) - API specifications
+- [Audit Log System](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) - Configuration change audit
+- [Approval Workflow](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - Configuration change approval
 
 ---
 

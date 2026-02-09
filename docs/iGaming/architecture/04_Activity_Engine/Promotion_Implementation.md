@@ -1,6 +1,6 @@
 # Promotion Implementation
 
-> **Canonical Source**: [00-13_Promotion_Implementation.md](../../source/00_Foundation/guides/00-13_Promotion_Implementation.md)
+> **Canonical Source**: [00-13_Promotion_Implementation.md](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md)
 > **Audience**: Architects, Backend Engineers, Product Engineers
 > **Business Requirements**: [Promotion_Requirements.md](../../requirements/04_Promotions_VIP/Promotion_Requirements.md)
 > **Last Synced**: 2026-02-08
@@ -26,9 +26,9 @@ Build configurable bonus type definitions, a rule engine for distribution logic,
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [04-04 Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) | S3 Rule Engine | Bonus distribution logic |
-| 2 | [04-04 Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) | Full doc | Calculation formulas |
-| 3 | [02-06 Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) | S2 Bonus Wallet | Wallet integration |
+| 1 | [04-04 Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) | S3 Rule Engine | Bonus distribution logic |
+| 2 | [04-04 Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) | Full doc | Calculation formulas |
+| 3 | [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) | S2 Bonus Wallet | Wallet integration |
 
 ### SmartAdmin Layer Mapping
 
@@ -74,9 +74,9 @@ Implement wagering calculation logic, real-time progress tracking, and completio
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [03-04 Turnover Calculation](../../source/03_Game_Center/03-04_Turnover_Calculation.md) | S1 Three-Layer Validation | Valid bet algorithm |
-| 2 | [04-04 Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) | S5 Wagering Requirements | Wagering calculation |
-| 3 | [04-04 Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) | S4 Wagering Tracking | Progress recording |
+| 1 | [03-04 Turnover Calculation](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) | S1 Three-Layer Validation | Valid bet algorithm |
+| 2 | [04-04 Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) | S5 Wagering Requirements | Wagering calculation |
+| 3 | [04-04 Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) | S4 Wagering Tracking | Progress recording |
 
 ### SmartAdmin Layer Mapping
 
@@ -138,9 +138,9 @@ Implement tier definitions, upgrade/downgrade rules, points calculation, and exc
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [01-06 VIP Loyalty](../../source/01_Player_Center/01-06_VIP_Loyalty.md) | S2 Tier System | VIP definition |
-| 2 | [01-06 VIP Loyalty](../../source/01_Player_Center/01-06_VIP_Loyalty.md) | S3 Upgrade Rules | Points calculation |
-| 3 | [01-06 VIP Loyalty](../../source/01_Player_Center/01-06_VIP_Loyalty.md) | S4 Benefits Config | Exclusive benefits |
+| 1 | [01-06 VIP Loyalty](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md) | S2 Tier System | VIP definition |
+| 2 | [01-06 VIP Loyalty](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md) | S3 Upgrade Rules | Points calculation |
+| 3 | [01-06 VIP Loyalty](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md) | S4 Benefits Config | Exclusive benefits |
 
 ### SmartAdmin Layer Mapping
 
@@ -196,10 +196,10 @@ if (player.periodPoints < currentTier.retentionPoints
 
 | Area | Document |
 |------|----------|
-| Activity Bonus | [04-04 Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) |
-| Turnover Calculation | [03-04 Turnover Calculation](../../source/03_Game_Center/03-04_Turnover_Calculation.md) |
-| VIP & Loyalty | [01-06 VIP Loyalty](../../source/01_Player_Center/01-06_VIP_Loyalty.md) |
-| Wallet Architecture | [02-06 Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) |
+| Activity Bonus | [04-04 Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) |
+| Turnover Calculation | [03-04 Turnover Calculation](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) |
+| VIP & Loyalty | [01-06 VIP Loyalty](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md) |
+| Wallet Architecture | [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) |
 
 ---
 

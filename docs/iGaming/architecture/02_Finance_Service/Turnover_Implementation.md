@@ -1,6 +1,6 @@
 # Turnover Implementation Details: LockAmount & Effective Stake
 
-> **Canonical Source**: [02-04-03_Implementation_Details.md](../../source/02_Finance_Center/02-04-diagrams/02-04-03_Implementation_Details.md)
+> **Canonical Source**: [02-04-03_Implementation_Details.md](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-03_Implementation_Details.md)
 > **Audience**: Architects, Backend Developers, DevOps
 > **Business Requirements**: None (pure technical content, no requirements counterpart)
 > **Last Synced**: 2026-02-08

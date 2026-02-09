@@ -1,6 +1,6 @@
 # MFA Login and Recovery Requirements (MFA 登入與恢復業務需求)
 
-> **Canonical Source**: [06-06-03_Recovery_Flow.md](../../source/06_Platform_Governance/06-06-03_Recovery_Flow.md)
+> **Canonical Source**: [06-06-03_Recovery_Flow.md](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 > **Audience**: Executives, Compliance Officers, Security Operations
 > **Related Doc**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md)
 > **Last Synced**: 2026-02-09

@@ -1,6 +1,6 @@
 # TOTP 與 WebAuthn 技術實作
 
-> **Canonical Source**: [06-06-02_TOTP_WebAuthn.md](../../source/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
+> **Canonical Source**: [06-06-02_TOTP_WebAuthn.md](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: None (pure technical)
 > **Last Synced**: 2026-02-08

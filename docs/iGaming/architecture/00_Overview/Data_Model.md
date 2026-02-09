@@ -1,6 +1,6 @@
 # Data Model Architecture
 
-> **Canonical Source**: [source/00_Foundation/guides/00-10_Data_Model.md](../../source/00_Foundation/guides/00-10_Data_Model.md)
+> **Canonical Source**: [source/00_Foundation/guides/00-10_Data_Model.md](../../source-archive/00_Foundation/guides/00-10_Data_Model.md)
 > **Audience**: Architects, Backend Developers, DevOps
 > **Business Requirements**: None (pure technical)
 > **Last Synced**: 2026-02-08
@@ -145,7 +145,7 @@ Game Provider
 
 ### 3.1 Player Account State Machine
 
-> **SSOT**: Full definition at [01-01_Player_Lifecycle.md](../../source/01_Player_Center/01-01_Player_Lifecycle.md)
+> **SSOT**: Full definition at [01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
 
 **Five-State Definition**:
 
@@ -203,7 +203,7 @@ WHERE account_status = 'LOCKED'
 
 ### 3.2 Withdrawal State Machine
 
-> **SSOT**: Full SAGA definition at [01-05_Withdrawal_Risk.md](../../source/01_Player_Center/01-05_Withdrawal_Risk.md)
+> **SSOT**: Full SAGA definition at [01-05_Withdrawal_Risk.md](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md)
 
 **Ten-State Definition**:
 
@@ -270,7 +270,7 @@ WHERE wrc.player_id = ?
 
 ### 3.3 VIP Tier State Machine
 
-> **SSOT**: Full VIP system design at [01-06_VIP_Loyalty.md](../../source/01_Player_Center/01-06_VIP_Loyalty.md)
+> **SSOT**: Full VIP system design at [01-06_VIP_Loyalty.md](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md)
 
 **Five-Tier Definition**:
 
@@ -428,7 +428,7 @@ INSERT INTO player_status_audit_log (
 
 **Playable Balance Formula**:
 
-> **SSOT**: Full calculation logic at [02-06_Wallet_Architecture.md](../../source/02_Finance_Center/02-06_Wallet_Architecture.md)
+> **SSOT**: Full calculation logic at [02-06_Wallet_Architecture.md](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ```text
 Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
@@ -475,9 +475,9 @@ All wallet balance updates must be atomic and verified against transaction histo
 **Three-Layer Validation Architecture**:
 
 > **SSOT References**:
-> - Layer 1 (Risk Validation): [05-01_Risk_Framework.md](../../source/05_Risk_Control/05-01_Risk_Framework.md)
-> - Layer 2 (Finance Validation): [03-04_Turnover_Calculation.md](../../source/03_Game_Center/03-04_Turnover_Calculation.md)
-> - Layer 3 (Activity Application): [04-04_Activity_Bonus.md](../../source/04_Activity_Center/04-04_Activity_Bonus.md)
+> - Layer 1 (Risk Validation): [05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
+> - Layer 2 (Finance Validation): [03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
+> - Layer 3 (Activity Application): [04-04_Activity_Bonus.md](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
 
 ```text
 Layer 1: Risk Engine Validation (Real-time)

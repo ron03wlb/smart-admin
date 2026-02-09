@@ -1,6 +1,6 @@
 # Turnover and Valid Bet Terminology Standards
 
-> **Canonical Source**: [00-08_Terminology_Standards.md](../../source/00_Foundation/guides/00-08_Terminology_Standards.md)
+> **Canonical Source**: [00-08_Terminology_Standards.md](../../source-archive/00_Foundation/guides/00-08_Terminology_Standards.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
 > **Related Doc**: None
 > **Last Synced**: 2026-02-08

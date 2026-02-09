@@ -2,26 +2,34 @@
 
 > **Audience**: Executives, Product Managers, Compliance Officers, Business Analysts
 > **Focus**: WHAT and WHY - Business requirements, policies, and compliance
-> **Last Updated**: 2026-02-08
-> **Phase**: 6 Complete (35 documents split from source)
+> **Last Updated**: 2026-02-09
+> **Phase**: 9 Complete (66 documents across 15 categories)
 
 ---
 
 ## Category Navigation
 
-| Category | Description | Split Documents |
-|----------|-------------|-----------------|
+| Category | Description | Documents |
+|----------|-------------|-----------|
 | [01_Player_Experience](01_Player_Experience/) | Player lifecycle, VIP, segmentation | 6 |
 | [02_Financial_Operations](02_Financial_Operations/) | Payment, reconciliation, wallet rules | 5 |
 | [03_Gaming_Operations](03_Gaming_Operations/) | Game integration, turnover rules | 4 |
 | [04_Promotions_VIP](04_Promotions_VIP/) | Bonus rules, activity policies | 3 |
 | [05_Risk_Compliance](05_Risk_Compliance/) | KYC/AML, fraud detection, licensing | 11 |
 | [06_Governance_Licensing](06_Governance_Licensing/) | RBAC, audit, multi-jurisdiction, MFA | 6 |
-| [07_Metrics_KPIs](07_Metrics_KPIs/) | Reporting, analytics, CS operations | 0 (source index) |
+| [07_Agent_Operations](07_Agent_Operations/) | Credit network, agent system | 2 |
+| [08_Analytics_Operations](08_Analytics_Operations/) | Reporting, BI dashboards | 2 |
+| [09_Infrastructure_Requirements](09_Infrastructure_Requirements/) | QA standards, cost optimization | 2 |
+| [10_Platform_Operations](10_Platform_Operations/) | Tenant config, notifications, data pipeline | 3 |
+| [11_Frontend_Experience](11_Frontend_Experience/) | UX, SEO, mobile, localization | 4 |
+| [12_Security_Compliance](12_Security_Compliance/) | Data protection, compliance, payment security | 3 |
+| [13_Customer_Service](13_Customer_Service/) | CS platform, operations | 2 |
+| [14_Integration_Standards](14_Integration_Standards/) | Third-party integration | 1 |
+| [15_Responsible_Gambling](15_Responsible_Gambling/) | Self-exclusion, deposit limits, session protection | 4 |
 
 ---
 
-## All Split Documents
+## All Documents
 
 ### 01 Player Experience (6 documents)
 
@@ -88,6 +96,74 @@
 | [MFA Architecture Spec](06_Governance_Licensing/MFA_Architecture_Spec.md) | MFA design requirements, authenticator policies |
 | [Governance Requirements](06_Governance_Licensing/Governance_Requirements.md) | RBAC policies, audit logging, multi-tenant governance |
 
+### 07 Agent Operations (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Credit Network Requirements](07_Agent_Operations/Credit_Network_Requirements.md) | Credit lines, settlement cycles, business rules |
+| [Agent System Requirements](07_Agent_Operations/Agent_System_Requirements.md) | Agent hierarchy, commission rules, recruitment |
+
+### 08 Analytics Operations (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Reporting Requirements](08_Analytics_Operations/Reporting_Requirements.md) | Business reports, KPI definitions, data dimensions |
+| [BI Dashboard Requirements](08_Analytics_Operations/BI_Dashboard_Requirements.md) | Dashboard requirements, metric definitions |
+
+### 09 Infrastructure Requirements (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [QA Standards Requirements](09_Infrastructure_Requirements/QA_Standards_Requirements.md) | QA acceptance standards, test coverage |
+| [Cost Optimization Requirements](09_Infrastructure_Requirements/Cost_Optimization_Requirements.md) | Cost control objectives, budget constraints |
+
+### 10 Platform Operations (3 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Tenant Configuration Requirements](10_Platform_Operations/Tenant_Configuration_Requirements.md) | White-label config, tenant customization |
+| [Notification Requirements](10_Platform_Operations/Notification_Requirements.md) | Notification scenarios, channel priorities |
+| [Data Pipeline Requirements](10_Platform_Operations/Data_Pipeline_Requirements.md) | Data report requirements, ETL rules, SLA |
+
+### 11 Frontend Experience (4 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Frontend UX Requirements](11_Frontend_Experience/Frontend_UX_Requirements.md) | Page layout, banner rules |
+| [SEO Performance Requirements](11_Frontend_Experience/SEO_Performance_Requirements.md) | SEO goals, performance SLA |
+| [Mobile App Requirements](11_Frontend_Experience/Mobile_App_Requirements.md) | Mobile features, platform support |
+| [Localization Requirements](11_Frontend_Experience/Localization_Requirements.md) | Multi-language, translation workflow |
+
+### 12 Security Compliance (3 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Data Protection Requirements](12_Security_Compliance/Data_Protection_Requirements.md) | GDPR compliance, data deletion policies |
+| [Compliance Standards Requirements](12_Security_Compliance/Compliance_Standards_Requirements.md) | ISO 27001, UK RTS compliance |
+| [Payment Security Requirements](12_Security_Compliance/Payment_Security_Requirements.md) | Payment restrictions, data portability |
+
+### 13 Customer Service (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [CS Platform Requirements](13_Customer_Service/CS_Platform_Requirements.md) | CS platform, Player 360 view, ticket classification |
+| [CS Operations Requirements](13_Customer_Service/CS_Operations_Requirements.md) | CS operations, SLA metrics, scheduling |
+
+### 14 Integration Standards (1 document)
+
+| Document | Key Topics |
+|----------|------------|
+| [Third Party Integration Requirements](14_Integration_Standards/Third_Party_Integration_Requirements.md) | Third-party commercial conditions, SLA |
+
+### 15 Responsible Gambling (4 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Self Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) | Self-exclusion types, regulatory requirements |
+| [Deposit Limits Requirements](15_Responsible_Gambling/Deposit_Limits_Requirements.md) | Deposit limits, loss limits, business rules |
+| [Session Protection Requirements](15_Responsible_Gambling/Session_Protection_Requirements.md) | Cool-off periods, session management, reality checks |
+| [Affordability Requirements](15_Responsible_Gambling/Affordability_Requirements.md) | Player protection API, affordability assessment |
+
 ---
 
 ## Quick Links by Role
@@ -96,32 +172,28 @@
 - [Risk Strategy Overview](05_Risk_Compliance/Risk_Strategy_Overview.md) - Fraud costs, KPIs, vendor comparison
 - [Player Lifecycle](01_Player_Experience/Player_Lifecycle.md) - Player journey and engagement
 - [Platform Overview](01_Player_Experience/Platform_Overview.md) - Platform capabilities overview
-- [Solution Overview](01_Player_Experience/Solution_Overview.md) - Platform positioning
 
 ### For Compliance Officers
+- [Self Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) - Self-exclusion types
 - [KYC/AML Requirements](05_Risk_Compliance/KYC_AML_Requirements.md) - Verification procedures
-- [Fraud Detection Requirements](05_Risk_Compliance/Fraud_Detection_Requirements.md) - Detection policies
-- [MFA Requirements](06_Governance_Licensing/MFA_Requirements.md) - Authentication compliance
-- [Jurisdiction Framework Requirements](05_Risk_Compliance/Jurisdiction_Framework_Requirements.md) - Multi-jurisdiction compliance
-- [Player Protection Requirements](05_Risk_Compliance/Player_Protection_Requirements.md) - Responsible gambling
-- [Affordability Requirements](05_Risk_Compliance/Affordability_Requirements.md) - Player affordability
+- [Compliance Standards Requirements](12_Security_Compliance/Compliance_Standards_Requirements.md) - ISO 27001, UK RTS
+- [Data Protection Requirements](12_Security_Compliance/Data_Protection_Requirements.md) - GDPR compliance
 
 ### For Product Managers
 - [Bonus Calculation Requirements](04_Promotions_VIP/Bonus_Calculation_Requirements.md) - Bonus rules
 - [Payment Operations](02_Financial_Operations/Payment_Operations.md) - Payment methods
-- [Multi-Tenant Requirements](06_Governance_Licensing/Multi_Tenant_Requirements.md) - Platform hierarchy
-- [Game Lobby Requirements](03_Gaming_Operations/Game_Lobby_Requirements.md) - Game lobby organization
-- [Promotion Requirements](04_Promotions_VIP/Promotion_Requirements.md) - Promotion policies
+- [Credit Network Requirements](07_Agent_Operations/Credit_Network_Requirements.md) - Agent credit system
+- [BI Dashboard Requirements](08_Analytics_Operations/BI_Dashboard_Requirements.md) - Analytics dashboards
 
 ---
 
 ## Related Documentation
 
 - **Technical Implementation**: [../architecture/](../architecture/) - For architects and developers
-- **Complete Source**: [../source/](../source/) - Full documentation (SSOT)
+- **Archived Source**: [../source-archive/](../source-archive/) - Original SSOT documents (read-only)
 - **Main Index**: [../README.md](../README.md) - Navigation hub
 
 ---
 
-**Status**: Phase 6 Complete - 35 documents split from source
-**Validation**: No code blocks in requirements documents (verified)
+**Status**: Phase 9 Complete - 66 documents across 15 categories
+**Validation**: No code blocks in requirements documents (verified via `validate-requirements-purity.sh`)

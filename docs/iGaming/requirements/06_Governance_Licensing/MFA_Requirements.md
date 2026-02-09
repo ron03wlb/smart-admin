@@ -9,13 +9,13 @@
 - Owner: Product Team + Compliance Team
 - View Type: Business Requirements
 
-**Canonical Source**: [docs/iGaming/source/06_Platform_Governance/06-06_MFA_Implementation.md](../../source/06_Platform_Governance/06-06_MFA_Implementation.md)
+**Canonical Source**: [docs/iGaming/source-archive/06_Platform_Governance/06-06_MFA_Implementation.md](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
 
 **Related Documents**:
 - Technical Architecture: [MFA_Technical.md](../../architecture/06_Platform_Core/MFA_Technical.md)
 - Source Sub-documents:
-  - [06-06-01 MFA Architecture Design](../../source/06_Platform_Governance/06-06-01_MFA_Architecture.md)
-  - [06-06-04 Compliance & Audit](../../source/06_Platform_Governance/06-06-04_Compliance_Audit.md)
+  - [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
+  - [06-06-04 Compliance & Audit](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 
 ---
 
@@ -117,9 +117,8 @@ Backend administrators have high-privilege access that, if compromised, can resu
 
 1. All Super Admin, Finance Manager, Risk Control must enable MFA
 2. MFA Secret must be encrypted using NIST-approved 256-bit encryption standards
-   (AES-256-GCM is the approved implementation algorithm)
 
-→ **[MFA Secret Encryption](../../architecture/06_Platform_Core/MFA_Technical.md#secret-encryption)**
+→ **[MFA Secret Encryption](../../architecture/06_Platform_Core/MFA_Technical.md#secret-encryption)** — See architecture layer for approved algorithm details
 3. Audit logs must record all MFA events (setup, verify, failure)
 4. Recovery mechanism must require secondary verification (no self-service)
 5. MFA implementation must pass penetration testing
@@ -179,9 +178,8 @@ Backend administrators have high-privilege access that, if compromised, can resu
 - **Format**: 8 digits (e.g., 1234-5678)
 - **Generation**: SecureRandom, cryptographically secure
 - **Storage**: NIST-approved 256-bit encryption, stored with user MFA record
-  (Implementation algorithm: AES-256-GCM)
 
-→ **[Encryption Implementation Details](../../architecture/06_Platform_Core/MFA_Technical.md#secret-encryption)**
+→ **[Encryption Implementation Details](../../architecture/06_Platform_Core/MFA_Technical.md#secret-encryption)** — See architecture layer for approved algorithm details
 - **Usage**: Each code can only be used once
 
 **User Guidance**:

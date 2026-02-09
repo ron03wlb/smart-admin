@@ -1,6 +1,6 @@
 # MFA 架構規格 - 業務需求與方法選擇
 
-> **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source/06_Platform_Governance/06-06-01_MFA_Architecture.md)
+> **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
 > **Audience**: Executives, Compliance Officers, Risk Officers
 > **Related Doc**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
 > **Last Synced**: 2026-02-09

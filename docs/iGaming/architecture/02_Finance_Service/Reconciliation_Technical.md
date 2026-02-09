@@ -1,6 +1,6 @@
 # Reconciliation System Technical Architecture
 
-> **Canonical Source**: [02-03_Reconciliation_System.md](../../source/02_Finance_Center/02-03_Reconciliation_System.md)
+> **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers, System Integration Engineers
 > **Business Requirements**: [Reconciliation_Requirements.md](../../requirements/02_Financial_Operations/Reconciliation_Requirements.md)
 > **Last Synced**: 2026-02-09
@@ -1361,12 +1361,12 @@ GROUP BY DATE_FORMAT(created_at, '%Y-%m');
 ## Related Documents
 
 ### Technical Architecture Reference
-- [02-02 Payment Gateway Integration](../../source/02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP transaction data source
-- [02-04 Turnover and Game Reconciliation Analysis](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation process
-- [02-06 Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) - Balance adjustment logic
-- [06-03 Audit Log](../../source/06_Platform_Governance/06-03_Audit_Log.md) - Adjustment audit
-- [06-04 Approval Workflow](../../source/06_Platform_Governance/06-04_Approval_Workflow.md) - Adjustment approval workflow
-- [09-03-01 API Design Principles](../../source/09_Technical_Infrastructure/09-03-01_Design_Principles.md) - PSP API specification
+- [02-02 Payment Gateway Integration](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP transaction data source
+- [02-04 Turnover and Game Reconciliation Analysis](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation process
+- [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Balance adjustment logic
+- [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) - Adjustment audit
+- [06-04 Approval Workflow](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - Adjustment approval workflow
+- [09-03-01 API Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) - PSP API specification
 
 ### Business Requirements Reference
 - [Reconciliation_Requirements.md](../../requirements/02_Financial_Operations/Reconciliation_Requirements.md) - Business requirements view

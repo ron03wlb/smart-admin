@@ -72,8 +72,12 @@ while IFS= read -r file; do
                 continue
             fi
 
-            # Check diagram type
-            FIRST_LINE=$(echo "$BLOCK" | head -1 | xargs)
+            # Check diagram type (find first line matching a valid diagram type)
+            # Skip %%{init:}%% directives, YAML frontmatter (---), and JSON config lines
+            FIRST_LINE=$(echo "$BLOCK" | grep -E "^($VALID_TYPES)" | head -1 | xargs)
+            if [[ -z "$FIRST_LINE" ]]; then
+                FIRST_LINE=$(echo "$BLOCK" | head -1 | xargs)
+            fi
             if ! echo "$FIRST_LINE" | grep -qE "^($VALID_TYPES)" 2>/dev/null; then
                 echo "✗ $file (diagram #$DIAGRAM_IDX): unknown diagram type: $FIRST_LINE"
                 FILE_PASS=false
@@ -112,7 +116,7 @@ while IFS= read -r file; do
         FAIL_COUNT=$((FAIL_COUNT + 1))
     fi
 
-done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/backup-corrupted/*" 2>/dev/null | sort)
+done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/source-archive/*" ! -path "*/backup-corrupted/*" 2>/dev/null | sort)
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

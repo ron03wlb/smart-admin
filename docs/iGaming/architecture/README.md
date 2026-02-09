@@ -2,150 +2,201 @@
 
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Focus**: HOW - Technical implementation, APIs, system design
-> **Last Updated**: 2026-02-08
-> **Phase**: 6 Complete (40 documents split from source)
+> **Last Updated**: 2026-02-09
+> **Phase**: 9 Complete (117 documents across 18 categories)
 
 ---
 
 ## Category Navigation
 
-| Category | Description | Split Documents |
-|----------|-------------|-----------------|
+| Category | Description | Documents |
+|----------|-------------|-----------|
 | [00_Overview](00_Overview/) | Technology stack, data model, platform architecture | 5 |
 | [01_Player_Service](01_Player_Service/) | Player lifecycle implementation | 1 |
-| [02_Finance_Service](02_Finance_Service/) | Wallet, payment, transactions, turnover | 8 + source index |
-| [03_Game_Integration](03_Game_Integration/) | GP API, turnover calculation, lobby system | 4 + source index |
+| [02_Finance_Service](02_Finance_Service/) | Wallet, payment, transactions, turnover | 8 |
+| [03_Game_Integration](03_Game_Integration/) | GP API, turnover calculation, lobby system | 4 |
 | [04_Activity_Engine](04_Activity_Engine/) | Bonus calculation, activity risk, promotions | 3 |
 | [05_Risk_Engine](05_Risk_Engine/) | Fraud detection, ML integration, risk proposals | 10 |
 | [06_Platform_Core](06_Platform_Core/) | Multi-tenant, RBAC, MFA, governance | 8 |
-| [09_Infrastructure](09_Infrastructure/) | API Gateway, caching, streaming | 1 + source index |
-| [11_Frontend](11_Frontend/) | Layout engine, i18n, mobile | 0 (source index) |
-| [12_Security](12_Security/) | Encryption, GDPR, blind index | 0 (source index) |
+| [07_Agent_Service](07_Agent_Service/) | Credit network, agent system | 2 |
+| [08_Analytics_Service](08_Analytics_Service/) | Reporting, BI dashboards | 2 |
+| [09_Infrastructure](09_Infrastructure/) | API Gateway, caching, streaming, token validation | 23 |
+| [10_Platform_Management](10_Platform_Management/) | Tenant config, notifications, data pipeline | 3 |
+| [11_Frontend](11_Frontend/) | Layout engine, i18n, mobile, A/B testing | 11 |
+| [12_Security](12_Security/) | Encryption, GDPR, blind index, ISO 27001 | 10 |
+| [13_Customer_Service](13_Customer_Service/) | CS platform, operations | 2 |
+| [14_Third_Party](14_Third_Party/) | Third-party integration | 1 |
+| [15_Responsible_Gambling](15_Responsible_Gambling/) | Self-exclusion, deposit limits, player protection API | 4 |
+| [adr](adr/) | Architecture Decision Records | 3 |
+| [quality-reports](quality-reports/) | Quality gate reports | 2 |
 
 ---
 
-## All Split Documents
+## New Modules (Phase 8-11)
+
+### 07 Agent Service (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Credit Network Architecture](07_Agent_Service/Credit_Network_Architecture.md) | Credit line management, settlement, database schema |
+| [Agent System Architecture](07_Agent_Service/Agent_System_Architecture.md) | Agent hierarchy, commission calculation, API specs |
+
+### 08 Analytics Service (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Reporting Architecture](08_Analytics_Service/Reporting_Architecture.md) | Report generation, data warehouse, ETL pipeline |
+| [BI Dashboard Architecture](08_Analytics_Service/BI_Dashboard_Architecture.md) | Dashboard framework, real-time metrics, OLAP |
+
+### 09 Infrastructure (23 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [README](09_Infrastructure/README.md) | Module overview and navigation |
+| [Infrastructure Implementation](09_Infrastructure/Infrastructure_Implementation.md) | API Gateway, Blue-Green K8s/Istio, rate limiting |
+| [Deployment Architecture](09_Infrastructure/Deployment_Architecture.md) | K8s config, CI/CD pipeline |
+| [Gateway Core](09_Infrastructure/Gateway_Core.md) | Kong configuration, routing |
+| [Gateway Rate Limiting](09_Infrastructure/Gateway_Rate_Limiting.md) | Token Bucket, sliding window |
+| [Gateway Security](09_Infrastructure/Gateway_Security.md) | mTLS, WAF rules, IP filtering |
+| [API Design Principles](09_Infrastructure/API_Design_Principles.md) | REST API standards, versioning |
+| [Authentication Architecture](09_Infrastructure/Authentication_Architecture.md) | OAuth2, JWT, multi-actor token |
+| [Common Patterns](09_Infrastructure/Common_Patterns.md) | Shared API patterns, error handling |
+| [Domain APIs](09_Infrastructure/Domain_APIs.md) | Domain-specific API specs |
+| [QA Standards](09_Infrastructure/QA_Standards.md) | Test pyramid, coverage, automation |
+| [Maintenance Architecture](09_Infrastructure/Maintenance_Architecture.md) | Zero-downtime, blue-green, canary |
+| [Performance Monitoring](09_Infrastructure/Performance_Monitoring.md) | APM, Prometheus/Grafana, alerting |
+| [Performance Optimization](09_Infrastructure/Performance_Optimization.md) | Caching, query optimization |
+| [Stream Processing Architecture](09_Infrastructure/Stream_Processing_Architecture.md) | Kafka/Flink, event sourcing, CQRS |
+| [Caching Strategy](09_Infrastructure/Caching_Strategy.md) | L1/L2/L3 cache, Redis, Caffeine |
+| [Cost Optimization Architecture](09_Infrastructure/Cost_Optimization_Architecture.md) | Auto-scaling, infrastructure cost |
+| [OAuth Refresh Token](09_Infrastructure/OAuth_Refresh_Token.md) | Token rotation, security |
+| [Multi Actor Token Security](09_Infrastructure/Multi_Actor_Token_Security.md) | Multi-actor token design |
+| [Token Validation Service](09_Infrastructure/Token_Validation_Service.md) | Centralized token validation |
+| [Token Validation Architecture](09_Infrastructure/Token_Validation_Architecture.md) | Validation flow, circuit breaker |
+| [Token Cache Performance](09_Infrastructure/Token_Cache_Performance.md) | Token cache hierarchy, TTL |
+| [Token Edge Deployment](09_Infrastructure/Token_Edge_Deployment.md) | Edge deployment, CDN |
+
+### 10 Platform Management (3 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Tenant Configuration Architecture](10_Platform_Management/Tenant_Configuration_Architecture.md) | Tenant routing, white-label config |
+| [Notification Architecture](10_Platform_Management/Notification_Architecture.md) | Multi-channel notifications, templates |
+| [Data Pipeline Architecture](10_Platform_Management/Data_Pipeline_Architecture.md) | ETL, data warehouse, real-time sync |
+
+### 11 Frontend (11 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [README](11_Frontend/README.md) | Module overview |
+| [Frontend Layout Engine](11_Frontend/Frontend_Layout_Engine.md) | Layout system, component architecture |
+| [Banner Announcement](11_Frontend/Banner_Announcement.md) | Banner management, scheduling |
+| [SEO Performance](11_Frontend/SEO_Performance.md) | SEO optimization, Core Web Vitals |
+| [Mobile App Architecture](11_Frontend/Mobile_App_Architecture.md) | Hybrid/native, platform support |
+| [Marketing Compliance](11_Frontend/Marketing_Compliance.md) | Ad compliance, ASA/UKGC rules |
+| [AB Testing Framework](11_Frontend/AB_Testing_Framework.md) | A/B testing, feature flags |
+| [i18n Localization](11_Frontend/i18n_Localization.md) | Internationalization architecture |
+| [Dynamic Content Localization](11_Frontend/Dynamic_Content_Localization.md) | Dynamic content translation |
+| [Localization Workflow](11_Frontend/Localization_Workflow.md) | Translation pipeline |
+| [Localization API](11_Frontend/Localization_API.md) | i18n API specifications |
+
+### 12 Security (10 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [README](12_Security/README.md) | Module overview |
+| [Data Security Standard](12_Security/Data_Security_Standard.md) | PII classification, encryption |
+| [Encryption Strategy](12_Security/Encryption_Strategy.md) | AES-256-GCM, Argon2id |
+| [Blind Index Architecture](12_Security/Blind_Index_Architecture.md) | HMAC-SHA256 searchable encryption |
+| [GDPR Data Deletion](12_Security/GDPR_Data_Deletion.md) | Crypto-shredding, right to erasure |
+| [ISO27001 Mapping](12_Security/ISO27001_Mapping.md) | ISO 27001 control mapping |
+| [UK RTS Security](12_Security/UK_RTS_Security.md) | UK Gambling Commission requirements |
+| [Payment Restrictions](12_Security/Payment_Restrictions.md) | Payment limit enforcement |
+| [Data Portability SAR](12_Security/Data_Portability_SAR.md) | Subject access requests |
+| [MITM Detection](12_Security/MITM_Detection.md) | Man-in-the-middle detection |
+
+### 13 Customer Service (2 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [CS Platform Architecture](13_Customer_Service/CS_Platform_Architecture.md) | CS system design, Player 360, ticket routing |
+| [CS Operations Architecture](13_Customer_Service/CS_Operations_Architecture.md) | CS operations, performance monitoring |
+
+### 14 Third Party (1 document)
+
+| Document | Key Topics |
+|----------|------------|
+| [Third Party Integration Architecture](14_Third_Party/Third_Party_Integration_Architecture.md) | Vendor integration standards, API specs |
+
+### 15 Responsible Gambling (4 documents)
+
+| Document | Key Topics |
+|----------|------------|
+| [Self Exclusion Architecture](15_Responsible_Gambling/Self_Exclusion_Architecture.md) | Self-exclusion service, GAMSTOP integration |
+| [Deposit Loss Limits Architecture](15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md) | Limit enforcement, database schema |
+| [Session Protection Architecture](15_Responsible_Gambling/Session_Protection_Architecture.md) | Session tracking, reality checks |
+| [Player Protection API](15_Responsible_Gambling/Player_Protection_API.md) | Protection API specs, affordability |
+
+---
+
+## Existing Modules (Phase 6)
 
 ### 00 Overview (5 documents)
 
 | Document | Key Topics |
 |----------|------------|
 | [Technology Stack](00_Overview/Technology_Stack.md) | Libraries, versions, frameworks |
-| [Business Logic Flows](00_Overview/Business_Logic_Flows.md) | Technical flow diagrams, sequence charts |
-| [Data Model](00_Overview/Data_Model.md) | Entity relationships, field mappings |
-| [Platform Architecture](00_Overview/Platform_Architecture.md) | Module architecture, system topology |
-| [System Overview](00_Overview/System_Overview.md) | Technical formulas, token verification, idempotency |
+| [Business Logic Flows](00_Overview/Business_Logic_Flows.md) | Technical flow diagrams |
+| [Data Model](00_Overview/Data_Model.md) | Entity relationships |
+| [Platform Architecture](00_Overview/Platform_Architecture.md) | Module architecture |
+| [System Overview](00_Overview/System_Overview.md) | Technical formulas, token verification |
 
-### 01 Player Service (1 document)
+### 01-06 (Core Modules - 42 documents)
 
-| Document | Key Topics |
-|----------|------------|
-| [Player Lifecycle Implementation](01_Player_Service/Player_Lifecycle_Implementation.md) | State machine, database design, API specs |
-
-### 02 Finance Service (8 documents)
-
-| Document | Key Topics |
-|----------|------------|
-| [Payment Gateway API](02_Finance_Service/Payment_Gateway_API.md) | API specs, webhooks, provider integration |
-| [Reconciliation Technical](02_Finance_Service/Reconciliation_Technical.md) | Three-way matching, scheduled jobs, data models |
-| [Financial Implementation](02_Finance_Service/Financial_Implementation.md) | Wallet architecture, SAGA orchestrator, risk scoring engine |
-| [Turnover Flowcharts](02_Finance_Service/Turnover_Flowcharts.md) | Turnover validation flow diagrams, bet lifecycle state machine |
-| [Turnover Calculation Architecture](02_Finance_Service/Turnover_Calculation_Architecture.md) | Three-layer validation, event-driven data exchange |
-| [Turnover Implementation](02_Finance_Service/Turnover_Implementation.md) | Wallet deduction algorithm, effective stake calculation |
-| [Seamless Wallet Analysis](02_Finance_Service/Seamless_Wallet_Analysis.md) | Seamless wallet API specs, concurrency control, state machines |
-| [Turnover Calculation Logic Detail](02_Finance_Service/Turnover_Calculation_Logic_Detail.md) | effectiveStake formulas, lockAmount lifecycle, rebate calculation |
-
-### 03 Game Integration (4 documents)
-
-| Document | Key Topics |
-|----------|------------|
-| [Turnover Calculation Logic](03_Game_Integration/Turnover_Calculation_Logic.md) | Three-layer validation, SmartAdmin mapping |
-| [Game Integration Implementation](03_Game_Integration/Game_Integration_Implementation.md) | Seamless Wallet API controller, token verification, idempotency |
-| [Game Integration Protocols](03_Game_Integration/Game_Integration_Protocols.md) | API protocols, provider adaptor layer, webhook specs |
-| [Game Lobby System](03_Game_Integration/Game_Lobby_System.md) | Multi-level caching, Elasticsearch search, sorting |
-
-### 04 Activity Engine (3 documents)
-
-| Document | Key Topics |
-|----------|------------|
-| [Bonus Calculation Engine](04_Activity_Engine/Bonus_Calculation_Engine.md) | Calculation pipeline, game weight factors |
-| [Activity Risk System](04_Activity_Engine/Activity_Risk_System.md) | Multi-layer risk assessment, matched betting detection |
-| [Promotion Implementation](04_Activity_Engine/Promotion_Implementation.md) | Redisson distributed lock, wagering calculation, VIP tier change |
-
-### 05 Risk Engine (10 documents)
-
-| Document | Key Topics |
-|----------|------------|
-| [Risk System Architecture](05_Risk_Engine/Risk_System_Architecture.md) | Event-driven pipeline, Kafka/Flink, ML model serving |
-| [KYC Verification API](05_Risk_Engine/KYC_Verification_API.md) | Identity verification service, database schema, API endpoints |
-| [Fraud Detection System](05_Risk_Engine/Fraud_Detection_System.md) | ML detection models, rule engine, SpotBugs integration |
-| [Risk Proposal Implementation](05_Risk_Engine/Risk_Proposal_Implementation.md) | Priority calculation, SLA monitoring, Camunda BPMN workflow |
-| [Affordability Implementation](05_Risk_Engine/Affordability_Implementation.md) | Affordability scoring algorithms, API endpoints, monitoring |
-| [Player Protection API](05_Risk_Engine/Player_Protection_API.md) | Self-exclusion service, limit management, GAMSTOP integration |
-| [ML Integration Architecture](05_Risk_Engine/ML_Integration_Architecture.md) | ML training pipeline, model deployment, A/B testing |
-| [Detection Model Implementation](05_Risk_Engine/Detection_Model_Implementation.md) | Five-layer detection architecture, Kafka pipeline, TCC transactions |
-| [Turnover Validation Architecture](05_Risk_Engine/Turnover_Validation_Architecture.md) | Snapshot SQL schema, validation service, index strategy |
-| [Risk Implementation](05_Risk_Engine/Risk_Implementation.md) | Rule engine (Drools/LiteFlow), risk score calculation, ML integration |
-
-### 06 Platform Core (8 documents)
-
-| Document | Key Topics |
-|----------|------------|
-| [Multi-Tenant Architecture](06_Platform_Core/Multi_Tenant_Architecture.md) | RLS, MyBatis-Plus plugin, tenant routing |
-| [MFA Technical](06_Platform_Core/MFA_Technical.md) | TOTP/WebAuthn implementation, recovery |
-| [MFA Recovery Implementation](06_Platform_Core/MFA_Recovery_Implementation.md) | Recovery flow, backup codes, identity verification |
-| [MFA Compliance Validation](06_Platform_Core/MFA_Compliance_Validation.md) | Compliance testing framework, audit validation |
-| [MFA Technical Architecture](06_Platform_Core/MFA_Technical_Architecture.md) | Authentication service design, factor management |
-| [TOTP WebAuthn Implementation](06_Platform_Core/TOTP_WebAuthn_Implementation.md) | TOTP algorithm, WebAuthn registration/authentication |
-| [Jurisdiction Routing Architecture](06_Platform_Core/Jurisdiction_Routing_Architecture.md) | Multi-jurisdiction routing, regulatory data isolation |
-| [Governance Implementation](06_Platform_Core/Governance_Implementation.md) | SmartAdmin layer mapping, Sa-Token, MyBatis encryption |
-
-### 09 Infrastructure (1 document)
-
-| Document | Key Topics |
-|----------|------------|
-| [Infrastructure Implementation](09_Infrastructure/Infrastructure_Implementation.md) | API Gateway config, Blue-Green K8s/Istio, Redisson rate limiting |
+See individual module READMEs for full listings:
+- [01_Player_Service](01_Player_Service/) (1 doc)
+- [02_Finance_Service](02_Finance_Service/) (8 docs)
+- [03_Game_Integration](03_Game_Integration/) (4 docs)
+- [04_Activity_Engine](04_Activity_Engine/) (3 docs)
+- [05_Risk_Engine](05_Risk_Engine/) (10 docs)
+- [06_Platform_Core](06_Platform_Core/) (8 docs)
 
 ---
 
 ## Quick Links by Technology
 
 ### Event-Driven Architecture
-- [Risk System Architecture](05_Risk_Engine/Risk_System_Architecture.md) - Kafka/Flink event processing pipeline
-- [Detection Model Implementation](05_Risk_Engine/Detection_Model_Implementation.md) - Five-layer detection with Kafka
-- Stream Processing - See [source index](09_Infrastructure/)
+- [Risk System Architecture](05_Risk_Engine/Risk_System_Architecture.md) - Kafka/Flink event processing
+- [Stream Processing Architecture](09_Infrastructure/Stream_Processing_Architecture.md) - Flink CDC, CQRS
 
 ### API Design
-- [Payment Gateway API](02_Finance_Service/Payment_Gateway_API.md) - Payment provider integration
-- [KYC Verification API](05_Risk_Engine/KYC_Verification_API.md) - Identity verification service
-- [Player Protection API](05_Risk_Engine/Player_Protection_API.md) - Self-exclusion and limits
-- [Game Integration Protocols](03_Game_Integration/Game_Integration_Protocols.md) - Game provider API
-- API Design Principles - See [source index](09_Infrastructure/)
+- [API Design Principles](09_Infrastructure/API_Design_Principles.md) - REST API standards
+- [Authentication Architecture](09_Infrastructure/Authentication_Architecture.md) - OAuth2, JWT
+- [Token Validation Service](09_Infrastructure/Token_Validation_Service.md) - Centralized validation
 
 ### Data Layer
-- [Multi-Tenant Architecture](06_Platform_Core/Multi_Tenant_Architecture.md) - Row-level security, tenant isolation
-- [Reconciliation Technical](02_Finance_Service/Reconciliation_Technical.md) - Three-way matching engine
-- [Turnover Calculation Architecture](02_Finance_Service/Turnover_Calculation_Architecture.md) - Three-layer validation
-- Wallet Architecture - See [source index](02_Finance_Service/)
+- [Multi-Tenant Architecture](06_Platform_Core/Multi_Tenant_Architecture.md) - RLS, tenant isolation
+- [Caching Strategy](09_Infrastructure/Caching_Strategy.md) - JetCache, Redis, Caffeine
 
-### Security & Authentication
-- [MFA Technical](06_Platform_Core/MFA_Technical.md) - TOTP/WebAuthn implementation
-- [Fraud Detection System](05_Risk_Engine/Fraud_Detection_System.md) - ML-based fraud detection
-- [ML Integration Architecture](05_Risk_Engine/ML_Integration_Architecture.md) - ML pipeline and A/B testing
+### Security & Compliance
+- [Data Security Standard](12_Security/Data_Security_Standard.md) - PII encryption
+- [GDPR Data Deletion](12_Security/GDPR_Data_Deletion.md) - Crypto-shredding
+- [ISO27001 Mapping](12_Security/ISO27001_Mapping.md) - Compliance mapping
 
 ### Infrastructure
-- [Infrastructure Implementation](09_Infrastructure/Infrastructure_Implementation.md) - API Gateway, K8s, rate limiting
-- [Game Lobby System](03_Game_Integration/Game_Lobby_System.md) - Multi-level caching, Elasticsearch
+- [Deployment Architecture](09_Infrastructure/Deployment_Architecture.md) - K8s, CI/CD
+- [Performance Monitoring](09_Infrastructure/Performance_Monitoring.md) - APM, Prometheus
+- [Cost Optimization Architecture](09_Infrastructure/Cost_Optimization_Architecture.md) - Cloud costs
 
 ---
 
 ## Related Documentation
 
 - **Business Requirements**: [../requirements/](../requirements/) - For executives and product managers
-- **Complete Source**: [../source/](../source/) - Full documentation (SSOT)
+- **Archived Source**: [../source-archive/](../source-archive/) - Original SSOT documents (read-only)
 - **Main Index**: [../README.md](../README.md) - Navigation hub
 
 ---
 
-**Status**: Phase 6 Complete - 40 documents split from source
+**Status**: Phase 9 Complete - 117 documents across 18 categories
 **Validation**: All documents contain technical implementation details (code, APIs, schemas)

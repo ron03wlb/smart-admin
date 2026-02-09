@@ -1,6 +1,6 @@
 # Game Integration Protocols
 
-> **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source/03_Game_Center/03-01_Game_Integration_Standard.md)
+> **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: Architects, Backend Engineers, Integration Engineers
 > **Business Requirements**: [Game Integration Standards](../../requirements/03_Gaming_Operations/Game_Integration_Standards.md)
 > **Last Synced**: 2026-02-09
@@ -269,17 +269,17 @@ Emergency provider disconnection follows an approval chain:
 ## Related Documents
 
 ### Core Dependencies
-- [Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md) - Game wallet transfer logic
-- [Seamless Wallet Analysis](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP edge case handling details
+- [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Game wallet transfer logic
+- [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP edge case handling details
 
 ### Technical References
-- [Gateway Architecture](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API security, HMAC signature verification
-- [Maintenance Procedures](../../source/09_Technical_Infrastructure/09-05_Maintenance.md) - Game maintenance workflows
+- [Gateway Architecture](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API security, HMAC signature verification
+- [Maintenance Procedures](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md) - Game maintenance workflows
 
 ### Business Integration
-- [Turnover and Reconciliation](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation and turnover calculation
-- [Game Lobby Management](../../source/03_Game_Center/03-02_Game_Lobby_Management.md) - Game metadata sync and lobby configuration
-- [Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) - Game risk detection and circuit breaker policies
+- [Turnover and Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation and turnover calculation
+- [Game Lobby Management](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) - Game metadata sync and lobby configuration
+- [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Game risk detection and circuit breaker policies
 
 ---
 

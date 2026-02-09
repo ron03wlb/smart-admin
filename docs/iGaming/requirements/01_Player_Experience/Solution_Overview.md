@@ -1,6 +1,6 @@
 # iGaming Platform Solution Overview
 
-> **Canonical Source**: [00-06_Solution_Overview.md](../../source/00_Foundation/guides/00-06_Solution_Overview.md)
+> **Canonical Source**: [00-06_Solution_Overview.md](../../source-archive/00_Foundation/guides/00-06_Solution_Overview.md)
 > **Audience**: Executives, Product Managers
 > **Related Doc**: [Platform_Architecture.md](../../architecture/00_Overview/Platform_Architecture.md)
 > **Last Synced**: 2026-02-08
@@ -394,7 +394,7 @@ The core of the bonus system is **anti-arbitrage** and **fund isolation**.
 | Strategy A (Principal-Preserving) | Cash first, then bonus | Better player experience | Slightly higher arbitrage risk |
 | Strategy B (Promotional) | Bonus first | Platform cost control | Less player-friendly |
 
-### Three-Party Reconciliation and Circuit Breaker
+### Three-Party Reconciliation and Automatic Suspension
 
 **Self-Healing Process for Dropped Transactions**:
 
@@ -404,7 +404,7 @@ The core of the bonus system is **anti-arbitrage** and **fund isolation**.
 | L2 (Compensatory) | Every 5 minutes | API polling of GetTransactionHistory, compare with local DB |
 | L3 (Daily Settlement) | Daily | Import provider Settlement Report, generate Discrepancy Report for manual reconciliation |
 
-**Circuit Breaker Policy**: When a single tenant's or game provider's RTP exceeds threshold (e.g., 1-hour RTP > 200% with bet volume > $10,000), the system shall automatically suspend the game entry and send alerts to prevent large-scale exploitation.
+**Automatic Suspension Policy**: When a single tenant's or game provider's RTP exceeds threshold (e.g., 1-hour RTP > 200% with bet volume > $10,000), the system shall automatically suspend the game entry and send alerts to prevent large-scale exploitation.
 
 ### SaaS Tenant Billing Logic
 

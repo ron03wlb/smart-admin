@@ -1,6 +1,6 @@
 # Risk Proposal Workflow Implementation
 
-> **Canonical Source**: [source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
+> **Canonical Source**: [source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Business Requirements**: [Risk_Proposal_Requirements.md](../../requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md)
 > **Last Synced**: 2026-02-08
@@ -13,7 +13,7 @@
 **Dependencies**:
 - [05-03 KYC/AML Configuration-Driven Risk](../05_Risk_Engine/) - Risk proposal service implementation
 - [05-01 Risk Framework](../05_Risk_Engine/) - Configuration-driven rule engine
-- [01-05 Withdrawal Risk](../../source/01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 delayed check
+- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 delayed check
 
 ---
 

@@ -1,17 +1,23 @@
-# iGaming Source Documentation (SSOT)
+# iGaming Source Documentation (Archive)
 
-> **Purpose**: Canonical source of truth for all iGaming documentation
+> **Status**: **ARCHIVED** - Read-only reference
+> **Purpose**: Original canonical source documents (SSOT) preserved for reference
 > **Audience**: All stakeholders
-> **Last Updated**: 2026-02-08
+> **Last Updated**: 2026-02-09
+> **Archived Date**: 2026-02-09
 
 ---
 
 ## About This Directory
 
-This directory contains the **complete, original documentation** for the iGaming platform. It serves as the Single Source of Truth (SSOT) for all derived documentation in:
+This directory contains the **archived original documentation** for the iGaming platform.
 
-- `../requirements/` - Business-focused extracts
-- `../architecture/` - Technical-focused extracts
+**Active documentation has been split into audience-specific directories:**
+
+- `../requirements/` - Business requirements (for executives, product managers)
+- `../architecture/` - Technical architecture (for architects, developers)
+
+**Do NOT modify files in this directory.** All updates should be made to the active `requirements/` and `architecture/` directories.
 
 ---
 
@@ -41,11 +47,10 @@ This directory contains the **complete, original documentation** for the iGaming
 
 ## Maintenance Notes
 
-When updating documentation in this directory:
-1. Check if changes affect `../requirements/` or `../architecture/`
-2. Update the derived documents accordingly
-3. Update the "Last Synced" timestamp in derived docs
+**This directory is read-only.** For updates:
+1. Edit the corresponding file in `../requirements/` or `../architecture/`
+2. Do NOT modify files here directly
 
 ---
 
-**Status**: Phase 1 pending - Content migration
+**Status**: Archived (Phase 7 - Structure migration complete)

@@ -74,7 +74,7 @@ while IFS= read -r file; do
         echo "❌ $file ($FILE_ERRORS errors)"
     fi
 
-done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/backup-corrupted/*" 2>/dev/null | sort)
+done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/source-archive/*" ! -path "*/backup-corrupted/*" 2>/dev/null | sort)
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

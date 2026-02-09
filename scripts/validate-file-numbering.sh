@@ -61,7 +61,7 @@ while IFS= read -r file; do
         echo "❌ 格式錯誤: $file"
         ((ERROR_COUNT++)) || true
     fi
-done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/backup-corrupted/*")
+done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/source-archive/*" ! -path "*/requirements/*" ! -path "*/architecture/*" ! -path "*/backup-corrupted/*")
 
 # 規則 2: 檢查重複編號 (使用臨時文件方式兼容 bash 3.x)
 echo ""
@@ -69,7 +69,7 @@ echo "📋 規則 2: 檢查重複編號"
 TEMP_FILE=$(mktemp)
 trap "rm -f $TEMP_FILE" EXIT
 
-find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/backup-corrupted/*" | while IFS= read -r file; do
+find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/source-archive/*" ! -path "*/requirements/*" ! -path "*/architecture/*" ! -path "*/backup-corrupted/*" | while IFS= read -r file; do
     filename=$(basename "$file")
     # 提取編號部分 (XX-YY 或 XX-YY-ZZ)
     if [[ "$filename" =~ ^([0-9]{2}-[0-9]{2}(-[0-9]{2})?)_ ]]; then
@@ -101,7 +101,7 @@ while IFS= read -r file; do
         echo "❌ 深度超標 (>3層): $file"
         ((ERROR_COUNT++)) || true
     fi
-done < <(find "$TARGET_DIR" -name "*.md" -type f)
+done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/source-archive/*" ! -path "*/requirements/*" ! -path "*/architecture/*" ! -path "*/backup-corrupted/*")
 
 echo ""
 echo "================================"

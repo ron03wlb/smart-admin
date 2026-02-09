@@ -1,6 +1,6 @@
 # MFA Compliance & Audit Requirements
 
-> **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source/06_Platform_Governance/06-06-04_Compliance_Audit.md)
+> **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 > **Audience**: Executives, Compliance Officers
 > **Related Doc**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md)
 > **Last Synced**: 2026-02-09

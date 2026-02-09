@@ -10,7 +10,7 @@
 |----------|-------|
 | **Version** | 1.0.0 |
 | **Last Updated** | 2026-02-08 |
-| **Canonical Source** | [05-02 Fraud Detection](../../source/05_Risk_Control/05-02_Fraud_Detection.md) |
+| **Canonical Source** | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
 | **View Type** | Technical Architecture |
 | **Target Audience** | Architects, Backend Engineers, DevOps, SRE |
 | **Related Doc** | [Fraud_Detection_Requirements.md](../../requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md) |
@@ -1073,12 +1073,12 @@ class WithdrawalDeferredRiskCheckIntegrationTest {
 
 ## Related Documents
 
-- [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) - Risk system overall architecture
-- [05-02-01 Detection Model](../../source/05_Risk_Control/05-02-01_Detection_Model.md) - 5-layer architecture details
-- [05-02-02 Rule Configuration](../../source/05_Risk_Control/05-02-02_Rule_Configuration.md) - Proposal service & deferred check
-- [05-02-03 ML Integration](../../source/05_Risk_Control/05-02-03_ML_Integration.md) - Multi-dimensional rules
-- [05-02-04 Operations Tools](../../source/05_Risk_Control/05-02-04_Operations_Tools.md) - Monitoring & alerting
-- [05-02-05 Multi-Account Detection](../../source/05_Risk_Control/05-02-05_Multi_Account_Detection.md) - Device fingerprinting
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Risk system overall architecture
+- [05-02-01 Detection Model](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) - 5-layer architecture details
+- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) - Proposal service & deferred check
+- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) - Multi-dimensional rules
+- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) - Monitoring & alerting
+- [05-02-05 Multi-Account Detection](../../source-archive/05_Risk_Control/05-02-05_Multi_Account_Detection.md) - Device fingerprinting
 
 ---
 

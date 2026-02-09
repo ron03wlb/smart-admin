@@ -1,6 +1,6 @@
 # Turnover Business Rules
 
-> **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source/03_Game_Center/03-04_Turnover_Calculation.md)
+> **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: Executives, Product Managers
 > **Related Doc**: [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)
 > **Last Synced**: 2026-02-08
@@ -272,15 +272,15 @@ All recalculations must:
 ## 12. Related Documents
 
 ### Prerequisites
-- [00-03 Terminology Standards](../../source/00_Foundation/concepts/00-03_Terminology_Standards.md) - Required reading
+- [00-03 Terminology Standards](../../source-archive/00_Foundation/concepts/00-03_Terminology_Standards.md) - Required reading
 
 ### Technical Implementation
 
 → **[Turnover Calculation Logic - Technical Architecture](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)** - Complete turnover calculation algorithms, bet status processing matrices, game weight tables, three-layer validation implementation
 
 ### Dependencies
-- [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) - Layer 1 risk engine
-- [04-04 Activity Bonus](../../source/04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3 activity system
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Layer 1 risk engine
+- [04-04 Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) - Layer 3 activity system
 
 ---
 

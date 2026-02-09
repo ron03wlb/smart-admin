@@ -1,6 +1,6 @@
 # Turnover Calculation Logic
 
-> **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source/03_Game_Center/03-04_Turnover_Calculation.md)
+> **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 > **Last Synced**: 2026-02-08
@@ -1189,17 +1189,17 @@ Background Reconciliation (Flink):
 ## 15. Related Documents
 
 ### Sub-documents
-- [03-04-01 Turnover Core Logic](../../source/03_Game_Center/03-04-01_Turnover_Core_Logic.md)
-- [03-04-02 Three Layer Validation](../../source/03_Game_Center/03-04-02_Three_Layer_Validation.md)
-- [03-04-03 Reconciliation Model](../../source/03_Game_Center/03-04-03_Reconciliation_Model.md)
-- [03-04-04 SmartAdmin Mapping](../../source/03_Game_Center/03-04-04_SmartAdmin_Mapping.md)
+- [03-04-01 Turnover Core Logic](../../source-archive/03_Game_Center/03-04-01_Turnover_Core_Logic.md)
+- [03-04-02 Three Layer Validation](../../source-archive/03_Game_Center/03-04-02_Three_Layer_Validation.md)
+- [03-04-03 Reconciliation Model](../../source-archive/03_Game_Center/03-04-03_Reconciliation_Model.md)
+- [03-04-04 SmartAdmin Mapping](../../source-archive/03_Game_Center/03-04-04_SmartAdmin_Mapping.md)
 
 ### Business Rules
 - [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 
 ### Architecture Dependencies
 - [SmartAdmin Architecture Rules](/.agent/rules/foundation/F04-architecture-rules.md)
-- [02-06 Wallet Architecture](../../source/02_Finance_Center/02-06_Wallet_Architecture.md)
+- [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ---
 

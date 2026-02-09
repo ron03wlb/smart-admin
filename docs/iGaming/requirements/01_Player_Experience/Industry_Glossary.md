@@ -1,6 +1,6 @@
 # iGaming Industry Glossary
 
-> **Canonical Source**: [source/00_Foundation/guides/00-07_Industry_Terminology.md](../../source/00_Foundation/guides/00-07_Industry_Terminology.md)
+> **Canonical Source**: [source/00_Foundation/guides/00-07_Industry_Terminology.md](../../source-archive/00_Foundation/guides/00-07_Industry_Terminology.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
 > **Related Doc**: None (pure business)
 > **Last Synced**: 2026-02-08

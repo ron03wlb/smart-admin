@@ -1,6 +1,6 @@
 # KYC/AML Compliance Requirements
 
-> **Canonical Source**: [source/05_Risk_Control/05-03_KYC_AML.md](../../source/05_Risk_Control/05-03_KYC_AML.md)
+> **Canonical Source**: [source/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
 > **Related Doc**: [KYC_Verification_API.md](../../architecture/05_Risk_Engine/KYC_Verification_API.md)
 > **Last Synced**: 2026-02-08
@@ -415,14 +415,14 @@ Money Laundering Reporting Officer (MLRO) is a key compliance role required by r
 ## Related Documentation
 
 ### Business References
-- [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) - AML monitoring, risk scoring model
-- [05-02 Fraud Detection](../../source/05_Risk_Control/05-02_Fraud_Detection.md) - Fund flow aggregation detection
-- [01-01 Player Lifecycle](../../source/01_Player_Center/01-01_Player_Lifecycle.md) - KYC trigger logic, registration flow
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - AML monitoring, risk scoring model
+- [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) - Fund flow aggregation detection
+- [01-01 Player Lifecycle](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) - KYC trigger logic, registration flow
 
 ### Compliance Framework
-- [06-08 UKGC Compliance](../../source/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK license specific requirements (2025 new regulations)
-- [06-09 MGA Compliance](../../source/06_Platform_Governance/06-09_MGA_Compliance.md) - Malta license requirements
-- [15 Responsible Gambling](../../source/15_Responsible_Gambling/) - Complete responsible gambling module
+- [06-08 UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK license specific requirements (2025 new regulations)
+- [06-09 MGA Compliance](../../source-archive/06_Platform_Governance/06-09_MGA_Compliance.md) - Malta license requirements
+- [15 Responsible Gambling](../../source-archive/15_Responsible_Gambling/) - Complete responsible gambling module
 
 ### External References
 - FATF Guidance: [www.fatf-gafi.org](https://www.fatf-gafi.org)

@@ -1,6 +1,6 @@
 # Seamless Wallet Business Requirements
 
-> **Canonical Source**: [03-03_Seamless_Wallet_Analysis.md](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md)
+> **Canonical Source**: [03-03_Seamless_Wallet_Analysis.md](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
 > **Related Doc**: [Seamless Wallet Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md)
 > **Last Synced**: 2026-02-09

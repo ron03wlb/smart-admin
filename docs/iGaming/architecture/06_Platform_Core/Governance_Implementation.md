@@ -1,6 +1,6 @@
 # Governance Implementation
 
-> **Canonical Source**: [00-15_Governance_Implementation.md](../../source/00_Foundation/guides/00-15_Governance_Implementation.md)
+> **Canonical Source**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
 > **Audience**: Architects, Backend Engineers, Security Engineers
 > **Business Requirements**: [Governance_Requirements.md](../../requirements/06_Governance_Licensing/Governance_Requirements.md)
 > **Last Synced**: 2026-02-08
@@ -26,9 +26,9 @@ Design and implement tenant isolation using schema-based separation, data shardi
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [06-01 Multi-Tenant](../../source/06_Platform_Governance/06-01_Multi_Tenant.md) | S2 Tenant Model | Schema isolation |
-| 2 | [06-01 Multi-Tenant](../../source/06_Platform_Governance/06-01_Multi_Tenant.md) | S3 Data Isolation | Sharding strategy |
-| 3 | [02-05 Billing](../../source/02_Finance_Center/02-05_Billing_and_Invoicing.md) | S2 Tenant Billing | Merchant management |
+| 1 | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) | S2 Tenant Model | Schema isolation |
+| 2 | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) | S3 Data Isolation | Sharding strategy |
+| 3 | [02-05 Billing](../../source-archive/02_Finance_Center/02-05_Billing_and_Invoicing.md) | S2 Tenant Billing | Merchant management |
 
 ### SmartAdmin Layer Mapping
 
@@ -67,9 +67,9 @@ Build role definitions, permission matrices, and dynamic authorization integrate
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [06-02 RBAC](../../source/06_Platform_Governance/06-02_RBAC_Permissions.md) | S2 Permission Model | RBAC design |
-| 2 | [06-02 RBAC](../../source/06_Platform_Governance/06-02_RBAC_Permissions.md) | S3 Role Management | Role inheritance |
-| 3 | [06-02 RBAC](../../source/06_Platform_Governance/06-02_RBAC_Permissions.md) | S4 Permission Verification | Sa-Token integration |
+| 1 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S2 Permission Model | RBAC design |
+| 2 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S3 Role Management | Role inheritance |
+| 3 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S4 Permission Verification | Sa-Token integration |
 
 ### SmartAdmin Layer Mapping
 
@@ -114,9 +114,9 @@ Build operation logging, change tracking, and compliance reporting using AOP-bas
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [06-03 Audit Log](../../source/06_Platform_Governance/06-03_Audit_Log.md) | S2 Log Model | Event definition |
-| 2 | [06-03 Audit Log](../../source/06_Platform_Governance/06-03_Audit_Log.md) | S3 AOP Interception | Automatic recording |
-| 3 | [06-03 Audit Log](../../source/06_Platform_Governance/06-03_Audit_Log.md) | S4 Query & Analysis | Audit reporting |
+| 1 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S2 Log Model | Event definition |
+| 2 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S3 AOP Interception | Automatic recording |
+| 3 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S4 Query & Analysis | Audit reporting |
 
 ### SmartAdmin Layer Mapping
 
@@ -163,9 +163,9 @@ Implement field-level encryption, KMS integration, and key rotation using MyBati
 
 | Order | Document | Section | Focus |
 |-------|----------|---------|-------|
-| 1 | [12-03 Data Security](../../source/12_System_Security/12-03_Data_Security_Standard.md) | S2 Encryption Standard | AES-256-GCM |
-| 2 | [12-03-01 Encryption](../../source/12_System_Security/12-03-01_Encryption_Strategy.md) | S3 Field Encryption | MyBatis interceptor |
-| 3 | [12-03-02 Blind Index](../../source/12_System_Security/12-03-02_Blind_Index_Architecture.md) | S2 Blind Index | Searchable encryption |
+| 1 | [12-03 Data Security](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md) | S2 Encryption Standard | AES-256-GCM |
+| 2 | [12-03-01 Encryption](../../source-archive/12_System_Security/12-03-01_Encryption_Strategy.md) | S3 Field Encryption | MyBatis interceptor |
+| 3 | [12-03-02 Blind Index](../../source-archive/12_System_Security/12-03-02_Blind_Index_Architecture.md) | S2 Blind Index | Searchable encryption |
 
 ### SmartAdmin Layer Mapping
 
@@ -206,12 +206,12 @@ Implement field-level encryption, KMS integration, and key rotation using MyBati
 
 | Area | Document |
 |------|----------|
-| Multi-Tenant | [06-01 Multi-Tenant](../../source/06_Platform_Governance/06-01_Multi_Tenant.md) |
-| RBAC | [06-02 RBAC Permissions](../../source/06_Platform_Governance/06-02_RBAC_Permissions.md) |
-| Audit Log | [06-03 Audit Log](../../source/06_Platform_Governance/06-03_Audit_Log.md) |
-| Data Security | [12-03 Data Security Standard](../../source/12_System_Security/12-03_Data_Security_Standard.md) |
-| Encryption | [12-03-01 Encryption Strategy](../../source/12_System_Security/12-03-01_Encryption_Strategy.md) |
-| Blind Index | [12-03-02 Blind Index Architecture](../../source/12_System_Security/12-03-02_Blind_Index_Architecture.md) |
+| Multi-Tenant | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
+| RBAC | [06-02 RBAC Permissions](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) |
+| Audit Log | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) |
+| Data Security | [12-03 Data Security Standard](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md) |
+| Encryption | [12-03-01 Encryption Strategy](../../source-archive/12_System_Security/12-03-01_Encryption_Strategy.md) |
+| Blind Index | [12-03-02 Blind Index Architecture](../../source-archive/12_System_Security/12-03-02_Blind_Index_Architecture.md) |
 
 ---
 

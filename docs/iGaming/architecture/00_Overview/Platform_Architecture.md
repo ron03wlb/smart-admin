@@ -1,6 +1,6 @@
 # iGaming Platform Architecture Overview
 
-> **Canonical Source**: [00-06_Solution_Overview.md](../../source/00_Foundation/guides/00-06_Solution_Overview.md)
+> **Canonical Source**: [00-06_Solution_Overview.md](../../source-archive/00_Foundation/guides/00-06_Solution_Overview.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Solution_Overview.md](../../requirements/01_Player_Experience/Solution_Overview.md)
 > **Last Synced**: 2026-02-08
