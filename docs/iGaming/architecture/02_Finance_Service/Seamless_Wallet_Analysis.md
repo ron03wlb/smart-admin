@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-03_Seamless_Wallet_Analysis.md](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md)
 > **Audience**: Architects, Backend Developers, DevOps
-> **Related Doc**: [Seamless Wallet Requirements](../../requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md)
+> **Business Requirements**: [Seamless Wallet Requirements](../../requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

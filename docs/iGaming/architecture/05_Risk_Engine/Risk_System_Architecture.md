@@ -1,9 +1,9 @@
 # Risk Control System Architecture
 
+> **Business Requirements**: [Risk_Strategy_Overview.md](../../requirements/05_Risk_Compliance/Risk_Strategy_Overview.md)
 > **Canonical Source**: [source/05_Risk_Control/05-01_Risk_Framework.md](../../source/05_Risk_Control/05-01_Risk_Framework.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Related Business Doc**: [Risk_Strategy_Overview.md](../../requirements/05_Risk_Compliance/Risk_Strategy_Overview.md)
-> **Last Synced**: 2026-02-08
+> **Last Synced**: 2026-02-09
 > **Source Version**: 4.0.0
 
 ---

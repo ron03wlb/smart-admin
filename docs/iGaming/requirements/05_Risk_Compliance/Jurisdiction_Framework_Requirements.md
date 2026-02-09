@@ -219,3 +219,7 @@ New jurisdictions must be onboardable through configuration changes only, withou
 | PAGCOR & Curacao Details | source/06_Platform_Governance/06-11_PAGCOR_Curacao.md |
 | Self-Exclusion | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
 | Technical Architecture | architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md |
+
+### Technical Implementation
+
+→ **[Jurisdiction Routing Architecture](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)** - Multi-jurisdiction configuration system, regulatory rule engine, jurisdiction-specific feature flags, compliance enforcement mechanisms, and audit trail logging

@@ -329,7 +329,7 @@ Different game types contribute at different rates:
 
 **Key Business Concepts Involved**:
 - **Risk Control**: Rule engine, risk scoring
-- **Wallet**: Fund locking, SAGA compensation
+- **Wallet**: Fund locking, automatic compensation policy
 - **Multi-Tenancy**: Different brands have different withdrawal rules
 
 ### 4.2 Withdrawal Review Flow
@@ -430,15 +430,16 @@ flowchart TD
 - Score 31-70: Manual review required
 - Score 71-100: Auto-reject
 
-#### SAGA Compensation Flow
+#### Automatic Fund Release Policy
 
-When a withdrawal payment fails after funds have been deducted, the system performs compensation:
+When a withdrawal payment fails at any stage, the system ensures funds are always restored to the player's account, even in distributed failure scenarios. This prevents player funds from being lost due to system failures.
 
-**Forward Flow**: Create Order -> Lock Funds -> Call Payment -> Deduct Balance
+**Compensation Policy**:
+- If withdrawal is rejected or fails, locked funds are automatically released back to the player's available balance
+- All compensation actions are logged for audit purposes
+- Player receives notification of the outcome
 
-**Compensation Flow (on failure)**: Delete Order <- Release Lock <- Cancel Payment <- Rollback Balance
-
-This ensures data consistency even in distributed failure scenarios.
+→ **[Technical Implementation: SAGA Compensation Flow](../../architecture/02_Finance_Service/Financial_Implementation.md#saga-compensation)**
 
 ### 4.4 Manual Review Process
 
@@ -617,6 +618,12 @@ Each JWT token includes the tenant identifier:
 3. System must deny access with "Cross-tenant access not allowed" error
 
 This test verifies that tenant isolation is enforced at the application level, not just the database level.
+
+---
+
+## Related Documentation
+
+→ **[Business Logic Flows - Technical Implementation](../../architecture/00_Overview/Business_Logic_Flows.md)** - Complete technical implementation details, API specifications, database schemas, and architectural patterns for all 6 business flows
 
 ---
 

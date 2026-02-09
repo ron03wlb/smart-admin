@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
+> **Business Requirements**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 

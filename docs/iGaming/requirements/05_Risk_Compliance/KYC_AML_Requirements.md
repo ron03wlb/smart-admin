@@ -428,6 +428,10 @@ Money Laundering Reporting Officer (MLRO) is a key compliance role required by r
 - FATF Guidance: [www.fatf-gafi.org](https://www.fatf-gafi.org)
 - UKGC AML Guide: [www.gamblingcommission.gov.uk](https://www.gamblingcommission.gov.uk)
 
+### Technical Implementation
+
+→ **[KYC Verification API](../../architecture/05_Risk_Engine/KYC_Verification_API.md)** - KYC/AML verification workflows, OCR identity document processing, third-party provider integration (Jumio/Onfido), PEP/sanctions list screening, liveness detection, and audit trail implementation
+
 ---
 
 **Document Maintenance**: Quarterly update of regulatory requirements and penalty cases

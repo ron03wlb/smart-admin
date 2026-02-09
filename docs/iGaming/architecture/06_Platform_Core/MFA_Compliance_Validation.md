@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 > **Audience**: Architects, Backend Developers, DevOps
-> **Related Doc**: [MFA Compliance Requirements](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
+> **Business Requirements**: [MFA Compliance Requirements](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

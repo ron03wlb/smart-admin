@@ -290,6 +290,10 @@ Covers interactive gaming system requirements:
 - [UKGC_Requirements](UKGC_Requirements.md) - UK regulatory requirements
 - [MGA_Requirements](MGA_Requirements.md) - Malta regulatory requirements
 
+### Technical Implementation
+
+→ **[Risk System Architecture](../../architecture/05_Risk_Engine/Risk_System_Architecture.md)** - Five-layer risk control architecture, real-time detection engine, rule configuration system, ML model integration, and cross-module orchestration
+
 ---
 
 **Document Version**: 1.0.0

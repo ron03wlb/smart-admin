@@ -1,8 +1,11 @@
 # Reconciliation Requirements
 
 > **Canonical Source**: [02-03_Reconciliation_System.md](../../source/02_Finance_Center/02-03_Reconciliation_System.md)
+> **Audience**: Executives, Compliance Officers, Finance Team, Operations Managers
+> **Related Doc**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
+> **Last Synced**: 2026-02-09
 >
-> This document extracts business requirements from the canonical source. For technical implementation details, see [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md).
+> **Refinement Note**: Technical details (PostgreSQL/S3 Glacier storage, UTC timezone conversion algorithms, 3DS verification implementation, blockchain confirmation counts) moved to Architecture layer. This document focuses on business requirements only.
 
 ---
 
@@ -220,11 +223,15 @@ Net Payable = (Total Win/Loss - Commission) + Adjustment (Late Settlement)
 
 ### 9.3 Data Archival Strategy
 
-| Data Tier | Scope | Storage | Query Performance |
-|-----------|-------|---------|-------------------|
-| Hot Data | Last 90 days | Primary database (PostgreSQL/MySQL) | < 100ms |
-| Warm Data | 90 days - 2 years | Archive database (partitioned tables) | < 1s |
-| Cold Data | 2 years - 10 years | Cloud cold storage (S3 Glacier / Azure Archive) | Minutes (requires restoration) |
+The system MUST implement tiered storage based on data age:
+
+| Data Tier | Scope | Access Requirement |
+|-----------|-------|-------------------|
+| Hot Data | Last 90 days | Immediate access (< 100ms) |
+| Warm Data | 90 days - 2 years | Near real-time access (< 1s) |
+| Cold Data | 2 years - 10 years | Acceptable restoration delay (minutes) |
+
+→ **[Technical Storage Implementation](../../architecture/02_Finance_Service/Reconciliation_Technical.md#data-archival)** - PostgreSQL/MySQL configuration, S3 Glacier/Azure Archive setup, partitioning strategies
 
 ### 9.4 Monthly Compliance Report
 
@@ -351,27 +358,27 @@ Record exchange rate snapshot at transaction time, compare with PSP actual settl
 
 ---
 
-## 15. Cross-Timezone Reconciliation Rules
+## 15. Cross-Timezone Reconciliation Requirements
 
-### 15.1 Timezone Unification Strategy
+### 15.1 Timezone Unification Requirements
 
-**Core Principle**: All reconciliation uses UTC as baseline, convert from each data source timezone for comparison.
+**Core Principle**: All reconciliation MUST use a unified baseline timezone to ensure accurate comparisons across different data sources.
 
-| Data Source | Original Timezone | Conversion | Offset |
-|-------------|-------------------|------------|--------|
-| **Platform Orders** | UTC | No conversion needed | +0 |
-| **PSP Reports** | Per PSP config | Per t_psp_config.timezone | Variable |
-| **Bank Statements** | Local timezone | Per bank config | Variable |
-| **GP Reports** | Per GP config | Per t_gp_config.timezone | Variable |
+**Data Source Considerations**:
+- Platform orders (baseline timezone)
+- PSP reports (may use different timezones)
+- Bank statements (local timezone)
+- Game provider reports (configured per provider)
 
-### 15.2 Time Tolerance Configuration
+### 15.2 Time Tolerance Requirements
 
-| Setting | Value |
-|---------|-------|
-| Standard Window | 00:00:00 - 23:59:59 UTC |
-| Tolerance Range | +/- 30 minutes (for cross-day boundary) |
-| Cross-Day Identification | Platform date != PSP report date |
-| Maximum Delay | 48 hours (covers weekends) |
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| Standard Window | Daily reconciliation period | Defines reconciliation day boundary |
+| Tolerance Range | +/- 30 minutes | Handles cross-day boundary transactions |
+| Maximum Delay | 48 hours | Covers weekends and holidays |
+
+→ **[Timezone Conversion Implementation](../../architecture/02_Finance_Service/Reconciliation_Technical.md#timezone-handling)** - UTC conversion algorithms, timezone offset configuration, cross-day identification logic
 
 ---
 
@@ -527,34 +534,39 @@ Trust Account Balance >= Sum(Player Wallet Balances) + In-Transit Deposits - In-
 
 ### 21.1 Payment Method Classification
 
-| Category | Payment Methods | Settlement Cycle | Reconciliation Granularity | Special Handling |
-|----------|-----------------|------------------|---------------------------|------------------|
-| **Card Payment** | Visa/MC | T+1~T+3 | Transaction level | Chargeback, 3DS verification |
+Different payment methods have different settlement cycles and reconciliation requirements:
+
+| Category | Payment Methods | Settlement Cycle | Reconciliation Granularity | Special Considerations |
+|----------|-----------------|------------------|---------------------------|----------------------|
+| **Card Payment** | Visa/MC | T+1~T+3 | Transaction level | Chargeback handling required |
 | **E-Wallet** | PayPal/Skrill | T+0~T+1 | Transaction level | Instant notification, currency conversion |
 | **Bank Transfer** | SEPA/Faster Payments | T+1~T+2 | Batch level | Bank reference matching |
-| **Cryptocurrency** | BTC/ETH/USDT | Instant after confirmation | Block level | Confirmation count, on-chain verification |
+| **Cryptocurrency** | BTC/ETH/USDT | Instant after confirmation | Block level | Confirmation requirements vary |
 | **Prepaid Card** | Paysafecard | T+1 | Transaction level | PIN verification |
-| **Carrier Billing** | Boku/Payforit | T+7~T+30 | Monthly | High refund rate handling |
+| **Carrier Billing** | Boku/Payforit | T+7~T+30 | Monthly | High refund rate (15-25%) |
 
-### 21.2 Card Payment Requirements
+### 21.2 Card Payment Business Rules
 
-- Chargeback stages: Initial notification -> Evidence collection (7-14 days) -> Representment -> Final ruling (45-120 days)
-- Track 3DS verification status
-- Match authorization codes
+**Chargeback Handling**:
+- Process stages: Initial notification → Evidence collection (7-14 days) → Representment → Final ruling (45-120 days)
+- All chargebacks MUST be tracked and reconciled
+- Authorization codes MUST be matched during reconciliation
 
-### 21.3 Cryptocurrency Requirements
+### 21.3 Cryptocurrency Business Rules
 
-- BTC: Minimum 3 confirmations
-- ETH/USDT: Minimum 12 confirmations
-- Travel Rule verification required
-- On-chain verification against platform records
+**Confirmation Requirements**:
+- Bitcoin transactions require minimum confirmations before finalization
+- Ethereum/USDT transactions require minimum confirmations before finalization
+- All cryptocurrency transactions MUST be verified against blockchain records
 
-### 21.4 Carrier Billing Requirements
+### 21.4 Carrier Billing Business Rules
 
+**Refund Provisions**:
 - Settlement cycle: T+30 (monthly)
 - Expected refund rate: 15-25% (industry average)
-- Provision for refunds: `provision = revenue x historical_refund_rate x 1.2`
-- MNO report matching
+- Provision formula: `provision = revenue × historical_refund_rate × 1.2`
+
+→ **[Payment Method Technical Specifications](../../architecture/02_Finance_Service/Reconciliation_Technical.md#payment-methods)** - 3DS verification implementation, blockchain confirmation counts, MNO report parsing, on-chain verification logic
 
 ---
 

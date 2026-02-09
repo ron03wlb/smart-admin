@@ -233,6 +233,10 @@ Player interactions with games are scored to drive recommendations:
 - [Frontend Layout Engine](../../source/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md) - Lobby page design
 - [Gateway Architecture](../../source/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API rate limiting
 
+### Technical Implementation
+
+→ **[Game Lobby System Architecture](../../architecture/03_Game_Integration/Game_Lobby_System.md)** - Game catalog management, filter algorithms, lazy loading implementation, CDN asset optimization, and personalization engine
+
 ---
 
 **Document Version**: 1.0.0

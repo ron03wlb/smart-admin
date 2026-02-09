@@ -185,6 +185,10 @@ If a player's existing assessment covers the required tier and has not expired, 
 | KYC / AML | Full assessments may share data with KYC verification |
 | UKGC Compliance | Affordability is a subset of overall UKGC licence compliance |
 
+### Technical Implementation
+
+→ **[Affordability Assessment Implementation](../../architecture/05_Risk_Engine/Affordability_Implementation.md)** - Light/enhanced/full assessment algorithms, bank API integration, income verification workflows, limit enforcement mechanisms, and real-time monitoring dashboards
+
 ---
 
 **Navigation**: [Risk and Compliance Requirements](../05_Risk_Compliance/) | [iGaming Home](../../README.md)

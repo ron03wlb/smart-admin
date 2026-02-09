@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-01_Quickstart.md](../../source/00_Foundation/00-01_Quickstart.md)
 > **Audience**: Architects, Backend Engineers, DevOps Engineers
-> **Related Doc**: [Platform_Overview.md](../../requirements/01_Player_Experience/Platform_Overview.md)
+> **Business Requirements**: [Platform_Overview.md](../../requirements/01_Player_Experience/Platform_Overview.md)
 > **Last Synced**: 2026-02-08
 
 ---

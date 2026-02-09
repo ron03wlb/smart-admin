@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-13_Promotion_Implementation.md](../../source/00_Foundation/guides/00-13_Promotion_Implementation.md)
 > **Audience**: Architects, Backend Engineers, Product Engineers
-> **Related Doc**: [Promotion_Requirements.md](../../requirements/04_Promotions_VIP/Promotion_Requirements.md)
+> **Business Requirements**: [Promotion_Requirements.md](../../requirements/04_Promotions_VIP/Promotion_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

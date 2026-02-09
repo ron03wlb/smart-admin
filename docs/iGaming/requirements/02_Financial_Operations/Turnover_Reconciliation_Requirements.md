@@ -3,7 +3,9 @@
 > **Canonical Source**: [source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md](../../source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 > **Audience**: Executives, Compliance Officers, Product Managers, Finance Team
 > **Related Doc**: [Turnover_Calculation_Architecture.md](../../architecture/02_Finance_Service/Turnover_Calculation_Architecture.md)
-> **Last Synced**: 2026-02-08
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (three-layer validation architecture, Mermaid flowchart, short-circuit optimization) moved to Architecture layer. This document focuses on business rules only.
 
 ---
 
@@ -128,49 +130,26 @@ The `valid_turnover_finance` calculated by this module is an incremental value t
 
 ---
 
-## 1.8 Cross-Module Turnover Consistency
+## 1.8 Cross-Module Turnover Consistency Requirements
 
 To ensure consistency between the Finance System and the Activity System, both must share unified base validation logic.
 
-### Three-Layer Validation Architecture Responsibilities
+**Key Principles**:
+- Finance and Activity modules MUST use consistent rules for turnover calculation
+- Risk Engine validation results MUST be respected by both Finance and Activity modules
+- Configuration parameters MUST be centralized in a Unified Config Service (no local hardcoding)
 
-**Key Principle**: Each layer is only responsible for its own duties. Rejection decisions are handled exclusively by Layer 1; subsequent layers only perform numerical adjustments.
+**Data Exchange**:
+- Finance module calculates `valid_turnover_finance` and publishes to event bus
+- Activity System consumes this value and applies game weights: `activity_valid_turnover = valid_turnover_finance x GAME_WEIGHTS[game_type]`
 
-| Responsibility | Layer 1 (Risk Engine) | Layer 2 (Finance) | Layer 3 (Activity) |
-|---------------|----------------------|-------------------|-------------------|
-| **Rejection Decision** | Solely responsible | Not involved | Not involved |
-| **Status Factor Adjustment** | Not involved | Solely responsible | Not involved |
-| **Game Weight Application** | Not involved | Not involved | Solely responsible |
-| **Short-circuit Return** | is_valid=false returns 0 directly | Trusts Layer 1 result | Trusts Layer 2 result |
-| **Performance Impact** | Executes for all bets | Only bets passing Layer 1 (~95%) | Only bets with active bonuses |
-
-### Finance Layer Processing Flow
-
-The finance module must strictly follow these steps:
-
-1. **Step 1 - Layer 1 Risk Validation**: Call Risk Engine to validate bet (Hedge/Arbitrage/Low Odds checks). BLOCK rules return turnover = 0 immediately (short-circuit). FLAG rules mark for review but allow normal calculation.
-2. **Step 2 - Layer 2 Status Factor Adjustment**: Apply status factor based on bet outcome (WIN/LOSS/DRAW/CANCEL). This layer does NOT make rejection decisions -- it trusts the Layer 1 result.
-3. **Step 3 - Record All Layers**: Record each layer's calculation result for audit and reconciliation purposes.
-
-### Performance Optimization (v2.0.0)
-
-- **Before (v1.x)**: Layer 2 still executed even after Layer 1 rejection -- 100% of bets hit Layer 2
-- **After (v2.0.0)**: Layer 1 rejection causes immediate short-circuit return -- only ~95% of bets reach Layer 2
-- **Savings**: ~5% CPU and database query reduction
-
-### Data Exchange with Activity System
-
-After finance module calculation, `valid_turnover_finance` is published to an event bus for the Activity System to consume. The Activity System then applies game weight on top of this value:
-
-`activity_valid_turnover = valid_turnover_finance x GAME_WEIGHTS[game_type]`
-
-### Configuration Synchronization Requirements
-
-The Finance and Activity modules must read the following parameters from a **Unified Config Service** -- local hardcoding is prohibited:
-
+**Configuration Synchronization**:
+The Finance and Activity modules must read the following parameters from a Unified Config Service:
 1. **Odds Thresholds**: Defined by Risk Engine (EUR: 1.5, HK: 0.5, MY: 0.5, ID: 1.2)
-2. **Game Weights**: Defined by Activity module (SLOTS: 1.0, SPORTS: 1.0, BACCARAT: 0.15, BLACKJACK: 0.10, ROULETTE: 0.20, VIDEO_POKER: 0.15, LOTTERY: 0.10, PVP: 0.0)
-3. **Status Factors**: Defined and maintained by Finance module (WIN: 1.0, LOSS: 1.0, DRAW: 0.0, TIE: 0.0, VOID: 0.0, CANCEL: 0.0, HALF_WIN: 1.0, HALF_LOSS: 1.0, RUNNING: 0.0)
+2. **Game Weights**: Defined by Activity module (SLOTS: 1.0, SPORTS: 1.0, BACCARAT: 0.15, etc.)
+3. **Status Factors**: Defined by Finance module (WIN: 1.0, LOSS: 1.0, DRAW: 0.0, etc.)
+
+→ **[Three-Layer Validation Architecture](../../architecture/02_Finance_Service/Turnover_Calculation_Architecture.md#three-layer-validation)** - Technical responsibility matrix, performance optimization, short-circuit implementation
 
 ---
 
@@ -268,7 +247,9 @@ When reconciliation finds deviations that cannot be auto-corrected, the compensa
 | Turnover Calculation Latency (P99) | < 100ms | End-to-end calculation time per bet |
 | Risk Engine Call Success Rate | > 99.9% | Layer 1 validation availability |
 | Daily Reconciliation Deviation Rate | < 0.01% | Acceptable deviation threshold |
-| Event Publish Success Rate | > 99.99% | Kafka message delivery reliability |
+| Event Publish Success Rate | > 99.99% | Guaranteed delivery of critical financial events to downstream systems |
+
+→ **[Event Publishing Architecture](../../architecture/02_Finance_Service/Turnover_Calculation_Architecture.md#event-publishing)**
 
 ### Alert Rules
 
@@ -281,31 +262,19 @@ When reconciliation finds deviations that cannot be auto-corrected, the compensa
 
 ---
 
-## 5. Turnover Calculation Business Flow
+## 5. Turnover Calculation Requirements
 
-The following simplified flow shows how a single bet simultaneously calculates general turnover and activity turnover:
+The system MUST simultaneously calculate both general turnover and activity turnover for each bet.
 
-```mermaid
-flowchart TD
-    A([Bet Settlement Trigger]) --> B{Status Valid?<br/>Not Draw/Cancel}
-    B -- No --> C[Turnover = 0]
-    B -- Yes --> D{Odds Above<br/>Threshold?}
-    D -- No --> C
-    D -- Yes --> E{Risk Engine<br/>Validation Pass?}
-    E -- No --> C
-    E -- Yes --> F[Calculate General Turnover]
-    F --> G{Has Active Bonus?}
-    G -- No --> H([End])
-    G -- Yes --> I[Load Bonus Rules]
-    I --> J{Game in<br/>Whitelist?}
-    J -- No --> K[Activity Turnover = 0]
-    J -- Yes --> L[Apply Contribution Cap]
-    L --> M[Calculate Activity Turnover]
-    K --> N[Update Wagering Progress]
-    M --> N
-    N --> H
-    C --> H
-```
+**Business Flow**:
+1. Validate bet status (not Draw/Cancel)
+2. Check odds threshold
+3. Validate with Risk Engine
+4. Calculate general turnover
+5. If player has active bonus: apply game whitelist check, contribution cap, and calculate activity turnover
+6. Update wagering progress
+
+→ **[Technical Flow Diagram](../../architecture/02_Finance_Service/Turnover_Calculation_Architecture.md#calculation-flow)** - Mermaid flowchart, decision tree, error handling
 
 ---
 
@@ -325,7 +294,7 @@ flowchart TD
 
 **Major Changes**:
 1. Clarified three-layer validation architecture responsibilities
-   - Layer 1 rejection causes immediate short-circuit return (does not enter Layer 2/3)
+   - Layer 1 rejection stops further processing (does not enter Layer 2/3)
    - Clear responsibility matrix defined
 
 2. HALF_WIN/HALF_LOSS standardized to 100% turnover (standard principal method)
@@ -336,6 +305,16 @@ flowchart TD
 - Turnover calculation logic (Sections 1.1-1.6)
 - Game reconciliation logic (Sections 2.1-2.2)
 - Free spins turnover rules
+
+---
+
+## Related Documentation
+
+→ **[Turnover Calculation Logic (Detailed)](../../architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md)** - Bet status factor matrices, game weight tables, HALF_WIN/HALF_LOSS processing algorithms
+
+→ **[Turnover Flow Diagrams](../../architecture/02_Finance_Service/Turnover_Flowcharts.md)** - Visual workflow diagrams for three-layer validation architecture, reconciliation processes, and exception handling
+
+→ **[Turnover System Implementation](../../architecture/02_Finance_Service/Turnover_Implementation.md)** - Complete technical implementation including Java code, SQL schemas, Redis caching strategies, and Kafka event streaming
 
 ---
 

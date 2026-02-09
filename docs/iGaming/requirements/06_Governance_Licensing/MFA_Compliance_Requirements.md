@@ -2,8 +2,10 @@
 
 > **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 > **Audience**: Executives, Compliance Officers
-> **Related Doc**: [MFA Compliance Validation (Architecture)](../../architecture/06_Platform_Core/MFA_Compliance_Validation.md)
-> **Last Synced**: 2026-02-08
+> **Related Doc**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md)
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (Backup Code AES-256-GCM encryption, Identity Document S3 upload implementation, Audit Log JSONB format + Kafka integration, Anomaly Detection rule implementations, HTTP status codes, Redis cache configuration) moved to Architecture layer. This document focuses on business policies, compliance mandates, and operational procedures only.
 
 ---
 
@@ -26,9 +28,11 @@ Users may lose access to TOTP-based MFA due to phone loss, Google Authenticator 
 | **Quantity** | 10 one-time backup codes per user |
 | **Format** | 8-digit numeric, displayed as XXXX-XXXX (e.g., 1234-5678) |
 | **Usage** | Each code is single-use; once consumed, it cannot be reused |
-| **Storage** | Codes stored in encrypted format with used/unused status tracking |
+| **Storage** | Codes stored securely with used/unused status tracking |
 | **Low Code Warning** | When remaining unused codes drops to 2 or fewer, prompt user to regenerate |
 | **Regeneration** | Requires active TOTP verification before new codes can be generated |
+
+→ **[Backup Code Storage & Encryption](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md#backup-code-encryption)** - AES-256-GCM encryption algorithm, secure generation, database schema, status tracking implementation
 
 ### 2.3 Backup Code Login Policy
 
@@ -39,7 +43,7 @@ Users may lose access to TOTP-based MFA due to phone loss, Google Authenticator 
    - Grant access
    - If remaining codes are 2 or fewer, display a warning recommending regeneration
 4. If the code is invalid or already used:
-   - Deny access (HTTP 401)
+   - Deny access
    - Record an audit log entry (BACKUP_CODE_INVALID)
 
 ### 2.4 Backup Code Management
@@ -86,6 +90,8 @@ Each recovery request must be tracked with:
 - Review status (PENDING / APPROVED / REJECTED)
 - Reviewer ID and review timestamp
 - Full audit trail
+
+→ **[Identity Document Upload Implementation](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md#identity-document-upload)** - S3 storage configuration, file validation, secure upload API, document verification workflow
 
 ---
 
@@ -213,6 +219,8 @@ Each audit entry must capture:
 - Additional details in structured format (e.g., reason, attempt count, remaining attempts)
 - Timestamp
 
+→ **[Audit Log Implementation](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md#audit-log-implementation)** - JSONB format specification, Kafka event streaming integration, PostgreSQL storage schema, retention policy automation
+
 ---
 
 ## 7. Anomaly Detection Rules
@@ -246,6 +254,8 @@ Each audit entry must capture:
   - **Immediately alert CTO / CISO**
   - Manual review: "Why was MFA disabled for a high-risk account?"
   - If not initiated by the account holder, treat as a security incident and lock the account immediately
+
+→ **[Anomaly Detection Implementation](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md#anomaly-detection-rules)** - Java rule engine implementation, threshold configuration, alert triggering logic, geographic location detection algorithm
 
 ---
 
@@ -285,7 +295,7 @@ Each audit entry must capture:
 | Task | Owner | Duration | Dependencies |
 |------|-------|----------|-------------|
 | Implement backup code generation and verification | Backend Dev | 1 day | Phase 1 |
-| Implement device trust mechanism (fingerprint + Redis) | Backend Dev | 1.5 days | Phase 1 |
+| Implement device trust mechanism (fingerprint-based) | Backend Dev | 1.5 days | Phase 1 |
 | Implement device loss recovery flow (human review) | Backend Dev | 1.5 days | Phase 1 |
 | Frontend backup code management page | Frontend Dev | 1 day | Backup code API |
 | Testing and verification | QA | 1 day | All above |
@@ -367,12 +377,12 @@ The following test scenarios must be verified for compliance acceptance:
 
 | Test ID | Scenario | Expected Result |
 |---------|---------|----------------|
-| TC-MFA-001 | User first-time TOTP setup (scan QR code) | Secret encrypted and stored, Status = PENDING |
+| TC-MFA-001 | User first-time TOTP setup (scan QR code) | Secret securely stored, Status = PENDING |
 | TC-MFA-002 | User enters correct TOTP code to activate MFA | Status changes to ACTIVE, audit log recorded |
-| TC-MFA-003 | User enters incorrect TOTP code | HTTP 401 returned, error counter incremented |
+| TC-MFA-003 | User enters incorrect TOTP code | Access denied, error counter incremented |
 | TC-MFA-004 | User fails TOTP 3 consecutive times | Account locked 15 minutes, security alert triggered |
 | TC-MFA-005 | User logs in with backup code | Login succeeds, backup code marked as used |
-| TC-MFA-006 | User reuses an already-consumed backup code | HTTP 401, audit log recorded |
+| TC-MFA-006 | User reuses an already-consumed backup code | Access denied, audit log recorded |
 | TC-MFA-007 | User selects "Trust this device for 30 days" | Trust token stored (TTL 30 days) |
 | TC-MFA-008 | Login from trusted device (MFA skipped) | Token issued directly without TOTP prompt |
 | TC-MFA-009 | Server time offset +25 seconds | Verification succeeds (+/-1 window) |
@@ -398,3 +408,7 @@ The following test scenarios must be verified for compliance acceptance:
 - MFA Architecture Design - Business requirements and method selection
 - TOTP & WebAuthn Implementation - TOTP algorithm details
 - Login & Recovery Flow - Authentication flow design
+
+### Technical Implementation
+
+→ **[MFA Compliance Validation](../../architecture/06_Platform_Core/MFA_Compliance_Validation.md)** - Backup code storage encryption, identity document upload workflows, audit log implementation (JSONB + Kafka), anomaly detection algorithms (failed attempts, geolocation, backup code abuse)

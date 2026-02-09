@@ -46,7 +46,9 @@ SmartAdmin iGaming v2.1.0 introduces a "Configuration-Driven Risk Control System
 
 **Layer 1: Synchronous Blocking (Very Few, <10ms)**
 
-These scenarios result in immediate rejection at the betting request stage using Redis cache quick checks:
+These scenarios result in immediate rejection at the betting request stage using high-speed cache lookups:
+
+→ **[Fast Cache Implementation](../../architecture/05_Risk_Engine/Fraud_Detection_System.md#layer1-cache)**
 
 - **Blacklisted Players** (confirmed fraudsters)
 - **IP Blocking** (known attack sources)
@@ -136,7 +138,9 @@ These rules execute asynchronously after bet success, generating medium-priority
 | `risk_proposal_pending_count` | >100 | Pending review backlog |
 | `risk_query_duration_ms (P95)` | >200ms | Query performance degradation |
 | `risk_cache_hit_rate` | <90% | Cache hit rate decline |
-| `risk_kafka_event_publish_errors` | >10/min | Kafka publish failures |
+| `risk_event_publish_errors` | >10/min | Risk event delivery failures (exceeding threshold indicates system degradation) |
+
+→ **[Event Publishing Architecture](../../architecture/05_Risk_Engine/Fraud_Detection_System.md#event-publishing)**
 | `multi_account_detection_rate` | >5% | Abnormally high multi-account detection |
 | `self_exclusion_bypass_attempts` | >10/day | High bypass attempt rate |
 

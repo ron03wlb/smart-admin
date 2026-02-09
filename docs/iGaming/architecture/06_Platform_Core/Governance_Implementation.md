@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-15_Governance_Implementation.md](../../source/00_Foundation/guides/00-15_Governance_Implementation.md)
 > **Audience**: Architects, Backend Engineers, Security Engineers
-> **Related Doc**: [Governance_Requirements.md](../../requirements/06_Governance_Licensing/Governance_Requirements.md)
+> **Business Requirements**: [Governance_Requirements.md](../../requirements/06_Governance_Licensing/Governance_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

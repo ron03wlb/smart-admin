@@ -445,6 +445,12 @@ Successful operators must balance rapid expansion with compliance rigor -- this 
 
 ---
 
+## Related Documentation
+
+→ **[Platform Architecture - Technical Implementation](../../architecture/00_Overview/Platform_Architecture.md)** - Complete system architecture, technology stack, infrastructure design, and deployment strategies
+
+---
+
 **Document Version**: 1.0.0
 **Last Updated**: 2026-02-08
 **Maintainer**: Product Management Team

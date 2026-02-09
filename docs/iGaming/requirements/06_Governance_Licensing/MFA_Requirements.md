@@ -116,7 +116,10 @@ Backend administrators have high-privilege access that, if compromised, can resu
 ### 4.2 MGA Compliance Checklist
 
 1. All Super Admin, Finance Manager, Risk Control must enable MFA
-2. MFA Secret must be encrypted (AES-256-GCM)
+2. MFA Secret must be encrypted using NIST-approved 256-bit encryption standards
+   (AES-256-GCM is the approved implementation algorithm)
+
+→ **[MFA Secret Encryption](../../architecture/06_Platform_Core/MFA_Technical.md#secret-encryption)**
 3. Audit logs must record all MFA events (setup, verify, failure)
 4. Recovery mechanism must require secondary verification (no self-service)
 5. MFA implementation must pass penetration testing
@@ -175,7 +178,10 @@ Backend administrators have high-privilege access that, if compromised, can resu
 - **Quantity**: 10 one-time use codes
 - **Format**: 8 digits (e.g., 1234-5678)
 - **Generation**: SecureRandom, cryptographically secure
-- **Storage**: AES-256-GCM encrypted, stored with user MFA record
+- **Storage**: NIST-approved 256-bit encryption, stored with user MFA record
+  (Implementation algorithm: AES-256-GCM)
+
+→ **[Encryption Implementation Details](../../architecture/06_Platform_Core/MFA_Technical.md#secret-encryption)**
 - **Usage**: Each code can only be used once
 
 **User Guidance**:
@@ -368,6 +374,12 @@ For MGA/UKGC audits, the following must be demonstrable:
 - Recommended only for Super Admin, CTO, CFO
 - Cost: $50 per device
 - Provides highest security (anti-phishing, anti-MITM)
+
+---
+
+## Related Documentation
+
+→ **[TOTP & WebAuthn Implementation](../../architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md)** - TOTP algorithm implementation (RFC 6238), secret generation, QR code rendering, backup code encryption (AES-256-GCM), trusted device fingerprinting, and audit log schemas
 
 ---
 

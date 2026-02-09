@@ -2,8 +2,10 @@
 
 > **Canonical Source**: [05-02-01_Detection_Model.md](../../source/05_Risk_Control/05-02-01_Detection_Model.md)
 > **Audience**: Architects, Backend Engineers, Risk Team Engineers
-> **Related Doc**: [Detection_Model_Spec.md](../../requirements/05_Risk_Compliance/Detection_Model_Spec.md)
-> **Last Synced**: 2026-02-08
+> **Business Requirements**: [Detection_Model_Spec.md](../../requirements/05_Risk_Compliance/Detection_Model_Spec.md)
+> **Last Synced**: 2026-02-09
+>
+> **Technical Focus**: This document contains implementation details (TCC pattern, SAGA flow, rule engine integration) extracted from Requirements layer.
 
 ---
 

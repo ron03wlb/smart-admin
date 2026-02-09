@@ -221,6 +221,10 @@ Tenants must be able to export:
 - [RBAC Permissions](RBAC_Requirements.md) - Hierarchical permission implementation
 - [Audit Logging](Audit_Log_Requirements.md) - Tenant operation auditing
 
+### Technical Implementation
+
+→ **[Multi-Tenant Architecture](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md)** - Tenant isolation mechanisms (shared-nothing pattern), dynamic tenant routing, hierarchical data partitioning (tenantId propagation), database sharding strategies, and SSO configuration options
+
 ---
 
 **Document Version**: 1.0.0

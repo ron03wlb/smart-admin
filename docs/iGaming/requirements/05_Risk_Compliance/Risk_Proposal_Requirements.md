@@ -263,3 +263,9 @@ A dedicated Grafana dashboard MUST display:
 - Introduced per-priority SLA deadlines (URGENT=1h, HIGH=2h, MEDIUM=24h, LOW=48h)
 - Added automatic timeout actions per priority level
 - Added SLA warning notifications at 75% threshold
+
+---
+
+## Related Documentation
+
+→ **[Risk Proposal Implementation](../../architecture/05_Risk_Engine/Risk_Proposal_Implementation.md)** - State machine workflows, approval logic, SLA enforcement mechanisms, compensation execution patterns, and Grafana dashboard configurations

@@ -169,3 +169,9 @@ Testing confirms the performance overhead is less than 5%. The benefits in data 
 |---------|------|---------|
 | 2.0.0 | 2026-02-03 | v2 restructured -- redesigned navigation, focused on 5 core concepts |
 | 1.0.0 | 2026-01-27 | Initial version |
+
+---
+
+## Related Documentation
+
+→ **[System Overview - Technical Implementation](../../architecture/00_Overview/System_Overview.md)** - Detailed system architecture, module dependencies, data flow diagrams, and technical infrastructure specifications

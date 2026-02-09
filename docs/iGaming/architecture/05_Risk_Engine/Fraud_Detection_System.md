@@ -1,5 +1,9 @@
 # Fraud Detection System Architecture
 
+> **Business Requirements**: [Fraud_Detection_Requirements.md](../../requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md)
+> **Audience**: Backend Developers, Risk Control Engineers, Data Scientists
+> **Last Synced**: 2026-02-09
+
 ## Document Information
 
 | Property | Value |

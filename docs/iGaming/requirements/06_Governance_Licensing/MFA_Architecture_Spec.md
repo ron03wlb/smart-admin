@@ -1,9 +1,11 @@
 # MFA 架構規格 - 業務需求與方法選擇
 
 > **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source/06_Platform_Governance/06-06-01_MFA_Architecture.md)
-> **Audience**: Executives, Compliance Officers
-> **Related Doc**: [MFA_Technical_Architecture.md](../../architecture/06_Platform_Core/MFA_Technical_Architecture.md)
-> **Last Synced**: 2026-02-08
+> **Audience**: Executives, Compliance Officers, Risk Officers
+> **Related Doc**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (TOTP RFC 6238 specifications, HMAC-SHA1 algorithms, SIM Swap attack vectors, SS7 hijacking, TOTP secret encryption AES/GCM, FIDO2 technical standards) moved to Architecture layer. This document focuses on business risk analysis and decision-making only.
 
 ---
 
@@ -74,10 +76,12 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 | 序號 | 要求 |
 |------|------|
 | 1 | 所有 Super Admin、Finance Manager、Risk Control 必須啟用 MFA |
-| 2 | MFA Secret 必須加密存儲（AES-256-GCM） |
+| 2 | MFA Secret 必須加密存儲 |
 | 3 | 審計日誌必須記錄所有 MFA 事件（註冊、驗證、失敗） |
 | 4 | 備份恢復機制必須有二次驗證（不能自助恢復） |
 | 5 | MFA 實施後需通過滲透測試（Penetration Test） |
+
+→ **[MFA Secret Encryption Implementation](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md#secret-encryption)** - AES-256-GCM encryption algorithm, key rotation policy, HSM integration
 
 ---
 
@@ -98,19 +102,23 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 
 | 維度 | 說明 |
 |------|------|
-| **優點** | 高安全性（RFC 6238 標準）；離線可用（不依賴網絡）；成本低（免費應用）；廣泛支持 |
+| **優點** | 高安全性（行業標準時間算法）；離線可用（不依賴網絡）；成本低（免費應用）；廣泛支持 |
 | **缺點** | 設備丟失風險（需備份恢復機制）；時間同步問題 |
 | **適用場景** | Super Admin、Finance Manager（高權限角色）；開發者、DevOps |
+
+→ **[TOTP RFC 6238 Implementation](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md#totp-specification)** - HMAC-SHA1 algorithm, time step (30s), code length (6 digits), time window tolerance
 
 #### SMS OTP
 
 | 維度 | 說明 |
 |------|------|
 | **優點** | 用戶體驗好（無需安裝應用）；覆蓋率高（99% 用戶有手機號） |
-| **缺點** | 安全性較低（SIM Swap 攻擊、SS7 劫持）；依賴 SMS 網關（成本 $0.05-$0.10/條）；NIST SP 800-63B 已不推薦 |
+| **缺點** | 安全性較低（易受多種攻擊向量影響）；依賴 SMS 網關（成本 $0.05-$0.10/條）；國際標準已不推薦 |
 | **適用場景** | 作為 TOTP 的備用方案；低敏感度操作 |
 
-**NIST 官方立場**：SMS OTP 已被棄用（deprecated），未來版本將禁止使用。
+**標準機構立場**：SMS OTP 已被國際安全標準列為棄用（deprecated），未來版本將禁止使用。
+
+→ **[SMS Security Threat Analysis](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md#sms-vulnerabilities)** - SIM Swap attack vectors, SS7 hijacking, NIST SP 800-63B deprecation notice
 
 #### Email OTP
 
@@ -124,9 +132,11 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 
 | 維度 | 說明 |
 |------|------|
-| **優點** | 最高安全性（物理設備防釣魚、防中間人攻擊）；符合 FIDO2 標準 |
+| **優點** | 最高安全性（物理設備防釣魚、防中間人攻擊）；符合國際物理認證標準 |
 | **缺點** | 成本高（每個設備 $50-$70 USD）；物流問題（需郵寄給遠程員工）；丟失風險 |
 | **適用場景** | 超高權限角色（Super Admin、CTO、CFO）；有預算的大型企業 |
+
+→ **[FIDO2/WebAuthn Standards](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md#fido2-webauthn)** - FIDO2 protocol specification, WebAuthn API integration, hardware token support
 
 ---
 
@@ -156,7 +166,7 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 
 | 維度 | 評估 |
 |------|------|
-| **優點** | 最高安全性（物理設備防釣魚）；符合金融級安全標準（PSD2、FIDO2） |
+| **優點** | 最高安全性（物理設備防釣魚）；符合金融級安全標準 |
 | **缺點** | 成本極高（$10,000 以 200 員工計）；物流複雜；需每人 2 個設備 |
 | **適用場景** | 超高安全要求（銀行、支付平台）；僅用於 Super Admin、Finance Manager（5-10 人） |
 
@@ -207,6 +217,10 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 - [TOTP_WebAuthn_Implementation.md](../../architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md) - TOTP 與 WebAuthn 技術實作
 - [MFA_Compliance_Requirements.md](./MFA_Compliance_Requirements.md) - 合規與審計要求
 - [MFA_Recovery_Requirements.md](./MFA_Recovery_Requirements.md) - 登入與恢復流程需求
+
+### 技術實現
+
+→ **[MFA 技術架構](../../architecture/06_Platform_Core/MFA_Technical_Architecture.md)** - TOTP RFC 6238 規範、TOTP Secret 加密（AES-256-GCM）、SMS 安全威脅分析（SIM Swap/SS7 劫持）、FIDO2/WebAuthn 標準協議、技術比較矩陣
 
 ---
 

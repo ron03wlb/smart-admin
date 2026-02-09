@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [05-07_Turnover_Validation_Scheme.md](../../source/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
 > **Audience**: Architects, Backend Engineers, Database Engineers
-> **Related Doc**: [Turnover_Validation_Requirements.md](../../requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md)
+> **Business Requirements**: [Turnover_Validation_Requirements.md](../../requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

@@ -1,5 +1,9 @@
 # MFA Technical Architecture
 
+> **Business Requirements**: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Requirements.md)
+> **Audience**: Backend Developers, Security Engineers, Compliance Officers
+> **Last Synced**: 2026-02-09
+
 **Document Metadata**:
 - Version: 1.0.0
 - Created: 2026-02-08

@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
+> **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 

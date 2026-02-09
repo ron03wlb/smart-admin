@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/00_Foundation/guides/00-10_Data_Model.md](../../source/00_Foundation/guides/00-10_Data_Model.md)
 > **Audience**: Architects, Backend Developers, DevOps
-> **Related Doc**: None (pure technical)
+> **Business Requirements**: None (pure technical)
 > **Last Synced**: 2026-02-08
 
 ---

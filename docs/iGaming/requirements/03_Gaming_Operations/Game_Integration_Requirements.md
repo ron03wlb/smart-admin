@@ -2,8 +2,10 @@
 
 > **Canonical Source**: [source/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
 > **Audience**: Executives, Product Managers
-> **Related Doc**: [Game Integration Implementation (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **Related Doc**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (Token generation Java code, HMAC-SHA256 signature algorithm, Base64 encoding, Redis anti-replay blacklist, Three-layer idempotency defense, Stalled transaction recovery jobs, Rate limiting Redisson implementation) moved to Architecture layer. This document focuses on business requirements only.
 
 ---
 
@@ -59,10 +61,12 @@ The Seamless Wallet integration must support four primary operations:
 | Requirement | Specification |
 |------------|---------------|
 | Token composition | Must include player ID, tenant ID, timestamp, and cryptographic signature |
-| Signature algorithm | HMAC-SHA256 minimum |
+| Signature algorithm | Industry-standard cryptographic signature |
 | Token validity window | Maximum 5 minutes (configurable) |
 | Anti-replay protection | Each token must be single-use; used tokens must be rejected |
-| Encoding | Base64 encoding for transport |
+| Encoding | Secure encoding for transport |
+
+→ **[Token Authentication Implementation](../../architecture/03_Game_Integration/Game_Integration_Security.md#token-authentication)** - HMAC-SHA256 algorithm, Base64 encoding, Java generateToken/validateToken methods
 
 ### 4.2 GP Onboarding Security Checklist
 
@@ -72,6 +76,8 @@ The Seamless Wallet integration must support four primary operations:
 | HTTPS enforcement | All API communications must use TLS 1.2 or higher |
 | API key rotation | GP API keys must support periodic rotation without downtime |
 | Rate limiting | API endpoints must enforce per-GP rate limits to prevent abuse |
+
+→ **[Security Implementation Details](../../architecture/03_Game_Integration/Game_Integration_Security.md#security-checklist)** - IP whitelisting configuration, TLS 1.2+ setup, rate limiting (Redisson), Redis anti-replay blacklist
 
 ---
 
@@ -92,6 +98,8 @@ After every automated recovery, the system must:
 - Record the recovery action in the audit log
 - Send an alert notification if the transaction status was FAILED or NOT_FOUND
 - Ensure the player's balance is consistent with the resolved state
+
+→ **[Stalled Transaction Auto-Recovery](../../architecture/03_Game_Integration/Game_Integration_Security.md#auto-recovery)** - Scheduled job configuration, SQL queries, GP status query API integration, refund automation
 
 ---
 
@@ -133,17 +141,25 @@ After every automated recovery, the system must:
 
 | Pitfall | Mitigation |
 |---------|-----------|
-| Token replay attacks | Mandatory single-use token enforcement via server-side blacklist |
-| Idempotency layer failure | Three-layer defense (cache, database, distributed lock) must all be operational |
-| Distributed lock timeout too short | Lock hold time must exceed maximum business execution time |
+| Token replay attacks | Mandatory single-use token enforcement with server-side tracking |
+| Idempotency layer failure | Multi-layer defense mechanism must be operational |
+| Lock timeout too short | Lock hold time must exceed maximum business execution time |
 | Stalled transaction accumulation | Automated recovery task must be monitored for continuous operation |
+
+→ **[Idempotency Implementation](../../architecture/03_Game_Integration/Game_Integration_Security.md#idempotency-defense)** - Three-layer defense (Redis cache + DB unique constraint + Distributed lock), timeout configuration, fallback mechanisms
 
 ---
 
 ## Related Documents
 
+### Business References
 - [Turnover Business Rules](./Turnover_Business_Rules.md) - Wagering and turnover requirements
-- [Game Integration Implementation (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Implementation.md) - Technical implementation details
+
+### Technical Implementation
+
+→ **[Game Integration Implementation](../../architecture/03_Game_Integration/Game_Integration_Implementation.md)** - Complete game provider integration patterns, API specifications, token generation/validation algorithms, error handling, and testing strategies
+
+**Additional Technical References**:
 - [Turnover Calculation Logic (Architecture)](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md) - Turnover calculation technical design
 
 ---

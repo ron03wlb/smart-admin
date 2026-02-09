@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/00_Foundation/00-02_Business_Flows.md](../../source/00_Foundation/00-02_Business_Flows.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Related Doc**: [Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md)
+> **Business Requirements**: [Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md)
 > **Last Synced**: 2026-02-08
 
 ---

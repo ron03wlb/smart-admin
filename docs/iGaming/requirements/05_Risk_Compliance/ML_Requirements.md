@@ -219,3 +219,7 @@ All new models and significant model updates must pass A/B testing before full d
 | Operations Tools | source/05_Risk_Control/05-02-04_Operations_Tools.md |
 | Technical ML Architecture | architecture/05_Risk_Engine/ML_Integration_Architecture.md |
 | KYC/AML Compliance | source/05_Risk_Control/05-03_KYC_AML.md |
+
+### Technical Implementation
+
+→ **[ML Integration Architecture](../../architecture/05_Risk_Engine/ML_Integration_Architecture.md)** - Machine learning model deployment, feature engineering pipelines, real-time prediction API, model retraining workflows, and fraud detection algorithms

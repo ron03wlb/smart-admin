@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-02_TOTP_WebAuthn.md](../../source/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: None (pure technical)
+> **Business Requirements**: None (pure technical)
 > **Last Synced**: 2026-02-08
 
 ---

@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [15-08_Affordability_Assessment.md](../../source/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
 > **Audience**: Architects, Backend Developers, DevOps
-> **Related Doc**: [Affordability_Requirements.md](../../requirements/05_Risk_Compliance/Affordability_Requirements.md)
+> **Business Requirements**: [Affordability_Requirements.md](../../requirements/05_Risk_Compliance/Affordability_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

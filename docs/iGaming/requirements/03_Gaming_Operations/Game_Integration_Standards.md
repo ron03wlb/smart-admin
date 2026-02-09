@@ -3,7 +3,9 @@
 > **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: Executives, Product Managers, Operations Leads, Compliance Officers
 > **Related Doc**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
-> **Last Synced**: 2026-02-08
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (HMAC-SHA256, TLS, Type A/B/C classifications, HTTP status codes) moved to Architecture layer. This document focuses on business requirements only.
 
 ---
 
@@ -21,10 +23,12 @@ All game provider integrations must satisfy the following communication standard
 
 | Requirement | Standard |
 |-------------|----------|
-| API Format | RESTful API with JSON body |
-| Transport Security | HTTPS mandatory (TLS 1.2+) |
+| API Format | Industry-standard RESTful API with JSON payloads |
+| Transport Security | Encrypted transport mandatory |
 | Network Access Control | IP whitelist enforcement |
-| Request Authentication | HMAC-SHA256 signature verification |
+| Request Authentication | Cryptographic signature verification |
+
+→ **[Technical Implementation Details](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#1-integration-architecture-overview)** - HTTPS/TLS configuration, HMAC-SHA256 signature algorithm
 
 ### 2.2 Core API Contract
 
@@ -33,12 +37,14 @@ The platform exposes the following interfaces for game providers to invoke:
 | API Endpoint | Purpose | Key Requirement |
 |--------------|---------|-----------------|
 | **GetBalance** | Query player current balance | Real-time balance accuracy |
-| **Transaction (Bet/Win)** | Process wagers and payouts | Atomicity and idempotency guaranteed |
+| **Transaction (Bet/Win)** | Process wagers and payouts | Consistency and duplicate prevention guaranteed |
 | **CheckToken** | Validate player login token | Session validity confirmation |
 
 **Transaction Requirements**:
-- Bet and Win must be processed atomically (within a single transaction) or support rollback
-- Duplicate requests with the same transaction ID must never result in duplicate charges (idempotent processing)
+- Bet and Win must be processed consistently with support for rollback
+- Duplicate requests with the same transaction ID must never result in duplicate charges
+
+→ **[Transaction Guarantees](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#22-transaction-betwin)** - Atomicity implementation, idempotency mechanisms
 
 ### 2.3 Game Launch Flow
 
@@ -64,20 +70,16 @@ The following scenarios must have documented resolution procedures for every pro
 
 ---
 
-## 4. Provider Adaptation Standards
+## 4. Provider Adaptation Requirements
 
-Different game providers use different API styles. The platform maintains an adaptation layer to normalize all provider interactions:
-
-| Provider Type | API Style | Adaptation Approach |
-|---------------|-----------|---------------------|
-| **Type A** (PG-like) | Single Transfer Wallet endpoint for Bet and Win | Direct processing |
-| **Type B** (Evolution-like) | Separate Debit (Bet) and Credit (Win) calls | Maintain round state management |
-| **Type C** (Seamless) | Platform provides GetBalance only; changes initiated by GP | Implement webhook receiver |
+The platform must support integration with multiple game providers using different API styles and data formats.
 
 ### Data Normalization Requirements
 
 - All provider game types must be mapped to platform standard categories: Live, Slot, Sport
 - All currency units must be unified (e.g., if provider uses cents, platform converts to base currency units)
+
+→ **[Provider Adaptor Layer](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#4-provider-adaptor-layer)** - Type A/B/C technical classifications, middleware adaptation strategies
 
 ---
 
@@ -147,7 +149,9 @@ The system monitors each game provider and game ID using a 5-minute sliding wind
 | Alert Level | Trigger Condition (5-min window) | Automated Action | Recovery Method |
 |-------------|----------------------------------|-------------------|-----------------|
 | **Warning** | RTP > 120% AND Net Loss > $5,000 | Send alert to risk control team (Slack/Telegram) | Automatic (if next period normalizes) |
-| **Critical** | RTP > 200% AND Net Loss > $10,000 | Auto-disable the game/provider (HTTP 503) | Manual: requires CTO/Risk Director confirmation to unlock |
+| **Critical** | RTP > 200% AND Net Loss > $10,000 | Auto-disable the game/provider | Manual: requires CTO/Risk Director confirmation to unlock |
+
+→ **[Circuit Breaker Implementation](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#6-rtp-circuit-breaker-implementation)** - HTTP status codes, alert payloads, monitoring architecture
 
 ### 7.3 Manual Recovery Process
 
@@ -182,17 +186,19 @@ After a critical circuit breaker event:
 | API Uptime | 99.9% |
 | Transaction Processing Latency | < 200ms P95 |
 | Game Launch Success Rate | > 99.5% |
-| Webhook Delivery Guarantee | At-least-once with idempotency |
+| Webhook Delivery Guarantee | At-least-once with duplicate prevention |
 | New Game Onboarding Time | < 5 business days (after GP certification) |
 
 ### 8.2 Certification Requirements
 
 Before a game provider goes live, the following must be verified:
 - API contract compliance (all core endpoints functional)
-- Edge case handling (timeout, rollback, idempotency)
+- Edge case handling (timeout, rollback, duplicate prevention)
 - Currency and game type normalization
 - Jackpot transaction handling (if applicable)
 - Circuit breaker integration testing
+
+→ **[Technical Certification Checklist](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)** - Detailed testing procedures and validation criteria
 
 ---
 

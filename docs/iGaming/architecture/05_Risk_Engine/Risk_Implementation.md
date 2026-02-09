@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-14_Risk_Implementation.md](../../source/00_Foundation/guides/00-14_Risk_Implementation.md)
 > **Audience**: Architects, Backend Engineers, Data Engineers
-> **Related Doc**: [Risk_Requirements_Summary.md](../../requirements/05_Risk_Compliance/Risk_Requirements_Summary.md)
+> **Business Requirements**: [Risk_Requirements_Summary.md](../../requirements/05_Risk_Compliance/Risk_Requirements_Summary.md)
 > **Last Synced**: 2026-02-08
 
 ---

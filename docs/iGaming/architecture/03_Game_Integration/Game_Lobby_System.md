@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-02_Game_Lobby_Management.md](../../source/03_Game_Center/03-02_Game_Lobby_Management.md)
 > **Audience**: Architects, Backend Engineers, Frontend Engineers, Search Engineers
-> **Related Doc**: [Game Lobby Requirements](../../requirements/03_Gaming_Operations/Game_Lobby_Requirements.md)
+> **Business Requirements**: [Game Lobby Requirements](../../requirements/03_Gaming_Operations/Game_Lobby_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

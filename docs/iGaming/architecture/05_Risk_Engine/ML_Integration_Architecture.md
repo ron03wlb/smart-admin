@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [05-02-03_ML_Integration.md](../../source/05_Risk_Control/05-02-03_ML_Integration.md)
 > **Audience**: Architects, ML Engineers
-> **Related Doc**: [ML_Requirements.md](../../requirements/05_Risk_Compliance/ML_Requirements.md)
+> **Business Requirements**: [ML_Requirements.md](../../requirements/05_Risk_Compliance/ML_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

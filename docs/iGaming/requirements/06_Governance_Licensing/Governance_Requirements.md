@@ -120,9 +120,13 @@ This document defines the governance requirements for the iGaming platform, cove
 
 | Data Category | Encryption Standard | Use Case |
 |---------------|-------------------|----------|
-| PII Fields | AES-256-GCM | Player name, email, phone, address |
-| Financial Data | AES-256-GCM | Account balances, transaction amounts |
+| PII Fields | NIST-Approved 256-bit Encryption | Player name, email, phone, address |
+| Financial Data | NIST-Approved 256-bit Encryption | Account balances, transaction amounts |
 | Search Indexes | Blind Index (HMAC) | Searchable encrypted fields |
+
+**Note**: AES-256-GCM is the approved implementation algorithm for this requirement.
+
+→ **[Encryption Algorithm Selection](../../architecture/06_Platform_Core/Governance_Implementation.md#encryption-algorithms)**
 
 ### Compliance Checklist
 

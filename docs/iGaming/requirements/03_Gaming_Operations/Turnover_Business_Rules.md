@@ -275,7 +275,8 @@ All recalculations must:
 - [00-03 Terminology Standards](../../source/00_Foundation/concepts/00-03_Terminology_Standards.md) - Required reading
 
 ### Technical Implementation
-- [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md) - Technical architecture
+
+→ **[Turnover Calculation Logic - Technical Architecture](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)** - Complete turnover calculation algorithms, bet status processing matrices, game weight tables, three-layer validation implementation
 
 ### Dependencies
 - [05-01 Risk Framework](../../source/05_Risk_Control/05-01_Risk_Framework.md) - Layer 1 risk engine

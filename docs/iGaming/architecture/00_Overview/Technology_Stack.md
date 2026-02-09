@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/00_Foundation/guides/00-09_Technology_Stack.md](../../source/00_Foundation/guides/00-09_Technology_Stack.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Related Doc**: N/A (pure technical document, no requirements counterpart)
+> **Business Requirements**: N/A (pure technical document, no requirements counterpart)
 > **Last Synced**: 2026-02-08
 
 ---

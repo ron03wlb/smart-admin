@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-03_Recovery_Flow.md](../../source/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 > **Audience**: Architects, Backend Developers, DevOps
-> **Related Doc**: [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md)
+> **Business Requirements**: [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

@@ -161,6 +161,10 @@ The following betting behaviours contribute zero to valid turnover:
 - [05-05 Risk Proposal Workflow](../../source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) -- Proposal lifecycle management
 - [05-06 Withdrawal Risk Correlation](../../source/05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md) -- Withdrawal risk scoring
 
+### Technical Implementation
+
+→ **[Turnover Validation Architecture](../../architecture/05_Risk_Engine/Turnover_Validation_Architecture.md)** - Checkpoint snapshot mechanisms, dual-layer protection algorithms, invalid turnover detection rules, and real-time validation workflows
+
 ---
 
 ## 10. Version History

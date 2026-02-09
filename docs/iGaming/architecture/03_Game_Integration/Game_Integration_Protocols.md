@@ -2,8 +2,10 @@
 
 > **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: Architects, Backend Engineers, Integration Engineers
-> **Related Doc**: [Game Integration Standards (Requirements)](../../requirements/03_Gaming_Operations/Game_Integration_Standards.md)
-> **Last Synced**: 2026-02-08
+> **Business Requirements**: [Game Integration Standards](../../requirements/03_Gaming_Operations/Game_Integration_Standards.md)
+> **Last Synced**: 2026-02-09
+>
+> **Technical Focus**: This document contains implementation details (HMAC-SHA256 algorithms, TLS configuration, Provider Type A/B/C classifications, HTTP status codes) extracted from Requirements layer.
 
 ---
 

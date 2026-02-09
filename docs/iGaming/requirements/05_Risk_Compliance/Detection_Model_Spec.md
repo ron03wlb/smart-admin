@@ -3,7 +3,9 @@
 > **Canonical Source**: [05-02-01_Detection_Model.md](../../source/05_Risk_Control/05-02-01_Detection_Model.md)
 > **Audience**: Executives, Risk Operations, Compliance Officers, Product Managers
 > **Related Doc**: [Detection_Model_Implementation.md](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (TCC pattern, SAGA flow implementation) moved to Architecture layer. This document focuses on business rules and operational policies.
 
 ---
 
@@ -65,7 +67,9 @@ Only the most severe cases are blocked in real time:
 
 ### Layer 2: Transaction Processing
 
-Bets are processed using a TCC (Try-Confirm-Cancel) pattern. The player sees their bet result immediately. Risk analysis does not delay or affect the betting experience.
+Bets are processed using a two-phase transaction pattern. The player sees their bet result immediately. Risk analysis does not delay or affect the betting experience.
+
+→ **[TCC Pattern Implementation](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md#transaction-processing)** - Try-Confirm-Cancel technical details
 
 ### Layer 3: Asynchronous Risk Analysis (within approx. 5 seconds)
 
@@ -100,9 +104,11 @@ Risk proposals are reviewed by human operators. Three possible outcomes:
 | Rejected | Account frozen; suspicious funds marked; risk profile updated |
 | Partial | Partial account freeze applied |
 
-### Layer 5: Withdrawal Deferred Check (SAGA Step 2.5)
+### Layer 5: Withdrawal Deferred Check
 
 When a player requests a withdrawal, the system queries historical risk proposals (30-day window):
+
+→ **[SAGA Implementation](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md#withdrawal-deferred-check)** - SAGA Step 2.5 technical flow
 
 | Condition | Outcome |
 |-----------|---------|

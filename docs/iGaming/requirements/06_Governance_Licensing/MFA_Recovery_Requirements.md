@@ -2,8 +2,10 @@
 
 > **Canonical Source**: [06-06-03_Recovery_Flow.md](../../source/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 > **Audience**: Executives, Compliance Officers, Security Operations
-> **Related Doc**: [MFA_Recovery_Implementation.md](../../architecture/06_Platform_Core/MFA_Recovery_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **Related Doc**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md)
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (Two-Phase Login Sequence Diagram, Trusted Device Token generation Java code, Cookie configuration HttpOnly/Secure/SameSite, MFA Session Storage Redis + 5-minute TTL, SHA256 hashing, QR code generation) moved to Architecture layer. This document focuses on business policies only.
 
 ---
 
@@ -31,8 +33,10 @@ If MFA is not enabled for the user's role, Phase 1 completes the full login and 
 | Rule | Value | Rationale |
 |------|-------|-----------|
 | MFA session lifetime | 5 minutes | Limits window of vulnerability after password verification |
-| Session storage | Server-side only (Redis) | Prevents client-side tampering |
+| Session storage | Server-side only | Prevents client-side tampering |
 | Session is single-use | Yes | Consumed and deleted upon successful MFA verification |
+
+→ **[MFA Session Storage Implementation](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md#mfa-session-storage)** - Redis storage configuration, 5-minute TTL, session cleanup mechanism
 
 ---
 
@@ -49,16 +53,18 @@ Frequent MFA prompts degrade user experience for administrators who log in multi
 | Trust duration | 30 days | Industry standard; balances security and usability |
 | Opt-in required | Yes | User explicitly checks "Trust this device" during MFA step |
 | Trust binding | Device fingerprint + IP address + User-Agent | Three-factor binding prevents token reuse on different devices |
-| Cookie attributes | HttpOnly, Secure, SameSite=Strict | Prevents JavaScript access, requires HTTPS, blocks CSRF |
+| Cookie attributes | Secure cookie configuration | Prevents JavaScript access, requires HTTPS, blocks CSRF |
 
 ### 3.3 Security Risk Mitigations
 
 | Risk | Mitigation |
 |------|-----------|
-| Trust token theft | HttpOnly cookie cannot be read by JavaScript |
-| Cross-site request forgery | SameSite=Strict blocks cross-origin requests |
+| Trust token theft | Secure cookie configuration prevents JavaScript access |
+| Cross-site request forgery | Cookie policy blocks cross-origin requests |
 | Device fingerprint collision | Triple binding (fingerprint + IP + User-Agent) reduces false matches |
 | Trust period too long | 30-day TTL with automatic expiry; administrator can revoke remotely |
+
+→ **[Trusted Device Token Implementation](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md#trusted-device-token)** - Cookie configuration (HttpOnly, Secure, SameSite=Strict), SHA256 token generation, triple binding implementation
 
 ---
 
@@ -103,9 +109,11 @@ The registration process follows three sequential steps:
 
 | Step | Name | Description |
 |------|------|-------------|
-| 1 | Generate secret | System generates TOTP secret key and QR code |
+| 1 | Generate secret | System generates TOTP secret key and presents it to user |
 | 2 | Scan QR code | User scans QR code with Google Authenticator (or compatible TOTP app) |
 | 3 | Verify and activate | User enters first 6-digit code to prove successful registration |
+
+→ **[TOTP Secret and QR Code Generation](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md#totp-registration)** - Secret generation algorithm, QR code encoding, secure display implementation
 
 ### 5.3 Backup Code Policy
 
@@ -114,8 +122,10 @@ The registration process follows three sequential steps:
 | Number of backup codes | 10 |
 | Code format | 8-digit numeric |
 | Delivery method | Displayed on screen once; downloadable as text file |
-| Storage | Encrypted server-side; plaintext shown only at generation time |
+| Storage | Securely stored server-side; plaintext shown only at generation time |
 | Usage | Single-use; each code may be used once for account recovery |
+
+→ **[Backup Code Storage Implementation](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md#backup-codes)** - Encryption algorithm (AES-256-GCM), secure generation, storage format
 
 ---
 
@@ -184,6 +194,10 @@ Every MFA-related action must produce an immutable audit log entry:
 | TOTP and WebAuthn Implementation (06-06-02) | Detailed TOTP algorithm specification |
 | Compliance and Audit (06-06-04) | Audit logging standards and role-based MFA policies |
 | RBAC Permissions (06-02) | Role definitions that determine MFA enforcement |
+
+### Technical Implementation
+
+→ **[MFA Recovery Implementation](../../architecture/06_Platform_Core/MFA_Recovery_Implementation.md)** - Two-phase login sequence diagrams, MFA session storage (Redis + TTL), trusted device token generation (SHA256), cookie configuration (HttpOnly/Secure/SameSite), and TOTP QR code generation
 
 ---
 

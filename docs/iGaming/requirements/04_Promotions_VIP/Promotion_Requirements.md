@@ -170,6 +170,10 @@ This document defines the business requirements for the iGaming platform promoti
 | VIP & Loyalty | 01-06 VIP Loyalty |
 | Wallet Architecture | 02-06 Wallet Architecture |
 
+### Technical Implementation
+
+→ **[Promotion Implementation Architecture](../../architecture/04_Activity_Engine/Promotion_Implementation.md)** - Promotion rule engine, VIP tier calculation algorithms, benefit activation workflows, grace period management, and points expiration scheduling
+
 ---
 
 **Document Version**: 1.0.0

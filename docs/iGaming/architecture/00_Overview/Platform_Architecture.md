@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-06_Solution_Overview.md](../../source/00_Foundation/guides/00-06_Solution_Overview.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [Solution_Overview.md](../../requirements/01_Player_Experience/Solution_Overview.md)
+> **Business Requirements**: [Solution_Overview.md](../../requirements/01_Player_Experience/Solution_Overview.md)
 > **Last Synced**: 2026-02-08
 
 ---

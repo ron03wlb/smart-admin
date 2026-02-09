@@ -3,7 +3,9 @@
 > **Canonical Source**: [source/00_Foundation/guides/00-11_Financial_Implementation.md](../../source/00_Foundation/guides/00-11_Financial_Implementation.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
 > **Related Doc**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (atomicity, idempotency, HMAC-SHA256 algorithms, SAGA flow diagrams) moved to Architecture layer. This document focuses on business requirements only.
 
 ---
 
@@ -53,11 +55,13 @@ The system MUST calculate a player's available (bettable) balance using the foll
 - All lock/unlock operations MUST generate audit trail events
 - Expired lock records MUST be cleaned up periodically
 
-### 2.4 Concurrency and Consistency
+### 2.4 Concurrency and Consistency Requirements
 
-- Concurrent balance deductions MUST be handled atomically to prevent overdraft
-- Every debit operation MUST be idempotent (duplicate requests return the same result)
-- The system MUST guarantee eventual consistency between the cache layer and the database
+- Concurrent balance deductions MUST be handled safely to prevent overdraft
+- Every debit operation MUST handle duplicate requests correctly
+- The system MUST guarantee data consistency between all system components
+
+→ **[Technical Implementation](../../architecture/02_Finance_Service/Financial_Implementation.md#concurrency-control)** - Atomicity, idempotency, eventual consistency mechanisms
 
 ### 2.5 Transaction Event Publishing
 
@@ -105,8 +109,8 @@ The platform MUST support integration with third-party payment gateways (e.g., S
 2. System calls payment gateway to obtain a payment URL or QR code
 3. Player completes payment on the gateway
 4. Gateway sends a callback notification to the system
-5. System verifies HMAC signature on the callback
-6. System performs idempotency check (already-processed orders are skipped)
+5. System verifies signature on the callback
+6. System performs duplicate check (already-processed orders are skipped)
 7. System credits the player's wallet
 8. System sends a deposit success notification to the player
 
@@ -133,14 +137,15 @@ The platform MUST support integration with third-party payment gateways (e.g., S
 
 ### 3.4 Signature Verification Requirements
 
-- All payment gateway callbacks MUST be verified using HMAC-SHA256 signatures
-- Signature generation process: sort parameters by key, concatenate as key=value pairs with & separator, apply HMAC-SHA256, then Base64 encode
-- Signature comparison MUST use constant-time comparison to prevent timing attacks
+- All payment gateway callbacks MUST be verified using cryptographic signatures
+- Signature comparison MUST use secure comparison methods to prevent timing attacks
+
+→ **[Signature Algorithm Details](../../architecture/02_Finance_Service/Financial_Implementation.md#signature-verification)** - HMAC-SHA256 generation process, parameter sorting, Base64 encoding
 
 ### 3.5 Verification Criteria
 
-- HMAC signature verification works correctly
-- Deposit callback idempotency tests pass
+- Signature verification works correctly
+- Deposit callback duplicate prevention tests pass
 - Withdrawal risk control review flow is complete
 - Wallet amount is correctly unlocked upon withdrawal failure
 - Payment status query scheduled task runs normally
@@ -195,21 +200,18 @@ The withdrawal review workflow MUST follow this state machine:
 - Reviewer rejection unlocks the player's wallet amount and sends a notification
 - All review operations MUST be recorded in the audit log with reviewer identity and comments
 
-### 4.5 SAGA Compensation Requirements
+### 4.5 Compensation Requirements
 
-The withdrawal process MUST implement SAGA compensation to ensure data consistency:
-
-| Step | Action | Compensation (on failure) |
-|------|--------|--------------------------|
-| 1 | Lock wallet amount | Unlock wallet amount |
-| 2 | Risk control evaluation | (no compensation needed) |
-| 3 | Submit to payment gateway | Cancel gateway order |
-| 4 | Debit wallet balance | Credit wallet balance (refund) |
+The withdrawal process MUST implement compensation mechanisms to ensure data consistency when failures occur:
 
 **Business Rules**:
-- Compensations are executed in reverse order
+- If wallet locking succeeds but payment gateway submission fails, the wallet amount MUST be unlocked
+- If payment gateway submission succeeds but wallet debit fails, the gateway order MUST be cancelled
+- Compensations MUST be executed in reverse order of the original operations
 - If a compensation itself fails, the case MUST be routed to a manual processing queue
 - All compensation actions MUST be logged
+
+→ **[SAGA Pattern Implementation](../../architecture/02_Finance_Service/Financial_Implementation.md#saga-compensation)** - Technical flow diagram, compensation steps, distributed transaction handling
 
 ### 4.6 Verification Criteria
 
@@ -217,14 +219,14 @@ The withdrawal process MUST implement SAGA compensation to ensure data consisten
 - Auto-approve and auto-reject decisions are accurate
 - Manual review workflow is complete end-to-end
 - Rule engine chain executes successfully
-- SAGA compensation mechanism operates correctly
+- Compensation mechanism operates correctly
 - All review operations are recorded in the audit log
 - Stress test: risk control system responds within 500ms at 1,000 TPS
 
 ### 4.7 Common Pitfalls
 
-1. **Compensation not executed**: Must use try-finally or a SAGA framework
-2. **State machine concurrency issues**: Use optimistic locking or distributed locks
+1. **Compensation not executed**: Must use proper error handling and compensation framework
+2. **State machine concurrency issues**: Use locking mechanisms to prevent race conditions
 3. **Rule engine misconfiguration**: Thorough testing of rule chain expressions is required
 4. **Audit log gaps**: Every state change MUST be recorded
 
@@ -281,8 +283,10 @@ Three resolution actions are available:
 ### 5.6 Verification Criteria
 
 - Daily reconciliation scheduled task runs successfully
-- Wallet balance Redis/DB consistency exceeds 99.99%
+- Wallet balance accuracy verified to 99.99% across all data sources
 - Payment gateway reconciliation difference is below 0.01%
+
+→ **[Cache/Database Synchronization Strategy](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#cache-strategy)**
 - Three-way bet reconciliation achieves 100% accuracy
 - Discrepancy alerts are sent in a timely manner
 - Reconciliation reports are generated automatically

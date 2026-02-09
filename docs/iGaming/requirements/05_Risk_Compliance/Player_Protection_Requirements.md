@@ -227,3 +227,7 @@ For UK-licensed operations, the platform must integrate with the Gamstop nationa
 | Reality Checks | source/15_Responsible_Gambling/15-05_Reality_Checks.md |
 | API Design Standards | source/09_Technical_Infrastructure/09-03-04_Domain_APIs.md |
 | Technical API Specification | architecture/05_Risk_Engine/Player_Protection_API.md |
+
+### Technical Implementation
+
+→ **[Player Protection API](../../architecture/05_Risk_Engine/Player_Protection_API.md)** - Self-exclusion workflows, deposit/loss limit enforcement, session timeout mechanisms, reality check intervals, cooling-off period management, and responsible gambling tool APIs

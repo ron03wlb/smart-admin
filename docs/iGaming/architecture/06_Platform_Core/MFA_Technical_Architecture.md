@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source/06_Platform_Governance/06-06-01_MFA_Architecture.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md)
+> **Business Requirements**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md)
 > **Last Synced**: 2026-02-08
 
 ---

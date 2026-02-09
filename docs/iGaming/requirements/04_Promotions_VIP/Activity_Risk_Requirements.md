@@ -404,3 +404,9 @@ The activity system must respect all player-set protection mechanisms:
 - Idempotent operations as a distributed processing safeguard
 - Comprehensive audit with immutable logs for compliance
 - Regional compliance: Responsible gambling in European markets is mandatory, not optional
+
+---
+
+## Related Documentation
+
+→ **[Activity Risk System - Technical Implementation](../../architecture/04_Activity_Engine/Activity_Risk_System.md)** - Activity rule engine, risk scoring algorithms, bonus abuse detection patterns, configuration-driven architecture, and A/B testing framework

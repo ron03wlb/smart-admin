@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-07_Multi_Jurisdiction_Framework.md](../../source/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [Jurisdiction_Framework_Requirements.md](../../requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md)
+> **Business Requirements**: [Jurisdiction_Framework_Requirements.md](../../requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

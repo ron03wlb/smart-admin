@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [Bonus_Calculation_Requirements.md](../../requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md)
+> **Business Requirements**: [Bonus_Calculation_Requirements.md](../../requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 1.0.0
 

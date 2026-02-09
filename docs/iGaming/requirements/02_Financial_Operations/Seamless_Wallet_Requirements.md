@@ -2,8 +2,10 @@
 
 > **Canonical Source**: [03-03_Seamless_Wallet_Analysis.md](../../source/03_Game_Center/03-03_Seamless_Wallet_Analysis.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Doc**: [Seamless Wallet Analysis (Architecture)](../../architecture/02_Finance_Service/Seamless_Wallet_Analysis.md)
-> **Last Synced**: 2026-02-08
+> **Related Doc**: [Seamless Wallet Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md)
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (scheduled jobs, Redis cache, database constraints, distributed locks, pending queue implementation, idempotency mechanisms) moved to Architecture layer. This document focuses on business rules only.
 
 ---
 
@@ -29,8 +31,10 @@ This document defines the business rules, policies, and operational requirements
 | Behavior | Description | Risk & Policy |
 |:---------|:------------|:-------------|
 | **GetBalance Only** | GP only queries balance; balance changes recorded internally by GP with periodic settlement | **Extremely high risk.** Not recommended unless operating under a credit model. |
-| **Async Callback** | Platform returns HTTP 200 as acknowledgment only; actual deduction result delivered via callback | Requires bidirectional state machine; doubles process complexity. |
+| **Async Callback** | Platform acknowledges request receipt immediately; actual transaction result delivered asynchronously via callback notification | Requires bidirectional state machine; doubles process complexity. |
 | **Batch Processing** | GP combines multiple player transactions into a single HTTP request | Must support batch transaction processing. Business must decide: All-or-Nothing vs. Partial Success. |
+
+→ **[Async Response Protocol Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#async-response-protocol)**
 
 ---
 
@@ -51,17 +55,21 @@ This document defines the business rules, policies, and operational requirements
 
 An orphaned round occurs when a Bet succeeds but a Win never arrives.
 
-- **Detection**: Scheduled job scans every 15 minutes for rounds in OPEN state for more than 2 hours
+- **Detection**: System checks every 15 minutes for rounds open for more than 2 hours
 - **Resolution**: Query GP API for final status; auto-close if confirmed, or escalate to manual review
 - **Escalation Criteria**:
   - Round amount greater than $1,000: HIGH priority, 24-hour SLA
   - Round amount $1,000 or less: MEDIUM priority, 24-hour SLA
 
+→ **[Orphaned Round Detection Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#orphaned-round-detection)** - Scheduled job configuration, SQL queries, GP API integration
+
 ### 3.3 Duplicate Win Policy
 
 - Duplicate Win requests (same roundId + txId) must return the original execution result
 - No duplicate credit shall be applied
-- Enforcement via unique constraint on (roundId, txId) plus idempotency checks
+- Enforcement via duplicate prevention mechanisms
+
+→ **[Idempotency Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#idempotency-defense)** - Three-layer defense (Redis + DB unique constraint + Fallback query)
 
 ### 3.4 Resettlement Negative Balance Policy
 
@@ -103,8 +111,10 @@ When a GP claws back overpaid winnings and the player balance is insufficient:
 ### 4.4 Timeout & Retry (Scenario C)
 
 - When a GP times out waiting for a response, it may retry with the same txId
-- Business rule: Retries with the same txId must return the cached original result with no re-execution
-- A transaction without a txId must be rejected (HTTP 400)
+- Business rule: Retries with the same txId must return the stored original result with no re-execution
+- A transaction without a txId must be rejected with an error
+
+→ **[Idempotency Cache Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#timeout-retry-handling)** - Redis cache, 1-hour TTL, fallback query
 
 ### 4.5 Out-of-Order Requests (Scenario D)
 
@@ -114,9 +124,11 @@ When a Win request arrives before its corresponding Bet:
 |----------|------------|------|------|---------------|
 | **Strategy 1: Immediate Reject** | Return BET_NOT_FOUND error | Simple, stateless | Win may be lost if GP does not retry | Suitable for reliable GPs with retry mechanisms |
 | **Strategy 2: Allow Orphan Win** | Credit win without matching bet | Player does not lose winnings | High risk of double credit; reconciliation difficulty | **Not recommended** except as emergency fallback |
-| **Strategy 3: Pending Queue** | Store win in pending queue (TTL 30 min) | Automated resolution; full audit trail | Higher implementation complexity | **Recommended for production** |
+| **Strategy 3: Temporary Storage** | Store win temporarily (30-minute expiry) | Automated resolution; full audit trail | Higher implementation complexity | **Recommended for production** |
 
 **Production recommendation**: Strategy 3 as default, with automatic degradation to Strategy 1 under system pressure.
+
+→ **[Out-of-Order Handling Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#out-of-order-handling)** - Pending queue architecture, Redis storage, TTL configuration, degradation triggers
 
 ### 4.6 Rollback / Refund (Scenario E)
 
@@ -230,12 +242,12 @@ GP-initiated Rollback or Resettlement that deducts funds exceeding the player's 
 
 ### 10.1 Daily Reconciliation
 
-- The platform must download each GP's Transaction Report daily and compare it against the platform database
+- The platform must download each GP's Transaction Report daily and compare it against the platform records
 - Automated Diff Reports must be generated for: mismatched transaction IDs, mismatched amounts
 
 ### 10.2 Extreme Case Policy
 
-Even with retries, edge cases may occur where the GP considers a transaction successful while the platform considers it failed (e.g., database commit failure after successful response). Daily reconciliation is the safety net for these scenarios.
+Even with retries, edge cases may occur where the GP considers a transaction successful while the platform considers it failed (e.g., internal processing failure after successful response). Daily reconciliation is the safety net for these scenarios.
 
 ---
 
@@ -244,14 +256,16 @@ Even with retries, edge cases may occur where the GP considers a transaction suc
 | Scenario | Detection Point | Priority | Response Time | Risk Level | Automation Level |
 |----------|----------------|----------|--------------|------------|-----------------|
 | A - Insufficient Funds | Bet Request | P0 | < 100ms | LOW | 100% automated |
-| B - Concurrent Race | Bet Request | P0 | < 200ms | MEDIUM | 100% automated (distributed lock) |
+| B - Concurrent Race | Bet Request | P0 | < 200ms | MEDIUM | 100% automated (concurrency control) |
 | C - Timeout Retry | Win Timeout | P1 | 2 hours | MEDIUM | 90% automated (active query) |
-| D - Out-of-Order | Win Request | P1 | < 2 hours | MEDIUM | 95% automated (pending queue) |
+| D - Out-of-Order | Win Request | P1 | < 2 hours | MEDIUM | 95% automated (temporary storage) |
 | E - Rollback / Refund | Rollback Request | P1 | < 500ms | MEDIUM | 100% automated |
 | F - Resettlement | Adjust Request | P2 | < 1s | HIGH | 50% automated (negative balance requires manual) |
 | G - Free Spin | Bet Request | P0 | < 100ms | LOW | 100% automated |
 | H - Bonus Wallet | Bet Request | P0 | < 150ms | LOW | 100% automated |
 | I - Jackpot | Win Request | P0 | Manual review | HIGH | 0-50% automated (depends on GP agreement) |
+
+→ **[Concurrency Control & Queue Management](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#concurrency-management)** - Distributed lock (Redisson), pending queue implementation
 
 ---
 
@@ -261,10 +275,12 @@ Even with retries, edge cases may occur where the GP considers a transaction suc
 |---------------|-----------------|---------------------|----------------------|------------------------------|
 | Lock timeout | 3 retry failures | Return "System Busy" | Player retries | Lock wait exceeds 10s |
 | GP timeout | 2 hours no response | Active GP query | Compensatory credit or refund | Query fails 3 consecutive times |
-| Out-of-order backlog | Pending queue exceeds 100 | Alert + scale capacity | Extend TTL to 4 hours | Queue exceeds 500 |
+| Out-of-order backlog | Temporary storage exceeds 100 | Alert + scale capacity | Extend retention to 4 hours | Storage exceeds 500 |
 | Negative balance | Balance drops below 0 after deduction | Allow negative balance | Freeze withdrawals + manual recovery | Negative balance below -$1,000 |
 | Jackpot anomaly | Amount exceeds $50k | Force manual review | Withhold credit | All jackpots |
-| Idempotency cache expiry | Redis cache expired | Query database | Rebuild cache (TTL 1 hour) | No record in database |
+| Transaction history unavailable | Stored result expired | Query transaction records | Rebuild stored result (1-hour retention) | No record in system |
+
+→ **[Exception Handling Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#exception-handling)** - Redis cache expiry, database fallback query, pending queue scaling, lock timeout handling
 
 ---
 
@@ -272,21 +288,25 @@ Even with retries, edge cases may occur where the GP considers a transaction suc
 
 ### 13.1 Degradation Triggers
 
-| Trigger Condition | Metric | Threshold | Switch To | Recovery Condition |
-|------------------|--------|-----------|-----------|-------------------|
-| Pending queue backlog | pending_win_queue_size | > 500 | Strategy 3 to Strategy 1 | Queue < 100 for 10 minutes |
-| Redis unavailable | redis_connection_status | DISCONNECTED | Strategy 3 to Strategy 1 | Redis restored + 5-minute stability |
-| Database latency too high | db_query_latency_p99 | > 5s | Strategy 3 to Strategy 1 | Latency < 1s for 10 minutes |
-| System CPU too high | system_cpu_usage | > 90% | Strategy 3 to Strategy 1 | CPU < 70% for 10 minutes |
-| GP retry rate too low | gp_retry_success_rate | < 80% | Strategy 1 to Strategy 2 (emergency) | Manual recovery only |
+The system automatically switches between out-of-order handling strategies based on operational conditions:
+
+| Trigger Condition | Switch To | Recovery Condition |
+|------------------|-----------|-------------------|
+| Temporary storage backlog exceeds threshold | Strategy 3 to Strategy 1 | Backlog returns to normal for 10 minutes |
+| Storage service unavailable | Strategy 3 to Strategy 1 | Service restored + 5-minute stability |
+| Transaction processing time too high | Strategy 3 to Strategy 1 | Processing time normalized for 10 minutes |
+| System resource pressure too high | Strategy 3 to Strategy 1 | Resource usage normalized for 10 minutes |
+| GP retry rate too low | Strategy 1 to Strategy 2 (emergency) | Manual recovery only |
+
+→ **[Strategy Switching Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#strategy-switching)** - Specific thresholds (Redis connection, DB latency P99, CPU usage, queue size), monitoring metrics, degradation automation
 
 ### 13.2 Implementation Guidelines
 
-1. **Default strategy**: Strategy 3 (Pending Queue)
+1. **Default strategy**: Strategy 3 (Temporary Storage)
 2. **Automatic degradation**: When system pressure exceeds thresholds, degrade to Strategy 1
 3. **Emergency mode**: When GP retry rate drops below 80%, switch to Strategy 2 (requires manual recovery)
 4. **Automatic recovery**: When system metrics stabilize, auto-upgrade to Strategy 3
-5. **Alerting**: All strategy switches must trigger Slack alerts and audit log entries
+5. **Alerting**: All strategy switches must trigger alerts and audit log entries
 
 ---
 
@@ -295,7 +315,7 @@ Even with retries, edge cases may occur where the GP considers a transaction suc
 | KPI | Formula | Target |
 |-----|---------|--------|
 | Out-of-order frequency | (pending_wins_count / total_wins) x 100% | < 0.1% |
-| Pending queue size | Real-time monitoring | Alert threshold > 100 |
+| Pending transaction count | Real-time monitoring | Alert threshold > 100 |
 | Timeout escalation rate | (escalated_to_manual / pending_wins) x 100% | < 1% |
 | Insufficient funds rejection rate | (rejected_insufficient / total_bets) x 100% | Alert if > 30% |
 | Negative balance accumulation | sum(player_negative_balance) | Alert if < -$10,000 |
@@ -308,13 +328,17 @@ Even with retries, edge cases may occur where the GP considers a transaction suc
 ### 15.1 Mandatory TransactionId
 
 - All GP integrations **must** provide a globally unique `transaction_id` (or `request_id`) in the request header or body
-- Requests without a transaction ID are rejected with HTTP 400 Bad Request
+- Requests without a transaction ID are rejected with an error message indicating missing required field
+
+→ **[API Error Response Codes](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#error-responses)**
 
 ### 15.2 Duplicate Handling
 
-- Duplicate transaction IDs must return the previously cached response
+- Duplicate transaction IDs must return the previously stored response
 - Business logic must never execute twice for the same transaction ID
-- Cache TTL: 3,600 seconds (1 hour), unified across all wallet modules
+- Response retention: 1 hour, unified across all wallet modules
+
+→ **[Idempotency Storage Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#idempotency-storage)** - Redis cache, TTL configuration (3,600 seconds), fallback mechanisms
 
 ---
 
@@ -331,3 +355,7 @@ Even with retries, edge cases may occur where the GP considers a transaction suc
 ### Extended Reading
 - Game Lobby Management - Game entry management
 - Maintenance Procedures - Game maintenance and balance synchronization
+
+### Technical Implementation
+
+→ **[Seamless Wallet Technical Architecture](../../architecture/02_Finance_Service/Seamless_Wallet_Analysis.md)** - Round-based state machine, orphaned round detection, idempotency defense layers, concurrent processing patterns, negative balance handling, and exception recovery strategies

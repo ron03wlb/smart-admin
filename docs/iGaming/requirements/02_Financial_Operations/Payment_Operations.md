@@ -1,10 +1,11 @@
 # Payment Operations
 
 > **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
-> **Audience**: Executives, Product Managers
-> **Related Doc**: [Payment_Gateway_API.md](../../architecture/02_Finance_Service/Payment_Gateway_API.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 4.0.0
+> **Audience**: Executives, Product Managers, Compliance Officers
+> **Related Doc**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
+> **Last Synced**: 2026-02-09
+>
+> **Refinement Note**: Technical details (PSP webhook implementation, signature verification algorithms, smart routing code, scheduled reconciliation jobs, connection pool configuration, Prometheus metrics) moved to Architecture layer. This document focuses on business rules only.
 
 ---
 
@@ -81,6 +82,8 @@ The payment operations module is responsible for all interactions with external 
 | **VIP Priority** | 5% | Differentiated service for high-value players |
 | **Currency Match** | 3% | Avoid FX losses and additional fees |
 
+→ **[Smart Routing Algorithm](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#smart-routing-algorithm)** - Score calculation formula, weighted ranking implementation, real-time PSP selection logic
+
 ### 4.3 VIP Channel Benefits
 
 | VIP Level | Channel Benefit | Fee Discount | Priority |
@@ -97,8 +100,10 @@ The payment operations module is responsible for all interactions with external 
 ### 5.1 Deposit Flow Summary
 
 1. Player initiates deposit -> System creates order (Pending) -> Redirect to PSP payment page
-2. Player completes payment -> PSP sends callback -> System validates signature
-3. Validation passed -> Update database -> Credit player balance -> Update order status (Success) -> Send notification
+2. Player completes payment -> PSP sends callback -> System verifies authenticity
+3. Verification passed -> Credit player balance -> Update order status (Success) -> Send notification
+
+→ **[PSP Webhook Integration](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#psp-webhook-integration)** - Signature verification (HMAC-SHA256), callback processing, database updates
 
 ### 5.2 Amount Limits
 
@@ -143,6 +148,8 @@ The payment operations module is responsible for all interactions with external 
 - Target: Transactions pending > 30 minutes
 - Action: Query PSP status and reconcile
 
+→ **[Auto Reconciliation Implementation](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#auto-reconciliation)** - Scheduled job configuration, PSP API integration, SQL queries, status synchronization logic
+
 ### 7.2 Player Appeal Process
 
 1. Player uploads payment proof (bank transfer screenshot)
@@ -173,6 +180,8 @@ The payment operations module is responsible for all interactions with external 
 | **Manual Review Rate** | (Manual / Total Credits) x 100% | < 5% | > 15% |
 | **PSP API Success Rate** | (Successful Queries / Total Queries) x 100% | > 99% | < 95% |
 
+→ **[Performance Monitoring](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#performance-monitoring)** - Prometheus metrics configuration, Grafana dashboards, alert rules (PagerDuty, Slack)
+
 ### 8.2 PSP Health Status Thresholds
 
 | Status | Success Rate | Routing Decision | Recovery Criteria |
@@ -188,12 +197,14 @@ The payment operations module is responsible for all interactions with external 
 
 ### 9.1 Security Standards
 
-| Requirement | Standard | Implementation |
-|------------|----------|----------------|
+| Requirement | Standard | Business Rule |
+|------------|----------|---------------|
 | Card data storage | PCI-DSS Level 1 | Token-only storage; no full card numbers |
 | Payment page | PCI-DSS | Use PSP hosted payment page |
-| Data transmission | TLS 1.2+ | All API requests encrypted |
-| API key management | Vault | HashiCorp Vault or equivalent |
+| Data transmission | Encrypted | All API requests must be encrypted |
+| API key management | Secure vault | Keys stored in secure credential vault |
+
+→ **[Security Implementation](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#security-implementation)** - TLS 1.2+ configuration, HashiCorp Vault integration, API key rotation policy
 
 ### 9.2 3D Secure Requirements
 
@@ -201,6 +212,8 @@ The payment operations module is responsible for all interactions with external 
 |-----------|-------------|--------|
 | PSD2 (EU) | Mandatory 3DS 2.0 | All EU card transactions |
 | SCA Exemptions | Low-value (<30 EUR), Recurring | Reduced friction for eligible transactions |
+
+→ **[3DS Integration](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#3ds-integration)** - 3DS 2.0 flow implementation, SCA exemption logic, PSD2 compliance validation
 
 ### 9.3 AML Compliance
 
@@ -238,6 +251,10 @@ The payment operations module is responsible for all interactions with external 
 - [Payment Restrictions](../../source/12_System_Security/12-06_Payment_Restrictions.md) - Credit card ban and crypto compliance
 - [Multi-Jurisdiction Framework](../../source/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md) - Multi-license payment configuration
 - [UKGC Compliance](../../source/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK credit card ban details
+
+### Technical Implementation
+
+→ **[Payment Gateway API Architecture](../../architecture/02_Finance_Service/Payment_Gateway_API.md)** - PSP adapter implementation, webhook processing, smart routing algorithm, reconciliation automation, HikariCP tuning, and Prometheus monitoring
 
 ---
 

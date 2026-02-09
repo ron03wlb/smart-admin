@@ -181,7 +181,8 @@
 - [風控策略總覽](../05_Risk_Compliance/Risk_Strategy_Overview.md)
 
 ### 技術實現
-- [獎金計算引擎技術架構](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
+
+→ **[獎金計算引擎 - 技術架構](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)** - 獎金計算規則引擎、流水要求追蹤演算法、多幣種處理、遊戲權重矩陣、即時計算優化策略
 
 ---
 

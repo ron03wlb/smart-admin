@@ -397,7 +397,10 @@ VIP Players (1.5-3%)
 - AML/KYC Policy
 
 ### Technical Documents
-- [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md) - Technical implementation details
+
+→ **[Player Lifecycle Implementation](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)** - Complete player journey state machines, API specifications, database schemas, and KYC/AML integration patterns
+
+**Additional References**:
 - Risk Control Framework
 - Unified Wallet Model
 

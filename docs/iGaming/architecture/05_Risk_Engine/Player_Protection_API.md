@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [15-07_Player_Protection_API.md](../../source/15_Responsible_Gambling/15-07_Player_Protection_API.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/Player_Protection_Requirements.md)
+> **Business Requirements**: [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/Player_Protection_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---

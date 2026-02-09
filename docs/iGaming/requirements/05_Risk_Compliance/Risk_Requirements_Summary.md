@@ -160,6 +160,10 @@ This document summarizes the business requirements for the iGaming platform risk
 | Credit Network Logic | 07-02 Credit Network Logic |
 | Withdrawal Risk | 01-05 Withdrawal Risk |
 
+### Technical Implementation
+
+→ **[Risk Implementation Architecture](../../architecture/05_Risk_Engine/Risk_Implementation.md)** - Risk scoring engine, fraud detection algorithms, KYC/AML verification workflows, real-time monitoring dashboards, and compliance reporting systems
+
 ---
 
 **Document Version**: 1.0.0

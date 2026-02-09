@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [02-04-02_Calculation_Logic.md](../../source/02_Finance_Center/02-04-diagrams/02-04-02_Calculation_Logic.md)
 > **Audience**: Architects, Backend Developers
-> **Related Doc**: None
+> **Business Requirements**: None
 > **Last Synced**: 2026-02-08
 
 ---

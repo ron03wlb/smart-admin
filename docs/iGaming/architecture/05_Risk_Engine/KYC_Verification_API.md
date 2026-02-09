@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source/05_Risk_Control/05-03_KYC_AML.md](../../source/05_Risk_Control/05-03_KYC_AML.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Related Doc**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/KYC_AML_Requirements.md)
+> **Business Requirements**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/KYC_AML_Requirements.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 
