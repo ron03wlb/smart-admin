@@ -1,12 +1,8 @@
 # 成本優化架構 (Cost Optimization Architecture)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P1 (High)
-- Owner: Infrastructure Team + Finance Team
-- Source: [09-10 Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
+> **Business Requirements**: [Cost Optimization Requirements](../../requirements/09_Infrastructure_Requirements/Cost_Optimization_Requirements.md)
+> **Canonical Source**: [09-10 Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

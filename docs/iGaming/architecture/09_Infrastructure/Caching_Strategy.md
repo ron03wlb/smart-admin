@@ -1,12 +1,7 @@
 # 緩存策略架構 (Caching Strategy)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Backend Team
-- Source: [09-09 Caching Strategy](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md)
+> **Canonical Source**: [09-09 Caching Strategy](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

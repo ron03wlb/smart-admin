@@ -1,12 +1,7 @@
 # 流處理架構 (Stream Processing Architecture)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Data Engineering Team
-- Source: [09-08 Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md)
+> **Canonical Source**: [09-08 Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

@@ -1,12 +1,7 @@
 # API 設計原則 (API Design Principles)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Backend Team
-- Source: [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md)
+> **Canonical Source**: [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

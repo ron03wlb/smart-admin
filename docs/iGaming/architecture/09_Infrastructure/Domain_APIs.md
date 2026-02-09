@@ -1,12 +1,7 @@
 # 領域 API 設計 (Domain API Design)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P1 (High)
-- Owner: Backend Team
-- Source: [09-03-04 Domain APIs](../../source-archive/09_Technical_Infrastructure/09-03-04_Domain_APIs.md)
+> **Canonical Source**: [09-03-04 Domain APIs](../../source-archive/09_Technical_Infrastructure/09-03-04_Domain_APIs.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

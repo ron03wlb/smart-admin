@@ -1,12 +1,7 @@
 # Token 邊緣部署與運維 (Token Edge Deployment)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P2 (Medium)
-- Owner: Backend Team + Infrastructure Team
-- Source: [09-13-03 Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md)
+> **Canonical Source**: [09-13-03 Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

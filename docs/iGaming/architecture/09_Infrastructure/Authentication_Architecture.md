@@ -1,12 +1,8 @@
 # 身份驗證與授權架構 (Authentication & Authorization Architecture)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Security Team + Backend Team
-- Source: [09-03-02 Authentication](../../source-archive/09_Technical_Infrastructure/09-03-02_Authentication.md)
+> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **Canonical Source**: [09-03-02 Authentication](../../source-archive/09_Technical_Infrastructure/09-03-02_Authentication.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

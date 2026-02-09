@@ -1,12 +1,7 @@
 # 性能監控與告警架構 (Performance Monitoring & Alerting)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: DevOps Team + SRE Team
-- Source: [09-06 Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md)
+> **Canonical Source**: [09-06 Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

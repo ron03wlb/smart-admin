@@ -1,12 +1,8 @@
 # 測試驗收標準架構 (QA Testing Standards Architecture)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: QA Team + DevOps Team
-- Source: [09-04 QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md)
+> **Business Requirements**: [QA Standards Requirements](../../requirements/09_Infrastructure_Requirements/QA_Standards_Requirements.md)
+> **Canonical Source**: [09-04 QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

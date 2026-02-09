@@ -1,12 +1,7 @@
 # 系統維護與優雅停機架構 (Maintenance & Graceful Shutdown)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: DevOps Team + SRE Team
-- Source: [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md)
+> **Canonical Source**: [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

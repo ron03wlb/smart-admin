@@ -1,12 +1,7 @@
 # API 通用模式 (Common API Patterns)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P1 (High)
-- Owner: Backend Team
-- Source: [09-03-03 Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md)
+> **Canonical Source**: [09-03-03 Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

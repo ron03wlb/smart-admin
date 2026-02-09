@@ -1,12 +1,7 @@
 # Token 驗證架構 (Token Validation Architecture)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P1 (High)
-- Owner: Backend Team + Infrastructure Team
-- Source: [09-13-01 Validation Architecture](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md)
+> **Canonical Source**: [09-13-01 Validation Architecture](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

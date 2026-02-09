@@ -1,12 +1,8 @@
 # 網關安全與 DDoS 防禦架構 (Gateway Security & DDoS Mitigation)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Security Team + Infrastructure Team
-- Source: [09-02-03 Security](../../source-archive/09_Technical_Infrastructure/09-02-03_Security.md)
+> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **Canonical Source**: [09-02-03 Security](../../source-archive/09_Technical_Infrastructure/09-02-03_Security.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

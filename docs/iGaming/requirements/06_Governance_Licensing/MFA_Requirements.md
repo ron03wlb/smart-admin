@@ -1,21 +1,14 @@
 # MFA Requirements (Multi-Factor Authentication)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-08
-- Last Updated: 2026-02-08
-- Status: Production Ready
-- Priority: P1 (High)
-- Owner: Product Team + Compliance Team
-- View Type: Business Requirements
+> **Canonical Source**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
+> **View Type**: Business Requirements
+> **Target Audience**: Product Managers, Compliance Officers
+> **Related Doc**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
+> **Last Synced**: 2026-02-09
 
-**Canonical Source**: [docs/iGaming/source-archive/06_Platform_Governance/06-06_MFA_Implementation.md](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
-
-**Related Documents**:
-- Technical Architecture: [MFA_Technical.md](../../architecture/06_Platform_Core/MFA_Technical.md)
-- Source Sub-documents:
-  - [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
-  - [06-06-04 Compliance & Audit](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
+**Related Source Documents**:
+- [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
+- [06-06-04 Compliance & Audit](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 
 ---
 

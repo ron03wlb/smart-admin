@@ -1,12 +1,7 @@
 # 性能優化規範 (Performance Optimization)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Backend Team + DBA Team
-- Source: [09-07 Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md)
+> **Canonical Source**: [09-07 Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 
@@ -31,6 +26,22 @@ iGaming 平台採用零信任統一錢包模型與實時風控，引入三大瓶
 
 > GP 超時閾值: 200-500ms
 
+### 延遲預算流程圖
+
+```mermaid
+flowchart LR
+    A[Client Request] -->|2ms| B[Token Verification<br/>JWT HS512 Local]
+    B -->|10ms| C[Risk Control<br/>Redis + Rules]
+    C -->|20ms| D[DB Transaction<br/>Redisson Lock +<br/>Optimistic Lock]
+    D -->|5ms| E[Audit Log<br/>Async Kafka]
+    E -->|3ms| F[Response<br/>Serialization]
+    F --> G[Client Response<br/>Total: ~45ms]
+
+    style A fill:#e1f5fe
+    style G fill:#c8e6c9
+    style D fill:#fff3e0
+```
+
 ---
 
 ## 2. 下注請求優化
@@ -46,11 +57,60 @@ iGaming 平台採用零信任統一錢包模型與實時風控，引入三大瓶
 
 **鎖參數**:
 
-| 參數 | 值 |
-|------|-----|
-| Wait Time | 3 秒 |
-| Lease Time | 5 秒 |
-| Watchdog | 啟用 |
+| 參數 | 值 | 說明 |
+|------|-----|------|
+| Wait Time | 3 秒 | 獲取鎖最大等待時間 |
+| Lease Time | 5 秒 | 鎖自動釋放時間 |
+| Watchdog | 啟用 (30s) | 鎖自動續期機制 |
+
+**Java 實現 (Redisson 分佈式鎖)**:
+
+```java
+// Redisson 分佈式鎖 (取代 FOR UPDATE)
+public Result<Void> updateBalanceWithLock(
+    String tenantId,
+    String playerId,
+    BigDecimal amount
+) {
+    String lockKey = "wallet:lock:" + tenantId + ":" + playerId;
+    RLock lock = redissonClient.getLock(lockKey);
+
+    try {
+        // 等待 3 秒, 持鎖 5 秒, Watchdog 自動續期
+        boolean acquired = lock.tryLock(3, 5, TimeUnit.SECONDS);
+
+        if (!acquired) {
+            return Result.error("LOCK_TIMEOUT", "獲取鎖超時");
+        }
+
+        // 樂觀鎖更新 (version 欄位, 最多重試 3 次)
+        int retryCount = 0;
+        while (retryCount < 3) {
+            Wallet wallet = walletDao.selectById(tenantId, playerId);
+            int affected = walletDao.updateBalanceWithVersion(
+                tenantId, playerId, amount, wallet.getVersion()
+            );
+
+            if (affected > 0) {
+                return Result.ok();
+            }
+
+            retryCount++;
+            Thread.sleep(20 * retryCount); // 線性退避: 20ms, 40ms, 60ms
+        }
+
+        return Result.error("VERSION_CONFLICT", "版本衝突");
+
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return Result.error("INTERRUPTED", "操作中斷");
+    } finally {
+        if (lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+    }
+}
+```
 
 **全局規範**: `FOR UPDATE` 禁止使用
 
@@ -65,6 +125,36 @@ iGaming 平台採用零信任統一錢包模型與實時風控，引入三大瓶
 | 大型 | > 100,000 | 128 |
 
 **路由**: MyBatis-Plus `DynamicTableNameInterceptor`
+
+**MyBatis-Plus 分片攔截器配置**:
+
+```java
+@Configuration
+public class WalletShardingConfig {
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+
+        // DynamicTableNameInterceptor for wallet sharding
+        DynamicTableNameInnerInterceptor tableNameInterceptor =
+            new DynamicTableNameInnerInterceptor();
+        tableNameInterceptor.setTableNameHandler((sql, tableName) -> {
+            if ("player_wallet".equals(tableName)) {
+                ShardingContext ctx = ShardingContextHolder.get();
+                int shardIndex = Math.abs(
+                    Objects.hash(ctx.getTenantId(), ctx.getPlayerId())
+                ) % ctx.getShardCount();
+                return tableName + "_" + shardIndex;
+            }
+            return tableName;
+        });
+
+        interceptor.addInnerInterceptor(tableNameInterceptor);
+        return interceptor;
+    }
+}
+```
 
 ---
 
@@ -95,6 +185,33 @@ iGaming 平台採用零信任統一錢包模型與實時風控，引入三大瓶
 | 執行時間 | < 1ms |
 | Key 數量 | < 5 |
 | 禁止操作 | KEYS *, SMEMBERS, HGETALL, 循環 > 100 |
+
+**Redis 數據結構 (代理報表)**:
+
+```
+Key: agent_balance:{tenant}:{agent}
+Member: {player_id}
+Score: {balance}
+```
+
+**Lua 腳本示例 (代理餘額彙總, < 1ms)**:
+
+```lua
+local members = redis.call('ZRANGE', KEYS[1], 0, -1, 'WITHSCORES')
+local sum = 0
+for i = 2, #members, 2 do sum = sum + tonumber(members[i]) end
+return tostring(sum)
+```
+
+**一致性保證 (三層架構)**:
+
+| 層級 | 數據源 | 延遲 |
+|------|--------|------|
+| L0: Truth Source | PostgreSQL | 0 |
+| L1: Near Real-Time | Redis | < 1s |
+| L2: Aggregated | ClickHouse | 5 min |
+
+**對帳**: 每日 02:00 全量校準
 
 ---
 
@@ -127,6 +244,157 @@ PostgreSQL  S3 Std    S3 Glacier  S3 Deep    Delete
 | 審計日誌延遲 | 350ms | <= 50ms | -87% |
 | Cache Hit Rate | 65% | 95% | +30pp |
 | Redis QPS | 10,000 | 1,000 | -90% |
+
+---
+
+---
+
+## 7. 性能測試規範
+
+### 7.1 壓測工具：k6
+
+| 特性 | k6 | JMeter | 決策 |
+|------|-----|--------|------|
+| **資源占用** | 極低（Go 原生） | 高（Java GUI） | k6 |
+| **腳本語言** | JavaScript | Java/Groovy | k6 |
+| **CI/CD 整合** | 原生支持 | 需額外配置 | k6 |
+
+### 7.2 k6 測試場景示例
+
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 },  // 爬升至 100 VU
+    { duration: '5m', target: 100 },  // 維持 5 分鐘
+    { duration: '2m', target: 200 },  // 爬升至 200 VU
+    { duration: '5m', target: 200 },  // 維持 5 分鐘
+    { duration: '2m', target: 0 },    // 降至 0
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<200', 'p(99)<500'],
+    http_req_failed: ['rate<0.01'],
+  },
+};
+
+export default function () {
+  const payload = JSON.stringify({
+    fromPlayerId: Math.floor(Math.random() * 10000) + 1,
+    toPlayerId: Math.floor(Math.random() * 10000) + 1,
+    amount: Math.floor(Math.random() * 1000) + 10,
+    currency: 'CNY',
+  });
+
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${__ENV.TOKEN}',
+    },
+  };
+
+  const res = http.post('http://localhost:1024/api/wallet/transfer', payload, params);
+
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 200ms': (r) => r.timings.duration < 200,
+    'success flag is true': (r) => JSON.parse(r.body).success === true,
+  });
+
+  sleep(1);
+}
+```
+
+**執行壓測**:
+
+```bash
+# 本地執行
+k6 run --vus 100 --duration 5m wallet-transfer-test.js
+
+# 輸出結果至 InfluxDB + Grafana
+k6 run --out influxdb=http://localhost:8086/k6 wallet-transfer-test.js
+```
+
+### 7.3 壓測基線目標
+
+| 場景 | 目標 RPS | P95 延遲 | P99 延遲 | 錯誤率 |
+|------|---------|---------|---------|--------|
+| 玩家轉賬 | 500 | < 150ms | < 200ms | < 0.5% |
+| 下注扣款 | 1,000 | < 80ms | < 100ms | < 0.1% |
+| 風控檢查 | 800 | < 40ms | < 50ms | < 0.05% |
+| 餘額查詢 | 2,000 | < 30ms | < 50ms | < 0.01% |
+
+### 7.4 監控儀表盤整合
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpass
+      - DOCKER_INFLUXDB_INIT_ORG=smartadmin
+      - DOCKER_INFLUXDB_INIT_BUCKET=k6
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+```
+
+---
+
+## 8. JetCache 多級緩存架構
+
+```mermaid
+flowchart TD
+    A[Application<br/>Request] --> B{L1 Cache<br/>Caffeine<br/>Hit?}
+    B -->|Yes - 95%| C[Return from L1<br/>Latency: <1ms]
+    B -->|No - 5%| D{L2 Cache<br/>Redis<br/>Hit?}
+    D -->|Yes - 90%| E[Return from L2<br/>Latency: 2-5ms<br/>Write to L1]
+    D -->|No - 10%| F[Query Database<br/>Latency: 20-50ms<br/>Write to L1+L2]
+    E --> G[Response]
+    F --> G
+    C --> G
+```
+
+**JetCache 配置範例**:
+
+```java
+@Cached(
+    name = "wallet:balance:",
+    key = "#tenantId + ':' + #playerId",
+    expire = 3600,      // L2 TTL: 1h
+    localExpire = 100,  // L1 TTL: 100s
+    cacheType = CacheType.BOTH  // L1 + L2
+)
+public Option<WalletBalanceVO> getBalance(
+    String tenantId,
+    String playerId
+) {
+    return walletDao.selectById(tenantId, playerId)
+        .map(WalletBalanceVO::from);
+}
+```
+
+**緩存命中率分佈**:
+
+```
+L1 (Caffeine): 95% 命中 -> <1ms
+L2 (Redis):    4.5% 命中 -> 2-5ms
+Database:      0.5% 未命中 -> 20-50ms
+────────────────────────────────────
+Overall P99 Latency: <=200ms (vs 1,240ms 優化前)
+```
 
 ---
 

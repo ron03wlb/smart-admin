@@ -1,25 +1,13 @@
 # MFA Technical Architecture
 
 > **Business Requirements**: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Requirements.md)
+> **Canonical Source**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
+> **View**: Technical Architecture (Development & DevOps)
 > **Audience**: Backend Developers, Security Engineers, Compliance Officers
-> **Last Synced**: 2026-02-09
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-08
-- Last Updated: 2026-02-08
-- Status: Production Ready
-- Priority: P1 (High)
-- Owner: Security Team + Backend Team
-- View Type: Technical Architecture
-
-**Canonical Source**: [docs/iGaming/source-archive/06_Platform_Governance/06-06_MFA_Implementation.md](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
-
-**Related Documents**:
-- Business Requirements: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Requirements.md)
-- Source Sub-documents:
-  - [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
-  - [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
+**Related Source Documents**:
+- [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
+- [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 
 ---
 

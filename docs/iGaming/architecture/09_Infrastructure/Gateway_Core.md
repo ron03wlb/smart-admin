@@ -1,12 +1,7 @@
 # 網關核心架構 (Gateway Core Architecture)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Infrastructure Team
-- Source: [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
+> **Canonical Source**: [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

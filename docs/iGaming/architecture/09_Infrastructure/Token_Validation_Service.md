@@ -1,12 +1,7 @@
 # Token 驗證服務設計 (Token Validation Service)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P1 (High)
-- Owner: Backend Team + Infrastructure Team
-- Source: [09-13 Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md)
+> **Canonical Source**: [09-13 Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

@@ -1,12 +1,7 @@
 # 流量控制與限流架構 (Rate Limiting & Traffic Control)
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: Infrastructure Team
-- Source: [09-02-02 Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md)
+> **Canonical Source**: [09-02-02 Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 

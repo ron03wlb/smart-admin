@@ -1,12 +1,7 @@
 # 部署架構與 DevOps 規範
 
-**Document Metadata**:
-- Version: 1.0.0
-- Created: 2026-02-09
-- Status: Active
-- Priority: P0 (Critical)
-- Owner: DevOps Team + SRE Team
-- Source: [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md)
+> **Canonical Source**: [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md)
+> **View**: Technical Architecture (Development & DevOps)
 
 ---
 
