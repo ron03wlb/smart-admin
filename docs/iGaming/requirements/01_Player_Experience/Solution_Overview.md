@@ -7,6 +7,23 @@
 
 ---
 
+## Acceptance Criteria
+
+- [ ] Platform supports multi-tenant architecture with complete data isolation between brands
+- [ ] Dual wallet system (Cash Wallet + Promotional Wallet) implemented with correct deduction priority
+- [ ] Valid turnover calculation supports game type weighting (Slots 100%, Baccarat 50%, Roulette 0%)
+- [ ] Wagering release logic correctly handles Active → Completed/Expired/Forfeited state transitions
+- [ ] Three-party reconciliation process includes L1 (real-time), L2 (5-minute polling), L3 (daily settlement)
+- [ ] Automatic suspension policy triggers when single tenant/provider RTP exceeds 200% threshold
+- [ ] Multi-level agent commission calculation supports unlimited (or N) levels with override logic
+- [ ] SaaS tenant billing implements tiered pricing (<$500K: 15%, $500K-$1M: 12%, >$1M: 10%)
+- [ ] Payment gateway integration supports both seamless wallet and transfer wallet models
+- [ ] KYC/AML process includes ID verification, biometric liveness, proof of address, PEP screening
+- [ ] Platform complies with key regulatory standards (MGA, UKGC, Curacao, GDPR, PCI-DSS 4.0)
+- [ ] Player retention metrics meet benchmarks (Day 1: 40%, Day 7: 20%, Day 30: 10%)
+
+---
+
 ## 1. Market Context
 
 The global online gaming market reached **$786 billion to $955 billion** in 2024, and is projected to exceed **$1,500 billion to $2,770 billion** by 2030, with a compound annual growth rate (CAGR) of approximately **7.1%-12.6%**. Multi-tenant platform architecture has become the industry standard, enabling operators to enter the market quickly at lower cost while maintaining flexibility and scalability.
