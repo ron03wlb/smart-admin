@@ -9,22 +9,19 @@
 
 ## Business Value
 
-This glossary delivers strategic value by:
-- **Knowledge Standardization**: Provides 200+ professional terms across 8 core domains, enabling consistent communication across Executives, Product Managers, and Compliance Officers
-- **Onboarding Acceleration**: Reduces new team member ramp-up time by providing a single authoritative reference for iGaming terminology
-- **Compliance Alignment**: Documents regulatory terminology (KYC, AML, EDD, SAR) ensuring teams understand compliance requirements in a $660B+ global industry
-- **Cross-Functional Clarity**: Establishes internal terminology standards (Appendix A) that prevent miscommunication between Finance, Gaming, Risk Control, and Marketing teams
-
----
+This glossary delivers value by:
+- **Cross-functional communication**: Establishes unified terminology across executives, product managers, compliance officers, developers, and QA teams, eliminating misunderstandings in a $660B global market
+- **Regulatory compliance**: Provides standardized definitions for compliance documentation and regulatory reporting required by Tier-1 regulators (UKGC, MGA) with strict terminology standards
+- **Knowledge acceleration**: Reduces onboarding time for new team members through comprehensive 200+ term coverage across 8 core domains (gaming, payments, risk control, analytics)
 
 ## Success Metrics
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Term Coverage | ≥200 terms across 8 domains | Count of unique terms in glossary |
-| Internal Standard Adoption | 100% compliance with Appendix A terms | Documentation audit for prohibited term usage |
-| Onboarding Effectiveness | New hire references glossary within first week | Survey/usage tracking |
-| Cross-Team Consistency | Zero terminology conflicts in PRDs and technical specs | Quarterly documentation review |
+| Terminology Consistency | ≥95% | Percentage of internal documents using standardized terms from Appendix A (measured via grep audit of prohibited alternatives) |
+| Knowledge Coverage | 200+ terms | Maintain complete term coverage across 8 core domains (gaming, technology, payments, risk/compliance, regulatory, business models, analytics, operations) |
+| Update Frequency | Quarterly | Maintain review cycle aligned with industry evolution (tracked in document version history and CHANGELOG) |
+| Cross-Reference Accuracy | 100% | All Appendix A primary terms must have corresponding entries in Appendix B consistency guide |
 
 ---
 
