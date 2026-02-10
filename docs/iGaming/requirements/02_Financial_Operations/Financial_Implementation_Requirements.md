@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Architecture**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
+> **Related Doc**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (atomicity, idempotency, HMAC-SHA256 algorithms, SAGA flow diagrams) moved to Architecture layer. This document focuses on business requirements only.
@@ -11,26 +11,25 @@
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Financial Integrity**: Defines multi-wallet architecture (CASH, BONUS, LOCKED) with precise Available Balance formula ensuring players can never overdraft
-- **Fraud Prevention**: Establishes 7-dimensional risk scoring model (0-100 scale) with automated approval thresholds to block high-risk withdrawals while minimizing friction for legitimate players
-- **Operational Efficiency**: Specifies reconciliation requirements across wallet, deposits, withdrawals, and bets with 99.99% accuracy target and automated discrepancy alerting
-- **Regulatory Compliance**: Mandates comprehensive audit trails for all financial operations, supporting regulatory inspections and dispute resolution
-
----
+This financial system delivers value by:
+- **Fund safety**: Prevents player fund loss through concurrency control, idempotency protection, and SAGA compensation mechanisms, ensuring zero overdrafts and zero fund leakage
+- **Regulatory compliance**: Ensures financial accuracy required by Tier-1 regulators (UKGC, MGA) through comprehensive audit trails, multi-tenant isolation, and 4-decimal precision standards (DECIMAL(19,4))
+- **Fraud prevention**: Reduces fraudulent withdrawal risk through 7-dimension risk scoring model (0-100 scale) and automated approval workflows, protecting operator revenue
 
 ## Acceptance Criteria
 
-- [ ] Multi-wallet system supports CASH, BONUS, and LOCKED wallet types with independent balance tracking
-- [ ] Available Balance formula correctly calculates: Cash Balance - Locked Amount - Pending Bets (never negative)
-- [ ] Concurrent balance deductions pass stress test at 1,000 TPS without overdraft
-- [ ] Duplicate callback handling is idempotent (same order returns same result)
-- [ ] Withdrawal risk scoring calculates correctly across all 7 dimensions (0-100 scale)
-- [ ] Risk decisions route correctly: 0-29 AUTO_APPROVE, 30-69 MANUAL_REVIEW, 70-100 REJECT
-- [ ] SAGA compensation unlocks wallet when payment gateway submission fails
-- [ ] Daily reconciliation achieves 99.99% wallet balance accuracy
-- [ ] Three-way bet reconciliation (OLTP, GP Report, OLAP) achieves 100% accuracy
-- [ ] All financial operations generate complete audit trail records
+- [ ] Wallet system passes concurrency tests at 1,000 TPS without overdrafts or balance inconsistencies
+- [ ] Available balance formula calculates correctly across all scenarios (cash, bonus, locked funds)
+- [ ] Payment gateway signature verification achieves 100% accuracy using time-safe comparison
+- [ ] Deposit callback idempotency handles duplicate requests gracefully (no double credits)
+- [ ] Withdrawal risk control responds within 500ms at 1,000 TPS
+- [ ] Risk scoring model calculates accurately across all 7 dimensions (credit score, KYC, deposit ratio, frequency, turnover, IP/device, multi-account)
+- [ ] Auto-approve (0-29), manual review (30-69), and auto-reject (70-100) thresholds work correctly
+- [ ] SAGA compensation unlocks wallet amounts upon payment gateway failures
+- [ ] Daily reconciliation achieves 99.99% balance accuracy across wallet cache/database comparison
+- [ ] Three-way bet reconciliation (OLTP, Game Provider, OLAP) identifies discrepancies with 0.01 precision
+- [ ] All financial operations generate complete audit trail (operator, timestamp, before/after values)
+- [ ] Multi-tenant isolation enforced via tenant_id filtering on all financial queries
 
 ---
 
