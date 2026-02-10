@@ -83,6 +83,36 @@ Response:
 }
 ```
 
+### 2.1 Dynamic Content Localization Request Flow
+
+```mermaid
+sequenceDiagram
+    participant Client as Client (Browser/App)
+    participant Gateway as API Gateway
+    participant Service as Content Service
+    participant Cache as Redis Cache
+    participant DB as PostgreSQL
+
+    Client->>Gateway: GET /api/v1/promotions?lang=zh-TW
+    Gateway->>Service: Forward request with lang header
+
+    Service->>Cache: Check cache key: promotions:zh-TW
+    alt Cache Hit
+        Cache-->>Service: Return cached content
+    else Cache Miss
+        Service->>DB: SELECT * FROM promotions<br/>WHERE active = true
+        DB-->>Service: Return JSONB records
+        Note over Service: Extract title['zh-TW'],<br/>description['zh-TW']
+        Service->>Service: Fallback to 'en' if missing
+        Service->>Cache: Cache result (TTL: 5 min)
+    end
+
+    Service-->>Gateway: {code: 1000, data: [...]}
+    Gateway-->>Client: Localized response
+
+    Note over Client: Render content in<br/>user's language
+```
+
 ## 3. CMS Multi-Language Editor
 
 ```html
@@ -180,3 +210,76 @@ export default {
   ├── new_year_promo_th.jpg
   └── new_year_promo_default.jpg
 ```
+
+## 6. Database Schema
+
+### 6.1 localization_contents
+
+```sql
+CREATE TABLE localization_contents (
+    content_id BIGSERIAL PRIMARY KEY,
+    content_type VARCHAR(50) NOT NULL CHECK (content_type IN ('promotion', 'banner', 'faq', 'notification', 'game', 'vip_tier', 'payment_method')),
+    entity_id BIGINT NOT NULL,  -- Foreign key to actual entity (promotion_id, banner_id, etc.)
+    field_name VARCHAR(50) NOT NULL,  -- e.g., 'title', 'description', 'rules'
+
+    -- JSONB localized content
+    translations JSONB NOT NULL,  -- {"en": "...", "zh-TW": "...", "th": "..."}
+
+    -- Translation metadata
+    default_language VARCHAR(10) DEFAULT 'en',
+    supported_languages TEXT[] DEFAULT ARRAY['en', 'zh-TW', 'zh-CN', 'th', 'vi', 'id', 'pt-BR', 'ar'],
+    translation_status VARCHAR(20) DEFAULT 'draft' CHECK (translation_status IN ('draft', 'review', 'published', 'archived')),
+
+    -- Version control
+    version INT DEFAULT 1,
+    is_latest BOOLEAN DEFAULT TRUE,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT REFERENCES t_employee(employee_id),
+
+    UNIQUE(content_type, entity_id, field_name, version)
+);
+
+CREATE INDEX idx_loc_content_type_entity ON localization_contents(content_type, entity_id);
+CREATE INDEX idx_loc_status_latest ON localization_contents(translation_status, is_latest);
+CREATE INDEX idx_loc_translations_gin ON localization_contents USING gin(translations jsonb_path_ops);
+```
+
+### 6.2 content_translations
+
+```sql
+CREATE TABLE content_translations (
+    translation_id BIGSERIAL PRIMARY KEY,
+    content_id BIGINT NOT NULL REFERENCES localization_contents(content_id),
+    language_code VARCHAR(10) NOT NULL,  -- ISO 639-1 + ISO 3166-1 (e.g., 'zh-TW')
+    translated_text TEXT NOT NULL,
+
+    -- Translation quality
+    translation_method VARCHAR(20) DEFAULT 'manual' CHECK (translation_method IN ('manual', 'machine', 'hybrid', 'imported')),
+    translator_id BIGINT REFERENCES t_employee(employee_id),  -- NULL for machine translation
+    review_status VARCHAR(20) DEFAULT 'pending' CHECK (review_status IN ('pending', 'approved', 'rejected', 'needs_revision')),
+    reviewer_id BIGINT REFERENCES t_employee(employee_id),
+
+    -- Character count and metadata
+    character_count INT GENERATED ALWAYS AS (LENGTH(translated_text)) STORED,
+    word_count INT,
+    last_reviewed_at TIMESTAMP WITH TIME ZONE,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(content_id, language_code)
+);
+
+CREATE INDEX idx_ct_content_lang ON content_translations(content_id, language_code);
+CREATE INDEX idx_ct_status ON content_translations(review_status, translation_method);
+CREATE INDEX idx_ct_translator ON content_translations(translator_id);
+```
+
+**Translation Workflow**:
+1. Content created in `localization_contents` with default language (usually 'en')
+2. Translations added to `content_translations` (manual or machine)
+3. Reviewers approve translations → `review_status = 'approved'`
+4. API layer reads from `translations` JSONB field (denormalized for performance)
+5. Sync job updates `translations` JSONB from approved `content_translations` records
