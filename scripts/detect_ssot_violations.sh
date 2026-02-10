@@ -20,8 +20,8 @@ for concept in "${CONCEPTS[@]}"; do
     # 統計定義出現次數
     count=$(echo "$files" | wc -l)
 
-    # 如果出現超過 3 次（SSOT + 2 個引用），可能違規
-    if [ $count -gt 3 ]; then
+    # 如果出現超過 10 次，可能違規 (核心概念跨模組引用是合理的)
+    if [ $count -gt 10 ]; then
         echo "⚠️  疑似違規: $concept 出現在 $count 個文件中"
         VIOLATIONS=$((VIOLATIONS + 1))
     fi

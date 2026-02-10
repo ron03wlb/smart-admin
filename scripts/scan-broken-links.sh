@@ -1,6 +1,6 @@
 #!/bin/bash
 # scripts/scan-broken-links.sh
-# iGaming 文檔斷鏈掃描工具
+# iGaming 文檔斷鏈掃描工具 (macOS / Linux 兼容)
 # 用法: ./scripts/scan-broken-links.sh [目錄路徑]
 # 範例: ./scripts/scan-broken-links.sh docs/iGaming/
 
@@ -9,33 +9,46 @@ set -e
 TARGET_DIR="${1:-docs/iGaming}"
 BROKEN_COUNT=0
 TOTAL_LINKS=0
+LINKS_TMP=$(mktemp)
+trap "rm -f '$LINKS_TMP'" EXIT
 
 echo "🔍 掃描目錄: $TARGET_DIR"
 echo "================================"
 
 # 找出所有 Markdown 文件中的相對鏈接
 while IFS= read -r file; do
-    # 提取 [text](path) 格式的鏈接，排除 http/https 外部鏈接
-    while IFS= read -r link; do
-        if [[ -n "$link" && ! "$link" =~ ^https?:// && ! "$link" =~ ^# ]]; then
-            ((TOTAL_LINKS++)) || true
+    # 使用 python3 提取連結（跳過 code block 和 inline code）
+    python3 - "$file" > "$LINKS_TMP" 2>/dev/null <<'PYEOF'
+import re, sys
+filepath = sys.argv[1]
+with open(filepath, 'r', encoding='utf-8') as f:
+    content = f.read()
+content = re.sub(r'```.*?```', '', content, flags=re.DOTALL)
+content = re.sub(r'`.+?`', '', content)
+links = re.findall(r'\[.*?\]\(([^)]+)\)', content)
+for link in links:
+    if not link.startswith('http') and not link.startswith('#'):
+        clean = link.split('#')[0].split('?')[0]
+        if clean:
+            print(clean)
+PYEOF
 
-            # 移除錨點 (#section)
-            link_path="${link%%#*}"
+    file_dir=$(dirname "$file")
 
-            # 計算絕對路徑
-            file_dir=$(dirname "$file")
-            abs_path=$(cd "$file_dir" && realpath -m "$link_path" 2>/dev/null || echo "")
+    while IFS= read -r link_path; do
+        ((TOTAL_LINKS++)) || true
 
-            # 檢查文件是否存在
-            if [[ ! -f "$abs_path" && ! -d "$abs_path" ]]; then
-                echo "❌ 斷鏈: $file"
-                echo "   → $link"
-                ((BROKEN_COUNT++)) || true
-            fi
+        # 解析目標路徑 (macOS 兼容，不使用 realpath -m)
+        target="$file_dir/$link_path"
+
+        # 檢查文件是否存在
+        if [[ ! -f "$target" && ! -d "$target" ]]; then
+            echo "❌ 斷鏈: $file"
+            echo "   → $link_path"
+            ((BROKEN_COUNT++)) || true
         fi
-    done < <(grep -oE '\]\([^)]+\)' "$file" 2>/dev/null | sed 's/\](//;s/)$//' || true)
-done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/backup-corrupted/*")
+    done < "$LINKS_TMP"
+done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/backup-corrupted/*" ! -path "*/source-archive/*" ! -path "*/adr/*" ! -path "*/quality-reports/*" 2>/dev/null | sort)
 
 echo "================================"
 echo "📊 掃描結果:"

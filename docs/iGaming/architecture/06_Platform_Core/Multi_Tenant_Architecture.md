@@ -719,8 +719,8 @@ public class TenantService {
 ## Related Documents
 
 ### Architecture References
-- [RBAC Architecture](RBAC_Architecture.md) - Permission system implementation
-- [Audit Log Architecture](Audit_Log_Architecture.md) - Tenant operation auditing
+- RBAC Architecture *(planned)* - Permission system implementation
+- Audit Log Architecture *(planned)* - Tenant operation auditing
 
 ### Business Requirements
 - [Multi-Tenant Requirements](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md) - Business requirements view

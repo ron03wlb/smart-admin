@@ -113,7 +113,7 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   # ===== Execute Claude Code =====
   PROMPT_CONTENT=$(cat "$PROMPT_FILE")
 
-  OUTPUT=$(claude --print --dangerously-skip-permissions \
+  OUTPUT=$(claude --dangerously-skip-permissions \
     "${PROMPT_CONTENT}
 
 ---

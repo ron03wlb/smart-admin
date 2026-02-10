@@ -777,7 +777,7 @@ GROUP BY transaction_type;
 
 - [Game Integration Requirements](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md) - Business requirements
 - [Turnover Calculation Logic](./Turnover_Calculation_Logic.md) - Turnover technical design
-- [Wallet Architecture](../02_Finance_Service/Wallet_Architecture.md) - Wallet system design
+- Wallet Architecture *(planned)* - Wallet system design
 
 ---
 

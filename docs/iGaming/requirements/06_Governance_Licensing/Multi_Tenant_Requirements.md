@@ -213,13 +213,13 @@ Tenants must be able to export:
 ## Related Documents
 
 ### Business Logic References
-- [Billing & Invoicing](../02_Financial_Operations/Billing_Invoicing_Requirements.md) - Multi-tenant billing model details
-- [Agent System](../07_Agent_Center/Agent_System_Requirements.md) - Hierarchy structure extension
+- Billing & Invoicing *(planned)* - Multi-tenant billing model details
+- [Agent System](../07_Agent_Operations/Agent_System_Requirements.md) - Hierarchy structure extension
 
 ### Technical Architecture References
 - [Multi-Tenant Architecture](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md) - Technical implementation
-- [RBAC Permissions](RBAC_Requirements.md) - Hierarchical permission implementation
-- [Audit Logging](Audit_Log_Requirements.md) - Tenant operation auditing
+- RBAC Permissions *(planned)* - Hierarchical permission implementation
+- Audit Logging *(planned)* - Tenant operation auditing
 
 ### Technical Implementation
 

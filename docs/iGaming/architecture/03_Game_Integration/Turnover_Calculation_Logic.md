@@ -1198,7 +1198,7 @@ Background Reconciliation (Flink):
 - [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 
 ### Architecture Dependencies
-- [SmartAdmin Architecture Rules](/.agent/rules/foundation/F04-architecture-rules.md)
+- [SmartAdmin Architecture Rules](../../../../.agent/rules/foundation/F04-architecture-rules.md)
 - [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ---

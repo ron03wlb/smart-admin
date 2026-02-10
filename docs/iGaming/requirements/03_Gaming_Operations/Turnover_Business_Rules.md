@@ -272,7 +272,7 @@ All recalculations must:
 ## 12. Related Documents
 
 ### Prerequisites
-- [00-03 Terminology Standards](../../source-archive/00_Foundation/concepts/00-03_Terminology_Standards.md) - Required reading
+- 00-03 Terminology Standards *(planned - source-archive/00_Foundation/00-03_Terminology_Standards)* - Required reading
 
 ### Technical Implementation
 

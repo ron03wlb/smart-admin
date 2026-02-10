@@ -577,7 +577,7 @@ Player Deletion Request
 
 - [Business Logic Flows](./Business_Logic_Flows.md) - Business flow architecture
 - [Technology Stack](./Technology_Stack.md) - Technology stack overview
-- [Wallet Architecture](../02_Finance_Service/Wallet_Architecture.md) - Wallet system design
+- Wallet Architecture *(planned)* - Wallet system design
 - [Turnover Calculation Logic](../03_Game_Integration/Turnover_Calculation_Logic.md) - Turnover system design
 - [Risk Engine Architecture](../05_Risk_Engine/) - Risk control system
 

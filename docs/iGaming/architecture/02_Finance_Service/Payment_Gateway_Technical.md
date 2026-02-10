@@ -1168,8 +1168,8 @@ public void manualCredit(String orderId, String reason) {
 - [Seamless_Wallet_Technical.md](Seamless_Wallet_Technical.md) - Wallet API integration
 
 ### Extended Reading
-- [HashiCorp Vault Best Practices](../00_Foundation/Vault_Best_Practices.md)
-- [HikariCP Performance Tuning](../00_Foundation/HikariCP_Tuning.md)
+- HashiCorp Vault Best Practices *(planned)*
+- HikariCP Performance Tuning *(planned)*
 
 ---
 

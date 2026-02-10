@@ -14,11 +14,16 @@ echo "=========================================="
 echo ""
 
 while IFS= read -r file; do
-    # 使用 python3 提取所有內部 Markdown 連結
-    python3 -c "
-import re
-with open('${file}', 'r', encoding='utf-8') as f:
+    # 使用 python3 提取所有內部 Markdown 連結（跳過 code block）
+    python3 - "$file" > "$LINKS_TMP" 2>/dev/null <<'PYEOF'
+import re, sys
+filepath = sys.argv[1]
+with open(filepath, 'r', encoding='utf-8') as f:
     content = f.read()
+# 移除 fenced code blocks (``` ... ```) 避免誤判
+content = re.sub(r'```.*?```', '', content, flags=re.DOTALL)
+# 移除 inline code (`...`) 避免誤判
+content = re.sub(r'`.+?`', '', content)
 links = re.findall(r'\[.*?\]\(([^)]+)\)', content)
 for link in links:
     if not link.startswith('http') and not link.startswith('#'):
@@ -26,7 +31,7 @@ for link in links:
         clean = link.split('#')[0].split('?')[0]
         if clean:
             print(clean)
-" > "$LINKS_TMP" 2>/dev/null
+PYEOF
 
     dir=$(dirname "$file")
 
@@ -40,7 +45,7 @@ for link in links:
         fi
     done < "$LINKS_TMP"
 
-done < <(find "$DOCS_DIR" -name "*.md" -not -path "*/archive/*" 2>/dev/null | sort)
+done < <(find "$DOCS_DIR" -name "*.md" -not -path "*/archive/*" -not -path "*/source-archive/*" -not -path "*/adr/*" -not -path "*/quality-reports/*" 2>/dev/null | sort)
 
 echo ""
 echo "=========================================="

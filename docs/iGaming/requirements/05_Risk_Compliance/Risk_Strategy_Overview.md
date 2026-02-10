@@ -287,8 +287,8 @@ Covers interactive gaming system requirements:
 - [05_Risk_Compliance/KYC_AML_Requirements](KYC_AML_Requirements.md) - KYC procedures
 
 ### Compliance
-- [UKGC_Requirements](UKGC_Requirements.md) - UK regulatory requirements
-- [MGA_Requirements](MGA_Requirements.md) - Malta regulatory requirements
+- UKGC Requirements *(planned)* - UK regulatory requirements
+- MGA Requirements *(planned)* - Malta regulatory requirements
 
 ### Technical Implementation
 

@@ -514,12 +514,12 @@ public class RiskRuleConfigManager {
 ## Related Documents
 
 ### Core Dependencies
-- [Wallet_Architecture.md](../02_Finance_Service/Wallet_Architecture.md) - Balance monitoring
+- Wallet Architecture *(planned)* - Balance monitoring
 - [Turnover_Calculation_Logic.md](../03_Game_Integration/Turnover_Calculation_Logic.md) - Layer 2 integration
 
 ### Technical Reference
 - [Gateway_Core.md](../09_Infrastructure/Gateway_Core.md) - API rate limiting, circuit breaker
-- [Stream_Processing.md](../09_Infrastructure/Stream_Processing.md) - Kafka/Flink patterns
+- [Stream_Processing_Architecture.md](../09_Infrastructure/Stream_Processing_Architecture.md) - Kafka/Flink patterns
 
 ---
 

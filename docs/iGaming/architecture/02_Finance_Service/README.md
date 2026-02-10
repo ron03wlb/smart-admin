@@ -33,11 +33,11 @@
 | [Recovery Mechanisms](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-03_Recovery.md) | Transaction rollback, compensation, and failure recovery | [source](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-03_Recovery.md) |
 | [Accounting Integration](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-04_Accounting.md) | Double-entry bookkeeping and GL integration | [source](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-04_Accounting.md) |
 
-## Subdirectories
+## Additional Index
 
-| Directory | Description |
-|-----------|-------------|
-| [Seamless_Wallet/](./Seamless_Wallet/) | Detailed seamless wallet architecture documents |
+| Document | Description |
+|----------|-------------|
+| [Seamless Wallet Index](./Seamless_Wallet_Index.md) | Detailed seamless wallet architecture documents |
 
 ---
 

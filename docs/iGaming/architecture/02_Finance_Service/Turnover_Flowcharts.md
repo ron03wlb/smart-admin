@@ -21,7 +21,7 @@ This document provides the technical visualization of the iGaming platform's tur
 - Layer 3 (Activity System) applies game weights for activity contribution calculation
 
 **Reference Documents**:
-- [Terminology Standards](../../source-archive/00_Foundation/concepts/00-03_Terminology_Standards.md)
+- Terminology Standards *(planned - source-archive/00_Foundation/00-03_Terminology_Standards)*
 - [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
 - [Turnover and Reconciliation Analysis](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 - [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)

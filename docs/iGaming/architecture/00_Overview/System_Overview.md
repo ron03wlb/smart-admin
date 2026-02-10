@@ -229,7 +229,7 @@ flowchart LR
 
 | Priority | Topic | Document |
 |----------|-------|----------|
-| P0 | Solution Overview | [00-01 Solution Overview](../../source-archive/00_Foundation/concepts/00-01_Solution_Overview.md) |
+| P0 | Solution Overview | [00-01 Quickstart](../../source-archive/00_Foundation/00-01_Quickstart.md) |
 | P0 | Multi-Tenant Architecture | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
 | P0 | Data Security | [06-05 Data Security](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) |
 | P1 | Deployment Architecture | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) |

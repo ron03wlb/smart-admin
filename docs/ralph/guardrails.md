@@ -68,6 +68,38 @@
 - Do NOT over-engineer content for documents marked as PLANNED
 - SQL tables should be frontend-relevant (configs, experiments, localization)
 
+### P12: Business completeness — derive, don't fabricate
+- When adding Business Value / Success Metrics / Acceptance Criteria sections to requirements files
+- Content MUST be derived from the existing document text, NOT invented
+- Read the document first, understand what it describes, then summarize as business value
+- If the document doesn't have enough context to derive a section, add a minimal placeholder and mark as TODO
+- Check with: `bash scripts/measure-business-completeness.sh`
+
+### P13: SmartAdmin Java code pattern rules
+- Architecture docs containing Java code examples must follow SmartAdmin conventions:
+  - ❌ `@Autowired` field injection → ✅ `@RequiredArgsConstructor` + `private final`
+  - ❌ `@Transactional` in Service class → ✅ `@Transactional(rollbackFor = Throwable.class)` in Manager class
+  - ❌ `java.util.Optional` in Service → ✅ `io.vavr.control.Option`
+- When fixing: extract the @Transactional method to a new Manager class, keep Service calling Manager
+- Check with: `bash scripts/check-smartadmin-patterns.sh`
+
+### P14: Terminology standardization
+- Use English-only terms in documentation content:
+  - "Valid Turnover" (not 有效投注額 or 流水)
+  - "Playable Balance" (not 可下注餘額)
+  - "self-exclusion" (hyphenated, not "self exclusion")
+  - "multi-tenant" (hyphenated, not "multi tenant" or "multitenant")
+- Exception: Chinese terms may appear in code comments within source-archive/ (READ-ONLY)
+- Check with: `bash scripts/check-terminology-consistency.sh`
+
+### P15: Never decrease existing coverage
+- Mermaid must stay at 100% (73/73 core files)
+- SQL must stay at ≥80% (≥59 files)
+- Back-references must stay at 100%
+- Requirements purity must stay at 100%
+- SSOT violations must stay at 0
+- Always run full validation after changes to ensure no regression
+
 ---
 
 ## Lessons Learned
@@ -77,3 +109,17 @@
 - All 7 original Phase 5 targets were non-existent files
 - Fixed by using `grep -rL` to find actual files missing content
 - Strategy: select files missing BOTH Mermaid AND SQL for maximum efficiency
+
+### 2026-02-11: --print flag prevents tool usage
+- `claude --print` = text-only output mode, Claude CANNOT use Read/Write/Edit/Bash tools
+- Root cause of 30 failed iterations (0 file changes)
+- Fix: remove `--print` from ralph-igaming-docs.sh, keep `--dangerously-skip-permissions`
+
+### 2026-02-11: macOS realpath -m incompatibility
+- GNU `realpath -m` (canonicalize missing paths) not supported on macOS BSD
+- Causes scan-broken-links.sh to report ALL links as broken
+- Fix: use relative path resolution `"$file_dir/$link_path"` instead of `realpath -m`
+
+### 2026-02-11: validate_links.sh code block false positives
+- Regex patterns inside code blocks (e.g., `[a-zA-Z0-9]`) were parsed as markdown links
+- Fix: Python extraction now strips fenced code blocks and inline code before extracting links

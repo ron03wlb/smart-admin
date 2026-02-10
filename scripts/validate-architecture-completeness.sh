@@ -36,30 +36,32 @@ fi
 
 while IFS= read -r file; do
     TOTAL_FILES=$((TOTAL_FILES + 1))
-    CONTENT=$(cat "$file" 2>/dev/null || true)
 
-    # Check for Java code blocks
-    if echo "$CONTENT" | grep -q '```java' 2>/dev/null; then
+    # Check for Java code blocks (grep file directly to avoid echo truncation)
+    if grep -q '```java' "$file" 2>/dev/null; then
         HAS_JAVA=$((HAS_JAVA + 1))
     fi
 
     # Check for SQL schema
-    if echo "$CONTENT" | grep -qiE '(CREATE TABLE|CREATE INDEX|ALTER TABLE)' 2>/dev/null; then
+    if grep -qiE '(CREATE TABLE|CREATE INDEX|ALTER TABLE)' "$file" 2>/dev/null; then
         HAS_SQL=$((HAS_SQL + 1))
     fi
 
     # Check for YAML config
-    if echo "$CONTENT" | grep -qE '```ya?ml' 2>/dev/null; then
+    if grep -qE '```ya?ml' "$file" 2>/dev/null; then
         HAS_YAML=$((HAS_YAML + 1))
     fi
 
     # Check for Mermaid diagrams
-    if echo "$CONTENT" | grep -q '```mermaid' 2>/dev/null; then
+    if grep -q '```mermaid' "$file" 2>/dev/null; then
         HAS_MERMAID=$((HAS_MERMAID + 1))
     fi
 
-    # Check for back-reference to requirements
-    if echo "$CONTENT" | grep -qE '> \*\*Business Requirements\*\*|> \*\*需求文檔\*\*|requirements/' 2>/dev/null; then
+    # Check for back-reference to requirements (skip ADR files)
+    if [[ "$file" == */adr/* ]]; then
+        # ADR files are architecture decision records, no business requirements needed
+        HAS_BACKREF=$((HAS_BACKREF + 1))
+    elif grep -qE '> \*\*Business Requirements\*\*|> \*\*需求文檔\*\*|requirements/' "$file" 2>/dev/null; then
         HAS_BACKREF=$((HAS_BACKREF + 1))
     else
         MISSING_BACKREF=$((MISSING_BACKREF + 1))
