@@ -132,6 +132,38 @@ async function purgeGameCache(gameSlug) {
 }
 ```
 
+### 4.1 SEO Content Rendering Pipeline
+
+```mermaid
+graph LR
+    A[Search Engine Bot] --> B{User-Agent<br/>Detection}
+    B -->|Bot| C[SSR Path]
+    B -->|Human| D[CSR Path]
+
+    C --> E[Next.js SSR<br/>Server]
+    E --> F{ISR Cache<br/>Available?}
+    F -->|Hit| G[Serve Cached HTML]
+    F -->|Miss| H[Fetch DB Data]
+    H --> I[Render HTML<br/>+ SEO Tags]
+    I --> J[Store ISR Cache<br/>TTL: 1 hour]
+    J --> G
+
+    G --> K[CDN Edge Cache<br/>TTL: 60s]
+    K --> L[Bot Receives<br/>Fully Rendered HTML]
+
+    D --> M[Initial HTML Shell]
+    M --> N[Client-Side Hydration]
+    N --> O[Fetch API Data]
+    O --> P[Dynamic Rendering]
+
+    subgraph Prerender Service
+        Q[Prerenderer<br/>Puppeteer/Rendertron] --> R[Static HTML Snapshot]
+        R --> K
+    end
+
+    E -.->|Fallback for<br/>legacy bots| Q
+```
+
 ## 5. Image Optimization
 
 ```html
@@ -183,3 +215,104 @@ getLCP(sendToAnalytics);
   }
 }
 ```
+
+## 7. Database Schema
+
+### 7.1 seo_page_configs
+
+```sql
+CREATE TABLE seo_page_configs (
+    config_id BIGSERIAL PRIMARY KEY,
+    page_type VARCHAR(50) NOT NULL CHECK (page_type IN ('game_detail', 'game_list', 'promotion', 'landing_page', 'blog_post', 'homepage')),
+    page_identifier VARCHAR(200) NOT NULL,  -- e.g., 'pg-soft/mahjong-ways-2' for game_detail
+
+    -- SEO metadata (JSONB for multi-language support)
+    title JSONB NOT NULL,  -- {"en": "Mahjong Ways 2 - Play Free", "th": "เล่น Mahjong Ways 2"}
+    description JSONB NOT NULL,
+    keywords TEXT[],  -- ['slot', 'mahjong', 'pg-soft', 'high-rtp']
+
+    -- Open Graph tags
+    og_title JSONB,
+    og_description JSONB,
+    og_image_url TEXT,
+    og_type VARCHAR(50) DEFAULT 'website',
+
+    -- Structured data (Schema.org)
+    structured_data JSONB,  -- Full JSON-LD schema
+
+    -- Canonical and hreflang
+    canonical_url TEXT NOT NULL,
+    hreflang_urls JSONB,  -- {"en": "https://...", "th": "https://..."}
+
+    -- ISR/SSR configuration
+    render_strategy VARCHAR(20) DEFAULT 'isr' CHECK (render_strategy IN ('ssr', 'isr', 'ssg', 'csr')),
+    revalidate_seconds INT DEFAULT 3600,
+    prerender_enabled BOOLEAN DEFAULT FALSE,
+
+    -- Cache settings
+    edge_cache_ttl INT DEFAULT 60,  -- CDN edge cache TTL (seconds)
+    browser_cache_ttl INT DEFAULT 0,  -- Browser cache TTL
+
+    -- Status
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'testing', 'disabled')),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT REFERENCES t_employee(employee_id),
+
+    UNIQUE(page_type, page_identifier)
+);
+
+CREATE INDEX idx_seo_page_type_status ON seo_page_configs(page_type, status);
+CREATE INDEX idx_seo_page_identifier ON seo_page_configs(page_identifier);
+CREATE INDEX idx_seo_structured_data_gin ON seo_page_configs USING gin(structured_data jsonb_path_ops);
+```
+
+### 7.2 seo_metrics
+
+```sql
+CREATE TABLE seo_metrics (
+    metric_id BIGSERIAL PRIMARY KEY,
+    config_id BIGINT NOT NULL REFERENCES seo_page_configs(config_id),
+    page_url TEXT NOT NULL,
+
+    -- Core Web Vitals (from RUM data)
+    lcp_value DECIMAL(6,2),  -- Largest Contentful Paint (ms)
+    fid_value DECIMAL(6,2),  -- First Input Delay (ms)
+    cls_value DECIMAL(4,3),  -- Cumulative Layout Shift
+
+    -- Lighthouse scores (from CI or on-demand audits)
+    performance_score DECIMAL(3,2),  -- 0.00-1.00
+    seo_score DECIMAL(3,2),
+    accessibility_score DECIMAL(3,2),
+    best_practices_score DECIMAL(3,2),
+
+    -- Search engine crawl data
+    last_crawled_at TIMESTAMP WITH TIME ZONE,
+    crawler_user_agent TEXT,
+    http_status_code INT,
+    response_time_ms INT,
+
+    -- Indexing status
+    indexed_by_google BOOLEAN DEFAULT FALSE,
+    indexed_by_bing BOOLEAN DEFAULT FALSE,
+    index_blocked_reason TEXT,
+
+    -- Organic traffic (from Google Analytics)
+    organic_sessions INT DEFAULT 0,
+    organic_conversion_rate DECIMAL(5,4),  -- 0.0000-1.0000
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_seo_metrics_config ON seo_metrics(config_id, created_at DESC);
+CREATE INDEX idx_seo_metrics_url ON seo_metrics(page_url);
+CREATE INDEX idx_seo_metrics_crawled ON seo_metrics(last_crawled_at DESC);
+CREATE INDEX idx_seo_metrics_performance ON seo_metrics(performance_score, lcp_value);
+```
+
+**Monitoring Integration**:
+- Web Vitals data collected via `web-vitals` library and stored in `seo_metrics`
+- Lighthouse CI runs on every deployment and updates `performance_score`, `seo_score`
+- Google Search Console API integration updates `indexed_by_google`, `organic_sessions`
+- Scheduled crawler (Puppeteer) validates rendered HTML and updates `http_status_code`, `response_time_ms`
