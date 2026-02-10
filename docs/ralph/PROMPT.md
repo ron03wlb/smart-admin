@@ -74,6 +74,8 @@ Use for decisions like:
 5. **Max 5 files per iteration** — keep changes focused and verifiable
 6. **Git commit after every meaningful batch** — format: `docs(iGaming): <description>`
 7. **Verify target paths exist** before creating cross-reference links — use `test -f <path>`
+8. **NEVER fabricate file paths** — Always use `ls`, `find`, or `grep -rL` to discover actual file names. Phase 5 originally failed because all 7 target files were guessed names that did not exist. (P9 guardrail)
+9. **Dual-missing optimization** — When adding both Mermaid AND SQL, prefer files missing BOTH content types to maximize coverage per edit
 
 ## Workflow (execute every iteration)
 
@@ -84,6 +86,13 @@ Read the current progress and lessons learned:
 
 ### Step 2: Execute Next Task
 Pick the FIRST unchecked `- [ ]` task in the current active phase.
+
+**Before executing**: Verify all file paths mentioned in the task exist:
+```bash
+test -f "docs/iGaming/<path>" && echo "EXISTS" || echo "NOT FOUND"
+```
+If a file does NOT exist, mark it as `- [!] STUCK: file not found` and use `grep -rL` to find the correct file.
+
 Execute it carefully, following the task-specific instructions.
 
 ### Step 3: Validate

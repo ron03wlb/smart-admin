@@ -36,11 +36,12 @@ if [ ! -f "$QUOTA_FILE" ]; then
   exit 0  # Safe to continue (no data yet)
 fi
 
-# Read quota data (using Node.js for JSON parsing, cross-platform compatible)
-RISK_SCORE=$(node -p "JSON.parse(require('fs').readFileSync('$QUOTA_FILE', 'utf8')).risk_score" 2>/dev/null || echo "0.0")
-TOKEN_USAGE_PCT=$(node -p "JSON.parse(require('fs').readFileSync('$QUOTA_FILE', 'utf8')).risk_components.token_usage_pct" 2>/dev/null || echo "0.0")
-FAILURE_RATE=$(node -p "JSON.parse(require('fs').readFileSync('$QUOTA_FILE', 'utf8')).risk_components.failure_rate" 2>/dev/null || echo "0.0")
-RECOMMENDATION=$(node -p "JSON.parse(require('fs').readFileSync('$QUOTA_FILE', 'utf8')).recommendation" 2>/dev/null || echo "continue")
+# Read quota data once (single Node.js call for all values, cross-platform compatible)
+QUOTA_VALUES=$(node -p "
+  var q = JSON.parse(require('fs').readFileSync('$QUOTA_FILE', 'utf8'));
+  [q.risk_score, q.risk_components.token_usage_pct, q.risk_components.failure_rate, q.recommendation].join(' ')
+" 2>/dev/null || echo "0.0 0.0 0.0 continue")
+read -r RISK_SCORE TOKEN_USAGE_PCT FAILURE_RATE RECOMMENDATION <<< "$QUOTA_VALUES"
 
 # Read thresholds from thresholds.yml (if exists)
 if [ -f "$THRESHOLDS_FILE" ]; then

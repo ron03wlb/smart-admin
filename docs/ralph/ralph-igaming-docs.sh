@@ -189,7 +189,7 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
   fi
 
   # ===== Error detection =====
-  if echo "$OUTPUT" | grep -qiE "(error|exception|fatal)" | head -1; then
+  if echo "$OUTPUT" | grep -qiE "(error|exception|fatal)"; then
     echo -e "${YELLOW}Possible error detected in output. Continuing...${NC}"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Possible error at iteration #$i" >> "$LOG_FILE"
   fi
@@ -202,8 +202,8 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
     echo -e "${CYAN}🔍 Checking usage quota...${NC}"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Quota check triggered at iteration #$i" >> "$LOG_FILE"
 
-    # Update quota cache
-    node "$RALPH_DIR/scripts/quota-manager.js" > "$RALPH_DIR/quota.json" 2>&1 | tee -a "$LOG_FILE" || {
+    # Update quota cache (stdout → quota.json, stderr → log)
+    node "$RALPH_DIR/scripts/quota-manager.js" > "$RALPH_DIR/quota.json" 2>> "$LOG_FILE" || {
       echo "WARNING: quota-manager failed, skipping check" | tee -a "$LOG_FILE"
       LAST_QUOTA_CHECK=$NOW
       continue
