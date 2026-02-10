@@ -26,6 +26,141 @@ The existing system lacks protection against bonus exploitation:
 - Hedge betting to eliminate risk before withdrawing bonus
 - No mechanism to mark invalid turnover contributions
 
+### 1.3 Turnover Validation Decision Tree
+
+The following flowchart illustrates the complete turnover validation flow from withdrawal request through snapshot creation:
+
+```mermaid
+flowchart TD
+    Start[Player Requests Withdrawal]
+
+    subgraph "Step 1: Snapshot Retrieval"
+        GetSnapshot[Query Latest Snapshot<br/>snapshotDao.findLatest playerId]
+        CheckSnapshot{Snapshot<br/>Exists?}
+        UseZero[Use TurnoverSnapshot.ZERO<br/>First-time withdrawal]
+        UseSnapshot[Use Last Snapshot<br/>totalValidBet, snapshotTime]
+    end
+
+    subgraph "Step 2: Real-Time Aggregation"
+        GetCurrent[Query Current Valid Bet<br/>betRecordDao.sumValidBet playerId]
+        CalcDiff[Calculate Period Turnover<br/>periodValidBet = current - snapshot]
+    end
+
+    subgraph "Step 3: Bet Validity Rules"
+        CheckBetRules[Apply Validity Rules to Each Bet]
+        LowOdds{Odds < 1.3?}
+        HedgeBet{Hedge Bet<br/>Detected?}
+        MinBetBonus{Min Bet +<br/>Activity Turnover?}
+        SameEventOpp{Same Event<br/>Opposite Bets?}
+        ValidBet[Valid Turnover = Bet Amount]
+        InvalidBet[Valid Turnover = 0]
+    end
+
+    subgraph "Step 4: Requirement Calculation"
+        CalcRequired[Calculate Required Turnover<br/>depositAmount × multiplier + bonusAmount × multiplier]
+        Compare{periodValidBet >=<br/>requiredTurnover?}
+    end
+
+    subgraph "Step 5: Risk Proposal Check"
+        QueryProposals[Query Unresolved Risk Proposals<br/>Time Range: lastSnapshotTime → NOW]
+        CheckProposals{Has URGENT/HIGH<br/>Proposals?}
+    end
+
+    subgraph "Step 6: Validation Result"
+        PassWithRisk[PASS with Risk Warning<br/>Manual Review Required]
+        Pass[PASS<br/>Proceed to Withdrawal]
+        Fail[FAIL<br/>Reject Withdrawal]
+    end
+
+    subgraph "Step 7: Post-Withdrawal Snapshot"
+        CreateSnapshot[Create New Snapshot<br/>INSERT INTO t_player_turnover_snapshot<br/>snapshotType = WITHDRAWAL]
+        SnapshotData[Record:<br/>totalBet, totalValidBet, totalWin<br/>triggerId = withdrawalId]
+    end
+
+    Start --> GetSnapshot
+    GetSnapshot --> CheckSnapshot
+
+    CheckSnapshot -->|No| UseZero
+    CheckSnapshot -->|Yes| UseSnapshot
+
+    UseZero --> GetCurrent
+    UseSnapshot --> GetCurrent
+
+    GetCurrent --> CalcDiff
+    CalcDiff --> CheckBetRules
+
+    CheckBetRules --> LowOdds
+    LowOdds -->|Yes| InvalidBet
+    LowOdds -->|No| HedgeBet
+
+    HedgeBet -->|Yes| InvalidBet
+    HedgeBet -->|No| MinBetBonus
+
+    MinBetBonus -->|Yes| InvalidBet
+    MinBetBonus -->|No| SameEventOpp
+
+    SameEventOpp -->|Yes| InvalidBet
+    SameEventOpp -->|No| ValidBet
+
+    InvalidBet --> CalcRequired
+    ValidBet --> CalcRequired
+
+    CalcRequired --> Compare
+
+    Compare -->|No| Fail
+    Compare -->|Yes| QueryProposals
+
+    QueryProposals --> CheckProposals
+
+    CheckProposals -->|Yes| PassWithRisk
+    CheckProposals -->|No| Pass
+
+    Pass --> CreateSnapshot
+    CreateSnapshot --> SnapshotData
+    SnapshotData --> End[Withdrawal Approved]
+
+    PassWithRisk --> End2[Escalate to Manual Review]
+    Fail --> End3[Rejection Notification]
+
+    style GetSnapshot fill:#e1f5ff
+    style UseZero fill:#e1f5ff
+    style UseSnapshot fill:#e1f5ff
+    style GetCurrent fill:#fff4e6
+    style CalcDiff fill:#fff4e6
+    style CheckBetRules fill:#ffe6e6
+    style LowOdds fill:#ffe6e6
+    style HedgeBet fill:#ffe6e6
+    style MinBetBonus fill:#ffe6e6
+    style SameEventOpp fill:#ffe6e6
+    style InvalidBet fill:#ffcccc
+    style ValidBet fill:#ccffcc
+    style CalcRequired fill:#e6ffe6
+    style Compare fill:#e6ffe6
+    style QueryProposals fill:#f3e5f5
+    style CheckProposals fill:#f3e5f5
+    style Pass fill:#d4edda
+    style PassWithRisk fill:#fff3cd
+    style Fail fill:#f8d7da
+    style CreateSnapshot fill:#cce5ff
+    style SnapshotData fill:#cce5ff
+```
+
+**Decision Tree Stages**:
+
+1. **Snapshot Retrieval**: O(1) index scan on `(player_id, snapshot_time DESC)`
+2. **Real-Time Aggregation**: Query pre-aggregated counter for current valid bets
+3. **Bet Validity Rules**: Apply 4 invalid turnover filters (low-odds, hedge, min-bet-bonus, same-event-opposite)
+4. **Requirement Calculation**: Compare period turnover against deposit/bonus multiplier requirements
+5. **Risk Proposal Check**: Query unresolved proposals within time window aligned with last snapshot
+6. **Validation Result**: 3 outcomes - PASS, PASS with Risk Warning, FAIL
+7. **Post-Withdrawal Snapshot**: Create checkpoint for next validation cycle
+
+**Performance Characteristics**:
+- Snapshot retrieval: < 5ms (index scan)
+- Valid bet sum: < 10ms (pre-aggregated)
+- Risk proposal query: < 20ms (time-range index scan)
+- Total validation: < 50ms (P95)
+
 ---
 
 ## 2. Checkpoint Snapshot Design

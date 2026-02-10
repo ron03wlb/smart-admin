@@ -51,10 +51,10 @@
 ### 6B: Mermaid-Only Gap Closure (+6 Mermaid → 100%)
 
 #### Batch 3 — Finance/Game/Risk (3 files)
-- [ ] architecture/02_Finance_Service/Financial_Implementation.md (+Mermaid)
-  - sequenceDiagram: Payment processing end-to-end flow (deposit → gateway → ledger)
-- [ ] architecture/03_Game_Integration/Game_Integration_Security.md (+Mermaid)
-  - graph TB: Security verification layers (API key, token, IP whitelist, signature)
+- [x] architecture/02_Finance_Service/Financial_Implementation.md (+Mermaid)
+  - sequenceDiagram: Payment processing end-to-end flow (deposit → gateway → ledger) ✅
+- [x] architecture/03_Game_Integration/Game_Integration_Security.md (+Mermaid)
+  - graph TB: Security verification layers (API key, token, IP whitelist, signature) ✅
 - [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (+Mermaid)
   - flowchart TD: Turnover validation decision tree
 
