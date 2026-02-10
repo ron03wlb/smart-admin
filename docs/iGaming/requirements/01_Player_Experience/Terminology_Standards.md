@@ -9,22 +9,19 @@
 
 ## Business Value
 
-This terminology standard delivers strategic value by:
-- **Calculation Accuracy**: Ensures consistent Valid Bet calculation using the Standard Principal Method (industry standard used by Pinnacle, Betfair, Evolution Gaming)
-- **Risk Mitigation**: Prevents promotion abuse by clearly defining Wagering Requirement verification timing (at withdrawal, not during betting)
-- **System Consistency**: Establishes mandatory API field naming conventions (`validBet`, `wageringProgress.*`) to prevent integration errors
-- **Compliance Readiness**: Provides auditable definitions that align with major game provider standards for regulatory inspections
-
----
+This standardization delivers value by:
+- **Financial accuracy**: Eliminates ambiguous terminology that causes calculation errors in critical operations (e.g., Valid Bet vs Turnover confusion leading to incorrect GGR reporting, bonus unlock errors)
+- **Regulatory compliance**: Ensures accurate financial reporting for regulators (UKGC, MGA) by standardizing GGR calculation methodology and wagering requirement definitions
+- **Cross-team efficiency**: Reduces communication overhead by establishing unified terminology across product, engineering, QA, and compliance teams
 
 ## Success Metrics
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Terminology Compliance | 100% of new documents use standard terms | Documentation audit for prohibited term usage |
-| API Naming Compliance | 100% of endpoints use standard field names | Code review and API schema validation |
-| Calculation Accuracy | Zero discrepancies in Valid Bet calculations | Reconciliation between platform and game providers |
-| Cross-Team Understanding | All team members can correctly define the 4 core terms | Quarterly terminology quiz (Bet Amount, Turnover, Valid Bet, Wagering Requirement) |
+| API Naming Compliance | 100% | All new API endpoints use standardized field names (`betAmount`, `validBet`, `wageringProgress`) verified via code review checklist |
+| Documentation Compliance | 100% | All new business documents follow prohibited terminology rules (grep audit for "Effective Turnover", "RemainingRollover", etc.) |
+| Code Review Coverage | 100% | Terminology compliance check integrated into code review process (verify no deprecated field names like `effectiveTurnover`, `turnoverRequirement`) |
+| Cross-Reference Accuracy | 100% | All documents referencing these terms include citation to this standards document (Section 9 compliance) |
 
 ---
 
