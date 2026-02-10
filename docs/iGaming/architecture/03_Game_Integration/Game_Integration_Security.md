@@ -18,6 +18,100 @@ The Game Integration Security system provides secure communication and transacti
 - Rate limiting using Redisson
 - IP whitelisting with Nginx integration
 
+### 1.1 Security Verification Layers
+
+The following diagram illustrates the defense-in-depth security architecture with multiple verification layers:
+
+```mermaid
+graph TB
+    Request[Game Provider Request]
+
+    subgraph "Layer 1: Network Security"
+        Nginx[Nginx IP Whitelist<br/>- Check source IP against GP whitelist<br/>- Reject 403 if not whitelisted]
+        RateLimit[Rate Limiter<br/>- Global: 1000 req/s<br/>- Per-GP: 100 req/s<br/>- Return 429 if exceeded]
+    end
+
+    subgraph "Layer 2: Authentication"
+        APIKey[API Key Validation<br/>- Extract X-GP-ID header<br/>- Validate against GP registry<br/>- Check GP status ACTIVE]
+        Token[Token Validation<br/>- Base64 decode token<br/>- Verify HMAC-SHA256 signature<br/>- Check expiry 5-min window<br/>- Constant-time comparison]
+    end
+
+    subgraph "Layer 3: Anti-Replay"
+        Replay[Redis Blacklist Check<br/>- SHA256 hash token<br/>- Check redis token:blacklist:*<br/>- Reject if exists TTL=5min]
+    end
+
+    subgraph "Layer 4: Idempotency"
+        Cache[Redis Cache Check<br/>- game:tx:response:txId<br/>- Return cached if exists]
+        DB[DB Unique Constraint<br/>- t_game_transaction.tx_id UNIQUE<br/>- ON CONFLICT DO NOTHING]
+        Lock[Distributed Lock<br/>- Redisson RLock per player<br/>- Prevent race conditions]
+    end
+
+    Execute[Execute Business Logic<br/>Wallet Debit/Credit]
+    Response[Return Response + Cache]
+
+    Request --> Nginx
+    Nginx -->|IP Whitelisted| RateLimit
+    Nginx -->|IP Not Whitelisted| Reject1[403 Forbidden]
+
+    RateLimit -->|Within Limit| APIKey
+    RateLimit -->|Exceeded| Reject2[429 Too Many Requests]
+
+    APIKey -->|Valid GP| Token
+    APIKey -->|Invalid GP| Reject3[401 Unauthorized]
+
+    Token -->|Valid Signature| Replay
+    Token -->|Invalid/Expired| Reject4[401 Invalid Token]
+
+    Replay -->|First Use| Cache
+    Replay -->|Already Used| Reject5[409 Replay Attack]
+
+    Cache -->|Cache Hit| Response
+    Cache -->|Cache Miss| DB
+
+    DB -->|Exists| Response
+    DB -->|New Transaction| Lock
+
+    Lock -->|Lock Acquired| Execute
+    Lock -->|Lock Timeout| Reject6[503 System Busy]
+
+    Execute --> Response
+
+    style Nginx fill:#e1f5ff
+    style RateLimit fill:#e1f5ff
+    style APIKey fill:#fff4e6
+    style Token fill:#fff4e6
+    style Replay fill:#ffe6e6
+    style Cache fill:#e6ffe6
+    style DB fill:#e6ffe6
+    style Lock fill:#e6ffe6
+    style Execute fill:#f3e5f5
+    style Response fill:#f3e5f5
+```
+
+**Security Layer Responsibilities**:
+
+1. **Network Security (Layer 1)**:
+   - IP Whitelisting: Nginx `geo` module blocks unauthorized source IPs
+   - Rate Limiting: Redisson rate limiter prevents DDoS and abuse
+
+2. **Authentication (Layer 2)**:
+   - API Key: Validates GP identity via `X-GP-ID` header
+   - Token: HMAC-SHA256 signature verification with constant-time comparison
+
+3. **Anti-Replay (Layer 3)**:
+   - Redis blacklist prevents token reuse within 5-minute validity window
+   - SHA256 token hash reduces Redis key size
+
+4. **Idempotency (Layer 4)**:
+   - Redis Cache: O(1) lookup for duplicate requests (<5ms)
+   - DB Unique Constraint: Prevents double-execution at database level
+   - Distributed Lock: Prevents race conditions for concurrent first-time execution
+
+**Performance Characteristics**:
+- Cache hit (Layer 4.1): ~5ms response time
+- DB hit (Layer 4.2): ~15ms response time
+- New transaction (Layer 4.3): ~50-100ms (includes lock acquisition + business logic)
+
 ---
 
 ## 2. Token-Based Authentication
