@@ -796,7 +796,129 @@ public class MFAEnforcementService {
 
 ---
 
-## 6. Related Documents
+## 6. MFA Challenge-Response Flow
+
+### 6.1 End-to-End MFA Verification Sequence
+
+The following diagram illustrates the complete MFA challenge-response flow from initial login to successful authentication:
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant A as Auth Controller
+    participant M as MFA Service
+    participant L as MFA Audit Logger
+    participant DB as PostgreSQL
+
+    Note over U,DB: Phase 1: Primary Authentication
+    U->>F: Login with username + password
+    F->>A: POST /api/auth/login
+    A->>A: Verify credentials
+
+    alt Credentials Invalid
+        A-->>F: 401 Unauthorized
+        F-->>U: Display error
+    end
+
+    Note over U,DB: Phase 2: MFA Challenge
+    A->>M: checkMFARequired(userId)
+    M->>DB: SELECT * FROM t_user_mfa WHERE user_id = ?
+    DB-->>M: MFA config (enabled, method)
+
+    alt MFA Required
+        M->>A: MFA Required: TOTP
+        A-->>F: 200 OK + requiresMFA: true + sessionToken
+        F-->>U: Display MFA input form
+
+        Note over U,DB: Phase 3: MFA Code Submission
+        U->>F: Enter TOTP code (6-digit)
+        F->>A: POST /api/auth/mfa/verify<br/>{sessionToken, code}
+
+        A->>M: verifyMFACode(userId, code)
+        M->>DB: SELECT totp_secret FROM t_user_mfa
+        DB-->>M: Encrypted TOTP secret
+        M->>M: Decrypt secret (AES-256-GCM)
+        M->>M: Generate expected TOTP<br/>(time window ±1)
+
+        alt Code Valid
+            M->>L: log(MFA_LOGIN_SUCCESS)
+            L->>DB: INSERT INTO t_mfa_audit_log
+            M-->>A: Verification Success
+            A->>A: Generate JWT access token
+            A-->>F: 200 OK + accessToken + refreshToken
+            F-->>U: Redirect to dashboard
+        else Code Invalid
+            M->>L: log(MFA_LOGIN_FAILED)
+            L->>DB: INSERT INTO t_mfa_audit_log
+            M->>M: Increment failedAttempts
+
+            alt Failed Attempts >= 3
+                M->>M: Lock account (15 minutes)
+                M->>L: log(MFA_ACCOUNT_LOCKED)
+                M-->>A: Account Locked
+                A-->>F: 423 Locked + lockedUntil
+                F-->>U: Account locked message
+            else Failed Attempts < 3
+                M-->>A: Invalid Code (attemptsRemaining)
+                A-->>F: 401 Unauthorized + attemptsRemaining
+                F-->>U: Display error + retry
+            end
+        end
+    else MFA Not Required
+        A->>A: Generate JWT access token
+        A-->>F: 200 OK + accessToken
+        F-->>U: Redirect to dashboard
+    end
+
+    Note over U,DB: Optional: Backup Code Fallback
+    U->>F: Click "Use backup code"
+    F->>A: POST /api/auth/mfa/backup-code<br/>{sessionToken, backupCode}
+    A->>M: verifyBackupCode(userId, backupCode)
+    M->>DB: SELECT * FROM t_mfa_backup_code<br/>WHERE user_id = ? AND used = FALSE
+    DB-->>M: List of backup codes (encrypted)
+    M->>M: Decrypt each code (AES-256-GCM)
+    M->>M: Compare with input
+
+    alt Backup Code Valid
+        M->>DB: UPDATE t_mfa_backup_code<br/>SET used = TRUE, used_at = NOW()
+        M->>L: log(MFA_BACKUP_CODE_USED)
+        M-->>A: Verification Success
+        A-->>F: 200 OK + accessToken
+        F-->>U: Redirect to dashboard
+    else Backup Code Invalid
+        M->>L: log(MFA_LOGIN_FAILED)
+        M-->>A: Invalid Backup Code
+        A-->>F: 401 Unauthorized
+        F-->>U: Display error
+    end
+```
+
+### 6.2 Key Security Measures
+
+**Time-Based Window (TOTP)**:
+- Accept codes from T-30s to T+30s (±1 time step)
+- Prevents replay attacks via time-based invalidation
+- 30-second window = 3 valid codes at any time (T-1, T, T+1)
+
+**Account Lockout**:
+- 3 failed attempts → 15-minute lockout
+- Lockout duration stored in Redis (expires automatically)
+- Prevents brute-force attacks
+
+**Backup Code Single-Use**:
+- Each backup code can only be used once
+- `used` flag set to TRUE in database after verification
+- User receives notification when backup code is used
+
+**Audit Trail**:
+- Every MFA attempt logged to PostgreSQL + Kafka
+- JSONB storage for flexible event data
+- 90-day retention for login events, 365 days for security alerts
+
+---
+
+## 7. Related Documents
 
 ### Business Requirements
 - [MFA_Compliance_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md) - Backup code specs, recovery flow, audit requirements
