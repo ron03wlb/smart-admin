@@ -310,6 +310,72 @@ public void relayOutboxEvents() {
 
 ## 3. Payment Gateway Integration
 
+### 3.0 Payment Processing End-to-End Flow
+
+The following sequence diagram illustrates the complete payment processing flow from deposit initiation through gateway interaction to final wallet crediting:
+
+```mermaid
+sequenceDiagram
+    participant Player
+    participant DepositService
+    participant DepositOrderDao
+    participant PaymentGateway
+    participant WalletService
+    participant WalletDao
+    participant NotificationService
+
+    Player->>DepositService: createDepositOrder(amount, paymentMethod)
+
+    Note over DepositService: 1. Create Order (PENDING)
+    DepositService->>DepositOrderDao: insert(order)
+    DepositOrderDao-->>DepositService: orderId
+
+    Note over DepositService,PaymentGateway: 2. Submit to Gateway
+    DepositService->>PaymentGateway: createDeposit(request)
+    PaymentGateway-->>DepositService: gatewayOrderId, paymentUrl
+
+    DepositService->>DepositOrderDao: updateGatewayOrderId(orderId, gatewayOrderId)
+    DepositService-->>Player: paymentUrl (redirect/QR code)
+
+    Player->>PaymentGateway: Complete Payment (external flow)
+
+    Note over PaymentGateway,DepositService: 3. Callback Processing
+    PaymentGateway->>DepositService: handleDepositCallback(gatewayOrderId, status, signature)
+
+    alt Signature Invalid
+        DepositService-->>PaymentGateway: 400 Invalid Signature
+    else Signature Valid
+        DepositService->>DepositOrderDao: findByGatewayOrderId(gatewayOrderId)
+
+        alt Order Already SUCCESS (Idempotency)
+            DepositService-->>PaymentGateway: 200 Already Processed
+        else Order PENDING
+            DepositService->>DepositOrderDao: updateStatus(orderId, SUCCESS)
+
+            Note over DepositService,WalletService: 4. Credit Wallet
+            DepositService->>WalletService: creditWallet(playerId, amount, "DEPOSIT:"+orderId)
+            WalletService->>WalletDao: incrementBalance(playerId, amount)
+            WalletDao-->>WalletService: success
+            WalletService-->>DepositService: wallet credited
+
+            Note over DepositService,NotificationService: 5. Notification
+            DepositService->>NotificationService: sendDepositSuccessNotification(order)
+            NotificationService-->>Player: Email/SMS/Push notification
+
+            DepositService-->>PaymentGateway: 200 Deposit Processed
+        end
+    end
+```
+
+**Key Implementation Notes**:
+1. **Order Creation**: Status starts as `PENDING`, gateway order ID recorded after gateway response
+2. **Signature Verification**: HMAC-SHA256 signature check prevents unauthorized callbacks
+3. **Idempotency**: Duplicate callbacks return success without re-crediting wallet
+4. **Transactional Consistency**: Wallet credit and order status update occur in single transaction
+5. **Async Notification**: Email/SMS sent after transaction commit to avoid blocking
+
+---
+
 ### 3.1 Gateway Interface Definition
 
 ```java
