@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: Executives, Product Managers, Operations Leads, Compliance Officers
-> **Related Architecture**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
+> **Related Doc**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (HMAC-SHA256, TLS, Type A/B/C classifications, HTTP status codes) moved to Architecture layer. This document focuses on business requirements only.
@@ -11,26 +11,24 @@
 
 ## Business Value
 
-This standards document delivers strategic value by:
-- **Player Experience**: Defines Seamless Wallet architecture enabling players to access any integrated game without manual fund transfers
-- **Platform Protection**: Establishes RTP automatic suspension thresholds (RTP >200% AND Net Loss >$10K triggers auto-disable) to prevent catastrophic losses from GP bugs
-- **Operational Efficiency**: Specifies new game onboarding in <5 business days with standardized certification requirements
-- **Revenue Assurance**: Documents jackpot handling to correctly attribute network jackpots (GP-funded) vs normal wins (merchant-funded), preventing merchant insolvency
+This Game Integration Standard delivers critical business value by:
+- **Player Experience**: Seamless wallet architecture eliminates manual fund transfers between game wallets, reducing friction and improving retention
+- **Risk Protection**: RTP automatic suspension prevents catastrophic losses from game provider bugs or odds misconfiguration (e.g., guaranteed-win glitches)
+- **Time-to-Market**: Fast onboarding process (< 5 business days) enables rapid game catalog expansion and competitive game portfolio
+- **Financial Safety**: Jackpot verification workflow prevents merchant insolvency by correctly distinguishing GP-funded wins from merchant-funded wins
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] All GP integrations satisfy communication standards (RESTful API, encrypted transport, IP whitelist, cryptographic signatures)
-- [ ] GetBalance, Transaction (Bet/Win), and CheckToken endpoints function correctly for all integrated providers
-- [ ] Duplicate requests with same transaction ID never result in duplicate charges (idempotency test)
-- [ ] API timeout handling marks transactions as "Pending" and queries final status (no direct rollback)
-- [ ] Jackpot transactions are correctly identified and frozen pending GP verification
-- [ ] RTP monitoring triggers warning alert at RTP >120% AND Net Loss >$5K (5-min window)
-- [ ] RTP monitoring auto-disables game at RTP >200% AND Net Loss >$10K (5-min window)
-- [ ] Game provider integration achieves API uptime ≥99.9%
-- [ ] Transaction processing latency <200ms P95
-- [ ] Game launch success rate >99.5%
+- [ ] All game provider integrations pass certification checklist (API compliance, edge case handling, currency normalization, jackpot handling)
+- [ ] Circuit breaker automatically suspends games when RTP > 200% AND Net Loss > $10,000 in a 5-minute window
+- [ ] API uptime meets ≥ 99.9% SLA target with transaction latency < 200ms P95
+- [ ] Jackpot wins are correctly identified and isolated from merchant quota (network jackpots do NOT deduct from merchant balance)
+- [ ] New game providers complete onboarding within 5 business days after GP certification
+- [ ] Duplicate transaction IDs return success without re-processing (idempotency guarantee)
+- [ ] API timeout scenarios mark transactions as "Pending" and query final status via QueryStatus (no direct rollback)
+- [ ] Player experience during circuit break: in-game players see maintenance message, lobby players see greyed-out game icons
 
 ---
 
