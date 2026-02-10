@@ -39,7 +39,31 @@ Session Protection encompasses three complementary player protection tools: Cool
 
 ---
 
-## 2. Cooling-Off Period (Time-Out)
+## 2. Business Value
+
+This feature delivers value by:
+- **Multi-Jurisdictional Compliance**: Satisfies UKGC, Sweden, and Germany mandatory session management regulations (UKGC 60-min break after 10 deposits, Germany 5-min break per 60-min play, Sweden session limit options), preventing penalties and maintaining operating licenses
+- **Player Retention via Awareness**: Reality checks with session P&L display increase player self-awareness (target >20% stop rate), reducing impulsive gambling and supporting long-term player retention by fostering responsible play habits
+- **Risk Detection Layer**: Identifies vulnerable behavior patterns (10+ fast reality check continues <5 sec, gaming time >4h, >50% deposit lost immediately) for proactive intervention via affordability assessment or care messages, preventing escalation to problem gambling
+- **Flexible Protection Spectrum**: Offers graduated protection from light interventions (15-min reality checks, idle timeout) to strong controls (6-week cooling-off, mandatory breaks), allowing players to self-regulate while meeting regulatory minimums
+
+---
+
+## 3. Acceptance Criteria
+
+- [ ] **Cooling-Off Immediate Activation**: Player-initiated cooling-off (24h-6 weeks) activates immediately with no additional confirmation - all gaming sessions closed, open bets preserved, withdrawals allowed, deposits/betting prohibited
+- [ ] **Auto-Release on Expiry**: Cooling-off periods auto-release at expiry time (UTC 23:59:59 for custom durations) with email/push notification sent - account fully restored without player action required
+- [ ] **UKGC Mandatory Break (10 Deposits)**: UK players with 10+ deposits within 24 hours trigger 60-minute mandatory break - gaming prohibited during break, countdown timer displayed
+- [ ] **Germany Mandatory Break (60-Min Play)**: German players after 60 minutes continuous play trigger 5-minute mandatory break - must complete break before continuing
+- [ ] **Reality Check Interval Options**: Players can select reality check intervals (15/30/60 minutes or not set) - popup displays session time + net P&L (clearly show losses as negative) + action options (continue/stop/set limits/view history)
+- [ ] **Game Round Preservation**: Reality checks and idle timeout WAIT for active game round to complete before displaying - preserves game integrity, displays immediately after round completion
+- [ ] **Auto-Play Pause on Reality Check**: During auto-play mode, reality check pauses auto-play and displays popup - player may resume auto-play after acknowledgment
+- [ ] **Risk Behavior Flagging**: System detects and flags high-risk patterns - 10+ consecutive fast reality check continues (<5 sec), gaming time >4h, loss >$1,000 with continue, >50% deposit lost immediately - triggers suggested actions (increase frequency, care message, affordability assessment)
+- [ ] **Idle Timeout Auto-Logout**: 30 minutes inactivity (configurable 15-60 min) triggers auto-logout - active game rounds excluded from idle time calculation
+
+---
+
+## 4. Cooling-Off Period (Time-Out)
 
 ### 2.1 Purpose and Distinction from Self-Exclusion
 
