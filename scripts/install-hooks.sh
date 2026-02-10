@@ -433,7 +433,7 @@ run_check() {
     local args=("$@")
 
     if [[ -x "$PROJECT_ROOT/$script" ]]; then
-        "$PROJECT_ROOT/$script" "${args[@]}" > "$RESULT_DIR/$key.log" 2>&1
+        "$PROJECT_ROOT/$script" ${args[@]+"${args[@]}"} > "$RESULT_DIR/$key.log" 2>&1
         echo $? > "$RESULT_DIR/$key.exit"
     else
         echo "skipped" > "$RESULT_DIR/$key.exit"
