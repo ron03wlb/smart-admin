@@ -9,6 +9,26 @@
 
 ---
 
+## Acceptance Criteria
+
+- [ ] Platform supports all four transaction models (Transaction-Based, Round-Based, Transfer-Based, Result-Only)
+- [ ] Round lifecycle management correctly handles all states (OPEN, CLOSED, TIMEOUT, PENDING_REVIEW, CANCELLED, ADJUSTED)
+- [ ] Orphaned round detection runs every 15 minutes and escalates rounds open > 2 hours
+- [ ] Idempotency enforcement prevents duplicate credits for retries with same txId (100% accuracy)
+- [ ] Out-of-order handling uses Strategy 3 (Temporary Storage) with 30-minute expiry and auto-degradation under pressure
+- [ ] Concurrent betting prevents over-deduction via distributed lock with < 200ms response time
+- [ ] Insufficient funds returns error with < 100ms response time (P0 priority)
+- [ ] Negative balance handling locks account immediately and triggers P2 risk alert
+- [ ] Free Spin quota validation rejects expired quotas with "Free Spin Quota Exceeded" error
+- [ ] Dual-wallet deduction follows configured priority (default: Bonus → Cash → Credit) with mixed deduction support
+- [ ] Win requests with expired player tokens are accepted (player rightful asset regardless of settlement timing)
+- [ ] Jackpot wins > $10,000 trigger manual approval mode or auto-credit with account freeze based on GP agreement
+- [ ] Daily reconciliation generates automated Diff Reports for mismatched transaction IDs and amounts
+- [ ] All GP integrations enforce mandatory TransactionId (reject requests missing required field)
+- [ ] Monitoring KPIs meet targets (out-of-order < 0.1%, pending < 100, timeout escalation < 1%, insufficient funds alert > 30%)
+
+---
+
 ## 1. Purpose
 
 This document defines the business rules, policies, and operational requirements for the Seamless Wallet (Single Wallet) integration with Game Providers (GP). It covers transaction types, settlement rules, player-facing policies, risk scenarios, and compliance requirements.
