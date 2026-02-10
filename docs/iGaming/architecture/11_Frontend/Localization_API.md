@@ -21,6 +21,44 @@
 | **POST** | `/api/v1/i18n/missing-keys` | Report missing key | Public |
 | **POST** | `/api/v1/i18n/translations/{key}/publish` | Publish to CDN | Publisher |
 
+### 1.1 Localization API Architecture
+
+```mermaid
+graph TB
+    Client[Client<br/>Browser/App] --> LB[Load Balancer]
+    LB --> API1[Localization API<br/>Instance 1]
+    LB --> API2[Localization API<br/>Instance 2]
+
+    API1 --> L1Cache[L1: Local Memory Cache<br/>TTL: 5 min]
+    API2 --> L1Cache2[L1: Local Memory Cache<br/>TTL: 5 min]
+
+    L1Cache --> L2Cache[L2: Redis Cache<br/>TTL: 30 min]
+    L1Cache2 --> L2Cache
+
+    L2Cache --> DB[(PostgreSQL<br/>localization_keys<br/>localization_values)]
+
+    API1 --> CDN[CDN Edge Cache<br/>CloudFlare/Akamai]
+    API2 --> CDN
+
+    CDN --> StaticFiles[Static Translation Files<br/>/i18n/zh-TW/game.v7.json]
+
+    DB --> Publisher[Publisher Service]
+    Publisher --> CDN
+
+    subgraph Fallback Chain
+        L1Cache -.->|Cache Miss| L2Cache
+        L2Cache -.->|Cache Miss| DB
+        DB -.->|Key Not Found| Fallback[Fallback to 'en']
+    end
+
+    subgraph Monitoring
+        API1 --> Prometheus[Prometheus Metrics]
+        API2 --> Prometheus
+        Prometheus --> Grafana[Grafana Dashboard]
+        Prometheus --> AlertManager[AlertManager]
+    end
+```
+
 ## 2. API Specifications
 
 ### 2.1 Get Translation List
@@ -209,3 +247,113 @@ groups:
 | **Customer Service** | API Call + JSONB | CS Templates -> i18n API |
 | **Notification Architecture** | API Call | Notification Service -> i18n API |
 | **Audit Log** | Event Subscription | i18n API -> Audit Log |
+
+## 7. Database Schema
+
+### 7.1 localization_keys
+
+```sql
+CREATE TABLE localization_keys (
+    key_id BIGSERIAL PRIMARY KEY,
+    key_name VARCHAR(200) UNIQUE NOT NULL,  -- e.g., 'game.slot.freespin_won'
+    namespace VARCHAR(50) NOT NULL,  -- e.g., 'game', 'bonus', 'common'
+    context TEXT,  -- Description for translators (e.g., "Slot game win notification")
+
+    -- Default value and metadata
+    default_value TEXT NOT NULL,  -- Default English text
+    data_type VARCHAR(20) DEFAULT 'text' CHECK (data_type IN ('text', 'html', 'markdown', 'pluralized')),
+    placeholders TEXT[],  -- e.g., ['{amount}', '{currency}']
+
+    -- Usage tracking
+    first_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    usage_count BIGINT DEFAULT 0,
+
+    -- Status
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'deprecated', 'archived')),
+    deprecation_note TEXT,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT REFERENCES t_employee(employee_id)
+);
+
+CREATE INDEX idx_loc_keys_namespace ON localization_keys(namespace, status);
+CREATE INDEX idx_loc_keys_status ON localization_keys(status, last_used_at);
+CREATE INDEX idx_loc_keys_name ON localization_keys(key_name);
+```
+
+### 7.2 localization_values
+
+```sql
+CREATE TABLE localization_values (
+    value_id BIGSERIAL PRIMARY KEY,
+    key_id BIGINT NOT NULL REFERENCES localization_keys(key_id),
+    language_code VARCHAR(10) NOT NULL,  -- ISO 639-1 + ISO 3166-1 (e.g., 'zh-TW')
+    translated_value TEXT NOT NULL,
+
+    -- Translation metadata
+    translation_method VARCHAR(20) DEFAULT 'manual' CHECK (translation_method IN ('manual', 'machine', 'hybrid', 'imported')),
+    translator_id BIGINT REFERENCES t_employee(employee_id),
+    reviewed_by BIGINT REFERENCES t_employee(employee_id),
+
+    -- Quality assurance
+    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'review', 'approved', 'published', 'rejected')),
+    character_count INT GENERATED ALWAYS AS (LENGTH(translated_value)) STORED,
+    quality_score DECIMAL(3,2),  -- 0.00-1.00 (machine translation confidence or QA score)
+
+    -- Version control
+    version INT DEFAULT 1,
+    is_latest BOOLEAN DEFAULT TRUE,
+
+    -- Publishing
+    published_at TIMESTAMP WITH TIME ZONE,
+    cdn_url TEXT,  -- e.g., 'https://cdn.casino.com/i18n/zh-TW/game.v7.json'
+    cdn_version INT,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(key_id, language_code, version)
+);
+
+CREATE INDEX idx_loc_values_key_lang ON localization_values(key_id, language_code);
+CREATE INDEX idx_loc_values_status ON localization_values(status, is_latest);
+CREATE INDEX idx_loc_values_published ON localization_values(published_at, cdn_version);
+CREATE INDEX idx_loc_values_translator ON localization_values(translator_id);
+```
+
+### 7.3 missing_translation_keys
+
+```sql
+CREATE TABLE missing_translation_keys (
+    report_id BIGSERIAL PRIMARY KEY,
+    key_name VARCHAR(200) NOT NULL,
+    namespace VARCHAR(50),
+    language_code VARCHAR(10) NOT NULL,
+
+    -- Context
+    page_url TEXT,
+    user_agent TEXT,
+    player_id BIGINT REFERENCES t_player(player_id),
+
+    -- Frequency tracking
+    first_reported_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_reported_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    report_count INT DEFAULT 1,
+
+    -- Resolution
+    resolved BOOLEAN DEFAULT FALSE,
+    resolved_at TIMESTAMP WITH TIME ZONE,
+    resolved_by BIGINT REFERENCES t_employee(employee_id)
+);
+
+CREATE INDEX idx_missing_keys_lang ON missing_translation_keys(language_code, resolved);
+CREATE INDEX idx_missing_keys_count ON missing_translation_keys(report_count DESC, resolved);
+CREATE INDEX idx_missing_keys_namespace ON missing_translation_keys(namespace, resolved);
+```
+
+**Cache Strategy**:
+- L1 (Memory): 5-minute TTL, per-instance cache
+- L2 (Redis): 30-minute TTL, shared across instances
+- CDN: 1-hour edge cache, purged on publish events
