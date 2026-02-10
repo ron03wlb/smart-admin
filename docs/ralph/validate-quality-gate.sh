@@ -5,7 +5,9 @@
 
 set -uo pipefail
 
-PROJECT_ROOT="/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin"
+# Get project root from script location (portable)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 IGAMING_DIR="$PROJECT_ROOT/docs/iGaming"
 ARCH_DIR="$IGAMING_DIR/architecture"
 REQ_DIR="$IGAMING_DIR/requirements"
