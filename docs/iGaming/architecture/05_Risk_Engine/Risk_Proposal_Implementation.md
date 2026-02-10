@@ -17,6 +17,92 @@
 
 ---
 
+## 1.1 Async Risk Proposal Lifecycle
+
+The risk proposal workflow follows an asynchronous pattern, allowing reviewers to process proposals independently from the triggering event (e.g., withdrawal request).
+
+```mermaid
+sequenceDiagram
+    participant W as Withdrawal Service
+    participant R as Risk Engine
+    participant P as Risk Proposal Service
+    participant Q as Review Queue
+    participant Rev as Reviewer
+    participant M as Manager Layer
+    participant K as Kafka
+
+    %% 1. Create Proposal
+    W->>R: Trigger risk check (withdrawal)
+    R->>R: Detect suspicious pattern
+    R->>P: Create risk proposal
+    P->>P: Calculate priority (URGENT/HIGH/MEDIUM/LOW)
+    P->>Q: Add to review queue
+    P->>K: Publish "proposal.created" event
+    P-->>W: Return proposal ID (async)
+
+    %% 2. Review Process
+    Rev->>Q: Query pending proposals (sorted by priority)
+    Q-->>Rev: Return proposal list
+    Rev->>P: Claim task (proposalId, reviewerId)
+    P->>P: Update status to "IN_REVIEW"
+
+    Rev->>Rev: Analyze proposal (review notes, evidence)
+
+    alt Approve
+        Rev->>P: Submit APPROVE decision
+        P->>M: approveProposalWithTransaction
+        M->>M: Update proposal status to "APPROVED"
+        M->>W: Unfreeze amount, continue withdrawal
+        M->>K: Publish "proposal.approved" event
+        M-->>P: Success
+        P-->>Rev: 200 OK
+    else Reject
+        Rev->>P: Submit REJECT decision
+        P->>M: rejectProposalWithTransaction
+        M->>M: Update proposal status to "REJECTED"
+        M->>W: Execute deduction compensation
+        M->>K: Publish "proposal.rejected" event
+        M-->>P: Success
+        P-->>Rev: 200 OK
+    else Partial Approve
+        Rev->>P: Submit PARTIAL_APPROVE decision
+        P->>M: partialApproveProposalWithTransaction
+        M->>M: Update proposal status to "PARTIAL_APPROVED"
+        M->>W: Unfreeze approved amount
+        M->>W: Deduct rejected amount
+        M->>K: Publish "proposal.partial_approved" event
+        M-->>P: Success
+        P-->>Rev: 200 OK
+    else Escalate
+        Rev->>P: Submit ESCALATE decision
+        P->>M: escalateProposalWithTransaction
+        M->>M: Update status to "ESCALATED", priority to "URGENT"
+        M->>Q: Notify senior analysts
+        M->>K: Publish "proposal.escalated" event
+        M-->>P: Success
+        P-->>Rev: 200 OK
+    end
+
+    %% 3. SLA Timeout Handling
+    Note over P: Scheduled task (every 5 min)
+    P->>P: Check SLA expiration (per-priority)
+    alt LOW priority timeout
+        P->>M: Auto-approve (unfreezeAmount)
+        M->>K: Publish "proposal.auto_approved" event
+    else URGENT/HIGH/MEDIUM timeout
+        P->>M: Auto-reject (executeDeduction)
+        M->>K: Publish "proposal.auto_rejected" event
+    end
+```
+
+**Key Characteristics**:
+- **Asynchronous**: Withdrawal service does NOT block on proposal creation
+- **Priority-driven**: Queue sorted by priority + creation time
+- **SLA-enforced**: Auto-approve (LOW) or auto-reject (URGENT/HIGH/MEDIUM) on timeout
+- **Event-driven**: All state changes publish Kafka events for audit/analytics
+
+---
+
 ## 2. Review Queue Management
 
 ### 2.1 Priority Calculation Service
@@ -1414,3 +1500,160 @@ All state changes publish Kafka events for downstream consumers:
 - **@Transactional ONLY in Manager layer** (NEVER in Service/Controller)
 - **Constructor injection** via `@RequiredArgsConstructor` + `private final`
 - **Boolean field naming**: `deleted` (NOT `isDeleted`)
+
+---
+
+## 9. Database Schema
+
+### 9.1 Risk Proposals Table
+
+The `risk_proposals` table stores all risk proposal records with priority-based SLA tracking.
+
+```sql
+CREATE TABLE risk_proposals (
+    proposal_id BIGSERIAL PRIMARY KEY,
+    proposal_no VARCHAR(50) NOT NULL UNIQUE,
+    player_id BIGINT NOT NULL,
+    withdrawal_request_id BIGINT, -- Nullable if not triggered by withdrawal
+    risk_type VARCHAR(50) NOT NULL, -- SUSPICIOUS_BET, HIGH_WIN_RATE, ABNORMAL_WITHDRAWAL, etc.
+    suspicious_amount NUMERIC(15, 2) NOT NULL CHECK (suspicious_amount > 0),
+    approved_amount NUMERIC(15, 2) DEFAULT 0 CHECK (approved_amount >= 0),
+    priority VARCHAR(20) NOT NULL CHECK (priority IN ('URGENT', 'HIGH', 'MEDIUM', 'LOW')),
+    status VARCHAR(30) NOT NULL CHECK (status IN ('PENDING_REVIEW', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'PARTIAL_APPROVED', 'ESCALATED', 'AUTO_APPROVED', 'AUTO_REJECTED')),
+    reviewer_id BIGINT, -- Assigned reviewer (nullable if not claimed)
+    reviewed_at TIMESTAMP, -- Nullable until reviewed
+    review_notes TEXT,
+    escalation_reason TEXT, -- Nullable unless escalated
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT fk_risk_proposals_player FOREIGN KEY (player_id) REFERENCES players(player_id),
+    CONSTRAINT fk_risk_proposals_withdrawal FOREIGN KEY (withdrawal_request_id) REFERENCES withdrawal_requests(request_id),
+    CONSTRAINT fk_risk_proposals_reviewer FOREIGN KEY (reviewer_id) REFERENCES admin_users(user_id)
+);
+
+CREATE INDEX idx_risk_proposals_player_id ON risk_proposals(player_id);
+CREATE INDEX idx_risk_proposals_status ON risk_proposals(status) WHERE deleted = false;
+CREATE INDEX idx_risk_proposals_priority_created ON risk_proposals(priority DESC, created_at ASC) WHERE status IN ('PENDING_REVIEW', 'IN_REVIEW', 'ESCALATED');
+CREATE INDEX idx_risk_proposals_reviewer_id ON risk_proposals(reviewer_id) WHERE reviewer_id IS NOT NULL;
+CREATE INDEX idx_risk_proposals_withdrawal_id ON risk_proposals(withdrawal_request_id) WHERE withdrawal_request_id IS NOT NULL;
+CREATE INDEX idx_risk_proposals_created_at ON risk_proposals(created_at DESC);
+
+COMMENT ON TABLE risk_proposals IS 'Risk proposal records with async review workflow, priority-based SLA enforcement';
+COMMENT ON COLUMN risk_proposals.priority IS 'Priority level: URGENT (1h SLA), HIGH (2h), MEDIUM (24h), LOW (48h)';
+COMMENT ON COLUMN risk_proposals.approved_amount IS 'Approved amount after review (0 if rejected, partial if PARTIAL_APPROVED, full if APPROVED)';
+COMMENT ON COLUMN risk_proposals.escalation_reason IS 'Reason for escalating to senior analyst (required if status = ESCALATED)';
+```
+
+### 9.2 Risk Proposal Reviews Table
+
+The `risk_proposal_reviews` table stores detailed review history for audit purposes.
+
+```sql
+CREATE TABLE risk_proposal_reviews (
+    review_id BIGSERIAL PRIMARY KEY,
+    proposal_id BIGINT NOT NULL REFERENCES risk_proposals(proposal_id),
+    reviewer_id BIGINT NOT NULL REFERENCES admin_users(user_id),
+    review_action VARCHAR(30) NOT NULL CHECK (review_action IN ('CLAIM', 'APPROVE', 'REJECT', 'PARTIAL_APPROVE', 'ESCALATE', 'AUTO_APPROVE', 'AUTO_REJECT')),
+    approved_amount NUMERIC(15, 2), -- Nullable for CLAIM/ESCALATE actions
+    rejected_amount NUMERIC(15, 2), -- Calculated for PARTIAL_APPROVE
+    review_notes TEXT,
+    escalation_reason TEXT, -- Nullable unless action = ESCALATE
+    review_duration_seconds INT, -- Time spent reviewing (calculated)
+    previous_status VARCHAR(30) NOT NULL, -- Status before this review
+    new_status VARCHAR(30) NOT NULL, -- Status after this review
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT fk_risk_proposal_reviews_proposal FOREIGN KEY (proposal_id) REFERENCES risk_proposals(proposal_id)
+);
+
+CREATE INDEX idx_risk_proposal_reviews_proposal_id ON risk_proposal_reviews(proposal_id);
+CREATE INDEX idx_risk_proposal_reviews_reviewer_id ON risk_proposal_reviews(reviewer_id);
+CREATE INDEX idx_risk_proposal_reviews_review_action ON risk_proposal_reviews(review_action);
+CREATE INDEX idx_risk_proposal_reviews_created_at ON risk_proposal_reviews(created_at DESC);
+
+COMMENT ON TABLE risk_proposal_reviews IS 'Complete audit trail of all risk proposal review actions (claim, approve, reject, escalate)';
+COMMENT ON COLUMN risk_proposal_reviews.review_action IS 'Action taken: CLAIM (assign to self), APPROVE, REJECT, PARTIAL_APPROVE, ESCALATE, AUTO_APPROVE/AUTO_REJECT (SLA timeout)';
+COMMENT ON COLUMN risk_proposal_reviews.review_duration_seconds IS 'Time from CLAIM to decision (in seconds), for performance metrics';
+```
+
+### 9.3 Example Queries
+
+**Query pending proposals sorted by priority**:
+```sql
+SELECT
+    rp.proposal_id,
+    rp.proposal_no,
+    rp.player_id,
+    rp.risk_type,
+    rp.suspicious_amount,
+    rp.priority,
+    rp.status,
+    rp.created_at,
+    EXTRACT(EPOCH FROM (NOW() - rp.created_at)) AS wait_time_seconds
+FROM risk_proposals rp
+WHERE rp.status IN ('PENDING_REVIEW', 'ESCALATED')
+  AND rp.deleted = false
+ORDER BY
+    CASE rp.priority
+        WHEN 'URGENT' THEN 1
+        WHEN 'HIGH' THEN 2
+        WHEN 'MEDIUM' THEN 3
+        WHEN 'LOW' THEN 4
+    END ASC,
+    rp.created_at ASC
+LIMIT 50;
+```
+
+**Query reviewer performance metrics**:
+```sql
+SELECT
+    rpr.reviewer_id,
+    au.username AS reviewer_name,
+    COUNT(*) AS total_reviews,
+    COUNT(*) FILTER (WHERE rpr.review_action = 'APPROVE') AS approve_count,
+    COUNT(*) FILTER (WHERE rpr.review_action = 'REJECT') AS reject_count,
+    COUNT(*) FILTER (WHERE rpr.review_action = 'PARTIAL_APPROVE') AS partial_approve_count,
+    COUNT(*) FILTER (WHERE rpr.review_action = 'ESCALATE') AS escalate_count,
+    ROUND(AVG(rpr.review_duration_seconds), 2) AS avg_review_duration_seconds
+FROM risk_proposal_reviews rpr
+JOIN admin_users au ON rpr.reviewer_id = au.user_id
+WHERE rpr.created_at > NOW() - INTERVAL '30 days'
+  AND rpr.review_action IN ('APPROVE', 'REJECT', 'PARTIAL_APPROVE', 'ESCALATE')
+GROUP BY rpr.reviewer_id, au.username
+ORDER BY total_reviews DESC;
+```
+
+**Query SLA violation candidates**:
+```sql
+SELECT
+    rp.proposal_id,
+    rp.proposal_no,
+    rp.priority,
+    rp.created_at,
+    CASE rp.priority
+        WHEN 'URGENT' THEN 1
+        WHEN 'HIGH' THEN 2
+        WHEN 'MEDIUM' THEN 24
+        WHEN 'LOW' THEN 48
+    END AS sla_hours,
+    EXTRACT(EPOCH FROM (NOW() - rp.created_at)) / 3600 AS elapsed_hours,
+    ROUND((EXTRACT(EPOCH FROM (NOW() - rp.created_at)) / 3600) /
+        CASE rp.priority
+            WHEN 'URGENT' THEN 1
+            WHEN 'HIGH' THEN 2
+            WHEN 'MEDIUM' THEN 24
+            WHEN 'LOW' THEN 48
+        END * 100, 2) AS sla_usage_percentage
+FROM risk_proposals rp
+WHERE rp.status IN ('PENDING_REVIEW', 'IN_REVIEW', 'ESCALATED')
+  AND rp.deleted = false
+  AND EXTRACT(EPOCH FROM (NOW() - rp.created_at)) / 3600 >
+      CASE rp.priority
+          WHEN 'URGENT' THEN 0.75  -- 75% of 1 hour
+          WHEN 'HIGH' THEN 1.5     -- 75% of 2 hours
+          WHEN 'MEDIUM' THEN 18    -- 75% of 24 hours
+          WHEN 'LOW' THEN 36       -- 75% of 48 hours
+      END
+ORDER BY sla_usage_percentage DESC;
+```
