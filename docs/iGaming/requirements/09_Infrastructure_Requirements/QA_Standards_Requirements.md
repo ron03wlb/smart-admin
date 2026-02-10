@@ -1,9 +1,9 @@
 # 品質保證與測試驗收標準需求
 
 > **Canonical Source**: [09-04 QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md)
+> **Related Architecture**: [QA Standards Architecture](../../architecture/09_Infrastructure/QA_Standards.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [QA Standards Architecture](../../architecture/09_Infrastructure/QA_Standards.md)
 > **Last Synced**: 2026-02-09
 
 ---

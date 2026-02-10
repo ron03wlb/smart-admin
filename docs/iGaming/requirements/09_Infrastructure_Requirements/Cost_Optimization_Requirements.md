@@ -1,9 +1,9 @@
 # 基礎設施成本優化需求
 
 > **Canonical Source**: [09-10 Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
+> **Related Architecture**: [Cost Optimization Architecture](../../architecture/09_Infrastructure/Cost_Optimization_Architecture.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Cost Optimization Architecture](../../architecture/09_Infrastructure/Cost_Optimization_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---
