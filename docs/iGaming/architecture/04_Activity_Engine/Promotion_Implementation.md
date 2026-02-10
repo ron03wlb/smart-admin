@@ -39,6 +39,75 @@ Build configurable bonus type definitions, a rule engine for distribution logic,
 | Manager | @Transactional bonus distribution + wallet credit (atomic operation), @Cacheable campaign config |
 | Dao | Bonus record CRUD, campaign configuration queries via MyBatis Plus |
 
+### Bonus Processing Flow
+
+```mermaid
+graph TB
+    A[Player Triggers<br/>Bonus Claim] --> B{Eligibility<br/>Check}
+    B -->|Not Eligible| C[Return Error<br/>with Reason]
+    B -->|Eligible| D{Duplicate<br/>Check}
+    D -->|Already Claimed| E[Return Idempotent<br/>Response]
+    D -->|First Claim| F[Acquire Redisson<br/>Distributed Lock]
+    F --> G{Lock<br/>Acquired?}
+    G -->|No| H[Retry or<br/>Return Busy]
+    G -->|Yes| I[Manager: @Transactional]
+    I --> J[Create Bonus<br/>Record]
+    J --> K[Credit Bonus<br/>to Wallet]
+    K --> L[Initialize Wagering<br/>Requirement]
+    L --> M[Write Audit<br/>Log]
+    M --> N[Release Lock]
+    N --> O[Return Success<br/>ResponseDTO.ok]
+```
+
+### Database Schema
+
+```sql
+-- Promotion rule configuration
+CREATE TABLE promotion_rules (
+    id              BIGSERIAL PRIMARY KEY,
+    promotion_code  VARCHAR(64) NOT NULL UNIQUE,
+    promotion_name  VARCHAR(128) NOT NULL,
+    promotion_type  VARCHAR(32) NOT NULL,  -- FIRST_DEPOSIT, RELOAD, WAGERING, ACTIVITY
+    status          VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',  -- ACTIVE, PAUSED, EXPIRED
+    start_time      TIMESTAMP NOT NULL,
+    end_time        TIMESTAMP NOT NULL,
+    min_deposit     NUMERIC(18,2) DEFAULT 0,
+    bonus_rate      NUMERIC(8,4),          -- e.g. 1.0000 = 100% match
+    max_bonus       NUMERIC(18,2),
+    wagering_multi  NUMERIC(8,2) DEFAULT 1.00,  -- wagering multiplier
+    tenant_id       BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_promotion_rules_tenant_status ON promotion_rules(tenant_id, status);
+CREATE INDEX idx_promotion_rules_time ON promotion_rules(start_time, end_time);
+
+-- Player bonus claim records
+CREATE TABLE player_bonus_records (
+    id                  BIGSERIAL PRIMARY KEY,
+    player_id           BIGINT NOT NULL,
+    promotion_id        BIGINT NOT NULL REFERENCES promotion_rules(id),
+    claim_id            VARCHAR(64) NOT NULL UNIQUE,  -- idempotency key
+    bonus_amount        NUMERIC(18,2) NOT NULL,
+    wagering_required   NUMERIC(18,2) NOT NULL DEFAULT 0,
+    wagering_completed  NUMERIC(18,2) NOT NULL DEFAULT 0,
+    status              VARCHAR(16) NOT NULL DEFAULT 'PENDING',  -- PENDING, ACTIVE, COMPLETED, EXPIRED, CANCELLED
+    claimed_at          TIMESTAMP NOT NULL DEFAULT NOW(),
+    completed_at        TIMESTAMP,
+    expired_at          TIMESTAMP,
+    tenant_id           BIGINT NOT NULL,
+    created_at          TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted             BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE UNIQUE INDEX idx_player_bonus_dedup ON player_bonus_records(player_id, promotion_id, claim_id);
+CREATE INDEX idx_player_bonus_status ON player_bonus_records(player_id, status);
+CREATE INDEX idx_player_bonus_expiry ON player_bonus_records(status, expired_at) WHERE status = 'ACTIVE';
+```
+
 ### Key Technical Considerations
 
 - **Distributed Lock**: Use Redisson `RLock` to prevent concurrent duplicate claims

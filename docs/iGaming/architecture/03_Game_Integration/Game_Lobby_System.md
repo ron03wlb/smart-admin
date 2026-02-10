@@ -11,6 +11,34 @@
 
 The Game Lobby Service manages the player-facing game catalog, including metadata management, categorization, search, personalized recommendations, and multi-tenant game filtering. The system is designed for high-read, low-write workloads with aggressive caching.
 
+### Game Launch Interaction Flow
+
+```mermaid
+sequenceDiagram
+    participant P as Player
+    participant L as Lobby Service
+    participant C as Redis Cache
+    participant GP as Game Provider
+    participant W as Wallet Service
+
+    P->>L: GET /games?category=HOT
+    L->>C: Check cached game list
+    alt Cache Hit
+        C-->>L: Return cached list
+    else Cache Miss
+        L->>L: Query DB + build list
+        L->>C: Store in cache (TTL 15m)
+    end
+    L-->>P: Game list (ResponseDTO.ok)
+
+    P->>L: POST /games/{gameId}/launch
+    L->>W: Check player balance
+    W-->>L: Balance sufficient
+    L->>GP: Create game session
+    GP-->>L: Session URL + token
+    L-->>P: Redirect to game URL
+```
+
 ---
 
 ## 2. Game Metadata Sync Architecture
@@ -67,6 +95,47 @@ GameDiscoveryJob (every 4 hours)
 - `tags` (Array[String]) - System and operations tags
 - `status` (Enum) - `ENABLED`, `DISABLED`, `MAINTENANCE`
 - `supported_devices` (Array[Enum]) - `DESKTOP`, `MOBILE`
+
+### 2.3 Database Schema
+
+```sql
+-- Game category configuration (multi-tenant)
+CREATE TABLE game_categories (
+    id              BIGSERIAL PRIMARY KEY,
+    category_code   VARCHAR(32) NOT NULL,   -- HOT, NEW, JACKPOT, SLOT, LIVE
+    category_name   JSONB NOT NULL,         -- {"zh": "熱門", "en": "Hot Games"}
+    sort_order      INT NOT NULL DEFAULT 0,
+    icon_url        VARCHAR(512),
+    status          VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+    tenant_id       BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE UNIQUE INDEX idx_game_categories_tenant_code ON game_categories(tenant_id, category_code);
+
+-- Game provider configuration (per-tenant enablement)
+CREATE TABLE game_provider_configs (
+    id              BIGSERIAL PRIMARY KEY,
+    provider_code   VARCHAR(32) NOT NULL,   -- PG, PRAGMATIC, EVOLUTION
+    provider_name   VARCHAR(128) NOT NULL,
+    api_endpoint    VARCHAR(512) NOT NULL,
+    api_key         VARCHAR(256),           -- encrypted
+    status          VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',  -- ACTIVE, DISABLED, MAINTENANCE
+    sync_interval   INT NOT NULL DEFAULT 240,  -- minutes (default 4 hours)
+    last_synced_at  TIMESTAMP,
+    game_count      INT NOT NULL DEFAULT 0,
+    supported_currencies JSONB,             -- ["USD", "CNY", "THB"]
+    tenant_id       BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE UNIQUE INDEX idx_provider_configs_tenant ON game_provider_configs(tenant_id, provider_code);
+CREATE INDEX idx_provider_configs_status ON game_provider_configs(status);
+```
 
 ---
 

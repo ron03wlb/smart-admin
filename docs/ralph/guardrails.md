@@ -50,7 +50,19 @@
 - The Edit tool requires prior Read — will fail otherwise
 - Check existing headers to avoid duplicating cross-references
 
+### P9: Always verify target file paths exist BEFORE adding to task list
+- Phase 5 originally listed 7 target files — ALL were fabricated (did not exist on filesystem)
+- Root cause: previous session generated file names from assumptions, not from actual `ls` or `find`
+- **ALWAYS run** `test -f <path>` or `ls <directory>` before including a file in the task list
+- Prefer `grep -rL` to find files MISSING specific content (e.g., `grep -rL '```mermaid'` to find files without Mermaid)
+- This guardrail applies to both Ralph loop AND manual task planning
+
 ---
 
 ## Lessons Learned
 (Auto-populated during execution — add entries here when you discover new pitfalls)
+
+### 2026-02-10: Phantom file references in Phase 5
+- All 7 original Phase 5 targets were non-existent files
+- Fixed by using `grep -rL` to find actual files missing content
+- Strategy: select files missing BOTH Mermaid AND SQL for maximum efficiency

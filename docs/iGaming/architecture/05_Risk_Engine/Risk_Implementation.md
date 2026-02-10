@@ -41,10 +41,18 @@ Design and implement a rule engine architecture integrating Drools/LiteFlow, wit
 
 ### Rule Engine Architecture
 
-```
-Event Ingestion → Rule Matching → Score Calculation → Action Dispatch
-       ↓               ↓                ↓                  ↓
-  Kafka Consumer   Drools/LiteFlow   Weighted Sum    Block/Flag/Log
+```mermaid
+graph LR
+    A[Risk Event<br/>Kafka Consumer] --> B[Rule Matching<br/>Drools/LiteFlow]
+    B --> C[Score Calculation<br/>Weighted Sum]
+    C --> D{Score<br/>Range?}
+    D -->|0-30| E[Log Only<br/>Async Audit]
+    D -->|31-60| F[Flag for Review<br/>Create Proposal]
+    D -->|61-85| G[Escalate<br/>Notify Risk Team]
+    D -->|86-100| H[Auto-Block<br/>Account Restriction]
+
+    B --> I[(Rule Store<br/>@Cacheable)]
+    I -->|Hot Reload| B
 ```
 
 ### Risk Score Calculation
@@ -80,6 +88,54 @@ public RiskScore evaluate(RiskEvent event) {
 1. **Rule Conflicts**: Multiple rules match simultaneously -- implement priority-based resolution with early-exit
 2. **Performance**: Too many rules slow execution -- use indexed rule matching and Drools RETE optimization
 3. **Hot Update Failure**: Rule updates not reflected -- version rules in Manager with @Cacheable eviction on update
+
+### Database Schema
+
+```sql
+-- Risk rule definitions with versioning
+CREATE TABLE risk_rules (
+    id              BIGSERIAL PRIMARY KEY,
+    rule_code       VARCHAR(64) NOT NULL UNIQUE,
+    rule_name       VARCHAR(128) NOT NULL,
+    rule_type       VARCHAR(32) NOT NULL,   -- VELOCITY, AMOUNT, PATTERN, DEVICE, GEO
+    category        VARCHAR(32) NOT NULL,   -- DEPOSIT, WITHDRAWAL, LOGIN, BET, REGISTRATION
+    priority        INT NOT NULL DEFAULT 100,
+    weight          NUMERIC(5,2) NOT NULL DEFAULT 1.00,
+    condition_expr  TEXT NOT NULL,           -- Drools/LiteFlow expression
+    action_type     VARCHAR(16) NOT NULL,   -- LOG, FLAG, ESCALATE, BLOCK
+    score_value     INT NOT NULL DEFAULT 0, -- 0-100
+    status          VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+    version         INT NOT NULL DEFAULT 1,
+    tenant_id       BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_risk_rules_category ON risk_rules(category, status);
+CREATE INDEX idx_risk_rules_tenant ON risk_rules(tenant_id, status);
+
+-- Risk assessment event log
+CREATE TABLE risk_assessments (
+    id              BIGSERIAL PRIMARY KEY,
+    event_id        VARCHAR(64) NOT NULL UNIQUE,  -- idempotency
+    player_id       BIGINT NOT NULL,
+    event_type      VARCHAR(32) NOT NULL,   -- DEPOSIT, WITHDRAWAL, LOGIN, BET
+    risk_score      INT NOT NULL,           -- 0-100 aggregated score
+    action_taken    VARCHAR(16) NOT NULL,   -- LOG, FLAG, ESCALATE, BLOCK
+    matched_rules   JSONB,                  -- array of rule_codes that matched
+    event_data      JSONB,                  -- original event payload
+    reviewed_by     BIGINT,                 -- admin user who reviewed (nullable)
+    review_result   VARCHAR(16),            -- APPROVED, REJECTED, ESCALATED
+    reviewed_at     TIMESTAMP,
+    tenant_id       BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_risk_assessments_player ON risk_assessments(player_id, created_at DESC);
+CREATE INDEX idx_risk_assessments_score ON risk_assessments(risk_score) WHERE risk_score >= 60;
+CREATE INDEX idx_risk_assessments_review ON risk_assessments(action_taken, review_result) WHERE review_result IS NULL;
+```
 
 ---
 
