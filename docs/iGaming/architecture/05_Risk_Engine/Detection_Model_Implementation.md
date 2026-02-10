@@ -241,7 +241,181 @@ Review outcomes and their system actions:
 
 ---
 
-## 6. Architecture Comparison (v2.1.0 vs v3.0.0)
+## 6. Database Schema (PostgreSQL)
+
+### detection_models
+Stores risk detection model configurations and rules.
+
+```sql
+CREATE TABLE detection_models (
+    model_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    model_name VARCHAR(100) NOT NULL,
+    model_type VARCHAR(50) NOT NULL, -- 'BLACKLIST', 'BOT_DETECTION', 'HEDGING', 'ARBITRAGE', 'TURNOVER_MANIPULATION'
+    action_type VARCHAR(20) NOT NULL, -- 'BLOCK', 'FLAG', 'IGNORE'
+    priority VARCHAR(10) NOT NULL, -- 'HIGH', 'MEDIUM', 'LOW'
+    layer INT NOT NULL, -- 1 (Sync), 3 (Async), 5 (Withdrawal)
+
+    -- Rule configuration
+    rule_definition JSONB NOT NULL, -- Model-specific detection logic
+    thresholds JSONB, -- Configurable thresholds (e.g., { "max_frequency": 10, "odds_min": 1.5 })
+    detection_method TEXT, -- Natural language description
+    enabled_game_types TEXT[], -- ['SPORTS', 'SLOTS', 'BACCARAT', ...] or NULL (all games)
+
+    -- Model metadata
+    accuracy_rate DECIMAL(5,4), -- 0.0000 to 1.0000 (e.g., 0.9523 = 95.23%)
+    false_positive_rate DECIMAL(5,4),
+    training_data_size BIGINT,
+    last_trained_at TIMESTAMPTZ,
+    model_version VARCHAR(20),
+
+    -- Status and lifecycle
+    is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    effective_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_to TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by UUID NOT NULL REFERENCES admins(admin_id),
+    updated_by UUID REFERENCES admins(admin_id),
+
+    -- Audit trail
+    change_history JSONB, -- Array of { timestamp, changed_by, changes[] }
+
+    CONSTRAINT valid_layer CHECK (layer IN (1, 3, 5)),
+    CONSTRAINT valid_action_type CHECK (action_type IN ('BLOCK', 'FLAG', 'IGNORE')),
+    CONSTRAINT valid_priority CHECK (priority IN ('HIGH', 'MEDIUM', 'LOW'))
+);
+
+CREATE INDEX idx_detection_models_tenant ON detection_models(tenant_id) WHERE is_enabled = TRUE;
+CREATE INDEX idx_detection_models_layer_action ON detection_models(layer, action_type) WHERE is_enabled = TRUE;
+CREATE INDEX idx_detection_models_type ON detection_models(model_type) WHERE is_enabled = TRUE;
+CREATE INDEX idx_detection_models_effective ON detection_models(effective_from, effective_to) WHERE is_enabled = TRUE;
+
+COMMENT ON TABLE detection_models IS 'Risk detection model configurations for five-layer risk control system';
+COMMENT ON COLUMN detection_models.layer IS '1=Synchronous blacklist check, 3=Async risk analysis, 5=Withdrawal deferred check';
+COMMENT ON COLUMN detection_models.action_type IS 'BLOCK=Generate HIGH priority proposal, FLAG=Generate MEDIUM priority proposal, IGNORE=Log only';
+COMMENT ON COLUMN detection_models.rule_definition IS 'JSONB configuration for rule-specific logic (SQL queries, ML model params, threshold conditions)';
+```
+
+### detection_results
+Tracks risk detection execution results and matched rules.
+
+```sql
+CREATE TABLE detection_results (
+    result_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    player_id UUID NOT NULL REFERENCES players(player_id),
+    bet_id UUID REFERENCES bets(bet_id),
+    withdrawal_id UUID REFERENCES withdrawals(withdrawal_id),
+    model_id UUID NOT NULL REFERENCES detection_models(model_id),
+
+    -- Detection context
+    layer INT NOT NULL, -- 1, 3, or 5
+    event_type VARCHAR(50) NOT NULL, -- 'BET_PLACED', 'WITHDRAWAL_REQUEST', 'BLACKLIST_CHECK'
+    event_timestamp TIMESTAMPTZ NOT NULL,
+    game_type VARCHAR(50),
+    amount DECIMAL(18,4),
+
+    -- Detection outcome
+    matched BOOLEAN NOT NULL DEFAULT FALSE,
+    action_type VARCHAR(20) NOT NULL, -- 'BLOCK', 'FLAG', 'IGNORE'
+    risk_score DECIMAL(5,4), -- 0.0000 to 1.0000 (higher = riskier)
+    confidence_level DECIMAL(5,4), -- Model confidence (0.0000 to 1.0000)
+
+    -- Matched rule details
+    matched_rules JSONB, -- Array of matched rule names with scores
+    detection_reason TEXT, -- Human-readable explanation
+    suspicious_amount DECIMAL(18,4), -- Amount flagged for review (if applicable)
+
+    -- Risk proposal linkage
+    risk_proposal_id UUID REFERENCES risk_proposals(proposal_id),
+    proposal_priority VARCHAR(10), -- 'HIGH' (BLOCK), 'MEDIUM' (FLAG), NULL (IGNORE)
+
+    -- Processing metadata
+    processing_time_ms INT, -- Execution time in milliseconds
+    model_version VARCHAR(20),
+    rule_snapshot JSONB, -- Snapshot of detection_models at execution time
+
+    -- Audit trail
+    detected_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    reviewed_at TIMESTAMPTZ,
+    review_decision VARCHAR(20), -- 'APPROVED', 'REJECTED', 'PARTIAL', NULL (pending)
+    reviewed_by UUID REFERENCES admins(admin_id),
+
+    CONSTRAINT valid_layer CHECK (layer IN (1, 3, 5)),
+    CONSTRAINT valid_action_type CHECK (action_type IN ('BLOCK', 'FLAG', 'IGNORE')),
+    CONSTRAINT valid_review_decision CHECK (review_decision IS NULL OR review_decision IN ('APPROVED', 'REJECTED', 'PARTIAL'))
+);
+
+CREATE INDEX idx_detection_results_player ON detection_results(player_id, detected_at DESC);
+CREATE INDEX idx_detection_results_bet ON detection_results(bet_id) WHERE bet_id IS NOT NULL;
+CREATE INDEX idx_detection_results_withdrawal ON detection_results(withdrawal_id) WHERE withdrawal_id IS NOT NULL;
+CREATE INDEX idx_detection_results_matched ON detection_results(matched, action_type, detected_at DESC) WHERE matched = TRUE;
+CREATE INDEX idx_detection_results_proposal ON detection_results(risk_proposal_id) WHERE risk_proposal_id IS NOT NULL;
+CREATE INDEX idx_detection_results_review_pending ON detection_results(detected_at DESC) WHERE review_decision IS NULL AND matched = TRUE;
+CREATE INDEX idx_detection_results_layer_event ON detection_results(layer, event_type, detected_at DESC);
+
+COMMENT ON TABLE detection_results IS 'Risk detection execution results for all layers (sync, async, withdrawal)';
+COMMENT ON COLUMN detection_results.matched IS 'TRUE if detection rule was triggered, FALSE otherwise';
+COMMENT ON COLUMN detection_results.suspicious_amount IS 'Amount flagged for review or freeze (used in Layer 5 withdrawal check)';
+COMMENT ON COLUMN detection_results.rule_snapshot IS 'Immutable snapshot of detection_models configuration at execution time';
+```
+
+### Query Examples
+
+**Analyze detection model effectiveness:**
+```sql
+SELECT
+    dm.model_name,
+    dm.model_type,
+    dm.action_type,
+    COUNT(*) AS total_executions,
+    COUNT(*) FILTER (WHERE dr.matched = TRUE) AS matches,
+    COUNT(*) FILTER (WHERE dr.review_decision = 'REJECTED') AS confirmed_fraud,
+    (COUNT(*) FILTER (WHERE dr.review_decision = 'REJECTED')::DECIMAL / NULLIF(COUNT(*) FILTER (WHERE dr.matched = TRUE), 0))::DECIMAL(5,4) AS precision,
+    AVG(dr.processing_time_ms) AS avg_processing_time_ms
+FROM detection_models dm
+INNER JOIN detection_results dr ON dm.model_id = dr.model_id
+WHERE dr.detected_at >= NOW() - INTERVAL '30 days'
+GROUP BY dm.model_id, dm.model_name, dm.model_type, dm.action_type
+ORDER BY confirmed_fraud DESC;
+```
+
+**Calculate suspicious amount for withdrawal deferred check (Layer 5):**
+```sql
+SELECT
+    player_id,
+    SUM(suspicious_amount) AS total_suspicious_amount,
+    COUNT(*) FILTER (WHERE action_type = 'BLOCK') AS high_priority_flags,
+    COUNT(*) FILTER (WHERE action_type = 'FLAG') AS medium_priority_flags,
+    MAX(detected_at) AS latest_detection
+FROM detection_results
+WHERE player_id = 'player-uuid-001'
+    AND matched = TRUE
+    AND review_decision IS NULL -- Pending review
+    AND detected_at >= NOW() - INTERVAL '30 days' -- 30-day window
+GROUP BY player_id;
+```
+
+**Audit Layer 1 synchronous blocks:**
+```sql
+SELECT
+    DATE_TRUNC('hour', detected_at) AS hour,
+    model_type,
+    COUNT(*) AS block_count,
+    COUNT(DISTINCT player_id) AS unique_players,
+    AVG(processing_time_ms) AS avg_processing_time_ms
+FROM detection_results
+WHERE layer = 1
+    AND matched = TRUE
+    AND detected_at >= NOW() - INTERVAL '24 hours'
+GROUP BY hour, model_type
+ORDER BY hour DESC, block_count DESC;
+```
+
+---
+
+## 7. Architecture Comparison (v2.1.0 vs v3.0.0)
 
 | Aspect | v2.1.0 (Synchronous) | v3.0.0 (Async Event-Driven) |
 |--------|----------------------|------------------------------|
