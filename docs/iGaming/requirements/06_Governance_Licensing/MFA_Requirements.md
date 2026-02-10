@@ -3,7 +3,7 @@
 > **Canonical Source**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
+> **Related Doc**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
 > **Last Synced**: 2026-02-09
 
 **Related Source Documents**:
@@ -14,26 +14,27 @@
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Risk Reduction**: MFA reduces account takeover risk by 47% (CVSS 8.1 → 4.3), protecting high-privilege accounts from phishing attacks
-- **Financial Protection**: Prevents credential-based fraud that caused $237K USD direct loss and 120K player data exposure in recent industry incidents
-- **Regulatory Compliance**: Satisfies mandatory MFA requirements for MGA, PCI DSS 4.0, and GDPR, avoiding fines up to EUR 20M or 4% global revenue
-- **Operational Efficiency**: Differentiates mandatory MFA (5 high-risk roles) from optional MFA (3 low-risk roles) to balance security with user experience
+Multi-Factor Authentication (MFA) for SmartAdmin backend delivers critical business value by:
+- **Risk Reduction**: Reduces account takeover risk by 47% (CVSS score drops from 8.1 High to 4.3 Medium) by requiring second-factor verification beyond passwords
+- **Financial Loss Prevention**: Prevents phishing attacks like the 2023 Finance Manager incident ($237,000 USD loss from 47 fraudulent withdrawals) and credential stuffing attacks (2024 Super Admin breach exposing 120,000 player records)
+- **Regulatory Compliance**: Meets mandatory MGA requirements (avoiding EUR 50K-500K fines and license revocation), PCI DSS 4.0 Requirement 8.3.1 (mandatory for administrators), GDPR Art. 32 (avoiding EUR 20M or 4% global revenue penalties), and UKGC LCCP 10.1.1 (avoiding GBP 100K-2M fines)
+- **Optimized User Experience**: Differentiated policy (Option B) achieves 4.8/5.0 weighted score by enforcing mandatory MFA for high-risk roles (Super Admin, Finance, Risk Control, Database Admin, DevOps) while keeping optional for low-risk roles (Customer Service, Marketing, Content Editor), balancing security (5/5) with UX (4/5)
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] TOTP (Google Authenticator) functions as primary MFA method for 90% of users
-- [ ] SMS OTP functions as backup method when TOTP is unavailable
-- [ ] Backup codes (10 one-time use, 8-digit format) are generated and displayed during MFA setup
-- [ ] Super Admin, Finance Manager, Risk Control, Database Admin, and DevOps have mandatory MFA enforcement
-- [ ] Customer Service, Marketing, and Content Editor have optional MFA with recommendation banner
-- [ ] Account locks for 15 minutes after 3 consecutive MFA failures
-- [ ] Device trust feature allows 30-day MFA skip for verified devices
-- [ ] Device loss recovery completes within 24-48 business hours with human review
-- [ ] All 10 audit event types (MFA_SETUP_INIT through DEVICE_TRUSTED) are logged with required fields
-- [ ] 4 anomaly detection rules trigger appropriate alerts (multiple failures, geographic anomaly, backup code abuse, high-risk MFA disabled)
+- [ ] All 5 mandatory MFA role categories enforce MFA without exemptions: Super Admin, Finance Manager, Risk Control, Database Admin, DevOps (no bypass for high-privilege accounts)
+- [ ] TOTP (Google Authenticator) is the primary P0 method with 90% expected adoption; SMS OTP as P1 backup, Email OTP as P2 fallback, Backup Codes as P3 emergency recovery
+- [ ] Risk score reduction verified: CVSS baseline 8.1 (High) without MFA reduces to 4.3 (Medium) with MFA enabled (47% risk reduction)
+- [ ] Backup codes functionality: 10 one-time use codes, 8-digit format (XXXX-XXXX), encrypted storage, regeneration requires TOTP verification, low-code warning at ≤2 remaining
+- [ ] Device lost recovery SLA: Multi-factor verification (identity document, email OTP, SMS OTP, security questions, human review) completes within 24-48 business hours
+- [ ] Trust device feature: 30-day trust duration, HttpOnly secure cookie, bound to IP + User-Agent + Fingerprint, auto-revoke on password change
+- [ ] Failure handling policy: 3 consecutive failures trigger 15-minute account lockout with security alert
+- [ ] Audit logging: 10 event types recorded (MFA_SETUP_INIT, MFA_ENABLED, MFA_DISABLED, MFA_LOGIN_SUCCESS, MFA_LOGIN_FAILED, MFA_LOCKED, BACKUP_CODE_USED, BACKUP_CODE_REGENERATE, MFA_FORCE_RESET, DEVICE_TRUSTED) with permanent retention for CRITICAL/WARNING, 90 days for INFO
+- [ ] Anomaly detection: 4 rules active (multiple failures, geographic anomaly, frequent backup code use, high-risk MFA disabled) with immediate CTO/CISO alert for high-risk role MFA disablement
+- [ ] Regulatory compliance: Pass all MGA compliance checklist items (secret encryption, audit logging, penetration testing, no self-service recovery)
+- [ ] Implementation roadmap: Phase 1 (Week 1-2 TOTP core), Phase 2 (Week 3 backup & recovery), Phase 3 (Week 4 SMS OTP + anomaly detection) completed on schedule
 
 ---
 
