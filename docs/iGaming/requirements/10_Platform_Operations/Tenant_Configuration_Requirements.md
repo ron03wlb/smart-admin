@@ -3,31 +3,32 @@
 > **Canonical Source**: [source-archive/10_Platform_Management/10-02_Tenant_Configuration.md](../../source-archive/10_Platform_Management/10-02_Tenant_Configuration.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Tenant Configuration Architecture](../../architecture/10_Platform_Management/Tenant_Configuration_Architecture.md)
+> **Related Doc**: [Tenant Configuration Architecture](../../architecture/10_Platform_Management/Tenant_Configuration_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Self-Service Enablement**: Provides "out-of-the-box" tenant configuration enabling operators to manage site properties without platform intervention
-- **Market Agility**: Defines 4 market templates (Asia VN/TH, Europe EU, Latin America) with pre-configured currencies, payment methods, and KYC levels for rapid market entry
-- **Risk Control**: Establishes dual-review approval workflow for high-risk operations (IP restrictions, domain binding, maintenance mode) with comprehensive audit logging
-- **Operational Safety**: Specifies real-time health checks (config sync every 30s, DNS every 5m, balance every hour) with severity-based alerting
-
----
+This Tenant Configuration system delivers value by:
+- **Operational Autonomy**: Enabling tenants to self-manage site properties (domain, currency, timezone, operational switches, IP restrictions, game blocklist) without platform intervention, reducing operational overhead and accelerating time-to-market for configuration changes
+- **Zero-Downtime Configuration**: Supporting dynamic configuration changes that propagate to all nodes within 1 minute with zero service restarts (Section 4.1), eliminating maintenance windows for configuration updates
+- **Market-Specific Templates**: Providing pre-configured templates for Asia (VN/TH), Europe (EU), and Latin America with market-appropriate defaults (currency, payment methods, KYC level, withdrawal limits, language support), enabling rapid tenant onboarding with compliant regional settings
+- **Risk Mitigation Through Approval Workflow**: Enforcing dual-review approval for high-risk operations (IP restrictions, domain binding, maintenance mode) while allowing audit-only for standard operations (site name, limits, game toggles), balancing agility with security
+- **Proactive Health Monitoring**: Continuous configuration consistency checks (30s), domain DNS validation (5min), IP conflict detection (on change), and tenant balance threshold alerts (hourly), preventing configuration drift and service degradation
 
 ## Success Metrics
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Configuration Propagation Time | < 1 minute | Time from change to all nodes synchronized |
-| Zero-Downtime Deployment | 100% | No service restarts required for config changes |
-| Audit Log Coverage | 100% | All configuration changes recorded with required fields |
-| Config Health Check Pass Rate | > 99% | Successful health checks / Total checks |
-| New Tenant Onboarding Time | < 1 hour | Time from template selection to site live |
-| Dual-Review Compliance | 100% | High-risk operations with proper approval / Total high-risk ops |
+| Configuration Propagation Latency | < 1 minute | Time from config save to all nodes reflecting new version (Section 4.1) |
+| Configuration Consistency Rate | 99.9% | Percentage of health checks showing consistent config version across all nodes (Section 6.1) |
+| Template Adoption Rate | ≥ 70% | Percentage of new tenants using market templates vs custom configuration |
+| Approval Workflow SLA (High-Risk Ops) | < 4 hours | Median time from submission to approval for IP/domain/maintenance changes (Section 4.2) |
+| Audit Trail Completeness | 100% | All configuration changes captured with Who/What/When/Why/Approval/Source IP fields (Section 4.3) |
+| Zero-Downtime Configuration Changes | 100% | No service restarts triggered by configuration updates (Section 4.1) |
+| Configuration Validation Error Rate | < 1% | Percentage of configuration submissions failing business rule validation (Section 7.2) |
+| Tenant Balance Alert Coverage | 100% | All tenants with balance < $1,000 receive hourly alerts (Section 6.2) |
 
 ---
 
