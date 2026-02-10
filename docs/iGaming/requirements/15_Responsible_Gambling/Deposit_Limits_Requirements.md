@@ -39,7 +39,31 @@ Deposit Limits and Loss Limits are core player protection tools that help player
 
 ---
 
-## 2. Regulatory Requirements
+## 2. Business Value
+
+This feature delivers value by:
+- **UKGC 2025 Compliance**: Implements mandatory pre-deposit limit setup (LCCP SR 3.4.1, effective 2025-10-31), ensuring all UK players set limits before first deposit, preventing regulatory penalties and license revocation
+- **Player Protection**: Provides dual-layer protection via deposit limits (control funds deposited) and loss limits (control actual losses), empowering players to gamble within safe boundaries and reducing problem gambling risk
+- **Operational Risk Mitigation**: Reconciliation mechanism ensures system-enforced limits are never violated (target: 0 system-caused breaches), preventing refund obligations and regulatory reporting incidents
+- **Multi-Jurisdictional Flexibility**: Supports jurisdiction-specific limit rules (Germany EUR 1,000 monthly cap, Netherlands default limits, UKGC 24-72h cooling-off periods), enabling compliant operation across key markets
+
+---
+
+## 3. Acceptance Criteria
+
+- [ ] **Pre-Deposit Limit Setup (UKGC 2025-10-31)**: New UK players MUST set at least one time-based limit (daily/weekly/monthly) before accessing deposit page - no bypass allowed
+- [ ] **Immediate Limit Lowering**: When player lowers deposit or loss limit, new limit takes effect immediately with confirmation notification sent
+- [ ] **Cooling-Off Period for Limit Increases**: Raising/removing limits triggers 24-72h cooling-off period (jurisdiction-configurable), with player cancellation option during cooling-off
+- [ ] **Hierarchy Validation**: System enforces limit hierarchy rules - Daily ≤ Weekly ≤ Monthly (recommended) - and validates in order (Daily → Weekly → Monthly)
+- [ ] **Loss Limit Calculation Accuracy**: Net Loss = Total Bets - Total Wins - Winnings correctly reduce accumulated loss and re-enable betting when net loss falls below limit
+- [ ] **Limit Breach Prevention**: Deposit/bet attempts exceeding current remaining limit are rejected with clear messaging showing remaining allowance
+- [ ] **Reconciliation Zero Tolerance**: Daily reconciliation job detects and auto-reports any system-caused limit violations to compliance team within 24h (target: 0 breaches)
+- [ ] **Approaching Limit Warnings**: Notify player when 80% of any limit is reached, showing current usage and remaining amount
+- [ ] **Germany Jurisdiction Cap**: German players CANNOT set monthly deposit limit > EUR 1,000 (legal cap) - system enforces this hard limit regardless of player request
+
+---
+
+## 4. Regulatory Requirements
 
 ### 2.1 Deposit Limits
 
