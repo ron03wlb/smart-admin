@@ -37,7 +37,31 @@ Self-Exclusion is the most stringent player protection tool, allowing players to
 
 ---
 
-## 2. Regulatory Requirements
+## 2. Business Value
+
+This feature delivers value by:
+- **License Protection**: Ensures compliance with mandatory self-exclusion requirements across key jurisdictions (UKGC, MGA, Netherlands, Sweden, Denmark), preventing license suspension or revocation due to exclusion breaches
+- **National Exclusion Sync**: Integrates with 5 national exclusion databases (Gamstop UK, CRUKS Netherlands, Spelpaus Sweden, ROFUS Denmark, MGA Self-Ban), preventing excluded players from circumventing protections via multi-operator access
+- **Breach Prevention**: Three-layer reconciliation architecture (real-time query, daily batch comparison, weekly audit) ensures ≥99.9% sync success rate, minimizing critical Type A discrepancies (excluded in Gamstop, active locally) to <0.1%
+- **Player Trust**: Provides robust exclusion mechanisms with cooling-off periods (24h-7d for revocation), anti-circumvention measures (device fingerprint, payment matching), and transparent communication, supporting responsible gambling commitments
+
+---
+
+## 3. Success Metrics
+
+| Metric | Target | Measurement | Business Impact |
+|--------|--------|-------------|-----------------|
+| Gamstop Sync Success Rate | ≥99.9% | (Successful syncs / Total sync attempts) × 100% (real-time + daily batch) | Regulatory compliance - UKGC requires near-perfect sync reliability |
+| Type A Discrepancy Resolution Time | <24h | Time from Type A detection (excluded in Gamstop, active locally) to account freeze + UKGC report submission | Critical breach mitigation - UKGC mandates 24h reporting |
+| Daily Reconciliation Completion | 100% | Daily batch jobs (03:00 UTC) complete successfully without failures | Operational reliability - ensure gap detection layer functions |
+| Post-Exclusion Re-Registration Attempt Rate | <5% | (Re-registration attempts within 90 days / Total exclusions) × 100% | Anti-circumvention effectiveness - low rate indicates robust detection (device fingerprint, payment matching) |
+| Self-Exclusion Rate Trend | Monitor (baseline establishment) | (Monthly new exclusions / Monthly active players) × 100% | Player protection awareness - track adoption of strongest protection tool |
+| Permanent Exclusion Revocation Attempts | 0 successful attempts | Count of permanent exclusion revocation requests incorrectly approved (should be 0 - permanent means irrevocable) | System integrity - verify permanent exclusion enforcement logic |
+| Cooling-Off Period Compliance | 100% | (Revocations with proper cooling-off period / Total revocations) × 100% | Regulatory adherence - 6-month exclusion requires 1-day, 1-5 year requires 7-day cooling-off before release |
+
+---
+
+## 4. Regulatory Requirements
 
 ### 2.1 Jurisdiction-Specific Rules
 
