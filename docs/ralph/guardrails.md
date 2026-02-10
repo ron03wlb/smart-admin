@@ -57,6 +57,17 @@
 - Prefer `grep -rL` to find files MISSING specific content (e.g., `grep -rL '```mermaid'` to find files without Mermaid)
 - This guardrail applies to both Ralph loop AND manual task planning
 
+### P10: Phase 6 dual-missing strategy
+- 8 files missing BOTH Mermaid AND SQL → each enhancement gives +1 to both counters
+- Complete ALL 8 dual-missing files before moving to single-missing files
+- Expected: After 8 dual-missing files, Mermaid 91.8%, SQL 72.6%
+
+### P11: Frontend/thin document content guidelines
+- Files in 11_Frontend/ and 14_Third_Party/ are often under 300 lines
+- Keep additions proportional: 1 diagram + 1-2 SQL tables is sufficient
+- Do NOT over-engineer content for documents marked as PLANNED
+- SQL tables should be frontend-relevant (configs, experiments, localization)
+
 ---
 
 ## Lessons Learned

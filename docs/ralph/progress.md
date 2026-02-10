@@ -1,87 +1,103 @@
 # iGaming Documentation Optimization Progress
 
-> **Started**: 2026-02-10 (Phase 5 Restart)
-> **Current Phase**: Phase 5 - Content Quality Enhancement Sprint
-> **Total Iterations**: 1
-> **Status**: ✅ COMPLETE
+> **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
+> **Current Phase**: Phase 6 - Coverage Enhancement Sprint
+> **Total Iterations**: 0
+> **Status**: IN PROGRESS
 
 ---
 
-## Overview: Phase 5 Mission
+## Phase 6: Coverage Enhancement Sprint [ACTIVE]
 
-**Goal**: Pass ALL quality gates (achieved: 8/8 PASSED)
+**Goal**: Push coverage beyond minimums to excellence level
+**Target**: Mermaid 100% (73/73), SQL ≥80% (≥59/73), Forward-ref 100% (58/58)
 
-**Results**:
-- ✅ **Mermaid Coverage**: 59/73 (80%) — target met
-- ✅ **SQL Coverage**: 45/73 (61%) — target met
-- ✅ **Stale Display Text**: 0 files — fixed
-- ✅ **All other gates**: maintained
-
-**Strategy**: Selected 3 core files missing BOTH Mermaid AND SQL for maximum efficiency
+**Baseline** (Phase 5 end): Mermaid 59/73 (80%), SQL 45/73 (61%)
 
 ---
 
-## Phase 5: Content Quality Enhancement Sprint [COMPLETE] ✅
+### 6A: Dual-Missing Enhancement (+8 Mermaid, +8 SQL)
 
-### 5A: Mermaid Diagram Enhancement (+3 diagrams → 80%)
+#### Batch 1 — Core Business (4 files)
+- [ ] architecture/03_Game_Integration/Game_Integration_Protocols.md (+Mermaid +SQL)
+  - Mermaid: graph LR — Provider protocol message flow (HTTP/WebSocket/polling)
+  - SQL: game_provider_protocols + protocol_message_logs
+- [ ] architecture/05_Risk_Engine/Risk_Proposal_Implementation.md (+Mermaid +SQL)
+  - Mermaid: sequenceDiagram — Async risk proposal lifecycle (create → review → approve/reject)
+  - SQL: risk_proposals + risk_proposal_reviews
+- [ ] architecture/06_Platform_Core/Governance_Implementation.md (+Mermaid +SQL)
+  - Mermaid: flowchart TD — Governance approval workflow
+  - SQL: governance_policies + compliance_audit_trail
+- [ ] architecture/14_Third_Party/Third_Party_Integration_Architecture.md (+Mermaid +SQL)
+  - Mermaid: graph TB — Third-party integration hub (adapters, circuit breakers)
+  - SQL: third_party_integrations + integration_audit_logs
 
-- [x] **architecture/04_Activity_Engine/Promotion_Implementation.md**
-  - Added: Bonus processing flowchart (`graph TB`)
-  - Content: Player trigger → Eligibility check → Lock → Bonus award → Audit
-
-- [x] **architecture/05_Risk_Engine/Risk_Implementation.md**
-  - Added: Risk scoring pipeline (`graph LR`)
-  - Content: Event → Rule engine → Score → Action dispatch (log/flag/escalate/block)
-
-- [x] **architecture/03_Game_Integration/Game_Lobby_System.md**
-  - Added: Game launch interaction flow (`sequenceDiagram`)
-  - Content: Player → Lobby → Cache → Provider → Wallet → Session
-
----
-
-### 5B: SQL Schema Enhancement (+3 schemas → 61%)
-
-- [x] **architecture/04_Activity_Engine/Promotion_Implementation.md** (same file as 5A-1)
-  - Added: `promotion_rules` + `player_bonus_records` tables
-  - Includes: PRIMARY KEY, business indexes, dedup key, audit columns
-
-- [x] **architecture/05_Risk_Engine/Risk_Implementation.md** (same file as 5A-2)
-  - Added: `risk_rules` + `risk_assessments` tables
-  - Includes: JSONB matched_rules, partial indexes for review queue
-
-- [x] **architecture/03_Game_Integration/Game_Lobby_System.md** (same file as 5A-3)
-  - Added: `game_categories` + `game_provider_configs` tables
-  - Includes: JSONB multilingual names, provider API config
+#### Batch 2 — Frontend/Localization (4 files)
+- [ ] architecture/11_Frontend/AB_Testing_Framework.md (+Mermaid +SQL)
+  - Mermaid: flowchart TD — A/B test variant assignment pipeline
+  - SQL: ab_experiments + ab_experiment_assignments
+- [ ] architecture/11_Frontend/Dynamic_Content_Localization.md (+Mermaid +SQL)
+  - Mermaid: sequenceDiagram — Dynamic content localization request flow
+  - SQL: localization_contents + content_translations
+- [ ] architecture/11_Frontend/Localization_API.md (+Mermaid +SQL)
+  - Mermaid: graph TB — Localization API architecture (cache, fallback, CDN)
+  - SQL: localization_keys + localization_values
+- [ ] architecture/11_Frontend/SEO_Performance.md (+Mermaid +SQL)
+  - Mermaid: graph LR — SEO content rendering pipeline (SSR, prerender, CDN)
+  - SQL: seo_page_configs + seo_metrics
 
 ---
 
-### 5C: Stale Display Text Cleanup ✅
+### 6B: Mermaid-Only Gap Closure (+6 Mermaid → 100%)
 
-- [x] **docs/iGaming/architecture/quality-reports/2026-Q1-quality-gate-report.md**
-  - Fixed false-positive: reworded descriptive text to avoid grep match
+#### Batch 3 — Finance/Game/Risk (3 files)
+- [ ] architecture/02_Finance_Service/Financial_Implementation.md (+Mermaid)
+  - sequenceDiagram: Payment processing end-to-end flow (deposit → gateway → ledger)
+- [ ] architecture/03_Game_Integration/Game_Integration_Security.md (+Mermaid)
+  - graph TB: Security verification layers (API key, token, IP whitelist, signature)
+- [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (+Mermaid)
+  - flowchart TD: Turnover validation decision tree
+
+#### Batch 4 — Auth/Responsible Gambling (3 files)
+- [ ] architecture/06_Platform_Core/MFA_Compliance_Technical.md (+Mermaid)
+  - sequenceDiagram: MFA challenge-response flow
+- [ ] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md (+Mermaid)
+  - sequenceDiagram: TOTP enrollment + WebAuthn registration flow
+- [ ] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md (+Mermaid)
+  - flowchart TD: Deposit/loss limit enforcement pipeline
 
 ---
 
-### 5D: Final Validation & Report Update ✅
+### 6C: SQL Push + Hygiene (+6 SQL → 80%)
 
-- [x] Ran `./docs/ralph/validate-quality-gate.sh` → 8/8 PASSED
-- [x] Updated quality gate report (v2.0.0 → v3.0.0)
-- [x] Git commit pending
+#### Batch 5 — High-value SQL (5 files)
+- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (+SQL)
+  - payment_transactions + payment_methods tables
+- [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (+SQL)
+  - bonus_rules + bonus_calculations tables
+- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+SQL)
+  - detection_models + detection_results tables
+- [ ] architecture/05_Risk_Engine/Player_Protection_API.md (+SQL)
+  - player_limits + self_exclusions tables
+- [ ] architecture/03_Game_Integration/Game_Integration_Implementation.md (+SQL)
+  - game_sessions + game_round_logs tables
 
-**Actual Quality Gate Results** (2026-02-10 21:19):
-```
-✅ Architecture → Requirements: 100/100 (100%)
-✅ Requirements → Architecture: 57/58 (98%)
-✅ Stale Display Text: 0 files
-✅ Java Code: 59/73 (80%)
-✅ Mermaid Diagrams: 59/73 (80%)
-✅ SQL Schema: 45/73 (61%)
-✅ StateDiagram Violations: 0
-✅ Requirements Business Purity: 100%
+#### Batch 6 — SQL + Hygiene (3 tasks)
+- [ ] architecture/10_Platform_Management/Notification_Architecture.md (+SQL)
+  - notification_templates + notification_delivery_logs tables
+- [ ] Fix missing forward-reference in requirements/09_Infrastructure_Requirements/
+  - Check which file is missing 'Related Architecture' header and add it
+- [ ] Update ADR-012 implementation status in architecture/adr/
+  - Mark documented sections as IMPLEMENTED where applicable
 
-Results: 8/8 passed, 0 failed, 0 warnings
-══ QUALITY GATE: PASSED ══
-```
+---
+
+### 6D: Final Validation
+
+#### Batch 7 — Quality Gate + Report
+- [ ] Run validate-quality-gate.sh (expect 8/8 PASSED)
+- [ ] Update quality-gate-report.md (v3.0.0 → v4.0.0)
+- [ ] Git commit: docs(iGaming): Phase 6 complete — Mermaid 100%, SQL 80%+
 
 ---
 
@@ -108,18 +124,7 @@ Results: 8/8 passed, 0 failed, 0 warnings
 - 3 files enhanced with Mermaid + SQL (6 content additions total)
 - Fixed 1 quality report false-positive
 - All 8/8 quality gates PASSED
-
----
-
-## Progress Tracking
-
-**Phase 5 Tasks**: 10/10 completed (100%)
-- 5A (Mermaid): 3/3 ✅
-- 5B (SQL): 3/3 ✅
-- 5C (Display Text): 1/1 ✅
-- 5D (Validation): 3/3 ✅
-
-**Key Insight**: Selecting files missing BOTH content types reduced effort from 7 file edits to 3 file edits while achieving the same quality gate targets.
+- Key insight: dual-missing optimization reduces effort by 57%
 
 ---
 
@@ -129,7 +134,7 @@ Results: 8/8 passed, 0 failed, 0 warnings
 bash docs/ralph/validate-quality-gate.sh
 ```
 
-**Final Status** (2026-02-10 21:19):
+**Phase 5 Final Status** (2026-02-10 21:19):
 ```
 Results: 8/8 passed, 0 failed, 0 warnings
 ══ QUALITY GATE: PASSED ══
@@ -137,5 +142,5 @@ Results: 8/8 passed, 0 failed, 0 warnings
 
 ---
 
-**Last Updated**: 2026-02-10 21:20
-**Status**: RALPH_COMPLETE
+**Last Updated**: 2026-02-10
+**Status**: Phase 6 IN PROGRESS
