@@ -376,7 +376,119 @@ routing_config:
 
 ---
 
-## 11. Security Implementation
+## 11. PostgreSQL Schema
+
+### 11.1 notification_templates
+
+```sql
+-- Notification template definition
+CREATE TABLE notification_templates (
+    template_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    template_code VARCHAR(50) UNIQUE NOT NULL,  -- e.g., OTP_REGISTER
+    category VARCHAR(30) NOT NULL,               -- TRANSACTIONAL, MARKETING
+    title_i18n JSONB NOT NULL,                   -- { "en_US": "OTP Code", "zh_TW": "驗證碼" }
+    body_i18n JSONB NOT NULL,                    -- { "en_US": "Your code: {code}", ... }
+    variables JSONB NOT NULL,                    -- ["code", "expire_minutes"]
+    default_channel VARCHAR(20),                 -- AUTO, SMS, EMAIL, TELEGRAM, etc.
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_category CHECK (category IN ('TRANSACTIONAL', 'MARKETING'))
+);
+
+-- Indexes
+CREATE INDEX idx_notification_templates_code ON notification_templates (template_code);
+CREATE INDEX idx_notification_templates_category ON notification_templates (category) WHERE is_active = TRUE;
+```
+
+### 11.2 notification_delivery_logs
+
+```sql
+-- Notification delivery audit trail
+CREATE TABLE notification_delivery_logs (
+    log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    notification_id VARCHAR(50) UNIQUE NOT NULL,  -- Business ID: ntf-abc123
+    template_code VARCHAR(50) NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
+    destination_encrypted TEXT NOT NULL,           -- Encrypted phone/email (SM4)
+    channel_used VARCHAR(20) NOT NULL,             -- TELEGRAM, SMS, EMAIL, etc.
+    provider VARCHAR(50) NOT NULL,                 -- TWILIO, AWS_SES, FIREBASE_FCM, etc.
+    priority VARCHAR(10) NOT NULL,                 -- HIGH, LOW
+    status VARCHAR(20) NOT NULL,                   -- DELIVERED, FAILED, PENDING
+    fallback_reason TEXT,                          -- e.g., "Telegram user not found"
+    cost_usd DECIMAL(10,6) DEFAULT 0.00,          -- Provider cost
+    delivery_time_ms INTEGER,                      -- Latency in milliseconds
+    sent_at TIMESTAMPTZ NOT NULL,
+    delivered_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_status CHECK (status IN ('DELIVERED', 'FAILED', 'PENDING', 'QUEUED')),
+    CONSTRAINT chk_priority CHECK (priority IN ('HIGH', 'LOW'))
+);
+
+-- Indexes
+CREATE INDEX idx_notification_logs_user_id ON notification_delivery_logs (user_id, created_at DESC);
+CREATE INDEX idx_notification_logs_status ON notification_delivery_logs (status, created_at DESC);
+CREATE INDEX idx_notification_logs_template ON notification_delivery_logs (template_code, created_at DESC);
+CREATE INDEX idx_notification_logs_cost ON notification_delivery_logs (sent_at DESC, cost_usd DESC);  -- Cost analytics
+```
+
+### 11.3 Query Examples
+
+```sql
+-- 1. Daily cost breakdown by channel
+SELECT
+    channel_used,
+    COUNT(*) AS total_sent,
+    SUM(cost_usd) AS total_cost,
+    AVG(delivery_time_ms) AS avg_latency_ms,
+    SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS delivery_rate_pct
+FROM notification_delivery_logs
+WHERE sent_at >= CURRENT_DATE - INTERVAL '1 day'
+GROUP BY channel_used
+ORDER BY total_cost DESC;
+
+-- 2. User notification history with template details
+SELECT
+    l.notification_id,
+    l.channel_used,
+    l.status,
+    l.sent_at,
+    t.title_i18n->>'en_US' AS title,
+    t.category
+FROM notification_delivery_logs l
+JOIN notification_templates t ON l.template_code = t.template_code
+WHERE l.user_id = '12345'
+ORDER BY l.sent_at DESC
+LIMIT 20;
+
+-- 3. Fallback analysis (Telegram -> SMS cost impact)
+SELECT
+    DATE_TRUNC('day', sent_at) AS date,
+    COUNT(*) AS fallback_count,
+    SUM(cost_usd) AS fallback_cost
+FROM notification_delivery_logs
+WHERE fallback_reason LIKE '%Telegram%'
+  AND channel_used = 'SMS'
+  AND sent_at >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY date
+ORDER BY date DESC;
+
+-- 4. Template performance by channel
+SELECT
+    template_code,
+    channel_used,
+    COUNT(*) AS sent_count,
+    AVG(delivery_time_ms) AS avg_latency_ms,
+    SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS delivery_rate_pct
+FROM notification_delivery_logs
+WHERE sent_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY template_code, channel_used
+ORDER BY sent_count DESC;
+```
+
+---
+
+## 12. Security Implementation
 
 ```java
 /**
@@ -411,6 +523,6 @@ public class NotificationSecurityService {
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-09
+**Document Version**: 4.1.0
+**Last Updated**: 2026-02-10
 **Maintenance Team**: Platform Team & DevOps Team
