@@ -1,6 +1,6 @@
 # Payment Operations
 
-> **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
+> **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
 > **Related Doc**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
 > **Last Synced**: 2026-02-09

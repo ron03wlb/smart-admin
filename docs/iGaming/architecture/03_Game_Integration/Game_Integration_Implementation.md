@@ -1,6 +1,6 @@
 # Game Integration Implementation
 
-> **Canonical Source**: [source/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
+> **Canonical Source**: [source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Game Integration Requirements](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md)
 > **Last Synced**: 2026-02-08

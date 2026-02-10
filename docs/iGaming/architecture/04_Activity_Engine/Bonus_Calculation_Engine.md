@@ -1,6 +1,6 @@
 # 獎金計算引擎技術架構 (Bonus Calculation Engine Architecture)
 
-> **Canonical Source**: [source/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
+> **Canonical Source**: [source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Bonus_Calculation_Requirements.md](../../requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md)
 > **Last Synced**: 2026-02-08

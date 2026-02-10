@@ -1,6 +1,6 @@
 # KYC Verification API Architecture
 
-> **Canonical Source**: [source/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
+> **Canonical Source**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Business Requirements**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/KYC_AML_Requirements.md)
 > **Last Synced**: 2026-02-08

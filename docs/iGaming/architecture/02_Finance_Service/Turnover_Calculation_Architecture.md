@@ -1,6 +1,6 @@
 # Turnover Calculation Architecture
 
-> **Canonical Source**: [source/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
+> **Canonical Source**: [source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 > **Audience**: Architects, Backend Developers, Risk Engineers
 > **Business Requirements**: [Turnover_Reconciliation_Requirements.md](../../requirements/02_Financial_Operations/Turnover_Reconciliation_Requirements.md)
 > **Last Synced**: 2026-02-09

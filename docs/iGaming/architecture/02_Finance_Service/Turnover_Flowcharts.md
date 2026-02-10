@@ -1,6 +1,6 @@
 # Turnover Calculation Flowcharts and Sequence Diagrams
 
-> **Canonical Source**: [source/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
+> **Canonical Source**: [source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
 > **Audience**: Architects, Backend Developers, Data Engineers
 > **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 > **Last Synced**: 2026-02-08

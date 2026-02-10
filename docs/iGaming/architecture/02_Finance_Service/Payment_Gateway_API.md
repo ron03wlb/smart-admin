@@ -1,6 +1,6 @@
 # Payment Gateway API
 
-> **Canonical Source**: [source/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
+> **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
 > **Last Synced**: 2026-02-08

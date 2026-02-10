@@ -1,6 +1,6 @@
 # Risk Proposal Workflow Requirements
 
-> **Canonical Source**: [source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
+> **Canonical Source**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
 > **Audience**: Executives, Compliance Officers, Risk Team Managers
 > **Related Doc**: [Risk_Proposal_Implementation.md](../../architecture/05_Risk_Engine/Risk_Proposal_Implementation.md)
 > **Last Synced**: 2026-02-08

@@ -1,6 +1,6 @@
 # Turnover Calculation Logic
 
-> **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
+> **Canonical Source**: [source-archive/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: Architects, Backend Developers
 > **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 > **Last Synced**: 2026-02-08

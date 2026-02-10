@@ -1,6 +1,6 @@
 # Data Model Architecture
 
-> **Canonical Source**: [source/00_Foundation/guides/00-10_Data_Model.md](../../source-archive/00_Foundation/guides/00-10_Data_Model.md)
+> **Canonical Source**: [source-archive/00_Foundation/guides/00-10_Data_Model.md](../../source-archive/00_Foundation/guides/00-10_Data_Model.md)
 > **Audience**: Architects, Backend Developers, DevOps
 > **Business Requirements**: None (pure technical)
 > **Last Synced**: 2026-02-08

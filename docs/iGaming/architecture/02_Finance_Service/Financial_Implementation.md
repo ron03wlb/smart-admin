@@ -1,6 +1,6 @@
 # Financial Implementation Architecture
 
-> **Canonical Source**: [source/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
+> **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
 > **Audience**: Architects, Backend Developers, System Integration Engineers
 > **Business Requirements**: [Financial_Implementation_Requirements.md](../../requirements/02_Financial_Operations/Financial_Implementation_Requirements.md)
 > **Last Synced**: 2026-02-09

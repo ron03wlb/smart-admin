@@ -1,6 +1,6 @@
 # Turnover Business Rules
 
-> **Canonical Source**: [source/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
+> **Canonical Source**: [source-archive/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: Executives, Product Managers
 > **Related Doc**: [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)
 > **Last Synced**: 2026-02-08

@@ -1,6 +1,6 @@
 # Risk Proposal Workflow Implementation
 
-> **Canonical Source**: [source/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
+> **Canonical Source**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
 > **Business Requirements**: [Risk_Proposal_Requirements.md](../../requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md)
 > **Last Synced**: 2026-02-08
