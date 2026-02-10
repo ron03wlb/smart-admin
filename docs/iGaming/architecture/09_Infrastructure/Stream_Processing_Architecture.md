@@ -1,5 +1,6 @@
 # 流處理架構 (Stream Processing Architecture)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-08 Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md)
 > **View**: Technical Architecture (Development & DevOps)
 

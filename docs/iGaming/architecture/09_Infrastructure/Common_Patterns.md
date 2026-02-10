@@ -1,5 +1,6 @@
 # API 通用模式 (Common API Patterns)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-03-03 Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md)
 > **View**: Technical Architecture (Development & DevOps)
 

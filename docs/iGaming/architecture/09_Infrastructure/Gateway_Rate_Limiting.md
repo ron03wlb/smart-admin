@@ -1,5 +1,6 @@
 # 流量控制與限流架構 (Rate Limiting & Traffic Control)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-02-02 Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md)
 > **View**: Technical Architecture (Development & DevOps)
 

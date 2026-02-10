@@ -1,5 +1,6 @@
 # Token 驗證服務設計 (Token Validation Service)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-13 Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md)
 > **View**: Technical Architecture (Development & DevOps)
 

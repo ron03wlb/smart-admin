@@ -1,5 +1,6 @@
 # Token 邊緣部署與運維 (Token Edge Deployment)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-13-03 Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md)
 > **View**: Technical Architecture (Development & DevOps)
 

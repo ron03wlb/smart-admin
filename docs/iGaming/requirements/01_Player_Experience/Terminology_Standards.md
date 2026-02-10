@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-08_Terminology_Standards.md](../../source-archive/00_Foundation/guides/00-08_Terminology_Standards.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Doc**: None
+> **Related Architecture**: N/A — Reference/glossary document
 > **Last Synced**: 2026-02-08
 
 ---

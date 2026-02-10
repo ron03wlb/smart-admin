@@ -1,5 +1,6 @@
 # 性能優化規範 (Performance Optimization)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-07 Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md)
 > **View**: Technical Architecture (Development & DevOps)
 

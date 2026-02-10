@@ -1,5 +1,6 @@
 # 系統維護與優雅停機架構 (Maintenance & Graceful Shutdown)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md)
 > **View**: Technical Architecture (Development & DevOps)
 

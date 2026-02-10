@@ -1,5 +1,6 @@
 # 性能監控與告警架構 (Performance Monitoring & Alerting)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-06 Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md)
 > **View**: Technical Architecture (Development & DevOps)
 

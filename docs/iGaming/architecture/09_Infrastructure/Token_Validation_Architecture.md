@@ -1,5 +1,6 @@
 # Token 驗證架構 (Token Validation Architecture)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-13-01 Validation Architecture](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md)
 > **View**: Technical Architecture (Development & DevOps)
 

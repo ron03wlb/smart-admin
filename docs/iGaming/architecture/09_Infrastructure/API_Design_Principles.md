@@ -1,5 +1,6 @@
 # API 設計原則 (API Design Principles)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md)
 > **View**: Technical Architecture (Development & DevOps)
 

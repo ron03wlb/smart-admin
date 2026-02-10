@@ -1,5 +1,6 @@
 # Token 緩存性能設計 (Token Cache Performance)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-13-02 Cache Performance](../../source-archive/09_Technical_Infrastructure/09-13-02_Cache_Performance.md)
 > **View**: Technical Architecture (Development & DevOps)
 

@@ -1,5 +1,6 @@
 # 緩存策略架構 (Caching Strategy)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-09 Caching Strategy](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md)
 > **View**: Technical Architecture (Development & DevOps)
 

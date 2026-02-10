@@ -1,5 +1,6 @@
 # 網關核心架構 (Gateway Core Architecture)
 
+> **Business Requirements**: N/A — Pure technical infrastructure document
 > **Canonical Source**: [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
 > **View**: Technical Architecture (Development & DevOps)
 
