@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
 > **Audience**: Executives, Compliance Officers, Finance Team, Operations Managers
-> **Related Architecture**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
+> **Related Doc**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (PostgreSQL/S3 Glacier storage, UTC timezone conversion algorithms, 3DS verification implementation, blockchain confirmation counts) moved to Architecture layer. This document focuses on business requirements only.
@@ -11,12 +11,12 @@
 
 ## Business Value
 
-The reconciliation system delivers critical business value by:
-- **Fund Security**: Three-way matching (Platform ↔ PSP ↔ Bank) prevents fake callback attacks and ensures no unauthorized balance credits
-- **Regulatory Compliance**: 10-year data retention meets UKGC, MGA, and tax requirements; automated SAR/CTR generation satisfies AML obligations
-- **Operational Efficiency**: 100% automated Tier-1 real-time checks + 95% automated Tier-2 batch processing reduces manual workload
-- **Financial Accuracy**: ≥99.5% daily match rate target ensures reliable financial reporting and audit trails
-- **Risk Mitigation**: Immediate P0 alerts for short payments prevent fraud losses; chargeback monitoring protects against excessive dispute rates
+This reconciliation system delivers critical value by:
+
+- **Protecting Platform Funds**: Three-tier reconciliation (real-time, batch, daily) acts as the last line of defense against fake callback attacks, payment fraud, and system errors, preventing financial losses
+- **Ensuring Regulatory Compliance**: 10-year unified data retention period satisfies UKGC (5 years), MGA (10 years), PAGCOR (5 years), and tax compliance (7 years) requirements, avoiding regulatory penalties up to 4% of global annual turnover or EUR 20M (GDPR maximum)
+- **Enabling Trust and Transparency**: Automated discrepancy handling with defined escalation paths (L1 → L4) and mandatory dual approval ensures audit trail integrity, building regulator and player trust
+- **Reducing Operational Costs**: 80-100% automation levels across tolerance-based auto-approval (amount < $10) and first-pass match rate (≥95% target) minimize manual intervention and accelerate resolution cycles
 
 ---
 
