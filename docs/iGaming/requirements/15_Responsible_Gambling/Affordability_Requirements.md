@@ -37,7 +37,30 @@ Affordability Assessment is a core requirement of the UK Gambling Commission's 2
 
 ---
 
-## 2. Regulatory Requirements
+## 2. Business Value
+
+This feature delivers value by:
+- **Regulatory Compliance**: Ensures compliance with UKGC 2025 affordability assessment regulations, avoiding penalties and maintaining operating licenses in key jurisdictions (UK, Netherlands, Germany)
+- **Player Protection**: Prevents financial harm by detecting vulnerable gambling behavior (chasing losses, deposit velocity) and enforcing appropriate limits before players exceed their affordable range
+- **Risk Mitigation**: Reduces dependence on high-risk players (target <5% of GGR), protecting the business from reputational damage and regulatory scrutiny
+- **Operational Efficiency**: Provides unified Player Protection API for all responsible gambling tools (deposit limits, loss limits, self-exclusion), reducing integration complexity and ensuring consistent enforcement
+
+---
+
+## 3. Success Metrics
+
+| Metric | Target | Measurement | Business Impact |
+|--------|--------|-------------|-----------------|
+| UKGC Assessment Coverage | ≥98% of triggered players complete assessment within 7 days | Track completion rate for GBP 125/500/2,000 net loss thresholds and GBP 150 monthly net deposit triggers | Regulatory compliance - avoid enforcement actions |
+| High-Risk Player GGR Ratio | <5% of total GGR from high-risk players | Monthly calculation of GGR from players flagged with behavioral vulnerability indicators | Sustainable revenue mix - reduce reputational risk |
+| Assessment Pass Rate | Monitor trend (baseline establishment) | (PASSED assessments / TOTAL assessments) × 100% | Early warning for excessive gambling patterns across player base |
+| Vulnerability Detection Accuracy | ≥85% of detected patterns confirmed as genuine risk (not false positives) | Manual review of behavioral detection (chasing losses, deposit velocity) vs. subsequent player outcomes | Optimize detection rules to minimize player friction while catching real risks |
+| API Response Time (P95) | <300ms for player-facing endpoints | P95 latency for Get protection settings, Set limits, Get limit usage | Player experience - ensure real-time limit enforcement without delays |
+| Monthly Net Deposit Trigger Adoption | ≥95% of players with net deposit ≥GBP 150 receive financial vulnerability check | Audit log coverage of monthly net deposit rule (effective 2025-02-28) | UKGC 2025 compliance - new trigger rule enforcement |
+
+---
+
+## 4. Regulatory Requirements
 
 ### 2.1 Affordability Assessment
 
