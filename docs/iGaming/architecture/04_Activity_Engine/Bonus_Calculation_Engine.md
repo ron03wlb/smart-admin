@@ -308,6 +308,155 @@ Finance 與 Activity 模組均需調用 `RiskEngine.validateTurnover()` 作為�
 
 ---
 
+## Database Schema (PostgreSQL)
+
+### bonus_rules
+Stores bonus calculation rules and game weight configurations.
+
+```sql
+CREATE TABLE bonus_rules (
+    rule_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    promotion_id UUID NOT NULL REFERENCES promotions(promotion_id),
+    rule_type VARCHAR(50) NOT NULL, -- 'GAME_WEIGHT', 'ODDS_THRESHOLD', 'STATUS_FACTOR'
+    game_category VARCHAR(50), -- 'SLOTS', 'SPORTS', 'BACCARAT', 'BLACKJACK', 'ROULETTE'
+    game_id UUID REFERENCES games(game_id),
+    weight_factor DECIMAL(5,4) NOT NULL DEFAULT 1.0, -- 0.05 to 1.0
+    odds_threshold DECIMAL(5,2), -- Minimum odds (e.g., 1.5 for EUR)
+    odds_type VARCHAR(10), -- 'EUR', 'HK', 'MY', 'ID'
+    status_factors JSONB, -- { "WIN": 1.0, "LOSS": 1.0, "DRAW": 0, "VOID": 0, "HALF_WIN": 0.5 }
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    priority INT NOT NULL DEFAULT 0, -- Higher priority = applied first
+    effective_from TIMESTAMPTZ NOT NULL,
+    effective_to TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by UUID NOT NULL REFERENCES admins(admin_id),
+    updated_by UUID REFERENCES admins(admin_id),
+    metadata JSONB, -- Additional rule-specific configs
+    CONSTRAINT valid_weight CHECK (weight_factor >= 0 AND weight_factor <= 1),
+    CONSTRAINT valid_odds CHECK (odds_threshold IS NULL OR odds_threshold > 0)
+);
+
+CREATE INDEX idx_bonus_rules_promotion ON bonus_rules(promotion_id) WHERE is_active = TRUE;
+CREATE INDEX idx_bonus_rules_game_category ON bonus_rules(game_category) WHERE is_active = TRUE;
+CREATE INDEX idx_bonus_rules_effective ON bonus_rules(effective_from, effective_to) WHERE is_active = TRUE;
+
+COMMENT ON TABLE bonus_rules IS 'Bonus calculation rules including game weights and turnover validation factors';
+COMMENT ON COLUMN bonus_rules.weight_factor IS 'Layer 3 game weight: SLOTS=1.0, BACCARAT=0.15, BLACKJACK=0.10';
+COMMENT ON COLUMN bonus_rules.status_factors IS 'Layer 2 status factor mapping for WIN/LOSS/DRAW/VOID/HALF_WIN/HALF_LOSS';
+```
+
+### bonus_calculations
+Tracks bonus progress and three-layer turnover calculations.
+
+```sql
+CREATE TABLE bonus_calculations (
+    calculation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    player_id UUID NOT NULL REFERENCES players(player_id),
+    bonus_id UUID NOT NULL REFERENCES bonuses(bonus_id),
+    promotion_id UUID NOT NULL REFERENCES promotions(promotion_id),
+    bet_id UUID NOT NULL REFERENCES bets(bet_id),
+    game_round_id UUID NOT NULL REFERENCES game_rounds(game_round_id),
+    game_type VARCHAR(50) NOT NULL, -- 'SLOTS', 'SPORTS', 'BACCARAT', etc.
+
+    -- Three-layer calculation breakdown
+    bet_amount DECIMAL(18,4) NOT NULL,
+    layer1_risk_factor DECIMAL(3,2) NOT NULL, -- 0 or 1 (Risk Engine validation)
+    layer1_effective_base DECIMAL(18,4) NOT NULL, -- bet_amount × layer1_risk_factor
+    layer2_status_factor DECIMAL(3,2) NOT NULL, -- 0, 0.5, or 1.0 (Finance status)
+    layer2_valid_turnover DECIMAL(18,4) NOT NULL, -- layer1_effective_base × layer2_status_factor
+    layer3_game_weight DECIMAL(5,4) NOT NULL, -- 0.05 to 1.0 (Activity weight)
+    layer3_activity_turnover DECIMAL(18,4) NOT NULL, -- layer2_valid_turnover × layer3_game_weight
+
+    -- Risk validation results
+    risk_code VARCHAR(50) NOT NULL, -- 'VALID', 'HEDGE_DETECTED', 'ARBITRAGE', 'LOW_ODDS'
+    risk_rejection_reason TEXT,
+
+    -- Progress tracking
+    progress_before DECIMAL(18,4) NOT NULL,
+    progress_after DECIMAL(18,4) NOT NULL,
+    required_total DECIMAL(18,4) NOT NULL,
+    contribution_rate INT NOT NULL, -- Percentage (0-100)
+
+    -- Calculation status
+    calculation_status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- 'PENDING', 'COMPLETED', 'REJECTED', 'ROLLED_BACK'
+    calculated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ,
+
+    -- Audit trail
+    rule_snapshot JSONB NOT NULL, -- Snapshot of applied bonus_rules
+    event_metadata JSONB, -- Original Kafka event data
+
+    CONSTRAINT valid_factors CHECK (
+        layer1_risk_factor IN (0, 1) AND
+        layer2_status_factor >= 0 AND layer2_status_factor <= 1 AND
+        layer3_game_weight >= 0 AND layer3_game_weight <= 1
+    ),
+    CONSTRAINT valid_progression CHECK (progress_after >= progress_before)
+);
+
+CREATE INDEX idx_bonus_calc_player ON bonus_calculations(player_id, bonus_id);
+CREATE INDEX idx_bonus_calc_status ON bonus_calculations(calculation_status, calculated_at);
+CREATE INDEX idx_bonus_calc_game_round ON bonus_calculations(game_round_id);
+CREATE INDEX idx_bonus_calc_promotion ON bonus_calculations(promotion_id, calculated_at);
+CREATE INDEX idx_bonus_calc_risk_code ON bonus_calculations(risk_code) WHERE risk_code != 'VALID';
+
+COMMENT ON TABLE bonus_calculations IS 'Three-layer turnover calculation audit trail for bonus wagering progress';
+COMMENT ON COLUMN bonus_calculations.layer1_risk_factor IS 'Layer 1: Risk Engine validation (0=rejected, 1=valid)';
+COMMENT ON COLUMN bonus_calculations.layer2_status_factor IS 'Layer 2: Finance status factor (WIN=1.0, DRAW=0, HALF_WIN=0.5)';
+COMMENT ON COLUMN bonus_calculations.layer3_game_weight IS 'Layer 3: Activity game weight (SLOTS=1.0, BACCARAT=0.15)';
+COMMENT ON COLUMN bonus_calculations.rule_snapshot IS 'Immutable snapshot of bonus_rules applied at calculation time';
+```
+
+### Query Examples
+
+**Calculate total wagering progress for a bonus:**
+```sql
+SELECT
+    player_id,
+    bonus_id,
+    SUM(layer3_activity_turnover) AS total_wagered,
+    MAX(required_total) AS wagering_requirement,
+    (SUM(layer3_activity_turnover) / MAX(required_total) * 100)::DECIMAL(5,2) AS completion_percentage
+FROM bonus_calculations
+WHERE calculation_status = 'COMPLETED'
+    AND bonus_id = 'bonus-uuid-001'
+GROUP BY player_id, bonus_id;
+```
+
+**Audit rejected turnover by risk code:**
+```sql
+SELECT
+    risk_code,
+    COUNT(*) AS rejection_count,
+    SUM(bet_amount) AS total_bet_amount,
+    SUM(layer1_effective_base) AS lost_turnover
+FROM bonus_calculations
+WHERE calculation_status = 'REJECTED'
+    AND calculated_at >= NOW() - INTERVAL '7 days'
+GROUP BY risk_code
+ORDER BY rejection_count DESC;
+```
+
+**Analyze game contribution effectiveness:**
+```sql
+SELECT
+    game_type,
+    AVG(layer3_game_weight) AS avg_weight,
+    SUM(layer2_valid_turnover) AS finance_turnover,
+    SUM(layer3_activity_turnover) AS activity_turnover,
+    (SUM(layer3_activity_turnover) / NULLIF(SUM(layer2_valid_turnover), 0))::DECIMAL(5,4) AS effective_contribution_rate
+FROM bonus_calculations
+WHERE calculation_status = 'COMPLETED'
+    AND calculated_at >= NOW() - INTERVAL '30 days'
+GROUP BY game_type
+ORDER BY activity_turnover DESC;
+```
+
+---
+
 ## 技術棧推薦
 
 | 層級 | 技術選型 | 用途 |
