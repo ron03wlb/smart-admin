@@ -198,6 +198,250 @@ sequenceDiagram
 
 ---
 
+## 2.3. Database Schema
+
+### 2.3.1 Payment Transactions Table
+
+```sql
+CREATE TABLE t_payment_transaction (
+    id                      BIGSERIAL PRIMARY KEY,
+    transaction_id          VARCHAR(100) NOT NULL UNIQUE,  -- txn_20260127_001
+    player_id               BIGINT NOT NULL,
+
+    -- Transaction details
+    type                    VARCHAR(20) NOT NULL,  -- DEPOSIT, WITHDRAWAL
+    amount                  DECIMAL(18,2) NOT NULL,
+    currency                VARCHAR(10) NOT NULL,  -- USD, EUR, GBP, etc.
+
+    -- PSP details
+    psp_code                VARCHAR(50) NOT NULL,  -- nuvei, adyen, stripe
+    psp_order_id            VARCHAR(200),          -- PSP payment token
+    psp_transaction_id      VARCHAR(200),          -- PSP final transaction ID
+    payment_method          VARCHAR(50) NOT NULL,  -- credit_card, e_wallet, bank_transfer, crypto
+
+    -- Status tracking
+    status                  VARCHAR(20) NOT NULL,  -- PENDING, SUCCESS, FAILED, EXPIRED
+    error_code              VARCHAR(50),           -- INSUFFICIENT_FUNDS, INVALID_CARD, etc.
+    error_message           VARCHAR(500),
+
+    -- URLs and expiry
+    redirect_url            VARCHAR(500),
+    return_url              VARCHAR(500),
+    expires_at              TIMESTAMP,
+
+    -- Timestamps
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    completed_at            TIMESTAMP,
+
+    -- Audit fields
+    ip_address              VARCHAR(45),
+    user_agent              VARCHAR(500),
+    device_fingerprint      VARCHAR(100),
+
+    -- Credit tracking (for reconciliation)
+    credit_flag             BOOLEAN DEFAULT FALSE,
+    credit_at               TIMESTAMP,
+    credit_source           VARCHAR(50),  -- WEBHOOK, RECONCILIATION, MANUAL_CREDIT
+
+    -- Indexes
+    CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES t_player(id)
+);
+
+-- Performance indexes
+CREATE INDEX idx_payment_txn_player_id ON t_payment_transaction(player_id);
+CREATE INDEX idx_payment_txn_status ON t_payment_transaction(status);
+CREATE INDEX idx_payment_txn_created_at ON t_payment_transaction(created_at DESC);
+CREATE INDEX idx_payment_txn_psp_code ON t_payment_transaction(psp_code);
+
+-- Reconciliation query optimization
+CREATE INDEX idx_payment_txn_pending_old ON t_payment_transaction(created_at)
+    WHERE status = 'PENDING';
+
+-- Unique constraint to prevent duplicate PSP transactions
+CREATE UNIQUE INDEX uk_payment_txn_psp ON t_payment_transaction(psp_code, psp_transaction_id)
+    WHERE psp_transaction_id IS NOT NULL;
+```
+
+### 2.3.2 Payment Methods Configuration Table
+
+```sql
+CREATE TABLE t_payment_method (
+    id                      BIGSERIAL PRIMARY KEY,
+    method_code             VARCHAR(50) NOT NULL UNIQUE,  -- credit_card, alipay, gcash, etc.
+    method_name             VARCHAR(100) NOT NULL,
+    method_type             VARCHAR(20) NOT NULL,  -- CARD, E_WALLET, BANK, CRYPTO
+
+    -- Availability
+    enabled                 BOOLEAN DEFAULT TRUE,
+    supported_currencies    TEXT[] NOT NULL,  -- ARRAY['USD', 'EUR', 'GBP']
+    supported_countries     TEXT[] NOT NULL,  -- ARRAY['US', 'UK', 'CA']
+
+    -- Limits
+    min_deposit_amount      DECIMAL(18,2),
+    max_deposit_amount      DECIMAL(18,2),
+    min_withdrawal_amount   DECIMAL(18,2),
+    max_withdrawal_amount   DECIMAL(18,2),
+
+    -- Fee configuration
+    deposit_fee_type        VARCHAR(20),  -- FIXED, PERCENTAGE, NONE
+    deposit_fee_value       DECIMAL(18,4),
+    withdrawal_fee_type     VARCHAR(20),
+    withdrawal_fee_value    DECIMAL(18,4),
+
+    -- Processing time
+    deposit_eta_minutes     INT,  -- Expected time to credit (5, 15, 30, etc.)
+    withdrawal_eta_hours    INT,  -- Expected time to payout (1, 24, 72, etc.)
+
+    -- Display configuration
+    display_order           INT DEFAULT 0,
+    icon_url                VARCHAR(500),
+    description             VARCHAR(500),
+
+    -- Audit fields
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Insert example data
+INSERT INTO t_payment_method (method_code, method_name, method_type, supported_currencies, supported_countries, min_deposit_amount, max_deposit_amount, deposit_fee_type, deposit_fee_value, deposit_eta_minutes, display_order) VALUES
+('credit_card', 'Credit/Debit Card', 'CARD', ARRAY['USD', 'EUR', 'GBP'], ARRAY['US', 'UK', 'CA', 'AU'], 10.00, 10000.00, 'PERCENTAGE', 2.5, 5, 1),
+('alipay', 'Alipay', 'E_WALLET', ARRAY['USD', 'CNY'], ARRAY['CN', 'HK', 'SG'], 5.00, 5000.00, 'FIXED', 1.00, 10, 2),
+('gcash', 'GCash', 'E_WALLET', ARRAY['PHP', 'USD'], ARRAY['PH'], 50.00, 50000.00, 'PERCENTAGE', 1.5, 15, 3),
+('bank_transfer', 'Bank Transfer', 'BANK', ARRAY['USD', 'EUR'], ARRAY['US', 'UK', 'EU'], 50.00, 50000.00, 'NONE', 0.00, 1440, 4),
+('usdt_trc20', 'USDT (TRC20)', 'CRYPTO', ARRAY['USDT'], ARRAY['ALL'], 10.00, 100000.00, 'FIXED', 1.00, 30, 5);
+```
+
+### 2.3.3 Payment Audit Log Table
+
+```sql
+CREATE TABLE t_payment_audit_log (
+    id                      BIGSERIAL PRIMARY KEY,
+    transaction_id          VARCHAR(100) NOT NULL,
+    event_type              VARCHAR(50) NOT NULL,  -- ORDER_CREATED, WEBHOOK_RECEIVED, CREDIT_SUCCESS, MANUAL_CREDIT, etc.
+    event_data              JSONB,  -- Flexible event-specific data
+
+    -- Operator tracking
+    operator_type           VARCHAR(20),  -- SYSTEM, CS_AGENT, FINANCE_MANAGER
+    operator_id             BIGINT,
+    operator_name           VARCHAR(100),
+
+    -- Request details (for webhook events)
+    request_ip              VARCHAR(45),
+    request_signature       VARCHAR(500),
+    request_body            TEXT,
+
+    -- Timestamps
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    -- Indexes
+    CONSTRAINT fk_transaction FOREIGN KEY (transaction_id) REFERENCES t_payment_transaction(transaction_id)
+);
+
+CREATE INDEX idx_payment_audit_txn_id ON t_payment_audit_log(transaction_id);
+CREATE INDEX idx_payment_audit_created_at ON t_payment_audit_log(created_at DESC);
+CREATE INDEX idx_payment_audit_event_type ON t_payment_audit_log(event_type);
+
+-- GIN index for JSONB queries
+CREATE INDEX idx_payment_audit_event_data ON t_payment_audit_log USING GIN (event_data);
+```
+
+### 2.3.4 PSP Configuration Table
+
+```sql
+CREATE TABLE t_psp_config (
+    id                      BIGSERIAL PRIMARY KEY,
+    psp_code                VARCHAR(50) NOT NULL UNIQUE,  -- nuvei, adyen, stripe
+    psp_name                VARCHAR(100) NOT NULL,
+
+    -- Status
+    enabled                 BOOLEAN DEFAULT TRUE,
+    health_status           VARCHAR(20) DEFAULT 'HEALTHY',  -- HEALTHY, DEGRADED, UNAVAILABLE
+    last_health_check       TIMESTAMP,
+
+    -- Routing configuration
+    priority                INT DEFAULT 0,  -- Higher = preferred
+    supported_methods       TEXT[] NOT NULL,  -- ARRAY['credit_card', 'alipay']
+    supported_currencies    TEXT[] NOT NULL,
+    supported_countries     TEXT[] NOT NULL,
+
+    -- Fee configuration
+    fee_percentage          DECIMAL(5,4),  -- 2.5% = 0.0250
+    settlement_eta_minutes  INT,  -- Expected credit time
+
+    -- API credentials (encrypted)
+    merchant_id             VARCHAR(200),
+    api_key_encrypted       VARCHAR(500),
+    webhook_secret_encrypted VARCHAR(500),
+
+    -- Health metrics (cached, updated by monitoring job)
+    success_rate_24h        DECIMAL(5,4),  -- 0.9500 = 95%
+    avg_response_time_ms    INT,
+
+    -- VIP channel
+    has_vip_channel         BOOLEAN DEFAULT FALSE,
+    vip_min_level           INT,  -- Minimum VIP level required
+
+    -- Audit fields
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Insert example PSP configurations
+INSERT INTO t_psp_config (psp_code, psp_name, enabled, priority, supported_methods, supported_currencies, supported_countries, fee_percentage, settlement_eta_minutes, success_rate_24h, has_vip_channel) VALUES
+('nuvei', 'Nuvei', TRUE, 10, ARRAY['credit_card', 'bank_transfer'], ARRAY['USD', 'EUR', 'GBP'], ARRAY['US', 'UK', 'CA'], 0.0250, 10, 0.9500, TRUE),
+('adyen', 'Adyen', TRUE, 8, ARRAY['credit_card', 'alipay', 'gcash'], ARRAY['USD', 'EUR', 'CNY', 'PHP'], ARRAY['US', 'EU', 'CN', 'PH'], 0.0300, 5, 0.9200, FALSE),
+('stripe', 'Stripe', TRUE, 6, ARRAY['credit_card', 'bank_transfer'], ARRAY['USD', 'EUR'], ARRAY['US', 'UK'], 0.0290, 15, 0.9000, FALSE);
+```
+
+### 2.3.5 Query Examples
+
+**Find pending transactions older than 30 minutes (for reconciliation)**:
+```sql
+SELECT
+    t.transaction_id,
+    t.player_id,
+    t.amount,
+    t.currency,
+    t.psp_code,
+    t.created_at,
+    EXTRACT(EPOCH FROM (NOW() - t.created_at))/60 AS pending_minutes
+FROM t_payment_transaction t
+WHERE t.status = 'PENDING'
+  AND t.created_at < NOW() - INTERVAL '30 minutes'
+ORDER BY t.created_at ASC
+LIMIT 100;
+```
+
+**Calculate PSP success rate for smart routing**:
+```sql
+SELECT
+    psp_code,
+    COUNT(*) AS total_transactions,
+    SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) AS success_count,
+    ROUND(SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END)::DECIMAL / COUNT(*), 4) AS success_rate,
+    AVG(EXTRACT(EPOCH FROM (completed_at - created_at))) AS avg_processing_seconds
+FROM t_payment_transaction
+WHERE created_at >= NOW() - INTERVAL '24 hours'
+  AND status IN ('SUCCESS', 'FAILED')
+GROUP BY psp_code
+ORDER BY success_rate DESC;
+```
+
+**Audit log query for a specific transaction**:
+```sql
+SELECT
+    event_type,
+    event_data,
+    operator_type,
+    operator_name,
+    created_at
+FROM t_payment_audit_log
+WHERE transaction_id = 'txn_20260127_001'
+ORDER BY created_at ASC;
+```
+
+---
+
 ## 3. Smart Routing Algorithm
 
 ### 3.1 Routing Architecture Overview
