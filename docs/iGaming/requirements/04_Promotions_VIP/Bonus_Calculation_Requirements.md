@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 > **Audience**: Executives, Product Managers
-> **Related Architecture**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
+> **Related Doc**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 1.0.0
 
@@ -10,11 +10,11 @@
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Fair Play Assurance**: Defines game contribution rates (Slots 100%, Blackjack 5-10%, Poker 0%) ensuring wagering requirements reflect true game risk
-- **Fraud Prevention**: Documents invalid bet types (hedge betting, arbitrage, low odds <1.5) to prevent bonus abuse and player exploitation
-- **Cost Control**: Establishes multi-bonus conflict resolution strategies (MAX_REWARD, TYPE_EXCLUSIVE) with global limits (max 5 active bonuses, $10K balance cap)
-- **Operational Visibility**: Specifies daily reconciliation with ≤0.01% deviation tolerance and A/B testing framework for rule optimization
+The Bonus Calculation Engine delivers critical business value by:
+- **Risk Control**: Game contribution rates prevent low house-edge games (e.g., Blackjack ~0.5%) from being exploited to easily complete turnover requirements, protecting bonus budget integrity
+- **Cost Optimization**: Multi-bonus conflict resolution strategies (MAX_REWARD, PRIORITY, TYPE_EXCLUSIVE) control bonus costs by preventing uncontrolled stacking while maintaining player experience
+- **Fraud Prevention**: Valid turnover validation rules block hedge betting and arbitrage strategies, reducing bonus abuse by up to 70%
+- **Financial Accuracy**: Daily reconciliation with ≤0.01% deviation tolerance ensures bonus system integrity and regulatory compliance
 
 ---
 
@@ -22,11 +22,12 @@ This requirements document delivers strategic value by:
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Wagering Completion Rate | ≥30% | Players completing wagering requirements / Total bonus claims |
-| Conflict Complaint Rate | <2% | Player complaints about conflict rules / Total claims |
-| Bonus Cost Ratio | <15% of revenue | Total bonus payout / Gross Gaming Revenue |
-| Daily Reconciliation Deviation | ≤0.01% | Finance system vs Activity system turnover |
-| Activity Switch Frequency | <5 per player/hour | Monitoring for suspected arbitrage testing |
+| Bonus Cost Ratio | ≤15% of revenue | Daily financial reconciliation report |
+| Turnover Completion Rate | ≥30% | Players completing wagering requirements |
+| Conflict Resolution Complaint Rate | ≤2% | Customer service ticket analysis |
+| Reconciliation Deviation | ≤0.01% | Finance System vs Activity System daily variance |
+| Fraud Detection Rate | Block ≥70% of hedge/arbitrage attempts | Risk control alert analysis |
+| Player Activity Switch Frequency | ≤5 times/hour per player | Anti-arbitrage monitoring threshold |
 
 ---
 
