@@ -2,7 +2,7 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 6 - Coverage Enhancement Sprint
-> **Total Iterations**: 5
+> **Total Iterations**: 6
 > **Status**: IN PROGRESS
 
 ---
@@ -55,24 +55,24 @@
   - sequenceDiagram: Payment processing end-to-end flow (deposit → gateway → ledger) ✅
 - [x] architecture/03_Game_Integration/Game_Integration_Security.md (+Mermaid)
   - graph TB: Security verification layers (API key, token, IP whitelist, signature) ✅
-- [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (+Mermaid)
-  - flowchart TD: Turnover validation decision tree
+- [x] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (+Mermaid)
+  - flowchart TD: Turnover validation decision tree ✅
 
 #### Batch 4 — Auth/Responsible Gambling (3 files)
-- [ ] architecture/06_Platform_Core/MFA_Compliance_Technical.md (+Mermaid)
-  - sequenceDiagram: MFA challenge-response flow
-- [ ] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md (+Mermaid)
-  - sequenceDiagram: TOTP enrollment + WebAuthn registration flow
-- [ ] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md (+Mermaid)
-  - flowchart TD: Deposit/loss limit enforcement pipeline
+- [x] architecture/06_Platform_Core/MFA_Compliance_Technical.md (+Mermaid)
+  - sequenceDiagram: MFA challenge-response flow (3-phase: auth → challenge → verify, with backup code fallback) ✅
+- [x] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md (+Mermaid)
+  - sequenceDiagram: TOTP enrollment + WebAuthn registration flow (2-phase: TOTP secret generation + WebAuthn credential binding) ✅
+- [x] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md (+Mermaid)
+  - flowchart TD: Deposit/loss limit enforcement pipeline (hierarchical checks: pre-deposit setup → self-exclusion → daily/weekly/monthly limits, with configurable breach actions) ✅
 
 ---
 
 ### 6C: SQL Push + Hygiene (+6 SQL → 80%)
 
 #### Batch 5 — High-value SQL (5 files)
-- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (+SQL)
-  - payment_transactions + payment_methods tables
+- [x] architecture/02_Finance_Service/Payment_Gateway_API.md (+SQL)
+  - payment_transactions + payment_methods tables (4 tables total: transactions, methods, audit_log, psp_config + query examples) ✅
 - [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (+SQL)
   - bonus_rules + bonus_calculations tables
 - [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+SQL)
