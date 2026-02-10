@@ -2,33 +2,26 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
 > **Audience**: Executives, Product Managers, Compliance Officers, QA Teams
-> **Related Architecture**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
+> **Related Doc**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
 > **Last Synced**: 2026-02-08
 
 ---
 
 ## Business Value
 
-This document delivers strategic value by:
-- **Operational Clarity**: Provides 6 end-to-end business flows covering the complete player lifecycle from registration through withdrawal
-- **Cross-Functional Alignment**: Enables Executives, Product Managers, Compliance Officers, and QA Teams to share a common understanding of platform operations
-- **Compliance Foundation**: Documents KYC verification levels, risk control checkpoints, and multi-tenant data isolation requirements for regulatory audit readiness
-- **Risk Mitigation**: Defines five-layer withdrawal review process and risk scoring factors to prevent fraud and bonus abuse
-
----
+This document delivers value by:
+- **Cross-functional alignment**: Provides a unified business flow reference for executives, product managers, compliance officers, and QA teams to ensure consistent understanding of platform operations
+- **Regulatory compliance**: Documents compliance checkpoints (KYC verification levels, risk control checks) required by gambling jurisdictions
+- **Risk mitigation**: Defines exception handling and automatic compensation policies to prevent player fund loss and operational disputes
 
 ## Acceptance Criteria
 
-- [ ] Player registration flow correctly assigns tenant context from domain/URL path
-- [ ] Wallet initialization creates all four balance fields (Cash, Promotional, Locked, Playable) with zero values
-- [ ] KYC verification supports three levels (L1: $1,000/day, L2: $10,000/day, L3: Unlimited)
-- [ ] Game launch tokens expire after 5 minutes and enforce one-time use
-- [ ] Playable Balance calculation follows formula: Cash Balance - Locked Amount - In-Progress Bets
-- [ ] Bonus wagering uses game-specific weights (Slots 100%, Baccarat 10%, Sports 50%)
-- [ ] Withdrawal review implements five-layer risk control (KYC → Turnover → Bonus → Frequency → Risk Score)
-- [ ] Risk score thresholds trigger correct actions (0-30 auto-approve, 31-70 manual review, 71-100 auto-reject)
-- [ ] Three-layer turnover verification (Real-time OLTP → Hourly Reconciliation → Daily OLAP) detects and alerts on discrepancies
-- [ ] Multi-tenant data isolation prevents cross-tenant access at application and database layers
+- [ ] All 6 business flows include complete flow diagrams, business rules, and exception handling sections
+- [ ] Flow diagrams include clear decision nodes with pass/reject criteria (e.g., KYC verification, turnover checks, risk scoring thresholds)
+- [ ] Cross-references to technical implementation documents are verified and functional
+- [ ] Business rules align with compliance requirements (KYC levels, withdrawal limits, risk scoring)
+- [ ] Exception handling policies include error codes and resolution procedures
+- [ ] Document remains synchronized with technical implementation changes in architecture docs
 
 ---
 
