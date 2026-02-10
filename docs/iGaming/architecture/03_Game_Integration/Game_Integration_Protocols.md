@@ -23,6 +23,33 @@ The platform integrates with external Game Providers (GP) using a **Seamless Wal
 | Data Format | JSON request/response bodies |
 | Idempotency | Transaction ID-based deduplication |
 
+### 1.2 Protocol Message Flow
+
+The platform supports three communication patterns for Game Provider integration:
+
+```mermaid
+graph LR
+    A[Platform API] -->|HTTP/HTTPS| B[Provider Adaptor]
+    B -->|REST API| C[Type A Provider<br/>PG-like]
+    B -->|Webhook| D[Type B Provider<br/>Evolution-like]
+    B -->|WebSocket| E[Type C Provider<br/>Real-time Stream]
+
+    C -->|JSON Response| B
+    D -->|Callback POST| B
+    E -->|Bidirectional<br/>Messages| B
+
+    B -->|Normalized| F[Platform Core]
+
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style F fill:#e8f5e9
+```
+
+**Communication Patterns**:
+- **HTTP/REST**: Type A providers (polling, request-response)
+- **Webhook**: Type B providers (callback-based, async)
+- **WebSocket**: Type C providers (persistent connection, real-time)
+
 ---
 
 ## 2. Core API Specifications
@@ -99,6 +126,90 @@ Currency: VND (23000)     ──>  convertCurrency()      ──>   Currency: US
 
 All GP `GameType` values are mapped to platform standard categories: `LIVE`, `SLOT`, `SPORT`.
 All currency units are normalized (e.g., GP uses cents -> platform converts to base currency).
+
+### 4.3 Protocol Persistence Layer
+
+The platform persists provider protocol configurations and message logs for debugging and audit purposes.
+
+#### 4.3.1 Provider Protocol Configuration
+
+```sql
+CREATE TABLE game_provider_protocols (
+    protocol_id BIGSERIAL PRIMARY KEY,
+    provider_code VARCHAR(50) NOT NULL UNIQUE,
+    provider_name VARCHAR(100) NOT NULL,
+    provider_type CHAR(1) NOT NULL CHECK (provider_type IN ('A', 'B', 'C')),
+    api_endpoint VARCHAR(255) NOT NULL,
+    communication_method VARCHAR(20) NOT NULL CHECK (communication_method IN ('HTTP', 'HTTPS', 'WEBHOOK', 'WEBSOCKET')),
+    auth_method VARCHAR(50) NOT NULL DEFAULT 'HMAC-SHA256',
+    ip_whitelist TEXT[], -- Array of whitelisted IP addresses
+    tls_version VARCHAR(10) NOT NULL DEFAULT 'TLS 1.2',
+    timeout_seconds INT NOT NULL DEFAULT 30,
+    retry_policy JSONB NOT NULL DEFAULT '{"max_retries": 3, "backoff_multiplier": 2}',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(50) NOT NULL,
+    updated_by VARCHAR(50) NOT NULL
+);
+
+CREATE INDEX idx_game_provider_protocols_provider_code ON game_provider_protocols(provider_code);
+CREATE INDEX idx_game_provider_protocols_provider_type ON game_provider_protocols(provider_type);
+CREATE INDEX idx_game_provider_protocols_is_active ON game_provider_protocols(is_active);
+
+COMMENT ON TABLE game_provider_protocols IS 'Game provider integration protocol configurations (Type A/B/C mapping, communication method, auth settings)';
+COMMENT ON COLUMN game_provider_protocols.provider_type IS 'A=PG-like single endpoint, B=Evolution-like Debit/Credit, C=Seamless webhook';
+COMMENT ON COLUMN game_provider_protocols.retry_policy IS 'JSON configuration for retry behavior (max_retries, backoff_multiplier, timeout)';
+```
+
+#### 4.3.2 Protocol Message Logs
+
+```sql
+CREATE TABLE protocol_message_logs (
+    log_id BIGSERIAL PRIMARY KEY,
+    protocol_id BIGINT NOT NULL REFERENCES game_provider_protocols(protocol_id),
+    transaction_id VARCHAR(100), -- Nullable for non-transactional messages (e.g., CheckToken)
+    message_type VARCHAR(50) NOT NULL, -- GetBalance, Transaction, CheckToken, Callback, etc.
+    direction VARCHAR(10) NOT NULL CHECK (direction IN ('REQUEST', 'RESPONSE', 'CALLBACK')),
+    http_method VARCHAR(10), -- GET, POST, etc. (nullable for WebSocket)
+    http_status_code INT, -- HTTP response code (nullable for WebSocket)
+    request_payload TEXT NOT NULL,
+    response_payload TEXT,
+    processing_time_ms INT,
+    error_code VARCHAR(50),
+    error_message TEXT,
+    client_ip VARCHAR(45), -- IPv4 or IPv6
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_protocol_message_logs_protocol_id ON protocol_message_logs(protocol_id);
+CREATE INDEX idx_protocol_message_logs_transaction_id ON protocol_message_logs(transaction_id);
+CREATE INDEX idx_protocol_message_logs_message_type ON protocol_message_logs(message_type);
+CREATE INDEX idx_protocol_message_logs_created_at ON protocol_message_logs(created_at DESC);
+CREATE INDEX idx_protocol_message_logs_error_code ON protocol_message_logs(error_code) WHERE error_code IS NOT NULL;
+
+COMMENT ON TABLE protocol_message_logs IS 'Complete audit trail of all Game Provider API interactions (request/response/callback messages)';
+COMMENT ON COLUMN protocol_message_logs.direction IS 'REQUEST=platform→GP, RESPONSE=GP→platform, CALLBACK=GP→platform (webhook/WebSocket)';
+COMMENT ON COLUMN protocol_message_logs.processing_time_ms IS 'API call duration in milliseconds (for performance monitoring)';
+```
+
+**Usage Example**:
+```sql
+-- Query all failed messages for a specific provider in the last hour
+SELECT
+    pml.transaction_id,
+    pml.message_type,
+    pml.http_status_code,
+    pml.error_message,
+    pml.processing_time_ms,
+    pml.created_at
+FROM protocol_message_logs pml
+JOIN game_provider_protocols gpp ON pml.protocol_id = gpp.protocol_id
+WHERE gpp.provider_code = 'PGSoft'
+  AND pml.error_code IS NOT NULL
+  AND pml.created_at > NOW() - INTERVAL '1 hour'
+ORDER BY pml.created_at DESC;
+```
 
 ---
 
