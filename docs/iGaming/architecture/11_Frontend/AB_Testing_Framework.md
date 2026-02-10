@@ -33,6 +33,30 @@
 
 **Platform Recommendation**: GrowthBook (open-source, self-hosted, full-featured)
 
+### 1.1 Variant Assignment Pipeline
+
+```mermaid
+flowchart TD
+    A[Player Request] --> B{Experiment<br/>Active?}
+    B -->|No| C[Return Control]
+    B -->|Yes| D{Player in<br/>Target Segment?}
+    D -->|No| C
+    D -->|Yes| E[Hash Player ID<br/>+ Experiment ID]
+    E --> F[Calculate Bucket<br/>0-99]
+    F --> G{Check Traffic<br/>Allocation}
+    G -->|0-49| H[Assign Control]
+    G -->|50-74| I[Assign Variant A]
+    G -->|75-99| J[Assign Variant B]
+    H --> K[Track Exposure Event]
+    I --> K
+    J --> K
+    K --> L[Serve Variant Content]
+    L --> M{Conversion<br/>Event?}
+    M -->|Yes| N[Record Conversion]
+    M -->|No| O[End]
+    N --> O
+```
+
 ## 2. Hash-Based Traffic Allocation
 
 ```javascript
@@ -150,3 +174,83 @@ Rule 3: Guardrail metric triggered
 -> 6. Analysis (statistical tests, business decision)
 -> 7. Winner Rollout (100% traffic, decommission control)
 ```
+
+## 7. Database Schema
+
+### 7.1 ab_experiments
+
+```sql
+CREATE TABLE ab_experiments (
+    experiment_id BIGSERIAL PRIMARY KEY,
+    experiment_key VARCHAR(100) UNIQUE NOT NULL,  -- e.g., 'homepage-redesign'
+    experiment_name VARCHAR(200) NOT NULL,
+    description TEXT,
+    status VARCHAR(20) NOT NULL CHECK (status IN ('draft', 'running', 'paused', 'completed', 'archived')),
+    start_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_date TIMESTAMP WITH TIME ZONE,
+
+    -- Experiment configuration (JSONB for flexible schema)
+    variants JSONB NOT NULL,  -- [{"name": "control", "traffic": 50}, {"name": "variant_a", "traffic": 50}]
+    target_segments JSONB,    -- {"country": ["US", "UK"], "new_users": true}
+    primary_metric JSONB NOT NULL,  -- {"name": "conversion_rate", "goal": "maximize", "mde": 0.05}
+    secondary_metrics JSONB,
+    guardrail_metrics JSONB,
+
+    -- Sample size and statistical settings
+    min_sample_size INT DEFAULT 1000,
+    max_sample_size INT DEFAULT 100000,
+    significance_level DECIMAL(3,2) DEFAULT 0.05,
+    statistical_power DECIMAL(3,2) DEFAULT 0.80,
+
+    -- Results tracking
+    current_sample_size INT DEFAULT 0,
+    statistical_significance BOOLEAN DEFAULT FALSE,
+    winning_variant VARCHAR(50),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT REFERENCES t_employee(employee_id)
+);
+
+CREATE INDEX idx_ab_exp_status ON ab_experiments(status, start_date);
+CREATE INDEX idx_ab_exp_key ON ab_experiments(experiment_key);
+```
+
+### 7.2 ab_experiment_assignments
+
+```sql
+CREATE TABLE ab_experiment_assignments (
+    assignment_id BIGSERIAL PRIMARY KEY,
+    experiment_id BIGINT NOT NULL REFERENCES ab_experiments(experiment_id),
+    player_id BIGINT NOT NULL REFERENCES t_player(player_id),
+    variant_name VARCHAR(50) NOT NULL,
+
+    -- Assignment details
+    assigned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    assignment_hash VARCHAR(32) NOT NULL,  -- Murmur3 hash for reproducibility
+
+    -- Exposure tracking
+    first_exposure_at TIMESTAMP WITH TIME ZONE,
+    total_exposures INT DEFAULT 0,
+
+    -- Conversion tracking
+    converted BOOLEAN DEFAULT FALSE,
+    conversion_time TIMESTAMP WITH TIME ZONE,
+    conversion_value DECIMAL(15,2),
+
+    -- Metadata
+    user_agent TEXT,
+    ip_address INET,
+
+    UNIQUE(experiment_id, player_id)
+);
+
+CREATE INDEX idx_ab_assign_exp_variant ON ab_experiment_assignments(experiment_id, variant_name);
+CREATE INDEX idx_ab_assign_player ON ab_experiment_assignments(player_id);
+CREATE INDEX idx_ab_assign_converted ON ab_experiment_assignments(experiment_id, converted, conversion_time);
+```
+
+**Data Retention**:
+- Experiment configs: Retained indefinitely for audit purposes
+- Assignment records: Retained for 2 years after experiment completion
+- Raw event data: Stored in ClickHouse with 6-month retention
