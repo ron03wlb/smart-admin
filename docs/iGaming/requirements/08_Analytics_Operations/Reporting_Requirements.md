@@ -3,31 +3,31 @@
 > **Canonical Source**: [source-archive/08_Analytics_BI/08-01_Reporting_BI.md](../../source-archive/08_Analytics_BI/08-01_Reporting_BI.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Reporting Architecture](../../architecture/08_Analytics_Service/Reporting_Architecture.md)
+> **Related Doc**: [Reporting Architecture](../../architecture/08_Analytics_Service/Reporting_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Revenue Visibility**: Defines GGR/NGR calculations with hourly refresh enabling real-time P&L monitoring across game types and player segments
-- **Risk Mitigation**: Specifies 4 suspicious betting detection types (Hedging, Arbitrage, Abnormal Win Rate, Turnover Anomaly) with real-time 5-minute delay alerting
-- **Regulatory Compliance**: Documents MGA regulatory report requirements (monthly GGR, RTP verification, Responsible Gaming metrics) and AML/KYC reporting (SAR filing, SOF verification)
-- **Operational Efficiency**: Establishes tiered export rules (sync <100k rows, async >100k rows) with role-based access control across 6 user categories
-
----
+This Reporting & BI system delivers value by:
+- **Informed Decision-Making**: Providing real-time (T+0), daily (T+1), and monthly reporting across financial (GGR/NGR), operational (DAU/MAU), risk (fraud detection), and compliance (MGA/AML) domains, enabling data-driven strategic and tactical decisions
+- **Regulatory Compliance**: Automating MGA monthly submissions and AML/KYC reporting, reducing manual effort and regulatory risk
+- **Revenue Optimization**: Enabling game performance analysis, campaign ROI measurement, and player segmentation to identify high-value opportunities and underperforming assets
+- **Risk Mitigation**: Delivering real-time suspicious betting, multi-account detection, and withdrawal risk reports with 5-minute delay, allowing proactive fraud prevention
+- **Operational Efficiency**: Supporting role-based access (C-Level, Operations Manager, Risk Analyst, Agent, Finance, BI Analyst) and self-service analytics, reducing ad-hoc report requests and empowering teams
 
 ## Success Metrics
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Real-time Dashboard Freshness | < 5 minutes delay | Data lag from event to dashboard |
-| Real-time Dashboard Availability | 99.9% uptime | Monthly availability percentage |
-| T+1 Report Accuracy | 100% | Reconciliation with source systems |
-| T+1 Report Availability | By 03:00 AM daily | Report generation completion time |
-| Monthly Compliance Report SLA | Available by 2nd of month | Report delivery date |
-| Export Task Success Rate | > 99% | Successful exports / Total export requests |
+| Real-time Dashboard Freshness | < 5 minutes delay | 99.9% of queries meet SLA (Section 8) |
+| T+1 Daily Report Availability | 100% by 03:00 AM | 99.5% on-time delivery (Section 8) |
+| Monthly Compliance Report Accuracy | 100% auditable accuracy | 99% availability by 2nd of month (Section 8) |
+| Report Export Success Rate | ≥ 98% | Track small exports (< 100k rows synchronous) and large exports (> 100k asynchronous with notification) completion rates (Section 6.2) |
+| Role-Based Access Coverage | 100% enforcement | All 6 role types (C-Level, Ops, Risk, Agent, Finance, BI Analyst) can access only authorized reports per Section 7 matrix |
+| User Adoption Rate | ≥ 70% active weekly users | Track weekly unique users per role accessing reports (proxy for self-service effectiveness) |
+| Query Rate Limit Compliance | < 1% violation rate | Monitor per-user (10/min) and per-tenant (100/min) rate limit violations (Section 9) |
 
 ---
 
