@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Architecture**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
+> **Related Doc**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (PSP webhook implementation, signature verification algorithms, smart routing code, scheduled reconciliation jobs, connection pool configuration, Prometheus metrics) moved to Architecture layer. This document focuses on business rules only.
@@ -11,24 +11,21 @@
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Revenue Optimization**: Defines smart routing with weighted factors (Success Rate 50%, Fee 30%, Speed 15%) to maximize transaction success while minimizing costs
-- **Regulatory Compliance**: Documents jurisdiction-specific restrictions (UK credit card ban, PSD2 3DS 2.0, AML wallet scoring) to prevent regulatory violations and associated fines
-- **Operational Efficiency**: Establishes automated reconciliation (every 15 minutes) and severity-based alerting (P0-P3) to minimize manual intervention and reduce failed transaction resolution time
-- **VIP Retention**: Specifies differentiated payment channels for VIP levels (dedicated account manager, fee reductions, expedited settlement) to enhance high-value player experience
-
----
+This payment operations system delivers value by:
+- **Payment success rate optimization**: Smart routing algorithm dynamically selects optimal PSPs based on success rate (50% weight), transaction fees (30% weight), and settlement speed (15% weight), reducing drop rate from industry average 3-5% to target <1%
+- **Cost efficiency**: Multi-PSP competition and dynamic channel switching reduce per-transaction fees by 15-30% compared to single-provider setups, especially for high-volume VIP players
+- **Regulatory compliance**: Ensures PCI-DSS Level 1 compliance (no card storage), PSD2 3D Secure mandates (EU), and AML wallet address risk scoring for cryptocurrency payments
 
 ## Success Metrics
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Drop Rate | < 1% | (Credits / Total Success) × 100% |
-| Credit Success Rate | > 95% | (Successful Credits / Credit Attempts) × 100% |
-| Average Credit Delay | < 30 min | Time from PSP success to platform credit |
-| Pending Backlog | < 10 orders | Orders pending > 2 hours |
-| Manual Review Rate | < 5% | (Manual / Total Credits) × 100% |
-| PSP API Success Rate | > 99% | (Successful Queries / Total Queries) × 100% |
+| Drop Rate | <1% | (Credits / Total Success) x 100%; alert triggered at >3% |
+| Credit Success Rate | >95% | (Successful Credits / Credit Attempts) x 100%; alert at <90% |
+| Average Credit Delay | <30 min | Time from PSP success callback to platform balance credit; alert at >2 hours |
+| PSP API Success Rate | >99% | (Successful Queries / Total Queries) x 100%; alert at <95% |
+| Pending Backlog | <10 orders | Orders pending >2 hours; alert at >50 orders |
+| Manual Review Rate | <5% | (Manual Reviews / Total Credits) x 100%; alert at >15% |
 
 ---
 
