@@ -1,8 +1,8 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: Phase 6 - Coverage Enhancement Sprint
-> **Total Iterations**: 6
+> **Current Phase**: Phase 6 - Coverage Enhancement Sprint (Batch 5 Complete → Batch 6)
+> **Total Iterations**: 5
 > **Status**: IN PROGRESS
 
 ---
@@ -73,14 +73,14 @@
 #### Batch 5 — High-value SQL (5 files)
 - [x] architecture/02_Finance_Service/Payment_Gateway_API.md (+SQL)
   - payment_transactions + payment_methods tables (4 tables total: transactions, methods, audit_log, psp_config + query examples) ✅
-- [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (+SQL)
-  - bonus_rules + bonus_calculations tables
-- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+SQL)
-  - detection_models + detection_results tables
-- [ ] architecture/05_Risk_Engine/Player_Protection_API.md (+SQL)
-  - player_limits + self_exclusions tables
-- [ ] architecture/03_Game_Integration/Game_Integration_Implementation.md (+SQL)
-  - game_sessions + game_round_logs tables
+- [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (+SQL)
+  - bonus_rules + bonus_calculations tables (2 tables + 3 query examples: wagering progress, risk audit, game contribution analysis) ✅
+- [x] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+SQL)
+  - detection_models + detection_results tables (2 tables + 3 query examples: model effectiveness, withdrawal check, Layer 1 audit) ✅
+- [x] architecture/05_Risk_Engine/Player_Protection_API.md (+SQL)
+  - player_limits + self_exclusions tables (2 tables + 4 query examples: active limits/usage, exclusion check, compliance report, limit breaches) ✅
+- [x] architecture/03_Game_Integration/Game_Integration_Implementation.md (+SQL)
+  - game_sessions + game_round_logs tables (2 tables + 5 query examples: session summary, idempotency check, stalled tx recovery, failed tx audit, cache hit rate) ✅
 
 #### Batch 6 — SQL + Hygiene (3 tasks)
 - [ ] architecture/10_Platform_Management/Notification_Architecture.md (+SQL)
