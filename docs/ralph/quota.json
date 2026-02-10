@@ -1,0 +1,28 @@
+{
+  "window_start": "2026-02-10T04:52:00.715Z",
+  "window_end": "2026-02-10T05:52:00.715Z",
+  "accumulated": {
+    "input_tokens": 85000,
+    "output_tokens": 20500,
+    "cached_tokens": 37000,
+    "effective_tokens": 72200,
+    "api_calls": 3
+  },
+  "failure_count": 0,
+  "success_count": 3,
+  "estimated_quota": {
+    "tier": "tier-4",
+    "input_tpm": 400000,
+    "max_tokens_in_window": 24000000,
+    "token_usage_pct": 0.35,
+    "remaining_input_pct": 99.65
+  },
+  "risk_components": {
+    "token_usage_pct": 0.35,
+    "api_call_rate_pct": 0.1,
+    "failure_rate": 0,
+    "five_hour_proximity": 0
+  },
+  "risk_score": 0.0017,
+  "recommendation": "continue"
+}

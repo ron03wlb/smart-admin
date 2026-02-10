@@ -1,0 +1,185 @@
+# Ralph Loop - Usage Thresholds Configuration
+#
+# This file defines token usage thresholds and rest strategies for Ralph Loop monitoring.
+#
+# Version: 1.0
+# Last Updated: 2026-02-10
+
+# API Tier Configuration
+# Supported tiers: tier-1, tier-2, tier-3, tier-4
+api_tier: "tier-4"
+
+# Tier Limits (Tokens Per Minute / Requests Per Minute)
+tier_limits:
+  tier-1:
+    input_tpm: 50000      # 50k TPM
+    output_tpm: 10000     # 10k TPM
+    rpm: 50               # 50 RPM
+
+  tier-2:
+    input_tpm: 100000     # 100k TPM
+    output_tpm: 20000     # 20k TPM
+    rpm: 100              # 100 RPM
+
+  tier-3:
+    input_tpm: 200000     # 200k TPM
+    output_tpm: 40000     # 40k TPM
+    rpm: 200              # 200 RPM
+
+  tier-4:
+    input_tpm: 400000     # 400k TPM
+    output_tpm: 80000     # 80k TPM
+    rpm: 4000             # 4k RPM
+
+# Token Usage Thresholds (percentage of tier limit)
+# When usage exceeds these thresholds, the system will take action
+token_thresholds:
+  input:
+    moderate: 60    # 60% - Start monitoring closely
+    high: 80        # 80% - Recommend rest
+    critical: 90    # 90% - Force rest or stop
+
+  output:
+    moderate: 60
+    high: 80
+    critical: 90
+
+# Monitoring Configuration
+monitoring:
+  # How often to check quota (in seconds)
+  quota_check_interval_seconds: 1800  # 30 minutes
+
+  # Metrics retention (in days)
+  metrics_retention_days: 90
+
+# Rest Strategy Configuration
+# Defines how long to rest based on risk score
+rest_strategy:
+  risk_bands:
+    # Moderate risk (0.3 - 0.6)
+    moderate:
+      min_minutes: 5
+      max_minutes: 10
+
+    # High risk (0.6 - 0.8)
+    high:
+      min_minutes: 15
+      max_minutes: 30
+
+    # Critical risk (0.8 - 1.0)
+    critical:
+      min_minutes: 45
+      max_minutes: 60
+
+# 5-Hour Usage Window Configuration
+# Claude API has a 5-hour rolling usage limit
+five_hour_window:
+  enabled: true
+
+  # Warning threshold (in minutes)
+  # Alert when approaching 5-hour limit
+  warning_threshold_minutes: 270    # 4.5 hours
+
+  # Critical threshold (in minutes)
+  # Force rest when very close to limit
+  critical_threshold_minutes: 285   # 4.75 hours
+
+  # Rest duration when 5-hour limit is hit (in minutes)
+  forced_rest_minutes: 60
+
+# Risk Score Calculation Weights
+# These weights determine how each factor contributes to the overall risk score
+# Total must sum to 1.0
+risk_score_weights:
+  token_usage: 0.40         # Token usage percentage (40%)
+  api_call_rate: 0.30       # API call frequency (30%)
+  failure_rate: 0.15        # Failure rate (15%)
+  five_hour_proximity: 0.15 # Proximity to 5-hour limit (15%)
+
+# Failure Handling
+failure_handling:
+  # Maximum consecutive failures before forcing rest
+  max_consecutive_failures: 3
+
+  # Rest duration after consecutive failures (in minutes)
+  failure_rest_minutes: 10
+
+  # Exponential backoff multiplier for repeated failures
+  backoff_multiplier: 1.5
+
+# Notification Configuration (optional)
+# Enable/disable notifications for different events
+notifications:
+  enabled: false
+
+  # Events to notify
+  events:
+    rest_triggered: true
+    critical_threshold: true
+    five_hour_warning: true
+    quota_exceeded: true
+
+# Advanced Configuration
+advanced:
+  # Cached token discount rate (0.0 - 1.0)
+  # Claude API charges less for cached tokens
+  cached_token_discount: 0.9   # 90% discount (10% cost)
+
+  # Minimum rest duration (in minutes)
+  # Even if risk is low, rest at least this long
+  minimum_rest_minutes: 5
+
+  # Maximum rest duration (in minutes)
+  # Never rest longer than this
+  maximum_rest_minutes: 60
+
+# Tier-Specific Overrides (optional)
+# Override default settings for specific tiers
+tier_overrides:
+  tier-1:
+    token_thresholds:
+      input:
+        moderate: 50    # More conservative for lower tiers
+        high: 70
+        critical: 85
+
+    rest_strategy:
+      risk_bands:
+        moderate:
+          min_minutes: 10
+          max_minutes: 20
+        high:
+          min_minutes: 25
+          max_minutes: 40
+
+  tier-2:
+    token_thresholds:
+      input:
+        moderate: 55
+        high: 75
+        critical: 88
+
+# Maintenance Settings
+maintenance:
+  # Auto-cleanup old metrics files
+  auto_cleanup_enabled: true
+
+  # Cleanup interval (in days)
+  cleanup_interval_days: 7
+
+  # Compress old metrics (gzip)
+  compress_old_metrics: false
+
+# Logging
+logging:
+  # Log level: debug, info, warn, error
+  level: "info"
+
+  # Log file rotation
+  rotate_logs: true
+
+  # Maximum log file size (in MB)
+  max_log_size_mb: 10
+
+  # Number of log files to keep
+  max_log_files: 5

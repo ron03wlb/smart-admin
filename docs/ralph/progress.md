@@ -1,114 +1,160 @@
 # iGaming Documentation Optimization Progress
 
-> **Started**: 2026-02-10
-> **Completed**: 2026-02-10
-> **Total Iterations**: 2
-> **Final Status**: ✅ COMPLETE (6/6 critical quality gates PASSED)
+> **Started**: 2026-02-10 (Phase 5 Restart)
+> **Current Phase**: Phase 5 - Content Quality Enhancement Sprint
+> **Total Iterations**: 0
+> **Status**: 🔄 IN PROGRESS
 
 ---
 
-## Phase 1: Cross-Reference Completion [COMPLETE]
+## Overview: Phase 5 Mission
 
-### 1A: Requirements files needing `> **Related Architecture**:` header
+**Goal**: Pass ALL 7 quality gates (currently 5/7 passed)
 
-- [x] requirements/01_Player_Experience/Industry_Glossary.md → N/A (reference document)
-- [x] requirements/01_Player_Experience/Terminology_Standards.md → N/A (reference document)
-- [x] requirements/05_Risk_Compliance/Risk_Strategy_Overview.md → (ALREADY HAD cross-ref)
-- [x] requirements/06_Governance_Licensing/MFA_Requirements.md → (ALREADY HAD cross-ref)
-- [x] requirements/09_Infrastructure_Requirements/Cost_Optimization_Requirements.md → (ALREADY HAD cross-ref)
-- [x] requirements/09_Infrastructure_Requirements/QA_Standards_Requirements.md → (ALREADY HAD cross-ref)
+**Blocking Issues**:
+- ❌ **Mermaid Coverage**: 56/73 (76%) → Need 80% (add 3+ diagrams)
+- ❌ **SQL Coverage**: 42/73 (57%) → Need 60% (add 3+ schemas)
+- ⚠️ **Stale Display Text**: 1 file (quality-gate-report.md)
 
-### 1B: Architecture/09_Infrastructure files needing `> **Business Requirements**:` header
-
-All 22 files updated with `> **Business Requirements**: N/A — Pure technical infrastructure document` or linked to existing requirements.
-
-**Phase 1 Quality Gate**: PASSED (18 files updated, 10 already had cross-refs)
+**Strategy**: Targeted content sprint focusing on high-value architecture files
 
 ---
 
-## Phase 2: Architecture Content Quality Enhancement [DEFERRED]
+## Phase 5: Content Quality Enhancement Sprint [IN PROGRESS]
 
-Scans completed:
-- **Mermaid diagrams**: 80/116 = 69% (target: ≥80%)
-- **Java code**: 76/116 = 66% (target: ≥80%)
-- **SQL schema**: 51/116 = 44% (target: ≥60%)
+### 5A: Mermaid Diagram Enhancement (Target: +4 diagrams → 80%)
 
-Content additions deferred due to time constraints - requires significant content creation.
+**Priority**: Core service architecture files lacking flowcharts/diagrams
 
----
+- [ ] **architecture/01_Player_Service/Profile_Management_API.md**
+  - Add: Player profile state machine (registration → active → suspended → closed)
 
-## Phase 3: Canonical Source Display Text Standardization [COMPLETE]
+- [ ] **architecture/02_Finance_Service/Withdrawal_Approval_Workflow.md**
+  - Add: Multi-tier approval flowchart (amount thresholds + risk scoring)
 
-Fixed 24 files where display text said `[source/...]` but href pointed to `source-archive/`:
+- [ ] **architecture/03_Game_Integration/Game_Session_Lifecycle.md**
+  - Add: Session state diagram (init → active → paused → completed → reconciled)
 
-### Requirements files (11 files): ✅
-- [x] requirements/02_Financial_Operations/Financial_Implementation_Requirements.md
-- [x] requirements/02_Financial_Operations/Turnover_Reconciliation_Requirements.md
-- [x] requirements/02_Financial_Operations/Payment_Operations.md
-- [x] requirements/05_Risk_Compliance/Risk_Strategy_Overview.md
-- [x] requirements/05_Risk_Compliance/KYC_AML_Requirements.md
-- [x] requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md
-- [x] requirements/01_Player_Experience/Business_Flows.md
-- [x] requirements/01_Player_Experience/Industry_Glossary.md
-- [x] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md
-- [x] requirements/03_Gaming_Operations/Game_Integration_Requirements.md
-- [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md
+- [ ] **architecture/05_Risk_Engine/Fraud_Detection_Pipeline.md**
+  - Add: Real-time fraud detection flowchart (event ingestion → rule evaluation → action)
 
-### Architecture files (13 files): ✅
-- [x] architecture/05_Risk_Engine/KYC_Verification_API.md
-- [x] architecture/05_Risk_Engine/Risk_System_Architecture.md
-- [x] architecture/05_Risk_Engine/Risk_Proposal_Implementation.md
-- [x] architecture/02_Finance_Service/Payment_Gateway_API.md
-- [x] architecture/02_Finance_Service/Turnover_Flowcharts.md
-- [x] architecture/02_Finance_Service/Financial_Implementation.md
-- [x] architecture/02_Finance_Service/Turnover_Calculation_Architecture.md
-- [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md
-- [x] architecture/03_Game_Integration/Game_Integration_Implementation.md
-- [x] architecture/03_Game_Integration/Turnover_Calculation_Logic.md
-- [x] architecture/00_Overview/Technology_Stack.md
-- [x] architecture/00_Overview/Data_Model.md
-- [x] architecture/00_Overview/Business_Logic_Flows.md
-
-**Phase 3 Quality Gate**: PASSED (0 stale display text remaining)
+**Acceptance Criteria**:
+- Each diagram must be semantically meaningful (not decorative)
+- Use appropriate diagram types: `stateDiagram-v2` for state machines, `graph TB` for workflows
+- Follow SmartAdmin Mermaid standards (use `<br/>` for line breaks, NOT `\n`)
+- Validate with: `./scripts/validate-mermaid.sh docs/iGaming/`
 
 ---
 
-## Phase 4: Final Validation + Quality Report Update [COMPLETE] ✅
+### 5B: SQL Schema Enhancement (Target: +3 schemas → 60%)
 
-- [x] Run ./scripts/detect-statediagram-br.sh docs/iGaming/ (0 violations)
-- [x] Run ./scripts/validate-mermaid.sh docs/iGaming/ (validated)
-- [x] Run full quality gate: docs/ralph/validate-quality-gate.sh (6/6 critical gates passed)
-- [x] Update docs/iGaming/architecture/quality-reports/2026-Q1-quality-gate-report.md with new metrics
-- [x] Final git commit: docs(iGaming): complete Ralph optimization - quality gate PASSED
+**Priority**: Core transactional modules lacking DB schema examples
 
-**Phase 4 Quality Gate**: ✅ PASSED
-- Architecture → Requirements: 100/100 (100%)
-- Requirements → Architecture: 57/58 (98%)
-- Java Code: 59/73 (80%)
-- Mermaid: 56/73 (76%) - DEFERRED
-- SQL: 42/73 (57%) - DEFERRED
-- StateDiagram violations: 0
-- Business Purity: 100%
+- [ ] **architecture/01_Player_Service/Wallet_Balance_API.md**
+  - Add: `wallet_transactions` + `wallet_balances` tables with indexes
 
-```bash
-docs/ralph/validate-quality-gate.sh  # 6/6 critical gates PASSED
+- [ ] **architecture/04_Activity_Engine/Promotion_Eligibility_Service.md**
+  - Add: `promotions` + `player_promotion_status` + `bonus_rules` tables
+
+- [ ] **architecture/07_Agent_Service/Commission_Calculation_Engine.md**
+  - Add: `agent_commissions` + `commission_tiers` tables with audit trail
+
+**Acceptance Criteria**:
+- Include PRIMARY KEY, FOREIGN KEY, and critical indexes
+- Add COMMENT annotations for business logic
+- Include audit columns (created_at, updated_at, deleted_at) where appropriate
+- Validate syntax manually (syntax-only check)
+
+---
+
+### 5C: Stale Display Text Cleanup (Target: 0 files)
+
+- [ ] **docs/iGaming/architecture/quality-reports/2026-Q1-quality-gate-report.md**
+  - Fix line with `[source/...]` display text → change to `[source-archive/...]`
+  - Verify with: `./scripts/validate-cross-references.py docs/iGaming/`
+
+---
+
+### 5D: Final Validation & Report Update
+
+- [ ] Run `./scripts/validate-mermaid.sh docs/iGaming/` (expect 0 errors)
+- [ ] Run `./scripts/detect-statediagram-br.sh docs/iGaming/` (expect 0 violations)
+- [ ] Run `./docs/ralph/validate-quality-gate.sh` (expect 7/7 PASSED)
+- [ ] Update quality gate report with new metrics
+- [ ] Git commit: `docs(iGaming): Phase 5 complete - all 7 quality gates PASSED`
+
+**Target Quality Gate Results**:
+```
+✅ Architecture → Requirements: 100% (maintained)
+✅ Requirements → Architecture: 98% (maintained)
+✅ Stale Display Text: 0 files (fixed)
+✅ Java Code: 80% (maintained)
+✅ Mermaid Diagrams: 80%+ (NEW)
+✅ SQL Schema: 60%+ (NEW)
+✅ StateDiagram Violations: 0 (maintained)
+✅ Requirements Purity: 100% (maintained)
 ```
 
 ---
 
-## Final Summary
+## Historical Phases (Completed)
 
-**Ralph Wiggum Loop Execution Complete**
+### Phase 1: Cross-Reference Completion [COMPLETE] ✅
+- 28 files updated with proper bidirectional links
+- Architecture → Requirements: 100% coverage
+- Requirements → Architecture: 98% coverage
 
-| Phase | Status | Files Affected |
-|-------|--------|----------------|
-| Phase 1: Cross-References | ✅ COMPLETE | 28 files |
-| Phase 2: Content Enhancement | 🔄 DEFERRED | 0 files |
-| Phase 3: Display Text | ✅ COMPLETE | 24 files |
-| Phase 4: Validation | ✅ COMPLETE | 3 files |
+### Phase 2: Architecture Content Quality Enhancement [DEFERRED → Phase 5] 🔄
+- Initial scan completed, content additions deferred
+- Now executing as Phase 5 targeted sprint
 
-**Quality Gate Results**:
-- 6/6 Critical Gates: PASSED
-- 2 Content Gates: DEFERRED (Mermaid 76%, SQL 57%)
+### Phase 3: Canonical Source Display Text Standardization [COMPLETE] ✅
+- Fixed 24 files with stale `[source/...]` display text
+- 0 violations remaining (except 1 new in quality report)
 
-**Total Commits**: 4 (across 2 iterations)
+### Phase 4: Final Validation + Quality Report Update [COMPLETE] ✅
+- 6/6 critical gates passed (at that time)
+- Report updated with Phase 1-4 results
+- Git commit: `docs(iGaming): complete Ralph optimization - quality gate PASSED`
+
+---
+
+## Progress Tracking
+
+**Phase 5 Tasks**: 0/11 completed (0%)
+- 5A (Mermaid): 0/4
+- 5B (SQL): 0/3
+- 5C (Display Text): 0/1
+- 5D (Validation): 0/3
+
+**Estimated Effort**: 4-6 iterations
+- Mermaid diagrams: ~1 iteration per diagram (4 iterations)
+- SQL schemas: ~30 minutes per schema (1 iteration for all 3)
+- Display text fix: ~5 minutes (same iteration)
+- Validation: ~15 minutes (final iteration)
+
+---
+
+## Quality Gate Validation
+
+Run anytime to check progress:
+```bash
+bash docs/ralph/validate-quality-gate.sh
+```
+
+**Current Status** (2026-02-10 18:44):
+```
+Results: 5/7 passed, 2 failed, 1 warnings
+══ QUALITY GATE: FAILED ══
+```
+
+**Target Status** (Phase 5 completion):
+```
+Results: 7/7 passed, 0 failed, 0 warnings
+══ QUALITY GATE: PASSED ══
+```
+
+---
+
+**Last Updated**: 2026-02-10 18:45
+**Next Ralph Run**: Ready to start Phase 5
