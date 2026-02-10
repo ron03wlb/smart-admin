@@ -83,12 +83,12 @@
   - game_sessions + game_round_logs tables (2 tables + 5 query examples: session summary, idempotency check, stalled tx recovery, failed tx audit, cache hit rate) ✅
 
 #### Batch 6 — SQL + Hygiene (3 tasks)
-- [ ] architecture/10_Platform_Management/Notification_Architecture.md (+SQL)
-  - notification_templates + notification_delivery_logs tables
-- [ ] Fix missing forward-reference in requirements/09_Infrastructure_Requirements/
-  - Check which file is missing 'Related Architecture' header and add it
-- [ ] Update ADR-012 implementation status in architecture/adr/
-  - Mark documented sections as IMPLEMENTED where applicable
+- [x] architecture/10_Platform_Management/Notification_Architecture.md (+SQL)
+  - notification_templates + notification_delivery_logs tables (2 tables + 4 query examples: cost breakdown, user history, fallback analysis, template performance) ✅
+- [x] Fix missing forward-reference in requirements/09_Infrastructure_Requirements/
+  - Standardized 'Related Doc' → 'Related Architecture' in Cost_Optimization_Requirements.md and QA_Standards_Requirements.md ✅
+- [x] Update ADR-012 implementation status in architecture/adr/
+  - Marked 4 compliance acceptance criteria as IMPLEMENTED with section references ✅
 
 ---
 
