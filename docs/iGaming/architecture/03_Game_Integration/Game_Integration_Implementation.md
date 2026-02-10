@@ -530,7 +530,217 @@ public class GameTransactionRecoveryService {
 
 ---
 
-## 6. Planned: Seamless Wallet API (Phase 5+)
+## 6. Database Schema (PostgreSQL)
+
+### game_sessions
+Tracks player game sessions with seamless wallet integration.
+
+```sql
+CREATE TABLE game_sessions (
+    session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    player_id UUID NOT NULL REFERENCES players(player_id),
+    game_id UUID NOT NULL REFERENCES games(game_id),
+    provider_id UUID NOT NULL REFERENCES game_providers(provider_id),
+
+    -- Session token (for seamless wallet API authentication)
+    session_token TEXT NOT NULL UNIQUE, -- Base64(player_id|tenant_id|timestamp|signature)
+    token_expires_at TIMESTAMPTZ NOT NULL, -- Token TTL (typically 5-15 minutes)
+
+    -- Session lifecycle
+    session_status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- 'ACTIVE', 'COMPLETED', 'EXPIRED', 'FORCED_LOGOUT'
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ended_at TIMESTAMPTZ,
+
+    -- Session statistics
+    total_rounds INT NOT NULL DEFAULT 0,
+    total_bet_amount DECIMAL(18,4) NOT NULL DEFAULT 0.00,
+    total_win_amount DECIMAL(18,4) NOT NULL DEFAULT 0.00,
+    net_result DECIMAL(18,4) GENERATED ALWAYS AS (total_win_amount - total_bet_amount) STORED,
+
+    -- Context
+    ip_address INET,
+    user_agent TEXT,
+    device_type VARCHAR(20), -- 'MOBILE', 'TABLET', 'DESKTOP'
+    game_mode VARCHAR(20), -- 'REAL', 'DEMO'
+
+    -- Metadata
+    metadata JSONB, -- Additional session context (e.g., game config, lobby URL)
+
+    CONSTRAINT valid_session_status CHECK (session_status IN ('ACTIVE', 'COMPLETED', 'EXPIRED', 'FORCED_LOGOUT')),
+    CONSTRAINT valid_game_mode CHECK (game_mode IN ('REAL', 'DEMO'))
+);
+
+CREATE INDEX idx_game_sessions_player ON game_sessions(player_id, started_at DESC);
+CREATE INDEX idx_game_sessions_token ON game_sessions(session_token) WHERE session_status = 'ACTIVE';
+CREATE INDEX idx_game_sessions_active ON game_sessions(session_status, last_activity_at) WHERE session_status = 'ACTIVE';
+CREATE INDEX idx_game_sessions_provider ON game_sessions(provider_id, started_at DESC);
+CREATE INDEX idx_game_sessions_game ON game_sessions(game_id, started_at DESC);
+
+COMMENT ON TABLE game_sessions IS 'Player game sessions with seamless wallet integration and session token management';
+COMMENT ON COLUMN game_sessions.session_token IS 'HMAC-SHA256 signed token for seamless wallet API authentication (Base64 encoded)';
+COMMENT ON COLUMN game_sessions.token_expires_at IS 'Token expiry time (typically 5-15 minutes from generation)';
+```
+
+### game_round_logs
+Logs individual game rounds with transaction history (debit, credit, cancel).
+
+```sql
+CREATE TABLE game_round_logs (
+    round_log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    player_id UUID NOT NULL REFERENCES players(player_id),
+    session_id UUID NOT NULL REFERENCES game_sessions(session_id),
+    game_id UUID NOT NULL REFERENCES games(game_id),
+    provider_id UUID NOT NULL REFERENCES game_providers(provider_id),
+
+    -- Game round identifiers
+    round_id VARCHAR(100) NOT NULL, -- Provider's unique round ID
+    game_transaction_id VARCHAR(100), -- Internal transaction ID
+    request_id VARCHAR(100) NOT NULL UNIQUE, -- Idempotency key from provider
+
+    -- Transaction type
+    transaction_type VARCHAR(20) NOT NULL, -- 'DEBIT' (bet), 'CREDIT' (win), 'CANCEL'
+    original_request_id VARCHAR(100), -- For CANCEL transactions (references original DEBIT/CREDIT)
+
+    -- Amounts
+    bet_amount DECIMAL(18,4), -- For DEBIT transactions
+    win_amount DECIMAL(18,4), -- For CREDIT transactions
+    transaction_amount DECIMAL(18,4) NOT NULL, -- Actual amount processed (always positive)
+    currency VARCHAR(3) NOT NULL, -- ISO 4217 currency code
+
+    -- Balance snapshot
+    balance_before DECIMAL(18,4) NOT NULL,
+    balance_after DECIMAL(18,4) NOT NULL,
+
+    -- Transaction status
+    transaction_status VARCHAR(20) NOT NULL DEFAULT 'SUCCESS', -- 'SUCCESS', 'PENDING', 'FAILED', 'CANCELLED', 'NOT_FOUND'
+    failure_reason TEXT, -- Error message for failed transactions
+
+    -- Idempotency and recovery
+    is_duplicate BOOLEAN NOT NULL DEFAULT FALSE, -- TRUE if request_id was already processed
+    cached_result BOOLEAN NOT NULL DEFAULT FALSE, -- TRUE if returned from cache (Layer 1 idempotency)
+    recovery_action VARCHAR(20), -- 'REFUNDED', 'CONFIRMED', NULL (no recovery needed)
+
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    processed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    cancelled_at TIMESTAMPTZ, -- For CANCEL transactions
+
+    -- Audit trail
+    metadata JSONB, -- Additional provider-specific data (game state, bonus data, etc.)
+
+    CONSTRAINT valid_transaction_type CHECK (transaction_type IN ('DEBIT', 'CREDIT', 'CANCEL')),
+    CONSTRAINT valid_transaction_status CHECK (transaction_status IN ('SUCCESS', 'PENDING', 'FAILED', 'CANCELLED', 'NOT_FOUND')),
+    CONSTRAINT valid_recovery_action CHECK (recovery_action IS NULL OR recovery_action IN ('REFUNDED', 'CONFIRMED')),
+    CONSTRAINT debit_has_bet_amount CHECK (transaction_type != 'DEBIT' OR bet_amount IS NOT NULL),
+    CONSTRAINT credit_has_win_amount CHECK (transaction_type != 'CREDIT' OR win_amount IS NOT NULL),
+    CONSTRAINT cancel_has_original CHECK (transaction_type != 'CANCEL' OR original_request_id IS NOT NULL)
+);
+
+CREATE INDEX idx_game_round_logs_player ON game_round_logs(player_id, created_at DESC);
+CREATE INDEX idx_game_round_logs_session ON game_round_logs(session_id, created_at DESC);
+CREATE INDEX idx_game_round_logs_round ON game_round_logs(round_id, transaction_type);
+CREATE INDEX idx_game_round_logs_request ON game_round_logs(request_id) WHERE transaction_status = 'SUCCESS';
+CREATE INDEX idx_game_round_logs_pending ON game_round_logs(transaction_status, created_at) WHERE transaction_status = 'PENDING';
+CREATE INDEX idx_game_round_logs_failed ON game_round_logs(transaction_status, created_at) WHERE transaction_status IN ('FAILED', 'NOT_FOUND');
+CREATE INDEX idx_game_round_logs_provider ON game_round_logs(provider_id, created_at DESC);
+
+COMMENT ON TABLE game_round_logs IS 'Game round transaction logs for seamless wallet integration (debit, credit, cancel)';
+COMMENT ON COLUMN game_round_logs.request_id IS 'Idempotency key from provider (unique per transaction, used for three-layer defense)';
+COMMENT ON COLUMN game_round_logs.is_duplicate IS 'TRUE if request_id was already processed (idempotency check)';
+COMMENT ON COLUMN game_round_logs.cached_result IS 'TRUE if result was returned from Redis cache (Layer 1 idempotency)';
+COMMENT ON COLUMN game_round_logs.recovery_action IS 'Recovery action taken by scheduled recovery service for stalled transactions';
+```
+
+### Query Examples
+
+**Session summary for a player:**
+```sql
+SELECT
+    gs.session_id,
+    gs.game_id,
+    g.game_name,
+    gs.started_at,
+    gs.ended_at,
+    gs.total_rounds,
+    gs.total_bet_amount,
+    gs.total_win_amount,
+    gs.net_result,
+    (gs.ended_at - gs.started_at) AS session_duration
+FROM game_sessions gs
+INNER JOIN games g ON gs.game_id = g.game_id
+WHERE gs.player_id = 'player-uuid-001'
+    AND gs.session_status = 'COMPLETED'
+    AND gs.started_at >= NOW() - INTERVAL '7 days'
+ORDER BY gs.started_at DESC;
+```
+
+**Idempotency check for incoming request:**
+```sql
+SELECT
+    round_log_id,
+    transaction_type,
+    transaction_amount,
+    transaction_status,
+    balance_after,
+    is_duplicate
+FROM game_round_logs
+WHERE request_id = 'provider-request-id-12345'
+LIMIT 1;
+```
+
+**Find stalled transactions for recovery (PENDING > 10 minutes):**
+```sql
+SELECT
+    round_log_id,
+    player_id,
+    request_id,
+    round_id,
+    transaction_type,
+    transaction_amount,
+    created_at,
+    (NOW() - created_at) AS stalled_duration
+FROM game_round_logs
+WHERE transaction_status = 'PENDING'
+    AND created_at < NOW() - INTERVAL '10 minutes'
+ORDER BY created_at ASC
+LIMIT 100;
+```
+
+**Audit failed transactions by provider:**
+```sql
+SELECT
+    gp.provider_name,
+    COUNT(*) AS failed_count,
+    SUM(grl.transaction_amount) AS total_failed_amount,
+    COUNT(DISTINCT grl.player_id) AS affected_players,
+    STRING_AGG(DISTINCT grl.failure_reason, '; ') AS failure_reasons
+FROM game_round_logs grl
+INNER JOIN game_providers gp ON grl.provider_id = gp.provider_id
+WHERE grl.transaction_status = 'FAILED'
+    AND grl.created_at >= NOW() - INTERVAL '24 hours'
+GROUP BY gp.provider_id, gp.provider_name
+ORDER BY failed_count DESC;
+```
+
+**Analyze idempotency effectiveness (cache hit rate):**
+```sql
+SELECT
+    transaction_type,
+    COUNT(*) AS total_requests,
+    COUNT(*) FILTER (WHERE cached_result = TRUE) AS cache_hits,
+    COUNT(*) FILTER (WHERE is_duplicate = TRUE AND NOT cached_result) AS db_hits,
+    (COUNT(*) FILTER (WHERE cached_result = TRUE)::DECIMAL / COUNT(*) * 100)::DECIMAL(5,2) AS cache_hit_rate
+FROM game_round_logs
+WHERE created_at >= NOW() - INTERVAL '1 hour'
+GROUP BY transaction_type;
+```
+
+---
+
+## 7. Planned: Seamless Wallet API (Phase 5+)
 
 **Status**: PLANNED
 
