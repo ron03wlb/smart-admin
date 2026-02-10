@@ -7,6 +7,19 @@
 
 ---
 
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Wallet Calculation Accuracy | 99.99% | Zero balance discrepancies in production audits |
+| Turnover Calculation Precision | 100% | All weighted turnover calculations match business rules |
+| Multi-Tenant Data Isolation | 100% | Zero cross-tenant data leakage incidents |
+| Risk Engine Effectiveness | ≥90% fraud detection rate | Ratio of detected fraud cases to total fraud attempts |
+| Platform Performance Overhead (Multi-Tenant) | <5% | Latency comparison between single-tenant and multi-tenant deployments |
+| Player Journey Completion Rate | ≥70% | Percentage of players completing registration → first deposit → first bet |
+
+---
+
 ## 1. Platform Vision
 
 The iGaming platform is a comprehensive online gaming solution designed to serve multiple brands (tenants) within a single unified system. It addresses five core business domains that together cover 80% of the system's design considerations:
