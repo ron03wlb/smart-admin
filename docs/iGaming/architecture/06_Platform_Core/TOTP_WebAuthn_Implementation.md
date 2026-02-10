@@ -313,6 +313,147 @@ ntpq -p
 
 ---
 
+## 3. TOTP 註冊與 WebAuthn 註冊流程
+
+### 3.1 端對端註冊序列圖
+
+以下流程圖展示了 TOTP 註冊和 WebAuthn 註冊的完整序列：
+
+```mermaid
+sequenceDiagram
+    participant U as 用戶
+    participant F as 前端
+    participant A as Auth Controller
+    participant M as MFA Service
+    participant KMS as KMS (Vault)
+    participant DB as PostgreSQL
+
+    Note over U,DB: 階段 1: TOTP 註冊流程
+    U->>F: 點擊「啟用 MFA」
+    F->>A: POST /api/mfa/totp/enroll
+    A->>M: generateTOTPSecret(userId)
+
+    M->>M: SecureRandom.nextBytes(20)<br/>(生成 160-bit 隨機密鑰)
+    M->>M: Base32.encode(secret)<br/>(編碼為 Base32 字串)
+
+    Note over M: Secret = JBSWY3DPEHPK3PXP
+    M->>KMS: getMasterEncryptionKey()
+    KMS-->>M: 主密鑰 (AES-256)
+    M->>M: encryptSecret(secret, masterKey)<br/>(AES-256-GCM 加密)
+
+    M->>DB: INSERT INTO t_admin_user_mfa<br/>(user_id, totp_secret_encrypted)
+    DB-->>M: 插入成功
+
+    M->>M: generateQrCodeUrl(username, secret)<br/>(生成 otpauth:// URL)
+    M-->>A: QR Code URL + 明文 Secret (一次性顯示)
+    A-->>F: 200 OK + qrCodeUrl + secret
+    F-->>U: 顯示 QR Code<br/>(用戶使用 Google Authenticator 掃描)
+
+    Note over U,F: 用戶掃描 QR Code 並輸入第一個驗證碼
+    U->>F: 輸入 6 位數驗證碼<br/>(例: 123456)
+    F->>A: POST /api/mfa/totp/verify<br/>{userId, code}
+
+    A->>M: verifyTOTPCode(userId, code)
+    M->>DB: SELECT totp_secret_encrypted<br/>FROM t_admin_user_mfa
+    DB-->>M: 加密的 Secret
+    M->>KMS: getMasterEncryptionKey()
+    KMS-->>M: 主密鑰
+    M->>M: decryptSecret(encrypted, masterKey)
+    M->>M: generateTotp(secret, currentTime)<br/>(允許 ±1 時間窗口)
+
+    alt 驗證碼正確
+        M->>DB: UPDATE t_admin_user_mfa<br/>SET mfa_enabled = TRUE
+        M-->>A: 驗證成功
+        A-->>F: 200 OK + backupCodes (10個)
+        F-->>U: 顯示備份碼<br/>(提示用戶保存)
+    else 驗證碼錯誤
+        M-->>A: 驗證失敗
+        A-->>F: 401 Unauthorized
+        F-->>U: 顯示錯誤訊息
+    end
+
+    Note over U,DB: 階段 2: WebAuthn 註冊流程 (選配)
+    U->>F: 點擊「註冊 WebAuthn」
+    F->>A: POST /api/mfa/webauthn/register/options
+    A->>M: generateRegistrationOptions(userId)
+
+    M->>M: 生成 challenge (32-byte 隨機數)
+    M->>DB: SELECT username, user_id<br/>FROM t_admin_user
+    DB-->>M: 用戶資訊
+    M-->>A: PublicKeyCredentialCreationOptions<br/>{challenge, rp, user, pubKeyCredParams}
+    A-->>F: 200 OK + options (JSON)
+
+    F->>F: navigator.credentials.create()<br/>(調用瀏覽器 WebAuthn API)
+    Note over U,F: 用戶使用指紋/Face ID/安全密鑰
+    F-->>U: 提示生物識別驗證
+    U->>F: 完成生物識別
+    F->>F: 取得公鑰憑證<br/>(Public Key Credential)
+
+    F->>A: POST /api/mfa/webauthn/register/verify<br/>{credentialId, publicKey, attestation}
+    A->>M: verifyRegistration(userId, credential)
+
+    M->>M: 驗證 challenge 簽名
+    M->>M: 驗證 attestation (設備真實性)
+
+    alt 驗證成功
+        M->>DB: INSERT INTO t_webauthn_credential<br/>(user_id, credential_id, public_key)
+        M->>DB: UPDATE t_admin_user_mfa<br/>SET webauthn_enabled = TRUE
+        M-->>A: 註冊成功
+        A-->>F: 200 OK
+        F-->>U: 顯示「WebAuthn 已啟用」
+    else 驗證失敗
+        M-->>A: 註冊失敗
+        A-->>F: 400 Bad Request
+        F-->>U: 顯示錯誤訊息
+    end
+
+    Note over U,DB: 後續登入可使用 TOTP 或 WebAuthn
+```
+
+### 3.2 TOTP vs WebAuthn 比較
+
+| 特性 | TOTP (Google Authenticator) | WebAuthn (生物識別) |
+|------|---------------------------|-------------------|
+| **安全性** | 4/5 (需妥善保管密鑰) | 5/5 (公鑰加密 + 防釣魚) |
+| **用戶體驗** | 3/5 (需手動輸入 6 位數) | 5/5 (一鍵驗證) |
+| **設備支援** | 5/5 (所有智能手機) | 3/5 (需瀏覽器支援 + 硬體) |
+| **離線可用** | 5/5 (完全離線) | 2/5 (需設備連接) |
+| **實施複雜度** | 2/5 (簡單) | 4/5 (需前端集成) |
+
+### 3.3 WebAuthn 資料庫 Schema
+
+```sql
+CREATE TABLE t_webauthn_credential (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES t_admin_user(user_id),
+    credential_id VARCHAR(500) NOT NULL UNIQUE,  -- Base64 編碼的憑證 ID
+    public_key TEXT NOT NULL,                     -- COSE 格式公鑰
+    sign_count BIGINT NOT NULL DEFAULT 0,         -- 防重放攻擊計數器
+    device_type VARCHAR(50),                      -- platform (生物識別) / cross-platform (安全密鑰)
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_used_at TIMESTAMP
+);
+
+CREATE INDEX idx_webauthn_user_id ON t_webauthn_credential(user_id);
+CREATE INDEX idx_webauthn_credential_id ON t_webauthn_credential(credential_id);
+```
+
+### 3.4 關鍵安全機制
+
+**TOTP 密鑰保護**:
+- ✅ 密鑰使用 AES-256-GCM 加密存儲
+- ✅ 主密鑰托管在 KMS (Vault/AWS KMS)
+- ✅ QR Code 僅顯示一次 (前端顯示後立即銷毀)
+- ✅ 允許 ±1 時間窗口 (共 90 秒驗證期)
+
+**WebAuthn 防護**:
+- ✅ Challenge 隨機生成 (32 bytes) 防重放
+- ✅ 公鑰加密 (私鑰永不離開設備)
+- ✅ Attestation 驗證設備真實性
+- ✅ Sign counter 防止憑證克隆攻擊
+
+---
+
 ## 相關文檔
 
 - [MFA_Technical_Architecture.md](./MFA_Technical_Architecture.md) - MFA 系統架構設計
