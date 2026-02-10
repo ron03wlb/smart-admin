@@ -418,7 +418,162 @@ HAVING status = 'BREACH';
 
 ---
 
-## 4. Monitoring
+## 4. Deposit/Loss Limit Enforcement Pipeline
+
+### 4.1 End-to-End Enforcement Flow
+
+The following diagram illustrates the complete enforcement pipeline for deposit and loss limits:
+
+```mermaid
+flowchart TD
+    Start[Player Action] --> Decision{Action Type?}
+
+    Decision -->|Deposit| Deposit[Deposit Request]
+    Decision -->|Bet| Bet[Bet Placement Request]
+
+    %% Deposit Flow
+    Deposit --> PreCheck{Pre-deposit<br/>Limit Setup?}
+    PreCheck -->|No| BlockPreDeposit[Block: Setup Required<br/>UKGC 2025-10-31]
+    PreCheck -->|Yes| SelfExcl{Self-Exclusion<br/>Active?}
+
+    SelfExcl -->|Yes| BlockExcl[Block: Player Excluded]
+    SelfExcl -->|No| DailyCheck{Daily Limit<br/>Exceeded?}
+
+    DailyCheck -->|Yes| BlockDaily[Block: Daily Limit Reached<br/>Show remaining amount]
+    DailyCheck -->|No| WeeklyCheck{Weekly Limit<br/>Exceeded?}
+
+    WeeklyCheck -->|Yes| BlockWeekly[Block: Weekly Limit Reached]
+    WeeklyCheck -->|No| MonthlyCheck{Monthly Limit<br/>Exceeded?}
+
+    MonthlyCheck -->|Yes| BlockMonthly[Block: Monthly Limit Reached]
+    MonthlyCheck -->|No| ExecuteDeposit[Execute Deposit Transaction]
+
+    ExecuteDeposit --> RecordDeposit[Record Deposit Accumulation<br/>Update t_deposit_accumulation]
+    RecordDeposit --> DepositSuccess[Return Success + Receipt]
+
+    %% Bet Flow
+    Bet --> LossLimitCheck{Loss Limit<br/>Configured?}
+    LossLimitCheck -->|No| ExecuteBet[Execute Bet Transaction]
+    LossLimitCheck -->|Yes| DailyLossCheck{Daily Loss<br/>+ Stake > Limit?}
+
+    DailyLossCheck -->|Yes| LossAction{Breach Action?}
+    LossAction -->|BLOCK| BlockLoss[Block: Daily Loss Limit<br/>Show remaining allowance]
+    LossAction -->|WARN| WarnLoss[Warn + Allow Bet<br/>Send notification]
+    LossAction -->|COOLING_OFF| CoolingOff[Enter Cooling-Off Period<br/>24h restriction]
+
+    DailyLossCheck -->|No| WeeklyLossCheck{Weekly Loss<br/>+ Stake > Limit?}
+    WeeklyLossCheck -->|Yes| LossAction
+    WeeklyLossCheck -->|No| MonthlyLossCheck{Monthly Loss<br/>+ Stake > Limit?}
+
+    MonthlyLossCheck -->|Yes| LossAction
+    MonthlyLossCheck -->|No| ExecuteBet
+
+    WarnLoss --> ExecuteBet
+    ExecuteBet --> RecordBet[Record Bet Result<br/>Update t_loss_accumulation]
+    RecordBet --> BetSuccess[Return Bet Result]
+
+    %% Error Paths
+    BlockPreDeposit --> ErrorResponse[Return Error Response<br/>Status Code 403]
+    BlockExcl --> ErrorResponse
+    BlockDaily --> ErrorResponse
+    BlockWeekly --> ErrorResponse
+    BlockMonthly --> ErrorResponse
+    BlockLoss --> ErrorResponse
+    CoolingOff --> ErrorResponse
+
+    %% Success Paths
+    DepositSuccess --> End[End]
+    BetSuccess --> End
+    ErrorResponse --> End
+
+    %% Styling
+    classDef blockStyle fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    classDef successStyle fill:#51cf66,stroke:#2f9e44,color:#fff
+    classDef warningStyle fill:#ffd43b,stroke:#fab005,color:#000
+    classDef processStyle fill:#339af0,stroke:#1971c2,color:#fff
+
+    class BlockPreDeposit,BlockExcl,BlockDaily,BlockWeekly,BlockMonthly,BlockLoss,CoolingOff blockStyle
+    class DepositSuccess,BetSuccess,ExecuteDeposit,ExecuteBet successStyle
+    class WarnLoss warningStyle
+    class RecordDeposit,RecordBet,DailyCheck,WeeklyCheck,MonthlyCheck,DailyLossCheck,WeeklyLossCheck,MonthlyLossCheck processStyle
+```
+
+### 4.2 Enforcement Rules Summary
+
+**Deposit Limits (Hierarchical Enforcement)**:
+1. **Pre-deposit Setup** (P0): Block if UKGC player without limit setup (2025-10-31)
+2. **Self-Exclusion** (P0): Block all deposits during exclusion period
+3. **Daily Limit** (P1): Check accumulated deposits for current day (UTC 00:00 reset)
+4. **Weekly Limit** (P2): Check accumulated deposits for current week (Monday reset)
+5. **Monthly Limit** (P3): Check accumulated deposits for current calendar month
+
+**Loss Limits (Configurable Actions)**:
+- **BLOCK**: Prevent bet placement when limit is exceeded (default)
+- **WARN**: Allow bet but send notification to player (high rollers)
+- **COOLING_OFF**: Trigger 24-hour cooling-off period (regulatory requirement)
+
+**Limit Application Order**:
+```
+Pre-deposit Setup (UKGC) → Self-Exclusion → Daily → Weekly → Monthly
+```
+
+If ANY check fails, transaction is blocked immediately (fail-fast pattern).
+
+### 4.3 Accumulation Calculation
+
+**Deposit Accumulation**:
+```java
+// Period boundaries (UTC)
+LocalDate today = LocalDate.now(ZoneOffset.UTC);
+LocalDate weekStart = today.with(DayOfWeek.MONDAY);
+LocalDate monthStart = today.withDayOfMonth(1);
+
+// Query accumulated amount
+BigDecimal accumulated = depositAccumulationDao
+    .selectOne(Wrappers.lambdaQuery(DepositAccumulation.class)
+        .eq(DepositAccumulation::getPlayerId, playerId)
+        .eq(DepositAccumulation::getPeriodType, periodType)
+        .eq(DepositAccumulation::getPeriodStart, periodStart))
+    .map(DepositAccumulation::getAccumulatedAmount)
+    .getOrElse(BigDecimal.ZERO);
+```
+
+**Loss Accumulation**:
+```java
+// Net loss calculation
+BigDecimal netLoss = totalStake.subtract(totalWin);
+
+// Update atomic operation
+lossAccumulationDao.updateAccumulation(
+    playerId,
+    periodType,
+    periodStart,
+    stakeAmount,
+    winAmount
+);
+```
+
+### 4.4 Error Response Format
+
+```json
+{
+  "code": 40301,
+  "msg": "Deposit limit exceeded",
+  "data": {
+    "limitType": "DAILY",
+    "limit": "500.00",
+    "accumulated": "450.00",
+    "remaining": "50.00",
+    "requestedAmount": "100.00",
+    "excessAmount": "50.00",
+    "resetTime": "2026-02-11T00:00:00Z"
+  }
+}
+```
+
+---
+
+## 5. Monitoring
 
 | Metric | Prometheus Name | Description |
 |--------|----------------|-------------|
