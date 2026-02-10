@@ -485,7 +485,211 @@ Content-Type: application/json
 
 ---
 
-## 5. Error Codes
+## 5. Database Schema (PostgreSQL)
+
+### player_limits
+Stores player-set limits for deposits, losses, and session durations.
+
+```sql
+CREATE TABLE player_limits (
+    limit_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    player_id UUID NOT NULL REFERENCES players(player_id),
+    limit_type VARCHAR(50) NOT NULL, -- 'DEPOSIT', 'LOSS', 'SESSION', 'REALITY_CHECK'
+    time_period VARCHAR(20) NOT NULL, -- 'DAILY', 'WEEKLY', 'MONTHLY', 'PER_SESSION'
+
+    -- Limit values
+    limit_amount DECIMAL(18,4), -- For deposit/loss limits (NULL for session/reality check)
+    limit_duration_minutes INT, -- For session limits (NULL for deposit/loss limits)
+    reality_check_interval_minutes INT, -- For reality checks (NULL for other types)
+
+    -- Effective period
+    effective_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_to TIMESTAMPTZ, -- NULL = active indefinitely
+
+    -- Change management
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- 'PENDING', 'ACTIVE', 'SUPERSEDED', 'CANCELLED'
+    pending_change_id UUID REFERENCES player_limits(limit_id), -- Links to future limit change
+    cooldown_ends_at TIMESTAMPTZ, -- For limit increases (24-hour cooldown)
+
+    -- Usage tracking
+    current_used_amount DECIMAL(18,4) DEFAULT 0.00, -- Real-time usage counter
+    reset_at TIMESTAMPTZ, -- Next reset time for daily/weekly/monthly limits
+
+    -- Audit trail
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by UUID, -- Player-initiated (player_id) or admin-initiated (admin_id)
+    reason TEXT, -- Optional reason provided by player or admin
+    metadata JSONB, -- Additional context (e.g., IP address, user agent)
+
+    CONSTRAINT valid_limit_type CHECK (limit_type IN ('DEPOSIT', 'LOSS', 'SESSION', 'REALITY_CHECK')),
+    CONSTRAINT valid_time_period CHECK (time_period IN ('DAILY', 'WEEKLY', 'MONTHLY', 'PER_SESSION')),
+    CONSTRAINT valid_status CHECK (status IN ('PENDING', 'ACTIVE', 'SUPERSEDED', 'CANCELLED')),
+    CONSTRAINT valid_limit_amount CHECK (limit_amount IS NULL OR limit_amount > 0),
+    CONSTRAINT valid_duration CHECK (limit_duration_minutes IS NULL OR limit_duration_minutes > 0),
+    CONSTRAINT hierarchy_check CHECK (
+        -- Monthly >= Weekly >= Daily
+        (time_period = 'DAILY') OR
+        (time_period = 'WEEKLY' AND limit_amount >= (SELECT limit_amount FROM player_limits WHERE player_id = player_limits.player_id AND time_period = 'DAILY' AND status = 'ACTIVE' AND limit_type = player_limits.limit_type LIMIT 1)) OR
+        (time_period = 'MONTHLY' AND limit_amount >= (SELECT limit_amount FROM player_limits WHERE player_id = player_limits.player_id AND time_period = 'WEEKLY' AND status = 'ACTIVE' AND limit_type = player_limits.limit_type LIMIT 1))
+    )
+);
+
+CREATE INDEX idx_player_limits_player ON player_limits(player_id, status, effective_from) WHERE status = 'ACTIVE';
+CREATE INDEX idx_player_limits_type_period ON player_limits(limit_type, time_period) WHERE status = 'ACTIVE';
+CREATE INDEX idx_player_limits_pending ON player_limits(status, cooldown_ends_at) WHERE status = 'PENDING';
+CREATE INDEX idx_player_limits_reset ON player_limits(reset_at) WHERE status = 'ACTIVE' AND reset_at IS NOT NULL;
+
+COMMENT ON TABLE player_limits IS 'Player-set and admin-set limits for responsible gambling (deposit, loss, session, reality checks)';
+COMMENT ON COLUMN player_limits.cooldown_ends_at IS '24-hour cooldown for limit increases (immediate for decreases)';
+COMMENT ON COLUMN player_limits.current_used_amount IS 'Real-time usage counter (updated by deposit/loss transactions)';
+COMMENT ON COLUMN player_limits.hierarchy_check IS 'Enforces monthly >= weekly >= daily for same limit_type';
+```
+
+### self_exclusions
+Tracks self-exclusion and cooling-off periods (player-initiated or operator-initiated).
+
+```sql
+CREATE TABLE self_exclusions (
+    exclusion_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+    player_id UUID NOT NULL REFERENCES players(player_id),
+    exclusion_type VARCHAR(20) NOT NULL, -- 'SELF', 'OPERATOR', 'GAMSTOP', 'COOLING_OFF'
+    duration VARCHAR(20) NOT NULL, -- '24H', '7D', '30D', '6M', '1Y', '5Y', 'PERMANENT'
+
+    -- Time period
+    start_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    end_time TIMESTAMPTZ, -- NULL for PERMANENT
+    actual_end_time TIMESTAMPTZ, -- Actual end (for early revocations)
+
+    -- Status
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- 'ACTIVE', 'COMPLETED', 'PENDING_REVOCATION', 'REVOKED'
+    revocation_reason TEXT, -- Reason for revocation (if applicable)
+    revocation_requested_at TIMESTAMPTZ,
+    revocation_approved_by UUID REFERENCES admins(admin_id),
+
+    -- Gamstop integration
+    gamstop_synced BOOLEAN NOT NULL DEFAULT FALSE,
+    gamstop_sync_time TIMESTAMPTZ,
+    gamstop_reference VARCHAR(100),
+
+    -- Notification
+    player_notified BOOLEAN NOT NULL DEFAULT FALSE,
+    notification_sent_at TIMESTAMPTZ,
+
+    -- Audit trail
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by UUID, -- Player (player_id) or Admin (admin_id)
+    reason TEXT, -- Player or operator reason for exclusion
+    metadata JSONB, -- Additional context (IP, user agent, verification method)
+
+    CONSTRAINT valid_exclusion_type CHECK (exclusion_type IN ('SELF', 'OPERATOR', 'GAMSTOP', 'COOLING_OFF')),
+    CONSTRAINT valid_duration CHECK (duration IN ('24H', '7D', '30D', '6M', '1Y', '5Y', 'PERMANENT')),
+    CONSTRAINT valid_status CHECK (status IN ('ACTIVE', 'COMPLETED', 'PENDING_REVOCATION', 'REVOKED')),
+    CONSTRAINT permanent_no_end CHECK (
+        (duration = 'PERMANENT' AND end_time IS NULL) OR
+        (duration != 'PERMANENT' AND end_time IS NOT NULL)
+    ),
+    CONSTRAINT no_overlap CHECK (
+        -- Prevent overlapping active exclusions for same player
+        NOT EXISTS (
+            SELECT 1 FROM self_exclusions se2
+            WHERE se2.player_id = self_exclusions.player_id
+                AND se2.exclusion_id != self_exclusions.exclusion_id
+                AND se2.status = 'ACTIVE'
+                AND se2.start_time < self_exclusions.end_time
+                AND se2.end_time > self_exclusions.start_time
+        )
+    )
+);
+
+CREATE INDEX idx_self_exclusions_player ON self_exclusions(player_id, status, start_time DESC);
+CREATE INDEX idx_self_exclusions_active ON self_exclusions(status, end_time) WHERE status = 'ACTIVE';
+CREATE INDEX idx_self_exclusions_pending_revocation ON self_exclusions(status, revocation_requested_at) WHERE status = 'PENDING_REVOCATION';
+CREATE INDEX idx_self_exclusions_gamstop ON self_exclusions(gamstop_reference) WHERE gamstop_synced = TRUE;
+CREATE INDEX idx_self_exclusions_type ON self_exclusions(exclusion_type, status);
+
+COMMENT ON TABLE self_exclusions IS 'Self-exclusion and cooling-off periods for responsible gambling compliance (UKGC/MGA)';
+COMMENT ON COLUMN self_exclusions.duration IS 'Exclusion duration: 24H (cooling-off) to PERMANENT (self-exclusion)';
+COMMENT ON COLUMN self_exclusions.gamstop_synced IS 'TRUE if exclusion has been synced with UK Gamstop registry';
+COMMENT ON COLUMN self_exclusions.no_overlap IS 'Prevents concurrent active exclusions for same player';
+```
+
+### Query Examples
+
+**Get active limits and usage for a player:**
+```sql
+SELECT
+    limit_type,
+    time_period,
+    limit_amount,
+    current_used_amount,
+    (limit_amount - current_used_amount) AS remaining,
+    (current_used_amount / limit_amount * 100)::DECIMAL(5,2) AS usage_percentage,
+    reset_at
+FROM player_limits
+WHERE player_id = 'player-uuid-001'
+    AND status = 'ACTIVE'
+    AND effective_from <= NOW()
+    AND (effective_to IS NULL OR effective_to > NOW())
+ORDER BY limit_type, time_period;
+```
+
+**Check if player is currently excluded:**
+```sql
+SELECT
+    exclusion_id,
+    exclusion_type,
+    duration,
+    start_time,
+    end_time,
+    status
+FROM self_exclusions
+WHERE player_id = 'player-uuid-001'
+    AND status = 'ACTIVE'
+    AND start_time <= NOW()
+    AND (end_time IS NULL OR end_time > NOW())
+LIMIT 1;
+```
+
+**Generate compliance report (monthly self-exclusions):**
+```sql
+SELECT
+    exclusion_type,
+    COUNT(*) AS total_exclusions,
+    COUNT(*) FILTER (WHERE status = 'ACTIVE') AS currently_active,
+    COUNT(*) FILTER (WHERE status = 'COMPLETED') AS completed_this_month,
+    COUNT(*) FILTER (WHERE status = 'REVOKED') AS revoked,
+    AVG(EXTRACT(EPOCH FROM (COALESCE(actual_end_time, end_time, NOW()) - start_time)) / 86400)::DECIMAL(10,2) AS avg_duration_days
+FROM self_exclusions
+WHERE created_at >= DATE_TRUNC('month', NOW())
+    AND created_at < DATE_TRUNC('month', NOW()) + INTERVAL '1 month'
+GROUP BY exclusion_type
+ORDER BY total_exclusions DESC;
+```
+
+**Audit limit breaches (deposits exceeding limits):**
+```sql
+SELECT
+    pl.player_id,
+    pl.limit_type,
+    pl.time_period,
+    pl.limit_amount,
+    pl.current_used_amount,
+    (pl.current_used_amount - pl.limit_amount) AS breach_amount,
+    pl.reset_at
+FROM player_limits pl
+WHERE pl.status = 'ACTIVE'
+    AND pl.limit_amount IS NOT NULL
+    AND pl.current_used_amount > pl.limit_amount
+ORDER BY (pl.current_used_amount - pl.limit_amount) DESC;
+```
+
+---
+
+## 6. Error Codes
 
 | Error Code | Description | HTTP Status |
 |------------|-------------|-------------|
