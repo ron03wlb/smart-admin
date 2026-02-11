@@ -72,31 +72,33 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 - [x] requirements/04_Promotions_VIP/Promotion_Requirements.md (+Business Value)
 - [x] requirements/05_Risk_Compliance/Affordability_Requirements.md (+Acceptance Criteria)
 
-#### Batch 7 — Risk/Compliance (5 files)
-- [ ] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value)
-- [ ] requirements/05_Risk_Compliance/ML_Requirements.md (+Acceptance Criteria)
-- [ ] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (+Success Metrics)
-- [ ] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value)
-- [ ] requirements/06_Governance_Licensing/Governance_Requirements.md (+Acceptance Criteria)
+#### Batch 7 — Risk/Compliance (5 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value)
+- [x] requirements/05_Risk_Compliance/ML_Requirements.md (+Acceptance Criteria)
+- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (+Success Metrics)
+- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value)
+- [x] requirements/06_Governance_Licensing/Governance_Requirements.md (+Acceptance Criteria)
 
-#### Batch 8 — MFA/Agent/Analytics (5 files)
-- [ ] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (+Business Value)
-- [ ] requirements/07_Agent_Operations/Agent_System_Requirements.md (+Success Metrics)
-- [ ] requirements/07_Agent_Operations/Credit_Network_Requirements.md (+Acceptance Criteria)
-- [ ] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md (+Business Value)
-- [ ] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md (+Acceptance Criteria)
+#### Batch 8 — MFA/Agent/Analytics (5 files) ✅ COMPLETE
+- [x] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (+Business Value)
+- [x] requirements/07_Agent_Operations/Agent_System_Requirements.md (+Success Metrics)
+- [x] requirements/07_Agent_Operations/Credit_Network_Requirements.md (+Acceptance Criteria)
+- [x] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md (+Business Value)
+- [x] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md (+Acceptance Criteria)
 
-#### Batch 9 — Frontend/Security (5 files)
-- [ ] requirements/11_Frontend_Experience/Localization_Requirements.md (+Business Value)
-- [ ] requirements/11_Frontend_Experience/Mobile_App_Requirements.md (+Success Metrics)
-- [ ] requirements/11_Frontend_Experience/SEO_Performance_Requirements.md (+Business Value)
-- [ ] requirements/12_Security_Compliance/Compliance_Standards_Requirements.md (+Acceptance Criteria)
-- [ ] requirements/12_Security_Compliance/Data_Protection_Requirements.md (+Business Value)
+#### Batch 9 — Frontend/Security (5 files) ✅ COMPLETE
+- [x] requirements/11_Frontend_Experience/Localization_Requirements.md (+Business Value)
+- [x] requirements/11_Frontend_Experience/Mobile_App_Requirements.md (+Success Metrics)
+- [x] requirements/11_Frontend_Experience/SEO_Performance_Requirements.md (+Business Value)
+- [x] requirements/12_Security_Compliance/Compliance_Standards_Requirements.md (+Acceptance Criteria)
+- [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md (+Business Value)
 
-#### Batch 10 — CS/Integration (3 files)
-- [ ] requirements/13_Customer_Service/CS_Operations_Requirements.md (+Success Metrics)
-- [ ] requirements/13_Customer_Service/CS_Platform_Requirements.md (+Business Value)
-- [ ] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md (+Acceptance Criteria)
+#### Batch 10 — CS/Integration (3 files) ✅ COMPLETE
+- [x] requirements/13_Customer_Service/CS_Operations_Requirements.md (+Success Metrics)
+- [x] requirements/13_Customer_Service/CS_Platform_Requirements.md (+Business Value)
+- [x] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md (+Acceptance Criteria)
+
+**Phase 7B COMPLETE**: All 28 score-1/3 files enhanced with additional business criteria (≥2/3)
 
 ---
 
