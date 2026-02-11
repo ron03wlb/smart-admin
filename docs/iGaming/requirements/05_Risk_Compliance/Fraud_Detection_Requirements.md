@@ -309,7 +309,7 @@ Per UKGC LCCP 17.1.1:
 - [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Risk system overall architecture
 - [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - Withdrawal SAGA process
 - [05-03 KYC/AML](../../source-archive/05_Risk_Control/05-03_KYC_AML.md) - Identity verification and AML
-- [15-01 Self Exclusion](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md) - Self-exclusion system
+- [15-01 Self-Exclusion](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md) - Self-exclusion system
 - [06-08 UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK regulatory compliance
 
 ---

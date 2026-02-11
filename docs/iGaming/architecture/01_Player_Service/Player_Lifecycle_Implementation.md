@@ -80,7 +80,7 @@ stateDiagram-v2
 
     note right of CLOSED
         Irreversible Terminal State
-        - Self Exclusion
+        - Self-Exclusion
         - AML Violation
         - Fraud Confirmed
         - Refund Unused Balance

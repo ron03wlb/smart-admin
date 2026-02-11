@@ -44,7 +44,7 @@
 
 | Document | Description | Source |
 |----------|-------------|--------|
-| Self Exclusion | Player self-exclusion programs, GAMSTOP integration | [source](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md) |
+| Self-Exclusion | Player self-exclusion programs, GAMSTOP integration | [source](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md) |
 | Deposit Limits | Deposit limit setting and enforcement | [source](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md) |
 | Cooling Off Period | Temporary account restrictions | [source](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md) |
 | Session Management | Play session time limits | [source](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md) |
@@ -52,7 +52,7 @@
 | Loss Limits | Loss limit configuration and enforcement | [source](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md) |
 | Player Protection API | Responsible gambling API integration | [source](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md) |
 | Affordability Assessment | Player affordability checks | [source](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md) |
-| Self Exclusion Reconciliation | Self-exclusion list synchronization | [source](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md) |
+| Self-Exclusion Reconciliation | Self-exclusion list synchronization | [source](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md) |
 
 ---
 

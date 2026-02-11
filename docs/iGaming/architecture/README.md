@@ -132,7 +132,7 @@
 
 | Document | Key Topics |
 |----------|------------|
-| [Self Exclusion Architecture](15_Responsible_Gambling/Self_Exclusion_Architecture.md) | Self-exclusion service, GAMSTOP integration |
+| [Self-Exclusion Architecture](15_Responsible_Gambling/Self_Exclusion_Architecture.md) | Self-exclusion service, GAMSTOP integration |
 | [Deposit Loss Limits Architecture](15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md) | Limit enforcement, database schema |
 | [Session Protection Architecture](15_Responsible_Gambling/Session_Protection_Architecture.md) | Session tracking, reality checks |
 | [Player Protection API](15_Responsible_Gambling/Player_Protection_API.md) | Protection API specs, affordability |

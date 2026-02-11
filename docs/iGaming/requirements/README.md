@@ -159,7 +159,7 @@
 
 | Document | Key Topics |
 |----------|------------|
-| [Self Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) | Self-exclusion types, regulatory requirements |
+| [Self-Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) | Self-exclusion types, regulatory requirements |
 | [Deposit Limits Requirements](15_Responsible_Gambling/Deposit_Limits_Requirements.md) | Deposit limits, loss limits, business rules |
 | [Session Protection Requirements](15_Responsible_Gambling/Session_Protection_Requirements.md) | Cool-off periods, session management, reality checks |
 | [Affordability Requirements](15_Responsible_Gambling/Affordability_Requirements.md) | Player protection API, affordability assessment |
@@ -174,7 +174,7 @@
 - [Platform Overview](01_Player_Experience/Platform_Overview.md) - Platform capabilities overview
 
 ### For Compliance Officers
-- [Self Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) - Self-exclusion types
+- [Self-Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) - Self-exclusion types
 - [KYC/AML Requirements](05_Risk_Compliance/KYC_AML_Requirements.md) - Verification procedures
 - [Compliance Standards Requirements](12_Security_Compliance/Compliance_Standards_Requirements.md) - ISO 27001, UK RTS
 - [Data Protection Requirements](12_Security_Compliance/Data_Protection_Requirements.md) - GDPR compliance
