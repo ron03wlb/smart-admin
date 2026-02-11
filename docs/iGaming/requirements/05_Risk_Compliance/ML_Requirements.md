@@ -210,6 +210,20 @@ All new models and significant model updates must pass A/B testing before full d
 
 ---
 
+## Acceptance Criteria
+
+- [ ] Abnormal Betting Detection model achieves ≥95% accuracy with latency under 50ms
+- [ ] Multi-Account Detection model identifies linked accounts with ≥90% accuracy under 100ms
+- [ ] Bonus Abuse Detection model flags systematic exploitation patterns with ≥85% accuracy
+- [ ] AML Risk Scoring assigns risk grades within 500ms with ≥80% accuracy against known money laundering patterns
+- [ ] Fraudulent Transaction Detection achieves ≥92% accuracy for payment fraud with latency under 100ms
+- [ ] All ML models pass A/B testing requirements (14 days, p-value < 0.05, 95% confidence)
+- [ ] Model drift monitoring detects PSI > 0.2 and triggers retraining alerts automatically
+- [ ] VIP players receive identical risk controls as non-VIP players (no exemptions permitted)
+- [ ] Game-type dimensional filtering correctly applies rules only to specified game categories
+
+---
+
 ## 9. Cross-References
 
 | Topic | Document |

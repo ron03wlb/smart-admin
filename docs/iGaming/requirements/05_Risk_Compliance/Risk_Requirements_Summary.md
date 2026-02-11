@@ -13,6 +13,17 @@ This document summarizes the business requirements for the iGaming platform risk
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- Protecting platform revenue through real-time fraud detection with configurable risk rules that adapt to evolving threats
+- Reducing financial losses via device fingerprinting, behavioral analysis, and ML-driven anomaly detection (target: >90% precision, <5% false positive rate)
+- Enabling efficient operations by automating risk escalation procedures with defined response times (immediate to 24 hours based on severity)
+- Managing agent credit risk through real-time monitoring, threshold-based alerts, and automated freeze mechanisms at critical utilization levels
+- Meeting regulatory compliance requirements for AML monitoring, risk reporting, and audit trail documentation
+
+---
+
 ## 2. Risk Rule Engine Requirements
 
 **Business Goal**: Establish a configurable, real-time risk rule engine that evaluates transactions and player behavior against dynamic risk rules, producing accurate risk scores for decision-making.

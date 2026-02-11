@@ -143,6 +143,22 @@ This document defines the governance requirements for the iGaming platform, cove
 
 ---
 
+## Acceptance Criteria
+
+- [ ] Multi-tenant data isolation: No query can access data belonging to another tenant (verified through automated security testing)
+- [ ] Cross-tenant query blocking: System actively rejects any query pattern that could leak data across tenants
+- [ ] Tenant configuration isolation: Each tenant loads its own configuration independently upon context switch
+- [ ] Per-tenant billing accuracy: Billing calculations reconcile correctly with actual usage metrics within ±0.1%
+- [ ] RBAC permission enforcement: Every protected API endpoint verifies permissions before execution (100% coverage)
+- [ ] Dynamic authorization propagation: Permission changes take effect without service redeployment or restart
+- [ ] Role inheritance resolution: Child roles correctly inherit parent permissions without circular dependency errors
+- [ ] Audit log completeness: All critical operations (data changes, access events, configuration updates) are recorded with before/after values
+- [ ] Audit log immutability: Audit records cannot be modified or deleted after creation (tamper-proof)
+- [ ] PII encryption at rest: All personally identifiable and financial fields use NIST-approved 256-bit encryption
+- [ ] Key rotation continuity: Encryption keys can be rotated without service downtime or data loss
+
+---
+
 ## 6. Reference Documents
 
 | Area | Reference |

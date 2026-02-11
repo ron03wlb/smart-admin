@@ -13,6 +13,16 @@ The Multi-Jurisdiction Framework enables the iGaming platform to operate under m
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- Enabling market expansion into multiple regulated jurisdictions (UKGC, MGA, PAGCOR, Curacao, Brazil SPA) without separate platform instances
+- Reducing compliance risk through automated jurisdiction-specific rule enforcement for KYC, responsible gambling, and payment restrictions
+- Accelerating time-to-market for new jurisdictions through configuration-driven onboarding (no code changes required)
+- Protecting licence status by ensuring geo-fencing, payment method restrictions, and reporting requirements are automatically enforced per jurisdiction
+
+---
+
 ## 2. Business Objectives
 
 | Objective | Description | Priority |

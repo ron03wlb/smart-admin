@@ -216,6 +216,20 @@ For UK-licensed operations, the platform must integrate with the Gamstop nationa
 
 ---
 
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Self-Exclusion Activation Rate | 100% immediate activation | Time from player request to active exclusion status |
+| Limit Change Compliance | 100% adherence to cooling-off rules | Audit trail verification of 24-hour delays for limit increases |
+| Gamstop Sync Success Rate | ≥99.9% | Percentage of UK registrations successfully checked against Gamstop |
+| Reality Check Delivery Rate | 100% at configured intervals | Player receives reality check at scheduled time (default 30 min) |
+| Audit Trail Completeness | 100% of protection events logged | All exclusion, limit change, and cooling-off events have audit records |
+| Report Generation Timeliness | Within 24 hours of period end | Self-exclusion, deposit limit, and reality check reports generated on time |
+| Gamstop Sync Retry Success | 100% eventual consistency | All sync failures are logged, alerted, and successfully retried |
+
+---
+
 ## 10. Cross-References
 
 | Topic | Document |
