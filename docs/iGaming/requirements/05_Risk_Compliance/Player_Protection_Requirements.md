@@ -13,6 +13,23 @@ The Player Protection module provides a unified set of responsible gambling tool
 
 ---
 
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Player Protection Tool Adoption | ≥40% of active players | Percentage of players with at least one active protection limit (deposit/loss/session) |
+| Self-Exclusion Effectiveness | 100% | Percentage of self-excluded players successfully blocked from gambling during exclusion period |
+| Deposit Limit Compliance | 100% | Percentage of deposits correctly enforced against active deposit limits (0 limit breaches) |
+| Loss Limit Enforcement Accuracy | 100% | Percentage of wagers correctly blocked when loss limit reached |
+| Reality Check Engagement | ≥70% | Percentage of reality check prompts acknowledged by players within 2 minutes |
+| Gamstop Sync Success Rate (UKGC) | ≥99.9% | Percentage of Gamstop checks and sync operations completed successfully |
+| Gamstop Match Detection | 100% | Percentage of Gamstop-registered players correctly identified and blocked at registration |
+| Limit Hierarchy Validation | 100% | Percentage of limit changes correctly validating hierarchy rules (daily ≤ weekly ≤ monthly) |
+| Protection Report Timeliness | 100% on-time | Percentage of compliance reports generated within 24 hours of reporting period end |
+| Cooling-Off Period Enforcement | ≥24 hours | Minimum delay applied to all deposit/loss limit increases before taking effect |
+
+---
+
 ## 2. Business Objectives
 
 | Objective | Description | Priority |
