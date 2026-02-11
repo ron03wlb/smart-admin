@@ -1,4 +1,4 @@
-# Turnover and Valid Bet Terminology Standards
+# 投注與有效投注術語標準
 
 > **Canonical Source**: [00-08_Terminology_Standards.md](../../source-archive/00_Foundation/guides/00-08_Terminology_Standards.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
@@ -7,339 +7,339 @@
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
-This standardization delivers value by:
-- **Financial accuracy**: Eliminates ambiguous terminology that causes calculation errors in critical operations (e.g., Valid Bet vs Turnover confusion leading to incorrect GGR reporting, bonus unlock errors)
-- **Regulatory compliance**: Ensures accurate financial reporting for regulators (UKGC, MGA) by standardizing GGR calculation methodology and wagering requirement definitions
-- **Cross-team efficiency**: Reduces communication overhead by establishing unified terminology across product, engineering, QA, and compliance teams
+此標準化提供以下價值：
+- **財務準確性**：消除導致關鍵業務計算錯誤的模糊術語（例如，Valid Bet 與 Turnover 混淆導致 GGR 報告錯誤、紅利解鎖錯誤）
+- **合規保證**：通過標準化 GGR 計算方法和流水要求定義，確保向監管機構（UKGC, MGA）提供準確的財務報告
+- **跨團隊效率**：在產品、工程、QA 和合規團隊之間建立統一術語，減少溝通成本
 
-## Success Metrics
+## 成功指標（Success Metrics）
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| API Naming Compliance | 100% | All new API endpoints use standardized field names (`betAmount`, `validBet`, `wageringProgress`) verified via code review checklist |
-| Documentation Compliance | 100% | All new business documents follow prohibited terminology rules (grep audit for "Effective Turnover", "RemainingRollover", etc.) |
-| Code Review Coverage | 100% | Terminology compliance check integrated into code review process (verify no deprecated field names like `effectiveTurnover`, `turnoverRequirement`) |
-| Cross-Reference Accuracy | 100% | All documents referencing these terms include citation to this standards document (Section 9 compliance) |
-
----
-
-## Document Information
-
-- **Version**: 4.0.0
-- **Created**: 2026-01-28
-- **Scope**: All iGaming business documentation
-- **Enforcement**: Mandatory
+| 指標 | 目標 | 測量方式 |
+|------|------|----------|
+| API 命名合規率 | 100% | 所有新 API 端點使用標準化字段名稱（`betAmount`, `validBet`, `wageringProgress`），通過代碼審查檢查表驗證 |
+| 文檔合規率 | 100% | 所有新業務文檔遵循禁用術語規則（grep 審計 "Effective Turnover", "RemainingRollover" 等） |
+| 代碼審查覆蓋率 | 100% | 術語合規性檢查整合到代碼審查流程（驗證無已棄用字段名稱，如 `effectiveTurnover`, `turnoverRequirement`） |
+| 交叉引用準確性 | 100% | 所有引用這些術語的文檔包含對本標準文檔的引用（Section 9 合規） |
 
 ---
 
-## 1. Bet Amount
+## 文檔資訊（Document Information）
 
-### Definition
-
-The original amount a player wagers in a single bet.
-
-### Characteristics
-
-| Property | Description |
-|---|---|
-| **Scope** | Single bet |
-| **Nature** | Raw, unfiltered, unadjusted |
-| **Immutability** | Cannot change once bet is confirmed |
-
-### Usage Scenarios
-
-- API parameter passing
-- Fund deduction records
-- Transaction detail raw data
-
-### Examples
-
-| Scenario | Bet Amount |
-|---|---|
-| Player bets 100 on a slot machine | 100 |
-| Player bets 200 on sports | 200 |
-
-### Position in Three-Layer Architecture
-
-- **Input**: Layer 1 risk engine input
-- **Record**: `wagering_details.bet_amount`
+- **版本**: 4.0.0
+- **創建日期**: 2026-01-28
+- **範圍**: 所有 iGaming 業務文檔
+- **執行力度**: 強制
 
 ---
 
-## 2. Turnover
+## 1. 投注金額（Bet Amount）
 
-### Definition
+### 定義
 
-The cumulative sum of bet amounts over a time period.
+玩家在單次投注中下注的原始金額。
 
-### Characteristics
+### 特性
 
-| Property | Description |
-|---|---|
-| **Nature** | Cumulative (multiple bets added together) |
-| **Time Scope** | Typically daily / weekly / monthly |
-| **Financial Purpose** | Used for calculating GGR (Gross Gaming Revenue) |
+| 屬性 | 說明 |
+|------|------|
+| **範圍** | 單次投注 |
+| **性質** | 原始的、未過濾的、未調整的 |
+| **不可變性** | 投注確認後不可更改 |
 
-### Formula
+### 使用場景
 
-**Turnover** = Sum of all Bet Amounts
+- API 參數傳遞
+- 資金扣除記錄
+- 交易明細原始數據
 
-**GGR** = Turnover - Payout
+### 範例
 
-### Usage Scenarios
+| 場景 | 投注金額（Bet Amount） |
+|------|----------------------|
+| 玩家在老虎機上投注 100 | 100 |
+| 玩家在體育博彩上投注 200 | 200 |
 
-- Financial reporting and statistics
-- GGR calculation
-- Revenue analysis
+### 在三層架構中的位置
 
-### Example
-
-| Scenario | Calculation | Result |
-|---|---|---|
-| Player bets 10 times today at 100 each | 10 x 100 | Daily Turnover = 1,000 |
-| GGR from above | 1,000 - 800 (payouts) | GGR = 200 (operator revenue) |
-
-### Position in Three-Layer Architecture
-
-- **Position**: Not part of the three-layer validation flow
-- **Purpose**: Independent financial reporting metric
+- **輸入**: Layer 1 風控引擎輸入
+- **記錄**: `wagering_details.bet_amount`
 
 ---
 
-## 3. Valid Bet
+## 2. 流水（Turnover）
 
-### Definition
+### 定義
 
-The single-bet amount after risk control filtering.
+一段時間內投注金額的累計總和。
 
-### Characteristics
+### 特性
 
-| Property | Description |
-|---|---|
-| **Scope** | Single bet |
-| **Filtering** | Determined by Layer 1 risk engine |
-| **Can be zero** | If rejected by risk control |
+| 屬性 | 說明 |
+|------|------|
+| **性質** | 累計（多次投注相加） |
+| **時間範圍** | 通常為每日 / 每週 / 每月 |
+| **財務用途** | 用於計算 GGR（毛利） |
 
-### Calculation Rules (Standard Principal Method - Industry Standard)
+### 公式
 
-| Outcome | Valid Bet Rule |
-|---|---|
-| Risk control passed | Valid Bet = Bet Amount |
-| Risk control rejected | Valid Bet = 0 |
-| Full Win (WIN) | Valid Bet = Bet Amount |
-| Full Loss (LOSS) | Valid Bet = Bet Amount |
-| Half Win (HALF_WIN) | Valid Bet = Bet Amount (NOT half) |
-| Half Loss (HALF_LOSS) | Valid Bet = Bet Amount (NOT half) |
-| Draw (DRAW) | Valid Bet = 0 (no risk assumed) |
-| Void (VOID) | Valid Bet = 0 (no risk assumed) |
+**流水（Turnover）** = 所有投注金額之和
 
-**Critical Principle**: Valid Bet is NOT affected by settlement outcome.
+**GGR（毛利）** = 流水 - 派彩
 
-**Deprecated Method (Actual Risk Method)**:
-- Half win/loss at 50% of Bet Amount -- this approach is NO LONGER USED
+### 使用場景
 
-### Usage Scenarios
+- 財務報表與統計
+- GGR 計算
+- 收入分析
 
-- Wagering requirement calculation
-- VIP level calculation
-- Rebate calculation
+### 範例
 
-### Examples
+| 場景 | 計算 | 結果 |
+|------|------|------|
+| 玩家今天投注 10 次，每次 100 | 10 x 100 | 當日流水 = 1,000 |
+| 上述情境的 GGR | 1,000 - 800（派彩） | GGR = 200（運營商收入） |
 
-| Scenario | Result |
-|---|---|
-| Normal bet: Player bets 100, risk check passes | Valid Bet = 100 |
-| Hedge bet: Player bets 100, risk detects hedging | Valid Bet = 0 |
-| Sports half-win: Player bets 100, payout 145 | Valid Bet = 100 (NOT 50) |
+### 在三層架構中的位置
 
-### Industry Standard References
-
-| Provider | Method Used |
-|---|---|
-| Pinnacle, Betfair | Standard Principal Method |
-| Pragmatic Play | Standard Principal Method |
-| Evolution Gaming | Standard Principal Method |
-
-### Position in Three-Layer Architecture
-
-- **Layer 1**: Risk engine determines valid_bet
-- **Layer 2**: Unchanged, only records settlement status
-- **Layer 3**: Applies game weights
+- **位置**: 不屬於三層驗證流程
+- **用途**: 獨立的財務報告指標
 
 ---
 
-## 4. Wagering Requirement
+## 3. 有效投注（Valid Bet）
 
-### Definition
+### 定義
 
-The total valid bet amount threshold a player must reach.
+經過風控過濾後的單次投注金額。
 
-### Characteristics
+### 特性
 
-| Property | Description |
-|---|---|
-| **Nature** | Threshold value |
-| **Calculation** | Cumulative: Sum of (Valid Bet x Game Weight) |
-| **Scope** | Tied to specific promotion/bonus |
+| 屬性 | 說明 |
+|------|------|
+| **範圍** | 單次投注 |
+| **過濾** | 由 Layer 1 風控引擎決定 |
+| **可為零** | 如被風控拒絕 |
 
-### Formula
+### 計算規則（標準本金法 - 行業標準）
 
-**Wagering Requirement** = Deposit Amount x Multiplier
+| 結算結果 | 有效投注規則（Valid Bet Rule） |
+|---------|------------------------------|
+| 風控通過 | Valid Bet = Bet Amount |
+| 風控拒絕 | Valid Bet = 0 |
+| 全贏（WIN） | Valid Bet = Bet Amount |
+| 全輸（LOSS） | Valid Bet = Bet Amount |
+| 半贏（HALF_WIN） | Valid Bet = Bet Amount（不是一半） |
+| 半輸（HALF_LOSS） | Valid Bet = Bet Amount（不是一半） |
+| 和局（DRAW） | Valid Bet = 0（無風險承擔） |
+| 作廢（VOID） | Valid Bet = 0（無風險承擔） |
 
-**Progress Calculation**:
+**關鍵原則**：有效投注（Valid Bet）不受結算結果影響。
 
-| Metric | Formula |
-|---|---|
-| Completed | Sum of (Valid Bet x Game Weight) |
-| Remaining | Requirement - Completed |
-| Percentage | (Completed / Requirement) x 100% |
+**已棄用方法（實際風險法）**：
+- 半贏/半輸為投注金額的 50% — 此方法已不再使用
 
-### Game Weights
+### 使用場景
 
-| Game Type | Weight | Description |
+- 流水要求計算
+- VIP 等級計算
+- 返水計算
+
+### 範例
+
+| 場景 | 結果 |
+|------|------|
+| 正常投注：玩家投注 100，風控通過 | Valid Bet = 100 |
+| 對沖投注：玩家投注 100，風控檢測到對沖 | Valid Bet = 0 |
+| 體育半贏：玩家投注 100，派彩 145 | Valid Bet = 100（不是 50） |
+
+### 行業標準參考
+
+| 供應商 | 使用方法 |
+|--------|---------|
+| Pinnacle, Betfair | 標準本金法（Standard Principal Method） |
+| Pragmatic Play | 標準本金法（Standard Principal Method） |
+| Evolution Gaming | 標準本金法（Standard Principal Method） |
+
+### 在三層架構中的位置
+
+- **Layer 1**: 風控引擎決定 valid_bet
+- **Layer 2**: 不變，僅記錄結算狀態
+- **Layer 3**: 應用遊戲權重
+
+---
+
+## 4. 流水要求（Wagering Requirement）
+
+### 定義
+
+玩家必須達到的有效投注總額門檻。
+
+### 特性
+
+| 屬性 | 說明 |
+|------|------|
+| **性質** | 門檻值 |
+| **計算** | 累計：Sum of (Valid Bet x Game Weight) |
+| **範圍** | 綁定特定促銷活動/紅利 |
+
+### 公式
+
+**流水要求（Wagering Requirement）** = 存款金額 x 倍數
+
+**進度計算**：
+
+| 指標 | 公式 |
+|------|------|
+| 已完成 | Sum of (Valid Bet x Game Weight) |
+| 剩餘 | Requirement - Completed |
+| 百分比 | (Completed / Requirement) x 100% |
+
+### 遊戲權重（Game Weights）
+
+| 遊戲類型 | 權重 | 說明 |
 |---------|------|------|
-| Slots | 100% | Full contribution |
-| Sports Betting | 100% | Full contribution |
-| Baccarat | 15% | Only 15% counts |
-| Blackjack | 10% | Only 10% counts |
-| Roulette | 20% | Only 20% counts |
+| 老虎機（Slots） | 100% | 完全貢獻 |
+| 體育博彩（Sports Betting） | 100% | 完全貢獻 |
+| 百家樂（Baccarat） | 15% | 僅計算 15% |
+| 二十一點（Blackjack） | 10% | 僅計算 10% |
+| 輪盤（Roulette） | 20% | 僅計算 20% |
 
-### Usage Scenarios
+### 使用場景
 
-- Promotion verification
-- Withdrawal restrictions
-- Bonus unlock conditions
+- 促銷驗證
+- 提款限制
+- 紅利解鎖條件
 
-### Example
+### 範例
 
-**Promotion**: Deposit 100, get 100 bonus, 10x wagering requirement
+**促銷活動**：存款 100，獲得 100 紅利，10 倍流水要求
 
-**Wagering Requirement** = (100 + 100) x 10 = **2,000**
+**流水要求（Wagering Requirement）** = (100 + 100) x 10 = **2,000**
 
-| Player Bet Record | Amount | Weight | Contribution |
-|---|---|---|---|
-| Slots | 800 | 100% | 800 |
-| Baccarat | 600 | 15% | 90 |
-| Roulette | 300 | 20% | 60 |
-| **Total Completed** | | | **950** |
-| **Remaining** | | | **1,050** |
-| **Progress** | | | **47.5%** |
+| 玩家投注記錄 | 金額 | 權重 | 貢獻 |
+|------------|------|------|------|
+| 老虎機（Slots） | 800 | 100% | 800 |
+| 百家樂（Baccarat） | 600 | 15% | 90 |
+| 輪盤（Roulette） | 300 | 20% | 60 |
+| **總計已完成** | | | **950** |
+| **剩餘** | | | **1,050** |
+| **進度** | | | **47.5%** |
 
-### Verification Timing (Industry Standard)
+### 驗證時機（行業標準）
 
-**Correct Approach**: Verify at withdrawal time
+**正確做法**：在提款時驗證
 
-| Step | Action |
-|---|---|
-| During betting | Only accumulate progress |
-| At withdrawal | Verify whether requirement is met |
-| If met | Unlock bonus wallet |
+| 步驟 | 動作 |
+|------|------|
+| 投注期間 | 僅累計進度 |
+| 提款時 | 驗證是否達到要求 |
+| 達到要求 | 解鎖紅利錢包 |
 
-**Deprecated Approach**: Auto-unlock during betting (risk: player continues playing after reaching target and loses bonus)
+**已棄用做法**：在投注期間自動解鎖（風險：玩家達到目標後繼續遊戲並輸掉紅利）
 
-### Position in Three-Layer Architecture
+### 在三層架構中的位置
 
-- **Layer 3 Output**: Accumulates contributed_amount
-- **Withdrawal Verification**: Checks whether Wagering Requirement is met
-
----
-
-## 5. Key Relationship Flow
-
-### Single Bet Data Flow
-
-| Stage | Term | Example | Description |
-|---|---|---|---|
-| Player bets | Bet Amount | 100 | Original amount |
-| Risk engine check | Valid Bet | 100 (passed) or 0 (rejected) | Not affected by settlement |
-| Apply weight | Contributed Amount | 100 x 1.0 = 100 | After game weight |
-| Accumulate | Wagering Progress | 950 + 100 = 1,050 | Running total toward target |
-
-### Time-Based Accumulation
-
-| Term | Purpose | Formula |
-|---|---|---|
-| Turnover | Financial reporting | Sum of all Bet Amounts |
-| Wagering Progress | Promotion tracking | Sum of (Valid Bet x Game Weight) |
+- **Layer 3 輸出**: 累計 contributed_amount
+- **提款驗證**: 檢查是否達到流水要求（Wagering Requirement）
 
 ---
 
-## 6. Terminology Reference Table
+## 5. 關鍵關係流程（Key Relationship Flow）
 
-| Chinese | English | Abbreviation | Definition | Unit | Usage |
-|------|------|------|------|------|------|
-| **Bet Amount** | Bet Amount | - | Single original bet amount | Per bet | API interaction, fund deduction |
-| **Turnover** | Turnover | - | Cumulative sum of bet amounts over time | Cumulative | GGR calculation, financial reports |
-| **Valid Bet** | Valid Bet | VB | Single bet amount after risk filtering | Per bet | Wagering requirements, rebate, VIP |
-| **Wagering Requirement** | Wagering Requirement | WR | Total valid bet threshold to reach | Cumulative | Promotion verification, withdrawal restrictions |
+### 單次投注數據流
 
----
+| 階段 | 術語 | 範例 | 說明 |
+|------|------|------|------|
+| 玩家投注 | 投注金額（Bet Amount） | 100 | 原始金額 |
+| 風控檢查 | 有效投注（Valid Bet） | 100（通過）或 0（拒絕） | 不受結算影響 |
+| 應用權重 | 貢獻金額（Contributed Amount） | 100 x 1.0 = 100 | 遊戲權重後 |
+| 累計 | 流水進度（Wagering Progress） | 950 + 100 = 1,050 | 累計至目標 |
 
-## 7. Prohibited Terminology
+### 基於時間的累計
 
-| Incorrect Term | Correct Term | Reason |
-|-----------|-----------|------|
-| Effective Turnover (mixed) | Valid Bet (single) / Total Valid Bets (cumulative) | Confuses single-bet and cumulative concepts |
-| Remaining Turnover Requirement (vague) | Remaining Wagering Requirement | Imprecise terminology |
-| Effective Turnover (English) | Valid Bet | Confuses Turnover (cumulative) with Valid Bet (single) |
-| RemainingRollover | Remaining Wagering Requirement | Non-standard terminology |
+| 術語 | 用途 | 公式 |
+|------|------|------|
+| 流水（Turnover） | 財務報告 | Sum of all Bet Amounts |
+| 流水進度（Wagering Progress） | 促銷追蹤 | Sum of (Valid Bet x Game Weight) |
 
 ---
 
-## 8. Naming Conventions for Code and APIs
+## 6. 術語對照表（Terminology Reference Table）
 
-### API Response Field Naming
+| 中文 | 英文 | 縮寫 | 定義 | 單位 | 使用場景 |
+|------|------|------|------|------|---------|
+| **投注金額** | Bet Amount | - | 單次原始投注金額 | 單次 | API 交互、資金扣除 |
+| **流水** | Turnover | - | 一段時間內投注金額的累計總和 | 累計 | GGR 計算、財務報告 |
+| **有效投注** | Valid Bet | VB | 經過風控過濾後的單次投注金額 | 單次 | 流水要求、返水、VIP |
+| **流水要求** | Wagering Requirement | WR | 必須達到的有效投注總額門檻 | 累計 | 促銷驗證、提款限制 |
 
-**Correct naming convention**:
+---
 
-| Field | Meaning |
-|---|---|
-| `betAmount` | Bet Amount |
-| `validBet` | Valid Bet |
-| `wageringProgress.totalRequirement` | Wagering Requirement |
-| `wageringProgress.completedAmount` | Completed amount |
-| `wageringProgress.remainingAmount` | Remaining amount |
-| `wageringProgress.percentage` | Progress percentage |
+## 7. 禁用術語（Prohibited Terminology）
 
-**Deprecated naming (do not use)**:
+| 錯誤術語 | 正確術語 | 原因 |
+|---------|---------|------|
+| Effective Turnover（混合） | Valid Bet（單次）/ Total Valid Bets（累計） | 混淆單次投注與累計概念 |
+| Remaining Turnover Requirement（模糊） | Remaining Wagering Requirement | 術語不精確 |
+| Effective Turnover（英文） | Valid Bet | 混淆 Turnover（累計）與 Valid Bet（單次） |
+| RemainingRollover | Remaining Wagering Requirement | 非標準術語 |
 
-| Deprecated Field | Replacement |
-|---|---|
+---
+
+## 8. 代碼與 API 命名規範（Naming Conventions for Code and APIs）
+
+### API 響應字段命名
+
+**正確命名規範**：
+
+| 字段 | 含義 |
+|------|------|
+| `betAmount` | 投注金額（Bet Amount） |
+| `validBet` | 有效投注（Valid Bet） |
+| `wageringProgress.totalRequirement` | 流水要求（Wagering Requirement） |
+| `wageringProgress.completedAmount` | 已完成金額 |
+| `wageringProgress.remainingAmount` | 剩餘金額 |
+| `wageringProgress.percentage` | 進度百分比 |
+
+**已棄用命名（請勿使用）**：
+
+| 已棄用字段 | 替換為 |
+|-----------|--------|
 | `effectiveTurnover` | `validBet` |
 | `turnoverRequirement` | `totalRequirement` |
 
 ---
 
-## 9. Documentation Citation Standard
+## 9. 文檔引用標準（Documentation Citation Standard）
 
-### How to Reference These Terms
+### 如何引用這些術語
 
-When mentioning these terms in other documents, the first occurrence should include the full definition or reference to this document.
+在其他文檔中提及這些術語時，首次出現應包含完整定義或引用本文檔。
 
-**Correct citation examples**:
-- "Valid Bet (see Terminology Standards, Section 3)"
-- "Per the Standard Principal Method, Valid Bet = Bet Amount"
+**正確引用範例**：
+- "有效投注（Valid Bet，見術語標準，Section 3）"
+- "根據標準本金法（Standard Principal Method），Valid Bet = Bet Amount"
 
-### Enforcement Rules
+### 執行規則
 
-| Scope | Requirement |
-|---|---|
-| All new documents | Must follow this terminology standard |
-| Existing documents | Replace with standard terms during revision |
-| Code reviews | Check naming compliance |
-
----
-
-## 10. Version History
-
-| Version | Date | Changes | Author |
-|------|------|---------|------|
-| 1.0.0 | 2026-01-28 | Initial version defining four core terms | Claude Code |
+| 範圍 | 要求 |
+|------|------|
+| 所有新文檔 | 必須遵循本術語標準 |
+| 現有文檔 | 在修訂期間替換為標準術語 |
+| 代碼審查 | 檢查命名合規性 |
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-08
-**Maintainer**: Product Management Team
+## 10. 版本歷史（Version History）
+
+| 版本 | 日期 | 變更 | 作者 |
+|------|------|------|------|
+| 1.0.0 | 2026-01-28 | 初始版本，定義四個核心術語 | Claude Code |
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-08
+**維護者**: 產品管理團隊（Product Management Team）
