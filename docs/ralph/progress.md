@@ -2,7 +2,7 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation [ACTIVE]
-> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 5 (Phase 9) = 23 total
+> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 6 (Phase 9) = 24 total
 > **Status**: IN PROGRESS
 
 ---
@@ -228,12 +228,12 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 - [x] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md ✅ commit f88439cf
 - [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md ✅ commit f88439cf
 
-#### Batch 21 — 04_Promotions (3) + 05_Risk (2) (5 files)
+#### Batch 21 — 04_Promotions (3) + 05_Risk (2) (5 files) ✅ COMPLETE
 - [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md ✅ commit fa46cca9 (part 1/2)
 - [x] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md ✅ ALREADY TRANSLATED (verified)
 - [x] requirements/04_Promotions_VIP/Promotion_Requirements.md ✅ commit fa46cca9 (part 1/2)
-- [ ] requirements/05_Risk_Compliance/Affordability_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Detection_Model_Spec.md
+- [x] requirements/05_Risk_Compliance/Affordability_Requirements.md ✅ commit 19ddd6ef (part 2/2)
+- [x] requirements/05_Risk_Compliance/Detection_Model_Spec.md ✅ commit 1bbfe800 (part 3/3)
 
 #### Batch 22 — 05_Risk_Compliance (5 files)
 - [ ] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md
