@@ -1,4 +1,4 @@
-# Governance Requirements
+# 治理需求（Governance Requirements）
 
 > **Canonical Source**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
@@ -7,195 +7,195 @@
 
 ---
 
-## 1. Overview
+## 1. 概述（Overview）
 
-This document defines the governance requirements for the iGaming platform, covering multi-tenancy, role-based access control (RBAC), audit logging, and data encryption. These requirements ensure the platform meets regulatory compliance, data isolation, and security standards.
-
----
-
-## Business Value
-
-This governance framework delivers critical value through:
-
-- **Multi-Tenant Revenue Scalability**: Enables serving multiple operators (tenants) on a single platform with complete data isolation, reducing infrastructure costs by 60% through shared resources while maintaining regulatory compliance and independent per-tenant billing accuracy
-- **Regulatory Compliance Assurance**: Tamper-proof audit logging and comprehensive access control meet UKGC, MGA, and GDPR requirements, protecting operating licences and reducing regulatory penalty exposure through complete audit trail coverage of all critical operations
-- **Data Security Protection**: Field-level encryption of all PII and financial data using NIST-approved 256-bit standards with centralized key management protects player privacy, prevents data breaches, and ensures GDPR Article 32 compliance for data-at-rest security
-- **Operational Efficiency**: Role-based access control (RBAC) with dynamic authorization eliminates manual permission management overhead by 80%, enables instant permission changes without system downtime, and scales permission management across thousands of users through role inheritance
-- **Risk Mitigation**: Mandatory tenant_id filtering prevents catastrophic data leakage scenarios, immutable audit logs enable forensic investigation of security incidents, and blind index implementation supports compliance searches on encrypted data without compromising security
+本文件定義 iGaming 平台的治理需求，涵蓋多租戶（Multi-Tenancy）、基於角色的存取控制（Role-Based Access Control, RBAC）、稽核日誌和數據加密。這些需求確保平台符合監管合規、數據隔離和安全標準。
 
 ---
 
-## Acceptance Criteria
+## 業務價值（Business Value）
 
-- [ ] Multi-tenant data isolation prevents all cross-tenant data leakage scenarios, with 100% of database queries correctly filtered by tenant_id (GOV-MT-01, GOV-MT-02)
-- [ ] Tenant-specific configurations load independently per tenant without cross-contamination, with accurate per-tenant billing reconciliation (GOV-MT-03, GOV-MT-04)
-- [ ] RBAC permission system enforces authorization checks on 100% of protected API endpoints, with role-permission mappings configured correctly (GOV-RBAC-01, GOV-RBAC-02)
-- [ ] Dynamic permission changes propagate immediately without redeployment, with role inheritance resolving correctly (no circular dependencies) (GOV-RBAC-03, GOV-RBAC-04)
-- [ ] Audit logging captures all critical operations (player actions, financial transactions, permission changes, configuration updates) with complete context and before/after values (GOV-AUDIT-01, GOV-AUDIT-02)
-- [ ] Audit logs are tamper-proof (immutable, cannot be modified or deleted), with regulatory compliance reports generated accurately on demand (GOV-AUDIT-03, GOV-AUDIT-04)
-- [ ] All PII and financial data fields encrypted at rest using NIST-approved 256-bit encryption, with centralized KMS integration operational (GOV-ENC-01, GOV-ENC-02)
-- [ ] Key rotation mechanism executes without service downtime, with encryption/decryption performance within SLA thresholds (GOV-ENC-03, GOV-ENC-04)
-- [ ] Blind index implementation supports searchable encrypted fields with acceptable collision rates (<0.001%)
-- [ ] All compliance checklists (multi-tenant, RBAC, audit, encryption) pass 100% verification testing
+本治理框架透過以下方式提供關鍵價值：
+
+- **多租戶收入可擴展性**：能夠在單一平台上為多個營運商（租戶）提供服務，並提供完整的數據隔離，透過共享資源降低 60% 的基礎設施成本，同時維持監管合規和獨立的每租戶計費準確性
+- **監管合規保證**：防篡改稽核日誌和全面的存取控制滿足 UKGC、MGA 和 GDPR 要求，保護營運執照並透過完整的稽核軌跡覆蓋所有關鍵操作來降低監管罰款風險
+- **數據安全保護**：使用 NIST 認可的 256 位元標準對所有 PII 和財務數據進行欄位級加密，配合集中式金鑰管理，保護玩家隱私，防止數據洩露，並確保符合 GDPR 第 32 條的靜態數據安全
+- **營運效率**：基於角色的存取控制（RBAC）與動態授權消除 80% 的人工權限管理開銷，能夠在無系統停機的情況下即時變更權限，並透過角色繼承在數千名用戶間擴展權限管理
+- **風險緩解**：強制性 tenant_id 過濾防止災難性數據洩漏場景，不可變稽核日誌支援安全事件的鑑識調查，盲索引（Blind Index）實施支援在不損害安全性的情況下對加密數據進行合規搜尋
 
 ---
 
-## 2. Multi-Tenant Architecture Requirements
+## 驗收標準（Acceptance Criteria）
 
-**Business Goal**: Enable the platform to serve multiple operators (tenants) with complete data isolation, independent configuration, and accurate per-tenant billing.
+- [ ] 多租戶數據隔離防止所有跨租戶數據洩漏場景，100% 的資料庫查詢正確按 tenant_id 過濾（GOV-MT-01, GOV-MT-02）
+- [ ] 租戶特定配置獨立載入每個租戶而無交叉污染，每租戶計費對帳準確（GOV-MT-03, GOV-MT-04）
+- [ ] RBAC 權限系統在 100% 的受保護 API 端點上強制執行授權檢查，角色權限映射配置正確（GOV-RBAC-01, GOV-RBAC-02）
+- [ ] 動態權限變更無需重新部署即時傳播，角色繼承正確解析（無循環依賴）（GOV-RBAC-03, GOV-RBAC-04）
+- [ ] 稽核日誌捕獲所有關鍵操作（玩家操作、財務交易、權限變更、配置更新），包含完整上下文和前後值（GOV-AUDIT-01, GOV-AUDIT-02）
+- [ ] 稽核日誌防篡改（不可變，無法修改或刪除），監管合規報告按需準確生成（GOV-AUDIT-03, GOV-AUDIT-04）
+- [ ] 所有 PII 和財務數據欄位使用 NIST 認可的 256 位元加密進行靜態加密，集中式 KMS 整合運作正常（GOV-ENC-01, GOV-ENC-02）
+- [ ] 金鑰輪替機制在無服務停機的情況下執行，加密/解密效能在 SLA 閾值內（GOV-ENC-03, GOV-ENC-04）
+- [ ] 盲索引實施支援可搜尋的加密欄位，碰撞率可接受（<0.001%）
+- [ ] 所有合規檢查清單（多租戶、RBAC、稽核、加密）通過 100% 驗證測試
 
-### Functional Requirements
+---
 
-| ID | Requirement | Priority | Acceptance Criteria |
+## 2. 多租戶架構需求（Multi-Tenant Architecture Requirements）
+
+**業務目標**：使平台能夠為多個營運商（租戶）提供服務，並提供完整的數據隔離、獨立配置和準確的每租戶計費。
+
+### 功能需求（Functional Requirements）
+
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| GOV-MT-01 | Complete tenant data isolation | Critical | No data leakage across tenants under any query scenario |
-| GOV-MT-02 | Cross-tenant query prevention | Critical | System blocks any query that could access another tenant's data |
-| GOV-MT-03 | Tenant-specific configuration loading | High | Each tenant loads its own configuration independently |
-| GOV-MT-04 | Accurate tenant billing | High | Per-tenant billing reconciles correctly with usage metrics |
+| GOV-MT-01 | 完整租戶數據隔離 | Critical | 在任何查詢場景下無數據洩漏跨租戶 |
+| GOV-MT-02 | 跨租戶查詢預防 | Critical | 系統封鎖任何可能存取其他租戶數據的查詢 |
+| GOV-MT-03 | 租戶特定配置載入 | High | 每個租戶獨立載入其自己的配置 |
+| GOV-MT-04 | 準確的租戶計費 | High | 每租戶計費與使用指標正確對帳 |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- Tenant data is fully isolated at the database level
-- Cross-tenant queries are systematically blocked
-- Tenant-specific configurations load correctly on tenant switch
-- Tenant billing calculations are accurate and auditable
+- 租戶數據在資料庫層級完全隔離
+- 跨租戶查詢被系統性封鎖
+- 租戶特定配置在租戶切換時正確載入
+- 租戶計費計算準確且可稽核
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| Data Leakage | Missing tenant ID filter allows cross-tenant data access | Mandatory tenant_id filtering on all queries |
-| Performance Degradation | Multi-tenant queries not using partition keys | Enforce shard-key usage in query patterns |
-| Configuration Error | Tenant-specific settings not properly isolated | Separate configuration stores per tenant |
+| 數據洩漏 | 缺少租戶 ID 過濾允許跨租戶數據存取 | 對所有查詢強制使用 tenant_id 過濾 |
+| 效能下降 | 多租戶查詢未使用分區鍵 | 在查詢模式中強制使用分片鍵 |
+| 配置錯誤 | 租戶特定設定未正確隔離 | 每個租戶使用獨立的配置儲存 |
 
 ---
 
-## 3. RBAC Permission System Requirements
+## 3. RBAC 權限系統需求（RBAC Permission System Requirements）
 
-**Business Goal**: Provide a flexible, scalable role-based access control system that supports role inheritance, dynamic authorization, and fine-grained permission management.
+**業務目標**：提供靈活、可擴展的基於角色的存取控制系統，支援角色繼承、動態授權和細粒度權限管理。
 
-### Functional Requirements
+### 功能需求（Functional Requirements）
 
-| ID | Requirement | Priority | Acceptance Criteria |
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| GOV-RBAC-01 | Role permission configuration | Critical | All roles have correct permission assignments |
-| GOV-RBAC-02 | Permission verification | Critical | Every API endpoint enforces permission checks |
-| GOV-RBAC-03 | Dynamic authorization | High | Permission changes take effect without redeployment |
-| GOV-RBAC-04 | Role inheritance | High | Child roles correctly inherit parent role permissions |
+| GOV-RBAC-01 | 角色權限配置 | Critical | 所有角色具有正確的權限分配 |
+| GOV-RBAC-02 | 權限驗證 | Critical | 每個 API 端點強制執行權限檢查 |
+| GOV-RBAC-03 | 動態授權 | High | 權限變更無需重新部署即時生效 |
+| GOV-RBAC-04 | 角色繼承 | High | 子角色正確繼承父角色權限 |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- Role-permission mappings are correctly configured and documented
-- Permission verification is accurate for all protected endpoints
-- Dynamic authorization changes propagate immediately
-- Role inheritance chains resolve correctly without circular dependencies
+- 角色權限映射正確配置並記錄
+- 所有受保護端點的權限驗證準確
+- 動態授權變更即時傳播
+- 角色繼承鏈正確解析且無循環依賴
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| Permission Explosion | Too many permissions become unmanageable | Group permissions into logical categories |
-| Circular Dependency | Role inheritance creates circular references | Validate inheritance graphs on configuration change |
-| Cache Inconsistency | Permission changes not reflected in cache | Implement cache invalidation on permission update |
+| 權限爆炸 | 過多權限變得無法管理 | 將權限分組為邏輯類別 |
+| 循環依賴 | 角色繼承創建循環引用 | 配置變更時驗證繼承圖 |
+| 快取不一致 | 權限變更未反映在快取中 | 在權限更新時實施快取失效 |
 
 ---
 
-## 4. Audit Logging Requirements
+## 4. 稽核日誌需求（Audit Logging Requirements）
 
-**Business Goal**: Maintain a comprehensive, tamper-proof audit trail of all critical platform operations for regulatory compliance and incident investigation.
+**業務目標**：維護所有關鍵平台操作的全面、防篡改稽核軌跡，以符合監管合規和事件調查需求。
 
-### Functional Requirements
+### 功能需求（Functional Requirements）
 
-| ID | Requirement | Priority | Acceptance Criteria |
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| GOV-AUDIT-01 | Critical operation logging | Critical | All sensitive operations are recorded with full context |
-| GOV-AUDIT-02 | Before/after change comparison | High | Every data modification records previous and new values |
-| GOV-AUDIT-03 | Tamper-proof audit logs | Critical | Audit records cannot be modified or deleted |
-| GOV-AUDIT-04 | Compliance reporting | High | Regulatory audit reports can be generated on demand |
+| GOV-AUDIT-01 | 關鍵操作日誌記錄 | Critical | 所有敏感操作均記錄完整上下文 |
+| GOV-AUDIT-02 | 前後變更比較 | High | 每次數據修改記錄先前值和新值 |
+| GOV-AUDIT-03 | 防篡改稽核日誌 | Critical | 稽核記錄無法修改或刪除 |
+| GOV-AUDIT-04 | 合規報告 | High | 監管稽核報告可按需生成 |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- All critical operations are captured in audit logs
-- Before/after comparisons are accurate for data changes
-- Audit logs are immutable and protected from tampering
-- Compliance reports are complete and meet regulatory standards
+- 所有關鍵操作均在稽核日誌中捕獲
+- 數據變更的前後比較準確
+- 稽核日誌不可變且受保護免於篡改
+- 合規報告完整且符合監管標準
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| Missing Critical Operations | Not all sensitive operations are covered | Maintain a registry of auditable operations |
-| Performance Impact | Synchronous log writes degrade system performance | Use asynchronous log writing with guaranteed delivery |
-| Storage Bloat | Logs grow without bound | Implement log archival and retention policies |
+| 缺少關鍵操作 | 並非所有敏感操作都涵蓋 | 維護可稽核操作的註冊表 |
+| 效能影響 | 同步日誌寫入降低系統效能 | 使用非同步日誌寫入並保證交付 |
+| 儲存膨脹 | 日誌無限增長 | 實施日誌歸檔和保留政策 |
 
 ---
 
-## 5. Data Encryption Requirements
+## 5. 數據加密需求（Data Encryption Requirements）
 
-**Business Goal**: Protect all sensitive player and financial data through field-level encryption, centralized key management, and regular key rotation.
+**業務目標**：透過欄位級加密、集中式金鑰管理和定期金鑰輪替保護所有敏感玩家和財務數據。
 
-### Functional Requirements
+### 功能需求（Functional Requirements）
 
-| ID | Requirement | Priority | Acceptance Criteria |
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| GOV-ENC-01 | Sensitive field encryption | Critical | All PII and financial fields are encrypted at rest |
-| GOV-ENC-02 | KMS integration | Critical | Key management is centralized and access-controlled |
-| GOV-ENC-03 | Key rotation mechanism | High | Keys can be rotated without service downtime |
-| GOV-ENC-04 | Acceptable encryption performance | High | Encryption overhead does not exceed SLA thresholds |
+| GOV-ENC-01 | 敏感欄位加密 | Critical | 所有 PII 和財務欄位靜態加密 |
+| GOV-ENC-02 | KMS 整合 | Critical | 金鑰管理集中化且存取受控 |
+| GOV-ENC-03 | 金鑰輪替機制 | High | 金鑰可在無服務停機的情況下輪替 |
+| GOV-ENC-04 | 可接受的加密效能 | High | 加密開銷不超過 SLA 閾值 |
 
-### Encryption Standards
+### 加密標準（Encryption Standards）
 
-| Data Category | Encryption Standard | Use Case |
+| 數據類別 | 加密標準 | 使用案例 |
 |---------------|-------------------|----------|
-| PII Fields | NIST-Approved 256-bit Encryption | Player name, email, phone, address |
-| Financial Data | NIST-Approved 256-bit Encryption | Account balances, transaction amounts |
-| Search Indexes | Blind Index (HMAC) | Searchable encrypted fields |
+| PII 欄位 | NIST 認可的 256 位元加密 | 玩家姓名、電子郵件、電話、地址 |
+| 財務數據 | NIST 認可的 256 位元加密 | 帳戶餘額、交易金額 |
+| 搜尋索引 | 盲索引（Blind Index, HMAC） | 可搜尋的加密欄位 |
 
-→ **[Encryption Algorithm Selection](../../architecture/06_Platform_Core/Governance_Implementation.md#encryption-algorithms)** — See architecture layer for approved algorithm details
+→ **[Encryption Algorithm Selection](../../architecture/06_Platform_Core/Governance_Implementation.md#encryption-algorithms)** — 有關認可演算法詳情，請參閱架構層
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- All sensitive fields are encrypted at rest and in transit
-- KMS integration is operational with proper access controls
-- Key rotation mechanism functions without service interruption
-- Encryption performance meets defined SLA requirements
+- 所有敏感欄位在靜態和傳輸中加密
+- KMS 整合運作正常且具有適當的存取控制
+- 金鑰輪替機制在無服務中斷的情況下運作
+- 加密效能符合定義的 SLA 要求
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| Key Management Chaos | Hardcoded keys or key leakage | Use centralized KMS; never store keys in code |
-| Weak Algorithms | Using outdated encryption standards | Enforce NIST-approved 256-bit minimum standard |
-| Blind Index Collision | Hash collisions cause incorrect query results | Use high-entropy hash functions with sufficient output length |
+| 金鑰管理混亂 | 硬編碼金鑰或金鑰洩漏 | 使用集中式 KMS；絕不在程式碼中儲存金鑰 |
+| 弱演算法 | 使用過時的加密標準 | 強制執行 NIST 認可的最低 256 位元標準 |
+| 盲索引碰撞 | 雜湊碰撞導致錯誤的查詢結果 | 使用高熵雜湊函數並具有足夠的輸出長度 |
 
 ---
 
-## Acceptance Criteria
+## 驗收標準（Acceptance Criteria）
 
-- [ ] Multi-tenant data isolation: No query can access data belonging to another tenant (verified through automated security testing)
-- [ ] Cross-tenant query blocking: System actively rejects any query pattern that could leak data across tenants
-- [ ] Tenant configuration isolation: Each tenant loads its own configuration independently upon context switch
-- [ ] Per-tenant billing accuracy: Billing calculations reconcile correctly with actual usage metrics within ±0.1%
-- [ ] RBAC permission enforcement: Every protected API endpoint verifies permissions before execution (100% coverage)
-- [ ] Dynamic authorization propagation: Permission changes take effect without service redeployment or restart
-- [ ] Role inheritance resolution: Child roles correctly inherit parent permissions without circular dependency errors
-- [ ] Audit log completeness: All critical operations (data changes, access events, configuration updates) are recorded with before/after values
-- [ ] Audit log immutability: Audit records cannot be modified or deleted after creation (tamper-proof)
-- [ ] PII encryption at rest: All personally identifiable and financial fields use NIST-approved 256-bit encryption
-- [ ] Key rotation continuity: Encryption keys can be rotated without service downtime or data loss
+- [ ] 多租戶數據隔離：無查詢可存取屬於其他租戶的數據（透過自動化安全測試驗證）
+- [ ] 跨租戶查詢封鎖：系統主動拒絕任何可能洩漏跨租戶數據的查詢模式
+- [ ] 租戶配置隔離：每個租戶在上下文切換時獨立載入其自己的配置
+- [ ] 每租戶計費準確性：計費計算與實際使用指標正確對帳，誤差在 ±0.1% 以內
+- [ ] RBAC 權限強制執行：每個受保護的 API 端點在執行前驗證權限（100% 覆蓋）
+- [ ] 動態授權傳播：權限變更無需服務重新部署或重啟即時生效
+- [ ] 角色繼承解析：子角色正確繼承父權限且無循環依賴錯誤
+- [ ] 稽核日誌完整性：所有關鍵操作（數據變更、存取事件、配置更新）均記錄前後值
+- [ ] 稽核日誌不可變性：稽核記錄在創建後無法修改或刪除（防篡改）
+- [ ] PII 靜態加密：所有個人識別和財務欄位使用 NIST 認可的 256 位元加密
+- [ ] 金鑰輪替連續性：加密金鑰可在無服務停機或數據丟失的情況下輪替
 
 ---
 
-## 6. Reference Documents
+## 6. 參考文件（Reference Documents）
 
-| Area | Reference |
+| 領域 | 參考 |
 |------|-----------|
-| Multi-Tenant Architecture | 06-01 Multi-Tenant Design |
-| RBAC Permissions | 06-02 RBAC Permissions |
-| Audit Logging | 06-03 Audit Log System |
-| Data Encryption | 12-03 Data Security Standard |
-| Encryption Strategy | 12-03-01 Encryption Strategy |
-| Blind Index | 12-03-02 Blind Index Architecture |
+| 多租戶架構 | 06-01 Multi-Tenant Design |
+| RBAC 權限 | 06-02 RBAC Permissions |
+| 稽核日誌 | 06-03 Audit Log System |
+| 數據加密 | 12-03 Data Security Standard |
+| 加密策略 | 12-03-01 Encryption Strategy |
+| 盲索引 | 12-03-02 Blind Index Architecture |
 
 ---
 
