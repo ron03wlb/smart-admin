@@ -2,7 +2,7 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 8 - Architecture Quality Enhancement [ACTIVE]
-> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + ongoing
+> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 1 (Phase 8) = 12 total
 > **Status**: IN PROGRESS
 
 ---
@@ -138,7 +138,7 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 Fix Java code examples to follow SmartAdmin conventions: Constructor injection, @Transactional in Manager only, Vavr Option.
 
 #### Batch 11 — Player/Finance (5 files)
-- [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (fix Optional → Vavr Option, @Transactional → Manager)
+- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (extracted @Transactional to KycVerificationManager, PasswordResetManager) ✅ commit 70538352
 - [ ] architecture/02_Finance_Service/Financial_Implementation.md (fix @Transactional → Manager)
 - [ ] architecture/02_Finance_Service/Payment_Gateway_Technical.md (fix @Autowired → constructor, @Transactional → Manager)
 - [ ] architecture/02_Finance_Service/Reconciliation_Technical.md (fix @Autowired → constructor)
