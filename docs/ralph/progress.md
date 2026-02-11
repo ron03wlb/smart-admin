@@ -2,7 +2,7 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation [ACTIVE]
-> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 10 (Phase 9) = 28 total
+> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 11 (Phase 9) = 29 total
 > **Status**: IN PROGRESS
 
 ---
@@ -298,12 +298,12 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 
 ### 9B: Architecture Translation (105 files)
 
-#### Batch 31 — 00_Overview (5 files)
+#### Batch 31 — 00_Overview (5 files) ✅ COMPLETE
 - [x] architecture/00_Overview/Business_Logic_Flows.md ✅ commit 3dfb90c2
-- [ ] architecture/00_Overview/Data_Model.md
-- [ ] architecture/00_Overview/Platform_Architecture.md
-- [ ] architecture/00_Overview/System_Overview.md
-- [ ] architecture/00_Overview/Technology_Stack.md
+- [x] architecture/00_Overview/Data_Model.md ✅ commit 82f71b34
+- [x] architecture/00_Overview/Platform_Architecture.md ✅ commit d4047321
+- [x] architecture/00_Overview/System_Overview.md ✅ ALREADY TRANSLATED (verified)
+- [x] architecture/00_Overview/Technology_Stack.md ✅ commit 1240c4a7
 
 #### Batch 32 — 01_Player + 02_Finance (5 files)
 - [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md
