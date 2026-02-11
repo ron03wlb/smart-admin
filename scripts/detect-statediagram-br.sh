@@ -64,10 +64,10 @@ for file in $files_with_statediagram; do
                 in_mermaid=0
             }
         }
-        END { if (error_count > 0) exit 0; else exit 1 }
-    ' "$file")
+        END { if (error_count > 0) exit 1; else exit 0 }
+    ' "$file") || true
 
-    if [ $? -eq 0 ]; then
+    if [ -n "$errors" ]; then
         error_files=$((error_files + 1))
         file_error_count=$(echo "$errors" | wc -l)
         total_errors=$((total_errors + file_error_count))
