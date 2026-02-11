@@ -1,488 +1,488 @@
-# iGaming Platform Solution Overview
+# iGaming 平台解決方案概覽
 
-> **Canonical Source**: [00-06_Solution_Overview.md](../../source-archive/00_Foundation/guides/00-06_Solution_Overview.md)
-> **Audience**: Executives, Product Managers
-> **Related Architecture**: [Platform_Architecture.md](../../architecture/00_Overview/Platform_Architecture.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## Acceptance Criteria
-
-- [ ] Platform supports multi-tenant architecture with complete data isolation between brands
-- [ ] Dual wallet system (Cash Wallet + Promotional Wallet) implemented with correct deduction priority
-- [ ] Valid turnover calculation supports game type weighting (Slots 100%, Baccarat 50%, Roulette 0%)
-- [ ] Wagering release logic correctly handles Active → Completed/Expired/Forfeited state transitions
-- [ ] Three-party reconciliation process includes L1 (real-time), L2 (5-minute polling), L3 (daily settlement)
-- [ ] Automatic suspension policy triggers when single tenant/provider RTP exceeds 200% threshold
-- [ ] Multi-level agent commission calculation supports unlimited (or N) levels with override logic
-- [ ] SaaS tenant billing implements tiered pricing (<$500K: 15%, $500K-$1M: 12%, >$1M: 10%)
-- [ ] Payment gateway integration supports both seamless wallet and transfer wallet models
-- [ ] KYC/AML process includes ID verification, biometric liveness, proof of address, PEP screening
-- [ ] Platform complies with key regulatory standards (MGA, UKGC, Curacao, GDPR, PCI-DSS 4.0)
-- [ ] Player retention metrics meet benchmarks (Day 1: 40%, Day 7: 20%, Day 30: 10%)
+> **規範來源**: [00-06_Solution_Overview.md](../../source-archive/00_Foundation/guides/00-06_Solution_Overview.md)
+> **目標讀者**: 高層管理者、產品經理
+> **相關架構**: [Platform_Architecture.md](../../architecture/00_Overview/Platform_Architecture.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1. Market Context
+## 驗收標準
 
-The global online gaming market reached **$786 billion to $955 billion** in 2024, and is projected to exceed **$1,500 billion to $2,770 billion** by 2030, with a compound annual growth rate (CAGR) of approximately **7.1%-12.6%**. Multi-tenant platform architecture has become the industry standard, enabling operators to enter the market quickly at lower cost while maintaining flexibility and scalability.
+- [ ] 平台支持多租戶 (Multi-Tenant) 架構，品牌之間實現完整數據隔離
+- [ ] 雙錢包系統（現金錢包 + 促銷錢包）已實現，且扣款優先級正確
+- [ ] 有效投注額 (Valid Turnover) 計算支持遊戲類型權重（老虎機 100%、百家樂 50%、輪盤 0%）
+- [ ] 流水要求 (Wagering Requirement) 釋放邏輯正確處理 Active → Completed/Expired/Forfeited 狀態轉換
+- [ ] 三方對賬流程包含 L1（即時）、L2（5 分鐘輪詢）、L3（每日結算）
+- [ ] 自動暫停策略在單一租戶/供應商 RTP 超過 200% 閾值時觸發
+- [ ] 多層級代理佣金計算支持無限（或 N 層）層級及覆蓋邏輯
+- [ ] SaaS 租戶計費實現階梯定價（<$500K: 15%、$500K-$1M: 12%、>$1M: 10%）
+- [ ] 支付閘道 (Payment Gateway) 整合支持無縫錢包 (Seamless Wallet) 和轉賬錢包 (Transfer Wallet) 模式
+- [ ] KYC/AML 流程包含身份證件驗證、生物識別活體檢測、地址證明、政治敏感人物 (PEP) 篩查
+- [ ] 平台符合主要監管標準（MGA、UKGC、Curacao、GDPR、PCI-DSS 4.0）
+- [ ] 玩家留存率 (Retention Rate) 指標達到基準（Day 1: 40%、Day 7: 20%、Day 30: 10%）
 
-### Market Size Estimates by Research Firm
+---
 
-| Research Firm | 2024 Value | 2030/34 Projection | CAGR |
+## 1. 市場背景
+
+全球線上博彩市場在 2024 年達到 **$786 億至 $955 億**，預計到 2030 年將超過 **$1,500 億至 $2,770 億**，年複合增長率 (CAGR) 約為 **7.1%-12.6%**。多租戶平台架構已成為行業標準，使營運商能以較低成本快速進入市場，同時保持靈活性和可擴展性。
+
+### 各研究機構市場規模估算
+
+| 研究機構 | 2024 年市值 | 2030/34 年預測 | CAGR |
 |---|---|---|---|
 | Grand View Research | $78.7B | $153.6B (2030) | 11.9% |
 | IMARC Group | $93.0B | $172.8B (2033) | 7.1% |
 | Polaris Market Research | $111.4B | $277.6B (2034) | 9.6% |
 
-### Market Structure
+### 市場結構
 
-- **Sports Betting**: 50-51.5% share (fastest growing, CAGR ~12.5%)
-- **Casino Games**: Second largest category
-- **Poker**: Growing at 9.7% CAGR
-- **Mobile Gaming**: Reached $42.6B in 2024; 54% of global population (4.3B people) own smartphones; 5G adoption further accelerates mobile gaming
+- **體育博彩 (Sports Betting)**：50-51.5% 市場份額（增長最快，CAGR ~12.5%）
+- **賭場遊戲 (Casino Games)**：第二大品類
+- **撲克 (Poker)**：以 9.7% CAGR 增長
+- **行動遊戲 (Mobile Gaming)**：2024 年達到 $42.6B；全球 54% 人口（43 億人）擁有智慧型手機；5G 普及進一步加速行動遊戲發展
 
 ---
 
-## 2. Business Models and Revenue Structure
+## 2. 商業模式與營收結構
 
-### B2B vs. B2C Strategic Trade-offs
+### B2B 與 B2C 策略取捨
 
-B2B Platform-as-a-Service (PaaS) model covers five core modules: **Player Account Management (PAM)**, **Game Aggregation**, **Sportsbook Engine**, **Payment Orchestration**, **CRM Analytics**. This modular architecture allows operators to selectively procure based on needs.
+B2B 平台即服務 (PaaS) 模式涵蓋五大核心模組：**玩家帳戶管理 (Player Account Management, PAM)**、**遊戲聚合 (Game Aggregation)**、**體育投注引擎 (Sportsbook Engine)**、**支付編排 (Payment Orchestration)**、**CRM 分析 (CRM Analytics)**。此模組化架構允許營運商按需選擇採購。
 
-| Solution Type | Build Cost | Time-to-Market | Revenue Share | Best For |
+| 解決方案類型 | 建置成本 | 上市時間 | 營收分成 | 最適對象 |
 |---|---|---|---|---|
-| **White Label** | $10K-$150K | 4-12 weeks | 10-30% of NGR | Startups, limited capital, market validation |
-| **Turnkey** | $50K-$150K | 8-16 weeks | 0-10% of NGR | Mid-size operators, need control |
-| **Custom Build** | $500K-$1.5M+ | 6-18 months | None | Large operators, long-term strategy |
+| **白標 (White Label)** | $10K-$150K | 4-12 週 | 10-30% NGR | 新創公司、資金有限、市場驗證 |
+| **交鑰匙 (Turnkey)** | $50K-$150K | 8-16 週 | 0-10% NGR | 中型營運商、需要控制權 |
+| **客製化建置 (Custom Build)** | $500K-$1.5M+ | 6-18 個月 | 無 | 大型營運商、長期策略 |
 
-**Key Insight**: When monthly NGR exceeds **$200K**, white label revenue share costs exceed the amortized cost of a custom platform. At 20% share, an operator with $3M monthly NGR pays **$600K/month** to the platform provider.
+**關鍵洞察**：當月淨博彩收入 (NGR) 超過 **$200K** 時，白標營收分成成本將超過客製化平台的攤銷成本。以 20% 分成計算，月 NGR 為 $3M 的營運商每月需支付 **$600K** 給平台供應商。
 
-### Leading White Label Providers
+### 主要白標供應商
 
-| Provider | Key Strengths |
+| 供應商 | 核心優勢 |
 |---|---|
-| **SoftSwiss** | Crypto market leader; 200+ Bitcoin casinos; 300+ game providers; 36,700+ games; EUR 10B+ monthly betting volume |
-| **EveryMatrix** | Modular architecture; 2023 WLA Responsible Gaming certification; clients include bet365, Kindred (Tier-1) |
-| **BetConstruct** | Omni-channel solution; strategic partnership with Flutter's Betfair International |
+| **SoftSwiss** | 加密貨幣市場領導者；200+ 比特幣賭場；300+ 遊戲供應商；36,700+ 遊戲；月投注量超過 EUR 10B |
+| **EveryMatrix** | 模組化架構；2023 年 WLA 責任博彩認證；客戶包括 bet365、Kindred（Tier-1） |
+| **BetConstruct** | 全通路解決方案；與 Flutter 旗下 Betfair International 達成策略合作 |
 
-### Revenue Share Model
+### 營收分成模式
 
-The industry uses **GGR (Gross Gaming Revenue)** as the core metric:
+行業以 **總博彩收入 (Gross Gaming Revenue, GGR)** 作為核心指標：
 
-- **Formula**: GGR = Total Bets - Total Payouts
-- **Industry average GGR margin**: 8-15%
+- **公式**：GGR = 總投注額 - 總派彩
+- **行業平均 GGR 利潤率**：8-15%
 
-**Deductions from GGR to NGR**:
+**從 GGR 到淨博彩收入 (NGR) 的扣除項**：
 
-| Deduction Item | Percentage |
+| 扣除項 | 比例 |
 |---|---|
-| Bonus costs | 5-15% of GGR |
-| Game provider fees | 10-20% of game revenue |
-| Payment processing | 0.5-4% of transaction volume |
-| Regulatory taxes | 8-54% (varies by jurisdiction) |
+| 獎金成本 | 5-15% GGR |
+| 遊戲供應商費用 | 10-20% 遊戲收入 |
+| 支付處理費 | 0.5-4% 交易量 |
+| 監管稅 | 8-54%（因司法管轄區而異） |
 
-**Affiliate models**: RevShare (20-60% of player NGR), CPA ($50-$500 per first-time depositor), or hybrid. Tiered structures allow large operators to negotiate down to 8-10% of NGR.
+**聯盟行銷 (Affiliate) 模式**：營收分成 (RevShare，20-60% 玩家 NGR)、每次獲客成本 (CPA，$50-$500 每位首次存款玩家)，或混合模式。階梯結構允許大型營運商協商至 NGR 的 8-10%。
 
 ---
 
-## 3. Global Regulatory and Licensing Requirements
+## 3. 全球監管與牌照要求
 
-### Major License Comparison
+### 主要牌照比較
 
-| License | Reputation Tier | Total Cost (Year 1) | Timeline | Tax Rate | Best Use Case |
+| 牌照 | 信譽等級 | 第一年總成本 | 時程 | 稅率 | 最佳使用場景 |
 |---|---|---|---|---|---|
-| **MGA (Malta)** | Tier 1 | ~EUR 130,000 | 10-16 weeks | 5% GGR (Malta players only) | EU/EEA markets |
-| **UKGC (UK)** | Tier 1 | GBP 4K-92K | 16 weeks | 21% GGY POC | UK market (mandatory) |
-| **Curacao** | Tier 2 | ~EUR 55,000 | 6 weeks | 2% corporate tax | Rapid global launch |
-| **Isle of Man** | Tier 1 | GBP 42,000 | 3-4 months | 0% corporate tax | Tax optimization |
-| **Gibraltar** | Tier 1 | GBP 130,000+ | 2-6 months | 10% corporate tax | Established brands |
-| **Kahnawake** | Tier 2 | $40,000 | 6 months | 0% total tax | Cost-driven |
+| **MGA（馬耳他）** | Tier 1 | ~EUR 130,000 | 10-16 週 | 5% GGR（僅限馬耳他玩家） | 歐盟/歐洲經濟區市場 |
+| **UKGC（英國）** | Tier 1 | GBP 4K-92K | 16 週 | 21% GGY POC | 英國市場（強制） |
+| **Curacao** | Tier 2 | ~EUR 55,000 | 6 週 | 2% 企業稅 | 快速全球上線 |
+| **Isle of Man** | Tier 1 | GBP 42,000 | 3-4 個月 | 0% 企業稅 | 稅務優化 |
+| **Gibraltar** | Tier 1 | GBP 130,000+ | 2-6 個月 | 10% 企業稅 | 成熟品牌 |
+| **Kahnawake** | Tier 2 | $40,000 | 6 個月 | 0% 總稅 | 成本導向 |
 
-### 2024-2025 Major Regulatory Changes
+### 2024-2025 年重大監管變革
 
-**Curacao Overhaul** (effective Dec 24, 2024): Old NOOGH master license system abolished. New **LOK framework** requires direct application to CGA, physical company in Curacao, at least one resident director; data center hosting in local Tier-IV certified facility required from 2028-2029.
+**Curacao 全面改革**（2024 年 12 月 24 日生效）：舊 NOOGH 主牌照制度廢除。新 **LOK 框架** 要求向 CGA 直接申請，須在 Curacao 設立實體公司，至少一名常駐董事；2028-2029 年起須在本地 Tier-IV 認證數據中心託管。
 
-**UK Enhanced Player Protection**: Financial risk checks starting Feb 28, 2025 (monthly net deposits GBP 150+ require verification); direct marketing requires explicit consent from May 1, 2025; mandatory gambling levy from Apr 6, 2025.
+**英國加強玩家保護**：自 2025 年 2 月 28 日起實施財務風險審查（月淨存款 GBP 150+ 須驗證）；自 2025 年 5 月 1 日起直接行銷須取得明確同意；自 2025 年 4 月 6 日起實施強制博彩稅。
 
-### KYC/AML Compliance Requirements
+### KYC/AML 合規要求
 
-**Standard KYC Process**:
-- Government-issued ID verification
-- Biometric liveness detection (mandatory from 2025)
-- Proof of address
-- Source of funds and Politically Exposed Persons (PEP) screening
+**標準 KYC 流程**：
+- 政府核發身份證件驗證
+- 生物識別活體檢測 (Biometric Liveness Detection)（2025 年起強制）
+- 地址證明
+- 資金來源及政治敏感人物 (Politically Exposed Persons, PEP) 篩查
 
-**AML Transaction Monitoring Thresholds**:
+**AML 交易監控閾值**：
 
-| Jurisdiction | CTR Threshold | SAR Threshold |
+| 司法管轄區 | CTR 閾值 | SAR 閾值 |
 |---|---|---|
-| United States | $10,000+ | $5,000+ suspicious |
-| Australia | $5,000 (lowered in 2025) | Risk-based |
+| 美國 | $10,000+ | $5,000+ 可疑交易 |
+| 澳洲 | $5,000（2025 年下調） | 基於風險 |
 
-Record retention period: typically **5+ years**.
+紀錄保存期限：通常 **5 年以上**。
 
-EU new framework (**AMLR 2024** and **AMLA 2024**) establishes unified KYC/CDD rules and the EU Anti-Money Laundering Authority in Frankfurt.
+歐盟新框架（**AMLR 2024** 及 **AMLA 2024**）建立統一 KYC/CDD 規則，並在法蘭克福設立歐盟反洗錢管理局。
 
-### Responsible Gaming Mechanisms
+### 責任博彩機制
 
-**GAMSTOP (UK)**: Mandatory for UKGC-licensed operators. Players can self-exclude for 6 months, 1 year, or 5 years. In 2024, 3.8 million self-exclusions recorded. Research shows 83% of users reported reduced or stopped gambling.
+**GAMSTOP（英國）**：UKGC 持牌營運商強制接入。玩家可自我排除 (Self-Exclusion) 6 個月、1 年或 5 年。2024 年記錄 380 萬次自我排除。研究顯示 83% 使用者表示已減少或停止賭博。
 
-**Additional Measures**:
+**其他措施**：
 
-| Measure | Details |
+| 措施 | 詳情 |
 |---|---|
-| Deposit Limits | UK projected 50% adoption by 2026 |
-| Cooling-off Periods | Over 50,000 UK players used in 2024 |
-| Reality Checks | Session time notifications |
-| MGA Player Protection | Tool compliance rate reached 95% |
+| 存款限額 (Deposit Limits) | 英國預計 2026 年採用率達 50% |
+| 冷靜期 (Cooling-off Periods) | 2024 年英國超過 50,000 名玩家使用 |
+| 現實檢查 (Reality Checks) | 遊戲時間提醒通知 |
+| MGA 玩家保護 | 工具合規率達 95% |
 
 ---
 
-## 4. Game Supplier Integration Ecosystem
+## 4. 遊戲供應商整合生態系統
 
-### Market Leaders
+### 市場領導者
 
-| Provider | Market Position | Key Data |
+| 供應商 | 市場地位 | 關鍵數據 |
 |---|---|---|
-| **Evolution** | Dominates live dealer (45-63% share) | 2024 revenue EUR 2.21B; brands include NetEnt, Red Tiger, Big Time Gaming, Nolimit City; acquired Galaxy Gaming for $85M in 2025 |
-| **Pragmatic Play** | Fastest growing challenger | ~22% global slot install share; ~25% live dealer; 7-8 new games/month; 500+ slots; 200+ live tables in Bucharest |
-| **Microgaming/Games Global** | Largest progressive jackpot network | EUR 1.3B+ total payouts; single highest: EUR 19.4M Mega Moolah (2021) |
+| **Evolution** | 主導真人荷官（45-63% 市場份額） | 2024 年營收 EUR 2.21B；品牌包括 NetEnt、Red Tiger、Big Time Gaming、Nolimit City；2025 年以 $85M 收購 Galaxy Gaming |
+| **Pragmatic Play** | 增長最快的挑戰者 | 全球老虎機安裝份額約 22%；真人荷官約 25%；每月 7-8 款新遊戲；500+ 老虎機；布加勒斯特 200+ 真人桌台 |
+| **Microgaming/Games Global** | 最大累進式獎金網絡 | 總派彩超過 EUR 1.3B；單次最高：EUR 19.4M Mega Moolah（2021） |
 
-### Game Aggregator Landscape
+### 遊戲聚合商概覽
 
-| Aggregator | Game Count | Providers | Special Features |
+| 聚合商 | 遊戲數量 | 供應商數量 | 特色功能 |
 |---|---|---|---|
-| **SoftSwiss** | 36,700+ | 300+ | Crypto-native, tournament tools |
-| **EveryMatrix** | 22,500+ | 320+ | Zero platform fee, exclusive content |
-| **Hub88** | 12,000+ | 120+ | Fastest integration speed in industry |
-| **SoftGamings** | 10,000+ | 250+ | Complete turnkey, loyalty system |
+| **SoftSwiss** | 36,700+ | 300+ | 原生加密貨幣支持、錦標賽工具 |
+| **EveryMatrix** | 22,500+ | 320+ | 零平台費、獨家內容 |
+| **Hub88** | 12,000+ | 120+ | 業界最快整合速度 |
+| **SoftGamings** | 10,000+ | 250+ | 完整交鑰匙方案、忠誠計劃系統 |
 
-### Wallet Integration Models
+### 錢包整合模式
 
-| Model | Description | Integration Time | Trade-offs |
+| 模式 | 描述 | 整合時間 | 取捨 |
 |---|---|---|---|
-| **Seamless Wallet** (industry standard) | Player balance stays on operator platform; real-time processing per bet/win; supports multi-game simultaneous play | ~10 days | Better player experience; more complex |
-| **Transfer Wallet** | Funds transferred to provider-specific wallet | ~2 days | Simpler integration; poorer experience; risk of fund isolation on disconnect |
+| **無縫錢包 (Seamless Wallet)**（行業標準） | 玩家餘額留在營運商平台；每筆投注/贏獎即時處理；支持多遊戲同時進行 | ~10 天 | 更好的玩家體驗；更複雜 |
+| **轉賬錢包 (Transfer Wallet)** | 資金轉移至供應商專屬錢包 | ~2 天 | 整合更簡單；體驗較差；斷線時有資金隔離風險 |
 
-### Emerging Category: Crash Games
+### 新興品類：Crash Games
 
-SPRIBE's **Aviator** (launched 2018) created the Crash Games category, currently processing **165,000+** bets per minute. Primarily attracts millennials and Gen Z, especially popular in Brazil, Africa, India, and CIS countries.
+SPRIBE 的 **Aviator**（2018 年推出）開創了 Crash Games 品類，目前每分鐘處理 **165,000+** 筆投注。主要吸引千禧世代和 Z 世代玩家，在巴西、非洲、印度和獨聯體國家尤為流行。
 
 ---
 
-## 5. Payment and Cash Flow Solutions
+## 5. 支付與資金流解決方案
 
-### Traditional Payment Gateway Ecosystem
+### 傳統支付閘道生態系統
 
-| Provider | Coverage | Key Features |
+| 供應商 | 覆蓋範圍 | 核心特色 |
 |---|---|---|
-| **Nuvei** | 50 markets, 150+ currencies, 720 APMs | AI-driven integration tools; market leader in iGaming payments |
-| **Worldpay** | 145+ countries | Rate increase announced effective Jan 2026 |
+| **Nuvei** | 50 個市場、150+ 幣種、720 種替代支付方式 | AI 驅動整合工具；iGaming 支付市場領導者 |
+| **Worldpay** | 145+ 個國家 | 宣佈自 2026 年 1 月起調漲費率 |
 
-**High-Risk Merchant (MCC 7995) Challenges**:
+**高風險商戶 (MCC 7995) 挑戰**：
 
-| Fee Category | Low-Risk Merchant | iGaming High-Risk |
+| 費用類別 | 低風險商戶 | iGaming 高風險商戶 |
 |---|---|---|
-| Transaction rate | 1.5-2.5% | 3.5-6.5% (up to 10%+) |
-| Per-transaction fee | 20-30 cents | 20-35 cents |
-| Rolling reserve | None | 5-15% of total revenue |
-| Reserve period | N/A | 3-6 months |
+| 交易費率 | 1.5-2.5% | 3.5-6.5%（最高 10%+） |
+| 單筆交易費 | 20-30 美分 | 20-35 美分 |
+| 滾動準備金 | 無 | 總收入的 5-15% |
+| 準備金期限 | 不適用 | 3-6 個月 |
 
-### Cryptocurrency Payment Advantages
+### 加密貨幣支付優勢
 
-**CoinsPaid** (focused on iGaming since 2014): processes ~0.8% of global Bitcoin transactions, EUR 1B monthly volume, **0.8% fee** (1.5% for fiat conversion).
+**CoinsPaid**（自 2014 年專注 iGaming）：處理全球約 0.8% 的比特幣交易量，月處理量 EUR 1B，**0.8% 費率**（法幣兌換 1.5%）。
 
-**Key advantages of crypto payments**:
+**加密貨幣支付的核心優勢**：
 
-| Advantage | Details |
+| 優勢 | 詳情 |
 |---|---|
-| Faster withdrawals | Minutes vs. days for traditional methods |
-| Lower fees | 0.5-1.5% vs. 3-6% for high-risk card processing |
-| Zero chargeback disputes | Eliminates iGaming's biggest pain point |
-| Global accessibility | No banking restrictions |
-| Stablecoin adoption | USDT, USDC reduce volatility risk |
+| 更快提款 | 數分鐘 vs. 傳統方式需數天 |
+| 更低費率 | 0.5-1.5% vs. 高風險卡片處理 3-6% |
+| 零退款爭議 | 消除 iGaming 最大痛點 |
+| 全球可及性 | 無銀行限制 |
+| 穩定幣採用 | USDT、USDC 降低波動風險 |
 
-2024 crypto casino GGR reached **$81B+**, 5x growth from 2022.
+2024 年加密貨幣賭場 GGR 達到 **$81B+**，較 2022 年增長 5 倍。
 
-### Multi-Acquirer Strategy
+### 多收單機構策略
 
-Leading operators use multiple acquirer relationships for risk diversification: redundancy (avoid single point of failure), load balancing (distribute transaction volume), geographic optimization (local acquirers for higher approval rates), and risk distribution (avoid total shutdown from single account termination). **PaymentIQ** and similar payment orchestration platforms handle multi-acquirer routing, achieving **99%+ transaction success rate**.
+領先營運商使用多收單機構關係進行風險分散：冗餘備援（避免單點故障）、負載均衡（分散交易量）、地理優化（本地收單機構提高通過率）、風險分散（避免單一帳戶終止導致全面停擺）。**PaymentIQ** 等支付編排平台處理多收單機構路由，實現 **99%+ 交易成功率**。
 
 ---
 
-## 6. Risk Control and Compliance
+## 6. 風控與合規
 
-### Fraud Detection Capabilities
+### 欺詐檢測能力
 
-| Provider | Capabilities |
+| 供應商 | 能力 |
 |---|---|
-| **SEON** | 900+ first-party data signals; iGaming fraud prevention and AML compliance; claimed $200B in prevented fraud losses |
-| **Sift** | 100% fraud guarantee with financial backing on approved orders |
+| **SEON** | 900+ 第一方數據信號；iGaming 欺詐預防及 AML 合規；聲稱已防止 $200B 欺詐損失 |
+| **Sift** | 對已審核訂單提供 100% 欺詐擔保及財務支持 |
 
-**Core Fraud Detection Techniques**:
+**核心欺詐檢測技術**：
 
-| Technique | Description |
+| 技術 | 描述 |
 |---|---|
-| Device Fingerprinting | Unique ID from browser, OS, hardware config; more reliable than cookies |
-| Velocity Checks | Limits on deposit/withdrawal frequency, login attempts within time period |
-| Multi-Account Detection | Cross-referencing device fingerprints, IP correlation, payment method links |
-| Bonus Abuse Prevention | Identifying repeat bonus claimers, VPN detection |
+| 設備指紋 (Device Fingerprinting) | 根據瀏覽器、作業系統、硬體配置生成唯一 ID；比 Cookie 更可靠 |
+| 速率檢查 (Velocity Checks) | 限制時間段內的存款/提款頻率、登入嘗試次數 |
+| 多帳戶檢測 (Multi-Account Detection) | 交叉比對設備指紋、IP 關聯、支付方式關聯 |
+| 獎金濫用防範 (Bonus Abuse Prevention) | 識別重複領取獎金者、VPN 檢測 |
 
-### Problem Gambling Detection
+### 問題賭博檢測
 
-Behavioral indicators based on academic research: higher daily/per-session loss amounts, increased deposit frequency per session, frequent account depletion, increased bet size volatility, withdrawal cancellation, continuous nighttime gambling, loss-chasing patterns.
+基於學術研究的行為指標：日/每次遊戲虧損金額增加、每次遊戲存款頻率增加、帳戶頻繁歸零、投注金額波動加大、取消提款、持續深夜賭博、追損模式。
 
-AI/ML methods have achieved **AUC 0.729** (random forest) prediction accuracy. Most predictive variables: average deposits per session, daily total bets, session duration.
+AI/ML 方法已達到 **AUC 0.729**（隨機森林）預測準確度。最具預測力的變數：每次遊戲平均存款次數、日總投注額、遊戲時長。
 
-### Data Security Compliance
+### 數據安全合規
 
-**PCI-DSS 4.0 Requirements**: MFA for all cardholder data environment access, mandatory WAF implementation, quarterly vulnerability scans, annual on-site assessment (Level 1 merchants).
+**PCI-DSS 4.0 要求**：所有持卡人數據環境訪問須多因素認證 (MFA)、強制實施 WAF、每季漏洞掃描、年度現場評估（Level 1 商戶）。
 
-**GDPR Player Rights**: Access, rectification, erasure ("right to be forgotten"), data portability, objection. Exceptions: AML records typically retained 5-7 years; self-exclusion records maintained throughout exclusion period.
+**GDPR 玩家權利**：訪問權、更正權、刪除權（「被遺忘權」）、數據可攜權、反對權。例外：AML 紀錄通常保留 5-7 年；自我排除紀錄在排除期間全程維護。
 
-**Penalties**: Up to **4% of global annual turnover** or **EUR 20M** (whichever is greater). Reports indicate **40%** of online gaming operators have experienced payment card data breaches.
+**罰則**：最高全球年營業額的 **4%** 或 **EUR 20M**（取較高者）。報告指出 **40%** 線上博彩營運商曾發生支付卡數據洩漏事件。
 
 ---
 
-## 7. Regional Market Characteristics
+## 7. 區域市場特徵
 
-### Europe (Mature, Highly Regulated)
+### 歐洲（成熟、高度監管）
 
-- 41-49% of global market share
-- UK: 2,300+ licensed operators, GBP 6.5B GGY
-- Germany: projected EUR 5.65B+ revenue in 2024
-- Challenges: Increasing advertising restrictions (Netherlands, Bulgaria)
+- 全球市場份額 41-49%
+- 英國：2,300+ 持牌營運商，GGY GBP 6.5B
+- 德國：預計 2024 年營收超過 EUR 5.65B+
+- 挑戰：廣告限制日趨嚴格（荷蘭、保加利亞）
 
-### North America
+### 北美
 
-- US: 47% of regional market, projected CAGR ~18%
-- 38 states with some form of legal sports betting
-- New York operator revenue exceeds $2B
-- Canada Ontario: CAD 3.34B gaming revenue in 2023-24
+- 美國：佔區域市場 47%，預計 CAGR ~18%
+- 38 個州已實施某種形式的合法體育博彩
+- 紐約營運商收入超過 $2B
+- 加拿大安大略省：2023-24 年博彩收入 CAD 3.34B
 
-### Latin America (Emerging Market)
+### 拉丁美洲（新興市場）
 
-- Brazil: World's 5th largest gaming market, 200M+ population
-- Official regulation went live Jan 1, 2025; 68 licenses issued
-- Tax rate: from 15% planned increase to 28% GGR by 2028
-- Currently 51% of market remains illegal/offshore
+- 巴西：全球第 5 大博彩市場，人口超過 2 億
+- 2025 年 1 月 1 日正式監管上線；已發放 68 張牌照
+- 稅率：從 15% 計劃提高至 2028 年 28% GGR
+- 目前 51% 市場仍為非法/離岸
 
-### Asia Pacific
+### 亞太地區
 
-- Projected $50B by 2030 (CAGR 12.8%)
-- Australia: Highest per-capita gaming spend globally ($15.16B)
-- China: Full prohibition (73,000+ cross-border cases investigated in 2024)
-- India: Major legislation expected in 2025
+- 預計 2030 年達 $50B（CAGR 12.8%）
+- 澳洲：全球人均博彩支出最高（$15.16B）
+- 中國：全面禁止（2024 年調查 73,000+ 跨境案件）
+- 印度：預計 2025 年推出重大立法
 
 ---
 
-## 8. Emerging Technology Trends
+## 8. 新興技術趨勢
 
-| Trend | Significance | Key Data |
+| 趨勢 | 重要性 | 關鍵數據 |
 |---|---|---|
-| **AI Applications** | Importance score 8.2/10 in 2025 | Personalized recommendations; AI flags risk behavior 30% faster than manual monitoring; Kambi's AI pricing contributes 30%+ of operator GGR |
-| **VR/AR Gaming** | Next-generation experience | VR gaming market projected from $29.2B (2025) to $189.2B (2032), CAGR 30.4%; Gen Z players extend engagement time by 40% in VR |
-| **Web3/Blockchain** | Provably fair gaming | Smart contracts for verifiable fairness; NFT loyalty rewards; decentralized casino concepts (Decentral Games in Decentraland) |
+| **AI 應用** | 2025 年重要性評分 8.2/10 | 個性化推薦；AI 標記風險行為速度比人工監控快 30%；Kambi 的 AI 定價貢獻營運商 GGR 的 30%+ |
+| **VR/AR 遊戲** | 下一代體驗 | VR 遊戲市場預計從 $29.2B（2025）增長至 $189.2B（2032），CAGR 30.4%；Z 世代玩家在 VR 中參與時間延長 40% |
+| **Web3/區塊鏈** | 可驗證公平遊戲 | 智能合約實現可驗證公平性；NFT 忠誠獎勵；去中心化賭場概念（Decentraland 中的 Decentral Games） |
 
 ---
 
-## 9. Implementation Timeline and Budget
+## 9. 實施時程與預算
 
-### Complete Implementation Process
+### 完整實施流程
 
-| Phase | White Label | Custom Build | Key Activities |
+| 階段 | 白標 | 客製化建置 | 關鍵活動 |
 |---|---|---|---|
-| **Planning & Requirements** | 1-4 weeks | 1-3 months | Market research, business model, budget, jurisdiction selection |
-| **License Application** | 4-12 weeks | 3-6 months | Company incorporation, background checks, compliance docs, technical certification |
-| **Platform Build** | 2-4 weeks | 6-12 months | Brand customization / core development |
-| **Game Integration** | 2-4 weeks | 2-4 months | Provider contracts, API integration, RNG certification |
-| **Payment Integration** | 2-4 weeks | 2-4 months | PSP selection, KYC/AML systems, multi-currency setup |
-| **Testing & Certification** | 2-4 weeks | 2-4 months | Functional/security testing, regulatory audit, GLI/eCOGRA certification |
-| **Soft Launch** | 2-4 weeks | 2-3 months | Limited market testing, affiliate setup, initial marketing |
-| **Go-Live** | - | - | Full deployment, marketing expansion, operations |
+| **規劃與需求** | 1-4 週 | 1-3 個月 | 市場調研、商業模式、預算、司法管轄區選擇 |
+| **牌照申請** | 4-12 週 | 3-6 個月 | 公司設立、背景調查、合規文件、技術認證 |
+| **平台建置** | 2-4 週 | 6-12 個月 | 品牌客製化 / 核心開發 |
+| **遊戲整合** | 2-4 週 | 2-4 個月 | 供應商合約、API 整合、RNG 認證 |
+| **支付整合** | 2-4 週 | 2-4 個月 | PSP 選擇、KYC/AML 系統、多幣種設置 |
+| **測試與認證** | 2-4 週 | 2-4 個月 | 功能/安全測試、監管審計、GLI/eCOGRA 認證 |
+| **試營運 (Soft Launch)** | 2-4 週 | 2-3 個月 | 限定市場測試、聯盟行銷設置、初始行銷 |
+| **正式上線 (Go-Live)** | - | - | 全面部署、行銷擴展、營運 |
 
-**Total Timeline**: White Label **3-6 months**, Custom Build **12-18 months**
+**總時程**：白標 **3-6 個月**，客製化建置 **12-18 個月**
 
-### Budget Planning
+### 預算規劃
 
-**White Label Year-1 Costs**:
+**白標第一年成本**：
 
-| Item | Cost Range |
+| 項目 | 成本範圍 |
 |---|---|
-| Setup fee | $10,000-$150,000 |
-| Monthly fee | $2,000-$50,000 |
-| License | $10,000-$100,000 |
-| Initial marketing | $20,000-$100,000 |
-| **Total** | **$74,000-$750,000** |
+| 設置費 | $10,000-$150,000 |
+| 月費 | $2,000-$50,000 |
+| 牌照 | $10,000-$100,000 |
+| 初始行銷 | $20,000-$100,000 |
+| **合計** | **$74,000-$750,000** |
 
-**Custom Build Costs**:
+**客製化建置成本**：
 
-| Item | Cost Range |
+| 項目 | 成本範圍 |
 |---|---|
-| Development | GBP 200,000-2,000,000 |
-| KYC/AML system | GBP 50,000-150,000 |
-| Regulatory compliance | GBP 100,000-500,000 |
-| License | $10,000-$500,000 |
-| **Total** | **$500,000-$2,500,000+** |
+| 開發 | GBP 200,000-2,000,000 |
+| KYC/AML 系統 | GBP 50,000-150,000 |
+| 監管合規 | GBP 100,000-500,000 |
+| 牌照 | $10,000-$500,000 |
+| **合計** | **$500,000-$2,500,000+** |
 
-**Ongoing Monthly Operations**:
+**持續每月營運費用**：
 
-| Item | Cost |
+| 項目 | 成本 |
 |---|---|
-| Platform/hosting | $2,000-$50,000 |
-| Payment processing | 2-4% of GGR |
-| Game content | 10-15% of GGR |
-| Marketing | 25-40% of revenue |
-| Affiliate commissions | 25-40% of player value |
+| 平台/託管 | $2,000-$50,000 |
+| 支付處理 | GGR 的 2-4% |
+| 遊戲內容 | GGR 的 10-15% |
+| 行銷 | 收入的 25-40% |
+| 聯盟佣金 | 玩家價值的 25-40% |
 
-### Return on Investment Analysis
+### 投資回報分析
 
-| Model | Break-Even | Positive ROI | Scaled ROI |
+| 模式 | 損益平衡 | 正向 ROI | 規模化 ROI |
 |---|---|---|---|
-| White Label | 12-18 months | 18-24 months | 24-36 months |
-| Custom Build | 24-36 months | 36-48 months | 48-60 months |
+| 白標 | 12-18 個月 | 18-24 個月 | 24-36 個月 |
+| 客製化建置 | 24-36 個月 | 36-48 個月 | 48-60 個月 |
 
-### Key Success Metrics
+### 關鍵成功指標
 
-| Category | Metric | Benchmark |
+| 類別 | 指標 | 基準 |
 |---|---|---|
-| Player | Day 1/7/30 Retention | 40%/20%/10% |
-| Player | Monthly Churn Rate | Target <5% |
-| Financial | ARPU | $50-$200/month |
-| Financial | LTV:CAC Ratio | Target 3:1+ |
-| Operational | Visitor-to-FTD Conversion | Varies by market |
+| 玩家 | Day 1/7/30 留存率 | 40%/20%/10% |
+| 玩家 | 月流失率 (Churn Rate) | 目標 <5% |
+| 財務 | 每用戶平均收入 (ARPU) | $50-$200/月 |
+| 財務 | LTV:CAC 比率 | 目標 3:1+ |
+| 營運 | 訪客到首次存款轉換率 (FTD Conversion) | 因市場而異 |
 
 ---
 
-## 10. Strategic Recommendations
+## 10. 策略建議
 
-### By Operator Profile
+### 按營運商類型
 
-| Profile | Budget | Recommended Approach | Details |
+| 類型 | 預算 | 建議方案 | 詳情 |
 |---|---|---|---|
-| **New Entrants** | $50K-$200K | White Label (SoftSwiss, NuxGame) | $15K-$40K setup + $5K-$15K/month + 15-25% revenue share; 4-8 weeks to launch |
-| **Scaling Operators** | $200K-$500K | Turnkey with own license | Break-even when monthly NGR exceeds ~$200K (savings on revenue share exceed setup costs) |
-| **Enterprise Operators** | $1M+ | Custom build or EveryMatrix modular | No revenue share; full control; maximum differentiation; requires long-term investment horizon |
+| **新進者** | $50K-$200K | 白標（SoftSwiss、NuxGame） | $15K-$40K 設置費 + $5K-$15K/月 + 15-25% 營收分成；4-8 週上線 |
+| **成長型營運商** | $200K-$500K | 交鑰匙方案 + 自有牌照 | 月 NGR 超過 ~$200K 時達到損益平衡（節省的營收分成超過設置成本） |
+| **企業級營運商** | $1M+ | 客製化建置或 EveryMatrix 模組化方案 | 無營收分成；完全控制；最大差異化；需要長期投資視野 |
 
 ---
 
-## 11. Key Business Logic (Multi-Tenant Environment)
+## 11. 核心業務邏輯（多租戶環境）
 
-### Multi-Level Agent and Commission Logic
+### 多層級代理與佣金邏輯
 
-Distinct from Western affiliate models, Asian and emerging markets rely heavily on **Rolling/Rebate** and **Credit network** hybrid models.
+有別於西方聯盟行銷模式，亞洲及新興市場高度依賴**回水/返佣 (Rolling/Rebate)** 和**信用網絡 (Credit Network)** 混合模式。
 
-**Multi-Level Override Commission**:
-- System must support **unlimited levels** (or at least N levels) of agent structure
-- Calculation: `Superior's net commission = (Superior's rate - Subordinate's rate) x Subordinate team performance`
+**多層級覆蓋佣金 (Multi-Level Override Commission)**：
+- 系統必須支持**無限層級**（或至少 N 層）的代理結構
+- 計算公式：`上級淨佣金 = (上級費率 - 下級費率) x 下級團隊業績`
 
-**Valid Turnover Determination**:
-- Rebates based on "valid turnover" not raw volume
-- Must filter hedge betting, draws, and low-odds bets (e.g., European odds < 1.5)
-- Must support **contribution weight** settings per game type
+**有效投注額判定**：
+- 返佣基於「有效投注額」而非原始投注量
+- 必須過濾對沖投注、平局和低賠率投注（例如歐洲賠率 < 1.5）
+- 必須支持按遊戲類型設定**貢獻權重**
 
-| Game Type | Weight | Rationale |
+| 遊戲類型 | 權重 | 原因 |
 |---|---|---|
-| Slots | 100% | Full contribution |
-| Baccarat | 50% | Reduced due to low house edge |
-| Roulette | 0% | Prevents red/black hedge volume farming |
+| 老虎機 (Slots) | 100% | 全額計入 |
+| 百家樂 (Baccarat) | 50% | 因莊家優勢較低而減少 |
+| 輪盤 (Roulette) | 0% | 防止紅/黑對沖刷量 |
 
-### Bonus Lifecycle and Wallet Logic
+### 獎金生命週期與錢包邏輯
 
-The core of the bonus system is **anti-arbitrage** and **fund isolation**.
+獎金系統的核心是**反套利 (Anti-Arbitrage)** 和**資金隔離 (Fund Isolation)**。
 
-**Dual Wallet Architecture**:
+**雙錢包架構**：
 
-| Wallet Type | Description | Withdrawal |
+| 錢包類型 | 描述 | 提款 |
 |---|---|---|
-| **Cash Wallet** | No restrictions | Anytime |
-| **Locked/Bonus Wallet** | Stores bonus funds and locked principal | Only after wagering requirement met |
+| **現金錢包 (Cash Wallet)** | 無限制 | 隨時可提 |
+| **鎖定/獎金錢包 (Locked/Bonus Wallet)** | 儲存獎金資金和鎖定本金 | 僅在流水要求達標後 |
 
-**Wagering Release Logic**:
-- Formula: `Required turnover = (Deposit + Bonus) x Wagering multiplier`
-- States: Active (in progress) -> Completed (met, funds transfer to cash wallet) or Expired (bonus and related winnings removed) or Forfeited (player abandons, deduct bonus and winnings, return remaining principal)
+**流水釋放邏輯**：
+- 公式：`所需流水 = (存款 + 獎金) x 流水倍數`
+- 狀態：Active（進行中）-> Completed（達標，資金轉入現金錢包）或 Expired（獎金及相關贏獎被移除）或 Forfeited（玩家放棄，扣除獎金和贏獎，返還剩餘本金）
 
-**Deduction Priority Strategies**:
+**扣款優先策略**：
 
-| Strategy | Order | Pros | Cons |
+| 策略 | 順序 | 優點 | 缺點 |
 |---|---|---|---|
-| Strategy A (Principal-Preserving) | Cash first, then bonus | Better player experience | Slightly higher arbitrage risk |
-| Strategy B (Promotional) | Bonus first | Platform cost control | Less player-friendly |
+| 策略 A（保本型） | 先扣現金，再扣獎金 | 更好的玩家體驗 | 略高套利風險 |
+| 策略 B（促銷型） | 先扣獎金 | 平台成本控制 | 對玩家較不友善 |
 
-### Three-Party Reconciliation and Automatic Suspension
+### 三方對賬與自動暫停
 
-**Self-Healing Process for Dropped Transactions**:
+**掉單自動修復流程**：
 
-| Level | Timing | Mechanism |
+| 層級 | 時機 | 機制 |
 |---|---|---|
-| L1 (Real-time) | Immediate | Game provider callback |
-| L2 (Compensatory) | Every 5 minutes | API polling of GetTransactionHistory, compare with local DB |
-| L3 (Daily Settlement) | Daily | Import provider Settlement Report, generate Discrepancy Report for manual reconciliation |
+| L1（即時） | 即時 | 遊戲供應商回調 |
+| L2（補償性） | 每 5 分鐘 | API 輪詢 GetTransactionHistory，與本地資料庫比對 |
+| L3（每日結算） | 每日 | 匯入供應商結算報表，生成差異報表供人工對賬 |
 
-**Automatic Suspension Policy**: When a single tenant's or game provider's RTP exceeds threshold (e.g., 1-hour RTP > 200% with bet volume > $10,000), the system shall automatically suspend the game entry and send alerts to prevent large-scale exploitation.
+**自動暫停策略**：當單一租戶或遊戲供應商的 RTP 超過閾值（例如 1 小時 RTP > 200% 且投注量 > $10,000），系統應自動暫停遊戲入口並發送告警，以防止大規模漏洞利用。
 
-### SaaS Tenant Billing Logic
+### SaaS 租戶計費邏輯
 
-**Dynamic Cost Allocation**: API call fees, CDN traffic, cloud storage costs must use tagging mechanisms to precisely attribute to Tenant ID.
+**動態成本分配**：API 調用費、CDN 流量、雲端儲存成本必須使用標記機制精確歸屬至 Tenant ID。
 
-**Tiered Pricing**:
+**階梯定價**：
 
-| GGR Tier | Revenue Share |
+| GGR 層級 | 營收分成 |
 |---|---|
 | < $500K | 15% |
 | $500K - $1M | 12% |
 | > $1M | 10% |
 
-Base structure: `Base Fee + GGR Share %`
+基礎結構：`基礎費用 + GGR 分成 %`
 
-**Non-Payment Suspension Escalation**:
+**欠款暫停升級機制**：
 
-| Day | Action |
+| 天數 | 動作 |
 |---|---|
-| T+1 | Send payment reminder notification |
-| T+3 | Restrict tenant from opening new player accounts |
-| T+7 | Freeze tenant back-office access (frontend players can still withdraw to avoid regulatory intervention) |
-| T+30 | Full shutdown and data archival |
+| T+1 | 發送付款提醒通知 |
+| T+3 | 限制租戶開設新玩家帳戶 |
+| T+7 | 凍結租戶後台訪問（前端玩家仍可提款以避免監管介入） |
+| T+30 | 全面關閉並歸檔數據 |
 
 ---
 
-## 12. Conclusion and Core Insights
+## 12. 結論與核心洞察
 
-Successful multi-tenant iGaming platform development requires precise balance among technical architecture, business model, regulatory compliance, and market strategy. The market is projected to continue growing at **7-12% CAGR** through the 2030s.
+成功的多租戶 iGaming 平台開發需要在技術架構、商業模式、監管合規和市場策略之間取得精確平衡。預計市場將持續以 **7-12% CAGR** 增長至 2030 年代。
 
-**Core competitive factors for 2025-2026**:
-- Mobile-first design
-- Cryptocurrency payment integration
-- AI-driven personalization
-- Rigorous responsible gaming mechanisms
+**2025-2026 年核心競爭因素**：
+- 行動優先設計 (Mobile-first)
+- 加密貨幣支付整合
+- AI 驅動個性化
+- 嚴格的責任博彩機制
 
-Successful operators must balance rapid expansion with compliance rigor -- this is not merely a regulatory requirement, but the foundation for building long-term brand credibility and player trust.
-
----
-
-## 13. Acceptance Criteria
-
-- [ ] Multi-tenant architecture supports ≥4 tier hierarchy (Platform → Brand → Agent → Player)
-- [ ] Seamless wallet integration completes real-time bet/win processing within 200ms
-- [ ] Dual wallet system isolates bonus funds from cash wallet with turnover tracking
-- [ ] Risk control engine auto-approves ≥80% low-risk transactions (score 0-30)
-- [ ] KYC verification integrates government ID + biometric liveness detection
-- [ ] Payment orchestration achieves ≥99% transaction success rate across multiple acquirers
-- [ ] Game aggregation supports ≥300 game providers via standardized API
-- [ ] Responsible gaming tools include deposit limits, cooling-off periods, and self-exclusion
-- [ ] Three-party reconciliation runs at L1 (real-time), L2 (5-min), and L3 (daily) levels
-- [ ] SaaS billing supports tiered pricing based on GGR thresholds
+成功的營運商必須在快速擴張與合規嚴謹之間取得平衡——這不僅是監管要求，更是建立長期品牌信譽和玩家信任的基礎。
 
 ---
 
-## Related Documentation
+## 13. 驗收標準
 
-→ **[Platform Architecture - Technical Implementation](../../architecture/00_Overview/Platform_Architecture.md)** - Complete system architecture, technology stack, infrastructure design, and deployment strategies
+- [ ] 多租戶架構支持 ≥4 層級階層（平台 → 品牌 → 代理 → 玩家）
+- [ ] 無縫錢包整合在 200ms 內完成即時投注/贏獎處理
+- [ ] 雙錢包系統將獎金資金與現金錢包隔離，並追蹤流水
+- [ ] 風控引擎自動通過 ≥80% 低風險交易（評分 0-30）
+- [ ] KYC 驗證整合政府身份證件 + 生物識別活體檢測
+- [ ] 支付編排透過多收單機構實現 ≥99% 交易成功率
+- [ ] 遊戲聚合透過標準化 API 支持 ≥300 家遊戲供應商
+- [ ] 責任博彩工具包含存款限額、冷靜期和自我排除
+- [ ] 三方對賬在 L1（即時）、L2（5 分鐘）、L3（每日）層級運行
+- [ ] SaaS 計費支持基於 GGR 閾值的階梯定價
 
 ---
 
-**Document Version**: 1.1.0
-**Last Updated**: 2026-02-08
-**Maintainer**: Product Management Team
+## 相關文檔
+
+→ **[平台架構 - 技術實施](../../architecture/00_Overview/Platform_Architecture.md)** - 完整系統架構、技術堆疊、基礎設施設計和部署策略
+
+---
+
+**文檔版本**: 1.1.0
+**最後更新**: 2026-02-08
+**維護者**: 產品管理團隊

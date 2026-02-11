@@ -1,202 +1,202 @@
-# iGaming Platform Overview
+# iGaming 平台總覽
 
-> **Canonical Source**: [00-01_Quickstart.md](../../source-archive/00_Foundation/00-01_Quickstart.md)
-> **Audience**: Executives, Product Managers, Business Stakeholders
-> **Related Architecture**: [System_Overview.md](../../architecture/00_Overview/System_Overview.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## Success Metrics
-
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Wallet Calculation Accuracy | 99.99% | Zero balance discrepancies in production audits |
-| Turnover Calculation Precision | 100% | All weighted turnover calculations match business rules |
-| Multi-Tenant Data Isolation | 100% | Zero cross-tenant data leakage incidents |
-| Risk Engine Effectiveness | ≥90% fraud detection rate | Ratio of detected fraud cases to total fraud attempts |
-| Platform Performance Overhead (Multi-Tenant) | <5% | Latency comparison between single-tenant and multi-tenant deployments |
-| Player Journey Completion Rate | ≥70% | Percentage of players completing registration → first deposit → first bet |
+> **權威來源**: [00-01_Quickstart.md](../../source-archive/00_Foundation/00-01_Quickstart.md)
+> **目標讀者**: 高階主管、產品經理、業務利害關係人
+> **相關架構**: [System_Overview.md](../../architecture/00_Overview/System_Overview.md)
+> **最近同步**: 2026-02-08
 
 ---
 
-## 1. Platform Vision
+## 成功指標
 
-The iGaming platform is a comprehensive online gaming solution designed to serve multiple brands (tenants) within a single unified system. It addresses five core business domains that together cover 80% of the system's design considerations:
-
-1. **Wallet and Bettable Balance** -- Ensuring players always know exactly how much they can wager
-2. **Turnover Calculation (Valid Bets)** -- Determining which wagers count towards promotional and compliance requirements
-3. **Token Verification and API Security** -- Safeguarding interactions between the platform and game providers
-4. **Multi-Tenant Architecture and Data Isolation** -- Supporting multiple brands with complete data separation
-5. **Risk Control Rule Engine** -- Real-time detection of abnormal behaviour to prevent fraud and money laundering
-
----
-
-## 2. Core Business Concepts
-
-### 2.1 Wallet and Bettable Balance
-
-The most fundamental formula in the platform determines how much a player can wager:
-
-| Component | Description |
-|-----------|-------------|
-| Cash Balance | The player's deposited funds |
-| Locked Amount | Funds reserved or frozen by the system |
-| In-Progress Bets | Wagers currently being settled |
-| **Bettable Balance** | **Cash Balance - Locked Amount - In-Progress Bets** |
-
-**Business Impact**:
-- Incorrect calculations lead to either over-betting (platform losses) or blocked betting (poor customer experience)
-- Correct calculations ensure both fund safety and player satisfaction
-
-**Key Scenarios**:
-- When a player places a bet: check bettable balance, lock funds, deduct
-- When a game settles: release lock, settle win/loss, update balance
-
-### 2.2 Turnover Calculation (Valid Bets)
-
-Different game types contribute differently to turnover requirements:
-
-| Game Type | Turnover Weight | Rationale |
-|-----------|----------------|-----------|
-| Slots | 100% | Pure luck, full contribution |
-| Baccarat | 95% | Some skill involved; tie exception |
-| Sports Betting | Actual risk amount only | High hedging risk; only settled risk counts |
-
-**Business Significance**:
-- **Promotional Requirements**: e.g., "Deposit 100, get 50 bonus, requires 20x turnover" means the player must generate (100+50) x 20 = 3,000 in valid bets
-- **VIP Level Calculation**: Monthly turnover thresholds determine VIP tier upgrades
-- **Anti-Money Laundering (AML)**: Players must achieve minimum 1x turnover after depositing before withdrawing
-
-### 2.3 Multi-Tenant Architecture
-
-The platform supports a four-tier hierarchy for multi-brand operations:
-
-| Level | Entity | Purpose |
-|-------|--------|---------|
-| Level 1 | Platform | Top-level system operator |
-| Level 2 | Brand / Tenant | Independent brand with isolated data |
-| Level 3 | Agent | Distribution and referral layer |
-| Level 4 | Player | End user |
-
-**Business Benefits**:
-- **Data Security**: Brand A's player data is never visible to Brand B
-- **Business Flexibility**: Each brand can have unique games, promotions, and configurations
-- **Regulatory Compliance**: Different brands can satisfy different jurisdictional requirements
-
-### 2.4 Risk Control Rule Engine
-
-The risk engine operates across multiple checkpoints throughout the player journey:
-
-| Checkpoint | Action | Outcomes |
-|------------|--------|----------|
-| Deposit | Frequency and amount limit checks | Pass / Reject |
-| Withdrawal | KYC verification, AML checks, turnover validation | Pass / Pending Review / Reject |
-| Betting | Real-time hedging detection | Pass / Reject |
-| Promotion Claim | Eligibility checks | Pass / Reject |
-
-**Risk Scoring Model**:
-
-| Risk Level | Score Range | Action |
-|------------|-------------|--------|
-| Low Risk | 0 -- 30 | Automatic approval |
-| Medium Risk | 31 -- 70 | Manual review required |
-| High Risk | 71 -- 100 | Automatic rejection |
-
-**Business Value**:
-- Detects professional players, hedge arbitrage, and money laundering behaviour
-- Prevents bonus abuse and abnormal withdrawals
-- Satisfies AML regulatory requirements
+| 指標 | 目標 | 衡量方式 |
+|------|------|----------|
+| 錢包計算精確度 | 99.99% | 生產環境審計中零餘額差異 |
+| 有效投注額 (Valid Turnover) 計算精確度 | 100% | 所有加權投注額計算結果符合業務規則 |
+| 多租戶 (Multi-Tenant) 資料隔離 | 100% | 零跨租戶資料洩露事件 |
+| 風控引擎 (Risk Engine) 有效性 | ≥90% 詐欺偵測率 | 已偵測詐欺案例佔總詐欺嘗試之比率 |
+| 平台效能開銷（多租戶） | <5% | 單租戶與多租戶部署之延遲比較 |
+| 玩家旅程完成率 | ≥70% | 完成註冊→首次存款→首次下注之玩家百分比 |
 
 ---
 
-## 3. End-to-End Player Journey
+## 1. 平台願景
 
-The complete player lifecycle connects all five core concepts:
+iGaming 平台是一套綜合性線上博弈解決方案，設計用於在單一統一系統中服務多個品牌（租戶）。平台涵蓋五大核心業務領域，涵蓋系統設計考量的 80%：
 
-| Step | Activity | Core Concept Involved |
-|------|----------|-----------------------|
-| 1 | Player Registration | Multi-Tenant (assigned to a Tenant) |
-| 2 | KYC Verification | Risk Control |
-| 3 | First Deposit | Wallet |
-| 4 | Risk Check on Deposit | Risk Control |
-| 5 | Claim Bonus | Wallet (Promotional Wallet) |
-| 6 | Enter Game | Token Verification |
-| 7 | Place Bets / Play | Wallet + Turnover |
-| 8 | Accumulate Turnover | Turnover Calculation |
-| 9 | Turnover Requirement Met | Bonus converts to cash |
-| 10 | Request Withdrawal | Risk Control (withdrawal check) |
-| 11 | Withdrawal Approved | Wallet (funds released) |
+1. **錢包與可下注餘額 (Wallet and Bettable Balance)** —— 確保玩家隨時知道自己可以投注多少
+2. **有效投注額計算 (Turnover Calculation)** —— 判定哪些投注計入促銷與合規要求
+3. **Token 驗證與 API 安全** —— 保障平台與遊戲供應商之間的互動安全
+4. **多租戶架構與資料隔離 (Multi-Tenant Architecture)** —— 支援多品牌運營並確保資料完全隔離
+5. **風控規則引擎 (Risk Control Rule Engine)** —— 即時偵測異常行為，防止詐欺與洗錢
 
 ---
 
-## 4. Dual Wallet Design
+## 2. 核心業務概念
 
-The platform uses two distinct wallet types to balance promotional generosity with fraud prevention:
+### 2.1 錢包與可下注餘額
 
-| Wallet Type | Source of Funds | Withdrawal Policy |
-|-------------|-----------------|-------------------|
-| Cash Wallet | Player's real money deposits | Withdrawable at any time (subject to turnover) |
-| Promotional Wallet | Platform-granted bonuses | Must complete turnover requirement before converting to cash |
+平台中最基本的公式決定了玩家可以投注多少：
 
-This design prevents bonus abuse where players would claim promotions and immediately withdraw without engaging with the platform.
+| 組成項目 | 說明 |
+|----------|------|
+| 現金餘額 (Cash Balance) | 玩家的存款資金 |
+| 鎖定金額 (Locked Amount) | 系統預留或凍結的資金 |
+| 進行中投注 (In-Progress Bets) | 正在結算中的投注 |
+| **可下注餘額 (Bettable Balance)** | **現金餘額 - 鎖定金額 - 進行中投注** |
+
+**業務影響**：
+- 計算錯誤將導致超額投注（平台損失）或投注受阻（客戶體驗不佳）
+- 正確計算確保資金安全與玩家滿意度
+
+**關鍵場景**：
+- 玩家下注時：檢查可下注餘額、鎖定資金、扣款
+- 遊戲結算時：釋放鎖定、結算輸贏、更新餘額
+
+### 2.2 有效投注額計算
+
+不同遊戲類型對投注額要求的貢獻比例各異：
+
+| 遊戲類型 | 投注額權重 | 原因說明 |
+|----------|-----------|----------|
+| 老虎機 (Slots) | 100% | 純靠運氣，全額計入 |
+| 百家樂 (Baccarat) | 95% | 含部分技巧；和局例外 |
+| 體育投注 (Sports Betting) | 僅計算實際風險金額 | 對沖風險高；僅計入已結算風險 |
+
+**業務意義**：
+- **促銷要求 (Promotional Requirements)**：例如「存款 100，獲得 50 紅利，需要 20 倍有效投注額」意味著玩家必須產生 (100+50) x 20 = 3,000 的有效投注額
+- **VIP 等級計算**：每月有效投注額門檻決定 VIP 等級升級
+- **反洗錢 (AML)**：玩家存款後必須達到最低 1 倍有效投注額才能提款
+
+### 2.3 多租戶架構
+
+平台支援四層層級結構，用於多品牌運營：
+
+| 層級 | 實體 | 用途 |
+|------|------|------|
+| 第 1 層 | 平台 (Platform) | 頂層系統營運商 |
+| 第 2 層 | 品牌/租戶 (Brand / Tenant) | 獨立品牌，資料隔離 |
+| 第 3 層 | 代理 (Agent) | 分銷與推薦層 |
+| 第 4 層 | 玩家 (Player) | 終端用戶 |
+
+**業務效益**：
+- **資料安全**：品牌 A 的玩家資料對品牌 B 完全不可見
+- **業務彈性**：每個品牌可擁有獨立的遊戲、促銷活動與配置
+- **法規合規**：不同品牌可滿足不同司法管轄區的要求
+
+### 2.4 風控規則引擎
+
+風控引擎在玩家旅程的多個檢查點運作：
+
+| 檢查點 | 動作 | 結果 |
+|--------|------|------|
+| 存款 | 頻率與金額限制檢查 | 通過 / 拒絕 |
+| 提款 | KYC 驗證、AML 檢查、有效投注額驗證 | 通過 / 待審核 / 拒絕 |
+| 投注 | 即時對沖偵測 | 通過 / 拒絕 |
+| 領取促銷 | 資格檢查 | 通過 / 拒絕 |
+
+**風險評分模型**：
+
+| 風險等級 | 分數範圍 | 處置方式 |
+|----------|----------|----------|
+| 低風險 | 0 -- 30 | 自動核准 |
+| 中風險 | 31 -- 70 | 需人工審核 |
+| 高風險 | 71 -- 100 | 自動拒絕 |
+
+**業務價值**：
+- 偵測職業玩家、對沖套利 (Hedge Arbitrage) 及洗錢行為
+- 防止紅利濫用與異常提款
+- 滿足 AML 法規要求
 
 ---
 
-## 5. Role-Based Reading Paths
+## 3. 端到端玩家旅程
 
-### Product Managers
-| Priority | Topic | Focus |
-|----------|-------|-------|
-| P0 | Player Lifecycle | Registration, KYC, retention |
-| P0 | Promotion System | Bonus rules, turnover requirements |
-| P1 | VIP System | Tier management, loyalty programmes |
-| P1 | Agent System | Commission structures, referrals |
+完整的玩家生命週期串聯五大核心概念：
 
-### Business Executives
-| Priority | Topic | Focus |
-|----------|-------|-------|
-| P0 | Platform Overview | Market positioning, feature highlights |
-| P0 | Multi-Tenant Strategy | Brand management, data isolation |
-| P1 | Risk & Compliance | AML, responsible gambling, regulatory |
-| P1 | Analytics & BI | Revenue reporting, player metrics |
-
----
-
-## 6. Frequently Asked Questions
-
-### Why are there two wallet types (Cash + Promotional)?
-The cash wallet holds real deposits that can be withdrawn freely. The promotional wallet holds platform bonuses that require turnover completion before becoming withdrawable. This prevents immediate bonus-and-withdraw abuse.
-
-### Why is turnover calculation so complex?
-Different game types carry different risk profiles. Slots are pure chance (100% turnover), while table games and sports betting allow strategic play that could be exploited. Weighted turnover prevents players from using low-risk games to rapidly complete requirements.
-
-### Does multi-tenant architecture affect performance?
-Testing confirms the performance overhead is less than 5%. The benefits in data security, business flexibility, and regulatory compliance far outweigh this minimal cost.
+| 步驟 | 活動 | 涉及的核心概念 |
+|------|------|----------------|
+| 1 | 玩家註冊 | 多租戶（分配至租戶） |
+| 2 | KYC 驗證 | 風控 |
+| 3 | 首次存款 | 錢包 |
+| 4 | 存款風險檢查 | 風控 |
+| 5 | 領取紅利 | 錢包（促銷錢包） |
+| 6 | 進入遊戲 | Token 驗證 |
+| 7 | 下注 / 遊戲 | 錢包 + 有效投注額 |
+| 8 | 累積有效投注額 | 有效投注額計算 |
+| 9 | 達成有效投注額要求 | 紅利轉為現金 |
+| 10 | 申請提款 | 風控（提款檢查） |
+| 11 | 提款核准 | 錢包（資金釋放） |
 
 ---
 
-## 7. Success Metrics
+## 4. 雙錢包設計
 
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| Bettable Balance Accuracy | 100% | Reconciliation between wallet service and game provider records |
-| Multi-Tenant Performance Overhead | <5% | Load testing comparison vs single-tenant baseline |
-| Risk Control Automation Rate | ≥80% low-risk auto-approved | Ratio of automated decisions to total risk assessments |
-| Turnover Calculation Consistency | 100% | Cross-validation between game logs and turnover aggregation |
-| Player Journey Completion Rate | ≥70% registration-to-first-bet | Funnel analytics from registration through first wager |
+平台使用兩種不同的錢包類型，在促銷優惠與防詐之間取得平衡：
 
----
+| 錢包類型 | 資金來源 | 提款政策 |
+|----------|----------|----------|
+| 現金錢包 (Cash Wallet) | 玩家的真實存款 | 隨時可提款（需滿足有效投注額要求） |
+| 促銷錢包 (Promotional Wallet) | 平台發放的紅利 | 必須完成有效投注額要求後方可轉為現金 |
 
-## 8. Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 2.0.0 | 2026-02-03 | v2 restructured -- redesigned navigation, focused on 5 core concepts |
-| 1.0.0 | 2026-01-27 | Initial version |
+此設計可防止紅利濫用——即玩家領取促銷後立即提款而未實際參與平台遊戲的行為。
 
 ---
 
-## Related Documentation
+## 5. 角色導向閱讀路徑
 
-→ **[System Overview - Technical Implementation](../../architecture/00_Overview/System_Overview.md)** - Detailed system architecture, module dependencies, data flow diagrams, and technical infrastructure specifications
+### 產品經理
+| 優先級 | 主題 | 重點 |
+|--------|------|------|
+| P0 | 玩家生命週期 | 註冊、KYC、留存 |
+| P0 | 促銷系統 | 紅利規則、有效投注額要求 |
+| P1 | VIP 系統 | 等級管理、忠誠計畫 |
+| P1 | 代理系統 | 佣金結構、推薦機制 |
+
+### 業務高階主管
+| 優先級 | 主題 | 重點 |
+|--------|------|------|
+| P0 | 平台總覽 | 市場定位、功能亮點 |
+| P0 | 多租戶策略 | 品牌管理、資料隔離 |
+| P1 | 風控與合規 | AML、負責任博弈、法規 |
+| P1 | 分析與 BI | 營收報表、玩家指標 |
+
+---
+
+## 6. 常見問題
+
+### 為什麼有兩種錢包類型（現金 + 促銷）？
+現金錢包持有可自由提取的真實存款。促銷錢包持有平台紅利，需完成有效投注額要求後才能提取。此設計可防止「領取紅利後立即提款」的濫用行為。
+
+### 為什麼有效投注額計算如此複雜？
+不同遊戲類型具有不同的風險特徵。老虎機為純機率遊戲（100% 計入投注額），而桌上遊戲和體育投注允許策略性操作，可能被利用。加權投注額可防止玩家利用低風險遊戲快速完成要求。
+
+### 多租戶架構是否影響效能？
+測試證實效能開銷低於 5%。在資料安全、業務彈性和法規合規方面的效益遠超此微小成本。
+
+---
+
+## 7. 成功指標
+
+| 指標 | 目標 | 衡量方法 |
+|------|------|----------|
+| 可下注餘額精確度 | 100% | 錢包服務與遊戲供應商記錄之間的對帳 |
+| 多租戶效能開銷 | <5% | 與單租戶基準的負載測試比較 |
+| 風控自動化率 | ≥80% 低風險自動核准 | 自動決策佔總風險評估之比率 |
+| 有效投注額計算一致性 | 100% | 遊戲日誌與投注額彙總之間的交叉驗證 |
+| 玩家旅程完成率 | ≥70% 從註冊到首次下注 | 從註冊到首次投注的漏斗分析 |
+
+---
+
+## 8. 版本紀錄
+
+| 版本 | 日期 | 變更內容 |
+|------|------|----------|
+| 2.0.0 | 2026-02-03 | v2 重構 —— 重新設計導覽，聚焦 5 大核心概念 |
+| 1.0.0 | 2026-01-27 | 初始版本 |
+
+---
+
+## 相關文件
+
+→ **[系統總覽 - 技術實作](../../architecture/00_Overview/System_Overview.md)** - 詳細系統架構、模組依賴、資料流程圖及技術基礎設施規格
