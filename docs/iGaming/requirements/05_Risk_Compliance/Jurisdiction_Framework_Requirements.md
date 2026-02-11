@@ -1,247 +1,247 @@
-# Multi-Jurisdiction Framework Requirements (多牌照合規業務需求)
+# 多司法管轄區框架需求（Multi-Jurisdiction Framework Requirements）
 
-> **Canonical Source**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
-> **Audience**: Executives, Compliance Officers
-> **Related Doc**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-The Multi-Jurisdiction Framework enables the iGaming platform to operate under multiple gambling licences simultaneously, applying jurisdiction-specific compliance rules based on the player's geographic location and registered licence. This is a foundational requirement for any operator seeking to serve players across different regulatory markets.
+> **規範來源**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
+> **目標讀者**: 高管、合規官
+> **相關文檔**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## Business Value
+## 1. 概述
 
-This framework delivers critical value through:
+多司法管轄區框架（Multi-Jurisdiction Framework）使 iGaming 平台能夠同時在多個賭博牌照下運營，根據玩家的地理位置和註冊牌照應用特定司法管轄區的合規規則。這是任何希望在不同監管市場服務玩家的運營商的基礎要求。
 
-- **Market Expansion**: Enables operators to serve players across multiple regulatory markets under different licences (UKGC, MGA, PAGCOR, Curacao, Brazil SPA) without code changes, accelerating time-to-market for new jurisdictions
-- **Regulatory Compliance Automation**: Automatically enforces jurisdiction-specific rules (KYC timing, responsible gambling tools, payment restrictions, game limits) based on player location, reducing manual compliance overhead by 70-80%
-- **Risk Mitigation**: Prevents regulatory violations through automated geo-fencing, VPN/proxy detection, and continuous session validation, protecting operator licences and reducing penalty exposure
-- **Operational Efficiency**: Configuration-driven design enables new jurisdiction onboarding in weeks instead of months, with compliance reporting automated per regulatory submission schedules
-- **Player Protection**: Enforces jurisdiction-appropriate responsible gambling measures (self-exclusion, deposit limits, affordability checks) aligned with local consumer protection standards
+---
 
-## Success Metrics
+## 業務價值
 
-| Metric | Target | Measurement |
+此框架通過以下方式提供關鍵價值:
+
+- **市場擴張**: 使運營商能夠在不同牌照（UKGC、MGA、PAGCOR、Curacao、Brazil SPA）下為多個監管市場的玩家提供服務，無需修改代碼，加快新司法管轄區的上市時間
+- **監管合規自動化**: 根據玩家位置自動執行特定司法管轄區的規則（KYC 時機、責任博彩工具、支付限制、遊戲限制），將人工合規開銷降低 70-80%
+- **風險緩解**: 通過自動化地理圍欄、VPN/代理偵測和持續會話驗證防止監管違規，保護運營商牌照並降低罰款風險
+- **運營效率**: 配置驅動設計使新司法管轄區的上線時間從數月縮短至數週，合規報告按監管提交時間表自動化
+- **玩家保護**: 執行符合當地消費者保護標準的司法管轄區適當責任博彩措施（自我排除、存款限額、負擔能力檢查）
+
+## 成功指標
+
+| 指標 | 目標 | 測量方式 |
 |--------|--------|-------------|
-| Jurisdiction Onboarding Time | ≤4 weeks per new licence | Time from regulatory approval to platform activation |
-| Compliance Automation Rate | ≥95% | Percentage of compliance checks automated vs manual review |
-| Geo-Fencing Accuracy | ≥99.9% | Correct location detection and access control decisions |
-| Regulatory Reporting SLA | 100% on-time | Submissions delivered before deadline per jurisdiction |
-| VPN/Proxy Detection Rate | ≥98% | Blocked proxy/VPN attempts vs total access attempts |
+| 司法管轄區上線時間 | ≤4 週/新牌照 | 從監管批准到平台啟用的時間 |
+| 合規自動化率 | ≥95% | 自動化合規檢查與人工審核的百分比 |
+| 地理圍欄準確性 | ≥99.9% | 正確的位置偵測和訪問控制決策 |
+| 監管報告 SLA | 100% 準時 | 按司法管轄區截止日期前提交的提交 |
+| VPN/代理偵測率 | ≥98% | 阻止的代理/VPN 嘗試與總訪問嘗試 |
 
 ---
 
-## 2. Business Objectives
+## 2. 業務目標
 
-| Objective | Description | Priority |
+| 目標 | 描述 | 優先級 |
 |-----------|-------------|----------|
-| Multi-Licence Operations | Support simultaneous operations under multiple gambling licences | P0 |
-| Dynamic Compliance | Automatically apply the correct regulatory rules per player jurisdiction | P0 |
-| Geographic Enforcement | Prevent players from accessing the platform from restricted regions | P0 |
-| Regulatory Reporting | Generate jurisdiction-specific compliance reports | P1 |
-| Scalable Expansion | Enable rapid onboarding of new jurisdictions without code changes | P1 |
+| 多牌照運營 | 支持在多個賭博牌照下同時運營 | P0 |
+| 動態合規 | 自動為每個玩家司法管轄區應用正確的監管規則 | P0 |
+| 地理執行 | 防止玩家從受限地區訪問平台 | P0 |
+| 監管報告 | 生成特定司法管轄區的合規報告 | P1 |
+| 可擴展擴張 | 無需修改代碼即可快速上線新司法管轄區 | P1 |
 
 ---
 
-## 3. Supported Licences
+## 3. 支持的牌照
 
-| Licence | Regulatory Body | Region | Strictness Level |
+| 牌照 | 監管機構 | 地區 | 嚴格程度 |
 |---------|----------------|--------|-----------------|
-| UKGC | UK Gambling Commission | United Kingdom | Very High |
-| MGA | Malta Gaming Authority | European Union | High |
-| PAGCOR | Philippine Amusement and Gaming Corporation | Philippines | Medium |
-| Curacao | Curacao eGaming | Offshore | Low |
-| Brazil SPA | Secretariat of Prizes and Bets | Brazil | High |
+| UKGC | 英國賭博委員會（UK Gambling Commission） | 英國 | 非常高 |
+| MGA | 馬耳他博彩管理局（Malta Gaming Authority） | 歐盟 | 高 |
+| PAGCOR | 菲律賓娛樂博彩公司（Philippine Amusement and Gaming Corporation） | 菲律賓 | 中 |
+| Curacao | Curacao eGaming | 離岸 | 低 |
+| Brazil SPA | 獎品與賭注秘書處（Secretariat of Prizes and Bets） | 巴西 | 高 |
 
 ---
 
-## 4. Jurisdiction Configuration Requirements
+## 4. 司法管轄區配置需求
 
-### 4.1 Geographic Controls
+### 4.1 地理控制
 
-| Requirement | Details |
+| 需求 | 詳情 |
 |-------------|---------|
-| Country Allow-List | Each licence defines which countries are permitted |
-| Country Block-List | Each licence defines which countries are explicitly blocked |
-| Sub-National Restrictions | Support for state/province-level restrictions (e.g., US states) |
-| Default Behaviour | If a player's country matches no licence, access is denied |
+| 國家允許清單 | 每個牌照定義允許的國家 |
+| 國家封鎖清單 | 每個牌照定義明確封鎖的國家 |
+| 次國家級限制 | 支持州/省級限制（例如美國各州） |
+| 默認行為 | 如果玩家的國家不匹配任何牌照，則拒絕訪問 |
 
-### 4.2 KYC Requirements by Jurisdiction
+### 4.2 按司法管轄區的 KYC 要求
 
-| Requirement | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
+| 需求 | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
 |-------------|------|-----|--------|---------|------------|
-| Immediate KYC before deposit | Yes | No | No | No | Yes |
-| KYC Grace Period | None | 72 hours | 30 days | None | None |
-| Enhanced Due Diligence | Required | Case-by-case | No | No | Required |
-| Source of Funds | Required (high value) | Required (high value) | No | No | Required |
+| 存款前立即 KYC | 是 | 否 | 否 | 否 | 是 |
+| KYC 寬限期 | 無 | 72 小時 | 30 天 | 無 | 無 |
+| 加強盡職調查（Enhanced Due Diligence） | 必需 | 個案處理 | 否 | 否 | 必需 |
+| 資金來源（Source of Funds） | 必需（高價值） | 必需（高價值） | 否 | 否 | 必需 |
 
-### 4.3 Responsible Gambling Requirements
+### 4.3 責任博彩要求
 
-| Requirement | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
+| 需求 | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
 |-------------|------|-----|--------|---------|------------|
-| Self-Exclusion | Mandatory | Mandatory | Optional | Optional | Mandatory |
-| Deposit Limits | Mandatory | Mandatory | Optional | Optional | Mandatory |
-| Mandatory Cooling-Off | Yes | No | No | No | Yes |
-| Reality Check Interval | 30 minutes | 60 minutes | None | None | 30 minutes |
-| Affordability Check | Required | No | No | No | Required |
+| 自我排除（Self-Exclusion） | 強制 | 強制 | 可選 | 可選 | 強制 |
+| 存款限額（Deposit Limits） | 強制 | 強制 | 可選 | 可選 | 強制 |
+| 強制冷靜期（Mandatory Cooling-Off） | 是 | 否 | 否 | 否 | 是 |
+| 現實檢查間隔（Reality Check Interval） | 30 分鐘 | 60 分鐘 | 無 | 無 | 30 分鐘 |
+| 負擔能力檢查（Affordability Check） | 必需 | 否 | 否 | 否 | 必需 |
 
-### 4.4 Game Restrictions
+### 4.4 遊戲限制
 
-| Requirement | Details |
+| 需求 | 詳情 |
 |-------------|---------|
-| Allowed Game Types | Each licence defines which game types are permitted |
-| Blocked Game Types | Each licence defines which game types are prohibited |
-| Maximum Bet Amount | Jurisdiction-specific maximum wager limits |
-| Maximum Win Amount | Jurisdiction-specific maximum payout limits |
+| 允許的遊戲類型 | 每個牌照定義允許的遊戲類型 |
+| 封鎖的遊戲類型 | 每個牌照定義禁止的遊戲類型 |
+| 最大投注金額 | 特定司法管轄區的最大投注限額 |
+| 最大贏獎金額 | 特定司法管轄區的最大派彩限額 |
 
-### 4.5 Payment Restrictions
+### 4.5 支付限制
 
-| Requirement | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
+| 需求 | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
 |-------------|------|-----|--------|---------|------------|
-| Credit Cards Allowed | No (banned since April 2020) | Yes | Yes | Yes | No |
-| Cryptocurrency Allowed | No | No | Yes | Yes | No |
-| Allowed Payment Methods | Bank transfer, debit card, e-wallets | All standard methods | All methods | All methods | PIX, bank transfer |
+| 允許信用卡 | 否（2020 年 4 月起禁止） | 是 | 是 | 是 | 否 |
+| 允許加密貨幣 | 否 | 否 | 是 | 是 | 否 |
+| 允許的支付方式 | 銀行轉賬、借記卡、電子錢包 | 所有標準方式 | 所有方式 | 所有方式 | PIX、銀行轉賬 |
 
-### 4.6 Tax and Financial Requirements
+### 4.6 稅務與財務要求
 
-| Requirement | Details |
+| 需求 | 詳情 |
 |-------------|---------|
-| GGR Tax Rate | Jurisdiction-specific gross gaming revenue tax rate |
-| Withholding Tax | Whether winnings are subject to withholding tax |
-| Withholding Tax Rate | The applicable withholding tax rate on player winnings |
-| Reporting Frequency | How often financial reports must be submitted to the regulator |
+| GGR 稅率 | 特定司法管轄區的博彩總收入稅率 |
+| 預扣稅（Withholding Tax） | 贏獎是否需要預扣稅 |
+| 預扣稅率 | 適用於玩家贏獎的預扣稅率 |
+| 報告頻率 | 必須向監管機構提交財務報告的頻率 |
 
 ---
 
-## 5. Player Journey Rules
+## 5. 玩家旅程規則
 
-### 5.1 Registration
+### 5.1 註冊
 
-| Step | Policy |
+| 步驟 | 政策 |
 |------|--------|
-| Geo-Detection | Player's country is determined from IP address at registration |
-| Licence Assignment | Player is assigned to the appropriate licence based on their country |
-| Age Verification | Minimum age varies by jurisdiction (18 for UKGC/MGA, 21 for PAGCOR) |
-| Gamstop Check (UKGC) | All UK registrations must be checked against the Gamstop national exclusion database |
-| KYC Timing | Depends on jurisdiction (immediate for UKGC, grace period for MGA) |
+| 地理偵測 | 玩家的國家從註冊時的 IP 地址確定 |
+| 牌照分配 | 玩家根據其國家分配到適當的牌照 |
+| 年齡驗證 | 最低年齡因司法管轄區而異（UKGC/MGA 為 18 歲，PAGCOR 為 21 歲） |
+| Gamstop 檢查（UKGC） | 所有英國註冊必須檢查 Gamstop 國家排除數據庫 |
+| KYC 時機 | 取決於司法管轄區（UKGC 立即，MGA 有寬限期） |
 
-### 5.2 Deposits
+### 5.2 存款
 
-| Step | Policy |
+| 步驟 | 政策 |
 |------|--------|
-| Payment Method Validation | Only payment methods permitted by the player's jurisdiction are offered |
-| Credit Card Block | Credit cards are blocked in jurisdictions that prohibit them (UKGC, Brazil) |
-| Affordability Check | In jurisdictions that require it, players must pass an affordability assessment before large deposits |
-| Deposit Limit Enforcement | Deposits are checked against the player's configured limits |
+| 支付方式驗證 | 僅提供玩家司法管轄區允許的支付方式 |
+| 信用卡封鎖 | 在禁止信用卡的司法管轄區（UKGC、巴西）封鎖信用卡 |
+| 負擔能力檢查 | 在要求的司法管轄區，玩家必須在大額存款前通過負擔能力評估 |
+| 存款限額執行 | 存款根據玩家配置的限額進行檢查 |
 
-### 5.3 Game Launch
+### 5.3 遊戲啟動
 
-| Step | Policy |
+| 步驟 | 政策 |
 |------|--------|
-| Game Type Validation | The game type must be permitted in the player's jurisdiction |
-| Self-Exclusion Check | Players with active self-exclusion cannot launch any game |
-| Cooling-Off Check | Players in a cooling-off period cannot launch any game |
-| Bet Limits | Maximum bet amounts are enforced per jurisdiction configuration |
+| 遊戲類型驗證 | 遊戲類型必須在玩家的司法管轄區允許 |
+| 自我排除檢查 | 有活躍自我排除的玩家無法啟動任何遊戲 |
+| 冷靜期檢查 | 處於冷靜期的玩家無法啟動任何遊戲 |
+| 投注限額 | 根據司法管轄區配置執行最大投注金額 |
 
 ---
 
-## 6. Geographic Enforcement (Geo-Fencing)
+## 6. 地理執行（地理圍欄）
 
-### 6.1 Access Control Requirements
+### 6.1 訪問控制要求
 
-| Requirement | Details |
+| 需求 | 詳情 |
 |-------------|---------|
-| IP-Based Detection | Player location is determined using GeoIP services |
-| VPN/Proxy Detection | VPN and proxy usage must be detected and blocked |
-| Continuous Monitoring | Active player sessions must be periodically re-validated for location compliance |
-| Session Termination | If a player's location changes to a restricted region during a session, the session must be terminated |
-| Player Notification | Players must be notified when access is denied or a session is terminated due to geo-fencing |
+| 基於 IP 的偵測 | 使用 GeoIP 服務確定玩家位置 |
+| VPN/代理偵測 | 必須偵測並封鎖 VPN 和代理使用 |
+| 持續監控 | 必須定期重新驗證活躍玩家會話的位置合規性 |
+| 會話終止 | 如果玩家在會話期間位置變更到受限地區，必須終止會話 |
+| 玩家通知 | 當因地理圍欄拒絕訪問或終止會話時，必須通知玩家 |
 
-### 6.2 Monitoring Frequency
+### 6.2 監控頻率
 
-| Check Type | Frequency |
+| 檢查類型 | 頻率 |
 |------------|-----------|
-| Registration | On registration attempt |
-| Login | On every login |
-| Active Session | Every 5 minutes during active sessions |
-| Deposit | Before each deposit |
-| Game Launch | Before each game launch |
+| 註冊 | 註冊嘗試時 |
+| 登入 | 每次登入時 |
+| 活躍會話 | 活躍會話期間每 5 分鐘 |
+| 存款 | 每次存款前 |
+| 遊戲啟動 | 每次遊戲啟動前 |
 
 ---
 
-## 7. Compliance Reporting
+## 7. 合規報告
 
-### 7.1 Report Requirements by Jurisdiction
+### 7.1 按司法管轄區的報告要求
 
-| Report Type | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
+| 報告類型 | UKGC | MGA | PAGCOR | Curacao | Brazil SPA |
 |-------------|------|-----|--------|---------|------------|
-| Monthly Activity Report | Required | Required | Required | Optional | Required |
-| Quarterly Financial Report | Required | Required | Optional | Optional | Required |
-| Annual Audit Report | Required | Required | Required | Optional | Required |
-| Incident Report | Within 5 days | Within 72 hours | Within 30 days | None | Within 48 hours |
-| Self-Exclusion Report | Monthly | Quarterly | None | None | Monthly |
+| 月度活動報告 | 必需 | 必需 | 必需 | 可選 | 必需 |
+| 季度財務報告 | 必需 | 必需 | 可選 | 可選 | 必需 |
+| 年度審計報告 | 必需 | 必需 | 必需 | 可選 | 必需 |
+| 事件報告 | 5 天內 | 72 小時內 | 30 天內 | 無 | 48 小時內 |
+| 自我排除報告 | 每月 | 每季 | 無 | 無 | 每月 |
 
-### 7.2 Dashboard Requirements
+### 7.2 儀表板需求
 
-| Feature | Details |
+| 功能 | 詳情 |
 |---------|---------|
-| Licence Status Cards | At-a-glance view of each licence's compliance status |
-| Active Player Count | Number of active players per jurisdiction |
-| Next Report Due | Countdown to the next required regulatory submission |
-| Compliance Alerts | Real-time alerts for compliance violations or upcoming deadlines |
-| Alert Severity Levels | CRITICAL (immediate action) and WARNING (attention needed) |
+| 牌照狀態卡 | 每個牌照合規狀態的一目了然視圖 |
+| 活躍玩家數 | 每個司法管轄區的活躍玩家數量 |
+| 下次報告截止 | 下次所需監管提交的倒計時 |
+| 合規警報 | 合規違規或即將到期截止日期的即時警報 |
+| 警報嚴重程度 | 緊急（CRITICAL）（需要立即行動）和警告（WARNING）（需要關注） |
 
 ---
 
-## 8. External System Integration
+## 8. 外部系統整合
 
-| Integration | Applicable Jurisdictions | Purpose |
+| 整合 | 適用司法管轄區 | 目的 |
 |-------------|------------------------|---------|
-| Gamstop | UKGC | National self-exclusion scheme for UK players |
-| GeoIP Service | All | Player location detection and geo-fencing |
-| Tax Authority Systems | Per jurisdiction | Tax reporting and withholding |
-| Regulator Portals | Per jurisdiction | Regulatory report submission |
+| Gamstop | UKGC | 英國玩家的國家自我排除計劃 |
+| GeoIP Service | 全部 | 玩家位置偵測和地理圍欄 |
+| 稅務機構系統 | 按司法管轄區 | 稅務報告和預扣 |
+| 監管機構入口 | 按司法管轄區 | 監管報告提交 |
 
 ---
 
-## 9. New Jurisdiction Onboarding
+## 9. 新司法管轄區上線
 
-### 9.1 Onboarding Checklist
+### 9.1 上線檢查清單
 
-| Step | Description |
+| 步驟 | 描述 |
 |------|-------------|
-| 1. Regulatory Analysis | Document all regulatory requirements for the new jurisdiction |
-| 2. Configuration Setup | Create jurisdiction configuration with all required parameters |
-| 3. Payment Integration | Configure permitted payment methods for the jurisdiction |
-| 4. Game Configuration | Define allowed and blocked game types |
-| 5. KYC/AML Setup | Configure KYC requirements and AML thresholds |
-| 6. Responsible Gambling | Enable required responsible gambling tools |
-| 7. Reporting Setup | Configure reporting templates and submission schedules |
-| 8. Geo-Fencing | Set up country allow/block lists |
-| 9. Testing | End-to-end testing of all jurisdiction-specific flows |
-| 10. Go-Live | Activate the jurisdiction configuration |
+| 1. 監管分析 | 記錄新司法管轄區的所有監管要求 |
+| 2. 配置設置 | 創建包含所有必需參數的司法管轄區配置 |
+| 3. 支付整合 | 配置司法管轄區允許的支付方式 |
+| 4. 遊戲配置 | 定義允許和封鎖的遊戲類型 |
+| 5. KYC/AML 設置 | 配置 KYC 要求和 AML 閾值 |
+| 6. 責任博彩 | 啟用所需的責任博彩工具 |
+| 7. 報告設置 | 配置報告模板和提交時間表 |
+| 8. 地理圍欄 | 設置國家允許/封鎖清單 |
+| 9. 測試 | 所有特定司法管轄區流程的端到端測試 |
+| 10. 上線 | 啟用司法管轄區配置 |
 
-### 9.2 Configuration-Driven Design Principle
+### 9.2 配置驅動設計原則
 
-New jurisdictions must be onboardable through configuration changes only, without requiring code modifications. All jurisdiction-specific behaviours must be driven by the jurisdiction configuration data model.
+新司法管轄區必須僅通過配置更改即可上線，無需修改代碼。所有特定司法管轄區的行為必須由司法管轄區配置數據模型驅動。
 
 ---
 
-## 10. Cross-References
+## 10. 交叉引用
 
-| Topic | Document |
+| 主題 | 文檔 |
 |-------|----------|
-| UKGC Compliance Details | source/06_Platform_Governance/06-08_UKGC_Compliance.md |
-| MGA Compliance Details | source/06_Platform_Governance/06-09_MGA_Compliance.md |
-| Brazil SPA Compliance Details | source/06_Platform_Governance/06-10_Brazil_SPA_Compliance.md |
-| PAGCOR & Curacao Details | source/06_Platform_Governance/06-11_PAGCOR_Curacao.md |
-| Self-Exclusion | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
-| Technical Architecture | architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md |
+| UKGC 合規詳情 | source/06_Platform_Governance/06-08_UKGC_Compliance.md |
+| MGA 合規詳情 | source/06_Platform_Governance/06-09_MGA_Compliance.md |
+| Brazil SPA 合規詳情 | source/06_Platform_Governance/06-10_Brazil_SPA_Compliance.md |
+| PAGCOR & Curacao 詳情 | source/06_Platform_Governance/06-11_PAGCOR_Curacao.md |
+| 自我排除 | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
+| 技術架構 | architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md |
 
-### Technical Implementation
+### 技術實現
 
-→ **[Jurisdiction Routing Architecture](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)** - Multi-jurisdiction configuration system, regulatory rule engine, jurisdiction-specific feature flags, compliance enforcement mechanisms, and audit trail logging
+→ **[Jurisdiction Routing Architecture](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)** - 多司法管轄區配置系統、監管規則引擎、特定司法管轄區功能標誌、合規執行機制和審計追蹤日誌

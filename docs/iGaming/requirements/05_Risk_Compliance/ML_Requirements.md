@@ -1,253 +1,253 @@
-# ML Risk Detection Requirements (機器學習風控業務需求)
+# 機器學習風險偵測需求（ML Risk Detection Requirements）
 
-> **Canonical Source**: [05-02-03_ML_Integration.md](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md)
-> **Audience**: Executives, Product Managers
-> **Related Architecture**: [ML_Integration_Architecture.md](../../architecture/05_Risk_Engine/ML_Integration_Architecture.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-Machine learning models augment the rule-based risk control system by detecting complex fraud patterns that static rules cannot capture. This document defines the business requirements, expected outcomes, and governance policies for ML-based risk detection.
+> **規範來源**: [05-02-03_ML_Integration.md](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md)
+> **目標讀者**: 高管、產品經理
+> **相關架構**: [ML_Integration_Architecture.md](../../architecture/05_Risk_Engine/ML_Integration_Architecture.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## Acceptance Criteria
+## 1. 概述
 
-- [ ] All five ML models (Abnormal Betting, Multi-Account, Bonus Abuse, AML Risk Scoring, Fraudulent Transaction) deployed and operational with accuracy meeting or exceeding targets specified in Section 3.1
-- [ ] Real-time risk scoring API responds within latency targets: ≤50ms for betting detection, ≤100ms for multi-account/transaction detection, ≤200ms for bonus abuse, ≤500ms for AML scoring
-- [ ] Player risk profiling calculates total scores correctly using factor weights and caps (Section 5.2-5.3), assigns risk levels (LOW/MEDIUM/HIGH/BLACKLIST) accurately
-- [ ] VIP players undergo identical risk controls as non-VIP players (no exemptions or reduced thresholds) as mandated in Section 5.4
-- [ ] Model governance dashboard displays performance metrics (F1 score, false positive rate, latency, PSI) with automated alerts when thresholds breached (Section 7.1)
-- [ ] All new models and updates pass 14-day A/B testing with p-value <0.05 before full deployment, with automated rollback if treatment underperforms control (Section 7.2)
-- [ ] Game-type dimensional rules correctly filter risk rules to applicable game types (SPORTS, LIVE, SLOTS, etc.) per Section 4
-- [ ] Blacklist enforcement immediately blocks all betting activity and restricts account access to read-only when player added to blacklist (Section 6.2)
-- [ ] Fraud detection rate improves from 70% (rule-based) to ≥95% (with ML), false positive rate reduces from 15% to <5%, as specified in Section 8
+機器學習模型通過偵測靜態規則無法捕獲的複雜詐騙模式來增強基於規則的風險控制系統。本文檔定義了基於 ML 的風險偵測的業務需求、預期結果和治理政策。
 
 ---
 
-## 2. Business Objectives
+## 驗收標準
 
-| Objective | Description | Priority |
+- [ ] 所有五個 ML 模型（異常投注、多帳戶、獎金濫用、AML 風險評分、詐騙交易）已部署並運行，準確性達到或超過第 3.1 節指定的目標
+- [ ] 即時風險評分 API 在延遲目標內響應: 投注偵測 ≤50ms、多帳戶/交易偵測 ≤100ms、獎金濫用 ≤200ms、AML 評分 ≤500ms
+- [ ] 玩家風險分析使用因素權重和上限（第 5.2-5.3 節）正確計算總分，準確分配風險等級（LOW/MEDIUM/HIGH/BLACKLIST）
+- [ ] VIP 玩家接受與非 VIP 玩家相同的風險控制（無豁免或降低閾值），如第 5.4 節要求
+- [ ] 模型治理儀表板顯示性能指標（F1 分數、誤判率、延遲、PSI），在閾值被突破時自動警報（第 7.1 節）
+- [ ] 所有新模型和更新在全面部署前通過 14 天 A/B 測試，p 值 <0.05，如果治療組表現不如控制組則自動回滾（第 7.2 節）
+- [ ] 遊戲類型維度規則正確過濾風險規則至適用的遊戲類型（SPORTS、LIVE、SLOTS 等），按第 4 節規定
+- [ ] 黑名單執行在玩家被添加到黑名單時立即阻止所有投注活動並將帳戶訪問限制為只讀（第 6.2 節）
+- [ ] 詐騙偵測率從 70%（基於規則）提高至 ≥95%（含 ML），誤判率從 15% 降至 <5%，如第 8 節規定
+
+---
+
+## 2. 業務目標
+
+| 目標 | 描述 | 優先級 |
 |-----------|-------------|----------|
-| Enhanced Fraud Detection | Identify sophisticated fraud patterns beyond rule-based detection | P0 |
-| Real-Time Risk Scoring | Provide sub-second risk assessments for every betting transaction | P0 |
-| Adaptive Learning | Models must adapt to evolving fraud tactics without manual rule updates | P1 |
-| Regulatory Compliance | All ML decisions must be explainable and auditable for regulatory review | P0 |
-| Operational Efficiency | Reduce false positive rates to minimise manual review workload | P1 |
+| 增強詐騙偵測（Enhanced Fraud Detection） | 識別超出基於規則偵測的複雜詐騙模式 | P0 |
+| 即時風險評分（Real-Time Risk Scoring） | 為每筆投注交易提供亞秒級風險評估 | P0 |
+| 自適應學習（Adaptive Learning） | 模型必須適應不斷演變的詐騙策略而無需人工規則更新 | P1 |
+| 監管合規（Regulatory Compliance） | 所有 ML 決策必須可解釋且可審計以供監管審查 | P0 |
+| 運營效率（Operational Efficiency） | 降低誤判率以最小化人工審核工作量 | P1 |
 
 ---
 
-## 3. ML Model Use Cases
+## 3. ML 模型用例
 
-### 3.1 Model Portfolio
+### 3.1 模型組合
 
-| Model | Business Purpose | Accuracy Target | Latency Target |
+| 模型 | 業務目的 | 準確性目標 | 延遲目標 |
 |-------|-----------------|-----------------|----------------|
-| Abnormal Betting Detection | Identify suspicious betting patterns (e.g., timing anomalies, amount clustering, correlated accounts) | 95% or higher | Under 50ms |
-| Multi-Account Detection | Detect device fingerprint and behavioural similarities across accounts to identify linked accounts | 90% or higher | Under 100ms |
-| Bonus Abuse Detection | Identify players systematically exploiting promotional offers through coordinated or repeated abuse patterns | 85% or higher | Under 200ms |
-| AML Risk Scoring | Assign anti-money-laundering risk grades based on transaction patterns, account behaviour, and external data | 80% or higher | Under 500ms |
-| Fraudulent Transaction Detection | Identify payment fraud in deposits and withdrawals using transaction pattern analysis | 92% or higher | Under 100ms |
+| 異常投注偵測（Abnormal Betting Detection） | 識別可疑投注模式（例如時間異常、金額聚類、關聯帳戶） | 95% 或更高 | 50ms 以內 |
+| 多帳戶偵測（Multi-Account Detection） | 偵測設備指紋和跨帳戶行為相似性以識別關聯帳戶 | 90% 或更高 | 100ms 以內 |
+| 獎金濫用偵測（Bonus Abuse Detection） | 識別通過協調或重複濫用模式系統性利用促銷優惠的玩家 | 85% 或更高 | 200ms 以內 |
+| AML 風險評分（AML Risk Scoring） | 根據交易模式、帳戶行為和外部數據分配反洗錢風險等級 | 80% 或更高 | 500ms 以內 |
+| 詐騙交易偵測（Fraudulent Transaction Detection） | 使用交易模式分析識別存款和提款中的支付詐騙 | 92% 或更高 | 100ms 以內 |
 
-### 3.2 Use Case Descriptions
+### 3.2 用例描述
 
-**Abnormal Betting Detection**
-- Detects anomalous wagering patterns such as sudden stake increases, rapid bet placement, and hedging across correlated markets
-- Triggers further investigation or automatic flagging based on confidence score
+**異常投注偵測（Abnormal Betting Detection）**
+- 偵測異常投注模式，例如突然增加注額、快速下注和跨關聯市場對沖
+- 根據置信度分數觸發進一步調查或自動標記
 
-**Multi-Account Detection**
-- Uses device fingerprinting, behavioural biometrics, and network analysis to cluster accounts
-- Identifies shared devices, similar betting patterns, and suspicious registration correlations
+**多帳戶偵測（Multi-Account Detection）**
+- 使用設備指紋、行為生物識別和網路分析對帳戶進行聚類
+- 識別共享設備、類似投注模式和可疑註冊關聯
 
-**Bonus Abuse Detection**
-- Monitors promotional offer redemption patterns across accounts
-- Detects systematic exploitation such as minimum-play bonus extraction and coordinated signup bonuses
+**獎金濫用偵測（Bonus Abuse Detection）**
+- 監控跨帳戶的促銷優惠兌換模式
+- 偵測系統性利用，例如最低遊戲獎金提取和協調的註冊獎金
 
-**AML Risk Scoring**
-- Continuous risk scoring based on transaction velocity, structuring patterns, and source-of-funds indicators
-- Risk grades feed into the compliance team's enhanced due diligence workflow
+**AML 風險評分（AML Risk Scoring）**
+- 基於交易速度、結構化模式和資金來源指標的持續風險評分
+- 風險等級饋入合規團隊的加強盡職調查工作流
 
-**Fraudulent Transaction Detection**
-- Real-time scoring of payment transactions for chargeback risk and stolen credentials
-- Integrates with payment gateway decision engines
+**詐騙交易偵測（Fraudulent Transaction Detection）**
+- 支付交易的即時評分，用於拒付風險和被盜憑證
+- 與支付閘道決策引擎整合
 
 ---
 
-## 4. Game-Type Dimensional Rules
+## 4. 遊戲類型維度規則
 
-### 4.1 Game-Type Applicability
+### 4.1 遊戲類型適用性
 
-Risk detection rules (both ML and rule-based) must support game-type filtering so that rules designed for specific gambling verticals are only applied to relevant transactions.
+風險偵測規則（ML 和基於規則）必須支持遊戲類型過濾，以便為特定賭博垂直領域設計的規則僅應用於相關交易。
 
-| Configuration | Business Meaning |
+| 配置 | 業務含義 |
 |---------------|-----------------|
-| Rule with no game type filter | Applies universally to all game types |
-| Rule with specific game types | Applies only to the listed game types |
-| Rule with excluded games | Applies to all games except those specifically excluded |
+| 無遊戲類型過濾的規則 | 普遍應用於所有遊戲類型 |
+| 具有特定遊戲類型的規則 | 僅應用於列出的遊戲類型 |
+| 具有排除遊戲的規則 | 應用於除明確排除的所有遊戲 |
 
-### 4.2 Supported Game Types
+### 4.2 支持的遊戲類型
 
-| Game Type | Description |
+| 遊戲類型 | 描述 |
 |-----------|-------------|
-| SPORTS | Sports betting (pre-match and live) |
-| LIVE | Live casino (baccarat, roulette, blackjack) |
-| SLOTS | Slot machines and video slots |
-| LOTTERY | Lottery and number games |
-| POKER | Poker (cash games and tournaments) |
-| FISHING | Fishing arcade games |
-| ESPORTS | Esports betting |
+| SPORTS | 體育投注（賽前和即時） |
+| LIVE | 真人娛樂場（百家樂、輪盤、21 點） |
+| SLOTS | 老虎機和視頻老虎機 |
+| LOTTERY | 彩票和數字遊戲 |
+| POKER | 撲克（現金遊戲和錦標賽） |
+| FISHING | 捕魚街機遊戲 |
+| ESPORTS | 電子競技投注 |
 
-### 4.3 Game-Specific Rule Examples
+### 4.3 特定遊戲規則範例
 
-| Rule | Applicable Game Types | Action |
+| 規則 | 適用遊戲類型 | 動作 |
 |------|----------------------|--------|
-| Same-Match Hedging | SPORTS only | Block |
-| Cross-Match Hedging | SPORTS only | Flag |
-| Low-Odds Wagering | SPORTS, LIVE | Flag |
-| Blacklist Player | All (universal) | Block |
-| Bot Detection | All (universal) | Block |
+| 同場對沖（Same-Match Hedging） | 僅 SPORTS | 阻斷 |
+| 跨場對沖（Cross-Match Hedging） | 僅 SPORTS | 標記 |
+| 低賠率投注（Low-Odds Wagering） | SPORTS、LIVE | 標記 |
+| 黑名單玩家（Blacklist Player） | 全部（通用） | 阻斷 |
+| 機器人偵測（Bot Detection） | 全部（通用） | 阻斷 |
 
-### 4.4 Game Exclusion Policy
+### 4.4 遊戲排除政策
 
-Individual games or game providers may be excluded from specific rules. For example, a low-odds wagering rule may exclude specific Evolution Gaming titles where the betting pattern is normal for the game type.
+個別遊戲或遊戲供應商可能被排除在特定規則之外。例如，低賠率投注規則可能排除特定的 Evolution Gaming 標題，其中投注模式對該遊戲類型是正常的。
 
 ---
 
-## 5. Player Risk Profiling
+## 5. 玩家風險分析
 
-### 5.1 Risk Levels
+### 5.1 風險等級
 
-| Risk Level | Score Range | Operational Response |
+| 風險等級 | 分數範圍 | 運營響應 |
 |------------|-----------|---------------------|
-| LOW | 0 - 49 | Standard monitoring; no additional action |
-| MEDIUM | 50 - 79 | Enhanced monitoring; periodic manual review |
-| HIGH | 80 - 100 | Mandatory manual review; restricted operations |
-| BLACKLIST | N/A | All betting activity blocked; account frozen |
+| 低（LOW） | 0 - 49 | 標準監控；無額外行動 |
+| 中（MEDIUM） | 50 - 79 | 加強監控；定期人工審核 |
+| 高（HIGH） | 80 - 100 | 強制人工審核；限制操作 |
+| 黑名單（BLACKLIST） | N/A | 阻止所有投注活動；凍結帳戶 |
 
-### 5.2 Risk Scoring Factors
+### 5.2 風險評分因素
 
-| Factor | Weight per Occurrence | Maximum Contribution | Description |
+| 因素 | 每次權重 | 最大貢獻 | 描述 |
 |--------|-----------------------|---------------------|-------------|
-| Risk Flag Count | +5 per flag | 30 points | Number of times the player has been flagged by any risk rule |
-| Block Count | +10 per block | 40 points | Number of times the player's activity has been actively blocked |
-| Abnormal Win Rate | +20 (one-time) | 20 points | Win rate above 60% or below 30% (statistical anomaly) |
-| Recent Proposals | +3 per proposal | 20 points | Number of risk proposals generated in the past 30 days |
+| 風險標記次數 | 每次標記 +5 | 30 分 | 玩家被任何風險規則標記的次數 |
+| 阻斷次數 | 每次阻斷 +10 | 40 分 | 玩家活動被主動阻斷的次數 |
+| 異常勝率 | +20（一次性） | 20 分 | 勝率高於 60% 或低於 30%（統計異常） |
+| 近期提案 | 每個提案 +3 | 20 分 | 過去 30 天生成的風險提案數量 |
 
-### 5.3 Total Score Calculation
+### 5.3 總分計算
 
-- Total Score = sum of all factor contributions, capped at 0 (minimum) and 100 (maximum)
-- Risk level is derived directly from the score using the thresholds in Section 5.1
+- 總分 = 所有因素貢獻的總和，最小值為 0，最大值為 100
+- 風險等級直接從分數使用第 5.1 節的閾值派生
 
-### 5.4 VIP Player Compliance Policy
+### 5.4 VIP 玩家合規政策
 
-**Critical Regulatory Requirement**: VIP players must undergo the exact same risk controls as all other players. No exemptions, reduced thresholds, or bypasses are permitted for VIP status.
+**關鍵監管要求**: VIP 玩家必須接受與所有其他玩家完全相同的風險控制。不允許豁免、降低閾值或繞過 VIP 身份。
 
-VIP level affects only:
-- Priority ordering in the manual review queue (VIP proposals are reviewed first)
-- Dedicated customer service assistance for preparing KYC/SOF documentation
+VIP 等級僅影響：
+- 人工審核隊列中的優先順序（VIP 提案優先審核）
+- 專屬客服協助準備 KYC/SOF 文件
 
-VIP level does NOT affect:
-- Risk rule trigger conditions
-- AML thresholds
-- Affordability assessment triggers
+VIP 等級不影響：
+- 風險規則觸發條件
+- AML 閾值
+- 負擔能力評估觸發
 
-Regulatory precedent: Entain was fined 17 million GBP for failing to apply adequate risk controls to VIP players.
+監管先例: Entain 因未對 VIP 玩家應用足夠的風險控制而被罰款 1700 萬英鎊。
 
 ---
 
-## 6. Blacklist Management
+## 6. 黑名單管理
 
-### 6.1 Blacklist Entry Criteria
+### 6.1 黑名單進入標準
 
-| Criterion | Description |
+| 標準 | 描述 |
 |-----------|-------------|
-| Confirmed Fraud | Player confirmed as fraudulent through investigation |
-| AML Violation | Player involved in money laundering activity |
-| Multiple Account Abuse | Player operating multiple accounts to circumvent controls |
-| Regulatory Order | Blacklisting ordered by a regulator or law enforcement |
-| Operator Decision | Operator-initiated blacklisting based on risk assessment |
+| 確認詐騙（Confirmed Fraud） | 通過調查確認為詐騙者的玩家 |
+| AML 違規（AML Violation） | 涉及洗錢活動的玩家 |
+| 多帳戶濫用（Multiple Account Abuse） | 操作多個帳戶以規避控制的玩家 |
+| 監管命令（Regulatory Order） | 監管機構或執法機構下令列入黑名單 |
+| 運營商決定（Operator Decision） | 運營商基於風險評估發起的列入黑名單 |
 
-### 6.2 Blacklist Consequences
+### 6.2 黑名單後果
 
-- All betting activity is immediately and permanently blocked
-- Pending withdrawals are reviewed and may be suspended
-- Account access is restricted to read-only (balance viewing only)
-- The blacklist reason and operator are recorded for audit purposes
+- 立即且永久阻止所有投注活動
+- 待處理的提款將被審查並可能被暫停
+- 帳戶訪問限制為只讀（僅查看餘額）
+- 記錄黑名單原因和運營商以供審計
 
 ---
 
-## 7. Model Governance
+## 7. 模型治理
 
-### 7.1 Performance Monitoring
+### 7.1 性能監控
 
-| Metric | Threshold | Action When Breached |
+| 指標 | 閾值 | 突破時的行動 |
 |--------|-----------|---------------------|
-| Accuracy (F1 Score) | Must not drop more than 5% from baseline | Trigger model retraining |
-| False Positive Rate | Must remain below the agreed ceiling per model | Investigate and tune |
-| Latency | Must remain within the target specified per model | Optimise or scale infrastructure |
-| Data Drift (PSI) | PSI must remain below 0.2 | Re-evaluate model with new data |
+| 準確性（F1 分數） | 不得從基線下降超過 5% | 觸發模型重新訓練 |
+| 誤判率 | 必須保持在每個模型商定的上限以下 | 調查並調整 |
+| 延遲 | 必須保持在每個模型指定的目標內 | 優化或擴展基礎設施 |
+| 數據漂移（PSI） | PSI 必須保持在 0.2 以下 | 用新數據重新評估模型 |
 
-### 7.2 A/B Testing Policy
+### 7.2 A/B 測試政策
 
-All new models and significant model updates must pass A/B testing before full deployment.
+所有新模型和重大模型更新必須在全面部署前通過 A/B 測試。
 
-| Requirement | Details |
+| 要求 | 詳情 |
 |-------------|---------|
-| Minimum Test Duration | 14 days |
-| Statistical Significance | p-value below 0.05 (95% confidence) |
-| Traffic Split | Configurable; default 10% treatment, 90% control |
-| Rollback Criteria | If treatment performs worse than control at any point with statistical significance, rollback immediately |
-| Assignment Method | Consistent hashing by player ID to ensure the same player always sees the same model version |
+| 最小測試持續時間 | 14 天 |
+| 統計顯著性 | p 值低於 0.05（95% 置信度） |
+| 流量分割 | 可配置；默認 10% 治療組、90% 控制組 |
+| 回滾標準 | 如果治療組在任何時刻表現差於控制組且具有統計顯著性，立即回滾 |
+| 分配方法 | 按玩家 ID 進行一致哈希以確保同一玩家始終看到相同的模型版本 |
 
-### 7.3 Model Drift Monitoring
+### 7.3 模型漂移監控
 
-| Drift Type | Detection Method | Response |
+| 漂移類型 | 偵測方法 | 響應 |
 |------------|-----------------|----------|
-| Data Drift | Feature distribution changes (KS Test, PSI) | Investigate feature pipeline changes |
-| Concept Drift | Prediction distribution shift, accuracy decline | Schedule model retraining |
-| Missing Values | Missing value ratio increase | Investigate data source issues |
-| New Categories | Appearance of previously unseen categorical values | Update feature encoding |
+| 數據漂移（Data Drift） | 特徵分佈變化（KS 測試、PSI） | 調查特徵管道變化 |
+| 概念漂移（Concept Drift） | 預測分佈偏移、準確性下降 | 安排模型重新訓練 |
+| 缺失值（Missing Values） | 缺失值比率增加 | 調查數據源問題 |
+| 新類別（New Categories） | 出現以前未見過的類別值 | 更新特徵編碼 |
 
 ---
 
-## 8. Expected Outcomes
+## 8. 預期結果
 
-| Metric | Current (Rule-Based Only) | Target (With ML) |
+| 指標 | 當前（僅基於規則） | 目標（含 ML） |
 |--------|--------------------------|-------------------|
-| Fraud Detection Rate | 70% | 95% or higher |
-| False Positive Rate | 15% | Under 5% |
-| Mean Detection Latency | 200ms | Under 100ms |
-| Manual Review Volume | 100% of flagged cases | 30% reduction |
-| Bonus Abuse Losses | Baseline | 40% reduction |
+| 詐騙偵測率 | 70% | 95% 或更高 |
+| 誤判率 | 15% | 5% 以下 |
+| 平均偵測延遲 | 200ms | 100ms 以下 |
+| 人工審核量 | 已標記案例的 100% | 減少 30% |
+| 獎金濫用損失 | 基線 | 減少 40% |
 
 ---
 
-## Acceptance Criteria
+## 驗收標準
 
-- [ ] Abnormal Betting Detection model achieves ≥95% accuracy with latency under 50ms
-- [ ] Multi-Account Detection model identifies linked accounts with ≥90% accuracy under 100ms
-- [ ] Bonus Abuse Detection model flags systematic exploitation patterns with ≥85% accuracy
-- [ ] AML Risk Scoring assigns risk grades within 500ms with ≥80% accuracy against known money laundering patterns
-- [ ] Fraudulent Transaction Detection achieves ≥92% accuracy for payment fraud with latency under 100ms
-- [ ] All ML models pass A/B testing requirements (14 days, p-value < 0.05, 95% confidence)
-- [ ] Model drift monitoring detects PSI > 0.2 and triggers retraining alerts automatically
-- [ ] VIP players receive identical risk controls as non-VIP players (no exemptions permitted)
-- [ ] Game-type dimensional filtering correctly applies rules only to specified game categories
+- [ ] 異常投注偵測模型達到 ≥95% 準確性，延遲 50ms 以內
+- [ ] 多帳戶偵測模型以 ≥90% 準確性識別關聯帳戶，100ms 以內
+- [ ] 獎金濫用偵測模型以 ≥85% 準確性標記系統性利用模式
+- [ ] AML 風險評分在 500ms 內分配風險等級，對已知洗錢模式達到 ≥80% 準確性
+- [ ] 詐騙交易偵測對支付詐騙達到 ≥92% 準確性，延遲 100ms 以內
+- [ ] 所有 ML 模型通過 A/B 測試要求（14 天、p 值 < 0.05、95% 置信度）
+- [ ] 模型漂移監控偵測 PSI > 0.2 並自動觸發重新訓練警報
+- [ ] VIP 玩家接受與非 VIP 玩家相同的風險控制（不允許豁免）
+- [ ] 遊戲類型維度過濾正確地僅將規則應用於指定的遊戲類別
 
 ---
 
-## 9. Cross-References
+## 9. 交叉引用
 
-| Topic | Document |
+| 主題 | 文檔 |
 |-------|----------|
-| Detection Model Architecture | source/05_Risk_Control/05-02-01_Detection_Model.md |
-| Rule Configuration | source/05_Risk_Control/05-02-02_Rule_Configuration.md |
-| Operations Tools | source/05_Risk_Control/05-02-04_Operations_Tools.md |
-| Technical ML Architecture | architecture/05_Risk_Engine/ML_Integration_Architecture.md |
-| KYC/AML Compliance | source/05_Risk_Control/05-03_KYC_AML.md |
+| 偵測模型架構 | source/05_Risk_Control/05-02-01_Detection_Model.md |
+| 規則配置 | source/05_Risk_Control/05-02-02_Rule_Configuration.md |
+| 運營工具 | source/05_Risk_Control/05-02-04_Operations_Tools.md |
+| 技術 ML 架構 | architecture/05_Risk_Engine/ML_Integration_Architecture.md |
+| KYC/AML 合規 | source/05_Risk_Control/05-03_KYC_AML.md |
 
-### Technical Implementation
+### 技術實現
 
-→ **[ML Integration Architecture](../../architecture/05_Risk_Engine/ML_Integration_Architecture.md)** - Machine learning model deployment, feature engineering pipelines, real-time prediction API, model retraining workflows, and fraud detection algorithms
+→ **[ML Integration Architecture](../../architecture/05_Risk_Engine/ML_Integration_Architecture.md)** - 機器學習模型部署、特徵工程管道、即時預測 API、模型重新訓練工作流和詐騙偵測算法

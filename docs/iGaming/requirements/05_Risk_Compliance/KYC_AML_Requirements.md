@@ -1,438 +1,438 @@
-# KYC/AML Compliance Requirements
+# KYC/AML 合規需求
 
-> **Canonical Source**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
-> **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Architecture**: [KYC_Verification_API.md](../../architecture/05_Risk_Engine/KYC_Verification_API.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 4.0.0
+> **規範來源**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
+> **目標讀者**: 高管、合規官、產品經理
+> **相關架構**: [KYC_Verification_API.md](../../architecture/05_Risk_Engine/KYC_Verification_API.md)
+> **最後同步**: 2026-02-08
+> **源版本**: 4.0.0
 
 ---
 
-## Executive Summary
+## 執行摘要
 
-SmartAdmin iGaming platform implements a comprehensive KYC/AML compliance system to meet global multi-jurisdictional regulatory requirements. The system adopts a **tiered verification approach** (L0/L1/L2/L3) and a **Risk-Based Approach** for AML monitoring, balancing user experience with compliance costs.
+SmartAdmin iGaming 平台實施全面的 KYC/AML 合規系統，以滿足全球多司法管轄區監管要求。系統採用**分層驗證方法**（L0/L1/L2/L3）和**基於風險的方法**進行 AML 監控，平衡用戶體驗與合規成本。
 
-### Core Capabilities
+### 核心能力
 
-| Feature | Description | Business Value |
+| 功能 | 描述 | 業務價值 |
 |---------|-------------|----------------|
-| **Tiered Verification** | L0 (Registration) -> L1 (Identity) -> L2 (Address) -> L3 (SOF/SOW) | Reduces first-time registration friction with progressive trust building |
-| **Automated Review** | AI OCR + Facial Recognition, 90% auto-approval rate | Reduces labor costs, improves review efficiency |
-| **Risk-Based Approach** | Enhanced Due Diligence (EDD) for high-risk customers | Focuses resources on high-risk scenarios |
-| **Multi-Jurisdiction Support** | UK UKGC, Malta MGA, Gibraltar, Curacao | One system adapts to multiple markets |
-| **Audit Logs** | 7-year retention period, meets AML regulatory requirements | Compliance audits, historical traceability |
+| **分層驗證（Tiered Verification）** | L0（註冊）→ L1（身份）→ L2（地址）→ L3（資金來源/財富來源） | 降低首次註冊摩擦，逐步建立信任 |
+| **自動化審核（Automated Review）** | AI OCR + 面部識別，90% 自動批准率 | 降低人工成本，提高審核效率 |
+| **基於風險的方法（Risk-Based Approach）** | 對高風險客戶進行加強盡職調查（Enhanced Due Diligence, EDD） | 將資源集中在高風險場景 |
+| **多司法管轄區支持** | UK UKGC、Malta MGA、Gibraltar、Curacao | 一套系統適應多個市場 |
+| **審計日誌（Audit Logs）** | 7 年保留期，滿足 AML 監管要求 | 合規審計，歷史可追溯性 |
 
 ---
 
-## Regulatory Penalty Case Studies
+## 監管罰款案例研究
 
-**2023 European regulatory fines totaled GBP 348 million / USD 443 million**. Major cases include:
+**2023 年歐洲監管罰款總額達 3.48 億英鎊 / 4.43 億美元**。主要案例包括：
 
-- **Entain (Ladbrokes Coral)**: GBP 17M fine - Failed to conduct proper Source of Funds (SOF) checks
-- **Betfred**: GBP 3.25M fine - Allowed a player to deposit GBP 210,000 over 8 months without triggering AML alerts
-- **Caesars Entertainment**: USD 15M ransom payment - Internal systems breached due to insufficient employee security awareness
+- **Entain (Ladbrokes Coral)**: 1700 萬英鎊罰款 - 未能進行適當的資金來源（Source of Funds, SOF）檢查
+- **Betfred**: 325 萬英鎊罰款 - 允許玩家在 8 個月內存入 21 萬英鎊而未觸發 AML 警報
+- **Caesars Entertainment**: 1500 萬美元勒索贖金 - 因員工安全意識不足導致內部系統被入侵
 
-### Key Lessons
+### 關鍵教訓
 
-- Robust Customer Due Diligence (CDD) procedures are critical
-- Real-time transaction monitoring is essential
-- VIP customers require appropriate SOF/SOW checks
-- Employee security awareness training cannot be overlooked
+- 健全的客戶盡職調查（Customer Due Diligence, CDD）程序至關重要
+- 即時交易監控必不可少
+- VIP 客戶需要適當的資金來源/財富來源檢查
+- 員工安全意識培訓不可忽視
 
-> **VIP No Exemption Principle**: VIP players must undergo **exactly the same** risk control checks as regular players. VIP status only affects review queue priority, and **never** affects rule trigger thresholds or CDD/EDD requirements.
-> **Reference Case**: Entain GBP 17M fine (2022) - VIP customer due diligence failure.
+> **VIP 無豁免原則**: VIP 玩家必須接受與普通玩家**完全相同**的風控檢查。VIP 身份僅影響審核隊列優先級，**絕不**影響規則觸發閾值或 CDD/EDD 要求。
+> **參考案例**: Entain 1700 萬英鎊罰款（2022）- VIP 客戶盡職調查失敗。
 
 ---
 
-## 1. KYC Tiered Verification System
+## 1. KYC 分層驗證系統
 
-### 1.1 Four-Level Certification Standards
+### 1.1 四級認證標準
 
-SmartAdmin adopts a **progressive KYC system** that dynamically adjusts verification requirements based on player behavior:
+SmartAdmin 採用**漸進式 KYC 系統**，根據玩家行為動態調整驗證要求：
 
-| Level | Verification Requirements | Withdrawal Limit | Use Case | Automation Level |
+| 級別 | 驗證要求 | 提款限額 | 使用場景 | 自動化程度 |
 |-------|--------------------------|------------------|----------|------------------|
-| **L0 (Registration)** | Phone/Email verification | No withdrawals | Initial registration, trial mode | 100% automated |
-| **L1 (Identity)** | Upload ID (Passport/ID Card), AI OCR + Facial comparison | <= $2,000/day | Small players, daily withdrawals | 90% automated |
-| **L2 (Address)** | Upload utility bill/bank statement, address matching | <= $10,000/day | Medium players, VIP level upgrades | 70% automated |
-| **L3 (Source of Wealth)** | Provide SOF (Source of Funds), SOW (Source of Wealth) documents | Unlimited | Large transactions (> EUR 10,000), PEPs (Politically Exposed Persons) | 0% automated (manual review) |
+| **L0（註冊）** | 電話/電子郵件驗證 | 無提款 | 初次註冊，試玩模式 | 100% 自動化 |
+| **L1（身份）** | 上傳身份證件（護照/身份證），AI OCR + 面部比對 | <= $2,000/天 | 小額玩家，日常提款 | 90% 自動化 |
+| **L2（地址）** | 上傳水電費帳單/銀行對帳單，地址匹配 | <= $10,000/天 | 中額玩家，VIP 等級升級 | 70% 自動化 |
+| **L3（財富來源）** | 提供 SOF（資金來源）、SOW（財富來源）文件 | 無限額 | 大額交易（> 10,000 歐元）、政治敏感人士（PEPs） | 0% 自動化（人工審核） |
 
-### 1.2 Upgrade Trigger Rules
+### 1.2 升級觸發規則
 
-**L1 Upgrade Triggers**:
-- UKGC: GBP 2,000 cumulative deposits OR first withdrawal request
-- General: Cumulative deposit >= 2,000 currency units
+**L1 升級觸發條件**：
+- UKGC: 累計存款 >= 2,000 英鎊或首次提款請求
+- 一般: 累計存款 >= 2,000 幣種單位
 
-**L2 Upgrade Triggers**:
-- Cumulative deposit >= 5,000 currency units
-- VIP level >= 3
+**L2 升級觸發條件**：
+- 累計存款 >= 5,000 幣種單位
+- VIP 等級 >= 3
 
-**L3 EDD Triggers**:
-- Single transaction >= 10,000 currency units
-- Cumulative deposit >= 50,000 currency units
-- Identified as PEP
-- Risk score >= 80
+**L3 EDD 觸發條件**：
+- 單筆交易 >= 10,000 幣種單位
+- 累計存款 >= 50,000 幣種單位
+- 識別為 PEP
+- 風險評分 >= 80
 
-### 1.3 Key Performance Indicators (KPI)
+### 1.3 關鍵績效指標（KPI）
 
-- **Auto-approval rate**: Target >= 90% (L1), >= 70% (L2)
-- **Manual review SLA**: 95% cases completed within 24 hours
-- **False positive rate**: < 2% (legitimate players incorrectly rejected)
-- **Average review time**: L1 < 5 minutes, L2 < 30 minutes
+- **自動批准率**: 目標 >= 90%（L1）、>= 70%（L2）
+- **人工審核 SLA**: 95% 案例在 24 小時內完成
+- **誤判率**: < 2%（合法玩家被錯誤拒絕）
+- **平均審核時間**: L1 < 5 分鐘、L2 < 30 分鐘
 
-### 1.4 Third-Party Provider Options
+### 1.4 第三方供應商選項
 
-| Provider | Function | Cost | Recommendation |
+| 供應商 | 功能 | 成本 | 建議 |
 |----------|----------|------|----------------|
-| **Sumsub** | Full KYC flow (OCR + Face + Liveness) | $0.5-2.0/verification | Small operators (< 10K players) |
-| **Jumio** | Identity verification + AML screening | $1.0-3.0/verification | Medium operators (10K-100K) |
-| **AWS Rekognition** | Facial comparison + Liveness detection | $0.001/image | All sizes |
-| **Tesseract OCR** | Open-source OCR (self-hosted) | Free | Large operators (> 100K) |
-| **Cifas** | UK National Fraud Database | GBP 5,000/year | UK-licensed operators |
+| **Sumsub** | 完整 KYC 流程（OCR + Face + Liveness） | $0.5-2.0/次驗證 | 小型運營商（< 10K 玩家） |
+| **Jumio** | 身份驗證 + AML 篩查 | $1.0-3.0/次驗證 | 中型運營商（10K-100K） |
+| **AWS Rekognition** | 面部比對 + 活體偵測 | $0.001/張圖像 | 所有規模 |
+| **Tesseract OCR** | 開源 OCR（自托管） | 免費 | 大型運營商（> 100K） |
+| **Cifas** | 英國國家詐騙數據庫 | 5,000 英鎊/年 | 英國持牌運營商 |
 
-**Recommended Solutions**:
-- **Small operators (< 10K players)**: Sumsub all-in-one (fast deployment)
-- **Medium operators (10K-100K)**: Jumio + AWS Rekognition (cost-optimized)
-- **Large operators (> 100K)**: Self-built OCR + AWS Rekognition (lowest cost)
+**推薦方案**：
+- **小型運營商（< 10K 玩家）**: Sumsub 全合一（快速部署）
+- **中型運營商（10K-100K）**: Jumio + AWS Rekognition（成本優化）
+- **大型運營商（> 100K）**: 自建 OCR + AWS Rekognition（成本最低）
 
 ---
 
-## 2. AML Anti-Money Laundering Requirements
+## 2. AML 反洗錢要求
 
-### 2.1 Money Laundering Three Stages
+### 2.1 洗錢三階段
 
-| Stage | Description | Detection Focus |
+| 階段 | 描述 | 偵測重點 |
 |-------|-------------|-----------------|
-| **Placement** | Illegal cash deposited into gambling accounts via small frequent deposits to avoid CDD thresholds | Multi-account detection, deposit frequency monitoring |
-| **Layering** | Multiple low-risk bets (sports arbitrage, low-stake slots), cross-account transfers | Abnormal betting patterns, effective wager rate < 30% |
-| **Integration** | Withdrawal to bank accounts, funds appear as legitimate gambling winnings | Large withdrawal monitoring, fund flow aggregation |
+| **安置（Placement）** | 非法現金通過小額頻繁存款存入賭博帳戶以規避 CDD 閾值 | 多帳戶偵測，存款頻率監控 |
+| **分層（Layering）** | 多次低風險投注（體育套利、低注額老虎機）、跨帳戶轉賬 | 異常投注模式，有效投注率 < 30% |
+| **整合（Integration）** | 提款至銀行帳戶，資金看似合法賭博贏獎 | 大額提款監控，資金流動聚合 |
 
-### 2.2 Customer Due Diligence (CDD) Requirements
+### 2.2 客戶盡職調查（CDD）要求
 
-**Standard CDD Process**:
-1. **Customer Identification**: Collect basic information (name, DOB, address, nationality)
-2. **Identity Verification**: Government-issued ID + address proof
-3. **Ongoing Monitoring**: Transaction behavior anomaly detection, periodic re-verification (every 12 months)
+**標準 CDD 流程**：
+1. **客戶識別**: 收集基本信息（姓名、出生日期、地址、國籍）
+2. **身份驗證**: 政府頒發的身份證件 + 地址證明
+3. **持續監控**: 交易行為異常偵測，定期重新驗證（每 12 個月）
 
-**Trigger Conditions by Jurisdiction**:
+**按司法管轄區的觸發條件**：
 
-| Jurisdiction | CDD Threshold | Notes |
+| 司法管轄區 | CDD 閾值 | 備註 |
 |--------------|---------------|-------|
-| **EU** | Single transaction >= EUR 2,000 | EU AML 5th Directive |
-| **UK (UKGC)** | Cumulative deposit >= GBP 2,000 OR first withdrawal | Most stringent |
-| **Malta (MGA)** | Single transaction >= EUR 2,000 | EU-aligned |
+| **歐盟** | 單筆交易 >= 2,000 歐元 | EU AML 第五指令 |
+| **英國（UKGC）** | 累計存款 >= 2,000 英鎊或首次提款 | 最嚴格 |
+| **馬耳他（MGA）** | 單筆交易 >= 2,000 歐元 | 與歐盟一致 |
 
-### 2.3 Enhanced Due Diligence (EDD) Requirements
+### 2.3 加強盡職調查（EDD）要求
 
-**Applicable Subjects**:
-- **Politically Exposed Persons (PEPs)**: Current/former government officials, legislators, military officers
-- **High-Risk Region Customers**: FATF blacklist countries (North Korea, Iran, Myanmar)
-- **Large Transaction Customers**: Single deposit > EUR 10,000 OR cumulative deposit > EUR 50,000
+**適用對象**：
+- **政治敏感人士（Politically Exposed Persons, PEPs）**: 現任/前任政府官員、立法者、軍官
+- **高風險地區客戶**: FATF 黑名單國家（北韓、伊朗、緬甸）
+- **大額交易客戶**: 單筆存款 > 10,000 歐元或累計存款 > 50,000 歐元
 
-**Additional Requirements**:
-- Source of Wealth (SOW): Salary slips, property documents, inheritance documents
-- Source of Funds (SOF): Bank statements, investment portfolio reports
-- Purpose of Transaction: Declaration of gambling motivation
-- Senior Management Approval: Requires MLRO (Money Laundering Reporting Officer) sign-off
+**額外要求**：
+- 財富來源（Source of Wealth, SOW）: 薪資單、財產文件、繼承文件
+- 資金來源（Source of Funds, SOF）: 銀行對帳單、投資組合報告
+- 交易目的: 賭博動機聲明
+- 高級管理層批准: 需要 MLRO（Money Laundering Reporting Officer，反洗錢報告官）簽字
 
-### 2.4 Suspicious Activity Report (SAR) Requirements
+### 2.4 可疑活動報告（SAR）要求
 
-**Mandatory Reporting Scenarios**:
-- Player refuses to provide KYC documents or provides forged documents
-- Fund flow aggregation: Multiple accounts withdrawing to the same bank account
-- Abnormal betting patterns: Sports arbitrage, effective wager rate < 20%
-- Large cash transactions: Single deposit > EUR 10,000 without reasonable explanation
-- Shared account usage: Frequent device/IP changes on login
+**強制報告場景**：
+- 玩家拒絕提供 KYC 文件或提供偽造文件
+- 資金流動聚合: 多個帳戶提款至同一銀行帳戶
+- 異常投注模式: 體育套利，有效投注率 < 20%
+- 大額現金交易: 單筆存款 > 10,000 歐元且無合理解釋
+- 共享帳戶使用: 登入時設備/IP 頻繁變更
 
-**Reporting Deadlines by Jurisdiction**:
+**按司法管轄區的報告截止日期**：
 
-| Jurisdiction | Deadline | Reporting Authority |
+| 司法管轄區 | 截止日期 | 報告機構 |
 |--------------|----------|---------------------|
-| **UK (UKGC)** | **7 working days** from suspicion formed | NCA (National Crime Agency) |
-| **Malta (MGA)** | 15 days | FIAU (Financial Intelligence Analysis Unit) |
-| **Gibraltar** | 7 days | GFIU (Gibraltar Financial Intelligence Unit) |
-| **Curacao** | 30 days | Gaming Control Board |
+| **英國（UKGC）** | **7 個工作日**自懷疑形成 | NCA（National Crime Agency，國家犯罪局） |
+| **馬耳他（MGA）** | 15 天 | FIAU（Financial Intelligence Analysis Unit，金融情報分析單位） |
+| **直布羅陀（Gibraltar）** | 7 天 | GFIU（Gibraltar Financial Intelligence Unit） |
+| **庫拉索（Curacao）** | 30 天 | Gaming Control Board（博彩控制委員會） |
 
-> **Important Correction (2026-02-07)**: Per UKGC AML Guidance 2023 and POCA 2002 Section 330, SAR must be submitted within **7 working days** of suspicion forming, not 14 days.
+> **重要更正（2026-02-07）**: 根據 UKGC AML 指南 2023 和 POCA 2002 第 330 條，SAR 必須在懷疑形成後 **7 個工作日內**提交，而非 14 天。
 
-### 2.5 Transaction Monitoring Rules
+### 2.5 交易監控規則
 
-| Indicator | Threshold | Action | False Positive Rate |
+| 指標 | 閾值 | 動作 | 誤判率 |
 |-----------|-----------|--------|---------------------|
-| **Deposit Frequency** | > 10 transactions/hour | FLAG (manual review) | 8% |
-| **Small Frequent Deposits** | > 20 deposits < EUR 50/day | FLAG (suspicious placement) | 12% |
-| **Two-Sided Betting** | Sports hedge > EUR 1,000 | BLOCK (money laundering risk) | 3% |
-| **Fund Aggregation** | 3+ accounts -> same bank account | BLOCK + SAR | 1% |
-| **Effective Wager Rate** | < 20% (consecutive 7 days) | FLAG (low-risk games) | 15% |
-| **Rapid Withdrawal** | Withdrawal within 24h of deposit | FLAG (test account) | 20% |
+| **存款頻率** | > 10 筆交易/小時 | FLAG（人工審核） | 8% |
+| **小額頻繁存款** | > 20 筆存款 < 50 歐元/天 | FLAG（可疑安置） | 12% |
+| **雙向投注** | 體育對沖 > 1,000 歐元 | BLOCK（洗錢風險） | 3% |
+| **資金聚合** | 3+ 帳戶 → 同一銀行帳戶 | BLOCK + SAR | 1% |
+| **有效投注率** | < 20%（連續 7 天） | FLAG（低風險遊戲） | 15% |
+| **快速提款** | 存款後 24 小時內提款 | FLAG（測試帳戶） | 20% |
 
-**Effective Wager Rate Formula**:
+**有效投注率公式**：
 ```
-Effective Wager Rate = (Actual Risk Wager Amount / Total Wager Amount) x 100%
+有效投注率 = (實際風險投注金額 / 總投注金額) × 100%
 
-Actual Risk Wager Calculation:
-- Sports arbitrage betting: 0% (fully hedged)
-- Slot low stake (< 10% minimum bet): 30%
-- Live games normal betting: 100%
+實際風險投注計算：
+- 體育套利投注: 0%（完全對沖）
+- 老虎機低注額（< 10% 最小投注）: 30%
+- 真人遊戲正常投注: 100%
 ```
 
 ---
 
-## 3. Multi-Jurisdiction Requirements
+## 3. 多司法管轄區要求
 
-### 3.1 Regulatory Authority Comparison
+### 3.1 監管機構比較
 
-| Jurisdiction | Regulator | CDD Threshold | SAR Deadline | Special Requirements | Strictness |
+| 司法管轄區 | 監管機構 | CDD 閾值 | SAR 截止日期 | 特殊要求 | 嚴格程度 |
 |--------------|-----------|---------------|--------------|----------------------|------------|
-| **UK** | UKGC | GBP 2,000 cumulative | 7 working days | Credit card gambling banned, GamStop mandatory | Most strict |
-| **Malta** | MGA | EUR 2,000 single | 15 days | EU AML Directive compliant, 10-year license | High |
-| **Gibraltar** | GRA | GBP 2,000 | 7 days | Dedicated AML Code of Practice, audit requirements | High |
-| **Curacao** | Gaming Control Board | USD 2,500 | 30 days | Crypto allowed, less stringent oversight | Moderate |
-| **Philippines** | PAGCOR | PHP 100,000 (~USD 2,000) | 5 working days | AMLC supervision, local server required | Moderate-High |
+| **英國** | UKGC | 2,000 英鎊累計 | 7 個工作日 | 禁止信用卡賭博、GamStop 強制 | 最嚴格 |
+| **馬耳他** | MGA | 2,000 歐元單筆 | 15 天 | 符合 EU AML 指令、10 年牌照 | 高 |
+| **直布羅陀** | GRA | 2,000 英鎊 | 7 天 | 專用 AML 行為準則、審計要求 | 高 |
+| **庫拉索** | Gaming Control Board | 2,500 美元 | 30 天 | 允許加密貨幣、監管較寬鬆 | 中 |
+| **菲律賓** | PAGCOR | 100,000 菲律賓披索（~2,000 美元） | 5 個工作日 | AMLC 監督、需要本地服務器 | 中-高 |
 
-### 3.2 UK UKGC Special Requirements (Most Stringent)
+### 3.2 英國 UKGC 特殊要求（最嚴格）
 
-**2025 New Regulations**:
-- **Instant KYC Verification** (from January 2025): 72-hour grace period removed, **must verify before deposits**
-- **Affordability Assessment**: GBP 125-500 display warning, GBP 500-2,000 player self-declaration, > GBP 2,000 third-party verification
-- **Gambling Levy**: From April 6, 2025, tiered by GGR (0.1%-1.1%)
-- **Credit Card Ban** (from April 2020): No credit card gambling
-- **Mandatory SOF Checks**: At GBP 2,000 cumulative deposit
-- **GamStop Self-Exclusion**: Must integrate national self-exclusion system
-- **Affordability Checks**: Net loss > GBP 2,000/90 days requires financial capability assessment
-- **No VIP Exemptions**: All players (including VIP) must undergo same AML checks
+**2025 年新規定**：
+- **即時 KYC 驗證**（自 2025 年 1 月起）: 取消 72 小時寬限期，**必須在存款前驗證**
+- **負擔能力評估（Affordability Assessment）**: 125-500 英鎊顯示警告、500-2,000 英鎊玩家自我聲明、> 2,000 英鎊第三方驗證
+- **賭博稅（Gambling Levy）**: 自 2025 年 4 月 6 日起，按 GGR 分級（0.1%-1.1%）
+- **信用卡禁令**（自 2020 年 4 月起）: 禁止信用卡賭博
+- **強制 SOF 檢查**: 累計存款達 2,000 英鎊時
+- **GamStop 自我排除**: 必須整合國家自我排除系統
+- **負擔能力檢查**: 淨損失 > 2,000 英鎊/90 天需要財務能力評估
+- **無 VIP 豁免**: 所有玩家（包括 VIP）必須接受相同的 AML 檢查
 
-**Penalty Cases**:
-- **Entain (2022)**: GBP 17M - Failed SOF checks on VIP players
-- **Betfred (2021)**: GBP 3.25M - Failed to trigger AML alerts (player deposited GBP 210,000 over 8 months)
+**罰款案例**：
+- **Entain（2022）**: 1700 萬英鎊 - VIP 玩家 SOF 檢查失敗
+- **Betfred（2021）**: 325 萬英鎊 - 未能觸發 AML 警報（玩家在 8 個月內存入 21 萬英鎊）
 
-### 3.3 EU AML Fifth Directive (5AMLD)
+### 3.3 歐盟 AML 第五指令（5AMLD）
 
-**Core Changes** (effective 2020):
-- Virtual currency exchanges brought under regulation
-- Anonymous prepaid card limit reduced to EUR 150
-- High-risk third country list updated (23 countries)
-- Beneficial ownership transparency requirements
+**核心變更**（2020 年生效）：
+- 虛擬貨幣交易所納入監管
+- 匿名預付卡限額降至 150 歐元
+- 更新高風險第三國清單（23 個國家）
+- 實益所有權透明度要求
 
-**Impact on iGaming Platforms**:
-- Cryptocurrency deposits require KYC (even small amounts)
-- Prepaid card payments require additional verification
-- Players from high-risk countries automatically trigger EDD
+**對 iGaming 平台的影響**：
+- 加密貨幣存款需要 KYC（即使小額）
+- 預付卡支付需要額外驗證
+- 來自高風險國家的玩家自動觸發 EDD
 
 ---
 
-## 4. Politically Exposed Persons (PEP) Handling
+## 4. 政治敏感人士（PEP）處理
 
-### 4.1 PEP Definition and Classification
+### 4.1 PEP 定義與分類
 
-Per FATF guidelines and EU 4AMLD/5AMLD:
+根據 FATF 指南和 EU 4AMLD/5AMLD：
 
-| Category | Definition | Risk Level |
+| 類別 | 定義 | 風險等級 |
 |----------|------------|------------|
-| **Foreign PEP** | Senior foreign government officials, legislators, judges, military officers, state enterprise executives | Highest |
-| **Domestic PEP** | Senior domestic government officials and equivalent positions | High |
-| **International Organization PEP** | Senior positions in international organizations (UN, EU, IMF, etc.) | High |
-| **PEP Associates** | PEP family members, close business associates | Medium-High |
+| **外國 PEP（Foreign PEP）** | 高級外國政府官員、立法者、法官、軍官、國有企業高管 | 最高 |
+| **國內 PEP（Domestic PEP）** | 高級國內政府官員及同等職位 | 高 |
+| **國際組織 PEP（International Organization PEP）** | 國際組織（UN、EU、IMF 等）高級職位 | 高 |
+| **PEP 關聯人（PEP Associates）** | PEP 家庭成員、密切商業夥伴 | 中-高 |
 
-**Family Member Definition**:
-- Spouse/cohabiting partner
-- Children and their spouses/partners
-- Parents
+**家庭成員定義**：
+- 配偶/同居伴侶
+- 子女及其配偶/伴侶
+- 父母
 
-**Close Business Associate Definition**:
-- Person who co-beneficially owns a legal entity with a PEP
-- Person with close business relationship with a PEP
-- Sole beneficial owner of a legal entity where PEP actually benefits
+**密切商業夥伴定義**：
+- 與 PEP 共同實益擁有法律實體的人
+- 與 PEP 有密切商業關係的人
+- 法律實體的唯一實益所有人，但 PEP 實際受益
 
-### 4.2 PEP Screening Process
+### 4.2 PEP 篩查流程
 
-1. Screen against PEP lists (World-Check, Dow Jones) at registration and periodic re-screening
-2. **Exact match** (>= 95% confidence): Automatically trigger EDD, account restrictions
-3. **Fuzzy match** (70-95%): Manual review queue (24h SLA)
-4. **No match**: Normal process
-5. If confirmed PEP: Request SOF + SOW documents, MLRO approval required
-6. Ongoing monitoring: Monthly transaction review, annual re-screening
+1. 在註冊時和定期重新篩查時針對 PEP 清單（World-Check、Dow Jones）進行篩查
+2. **精確匹配**（>= 95% 置信度）: 自動觸發 EDD，帳戶限制
+3. **模糊匹配**（70-95%）: 人工審核隊列（24 小時 SLA）
+4. **無匹配**: 正常流程
+5. 如果確認 PEP: 要求 SOF + SOW 文件，需要 MLRO 批准
+6. 持續監控: 每月交易審查，年度重新篩查
 
-### 4.3 PEP EDD Requirements
+### 4.3 PEP EDD 要求
 
-Required documents for PEP accounts:
-- **SOF (Source of Funds)**: Bank statements showing fund origin
-- **SOW (Source of Wealth)**: Documentation of overall wealth accumulation
-- **PEP Declaration**: Signed declaration of PEP status
-- **Purpose Statement**: Account usage explanation
+PEP 帳戶所需文件：
+- **SOF（資金來源）**: 顯示資金來源的銀行對帳單
+- **SOW（財富來源）**: 整體財富累積的文件
+- **PEP 聲明**: 簽署的 PEP 身份聲明
+- **目的聲明**: 帳戶使用說明
 
 ---
 
-## 5. Counter-Terrorism Financing (CTF)
+## 5. 反恐融資（CTF）
 
-### 5.1 CTF Regulatory Framework
+### 5.1 CTF 監管框架
 
-| Authority | List Type | Update Frequency |
+| 機構 | 清單類型 | 更新頻率 |
 |-----------|-----------|------------------|
-| **UN** | UN Security Council Sanctions | Immediate |
-| **OFAC** | SDN List (US) | Daily |
-| **EU** | EU Consolidated Sanctions | Weekly |
-| **UK** | UK Sanctions List | Daily |
-| **FATF** | High-Risk Jurisdictions | Quarterly |
+| **UN** | UN Security Council Sanctions | 立即 |
+| **OFAC** | SDN List（美國） | 每日 |
+| **EU** | EU Consolidated Sanctions | 每週 |
+| **UK** | UK Sanctions List | 每日 |
+| **FATF** | 高風險司法管轄區 | 每季 |
 
-### 5.2 Sanctions Screening Requirements
+### 5.2 制裁篩查要求
 
-When a player matches a sanctions list:
-1. **Immediate account freeze** - prohibit all transactions
-2. **Notify MLRO** within 30 minutes
-3. **MLRO confirms match** - rule out namesakes
-4. If confirmed: **Report to regulatory authority** within 24 hours
-5. Maintain freeze pending regulatory decision
-6. Execute confiscation or unfreeze per regulatory instruction
+當玩家匹配制裁清單時：
+1. **立即凍結帳戶** - 禁止所有交易
+2. **通知 MLRO** 30 分鐘內
+3. **MLRO 確認匹配** - 排除同名者
+4. 如果確認: **向監管機構報告** 24 小時內
+5. 維持凍結，等待監管決定
+6. 根據監管指示執行沒收或解凍
 
-### 5.3 High-Risk Jurisdictions
+### 5.3 高風險司法管轄區
 
-**FATF Blacklist (High-Risk)**:
-- North Korea (KP), Iran (IR), Myanmar (MM)
+**FATF 黑名單（高風險）**：
+- 北韓（KP）、伊朗（IR）、緬甸（MM）
 
-**FATF Greylist (Increased Monitoring)**:
-- Syria, Yemen, Afghanistan, Albania, Burkina Faso, Cameroon, Congo (DR), Ghana, Haiti, Jamaica, Jordan, Mali, Mozambique, Nicaragua, Nigeria, Panama, Philippines, Senegal, South Sudan, Tanzania, Togo, Uganda, UAE, Vietnam
+**FATF 灰名單（加強監控）**：
+- 敘利亞、葉門、阿富汗、阿爾巴尼亞、布基納法索、喀麥隆、剛果（民主共和國）、加納、海地、牙買加、約旦、馬利、莫桑比克、尼加拉瓜、尼日利亞、巴拿馬、菲律賓、塞內加爾、南蘇丹、坦桑尼亞、多哥、烏干達、阿聯酋、越南
 
-Players from these jurisdictions automatically trigger EDD.
+來自這些司法管轄區的玩家自動觸發 EDD。
 
 ---
 
-## 6. Smurfing (Structuring) Detection
+## 6. 拆分（Structuring）偵測
 
-### 6.1 Definition
+### 6.1 定義
 
-Smurfing (also called Structuring) is a money laundering technique that splits large transactions into multiple small transactions to evade reporting thresholds.
+拆分（也稱為 Structuring）是一種洗錢技術，將大額交易拆分為多個小額交易以規避報告閾值。
 
-| Characteristic | Description |
+| 特徵 | 描述 |
 |----------------|-------------|
-| **Purpose** | Evade CDD/EDD trigger thresholds |
-| **Method** | Split transactions below thresholds |
-| **Common Thresholds** | EUR 2,000 (MGA) / GBP 2,000 (UKGC) |
+| **目的** | 規避 CDD/EDD 觸發閾值 |
+| **方法** | 拆分交易低於閾值 |
+| **常見閾值** | 2,000 歐元（MGA）/ 2,000 英鎊（UKGC） |
 
-### 6.2 Detection Rules
+### 6.2 偵測規則
 
-| Rule | Condition | Risk Level | Action |
+| 規則 | 條件 | 風險等級 | 動作 |
 |------|-----------|------------|--------|
-| **High-frequency near-threshold** | 24h: >= 3 deposits of EUR 1,500-1,999 | Critical | SAR + Freeze |
-| **Cumulative exceeded** | 7-day cumulative deposit > EUR 10,000 (multiple small amounts) | High | Trigger EDD |
-| **Split pattern** | Multiple small test deposits before large deposit | High | FLAG |
-| **Cross-account split** | Linked accounts total exceeds threshold | Critical | SAR |
+| **高頻接近閾值** | 24 小時: >= 3 筆 1,500-1,999 歐元存款 | 極高 | SAR + 凍結 |
+| **累計超額** | 7 天累計存款 > 10,000 歐元（多次小額） | 高 | 觸發 EDD |
+| **拆分模式** | 大額存款前多次小額測試存款 | 高 | FLAG |
+| **跨帳戶拆分** | 關聯帳戶總額超過閾值 | 極高 | SAR |
 
 ---
 
-## 7. MLRO Role and Responsibilities
+## 7. MLRO 角色與職責
 
-### 7.1 MLRO Definition
+### 7.1 MLRO 定義
 
-Money Laundering Reporting Officer (MLRO) is a key compliance role required by regulators.
+反洗錢報告官（Money Laundering Reporting Officer, MLRO）是監管機構要求的關鍵合規角色。
 
-| Regulator | MLRO Requirement |
+| 監管機構 | MLRO 要求 |
 |-----------|------------------|
-| **UKGC** | Must designate, reports to NCA |
-| **MGA** | Must designate, reports to FIAU |
-| **Gibraltar** | Must designate, reports to GFIU |
+| **UKGC** | 必須指定，向 NCA 報告 |
+| **MGA** | 必須指定，向 FIAU 報告 |
+| **直布羅陀** | 必須指定，向 GFIU 報告 |
 
-### 7.2 MLRO Core Responsibilities
+### 7.2 MLRO 核心職責
 
-**Daily Responsibilities**:
-- Review and decide whether to submit SAR
-- Maintain AML policies and procedures
-- Oversee transaction monitoring systems
-- Handle internal whistleblowing
+**日常職責**：
+- 審查並決定是否提交 SAR
+- 維護 AML 政策和程序
+- 監督交易監控系統
+- 處理內部舉報
 
-**Periodic Responsibilities**:
-- Monthly: AML alert statistics report
-- Quarterly: Report AML status to Board
-- Annual: AML policy review and update
-- Annual: Employee AML training program
+**定期職責**：
+- 每月: AML 警報統計報告
+- 每季: 向董事會報告 AML 狀態
+- 每年: AML 政策審查與更新
+- 每年: 員工 AML 培訓計劃
 
-**Emergency Responsibilities**:
-- Urgent SAR submission (terrorism financing, etc.)
-- Regulatory investigation cooperation
-- Asset freeze order execution
+**緊急職責**：
+- 緊急 SAR 提交（恐怖融資等）
+- 監管調查合作
+- 資產凍結令執行
 
-**Authority Requirements**:
-- Independent reporting line (direct to Board)
-- Access to all AML-related information
-- Authority to freeze suspicious accounts
-- Authority to reject high-risk customers
-
----
-
-## 8. Compliance Checklist
-
-### 8.1 Pre-Launch Requirements
-
-- [ ] KYC tiered system implemented (L0/L1/L2/L3)
-- [ ] Automated review process (OCR + Facial comparison + Liveness detection)
-- [ ] AML transaction monitoring rules (at least 6 core rules)
-- [ ] SAR reporting process (with deadline monitoring)
-- [ ] Audit log Hash Chain (7-year retention)
-- [ ] Third-party integration (Sumsub/Jumio or self-built)
-- [ ] Blacklist integration (Cifas/PEPs/FATF)
-- [ ] Employee AML training (2 times per year)
-- [ ] MLRO designated (Money Laundering Reporting Officer)
-- [ ] Compliance policy documentation (AML Policy, KYC Manual)
-
-### 8.2 Periodic Maintenance
-
-- [ ] Quarterly audit (Hash Chain verification, SAR timeliness rate)
-- [ ] Monthly blacklist update (Cifas, PEPs)
-- [ ] Semi-annual risk model tuning (reduce false positive rate)
-- [ ] Annual regulatory requirement update (UKGC/MGA policy changes)
+**權限要求**：
+- 獨立報告線（直接向董事會）
+- 訪問所有 AML 相關信息
+- 凍結可疑帳戶的權力
+- 拒絕高風險客戶的權力
 
 ---
 
-## 9. Best Practices
+## 8. 合規檢查清單
 
-### 9.1 Balancing Compliance and User Experience
+### 8.1 上線前要求
 
-| Scenario | Traditional Approach (High Friction) | SmartAdmin Optimization |
+- [ ] KYC 分層系統實施（L0/L1/L2/L3）
+- [ ] 自動化審核流程（OCR + 面部比對 + 活體偵測）
+- [ ] AML 交易監控規則（至少 6 條核心規則）
+- [ ] SAR 報告流程（含截止日期監控）
+- [ ] 審計日誌 Hash Chain（7 年保留）
+- [ ] 第三方整合（Sumsub/Jumio 或自建）
+- [ ] 黑名單整合（Cifas/PEPs/FATF）
+- [ ] 員工 AML 培訓（每年 2 次）
+- [ ] 指定 MLRO（反洗錢報告官）
+- [ ] 合規政策文檔（AML 政策、KYC 手冊）
+
+### 8.2 定期維護
+
+- [ ] 季度審計（Hash Chain 驗證、SAR 及時率）
+- [ ] 每月黑名單更新（Cifas、PEPs）
+- [ ] 半年風險模型調整（降低誤判率）
+- [ ] 年度監管要求更新（UKGC/MGA 政策變更）
+
+---
+
+## 9. 最佳實踐
+
+### 9.1 平衡合規與用戶體驗
+
+| 場景 | 傳統方法（高摩擦） | SmartAdmin 優化 |
 |----------|--------------------------------------|-------------------------|
-| **First Registration** | Immediately require ID upload | L0 (phone only) -> Allow trial -> L1 on first withdrawal |
-| **KYC Review** | 1-3 day manual review | 90% auto-approval (< 5 min) -> Only 10% manual review |
-| **Large Transactions** | Immediate freeze + SOF request | Soft prompt (advance notice) + 48-hour buffer |
-| **VIP Players** | KYC exemption (violation) | Equal treatment + Dedicated support for document preparation |
+| **首次註冊** | 立即要求上傳身份證件 | L0（僅電話）→ 允許試玩 → 首次提款時 L1 |
+| **KYC 審核** | 1-3 天人工審核 | 90% 自動批准（< 5 分鐘）→ 僅 10% 人工審核 |
+| **大額交易** | 立即凍結 + 要求 SOF | 軟提示（提前通知）+ 48 小時緩衝 |
+| **VIP 玩家** | KYC 豁免（違規） | 平等對待 + 專屬支持協助準備文件 |
 
-### 9.2 Common Pitfalls to Avoid
+### 9.2 常見錯誤避免
 
-| Mistake | Risk | Correct Approach |
+| 錯誤 | 風險 | 正確方法 |
 |---------|------|------------------|
-| VIP exemption from KYC | Entain fined GBP 17M for this | All players undergo same AML process |
-| No alerts for small frequent deposits | Structuring evades regulation | Set > 20 deposits < EUR 50/day to trigger FLAG |
-| Delayed SAR submission | Regulatory fines + license revocation | Automated process + SLA monitoring (100% within deadline) |
-| Unencrypted/modifiable audit logs | Compliance audit failure | Hash Chain + HMAC tamper-proofing + 7-year retention |
+| VIP 豁免 KYC | Entain 因此被罰 1700 萬英鎊 | 所有玩家接受相同的 AML 流程 |
+| 小額頻繁存款無警報 | 拆分規避監管 | 設置 > 20 筆存款 < 50 歐元/天觸發 FLAG |
+| 延遲 SAR 提交 | 監管罰款 + 牌照吊銷 | 自動化流程 + SLA 監控（100% 截止日期內） |
+| 未加密/可修改審計日誌 | 合規審計失敗 | Hash Chain + HMAC 防篡改 + 7 年保留 |
 
-### 9.3 Cost Optimization
+### 9.3 成本優化
 
-**Cost Estimate (100K players/year)**:
-- Full outsourcing: $150,000 - $200,000/year
-- Hybrid approach (recommended): $30,000 - $50,000/year
-- Fully self-built: $5,000 - $10,000/year (excluding labor costs)
-
----
-
-## Related Documentation
-
-### Business References
-- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - AML monitoring, risk scoring model
-- [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) - Fund flow aggregation detection
-- [01-01 Player Lifecycle](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) - KYC trigger logic, registration flow
-
-### Compliance Framework
-- [06-08 UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK license specific requirements (2025 new regulations)
-- [06-09 MGA Compliance](../../source-archive/06_Platform_Governance/06-09_MGA_Compliance.md) - Malta license requirements
-- [15 Responsible Gambling](../../source-archive/15_Responsible_Gambling/) - Complete responsible gambling module
-
-### External References
-- FATF Guidance: [www.fatf-gafi.org](https://www.fatf-gafi.org)
-- UKGC AML Guide: [www.gamblingcommission.gov.uk](https://www.gamblingcommission.gov.uk)
-
-### Technical Implementation
-
-→ **[KYC Verification API](../../architecture/05_Risk_Engine/KYC_Verification_API.md)** - KYC/AML verification workflows, OCR identity document processing, third-party provider integration (Jumio/Onfido), PEP/sanctions list screening, liveness detection, and audit trail implementation
+**成本估算（每年 100K 玩家）**：
+- 完全外包: $150,000 - $200,000/年
+- 混合方法（推薦）: $30,000 - $50,000/年
+- 完全自建: $5,000 - $10,000/年（不包括人工成本）
 
 ---
 
-**Document Maintenance**: Quarterly update of regulatory requirements and penalty cases
-**Last Review**: 2026-02-08 (Compliance Team)
+## 相關文檔
+
+### 業務參考
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - AML 監控、風險評分模型
+- [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) - 資金流動聚合偵測
+- [01-01 Player Lifecycle](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) - KYC 觸發邏輯、註冊流程
+
+### 合規框架
+- [06-08 UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - 英國牌照特定要求（2025 年新規定）
+- [06-09 MGA Compliance](../../source-archive/06_Platform_Governance/06-09_MGA_Compliance.md) - 馬耳他牌照要求
+- [15 Responsible Gambling](../../source-archive/15_Responsible_Gambling/) - 完整責任博彩模塊
+
+### 外部參考
+- FATF 指南: [www.fatf-gafi.org](https://www.fatf-gafi.org)
+- UKGC AML 指南: [www.gamblingcommission.gov.uk](https://www.gamblingcommission.gov.uk)
+
+### 技術實現
+
+→ **[KYC Verification API](../../architecture/05_Risk_Engine/KYC_Verification_API.md)** - KYC/AML 驗證工作流、OCR 身份文件處理、第三方供應商整合（Jumio/Onfido）、PEP/制裁清單篩查、活體偵測和審計追蹤實施
+
+---
+
+**文檔維護**: 每季更新監管要求和罰款案例
+**最後審查**: 2026-02-08（合規團隊）
