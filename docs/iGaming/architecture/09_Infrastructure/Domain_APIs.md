@@ -297,6 +297,53 @@ components:
 
 ---
 
+## 5. SmartAdmin Implementation
+
+### 5.1 Player Controller
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/players")
+public class PlayerController {
+
+    private final PlayerService playerService;
+
+    @GetMapping
+    public ResponseDTO<PageResult<PlayerVO>> listPlayers(@Valid PlayerQueryForm form) {
+        Page<PlayerEntity> page = SmartPageUtil.convert2PageQuery(form);
+        return playerService.listPlayers(page, form);
+    }
+
+    @PostMapping
+    public ResponseDTO<Long> createPlayer(@Valid @RequestBody CreatePlayerForm form) {
+        return playerService.createPlayer(form);
+    }
+}
+```
+
+### 5.2 Database Schema
+
+```sql
+-- Player management table
+CREATE TABLE t_player (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    username        VARCHAR(50) NOT NULL,
+    email           VARCHAR(200),
+    status          SMALLINT NOT NULL DEFAULT 1,
+    kyc_status      SMALLINT NOT NULL DEFAULT 0,
+    vip_level       SMALLINT NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT uk_player_username UNIQUE (tenant_id, username)
+);
+
+CREATE INDEX idx_player_tenant ON t_player(tenant_id, status);
+```
+
+---
+
 ## 相關文檔
 
 - [API Design Principles](./API_Design_Principles.md) - API 設計原則

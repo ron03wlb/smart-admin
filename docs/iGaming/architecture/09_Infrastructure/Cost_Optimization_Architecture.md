@@ -227,6 +227,78 @@ grafana:
 
 ---
 
+## 8. SmartAdmin Implementation
+
+### 8.1 Cost Monitoring Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class CostMonitoringService {
+
+    private final CostAllocationDao costAllocationDao;
+    private final CostAlertManager alertManager;
+
+    /**
+     * Query cost allocation by tenant using Vavr Option.
+     */
+    public Option<CostAllocationVO> getCostByTenant(Long tenantId, LocalDate month) {
+        return Option.of(costAllocationDao.selectByTenantAndMonth(tenantId, month))
+            .map(entity -> SmartBeanUtil.copy(entity, CostAllocationVO.class));
+    }
+}
+```
+
+### 8.2 Cost Alert Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class CostAlertManager {
+
+    private final CostAllocationDao costAllocationDao;
+    private final CostBudgetDao budgetDao;
+
+    /**
+     * Calculate costs and trigger alerts if over budget.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> checkBudgetAlerts(LocalDate month) {
+        List<CostAllocationEntity> allocations = costAllocationDao.selectByMonth(month);
+        for (CostAllocationEntity allocation : allocations) {
+            CostBudgetEntity budget = budgetDao.selectByTenantId(allocation.getTenantId());
+            if (budget != null && allocation.getTotalCost()
+                    .compareTo(budget.getMonthlyBudget().multiply(new BigDecimal("0.9"))) > 0) {
+                // Trigger alert
+            }
+        }
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 8.3 Database Schema
+
+```sql
+-- Cost allocation tracking table
+CREATE TABLE t_cost_allocation (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    month           DATE NOT NULL,
+    compute_cost    DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    storage_cost    DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    network_cost    DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    total_cost      DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_cost_tenant_month UNIQUE (tenant_id, month)
+);
+
+CREATE INDEX idx_cost_tenant ON t_cost_allocation(tenant_id, month DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [Performance Optimization](./Performance_Optimization.md) - 性能優化

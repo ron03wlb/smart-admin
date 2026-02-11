@@ -291,6 +291,97 @@ services:
 
 ---
 
+## 8. SmartAdmin Implementation
+
+### 8.1 Security Filter Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class SecurityFilterService {
+
+    private final IpWhitelistDao ipWhitelistDao;
+    private final SecurityEventManager securityEventManager;
+
+    /**
+     * Check if IP is in whitelist using Vavr Option.
+     */
+    public boolean isIpAllowed(String ipAddress, String routeName) {
+        Option<IpWhitelistEntity> whitelistOpt = Option.of(
+            ipWhitelistDao.selectByRoute(routeName));
+
+        if (whitelistOpt.isEmpty()) {
+            return true; // No whitelist configured
+        }
+
+        return whitelistOpt.get().getAllowedIps().contains(ipAddress);
+    }
+
+    /**
+     * Log security event for audit.
+     */
+    public void logSecurityEvent(SecurityEventForm form) {
+        securityEventManager.recordEvent(form);
+    }
+}
+```
+
+### 8.2 Security Event Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class SecurityEventManager {
+
+    private final SecurityEventDao securityEventDao;
+
+    /**
+     * Record security event with transaction support.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void recordEvent(SecurityEventForm form) {
+        SecurityEventEntity entity = SmartBeanUtil.copy(form, SecurityEventEntity.class);
+        entity.setCreatedAt(LocalDateTime.now());
+        securityEventDao.insert(entity);
+    }
+}
+```
+
+### 8.3 Database Schema
+
+```sql
+-- IP whitelist configuration
+CREATE TABLE t_ip_whitelist (
+    id              BIGSERIAL PRIMARY KEY,
+    route_name      VARCHAR(100) NOT NULL,
+    allowed_ips     JSONB NOT NULL,
+    description     VARCHAR(500),
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_whitelist_route ON t_ip_whitelist(route_name) WHERE enabled = TRUE;
+
+-- Security event log
+CREATE TABLE t_security_event (
+    id              BIGSERIAL PRIMARY KEY,
+    event_type      VARCHAR(50) NOT NULL,
+    ip_address      VARCHAR(45) NOT NULL,
+    user_agent      VARCHAR(500),
+    route_name      VARCHAR(100),
+    action_taken    VARCHAR(50) NOT NULL,
+    details         JSONB,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_security_event_type ON t_security_event(event_type, created_at DESC);
+CREATE INDEX idx_security_event_ip ON t_security_event(ip_address, created_at DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [Gateway Core](./Gateway_Core.md) - 網關核心架構

@@ -255,6 +255,69 @@ Request arrives at Cloudflare
 
 ---
 
+## 5. SmartAdmin Implementation
+
+### 5.1 Gateway Filter Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class GatewayFilterService {
+
+    private final RouteConfigDao routeConfigDao;
+    private final GatewayMetricsManager metricsManager;
+
+    /**
+     * Load route configuration by host using Vavr Option.
+     */
+    public Option<RouteConfigVO> getRouteByHost(String host) {
+        return Option.of(routeConfigDao.selectByHost(host))
+            .map(entity -> SmartBeanUtil.copy(entity, RouteConfigVO.class));
+    }
+
+    /**
+     * Record gateway metrics for monitoring.
+     */
+    public void recordMetrics(GatewayRequestForm form) {
+        metricsManager.recordRequest(form);
+    }
+}
+```
+
+### 5.2 Database Schema
+
+```sql
+-- Gateway route configuration
+CREATE TABLE t_gateway_route (
+    id              BIGSERIAL PRIMARY KEY,
+    route_name      VARCHAR(100) NOT NULL UNIQUE,
+    host_pattern    VARCHAR(200) NOT NULL,
+    path_pattern    VARCHAR(200) NOT NULL,
+    upstream_url    VARCHAR(500) NOT NULL,
+    plugins         JSONB,
+    strip_path      BOOLEAN NOT NULL DEFAULT FALSE,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_route_host ON t_gateway_route(host_pattern) WHERE enabled = TRUE;
+
+-- Gateway request metrics
+CREATE TABLE t_gateway_metrics (
+    id              BIGSERIAL PRIMARY KEY,
+    route_name      VARCHAR(100) NOT NULL,
+    request_count   BIGINT NOT NULL DEFAULT 0,
+    error_count     BIGINT NOT NULL DEFAULT 0,
+    avg_latency_ms  INTEGER NOT NULL DEFAULT 0,
+    recorded_at     TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_metrics_route ON t_gateway_metrics(route_name, recorded_at DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [Gateway Rate Limiting](./Gateway_Rate_Limiting.md) - 流量控制與限流

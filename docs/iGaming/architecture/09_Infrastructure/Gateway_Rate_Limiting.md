@@ -228,6 +228,94 @@ circuit_breaker_trips_total{service="payment-gateway"} = 3
 
 ---
 
+## 5. SmartAdmin Implementation
+
+### 5.1 Rate Limit Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class RateLimitService {
+
+    private final RateLimitConfigDao rateLimitConfigDao;
+    private final RateLimitManager rateLimitManager;
+
+    /**
+     * Check if request is within rate limit using Vavr Option.
+     */
+    public boolean isAllowed(String key, String endpoint) {
+        Option<RateLimitConfigEntity> configOpt = Option.of(
+            rateLimitConfigDao.selectByEndpoint(endpoint));
+
+        if (configOpt.isEmpty()) {
+            return true; // No limit configured
+        }
+
+        return rateLimitManager.checkAndIncrement(key, configOpt.get());
+    }
+}
+```
+
+### 5.2 Rate Limit Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class RateLimitManager {
+
+    private final RedisTemplate<String, String> redisTemplate;
+
+    /**
+     * Check rate limit using Redis token bucket.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    public boolean checkAndIncrement(String key, RateLimitConfigEntity config) {
+        String redisKey = "rate_limit:" + key;
+        Long count = redisTemplate.opsForValue().increment(redisKey);
+
+        if (count == 1) {
+            redisTemplate.expire(redisKey, Duration.ofSeconds(config.getWindowSeconds()));
+        }
+
+        return count <= config.getMaxRequests();
+    }
+}
+```
+
+### 5.3 Database Schema
+
+```sql
+-- Rate limit configuration
+CREATE TABLE t_rate_limit_config (
+    id              BIGSERIAL PRIMARY KEY,
+    endpoint        VARCHAR(200) NOT NULL,
+    scope           VARCHAR(20) NOT NULL DEFAULT 'PER_IP',
+    max_requests    INTEGER NOT NULL DEFAULT 100,
+    window_seconds  INTEGER NOT NULL DEFAULT 60,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_rate_limit_endpoint UNIQUE (endpoint, scope)
+);
+
+CREATE INDEX idx_rate_limit_endpoint ON t_rate_limit_config(endpoint) WHERE enabled = TRUE;
+
+-- Circuit breaker state
+CREATE TABLE t_circuit_breaker_state (
+    id              BIGSERIAL PRIMARY KEY,
+    service_name    VARCHAR(100) NOT NULL UNIQUE,
+    state           SMALLINT NOT NULL DEFAULT 0,
+    failure_count   INTEGER NOT NULL DEFAULT 0,
+    last_failure_at TIMESTAMP,
+    opened_at       TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_circuit_state ON t_circuit_breaker_state(state);
+```
+
+---
+
 ## 相關文檔
 
 - [Gateway Core](./Gateway_Core.md) - 網關核心架構
