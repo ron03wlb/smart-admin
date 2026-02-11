@@ -1,4 +1,4 @@
-# Multi-Tenant Requirements
+# Multi-Tenant 需求（多租戶需求）
 
 > **Canonical Source**: [`docs/iGaming/source-archive/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
 >
@@ -8,244 +8,244 @@
 
 ## Business Value
 
-This multi-tenant architecture delivers value by:
-- **Scalability**: Supporting multiple Brands and Tenants on a single platform infrastructure, reducing operational overhead per site
-- **Flexible Monetization**: Enabling three billing models (fixed monthly fee, revenue share, hybrid) to accommodate different client scales and business models
-- **White-Label Capability**: Allowing each Tenant to customize domain, branding, and email templates, enabling rapid market entry for new sites
-- **Hierarchical Control**: Providing Super Admin global oversight, Brand-level aggregation, and Tenant-level independence, balancing governance with operational autonomy
-- **Regulatory Compliance**: Enforcing strict tenant data isolation while supporting Brand-wide SSO and cross-tenant reporting for group operators
+此 Multi-Tenant 架構為業務提供價值：
+- **可擴展性 (Scalability)**：在單一平台基礎設施上支援多個 Brand 和 Tenant，降低每個站點的運營開銷
+- **靈活變現模式 (Flexible Monetization)**：啟用三種計費模式（固定月費、營收分成、混合模式）以適應不同客戶規模和商業模式
+- **White-Label 能力**：允許每個 Tenant 自訂域名、品牌和 Email 模板，使新站點能快速進入市場
+- **階層式控制 (Hierarchical Control)**：提供 Super Admin 全局監督、Brand 層級聚合和 Tenant 層級獨立性，平衡治理與運營自主性
+- **監管合規 (Regulatory Compliance)**：強制執行嚴格的 Tenant 數據隔離，同時支援 Brand 範圍的 SSO 和跨 Tenant 報表（適用於集團運營商）
 
 ## Acceptance Criteria
 
-- [ ] **Tenant Hierarchy Enforcement**: System correctly enforces 4-tier hierarchy (Super Admin → Brand → Tenant → Agent) with permission scope defined in Section 4.1
-- [ ] **Data Isolation Validation**: Player data, transactions, and game sessions are strictly isolated by tenant_id with no cross-tenant data leakage (Section 5.1)
-- [ ] **Impersonation Mode**: Super Admin can impersonate any Tenant with clear visual indicator displayed throughout the session (Section 3.1)
-- [ ] **White-Label Configuration**: Each Tenant can independently configure domain, logo, color theme, email templates, and currency settings (Section 6.1)
-- [ ] **Billing Cycle Execution**: Monthly billing cycles execute on the 1st of each month, support all three billing models (fixed, revenue share, hybrid), and handle overdue accounts according to the 31-day escalation schedule (Section 7.2, 7.3)
-- [ ] **Cross-Brand Transfer**: Tenant migration from Brand A to Brand B preserves all player data, transaction history, wallet balances, and audit trail as per Section 8.1 checklist
-- [ ] **SSO Configuration**: Brand-wide SSO supports all three modes (disabled, same wallet, separate wallets) with wallet balances and VIP status correctly scoped per Tenant (Section 9.2)
-- [ ] **Permission Matrix Compliance**: All operations (Create Brand, Create Tenant, Global Game Switch, etc.) enforce permissions as defined in Section 4.2 table
+- [ ] **Tenant 階層強制執行**：系統正確強制執行 4 層階層（Super Admin → Brand → Tenant → Agent），權限範圍定義於第 4.1 節
+- [ ] **數據隔離驗證**：玩家數據、交易和遊戲會話嚴格按 tenant_id 隔離，無跨 Tenant 數據洩漏（第 5.1 節）
+- [ ] **模擬模式 (Impersonation Mode)**：Super Admin 可模擬任何 Tenant，並在整個會話期間顯示清晰的視覺指示器（第 3.1 節）
+- [ ] **White-Label 配置**：每個 Tenant 可獨立配置域名、Logo、色彩主題、Email 模板和貨幣設定（第 6.1 節）
+- [ ] **計費週期執行**：每月計費週期在每月 1 日執行，支援所有三種計費模式（固定、營收分成、混合），並根據 31 天升級時程處理逾期帳號（第 7.2、7.3 節）
+- [ ] **跨 Brand 轉移**：Tenant 從 Brand A 遷移至 Brand B 時保留所有玩家數據、交易歷史、錢包餘額和審計追蹤（依第 8.1 節檢查清單）
+- [ ] **SSO 配置**：Brand 範圍的 SSO 支援所有三種模式（禁用、相同錢包、獨立錢包），錢包餘額和 VIP 狀態正確按 Tenant 範圍界定（第 9.2 節）
+- [ ] **權限矩陣合規**：所有操作（建立 Brand、建立 Tenant、全局遊戲開關等）按第 4.2 節表格定義強制執行權限
 
 ---
 
-## 1. Tenant Hierarchy Definition
+## 1. Tenant 階層定義
 
-The system adopts a **SaaS (Software as a Service)** multi-tenant architecture with the following hierarchy:
+系統採用 **SaaS (Software as a Service)** Multi-Tenant 架構，具有以下階層：
 
-**Super Admin (Platform) -> Brand (Group/Conglomerate) -> Tenant (Merchant/Site) -> Agent**
-
----
-
-## 2. Hierarchy Requirements
-
-### 2.1 Super Admin (Platform Administrator)
-
-- **Authority**: God-view perspective with visibility into all Brand and Tenant data
-- **Functions**:
-  - Create new Brands
-  - Global game switches (emergency kill-switch for Game Providers)
-  - Global risk control rule settings
-
-### 2.2 Brand (Group/Conglomerate)
-
-- **Definition**: Represents an operating group that can own multiple sites (Tenants) with different domains
-- **Shared Resources**:
-  - Tenants under a Brand may optionally share "Player Blacklist"
-  - Financial Quota typically managed at Brand level
-
-### 2.3 Tenant (Merchant/Site)
-
-- **Definition**: Actual operating website with independent domain, logo, and frontend styling
-- **Data Isolation**: Tenant A players cannot log into Tenant B (unless group-wide SSO is configured)
-- **Configuration Independence**:
-  - Independent payment gateway merchant IDs
-  - Independent game selection
-  - Independent promotional activities
+**Super Admin (Platform，平台) -> Brand (Group/Conglomerate，集團) -> Tenant (Merchant/Site，商戶/站點) -> Agent（代理）**
 
 ---
 
-## 3. Cross-Hierarchy Management Requirements
+## 2. 階層需求
 
-### 3.1 Perspective Switching
+### 2.1 Super Admin (Platform Administrator，平台管理員)
 
-- Super Admin can "Impersonate" (simulate) entry into any Tenant's backend for operations
-- Visual indicator required when in impersonation mode
+- **權限**：上帝視角，可見所有 Brand 和 Tenant 數據
+- **功能**：
+  - 建立新 Brand
+  - 全局遊戲開關（Game Provider 的緊急停機開關）
+  - 全局風控規則設定
 
-### 3.2 Report Aggregation
+### 2.2 Brand (Group/Conglomerate，集團)
 
-- **Tenant-level reports**: Single site profit/loss
-- **Brand-level reports**: Group total profit/loss (aggregating all Tenants)
+- **定義**：代表一個運營集團，可擁有多個不同域名的站點（Tenant）
+- **共享資源**：
+  - Brand 下的 Tenant 可選擇性共享「玩家黑名單」
+  - 財務額度通常在 Brand 層級管理
+
+### 2.3 Tenant (Merchant/Site，商戶/站點)
+
+- **定義**：實際運營的網站，具有獨立域名、Logo 和前端樣式
+- **數據隔離**：Tenant A 的玩家無法登入 Tenant B（除非配置了集團範圍的 SSO）
+- **配置獨立性**：
+  - 獨立的支付網關商戶 ID
+  - 獨立的遊戲選擇
+  - 獨立的促銷活動
 
 ---
 
-## 4. Permission Inheritance Rules
+## 3. 跨階層管理需求
 
-### 4.1 Top-Down Inheritance
+### 3.1 視角切換
 
-| Hierarchy | Visible Data Scope | Operable Scope | Example Role |
+- Super Admin 可「模擬 (Impersonate)」（模擬）進入任何 Tenant 的後台進行操作
+- 在模擬模式時需要視覺指示器
+
+### 3.2 報表聚合
+
+- **Tenant 層級報表**：單一站點損益
+- **Brand 層級報表**：集團總損益（聚合所有 Tenant）
+
+---
+
+## 4. 權限繼承規則
+
+### 4.1 自頂向下繼承
+
+| 階層 | 可見數據範圍 | 可操作範圍 | 示例角色 |
 |-----------|-------------------|----------------|--------------|
-| **Super Admin** | All global data | Create Brand, global configuration | Platform CTO |
-| **Brand Admin** | All Tenants under owned Brand | Create Tenant, Brand-level configuration | Group CEO |
-| **Tenant Admin** | Owned Tenant data | Manage players, agents, activities | Site Operations Manager |
-| **Agent** | Self and subordinate agent data | View subordinate players, commissions | Agent Partner |
+| **Super Admin** | 所有全局數據 | 建立 Brand、全局配置 | 平台 CTO |
+| **Brand Admin** | 所屬 Brand 下的所有 Tenant | 建立 Tenant、Brand 層級配置 | 集團 CEO |
+| **Tenant Admin** | 所屬 Tenant 數據 | 管理玩家、代理、活動 | 站點運營經理 |
+| **Agent** | 自己及下級代理數據 | 查看下級玩家、佣金 | 代理合作夥伴 |
 
-### 4.2 Permission Scope Matrix
+### 4.2 權限範圍矩陣
 
-| Operation | Super Admin | Brand Admin | Tenant Admin | Agent |
+| 操作 | Super Admin | Brand Admin | Tenant Admin | Agent |
 |-----------|:-----------:|:-----------:|:------------:|:-----:|
-| Create Brand | Yes | No | No | No |
-| Create Tenant | Yes | Yes | No | No |
-| Global Game Switch | Yes | No | No | No |
-| Brand Quota Adjustment | Yes | Yes | No | No |
-| Player Management | Yes | Yes | Yes | No |
-| View Commission Reports | Yes | Yes | Yes | Yes |
+| 建立 Brand | 是 | 否 | 否 | 否 |
+| 建立 Tenant | 是 | 是 | 否 | 否 |
+| 全局遊戲開關 | 是 | 否 | 否 | 否 |
+| Brand 額度調整 | 是 | 是 | 否 | 否 |
+| 玩家管理 | 是 | 是 | 是 | 否 |
+| 查看佣金報表 | 是 | 是 | 是 | 是 |
 
 ---
 
-## 5. Data Segregation Policies
+## 5. 數據隔離政策
 
-### 5.1 Isolation Requirements
+### 5.1 隔離需求
 
-1. **Strict Tenant Isolation**: Players, transactions, and game sessions must be isolated by tenant_id
-2. **Brand-Level Aggregation**: Brand Admin can view aggregated data across Tenants but cannot modify individual Tenant records without impersonation
-3. **No Cross-Brand Access**: Brand A cannot access any data from Brand B
+1. **嚴格的 Tenant 隔離**：玩家、交易和遊戲會話必須按 tenant_id 隔離
+2. **Brand 層級聚合**：Brand Admin 可查看跨 Tenant 的聚合數據，但未經模擬無法修改個別 Tenant 記錄
+3. **無跨 Brand 訪問**：Brand A 無法訪問 Brand B 的任何數據
 
-### 5.2 Shared Data Considerations
+### 5.2 共享數據考量
 
-| Data Type | Sharing Level | Requirement |
+| 數據類型 | 共享層級 | 需求 |
 |-----------|--------------|-------------|
-| Player Blacklist | Optional (Brand) | Configurable per Brand |
-| Game Provider List | Global | Managed by Super Admin |
-| Payment Providers | Tenant-specific | Each Tenant has own merchant ID |
-| Risk Rules | Hierarchical | Global defaults, Tenant overrides allowed |
+| 玩家黑名單 | 可選（Brand） | 每個 Brand 可配置 |
+| Game Provider 列表 | 全局 | 由 Super Admin 管理 |
+| 支付提供商 | Tenant 特定 | 每個 Tenant 擁有自己的商戶 ID |
+| 風控規則 | 階層式 | 全局預設值，允許 Tenant 覆蓋 |
 
 ---
 
-## 6. Branding and Customization Rules
+## 6. 品牌化和自訂規則
 
-### 6.1 Tenant-Level Customization
+### 6.1 Tenant 層級自訂
 
-Each Tenant must support:
-- **Domain Configuration**: Independent FQDN
-- **Visual Identity**: Logo, favicon, color scheme
-- **Email Templates**: Branded transactional emails
-- **SMS Sender ID**: Localized sender identification
-- **Currency Settings**: Primary currency and exchange rates
+每個 Tenant 必須支援：
+- **域名配置**：獨立 FQDN
+- **視覺識別**：Logo、favicon、色彩方案
+- **Email 模板**：品牌化交易 Email
+- **SMS 發送者 ID**：本地化發送者識別
+- **貨幣設定**：主要貨幣和匯率
 
-### 6.2 White-Label Requirements
+### 6.2 White-Label 需求
 
-| Component | Customizable | Notes |
+| 組件 | 可自訂 | 備註 |
 |-----------|:------------:|-------|
-| Domain | Yes | SSL certificate required |
-| Logo | Yes | Multiple sizes (favicon, header, footer) |
-| Color Theme | Yes | Primary, secondary, accent colors |
-| Footer Text | Yes | Copyright, legal disclaimers |
-| Email From Address | Yes | SPF/DKIM configuration needed |
-| App Icon (if PWA) | Yes | iOS/Android specific sizes |
+| 域名 | 是 | 需要 SSL 憑證 |
+| Logo | 是 | 多種尺寸（favicon、header、footer） |
+| 色彩主題 | 是 | 主色、次要色、強調色 |
+| Footer 文字 | 是 | 版權、法律聲明 |
+| Email From 地址 | 是 | 需要 SPF/DKIM 配置 |
+| App 圖示（如果是 PWA） | 是 | iOS/Android 特定尺寸 |
 
 ---
 
-## 7. Licensing Per Tenant
+## 7. 每個 Tenant 的授權
 
-### 7.1 Billing Models
+### 7.1 計費模式
 
-Three billing modes supported:
+支援三種計費模式：
 
-1. **Fixed Monthly Fee (Subscription)**:
-   - Fixed monthly charge per Tenant (e.g., $1,000/month)
-   - Suitable for small sites
+1. **固定月費 (Fixed Monthly Fee，訂閱制)**：
+   - 每個 Tenant 固定月費（例如 $1,000/月）
+   - 適合小型站點
 
-2. **Revenue Share**:
-   - Platform takes percentage of player effective turnover (2-5%)
-   - Suitable for large sites
+2. **營收分成 (Revenue Share)**：
+   - 平台抽取玩家有效投注額 (Valid Turnover) 的百分比（2-5%）
+   - 適合大型站點
 
-3. **Hybrid Model**:
-   - Base monthly fee + revenue share (e.g., $500/month + 1% turnover)
-   - Balanced risk and reward
+3. **混合模式 (Hybrid Model)**：
+   - 基礎月費 + 營收分成（例如 $500/月 + 1% 投注額）
+   - 平衡風險與回報
 
-### 7.2 Billing Cycle Requirements
+### 7.2 計費週期需求
 
-| Requirement | Specification |
+| 需求 | 規格 |
 |------------|---------------|
-| Billing Period | Monthly (1st of each month) |
-| Grace Period | 7 days before service suspension |
-| Auto-Renewal | Default enabled |
-| Invoice Format | PDF with VAT/Tax details |
-| Payment Methods | Wire transfer, Credit card, Crypto |
+| 計費週期 | 每月（每月 1 日） |
+| 寬限期 | 服務暫停前 7 天 |
+| 自動續訂 | 預設啟用 |
+| 發票格式 | 帶有 VAT/稅務詳情的 PDF |
+| 支付方式 | 電匯、信用卡、加密貨幣 |
 
-### 7.3 Overdue Handling
+### 7.3 逾期處理
 
-| Days Overdue | Action |
+| 逾期天數 | 動作 |
 |--------------|--------|
-| 0-7 | Warning email sent daily |
-| 8-14 | Account marked as "At Risk" |
-| 15-30 | New player registration disabled |
-| 31+ | Full service suspension |
+| 0-7 | 每日發送警告 Email |
+| 8-14 | 帳號標記為「有風險」 |
+| 15-30 | 禁用新玩家註冊 |
+| 31+ | 完全暫停服務 |
 
 ---
 
-## 8. Data Migration and Tenant Transfer
+## 8. 數據遷移和 Tenant 轉移
 
-### 8.1 Cross-Brand Transfer Requirements
+### 8.1 跨 Brand 轉移需求
 
-**Scenario**: Tenant transfers from Brand A to Brand B (e.g., acquisition)
+**場景**：Tenant 從 Brand A 轉移至 Brand B（例如收購）
 
-**Migration Checklist**:
-- [ ] All player data integrity verified
-- [ ] Transaction history complete
-- [ ] Wallet balances reconciled
-- [ ] Pending withdrawals processed
-- [ ] Audit trail preserved
-- [ ] Regulatory notification (if required)
+**遷移檢查清單**：
+- [ ] 所有玩家數據完整性已驗證
+- [ ] 交易歷史完整
+- [ ] 錢包餘額已對帳
+- [ ] 待處理提現已處理
+- [ ] 審計追蹤已保留
+- [ ] 監管通知（如需要）
 
-### 8.2 Data Portability (GDPR Compliance)
+### 8.2 數據可攜性 (Data Portability，GDPR 合規)
 
-Tenants must be able to export:
-- Player registration data
-- Transaction history
-- Game session records
-- Communication logs
-- Marketing consent records
+Tenant 必須能夠匯出：
+- 玩家註冊數據
+- 交易歷史
+- 遊戲會話記錄
+- 通訊日誌
+- 行銷同意記錄
 
-**Export Format**: JSON or CSV with schema documentation
+**匯出格式**：JSON 或 CSV，附帶 Schema 文檔
 
 ---
 
-## 9. Group-Wide SSO Requirements
+## 9. 集團範圍 SSO 需求
 
-### 9.1 Brand-Wide Single Sign-On
+### 9.1 Brand 範圍單一登入 (Single Sign-On)
 
-**Requirement**: Players can use one account to log into multiple Tenants under the same Brand.
+**需求**：玩家可使用一個帳號登入同一 Brand 下的多個 Tenant。
 
-**Considerations**:
-- Wallet balances remain Tenant-specific (no automatic transfer)
-- VIP status may differ per Tenant
-- Bonus eligibility checked per Tenant
+**考量**：
+- 錢包餘額保持 Tenant 特定（無自動轉移）
+- VIP 狀態可能因 Tenant 而異
+- 獎金資格按 Tenant 檢查
 
-### 9.2 SSO Configuration Options
+### 9.2 SSO 配置選項
 
-| Option | Description |
+| 選項 | 描述 |
 |--------|-------------|
-| Disabled | Each Tenant has completely separate player pools |
-| Enabled (Same Wallet) | Shared wallet across Tenants |
-| Enabled (Separate Wallets) | Same login, different wallet per Tenant |
+| 禁用 (Disabled) | 每個 Tenant 擁有完全獨立的玩家池 |
+| 啟用（相同錢包，Same Wallet） | 跨 Tenant 共享錢包 |
+| 啟用（獨立錢包，Separate Wallets） | 相同登入，每個 Tenant 獨立錢包 |
 
 ---
 
-## Related Documents
+## 相關文檔
 
-### Business Logic References
-- Billing & Invoicing *(planned)* - Multi-tenant billing model details
-- [Agent System](../07_Agent_Operations/Agent_System_Requirements.md) - Hierarchy structure extension
+### 業務邏輯參考
+- Billing & Invoicing *(planned)* - Multi-tenant 計費模式詳情
+- [Agent System](../07_Agent_Operations/Agent_System_Requirements.md) - 階層結構擴展
 
-### Technical Architecture References
-- [Multi-Tenant Architecture](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md) - Technical implementation
-- RBAC Permissions *(planned)* - Hierarchical permission implementation
-- Audit Logging *(planned)* - Tenant operation auditing
+### 技術架構參考
+- [Multi-Tenant Architecture](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md) - 技術實作
+- RBAC Permissions *(planned)* - 階層式權限實作
+- Audit Logging *(planned)* - Tenant 操作審計
 
-### Technical Implementation
+### 技術實作
 
-→ **[Multi-Tenant Architecture](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md)** - Tenant isolation mechanisms (shared-nothing pattern), dynamic tenant routing, hierarchical data partitioning (tenantId propagation), database sharding strategies, and SSO configuration options
+→ **[Multi-Tenant Architecture](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md)** - Tenant 隔離機制（shared-nothing 模式）、動態 Tenant 路由、階層式數據分區（tenantId 傳播）、數據庫分片策略、SSO 配置選項
 
 ---
 
