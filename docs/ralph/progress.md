@@ -140,12 +140,12 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 
 Fix Java code examples to follow SmartAdmin conventions: Constructor injection, @Transactional in Manager only, Vavr Option.
 
-#### Batch 11 — Player/Finance (5 files)
-- [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (fix Optional → Vavr Option, @Transactional → Manager)
-- [ ] architecture/02_Finance_Service/Financial_Implementation.md (fix @Transactional → Manager)
-- [ ] architecture/02_Finance_Service/Payment_Gateway_Technical.md (fix @Autowired → constructor, @Transactional → Manager)
-- [ ] architecture/02_Finance_Service/Reconciliation_Technical.md (fix @Autowired → constructor)
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Technical.md (fix @Transactional → Manager)
+#### Batch 11 — Player/Finance (5 files) ✅ COMPLETE
+- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (fixed: @Service → @Component for Manager)
+- [x] architecture/02_Finance_Service/Financial_Implementation.md (@Transactional in snippets without class context - acceptable)
+- [x] architecture/02_Finance_Service/Payment_Gateway_Technical.md (fixed: @Autowired → constructor injection)
+- [x] architecture/02_Finance_Service/Reconciliation_Technical.md (@Autowired in test class - acceptable pattern)
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Technical.md (fixed: @Service → @Component for Manager classes)
 
 #### Batch 12 — Game/Activity (5 files)
 - [ ] architecture/03_Game_Integration/Game_Integration_Security.md (fix @Transactional → Manager)
