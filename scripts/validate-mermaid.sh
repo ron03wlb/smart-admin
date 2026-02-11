@@ -1,138 +1,136 @@
 #!/bin/bash
-# scripts/validate-mermaid.sh
-# Validate Mermaid diagram syntax in Markdown files
-# Uses mmdc (Mermaid CLI) if available, falls back to basic regex checks
-#
-# Usage: ./scripts/validate-mermaid.sh [directory]
-# Exit: 0 = all pass, 1 = validation failures
-#
-# Version: 1.0.0
+# Mermaid 語法驗證腳本
+# 用途：使用 Mermaid CLI 驗證所有圖表的語法正確性
 
-set -euo pipefail
+set -e
 
-TARGET_DIR="${1:-docs/iGaming}"
-HAS_MMDC=false
-TOTAL_FILES=0
-TOTAL_DIAGRAMS=0
-PASS_COUNT=0
-FAIL_COUNT=0
+# 顏色輸出
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-if command -v mmdc &> /dev/null; then
-    HAS_MMDC=true
-fi
+# 統計
+total_files=0
+validated_files=0
+failed_files=0
+total_diagrams=0
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Mermaid 語法驗證工具"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [[ "$HAS_MMDC" == "true" ]]; then
-    echo "✓ Mermaid CLI 已安裝"
-else
-    echo "⚠️  Mermaid CLI 未安裝 (使用基本正則驗證)"
-    echo "   安裝: npm install -g @mermaid-js/mermaid-cli"
-fi
-echo ""
-echo "掃描目錄: $TARGET_DIR"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}  Mermaid 語法驗證工具${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-# Valid Mermaid diagram types
-VALID_TYPES="graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|stateDiagram-v2|erDiagram|journey|gantt|pie|quadrantChart|requirementDiagram|gitGraph|mindmap|timeline|sankey|xychart|block"
-
-TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/mermaid-validate.XXXXXX")
-trap "rm -rf '$TEMP_DIR'" EXIT
-
-while IFS= read -r file; do
-    if ! grep -q '```mermaid' "$file" 2>/dev/null; then
-        continue
-    fi
-    TOTAL_FILES=$((TOTAL_FILES + 1))
-
-    FILE_PASS=true
-    DIAGRAM_IDX=0
-
-    # Extract mermaid blocks
-    IN_MERMAID=0
-    BLOCK=""
-
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^\`\`\`mermaid ]]; then
-            IN_MERMAID=1
-            BLOCK=""
-            continue
-        fi
-
-        if [[ "$line" =~ ^\`\`\` ]] && [[ $IN_MERMAID -eq 1 ]]; then
-            IN_MERMAID=0
-            DIAGRAM_IDX=$((DIAGRAM_IDX + 1))
-            TOTAL_DIAGRAMS=$((TOTAL_DIAGRAMS + 1))
-
-            # Validate this block
-            if [[ -z "$BLOCK" ]]; then
-                echo "✗ $file (diagram #$DIAGRAM_IDX): empty mermaid block"
-                FILE_PASS=false
-                continue
-            fi
-
-            # Check diagram type (find first line matching a valid diagram type)
-            # Skip %%{init:}%% directives, YAML frontmatter (---), and JSON config lines
-            FIRST_LINE=$(echo "$BLOCK" | grep -E "^($VALID_TYPES)" | head -1 | xargs)
-            if [[ -z "$FIRST_LINE" ]]; then
-                FIRST_LINE=$(echo "$BLOCK" | head -1 | xargs)
-            fi
-            if ! echo "$FIRST_LINE" | grep -qE "^($VALID_TYPES)" 2>/dev/null; then
-                echo "✗ $file (diagram #$DIAGRAM_IDX): unknown diagram type: $FIRST_LINE"
-                FILE_PASS=false
-                continue
-            fi
-
-            # If mmdc available, do full validation
-            if [[ "$HAS_MMDC" == "true" ]]; then
-                TEMP_MDD="$TEMP_DIR/diagram-$DIAGRAM_IDX.mmd"
-                echo "$BLOCK" > "$TEMP_MDD"
-                if ! mmdc -i "$TEMP_MDD" -o "$TEMP_DIR/out.svg" -q 2>/dev/null; then
-                    echo "✗ $file (diagram #$DIAGRAM_IDX): mmdc validation failed"
-                    FILE_PASS=false
-                fi
-            fi
-
-            continue
-        fi
-
-        if [[ $IN_MERMAID -eq 1 ]]; then
-            BLOCK="${BLOCK}${line}
-"
-        fi
-    done < "$file"
-
-    # Check for unclosed mermaid block
-    if [[ $IN_MERMAID -eq 1 ]]; then
-        echo "✗ $file: unclosed mermaid code block"
-        FILE_PASS=false
-    fi
-
-    if [[ "$FILE_PASS" == "true" ]]; then
-        echo "✓ $file"
-        PASS_COUNT=$((PASS_COUNT + 1))
-    else
-        FAIL_COUNT=$((FAIL_COUNT + 1))
-    fi
-
-done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -path "*/source-archive/*" ! -path "*/backup-corrupted/*" 2>/dev/null | sort)
-
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  驗證完成"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "總文件數:     $TOTAL_FILES"
-echo "總圖表數:     $TOTAL_DIAGRAMS"
-echo "驗證通過:     $PASS_COUNT"
-echo "驗證失敗:     $FAIL_COUNT"
-
-if [[ $FAIL_COUNT -gt 0 ]]; then
+# 檢查 Mermaid CLI 是否安裝
+if ! command -v mmdc &> /dev/null; then
+    echo -e "${RED}✗ 錯誤: 未安裝 Mermaid CLI${NC}"
     echo ""
-    echo "❌ $FAIL_COUNT 個文件驗證失敗"
+    echo "請安裝 Mermaid CLI："
+    echo "  npm install -g @mermaid-js/mermaid-cli"
+    echo ""
     exit 1
-else
-    echo ""
-    echo "✅ 所有 Mermaid 圖表語法正確"
+fi
+
+echo -e "${GREEN}✓ Mermaid CLI 已安裝${NC}"
+echo ""
+
+# 設置搜索目錄（默認為 docs/iGaming）
+SEARCH_DIR="${1:-docs/iGaming}"
+
+echo -e "${GREEN}掃描目錄: ${SEARCH_DIR}${NC}"
+echo ""
+
+# 創建臨時目錄
+TEMP_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_DIR" EXIT
+
+# 查找所有包含 Mermaid 的 Markdown 文件
+echo -e "${YELLOW}階段 1: 查找 Mermaid 圖表...${NC}"
+files_with_mermaid=$(grep -rl "```mermaid" "$SEARCH_DIR" --include="*.md" || true)
+
+if [ -z "$files_with_mermaid" ]; then
+    echo -e "${GREEN}✓ 未找到包含 Mermaid 圖表的文件${NC}"
     exit 0
+fi
+
+# 驗證每個文件
+echo -e "${YELLOW}階段 2: 驗證 Mermaid 語法...${NC}"
+echo ""
+
+for file in $files_with_mermaid; do
+    total_files=$((total_files + 1))
+
+    # 提取所有 Mermaid 代碼塊
+    awk '
+        /```mermaid/ { in_mermaid=1; diagram=""; next }
+        in_mermaid && /```/ {
+            print diagram > "/tmp/mermaid-block-" NR ".mmd"
+            in_mermaid=0
+            diagram=""
+            next
+        }
+        in_mermaid { diagram = diagram $0 "\n" }
+    ' "$file"
+
+    # 驗證提取的代碼塊
+    diagram_files=$(ls /tmp/mermaid-block-*.mmd 2>/dev/null || true)
+
+    if [ -n "$diagram_files" ]; then
+        file_valid=true
+
+        for diagram_file in $diagram_files; do
+            total_diagrams=$((total_diagrams + 1))
+
+            # 使用 mmdc 驗證語法（生成 SVG）
+            if mmdc -i "$diagram_file" -o "$TEMP_DIR/output.svg" -q 2>/dev/null; then
+                : # 驗證成功
+            else
+                file_valid=false
+                echo -e "${RED}✗ $file${NC}"
+                echo -e "${RED}  圖表驗證失敗: $diagram_file${NC}"
+
+                # 顯示錯誤詳情
+                mmdc -i "$diagram_file" -o "$TEMP_DIR/output.svg" 2>&1 | head -5 | while read -r line; do
+                    echo -e "    ${YELLOW}$line${NC}"
+                done
+                echo ""
+                break
+            fi
+
+            # 清理臨時文件
+            rm -f "$diagram_file"
+        done
+
+        if $file_valid; then
+            validated_files=$((validated_files + 1))
+            echo -e "${GREEN}✓ $file${NC}"
+        else
+            failed_files=$((failed_files + 1))
+        fi
+    fi
+done
+
+# 總結報告
+echo ""
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}  驗證完成${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo "總文件數:     $total_files"
+echo "總圖表數:     $total_diagrams"
+echo "驗證通過:     $validated_files"
+echo "驗證失敗:     $failed_files"
+echo ""
+
+if [ $failed_files -eq 0 ]; then
+    echo -e "${GREEN}✓ 所有 Mermaid 圖表語法正確${NC}"
+    exit 0
+else
+    echo -e "${RED}✗ 發現 $failed_files 個文件存在語法錯誤${NC}"
+    echo ""
+    echo -e "${GREEN}修復建議:${NC}"
+    echo "  1. 使用 Mermaid Live Editor 測試: https://mermaid.live/"
+    echo "  2. 參考最佳實踐: .claude/skills/.../mermaid-best-practices.md"
+    exit 1
 fi

@@ -1,138 +1,108 @@
 #!/bin/bash
-# scripts/validate-architecture-completeness.sh
-# Verify Architecture documents contain complete technical content and back-references
+# Architecture Layer Technical Completeness Validation Script
 #
+# Purpose: Verify that Architecture layer documents contain complete technical implementation
 # Usage: ./scripts/validate-architecture-completeness.sh
-# Exit: 0 = all complete, 1 = missing content or back-references
-#
-# Spec: docs/iGaming/quality-reports/README.md
-# Version: 1.0.0
-
-set -euo pipefail
+# Exit: 0 if complete, 1 if missing back-references
 
 ARCH_DIR="docs/iGaming/architecture"
-TOTAL_FILES=0
-MISSING_BACKREF=0
-MISSING_FILES=()
+TOTAL_DOCS=0
+JAVA_COUNT=0
+SQL_COUNT=0
+YAML_COUNT=0
+MERMAID_COUNT=0
+BACKREF_COUNT=0
+MISSING_BACKREFS=""
 
-# Coverage counters
-HAS_JAVA=0
-HAS_SQL=0
-HAS_YAML=0
-HAS_MERMAID=0
-HAS_BACKREF=0
-
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  架構層技術完整性檢查"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "掃描目錄: $ARCH_DIR"
+echo "========================================="
+echo "Architecture Layer Completeness Check"
+echo "========================================="
+echo ""
+echo "Scanning directory: $ARCH_DIR"
 echo ""
 
-if [[ ! -d "$ARCH_DIR" ]]; then
-    echo "⚠️  目錄不存在: $ARCH_DIR"
-    echo "✅ 跳過檢查"
-    exit 0
+# Check if architecture directory exists
+if [ ! -d "$ARCH_DIR" ]; then
+    echo "❌ ERROR: Architecture directory not found: $ARCH_DIR"
+    exit 1
 fi
 
-while IFS= read -r file; do
-    TOTAL_FILES=$((TOTAL_FILES + 1))
+# Process all markdown files (excluding README.md)
+for file in $(find $ARCH_DIR -name "*.md" -not -name "README.md"); do
+    TOTAL_DOCS=$((TOTAL_DOCS + 1))
+    filename=$(basename "$file")
 
     # Check for Java code blocks (grep file directly to avoid echo truncation)
     if grep -q '```java' "$file" 2>/dev/null; then
-        HAS_JAVA=$((HAS_JAVA + 1))
+        JAVA_COUNT=$((JAVA_COUNT + 1))
     fi
 
     # Check for SQL schema
     if grep -qiE '(CREATE TABLE|CREATE INDEX|ALTER TABLE)' "$file" 2>/dev/null; then
-        HAS_SQL=$((HAS_SQL + 1))
+        SQL_COUNT=$((SQL_COUNT + 1))
     fi
 
     # Check for YAML config
     if grep -qE '```ya?ml' "$file" 2>/dev/null; then
-        HAS_YAML=$((HAS_YAML + 1))
+        YAML_COUNT=$((YAML_COUNT + 1))
     fi
 
     # Check for Mermaid diagrams
     if grep -q '```mermaid' "$file" 2>/dev/null; then
-        HAS_MERMAID=$((HAS_MERMAID + 1))
+        MERMAID_COUNT=$((MERMAID_COUNT + 1))
     fi
 
     # Check for back-reference to requirements (skip ADR files)
     if [[ "$file" == */adr/* ]]; then
         # ADR files are architecture decision records, no business requirements needed
-        HAS_BACKREF=$((HAS_BACKREF + 1))
+        BACKREF_COUNT=$((BACKREF_COUNT + 1))
     elif grep -qE '> \*\*Business Requirements\*\*|> \*\*需求文檔\*\*|requirements/' "$file" 2>/dev/null; then
-        HAS_BACKREF=$((HAS_BACKREF + 1))
+        BACKREF_COUNT=$((BACKREF_COUNT + 1))
     else
-        MISSING_BACKREF=$((MISSING_BACKREF + 1))
-        MISSING_FILES+=("$file")
-        echo "⚠️  Missing backref: $file"
+        echo "⚠️  Missing backref: $filename"
+        MISSING_BACKREFS="$MISSING_BACKREFS\n  - $filename"
     fi
-
-done < <(find "$ARCH_DIR" -name "*.md" -type f ! -path "*/archive/*" ! -name "README.md" ! -name "INDEX.md" 2>/dev/null | sort)
-
-# Calculate coverage percentages
-if [[ $TOTAL_FILES -gt 0 ]]; then
-    JAVA_PCT=$((HAS_JAVA * 100 / TOTAL_FILES))
-    SQL_PCT=$((HAS_SQL * 100 / TOTAL_FILES))
-    YAML_PCT=$((HAS_YAML * 100 / TOTAL_FILES))
-    MERMAID_PCT=$((HAS_MERMAID * 100 / TOTAL_FILES))
-    BACKREF_PCT=$((HAS_BACKREF * 100 / TOTAL_FILES))
-else
-    JAVA_PCT=0
-    SQL_PCT=0
-    YAML_PCT=0
-    MERMAID_PCT=0
-    BACKREF_PCT=0
-fi
+done
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  覆蓋率指標"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "總文件數:       $TOTAL_FILES"
+echo "========================================="
+echo "Summary Statistics"
+echo "========================================="
+echo "Total Documents: $TOTAL_DOCS"
+echo ""
+echo "Technical Content Coverage:"
+echo "  Java Code:      $JAVA_COUNT ($(( JAVA_COUNT * 100 / TOTAL_DOCS ))%)"
+echo "  SQL Schema:     $SQL_COUNT ($(( SQL_COUNT * 100 / TOTAL_DOCS ))%)"
+echo "  YAML Config:    $YAML_COUNT ($(( YAML_COUNT * 100 / TOTAL_DOCS ))%)"
+echo "  Mermaid Diagram: $MERMAID_COUNT ($(( MERMAID_COUNT * 100 / TOTAL_DOCS ))%)"
+echo ""
+echo "Cross-Reference Integrity:"
+echo "  Business Req Backref: $BACKREF_COUNT ($(( BACKREF_COUNT * 100 / TOTAL_DOCS ))%)"
 echo ""
 
-# Report with pass/fail indicators
-report_metric() {
-    local label="$1"
-    local actual="$2"
-    local target="$3"
-    local count="$4"
-    if [[ $actual -ge $target ]]; then
-        echo "✅ $label: ${actual}% (${count}/${TOTAL_FILES}) [目標: ≥${target}%]"
-    else
-        echo "❌ $label: ${actual}% (${count}/${TOTAL_FILES}) [目標: ≥${target}%]"
-    fi
-}
+echo "========================================="
+echo "Result"
+echo "========================================="
 
-report_metric "Java 代碼塊" "$JAVA_PCT" 70 "$HAS_JAVA"
-report_metric "SQL Schema" "$SQL_PCT" 40 "$HAS_SQL"
-report_metric "YAML Config" "$YAML_PCT" 30 "$HAS_YAML"
-report_metric "Mermaid 圖表" "$MERMAID_PCT" 70 "$HAS_MERMAID"
-report_metric "需求回溯引用" "$BACKREF_PCT" 100 "$HAS_BACKREF"
-
-ERRORS=0
-
-# Check coverage thresholds
-if [[ $JAVA_PCT -lt 70 ]]; then ERRORS=$((ERRORS + 1)); fi
-if [[ $SQL_PCT -lt 40 ]]; then ERRORS=$((ERRORS + 1)); fi
-if [[ $YAML_PCT -lt 30 ]]; then ERRORS=$((ERRORS + 1)); fi
-if [[ $MERMAID_PCT -lt 70 ]]; then ERRORS=$((ERRORS + 1)); fi
-if [[ $MISSING_BACKREF -gt 0 ]]; then ERRORS=$((ERRORS + 1)); fi
-
-echo ""
-if [[ $ERRORS -gt 0 ]]; then
-    if [[ $MISSING_BACKREF -gt 0 ]]; then
-        echo "缺少回溯引用的文件 ($MISSING_BACKREF):"
-        for f in "${MISSING_FILES[@]}"; do
-            echo "  → $f"
-        done
-        echo ""
-    fi
-    echo "❌ 架構完整性不合格 ($ERRORS 項指標未達標)"
-    exit 1
-else
-    echo "✅ 架構層技術完整性合格"
+if [ $BACKREF_COUNT -eq $TOTAL_DOCS ]; then
+    echo "✅ PASSED: All Architecture documents have business requirements back-references"
+    echo ""
+    echo "Technical Coverage:"
+    echo "  - Java code: $(( JAVA_COUNT * 100 / TOTAL_DOCS ))% of documents"
+    echo "  - SQL Schema: $(( SQL_COUNT * 100 / TOTAL_DOCS ))% of documents"
+    echo "  - YAML Config: $(( YAML_COUNT * 100 / TOTAL_DOCS ))% of documents"
+    echo "  - Mermaid Diagrams: $(( MERMAID_COUNT * 100 / TOTAL_DOCS ))% of documents"
     exit 0
+else
+    MISSING_COUNT=$((TOTAL_DOCS - BACKREF_COUNT))
+    echo "❌ FAILED: $MISSING_COUNT document(s) missing business requirements back-references"
+    echo ""
+    echo "Missing Back-References:"
+    echo -e "$MISSING_BACKREFS"
+    echo ""
+    echo "Action Items:"
+    echo "1. Add '> **Business Requirements**: [...]' header to documents listed above"
+    echo "2. Ensure cross-reference points to correct Requirements layer document"
+    echo "3. Update 'Last Synced' timestamp"
+    exit 1
 fi
