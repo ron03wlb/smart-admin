@@ -11,7 +11,7 @@
 
 **Goal**: Push requirements documentation to business excellence
 **Targets**:
-- Business Completeness: 18% → **≥90%** (currently 11/58 files complete)
+- Business Completeness: 18% → **≥90%** (currently 50/58 files = 86% complete)
 - Terminology Consistency: 50% → **≥95%**
 - Forward Reference: 98% → **100%**
 
@@ -77,12 +77,12 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 - [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value, now 2/3)
 - [x] requirements/06_Governance_Licensing/Governance_Requirements.md (+Business Value +Acceptance Criteria, now 2/3)
 
-#### Batch 8 — MFA/Agent/Analytics (5 files)
-- [ ] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (+Business Value)
-- [ ] requirements/07_Agent_Operations/Agent_System_Requirements.md (+Success Metrics)
-- [ ] requirements/07_Agent_Operations/Credit_Network_Requirements.md (+Acceptance Criteria)
-- [ ] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md (+Business Value)
-- [ ] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md (+Acceptance Criteria)
+#### Batch 8 — MFA/Agent/Analytics (5 files) ✅ COMPLETE
+- [x] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (+Business Value +Success Metrics, now 2/3)
+- [x] requirements/07_Agent_Operations/Agent_System_Requirements.md (+Business Value +Success Metrics, now 2/3)
+- [x] requirements/07_Agent_Operations/Credit_Network_Requirements.md (+Acceptance Criteria, now 2/3)
+- [x] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md (+Business Value, now 2/3)
+- [x] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md (+Business Value +Acceptance Criteria, now 2/3)
 
 #### Batch 9 — Frontend/Security (5 files)
 - [ ] requirements/11_Frontend_Experience/Localization_Requirements.md (+Business Value)
