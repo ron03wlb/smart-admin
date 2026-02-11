@@ -9,6 +9,31 @@
 
 ---
 
+## Business Value
+
+This standards document delivers strategic value by:
+- **Player Experience**: Defines Seamless Wallet architecture enabling players to access any integrated game without manual fund transfers
+- **Platform Protection**: Establishes RTP automatic suspension thresholds (RTP >200% AND Net Loss >$10K triggers auto-disable) to prevent catastrophic losses from GP bugs
+- **Operational Efficiency**: Specifies new game onboarding in <5 business days with standardized certification requirements
+- **Revenue Assurance**: Documents jackpot handling to correctly attribute network jackpots (GP-funded) vs normal wins (merchant-funded), preventing merchant insolvency
+
+---
+
+## Acceptance Criteria
+
+- [ ] All GP integrations satisfy communication standards (RESTful API, encrypted transport, IP whitelist, cryptographic signatures)
+- [ ] GetBalance, Transaction (Bet/Win), and CheckToken endpoints function correctly for all integrated providers
+- [ ] Duplicate requests with same transaction ID never result in duplicate charges (idempotency test)
+- [ ] API timeout handling marks transactions as "Pending" and queries final status (no direct rollback)
+- [ ] Jackpot transactions are correctly identified and frozen pending GP verification
+- [ ] RTP monitoring triggers warning alert at RTP >120% AND Net Loss >$5K (5-min window)
+- [ ] RTP monitoring auto-disables game at RTP >200% AND Net Loss >$10K (5-min window)
+- [ ] Game provider integration achieves API uptime ≥99.9%
+- [ ] Transaction processing latency <200ms P95
+- [ ] Game launch success rate >99.5%
+
+---
+
 ## 1. Overview
 
 The platform integrates with external Game Providers (GP) using a **Seamless Wallet (Single Wallet)** architecture. Players can access any integrated game without manual fund transfers between wallets. This document defines the partnership standards, certification requirements, and SLA expectations for all game provider integrations.

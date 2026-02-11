@@ -12,6 +12,31 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Risk Reduction**: MFA reduces account takeover risk by 47% (CVSS 8.1 → 4.3), protecting high-privilege accounts from phishing attacks
+- **Financial Protection**: Prevents credential-based fraud that caused $237K USD direct loss and 120K player data exposure in recent industry incidents
+- **Regulatory Compliance**: Satisfies mandatory MFA requirements for MGA, PCI DSS 4.0, and GDPR, avoiding fines up to EUR 20M or 4% global revenue
+- **Operational Efficiency**: Differentiates mandatory MFA (5 high-risk roles) from optional MFA (3 low-risk roles) to balance security with user experience
+
+---
+
+## Acceptance Criteria
+
+- [ ] TOTP (Google Authenticator) functions as primary MFA method for 90% of users
+- [ ] SMS OTP functions as backup method when TOTP is unavailable
+- [ ] Backup codes (10 one-time use, 8-digit format) are generated and displayed during MFA setup
+- [ ] Super Admin, Finance Manager, Risk Control, Database Admin, and DevOps have mandatory MFA enforcement
+- [ ] Customer Service, Marketing, and Content Editor have optional MFA with recommendation banner
+- [ ] Account locks for 15 minutes after 3 consecutive MFA failures
+- [ ] Device trust feature allows 30-day MFA skip for verified devices
+- [ ] Device loss recovery completes within 24-48 business hours with human review
+- [ ] All 10 audit event types (MFA_SETUP_INIT through DEVICE_TRUSTED) are logged with required fields
+- [ ] 4 anomaly detection rules trigger appropriate alerts (multiple failures, geographic anomaly, backup code abuse, high-risk MFA disabled)
+
+---
+
 ## 1. Executive Summary
 
 This document outlines the **Multi-Factor Authentication (MFA)** requirements for the SmartAdmin iGaming platform backend administration system. MFA is critical for protecting high-privilege accounts from unauthorized access, preventing financial fraud, and meeting regulatory compliance requirements.

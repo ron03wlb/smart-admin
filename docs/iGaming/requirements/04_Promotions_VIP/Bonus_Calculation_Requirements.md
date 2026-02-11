@@ -8,6 +8,28 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Fair Play Assurance**: Defines game contribution rates (Slots 100%, Blackjack 5-10%, Poker 0%) ensuring wagering requirements reflect true game risk
+- **Fraud Prevention**: Documents invalid bet types (hedge betting, arbitrage, low odds <1.5) to prevent bonus abuse and player exploitation
+- **Cost Control**: Establishes multi-bonus conflict resolution strategies (MAX_REWARD, TYPE_EXCLUSIVE) with global limits (max 5 active bonuses, $10K balance cap)
+- **Operational Visibility**: Specifies daily reconciliation with ≤0.01% deviation tolerance and A/B testing framework for rule optimization
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Wagering Completion Rate | ≥30% | Players completing wagering requirements / Total bonus claims |
+| Conflict Complaint Rate | <2% | Player complaints about conflict rules / Total claims |
+| Bonus Cost Ratio | <15% of revenue | Total bonus payout / Gross Gaming Revenue |
+| Daily Reconciliation Deviation | ≤0.01% | Finance system vs Activity system turnover |
+| Activity Switch Frequency | <5 per player/hour | Monitoring for suspected arbitrage testing |
+
+---
+
 ## 概述
 
 本文檔定義活動系統獎金計算引擎的業務需求，包括跨遊戲類型的流水計算規則、多獎金衝突處理策略，以及與風控系統整合的業務規則。這是確保活動系統公平性與財務一致性的核心業務文檔。

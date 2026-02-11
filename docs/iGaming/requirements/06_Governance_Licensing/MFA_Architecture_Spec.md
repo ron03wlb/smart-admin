@@ -9,6 +9,30 @@
 
 ---
 
+## Business Value
+
+This specification delivers strategic value by:
+- **Risk Reduction**: MFA reduces security risk from CVSS 8.1 (High) to 4.3 (Medium), a 47% risk reduction for high-privilege backend accounts
+- **Compliance Readiness**: Satisfies MGA, UKGC, PCI DSS 4.0, and GDPR requirements for multi-factor authentication, avoiding fines up to EUR 20M
+- **Financial Protection**: Prevents credential-based attacks that caused $237K USD loss (2023 industry case) and 120K player data breach (2024)
+- **Defense in Depth**: Implements three-layer MFA architecture (TOTP primary, SMS backup, Backup Codes offline recovery) for business continuity
+
+---
+
+## Acceptance Criteria
+
+- [ ] All Super Admin, Finance Manager, and Risk Control roles have mandatory MFA enabled
+- [ ] TOTP (Google Authenticator/Authy) functions as primary MFA method
+- [ ] SMS OTP functions as backup when TOTP is unavailable
+- [ ] Backup Codes (10 one-time recovery codes) are available for offline recovery
+- [ ] Account locks for 15 minutes after 3 consecutive MFA failures
+- [ ] Security alert notification triggers on account lockout
+- [ ] MFA audit log records all events (registration, verification, failure)
+- [ ] MFA implementation passes penetration testing per MGA requirements
+- [ ] Phase 1 (TOTP) completes within 2 weeks, Phase 2 (SMS) within 3 weeks, Phase 3 (Backup Codes) within 4 weeks
+
+---
+
 ## 1. 業務需求
 
 ### 1.1 為什麼後台用戶需要 MFA
