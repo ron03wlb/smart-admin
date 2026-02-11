@@ -8,6 +8,21 @@
 
 ---
 
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Hot Update Success Rate | ≥ 98% | Percentage of users successfully applying updates without rollback |
+| Push Notification Delivery Rate | ≥ 95% (iOS/FCM), ≥ 85% (China vendors) | Delivered vs sent notifications |
+| Biometric Login Adoption | ≥ 60% of eligible devices | Users enabling FaceID/TouchID |
+| Offline Mode Usage | ≥ 30% DAU use cached lobby | Users browsing games offline |
+| Crash-Free Sessions | ≥ 99.5% | Sessions without crashes (measured by Crashlytics/Sentry) |
+| SSL Pinning Pass Rate | 100% | Requests blocked when certificate mismatch detected |
+| Test Coverage | E2E: 100% critical flows, Integration: 80%, Unit: 90% | Code coverage reports |
+| App Store Rejection Rate | < 5% | Distribution success for enterprise/alternative channels |
+
+---
+
 ## 1. Platform Support Requirements
 
 ### 1.1 Framework Strategy
