@@ -63,12 +63,12 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 - [x] requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md (+Acceptance Criteria)
 - [x] requirements/03_Gaming_Operations/Game_Integration_Requirements.md (+Business Value)
 
-#### Batch 6 — Gaming/Promotions (5 files)
-- [ ] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md (+Success Metrics)
-- [ ] requirements/03_Gaming_Operations/Turnover_Business_Rules.md (+Acceptance Criteria)
-- [ ] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md (+Success Metrics)
-- [ ] requirements/04_Promotions_VIP/Promotion_Requirements.md (+Business Value)
-- [ ] requirements/05_Risk_Compliance/Affordability_Requirements.md (+Acceptance Criteria)
+#### Batch 6 — Gaming/Promotions (5 files) ✅ COMPLETE
+- [x] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md (+Business Value +Success Metrics)
+- [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md (+Acceptance Criteria)
+- [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md (+Business Value +Success Metrics)
+- [x] requirements/04_Promotions_VIP/Promotion_Requirements.md (+Business Value, now 3/3)
+- [x] requirements/05_Risk_Compliance/Affordability_Requirements.md (+Acceptance Criteria)
 
 #### Batch 7 — Risk/Compliance (5 files)
 - [ ] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value)
