@@ -1,4 +1,4 @@
-# Business Logic Flows -- Technical Implementation
+# 業務邏輯流程 -- 技術實現
 
 > **Canonical Source**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
@@ -7,126 +7,126 @@
 
 ---
 
-## Document Purpose
+## 文檔目的
 
-This document provides the **technical implementation details** for the 6 end-to-end business flows in the iGaming platform. It includes code samples, API specifications, database schemas, system interaction patterns, and infrastructure configurations that architects and developers need to implement each flow.
+本文檔提供 iGaming 平台中 6 個端到端業務流程的**技術實現細節**。包括程式碼範例、API 規範、資料庫架構、系統交互模式以及架構師和開發人員實現每個流程所需的基礎設施配置。
 
-For business rules, policies, user journeys, and compliance requirements, see the [Business Flows (Requirements View)](../../requirements/01_Player_Experience/Business_Flows.md).
-
----
-
-## Table of Contents
-
-1. [Player Registration and KYC -- Technical Implementation](#1-player-registration-and-kyc)
-2. [Game Integration and Token Verification](#2-game-integration-and-token-verification)
-3. [Bonus Engine and Wagering Tracking](#3-bonus-engine-and-wagering-tracking)
-4. [Withdrawal Processing and Risk Engine](#4-withdrawal-processing-and-risk-engine)
-5. [Turnover Calculation and Reconciliation Pipeline](#5-turnover-calculation-and-reconciliation-pipeline)
-6. [Multi-Tenant Data Isolation Architecture](#6-multi-tenant-data-isolation-architecture)
+關於業務規則、政策、用戶旅程和合規要求，請參閱 [Business Flows (Requirements View)](../../requirements/01_Player_Experience/Business_Flows.md)。
 
 ---
 
-## 1. Player Registration and KYC
+## 目錄
 
-### 1.1 Tenant Context Resolution
+1. [玩家註冊與 KYC -- 技術實現](#1-玩家註冊與-kyc)
+2. [遊戲整合與 Token 驗證](#2-遊戲整合與-token-驗證)
+3. [優惠引擎與投注追蹤](#3-優惠引擎與投注追蹤)
+4. [提款處理與風控引擎](#4-提款處理與風控引擎)
+5. [有效投注額計算與對帳流水線](#5-有效投注額計算與對帳流水線)
+6. [多租戶數據隔離架構](#6-多租戶數據隔離架構)
 
-The tenant context is resolved from the incoming request and injected into a ThreadLocal for the duration of the request lifecycle.
+---
+
+## 1. 玩家註冊與 KYC
+
+### 1.1 租戶上下文解析
+
+租戶上下文從傳入請求中解析，並在請求生命週期期間注入到 ThreadLocal 中。
 
 ```java
-// From domain name or sub-path
+// 從域名或子路徑提取
 String tenantCode = extractTenantFromRequest(request);
 TenantContext.set(tenantCode);
 
-// Or from JWT Token (authenticated users)
+// 或從 JWT Token 提取（已認證用戶）
 Claims claims = jwtService.parse(token);
 String tenantId = claims.get("tenant_id", String.class);
 ```
 
-**Design Rationale**: ThreadLocal ensures tenant isolation per request thread. The `finally` block in the filter must always call `TenantContext.clear()` to prevent memory leaks.
+**設計理由**：ThreadLocal 確保每個請求執行緒的租戶隔離。Filter 的 `finally` 區塊必須始終調用 `TenantContext.clear()` 以防止記憶體洩漏。
 
-Reference: [Multi-Tenant Architecture](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md#tenant-context)
+參考：[Multi-Tenant Architecture](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md#tenant-context)
 
-### 1.2 Wallet Initialization Schema
+### 1.2 錢包初始化架構
 
 ```sql
 INSERT INTO t_player_wallet (player_id, tenant_id, cash_balance, bonus_balance, locked_amount)
 VALUES (:playerId, :tenantId, 0, 0, 0);
 ```
 
-**Table Design Notes**:
-- `cash_balance`: Real money deposited by the player
-- `bonus_balance`: Promotional credits from bonuses
-- `locked_amount`: Funds reserved for pending withdrawals or in-progress bets
-- All monetary fields use `DECIMAL(18,2)` for precision
+**資料表設計注意事項**：
+- `cash_balance`：玩家存入的真實貨幣
+- `bonus_balance`：來自優惠活動的促銷積分
+- `locked_amount`：為待處理提款或進行中投注預留的資金
+- 所有貨幣欄位使用 `DECIMAL(18,2)` 以確保精度
 
-Reference: [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
+參考：[Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ---
 
-## 2. Game Integration and Token Verification
+## 2. 遊戲整合與 Token 驗證
 
-### 2.1 Sequence Diagram
+### 2.1 序列圖
 
 ```mermaid
 sequenceDiagram
-    participant P as Player
-    participant F as Platform Frontend
-    participant B as Platform Backend
-    participant G as Game Provider (GP)
+    participant P as 玩家
+    participant F as 平台前端
+    participant B as 平台後端
+    participant G as 遊戲提供商 (GP)
 
-    P->>F: Click game icon
-    F->>B: Request game URL
+    P->>F: 點擊遊戲圖標
+    F->>B: 請求遊戲 URL
 
-    B->>B: Generate Token<br/>(Player ID + Timestamp + HMAC)
-    B->>F: Return game URL + Token
+    B->>B: 生成 Token<br/>(Player ID + Timestamp + HMAC)
+    B->>F: 返回遊戲 URL + Token
 
-    F->>G: Redirect to game<br/>(URL?token=xxx)
+    F->>G: 重定向到遊戲<br/>(URL?token=xxx)
 
-    Note over G: GP Server Side
+    Note over G: GP 伺服器端
     G->>B: 1. GetBalance(Token)
-    B->>B: Validate Token<br/>- HMAC signature<br/>- Expiry check<br/>- Replay check
+    B->>B: 驗證 Token<br/>- HMAC 簽名<br/>- 過期檢查<br/>- 重放檢查
 
-    alt Token Valid
-        B->>B: Query player balance
-        B-->>G: Return balance
-        G->>P: Show game interface
-    else Token Invalid
-        B-->>G: Return error
-        G->>P: Show error message
+    alt Token 有效
+        B->>B: 查詢玩家餘額
+        B-->>G: 返回餘額
+        G->>P: 顯示遊戲介面
+    else Token 無效
+        B-->>G: 返回錯誤
+        G->>P: 顯示錯誤訊息
     end
 
-    Note over P,G: Player starts game
+    Note over P,G: 玩家開始遊戲
 
-    P->>G: Place bet $100
+    P->>G: 下注 $100
     G->>B: 2. Debit(Request ID, $100)
 
-    B->>B: Idempotency check<br/>(Has Request ID been processed?)
+    B->>B: 冪等性檢查<br/>(Request ID 是否已處理？)
 
-    alt First Request
-        B->>B: Check playable balance
-        B->>B: Deduct + Lock
-        B->>B: Record Request ID
-        B-->>G: Debit success
-        G->>P: Start game
-    else Duplicate Request
-        B->>B: Return cached result
-        B-->>G: Debit success (idempotent)
+    alt 首次請求
+        B->>B: 檢查可下注餘額
+        B->>B: 扣除 + 鎖定
+        B->>B: 記錄 Request ID
+        B-->>G: Debit 成功
+        G->>P: 開始遊戲
+    else 重複請求
+        B->>B: 返回快取結果
+        B-->>G: Debit 成功（冪等）
     end
 
-    Note over P,G: Game Settlement
+    Note over P,G: 遊戲結算
 
     G->>B: 3. Credit(Request ID, Win $50)
-    B->>B: Idempotency check
-    B->>B: Add funds + Release lock
-    B->>B: Record turnover
-    B-->>G: Credit success
+    B->>B: 冪等性檢查
+    B->>B: 增加資金 + 釋放鎖定
+    B->>B: 記錄有效投注額
+    B-->>G: Credit 成功
 
-    G->>P: Show settlement result
+    G->>P: 顯示結算結果
 ```
 
-### 2.2 Token Generation
+### 2.2 Token 生成
 
-**Token Structure**:
+**Token 結構**：
 ```json
 {
   "player_id": "12345",
@@ -137,48 +137,48 @@ sequenceDiagram
 }
 ```
 
-**HMAC Signature Computation**:
+**HMAC 簽名計算**：
 ```java
 String data = playerId + "|" + tenantId + "|" + timestamp;
 String signature = HmacUtils.hmacSha256Hex(secretKey, data);
 ```
 
-**Security Constraints**:
-- TTL: 5 minutes
-- One-time use: Token is marked as consumed after first use
-- Optional IP binding: Prevents token theft via IP validation
+**安全約束**：
+- TTL：5 分鐘
+- 一次性使用：Token 在首次使用後標記為已消費
+- 可選 IP 綁定：通過 IP 驗證防止 Token 盜用
 
-Reference: [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-verification)
+參考：[Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-verification)
 
-### 2.3 Three-Tier Idempotency Implementation
+### 2.3 三層冪等性實現
 
 ```java
-// Tier 1: Redis fast check (handles 99% of cases)
+// 第一層：Redis 快速檢查（處理 99% 的情況）
 if (redisTemplate.hasKey("request:" + requestId)) {
     return getCachedResult(requestId);
 }
 
-// Tier 2: Database check (Redis miss/failure)
+// 第二層：資料庫檢查（Redis 未命中/失敗）
 Transaction tx = transactionDao.findByRequestId(requestId);
 if (tx != null) {
     return tx.getResult();
 }
 
-// Tier 3: Distributed lock (extreme concurrency)
+// 第三層：分散式鎖（極端並發情況）
 try (DistributedLock lock = redisson.getLock("lock:" + requestId)) {
     lock.lock();
-    // Execute debit logic
+    // 執行 debit 邏輯
 }
 ```
 
-**Design Rationale**:
-- Redis provides sub-millisecond lookup for the common case
-- Database serves as durable backup when Redis is unavailable
-- Distributed lock (Redisson) handles the edge case where two identical requests arrive simultaneously before either is persisted
+**設計理由**：
+- Redis 為常見情況提供亞毫秒級查詢
+- 資料庫作為 Redis 不可用時的持久備份
+- 分散式鎖（Redisson）處理兩個相同請求在任一持久化之前同時到達的邊緣情況
 
-Reference: [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#idempotency)
+參考：[Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#idempotency)
 
-### 2.4 Playable Balance Check
+### 2.4 可下注餘額檢查
 
 ```java
 if (availableBalance < betAmount) {
@@ -186,13 +186,13 @@ if (availableBalance < betAmount) {
 }
 ```
 
-**Formula**: `playable_balance = cash_balance - locked_amount - in_progress_bets`
+**公式**：`playable_balance = cash_balance - locked_amount - in_progress_bets`
 
-Reference: [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#playable-balance)
+參考：[Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#playable-balance)
 
-### 2.5 API Specifications
+### 2.5 API 規範
 
-**GetBalance API**:
+**GetBalance API**：
 ```http
 POST /api/gp/getBalance
 Content-Type: application/json
@@ -205,7 +205,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**:
+**回應**：
 ```json
 {
   "code": 0,
@@ -216,7 +216,7 @@ Content-Type: application/json
 }
 ```
 
-**Debit API**:
+**Debit API**：
 ```http
 POST /api/gp/debit
 Content-Type: application/json
@@ -230,13 +230,13 @@ Content-Type: application/json
 }
 ```
 
-Reference: [Game Integration Standard](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
+參考：[Game Integration Standard](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 
 ---
 
-## 3. Bonus Engine and Wagering Tracking
+## 3. 優惠引擎與投注追蹤
 
-### 3.1 Bonus Calculation Logic
+### 3.1 優惠計算邏輯
 
 ```java
 BigDecimal bonusAmount = depositAmount.multiply(bonusRate);
@@ -247,32 +247,32 @@ if (bonusAmount.compareTo(maxBonus) > 0) {
 BigDecimal wageringRequirement = depositAmount.add(bonusAmount).multiply(multiplier);
 ```
 
-**Key Parameters**:
-- `bonusRate`: Percentage of deposit (e.g., 0.50 for 50%)
-- `maxBonus`: Maximum bonus cap (e.g., $500)
-- `multiplier`: Wagering multiplier (e.g., 20x)
+**關鍵參數**：
+- `bonusRate`：存款百分比（例如，0.50 表示 50%）
+- `maxBonus`：最大優惠上限（例如，$500）
+- `multiplier`：流水倍數（例如，20x）
 
-Reference: [Bonus Calculation Engine](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
+參考：[Bonus Calculation Engine](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 
-### 3.2 Wagering Accumulation Logic
+### 3.2 流水累積邏輯
 
 ```java
-// After each bet, update wagering progress
+// 每次下注後，更新流水進度
 BigDecimal validBet = betAmount.multiply(gameWeight);
 wageringProgress = wageringProgress.add(validBet);
 
-// Check if wagering requirement is met
+// 檢查是否滿足流水要求
 if (wageringProgress.compareTo(wageringRequirement) >= 0) {
     convertBonusToCash();
 }
 ```
 
-Reference: [Turnover Calculation](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
+參考：[Turnover Calculation](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 
-### 3.3 Bonus-to-Cash Conversion (Atomic Transaction)
+### 3.3 優惠轉真金（原子交易）
 
 ```sql
--- Atomic operation
+-- 原子操作
 BEGIN;
 
 UPDATE t_player_wallet
@@ -289,18 +289,18 @@ WHERE id = :bonusId;
 COMMIT;
 ```
 
-**Transaction Safety**:
-- The `WHERE bonus_balance >= :bonusAmount` clause prevents negative balance
-- Both updates must succeed atomically (wrapped in a single transaction)
-- The Manager layer handles `@Transactional(rollbackFor = Throwable.class)` per SmartAdmin architecture rules
+**交易安全性**：
+- `WHERE bonus_balance >= :bonusAmount` 子句防止負餘額
+- 兩個更新必須原子性成功（包裹在單一交易中）
+- Manager 層處理 `@Transactional(rollbackFor = Throwable.class)`，符合 SmartAdmin 架構規則
 
-Reference: [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
+參考：[Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
 
 ---
 
-## 4. Withdrawal Processing and Risk Engine
+## 4. 提款處理與風控引擎
 
-### 4.1 Fund Locking Implementation
+### 4.1 資金鎖定實現
 
 ```sql
 UPDATE t_player_wallet
@@ -309,45 +309,45 @@ WHERE player_id = :playerId
   AND (cash_balance - locked_amount) >= :withdrawAmount;
 ```
 
-**Design Notes**:
-- The `WHERE` clause ensures atomic check-and-lock (no race condition)
-- If the available balance is insufficient, the UPDATE affects 0 rows, and the application returns an error
+**設計注意事項**：
+- `WHERE` 子句確保原子性檢查並鎖定（無競爭條件）
+- 如果可用餘額不足，UPDATE 影響 0 行，應用程式返回錯誤
 
-Reference: [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#fund-locking)
+參考：[Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#fund-locking)
 
-### 4.2 Multi-Layer Risk Engine Implementation
+### 4.2 多層風控引擎實現
 
 ```java
 RiskScore riskScore = new RiskScore();
 
-// Layer 1: KYC Check
+// 第一層：KYC 檢查
 if (!player.isKycVerified()) {
     return RiskDecision.REJECT("KYC_NOT_VERIFIED");
 }
 
-// Layer 2: Turnover Check
+// 第二層：流水檢查
 BigDecimal requiredTurnover = player.getDeposits().multiply(BigDecimal.ONE); // 1x turnover
 if (player.getTurnover().compareTo(requiredTurnover) < 0) {
     return RiskDecision.REJECT("TURNOVER_NOT_MET");
 }
 
-// Layer 3: Frequency Check
+// 第三層：頻率檢查
 int withdrawCountToday = withdrawalDao.countToday(playerId);
 if (withdrawCountToday > 3) {
     riskScore.add(30, "HIGH_FREQUENCY");
 }
 
-// Layer 4: Amount Check
+// 第四層：金額檢查
 if (withdrawAmount.compareTo(player.getTotalDeposits().multiply(BigDecimal.valueOf(3))) > 0) {
     riskScore.add(40, "LARGE_AMOUNT");
 }
 
-// Layer 5: Behavior Check
+// 第五層：行為檢查
 if (player.hasOnlyBonusPlay()) {
     riskScore.add(50, "BONUS_ABUSE");
 }
 
-// Decision
+// 決策
 if (riskScore.getTotal() <= 30) {
     return RiskDecision.AUTO_APPROVE();
 } else if (riskScore.getTotal() <= 70) {
@@ -357,76 +357,76 @@ if (riskScore.getTotal() <= 30) {
 }
 ```
 
-Reference: [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
+參考：[Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
 
-### 4.3 SAGA Compensation Transaction
+### 4.3 SAGA 補償交易
 
 ```java
 @Transactional(rollbackFor = Throwable.class)
 public void processWithdrawal(WithdrawalRequest request) {
     try {
-        // Step 1: Create order
+        // 步驟 1：創建訂單
         Withdrawal withdrawal = createWithdrawal(request);
 
-        // Step 2: Lock funds
+        // 步驟 2：鎖定資金
         walletService.lockFunds(playerId, amount);
 
-        // Step 3: Call payment gateway
+        // 步驟 3：調用支付閘道
         PaymentResult result = paymentGateway.withdraw(withdrawal);
 
         if (!result.isSuccess()) {
-            // Compensation: release lock
+            // 補償：釋放鎖定
             walletService.unlockFunds(playerId, amount);
             throw new WithdrawalFailedException();
         }
 
-        // Step 4: Deduct balance
+        // 步驟 4：扣除餘額
         walletService.deductBalance(playerId, amount);
 
     } catch (Exception e) {
-        // Trigger compensation transaction
+        // 觸發補償交易
         compensate(withdrawal);
         throw e;
     }
 }
 ```
 
-**SAGA Flow**:
+**SAGA 流程**：
 ```
-Forward:  Create Order -> Lock Funds -> Call Payment -> Deduct Balance
-Compensate: Delete Order <- Release Lock <- Cancel Payment <- Rollback Balance
+正向：創建訂單 -> 鎖定資金 -> 調用支付 -> 扣除餘額
+補償：刪除訂單 <- 釋放鎖定 <- 取消支付 <- 回滾餘額
 ```
 
-**Architecture Note**: Per SmartAdmin rules, `@Transactional` must be placed in the Manager layer, not the Service layer. The code above should reside in a `WithdrawalManager` class.
+**架構注意事項**：根據 SmartAdmin 規則，`@Transactional` 必須放置在 Manager 層，而非 Service 層。上述程式碼應位於 `WithdrawalManager` 類別中。
 
-Reference: [Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md#saga-compensation)
+參考：[Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md#saga-compensation)
 
 ---
 
-## 5. Turnover Calculation and Reconciliation Pipeline
+## 5. 有效投注額計算與對帳流水線
 
-### 5.1 Three-Layer Architecture Diagram
+### 5.1 三層架構圖
 
 ```mermaid
 flowchart LR
-    A[Game Provider GP] -->|1. Real-time push| B[Layer 1: Real-Time<br/>OLTP]
-    B -->|2. Scheduled sync| C[Layer 2: Reconciliation<br/>GP API Pull]
-    C -->|3. Data warehouse| D[Layer 3: Analytics<br/>OLAP]
+    A[遊戲提供商 GP] -->|1. 即時推送| B[第一層：即時<br/>OLTP]
+    B -->|2. 定時同步| C[第二層：對帳<br/>GP API 拉取]
+    C -->|3. 數據倉庫| D[第三層：分析<br/>OLAP]
 
-    B --> E[Real-time turnover stats]
-    C --> F[Hourly reconciliation]
-    D --> G[Daily final reports]
+    B --> E[即時有效投注額統計]
+    C --> F[每小時對帳]
+    D --> G[每日最終報表]
 
-    F --> H{Discrepancy detected}
-    H -->|Discrepancy| I[Alert and correction]
-    H -->|No discrepancy| J[Mark consistent]
+    F --> H{檢測到差異}
+    H -->|有差異| I[告警與修正]
+    H -->|無差異| J[標記一致]
 
     style H fill:#fff4e1
     style I fill:#ffe1e1
     style J fill:#e1f5e1
 ```
 
-### 5.2 Layer 1: OLTP Schema
+### 5.2 第一層：OLTP 架構
 
 ```sql
 CREATE TABLE t_player_bet (
@@ -435,58 +435,58 @@ CREATE TABLE t_player_bet (
     game_id VARCHAR(50),
     round_id VARCHAR(100),
     bet_amount DECIMAL(18,2),
-    valid_bet DECIMAL(18,2),  -- Valid bet (risk-filtered)
+    valid_bet DECIMAL(18,2),  -- 有效投注（風控篩選後）
     win_amount DECIMAL(18,2),
     bet_time TIMESTAMP,
     settle_time TIMESTAMP
 );
 ```
 
-**Real-time Turnover Query**:
+**即時有效投注額查詢**：
 ```sql
--- Player's daily turnover
+-- 玩家的每日有效投注額
 SELECT SUM(valid_bet)
 FROM t_player_bet
 WHERE player_id = ?
   AND DATE(bet_time) = CURRENT_DATE;
 ```
 
-### 5.3 Layer 2: Reconciliation Engine
+### 5.3 第二層：對帳引擎
 
 ```java
-// 1. Pull data from GP API
+// 1. 從 GP API 拉取數據
 List<GPBetRecord> gpRecords = gpApi.getBets(startTime, endTime);
 
-// 2. Compare with local data
+// 2. 與本地數據比較
 for (GPBetRecord gpRecord : gpRecords) {
     LocalBetRecord localRecord = betDao.findByRoundId(gpRecord.getRoundId());
 
     if (localRecord == null) {
-        // Discrepancy 1: Missing local record
+        // 差異 1：缺少本地記錄
         alerts.add("MISSING_LOCAL:" + gpRecord.getRoundId());
         supplementRecord(gpRecord);
     } else if (!localRecord.getValidBet().equals(gpRecord.getValidBet())) {
-        // Discrepancy 2: Amount mismatch
+        // 差異 2：金額不匹配
         alerts.add("AMOUNT_MISMATCH:" + gpRecord.getRoundId());
         correctRecord(localRecord, gpRecord);
     }
 }
 
-// 3. Check for extra local records
+// 3. 檢查多餘的本地記錄
 List<LocalBetRecord> extraLocal = betDao.findNotInGP(gpRecords);
 if (!extraLocal.isEmpty()) {
     alerts.add("EXTRA_LOCAL:" + extraLocal.size());
 }
 ```
 
-**Reconciliation Priority**: GP data is the authoritative source. Local records are corrected to match GP when discrepancies are found.
+**對帳優先級**：GP 數據是權威來源。當發現差異時，本地記錄會修正以匹配 GP。
 
-### 5.4 Layer 3: OLAP Data Warehouse Schema
+### 5.4 第三層：OLAP 數據倉庫架構
 
 ```sql
--- DWD Detail Layer
+-- DWD 明細層
 CREATE TABLE dwd_player_bet (
-    -- Same as OLTP but with added dimensions
+    -- 與 OLTP 相同，但添加了維度
     tenant_id BIGINT,
     brand_name VARCHAR(50),
     game_type VARCHAR(20),
@@ -494,7 +494,7 @@ CREATE TABLE dwd_player_bet (
     ...
 ) PARTITION BY RANGE (bet_time);
 
--- DWS Summary Layer
+-- DWS 匯總層
 CREATE TABLE dws_player_turnover_daily (
     player_id BIGINT,
     stat_date DATE,
@@ -505,7 +505,7 @@ CREATE TABLE dws_player_turnover_daily (
 );
 ```
 
-**Daily Report Generation** (runs at 2:00 AM):
+**每日報表生成**（在凌晨 2:00 運行）：
 ```sql
 INSERT INTO dws_player_turnover_daily
 SELECT
@@ -519,36 +519,36 @@ WHERE DATE(bet_time) = CURRENT_DATE - INTERVAL 1 DAY
 GROUP BY player_id, DATE(bet_time);
 ```
 
-For detailed turnover calculation flowcharts, see [Turnover Flowcharts](../02_Finance_Service/Turnover_Flowcharts.md).
+關於詳細的有效投注額計算流程圖，請參閱 [Turnover Flowcharts](../02_Finance_Service/Turnover_Flowcharts.md)。
 
 ---
 
-## 6. Multi-Tenant Data Isolation Architecture
+## 6. 多租戶數據隔離架構
 
-### 6.1 Architecture Diagram
+### 6.1 架構圖
 
 ```mermaid
 flowchart TD
-    subgraph "Frontend Layer"
-        A1[Brand A Frontend<br/>brandA.com]
-        A2[Brand B Frontend<br/>brandB.com]
+    subgraph "前端層"
+        A1[品牌 A 前端<br/>brandA.com]
+        A2[品牌 B 前端<br/>brandB.com]
     end
 
     subgraph "API Gateway"
         B[Nginx / Kong]
     end
 
-    subgraph "Application Layer"
+    subgraph "應用層"
         C[Spring Boot Application]
         D[Tenant Context Filter]
     end
 
-    subgraph "Cache Layer"
+    subgraph "快取層"
         E1[Redis: brand_a:*]
         E2[Redis: brand_b:*]
     end
 
-    subgraph "Data Layer"
+    subgraph "數據層"
         F[(PostgreSQL)]
         G[Schema: brand_a]
         H[Schema: brand_b]
@@ -560,21 +560,21 @@ flowchart TD
     B --> C
     C --> D
 
-    D -->|Resolve Tenant ID| E1
-    D -->|Resolve Tenant ID| E2
+    D -->|解析 Tenant ID| E1
+    D -->|解析 Tenant ID| E2
 
     E1 --> G
     E2 --> H
 
-    G -.->|Complete isolation| F
-    H -.->|Complete isolation| F
+    G -.->|完全隔離| F
+    H -.->|完全隔離| F
 
     style D fill:#fff4e1
     style G fill:#e1f5e1
     style H fill:#e1f5e1
 ```
 
-### 6.2 Tenant Context Filter Implementation
+### 6.2 租戶上下文 Filter 實現
 
 ```java
 @Component
@@ -583,26 +583,26 @@ public class TenantContextFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
         try {
-            // 1. Parse Tenant ID from JWT Token
+            // 1. 從 JWT Token 解析 Tenant ID
             String token = extractToken(request);
             Claims claims = jwtService.parse(token);
             String tenantId = claims.get("tenant_id", String.class);
 
-            // 2. Inject into ThreadLocal
+            // 2. 注入到 ThreadLocal
             TenantContext.set(tenantId);
 
-            // 3. Continue processing request
+            // 3. 繼續處理請求
             chain.doFilter(request, response);
 
         } finally {
-            // 4. Clean up ThreadLocal (prevent memory leak)
+            // 4. 清理 ThreadLocal（防止記憶體洩漏）
             TenantContext.clear();
         }
     }
 }
 ```
 
-### 6.3 TenantContext ThreadLocal Implementation
+### 6.3 TenantContext ThreadLocal 實現
 
 ```java
 public class TenantContext {
@@ -626,7 +626,7 @@ public class TenantContext {
 }
 ```
 
-**Important**: When using Virtual Threads (Java 21), consider using `ScopedValue` instead of `ThreadLocal` to avoid thread-local inheritance issues with virtual thread pools.
+**重要提示**：使用 Virtual Threads（Java 21）時，考慮使用 `ScopedValue` 而非 `ThreadLocal`，以避免虛擬執行緒池的執行緒本地繼承問題。
 
 ### 6.4 MyBatis Schema Interceptor
 
@@ -639,33 +639,33 @@ public class TenantSchemaInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        // 1. Get Tenant ID
+        // 1. 獲取 Tenant ID
         String tenantId = TenantContext.get();
 
-        // 2. Dynamically switch schema
+        // 2. 動態切換 schema
         String schemaName = "tenant_" + tenantId;
         Connection conn = getConnection(invocation);
         conn.createStatement().execute("SET search_path TO " + schemaName);
 
-        // 3. Execute SQL
+        // 3. 執行 SQL
         return invocation.proceed();
     }
 }
 ```
 
-**SQL Auto-Rewrite Example**:
+**SQL 自動重寫範例**：
 ```sql
--- Original SQL
+-- 原始 SQL
 SELECT * FROM t_player WHERE id = ?
 
--- Auto-rewritten to
+-- 自動重寫為
 SET search_path TO tenant_brand_a;
 SELECT * FROM t_player WHERE id = ?
 ```
 
-**Security Note**: The `schemaName` must be validated against a whitelist of known tenants to prevent SQL injection via manipulated tenant IDs.
+**安全注意事項**：`schemaName` 必須針對已知租戶的白名單進行驗證，以防止通過操縱租戶 ID 進行 SQL 注入。
 
-### 6.5 Redis Key Prefix Isolation
+### 6.5 Redis Key 前綴隔離
 
 ```java
 public class RedisKeyBuilder {
@@ -675,32 +675,32 @@ public class RedisKeyBuilder {
     }
 }
 
-// Usage example
+// 使用範例
 String key = RedisKeyBuilder.buildKey("player", "wallet:" + playerId);
-// Result: "brand_a:player:wallet:12345"
+// 結果："brand_a:player:wallet:12345"
 ```
 
-**Benefits**:
-- Prevents data conflicts between tenants in shared Redis
-- Enables per-tenant cache flushing (`DEL brand_a:*`)
-- Supports per-tenant cache monitoring and metrics
+**優點**：
+- 防止共享 Redis 中租戶之間的數據衝突
+- 支援按租戶快取清除（`DEL brand_a:*`）
+- 支援按租戶快取監控和指標
 
-### 6.6 JWT Token Generation
+### 6.6 JWT Token 生成
 
 ```java
 public String generateToken(Player player) {
     return Jwts.builder()
         .setSubject(player.getId().toString())
-        .claim("tenant_id", player.getTenantId())  // Critical: inject Tenant ID
+        .claim("tenant_id", player.getTenantId())  // 關鍵：注入 Tenant ID
         .claim("roles", player.getRoles())
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + 86400000))  // 24 hours
+        .setExpiration(new Date(System.currentTimeMillis() + 86400000))  // 24 小時
         .signWith(secretKey)
         .compact();
 }
 ```
 
-### 6.7 Cross-Tenant Access Prevention
+### 6.7 跨租戶訪問防護
 
 ```java
 @Service
@@ -709,7 +709,7 @@ public class PlayerService {
     public Player getPlayer(Long playerId) {
         Player player = playerDao.findById(playerId);
 
-        // Critical check: verify player belongs to current tenant
+        // 關鍵檢查：驗證玩家屬於當前租戶
         if (!player.getTenantId().equals(TenantContext.get())) {
             throw new AccessDeniedException("Cross-tenant access not allowed");
         }
@@ -719,16 +719,16 @@ public class PlayerService {
 }
 ```
 
-### 6.8 Tenant Isolation Test
+### 6.8 租戶隔離測試
 
 ```java
 @Test
 public void testTenantIsolation() {
-    // 1. Brand A creates a player
+    // 1. 品牌 A 創建玩家
     TenantContext.set("brand_a");
     Player playerA = playerService.createPlayer("Alice");
 
-    // 2. Brand B attempts to access Brand A's player
+    // 2. 品牌 B 嘗試訪問品牌 A 的玩家
     TenantContext.set("brand_b");
     assertThrows(AccessDeniedException.class, () -> {
         playerService.getPlayer(playerA.getId());
@@ -736,23 +736,23 @@ public void testTenantIsolation() {
 }
 ```
 
-**Test Coverage Requirements**:
-- Cross-tenant data access must be blocked at application layer
-- Database schema isolation must be verified independently
-- Redis key isolation must be verified (no key leakage across tenants)
+**測試覆蓋率要求**：
+- 應用層必須阻止跨租戶數據訪問
+- 必須獨立驗證資料庫 schema 隔離
+- 必須驗證 Redis key 隔離（租戶之間無 key 洩漏）
 
 ---
 
-## Cross-Reference Index
+## 交叉引用索引
 
-| Flow | Requirements Doc | Architecture Doc |
+| 流程 | Requirements 文檔 | Architecture 文檔 |
 |------|-----------------|-----------------|
-| Player Registration & KYC | [Business_Flows.md Section 1](../../requirements/01_Player_Experience/Business_Flows.md#1-player-registration-and-kyc) | This document, Section 1 |
-| Game Integration & Token | [Business_Flows.md Section 2](../../requirements/01_Player_Experience/Business_Flows.md#2-game-launch-and-token-verification) | This document, Section 2 |
-| Bonus & Wagering | [Business_Flows.md Section 3](../../requirements/01_Player_Experience/Business_Flows.md#3-bonus-distribution-and-wagering-requirements) | This document, Section 3 |
-| Withdrawal & Risk | [Business_Flows.md Section 4](../../requirements/01_Player_Experience/Business_Flows.md#4-withdrawal-review-and-risk-control) | This document, Section 4 |
-| Turnover & Reconciliation | [Business_Flows.md Section 5](../../requirements/01_Player_Experience/Business_Flows.md#5-turnover-calculation-and-reconciliation) | This document, Section 5 |
-| Multi-Tenant Isolation | [Business_Flows.md Section 6](../../requirements/01_Player_Experience/Business_Flows.md#6-multi-tenant-data-isolation) | This document, Section 6 |
+| 玩家註冊與 KYC | [Business_Flows.md Section 1](../../requirements/01_Player_Experience/Business_Flows.md#1-player-registration-and-kyc) | 本文檔，第 1 節 |
+| 遊戲整合與 Token | [Business_Flows.md Section 2](../../requirements/01_Player_Experience/Business_Flows.md#2-game-launch-and-token-verification) | 本文檔，第 2 節 |
+| 優惠與流水 | [Business_Flows.md Section 3](../../requirements/01_Player_Experience/Business_Flows.md#3-bonus-distribution-and-wagering-requirements) | 本文檔，第 3 節 |
+| 提款與風控 | [Business_Flows.md Section 4](../../requirements/01_Player_Experience/Business_Flows.md#4-withdrawal-review-and-risk-control) | 本文檔，第 4 節 |
+| 有效投注額與對帳 | [Business_Flows.md Section 5](../../requirements/01_Player_Experience/Business_Flows.md#5-turnover-calculation-and-reconciliation) | 本文檔，第 5 節 |
+| 多租戶隔離 | [Business_Flows.md Section 6](../../requirements/01_Player_Experience/Business_Flows.md#6-multi-tenant-data-isolation) | 本文檔，第 6 節 |
 
 ---
 
