@@ -1,4 +1,4 @@
-# Promotion Requirements
+# 促銷需求（Promotion Requirements）
 
 > **Canonical Source**: [00-13_Promotion_Implementation.md](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md)
 > **Audience**: Executives, Product Managers, Operations Teams
@@ -7,193 +7,193 @@
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
-The promotion system delivers critical business value by:
-- **Player Acquisition**: First deposit bonuses convert registrations to active depositors with industry-standard 25-40% FTD conversion rates
-- **Player Retention**: VIP tier system rewards loyalty, reducing churn by incentivizing continued play through progressive benefits
-- **Revenue Protection**: Anti-duplicate claim mechanisms and wagering requirements prevent bonus abuse that accounts for 63.8% of iGaming fraud
-- **Competitive Positioning**: Configurable bonus engine enables rapid deployment of market-competitive promotions without code changes
-- **Regulatory Compliance**: Accurate wagering tracking supports AML turnover requirements and audit obligations
-
----
-
-## 1. Overview
-
-This document defines the business requirements for the iGaming platform promotion system, covering bonus distribution, wagering requirement tracking, and VIP tier management. These requirements ensure promotions are properly configured, securely distributed, and accurately tracked.
+促銷系統提供關鍵業務價值：
+- **玩家獲取（Player Acquisition）**：首存獎金將註冊轉化為活躍存款者，行業標準 FTD 轉化率為 25-40%
+- **玩家留存（Player Retention）**：VIP 層級系統獎勵忠誠度，透過漸進式權益激勵持續遊戲以減少流失
+- **營收保護（Revenue Protection）**：防重複領取機制和流水要求防止佔 iGaming 詐欺 63.8% 的獎金濫用
+- **競爭定位（Competitive Positioning）**：可配置獎金引擎無需程式碼變更即可快速部署市場競爭力促銷
+- **法規合規（Regulatory Compliance）**：準確的流水追蹤支持 AML 投注要求和審計義務
 
 ---
 
-## 2. Bonus Distribution Engine Requirements
+## 1. 概述（Overview）
 
-**Business Goal**: Build a configurable bonus engine that supports multiple bonus types, enforces distribution rules, and prevents abuse through anti-duplication mechanisms.
-
-### Bonus Types
-
-| Bonus Type | Description | Trigger |
-|-----------|-------------|---------|
-| First Deposit Bonus | Percentage match on player's first deposit | First successful deposit |
-| Wagering Bonus | Reward for reaching wagering milestones | Cumulative bet threshold reached |
-| Activity Bonus | Time-limited promotional bonuses | Campaign enrollment |
-| Reload Bonus | Bonus on subsequent deposits | Qualifying deposit |
-| Referral Bonus | Reward for successful player referrals | Referred player completes requirements |
-
-### Functional Requirements
-
-| ID | Requirement | Priority | Acceptance Criteria |
-|----|-------------|----------|---------------------|
-| PROMO-BONUS-01 | Bonus type configuration | Critical | All bonus types (first deposit, wagering, activity, etc.) can be configured |
-| PROMO-BONUS-02 | Distribution rule engine | Critical | Bonus rules execute correctly for all trigger conditions |
-| PROMO-BONUS-03 | Anti-duplicate claim | Critical | A player cannot claim the same bonus more than once per eligibility window |
-| PROMO-BONUS-04 | Bonus wallet balance | High | Bonus funds are credited to the correct wallet with accurate balance |
-
-### Eligibility Rules
-
-| Rule | Description |
-|------|-------------|
-| Player Status | Player must be active and KYC-verified |
-| Deposit Minimum | Qualifying deposit must meet minimum threshold |
-| Time Window | Claim must occur within promotion validity period |
-| Wagering Status | No outstanding incomplete wagering from previous bonuses |
-| Geographic Eligibility | Player's jurisdiction permits the promotion type |
-
-### Compliance Checklist
-
-- Bonus types are correctly configured and match business specifications
-- Distribution rules execute accurately for all trigger scenarios
-- Anti-duplicate claim mechanism prevents concurrent exploitation
-- Bonus wallet balances are correct after distribution
-
-### Known Risks
-
-| Risk | Description | Mitigation |
-|------|-------------|------------|
-| Duplicate Claims | Concurrent requests allow double-claiming | Implement distributed locking on claim operations |
-| Incomplete Wagering | New bonus issued while previous wagering is incomplete | Check outstanding wagering before new bonus distribution |
-| Expired Bonuses | Unclaimed or expired bonuses remain in system | Schedule automated cleanup of expired bonuses |
+本文檔定義 iGaming 平台促銷系統的業務需求，涵蓋獎金發放、流水要求追蹤和 VIP 層級管理。這些需求確保促銷被正確配置、安全分發和準確追蹤。
 
 ---
 
-## 3. Wagering Requirement Tracking
+## 2. 獎金發放引擎需求（Bonus Distribution Engine Requirements）
 
-**Business Goal**: Accurately track player wagering progress against bonus requirements, ensuring fair calculation across all game types with real-time progress visibility.
+**業務目標**：建立可配置的獎金引擎，支持多種獎金類型、執行分發規則，並透過防重複機制防止濫用。
 
-### Wagering Calculation Rules
+### 獎金類型（Bonus Types）
 
-| Factor | Description |
-|--------|-------------|
-| Valid Bet Definition | Only settled bets count toward wagering; voided/cancelled bets are excluded |
-| Game Weight | Different game categories contribute different percentages toward wagering |
-| Accumulation Period | Wagering accumulates across days until requirement is met or expires |
-| Cancellation Handling | Cancelled bets must be deducted from accumulated wagering progress |
+| 獎金類型 | 描述 | 觸發條件 |
+|---------|------|---------|
+| 首存獎金（First Deposit Bonus） | 玩家首次存款的百分比匹配 | 首次成功存款 |
+| 流水獎金（Wagering Bonus） | 達到流水里程碑的獎勵 | 累計投注門檻達成 |
+| 活動獎金（Activity Bonus） | 限時促銷獎金 | 活動註冊 |
+| 再存獎金（Reload Bonus） | 後續存款獎金 | 符合資格的存款 |
+| 推薦獎金（Referral Bonus） | 成功推薦玩家的獎勵 | 被推薦玩家完成要求 |
 
-### Game Weight Examples
+### 功能需求（Functional Requirements）
 
-| Game Category | Wagering Contribution |
-|--------------|----------------------|
-| Slots | 100% |
-| Table Games | 50% |
-| Live Casino | 25% |
-| Sports Betting | Varies by market type |
+| ID | 需求 | 優先級 | 驗收標準 |
+|----|------|--------|---------|
+| PROMO-BONUS-01 | 獎金類型配置 | 關鍵 | 所有獎金類型（首存、流水、活動等）可配置 |
+| PROMO-BONUS-02 | 分發規則引擎 | 關鍵 | 獎金規則對所有觸發條件正確執行 |
+| PROMO-BONUS-03 | 防重複領取 | 關鍵 | 玩家在資格期間內無法重複領取同一獎金 |
+| PROMO-BONUS-04 | 獎金錢包餘額 | 高 | 獎金資金準確記入正確錢包並顯示準確餘額 |
 
-### Functional Requirements
+### 資格規則（Eligibility Rules）
 
-| ID | Requirement | Priority | Acceptance Criteria |
-|----|-------------|----------|---------------------|
-| PROMO-WAG-01 | Valid bet calculation | Critical | Only settled, non-voided bets contribute to wagering |
-| PROMO-WAG-02 | Real-time progress updates | High | Wagering progress reflects within 30 seconds of bet settlement |
-| PROMO-WAG-03 | Completion notifications | High | Player receives notification when wagering requirement is met |
-| PROMO-WAG-04 | Historical wagering audit trail | Medium | All wagering records are traceable for compliance review |
+| 規則 | 描述 |
+|------|------|
+| 玩家狀態（Player Status） | 玩家必須處於活躍狀態並完成 KYC 驗證 |
+| 最低存款（Deposit Minimum） | 符合資格的存款必須達到最低門檻 |
+| 時間窗口（Time Window） | 領取必須在促銷有效期內進行 |
+| 流水狀態（Wagering Status） | 沒有未完成的先前獎金流水要求 |
+| 地理資格（Geographic Eligibility） | 玩家所在司法管轄區允許該促銷類型 |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- Valid bet calculations are accurate across all game types
-- Wagering progress updates in real time
-- Completion notifications are sent promptly
-- Historical wagering records are fully traceable
+- 獎金類型配置正確並符合業務規格
+- 分發規則對所有觸發場景準確執行
+- 防重複領取機制防止並發利用
+- 獎金錢包餘額在分發後正確
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
-|------|-------------|------------|
-| Game Weight Errors | Incorrect weight assignment for game categories | Maintain centralized weight configuration with approval workflow |
-| Cancelled Bet Handling | Cancelled bets not properly deducted | Implement deduction logic triggered on bet cancellation events |
-| Cross-Day Accumulation | Progress resets incorrectly at day boundary | Use cumulative tracking without daily reset boundaries |
-
----
-
-## 4. VIP Tier System Requirements
-
-**Business Goal**: Implement a multi-tier VIP program that rewards loyal players with progressive benefits, clear upgrade criteria, and fair demotion policies.
-
-### VIP Tier Structure
-
-| Tier | Upgrade Criteria | Key Benefits |
-|------|-----------------|--------------|
-| Bronze | Default entry level | Basic promotions access |
-| Silver | Points or deposit threshold | Enhanced bonus percentages |
-| Gold | Higher points or deposit threshold | Priority withdrawals, personal manager |
-| Platinum | Top-tier achievement | Exclusive events, maximum bonus rates |
-| Diamond | Invitation only | Bespoke benefits, highest limits |
-
-### Functional Requirements
-
-| ID | Requirement | Priority | Acceptance Criteria |
-|----|-------------|----------|---------------------|
-| PROMO-VIP-01 | VIP tier calculation | Critical | Tier assignment is accurate based on configured criteria |
-| PROMO-VIP-02 | Upgrade trigger accuracy | Critical | Upgrade occurs immediately when criteria are met |
-| PROMO-VIP-03 | Demotion mechanism | High | Demotion follows grace period and notification policies |
-| PROMO-VIP-04 | Exclusive benefits activation | High | Tier-specific benefits are active immediately on tier change |
-
-### Demotion Policy
-
-| Policy Element | Description |
-|---------------|-------------|
-| Retention Conditions | Minimum activity required to maintain current tier |
-| Grace Period | Buffer period before demotion takes effect |
-| Benefit Removal | Tier-specific benefits are removed upon confirmed demotion |
-| Notification | Player is notified of impending demotion during grace period |
-
-### Compliance Checklist
-
-- VIP tiers are correctly calculated based on defined criteria
-- Upgrades trigger accurately and immediately
-- Demotion mechanism operates with proper grace period
-- Exclusive benefits activate and deactivate on tier changes
-
-### Known Risks
-
-| Risk | Description | Mitigation |
-|------|-------------|------------|
-| Demotion Rules | Unclear retention conditions cause player confusion | Define and publish clear retention criteria |
-| Benefit Deactivation | Demoted player retains elevated benefits | Implement benefit removal triggered by demotion event |
-| Points Expiration | Expired points not cleaned up | Schedule periodic points expiration processing |
+| 風險 | 描述 | 緩解措施 |
+|------|------|---------|
+| 重複領取（Duplicate Claims） | 並發請求允許重複領取 | 在領取操作上實施分散式鎖定 |
+| 未完成流水（Incomplete Wagering） | 先前流水未完成時發放新獎金 | 在新獎金分發前檢查未完成流水 |
+| 過期獎金（Expired Bonuses） | 未領取或過期獎金保留在系統中 | 排程自動清理過期獎金 |
 
 ---
 
-## 5. Business Value
+## 3. 流水要求追蹤（Wagering Requirement Tracking）
 
-The Promotion system delivers measurable business value by:
+**業務目標**：準確追蹤玩家對獎金要求的流水進度，確保所有遊戲類型的公平計算並提供即時進度可見性。
 
-- **Player Acquisition Efficiency**: First deposit bonuses increase conversion from registration to FTD by 40-65%, reducing customer acquisition cost while maintaining fraud control through anti-duplication mechanisms
-- **Retention and Engagement**: Wagering-based bonuses and reload promotions increase player stickiness, with D7 retention improving from 28% (no promotion) to 42% (with active promotion engagement)
-- **Revenue per User Optimization**: VIP tier system drives progressive engagement, with Platinum/Diamond tier players generating 5-8x higher lifetime value compared to Bronze tier through exclusive benefits and higher wagering volumes
-- **Operational Scalability**: Configuration-driven bonus engine eliminates manual distribution processes, reducing operational overhead from 4 hours/campaign to <15 minutes while supporting concurrent campaigns
-- **Compliance and Transparency**: Real-time wagering progress tracking and automated notifications ensure regulatory compliance (UKGC transparency requirements), reducing customer disputes by 63%
+### 流水計算規則（Wagering Calculation Rules）
+
+| 因子 | 描述 |
+|------|------|
+| 有效投注定義（Valid Bet Definition） | 僅已結算投注計入流水；作廢/取消投注排除 |
+| 遊戲權重（Game Weight） | 不同遊戲類別對流水貢獻不同百分比 |
+| 累積期間（Accumulation Period） | 流水跨天累積直到達到要求或過期 |
+| 取消處理（Cancellation Handling） | 取消的投注必須從累積流水進度中扣除 |
+
+### 遊戲權重範例（Game Weight Examples）
+
+| 遊戲類別 | 流水貢獻 |
+|---------|---------|
+| 老虎機（Slots） | 100% |
+| 桌遊（Table Games） | 50% |
+| 真人賭場（Live Casino） | 25% |
+| 體育博彩（Sports Betting） | 依市場類型而異 |
+
+### 功能需求（Functional Requirements）
+
+| ID | 需求 | 優先級 | 驗收標準 |
+|----|------|--------|---------|
+| PROMO-WAG-01 | 有效投注計算 | 關鍵 | 僅已結算、非作廢投注計入流水 |
+| PROMO-WAG-02 | 即時進度更新 | 高 | 流水進度在投注結算後 30 秒內反映 |
+| PROMO-WAG-03 | 完成通知 | 高 | 玩家在流水要求達成時收到通知 |
+| PROMO-WAG-04 | 歷史流水審計軌跡 | 中 | 所有流水記錄可追溯以供合規審核 |
+
+### 合規檢查清單（Compliance Checklist）
+
+- 所有遊戲類型的有效投注計算準確
+- 流水進度即時更新
+- 完成通知及時發送
+- 歷史流水記錄完全可追溯
+
+### 已知風險（Known Risks）
+
+| 風險 | 描述 | 緩解措施 |
+|------|------|---------|
+| 遊戲權重錯誤（Game Weight Errors） | 遊戲類別的權重分配不正確 | 維護集中式權重配置並實施審批工作流程 |
+| 取消投注處理（Cancelled Bet Handling） | 取消投注未正確扣除 | 實施由投注取消事件觸發的扣除邏輯 |
+| 跨天累積（Cross-Day Accumulation） | 進度在日期邊界不正確重置 | 使用無每日重置邊界的累積追蹤 |
 
 ---
 
-## 6. Reference Documents
+## 4. VIP 層級系統需求（VIP Tier System Requirements）
 
-| Area | Reference |
-|------|-----------|
-| Activity Bonus System | 04-04 Activity Bonus |
-| Bonus Calculation Engine | 04-02 Bonus Calculation Engine |
-| Turnover Calculation | 03-04 Turnover Calculation |
-| VIP & Loyalty | 01-06 VIP Loyalty |
-| Wallet Architecture | 02-06 Wallet Architecture |
+**業務目標**：實施多層級 VIP 計劃，透過漸進式權益、明確升級標準和公平降級政策獎勵忠誠玩家。
 
-### Technical Implementation
+### VIP 層級結構（VIP Tier Structure）
+
+| 層級 | 升級標準 | 關鍵權益 |
+|------|---------|---------|
+| Bronze | 預設入門級 | 基本促銷訪問 |
+| Silver | 積分或存款門檻 | 增強獎金百分比 |
+| Gold | 更高積分或存款門檻 | 優先提款、專屬經理 |
+| Platinum | 頂級成就 | 專屬活動、最大獎金率 |
+| Diamond | 僅邀請 | 客製化權益、最高限額 |
+
+### 功能需求（Functional Requirements）
+
+| ID | 需求 | 優先級 | 驗收標準 |
+|----|------|--------|---------|
+| PROMO-VIP-01 | VIP 層級計算 | 關鍵 | 基於配置標準的層級分配準確 |
+| PROMO-VIP-02 | 升級觸發準確性 | 關鍵 | 達到標準時立即升級 |
+| PROMO-VIP-03 | 降級機制 | 高 | 降級遵循寬限期和通知政策 |
+| PROMO-VIP-04 | 專屬權益啟用 | 高 | 層級特定權益在層級變更時立即啟用 |
+
+### 降級政策（Demotion Policy）
+
+| 政策元素 | 描述 |
+|---------|------|
+| 保留條件（Retention Conditions） | 維持當前層級所需的最低活動 |
+| 寬限期（Grace Period） | 降級生效前的緩衝期 |
+| 權益移除（Benefit Removal） | 確認降級後移除層級特定權益 |
+| 通知（Notification） | 玩家在寬限期內收到即將降級的通知 |
+
+### 合規檢查清單（Compliance Checklist）
+
+- VIP 層級基於定義標準正確計算
+- 升級準確且立即觸發
+- 降級機制在適當寬限期內運作
+- 專屬權益在層級變更時啟用和停用
+
+### 已知風險（Known Risks）
+
+| 風險 | 描述 | 緩解措施 |
+|------|------|---------|
+| 降級規則（Demotion Rules） | 不明確的保留條件導致玩家困惑 | 定義並公布明確的保留標準 |
+| 權益停用（Benefit Deactivation） | 降級玩家保留提升權益 | 實施由降級事件觸發的權益移除 |
+| 積分過期（Points Expiration） | 過期積分未清理 | 排程定期積分過期處理 |
+
+---
+
+## 5. 業務價值（Business Value）
+
+促銷系統提供可衡量的業務價值：
+
+- **玩家獲取效率（Player Acquisition Efficiency）**：首存獎金將註冊到 FTD 的轉化率提升 40-65%，透過防重複機制降低客戶獲取成本同時維持詐欺控制
+- **留存與參與（Retention and Engagement）**：基於流水的獎金和再存促銷提升玩家黏著度，D7 留存從 28%（無促銷）提升至 42%（有活躍促銷參與）
+- **每用戶營收優化（Revenue per User Optimization）**：VIP 層級系統驅動漸進式參與，Platinum/Diamond 層級玩家透過專屬權益和更高流水量產生 5-8 倍於 Bronze 層級的終身價值
+- **營運可擴展性（Operational Scalability）**：配置驅動的獎金引擎消除人工分發流程，將每次活動的營運開銷從 4 小時降至 <15 分鐘，同時支持並發活動
+- **合規與透明度（Compliance and Transparency）**：即時流水進度追蹤和自動通知確保法規合規（UKGC 透明度要求），客戶爭議減少 63%
+
+---
+
+## 6. 參考文檔（Reference Documents）
+
+| 領域 | 參考 |
+|------|------|
+| 活動獎金系統（Activity Bonus System） | 04-04 Activity Bonus |
+| 獎金計算引擎（Bonus Calculation Engine） | 04-02 Bonus Calculation Engine |
+| 投注額計算（Turnover Calculation） | 03-04 Turnover Calculation |
+| VIP 與忠誠度（VIP & Loyalty） | 01-06 VIP Loyalty |
+| 錢包架構（Wallet Architecture） | 02-06 Wallet Architecture |
+
+### 技術實現（Technical Implementation）
 
 → **[Promotion Implementation Architecture](../../architecture/04_Activity_Engine/Promotion_Implementation.md)** - Promotion rule engine, VIP tier calculation algorithms, benefit activation workflows, grace period management, and points expiration scheduling
 

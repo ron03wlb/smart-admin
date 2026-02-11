@@ -1,4 +1,4 @@
-# Activity Risk Control Requirements
+# 活動風險控制需求（Activity Risk Control Requirements）
 
 > **Canonical Source**: [04-03_Activity_Risk_Control.md](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
@@ -7,435 +7,435 @@
 
 ---
 
-## 1. Overview
+## 1. 概述（Overview）
 
-Bonus abuse accounts for **63.8%** of all iGaming fraud, with fraud rates rising **64%** between 2022 and 2024. Risk control must be deeply integrated with the activity (promotion) system to protect revenue while maintaining a positive player experience.
+獎金濫用（Bonus Abuse）佔所有 iGaming 詐欺案件的 **63.8%**，詐欺率在 2022 至 2024 年間上升了 **64%**。風險控制必須與活動（促銷）系統深度整合，以保護營收同時維持正面的玩家體驗。
 
 ---
 
-## 2. Player Lifecycle Activity Strategy
+## 2. 玩家生命週期活動策略（Player Lifecycle Activity Strategy）
 
-### 2.1 Lifecycle Stage Framework
+### 2.1 生命週期階段框架（Lifecycle Stage Framework）
 
-| Stage | Objective | Core Activity Types | Key Metrics |
-|-------|-----------|---------------------|-------------|
-| **Acquisition** | Convert registrations | First deposit bonus, no-deposit bonus | FTD conversion rate, CAC |
-| **Activation** | First experience | Task system, onboarding tutorial | Day-1 retention, games tried |
-| **Retention** | Long-term engagement | Daily check-in, VIP, consecutive login | MAU, churn rate, LTV |
-| **Reactivation** | Win back lapsed players | Exclusive comeback gift, time-limited offer | Reactivation cost, re-deposit rate |
+| 階段 | 目標 | 核心活動類型 | 關鍵指標 |
+|------|------|------------|---------|
+| **獲取（Acquisition）** | 轉化註冊 | 首存獎金、無存款獎金 | FTD 轉化率、CAC |
+| **激活（Activation）** | 首次體驗 | 任務系統、新手教學 | Day-1 留存、試玩遊戲數 |
+| **留存（Retention）** | 長期參與 | 每日簽到、VIP、連續登入 | MAU、流失率、LTV |
+| **重新激活（Reactivation）** | 召回流失玩家 | 專屬回歸禮、限時優惠 | 重新激活成本、再存款率 |
 
-### 2.2 First Deposit Bonus Standards
+### 2.2 首存獎金標準（First Deposit Bonus Standards）
 
-**Industry parameter ranges:**
+**行業參數範圍：**
 
-| Parameter | Low | Average | High |
-|-----------|-----|---------|------|
-| Match percentage | 50% | 100% | 200%+ |
-| Maximum amount | $100 | $500 | $2,000+ |
-| Wagering multiplier | 15x | 35x | 50x |
-| Completion deadline | 7 days | 14 days | 30 days |
+| 參數 | 低 | 平均 | 高 |
+|------|---|------|---|
+| 匹配百分比 | 50% | 100% | 200%+ |
+| 最大金額 | $100 | $500 | $2,000+ |
+| 流水倍數（Wagering Multiplier） | 15x | 35x | 50x |
+| 完成期限 | 7 天 | 14 天 | 30 天 |
 
-**Multi-deposit welcome package (recommended):**
+**多筆存款歡迎套餐（推薦）：**
 
-- 1st deposit: 100% up to $500 + 50 free spins
-- 2nd deposit: 50% up to $300 + 30 free spins
-- 3rd deposit: 25% up to $200 + 20 free spins
+- 第 1 筆存款：100% 最高 $500 + 50 個免費旋轉
+- 第 2 筆存款：50% 最高 $300 + 30 個免費旋轉
+- 第 3 筆存款：25% 最高 $200 + 20 個免費旋轉
 
-### 2.3 Cashback / Rebate System
+### 2.3 返水（Cashback）/ 返利（Rebate）系統
 
-| Type | Calculation Basis | Typical Rate | Target Audience |
-|------|-------------------|--------------|-----------------|
-| Loss-based Cashback | Net losses | 5-25% | Casual players |
-| Turnover-based Rebate | Total wager | 0.2-0.8% | High-frequency players |
-| VIP Rakeback | Wager (tiered) | 10-25% | Top-tier VIP |
+| 類型 | 計算基礎 | 典型比率 | 目標受眾 |
+|------|---------|---------|---------|
+| 損失型返水（Loss-based Cashback） | 淨損失 | 5-25% | 休閒玩家 |
+| 流水型返利（Turnover-based Rebate） | 總投注 | 0.2-0.8% | 高頻玩家 |
+| VIP 返佣（VIP Rakeback） | 投注（分層） | 10-25% | 頂級 VIP |
 
-**Cashback formulas:**
+**返水公式：**
 
-| Type | Formula | Example |
+| 類型 | 公式 | 範例 |
+|------|------|------|
+| 損失型 | (總投注 - 總派彩) x 比率 | 10% x $1,000 淨損失 = $100 |
+| 流水型 | 總投注 x 比率 | 0.5% x $10,000 投注 = $50 |
+
+### 2.4 VIP 層級系統（VIP Tier System）
+
+**標準五層結構：**
+
+| 層級 | 積分門檻 | 核心權益 |
 |------|---------|---------|
-| Loss-based | (Total Bets - Total Payouts) x Rate | 10% x $1,000 net loss = $100 |
-| Turnover-based | Total Wager x Rate | 0.5% x $10,000 wager = $50 |
+| Bronze | 0 | 基礎返利、標準客服 |
+| Silver | 1,000 | 10% 返利提升、生日獎金 |
+| Gold | 5,000 | 15% 返利、快速提款、專屬獎勵 |
+| Platinum | 20,000 | 20% 返利、VIP 經理、專屬活動 |
+| Diamond | 50,000 | 25% 返利、奢華禮品、旅遊獎勵 |
 
-### 2.4 VIP Tier System
+**進階 VIP 政策：**
 
-**Standard five-tier structure:**
-
-| Tier | Points Threshold | Core Benefits |
-|------|-----------------|---------------|
-| Bronze | 0 | Base rebate, standard support |
-| Silver | 1,000 | 10% rebate boost, birthday bonus |
-| Gold | 5,000 | 15% rebate, fast withdrawal, exclusive rewards |
-| Platinum | 20,000 | 20% rebate, VIP manager, exclusive events |
-| Diamond | 50,000 | 25% rebate, luxury gifts, travel rewards |
-
-**Advanced VIP policies:**
-
-- Level matching: Match competitor VIP tiers for new sign-ups
-- No negative carryover: Unmet wager from previous month does not affect current month
-- Dedicated manager: Platinum and above receive 24/7 personal service
+- 等級匹配：為新註冊用戶匹配競爭對手的 VIP 層級
+- 無負數結轉：上月未完成的流水要求不影響當月
+- 專屬經理：Platinum 及以上享有 24/7 專人服務
 
 ---
 
-## 3. Regional Market Localization Requirements
+## 3. 區域市場本地化需求（Regional Market Localization Requirements）
 
-### 3.1 Southeast Asia (Thailand, Vietnam, Indonesia, Philippines, Malaysia)
+### 3.1 東南亞（泰國、越南、印尼、菲律賓、馬來西亞）
 
-**Core strategy**: Mobile-first + Festival-driven + Gamification
+**核心策略**：移動優先 + 節慶驅動 + 遊戲化
 
-**Key festival calendar:**
+**關鍵節慶日曆：**
 
-| Festival | Period | Activity Design |
-|----------|--------|-----------------|
-| Lunar New Year / Tet | Jan-Feb | Red envelope rewards, 888 lucky numbers, dragon-themed slots |
-| Songkran | Apr 13-15 | "Cool down" rewards, water-themed games, refreshed jackpots |
-| Eid al-Fitr | Post-Ramadan | Celebration rewards, family reunion theme |
-| Mid-Autumn Festival | Aug-Sep | Mooncake theme, lantern activities |
+| 節慶 | 期間 | 活動設計 |
+|------|------|---------|
+| 農曆新年 / Tet | 1-2 月 | 紅包獎勵、888 幸運號碼、龍主題老虎機 |
+| 潑水節（Songkran） | 4 月 13-15 日 | 「消暑」獎勵、水主題遊戲、刷新獎池 |
+| 開齋節（Eid al-Fitr） | 齋月後 | 慶祝獎勵、家庭團聚主題 |
+| 中秋節 | 8-9 月 | 月餅主題、燈籠活動 |
 
-**Payment and technical requirements:**
+**支付與技術要求：**
 
-- Payment: GCash (Philippines), PromptPay (Thailand), e-wallets primary
-- Games: Fishing games highly popular; live dealer is core expectation
-- Technical: App must be under 5 MB, portrait-mode design, 75%+ revenue from mobile
+- 支付：GCash（菲律賓）、PromptPay（泰國）、電子錢包為主
+- 遊戲：捕魚遊戲極受歡迎；真人荷官是核心期望
+- 技術：App 必須小於 5 MB、直向設計、75%+ 營收來自移動端
 
-### 3.2 Latin America (Brazil, Mexico, Argentina, Colombia)
+### 3.2 拉丁美洲（巴西、墨西哥、阿根廷、哥倫比亞）
 
-**Core strategy**: Football integration + PIX payments + Low entry barriers
+**核心策略**：足球整合 + PIX 支付 + 低進入門檻
 
-**Football dominance**: 81% of Brazilian bettors prefer football betting. Activities must deeply integrate local leagues (Liga MX, Copa Libertadores) and European leagues.
+**足球主導**：81% 的巴西投注者偏好足球投注。活動必須深度整合本地聯賽（Liga MX、Copa Libertadores）和歐洲聯賽。
 
-**Key festivals:**
+**關鍵節慶：**
 
-| Festival | Period | Activity Design |
-|----------|--------|-----------------|
-| Carnival | Feb-Mar | Party theme, samba-themed slots, extended promotions |
-| Day of the Dead | Nov 1-2 | Skull/marigold themed slots |
-| World Cup / Copa America | Periodic | Region-wide super events, national team support |
+| 節慶 | 期間 | 活動設計 |
+|------|------|---------|
+| 嘉年華（Carnival） | 2-3 月 | 派對主題、森巴主題老虎機、延長促銷 |
+| 亡靈節（Day of the Dead） | 11 月 1-2 日 | 骷髏 / 萬壽菊主題老虎機 |
+| 世界盃 / 美洲盃 | 週期性 | 全區域超級活動、國家隊支持 |
 
-**Brazil payment**: PIX accounts for 81-90% of iGaming transactions -- instant, free, 24/7. Credit cards are **banned** for gambling transactions.
+**巴西支付**：PIX 佔 iGaming 交易的 81-90%——即時、免費、24/7。信用卡**禁止**用於賭博交易。
 
-### 3.3 Europe (UK, Germany, Spain, Italy)
+### 3.3 歐洲（英國、德國、西班牙、義大利）
 
-**Core strategy**: Compliance-first + Responsible gambling integration
+**核心策略**：合規優先 + 責任博彩整合
 
-**UK January 2026 regulations (major changes):**
+**英國 2026 年 1 月法規（重大變更）：**
 
-| Regulation | Requirement |
-|------------|-------------|
-| Wagering multiplier cap | Maximum 10x (down from 50x+) |
-| Mixed product promotions | Banned (cannot combine betting + casino in single offer) |
-| Slot stake limits | GBP 5/spin (age 25+), GBP 2/spin (age 18-24) |
-| Financial vulnerability check | Triggered at GBP 500 net deposits within 30 days |
+| 法規 | 要求 |
+|------|------|
+| 流水倍數上限 | 最高 10x（從 50x+ 下調） |
+| 混合產品促銷 | 禁止（不能在單一優惠中結合投注 + 賭場） |
+| 老虎機投注限額 | GBP 5/旋轉（25 歲+）、GBP 2/旋轉（18-24 歲） |
+| 財務脆弱性檢查 | 30 天內淨存款 GBP 500 時觸發 |
 
-**Germany restrictions:**
+**德國限制：**
 
-| Restriction | Detail |
-|-------------|--------|
-| Slot maximum stake | EUR 1 per spin |
-| Advertising ban | 6 AM - 9 PM (TV and internet) |
-| Bonus advertising | Public bonus promotions prohibited |
+| 限制 | 詳細 |
+|------|------|
+| 老虎機最高投注 | EUR 1 每次旋轉 |
+| 廣告禁令 | 上午 6 點至晚上 9 點（電視和網路） |
+| 獎金廣告 | 禁止公開獎金促銷 |
 
-**GDPR marketing requirements:**
+**GDPR 行銷要求：**
 
-- Explicit opt-in consent required for marketing communications
-- Separate consent by product type (betting vs. casino)
-- Easy unsubscribe mechanism must be provided
+- 行銷傳播需要明確選擇加入（Opt-in）同意
+- 按產品類型分別同意（投注 vs. 賭場）
+- 必須提供簡易取消訂閱機制
 
-### 3.4 Chinese / Chinese-Speaking Markets
+### 3.4 中文 / 華語市場
 
-**Core strategy**: Lucky numbers + Red envelope mechanics + Social sharing
+**核心策略**：幸運數字 + 紅包機制 + 社交分享
 
-**Key festivals:**
+**關鍵節慶：**
 
-| Festival | Activity Design |
-|----------|-----------------|
-| Chinese New Year | Red envelope rewards, 888 jackpots, dragon/phoenix theme |
-| Mid-Autumn Festival | Mooncake-themed slots, reunion rewards |
-| Singles' Day (11.11) | Shopping festival cross-promotions |
-| National Day Golden Week | 7-day consecutive events |
+| 節慶 | 活動設計 |
+|------|---------|
+| 農曆新年 | 紅包獎勵、888 獎池、龍鳳主題 |
+| 中秋節 | 月餅主題老虎機、團圓獎勵 |
+| 光棍節（11.11） | 購物節交叉促銷 |
+| 國慶黃金週 | 7 天連續活動 |
 
-**Cultural symbolism rules:**
+**文化象徵規則：**
 
-| Element | Favorable | Prohibited |
-|---------|-----------|------------|
-| Numbers | 8 (prosperity), 88, 888, 9 (longevity), 6 (smooth) | 4 (death) -- never use in bonus amounts |
-| Colors | Red (primary), Gold (wealth) | White/black combination (funeral association) |
+| 元素 | 吉祥 | 禁忌 |
+|------|------|------|
+| 數字 | 8（繁榮）、88、888、9（長壽）、6（順利） | 4（死亡）—— 絕不用於獎金金額 |
+| 顏色 | 紅色（主要）、金色（財富） | 白黑組合（喪葬聯想） |
 
-**Game preferences**: Baccarat is dominant (95% of Macau tables), Sic Bo, Mahjong, Dragon Tiger.
-
----
-
-## 4. Risk Control and Anti-Fraud Policies
-
-### 4.1 Common Bonus Abuse Methods
-
-| Abuse Type | Method | Detection Approach |
-|------------|--------|-------------------|
-| Multi-account | Multiple identities to claim welcome bonus repeatedly | Device fingerprint, IP correlation, behavioral analysis |
-| Bonus hunter | Systematically targets low-wagering platforms | Betting pattern analysis, rapid withdrawal monitoring |
-| Arbitrage betting | Cross-platform hedging of all possible outcomes | Abnormal odds betting, multi-platform data sharing |
-| Chip dumping | Deliberately losing to accomplice accounts in P2P games | Co-table frequency analysis, win/loss pattern tracking |
-
-### 4.2 Multi-Layer Risk Assessment Framework
-
-| Layer | Assessment Target | Methods |
-|-------|-------------------|---------|
-| Device layer | Device authenticity | Device fingerprint, emulator detection, GPS spoofing detection |
-| Identity layer | Player identity | KYC verification status, document authenticity, biometrics |
-| Behavior layer | Player patterns | Betting patterns, deposit/withdrawal behavior, game preferences |
-| Network layer | Player associations | Known fraudster linkage, shared attribute detection |
-| Composite | Final decision | Real-time risk scoring combining all layers |
-
-### 4.3 KYC Tiered Verification Strategy
-
-| Stage | Trigger | Verification Content |
-|-------|---------|---------------------|
-| Light KYC | Registration | Email/phone verification, basic identity |
-| Enhanced KYC | First deposit | Document verification, liveness detection |
-| Full KYC | First withdrawal | Source of funds, biometric re-verification |
-| Ongoing monitoring | Full lifecycle | Behavioral anomaly detection |
-
-### 4.4 Responsible Gambling Integration
-
-The activity system must respect all player-set protection mechanisms:
-
-| Protection | Requirement |
-|------------|-------------|
-| Deposit limits | Verify bonus activation will not exceed player's set limits |
-| Self-exclusion | Players on exclusion list must be blocked from all promotions |
-| Cooling-off period | All marketing communications paused during cooling-off |
-| Problem gambling identification | Automatically stop promotion delivery when risk indicators triggered |
+**遊戲偏好**：百家樂占主導（澳門賭桌的 95%）、骰寶、麻將、龍虎。
 
 ---
 
-## 5. Bonus Abuse Detection Policies
+## 4. 風險控制與反詐欺政策（Risk Control and Anti-Fraud Policies）
 
-### 5.1 Matched Betting Detection Indicators
+### 4.1 常見獎金濫用方法（Common Bonus Abuse Methods）
 
-| Indicator | Description | Risk Weight |
-|-----------|-------------|-------------|
-| Pre-match timing | Bet placed within 15 minutes of match start | 20 points |
-| High odds / low risk | Selecting high-odds but statistically safe outcomes | 30 points |
-| Near max bet | Bet amount approaches maximum allowed | 15 points |
-| Rapid turnover | 35x wagering completed in under 12 hours | 25 points |
-| No recreational betting | Absence of casual / exploratory bets | 20 points |
+| 濫用類型 | 方法 | 檢測方法 |
+|---------|------|---------|
+| 多帳號（Multi-account） | 使用多個身份重複領取歡迎獎金 | 設備指紋、IP 關聯、行為分析 |
+| 獎金獵人（Bonus Hunter） | 系統性針對低流水平台 | 投注模式分析、快速提款監控 |
+| 套利投注（Arbitrage Betting） | 跨平台對沖所有可能結果 | 異常賠率投注、多平台資料共享 |
+| 籌碼轉移（Chip Dumping） | 在 P2P 遊戲中故意輸給共謀帳號 | 同桌頻率分析、勝負模式追蹤 |
 
-**Threshold**: Risk score >= 70 triggers investigation.
+### 4.2 多層風險評估框架（Multi-Layer Risk Assessment Framework）
 
-### 5.2 Bonus Hunter Detection Criteria
+| 層級 | 評估對象 | 方法 |
+|------|---------|------|
+| 設備層 | 設備真實性 | 設備指紋、模擬器檢測、GPS 欺騙檢測 |
+| 身份層 | 玩家身份 | KYC 驗證狀態、文件真實性、生物識別 |
+| 行為層 | 玩家模式 | 投注模式、存提款行為、遊戲偏好 |
+| 網路層 | 玩家關聯 | 已知詐欺者關聯、共享屬性檢測 |
+| 綜合 | 最終決策 | 結合所有層級的即時風險評分 |
 
-| Pattern Category | Indicators | Weight |
-|-----------------|------------|--------|
-| Deposit pattern | Minimum deposit only, instant bonus activation, no follow-up deposits | 20% |
-| Betting pattern | Highest RTP games only, uniform bet amounts, fewer than 3 games played | 30% |
-| Withdrawal pattern | Immediate withdrawal after wager completion, account goes dormant | 30% |
-| Account activity | Registration coincides with promotion launch, no return deposits | 20% |
+### 4.3 KYC 分層驗證策略（KYC Tiered Verification Strategy）
 
-**Risk Score Formula**: Score = (Deposit x 0.2) + (Betting x 0.3) + (Withdrawal x 0.3) + (Activity x 0.2)
+| 階段 | 觸發條件 | 驗證內容 |
+|------|---------|---------|
+| 輕度 KYC（Light KYC） | 註冊 | 電子郵件 / 電話驗證、基本身份 |
+| 增強 KYC（Enhanced KYC） | 首次存款 | 文件驗證、活體檢測 |
+| 完整 KYC（Full KYC） | 首次提款 | 資金來源、生物識別再驗證 |
+| 持續監控（Ongoing Monitoring） | 全生命週期 | 行為異常檢測 |
 
-### 5.3 Instant Blocking Rules (BLOCK)
+### 4.4 責任博彩整合（Responsible Gambling Integration）
 
-| Rule | Condition | Action | Code |
-|------|-----------|--------|------|
-| Multi-account strong link | Same device + same bank account | Block bonus activation | `BLOCK_MULTI_ACCOUNT` |
-| Known bonus hunter | Risk score >= 90 | Block bonus activation | `BLOCK_BONUS_HUNTER` |
-| Blacklisted bank | Bank account on blacklist | Block deposit and bonus | `BLOCK_BLACKLISTED_BANK` |
+活動系統必須尊重所有玩家設定的保護機制：
 
-### 5.4 Delayed Detection Rules (FLAG)
-
-| Rule | Condition | Action | Code |
-|------|-----------|--------|------|
-| Rapid turnover completion | Completion time < 50% of expected | Manual review on withdrawal | `FLAG_RAPID_TURNOVER` |
-| Matched betting suspicion | 3+ suspicious indicators | Flag for review | `FLAG_MATCHED_BETTING` |
-| Bonus hunter suspicion | Risk score 60-89 | Restrict future bonuses | `FLAG_BONUS_HUNTER_SUSPECT` |
-
-### 5.5 Bonus Forfeiture Rules
-
-**Automatic forfeiture (no review required):**
-
-- Confirmed multi-account violation
-- Conclusive matched betting evidence
-- Violation of activity terms (game restrictions, etc.)
-
-**Forfeiture after review:**
-
-- Confirmed bonus hunter behavior
-- AML investigation related
-- Abnormal betting patterns
-
-**Fund handling on forfeiture:**
-
-| Fund Type | Action |
-|-----------|--------|
-| Bonus balance | Full forfeiture |
-| Cash balance | Retained (unless AML-related) |
-| Pending bets (bonus-funded) | Cancel and forfeit |
-| Pending bets (cash-funded) | Settle normally |
-
-**Player notification requirements:**
-
-- Send forfeiture notification email
-- State specific violation reason
-- Provide appeal channel
-- Retain full audit record
+| 保護措施 | 要求 |
+|---------|------|
+| 存款限額（Deposit Limits） | 驗證獎金激活不會超過玩家設定的限額 |
+| 自我排除（Self-Exclusion） | 排除名單上的玩家必須被阻擋所有促銷 |
+| 冷靜期（Cooling-off Period） | 冷靜期間暫停所有行銷傳播 |
+| 問題賭博識別（Problem Gambling Identification） | 觸發風險指標時自動停止促銷投放 |
 
 ---
 
-## 6. Monitoring Metrics
+## 5. 獎金濫用檢測政策（Bonus Abuse Detection Policies）
 
-| Metric | Formula | Alert Threshold | Purpose |
-|--------|---------|-----------------|---------|
-| `bonus_abuse_rate` | Forfeitures / Claims | >5% | Overall abuse level |
-| `matched_betting_detected` | Detected cases / day | >10 | Matched betting prevalence |
-| `bonus_hunter_score_avg` | Average risk score | >50 | Bonus hunter risk trend |
-| `turnover_completion_time_avg` | Average completion time | <24h | Abnormally fast completion |
-| `bonus_roi` | Incremental NGR / Bonus cost | <1.0 | Bonus investment return |
+### 5.1 對沖投注檢測指標（Matched Betting Detection Indicators）
 
----
+| 指標 | 描述 | 風險權重 |
+|------|------|---------|
+| 賽前時機 | 比賽開始前 15 分鐘內下注 | 20 分 |
+| 高賠率 / 低風險 | 選擇高賠率但統計安全的結果 | 30 分 |
+| 接近最大投注 | 投注金額接近允許的最大值 | 15 分 |
+| 快速流水 | 35x 流水在 12 小時內完成 | 25 分 |
+| 無娛樂投注 | 缺乏休閒 / 探索性投注 | 20 分 |
 
-## 7. Data-Driven Activity Optimization
+**閾值**：風險評分 >= 70 觸發調查。
 
-### 7.1 Core KPI Framework
+### 5.2 獎金獵人檢測標準（Bonus Hunter Detection Criteria）
 
-**Acquisition metrics:**
+| 模式類別 | 指標 | 權重 |
+|---------|------|------|
+| 存款模式 | 僅最低存款、即時獎金激活、無後續存款 | 20% |
+| 投注模式 | 僅最高 RTP 遊戲、統一投注金額、少於 3 款遊戲 | 30% |
+| 提款模式 | 完成流水後立即提款、帳號進入休眠 | 30% |
+| 帳號活動 | 註冊與促銷啟動同時、無回存 | 20% |
 
-| Metric | Formula | Purpose |
-|--------|---------|---------|
-| Player Acquisition Rate (PAR) | New players / Unique visitors x 100 | Conversion efficiency |
-| First Deposit Conversion (FTD) | First depositors / Registrations x 100 | Activation efficiency |
-| Customer Acquisition Cost (CAC) | Total marketing spend / New customers | Cost effectiveness |
+**風險評分公式**：評分 = (存款 x 0.2) + (投注 x 0.3) + (提款 x 0.3) + (活動 x 0.2)
 
-**Revenue metrics:**
+### 5.3 即時阻擋規則（Instant Blocking Rules - BLOCK）
 
-| Metric | Formula | Notes |
-|--------|---------|-------|
-| Gross Gaming Revenue (GGR) | Total bets - Total payouts | Top-line revenue |
-| Net Gaming Revenue (NGR) | GGR - Bonuses - Taxes | True profit |
-| Player Lifetime Value (LTV) | Predicted total revenue | Top 1% of players = 40% of GGR |
+| 規則 | 條件 | 動作 | 代碼 |
+|------|------|------|------|
+| 多帳號強關聯 | 相同設備 + 相同銀行帳號 | 阻擋獎金激活 | `BLOCK_MULTI_ACCOUNT` |
+| 已知獎金獵人 | 風險評分 >= 90 | 阻擋獎金激活 | `BLOCK_BONUS_HUNTER` |
+| 黑名單銀行 | 銀行帳號在黑名單上 | 阻擋存款和獎金 | `BLOCK_BLACKLISTED_BANK` |
 
-**Activity-specific metrics:**
+### 5.4 延遲檢測規則（Delayed Detection Rules - FLAG）
 
-| Metric | Description |
-|--------|-------------|
-| Bonus clearance rate | Percentage of bonuses with wagering completed |
-| Bonus ratio | Bonus spend / Total deposits |
-| Bonus player share | Active players using bonuses / Total active players |
-| Bonus ROI | (Incremental NGR - Bonus cost) / Bonus cost |
+| 規則 | 條件 | 動作 | 代碼 |
+|------|------|------|------|
+| 快速流水完成 | 完成時間 < 預期的 50% | 提款時人工審核 | `FLAG_RAPID_TURNOVER` |
+| 對沖投注嫌疑 | 3+ 可疑指標 | 標記審核 | `FLAG_MATCHED_BETTING` |
+| 獎金獵人嫌疑 | 風險評分 60-89 | 限制未來獎金 | `FLAG_BONUS_HUNTER_SUSPECT` |
 
-### 7.2 A/B Testing Framework
+### 5.5 獎金沒收規則（Bonus Forfeiture Rules）
 
-**Testable elements:**
+**自動沒收（無需審核）：**
 
-- Bonus amount and structure
-- Wagering multiplier
-- Promotional copy and CTA
-- Landing page design
-- Email subject line and send time
-- Bonus unlock mechanism
+- 確認多帳號違規
+- 確鑿對沖投注證據
+- 違反活動條款（遊戲限制等）
 
-**Testing best practices:**
+**審核後沒收：**
 
-1. Define clear, measurable objectives
-2. Test one variable at a time
-3. Ensure sufficient sample size for statistical significance
-4. Run long enough to cover cyclical variations
-5. Track both short-term (conversion) and long-term (LTV) metrics
+- 確認獎金獵人行為
+- AML 調查相關
+- 異常投注模式
 
----
+**沒收時資金處理：**
 
-## 8. Dynamic Configuration and Approval Policies
+| 資金類型 | 動作 |
+|---------|------|
+| 獎金餘額 | 完全沒收 |
+| 現金餘額 | 保留（除非 AML 相關） |
+| 待定投注（獎金資助） | 取消並沒收 |
+| 待定投注（現金資助） | 正常結算 |
 
-### 8.1 Dynamic Configuration Requirements
+**玩家通知要求：**
 
-- **No hardcoding**: Rules such as "Deposit > 100" or "Bonus = 50%" must never be hardcoded. All variables must come from back-office configuration.
-- **Configurable scope:**
-  - Trigger conditions: Deposit amount, wagering multiplier, eligible games, valid period
-  - Reward parameters: Bonus percentage, maximum cap, target wallet type
-  - Audience targeting: Applicable countries, VIP tiers, exclusion lists
-
-### 8.2 Approval Workflow Requirements
-
-**Activity publication approval:**
-
-| Role | Responsibility |
-|------|----------------|
-| Maker (Operations) | Create activity draft, configure all parameters |
-| Checker (Ops Manager / Finance) | Review activity cost and terms |
-| Action | Approved -> Activity status transitions to Ready/Active |
-
-**Sensitive change approval:**
-
-| Change Type | Risk Level | Required Approver |
-|-------------|------------|-------------------|
-| Increase budget | High | CFO or above |
-| Lower wagering requirement | High | CFO or above |
-| Extend promotion period | Medium | Operations Manager |
-| Update eligible games | Low | Checker (standard) |
+- 發送沒收通知電子郵件
+- 說明具體違規原因
+- 提供申訴管道
+- 保留完整審計記錄
 
 ---
 
-## 9. Implementation Priority
+## 6. 監控指標（Monitoring Metrics）
 
-### Phase 1: Core Foundation (Months 1-3)
-
-1. Rule engine framework and basic activity templates
-2. Multi-tenant activity isolation
-3. Unified turnover tracking service
-4. Basic KYC and risk control integration
-
-### Phase 2: Feature Expansion (Months 3-6)
-
-1. Event-driven real-time triggers
-2. VIP tier system
-3. Automated cashback / rebate
-4. Leaderboard and tournament functionality
-
-### Phase 3: Intelligent Optimization (Months 6-12)
-
-1. A/B testing platform
-2. AI-driven player segmentation
-3. Personalized activity recommendations
-4. Predictive analytics and LTV modeling
-
-### Key Success Factors
-
-- Start with templates for common activity types
-- Event-first design: Record all player actions as events from day one
-- Schema validation for all configurations
-- Idempotent operations as a distributed processing safeguard
-- Comprehensive audit with immutable logs for compliance
-- Regional compliance: Responsible gambling in European markets is mandatory, not optional
+| 指標 | 公式 | 警報閾值 | 目的 |
+|------|------|---------|------|
+| `bonus_abuse_rate` | 沒收數 / 領取數 | >5% | 整體濫用水平 |
+| `matched_betting_detected` | 每日檢測案例數 | >10 | 對沖投注盛行率 |
+| `bonus_hunter_score_avg` | 平均風險評分 | >50 | 獎金獵人風險趨勢 |
+| `turnover_completion_time_avg` | 平均完成時間 | <24h | 異常快速完成 |
+| `bonus_roi` | 增量 NGR / 獎金成本 | <1.0 | 獎金投資回報 |
 
 ---
 
-## Business Value
+## 7. 資料驅動活動優化（Data-Driven Activity Optimization）
 
-Activity Risk Control delivers critical business value by:
+### 7.1 核心 KPI 框架（Core KPI Framework）
 
-- **Revenue Protection**: Reducing bonus abuse from 63.8% industry average to <3% saves approximately $1.2M annually per $10M in bonus expenditure
-- **Improved Acquisition Efficiency**: First-deposit conversion rates increase from 12% (unoptimized) to 18%+ with lifecycle-stage targeting, reducing customer acquisition cost by 33%
-- **Player Lifetime Value Optimization**: Differentiated VIP tier benefits increase retention (D7: 40%+, D30: 22%+) and boost LTV by 2.5x compared to non-VIP players
-- **Operational Scalability**: Configuration-driven risk rules eliminate manual review bottlenecks, reducing fraud investigation time from 4 hours to <15 minutes per case
-- **Regulatory Compliance**: Automated responsible gambling protections (deposit limits, self-exclusion, cooling-off) ensure UKGC/MGA compliance and protect license validity
+**獲取指標（Acquisition Metrics）：**
+
+| 指標 | 公式 | 目的 |
+|------|------|------|
+| 玩家獲取率（PAR） | 新玩家 / 獨立訪客 x 100 | 轉化效率 |
+| 首存轉化率（FTD） | 首次存款者 / 註冊數 x 100 | 激活效率 |
+| 客戶獲取成本（CAC） | 總行銷支出 / 新客戶數 | 成本效益 |
+
+**營收指標（Revenue Metrics）：**
+
+| 指標 | 公式 | 備註 |
+|------|------|------|
+| 總博彩營收（GGR） | 總投注 - 總派彩 | 頂線營收 |
+| 淨博彩營收（NGR） | GGR - 獎金 - 稅金 | 真實利潤 |
+| 玩家終身價值（LTV） | 預測總營收 | 前 1% 玩家 = 40% GGR |
+
+**活動專屬指標（Activity-specific Metrics）：**
+
+| 指標 | 描述 |
+|------|------|
+| 獎金清算率 | 完成流水要求的獎金百分比 |
+| 獎金比率 | 獎金支出 / 總存款 |
+| 獎金玩家份額 | 使用獎金的活躍玩家 / 總活躍玩家 |
+| 獎金 ROI | (增量 NGR - 獎金成本) / 獎金成本 |
+
+### 7.2 A/B 測試框架（A/B Testing Framework）
+
+**可測試元素：**
+
+- 獎金金額和結構
+- 流水倍數
+- 促銷文案和 CTA
+- 著陸頁設計
+- 電子郵件主旨和發送時間
+- 獎金解鎖機制
+
+**測試最佳實踐：**
+
+1. 定義明確、可衡量的目標
+2. 一次測試一個變數
+3. 確保足夠的樣本量以達統計顯著性
+4. 執行足夠長時間以涵蓋週期性變化
+5. 追蹤短期（轉化）和長期（LTV）指標
 
 ---
 
-## Success Metrics
+## 8. 動態配置與審批政策（Dynamic Configuration and Approval Policies）
 
-The Activity Risk Control system delivers measurable success through:
+### 8.1 動態配置需求（Dynamic Configuration Requirements）
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Bonus Abuse Rate | <3% | (Bonus forfeitures / Total bonus claims) × 100% |
-| Risk Detection Accuracy | ≥95% | True positives / (True positives + False positives) |
-| FTD Conversion Rate | ≥18% | (First deposits / Registrations) × 100% with welcome bonus |
-| Bonus ROI | ≥1.2 | Incremental NGR / Total bonus cost |
-| Turnover Completion Rate | ≥65% | Players completing wagering requirement / Total bonus recipients |
-| Matched Betting Detection Speed | <500ms P99 | Real-time detection latency at bet placement |
-| Player Retention (D7) | ≥40% | Players active on Day 7 / FTD players (with activity participation) |
-| VIP Tier Advancement Rate | ≥15% | Players advancing to higher tier / Total VIP players monthly |
+- **無硬編碼**：規則如「存款 > 100」或「獎金 = 50%」絕不能硬編碼。所有變數必須來自後台配置。
+- **可配置範圍：**
+  - 觸發條件：存款金額、流水倍數、符合資格的遊戲、有效期
+  - 獎勵參數：獎金百分比、最大上限、目標錢包類型
+  - 受眾定位：適用國家、VIP 層級、排除名單
+
+### 8.2 審批工作流程需求（Approval Workflow Requirements）
+
+**活動發布審批：**
+
+| 角色 | 責任 |
+|------|------|
+| 製作者（Maker - 營運） | 創建活動草稿、配置所有參數 |
+| 檢查者（Checker - 營運經理 / 財務） | 審核活動成本和條款 |
+| 動作 | 批准 -> 活動狀態轉為就緒 / 啟動 |
+
+**敏感變更審批：**
+
+| 變更類型 | 風險等級 | 必要批准者 |
+|---------|---------|-----------|
+| 增加預算 | 高 | CFO 或以上 |
+| 降低流水要求 | 高 | CFO 或以上 |
+| 延長促銷期間 | 中 | 營運經理 |
+| 更新符合資格的遊戲 | 低 | 檢查者（標準） |
 
 ---
 
-## Related Documentation
+## 9. 實施優先級（Implementation Priority）
+
+### 第一階段：核心基礎（1-3 月）
+
+1. 規則引擎框架和基本活動模板
+2. 多租戶活動隔離
+3. 統一流水追蹤服務
+4. 基本 KYC 和風險控制整合
+
+### 第二階段：功能擴展（3-6 月）
+
+1. 事件驅動即時觸發
+2. VIP 層級系統
+3. 自動返水 / 返利
+4. 排行榜和錦標賽功能
+
+### 第三階段：智能優化（6-12 月）
+
+1. A/B 測試平台
+2. AI 驅動玩家分群
+3. 個人化活動推薦
+4. 預測分析和 LTV 建模
+
+### 關鍵成功因素（Key Success Factors）
+
+- 從常見活動類型的模板開始
+- 事件優先設計：從第一天起記錄所有玩家動作為事件
+- 所有配置的 Schema 驗證
+- 冪等操作作為分散式處理的保障
+- 全面審計與不可變日誌以符合合規
+- 區域合規：歐洲市場的責任博彩是強制性的，而非可選
+
+---
+
+## 業務價值（Business Value）
+
+活動風險控制提供關鍵業務價值：
+
+- **營收保護**：將獎金濫用從 63.8% 行業平均降至 <3%，每 $10M 獎金支出每年節省約 $1.2M
+- **提升獲取效率**：透過生命週期階段定位，首存轉化率從 12%（未優化）提升至 18%+，客戶獲取成本降低 33%
+- **玩家終身價值優化**：差異化 VIP 層級權益提升留存（D7: 40%+，D30: 22%+）並將 LTV 提升 2.5 倍（相比非 VIP 玩家）
+- **營運可擴展性**：配置驅動的風險規則消除人工審核瓶頸，詐欺調查時間從 4 小時減少至每案 <15 分鐘
+- **法規合規**：自動責任博彩保護（存款限額、自我排除、冷靜期）確保 UKGC/MGA 合規並保護牌照有效性
+
+---
+
+## 成功指標（Success Metrics）
+
+活動風險控制系統透過可衡量的成功指標：
+
+| 指標 | 目標 | 衡量方式 |
+|------|------|---------|
+| 獎金濫用率 | <3% | (獎金沒收數 / 總獎金領取數) × 100% |
+| 風險檢測準確率 | ≥95% | 真陽性 / (真陽性 + 假陽性) |
+| FTD 轉化率 | ≥18% | (首次存款 / 註冊數) × 100%（含歡迎獎金） |
+| 獎金 ROI | ≥1.2 | 增量 NGR / 總獎金成本 |
+| 流水完成率 | ≥65% | 完成流水要求的玩家 / 總獎金領取者 |
+| 對沖投注檢測速度 | <500ms P99 | 下注時即時檢測延遲 |
+| 玩家留存（D7） | ≥40% | Day 7 活躍玩家 / FTD 玩家（參與活動） |
+| VIP 層級晉升率 | ≥15% | 晉升更高層級的玩家 / 總 VIP 玩家（每月） |
+
+---
+
+## 相關文檔（Related Documentation）
 
 → **[Activity Risk System - Technical Implementation](../../architecture/04_Activity_Engine/Activity_Risk_System.md)** - Activity rule engine, risk scoring algorithms, bonus abuse detection patterns, configuration-driven architecture, and A/B testing framework
