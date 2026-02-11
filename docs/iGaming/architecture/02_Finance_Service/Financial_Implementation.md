@@ -1,33 +1,33 @@
 # Financial Implementation Architecture
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
-> **Audience**: Architects, Backend Developers, System Integration Engineers
+> **Audience**: 架構師、後端開發人員、系統整合工程師
 > **Business Requirements**: [Financial_Implementation_Requirements.md](../../requirements/02_Financial_Operations/Financial_Implementation_Requirements.md)
 > **Last Synced**: 2026-02-09
 >
-> **Technical Focus**: This document contains implementation details (atomicity, idempotency, HMAC-SHA256 algorithms, SAGA compensation flows) extracted from Requirements layer.
+> **Technical Focus**: 本文件包含從需求層提取的實作細節（原子性 (Atomicity)、冪等性 (Idempotency)、HMAC-SHA256 演算法、SAGA 補償流程）。
 
 ---
 
-## 1. Document Purpose
+## 1. 文件目的
 
-This document provides the **technical architecture and implementation guide** for the iGaming platform's core financial processes, including wallet system, payment gateway integration, withdrawal risk control, and reconciliation system.
+本文件提供 iGaming 平台核心金融流程的**技術架構與實作指南**，包括錢包系統、支付閘道整合、提款風控與對帳系統。
 
-**Target Audience**:
-- Backend Developers (financial module)
-- Full-Stack Developers
-- System Integration Engineers
+**目標讀者**：
+- 後端開發人員（金融模組）
+- Full-Stack 開發人員
+- 系統整合工程師
 
-**Implementation Sequence**:
-1. Wallet System -> Payment Gateway -> Withdrawal Risk Control -> Reconciliation System
-2. Each task includes: reading order, implementation steps, verification checklist, common pitfalls
-3. Follow SmartAdmin architecture patterns (Entity, Manager, Service)
+**實作順序**：
+1. 錢包系統 → 支付閘道 → 提款風控 → 對帳系統
+2. 每項任務包含：閱讀順序、實作步驟、驗證檢查表、常見陷阱
+3. 遵循 SmartAdmin 架構模式（Entity、Manager、Service）
 
 ---
 
-## 2. Wallet System Implementation
+## 2. 錢包系統實作
 
-### 2.1 Database Schema
+### 2.1 資料庫 Schema
 
 ```sql
 -- Wallet master table
@@ -70,20 +70,20 @@ CREATE TABLE wallet_lock (
 );
 ```
 
-### 2.2 Available Balance Calculation
+### 2.2 可下注餘額計算
 
 ```java
 /**
- * Calculate available (bettable) balance
+ * 計算可用餘額（可下注餘額）
  *
- * Formula: Available Balance = Cash Wallet Balance - Locked Amount - Pending Bets
+ * 公式：可下注餘額 = 現金錢包餘額 - 鎖定金額 - 待結算投注
  *
- * @param playerId Player ID
- * @param tenantId Tenant ID
- * @return Available balance
+ * @param playerId 玩家 ID
+ * @param tenantId 租戶 ID
+ * @return 可用餘額
  */
 public BigDecimal calculateAvailableBalance(Long playerId, String tenantId) {
-    // 1. Query cash wallet
+    // 1. 查詢現金錢包
     Wallet cashWallet = walletDao.findByPlayerAndType(
         playerId,
         WalletType.CASH
@@ -93,40 +93,40 @@ public BigDecimal calculateAvailableBalance(Long playerId, String tenantId) {
         return BigDecimal.ZERO;
     }
 
-    // 2. Apply formula
+    // 2. 套用公式
     BigDecimal availableBalance = cashWallet.getBalance()
         .subtract(cashWallet.getLockedAmount())
         .subtract(calculatePendingBets(playerId));
 
-    // 3. Floor at zero
+    // 3. 最小值為零
     return availableBalance.max(BigDecimal.ZERO);
 }
 
 /**
- * Calculate pending bet amount
+ * 計算待結算投注金額
  */
 private BigDecimal calculatePendingBets(Long playerId) {
     return betDao.sumPendingBetAmount(playerId);
 }
 ```
 
-### 2.3 Concurrent-Safe Balance Deduction (Redis Lua)
+### 2.3 並發安全的餘額扣減（Redis Lua）
 
 ```java
 /**
- * Debit wallet balance (atomic operation)
+ * 扣減錢包餘額（原子操作）
  *
- * Uses Redis Lua script for atomicity
+ * 使用 Redis Lua script 保證原子性
  *
- * @param request Debit request
- * @return Debit result
+ * @param request 扣款請求
+ * @return 扣款結果
  */
 public DebitResult debitWallet(DebitRequest request) {
     String requestId = request.getRequestId();
     Long walletId = request.getWalletId();
     BigDecimal amount = request.getAmount();
 
-    // 1. Idempotency check (Redis fast path)
+    // 1. 冪等性檢查（Redis 快速路徑）
     String cacheKey = "wallet:debit:" + requestId;
     DebitResult cachedResult = redisTemplate.opsForValue().get(cacheKey);
     if (cachedResult != null) {
@@ -134,7 +134,7 @@ public DebitResult debitWallet(DebitRequest request) {
         return cachedResult;
     }
 
-    // 2. Execute Lua script for deduction
+    // 2. 執行 Lua script 進行扣減
     String luaScript = """
         local wallet_key = KEYS[1]
         local amount = tonumber(ARGV[1])
@@ -161,12 +161,12 @@ public DebitResult debitWallet(DebitRequest request) {
         throw new InsufficientBalanceException("Insufficient balance");
     }
 
-    // 3. Persist to database (async)
+    // 3. 持久化到資料庫（非同步）
     CompletableFuture.runAsync(() -> {
         persistWalletTransaction(request);
     }, asyncExecutor);
 
-    // 4. Cache result (15 minutes)
+    // 4. 快取結果（15 分鐘）
     DebitResult debitResult = new DebitResult(requestId, walletId, amount);
     redisTemplate.opsForValue().set(cacheKey, debitResult, 15, TimeUnit.MINUTES);
 
@@ -174,11 +174,11 @@ public DebitResult debitWallet(DebitRequest request) {
 }
 ```
 
-### 2.4 Wallet Lock/Unlock Mechanism
+### 2.4 錢包鎖定/解鎖機制
 
 ```java
 /**
- * Wallet Service (delegates to Manager for transactions)
+ * Wallet Service（委派給 Manager 處理交易）
  */
 @Service
 @RequiredArgsConstructor
@@ -187,21 +187,21 @@ public class WalletService {
     private final WalletManager walletManager;
 
     /**
-     * Lock wallet amount (used during bet placement)
+     * 鎖定錢包金額（下注時使用）
      *
-     * @param walletId Wallet ID
-     * @param amount Lock amount
-     * @param betId Bet order ID
+     * @param walletId 錢包 ID
+     * @param amount 鎖定金額
+     * @param betId 投注訂單 ID
      */
     public void lockWalletAmount(Long walletId, BigDecimal amount, String betId) {
         walletManager.lockWalletAmount(walletId, amount, betId);
     }
 
     /**
-     * Unlock wallet amount (used during bet settlement)
+     * 解鎖錢包金額（結算時使用）
      *
-     * @param walletId Wallet ID
-     * @param betId Bet order ID
+     * @param walletId 錢包 ID
+     * @param betId 投注訂單 ID
      */
     public void unlockWalletAmount(Long walletId, String betId) {
         walletManager.unlockWalletAmount(walletId, betId);
@@ -209,7 +209,7 @@ public class WalletService {
 }
 
 /**
- * Wallet Manager (handles transactions)
+ * Wallet Manager（處理交易）
  */
 @Component
 @RequiredArgsConstructor
@@ -220,21 +220,21 @@ public class WalletManager {
     private final EventPublisher eventPublisher;
 
     /**
-     * Lock wallet amount (transactional)
+     * 鎖定錢包金額（交易性）
      *
-     * @param walletId Wallet ID
-     * @param amount Lock amount
-     * @param betId Bet order ID
+     * @param walletId 錢包 ID
+     * @param amount 鎖定金額
+     * @param betId 投注訂單 ID
      */
     @Transactional(rollbackFor = Throwable.class)
     public void lockWalletAmount(Long walletId, BigDecimal amount, String betId) {
-        // 1. Optimistic lock update
+        // 1. 樂觀鎖更新
         int updated = walletDao.incrementLockedAmount(walletId, amount);
         if (updated == 0) {
             throw new ConcurrentUpdateException("Wallet update conflict, please retry");
         }
 
-        // 2. Record lock detail
+        // 2. 記錄鎖定明細
         WalletLock lock = WalletLock.builder()
             .walletId(walletId)
             .lockAmount(amount)
@@ -245,41 +245,41 @@ public class WalletManager {
 
         walletLockDao.insert(lock);
 
-        // 3. Publish event
+        // 3. 發布事件
         eventPublisher.publish(new WalletLockedEvent(walletId, amount, betId));
     }
 
     /**
-     * Unlock wallet amount (transactional)
+     * 解鎖錢包金額（交易性）
      *
-     * @param walletId Wallet ID
-     * @param betId Bet order ID
+     * @param walletId 錢包 ID
+     * @param betId 投注訂單 ID
      */
     @Transactional(rollbackFor = Throwable.class)
     public void unlockWalletAmount(Long walletId, String betId) {
-        // 1. Query lock record
+        // 1. 查詢鎖定記錄
         WalletLock lock = walletLockDao.findByReference(walletId, betId);
         if (lock == null) {
             log.warn("Lock not found for bet {}", betId);
             return;
         }
 
-        // 2. Optimistic lock update
+        // 2. 樂觀鎖更新
         int updated = walletDao.decrementLockedAmount(walletId, lock.getLockAmount());
         if (updated == 0) {
             throw new ConcurrentUpdateException("Wallet update conflict, please retry");
         }
 
-        // 3. Delete lock record
+        // 3. 刪除鎖定記錄
         walletLockDao.deleteById(lock.getLockId());
 
-        // 4. Publish event
+        // 4. 發布事件
         eventPublisher.publish(new WalletUnlockedEvent(walletId, lock.getLockAmount(), betId));
     }
 }
 ```
 
-### 2.5 Outbox Pattern (Transactional Consistency)
+### 2.5 Outbox Pattern（交易一致性）
 
 ```sql
 -- Outbox event table
@@ -297,7 +297,7 @@ CREATE TABLE outbox_event (
 
 ```java
 /**
- * Wallet Manager - Save business data and event in the same transaction
+ * Wallet Manager - 在同一交易中儲存業務資料與事件
  */
 @Component
 @RequiredArgsConstructor
@@ -308,20 +308,20 @@ public class WalletManager {
     private final OutboxEventDao outboxEventDao;
 
     /**
-     * Debit wallet with event (transactional)
+     * 扣款並記錄事件（交易性）
      *
-     * @param request Debit request
+     * @param request 扣款請求
      */
     @Transactional(rollbackFor = Throwable.class)
     public void debitWalletWithEvent(DebitRequest request) {
-        // 1. Update wallet balance
+        // 1. 更新錢包餘額
         walletDao.debitBalance(request.getWalletId(), request.getAmount());
 
-        // 2. Record transaction
+        // 2. 記錄交易
         WalletTransaction tx = createTransaction(request);
         walletTransactionDao.insert(tx);
 
-        // 3. Save Outbox event (same transaction)
+        // 3. 儲存 Outbox 事件（同一交易）
         OutboxEvent event = OutboxEvent.builder()
             .aggregateType("WALLET")
             .aggregateId(request.getWalletId().toString())
@@ -332,12 +332,12 @@ public class WalletManager {
 
         outboxEventDao.insert(event);
 
-        // After transaction commits, event will be relayed to Kafka asynchronously
+        // 交易提交後，事件將非同步轉發至 Kafka
     }
 }
 
 /**
- * Outbox Event Relay (scheduled task)
+ * Outbox Event Relay（排程任務）
  */
 @Scheduled(fixedDelay = 1000)
 public void relayOutboxEvents() {
@@ -345,19 +345,19 @@ public void relayOutboxEvents() {
 
     for (OutboxEvent event : events) {
         try {
-            // Send to Kafka
+            // 發送至 Kafka
             kafkaTemplate.send(
                 "wallet-events",
                 event.getAggregateId(),
                 event.getPayload()
             );
 
-            // Mark as processed
+            // 標記為已處理
             outboxEventDao.markProcessed(event.getEventId());
 
         } catch (Exception e) {
             log.error("Failed to relay event {}", event.getEventId(), e);
-            // Will retry on next cycle
+            // 下次循環重試
         }
     }
 }
@@ -365,57 +365,57 @@ public void relayOutboxEvents() {
 
 ---
 
-## 3. Payment Gateway Integration
+## 3. 支付閘道整合
 
-### 3.0 Payment Processing End-to-End Flow
+### 3.0 支付處理端到端流程
 
-The following sequence diagram illustrates the complete payment processing flow from deposit initiation through gateway interaction to final wallet crediting:
+以下序列圖說明從存款發起、閘道互動到最終入賬的完整支付處理流程：
 
 ```mermaid
 sequenceDiagram
-    participant Player
+    participant Player as 玩家
     participant DepositService
     participant DepositOrderDao
-    participant PaymentGateway
+    participant PaymentGateway as 支付閘道
     participant WalletService
     participant WalletDao
-    participant NotificationService
+    participant NotificationService as 通知服務
 
     Player->>DepositService: createDepositOrder(amount, paymentMethod)
 
-    Note over DepositService: 1. Create Order (PENDING)
+    Note over DepositService: 1. 建立訂單 (PENDING)
     DepositService->>DepositOrderDao: insert(order)
     DepositOrderDao-->>DepositService: orderId
 
-    Note over DepositService,PaymentGateway: 2. Submit to Gateway
+    Note over DepositService,PaymentGateway: 2. 提交至閘道
     DepositService->>PaymentGateway: createDeposit(request)
     PaymentGateway-->>DepositService: gatewayOrderId, paymentUrl
 
     DepositService->>DepositOrderDao: updateGatewayOrderId(orderId, gatewayOrderId)
-    DepositService-->>Player: paymentUrl (redirect/QR code)
+    DepositService-->>Player: paymentUrl (重定向/QR code)
 
-    Player->>PaymentGateway: Complete Payment (external flow)
+    Player->>PaymentGateway: 完成支付（外部流程）
 
-    Note over PaymentGateway,DepositService: 3. Callback Processing
+    Note over PaymentGateway,DepositService: 3. Callback 處理
     PaymentGateway->>DepositService: handleDepositCallback(gatewayOrderId, status, signature)
 
-    alt Signature Invalid
+    alt 簽名無效
         DepositService-->>PaymentGateway: 400 Invalid Signature
-    else Signature Valid
+    else 簽名有效
         DepositService->>DepositOrderDao: findByGatewayOrderId(gatewayOrderId)
 
-        alt Order Already SUCCESS (Idempotency)
+        alt 訂單已成功（冪等性）
             DepositService-->>PaymentGateway: 200 Already Processed
-        else Order PENDING
+        else 訂單 PENDING
             DepositService->>DepositOrderDao: updateStatus(orderId, SUCCESS)
 
-            Note over DepositService,WalletService: 4. Credit Wallet
+            Note over DepositService,WalletService: 4. 入賬錢包
             DepositService->>WalletService: creditWallet(playerId, amount, "DEPOSIT:"+orderId)
             WalletService->>WalletDao: incrementBalance(playerId, amount)
             WalletDao-->>WalletService: success
             WalletService-->>DepositService: wallet credited
 
-            Note over DepositService,NotificationService: 5. Notification
+            Note over DepositService,NotificationService: 5. 通知
             DepositService->>NotificationService: sendDepositSuccessNotification(order)
             NotificationService-->>Player: Email/SMS/Push notification
 
@@ -424,71 +424,71 @@ sequenceDiagram
     end
 ```
 
-**Key Implementation Notes**:
-1. **Order Creation**: Status starts as `PENDING`, gateway order ID recorded after gateway response
-2. **Signature Verification**: HMAC-SHA256 signature check prevents unauthorized callbacks
-3. **Idempotency**: Duplicate callbacks return success without re-crediting wallet
-4. **Transactional Consistency**: Wallet credit and order status update occur in single transaction
-5. **Async Notification**: Email/SMS sent after transaction commit to avoid blocking
+**關鍵實作要點**：
+1. **訂單建立**：狀態初始為 `PENDING`，閘道回應後記錄 gateway order ID
+2. **簽名驗證**：HMAC-SHA256 簽名檢查防止未授權的 callback
+3. **冪等性**：重複 callback 直接返回成功，不重複入賬
+4. **交易一致性**：錢包入賬與訂單狀態更新在單一交易中完成
+5. **非同步通知**：Email/SMS 在交易提交後發送，避免阻塞
 
 ---
 
-### 3.1 Gateway Interface Definition
+### 3.1 閘道介面定義
 
 ```java
 /**
- * Payment gateway abstract interface
+ * 支付閘道抽象介面
  */
 public interface PaymentGateway {
 
     /**
-     * Create deposit order
+     * 建立存款訂單
      *
-     * @param request Deposit request
-     * @return Payment URL or QR code
+     * @param request 存款請求
+     * @return 支付 URL 或 QR code
      */
     DepositResponse createDeposit(DepositRequest request);
 
     /**
-     * Handle deposit callback
+     * 處理存款回調
      *
-     * @param callback Callback data
-     * @return Processing result
+     * @param callback 回調資料
+     * @return 處理結果
      */
     CallbackResult handleDepositCallback(Map<String, String> callback);
 
     /**
-     * Create withdrawal order
+     * 建立提款訂單
      *
-     * @param request Withdrawal request
-     * @return Withdrawal order number
+     * @param request 提款請求
+     * @return 提款訂單號
      */
     WithdrawalResponse createWithdrawal(WithdrawalRequest request);
 
     /**
-     * Query withdrawal status
+     * 查詢提款狀態
      *
-     * @param orderId Order ID
-     * @return Order status
+     * @param orderId 訂單 ID
+     * @return 訂單狀態
      */
     WithdrawalStatus queryWithdrawalStatus(String orderId);
 
     /**
-     * Verify callback signature
+     * 驗證回調簽名
      *
-     * @param params Callback parameters
-     * @param signature Signature
-     * @return Whether valid
+     * @param params 回調參數
+     * @param signature 簽名
+     * @return 是否有效
      */
     boolean verifySignature(Map<String, String> params, String signature);
 }
 ```
 
-### 3.2 HMAC Signature Verification
+### 3.2 HMAC 簽名驗證
 
 ```java
 /**
- * Payment gateway signature utility
+ * 支付閘道簽名工具
  */
 @Component
 public class PaymentSignatureUtil {
@@ -497,43 +497,43 @@ public class PaymentSignatureUtil {
     private String secretKey;
 
     /**
-     * Generate HMAC-SHA256 signature
+     * 產生 HMAC-SHA256 簽名
      *
-     * Steps:
-     * 1. Sort parameters by key
-     * 2. Concatenate as key1=value1&key2=value2
-     * 3. HMAC-SHA256 encrypt
-     * 4. Base64 encode
+     * 步驟：
+     * 1. 參數按 key 排序
+     * 2. 拼接為 key1=value1&key2=value2
+     * 3. HMAC-SHA256 加密
+     * 4. Base64 編碼
      *
-     * @param params Parameters
-     * @return Signature
+     * @param params 參數
+     * @return 簽名
      */
     public String generateSignature(Map<String, String> params) {
-        // 1. Filter empty values and sort
+        // 1. 過濾空值並排序
         String sortedParams = params.entrySet().stream()
             .filter(e -> StringUtils.isNotBlank(e.getValue()))
             .sorted(Map.Entry.comparingByKey())
             .map(e -> e.getKey() + "=" + e.getValue())
             .collect(Collectors.joining("&"));
 
-        // 2. HMAC-SHA256 encrypt
+        // 2. HMAC-SHA256 加密
         byte[] hmac = HmacUtils.hmacSha256(secretKey.getBytes(), sortedParams.getBytes());
 
-        // 3. Base64 encode
+        // 3. Base64 編碼
         return Base64.getEncoder().encodeToString(hmac);
     }
 
     /**
-     * Verify signature
+     * 驗證簽名
      *
-     * @param params Parameters
-     * @param receivedSignature Received signature
-     * @return Whether valid
+     * @param params 參數
+     * @param receivedSignature 收到的簽名
+     * @return 是否有效
      */
     public boolean verifySignature(Map<String, String> params, String receivedSignature) {
         String expectedSignature = generateSignature(params);
 
-        // Use time-safe comparison function (prevent timing attacks)
+        // 使用時間安全比較函數（防止計時攻擊）
         return MessageDigest.isEqual(
             expectedSignature.getBytes(),
             receivedSignature.getBytes()
@@ -542,11 +542,11 @@ public class PaymentSignatureUtil {
 }
 ```
 
-### 3.3 Deposit Service Implementation
+### 3.3 存款服務實作
 
 ```java
 /**
- * Deposit service
+ * 存款服務
  */
 @Service
 @RequiredArgsConstructor
@@ -558,13 +558,13 @@ public class DepositService {
     private final DepositManager depositManager;
 
     /**
-     * Create deposit order
+     * 建立存款訂單
      *
-     * @param request Deposit request
-     * @return Payment URL
+     * @param request 存款請求
+     * @return 支付 URL
      */
     public DepositResponse createDepositOrder(DepositRequest request) {
-        // 1. Create order (status: PENDING)
+        // 1. 建立訂單（狀態：PENDING）
         DepositOrder order = DepositOrder.builder()
             .orderId(generateOrderId())
             .playerId(request.getPlayerId())
@@ -578,10 +578,10 @@ public class DepositService {
 
         depositOrderDao.insert(order);
 
-        // 2. Call payment gateway
+        // 2. 呼叫支付閘道
         DepositResponse response = paymentGateway.createDeposit(request);
 
-        // 3. Update order (record gateway order ID)
+        // 3. 更新訂單（記錄閘道訂單 ID）
         depositOrderDao.updateGatewayOrderId(
             order.getOrderId(),
             response.getGatewayOrderId()
@@ -591,30 +591,30 @@ public class DepositService {
     }
 
     /**
-     * Handle deposit callback
+     * 處理存款回調
      *
-     * Idempotency guarantee: each order is credited only once
+     * 冪等性保證：每筆訂單僅入賬一次
      *
-     * @param callback Callback data
-     * @return Processing result
+     * @param callback 回調資料
+     * @return 處理結果
      */
     public CallbackResult handleDepositCallback(Map<String, String> callback) {
         String signature = callback.get("signature");
 
-        // 1. Verify signature
+        // 1. 驗證簽名
         if (!paymentGateway.verifySignature(callback, signature)) {
             String gatewayOrderId = callback.get("order_id");
             log.error("Invalid signature for order {}", gatewayOrderId);
             return CallbackResult.failure("Invalid signature");
         }
 
-        // 2. Delegate to Manager for transactional processing
+        // 2. 委派給 Manager 處理交易
         return depositManager.processDepositCallback(callback);
     }
 }
 
 /**
- * Deposit Manager (handles transactions)
+ * Deposit Manager（處理交易）
  */
 @Component
 @RequiredArgsConstructor
@@ -625,43 +625,43 @@ public class DepositManager {
     private final NotificationService notificationService;
 
     /**
-     * Process deposit callback (transactional)
+     * 處理存款回調（交易性）
      *
-     * @param callback Callback data
-     * @return Processing result
+     * @param callback 回調資料
+     * @return 處理結果
      */
     @Transactional(rollbackFor = Throwable.class)
     public CallbackResult processDepositCallback(Map<String, String> callback) {
         String gatewayOrderId = callback.get("order_id");
         String status = callback.get("status");
 
-        // 1. Query order
+        // 1. 查詢訂單
         DepositOrder order = depositOrderDao.findByGatewayOrderId(gatewayOrderId);
         if (order == null) {
             log.error("Order not found: {}", gatewayOrderId);
             return CallbackResult.failure("Order not found");
         }
 
-        // 2. Idempotency check
+        // 2. 冪等性檢查
         if (order.getStatus() == OrderStatus.SUCCESS) {
             log.info("Order {} already processed", order.getOrderId());
             return CallbackResult.success("Already processed");
         }
 
-        // 3. Update order status
+        // 3. 更新訂單狀態
         if ("SUCCESS".equals(status)) {
             order.setStatus(OrderStatus.SUCCESS);
             order.setCompletedAt(LocalDateTime.now());
             depositOrderDao.updateStatus(order);
 
-            // 4. Credit wallet
+            // 4. 入賬錢包
             walletService.creditWallet(
                 order.getPlayerId(),
                 order.getAmount(),
                 "DEPOSIT:" + order.getOrderId()
             );
 
-            // 5. Send notification
+            // 5. 發送通知
             notificationService.sendDepositSuccessNotification(order);
 
             return CallbackResult.success("Deposit processed");
@@ -676,11 +676,11 @@ public class DepositManager {
 }
 ```
 
-### 3.4 Withdrawal Service Implementation
+### 3.4 提款服務實作
 
 ```java
 /**
- * Withdrawal service
+ * 提款服務
  */
 @Service
 @RequiredArgsConstructor
@@ -692,33 +692,33 @@ public class WithdrawalService {
     private final WithdrawalManager withdrawalManager;
 
     /**
-     * Create withdrawal order
+     * 建立提款訂單
      *
-     * Flow:
-     * 1. Risk control evaluation
-     * 2. Lock wallet amount
-     * 3. Submit to payment gateway
-     * 4. Async status polling
+     * 流程：
+     * 1. 風控評估
+     * 2. 鎖定錢包金額
+     * 3. 提交至支付閘道
+     * 4. 非同步狀態輪詢
      *
-     * @param request Withdrawal request
-     * @return Order result
+     * @param request 提款請求
+     * @return 訂單結果
      */
     public WithdrawalResult createWithdrawalOrder(WithdrawalRequest request) {
-        // 1. Risk control evaluation
+        // 1. 風控評估
         RiskDecision decision = riskControlService.evaluateWithdrawal(request);
 
         if (decision.getAction() == RiskAction.REJECT) {
             throw new WithdrawalRejectedException(decision.getReason());
         }
 
-        // 2. Delegate to Manager for transactional processing
+        // 2. 委派給 Manager 處理交易
         return withdrawalManager.processWithdrawalOrder(request, decision);
     }
 
     /**
-     * Query withdrawal status (scheduled task)
+     * 查詢提款狀態（排程任務）
      *
-     * Every 30 seconds, max 24 hours
+     * 每 30 秒執行一次，最長 24 小時
      */
     @Scheduled(fixedDelay = 30000)
     public void queryPendingWithdrawals() {
@@ -746,7 +746,7 @@ public class WithdrawalService {
 }
 
 /**
- * Withdrawal Manager (handles transactions)
+ * Withdrawal Manager（處理交易）
  */
 @Component
 @RequiredArgsConstructor
@@ -758,15 +758,15 @@ public class WithdrawalManager {
     private final NotificationService notificationService;
 
     /**
-     * Process withdrawal order (transactional)
+     * 處理提款訂單（交易性）
      *
-     * @param request Withdrawal request
-     * @param decision Risk decision
-     * @return Order result
+     * @param request 提款請求
+     * @param decision 風控決策
+     * @return 訂單結果
      */
     @Transactional(rollbackFor = Throwable.class)
     public WithdrawalResult processWithdrawalOrder(WithdrawalRequest request, RiskDecision decision) {
-        // 1. Create order
+        // 1. 建立訂單
         WithdrawalOrder order = WithdrawalOrder.builder()
             .orderId(generateOrderId())
             .playerId(request.getPlayerId())
@@ -781,74 +781,74 @@ public class WithdrawalManager {
 
         withdrawalOrderDao.insert(order);
 
-        // 2. Lock wallet amount
+        // 2. 鎖定錢包金額
         walletService.lockWalletAmount(
             request.getPlayerId(),
             request.getAmount(),
             "WITHDRAWAL:" + order.getOrderId()
         );
 
-        // 3. If manual review required
+        // 3. 若需人工審核
         if (decision.getAction() == RiskAction.MANUAL_REVIEW) {
             order.setStatus(OrderStatus.REVIEWING);
             withdrawalOrderDao.updateStatus(order);
 
-            // Notify risk control team
+            // 通知風控團隊
             notificationService.notifyManualReview(order);
 
             return WithdrawalResult.underReview(order.getOrderId());
         }
 
-        // 4. Auto-approved, submit to payment gateway
+        // 4. 自動通過，提交至支付閘道
         WithdrawalResponse response = paymentGateway.createWithdrawal(request);
 
         order.setGatewayOrderId(response.getGatewayOrderId());
         order.setStatus(OrderStatus.PROCESSING);
         withdrawalOrderDao.update(order);
 
-        // 5. Start async status query
+        // 5. 啟動非同步狀態查詢
         scheduleStatusQuery(order.getOrderId());
 
         return WithdrawalResult.processing(order.getOrderId());
     }
 
     /**
-     * Complete withdrawal (transactional)
+     * 完成提款（交易性）
      */
     @Transactional(rollbackFor = Throwable.class)
     public void completeWithdrawal(WithdrawalOrder order) {
-        // 1. Update order status
+        // 1. 更新訂單狀態
         order.setStatus(OrderStatus.SUCCESS);
         order.setCompletedAt(LocalDateTime.now());
         withdrawalOrderDao.update(order);
 
-        // 2. Debit wallet balance (unlock + debit)
+        // 2. 扣減錢包餘額（解鎖 + 扣款）
         walletService.debitWallet(
             order.getPlayerId(),
             order.getAmount(),
             "WITHDRAWAL:" + order.getOrderId()
         );
 
-        // 3. Send notification
+        // 3. 發送通知
         notificationService.sendWithdrawalSuccessNotification(order);
     }
 
     /**
-     * Withdrawal failure (transactional)
+     * 提款失敗（交易性）
      */
     @Transactional(rollbackFor = Throwable.class)
     public void failWithdrawal(WithdrawalOrder order) {
-        // 1. Update order status
+        // 1. 更新訂單狀態
         order.setStatus(OrderStatus.FAILED);
         withdrawalOrderDao.update(order);
 
-        // 2. Unlock wallet amount
+        // 2. 解鎖錢包金額
         walletService.unlockWalletAmount(
             order.getPlayerId(),
             "WITHDRAWAL:" + order.getOrderId()
         );
 
-        // 3. Send notification
+        // 3. 發送通知
         notificationService.sendWithdrawalFailedNotification(order);
     }
 }
@@ -856,27 +856,27 @@ public class WithdrawalManager {
 
 ---
 
-## 4. Withdrawal Risk Control Implementation
+## 4. 提款風控實作
 
-### 4.1 Risk Scoring Model
+### 4.1 風險評分模型
 
 ```java
 /**
- * Withdrawal risk scorer
+ * 提款風險評分器
  *
- * Scoring dimensions:
- * 1. Player credit score (0-20 points)
- * 2. KYC completeness (0-15 points)
- * 3. Deposit/withdrawal ratio (0-15 points)
- * 4. Recent withdrawal frequency (0-15 points)
- * 5. Turnover completion (0-15 points)
- * 6. IP/device anomaly (0-10 points)
- * 7. Multi-account correlation (0-10 points)
+ * 評分維度：
+ * 1. 玩家信用分數（0-20 分）
+ * 2. KYC 完成度（0-15 分）
+ * 3. 存提比（0-15 分）
+ * 4. 近期提款頻率（0-15 分）
+ * 5. 投注流水完成度（0-15 分）
+ * 6. IP/裝置異常（0-10 分）
+ * 7. 多帳號關聯（0-10 分）
  *
- * Total 0-100, decision thresholds:
- * - [0, 30): Auto-approve
- * - [30, 70): Manual review
- * - [70, 100]: Auto-reject
+ * 總分 0-100，決策閾值：
+ * - [0, 30)：自動通過
+ * - [30, 70)：人工審核
+ * - [70, 100]：自動拒絕
  */
 @Component
 @RequiredArgsConstructor
@@ -888,20 +888,20 @@ public class WithdrawalRiskScorer {
     private final FraudDetectionService fraudDetectionService;
 
     /**
-     * Calculate withdrawal risk score
+     * 計算提款風險分數
      *
-     * @param request Withdrawal request
-     * @return Risk decision
+     * @param request 提款請求
+     * @return 風控決策
      */
     public RiskDecision scoreWithdrawal(WithdrawalRequest request) {
         Long playerId = request.getPlayerId();
         BigDecimal amount = request.getAmount();
 
-        // 1. Player credit score (0-20 points)
+        // 1. 玩家信用分數（0-20 分）
         int creditScore = playerCreditService.getCreditScore(playerId);
-        int creditRisk = (100 - creditScore) * 20 / 100; // Inverse calculation
+        int creditRisk = (100 - creditScore) * 20 / 100; // 反向計算
 
-        // 2. KYC completeness (0-15 points)
+        // 2. KYC 完成度（0-15 分）
         KycLevel kycLevel = kycService.getKycLevel(playerId);
         int kycRisk = switch (kycLevel) {
             case VERIFIED -> 0;
@@ -909,17 +909,17 @@ public class WithdrawalRiskScorer {
             case NOT_VERIFIED -> 15;
         };
 
-        // 3. Deposit/withdrawal ratio (0-15 points)
+        // 3. 存提比（0-15 分）
         BigDecimal depositTotal = transactionHistoryService.getTotalDeposits(playerId);
         BigDecimal withdrawalTotal = transactionHistoryService.getTotalWithdrawals(playerId);
 
         int ratioRisk = 0;
         if (depositTotal.compareTo(BigDecimal.ZERO) == 0) {
-            ratioRisk = 15; // Never deposited, direct withdrawal
+            ratioRisk = 15; // 從未存款，直接提款
         } else {
             BigDecimal ratio = withdrawalTotal.divide(depositTotal, 2, RoundingMode.HALF_UP);
             if (ratio.compareTo(new BigDecimal("2.0")) > 0) {
-                ratioRisk = 15; // Withdrawal exceeds 2x deposits
+                ratioRisk = 15; // 提款超過存款 2 倍
             } else if (ratio.compareTo(new BigDecimal("1.5")) > 0) {
                 ratioRisk = 10;
             } else if (ratio.compareTo(new BigDecimal("1.0")) > 0) {
@@ -927,11 +927,11 @@ public class WithdrawalRiskScorer {
             }
         }
 
-        // 4. Recent withdrawal frequency (0-15 points)
+        // 4. 近期提款頻率（0-15 分）
         int recentWithdrawals = transactionHistoryService.countWithdrawalsLast7Days(playerId);
         int frequencyRisk = Math.min(recentWithdrawals * 3, 15);
 
-        // 5. Turnover completion (0-15 points)
+        // 5. 投注流水完成度（0-15 分）
         BigDecimal requiredTurnover = calculateRequiredTurnover(playerId);
         BigDecimal actualTurnover = transactionHistoryService.getTurnover(playerId);
 
@@ -943,17 +943,17 @@ public class WithdrawalRiskScorer {
             }
         }
 
-        // 6. IP/device anomaly (0-10 points)
+        // 6. IP/裝置異常（0-10 分）
         int deviceRisk = fraudDetectionService.detectDeviceAnomaly(playerId);
 
-        // 7. Multi-account correlation (0-10 points)
+        // 7. 多帳號關聯（0-10 分）
         int multiAccountRisk = fraudDetectionService.detectMultiAccount(playerId);
 
-        // Calculate total score
+        // 計算總分
         int totalScore = creditRisk + kycRisk + ratioRisk + frequencyRisk
                        + turnoverRisk + deviceRisk + multiAccountRisk;
 
-        // Decision
+        // 決策
         RiskAction action;
         String reason;
 
@@ -986,23 +986,23 @@ public class WithdrawalRiskScorer {
 }
 ```
 
-### 4.2 LiteFlow Rule Engine Configuration
+### 4.2 LiteFlow 規則引擎設定
 
 ```java
 /**
- * LiteFlow risk control chain configuration
+ * LiteFlow 風控鏈設定
  */
 @Configuration
 public class WithdrawalRiskChainConfig {
 
     /**
-     * Risk control rule chain (EL expression)
+     * 風控規則鏈（EL 表達式）
      *
-     * Rules:
-     * 1. Basic validation (player status, balance check)
-     * 2. Risk scoring
-     * 3. Decision routing
-     * 4. Compensation handling (unlock on failure)
+     * 規則：
+     * 1. 基本驗證（玩家狀態、餘額檢查）
+     * 2. 風險評分
+     * 3. 決策路由
+     * 4. 補償處理（失敗時解鎖）
      */
     @Bean
     public String withdrawalRiskChainEL() {
@@ -1022,7 +1022,7 @@ public class WithdrawalRiskChainConfig {
 }
 
 /**
- * Basic validation node
+ * 基本驗證節點
  */
 @Component("validation_node")
 public class ValidationNode extends NodeComponent {
@@ -1037,19 +1037,19 @@ public class ValidationNode extends NodeComponent {
     public void process() {
         WithdrawalRequest request = this.getRequestData();
 
-        // 1. Check player status
+        // 1. 檢查玩家狀態
         Player player = playerService.getPlayer(request.getPlayerId());
         if (player.getStatus() == PlayerStatus.BLOCKED) {
             throw new BizException("Player is blocked, withdrawal denied");
         }
 
-        // 2. Check balance
+        // 2. 檢查餘額
         BigDecimal balance = walletService.getAvailableBalance(request.getPlayerId());
         if (balance.compareTo(request.getAmount()) < 0) {
             throw new BizException("Insufficient balance");
         }
 
-        // 3. Check minimum withdrawal amount
+        // 3. 檢查最低提款金額
         if (request.getAmount().compareTo(new BigDecimal("100")) < 0) {
             throw new BizException("Withdrawal amount must be at least 100");
         }
@@ -1057,7 +1057,7 @@ public class ValidationNode extends NodeComponent {
 }
 
 /**
- * Risk scoring node
+ * 風險評分節點
  */
 @Component("risk_scoring_node")
 public class RiskScoringNode extends NodeComponent {
@@ -1069,10 +1069,10 @@ public class RiskScoringNode extends NodeComponent {
     public void process() {
         WithdrawalRequest request = this.getRequestData();
 
-        // Calculate risk score
+        // 計算風險分數
         RiskDecision decision = riskScorer.scoreWithdrawal(request);
 
-        // Save to context
+        // 儲存至上下文
         this.setContextBean("riskDecision", decision);
 
         log.info("Withdrawal {} risk score: {}, action: {}",
@@ -1083,7 +1083,7 @@ public class RiskScoringNode extends NodeComponent {
 }
 
 /**
- * Decision node
+ * 決策節點
  */
 @Component("decision_node")
 public class DecisionNode extends NodeComponent {
@@ -1096,7 +1096,7 @@ public class DecisionNode extends NodeComponent {
         WithdrawalRequest request = this.getRequestData();
         RiskDecision decision = this.getContextBean("riskDecision");
 
-        // Route based on decision
+        // 根據決策路由
         switch (decision.getAction()) {
             case AUTO_APPROVE -> {
                 withdrawalOrderDao.updateStatus(
@@ -1122,7 +1122,7 @@ public class DecisionNode extends NodeComponent {
 }
 
 /**
- * Compensation node (unlock wallet on failure)
+ * 補償節點（失敗時解鎖錢包）
  */
 @Component("compensation_node")
 public class CompensationNode extends NodeComponent {
@@ -1134,7 +1134,7 @@ public class CompensationNode extends NodeComponent {
     public void process() {
         WithdrawalRequest request = this.getRequestData();
 
-        // Unlock wallet amount
+        // 解鎖錢包金額
         walletService.unlockWalletAmount(
             request.getPlayerId(),
             "WITHDRAWAL:" + request.getOrderId()
@@ -1146,13 +1146,13 @@ public class CompensationNode extends NodeComponent {
 }
 ```
 
-### 4.3 Review Workflow State Machine
+### 4.3 審核工作流狀態機
 
 ```java
 /**
- * Withdrawal review state machine
+ * 提款審核狀態機
  *
- * State transitions:
+ * 狀態轉換：
  * PENDING -> REVIEWING -> APPROVED -> PROCESSING -> SUCCESS
  *                      -> REJECTED
  */
@@ -1163,14 +1163,14 @@ public class WithdrawalWorkflowStateMachine {
     private final WithdrawalReviewManager withdrawalReviewManager;
 
     /**
-     * Reviewer approval
+     * 審核人員通過
      */
     public void approveByReviewer(String orderId, String reviewerId, String comment) {
         withdrawalReviewManager.approveByReviewer(orderId, reviewerId, comment);
     }
 
     /**
-     * Reviewer rejection
+     * 審核人員拒絕
      */
     public void rejectByReviewer(String orderId, String reviewerId, String reason) {
         withdrawalReviewManager.rejectByReviewer(orderId, reviewerId, reason);
@@ -1178,7 +1178,7 @@ public class WithdrawalWorkflowStateMachine {
 }
 
 /**
- * Withdrawal Review Manager (handles transactions)
+ * Withdrawal Review Manager（處理交易）
  */
 @Component
 @RequiredArgsConstructor
@@ -1191,34 +1191,34 @@ public class WithdrawalReviewManager {
     private final AuditLogService auditLogService;
 
     /**
-     * Reviewer approval (transactional)
+     * 審核人員通過（交易性）
      */
     @Transactional(rollbackFor = Throwable.class)
     public void approveByReviewer(String orderId, String reviewerId, String comment) {
         WithdrawalOrder order = withdrawalOrderDao.findById(orderId);
 
-        // 1. State check
+        // 1. 狀態檢查
         if (order.getStatus() != OrderStatus.REVIEWING) {
             throw new IllegalStateException(
                 "Invalid order status, current: " + order.getStatus()
             );
         }
 
-        // 2. Update status
+        // 2. 更新狀態
         order.setStatus(OrderStatus.APPROVED);
         order.setReviewerId(reviewerId);
         order.setReviewComment(comment);
         order.setReviewedAt(LocalDateTime.now());
         withdrawalOrderDao.update(order);
 
-        // 3. Submit to payment gateway
+        // 3. 提交至支付閘道
         WithdrawalResponse response = paymentGateway.createWithdrawal(order);
 
         order.setGatewayOrderId(response.getGatewayOrderId());
         order.setStatus(OrderStatus.PROCESSING);
         withdrawalOrderDao.update(order);
 
-        // 4. Record audit log
+        // 4. 記錄稽核日誌
         auditLogService.log(AuditEvent.builder()
             .action("WITHDRAWAL_APPROVED")
             .operator(reviewerId)
@@ -1228,36 +1228,36 @@ public class WithdrawalReviewManager {
     }
 
     /**
-     * Reviewer rejection (transactional)
+     * 審核人員拒絕（交易性）
      */
     @Transactional(rollbackFor = Throwable.class)
     public void rejectByReviewer(String orderId, String reviewerId, String reason) {
         WithdrawalOrder order = withdrawalOrderDao.findById(orderId);
 
-        // 1. State check
+        // 1. 狀態檢查
         if (order.getStatus() != OrderStatus.REVIEWING) {
             throw new IllegalStateException(
                 "Invalid order status, current: " + order.getStatus()
             );
         }
 
-        // 2. Update status
+        // 2. 更新狀態
         order.setStatus(OrderStatus.REJECTED);
         order.setReviewerId(reviewerId);
         order.setReviewComment(reason);
         order.setReviewedAt(LocalDateTime.now());
         withdrawalOrderDao.update(order);
 
-        // 3. Unlock wallet amount
+        // 3. 解鎖錢包金額
         walletService.unlockWalletAmount(
             order.getPlayerId(),
             "WITHDRAWAL:" + order.getOrderId()
         );
 
-        // 4. Send notification
+        // 4. 發送通知
         notificationService.sendWithdrawalRejectedNotification(order);
 
-        // 5. Record audit log
+        // 5. 記錄稽核日誌
         auditLogService.log(AuditEvent.builder()
             .action("WITHDRAWAL_REJECTED")
             .operator(reviewerId)
@@ -1268,20 +1268,20 @@ public class WithdrawalReviewManager {
 }
 ```
 
-### 4.4 SAGA Compensation Orchestrator
+### 4.4 SAGA 補償編排器
 
 ```java
 /**
- * Withdrawal SAGA Orchestrator
+ * 提款 SAGA 編排器
  *
- * Steps:
- * 1. Lock wallet amount
- * 2. Risk control evaluation
- * 3. Submit to payment gateway
- * 4. Debit balance
+ * 步驟：
+ * 1. 鎖定錢包金額
+ * 2. 風控評估
+ * 3. 提交至支付閘道
+ * 4. 扣減餘額
  *
- * Compensation:
- * On any failure, rollback previous steps in reverse order
+ * 補償：
+ * 任何失敗時，反向回滾先前步驟
  */
 @Component
 @RequiredArgsConstructor
@@ -1292,14 +1292,14 @@ public class WithdrawalSagaOrchestrator {
     private final PaymentGateway paymentGateway;
 
     /**
-     * Execute withdrawal SAGA
+     * 執行提款 SAGA
      */
     public WithdrawalResult executeWithdrawalSaga(WithdrawalRequest request) {
         String orderId = request.getOrderId();
         List<CompensationAction> compensations = new ArrayList<>();
 
         try {
-            // Step 1: Lock wallet amount
+            // 步驟 1：鎖定錢包金額
             walletService.lockWalletAmount(
                 request.getPlayerId(),
                 request.getAmount(),
@@ -1312,19 +1312,19 @@ public class WithdrawalSagaOrchestrator {
                 );
             });
 
-            // Step 2: Risk control evaluation
+            // 步驟 2：風控評估
             RiskDecision decision = riskControlService.evaluateWithdrawal(request);
             if (decision.getAction() == RiskAction.REJECT) {
                 throw new WithdrawalRejectedException(decision.getReason());
             }
 
-            // Step 3: Submit to payment gateway
+            // 步驟 3：提交至支付閘道
             WithdrawalResponse response = paymentGateway.createWithdrawal(request);
             compensations.add(() -> {
                 paymentGateway.cancelWithdrawal(response.getGatewayOrderId());
             });
 
-            // Step 4: Debit balance
+            // 步驟 4：扣減餘額
             walletService.debitWallet(
                 request.getPlayerId(),
                 request.getAmount(),
@@ -1341,7 +1341,7 @@ public class WithdrawalSagaOrchestrator {
             return WithdrawalResult.success(orderId);
 
         } catch (Exception e) {
-            // Execute compensations in reverse order
+            // 反向執行補償
             log.error("Withdrawal SAGA failed for order {}, executing compensations",
                       orderId, e);
 
@@ -1350,7 +1350,7 @@ public class WithdrawalSagaOrchestrator {
                     compensations.get(i).compensate();
                 } catch (Exception ce) {
                     log.error("Compensation failed for order {}", orderId, ce);
-                    // Route to manual processing queue
+                    // 路由至人工處理佇列
                     manualCompensationQueue.add(orderId, compensations.get(i));
                 }
             }
@@ -1361,7 +1361,7 @@ public class WithdrawalSagaOrchestrator {
 }
 
 /**
- * Compensation action interface
+ * 補償動作介面
  */
 @FunctionalInterface
 interface CompensationAction {
@@ -1371,44 +1371,44 @@ interface CompensationAction {
 
 ---
 
-## 5. Reconciliation System Implementation
+## 5. 對帳系統實作
 
-### 5.1 Database Schema
+### 5.1 資料庫 Schema
 
 ```sql
--- Daily financial reconciliation table
+-- 每日財務對帳表
 CREATE TABLE daily_financial_reconciliation (
     recon_id BIGINT PRIMARY KEY,
     tenant_id VARCHAR(50) NOT NULL,
     recon_date DATE NOT NULL,
 
-    -- Wallet reconciliation
+    -- 錢包對帳
     wallet_balance_system DECIMAL(19,4) NOT NULL,
     wallet_balance_db DECIMAL(19,4) NOT NULL,
     wallet_balance_diff DECIMAL(19,4) NOT NULL,
 
-    -- Deposit reconciliation
+    -- 存款對帳
     deposit_count_system INT NOT NULL,
     deposit_count_gateway INT NOT NULL,
     deposit_amount_system DECIMAL(19,4) NOT NULL,
     deposit_amount_gateway DECIMAL(19,4) NOT NULL,
     deposit_diff DECIMAL(19,4) NOT NULL,
 
-    -- Withdrawal reconciliation
+    -- 提款對帳
     withdrawal_count_system INT NOT NULL,
     withdrawal_count_gateway INT NOT NULL,
     withdrawal_amount_system DECIMAL(19,4) NOT NULL,
     withdrawal_amount_gateway DECIMAL(19,4) NOT NULL,
     withdrawal_diff DECIMAL(19,4) NOT NULL,
 
-    -- Bet reconciliation
+    -- 投注對帳
     bet_count_system INT NOT NULL,
     bet_count_provider INT NOT NULL,
     bet_amount_system DECIMAL(19,4) NOT NULL,
     bet_amount_provider DECIMAL(19,4) NOT NULL,
     bet_diff DECIMAL(19,4) NOT NULL,
 
-    -- Reconciliation status
+    -- 對帳狀態
     status VARCHAR(20) NOT NULL, -- MATCHED, MISMATCHED, PENDING
     created_at TIMESTAMP NOT NULL,
 
@@ -1416,7 +1416,7 @@ CREATE TABLE daily_financial_reconciliation (
     INDEX idx_status_date (status, recon_date)
 );
 
--- Reconciliation discrepancy detail table
+-- 對帳差異明細表
 CREATE TABLE reconciliation_discrepancy (
     discrepancy_id BIGINT PRIMARY KEY,
     recon_id BIGINT NOT NULL,
@@ -1435,13 +1435,13 @@ CREATE TABLE reconciliation_discrepancy (
 );
 ```
 
-### 5.2 Daily Financial Reconciliation Service
+### 5.2 每日財務對帳服務
 
 ```java
 /**
- * Daily financial reconciliation service
+ * 每日財務對帳服務
  *
- * Execution time: 02:00 AM daily
+ * 執行時間：每日凌晨 02:00
  */
 @Service
 @RequiredArgsConstructor
@@ -1450,7 +1450,7 @@ public class DailyFinancialReconciliationService {
     private final ReconciliationManager reconciliationManager;
 
     /**
-     * Execute daily reconciliation (scheduled task)
+     * 執行每日對帳（排程任務）
      */
     @Scheduled(cron = "0 0 2 * * *")
     public void executeDailyReconciliation(String tenantId, LocalDate reconDate) {
@@ -1459,7 +1459,7 @@ public class DailyFinancialReconciliationService {
 }
 
 /**
- * Reconciliation Manager (handles transactions)
+ * Reconciliation Manager（處理交易）
  */
 @Component
 @RequiredArgsConstructor
@@ -1475,29 +1475,29 @@ public class ReconciliationManager {
     private final AlertService alertService;
 
     /**
-     * Execute daily reconciliation (transactional)
+     * 執行每日對帳（交易性）
      *
-     * @param tenantId Tenant ID
-     * @param reconDate Reconciliation date
+     * @param tenantId 租戶 ID
+     * @param reconDate 對帳日期
      */
     @Transactional(rollbackFor = Throwable.class)
     public void executeDailyReconciliation(String tenantId, LocalDate reconDate) {
         log.info("Starting daily reconciliation for tenant {} on {}",
                  tenantId, reconDate);
 
-        // 1. Wallet reconciliation
+        // 1. 錢包對帳
         WalletReconciliationResult walletResult = reconcileWallets(tenantId, reconDate);
 
-        // 2. Deposit reconciliation
+        // 2. 存款對帳
         DepositReconciliationResult depositResult = reconcileDeposits(tenantId, reconDate);
 
-        // 3. Withdrawal reconciliation
+        // 3. 提款對帳
         WithdrawalReconciliationResult withdrawalResult = reconcileWithdrawals(tenantId, reconDate);
 
-        // 4. Bet reconciliation
+        // 4. 投注對帳
         BetReconciliationResult betResult = reconcileBets(tenantId, reconDate);
 
-        // 5. Save reconciliation results
+        // 5. 儲存對帳結果
         DailyFinancialReconciliation recon = DailyFinancialReconciliation.builder()
             .tenantId(tenantId)
             .reconDate(reconDate)
@@ -1525,7 +1525,7 @@ public class ReconciliationManager {
 
         reconciliationDao.insert(recon);
 
-        // 6. Send alert if discrepancies found
+        // 6. 若發現差異則發送警報
         if (recon.getStatus() == ReconciliationStatus.MISMATCHED) {
             alertService.sendReconciliationMismatchAlert(recon);
         }
@@ -1535,16 +1535,16 @@ public class ReconciliationManager {
     }
 
     /**
-     * Wallet reconciliation
+     * 錢包對帳
      */
     private WalletReconciliationResult reconcileWallets(String tenantId, LocalDate date) {
-        // 1. System balance (Redis)
+        // 1. 系統餘額（Redis）
         BigDecimal systemBalance = walletDao.sumAllBalancesFromRedis(tenantId);
 
-        // 2. Database balance
+        // 2. 資料庫餘額
         BigDecimal dbBalance = walletDao.sumAllBalancesFromDb(tenantId);
 
-        // 3. Calculate difference
+        // 3. 計算差異
         BigDecimal diff = systemBalance.subtract(dbBalance);
 
         if (diff.abs().compareTo(new BigDecimal("0.01")) > 0) {
@@ -1556,7 +1556,7 @@ public class ReconciliationManager {
     }
 
     /**
-     * Deposit reconciliation
+     * 存款對帳
      */
     private DepositReconciliationResult reconcileDeposits(String tenantId, LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
@@ -1590,26 +1590,26 @@ public class ReconciliationManager {
     }
 
     /**
-     * Bet reconciliation (three-way comparison)
+     * 投注對帳（三方比對）
      */
     private BetReconciliationResult reconcileBets(String tenantId, LocalDate date) {
-        // 1. System statistics (OLTP)
+        // 1. 系統統計（OLTP）
         int systemCount = betOrderDao.countByPeriod(tenantId, date);
         BigDecimal systemAmount = betOrderDao.sumAmountByPeriod(tenantId, date);
 
-        // 2. Game provider statistics
+        // 2. 遊戲商統計
         GameProviderReport providerReport = gameProviderService.getDailyReport(tenantId, date);
         int providerCount = providerReport.getBetCount();
         BigDecimal providerAmount = providerReport.getBetAmount();
 
-        // 3. Calculate difference
+        // 3. 計算差異
         BigDecimal diff = systemAmount.subtract(providerAmount);
 
         if (diff.abs().compareTo(new BigDecimal("0.01")) > 0) {
             log.error("Bet mismatch: system={}/{}, provider={}/{}, diff={}",
                       systemCount, systemAmount, providerCount, providerAmount, diff);
 
-            // Three-way comparison (system, provider, OLAP)
+            // 三方比對（系統、遊戲商、OLAP）
             performThreeWayBetReconciliation(tenantId, date);
         }
 
@@ -1619,20 +1619,20 @@ public class ReconciliationManager {
     }
 
     /**
-     * Three-way bet reconciliation
+     * 三方投注對帳
      *
-     * Compare:
-     * 1. OLTP system (real-time)
-     * 2. Game provider report
-     * 3. OLAP data warehouse (T+1)
+     * 比對：
+     * 1. OLTP 系統（即時）
+     * 2. 遊戲商報表
+     * 3. OLAP 資料倉儲（T+1）
      */
     private void performThreeWayBetReconciliation(String tenantId, LocalDate date) {
-        // 1. Fetch bet lists from three sources
+        // 1. 從三個來源抓取投注清單
         List<BetOrder> systemBets = betOrderDao.findByDate(tenantId, date);
         List<BetOrder> providerBets = gameProviderService.getBetsByDate(tenantId, date);
         List<BetOrder> olapBets = olapService.getBetsByDate(tenantId, date);
 
-        // 2. Convert to Sets (using bet ID)
+        // 2. 轉換為 Sets（使用 bet ID）
         Set<String> systemBetIds = systemBets.stream()
             .map(BetOrder::getBetId)
             .collect(Collectors.toSet());
@@ -1645,7 +1645,7 @@ public class ReconciliationManager {
             .map(BetOrder::getBetId)
             .collect(Collectors.toSet());
 
-        // 3. Find discrepancies
+        // 3. 找出差異
         Set<String> onlyInSystem = new HashSet<>(systemBetIds);
         onlyInSystem.removeAll(providerBetIds);
         onlyInSystem.removeAll(olapBetIds);
@@ -1658,30 +1658,30 @@ public class ReconciliationManager {
         onlyInOlap.removeAll(systemBetIds);
         onlyInOlap.removeAll(providerBetIds);
 
-        // 4. Log discrepancies
+        // 4. 記錄差異
         if (!onlyInSystem.isEmpty()) {
             log.error("Bets only in system: {}", onlyInSystem);
-            // Possible: provider did not report
+            // 可能：遊戲商未回報
         }
 
         if (!onlyInProvider.isEmpty()) {
             log.error("Bets only in provider: {}", onlyInProvider);
-            // Possible: system did not record (critical issue)
+            // 可能：系統未記錄（嚴重問題）
         }
 
         if (!onlyInOlap.isEmpty()) {
             log.error("Bets only in OLAP: {}", onlyInOlap);
-            // Possible: ETL delay
+            // 可能：ETL 延遲
         }
     }
 }
 ```
 
-### 5.3 Discrepancy Resolution Service
+### 5.3 差異處理服務
 
 ```java
 /**
- * Reconciliation discrepancy resolution service
+ * 對帳差異處理服務
  */
 @Service
 @RequiredArgsConstructor
@@ -1690,12 +1690,12 @@ public class ReconciliationDiscrepancyService {
     private final ReconciliationDiscrepancyManager discrepancyManager;
 
     /**
-     * Manually resolve discrepancy
+     * 人工處理差異
      *
-     * @param discrepancyId Discrepancy ID
-     * @param action Resolution action (ADJUST_SYSTEM, ADJUST_EXTERNAL, IGNORE)
-     * @param operator Operator
-     * @param comment Notes
+     * @param discrepancyId 差異 ID
+     * @param action 處理動作（ADJUST_SYSTEM, ADJUST_EXTERNAL, IGNORE）
+     * @param operator 操作人員
+     * @param comment 備註
      */
     public void resolveDiscrepancy(
         Long discrepancyId,
@@ -1707,7 +1707,7 @@ public class ReconciliationDiscrepancyService {
     }
 
     /**
-     * Auto-resolve minor discrepancies (scheduled task)
+     * 自動處理小額差異（排程任務）
      */
     @Scheduled(cron = "0 0 3 * * *")
     public void autoResolveMinorDiscrepancies() {
@@ -1716,7 +1716,7 @@ public class ReconciliationDiscrepancyService {
 }
 
 /**
- * Reconciliation Discrepancy Manager (handles transactions)
+ * Reconciliation Discrepancy Manager（處理交易）
  */
 @Component
 @RequiredArgsConstructor
@@ -1727,12 +1727,12 @@ public class ReconciliationDiscrepancyManager {
     private final AuditLogService auditLogService;
 
     /**
-     * Manually resolve discrepancy (transactional)
+     * 人工處理差異（交易性）
      *
-     * @param discrepancyId Discrepancy ID
-     * @param action Resolution action (ADJUST_SYSTEM, ADJUST_EXTERNAL, IGNORE)
-     * @param operator Operator
-     * @param comment Notes
+     * @param discrepancyId 差異 ID
+     * @param action 處理動作（ADJUST_SYSTEM, ADJUST_EXTERNAL, IGNORE）
+     * @param operator 操作人員
+     * @param comment 備註
      */
     @Transactional(rollbackFor = Throwable.class)
     public void resolveDiscrepancy(
@@ -1749,26 +1749,26 @@ public class ReconciliationDiscrepancyManager {
 
         switch (action) {
             case ADJUST_SYSTEM -> {
-                // Adjust system data (e.g., create missing order)
+                // 調整系統資料（例如：補建遺失訂單）
                 adjustSystemData(discrepancy);
             }
             case ADJUST_EXTERNAL -> {
-                // Contact external party for adjustment
+                // 聯繫外部方調整
                 requestExternalAdjustment(discrepancy);
             }
             case IGNORE -> {
-                // Mark as ignorable (small amount difference)
+                // 標記為可忽略（小額差異）
                 log.info("Discrepancy {} marked as ignore", discrepancyId);
             }
         }
 
-        // Mark as resolved
+        // 標記為已處理
         discrepancy.setResolved(true);
         discrepancy.setResolvedAt(LocalDateTime.now());
         discrepancy.setResolvedBy(operator);
         discrepancyDao.update(discrepancy);
 
-        // Record audit log
+        // 記錄稽核日誌
         auditLogService.log(AuditEvent.builder()
             .action("DISCREPANCY_RESOLVED")
             .operator(operator)
@@ -1778,9 +1778,9 @@ public class ReconciliationDiscrepancyManager {
     }
 
     /**
-     * Auto-resolve minor discrepancies (transactional)
+     * 自動處理小額差異（交易性）
      *
-     * Condition: difference < 0.01 AND appears for 3+ consecutive days
+     * 條件：差異 < 0.01 且連續出現 3+ 天
      */
     public void autoResolveMinorDiscrepancies() {
         List<ReconciliationDiscrepancy> minorDiscrepancies =
@@ -1802,11 +1802,11 @@ public class ReconciliationDiscrepancyManager {
 }
 ```
 
-### 5.4 Report Generation Service
+### 5.4 報表產生服務
 
 ```java
 /**
- * Reconciliation report generation service
+ * 對帳報表產生服務
  */
 @Service
 @RequiredArgsConstructor
@@ -1816,33 +1816,33 @@ public class ReconciliationReportService {
     private final ReconciliationDiscrepancyDao discrepancyDao;
 
     /**
-     * Generate daily reconciliation report (PDF)
+     * 產生每日對帳報表（PDF）
      *
-     * @param tenantId Tenant ID
-     * @param reconDate Reconciliation date
-     * @return PDF file path
+     * @param tenantId 租戶 ID
+     * @param reconDate 對帳日期
+     * @return PDF 檔案路徑
      */
     public String generateDailyReport(String tenantId, LocalDate reconDate) {
-        // 1. Query reconciliation data
+        // 1. 查詢對帳資料
         DailyFinancialReconciliation recon = reconciliationDao.findByDate(tenantId, reconDate);
 
-        // 2. Query discrepancy details
+        // 2. 查詢差異明細
         List<ReconciliationDiscrepancy> discrepancies =
             discrepancyDao.findByReconId(recon.getReconId());
 
-        // 3. Generate PDF
+        // 3. 產生 PDF
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream("report.pdf"));
         document.open();
 
-        // Title
+        // 標題
         document.add(new Paragraph("Daily Financial Reconciliation Report", titleFont));
         document.add(new Paragraph("Tenant: " + tenantId, normalFont));
         document.add(new Paragraph("Date: " + reconDate, normalFont));
         document.add(new Paragraph("Status: " + recon.getStatus(), normalFont));
         document.add(Chunk.NEWLINE);
 
-        // Wallet reconciliation table
+        // 錢包對帳表
         PdfPTable walletTable = new PdfPTable(3);
         walletTable.addCell("Item");
         walletTable.addCell("System");
@@ -1852,7 +1852,7 @@ public class ReconciliationReportService {
         walletTable.addCell(recon.getWalletBalanceDb().toString());
         document.add(walletTable);
 
-        // Deposit reconciliation table
+        // 存款對帳表
         PdfPTable depositTable = new PdfPTable(4);
         depositTable.addCell("Item");
         depositTable.addCell("System Count");
@@ -1864,7 +1864,7 @@ public class ReconciliationReportService {
         depositTable.addCell(recon.getDepositAmountGateway().toString());
         document.add(depositTable);
 
-        // Discrepancy details
+        // 差異明細
         if (!discrepancies.isEmpty()) {
             document.add(new Paragraph("Discrepancy Details:", subtitleFont));
 
@@ -1895,14 +1895,14 @@ public class ReconciliationReportService {
 
 ---
 
-## 6. Reference Documentation
+## 6. 參考文件
 
-| Order | Document | Section | Focus |
+| 順序 | 文件 | 章節 | 重點 |
 |-------|----------|---------|-------|
-| 1 | Wallet Architecture (02-06) | Concurrency Control | Redis Lua atomicity |
-| 2 | Transaction Processing Flow (02-07) | Event-Driven | Outbox Pattern |
-| 3 | Payment Gateway Integration (02-02) | Integration Flow | Deposit/Withdrawal API |
-| 4 | Withdrawal Risk (01-05) | Risk Control | Rule engine design |
-| 5 | Risk Framework (05-01) | Rule Engine | LiteFlow implementation |
-| 6 | Reconciliation System (02-03) | Reconciliation Model | Three-way reconciliation |
-| 7 | Turnover Calculation (03-04) | Three-Layer Validation | Turnover reconciliation |
+| 1 | Wallet Architecture (02-06) | 並發控制 | Redis Lua 原子性 |
+| 2 | Transaction Processing Flow (02-07) | 事件驅動 | Outbox Pattern |
+| 3 | Payment Gateway Integration (02-02) | 整合流程 | 存款/提款 API |
+| 4 | Withdrawal Risk (01-05) | 風控 | 規則引擎設計 |
+| 5 | Risk Framework (05-01) | 規則引擎 | LiteFlow 實作 |
+| 6 | Reconciliation System (02-03) | 對帳模型 | 三方對帳 |
+| 7 | Turnover Calculation (03-04) | 三層驗證 | 投注流水對帳 |
