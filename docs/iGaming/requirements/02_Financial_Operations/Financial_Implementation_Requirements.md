@@ -9,6 +9,31 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Financial Integrity**: Defines multi-wallet architecture (CASH, BONUS, LOCKED) with precise Available Balance formula ensuring players can never overdraft
+- **Fraud Prevention**: Establishes 7-dimensional risk scoring model (0-100 scale) with automated approval thresholds to block high-risk withdrawals while minimizing friction for legitimate players
+- **Operational Efficiency**: Specifies reconciliation requirements across wallet, deposits, withdrawals, and bets with 99.99% accuracy target and automated discrepancy alerting
+- **Regulatory Compliance**: Mandates comprehensive audit trails for all financial operations, supporting regulatory inspections and dispute resolution
+
+---
+
+## Acceptance Criteria
+
+- [ ] Multi-wallet system supports CASH, BONUS, and LOCKED wallet types with independent balance tracking
+- [ ] Available Balance formula correctly calculates: Cash Balance - Locked Amount - Pending Bets (never negative)
+- [ ] Concurrent balance deductions pass stress test at 1,000 TPS without overdraft
+- [ ] Duplicate callback handling is idempotent (same order returns same result)
+- [ ] Withdrawal risk scoring calculates correctly across all 7 dimensions (0-100 scale)
+- [ ] Risk decisions route correctly: 0-29 AUTO_APPROVE, 30-69 MANUAL_REVIEW, 70-100 REJECT
+- [ ] SAGA compensation unlocks wallet when payment gateway submission fails
+- [ ] Daily reconciliation achieves 99.99% wallet balance accuracy
+- [ ] Three-way bet reconciliation (OLTP, GP Report, OLAP) achieves 100% accuracy
+- [ ] All financial operations generate complete audit trail records
+
+---
+
 ## 1. Document Purpose
 
 This document defines the **business requirements** for the iGaming platform's core financial processes, including the wallet system, payment gateway integration, withdrawal risk control, and reconciliation system.

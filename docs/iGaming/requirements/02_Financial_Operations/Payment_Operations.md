@@ -9,6 +9,29 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Revenue Optimization**: Defines smart routing with weighted factors (Success Rate 50%, Fee 30%, Speed 15%) to maximize transaction success while minimizing costs
+- **Regulatory Compliance**: Documents jurisdiction-specific restrictions (UK credit card ban, PSD2 3DS 2.0, AML wallet scoring) to prevent regulatory violations and associated fines
+- **Operational Efficiency**: Establishes automated reconciliation (every 15 minutes) and severity-based alerting (P0-P3) to minimize manual intervention and reduce failed transaction resolution time
+- **VIP Retention**: Specifies differentiated payment channels for VIP levels (dedicated account manager, fee reductions, expedited settlement) to enhance high-value player experience
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Drop Rate | < 1% | (Credits / Total Success) × 100% |
+| Credit Success Rate | > 95% | (Successful Credits / Credit Attempts) × 100% |
+| Average Credit Delay | < 30 min | Time from PSP success to platform credit |
+| Pending Backlog | < 10 orders | Orders pending > 2 hours |
+| Manual Review Rate | < 5% | (Manual / Total Credits) × 100% |
+| PSP API Success Rate | > 99% | (Successful Queries / Total Queries) × 100% |
+
+---
+
 ## 1. Overview
 
 The payment operations module is responsible for all interactions with external payment service providers (PSPs), ensuring secure, stable, and automated fund inflows and outflows. The system must support multiple payment methods and dynamic routing capabilities.

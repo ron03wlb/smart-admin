@@ -7,6 +7,27 @@
 
 ---
 
+## Business Value
+
+This terminology standard delivers strategic value by:
+- **Calculation Accuracy**: Ensures consistent Valid Bet calculation using the Standard Principal Method (industry standard used by Pinnacle, Betfair, Evolution Gaming)
+- **Risk Mitigation**: Prevents promotion abuse by clearly defining Wagering Requirement verification timing (at withdrawal, not during betting)
+- **System Consistency**: Establishes mandatory API field naming conventions (`validBet`, `wageringProgress.*`) to prevent integration errors
+- **Compliance Readiness**: Provides auditable definitions that align with major game provider standards for regulatory inspections
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Terminology Compliance | 100% of new documents use standard terms | Documentation audit for prohibited term usage |
+| API Naming Compliance | 100% of endpoints use standard field names | Code review and API schema validation |
+| Calculation Accuracy | Zero discrepancies in Valid Bet calculations | Reconciliation between platform and game providers |
+| Cross-Team Understanding | All team members can correctly define the 4 core terms | Quarterly terminology quiz (Bet Amount, Turnover, Valid Bet, Wagering Requirement) |
+
+---
+
 ## Document Information
 
 - **Version**: 4.0.0

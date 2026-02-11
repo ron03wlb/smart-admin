@@ -7,6 +7,31 @@
 
 ---
 
+## Business Value
+
+This document delivers strategic value by:
+- **Operational Clarity**: Provides 6 end-to-end business flows covering the complete player lifecycle from registration through withdrawal
+- **Cross-Functional Alignment**: Enables Executives, Product Managers, Compliance Officers, and QA Teams to share a common understanding of platform operations
+- **Compliance Foundation**: Documents KYC verification levels, risk control checkpoints, and multi-tenant data isolation requirements for regulatory audit readiness
+- **Risk Mitigation**: Defines five-layer withdrawal review process and risk scoring factors to prevent fraud and bonus abuse
+
+---
+
+## Acceptance Criteria
+
+- [ ] Player registration flow correctly assigns tenant context from domain/URL path
+- [ ] Wallet initialization creates all four balance fields (Cash, Promotional, Locked, Playable) with zero values
+- [ ] KYC verification supports three levels (L1: $1,000/day, L2: $10,000/day, L3: Unlimited)
+- [ ] Game launch tokens expire after 5 minutes and enforce one-time use
+- [ ] Playable Balance calculation follows formula: Cash Balance - Locked Amount - In-Progress Bets
+- [ ] Bonus wagering uses game-specific weights (Slots 100%, Baccarat 10%, Sports 50%)
+- [ ] Withdrawal review implements five-layer risk control (KYC → Turnover → Bonus → Frequency → Risk Score)
+- [ ] Risk score thresholds trigger correct actions (0-30 auto-approve, 31-70 manual review, 71-100 auto-reject)
+- [ ] Three-layer turnover verification (Real-time OLTP → Hourly Reconciliation → Daily OLAP) detects and alerts on discrepancies
+- [ ] Multi-tenant data isolation prevents cross-tenant access at application and database layers
+
+---
+
 ## Document Purpose
 
 This document provides **6 end-to-end business flows** that describe the complete iGaming platform operations from a business perspective. Each flow covers the user journey, business rules, compliance requirements, and exception handling -- without technical implementation details.
