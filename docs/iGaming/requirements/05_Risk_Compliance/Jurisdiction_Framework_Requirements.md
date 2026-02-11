@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
 > **Audience**: Executives, Compliance Officers
-> **Related Architecture**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)
+> **Related Doc**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)
 > **Last Synced**: 2026-02-08
 
 ---
@@ -15,11 +15,23 @@ The Multi-Jurisdiction Framework enables the iGaming platform to operate under m
 
 ## Business Value
 
-This feature delivers value by:
-- Enabling market expansion into multiple regulated jurisdictions (UKGC, MGA, PAGCOR, Curacao, Brazil SPA) without separate platform instances
-- Reducing compliance risk through automated jurisdiction-specific rule enforcement for KYC, responsible gambling, and payment restrictions
-- Accelerating time-to-market for new jurisdictions through configuration-driven onboarding (no code changes required)
-- Protecting licence status by ensuring geo-fencing, payment method restrictions, and reporting requirements are automatically enforced per jurisdiction
+This framework delivers critical value through:
+
+- **Market Expansion**: Enables operators to serve players across multiple regulatory markets under different licences (UKGC, MGA, PAGCOR, Curacao, Brazil SPA) without code changes, accelerating time-to-market for new jurisdictions
+- **Regulatory Compliance Automation**: Automatically enforces jurisdiction-specific rules (KYC timing, responsible gambling tools, payment restrictions, game limits) based on player location, reducing manual compliance overhead by 70-80%
+- **Risk Mitigation**: Prevents regulatory violations through automated geo-fencing, VPN/proxy detection, and continuous session validation, protecting operator licences and reducing penalty exposure
+- **Operational Efficiency**: Configuration-driven design enables new jurisdiction onboarding in weeks instead of months, with compliance reporting automated per regulatory submission schedules
+- **Player Protection**: Enforces jurisdiction-appropriate responsible gambling measures (self-exclusion, deposit limits, affordability checks) aligned with local consumer protection standards
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Jurisdiction Onboarding Time | ≤4 weeks per new licence | Time from regulatory approval to platform activation |
+| Compliance Automation Rate | ≥95% | Percentage of compliance checks automated vs manual review |
+| Geo-Fencing Accuracy | ≥99.9% | Correct location detection and access control decisions |
+| Regulatory Reporting SLA | 100% on-time | Submissions delivered before deadline per jurisdiction |
+| VPN/Proxy Detection Rate | ≥98% | Blocked proxy/VPN attempts vs total access attempts |
 
 ---
 
