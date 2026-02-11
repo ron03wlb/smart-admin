@@ -2,7 +2,7 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation [ACTIVE]
-> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 9 (Phase 9) = 27 total
+> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 10 (Phase 9) = 28 total
 > **Status**: IN PROGRESS
 
 ---
@@ -284,15 +284,15 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 - [x] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md ✅ commit 66972379 (part 1/3)
 - [x] requirements/15_Responsible_Gambling/Affordability_Requirements.md ✅ commit f32f97ca (part 2/3)
 
-#### Batch 29 — 15_Responsible_Gambling (3 files)
-- [ ] requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md
-- [ ] requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md
-- [ ] requirements/15_Responsible_Gambling/Session_Protection_Requirements.md
+#### Batch 29 — 15_Responsible_Gambling (3 files) ✅ COMPLETE
+- [x] requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md ✅ commit e39e10da
+- [x] requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md ✅ commit e39e10da
+- [x] requirements/15_Responsible_Gambling/Session_Protection_Requirements.md ✅ commit e39e10da
 
-#### Batch 30 — Requirements READMEs + Validation
-- [ ] Translate all requirements/*/README.md files (7 files)
-- [ ] Translate requirements/README.md (1 file)
-- [ ] Run requirements translation quality gate
+#### Batch 30 — Requirements READMEs + Validation ✅ COMPLETE
+- [x] Translate all requirements/*/README.md files (7 files) ✅ commit 3d7b636b
+- [x] Translate requirements/README.md (1 file) ✅ commit 2b75294a
+- [x] Run requirements translation quality gate ✅ PASSED (terminology ✅, encoding ✅, links 0 broken)
 
 ---
 
