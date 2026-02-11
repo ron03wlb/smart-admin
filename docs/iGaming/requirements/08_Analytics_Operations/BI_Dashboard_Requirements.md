@@ -14,6 +14,18 @@ The BI Dashboard and Data Pipeline system addresses the operational analytics ne
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- Enabling real-time operational decisions through Hot Path data (< 5 second delay) for risk alerts, capacity monitoring, and incident response
+- Supporting strategic business decisions through T+1 reports with 100% data completeness for settlement reconciliation and compliance
+- Ensuring multi-tenant data isolation with mandatory tenant_id filtering on all queries, protecting operator data privacy
+- Meeting regulatory requirements through automated compliance reporting with 7+ year data retention for audit purposes
+- Protecting player privacy through systematic PII masking (name, phone, ID, email) before data enters the analytics layer
+- Enabling business self-service through ad-hoc queries, custom dashboards, and scheduled reports without engineering dependency
+
+---
+
 ## 2. Dashboard Requirements by Role
 
 ### 2.1 Operations Dashboard (Real-time)

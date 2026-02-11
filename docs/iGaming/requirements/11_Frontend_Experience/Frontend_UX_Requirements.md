@@ -181,9 +181,13 @@ All banner content must go through mandatory approval:
 
 ## 7. Acceptance Criteria
 
-1. Operations can create, edit, preview, and publish page layouts without developer assistance
-2. Banner system supports multi-language with proper fallback
-3. All banners go through approval workflow before publishing
-4. Targeting rules correctly filter banners by user segment, VIP level, device, geo, and time
-5. Analytics dashboard shows real-time CTR and conversion metrics
-6. Wallet mode UI correctly adapts Header display based on player configuration
+- [ ] Operations can create, edit, preview, and publish page layouts without developer assistance
+- [ ] Banner system supports multi-language with proper fallback (User language → English → zh-CN → default image)
+- [ ] All banners go through mandatory approval workflow (Specialist → Supervisor) before publishing
+- [ ] Targeting rules correctly filter banners by user segment, VIP level, device, geo, and time
+- [ ] Analytics dashboard shows real-time CTR and conversion metrics with attribution tracking
+- [ ] Wallet mode UI correctly adapts Header display based on player configuration (Cash/Credit/Hybrid)
+- [ ] Theme switching allows one-click site-wide color scheme change across all page components
+- [ ] Multi-terminal support provides adaptive layout for Web, H5, and App with independent component visibility
+- [ ] Preview URL generation allows internal testing without affecting production users
+- [ ] Version control generates version numbers on publish and pushes configuration to CDN

@@ -227,6 +227,22 @@ When an agent reaches 100% usage:
 
 ---
 
+## Acceptance Criteria
+
+- [ ] Credit limit allocation flows top-down through agent hierarchy with real-time available credit validation
+- [ ] Child agent credit allocation cannot exceed parent's available credit at any point
+- [ ] Risk alert notifications trigger automatically at 81%, 91%, and 100% credit usage thresholds
+- [ ] Credit freeze activates immediately when agent reaches 100% usage, blocking all downstream betting
+- [ ] Cascading credit monitoring recalculates parent usage within 5 seconds of child blowout
+- [ ] Position taking calculations correctly distribute win/loss across agent hierarchy (with normalization when > 100%)
+- [ ] Weekly settlement cycle completes within defined phases: Freeze (1 hour), Collection (4.5 days), Verification (18 hours)
+- [ ] Overdue payment actions escalate automatically: email (0-3 days), 50% limit reduction (4-7 days), freeze (8-14 days), suspension (15+ days)
+- [ ] Settlement exception handling correctly identifies and routes: calculation errors, duplicate settlements, over-limit conditions, payment failures
+- [ ] Position change notifications send to appropriate recipients for changes > 10% or limit changes > $10,000
+- [ ] Joint arbitrage detection flags agents with sudden position increases (> 50%) combined with large player wins (> $100k)
+
+---
+
 **Document Version**: 4.0.0
 **Last Updated**: 2026-02-09
 **Maintenance Team**: Agent Network Team

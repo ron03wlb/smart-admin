@@ -15,6 +15,18 @@ Multi-Factor Authentication (MFA) is a mandatory security control for the back-o
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- Protecting administrative functions against credential compromise through mandatory two-phase authentication (password + TOTP)
+- Meeting regulatory compliance requirements across UKGC LCCP, MGA Technical Standards, and ISO 27001 A.9.4.2 frameworks
+- Reducing security risk exposure through 5-minute MFA session lifetime and single-use session tokens
+- Improving user experience through trusted device mechanism (30-day trust with triple binding) while maintaining security
+- Enabling rapid incident response through comprehensive audit logging of all MFA events (setup, login, lockout, alerts)
+- Providing emergency access through backup codes (10 single-use codes) without compromising security posture
+
+---
+
 ## 2. Two-Phase Login Flow
 
 ### 2.1 Phase Overview

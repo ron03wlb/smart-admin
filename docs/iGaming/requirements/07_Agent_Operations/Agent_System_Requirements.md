@@ -200,6 +200,21 @@ When an agent and their downstream players use the same IP address, the account 
 
 ---
 
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Agent Acquisition Cost | < $200 per agent | Total marketing spend / new agent registrations |
+| Players per Agent | > 50 active players | Average active players per agent (bet in last 30 days) |
+| Commission Payout Ratio | 25-40% of GGR | Total commission paid / Gross Gaming Revenue |
+| On-time Settlement Rate | > 95% | Settlements completed on schedule / total settlements |
+| Agent Retention | > 80% annually | Active agents (logged in within 90 days) / total registered agents |
+| Same-IP Fraud Detection Rate | 100% detection | All agent-player IP matches flagged automatically |
+| Commission Calculation Accuracy | 100% | Zero commission calculation errors after system approval |
+| Negative Carryover Resolution | Within 6 months | Average time to clear negative carryover balance |
+
+---
+
 **Document Version**: 4.0.0
 **Last Updated**: 2026-02-09
 **Maintenance Team**: Product Team
