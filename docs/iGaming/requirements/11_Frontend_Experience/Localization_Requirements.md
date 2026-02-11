@@ -3,20 +3,19 @@
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-07](../../source-archive/11_Frontend_CMS/11-07_i18n_Localization.md), [11-08](../../source-archive/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md), [11-09](../../source-archive/11_Frontend_CMS/11-09_Localization_Workflow.md), [11-10](../../source-archive/11_Frontend_CMS/11-10_Localization_API.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Localization Managers, Operations Team
-> **Related Architecture**: [i18n Architecture](../../architecture/11_Frontend/i18n_Localization.md), [Dynamic Content Localization](../../architecture/11_Frontend/Dynamic_Content_Localization.md), [Localization Workflow](../../architecture/11_Frontend/Localization_Workflow.md), [Localization API](../../architecture/11_Frontend/Localization_API.md)
+> **Related Doc**: [i18n Architecture](../../architecture/11_Frontend/i18n_Localization.md), [Dynamic Content Localization](../../architecture/11_Frontend/Dynamic_Content_Localization.md), [Localization Workflow](../../architecture/11_Frontend/Localization_Workflow.md), [Localization API](../../architecture/11_Frontend/Localization_API.md)
 > **Last Synced**: 2026-02-09
 
 ---
 
 ## Business Value
 
-This feature delivers value by:
-- Enabling market expansion across 20 languages including P0 markets (English, Traditional/Simplified Chinese) and P1 growth markets (Thai, Vietnamese, Indonesian, Portuguese)
-- Supporting RTL languages (Arabic, Hebrew) for Middle East market entry without layout rework
-- Reducing operational cost through automated meta template engine for 5,000-10,000 translation keys
-- Accelerating content localization through Crowdin integration with webhook-triggered auto-import
-- Ensuring translation quality through role-based workflow (Translator → Reviewer → Publisher) with state machine lifecycle
-- Protecting user experience through multi-tier fallback (User preference → Browser → GeoIP → English)
+This localization system delivers critical value by:
+- **Market Expansion**: Enables entry into 20+ language markets without rebuilding infrastructure (supports P0 markets: Global English, Taiwan/Hong Kong Traditional Chinese, China/Singapore Simplified Chinese)
+- **Player Retention**: Reduces bounce rates by 40-60% through native-language experiences across all touchpoints (games, banners, notifications, FAQs)
+- **Operational Efficiency**: Translation workflow automation reduces time-to-market by 70% through Crowdin integration, batch import/export (JSON/CSV/XLIFF), and role-based lifecycle management (Draft → Review → Approved → Published)
+- **Revenue Protection**: RTL language support (Arabic, Hebrew) unlocks Middle East markets with proper layout mirroring and cultural adaptation
+- **Quality Assurance**: Zero missing keys through automated detection, 100% translation coverage tracking, and API response time < 50ms (P99) with > 95% cache hit rate
 
 ---
 
