@@ -235,12 +235,12 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 - [x] requirements/05_Risk_Compliance/Affordability_Requirements.md ✅ commit 19ddd6ef (part 2/2)
 - [x] requirements/05_Risk_Compliance/Detection_Model_Spec.md ✅ commit 1bbfe800 (part 3/3)
 
-#### Batch 22 — 05_Risk_Compliance (5 files)
-- [ ] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md
-- [ ] requirements/05_Risk_Compliance/KYC_AML_Requirements.md
-- [ ] requirements/05_Risk_Compliance/ML_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Player_Protection_Requirements.md
+#### Batch 22 — 05_Risk_Compliance (5 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/KYC_AML_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/ML_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md ✅ commit e59eca63
 
 #### Batch 23 — 05_Risk (4) + 06_Gov (1) (5 files)
 - [ ] requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md
