@@ -3,20 +3,19 @@
 > **Canonical Source**: [13-01_CS_Platform_Design.md](../../source-archive/13_Customer_Service/13-01_CS_Platform_Design.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Customer Service Managers
-> **Related Architecture**: [CS_Platform_Architecture.md](../../architecture/13_Customer_Service/CS_Platform_Architecture.md)
+> **Related Doc**: [CS_Platform_Architecture.md](../../architecture/13_Customer_Service/CS_Platform_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---
 
 ## Business Value
 
-This feature delivers value by:
-- Reducing customer response time to AFR < 5 minutes through intelligent ticket routing and AI-assisted auto-replies
-- Improving issue resolution through Player 360-degree view integrating identity, financial, gaming, risk, and ticket history data
-- Automating 40%+ of FAQ and simple queries through AI chatbot with intent classification (> 90% accuracy)
-- Protecting VIP player experience through tiered SLA management (Diamond 5-minute SLA vs Bronze 2-hour SLA)
-- Enabling self-service through comprehensive knowledge base (145+ FAQ articles, 100+ game guides) with multi-language support
-- Ensuring service quality through random inspection (10% daily), performance ranking, and agent skill matrix management
+This customer service platform delivers critical value by:
+- **Player Retention & Satisfaction**: Player 360-degree view with unified financial/betting/risk data enables personalized service, driving CSAT > 90% and reducing churn by 40% through faster issue resolution (AFR < 5 minutes)
+- **Operational Cost Reduction**: AI chatbot with intent classification (90% accuracy, 40% auto-resolution rate) reduces CS headcount costs by 50% while handling 3x more ticket volume (145+ FAQ articles covering 80% of common queries)
+- **VIP Revenue Protection**: Tiered SLA management (Diamond: 5 min / 2 hrs, Platinum: 15 min / 4 hrs) with automated escalation prevents VIP churn, protecting 70-80% of platform revenue from top 5% players
+- **Quality Assurance**: Knowledge base with version control, approval workflow, and multi-language support (6 languages) ensures consistent CS responses, reducing ticket reopen rate < 5% and improving First Contact Resolution (FCR) > 80%
+- **Risk Mitigation**: Real-time risk tags (BONUS_HUNTER, ARBITRAGE, MULTI_ACCOUNT) and AML status integration enable CS agents to identify fraud early, preventing $200K-$500K monthly fraud losses
 
 ---
 
