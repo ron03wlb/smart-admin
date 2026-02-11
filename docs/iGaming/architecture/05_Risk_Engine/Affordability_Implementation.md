@@ -188,14 +188,61 @@ public void checkMonthlyNetDepositThreshold() {
 ### 4.1 AffordabilityAssessmentService
 
 ```java
+/**
+ * Manager class for affordability assessment persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class AffordabilityAssessmentManager {
+
+    private final AffordabilityAssessmentDao assessmentDao;
+    private final DepositLimitService depositLimitService;
+
+    /**
+     * Persist self-declaration assessment (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public AffordabilityAssessment saveDeclarationAssessment(AffordabilityAssessment assessment) {
+        assessmentDao.insert(assessment);
+        return assessment;
+    }
+
+    /**
+     * Persist full assessment and optionally force limit (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public AffordabilityAssessment saveFullAssessmentWithLimit(
+            AffordabilityAssessment assessment,
+            boolean forceLimit,
+            Long playerId,
+            BigDecimal appliedLimit) {
+        assessmentDao.insert(assessment);
+
+        if (forceLimit) {
+            depositLimitService.forceApplyLimit(playerId, appliedLimit, "AFFORDABILITY_ASSESSMENT");
+        }
+
+        log.info("Full affordability assessment completed: playerId={}, result={}, limit={}",
+            playerId, assessment.getAssessmentResult(), appliedLimit);
+
+        return assessment;
+    }
+}
+
+/**
+ * Service class for affordability assessment orchestration.
+ * Delegates transactional operations to AffordabilityAssessmentManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AffordabilityAssessmentService {
 
+    private final AffordabilityAssessmentManager assessmentManager;
     private final AffordabilityAssessmentDao assessmentDao;
     private final FinancialVulnerabilityDao vulnerabilityDao;
-    private final DepositLimitService depositLimitService;
     private final OpenBankingClient openBankingClient;
     private final CreditReferenceClient creditClient;
 
@@ -245,8 +292,8 @@ public class AffordabilityAssessmentService {
 
     /**
      * Submit player self-declaration (Enhanced tier).
+     * Delegates persistence to AffordabilityAssessmentManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<AssessmentResultVO> submitSelfDeclaration(
             Long playerId,
             SelfDeclarationForm form) {
@@ -271,7 +318,8 @@ public class AffordabilityAssessmentService {
             .validUntil(LocalDateTime.now().plusMonths(3))
             .build();
 
-        assessmentDao.insert(assessment);
+        // Delegate transactional operation to Manager
+        assessmentManager.saveDeclarationAssessment(assessment);
 
         return ResponseDTO.ok(AssessmentResultVO.builder()
             .assessmentId(assessment.getId())
@@ -283,8 +331,8 @@ public class AffordabilityAssessmentService {
 
     /**
      * Perform full assessment with third-party verification.
+     * Delegates persistence to AffordabilityAssessmentManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<AssessmentResultVO> performFullAssessment(
             Long playerId,
             FullAssessmentForm form) {
@@ -313,7 +361,7 @@ public class AffordabilityAssessmentService {
         RiskTier riskTier = determineRiskTier(analysis);
         BigDecimal appliedLimit = calculateAppliedLimit(analysis, riskTier);
 
-        // 5. Persist assessment record
+        // 5. Build assessment record
         AffordabilityAssessment assessment = AffordabilityAssessment.builder()
             .playerId(playerId)
             .assessmentType(AssessmentType.FULL)
@@ -330,15 +378,13 @@ public class AffordabilityAssessmentService {
             .validUntil(LocalDateTime.now().plusMonths(6))
             .build();
 
-        assessmentDao.insert(assessment);
-
-        // 6. Force limit if assessment failed
-        if (!analysis.isPassed()) {
-            depositLimitService.forceApplyLimit(playerId, appliedLimit, "AFFORDABILITY_ASSESSMENT");
-        }
-
-        log.info("Full affordability assessment completed: playerId={}, result={}, limit={}",
-            playerId, assessment.getAssessmentResult(), appliedLimit);
+        // 6. Delegate transactional operation to Manager (includes force limit if needed)
+        assessmentManager.saveFullAssessmentWithLimit(
+            assessment,
+            !analysis.isPassed(),  // forceLimit when assessment failed
+            playerId,
+            appliedLimit
+        );
 
         return ResponseDTO.ok(AssessmentResultVO.builder()
             .assessmentId(assessment.getId())

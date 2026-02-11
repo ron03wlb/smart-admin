@@ -719,7 +719,7 @@ public class BetTurnoverRecordEntity extends SmartBaseEntity {
 ### 9.3 Manager Layer
 
 ```java
-@Service
+@Component  // SmartAdmin Pattern: Manager uses @Component, not @Service
 @RequiredArgsConstructor
 public class TurnoverCalculationManager {
 

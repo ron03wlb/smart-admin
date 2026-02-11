@@ -222,7 +222,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component  // SmartAdmin Pattern: Manager uses @Component, not @Service
 @RequiredArgsConstructor
 public class RiskProposalManager {
 

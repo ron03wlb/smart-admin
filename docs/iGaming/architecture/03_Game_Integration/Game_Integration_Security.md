@@ -1059,9 +1059,13 @@ sum(rate(game_api_ip_whitelist_rejections[5m])) by (gp_id)
 **Implementation**:
 
 ```java
-@Service
+/**
+ * Manager class for secret rotation operations (handles @Transactional).
+ * SmartAdmin Pattern: @Transactional only in Manager layer.
+ */
+@Component
 @RequiredArgsConstructor
-public class SecretRotationService {
+public class SecretRotationManager {
 
     private final VaultKeyManager vaultKeyManager;
     private final GPConfigRepository configRepository;
@@ -1070,10 +1074,7 @@ public class SecretRotationService {
      * Rotate GP API secret with grace period
      */
     @Transactional(rollbackFor = Throwable.class)
-    public void rotateGPSecret(Long gpId) {
-        // Generate new secret
-        String newSecret = generateSecureSecret();
-
+    public void rotateGPSecret(Long gpId, String newSecret) {
         // Store new secret in Vault
         vaultKeyManager.storeGPApiSecret(gpId, newSecret);
 
@@ -1087,6 +1088,28 @@ public class SecretRotationService {
 
         log.info("Rotated API secret for GP {}, grace period until {}",
             gpId, config.getGracePeriodEndAt());
+    }
+}
+
+/**
+ * Service class for secret rotation orchestration.
+ * Delegates transactional operations to SecretRotationManager.
+ */
+@Service
+@RequiredArgsConstructor
+public class SecretRotationService {
+
+    private final SecretRotationManager secretRotationManager;
+
+    /**
+     * Rotate GP API secret with grace period
+     */
+    public void rotateGPSecret(Long gpId) {
+        // Generate new secret
+        String newSecret = generateSecureSecret();
+
+        // Delegate transactional operation to Manager
+        secretRotationManager.rotateGPSecret(gpId, newSecret);
     }
 
     private String generateSecureSecret() {
