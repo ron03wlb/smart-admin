@@ -342,29 +342,29 @@ All platform documentation must use the following standardized terms. New terms 
 
 ### A.2 Core Term Mapping
 
-| Concept | Recommended Term (EN) | Recommended Term (ZH) | Prohibited Alternatives | Scope |
-|---------|----------------------|----------------------|------------------------|-------|
-| Bonus | Bonus | 紅利 | ~~Promotion~~, ~~Reward~~, ~~Incentive~~ | Global |
-| Valid Turnover | Valid Turnover | 有效流水 | ~~Valid Bet~~, ~~Wagering~~, ~~Betting Amount~~ | Finance, Risk, Activity |
-| Tenant | Tenant | 租戶 | ~~Merchant~~, ~~Customer~~ | Multi-tenant modules |
-| Game Provider | Game Provider (GP) | 遊戲商 | ~~Game Vendor~~, ~~Game Developer~~, ~~Game Studio~~ | Game modules |
-| Player | Player | 玩家 | ~~User~~, ~~Member~~ | Global |
-| Agent | Agent / Affiliate | 代理 | ~~Referrer~~, ~~Distributor~~ | Agent modules |
-| Withdrawal | Withdrawal | 提款 | ~~Cash Out~~, ~~Payout~~ | Global |
-| Deposit | Deposit | 存款 | ~~Top-up~~, ~~Fund In~~ | Global |
-| Credit Limit | Credit Limit | 信用額度 | ~~Limit~~, ~~Credit~~ | Finance, Agent |
-| Risk Control | Risk Control | 風控 | ~~Risk Management~~, ~~Anti-Fraud~~ | Global |
-| Wallet | Wallet | 錢包 | ~~Account~~, ~~Balance~~ | Finance, Game |
-| Playable Balance | Playable Balance | 可下注餘額 | ~~Available Balance~~ | Finance, Game |
-| Wagering Requirement | Wagering Requirement | 流水要求 | ~~Rollover~~, ~~Play-through~~ | Activity |
-| Approval Workflow | Approval Workflow | 審批工作流 | ~~Review Process~~ | Governance |
-| Audit Log | Audit Log | 審計日誌 | ~~Activity Log~~, ~~Operation Log~~ | Global |
-| Multi-Tenancy | Multi-Tenancy | 多租戶 | ~~Multi-Merchant~~, ~~SaaS Mode~~ | Architecture |
-| Seamless Wallet | Seamless Wallet | 無縫錢包 | ~~Instant Wallet~~, ~~Single Wallet~~ | Game |
-| Transfer Wallet | Transfer Wallet | 轉帳錢包 | ~~Independent Wallet~~, ~~Fund Transfer~~ | Game |
-| Cashback / Rakeback | Cashback / Rakeback | 返水 | ~~Rebate~~ | Activity, VIP |
-| PSP | PSP (Payment Service Provider) | 支付服務商 | ~~Payment Provider~~ | Global |
-| Reconciliation | Reconciliation | 對帳 | ~~Settlement~~, ~~Account Matching~~ | Finance |
+| Concept | Recommended Term | Prohibited Alternatives | Scope |
+|---------|-----------------|------------------------|-------|
+| Bonus | Bonus | ~~Promotion~~, ~~Reward~~, ~~Incentive~~ | Global |
+| Valid Turnover | Valid Turnover | ~~Valid Bet~~, ~~Wagering~~, ~~Betting Amount~~ | Finance, Risk, Activity |
+| Tenant | Tenant | ~~Merchant~~, ~~Customer~~ | Multi-tenant modules |
+| Game Provider | Game Provider (GP) | ~~Game Vendor~~, ~~Game Developer~~, ~~Game Studio~~ | Game modules |
+| Player | Player | ~~User~~, ~~Member~~ | Global |
+| Agent | Agent / Affiliate | ~~Referrer~~, ~~Distributor~~ | Agent modules |
+| Withdrawal | Withdrawal | ~~Cash Out~~, ~~Payout~~ | Global |
+| Deposit | Deposit | ~~Top-up~~, ~~Fund In~~ | Global |
+| Credit Limit | Credit Limit | ~~Limit~~, ~~Credit~~ | Finance, Agent |
+| Risk Control | Risk Control | ~~Risk Management~~, ~~Anti-Fraud~~ | Global |
+| Wallet | Wallet | ~~Account~~, ~~Balance~~ | Finance, Game |
+| Playable Balance | Playable Balance | ~~Available Balance~~ | Finance, Game |
+| Wagering Requirement | Wagering Requirement | ~~Rollover~~, ~~Play-through~~ | Activity |
+| Approval Workflow | Approval Workflow | ~~Review Process~~ | Governance |
+| Audit Log | Audit Log | ~~Activity Log~~, ~~Operation Log~~ | Global |
+| Multi-Tenancy | Multi-Tenancy | ~~Multi-Merchant~~, ~~SaaS Mode~~ | Architecture |
+| Seamless Wallet | Seamless Wallet | ~~Instant Wallet~~, ~~Single Wallet~~ | Game |
+| Transfer Wallet | Transfer Wallet | ~~Independent Wallet~~, ~~Fund Transfer~~ | Game |
+| Cashback / Rakeback | Cashback / Rakeback | ~~Rebate~~ | Activity, VIP |
+| PSP | PSP (Payment Service Provider) | ~~Payment Provider~~ | Global |
+| Reconciliation | Reconciliation | ~~Settlement~~, ~~Account Matching~~ | Finance |
 
 ### A.3 Usage Rules
 

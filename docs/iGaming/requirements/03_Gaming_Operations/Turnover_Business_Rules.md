@@ -23,12 +23,12 @@ This document defines the business rules for turnover (wagering) calculation in 
 
 ## 2. Terminology Definitions
 
-| Term (EN) | Term (ZH) | Definition | Scope |
-|-----------|-----------|------------|-------|
-| **Bet Amount** | 投注額 | Original stake placed on a single bet | Per Bet |
-| **Turnover** | 流水 | Cumulative sum of bet amounts over time | Cumulative |
-| **Valid Bet** | 有效投注額 | Single bet amount after risk filtering | Per Bet |
-| **Wagering Requirement** | 流水要求 | Total valid turnover needed to unlock bonus | Cumulative |
+| Term | Definition | Scope |
+|------|------------|-------|
+| **Bet Amount** | Original stake placed on a single bet | Per Bet |
+| **Valid Turnover** | Cumulative sum of bet amounts over time (also called "Turnover") | Cumulative |
+| **Valid Bet** | Single bet amount after risk filtering | Per Bet |
+| **Wagering Requirement** | Total valid turnover needed to unlock bonus | Cumulative |
 
 ---
 
