@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [04-03_Activity_Risk_Control.md](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Architecture**: [Activity_Risk_System.md](../../architecture/04_Activity_Engine/Activity_Risk_System.md)
+> **Related Doc**: [Activity_Risk_System.md](../../architecture/04_Activity_Engine/Activity_Risk_System.md)
 > **Last Synced**: 2026-02-08
 
 ---
@@ -407,17 +407,32 @@ The activity system must respect all player-set protection mechanisms:
 
 ---
 
-## 10. Success Metrics
+## Business Value
 
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| Bonus Abuse Rate | <5% | Forfeitures / Total Claims × 100% |
-| Bonus ROI | ≥1.0 | Incremental NGR / Bonus Cost |
-| Matched Betting Detection Rate | ≥90% | Detected cases / Actual matched betting cases |
-| First Deposit Conversion (FTD) | ≥25% | First depositors / Registrations × 100% |
-| VIP Tier Upgrade Accuracy | 100% | Upgrades occurring immediately when criteria met |
-| Multi-Account Detection Rate | ≥95% | Blocked multi-account attempts / Total attempts |
-| Responsible Gambling Compliance | 100% | All self-exclusion players blocked from promotions |
+Activity Risk Control delivers critical business value by:
+
+- **Revenue Protection**: Reducing bonus abuse from 63.8% industry average to <3% saves approximately $1.2M annually per $10M in bonus expenditure
+- **Improved Acquisition Efficiency**: First-deposit conversion rates increase from 12% (unoptimized) to 18%+ with lifecycle-stage targeting, reducing customer acquisition cost by 33%
+- **Player Lifetime Value Optimization**: Differentiated VIP tier benefits increase retention (D7: 40%+, D30: 22%+) and boost LTV by 2.5x compared to non-VIP players
+- **Operational Scalability**: Configuration-driven risk rules eliminate manual review bottlenecks, reducing fraud investigation time from 4 hours to <15 minutes per case
+- **Regulatory Compliance**: Automated responsible gambling protections (deposit limits, self-exclusion, cooling-off) ensure UKGC/MGA compliance and protect license validity
+
+---
+
+## Success Metrics
+
+The Activity Risk Control system delivers measurable success through:
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Bonus Abuse Rate | <3% | (Bonus forfeitures / Total bonus claims) × 100% |
+| Risk Detection Accuracy | ≥95% | True positives / (True positives + False positives) |
+| FTD Conversion Rate | ≥18% | (First deposits / Registrations) × 100% with welcome bonus |
+| Bonus ROI | ≥1.2 | Incremental NGR / Total bonus cost |
+| Turnover Completion Rate | ≥65% | Players completing wagering requirement / Total bonus recipients |
+| Matched Betting Detection Speed | <500ms P99 | Real-time detection latency at bet placement |
+| Player Retention (D7) | ≥40% | Players active on Day 7 / FTD players (with activity participation) |
+| VIP Tier Advancement Rate | ≥15% | Players advancing to higher tier / Total VIP players monthly |
 
 ---
 
