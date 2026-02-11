@@ -8,6 +8,29 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Self-Service Enablement**: Provides "out-of-the-box" tenant configuration enabling operators to manage site properties without platform intervention
+- **Market Agility**: Defines 4 market templates (Asia VN/TH, Europe EU, Latin America) with pre-configured currencies, payment methods, and KYC levels for rapid market entry
+- **Risk Control**: Establishes dual-review approval workflow for high-risk operations (IP restrictions, domain binding, maintenance mode) with comprehensive audit logging
+- **Operational Safety**: Specifies real-time health checks (config sync every 30s, DNS every 5m, balance every hour) with severity-based alerting
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Configuration Propagation Time | < 1 minute | Time from change to all nodes synchronized |
+| Zero-Downtime Deployment | 100% | No service restarts required for config changes |
+| Audit Log Coverage | 100% | All configuration changes recorded with required fields |
+| Config Health Check Pass Rate | > 99% | Successful health checks / Total checks |
+| New Tenant Onboarding Time | < 1 hour | Time from template selection to site live |
+| Dual-Review Compliance | 100% | High-risk operations with proper approval / Total high-risk ops |
+
+---
+
 ## 1. Business Overview
 
 The Tenant Configuration system provides "out-of-the-box" site configuration capabilities, enabling tenants to self-manage their site properties. All configuration changes must take effect dynamically without requiring service restarts.

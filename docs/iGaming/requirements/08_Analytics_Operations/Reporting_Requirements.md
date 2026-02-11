@@ -8,6 +8,29 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Revenue Visibility**: Defines GGR/NGR calculations with hourly refresh enabling real-time P&L monitoring across game types and player segments
+- **Risk Mitigation**: Specifies 4 suspicious betting detection types (Hedging, Arbitrage, Abnormal Win Rate, Turnover Anomaly) with real-time 5-minute delay alerting
+- **Regulatory Compliance**: Documents MGA regulatory report requirements (monthly GGR, RTP verification, Responsible Gaming metrics) and AML/KYC reporting (SAR filing, SOF verification)
+- **Operational Efficiency**: Establishes tiered export rules (sync <100k rows, async >100k rows) with role-based access control across 6 user categories
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Real-time Dashboard Freshness | < 5 minutes delay | Data lag from event to dashboard |
+| Real-time Dashboard Availability | 99.9% uptime | Monthly availability percentage |
+| T+1 Report Accuracy | 100% | Reconciliation with source systems |
+| T+1 Report Availability | By 03:00 AM daily | Report generation completion time |
+| Monthly Compliance Report SLA | Available by 2nd of month | Report delivery date |
+| Export Task Success Rate | > 99% | Successful exports / Total export requests |
+
+---
+
 ## 1. Business Overview
 
 The Reporting & BI system provides **data insights** and **decision support** for different roles across the iGaming platform. The system must support multi-dimensional analysis, near real-time monitoring, compliance reporting, and self-service analytics.

@@ -6,6 +6,31 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Scalable SaaS Revenue**: Defines three billing models (Subscription, Revenue Share, Hybrid) enabling flexible monetization across diverse tenant sizes
+- **Data Compliance**: Specifies strict tenant isolation and GDPR-compliant data portability (JSON/CSV export) requirements
+- **Operational Efficiency**: Establishes 4-level hierarchy (Super Admin → Brand → Tenant → Agent) with clear permission inheritance reducing access management complexity
+- **Enterprise Features**: Documents white-label customization (domain, branding, currency) and optional group-wide SSO supporting multi-brand gaming conglomerates
+
+---
+
+## Acceptance Criteria
+
+- [ ] Super Admin can create Brands and execute global game kill-switch
+- [ ] Brand Admin can create Tenants and manage Brand-level quota
+- [ ] Tenant data isolation enforced: Tenant A players cannot access Tenant B data
+- [ ] Each Tenant supports independent domain, logo, color scheme, and currency configuration
+- [ ] Three billing models (Fixed Fee, Revenue Share, Hybrid) are configurable per Tenant
+- [ ] Grace period of 7 days before service suspension for overdue accounts
+- [ ] Super Admin "Impersonate" mode has visible indicator when active
+- [ ] Brand-level and Tenant-level reports aggregate correctly
+- [ ] Data export (JSON/CSV) includes player data, transactions, game sessions per GDPR requirements
+- [ ] SSO configuration supports three modes: Disabled, Enabled (Same Wallet), Enabled (Separate Wallets)
+
+---
+
 ## 1. Tenant Hierarchy Definition
 
 The system adopts a **SaaS (Software as a Service)** multi-tenant architecture with the following hierarchy:

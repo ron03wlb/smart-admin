@@ -8,6 +8,31 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Financial Protection**: Establishes zero-tolerance testing standards for financial calculations, preventing direct monetary losses and customer trust crises
+- **High-Availability Assurance**: Defines 7 load testing scenarios (login surge, betting peak, withdrawal peak, game launch, 24h stability, spike, breaking point) ensuring platform stability during major events
+- **Quality Gate Enforcement**: Specifies automated performance regression detection (>10% degradation triggers alert) integrated into CI/CD pipeline
+- **Regulatory Compliance**: Documents test coverage requirements (>90% for core financial modules) meeting financial regulatory expectations
+
+---
+
+## Acceptance Criteria
+
+- [ ] Core financial module test coverage > 90% including boundary conditions (zero balance, minimal differences)
+- [ ] All API endpoints have corresponding automated test scripts
+- [ ] Daily end-to-end regression tests execute successfully (registration → deposit → game → withdrawal)
+- [ ] Login surge test passes: 50,000 logins/minute with response time < 500ms
+- [ ] Betting peak test passes: 100,000 bets/minute with zero data loss and correct balances
+- [ ] Withdrawal peak test passes: 10,000 withdrawals/minute with queue delay < 30 seconds
+- [ ] Game launch test passes: 200,000 launches/minute with error rate < 0.1%
+- [ ] 24-hour stability test completes without resource degradation
+- [ ] Performance regression detection alerts when metrics degrade > 10%
+- [ ] Pre-release checklist completed: all P0/P1 issues fixed, load test signed off, rollback script verified, monitoring configured
+
+---
+
 ## 業務背景
 
 金融類系統對錯誤的容忍度為零。任何金額計算錯誤、交易遺失或安全漏洞都可能導致直接的財務損失和客戶信任危機。因此需要建立嚴格且全面的測試驗收標準，確保每個功能上線前都經過充分驗證。

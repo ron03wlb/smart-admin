@@ -8,6 +8,29 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Cost Reduction**: Targets 37% monthly infrastructure cost reduction (from $2,820 to $1,788), achieving $12,383 annual savings with <6 month payback
+- **Performance Enhancement**: Specifies 418% processing capacity improvement with 84% latency reduction through query offloading and cache optimization
+- **Storage Optimization**: Defines 4-tier data lifecycle (hot/warm/cold/archive) reducing storage costs by 94% while maintaining SLA-appropriate query times
+- **Operational Independence**: Eliminates external monitoring service dependency through self-hosted open-source observability stack (metrics, logs, traces, alerts)
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Monthly Infrastructure Cost | < $1,800 | Cloud billing dashboard |
+| Storage Cost Reduction | > 90% | (Original - Current) / Original |
+| System Throughput | > 450 TPS | Load test benchmark |
+| Response Latency (P99) | < 200 ms | APM monitoring |
+| Investment Payback Period | < 7 months | Cumulative savings / Implementation cost |
+| Monitoring Coverage | 100% | Metrics + Logs + Traces + Alerts all functional |
+
+---
+
 ## 業務背景
 
 隨著平台業務增長，基礎設施成本持續攀升。需要在不降低系統效能和可用性的前提下，系統性地優化各項基礎設施支出，實現「效能提升與成本降低並行」的目標。
