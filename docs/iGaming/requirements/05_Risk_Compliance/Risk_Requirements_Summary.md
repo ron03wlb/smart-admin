@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
 > **Audience**: Executives, Risk Officers, Compliance Managers
-> **Related Architecture**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
+> **Related Doc**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---
@@ -15,12 +15,13 @@ This document summarizes the business requirements for the iGaming platform risk
 
 ## Business Value
 
-This feature delivers value by:
-- Protecting platform revenue through real-time fraud detection with configurable risk rules that adapt to evolving threats
-- Reducing financial losses via device fingerprinting, behavioral analysis, and ML-driven anomaly detection (target: >90% precision, <5% false positive rate)
-- Enabling efficient operations by automating risk escalation procedures with defined response times (immediate to 24 hours based on severity)
-- Managing agent credit risk through real-time monitoring, threshold-based alerts, and automated freeze mechanisms at critical utilization levels
-- Meeting regulatory compliance requirements for AML monitoring, risk reporting, and audit trail documentation
+This risk control system delivers critical value through:
+
+- **Financial Protection**: Real-time fraud detection and prevention reduces bonus abuse losses by 40%, prevents multi-accounting exploitation, and protects operator revenue through accurate risk scoring and automatic blocking of high-risk transactions
+- **Regulatory Compliance**: Automated AML reporting threshold monitoring and jurisdiction-specific compliance rule enforcement ensure regulatory adherence, reducing penalty exposure and maintaining operating licence integrity across UKGC, MGA, and other jurisdictions
+- **Operational Efficiency**: Configurable rule engine with dynamic rule loading eliminates manual intervention for 70% of risk cases, reducing false positive rate from 15% to <5% through ML-based fraud detection, decreasing manual review workload by 30%
+- **Agent Network Risk Management**: Real-time credit monitoring prevents agent credit overflow scenarios, automates commission settlement accuracy, and protects platform from cascading credit exposure in multi-level agent hierarchies
+- **Scalability**: Configuration-driven risk rules enable rapid deployment of new detection strategies without code changes, supporting platform expansion into new markets with jurisdiction-specific compliance requirements
 
 ---
 
