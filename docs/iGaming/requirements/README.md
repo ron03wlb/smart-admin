@@ -1,199 +1,199 @@
-# iGaming Requirements Documentation
+# iGaming 需求文檔
 
-> **Audience**: Executives, Product Managers, Compliance Officers, Business Analysts
-> **Focus**: WHAT and WHY - Business requirements, policies, and compliance
-> **Last Updated**: 2026-02-09
-> **Phase**: 9 Complete (66 documents across 15 categories)
+> **受眾（Audience）**: 高階主管、產品經理、合規官、業務分析師
+> **重點（Focus）**: 做什麼和為什麼 - 業務需求、政策和合規
+> **最後更新（Last Updated）**: 2026-02-09
+> **階段（Phase）**: 9 完成（15 個類別共 66 份文檔）
 
 ---
 
-## Category Navigation
+## 類別導航（Category Navigation）
 
-| Category | Description | Documents |
+| 類別 | 描述 | 文檔數量 |
 |----------|-------------|-----------|
-| [01_Player_Experience](01_Player_Experience/) | Player lifecycle, VIP, segmentation | 6 |
-| [02_Financial_Operations](02_Financial_Operations/) | Payment, reconciliation, wallet rules | 5 |
-| [03_Gaming_Operations](03_Gaming_Operations/) | Game integration, turnover rules | 4 |
-| [04_Promotions_VIP](04_Promotions_VIP/) | Bonus rules, activity policies | 3 |
-| [05_Risk_Compliance](05_Risk_Compliance/) | KYC/AML, fraud detection, licensing | 11 |
-| [06_Governance_Licensing](06_Governance_Licensing/) | RBAC, audit, multi-jurisdiction, MFA | 6 |
-| [07_Agent_Operations](07_Agent_Operations/) | Credit network, agent system | 2 |
-| [08_Analytics_Operations](08_Analytics_Operations/) | Reporting, BI dashboards | 2 |
-| [09_Infrastructure_Requirements](09_Infrastructure_Requirements/) | QA standards, cost optimization | 2 |
-| [10_Platform_Operations](10_Platform_Operations/) | Tenant config, notifications, data pipeline | 3 |
-| [11_Frontend_Experience](11_Frontend_Experience/) | UX, SEO, mobile, localization | 4 |
-| [12_Security_Compliance](12_Security_Compliance/) | Data protection, compliance, payment security | 3 |
-| [13_Customer_Service](13_Customer_Service/) | CS platform, operations | 2 |
-| [14_Integration_Standards](14_Integration_Standards/) | Third-party integration | 1 |
-| [15_Responsible_Gambling](15_Responsible_Gambling/) | Self-exclusion, deposit limits, session protection | 4 |
+| [01_Player_Experience](01_Player_Experience/) | 玩家生命週期、VIP、細分 | 6 |
+| [02_Financial_Operations](02_Financial_Operations/) | 支付、對帳、錢包規則 | 5 |
+| [03_Gaming_Operations](03_Gaming_Operations/) | 遊戲整合、投注額規則 | 4 |
+| [04_Promotions_VIP](04_Promotions_VIP/) | 紅利規則、活動政策 | 3 |
+| [05_Risk_Compliance](05_Risk_Compliance/) | KYC/AML、欺詐檢測、授權 | 11 |
+| [06_Governance_Licensing](06_Governance_Licensing/) | RBAC、審計、多司法管轄區、MFA | 6 |
+| [07_Agent_Operations](07_Agent_Operations/) | 信用網絡、代理系統 | 2 |
+| [08_Analytics_Operations](08_Analytics_Operations/) | 報告、BI 儀表板 | 2 |
+| [09_Infrastructure_Requirements](09_Infrastructure_Requirements/) | QA 標準、成本優化 | 2 |
+| [10_Platform_Operations](10_Platform_Operations/) | 租戶配置、通知、數據管道 | 3 |
+| [11_Frontend_Experience](11_Frontend_Experience/) | UX、SEO、移動端、本地化 | 4 |
+| [12_Security_Compliance](12_Security_Compliance/) | 數據保護、合規、支付安全 | 3 |
+| [13_Customer_Service](13_Customer_Service/) | 客服平台、運營 | 2 |
+| [14_Integration_Standards](14_Integration_Standards/) | 第三方整合 | 1 |
+| [15_Responsible_Gambling](15_Responsible_Gambling/) | 自我排除、存款限額、會話保護 | 4 |
 
 ---
 
-## All Documents
+## 所有文檔（All Documents）
 
-### 01 Player Experience (6 documents)
+### 01 玩家體驗（Player Experience）（6 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Player Lifecycle](01_Player_Experience/Player_Lifecycle.md) | Player stages, KYC levels, status transitions |
-| [Business Flows](01_Player_Experience/Business_Flows.md) | Core business processes, player journey maps |
-| [Platform Overview](01_Player_Experience/Platform_Overview.md) | Platform capabilities, 5 core business concepts |
-| [Solution Overview](01_Player_Experience/Solution_Overview.md) | Platform positioning, module relationships |
-| [Industry Glossary](01_Player_Experience/Industry_Glossary.md) | iGaming terminology reference |
-| [Terminology Standards](01_Player_Experience/Terminology_Standards.md) | Naming conventions, term standardization |
+| [玩家生命週期（Player Lifecycle）](01_Player_Experience/Player_Lifecycle.md) | 玩家階段、KYC 等級、狀態轉換 |
+| [業務流程（Business Flows）](01_Player_Experience/Business_Flows.md) | 核心業務流程、玩家旅程圖 |
+| [平台概覽（Platform Overview）](01_Player_Experience/Platform_Overview.md) | 平台功能、5 個核心業務概念 |
+| [解決方案概覽（Solution Overview）](01_Player_Experience/Solution_Overview.md) | 平台定位、模塊關係 |
+| [行業術語表（Industry Glossary）](01_Player_Experience/Industry_Glossary.md) | iGaming 術語參考 |
+| [術語標準（Terminology Standards）](01_Player_Experience/Terminology_Standards.md) | 命名慣例、術語標準化 |
 
-### 02 Financial Operations (5 documents)
+### 02 財務運營（Financial Operations）（5 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Payment Operations](02_Financial_Operations/Payment_Operations.md) | Payment methods, costs, SLAs, compliance |
-| [Reconciliation Requirements](02_Financial_Operations/Reconciliation_Requirements.md) | Three-tier matching, discrepancy handling |
-| [Financial Implementation Requirements](02_Financial_Operations/Financial_Implementation_Requirements.md) | Wallet business rules, payment processing policies |
-| [Turnover Reconciliation Requirements](02_Financial_Operations/Turnover_Reconciliation_Requirements.md) | Turnover validation policies, game reconciliation |
-| [Seamless Wallet Requirements](02_Financial_Operations/Seamless_Wallet_Requirements.md) | Seamless wallet business rules, state transitions |
+| [支付運營（Payment Operations）](02_Financial_Operations/Payment_Operations.md) | 支付方式、成本、SLA、合規 |
+| [對帳需求（Reconciliation Requirements）](02_Financial_Operations/Reconciliation_Requirements.md) | 三層匹配、差異處理 |
+| [財務實施需求（Financial Implementation Requirements）](02_Financial_Operations/Financial_Implementation_Requirements.md) | 錢包業務規則、支付處理政策 |
+| [投注額對帳需求（Turnover Reconciliation Requirements）](02_Financial_Operations/Turnover_Reconciliation_Requirements.md) | 投注額驗證政策、遊戲對帳 |
+| [無縫錢包需求（Seamless Wallet Requirements）](02_Financial_Operations/Seamless_Wallet_Requirements.md) | 無縫錢包業務規則、狀態轉換 |
 
-### 03 Gaming Operations (4 documents)
+### 03 遊戲運營（Gaming Operations）（4 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Turnover Business Rules](03_Gaming_Operations/Turnover_Business_Rules.md) | Wagering requirements, game weights |
-| [Game Integration Requirements](03_Gaming_Operations/Game_Integration_Requirements.md) | Provider standards, certification checklist |
-| [Game Integration Standards](03_Gaming_Operations/Game_Integration_Standards.md) | Provider API standards, integration policies |
-| [Game Lobby Requirements](03_Gaming_Operations/Game_Lobby_Requirements.md) | Lobby organization, categorization, recommendations |
+| [投注額業務規則（Turnover Business Rules）](03_Gaming_Operations/Turnover_Business_Rules.md) | 流水要求、遊戲權重 |
+| [遊戲整合需求（Game Integration Requirements）](03_Gaming_Operations/Game_Integration_Requirements.md) | 供應商標準、認證檢查表 |
+| [遊戲整合標準（Game Integration Standards）](03_Gaming_Operations/Game_Integration_Standards.md) | 供應商 API 標準、整合政策 |
+| [遊戲大廳需求（Game Lobby Requirements）](03_Gaming_Operations/Game_Lobby_Requirements.md) | 大廳組織、分類、推薦 |
 
-### 04 Promotions & VIP (3 documents)
+### 04 促銷與 VIP（Promotions & VIP）（3 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Bonus Calculation Requirements](04_Promotions_VIP/Bonus_Calculation_Requirements.md) | Bonus types, eligibility, terms |
-| [Activity Risk Requirements](04_Promotions_VIP/Activity_Risk_Requirements.md) | Bonus abuse policies, matched betting detection |
-| [Promotion Requirements](04_Promotions_VIP/Promotion_Requirements.md) | Wagering game weights, VIP tier rules |
+| [紅利計算需求（Bonus Calculation Requirements）](04_Promotions_VIP/Bonus_Calculation_Requirements.md) | 紅利類型、資格、條款 |
+| [活動風險需求（Activity Risk Requirements）](04_Promotions_VIP/Activity_Risk_Requirements.md) | 紅利濫用政策、配對投注檢測 |
+| [促銷需求（Promotion Requirements）](04_Promotions_VIP/Promotion_Requirements.md) | 流水遊戲權重、VIP 等級規則 |
 
-### 05 Risk & Compliance (11 documents)
+### 05 風險與合規（Risk & Compliance）（11 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Risk Strategy Overview](05_Risk_Compliance/Risk_Strategy_Overview.md) | Fraud types, KPIs, industry context |
-| [KYC/AML Requirements](05_Risk_Compliance/KYC_AML_Requirements.md) | Verification levels, regulations |
-| [Fraud Detection Requirements](05_Risk_Compliance/Fraud_Detection_Requirements.md) | Detection policies, priority levels |
-| [Risk Proposal Requirements](05_Risk_Compliance/Risk_Proposal_Requirements.md) | Approval workflows, SLA policies |
-| [Affordability Requirements](05_Risk_Compliance/Affordability_Requirements.md) | Affordability scoring, income assessment |
-| [Player Protection Requirements](05_Risk_Compliance/Player_Protection_Requirements.md) | Self-exclusion, limit management, GAMSTOP |
-| [ML Requirements](05_Risk_Compliance/ML_Requirements.md) | ML model policies, drift monitoring |
-| [Jurisdiction Framework Requirements](05_Risk_Compliance/Jurisdiction_Framework_Requirements.md) | Multi-jurisdiction policies, regulatory routing |
-| [Detection Model Spec](05_Risk_Compliance/Detection_Model_Spec.md) | Detection categories, rule thresholds |
-| [Risk Requirements Summary](05_Risk_Compliance/Risk_Requirements_Summary.md) | Rule engine policies, escalation procedures |
-| [Turnover Validation Requirements](05_Risk_Compliance/Turnover_Validation_Requirements.md) | Checkpoint snapshot rules, dual-layer protection |
+| [風險策略概覽（Risk Strategy Overview）](05_Risk_Compliance/Risk_Strategy_Overview.md) | 欺詐類型、KPI、行業背景 |
+| [KYC/AML 需求](05_Risk_Compliance/KYC_AML_Requirements.md) | 驗證等級、法規 |
+| [欺詐檢測需求（Fraud Detection Requirements）](05_Risk_Compliance/Fraud_Detection_Requirements.md) | 檢測政策、優先級 |
+| [風險提案需求（Risk Proposal Requirements）](05_Risk_Compliance/Risk_Proposal_Requirements.md) | 審批工作流程、SLA 政策 |
+| [負擔能力需求（Affordability Requirements）](05_Risk_Compliance/Affordability_Requirements.md) | 負擔能力評分、收入評估 |
+| [玩家保護需求（Player Protection Requirements）](05_Risk_Compliance/Player_Protection_Requirements.md) | 自我排除、限額管理、GAMSTOP |
+| [ML 需求](05_Risk_Compliance/ML_Requirements.md) | ML 模型政策、漂移監控 |
+| [司法管轄區框架需求（Jurisdiction Framework Requirements）](05_Risk_Compliance/Jurisdiction_Framework_Requirements.md) | 多司法管轄區政策、監管路由 |
+| [檢測模型規範（Detection Model Spec）](05_Risk_Compliance/Detection_Model_Spec.md) | 檢測類別、規則閾值 |
+| [風險需求摘要（Risk Requirements Summary）](05_Risk_Compliance/Risk_Requirements_Summary.md) | 規則引擎政策、升級程序 |
+| [投注額驗證需求（Turnover Validation Requirements）](05_Risk_Compliance/Turnover_Validation_Requirements.md) | 檢查點快照規則、雙層保護 |
 
-### 06 Governance & Licensing (6 documents)
+### 06 治理與授權（Governance & Licensing）（6 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Multi-Tenant Requirements](06_Governance_Licensing/Multi_Tenant_Requirements.md) | Hierarchy, data isolation, billing |
-| [MFA Requirements](06_Governance_Licensing/MFA_Requirements.md) | Authentication policies, compliance |
-| [MFA Recovery Requirements](06_Governance_Licensing/MFA_Recovery_Requirements.md) | Recovery procedures, backup authentication |
-| [MFA Compliance Requirements](06_Governance_Licensing/MFA_Compliance_Requirements.md) | Audit trails, compliance testing |
-| [MFA Architecture Spec](06_Governance_Licensing/MFA_Architecture_Spec.md) | MFA design requirements, authenticator policies |
-| [Governance Requirements](06_Governance_Licensing/Governance_Requirements.md) | RBAC policies, audit logging, multi-tenant governance |
+| [多租戶需求（Multi-Tenant Requirements）](06_Governance_Licensing/Multi_Tenant_Requirements.md) | 層級結構、數據隔離、計費 |
+| [MFA 需求](06_Governance_Licensing/MFA_Requirements.md) | 驗證政策、合規 |
+| [MFA 恢復需求（MFA Recovery Requirements）](06_Governance_Licensing/MFA_Recovery_Requirements.md) | 恢復程序、備份驗證 |
+| [MFA 合規需求（MFA Compliance Requirements）](06_Governance_Licensing/MFA_Compliance_Requirements.md) | 審計追蹤、合規測試 |
+| [MFA 架構規範（MFA Architecture Spec）](06_Governance_Licensing/MFA_Architecture_Spec.md) | MFA 設計需求、驗證器政策 |
+| [治理需求（Governance Requirements）](06_Governance_Licensing/Governance_Requirements.md) | RBAC 政策、審計日誌、多租戶治理 |
 
-### 07 Agent Operations (2 documents)
+### 07 代理運營（Agent Operations）（2 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Credit Network Requirements](07_Agent_Operations/Credit_Network_Requirements.md) | Credit lines, settlement cycles, business rules |
-| [Agent System Requirements](07_Agent_Operations/Agent_System_Requirements.md) | Agent hierarchy, commission rules, recruitment |
+| [信用網絡需求（Credit Network Requirements）](07_Agent_Operations/Credit_Network_Requirements.md) | 信用額度、結算週期、業務規則 |
+| [代理系統需求（Agent System Requirements）](07_Agent_Operations/Agent_System_Requirements.md) | 代理層級、佣金規則、招募 |
 
-### 08 Analytics Operations (2 documents)
+### 08 分析運營（Analytics Operations）（2 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Reporting Requirements](08_Analytics_Operations/Reporting_Requirements.md) | Business reports, KPI definitions, data dimensions |
-| [BI Dashboard Requirements](08_Analytics_Operations/BI_Dashboard_Requirements.md) | Dashboard requirements, metric definitions |
+| [報告需求（Reporting Requirements）](08_Analytics_Operations/Reporting_Requirements.md) | 業務報告、KPI 定義、數據維度 |
+| [BI 儀表板需求（BI Dashboard Requirements）](08_Analytics_Operations/BI_Dashboard_Requirements.md) | 儀表板需求、指標定義 |
 
-### 09 Infrastructure Requirements (2 documents)
+### 09 基礎設施需求（Infrastructure Requirements）（2 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [QA Standards Requirements](09_Infrastructure_Requirements/QA_Standards_Requirements.md) | QA acceptance standards, test coverage |
-| [Cost Optimization Requirements](09_Infrastructure_Requirements/Cost_Optimization_Requirements.md) | Cost control objectives, budget constraints |
+| [QA 標準需求（QA Standards Requirements）](09_Infrastructure_Requirements/QA_Standards_Requirements.md) | QA 驗收標準、測試覆蓋率 |
+| [成本優化需求（Cost Optimization Requirements）](09_Infrastructure_Requirements/Cost_Optimization_Requirements.md) | 成本控制目標、預算約束 |
 
-### 10 Platform Operations (3 documents)
+### 10 平台運營（Platform Operations）（3 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Tenant Configuration Requirements](10_Platform_Operations/Tenant_Configuration_Requirements.md) | White-label config, tenant customization |
-| [Notification Requirements](10_Platform_Operations/Notification_Requirements.md) | Notification scenarios, channel priorities |
-| [Data Pipeline Requirements](10_Platform_Operations/Data_Pipeline_Requirements.md) | Data report requirements, ETL rules, SLA |
+| [租戶配置需求（Tenant Configuration Requirements）](10_Platform_Operations/Tenant_Configuration_Requirements.md) | 白標配置、租戶自定義 |
+| [通知需求（Notification Requirements）](10_Platform_Operations/Notification_Requirements.md) | 通知場景、渠道優先級 |
+| [數據管道需求（Data Pipeline Requirements）](10_Platform_Operations/Data_Pipeline_Requirements.md) | 數據報告需求、ETL 規則、SLA |
 
-### 11 Frontend Experience (4 documents)
+### 11 前端體驗（Frontend Experience）（4 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Frontend UX Requirements](11_Frontend_Experience/Frontend_UX_Requirements.md) | Page layout, banner rules |
-| [SEO Performance Requirements](11_Frontend_Experience/SEO_Performance_Requirements.md) | SEO goals, performance SLA |
-| [Mobile App Requirements](11_Frontend_Experience/Mobile_App_Requirements.md) | Mobile features, platform support |
-| [Localization Requirements](11_Frontend_Experience/Localization_Requirements.md) | Multi-language, translation workflow |
+| [前端 UX 需求（Frontend UX Requirements）](11_Frontend_Experience/Frontend_UX_Requirements.md) | 頁面佈局、橫幅規則 |
+| [SEO 性能需求（SEO Performance Requirements）](11_Frontend_Experience/SEO_Performance_Requirements.md) | SEO 目標、性能 SLA |
+| [移動應用需求（Mobile App Requirements）](11_Frontend_Experience/Mobile_App_Requirements.md) | 移動功能、平台支援 |
+| [本地化需求（Localization Requirements）](11_Frontend_Experience/Localization_Requirements.md) | 多語言、翻譯工作流程 |
 
-### 12 Security Compliance (3 documents)
+### 12 安全合規（Security Compliance）（3 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Data Protection Requirements](12_Security_Compliance/Data_Protection_Requirements.md) | GDPR compliance, data deletion policies |
-| [Compliance Standards Requirements](12_Security_Compliance/Compliance_Standards_Requirements.md) | ISO 27001, UK RTS compliance |
-| [Payment Security Requirements](12_Security_Compliance/Payment_Security_Requirements.md) | Payment restrictions, data portability |
+| [數據保護需求（Data Protection Requirements）](12_Security_Compliance/Data_Protection_Requirements.md) | GDPR 合規、數據刪除政策 |
+| [合規標準需求（Compliance Standards Requirements）](12_Security_Compliance/Compliance_Standards_Requirements.md) | ISO 27001、UK RTS 合規 |
+| [支付安全需求（Payment Security Requirements）](12_Security_Compliance/Payment_Security_Requirements.md) | 支付限制、數據可攜性 |
 
-### 13 Customer Service (2 documents)
+### 13 客戶服務（Customer Service）（2 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [CS Platform Requirements](13_Customer_Service/CS_Platform_Requirements.md) | CS platform, Player 360 view, ticket classification |
-| [CS Operations Requirements](13_Customer_Service/CS_Operations_Requirements.md) | CS operations, SLA metrics, scheduling |
+| [客服平台需求（CS Platform Requirements）](13_Customer_Service/CS_Platform_Requirements.md) | 客服平台、玩家 360 視圖、工單分類 |
+| [客服運營需求（CS Operations Requirements）](13_Customer_Service/CS_Operations_Requirements.md) | 客服運營、SLA 指標、排班 |
 
-### 14 Integration Standards (1 document)
+### 14 整合標準（Integration Standards）（1 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Third Party Integration Requirements](14_Integration_Standards/Third_Party_Integration_Requirements.md) | Third-party commercial conditions, SLA |
+| [第三方整合需求（Third Party Integration Requirements）](14_Integration_Standards/Third_Party_Integration_Requirements.md) | 第三方商業條件、SLA |
 
-### 15 Responsible Gambling (4 documents)
+### 15 負責任博彩（Responsible Gambling）（4 份文檔）
 
-| Document | Key Topics |
+| 文檔 | 關鍵主題 |
 |----------|------------|
-| [Self-Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) | Self-exclusion types, regulatory requirements |
-| [Deposit Limits Requirements](15_Responsible_Gambling/Deposit_Limits_Requirements.md) | Deposit limits, loss limits, business rules |
-| [Session Protection Requirements](15_Responsible_Gambling/Session_Protection_Requirements.md) | Cool-off periods, session management, reality checks |
-| [Affordability Requirements](15_Responsible_Gambling/Affordability_Requirements.md) | Player protection API, affordability assessment |
+| [自我排除需求（Self-Exclusion Requirements）](15_Responsible_Gambling/Self_Exclusion_Requirements.md) | 自我排除類型、監管要求 |
+| [存款限額需求（Deposit Limits Requirements）](15_Responsible_Gambling/Deposit_Limits_Requirements.md) | 存款限額、虧損限額、業務規則 |
+| [會話保護需求（Session Protection Requirements）](15_Responsible_Gambling/Session_Protection_Requirements.md) | 冷靜期、會話管理、現實檢查 |
+| [負擔能力需求（Affordability Requirements）](15_Responsible_Gambling/Affordability_Requirements.md) | 玩家保護 API、負擔能力評估 |
 
 ---
 
-## Quick Links by Role
+## 按角色快速連結（Quick Links by Role）
 
-### For Executives
-- [Risk Strategy Overview](05_Risk_Compliance/Risk_Strategy_Overview.md) - Fraud costs, KPIs, vendor comparison
-- [Player Lifecycle](01_Player_Experience/Player_Lifecycle.md) - Player journey and engagement
-- [Platform Overview](01_Player_Experience/Platform_Overview.md) - Platform capabilities overview
+### 高階主管（For Executives）
+- [風險策略概覽（Risk Strategy Overview）](05_Risk_Compliance/Risk_Strategy_Overview.md) - 欺詐成本、KPI、供應商比較
+- [玩家生命週期（Player Lifecycle）](01_Player_Experience/Player_Lifecycle.md) - 玩家旅程和互動
+- [平台概覽（Platform Overview）](01_Player_Experience/Platform_Overview.md) - 平台功能概覽
 
-### For Compliance Officers
-- [Self-Exclusion Requirements](15_Responsible_Gambling/Self_Exclusion_Requirements.md) - Self-exclusion types
-- [KYC/AML Requirements](05_Risk_Compliance/KYC_AML_Requirements.md) - Verification procedures
-- [Compliance Standards Requirements](12_Security_Compliance/Compliance_Standards_Requirements.md) - ISO 27001, UK RTS
-- [Data Protection Requirements](12_Security_Compliance/Data_Protection_Requirements.md) - GDPR compliance
+### 合規官（For Compliance Officers）
+- [自我排除需求（Self-Exclusion Requirements）](15_Responsible_Gambling/Self_Exclusion_Requirements.md) - 自我排除類型
+- [KYC/AML 需求](05_Risk_Compliance/KYC_AML_Requirements.md) - 驗證程序
+- [合規標準需求（Compliance Standards Requirements）](12_Security_Compliance/Compliance_Standards_Requirements.md) - ISO 27001、UK RTS
+- [數據保護需求（Data Protection Requirements）](12_Security_Compliance/Data_Protection_Requirements.md) - GDPR 合規
 
-### For Product Managers
-- [Bonus Calculation Requirements](04_Promotions_VIP/Bonus_Calculation_Requirements.md) - Bonus rules
-- [Payment Operations](02_Financial_Operations/Payment_Operations.md) - Payment methods
-- [Credit Network Requirements](07_Agent_Operations/Credit_Network_Requirements.md) - Agent credit system
-- [BI Dashboard Requirements](08_Analytics_Operations/BI_Dashboard_Requirements.md) - Analytics dashboards
-
----
-
-## Related Documentation
-
-- **Technical Implementation**: [../architecture/](../architecture/) - For architects and developers
-- **Archived Source**: [../source-archive/](../source-archive/) - Original SSOT documents (read-only)
-- **Main Index**: [../README.md](../README.md) - Navigation hub
+### 產品經理（For Product Managers）
+- [紅利計算需求（Bonus Calculation Requirements）](04_Promotions_VIP/Bonus_Calculation_Requirements.md) - 紅利規則
+- [支付運營（Payment Operations）](02_Financial_Operations/Payment_Operations.md) - 支付方式
+- [信用網絡需求（Credit Network Requirements）](07_Agent_Operations/Credit_Network_Requirements.md) - 代理信用系統
+- [BI 儀表板需求（BI Dashboard Requirements）](08_Analytics_Operations/BI_Dashboard_Requirements.md) - 分析儀表板
 
 ---
 
-**Status**: Phase 9 Complete - 66 documents across 15 categories
-**Validation**: No code blocks in requirements documents (verified via `validate-requirements-purity.sh`)
+## 相關文檔（Related Documentation）
+
+- **技術實施（Technical Implementation）**: [../architecture/](../architecture/) - 供架構師和開發者使用
+- **已歸檔來源（Archived Source）**: [../source-archive/](../source-archive/) - 原始 SSOT 文檔（只讀）
+- **主索引（Main Index）**: [../README.md](../README.md) - 導航中心
+
+---
+
+**狀態（Status）**: Phase 9 完成 - 15 個類別共 66 份文檔
+**驗證（Validation）**: 需求文檔中無代碼區塊（已透過 `validate-requirements-purity.sh` 驗證）
