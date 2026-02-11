@@ -168,11 +168,13 @@ Real-time monitoring of all third-party service health:
 
 ## 8. Acceptance Criteria
 
-1. All third-party integrations use unified adapter layer
-2. Third-party failures do not crash core platform services
-3. Webhook retry with exponential backoff (6 retries, DLQ after exhaustion)
-4. API keys stored in Vault, never in source code
-5. Key rotation policies enforced per schedule
-6. Service degradation fallbacks functional (PSP backup, KYC manual review)
-7. Health dashboard shows real-time status for all integrations
-8. Alerting configured for availability, latency, and error rate thresholds
+- [ ] All third-party integrations access through unified adapter layer with consistent interface patterns
+- [ ] Third-party service failures do not crash core platform services (circuit breaker implemented)
+- [ ] Webhook retry with exponential backoff (5s → 10s → 20s → 40s → 80s → 160s, DLQ after 6 failures)
+- [ ] API keys stored in encrypted secret management (HashiCorp Vault), never in source code or logs
+- [ ] Key rotation policies enforced: PSP 90 days, internal 30 days, database 180 days
+- [ ] Service degradation fallbacks functional: PSP backup switch, KYC manual review, game maintenance notice
+- [ ] Health dashboard shows real-time status (availability %, P99 latency, error rate) for all integrations
+- [ ] Alerting configured: PSP failure > 5% (Critical), KYC P99 > 5s (Warning), DLQ > 100 events (High)
+- [ ] Rate limiting awareness implemented with proper queuing for Onfido (100/min), SendGrid (1000/hour)
+- [ ] Service recovery detection triggers auto-switch back after 3 consecutive successful health checks

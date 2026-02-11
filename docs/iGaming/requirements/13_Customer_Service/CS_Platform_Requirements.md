@@ -8,6 +8,18 @@
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- Reducing customer response time to AFR < 5 minutes through intelligent ticket routing and AI-assisted auto-replies
+- Improving issue resolution through Player 360-degree view integrating identity, financial, gaming, risk, and ticket history data
+- Automating 40%+ of FAQ and simple queries through AI chatbot with intent classification (> 90% accuracy)
+- Protecting VIP player experience through tiered SLA management (Diamond 5-minute SLA vs Bronze 2-hour SLA)
+- Enabling self-service through comprehensive knowledge base (145+ FAQ articles, 100+ game guides) with multi-language support
+- Ensuring service quality through random inspection (10% daily), performance ranking, and agent skill matrix management
+
+---
+
 ## 1. Overview
 
 The Customer Service Platform is a core operational support system for iGaming platforms, providing omnichannel ticket management, AI-assisted responses, Player 360-degree view, and SLA automation.

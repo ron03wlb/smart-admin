@@ -232,6 +232,21 @@ CS agents should identify and escalate when players:
 
 ---
 
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| VIP Priority Routing Accuracy | 100% | Diamond/Platinum players routed to VIP manager/team |
+| Skill Matching Accuracy | > 95% | Tickets routed to agents with matching skill tags |
+| Language Match Rate | > 98% | Tickets assigned to agents speaking player's language |
+| Load Balancing Efficiency | Max 20 tickets/agent | No agent exceeds ticket limit during peak hours |
+| Multi-Channel Context Retention | 100% | CS agent sees complete cross-channel conversation history |
+| SLA Alert Response Time | < 5 minutes | Time from Level 1 alert to agent acknowledgment |
+| Quality Inspection Coverage | 10% daily | Random inspection quota met |
+| Responsible Gambling Response | 100% immediate | Self-exclusion requests processed without delay |
+
+---
+
 ## Related Documents
 
 - [CS_Platform_Requirements.md](CS_Platform_Requirements.md) - CS platform requirements
