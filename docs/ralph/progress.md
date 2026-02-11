@@ -227,6 +227,143 @@ Use `grep -rL` to find architecture files missing Java/SQL content.
 
 ---
 
+## Phase 9: Traditional Chinese Translation [PLANNED]
+
+**Goal**: Translate 184 iGaming documents to Traditional Chinese while preserving technical terms in English
+**Targets**:
+- Requirements documentation: 66 files (Chinese prose + English tech terms)
+- Architecture documentation: 118 files (Chinese prose + English tech terms, code examples remain English)
+- Terminology consistency: 100% (all business terms follow TRANSLATION_GLOSSARY.md)
+- Technical terms preserved: 100% (Controller, Service, Manager, API, etc.)
+
+**Translation Resources**:
+- Translation Glossary: docs/iGaming/TRANSLATION_GLOSSARY.md (500+ term mappings)
+- Templates: docs/iGaming/TEMPLATE_REQUIREMENTS.md, TEMPLATE_ARCHITECTURE.md, TEMPLATE_ADR.md
+- P14 Guardrails: docs/ralph/guardrails.md#P14 (updated 2026-02-11)
+
+**Validation**:
+```bash
+bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/
+bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
+bash scripts/check-technical-terms.sh docs/iGaming/
+bash scripts/validate-mermaid.sh docs/iGaming/
+bash scripts/validate_links.sh docs/iGaming/
+```
+
+**Quality Gates**:
+- P14 terminology consistency: 100%
+- Technical terms preserved in English: 100%
+- Traditional Chinese encoding (UTF-8): PASS
+- No code examples translated: 100%
+- Links/cross-references preserved: 100%
+- Mermaid diagrams render correctly: 100%
+
+---
+
+### 9A: Requirements Translation (66 files) [Status]
+
+Priority: Requirements files contain business context suited for Chinese audience.
+
+#### Batch 1 — Player Experience (5 files) [Status]
+- [ ] requirements/01_Player_Experience/Business_Flows.md (translate, preserve code/links)
+- [ ] requirements/01_Player_Experience/Industry_Glossary.md (translate, use TRANSLATION_GLOSSARY.md)
+- [ ] requirements/01_Player_Experience/Terminology_Standards.md (translate, term mappings)
+- [ ] requirements/01_Player_Experience/Platform_Overview.md (translate, preserve ResponseDTO)
+- [ ] requirements/01_Player_Experience/Solution_Overview.md (translate business context)
+
+#### Batch 2 — Player Experience (2 files) + Finance (3 files) [Status]
+- [ ] requirements/01_Player_Experience/Player_Lifecycle.md
+- [ ] requirements/01_Player_Experience/README.md
+- [ ] requirements/02_Financial_Operations/Financial_Implementation_Requirements.md
+- [ ] requirements/02_Financial_Operations/Payment_Operations.md
+- [ ] requirements/02_Financial_Operations/Reconciliation_Requirements.md
+
+#### Batch 3 — Financial Operations (5 files) [Status]
+- [ ] requirements/02_Financial_Operations/README.md
+- [ ] requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md
+- [ ] requirements/02_Financial_Operations/Turnover_Reconciliation_Requirements.md
+- [ ] requirements/03_Gaming_Operations/Game_Integration_Requirements.md
+- [ ] requirements/03_Gaming_Operations/Game_Integration_Standards.md
+
+#### Batch 4 — Gaming Operations (3 files) + Promotions (2 files) [Status]
+- [ ] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md
+- [ ] requirements/03_Gaming_Operations/README.md
+- [ ] requirements/03_Gaming_Operations/Turnover_Business_Rules.md
+- [ ] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md
+- [ ] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md
+
+#### Batch 5 — Promotions (2 files) + Risk Compliance (3 files) [Status]
+- [ ] requirements/04_Promotions_VIP/Promotion_Requirements.md
+- [ ] requirements/04_Promotions_VIP/README.md
+- [ ] requirements/05_Risk_Compliance/Affordability_Requirements.md
+- [ ] requirements/05_Risk_Compliance/Detection_Model_Spec.md
+- [ ] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md
+
+**Note**: Batches 6-14 will cover remaining 46 requirements files (9 more in Risk Compliance + 7 Governance + 2 Agent + 2 Analytics + 2 Infra + 3 Platform + 4 Frontend + 3 Security + 2 CS + 1 Integration + 4 Responsible Gambling + 5 READMEs). Full file list: `find docs/iGaming/requirements -name '*.md' | sort`
+
+**Phase 9A COMPLETE**: [Summary when done]
+
+---
+
+### 9B: Architecture Translation (118 files) [Status]
+
+Priority: Architecture files contain technical design suited for Chinese developer audience.
+
+#### Batch 15 — Overview (5 files) [Status]
+- [ ] architecture/00_Overview/System_Architecture_Overview.md
+- [ ] architecture/00_Overview/Technology_Stack.md
+- [ ] architecture/00_Overview/Multi_Tenant_Architecture.md
+- [ ] architecture/00_Overview/Deployment_Architecture.md
+- [ ] architecture/00_Overview/README.md
+
+#### Batch 16 — Player Service (5 files) [Status]
+- [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md
+- [ ] architecture/01_Player_Service/KYC_Identity_Verification.md
+- [ ] architecture/01_Player_Service/Player_Account_Lifecycle.md
+- [ ] architecture/01_Player_Service/Session_Management_Architecture.md
+- [ ] architecture/01_Player_Service/README.md
+
+#### Batch 17 — Player Service (3 files) + Finance Service (2 files) [Status]
+- [ ] architecture/01_Player_Service/Tag_System_Architecture.md
+- [ ] architecture/01_Player_Service/Turnover_Tracking_Architecture.md
+- [ ] architecture/01_Player_Service/VIP_System.md
+- [ ] architecture/02_Finance_Service/Financial_Implementation_Architecture.md
+- [ ] architecture/02_Finance_Service/Payment_Operations_Architecture.md
+
+#### Batch 18 — Finance Service (5 files) [Status]
+- [ ] architecture/02_Finance_Service/Payment_Processing_Architecture.md
+- [ ] architecture/02_Finance_Service/Reconciliation_Architecture.md
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Architecture.md
+- [ ] architecture/02_Finance_Service/Turnover_Reconciliation_Architecture.md
+- [ ] architecture/02_Finance_Service/README.md
+
+#### Batch 19 — Game Integration (5 files) [Status]
+- [ ] architecture/03_Game_Integration/Game_Integration_Architecture.md
+- [ ] architecture/03_Game_Integration/Game_Session_Architecture.md
+- [ ] architecture/03_Game_Integration/Third_Party_Standards.md
+- [ ] architecture/03_Game_Integration/Turnover_System_Architecture.md
+- [ ] architecture/03_Game_Integration/README.md
+
+**Note**: Batches 20-37 will cover remaining 93 architecture files across 18 modules (Activity Engine, Risk Engine, Platform Core, Infrastructure, Frontend, Security, etc.). Full file list: `find docs/iGaming/architecture -name '*.md' | sort`
+
+**Phase 9B COMPLETE**: [Summary when done]
+
+---
+
+### 9C: Translation Quality Gate [Status]
+
+- [ ] P14 terminology consistency: 100% (check-terminology-consistency-zh-tw.sh)
+- [ ] Technical terms preserved: 100% (check-technical-terms.sh)
+- [ ] Traditional Chinese encoding: PASS (validate-zh-tw-encoding.sh)
+- [ ] No code examples translated: 100% (manual review)
+- [ ] Links/cross-references preserved: 100% (validate_links.sh)
+- [ ] Mermaid diagrams render correctly: 100% (validate-mermaid.sh)
+- [ ] Git commit history: 37 batch commits (docs(iGaming): translate Batch N...)
+
+**Phase 9 COMPLETE**: Traditional Chinese Translation achieved ✅
+
+---
+
 ## Historical Phases (Completed)
 
 ### Phase 1: Cross-Reference Completion [COMPLETE] ✅
