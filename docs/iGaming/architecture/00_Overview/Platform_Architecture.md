@@ -120,6 +120,59 @@ SELECT * FROM player_wallet; -- Only returns tenant 12345 data
 | **Node.js** | WebSocket services, real-time features | Event-driven, optimal for WebSocket |
 | **Go** | High-performance microservices | Efficient concurrency, low memory footprint |
 
+### SmartAdmin Multi-Tenant Service Example
+
+```java
+@Service
+@RequiredArgsConstructor
+public class TenantService {
+
+    private final TenantDao tenantDao;
+    private final TenantManager tenantManager;
+
+    /**
+     * Query tenant by ID with Vavr Option for null-safety.
+     */
+    public Option<TenantVO> getTenantById(Long tenantId) {
+        return Option.of(tenantDao.selectById(tenantId))
+            .map(entity -> SmartBeanUtil.copy(entity, TenantVO.class));
+    }
+
+    /**
+     * Create tenant with full initialization (requires transaction).
+     * Delegates to Manager layer for @Transactional support.
+     */
+    public ResponseDTO<Long> createTenant(TenantCreateForm form) {
+        return tenantManager.createTenantWithSchema(form);
+    }
+}
+
+@Component
+@RequiredArgsConstructor
+public class TenantManager {
+
+    private final TenantDao tenantDao;
+    private final TenantSchemaInitializer schemaInitializer;
+
+    /**
+     * Create tenant and initialize isolated schema.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Long> createTenantWithSchema(TenantCreateForm form) {
+        // 1. Create tenant record
+        TenantEntity entity = SmartBeanUtil.copy(form, TenantEntity.class);
+        entity.setStatus(TenantStatusEnum.ACTIVE);
+        tenantDao.insert(entity);
+
+        // 2. Initialize tenant schema for data isolation
+        schemaInitializer.initializeSchema(entity.getId(), entity.getSchemaName());
+
+        return ResponseDTO.ok(entity.getId());
+    }
+}
+```
+
 ### Frontend
 
 | Technology | Use Case |

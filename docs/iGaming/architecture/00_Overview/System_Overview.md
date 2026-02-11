@@ -98,6 +98,59 @@ Flow:
 
 This is defensive programming -- even if Redis fails, fund safety is guaranteed.
 
+### 4.4 SmartAdmin Idempotency Implementation
+
+```java
+@Service
+@RequiredArgsConstructor
+public class WalletIdempotencyService {
+
+    private final WalletTransactionDao transactionDao;
+    private final WalletIdempotencyManager idempotencyManager;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String IDEMPOTENCY_KEY_PREFIX = "wallet:idempotency:";
+
+    /**
+     * Check idempotency using three-layer protection.
+     * Returns cached result if transaction already processed.
+     */
+    public Option<TransactionResult> checkIdempotency(String txId) {
+        // Layer 1: Redis cache lookup (fastest)
+        String cacheKey = IDEMPOTENCY_KEY_PREFIX + txId;
+        String cached = redisTemplate.opsForValue().get(cacheKey);
+        if (cached != null) {
+            return Option.of(JSON.parseObject(cached, TransactionResult.class));
+        }
+
+        // Layer 2: Database lookup (fallback)
+        return Option.of(transactionDao.selectByTxId(txId))
+            .map(entity -> {
+                TransactionResult result = SmartBeanUtil.copy(entity, TransactionResult.class);
+                // Repopulate cache for future lookups
+                redisTemplate.opsForValue().set(cacheKey, JSON.toJSONString(result),
+                    Duration.ofHours(1));
+                return result;
+            });
+    }
+
+    /**
+     * Process debit with distributed lock protection.
+     * Delegates to Manager for transactional operations.
+     */
+    public ResponseDTO<TransactionResult> processDebit(DebitRequestForm form) {
+        // Check idempotency first
+        Option<TransactionResult> existing = checkIdempotency(form.getTxId());
+        if (existing.isDefined()) {
+            return ResponseDTO.ok(existing.get());
+        }
+
+        // Delegate to Manager for transaction with distributed lock
+        return idempotencyManager.executeDebitWithLock(form);
+    }
+}
+```
+
 ### 4.4 References
 
 - SSOT: [03-03 Seamless Wallet Analysis -- Token Verification](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md#token-驗證流程)
@@ -123,6 +176,50 @@ Level 1: Platform
 | Cache | Redis Key prefix includes Tenant ID | `{tenantId}:{key}` pattern |
 | Application | ThreadLocal injection of Tenant Context | Request filter sets context |
 | API | JWT Token contains Tenant ID | Token validation extracts tenant |
+
+### 5.3 Multi-Tenant Database Schema
+
+```sql
+-- Core tenant management table
+CREATE TABLE t_tenant (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_code     VARCHAR(50) NOT NULL UNIQUE,
+    tenant_name     VARCHAR(200) NOT NULL,
+    schema_name     VARCHAR(100) NOT NULL UNIQUE,
+    status          SMALLINT NOT NULL DEFAULT 1,
+    config_json     JSONB,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_tenant_status ON t_tenant(status) WHERE deleted = FALSE;
+CREATE INDEX idx_tenant_code ON t_tenant(tenant_code) WHERE deleted = FALSE;
+
+-- Wallet transaction table with tenant isolation
+CREATE TABLE t_wallet_transaction (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    player_id       BIGINT NOT NULL,
+    tx_id           VARCHAR(100) NOT NULL,
+    tx_type         VARCHAR(20) NOT NULL,
+    amount          DECIMAL(18, 4) NOT NULL,
+    balance_before  DECIMAL(18, 4) NOT NULL,
+    balance_after   DECIMAL(18, 4) NOT NULL,
+    status          SMALLINT NOT NULL DEFAULT 1,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_wallet_tx_id UNIQUE (tenant_id, tx_id)
+);
+
+-- Enable Row-Level Security for tenant isolation
+ALTER TABLE t_wallet_transaction ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_policy ON t_wallet_transaction
+    USING (tenant_id = current_setting('app.current_tenant')::bigint);
+
+CREATE INDEX idx_wallet_tx_player ON t_wallet_transaction(tenant_id, player_id, created_at DESC);
+CREATE INDEX idx_wallet_tx_status ON t_wallet_transaction(tenant_id, status) WHERE status != 1;
+```
 
 ### 5.3 Key Scenarios
 

@@ -600,6 +600,95 @@ The turnover calculation module depends on the following SmartAdmin Foundation m
 | **foundation.mq** | Kafka event publishing | Publishes finance.turnover.calculated event |
 | **foundation.retry** | Failure retry strategy | Risk Engine call failure retry |
 
+### 10.4.1 SmartAdmin Java Implementation
+
+```java
+@Service
+@RequiredArgsConstructor
+public class TurnoverService {
+
+    private final BetTurnoverRecordDao turnoverDao;
+    private final TurnoverCalculationManager turnoverManager;
+    private final RiskEngineClient riskEngineClient;
+
+    /**
+     * Query turnover record by bet ID using Vavr Option.
+     * Service layer can call Dao directly for simple queries.
+     */
+    public Option<TurnoverRecordVO> getTurnoverByBetId(String betId) {
+        return Option.of(turnoverDao.selectByBetId(betId))
+            .map(entity -> SmartBeanUtil.copy(entity, TurnoverRecordVO.class));
+    }
+
+    /**
+     * Calculate turnover for a bet with three-layer validation.
+     * Delegates to Manager for transactional operations.
+     */
+    public ResponseDTO<TurnoverResult> calculateTurnover(BetSettleForm form) {
+        // Layer 1: Risk Engine validation (short-circuit on BLOCK)
+        RiskValidationResult riskResult = riskEngineClient.validateTurnover(form);
+        if (!riskResult.isValid() && riskResult.getActionType() == ActionType.BLOCK) {
+            return ResponseDTO.ok(TurnoverResult.blocked(riskResult.getMatchedRules()));
+        }
+
+        // Layer 2 & 3: Delegate to Manager for transactional calculation
+        return turnoverManager.calculateAndRecordTurnover(form, riskResult);
+    }
+}
+
+@Component
+@RequiredArgsConstructor
+public class TurnoverCalculationManager {
+
+    private final BetTurnoverRecordDao turnoverDao;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    private static final Map<String, BigDecimal> STATUS_FACTORS = Map.of(
+        "WIN", BigDecimal.ONE,
+        "LOSS", BigDecimal.ONE,
+        "DRAW", BigDecimal.ZERO,
+        "CANCEL", BigDecimal.ZERO,
+        "HALF_WIN", BigDecimal.ONE,
+        "HALF_LOSS", BigDecimal.ONE
+    );
+
+    /**
+     * Calculate and record turnover with transaction support.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<TurnoverResult> calculateAndRecordTurnover(
+            BetSettleForm form, RiskValidationResult riskResult) {
+
+        // Layer 2: Apply status factor
+        BigDecimal statusFactor = STATUS_FACTORS.getOrDefault(form.getStatus(), BigDecimal.ZERO);
+        BigDecimal validTurnover = riskResult.getEffectiveTurnoverBase()
+            .multiply(statusFactor);
+
+        // Record turnover
+        BetTurnoverRecordEntity record = new BetTurnoverRecordEntity();
+        record.setBetId(form.getBetId());
+        record.setPlayerId(form.getPlayerId());
+        record.setEffectiveTurnoverBase(riskResult.getEffectiveTurnoverBase());
+        record.setStatusFactor(statusFactor);
+        record.setValidTurnoverFinance(validTurnover);
+        record.setActionType(riskResult.getActionType().name());
+        turnoverDao.insert(record);
+
+        // Publish event for Activity layer (Layer 3)
+        publishTurnoverEvent(record);
+
+        return ResponseDTO.ok(TurnoverResult.success(validTurnover));
+    }
+
+    private void publishTurnoverEvent(BetTurnoverRecordEntity record) {
+        TurnoverCalculatedEvent event = SmartBeanUtil.copy(record, TurnoverCalculatedEvent.class);
+        kafkaTemplate.send("finance.turnover.calculated", record.getPlayerId().toString(),
+            JSON.toJSONString(event));
+    }
+}
+```
+
 ### 10.5 Configuration Definitions
 
 **Odds Thresholds** (defined by Risk Engine):
@@ -659,6 +748,66 @@ The turnover calculation module depends on the following SmartAdmin Foundation m
 **Backward Compatibility**:
 - Layer 2/3 processing flow remains unchanged
 - Only Layer 1 API changed (internal implementation)
+
+### 11.1 Complete Database Schema
+
+```sql
+-- Bet turnover record table for three-layer validation
+CREATE TABLE t_bet_turnover_record (
+    id                      BIGSERIAL PRIMARY KEY,
+    tenant_id               BIGINT NOT NULL,
+    bet_id                  VARCHAR(100) NOT NULL,
+    player_id               BIGINT NOT NULL,
+    game_type               VARCHAR(50) NOT NULL,
+
+    -- Layer 1: Risk Engine results
+    effective_turnover_base DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    action_type             VARCHAR(20) NOT NULL DEFAULT 'PASS',
+    matched_rules           JSONB,
+    risk_proposal_id        VARCHAR(50),
+
+    -- Layer 2: Finance status results
+    status                  VARCHAR(20) NOT NULL,
+    status_factor           DECIMAL(5, 4) NOT NULL DEFAULT 1.0000,
+    valid_turnover_finance  DECIMAL(18, 4) NOT NULL DEFAULT 0,
+
+    -- Layer 3: Activity weight results
+    game_weight             DECIMAL(5, 4) NOT NULL DEFAULT 1.0000,
+    activity_valid_turnover DECIMAL(18, 4) NOT NULL DEFAULT 0,
+
+    layer_breakdown         JSONB,
+    calculated_at           TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted                 BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT uk_bet_turnover UNIQUE (tenant_id, bet_id)
+);
+
+CREATE INDEX idx_turnover_player ON t_bet_turnover_record(tenant_id, player_id, calculated_at DESC);
+CREATE INDEX idx_turnover_action ON t_bet_turnover_record(tenant_id, action_type, calculated_at)
+    WHERE action_type IN ('BLOCK', 'FLAG');
+CREATE INDEX idx_turnover_date ON t_bet_turnover_record(tenant_id, DATE(calculated_at));
+
+-- Daily reconciliation report table
+CREATE TABLE t_daily_reconciliation_report (
+    id                      BIGSERIAL PRIMARY KEY,
+    tenant_id               BIGINT NOT NULL,
+    report_date             DATE NOT NULL,
+    total_bets_processed    INTEGER NOT NULL DEFAULT 0,
+    total_finance_turnover  DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    total_activity_turnover DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    expected_ratio          DECIMAL(10, 6),
+    actual_ratio            DECIMAL(10, 6),
+    deviation_percentage    DECIMAL(10, 6),
+    status                  VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    mismatched_players      JSONB,
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_reconciliation_date UNIQUE (tenant_id, report_date)
+);
+
+CREATE INDEX idx_reconciliation_status ON t_daily_reconciliation_report(tenant_id, status, report_date DESC);
+```
 
 ---
 

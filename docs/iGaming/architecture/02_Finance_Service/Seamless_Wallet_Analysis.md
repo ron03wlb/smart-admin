@@ -654,6 +654,57 @@ Controller -> Manager (FORBIDDEN - violates layering)
 
 **RoundStateEntity.java** - Maps to the round state table for Round-Based GP integrations, tracking roundId, status (OPEN/CLOSED/CANCELLED/ADJUSTED/TIMEOUT/PENDING_REVIEW), total bet amount, total win amount, and timestamps.
 
+### 10.3.1 Database Schema
+
+```sql
+-- Game transaction record table for seamless wallet operations
+CREATE TABLE t_game_transaction_record (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    player_id       BIGINT NOT NULL,
+    tx_id           VARCHAR(100) NOT NULL,
+    round_id        VARCHAR(100),
+    tx_type         VARCHAR(20) NOT NULL,
+    amount          DECIMAL(18, 4) NOT NULL,
+    balance_after   DECIMAL(18, 4) NOT NULL,
+    status          SMALLINT NOT NULL DEFAULT 1,
+    game_code       VARCHAR(50),
+    provider_code   VARCHAR(50),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT uk_game_tx_id UNIQUE (tenant_id, tx_id)
+);
+
+CREATE INDEX idx_game_tx_player ON t_game_transaction_record(tenant_id, player_id, created_at DESC);
+CREATE INDEX idx_game_tx_round ON t_game_transaction_record(tenant_id, round_id) WHERE round_id IS NOT NULL;
+CREATE INDEX idx_game_tx_status ON t_game_transaction_record(tenant_id, status, created_at) WHERE status != 1;
+
+-- Round state table for round-based game provider integrations
+CREATE TABLE t_round_state (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    player_id       BIGINT NOT NULL,
+    round_id        VARCHAR(100) NOT NULL,
+    status          VARCHAR(20) NOT NULL DEFAULT 'OPEN',
+    total_bet       DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    total_win       DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    game_code       VARCHAR(50),
+    provider_code   VARCHAR(50),
+    opened_at       TIMESTAMP NOT NULL DEFAULT NOW(),
+    closed_at       TIMESTAMP,
+    timeout_at      TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT uk_round_id UNIQUE (tenant_id, round_id)
+);
+
+CREATE INDEX idx_round_player ON t_round_state(tenant_id, player_id, opened_at DESC);
+CREATE INDEX idx_round_status ON t_round_state(tenant_id, status, opened_at) WHERE status = 'OPEN';
+CREATE INDEX idx_round_timeout ON t_round_state(tenant_id, timeout_at) WHERE status = 'OPEN' AND timeout_at IS NOT NULL;
+```
+
 ### 10.4 DAO Layer
 
 **GameTransactionRecordDao.java** - MyBatis Mapper for game transaction CRUD operations, including queries by txId for idempotency checks and batch queries for reconciliation.
@@ -667,6 +718,65 @@ Controller -> Manager (FORBIDDEN - violates layering)
 - `processWin()`: Credit execution, round closure within @Transactional
 - `processRollback()`: Reverse operation execution within @Transactional
 - `processAdjustment()`: Resettlement handling with negative balance support within @Transactional
+
+```java
+@Component
+@RequiredArgsConstructor
+public class SeamlessWalletTransactionManager {
+
+    private final PlayerWalletDao walletDao;
+    private final GameTransactionRecordDao transactionDao;
+    private final RoundStateDao roundStateDao;
+    private final RedissonClient redissonClient;
+
+    private static final String LOCK_KEY_PREFIX = "seamless:player:";
+
+    /**
+     * Process bet with distributed lock and transaction management.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public TransactionResult processBet(BetRequestForm form) {
+        String lockKey = LOCK_KEY_PREFIX + form.getPlayerId();
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            // Acquire distributed lock with timeout
+            if (!lock.tryLock(5, 10, TimeUnit.SECONDS)) {
+                throw new BusinessException(ErrorCode.SYSTEM_BUSY);
+            }
+
+            // Check balance with SELECT FOR UPDATE
+            PlayerWalletEntity wallet = walletDao.selectForUpdate(form.getPlayerId());
+            if (wallet.getBalance().compareTo(form.getAmount()) < 0) {
+                throw new BusinessException(ErrorCode.INSUFFICIENT_FUNDS);
+            }
+
+            // Debit balance
+            BigDecimal newBalance = wallet.getBalance().subtract(form.getAmount());
+            walletDao.updateBalance(form.getPlayerId(), newBalance, wallet.getVersion());
+
+            // Record transaction
+            GameTransactionRecordEntity record = new GameTransactionRecordEntity();
+            record.setTxId(form.getTxId());
+            record.setPlayerId(form.getPlayerId());
+            record.setType(TransactionType.DEBIT);
+            record.setAmount(form.getAmount());
+            record.setBalanceAfter(newBalance);
+            transactionDao.insert(record);
+
+            return TransactionResult.success(newBalance);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ErrorCode.LOCK_ACQUISITION_FAILED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+}
+```
 
 ### 10.6 Service Layer
 
