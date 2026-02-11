@@ -8,6 +8,18 @@
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- Enabling multi-jurisdiction operations through compliance with GDPR, PCI-DSS, CCPA, PDPA, and LGPD data protection requirements
+- Protecting player trust through application-layer encryption of all PII (name, phone, email, bank account, ID) with DBAs unable to view plaintext
+- Supporting GDPR Right to Erasure through crypto-shredding mechanism making deleted data unrecoverable even from backups
+- Reducing data breach risk through role-based masking (CS Agent sees masked data, Risk Control requires approval for plaintext)
+- Preventing fraudulent re-registration through tombstone records while maintaining regulatory compliance
+- Balancing regulatory obligations through data retention matrix (5-7 year AML retention, permanent fraud prevention records)
+
+---
+
 ## 1. Regulatory Framework
 
 The platform must comply with the following data protection regulations:

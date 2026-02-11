@@ -155,11 +155,13 @@ Administrative tools require:
 
 ## 4. Acceptance Criteria
 
-1. ISO 27001:2022 gap analysis completed and documented
-2. All P0 controls implemented and evidenced
-3. UK RTS Section 4 requirements fully mapped and addressed
-4. Environment separation enforced (DEV/UAT/PROD)
-5. Clock synchronization within 1 second across all systems
-6. Administrative tools have independent authentication and full audit trails
-7. TLS 1.2+ enforced on all communications
-8. Compliance calendar established with regular cadence
+- [ ] ISO 27001:2022 gap analysis completed with all 93 controls assessed and documented
+- [ ] All P0 controls (5.1, 5.2, 5.3, 5.15, 8.2, 8.3, 8.5, 8.9, 8.12, 8.15, 8.16, 8.20, 8.24, 8.25, 8.28) implemented with evidence
+- [ ] UK RTS Section 4 requirements fully mapped: ISMS (4.1), clock sync (4.2), environment separation (4.3), access control (4.4), outsourced development (4.5), privileged tools (4.6)
+- [ ] Environment separation enforced: DEV, UAT, PROD fully isolated with no data leakage
+- [ ] Clock synchronization within 1 second across all systems using NTP with UTC timezone logging
+- [ ] Administrative tools have independent authentication (separate from user auth) and full audit trails
+- [ ] TLS 1.2+ enforced on all communications with strong cipher suites only
+- [ ] Compliance calendar established: risk assessment (annual), penetration testing (semi-annual), access review (quarterly), training (annual)
+- [ ] Internal audit completed before certification audit preparation
+- [ ] Gap analysis actions for P2 controls (5.7, 5.23, 6.3, 8.1) scheduled with timeline

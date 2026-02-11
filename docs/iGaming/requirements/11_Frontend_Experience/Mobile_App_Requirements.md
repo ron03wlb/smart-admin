@@ -183,3 +183,18 @@ Push notification clicks must navigate directly to relevant page (activity detai
 5. Push notifications respect quiet hours and daily limits
 6. Deep linking navigates to correct pages from push notifications
 7. App passes security audit: SSL pinning, code obfuscation, root detection
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| App Cold Start Time | < 2 seconds | Time from tap to first usable screen |
+| App Hot Start Time | < 0.5 seconds | Time from background to foreground usable |
+| Hot Update Success Rate | > 99% | Successful patch downloads / total update attempts |
+| Push Delivery Rate | > 95% | Delivered notifications / sent notifications |
+| Biometric Login Adoption | > 60% | Users with biometric enabled / total active users |
+| Crash Rate | < 0.1% | Crash sessions / total sessions |
+| Offline Cache Hit Rate | > 90% | Cached content served / offline content requests |
+| E2E Test Coverage | 100% critical flows | All login, deposit, bet, withdrawal flows tested |
