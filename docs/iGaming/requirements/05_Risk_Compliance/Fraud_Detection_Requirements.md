@@ -9,7 +9,7 @@
 | **Canonical Source** | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
 | **View Type** | Business Requirements |
 | **Target Audience** | Product Managers, Compliance Officers, Risk Analysts |
-| **Related Doc** | [Fraud_Detection_System.md](../../architecture/05_Risk_Engine/Fraud_Detection_System.md) |
+| **Related Architecture** | [Fraud_Detection_System.md](../../architecture/05_Risk_Engine/Fraud_Detection_System.md) |
 
 ---
 

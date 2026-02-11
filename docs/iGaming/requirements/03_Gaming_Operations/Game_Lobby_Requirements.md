@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-02_Game_Lobby_Management.md](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md)
 > **Audience**: Executives, Product Managers, Operations Leads, UX Designers
-> **Related Doc**: [Game Lobby System (Architecture)](../../architecture/03_Game_Integration/Game_Lobby_System.md)
+> **Related Architecture**: [Game Lobby System (Architecture)](../../architecture/03_Game_Integration/Game_Lobby_System.md)
 > **Last Synced**: 2026-02-08
 
 ---

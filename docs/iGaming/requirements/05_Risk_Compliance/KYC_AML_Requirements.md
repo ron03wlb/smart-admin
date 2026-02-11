@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Doc**: [KYC_Verification_API.md](../../architecture/05_Risk_Engine/KYC_Verification_API.md)
+> **Related Architecture**: [KYC_Verification_API.md](../../architecture/05_Risk_Engine/KYC_Verification_API.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 

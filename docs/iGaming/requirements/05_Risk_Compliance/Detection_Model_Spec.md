@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
 > **Audience**: Executives, Risk Operations, Compliance Officers, Product Managers
-> **Related Doc**: [Detection_Model_Implementation.md](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md)
+> **Related Architecture**: [Detection_Model_Implementation.md](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (TCC pattern, SAGA flow implementation) moved to Architecture layer. This document focuses on business rules and operational policies.

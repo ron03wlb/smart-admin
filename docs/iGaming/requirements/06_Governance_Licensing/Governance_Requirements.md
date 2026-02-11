@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Doc**: [Governance_Implementation.md](../../architecture/06_Platform_Core/Governance_Implementation.md)
+> **Related Architecture**: [Governance_Implementation.md](../../architecture/06_Platform_Core/Governance_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---

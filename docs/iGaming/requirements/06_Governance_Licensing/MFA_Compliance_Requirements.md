@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 > **Audience**: Executives, Compliance Officers
-> **Related Doc**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md)
+> **Related Architecture**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (Backup Code AES-256-GCM encryption, Identity Document S3 upload implementation, Audit Log JSONB format + Kafka integration, Anomaly Detection rule implementations, HTTP status codes, Redis cache configuration) moved to Architecture layer. This document focuses on business policies, compliance mandates, and operational procedures only.

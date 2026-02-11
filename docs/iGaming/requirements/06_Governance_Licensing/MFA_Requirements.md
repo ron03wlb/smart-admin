@@ -3,7 +3,7 @@
 > **Canonical Source**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
+> **Related Architecture**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
 > **Last Synced**: 2026-02-09
 
 **Related Source Documents**:

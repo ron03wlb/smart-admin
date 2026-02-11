@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-03_Recovery_Flow.md](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 > **Audience**: Executives, Compliance Officers, Security Operations
-> **Related Doc**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md)
+> **Related Architecture**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (Two-Phase Login Sequence Diagram, Trusted Device Token generation Java code, Cookie configuration HttpOnly/Secure/SameSite, MFA Session Storage Redis + 5-minute TTL, SHA256 hashing, QR code generation) moved to Architecture layer. This document focuses on business policies only.

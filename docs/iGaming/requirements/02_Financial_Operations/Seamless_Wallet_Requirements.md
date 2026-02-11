@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-03_Seamless_Wallet_Analysis.md](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Doc**: [Seamless Wallet Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md)
+> **Related Architecture**: [Seamless Wallet Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (scheduled jobs, Redis cache, database constraints, distributed locks, pending queue implementation, idempotency mechanisms) moved to Architecture layer. This document focuses on business rules only.

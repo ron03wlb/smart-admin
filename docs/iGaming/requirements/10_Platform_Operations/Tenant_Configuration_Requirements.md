@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/10_Platform_Management/10-02_Tenant_Configuration.md](../../source-archive/10_Platform_Management/10-02_Tenant_Configuration.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Tenant Configuration Architecture](../../architecture/10_Platform_Management/Tenant_Configuration_Architecture.md)
+> **Related Architecture**: [Tenant Configuration Architecture](../../architecture/10_Platform_Management/Tenant_Configuration_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

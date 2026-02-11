@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/10_Platform_Management/10-03_Notification_Architecture.md](../../source-archive/10_Platform_Management/10-03_Notification_Architecture.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Notification Architecture](../../architecture/10_Platform_Management/Notification_Architecture.md)
+> **Related Architecture**: [Notification Architecture](../../architecture/10_Platform_Management/Notification_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

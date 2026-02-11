@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Doc**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
+> **Related Architecture**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---

@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-04](../../source-archive/11_Frontend_CMS/11-04_Mobile_App_Architecture.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Mobile Team Leads
-> **Related Doc**: [Mobile App Architecture](../../architecture/11_Frontend/Mobile_App_Architecture.md)
+> **Related Architecture**: [Mobile App Architecture](../../architecture/11_Frontend/Mobile_App_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

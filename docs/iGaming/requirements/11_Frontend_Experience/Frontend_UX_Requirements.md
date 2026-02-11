@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-01](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md), [11-02](../../source-archive/11_Frontend_CMS/11-02_Banner_and_Announcement.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, UX Designers, Operations Team
-> **Related Doc**: [Frontend Layout Engine Architecture](../../architecture/11_Frontend/Frontend_Layout_Engine.md), [Banner Announcement Architecture](../../architecture/11_Frontend/Banner_Announcement.md)
+> **Related Architecture**: [Frontend Layout Engine Architecture](../../architecture/11_Frontend/Frontend_Layout_Engine.md), [Banner Announcement Architecture](../../architecture/11_Frontend/Banner_Announcement.md)
 > **Last Synced**: 2026-02-09
 
 ---

@@ -3,7 +3,7 @@
 > **Canonical Source**: [15-01_Self_Exclusion.md](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md), [15-09_Self_Exclusion_Reconciliation.md](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md)
+> **Related Architecture**: [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

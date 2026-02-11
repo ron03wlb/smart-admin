@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
 > **Audience**: Executives, Product Managers
-> **Related Doc**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
+> **Related Architecture**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (Token generation Java code, HMAC-SHA256 signature algorithm, Base64 encoding, Redis anti-replay blacklist, Three-layer idempotency defense, Stalled transaction recovery jobs, Rate limiting Redisson implementation) moved to Architecture layer. This document focuses on business requirements only.

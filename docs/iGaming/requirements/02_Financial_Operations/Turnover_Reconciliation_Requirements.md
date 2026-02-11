@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 > **Audience**: Executives, Compliance Officers, Product Managers, Finance Team
-> **Related Doc**: [Turnover_Calculation_Architecture.md](../../architecture/02_Finance_Service/Turnover_Calculation_Architecture.md)
+> **Related Architecture**: [Turnover_Calculation_Architecture.md](../../architecture/02_Finance_Service/Turnover_Calculation_Architecture.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (three-layer validation architecture, Mermaid flowchart, short-circuit optimization) moved to Architecture layer. This document focuses on business rules only.

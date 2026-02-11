@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/07_Agent_Center/07-03_Agent_System.md](../../source-archive/07_Agent_Center/07-03_Agent_System.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Agent System Architecture](../../architecture/07_Agent_Service/Agent_System_Architecture.md)
+> **Related Architecture**: [Agent System Architecture](../../architecture/07_Agent_Service/Agent_System_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

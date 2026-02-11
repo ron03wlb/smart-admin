@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [05-07_Turnover_Validation_Scheme.md](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
 > **Audience**: Executives, Product Managers, Risk Operations, Compliance Officers
-> **Related Doc**: [Turnover_Validation_Architecture.md](../../architecture/05_Risk_Engine/Turnover_Validation_Architecture.md)
+> **Related Architecture**: [Turnover_Validation_Architecture.md](../../architecture/05_Risk_Engine/Turnover_Validation_Architecture.md)
 > **Last Synced**: 2026-02-08
 
 ---

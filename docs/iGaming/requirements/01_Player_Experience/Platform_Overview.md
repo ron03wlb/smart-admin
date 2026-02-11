@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-01_Quickstart.md](../../source-archive/00_Foundation/00-01_Quickstart.md)
 > **Audience**: Executives, Product Managers, Business Stakeholders
-> **Related Doc**: [System_Overview.md](../../architecture/00_Overview/System_Overview.md)
+> **Related Architecture**: [System_Overview.md](../../architecture/00_Overview/System_Overview.md)
 > **Last Synced**: 2026-02-08
 
 ---

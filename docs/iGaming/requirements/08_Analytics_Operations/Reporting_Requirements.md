@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/08_Analytics_BI/08-01_Reporting_BI.md](../../source-archive/08_Analytics_BI/08-01_Reporting_BI.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Reporting Architecture](../../architecture/08_Analytics_Service/Reporting_Architecture.md)
+> **Related Architecture**: [Reporting Architecture](../../architecture/08_Analytics_Service/Reporting_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md](../../source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [BI Dashboard Architecture](../../architecture/08_Analytics_Service/BI_Dashboard_Architecture.md)
+> **Related Architecture**: [BI Dashboard Architecture](../../architecture/08_Analytics_Service/BI_Dashboard_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

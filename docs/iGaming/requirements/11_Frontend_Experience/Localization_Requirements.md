@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-07](../../source-archive/11_Frontend_CMS/11-07_i18n_Localization.md), [11-08](../../source-archive/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md), [11-09](../../source-archive/11_Frontend_CMS/11-09_Localization_Workflow.md), [11-10](../../source-archive/11_Frontend_CMS/11-10_Localization_API.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Localization Managers, Operations Team
-> **Related Doc**: [i18n Architecture](../../architecture/11_Frontend/i18n_Localization.md), [Dynamic Content Localization](../../architecture/11_Frontend/Dynamic_Content_Localization.md), [Localization Workflow](../../architecture/11_Frontend/Localization_Workflow.md), [Localization API](../../architecture/11_Frontend/Localization_API.md)
+> **Related Architecture**: [i18n Architecture](../../architecture/11_Frontend/i18n_Localization.md), [Dynamic Content Localization](../../architecture/11_Frontend/Dynamic_Content_Localization.md), [Localization Workflow](../../architecture/11_Frontend/Localization_Workflow.md), [Localization API](../../architecture/11_Frontend/Localization_API.md)
 > **Last Synced**: 2026-02-09
 
 ---

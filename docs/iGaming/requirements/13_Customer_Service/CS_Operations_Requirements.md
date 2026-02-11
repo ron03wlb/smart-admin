@@ -3,7 +3,7 @@
 > **Canonical Source**: [13-02_Customer_Service_Operations.md](../../source-archive/13_Customer_Service/13-02_Customer_Service_Operations.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Customer Service Managers, Operations Directors
-> **Related Doc**: [CS_Operations_Architecture.md](../../architecture/13_Customer_Service/CS_Operations_Architecture.md)
+> **Related Architecture**: [CS_Operations_Architecture.md](../../architecture/13_Customer_Service/CS_Operations_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

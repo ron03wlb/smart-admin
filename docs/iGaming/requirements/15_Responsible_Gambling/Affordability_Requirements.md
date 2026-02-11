@@ -3,7 +3,7 @@
 > **Canonical Source**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md), [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Player_Protection_API.md](../../architecture/15_Responsible_Gambling/Player_Protection_API.md)
+> **Related Architecture**: [Player_Protection_API.md](../../architecture/15_Responsible_Gambling/Player_Protection_API.md)
 > **Last Synced**: 2026-02-09
 
 ---

@@ -3,7 +3,7 @@
 > **Canonical Source**: [13-01_CS_Platform_Design.md](../../source-archive/13_Customer_Service/13-01_CS_Platform_Design.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Customer Service Managers
-> **Related Doc**: [CS_Platform_Architecture.md](../../architecture/13_Customer_Service/CS_Platform_Architecture.md)
+> **Related Architecture**: [CS_Platform_Architecture.md](../../architecture/13_Customer_Service/CS_Platform_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

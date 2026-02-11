@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Credit Network Architecture](../../architecture/07_Agent_Service/Credit_Network_Architecture.md)
+> **Related Architecture**: [Credit Network Architecture](../../architecture/07_Agent_Service/Credit_Network_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

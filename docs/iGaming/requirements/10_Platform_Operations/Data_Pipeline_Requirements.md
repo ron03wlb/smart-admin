@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md](../../source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Data Pipeline Architecture](../../architecture/10_Platform_Management/Data_Pipeline_Architecture.md)
+> **Related Architecture**: [Data Pipeline Architecture](../../architecture/10_Platform_Management/Data_Pipeline_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

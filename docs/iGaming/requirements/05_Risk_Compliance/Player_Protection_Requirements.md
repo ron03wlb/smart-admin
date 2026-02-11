@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md)
 > **Audience**: Executives, Compliance Officers
-> **Related Doc**: [Player_Protection_API.md](../../architecture/05_Risk_Engine/Player_Protection_API.md)
+> **Related Architecture**: [Player_Protection_API.md](../../architecture/05_Risk_Engine/Player_Protection_API.md)
 > **Last Synced**: 2026-02-08
 
 ---

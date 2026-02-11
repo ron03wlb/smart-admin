@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Doc**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
+> **Related Architecture**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (PSP webhook implementation, signature verification algorithms, smart routing code, scheduled reconciliation jobs, connection pool configuration, Prometheus metrics) moved to Architecture layer. This document focuses on business rules only.

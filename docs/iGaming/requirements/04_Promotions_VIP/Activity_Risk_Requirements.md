@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [04-03_Activity_Risk_Control.md](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md)
 > **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Doc**: [Activity_Risk_System.md](../../architecture/04_Activity_Engine/Activity_Risk_System.md)
+> **Related Architecture**: [Activity_Risk_System.md](../../architecture/04_Activity_Engine/Activity_Risk_System.md)
 > **Last Synced**: 2026-02-08
 
 ---

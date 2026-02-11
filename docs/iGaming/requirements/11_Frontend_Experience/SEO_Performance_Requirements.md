@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-03](../../source-archive/11_Frontend_CMS/11-03_SEO_and_Performance.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, SEO Specialists, Performance Engineers
-> **Related Doc**: [SEO Performance Architecture](../../architecture/11_Frontend/SEO_Performance.md)
+> **Related Architecture**: [SEO Performance Architecture](../../architecture/11_Frontend/SEO_Performance.md)
 > **Last Synced**: 2026-02-09
 
 ---

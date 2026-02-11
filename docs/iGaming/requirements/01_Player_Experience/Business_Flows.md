@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
 > **Audience**: Executives, Product Managers, Compliance Officers, QA Teams
-> **Related Doc**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
+> **Related Architecture**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
 > **Last Synced**: 2026-02-08
 
 ---

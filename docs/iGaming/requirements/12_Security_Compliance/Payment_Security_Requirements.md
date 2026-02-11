@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/12_System_Security/12-06](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md), [12-07](../../source-archive/12_System_Security/12-07_Data_Portability_SAR.md), [12-08](../../source-archive/12_System_Security/12-08_MITM_Detection.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers, Payment Operations
-> **Related Doc**: [Payment Restrictions Architecture](../../architecture/12_Security/Payment_Restrictions.md), [Data Portability SAR Architecture](../../architecture/12_Security/Data_Portability_SAR.md), [MITM Detection Architecture](../../architecture/12_Security/MITM_Detection.md)
+> **Related Architecture**: [Payment Restrictions Architecture](../../architecture/12_Security/Payment_Restrictions.md), [Data Portability SAR Architecture](../../architecture/12_Security/Data_Portability_SAR.md), [MITM Detection Architecture](../../architecture/12_Security/MITM_Detection.md)
 > **Last Synced**: 2026-02-09
 
 ---

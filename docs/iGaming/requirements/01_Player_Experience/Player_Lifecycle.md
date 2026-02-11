@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [docs/iGaming/source-archive/01_Player_Center/01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
 > **View**: Business Requirements (Product & Operations)
-> **Technical Implementation**: [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)
+> **Related Architecture**: [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)
 
 ---
 

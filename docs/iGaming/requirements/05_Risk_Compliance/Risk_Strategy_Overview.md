@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/05_Risk_Control/05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
 > **Audience**: Executives, Compliance Officers, Business Analysts
-> **Related Technical Doc**: [Risk_System_Architecture.md](../../architecture/05_Risk_Engine/Risk_System_Architecture.md)
+> **Related Architecture**: [Risk_System_Architecture.md](../../architecture/05_Risk_Engine/Risk_System_Architecture.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 

@@ -3,7 +3,7 @@
 > **Canonical Source**: [15-03_Cooling_Off_Period.md](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md), [15-04_Session_Management.md](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md), [15-05_Reality_Checks.md](../../source-archive/15_Responsible_Gambling/15-05_Reality_Checks.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Session_Protection_Architecture.md](../../architecture/15_Responsible_Gambling/Session_Protection_Architecture.md)
+> **Related Architecture**: [Session_Protection_Architecture.md](../../architecture/15_Responsible_Gambling/Session_Protection_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

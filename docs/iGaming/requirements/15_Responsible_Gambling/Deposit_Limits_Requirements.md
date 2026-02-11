@@ -3,7 +3,7 @@
 > **Canonical Source**: [15-02_Deposit_Limits.md](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md), [15-06_Loss_Limits.md](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Deposit_Loss_Limits_Architecture.md](../../architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md)
+> **Related Architecture**: [Deposit_Loss_Limits_Architecture.md](../../architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

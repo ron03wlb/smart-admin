@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Doc**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
+> **Related Architecture**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (atomicity, idempotency, HMAC-SHA256 algorithms, SAGA flow diagrams) moved to Architecture layer. This document focuses on business requirements only.

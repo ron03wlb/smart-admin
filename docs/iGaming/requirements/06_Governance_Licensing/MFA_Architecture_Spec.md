@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
 > **Audience**: Executives, Compliance Officers, Risk Officers
-> **Related Doc**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
+> **Related Architecture**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (TOTP RFC 6238 specifications, HMAC-SHA1 algorithms, SIM Swap attack vectors, SS7 hijacking, TOTP secret encryption AES/GCM, FIDO2 technical standards) moved to Architecture layer. This document focuses on business risk analysis and decision-making only.

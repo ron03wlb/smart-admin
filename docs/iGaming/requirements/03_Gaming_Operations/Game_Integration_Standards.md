@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: Executives, Product Managers, Operations Leads, Compliance Officers
-> **Related Doc**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
+> **Related Architecture**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (HMAC-SHA256, TLS, Type A/B/C classifications, HTTP status codes) moved to Architecture layer. This document focuses on business requirements only.

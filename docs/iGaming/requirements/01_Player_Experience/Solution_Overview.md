@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-06_Solution_Overview.md](../../source-archive/00_Foundation/guides/00-06_Solution_Overview.md)
 > **Audience**: Executives, Product Managers
-> **Related Doc**: [Platform_Architecture.md](../../architecture/00_Overview/Platform_Architecture.md)
+> **Related Architecture**: [Platform_Architecture.md](../../architecture/00_Overview/Platform_Architecture.md)
 > **Last Synced**: 2026-02-08
 
 ---

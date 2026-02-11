@@ -3,7 +3,7 @@
 > **Canonical Source**: [source-archive/14_Third_Party_Integration/14-01](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md)
 > **View Type**: Business Requirements
 > **Target Audience**: Product Managers, Integration Managers, Operations Team
-> **Related Doc**: [Third Party Integration Architecture](../../architecture/14_Third_Party/Third_Party_Integration_Architecture.md)
+> **Related Architecture**: [Third Party Integration Architecture](../../architecture/14_Third_Party/Third_Party_Integration_Architecture.md)
 > **Last Synced**: 2026-02-09
 
 ---

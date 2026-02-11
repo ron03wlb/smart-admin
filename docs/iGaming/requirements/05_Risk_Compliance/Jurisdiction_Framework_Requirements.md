@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
 > **Audience**: Executives, Compliance Officers
-> **Related Doc**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)
+> **Related Architecture**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md)
 > **Last Synced**: 2026-02-08
 
 ---

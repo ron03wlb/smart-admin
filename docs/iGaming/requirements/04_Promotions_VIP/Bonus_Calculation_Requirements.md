@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 > **Audience**: Executives, Product Managers
-> **Related Doc**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
+> **Related Architecture**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 1.0.0
 

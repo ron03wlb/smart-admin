@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [00-13_Promotion_Implementation.md](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md)
 > **Audience**: Executives, Product Managers, Operations Teams
-> **Related Doc**: [Promotion_Implementation.md](../../architecture/04_Activity_Engine/Promotion_Implementation.md)
+> **Related Architecture**: [Promotion_Implementation.md](../../architecture/04_Activity_Engine/Promotion_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---

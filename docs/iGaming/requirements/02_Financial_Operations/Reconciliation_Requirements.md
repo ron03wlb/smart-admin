@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
 > **Audience**: Executives, Compliance Officers, Finance Team, Operations Managers
-> **Related Doc**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
+> **Related Architecture**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (PostgreSQL/S3 Glacier storage, UTC timezone conversion algorithms, 3DS verification implementation, blockchain confirmation counts) moved to Architecture layer. This document focuses on business requirements only.
