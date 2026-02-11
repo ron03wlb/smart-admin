@@ -183,3 +183,158 @@ Response:
 | **Reviewer** | Approve/Reject in_review | Quality assurance |
 | **Publisher** | Publish approved to production | Release management |
 | **Admin** | All operations | System administration |
+
+---
+
+## 7. SmartAdmin Implementation
+
+### 7.1 Translation Workflow Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class TranslationWorkflowService {
+
+    private final TranslationDao translationDao;
+    private final TranslationStateManager stateManager;
+
+    /**
+     * Get translation by key and language using Vavr Option.
+     */
+    public Option<TranslationVO> getTranslation(String key, String lang) {
+        return Option.of(translationDao.selectByKeyAndLang(key, lang))
+            .map(entity -> SmartBeanUtil.copy(entity, TranslationVO.class));
+    }
+
+    /**
+     * Submit translation for review.
+     */
+    public ResponseDTO<Void> submitForReview(TranslationSubmitForm form) {
+        return stateManager.transitionState(form.getTranslationId(), TranslationState.IN_REVIEW, form);
+    }
+}
+```
+
+### 7.2 Translation State Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class TranslationStateManager {
+
+    private final TranslationDao translationDao;
+    private final TranslationHistoryDao historyDao;
+
+    /**
+     * Transition translation state with validation.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> transitionState(Long translationId, TranslationState newState, TranslationSubmitForm form) {
+        TranslationEntity entity = translationDao.selectById(translationId);
+        if (entity == null) {
+            return ResponseDTO.userErrorParam("Translation not found");
+        }
+
+        // Validate state transition
+        if (!isValidTransition(TranslationState.valueOf(entity.getStatus()), newState)) {
+            return ResponseDTO.userErrorParam("Invalid state transition");
+        }
+
+        // Record history
+        TranslationHistoryEntity history = new TranslationHistoryEntity();
+        history.setTranslationId(translationId);
+        history.setFromStatus(entity.getStatus());
+        history.setToStatus(newState.name());
+        history.setComment(form.getComment());
+        history.setOperatorId(form.getOperatorId());
+        history.setCreatedAt(LocalDateTime.now());
+        historyDao.insert(history);
+
+        // Update status
+        entity.setStatus(newState.name());
+        entity.setUpdatedAt(LocalDateTime.now());
+        translationDao.updateById(entity);
+
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 7.3 Database Schema
+
+```sql
+-- Translation key registry
+CREATE TABLE t_translation_key (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    namespace       VARCHAR(50) NOT NULL,
+    key_name        VARCHAR(200) NOT NULL,
+    description     VARCHAR(500),
+    source_text     TEXT NOT NULL,
+    context_url     VARCHAR(500),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_translation_key UNIQUE (tenant_id, namespace, key_name)
+);
+
+CREATE INDEX idx_trans_key_ns ON t_translation_key(tenant_id, namespace);
+
+-- Translation values per language
+CREATE TABLE t_translation_value (
+    id              BIGSERIAL PRIMARY KEY,
+    key_id          BIGINT NOT NULL REFERENCES t_translation_key(id),
+    lang_code       VARCHAR(10) NOT NULL,
+    translated_text TEXT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    translator_id   BIGINT,
+    reviewer_id     BIGINT,
+    published_at    TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_trans_value UNIQUE (key_id, lang_code)
+);
+
+CREATE INDEX idx_trans_value_status ON t_translation_value(status, lang_code);
+
+-- Translation workflow history
+CREATE TABLE t_translation_history (
+    id              BIGSERIAL PRIMARY KEY,
+    translation_id  BIGINT NOT NULL REFERENCES t_translation_value(id),
+    from_status     VARCHAR(20) NOT NULL,
+    to_status       VARCHAR(20) NOT NULL,
+    comment         VARCHAR(500),
+    operator_id     BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_trans_history ON t_translation_history(translation_id, created_at DESC);
+
+-- Missing key auto-capture log
+CREATE TABLE t_translation_missing_key (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    namespace       VARCHAR(50) NOT NULL,
+    key_name        VARCHAR(200) NOT NULL,
+    fallback_value  TEXT,
+    page_url        VARCHAR(500),
+    lang_codes      JSONB,
+    captured_at     TIMESTAMP NOT NULL DEFAULT NOW(),
+    resolved        BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_missing_key_resolved ON t_translation_missing_key(tenant_id, resolved);
+
+-- CDN publish log
+CREATE TABLE t_translation_publish (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    lang_code       VARCHAR(10) NOT NULL,
+    namespace       VARCHAR(50),
+    key_count       INTEGER NOT NULL,
+    cdn_url         VARCHAR(500) NOT NULL,
+    published_by    BIGINT NOT NULL,
+    published_at    TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_publish_tenant ON t_translation_publish(tenant_id, published_at DESC);
+```

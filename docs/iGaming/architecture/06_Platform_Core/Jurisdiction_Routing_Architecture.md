@@ -549,7 +549,97 @@ flowchart TD
 
 ---
 
-## 9. Cross-References
+## 9. Database Schema
+
+```sql
+-- Jurisdiction configuration table
+CREATE TABLE t_jurisdiction_config (
+    id              BIGSERIAL PRIMARY KEY,
+    jurisdiction_code VARCHAR(20) NOT NULL UNIQUE,
+    display_name    VARCHAR(100) NOT NULL,
+    regulator_name  VARCHAR(200),
+    website         VARCHAR(500),
+    allowed_countries JSONB NOT NULL DEFAULT '[]',
+    blocked_countries JSONB NOT NULL DEFAULT '[]',
+    immediate_kyc_required BOOLEAN NOT NULL DEFAULT FALSE,
+    kyc_grace_period_hours INTEGER,
+    enhanced_due_diligence_required BOOLEAN NOT NULL DEFAULT FALSE,
+    self_exclusion_required BOOLEAN NOT NULL DEFAULT TRUE,
+    deposit_limits_required BOOLEAN NOT NULL DEFAULT TRUE,
+    mandatory_cooling_off BOOLEAN NOT NULL DEFAULT FALSE,
+    reality_check_minutes INTEGER,
+    affordability_check_required BOOLEAN NOT NULL DEFAULT FALSE,
+    allowed_game_types JSONB NOT NULL DEFAULT '[]',
+    blocked_game_types JSONB NOT NULL DEFAULT '[]',
+    max_bet_amount DECIMAL(15, 2),
+    max_win_amount DECIMAL(15, 2),
+    credit_cards_allowed BOOLEAN NOT NULL DEFAULT TRUE,
+    crypto_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    allowed_payment_methods JSONB NOT NULL DEFAULT '[]',
+    ggr_tax_rate DECIMAL(5, 4),
+    withholding_tax_required BOOLEAN NOT NULL DEFAULT FALSE,
+    withholding_tax_rate DECIMAL(5, 4),
+    reporting_frequency_days INTEGER NOT NULL DEFAULT 30,
+    reporting_config JSONB,
+    exclusion_database_url VARCHAR(500),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    effective_from TIMESTAMP,
+    effective_to TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_jurisdiction_active ON t_jurisdiction_config(active, jurisdiction_code);
+
+-- GeoIP lookup cache
+CREATE TABLE t_geoip_cache (
+    id              BIGSERIAL PRIMARY KEY,
+    ip_address      VARCHAR(45) NOT NULL,
+    country_code    VARCHAR(2) NOT NULL,
+    state_code      VARCHAR(10),
+    city            VARCHAR(100),
+    is_vpn          BOOLEAN NOT NULL DEFAULT FALSE,
+    is_proxy        BOOLEAN NOT NULL DEFAULT FALSE,
+    lookup_provider VARCHAR(50) NOT NULL,
+    cached_at       TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at      TIMESTAMP NOT NULL,
+    CONSTRAINT uk_geoip_ip UNIQUE (ip_address)
+);
+
+CREATE INDEX idx_geoip_expires ON t_geoip_cache(expires_at);
+
+-- Geo-fence violation log
+CREATE TABLE t_geofence_violation_log (
+    id              BIGSERIAL PRIMARY KEY,
+    player_id       BIGINT NOT NULL,
+    session_id      VARCHAR(100),
+    ip_address      VARCHAR(45) NOT NULL,
+    detected_country VARCHAR(2) NOT NULL,
+    registered_jurisdiction VARCHAR(20) NOT NULL,
+    violation_reason VARCHAR(50) NOT NULL,
+    action_taken    VARCHAR(50) NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_geofence_player ON t_geofence_violation_log(player_id, created_at DESC);
+
+-- Jurisdiction rule violation log
+CREATE TABLE t_jurisdiction_rule_violation (
+    id              BIGSERIAL PRIMARY KEY,
+    player_id       BIGINT NOT NULL,
+    jurisdiction_code VARCHAR(20) NOT NULL,
+    rule_type       VARCHAR(50) NOT NULL,
+    rule_code       VARCHAR(50) NOT NULL,
+    violation_message TEXT NOT NULL,
+    context         JSONB,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_rule_violation ON t_jurisdiction_rule_violation(jurisdiction_code, rule_type, created_at DESC);
+
+---
+
+## 10. Cross-References
 
 | Topic | Document |
 |-------|----------|

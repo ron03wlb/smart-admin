@@ -374,6 +374,72 @@ public class RateLimitFilter implements GlobalFilter {
 
 ---
 
+## 6. Database Schema
+
+```sql
+-- Gateway route configuration
+CREATE TABLE t_gateway_route_config (
+    id              BIGSERIAL PRIMARY KEY,
+    route_id        VARCHAR(100) NOT NULL UNIQUE,
+    uri             VARCHAR(500) NOT NULL,
+    predicates      JSONB NOT NULL,
+    filters         JSONB,
+    metadata        JSONB,
+    order_num       INTEGER NOT NULL DEFAULT 0,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_route_enabled ON t_gateway_route_config(enabled, order_num);
+
+-- Deployment history tracking
+CREATE TABLE t_deployment_history (
+    id              BIGSERIAL PRIMARY KEY,
+    service_name    VARCHAR(100) NOT NULL,
+    version         VARCHAR(50) NOT NULL,
+    environment     VARCHAR(20) NOT NULL,
+    deployment_type VARCHAR(20) NOT NULL,
+    status          VARCHAR(20) NOT NULL,
+    deployed_by     VARCHAR(100),
+    started_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    completed_at    TIMESTAMP,
+    rollback_version VARCHAR(50),
+    notes           TEXT
+);
+
+CREATE INDEX idx_deploy_service ON t_deployment_history(service_name, environment, started_at DESC);
+
+-- Rate limiter configuration
+CREATE TABLE t_rate_limiter_config (
+    id              BIGSERIAL PRIMARY KEY,
+    limiter_key     VARCHAR(200) NOT NULL UNIQUE,
+    layer           VARCHAR(20) NOT NULL,
+    replenish_rate  INTEGER NOT NULL,
+    burst_capacity  INTEGER NOT NULL,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_limiter_layer ON t_rate_limiter_config(layer, enabled);
+
+-- Circuit breaker configuration
+CREATE TABLE t_circuit_breaker_config (
+    id              BIGSERIAL PRIMARY KEY,
+    service_name    VARCHAR(100) NOT NULL UNIQUE,
+    failure_rate_threshold DECIMAL(5, 2) NOT NULL DEFAULT 50,
+    wait_duration_seconds INTEGER NOT NULL DEFAULT 30,
+    sliding_window_size INTEGER NOT NULL DEFAULT 100,
+    minimum_calls   INTEGER NOT NULL DEFAULT 10,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+```
+
+---
+
 **Document Version**: 1.0.0
 **Last Updated**: 2026-02-08
 **Source Version**: 4.0.0

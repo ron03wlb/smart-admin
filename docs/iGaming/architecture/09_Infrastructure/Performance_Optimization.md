@@ -399,6 +399,112 @@ Overall P99 Latency: <=200ms (vs 1,240ms 優化前)
 
 ---
 
+## 9. SmartAdmin Implementation
+
+### 9.1 Performance Metrics Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class PerformanceMetricsService {
+
+    private final PerformanceMetricsDao metricsDao;
+    private final PerformanceAlertManager alertManager;
+
+    /**
+     * Query performance metrics by time range using Vavr Option.
+     */
+    public Option<PerformanceMetricsVO> getMetrics(LocalDate date, String serviceName) {
+        return Option.of(metricsDao.selectByDateAndService(date, serviceName))
+            .map(entity -> SmartBeanUtil.copy(entity, PerformanceMetricsVO.class));
+    }
+
+    /**
+     * Record performance snapshot.
+     */
+    public void recordMetrics(PerformanceMetricsForm form) {
+        alertManager.checkAndRecord(form);
+    }
+}
+```
+
+### 9.2 Performance Alert Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class PerformanceAlertManager {
+
+    private final PerformanceMetricsDao metricsDao;
+    private final AlertNotificationDao alertDao;
+
+    /**
+     * Check thresholds and record metrics.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void checkAndRecord(PerformanceMetricsForm form) {
+        PerformanceMetricsEntity entity = SmartBeanUtil.copy(form, PerformanceMetricsEntity.class);
+        entity.setRecordedAt(LocalDateTime.now());
+        metricsDao.insert(entity);
+
+        // Check for alert conditions
+        if (form.getP99LatencyMs() > 200 || form.getErrorRate().compareTo(new BigDecimal("0.01")) > 0) {
+            AlertNotificationEntity alert = new AlertNotificationEntity();
+            alert.setServiceName(form.getServiceName());
+            alert.setSeverity("WARNING");
+            alert.setMessage("Performance degradation detected");
+            alertDao.insert(alert);
+        }
+    }
+}
+```
+
+### 9.3 Database Schema
+
+```sql
+-- Performance metrics tracking
+CREATE TABLE t_performance_metrics (
+    id              BIGSERIAL PRIMARY KEY,
+    service_name    VARCHAR(100) NOT NULL,
+    metric_date     DATE NOT NULL,
+    tps             INTEGER NOT NULL DEFAULT 0,
+    p50_latency_ms  INTEGER NOT NULL DEFAULT 0,
+    p95_latency_ms  INTEGER NOT NULL DEFAULT 0,
+    p99_latency_ms  INTEGER NOT NULL DEFAULT 0,
+    error_rate      DECIMAL(5, 4) NOT NULL DEFAULT 0,
+    cache_hit_rate  DECIMAL(5, 4) NOT NULL DEFAULT 0,
+    recorded_at     TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_perf_metrics UNIQUE (service_name, metric_date)
+);
+
+CREATE INDEX idx_perf_service ON t_performance_metrics(service_name, metric_date DESC);
+
+-- Wallet sharding configuration
+CREATE TABLE t_wallet_shard_config (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL UNIQUE,
+    shard_count     INTEGER NOT NULL DEFAULT 8,
+    shard_strategy  VARCHAR(50) NOT NULL DEFAULT 'HASH',
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Performance baseline tracking
+CREATE TABLE t_performance_baseline (
+    id              BIGSERIAL PRIMARY KEY,
+    service_name    VARCHAR(100) NOT NULL UNIQUE,
+    baseline_tps    INTEGER NOT NULL,
+    baseline_p99_ms INTEGER NOT NULL,
+    baseline_error_rate DECIMAL(5, 4) NOT NULL,
+    established_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+```
+
+---
+
 ## 相關文檔
 
 - [Caching Strategy](./Caching_Strategy.md) - JetCache 多級緩存

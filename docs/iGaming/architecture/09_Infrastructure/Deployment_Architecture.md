@@ -308,6 +308,127 @@ if (featureFlag) {
 
 ---
 
+## 8. SmartAdmin Implementation
+
+### 8.1 Deployment Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class DeploymentService {
+
+    private final DeploymentHistoryDao deploymentDao;
+    private final DeploymentManager deploymentManager;
+
+    /**
+     * Query deployment history using Vavr Option.
+     */
+    public Option<DeploymentHistoryVO> getLatestDeployment(String serviceName, String environment) {
+        return Option.of(deploymentDao.selectLatest(serviceName, environment))
+            .map(entity -> SmartBeanUtil.copy(entity, DeploymentHistoryVO.class));
+    }
+
+    /**
+     * Initiate new deployment.
+     */
+    public ResponseDTO<Long> startDeployment(DeploymentForm form) {
+        return deploymentManager.initiateDeployment(form);
+    }
+}
+```
+
+### 8.2 Deployment Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class DeploymentManager {
+
+    private final DeploymentHistoryDao deploymentDao;
+    private final EnvironmentConfigDao envConfigDao;
+
+    /**
+     * Initiate deployment with transaction support.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Long> initiateDeployment(DeploymentForm form) {
+        DeploymentHistoryEntity entity = SmartBeanUtil.copy(form, DeploymentHistoryEntity.class);
+        entity.setStatus("IN_PROGRESS");
+        entity.setStartedAt(LocalDateTime.now());
+        deploymentDao.insert(entity);
+        return ResponseDTO.ok(entity.getId());
+    }
+
+    /**
+     * Complete deployment and update status.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> completeDeployment(Long deploymentId, String status) {
+        deploymentDao.updateStatus(deploymentId, status, LocalDateTime.now());
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 8.3 Database Schema
+
+```sql
+-- Deployment environment configuration
+CREATE TABLE t_environment_config (
+    id              BIGSERIAL PRIMARY KEY,
+    environment     VARCHAR(20) NOT NULL UNIQUE,
+    namespace       VARCHAR(100) NOT NULL,
+    cluster_name    VARCHAR(100) NOT NULL,
+    data_source     VARCHAR(50) NOT NULL,
+    is_production   BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Canary deployment tracking
+CREATE TABLE t_canary_deployment (
+    id              BIGSERIAL PRIMARY KEY,
+    deployment_id   BIGINT NOT NULL REFERENCES t_deployment_history(id),
+    phase           INTEGER NOT NULL DEFAULT 1,
+    traffic_weight  INTEGER NOT NULL DEFAULT 5,
+    started_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    completed_at    TIMESTAMP,
+    error_rate      DECIMAL(5, 4),
+    p99_latency_ms  INTEGER,
+    status          VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS'
+);
+
+CREATE INDEX idx_canary_deploy ON t_canary_deployment(deployment_id, phase);
+
+-- Feature flag configuration
+CREATE TABLE t_feature_flag (
+    id              BIGSERIAL PRIMARY KEY,
+    flag_key        VARCHAR(100) NOT NULL UNIQUE,
+    description     VARCHAR(500),
+    enabled         BOOLEAN NOT NULL DEFAULT FALSE,
+    rollout_percent INTEGER NOT NULL DEFAULT 0,
+    target_users    JSONB,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_feature_flag_enabled ON t_feature_flag(enabled);
+
+-- Seed data tracking
+CREATE TABLE t_seed_data_log (
+    id              BIGSERIAL PRIMARY KEY,
+    seed_type       VARCHAR(50) NOT NULL,
+    seed_key        VARCHAR(100) NOT NULL,
+    applied_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    applied_by      VARCHAR(100),
+    version         VARCHAR(20),
+    CONSTRAINT uk_seed_data UNIQUE (seed_type, seed_key)
+);
+```
+
+---
+
 ## 相關文檔
 
 - [Gateway Core Architecture](./Gateway_Core.md) - API Gateway 架構

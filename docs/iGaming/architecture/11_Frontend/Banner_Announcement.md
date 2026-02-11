@@ -135,3 +135,147 @@ location /banners/ {
 | CTR | - | (Clicks / Impressions) x 100% |
 | Conversions | `conversion_event` | COUNT(conversion_event) |
 | CVR | - | (Conversions / Clicks) x 100% |
+
+---
+
+## 8. SmartAdmin Implementation
+
+### 8.1 Banner Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class BannerService {
+
+    private final BannerDao bannerDao;
+    private final BannerPublishManager publishManager;
+
+    /**
+     * Get active banners for display using Vavr Option.
+     */
+    public List<BannerVO> getActiveBanners(Long tenantId, String deviceType, String lang) {
+        List<BannerEntity> banners = bannerDao.selectActiveByTenant(tenantId, deviceType);
+        return banners.stream()
+            .map(entity -> SmartBeanUtil.copy(entity, BannerVO.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Submit banner for approval workflow.
+     */
+    public ResponseDTO<Void> submitForApproval(BannerApprovalForm form) {
+        return publishManager.submitForApproval(form);
+    }
+}
+```
+
+### 8.2 Banner Publish Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class BannerPublishManager {
+
+    private final BannerDao bannerDao;
+    private final BannerApprovalDao approvalDao;
+
+    /**
+     * Submit banner for approval with validation.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> submitForApproval(BannerApprovalForm form) {
+        BannerEntity banner = bannerDao.selectById(form.getBannerId());
+        if (banner == null) {
+            return ResponseDTO.userErrorParam("Banner not found");
+        }
+
+        // Create approval record
+        BannerApprovalEntity approval = new BannerApprovalEntity();
+        approval.setBannerId(form.getBannerId());
+        approval.setSubmittedBy(form.getOperatorId());
+        approval.setStatus(ApprovalStatus.PENDING.getValue());
+        approval.setCreatedAt(LocalDateTime.now());
+        approvalDao.insert(approval);
+
+        // Update banner status
+        banner.setStatus(BannerStatus.PENDING_APPROVAL.getValue());
+        bannerDao.updateById(banner);
+
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 8.3 Database Schema
+
+```sql
+-- Banner configuration table
+CREATE TABLE t_banner (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    banner_name     VARCHAR(100) NOT NULL,
+    title           JSONB NOT NULL,
+    images          JSONB NOT NULL,
+    link_url        JSONB NOT NULL,
+    device_target   VARCHAR(20) NOT NULL DEFAULT 'all',
+    display_order   INTEGER NOT NULL DEFAULT 0,
+    status          SMALLINT NOT NULL DEFAULT 0,
+    effective_start TIMESTAMP,
+    effective_end   TIMESTAMP,
+    experiment_id   BIGINT,
+    created_by      BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_banner_tenant_status ON t_banner(tenant_id, status, device_target) WHERE deleted = FALSE;
+CREATE INDEX idx_banner_effective ON t_banner(effective_start, effective_end) WHERE status = 1 AND deleted = FALSE;
+
+-- Banner approval workflow
+CREATE TABLE t_banner_approval (
+    id              BIGSERIAL PRIMARY KEY,
+    banner_id       BIGINT NOT NULL REFERENCES t_banner(id),
+    submitted_by    BIGINT NOT NULL,
+    reviewed_by     BIGINT,
+    status          SMALLINT NOT NULL DEFAULT 0,
+    rejection_reason VARCHAR(500),
+    submitted_at    TIMESTAMP NOT NULL DEFAULT NOW(),
+    reviewed_at     TIMESTAMP
+);
+
+CREATE INDEX idx_approval_status ON t_banner_approval(status, submitted_at DESC);
+
+-- Banner analytics tracking
+CREATE TABLE t_banner_analytics (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    banner_id       BIGINT NOT NULL,
+    event_date      DATE NOT NULL,
+    impressions     BIGINT NOT NULL DEFAULT 0,
+    clicks          BIGINT NOT NULL DEFAULT 0,
+    conversions     BIGINT NOT NULL DEFAULT 0,
+    unique_viewers  BIGINT NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_banner_analytics UNIQUE (banner_id, event_date)
+);
+
+CREATE INDEX idx_banner_analytics_date ON t_banner_analytics(tenant_id, event_date DESC);
+
+-- A/B test experiment configuration
+CREATE TABLE t_banner_experiment (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    experiment_name VARCHAR(100) NOT NULL,
+    variants        JSONB NOT NULL,
+    traffic_split   JSONB NOT NULL,
+    status          SMALLINT NOT NULL DEFAULT 0,
+    start_time      TIMESTAMP NOT NULL,
+    end_time        TIMESTAMP NOT NULL,
+    created_by      BIGINT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_experiment_status ON t_banner_experiment(tenant_id, status);
+```

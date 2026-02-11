@@ -226,6 +226,77 @@ All security-relevant operations must produce audit logs with:
 
 ---
 
+## 6. Database Schema
+
+```sql
+-- ISO 27001 control implementation tracking
+CREATE TABLE t_iso27001_control (
+    id              BIGSERIAL PRIMARY KEY,
+    control_id      VARCHAR(20) NOT NULL UNIQUE,
+    category        VARCHAR(50) NOT NULL,
+    description     VARCHAR(500) NOT NULL,
+    implementation  TEXT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    smartadmin_component VARCHAR(200),
+    evidence_path   VARCHAR(500),
+    last_reviewed   TIMESTAMP,
+    reviewed_by     BIGINT,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_iso_category ON t_iso27001_control(category, status);
+
+-- Gap remediation tracking
+CREATE TABLE t_iso27001_gap_remediation (
+    id              BIGSERIAL PRIMARY KEY,
+    control_id      VARCHAR(20) NOT NULL,
+    gap_description TEXT NOT NULL,
+    recommended_action TEXT NOT NULL,
+    priority        VARCHAR(10) NOT NULL,
+    estimated_effort VARCHAR(50),
+    assigned_to     BIGINT,
+    target_date     DATE,
+    completed_date  DATE,
+    status          VARCHAR(20) NOT NULL DEFAULT 'OPEN',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_gap_status ON t_iso27001_gap_remediation(status, priority);
+
+-- Security training records
+CREATE TABLE t_security_training (
+    id              BIGSERIAL PRIMARY KEY,
+    employee_id     BIGINT NOT NULL,
+    training_module VARCHAR(100) NOT NULL,
+    completed_at    TIMESTAMP,
+    score           INTEGER,
+    passed          BOOLEAN,
+    valid_until     DATE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_training_employee ON t_security_training(employee_id, training_module);
+
+-- Compliance audit log
+CREATE TABLE t_compliance_audit_log (
+    id              BIGSERIAL PRIMARY KEY,
+    control_id      VARCHAR(20) NOT NULL,
+    audit_type      VARCHAR(50) NOT NULL,
+    auditor_id      BIGINT,
+    audit_date      DATE NOT NULL,
+    finding         TEXT,
+    recommendation  TEXT,
+    status          VARCHAR(20) NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_audit_control ON t_compliance_audit_log(control_id, audit_date DESC);
+```
+
+---
+
 ## Related Documents
 
 - [UK RTS Security](./UK_RTS_Security.md) - UK Gambling Commission RTS Section 4

@@ -210,6 +210,127 @@ public void warmUpActivePlayerCache() {
 
 ---
 
+## 7. SmartAdmin Implementation
+
+### 7.1 Cache Configuration Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class CacheConfigService {
+
+    private final CacheConfigDao cacheConfigDao;
+    private final CacheInvalidationManager cacheManager;
+
+    /**
+     * Query cache configuration using Vavr Option.
+     */
+    public Option<CacheConfigVO> getCacheConfig(String cacheName) {
+        return Option.of(cacheConfigDao.selectByName(cacheName))
+            .map(entity -> SmartBeanUtil.copy(entity, CacheConfigVO.class));
+    }
+
+    /**
+     * Invalidate cache entry.
+     */
+    public ResponseDTO<Void> invalidateCache(CacheInvalidationForm form) {
+        return cacheManager.invalidate(form);
+    }
+}
+```
+
+### 7.2 Cache Invalidation Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class CacheInvalidationManager {
+
+    private final Cache<String, Object> caffeineCache;
+    private final RedissonClient redissonClient;
+    private final CacheInvalidationLogDao logDao;
+
+    /**
+     * Invalidate cache across all layers.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> invalidate(CacheInvalidationForm form) {
+        // L1: Clear Caffeine
+        caffeineCache.invalidate(form.getCacheKey());
+
+        // L2: Clear Redis
+        redissonClient.getBucket(form.getCacheKey()).delete();
+
+        // Log invalidation
+        CacheInvalidationLogEntity log = new CacheInvalidationLogEntity();
+        log.setCacheName(form.getCacheName());
+        log.setCacheKey(form.getCacheKey());
+        log.setReason(form.getReason());
+        log.setInvalidatedAt(LocalDateTime.now());
+        logDao.insert(log);
+
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 7.3 Database Schema
+
+```sql
+-- Cache configuration
+CREATE TABLE t_cache_config (
+    id              BIGSERIAL PRIMARY KEY,
+    cache_name      VARCHAR(100) NOT NULL UNIQUE,
+    cache_type      VARCHAR(20) NOT NULL DEFAULT 'BOTH',
+    l1_ttl_seconds  INTEGER NOT NULL DEFAULT 100,
+    l2_ttl_seconds  INTEGER NOT NULL DEFAULT 3600,
+    max_entries     INTEGER NOT NULL DEFAULT 10000,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Cache invalidation log
+CREATE TABLE t_cache_invalidation_log (
+    id              BIGSERIAL PRIMARY KEY,
+    cache_name      VARCHAR(100) NOT NULL,
+    cache_key       VARCHAR(500) NOT NULL,
+    reason          VARCHAR(200),
+    invalidated_by  BIGINT,
+    invalidated_at  TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_cache_inv_time ON t_cache_invalidation_log(invalidated_at DESC);
+
+-- Cache hit statistics
+CREATE TABLE t_cache_hit_stats (
+    id              BIGSERIAL PRIMARY KEY,
+    cache_name      VARCHAR(100) NOT NULL,
+    stat_date       DATE NOT NULL,
+    l1_hits         BIGINT NOT NULL DEFAULT 0,
+    l2_hits         BIGINT NOT NULL DEFAULT 0,
+    misses          BIGINT NOT NULL DEFAULT 0,
+    hit_rate        DECIMAL(5, 4) NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_cache_stats UNIQUE (cache_name, stat_date)
+);
+
+CREATE INDEX idx_cache_stats_date ON t_cache_hit_stats(stat_date DESC);
+
+-- Bloom filter configuration
+CREATE TABLE t_bloom_filter_config (
+    id              BIGSERIAL PRIMARY KEY,
+    filter_name     VARCHAR(100) NOT NULL UNIQUE,
+    expected_insertions BIGINT NOT NULL DEFAULT 1000000,
+    false_positive_rate DECIMAL(5, 4) NOT NULL DEFAULT 0.01,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+```
+
+---
+
 ## 相關文檔
 
 - [Performance Optimization](./Performance_Optimization.md) - 性能優化規範

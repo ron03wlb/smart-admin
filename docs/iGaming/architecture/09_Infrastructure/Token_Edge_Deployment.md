@@ -854,6 +854,68 @@ class TokenValidationIntegrationTest {
 
 ---
 
+## 8. Database Schema
+
+```sql
+-- Nonce tracking for replay attack prevention
+CREATE TABLE t_nonce_log (
+    id              BIGSERIAL PRIMARY KEY,
+    nonce           VARCHAR(64) NOT NULL UNIQUE,
+    actor_id        BIGINT,
+    actor_type      VARCHAR(20),
+    ip_address      VARCHAR(45),
+    used_at         TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at      TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_nonce_expires ON t_nonce_log(expires_at);
+CREATE INDEX idx_nonce_actor ON t_nonce_log(actor_id, used_at DESC);
+
+-- Rate limit state persistence (for recovery)
+CREATE TABLE t_rate_limit_state (
+    id              BIGSERIAL PRIMARY KEY,
+    limit_key       VARCHAR(200) NOT NULL UNIQUE,
+    tokens          INTEGER NOT NULL,
+    last_refill     TIMESTAMP NOT NULL,
+    bucket_capacity INTEGER NOT NULL,
+    refill_rate     INTEGER NOT NULL,
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_rate_limit_key ON t_rate_limit_state(limit_key);
+
+-- Circuit breaker state tracking
+CREATE TABLE t_circuit_breaker_event (
+    id              BIGSERIAL PRIMARY KEY,
+    service_name    VARCHAR(100) NOT NULL,
+    state           VARCHAR(20) NOT NULL,
+    failure_count   INTEGER NOT NULL DEFAULT 0,
+    success_count   INTEGER NOT NULL DEFAULT 0,
+    last_failure_at TIMESTAMP,
+    opened_at       TIMESTAMP,
+    closed_at       TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_cb_service ON t_circuit_breaker_event(service_name, created_at DESC);
+
+-- Deployment health check log
+CREATE TABLE t_health_check_log (
+    id              BIGSERIAL PRIMARY KEY,
+    az_name         VARCHAR(50) NOT NULL,
+    instance_id     VARCHAR(100) NOT NULL,
+    service_name    VARCHAR(100) NOT NULL,
+    status          VARCHAR(20) NOT NULL,
+    latency_ms      INTEGER,
+    error_message   TEXT,
+    checked_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_health_az ON t_health_check_log(az_name, service_name, checked_at DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [Token Validation Service](./Token_Validation_Service.md) - 服務總覽

@@ -469,4 +469,92 @@ flowchart TD
 
 ---
 
+## 9. Database Schema
+
+```sql
+-- Customer service ticket table
+CREATE TABLE t_customer_service_ticket (
+    id              BIGSERIAL PRIMARY KEY,
+    ticket_id       BIGINT NOT NULL UNIQUE,
+    player_id       BIGINT NOT NULL,
+    type            VARCHAR(50) NOT NULL,
+    priority        VARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+    status          VARCHAR(20) NOT NULL DEFAULT 'NEW',
+    assigned_agent_id BIGINT,
+    subject         VARCHAR(200) NOT NULL,
+    description     TEXT,
+    first_response_time TIMESTAMP,
+    resolved_time   TIMESTAMP,
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_ticket_player ON t_customer_service_ticket(player_id, status);
+CREATE INDEX idx_ticket_agent ON t_customer_service_ticket(assigned_agent_id, status);
+CREATE INDEX idx_ticket_priority ON t_customer_service_ticket(priority, status, created_at);
+
+-- Agent information table
+CREATE TABLE t_cs_agent (
+    id              BIGSERIAL PRIMARY KEY,
+    agent_id        BIGINT NOT NULL UNIQUE,
+    name            VARCHAR(100) NOT NULL,
+    level           VARCHAR(20) NOT NULL DEFAULT 'REGULAR',
+    native_language VARCHAR(10) NOT NULL,
+    fluent_languages JSONB,
+    basic_languages JSONB,
+    current_ticket_count INTEGER NOT NULL DEFAULT 0,
+    max_concurrent_tickets INTEGER NOT NULL DEFAULT 10,
+    status          VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_agent_status ON t_cs_agent(status, level);
+
+-- SLA configuration table
+CREATE TABLE t_sla_config (
+    id              BIGSERIAL PRIMARY KEY,
+    priority        VARCHAR(20) NOT NULL,
+    vip_level       VARCHAR(20) NOT NULL,
+    first_response_minutes INTEGER NOT NULL,
+    resolution_minutes INTEGER NOT NULL,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_sla_config UNIQUE (priority, vip_level)
+);
+
+-- Chat message history
+CREATE TABLE t_chat_message (
+    id              BIGSERIAL PRIMARY KEY,
+    ticket_id       BIGINT NOT NULL,
+    sender_type     VARCHAR(20) NOT NULL,
+    sender_id       BIGINT NOT NULL,
+    message_content TEXT NOT NULL,
+    attachments     JSONB,
+    sent_at         TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_chat_ticket ON t_chat_message(ticket_id, sent_at);
+
+-- Knowledge base article
+CREATE TABLE t_knowledge_article (
+    id              BIGSERIAL PRIMARY KEY,
+    article_id      BIGINT NOT NULL UNIQUE,
+    title           VARCHAR(200) NOT NULL,
+    content         TEXT NOT NULL,
+    category        VARCHAR(50) NOT NULL,
+    tags            JSONB,
+    view_count      INTEGER NOT NULL DEFAULT 0,
+    helpful_count   INTEGER NOT NULL DEFAULT 0,
+    status          VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    published_at    TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_article_category ON t_knowledge_article(category, status);
+```
+
+---
+
 **Return**: [Customer Service Module](../../source-archive/13_Customer_Service/README.md) | [iGaming Home](../../source-archive/README.md)

@@ -286,6 +286,76 @@ POST /api/v1/bonuses/batch-create
 
 ---
 
+## 6. SmartAdmin Implementation
+
+### 6.1 Error Code Registry Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ErrorCodeService {
+
+    private final ErrorCodeDao errorCodeDao;
+
+    /**
+     * Query error code definition using Vavr Option.
+     */
+    public Option<ErrorCodeVO> getErrorCode(Integer code) {
+        return Option.of(errorCodeDao.selectByCode(code))
+            .map(entity -> SmartBeanUtil.copy(entity, ErrorCodeVO.class));
+    }
+}
+```
+
+### 6.2 Database Schema
+
+```sql
+-- Error code registry
+CREATE TABLE t_error_code (
+    id              BIGSERIAL PRIMARY KEY,
+    code            INTEGER NOT NULL UNIQUE,
+    category        VARCHAR(20) NOT NULL,
+    http_status     INTEGER NOT NULL,
+    message_key     VARCHAR(100) NOT NULL,
+    message_en      VARCHAR(200) NOT NULL,
+    message_zh      VARCHAR(200),
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_error_category ON t_error_code(category, enabled);
+
+-- API documentation group configuration
+CREATE TABLE t_api_doc_group (
+    id              BIGSERIAL PRIMARY KEY,
+    group_code      VARCHAR(50) NOT NULL UNIQUE,
+    display_name    VARCHAR(100) NOT NULL,
+    path_pattern    VARCHAR(200) NOT NULL,
+    sort_order      INTEGER NOT NULL DEFAULT 0,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Exception log for debugging
+CREATE TABLE t_exception_log (
+    id              BIGSERIAL PRIMARY KEY,
+    request_uri     VARCHAR(500) NOT NULL,
+    error_code      INTEGER,
+    error_message   TEXT,
+    stack_trace     TEXT,
+    request_body    TEXT,
+    user_id         BIGINT,
+    ip_address      VARCHAR(45),
+    user_agent      VARCHAR(500),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_exception_time ON t_exception_log(created_at DESC);
+CREATE INDEX idx_exception_code ON t_exception_log(error_code, created_at DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [API Design Principles](./API_Design_Principles.md) - API 設計原則

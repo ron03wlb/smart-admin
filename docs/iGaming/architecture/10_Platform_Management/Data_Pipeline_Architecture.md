@@ -378,6 +378,154 @@ ALTER TABLE dws_daily_revenue
 
 ---
 
+## 12. SmartAdmin Implementation
+
+### 12.1 Data Pipeline Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class DataPipelineService {
+
+    private final PipelineJobDao pipelineJobDao;
+    private final PipelineExecutionManager executionManager;
+
+    /**
+     * Get pipeline job status using Vavr Option.
+     */
+    public Option<PipelineJobVO> getJobStatus(Long jobId) {
+        return Option.of(pipelineJobDao.selectById(jobId))
+            .map(entity -> SmartBeanUtil.copy(entity, PipelineJobVO.class));
+    }
+
+    /**
+     * Trigger pipeline re-run for data correction.
+     */
+    public ResponseDTO<Long> triggerRerun(PipelineRerunForm form) {
+        return executionManager.executeRerun(form);
+    }
+}
+```
+
+### 12.2 Pipeline Execution Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class PipelineExecutionManager {
+
+    private final PipelineJobDao pipelineJobDao;
+    private final PipelineExecutionDao executionDao;
+
+    /**
+     * Execute pipeline re-run with idempotency.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Long> executeRerun(PipelineRerunForm form) {
+        // Create execution record
+        PipelineExecutionEntity execution = new PipelineExecutionEntity();
+        execution.setJobId(form.getJobId());
+        execution.setTargetDate(form.getTargetDate());
+        execution.setRerunReason(form.getReason());
+        execution.setStatus(ExecutionStatus.PENDING.getValue());
+        execution.setCreatedAt(LocalDateTime.now());
+        executionDao.insert(execution);
+
+        // Update job status
+        PipelineJobEntity job = pipelineJobDao.selectById(form.getJobId());
+        job.setLastExecutionId(execution.getId());
+        job.setStatus(JobStatus.RERUNNING.getValue());
+        pipelineJobDao.updateById(job);
+
+        return ResponseDTO.ok(execution.getId());
+    }
+}
+```
+
+### 12.3 Database Schema
+
+```sql
+-- Pipeline job configuration
+CREATE TABLE t_pipeline_job (
+    id              BIGSERIAL PRIMARY KEY,
+    job_name        VARCHAR(100) NOT NULL,
+    layer           VARCHAR(20) NOT NULL,
+    source_table    VARCHAR(100) NOT NULL,
+    target_table    VARCHAR(100) NOT NULL,
+    schedule_cron   VARCHAR(50),
+    status          SMALLINT NOT NULL DEFAULT 0,
+    last_execution_id BIGINT,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_pipeline_job_layer ON t_pipeline_job(layer, status);
+
+-- Pipeline execution history
+CREATE TABLE t_pipeline_execution (
+    id              BIGSERIAL PRIMARY KEY,
+    job_id          BIGINT NOT NULL REFERENCES t_pipeline_job(id),
+    target_date     DATE NOT NULL,
+    status          SMALLINT NOT NULL DEFAULT 0,
+    rerun_reason    VARCHAR(200),
+    started_at      TIMESTAMP,
+    completed_at    TIMESTAMP,
+    records_in      BIGINT,
+    records_out     BIGINT,
+    error_message   TEXT,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_execution_job ON t_pipeline_execution(job_id, target_date DESC);
+
+-- Data quality rules
+CREATE TABLE t_data_quality_rule (
+    id              BIGSERIAL PRIMARY KEY,
+    rule_name       VARCHAR(100) NOT NULL,
+    target_table    VARCHAR(100) NOT NULL,
+    check_type      VARCHAR(50) NOT NULL,
+    check_sql       TEXT NOT NULL,
+    threshold       DECIMAL(5, 2) NOT NULL,
+    severity        SMALLINT NOT NULL DEFAULT 1,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_quality_rule_table ON t_data_quality_rule(target_table) WHERE enabled = TRUE;
+
+-- PII masking configuration
+CREATE TABLE t_pii_masking_config (
+    id              BIGSERIAL PRIMARY KEY,
+    table_name      VARCHAR(100) NOT NULL,
+    column_name     VARCHAR(100) NOT NULL,
+    masking_type    VARCHAR(50) NOT NULL,
+    masking_pattern VARCHAR(100),
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_pii_config UNIQUE (table_name, column_name)
+);
+
+CREATE INDEX idx_pii_masking_table ON t_pii_masking_config(table_name) WHERE enabled = TRUE;
+
+-- Data retention policy
+CREATE TABLE t_data_retention_policy (
+    id              BIGSERIAL PRIMARY KEY,
+    layer           VARCHAR(20) NOT NULL,
+    table_name      VARCHAR(100) NOT NULL,
+    hot_days        INTEGER NOT NULL DEFAULT 90,
+    warm_days       INTEGER NOT NULL DEFAULT 365,
+    archive_days    INTEGER NOT NULL DEFAULT 2555,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_retention_layer ON t_data_retention_policy(layer) WHERE enabled = TRUE;
+```
+
+---
+
 **Document Version**: 4.0.0
 **Last Updated**: 2026-02-09
 **Maintenance Team**: Data Team & Platform Team

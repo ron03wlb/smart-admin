@@ -319,6 +319,150 @@ public class MtlsConfig {
 
 ---
 
+## 4. SmartAdmin Implementation
+
+### 4.1 Compliance Verification Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class RtsComplianceService {
+
+    private final ComplianceCheckDao complianceDao;
+    private final ComplianceAlertManager alertManager;
+
+    /**
+     * Verify RTS compliance status using Vavr Option.
+     */
+    public Option<ComplianceStatusVO> getComplianceStatus(String rtsSection) {
+        return Option.of(complianceDao.selectBySection(rtsSection))
+            .map(entity -> SmartBeanUtil.copy(entity, ComplianceStatusVO.class));
+    }
+
+    /**
+     * Record compliance check result.
+     */
+    public void recordComplianceCheck(ComplianceCheckForm form) {
+        alertManager.checkAndRecord(form);
+    }
+}
+```
+
+### 4.2 Compliance Alert Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class ComplianceAlertManager {
+
+    private final ComplianceCheckDao complianceDao;
+    private final ComplianceAlertDao alertDao;
+
+    /**
+     * Check compliance and record result.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void checkAndRecord(ComplianceCheckForm form) {
+        ComplianceCheckEntity entity = SmartBeanUtil.copy(form, ComplianceCheckEntity.class);
+        entity.setCheckedAt(LocalDateTime.now());
+        complianceDao.insert(entity);
+
+        // Alert on violation
+        if (!form.isCompliant()) {
+            ComplianceAlertEntity alert = new ComplianceAlertEntity();
+            alert.setRtsSection(form.getRtsSection());
+            alert.setSeverity("CRITICAL");
+            alert.setMessage("RTS compliance violation detected");
+            alertDao.insert(alert);
+        }
+    }
+}
+```
+
+### 4.3 Database Schema
+
+```sql
+-- RTS compliance check records
+CREATE TABLE t_rts_compliance_check (
+    id              BIGSERIAL PRIMARY KEY,
+    rts_section     VARCHAR(20) NOT NULL,
+    requirement_id  VARCHAR(20) NOT NULL,
+    check_type      VARCHAR(50) NOT NULL,
+    is_compliant    BOOLEAN NOT NULL,
+    evidence        JSONB,
+    notes           TEXT,
+    checked_by      BIGINT,
+    checked_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_rts_section ON t_rts_compliance_check(rts_section, checked_at DESC);
+
+-- Clock synchronization audit log
+CREATE TABLE t_clock_sync_audit (
+    id              BIGSERIAL PRIMARY KEY,
+    server_id       VARCHAR(100) NOT NULL,
+    system_time     TIMESTAMP NOT NULL,
+    ntp_time        TIMESTAMP NOT NULL,
+    drift_ms        INTEGER NOT NULL,
+    is_within_tolerance BOOLEAN NOT NULL,
+    checked_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_clock_audit ON t_clock_sync_audit(server_id, checked_at DESC);
+
+-- Penetration test records
+CREATE TABLE t_pentest_record (
+    id              BIGSERIAL PRIMARY KEY,
+    test_type       VARCHAR(50) NOT NULL,
+    scope           VARCHAR(200) NOT NULL,
+    performed_by    VARCHAR(200) NOT NULL,
+    started_at      TIMESTAMP NOT NULL,
+    completed_at    TIMESTAMP,
+    critical_findings INTEGER NOT NULL DEFAULT 0,
+    high_findings   INTEGER NOT NULL DEFAULT 0,
+    medium_findings INTEGER NOT NULL DEFAULT 0,
+    low_findings    INTEGER NOT NULL DEFAULT 0,
+    report_path     VARCHAR(500),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_pentest_date ON t_pentest_record(started_at DESC);
+
+-- Vulnerability remediation tracking
+CREATE TABLE t_vulnerability_remediation (
+    id              BIGSERIAL PRIMARY KEY,
+    pentest_id      BIGINT NOT NULL REFERENCES t_pentest_record(id),
+    severity        VARCHAR(20) NOT NULL,
+    description     TEXT NOT NULL,
+    remediation_deadline TIMESTAMP NOT NULL,
+    remediated_at   TIMESTAMP,
+    status          VARCHAR(20) NOT NULL DEFAULT 'OPEN',
+    assigned_to     BIGINT,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_vuln_status ON t_vulnerability_remediation(status, severity);
+
+-- TLS certificate tracking
+CREATE TABLE t_tls_certificate (
+    id              BIGSERIAL PRIMARY KEY,
+    domain          VARCHAR(200) NOT NULL,
+    issuer          VARCHAR(200) NOT NULL,
+    serial_number   VARCHAR(100) NOT NULL,
+    valid_from      TIMESTAMP NOT NULL,
+    valid_until     TIMESTAMP NOT NULL,
+    tls_version     VARCHAR(10) NOT NULL,
+    cipher_suite    VARCHAR(100) NOT NULL,
+    is_valid        BOOLEAN NOT NULL DEFAULT TRUE,
+    last_checked    TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_cert_expiry ON t_tls_certificate(valid_until);
+```
+
+---
+
 ## Related Documents
 
 - [ISO 27001:2022 Mapping](./ISO27001_Mapping.md) - ISO control mapping

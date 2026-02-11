@@ -1,28 +1,28 @@
 {
-  "window_start": "2026-02-10T04:52:00.715Z",
-  "window_end": "2026-02-10T05:52:00.715Z",
+  "window_start": "2026-02-11T03:27:13.061Z",
+  "window_end": "2026-02-11T03:57:13.061Z",
   "accumulated": {
-    "input_tokens": 85000,
-    "output_tokens": 20500,
-    "cached_tokens": 37000,
-    "effective_tokens": 72200,
-    "api_calls": 3
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cached_tokens": 0,
+    "effective_tokens": 0,
+    "api_calls": 4
   },
   "failure_count": 0,
-  "success_count": 3,
+  "success_count": 4,
   "estimated_quota": {
     "tier": "tier-4",
     "input_tpm": 400000,
-    "max_tokens_in_window": 24000000,
-    "token_usage_pct": 0.35,
-    "remaining_input_pct": 99.65
+    "max_tokens_in_window": 12000000,
+    "token_usage_pct": 0,
+    "remaining_input_pct": 100
   },
   "risk_components": {
-    "token_usage_pct": 0.35,
-    "api_call_rate_pct": 0.1,
+    "token_usage_pct": 0,
+    "api_call_rate_pct": 0.27,
     "failure_rate": 0,
     "five_hour_proximity": 0
   },
-  "risk_score": 0.0017,
+  "risk_score": 0.0008,
   "recommendation": "continue"
 }

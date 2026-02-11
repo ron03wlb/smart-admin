@@ -310,6 +310,144 @@ ORDER BY total_ggr DESC;
 
 ---
 
+## 10. SmartAdmin Implementation
+
+### 10.1 Dashboard Query Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class DashboardQueryService {
+
+    private final DashboardMetricsDao metricsDao;
+    private final DashboardCacheManager cacheManager;
+
+    /**
+     * Get real-time KPI metrics using Vavr Option.
+     */
+    public Option<DashboardKpiVO> getRealTimeKpi(Long tenantId) {
+        // Try cache first
+        Option<DashboardKpiVO> cached = cacheManager.getCachedKpi(tenantId);
+        if (cached.isDefined()) {
+            return cached;
+        }
+
+        return Option.of(metricsDao.selectLatestKpi(tenantId))
+            .map(entity -> SmartBeanUtil.copy(entity, DashboardKpiVO.class));
+    }
+
+    /**
+     * Query historical metrics by date range.
+     */
+    public ResponseDTO<PageResult<DashboardMetricsVO>> queryHistoricalMetrics(DashboardQueryForm form) {
+        Page<DashboardMetricsEntity> page = SmartPageUtil.convert2PageQuery(form);
+        return ResponseDTO.ok(metricsDao.selectByDateRange(page, form));
+    }
+}
+```
+
+### 10.2 ETL Quality Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class EtlQualityManager {
+
+    private final EtlJobDao etlJobDao;
+    private final EtlQualityCheckDao qualityCheckDao;
+
+    /**
+     * Record ETL quality check results.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<Void> recordQualityCheck(EtlQualityCheckForm form) {
+        EtlQualityCheckEntity check = SmartBeanUtil.copy(form, EtlQualityCheckEntity.class);
+        check.setCheckedAt(LocalDateTime.now());
+        qualityCheckDao.insert(check);
+
+        // Update ETL job status if quality check failed
+        if (!form.isPassed()) {
+            EtlJobEntity job = etlJobDao.selectById(form.getJobId());
+            job.setStatus(EtlStatus.QUALITY_FAILED.getValue());
+            etlJobDao.updateById(job);
+        }
+
+        return ResponseDTO.ok();
+    }
+}
+```
+
+### 10.3 Database Schema
+
+```sql
+-- Dashboard KPI metrics table
+CREATE TABLE t_dashboard_kpi (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    metric_date     DATE NOT NULL,
+    online_players  INTEGER NOT NULL DEFAULT 0,
+    total_deposits  DECIMAL(18, 2) NOT NULL DEFAULT 0,
+    total_withdrawals DECIMAL(18, 2) NOT NULL DEFAULT 0,
+    total_ggr       DECIMAL(18, 2) NOT NULL DEFAULT 0,
+    new_registrations INTEGER NOT NULL DEFAULT 0,
+    active_players  INTEGER NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_dashboard_kpi UNIQUE (tenant_id, metric_date)
+);
+
+CREATE INDEX idx_kpi_tenant_date ON t_dashboard_kpi(tenant_id, metric_date DESC);
+
+-- ETL job tracking table
+CREATE TABLE t_etl_job (
+    id              BIGSERIAL PRIMARY KEY,
+    job_name        VARCHAR(100) NOT NULL,
+    layer           VARCHAR(20) NOT NULL,
+    source_table    VARCHAR(100) NOT NULL,
+    target_table    VARCHAR(100) NOT NULL,
+    status          SMALLINT NOT NULL DEFAULT 0,
+    started_at      TIMESTAMP NOT NULL,
+    completed_at    TIMESTAMP,
+    records_processed BIGINT,
+    error_message   TEXT,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_etl_job_status ON t_etl_job(status, started_at DESC);
+
+-- ETL quality check results
+CREATE TABLE t_etl_quality_check (
+    id              BIGSERIAL PRIMARY KEY,
+    job_id          BIGINT NOT NULL REFERENCES t_etl_job(id),
+    check_type      VARCHAR(50) NOT NULL,
+    source_count    BIGINT,
+    target_count    BIGINT,
+    variance_pct    DECIMAL(5, 2),
+    passed          BOOLEAN NOT NULL,
+    error_details   JSONB,
+    checked_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_quality_check_job ON t_etl_quality_check(job_id);
+
+-- Data lineage tracking
+CREATE TABLE t_data_lineage (
+    id              BIGSERIAL PRIMARY KEY,
+    source_layer    VARCHAR(20) NOT NULL,
+    source_table    VARCHAR(100) NOT NULL,
+    target_layer    VARCHAR(20) NOT NULL,
+    target_table    VARCHAR(100) NOT NULL,
+    transformation  VARCHAR(50) NOT NULL,
+    column_mapping  JSONB,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_lineage_source ON t_data_lineage(source_table);
+CREATE INDEX idx_lineage_target ON t_data_lineage(target_table);
+```
+
+---
+
 **Document Version**: 4.0.0
 **Last Updated**: 2026-02-09
 **Maintenance Team**: Data Team & Platform Team

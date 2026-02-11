@@ -267,3 +267,73 @@ const BetQueue = {
   },
 };
 ```
+
+---
+
+## 9. Database Schema
+
+```sql
+-- Mobile app version configuration
+CREATE TABLE t_mobile_app_version (
+    id              BIGSERIAL PRIMARY KEY,
+    platform        VARCHAR(20) NOT NULL,
+    version_code    INTEGER NOT NULL,
+    version_name    VARCHAR(20) NOT NULL,
+    min_sdk_version INTEGER,
+    download_url    VARCHAR(500),
+    release_notes   TEXT,
+    force_update    BOOLEAN NOT NULL DEFAULT FALSE,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    released_at     TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_app_version UNIQUE (platform, version_code)
+);
+
+CREATE INDEX idx_app_platform ON t_mobile_app_version(platform, enabled);
+
+-- CodePush deployment tracking
+CREATE TABLE t_codepush_deployment (
+    id              BIGSERIAL PRIMARY KEY,
+    deployment_key  VARCHAR(100) NOT NULL,
+    app_version     VARCHAR(20) NOT NULL,
+    label           VARCHAR(50) NOT NULL,
+    description     TEXT,
+    is_mandatory    BOOLEAN NOT NULL DEFAULT FALSE,
+    rollout_percent INTEGER NOT NULL DEFAULT 100,
+    installed_count BIGINT NOT NULL DEFAULT 0,
+    active_count    BIGINT NOT NULL DEFAULT 0,
+    released_at     TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_codepush_version ON t_codepush_deployment(app_version, released_at DESC);
+
+-- Push notification configuration
+CREATE TABLE t_push_notification_config (
+    id              BIGSERIAL PRIMARY KEY,
+    config_key      VARCHAR(100) NOT NULL UNIQUE,
+    max_daily_pushes INTEGER NOT NULL DEFAULT 5,
+    quiet_hours_start TIME,
+    quiet_hours_end TIME,
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Device registration
+CREATE TABLE t_mobile_device_registration (
+    id              BIGSERIAL PRIMARY KEY,
+    player_id       BIGINT NOT NULL,
+    device_id       VARCHAR(200) NOT NULL,
+    platform        VARCHAR(20) NOT NULL,
+    push_token      VARCHAR(500),
+    app_version     VARCHAR(20),
+    os_version      VARCHAR(50),
+    device_model    VARCHAR(100),
+    last_active     TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_device_player UNIQUE (player_id, device_id)
+);
+
+CREATE INDEX idx_device_player ON t_mobile_device_registration(player_id);
+CREATE INDEX idx_device_token ON t_mobile_device_registration(push_token) WHERE push_token IS NOT NULL;
+```

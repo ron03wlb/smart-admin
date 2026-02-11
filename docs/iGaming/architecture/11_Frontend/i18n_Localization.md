@@ -139,3 +139,69 @@ Object.keys(localStorage)
 | **Thai** | No space word separation | CSS `word-break: break-word` |
 | **Vietnamese** | Extensive diacritics | Noto Sans Vietnamese font |
 | **Arabic** | RTL layout + cursive joining | Logical CSS properties + Noto Sans Arabic |
+
+---
+
+## 8. Database Schema
+
+```sql
+-- Translation key registry
+CREATE TABLE t_translation_key (
+    id              BIGSERIAL PRIMARY KEY,
+    namespace       VARCHAR(50) NOT NULL,
+    key_path        VARCHAR(200) NOT NULL,
+    description     VARCHAR(500),
+    context         TEXT,
+    max_length      INTEGER,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_translation_key UNIQUE (namespace, key_path)
+);
+
+CREATE INDEX idx_trans_namespace ON t_translation_key(namespace);
+
+-- Translation values per locale
+CREATE TABLE t_translation_value (
+    id              BIGSERIAL PRIMARY KEY,
+    key_id          BIGINT NOT NULL REFERENCES t_translation_key(id),
+    locale          VARCHAR(10) NOT NULL,
+    value           TEXT NOT NULL,
+    status          VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    translator_id   BIGINT,
+    reviewed_by     BIGINT,
+    reviewed_at     TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_translation_value UNIQUE (key_id, locale)
+);
+
+CREATE INDEX idx_trans_locale ON t_translation_value(locale, status);
+
+-- Supported locales configuration
+CREATE TABLE t_supported_locale (
+    id              BIGSERIAL PRIMARY KEY,
+    locale_code     VARCHAR(10) NOT NULL UNIQUE,
+    display_name    VARCHAR(100) NOT NULL,
+    native_name     VARCHAR(100) NOT NULL,
+    is_rtl          BOOLEAN NOT NULL DEFAULT FALSE,
+    font_family     VARCHAR(200),
+    fallback_locale VARCHAR(10),
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    sort_order      INTEGER NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Translation publish history
+CREATE TABLE t_translation_publish (
+    id              BIGSERIAL PRIMARY KEY,
+    namespace       VARCHAR(50) NOT NULL,
+    locale          VARCHAR(10) NOT NULL,
+    version         VARCHAR(20) NOT NULL,
+    cdn_path        VARCHAR(500) NOT NULL,
+    published_by    BIGINT NOT NULL,
+    published_at    TIMESTAMP NOT NULL DEFAULT NOW(),
+    key_count       INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_publish_locale ON t_translation_publish(locale, namespace, published_at DESC);
+```

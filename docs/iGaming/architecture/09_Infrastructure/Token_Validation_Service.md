@@ -328,6 +328,61 @@ message RevokeResponse {
 
 ---
 
+## 11. Database Schema
+
+```sql
+-- Token blacklist for revoked tokens
+CREATE TABLE t_token_blacklist (
+    id              BIGSERIAL PRIMARY KEY,
+    token_hash      VARCHAR(64) NOT NULL UNIQUE,
+    actor_id        BIGINT,
+    actor_type      VARCHAR(20),
+    reason          VARCHAR(200) NOT NULL,
+    revoked_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at      TIMESTAMP NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_blacklist_hash ON t_token_blacklist(token_hash);
+CREATE INDEX idx_blacklist_expires ON t_token_blacklist(expires_at);
+
+-- Token session storage (for opaque tokens)
+CREATE TABLE t_token_session (
+    id              BIGSERIAL PRIMARY KEY,
+    token_id        VARCHAR(64) NOT NULL UNIQUE,
+    actor_id        BIGINT NOT NULL,
+    actor_type      VARCHAR(20) NOT NULL,
+    permissions     JSONB,
+    device_info     JSONB,
+    ip_address      VARCHAR(45),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at      TIMESTAMP NOT NULL,
+    last_accessed   TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_session_actor ON t_token_session(actor_id, actor_type);
+CREATE INDEX idx_session_expires ON t_token_session(expires_at);
+
+-- Token validation metrics (for monitoring)
+CREATE TABLE t_token_validation_metrics (
+    id              BIGSERIAL PRIMARY KEY,
+    metric_date     DATE NOT NULL,
+    actor_type      VARCHAR(20) NOT NULL,
+    total_requests  BIGINT NOT NULL DEFAULT 0,
+    l1_hits         BIGINT NOT NULL DEFAULT 0,
+    l2_hits         BIGINT NOT NULL DEFAULT 0,
+    l3_hits         BIGINT NOT NULL DEFAULT 0,
+    failures        BIGINT NOT NULL DEFAULT 0,
+    avg_latency_ms  INTEGER NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_token_metrics UNIQUE (metric_date, actor_type)
+);
+
+CREATE INDEX idx_metrics_date ON t_token_validation_metrics(metric_date DESC);
+```
+
+---
+
 ## Related Documentation
 
 - [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - Multi-actor token security model

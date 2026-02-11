@@ -279,3 +279,84 @@ To avoid calling KMS for every decrypt operation, DEKs are cached in-memory with
 | Max entries | 100 | Limit memory footprint (~3.2 KB) |
 | Eviction | LRU | Least recently used keys evicted first |
 | On rotation | Invalidate all | Force fresh DEK fetch after key rotation |
+
+---
+
+## 9. Database Schema
+
+```sql
+-- Encryption key metadata (not the keys themselves)
+CREATE TABLE t_encryption_key_metadata (
+    id              BIGSERIAL PRIMARY KEY,
+    key_version     VARCHAR(10) NOT NULL UNIQUE,
+    key_type        VARCHAR(20) NOT NULL,
+    algorithm       VARCHAR(50) NOT NULL,
+    kms_key_arn     VARCHAR(500),
+    status          VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    activated_at    TIMESTAMP,
+    deprecated_at   TIMESTAMP,
+    archived_at     TIMESTAMP
+);
+
+CREATE INDEX idx_key_status ON t_encryption_key_metadata(status, key_type);
+
+-- Key rotation history
+CREATE TABLE t_key_rotation_log (
+    id              BIGSERIAL PRIMARY KEY,
+    old_version     VARCHAR(10) NOT NULL,
+    new_version     VARCHAR(10) NOT NULL,
+    rotation_type   VARCHAR(20) NOT NULL,
+    records_migrated BIGINT NOT NULL DEFAULT 0,
+    started_at      TIMESTAMP NOT NULL,
+    completed_at    TIMESTAMP,
+    status          VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_rotation_status ON t_key_rotation_log(status, started_at DESC);
+
+-- Data masking configuration
+CREATE TABLE t_data_masking_config (
+    id              BIGSERIAL PRIMARY KEY,
+    field_name      VARCHAR(100) NOT NULL UNIQUE,
+    field_type      VARCHAR(50) NOT NULL,
+    masking_rule    VARCHAR(100) NOT NULL,
+    example_masked  VARCHAR(200),
+    enabled         BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Encrypted field audit log
+CREATE TABLE t_encrypted_field_access_log (
+    id              BIGSERIAL PRIMARY KEY,
+    table_name      VARCHAR(100) NOT NULL,
+    record_id       BIGINT NOT NULL,
+    field_name      VARCHAR(100) NOT NULL,
+    access_type     VARCHAR(20) NOT NULL,
+    accessed_by     BIGINT,
+    purpose         VARCHAR(200),
+    decrypted       BOOLEAN NOT NULL DEFAULT FALSE,
+    accessed_at     TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_field_access ON t_encrypted_field_access_log(table_name, field_name, accessed_at DESC);
+
+-- Certificate inventory
+CREATE TABLE t_certificate_inventory (
+    id              BIGSERIAL PRIMARY KEY,
+    domain          VARCHAR(200) NOT NULL,
+    certificate_type VARCHAR(50) NOT NULL,
+    issuer          VARCHAR(200) NOT NULL,
+    serial_number   VARCHAR(100) NOT NULL UNIQUE,
+    valid_from      TIMESTAMP NOT NULL,
+    valid_until     TIMESTAMP NOT NULL,
+    key_algorithm   VARCHAR(50) NOT NULL,
+    key_size        INTEGER NOT NULL,
+    last_verified   TIMESTAMP,
+    status          VARCHAR(20) NOT NULL DEFAULT 'VALID',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_cert_expiry ON t_certificate_inventory(valid_until);
+```
