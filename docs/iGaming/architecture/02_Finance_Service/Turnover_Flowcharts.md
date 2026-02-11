@@ -1181,6 +1181,121 @@ graph LR
 
 ---
 
+## 11. SmartAdmin Implementation
+
+### 11.1 Service Layer Implementation
+
+```java
+@Service
+@RequiredArgsConstructor
+public class TurnoverValidationService {
+
+    private final TurnoverRecordDao turnoverRecordDao;
+    private final TurnoverValidationManager validationManager;
+    private final RiskEngineClient riskEngineClient;
+
+    /**
+     * Execute three-layer validation for a settled bet.
+     * Uses Vavr Option for null-safety per SmartAdmin patterns.
+     */
+    public ResponseDTO<TurnoverValidationResult> validateTurnover(BetSettleEvent event) {
+        // Layer 1: Risk Engine validation
+        RiskValidationResult riskResult = riskEngineClient.validate(event);
+        if (riskResult.getActionType() == ActionType.BLOCK) {
+            return ResponseDTO.ok(TurnoverValidationResult.rejected(riskResult));
+        }
+
+        // Layer 2 & 3: Delegate to Manager for transactional operations
+        return validationManager.processFinanceAndActivity(event, riskResult);
+    }
+
+    /**
+     * Query turnover record by bet ID.
+     */
+    public Option<TurnoverRecordVO> getTurnoverByBetId(String betId) {
+        return Option.of(turnoverRecordDao.selectByBetId(betId))
+            .map(entity -> SmartBeanUtil.copy(entity, TurnoverRecordVO.class));
+    }
+}
+```
+
+### 11.2 Manager Layer Implementation
+
+```java
+@Component
+@RequiredArgsConstructor
+public class TurnoverValidationManager {
+
+    private final TurnoverRecordDao turnoverRecordDao;
+    private final WageringProgressDao wageringProgressDao;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    /**
+     * Process Layer 2 (Finance) and Layer 3 (Activity) with transaction support.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<TurnoverValidationResult> processFinanceAndActivity(
+            BetSettleEvent event, RiskValidationResult riskResult) {
+
+        BigDecimal effectiveBase = riskResult.getEffectiveTurnoverBase();
+
+        // Layer 2: Record settlement status (does NOT modify valid_bet)
+        BigDecimal validTurnoverFinance = effectiveBase;
+
+        // Layer 3: Apply game weight for activity contribution
+        BigDecimal gameWeight = getGameWeight(event.getGameType());
+        BigDecimal activityContribution = validTurnoverFinance.multiply(gameWeight);
+
+        // Save turnover record
+        TurnoverRecordEntity record = buildTurnoverRecord(event, riskResult,
+            validTurnoverFinance, gameWeight, activityContribution);
+        turnoverRecordDao.insert(record);
+
+        // Update wagering progress if player has active bonus
+        updateWageringProgress(event.getPlayerId(), activityContribution);
+
+        return ResponseDTO.ok(TurnoverValidationResult.success(record));
+    }
+
+    private BigDecimal getGameWeight(String gameType) {
+        return switch (gameType) {
+            case "SLOTS", "SPORTS" -> BigDecimal.ONE;
+            case "BACCARAT", "LIVE_CASINO" -> new BigDecimal("0.15");
+            case "BLACKJACK" -> new BigDecimal("0.10");
+            case "ROULETTE" -> new BigDecimal("0.20");
+            default -> BigDecimal.ONE;
+        };
+    }
+}
+```
+
+### 11.3 Database Schema
+
+```sql
+-- Wagering progress table for bonus tracking
+CREATE TABLE t_wagering_progress (
+    id                      BIGSERIAL PRIMARY KEY,
+    tenant_id               BIGINT NOT NULL,
+    player_id               BIGINT NOT NULL,
+    bonus_id                BIGINT NOT NULL,
+    wagering_requirement    DECIMAL(18, 4) NOT NULL,
+    wagering_completed      DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    progress_percentage     DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    status                  VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    completed_at            TIMESTAMP,
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_wagering_progress UNIQUE (tenant_id, player_id, bonus_id)
+);
+
+CREATE INDEX idx_wagering_player ON t_wagering_progress(tenant_id, player_id, status);
+CREATE INDEX idx_wagering_status ON t_wagering_progress(tenant_id, status, updated_at DESC)
+    WHERE status = 'ACTIVE';
+```
+
+---
+
 ## Summary
 
 ### Core Design Principles

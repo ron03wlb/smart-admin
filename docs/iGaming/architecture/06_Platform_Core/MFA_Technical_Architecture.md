@@ -153,6 +153,111 @@ graph LR
 
 ---
 
+## 7. SmartAdmin Implementation
+
+### 7.1 Service Layer
+
+```java
+@Service
+@RequiredArgsConstructor
+public class MfaService {
+
+    private final MfaSecretDao mfaSecretDao;
+    private final MfaManager mfaManager;
+    private final TotpGenerator totpGenerator;
+
+    /**
+     * Verify MFA code using TOTP algorithm.
+     * Service layer handles orchestration, no @Transactional here.
+     */
+    public ResponseDTO<MfaVerifyResult> verifyMfaCode(Long userId, String code) {
+        Option<MfaSecretEntity> secretOpt = Option.of(mfaSecretDao.selectByUserId(userId));
+        if (secretOpt.isEmpty()) {
+            return ResponseDTO.error(ErrorCode.MFA_NOT_ENABLED);
+        }
+
+        MfaSecretEntity secret = secretOpt.get();
+        boolean valid = totpGenerator.verify(secret.getDecryptedSecret(), code);
+        if (!valid) {
+            return mfaManager.handleVerificationFailure(userId);
+        }
+
+        return mfaManager.handleVerificationSuccess(userId);
+    }
+}
+```
+
+### 7.2 Manager Layer
+
+```java
+@Component
+@RequiredArgsConstructor
+public class MfaManager {
+
+    private final MfaSecretDao mfaSecretDao;
+    private final MfaAuditLogDao auditLogDao;
+    private final AesEncryptor aesEncryptor;
+
+    /**
+     * Handle verification failure with lockout logic.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<MfaVerifyResult> handleVerificationFailure(Long userId) {
+        MfaSecretEntity entity = mfaSecretDao.selectByUserId(userId);
+        int newCount = entity.getFailureCount() + 1;
+
+        if (newCount >= 3) {
+            entity.setStatus(MfaStatus.LOCKED);
+            entity.setLockedUntil(LocalDateTime.now().plusMinutes(15));
+            logAuditEvent(userId, MfaEventType.ACCOUNT_LOCKED);
+        }
+
+        entity.setFailureCount(newCount);
+        mfaSecretDao.updateById(entity);
+        logAuditEvent(userId, MfaEventType.VERIFICATION_FAILED);
+
+        return ResponseDTO.error(ErrorCode.MFA_INVALID_CODE);
+    }
+}
+```
+
+### 7.3 Database Schema
+
+```sql
+-- MFA secret storage with AES-256-GCM encryption
+CREATE TABLE t_mfa_secret (
+    id                  BIGSERIAL PRIMARY KEY,
+    user_id             BIGINT NOT NULL UNIQUE,
+    encrypted_secret    VARCHAR(500) NOT NULL,
+    status              VARCHAR(20) NOT NULL DEFAULT 'PENDING_VERIFICATION',
+    failure_count       INTEGER NOT NULL DEFAULT 0,
+    locked_until        TIMESTAMP,
+    last_verified_at    TIMESTAMP,
+    created_at          TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted             BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_mfa_user ON t_mfa_secret(user_id) WHERE deleted = FALSE;
+CREATE INDEX idx_mfa_locked ON t_mfa_secret(status, locked_until)
+    WHERE status = 'LOCKED';
+
+-- MFA audit log for compliance
+CREATE TABLE t_mfa_audit_log (
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT NOT NULL,
+    event_type      VARCHAR(50) NOT NULL,
+    ip_address      VARCHAR(45),
+    device_info     JSONB,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_mfa_audit_user ON t_mfa_audit_log(user_id, created_at DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md) - MFA 業務需求與方法選擇

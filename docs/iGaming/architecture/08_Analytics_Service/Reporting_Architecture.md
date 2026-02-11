@@ -317,6 +317,143 @@ ALTER TABLE dws_revenue DROP PARTITION '2023-10-01';
 
 ---
 
+---
+
+## 9. SmartAdmin Implementation
+
+### 9.1 Report Service Layer
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ReportService {
+
+    private final ReportDao reportDao;
+    private final ReportManager reportManager;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String CACHE_KEY_PREFIX = "report:";
+
+    /**
+     * Query GGR/NGR report with Redis caching.
+     * Uses Vavr Option for null-safety per SmartAdmin patterns.
+     */
+    public ResponseDTO<GgrNgrReportVO> getGgrNgrReport(ReportQueryForm form) {
+        String cacheKey = buildCacheKey("ggr_ngr", form);
+
+        // Check cache first
+        String cached = redisTemplate.opsForValue().get(cacheKey);
+        if (cached != null) {
+            return ResponseDTO.ok(JSON.parseObject(cached, GgrNgrReportVO.class));
+        }
+
+        // Query from ClickHouse via Dao
+        Option<GgrNgrReportEntity> result = Option.of(
+            reportDao.selectGgrNgrReport(form.getTenantId(), form.getStartDate(), form.getEndDate())
+        );
+
+        return result
+            .map(entity -> {
+                GgrNgrReportVO vo = SmartBeanUtil.copy(entity, GgrNgrReportVO.class);
+                // Cache for 5 minutes (hot report)
+                redisTemplate.opsForValue().set(cacheKey, JSON.toJSONString(vo),
+                    Duration.ofMinutes(5));
+                return ResponseDTO.ok(vo);
+            })
+            .getOrElse(() -> ResponseDTO.ok(GgrNgrReportVO.empty()));
+    }
+
+    /**
+     * Request async export for large datasets.
+     */
+    public ResponseDTO<ExportTaskVO> requestAsyncExport(ExportRequestForm form) {
+        return reportManager.createExportTask(form);
+    }
+}
+```
+
+### 9.2 Report Manager Layer
+
+```java
+@Component
+@RequiredArgsConstructor
+public class ReportManager {
+
+    private final ExportTaskDao exportTaskDao;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    /**
+     * Create async export task with Kafka queue.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<ExportTaskVO> createExportTask(ExportRequestForm form) {
+        // Create task record
+        ExportTaskEntity task = new ExportTaskEntity();
+        task.setTenantId(form.getTenantId());
+        task.setUserId(form.getUserId());
+        task.setReportType(form.getReportType());
+        task.setParameters(JSON.toJSONString(form.getParameters()));
+        task.setStatus(ExportStatus.PENDING);
+        exportTaskDao.insert(task);
+
+        // Send to Kafka for async processing
+        ExportTaskMessage message = SmartBeanUtil.copy(task, ExportTaskMessage.class);
+        kafkaTemplate.send("export_task_queue", task.getId().toString(),
+            JSON.toJSONString(message));
+
+        return ResponseDTO.ok(SmartBeanUtil.copy(task, ExportTaskVO.class));
+    }
+}
+```
+
+### 9.3 Database Schema
+
+```sql
+-- DWS layer: Daily GGR/NGR aggregation table
+CREATE TABLE dws_ggr_ngr_daily (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    report_date     DATE NOT NULL,
+    total_bets      DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    total_wins      DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    ggr             DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    ngr             DECIMAL(18, 4) NOT NULL DEFAULT 0,
+    player_count    INTEGER NOT NULL DEFAULT 0,
+    bet_count       INTEGER NOT NULL DEFAULT 0,
+    currency        VARCHAR(3) NOT NULL DEFAULT 'USD',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_ggr_daily UNIQUE (tenant_id, report_date, currency)
+);
+
+CREATE INDEX idx_ggr_daily_tenant ON dws_ggr_ngr_daily(tenant_id, report_date DESC);
+
+-- Export task queue table
+CREATE TABLE t_export_task (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    user_id         BIGINT NOT NULL,
+    report_type     VARCHAR(50) NOT NULL,
+    parameters      JSONB NOT NULL,
+    status          VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    file_url        VARCHAR(500),
+    file_size       BIGINT,
+    row_count       INTEGER,
+    error_message   TEXT,
+    started_at      TIMESTAMP,
+    completed_at    TIMESTAMP,
+    expires_at      TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_export_user ON t_export_task(tenant_id, user_id, created_at DESC);
+CREATE INDEX idx_export_status ON t_export_task(status, created_at)
+    WHERE status IN ('PENDING', 'PROCESSING');
+```
+
+---
+
 **Document Version**: 4.0.0
 **Last Updated**: 2026-02-09
 **Maintenance Team**: Data Team & BI Team

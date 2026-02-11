@@ -223,6 +223,82 @@ Link: </api/v2/players>; rel="alternate"
 
 ---
 
+## 7. SmartAdmin Implementation
+
+### 7.1 Controller Layer
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/players")
+public class PlayerController {
+
+    private final PlayerService playerService;
+
+    /**
+     * Query player by ID with standardized ResponseDTO.
+     */
+    @GetMapping("/{id}")
+    public ResponseDTO<PlayerVO> getPlayer(@PathVariable Long id) {
+        return playerService.getPlayerById(id)
+            .map(ResponseDTO::ok)
+            .getOrElse(() -> ResponseDTO.error(ErrorCode.PLAYER_NOT_FOUND));
+    }
+
+    /**
+     * Query player list with pagination.
+     */
+    @GetMapping
+    public ResponseDTO<PageResult<PlayerVO>> listPlayers(@Valid PlayerQueryForm form) {
+        return playerService.listPlayers(form);
+    }
+
+    /**
+     * Create new player.
+     */
+    @PostMapping
+    public ResponseDTO<Long> createPlayer(@Valid @RequestBody PlayerCreateForm form) {
+        return playerService.createPlayer(form);
+    }
+}
+```
+
+### 7.2 Database Schema for API Rate Limiting
+
+```sql
+-- API rate limit configuration
+CREATE TABLE t_api_rate_limit (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    endpoint        VARCHAR(200) NOT NULL,
+    limit_type      VARCHAR(20) NOT NULL DEFAULT 'PER_USER',
+    max_requests    INTEGER NOT NULL DEFAULT 100,
+    window_seconds  INTEGER NOT NULL DEFAULT 60,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_rate_limit UNIQUE (tenant_id, endpoint, limit_type)
+);
+
+CREATE INDEX idx_rate_limit_tenant ON t_api_rate_limit(tenant_id);
+
+-- API request log for audit
+CREATE TABLE t_api_request_log (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    user_id         BIGINT,
+    request_id      VARCHAR(50) NOT NULL,
+    endpoint        VARCHAR(200) NOT NULL,
+    method          VARCHAR(10) NOT NULL,
+    status_code     INTEGER NOT NULL,
+    response_time   INTEGER NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_api_log_tenant ON t_api_request_log(tenant_id, created_at DESC);
+```
+
+---
+
 ## 相關文檔
 
 - [Authentication Architecture](./Authentication_Architecture.md) - 認證與授權

@@ -169,6 +169,152 @@ X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
 
 ---
 
+## 7. SmartAdmin Implementation
+
+### 7.1 Authentication Service
+
+```java
+@Service
+@RequiredArgsConstructor
+public class AuthenticationService {
+
+    private final UserDao userDao;
+    private final AuthenticationManager authManager;
+    private final JwtTokenProvider tokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String REFRESH_TOKEN_PREFIX = "refresh:";
+
+    /**
+     * Authenticate user and issue tokens.
+     * Uses Vavr Option for null-safety per SmartAdmin patterns.
+     */
+    public ResponseDTO<TokenVO> authenticate(LoginForm form) {
+        // Validate credentials
+        Option<UserEntity> userOpt = Option.of(userDao.selectByUsername(form.getUsername()));
+        if (userOpt.isEmpty()) {
+            return ResponseDTO.error(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        UserEntity user = userOpt.get();
+        if (!passwordEncoder.matches(form.getPassword(), user.getPassword())) {
+            return ResponseDTO.error(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        // Delegate token creation to Manager
+        return authManager.createTokenPair(user, form.getDeviceFingerprint());
+    }
+
+    /**
+     * Refresh access token using refresh token.
+     */
+    public ResponseDTO<TokenVO> refreshToken(String refreshToken) {
+        return authManager.refreshAccessToken(refreshToken);
+    }
+}
+```
+
+### 7.2 Authentication Manager
+
+```java
+@Component
+@RequiredArgsConstructor
+public class AuthenticationManager {
+
+    private final JwtTokenProvider tokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String REFRESH_TOKEN_PREFIX = "refresh:";
+    private static final Duration REFRESH_TTL = Duration.ofDays(30);
+
+    /**
+     * Create access and refresh token pair with rotation.
+     * @Transactional only allowed in Manager layer per SmartAdmin architecture.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<TokenVO> createTokenPair(UserEntity user, String deviceFingerprint) {
+        // Generate tokens
+        String accessToken = tokenProvider.createAccessToken(user);
+        String refreshToken = UUID.randomUUID().toString();
+
+        // Store refresh token in Redis with device binding
+        RefreshTokenData data = new RefreshTokenData(user.getId(), deviceFingerprint);
+        redisTemplate.opsForValue().set(
+            REFRESH_TOKEN_PREFIX + refreshToken,
+            JSON.toJSONString(data),
+            REFRESH_TTL
+        );
+
+        return ResponseDTO.ok(new TokenVO(accessToken, refreshToken, 900L));
+    }
+
+    /**
+     * Refresh with token rotation (old token immediately invalidated).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ResponseDTO<TokenVO> refreshAccessToken(String refreshToken) {
+        String key = REFRESH_TOKEN_PREFIX + refreshToken;
+        String dataJson = redisTemplate.opsForValue().get(key);
+
+        if (dataJson == null) {
+            return ResponseDTO.error(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        // Invalidate old refresh token immediately (rotation)
+        redisTemplate.delete(key);
+
+        RefreshTokenData data = JSON.parseObject(dataJson, RefreshTokenData.class);
+        UserEntity user = userDao.selectById(data.getUserId());
+
+        // Issue new token pair
+        return createTokenPair(user, data.getDeviceFingerprint());
+    }
+}
+```
+
+### 7.3 Database Schema
+
+```sql
+-- User authentication table
+CREATE TABLE t_user (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    username        VARCHAR(100) NOT NULL,
+    password_hash   VARCHAR(200) NOT NULL,
+    email           VARCHAR(200),
+    phone           VARCHAR(20),
+    status          SMALLINT NOT NULL DEFAULT 1,
+    mfa_enabled     BOOLEAN NOT NULL DEFAULT FALSE,
+    last_login_at   TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted         BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT uk_user_tenant_username UNIQUE (tenant_id, username)
+);
+
+CREATE INDEX idx_user_tenant ON t_user(tenant_id, status) WHERE deleted = FALSE;
+CREATE INDEX idx_user_email ON t_user(tenant_id, email) WHERE deleted = FALSE;
+
+-- API key for game provider authentication
+CREATE TABLE t_api_key (
+    id              BIGSERIAL PRIMARY KEY,
+    tenant_id       BIGINT NOT NULL,
+    provider_code   VARCHAR(50) NOT NULL,
+    api_key         VARCHAR(100) NOT NULL UNIQUE,
+    secret_key      VARCHAR(200) NOT NULL,
+    ip_whitelist    JSONB,
+    status          SMALLINT NOT NULL DEFAULT 1,
+    expires_at      TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_api_key_provider UNIQUE (tenant_id, provider_code)
+);
+
+CREATE INDEX idx_api_key_lookup ON t_api_key(api_key) WHERE status = 1;
+```
+
+---
+
 ## 相關文檔
 
 - [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - 多主體 Token 安全方案
