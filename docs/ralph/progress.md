@@ -229,9 +229,9 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 - [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md ✅ commit f88439cf
 
 #### Batch 21 — 04_Promotions (3) + 05_Risk (2) (5 files)
-- [ ] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md
-- [ ] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md
-- [ ] requirements/04_Promotions_VIP/Promotion_Requirements.md
+- [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md ✅ commit fa46cca9 (part 1/2)
+- [x] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md ✅ ALREADY TRANSLATED (verified)
+- [x] requirements/04_Promotions_VIP/Promotion_Requirements.md ✅ commit fa46cca9 (part 1/2)
 - [ ] requirements/05_Risk_Compliance/Affordability_Requirements.md
 - [ ] requirements/05_Risk_Compliance/Detection_Model_Spec.md
 
