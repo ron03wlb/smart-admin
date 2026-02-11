@@ -1,243 +1,243 @@
-# Game Integration Standards
+# 遊戲整合標準（Game Integration Standards）
 
 > **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
-> **Audience**: Executives, Product Managers, Operations Leads, Compliance Officers
+> **Audience**: 高階主管、產品經理、營運主管、合規官員
 > **Related Doc**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
 > **Last Synced**: 2026-02-09
 >
-> **Refinement Note**: Technical details (HMAC-SHA256, TLS, Type A/B/C classifications, HTTP status codes) moved to Architecture layer. This document focuses on business requirements only.
+> **精煉說明**：技術細節（HMAC-SHA256、TLS、Type A/B/C 分類、HTTP 狀態碼）已移至架構層。本文件僅專注於業務需求。
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
-This Game Integration Standard delivers critical business value by:
-- **Player Experience**: Seamless wallet architecture eliminates manual fund transfers between game wallets, reducing friction and improving retention
-- **Risk Protection**: RTP automatic suspension prevents catastrophic losses from game provider bugs or odds misconfiguration (e.g., guaranteed-win glitches)
-- **Time-to-Market**: Fast onboarding process (< 5 business days) enables rapid game catalog expansion and competitive game portfolio
-- **Financial Safety**: Jackpot verification workflow prevents merchant insolvency by correctly distinguishing GP-funded wins from merchant-funded wins
-
----
-
-## Acceptance Criteria
-
-- [ ] All game provider integrations pass certification checklist (API compliance, edge case handling, currency normalization, jackpot handling)
-- [ ] Circuit breaker automatically suspends games when RTP > 200% AND Net Loss > $10,000 in a 5-minute window
-- [ ] API uptime meets ≥ 99.9% SLA target with transaction latency < 200ms P95
-- [ ] Jackpot wins are correctly identified and isolated from merchant quota (network jackpots do NOT deduct from merchant balance)
-- [ ] New game providers complete onboarding within 5 business days after GP certification
-- [ ] Duplicate transaction IDs return success without re-processing (idempotency guarantee)
-- [ ] API timeout scenarios mark transactions as "Pending" and query final status via QueryStatus (no direct rollback)
-- [ ] Player experience during circuit break: in-game players see maintenance message, lobby players see greyed-out game icons
+此遊戲整合標準提供關鍵業務價值：
+- **玩家體驗**：無縫錢包架構消除遊戲錢包間的手動資金轉移，減少摩擦並提升留存率
+- **風險保護**：RTP 自動暫停防止因遊戲供應商錯誤或賠率配置錯誤（例如必贏漏洞）造成的災難性損失
+- **上市時間**：快速上線流程（< 5 個工作日）實現快速擴充遊戲目錄和競爭性遊戲組合
+- **財務安全**：累積獎金驗證工作流程正確區分 GP 資助贏額與商戶資助贏額，防止商戶破產
 
 ---
 
-## 1. Overview
+## 驗收標準（Acceptance Criteria）
 
-The platform integrates with external Game Providers (GP) using a **Seamless Wallet (Single Wallet)** architecture. Players can access any integrated game without manual fund transfers between wallets. This document defines the partnership standards, certification requirements, and SLA expectations for all game provider integrations.
+- [ ] 所有遊戲供應商整合通過認證檢查清單（API 合規、邊緣案例處理、幣別正規化、累積獎金處理）
+- [ ] 熔斷器在 5 分鐘窗口內 RTP > 200% 且淨損失 > $10,000 時自動暫停遊戲
+- [ ] API 正常運作時間達到 ≥ 99.9% SLA 目標，交易延遲 < 200ms P95
+- [ ] 累積獎金贏額被正確識別並與商戶配額隔離（網路累積獎金不從商戶餘額扣除）
+- [ ] 新遊戲供應商在 GP 認證後 5 個工作日內完成上線
+- [ ] 重複交易 ID 回傳成功而不重新處理（冪等性保證）
+- [ ] API 逾時場景將交易標記為「Pending」並透過 QueryStatus 查詢最終狀態（禁止直接回滾）
+- [ ] 熔斷期間的玩家體驗：遊戲中玩家看到維護訊息，大廳玩家看到灰色遊戲圖示
 
 ---
 
-## 2. Provider Partnership Standards
+## 1. 概述（Overview）
 
-### 2.1 Communication Protocol Requirements
+平台使用**無縫錢包（Seamless Wallet / Single Wallet）**架構與外部遊戲供應商（GP, Game Provider）整合。玩家可以存取任何整合的遊戲，無需在錢包之間手動轉移資金。本文件定義所有遊戲供應商整合的合作夥伴標準、認證要求和 SLA 期望。
 
-All game provider integrations must satisfy the following communication standards:
+---
 
-| Requirement | Standard |
+## 2. 供應商合作夥伴標準（Provider Partnership Standards）
+
+### 2.1 通訊協定要求
+
+所有遊戲供應商整合必須滿足以下通訊標準：
+
+| 需求 | 標準 |
 |-------------|----------|
-| API Format | Industry-standard RESTful API with JSON payloads |
-| Transport Security | Encrypted transport mandatory |
-| Network Access Control | IP whitelist enforcement |
-| Request Authentication | Cryptographic signature verification |
+| API 格式 | 行業標準 RESTful API，使用 JSON 負載 |
+| 傳輸安全 | 強制執行加密傳輸 |
+| 網路存取控制 | IP 白名單強制執行 |
+| 請求身份驗證 | 密碼學簽章驗證 |
 
-→ **[Technical Implementation Details](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#1-integration-architecture-overview)** - HTTPS/TLS configuration, HMAC-SHA256 signature algorithm
+→ **[技術實作細節](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#1-integration-architecture-overview)** - HTTPS/TLS 配置、HMAC-SHA256 簽章演算法
 
-### 2.2 Core API Contract
+### 2.2 核心 API 合約
 
-The platform exposes the following interfaces for game providers to invoke:
+平台公開以下介面供遊戲供應商調用：
 
-| API Endpoint | Purpose | Key Requirement |
+| API 端點 | 目的 | 關鍵需求 |
 |--------------|---------|-----------------|
-| **GetBalance** | Query player current balance | Real-time balance accuracy |
-| **Transaction (Bet/Win)** | Process wagers and payouts | Consistency and duplicate prevention guaranteed |
-| **CheckToken** | Validate player login token | Session validity confirmation |
+| **GetBalance** | 查詢玩家當前餘額 | 即時餘額準確性 |
+| **Transaction (Bet/Win)** | 處理投注和派彩 | 保證一致性和防止重複 |
+| **CheckToken** | 驗證玩家登入 Token | 會話有效性確認 |
 
-**Transaction Requirements**:
-- Bet and Win must be processed consistently with support for rollback
-- Duplicate requests with the same transaction ID must never result in duplicate charges
+**交易需求**：
+- 投注和派彩必須一致處理並支援回滾
+- 具有相同交易 ID 的重複請求絕不能導致重複扣款
 
-→ **[Transaction Guarantees](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#22-transaction-betwin)** - Atomicity implementation, idempotency mechanisms
+→ **[交易保證](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#22-transaction-betwin)** - 原子性實作、冪等性機制
 
-### 2.3 Game Launch Flow
+### 2.3 遊戲啟動流程
 
-The game launch process follows a defined sequence:
-1. Frontend requests a launch URL from the platform backend
-2. Backend obtains a token and URL from the game provider
-3. Frontend embeds the game via iframe or opens a new window
+遊戲啟動流程遵循定義的順序：
+1. 前端向平台後端請求啟動 URL
+2. 後端從遊戲供應商取得 Token 和 URL
+3. 前端透過 iframe 嵌入遊戲或開啟新視窗
 
-**Required Launch Parameters**: player token, language, currency, and lobby return URL.
+**必要的啟動參數**：玩家 Token、語言、幣別和大廳返回 URL。
 
 ---
 
-## 3. Seamless Wallet Edge Case Handling
+## 3. 無縫錢包邊緣案例處理（Seamless Wallet Edge Case Handling）
 
-The following scenarios must have documented resolution procedures for every provider integration:
+每個供應商整合必須為以下場景制定記錄的解決程序：
 
-| Scenario | Description | Required Resolution |
+| 場景 | 說明 | 必要的解決方式 |
 |----------|-------------|---------------------|
-| **API Timeout** | Platform debit succeeds but GP response times out | Mark as "Pending" and query final status via QueryStatus. Direct rollback is strictly prohibited. |
-| **Rollback / Cancel** | GP initiates bet cancellation (system error or event cancellation) | Refund if balance is sufficient; allow negative balance if funds were already withdrawn, flag for manual recovery. |
-| **Race Condition** | Player sends concurrent bet requests | Use optimistic locking to prevent balance from going negative. |
-| **Idempotency** | GP retries sending the same webhook | Return success for duplicate transaction IDs without re-processing. |
+| **API 逾時** | 平台扣款成功但 GP 回應逾時 | 標記為「Pending」並透過 QueryStatus 查詢最終狀態。嚴格禁止直接回滾。 |
+| **回滾 / 取消** | GP 發起投注取消（系統錯誤或事件取消） | 如果餘額足夠則退款；如果資金已提領則允許負餘額，標記為人工恢復。 |
+| **競態條件** | 玩家發送並發投注請求 | 使用樂觀鎖定防止餘額變為負數。 |
+| **冪等性** | GP 重試發送相同 webhook | 對於重複交易 ID 回傳成功而不重新處理。 |
 
 ---
 
-## 4. Provider Adaptation Requirements
+## 4. 供應商適配需求（Provider Adaptation Requirements）
 
-The platform must support integration with multiple game providers using different API styles and data formats.
+平台必須支援與使用不同 API 風格和資料格式的多個遊戲供應商整合。
 
-### Data Normalization Requirements
+### 資料正規化需求
 
-- All provider game types must be mapped to platform standard categories: Live, Slot, Sport
-- All currency units must be unified (e.g., if provider uses cents, platform converts to base currency units)
+- 所有供應商遊戲類型必須映射到平台標準類別：Live、Slot、Sport
+- 所有幣別單位必須統一（例如，如果供應商使用分，平台轉換為基礎幣別單位）
 
-→ **[Provider Adaptor Layer](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#4-provider-adaptor-layer)** - Type A/B/C technical classifications, middleware adaptation strategies
+→ **[供應商適配層](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#4-provider-adaptor-layer)** - Type A/B/C 技術分類、中間件適配策略
 
 ---
 
-## 5. Dynamic Configuration and Approval Workflows
+## 5. 動態配置和審批工作流程（Dynamic Configuration and Approval Workflows）
 
-### 5.1 Emergency Provider Maintenance
+### 5.1 緊急供應商維護
 
-When a game provider experiences critical errors requiring immediate disconnection:
+當遊戲供應商遇到需要立即斷線的嚴重錯誤時：
 
-| Step | Actor | Action |
+| 步驟 | 執行者 | 動作 |
 |------|-------|--------|
-| 1 | Operations Engineer | Initiates "GP Maintenance" request |
-| 2 | CTO | Approves the request |
-| 3 | System | Hides all entry points for that provider platform-wide |
+| 1 | 營運工程師 | 發起「GP 維護」請求 |
+| 2 | CTO | 核准請求 |
+| 3 | 系統 | 全平台隱藏該供應商的所有入口點 |
 
-### 5.2 Bet Limit Adjustments
+### 5.2 投注限額調整
 
-- Bet limits (minimum/maximum) are configured per currency and per merchant
-- All bet limit changes require approval from the Risk Management department
+- 投注限額（最小/最大）依幣別和商戶配置
+- 所有投注限額變更需要風險管理部門核准
 
 ---
 
-## 6. Jackpot Handling Requirements
+## 6. 累積獎金處理需求（Jackpot Handling Requirements）
 
-### 6.1 Risk Scenario
+### 6.1 風險場景
 
-Network Jackpots (e.g., accumulated prize pools of USD 10M) are funded by the Game Provider, not the merchant. The platform must distinguish between normal wins (merchant-funded) and jackpot wins (GP-funded) to prevent merchant insolvency.
+網路累積獎金（例如累積獎金池 USD 10M）由遊戲供應商資助，而非商戶。平台必須區分正常贏額（商戶資助）和累積獎金贏額（GP 資助），以防止商戶破產。
 
-### 6.2 Win Type Classification
+### 6.2 贏額類型分類
 
-| Win Type | Funding Source | Balance Impact |
+| 贏額類型 | 資金來源 | 餘額影響 |
 |----------|---------------|----------------|
-| **Normal Win** | Merchant | Directly updates player balance |
-| **Jackpot Win (Network)** | Game Provider | Does NOT deduct from merchant quota |
-| **Jackpot Win (Local)** | Varies by agreement | Per provider contract terms |
+| **正常贏額** | 商戶 | 直接更新玩家餘額 |
+| **累積獎金贏額（網路）** | 遊戲供應商 | 不從商戶配額扣除 |
+| **累積獎金贏額（本地）** | 依協議而異 | 依供應商合約條款 |
 
-### 6.3 Jackpot Verification Process
+### 6.3 累積獎金驗證流程
 
-| Step | Action | Responsible Party |
+| 步驟 | 動作 | 責任方 |
 |------|--------|-------------------|
-| 1 | Identify jackpot transaction | System (automatic) |
-| 2 | Freeze funds in Jackpot Wallet | System (automatic) |
-| 3 | Alert risk control and finance teams | System (automatic notification) |
-| 4 | Await GP official Jackpot Verification Report | Game Provider |
-| 5 | Confirm GP fund transfer to platform | Finance Team |
-| 6 | Unfreeze and credit to player balance | Finance Team (manual release) |
+| 1 | 識別累積獎金交易 | 系統（自動） |
+| 2 | 在累積獎金錢包中凍結資金 | 系統（自動） |
+| 3 | 警告風控和財務團隊 | 系統（自動通知） |
+| 4 | 等待 GP 官方累積獎金驗證報告 | 遊戲供應商 |
+| 5 | 確認 GP 資金轉入平台 | 財務團隊 |
+| 6 | 解凍並入帳至玩家餘額 | 財務團隊（人工釋放） |
 
 ---
 
-## 7. RTP Automatic Suspension - Business Rules
+## 7. RTP 自動暫停 - 業務規則（RTP Automatic Suspension - Business Rules）
 
-To protect against GP bugs (e.g., guaranteed-win glitches) or incorrect odds causing rapid platform losses, the integration layer implements real-time automatic game suspension.
+為防止 GP 錯誤（例如必贏漏洞）或錯誤賠率導致平台快速損失，整合層實作即時自動遊戲暫停。
 
-### 7.1 Monitoring Metrics
+### 7.1 監控指標
 
-The system monitors each game provider and game ID using a 5-minute sliding window:
+系統使用 5 分鐘滑動窗口監控每個遊戲供應商和遊戲 ID：
 
-| Metric | Definition |
+| 指標 | 定義 |
 |--------|------------|
-| Total Bet | Sum of all wagers in the window |
-| Total Win | Sum of all payouts in the window |
-| RTP (Return To Player) | Total Win / Total Bet x 100% |
-| Net Loss | Total Win - Total Bet |
+| 總投注額（Total Bet） | 窗口內所有投注總和 |
+| 總贏額（Total Win） | 窗口內所有派彩總和 |
+| RTP（Return To Player） | 總贏額 / 總投注額 x 100% |
+| 淨損失（Net Loss） | 總贏額 - 總投注額 |
 
-### 7.2 Automatic Suspension Thresholds
+### 7.2 自動暫停門檻
 
-| Alert Level | Trigger Condition (5-min window) | Automated Action | Recovery Method |
+| 警報級別 | 觸發條件（5 分鐘窗口） | 自動化動作 | 恢復方法 |
 |-------------|----------------------------------|-------------------|-----------------|
-| **Warning** | RTP > 120% AND Net Loss > $5,000 | Send alert to risk control team (Slack/Telegram) | Automatic (if next period normalizes) |
-| **Critical** | RTP > 200% AND Net Loss > $10,000 | Auto-disable the game/provider | Manual: requires CTO/Risk Director confirmation to unlock |
+| **警告** | RTP > 120% 且淨損失 > $5,000 | 發送警報至風控團隊（Slack/Telegram） | 自動（如果下一期正常化） |
+| **關鍵** | RTP > 200% 且淨損失 > $10,000 | 自動停用遊戲/供應商 | 人工：需要 CTO/風控總監確認才能解鎖 |
 
-→ **[Suspension Implementation](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#6-rtp-circuit-breaker-implementation)** - See architecture layer for technical implementation details
+→ **[暫停實作](../../architecture/03_Game_Integration/Game_Integration_Protocols.md#6-rtp-circuit-breaker-implementation)** - 技術實作細節請見架構層
 
-### 7.3 Manual Recovery Process
+### 7.3 人工恢復流程
 
-After a critical automatic suspension event:
+在關鍵自動暫停事件後：
 
-| Step | Action | Responsible Party |
+| 步驟 | 動作 | 責任方 |
 |------|--------|-------------------|
-| 1 | Analyze game logs to determine if bug or player luck | Risk Control Team |
-| 2 | Contact GP to confirm known vulnerabilities | Integration Team |
-| 3a | If false positive: Admin resets and resumes via back-office | Operations |
-| 3b | If confirmed bug: Maintain block until GP provides fix and patch notes | Integration Team |
+| 1 | 分析遊戲日誌以確定是錯誤還是玩家運氣 | 風控團隊 |
+| 2 | 聯繫 GP 確認已知漏洞 | 整合團隊 |
+| 3a | 如果誤報：管理員透過後台重置並恢復 | 營運 |
+| 3b | 如果確認錯誤：維持阻擋直到 GP 提供修復和補丁說明 | 整合團隊 |
 
-### 7.4 Player Experience During Circuit Break
+### 7.4 熔斷期間的玩家體驗
 
-**Players currently in-game**:
-- Next bet request returns a service unavailable response
-- Frontend displays: "Game under temporary maintenance, please try again later"
-- Balance automatically syncs back to main wallet
+**遊戲中的玩家**：
+- 下一個投注請求回傳服務不可用回應
+- 前端顯示：「遊戲暫時維護中，請稍後再試」
+- 餘額自動同步回主錢包
 
-**Players in the lobby**:
-- Affected game icon is greyed out with a "Maintenance" label
-- Clicking displays a maintenance announcement
+**大廳中的玩家**：
+- 受影響的遊戲圖示變為灰色並標記「維護」
+- 點擊顯示維護公告
 
 ---
 
-## 8. SLA Expectations
+## 8. SLA 期望（SLA Expectations）
 
-### 8.1 Provider Integration SLAs
+### 8.1 供應商整合 SLA
 
-| Metric | Target |
+| 指標 | 目標 |
 |--------|--------|
-| API Uptime | 99.9% |
-| Transaction Processing Latency | < 200ms P95 |
-| Game Launch Success Rate | > 99.5% |
-| Webhook Delivery Guarantee | At-least-once with duplicate prevention |
-| New Game Onboarding Time | < 5 business days (after GP certification) |
+| API 正常運作時間 | 99.9% |
+| 交易處理延遲 | < 200ms P95 |
+| 遊戲啟動成功率 | > 99.5% |
+| Webhook 傳遞保證 | 至少一次並防止重複 |
+| 新遊戲上線時間 | < 5 個工作日（GP 認證後） |
 
-### 8.2 Certification Requirements
+### 8.2 認證要求
 
-Before a game provider goes live, the following must be verified:
-- API contract compliance (all core endpoints functional)
-- Edge case handling (timeout, rollback, duplicate prevention)
-- Currency and game type normalization
-- Jackpot transaction handling (if applicable)
-- Circuit breaker integration testing
+遊戲供應商上線前，必須驗證以下項目：
+- API 合約合規（所有核心端點功能正常）
+- 邊緣案例處理（逾時、回滾、防止重複）
+- 幣別和遊戲類型正規化
+- 累積獎金交易處理（如適用）
+- 熔斷器整合測試
 
-→ **[Technical Certification Checklist](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)** - Detailed testing procedures and validation criteria
+→ **[技術認證檢查清單](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)** - 詳細測試程序和驗證標準
 
 ---
 
-## Related Documents
+## 相關文件（Related Documents）
 
-### Core Dependencies
-- [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Game wallet transfer logic
-- [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP edge case handling
+### 核心依賴
+- [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - 遊戲錢包轉帳邏輯
+- [Seamless Wallet Analysis](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) - GP 邊緣案例處理
 
-### Business Integration
-- [Turnover and Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation and turnover calculation
-- [Game Lobby Management](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) - Game metadata sync and lobby configuration
-- [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Game risk detection and circuit breaker
+### 業務整合
+- [Turnover and Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳和投注額計算
+- [Game Lobby Management](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) - 遊戲元資料同步和大廳配置
+- [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - 遊戲風險偵測和熔斷器
 
 ---
 
 **Document Version**: 1.0.0
 **Last Updated**: 2026-02-08
-**Maintainer**: Game Integration Team
+**Maintainer**: 遊戲整合團隊
