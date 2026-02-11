@@ -233,14 +233,48 @@ CREATE TABLE t_financial_vulnerability_indicator (
 ## 5. Affordability Assessment Service
 
 ```java
+/**
+ * Manager class for affordability assessment persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class AffordabilityAssessmentManager {
+
+    private final AffordabilityAssessmentDao assessmentDao;
+    private final DepositLimitService depositLimitService;
+
+    /**
+     * Save full assessment and apply limit if failed (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public AffordabilityAssessment saveFullAssessment(AffordabilityAssessment assessment, boolean forceLimit, Long playerId, BigDecimal appliedLimit) {
+        assessmentDao.insert(assessment);
+
+        if (forceLimit) {
+            depositLimitService.forceApplyLimit(playerId, appliedLimit, "AFFORDABILITY_ASSESSMENT");
+        }
+
+        log.info("Full affordability assessment completed: playerId={}, result={}, limit={}",
+            playerId, assessment.getAssessmentResult(), appliedLimit);
+
+        return assessment;
+    }
+}
+
+/**
+ * Service class for affordability assessment orchestration.
+ * Delegates transactional operations to AffordabilityAssessmentManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AffordabilityAssessmentService {
 
+    private final AffordabilityAssessmentManager assessmentManager;
     private final AffordabilityAssessmentDao assessmentDao;
     private final FinancialVulnerabilityDao vulnerabilityDao;
-    private final DepositLimitService depositLimitService;
     private final OpenBankingClient openBankingClient;
     private final CreditReferenceClient creditClient;
 
@@ -285,9 +319,9 @@ public class AffordabilityAssessmentService {
     }
 
     /**
-     * Perform full assessment (third-party verification)
+     * Perform full assessment (third-party verification).
+     * Delegates transactional operation to AffordabilityAssessmentManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<AssessmentResultVO> performFullAssessment(
             Long playerId, FullAssessmentForm form) {
 
@@ -325,12 +359,9 @@ public class AffordabilityAssessmentService {
             .validFrom(LocalDateTime.now())
             .validUntil(LocalDateTime.now().plusMonths(6))
             .build();
-        assessmentDao.insert(assessment);
 
-        // 6. Force-apply limit if assessment failed
-        if (!analysis.isPassed()) {
-            depositLimitService.forceApplyLimit(playerId, appliedLimit, "AFFORDABILITY_ASSESSMENT");
-        }
+        // 6. Delegate transactional operation to Manager
+        assessmentManager.saveFullAssessment(assessment, !analysis.isPassed(), playerId, appliedLimit);
 
         return ResponseDTO.ok(AssessmentResultVO.builder()
             .assessmentId(assessment.getId())

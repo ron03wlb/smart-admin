@@ -139,21 +139,66 @@ CREATE TABLE t_gamstop_reconciliation_report (
 ### 2.1 SelfExclusionService
 
 ```java
+/**
+ * Manager class for self-exclusion persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class SelfExclusionManager {
+
+    private final ExclusionRecordDao exclusionRecordDao;
+    private final PlayerSessionManager sessionManager;
+    private final BetSettlementService betSettlementService;
+
+    /**
+     * Create exclusion record and enforce exclusion (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public ExclusionRecord createAndEnforceExclusion(ExclusionRecord record) {
+        exclusionRecordDao.insert(record);
+
+        // Terminate active sessions
+        sessionManager.terminateSessions(record.getPlayerId(), "SELF_EXCLUSION");
+
+        // Settle open bets
+        betSettlementService.settlePendingBets(record.getPlayerId());
+
+        return record;
+    }
+
+    /**
+     * Update exclusion record for revocation request (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateRevocationRequest(ExclusionRecord record, LocalDateTime effectiveTime, String reason) {
+        record.setRevocationStatus(RevocationStatus.PENDING_REVOCATION);
+        record.setRevocationRequestTime(LocalDateTime.now());
+        record.setRevocationEffectiveTime(effectiveTime);
+        record.setRevocationReason(reason);
+        exclusionRecordDao.updateById(record);
+    }
+}
+
+/**
+ * Service class for self-exclusion orchestration.
+ * Delegates transactional operations to SelfExclusionManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SelfExclusionService {
 
+    private final SelfExclusionManager exclusionManager;
     private final ExclusionRecordDao exclusionRecordDao;
-    private final PlayerSessionManager sessionManager;
     private final GamstopClient gamstopClient;
-    private final BetSettlementService betSettlementService;
     private final NotificationService notificationService;
 
     /**
-     * Player requests self-exclusion
+     * Player requests self-exclusion.
+     * Delegates transactional operation to SelfExclusionManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<ExclusionResultVO> requestSelfExclusion(
             Long playerId,
             SelfExclusionForm form) {
@@ -180,7 +225,7 @@ public class SelfExclusionService {
                 .build());
         }
 
-        // 4. Create exclusion record
+        // 4. Create exclusion record and enforce (delegate to Manager)
         ExclusionRecord record = ExclusionRecord.builder()
             .playerId(playerId)
             .exclusionType(ExclusionType.SELF)
@@ -191,17 +236,15 @@ public class SelfExclusionService {
             .initiatedBy(InitiatedBy.PLAYER)
             .revocationStatus(RevocationStatus.ACTIVE)
             .build();
-        exclusionRecordDao.insert(record);
 
-        // 5. Execute exclusion actions
-        executeExclusionActions(playerId, record);
+        exclusionManager.createAndEnforceExclusion(record);
 
-        // 6. UK jurisdiction: sync to Gamstop
+        // 5. UK jurisdiction: sync to Gamstop
         if (isUkJurisdiction(playerId)) {
             syncToGamstop(playerId, record);
         }
 
-        // 7. Send confirmation notification
+        // 6. Send confirmation notification
         notificationService.sendExclusionConfirmation(playerId, record);
 
         log.info("Self-exclusion activated: playerId={}, duration={}",
@@ -244,9 +287,9 @@ public class SelfExclusionService {
     }
 
     /**
-     * Request revocation of exclusion
+     * Request revocation of exclusion.
+     * Delegates transactional operation to SelfExclusionManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<RevocationResultVO> requestRevocation(
             Long playerId,
             RevocationForm form) {
@@ -271,15 +314,11 @@ public class SelfExclusionService {
                 "Exclusion ends at " + record.getEndTime());
         }
 
-        // Set cooling-off period
+        // Set cooling-off period and delegate to Manager
         int coolingOffDays = getCoolingOffDays(record.getDurationType());
         LocalDateTime effectiveTime = LocalDateTime.now().plusDays(coolingOffDays);
 
-        record.setRevocationStatus(RevocationStatus.PENDING_REVOCATION);
-        record.setRevocationRequestTime(LocalDateTime.now());
-        record.setRevocationEffectiveTime(effectiveTime);
-        record.setRevocationReason(form.getReason());
-        exclusionRecordDao.updateById(record);
+        exclusionManager.updateRevocationRequest(record, effectiveTime, form.getReason());
 
         notificationService.sendRevocationPending(playerId, effectiveTime);
 

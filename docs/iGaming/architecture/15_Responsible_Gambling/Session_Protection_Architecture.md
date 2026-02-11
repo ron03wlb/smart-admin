@@ -147,19 +147,49 @@ CREATE TABLE t_reality_check_record (
 
 ## 2. Service Implementation
 
-### 2.1 CoolingOffService
+### 2.1 CoolingOffManager and CoolingOffService
 
 ```java
+/**
+ * Manager class for cooling-off persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class CoolingOffManager {
+
+    private final CoolingOffRecordDao coolingOffRecordDao;
+    private final PlayerSessionManager sessionManager;
+
+    /**
+     * Create cooling-off record and terminate sessions (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public CoolingOffRecord createAndEnforceCoolingOff(CoolingOffRecord record) {
+        coolingOffRecordDao.insert(record);
+        sessionManager.terminateAllSessions(record.getPlayerId(), "COOLING_OFF");
+        return record;
+    }
+}
+
+/**
+ * Service class for cooling-off orchestration.
+ * Delegates transactional operations to CoolingOffManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CoolingOffService {
 
+    private final CoolingOffManager coolingOffManager;
     private final CoolingOffRecordDao coolingOffRecordDao;
-    private final PlayerSessionManager sessionManager;
     private final NotificationService notificationService;
 
-    @Transactional(rollbackFor = Throwable.class)
+    /**
+     * Start cooling-off period.
+     * Delegates transactional operation to CoolingOffManager.
+     */
     public ResponseDTO<CoolingOffResultVO> startCoolingOff(
             Long playerId, CoolingOffForm form) {
 
@@ -179,9 +209,9 @@ public class CoolingOffService {
             .triggerSource(TriggerSource.PLAYER)
             .triggerReason(form.getReason())
             .build();
-        coolingOffRecordDao.insert(record);
 
-        sessionManager.terminateAllSessions(playerId, "COOLING_OFF");
+        // Delegate transactional operation to Manager
+        coolingOffManager.createAndEnforceCoolingOff(record);
         notificationService.sendCoolingOffStarted(playerId, record);
 
         log.info("Cooling-off started: playerId={}, duration={}, endTime={}",
@@ -232,11 +262,47 @@ public class CoolingOffService {
 ### 2.2 SessionManagementService
 
 ```java
+/**
+ * Manager class for session management persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class SessionManagementManager {
+
+    private final SessionRecordDao sessionRecordDao;
+    private final MandatoryBreakRecordDao mandatoryBreakDao;
+
+    /**
+     * Create new session record (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public SessionRecord createSession(SessionRecord session) {
+        sessionRecordDao.insert(session);
+        return session;
+    }
+
+    /**
+     * Terminate existing sessions and create mandatory break (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void terminateSessionAndCreateBreak(Long playerId, MandatoryBreakRecord breakRecord) {
+        sessionRecordDao.terminateByPlayerId(playerId);
+        mandatoryBreakDao.insert(breakRecord);
+    }
+}
+
+/**
+ * Service class for session management orchestration.
+ * Delegates transactional operations to SessionManagementManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SessionManagementService {
 
+    private final SessionManagementManager sessionManager;
     private final SessionRecordDao sessionRecordDao;
     private final SessionSettingDao sessionSettingDao;
     private final MandatoryBreakRecordDao mandatoryBreakDao;
@@ -246,7 +312,10 @@ public class SessionManagementService {
     private static final String SESSION_KEY_PREFIX = "session:";
     private static final String ACTIVITY_KEY_PREFIX = "session:activity:";
 
-    @Transactional(rollbackFor = Throwable.class)
+    /**
+     * Start new session.
+     * Delegates transactional operation to SessionManagementManager.
+     */
     public ResponseDTO<SessionStartResultVO> startSession(
             Long playerId, SessionStartForm form) {
 
@@ -265,7 +334,7 @@ public class SessionManagementService {
         SessionSetting setting = sessionSettingDao.findByPlayerId(playerId)
             .getOrElse(SessionSetting::defaultSetting);
 
-        // 4. Create new session
+        // 4. Create new session (delegate to Manager)
         String sessionToken = generateSessionToken();
         LocalDateTime now = LocalDateTime.now();
 
@@ -279,7 +348,7 @@ public class SessionManagementService {
             .ipAddress(form.getIpAddress())
             .userAgent(form.getUserAgent())
             .build();
-        sessionRecordDao.insert(session);
+        sessionManager.createSession(session);
 
         // 5. Cache session state in Redis
         cacheSessionState(playerId, session, setting);
@@ -295,9 +364,9 @@ public class SessionManagementService {
     }
 
     /**
-     * Trigger mandatory break
+     * Trigger mandatory break.
+     * Delegates transactional operation to SessionManagementManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public void triggerMandatoryBreak(Long playerId, MandatoryBreakReason reason) {
         int breakDuration = getBreakDuration(reason);
         LocalDateTime now = LocalDateTime.now();
@@ -310,9 +379,9 @@ public class SessionManagementService {
             .endTime(now.plusMinutes(breakDuration))
             .status(MandatoryBreakStatus.ACTIVE)
             .build();
-        mandatoryBreakDao.insert(breakRecord);
 
-        terminateSession(playerId, EndReason.FORCED_BREAK);
+        // Delegate transactional operation to Manager
+        sessionManager.terminateSessionAndCreateBreak(playerId, breakRecord);
         wsSessionManager.sendMessage(playerId,
             WebSocketMessage.mandatoryBreak(breakDuration));
 
@@ -340,14 +409,44 @@ public class SessionManagementService {
 }
 ```
 
-### 2.3 RealityCheckService
+### 2.3 RealityCheckManager and RealityCheckService
 
 ```java
+/**
+ * Manager class for reality check persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class RealityCheckManager {
+
+    private final RealityCheckRecordDao realityCheckRecordDao;
+
+    /**
+     * Update reality check record with player response (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void recordPlayerResponse(RealityCheckRecord record, RealityCheckResponse response, LocalDateTime now) {
+        record.setResponse(response.name());
+        record.setResponseTime(now);
+        record.setResponseDurationSeconds(
+            (int) Duration.between(record.getCheckTime(), now).getSeconds()
+        );
+        realityCheckRecordDao.updateById(record);
+    }
+}
+
+/**
+ * Service class for reality check orchestration.
+ * Delegates transactional operations to RealityCheckManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RealityCheckService {
 
+    private final RealityCheckManager realityCheckManager;
     private final RealityCheckRecordDao realityCheckRecordDao;
     private final SessionRecordDao sessionRecordDao;
     private final WalletService walletService;
@@ -379,19 +478,15 @@ public class RealityCheckService {
     }
 
     /**
-     * Record player response and analyze behavior
+     * Record player response and analyze behavior.
+     * Delegates transactional operation to RealityCheckManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public void recordResponse(Long recordId, RealityCheckResponse response) {
         RealityCheckRecord record = realityCheckRecordDao.selectById(recordId);
         LocalDateTime now = LocalDateTime.now();
 
-        record.setResponse(response.name());
-        record.setResponseTime(now);
-        record.setResponseDurationSeconds(
-            (int) Duration.between(record.getCheckTime(), now).getSeconds()
-        );
-        realityCheckRecordDao.updateById(record);
+        // Delegate transactional operation to Manager
+        realityCheckManager.recordPlayerResponse(record, response, now);
 
         // Analyze player behavior for risk identification
         analyzePlayerBehavior(record);
