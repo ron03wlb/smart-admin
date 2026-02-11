@@ -197,9 +197,34 @@ Player interactions with games are scored to drive recommendations:
 
 ---
 
-## 10. Business KPIs
+## 10. Business Value
 
-### 10.1 Core Metrics
+The Game Lobby delivers measurable business value by:
+
+- **Increasing Player Engagement**: Personalized recommendations drive 25% higher click-through rates compared to static game lists, increasing time-on-platform and lifetime value
+- **Reducing Player Churn**: "Thousands of faces for thousands of players" strategy ensures each player sees relevant content, reducing bounce rate from irrelevant game displays
+- **Accelerating New Game Adoption**: Automated sync and promotional tags enable rapid go-to-market for new game launches, capturing first-mover advantage
+- **Optimizing Operational Efficiency**: Configuration-driven lobby eliminates hardcoded frontend changes, reducing deployment cycles from days to minutes
+- **Enabling Merchant Differentiation**: Per-merchant game blocking and exclusive game assignments support multi-brand portfolio strategies without code duplication
+
+---
+
+## 11. Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Game Click-Through Rate (CTR) | ≥8% | (Game clicks / Impressions) × 100% |
+| Game Conversion Rate | ≥12% | (Actual bets / Game clicks) × 100% |
+| Search Result Relevance | ≥90% | Players finding target game within top 5 results |
+| Lobby API Response Time (P99) | <500ms | 99th percentile API latency monitoring |
+| Personalization Engagement | ≥25% | Clicks on recommended games vs total game clicks |
+| CDN Cache Hit Rate | ≥98% | Game asset CDN cache effectiveness |
+
+---
+
+## 12. Business KPIs
+
+### 12.1 Core Metrics
 
 | KPI | Formula |
 |-----|---------|
@@ -208,7 +233,7 @@ Player interactions with games are scored to drive recommendations:
 | Average Session Duration | AVG(session_duration) per game |
 | Top 10 Popular Games | Ranked by total betting volume |
 
-### 10.2 Alert Rules
+### 12.2 Alert Rules
 
 | Alert Condition | Severity |
 |-----------------|----------|
