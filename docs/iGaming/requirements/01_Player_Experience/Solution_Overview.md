@@ -445,12 +445,27 @@ Successful operators must balance rapid expansion with compliance rigor -- this 
 
 ---
 
+## 13. Acceptance Criteria
+
+- [ ] Multi-tenant architecture supports ≥4 tier hierarchy (Platform → Brand → Agent → Player)
+- [ ] Seamless wallet integration completes real-time bet/win processing within 200ms
+- [ ] Dual wallet system isolates bonus funds from cash wallet with turnover tracking
+- [ ] Risk control engine auto-approves ≥80% low-risk transactions (score 0-30)
+- [ ] KYC verification integrates government ID + biometric liveness detection
+- [ ] Payment orchestration achieves ≥99% transaction success rate across multiple acquirers
+- [ ] Game aggregation supports ≥300 game providers via standardized API
+- [ ] Responsible gaming tools include deposit limits, cooling-off periods, and self-exclusion
+- [ ] Three-party reconciliation runs at L1 (real-time), L2 (5-min), and L3 (daily) levels
+- [ ] SaaS billing supports tiered pricing based on GGR thresholds
+
+---
+
 ## Related Documentation
 
 → **[Platform Architecture - Technical Implementation](../../architecture/00_Overview/Platform_Architecture.md)** - Complete system architecture, technology stack, infrastructure design, and deployment strategies
 
 ---
 
-**Document Version**: 1.0.0
+**Document Version**: 1.1.0
 **Last Updated**: 2026-02-08
 **Maintainer**: Product Management Team

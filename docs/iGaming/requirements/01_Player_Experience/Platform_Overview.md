@@ -163,7 +163,19 @@ Testing confirms the performance overhead is less than 5%. The benefits in data 
 
 ---
 
-## 7. Version History
+## 7. Success Metrics
+
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Bettable Balance Accuracy | 100% | Reconciliation between wallet service and game provider records |
+| Multi-Tenant Performance Overhead | <5% | Load testing comparison vs single-tenant baseline |
+| Risk Control Automation Rate | ≥80% low-risk auto-approved | Ratio of automated decisions to total risk assessments |
+| Turnover Calculation Consistency | 100% | Cross-validation between game logs and turnover aggregation |
+| Player Journey Completion Rate | ≥70% registration-to-first-bet | Funnel analytics from registration through first wager |
+
+---
+
+## 8. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|

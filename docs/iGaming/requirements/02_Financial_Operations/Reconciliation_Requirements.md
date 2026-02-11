@@ -9,6 +9,17 @@
 
 ---
 
+## Business Value
+
+The reconciliation system delivers critical business value by:
+- **Fund Security**: Three-way matching (Platform ↔ PSP ↔ Bank) prevents fake callback attacks and ensures no unauthorized balance credits
+- **Regulatory Compliance**: 10-year data retention meets UKGC, MGA, and tax requirements; automated SAR/CTR generation satisfies AML obligations
+- **Operational Efficiency**: 100% automated Tier-1 real-time checks + 95% automated Tier-2 batch processing reduces manual workload
+- **Financial Accuracy**: ≥99.5% daily match rate target ensures reliable financial reporting and audit trails
+- **Risk Mitigation**: Immediate P0 alerts for short payments prevent fraud losses; chargeback monitoring protects against excessive dispute rates
+
+---
+
 ## 1. Business Overview
 
 Reconciliation is the last line of defense for platform fund security and data accuracy. The system compares "Internal Ledger" with "External Statements" and generates financial reports.

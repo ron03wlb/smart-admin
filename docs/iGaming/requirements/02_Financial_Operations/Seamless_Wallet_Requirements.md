@@ -342,7 +342,22 @@ The system automatically switches between out-of-order handling strategies based
 
 ---
 
-## 16. Related Documents
+## 16. Acceptance Criteria
+
+- [ ] All GP integrations require globally unique `transaction_id` in every request
+- [ ] Duplicate transaction IDs return stored response without re-execution
+- [ ] Insufficient funds returns error within 100ms response time (Scenario A)
+- [ ] Concurrent bet requests for same player processed atomically without over-deduction
+- [ ] Orphaned rounds detected within 15-minute check cycle and escalated after 2 hours
+- [ ] Out-of-order Win requests stored temporarily with 30-minute expiry (Strategy 3)
+- [ ] Resettlement supports negative balance with automatic account lock and risk alert
+- [ ] Jackpot wins above $10,000 trigger manual approval or auto-freeze per GP agreement
+- [ ] Daily reconciliation compares platform records with GP Transaction Reports
+- [ ] Out-of-order frequency maintained at <0.1% and timeout escalation rate at <1%
+
+---
+
+## 17. Related Documents
 
 ### Core Dependencies
 - Unified Wallet Model - Wallet balance updates, locking mechanisms

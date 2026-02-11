@@ -9,6 +9,17 @@
 
 ---
 
+## Business Value
+
+The game integration system delivers critical business value by:
+- **Unified Player Experience**: Seamless Wallet enables players to use a single balance across all Game Providers without manual transfers
+- **Revenue Protection**: Idempotent transaction processing eliminates duplicate debit/credit risks that could cause financial losses
+- **Security Compliance**: Token-based authentication with anti-replay protection satisfies gaming license security requirements
+- **Operational Efficiency**: Automated error recovery resolves 90%+ of stalled transactions within 10 minutes without manual intervention
+- **Market Agility**: Standardized onboarding accelerates new GP integration from months to weeks
+
+---
+
 ## 1. Overview
 
 This document defines the business requirements for integrating new Game Providers (GPs) into the iGaming platform. It covers the core functional areas that must be supported, the partnership standards, and the acceptance criteria for each integration milestone.
