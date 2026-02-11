@@ -242,12 +242,12 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 - [x] requirements/05_Risk_Compliance/ML_Requirements.md ✅ commit e59eca63
 - [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md ✅ commit e59eca63
 
-#### Batch 23 — 05_Risk (4) + 06_Gov (1) (5 files)
-- [ ] requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md
-- [ ] requirements/05_Risk_Compliance/Risk_Strategy_Overview.md
-- [ ] requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md
-- [ ] requirements/06_Governance_Licensing/Governance_Requirements.md
+#### Batch 23 — 05_Risk (4) + 06_Gov (1) (5 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md ✅ commit ed4330e9
+- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md ✅ commit 8bad3161
+- [x] requirements/05_Risk_Compliance/Risk_Strategy_Overview.md ✅ commit 794a0113
+- [x] requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md ✅ commit f997e02d
+- [x] requirements/06_Governance_Licensing/Governance_Requirements.md ✅ commit 21b203c2
 
 #### Batch 24 — 06_Governance (5 files)
 - [ ] requirements/06_Governance_Licensing/MFA_Architecture_Spec.md
