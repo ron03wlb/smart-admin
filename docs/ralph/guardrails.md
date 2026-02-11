@@ -142,3 +142,10 @@
 ### 2026-02-11: validate_links.sh code block false positives
 - Regex patterns inside code blocks (e.g., `[a-zA-Z0-9]`) were parsed as markdown links
 - Fix: Python extraction now strips fenced code blocks and inline code before extracting links
+
+### 2026-02-12: Rate limit regex missed "You've hit your limit" message
+- Actual error: `You've hit your limit · resets 2am (Asia/Taipei)`
+- Old regex only matched: `rate.?limit|usage.?limit|capacity|overloaded|429`
+- Root cause: 91 iterations (#30-#120) burned through with 0 progress (no rate limit sleep)
+- Fix: Added `hit.+limit|your.+limit|resets [0-9]+am` to grep pattern in ralph-igaming-docs.sh line 169
+- Impact: Wasted all 120 iteration quota; only 29 effective iterations completed 65 tasks
