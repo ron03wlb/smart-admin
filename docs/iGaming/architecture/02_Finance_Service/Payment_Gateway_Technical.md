@@ -184,7 +184,7 @@ sequenceDiagram
 **PaymentManager.processCallback()**:
 
 ```java
-@Service
+@Component
 @RequiredArgsConstructor
 public class PaymentManager {
 
@@ -502,26 +502,41 @@ public class PSPClient {
 
 ### 4.4 Status Synchronization Logic
 
-**PSPReconciliationService**:
+**PSPReconciliationService** (delegates @Transactional to Manager):
 
 ```java
 @Service
 @RequiredArgsConstructor
 public class PSPReconciliationService {
 
-    private final PaymentOrderDao paymentOrderDao;
     private final PSPClient pspClient;
-    private final PlayerWalletManager walletManager;
+    private final PSPReconciliationManager reconciliationManager;
 
-    @Transactional(rollbackFor = Throwable.class)
     public void reconcileOrder(PaymentOrderEntity order) {
-        // Step 1: Query PSP status
+        // Step 1: Query PSP status (non-transactional)
         PSPOrderStatusResponse pspStatus = pspClient.queryOrderStatus(
             order.getPspCode(),
             order.getOrderId()
         );
 
-        // Step 2: Synchronize platform status with PSP
+        // Step 2: Delegate transactional work to Manager
+        reconciliationManager.synchronizeOrderStatus(order, pspStatus);
+    }
+}
+```
+
+**PSPReconciliationManager** (@Transactional in Manager layer):
+
+```java
+@Component
+@RequiredArgsConstructor
+public class PSPReconciliationManager {
+
+    private final PaymentOrderDao paymentOrderDao;
+    private final PlayerWalletManager walletManager;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void synchronizeOrderStatus(PaymentOrderEntity order, PSPOrderStatusResponse pspStatus) {
         if (pspStatus.getStatus() == PSPStatus.SUCCESS && order.getStatus() == PaymentStatus.PENDING) {
             // PSP says success, but platform is still pending -> Credit player
             log.warn("[Reconciliation] Order {} was SUCCESS at PSP but PENDING in platform, crediting now",

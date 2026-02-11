@@ -326,12 +326,37 @@ public class ConcurrencyManager {
 @RequiredArgsConstructor
 public class ResettlementService {
 
-    private final WalletService walletService;
-    private final PlayerAccountService accountService;
+    private final ResettlementManager resettlementManager;
     private final AlertService alertService;
 
-    @Transactional(rollbackFor = Throwable.class)
     public void processResettlement(ResettlementRequest request) {
+        // Delegate transactional work to Manager
+        WalletResponse response = resettlementManager.applyResettlement(request);
+
+        // Non-transactional: trigger alert if negative balance
+        if (response.getNewBalance().compareTo(BigDecimal.ZERO) < 0) {
+            alertService.sendAlert(
+                AlertLevel.CRITICAL,
+                "Negative Balance Alert",
+                "Player " + request.getPlayerId() + " balance: " + response.getNewBalance()
+            );
+        }
+    }
+}
+```
+
+**ResettlementManager** (@Transactional in Manager layer):
+
+```java
+@Component
+@RequiredArgsConstructor
+public class ResettlementManager {
+
+    private final WalletService walletService;
+    private final PlayerAccountService accountService;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public WalletResponse applyResettlement(ResettlementRequest request) {
         BigDecimal adjustAmount = request.getAdjustAmount(); // Can be negative
 
         // Apply adjustment (may result in negative balance)
@@ -341,22 +366,16 @@ public class ResettlementService {
             request.getTxId()
         );
 
-        // Check for negative balance
+        // Check for negative balance - lock account within same transaction
         if (response.getNewBalance().compareTo(BigDecimal.ZERO) < 0) {
-            // Lock account immediately
             accountService.lockAccount(
                 request.getPlayerId(),
                 AccountLockReason.NEGATIVE_BALANCE,
                 "Balance: " + response.getNewBalance()
             );
-
-            // Trigger high-priority alert
-            alertService.sendAlert(
-                AlertLevel.CRITICAL,
-                "Negative Balance Alert",
-                "Player " + request.getPlayerId() + " balance: " + response.getNewBalance()
-            );
         }
+
+        return response;
     }
 }
 ```
