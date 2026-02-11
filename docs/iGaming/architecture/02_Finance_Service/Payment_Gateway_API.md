@@ -8,22 +8,22 @@
 
 ---
 
-## 1. System Architecture Overview
+## 1. 系統架構概覽（System Architecture Overview）
 
-The Payment Gateway integrates with multiple external PSPs (Payment Service Providers) to handle deposit and withdrawal transactions. Key architectural goals:
+Payment Gateway 整合多個外部 PSP (Payment Service Provider，支付服務提供商) 處理存款和提款交易。核心架構目標：
 
-- Multi-PSP support with intelligent routing
-- Fault-tolerant failover mechanism
-- Idempotent transaction processing
-- PCI-DSS compliant data handling
+- 多 PSP 支援與智能路由
+- 容錯式故障轉移機制
+- 冪等交易處理
+- PCI-DSS 合規的資料處理
 
 ---
 
-## 2. Deposit Flow Sequence
+## 2. 存款流程序列（Deposit Flow Sequence）
 
-### 2.1 Complete Deposit Flow
+### 2.1 完整存款流程（Complete Deposit Flow）
 
-The following sequence diagram shows the complete flow from player deposit initiation to balance crediting, including PSP routing, signature verification, callback handling, and idempotency protection:
+以下序列圖展示從玩家發起存款到餘額入賬的完整流程，包含 PSP 路由、簽名驗證、回調處理及冪等保護：
 
 ```mermaid
 sequenceDiagram
@@ -39,9 +39,9 @@ sequenceDiagram
     participant DB
     participant Notification
 
-    Note over Player,Notification: Deposit Flow - From Request to Credit
+    Note over Player,Notification: 存款流程 - 從請求到入賬
 
-    Player->>Frontend: Click "Deposit" (Amount: $100, Method: Credit Card)
+    Player->>Frontend: 點擊「存款」(金額: $100, 方式: Credit Card)
     Frontend->>API Gateway: POST /api/v1/payments/deposit<br/>{amount: 100, currency: USD, payment_method: credit_card}
 
     API Gateway->>PaymentService: createDepositOrder(playerId, amount, method)
@@ -50,16 +50,16 @@ sequenceDiagram
     PaymentService->>PSP Router: selectBestPSP(player, amount, method, country)
     activate PSP Router
 
-    Note over PSP Router: Smart Routing Algorithm (See Section 3)
+    Note over PSP Router: 智能路由演算法（見第 3 節）
 
-    PSP Router->>PSP Router: Calculate PSP Scores:<br/>Nuvei: 85, Adyen: 78, Stripe: 72
-    PSP Router-->>PaymentService: Selected PSP: Nuvei (Score: 85)
+    PSP Router->>PSP Router: 計算 PSP 分數：<br/>Nuvei: 85, Adyen: 78, Stripe: 72
+    PSP Router-->>PaymentService: 選中 PSP: Nuvei (分數: 85)
     deactivate PSP Router
 
     PaymentService->>DB: BEGIN TRANSACTION
     PaymentService->>DB: INSERT INTO transactions<br/>(id, player_id, amount, status, psp_code, created_at)<br/>VALUES (txn_20260127_001, player_123, 100, 'PENDING', 'nuvei', NOW())
 
-    PaymentService->>PaymentService: Generate Checksum:<br/>SHA256(merchantId + amount + currency + timestamp + secret)
+    PaymentService->>PaymentService: 生成校驗碼：<br/>SHA256(merchantId + amount + currency + timestamp + secret)
 
     PaymentService->>PSP (Nuvei): POST /ppp/api/v1/payment.do<br/>{merchantId, amount, currency, checksum, returnUrl}
     PSP (Nuvei)-->>PaymentService: {status: OK, redirect_url, payment_token, expires_at}
@@ -71,52 +71,52 @@ sequenceDiagram
     deactivate PaymentService
 
     API Gateway-->>Frontend: 200 OK {redirect_url}
-    Frontend->>PSP (Nuvei): 302 Redirect to Payment Page
+    Frontend->>PSP (Nuvei): 302 重定向至支付頁面
 
-    Note over Player,PSP (Nuvei): Player fills in card details & completes 3DS verification
+    Note over Player,PSP (Nuvei): 玩家填寫卡片資訊並完成 3DS 驗證
 
-    Player->>PSP (Nuvei): Submit Card Details (Card: 4111****1111, CVV: 123)
-    PSP (Nuvei)->>PSP (Nuvei): Process Payment (3-30 seconds)
+    Player->>PSP (Nuvei): 提交卡片資訊 (卡號: 4111****1111, CVV: 123)
+    PSP (Nuvei)->>PSP (Nuvei): 處理支付 (3-30 秒)
 
-    alt Payment Success
+    alt 支付成功
         PSP (Nuvei)->>Webhook Handler: POST /webhook/deposit<br/>X-PSP-Signature: HMAC-SHA256<br/>Body: {transaction_id, status: APPROVED, psp_txn_id, amount}
 
         activate Webhook Handler
 
-        Webhook Handler->>Webhook Handler: Step 1: Verify IP Whitelist<br/>(Request IP in PSP_IPS?)
+        Webhook Handler->>Webhook Handler: 步驟 1: 驗證 IP 白名單<br/>(請求 IP 是否在 PSP_IPS？)
 
-        alt IP Not Whitelisted
+        alt IP 不在白名單
             Webhook Handler-->>PSP (Nuvei): 403 Forbidden
-            Webhook Handler->>Notification: Alert Security Team (Suspicious IP)
+            Webhook Handler->>Notification: 通知安全團隊 (可疑 IP)
         end
 
-        Webhook Handler->>Webhook Handler: Step 2: Verify HMAC Signature<br/>Expected = HMAC(body, webhook_secret)<br/>Received = X-PSP-Signature
+        Webhook Handler->>Webhook Handler: 步驟 2: 驗證 HMAC 簽名<br/>預期 = HMAC(body, webhook_secret)<br/>收到 = X-PSP-Signature
 
-        alt Signature Mismatch
-            Webhook Handler-->>PSP (Nuvei): 403 Forbidden (Invalid Signature)
-            Webhook Handler->>Notification: Alert Security Team (Signature Forgery)
+        alt 簽名不符
+            Webhook Handler-->>PSP (Nuvei): 403 Forbidden (無效簽名)
+            Webhook Handler->>Notification: 通知安全團隊 (簽名偽造)
         end
 
-        Webhook Handler->>Webhook Handler: Step 3: Verify Timestamp<br/>(NOW() - request_timestamp < 5min?)
+        Webhook Handler->>Webhook Handler: 步驟 3: 驗證時間戳<br/>(NOW() - request_timestamp < 5min？)
 
-        alt Timestamp Expired
-            Webhook Handler-->>PSP (Nuvei): 400 Bad Request (Replay Attack)
+        alt 時間戳過期
+            Webhook Handler-->>PSP (Nuvei): 400 Bad Request (重放攻擊)
         end
 
         Webhook Handler->>Redis: SET NX callback:txn_20260127_001 1 EX 60
-        Redis-->>Webhook Handler: OK (Lock Acquired)
+        Redis-->>Webhook Handler: OK (取得鎖)
 
-        alt Lock Failed (Duplicate Callback)
-            Redis-->>Webhook Handler: NIL (Already Processing)
+        alt 鎖獲取失敗 (重複回調)
+            Redis-->>Webhook Handler: NIL (已在處理中)
             Webhook Handler-->>PSP (Nuvei): 200 OK {status: ALREADY_PROCESSED}
         end
 
         Webhook Handler->>DB: SELECT * FROM transactions<br/>WHERE id = txn_20260127_001 FOR UPDATE
         DB-->>Webhook Handler: {status: PENDING, player_id: player_123, amount: 100}
 
-        alt Status != PENDING (Idempotent Check)
+        alt 狀態 != PENDING (冪等檢查)
             Webhook Handler-->>PSP (Nuvei): 200 OK {status: ALREADY_PROCESSED}
-        else Status = PENDING (Normal Path)
+        else 狀態 = PENDING (正常路徑)
             Webhook Handler->>DB: BEGIN TRANSACTION
 
             Webhook Handler->>DB: UPDATE transactions SET<br/>status = 'SUCCESS',<br/>psp_transaction_id = psp_txn_id,<br/>completed_at = NOW()
@@ -133,7 +133,7 @@ sequenceDiagram
             Webhook Handler->>DB: COMMIT
 
             Webhook Handler->>Notification: sendDepositSuccessNotification(player_123, amount: 100)
-            Notification->>Player: Email + SMS: "Deposit $100 Successful. New Balance: $1,100"
+            Notification->>Player: Email + SMS: "存款 $100 成功。新餘額: $1,100"
 
             Webhook Handler-->>PSP (Nuvei): 200 OK {status: SUCCESS}
         end
@@ -141,66 +141,66 @@ sequenceDiagram
         Webhook Handler->>Redis: DEL callback:txn_20260127_001
         deactivate Webhook Handler
 
-        PSP (Nuvei)->>Frontend: 302 Redirect to Return URL (success_page)
-        Frontend->>Player: Display "Deposit Successful" + New Balance
+        PSP (Nuvei)->>Frontend: 302 重定向至返回 URL (success_page)
+        Frontend->>Player: 顯示「存款成功」+ 新餘額
 
-    else Payment Failed
+    else 支付失敗
         PSP (Nuvei)->>Webhook Handler: POST /webhook/deposit<br/>Body: {transaction_id, status: DECLINED, error_code: INSUFFICIENT_FUNDS}
 
         Webhook Handler->>DB: UPDATE transactions SET<br/>status = 'FAILED',<br/>error_code = 'INSUFFICIENT_FUNDS',<br/>completed_at = NOW()
 
         Webhook Handler->>Notification: sendDepositFailedNotification(player_123, reason: INSUFFICIENT_FUNDS)
-        Notification->>Player: Email: "Deposit Failed. Please try another card."
+        Notification->>Player: Email: "存款失敗。請嘗試另一張卡片。"
 
         Webhook Handler-->>PSP (Nuvei): 200 OK {status: RECEIVED}
 
-        PSP (Nuvei)->>Frontend: 302 Redirect to Return URL (failure_page)
-        Frontend->>Player: Display "Payment Failed. Reason: Insufficient Funds"
+        PSP (Nuvei)->>Frontend: 302 重定向至返回 URL (failure_page)
+        Frontend->>Player: 顯示「支付失敗。原因: 餘額不足」
 
-    else Payment Timeout (No Callback Received)
-        Note over PaymentService,DB: Scheduled Job - Reconciliation (Every 15 min)
+    else 支付超時 (未收到回調)
+        Note over PaymentService,DB: 排程任務 - 對帳 (每 15 分鐘)
 
         PaymentService->>DB: SELECT * FROM transactions<br/>WHERE status = 'PENDING'<br/>AND created_at < NOW() - INTERVAL '30 minutes'
         DB-->>PaymentService: [txn_20260127_001, ...]
 
-        loop For each Pending Transaction
+        loop 針對每筆待處理交易
             PaymentService->>PSP (Nuvei): GET /api/v1/query?transaction_id=txn_20260127_001<br/>Authorization: HMAC-SHA256
 
-            alt PSP Status: APPROVED
+            alt PSP 狀態: APPROVED
                 PSP (Nuvei)-->>PaymentService: {status: APPROVED, psp_txn_id, amount: 100}
-                PaymentService->>PaymentService: Trigger Manual Credit Flow (Same as Webhook Handler)
+                PaymentService->>PaymentService: 觸發手動入賬流程 (同 Webhook Handler)
                 PaymentService->>WalletService: creditBalance(player_123, 100)
                 PaymentService->>DB: UPDATE transactions SET status = 'SUCCESS'
-                PaymentService->>Notification: Send Manual Credit Notification
-            else PSP Status: DECLINED
+                PaymentService->>Notification: 發送手動入賬通知
+            else PSP 狀態: DECLINED
                 PSP (Nuvei)-->>PaymentService: {status: DECLINED}
                 PaymentService->>DB: UPDATE transactions SET status = 'FAILED'
-            else PSP Status: PENDING
+            else PSP 狀態: PENDING
                 PSP (Nuvei)-->>PaymentService: {status: PENDING}
-                PaymentService->>PaymentService: Keep PENDING, retry later
+                PaymentService->>PaymentService: 保持 PENDING，稍後重試
             end
         end
     end
 ```
 
-### 2.2 Key Design Points
+### 2.2 關鍵設計要點（Key Design Points）
 
-| Phase | Key Step | Security Mechanism | Performance Target |
+| 階段 | 關鍵步驟 | 安全機制 | 效能目標 |
 |-------|----------|-------------------|-------------------|
-| **1. PSP Routing** | Smart PSP selection | Multi-dimensional scoring (success rate, cost, speed) | < 100ms |
-| **2. Order Creation** | Generate unique transaction_id | DB unique constraint prevents duplicates | < 50ms |
-| **3. Signature Generation** | SHA256 checksum | Prevents request tampering | < 10ms |
-| **4. PSP Request** | Obtain redirect_url | HTTPS + TLS 1.2+ | < 500ms |
-| **5. Callback Verification** | 3-layer validation (IP, signature, timestamp) | Prevents forgery, replay attacks | < 50ms |
-| **6. Idempotency** | Redis SET NX lock | Prevents duplicate callbacks | < 10ms |
-| **7. Balance Update** | Optimistic locking (version) | Prevents concurrent conflicts | < 100ms |
-| **8. Reconciliation** | Scheduled PSP status query | Prevents dropped transactions | Every 15 min |
+| **1. PSP 路由** | 智能 PSP 選擇 | 多維度評分 (成功率、成本、速度) | < 100ms |
+| **2. 訂單建立** | 生成唯一 transaction_id | 資料庫唯一約束防止重複 | < 50ms |
+| **3. 簽名生成** | SHA256 校驗碼 | 防止請求篡改 | < 10ms |
+| **4. PSP 請求** | 取得 redirect_url | HTTPS + TLS 1.2+ | < 500ms |
+| **5. 回調驗證** | 三層驗證 (IP、簽名、時間戳) | 防止偽造、重放攻擊 | < 50ms |
+| **6. 冪等性** | Redis SET NX 鎖 | 防止重複回調 | < 10ms |
+| **7. 餘額更新** | 樂觀鎖 (version) | 防止並發衝突 | < 100ms |
+| **8. 對帳** | 排程查詢 PSP 狀態 | 防止遺失交易 | 每 15 分鐘 |
 
 ---
 
-## 2.3. Database Schema
+## 2.3. 資料庫架構（Database Schema）
 
-### 2.3.1 Payment Transactions Table
+### 2.3.1 支付交易表（Payment Transactions Table）
 
 ```sql
 CREATE TABLE t_payment_transaction (
@@ -262,7 +262,7 @@ CREATE UNIQUE INDEX uk_payment_txn_psp ON t_payment_transaction(psp_code, psp_tr
     WHERE psp_transaction_id IS NOT NULL;
 ```
 
-### 2.3.2 Payment Methods Configuration Table
+### 2.3.2 支付方式配置表（Payment Methods Configuration Table）
 
 ```sql
 CREATE TABLE t_payment_method (
@@ -311,7 +311,7 @@ INSERT INTO t_payment_method (method_code, method_name, method_type, supported_c
 ('usdt_trc20', 'USDT (TRC20)', 'CRYPTO', ARRAY['USDT'], ARRAY['ALL'], 10.00, 100000.00, 'FIXED', 1.00, 30, 5);
 ```
 
-### 2.3.3 Payment Audit Log Table
+### 2.3.3 支付審計日誌表（Payment Audit Log Table）
 
 ```sql
 CREATE TABLE t_payment_audit_log (
@@ -345,7 +345,7 @@ CREATE INDEX idx_payment_audit_event_type ON t_payment_audit_log(event_type);
 CREATE INDEX idx_payment_audit_event_data ON t_payment_audit_log USING GIN (event_data);
 ```
 
-### 2.3.4 PSP Configuration Table
+### 2.3.4 PSP 配置表（PSP Configuration Table）
 
 ```sql
 CREATE TABLE t_psp_config (
@@ -393,9 +393,9 @@ INSERT INTO t_psp_config (psp_code, psp_name, enabled, priority, supported_metho
 ('stripe', 'Stripe', TRUE, 6, ARRAY['credit_card', 'bank_transfer'], ARRAY['USD', 'EUR'], ARRAY['US', 'UK'], 0.0290, 15, 0.9000, FALSE);
 ```
 
-### 2.3.5 Query Examples
+### 2.3.5 查詢範例（Query Examples）
 
-**Find pending transactions older than 30 minutes (for reconciliation)**:
+**查找超過 30 分鐘的待處理交易（用於對帳）**:
 ```sql
 SELECT
     t.transaction_id,
@@ -412,7 +412,7 @@ ORDER BY t.created_at ASC
 LIMIT 100;
 ```
 
-**Calculate PSP success rate for smart routing**:
+**計算 PSP 成功率用於智能路由**:
 ```sql
 SELECT
     psp_code,
@@ -427,7 +427,7 @@ GROUP BY psp_code
 ORDER BY success_rate DESC;
 ```
 
-**Audit log query for a specific transaction**:
+**查詢特定交易的審計日誌**:
 ```sql
 SELECT
     event_type,
@@ -442,57 +442,57 @@ ORDER BY created_at ASC;
 
 ---
 
-## 3. Smart Routing Algorithm
+## 3. 智能路由演算法（Smart Routing Algorithm）
 
-### 3.1 Routing Architecture Overview
+### 3.1 路由架構概覽（Routing Architecture Overview）
 
 ```mermaid
 flowchart LR
-    START[Player Deposit Request] --> INPUT["Input Parameters<br/>-----<br/>Amount: $1000<br/>Currency: USD<br/>Country: US<br/>Payment Method: Credit Card<br/>VIP Level: 2"]
+    START[玩家存款請求] --> INPUT["輸入參數<br/>-----<br/>金額: $1000<br/>幣別: USD<br/>國家: US<br/>支付方式: Credit Card<br/>VIP 等級: 2"]
 
-    INPUT --> STEP1["Step 1<br/>Country & Payment<br/>Method Filtering<br/>-----<br/>Filter by Geography<br/>& Payment Type"]
+    INPUT --> STEP1["步驟 1<br/>國家與支付方式<br/>篩選<br/>-----<br/>地理位置與<br/>支付類型篩選"]
 
-    STEP1 --> CANDIDATES["Candidate PSPs<br/>-----<br/>Nuvei<br/>Adyen<br/>Stripe<br/>(3 candidates)"]
+    STEP1 --> CANDIDATES["候選 PSP<br/>-----<br/>Nuvei<br/>Adyen<br/>Stripe<br/>(3 個候選)"]
 
-    CANDIDATES --> STEP2["Step 2<br/>Health Status Check<br/>-----<br/>Filter Unavailable PSPs"]
+    CANDIDATES --> STEP2["步驟 2<br/>健康狀態檢查<br/>-----<br/>過濾不可用 PSP"]
 
-    STEP2 --> AVAILABLE["Available PSPs<br/>-----<br/>Nuvei: Healthy<br/>Adyen: Healthy<br/>Stripe: Degraded<br/>(2 healthy)"]
+    STEP2 --> AVAILABLE["可用 PSP<br/>-----<br/>Nuvei: Healthy<br/>Adyen: Healthy<br/>Stripe: Degraded<br/>(2 個健康)"]
 
-    AVAILABLE --> STEP3["Step 3<br/>Multi-Dimensional<br/>Scoring Algorithm<br/>-----<br/>5 Dimensions Evaluation"]
+    AVAILABLE --> STEP3["步驟 3<br/>多維度<br/>評分演算法<br/>-----<br/>5 個維度評估"]
 
-    STEP3 --> RANKED["Ranked PSPs<br/>-----<br/>1. Nuvei: 92.25<br/>2. Adyen: 78.0<br/>3. Stripe: 72.0"]
+    STEP3 --> RANKED["排序後的 PSP<br/>-----<br/>1. Nuvei: 92.25<br/>2. Adyen: 78.0<br/>3. Stripe: 72.0"]
 
-    RANKED --> STEP4["Step 4<br/>Final Health Check<br/>-----<br/>Verify Top PSP Status"]
+    RANKED --> STEP4["步驟 4<br/>最終健康檢查<br/>-----<br/>驗證首選 PSP 狀態"]
 
-    STEP4 --> DECISION{Top PSP Status?}
+    STEP4 --> DECISION{首選 PSP 狀態?}
 
-    DECISION -->|Healthy| ROUTE["Route to Nuvei<br/>-----<br/>Payment URL Generated<br/>Settlement ETA: 10 min"]
-    DECISION -->|Degraded/Down| FALLBACK["Fallback to Adyen<br/>-----<br/>Retry with 2nd PSP"]
+    DECISION -->|健康| ROUTE["路由至 Nuvei<br/>-----<br/>生成支付 URL<br/>入賬 ETA: 10 分鐘"]
+    DECISION -->|降級/下線| FALLBACK["備援至 Adyen<br/>-----<br/>重試第 2 順位 PSP"]
 
     FALLBACK --> DECISION
 
-    ROUTE --> LOG["Log Routing Decision<br/>-----<br/>Selected: Nuvei<br/>Score: 92.25<br/>Fallback Queue: Adyen, Stripe"]
+    ROUTE --> LOG["記錄路由決策<br/>-----<br/>選中: Nuvei<br/>分數: 92.25<br/>備援佇列: Adyen, Stripe"]
 
-    LOG --> RETURN["Return to Gateway<br/>-----<br/>Redirect URL + ETA"]
+    LOG --> RETURN["返回至 Gateway<br/>-----<br/>重定向 URL + ETA"]
 
-    RETURN --> END1[End - Success]
+    RETURN --> END1[結束 - 成功]
 ```
 
-### 3.2 Country & Payment Method Filtering
+### 3.2 國家與支付方式篩選（Country & Payment Method Filtering）
 
 ```mermaid
 flowchart TD
-    START[Step 1: Filter PSPs] --> INPUT[Input: Country, Payment Method]
+    START[步驟 1: 篩選 PSP] --> INPUT[輸入: 國家, 支付方式]
 
-    INPUT --> COUNTRY{Country?}
+    INPUT --> COUNTRY{國家?}
 
-    COUNTRY -->|US| US["US PSPs<br/>-----<br/>Stripe<br/>Nuvei<br/>PayPal<br/>Coinbase"]
-    COUNTRY -->|EU| EU["EU PSPs<br/>-----<br/>Adyen<br/>Trustly<br/>Klarna<br/>Skrill"]
-    COUNTRY -->|CN| CN["CN PSPs<br/>-----<br/>Alipay<br/>WeChat Pay<br/>UnionPay"]
-    COUNTRY -->|PH| PH["PH PSPs<br/>-----<br/>GCash<br/>PayMaya<br/>GrabPay"]
-    COUNTRY -->|BR| BR["BR PSPs<br/>-----<br/>PagSeguro<br/>MercadoPago<br/>Pix"]
-    COUNTRY -->|JP| JP["JP PSPs<br/>-----<br/>PayPay<br/>Line Pay<br/>Rakuten Pay"]
-    COUNTRY -->|Other| GLOBAL["Global PSPs<br/>-----<br/>Stripe<br/>Adyen<br/>Nuvei"]
+    COUNTRY -->|US| US["美國 PSP<br/>-----<br/>Stripe<br/>Nuvei<br/>PayPal<br/>Coinbase"]
+    COUNTRY -->|EU| EU["歐盟 PSP<br/>-----<br/>Adyen<br/>Trustly<br/>Klarna<br/>Skrill"]
+    COUNTRY -->|CN| CN["中國 PSP<br/>-----<br/>Alipay<br/>WeChat Pay<br/>UnionPay"]
+    COUNTRY -->|PH| PH["菲律賓 PSP<br/>-----<br/>GCash<br/>PayMaya<br/>GrabPay"]
+    COUNTRY -->|BR| BR["巴西 PSP<br/>-----<br/>PagSeguro<br/>MercadoPago<br/>Pix"]
+    COUNTRY -->|JP| JP["日本 PSP<br/>-----<br/>PayPay<br/>Line Pay<br/>Rakuten Pay"]
+    COUNTRY -->|其他| GLOBAL["全球 PSP<br/>-----<br/>Stripe<br/>Adyen<br/>Nuvei"]
 
     US --> METHOD
     EU --> METHOD
@@ -502,45 +502,45 @@ flowchart TD
     JP --> METHOD
     GLOBAL --> METHOD
 
-    METHOD{Payment Method?}
+    METHOD{支付方式?}
 
-    METHOD -->|Credit Card| CARD["PSPs Supporting Cards<br/>-----<br/>Example: Stripe, Adyen, Nuvei<br/>Card Networks: VISA, MC, AMEX"]
-    METHOD -->|E-Wallet| EWALLET["PSPs Supporting E-Wallets<br/>-----<br/>Example: PayPal, Skrill, Neteller<br/>Local: Alipay, WeChat, GCash"]
-    METHOD -->|Bank Transfer| BANK["PSPs Supporting Bank Transfers<br/>-----<br/>Example: Trustly, Klarna, Pix<br/>Settlement: T+1 to T+3"]
-    METHOD -->|Crypto| CRYPTO["PSPs Supporting Crypto<br/>-----<br/>Example: Coinbase, BitPay<br/>Currencies: USDT, BTC, ETH"]
+    METHOD -->|Credit Card| CARD["支援卡片的 PSP<br/>-----<br/>範例: Stripe, Adyen, Nuvei<br/>卡組織: VISA, MC, AMEX"]
+    METHOD -->|E-Wallet| EWALLET["支援電子錢包的 PSP<br/>-----<br/>範例: PayPal, Skrill, Neteller<br/>本地: Alipay, WeChat, GCash"]
+    METHOD -->|Bank Transfer| BANK["支援銀行轉帳的 PSP<br/>-----<br/>範例: Trustly, Klarna, Pix<br/>到帳: T+1 至 T+3"]
+    METHOD -->|Crypto| CRYPTO["支援加密貨幣的 PSP<br/>-----<br/>範例: Coinbase, BitPay<br/>幣種: USDT, BTC, ETH"]
 
     CARD --> STATUS_FILTER
     EWALLET --> STATUS_FILTER
     BANK --> STATUS_FILTER
     CRYPTO --> STATUS_FILTER
 
-    STATUS_FILTER[Health Status Filtering] --> HEALTH{PSP Status?}
+    STATUS_FILTER[健康狀態篩選] --> HEALTH{PSP 狀態?}
 
-    HEALTH -->|Healthy<br/>Success >= 80%| HEALTHY["Available for Scoring<br/>-----<br/>Pass to Step 3"]
-    HEALTH -->|Degraded<br/>Success 50-79%| DEGRADED["Lower Priority<br/>-----<br/>Score Penalty: -20"]
-    HEALTH -->|Unavailable<br/>Success < 50%| UNAVAILABLE["Skip<br/>-----<br/>Use Fallback"]
+    HEALTH -->|健康<br/>成功率 >= 80%| HEALTHY["可用於評分<br/>-----<br/>進入步驟 3"]
+    HEALTH -->|降級<br/>成功率 50-79%| DEGRADED["降低優先級<br/>-----<br/>分數懲罰: -20"]
+    HEALTH -->|不可用<br/>成功率 < 50%| UNAVAILABLE["跳過<br/>-----<br/>使用備援"]
 
-    HEALTHY --> RETURN1[Return Filtered PSPs]
+    HEALTHY --> RETURN1[返回篩選後的 PSP]
     DEGRADED --> RETURN1
-    UNAVAILABLE --> FALLBACK_OPTION["Manual Bank Transfer<br/>-----<br/>Settlement: T+2"]
+    UNAVAILABLE --> FALLBACK_OPTION["手動銀行轉帳<br/>-----<br/>到帳: T+2"]
 
-    RETURN1 --> END1[Proceed to Step 3: Scoring]
-    FALLBACK_OPTION --> END2[Notify Ops Team]
+    RETURN1 --> END1[進入步驟 3: 評分]
+    FALLBACK_OPTION --> END2[通知運營團隊]
 ```
 
-### 3.3 Multi-Dimensional Scoring Algorithm
+### 3.3 多維度評分演算法（Multi-Dimensional Scoring Algorithm）
 
 ```mermaid
 flowchart TD
-    START[Step 3: Calculate Score for Each PSP] --> INIT[Initialize Score = 0]
+    START[步驟 3: 計算每個 PSP 的分數] --> INIT[初始化分數 = 0]
 
-    INIT --> DIM1{"Dimension 1<br/>Success Rate (24h)<br/>-----<br/>Weight: 50%"}
+    INIT --> DIM1{"維度 1<br/>成功率 (24h)<br/>-----<br/>權重: 50%"}
 
-    DIM1 -->|>= 95%| S1A["Score += 50 x 0.95<br/>= 47.5"]
-    DIM1 -->|90-94%| S1B["Score += 50 x 0.92<br/>= 46.0"]
-    DIM1 -->|85-89%| S1C["Score += 50 x 0.88<br/>= 44.0"]
-    DIM1 -->|80-84%| S1D["Score += 50 x 0.85<br/>= 42.5"]
-    DIM1 -->|< 80%| S1E["Score += 50 x 0.75<br/>= 37.5"]
+    DIM1 -->|>= 95%| S1A["分數 += 50 x 0.95<br/>= 47.5"]
+    DIM1 -->|90-94%| S1B["分數 += 50 x 0.92<br/>= 46.0"]
+    DIM1 -->|85-89%| S1C["分數 += 50 x 0.88<br/>= 44.0"]
+    DIM1 -->|80-84%| S1D["分數 += 50 x 0.85<br/>= 42.5"]
+    DIM1 -->|< 80%| S1E["分數 += 50 x 0.75<br/>= 37.5"]
 
     S1A --> DIM2
     S1B --> DIM2
@@ -548,13 +548,13 @@ flowchart TD
     S1D --> DIM2
     S1E --> DIM2
 
-    DIM2{"Dimension 2<br/>Fee Rate<br/>-----<br/>Weight: 30%"}
+    DIM2{"維度 2<br/>手續費率<br/>-----<br/>權重: 30%"}
 
-    DIM2 -->|< 2%| S2A["Score += 30 x 0.98<br/>= 29.4"]
-    DIM2 -->|2-3%| S2B["Score += 30 x 0.95<br/>= 28.5"]
-    DIM2 -->|3-4%| S2C["Score += 30 x 0.92<br/>= 27.6"]
-    DIM2 -->|4-5%| S2D["Score += 30 x 0.90<br/>= 27.0"]
-    DIM2 -->|> 5%| S2E["Score += 30 x 0.80<br/>= 24.0"]
+    DIM2 -->|< 2%| S2A["分數 += 30 x 0.98<br/>= 29.4"]
+    DIM2 -->|2-3%| S2B["分數 += 30 x 0.95<br/>= 28.5"]
+    DIM2 -->|3-4%| S2C["分數 += 30 x 0.92<br/>= 27.6"]
+    DIM2 -->|4-5%| S2D["分數 += 30 x 0.90<br/>= 27.0"]
+    DIM2 -->|> 5%| S2E["分數 += 30 x 0.80<br/>= 24.0"]
 
     S2A --> DIM3
     S2B --> DIM3
@@ -562,13 +562,13 @@ flowchart TD
     S2D --> DIM3
     S2E --> DIM3
 
-    DIM3{"Dimension 3<br/>Settlement Speed<br/>-----<br/>Weight: 15%"}
+    DIM3{"維度 3<br/>到帳速度<br/>-----<br/>權重: 15%"}
 
-    DIM3 -->|< 5 min| S3A["Score += 15 x 1.0<br/>= 15.0"]
-    DIM3 -->|5-15 min| S3B["Score += 15 x 0.8<br/>= 12.0"]
-    DIM3 -->|15-30 min| S3C["Score += 15 x 0.6<br/>= 9.0"]
-    DIM3 -->|30-60 min| S3D["Score += 15 x 0.5<br/>= 7.5"]
-    DIM3 -->|> 60 min| S3E["Score += 15 x 0.2<br/>= 3.0"]
+    DIM3 -->|< 5 分鐘| S3A["分數 += 15 x 1.0<br/>= 15.0"]
+    DIM3 -->|5-15 分鐘| S3B["分數 += 15 x 0.8<br/>= 12.0"]
+    DIM3 -->|15-30 分鐘| S3C["分數 += 15 x 0.6<br/>= 9.0"]
+    DIM3 -->|30-60 分鐘| S3D["分數 += 15 x 0.5<br/>= 7.5"]
+    DIM3 -->|> 60 分鐘| S3E["分數 += 15 x 0.2<br/>= 3.0"]
 
     S3A --> DIM4
     S3B --> DIM4
@@ -576,111 +576,111 @@ flowchart TD
     S3D --> DIM4
     S3E --> DIM4
 
-    DIM4{"Dimension 4<br/>VIP Channel<br/>-----<br/>Weight: 5%"}
+    DIM4{"維度 4<br/>VIP 通道<br/>-----<br/>權重: 5%"}
 
-    DIM4 -->|VIP >= 3<br/>AND<br/>PSP has VIP channel| S4A["Score += 5.0<br/>VIP Bonus"]
-    DIM4 -->|Otherwise| S4B[Score += 0]
+    DIM4 -->|VIP >= 3<br/>且<br/>PSP 有 VIP 通道| S4A["分數 += 5.0<br/>VIP 加分"]
+    DIM4 -->|否| S4B[分數 += 0]
 
     S4A --> DIM5
     S4B --> DIM5
 
-    DIM5{"Dimension 5<br/>Currency Match<br/>-----<br/>Weight: 3%"}
+    DIM5{"維度 5<br/>幣別匹配<br/>-----<br/>權重: 3%"}
 
-    DIM5 -->|Exact Match<br/>No FX Fee| S5A[Score += 3.0]
-    DIM5 -->|Need Conversion<br/>FX Fee Applied| S5B[Score += 0]
+    DIM5 -->|完全匹配<br/>無匯兌費| S5A[分數 += 3.0]
+    DIM5 -->|需要轉換<br/>有匯兌費| S5B[分數 += 0]
 
     S5A --> TOTAL
     S5B --> TOTAL
 
-    TOTAL["Calculate Total Score<br/>-----<br/>Range: 0-103<br/>Typical: 70-95"] --> EXAMPLE["Scoring Example:<br/>-----<br/>Nuvei<br/>Success 95%: 47.5<br/>Fee 2.5%: 28.5<br/>Speed 10min: 12.0<br/>VIP: 0<br/>Currency Match: 3.0<br/>-----<br/>Total: 91.0"]
+    TOTAL["計算總分<br/>-----<br/>範圍: 0-103<br/>典型: 70-95"] --> EXAMPLE["評分範例:<br/>-----<br/>Nuvei<br/>成功率 95%: 47.5<br/>手續費 2.5%: 28.5<br/>速度 10分鐘: 12.0<br/>VIP: 0<br/>幣別匹配: 3.0<br/>-----<br/>總分: 91.0"]
 
-    EXAMPLE --> RANK[Rank All PSPs by Score DESC]
+    EXAMPLE --> RANK[依分數降序排列所有 PSP]
 
-    RANK --> SELECT[Select Top 1 PSP]
+    RANK --> SELECT[選擇第 1 名 PSP]
 
-    SELECT --> HEALTH_CHECK{Final Health Check}
+    SELECT --> HEALTH_CHECK{最終健康檢查}
 
-    HEALTH_CHECK -->|Healthy| ROUTE[Route to Selected PSP]
-    HEALTH_CHECK -->|Degraded/Down| RETRY[Retry with 2nd Ranked PSP]
+    HEALTH_CHECK -->|健康| ROUTE[路由至選中的 PSP]
+    HEALTH_CHECK -->|降級/下線| RETRY[重試第 2 名 PSP]
 
     RETRY --> HEALTH_CHECK
 
-    ROUTE --> LOG[Log Decision + Fallback Queue]
-    LOG --> END[Return PSP Details]
+    ROUTE --> LOG[記錄決策 + 備援佇列]
+    LOG --> END[返回 PSP 詳細資訊]
 ```
 
-### 3.4 Score Calculation Example
+### 3.4 分數計算範例（Score Calculation Example）
 
-For a US player depositing $1000 via Credit Card:
+美國玩家透過 Credit Card 存款 $1000：
 
 ```
 Nuvei:
-  Success Rate: 95% -> 95% x 50 = 47.5
-  Fee: 2.5% -> (1 - 0.025) x 30 = 29.25
-  Settlement: 10 min -> (1 - 10/60) x 15 = 12.5
-  VIP Bonus: No -> 0
-  Currency Match: USD -> +3
-  Total Score: 92.25 (Selected)
+  成功率: 95% -> 95% x 50 = 47.5
+  手續費: 2.5% -> (1 - 0.025) x 30 = 29.25
+  到帳時間: 10 分鐘 -> (1 - 10/60) x 15 = 12.5
+  VIP 加分: 無 -> 0
+  幣別匹配: USD -> +3
+  總分: 92.25 (選中)
 
 Adyen:
-  Success Rate: 92% -> 46.0
-  Fee: 3.0% -> 29.1
-  Settlement: 5 min -> 13.75
-  VIP Bonus: No -> 0
-  Currency Match: EUR (need convert) -> 0
-  Total Score: 88.85
+  成功率: 92% -> 46.0
+  手續費: 3.0% -> 29.1
+  到帳時間: 5 分鐘 -> 13.75
+  VIP 加分: 無 -> 0
+  幣別匹配: EUR (需轉換) -> 0
+  總分: 88.85
 
 Stripe:
-  Success Rate: 90% -> 45.0
-  Fee: 2.9% -> 29.13
-  Settlement: 15 min -> 11.25
-  VIP Bonus: No -> 0
-  Currency Match: USD -> +3
-  Total Score: 88.38
+  成功率: 90% -> 45.0
+  手續費: 2.9% -> 29.13
+  到帳時間: 15 分鐘 -> 11.25
+  VIP 加分: 無 -> 0
+  幣別匹配: USD -> +3
+  總分: 88.38
 ```
 
-**Decision**: Nuvei selected (92.25). Fallback queue: [Adyen, Stripe]
+**決策結果**: 選中 Nuvei (92.25)。備援佇列: [Adyen, Stripe]
 
 ---
 
-## 4. Reconciliation & Manual Credit Flow
+## 4. 對帳與手動入賬流程（Reconciliation & Manual Credit Flow）
 
-### 4.1 Reconciliation Task Overview
+### 4.1 對帳任務概覽（Reconciliation Task Overview）
 
 ```mermaid
 flowchart TD
-    START["Cron Job<br/>-----<br/>Trigger: Every 15 minutes<br/>Target: Pending > 30 min"] --> QUERY["Query Pending Transactions<br/>-----<br/>SELECT * FROM transactions<br/>WHERE status = 'PENDING'<br/>AND created_at < NOW() - 30min"]
+    START["Cron Job<br/>-----<br/>觸發: 每 15 分鐘<br/>目標: 待處理 > 30 分鐘"] --> QUERY["查詢待處理交易<br/>-----<br/>SELECT * FROM transactions<br/>WHERE status = 'PENDING'<br/>AND created_at < NOW() - 30min"]
 
-    QUERY --> CHECK{"Found Pending<br/>Transactions?"}
+    QUERY --> CHECK{"找到待處理<br/>交易?"}
 
-    CHECK -->|No| END1["End<br/>-----<br/>No Action Needed<br/>Next Run: 15 min"]
+    CHECK -->|否| END1["結束<br/>-----<br/>無需操作<br/>下次執行: 15 分鐘"]
 
-    CHECK -->|Yes| COUNT["Pending Count: 25<br/>-----<br/>Begin Reconciliation Loop"]
+    CHECK -->|是| COUNT["待處理數量: 25<br/>-----<br/>開始對帳迴圈"]
 
-    COUNT --> LOOP["For Each Transaction<br/>-----<br/>Query PSP Status via API"]
+    COUNT --> LOOP["針對每筆交易<br/>-----<br/>透過 API 查詢 PSP 狀態"]
 
-    LOOP --> PSP_API["PSP Query Result<br/>-----<br/>GET /api/v1/query<br/>HMAC Signature Auth"]
+    LOOP --> PSP_API["PSP 查詢結果<br/>-----<br/>GET /api/v1/query<br/>HMAC 簽名驗證"]
 
-    PSP_API --> ROUTE{PSP Status?}
+    PSP_API --> ROUTE{PSP 狀態?}
 
-    ROUTE -->|SUCCESS| PATH_SUCCESS["Auto Credit Flow<br/>-----<br/>PSP confirmed but not credited<br/>Proceed to Credit Process"]
+    ROUTE -->|SUCCESS| PATH_SUCCESS["自動入賬流程<br/>-----<br/>PSP 確認但未入賬<br/>執行入賬流程"]
 
-    ROUTE -->|FAILED| PATH_FAILED["Update Status<br/>-----<br/>Mark as FAILED<br/>Notify Player<br/>No Credit Needed"]
+    ROUTE -->|FAILED| PATH_FAILED["更新狀態<br/>-----<br/>標記為 FAILED<br/>通知玩家<br/>無需入賬"]
 
-    ROUTE -->|PENDING| PATH_PENDING["Continue Waiting<br/>-----<br/>Check Duration:<br/>< 2h: Wait<br/>>= 2h: Alert CS Team"]
+    ROUTE -->|PENDING| PATH_PENDING["繼續等待<br/>-----<br/>檢查持續時間:<br/>< 2h: 等待<br/>>= 2h: 通知客服"]
 
-    ROUTE -->|NOT_FOUND| PATH_NOT_FOUND["Manual Review Flow<br/>-----<br/>PSP has no record<br/>Proceed to Appeal Process"]
+    ROUTE -->|NOT_FOUND| PATH_NOT_FOUND["手動審核流程<br/>-----<br/>PSP 無記錄<br/>進入申訴流程"]
 
-    ROUTE -->|API ERROR| PATH_ERROR["Retry Logic<br/>-----<br/>Retry < 3: Wait 5min<br/>Retry >= 3: Escalate"]
+    ROUTE -->|API ERROR| PATH_ERROR["重試邏輯<br/>-----<br/>重試 < 3: 等待 5 分鐘<br/>重試 >= 3: 升級"]
 
-    PATH_SUCCESS --> AUTO_CREDIT[See: Auto Credit Flow<br/>-----<br/>Idempotency + Lock + Credit]
-    PATH_NOT_FOUND --> MANUAL_REVIEW["See: Manual Review Flow<br/>-----<br/>Appeal + Verify + Approval"]
+    PATH_SUCCESS --> AUTO_CREDIT[見: 自動入賬流程<br/>-----<br/>冪等 + 鎖 + 入賬]
+    PATH_NOT_FOUND --> MANUAL_REVIEW["見: 手動審核流程<br/>-----<br/>申訴 + 驗證 + 審批"]
 
-    AUTO_CREDIT --> RESULT1[Result: Credit Success/Failed]
-    MANUAL_REVIEW --> RESULT2[Result: Approved/Rejected]
-    PATH_FAILED --> RESULT3[Result: Marked Failed]
-    PATH_PENDING --> RESULT4[Result: Still Pending]
-    PATH_ERROR --> RESULT5[Result: Retry/Escalated]
+    AUTO_CREDIT --> RESULT1[結果: 入賬成功/失敗]
+    MANUAL_REVIEW --> RESULT2[結果: 批准/拒絕]
+    PATH_FAILED --> RESULT3[結果: 標記為失敗]
+    PATH_PENDING --> RESULT4[結果: 仍在待處理]
+    PATH_ERROR --> RESULT5[結果: 重試/升級]
 
     RESULT1 --> NEXT
     RESULT2 --> NEXT
@@ -688,174 +688,174 @@ flowchart TD
     RESULT4 --> NEXT
     RESULT5 --> NEXT
 
-    NEXT{"More Pending<br/>Transactions?"}
+    NEXT{"還有待處理<br/>交易?"}
 
-    NEXT -->|Yes| LOOP
-    NEXT -->|No| SUMMARY["Generate Report<br/>-----<br/>Total Checked: 25<br/>Credit Success: 5<br/>Failed: 3<br/>Still Pending: 15<br/>Manual Review: 2"]
+    NEXT -->|是| LOOP
+    NEXT -->|否| SUMMARY["生成報告<br/>-----<br/>總檢查數: 25<br/>入賬成功: 5<br/>失敗: 3<br/>仍待處理: 15<br/>手動審核: 2"]
 
-    SUMMARY --> REPORT["Send to Finance Team<br/>-----<br/>Daily Report @ 08:00 AM<br/>Email + Dashboard"]
+    SUMMARY --> REPORT["發送至財務團隊<br/>-----<br/>每日報告 @ 08:00 AM<br/>Email + Dashboard"]
 
-    REPORT --> END2["End<br/>-----<br/>Reconciliation Complete<br/>Next Run: 15 min"]
+    REPORT --> END2["結束<br/>-----<br/>對帳完成<br/>下次執行: 15 分鐘"]
 ```
 
-### 4.2 Auto Credit Flow
+### 4.2 自動入賬流程（Auto Credit Flow）
 
 ```mermaid
 flowchart TD
-    START["Auto Credit Trigger<br/>-----<br/>Condition: PSP Status = SUCCESS<br/>Platform Status = PENDING"] --> IDEMPOTENT{"Idempotent Check<br/>-----<br/>Already Credited?"}
+    START["自動入賬觸發<br/>-----<br/>條件: PSP 狀態 = SUCCESS<br/>平台狀態 = PENDING"] --> IDEMPOTENT{"冪等檢查<br/>-----<br/>已入賬?"}
 
-    IDEMPOTENT -->|Yes| SKIP["Skip Credit<br/>-----<br/>Log: Duplicate Attempt<br/>Reason: Already Processed<br/>Action: None"]
+    IDEMPOTENT -->|是| SKIP["跳過入賬<br/>-----<br/>日誌: 重複嘗試<br/>原因: 已處理<br/>動作: 無"]
 
-    IDEMPOTENT -->|No| LOCK["Acquire Redis Lock<br/>-----<br/>Key: reconcile:txn_{id}<br/>Command: SET NX<br/>TTL: 300 seconds"]
+    IDEMPOTENT -->|否| LOCK["取得 Redis 鎖<br/>-----<br/>Key: reconcile:txn_{id}<br/>命令: SET NX<br/>TTL: 300 秒"]
 
-    LOCK --> LOCK_CHECK{Lock Acquired?}
+    LOCK --> LOCK_CHECK{鎖取得成功?}
 
-    LOCK_CHECK -->|No| SKIP2["Skip Credit<br/>-----<br/>Reason: Another Job Processing<br/>Action: Wait Next Cycle"]
+    LOCK_CHECK -->|否| SKIP2["跳過入賬<br/>-----<br/>原因: 另一個任務處理中<br/>動作: 等待下次循環"]
 
-    LOCK_CHECK -->|Yes| DB_TXN["BEGIN DB Transaction<br/>-----<br/>Isolation: READ_COMMITTED"]
+    LOCK_CHECK -->|是| DB_TXN["BEGIN DB Transaction<br/>-----<br/>隔離級別: READ_COMMITTED"]
 
     DB_TXN --> UPDATE_TXN["UPDATE transactions SET<br/>-----<br/>status = 'SUCCESS',<br/>psp_transaction_id = ?,<br/>credit_flag = TRUE,<br/>credit_at = NOW(),<br/>completed_at = NOW()<br/>WHERE id = ? AND status = 'PENDING'"]
 
-    UPDATE_TXN --> AFFECTED{Affected Rows?}
+    UPDATE_TXN --> AFFECTED{影響行數?}
 
-    AFFECTED -->|0 rows| ROLLBACK["ROLLBACK Transaction<br/>-----<br/>Reason: Already Updated<br/>Release Lock"]
+    AFFECTED -->|0 行| ROLLBACK["ROLLBACK Transaction<br/>-----<br/>原因: 已更新<br/>釋放鎖"]
 
-    AFFECTED -->|1 row| CREDIT["Credit Player Balance<br/>-----<br/>wallet_service.credit(<br/>  player_id,<br/>  amount,<br/>  source: 'RECONCILIATION'<br/>)"]
+    AFFECTED -->|1 行| CREDIT["入賬玩家餘額<br/>-----<br/>wallet_service.credit(<br/>  player_id,<br/>  amount,<br/>  source: 'RECONCILIATION'<br/>)"]
 
-    CREDIT --> CREDIT_CHECK{Credit Success?}
+    CREDIT --> CREDIT_CHECK{入賬成功?}
 
-    CREDIT_CHECK -->|Failed| ROLLBACK2["ROLLBACK Transaction<br/>-----<br/>Reason: Wallet Service Error<br/>Action: Retry Later"]
+    CREDIT_CHECK -->|失敗| ROLLBACK2["ROLLBACK Transaction<br/>-----<br/>原因: 錢包服務錯誤<br/>動作: 稍後重試"]
 
-    CREDIT_CHECK -->|Success| AUDIT["Insert Audit Log<br/>-----<br/>INSERT INTO payment_audit_log<br/>(transaction_id, event, operator, details)<br/>VALUES (?, 'RECONCILIATION_CREDITED',<br/>'SYSTEM', JSON)"]
+    CREDIT_CHECK -->|成功| AUDIT["插入審計日誌<br/>-----<br/>INSERT INTO payment_audit_log<br/>(transaction_id, event, operator, details)<br/>VALUES (?, 'RECONCILIATION_CREDITED',<br/>'SYSTEM', JSON)"]
 
-    AUDIT --> COMMIT["COMMIT Transaction<br/>-----<br/>Status: Success<br/>Balance Updated"]
+    AUDIT --> COMMIT["COMMIT Transaction<br/>-----<br/>狀態: 成功<br/>餘額已更新"]
 
-    COMMIT --> NOTIFY_PLAYER["Notify Player<br/>-----<br/>Channel: Email + SMS<br/>Subject: Deposit Credited (Delayed)<br/>Content: Your $100 deposit has been credited"]
+    COMMIT --> NOTIFY_PLAYER["通知玩家<br/>-----<br/>通道: Email + SMS<br/>主旨: 存款已入賬 (延遲)<br/>內容: 您的 $100 存款已入賬"]
 
-    NOTIFY_PLAYER --> NOTIFY_FINANCE["Alert Finance Team<br/>-----<br/>Channel: Slack + Email<br/>Info: Credit Success<br/>Transaction ID: ?<br/>Reason: Webhook Not Received"]
+    NOTIFY_PLAYER --> NOTIFY_FINANCE["通知財務團隊<br/>-----<br/>通道: Slack + Email<br/>資訊: 入賬成功<br/>交易 ID: ?<br/>原因: 未收到 Webhook"]
 
-    NOTIFY_FINANCE --> RELEASE["Release Redis Lock<br/>-----<br/>Command: DEL reconcile:txn_{id}"]
+    NOTIFY_FINANCE --> RELEASE["釋放 Redis 鎖<br/>-----<br/>命令: DEL reconcile:txn_{id}"]
 
-    RELEASE --> SUCCESS["Credit Successful<br/>-----<br/>Balance: +$100<br/>Status: SUCCESS<br/>Flag: credit_flag = TRUE"]
+    RELEASE --> SUCCESS["入賬成功<br/>-----<br/>餘額: +$100<br/>狀態: SUCCESS<br/>標記: credit_flag = TRUE"]
 
-    ROLLBACK --> ERROR1["Credit Failed<br/>-----<br/>Reason: Already Updated<br/>Action: Skip"]
+    ROLLBACK --> ERROR1["入賬失敗<br/>-----<br/>原因: 已更新<br/>動作: 跳過"]
 
-    ROLLBACK2 --> ERROR2["Credit Failed<br/>-----<br/>Reason: Wallet Error<br/>Action: Retry Next Cycle"]
+    ROLLBACK2 --> ERROR2["入賬失敗<br/>-----<br/>原因: 錢包錯誤<br/>動作: 下次循環重試"]
 
-    SKIP --> END1[End - Skipped]
+    SKIP --> END1[結束 - 跳過]
     SKIP2 --> END1
-    SUCCESS --> END2[End - Success]
-    ERROR1 --> END3[End - Error]
+    SUCCESS --> END2[結束 - 成功]
+    ERROR1 --> END3[結束 - 錯誤]
     ERROR2 --> END3
 ```
 
-### 4.3 Manual Review & Appeal Flow
+### 4.3 手動審核與申訴流程（Manual Review & Appeal Flow）
 
 ```mermaid
 flowchart TD
-    START["Manual Review Trigger<br/>-----<br/>Condition: PSP Status = NOT_FOUND<br/>PSP has no transaction record"] --> SEVERITY{Amount Severity?}
+    START["手動審核觸發<br/>-----<br/>條件: PSP 狀態 = NOT_FOUND<br/>PSP 無交易記錄"] --> SEVERITY{金額嚴重性?}
 
-    SEVERITY -->|>= $1000<br/>High Value| CRITICAL["CRITICAL Alert<br/>-----<br/>Notify: Finance + Security + CTO<br/>Priority: HIGH<br/>SLA: 2 hours"]
+    SEVERITY -->|>= $1000<br/>高價值| CRITICAL["緊急警報<br/>-----<br/>通知: 財務 + 安全 + CTO<br/>優先級: 高<br/>SLA: 2 小時"]
 
-    SEVERITY -->|< $1000<br/>Low Value| STANDARD["STANDARD Alert<br/>-----<br/>Notify: CS Team<br/>Priority: MEDIUM<br/>SLA: 24 hours"]
+    SEVERITY -->|< $1000<br/>低價值| STANDARD["標準警報<br/>-----<br/>通知: 客服團隊<br/>優先級: 中<br/>SLA: 24 小時"]
 
-    CRITICAL --> TICKET["Create Review Ticket<br/>-----<br/>System: Jira<br/>Type: Payment Investigation<br/>Assignee: Finance Team<br/>Fields: {txn_id, amount, player_id, psp}"]
+    CRITICAL --> TICKET["建立審核工單<br/>-----<br/>系統: Jira<br/>類型: 支付調查<br/>指派: 財務團隊<br/>欄位: {txn_id, amount, player_id, psp}"]
 
     STANDARD --> TICKET
 
-    TICKET --> APPEAL{"Player Appeals?<br/>-----<br/>Timeout: 7 days"}
+    TICKET --> APPEAL{"玩家申訴?<br/>-----<br/>逾時: 7 天"}
 
-    APPEAL -->|No - Timeout| TIMEOUT["Close Ticket<br/>-----<br/>Status: EXPIRED<br/>Reason: No Player Response<br/>Action: Mark as FAILED"]
+    APPEAL -->|否 - 逾時| TIMEOUT["關閉工單<br/>-----<br/>狀態: 過期<br/>原因: 玩家無回應<br/>動作: 標記為 FAILED"]
 
-    APPEAL -->|Yes - Upload Receipt| VERIFY["CS Agent Verifies Receipt<br/>-----<br/>Check:<br/>Bank Reference Number<br/>Transaction Amount<br/>Transaction Date<br/>Payment Method"]
+    APPEAL -->|是 - 上傳收據| VERIFY["客服驗證收據<br/>-----<br/>檢查:<br/>銀行參考編號<br/>交易金額<br/>交易日期<br/>支付方式"]
 
-    VERIFY --> CONTACT_PSP["Contact PSP Support<br/>-----<br/>Action: Submit Ticket to PSP<br/>Evidence: Bank Receipt<br/>Wait: 1-3 business days"]
+    VERIFY --> CONTACT_PSP["聯繫 PSP 支援<br/>-----<br/>動作: 提交工單至 PSP<br/>證據: 銀行收據<br/>等待: 1-3 工作天"]
 
-    CONTACT_PSP --> PSP_CONFIRM{"PSP Confirms<br/>Payment?"}
+    CONTACT_PSP --> PSP_CONFIRM{"PSP 確認<br/>支付?"}
 
-    PSP_CONFIRM -->|No - Not Found| REJECT["Reject Appeal<br/>-----<br/>Status: REJECTED<br/>Reason: No Payment Proof from PSP<br/>Notify Player: Email"]
+    PSP_CONFIRM -->|否 - 未找到| REJECT["拒絕申訴<br/>-----<br/>狀態: 拒絕<br/>原因: PSP 無支付證明<br/>通知玩家: Email"]
 
-    PSP_CONFIRM -->|Yes - Confirmed| MANUAL_CREDIT["Manual Credit Request<br/>-----<br/>Operator: CS Agent<br/>Evidence: PSP Confirmation Email<br/>Audit Trail: Logged"]
+    PSP_CONFIRM -->|是 - 已確認| MANUAL_CREDIT["手動入賬請求<br/>-----<br/>操作員: 客服<br/>證據: PSP 確認郵件<br/>審計追蹤: 已記錄"]
 
-    MANUAL_CREDIT --> APPROVAL{"Approval Required?<br/>-----<br/>Threshold: $1000"}
+    MANUAL_CREDIT --> APPROVAL{"需要審批?<br/>-----<br/>門檻: $1000"}
 
-    APPROVAL -->|No<br/>(Amount < $1000)| EXECUTE["Execute Credit<br/>-----<br/>Same as Auto Credit Flow<br/>Operator: CS Agent"]
+    APPROVAL -->|否<br/>(金額 < $1000)| EXECUTE["執行入賬<br/>-----<br/>同自動入賬流程<br/>操作員: 客服"]
 
-    APPROVAL -->|Yes<br/>(Amount >= $1000)| AWAIT["Await CFO Approval<br/>-----<br/>Approval System: Workflow<br/>Approver: CFO<br/>SLA: 24 hours"]
+    APPROVAL -->|是<br/>(金額 >= $1000)| AWAIT["等待 CFO 審批<br/>-----<br/>審批系統: 工作流<br/>審批者: CFO<br/>SLA: 24 小時"]
 
-    AWAIT --> APPROVED{Approved?}
+    AWAIT --> APPROVED{已批准?}
 
-    APPROVED -->|No - Rejected| REJECT2["Reject Appeal<br/>-----<br/>Status: CFO_REJECTED<br/>Reason: Insufficient Evidence<br/>Notify Player + CS"]
+    APPROVED -->|否 - 拒絕| REJECT2["拒絕申訴<br/>-----<br/>狀態: CFO 拒絕<br/>原因: 證據不足<br/>通知玩家 + 客服"]
 
-    APPROVED -->|Yes - Approved| EXECUTE
+    APPROVED -->|是 - 批准| EXECUTE
 
-    EXECUTE --> CREDIT_EXEC["Credit Player Balance<br/>-----<br/>Source: MANUAL_CREDIT<br/>Operator: {cs_agent_id}<br/>Approver: {cfo_id if required}"]
+    EXECUTE --> CREDIT_EXEC["入賬玩家餘額<br/>-----<br/>來源: MANUAL_CREDIT<br/>操作員: {cs_agent_id}<br/>審批者: {cfo_id if required}"]
 
-    CREDIT_EXEC --> CREDIT_CHECK{Credit Success?}
+    CREDIT_EXEC --> CREDIT_CHECK{入賬成功?}
 
-    CREDIT_CHECK -->|Failed| ERROR["Credit Failed<br/>-----<br/>Reason: Wallet Service Error<br/>Action: Escalate to Tech Team"]
+    CREDIT_CHECK -->|失敗| ERROR["入賬失敗<br/>-----<br/>原因: 錢包服務錯誤<br/>動作: 升級至技術團隊"]
 
-    CREDIT_CHECK -->|Success| AUDIT_LOG["Insert Audit Log<br/>-----<br/>Event: MANUAL_CREDIT<br/>Evidence: {psp_confirmation, bank_receipt}<br/>Approver: {cfo_id}<br/>Compliance: 7-year retention"]
+    CREDIT_CHECK -->|成功| AUDIT_LOG["插入審計日誌<br/>-----<br/>事件: MANUAL_CREDIT<br/>證據: {psp_confirmation, bank_receipt}<br/>審批者: {cfo_id}<br/>合規: 7 年保留"]
 
-    AUDIT_LOG --> NOTIFY["Notify Stakeholders<br/>-----<br/>Player: Email + SMS<br/>Finance: Slack Alert<br/>Audit: Log to SIEM"]
+    AUDIT_LOG --> NOTIFY["通知利害關係人<br/>-----<br/>玩家: Email + SMS<br/>財務: Slack 警報<br/>審計: 記錄至 SIEM"]
 
-    NOTIFY --> SUCCESS["Manual Credit Complete<br/>-----<br/>Status: SUCCESS<br/>Flag: manual_credit = TRUE<br/>Audit Trail: Complete"]
+    NOTIFY --> SUCCESS["手動入賬完成<br/>-----<br/>狀態: SUCCESS<br/>標記: manual_credit = TRUE<br/>審計追蹤: 完整"]
 
-    TIMEOUT --> END1[End - Expired]
-    REJECT --> END2[End - Rejected]
+    TIMEOUT --> END1[結束 - 過期]
+    REJECT --> END2[結束 - 拒絕]
     REJECT2 --> END2
-    SUCCESS --> END3[End - Success]
-    ERROR --> END4[End - Error]
+    SUCCESS --> END3[結束 - 成功]
+    ERROR --> END4[結束 - 錯誤]
 ```
 
 ---
 
-## 5. Security Implementation
+## 5. 安全實作（Security Implementation）
 
-### 5.1 Three-Layer Callback Verification
+### 5.1 三層回調驗證（Three-Layer Callback Verification）
 
 ```
-Layer 1: IP Whitelist Verification
-  - Only accept requests from PSP designated IPs
-  - Reject other IPs -> 403 Forbidden + Alert
+第 1 層: IP 白名單驗證
+  - 僅接受來自 PSP 指定 IP 的請求
+  - 拒絕其他 IP -> 403 Forbidden + 警報
 
-Layer 2: HMAC Signature Verification
-  - Expected = HMAC-SHA256(request_body, webhook_secret)
-  - Received = X-PSP-Signature Header
-  - Mismatch -> 403 Forbidden + Security Alert
+第 2 層: HMAC 簽名驗證
+  - 預期 = HMAC-SHA256(request_body, webhook_secret)
+  - 收到 = X-PSP-Signature Header
+  - 不符 -> 403 Forbidden + 安全警報
 
-Layer 3: Timestamp Verification (Replay Attack Prevention)
-  - NOW() - request_timestamp < 5 minutes
-  - Expired -> 400 Bad Request
+第 3 層: 時間戳驗證（防重放攻擊）
+  - NOW() - request_timestamp < 5 分鐘
+  - 過期 -> 400 Bad Request
 ```
 
-### 5.2 Idempotency Protection
+### 5.2 冪等保護（Idempotency Protection）
 
-| Mechanism | Implementation | TTL | Purpose |
+| 機制 | 實作 | TTL | 目的 |
 |-----------|---------------|-----|---------|
-| **Redis Lock** | `SET NX callback:{txn_id} 1 EX 60` | 60 sec | Prevent concurrent callback processing |
-| **Database Status** | `WHERE status = 'PENDING' AND UPDATE status = 'SUCCESS'` | N/A | Ensure unique state transition |
-| **Unique Constraint** | `UNIQUE (transaction_id, psp_transaction_id)` | N/A | Prevent duplicate credits |
+| **Redis 鎖** | `SET NX callback:{txn_id} 1 EX 60` | 60 秒 | 防止並發回調處理 |
+| **資料庫狀態** | `WHERE status = 'PENDING' AND UPDATE status = 'SUCCESS'` | N/A | 確保唯一狀態轉換 |
+| **唯一約束** | `UNIQUE (transaction_id, psp_transaction_id)` | N/A | 防止重複入賬 |
 
-### 5.3 3D Secure Implementation
+### 5.3 3D Secure 實作（3D Secure Implementation）
 
-| Feature | 3DS 1.0 | 3DS 2.0 (EMV 3DS) |
+| 功能 | 3DS 1.0 | 3DS 2.0 (EMV 3DS) |
 |---------|---------|-------------------|
-| User Experience | Redirect to bank page (high abandonment) | Native in-app verification |
-| Data Transmission | Basic card info only | Device fingerprint, behavioral data |
-| Risk Assessment | Issuer-only decision | Multi-party collaboration (Issuer+PSP+Merchant) |
-| Applicable Scenario | Desktop | Mobile-first |
+| 使用者體驗 | 重定向至銀行頁面（高放棄率） | 原生應用內驗證 |
+| 資料傳輸 | 僅基本卡片資訊 | 裝置指紋、行為資料 |
+| 風險評估 | 僅發卡行決定 | 多方協作（發卡行+PSP+商戶） |
+| 適用場景 | 桌面端 | 行動優先 |
 
-**PSD2 Exemptions**:
-- Transaction amount < EUR 30
-- Merchant has high risk score (low-risk merchant)
-- Recurring payments (Subscription)
+**PSD2 豁免規則**:
+- 交易金額 < EUR 30
+- 商戶有高風險評分（低風險商戶）
+- 定期支付（訂閱）
 
 ---
 
-## 6. PSP Integration Examples
+## 6. PSP 整合範例（PSP Integration Examples）
 
-### 6.1 Nuvei (Formerly SafeCharge)
+### 6.1 Nuvei（原 SafeCharge）
 
 **API Endpoints**:
 ```
@@ -863,7 +863,7 @@ Production: https://ppp.nuvei.com/ppp/api/v1/payment.do
 Sandbox: https://ppp-test.nuvei.com/ppp/api/v1/payment.do
 ```
 
-**Deposit API Request**:
+**存款 API 請求**:
 ```json
 POST /ppp/api/v1/payment.do
 {
@@ -878,20 +878,20 @@ POST /ppp/api/v1/payment.do
 }
 ```
 
-**Checksum Generation**:
+**校驗碼生成**:
 ```
 SHA256(merchantId + merchantSiteId + clientRequestId + amount + currency + timeStamp + secret)
 ```
 
 ### 6.2 Adyen
 
-**3DS 2.0 Integration Flow**:
-1. Frontend collects card number, CVV, cardholder name
-2. Call Adyen `/payments` API, returns `action.type = "threeDS2"`
-3. Frontend loads Adyen 3DS Component (iframe)
-4. Player completes bank verification, call `/payments/details` for final result
+**3DS 2.0 整合流程**:
+1. Frontend 收集卡號、CVV、持卡人姓名
+2. 呼叫 Adyen `/payments` API，返回 `action.type = "threeDS2"`
+3. Frontend 載入 Adyen 3DS Component (iframe)
+4. 玩家完成銀行驗證，呼叫 `/payments/details` 取得最終結果
 
-**Payout API Request**:
+**提款 API 請求**:
 ```json
 POST /pal/servlet/Payout/v68/payout
 {
@@ -911,15 +911,15 @@ POST /pal/servlet/Payout/v68/payout
 }
 ```
 
-**Note**: Adyen uses smallest currency unit (5000 = EUR 50.00)
+**注意**: Adyen 使用最小貨幣單位（5000 = EUR 50.00）
 
 ---
 
-## 7. API Specifications
+## 7. API 規格（API Specifications）
 
-### 7.1 Unified Deposit API
+### 7.1 統一存款 API（Unified Deposit API）
 
-**Request**:
+**請求**:
 ```http
 POST /api/v1/payments/deposit
 Content-Type: application/json
@@ -934,7 +934,7 @@ Authorization: Bearer <player_jwt_token>
 }
 ```
 
-**Response**:
+**回應**:
 ```json
 {
   "code": 1000,
@@ -947,61 +947,61 @@ Authorization: Bearer <player_jwt_token>
 }
 ```
 
-### 7.2 Webhook Callback Handler
+### 7.2 Webhook 回調處理器（Webhook Callback Handler）
 
-**Security Requirements**:
-1. IP Whitelist validation
-2. HMAC-SHA256 signature verification
-3. Timestamp validation (< 5 min)
-4. Idempotency via Redis lock: `SET callback:{txn_id} 1 EX 60 NX`
-
----
-
-## 8. Failover Strategy
-
-### 8.1 Health Check Mechanism
-
-**Periodic Health Probe** (every 5 minutes):
-- Test small transaction capability
-- Monitor success rate trends
-- Update PSP status in cache
-
-### 8.2 Automatic Switching
-
-```
-Primary PSP: Nuvei (Status: Unavailable)
-    ↓ Automatic switch
-Backup PSP: Adyen (Status: Healthy)
-    ↓ If also fails
-Fallback PSP: Manual Bank Transfer (Notify Finance Team)
-```
-
-### 8.3 Recovery Detection
-
-- Test degraded PSP every 10 minutes
-- Restore to `available` status after 3 consecutive successes
+**安全要求**:
+1. IP 白名單驗證
+2. HMAC-SHA256 簽名驗證
+3. 時間戳驗證（< 5 分鐘）
+4. 透過 Redis 鎖實現冪等: `SET callback:{txn_id} 1 EX 60 NX`
 
 ---
 
-## 9. Error Handling Matrix
+## 8. 故障轉移策略（Failover Strategy）
 
-| Exception Type | Trigger Condition | Handling Strategy | Notification |
+### 8.1 健康檢查機制（Health Check Mechanism）
+
+**定期健康探測**（每 5 分鐘）:
+- 測試小額交易能力
+- 監控成功率趨勢
+- 更新 PSP 狀態至快取
+
+### 8.2 自動切換（Automatic Switching）
+
+```
+主要 PSP: Nuvei (狀態: 不可用)
+    ↓ 自動切換
+備用 PSP: Adyen (狀態: 健康)
+    ↓ 若也失敗
+備援 PSP: 手動銀行轉帳 (通知財務團隊)
+```
+
+### 8.3 恢復檢測（Recovery Detection）
+
+- 每 10 分鐘測試降級的 PSP
+- 連續 3 次成功後恢復至 `available` 狀態
+
+---
+
+## 9. 錯誤處理矩陣（Error Handling Matrix）
+
+| 異常類型 | 觸發條件 | 處理策略 | 通知對象 |
 |---------------|-------------------|-------------------|--------------|
-| **IP Not Whitelisted** | Request IP not in PSP_IPS | Reject + Security Alert | Security Team |
-| **Signature Mismatch** | HMAC Mismatch | Reject + Security Alert | Security + CTO |
-| **Duplicate Callback** | Redis Lock Failed | Return 200 OK (ALREADY_PROCESSED) | None (normal) |
-| **Status Changed** | Status != PENDING | Return 200 OK (Idempotent) | None (normal) |
-| **Callback Timeout** | No callback for 30 min | Query PSP status proactively | Tech Team |
-| **Credit Failed** | PSP returns NOT_FOUND | Manual review + Player appeal | CS + Finance |
+| **IP 不在白名單** | 請求 IP 不在 PSP_IPS | 拒絕 + 安全警報 | 安全團隊 |
+| **簽名不符** | HMAC 不符 | 拒絕 + 安全警報 | 安全 + CTO |
+| **重複回調** | Redis 鎖失敗 | 返回 200 OK (ALREADY_PROCESSED) | 無（正常） |
+| **狀態已變更** | 狀態 != PENDING | 返回 200 OK（冪等） | 無（正常） |
+| **回調超時** | 30 分鐘未收到回調 | 主動查詢 PSP 狀態 | 技術團隊 |
+| **入賬失敗** | PSP 返回 NOT_FOUND | 手動審核 + 玩家申訴 | 客服 + 財務 |
 
 ---
 
-## 10. Related Technical Documentation
+## 10. 相關技術文件（Related Technical Documentation）
 
-- [Data Security Standard](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md) - Payment data encryption
-- [API Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) - API specifications
-- [Audit Log System](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) - Configuration change audit
-- [Approval Workflow](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - Configuration change approval
+- [Data Security Standard](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md) - 支付資料加密
+- [API Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) - API 規格
+- [Audit Log System](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) - 配置變更審計
+- [Approval Workflow](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - 配置變更審批
 
 ---
 
