@@ -1068,13 +1068,12 @@ WHERE l.event_type = 'MFA_DISABLED'
 ```java
 @SpringBootTest
 @AutoConfigureMockMvc
+@RequiredArgsConstructor
 class MfaIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
-    @Autowired
-    private MfaRepository mfaRepository;
+    private final MfaRepository mfaRepository;
 
     @Test
     @DisplayName("TC-MFA-001: User first time TOTP setup")
