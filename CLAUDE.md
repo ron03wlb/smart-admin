@@ -46,6 +46,108 @@ When working with SmartAdmin codebase, read documentation in this order:
 - **User Communication**: Respond to users in **Traditional Chinese (繁體中文)**
 - **Code Comments**: English (SmartAdmin standard - no Chinese in code comments)
 
+### iGaming Documentation Language Standards
+
+**Effective Date**: 2026-02-11
+**Scope**: All documentation under `docs/iGaming/` (Requirements, Architecture, ADR)
+
+#### Language Policy
+
+- **Primary Language**: 繁體中文 (Traditional Chinese)
+- **Technical Terms**: Preserve in English (see list below)
+- **Code Elements**: All code (Java/SQL/YAML), class names, method names, variable names remain in English
+- **First Mention**: Business terms show English in parentheses on first appearance
+
+#### Technical Terms (Preserve in English)
+
+**SmartAdmin Architecture**:
+- Controller, Service, Manager, Dao, Repository
+- Entity, VO, DTO, Form, QueryForm, UpdateForm
+- ResponseDTO, PageResult, Option (Vavr), Try, Either
+- @Transactional, @RequiredArgsConstructor, @SaCheckPermission, @Cacheable
+
+**Infrastructure**:
+- API, REST, HTTP, HTTPS, JSON, YAML
+- Database, PostgreSQL, Redis, Kafka, Multi-Tenant
+- Row-Level Security (RLS), Session, Token, JWT, OAuth
+
+**Data Security**:
+- AES-256-GCM, HMAC-SHA256, Argon2id
+- PII (Personally Identifiable Information)
+- Blind Index, Crypto-Shredding, DEK, KEK
+
+**Full Technical Terms List**: [docs/iGaming/TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md)
+
+#### Business Terms (繁體中文 Translation)
+
+| English | 繁體中文 | First Mention Format |
+|---------|---------|---------------------|
+| Valid Turnover | 有效投注額 | 有效投注額 (Valid Turnover) |
+| Playable Balance | 可下注餘額 | 可下注餘額 (Playable Balance) |
+| Self-Exclusion | 自我排除 | 自我排除 (Self-Exclusion) |
+| KYC | 身份驗證 | 身份驗證 (KYC, Know Your Customer) |
+| AML | 反洗錢 | 反洗錢 (AML, Anti-Money Laundering) |
+
+**Full Business Terms Glossary**: [docs/iGaming/TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md)
+
+#### Translation Rules
+
+**Rule 1**: Technical terms NEVER translate
+✅ `PlayerService` → 保留
+❌ `PlayerService` → 玩家服務（錯誤）
+
+**Rule 2**: Business terms use Traditional Chinese + English on first mention
+✅ `有效投注額 (Valid Turnover)` → First mention
+✅ `有效投注額` → Subsequent mentions
+
+**Rule 3**: Code snippets remain entirely in English
+```java
+// Code comments may use Traditional Chinese (if project allows)
+public class PlayerService {
+    private final PlayerDao playerDao;
+}
+```
+
+**Rule 4**: Mermaid diagrams use Traditional Chinese labels, but preserve class/method names
+```mermaid
+flowchart TD
+    A[玩家註冊] --> B[PlayerService.register]
+```
+
+**Rule 5**: SQL table/column names remain in English, but COMMENT uses Traditional Chinese
+```sql
+CREATE TABLE t_player (player_id BIGINT);
+COMMENT ON COLUMN t_player.player_id IS '玩家唯一標識';
+```
+
+#### Translation Templates
+
+- **Requirements**: [docs/iGaming/TEMPLATE_REQUIREMENTS.md](docs/iGaming/TEMPLATE_REQUIREMENTS.md)
+- **Architecture**: [docs/iGaming/TEMPLATE_ARCHITECTURE.md](docs/iGaming/TEMPLATE_ARCHITECTURE.md)
+- **ADR**: [docs/iGaming/TEMPLATE_ADR.md](docs/iGaming/TEMPLATE_ADR.md)
+
+#### Validation Scripts
+
+```bash
+# Verify technical terms remain in English
+./scripts/check-technical-terms.sh docs/iGaming/
+
+# Verify Traditional Chinese encoding
+./scripts/validate-zh-tw-encoding.sh docs/iGaming/
+
+# Verify terminology consistency
+./scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/
+
+# Verify Mermaid syntax
+./scripts/validate-mermaid.sh docs/iGaming/
+```
+
+#### Related Documentation
+
+- **Translation Glossary**: [docs/iGaming/TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md) - 500+ term mappings
+- **Ralph Loop P14 Rule**: [docs/ralph/guardrails.md](docs/ralph/guardrails.md) - Updated 2026-02-11
+- **Implementation Plan**: [C:\Users\ron.chang\.claude\plans\robust-weaving-pinwheel.md](C:\Users\ron.chang\.claude\plans\robust-weaving-pinwheel.md) - v2.0.0
+
 ### Key Constraints (Always Apply)
 
 **CRITICAL** - These rules are enforced by ArchitectureTest and must NEVER be violated:

@@ -83,14 +83,33 @@
 - When fixing: extract the @Transactional method to a new Manager class, keep Service calling Manager
 - Check with: `bash scripts/check-smartadmin-patterns.sh`
 
-### P14: Terminology standardization
-- Use English-only terms in documentation content:
-  - "Valid Turnover" (not 有效投注額 or 流水)
-  - "Playable Balance" (not 可下注餘額)
-  - "self-exclusion" (hyphenated, not "self exclusion")
-  - "multi-tenant" (hyphenated, not "multi tenant" or "multitenant")
-- Exception: Chinese terms may appear in code comments within source-archive/ (READ-ONLY)
-- Check with: `bash scripts/check-terminology-consistency.sh`
+### P14: Terminology standardization (Updated 2026-02-11)
+- **Language**: 繁體中文為主，技術術語保留英文 (Traditional Chinese primary, technical terms remain in English)
+- **Technical Terms (保留英文)**:
+  - SmartAdmin: Controller, Service, Manager, Dao, Repository, Entity, VO, DTO, Form
+  - Annotations: @Transactional, @RequiredArgsConstructor, @SaCheckPermission, @Cacheable
+  - Infrastructure: API, REST, HTTP, JSON, YAML, Database, PostgreSQL, Redis, Kafka
+  - Architecture: Multi-Tenant, Row-Level Security (RLS), Session, Token, JWT, OAuth
+  - Data Types: Option (Vavr), Try, Either, ResponseDTO, PageResult
+  - Code: All class names, method names, variable names, table names, column names
+- **Business Terms (繁體中文 with English notation on first use)**:
+  - "有效投注額 (Valid Turnover)" - subsequent uses: "有效投注額"
+  - "可下注餘額 (Playable Balance)" - subsequent uses: "可下注餘額"
+  - "自我排除 (Self-Exclusion)" - subsequent uses: "自我排除"
+  - "身份驗證 (KYC, Know Your Customer)" - subsequent uses: "KYC" or "身份驗證"
+  - "反洗錢 (AML, Anti-Money Laundering)" - subsequent uses: "AML" or "反洗錢"
+- **Translation Rules**:
+  1. Technical terms NEVER translate (PlayerService stays as PlayerService)
+  2. Business terms use Traditional Chinese + English notation on first appearance
+  3. Code snippets (Java/SQL/YAML) remain entirely in English
+  4. Mermaid diagram labels use Traditional Chinese, but class/method names stay in English
+  5. SQL table/column names remain in English, but COMMENT uses Traditional Chinese
+- **Exception**: Chinese terms may appear in code comments within source-archive/ (READ-ONLY)
+- **Reference**: [docs/iGaming/TRANSLATION_GLOSSARY.md](../iGaming/TRANSLATION_GLOSSARY.md) - 500+ term mappings
+- **Check with**:
+  - `bash scripts/check-technical-terms.sh` - Verify technical terms remain in English
+  - `bash scripts/validate-zh-tw-encoding.sh` - Check Traditional Chinese encoding
+  - `bash scripts/check-terminology-consistency-zh-tw.sh` - Verify term consistency
 
 ### P15: Never decrease existing coverage
 - Mermaid must stay at 100% (73/73 core files)
