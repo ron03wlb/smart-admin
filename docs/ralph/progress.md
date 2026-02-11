@@ -147,30 +147,32 @@ Fix Java code examples to follow SmartAdmin conventions: Constructor injection, 
 - [x] architecture/02_Finance_Service/Reconciliation_Technical.md (@Autowired in test class - acceptable pattern)
 - [x] architecture/02_Finance_Service/Seamless_Wallet_Technical.md (fixed: @Service → @Component for Manager classes)
 
-#### Batch 12 — Game/Activity (5 files)
-- [ ] architecture/03_Game_Integration/Game_Integration_Security.md (fix @Transactional → Manager)
-- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (fix @Autowired → constructor)
-- [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (fix @Transactional → Manager)
-- [ ] architecture/05_Risk_Engine/Affordability_Implementation.md (fix @Transactional → Manager)
-- [ ] architecture/05_Risk_Engine/Fraud_Detection_System.md (fix @Autowired → constructor)
+#### Batch 12 — Game/Activity (5 files) ✅ COMPLETE
+- [x] architecture/03_Game_Integration/Game_Integration_Security.md (extracted @Transactional to SecretRotationManager)
+- [x] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (fixed: @Service → @Component for Manager)
+- [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (already compliant - no changes needed)
+- [x] architecture/05_Risk_Engine/Affordability_Implementation.md (extracted @Transactional to AffordabilityAssessmentManager)
+- [x] architecture/05_Risk_Engine/Fraud_Detection_System.md (fixed: @Service → @Component for Manager; @Autowired in test classes is acceptable)
 
-#### Batch 13 — Risk/MFA (5 files)
-- [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (fix @Transactional → Manager)
-- [ ] architecture/06_Platform_Core/MFA_Compliance_Technical.md (fix @Transactional → Manager)
-- [ ] architecture/06_Platform_Core/MFA_Compliance_Validation.md (fix @Autowired → constructor)
-- [ ] architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md (fix @Transactional → Manager)
-- [ ] architecture/06_Platform_Core/MFA_Recovery_Implementation.md (fix @Transactional → Manager)
+#### Batch 13 — Risk/MFA (5 files) ✅ COMPLETE
+- [x] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (added @Component + class context)
+- [x] architecture/06_Platform_Core/MFA_Compliance_Technical.md (extracted to IdentityDocumentManager + DocumentVerificationManager)
+- [x] architecture/06_Platform_Core/MFA_Compliance_Validation.md (extracted to MfaResetManager; @Autowired in test class acceptable)
+- [x] architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md (extracted to MFASetupManager + MFABackupCodeManager)
+- [x] architecture/06_Platform_Core/MFA_Recovery_Implementation.md (extracted to MfaSetupManager)
 
-#### Batch 14 — Platform/Infrastructure (4 files)
-- [ ] architecture/06_Platform_Core/MFA_Technical.md (fix @Autowired → constructor, @Transactional → Manager)
-- [ ] architecture/06_Platform_Core/Multi_Tenant_Architecture.md (fix @Transactional → Manager)
-- [ ] architecture/09_Infrastructure/Token_Edge_Deployment.md (fix @Autowired → constructor)
-- [ ] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md (fix @Transactional → Manager)
+#### Batch 14 — Platform/Infrastructure (4 files) ✅ COMPLETE
+- [x] architecture/06_Platform_Core/MFA_Technical.md (extracted to MfaSetupManager; @Autowired in test class acceptable)
+- [x] architecture/06_Platform_Core/Multi_Tenant_Architecture.md (@Service → @Component for TenantMigrationManager)
+- [x] architecture/09_Infrastructure/Token_Edge_Deployment.md (no changes needed - @Autowired in test class is acceptable)
+- [x] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md (extracted to LossLimitManager + DepositManager)
 
-#### Batch 15 — Responsible Gambling (3 files)
-- [ ] architecture/15_Responsible_Gambling/Player_Protection_API.md (fix @Transactional → Manager)
-- [ ] architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md (fix @Autowired → constructor, @Transactional → Manager)
-- [ ] architecture/15_Responsible_Gambling/Session_Protection_Architecture.md (fix @Transactional → Manager)
+#### Batch 15 — Responsible Gambling (3 files) ✅ COMPLETE
+- [x] architecture/15_Responsible_Gambling/Player_Protection_API.md (extracted to AffordabilityAssessmentManager)
+- [x] architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md (extracted to SelfExclusionManager; @Autowired in test class acceptable)
+- [x] architecture/15_Responsible_Gambling/Session_Protection_Architecture.md (extracted to CoolingOffManager + SessionManagementManager + RealityCheckManager)
+
+**Phase 8A COMPLETE**: All 22 architecture files with SmartAdmin pattern violations fixed
 
 ---
 
