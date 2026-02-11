@@ -1,4 +1,4 @@
-# Data Pipeline Business Requirements
+# 資料管道業務需求（Data Pipeline Business Requirements）
 
 > **Canonical Source**: [source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md](../../source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md)
 > **View Type**: Business Requirements
@@ -8,172 +8,172 @@
 
 ---
 
-## 1. Business Overview
+## 1. 業務概述（Business Overview）
 
-The Data Pipeline system solves the performance bottleneck of traditional transactional databases when handling analytical queries. It enables **T+1 business reports** and **near real-time risk control dashboards**, supporting operational decision-making across the iGaming platform.
+資料管道系統解決傳統交易資料庫在處理分析查詢時的效能瓶頸。它實現 **T+1 業務報表**和**近即時風險控制儀表板**，支援跨 iGaming 平台的營運決策。
 
 ---
 
-## 2. Data Processing Requirements
+## 2. 資料處理需求（Data Processing Requirements）
 
-### 2.1 Processing Modes
+### 2.1 處理模式（Processing Modes）
 
-| Mode | Maximum Delay | Data Completeness | Business Use Case |
+| 模式 | 最大延遲 | 資料完整性 | 業務使用場景 |
 |------|--------------|-------------------|-------------------|
-| **Real-time** | < 5 seconds | May have minor gaps | Operations monitoring, risk alerts |
-| **Near Real-time** | 5-60 seconds | High (99%+) | Live dashboards, anomaly detection |
-| **Batch (T+1)** | Next day | 100% complete | Business reports, settlement reconciliation |
+| **即時（Real-time）** | < 5 秒 | 可能有輕微缺失 | 營運監控、風險告警 |
+| **近即時（Near Real-time）** | 5-60 秒 | 高（99%+） | 即時儀表板、異常偵測 |
+| **批次（Batch, T+1）** | 次日 | 100% 完整 | 業務報表、結算對帳 |
 
-### 2.2 Processing Mode Selection Guide
+### 2.2 處理模式選擇指南（Processing Mode Selection Guide）
 
-Product managers should use this decision matrix when evaluating new report requirements:
+產品經理在評估新報表需求時應使用此決策矩陣：
 
-| Decision Factor | Choose Real-time | Choose Batch (T+1) |
+| 決策因素 | 選擇即時（Real-time） | 選擇批次（Batch, T+1） |
 |----------------|-----------------|---------------------|
-| **Revenue impact of delay** | Business loses money with 1-day delay | No immediate financial impact |
-| **Operational urgency** | Used for immediate decisions | Used for strategic planning |
-| **Regulatory requirement** | Compliance mandates real-time monitoring | Periodic submission acceptable |
-| **Calculation complexity** | Simple aggregations (counts, sums) | Complex multi-table joins |
-| **Accuracy requirement** | 95%+ acceptable | Must be 100% accurate |
-| **Cost sensitivity** | Budget allows 5-10x premium | Cost optimization priority |
+| **延遲的收益影響** | 1 天延遲會導致業務損失 | 無立即財務影響 |
+| **營運緊急性** | 用於立即決策 | 用於策略規劃 |
+| **監管要求** | 合規要求即時監控 | 定期提交可接受 |
+| **計算複雜度** | 簡單聚合（計數、求和） | 複雜多表連接 |
+| **準確性要求** | 95%+ 可接受 | 必須 100% 準確 |
+| **成本敏感度** | 預算允許 5-10 倍溢價 | 成本優化優先 |
 
 ---
 
-## 3. Report Type Requirements
+## 3. 報表類型需求（Report Type Requirements）
 
-### 3.1 Real-time Dashboard Reports
+### 3.1 即時儀表板報表（Real-time Dashboard Reports）
 
-| Report | Update Frequency | Key Metrics | Decision Type |
+| 報表 | 更新頻率 | 關鍵指標 | 決策類型 |
 |--------|-----------------|-------------|---------------|
-| **Online Player Count** | Every 10 seconds | Current connected users | Capacity management |
-| **Today's Deposit Total** | Every 5 minutes | Cumulative deposits | Revenue tracking |
-| **Risk Alert Monitor** | Real-time | Active fraud/risk events | Incident response |
-| **Game Performance Live** | Every hour | GGR by game, player count | Game operations |
+| **線上玩家數量** | 每 10 秒 | 當前連線用戶 | 容量管理 |
+| **今日存款總額** | 每 5 分鐘 | 累計存款 | 收益追蹤 |
+| **風險告警監控** | 即時 | 活躍的詐欺/風險事件 | 事件回應 |
+| **遊戲效能即時** | 每小時 | 按遊戲的 GGR、玩家數 | 遊戲營運 |
 
-### 3.2 T+1 Business Reports
+### 3.2 T+1 業務報表（T+1 Business Reports）
 
-| Report | Schedule | Key Metrics | Stakeholder |
+| 報表 | 排程 | 關鍵指標 | 利害關係人 |
 |--------|----------|-------------|-------------|
-| **Monthly P&L Statement** | 1st of month | Revenue, costs, net profit | CFO, Finance |
-| **Agent Settlement** | Weekly (Monday) | Commission, position, payables | Agent operations |
-| **Game Reconciliation** | Daily (02:00 AM) | Provider bets vs platform records | Finance |
-| **Player LTV Analysis** | Weekly | Lifetime value by segment | Marketing |
-| **Compliance Report** | Monthly | Regulatory metrics | Compliance officer |
+| **月度損益表** | 每月 1 日 | 收益、成本、淨利潤 | CFO、財務 |
+| **代理結算** | 每週一 | 佣金、頭寸、應付款 | 代理營運 |
+| **遊戲對帳** | 每日 02:00 | 供應商投注 vs 平台記錄 | 財務 |
+| **玩家 LTV 分析** | 每週 | 按區段的終身價值 | 行銷 |
+| **合規報表** | 每月 | 監管指標 | 合規官 |
 
 ---
 
-## 4. Data Quality Business Rules
+## 4. 資料品質業務規則（Data Quality Business Rules）
 
-### 4.1 Quality Standards
+### 4.1 品質標準（Quality Standards）
 
-| Standard | Requirement | Consequence of Failure |
+| 標準 | 要求 | 失敗後果 |
 |----------|-------------|----------------------|
-| **Completeness** | All records from previous day must be present | Report delayed, not published |
-| **Accuracy** | Financial figures must match source to the cent | Manual reconciliation required |
-| **Timeliness** | Daily reports available by 03:00 AM | SLA breach notification |
-| **Consistency** | Same metric shows same value across all views | Investigation triggered |
-| **Anomaly Detection** | If error rate > 5%, pipeline halts | Downstream reports blocked |
+| **完整性（Completeness）** | 前一天的所有記錄必須存在 | 報表延遲，不發布 |
+| **準確性（Accuracy）** | 財務數據必須與來源精確到分 | 需要人工對帳 |
+| **及時性（Timeliness）** | 每日報表必須在 03:00 AM 前可用 | SLA 違約通知 |
+| **一致性（Consistency）** | 相同指標在所有視圖中顯示相同值 | 觸發調查 |
+| **異常偵測（Anomaly Detection）** | 如果錯誤率 > 5%，管道停止 | 下游報表被阻止 |
 
-### 4.2 Data Correction Policy
+### 4.2 資料修正政策（Data Correction Policy）
 
-| Policy | Description |
+| 政策 | 描述 |
 |--------|-------------|
-| **Historical Immutability** | Published reports are never retroactively modified |
-| **Correction by Overwrite** | For corrections, the affected date's data is fully recalculated |
-| **Audit Trail** | All corrections logged with operator, timestamp, and reason |
-| **Notification** | Stakeholders notified when a correction affects their reports |
+| **歷史不可變性** | 已發布報表永不追溯修改 |
+| **覆蓋式修正** | 對於修正，受影響日期的資料完全重新計算 |
+| **審計追蹤** | 所有修正記錄操作員、時間戳和原因 |
+| **通知** | 當修正影響利害關係人的報表時通知 |
 
 ---
 
-## 5. Data Privacy Requirements
+## 5. 資料隱私需求（Data Privacy Requirements）
 
-### 5.1 PII Masking Rules
+### 5.1 PII 遮罩規則（PII Masking Rules）
 
-All personally identifiable information must be masked before entering the analytics layer.
+所有個人識別資訊必須在進入分析層之前遮罩。
 
-| Data Type | Masking Rule | Example |
+| 資料類型 | 遮罩規則 | 範例 |
 |-----------|-------------|---------|
-| **Name** | First initial + asterisks | R** C** |
-| **Phone** | Middle digits masked | 0912***789 |
-| **ID Number** | Middle digits masked | A12****89 |
-| **Email** | Username partially masked | r***@gmail.com |
+| **姓名** | 首字母 + 星號 | R** C** |
+| **電話** | 中間數字遮罩 | 0912***789 |
+| **身份證號** | 中間數字遮罩 | A12****89 |
+| **Email** | 用戶名部分遮罩 | r***@gmail.com |
 
-### 5.2 Access Control
+### 5.2 存取控制（Access Control）
 
-| Data Layer | Authorized Access |
+| 資料層 | 授權存取 |
 |-----------|------------------|
-| **Raw Data (Original)** | Database administrators only |
-| **Cleaned Data** | Data engineers |
-| **Summary Data** | BI analysts, data scientists |
-| **Application Data** | All authorized applications |
+| **原始資料（Original）** | 僅資料庫管理員 |
+| **清洗資料（Cleaned Data）** | 資料工程師 |
+| **摘要資料（Summary Data）** | BI 分析師、資料科學家 |
+| **應用資料（Application Data）** | 所有授權應用程式 |
 
 ---
 
-## 6. Data Retention Policy
+## 6. 資料保留政策（Data Retention Policy）
 
-| Data Tier | Storage Duration | Access Pattern | Cost Category |
+| 資料層級 | 儲存期限 | 存取模式 | 成本類別 |
 |-----------|-----------------|----------------|---------------|
-| **Hot Data** | Most recent 3 months | High-frequency queries | Premium (SSD) |
-| **Warm Data** | 3 months - 1 year | Occasional queries | Standard (HDD) |
-| **Cold Data** | 1+ years | Audit and compliance only | Archive (object storage) |
-| **Regulatory Archive** | 7+ years | Regulator requests only | Deep archive |
+| **熱資料（Hot Data）** | 最近 3 個月 | 高頻查詢 | 高級（SSD） |
+| **溫資料（Warm Data）** | 3 個月 - 1 年 | 偶爾查詢 | 標準（HDD） |
+| **冷資料（Cold Data）** | 1 年以上 | 僅審計與合規 | 歸檔（物件儲存） |
+| **監管歸檔（Regulatory Archive）** | 7 年以上 | 僅監管機構請求 | 深度歸檔 |
 
 ---
 
-## 7. Multi-Tenant Data Isolation
+## 7. 多租戶資料隔離（Multi-Tenant Data Isolation）
 
-### 7.1 Isolation Model
+### 7.1 隔離模型（Isolation Model）
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| **Logical Isolation** | All tenants share the same infrastructure, separated by tenant_id |
-| **Mandatory Filtering** | Every query must include tenant_id; queries without it are rejected |
-| **Cross-Tenant Reporting** | Platform-level reports aggregate across tenants (platform admin only) |
-| **Tenant-Level SLA** | Each tenant has independent data freshness guarantees |
+| **邏輯隔離** | 所有租戶共享相同基礎設施，通過 tenant_id 分隔 |
+| **強制過濾** | 每個查詢必須包含 tenant_id；沒有的查詢將被拒絕 |
+| **跨租戶報表** | 平台級報表跨租戶聚合（僅平台管理員） |
+| **租戶級 SLA** | 每個租戶有獨立的資料新鮮度保證 |
 
-### 7.2 Business Benefits
+### 7.2 業務效益（Business Benefits）
 
-| Benefit | Description |
+| 效益 | 描述 |
 |---------|-------------|
-| No per-tenant database management | Single infrastructure reduces operational overhead |
-| Platform-wide analytics | Cross-tenant insights (e.g., total platform GGR) |
-| Consistent quality | Uniform data quality standards across all tenants |
-| Cost efficiency | Shared compute and storage resources |
+| 無需每個租戶資料庫管理 | 單一基礎設施降低營運負擔 |
+| 平台級分析 | 跨租戶洞察（例如，總平台 GGR） |
+| 一致品質 | 所有租戶統一的資料品質標準 |
+| 成本效率 | 共享計算與儲存資源 |
 
 ---
 
-## 8. Scheduling & Delivery Requirements
+## 8. 排程與交付需求（Scheduling & Delivery Requirements）
 
-### 8.1 Daily Report Schedule
+### 8.1 每日報表排程（Daily Report Schedule）
 
-| Time | Activity | Output |
+| 時間 | 活動 | 輸出 |
 |------|----------|--------|
-| 02:00 - 02:15 | Data cleaning and masking | Cleaned data layer |
-| 02:15 - 02:45 | Aggregation calculations | Summary data layer |
-| 02:45 - 03:00 | Application table building | Application data layer |
-| 03:00 - 03:05 | Data quality validation | Quality report |
-| 03:05 | Completion notification | Reports available |
+| 02:00 - 02:15 | 資料清洗與遮罩 | 清洗資料層 |
+| 02:15 - 02:45 | 聚合計算 | 摘要資料層 |
+| 02:45 - 03:00 | 應用表建構 | 應用資料層 |
+| 03:00 - 03:05 | 資料品質驗證 | 品質報表 |
+| 03:05 | 完成通知 | 報表可用 |
 
-### 8.2 Report Delivery Channels
+### 8.2 報表交付通道（Report Delivery Channels）
 
-| Channel | Use Case |
+| 通道 | 使用場景 |
 |---------|----------|
-| **Dashboard** | Real-time and T+1 metrics visualization |
-| **Email** | Scheduled report delivery to stakeholders |
-| **Export** | On-demand Excel/PDF/CSV download |
-| **Notification** | Alert when report is ready or anomaly detected |
+| **儀表板（Dashboard）** | 即時與 T+1 指標視覺化 |
+| **Email** | 定期報表交付給利害關係人 |
+| **匯出（Export）** | 隨需 Excel/PDF/CSV 下載 |
+| **通知（Notification）** | 報表就緒或異常偵測時告警 |
 
 ---
 
-## 9. Business SLAs
+## 9. 業務 SLA（Business SLAs）
 
-| SLA | Target | Measurement |
+| SLA | 目標 | 測量 |
 |-----|--------|-------------|
-| **Daily Report Availability** | By 03:00 AM | Time when ADS layer data is ready |
-| **Report Accuracy** | 100% for financial data | Post-reconciliation error rate |
-| **Pipeline Uptime** | 99.5% | Successful pipeline runs / total scheduled runs |
-| **Query Response Time** | < 3 seconds (P95) | Application layer query performance |
-| **Data Freshness** | < 5 minutes (real-time), T+1 (batch) | Delay from source to analytics |
+| **每日報表可用性** | 03:00 AM 前 | ADS 層資料就緒時間 |
+| **報表準確性** | 財務資料 100% | 對帳後錯誤率 |
+| **管道正常運行時間** | 99.5% | 成功管道執行 / 總排程執行 |
+| **查詢回應時間** | < 3 秒（P95） | 應用層查詢效能 |
+| **資料新鮮度** | < 5 分鐘（即時）、T+1（批次） | 從來源到分析的延遲 |
 
 ---
 
