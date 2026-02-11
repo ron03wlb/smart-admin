@@ -178,61 +178,104 @@ public DebitResult debitWallet(DebitRequest request) {
 
 ```java
 /**
- * Lock wallet amount (used during bet placement)
- *
- * @param walletId Wallet ID
- * @param amount Lock amount
- * @param betId Bet order ID
+ * Wallet Service (delegates to Manager for transactions)
  */
-@Transactional(rollbackFor = Throwable.class)
-public void lockWalletAmount(Long walletId, BigDecimal amount, String betId) {
-    // 1. Optimistic lock update
-    int updated = walletDao.incrementLockedAmount(walletId, amount);
-    if (updated == 0) {
-        throw new ConcurrentUpdateException("Wallet update conflict, please retry");
+@Service
+@RequiredArgsConstructor
+public class WalletService {
+
+    private final WalletManager walletManager;
+
+    /**
+     * Lock wallet amount (used during bet placement)
+     *
+     * @param walletId Wallet ID
+     * @param amount Lock amount
+     * @param betId Bet order ID
+     */
+    public void lockWalletAmount(Long walletId, BigDecimal amount, String betId) {
+        walletManager.lockWalletAmount(walletId, amount, betId);
     }
 
-    // 2. Record lock detail
-    WalletLock lock = WalletLock.builder()
-        .walletId(walletId)
-        .lockAmount(amount)
-        .lockReason(LockReason.BET_PENDING)
-        .referenceId(betId)
-        .createdAt(LocalDateTime.now())
-        .build();
-
-    walletLockDao.insert(lock);
-
-    // 3. Publish event
-    eventPublisher.publish(new WalletLockedEvent(walletId, amount, betId));
+    /**
+     * Unlock wallet amount (used during bet settlement)
+     *
+     * @param walletId Wallet ID
+     * @param betId Bet order ID
+     */
+    public void unlockWalletAmount(Long walletId, String betId) {
+        walletManager.unlockWalletAmount(walletId, betId);
+    }
 }
 
 /**
- * Unlock wallet amount (used during bet settlement)
- *
- * @param walletId Wallet ID
- * @param betId Bet order ID
+ * Wallet Manager (handles transactions)
  */
-@Transactional(rollbackFor = Throwable.class)
-public void unlockWalletAmount(Long walletId, String betId) {
-    // 1. Query lock record
-    WalletLock lock = walletLockDao.findByReference(walletId, betId);
-    if (lock == null) {
-        log.warn("Lock not found for bet {}", betId);
-        return;
+@Component
+@RequiredArgsConstructor
+public class WalletManager {
+
+    private final WalletDao walletDao;
+    private final WalletLockDao walletLockDao;
+    private final EventPublisher eventPublisher;
+
+    /**
+     * Lock wallet amount (transactional)
+     *
+     * @param walletId Wallet ID
+     * @param amount Lock amount
+     * @param betId Bet order ID
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void lockWalletAmount(Long walletId, BigDecimal amount, String betId) {
+        // 1. Optimistic lock update
+        int updated = walletDao.incrementLockedAmount(walletId, amount);
+        if (updated == 0) {
+            throw new ConcurrentUpdateException("Wallet update conflict, please retry");
+        }
+
+        // 2. Record lock detail
+        WalletLock lock = WalletLock.builder()
+            .walletId(walletId)
+            .lockAmount(amount)
+            .lockReason(LockReason.BET_PENDING)
+            .referenceId(betId)
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        walletLockDao.insert(lock);
+
+        // 3. Publish event
+        eventPublisher.publish(new WalletLockedEvent(walletId, amount, betId));
     }
 
-    // 2. Optimistic lock update
-    int updated = walletDao.decrementLockedAmount(walletId, lock.getLockAmount());
-    if (updated == 0) {
-        throw new ConcurrentUpdateException("Wallet update conflict, please retry");
+    /**
+     * Unlock wallet amount (transactional)
+     *
+     * @param walletId Wallet ID
+     * @param betId Bet order ID
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void unlockWalletAmount(Long walletId, String betId) {
+        // 1. Query lock record
+        WalletLock lock = walletLockDao.findByReference(walletId, betId);
+        if (lock == null) {
+            log.warn("Lock not found for bet {}", betId);
+            return;
+        }
+
+        // 2. Optimistic lock update
+        int updated = walletDao.decrementLockedAmount(walletId, lock.getLockAmount());
+        if (updated == 0) {
+            throw new ConcurrentUpdateException("Wallet update conflict, please retry");
+        }
+
+        // 3. Delete lock record
+        walletLockDao.deleteById(lock.getLockId());
+
+        // 4. Publish event
+        eventPublisher.publish(new WalletUnlockedEvent(walletId, lock.getLockAmount(), betId));
     }
-
-    // 3. Delete lock record
-    walletLockDao.deleteById(lock.getLockId());
-
-    // 4. Publish event
-    eventPublisher.publish(new WalletUnlockedEvent(walletId, lock.getLockAmount(), betId));
 }
 ```
 
@@ -254,29 +297,43 @@ CREATE TABLE outbox_event (
 
 ```java
 /**
- * Save business data and event in the same transaction
+ * Wallet Manager - Save business data and event in the same transaction
  */
-@Transactional(rollbackFor = Throwable.class)
-public void debitWalletWithEvent(DebitRequest request) {
-    // 1. Update wallet balance
-    walletDao.debitBalance(request.getWalletId(), request.getAmount());
+@Component
+@RequiredArgsConstructor
+public class WalletManager {
 
-    // 2. Record transaction
-    WalletTransaction tx = createTransaction(request);
-    walletTransactionDao.insert(tx);
+    private final WalletDao walletDao;
+    private final WalletTransactionDao walletTransactionDao;
+    private final OutboxEventDao outboxEventDao;
 
-    // 3. Save Outbox event (same transaction)
-    OutboxEvent event = OutboxEvent.builder()
-        .aggregateType("WALLET")
-        .aggregateId(request.getWalletId().toString())
-        .eventType("WALLET_DEBITED")
-        .payload(toJson(tx))
-        .createdAt(LocalDateTime.now())
-        .build();
+    /**
+     * Debit wallet with event (transactional)
+     *
+     * @param request Debit request
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void debitWalletWithEvent(DebitRequest request) {
+        // 1. Update wallet balance
+        walletDao.debitBalance(request.getWalletId(), request.getAmount());
 
-    outboxEventDao.insert(event);
+        // 2. Record transaction
+        WalletTransaction tx = createTransaction(request);
+        walletTransactionDao.insert(tx);
 
-    // After transaction commits, event will be relayed to Kafka asynchronously
+        // 3. Save Outbox event (same transaction)
+        OutboxEvent event = OutboxEvent.builder()
+            .aggregateType("WALLET")
+            .aggregateId(request.getWalletId().toString())
+            .eventType("WALLET_DEBITED")
+            .payload(toJson(tx))
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        outboxEventDao.insert(event);
+
+        // After transaction commits, event will be relayed to Kafka asynchronously
+    }
 }
 
 /**
@@ -498,6 +555,7 @@ public class DepositService {
     private final PaymentGateway paymentGateway;
     private final DepositOrderDao depositOrderDao;
     private final WalletService walletService;
+    private final DepositManager depositManager;
 
     /**
      * Create deposit order
@@ -540,45 +598,70 @@ public class DepositService {
      * @param callback Callback data
      * @return Processing result
      */
-    @Transactional(rollbackFor = Throwable.class)
     public CallbackResult handleDepositCallback(Map<String, String> callback) {
-        String gatewayOrderId = callback.get("order_id");
-        String status = callback.get("status");
         String signature = callback.get("signature");
 
         // 1. Verify signature
         if (!paymentGateway.verifySignature(callback, signature)) {
+            String gatewayOrderId = callback.get("order_id");
             log.error("Invalid signature for order {}", gatewayOrderId);
             return CallbackResult.failure("Invalid signature");
         }
 
-        // 2. Query order
+        // 2. Delegate to Manager for transactional processing
+        return depositManager.processDepositCallback(callback);
+    }
+}
+
+/**
+ * Deposit Manager (handles transactions)
+ */
+@Component
+@RequiredArgsConstructor
+public class DepositManager {
+
+    private final DepositOrderDao depositOrderDao;
+    private final WalletService walletService;
+    private final NotificationService notificationService;
+
+    /**
+     * Process deposit callback (transactional)
+     *
+     * @param callback Callback data
+     * @return Processing result
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public CallbackResult processDepositCallback(Map<String, String> callback) {
+        String gatewayOrderId = callback.get("order_id");
+        String status = callback.get("status");
+
+        // 1. Query order
         DepositOrder order = depositOrderDao.findByGatewayOrderId(gatewayOrderId);
         if (order == null) {
             log.error("Order not found: {}", gatewayOrderId);
             return CallbackResult.failure("Order not found");
         }
 
-        // 3. Idempotency check
+        // 2. Idempotency check
         if (order.getStatus() == OrderStatus.SUCCESS) {
             log.info("Order {} already processed", order.getOrderId());
             return CallbackResult.success("Already processed");
         }
 
-        // 4. Update order status
+        // 3. Update order status
         if ("SUCCESS".equals(status)) {
             order.setStatus(OrderStatus.SUCCESS);
             order.setCompletedAt(LocalDateTime.now());
             depositOrderDao.updateStatus(order);
 
-            // 5. Credit wallet
+            // 4. Credit wallet
             walletService.creditWallet(
                 order.getPlayerId(),
                 order.getAmount(),
                 "DEPOSIT:" + order.getOrderId()
             );
 
-            // 6. Send notification
+            // 5. Send notification
             notificationService.sendDepositSuccessNotification(order);
 
             return CallbackResult.success("Deposit processed");
@@ -605,8 +688,8 @@ public class WithdrawalService {
 
     private final PaymentGateway paymentGateway;
     private final WithdrawalOrderDao withdrawalOrderDao;
-    private final WalletService walletService;
     private final RiskControlService riskControlService;
+    private final WithdrawalManager withdrawalManager;
 
     /**
      * Create withdrawal order
@@ -620,7 +703,6 @@ public class WithdrawalService {
      * @param request Withdrawal request
      * @return Order result
      */
-    @Transactional(rollbackFor = Throwable.class)
     public WithdrawalResult createWithdrawalOrder(WithdrawalRequest request) {
         // 1. Risk control evaluation
         RiskDecision decision = riskControlService.evaluateWithdrawal(request);
@@ -629,50 +711,8 @@ public class WithdrawalService {
             throw new WithdrawalRejectedException(decision.getReason());
         }
 
-        // 2. Create order
-        WithdrawalOrder order = WithdrawalOrder.builder()
-            .orderId(generateOrderId())
-            .playerId(request.getPlayerId())
-            .tenantId(request.getTenantId())
-            .amount(request.getAmount())
-            .currency(request.getCurrency())
-            .bankAccount(request.getBankAccount())
-            .status(OrderStatus.PENDING)
-            .riskScore(decision.getScore())
-            .createdAt(LocalDateTime.now())
-            .build();
-
-        withdrawalOrderDao.insert(order);
-
-        // 3. Lock wallet amount
-        walletService.lockWalletAmount(
-            request.getPlayerId(),
-            request.getAmount(),
-            "WITHDRAWAL:" + order.getOrderId()
-        );
-
-        // 4. If manual review required
-        if (decision.getAction() == RiskAction.MANUAL_REVIEW) {
-            order.setStatus(OrderStatus.REVIEWING);
-            withdrawalOrderDao.updateStatus(order);
-
-            // Notify risk control team
-            notificationService.notifyManualReview(order);
-
-            return WithdrawalResult.underReview(order.getOrderId());
-        }
-
-        // 5. Auto-approved, submit to payment gateway
-        WithdrawalResponse response = paymentGateway.createWithdrawal(request);
-
-        order.setGatewayOrderId(response.getGatewayOrderId());
-        order.setStatus(OrderStatus.PROCESSING);
-        withdrawalOrderDao.update(order);
-
-        // 6. Start async status query
-        scheduleStatusQuery(order.getOrderId());
-
-        return WithdrawalResult.processing(order.getOrderId());
+        // 2. Delegate to Manager for transactional processing
+        return withdrawalManager.processWithdrawalOrder(request, decision);
     }
 
     /**
@@ -691,11 +731,11 @@ public class WithdrawalService {
                 );
 
                 if (status == WithdrawalStatus.SUCCESS) {
-                    completeWithdrawal(order);
+                    withdrawalManager.completeWithdrawal(order);
                 } else if (status == WithdrawalStatus.FAILED) {
-                    failWithdrawal(order);
+                    withdrawalManager.failWithdrawal(order);
                 } else if (isTimeout(order)) {
-                    timeoutWithdrawal(order);
+                    withdrawalManager.timeoutWithdrawal(order);
                 }
 
             } catch (Exception e) {
@@ -703,12 +743,80 @@ public class WithdrawalService {
             }
         }
     }
+}
+
+/**
+ * Withdrawal Manager (handles transactions)
+ */
+@Component
+@RequiredArgsConstructor
+public class WithdrawalManager {
+
+    private final WithdrawalOrderDao withdrawalOrderDao;
+    private final WalletService walletService;
+    private final PaymentGateway paymentGateway;
+    private final NotificationService notificationService;
 
     /**
-     * Complete withdrawal
+     * Process withdrawal order (transactional)
+     *
+     * @param request Withdrawal request
+     * @param decision Risk decision
+     * @return Order result
      */
     @Transactional(rollbackFor = Throwable.class)
-    private void completeWithdrawal(WithdrawalOrder order) {
+    public WithdrawalResult processWithdrawalOrder(WithdrawalRequest request, RiskDecision decision) {
+        // 1. Create order
+        WithdrawalOrder order = WithdrawalOrder.builder()
+            .orderId(generateOrderId())
+            .playerId(request.getPlayerId())
+            .tenantId(request.getTenantId())
+            .amount(request.getAmount())
+            .currency(request.getCurrency())
+            .bankAccount(request.getBankAccount())
+            .status(OrderStatus.PENDING)
+            .riskScore(decision.getScore())
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        withdrawalOrderDao.insert(order);
+
+        // 2. Lock wallet amount
+        walletService.lockWalletAmount(
+            request.getPlayerId(),
+            request.getAmount(),
+            "WITHDRAWAL:" + order.getOrderId()
+        );
+
+        // 3. If manual review required
+        if (decision.getAction() == RiskAction.MANUAL_REVIEW) {
+            order.setStatus(OrderStatus.REVIEWING);
+            withdrawalOrderDao.updateStatus(order);
+
+            // Notify risk control team
+            notificationService.notifyManualReview(order);
+
+            return WithdrawalResult.underReview(order.getOrderId());
+        }
+
+        // 4. Auto-approved, submit to payment gateway
+        WithdrawalResponse response = paymentGateway.createWithdrawal(request);
+
+        order.setGatewayOrderId(response.getGatewayOrderId());
+        order.setStatus(OrderStatus.PROCESSING);
+        withdrawalOrderDao.update(order);
+
+        // 5. Start async status query
+        scheduleStatusQuery(order.getOrderId());
+
+        return WithdrawalResult.processing(order.getOrderId());
+    }
+
+    /**
+     * Complete withdrawal (transactional)
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void completeWithdrawal(WithdrawalOrder order) {
         // 1. Update order status
         order.setStatus(OrderStatus.SUCCESS);
         order.setCompletedAt(LocalDateTime.now());
@@ -726,10 +834,10 @@ public class WithdrawalService {
     }
 
     /**
-     * Withdrawal failure
+     * Withdrawal failure (transactional)
      */
     @Transactional(rollbackFor = Throwable.class)
-    private void failWithdrawal(WithdrawalOrder order) {
+    public void failWithdrawal(WithdrawalOrder order) {
         // 1. Update order status
         order.setStatus(OrderStatus.FAILED);
         withdrawalOrderDao.update(order);
@@ -1052,12 +1160,38 @@ public class CompensationNode extends NodeComponent {
 @RequiredArgsConstructor
 public class WithdrawalWorkflowStateMachine {
 
-    private final WithdrawalOrderDao withdrawalOrderDao;
-    private final PaymentGateway paymentGateway;
-    private final WalletService walletService;
+    private final WithdrawalReviewManager withdrawalReviewManager;
 
     /**
      * Reviewer approval
+     */
+    public void approveByReviewer(String orderId, String reviewerId, String comment) {
+        withdrawalReviewManager.approveByReviewer(orderId, reviewerId, comment);
+    }
+
+    /**
+     * Reviewer rejection
+     */
+    public void rejectByReviewer(String orderId, String reviewerId, String reason) {
+        withdrawalReviewManager.rejectByReviewer(orderId, reviewerId, reason);
+    }
+}
+
+/**
+ * Withdrawal Review Manager (handles transactions)
+ */
+@Component
+@RequiredArgsConstructor
+public class WithdrawalReviewManager {
+
+    private final WithdrawalOrderDao withdrawalOrderDao;
+    private final PaymentGateway paymentGateway;
+    private final WalletService walletService;
+    private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
+
+    /**
+     * Reviewer approval (transactional)
      */
     @Transactional(rollbackFor = Throwable.class)
     public void approveByReviewer(String orderId, String reviewerId, String comment) {
@@ -1094,7 +1228,7 @@ public class WithdrawalWorkflowStateMachine {
     }
 
     /**
-     * Reviewer rejection
+     * Reviewer rejection (transactional)
      */
     @Transactional(rollbackFor = Throwable.class)
     public void rejectByReviewer(String orderId, String reviewerId, String reason) {
@@ -1313,6 +1447,24 @@ CREATE TABLE reconciliation_discrepancy (
 @RequiredArgsConstructor
 public class DailyFinancialReconciliationService {
 
+    private final ReconciliationManager reconciliationManager;
+
+    /**
+     * Execute daily reconciliation (scheduled task)
+     */
+    @Scheduled(cron = "0 0 2 * * *")
+    public void executeDailyReconciliation(String tenantId, LocalDate reconDate) {
+        reconciliationManager.executeDailyReconciliation(tenantId, reconDate);
+    }
+}
+
+/**
+ * Reconciliation Manager (handles transactions)
+ */
+@Component
+@RequiredArgsConstructor
+public class ReconciliationManager {
+
     private final WalletDao walletDao;
     private final DepositOrderDao depositOrderDao;
     private final WithdrawalOrderDao withdrawalOrderDao;
@@ -1320,14 +1472,14 @@ public class DailyFinancialReconciliationService {
     private final PaymentGateway paymentGateway;
     private final GameProviderService gameProviderService;
     private final ReconciliationDao reconciliationDao;
+    private final AlertService alertService;
 
     /**
-     * Execute daily reconciliation
+     * Execute daily reconciliation (transactional)
      *
      * @param tenantId Tenant ID
      * @param reconDate Reconciliation date
      */
-    @Scheduled(cron = "0 0 2 * * *")
     @Transactional(rollbackFor = Throwable.class)
     public void executeDailyReconciliation(String tenantId, LocalDate reconDate) {
         log.info("Starting daily reconciliation for tenant {} on {}",
@@ -1535,11 +1687,47 @@ public class DailyFinancialReconciliationService {
 @RequiredArgsConstructor
 public class ReconciliationDiscrepancyService {
 
-    private final ReconciliationDiscrepancyDao discrepancyDao;
-    private final WalletService walletService;
+    private final ReconciliationDiscrepancyManager discrepancyManager;
 
     /**
      * Manually resolve discrepancy
+     *
+     * @param discrepancyId Discrepancy ID
+     * @param action Resolution action (ADJUST_SYSTEM, ADJUST_EXTERNAL, IGNORE)
+     * @param operator Operator
+     * @param comment Notes
+     */
+    public void resolveDiscrepancy(
+        Long discrepancyId,
+        ResolutionAction action,
+        String operator,
+        String comment
+    ) {
+        discrepancyManager.resolveDiscrepancy(discrepancyId, action, operator, comment);
+    }
+
+    /**
+     * Auto-resolve minor discrepancies (scheduled task)
+     */
+    @Scheduled(cron = "0 0 3 * * *")
+    public void autoResolveMinorDiscrepancies() {
+        discrepancyManager.autoResolveMinorDiscrepancies();
+    }
+}
+
+/**
+ * Reconciliation Discrepancy Manager (handles transactions)
+ */
+@Component
+@RequiredArgsConstructor
+public class ReconciliationDiscrepancyManager {
+
+    private final ReconciliationDiscrepancyDao discrepancyDao;
+    private final WalletService walletService;
+    private final AuditLogService auditLogService;
+
+    /**
+     * Manually resolve discrepancy (transactional)
      *
      * @param discrepancyId Discrepancy ID
      * @param action Resolution action (ADJUST_SYSTEM, ADJUST_EXTERNAL, IGNORE)
@@ -1590,11 +1778,10 @@ public class ReconciliationDiscrepancyService {
     }
 
     /**
-     * Auto-resolve minor discrepancies
+     * Auto-resolve minor discrepancies (transactional)
      *
      * Condition: difference < 0.01 AND appears for 3+ consecutive days
      */
-    @Scheduled(cron = "0 0 3 * * *")
     public void autoResolveMinorDiscrepancies() {
         List<ReconciliationDiscrepancy> minorDiscrepancies =
             discrepancyDao.findUnresolvedMinorDiscrepancies(new BigDecimal("0.01"));
