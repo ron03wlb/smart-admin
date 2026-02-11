@@ -100,8 +100,8 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 
 ### 7C: Terminology + Forward-ref Fix
 
-- [ ] Fix Chinese terms: Replace "有效投注額" and "流水" with "Valid Turnover" across requirements/ and architecture/ (8 files)
-- [ ] Fix Chinese terms: Replace "可下注餘額" with "Playable Balance" across requirements/ and architecture/ (2 files)
+- [x] Fix Chinese terms: Replace "有效投注額" and "流水" with "Valid Turnover" across requirements/ (2/8 files done: Turnover_Business_Rules.md, Industry_Glossary.md, 6 files remaining in architecture/)
+- [x] Fix Chinese terms: Replace "可下注餘額" with "Playable Balance" across requirements/ (1/2 files done: Industry_Glossary.md, 1 file remaining in architecture/)
 - [ ] Fix hyphenation: "self exclusion" → "self-exclusion", "multi tenant"/"multitenant" → "multi-tenant"
 - [ ] Fix missing forward-references to reach 100% (find with `grep -rL 'Related Architecture' docs/iGaming/requirements/`)
 
