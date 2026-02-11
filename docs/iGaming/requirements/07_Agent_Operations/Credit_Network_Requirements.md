@@ -8,6 +8,19 @@
 
 ---
 
+## Acceptance Criteria
+
+- [ ] Dual wallet system: Each player account must have independent Cash Wallet and Credit Wallet with distinct balance tracking
+- [ ] Credit propagation: Parent agents can adjust child credit limits in real-time; total child allocations must not exceed parent available credit
+- [ ] Risk alert thresholds: System automatically sends alerts at 81-90% usage (Warning), reduces allocation cap at 91-99% (High Risk), and freezes betting at 100%+ (Critical)
+- [ ] Position taking calculation: Agent Win/Loss = Player Win/Loss × Agent Position %, with normalization when total positions exceed 100%
+- [ ] Settlement cycle: Weekly settlement completes Phase 1 (Freeze & Calculate), Phase 2 (Payment Collection at >95% on-time rate), Phase 3 (Verification & Reset at 100% accuracy), and Phase 4 (Final Report)
+- [ ] Overdue payment automation: System automatically reduces credit limit by 50% at 4-7 days, freezes limit at 8-14 days, and suspends account at 15+ days
+- [ ] Credit allocation validation: System rejects decrease operations when child used credit exceeds new limit; rejects revoke operations when child used credit > 0
+- [ ] Cascading blowout handling: When agent reaches 100% usage, all downstream players are frozen from betting, parent available credit is reduced, and margin call notification is sent
+
+---
+
 ## 1. Business Overview
 
 The Credit Network is a unique operating model in the Asian market. The core difference from the Cash Market is the **"play first, settle later"** principle. The system must support credit limit allocation, consumption, and repayment, as well as position taking calculations within the agent hierarchy.

@@ -8,6 +8,30 @@
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- **Powering Customer Acquisition Engine**: Unlimited hierarchy agent system enables scalable partner network, supporting both credit/position-taking and pure commission models for diverse market needs
+- **Reducing Manual Settlement Overhead**: Automated commission calculation (daily/weekly/monthly cycles) with adjustment wallet eliminates 90%+ manual finance operations
+- **Preventing Agent Fraud**: Risk control mechanisms (same-IP detection, commission anomaly alerts, threshold reset policies) protect platform revenue from self-commission fraud and joint arbitrage schemes
+- **Increasing Agent Retention**: Agent portal with self-service reporting tools (Downstream Player Report, Win/Loss Report, Commission History) reduces support tickets by 70% and improves agent satisfaction
+- **Ensuring Regulatory Compliance**: Negative carryover rules, approval workflows, and audit trails satisfy MGA/UKGC agent commission transparency requirements
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Agent Acquisition Cost | < $200/agent | Marketing spend / new agents |
+| Player per Agent | > 50 active players | Average active players per agent |
+| Commission Payout Ratio | 25-40% of GGR | Total commission / GGR |
+| On-time Settlement Rate | > 95% | Settled on time / total settlements |
+| Agent Retention | > 80% annual | Active agents / total agents |
+| Commission Approval Cycle | < 24 hours | Time from calculation to approval |
+| Negative Carryover Resolution | < 5% of agents | Agents with negative carryover > 3 months |
+| Risk Detection Accuracy | > 90% | True positives / total flags |
+
+---
+
 ## 1. Business Overview
 
 The Agent (Affiliate) System is the core customer acquisition engine for the iGaming platform. It supports **unlimited hierarchy levels** and tenant-isolated agent structures. The system accommodates both **credit/position taking** and **pure commission** business models.

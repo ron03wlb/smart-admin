@@ -8,6 +8,30 @@
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- **Reducing Time-to-Market for Promotions**: No-code page editor eliminates engineering dependency, enabling operations teams to launch new campaigns in hours instead of days (80%+ faster deployment)
+- **Increasing Conversion Rates**: Wallet mode UI adaptation (Cash/Credit/Hybrid display) reduces payment friction and increases deposit conversion by providing clear, contextual balance information
+- **Preventing Revenue Loss from Promotion Errors**: Mandatory approval workflow (Operations Specialist → Operations Supervisor → CTO emergency takedown) prevents financially damaging banner mistakes (e.g., "Deposit 100 get 1000" typos)
+- **Improving Player Engagement**: Multi-language banner support (6+ languages with fallback logic) and geo/VIP/time-based targeting increases CTR by 2-3× compared to generic campaigns
+- **Optimizing Marketing ROI**: Banner analytics (impressions, clicks, CTR, conversions, CVR) with A/B testing enables data-driven campaign optimization, reducing cost-per-acquisition by 30%+
+
+## Acceptance Criteria
+
+- [ ] No-code page editor allows operations staff to adjust homepage layout via drag-and-drop without engineering support
+- [ ] Theme switching enables one-click color scheme changes across entire site (dark, light, holiday-limited)
+- [ ] Multi-terminal support: Layout configurations are adaptive across Web, H5, and App with independent component visibility settings
+- [ ] Wallet mode UI adaptation: Header automatically switches between Cash Mode (emphasize "Deposit"), Credit Mode (show Quota/Settlement Countdown), and Hybrid Mode (payment selector) based on player configuration
+- [ ] Preview-before-publish: All layout changes generate a Preview URL for internal testing without affecting production users
+- [ ] Approval workflow: All banner content goes through Operations Specialist (submit) → Operations Supervisor (approve) → CTO (emergency takedown) before publishing
+- [ ] Multi-language banner support: Banner images support 6+ languages (zh-CN, en-US, vi-VN, th-TH, pt-BR, ja-JP) with fallback logic (User language → English → Simplified Chinese → Default image)
+- [ ] Banner targeting: System correctly filters banners by user segment (new/active/inactive/high-roller), VIP level, device (desktop/mobile/both), geo, and time-based rules
+- [ ] Banner analytics: Dashboard shows real-time Impressions, Clicks, CTR, Conversions, and CVR with attribution logic and A/B testing support
+- [ ] Image optimization: All banners meet technical specifications (Desktop ≤200KB @1920x600, Mobile ≤150KB @750x400, Pop-up ≤100KB @600x600) with WebP/PNG format and lazy loading
+
+---
+
 ## 1. Layout Configuration Requirements
 
 ### 1.1 No-Code Page Editor

@@ -9,6 +9,28 @@
 
 ---
 
+## Business Value
+
+This feature delivers value by:
+- **Preventing Credential Compromise**: MFA adds a critical second authentication factor, protecting administrative functions from password theft or brute-force attacks
+- **Meeting Regulatory Compliance**: Satisfies mandatory strong authentication requirements for UKGC LCCP, MGA Technical Standards, and ISO 27001 A.9.4.2
+- **Optimizing Administrator Productivity**: Trusted device mechanism (30-day trust period) eliminates repetitive MFA prompts for administrators logging in multiple times daily from the same workstation
+- **Reducing Account Lockout Friction**: Backup code policy provides emergency recovery path, preventing administrator lockouts that could delay critical operations
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| MFA Enrollment Rate | 100% for mandatory roles | Enrolled users / Total users in MFA-required roles |
+| Average Login Time | < 15 seconds (including MFA step) | Total login duration from password entry to dashboard |
+| Trusted Device Adoption | > 70% of administrators | Users with active trusted device tokens / Total administrators |
+| MFA Lockout Rate | < 2% of login attempts | Accounts locked due to 3 failed TOTP attempts / Total MFA login attempts |
+| Backup Code Usage | < 5% of MFA verifications | Backup code usage count / Total MFA verification count |
+| Audit Log Completeness | 100% of MFA events | Logged events / Total MFA operations |
+| Regulatory Compliance Pass | 100% audit pass rate | Passed regulatory audits / Total audits |
+
+---
+
 ## 1. Business Context
 
 Multi-Factor Authentication (MFA) is a mandatory security control for the back-office administration platform. This document defines the business requirements for the two-phase login flow, the MFA registration process, the trusted device mechanism, and error handling policies. MFA protects administrative functions against credential compromise and satisfies regulatory security requirements across UKGC, MGA, and ISO 27001 frameworks.
