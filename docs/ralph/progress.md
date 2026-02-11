@@ -306,10 +306,10 @@ No additional files needed. Proceeding to Phase 8C Quality Gate.
 - [x] architecture/00_Overview/Technology_Stack.md ✅ commit 1240c4a7
 
 #### Batch 32 — 01_Player + 02_Finance (5 files)
-- [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md
-- [ ] architecture/02_Finance_Service/Financial_Implementation.md
-- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md
-- [ ] architecture/02_Finance_Service/Payment_Gateway_Technical.md
+- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md ✅ commit f320984b
+- [x] architecture/02_Finance_Service/Financial_Implementation.md ✅ commit 7d1ab904
+- [x] architecture/02_Finance_Service/Payment_Gateway_API.md ✅ commit 0d1b3a3e
+- [x] architecture/02_Finance_Service/Payment_Gateway_Technical.md ✅ commit 2b5fae1a
 - [ ] architecture/02_Finance_Service/Reconciliation_Technical.md
 
 #### Batch 33 — 02_Finance (5 files)
