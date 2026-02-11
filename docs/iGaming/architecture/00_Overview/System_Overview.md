@@ -28,7 +28,7 @@ Bettable Balance = Cash Balance - Locked Amount - In-Progress Bets
 
 ### 2.3 References
 
-- SSOT: [02-06 Wallet Architecture -- Playable Balance](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#可下注餘額計算)
+- SSOT: [02-06 Wallet Architecture -- Playable Balance](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#22-playable-balance-formula)
 
 ---
 

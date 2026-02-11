@@ -33,31 +33,31 @@ The Bonus Calculation Engine delivers critical business value by:
 
 ## 概述
 
-本文檔定義活動系統獎金計算引擎的業務需求，包括跨遊戲類型的流水計算規則、多獎金衝突處理策略，以及與風控系統整合的業務規則。這是確保活動系統公平性與財務一致性的核心業務文檔。
+本文檔定義活動系統獎金計算引擎的業務需求，包括跨遊戲類型的 Valid Turnover 計算規則、多獎金衝突處理策略，以及與風控系統整合的業務規則。這是確保活動系統公平性與財務一致性的核心業務文檔。
 
 ---
 
-## 遊戲流水貢獻率規則 (Game Contribution Rules)
+## 遊戲 Valid Turnover 貢獻率規則 (Game Contribution Rules)
 
 ### 業務目標
 
-不同遊戲類型的莊家優勢差異巨大（老虎機 ~5%、二十一點 ~0.5%），需透過貢獻率系統標準化流水計算，確保：
-- 玩家無法通過低莊家優勢遊戲輕易完成流水要求
+不同遊戲類型的莊家優勢差異巨大（老虎機 ~5%、二十一點 ~0.5%），需透過貢獻率系統標準化 Valid Turnover 計算，確保：
+- 玩家無法通過低莊家優勢遊戲輕易完成 Valid Turnover 要求
 - 各遊戲類型對獎金釋放的貢獻度反映其真實風險
 
 ### 遊戲權重配置表
 
 | 遊戲類型 | 貢獻率 (Contribution Rate) | 業務原因 | 玩家說明範例 |
 |---------|---------------------------|---------|-------------|
-| 老虎機/Slots | 100% | 高莊家優勢，標準基準 | $100 投注 = $100 流水 |
-| 體育博彩 | 100% | 結果不可控，風險可接受 | $100 投注 = $100 流水 (需符合賠率要求) |
-| 刮刮卡 | 100% | 單次結果型遊戲 | $100 投注 = $100 流水 |
-| 輪盤 | 10-20% | 可對沖投注 | $100 投注 = $15 流水 |
-| 百家樂 | 10-15% | 接近 50/50 賠率 | $100 投注 = $15 流水 |
-| 二十一點 | 5-10% | 低莊家優勢，可計牌 | $100 投注 = $10 流水 |
-| 視頻撲克 | 10-20% | 策略可降低莊家優勢 | $100 投注 = $15 流水 |
-| 真人娛樂場 | 5-15% | 與桌遊類似 | $100 投注 = $10 流水 |
-| 撲克（抽水池）| 0% | 玩家對玩家，通常排除 | $100 投注 = $0 流水 |
+| 老虎機/Slots | 100% | 高莊家優勢，標準基準 | $100 投注 = $100 Valid Turnover |
+| 體育博彩 | 100% | 結果不可控，風險可接受 | $100 投注 = $100 Valid Turnover (需符合賠率要求) |
+| 刮刮卡 | 100% | 單次結果型遊戲 | $100 投注 = $100 Valid Turnover |
+| 輪盤 | 10-20% | 可對沖投注 | $100 投注 = $15 Valid Turnover |
+| 百家樂 | 10-15% | 接近 50/50 賠率 | $100 投注 = $15 Valid Turnover |
+| 二十一點 | 5-10% | 低莊家優勢，可計牌 | $100 投注 = $10 Valid Turnover |
+| 視頻撲克 | 10-20% | 策略可降低莊家優勢 | $100 投注 = $15 Valid Turnover |
+| 真人娛樂場 | 5-15% | 與桌遊類似 | $100 投注 = $10 Valid Turnover |
+| 撲克（抽水池）| 0% | 玩家對玩家，通常排除 | $100 投注 = $0 Valid Turnover |
 
 ### 計算範例
 
@@ -68,29 +68,29 @@ The Bonus Calculation Engine delivers critical business value by:
 | Layer 1 風控因子 | 1 | 通過風控驗證 |
 | Layer 2 狀態因子 | 100% | 結果為 WIN/LOSS |
 | Layer 3 遊戲權重 | 10% | 二十一點貢獻率 |
-| **有效流水** | **$10** | $100 × 1 × 100% × 10% |
+| **有效Valid Turnover** | **$10** | $100 × 1 × 100% × 10% |
 
 ---
 
-## 有效流水驗證規則 (Valid Turnover Rules)
+## 有效Valid Turnover驗證規則 (Valid Turnover Rules)
 
 ### 驗證目的
 
-流水計算必須過濾「無風險投注」與「對沖投注」，避免玩家濫用活動機制。
+Valid Turnover計算必須過濾「無風險投注」與「對沖投注」，避免玩家濫用活動機制。
 
 ### 無效投注類型
 
 | 投注類型 | 處理方式 | 業務原因 |
 |---------|---------|---------|
-| 對沖投注 (Hedge Betting) | 拒絕計入流水 | 玩家無風險套利 |
-| 套利投注 (Arbitrage) | 拒絕計入流水 | 利用賠率差異套利 |
-| 低賠率投注 (<1.5 歐洲盤) | 拒絕計入流水 | 風險極低的確定性投注 |
-| 和局/作廢 (DRAW/VOID) | 不計流水 | 投注無風險承擔 |
-| 半贏/半輸 | 50% 計入流水 | 部分風險承擔 |
+| 對沖投注 (Hedge Betting) | 拒絕計入Valid Turnover | 玩家無風險套利 |
+| 套利投注 (Arbitrage) | 拒絕計入Valid Turnover | 利用賠率差異套利 |
+| 低賠率投注 (<1.5 歐洲盤) | 拒絕計入Valid Turnover | 風險極低的確定性投注 |
+| 和局/作廢 (DRAW/VOID) | 不計Valid Turnover | 投注無風險承擔 |
+| 半贏/半輸 | 50% 計入Valid Turnover | 部分風險承擔 |
 
 ### 狀態因子對照表
 
-| 結算狀態 | 流水因子 | 說明 |
+| 結算狀態 | Valid Turnover因子 | 說明 |
 |---------|---------|------|
 | WIN (贏) | 100% | 完整計入 |
 | LOSS (輸) | 100% | 完整計入 |
@@ -120,12 +120,12 @@ The Bonus Calculation Engine delivers critical business value by:
 | **同類型互斥 (TYPE_EXCLUSIVE)** | 混合活動組 | ⭐⭐⭐⭐ 良好 | 🟢 可控 |
 | **順序模式 (SEQUENTIAL)** | 新手任務鏈 | ⭐⭐⭐ 中等 | 🟢 可控 |
 
-### 流水追蹤模式
+### Valid Turnover追蹤模式
 
 | 模式 | 說明 | 適用場景 |
 |------|------|---------|
-| **隔離流水 (ISOLATED)** | 每個獎金獨立追蹤流水進度 | 多紅利疊加場景 |
-| **共用流水 (SHARED)** | 所有獎金共用同一流水池 | 簡化用戶體驗場景 |
+| **隔離Valid Turnover (ISOLATED)** | 每個獎金獨立追蹤Valid Turnover進度 | 多紅利疊加場景 |
+| **共用Valid Turnover (SHARED)** | 所有獎金共用同一Valid Turnover池 | 簡化用戶體驗場景 |
 
 ### 典型場景決策
 
@@ -163,7 +163,7 @@ The Bonus Calculation Engine delivers critical business value by:
 |------|---------|---------|
 | 活動切換頻率 | 單玩家 >5 次/小時 | 疑似套利測試 |
 | 衝突規則投訴率 | >2% | 規則說明不清晰 |
-| 流水完成率 | <30% | 門檻過高或權重不合理 |
+| Valid Turnover完成率 | <30% | 門檻過高或權重不合理 |
 | 獎金成本比 | >15% 營收 | 疊加規則過於寬鬆 |
 
 ### A/B 測試建議
@@ -171,7 +171,7 @@ The Bonus Calculation Engine delivers critical business value by:
 | 測試項目 | 測試組 | 觀察指標 |
 |---------|-------|---------|
 | 衝突策略效果 | MAX_REWARD vs PRIORITY | 玩家滿意度、投訴率 |
-| 流水追蹤模式 | ISOLATED vs SHARED | 流水完成率、用戶理解度 |
+| Valid Turnover追蹤模式 | ISOLATED vs SHARED | Valid Turnover完成率、用戶理解度 |
 | 遊戲權重調整 | 百家樂 10% vs 15% | 遊戲分佈、獎金成本 |
 
 ---
@@ -183,7 +183,7 @@ The Bonus Calculation Engine delivers critical business value by:
 | 項目 | 說明 |
 |------|------|
 | 執行時間 | 每日凌晨 03:00 (結算完成後) |
-| 比對對象 | 財務系統流水 vs 活動系統流水 |
+| 比對對象 | 財務系統Valid Turnover vs 活動系統Valid Turnover |
 | 偏差容忍 | ≤0.01% |
 | 警報通知 | Slack/Email 至財務與風控團隊 |
 
@@ -205,7 +205,7 @@ The Bonus Calculation Engine delivers critical business value by:
 
 ### 技術實現
 
-→ **[獎金計算引擎 - 技術架構](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)** - 獎金計算規則引擎、流水要求追蹤演算法、多幣種處理、遊戲權重矩陣、即時計算優化策略
+→ **[獎金計算引擎 - 技術架構](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)** - 獎金計算規則引擎、Valid Turnover要求追蹤演算法、多幣種處理、遊戲權重矩陣、即時計算優化策略
 
 ---
 
