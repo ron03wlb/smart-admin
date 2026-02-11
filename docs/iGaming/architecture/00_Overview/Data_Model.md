@@ -1,15 +1,15 @@
-# Data Model Architecture
+# 資料模型架構（Data Model Architecture）
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-10_Data_Model.md](../../source-archive/00_Foundation/guides/00-10_Data_Model.md)
-> **Audience**: Architects, Backend Developers, DevOps
-> **Business Requirements**: None (pure technical)
-> **Last Synced**: 2026-02-08
+> **目標讀者（Audience）**: 架構師、後端開發人員、DevOps
+> **業務需求（Business Requirements）**: None (pure technical)
+> **最後同步（Last Synced）**: 2026-02-08
 
 ---
 
-## 1. Entity Relationship Diagram
+## 1. 實體關係圖（Entity Relationship Diagram）
 
-### 1.1 Global ER Diagram
+### 1.1 全域 ER 圖（Global ER Diagram）
 
 ```mermaid
 erDiagram
@@ -61,124 +61,124 @@ erDiagram
 
 ---
 
-## 2. Entity Layered Architecture
+## 2. 實體分層架構（Entity Layered Architecture）
 
-### 2.1 Layer 1: Multi-Tenant & Organization Hierarchy
+### 2.1 第一層：多租戶與組織階層（Layer 1: Multi-Tenant & Organization Hierarchy）
 
 ```
-Super Admin (System Level)
-    +-- Brand
-        +-- Tenant (Operator)
-            +-- Agent
-                +-- Player
+Super Admin (系統層級)
+    +-- Brand (品牌)
+        +-- Tenant (租戶/營運商)
+            +-- Agent (代理)
+                +-- Player (玩家)
 ```
 
-**Core Entities**:
+**核心實體（Core Entities）**:
 
-| Entity | Table Name | Description |
+| 實體（Entity） | 表名（Table Name） | 說明（Description） |
 |--------|-----------|-------------|
-| Brand | `brands` | Brand entity |
-| Tenant | `tenants` | Tenant / Operator |
-| Agent | `agents` | Agent system (unlimited nesting) |
-| Player | `players` | End player |
+| Brand | `brands` | 品牌實體 |
+| Tenant | `tenants` | 租戶 / 營運商 |
+| Agent | `agents` | 代理系統（無限層級巢狀） |
+| Player | `players` | 終端玩家 |
 
-### 2.2 Layer 2: Financial Core
-
-```
-Player Wallet
-    +-- Cash Balance
-    +-- Bonus Balance
-    +-- Credit Balance
-```
-
-**Core Entities**:
-
-| Entity | Table Name | Description |
-|--------|-----------|-------------|
-| Wallet | `wallets` | Unified wallet master table |
-| Transaction | `transactions` | All fund movement records |
-| Bonus Wallet | `bonus_wallets` | Bonus sub-wallet |
-| Withdrawal Request | `withdrawal_requests` | Withdrawal applications |
-| Deposit Record | `deposit_records` | Deposit records |
-
-### 2.3 Layer 3: Game & Betting
+### 2.2 第二層：金融核心（Layer 2: Financial Core）
 
 ```
-Game Provider
-    +-- Game
-        +-- Game Session
-            +-- Bet Record
+Player Wallet (玩家錢包)
+    +-- Cash Balance (現金餘額)
+    +-- Bonus Balance (紅利餘額)
+    +-- Credit Balance (信用額度)
 ```
 
-**Core Entities**:
+**核心實體（Core Entities）**:
 
-| Entity | Table Name | Description |
+| 實體（Entity） | 表名（Table Name） | 說明（Description） |
 |--------|-----------|-------------|
-| Game Provider | `game_providers` | Game Provider (GP) |
-| Game | `games` | Game catalog |
-| Game Session | `game_sessions` | Game session |
-| Bet Record | `bet_records` | Bet details |
-| Game Round Aggregation | `game_round_aggregation` | Game round summary |
+| Wallet | `wallets` | 統一錢包主表 |
+| Transaction | `transactions` | 所有資金流動記錄 |
+| Bonus Wallet | `bonus_wallets` | 紅利子錢包 |
+| Withdrawal Request | `withdrawal_requests` | 提款申請 |
+| Deposit Record | `deposit_records` | 存款記錄 |
 
-### 2.4 Layer 4: Activity & Risk Control
+### 2.3 第三層：遊戲與投注（Layer 3: Game & Betting）
 
-**Activity System**:
+```
+Game Provider (遊戲提供商)
+    +-- Game (遊戲)
+        +-- Game Session (遊戲場次)
+            +-- Bet Record (投注記錄)
+```
 
-| Entity | Table Name | Description |
+**核心實體（Core Entities）**:
+
+| 實體（Entity） | 表名（Table Name） | 說明（Description） |
 |--------|-----------|-------------|
-| Activity | `activities` | Activity configuration |
-| Bonus | `bonuses` | Bonus distribution records |
-| Wagering Progress | `wagering_progress` | Turnover progress tracking |
+| Game Provider | `game_providers` | 遊戲提供商（GP） |
+| Game | `games` | 遊戲目錄 |
+| Game Session | `game_sessions` | 遊戲場次 |
+| Bet Record | `bet_records` | 投注詳情 |
+| Game Round Aggregation | `game_round_aggregation` | 遊戲回合匯總 |
 
-**Risk Control System**:
+### 2.4 第四層：活動與風險控制（Layer 4: Activity & Risk Control）
 
-| Entity | Table Name | Description |
+**活動系統（Activity System）**:
+
+| 實體（Entity） | 表名（Table Name） | 說明（Description） |
 |--------|-----------|-------------|
-| Risk Rule | `risk_rules` | Risk control rule configuration |
-| Risk Score | `risk_scores` | Player risk scores |
-| Risk Event | `risk_events` | Risk event records |
-| Approval Workflow | `approval_workflows` | Approval workflow |
+| Activity | `activities` | 活動配置 |
+| Bonus | `bonuses` | 紅利發放記錄 |
+| Wagering Progress | `wagering_progress` | 流水進度追蹤 |
+
+**風險控制系統（Risk Control System）**:
+
+| 實體（Entity） | 表名（Table Name） | 說明（Description） |
+|--------|-----------|-------------|
+| Risk Rule | `risk_rules` | 風險控制規則配置 |
+| Risk Score | `risk_scores` | 玩家風險分數 |
+| Risk Event | `risk_events` | 風險事件記錄 |
+| Approval Workflow | `approval_workflows` | 審批工作流 |
 
 ---
 
-## 3. State Machine Designs
+## 3. 狀態機設計（State Machine Designs）
 
-### 3.1 Player Account State Machine
+### 3.1 玩家帳號狀態機（Player Account State Machine）
 
-> **SSOT**: Full definition at [01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
+> **SSOT**: 完整定義見 [01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
 
-**Five-State Definition**:
+**五狀態定義（Five-State Definition）**:
 
-| State Code | Trigger Condition | Business Impact | Recovery Path |
+| 狀態碼（State Code） | 觸發條件（Trigger Condition） | 業務影響（Business Impact） | 恢復路徑（Recovery Path） |
 |-----------|------------------|-----------------|---------------|
-| `ACTIVE` | Default state | No restrictions | N/A |
-| `LOCKED` | 5 consecutive failed logins | Login prohibited for 30 min | Password reset OR auto-unlock |
-| `SUSPENDED` | Risk score >= 70 | Deposit/withdrawal/betting prohibited | Manual review approval |
-| `PENDING_VERIFICATION` | Withdrawal triggers KYC upgrade | Withdrawal limit (<$1000) | KYC verification passed |
-| `CLOSED` | Self-exclusion OR AML violation | All operations prohibited, permanent | Irrecoverable |
+| `ACTIVE` | 預設狀態 | 無限制 | N/A |
+| `LOCKED` | 連續 5 次登入失敗 | 登入禁止 30 分鐘 | 密碼重設 OR 自動解鎖 |
+| `SUSPENDED` | 風險分數 >= 70 | 存款/提款/投注禁止 | 人工審核通過 |
+| `PENDING_VERIFICATION` | 提款觸發 KYC 升級 | 提款限額（<$1000） | KYC 驗證通過 |
+| `CLOSED` | 自我排除 OR AML 違規 | 所有操作禁止，永久性 | 不可恢復 |
 
-**State Transition Diagram**:
+**狀態轉換圖（State Transition Diagram）**:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ACTIVE : Registration complete
-    ACTIVE --> LOCKED : 5 consecutive login failures
-    ACTIVE --> SUSPENDED : Risk score >= 70
-    ACTIVE --> PENDING_VERIFICATION : Withdrawal triggers KYC upgrade
-    ACTIVE --> CLOSED : Self-exclusion
+    [*] --> ACTIVE : 註冊完成
+    ACTIVE --> LOCKED : 連續 5 次登入失敗
+    ACTIVE --> SUSPENDED : 風險分數 >= 70
+    ACTIVE --> PENDING_VERIFICATION : 提款觸發 KYC 升級
+    ACTIVE --> CLOSED : 自我排除
 
-    LOCKED --> ACTIVE : Password reset OR 30min elapsed
+    LOCKED --> ACTIVE : 密碼重設 OR 30 分鐘已過
 
-    SUSPENDED --> ACTIVE : Manual review approved
-    SUSPENDED --> CLOSED : AML violation confirmed
+    SUSPENDED --> ACTIVE : 人工審核通過
+    SUSPENDED --> CLOSED : AML 違規確認
 
-    PENDING_VERIFICATION --> ACTIVE : KYC verification passed
-    PENDING_VERIFICATION --> SUSPENDED : KYC verification failed
+    PENDING_VERIFICATION --> ACTIVE : KYC 驗證通過
+    PENDING_VERIFICATION --> SUSPENDED : KYC 驗證失敗
 
-    CLOSED --> [*] : Permanently closed
+    CLOSED --> [*] : 永久關閉
 ```
 
-**State Transition SQL Examples**:
+**狀態轉換 SQL 範例（State Transition SQL Examples）**:
 
 ```sql
 -- ACTIVE -> LOCKED (login failure trigger)
@@ -201,59 +201,59 @@ WHERE account_status = 'LOCKED'
   AND locked_until < NOW();
 ```
 
-### 3.2 Withdrawal State Machine
+### 3.2 提款狀態機（Withdrawal State Machine）
 
-> **SSOT**: Full SAGA definition at [01-05_Withdrawal_Risk.md](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md)
+> **SSOT**: 完整 SAGA 定義見 [01-05_Withdrawal_Risk.md](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md)
 
-**Ten-State Definition**:
+**十狀態定義（Ten-State Definition）**:
 
-| State Code | Description | Possible Transitions | Business Impact |
+| 狀態碼（State Code） | 說明（Description） | 可能轉換（Possible Transitions） | 業務影響（Business Impact） |
 |-----------|-------------|---------------------|-----------------|
-| `PENDING` | Withdrawal request created | RISK_CHECK, REJECTED | Balance locked |
-| `RISK_CHECK` | Risk detection in progress | KYC_REQUIRED, APPROVED, MANUAL_REVIEW | Real-time risk scoring |
-| `KYC_REQUIRED` | KYC upgrade needed | RISK_CHECK | Waiting for player document upload |
-| `MANUAL_REVIEW` | Manual review | APPROVED, REJECTED | L1/L2/L3 reviewer intervention |
-| `APPROVED` | Review approved | PROCESSING | Ready for payout |
-| `PROCESSING` | PSP payout in progress | COMPLETED, FAILED | Calling PSP API |
-| `COMPLETED` | Withdrawal successful | [Terminal] | Funds arrived |
-| `FAILED` | Withdrawal failed | ROLLBACK | PSP returned failure |
-| `ROLLBACK` | Balance rollback in progress | REFUNDED | Releasing locked balance |
-| `REFUNDED` | Refunded | [Terminal] | Balance unlocked |
-| `REJECTED` | Review rejected | REFUNDED | Risk/manual rejection |
+| `PENDING` | 提款請求已建立 | RISK_CHECK, REJECTED | 餘額鎖定 |
+| `RISK_CHECK` | 風險檢測進行中 | KYC_REQUIRED, APPROVED, MANUAL_REVIEW | 即時風險評分 |
+| `KYC_REQUIRED` | 需要 KYC 升級 | RISK_CHECK | 等待玩家上傳文件 |
+| `MANUAL_REVIEW` | 人工審核 | APPROVED, REJECTED | L1/L2/L3 審核員介入 |
+| `APPROVED` | 審核通過 | PROCESSING | 準備支付 |
+| `PROCESSING` | PSP 支付進行中 | COMPLETED, FAILED | 呼叫 PSP API |
+| `COMPLETED` | 提款成功 | [終態] | 資金已到達 |
+| `FAILED` | 提款失敗 | ROLLBACK | PSP 返回失敗 |
+| `ROLLBACK` | 餘額回滾進行中 | REFUNDED | 釋放鎖定餘額 |
+| `REFUNDED` | 已退款 | [終態] | 餘額解鎖 |
+| `REJECTED` | 審核拒絕 | REFUNDED | 風險/人工拒絕 |
 
-**SAGA Orchestration Flow Diagram**:
+**SAGA 編排流程圖（SAGA Orchestration Flow Diagram）**:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING : Create withdrawal request
+    [*] --> PENDING : 建立提款請求
 
-    PENDING --> RISK_CHECK : Start risk detection
-    RISK_CHECK --> KYC_REQUIRED : KYC level insufficient
-    RISK_CHECK --> MANUAL_REVIEW : Risk score 60-85
-    RISK_CHECK --> REJECTED : Risk score >= 86
-    RISK_CHECK --> APPROVED : Risk score < 60 & KYC qualified
+    PENDING --> RISK_CHECK : 啟動風險檢測
+    RISK_CHECK --> KYC_REQUIRED : KYC 等級不足
+    RISK_CHECK --> MANUAL_REVIEW : 風險分數 60-85
+    RISK_CHECK --> REJECTED : 風險分數 >= 86
+    RISK_CHECK --> APPROVED : 風險分數 < 60 且 KYC 合格
 
-    KYC_REQUIRED --> RISK_CHECK : Player completes KYC
-    KYC_REQUIRED --> REJECTED : Upload timeout > 48 hours
+    KYC_REQUIRED --> RISK_CHECK : 玩家完成 KYC
+    KYC_REQUIRED --> REJECTED : 上傳逾時 > 48 小時
 
-    MANUAL_REVIEW --> APPROVED : Reviewer approves
-    MANUAL_REVIEW --> REJECTED : Reviewer rejects
+    MANUAL_REVIEW --> APPROVED : 審核員通過
+    MANUAL_REVIEW --> REJECTED : 審核員拒絕
 
-    APPROVED --> PROCESSING : Call PSP payout
+    APPROVED --> PROCESSING : 呼叫 PSP 支付
 
-    PROCESSING --> COMPLETED : PSP success
-    PROCESSING --> FAILED : PSP failure
+    PROCESSING --> COMPLETED : PSP 成功
+    PROCESSING --> FAILED : PSP 失敗
 
-    REJECTED --> ROLLBACK : Start rollback
-    FAILED --> ROLLBACK : Start rollback
+    REJECTED --> ROLLBACK : 啟動回滾
+    FAILED --> ROLLBACK : 啟動回滾
 
-    ROLLBACK --> REFUNDED : Balance unlocked
+    ROLLBACK --> REFUNDED : 餘額解鎖
 
-    COMPLETED --> [*] : Withdrawal complete
-    REFUNDED --> [*] : Refund complete
+    COMPLETED --> [*] : 提款完成
+    REFUNDED --> [*] : 退款完成
 ```
 
-**Step 2.5 Delayed Risk Check Query** (v2.1.0):
+**步驟 2.5 延遲風險檢查查詢（Step 2.5 Delayed Risk Check Query）** (v2.1.0):
 
 ```sql
 -- Check historical risk proposals
@@ -268,48 +268,48 @@ WHERE wrc.player_id = ?
 -- If pending_proposals > 0, current withdrawal forced into MANUAL_REVIEW
 ```
 
-### 3.3 VIP Tier State Machine
+### 3.3 VIP 等級狀態機（VIP Tier State Machine）
 
-> **SSOT**: Full VIP system design at [01-06_VIP_Loyalty.md](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md)
+> **SSOT**: 完整 VIP 系統設計見 [01-06_VIP_Loyalty.md](../../source-archive/01_Player_Center/01-06_VIP_Loyalty.md)
 
-**Five-Tier Definition**:
+**五層級定義（Five-Tier Definition）**:
 
-| Tier | Retention Condition (Monthly) | Upgrade Condition | Warning State | Grace Period |
+| 層級（Tier） | 保級條件（月度）（Retention Condition） | 升級條件（Upgrade Condition） | 警告狀態（Warning State） | 寬限期（Grace Period） |
 |------|------------------------------|-------------------|---------------|--------------|
-| Bronze | $100 deposit OR $1K turnover | $1K deposit OR $10K turnover | None | None |
-| Silver | $1K deposit OR $10K turnover | $5K deposit OR $50K turnover | 7-day warning | 30 days |
-| Gold | $5K deposit OR $50K turnover | $20K deposit OR $200K turnover | 14-day warning | 60 days |
-| Platinum | $20K deposit OR $200K turnover | $100K deposit OR $1M turnover | 21-day warning | 90 days |
-| Diamond | $100K deposit OR $1M turnover | N/A | 30-day warning | Permanent (unless violation) |
+| Bronze | $100 存款 OR $1K 流水 | $1K 存款 OR $10K 流水 | 無 | 無 |
+| Silver | $1K 存款 OR $10K 流水 | $5K 存款 OR $50K 流水 | 7 天警告 | 30 天 |
+| Gold | $5K 存款 OR $50K 流水 | $20K 存款 OR $200K 流水 | 14 天警告 | 60 天 |
+| Platinum | $20K 存款 OR $200K 流水 | $100K 存款 OR $1M 流水 | 21 天警告 | 90 天 |
+| Diamond | $100K 存款 OR $1M 流水 | N/A | 30 天警告 | 永久（除非違規） |
 
-**State Transition Diagram**:
+**狀態轉換圖（State Transition Diagram）**:
 
 ```mermaid
 stateDiagram-v2
     direction LR
-    Bronze --> Silver : Upgrade condition met
-    Silver --> Gold : Upgrade condition met
-    Gold --> Platinum : Upgrade condition met
-    Platinum --> Diamond : Upgrade condition met
+    Bronze --> Silver : 達到升級條件
+    Silver --> Gold : 達到升級條件
+    Gold --> Platinum : 達到升級條件
+    Platinum --> Diamond : 達到升級條件
 
-    Silver --> Warning_Silver : Retention condition not met
-    Gold --> Warning_Gold : Retention condition not met
-    Platinum --> Warning_Platinum : Retention condition not met
-    Diamond --> Warning_Diamond : Retention condition not met
+    Silver --> Warning_Silver : 未達保級條件
+    Gold --> Warning_Gold : 未達保級條件
+    Platinum --> Warning_Platinum : 未達保級條件
+    Diamond --> Warning_Diamond : 未達保級條件
 
-    Warning_Silver --> Silver : Met during grace period
-    Warning_Silver --> Bronze : Grace period expired
+    Warning_Silver --> Silver : 寬限期內達標
+    Warning_Silver --> Bronze : 寬限期已過
 
-    Warning_Gold --> Gold : Met during grace period
-    Warning_Gold --> Silver : Grace period expired
+    Warning_Gold --> Gold : 寬限期內達標
+    Warning_Gold --> Silver : 寬限期已過
 
-    Warning_Platinum --> Platinum : Met during grace period
-    Warning_Platinum --> Gold : Grace period expired
+    Warning_Platinum --> Platinum : 寬限期內達標
+    Warning_Platinum --> Gold : 寬限期已過
 
-    Warning_Diamond --> Diamond : Met during grace period (no demotion)
+    Warning_Diamond --> Diamond : 寬限期內達標（無降級）
 ```
 
-**Demotion Compensation Configuration**:
+**降級補償配置（Demotion Compensation Configuration）**:
 
 ```yaml
 demotion_compensation:
@@ -327,14 +327,14 @@ demotion_compensation:
     - VIP account manager contact
 ```
 
-### 3.4 State Machine Design Principles
+### 3.4 狀態機設計原則（State Machine Design Principles）
 
-**1. One-Way Transitions Priority**:
-- `CLOSED` state is irrecoverable
-- `COMPLETED` withdrawals cannot be cancelled
-- Avoid circular transitions (ACTIVE <-> SUSPENDED requires manual intervention)
+**1. 單向轉換優先（One-Way Transitions Priority）**:
+- `CLOSED` 狀態不可恢復
+- `COMPLETED` 提款無法取消
+- 避免循環轉換（ACTIVE <-> SUSPENDED 需人工介入）
 
-**2. Idempotency Guarantee**:
+**2. 冪等性保證（Idempotency Guarantee）**:
 
 ```java
 // State transitions must verify current state
@@ -351,7 +351,7 @@ public Result<Void> transitionToLocked(String playerId) {
 }
 ```
 
-**3. Mandatory Audit Logging**:
+**3. 強制審計日誌（Mandatory Audit Logging）**:
 
 ```sql
 -- All state changes must be recorded
@@ -365,224 +365,226 @@ INSERT INTO player_status_audit_log (
 ) VALUES (?, ?, ?, ?, ?, NOW());
 ```
 
-**4. State Transition Trigger Types**:
+**4. 狀態轉換觸發類型（State Transition Trigger Types）**:
 
-| Trigger Type | Example | Processing Method |
+| 觸發類型（Trigger Type） | 範例（Example） | 處理方式（Processing Method） |
 |-------------|---------|-------------------|
-| **Time-based** | Auto-unlock after 30 minutes | Cron Job |
-| **Event-based** | 5 consecutive login failures | Real-time detection |
-| **Manual** | Reviewer approves withdrawal | Approval workflow |
-| **External** | PSP returns failure | Webhook callback |
+| **時間觸發（Time-based）** | 30 分鐘後自動解鎖 | Cron Job |
+| **事件觸發（Event-based）** | 連續 5 次登入失敗 | 即時檢測 |
+| **人工觸發（Manual）** | 審核員通過提款 | 審批工作流 |
+| **外部觸發（External）** | PSP 返回失敗 | Webhook 回呼 |
 
 ---
 
-## 4. Cross-Module Foreign Key Relationships
+## 4. 跨模組外鍵關係（Cross-Module Foreign Key Relationships）
 
-### 4.1 Primary Key & Foreign Key Constraint Table
+### 4.1 主鍵與外鍵約束表（Primary Key & Foreign Key Constraint Table）
 
-| Child Table (From) | FK Field | Parent Table (To) | Relationship | Cascade Delete | Description |
+| 子表（Child Table） | FK 欄位（FK Field） | 父表（Parent Table） | 關係（Relationship） | 級聯刪除（Cascade Delete） | 說明（Description） |
 |-------------------|----------|-------------------|-------------|----------------|-------------|
-| **Player Domain** |
-| `players` | `tenant_id` | `tenants` | N:1 | RESTRICT | Player belongs to tenant |
-| `players` | `agent_id` | `agents` | N:1 | SET NULL | Referring agent (nullable) |
-| `players` | `vip_level_id` | `vip_levels` | N:1 | SET NULL | VIP tier |
-| `wallets` | `player_id` | `players` | 1:1 | CASCADE | Wallet bound to player |
-| **Transaction Domain** |
-| `transactions` | `player_id` | `players` | N:1 | RESTRICT | Transaction owner |
-| `transactions` | `wallet_id` | `wallets` | N:1 | RESTRICT | Associated wallet |
-| `transactions` | `game_id` | `games` | N:1 | SET NULL | Game transaction (optional) |
-| `transactions` | `psp_id` | `psps` | N:1 | SET NULL | Payment service provider |
-| **Game Domain** |
-| `games` | `provider_id` | `game_providers` | N:1 | CASCADE | Game belongs to GP |
-| `game_sessions` | `player_id` | `players` | N:1 | RESTRICT | Player session |
-| `game_sessions` | `game_id` | `games` | N:1 | RESTRICT | Game session |
-| `bet_records` | `session_id` | `game_sessions` | N:1 | CASCADE | Belongs to session |
-| `bet_records` | `player_id` | `players` | N:1 | RESTRICT | Betting player |
-| **Activity Domain** |
-| `bonuses` | `player_id` | `players` | N:1 | CASCADE | Bonus owner |
-| `bonuses` | `activity_id` | `activities` | N:1 | RESTRICT | Activity source |
-| `wagering_progress` | `bonus_id` | `bonuses` | N:1 | CASCADE | Turnover progress tracking |
-| **Agent Domain** |
-| `agents` | `parent_agent_id` | `agents` | N:1 | RESTRICT | Parent agent (self-reference) |
-| `agents` | `tenant_id` | `tenants` | N:1 | RESTRICT | Belonging tenant |
-| `commission_records` | `agent_id` | `agents` | N:1 | RESTRICT | Commission owner |
-| `commission_records` | `player_id` | `players` | N:1 | RESTRICT | Commission source player |
-| **Risk Control Domain** |
-| `risk_scores` | `player_id` | `players` | N:1 | CASCADE | Player risk score |
-| `risk_events` | `transaction_id` | `transactions` | N:1 | CASCADE | Risk event trigger transaction |
-| `withdrawal_requests` | `player_id` | `players` | N:1 | RESTRICT | Withdrawal applicant |
-| `approval_records` | `request_id` | `withdrawal_requests` | N:1 | CASCADE | Approval records |
+| **玩家領域（Player Domain）** |
+| `players` | `tenant_id` | `tenants` | N:1 | RESTRICT | 玩家屬於租戶 |
+| `players` | `agent_id` | `agents` | N:1 | SET NULL | 推薦代理（可空） |
+| `players` | `vip_level_id` | `vip_levels` | N:1 | SET NULL | VIP 層級 |
+| `wallets` | `player_id` | `players` | 1:1 | CASCADE | 錢包綁定玩家 |
+| **交易領域（Transaction Domain）** |
+| `transactions` | `player_id` | `players` | N:1 | RESTRICT | 交易擁有者 |
+| `transactions` | `wallet_id` | `wallets` | N:1 | RESTRICT | 關聯錢包 |
+| `transactions` | `game_id` | `games` | N:1 | SET NULL | 遊戲交易（可選） |
+| `transactions` | `psp_id` | `psps` | N:1 | SET NULL | 支付服務提供商 |
+| **遊戲領域（Game Domain）** |
+| `games` | `provider_id` | `game_providers` | N:1 | CASCADE | 遊戲屬於 GP |
+| `game_sessions` | `player_id` | `players` | N:1 | RESTRICT | 玩家場次 |
+| `game_sessions` | `game_id` | `games` | N:1 | RESTRICT | 遊戲場次 |
+| `bet_records` | `session_id` | `game_sessions` | N:1 | CASCADE | 屬於場次 |
+| `bet_records` | `player_id` | `players` | N:1 | RESTRICT | 投注玩家 |
+| **活動領域（Activity Domain）** |
+| `bonuses` | `player_id` | `players` | N:1 | CASCADE | 紅利擁有者 |
+| `bonuses` | `activity_id` | `activities` | N:1 | RESTRICT | 活動來源 |
+| `wagering_progress` | `bonus_id` | `bonuses` | N:1 | CASCADE | 流水進度追蹤 |
+| **代理領域（Agent Domain）** |
+| `agents` | `parent_agent_id` | `agents` | N:1 | RESTRICT | 上級代理（自引用） |
+| `agents` | `tenant_id` | `tenants` | N:1 | RESTRICT | 所屬租戶 |
+| `commission_records` | `agent_id` | `agents` | N:1 | RESTRICT | 佣金擁有者 |
+| `commission_records` | `player_id` | `players` | N:1 | RESTRICT | 佣金來源玩家 |
+| **風險控制領域（Risk Control Domain）** |
+| `risk_scores` | `player_id` | `players` | N:1 | CASCADE | 玩家風險分數 |
+| `risk_events` | `transaction_id` | `transactions` | N:1 | CASCADE | 風險事件觸發交易 |
+| `withdrawal_requests` | `player_id` | `players` | N:1 | RESTRICT | 提款申請人 |
+| `approval_records` | `request_id` | `withdrawal_requests` | N:1 | CASCADE | 審批記錄 |
 
 ---
 
-## 5. Core Table Designs
+## 5. 核心表設計（Core Table Designs）
 
-### 5.1 Player Table (`players`)
+### 5.1 玩家表（Player Table）（`players`）
 
-**Key Field Notes**:
-- `email_blind_index`: HMAC-SHA256 blind index for encrypted email searchable queries
-- `password_hash`: Argon2id algorithm with parameters m=65536, t=3, p=4
-- `kyc_status`: Supports Enhanced Due Diligence (EDD) flow
+**關鍵欄位說明（Key Field Notes）**:
+- `email_blind_index`: HMAC-SHA256 盲索引，用於加密郵箱可查詢
+- `password_hash`: Argon2id 演算法，參數 m=65536, t=3, p=4
+- `kyc_status`: 支援增強盡職調查（Enhanced Due Diligence, EDD）流程
 
-### 5.2 Wallet Table (`wallets`)
+### 5.2 錢包表（Wallet Table）（`wallets`）
 
-**Playable Balance Formula**:
+**可下注餘額公式（Playable Balance Formula）**:
 
-> **SSOT**: Full calculation logic at [02-06_Wallet_Architecture.md](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
+> **SSOT**: 完整計算邏輯見 [02-06_Wallet_Architecture.md](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ```text
+可下注餘額 = 現金 + 紅利 + (信用額度 - 已用信用) - 鎖定餘額
 Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 ```
 
-**Concurrency Control**:
-- Uses `version` field for optimistic locking
+**並發控制（Concurrency Control）**:
+- 使用 `version` 欄位進行樂觀鎖
 
-### 5.3 Transaction Table (`transactions`)
+### 5.3 交易表（Transaction Table）（`transactions`）
 
-All fund movements recorded in a unified table.
+所有資金流動均記錄於統一表中。
 
-### 5.4 Bonus Table (`bonuses`)
+### 5.4 紅利表（Bonus Table）（`bonuses`）
 
-Player bonus distribution and turnover tracking.
+玩家紅利發放及流水追蹤。
 
-### 5.5 Game Table (`games`)
+### 5.5 遊戲表（Game Table）（`games`）
 
-Game catalog and metadata.
+遊戲目錄及元資料。
 
-### 5.6 Withdrawal Request Table (`withdrawal_requests`)
+### 5.6 提款請求表（Withdrawal Request Table）（`withdrawal_requests`）
 
-**SAGA Distributed Transaction Flow**:
+**SAGA 分散式交易流程（SAGA Distributed Transaction Flow）**:
 
 ```text
-1. Create withdrawal request (Pending)
-2. Lock wallet balance (Locked)
-3. Risk detection (Risk Check)
-4. Multi-level approval (L1 -> L2 -> L3)
-5. PSP payout (Processing)
-6. Complete/Rollback (Completed/Failed)
+1. 建立提款請求（Pending）
+2. 鎖定錢包餘額（Locked）
+3. 風險檢測（Risk Check）
+4. 多層級審批（L1 -> L2 -> L3）
+5. PSP 支付（Processing）
+6. 完成/回滾（Completed/Failed）
 ```
 
 ---
 
-## 6. Data Consistency Constraints
+## 6. 資料一致性約束（Data Consistency Constraints）
 
-### 6.1 Wallet Balance Consistency
+### 6.1 錢包餘額一致性（Wallet Balance Consistency）
 
-All wallet balance updates must be atomic and verified against transaction history.
+所有錢包餘額更新必須原子化，並與交易歷史驗證。
 
-### 6.2 Turnover Calculation Consistency
+### 6.2 流水計算一致性（Turnover Calculation Consistency）
 
-**Three-Layer Validation Architecture**:
+**三層驗證架構（Three-Layer Validation Architecture）**:
 
-> **SSOT References**:
-> - Layer 1 (Risk Validation): [05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
-> - Layer 2 (Finance Validation): [03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
-> - Layer 3 (Activity Application): [04-04_Activity_Bonus.md](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
+> **SSOT 參考（SSOT References）**:
+> - 第一層（風險驗證）（Layer 1 - Risk Validation）: [05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
+> - 第二層（金融驗證）（Layer 2 - Finance Validation）: [03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
+> - 第三層（活動應用）（Layer 3 - Activity Application）: [04-04_Activity_Bonus.md](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
 
 ```text
-Layer 1: Risk Engine Validation (Real-time)
-    | Valid bet marking
-Layer 2: Finance Layer Validation (Batch)
-    | Turnover data aggregation
-Layer 3: Activity Layer Application (Triggered)
-    | Activity progress update
+第一層：風險引擎驗證（即時）
+    | 有效投注標記
+第二層：金融層驗證（批次）
+    | 流水資料匯總
+第三層：活動層應用（觸發）
+    | 活動進度更新
 ```
 
-### 6.3 Multi-Tenant Data Isolation
+### 6.3 多租戶資料隔離（Multi-Tenant Data Isolation）
 
-**Isolation Strategy**:
+**隔離策略（Isolation Strategy）**:
 
-| Strategy | Use Case | Implementation |
+| 策略（Strategy） | 使用情境（Use Case） | 實現方式（Implementation） |
 |----------|----------|----------------|
-| Schema Separation | Large tenants | Dedicated database per tenant |
-| Row-Level Isolation | Small/medium tenants | Shared database with `tenant_id` column |
-| Hybrid Mode | Mixed workloads | Large tenants get dedicated DB; small tenants share |
+| Schema 分離（Schema Separation） | 大型租戶 | 每租戶獨立資料庫 |
+| 行級隔離（Row-Level Isolation） | 中小型租戶 | 共享資料庫 + `tenant_id` 欄位 |
+| 混合模式（Hybrid Mode） | 混合工作負載 | 大租戶獨立 DB；小租戶共享 |
 
 ---
 
-## 7. Index Strategy
+## 7. 索引策略（Index Strategy）
 
-### 7.1 High-Frequency Query Indexes
+### 7.1 高頻查詢索引（High-Frequency Query Indexes）
 
-| Table | Index Name | Columns | Type | Purpose |
+| 表（Table） | 索引名（Index Name） | 欄位（Columns） | 類型（Type） | 目的（Purpose） |
 |-------|-----------|---------|------|---------|
-| `players` | `idx_tenant_username` | `(tenant_id, username)` | UNIQUE | Unique username within tenant |
-| `players` | `idx_email_blind_index` | `email_blind_index` | BTREE | Email blind index lookup |
-| `wallets` | `idx_player_updated` | `(player_id, updated_at)` | BTREE | Player wallet history |
-| `transactions` | `idx_player_type_date` | `(player_id, type, created_at DESC)` | BTREE | Player transaction records |
-| `transactions` | `idx_turnover` | `(is_valid_turnover, player_id, created_at)` | BTREE | Turnover calculation query |
-| `bonuses` | `idx_player_status_expires` | `(player_id, status, expires_at)` | BTREE | Activity bonus query |
-| `games` | `idx_provider_category` | `(provider_id, category, status)` | BTREE | Game catalog classification |
-| `withdrawal_requests` | `idx_status_risk_created` | `(status, risk_level, created_at)` | BTREE | Withdrawal review queue |
+| `players` | `idx_tenant_username` | `(tenant_id, username)` | UNIQUE | 租戶內唯一使用者名稱 |
+| `players` | `idx_email_blind_index` | `email_blind_index` | BTREE | 郵箱盲索引查詢 |
+| `wallets` | `idx_player_updated` | `(player_id, updated_at)` | BTREE | 玩家錢包歷史 |
+| `transactions` | `idx_player_type_date` | `(player_id, type, created_at DESC)` | BTREE | 玩家交易記錄 |
+| `transactions` | `idx_turnover` | `(is_valid_turnover, player_id, created_at)` | BTREE | 流水計算查詢 |
+| `bonuses` | `idx_player_status_expires` | `(player_id, status, expires_at)` | BTREE | 活動紅利查詢 |
+| `games` | `idx_provider_category` | `(provider_id, category, status)` | BTREE | 遊戲目錄分類 |
+| `withdrawal_requests` | `idx_status_risk_created` | `(status, risk_level, created_at)` | BTREE | 提款審核佇列 |
 
-### 7.2 Covering Indexes
+### 7.2 覆蓋索引（Covering Indexes）
 
-Covering indexes should be used for high-frequency read queries to avoid table lookups. Design covering indexes based on actual query patterns from slow query logs.
+覆蓋索引應用於高頻讀取查詢以避免回表查詢。根據慢查詢日誌的實際查詢模式設計覆蓋索引。
 
 ---
 
-## 8. Data Security & Encryption
+## 8. 資料安全與加密（Data Security & Encryption）
 
-### 8.1 Encrypted Field Strategy
+### 8.1 加密欄位策略（Encrypted Field Strategy）
 
-| Data Category | Encryption Method | Key Management | Query Strategy |
+| 資料類別（Data Category） | 加密方法（Encryption Method） | 金鑰管理（Key Management） | 查詢策略（Query Strategy） |
 |--------------|-------------------|----------------|----------------|
-| **PII (Personally Identifiable Information)** |
-| Email | AES-256-GCM | KMS (per-tenant isolated) | Blind index query |
-| Phone number | AES-256-GCM | KMS | Blind index query |
-| ID card number | AES-256-GCM | KMS | Blind index query |
-| Name | AES-256-GCM | KMS | Not directly queryable |
-| Address | AES-256-GCM | KMS | Not directly queryable |
-| **Financial Information** |
-| Bank card number | AES-256-GCM | HSM | Tokenization + blind index |
-| CVV | Never stored | N/A | Processed at transaction time |
-| **Credentials** |
-| Password | Argon2id | Per-record salt | Hash comparison |
-| MFA secret | AES-256-GCM | KMS | Decrypt then verify |
+| **個人識別資訊（PII - Personally Identifiable Information）** |
+| 郵箱（Email） | AES-256-GCM | KMS（每租戶隔離） | 盲索引查詢 |
+| 電話號碼（Phone number） | AES-256-GCM | KMS | 盲索引查詢 |
+| 身份證號（ID card number） | AES-256-GCM | KMS | 盲索引查詢 |
+| 姓名（Name） | AES-256-GCM | KMS | 不可直接查詢 |
+| 地址（Address） | AES-256-GCM | KMS | 不可直接查詢 |
+| **金融資訊（Financial Information）** |
+| 銀行卡號（Bank card number） | AES-256-GCM | HSM | 代幣化 + 盲索引 |
+| CVV | 永不儲存（Never stored） | N/A | 交易時處理 |
+| **憑證（Credentials）** |
+| 密碼（Password） | Argon2id | 每記錄鹽值 | 雜湊比對 |
+| MFA 金鑰（MFA secret） | AES-256-GCM | KMS | 解密後驗證 |
 
-### 8.2 Blind Index Implementation
+### 8.2 盲索引實現（Blind Index Implementation）
 
-**Principle**:
+**原理（Principle）**:
 
 ```text
+盲索引 = HMAC-SHA256(index_key, plaintext_value)
 Blind Index = HMAC-SHA256(index_key, plaintext_value)
 ```
 
-**Key Rotation Strategy**:
-1. Retain old key (grace period)
-2. Create new key
-3. Background batch re-encryption
-4. Dual-key query transition period
-5. Decommission old key
+**金鑰輪換策略（Key Rotation Strategy）**:
+1. 保留舊金鑰（寬限期）
+2. 建立新金鑰
+3. 背景批次重新加密
+4. 雙金鑰查詢過渡期
+5. 淘汰舊金鑰
 
-### 8.3 GDPR Crypto-Shredding
+### 8.3 GDPR 加密粉碎（GDPR Crypto-Shredding）
 
-**Data Deletion Strategy**:
+**資料刪除策略（Data Deletion Strategy）**:
 
 ```text
-Player Deletion Request
+玩家刪除請求
     |
-1. Delete Data Encryption Key (DEK)
+1. 刪除資料加密金鑰（DEK）
     |
-2. Mark record as "deleted"
+2. 標記記錄為「已刪除」
     |
-3. Retain transaction records (regulatory requirement, but PII undecryptable)
+3. 保留交易記錄（監管要求，但 PII 無法解密）
     |
-4. Generate compliance report
+4. 生成合規報告
 ```
 
 ---
 
-## Related Documents
+## 相關文件（Related Documents）
 
-- [Business Logic Flows](./Business_Logic_Flows.md) - Business flow architecture
-- [Technology Stack](./Technology_Stack.md) - Technology stack overview
-- Wallet Architecture *(planned)* - Wallet system design
-- [Turnover Calculation Logic](../03_Game_Integration/Turnover_Calculation_Logic.md) - Turnover system design
-- [Risk Engine Architecture](../05_Risk_Engine/) - Risk control system
+- [業務邏輯流程（Business Logic Flows）](./Business_Logic_Flows.md) - 業務流程架構
+- [技術堆疊（Technology Stack）](./Technology_Stack.md) - 技術堆疊概覽
+- 錢包架構（Wallet Architecture） *(planned)* - 錢包系統設計
+- [流水計算邏輯（Turnover Calculation Logic）](../03_Game_Integration/Turnover_Calculation_Logic.md) - 流水系統設計
+- [風險引擎架構（Risk Engine Architecture）](../05_Risk_Engine/) - 風險控制系統
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-08
-**Maintainers**: Architecture Team & Data Team
+**文件版本（Document Version）**: 4.0.0
+**最後更新（Last Updated）**: 2026-02-08
+**維護者（Maintainers）**: 架構團隊 & 資料團隊
