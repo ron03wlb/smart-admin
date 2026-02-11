@@ -10,11 +10,11 @@
 
 ## 概述
 
-本文檔詳述活動系統獎金計算引擎的技術實現，包括三層流水計算架構、事件驅動處理流程、API 契約定義，以及跨模組一致性保障機制。這是確保活動系統與財務系統數據一致性的關鍵技術模塊。
+本文檔詳述活動系統獎金計算引擎的技術實現，包括三層 Turnover 計算架構、事件驅動處理流程、API 契約定義，以及跨模組一致性保障機制。這是確保活動系統與財務系統數據一致性的關鍵技術模塊。
 
 ---
 
-## 三層流水計算架構 (Three-Layer Turnover Calculation)
+## 三層 Valid Turnover 計算架構 (Three-Layer Turnover Calculation)
 
 ### 架構概覽
 
@@ -29,18 +29,18 @@
 │  │  - Filter: Hedge Detection (對沖投注檢測)                  │ │
 │  │  - Filter: Arbitrage Detection (套利投注檢測)              │ │
 │  │  - Filter: Low Odds (<1.5, configurable)                  │ │
-│  │  - Output: effective_turnover_base (基礎有效流水)          │ │
+│  │  - Output: effective_turnover_base (基礎 Valid Turnover)          │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                           ↓                                     │
 │  Layer 2: Finance Layer (02-04 Finance Center)                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
 │  │  effective_turnover_base × status_factor                  │ │
-│  │  - WIN: 1.0 (玩家贏,計入流水)                              │ │
-│  │  - LOSS: 1.0 (玩家輸,計入流水)                             │ │
-│  │  - DRAW/TIE: 0 (和局,無風險,不計流水)                      │ │
+│  │  - WIN: 1.0 (玩家贏,計入 Valid Turnover)                              │ │
+│  │  - LOSS: 1.0 (玩家輸,計入 Valid Turnover)                             │ │
+│  │  - DRAW/TIE: 0 (和局,無風險,不計 Valid Turnover)                      │ │
 │  │  - VOID/CANCEL: 0 (注單作廢)                               │ │
 │  │  - HALF_WIN/HALF_LOSS: 0.5 (半贏半輸)                      │ │
-│  │  → Output: valid_turnover_finance (財務有效流水)           │ │
+│  │  → Output: valid_turnover_finance (財務 Valid Turnover)           │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                           ↓                                     │
 │  Layer 3: Activity Layer (04-01 Activity Center)               │
@@ -51,7 +51,7 @@
 │  │  - Baccarat (百家樂): 0.1-0.15 (10-15%)                    │ │
 │  │  - Blackjack (二十一點): 0.05-0.1 (5-10%)                  │ │
 │  │  - Roulette (輪盤): 0.1-0.2                                │ │
-│  │  → Output: activity_valid_turnover (活動有效流水)          │ │
+│  │  → Output: activity_valid_turnover (活動 Valid Turnover)          │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -118,7 +118,7 @@ Topics:
 ├── promotion.triggers         # 活動觸發
 ├── promotion.claims           # 活動領取
 ├── reward.distributions       # 獎勵發放
-└── wagering.updates           # 流水更新
+└── wagering.updates           # Turnover 更新
 ```
 
 ### 玩家活動追蹤事件結構
@@ -152,7 +152,7 @@ Topics:
 
 ---
 
-## 流水驗證流程 (Turnover Validation Flow)
+## Valid Turnover 驗證流程 (Turnover Validation Flow)
 
 ### 處理時序
 
@@ -174,7 +174,7 @@ sequenceDiagram
 
 | 初始狀態 | 風控結果 | 最終狀態 | 後續動作 |
 |---------|---------|---------|---------|
-| PENDING | Valid | COMPLETED | 累積流水進度 |
+| PENDING | Valid | COMPLETED | 累積 Valid Turnover 進度 |
 | PENDING | Hedge Detected | REJECTED | 記錄原因、若已發放則 Rollback |
 | PENDING | Arbitrage | REJECTED | 記錄原因、觸發風控警報 |
 | PENDING | Low Odds | REJECTED | 記錄原因 |
@@ -293,8 +293,8 @@ const result = await RiskEngine.validateTurnover({
 ### 統一事件源
 
 所有注單結算事件 `GameRound.Settled` 必須同時發送至:
-- Finance Turnover Service (財務流水服務)
-- Activity Wagering Service (活動流水服務)
+- Finance Turnover Service (財務 Valid Turnover 服務)
+- Activity Wagering Service (活動 Valid Turnover 服務)
 
 兩者均訂閱相同的 Kafka Topic: `game.rounds.settled`
 
@@ -465,7 +465,7 @@ ORDER BY activity_turnover DESC;
 | 服務通訊 | gRPC（內部）/ REST（外部）| 高效內部調用 |
 | 事件串流 | Apache Kafka + Kafka Streams | 即時事件處理 |
 | 主數據庫 | PostgreSQL + JSONB | 活動配置、ACID 事務 |
-| 高併發寫入 | ScyllaDB / CockroachDB | 流水記錄、交易日誌 |
+| 高併發寫入 | ScyllaDB / CockroachDB | Turnover 記錄、交易日誌 |
 | 緩存 | Redis Cluster | 玩家狀態、活動快取 |
 | 搜尋 | Elasticsearch | 活動搜尋、玩家查詢 |
 
@@ -479,8 +479,8 @@ ORDER BY activity_turnover DESC;
 |-------------|----------------|------|
 | Promotion API | Controller | REST 端點定義 |
 | Bonus Calculation Service | Service | 業務邏輯編排 |
-| Turnover Validation Manager | Manager | @Transactional 流水驗證 |
-| Bonus Progress Dao | Dao | 流水進度持久化 |
+| Turnover Validation Manager | Manager | @Transactional Valid Turnover 驗證 |
+| Bonus Progress Dao | Dao | Valid Turnover 進度持久化 |
 | Risk Engine Client | Service | 調用風控 API |
 
 ### 關鍵類別設計
