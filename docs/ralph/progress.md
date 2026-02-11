@@ -71,10 +71,10 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 - [x] requirements/05_Risk_Compliance/Affordability_Requirements.md (+Acceptance Criteria)
 
 #### Batch 7 — Risk/Compliance (5 files)
-- [ ] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value)
-- [ ] requirements/05_Risk_Compliance/ML_Requirements.md (+Acceptance Criteria)
-- [ ] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (+Success Metrics)
-- [ ] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value)
+- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value +Success Metrics, now 2/3)
+- [x] requirements/05_Risk_Compliance/ML_Requirements.md (+Acceptance Criteria, now 2/3)
+- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (+Success Metrics, now 2/3)
+- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value, now 2/3)
 - [ ] requirements/06_Governance_Licensing/Governance_Requirements.md (+Acceptance Criteria)
 
 #### Batch 8 — MFA/Agent/Analytics (5 files)

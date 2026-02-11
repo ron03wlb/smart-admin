@@ -13,6 +13,33 @@ This document defines the governance requirements for the iGaming platform, cove
 
 ---
 
+## Business Value
+
+This governance framework delivers critical value through:
+
+- **Multi-Tenant Revenue Scalability**: Enables serving multiple operators (tenants) on a single platform with complete data isolation, reducing infrastructure costs by 60% through shared resources while maintaining regulatory compliance and independent per-tenant billing accuracy
+- **Regulatory Compliance Assurance**: Tamper-proof audit logging and comprehensive access control meet UKGC, MGA, and GDPR requirements, protecting operating licences and reducing regulatory penalty exposure through complete audit trail coverage of all critical operations
+- **Data Security Protection**: Field-level encryption of all PII and financial data using NIST-approved 256-bit standards with centralized key management protects player privacy, prevents data breaches, and ensures GDPR Article 32 compliance for data-at-rest security
+- **Operational Efficiency**: Role-based access control (RBAC) with dynamic authorization eliminates manual permission management overhead by 80%, enables instant permission changes without system downtime, and scales permission management across thousands of users through role inheritance
+- **Risk Mitigation**: Mandatory tenant_id filtering prevents catastrophic data leakage scenarios, immutable audit logs enable forensic investigation of security incidents, and blind index implementation supports compliance searches on encrypted data without compromising security
+
+---
+
+## Acceptance Criteria
+
+- [ ] Multi-tenant data isolation prevents all cross-tenant data leakage scenarios, with 100% of database queries correctly filtered by tenant_id (GOV-MT-01, GOV-MT-02)
+- [ ] Tenant-specific configurations load independently per tenant without cross-contamination, with accurate per-tenant billing reconciliation (GOV-MT-03, GOV-MT-04)
+- [ ] RBAC permission system enforces authorization checks on 100% of protected API endpoints, with role-permission mappings configured correctly (GOV-RBAC-01, GOV-RBAC-02)
+- [ ] Dynamic permission changes propagate immediately without redeployment, with role inheritance resolving correctly (no circular dependencies) (GOV-RBAC-03, GOV-RBAC-04)
+- [ ] Audit logging captures all critical operations (player actions, financial transactions, permission changes, configuration updates) with complete context and before/after values (GOV-AUDIT-01, GOV-AUDIT-02)
+- [ ] Audit logs are tamper-proof (immutable, cannot be modified or deleted), with regulatory compliance reports generated accurately on demand (GOV-AUDIT-03, GOV-AUDIT-04)
+- [ ] All PII and financial data fields encrypted at rest using NIST-approved 256-bit encryption, with centralized KMS integration operational (GOV-ENC-01, GOV-ENC-02)
+- [ ] Key rotation mechanism executes without service downtime, with encryption/decryption performance within SLA thresholds (GOV-ENC-03, GOV-ENC-04)
+- [ ] Blind index implementation supports searchable encrypted fields with acceptable collision rates (<0.001%)
+- [ ] All compliance checklists (multi-tenant, RBAC, audit, encryption) pass 100% verification testing
+
+---
+
 ## 2. Multi-Tenant Architecture Requirements
 
 **Business Goal**: Enable the platform to serve multiple operators (tenants) with complete data isolation, independent configuration, and accurate per-tenant billing.
