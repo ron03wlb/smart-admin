@@ -1,4 +1,4 @@
-# Session Protection Requirements (會話保護業務需求)
+# 會話保護需求
 
 > **Canonical Source**: [15-03_Cooling_Off_Period.md](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md), [15-04_Session_Management.md](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md), [15-05_Reality_Checks.md](../../source-archive/15_Responsible_Gambling/15-05_Reality_Checks.md)
 > **View Type**: Business Requirements
@@ -8,316 +8,316 @@
 
 ---
 
-## Business Value
+## 業務價值
 
-This requirements document delivers strategic value by:
-- **Regulatory Compliance**: Implements UKGC mandatory 60-min break after 10 deposits/24h and Germany GlüStV 60-min continuous play with 5-min break requirements
-- **Early Intervention**: Establishes cooling-off periods (24h-6 weeks) as preventive tool distinct from interventional self-exclusion
-- **Behavioral Awareness**: Defines reality check intervals (15-60 min) displaying session time and P&L with risk identification from player responses
-- **Session Integrity**: Preserves game round integrity (wait for completion before popups) while enforcing mandatory breaks and idle timeouts
-
----
-
-## Acceptance Criteria
-
-- [ ] Cooling-off periods activate immediately for durations 24h-6 weeks
-- [ ] Players can view balance, betting history, and request withdrawals during cooling-off
-- [ ] Players cannot deposit, game, bet, or claim bonuses during cooling-off
-- [ ] Auto-release occurs at cooling-off expiry with notification
-- [ ] UK mandatory break triggers after 10 deposits in 24 hours (60-min break)
-- [ ] Germany mandatory break triggers after 60 minutes continuous play (5-min break)
-- [ ] Session duration limits (15/30/60/120 min) display popup on expiry
-- [ ] Idle timeout (30 min default) triggers auto-logout, respecting active game rounds
-- [ ] Reality check displays session time and P&L at configured interval
-- [ ] Reality check waits for active game round completion before displaying
+本需求文檔提供以下策略價值：
+- **監管合規**：實施 UKGC 強制性 60 分鐘休息（24 小時內 10 次存款後）及德國 GlüStV 60 分鐘連續遊戲需 5 分鐘休息要求
+- **早期介入**：建立冷卻期（24 小時-6 週）作為預防工具，有別於介入性的自我排除
+- **行為意識**：定義現實檢查間隔（15-60 分鐘）顯示會話時間和損益，並從玩家回應識別風險
+- **會話完整性**：保持遊戲局完整性（等待完成後才彈出）同時強制執行強制休息和閒置超時
 
 ---
 
-## 1. Overview
+## 驗收標準
 
-Session Protection encompasses three complementary player protection tools: Cooling-Off Periods, Session Time Management, and Reality Checks. Together, these tools help players manage their gaming activity duration and maintain awareness of their gambling behavior.
-
----
-
-## 2. Business Value
-
-This feature delivers value by:
-- **Multi-Jurisdictional Compliance**: Satisfies UKGC, Sweden, and Germany mandatory session management regulations (UKGC 60-min break after 10 deposits, Germany 5-min break per 60-min play, Sweden session limit options), preventing penalties and maintaining operating licenses
-- **Player Retention via Awareness**: Reality checks with session P&L display increase player self-awareness (target >20% stop rate), reducing impulsive gambling and supporting long-term player retention by fostering responsible play habits
-- **Risk Detection Layer**: Identifies vulnerable behavior patterns (10+ fast reality check continues <5 sec, gaming time >4h, >50% deposit lost immediately) for proactive intervention via affordability assessment or care messages, preventing escalation to problem gambling
-- **Flexible Protection Spectrum**: Offers graduated protection from light interventions (15-min reality checks, idle timeout) to strong controls (6-week cooling-off, mandatory breaks), allowing players to self-regulate while meeting regulatory minimums
-
----
-
-## 3. Acceptance Criteria
-
-- [ ] **Cooling-Off Immediate Activation**: Player-initiated cooling-off (24h-6 weeks) activates immediately with no additional confirmation - all gaming sessions closed, open bets preserved, withdrawals allowed, deposits/betting prohibited
-- [ ] **Auto-Release on Expiry**: Cooling-off periods auto-release at expiry time (UTC 23:59:59 for custom durations) with email/push notification sent - account fully restored without player action required
-- [ ] **UKGC Mandatory Break (10 Deposits)**: UK players with 10+ deposits within 24 hours trigger 60-minute mandatory break - gaming prohibited during break, countdown timer displayed
-- [ ] **Germany Mandatory Break (60-Min Play)**: German players after 60 minutes continuous play trigger 5-minute mandatory break - must complete break before continuing
-- [ ] **Reality Check Interval Options**: Players can select reality check intervals (15/30/60 minutes or not set) - popup displays session time + net P&L (clearly show losses as negative) + action options (continue/stop/set limits/view history)
-- [ ] **Game Round Preservation**: Reality checks and idle timeout WAIT for active game round to complete before displaying - preserves game integrity, displays immediately after round completion
-- [ ] **Auto-Play Pause on Reality Check**: During auto-play mode, reality check pauses auto-play and displays popup - player may resume auto-play after acknowledgment
-- [ ] **Risk Behavior Flagging**: System detects and flags high-risk patterns - 10+ consecutive fast reality check continues (<5 sec), gaming time >4h, loss >$1,000 with continue, >50% deposit lost immediately - triggers suggested actions (increase frequency, care message, affordability assessment)
-- [ ] **Idle Timeout Auto-Logout**: 30 minutes inactivity (configurable 15-60 min) triggers auto-logout - active game rounds excluded from idle time calculation
+- [ ] 冷卻期（24 小時-6 週）立即啟用
+- [ ] 玩家可在冷卻期間查看餘額、投注歷史及請求提款
+- [ ] 玩家在冷卻期間無法存款、遊戲、投注或領取獎金
+- [ ] 冷卻期到期時自動解除並發送通知
+- [ ] UK 強制休息在 24 小時內 10 次存款後觸發（60 分鐘休息）
+- [ ] Germany 強制休息在 60 分鐘連續遊戲後觸發（5 分鐘休息）
+- [ ] 會話時長限制（15/30/60/120 分鐘）到期時顯示彈窗
+- [ ] 閒置超時（默認 30 分鐘）觸發自動登出，尊重活躍遊戲局
+- [ ] 現實檢查顯示會話時間和損益，依配置間隔觸發
+- [ ] 現實檢查等待活躍遊戲局完成後才顯示
 
 ---
 
-## 4. Cooling-Off Period (Time-Out)
+## 1. 概述
 
-### 2.1 Purpose and Distinction from Self-Exclusion
+會話保護 (Session Protection) 包含三個互補的玩家保護工具：冷卻期 (Cooling-Off Periods)、會話時間管理 (Session Time Management) 及現實檢查 (Reality Checks)。這些工具共同幫助玩家管理其遊戲活動持續時間並保持對其賭博行為的意識。
 
-| Feature | Cooling-Off | Self-Exclusion |
+---
+
+## 2. 業務價值
+
+本功能提供以下價值：
+- **多司法管轄區合規**：滿足 UKGC、瑞典及德國強制會話管理法規（UKGC 10 次存款後 60 分鐘休息、德國每 60 分鐘遊戲需 5 分鐘休息、瑞典會話限制選項），防止處罰並維持營運牌照
+- **玩家留存透過意識**：帶損益顯示的現實檢查提高玩家自我意識（目標 >20% 停止率），減少衝動賭博並透過培養負責任遊戲習慣支持長期玩家留存
+- **風險檢測層**：識別脆弱行為模式（10 次以上快速現實檢查繼續 <5 秒、遊戲時間 >4 小時、>50% 存款立即損失）以主動介入，通過可負擔性評估或關懷訊息，防止升級至問題賭博
+- **彈性保護譜系**：提供從輕度介入（15 分鐘現實檢查、閒置超時）到強控制（6 週冷卻期、強制休息）的漸進保護，允許玩家自我調節同時滿足監管最低要求
+
+---
+
+## 3. 驗收標準
+
+- [ ] **冷卻期立即啟用**：玩家發起的冷卻期（24 小時-6 週）立即啟用，無需額外確認 - 所有遊戲會話關閉、未結投注保留、允許提款、禁止存款/投注
+- [ ] **到期自動解除**：冷卻期在到期時間（自定義期限為 UTC 23:59:59）自動解除，並發送 email/push 通知 - 無需玩家動作即完全恢復帳戶
+- [ ] **UKGC 強制休息（10 次存款）**：英國玩家在 24 小時內存款 10 次以上觸發 60 分鐘強制休息 - 休息期間禁止遊戲，顯示倒數計時器
+- [ ] **Germany 強制休息（60 分鐘遊戲）**：德國玩家在 60 分鐘連續遊戲後觸發 5 分鐘強制休息 - 必須完成休息才能繼續
+- [ ] **現實檢查間隔選項**：玩家可選擇現實檢查間隔（15/30/60 分鐘或不設定）- 彈窗顯示會話時間 + 淨損益（清楚顯示虧損為負值）+ 動作選項（繼續/停止/設定限額/查看歷史）
+- [ ] **遊戲局保持**：現實檢查和閒置超時等待活躍遊戲局完成後才顯示 - 保持遊戲完整性，局完成後立即顯示
+- [ ] **自動遊戲暫停於現實檢查**：自動遊戲模式期間，現實檢查暫停自動遊戲並顯示彈窗 - 玩家確認後可恢復自動遊戲
+- [ ] **風險行為標記**：系統檢測並標記高風險模式 - 10 次以上連續快速現實檢查繼續（<5 秒）、遊戲時間 >4 小時、虧損 >$1,000 仍繼續、>50% 存款立即損失 - 觸發建議動作（增加頻率、關懷訊息、可負擔性評估）
+- [ ] **閒置超時自動登出**：30 分鐘不活動（可配置 15-60 分鐘）觸發自動登出 - 活躍遊戲局排除於閒置時間計算外
+
+---
+
+## 4. 冷卻期（Time-Out）
+
+### 2.1 目的及與自我排除的區別
+
+| 功能 | 冷卻期 (Cooling-Off) | 自我排除 (Self-Exclusion) |
 |---------|------------|----------------|
-| **Purpose** | Short-term break | Long-term/permanent ban |
-| **Duration** | 24 hours ~ 6 weeks | 6 months ~ Lifetime |
-| **Release** | Auto-release | Requires application + cooling-off |
-| **Cross-platform** | This platform only | Can sync to Gamstop |
-| **Severity** | Preventive | Interventional |
+| **目的** | 短期休息 | 長期/永久禁令 |
+| **期限** | 24 小時 ~ 6 週 | 6 個月 ~ 終身 |
+| **解除** | 自動解除 | 需要申請 + 冷卻期 |
+| **跨平台** | 僅此平台 | 可同步至 Gamstop |
+| **嚴重性** | 預防性 | 介入性 |
 
-### 2.2 Duration Options
+### 2.2 期限選項
 
-| Duration | Use Case | Auto-Release |
+| 期限 | 使用場景 | 自動解除 |
 |----------|----------|-------------|
-| 24 hours | Same-day cooling | Yes |
-| 48 hours | Weekend break | Yes |
-| 72 hours | Three-day cooling | Yes |
-| 7 days | One-week break | Yes |
-| 14 days | Two-week break | Yes |
-| 30 days | Monthly break | Yes |
-| 6 weeks | Maximum cooling-off | Yes |
+| 24 小時 | 當日冷卻 | 是 |
+| 48 小時 | 週末休息 | 是 |
+| 72 小時 | 三天冷卻 | 是 |
+| 7 天 | 一週休息 | 是 |
+| 14 天 | 兩週休息 | 是 |
+| 30 天 | 每月休息 | 是 |
+| 6 週 | 最長冷卻期 | 是 |
 
-### 2.3 Custom Duration Option (Optional)
+### 2.3 自定義期限選項（可選）
 
-- Minimum: 24 hours from selection
-- Maximum: 6 weeks from selection
-- End time: Fixed at selected date UTC 23:59:59
+- 最短：選擇後 24 小時
+- 最長：選擇後 6 週
+- 結束時間：固定於所選日期 UTC 23:59:59
 
-### 2.4 Business Rules
+### 2.4 業務規則
 
-#### Activating Cooling-Off
+#### 啟用冷卻期
 
-1. Immediate activation, no additional confirmation needed
-2. Preserve account balance
-3. Preserve open bets (wait for results)
-4. Preserve bonus progress (but cannot accumulate further)
-5. Prohibit deposits, gaming, and betting
-6. Allow withdrawal requests
+1. 立即啟用，無需額外確認
+2. 保留帳戶餘額
+3. 保留未結投注（等待結果）
+4. 保留獎金進度（但無法進一步累積）
+5. 禁止存款、遊戲及投注
+6. 允許提款請求
 
-#### Allowed Operations During Cooling-Off
+#### 冷卻期間允許的操作
 
-- View account balance
-- View betting history
-- Request withdrawals
-- Contact customer support
-- View responsible gambling resources
+- 查看帳戶餘額
+- 查看投注歷史
+- 請求提款
+- 聯繫客戶支持
+- 查看負責任賭博資源
 
-#### Prohibited Operations During Cooling-Off
+#### 冷卻期間禁止的操作
 
-- Deposits
-- Gaming
-- Betting
-- Claiming bonuses
-- Participating in promotions
+- 存款
+- 遊戲
+- 投注
+- 領取獎金
+- 參與促銷活動
 
-#### Release Rules
+#### 解除規則
 
-1. Auto-release on expiry, no action required
-2. Release notification sent (email/push)
-3. Account fully restored
+1. 到期時自動解除，無需動作
+2. 發送解除通知（email/push）
+3. 完全恢復帳戶
 
-#### Early Release (Optional Feature)
+#### 提前解除（可選功能）
 
-- Some jurisdictions allow early release
-- Requires 24-hour confirmation period
-- **UK license: early release NOT recommended**
+- 某些司法管轄區允許提前解除
+- 需要 24 小時確認期
+- **UK 牌照：不建議提前解除**
 
 ---
 
-## 3. Session Time Management
+## 3. 會話時間管理
 
-### 3.1 Regulatory Requirements
+### 3.1 監管要求
 
-| Regulator | Clause | Requirement |
+| 監管機構 | 條款 | 要求 |
 |-----------|--------|-------------|
-| **UKGC** | LCCP SR 3.4.2 | Mandatory 60-min break after 10 deposits in 24h |
-| **Sweden** | Gambling Act | Must provide session limit options |
-| **Germany** | GlüStV 2021 | Mandatory 60-min continuous play then 5-min break |
+| **UKGC** | LCCP SR 3.4.2 | 24 小時內 10 次存款後強制 60 分鐘休息 |
+| **Sweden** | Gambling Act | 必須提供會話限制選項 |
+| **Germany** | GlüStV 2021 | 強制 60 分鐘連續遊戲後 5 分鐘休息 |
 
-### 3.2 Session Duration Limit
+### 3.2 會話時長限制
 
-Players may set maximum duration per gaming session:
+玩家可設定每個遊戲會話的最長時長：
 
-| Option | Description | On Expiry |
+| 選項 | 說明 | 到期時 |
 |--------|------------|-----------|
-| 15 minutes | Brief play | Prompt + may continue |
-| 30 minutes | Standard session | Prompt + may continue |
-| 60 minutes | Extended session | Prompt + may continue |
-| 120 minutes | Long session | Prompt + may continue |
-| No limit | Unlimited | Per reality check settings |
+| 15 分鐘 | 簡短遊戲 | 提示 + 可繼續 |
+| 30 分鐘 | 標準會話 | 提示 + 可繼續 |
+| 60 分鐘 | 延長會話 | 提示 + 可繼續 |
+| 120 分鐘 | 長時間會話 | 提示 + 可繼續 |
+| 無限制 | 無限制 | 依現實檢查設定 |
 
-### 3.3 Mandatory Break Rules
+### 3.3 強制休息規則
 
-#### UK Rule
-- 10+ deposits within 24 hours -> Mandatory 60-minute break
-- No gaming during break period
+#### UK 規則
+- 24 小時內 10 次以上存款 -> 強制 60 分鐘休息
+- 休息期間無法遊戲
 
-#### Germany Rule
-- 60 minutes continuous play -> Mandatory 5-minute break
-- Must complete break before continuing
+#### Germany 規則
+- 60 分鐘連續遊戲 -> 強制 5 分鐘休息
+- 必須完成休息才能繼續
 
-### 3.4 Idle Timeout
+### 3.4 閒置超時
 
-- Default: 30 minutes of inactivity
-- Configurable: 15-60 minutes
-- Active game rounds do not count as idle time
-- Auto-logout on timeout
+- 默認：30 分鐘不活動
+- 可配置：15-60 分鐘
+- 活躍遊戲局不計入閒置時間
+- 超時時自動登出
 
-### 3.5 Session Lifecycle
+### 3.5 會話生命週期
 
 ```
-Login/Start Game -> Create Session -> Start Timers
+登入/開始遊戲 -> 創建會話 -> 啟動計時器
        |
-       +-- Check session limit settings
-       +-- Check mandatory break status
-       +-- Initialize activity tracking
+       +-- 檢查會話限制設定
+       +-- 檢查強制休息狀態
+       +-- 初始化活動追蹤
 
-During Session:
-       +-- Duration timer (player-set limit)
-       +-- Activity tracker (idle detection)
-       +-- Mandatory break checker (regulatory)
+會話期間：
+       +-- 時長計時器（玩家設定限制）
+       +-- 活動追蹤器（閒置檢測）
+       +-- 強制休息檢查器（監管）
 
-End Session:
-       +-- Save session statistics
-       +-- Record activity history
-       +-- Clean up session resources
+結束會話：
+       +-- 保存會話統計
+       +-- 記錄活動歷史
+       +-- 清理會話資源
 ```
 
 ---
 
-## 4. Reality Checks
+## 4. 現實檢查
 
-### 4.1 Regulatory Requirements
+### 4.1 監管要求
 
-| Regulator | Clause | Default Interval | Display Content |
+| 監管機構 | 條款 | 默認間隔 | 顯示內容 |
 |-----------|--------|-----------------|-----------------|
-| **UKGC** | LCCP SR 3.4.2 | Player-selectable | Time, P&L, options |
-| **Sweden** | Gambling Act | 60 minutes | Time, P&L |
-| **Germany** | GlüStV 2021 | 60 minutes | Mandatory display |
+| **UKGC** | LCCP SR 3.4.2 | 玩家可選 | 時間、損益、選項 |
+| **Sweden** | Gambling Act | 60 分鐘 | 時間、損益 |
+| **Germany** | GlüStV 2021 | 60 分鐘 | 強制顯示 |
 
-### 4.2 Interval Options
+### 4.2 間隔選項
 
-| Option | Use Case | Description |
+| 選項 | 使用場景 | 說明 |
 |--------|----------|-------------|
-| 15 minutes | High-risk players | Frequent reminders |
-| 30 minutes | Recommended setting | Moderate reminders |
-| 60 minutes | Default setting | Standard interval |
-| Not set | Player choice | Some jurisdictions prohibit this |
+| 15 分鐘 | 高風險玩家 | 頻繁提醒 |
+| 30 分鐘 | 建議設定 | 適度提醒 |
+| 60 分鐘 | 默認設定 | 標準間隔 |
+| 不設定 | 玩家選擇 | 某些司法管轄區禁止 |
 
-### 4.3 Display Content
+### 4.3 顯示內容
 
-**Must display**:
-1. Current session gaming time
-2. Current session net profit/loss (clearly show losses as negative)
+**必須顯示**：
+1. 當前會話遊戲時間
+2. 當前會話淨損益（清楚顯示虧損為負值）
 
-**Recommended display**:
-3. Today's total deposit amount
-4. Today's total bet amount
-5. Account balance
+**建議顯示**：
+3. 今日總存款金額
+4. 今日總投注金額
+5. 帳戶餘額
 
-**Action options**:
-- Continue playing
-- Stop playing (logout)
-- Set deposit limits (quick access)
-- View account history
+**動作選項**：
+- 繼續遊戲
+- 停止遊戲（登出）
+- 設定存款限額（快速訪問）
+- 查看帳戶歷史
 
-### 4.4 Game Round Interaction Rules
+### 4.4 遊戲局互動規則
 
-**During active game round**:
-- Do not display immediately, wait for round to complete
-- Display immediately after round completes
-- Preserve game integrity
+**活躍遊戲局期間**：
+- 不立即顯示，等待局完成
+- 局完成後立即顯示
+- 保持遊戲完整性
 
-**During auto-play mode**:
-- Pause auto-play
-- Display reality check
-- Player may resume after acknowledgment
+**自動遊戲模式期間**：
+- 暫停自動遊戲
+- 顯示現實檢查
+- 玩家確認後可恢復
 
-### 4.5 Risk Identification from Reality Check Behavior
+### 4.5 從現實檢查行為識別風險
 
-| Behavior Pattern | Risk Level | Suggested Action |
+| 行為模式 | 風險級別 | 建議動作 |
 |-----------------|-----------|-----------------|
-| 10+ consecutive fast continues (<5 sec) | Medium | Increase reality check frequency |
-| Loss > $1,000 and continues | Medium | Send care message |
-| Gaming time > 4 hours | High | Suggest break |
-| >50% deposit lost immediately | High | Trigger affordability assessment |
+| 10 次以上連續快速繼續（<5 秒） | 中 | 增加現實檢查頻率 |
+| 虧損 > $1,000 仍繼續 | 中 | 發送關懷訊息 |
+| 遊戲時間 > 4 小時 | 高 | 建議休息 |
+| >50% 存款立即損失 | 高 | 觸發可負擔性評估 |
 
 ---
 
-## 5. Notification Requirements
+## 5. 通知要求
 
-| Event | Channel | Content |
+| 事件 | 渠道 | 內容 |
 |-------|---------|---------|
-| Cooling-off activated | Email + Push | Duration, end time, allowed operations |
-| Cooling-off ended | Email + Push | Account restored notification |
-| Session duration limit reached | In-app popup | Time played, continue/stop options |
-| Mandatory break triggered | In-app popup | Reason, break duration, countdown |
-| Reality check triggered | In-app popup | Session stats, P&L, action options |
-| Idle timeout | In-app popup | Inactivity notice, session ended |
+| 冷卻期啟用 | Email + Push | 期限、結束時間、允許操作 |
+| 冷卻期結束 | Email + Push | 帳戶恢復通知 |
+| 會話時長限制達到 | 應用內彈窗 | 已遊戲時間、繼續/停止選項 |
+| 強制休息觸發 | 應用內彈窗 | 原因、休息時長、倒數計時 |
+| 現實檢查觸發 | 應用內彈窗 | 會話統計、損益、動作選項 |
+| 閒置超時 | 應用內彈窗 | 不活動通知、會話結束 |
 
 ---
 
-## 6. Effectiveness Metrics
+## 6. 有效性指標
 
-| Metric | Target | Description |
+| 指標 | 目標 | 說明 |
 |--------|--------|-------------|
-| Cooling-off usage | Monitor trend | Monthly cooling-off activations |
-| Session duration limit adoption | > 20% | Players with session limits set |
-| Reality check configuration rate | > 20% | Players with reality checks configured |
-| Reality check stop rate | > 20% | Players who stop after reality check |
-| Mandatory break trigger count | Monitor | Frequency of regulatory mandatory breaks |
-| Average session duration | Monitor | Track trends for player welfare |
+| 冷卻期使用 | 監控趨勢 | 每月冷卻期啟用次數 |
+| 會話時長限制採用 | > 20% | 設定會話限制的玩家 |
+| 現實檢查配置率 | > 20% | 配置現實檢查的玩家 |
+| 現實檢查停止率 | > 20% | 現實檢查後停止的玩家 |
+| 強制休息觸發計數 | 監控 | 監管強制休息的頻率 |
+| 平均會話時長 | 監控 | 追蹤玩家福祉趨勢 |
 
 ---
 
-## 7. Testing Scenarios
+## 7. 測試場景
 
-### Cooling-Off
+### 冷卻期
 
-| Scenario | Expected Result |
+| 場景 | 預期結果 |
 |----------|----------------|
-| Activate 24h cooling-off | Immediate activation, sessions closed |
-| Attempt login during cooling-off | Show cooling-off message with end time |
-| Cooling-off expires | Auto-release, notification sent |
-| Request early release (if enabled) | 24h confirmation period |
+| 啟用 24 小時冷卻期 | 立即啟用，會話關閉 |
+| 冷卻期間嘗試登入 | 顯示冷卻期訊息及結束時間 |
+| 冷卻期到期 | 自動解除，發送通知 |
+| 請求提前解除（如啟用） | 24 小時確認期 |
 
-### Session Management
+### 會話管理
 
-| Scenario | Expected Result |
+| 場景 | 預期結果 |
 |----------|----------------|
-| Session reaches duration limit | Popup shown, player can continue or stop |
-| 10 deposits in 24 hours (UK) | 60-minute mandatory break |
-| 30 minutes idle | Auto-logout |
-| Game in progress at idle timeout | Wait for round, then timeout |
+| 會話達到時長限制 | 顯示彈窗，玩家可繼續或停止 |
+| 24 小時內 10 次存款（UK） | 60 分鐘強制休息 |
+| 30 分鐘閒置 | 自動登出 |
+| 遊戲進行中達到閒置超時 | 等待局結束，然後超時 |
 
-### Reality Checks
+### 現實檢查
 
-| Scenario | Expected Result |
+| 場景 | 預期結果 |
 |----------|----------------|
-| 60 minutes elapsed | Reality check popup with stats |
-| Player in active game round | Wait for round end, then show popup |
-| Auto-play active | Pause auto-play, show popup |
-| Player clicks continue quickly 10 times | Flag for risk assessment |
+| 60 分鐘已過 | 現實檢查彈窗顯示統計 |
+| 玩家處於活躍遊戲局 | 等待局結束，然後顯示彈窗 |
+| 自動遊戲啟用 | 暫停自動遊戲，顯示彈窗 |
+| 玩家快速點擊繼續 10 次 | 標記為風險評估 |
 
 ---
 
-## Related Documents
+## 相關文檔
 
-- [Self_Exclusion_Requirements.md](Self_Exclusion_Requirements.md) - Self-exclusion
-- [Deposit_Limits_Requirements.md](Deposit_Limits_Requirements.md) - Deposit limits
-- [Affordability_Requirements.md](Affordability_Requirements.md) - Affordability assessment
-- [Session_Protection_Architecture.md](../../architecture/15_Responsible_Gambling/Session_Protection_Architecture.md) - Technical architecture
+- [Self_Exclusion_Requirements.md](Self_Exclusion_Requirements.md) - 自我排除
+- [Deposit_Limits_Requirements.md](Deposit_Limits_Requirements.md) - 存款限額
+- [Affordability_Requirements.md](Affordability_Requirements.md) - 可負擔性評估
+- [Session_Protection_Architecture.md](../../architecture/15_Responsible_Gambling/Session_Protection_Architecture.md) - 技術架構
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+**返回**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)

@@ -1,4 +1,4 @@
-# Self-Exclusion Requirements (自我排除業務需求)
+# 自我排除需求
 
 > **Canonical Source**: [15-01_Self_Exclusion.md](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md), [15-09_Self_Exclusion_Reconciliation.md](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md)
 > **View Type**: Business Requirements
@@ -8,266 +8,266 @@
 
 ---
 
-## Business Value
+## 業務價值
 
-This requirements document delivers strategic value by:
-- **Regulatory Compliance**: Implements mandatory Gamstop (UK), CRUKS (NL), Spelpaus (SE), ROFUS (DK) integrations with jurisdiction-specific duration requirements (6 months - lifetime)
-- **Player Harm Prevention**: Establishes the most stringent protection tool with irrevocable permanent exclusion option and cross-platform enforcement
-- **Operational Integrity**: Defines three-layer reconciliation architecture (real-time, daily batch, weekly audit) ensuring <24h discrepancy resolution
-- **Anti-Circumvention**: Specifies device fingerprinting, payment matching, and national database sync to prevent exclusion bypass via new accounts
+本需求文檔提供以下策略價值：
+- **監管合規**：實施強制性 Gamstop（UK）、CRUKS（NL）、Spelpaus（SE）、ROFUS（DK）整合，並符合各司法管轄區特定期限要求（6 個月 - 終身）
+- **玩家傷害預防**：建立最嚴格保護工具，提供不可撤銷的永久排除選項及跨平台強制執行
+- **運營完整性**：定義三層對帳架構（實時、每日批次、每週審計）確保 <24 小時差異解決
+- **反規避**：指定設備指紋識別、支付匹配及國家數據庫同步，防止通過新帳戶繞過排除
 
 ---
 
-## Success Metrics
+## 成功指標
 
-| Metric | Target | Measurement |
+| 指標 | 目標 | 衡量方式 |
 |--------|--------|-------------|
-| Gamstop Sync Success Rate | > 99.9% | Successful syncs / Total sync attempts |
-| Type A Discrepancy Resolution Time | < 24 hours | Time from detection to resolution |
-| Daily Reconciliation Completion | 100% | Days with completed batch / Total days |
-| Post-Exclusion Re-registration Attempt Rate | < 5% | Blocked re-registration attempts / Total exclusions |
-| UKGC Breach Report Deadline Compliance | 100% | Reports within 24h / Total breaches |
-| Exclusion Activation Accuracy | 100% | Correctly executed exclusions / Total requests |
+| Gamstop 同步成功率 | > 99.9% | 成功同步 / 總同步嘗試 |
+| Type A 差異解決時間 | < 24 小時 | 從檢測到解決的時間 |
+| 每日對帳完成率 | 100% | 完成批次天數 / 總天數 |
+| 排除後重新註冊嘗試率 | < 5% | 被阻止的重新註冊嘗試 / 總排除數 |
+| UKGC 違規報告期限合規 | 100% | 24 小時內報告 / 總違規數 |
+| 排除啟用準確性 | 100% | 正確執行的排除 / 總請求數 |
 
 ---
 
-## 1. Overview
+## 1. 概述
 
-Self-Exclusion is the most stringent player protection tool, allowing players to voluntarily prohibit themselves from accessing the gambling platform. This document defines the business requirements for self-exclusion, revocation, and cross-platform synchronization with national exclusion databases.
-
----
-
-## 2. Business Value
-
-This feature delivers value by:
-- **License Protection**: Ensures compliance with mandatory self-exclusion requirements across key jurisdictions (UKGC, MGA, Netherlands, Sweden, Denmark), preventing license suspension or revocation due to exclusion breaches
-- **National Exclusion Sync**: Integrates with 5 national exclusion databases (Gamstop UK, CRUKS Netherlands, Spelpaus Sweden, ROFUS Denmark, MGA Self-Ban), preventing excluded players from circumventing protections via multi-operator access
-- **Breach Prevention**: Three-layer reconciliation architecture (real-time query, daily batch comparison, weekly audit) ensures ≥99.9% sync success rate, minimizing critical Type A discrepancies (excluded in Gamstop, active locally) to <0.1%
-- **Player Trust**: Provides robust exclusion mechanisms with cooling-off periods (24h-7d for revocation), anti-circumvention measures (device fingerprint, payment matching), and transparent communication, supporting responsible gambling commitments
+自我排除 (Self-Exclusion) 是最嚴格的玩家保護工具，允許玩家自願禁止自己訪問賭博平台。本文檔定義自我排除、撤銷及與國家排除數據庫跨平台同步的業務需求。
 
 ---
 
-## 3. Success Metrics
+## 2. 業務價值
 
-| Metric | Target | Measurement | Business Impact |
+本功能提供以下價值：
+- **牌照保護**：確保符合主要司法管轄區（UKGC、MGA、荷蘭、瑞典、丹麥）的強制性自我排除要求，防止因排除違規而導致牌照暫停或吊銷
+- **國家排除同步**：整合 5 個國家排除數據庫（Gamstop UK、CRUKS 荷蘭、Spelpaus 瑞典、ROFUS 丹麥、MGA Self-Ban），防止被排除玩家通過多營運商訪問規避保護
+- **違規預防**：三層對帳架構（實時查詢、每日批次比較、每週審計）確保 ≥99.9% 同步成功率，將關鍵 Type A 差異（Gamstop 中排除、本地活躍）減少至 <0.1%
+- **玩家信任**：提供強大排除機制，包括冷卻期（撤銷需 24 小時-7 天）、反規避措施（設備指紋、支付匹配）及透明溝通，支持負責任賭博承諾
+
+---
+
+## 3. 成功指標
+
+| 指標 | 目標 | 衡量方式 | 業務影響 |
 |--------|--------|-------------|-----------------|
-| Gamstop Sync Success Rate | ≥99.9% | (Successful syncs / Total sync attempts) × 100% (real-time + daily batch) | Regulatory compliance - UKGC requires near-perfect sync reliability |
-| Type A Discrepancy Resolution Time | <24h | Time from Type A detection (excluded in Gamstop, active locally) to account freeze + UKGC report submission | Critical breach mitigation - UKGC mandates 24h reporting |
-| Daily Reconciliation Completion | 100% | Daily batch jobs (03:00 UTC) complete successfully without failures | Operational reliability - ensure gap detection layer functions |
-| Post-Exclusion Re-Registration Attempt Rate | <5% | (Re-registration attempts within 90 days / Total exclusions) × 100% | Anti-circumvention effectiveness - low rate indicates robust detection (device fingerprint, payment matching) |
-| Self-Exclusion Rate Trend | Monitor (baseline establishment) | (Monthly new exclusions / Monthly active players) × 100% | Player protection awareness - track adoption of strongest protection tool |
-| Permanent Exclusion Revocation Attempts | 0 successful attempts | Count of permanent exclusion revocation requests incorrectly approved (should be 0 - permanent means irrevocable) | System integrity - verify permanent exclusion enforcement logic |
-| Cooling-Off Period Compliance | 100% | (Revocations with proper cooling-off period / Total revocations) × 100% | Regulatory adherence - 6-month exclusion requires 1-day, 1-5 year requires 7-day cooling-off before release |
+| Gamstop 同步成功率 | ≥99.9% | （成功同步 / 總同步嘗試）× 100%（實時 + 每日批次） | 監管合規 - UKGC 要求近乎完美的同步可靠性 |
+| Type A 差異解決時間 | <24 小時 | 從 Type A 檢測（Gamstop 中排除、本地活躍）到帳戶凍結 + UKGC 報告提交的時間 | 關鍵違規緩解 - UKGC 強制 24 小時報告 |
+| 每日對帳完成率 | 100% | 每日批次作業（03:00 UTC）成功完成無失敗 | 運營可靠性 - 確保差異檢測層運作正常 |
+| 排除後重新註冊嘗試率 | <5% | （90 天內重新註冊嘗試 / 總排除數）× 100% | 反規避有效性 - 低比率表示強大檢測（設備指紋、支付匹配） |
+| 自我排除率趨勢 | 監控（建立基線） | （每月新排除 / 每月活躍玩家）× 100% | 玩家保護意識 - 追蹤最強保護工具的採用 |
+| 永久排除撤銷嘗試 | 0 次成功嘗試 | 錯誤批准的永久排除撤銷請求計數（應為 0 - 永久意味著不可撤銷） | 系統完整性 - 驗證永久排除強制執行邏輯 |
+| 冷卻期合規 | 100% | （具有適當冷卻期的撤銷 / 總撤銷數）× 100% | 監管遵守 - 6 個月排除需要 1 天，1-5 年需要 7 天冷卻期才能解除 |
 
 ---
 
-## 4. Regulatory Requirements
+## 4. 監管要求
 
-### 2.1 Jurisdiction-Specific Rules
+### 2.1 各司法管轄區特定規則
 
-| Regulator | Clause | Min Duration | Max Duration | Special Requirements |
+| 監管機構 | 條款 | 最短期限 | 最長期限 | 特殊要求 |
 |-----------|--------|-------------|-------------|---------------------|
-| **UKGC** | LCCP SR 3.5.1 | 6 months | 5 years+ | Must integrate with Gamstop |
-| **MGA** | Player Protection Directive | 6 months | Lifetime | National exclusion registry |
-| **PAGCOR** | Responsible Gaming Guidelines | 6 months | 1 year | Operator-managed |
-| **Brazil SPA** | Portaria SPA | 3 months | 5 years | National registry launching 2026 |
-| **Netherlands** | KOA Remote Gambling Act | 6 months | Lifetime | Must integrate CRUKS |
-| **Sweden** | Gambling Act | 1 month | Lifetime | Must integrate Spelpaus |
-| **Denmark** | Gambling Authority | 6 months | Lifetime | Must integrate ROFUS |
+| **UKGC** | LCCP SR 3.5.1 | 6 個月 | 5 年+ | 必須整合 Gamstop |
+| **MGA** | Player Protection Directive | 6 個月 | 終身 | 國家排除登記處 |
+| **PAGCOR** | Responsible Gaming Guidelines | 6 個月 | 1 年 | 營運商管理 |
+| **Brazil SPA** | Portaria SPA | 3 個月 | 5 年 | 2026 年啟動國家登記處 |
+| **Netherlands** | KOA Remote Gambling Act | 6 個月 | 終身 | 必須整合 CRUKS |
+| **Sweden** | Gambling Act | 1 個月 | 終身 | 必須整合 Spelpaus |
+| **Denmark** | Gambling Authority | 6 個月 | 終身 | 必須整合 ROFUS |
 
-### 2.2 Compliance Reporting
+### 2.2 合規報告
 
-| Report Type | Frequency | Regulator | Content |
+| 報告類型 | 頻率 | 監管機構 | 內容 |
 |-------------|-----------|-----------|---------|
-| Self-exclusion statistics | Monthly | UKGC, MGA | New/active/completed/revoked counts |
-| Exclusion database sync status | Monthly | UKGC | Sync success rate, discrepancies |
-| Incident reports | As needed | UKGC (24h), MGA (48h) | Breach details, remediation actions |
+| 自我排除統計 | 每月 | UKGC、MGA | 新增/活躍/完成/撤銷計數 |
+| 排除數據庫同步狀態 | 每月 | UKGC | 同步成功率、差異 |
+| 事件報告 | 需要時 | UKGC（24 小時）、MGA（48 小時） | 違規詳情、補救行動 |
 
 ---
 
-## 3. Exclusion Types
+## 3. 排除類型
 
-### 3.1 Temporary Exclusion (Player-Initiated)
+### 3.1 臨時排除（玩家發起）
 
-| Duration Option | Use Case | Release Conditions |
+| 期限選項 | 使用場景 | 解除條件 |
 |----------------|----------|-------------------|
-| 24 hours | Short-term cooling off | Auto-release |
-| 7 days | Short-term control | Auto-release |
-| 30 days | Monthly break | Auto-release |
-| 6 months | Medium-term exclusion | Application + 24h cooling-off |
-| 1 year | Long-term exclusion | Application + 7-day cooling-off |
-| 5 years | Long-term exclusion | Application + 7-day cooling-off |
+| 24 小時 | 短期冷卻 | 自動解除 |
+| 7 天 | 短期控制 | 自動解除 |
+| 30 天 | 每月休息 | 自動解除 |
+| 6 個月 | 中期排除 | 申請 + 24 小時冷卻期 |
+| 1 年 | 長期排除 | 申請 + 7 天冷卻期 |
+| 5 年 | 長期排除 | 申請 + 7 天冷卻期 |
 
-### 3.2 Permanent Exclusion
+### 3.2 永久排除
 
-- **Irrevocable**: Lifetime ban from the platform
-- **Non-transferable**: Cannot be transferred to other accounts
-- **Cross-platform**: Synced to all licensed operators via Gamstop (UK)
+- **不可撤銷**：終身禁止訪問平台
+- **不可轉移**：無法轉移至其他帳戶
+- **跨平台**：通過 Gamstop（UK）同步至所有持牌營運商
 
-### 3.3 Operator-Initiated Exclusion
+### 3.3 營運商發起的排除
 
-Operators may proactively exclude players when the risk control system identifies high-risk behaviors:
-- Suspected problem gambling behavior
-- Abnormal deposit patterns
-- Customer service request for assistance
+當風控系統識別到高風險行為時，營運商可主動排除玩家：
+- 疑似問題賭博行為
+- 異常存款模式
+- 客戶服務請求協助
 
 ---
 
-## 4. Business Process Flows
+## 4. 業務流程
 
-### 4.1 Player Self-Exclusion Flow
+### 4.1 玩家自我排除流程
 
-1. Player submits exclusion request with chosen duration
-2. System displays confirmation dialog showing consequences:
-   - Account access will be blocked
-   - All active sessions and games will be terminated
-   - Open bets will be settled
-   - Incomplete bonuses may be forfeited
-   - Marketing communications will be stopped
-3. For durations >= 6 months: 24-hour cooling-off confirmation window
-4. For durations <= 30 days: Immediate activation
-5. Upon activation, execute exclusion actions:
-   - Close all active sessions and games
-   - Settle all open bets/bonuses
-   - Sync to national exclusion database (UK: Gamstop)
-   - Send confirmation notification to player
-6. Record audit log of all actions taken
+1. 玩家提交排除請求並選擇期限
+2. 系統顯示確認對話框，說明後果：
+   - 帳戶訪問將被阻止
+   - 所有活躍會話和遊戲將被終止
+   - 未結投注將被結算
+   - 未完成獎金可能被沒收
+   - 營銷通訊將停止
+3. 期限 >= 6 個月：24 小時冷卻確認窗口
+4. 期限 <= 30 天：立即啟用
+5. 啟用時，執行排除動作：
+   - 關閉所有活躍會話和遊戲
+   - 結算所有未結投注/獎金
+   - 同步至國家排除數據庫（UK：Gamstop）
+   - 發送確認通知給玩家
+6. 記錄所有執行動作的審計日誌
 
-### 4.2 Exclusion Release Flow
+### 4.2 排除解除流程
 
-1. Exclusion period expires
-2. Cooling-off period begins:
-   - 6-month exclusion: 1-day cooling-off
-   - 1-5 year exclusion: 7-day cooling-off
-3. Player confirms release request
-4. Account restored after cooling-off period
-5. **Permanent exclusion: No release possible**
+1. 排除期限到期
+2. 冷卻期開始：
+   - 6 個月排除：1 天冷卻期
+   - 1-5 年排除：7 天冷卻期
+3. 玩家確認解除請求
+4. 冷卻期後帳戶恢復
+5. **永久排除：無法解除**
 
-### 4.3 During Exclusion Period
+### 4.3 排除期間
 
-**Allowed operations**:
-- View account balance
-- Request withdrawal of remaining funds
-- Contact customer support
+**允許的操作**：
+- 查看帳戶餘額
+- 請求提取剩餘資金
+- 聯繫客戶支持
 
-**Prohibited operations**:
-- Login to gaming platform
-- Deposit funds
-- Place bets or play games
-- Receive marketing communications
+**禁止的操作**：
+- 登入遊戲平台
+- 存款
+- 投注或玩遊戲
+- 接收營銷通訊
 
-### 4.4 Handling of Open Bets During Exclusion
+### 4.4 排除期間未結投注處理
 
-| Bet Type | Handling Rule |
+| 投注類型 | 處理規則 |
 |----------|-------------|
-| Games in progress | Wait for round to complete, settle normally |
-| Pre-scheduled bets | Cancel and refund |
-| Sports bets | Per license rules: may wait for result or settle early |
-| Bonuses (wagering met) | Allow withdrawal |
-| Bonuses (wagering not met) | Forfeit |
+| 進行中的遊戲 | 等待局結束，正常結算 |
+| 預定投注 | 取消並退款 |
+| 體育投注 | 依牌照規則：可等待結果或提前結算 |
+| 獎金（達到流水要求） | 允許提款 |
+| 獎金（未達流水要求） | 沒收 |
 
 ---
 
-## 5. Cross-Platform Synchronization Requirements
+## 5. 跨平台同步要求
 
-### 5.1 National Exclusion Databases
+### 5.1 國家排除數據庫
 
-| System | Region | Sync Mode | Sync Frequency |
+| 系統 | 地區 | 同步模式 | 同步頻率 |
 |--------|--------|-----------|----------------|
-| **Gamstop** | UK | Real-time + Daily Batch | Real-time + Daily 03:00 UTC |
-| **MGA Self-Ban** | Malta | Daily Batch | Daily via SFTP |
-| **CRUKS** | Netherlands | Real-time | Real-time query |
-| **Spelpaus** | Sweden | Real-time | Real-time query |
-| **ROFUS** | Denmark | Real-time | Real-time query |
+| **Gamstop** | UK | 實時 + 每日批次 | 實時 + 每日 03:00 UTC |
+| **MGA Self-Ban** | Malta | 每日批次 | 每日通過 SFTP |
+| **CRUKS** | Netherlands | 實時 | 實時查詢 |
+| **Spelpaus** | Sweden | 實時 | 實時查詢 |
+| **ROFUS** | Denmark | 實時 | 實時查詢 |
 
-### 5.2 Gamstop Integration Requirements (UK)
+### 5.2 Gamstop 整合要求（UK）
 
-1. **Registration Check**: Must check every new player registration against Gamstop
-2. **Login Check**: Periodic re-verification of active players
-3. **Exclusion Registration**: Must register player exclusions with Gamstop
-4. **Sync Reconciliation**: Daily batch comparison to detect discrepancies
+1. **註冊檢查**：必須對每個新玩家註冊進行 Gamstop 檢查
+2. **登入檢查**：定期重新驗證活躍玩家
+3. **排除註冊**：必須向 Gamstop 註冊玩家排除
+4. **同步對帳**：每日批次比較以檢測差異
 
-### 5.3 Reconciliation Rules
+### 5.3 對帳規則
 
-#### Three-Layer Reconciliation Architecture
+#### 三層對帳架構
 
-| Layer | Timing | Mechanism | Purpose |
+| 層級 | 時機 | 機制 | 目的 |
 |-------|--------|-----------|---------|
-| **Layer 1** | Player operation time | Real-time query | Immediate blocking |
-| **Layer 2** | Daily 03:00 UTC | Full list comparison | Gap detection |
-| **Layer 3** | Weekly (Monday) | Statistical report + audit | Compliance evidence |
+| **Layer 1** | 玩家操作時 | 實時查詢 | 立即阻止 |
+| **Layer 2** | 每日 03:00 UTC | 完整列表比較 | 差異檢測 |
+| **Layer 3** | 每週（週一） | 統計報告 + 審計 | 合規證據 |
 
-#### Discrepancy Types and Handling
+#### 差異類型及處理
 
-| Type | Description | Risk Level | Handling |
+| 類型 | 說明 | 風險級別 | 處理 |
 |------|-------------|-----------|---------|
-| **Type A** | Excluded in Gamstop, active locally | Critical | Immediate freeze + P0 alert |
-| **Type B** | Excluded locally (Gamstop type), not in Gamstop | Warning | Verify exclusion source |
-| **Type C** | End date mismatch | Info | Update to match Gamstop |
-| **Type D** | Connection failure | Warning | Retry 3 times + alert |
+| **Type A** | Gamstop 中排除、本地活躍 | 關鍵 | 立即凍結 + P0 警報 |
+| **Type B** | 本地排除（Gamstop 類型）、未在 Gamstop | 警告 | 驗證排除來源 |
+| **Type C** | 結束日期不匹配 | 資訊 | 更新以匹配 Gamstop |
+| **Type D** | 連接失敗 | 警告 | 重試 3 次 + 警報 |
 
-#### Breach Reporting Requirements
+#### 違規報告要求
 
-| Regulator | Report Deadline | Report Method | Required Content |
+| 監管機構 | 報告期限 | 報告方法 | 必需內容 |
 |-----------|----------------|---------------|-----------------|
-| **UKGC** | 24 hours | Key Event Report | Player details, breach timeline, remediation |
-| **MGA** | 48 hours | Incident Report | Impact scope, root cause analysis |
+| **UKGC** | 24 小時 | Key Event Report | 玩家詳情、違規時間線、補救措施 |
+| **MGA** | 48 小時 | Incident Report | 影響範圍、根本原因分析 |
 
 ---
 
-## 6. Anti-Circumvention Measures
+## 6. 反規避措施
 
-Players must not be able to bypass exclusion by creating new accounts. Required measures:
-- Device fingerprint identification
-- Payment information matching
-- Cross-platform sync via Gamstop (UK)
-- Facial recognition verification (advanced)
+玩家不得通過創建新帳戶繞過排除。必需措施：
+- 設備指紋識別
+- 支付資訊匹配
+- 通過 Gamstop（UK）跨平台同步
+- 面部識別驗證（進階）
 
 ---
 
-## 7. Notification Requirements
+## 7. 通知要求
 
-| Event | Channel | Content |
+| 事件 | 渠道 | 內容 |
 |-------|---------|---------|
-| Exclusion activated | Email + Push | Exclusion confirmation, duration, consequences |
-| Exclusion period ending | Email | Reminder of upcoming expiry, cooling-off info |
-| Revocation pending | Email | Confirmation of release request, effective date |
-| Revocation effective | Email + Push | Account restored notification |
-| Gamstop sync failure | Internal alert | P0 alert to compliance team |
+| 排除啟用 | Email + Push | 排除確認、期限、後果 |
+| 排除期限即將結束 | Email | 即將到期提醒、冷卻期資訊 |
+| 撤銷待處理 | Email | 解除請求確認、生效日期 |
+| 撤銷生效 | Email + Push | 帳戶恢復通知 |
+| Gamstop 同步失敗 | 內部警報 | P0 警報至合規團隊 |
 
 ---
 
-## 8. Effectiveness Metrics
+## 8. 有效性指標
 
-| Metric | Target | Description |
+| 指標 | 目標 | 說明 |
 |--------|--------|-------------|
-| Self-exclusion rate | Monitor trend | Monthly new exclusions / active players |
-| Post-exclusion re-registration attempt rate | < 5% | Exclusion mechanism effectiveness |
-| Gamstop sync success rate | > 99.9% | Sync reliability |
-| Discrepancy resolution time | < 24 hours | Time to resolve Type A discrepancies |
-| Daily reconciliation completion | 100% | All daily batches completed |
+| 自我排除率 | 監控趨勢 | 每月新排除 / 活躍玩家 |
+| 排除後重新註冊嘗試率 | < 5% | 排除機制有效性 |
+| Gamstop 同步成功率 | > 99.9% | 同步可靠性 |
+| 差異解決時間 | < 24 小時 | 解決 Type A 差異的時間 |
+| 每日對帳完成率 | 100% | 所有每日批次已完成 |
 
 ---
 
-## 9. Testing Scenarios
+## 9. 測試場景
 
-| Scenario | Expected Result |
+| 場景 | 預期結果 |
 |----------|----------------|
-| Player requests 24-hour exclusion | Immediate activation, auto-release after 24 hours |
-| Player requests 6-month exclusion | 24-hour confirmation window displayed |
-| Login attempt during exclusion | Exclusion message shown, login blocked |
-| Permanent exclusion release request | Rejected, permanent exclusion message shown |
-| Gamstop sync failure | Failure recorded, retry scheduled |
-| Gamstop shows excluded, local shows active | Immediate freeze, P0 alert, UKGC report within 24h |
+| 玩家請求 24 小時排除 | 立即啟用，24 小時後自動解除 |
+| 玩家請求 6 個月排除 | 顯示 24 小時確認窗口 |
+| 排除期間嘗試登入 | 顯示排除訊息，阻止登入 |
+| 永久排除解除請求 | 拒絕，顯示永久排除訊息 |
+| Gamstop 同步失敗 | 記錄失敗，安排重試 |
+| Gamstop 顯示排除、本地顯示活躍 | 立即凍結，P0 警報，24 小時內向 UKGC 報告 |
 
 ---
 
-## Related Documents
+## 相關文檔
 
-- [Deposit_Limits_Requirements.md](Deposit_Limits_Requirements.md) - Deposit limits
-- [Session_Protection_Requirements.md](Session_Protection_Requirements.md) - Cooling-off period
-- [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md) - Technical architecture
+- [Deposit_Limits_Requirements.md](Deposit_Limits_Requirements.md) - 存款限額
+- [Session_Protection_Requirements.md](Session_Protection_Requirements.md) - 冷卻期
+- [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md) - 技術架構
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+**返回**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
