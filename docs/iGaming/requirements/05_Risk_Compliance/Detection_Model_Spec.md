@@ -1,185 +1,185 @@
-# Detection Model Specification
+# 檢測模型規格（Detection Model Specification）
 
 > **Canonical Source**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
 > **Audience**: Executives, Risk Operations, Compliance Officers, Product Managers
 > **Related Architecture**: [Detection_Model_Implementation.md](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md)
 > **Last Synced**: 2026-02-09
 >
-> **Refinement Note**: Technical details (TCC pattern, SAGA flow implementation) moved to Architecture layer. This document focuses on business rules and operational policies.
+> **Refinement Note**: 技術細節（TCC 模式、SAGA 流程實現）已移至架構層。本文檔專注於業務規則和營運政策。
 
 ---
 
-## 1. Executive Summary
+## 1. 執行摘要（Executive Summary）
 
-SmartAdmin iGaming v2.1.0 introduces a Configuration-Driven Risk Control System that allows operations teams to configure how each risk rule is handled -- without requiring code changes or new deployments.
+SmartAdmin iGaming v2.1.0 引入了配置驅動風險控制系統（Configuration-Driven Risk Control System），允許營運團隊配置每個風險規則的處理方式——無需程式碼更改或新部署。
 
-### Core Value Proposition
+### 核心價值主張（Core Value Proposition）
 
-| Feature | Description | Business Value |
+| 功能 | 描述 | 業務價值 |
 |---------|-------------|----------------|
-| Configuration-Driven | Rule action types (BLOCK / FLAG / IGNORE) managed via database settings | Adjust risk strategies without code changes |
-| Human-Centric Review | Anomalies generate risk proposals for human review | Simplified decision logic; avoids over-automation |
-| Equal Treatment | All players undergo risk checks (no VIP exemptions) | Regulatory compliance; fairness principle |
-| Operator Choice | Operators decide their own risk tolerance levels | Supports multi-market strategies; improves client satisfaction |
+| 配置驅動 | 規則行動類型（BLOCK / FLAG / IGNORE）通過資料庫設定管理 | 無需程式碼更改即可調整風險策略 |
+| 以人為本的審核 | 異常生成風險提案供人工審核 | 簡化決策邏輯；避免過度自動化 |
+| 平等待遇 | 所有玩家都經過風險檢查（無 VIP 豁免） | 監管合規；公平原則 |
+| 營運商選擇 | 營運商決定自己的風險容忍度 | 支援多市場策略；提升客戶滿意度 |
 
 ---
 
-## 2. Evolution from Traditional Risk Control
+## 2. 從傳統風險控制的演進（Evolution from Traditional Risk Control）
 
-| Dimension | Traditional Risk (v2.0.0) | Configuration-Driven Risk (v2.1.0) |
+| 維度 | 傳統風險（v2.0.0） | 配置驅動風險（v2.1.0） |
 |-----------|--------------------------|--------------------------------------|
-| Rule Classification | Hard-coded P0/P1/P2 (30%/50%/20%) | Configuration-driven (operator chooses BLOCK/FLAG per rule) |
-| VIP Exemption | VIP Level 3+ exempt from risk checks (non-compliant) | All players treated equally (no exemptions) |
-| Anomaly Handling | Complex automated threshold logic | Human review as primary decision mechanism |
-| Strategy Adjustment | Requires code changes + deployment | Database configuration update only |
-| Flexibility | Fixed percentages, not adjustable | Each rule independently configurable |
+| 規則分類 | 硬編碼 P0/P1/P2（30%/50%/20%） | 配置驅動（營運商為每條規則選擇 BLOCK/FLAG） |
+| VIP 豁免 | VIP Level 3+ 豁免風險檢查（不合規） | 所有玩家平等對待（無豁免） |
+| 異常處理 | 複雜的自動門檻邏輯 | 人工審核作為主要決策機制 |
+| 策略調整 | 需要程式碼更改 + 部署 | 僅需資料庫配置更新 |
+| 靈活性 | 固定百分比，不可調整 | 每條規則可獨立配置 |
 
 ---
 
-## 3. Risk Rule Action Types
+## 3. 風險規則行動類型（Risk Rule Action Types）
 
-Every risk rule can be configured with one of three action types:
+每條風險規則可以配置為三種行動類型之一：
 
-| Action Type | Behaviour | Use Case |
+| 行動類型 | 行為 | 使用案例 |
 |-------------|-----------|----------|
-| **BLOCK** | Generates a high-priority risk proposal after the bet succeeds (async) | Serious fraud patterns -- bot detection, same-match hedging, same-IP arbitrage |
-| **FLAG** | Generates a medium-priority risk proposal after the bet succeeds (async) | Suspicious but lower-risk patterns -- cross-match hedging, low-odds turnover manipulation |
-| **IGNORE** | Logs the event only; no proposal generated | Experimental rules, data collection rules |
+| **BLOCK** | 在投注成功後生成高優先級風險提案（異步） | 嚴重欺詐模式——機器人檢測、同場對沖、同 IP 套利 |
+| **FLAG** | 在投注成功後生成中優先級風險提案（異步） | 可疑但風險較低的模式——跨場對沖、低賠率流水操縱 |
+| **IGNORE** | 僅記錄事件；不生成提案 | 實驗性規則、數據收集規則 |
 
-**Important**: BLOCK rules do not reject bets. All bets are processed first; risk analysis runs asynchronously afterward. Fund interception occurs at the withdrawal stage.
+**重要**：BLOCK 規則不會拒絕投注。所有投注首先被處理；風險分析隨後異步運行。資金攔截發生在提款階段。
 
 ---
 
-## 4. Detection Layers
+## 4. 檢測層級（Detection Layers）
 
-The system operates across five layers, each with specific business rules:
+系統在五個層級運作，每個層級都有特定的業務規則：
 
-### Layer 1: Synchronous Blocking (Immediate, under 10ms)
+### Layer 1: 同步阻斷（Synchronous Blocking，即時，<10ms）
 
-Only the most severe cases are blocked in real time:
+只有最嚴重的情況會即時阻斷：
 
-| Scenario | Description |
+| 場景 | 描述 |
 |----------|-------------|
-| Blacklisted Player | Confirmed fraudster; bet is immediately rejected |
-| IP Blocked | Known attack source |
-| Account Frozen | Under manual review |
-| Self-Exclusion List | Regulatory requirement (UKGC/MGA) |
+| 黑名單玩家 | 確認的欺詐者；投注立即拒絕 |
+| IP 封鎖 | 已知攻擊來源 |
+| 帳戶凍結 | 正在人工審核中 |
+| 自我排除名單 | 監管要求（UKGC/MGA） |
 
-### Layer 2: Transaction Processing
+### Layer 2: 交易處理（Transaction Processing）
 
-Bets are processed using a two-phase transaction pattern. The player sees their bet result immediately. Risk analysis does not delay or affect the betting experience.
+投注使用兩階段交易模式處理。玩家立即看到投注結果。風險分析不會延遲或影響投注體驗。
 
-→ **[TCC Pattern Implementation](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md#transaction-processing)** - Try-Confirm-Cancel technical details
+→ **[TCC Pattern Implementation](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md#transaction-processing)** - Try-Confirm-Cancel 技術細節
 
-### Layer 3: Asynchronous Risk Analysis (within approx. 5 seconds)
+### Layer 3: 異步風險分析（Asynchronous Risk Analysis，約 5 秒內）
 
-Rules are evaluated after the bet succeeds. Detected patterns generate risk proposals:
+規則在投注成功後評估。檢測到的模式生成風險提案：
 
-**BLOCK Rules (High Priority)**:
+**BLOCK 規則（高優先級）**：
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| Bot Detection | Behavioural pattern analysis identifies automated betting |
-| Same-Match Hedging | Opposite bets on the same match by the same player |
-| Same-IP Arbitrage | Correlated accounts from the same IP placing offsetting bets |
-| Abnormal Odds Detection | Statistical anomaly in odds selection patterns |
-| Turnover Manipulation | Artificial turnover generation to meet withdrawal requirements |
+| 機器人檢測 | 行為模式分析識別自動投注 |
+| 同場對沖 | 同一玩家在同一場賽事下相反投注 |
+| 同 IP 套利 | 來自同一 IP 的關聯帳戶進行對沖投注 |
+| 異常賠率檢測 | 賠率選擇模式的統計異常 |
+| 流水操縱 | 人為生成流水以滿足提款要求 |
 
-**FLAG Rules (Medium Priority)**:
+**FLAG 規則（中優先級）**：
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| Cross-Match Hedging | Opposite bets across different matches (lower risk) |
-| Low-Odds Turnover | Bets at odds below 1.5 (requires human judgement) |
-| Abnormal Betting Pattern | Unusual pattern that may be a false positive |
-| High-Frequency Betting | More than 10 bets per minute (requires trend observation) |
+| 跨場對沖 | 跨不同賽事的相反投注（風險較低） |
+| 低賠率流水 | 賠率低於 1.5 的投注（需要人工判斷） |
+| 異常投注模式 | 不尋常的模式，可能是誤報 |
+| 高頻投注 | 每分鐘超過 10 次投注（需要趨勢觀察） |
 
-### Layer 4: Human Review and Disposition
+### Layer 4: 人工審核與處置（Human Review and Disposition）
 
-Risk proposals are reviewed by human operators. Three possible outcomes:
+風險提案由人工營運人員審核。三種可能結果：
 
-| Decision | Action |
+| 決策 | 行動 |
 |----------|--------|
-| Approved | No action taken; player continues to be monitored |
-| Rejected | Account frozen; suspicious funds marked; risk profile updated |
-| Partial | Partial account freeze applied |
+| 通過（Approved） | 不採取行動；玩家繼續被監控 |
+| 拒絕（Rejected） | 凍結帳戶；標記可疑資金；更新風險檔案 |
+| 部分（Partial） | 應用部分帳戶凍結 |
 
-### Layer 5: Withdrawal Deferred Check
+### Layer 5: 提款延遲檢查（Withdrawal Deferred Check）
 
-When a player requests a withdrawal, the system queries historical risk proposals (30-day window):
+當玩家請求提款時，系統查詢歷史風險提案（30 天窗口）：
 
-→ **[SAGA Implementation](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md#withdrawal-deferred-check)** - SAGA Step 2.5 technical flow
+→ **[SAGA Implementation](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md#withdrawal-deferred-check)** - SAGA Step 2.5 技術流程
 
-| Condition | Outcome |
+| 條件 | 結果 |
 |-----------|---------|
-| Suspicious amount = 0 | Withdrawal proceeds normally |
-| Suspicious amount > 0 | Funds frozen; manual review proposal generated |
+| 可疑金額 = 0 | 提款正常進行 |
+| 可疑金額 > 0 | 凍結資金；生成人工審核提案 |
 
 ---
 
-## 5. Key Design Principles
+## 5. 關鍵設計原則（Key Design Principles）
 
-| Principle | Description | Business Benefit |
+| 原則 | 描述 | 業務收益 |
 |-----------|-------------|------------------|
-| Minimal Synchronous Blocking | Only blacklist / IP block / account freeze are checked synchronously | Near-zero latency impact on betting |
-| Bet-First Completion | Bets always succeed before risk analysis runs | No false rejections; zero innocent player impact |
-| Async Risk Analysis | All BLOCK/FLAG rules run asynchronously post-bet | 5-second analysis window; no betting delays |
-| Human-Primary Review | Automation generates proposals; humans make final decisions | Avoids ML model false positives |
-| Post-Hoc Fund Interception | Suspicious funds intercepted at withdrawal time | Compliant with industry best practices |
+| 最小同步阻斷 | 僅黑名單 / IP 封鎖 / 帳戶凍結同步檢查 | 對投注的延遲影響接近零 |
+| 投注優先完成 | 投注總是在風險分析運行前成功 | 無誤拒；對無辜玩家零影響 |
+| 異步風險分析 | 所有 BLOCK/FLAG 規則在投注後異步運行 | 5 秒分析窗口；無投注延遲 |
+| 以人為主的審核 | 自動化生成提案；人工做最終決策 | 避免 ML 模型誤報 |
+| 事後資金攔截 | 在提款時攔截可疑資金 | 符合行業最佳實踐 |
 
 ---
 
-## 6. Risk Thresholds and Policies
+## 6. 風險門檻和政策（Risk Thresholds and Policies）
 
-### Risk Score Model
+### 風險評分模型（Risk Score Model）
 
-The system does not use a composite risk score for per-bet decisions. Instead, each rule independently triggers proposals based on its configured action type.
+系統不使用複合風險評分進行單次投注決策。相反，每條規則根據其配置的行動類型獨立觸發提案。
 
-### Withdrawal Risk Aggregation
+### 提款風險聚合（Withdrawal Risk Aggregation）
 
-| Time Window | Scope |
+| 時間窗口 | 範圍 |
 |-------------|-------|
-| 30 days | All unresolved risk proposals within the window |
-| Calculation | Sum of suspicious amounts from all matched proposals |
-| Threshold | Any suspicious amount > 0 triggers review |
+| 30 天 | 窗口內所有未解決的風險提案 |
+| 計算 | 所有匹配提案的可疑金額總和 |
+| 門檻 | 任何可疑金額 > 0 觸發審核 |
 
-### Industry Benchmarks
+### 行業基準（Industry Benchmarks）
 
-| Operator / Regulator | Practice |
+| 營運商 / 監管機構 | 實踐 |
 |----------------------|----------|
-| DraftKings / FanDuel (US) | Only blacklist is synchronous; everything else is async |
-| Bet365 (UK) | Hedging detection analysed within 5 minutes post-bet |
-| UKGC Compliance Framework | Recommends post-hoc risk control + withdrawal interception |
+| DraftKings / FanDuel (US) | 僅黑名單同步；其他均為異步 |
+| Bet365 (UK) | 對沖檢測在投注後 5 分鐘內分析 |
+| UKGC Compliance Framework | 建議事後風險控制 + 提款攔截 |
 
 ---
 
-## 7. Comparison with Previous Architecture
+## 7. 與先前架構的比較（Comparison with Previous Architecture）
 
-| Metric | Previous (v2.1.0 sync) | Current (v3.0.0 async) |
+| 指標 | 先前（v2.1.0 同步） | 當前（v3.0.0 異步） |
 |--------|------------------------|------------------------|
-| Risk Trigger Timing | During bet request (synchronous) | After bet success (asynchronous) |
-| BLOCK Rule Handling | Rejects the bet | Generates high-priority proposal |
-| FLAG Rule Handling | Allows bet + generates proposal | Generates medium-priority proposal |
-| Blacklist Check | Mixed with other rules | Independent synchronous check layer |
-| Fund Interception Timing | At bet time (blocking) | At withdrawal time (deferred) |
-| False Positive Impact | 5--10% of normal players rejected | Zero false rejections (bet already succeeded) |
-| System Availability | Single point of failure (risk down = bets fail) | High availability (risk down does not affect bets) |
+| 風險觸發時機 | 投注請求期間（同步） | 投注成功後（異步） |
+| BLOCK 規則處理 | 拒絕投注 | 生成高優先級提案 |
+| FLAG 規則處理 | 允許投注 + 生成提案 | 生成中優先級提案 |
+| 黑名單檢查 | 與其他規則混合 | 獨立同步檢查層 |
+| 資金攔截時機 | 投注時（阻斷） | 提款時（延遲） |
+| 誤報影響 | 5--10% 的正常玩家被拒絕 | 零誤拒（投注已成功） |
+| 系統可用性 | 單點故障（風險宕機 = 投注失敗） | 高可用性（風險宕機不影響投注） |
 
 ---
 
-## 8. Acceptance Criteria
+## 8. 驗收標準（Acceptance Criteria）
 
-- All players undergo identical risk checks regardless of VIP status
-- BLOCK/FLAG action types are configurable per rule without code deployment
-- Bets are never rejected by asynchronous risk rules (zero false kills)
-- Risk proposals are generated within approximately 5 seconds of bet completion
-- Withdrawal checks query all unresolved proposals within a 30-day window
-- All configuration changes are recorded in an audit log
+- 所有玩家無論 VIP 狀態如何都經過相同的風險檢查
+- BLOCK/FLAG 行動類型可在無需程式碼部署的情況下按規則配置
+- 投注永不會被異步風險規則拒絕（零誤殺）
+- 風險提案在投注完成後約 5 秒內生成
+- 提款檢查查詢 30 天窗口內所有未解決提案
+- 所有配置更改記錄在審計日誌中
 
 ---
 
-## 9. Related Documents
+## 9. 相關文檔（Related Documents）
 
-- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) -- Risk proposal service and deferred checks
-- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) -- Multi-dimensional risk rules
-- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin architecture mapping and monitoring
+- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) -- 風險提案服務和延遲檢查
+- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) -- 多維度風險規則
+- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin 架構映射和監控
