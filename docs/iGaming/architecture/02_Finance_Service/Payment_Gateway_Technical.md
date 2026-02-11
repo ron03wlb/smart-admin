@@ -1,27 +1,27 @@
-# Payment Gateway Technical Implementation
+# 支付閘道技術實現（Payment Gateway Technical Implementation）
 
-> **Business Requirements**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
-> **Audience**: Backend Developers, DevOps Engineers, Security Engineers
-> **Last Synced**: 2026-02-09
+> **業務需求（Business Requirements）**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
+> **目標讀者（Audience）**: Backend Developers, DevOps Engineers, Security Engineers
+> **最後同步（Last Synced）**: 2026-02-09
 >
-> **Purpose**: This document contains the technical implementation details for payment gateway integration, including PSP webhook processing, signature verification, smart routing algorithms, scheduled reconciliation, security configuration, and monitoring setup.
+> **文檔目的（Purpose）**: 本文檔包含支付閘道整合的技術實現細節，包括 PSP webhook 處理、簽名驗證、智能路由演算法、定時對帳、安全配置和監控設置。
 
 ---
 
-## 1. Architecture Overview
+## 1. 架構概覽（Architecture Overview）
 
-### 1.1 Technology Stack
+### 1.1 技術堆疊（Technology Stack）
 
-| Component | Technology | Version | Purpose |
+| 組件（Component） | 技術（Technology） | 版本（Version） | 用途（Purpose） |
 |-----------|-----------|---------|---------|
-| HTTP Client | RestTemplate | Spring 6.x | PSP API integration |
-| Scheduler | Snail-Job | 1.x | Auto reconciliation (every 15 min) |
-| Connection Pool | HikariCP | 5.x | Database connection management |
-| Monitoring | Prometheus + Grafana | 2.x + 9.x | Performance metrics and dashboards |
-| Secret Management | HashiCorp Vault | 1.15+ | API key storage and rotation |
-| TLS | OpenSSL | 1.1.1+ | TLS 1.2+ encryption |
+| HTTP Client | RestTemplate | Spring 6.x | PSP API 整合 |
+| Scheduler | Snail-Job | 1.x | 自動對帳（每 15 分鐘） |
+| Connection Pool | HikariCP | 5.x | 數據庫連接管理 |
+| Monitoring | Prometheus + Grafana | 2.x + 9.x | 性能指標和儀表板 |
+| Secret Management | HashiCorp Vault | 1.15+ | API 金鑰存儲和輪換 |
+| TLS | OpenSSL | 1.1.1+ | TLS 1.2+ 加密 |
 
-### 1.2 Core Modules
+### 1.2 核心模組（Core Modules）
 
 ```
 smartadmin-business/
@@ -44,9 +44,9 @@ smartadmin-business/
 
 ---
 
-## 2. PSP Webhook Integration
+## 2. PSP Webhook 整合（PSP Webhook Integration）
 
-### 2.1 Webhook Endpoint
+### 2.1 Webhook 端點（Webhook Endpoint）
 
 **PaymentCallbackController**:
 
@@ -101,7 +101,7 @@ public class PaymentCallbackController {
 }
 ```
 
-### 2.2 HMAC-SHA256 Signature Verification
+### 2.2 HMAC-SHA256 簽名驗證（HMAC-SHA256 Signature Verification）
 
 **SignatureVerifier**:
 
@@ -150,11 +150,11 @@ public class SignatureVerifier {
 }
 ```
 
-### 2.3 Callback Processing Flow
+### 2.3 回調處理流程（Callback Processing Flow）
 
 ```mermaid
 sequenceDiagram
-    participant PSP as Payment Service Provider
+    participant PSP as 支付服務提供商<br/>(Payment Service Provider)
     participant Controller as PaymentCallbackController
     participant Verifier as SignatureVerifier
     participant Vault as HashiCorp Vault
@@ -165,21 +165,21 @@ sequenceDiagram
     Controller->>Verifier: verify(pspCode, payload, signature)
     Verifier->>Vault: getSecret(pspCode)
     Vault-->>Verifier: API secret
-    Verifier->>Verifier: Compute HMAC-SHA256
-    Verifier->>Verifier: Constant-time comparison
-    Verifier-->>Controller: Signature valid
+    Verifier->>Verifier: 計算 HMAC-SHA256
+    Verifier->>Verifier: 常量時間比較
+    Verifier-->>Controller: 簽名有效
 
     Controller->>Service: processCallback(pspCode, payload)
-    Service->>DB: Find order by order_id
-    Service->>DB: Update order status (PENDING -> SUCCESS)
-    Service->>Service: Credit player balance
-    Service->>Service: Send notification
-    Service-->>Controller: Success
+    Service->>DB: 根據 order_id 查詢訂單
+    Service->>DB: 更新訂單狀態 (PENDING -> SUCCESS)
+    Service->>Service: 入帳玩家餘額
+    Service->>Service: 發送通知
+    Service-->>Controller: 成功
 
     Controller-->>PSP: HTTP 200 OK
 ```
 
-### 2.4 Database Updates
+### 2.4 數據庫更新（Database Updates）
 
 **PaymentManager.processCallback()**:
 
@@ -235,24 +235,24 @@ public class PaymentManager {
 
 ---
 
-## 3. Smart Routing Algorithm
+## 3. 智能路由演算法（Smart Routing Algorithm）
 
-### 3.1 Score Calculation Formula
+### 3.1 評分計算公式（Score Calculation Formula）
 
-**Formula**:
+**公式（Formula）**:
 ```
 PSP Score = (Success Rate × 0.5) + (1 - Fee Rate × 0.3) + (Speed Score × 0.15)
             + (VIP Bonus × 0.05) + (Currency Match × 0.03)
 
-Where:
-- Success Rate: Last 100 transactions success rate (0.0 - 1.0)
-- Fee Rate: Transaction fee as decimal (e.g., 0.025 for 2.5%)
-- Speed Score: 1.0 if < 5 min, 0.7 if < 15 min, 0.4 if < 30 min, 0.0 otherwise
-- VIP Bonus: 1.0 if VIP-dedicated channel, 0.0 otherwise
-- Currency Match: 1.0 if PSP supports player currency natively, 0.0 otherwise
+其中（Where）:
+- Success Rate: 最近 100 筆交易成功率 (0.0 - 1.0)
+- Fee Rate: 交易手續費率（小數形式，例如 0.025 表示 2.5%）
+- Speed Score: < 5 分鐘 = 1.0，< 15 分鐘 = 0.7，< 30 分鐘 = 0.4，否則 = 0.0
+- VIP Bonus: VIP 專屬通道 = 1.0，否則 = 0.0
+- Currency Match: PSP 原生支持玩家幣種 = 1.0，否則 = 0.0
 ```
 
-### 3.2 SmartRoutingService Implementation
+### 3.2 SmartRoutingService 實現（SmartRoutingService Implementation）
 
 ```java
 @Service
@@ -349,9 +349,9 @@ public class SmartRoutingService {
 }
 ```
 
-### 3.3 Real-Time PSP Selection Logic
+### 3.3 即時 PSP 選擇邏輯（Real-Time PSP Selection Logic）
 
-**Deposit Flow Integration**:
+**存款流程整合（Deposit Flow Integration）**:
 
 ```java
 @Service
@@ -383,9 +383,9 @@ public class PaymentService {
 
 ---
 
-## 4. Auto Reconciliation
+## 4. 自動對帳（Auto Reconciliation）
 
-### 4.1 Scheduled Job Configuration
+### 4.1 定時任務配置（Scheduled Job Configuration）
 
 **ReconciliationJob** (Snail-Job):
 
@@ -428,7 +428,7 @@ public class ReconciliationJob {
 }
 ```
 
-### 4.2 SQL Queries
+### 4.2 SQL 查詢（SQL Queries）
 
 **MyBatis Mapper XML**:
 
@@ -451,7 +451,7 @@ public class ReconciliationJob {
 </select>
 ```
 
-### 4.3 PSP API Integration
+### 4.3 PSP API 整合（PSP API Integration）
 
 **PSPClient**:
 
@@ -500,9 +500,9 @@ public class PSPClient {
 }
 ```
 
-### 4.4 Status Synchronization Logic
+### 4.4 狀態同步邏輯（Status Synchronization Logic）
 
-**PSPReconciliationService** (delegates @Transactional to Manager):
+**PSPReconciliationService** （將 @Transactional 委派給 Manager）:
 
 ```java
 @Service
@@ -525,7 +525,7 @@ public class PSPReconciliationService {
 }
 ```
 
-**PSPReconciliationManager** (@Transactional in Manager layer):
+**PSPReconciliationManager** （@Transactional 在 Manager 層）:
 
 ```java
 @Component
@@ -567,11 +567,11 @@ public class PSPReconciliationManager {
 
 ---
 
-## 5. Security Implementation
+## 5. 安全實現（Security Implementation）
 
-### 5.1 TLS 1.2+ Configuration
+### 5.1 TLS 1.2+ 配置（TLS 1.2+ Configuration）
 
-**RestTemplate SSL Configuration**:
+**RestTemplate SSL 配置**:
 
 ```java
 @Configuration
@@ -615,7 +615,7 @@ public class PSPClientConfig {
 }
 ```
 
-### 5.2 HashiCorp Vault Integration
+### 5.2 HashiCorp Vault 整合（HashiCorp Vault Integration）
 
 **VaultKeyManager**:
 
@@ -666,7 +666,7 @@ public class VaultKeyManager {
 }
 ```
 
-**Vault Configuration** (`application.yml`):
+**Vault 配置（Vault Configuration）** (`application.yml`):
 
 ```yaml
 spring:
@@ -680,9 +680,9 @@ spring:
         backend: secret
 ```
 
-### 5.3 API Key Rotation Policy
+### 5.3 API 金鑰輪換策略（API Key Rotation Policy）
 
-**Scheduled Key Rotation** (every 90 days):
+**定時金鑰輪換（Scheduled Key Rotation）** （每 90 天）:
 
 ```java
 @Component
@@ -725,41 +725,41 @@ public class APIKeyRotationJob {
 
 ---
 
-## 6. 3DS Integration
+## 6. 3DS 整合（3DS Integration）
 
-### 6.1 3DS 2.0 Flow Implementation
+### 6.1 3DS 2.0 流程實現（3DS 2.0 Flow Implementation）
 
-**3DS Challenge Flow**:
+**3DS 挑戰流程（3DS Challenge Flow）**:
 
 ```mermaid
 sequenceDiagram
-    participant Player
-    participant Platform
+    participant Player as 玩家
+    participant Platform as 平台
     participant PSP
-    participant Issuer as Issuer Bank
+    participant Issuer as 發卡銀行
 
-    Player->>Platform: Initiate card deposit
-    Platform->>PSP: Create 3DS session
+    Player->>Platform: 發起信用卡存款
+    Platform->>PSP: 創建 3DS session
     PSP-->>Platform: 3DS URL
 
-    Platform-->>Player: Redirect to 3DS page
+    Platform-->>Player: 重定向至 3DS 頁面
 
-    Player->>PSP: 3DS authentication
-    PSP->>Issuer: SCA challenge
-    Issuer-->>Player: Show authentication (SMS, app)
+    Player->>PSP: 3DS 身份驗證
+    PSP->>Issuer: SCA 挑戰
+    Issuer-->>Player: 顯示身份驗證（SMS、app）
 
-    Player->>Issuer: Complete authentication
-    Issuer-->>PSP: Authentication result
+    Player->>Issuer: 完成身份驗證
+    Issuer-->>PSP: 驗證結果
 
-    PSP-->>Player: Redirect to Platform
-    Platform->>PSP: Query final status
-    PSP-->>Platform: Payment SUCCESS/FAILED
+    PSP-->>Player: 重定向回平台
+    Platform->>PSP: 查詢最終狀態
+    PSP-->>Platform: 支付 SUCCESS/FAILED
 
-    Platform->>Platform: Credit player balance
-    Platform-->>Player: Deposit success
+    Platform->>Platform: 入帳玩家餘額
+    Platform-->>Player: 存款成功
 ```
 
-### 6.2 SCA Exemption Logic
+### 6.2 SCA 豁免邏輯（SCA Exemption Logic）
 
 **SCAExemptionService**:
 
@@ -796,7 +796,7 @@ public class SCAExemptionService {
 }
 ```
 
-### 6.3 PSD2 Compliance Validation
+### 6.3 PSD2 合規驗證（PSD2 Compliance Validation）
 
 **PSD2ComplianceValidator**:
 
@@ -830,9 +830,9 @@ public class PSD2ComplianceValidator {
 
 ---
 
-## 7. Performance Monitoring
+## 7. 性能監控（Performance Monitoring）
 
-### 7.1 Prometheus Metrics Configuration
+### 7.1 Prometheus 指標配置（Prometheus Metrics Configuration）
 
 **PaymentMetricsCollector**:
 
@@ -875,7 +875,7 @@ public class PaymentMetricsCollector {
 }
 ```
 
-**Prometheus Configuration** (`prometheus.yml`):
+**Prometheus 配置（Prometheus Configuration）** (`prometheus.yml`):
 
 ```yaml
 scrape_configs:
@@ -886,9 +886,9 @@ scrape_configs:
       - targets: ['localhost:1024']
 ```
 
-### 7.2 Grafana Dashboards
+### 7.2 Grafana 儀表板（Grafana Dashboards）
 
-**Payment Operations Dashboard** (`payment-dashboard.json`):
+**支付營運儀表板（Payment Operations Dashboard）** (`payment-dashboard.json`):
 
 ```json
 {
@@ -951,9 +951,9 @@ scrape_configs:
 }
 ```
 
-### 7.3 Alert Rules (PagerDuty, Slack)
+### 7.3 告警規則（Alert Rules）（PagerDuty, Slack）
 
-**PrometheusAlert Configuration** (`alert-rules.yml`):
+**PrometheusAlert 配置（PrometheusAlert Configuration）** (`alert-rules.yml`):
 
 ```yaml
 groups:
@@ -1004,7 +1004,7 @@ groups:
           summary: "Pending orders backlog exceeds 50"
 ```
 
-**PagerDuty Integration**:
+**PagerDuty 整合（PagerDuty Integration）**:
 
 ```yaml
 # alertmanager.yml
@@ -1032,9 +1032,9 @@ route:
 
 ---
 
-## 8. Connection Pool Configuration
+## 8. 連接池配置（Connection Pool Configuration）
 
-### 8.1 HikariCP Configuration
+### 8.1 HikariCP 配置（HikariCP Configuration）
 
 **application.yml**:
 
@@ -1068,9 +1068,9 @@ spring:
       transaction-isolation: TRANSACTION_READ_COMMITTED
 ```
 
-### 8.2 Connection Pool Monitoring
+### 8.2 連接池監控（Connection Pool Monitoring）
 
-**HikariCPMetrics** (automatic with Spring Boot Actuator):
+**HikariCPMetrics** （Spring Boot Actuator 自動配置）:
 
 ```java
 @Component
@@ -1095,51 +1095,51 @@ public class HikariMonitor {
 
 ---
 
-## 9. Performance Benchmarks
+## 9. 性能基準（Performance Benchmarks）
 
-### 9.1 Response Time SLA
+### 9.1 響應時間 SLA（Response Time SLA）
 
-| Operation | P50 | P95 | P99 | Target |
+| 操作（Operation） | P50 | P95 | P99 | 目標（Target） |
 |-----------|-----|-----|-----|--------|
-| Deposit initiation | 100ms | 250ms | 500ms | < 500ms |
-| PSP callback processing | 50ms | 150ms | 300ms | < 300ms |
-| Signature verification | 5ms | 15ms | 30ms | < 50ms |
-| Smart routing selection | 20ms | 50ms | 100ms | < 100ms |
-| Reconciliation per order | 200ms | 500ms | 1000ms | < 1000ms |
+| 存款發起（Deposit initiation） | 100ms | 250ms | 500ms | < 500ms |
+| PSP 回調處理（PSP callback processing） | 50ms | 150ms | 300ms | < 300ms |
+| 簽名驗證（Signature verification） | 5ms | 15ms | 30ms | < 50ms |
+| 智能路由選擇（Smart routing selection） | 20ms | 50ms | 100ms | < 100ms |
+| 單筆訂單對帳（Reconciliation per order） | 200ms | 500ms | 1000ms | < 1000ms |
 
-### 9.2 Throughput
+### 9.2 吞吐量（Throughput）
 
-- **Target**: 500 TPS per node (deposit + callback)
-- **Actual (production)**: 600 TPS average, 900 TPS peak
-- **Bottleneck**: PSP API response time (avg 150ms)
+- **目標（Target）**: 500 TPS per node（存款 + 回調）
+- **實際生產（Actual (production)）**: 600 TPS 平均，900 TPS 峰值
+- **瓶頸（Bottleneck）**: PSP API 響應時間（平均 150ms）
 
-### 9.3 Cache Hit Rate
+### 9.3 緩存命中率（Cache Hit Rate）
 
-- **Vault API Key Cache**: 99.8% hit rate (keys rarely change)
-- **PSP Config Cache**: 95% hit rate (config changes infrequent)
+- **Vault API Key Cache**: 99.8% 命中率（金鑰很少變更）
+- **PSP Config Cache**: 95% 命中率（配置變更不頻繁）
 
 ---
 
-## 10. Operational Runbook
+## 10. 營運手冊（Operational Runbook）
 
-### 10.1 Alert Response
+### 10.1 告警響應（Alert Response）
 
-**Alert: Drop Rate > 3%**
-1. Check PSP API status page
-2. Review recent callback errors in logs
-3. Verify HikariCP connection pool health
-4. If PSP degraded, manually switch routing priority
-5. Contact PSP support if issue persists
+**告警: Drop Rate > 3%**
+1. 檢查 PSP API 狀態頁面
+2. 審查日誌中最近的回調錯誤
+3. 驗證 HikariCP 連接池健康狀態
+4. 如果 PSP 降級，手動切換路由優先級
+5. 如果問題持續，聯繫 PSP 支持團隊
 
-**Alert: Credit Delay > 2 hours**
-1. Query pending orders: `SELECT * FROM t_payment_order WHERE status='PENDING' AND created_at < NOW() - INTERVAL '2 hours'`
-2. Manually trigger reconciliation for those orders
-3. Check PSP API query rate limits
-4. Review scheduled job execution logs
+**告警: Credit Delay > 2 hours**
+1. 查詢待處理訂單: `SELECT * FROM t_payment_order WHERE status='PENDING' AND created_at < NOW() - INTERVAL '2 hours'`
+2. 手動觸發這些訂單的對帳
+3. 檢查 PSP API 查詢速率限制
+4. 審查定時任務執行日誌
 
-### 10.2 Manual Intervention
+### 10.2 手動干預（Manual Intervention）
 
-**Manual PSP Switch**:
+**手動切換 PSP（Manual PSP Switch）**:
 ```sql
 -- Lower priority for degraded PSP
 UPDATE t_psp_config
@@ -1149,7 +1149,7 @@ WHERE psp_code = 'stripe';
 -- Routing will automatically downgrade score by 30%
 ```
 
-**Manual Credit**:
+**手動入帳（Manual Credit）**:
 ```java
 // PaymentManager
 public void manualCredit(String orderId, String reason) {
@@ -1173,21 +1173,21 @@ public void manualCredit(String orderId, String reason) {
 
 ---
 
-## 11. Related Documents
+## 11. 相關文檔（Related Documents）
 
-### Business Requirements
-- [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md) - Business rules, PSP matrix, approval thresholds
+### 業務需求（Business Requirements）
+- [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md) - 業務規則、PSP 矩陣、審批閾值
 
-### Technical Dependencies
-- [Financial_Implementation.md](Financial_Implementation.md) - Wallet system, SAGA compensation
-- [Seamless_Wallet_Technical.md](Seamless_Wallet_Technical.md) - Wallet API integration
+### 技術依賴（Technical Dependencies）
+- [Financial_Implementation.md](Financial_Implementation.md) - 錢包系統、SAGA 補償
+- [Seamless_Wallet_Technical.md](Seamless_Wallet_Technical.md) - 錢包 API 整合
 
-### Extended Reading
+### 延伸閱讀（Extended Reading）
 - HashiCorp Vault Best Practices *(planned)*
 - HikariCP Performance Tuning *(planned)*
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-09
-**Maintenance Team**: Backend Team, DevOps Team, Security Team
+**文檔版本（Document Version）**: 1.0.0
+**最後更新（Last Updated）**: 2026-02-09
+**維護團隊（Maintenance Team）**: Backend Team, DevOps Team, Security Team
