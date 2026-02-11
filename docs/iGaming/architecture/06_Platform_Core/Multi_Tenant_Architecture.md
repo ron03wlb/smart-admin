@@ -537,7 +537,7 @@ stateDiagram-v2
 /**
  * Tenant migration service for cross-brand transfers
  */
-@Service
+@Component  // SmartAdmin Pattern: Manager uses @Component, not @Service
 @RequiredArgsConstructor
 public class TenantMigrationManager {
 

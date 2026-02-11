@@ -286,6 +286,39 @@ public class DepositLimitService {
 ### 2.2 LossLimitService
 
 ```java
+/**
+ * Manager class for loss limit persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class LossLimitManager {
+
+    private final LossAccumulationDao lossAccumulationDao;
+
+    /**
+     * Record bet result (update loss accumulation) - transactional.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void recordBetResultAccumulation(Long playerId, BigDecimal stakeAmount, BigDecimal winAmount) {
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+
+        updateAccumulation(playerId, PeriodType.DAILY, today, stakeAmount, winAmount);
+        updateAccumulation(playerId, PeriodType.WEEKLY, today.with(DayOfWeek.MONDAY), stakeAmount, winAmount);
+        updateAccumulation(playerId, PeriodType.MONTHLY, today.withDayOfMonth(1), stakeAmount, winAmount);
+    }
+
+    private void updateAccumulation(Long playerId, PeriodType type, LocalDate periodStart,
+                                    BigDecimal stakeAmount, BigDecimal winAmount) {
+        // Update logic implementation
+    }
+}
+
+/**
+ * Service class for loss limit orchestration.
+ * Delegates transactional operations to LossLimitManager.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -293,6 +326,7 @@ public class LossLimitService {
 
     private final LossLimitSettingDao lossLimitSettingDao;
     private final LossAccumulationDao lossAccumulationDao;
+    private final LossLimitManager lossLimitManager;
 
     /**
      * Check if bet exceeds loss limit
@@ -329,15 +363,11 @@ public class LossLimitService {
     }
 
     /**
-     * Record bet result (update loss accumulation)
+     * Record bet result (update loss accumulation).
+     * Delegates transactional operation to LossLimitManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public void recordBetResult(Long playerId, BigDecimal stakeAmount, BigDecimal winAmount) {
-        LocalDate today = LocalDate.now(ZoneOffset.UTC);
-
-        updateAccumulation(playerId, PeriodType.DAILY, today, stakeAmount, winAmount);
-        updateAccumulation(playerId, PeriodType.WEEKLY, today.with(DayOfWeek.MONDAY), stakeAmount, winAmount);
-        updateAccumulation(playerId, PeriodType.MONTHLY, today.withDayOfMonth(1), stakeAmount, winAmount);
+        lossLimitManager.recordBetResultAccumulation(playerId, stakeAmount, winAmount);
     }
 }
 ```
@@ -345,14 +375,59 @@ public class LossLimitService {
 ### 2.3 Integration with Payment and Bet Services
 
 ```java
+/**
+ * Manager class for deposit persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+public class DepositManager {
+
+    private final DepositDao depositDao;
+    private final DepositLimitAccumulationDao accumulationDao;
+
+    /**
+     * Process deposit and update accumulation (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public DepositResultVO processDeposit(Long playerId, BigDecimal amount) {
+        // Insert deposit record
+        DepositEntity deposit = DepositEntity.builder()
+            .playerId(playerId)
+            .amount(amount)
+            .status(DepositStatus.COMPLETED)
+            .createdAt(LocalDateTime.now())
+            .build();
+        depositDao.insert(deposit);
+
+        // Update deposit limit accumulation
+        accumulationDao.addDailyAccumulation(playerId, amount);
+        accumulationDao.addWeeklyAccumulation(playerId, amount);
+        accumulationDao.addMonthlyAccumulation(playerId, amount);
+
+        return DepositResultVO.builder()
+            .depositId(deposit.getId())
+            .status(deposit.getStatus())
+            .build();
+    }
+}
+
+/**
+ * Service class for deposit orchestration.
+ * Delegates transactional operations to DepositManager.
+ */
 @Service
 @RequiredArgsConstructor
 public class DepositService {
 
     private final PreDepositLimitService preDepositLimitService;
     private final DepositLimitService depositLimitService;
+    private final DepositManager depositManager;
 
-    @Transactional(rollbackFor = Throwable.class)
+    /**
+     * Deposit with limit checking.
+     * Delegates transactional operation to DepositManager.
+     */
     public ResponseDTO<DepositResultVO> deposit(Long playerId, DepositForm form) {
 
         // 0. Pre-deposit limit check (UKGC 2025-10-31)
@@ -379,11 +454,10 @@ public class DepositService {
                     breach.getLimit(), breach.getAccumulated(), breach.getRemaining()));
         }
 
-        // 3. Execute deposit... (continued)
-        // 4. Record deposit accumulation
-        depositLimitService.recordDeposit(playerId, form.getAmount());
+        // 3. Execute deposit (delegate transactional operation to Manager)
+        DepositResultVO result = depositManager.processDeposit(playerId, form.getAmount());
 
-        return ResponseDTO.ok(DepositResultVO.success(paymentResult));
+        return ResponseDTO.ok(result);
     }
 }
 ```
