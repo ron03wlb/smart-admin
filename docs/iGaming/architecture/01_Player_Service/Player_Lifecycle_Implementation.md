@@ -981,13 +981,123 @@ public class PlayerLifecycleController {
 
 ### 5.1 Sumsub Integration
 
+#### KycVerificationManager (Transaction Layer)
+
 ```java
+package net.lab1024.sa.business.module.player.manager;
+
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.module.player.dao.PlayerDao;
+import net.lab1024.sa.business.module.player.domain.entity.PlayerEntity;
+import net.lab1024.sa.business.module.player.domain.event.PlayerKycCompletedEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+
+/**
+ * KYC Verification Manager
+ *
+ * Responsibility: Handle KYC webhook processing with transaction coordination
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class KycVerificationManager {
+
+    private final PlayerDao playerDao;
+    private final ApplicationEventPublisher eventPublisher;
+
+    /**
+     * Handle Sumsub KYC webhook (transaction guaranteed)
+     *
+     * @param applicantId Sumsub applicant ID
+     * @param reviewStatus Review status (approved/rejected)
+     * @param rejectLabels Rejection reasons (if rejected)
+     * @return Try<Void> Success or failure
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public Try<Void> handleKycWebhook(
+        String applicantId,
+        String reviewStatus,
+        List<RejectLabel> rejectLabels
+    ) {
+        return Try.of(() -> {
+            playerDao.findBySumsubApplicantId(applicantId)
+                .forEach(player -> {
+                    if ("approved".equals(reviewStatus)) {
+                        String newLevel = player.getPendingKycLevel();
+                        player.setCurrentKycLevel(newLevel);
+                        player.setAccountStatus("ACTIVE");
+                        player.setKycVerifiedAt(LocalDateTime.now());
+
+                        playerDao.updateById(player);
+
+                        eventPublisher.publishEvent(new PlayerKycCompletedEvent(
+                            player.getPlayerId(),
+                            newLevel,
+                            LocalDateTime.now()
+                        ));
+
+                        log.info("KYC approved - playerId: {}, newLevel: {}",
+                            player.getPlayerId(), newLevel);
+
+                    } else if ("rejected".equals(reviewStatus)) {
+                        String rejectReason = rejectLabels.stream()
+                            .map(RejectLabel::getLabel)
+                            .collect(Collectors.joining(", "));
+
+                        player.setKycRejectReason(rejectReason);
+                        player.setKycRetryCount(player.getKycRetryCount() + 1);
+
+                        playerDao.updateById(player);
+
+                        if (player.getKycRetryCount() >= 3) {
+                            player.setAccountStatus("SUSPENDED");
+                            player.setSuspendedReason("KYC_FAILED_3_TIMES");
+                            playerDao.updateById(player);
+
+                            log.warn("Player suspended - KYC failed 3 times - playerId: {}",
+                                player.getPlayerId());
+                        }
+                    }
+                });
+
+            return null;
+        });
+    }
+}
+```
+
+#### KycVerificationService (Business Logic Layer)
+
+```java
+package net.lab1024.sa.business.module.player.service;
+
+import io.vavr.control.Option;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.module.player.dao.PlayerDao;
+import net.lab1024.sa.business.module.player.manager.KycVerificationManager;
+import org.springframework.stereotype.Service;
+
+/**
+ * KYC Verification Service
+ *
+ * Responsibility: Business logic processing (no transactions)
+ */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KycVerificationService {
+
     private final SumsubApiClient sumsubClient;
     private final PlayerDao playerDao;
-    private final ApplicationEventPublisher eventPublisher;
+    private final KycVerificationManager kycVerificationManager;
 
     /**
      * Create KYC verification session
@@ -1022,46 +1132,14 @@ public class KycVerificationService {
     }
 
     /**
-     * Webhook: Receive Sumsub review result
+     * Webhook: Receive Sumsub review result (delegates to Manager)
      */
-    @Transactional(rollbackFor = Throwable.class)
     public void handleKycWebhook(SumsubWebhookPayload webhookPayload) {
-        String applicantId = webhookPayload.getApplicantId();
-        String reviewStatus = webhookPayload.getReviewStatus();
-
-        playerDao.findBySumsubApplicantId(applicantId)
-            .forEach(player -> {
-                if ("approved".equals(reviewStatus)) {
-                    String newLevel = player.getPendingKycLevel();
-                    player.setCurrentKycLevel(newLevel);
-                    player.setAccountStatus("ACTIVE");
-                    player.setKycVerifiedAt(LocalDateTime.now());
-
-                    playerDao.updateById(player);
-
-                    eventPublisher.publishEvent(new PlayerKycCompletedEvent(
-                        player.getPlayerId(),
-                        newLevel,
-                        LocalDateTime.now()
-                    ));
-
-                } else if ("rejected".equals(reviewStatus)) {
-                    String rejectReason = webhookPayload.getRejectLabels().stream()
-                        .map(RejectLabel::getLabel)
-                        .collect(Collectors.joining(", "));
-
-                    player.setKycRejectReason(rejectReason);
-                    player.setKycRetryCount(player.getKycRetryCount() + 1);
-
-                    playerDao.updateById(player);
-
-                    if (player.getKycRetryCount() >= 3) {
-                        player.setAccountStatus("SUSPENDED");
-                        player.setSuspendedReason("KYC_FAILED_3_TIMES");
-                        playerDao.updateById(player);
-                    }
-                }
-            });
+        kycVerificationManager.handleKycWebhook(
+            webhookPayload.getApplicantId(),
+            webhookPayload.getReviewStatus(),
+            webhookPayload.getRejectLabels()
+        );
     }
 }
 ```
@@ -1206,13 +1284,67 @@ WHERE account_status = 'LOCKED'
 **Recovery Path 2: Password Reset Flow**
 
 ```java
+package net.lab1024.sa.business.module.player.manager;
+
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.module.player.dao.PlayerDao;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Password Reset Manager
+ *
+ * Responsibility: Handle password reset with account unlock (transaction coordination)
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class PasswordResetManager {
+
+    private final PlayerDao playerDao;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public Try<Void> resetPasswordAndUnlock(String email, String newPasswordHash) {
+        return playerDao.findByEmail(email)
+            .map(player -> {
+                player.setPasswordHash(newPasswordHash);
+
+                if ("LOCKED".equals(player.getAccountStatus())) {
+                    player.setAccountStatus("ACTIVE");
+                    player.setLockedUntil(null);
+                    player.setFailedLoginAttempts(0);
+                }
+
+                playerDao.updateById(player);
+                return null;
+            })
+            .toTry(() -> new PlayerNotFoundException("Player not found"));
+    }
+}
+```
+
+```java
+package net.lab1024.sa.business.module.player.service;
+
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.business.module.player.manager.PasswordResetManager;
+import org.springframework.stereotype.Service;
+
+/**
+ * Password Reset Service
+ *
+ * Responsibility: Business logic for password reset flow
+ */
 @Service
 @RequiredArgsConstructor
 public class PasswordResetService {
-    private final PlayerDao playerDao;
+
+    private final PasswordResetManager passwordResetManager;
     private final OtpService otpService;
 
-    @Transactional(rollbackFor = Throwable.class)
     public Try<Void> resetPasswordAndUnlock(String email, String otp, String newPassword) {
         return otpService.verifyOtp(email, otp)
             .flatMap(isValid -> {
@@ -1220,20 +1352,8 @@ public class PasswordResetService {
                     return Try.failure(new InvalidOtpException("OTP verification failed"));
                 }
 
-                return playerDao.findByEmail(email)
-                    .map(player -> {
-                        player.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-
-                        if ("LOCKED".equals(player.getAccountStatus())) {
-                            player.setAccountStatus("ACTIVE");
-                            player.setLockedUntil(null);
-                            player.setFailedLoginAttempts(0);
-                        }
-
-                        playerDao.updateById(player);
-                        return null;
-                    })
-                    .toTry(() -> new PlayerNotFoundException("Player not found"));
+                String passwordHash = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+                return passwordResetManager.resetPasswordAndUnlock(email, passwordHash);
             });
     }
 }
@@ -1242,9 +1362,28 @@ public class PasswordResetService {
 ### 7.2 SUSPENDED -> ACTIVE (Manual Review)
 
 ```java
-@Service
+package net.lab1024.sa.business.module.player.manager;
+
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.module.player.dao.AppealDao;
+import net.lab1024.sa.business.module.player.dao.PlayerDao;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+/**
+ * Appeal Manager
+ *
+ * Responsibility: Handle appeal approval with account status restoration (transaction coordination)
+ */
+@Slf4j
+@Component
 @RequiredArgsConstructor
 public class AppealManager {
+
     private final PlayerDao playerDao;
     private final AppealDao appealDao;
 
@@ -1264,6 +1403,10 @@ public class AppealManager {
                         player.setSuspendedAt(null);
                         player.setSuspendedReason(null);
                         playerDao.updateById(player);
+
+                        log.info("Appeal approved - playerId: {}, appealId: {}, reviewer: {}",
+                            player.getPlayerId(), appealId, reviewerUserId);
+
                         return null;
                     })
                     .toTry(() -> new PlayerNotFoundException("Player not found"));
