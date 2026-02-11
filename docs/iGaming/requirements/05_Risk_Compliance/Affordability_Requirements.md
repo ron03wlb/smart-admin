@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Architecture**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
+> **Related Doc**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---
@@ -178,16 +178,17 @@ If a player's existing assessment covers the required tier and has not expired, 
 
 ## 9. Acceptance Criteria
 
-- [ ] Annual net loss triggers apply correctly: GBP 125 (Basic), GBP 500 (Enhanced), GBP 2,000 (Full)
-- [ ] Monthly net deposit trigger fires at GBP 150 within rolling 30-day window
-- [ ] Enhanced tier requires self-declaration form with income, housing, household size, disposable income
-- [ ] Full tier integrates third-party verification (Open Banking, Credit Reference Agency)
-- [ ] Recommended limit calculation: 10% of disposable income, -20% for household >2, floor GBP 50, cap GBP 2,000
-- [ ] Assessment validity periods enforced: Enhanced = 3 months, Full = 6 months
-- [ ] Financial vulnerability indicators detected in real-time (chasing losses, deposit velocity, unusual patterns)
-- [ ] HIGH severity triggers full assessment + care message automatically
-- [ ] Monthly compliance reports include assessment statistics, vulnerability detection, limit enforcement
-- [ ] FAILED Full assessment applies forced limit with no player override
+The Affordability Assessment system must satisfy the following acceptance criteria:
+
+- [ ] **Trigger Detection**: Annual net loss (GBP 125/500/2,000) and monthly net deposit (GBP 150) triggers are detected within 30 minutes of transaction settlement
+- [ ] **Tiered Assessment Execution**: Basic (warning message), Enhanced (self-declaration form), and Full (third-party verification) assessments execute correctly based on trigger tier
+- [ ] **Self-Declaration Collection**: Enhanced tier players submit income, housing status, household size, and disposable income with validation ensuring data completeness
+- [ ] **Third-Party Integration**: Full tier assessments query Open Banking APIs, Credit Reference Agencies (Experian/Equifax), and public records with <5 second P99 latency
+- [ ] **Limit Calculation**: System calculates monthly spending limits using 5% disposable income (basic), 10% (enhanced), or third-party verified data (full) with override approval workflow
+- [ ] **Limit Enforcement**: Deposit and bet placement operations are blocked in real-time when player exceeds affordability-derived limit
+- [ ] **Assessment Validity**: Enhanced (3 months) and Full (6 months) assessments do not re-trigger within validity period unless player exceeds new tier
+- [ ] **Vulnerability Detection**: Real-time monitoring flags deposit velocity (3+ deposits in 2 hours), extreme loss (50% deposit lost), and rapid progression (deposit increase >200% month-over-month)
+- [ ] **Compliance Reporting**: Monthly reports include assessment trigger rates, pass rates, average recommended limits, and vulnerability detection counts with ≤1% data discrepancy
 
 ---
 
