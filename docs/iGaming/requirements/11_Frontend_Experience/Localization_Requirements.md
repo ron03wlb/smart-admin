@@ -1,4 +1,4 @@
-# Localization Requirements
+# 在地化需求（Localization Requirements）
 
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-07](../../source-archive/11_Frontend_CMS/11-07_i18n_Localization.md), [11-08](../../source-archive/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md), [11-09](../../source-archive/11_Frontend_CMS/11-09_Localization_Workflow.md), [11-10](../../source-archive/11_Frontend_CMS/11-10_Localization_API.md)
 > **View Type**: Business Requirements
@@ -8,207 +8,207 @@
 
 ---
 
-## Business Value
+## 商業價值（Business Value）
 
-This localization system delivers critical value by:
-- **Market Expansion**: Enables entry into 20+ language markets without rebuilding infrastructure (supports P0 markets: Global English, Taiwan/Hong Kong Traditional Chinese, China/Singapore Simplified Chinese)
-- **Player Retention**: Reduces bounce rates by 40-60% through native-language experiences across all touchpoints (games, banners, notifications, FAQs)
-- **Operational Efficiency**: Translation workflow automation reduces time-to-market by 70% through Crowdin integration, batch import/export (JSON/CSV/XLIFF), and role-based lifecycle management (Draft → Review → Approved → Published)
-- **Revenue Protection**: RTL language support (Arabic, Hebrew) unlocks Middle East markets with proper layout mirroring and cultural adaptation
-- **Quality Assurance**: Zero missing keys through automated detection, 100% translation coverage tracking, and API response time < 50ms (P99) with > 95% cache hit rate
-
----
-
-## 1. Multi-Language Support Requirements
-
-### 1.1 Supported Languages
-
-| Language Code | Language | Market | RTL | Priority |
-|--------------|----------|--------|-----|----------|
-| `en` | English | Global | No | P0 |
-| `zh-TW` | Traditional Chinese | Taiwan, Hong Kong | No | P0 |
-| `zh-CN` | Simplified Chinese | China, Singapore | No | P0 |
-| `th` | Thai | Thailand | No | P1 |
-| `vi` | Vietnamese | Vietnam | No | P1 |
-| `id` | Bahasa Indonesia | Indonesia | No | P1 |
-| `pt-BR` | Portuguese | Brazil | No | P1 |
-| `ar` | Arabic | Middle East | Yes | P2 |
-| `he` | Hebrew | Israel | Yes | P2 |
-
-### 1.2 Core Principle
-
-All user-facing text must use Translation Keys. Hardcoded strings are strictly prohibited.
-
-**Namespace Convention**: `module.component.key`
-- Example: `common.button.submit`, `game.slot.freespin_won`, `error.wallet.insufficient`
-
-### 1.3 Scale Expectations
-
-| Metric | Expected Value |
-|--------|---------------|
-| Supported languages | 20 |
-| Total translation keys | 5,000 - 10,000 |
-| File size per language | ~500 KB |
-| Peak API throughput | 5,000 req/s |
+此在地化系統提供以下關鍵價值：
+- **市場擴展**：支援 20+ 語言市場而無需重建基礎設施（支援 P0 市場：全球英語、台灣/香港繁體中文、中國/新加坡簡體中文）
+- **玩家留存**：透過所有接觸點（遊戲、橫幅、通知、FAQ）的母語體驗，將跳出率降低 40-60%
+- **營運效率**：透過 Crowdin 整合、批次匯入/匯出（JSON/CSV/XLIFF）以及基於角色的生命週期管理（草稿 → 審核 → 已核准 → 已發布），翻譯工作流程自動化可將上市時間縮短 70%
+- **營收保護**：RTL 語言支援（阿拉伯語、希伯來語）透過適當的版面鏡像和文化適應，開啟中東市場
+- **品質保證**：透過自動偵測、100% 翻譯覆蓋率追蹤以及 API 回應時間 < 50ms（P99）配合 > 95% 快取命中率，確保零遺漏鍵值
 
 ---
 
-## 2. Regional Format Standards
+## 1. 多語言支援需求
 
-Beyond text translation, the platform must handle format differences:
+### 1.1 支援的語言
 
-| Category | Item | US Format | Vietnam Format | India Format |
-|----------|------|-----------|----------------|--------------|
-| **Currency** | Symbol & position | $100.00 | 100.000 VND | Rs.100.00 |
-| **Numbers** | Thousands/decimal | 1,234.56 | 1.234,56 | 1,234.56 |
-| **Date** | Format | MM/DD/YYYY | DD/MM/YYYY | DD/MM/YYYY |
-| **Timezone** | Default display | UTC-4 | UTC+7 | UTC+5.5 |
+| Language Code | 語言 | 市場 | RTL | 優先級 |
+|--------------|------|------|-----|--------|
+| `en` | 英語 | 全球 | 否 | P0 |
+| `zh-TW` | 繁體中文 | 台灣、香港 | 否 | P0 |
+| `zh-CN` | 簡體中文 | 中國、新加坡 | 否 | P0 |
+| `th` | 泰語 | 泰國 | 否 | P1 |
+| `vi` | 越南語 | 越南 | 否 | P1 |
+| `id` | 印尼語 | 印尼 | 否 | P1 |
+| `pt-BR` | 葡萄牙語 | 巴西 | 否 | P1 |
+| `ar` | 阿拉伯語 | 中東 | 是 | P2 |
+| `he` | 希伯來語 | 以色列 | 是 | P2 |
 
-**Mandatory**: Use standard internationalization libraries (Intl API, dayjs). Custom regex for formatting is strictly prohibited.
+### 1.2 核心原則
 
----
+所有面向使用者的文字必須使用翻譯鍵值（Translation Keys）。嚴格禁止硬編碼字串。
 
-## 3. RTL Language Support
+**命名空間慣例**：`module.component.key`
+- 範例：`common.button.submit`、`game.slot.freespin_won`、`error.wallet.insufficient`
 
-### 3.1 RTL Requirements
+### 1.3 規模預期
 
-When supporting Arabic or Hebrew markets:
-- Navigation bar direction reversal (right-to-left)
-- Form field order reversal
-- Icon mirroring (back arrow flips direction)
-- Numbers and English text remain LTR
-- Scrollbar position adjustment
-
-### 3.2 RTL Testing Checklist
-
-- Navigation direction correct
-- Form fields reordered
-- Icons properly mirrored
-- Numbers maintain LTR
-- Scrollbar adjusted
+| 指標 | 預期值 |
+|------|--------|
+| 支援語言數 | 20 |
+| 翻譯鍵值總數 | 5,000 - 10,000 |
+| 每語言檔案大小 | ~500 KB |
+| 尖峰 API 吞吐量 | 5,000 req/s |
 
 ---
 
-## 4. Dynamic Content Localization
+## 2. 地區格式標準
 
-### 4.1 Content Types Requiring Localization
+除了文字翻譯外，平台必須處理格式差異：
 
-| Content Type | Fields | Example |
-|-------------|--------|---------|
-| Games | name, description, rules | Game names, gameplay instructions |
-| Banners | title, subtitle, cta_text | Banner titles, call-to-action text |
-| Notifications | title, body | In-site notification content |
-| FAQs | question, answer | Frequently asked questions |
-| VIP Tiers | tier_name, benefits | VIP level names and perks |
-| Payment Methods | display_name, instructions | Payment method names and guides |
+| 類別 | 項目 | 美國格式 | 越南格式 | 印度格式 |
+|------|------|----------|----------|----------|
+| **貨幣** | 符號與位置 | $100.00 | 100.000 VND | Rs.100.00 |
+| **數字** | 千分位/小數點 | 1,234.56 | 1.234,56 | 1,234.56 |
+| **日期** | 格式 | MM/DD/YYYY | DD/MM/YYYY | DD/MM/YYYY |
+| **時區** | 預設顯示 | UTC-4 | UTC+7 | UTC+5.5 |
 
-### 4.2 Language Fallback Priority
-
-1. User preference language (from profile)
-2. Browser Accept-Language header
-3. GeoIP detected language
-4. Platform default language (English)
-
-### 4.3 API Response Modes
-
-- **Single-language response** (for mobile apps): Return only the user's language
-- **Multi-language response** (for CMS backend): Return all language versions for editing
-
-### 4.4 Translation Completeness Tracking
-
-The CMS must show translation completeness dashboards per content type and language, highlighting missing translations.
+**強制要求**：使用標準國際化函式庫（Intl API、dayjs）。嚴格禁止使用自訂正規表示式進行格式化。
 
 ---
 
-## 5. Translation Workflow Requirements
+## 3. RTL 語言支援
 
-### 5.1 Missing Key Detection
+### 3.1 RTL 需求
 
-When the frontend attempts to display a missing translation key, the system must automatically report it to the backend for tracking and resolution.
+支援阿拉伯語或希伯來語市場時：
+- 導覽列方向反轉（由右至左）
+- 表單欄位順序反轉
+- 圖示鏡像（返回箭頭翻轉方向）
+- 數字和英文文字保持 LTR
+- 捲軸位置調整
 
-### 5.2 Translation Lifecycle
+### 3.2 RTL 測試檢查清單
 
-| State | Description | Allowed Actions |
-|-------|-------------|-----------------|
-| **Draft** | Translator is editing | Edit, Submit for review |
-| **In Review** | Awaiting reviewer approval | Approve, Reject, Flag |
-| **Approved** | Approved, pending publish | Publish |
-| **Published** | Live on CDN, visible to players | Archive |
-| **Flagged** | Issue found, needs correction | Edit, Resubmit |
-| **Archived** | Deprecated, no longer in use | Delete |
-
-### 5.3 Role-Based Access
-
-| Role | Permissions | Responsibilities |
-|------|------------|-----------------|
-| Translator | Edit draft, submit for review | Translate content |
-| Reviewer | Approve/reject submissions | Ensure quality |
-| Publisher | Publish approved translations to CDN | Release management |
-| Admin | All operations | System administration |
-
-### 5.4 Batch Import/Export
-
-- Support JSON, CSV, and XLIFF export formats
-- Support bulk import with upsert or overwrite modes
-- CSV format compatible with Excel and third-party translation tools
-- XLIFF format compatible with CAT (Computer-Assisted Translation) tools
-
-### 5.5 Crowdin Integration
-
-- Push missing translation tasks to Crowdin platform
-- Receive Webhook notifications when translations are completed
-- Auto-import completed translations
-- Scheduled sync jobs for regular synchronization
+- 導覽方向正確
+- 表單欄位重新排序
+- 圖示正確鏡像
+- 數字保持 LTR
+- 捲軸已調整
 
 ---
 
-## 6. Image and Media Localization
+## 4. 動態內容在地化
 
-### 6.1 Localized Image Naming
+### 4.1 需要在地化的內容類型
 
-File naming format: `{resource_name}_{lang}.{ext}`
+| 內容類型 | 欄位 | 範例 |
+|----------|------|------|
+| 遊戲 | name, description, rules | 遊戲名稱、遊戲說明 |
+| 橫幅 | title, subtitle, cta_text | 橫幅標題、行動呼籲文字 |
+| 通知 | title, body | 站內通知內容 |
+| FAQ | question, answer | 常見問題 |
+| VIP 等級 | tier_name, benefits | VIP 等級名稱和福利 |
+| 支付方式 | display_name, instructions | 支付方式名稱和指南 |
 
-Example: `new_year_promo_en.jpg`, `new_year_promo_zh-TW.jpg`, `new_year_promo_th.jpg`
+### 4.2 語言回退優先順序
 
-### 6.2 Best Practices
+1. 使用者偏好語言（來自個人資料）
+2. 瀏覽器 Accept-Language 標頭
+3. GeoIP 偵測語言
+4. 平台預設語言（英語）
 
-- Use pure graphic backgrounds with CSS/HTML text overlays (translatable)
-- Avoid embedding text directly in images (cannot be translated)
-- QA process should use OCR to detect hardcoded text in images
+### 4.3 API 回應模式
 
----
+- **單語言回應**（適用於行動應用程式）：僅返回使用者的語言
+- **多語言回應**（適用於 CMS 後台）：返回所有語言版本以供編輯
 
-## 7. SLA Requirements
+### 4.4 翻譯完整度追蹤
 
-| Metric | Target | Alert Threshold |
-|--------|--------|-----------------|
-| API Response Time (P99) | < 50ms | > 200ms |
-| Cache Hit Rate | > 95% | < 85% |
-| Translation Coverage | 100% | < 95% |
-| Missing Key Rate | 0% | > 1% |
-
----
-
-## 8. Implementation Roadmap
-
-| Phase | Duration | Scope |
-|-------|----------|-------|
-| Phase 1 | Week 1-2 | Database, API, frontend i18n integration |
-| Phase 2 | Week 3-4 | Translation management UI, batch upload, online editor |
-| Phase 3 | Week 5-6 | Translation state machine, RBAC, Crowdin integration |
-| Phase 4 | Week 7-8 | CDN distribution, RTL support, monitoring |
-
-**Total estimated effort**: 6-8 weeks
+CMS 必須顯示每種內容類型和語言的翻譯完整度儀表板，突出顯示缺失的翻譯。
 
 ---
 
-## 9. Acceptance Criteria
+## 5. 翻譯工作流程需求
 
-1. All user-facing text uses translation keys (zero hardcoded strings)
-2. Language fallback chain works correctly across all scenarios
-3. RTL languages render correctly with proper layout mirroring
-4. Dynamic content (banners, promotions, games) supports multi-language editing
-5. Translation workflow supports draft -> review -> approve -> publish lifecycle
-6. Batch import/export works in JSON, CSV, and XLIFF formats
-7. Missing keys are automatically detected, reported, and tracked
-8. API response time < 50ms at P99, cache hit rate > 95%
+### 5.1 缺失鍵值偵測
+
+當前端嘗試顯示缺失的翻譯鍵值時，系統必須自動向後端報告以進行追蹤和解決。
+
+### 5.2 翻譯生命週期
+
+| 狀態 | 說明 | 允許的操作 |
+|------|------|------------|
+| **草稿（Draft）** | 翻譯人員正在編輯 | 編輯、提交審核 |
+| **審核中（In Review）** | 等待審核者核准 | 核准、拒絕、標記 |
+| **已核准（Approved）** | 已核准，待發布 | 發布 |
+| **已發布（Published）** | 已上線至 CDN，玩家可見 | 歸檔 |
+| **已標記（Flagged）** | 發現問題，需要修正 | 編輯、重新提交 |
+| **已歸檔（Archived）** | 已棄用，不再使用 | 刪除 |
+
+### 5.3 基於角色的存取控制
+
+| 角色 | 權限 | 職責 |
+|------|------|------|
+| 翻譯人員（Translator） | 編輯草稿、提交審核 | 翻譯內容 |
+| 審核者（Reviewer） | 核准/拒絕提交 | 確保品質 |
+| 發布者（Publisher） | 將已核准的翻譯發布至 CDN | 發布管理 |
+| 管理員（Admin） | 所有操作 | 系統管理 |
+
+### 5.4 批次匯入/匯出
+
+- 支援 JSON、CSV 和 XLIFF 匯出格式
+- 支援 upsert 或 overwrite 模式的批次匯入
+- CSV 格式與 Excel 和第三方翻譯工具相容
+- XLIFF 格式與 CAT（電腦輔助翻譯）工具相容
+
+### 5.5 Crowdin 整合
+
+- 將缺失的翻譯任務推送至 Crowdin 平台
+- 當翻譯完成時接收 Webhook 通知
+- 自動匯入已完成的翻譯
+- 定期同步作業進行常規同步
+
+---
+
+## 6. 圖片和媒體在地化
+
+### 6.1 在地化圖片命名
+
+檔案命名格式：`{resource_name}_{lang}.{ext}`
+
+範例：`new_year_promo_en.jpg`、`new_year_promo_zh-TW.jpg`、`new_year_promo_th.jpg`
+
+### 6.2 最佳實踐
+
+- 使用純圖形背景配合 CSS/HTML 文字覆蓋層（可翻譯）
+- 避免將文字直接嵌入圖片（無法翻譯）
+- QA 流程應使用 OCR 偵測圖片中的硬編碼文字
+
+---
+
+## 7. SLA 需求
+
+| 指標 | 目標 | 告警閾值 |
+|------|------|----------|
+| API 回應時間（P99） | < 50ms | > 200ms |
+| 快取命中率 | > 95% | < 85% |
+| 翻譯覆蓋率 | 100% | < 95% |
+| 缺失鍵值率 | 0% | > 1% |
+
+---
+
+## 8. 實施路線圖
+
+| 階段 | 期間 | 範圍 |
+|------|------|------|
+| Phase 1 | 第 1-2 週 | 資料庫、API、前端 i18n 整合 |
+| Phase 2 | 第 3-4 週 | 翻譯管理 UI、批次上傳、線上編輯器 |
+| Phase 3 | 第 5-6 週 | 翻譯狀態機、RBAC、Crowdin 整合 |
+| Phase 4 | 第 7-8 週 | CDN 分發、RTL 支援、監控 |
+
+**總預估工作量**：6-8 週
+
+---
+
+## 9. 驗收標準（Acceptance Criteria）
+
+1. 所有面向使用者的文字使用翻譯鍵值（零硬編碼字串）
+2. 語言回退鏈在所有場景中正常運作
+3. RTL 語言正確渲染，具備適當的版面鏡像
+4. 動態內容（橫幅、促銷、遊戲）支援多語言編輯
+5. 翻譯工作流程支援草稿 → 審核 → 核准 → 發布生命週期
+6. 批次匯入/匯出在 JSON、CSV 和 XLIFF 格式下運作
+7. 缺失鍵值自動偵測、報告和追蹤
+8. API 回應時間 < 50ms（P99），快取命中率 > 95%

@@ -1,4 +1,4 @@
-# Data Protection Requirements
+# 資料保護需求（Data Protection Requirements）
 
 > **Canonical Source**: [source-archive/12_System_Security/12-03](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md), [12-03-03](../../source-archive/12_System_Security/12-03-03_GDPR_Data_Deletion.md)
 > **View Type**: Business Requirements
@@ -8,177 +8,177 @@
 
 ---
 
-## Business Value
+## 商業價值（Business Value）
 
-This data protection framework delivers critical value by:
-- **Multi-Jurisdiction Compliance**: Unified implementation for GDPR (EU/EEA), PCI-DSS (Global), CCPA (California), PDPA (Thailand), and LGPD (Brazil) eliminates need for region-specific architectures, reducing compliance infrastructure costs by 70%
-- **Breach Impact Mitigation**: Application-layer encryption with searchable blind indexes protects against database breaches — even if database and backups are compromised, PII remains encrypted (estimated breach cost reduction: $4.5M per incident based on IBM 2023 data)
-- **Regulatory Fine Avoidance**: GDPR right to erasure with 37-day workflow (7-day confirmation + 30-day cooling period) and crypto-shredding prevents non-compliance fines up to €20M or 4% of global turnover
-- **Operational Efficiency**: Role-based data masking (CS Agent: masked, Risk Control: approved plaintext, DBA: ciphertext-only) reduces insider threat risk by 85% while maintaining necessary operational access
-- **Legal Protection**: Tombstone records and deletion certificates provide audit trails for regulatory reports and dispute resolution, protecting against legal liability and DPA investigations
-
----
-
-## 1. Regulatory Framework
-
-The platform must comply with the following data protection regulations:
-
-| Regulation | Scope | Key Requirements |
-|-----------|-------|-----------------|
-| **GDPR** | EU/EEA | Data minimization, encryption, right to erasure, data portability |
-| **PCI-DSS** | Global (payment) | No full card storage, encryption of bank accounts, password hashing |
-| **CCPA** | California, USA | Right to know, right to delete, right to opt-out |
-| **PDPA** | Thailand | Consent-based processing, data breach notification |
-| **LGPD** | Brazil | Similar to GDPR, data protection officer required |
+此資料保護框架提供以下關鍵價值：
+- **多司法管轄區合規**：GDPR（EU/EEA）、PCI-DSS（全球）、CCPA（加州）、PDPA（泰國）和 LGPD（巴西）的統一實施，消除區域特定架構需求，將合規基礎設施成本降低 70%
+- **資料外洩影響緩解**：應用層加密配合可搜尋盲索引，防範資料庫外洩 — 即使資料庫和備份被攻破，PII 仍保持加密（根據 IBM 2023 資料，預估每次外洩成本降低：$4.5M）
+- **監管罰款規避**：GDPR 刪除權配合 37 天工作流程（7 天確認 + 30 天冷卻期）和加密粉碎，防止高達 €20M 或全球營業額 4% 的不合規罰款
+- **營運效率**：基於角色的資料遮罩（客服人員：遮罩、風險控制：經核准明文、DBA：僅密文）將內部威脅風險降低 85%，同時維持必要的營運存取
+- **法律保護**：墓碑記錄和刪除證明為監管報告和爭議解決提供審計追蹤，防範法律責任和 DPA 調查
 
 ---
 
-## 2. PII Classification
+## 1. 監管框架
 
-### 2.1 Sensitivity Levels
+平台必須符合以下資料保護法規：
 
-| PII Field | Example | Risk Level | Protection Requirement |
-|-----------|---------|------------|----------------------|
-| Name | "John Doe" | High | Encrypted at rest |
-| Phone | "+886912345678" | Very High | Encrypted + searchable index |
-| Email | "player@example.com" | Very High | Encrypted + searchable index |
-| Bank Account | "1234567890" | Very High | Encrypted + searchable index |
-| ID Number | "A123456789" | Very High | Encrypted + searchable index |
-| Password | "P@ssw0rd123" | Very High | One-way hash only (irreversible) |
-| Address | "Taipei City..." | Medium | Encrypted at rest |
-| IP Address | "1.2.3.4" | Medium | Hashed for indexing |
-
-### 2.2 Core Principles
-
-- **Zero Trust**: Assume database, backups, and logs may all be compromised; PII must be encrypted
-- **Application-Layer Encryption**: Data encrypted before writing to database; DBAs cannot view plaintext
-- **Searchable Encryption**: Encrypted data queryable via blind index
-- **Crypto-Shredding**: Key destruction renders data permanently unrecoverable (GDPR compliant)
+| 法規 | 範圍 | 關鍵需求 |
+|------|------|----------|
+| **GDPR** | EU/EEA | 資料最小化、加密、刪除權、資料可攜權 |
+| **PCI-DSS** | 全球（支付） | 禁止儲存完整卡號、銀行帳號加密、密碼雜湊 |
+| **CCPA** | 加州，美國 | 知情權、刪除權、退出權 |
+| **PDPA** | 泰國 | 同意處理、資料外洩通知 |
+| **LGPD** | 巴西 | 類似 GDPR，需要資料保護長 |
 
 ---
 
-## 3. Data Masking Requirements
+## 2. PII 分類
 
-### 3.1 Masking Rules
+### 2.1 敏感等級
 
-| PII Field | Masking Rule | Example |
-|-----------|-------------|---------|
-| Name | Keep first and last character | `David Beckham` -> `D***m` |
-| Phone | Keep first 3 and last 3 | `0912345678` -> `091****678` |
-| Email | Keep first 2 and domain | `david@gmail.com` -> `da***@gmail.com` |
-| Bank Account | Keep last 4 digits | `1234567890` -> `******7890` |
+| PII 欄位 | 範例 | 風險等級 | 保護需求 |
+|----------|------|----------|----------|
+| 姓名 | "John Doe" | 高 | 靜態加密 |
+| 電話 | "+886912345678" | 極高 | 加密 + 可搜尋索引 |
+| 電子郵件 | "player@example.com" | 極高 | 加密 + 可搜尋索引 |
+| 銀行帳號 | "1234567890" | 極高 | 加密 + 可搜尋索引 |
+| 身分證號 | "A123456789" | 極高 | 加密 + 可搜尋索引 |
+| 密碼 | "P@ssw0rd123" | 極高 | 僅單向雜湊（不可逆） |
+| 地址 | "台北市..." | 中 | 靜態加密 |
+| IP 位址 | "1.2.3.4" | 中 | 雜湊用於索引 |
 
-### 3.2 Role-Based Masking
+### 2.2 核心原則
 
-| Role | Phone | Email | Bank Account |
-|------|-------|-------|-------------|
-| Player (self) | Plaintext (with 2FA) | Plaintext | Last 4 digits only |
-| CS Agent (L1) | Masked | Masked | No access |
-| Risk Control | Plaintext (with approval) | Plaintext (with approval) | Plaintext (with approval) |
-| DBA | Ciphertext (cannot decrypt) | Ciphertext (cannot decrypt) | Ciphertext (cannot decrypt) |
-
----
-
-## 4. GDPR Right to Erasure
-
-### 4.1 Deletion Workflow
-
-1. Player submits deletion request (via account settings, CS, or legal team)
-2. Confirmation email sent (valid for 7 days)
-3. Player confirms -> Enter cooling period (30 days)
-4. Cooling period ends -> Execute crypto-shredding
-5. Deletion certificate sent to player
-
-### 4.2 Data Retention Matrix
-
-| Data Category | GDPR Deletion Obligation | Retention Period | Treatment |
-|--------------|-------------------------|-----------------|-----------|
-| Player name, address | Yes | None | Physical delete |
-| Game history | Yes (anonymize) | None | Replace player_id with UUID |
-| Transaction records (AML) | No (legal obligation) | 5-7 years | Retain with anonymized player_id |
-| Winning records (Tax) | No (legal obligation) | 7 years | Retain with anonymized player_id |
-| Violation records (Ban) | No (legitimate interest) | Permanent | Retain for fraud prevention |
-
-### 4.3 Deletion Exceptions (Suspension Conditions)
-
-| Scenario | Reason | Resolution Condition | Max Retention |
-|----------|--------|---------------------|---------------|
-| Under investigation | AML/Fraud investigation | Investigation closed | 1 year |
-| Pending litigation | Legal case pending | Case resolved | 10 years |
-| Pending wagering | Wagering requirement incomplete | Completed or forfeited | 90 days |
-| Outstanding balance | Balance > $0 | Balance zeroed | Indefinite (notify player) |
-| Tax audit | Tax audit period | Audit concluded | 7 years |
-
-### 4.4 Cooling Period Rules
-
-- Player can recover account within 30-day cooling period
-- All functionality restricted during cooling period (no login)
-- Reminder notifications sent at Day 7, Day 21, and Day 29
-- After 30 days, irreversible crypto-shredding is executed
-
-### 4.5 Tombstone Records
-
-After deletion, minimal tombstone records must be retained for:
-- Preventing re-registration with same credentials (anti-abuse)
-- Audit trail proving GDPR request was processed
-- Monthly deletion statistics for regulatory reports
-- Legal protection if player later disputes the deletion
+- **零信任**：假設資料庫、備份和日誌都可能被攻破；PII 必須加密
+- **應用層加密**：資料在寫入資料庫前加密；DBA 無法查看明文
+- **可搜尋加密**：透過盲索引查詢加密資料
+- **加密粉碎**：金鑰銷毀使資料永久無法恢復（符合 GDPR）
 
 ---
 
-## 5. Password Security Requirements
+## 3. 資料遮罩需求
 
-### 5.1 Password Complexity
+### 3.1 遮罩規則
 
-- Minimum 8 characters
-- At least 1 uppercase letter, 1 lowercase letter, 1 digit, 1 special character
+| PII 欄位 | 遮罩規則 | 範例 |
+|----------|----------|------|
+| 姓名 | 保留首尾字元 | `David Beckham` -> `D***m` |
+| 電話 | 保留前 3 和後 3 | `0912345678` -> `091****678` |
+| 電子郵件 | 保留前 2 和網域 | `david@gmail.com` -> `da***@gmail.com` |
+| 銀行帳號 | 保留後 4 位數 | `1234567890` -> `******7890` |
 
-### 5.2 Login Protection
+### 3.2 基於角色的遮罩
 
-- Limited retry attempts to prevent brute force attacks
-- Account lockout after repeated failures
-- Progressive delay between attempts
-
----
-
-## 6. Transport Security Requirements
-
-- All API communication must use HTTPS (TLS 1.3+ preferred, TLS 1.2 minimum)
-- HTTP plaintext transmission is strictly prohibited
-- Automatic HTTP -> HTTPS redirect
-- HSTS header must be enabled
-- Internal microservice communication must use mTLS or service mesh encryption
+| 角色 | 電話 | 電子郵件 | 銀行帳號 |
+|------|------|----------|----------|
+| 玩家（本人） | 明文（配合 2FA） | 明文 | 僅後 4 位數 |
+| 客服人員（L1） | 遮罩 | 遮罩 | 無存取權限 |
+| 風險控制 | 明文（經核准） | 明文（經核准） | 明文（經核准） |
+| DBA | 密文（無法解密） | 密文（無法解密） | 密文（無法解密） |
 
 ---
 
-## 7. Compliance Monitoring
+## 4. GDPR 刪除權
 
-### 7.1 GDPR Compliance Checklist
+### 4.1 刪除工作流程
 
-| Requirement | Implementation |
-|------------|---------------|
-| Data minimization | Collect only necessary PII |
-| Storage encryption | Application-layer encryption |
-| Transport encryption | TLS 1.3 |
-| Right to erasure | Crypto-shredding |
-| Right to portability | JSON data export |
-| Audit logging | All PII access logged |
+1. 玩家提交刪除請求（透過帳戶設定、客服或法務團隊）
+2. 發送確認電子郵件（有效期 7 天）
+3. 玩家確認 → 進入冷卻期（30 天）
+4. 冷卻期結束 → 執行加密粉碎
+5. 刪除證明發送給玩家
 
-### 7.2 Regulatory Reporting
+### 4.2 資料保留矩陣
 
-- Monthly deletion statistics report for DPA (Data Protection Authority)
-- Annual compliance audit report
-- Breach notification within 72 hours of detection
+| 資料類別 | GDPR 刪除義務 | 保留期間 | 處理方式 |
+|----------|--------------|----------|----------|
+| 玩家姓名、地址 | 是 | 無 | 實體刪除 |
+| 遊戲歷史 | 是（匿名化） | 無 | 以 UUID 取代 player_id |
+| 交易記錄（AML） | 否（法律義務） | 5-7 年 | 以匿名化 player_id 保留 |
+| 獲勝記錄（稅務） | 否（法律義務） | 7 年 | 以匿名化 player_id 保留 |
+| 違規記錄（禁令） | 否（合法利益） | 永久 | 保留用於防詐 |
+
+### 4.3 刪除例外（暫停條件）
+
+| 情境 | 原因 | 解決條件 | 最長保留 |
+|------|------|----------|----------|
+| 調查中 | AML/詐騙調查 | 調查結束 | 1 年 |
+| 待訴訟 | 法律案件待決 | 案件解決 | 10 年 |
+| 待流水 | 流水需求未完成 | 完成或沒收 | 90 天 |
+| 餘額未清 | 餘額 > $0 | 餘額歸零 | 無限期（通知玩家） |
+| 稅務審計 | 稅務審計期間 | 審計結束 | 7 年 |
+
+### 4.4 冷卻期規則
+
+- 玩家可在 30 天冷卻期內恢復帳戶
+- 冷卻期間限制所有功能（無法登入）
+- 在第 7、21 和 29 天發送提醒通知
+- 30 天後，執行不可逆的加密粉碎
+
+### 4.5 墓碑記錄
+
+刪除後，必須保留最小墓碑記錄用於：
+- 防止使用相同憑證重新註冊（反濫用）
+- 審計追蹤證明 GDPR 請求已處理
+- 監管報告的每月刪除統計
+- 法律保護，如果玩家後續對刪除提出爭議
 
 ---
 
-## 8. Acceptance Criteria
+## 5. 密碼安全需求
 
-1. All PII fields are encrypted at application layer before database storage
-2. Data masking correctly applied based on user role
-3. GDPR deletion workflow completes within 37 days (7 confirmation + 30 cooling)
-4. Crypto-shredding makes deleted data unrecoverable even from backups
-5. Deletion exceptions correctly block erasure for investigation/litigation/wagering scenarios
-6. Deletion certificates auto-generated and sent to players
-7. All API communication uses TLS 1.2+ with HSTS enabled
-8. Password policy enforces complexity requirements
+### 5.1 密碼複雜度
+
+- 最少 8 個字元
+- 至少 1 個大寫字母、1 個小寫字母、1 個數字、1 個特殊字元
+
+### 5.2 登入保護
+
+- 限制重試次數以防止暴力破解攻擊
+- 重複失敗後鎖定帳戶
+- 嘗試之間漸進式延遲
+
+---
+
+## 6. 傳輸安全需求
+
+- 所有 API 通訊必須使用 HTTPS（首選 TLS 1.3+，最低 TLS 1.2）
+- 嚴格禁止 HTTP 明文傳輸
+- 自動 HTTP -> HTTPS 重定向
+- 必須啟用 HSTS 標頭
+- 內部微服務通訊必須使用 mTLS 或服務網格加密
+
+---
+
+## 7. 合規監控
+
+### 7.1 GDPR 合規檢查清單
+
+| 需求 | 實施 |
+|------|------|
+| 資料最小化 | 僅收集必要的 PII |
+| 儲存加密 | 應用層加密 |
+| 傳輸加密 | TLS 1.3 |
+| 刪除權 | 加密粉碎 |
+| 可攜權 | JSON 資料匯出 |
+| 審計日誌 | 所有 PII 存取已記錄 |
+
+### 7.2 監管報告
+
+- DPA（資料保護機關）的每月刪除統計報告
+- 年度合規審計報告
+- 偵測到外洩後 72 小時內通知
+
+---
+
+## 8. 驗收標準（Acceptance Criteria）
+
+1. 所有 PII 欄位在資料庫儲存前於應用層加密
+2. 根據使用者角色正確套用資料遮罩
+3. GDPR 刪除工作流程在 37 天內完成（7 天確認 + 30 天冷卻）
+4. 加密粉碎使已刪除的資料即使從備份也無法恢復
+5. 刪除例外正確封鎖調查/訴訟/流水情境的刪除
+6. 刪除證明自動生成並發送給玩家
+7. 所有 API 通訊使用 TLS 1.2+ 並啟用 HSTS
+8. 密碼政策強制執行複雜度需求

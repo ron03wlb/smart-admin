@@ -1,4 +1,4 @@
-# SEO & Performance Requirements
+# SEO 與效能需求（SEO & Performance Requirements）
 
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-03](../../source-archive/11_Frontend_CMS/11-03_SEO_and_Performance.md)
 > **View Type**: Business Requirements
@@ -8,118 +8,118 @@
 
 ---
 
-## Business Value
+## 商業價值（Business Value）
 
-This SEO and performance optimization strategy delivers critical value by:
-- **Organic Traffic Growth**: SEO-friendly URLs for 3000+ games (`/games/{provider}/{game-slug}`) enable effective search engine indexing, reducing cost-per-acquisition by 40-60% compared to paid channels
-- **Operational Efficiency**: Automated meta template engine eliminates manual meta tag maintenance for 3000+ games, reducing content management overhead by 95%
-- **User Retention**: Core Web Vitals compliance (LCP < 2.5s, FID < 100ms, CLS < 0.1) improves bounce rate by 25-35%, directly impacting first-time deposit conversion
-- **International Expansion**: Multi-language SEO with hreflang tags prevents duplicate content penalties and enables ranking in 20+ language markets without canonical conflicts
-- **Quality Assurance**: Lighthouse CI integration on every pull request prevents performance regressions, maintaining Lighthouse score >= 90 with automated budget enforcement
-
----
-
-## 1. SEO Requirements
-
-### 1.1 Organic Traffic Optimization
-
-The iGaming industry is highly dependent on organic traffic. The platform must maximize SEO effectiveness to ensure thousands of slot/game pages are effectively indexed by search engines.
-
-**Business Goals**:
-- Every game must have its own unique, static, SEO-friendly URL
-- URL structure: `/games/{provider}/{game-slug}` (e.g., `/games/pg-soft/mahjong-ways-2`)
-- Query parameter-based routing is prohibited for game pages
-
-### 1.2 Automated Meta Data
-
-With 3000+ games, manual meta tag maintenance is not feasible. An automated Meta Template Engine is required.
-
-**Title Template**: `"{GameName} Slot - Play Free Demo & RTP {RTP}% | {SiteName}"`
-
-**Description Template**: `"Play {GameName} by {Provider}. Features: {Volatility} volatility, {MaxWin}x max win. Try the free demo now!"`
-
-**Structured Data**: Each game page must include Schema.org JSON-LD markup with `aggregateRating`, `operatingSystem`, and `applicationCategory`.
-
-### 1.3 Sitemap Automation
-
-- Dynamic generation: Daily synchronize game library, automatically write active game URLs to `sitemap-games.xml`
-- Chunking: If URLs exceed 50,000, auto-split into multiple sitemap files
-- Sitemap must include hreflang annotations for all supported languages
-
-### 1.4 Multi-Language SEO (Hreflang)
-
-For multi-country operations, hreflang tags must be correctly configured to prevent duplicate content penalties.
-
-**URL Strategy**: Subdirectory model (`casino.com/th/games`) is recommended, balancing SEO friendliness and implementation cost.
-
-| Model | SEO Friendliness | Implementation Complexity |
-|-------|-------------------|--------------------------|
-| Subdomain (`th.casino.com`) | Best | High (multiple SSL certs) |
-| Subdirectory (`casino.com/th/`) | Recommended | Medium (routing config) |
-| Query Parameter (`?lang=th`) | Not recommended | Low (SEO unfriendly) |
+此 SEO 與效能優化策略提供以下關鍵價值：
+- **自然流量增長**：3000+ 遊戲的 SEO 友善 URL（`/games/{provider}/{game-slug}`）實現有效的搜尋引擎索引，與付費管道相比，可將獲客成本降低 40-60%
+- **營運效率**：自動化 meta 模板引擎消除 3000+ 遊戲的手動 meta 標籤維護，將內容管理開銷減少 95%
+- **使用者留存**：Core Web Vitals 合規（LCP < 2.5s、FID < 100ms、CLS < 0.1）將跳出率降低 25-35%，直接影響首次存款轉換
+- **國際擴展**：多語言 SEO 配合 hreflang 標籤，防止重複內容處罰，並在 20+ 語言市場中實現排名，無 canonical 衝突
+- **品質保證**：每次 pull request 的 Lighthouse CI 整合防止效能倒退，透過自動預算強制執行維持 Lighthouse 分數 ≥ 90
 
 ---
 
-## 2. Performance Requirements
+## 1. SEO 需求
 
-### 2.1 Core Web Vitals Targets
+### 1.1 自然流量優化
 
-| Metric | Target | Description |
-|--------|--------|-------------|
-| **LCP** (Largest Contentful Paint) | < 2.5s | Largest element render time |
-| **FID** (First Input Delay) | < 100ms | First interaction response time |
-| **CLS** (Cumulative Layout Shift) | < 0.1 | Visual stability score |
+iGaming 產業高度依賴自然流量。平台必須最大化 SEO 效果，確保數千個老虎機/遊戲頁面被搜尋引擎有效索引。
 
-### 2.2 Lighthouse Performance Budget
+**商業目標**：
+- 每個遊戲必須擁有獨特、靜態、SEO 友善的 URL
+- URL 結構：`/games/{provider}/{game-slug}`（例如：`/games/pg-soft/mahjong-ways-2`）
+- 遊戲頁面嚴格禁止使用查詢參數路由
 
-- Performance score must be >= 90 (error threshold)
-- First Contentful Paint must be < 2000ms
-- LCP must be < 2500ms
-- CLS must be < 0.1
+### 1.2 自動化 Meta 資料
 
-### 2.3 Resource Loading Standards
+擁有 3000+ 遊戲，手動維護 meta 標籤不可行。需要自動化 Meta 模板引擎。
 
-- All images must use WebP/AVIF format
-- Game thumbnails must use lazy loading with blur placeholders
-- Game pre-loading: On hover, pre-establish TCP connection (preconnect) to game server
-- Clicking "Start Game" must show skeleton screen, never a blank page
+**標題模板**：`"{GameName} Slot - Play Free Demo & RTP {RTP}% | {SiteName}"`
 
-### 2.4 CDN Requirements
+**描述模板**：`"Play {GameName} by {Provider}. Features: {Volatility} volatility, {MaxWin}x max win. Try the free demo now!"`
 
-- Static resources (JS/CSS/Images) must be distributed via global CDN
-- HTML pages (especially homepage and game detail pages) must be edge-cached with TTL 60 seconds
-- Cache invalidation must be triggered when game information is updated
+**結構化資料**：每個遊戲頁面必須包含 Schema.org JSON-LD 標記，包含 `aggregateRating`、`operatingSystem` 和 `applicationCategory`。
 
----
+### 1.3 Sitemap 自動化
 
-## 3. Mobile Performance Targets
+- 動態生成：每日同步遊戲庫，自動將活躍遊戲 URL 寫入 `sitemap-games.xml`
+- 分塊：如果 URL 超過 50,000 個，自動拆分為多個 sitemap 檔案
+- Sitemap 必須包含所有支援語言的 hreflang 註解
 
-- Cold start: < 2 seconds
-- Hot start: < 0.5 seconds
-- Image cache must not cause out-of-memory issues
+### 1.4 多語言 SEO（Hreflang）
 
----
+對於多國營運，必須正確配置 hreflang 標籤以防止重複內容處罰。
 
-## 4. Monitoring Requirements
+**URL 策略**：建議使用子目錄模型（`casino.com/th/games`），平衡 SEO 友善性和實施成本。
 
-### 4.1 Real User Monitoring (RUM)
-
-- Core Web Vitals must be tracked via analytics integration
-- Performance data must be available in dashboard for trend analysis
-
-### 4.2 Automated Performance Testing
-
-- Lighthouse CI must run on every pull request
-- Performance budget violations must block merges
+| 模型 | SEO 友善性 | 實施複雜度 |
+|------|-----------|-----------|
+| 子網域（`th.casino.com`） | 最佳 | 高（多個 SSL 憑證） |
+| 子目錄（`casino.com/th/`） | 建議 | 中（路由配置） |
+| 查詢參數（`?lang=th`） | 不建議 | 低（SEO 不友善） |
 
 ---
 
-## 5. Acceptance Criteria
+## 2. 效能需求
 
-1. All game pages have unique, SEO-friendly URLs with proper meta tags
-2. Sitemap auto-generates daily and includes hreflang annotations
-3. Core Web Vitals meet targets: LCP < 2.5s, FID < 100ms, CLS < 0.1
-4. Lighthouse score >= 90 on all critical pages
-5. Game thumbnails lazy-load with blur placeholders
-6. CDN edge cache configured with TTL 60s for HTML, 7 days for static assets
-7. Hreflang tags properly configured for all supported languages
+### 2.1 Core Web Vitals 目標
+
+| 指標 | 目標 | 說明 |
+|------|------|------|
+| **LCP**（Largest Contentful Paint） | < 2.5s | 最大元素渲染時間 |
+| **FID**（First Input Delay） | < 100ms | 首次互動回應時間 |
+| **CLS**（Cumulative Layout Shift） | < 0.1 | 視覺穩定性分數 |
+
+### 2.2 Lighthouse 效能預算
+
+- 效能分數必須 ≥ 90（錯誤閾值）
+- First Contentful Paint 必須 < 2000ms
+- LCP 必須 < 2500ms
+- CLS 必須 < 0.1
+
+### 2.3 資源載入標準
+
+- 所有圖片必須使用 WebP/AVIF 格式
+- 遊戲縮圖必須使用延遲載入配合模糊佔位符
+- 遊戲預載入：滑鼠懸停時，預先建立到遊戲伺服器的 TCP 連線（preconnect）
+- 點擊「開始遊戲」必須顯示骨架螢幕，絕不顯示空白頁面
+
+### 2.4 CDN 需求
+
+- 靜態資源（JS/CSS/圖片）必須透過全球 CDN 分發
+- HTML 頁面（尤其是首頁和遊戲詳情頁面）必須在邊緣快取，TTL 60 秒
+- 遊戲資訊更新時必須觸發快取失效
+
+---
+
+## 3. 行動裝置效能目標
+
+- 冷啟動：< 2 秒
+- 熱啟動：< 0.5 秒
+- 圖片快取不得造成記憶體不足問題
+
+---
+
+## 4. 監控需求
+
+### 4.1 真實使用者監控（RUM）
+
+- Core Web Vitals 必須透過分析整合追蹤
+- 效能資料必須在儀表板中提供以進行趨勢分析
+
+### 4.2 自動化效能測試
+
+- Lighthouse CI 必須在每次 pull request 時執行
+- 效能預算違規必須封鎖合併
+
+---
+
+## 5. 驗收標準（Acceptance Criteria）
+
+1. 所有遊戲頁面擁有獨特、SEO 友善的 URL 配合適當的 meta 標籤
+2. Sitemap 每日自動生成並包含 hreflang 註解
+3. Core Web Vitals 達成目標：LCP < 2.5s、FID < 100ms、CLS < 0.1
+4. 所有關鍵頁面的 Lighthouse 分數 ≥ 90
+5. 遊戲縮圖延遲載入配合模糊佔位符
+6. CDN 邊緣快取配置：HTML 的 TTL 60s、靜態資源 7 天
+7. 所有支援語言的 hreflang 標籤正確配置

@@ -1,4 +1,4 @@
-# Mobile App Requirements
+# 行動應用程式需求（Mobile App Requirements）
 
 > **Canonical Source**: [source-archive/11_Frontend_CMS/11-04](../../source-archive/11_Frontend_CMS/11-04_Mobile_App_Architecture.md)
 > **View Type**: Business Requirements
@@ -8,208 +8,208 @@
 
 ---
 
-## Success Metrics
+## 成功指標（Success Metrics）
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Hot Update Success Rate | ≥ 98% | Percentage of users successfully applying updates without rollback |
-| Push Notification Delivery Rate | ≥ 95% (iOS/FCM), ≥ 85% (China vendors) | Delivered vs sent notifications |
-| Biometric Login Adoption | ≥ 60% of eligible devices | Users enabling FaceID/TouchID |
-| Offline Mode Usage | ≥ 30% DAU use cached lobby | Users browsing games offline |
-| Crash-Free Sessions | ≥ 99.5% | Sessions without crashes (measured by Crashlytics/Sentry) |
-| SSL Pinning Pass Rate | 100% | Requests blocked when certificate mismatch detected |
-| Test Coverage | E2E: 100% critical flows, Integration: 80%, Unit: 90% | Code coverage reports |
-| App Store Rejection Rate | < 5% | Distribution success for enterprise/alternative channels |
-
----
-
-## 1. Platform Support Requirements
-
-### 1.1 Framework Strategy
-
-The mobile app must provide a native or hybrid experience. Cross-platform development (Flutter or React Native) is recommended.
-
-**Selection Criteria**:
-- High performance game lobby: Flutter preferred
-- Fast iteration + hot update (iGaming norm): React Native + CodePush preferred
-
-### 1.2 Distribution Strategy
-
-Distribution is the core challenge due to app store restrictions on gambling apps.
-
-**iOS Distribution**:
-
-| Method | Description | Risk |
-|--------|-------------|------|
-| Enterprise Certificate | No App Store required; user trusts certificate | Frequent re-signing needed |
-| TestFlight | Distributed as "test" app | 90-day validity |
-| Super Signature | Uses developer account device ID quota | Limited capacity |
-| WebClip (PWA) | Desktop bookmark opens Safari | Safest but slightly inferior UX |
-
-**Android Distribution**:
-
-| Method | Description | Risk |
-|--------|-------------|------|
-| APK Download | Direct download from official website | Standard approach |
-| Disguised App | Upload as utility app with backend switch | High risk of takedown |
+| 指標 | 目標 | 測量方式 |
+|------|------|----------|
+| 熱更新成功率 | ≥ 98% | 成功套用更新且無回滾的使用者百分比 |
+| 推播通知送達率 | ≥ 95%（iOS/FCM）、≥ 85%（中國廠商） | 已送達 vs 已發送通知 |
+| 生物識別登入採用率 | ≥ 60% 的合格裝置 | 啟用 FaceID/TouchID 的使用者 |
+| 離線模式使用率 | ≥ 30% DAU 使用快取大廳 | 離線瀏覽遊戲的使用者 |
+| 無當機工作階段 | ≥ 99.5% | 無當機的工作階段（由 Crashlytics/Sentry 測量） |
+| SSL Pinning 通過率 | 100% | 偵測到憑證不符時封鎖的請求 |
+| 測試覆蓋率 | E2E: 100% 關鍵流程、Integration: 80%、Unit: 90% | 程式碼覆蓋率報告 |
+| App Store 拒絕率 | < 5% | 企業版/替代通路的分發成功率 |
 
 ---
 
-## 2. Core Feature Requirements
+## 1. 平台支援需求
 
-### 2.1 Infrastructure Features
+### 1.1 框架策略
 
-- **HttpDNS**: Prevent DNS pollution, ensure stable API connectivity
-- **Domain Fronting**: Hide real backend IP for anti-blocking
+行動應用程式必須提供原生或混合體驗。建議使用跨平台開發（Flutter 或 React Native）。
 
-### 2.2 Native Features
+**選擇標準**：
+- 高效能遊戲大廳：建議 Flutter
+- 快速迭代 + 熱更新（iGaming 標準）：建議 React Native + CodePush
 
-| Feature | Purpose | Priority |
-|---------|---------|----------|
-| Biometric Login | FaceID/TouchID for quick login | P0 |
-| Push Notifications | FCM/APNS for marketing and transaction alerts | P0 |
-| Device Fingerprint | IDFA/GAID/IMEI/AndroidID for risk control | P0 |
+### 1.2 分發策略
 
-### 2.3 Hot Update Mechanism
+由於應用程式商店對博弈應用程式的限制，分發是核心挑戰。
 
-- App checks `version.json` on startup
-- New patch downloads in background (JS Bundle / Assets)
-- After download, prompt user "Restart to apply" or auto-apply on next launch
-- **Rollback**: If new version crashes, automatically revert to previous version
+**iOS 分發**：
 
-**Staged Rollout**:
+| 方法 | 說明 | 風險 |
+|------|------|------|
+| 企業憑證 | 無需 App Store；使用者信任憑證 | 需頻繁重新簽署 |
+| TestFlight | 以「測試」應用程式分發 | 90 天有效期 |
+| 超級簽名 | 使用開發者帳號裝置 ID 配額 | 容量有限 |
+| WebClip（PWA） | 桌面書籤開啟 Safari | 最安全但使用者體驗稍差 |
 
-| Stage | User % | Purpose |
-|-------|--------|---------|
-| Stage 1 | 5% | Canary test, monitor crash rate |
-| Stage 2 | 20% | Expand if no anomalies |
-| Stage 3 | 100% | Full release |
+**Android 分發**：
 
-### 2.4 Offline Support
-
-**Available Offline**:
-- Browse game lobby (cached game list)
-- View recent bet history (last 100 records)
-- View personal profile
-
-**Requires Network**:
-- Placing bets, deposits, withdrawals
+| 方法 | 說明 | 風險 |
+|------|------|------|
+| APK 下載 | 從官網直接下載 | 標準方法 |
+| 偽裝應用程式 | 以工具應用程式上架，後端切換 | 高下架風險 |
 
 ---
 
-## 3. Push Notification Requirements
+## 2. 核心功能需求
 
-### 3.1 Multi-Channel Integration
+### 2.1 基礎設施功能
 
-| Platform | Service | Purpose |
-|----------|---------|---------|
-| iOS | APNS | Official push channel |
-| Android (Global) | FCM | Google official |
-| Android (China) | Xiaomi/Huawei/OPPO Push | Improve domestic delivery rate |
-| In-App | WebSocket/MQTT | Real-time notification when app is foreground |
+- **HttpDNS**：防止 DNS 污染，確保穩定的 API 連線
+- **Domain Fronting**：隱藏真實後端 IP 以防封鎖
 
-### 3.2 Push Categories
+### 2.2 原生功能
 
-| Category | Examples | Priority |
-|----------|----------|----------|
-| **Marketing** | New promotions, VIP offers, limited-time deals | Medium |
-| **Transactional** | Deposit success, withdrawal status update, big win congratulations | High |
-| **Risk Control** | Unusual login alert, account security warning | Critical |
+| 功能 | 目的 | 優先級 |
+|------|------|--------|
+| 生物識別登入 | FaceID/TouchID 快速登入 | P0 |
+| 推播通知 | FCM/APNS 用於行銷和交易提醒 | P0 |
+| 裝置指紋 | IDFA/GAID/IMEI/AndroidID 用於風險控制 | P0 |
 
-### 3.3 Anti-Disturbance Policy
+### 2.3 熱更新機制
 
-- Maximum 5 marketing pushes per day
-- Quiet hours: 23:00 - 09:00 (no marketing pushes)
-- Respect user subscription preferences
+- 應用程式啟動時檢查 `version.json`
+- 新修補程式在背景下載（JS Bundle / Assets）
+- 下載後提示使用者「重新啟動以套用」或下次啟動時自動套用
+- **回滾**：如果新版本當機，自動還原到先前版本
 
-### 3.4 Deep Linking
+**分階段推出**：
 
-Push notification clicks must navigate directly to relevant page (activity detail, withdrawal status), not just app homepage.
+| 階段 | 使用者 % | 目的 |
+|------|----------|------|
+| Stage 1 | 5% | 金絲雀測試，監控當機率 |
+| Stage 2 | 20% | 無異常則擴展 |
+| Stage 3 | 100% | 完整發布 |
 
----
+### 2.4 離線支援
 
-## 4. User Experience Requirements
+**可離線使用**：
+- 瀏覽遊戲大廳（快取遊戲清單）
+- 檢視近期投注歷史（最近 100 筆記錄）
+- 檢視個人資料
 
-### 4.1 Device Adaptation
-
-- Screen sizes: 4.7" to 6.7" mainstream devices
-- Safe area: Support iPhone notch, Android punch-hole cameras
-- Orientation: Game pages support landscape (especially slots, live games)
-
-### 4.2 Feedback and Animation
-
-- Skeleton screen during loading (content placeholder)
-- Haptic feedback for important operations
-- Optimistic UI: Show updated balance immediately after deposit (sync with backend confirmation later)
-
-### 4.3 Error Handling
-
-- Global error boundary catches all crashes
-- Errors logged to crash reporting service
-- Friendly error pages shown to users (never raw stack traces)
+**需要網路**：
+- 下注、存款、提款
 
 ---
 
-## 5. Security Requirements
+## 3. 推播通知需求
 
-### 5.1 Code Protection
+### 3.1 多通路整合
 
-- APK must be packed/hardened to prevent decompilation
-- Code obfuscation: ProGuard (Android) / Strip Symbols (iOS)
-- Root/Jailbreak detection: Force exit or restrict high-risk operations
+| 平台 | 服務 | 目的 |
+|------|------|------|
+| iOS | APNS | 官方推播通道 |
+| Android（全球） | FCM | Google 官方 |
+| Android（中國） | 小米/華為/OPPO Push | 提升國內送達率 |
+| 應用程式內 | WebSocket/MQTT | 應用程式前景時即時通知 |
 
-### 5.2 Communication Security
+### 3.2 推播類別
 
-- SSL Pinning to prevent MITM attacks
-- API signature verification on every request
-- Sensitive fields encrypted with AES-256 in transit
+| 類別 | 範例 | 優先級 |
+|------|------|--------|
+| **行銷** | 新促銷、VIP 優惠、限時優惠 | 中 |
+| **交易** | 存款成功、提款狀態更新、大獎恭喜 | 高 |
+| **風險控制** | 異常登入提醒、帳戶安全警告 | 關鍵 |
 
-### 5.3 Data Security
+### 3.3 防打擾政策
 
-- Local data encryption (AsyncStorage encrypted with AES)
-- Sensitive data (tokens) stored in Keychain/KeyStore
-- Screenshot prevention on payment and personal data pages
+- 每日最多 5 次行銷推播
+- 安靜時段：23:00 - 09:00（無行銷推播）
+- 尊重使用者訂閱偏好
 
----
+### 3.4 深度連結
 
-## 6. Testing Requirements
-
-### 6.1 Test Coverage
-
-| Test Type | Tool | Coverage Target |
-|-----------|------|----------------|
-| E2E Tests | Detox/Flutter Driver | 100% critical flows |
-| Integration Tests | Jest + Testing Library | 80% core components |
-| Unit Tests | Jest | 90% utility functions |
-
-### 6.2 Device Coverage
-
-- iOS: iPhone SE (small), iPhone 14 Pro (notch), iPad
-- Android: Samsung S22 (flagship), Xiaomi Redmi (mid-range), Huawei (HMS without GMS)
+推播通知點擊必須直接導航到相關頁面（活動詳情、提款狀態），而不僅僅是應用程式首頁。
 
 ---
 
-## 7. Acceptance Criteria
+## 4. 使用者體驗需求
 
-1. App supports iOS and Android with cross-platform framework
-2. Hot update mechanism works with staged rollout and automatic rollback
-3. Biometric login, push notifications, and device fingerprint functional
-4. Offline mode supports browsing cached game list and bet history
-5. Push notifications respect quiet hours and daily limits
-6. Deep linking navigates to correct pages from push notifications
-7. App passes security audit: SSL pinning, code obfuscation, root detection
+### 4.1 裝置適配
+
+- 螢幕尺寸：4.7" 到 6.7" 主流裝置
+- 安全區域：支援 iPhone 瀏海、Android 打孔鏡頭
+- 方向：遊戲頁面支援橫向（尤其是老虎機、真人遊戲）
+
+### 4.2 回饋和動畫
+
+- 載入期間顯示骨架螢幕（內容佔位符）
+- 重要操作的觸覺回饋
+- 樂觀 UI：存款後立即顯示更新後的餘額（稍後與後端確認同步）
+
+### 4.3 錯誤處理
+
+- 全域錯誤邊界捕獲所有當機
+- 錯誤記錄到當機報告服務
+- 向使用者顯示友善的錯誤頁面（絕不顯示原始堆疊追蹤）
 
 ---
 
-## Success Metrics
+## 5. 安全需求
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| App Cold Start Time | < 2 seconds | Time from tap to first usable screen |
-| App Hot Start Time | < 0.5 seconds | Time from background to foreground usable |
-| Hot Update Success Rate | > 99% | Successful patch downloads / total update attempts |
-| Push Delivery Rate | > 95% | Delivered notifications / sent notifications |
-| Biometric Login Adoption | > 60% | Users with biometric enabled / total active users |
-| Crash Rate | < 0.1% | Crash sessions / total sessions |
-| Offline Cache Hit Rate | > 90% | Cached content served / offline content requests |
-| E2E Test Coverage | 100% critical flows | All login, deposit, bet, withdrawal flows tested |
+### 5.1 程式碼保護
+
+- APK 必須進行加殼/加固以防止反編譯
+- 程式碼混淆：ProGuard（Android）/ Strip Symbols（iOS）
+- Root/Jailbreak 偵測：強制退出或限制高風險操作
+
+### 5.2 通訊安全
+
+- SSL Pinning 防止 MITM 攻擊
+- 每個請求進行 API 簽章驗證
+- 敏感欄位在傳輸中使用 AES-256 加密
+
+### 5.3 資料安全
+
+- 本地資料加密（AsyncStorage 使用 AES 加密）
+- 敏感資料（token）儲存在 Keychain/KeyStore
+- 支付和個人資料頁面防止截圖
+
+---
+
+## 6. 測試需求
+
+### 6.1 測試覆蓋率
+
+| 測試類型 | 工具 | 覆蓋率目標 |
+|----------|------|------------|
+| E2E 測試 | Detox/Flutter Driver | 100% 關鍵流程 |
+| 整合測試 | Jest + Testing Library | 80% 核心元件 |
+| 單元測試 | Jest | 90% 工具函式 |
+
+### 6.2 裝置覆蓋率
+
+- iOS：iPhone SE（小螢幕）、iPhone 14 Pro（瀏海）、iPad
+- Android：Samsung S22（旗艦）、Xiaomi Redmi（中階）、Huawei（HMS 無 GMS）
+
+---
+
+## 7. 驗收標準（Acceptance Criteria）
+
+1. 應用程式使用跨平台框架支援 iOS 和 Android
+2. 熱更新機制運作，具備分階段推出和自動回滾功能
+3. 生物識別登入、推播通知和裝置指紋功能正常
+4. 離線模式支援瀏覽快取遊戲清單和投注歷史
+5. 推播通知遵守安靜時段和每日限制
+6. 深度連結從推播通知導航到正確頁面
+7. 應用程式通過安全審核：SSL pinning、程式碼混淆、root 偵測
+
+---
+
+## 成功指標（Success Metrics）
+
+| 指標 | 目標 | 測量方式 |
+|------|------|----------|
+| 應用程式冷啟動時間 | < 2 秒 | 從點擊到第一個可用螢幕的時間 |
+| 應用程式熱啟動時間 | < 0.5 秒 | 從背景到前景可用的時間 |
+| 熱更新成功率 | > 99% | 成功修補下載 / 總更新嘗試 |
+| 推播送達率 | > 95% | 已送達通知 / 已發送通知 |
+| 生物識別登入採用率 | > 60% | 啟用生物識別的使用者 / 總活躍使用者 |
+| 當機率 | < 0.1% | 當機工作階段 / 總工作階段 |
+| 離線快取命中率 | > 90% | 提供的快取內容 / 離線內容請求 |
+| E2E 測試覆蓋率 | 100% 關鍵流程 | 所有登入、存款、投注、提款流程已測試 |
