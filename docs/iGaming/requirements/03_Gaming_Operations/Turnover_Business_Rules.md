@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: Executives, Product Managers
-> **Related Architecture**: [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)
+> **Related Doc**: [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 
@@ -271,16 +271,17 @@ All recalculations must:
 
 ## 12. Acceptance Criteria
 
-- [ ] Three-layer validation architecture (Risk → Finance → Activity) processes all bets correctly
-- [ ] Layer 1 Risk Engine is the ONLY layer making rejection decisions (BLOCK/FLAG/PASS)
-- [ ] Status Factor Table applies correctly: WIN/LOSS/HALF_WIN/HALF_LOSS = 100%, DRAW/VOID/RUNNING = 0%
-- [ ] Game weights are configurable per promotion (Slots 100%, Baccarat 15%, etc.)
-- [ ] Wagering requirement verification occurs at withdrawal time, not auto-unlock on bet
-- [ ] Free Spins: Turnover = Face Value Sum, Valid Bet = 0
-- [ ] Daily reconciliation at 03:00 UTC+8 with deviation threshold <0.01%
-- [ ] Turnover calculation latency P99 <100ms
-- [ ] Risk engine call success rate ≥99.9%
-- [ ] All recalculations require approval and create audit logs with before/after values
+The turnover calculation system must satisfy the following acceptance criteria:
+
+- [ ] **Layer 1 Risk Validation**: Risk engine executes BLOCK/FLAG/PASS decisions within 50ms P99 latency, with rejection decisions made ONLY at Layer 1
+- [ ] **Status Factor Processing**: HALF_WIN and HALF_LOSS bets are calculated at 100% turnover contribution using Standard Principal Method
+- [ ] **Game Weight Application**: All game types apply correct weight percentages (Slots 100%, Baccarat 15%, Blackjack 10%, etc.) without manual intervention
+- [ ] **Free Spins Accounting**: Free spin turnover equals face value sum, valid bet equals 0, ensuring accurate GGR reporting
+- [ ] **Wagering Verification**: Wagering requirement completion is verified at withdrawal time, not auto-unlocked on bet placement
+- [ ] **Risk Control Actions**: Hedge detection, arbitrage detection, low odds filtering, and same-IP hedging operate in real-time with <100ms latency
+- [ ] **Reconciliation Accuracy**: Daily turnover reconciliation deviation remains below 0.01% threshold, with automated alerts for deviations ≥0.01%
+- [ ] **Recalculation Support**: Status factor errors, game weight adjustments, and GP settlement discrepancies trigger automated recalculation with full audit trail
+- [ ] **Compliance Monitoring**: All SLA targets (P99 latency <100ms, success rate >99.9%, event publish >99.99%) are continuously monitored with alerting
 
 ---
 
