@@ -8,6 +8,31 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Regulatory Compliance**: Implements UKGC LCCP SR 3.4.1 mandatory pre-deposit limit setup (effective 2025-10-31) and Germany GlüStV EUR 1,000/month cap
+- **Player Harm Prevention**: Establishes asymmetric cooling-off rules (immediate effect for limit decreases, 24-72h delay for increases) preventing impulsive limit removal
+- **Loss Limit Protection**: Differentiates deposit limits (input control) from loss limits (outcome control) with real-time net loss tracking
+- **Reconciliation Assurance**: Mandates zero-tolerance for system-caused limit breaches with UKGC 24-hour reporting requirement
+
+---
+
+## Acceptance Criteria
+
+- [ ] Pre-deposit limit setup enforced for all new UKGC players (cannot skip to deposit page)
+- [ ] Daily, weekly, and monthly deposit limits function correctly with UTC 00:00 reset
+- [ ] Limit hierarchy validated: Daily <= Weekly <= Monthly (recommended)
+- [ ] Lowering limits takes effect immediately without cooling-off
+- [ ] Raising limits enters 24-72 hour cooling-off period (per jurisdiction)
+- [ ] Player can cancel limit increase request during cooling-off
+- [ ] Loss limit calculation: Net Loss = Total Bets - Total Wins (real-time)
+- [ ] Betting blocked when loss limit reached; re-enabled when wins reduce net loss
+- [ ] 80% limit warning notification sent to player
+- [ ] System-caused limit breaches trigger P0 alert with UKGC reporting within 24 hours
+
+---
+
 ## 1. Overview
 
 Deposit Limits and Loss Limits are core player protection tools that help players control their gambling expenditure. This document defines the business requirements for both deposit and loss limit management, including time-based limits, cooling-off periods for changes, and reconciliation.

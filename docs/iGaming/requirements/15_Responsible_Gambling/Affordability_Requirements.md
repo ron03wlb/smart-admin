@@ -8,6 +8,29 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Regulatory Compliance**: Implements UKGC 2025 mandatory affordability assessment requirements with lowered thresholds (GBP 500/year vs. previous GBP 2,000/year)
+- **Player Protection**: Establishes three-tier assessment framework (Basic, Enhanced, Full) with escalating interventions based on net loss levels
+- **Sustainable Revenue**: Targets <5% GGR ratio from high-risk players, avoiding regulatory penalties and reputational damage from harm-dependent revenue
+- **Unified API**: Provides single Player Protection API for all responsible gambling tools (deposit limits, loss limits, self-exclusion, session limits) reducing integration complexity
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Assessment Trigger Compliance | 100% | Players meeting thresholds assessed / Total players at threshold |
+| Assessment Pass Rate | Monitor | PASSED assessments / Total assessments |
+| High-Risk Player GGR Ratio | < 5% | GGR from high-risk players / Total GGR |
+| Monthly Net Deposit Trigger | 100% | Triggers at GBP 150/30-day threshold |
+| Assessment Validity Tracking | 100% | Re-assessments triggered on expiry (3/6 months) |
+| Vulnerability Detection Rate | Monitor | Behavioral indicators detected / Total active players |
+
+---
+
 ## 1. Overview
 
 Affordability Assessment is a core requirement of the UK Gambling Commission's 2025 regulations, designed to evaluate a player's financial capacity and ensure gambling activity does not exceed their affordable range. The Player Protection API provides a unified interface for all responsible gambling tools.

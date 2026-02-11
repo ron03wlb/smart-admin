@@ -8,6 +8,31 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Regulatory Compliance**: Implements UKGC mandatory 60-min break after 10 deposits/24h and Germany GlüStV 60-min continuous play with 5-min break requirements
+- **Early Intervention**: Establishes cooling-off periods (24h-6 weeks) as preventive tool distinct from interventional self-exclusion
+- **Behavioral Awareness**: Defines reality check intervals (15-60 min) displaying session time and P&L with risk identification from player responses
+- **Session Integrity**: Preserves game round integrity (wait for completion before popups) while enforcing mandatory breaks and idle timeouts
+
+---
+
+## Acceptance Criteria
+
+- [ ] Cooling-off periods activate immediately for durations 24h-6 weeks
+- [ ] Players can view balance, betting history, and request withdrawals during cooling-off
+- [ ] Players cannot deposit, game, bet, or claim bonuses during cooling-off
+- [ ] Auto-release occurs at cooling-off expiry with notification
+- [ ] UK mandatory break triggers after 10 deposits in 24 hours (60-min break)
+- [ ] Germany mandatory break triggers after 60 minutes continuous play (5-min break)
+- [ ] Session duration limits (15/30/60/120 min) display popup on expiry
+- [ ] Idle timeout (30 min default) triggers auto-logout, respecting active game rounds
+- [ ] Reality check displays session time and P&L at configured interval
+- [ ] Reality check waits for active game round completion before displaying
+
+---
+
 ## 1. Overview
 
 Session Protection encompasses three complementary player protection tools: Cooling-Off Periods, Session Time Management, and Reality Checks. Together, these tools help players manage their gaming activity duration and maintain awareness of their gambling behavior.

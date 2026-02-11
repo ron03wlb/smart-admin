@@ -8,6 +8,29 @@
 
 ---
 
+## Business Value
+
+This requirements document delivers strategic value by:
+- **Regulatory Compliance**: Implements mandatory Gamstop (UK), CRUKS (NL), Spelpaus (SE), ROFUS (DK) integrations with jurisdiction-specific duration requirements (6 months - lifetime)
+- **Player Harm Prevention**: Establishes the most stringent protection tool with irrevocable permanent exclusion option and cross-platform enforcement
+- **Operational Integrity**: Defines three-layer reconciliation architecture (real-time, daily batch, weekly audit) ensuring <24h discrepancy resolution
+- **Anti-Circumvention**: Specifies device fingerprinting, payment matching, and national database sync to prevent exclusion bypass via new accounts
+
+---
+
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Gamstop Sync Success Rate | > 99.9% | Successful syncs / Total sync attempts |
+| Type A Discrepancy Resolution Time | < 24 hours | Time from detection to resolution |
+| Daily Reconciliation Completion | 100% | Days with completed batch / Total days |
+| Post-Exclusion Re-registration Attempt Rate | < 5% | Blocked re-registration attempts / Total exclusions |
+| UKGC Breach Report Deadline Compliance | 100% | Reports within 24h / Total breaches |
+| Exclusion Activation Accuracy | 100% | Correctly executed exclusions / Total requests |
+
+---
+
 ## 1. Overview
 
 Self-Exclusion is the most stringent player protection tool, allowing players to voluntarily prohibit themselves from accessing the gambling platform. This document defines the business requirements for self-exclusion, revocation, and cross-platform synchronization with national exclusion databases.
