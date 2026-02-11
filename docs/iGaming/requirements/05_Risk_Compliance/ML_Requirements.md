@@ -13,6 +13,20 @@ Machine learning models augment the rule-based risk control system by detecting 
 
 ---
 
+## Acceptance Criteria
+
+- [ ] All five ML models (Abnormal Betting, Multi-Account, Bonus Abuse, AML Risk Scoring, Fraudulent Transaction) deployed and operational with accuracy meeting or exceeding targets specified in Section 3.1
+- [ ] Real-time risk scoring API responds within latency targets: ≤50ms for betting detection, ≤100ms for multi-account/transaction detection, ≤200ms for bonus abuse, ≤500ms for AML scoring
+- [ ] Player risk profiling calculates total scores correctly using factor weights and caps (Section 5.2-5.3), assigns risk levels (LOW/MEDIUM/HIGH/BLACKLIST) accurately
+- [ ] VIP players undergo identical risk controls as non-VIP players (no exemptions or reduced thresholds) as mandated in Section 5.4
+- [ ] Model governance dashboard displays performance metrics (F1 score, false positive rate, latency, PSI) with automated alerts when thresholds breached (Section 7.1)
+- [ ] All new models and updates pass 14-day A/B testing with p-value <0.05 before full deployment, with automated rollback if treatment underperforms control (Section 7.2)
+- [ ] Game-type dimensional rules correctly filter risk rules to applicable game types (SPORTS, LIVE, SLOTS, etc.) per Section 4
+- [ ] Blacklist enforcement immediately blocks all betting activity and restricts account access to read-only when player added to blacklist (Section 6.2)
+- [ ] Fraud detection rate improves from 70% (rule-based) to ≥95% (with ML), false positive rate reduces from 15% to <5%, as specified in Section 8
+
+---
+
 ## 2. Business Objectives
 
 | Objective | Description | Priority |
