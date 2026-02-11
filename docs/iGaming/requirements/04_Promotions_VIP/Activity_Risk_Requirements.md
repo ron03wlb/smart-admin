@@ -407,6 +407,20 @@ The activity system must respect all player-set protection mechanisms:
 
 ---
 
+## 10. Success Metrics
+
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Bonus Abuse Rate | <5% | Forfeitures / Total Claims × 100% |
+| Bonus ROI | ≥1.0 | Incremental NGR / Bonus Cost |
+| Matched Betting Detection Rate | ≥90% | Detected cases / Actual matched betting cases |
+| First Deposit Conversion (FTD) | ≥25% | First depositors / Registrations × 100% |
+| VIP Tier Upgrade Accuracy | 100% | Upgrades occurring immediately when criteria met |
+| Multi-Account Detection Rate | ≥95% | Blocked multi-account attempts / Total attempts |
+| Responsible Gambling Compliance | 100% | All self-exclusion players blocked from promotions |
+
+---
+
 ## Related Documentation
 
 → **[Activity Risk System - Technical Implementation](../../architecture/04_Activity_Engine/Activity_Risk_System.md)** - Activity rule engine, risk scoring algorithms, bonus abuse detection patterns, configuration-driven architecture, and A/B testing framework

@@ -269,7 +269,22 @@ All recalculations must:
 
 ---
 
-## 12. Related Documents
+## 12. Acceptance Criteria
+
+- [ ] Three-layer validation architecture (Risk → Finance → Activity) processes all bets correctly
+- [ ] Layer 1 Risk Engine is the ONLY layer making rejection decisions (BLOCK/FLAG/PASS)
+- [ ] Status Factor Table applies correctly: WIN/LOSS/HALF_WIN/HALF_LOSS = 100%, DRAW/VOID/RUNNING = 0%
+- [ ] Game weights are configurable per promotion (Slots 100%, Baccarat 15%, etc.)
+- [ ] Wagering requirement verification occurs at withdrawal time, not auto-unlock on bet
+- [ ] Free Spins: Turnover = Face Value Sum, Valid Bet = 0
+- [ ] Daily reconciliation at 03:00 UTC+8 with deviation threshold <0.01%
+- [ ] Turnover calculation latency P99 <100ms
+- [ ] Risk engine call success rate ≥99.9%
+- [ ] All recalculations require approval and create audit logs with before/after values
+
+---
+
+## 13. Related Documents
 
 ### Prerequisites
 - 00-03 Terminology Standards *(planned - source-archive/00_Foundation/00-03_Terminology_Standards)* - Required reading

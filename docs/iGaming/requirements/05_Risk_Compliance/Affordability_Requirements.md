@@ -176,7 +176,22 @@ If a player's existing assessment covers the required tier and has not expired, 
 
 ---
 
-## 9. Related Business Requirements
+## 9. Acceptance Criteria
+
+- [ ] Annual net loss triggers apply correctly: GBP 125 (Basic), GBP 500 (Enhanced), GBP 2,000 (Full)
+- [ ] Monthly net deposit trigger fires at GBP 150 within rolling 30-day window
+- [ ] Enhanced tier requires self-declaration form with income, housing, household size, disposable income
+- [ ] Full tier integrates third-party verification (Open Banking, Credit Reference Agency)
+- [ ] Recommended limit calculation: 10% of disposable income, -20% for household >2, floor GBP 50, cap GBP 2,000
+- [ ] Assessment validity periods enforced: Enhanced = 3 months, Full = 6 months
+- [ ] Financial vulnerability indicators detected in real-time (chasing losses, deposit velocity, unusual patterns)
+- [ ] HIGH severity triggers full assessment + care message automatically
+- [ ] Monthly compliance reports include assessment statistics, vulnerability detection, limit enforcement
+- [ ] FAILED Full assessment applies forced limit with no player override
+
+---
+
+## 10. Related Business Requirements
 
 | Document | Relationship |
 |----------|-------------|

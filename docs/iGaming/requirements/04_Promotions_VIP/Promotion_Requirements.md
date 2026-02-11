@@ -7,6 +7,17 @@
 
 ---
 
+## Business Value
+
+The promotion system delivers critical business value by:
+- **Player Acquisition**: First deposit bonuses convert registrations to active depositors with industry-standard 25-40% FTD conversion rates
+- **Player Retention**: VIP tier system rewards loyalty, reducing churn by incentivizing continued play through progressive benefits
+- **Revenue Protection**: Anti-duplicate claim mechanisms and wagering requirements prevent bonus abuse that accounts for 63.8% of iGaming fraud
+- **Competitive Positioning**: Configurable bonus engine enables rapid deployment of market-competitive promotions without code changes
+- **Regulatory Compliance**: Accurate wagering tracking supports AML turnover requirements and audit obligations
+
+---
+
 ## 1. Overview
 
 This document defines the business requirements for the iGaming platform promotion system, covering bonus distribution, wagering requirement tracking, and VIP tier management. These requirements ensure promotions are properly configured, securely distributed, and accurately tracked.

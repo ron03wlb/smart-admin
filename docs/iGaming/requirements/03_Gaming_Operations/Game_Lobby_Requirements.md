@@ -219,6 +219,20 @@ Player interactions with games are scored to drive recommendations:
 
 ---
 
+## 11. Success Metrics
+
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Game Click-Through Rate (CTR) | ≥15% | (Game clicks / Impressions) × 100% |
+| Game Conversion Rate | ≥40% | (Actual bets / Game clicks) × 100% |
+| API Response Time (P99) | <500ms | Latency monitoring at gateway level |
+| Search Query Latency | <50ms | Elasticsearch query time tracking |
+| Image CDN Hit Rate | ≥98% | CDN cache hit ratio logs |
+| New Game Sync Success Rate | ≥99% | Automated sync job success/failure ratio |
+| Player Personalization Match Rate | ≥70% | A/B test conversion lift from recommended vs random games |
+
+---
+
 ## Related Documents
 
 ### Core Dependencies
