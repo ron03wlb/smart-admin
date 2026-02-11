@@ -1,4 +1,4 @@
-# Player Lifecycle - Technical Implementation
+# 玩家生命週期 - 技術實作（Player Lifecycle - Technical Implementation）
 
 > **Canonical Source**: [docs/iGaming/source-archive/01_Player_Center/01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
 > **View**: Technical Architecture (Development & DevOps)
@@ -6,26 +6,26 @@
 
 ---
 
-## Document Purpose
+## 文件目的（Document Purpose）
 
-This document defines the **technical implementation** for Player Lifecycle Management in iGaming platforms. It covers:
-- State machine implementation
-- API specifications
-- Database schema
-- SmartAdmin layer mapping
-- Code examples and architecture patterns
+本文件定義 iGaming 平台中**玩家生命週期管理的技術實作**。涵蓋內容包括：
+- 狀態機實作（State Machine Implementation）
+- API 規格（API Specifications）
+- 資料庫架構（Database Schema）
+- SmartAdmin 層級映射（SmartAdmin Layer Mapping）
+- 程式碼範例與架構模式（Code Examples and Architecture Patterns）
 
-**For business requirements** (lifecycle stages, KYC rules, VIP progression), see [Player_Lifecycle.md](../../requirements/01_Player_Experience/Player_Lifecycle.md).
+**業務需求**（生命週期階段、KYC 規則、VIP 升級）請參考 [Player_Lifecycle.md](../../requirements/01_Player_Experience/Player_Lifecycle.md)。
 
 ---
 
-## 1. State Machine Implementation
+## 1. 狀態機實作（State Machine Implementation）
 
-### 1.1 Account Status State Machine
+### 1.1 帳戶狀態狀態機（Account Status State Machine）
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ACTIVE : New Player Registration
+    [*] --> ACTIVE : 新玩家註冊
 
     state "ACTIVE" as ACTIVE
     state "LOCKED" as LOCKED
@@ -33,96 +33,96 @@ stateDiagram-v2
     state "PENDING_VERIFICATION" as PENDING_VERIFICATION
     state "CLOSED" as CLOSED
 
-    ACTIVE --> ACTIVE : Normal Activity
-    ACTIVE --> LOCKED : 5 Login Failures
-    ACTIVE --> SUSPENDED : Risk Score >= 70
-    ACTIVE --> PENDING_VERIFICATION : Withdrawal Triggers KYC
-    ACTIVE --> CLOSED : Self-Exclusion / AML Violation
+    ACTIVE --> ACTIVE : 正常活動
+    ACTIVE --> LOCKED : 5次登入失敗
+    ACTIVE --> SUSPENDED : 風險分數 >= 70
+    ACTIVE --> PENDING_VERIFICATION : 提款觸發KYC
+    ACTIVE --> CLOSED : 自我排除 / AML違規
 
-    LOCKED --> ACTIVE : Auto-unlock after 30 min
-    LOCKED --> SUSPENDED : Password Reset Fails 3x
+    LOCKED --> ACTIVE : 30分鐘後自動解鎖
+    LOCKED --> SUSPENDED : 密碼重設失敗3次
 
-    SUSPENDED --> ACTIVE : Manual Review Approved
-    SUSPENDED --> CLOSED : Fraud Confirmed
+    SUSPENDED --> ACTIVE : 人工審核通過
+    SUSPENDED --> CLOSED : 詐欺確認
 
-    PENDING_VERIFICATION --> ACTIVE : KYC Approved
-    PENDING_VERIFICATION --> SUSPENDED : KYC Document Forgery
-    PENDING_VERIFICATION --> CLOSED : ID Verification Fails 3x
+    PENDING_VERIFICATION --> ACTIVE : KYC通過
+    PENDING_VERIFICATION --> SUSPENDED : KYC文件偽造
+    PENDING_VERIFICATION --> CLOSED : 身份驗證失敗3次
 
     CLOSED --> [*]
 
     note right of ACTIVE
-        Default State
-        No Restrictions
-        All Operations Allowed
+        預設狀態
+        無限制
+        允許所有操作
     end note
 
     note right of LOCKED
-        Security Protection
-        - Anti Brute Force
-        - Auto Unlock
-        - Password Reset Available
+        安全保護
+        - 防暴力破解
+        - 自動解鎖
+        - 可重設密碼
     end note
 
     note right of SUSPENDED
-        Risk Freeze State
-        - No Fund Operations
-        - Manual Review Required
-        - Appeal Submission Allowed
+        風險凍結狀態
+        - 禁止資金操作
+        - 需人工審核
+        - 可提交申訴
     end note
 
     note right of PENDING_VERIFICATION
-        Withdrawal Triggers KYC Upgrade
-        - Limited Withdrawal Amount
-        - L0 to L1: Upload Document
-        - L1 to L2: Address Verification
+        提款觸發KYC升級
+        - 限制提款金額
+        - L0→L1: 上傳文件
+        - L1→L2: 地址驗證
     end note
 
     note right of CLOSED
-        Irreversible Terminal State
-        - Self-Exclusion
-        - AML Violation
-        - Fraud Confirmed
-        - Refund Unused Balance
+        不可逆終止狀態
+        - 自我排除
+        - AML違規
+        - 詐欺確認
+        - 退還未使用餘額
     end note
 ```
 
-### 1.2 KYC Upgrade Flow
+### 1.2 KYC 升級流程（KYC Upgrade Flow）
 
 ```mermaid
 flowchart TD
-    START[New Player Registration] --> L0[L0 - Phone/Email Only]
+    START[新玩家註冊] --> L0[L0 - 僅電話/郵箱]
 
-    L0 --> DEPOSIT{First Deposit?}
-    DEPOSIT -->|Yes| CHECK_AMOUNT{Amount > $100?}
-    CHECK_AMOUNT -->|Yes| SUGGEST_L1[Suggest L1 Upgrade]
-    CHECK_AMOUNT -->|No| NORMAL_L0[Stay L0 - Limit $500]
+    L0 --> DEPOSIT{首次存款?}
+    DEPOSIT -->|是| CHECK_AMOUNT{金額 > $100?}
+    CHECK_AMOUNT -->|是| SUGGEST_L1[建議L1升級]
+    CHECK_AMOUNT -->|否| NORMAL_L0[保持L0 - 限額$500]
 
-    NORMAL_L0 --> WITHDRAW1{First Withdrawal?}
-    WITHDRAW1 -->|Amount > $500| FORCE_L1[Force L1 Upgrade]
-    WITHDRAW1 -->|Amount <= $500| ALLOW_L0[Allow Withdrawal - L0 Limit]
+    NORMAL_L0 --> WITHDRAW1{首次提款?}
+    WITHDRAW1 -->|金額 > $500| FORCE_L1[強制L1升級]
+    WITHDRAW1 -->|金額 <= $500| ALLOW_L0[允許提款 - L0限額]
 
-    SUGGEST_L1 --> L1_UPLOAD[Upload Document]
+    SUGGEST_L1 --> L1_UPLOAD[上傳文件]
     FORCE_L1 --> L1_UPLOAD
 
-    L1_UPLOAD --> L1_OCR[AI OCR Recognition]
-    L1_OCR --> L1_LIVENESS[Liveness Detection]
-    L1_LIVENESS --> L1_REVIEW{Review Result?}
+    L1_UPLOAD --> L1_OCR[AI OCR識別]
+    L1_OCR --> L1_LIVENESS[活體檢測]
+    L1_LIVENESS --> L1_REVIEW{審核結果?}
 
-    L1_REVIEW -->|Approved| L1[L1 - Identity Verified]
-    L1_REVIEW -->|Rejected| L1_RETRY[Rejected + Reason - Allow 3 Retries]
+    L1_REVIEW -->|通過| L1[L1 - 身份已驗證]
+    L1_REVIEW -->|拒絕| L1_RETRY[拒絕+原因 - 允許3次重試]
 
-    L1 --> WITHDRAW2{Withdrawal Amount?}
-    WITHDRAW2 -->|Amount > $5,000| FORCE_L2[Force L2 Upgrade]
-    WITHDRAW2 -->|Amount <= $5,000| ALLOW_L1[Allow Withdrawal]
+    L1 --> WITHDRAW2{提款金額?}
+    WITHDRAW2 -->|金額 > $5,000| FORCE_L2[強制L2升級]
+    WITHDRAW2 -->|金額 <= $5,000| ALLOW_L1[允許提款]
 
-    FORCE_L2 --> L2_UPLOAD[Upload Address Proof]
-    L2_UPLOAD --> L2_REVIEW{Manual Review?}
+    FORCE_L2 --> L2_UPLOAD[上傳地址證明]
+    L2_UPLOAD --> L2_REVIEW{人工審核?}
 
-    L2_REVIEW -->|Approved| L2[L2 - Address Verified]
-    L2_REVIEW -->|Rejected| L2_RETRY[Rejected + Reason]
+    L2_REVIEW -->|通過| L2[L2 - 地址已驗證]
+    L2_REVIEW -->|拒絕| L2_RETRY[拒絕+原因]
 
-    L2 --> UNLIMITED[Unlimited Withdrawal]
+    L2 --> UNLIMITED[無限額提款]
 
     style L0 fill:#FFE5B4
     style L1 fill:#B4D7FF
@@ -131,37 +131,37 @@ flowchart TD
     style FORCE_L2 fill:#FFB4B4
 ```
 
-### 1.3 KYC Review Decision Flow
+### 1.3 KYC 審核決策流程（KYC Review Decision Flow）
 
 ```mermaid
 flowchart TD
-    START[KYC Document Upload Complete] --> OCR[Sumsub OCR Recognition]
+    START[KYC文件上傳完成] --> OCR[Sumsub OCR識別]
 
-    OCR --> CHECK_CONF{OCR Confidence Score?}
-    CHECK_CONF -->|>= 95%| FACE[Face Matching]
-    CHECK_CONF -->|< 95%| MANUAL1[Manual Review - OCR Uncertain]
+    OCR --> CHECK_CONF{OCR信心分數?}
+    CHECK_CONF -->|>= 95%| FACE[人臉比對]
+    CHECK_CONF -->|< 95%| MANUAL1[人工審核 - OCR不確定]
 
-    FACE --> CHECK_FACE{Match Score?}
-    CHECK_FACE -->|>= 98%| BLACKLIST[Blacklist Check]
-    CHECK_FACE -->|< 98%| MANUAL2[Manual Review - Face Mismatch]
+    FACE --> CHECK_FACE{比對分數?}
+    CHECK_FACE -->|>= 98%| BLACKLIST[黑名單檢查]
+    CHECK_FACE -->|< 98%| MANUAL2[人工審核 - 人臉不符]
 
-    BLACKLIST --> CHECK_BL{Blacklist Match?}
-    CHECK_BL -->|Yes| REJECT[Auto Reject - Blacklisted]
-    CHECK_BL -->|No| AGE_CHECK{Age Check?}
+    BLACKLIST --> CHECK_BL{黑名單匹配?}
+    CHECK_BL -->|是| REJECT[自動拒絕 - 黑名單]
+    CHECK_BL -->|否| AGE_CHECK{年齡檢查?}
 
-    AGE_CHECK -->|< 18| REJECT_AGE[Auto Reject - Underage]
-    AGE_CHECK -->|18-20| MANUAL3[Manual Review - Risk Age]
-    AGE_CHECK -->|>= 21| AUTO_APPROVE[Auto Approve - 1-5 min]
+    AGE_CHECK -->|< 18| REJECT_AGE[自動拒絕 - 未成年]
+    AGE_CHECK -->|18-20| MANUAL3[人工審核 - 風險年齡]
+    AGE_CHECK -->|>= 21| AUTO_APPROVE[自動通過 - 1-5分鐘]
 
-    MANUAL1 & MANUAL2 & MANUAL3 --> QUEUE[Add to Review Queue]
-    QUEUE --> REVIEWER[Reviewer Inspection]
+    MANUAL1 & MANUAL2 & MANUAL3 --> QUEUE[加入審核佇列]
+    QUEUE --> REVIEWER[審核員檢查]
 
-    REVIEWER --> DECISION{Review Decision?}
-    DECISION -->|Approve| APPROVE[Manual Approve - 1-4 hours]
-    DECISION -->|Reject| REJECT_MANUAL[Manual Reject + Reason]
+    REVIEWER --> DECISION{審核決定?}
+    DECISION -->|通過| APPROVE[人工通過 - 1-4小時]
+    DECISION -->|拒絕| REJECT_MANUAL[人工拒絕+原因]
 
-    AUTO_APPROVE & APPROVE --> UPDATE[Update KYC Level]
-    REJECT & REJECT_AGE & REJECT_MANUAL --> NOTIFY[Notify Player]
+    AUTO_APPROVE & APPROVE --> UPDATE[更新KYC等級]
+    REJECT & REJECT_AGE & REJECT_MANUAL --> NOTIFY[通知玩家]
 
     style AUTO_APPROVE fill:#B4FFB4
     style APPROVE fill:#B4FFB4
@@ -175,7 +175,7 @@ flowchart TD
 
 ---
 
-## 2. Database Schema
+## 2. 資料庫架構（Database Schema）
 
 ### 2.1 Players Table
 
@@ -318,11 +318,11 @@ CREATE INDEX idx_kyc_tasks_status ON t_kyc_verification_tasks(status);
 
 ---
 
-## 3. API Specifications
+## 3. API 規格（API Specifications）
 
 ### 3.1 Player Lifecycle API
 
-#### Get Player Lifecycle Stage
+#### 取得玩家生命週期階段（Get Player Lifecycle Stage）
 
 ```
 GET /api/player/lifecycle/{playerId}/stage
@@ -348,7 +348,7 @@ GET /api/player/lifecycle/{playerId}/stage
 }
 ```
 
-#### Lock Player Account
+#### 鎖定玩家帳戶（Lock Player Account）
 
 ```
 POST /api/player/lifecycle/{playerId}/lock?reason=MANUAL_LOCK
@@ -363,7 +363,7 @@ POST /api/player/lifecycle/{playerId}/lock?reason=MANUAL_LOCK
 }
 ```
 
-#### Suspend Player Account
+#### 暫停玩家帳戶（Suspend Player Account）
 
 ```
 POST /api/player/lifecycle/{playerId}/suspend?reason=HIGH_RISK_SCORE
@@ -380,7 +380,7 @@ POST /api/player/lifecycle/{playerId}/suspend?reason=HIGH_RISK_SCORE
 
 ### 3.2 KYC API
 
-#### Create KYC Session
+#### 建立 KYC 會話（Create KYC Session）
 
 ```
 POST /api/player/kyc/session
@@ -405,13 +405,13 @@ POST /api/player/kyc/session
 }
 ```
 
-#### KYC Webhook (Sumsub Callback)
+#### KYC Webhook (Sumsub 回調)
 
 ```
 POST /api/webhook/kyc/sumsub
 ```
 
-**Request** (from Sumsub):
+**Request** (來自 Sumsub):
 ```json
 {
   "applicantId": "abc123",
@@ -422,11 +422,11 @@ POST /api/webhook/kyc/sumsub
 
 ---
 
-## 4. SmartAdmin Architecture Mapping
+## 4. SmartAdmin 架構映射（SmartAdmin Architecture Mapping）
 
-### 4.1 Layer Architecture Overview
+### 4.1 層級架構概覽（Layer Architecture Overview）
 
-SmartAdmin strictly follows a four-layer architecture:
+SmartAdmin 嚴格遵循四層架構：
 
 ```
 Controller Layer
@@ -440,12 +440,12 @@ Dao Layer (Data Access - MyBatis Plus)
 Entity Layer (Database Table Mapping)
 ```
 
-**Key Constraints (ArchUnit Enforced)**:
-- Controller can only call Service, cannot directly call Dao/Manager
-- Service can directly call Dao (single-table CRUD), requires Manager for transactions
-- `@Transactional` only in Manager layer, never in Service/Controller
-- Service layer uses `io.vavr.control.Option`, not `java.util.Optional`
-- Dependency injection: `@RequiredArgsConstructor` + `private final`, no `@Autowired` field injection
+**關鍵約束（ArchUnit 強制執行）**：
+- Controller 只能呼叫 Service，不能直接呼叫 Dao/Manager
+- Service 可以直接呼叫 Dao（單表 CRUD），需要 Manager 處理交易
+- `@Transactional` 僅在 Manager 層，絕不在 Service/Controller
+- Service 層使用 `io.vavr.control.Option`，不使用 `java.util.Optional`
+- 依賴注入：`@RequiredArgsConstructor` + `private final`，禁止 `@Autowired` 欄位注入
 
 ### 4.2 Entity - PlayerEntity
 
@@ -966,22 +966,22 @@ public class PlayerLifecycleController {
 }
 ```
 
-### 4.6 Foundation Module Dependencies
+### 4.6 基礎模組依賴（Foundation Module Dependencies）
 
-| Foundation Module | Usage | Call Location |
+| 基礎模組（Foundation Module） | 用途（Usage） | 呼叫位置（Call Location） |
 |------------------|-------|---------------|
-| **support.redis-lock** | Prevent concurrent status transitions (distributed lock) | Manager `transitionAccountStatus()` |
-| **support.mq** | Publish status change events (Kafka) | Manager `PlayerStatusChangedEvent` |
-| **support.cache** | Cache player lifecycle stage (Redis) | Service `getPlayerLifecycleStage()` |
-| **support.audit-log** | Record status transition audit logs | Manager `PlayerLoginLogEntity` |
+| **support.redis-lock** | 防止並發狀態轉換（分散式鎖） | Manager `transitionAccountStatus()` |
+| **support.mq** | 發布狀態變更事件（Kafka） | Manager `PlayerStatusChangedEvent` |
+| **support.cache** | 快取玩家生命週期階段（Redis） | Service `getPlayerLifecycleStage()` |
+| **support.audit-log** | 記錄狀態轉換審計日誌 | Manager `PlayerLoginLogEntity` |
 
 ---
 
-## 5. KYC Integration
+## 5. KYC 整合（KYC Integration）
 
-### 5.1 Sumsub Integration
+### 5.1 Sumsub 整合
 
-#### KycVerificationManager (Transaction Layer)
+#### KycVerificationManager（交易層，Transaction Layer）
 
 ```java
 package net.lab1024.sa.business.module.player.manager;
@@ -1073,7 +1073,7 @@ public class KycVerificationManager {
 }
 ```
 
-#### KycVerificationService (Business Logic Layer)
+#### KycVerificationService（業務邏輯層，Business Logic Layer）
 
 ```java
 package net.lab1024.sa.business.module.player.service;
@@ -1144,9 +1144,9 @@ public class KycVerificationService {
 }
 ```
 
-### 5.2 Device Fingerprint Collection
+### 5.2 設備指紋採集（Device Fingerprint Collection）
 
-**Frontend JavaScript SDK** (FingerprintJS Pro):
+**前端 JavaScript SDK** (FingerprintJS Pro):
 
 ```javascript
 import FingerprintJS from '@fingerprintjs/fingerprintjs-pro'
@@ -1192,7 +1192,7 @@ fpPromise
 
 ---
 
-## 6. ArchUnit Architecture Tests
+## 6. ArchUnit 架構測試（ArchUnit Architecture Tests）
 
 ```java
 package net.lab1024.sa.app.architecture;
@@ -1264,11 +1264,11 @@ class PlayerLifecycleArchitectureTest {
 
 ---
 
-## 7. Recovery Path Implementations
+## 7. 恢復路徑實作（Recovery Path Implementations）
 
-### 7.1 LOCKED -> ACTIVE (Auto-Unlock)
+### 7.1 LOCKED → ACTIVE（自動解鎖，Auto-Unlock）
 
-**Recovery Path 1: Time-based Auto-Unlock**
+**恢復路徑 1：基於時間的自動解鎖（Time-based Auto-Unlock）**
 
 ```sql
 -- Cron Job: Execute every 5 minutes
@@ -1281,7 +1281,7 @@ WHERE account_status = 'LOCKED'
   AND locked_until <= NOW();
 ```
 
-**Recovery Path 2: Password Reset Flow**
+**恢復路徑 2：密碼重設流程（Password Reset Flow）**
 
 ```java
 package net.lab1024.sa.business.module.player.manager;
@@ -1359,7 +1359,7 @@ public class PasswordResetService {
 }
 ```
 
-### 7.2 SUSPENDED -> ACTIVE (Manual Review)
+### 7.2 SUSPENDED → ACTIVE（人工審核，Manual Review）
 
 ```java
 package net.lab1024.sa.business.module.player.manager;
@@ -1416,13 +1416,13 @@ public class AppealManager {
 }
 ```
 
-### 7.3 CLOSED -> No Recovery
+### 7.3 CLOSED → 無恢復（No Recovery）
 
-**Irreversible State**: CLOSED status cannot be recovered. Players must re-register (with different Email/Phone).
+**不可逆狀態**：CLOSED 狀態無法恢復。玩家必須重新註冊（使用不同的電子郵件/電話）。
 
-**Exceptions**:
-- **Mistaken Operation**: System error or CS mistake - direct DB modification (requires executive approval)
-- **Self-Exclusion Expiry**: If player set a cooling-off period (e.g., 180 days), can apply to reopen after expiry
+**例外情況**：
+- **誤操作（Mistaken Operation）**：系統錯誤或客服失誤 - 需直接修改資料庫（需要主管批准）
+- **自我排除到期（Self-Exclusion Expiry）**：如果玩家設定了冷靜期（例如 180 天），到期後可申請重新開通
 
 ```sql
 -- Reopen account (requires executive approval)
@@ -1440,22 +1440,22 @@ WHERE player_id = ?
 
 ---
 
-## 8. Related Documents
+## 8. 相關文件（Related Documents）
 
-### Technical Documents
+### 技術文件（Technical Documents）
 - Risk Control Framework
 - Unified Wallet Model
 - Multi-Tenant Architecture
 
-### Business Documents
-- [Player_Lifecycle.md](../../requirements/01_Player_Experience/Player_Lifecycle.md) - Business requirements view
+### 業務文件（Business Documents）
+- [Player_Lifecycle.md](../../requirements/01_Player_Experience/Player_Lifecycle.md) - 業務需求視圖
 
 ---
 
-**Document Version**: 1.0.0
-**Created Date**: 2026-02-08
-**Last Updated**: 2026-02-08
-**Maintainers**: Player Center Team & Backend Team
+**文件版本（Document Version）**: 1.0.0
+**建立日期（Created Date）**: 2026-02-08
+**最後更新（Last Updated）**: 2026-02-08
+**維護者（Maintainers）**: Player Center Team & Backend Team
 
-**Change History**:
+**變更歷史（Change History）**:
 - 1.0.0 (2026-02-08): Initial version - Split from source document (technical architecture view)
