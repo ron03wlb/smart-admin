@@ -70,7 +70,7 @@ sequenceDiagram
 ### 2.3 Implementation (Java)
 
 ```java
-@Service
+@Component
 @RequiredArgsConstructor
 public class RoundLifecycleManager {
 
@@ -272,7 +272,7 @@ redisson:
 ### 5.2 Lock Implementation
 
 ```java
-@Service
+@Component
 @RequiredArgsConstructor
 public class ConcurrencyManager {
 

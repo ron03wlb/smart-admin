@@ -556,7 +556,7 @@ import net.lab1024.sa.business.module.player.domain.entity.PlayerLoginLogEntity;
 import net.lab1024.sa.business.module.player.domain.event.PlayerStatusChangedEvent;
 import net.lab1024.sa.support.redislock.DistributedLock;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -568,7 +568,7 @@ import java.util.concurrent.TimeUnit;
  * Responsibility: Complex transaction coordination (status transition + logging + event publishing)
  */
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class PlayerLifecycleManager {
 

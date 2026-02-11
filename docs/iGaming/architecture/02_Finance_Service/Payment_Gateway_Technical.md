@@ -1059,10 +1059,10 @@ spring:
 
 ```java
 @Component
+@RequiredArgsConstructor
 public class HikariMonitor {
 
-    @Autowired
-    private HikariDataSource dataSource;
+    private final HikariDataSource dataSource;
 
     @Scheduled(fixedDelay = 60000) // Every minute
     public void logPoolStats() {
