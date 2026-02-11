@@ -1,4 +1,4 @@
-# Technology Stack
+# 技術堆疊（Technology Stack）
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-09_Technology_Stack.md](../../source-archive/00_Foundation/guides/00-09_Technology_Stack.md)
 > **Audience**: Architects, Backend Developers, DevOps Engineers
@@ -7,44 +7,44 @@
 
 ---
 
-## Technology Selection Principles
+## 技術選型原則（Technology Selection Principles）
 
-### 1. Selection Decision Criteria
+### 1. 選型決策標準（Selection Decision Criteria）
 
-**Mandatory Requirements**:
-- Performance: Support high concurrency (10K+ TPS), low latency (<100ms P95)
-- Scalability: Horizontal scaling capability, stateless design
-- Reliability: 99.95%+ availability, disaster recovery capability
-- Security: PCI DSS, GDPR, SOC 2 compliance
-- Community Support: Active community, long-term maintenance, sufficient documentation
-- Talent Availability: Mainstream technology, ease of recruitment, reasonable learning curve
+**強制性要求（Mandatory Requirements）**：
+- 性能：支援高並發（10K+ TPS），低延遲（<100ms P95）
+- 可擴展性：水平擴展能力，無狀態設計
+- 可靠性：99.95%+ 可用性，災難恢復能力
+- 安全性：符合 PCI DSS、GDPR、SOC 2 合規要求
+- 社群支援：活躍社群，長期維護，充足文檔
+- 人才可得性：主流技術，易於招募，學習曲線合理
 
-### 2. Evaluation Dimension Weights
+### 2. 評估維度權重（Evaluation Dimension Weights）
 
-| Dimension | Weight | Description |
+| 維度 | 權重 | 說明 |
 |-----------|--------|-------------|
-| Performance | 30% | Throughput, latency, resource efficiency |
-| Maturity | 25% | Production validation, stability, case count |
-| Cost | 15% | Licensing fees, operations cost, personnel cost |
-| Ecosystem | 15% | Community, toolchain, integration capability |
-| Security | 10% | Vulnerability records, compliance, auditing |
-| Maintainability | 5% | Code quality, debugging tools, monitoring |
+| 性能 | 30% | 吞吐量、延遲、資源效率 |
+| 成熟度 | 25% | 生產驗證、穩定性、案例數量 |
+| 成本 | 15% | 許可費用、運維成本、人力成本 |
+| 生態系統 | 15% | 社群、工具鏈、集成能力 |
+| 安全性 | 10% | 漏洞記錄、合規性、審計 |
+| 可維護性 | 5% | 程式碼品質、除錯工具、監控 |
 
-### 3. Selection Decision Process
+### 3. 選型決策流程（Selection Decision Process）
 
 ```text
-1. Requirements Analysis -> 2. Candidate Technology Research -> 3. POC Validation -> 4. Scoring Decision -> 5. Architecture Review -> 6. Pilot Deployment
+1. 需求分析 -> 2. 候選技術調研 -> 3. POC 驗證 -> 4. 評分決策 -> 5. 架構評審 -> 6. 試點部署
 ```
 
 ---
 
-## Core Technology Stack Overview
+## 核心技術堆疊總覽（Core Technology Stack Overview）
 
-### Technology Architecture Full View
+### 技術架構全景圖（Technology Architecture Full View）
 
 ```text
 +---------------------------------------------------------+
-|                   Frontend Layer                          |
+|                   前端層（Frontend Layer）                 |
 |   Web: React 18 + TypeScript + Vite                     |
 |   Mobile: React Native 0.73 / Flutter 3.16              |
 |   CMS: Next.js 14 (SSR/ISR)                             |
@@ -57,7 +57,7 @@
 +------------+--------------------------------------------+
              |
 +------------v--------------------------------------------+
-|                  Backend Services                         |
+|                  後端服務（Backend Services）               |
 |   Java 21 (Spring Boot 3.2) - Core Business             |
 |   Node.js 20 (Fastify 4) - Real-time Services           |
 |   Go 1.22 - High Performance (Risk Engine, Payment GW)  |
@@ -65,7 +65,7 @@
 +------------+--------------------------------------------+
              |
 +------------v--------------------------------------------+
-|                  Data & Message Layer                     |
+|                  資料與訊息層（Data & Message Layer）       |
 |   PostgreSQL 16 (Primary) + Citus (Sharding)            |
 |   Redis 7.2 (Cache + Session + Rate Limiting)           |
 |   Apache Kafka 3.6 (Event Stream)                       |
@@ -74,30 +74,30 @@
 +------------+--------------------------------------------+
              |
 +------------v--------------------------------------------+
-|              Infrastructure & Operations                  |
+|              基礎設施與維運（Infrastructure & Operations）   |
 |   Kubernetes 1.29 + Helm 3.13                           |
 |   Docker 25.0                                            |
 |   Terraform 1.7 (IaC)                                    |
 |   ArgoCD 2.9 (GitOps)                                    |
-|   Prometheus + Grafana (Monitoring)                      |
+|   Prometheus + Grfana (Monitoring)                      |
 |   Datadog / New Relic (APM)                              |
 +---------------------------------------------------------+
 ```
 
 ---
 
-## Backend Technology Stack
+## 後端技術堆疊（Backend Technology Stack）
 
-### 1. Primary Development Languages
+### 1. 主要開發語言（Primary Development Languages）
 
-#### Java 21 (LTS) + Spring Boot 3.2 - Recommended
+#### Java 21 (LTS) + Spring Boot 3.2 - 推薦
 
-**Use Cases**:
-- Core business services (Player, Wallet, Transaction, Activity)
-- Complex business logic (Turnover Calculation, Reconciliation System)
-- High-consistency services
+**使用場景（Use Cases）**：
+- 核心業務服務（玩家、錢包、交易、活動）
+- 複雜業務邏輯（流水計算、對帳系統）
+- 高一致性服務
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Language: Java 21 (LTS until 2029)
 Framework: Spring Boot 3.2.x
@@ -115,28 +115,28 @@ Scheduling: Spring Scheduler + Quartz 2.3
 Distributed Lock: Redisson 3.26
 ```
 
-**Selection Rationale**:
-- Mature ecosystem, active community, abundant talent pool
-- Strong type system, compile-time checks, refactoring-friendly
-- Rich enterprise features (transactions, security, caching)
-- Spring Boot auto-configuration, out-of-the-box
-- Java 21 performance improvements (Virtual Threads, G1GC optimization)
+**選型理由（Selection Rationale）**：
+- 成熟生態系統，活躍社群，豐富人才池
+- 強型別系統，編譯期檢查，易於重構
+- 豐富的企業級特性（事務、安全、快取）
+- Spring Boot 自動配置，開箱即用
+- Java 21 性能改進（Virtual Threads、G1GC 優化）
 
-**Version Requirements**:
-- Java: >= 21 (recommended 21 LTS)
+**版本要求（Version Requirements）**：
+- Java: >= 21 (推薦 21 LTS)
 - Spring Boot: >= 3.2.0
 - Spring Cloud: >= 2023.0.0
 
 ---
 
-#### Node.js 20 LTS + Fastify 4 - Recommended
+#### Node.js 20 LTS + Fastify 4 - 推薦
 
-**Use Cases**:
-- Real-time communication services (WebSocket, SSE)
-- Lightweight API services (Game Lobby, Frontend BFF)
-- Rapid prototyping
+**使用場景（Use Cases）**：
+- 即時通訊服務（WebSocket、SSE）
+- 輕量級 API 服務（遊戲大廳、前端 BFF）
+- 快速原型開發
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Runtime: Node.js 20 LTS (until 2026-04)
 Framework: Fastify 4.25 (High-performance HTTP)
@@ -152,27 +152,27 @@ Validation: zod 3.22 / joi 17.12
 Testing: Vitest 1.2 + Supertest 6.3
 ```
 
-**Selection Rationale**:
-- Single-threaded non-blocking I/O, suitable for high concurrency
-- Fastify performance exceeds Express (3-5x)
-- Excellent TypeScript support
-- Rich npm ecosystem, high development efficiency
-- Frontend-backend language unification, talent sharing
+**選型理由（Selection Rationale）**：
+- 單執行緒非阻塞 I/O，適合高並發
+- Fastify 性能超越 Express（3-5 倍）
+- 優秀的 TypeScript 支援
+- 豐富的 npm 生態系統，開發效率高
+- 前後端語言統一，人才共享
 
-**Performance Benchmarks**:
-- Throughput: ~50K req/s (single core)
-- Latency: <10ms P99 (simple queries)
+**性能基準（Performance Benchmarks）**：
+- 吞吐量：~50K req/s（單核）
+- 延遲：<10ms P99（簡單查詢）
 
 ---
 
-#### Go 1.22 - Recommended
+#### Go 1.22 - 推薦
 
-**Use Cases**:
-- **High-performance components**: Payment Gateway, Risk Engine
-- **Low-latency services**: Rate Limiting, Circuit Breaking, Load Balancing
-- **System tools**: Data Synchronization, Reconciliation Scripts
+**使用場景（Use Cases）**：
+- **高性能元件**：支付閘道、風控引擎
+- **低延遲服務**：限流、熔斷、負載均衡
+- **系統工具**：資料同步、對帳腳本
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Language: Go 1.22
 Framework: Gin 1.9 / Fiber 2.52
@@ -184,28 +184,28 @@ Logging: zap 1.26 + lumberjack 2.2
 Testing: testify 1.8
 ```
 
-**Selection Rationale**:
-- Compiled language, native concurrency (goroutine)
-- Low memory footprint (< Java/Node.js)
-- Fast startup (<1 second)
-- Clean syntax, easy to maintain
-- Static typing, compile-time checks
+**選型理由（Selection Rationale）**：
+- 編譯型語言，原生並發（goroutine）
+- 記憶體佔用低（< Java/Node.js）
+- 啟動快速（<1 秒）
+- 簡潔語法，易於維護
+- 靜態型別，編譯期檢查
 
-**Performance Advantages**:
-- Startup time: ~500ms (vs Java 5-10s)
-- Memory footprint: ~50MB (vs Java 200MB+)
-- Concurrency: Million-level goroutines
+**性能優勢（Performance Advantages）**：
+- 啟動時間：~500ms（vs Java 5-10s）
+- 記憶體佔用：~50MB（vs Java 200MB+）
+- 並發能力：百萬級 goroutine
 
 ---
 
-#### Python 3.12 + FastAPI - Specialized Scenarios
+#### Python 3.12 + FastAPI - 專用場景
 
-**Use Cases**:
-- **ML Risk Models**: Fraud detection, anomalous turnover identification
-- **Data Analysis**: BI reports, data mining
-- **Automation Scripts**: Data migration, batch processing
+**使用場景（Use Cases）**：
+- **ML 風控模型**：詐欺偵測、異常流水識別
+- **資料分析**：BI 報表、資料探勘
+- **自動化腳本**：資料遷移、批次處理
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Language: Python 3.12
 Web Framework: FastAPI 0.109
@@ -220,11 +220,11 @@ Cache: redis-py 5.0
 
 ---
 
-### 2. Microservices Architecture
+### 2. 微服務架構（Microservices Architecture）
 
 #### Spring Cloud 2023.0.x
 
-**Core Components**:
+**核心元件（Core Components）**：
 ```yaml
 Service Registry: Consul 1.17 (recommended) / Eureka 2.0
 Config Center: Spring Cloud Config + Consul KV
@@ -234,33 +234,33 @@ Circuit Breaking/Rate Limiting: Resilience4j 2.2
 Distributed Tracing: Micrometer Tracing + Zipkin 2.24
 ```
 
-**vs Kubernetes Service Mesh**:
+**vs Kubernetes Service Mesh**：
 
-| Dimension | Spring Cloud | Istio Service Mesh |
+| 維度 | Spring Cloud | Istio Service Mesh |
 |-----------|-------------|-------------------|
-| Language Binding | Java Only | Language Agnostic |
-| Performance Overhead | Low | Medium (Sidecar proxy) |
-| Learning Curve | Steep | Steeper |
-| Observability | Good | Excellent |
-| Community | Java Community | CNCF |
+| 語言綁定 | 僅限 Java | 語言無關 |
+| 性能開銷 | 低 | 中等（Sidecar proxy） |
+| 學習曲線 | 陡峭 | 更陡峭 |
+| 可觀測性 | 良好 | 優秀 |
+| 社群 | Java 社群 | CNCF |
 
-**Recommended Strategy**:
-- **Spring Cloud**: Pure Java microservices, team familiar with Spring
-- **Istio**: Multi-language services, cloud-native architecture, future trend
+**推薦策略（Recommended Strategy）**：
+- **Spring Cloud**：純 Java 微服務，團隊熟悉 Spring
+- **Istio**：多語言服務，雲原生架構，未來趨勢
 
 ---
 
-### 3. API Design Standards
+### 3. API 設計標準（API Design Standards）
 
-#### RESTful API - Primary
+#### RESTful API - 主要
 
-**Specifications**:
-- **HTTP Methods**: GET (query), POST (create), PUT (replace), PATCH (partial update), DELETE (delete)
-- **Path Naming**: `/api/v1/{resource}`, `/api/v1/{resource}/{id}`
-- **Versioning Strategy**: URL versioning (`/v1/`, `/v2/`)
-- **Response Format**: JSON (unified wrapper)
+**規範（Specifications）**：
+- **HTTP Methods**：GET（查詢）、POST（建立）、PUT（替換）、PATCH（部分更新）、DELETE（刪除）
+- **路徑命名**：`/api/v1/{resource}`、`/api/v1/{resource}/{id}`
+- **版本策略**：URL 版本控制（`/v1/`、`/v2/`）
+- **回應格式**：JSON（統一包裝）
 
-**Unified Response Format**:
+**統一回應格式（Unified Response Format）**：
 ```json
 {
   "code": 1000,
@@ -271,30 +271,30 @@ Distributed Tracing: Micrometer Tracing + Zipkin 2.24
 }
 ```
 
-#### GraphQL (Optional)
+#### GraphQL（可選）
 
-**Use Cases**:
-- Frontend BFF (Backend for Frontend)
-- Complex relational queries (reduce over-fetching)
-- Mobile API (reduce request count)
+**使用場景（Use Cases）**：
+- 前端 BFF（Backend for Frontend）
+- 複雜關聯查詢（減少過度獲取）
+- 行動端 API（減少請求次數）
 
-**Technology Selection**:
+**技術選型（Technology Selection）**：
 - Java: Spring GraphQL 1.2
 - Node.js: Apollo Server 4.x
 
-**Recommended Strategy**:
-- **Internal API**: RESTful (standardized, cache-friendly)
-- **Mobile API**: GraphQL (higher flexibility)
+**推薦策略（Recommended Strategy）**：
+- **內部 API**：RESTful（標準化，快取友好）
+- **行動端 API**：GraphQL（靈活性更高）
 
 ---
 
-## Frontend Technology Stack
+## 前端技術堆疊（Frontend Technology Stack）
 
-### 1. Web Frontend
+### 1. Web 前端
 
-#### React 18 + TypeScript + Vite - Recommended
+#### React 18 + TypeScript + Vite - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Language: TypeScript 5.3
 Framework: React 18.2
@@ -311,9 +311,9 @@ SSR Framework: Next.js 14.1 (SEO-friendly)
 Testing: Vitest 1.2 + React Testing Library 14.1
 ```
 
-#### Vue 3 (Alternative)
+#### Vue 3（替代方案）
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Framework: Vue 3.4 + Composition API
 Build: Vite 5.0
@@ -324,11 +324,11 @@ UI Library: Element Plus 2.5 / Ant Design Vue 4.1
 
 ---
 
-### 2. Mobile
+### 2. 行動端（Mobile）
 
-#### React Native 0.73 - Recommended
+#### React Native 0.73 - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Framework: React Native 0.73
 Language: TypeScript 5.3
@@ -339,26 +339,26 @@ Hot Updates: CodePush (Microsoft)
 Build: EAS Build (Expo)
 ```
 
-#### Flutter 3.16 (Alternative)
+#### Flutter 3.16（替代方案）
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Framework: Flutter 3.16
 Language: Dart 3.2
 State Management: Riverpod 2.4 / Bloc 8.1
 ```
 
-**Recommended Strategy**:
-- **React Native**: Team has React experience, rapid iteration
-- **Flutter**: Pursuit of ultimate performance, dedicated mobile team
+**推薦策略（Recommended Strategy）**：
+- **React Native**：團隊具備 React 經驗，快速迭代
+- **Flutter**：追求極致性能，專職行動端團隊
 
 ---
 
-### 3. CMS Admin Backend
+### 3. CMS 管理後台
 
-#### Next.js 14 + React 18 - Recommended
+#### Next.js 14 + React 18 - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Framework: Next.js 14.1 (App Router)
 Rendering Strategy:
@@ -372,18 +372,18 @@ Deployment: Vercel / Self-hosted
 
 ---
 
-## Data Storage Technology
+## 資料儲存技術（Data Storage Technology）
 
-### 1. Relational Database
+### 1. 關聯式資料庫（Relational Database）
 
-#### PostgreSQL 16 + Citus - Recommended
+#### PostgreSQL 16 + Citus - 推薦
 
-**Use Cases**:
-- **Primary Database**: Player, Wallet, Transaction, Game
-- **OLTP Business**: High-concurrency read/write, transactional consistency
-- **Horizontal Scaling**: Citus sharding (single table >100M rows)
+**使用場景（Use Cases）**：
+- **主資料庫**：玩家、錢包、交易、遊戲
+- **OLTP 業務**：高並發讀寫、事務一致性
+- **水平擴展**：Citus 分片（單表 >100M 行）
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Database: PostgreSQL 16.1
 Sharding Extension: Citus 12.1 (Distributed PostgreSQL)
@@ -393,44 +393,44 @@ Monitoring: pg_stat_statements + Prometheus Exporter
 High Availability: Patroni 3.2 + etcd 3.5
 ```
 
-**Selection Rationale**:
-- ACID transactional integrity (financial-grade)
-- JSON/JSONB support (flexible data structures)
-- Rich index types (B-Tree, GIN, BRIN)
-- Window functions, CTE (complex analytical queries)
-- Citus sharding extension (TB-level data)
-- Open source, active community
+**選型理由（Selection Rationale）**：
+- ACID 事務完整性（金融級）
+- JSON/JSONB 支援（靈活資料結構）
+- 豐富的索引類型（B-Tree、GIN、BRIN）
+- 視窗函數、CTE（複雜分析查詢）
+- Citus 分片擴展（TB 級資料）
+- 開源，活躍社群
 
-**Version Requirements**:
+**版本要求（Version Requirements）**：
 - PostgreSQL: >= 16.0
 - Citus: >= 12.0
 
-**vs MySQL 8.0**:
+**vs MySQL 8.0**：
 
-| Dimension | PostgreSQL | MySQL |
+| 維度 | PostgreSQL | MySQL |
 |-----------|-----------|-------|
-| Transaction Isolation | 4-level full support | Repeatable Read default |
-| JSON Support | JSONB efficient | JSON native |
-| Window Functions | Complete | Complete |
-| Sharding Solution | Citus | Vitess / ShardingSphere |
-| Replication Lag | Low | Low |
-| Ecosystem | Java/Python/Go | PHP/Java |
+| 事務隔離級別 | 4 級完整支援 | Repeatable Read 預設 |
+| JSON 支援 | JSONB 高效 | JSON 原生 |
+| 視窗函數 | 完整 | 完整 |
+| 分片方案 | Citus | Vitess / ShardingSphere |
+| 複製延遲 | 低 | 低 |
+| 生態系統 | Java/Python/Go | PHP/Java |
 
 ---
 
-### 2. Cache Layer
+### 2. 快取層（Cache Layer）
 
-#### Redis 7.2 - Recommended
+#### Redis 7.2 - 推薦
 
-**Use Cases**:
-- Hot data caching (player sessions, wallet balance)
-- Distributed locks (Redlock algorithm)
-- Rate limiting (Token Bucket, Sliding Window)
-- Session storage
-- Message queue (Stream)
-- Leaderboards (Sorted Set)
+**使用場景（Use Cases）**：
+- 熱點資料快取（玩家 session、錢包餘額）
+- 分散式鎖（Redlock 演算法）
+- 限流（Token Bucket、Sliding Window）
+- Session 儲存
+- 訊息佇列（Stream）
+- 排行榜（Sorted Set）
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Cache: Redis 7.2 (single-thread optimized)
 High Availability: Redis Sentinel 7.2 / Redis Cluster
@@ -442,7 +442,7 @@ Clients:
 Monitoring: RedisInsight + Prometheus Exporter
 ```
 
-**Configuration Recommendations**:
+**配置建議（Configuration Recommendations）**：
 ```
 # redis.conf
 maxmemory: 80% system memory
@@ -451,15 +451,15 @@ appendonly: yes
 appendfsync: everysec
 ```
 
-#### JetCache 2.7 + Redisson 3.26 - Recommended
+#### JetCache 2.7 + Redisson 3.26 - 推薦
 
-**Use Cases**:
-- **Multi-level caching**: L1 (Caffeine JVM cache) + L2 (Redis distributed cache)
-- **Distributed locks**: Player wallet concurrent updates (replaces `SELECT ... FOR UPDATE`)
-- **Rate limiters**: Token Bucket / Sliding Window (API rate limiting)
-- **Bloom filters**: Prevent cache penetration (check player/order existence)
+**使用場景（Use Cases）**：
+- **多級快取**：L1（Caffeine JVM 快取）+ L2（Redis 分散式快取）
+- **分散式鎖**：玩家錢包並發更新（取代 `SELECT ... FOR UPDATE`）
+- **限流器**：Token Bucket / Sliding Window（API 限流）
+- **布隆過濾器**：防止快取穿透（檢查玩家/訂單是否存在）
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Cache Framework: JetCache 2.7.5
   - Local Cache: Caffeine 3.1.8 (L1)
@@ -474,22 +474,22 @@ Distributed Tools: Redisson 3.26.0
   - Pub/Sub: RTopic (cache invalidation notification)
 ```
 
-**Two-layer Cache Architecture**:
+**兩層快取架構（Two-layer Cache Architecture）**：
 
 ```mermaid
 flowchart LR
-    A[Request] --> B{L1 Caffeine<br/>95% Hit}
-    B -->|Hit| C[Return<br/>< 1ms]
-    B -->|Miss| D{L2 Redis<br/>4.5% Hit}
-    D -->|Hit| E[Return<br/>2-5ms]
-    D -->|Miss| F{Database<br/>0.5% Miss}
-    F --> G[Load Data<br/>20-50ms]
-    G --> H[Update L2]
-    H --> I[Update L1]
+    A[請求] --> B{L1 Caffeine<br/>95% 命中}
+    B -->|命中| C[返回<br/>< 1ms]
+    B -->|未命中| D{L2 Redis<br/>4.5% 命中}
+    D -->|命中| E[返回<br/>2-5ms]
+    D -->|未命中| F{Database<br/>0.5% 未命中}
+    F --> G[載入資料<br/>20-50ms]
+    G --> H[更新 L2]
+    H --> I[更新 L1]
     I --> C
 ```
 
-**JetCache Configuration Example**:
+**JetCache 配置範例（JetCache Configuration Example）**：
 
 ```yaml
 # application.yml
@@ -512,7 +512,7 @@ jetcache:
       uri: redis://redis-master:6379
 ```
 
-**Code Example - JetCache @Cached Annotation**:
+**程式碼範例 - JetCache @Cached 註解（Code Example - JetCache @Cached Annotation）**：
 
 ```java
 // Service layer using JetCache two-layer cache
@@ -545,7 +545,7 @@ public void updateBalance(
 }
 ```
 
-**Code Example - Redisson Distributed Lock**:
+**程式碼範例 - Redisson 分散式鎖（Code Example - Redisson Distributed Lock）**：
 
 ```java
 // Manager layer using Redisson distributed lock
@@ -606,28 +606,28 @@ public class WalletManager {
 }
 ```
 
-**vs Spring Cache / Guava Cache**:
+**vs Spring Cache / Guava Cache**：
 
-| Dimension | JetCache | Spring Cache | Guava Cache |
+| 維度 | JetCache | Spring Cache | Guava Cache |
 |-----------|---------|--------------|-------------|
-| Multi-level Cache | L1+L2 | Single-layer | Single-layer (local) |
-| Annotation Support | @Cached | @Cacheable | None |
-| Serialization | Kryo | JSON | Java |
-| TTL Control | L1/L2 independent | Global | Unified |
-| Cache Warmup | Supported | None | None |
-| Monitoring | Metrics | Limited | None |
-| Distributed Lock | Redisson | None | None |
+| 多級快取 | L1+L2 | 單層 | 單層（本地） |
+| 註解支援 | @Cached | @Cacheable | 無 |
+| 序列化 | Kryo | JSON | Java |
+| TTL 控制 | L1/L2 獨立 | 全局 | 統一 |
+| 快取預熱 | 支援 | 無 | 無 |
+| 監控 | Metrics | 有限 | 無 |
+| 分散式鎖 | Redisson | 無 | 無 |
 
-**Performance Improvement Data**:
+**性能改善資料（Performance Improvement Data）**：
 
-| Metric | Before Optimization | After (JetCache) | Improvement |
+| 指標 | 優化前 | 優化後（JetCache） | 改善幅度 |
 |--------|--------------------|------------------|-------------|
-| P99 Latency | 1,240ms | <=200ms | -84% |
-| Cache Hit Rate | 65% | 95% | +30pp |
-| Redis QPS | 50,000 | 5,000 | -90% (L1 intercept) |
-| Concurrent TPS | 87 | >=450 | +418% |
+| P99 延遲 | 1,240ms | <=200ms | -84% |
+| 快取命中率 | 65% | 95% | +30pp |
+| Redis QPS | 50,000 | 5,000 | -90%（L1 攔截） |
+| 並發 TPS | 87 | >=450 | +418% |
 
-**Version Requirements**:
+**版本要求（Version Requirements）**：
 - JetCache: >= 2.7.0
 - Caffeine: >= 3.1.0
 - Redisson: >= 3.26.0
@@ -635,17 +635,17 @@ public class WalletManager {
 
 ---
 
-### 3. Message Queue
+### 3. 訊息佇列（Message Queue）
 
-#### Apache Kafka 3.6 - Recommended
+#### Apache Kafka 3.6 - 推薦
 
-**Use Cases**:
-- **Event-driven architecture**: Transaction events, game events
-- **Data pipeline**: CDC (Change Data Capture)
-- **Audit logs**: Immutable log stream
-- **Real-time analytics**: Stream data processing
+**使用場景（Use Cases）**：
+- **事件驅動架構**：交易事件、遊戲事件
+- **資料管道**：CDC（Change Data Capture）
+- **審計日誌**：不可變日誌流
+- **即時分析**：串流資料處理
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Message Queue: Apache Kafka 3.6
 ZooKeeper Replacement: KRaft mode (recommended)
@@ -655,30 +655,30 @@ Monitoring: Kafka Exporter + Grafana
 Management Tool: Conduktor / Kafka UI
 ```
 
-**vs RabbitMQ / AWS SQS**:
+**vs RabbitMQ / AWS SQS**：
 
-| Dimension | Kafka | RabbitMQ | AWS SQS |
+| 維度 | Kafka | RabbitMQ | AWS SQS |
 |-----------|-------|----------|---------|
-| Throughput | Very High (millions/s) | Medium (tens of thousands/s) | High |
-| Latency | <10ms | <5ms | ~100ms |
-| Persistence | Disk log | Optional | Automatic |
-| Order Guarantee | Partition-ordered | Queue-ordered | FIFO queue |
-| Backtrack Consumption | Supported | Not supported | Not supported |
-| Ops Complexity | High | Medium | Low |
+| 吞吐量 | 極高（百萬/s） | 中等（數萬/s） | 高 |
+| 延遲 | <10ms | <5ms | ~100ms |
+| 持久化 | 磁碟日誌 | 可選 | 自動 |
+| 順序保證 | 分區有序 | 佇列有序 | FIFO 佇列 |
+| 回溯消費 | 支援 | 不支援 | 不支援 |
+| 維運複雜度 | 高 | 中等 | 低 |
 
 ---
 
-### 4. Stream Processing Engine
+### 4. 串流處理引擎（Stream Processing Engine）
 
-#### Apache Flink 1.18 - Recommended
+#### Apache Flink 1.18 - 推薦
 
-**Use Cases**:
-- **Real-time OLAP**: Agent report query latency from 5-10s reduced to <1s
-- **Real-time Risk Control**: Arbitrage detection, anomalous betting frequency detection (<100ms)
-- **CDC Data Pipeline**: PostgreSQL -> Kafka -> ClickHouse/Redis
-- **Streaming ETL**: Real-time data cleaning, transformation, aggregation
+**使用場景（Use Cases）**：
+- **即時 OLAP**：代理報表查詢延遲從 5-10s 降至 <1s
+- **即時風控**：套利偵測、異常投注頻率偵測（<100ms）
+- **CDC 資料管道**：PostgreSQL -> Kafka -> ClickHouse/Redis
+- **串流 ETL**：即時資料清洗、轉換、聚合
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Stream Processing Engine: Apache Flink 1.18.0
 CDC: Flink CDC 3.0.1 + Debezium 2.5.0
@@ -691,18 +691,18 @@ Runtime: Kubernetes FlinkDeployment
 Monitoring: Prometheus Metrics Reporter + Grafana
 ```
 
-**Architecture Example**:
+**架構範例（Architecture Example）**：
 
 ```mermaid
 flowchart LR
     A[PostgreSQL WAL] -->|Flink CDC 3.0.1| B[Kafka Topic]
-    B -->|Flink Job| C{Flink SQL<br/>Aggregation}
-    C -->|Pre-aggregated results| D[ClickHouse<br/>OLAP]
-    C -->|Hot data| E[Redis<br/>Cache]
-    C -->|Alert events| F[Kafka Alert<br/>Topic]
+    B -->|Flink Job| C{Flink SQL<br/>聚合}
+    C -->|預聚合結果| D[ClickHouse<br/>OLAP]
+    C -->|熱點資料| E[Redis<br/>Cache]
+    C -->|告警事件| F[Kafka Alert<br/>Topic]
 ```
 
-**Configuration Example - PostgreSQL CDC Table Definition**:
+**配置範例 - PostgreSQL CDC 資料表定義（Configuration Example - PostgreSQL CDC Table Definition）**：
 
 ```sql
 -- Flink SQL: Define CDC Source Table
@@ -744,31 +744,31 @@ WHERE agent_id IS NOT NULL
 GROUP BY tenant_id, agent_id, TUMBLE(update_time, INTERVAL '5' SECOND);
 ```
 
-**vs Spark Streaming / Kafka Streams**:
+**vs Spark Streaming / Kafka Streams**：
 
-| Dimension | Flink | Spark Streaming | Kafka Streams |
+| 維度 | Flink | Spark Streaming | Kafka Streams |
 |-----------|-------|----------------|---------------|
-| Processing Model | True streaming | Micro-batch | True streaming |
-| Latency | <100ms | 500ms-1s | <10ms |
-| State Management | RocksDB | In-memory | RocksDB |
-| SQL Support | Complete | Spark SQL | KSQL (limited) |
-| CEP Support | Native | None | None |
-| CDC Integration | Flink CDC | Spark-CDC | Kafka Connect |
-| Deployment Complexity | Medium | Medium | Low |
-| Community | Active | Active | Active |
+| 處理模型 | 真串流 | 微批次 | 真串流 |
+| 延遲 | <100ms | 500ms-1s | <10ms |
+| 狀態管理 | RocksDB | In-memory | RocksDB |
+| SQL 支援 | 完整 | Spark SQL | KSQL（有限） |
+| CEP 支援 | 原生 | 無 | 無 |
+| CDC 集成 | Flink CDC | Spark-CDC | Kafka Connect |
+| 部署複雜度 | 中等 | 中等 | 低 |
+| 社群 | 活躍 | 活躍 | 活躍 |
 
-**Recommended Strategy**:
-- **Flink**: Needs SQL/CEP/complex state management
-- **Kafka Streams**: Simple stream processing, Kafka ecosystem
-- **Spark Streaming**: Batch-stream unification, existing Spark cluster
+**推薦策略（Recommended Strategy）**：
+- **Flink**：需要 SQL/CEP/複雜狀態管理
+- **Kafka Streams**：簡單串流處理，Kafka 生態系統
+- **Spark Streaming**：批流一體，現有 Spark 叢集
 
-**Performance Benchmarks**:
-- Throughput: 100,000 events/s (single TaskManager)
-- Latency: P99 <100ms (including CDC -> ClickHouse end-to-end)
-- Checkpoint Interval: 60 seconds (EXACTLY_ONCE mode)
-- State Size: Supports TB-level state (RocksDB + S3)
+**性能基準（Performance Benchmarks）**：
+- 吞吐量：100,000 事件/s（單 TaskManager）
+- 延遲：P99 <100ms（包含 CDC -> ClickHouse 端到端）
+- Checkpoint 間隔：60 秒（EXACTLY_ONCE 模式）
+- 狀態大小：支援 TB 級狀態（RocksDB + S3）
 
-**Cost Estimation**:
+**成本估算（Cost Estimation）**：
 ```yaml
 Flink Cluster Configuration:
   JobManager: 2 x 4GB (HA) = $80/month
@@ -783,24 +783,24 @@ ROI Analysis:
   Net Benefit: $338.4/month (+61% ROI)
 ```
 
-**Version Requirements**:
+**版本要求（Version Requirements）**：
 - Flink: >= 1.18.0
 - Flink CDC: >= 3.0.0
 - Debezium: >= 2.5.0
-- PostgreSQL: >= 14 (supports WAL logical replication)
+- PostgreSQL: >= 14（支援 WAL 邏輯複製）
 
 ---
 
-### 5. Search Engine
+### 5. 搜尋引擎（Search Engine）
 
-#### Elasticsearch 8.11 - Recommended
+#### Elasticsearch 8.11 - 推薦
 
-**Use Cases**:
-- Audit log search
-- Full-text search (game names, player search)
-- Log analysis (ELK Stack)
+**使用場景（Use Cases）**：
+- 審計日誌搜尋
+- 全文搜尋（遊戲名稱、玩家搜尋）
+- 日誌分析（ELK Stack）
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Search Engine: Elasticsearch 8.11
 Log Collection: Logstash 8.11 / Filebeat 8.11
@@ -808,22 +808,22 @@ Visualization: Kibana 8.11
 Client: Official REST Client
 ```
 
-**vs OpenSearch**:
-- Elasticsearch: Better commercialization, more complete features
-- OpenSearch: Open-source friendly, AWS support
+**vs OpenSearch**：
+- Elasticsearch：商業化更好，功能更完整
+- OpenSearch：開源友好，AWS 支援
 
 ---
 
-### 6. OLAP Analytics
+### 6. OLAP 分析（OLAP Analytics）
 
-#### ClickHouse 23.12 - Recommended
+#### ClickHouse 23.12 - 推薦
 
-**Use Cases**:
-- **BI Reports**: Player behavior analysis, revenue reports
-- **Real-time Metrics**: DAU/MAU, GGR/NGR
-- **Data Warehouse**: ODS -> DWD -> DWS -> ADS
+**使用場景（Use Cases）**：
+- **BI 報表**：玩家行為分析、營收報表
+- **即時指標**：DAU/MAU、GGR/NGR
+- **資料倉儲**：ODS -> DWD -> DWS -> ADS
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 OLAP Engine: ClickHouse 23.12
 Data Synchronization:
@@ -832,25 +832,25 @@ Data Synchronization:
 Visualization: Superset 3.0 / Metabase 0.48
 ```
 
-**vs StarRocks / Apache Druid**:
+**vs StarRocks / Apache Druid**：
 
-| Dimension | ClickHouse | StarRocks | Druid |
+| 維度 | ClickHouse | StarRocks | Druid |
 |-----------|-----------|-----------|-------|
-| Query Performance | Extreme | Extreme | Fast |
-| Write Performance | High | Medium | High |
-| SQL Compatibility | High | High | Medium |
-| Learning Curve | Medium | Medium | Steep |
-| Community | Large | Medium | Small |
+| 查詢性能 | 極致 | 極致 | 快速 |
+| 寫入性能 | 高 | 中等 | 高 |
+| SQL 相容性 | 高 | 高 | 中等 |
+| 學習曲線 | 中等 | 中等 | 陡峭 |
+| 社群 | 大 | 中等 | 小 |
 
 ---
 
-## Infrastructure Technology
+## 基礎設施技術（Infrastructure Technology）
 
-### 1. Containerization & Orchestration
+### 1. 容器化與編排（Containerization & Orchestration）
 
-#### Kubernetes 1.29 + Docker - Recommended
+#### Kubernetes 1.29 + Docker - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Container Runtime: Docker 25.0 / containerd 1.7
 Container Orchestration: Kubernetes 1.29
@@ -860,23 +860,23 @@ Ingress: NGINX Ingress Controller 1.9
 Storage: Rook Ceph 1.13 / Longhorn 1.5
 ```
 
-**vs VMs / Serverless**:
+**vs VMs / Serverless**：
 
-| Dimension | Kubernetes | VMs | Serverless |
+| 維度 | Kubernetes | VMs | Serverless |
 |-----------|-----------|-----|-----------|
-| Resource Utilization | High | Low | Very High |
-| Startup Speed | Fast (<10s) | Slow (minutes) | Very Fast (<1s) |
-| Cost | Medium | High | Medium |
-| Ops Complexity | High | Medium | Low |
-| State Management | Complex | Simple | Stateless |
+| 資源利用率 | 高 | 低 | 極高 |
+| 啟動速度 | 快（<10s） | 慢（分鐘） | 極快（<1s） |
+| 成本 | 中等 | 高 | 中等 |
+| 維運複雜度 | 高 | 中等 | 低 |
+| 狀態管理 | 複雜 | 簡單 | 無狀態 |
 
 ---
 
 ### 2. CI/CD
 
-#### GitLab CI + ArgoCD - Recommended
+#### GitLab CI + ArgoCD - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Code Repository: GitLab 16.8 / GitHub Enterprise
 CI/CD: GitLab CI 16.8
@@ -885,22 +885,22 @@ Container Registry: Harbor 2.10 (self-hosted) / Docker Hub
 Image Scanning: Trivy 0.48
 ```
 
-**vs Jenkins / GitHub Actions**:
+**vs Jenkins / GitHub Actions**：
 
-| Dimension | GitLab CI | GitHub Actions | Jenkins |
+| 維度 | GitLab CI | GitHub Actions | Jenkins |
 |-----------|-----------|----------------|---------|
-| Config as Code | Yes | Yes | Plugin |
-| K8s Integration | Native | Third-party | Plugin |
-| Cost | Open source free | Paid | Open source free |
-| Learning Curve | Medium | Low | Steep |
+| Config as Code | 是 | 是 | 外掛 |
+| K8s 集成 | 原生 | 第三方 | 外掛 |
+| 成本 | 開源免費 | 付費 | 開源免費 |
+| 學習曲線 | 中等 | 低 | 陡峭 |
 
 ---
 
-### 3. Monitoring & Alerting
+### 3. 監控與告警（Monitoring & Alerting）
 
-#### Prometheus + Grafana - Recommended
+#### Prometheus + Grafana - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 Metrics Collection: Prometheus 2.49
 Time-series Storage: VictoriaMetrics 1.96 (long-term storage)
@@ -913,11 +913,11 @@ APM: Datadog / New Relic (commercial) / SkyWalking 9.7 (open source)
 
 ---
 
-### 4. Infrastructure as Code (IaC)
+### 4. 基礎設施即程式碼（Infrastructure as Code，IaC）
 
-#### Terraform 1.7 - Recommended
+#### Terraform 1.7 - 推薦
 
-**Technology Stack**:
+**技術堆疊（Technology Stack）**：
 ```yaml
 IaC Tool: Terraform 1.7
 Configuration Management: Ansible 9.1 (supplementary)
@@ -931,11 +931,11 @@ State Backend: Terraform Cloud / S3 + DynamoDB
 
 ---
 
-## Security & Compliance Technology
+## 安全與合規技術（Security & Compliance Technology）
 
-### 1. Encryption Technology
+### 1. 加密技術（Encryption Technology）
 
-**Data Encryption Standards**:
+**資料加密標準（Data Encryption Standards）**：
 ```yaml
 Transport Encryption: TLS 1.3
 Symmetric Encryption: AES-256-GCM
@@ -947,9 +947,9 @@ Blind Index: HMAC-SHA256
 
 ---
 
-### 2. Identity Authentication & Authorization
+### 2. 身份認證與授權（Identity Authentication & Authorization）
 
-**Technology Selection**:
+**技術選型（Technology Selection）**：
 ```yaml
 Authentication Protocol: OAuth 2.0 + OpenID Connect (OIDC)
 JWT Signing: RS256 (RSA-SHA256)
@@ -960,7 +960,7 @@ RBAC: Custom-built
 
 ---
 
-### 3. Compliance Tools
+### 3. 合規工具（Compliance Tools）
 
 ```yaml
 Vulnerability Scanning: Trivy 0.48 + SonarQube 10.3
@@ -973,72 +973,72 @@ Compliance Auditing: Vanta (SOC 2) / Drata (multi-compliance)
 
 ---
 
-## Third-Party Integration
+## 第三方整合（Third-Party Integration）
 
-### 1. Payment Service Providers (PSP)
+### 1. 支付服務供應商（Payment Service Providers，PSP）
 
-**Recommended Integrations**:
-- **Nuvei** (iGaming specialist)
-- **Paysafe** (high-risk merchant friendly)
-- **Adyen** (global coverage)
-- **Stripe** (developer friendly)
+**推薦整合（Recommended Integrations）**：
+- **Nuvei**（iGaming 專家）
+- **Paysafe**（高風險商戶友好）
+- **Adyen**（全球覆蓋）
+- **Stripe**（開發者友好）
 
-### 2. Game Providers (GP)
+### 2. 遊戲供應商（Game Providers，GP）
 
-**Aggregation Platforms**:
-- **SOFTSWISS Game Aggregator** (15K+ games)
-- **Hub88** (100+ providers)
-- **Groove Gaming** (rapid integration)
+**聚合平台（Aggregation Platforms）**：
+- **SOFTSWISS Game Aggregator**（15K+ 遊戲）
+- **Hub88**（100+ 供應商）
+- **Groove Gaming**（快速整合）
 
-### 3. KYC/AML Services
+### 3. KYC/AML 服務
 
-**Recommended Providers**:
-- **Sumsub** (global coverage)
-- **iDenfy** (fast verification)
-- **Onfido** (AI verification)
-- **Persona** (flexible configuration)
+**推薦供應商（Recommended Providers）**：
+- **Sumsub**（全球覆蓋）
+- **iDenfy**（快速驗證）
+- **Onfido**（AI 驗證）
+- **Persona**（靈活配置）
 
 ---
 
-## Version Requirements & Lifecycle
+## 版本要求與生命週期（Version Requirements & Lifecycle）
 
-### Minimum Version Requirements
+### 最低版本要求（Minimum Version Requirements）
 
-| Technology | Minimum Version | Recommended Version | LTS End |
+| 技術 | 最低版本 | 推薦版本 | LTS 終止 |
 |-----------|----------------|--------------------|---------|
-| **Backend** | | | |
+| **後端** | | | |
 | Java | 17 | 21 | 2029-09 |
 | Spring Boot | 3.0.0 | 3.2.x | - |
 | Node.js | 18 | 20 LTS | 2026-04 |
 | Go | 1.21 | 1.22 | - |
 | Python | 3.10 | 3.12 | 2028-10 |
-| **Frontend** | | | |
+| **前端** | | | |
 | React | 18.0 | 18.2 | - |
 | TypeScript | 5.0 | 5.3 | - |
 | Next.js | 13 | 14 | - |
-| **Database** | | | |
+| **資料庫** | | | |
 | PostgreSQL | 14 | 16 | 2028-11 |
 | Redis | 7.0 | 7.2 | - |
 | Kafka | 3.0 | 3.6 | - |
 | Elasticsearch | 8.0 | 8.11 | - |
 | ClickHouse | 23.3 | 23.12 | - |
-| **Infrastructure** | | | |
+| **基礎設施** | | | |
 | Kubernetes | 1.27 | 1.29 | 2024-12 |
 | Docker | 24.0 | 25.0 | - |
 
-### Upgrade Strategy
+### 升級策略（Upgrade Strategy）
 
-**Major Version Upgrades**:
-- Evaluation Period: 1 month (POC testing)
-- Canary Period: 2 months (production validation)
-- Full Rollout Period: 1 month (full deployment)
+**主要版本升級（Major Version Upgrades）**：
+- 評估期：1 個月（POC 測試）
+- 灰度期：2 個月（生產驗證）
+- 全量推廣期：1 個月（全面部署）
 
-**Minor Version Upgrades**:
-- Quarterly updates (3 months)
-- Security patches applied immediately
+**次要版本升級（Minor Version Upgrades）**：
+- 季度更新（3 個月）
+- 安全補丁立即應用
 
 ---
 
-**Document Version**: 4.0.0
-**Maintenance Team**: Architecture Team & Platform Team
-**Next Review**: 2026-04-27 (quarterly review)
+**文件版本（Document Version）**：4.0.0
+**維護團隊（Maintenance Team）**：Architecture Team & Platform Team
+**下次審查（Next Review）**：2026-04-27（季度審查）
