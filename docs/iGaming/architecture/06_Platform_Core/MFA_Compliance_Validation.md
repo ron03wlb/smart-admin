@@ -256,28 +256,65 @@ async function approveRequest(record) {
 ### 4.5 Force Reset MFA Implementation
 
 ```java
-@Transactional(rollbackFor = Throwable.class)
-public ResponseDTO<Void> forceResetMfa(Long userId, Long reviewerUserId) {
-    // Step 1: Delete old MFA records
-    mfaRepository.deleteByUserId(userId);
+/**
+ * Manager class for MFA force reset operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+public class MfaResetManager {
 
-    // Step 2: Generate new TOTP Secret
-    String newSecret = TotpSecretGenerator.generateSecret();
-    String qrCode = QrCodeGenerator.generateQrCode(
-        getUserEmail(userId),
-        newSecret,
-        "SmartAdmin iGaming"
-    );
+    private final MfaRepository mfaRepository;
+    private final AuditLogService auditLogService;
 
-    // Step 3: Send email to user
-    emailService.sendMfaResetEmail(userId, qrCode, newSecret);
+    /**
+     * Force reset MFA for a user (transactional).
+     * Deletes old MFA records and prepares for re-enrollment.
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void forceResetMfaRecords(Long userId, Long reviewerUserId) {
+        // Step 1: Delete old MFA records
+        mfaRepository.deleteByUserId(userId);
 
-    // Step 4: Record audit log (CRITICAL level)
-    auditLogService.log(userId, "MFA_FORCE_RESET", String.format(
-        "Security Team force reset MFA (reviewer: %d)", reviewerUserId
-    ));
+        // Step 2: Record audit log (CRITICAL level)
+        auditLogService.log(userId, "MFA_FORCE_RESET", String.format(
+            "Security Team force reset MFA (reviewer: %d)", reviewerUserId
+        ));
+    }
+}
 
-    return ResponseDTO.ok();
+/**
+ * Service class for MFA reset orchestration.
+ * Delegates transactional operations to MfaResetManager.
+ */
+@Service
+@RequiredArgsConstructor
+public class MfaResetService {
+
+    private final MfaResetManager mfaResetManager;
+    private final EmailService emailService;
+
+    /**
+     * Force reset MFA for a user.
+     * Orchestrates the reset flow and email notification.
+     */
+    public ResponseDTO<Void> forceResetMfa(Long userId, Long reviewerUserId) {
+        // Delegate transactional operation to Manager
+        mfaResetManager.forceResetMfaRecords(userId, reviewerUserId);
+
+        // Generate new TOTP Secret
+        String newSecret = TotpSecretGenerator.generateSecret();
+        String qrCode = QrCodeGenerator.generateQrCode(
+            getUserEmail(userId),
+            newSecret,
+            "SmartAdmin iGaming"
+        );
+
+        // Send email to user
+        emailService.sendMfaResetEmail(userId, qrCode, newSecret);
+
+        return ResponseDTO.ok();
+    }
 }
 ```
 

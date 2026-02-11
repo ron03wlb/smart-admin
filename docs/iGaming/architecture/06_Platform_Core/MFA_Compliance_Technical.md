@@ -168,25 +168,49 @@ CREATE INDEX idx_backup_code_user_id ON t_mfa_backup_code(user_id) WHERE used = 
 ### 2.2 S3 Upload Implementation
 
 ```java
+/**
+ * Manager class for identity document persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer.
+ */
+@Component
+@RequiredArgsConstructor
+public class IdentityDocumentManager {
+
+    private final IdentityDocumentDao documentDao;
+
+    /**
+     * Persist document reference in database (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void saveDocumentReference(IdentityDocumentEntity doc) {
+        documentDao.insert(doc);
+    }
+}
+
+/**
+ * Service class for identity document orchestration.
+ * Delegates transactional operations to IdentityDocumentManager.
+ */
 @Service
 @RequiredArgsConstructor
 public class IdentityDocumentService {
 
     private final AmazonS3 s3Client;
     private final UserMFADao userMFADao;
+    private final IdentityDocumentManager documentManager;
 
     private static final String BUCKET_NAME = "smartadmin-mfa-recovery";
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
     /**
-     * Upload identity document to S3 (for account recovery)
+     * Upload identity document to S3 (for account recovery).
+     * Delegates persistence to IdentityDocumentManager.
      *
      * @param userId User identifier
      * @param file Uploaded file
      * @param documentType Document type (passport, license, etc.)
      * @return S3 object key
      */
-    @Transactional(rollbackFor = Throwable.class)
     public String uploadDocument(Long userId, MultipartFile file, DocumentType documentType) {
         // Step 1: Validate file
         validateFile(file);
@@ -215,7 +239,7 @@ public class IdentityDocumentService {
                 metadata
             );
 
-            // Step 4: Store reference in database
+            // Step 4: Store reference in database (delegate to Manager)
             IdentityDocumentEntity doc = IdentityDocumentEntity.builder()
                 .userId(userId)
                 .documentType(documentType)
@@ -227,7 +251,7 @@ public class IdentityDocumentService {
                 .verificationStatus(VerificationStatus.PENDING)
                 .build();
 
-            identityDocumentDao.insert(doc);
+            documentManager.saveDocumentReference(doc);
 
             log.info("[IdentityDoc] User {} uploaded {} document: {}",
                 userId, documentType, s3Key);
@@ -293,22 +317,24 @@ public class IdentityDocumentService {
 ### 2.3 Document Verification Workflow
 
 ```java
-@Service
+/**
+ * Manager class for document verification persistence.
+ * SmartAdmin Pattern: @Transactional only in Manager layer.
+ */
+@Component
 @RequiredArgsConstructor
-public class DocumentVerificationService {
+public class DocumentVerificationManager {
 
     private final IdentityDocumentDao documentDao;
-    private final NotificationService notificationService;
 
     /**
-     * Admin review and approve/reject identity document
-     *
-     * @param documentId Document identifier
-     * @param status APPROVED or REJECTED
-     * @param reviewNote Admin review note
+     * Update document verification status (transactional).
      */
     @Transactional(rollbackFor = Throwable.class)
-    public void reviewDocument(Long documentId, VerificationStatus status, String reviewNote) {
+    public IdentityDocumentEntity updateVerificationStatus(
+            Long documentId,
+            VerificationStatus status,
+            String reviewNote) {
         IdentityDocumentEntity doc = documentDao.selectById(documentId);
 
         if (doc == null) {
@@ -320,6 +346,33 @@ public class DocumentVerificationService {
         doc.setReviewNote(reviewNote);
 
         documentDao.updateById(doc);
+        return doc;
+    }
+}
+
+/**
+ * Service class for document verification orchestration.
+ * Delegates transactional operations to DocumentVerificationManager.
+ */
+@Service
+@RequiredArgsConstructor
+public class DocumentVerificationService {
+
+    private final DocumentVerificationManager verificationManager;
+    private final NotificationService notificationService;
+
+    /**
+     * Admin review and approve/reject identity document.
+     * Delegates persistence to DocumentVerificationManager.
+     *
+     * @param documentId Document identifier
+     * @param status APPROVED or REJECTED
+     * @param reviewNote Admin review note
+     */
+    public void reviewDocument(Long documentId, VerificationStatus status, String reviewNote) {
+        // Delegate transactional operation to Manager
+        IdentityDocumentEntity doc = verificationManager.updateVerificationStatus(
+            documentId, status, reviewNote);
 
         // Send notification to user
         if (status == VerificationStatus.APPROVED) {

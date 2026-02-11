@@ -384,18 +384,62 @@ public class QrCodeGenerator {
 ### 5.3 MFA Setup Service
 
 ```java
+/**
+ * Manager class for MFA setup persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+public class MfaSetupManager {
+
+    private final MfaRepository mfaRepository;
+    private final AuditLogService auditLogService;
+
+    /**
+     * Persist new MFA setup record (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void savePendingMfaSetup(Long userId, String encryptedSecret, String encryptedBackupCodes) {
+        MfaEntity mfa = MfaEntity.builder()
+            .userId(userId)
+            .totpSecret(encryptedSecret)
+            .backupCodes(encryptedBackupCodes)
+            .status(MfaStatus.PENDING)
+            .build();
+
+        mfaRepository.save(mfa);
+        auditLogService.log(userId, "MFA_SETUP_INIT", "User initiated MFA setup");
+    }
+
+    /**
+     * Activate MFA after TOTP verification (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void activateMfa(Long userId, MfaEntity mfa) {
+        mfa.setStatus(MfaStatus.ACTIVE);
+        mfa.setActivatedAt(Instant.now());
+        mfaRepository.save(mfa);
+        auditLogService.log(userId, "MFA_ENABLED", "MFA successfully activated");
+    }
+}
+
+/**
+ * Service class for MFA setup orchestration.
+ * Delegates transactional operations to MfaSetupManager.
+ */
 @Service
 @RequiredArgsConstructor
 public class MfaSetupService {
 
     private final MfaRepository mfaRepository;
+    private final MfaSetupManager mfaSetupManager;
     private final TotpValidator totpValidator;
     private final AuditLogService auditLogService;
 
     /**
      * Initialize MFA setup: generate Secret + QR Code + backup codes.
+     * Delegates persistence to MfaSetupManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public MfaSetupVO initMfaSetup(Long userId) {
         // Check if already enabled
         if (mfaRepository.isMfaEnabled(userId)) {
@@ -414,20 +458,11 @@ public class MfaSetupService {
         // Generate 10 backup codes (8-digit)
         List<String> backupCodes = BackupCodeGenerator.generate(10);
 
-        // Encrypt and persist (Status = PENDING)
+        // Encrypt and persist (Status = PENDING) - delegate to Manager
         String encryptedSecret = encryptSecret(totpSecret);
         String encryptedBackupCodes = encryptBackupCodes(backupCodes);
 
-        MfaEntity mfa = MfaEntity.builder()
-            .userId(userId)
-            .totpSecret(encryptedSecret)
-            .backupCodes(encryptedBackupCodes)
-            .status(MfaStatus.PENDING)
-            .build();
-
-        mfaRepository.save(mfa);
-
-        auditLogService.log(userId, "MFA_SETUP_INIT", "User initiated MFA setup");
+        mfaSetupManager.savePendingMfaSetup(userId, encryptedSecret, encryptedBackupCodes);
 
         // Return plaintext secret (shown only once)
         return MfaSetupVO.builder()
@@ -439,8 +474,8 @@ public class MfaSetupService {
 
     /**
      * Verify TOTP code and activate MFA.
+     * Delegates transactional operation to MfaSetupManager.
      */
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<Void> verifyAndActivate(Long userId, String totpCode) {
         MfaEntity mfa = mfaRepository.findByUserIdAndStatus(userId, MfaStatus.PENDING)
             .orElseThrow(() -> new BusinessException("No pending MFA setup found"));
@@ -454,11 +489,8 @@ public class MfaSetupService {
             return ResponseDTO.error(ErrorCode.INVALID_TOTP);
         }
 
-        mfa.setStatus(MfaStatus.ACTIVE);
-        mfa.setActivatedAt(Instant.now());
-        mfaRepository.save(mfa);
-
-        auditLogService.log(userId, "MFA_ENABLED", "MFA successfully activated");
+        // Delegate transactional operation to Manager
+        mfaSetupManager.activateMfa(userId, mfa);
 
         return ResponseDTO.ok();
     }

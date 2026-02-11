@@ -214,7 +214,16 @@ COMMENT ON COLUMN t_player_turnover_snapshot.total_valid_bet IS 'Cumulative vali
 ## 3. Validation Service Implementation
 
 ```java
-public class TurnoverValidationService {
+/**
+ * Manager class for turnover validation operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+public class TurnoverValidationManager {
+
+    private final TurnoverSnapshotDao snapshotDao;
+    private final BetRecordDao betRecordDao;
 
     /**
      * Validate whether player turnover meets withdrawal requirements.

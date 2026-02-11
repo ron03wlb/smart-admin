@@ -530,6 +530,109 @@ public class MFAQRCodeService {
 ### 4.3 MFA Setup Flow
 
 ```java
+/**
+ * Manager class for MFA setup persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+public class MFASetupManager {
+
+    private final UserMFADao userMFADao;
+    private final MFABackupCodeDao backupCodeDao;
+
+    /**
+     * Persist MFA activation record and generate backup codes (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public List<String> activateMFA(Long userId, String encryptedSecret) {
+        // Insert MFA record
+        UserMFAEntity mfa = UserMFAEntity.builder()
+            .userId(userId)
+            .encryptedSecret(encryptedSecret)
+            .enabled(true)
+            .verifiedAt(LocalDateTime.now())
+            .build();
+        userMFADao.insert(mfa);
+
+        // Generate and store backup codes
+        return generateAndStoreBackupCodes(userId);
+    }
+
+    private List<String> generateAndStoreBackupCodes(Long userId) {
+        List<String> plainCodes = new ArrayList<>();
+        List<MFABackupCodeEntity> entities = new ArrayList<>();
+        SecureRandom random = new SecureRandom();
+
+        for (int i = 0; i < 10; i++) {
+            String code = String.format("%08d", random.nextInt(100000000));
+            plainCodes.add(code);
+            entities.add(MFABackupCodeEntity.builder()
+                .userId(userId)
+                .codeHash(hashCode(code))
+                .used(false)
+                .build());
+        }
+        backupCodeDao.insertBatch(entities);
+        return plainCodes;
+    }
+
+    private String hashCode(String code) {
+        return DigestUtils.sha256Hex(code);
+    }
+}
+
+/**
+ * Service class for MFA setup orchestration.
+ * Delegates transactional operations to MFASetupManager.
+ */
+@Service
+@RequiredArgsConstructor
+public class MFASetupService {
+
+    private final MFASetupManager setupManager;
+    private final MFASecretEncryptor secretEncryptor;
+    private final StringRedisTemplate redisTemplate;
+    private final TOTPGenerator totpGenerator;
+
+    /**
+     * Verify TOTP code and activate MFA.
+     */
+    public MFAActivationResponse verifyAndActivate(Long userId, String code) {
+        // Retrieve temporary secret from Redis
+        String tempKey = "mfa:setup:temp:" + userId;
+        String secret = redisTemplate.opsForValue().get(tempKey);
+
+        if (secret == null) {
+            throw new BusinessException("MFA setup expired, please restart");
+        }
+
+        // Verify TOTP code
+        boolean valid = totpGenerator.verifyTOTP(secret, code, 1);
+        if (!valid) {
+            throw new BusinessException("Invalid TOTP code, please try again");
+        }
+
+        // Encrypt secret
+        String encryptedSecret = secretEncryptor.encryptSecret(secret, userId.toString());
+
+        // Delegate transactional operation to Manager
+        List<String> backupCodes = setupManager.activateMFA(userId, encryptedSecret);
+
+        // Delete temporary secret
+        redisTemplate.delete(tempKey);
+
+        return MFAActivationResponse.builder()
+            .success(true)
+            .backupCodes(backupCodes)
+            .build();
+    }
+}
+
+/**
+ * Controller for MFA setup endpoints.
+ * Delegates business logic to MFASetupService.
+ */
 @RestController
 @RequestMapping("/api/mfa")
 @RequiredArgsConstructor
@@ -537,8 +640,7 @@ public class MFASetupController {
 
     private final MFASecretGenerator secretGenerator;
     private final MFAQRCodeService qrCodeService;
-    private final MFASecretEncryptor secretEncryptor;
-    private final UserMFADao userMFADao;
+    private final MFASetupService setupService;
 
     /**
      * Step 1: Initiate MFA setup (generate secret and QR code)
@@ -571,7 +673,8 @@ public class MFASetupController {
     }
 
     /**
-     * Step 2: Verify TOTP code and activate MFA
+     * Step 2: Verify TOTP code and activate MFA.
+     * Delegates to MFASetupService (SmartAdmin Pattern: no @Transactional in Controller).
      *
      * POST /api/mfa/setup/verify
      *
@@ -579,50 +682,19 @@ public class MFASetupController {
      * @return Success response with backup codes
      */
     @PostMapping("/setup/verify")
-    @Transactional(rollbackFor = Throwable.class)
     public ResponseDTO<MFAActivationResponse> verifySetup(
             @LoginUser UserDTO user,
             @RequestBody VerifyTOTPRequest request) {
 
-        // Step 1: Retrieve temporary secret from Redis
-        String tempKey = "mfa:setup:temp:" + user.getUserId();
-        String secret = redisTemplate.opsForValue().get(tempKey);
-
-        if (secret == null) {
-            throw new BusinessException("MFA setup expired, please restart");
-        }
-
-        // Step 2: Verify TOTP code
-        boolean valid = totpGenerator.verifyTOTP(secret, request.getCode(), 1);
-
-        if (!valid) {
-            throw new BusinessException("Invalid TOTP code, please try again");
-        }
-
-        // Step 3: Encrypt secret and store in database
-        String encryptedSecret = secretEncryptor.encryptSecret(secret, user.getUserId().toString());
-
-        UserMFAEntity mfa = UserMFAEntity.builder()
-            .userId(user.getUserId())
-            .encryptedSecret(encryptedSecret)
-            .enabled(true)
-            .verifiedAt(LocalDateTime.now())
-            .build();
-
-        userMFADao.insert(mfa);
-
-        // Step 4: Generate backup codes
-        List<String> backupCodes = generateBackupCodes(user.getUserId());
-
-        // Step 5: Delete temporary secret
-        redisTemplate.delete(tempKey);
+        // Delegate to Service layer
+        MFAActivationResponse response = setupService.verifyAndActivate(
+            user.getUserId(),
+            request.getCode()
+        );
 
         log.info("[MFASetup] User {} successfully enabled MFA", user.getUserId());
 
-        return ResponseDTO.ok(MFAActivationResponse.builder()
-            .success(true)
-            .backupCodes(backupCodes)
-            .build());
+        return ResponseDTO.ok(response);
     }
 
     private List<String> generateBackupCodes(Long userId) {
@@ -668,11 +740,46 @@ CREATE INDEX idx_backup_code_user_id ON t_mfa_backup_code(user_id);
 ### 5.2 BackupCodeService Implementation
 
 ```java
+/**
+ * Manager class for backup code persistence operations.
+ * SmartAdmin Pattern: @Transactional only in Manager layer with @Component.
+ */
+@Component
+@RequiredArgsConstructor
+public class MFABackupCodeManager {
+
+    private final MFABackupCodeDao backupCodeDao;
+
+    /**
+     * Verify and consume backup code (transactional).
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public boolean verifyAndConsumeBackupCode(Long userId, String codeHash) {
+        MFABackupCodeEntity backupCode = backupCodeDao.findByUserIdAndHash(userId, codeHash);
+
+        if (backupCode == null || backupCode.isUsed()) {
+            return false;
+        }
+
+        // Mark as used (single-use)
+        backupCode.setUsed(true);
+        backupCode.setUsedAt(LocalDateTime.now());
+        backupCodeDao.updateById(backupCode);
+
+        return true;
+    }
+}
+
+/**
+ * Service class for backup code operations.
+ * Delegates transactional operations to MFABackupCodeManager.
+ */
 @Service
 @RequiredArgsConstructor
 public class MFABackupCodeService {
 
     private final MFABackupCodeDao backupCodeDao;
+    private final MFABackupCodeManager backupCodeManager;
 
     /**
      * Generate and store backup codes
@@ -709,31 +816,24 @@ public class MFABackupCodeService {
     }
 
     /**
-     * Verify backup code (single-use)
+     * Verify backup code (single-use).
+     * Delegates transactional operation to MFABackupCodeManager.
      *
      * @param userId User identifier
      * @param code Plain backup code from user
      * @return true if code is valid and unused
      */
-    @Transactional(rollbackFor = Throwable.class)
     public boolean verifyBackupCode(Long userId, String code) {
         String codeHash = hashCode(code);
 
-        // Find matching code
-        MFABackupCodeEntity backupCode = backupCodeDao.findByUserIdAndHash(userId, codeHash);
+        // Delegate transactional operation to Manager
+        boolean verified = backupCodeManager.verifyAndConsumeBackupCode(userId, codeHash);
 
-        if (backupCode == null || backupCode.isUsed()) {
-            return false;
+        if (verified) {
+            log.info("[BackupCode] User {} used backup code", userId);
         }
 
-        // Mark as used (single-use)
-        backupCode.setUsed(true);
-        backupCode.setUsedAt(LocalDateTime.now());
-        backupCodeDao.updateById(backupCode);
-
-        log.info("[BackupCode] User {} used backup code", userId);
-
-        return true;
+        return verified;
     }
 
     /**
