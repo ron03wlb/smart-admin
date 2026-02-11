@@ -45,7 +45,7 @@ Use for decisions like:
 ## CRITICAL RULES (NEVER VIOLATE)
 1. **source-archive/ is READ-ONLY** — NEVER modify files under `docs/iGaming/source-archive/`
 2. **Mermaid standards**: Use `<br/>` for line breaks in ALL diagram types EXCEPT `stateDiagram-v2` (which CANNOT use `<br/>`)
-3. **Documentation language**: English for all content
+3. **Documentation language**: English for Phase 7-8 content. **Phase 9 ONLY**: Traditional Chinese for prose + English for technical terms (see Phase 9 section)
 4. **One phase at a time** — complete ALL tasks in current phase before moving to next
 5. **Max 5 files per iteration** — keep changes focused and verifiable
 6. **Git commit after every meaningful batch** — format: `docs(iGaming): <description>`
@@ -86,6 +86,12 @@ After each change, validate based on phase:
 - SmartAdmin Patterns: `bash scripts/check-smartadmin-patterns.sh`
 - Architecture Completeness: `bash scripts/validate-architecture-completeness.sh`
 - Verify Java code follows SmartAdmin conventions
+
+**For Phase 9 (Traditional Chinese translation)**:
+- Terminology Consistency: `bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/`
+- Encoding Validation: `bash scripts/validate-zh-tw-encoding.sh docs/iGaming/`
+- Technical Terms Preservation: `bash scripts/check-technical-terms.sh docs/iGaming/`
+- Mermaid Syntax: `bash scripts/validate-mermaid.sh docs/iGaming/`
 
 **General (always run after changes)**:
 - Links: `bash scripts/validate_links.sh docs/iGaming`
@@ -195,6 +201,83 @@ import io.vavr.control.Option;
 public Option<User> findUser(Long id) { ... }
 ```
 
+## Phase 9: Traditional Chinese Translation Guidelines
+
+### Translation Context
+You are translating iGaming documentation from English to Traditional Chinese while preserving technical terms in English.
+
+### Critical Resources (READ FIRST)
+1. **TRANSLATION_GLOSSARY.md**: 500+ term mappings (docs/iGaming/TRANSLATION_GLOSSARY.md)
+2. **P14 Guardrails**: Terminology standardization rules (docs/ralph/guardrails.md#P14)
+3. **Translation Templates**:
+   - Requirements: docs/iGaming/TEMPLATE_REQUIREMENTS.md
+   - Architecture: docs/iGaming/TEMPLATE_ARCHITECTURE.md
+   - ADR: docs/iGaming/TEMPLATE_ADR.md
+
+### Translation Rules (NEVER VIOLATE)
+1. **Technical terms NEVER translate**: PlayerService, Controller, Manager, @Transactional, ResponseDTO, etc.
+2. **Business terms use Chinese + English first mention**: "有效投注額 (Valid Turnover)" → "有效投注額" later
+3. **Code snippets remain 100% English**: Java/SQL/YAML code, class names, method names
+4. **Mermaid labels use Chinese, class names English**: `玩家註冊 → PlayerService.register`
+5. **SQL tables/columns English, COMMENT Chinese**: `COMMENT ON COLUMN t_player.kyc_status IS '身份驗證狀態'`
+
+### Per-Batch Workflow
+1. **Read current batch task** from progress.md (5 files per batch)
+2. **For each file**:
+   - Read original English file
+   - Translate prose to Traditional Chinese using TRANSLATION_GLOSSARY.md
+   - Preserve all technical terms in English
+   - Keep code examples, links, cross-references unchanged
+   - Write translated file (overwrite original)
+3. **Validate batch**:
+   ```bash
+   bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/
+   bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
+   bash scripts/check-technical-terms.sh docs/iGaming/
+   bash scripts/validate-mermaid.sh docs/iGaming/
+   ```
+4. **Git commit**:
+   ```bash
+   git add <5 files>
+   git commit -m "docs(iGaming): translate Batch N to Traditional Chinese
+
+   - Translate [category] requirements/architecture
+   - Preserve technical terms in English
+   - Apply TRANSLATION_GLOSSARY.md mappings
+
+   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+   ```
+5. **Update progress.md**: Mark batch tasks as `- [x]`
+
+### Common Translation Examples
+
+**Requirements Section Title**:
+- ❌ English: `## Functional Requirements`
+- ✅ Chinese: `## 功能需求（Functional Requirements）`
+
+**Architecture Layer Description**:
+- ❌ Bad: `Service 層負責業務邏輯處理` (Service translated)
+- ✅ Good: `Service 層負責業務邏輯處理` (Service preserved)
+
+**Business Term First Mention**:
+- ✅ Good: `玩家完成身份驗證 (KYC, Know Your Customer) 後...`
+- Later: `玩家完成 KYC 驗證後...` (no English needed)
+
+### Stuck Protocol for Translation Issues
+If you encounter untranslatable content or terminology conflicts:
+1. Mark task as `- [!] STUCK: [reason]` in progress.md
+2. Document issue in docs/ralph/guardrails.md under "## Lessons Learned"
+3. Skip to next task (do NOT block on single file)
+4. Continue progress (Ralph Loop never stops unless RALPH_COMPLETE)
+
+### Validation Failure Handling
+If validation scripts fail:
+1. Read validation error output
+2. Fix specific issues (e.g., terminology mismatch, encoding problem)
+3. Re-run validation
+4. Only mark `- [x]` when ALL validations pass
+5. If validation fails 3 times → use Stuck Protocol
+
 ## Cross-Reference Templates
 
 ### Requirements → Architecture (forward ref)
@@ -230,7 +313,8 @@ RALPH_COMPLETE
 - NEVER delete any documentation files
 - NEVER use `\n` in Mermaid diagrams (use `<br/>` instead)
 - NEVER use `<br/>` in stateDiagram-v2 blocks
-- NEVER introduce Chinese characters into English documentation content
+- NEVER introduce Chinese characters into English documentation content (Phase 7-8 only. Phase 9: Traditional Chinese is REQUIRED for prose)
+- NEVER translate technical terms in Phase 9 (PlayerService, Controller, @Transactional, etc. must remain English)
 - NEVER run `git push` — only use `git add` and `git commit` (push is done manually by the user)
 - NEVER fabricate business requirements — derive from existing content
 - NEVER decrease existing coverage metrics
