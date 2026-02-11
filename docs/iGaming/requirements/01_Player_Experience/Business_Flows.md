@@ -1,116 +1,116 @@
-# iGaming Business Flows
+# iGaming 業務流程
 
-> **Canonical Source**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
-> **Audience**: Executives, Product Managers, Compliance Officers, QA Teams
-> **Related Architecture**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## Business Value
-
-This document delivers strategic value by:
-- **Operational Clarity**: Provides 6 end-to-end business flows covering the complete player lifecycle from registration through withdrawal
-- **Cross-Functional Alignment**: Enables Executives, Product Managers, Compliance Officers, and QA Teams to share a common understanding of platform operations
-- **Compliance Foundation**: Documents KYC verification levels, risk control checkpoints, and multi-tenant data isolation requirements for regulatory audit readiness
-- **Risk Mitigation**: Defines five-layer withdrawal review process and risk scoring factors to prevent fraud and bonus abuse
+> **權威來源**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
+> **目標讀者**: 高階主管、產品經理、合規專員、QA 團隊
+> **相關架構**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## Acceptance Criteria
+## 業務價值（Business Value）
 
-- [ ] Player registration flow correctly assigns tenant context from domain/URL path
-- [ ] Wallet initialization creates all four balance fields (Cash, Promotional, Locked, Playable) with zero values
-- [ ] KYC verification supports three levels (L1: $1,000/day, L2: $10,000/day, L3: Unlimited)
-- [ ] Game launch tokens expire after 5 minutes and enforce one-time use
-- [ ] Playable Balance calculation follows formula: Cash Balance - Locked Amount - In-Progress Bets
-- [ ] Bonus wagering uses game-specific weights (Slots 100%, Baccarat 10%, Sports 50%)
-- [ ] Withdrawal review implements five-layer risk control (KYC → Turnover → Bonus → Frequency → Risk Score)
-- [ ] Risk score thresholds trigger correct actions (0-30 auto-approve, 31-70 manual review, 71-100 auto-reject)
-- [ ] Three-layer turnover verification (Real-time OLTP → Hourly Reconciliation → Daily OLAP) detects and alerts on discrepancies
-- [ ] Multi-tenant data isolation prevents cross-tenant access at application and database layers
+本文檔提供以下戰略價值：
+- **營運清晰度**: 提供 6 個端到端業務流程，涵蓋從註冊到提款的完整玩家生命週期
+- **跨職能協作**: 讓高階主管、產品經理、合規專員和 QA 團隊對平台營運有共同理解
+- **合規基礎**: 記錄 KYC 驗證等級、風控檢查點和 Multi-Tenant 數據隔離要求，為監管審計做好準備
+- **風險緩解**: 定義五層提款審核流程和風險評分因子，防止欺詐和獎金濫用
 
 ---
 
-## Document Purpose
+## 驗收標準（Acceptance Criteria）
 
-This document provides **6 end-to-end business flows** that describe the complete iGaming platform operations from a business perspective. Each flow covers the user journey, business rules, compliance requirements, and exception handling -- without technical implementation details.
-
-**How to Use**:
-1. Select the business flow relevant to your role
-2. Review the flow diagram to understand the overall process
-3. Use the related document links to explore technical implementation details
-
-**Five Core Business Concepts**:
-- **Wallet**: Playable balance calculation, fund locking mechanisms
-- **Turnover**: Valid bet calculation, wagering accumulation rules
-- **Token**: API security verification, idempotency guarantees
-- **Multi-Tenancy**: Data isolation between brands, tenant assignment
-- **Risk Control**: Rule engine decisions, risk scoring
+- [ ] 玩家註冊流程 (Player Registration) 正確從網域/URL 路徑分配租戶上下文 (Tenant Context)
+- [ ] 錢包初始化 (Wallet Initialization) 創建全部四個餘額欄位（現金、促銷、鎖定、可下注）並設為零值
+- [ ] KYC 驗證 (KYC Verification) 支援三個等級（L1: $1,000/天, L2: $10,000/天, L3: 無限制）
+- [ ] 遊戲啟動 Token 在 5 分鐘後過期並強制一次性使用
+- [ ] 可下注餘額 (Playable Balance) 計算遵循公式：現金餘額 - 鎖定金額 - 進行中投注
+- [ ] 獎金流水 (Bonus Wagering) 使用遊戲特定權重（老虎機 100%、百家樂 10%、體育 50%）
+- [ ] 提款審核 (Withdrawal Review) 實施五層風控（KYC → 流水 → 獎金 → 頻率 → 風險評分）
+- [ ] 風險評分閾值觸發正確動作（0-30 自動通過、31-70 人工審核、71-100 自動拒絕）
+- [ ] 三層流水驗證（即時 OLTP → 小時對帳 → 每日 OLAP）檢測並告警差異
+- [ ] Multi-Tenant 數據隔離在應用層和數據庫層防止跨租戶訪問
 
 ---
 
-## Flow Navigation
+## 文檔用途
 
-| Flow | Involved Areas | Key Challenges | Reading Time |
-|------|---------------|----------------|-------------|
-| [1. Player Registration and KYC](#1-player-registration-and-kyc) | Player, Risk | Multi-tenant assignment, KYC verification | 5 min |
-| [2. Game Launch and Token Verification](#2-game-launch-and-token-verification) | Finance, Games | Token security, idempotency | 10 min |
-| [3. Bonus Distribution and Wagering Requirements](#3-bonus-distribution-and-wagering-requirements) | Promotions, Finance | Bonus calculation, wagering tracking | 8 min |
-| [4. Withdrawal Review and Risk Control](#4-withdrawal-review-and-risk-control) | Player, Risk, Finance | Multi-layer review, compensation flow | 12 min |
-| [5. Turnover Calculation and Reconciliation](#5-turnover-calculation-and-reconciliation) | Finance, Games | Three-layer verification, data consistency | 10 min |
-| [6. Multi-Tenant Data Isolation](#6-multi-tenant-data-isolation) | Platform, Security | Schema isolation, context injection | 8 min |
+本文檔提供 **6 個端到端業務流程**，從業務角度描述完整的 iGaming 平台營運。每個流程涵蓋用戶旅程、業務規則、合規要求和異常處理——不涉及技術實現細節。
+
+**使用方式**：
+1. 選擇與您角色相關的業務流程
+2. 檢視流程圖以理解整體流程
+3. 使用相關文檔連結探索技術實現細節
+
+**五大核心業務概念**：
+- **錢包 (Wallet)**: 可下注餘額計算、資金鎖定機制
+- **流水 (Turnover)**: 有效投注額 (Valid Turnover) 計算、流水累積規則
+- **Token**: API 安全驗證、冪等性保證
+- **Multi-Tenancy**: 品牌間數據隔離、租戶分配
+- **風控 (Risk Control)**: 規則引擎決策、風險評分
 
 ---
 
-## 1. Player Registration and KYC
+## 流程導覽
 
-### 1.1 Flow Overview
+| 流程 | 涉及領域 | 關鍵挑戰 | 閱讀時間 |
+|------|---------|---------|---------|
+| [1. 玩家註冊與 KYC](#1-玩家註冊與-kyc) | 玩家、風控 | Multi-Tenant 分配、KYC 驗證 | 5 分鐘 |
+| [2. 遊戲啟動與 Token 驗證](#2-遊戲啟動與-token-驗證) | 財務、遊戲 | Token 安全、冪等性 | 10 分鐘 |
+| [3. 獎金發放與流水要求](#3-獎金發放與流水要求) | 促銷、財務 | 獎金計算、流水追蹤 | 8 分鐘 |
+| [4. 提款審核與風控](#4-提款審核與風控) | 玩家、風控、財務 | 多層審核、補償流程 | 12 分鐘 |
+| [5. 流水計算與對帳](#5-流水計算與對帳) | 財務、遊戲 | 三層驗證、數據一致性 | 10 分鐘 |
+| [6. Multi-Tenant 數據隔離](#6-multi-tenant-數據隔離) | 平台、安全 | Schema 隔離、上下文注入 | 8 分鐘 |
 
-**Business Goal**: Players complete registration and pass identity verification to become legitimate platform users.
+---
 
-**Key Business Concepts Involved**:
-- **Multi-Tenancy**: Each registration is bound to a specific brand (Tenant ID)
-- **Token**: JWT Token is generated upon successful registration
-- **Risk Control**: KYC verification and anti-fraud checks
+## 1. 玩家註冊與 KYC
 
-### 1.2 Registration Flow
+### 1.1 流程概述
+
+**業務目標**: 玩家 (Player) 完成註冊並通過身份驗證 (KYC, Know Your Customer)，成為平台合法用戶。
+
+**涉及的關鍵業務概念**：
+- **Multi-Tenancy**: 每次註冊都綁定到特定品牌 (Tenant ID)
+- **Token**: 註冊成功後生成 JWT Token
+- **風控 (Risk Control)**: KYC 驗證和反欺詐檢查
+
+### 1.2 註冊流程
 
 ```mermaid
 flowchart TD
-    A[Player visits registration page] --> B{Select brand}
-    B --> C[Fill in registration info]
-    C --> D[Submit registration request]
+    A[玩家訪問註冊頁面] --> B{選擇品牌}
+    B --> C[填寫註冊資訊]
+    C --> D[提交註冊請求]
 
-    D --> E[System: Resolve brand context]
-    E --> F[Check if username/email exists]
-    F --> G{Duplicate?}
+    D --> E[系統：解析品牌上下文]
+    E --> F[檢查用戶名/郵箱是否存在]
+    F --> G{重複？}
 
-    G -->|Yes| H[Return error: User already exists]
-    G -->|No| I[Create player account]
+    G -->|是| H[返回錯誤：用戶已存在]
+    G -->|否| I[創建玩家帳戶]
 
-    I --> J[Initialize wallet]
-    J --> K[Bind to brand/Tenant ID]
-    K --> L[Send verification email/SMS]
+    I --> J[初始化錢包]
+    J --> K[綁定品牌/Tenant ID]
+    K --> L[發送驗證郵件/簡訊]
 
-    L --> M[Player clicks verification link]
-    M --> N[Activate account]
+    L --> M[玩家點擊驗證連結]
+    M --> N[啟用帳戶]
 
-    N --> O{KYC required?}
-    O -->|Yes| P[Upload identity documents]
-    O -->|No| Q[Registration complete]
+    N --> O{需要 KYC？}
+    O -->|是| P[上傳身份證件]
+    O -->|否| Q[註冊完成]
 
-    P --> R[KYC system verification]
-    R --> S{Verification result}
+    P --> R[KYC 系統驗證]
+    R --> S{驗證結果}
 
-    S -->|Passed| T[Mark KYC verified]
-    S -->|Rejected| U[Notify player to resubmit]
+    S -->|通過| T[標記 KYC 已驗證]
+    S -->|拒絕| U[通知玩家重新提交]
 
     T --> Q
     U --> P
 
-    Q --> V[Generate login token]
-    V --> W[Return login credentials]
+    Q --> V[生成登入 Token]
+    V --> W[返回登入憑證]
 
     style A fill:#e1f5e1
     style W fill:#e1f5e1
@@ -118,85 +118,85 @@ flowchart TD
     style U fill:#fff4e1
 ```
 
-### 1.3 Key Business Rules
+### 1.3 關鍵業務規則
 
-#### Brand Context Resolution
-- Each player registration must be associated with a specific brand
-- Brand identity is determined from the domain name or URL path at registration time
-- This ensures player data is correctly segmented by brand
+#### 品牌上下文解析
+- 每次玩家註冊必須關聯到特定品牌
+- 品牌身份在註冊時從網域名稱或 URL 路徑確定
+- 這確保玩家數據按品牌正確分隔
 
-#### Wallet Initialization
-When a new player account is created, the system initializes a wallet with the following state:
+#### 錢包初始化
+當創建新玩家帳戶時，系統初始化錢包為以下狀態：
 
-| Attribute | Initial Value |
-|-----------|--------------|
-| Cash Balance | 0 |
-| Promotional Balance | 0 |
-| Locked Amount | 0 |
-| Playable Balance | 0 |
+| 屬性 | 初始值 |
+|-----|-------|
+| 現金餘額 (Cash Balance) | 0 |
+| 促銷餘額 (Promotional Balance) | 0 |
+| 鎖定金額 (Locked Amount) | 0 |
+| 可下注餘額 (Playable Balance) | 0 |
 
-#### KYC Verification Levels
+#### KYC 驗證等級
 
-| Level | Requirements | Withdrawal Limit |
-|-------|-------------|-----------------|
-| L0 | No KYC | Withdrawals prohibited |
-| L1 | Basic KYC (Name + ID Number) | Up to $1,000/day |
-| L2 | Enhanced KYC (+ Address Proof) | Up to $10,000/day |
-| L3 | Full KYC (+ Bank Verification) | Unlimited |
+| 等級 | 要求 | 提款限額 |
+|-----|-----|---------|
+| L0 | 無 KYC | 禁止提款 |
+| L1 | 基礎 KYC（姓名 + 身份證號） | 最高 $1,000/天 |
+| L2 | 增強 KYC（+ 地址證明） | 最高 $10,000/天 |
+| L3 | 完整 KYC（+ 銀行驗證） | 無限制 |
 
-**Verification Methods**:
-- Automatic: OCR identification document recognition
-- Manual Review: For high-risk users
-- Third-Party Services: Jumio, Onfido
+**驗證方式**：
+- 自動：OCR 身份證件識別
+- 人工審核：針對高風險用戶
+- 第三方服務：Jumio、Onfido
 
-### 1.4 Exception Handling
+### 1.4 異常處理
 
-| Exception | Resolution | Error Code |
-|-----------|-----------|------------|
-| Duplicate username | Prompt player to choose a different username | `PLAYER_EXISTS` |
-| Duplicate email/phone | Suggest password recovery | `EMAIL_EXISTS` |
-| KYC verification failed | Allow resubmission (max 3 attempts) | `KYC_FAILED` |
-| Tenant not found | Return 404 | `TENANT_NOT_FOUND` |
+| 異常 | 解決方案 | 錯誤碼 |
+|-----|---------|-------|
+| 用戶名重複 | 提示玩家選擇不同用戶名 | `PLAYER_EXISTS` |
+| 郵箱/電話重複 | 建議密碼找回 | `EMAIL_EXISTS` |
+| KYC 驗證失敗 | 允許重新提交（最多 3 次） | `KYC_FAILED` |
+| 租戶未找到 | 返回 404 | `TENANT_NOT_FOUND` |
 
 ---
 
-## 2. Game Launch and Token Verification
+## 2. 遊戲啟動與 Token 驗證
 
-### 2.1 Flow Overview
+### 2.1 流程概述
 
-**Business Goal**: Players launch games from the platform securely, with verified identity and synchronized funds.
+**業務目標**: 玩家從平台安全啟動遊戲，身份已驗證且資金已同步。
 
-**Key Business Concepts Involved**:
-- **Token**: HMAC signature, expiry validation, anti-replay
-- **Wallet**: Balance query, fund locking
-- **Turnover**: Bet amount recording
+**涉及的關鍵業務概念**：
+- **Token**: HMAC 簽名、過期驗證、防重放
+- **錢包 (Wallet)**: 餘額查詢、資金鎖定
+- **流水 (Turnover)**: 投注金額記錄
 
-### 2.2 Game Launch Flow
+### 2.2 遊戲啟動流程
 
 ```mermaid
 flowchart TD
-    A[Player clicks game icon] --> B[Platform requests game URL]
-    B --> C[Generate secure token]
-    C --> D[Redirect to game provider]
+    A[玩家點擊遊戲圖標] --> B[平台請求遊戲 URL]
+    B --> C[生成安全 Token]
+    C --> D[重定向至遊戲供應商]
 
-    D --> E[Game provider verifies token]
-    E --> F{Token valid?}
+    D --> E[遊戲供應商驗證 Token]
+    E --> F{Token 有效？}
 
-    F -->|Yes| G[Query player balance]
-    F -->|No| H[Display error message]
+    F -->|是| G[查詢玩家餘額]
+    F -->|否| H[顯示錯誤訊息]
 
-    G --> I[Display game interface]
+    G --> I[顯示遊戲介面]
 
-    I --> J[Player places bet]
-    J --> K{Sufficient balance?}
+    I --> J[玩家下注]
+    J --> K{餘額充足？}
 
-    K -->|No| L[Reject: Insufficient funds]
-    K -->|Yes| M[Deduct and lock funds]
+    K -->|否| L[拒絕：餘額不足]
+    K -->|是| M[扣除並鎖定資金]
 
-    M --> N[Game in progress]
-    N --> O[Game settles]
-    O --> P[Credit winnings to wallet]
-    P --> Q[Record turnover]
+    M --> N[遊戲進行中]
+    N --> O[遊戲結算]
+    O --> P[獎金存入錢包]
+    P --> Q[記錄流水]
 
     style A fill:#e1f5e1
     style Q fill:#e1f5e1
@@ -204,92 +204,92 @@ flowchart TD
     style L fill:#ffe1e1
 ```
 
-### 2.3 Key Business Rules
+### 2.3 關鍵業務規則
 
-#### Token Security Requirements
-- **Validity Period**: 5 minutes (prevents expired token reuse)
-- **One-Time Use**: Token is consumed after first use
-- **IP Binding**: Optional, prevents token theft
-- **HMAC Signature**: Ensures token integrity and authenticity
+#### Token 安全要求
+- **有效期**: 5 分鐘（防止過期 Token 重用）
+- **一次性使用**: Token 在首次使用後即失效
+- **IP 綁定**: 可選，防止 Token 被盜用
+- **HMAC 簽名**: 確保 Token 完整性和真實性
 
-#### Idempotency Protection
-The system must handle network retries and duplicate requests gracefully:
-- Same bet request must never result in double deduction
-- Three-tier protection: cache check, database check, distributed lock
-- Duplicate requests return the original result without re-processing
+#### 冪等性保護
+系統必須優雅處理網路重試和重複請求：
+- 相同投注請求絕不能導致重複扣款
+- 三層保護：緩存檢查、數據庫檢查、分佈式鎖
+- 重複請求返回原始結果，不重新處理
 
-#### Playable Balance Formula
+#### 可下注餘額公式
 
-The most important formula in the system:
+系統中最重要的公式：
 
-> **Playable Balance = Cash Balance - Locked Amount - In-Progress Bets**
+> **可下注餘額 (Playable Balance) = 現金餘額 - 鎖定金額 - 進行中投注**
 
-| Item | Amount |
-|------|--------|
-| Cash Balance | $1,000 |
-| Locked Amount (withdrawal in progress) | $200 |
-| In-Progress Bets (sports bets) | $100 |
-| **Playable Balance** | **$700** |
+| 項目 | 金額 |
+|-----|------|
+| 現金餘額 (Cash Balance) | $1,000 |
+| 鎖定金額（提款中） | $200 |
+| 進行中投注（體育投注） | $100 |
+| **可下注餘額** | **$700** |
 
-### 2.4 API Interaction Pattern
+### 2.4 API 互動模式
 
-The game provider integration follows a three-step API pattern:
+遊戲供應商整合遵循三步 API 模式：
 
-1. **GetBalance**: Game provider queries player balance via secure token
-2. **Debit**: Game provider requests fund deduction when player places a bet (with idempotent request ID)
-3. **Credit**: Game provider requests fund addition when game settles (with idempotent request ID)
+1. **GetBalance**: 遊戲供應商通過安全 Token 查詢玩家餘額
+2. **Debit**: 遊戲供應商在玩家下注時請求扣款（帶冪等請求 ID）
+3. **Credit**: 遊戲供應商在遊戲結算時請求加款（帶冪等請求 ID）
 
-Each API call includes request ID for idempotency and HMAC signature for security.
+每個 API 調用都包含請求 ID 用於冪等性，以及 HMAC 簽名用於安全性。
 
 ---
 
-## 3. Bonus Distribution and Wagering Requirements
+## 3. 獎金發放與流水要求
 
-### 3.1 Flow Overview
+### 3.1 流程概述
 
-**Business Goal**: Players claim promotional bonuses and convert them to cash after meeting wagering requirements.
+**業務目標**: 玩家領取促銷獎金 (Bonus)，並在滿足流水要求 (Wagering Requirement) 後將其轉換為現金。
 
-**Key Business Concepts Involved**:
-- **Bonus**: Promotional wallet, wagering requirements
-- **Turnover**: Valid bet accumulation, completion checking
-- **Wallet**: Bonus-to-Cash conversion
+**涉及的關鍵業務概念**：
+- **獎金 (Bonus)**: 促銷錢包、流水要求
+- **流水 (Turnover)**: 有效投注累積、完成度檢查
+- **錢包 (Wallet)**: 獎金轉現金
 
-### 3.2 Bonus Lifecycle Flow
+### 3.2 獎金生命週期流程
 
 ```mermaid
 flowchart TD
-    A[Player views promotions] --> B{Promotion type}
+    A[玩家查看促銷活動] --> B{促銷類型}
 
-    B -->|First Deposit Bonus| C1[Complete first deposit]
-    B -->|Daily Check-in| C2[Daily login claim]
-    B -->|VIP Upgrade| C3[Reach VIP level]
+    B -->|首存獎金| C1[完成首次存款]
+    B -->|每日簽到| C2[每日登入領取]
+    B -->|VIP 升級| C3[達到 VIP 等級]
 
-    C1 --> D[Trigger promotion rules]
+    C1 --> D[觸發促銷規則]
     C2 --> D
     C3 --> D
 
-    D --> E[Calculate Bonus amount]
-    E --> F{Conditions met?}
+    D --> E[計算獎金金額]
+    E --> F{條件滿足？}
 
-    F -->|No| G[Return error: Not eligible]
-    F -->|Yes| H[Issue Bonus to promotional wallet]
+    F -->|否| G[返回錯誤：不符合資格]
+    F -->|是| H[發放獎金至促銷錢包]
 
-    H --> I[Bind wagering requirement]
-    I --> J[Record claim history]
+    H --> I[綁定流水要求]
+    I --> J[記錄領取歷史]
 
-    J --> K[Player starts playing]
-    K --> L[Bet using Bonus]
+    J --> K[玩家開始遊戲]
+    K --> L[使用獎金投注]
 
-    L --> M[Accumulate valid bets]
-    M --> N{Wagering met?}
+    L --> M[累積有效投注]
+    M --> N{流水達標？}
 
-    N -->|No| O{Bonus expired?}
-    O -->|No| K
-    O -->|Yes| P[Clear Bonus balance]
+    N -->|否| O{獎金過期？}
+    O -->|否| K
+    O -->|是| P[清零獎金餘額]
 
-    N -->|Yes| Q[Convert Bonus to Cash]
-    Q --> R[Update cash wallet]
-    R --> S[Notify player]
+    N -->|是| Q[獎金轉為現金]
+    Q --> R[更新現金錢包]
+    R --> S[通知玩家]
 
     style A fill:#e1f5e1
     style S fill:#e1f5e1
@@ -298,118 +298,118 @@ flowchart TD
     style Q fill:#fff4e1
 ```
 
-### 3.3 Key Business Rules
+### 3.3 關鍵業務規則
 
-#### Bonus Calculation Example: First Deposit Bonus
+#### 獎金計算範例：首存獎金 (First Deposit Bonus)
 
-| Parameter | Value |
-|-----------|-------|
-| Eligibility | First deposit >= $100 |
-| Bonus Rate | 50% of deposit amount |
-| Maximum Bonus | $500 |
-| Wagering Multiplier | 20x (deposit + bonus) |
+| 參數 | 值 |
+|-----|---|
+| 資格條件 | 首次存款 >= $100 |
+| 獎金比例 | 存款金額的 50% |
+| 最高獎金 | $500 |
+| 流水倍數 (Wagering Multiplier) | 20 倍（存款 + 獎金） |
 
-**Example Calculation**:
-- Deposit: $200
-- Bonus: $200 x 50% = $100
-- Wagering Requirement: ($200 + $100) x 20 = $6,000
+**計算範例**：
+- 存款: $200
+- 獎金: $200 x 50% = $100
+- 流水要求: ($200 + $100) x 20 = $6,000
 
-#### Wagering Accumulation Rules
+#### 流水累積規則
 
-Valid bet toward wagering is calculated as:
+有效投注 (Valid Bet) 按以下方式計入流水：
 
-> **Valid Bet = Bet Amount x Game Weight**
+> **有效投注 = 投注金額 × 遊戲權重 (Game Weight)**
 
-Different game types contribute at different rates:
+不同遊戲類型的貢獻率不同：
 
-| Game Type | Bet Amount | Game Weight | Valid Bet | Cumulative Turnover |
-|-----------|-----------|-------------|----------|-------------------|
-| Slots | $100 | 100% | $100 | $100 |
-| Baccarat | $500 | 10% | $50 | $150 |
-| Sports Betting | $200 | 50% | $100 | $250 |
+| 遊戲類型 | 投注金額 | 遊戲權重 | 有效投注 | 累計流水 |
+|---------|---------|---------|---------|---------|
+| 老虎機 (Slots) | $100 | 100% | $100 | $100 |
+| 百家樂 (Baccarat) | $500 | 10% | $50 | $150 |
+| 體育投注 (Sports Betting) | $200 | 50% | $100 | $250 |
 
-> For detailed game weight tables and the three-layer validation architecture, see [Turnover Business Rules](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md).
+> 詳細遊戲權重表和三層驗證架構，請參閱 [流水業務規則](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)。
 
-#### Bonus-to-Cash Conversion Rules
-- Conversion happens automatically when wagering requirement is met
-- Maximum conversion amount = Bonus amount (winnings excluded from conversion)
-- Expired bonuses are cleared to zero and cannot be converted
+#### 獎金轉現金規則
+- 當流水要求達標時自動轉換
+- 最大轉換金額 = 獎金金額（獎金贏利不計入轉換）
+- 過期獎金清零，無法轉換
 
-### 3.4 Exception Handling
+### 3.4 異常處理
 
-| Exception | Resolution |
-|-----------|-----------|
-| Bonus expired | Automatically clear promotional balance, notify player |
-| Withdrawal before wagering met | Reject withdrawal, show remaining wagering requirement |
-| Excluded game (0% weight) | Does not count toward wagering, logged in risk system |
-| Duplicate claim | Check claim history, reject duplicate |
+| 異常 | 解決方案 |
+|-----|---------|
+| 獎金過期 | 自動清零促銷餘額，通知玩家 |
+| 流水未達標時提款 | 拒絕提款，顯示剩餘流水要求 |
+| 排除遊戲（0% 權重） | 不計入流水，記錄至風控系統 |
+| 重複領取 | 檢查領取歷史，拒絕重複 |
 
 ---
 
-## 4. Withdrawal Review and Risk Control
+## 4. 提款審核與風控
 
-### 4.1 Flow Overview
+### 4.1 流程概述
 
-**Business Goal**: Players request withdrawals, which pass through multiple risk control checks before processing.
+**業務目標**: 玩家請求提款 (Withdrawal)，經過多層風控檢查後處理。
 
-**Key Business Concepts Involved**:
-- **Risk Control**: Rule engine, risk scoring
-- **Wallet**: Fund locking, automatic compensation policy
-- **Multi-Tenancy**: Different brands have different withdrawal rules
+**涉及的關鍵業務概念**：
+- **風控 (Risk Control)**: 規則引擎、風險評分 (Risk Score)
+- **錢包 (Wallet)**: 資金鎖定、自動補償策略
+- **Multi-Tenancy**: 不同品牌有不同的提款規則
 
-### 4.2 Withdrawal Review Flow
+### 4.2 提款審核流程
 
 ```mermaid
 flowchart TD
-    A[Player requests withdrawal] --> B[Fill in withdrawal details]
-    B --> C[Submit withdrawal request]
+    A[玩家請求提款] --> B[填寫提款詳情]
+    B --> C[提交提款請求]
 
-    C --> D[Create withdrawal order]
-    D --> E[Lock withdrawal amount]
+    C --> D[創建提款訂單]
+    D --> E[鎖定提款金額]
 
-    E --> F[Risk Layer 1: KYC Check]
-    F --> G{KYC status}
+    E --> F[風控第 1 層：KYC 檢查]
+    F --> G{KYC 狀態}
 
-    G -->|Not verified| H[Reject: Please complete KYC first]
-    G -->|Verified| I[Risk Layer 2: Turnover Check]
+    G -->|未驗證| H[拒絕：請先完成 KYC]
+    G -->|已驗證| I[風控第 2 層：流水檢查]
 
-    I --> J{Post-deposit turnover}
-    J -->|Not met| K[Reject: 1x turnover required]
-    J -->|Met| L[Risk Layer 3: Bonus Check]
+    I --> J{存款後流水}
+    J -->|未達標| K[拒絕：需完成 1 倍流水]
+    J -->|已達標| L[風控第 3 層：獎金檢查]
 
-    L --> M{Bonus wagering}
-    M -->|Not met| N[Reject: Bonus wagering incomplete]
-    M -->|Met| O[Risk Layer 4: Frequency Check]
+    L --> M{獎金流水}
+    M -->|未達標| N[拒絕：獎金流水未完成]
+    M -->|已達標| O[風控第 4 層：頻率檢查]
 
-    O --> P{Withdrawal frequency}
-    P -->|Abnormal| Q[Manual review]
-    P -->|Normal| R[Risk Layer 5: Risk Score]
+    O --> P{提款頻率}
+    P -->|異常| Q[人工審核]
+    P -->|正常| R[風控第 5 層：風險評分]
 
-    R --> S{Risk score}
+    R --> S{風險評分}
 
-    S -->|0-30 Low risk| T[Auto-approve]
-    S -->|31-70 Medium risk| Q
-    S -->|71-100 High risk| U[Reject: High-risk user]
+    S -->|0-30 低風險| T[自動通過]
+    S -->|31-70 中風險| Q
+    S -->|71-100 高風險| U[拒絕：高風險用戶]
 
-    Q --> V{Review result}
-    V -->|Approved| T
-    V -->|Rejected| U
+    Q --> V{審核結果}
+    V -->|通過| T
+    V -->|拒絕| U
 
-    T --> W[Call payment gateway]
-    W --> X{Withdrawal status}
+    T --> W[調用支付閘道]
+    W --> X{提款狀態}
 
-    X -->|Success| Y[Deduct cash balance]
-    X -->|Failed| Z[Compensation flow]
+    X -->|成功| Y[扣除現金餘額]
+    X -->|失敗| Z[補償流程]
 
-    Y --> AA[Release locked amount]
-    AA --> AB[Update order: Success]
-    AB --> AC[Notify player]
+    Y --> AA[釋放鎖定金額]
+    AA --> AB[更新訂單：成功]
+    AB --> AC[通知玩家]
 
-    Z --> AD[Return locked amount]
-    AD --> AE[Update order: Failed]
+    Z --> AD[返還鎖定金額]
+    AD --> AE[更新訂單：失敗]
     AE --> AC
 
-    U --> AF[Release locked amount]
+    U --> AF[釋放鎖定金額]
     AF --> AE
 
     style A fill:#e1f5e1
@@ -421,258 +421,258 @@ flowchart TD
     style Q fill:#fff4e1
 ```
 
-### 4.3 Key Business Rules
+### 4.3 關鍵業務規則
 
-#### Fund Locking Policy
-- Funds are locked immediately when withdrawal request is created
-- This prevents the player from using funds during review
-- Auto-review locking period: 5-10 minutes
-- Manual review locking period: 1-24 hours
-- Rejected reviews: locked funds released immediately
+#### 資金鎖定策略
+- 提款請求創建時立即鎖定資金
+- 防止玩家在審核期間使用資金
+- 自動審核鎖定期：5-10 分鐘
+- 人工審核鎖定期：1-24 小時
+- 審核拒絕：鎖定資金立即釋放
 
-#### Five-Layer Risk Control Checks
+#### 五層風控檢查
 
-| Layer | Check | Pass Criteria | Rejection |
-|-------|-------|--------------|-----------|
-| Layer 1 | KYC Verification | KYC status is verified | "Please complete KYC first" |
-| Layer 2 | Post-Deposit Turnover | Turnover >= 1x total deposits | "Need to complete 1x turnover" |
-| Layer 3 | Bonus Wagering | All active bonus wagering requirements met | "Bonus wagering incomplete" |
-| Layer 4 | Withdrawal Frequency | Normal frequency pattern | Escalate to manual review |
-| Layer 5 | Risk Scoring | Score 0-30 auto-approve | Score 71-100 auto-reject |
+| 層級 | 檢查項目 | 通過條件 | 拒絕原因 |
+|-----|---------|---------|---------|
+| 第 1 層 | KYC 驗證 | KYC 狀態為已驗證 | 「請先完成 KYC」 |
+| 第 2 層 | 存款後流水 | 流水 >= 總存款的 1 倍 | 「需完成 1 倍流水」 |
+| 第 3 層 | 獎金流水 | 所有有效獎金流水要求已達標 | 「獎金流水未完成」 |
+| 第 4 層 | 提款頻率 | 正常頻率模式 | 轉人工審核 |
+| 第 5 層 | 風險評分 | 評分 0-30 自動通過 | 評分 71-100 自動拒絕 |
 
-#### Risk Scoring Factors
+#### 風險評分因子
 
-| Risk Factor | Score | Trigger Condition |
-|------------|-------|-------------------|
-| High-frequency withdrawals | +30 | More than 3 withdrawals per day |
-| Large-amount withdrawal | +40 | Amount > 3x total deposits |
-| Bonus abuse | +50 | Only plays with bonus, no self-funded play |
-| New user | +20 | Registered less than 7 days ago |
-| IP anomaly | +30 | Frequent IP changes |
+| 風險因子 | 分數 | 觸發條件 |
+|---------|-----|---------|
+| 高頻提款 | +30 | 每天超過 3 次提款 |
+| 大額提款 | +40 | 金額 > 總存款的 3 倍 |
+| 獎金濫用 | +50 | 僅使用獎金遊戲，無自有資金投注 |
+| 新用戶 | +20 | 註冊不到 7 天 |
+| IP 異常 | +30 | 頻繁更換 IP |
 
-**Decision Thresholds**:
-- Score 0-30: Auto-approve
-- Score 31-70: Manual review required
-- Score 71-100: Auto-reject
+**決策閾值**：
+- 評分 0-30：自動通過
+- 評分 31-70：需人工審核
+- 評分 71-100：自動拒絕
 
-#### Automatic Fund Release Policy
+#### 自動資金釋放策略
 
-When a withdrawal payment fails at any stage, the system ensures funds are always restored to the player's account, even in distributed failure scenarios. This prevents player funds from being lost due to system failures.
+當提款支付在任何階段失敗時，系統確保資金始終恢復到玩家帳戶，即使在分佈式故障場景下也是如此。這防止玩家資金因系統故障而丟失。
 
-**Compensation Policy**:
-- If withdrawal is rejected or fails, locked funds are automatically released back to the player's available balance
-- All compensation actions are logged for audit purposes
-- Player receives notification of the outcome
+**補償策略**：
+- 如果提款被拒絕或失敗，鎖定資金自動釋放回玩家可下注餘額 (Playable Balance)
+- 所有補償動作記錄用於審計目的
+- 玩家收到結果通知
 
-→ **[Technical Implementation: SAGA Compensation Flow](../../architecture/02_Finance_Service/Financial_Implementation.md#saga-compensation)**
+→ **[技術實現：SAGA 補償流程](../../architecture/02_Finance_Service/Financial_Implementation.md#saga-compensation)**
 
-### 4.4 Manual Review Process
+### 4.4 人工審核流程
 
-**Review Interface Capabilities**:
-- Player profile (registration date, KYC status)
-- Deposit/withdrawal history
-- Game records (bet details)
-- Risk score breakdown
-- One-click approve/reject/request additional information
+**審核介面功能**：
+- 玩家檔案（註冊日期、KYC 狀態）
+- 存款/提款歷史
+- 遊戲記錄（投注詳情）
+- 風險評分明細
+- 一鍵通過/拒絕/請求補充資料
 
-**Review SLA**:
-- Business days: Complete within 4 hours
-- Non-business days: Complete within 24 hours
+**審核 SLA**：
+- 工作日：4 小時內完成
+- 非工作日：24 小時內完成
 
 ---
 
-## 5. Turnover Calculation and Reconciliation
+## 5. 流水計算與對帳
 
-### 5.1 Flow Overview
+### 5.1 流程概述
 
-**Business Goal**: Accurately calculate player valid bets and ensure data consistency with game providers.
+**業務目標**: 準確計算玩家有效投注 (Valid Bet)，確保與遊戲供應商數據一致。
 
-**Key Business Concepts Involved**:
-- **Turnover**: Three-layer verification architecture
-- **Wallet**: Fund movement records
-- **Reconciliation**: Real-time vs batch data comparison
+**涉及的關鍵業務概念**：
+- **流水 (Turnover)**: 三層驗證架構
+- **錢包 (Wallet)**: 資金變動記錄
+- **對帳 (Reconciliation)**: 即時 vs 批次數據比對
 
-### 5.2 Three-Layer Verification Architecture
+### 5.2 三層驗證架構
 
 ```mermaid
 flowchart LR
-    A[Game Provider] -->|1. Real-time push| B[Layer 1: Real-Time<br/>OLTP]
-    B -->|2. Scheduled sync| C[Layer 2: Reconciliation<br/>GP API Pull]
-    C -->|3. Data warehouse| D[Layer 3: Analytics<br/>OLAP]
+    A[遊戲供應商] -->|1. 即時推送| B[第 1 層：即時<br/>OLTP]
+    B -->|2. 定時同步| C[第 2 層：對帳<br/>GP API 拉取]
+    C -->|3. 數據倉庫| D[第 3 層：分析<br/>OLAP]
 
-    B --> E[Real-time turnover stats]
-    C --> F[Hourly reconciliation]
-    D --> G[Daily final reports]
+    B --> E[即時流水統計]
+    C --> F[每小時對帳]
+    D --> G[每日最終報表]
 
-    F --> H{Discrepancy detected}
-    H -->|Discrepancy found| I[Alert and correction]
-    H -->|No discrepancy| J[Mark as consistent]
+    F --> H{檢測到差異}
+    H -->|發現差異| I[告警並修正]
+    H -->|無差異| J[標記為一致]
 
     style H fill:#fff4e1
     style I fill:#ffe1e1
     style J fill:#e1f5e1
 ```
 
-### 5.3 Key Business Rules
+### 5.3 關鍵業務規則
 
-#### Layer 1: Real-Time Layer (OLTP)
-- **Data Source**: Game providers push Debit/Credit requests in real time
-- **Records**: bet_id, player_id, game_id, round_id, bet_amount, valid_bet, win_amount, bet_time, settle_time
-- **Purpose**: Immediate turnover tracking for wagering progress
+#### 第 1 層：即時層（OLTP）
+- **數據來源**: 遊戲供應商即時推送 Debit/Credit 請求
+- **記錄內容**: bet_id, player_id, game_id, round_id, bet_amount, valid_bet, win_amount, bet_time, settle_time
+- **用途**: 即時流水追蹤用於流水進度
 
-#### Layer 2: Reconciliation Layer (Hourly)
+#### 第 2 層：對帳層（每小時）
 
-Reconciliation compares platform records against game provider data:
+對帳比較平台記錄與遊戲供應商數據：
 
-| Discrepancy Type | Resolution |
-|-----------------|------------|
-| Local record missing | Supplement from GP data |
-| Amount mismatch | Correct to match GP (GP is authoritative source) |
-| Extra local records | Flag as anomaly, manual investigation |
+| 差異類型 | 解決方案 |
+|---------|---------|
+| 本地記錄缺失 | 從 GP 數據補充 |
+| 金額不符 | 修正為 GP 值（GP 為權威來源） |
+| 本地多餘記錄 | 標記為異常，人工調查 |
 
-#### Layer 3: Analytics Layer (OLAP)
-- Data warehouse processes finalized daily reports
-- Aggregates per-player daily totals: total_bet, total_valid_bet, total_win
-- Reports generated at 2:00 AM daily
+#### 第 3 層：分析層（OLAP）
+- 數據倉庫處理最終每日報表
+- 彙總每玩家每日總計：total_bet、total_valid_bet、total_win
+- 報表於每日凌晨 2:00 生成
 
-#### Reconciliation Exception Policies
+#### 對帳異常策略
 
-**Automatic Correction**:
-- Amount discrepancy < $1: Auto-correct to GP value
-- Time discrepancy < 5 minutes: Treated as network delay, auto-match
+**自動修正**：
+- 金額差異 < $1：自動修正為 GP 值
+- 時間差異 < 5 分鐘：視為網路延遲，自動匹配
 
-**Manual Intervention Required**:
-- Amount discrepancy > $100: Alert notification, manual investigation
-- Missing records > 10/hour: Alert notification, check GP API
-- Reconciliation failure for 3 consecutive hours: Emergency alert, pause affected games
+**需人工介入**：
+- 金額差異 > $100：告警通知，人工調查
+- 缺失記錄 > 10 筆/小時：告警通知，檢查 GP API
+- 連續 3 小時對帳失敗：緊急告警，暫停受影響遊戲
 
-> For detailed turnover calculation flowcharts and technical implementation, see [Turnover Flowcharts](../../architecture/02_Finance_Service/Turnover_Flowcharts.md).
+> 詳細流水計算流程圖和技術實現，請參閱 [流水流程圖](../../architecture/02_Finance_Service/Turnover_Flowcharts.md)。
 
 ---
 
-## 6. Multi-Tenant Data Isolation
+## 6. Multi-Tenant 數據隔離
 
-### 6.1 Flow Overview
+### 6.1 流程概述
 
-**Business Goal**: Serve multiple brands within a single system while ensuring complete data isolation between tenants.
+**業務目標**: 在單一系統中服務多個品牌，同時確保租戶間數據完全隔離。
 
-**Key Business Concepts Involved**:
-- **Multi-Tenancy**: Schema isolation, context injection
-- **Security**: Token-based authentication, role-based access control (RBAC)
-- **Reporting**: Independent statistics per tenant
+**涉及的關鍵業務概念**：
+- **Multi-Tenancy**: Schema 隔離、上下文注入
+- **安全 (Security)**: Token 認證、角色存取控制 (RBAC)
+- **報表 (Reporting)**: 每租戶獨立統計
 
-### 6.2 Multi-Tenant Architecture Overview
+### 6.2 Multi-Tenant 架構概覽
 
 ```mermaid
 flowchart TD
-    subgraph "Frontend Layer"
-        A1[Brand A Frontend<br/>brandA.com]
-        A2[Brand B Frontend<br/>brandB.com]
+    subgraph "前端層"
+        A1[品牌 A 前端<br/>brandA.com]
+        A2[品牌 B 前端<br/>brandB.com]
     end
 
-    subgraph "API Gateway"
+    subgraph "API 閘道"
         B[Nginx / Kong]
     end
 
-    subgraph "Application Layer"
-        C[Application Server]
+    subgraph "應用層"
+        C[應用伺服器]
         D[Tenant Context Filter]
     end
 
-    subgraph "Cache Layer"
-        E1[Cache: brand_a:*]
-        E2[Cache: brand_b:*]
+    subgraph "緩存層"
+        E1[緩存: brand_a:*]
+        E2[緩存: brand_b:*]
     end
 
-    subgraph "Data Layer"
-        F[(Database)]
+    subgraph "數據層"
+        F[(數據庫)]
         G[Schema: brand_a]
         H[Schema: brand_b]
     end
 
-    A1 -->|Token with tenant_id=brand_a| B
-    A2 -->|Token with tenant_id=brand_b| B
+    A1 -->|Token 含 tenant_id=brand_a| B
+    A2 -->|Token 含 tenant_id=brand_b| B
 
     B --> C
     C --> D
 
-    D -->|Resolve Tenant ID| E1
-    D -->|Resolve Tenant ID| E2
+    D -->|解析 Tenant ID| E1
+    D -->|解析 Tenant ID| E2
 
     E1 --> G
     E2 --> H
 
-    G -.->|Complete isolation| F
-    H -.->|Complete isolation| F
+    G -.->|完全隔離| F
+    H -.->|完全隔離| F
 
     style D fill:#fff4e1
     style G fill:#e1f5e1
     style H fill:#e1f5e1
 ```
 
-### 6.3 Key Business Rules
+### 6.3 關鍵業務規則
 
-#### Tenant Context Resolution
-- Every API request must be associated with a tenant
-- Tenant identity is extracted from the JWT token (for authenticated requests) or from the domain/URL path (for registration)
-- The tenant context is maintained throughout the entire request lifecycle
+#### Tenant 上下文解析
+- 每個 API 請求必須關聯一個租戶
+- 租戶身份從 JWT Token（已認證請求）或網域/URL 路徑（註冊時）提取
+- Tenant 上下文在整個請求生命週期中維持
 
-#### Data Isolation Guarantees
-- **Database Level**: Each tenant has its own database schema; queries are automatically scoped to the correct schema
-- **Cache Level**: All cache keys are prefixed with the tenant identifier (e.g., `brand_a:player:wallet:12345`)
-- **API Level**: Cross-tenant access is explicitly blocked; attempting to access another tenant's data returns an access denied error
+#### 數據隔離保證
+- **數據庫層**: 每個租戶有自己的數據庫 Schema；查詢自動限定到正確的 Schema
+- **緩存層**: 所有緩存鍵以租戶標識為前綴（如 `brand_a:player:wallet:12345`）
+- **API 層**: 明確阻止跨租戶訪問；嘗試訪問另一租戶的數據返回拒絕訪問錯誤
 
-#### Token Structure for Multi-Tenancy
-Each JWT token includes the tenant identifier:
-- `sub`: Player ID
-- `tenant_id`: Tenant/Brand ID (critical field)
-- `roles`: Player roles (e.g., PLAYER)
-- `iat`: Issued at timestamp
-- `exp`: Expiration timestamp (24 hours)
+#### Multi-Tenancy 的 Token 結構
+每個 JWT Token 包含租戶標識：
+- `sub`: 玩家 ID
+- `tenant_id`: 租戶/品牌 ID（關鍵欄位）
+- `roles`: 玩家角色（如 PLAYER）
+- `iat`: 簽發時間戳
+- `exp`: 過期時間戳（24 小時）
 
-#### Cross-Tenant Access Prevention
-- Every data access operation validates that the requested resource belongs to the current tenant
-- Mismatched tenant IDs result in immediate access denial
-- This validation is enforced at both the application layer and database layer
+#### 跨租戶訪問防護
+- 每次數據訪問操作驗證請求資源屬於當前租戶
+- Tenant ID 不匹配導致立即拒絕訪問
+- 此驗證在應用層和數據庫層同時執行
 
-### 6.4 Security Verification
+### 6.4 安全驗證
 
-**Cross-Tenant Access Test Scenario**:
-1. Brand A creates a player "Alice"
-2. Brand B attempts to access Alice's data
-3. System must deny access with "Cross-tenant access not allowed" error
+**跨租戶訪問測試場景**：
+1. 品牌 A 創建玩家 "Alice"
+2. 品牌 B 嘗試訪問 Alice 的數據
+3. 系統必須拒絕訪問並返回「跨租戶訪問不允許」錯誤
 
-This test verifies that tenant isolation is enforced at the application level, not just the database level.
-
----
-
-## Related Documentation
-
-→ **[Business Logic Flows - Technical Implementation](../../architecture/00_Overview/Business_Logic_Flows.md)** - Complete technical implementation details, API specifications, database schemas, and architectural patterns for all 6 business flows
+此測試驗證租戶隔離在應用層執行，而不僅僅是數據庫層。
 
 ---
 
-## Extended Reading
+## 相關文檔
 
-### By Difficulty Level
-
-| Difficulty | Flow | Recommended For |
-|-----------|------|----------------|
-| Beginner | 1. Player Registration and KYC | Product Managers, QA Engineers |
-| Intermediate | 3. Bonus Distribution and Wagering | Backend Developers, Product Managers |
-| Intermediate | 6. Multi-Tenant Data Isolation | Backend Developers, Architects |
-| Advanced | 2. Game Launch and Token Verification | Backend Developers, Architects |
-| Advanced | 4. Withdrawal Review and Risk Control | Backend Developers, Risk Specialists |
-| Expert | 5. Turnover Calculation and Reconciliation | Backend Developers, Data Engineers |
-
-### Related Documentation
-
-- [Business Logic Flows (Architecture View)](../../architecture/00_Overview/Business_Logic_Flows.md) -- Technical implementation details for all 6 flows
-- [Turnover Business Rules](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md) -- Detailed wagering and turnover policies
-- [Turnover Flowcharts](../../architecture/02_Finance_Service/Turnover_Flowcharts.md) -- Technical turnover calculation diagrams
+→ **[業務邏輯流程 - 技術實現](../../architecture/00_Overview/Business_Logic_Flows.md)** - 全部 6 個業務流程的完整技術實現細節、API 規格、數據庫 Schema 和架構模式
 
 ---
 
-**Document Version**: 4.0.0
-**Created**: 2026-02-03
-**Maintained by**: Architecture Team
+## 延伸閱讀
+
+### 按難度等級
+
+| 難度 | 流程 | 建議對象 |
+|-----|------|---------|
+| 入門 | 1. 玩家註冊與 KYC | 產品經理、QA 工程師 |
+| 中級 | 3. 獎金發放與流水要求 | 後端開發、產品經理 |
+| 中級 | 6. Multi-Tenant 數據隔離 | 後端開發、架構師 |
+| 進階 | 2. 遊戲啟動與 Token 驗證 | 後端開發、架構師 |
+| 進階 | 4. 提款審核與風控 | 後端開發、風控專員 |
+| 專家 | 5. 流水計算與對帳 | 後端開發、數據工程師 |
+
+### 相關文檔
+
+- [業務邏輯流程（架構視圖）](../../architecture/00_Overview/Business_Logic_Flows.md) -- 全部 6 個流程的技術實現細節
+- [流水業務規則](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md) -- 詳細流水和投注策略
+- [流水流程圖](../../architecture/02_Finance_Service/Turnover_Flowcharts.md) -- 技術流水計算圖表
+
+---
+
+**文檔版本**: 4.0.0
+**創建日期**: 2026-02-03
+**維護者**: 架構團隊

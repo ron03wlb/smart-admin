@@ -1,478 +1,478 @@
-# iGaming Industry Glossary
+# iGaming 行業術語表
 
-> **Canonical Source**: [source-archive/00_Foundation/guides/00-07_Industry_Terminology.md](../../source-archive/00_Foundation/guides/00-07_Industry_Terminology.md)
-> **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Architecture**: N/A — Reference/glossary document
-> **Last Synced**: 2026-02-08
-
----
-
-## Business Value
-
-This glossary delivers strategic value by:
-- **Knowledge Standardization**: Provides 200+ professional terms across 8 core domains, enabling consistent communication across Executives, Product Managers, and Compliance Officers
-- **Onboarding Acceleration**: Reduces new team member ramp-up time by providing a single authoritative reference for iGaming terminology
-- **Compliance Alignment**: Documents regulatory terminology (KYC, AML, EDD, SAR) ensuring teams understand compliance requirements in a $660B+ global industry
-- **Cross-Functional Clarity**: Establishes internal terminology standards (Appendix A) that prevent miscommunication between Finance, Gaming, Risk Control, and Marketing teams
+> **權威來源**: [source-archive/00_Foundation/guides/00-07_Industry_Terminology.md](../../source-archive/00_Foundation/guides/00-07_Industry_Terminology.md)
+> **目標讀者**: 高階主管、產品經理、合規專員
+> **相關架構**: N/A — 參考/術語表文檔
+> **最後同步**: 2026-02-08
 
 ---
 
-## Success Metrics
+## 業務價值（Business Value）
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Term Coverage | ≥200 terms across 8 domains | Count of unique terms in glossary |
-| Internal Standard Adoption | 100% compliance with Appendix A terms | Documentation audit for prohibited term usage |
-| Onboarding Effectiveness | New hire references glossary within first week | Survey/usage tracking |
-| Cross-Team Consistency | Zero terminology conflicts in PRDs and technical specs | Quarterly documentation review |
-
----
-
-## Overview
-
-The iGaming industry exceeded **$660 billion GGR** globally in 2025. From platform technology to payment processing, compliance to data analytics, the industry has developed a complex and specialized terminology framework. This glossary covers 8 core domains with 200+ professional terms, providing practitioners with a comprehensive industry knowledge reference.
+本術語表提供以下戰略價值：
+- **知識標準化**: 提供 8 個核心領域超過 200 個專業術語，使高階主管、產品經理和合規專員能夠一致溝通
+- **入職加速**: 為新團隊成員提供單一權威的 iGaming 術語參考，縮短培訓時間
+- **合規對齊**: 記錄監管術語（KYC、AML、EDD、SAR），確保團隊理解 6,600 億美元以上全球產業的合規要求
+- **跨職能清晰度**: 建立內部術語標準（附錄 A），防止財務、遊戲、風控和行銷團隊之間的溝通誤解
 
 ---
 
-## 1. Game Type Terminology
+## 成功指標（Success Metrics）
 
-### 1.1 Sports Betting
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Asian Handicap** | 亞洲讓球盤 | Betting system using half-goal handicaps (0.25, 0.5, 0.75) to eliminate draws. Originated from Indonesian "hang cheng" betting, named by journalist Joe Saumarez Smith in 1998. Dominates Asia-Pacific football betting, offering only two outcomes (win/lose). Industry standard requires split-bet functionality (e.g., -0.25 line splits stake between 0 and -0.5). |
-| **In-Play Betting** | 滾球投注 | Real-time betting during live events with dynamically updated odds. Accounts for over **70%** of total wagering in some markets. Key challenges: latency control, collusion detection, rapid settlement. |
-| **Parlay / Accumulator** | 過關投注 | Combining multiple independent selections into a single bet; all selections must win to profit. Industry standard caps at **10-15 selections**. |
-| **Bookmaker Margin (Vigorish)** | 莊家水位 | Commission built into odds ensuring profitability regardless of outcome. Industry norm: **2-10%**; more competitive markets offer lower margins. |
-
-### 1.2 Poker
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Rake** | 抽水 | Commission taken from each pot or tournament entry fee. Cash tables: **2.5-10%** of pot (capped); tournaments: fixed fee model (e.g., $10+$1). "No flop, no drop" rule applies. |
-| **Rakeback** | 返水 | Returning a percentage of paid rake as cash or bonus. Ranges from **5%** (new players) to **45%** (top VIP). Key incentive for high-frequency players. |
-
-### 1.3 Slots
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Volatility** | 波動性 | Game risk and payout distribution characteristic. Low volatility: frequent small wins (20-30% hit rate); high volatility: rare large wins (10-15% hit rate). |
-| **Progressive Jackpot** | 累積獎金 | Portion of each bet feeds a prize pool until won. Multiple casinos can link to the same pool; prizes can reach millions. These games typically have lower base RTP. |
-| **Megaways** | 萬種賠付方式 | Big Time Gaming licensed dynamic reel system with variable paylines per spin, up to **117,649 ways** to win. Uses cascading mechanic. |
-
-### 1.4 Live Casino
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Live Dealer** | 真人荷官 | Games operated by real dealers via HD video streaming, 24/7. Evolution Gaming is the market leader. Supports "One Wallet" and "Fund Transfer" integration modes. |
-| **Baccarat Squeeze** | 百家樂揭牌 | Traditional slow card reveal ceremony using **15+ HD cameras** (Evolution Gaming). Control Squeeze allows virtual player-initiated reveal. Deep cultural roots in Macau VIP rooms. |
-| **Roads** | 路單 | Chart system displaying baccarat historical results, including Big Road, Big Eye Boy, Small Road, Cockroach Road, and Bead Plate. Used to identify patterns for betting decisions. |
+| 指標 | 目標 | 衡量方式 |
+|-----|------|---------|
+| 術語覆蓋率 | ≥200 個術語，涵蓋 8 個領域 | 術語表中的唯一術語數量 |
+| 內部標準採用率 | 100% 遵守附錄 A 術語 | 文檔審計禁用術語使用情況 |
+| 入職效果 | 新員工在第一週內參考術語表 | 調查/使用追蹤 |
+| 跨團隊一致性 | PRD 和技術規格中零術語衝突 | 季度文檔審查 |
 
 ---
 
-## 2. Technology Architecture Terminology
+## 概述
 
-### 2.1 Platform Types
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **White-Label Platform** | 白牌平台 (包網) | Pre-built complete platform operated under the operator's own brand. Supplier provides infrastructure, games, licensing, payments, and sometimes customer service. Typical launch time: **4-6 weeks**. Revenue share: **20-50% of GGR**; setup fee: $15,000-$50,000. |
-| **Turnkey Solution** | 交鑰匙解決方案 | Complete pre-built platform where the operator must obtain their own license. Greater customization flexibility than white-label. Build time: **2-3 months**. |
-| **Multi-Tenant Architecture** | 多租戶架構 | Single software instance serving multiple operator brands ("tenants"). Each tenant has independent branding, configuration, and user experience while sharing underlying infrastructure. |
-
-### 2.2 Wallet Integration
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Seamless Wallet** | 無縫錢包 | Single unified player balance usable across all games and verticals (casino, sports, poker) in real time. Preferred modern architecture providing the **best player experience**. |
-| **Transfer Wallet** | 轉帳錢包 | Players must manually or programmatically transfer funds from a main wallet to GP-specific wallets before playing. Simpler to implement than seamless wallet. |
-
-### 2.3 Game Aggregation
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Game Aggregator** | 遊戲聚合平台 | Platform integrating thousands of games from multiple studios into a single API entry point. Hub88, SOFTSWISS, Groove offer **15,000+ games** from **100+ providers** via a single API. Integration typically completes in **3-7 days**. |
-| **Unified API** | 統一API | Standardized interface integrating multiple game providers into a single access point. Zenith's OneAPI provides 10,000+ games from 150+ providers. RESTful architecture, JSON responses, webhook support. |
-
-### 2.4 Backend Systems
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **PAM (Player Account Management)** | 玩家帳戶管理系統 | Core backend system managing user accounts, wallets, payments, registration, sessions, and KYC/AML controls. EveryMatrix GamMatrix PAM achieves **99%+ uptime**. |
-| **Back Office** | 後台管理系統 | Administrative interface providing financial management, marketing operations, customer support, business intelligence, player management, and compliance reporting tools. |
-
-### 2.5 Performance Metrics
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Latency** | 延遲 | Round-trip time in milliseconds. Live casino requires **<50ms latency**. Google research: load time increase from 1s to 3s raises bounce rate by **32%**. |
-| **Uptime SLA** | 運行時間服務等級協議 | Contractual availability guarantee. Leading platforms guarantee **99.95-99.99% uptime**. 99.99% ("four nines") means only **52.56 minutes** downtime per year. Large enterprises lose $300,000-$1M per hour of downtime. |
+iGaming 行業在 2025 年全球 GGR（總博彩收入）超過 **6,600 億美元**。從平台技術到支付處理，從合規到數據分析，該行業已發展出複雜且專業的術語框架。本術語表涵蓋 8 個核心領域超過 200 個專業術語，為從業者提供全面的行業知識參考。
 
 ---
 
-## 3. Payment Terminology
+## 1. 遊戲類型術語
 
-### 3.1 Payment Infrastructure
+### 1.1 體育投注（Sports Betting）
 
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **PSP (Payment Service Provider)** | 支付服務提供商 | Third-party enabling merchants to accept cards, bank transfers, e-wallets, and alternative payments. iGaming-specialized PSPs (Paysafe, Nuvei, Corefy) understand high-risk merchant requirements. Must maintain **PCI DSS compliance**. |
-| **Payment Gateway** | 支付閘道 | Technical solution securely transmitting transaction data between merchant website and acquiring bank. Encrypts cardholder data, validates transactions, returns authorization results. |
-| **Payment Orchestration** | 支付編排 | Technology layer integrating multiple PSPs, acquirers, and payment methods via single API. Platforms like Praxis Tech, Corefy connect **200+ payment providers**, enabling smart routing and auto-failover for **85%+ acceptance rates**. |
-| **Smart Routing** | 智能路由 | Automatically directing each transaction to the optimal processor based on rules and real-time analytics. Considers approval rates, processing costs, geography, currency, and provider status. Modern engines analyze **100+ data points** per transaction. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Asian Handicap** | 亞洲讓球盤 | 使用半球讓分（0.25、0.5、0.75）來消除平局的投注系統。源自印尼的 "hang cheng" 投注，由記者 Joe Saumarez Smith 於 1998 年命名。主導亞太足球投注，僅提供兩種結果（贏/輸）。行業標準要求拆分投注功能（例如 -0.25 線將注額拆分到 0 和 -0.5）。 |
+| **In-Play Betting** | 滾球投注 | 在比賽進行中即時投注，賠率動態更新。在某些市場佔總投注額的 **70%** 以上。關鍵挑戰：延遲控制、串通檢測、快速結算。 |
+| **Parlay / Accumulator** | 過關投注 | 將多個獨立選項組合成單一投注；所有選項必須贏才能獲利。行業標準上限為 **10-15 個選項**。 |
+| **Bookmaker Margin (Vigorish)** | 莊家水位 | 內建於賠率中的佣金，確保無論結果如何都能獲利。行業常規：**2-10%**；競爭激烈的市場提供更低水位。 |
 
-### 3.2 Payment Methods
+### 1.2 撲克（Poker）
 
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **3D Secure (3DS)** | 3D安全驗證 | Authentication protocol adding verification for card-not-present transactions. "3D" refers to acquirer, issuer, and interoperability domains. Provides **liability shift** (fraud chargebacks become issuer responsibility), reducing fraud-related chargebacks by **70%+**. Brand names: Visa Secure, Mastercard Identity Check. |
-| **Chargeback** | 退款 (拒付) | Cardholder disputes transaction with issuer, causing reversal and merchant deduction. Fees: **$15-$70+** per chargeback. Card network thresholds: **0.9-1%**; exceeding triggers fines or service termination. |
-| **A2A Payments** | 帳戶對帳戶支付 | Direct bank-to-bank transfers without intermediary card networks. Benefits: lower costs (no interchange fees), reduced chargeback risk (irreversible transactions), built-in KYC via bank account verification. A2A processes **17%** of European e-commerce payments. |
-| **Open Banking** | 開放銀行 | Regulatory framework enabling banks to share financial data with authorized third parties via API. In iGaming: instant deposits (Pay by Bank), instant KYC verification, affordability checks for responsible gambling. Key providers: TrueLayer, Yaspa, Trustly. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Rake** | 抽水 | 從每個彩池或錦標賽報名費中收取的佣金。現金桌：**2.5-10%** 的彩池（有上限）；錦標賽：固定費用模式（例如 $10+$1）。適用「無翻牌不抽水」規則。 |
+| **Rakeback** | 返水 | 以現金或獎金形式返還一定比例的抽水。範圍從 **5%**（新玩家）到 **45%**（頂級 VIP）。是高頻玩家的關鍵激勵。 |
 
-### 3.3 Cryptocurrency Payments
+### 1.3 老虎機（Slots）
 
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Stablecoin Payments** | 穩定幣支付 | Payments using fiat-pegged cryptocurrencies (typically USD). USDT (Tether) and USDC (Circle) most common. Eliminates volatility risk for both operators and players. **60%+** of leading operators' crypto volume is via stablecoins. |
-| **Crypto Payment Processors** | 加密貨幣支付處理器 | Specialized providers enabling crypto acceptance with optional auto-conversion to fiat. NOWPayments (350+ coins, 0.5% fee), B2BINPAY (80+ coins, EU-regulated), CryptoProcessing/CoinsPaid (iGaming specialist, auto EUR conversion). |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Volatility** | 波動性 | 遊戲風險和派彩分佈特性。低波動性：頻繁小額贏（20-30% 中獎率）；高波動性：稀有大額贏（10-15% 中獎率）。 |
+| **Progressive Jackpot** | 累積獎金 | 每次投注的一部分進入獎池直到被贏得。多個賭場可連接到同一獎池；獎金可達數百萬。這些遊戲通常基礎 RTP 較低。 |
+| **Megaways** | 萬種賠付方式 | Big Time Gaming 授權的動態轉軸系統，每次旋轉的賠付線可變，最多 **117,649 種中獎方式**。使用級聯機制。 |
 
-### 3.4 Payment Operations
+### 1.4 真人娛樂場（Live Casino）
 
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Rolling Reserve** | 滾動儲備金 | Processor retains **5-15%** of transaction revenue for **90-180 days** to cover potential chargebacks, refunds, or merchant default. Standard for high-risk gambling merchants. Significant cash flow impact. |
-| **Payment Success Rate** | 支付成功率 | Percentage of successfully authorized and completed transactions. Industry benchmark: **85%+** with optimized setup. Each 1% improvement directly impacts revenue. Optimization: multi-PSP, local acquiring, smart routing, retry logic. |
-
----
-
-## 4. Risk Control & Compliance Terminology
-
-### 4.1 Player Verification
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **KYC (Know Your Customer)** | 認識你的客戶 | Comprehensive identity verification before allowing real-money gaming. Includes: identity verification, document verification (passport, driver's license, ID card), age verification (18+ or 21+), address verification (utility bills, bank statements). Automated systems: iDenfy, Sumsub, Persona. **UKGC requires pre-deposit verification in UK market**. |
-| **EDD (Enhanced Due Diligence)** | 加強盡職調查 | Additional verification for high-risk customers (PEPs, high-net-worth individuals, unusual transaction patterns). Includes: source of funds verification, source of wealth documentation, enhanced monitoring, executive-level account approval, more frequent reviews. |
-
-### 4.2 Anti-Money Laundering
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **AML (Anti-Money Laundering)** | 反洗錢 | Regulatory framework and procedures preventing criminals from disguising illegal proceeds as legitimate income through gambling. Includes: CDD, EDD, transaction monitoring, suspicious activity reporting, staff training, record keeping (**5+ years**). 2023 gambling AML fines exceeded **$475 million**. |
-| **SOF (Source of Funds)** | 資金來源 | Verification that customer funds originate from legitimate sources. Triggered when deposits exceed thresholds or for high-risk customers. Required documents: bank statements, pay slips, tax returns, investment records, property sale documents. |
-| **SAR (Suspicious Activity Report)** | 可疑活動報告 | Formal report to Financial Intelligence Unit (FIU) when transactions appear unusual or inconsistent with normal gambling behavior. Reportable scenarios: large cash deposits inconsistent with player profile, unusual betting patterns (deposit, minimal play, withdrawal), coordinated multi-account activity, rapid inter-account fund transfers. |
-
-### 4.3 Responsible Gambling Tools
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Self-Exclusion** | 自我排除 | Voluntary program banning individuals from gambling platforms for specified periods (6 months to lifetime). **GamStop** (UK) mandatory since March 2020; **83% of users** report reduced or stopped gambling. Winnings during exclusion may be voided. |
-| **Cooling-Off Period** | 冷靜期 | Shorter, typically reversible gambling pause (24 hours to several weeks). Prevents impulsive decisions to immediately resume gambling. |
-| **Deposit/Loss/Session Limits** | 存款/損失/時間限額 | Player self-imposed controls. Deposit limits set daily/weekly/monthly maximums; loss limits cap losses per time period; session limits restrict play duration. **Limit increases require 24-72 hour delay**; decreases take effect immediately. Operators offering customizable limits see **31% fewer** spending complaints. |
-| **Reality Checks** | 現實提醒 | Periodic pop-up notifications reminding players of elapsed time, amount spent, and current session status. Typically set at 15, 30, or 60-minute intervals. |
-
-### 4.4 Game Fairness
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **RTP (Return to Player)** | 玩家回報率 | Theoretical percentage of total wagered amount returned to players over the long term. Example: 96% RTP means a theoretical return of $96 per $100 wagered. Calculated over millions of game rounds, not single sessions. Set during game development; cannot be changed post-release. Regulatory minimums: Malta MGA **85%**, UK UKGC (slots since June 2023) **99.9%**. Online casinos typically range **95-98%**. |
-| **RNG (Random Number Generator)** | 隨機數字生成器 | Software algorithm ensuring completely random and unpredictable game outcomes. Types: TRNG (physical events, rare in iGaming due to cost) and PRNG (statistically indistinguishable randomness). Must be certified by accredited testing labs with periodic audits. |
-| **House Edge** | 莊家優勢 | Casino's mathematical advantage expressed as percentage retained per bet. Formula: House Edge = 100% - RTP. By game: Blackjack ~0.5-2% (optimal strategy), Baccarat (banker) ~1.06%, European Roulette ~2.7%, Slots 2-15%. |
-
-### 4.5 Testing & Certification Bodies
-
-| Body | Established | Coverage | Key Services |
-|------|------------|----------|-------------|
-| **eCOGRA** | 2003 (UK) | 25+ jurisdictions | RNG testing, RTP verification, dispute resolution. ISO/IEC 17025:2017 accredited. |
-| **GLI (Gaming Laboratories International)** | 30+ years | 480 jurisdictions | Full-spectrum testing and certification. |
-| **BMM Testlabs** | 1981 | Global | Oldest testing organization in the industry. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Live Dealer** | 真人荷官 | 由真人荷官通過高清視頻直播 24/7 運營的遊戲。Evolution Gaming 是市場領導者。支持「單一錢包」和「資金轉賬」整合模式。 |
+| **Baccarat Squeeze** | 百家樂揭牌 | 使用 **15 個以上高清攝像頭**（Evolution Gaming）的傳統慢速揭牌儀式。Control Squeeze 允許玩家虛擬主導揭牌。在澳門貴賓廳有深厚文化根源。 |
+| **Roads** | 路單 | 顯示百家樂歷史結果的圖表系統，包括大路、大眼仔、小路、蟑螂路和珠盤路。用於識別模式以做出投注決策。 |
 
 ---
 
-## 5. Regulatory Authority Terminology
+## 2. 技術架構術語
 
-### 5.1 Tier-1 Regulators
+### 2.1 平台類型
 
-| Regulator | Established | Processing Time | Initial Cost | Tax Rate | Reputation |
-|-----------|------------|----------------|-------------|----------|------------|
-| **UKGC** (UK Gambling Commission) | 2007 | ~16 weeks | 370 GBP application fee | 21% of gross profit | Gold Standard |
-| **MGA** (Malta Gaming Authority) | 2001 | 3-6 months | 25,000+ EUR | Per license type | Tier-1 |
-| **Curacao Gaming Authority** | 1996 | Varies | ANG 120,000/year | 2% net profit (to 2026) | Reforming |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **White-Label Platform** | 白牌平台（包網） | 以運營商自有品牌運營的預建完整平台。供應商提供基礎設施、遊戲、牌照、支付，有時還提供客服。典型上線時間：**4-6 週**。營收分成：**20-50% 的 GGR**；設置費：$15,000-$50,000。 |
+| **Turnkey Solution** | 交鑰匙解決方案 | 運營商必須獲得自己牌照的完整預建平台。比白牌有更大的定制靈活性。建設時間：**2-3 個月**。 |
+| **Multi-Tenant Architecture** | 多租戶架構 | 單一軟體實例服務多個運營商品牌（「租戶」）。每個租戶有獨立的品牌、配置和用戶體驗，同時共享底層基礎設施。 |
 
-**UKGC Details**: Governs all online and land-based gambling in England, Wales, Scotland. License types: operating, personal management (mandatory for key personnel), premises. Annual fee based on gross gambling yield (GGY). Mandatory GamStop participation since March 2020. Credit card deposits banned since April 2020. Fines since 2020 exceed **100 million GBP**.
+### 2.2 錢包整合（Wallet Integration）
 
-**MGA Details**: First EU member state to regulate online gambling. Controls approximately **10% of global virtual casinos**, 305+ active licensees, contributing **12%+ of Malta's GDP**. License types: Type 1 (RNG games), Type 2 (fixed-odds betting), Type 3 (P2P games), Type 4 (skill games), B2B Key Gaming Supply License. Must be EU/EEA company; servers in Malta.
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Seamless Wallet** | 無縫錢包 | 單一統一的玩家餘額，可即時用於所有遊戲和垂直領域（娛樂場、體育、撲克）。首選的現代架構，提供**最佳玩家體驗**。 |
+| **Transfer Wallet** | 轉帳錢包 | 玩家必須在遊戲前手動或程序化地將資金從主錢包轉移到遊戲商專用錢包。比無縫錢包更容易實現。 |
 
-**Curacao Details**: New LOK (National Gaming Ordinance) framework implemented in 2024, eliminating sub-license system. No VAT. Restricted markets: US, Australia, Netherlands, France, Curacao. New framework aims to meet MGA/UKGC standards.
+### 2.3 遊戲聚合（Game Aggregation）
 
-### 5.2 Other Notable Regulators
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Game Aggregator** | 遊戲聚合平台 | 將多個工作室的數千款遊戲整合到單一 API 入口的平台。Hub88、SOFTSWISS、Groove 通過單一 API 提供 **15,000+ 遊戲**，來自 **100+ 供應商**。整合通常在 **3-7 天**內完成。 |
+| **Unified API** | 統一 API | 將多個遊戲供應商整合到單一訪問點的標準化接口。Zenith 的 OneAPI 提供 150+ 供應商的 10,000+ 遊戲。RESTful 架構，JSON 響應，webhook 支持。 |
 
-| Regulator | Established | Processing Time | Initial Cost | Tax Rate | Reputation |
-|-----------|------------|----------------|-------------|----------|------------|
-| **Gibraltar** | 2005 | 3-6 months | 85-100K GBP | 0.15% | High |
-| **Isle of Man GSC** | 2001 | Varies | 5-50K GBP | 0.1-1.5% | High |
-| **AGCC** (Alderney) | 2000 | Varies | 10K+ GBP | 0% | High |
-| **Kahnawake** | 1996 | 6 months | $40,000 | 0% | Medium-High |
-| **PAGCOR** (Philippines) | 1976 | Varies | $4-15K | 5% | Medium |
+### 2.4 後端系統
 
-**Kahnawake Gaming Commission**: Located in Mohawk Territory, Quebec, Canada. One of the oldest iGaming regulators. Has authorized **250+ gambling websites**. No longer licenses US-facing operators since 2016.
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **PAM (Player Account Management)** | 玩家帳戶管理系統 | 管理用戶帳戶、錢包、支付、註冊、會話和 KYC/AML 控制的核心後端系統。EveryMatrix GamMatrix PAM 達到 **99%+ 運行時間**。 |
+| **Back Office** | 後台管理系統 | 提供財務管理、行銷營運、客戶支持、商業智能、玩家管理和合規報告工具的管理介面。 |
 
----
+### 2.5 效能指標
 
-## 6. Business Model Terminology
-
-### 6.1 Core Business Models
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **B2B (Business-to-Business)** | 企業對企業 | Companies providing products, services, or technology to other businesses. In iGaming, B2B suppliers license technology, games, or services to operators who directly serve players. Evolution Gaming is a leading B2B live casino provider. Revenue from licensing fees, setup fees, and GGR percentage share. |
-| **B2C (Business-to-Consumer)** | 企業對消費者 | Companies directly providing gambling services to individual players. B2C operators run online casinos, sportsbooks, and poker rooms, generating revenue through deposits, house edge, and gambling activity. Requires licenses in each accepting jurisdiction. |
-
-### 6.2 Solutions & Partnership Models
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **White-Label** | 白牌方案 (包網) | Ready-to-use platform under operator's own brand with supplier's infrastructure, license, games, and payments. Launch: **1-2 months**. GGR share: **20-50%**. |
-| **Revenue Sharing** | 營收分成模式 | B2B suppliers charge percentage of operator GGR rather than fixed fees. Aligns incentives. Game suppliers may charge **10-15%** of game-specific GGR. Tiered structures reduce percentage as volume increases. |
-| **Aggregation Platforms** | 聚合平台 | B2B platforms providing unified access to multiple game suppliers, payment processors, or services via single integration. Hub88, SOFTSWISS aggregate **15,000+ games** from **100+ studios**. |
-
-### 6.3 License Structures
-
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Master License** | 主牌照 | Primary gambling license from a jurisdiction granting the right to conduct gambling activities and issue sub-licenses. Holders act as micro-regulators for sub-licensees. In Curacao, only **4 companies** held master licenses. 2025 Curacao reform eliminated the sub-license system. |
-| **Sublicensing** | 子牌照 | Gambling permit issued by a master license holder to third-party operators. Grants same operating rights but cannot further sub-license. Historical Curacao sub-license cost: ~**$16,900**, 6-week processing. PAGCOR also offers sub-licensing. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Latency** | 延遲 | 往返時間（毫秒）。真人娛樂場要求 **<50ms 延遲**。Google 研究：載入時間從 1 秒增加到 3 秒會使跳出率提高 **32%**。 |
+| **Uptime SLA** | 運行時間服務等級協議 | 合約可用性保證。領先平台保證 **99.95-99.99% 運行時間**。99.99%（「四個九」）意味著每年僅 **52.56 分鐘**停機時間。大型企業每小時停機損失 $300,000-$1M。 |
 
 ---
 
-## 7. Data & Analytics Terminology
+## 3. 支付術語
 
-### 7.1 Core Revenue Metrics
+### 3.1 支付基礎設施
 
-| Metric | Formula | Industry Context |
-|--------|---------|-----------------|
-| **GGR (Gross Gaming Revenue)** | Total Wagers - Total Player Winnings | Primary tax base in most jurisdictions (Malta, UK, most US states). US 2023 gambling industry GGR: **$66.65 billion**. |
-| **NGR (Net Gaming Revenue)** | GGR - Bonuses - Taxes - Commissions - Operating Costs - Fees | Reflects true operator profitability. Promotional costs should stay under **20% of GGR**. Strong operators maintain NGR margins of **50-70% of GGR**. |
-| **Hold Percentage** | GGR / Total Wagers x 100% | Benchmarks: Slots 2.5-10%, Table games 15-25%, Sports betting theoretical hold 5-8%. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **PSP (Payment Service Provider)** | 支付服務提供商 | 使商家能夠接受銀行卡、銀行轉賬、電子錢包和替代支付方式的第三方。專注於 iGaming 的 PSP（Paysafe、Nuvei、Corefy）了解高風險商家需求。必須保持 **PCI DSS 合規**。 |
+| **Payment Gateway** | 支付閘道 | 在商家網站和收單銀行之間安全傳輸交易數據的技術解決方案。加密持卡人數據、驗證交易、返回授權結果。 |
+| **Payment Orchestration** | 支付編排 | 通過單一 API 整合多個 PSP、收單機構和支付方式的技術層。Praxis Tech、Corefy 等平台連接 **200+ 支付供應商**，實現智能路由和自動故障轉移，達到 **85%+ 接受率**。 |
+| **Smart Routing** | 智能路由 | 根據規則和即時分析自動將每筆交易導向最佳處理器。考慮批准率、處理成本、地理位置、幣種和供應商狀態。現代引擎分析每筆交易 **100+ 數據點**。 |
 
-### 7.2 Player Value Metrics
+### 3.2 支付方式
 
-| Metric | Formula | Industry Context |
-|--------|---------|-----------------|
-| **LTV (Player Lifetime Value)** | ARPU x Average Player Lifespan - Acquisition & Retention Costs | LTV must exceed **3x CAC** for profitability. High-value players can be 10-100x average LTV. |
-| **CAC (Customer Acquisition Cost)** | Total Sales & Marketing Expenses / New Customers Acquired | Benchmarks: US/UK iGaming CPA per FTD **$200-500+**; Asia-Pacific as low as $0.93. Low CAC ($50-80) may indicate low-quality "bonus hunter" traffic. |
-| **LTV:CAC Ratio** | LTV / CAC | 1:1 = breakeven; **3:1 = healthy benchmark**; 4:1+ = excellent; 5:1+ = possibly underinvesting in growth. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **3D Secure (3DS)** | 3D 安全驗證 | 為非面對面交易添加驗證的認證協議。「3D」指收單方、發卡方和互操作性域。提供**責任轉移**（欺詐退款成為發卡方責任），減少欺詐相關退款 **70%+**。品牌名稱：Visa Secure、Mastercard Identity Check。 |
+| **Chargeback** | 退款（拒付） | 持卡人向發卡方爭議交易，導致撤銷並扣除商家款項。費用：每次退款 **$15-$70+**。發卡組織閾值：**0.9-1%**；超過會觸發罰款或服務終止。 |
+| **A2A Payments** | 帳戶對帳戶支付 | 不經過中間卡網絡的直接銀行對銀行轉賬。優點：成本更低（無交換費）、退款風險降低（不可撤銷交易）、通過銀行帳戶驗證內建 KYC。A2A 處理歐洲電子商務支付的 **17%**。 |
+| **Open Banking** | 開放銀行 | 允許銀行通過 API 與授權第三方共享金融數據的監管框架。在 iGaming 中：即時存款（Pay by Bank）、即時 KYC 驗證、責任博彩可負擔性檢查。主要供應商：TrueLayer、Yaspa、Trustly。 |
 
-### 7.3 Conversion & Engagement Metrics
+### 3.3 加密貨幣支付
 
-| Metric | Benchmark | Notes |
-|--------|-----------|-------|
-| **Visit-to-Registration Conversion** | **20-30%** healthy | Low rate indicates landing page/UX issues |
-| **Registration-to-FTD Conversion** | **12-18%** typical; 15-18% strong | Low rate indicates KYC friction, payment issues, or weak bonus appeal |
-| **FTD (First Time Depositor)** | Quality FTDs complete second deposit within **7 days** | Key metrics: FTD count, FTD rate, cost per FTD (CPFTD), time to first deposit (TTFD) |
-| **Retention Rate** | 30-day retention **70-80%** = strong success | D1 retention (mobile) 25-30%; D30 minimum 3-5% to cover acquisition costs. **5% retention improvement can yield 25-95% profit increase**. |
-| **DAU/MAU Stickiness** | iGaming casino typical **15-25%** | 20% = ~6 days/month; 50% = every other day; 70%+ = daily habit |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Stablecoin Payments** | 穩定幣支付 | 使用與法幣掛鉤的加密貨幣（通常是美元）的支付。USDT（Tether）和 USDC（Circle）最常見。為運營商和玩家消除波動風險。領先運營商加密交易量的 **60%+** 通過穩定幣進行。 |
+| **Crypto Payment Processors** | 加密貨幣支付處理器 | 使加密接受成為可能的專業供應商，可選擇自動轉換為法幣。NOWPayments（350+ 幣種，0.5% 費用）、B2BINPAY（80+ 幣種，歐盟監管）、CryptoProcessing/CoinsPaid（iGaming 專家，自動歐元轉換）。 |
 
-### 7.4 Marketing Analytics
+### 3.4 支付營運
 
-| Metric | Formula | Context |
-|--------|---------|---------|
-| **CPA (Cost Per Acquisition)** | Fixed cost per qualifying customer | Primary affiliate payment model |
-| **ROAS (Return on Ad Spend)** | Ad Revenue / Ad Spend x 100% | 200% (2:1) = minimum breakeven; 400-800% = good; 6-9 month breakeven is target; >12 months is concerning |
-| **Cohort Analysis** | Group players by common attribute (typically acquisition date) | Applications: FTD-month cohort LTV analysis, acquisition channel quality comparison, bonus type promotional effectiveness |
-
-### 7.5 Risk & Fraud Metrics
-
-| Metric | Threshold / Benchmark | Impact |
-|--------|----------------------|--------|
-| **Chargeback Rate** | Card network threshold: **0.9-1.0%** | Exceeding triggers penalties or account termination. Merchant dispute win rate: only **32%**. |
-| **Bonus Abuse Detection** | Multi-account creation speed, device/browser fingerprint matching, deposit-to-withdrawal cycles | Detection methods: device fingerprinting, IP/geo tracking, velocity checks, behavioral analysis |
-| **Risk Scoring** | Scale: 0-100 or 0-1000 | Components: device trust, behavioral anomaly, transaction pattern, identity verification, historical activity. Thresholds for auto-approve, manual review, auto-reject. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Rolling Reserve** | 滾動儲備金 | 處理器保留交易收入的 **5-15%** 達 **90-180 天**，以覆蓋潛在退款、退還或商家違約。高風險賭博商家的標準做法。對現金流有重大影響。 |
+| **Payment Success Rate** | 支付成功率 | 成功授權並完成交易的百分比。行業基準：優化設置下 **85%+**。每提高 1% 直接影響收入。優化方法：多 PSP、本地收單、智能路由、重試邏輯。 |
 
 ---
 
-## 8. Operations & Marketing Terminology
+## 4. 風控與合規術語
 
-### 8.1 Bonus Types
+### 4.1 玩家驗證
 
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **Welcome Bonus** | 歡迎獎金 | Promotional offer for new player registration or first deposit. Most commonly 100% deposit match. Critical for player acquisition. |
-| **First Deposit Bonus (FDB)** | 首存紅利 | Bonus specifically for first deposit. Typically 100-200% match with a maximum cap. |
-| **No Deposit Bonus (NDB)** | 免存款紅利 | Bonus requiring no deposit, enabling risk-free play. Usually small amounts ($10-50) or free spins with high wagering requirements. |
-| **Cashback / Rakeback** | 返水 | Mechanism returning a percentage of player losses. Cashback: typically **5-15%** of net losses. Rakeback: poker-specific rake return, **5-45%** based on VIP tier. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **KYC (Know Your Customer)** | 認識你的客戶 | 在允許真錢遊戲前的全面身份驗證。包括：身份驗證、文檔驗證（護照、駕照、身份證）、年齡驗證（18+ 或 21+）、地址驗證（水電帳單、銀行對帳單）。自動化系統：iDenfy、Sumsub、Persona。**UKGC 要求英國市場存款前驗證**。 |
+| **EDD (Enhanced Due Diligence)** | 加強盡職調查 | 針對高風險客戶（政治公眾人物、高淨值個人、異常交易模式）的額外驗證。包括：資金來源驗證、財富來源文檔、增強監控、高管級帳戶批准、更頻繁審查。 |
 
-### 8.2 Wagering Requirements
+### 4.2 反洗錢（Anti-Money Laundering）
 
-| Concept | Standard | Notes |
-|---------|----------|-------|
-| **Wagering Requirement** | **20-40x** considered reasonable; 50x+ considered high | Calculation: Bonus x Multiplier = Required Turnover (e.g., $100 x 30x = $3,000) |
-| **Game Weighting** | Slots 100%, Table games 10-20%, Live casino 10-20%, Video poker 0-10% | Prevents players from exploiting low house edge games for bonus clearing |
-| **Bonus Abuse Types** | Multi-accounting (gnoming), collusive betting, chip dumping, arbitrage | Prevention: KYC verification, behavioral monitoring, strict terms, game weighting |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **AML (Anti-Money Laundering)** | 反洗錢 | 防止犯罪分子通過賭博將非法收益偽裝成合法收入的監管框架和程序。包括：CDD、EDD、交易監控、可疑活動報告、員工培訓、記錄保存（**5 年以上**）。2023 年賭博 AML 罰款超過 **4.75 億美元**。 |
+| **SOF (Source of Funds)** | 資金來源 | 驗證客戶資金來自合法來源。當存款超過閾值或針對高風險客戶時觸發。所需文檔：銀行對帳單、工資單、稅務申報表、投資記錄、房產銷售文檔。 |
+| **SAR (Suspicious Activity Report)** | 可疑活動報告 | 當交易看起來異常或與正常賭博行為不一致時向金融情報單位（FIU）提交的正式報告。可報告場景：與玩家檔案不符的大額現金存款、異常投注模式（存款、最少遊戲、提款）、協調多帳戶活動、快速帳戶間資金轉移。 |
 
-### 8.3 VIP & Loyalty Programs
+### 4.3 責任博彩工具（Responsible Gambling Tools）
 
-| Term | Chinese | Definition |
-|------|---------|------------|
-| **VIP Program** | 貴賓計劃 | Exclusive reward program for highest-value players. Typically invitation-only with personalized service, higher limits, and exclusive events. |
-| **Loyalty Points / Comp Points** | 忠誠積分 | Points earned through wagering, redeemable for rewards. Standard rate: 1 point per $10-20 wagered; 100 points = $1 bonus. Used in tiered systems (Bronze, Silver, Gold, Platinum, Diamond). |
-| **High Roller / Whale** | 豪賭客/鯨魚 | High Roller: consistent large bettors, typically $10,000+ deposits, $300-500+ per bet. Whale: extreme high-stakes gamblers who may lose hundreds of thousands to millions per session. These players represent critical revenue but high volatility risk. |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Self-Exclusion** | 自我排除 | 禁止個人在指定期間（6 個月至終身）使用賭博平台的自願計劃。**GamStop**（英國）自 2020 年 3 月起強制執行；**83% 的用戶**報告減少或停止賭博。排除期間的獎金可能被取消。 |
+| **Cooling-Off Period** | 冷靜期 | 較短、通常可撤銷的賭博暫停（24 小時至數週）。防止衝動決定立即恢復賭博。 |
+| **Deposit/Loss/Session Limits** | 存款/虧損/時間限額 | 玩家自設的控制。存款限額設定每日/每週/每月最大值；虧損限額限制每時段損失；會話限額限制遊戲時長。**限額增加需 24-72 小時延遲**；減少立即生效。提供可定制限額的運營商看到 **31% 更少**的消費投訴。 |
+| **Reality Checks** | 現實提醒 | 定期彈出通知，提醒玩家已用時間、已花金額和當前會話狀態。通常設定為 15、30 或 60 分鐘間隔。 |
 
-### 8.4 Player Acquisition Models
+### 4.4 遊戲公平性（Game Fairness）
 
-| Model | Structure | Typical Terms |
-|-------|-----------|---------------|
-| **CPA (Cost Per Acquisition)** | Fixed amount per qualifying player | Requires FTD and minimum wager |
-| **Revenue Share** | Percentage of referred player's net gaming revenue | Casino/poker: 20-60%; sports betting: 15-40% |
-| **Hybrid** | Upfront CPA + ongoing revenue share | Example: $100 CPA + 20% RevShare |
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **RTP (Return to Player)** | 玩家回報率 | 長期返還給玩家的理論總投注額百分比。例如：96% RTP 意味著每投注 $100 理論返還 $96。基於數百萬遊戲回合計算，非單次會話。在遊戲開發時設定；發布後無法更改。監管最低要求：Malta MGA **85%**，UK UKGC（2023 年 6 月起老虎機）**99.9%**。線上賭場通常範圍 **95-98%**。 |
+| **RNG (Random Number Generator)** | 隨機數字生成器 | 確保遊戲結果完全隨機且不可預測的軟體算法。類型：TRNG（物理事件，因成本在 iGaming 中罕見）和 PRNG（統計上不可區分的隨機性）。必須經認可測試實驗室認證並定期審計。 |
+| **House Edge** | 莊家優勢 | 以每次投注保留百分比表示的賭場數學優勢。公式：House Edge = 100% - RTP。按遊戲：21 點約 0.5-2%（最優策略）、百家樂（莊家）約 1.06%、歐洲輪盤約 2.7%、老虎機 2-15%。 |
 
-### 8.5 Retention & Reactivation
+### 4.5 測試與認證機構
 
-| Concept | Benchmark | Key Drivers |
-|---------|-----------|-------------|
-| **Churn Rate** | First-year churn 50-80% is common; monthly active retention 70%+ is strong | Drivers: payment friction, slow withdrawals, poor mobile UX (70-80% of activity is mobile), bonus fatigue, insufficient game variety |
-| **Reactivation Campaigns** | Segmented: 7-14 days inactive (warm), 30 days (cool), 90+ days (cold) | Strategies: personalized bonuses, limited-time offers, "we miss you" messaging. Cost lower than new acquisition. |
-| **5% churn reduction** | Can yield **25-95% profit increase** | Retention is more cost-effective than acquisition |
-
----
-
-## Appendix A: Internal Terminology Standards
-
-### A.1 Standardization Principles
-
-All platform documentation must use the following standardized terms. New terms must be defined in this table and submitted for architecture review before use.
-
-### A.2 Core Term Mapping
-
-| Concept | Recommended Term (EN) | Recommended Term (ZH) | Prohibited Alternatives | Scope |
-|---------|----------------------|----------------------|------------------------|-------|
-| Bonus | Bonus | 紅利 | ~~Promotion~~, ~~Reward~~, ~~Incentive~~ | Global |
-| Valid Turnover | Valid Turnover | 有效流水 | ~~Valid Bet~~, ~~Wagering~~, ~~Betting Amount~~ | Finance, Risk, Activity |
-| Tenant | Tenant | 租戶 | ~~Merchant~~, ~~Customer~~ | Multi-tenant modules |
-| Game Provider | Game Provider (GP) | 遊戲商 | ~~Game Vendor~~, ~~Game Developer~~, ~~Game Studio~~ | Game modules |
-| Player | Player | 玩家 | ~~User~~, ~~Member~~ | Global |
-| Agent | Agent / Affiliate | 代理 | ~~Referrer~~, ~~Distributor~~ | Agent modules |
-| Withdrawal | Withdrawal | 提款 | ~~Cash Out~~, ~~Payout~~ | Global |
-| Deposit | Deposit | 存款 | ~~Top-up~~, ~~Fund In~~ | Global |
-| Credit Limit | Credit Limit | 信用額度 | ~~Limit~~, ~~Credit~~ | Finance, Agent |
-| Risk Control | Risk Control | 風控 | ~~Risk Management~~, ~~Anti-Fraud~~ | Global |
-| Wallet | Wallet | 錢包 | ~~Account~~, ~~Balance~~ | Finance, Game |
-| Playable Balance | Playable Balance | 可下注餘額 | ~~Available Balance~~ | Finance, Game |
-| Wagering Requirement | Wagering Requirement | 流水要求 | ~~Rollover~~, ~~Play-through~~ | Activity |
-| Approval Workflow | Approval Workflow | 審批工作流 | ~~Review Process~~ | Governance |
-| Audit Log | Audit Log | 審計日誌 | ~~Activity Log~~, ~~Operation Log~~ | Global |
-| Multi-Tenancy | Multi-Tenancy | 多租戶 | ~~Multi-Merchant~~, ~~SaaS Mode~~ | Architecture |
-| Seamless Wallet | Seamless Wallet | 無縫錢包 | ~~Instant Wallet~~, ~~Single Wallet~~ | Game |
-| Transfer Wallet | Transfer Wallet | 轉帳錢包 | ~~Independent Wallet~~, ~~Fund Transfer~~ | Game |
-| Cashback / Rakeback | Cashback / Rakeback | 返水 | ~~Rebate~~ | Activity, VIP |
-| PSP | PSP (Payment Service Provider) | 支付服務商 | ~~Payment Provider~~ | Global |
-| Reconciliation | Reconciliation | 對帳 | ~~Settlement~~, ~~Account Matching~~ | Finance |
-
-### A.3 Usage Rules
-
-**First Occurrence**: Use "Chinese term (English abbreviation)" format. Subsequent references may use Chinese term or abbreviation alone.
-
-**Consistency Checklist**:
-- All core terms match this table
-- First use of abbreviations includes full form
-- No "prohibited" column terms are used
-- New terms have been defined in this table
-
-### A.4 New Term Introduction Process
-
-1. Confirm necessity (check if existing terms suffice)
-2. Add complete definition to this table
-3. Submit for Architecture Team review
-4. Record addition in CHANGELOG
+| 機構 | 成立時間 | 覆蓋範圍 | 主要服務 |
+|-----|---------|---------|---------|
+| **eCOGRA** | 2003（英國） | 25+ 司法管轄區 | RNG 測試、RTP 驗證、爭議解決。ISO/IEC 17025:2017 認可。 |
+| **GLI (Gaming Laboratories International)** | 30+ 年 | 480 個司法管轄區 | 全方位測試和認證。 |
+| **BMM Testlabs** | 1981 | 全球 | 行業最古老的測試機構。 |
 
 ---
 
-## Appendix B: Terminology Consistency Guide
+## 5. 監管機構術語
 
-### B.1 Finance Domain
+### 5.1 一級監管機構
 
-| Concept | Primary Term | Acceptable Variant | Avoid |
-|---------|-------------|-------------------|-------|
-| Withdrawal review process | **Withdrawal Approval** | Withdrawal Review (describing stages) | Withdrawal Check, Payout Approval |
-| Risk evaluation | **Risk Assessment** | Risk Evaluation (scoring context) | Risk Check, Safety Check |
-| Approval process | **Approval Workflow** | Approval Process (flow description) | Review Process, Check Process |
-| Transaction handling | **Transaction Processing** | Payment Processing (payment context) | Transaction Handling |
-| Account matching | **Reconciliation** | Settlement (settlement context) | Account Matching, Balance Check |
-| Funds verification | **Source of Funds (SOF)** | Funds Verification | Money Source Check |
+| 監管機構 | 成立時間 | 處理時間 | 初始成本 | 稅率 | 聲譽 |
+|---------|---------|---------|---------|-----|-----|
+| **UKGC**（英國博彩委員會） | 2007 | ~16 週 | 370 GBP 申請費 | 毛利潤的 21% | 黃金標準 |
+| **MGA**（馬耳他博彩管理局） | 2001 | 3-6 個月 | 25,000+ EUR | 按牌照類型 | 一級 |
+| **Curacao Gaming Authority** | 1996 | 不定 | 每年 ANG 120,000 | 淨利潤的 2%（至 2026 年） | 改革中 |
 
-### B.2 Gaming Domain
+**UKGC 詳情**: 管理英格蘭、威爾士、蘇格蘭的所有線上和實體賭博。牌照類型：營運、個人管理（關鍵人員強制）、場所。年費基於總賭博收益（GGY）。自 2020 年 3 月起強制參與 GamStop。自 2020 年 4 月起禁止信用卡存款。2020 年以來罰款超過 **1 億英鎊**。
 
-| Concept | Primary Term | Acceptable Variant | Avoid |
-|---------|-------------|-------------------|-------|
-| Valid turnover | **Valid Turnover** | Effective Turnover (efficiency analysis) | Valid Bet, Real Bet |
-| Valid bet amount | **Valid Bet Amount** | - | Effective Bet Amount |
-| Hedge detection | **Hedging Detection** | Hedge Check (as verb) | Anti-Hedging, Hedging Prevention |
-| Arbitrage detection | **Arbitrage Detection** | Arb Detection (abbreviation) | Arbitrage Check |
-| Game weight | **Game Weight** | Contribution Rate | Game Factor, Weight Factor |
-| Game supplier | **Game Provider (GP)** | Game Vendor (supplier context) | Game Studio, Game Developer |
+**MGA 詳情**: 第一個監管線上賭博的歐盟成員國。控制約 **10% 的全球虛擬賭場**，305+ 活躍持牌者，貢獻馬耳他 GDP 的 **12%+**。牌照類型：Type 1（RNG 遊戲）、Type 2（固定賠率投注）、Type 3（P2P 遊戲）、Type 4（技巧遊戲）、B2B 關鍵遊戲供應牌照。必須是歐盟/歐洲經濟區公司；伺服器在馬耳他。
 
-### B.3 Risk Control Domain
+**Curacao 詳情**: 2024 年實施新 LOK（國家博彩條例）框架，取消子牌照制度。無增值稅。限制市場：美國、澳洲、荷蘭、法國、Curacao。新框架旨在達到 MGA/UKGC 標準。
 
-| Concept | Primary Term | Acceptable Variant | Avoid |
-|---------|-------------|-------------------|-------|
-| Abnormal betting | **Anomaly Betting Pattern** | Abnormal Pattern (statistics) | Strange Bet, Weird Pattern |
-| Multi-account linking | **Multi-Account Linkage** | Account Clustering (technical) | Duplicate Account, Fake Account |
-| Risk factor | **Risk Factor** | Risk Score (scoring context) | Risk Value, Control Factor |
-| Odds threshold | **Odds Threshold** | Odds Limit | Odds Boundary, Max Odds |
-| Bet verification | **Bet Validation** | Wager Verification | Bet Check, Betting Verify |
+### 5.2 其他知名監管機構
 
-### B.4 Document Writing Rules
+| 監管機構 | 成立時間 | 處理時間 | 初始成本 | 稅率 | 聲譽 |
+|---------|---------|---------|---------|-----|-----|
+| **Gibraltar** | 2005 | 3-6 個月 | 85-100K GBP | 0.15% | 高 |
+| **Isle of Man GSC** | 2001 | 不定 | 5-50K GBP | 0.1-1.5% | 高 |
+| **AGCC**（Alderney） | 2000 | 不定 | 10K+ GBP | 0% | 高 |
+| **Kahnawake** | 1996 | 6 個月 | $40,000 | 0% | 中高 |
+| **PAGCOR**（菲律賓） | 1976 | 不定 | $4-15K | 5% | 中 |
 
-**Headings**: Must use primary term.
-
-**First occurrence**: Primary term + English full form.
-
-**Subsequent references**: Primary term or acceptable variant.
-
-**Cross-references**: Use primary term for consistency.
-
-**Multilingual handling**:
-
-| Context | Rule | Example |
-|---------|------|---------|
-| Chinese document | Chinese primary + English abbreviation (first use) | 提款審核流程 (Withdrawal Approval) |
-| English document | English primary + Chinese annotation (optional) | Withdrawal Approval (提款審核流程) |
-| Code comments | English primary + brief description | `// Withdrawal Approval: validates and processes withdrawal requests` |
-| API documentation | English primary (RESTful) | `POST /api/withdrawals/approval` |
-
-### B.5 Pre-Publication Checklist
-
-- All section headings use primary terms
-- Core concepts include full English form at first occurrence
-- Code/API naming matches primary terms
-- No "avoid" column terms are used
-- Cross-references use primary terms
-- Multilingual handling follows standards
-
-### B.6 Maintenance
-
-**Review Cycle**: Quarterly (synchronized with Appendix A)
-
-**Responsible Team**: Architecture Team
-
-**Update Process**:
-1. Collect documentation usage feedback
-2. Identify new terminology conflicts
-3. Assess industry terminology evolution
-4. Update primary term table
-5. Execute global terminology unification
+**Kahnawake Gaming Commission**: 位於加拿大魁北克的 Mohawk 領地。最古老的 iGaming 監管機構之一。已授權 **250+ 賭博網站**。自 2016 年起不再向美國市場運營商發放牌照。
 
 ---
 
-## Related Documents
+## 6. 商業模式術語
 
-- [Player Lifecycle](./Player_Lifecycle.md) - Player journey and account states
-- [Business Flows](./Business_Flows.md) - Core business processes
+### 6.1 核心商業模式
+
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **B2B (Business-to-Business)** | 企業對企業 | 向其他企業提供產品、服務或技術的公司。在 iGaming 中，B2B 供應商向直接服務玩家的運營商授權技術、遊戲或服務。Evolution Gaming 是領先的 B2B 真人娛樂場供應商。收入來自授權費、設置費和 GGR 百分比分成。 |
+| **B2C (Business-to-Consumer)** | 企業對消費者 | 直接向個人玩家提供賭博服務的公司。B2C 運營商經營線上賭場、體育博彩和撲克室，通過存款、莊家優勢和賭博活動產生收入。需要在每個接受司法管轄區持有牌照。 |
+
+### 6.2 解決方案與合作模式
+
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **White-Label** | 白牌方案（包網） | 以運營商自有品牌使用的即用型平台，由供應商提供基礎設施、牌照、遊戲和支付。上線：**1-2 個月**。GGR 分成：**20-50%**。 |
+| **Revenue Sharing** | 營收分成模式 | B2B 供應商收取運營商 GGR 的百分比而非固定費用。對齊激勵。遊戲供應商可能收取遊戲特定 GGR 的 **10-15%**。階梯結構隨交易量增加降低百分比。 |
+| **Aggregation Platforms** | 聚合平台 | 通過單一整合提供多個遊戲供應商、支付處理器或服務的統一訪問的 B2B 平台。Hub88、SOFTSWISS 聚合 **100+ 工作室**的 **15,000+ 遊戲**。 |
+
+### 6.3 牌照結構
+
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Master License** | 主牌照 | 來自司法管轄區的主要賭博牌照，授予進行賭博活動和發放子牌照的權利。持有者充當子持牌人的微型監管者。在 Curacao，只有 **4 家公司**持有主牌照。2025 年 Curacao 改革取消了子牌照制度。 |
+| **Sublicensing** | 子牌照 | 由主牌照持有人發放給第三方運營商的賭博許可。授予相同的運營權但不能進一步分發子牌照。歷史上 Curacao 子牌照成本：約 **$16,900**，6 週處理。PAGCOR 也提供子牌照。 |
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-08
-**Maintainers**: Architecture Team
-**Next Review**: 2026-05-08 (quarterly)
+## 7. 數據與分析術語
+
+### 7.1 核心收入指標
+
+| 指標 | 公式 | 行業背景 |
+|-----|-----|---------|
+| **GGR (Gross Gaming Revenue)** | 總投注額 - 總玩家獎金 | 大多數司法管轄區的主要稅基（馬耳他、英國、大多數美國州）。美國 2023 年賭博業 GGR：**666.5 億美元**。 |
+| **NGR (Net Gaming Revenue)** | GGR - 獎金 - 稅款 - 佣金 - 營運成本 - 費用 | 反映運營商真實盈利能力。促銷成本應保持在 **GGR 的 20%** 以下。強勢運營商保持 NGR 利潤率為 **GGR 的 50-70%**。 |
+| **Hold Percentage** | GGR / 總投注額 x 100% | 基準：老虎機 2.5-10%、桌遊 15-25%、體育投注理論持有 5-8%。 |
+
+### 7.2 玩家價值指標
+
+| 指標 | 公式 | 行業背景 |
+|-----|-----|---------|
+| **LTV (Player Lifetime Value)** | ARPU x 平均玩家壽命 - 獲客與留存成本 | LTV 必須超過 **CAC 的 3 倍**才能盈利。高價值玩家可達平均 LTV 的 10-100 倍。 |
+| **CAC (Customer Acquisition Cost)** | 總銷售與行銷費用 / 新獲客戶數 | 基準：美國/英國 iGaming 每 FTD CPA **$200-500+**；亞太地區低至 $0.93。低 CAC（$50-80）可能表示低質量的「獎金獵人」流量。 |
+| **LTV:CAC Ratio** | LTV / CAC | 1:1 = 打平；**3:1 = 健康基準**；4:1+ = 優秀；5:1+ = 可能對增長投資不足。 |
+
+### 7.3 轉換與互動指標
+
+| 指標 | 基準 | 備註 |
+|-----|-----|-----|
+| **Visit-to-Registration Conversion** | **20-30%** 健康 | 低比率表示著陸頁/UX 問題 |
+| **Registration-to-FTD Conversion** | **12-18%** 典型；15-18% 強勁 | 低比率表示 KYC 摩擦、支付問題或獎金吸引力弱 |
+| **FTD (First Time Depositor)** | 優質 FTD 在 **7 天內**完成第二次存款 | 關鍵指標：FTD 數量、FTD 率、每 FTD 成本（CPFTD）、首次存款時間（TTFD） |
+| **Retention Rate** | 30 天留存 **70-80%** = 強勁成功 | D1 留存（移動）25-30%；D30 最低 3-5% 以覆蓋獲客成本。**5% 留存改善可帶來 25-95% 利潤增長**。 |
+| **DAU/MAU Stickiness** | iGaming 賭場典型 **15-25%** | 20% = 約每月 6 天；50% = 隔天；70%+ = 每日習慣 |
+
+### 7.4 行銷分析
+
+| 指標 | 公式 | 背景 |
+|-----|-----|-----|
+| **CPA (Cost Per Acquisition)** | 每合格客戶的固定成本 | 主要聯盟支付模式 |
+| **ROAS (Return on Ad Spend)** | 廣告收入 / 廣告支出 x 100% | 200%（2:1）= 最低打平；400-800% = 良好；6-9 個月回本為目標；>12 個月令人擔憂 |
+| **Cohort Analysis** | 按共同屬性（通常是獲客日期）對玩家分組 | 應用：FTD 月度群體 LTV 分析、獲客渠道質量比較、獎金類型促銷效果 |
+
+### 7.5 風險與欺詐指標
+
+| 指標 | 閾值/基準 | 影響 |
+|-----|---------|-----|
+| **Chargeback Rate** | 發卡組織閾值：**0.9-1.0%** | 超過會觸發罰款或帳戶終止。商家爭議勝率：僅 **32%**。 |
+| **Bonus Abuse Detection** | 多帳戶創建速度、設備/瀏覽器指紋匹配、存提週期 | 檢測方法：設備指紋、IP/地理追蹤、速度檢查、行為分析 |
+| **Risk Scoring** | 量表：0-100 或 0-1000 | 組成部分：設備信任度、行為異常、交易模式、身份驗證、歷史活動。自動批准、人工審核、自動拒絕的閾值。 |
+
+---
+
+## 8. 營運與行銷術語
+
+### 8.1 獎金類型
+
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **Welcome Bonus** | 歡迎獎金 | 新玩家註冊或首次存款的促銷優惠。最常見的是 100% 存款匹配。對玩家獲取至關重要。 |
+| **First Deposit Bonus (FDB)** | 首存紅利 | 專門針對首次存款的獎金。通常 100-200% 匹配，有上限。 |
+| **No Deposit Bonus (NDB)** | 免存款紅利 | 無需存款即可獲得的獎金，實現無風險遊戲。通常是小額（$10-50）或免費旋轉，流水要求高。 |
+| **Cashback / Rakeback** | 返水 | 返還玩家損失一定百分比的機制。Cashback：通常為淨損失的 **5-15%**。Rakeback：撲克特定的抽水返還，基於 VIP 等級 **5-45%**。 |
+
+### 8.2 流水要求（Wagering Requirements）
+
+| 概念 | 標準 | 備註 |
+|-----|-----|-----|
+| **Wagering Requirement** | **20-40 倍**被認為合理；50 倍+ 被認為高 | 計算：獎金 x 倍數 = 所需流水（例如 $100 x 30 倍 = $3,000） |
+| **Game Weighting** | 老虎機 100%、桌遊 10-20%、真人娛樂場 10-20%、視頻撲克 0-10% | 防止玩家利用低莊家優勢遊戲清除獎金 |
+| **Bonus Abuse Types** | 多帳戶（gnoming）、串通投注、籌碼傾銷、套利 | 預防：KYC 驗證、行為監控、嚴格條款、遊戲權重 |
+
+### 8.3 VIP 與忠誠計劃
+
+| 術語 | 中文 | 定義 |
+|-----|-----|-----|
+| **VIP Program** | 貴賓計劃 | 針對最高價值玩家的專屬獎勵計劃。通常僅限邀請，提供個性化服務、更高限額和專屬活動。 |
+| **Loyalty Points / Comp Points** | 忠誠積分 | 通過投注獲得的積分，可兌換獎勵。標準比率：每投注 $10-20 獲 1 積分；100 積分 = $1 獎金。用於階梯系統（銅、銀、金、白金、鑽石）。 |
+| **High Roller / Whale** | 豪賭客/鯨魚 | High Roller：持續大額投注者，通常存款 $10,000+，每注 $300-500+。Whale：極端高額賭客，每次會話可能損失數十萬到數百萬。這些玩家代表關鍵收入但高波動風險。 |
+
+### 8.4 玩家獲取模式
+
+| 模式 | 結構 | 典型條款 |
+|-----|-----|---------|
+| **CPA (Cost Per Acquisition)** | 每合格玩家的固定金額 | 需要 FTD 和最低投注 |
+| **Revenue Share** | 推薦玩家淨遊戲收入的百分比 | 賭場/撲克：20-60%；體育投注：15-40% |
+| **Hybrid** | 預付 CPA + 持續營收分成 | 例如：$100 CPA + 20% RevShare |
+
+### 8.5 留存與重啟
+
+| 概念 | 基準 | 關鍵驅動因素 |
+|-----|-----|------------|
+| **Churn Rate** | 第一年流失 50-80% 常見；月活留存 70%+ 為強勁 | 驅動因素：支付摩擦、提款慢、移動 UX 差（70-80% 活動在移動端）、獎金疲勞、遊戲多樣性不足 |
+| **Reactivation Campaigns** | 分段：7-14 天不活躍（溫）、30 天（涼）、90+ 天（冷） | 策略：個性化獎金、限時優惠、「我們想念你」訊息。成本低於新獲客。 |
+| **5% churn reduction** | 可帶來 **25-95% 利潤增長** | 留存比獲客更具成本效益 |
+
+---
+
+## 附錄 A：內部術語標準
+
+### A.1 標準化原則
+
+所有平台文檔必須使用以下標準化術語。新術語必須在本表中定義，並在使用前提交架構審查。
+
+### A.2 核心術語對照
+
+| 概念 | 推薦術語（英文） | 推薦術語（中文） | 禁用替代詞 | 適用範圍 |
+|-----|---------------|---------------|----------|---------|
+| 獎金 | Bonus | 紅利 | ~~Promotion~~, ~~Reward~~, ~~Incentive~~ | 全局 |
+| 有效流水 | Valid Turnover | 有效流水 | ~~Valid Bet~~, ~~Wagering~~, ~~Betting Amount~~ | 財務、風控、活動 |
+| 租戶 | Tenant | 租戶 | ~~Merchant~~, ~~Customer~~ | Multi-Tenant 模塊 |
+| 遊戲商 | Game Provider (GP) | 遊戲商 | ~~Game Vendor~~, ~~Game Developer~~, ~~Game Studio~~ | 遊戲模塊 |
+| 玩家 | Player | 玩家 | ~~User~~, ~~Member~~ | 全局 |
+| 代理 | Agent / Affiliate | 代理 | ~~Referrer~~, ~~Distributor~~ | 代理模塊 |
+| 提款 | Withdrawal | 提款 | ~~Cash Out~~, ~~Payout~~ | 全局 |
+| 存款 | Deposit | 存款 | ~~Top-up~~, ~~Fund In~~ | 全局 |
+| 信用額度 | Credit Limit | 信用額度 | ~~Limit~~, ~~Credit~~ | 財務、代理 |
+| 風控 | Risk Control | 風控 | ~~Risk Management~~, ~~Anti-Fraud~~ | 全局 |
+| 錢包 | Wallet | 錢包 | ~~Account~~, ~~Balance~~ | 財務、遊戲 |
+| 可下注餘額 | Playable Balance | 可下注餘額 | ~~Available Balance~~ | 財務、遊戲 |
+| 流水要求 | Wagering Requirement | 流水要求 | ~~Rollover~~, ~~Play-through~~ | 活動 |
+| 審批工作流 | Approval Workflow | 審批工作流 | ~~Review Process~~ | 治理 |
+| 審計日誌 | Audit Log | 審計日誌 | ~~Activity Log~~, ~~Operation Log~~ | 全局 |
+| 多租戶 | Multi-Tenancy | 多租戶 | ~~Multi-Merchant~~, ~~SaaS Mode~~ | 架構 |
+| 無縫錢包 | Seamless Wallet | 無縫錢包 | ~~Instant Wallet~~, ~~Single Wallet~~ | 遊戲 |
+| 轉帳錢包 | Transfer Wallet | 轉帳錢包 | ~~Independent Wallet~~, ~~Fund Transfer~~ | 遊戲 |
+| 返水 | Cashback / Rakeback | 返水 | ~~Rebate~~ | 活動、VIP |
+| 支付服務商 | PSP (Payment Service Provider) | 支付服務商 | ~~Payment Provider~~ | 全局 |
+| 對帳 | Reconciliation | 對帳 | ~~Settlement~~, ~~Account Matching~~ | 財務 |
+
+### A.3 使用規則
+
+**首次出現**: 使用「中文術語（英文縮寫）」格式。後續引用可僅使用中文術語或縮寫。
+
+**一致性檢查清單**:
+- 所有核心術語與本表匹配
+- 縮寫首次使用包含完整形式
+- 未使用「禁用」欄中的術語
+- 新術語已在本表中定義
+
+### A.4 新術語引入流程
+
+1. 確認必要性（檢查現有術語是否足夠）
+2. 在本表中添加完整定義
+3. 提交架構團隊審查
+4. 在 CHANGELOG 中記錄添加
+
+---
+
+## 附錄 B：術語一致性指南
+
+### B.1 財務領域
+
+| 概念 | 主要術語 | 可接受變體 | 避免使用 |
+|-----|---------|----------|---------|
+| 提款審核流程 | **Withdrawal Approval** | Withdrawal Review（描述階段時） | Withdrawal Check, Payout Approval |
+| 風險評估 | **Risk Assessment** | Risk Evaluation（評分上下文） | Risk Check, Safety Check |
+| 審批流程 | **Approval Workflow** | Approval Process（流程描述） | Review Process, Check Process |
+| 交易處理 | **Transaction Processing** | Payment Processing（支付上下文） | Transaction Handling |
+| 帳戶匹配 | **Reconciliation** | Settlement（結算上下文） | Account Matching, Balance Check |
+| 資金驗證 | **Source of Funds (SOF)** | Funds Verification | Money Source Check |
+
+### B.2 遊戲領域
+
+| 概念 | 主要術語 | 可接受變體 | 避免使用 |
+|-----|---------|----------|---------|
+| 有效流水 | **Valid Turnover** | Effective Turnover（效率分析） | Valid Bet, Real Bet |
+| 有效投注金額 | **Valid Bet Amount** | - | Effective Bet Amount |
+| 對沖檢測 | **Hedging Detection** | Hedge Check（作為動詞） | Anti-Hedging, Hedging Prevention |
+| 套利檢測 | **Arbitrage Detection** | Arb Detection（縮寫） | Arbitrage Check |
+| 遊戲權重 | **Game Weight** | Contribution Rate | Game Factor, Weight Factor |
+| 遊戲供應商 | **Game Provider (GP)** | Game Vendor（供應商上下文） | Game Studio, Game Developer |
+
+### B.3 風控領域
+
+| 概念 | 主要術語 | 可接受變體 | 避免使用 |
+|-----|---------|----------|---------|
+| 異常投注 | **Anomaly Betting Pattern** | Abnormal Pattern（統計） | Strange Bet, Weird Pattern |
+| 多帳戶關聯 | **Multi-Account Linkage** | Account Clustering（技術） | Duplicate Account, Fake Account |
+| 風險因子 | **Risk Factor** | Risk Score（評分上下文） | Risk Value, Control Factor |
+| 賠率閾值 | **Odds Threshold** | Odds Limit | Odds Boundary, Max Odds |
+| 投注驗證 | **Bet Validation** | Wager Verification | Bet Check, Betting Verify |
+
+### B.4 文檔撰寫規則
+
+**標題**: 必須使用主要術語。
+
+**首次出現**: 主要術語 + 英文完整形式。
+
+**後續引用**: 主要術語或可接受變體。
+
+**交叉引用**: 使用主要術語保持一致性。
+
+**多語言處理**:
+
+| 上下文 | 規則 | 範例 |
+|-------|-----|-----|
+| 中文文檔 | 中文主要 + 英文縮寫（首次） | 提款審核流程 (Withdrawal Approval) |
+| 英文文檔 | 英文主要 + 中文註釋（可選） | Withdrawal Approval (提款審核流程) |
+| 代碼註釋 | 英文主要 + 簡短描述 | `// Withdrawal Approval: validates and processes withdrawal requests` |
+| API 文檔 | 英文主要（RESTful） | `POST /api/withdrawals/approval` |
+
+### B.5 發布前檢查清單
+
+- 所有章節標題使用主要術語
+- 核心概念首次出現包含完整英文形式
+- 代碼/API 命名與主要術語匹配
+- 未使用「避免」欄中的術語
+- 交叉引用使用主要術語
+- 多語言處理遵循標準
+
+### B.6 維護
+
+**審查週期**: 季度（與附錄 A 同步）
+
+**負責團隊**: 架構團隊
+
+**更新流程**:
+1. 收集文檔使用反饋
+2. 識別新術語衝突
+3. 評估行業術語演變
+4. 更新主要術語表
+5. 執行全局術語統一
+
+---
+
+## 相關文檔
+
+- [玩家生命週期](./Player_Lifecycle.md) - 玩家旅程與帳戶狀態
+- [業務流程](./Business_Flows.md) - 核心業務流程
+
+---
+
+**文檔版本**: 4.0.0
+**最後更新**: 2026-02-08
+**維護者**: 架構團隊
+**下次審查**: 2026-05-08（季度）
