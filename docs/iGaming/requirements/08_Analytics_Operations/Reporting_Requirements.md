@@ -1,4 +1,4 @@
-# Reporting & BI Business Requirements
+# 報表與 BI 業務需求
 
 > **Canonical Source**: [source-archive/08_Analytics_BI/08-01_Reporting_BI.md](../../source-archive/08_Analytics_BI/08-01_Reporting_BI.md)
 > **View Type**: Business Requirements
@@ -8,278 +8,278 @@
 
 ---
 
-## Business Value
+## 業務價值 (Business Value)
 
-This Reporting & BI system delivers value by:
-- **Informed Decision-Making**: Providing real-time (T+0), daily (T+1), and monthly reporting across financial (GGR/NGR), operational (DAU/MAU), risk (fraud detection), and compliance (MGA/AML) domains, enabling data-driven strategic and tactical decisions
-- **Regulatory Compliance**: Automating MGA monthly submissions and AML/KYC reporting, reducing manual effort and regulatory risk
-- **Revenue Optimization**: Enabling game performance analysis, campaign ROI measurement, and player segmentation to identify high-value opportunities and underperforming assets
-- **Risk Mitigation**: Delivering real-time suspicious betting, multi-account detection, and withdrawal risk reports with 5-minute delay, allowing proactive fraud prevention
-- **Operational Efficiency**: Supporting role-based access (C-Level, Operations Manager, Risk Analyst, Agent, Finance, BI Analyst) and self-service analytics, reducing ad-hoc report requests and empowering teams
+報表與 BI 系統交付的價值：
+- **支援明智決策**：提供即時 (T+0)、每日 (T+1) 和每月報表，涵蓋財務（GGR/NGR）、營運（DAU/MAU）、風險（欺詐偵測）和合規（MGA/AML）領域，支援數據驅動的策略和戰術決策
+- **監管合規**：自動化 MGA 月度提交和 AML/KYC 報告，減少人工工作量和監管風險
+- **收入優化**：實現遊戲績效分析、活動 ROI 衡量和玩家分群，識別高價值機會和表現不佳的資產
+- **風險緩解**：提供 5 分鐘延遲的即時可疑投注、多帳號偵測和提款風險報表，允許主動防範欺詐
+- **營運效率**：支援基於角色的存取（C 級、營運經理、風險分析師、代理、財務、BI 分析師）和自助分析，減少臨時報表請求並賦能團隊
 
-## Success Metrics
+## 成功指標 (Success Metrics)
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Real-time Dashboard Freshness | < 5 minutes delay | 99.9% of queries meet SLA (Section 8) |
-| T+1 Daily Report Availability | 100% by 03:00 AM | 99.5% on-time delivery (Section 8) |
-| Monthly Compliance Report Accuracy | 100% auditable accuracy | 99% availability by 2nd of month (Section 8) |
-| Report Export Success Rate | ≥ 98% | Track small exports (< 100k rows synchronous) and large exports (> 100k asynchronous with notification) completion rates (Section 6.2) |
-| Role-Based Access Coverage | 100% enforcement | All 6 role types (C-Level, Ops, Risk, Agent, Finance, BI Analyst) can access only authorized reports per Section 7 matrix |
-| User Adoption Rate | ≥ 70% active weekly users | Track weekly unique users per role accessing reports (proxy for self-service effectiveness) |
-| Query Rate Limit Compliance | < 1% violation rate | Monitor per-user (10/min) and per-tenant (100/min) rate limit violations (Section 9) |
-
----
-
-## 1. Business Overview
-
-The Reporting & BI system provides **data insights** and **decision support** for different roles across the iGaming platform. The system must support multi-dimensional analysis, near real-time monitoring, compliance reporting, and self-service analytics.
-
-### 1.1 Core Capabilities
-
-| Capability | Description |
-|-----------|-------------|
-| **Multi-dimensional Analysis** | Player behavior, game performance, financial metrics, risk events |
-| **Timeliness** | T+0 real-time (5-minute delay), T+1 daily, T+7 weekly, T+30 monthly |
-| **Visualization** | Dashboards, self-service analytics, Excel/PDF exports |
-| **Compliance** | MGA/Curacao regulatory reports, audit trails |
-| **Extensibility** | Custom reports, data export capabilities |
+| 指標 | 目標 | 衡量方式 |
+|------|------|---------|
+| 即時儀表板新鮮度 | < 5 分鐘延遲 | 99.9% 的查詢符合 SLA（第 8 節） |
+| T+1 每日報表可用性 | 100% 在 03:00 AM 前 | 99.5% 準時交付（第 8 節） |
+| 每月合規報表準確性 | 100% 可審計準確性 | 99% 在次月 2 日前可用（第 8 節） |
+| 報表匯出成功率 | ≥ 98% | 追蹤小型匯出（< 100k 行同步）和大型匯出（> 100k 非同步帶通知）完成率（第 6.2 節） |
+| 基於角色的存取覆蓋率 | 100% 強制執行 | 所有 6 種角色類型（C 級、營運、風險、代理、財務、BI 分析師）只能按第 7 節矩陣存取授權報表 |
+| 用戶採用率 | ≥ 70% 每週活躍用戶 | 追蹤每個角色每週唯一用戶存取報表數（自助服務有效性代理） |
+| 查詢速率限制合規性 | < 1% 違規率 | 監控每用戶（10/分鐘）和每租戶（100/分鐘）速率限制違規（第 9 節） |
 
 ---
 
-## 2. Financial Reports
+## 1. 業務概述
 
-### 2.1 GGR/NGR Report (Gross/Net Gaming Revenue)
+報表與 BI 系統為 iGaming 平台的不同角色提供**資料洞察**和**決策支援**。系統必須支援多維度分析、近即時監控、合規報告和自助分析。
 
-**Purpose**: Core revenue metrics, required for regulatory compliance.
+### 1.1 核心能力
 
-**Business Formulas**:
-- **GGR** = Total Bets - Total Wins
-- **NGR** = GGR - Bonuses - Chargebacks - Refunds
-
-**Key Indicators**:
-
-| Indicator | Breakdown |
-|-----------|-----------|
-| GGR by Game Type | Slots, Live Casino, Sports |
-| NGR by Player Segment | VIP, Regular, New |
-| GGR Margin | GGR / Total Bets |
-| NGR Margin | NGR / GGR |
-
-**Refresh Frequency**: Hourly (T+0)
+| 能力 | 說明 |
+|------|------|
+| **多維度分析** | 玩家行為、遊戲績效、財務指標、風險事件 |
+| **時效性** | T+0 即時（5 分鐘延遲）、T+1 每日、T+7 每週、T+30 每月 |
+| **視覺化** | 儀表板、自助分析、Excel/PDF 匯出 |
+| **合規** | MGA/Curacao 監管報表、審計軌跡 |
+| **可擴展性** | 自訂報表、資料匯出能力 |
 
 ---
 
-### 2.2 Deposit & Withdrawal Report
+## 2. 財務報表
 
-**Purpose**: Fund flow monitoring, PSP reconciliation.
+### 2.1 GGR/NGR 報表（總遊戲收入/淨遊戲收入）
 
-**Key Indicators**:
+**目的**：核心收入指標，監管合規所需。
 
-| Indicator | Breakdown |
-|-----------|-----------|
-| Total Deposits | By PSP, currency, region |
-| Total Withdrawals | By approval status, risk level |
-| Net Deposit | Deposit - Withdrawal |
-| PSP Success Rate | Success rate, average fee |
-| Deposit/Withdrawal Ratio | Health indicator |
+**業務公式**：
+- **GGR** = 總投注 - 總輸贏
+- **NGR** = GGR - 紅利 - 退款 - 退款
 
-**Refresh Frequency**: Real-time (5-minute delay)
+**關鍵指標**：
 
----
+| 指標 | 分解 |
+|------|------|
+| GGR 按遊戲類型 | 老虎機、真人娛樂場、體育 |
+| NGR 按玩家分群 | VIP、普通、新玩家 |
+| GGR 利潤率 | GGR / 總投注 |
+| NGR 利潤率 | NGR / GGR |
 
-### 2.3 Commission Report
-
-**Purpose**: Agent commission calculation and disbursement tracking.
-
-**Refresh Frequency**: Daily (T+1)
+**更新頻率**：每小時 (T+0)
 
 ---
 
-## 3. Operational Reports
+### 2.2 存款與提款報表
 
-### 3.1 Player Activity Report
+**目的**：資金流動監控、PSP 對帳。
 
-**Key Indicators**:
+**關鍵指標**：
 
-| Indicator | Definition |
-|-----------|------------|
-| **DAU** | Daily Active Users |
-| **MAU** | Monthly Active Users |
-| **Stickiness** | DAU / MAU ratio |
-| **New Registrations** | Daily new player count |
-| **Churn Rate** | Percentage of players who stopped playing |
+| 指標 | 分解 |
+|------|------|
+| 總存款 | 按 PSP、貨幣、地區 |
+| 總提款 | 按審批狀態、風險等級 |
+| 淨存款 | 存款 - 提款 |
+| PSP 成功率 | 成功率、平均手續費 |
+| 存款/提款比率 | 健康指標 |
 
-**Refresh Frequency**: Daily (T+1)
-
----
-
-### 3.2 Game Performance Report
-
-**Key Indicators**:
-
-| Indicator | Description |
-|-----------|-------------|
-| Total Bets / Wins | Per game breakdown |
-| Actual RTP | Actual Return to Player percentage |
-| Average Bet Size | Mean bet amount per game |
-| Top Performing Games | Ranked by GGR |
-| Game Popularity | By active player count |
-
-**Refresh Frequency**: Hourly (T+0)
+**更新頻率**：即時（5 分鐘延遲）
 
 ---
 
-### 3.3 Campaign Performance Report
+### 2.3 佣金報表
 
-**Key Indicators**:
+**目的**：代理佣金計算和支付追蹤。
 
-| Indicator | Description |
-|-----------|-------------|
-| Bonus Issued / Redeemed | Total bonus amounts and redemption rates |
-| Wagering Completion Rate | Percentage of players completing bonus requirements |
-| CPA | Cost Per Acquisition |
-| ROI | Return on Investment for campaign |
-| Bonus Abuse Detection | Rate of detected bonus abuse |
-
-**Refresh Frequency**: Daily (T+1)
+**更新頻率**：每日 (T+1)
 
 ---
 
-## 4. Risk Control Reports
+## 3. 營運報表
 
-### 4.1 Suspicious Betting Report
+### 3.1 玩家活動報表
 
-**Trigger Conditions**:
+**關鍵指標**：
 
-| Detection Type | Description |
-|---------------|-------------|
-| Hedging | Simultaneous opposite bets detected |
-| Arbitrage | Cross-platform value exploitation |
-| Abnormal Win Rate | Win rate exceeding 55% |
-| Turnover Anomaly | Large wagering completed in short time |
+| 指標 | 定義 |
+|------|------|
+| **DAU** | 每日活躍用戶 |
+| **MAU** | 每月活躍用戶 |
+| **黏性 (Stickiness)** | DAU / MAU 比率 |
+| **新註冊** | 每日新玩家數 |
+| **流失率 (Churn Rate)** | 停止遊玩的玩家百分比 |
 
-**Refresh Frequency**: Real-time (5-minute delay)
-
----
-
-### 4.2 Multi-Account Detection Report
-
-**Detection Dimensions**:
-
-| Dimension | Description |
-|-----------|-------------|
-| Device Fingerprint | Same device used by multiple accounts |
-| IP Address | Same IP for multiple accounts |
-| Payment Method | Same payment instrument across accounts |
-| Behavioral Similarity | ML model-based betting pattern analysis |
-
-**Refresh Frequency**: Daily (T+1)
+**更新頻率**：每日 (T+1)
 
 ---
 
-### 4.3 Withdrawal Risk Report
+### 3.2 遊戲績效報表
 
-**Key Indicators**:
+**關鍵指標**：
 
-| Indicator | Description |
-|-----------|-------------|
-| High Risk Withdrawals | Amounts exceeding $10,000 |
-| KYC Unverified Withdrawals | Withdrawals without identity verification |
-| First Deposit Bonus Abuse | Deposit-and-immediate-withdrawal pattern |
-| Average Approval Time | Average time for withdrawal review |
-| Rejection Rate by Reason | Categorized rejection analysis |
+| 指標 | 說明 |
+|------|------|
+| 總投注 / 輸贏 | 按遊戲分解 |
+| 實際 RTP | 實際玩家回報率 |
+| 平均投注額 | 每場遊戲的平均投注金額 |
+| 表現最佳遊戲 | 按 GGR 排名 |
+| 遊戲受歡迎度 | 按活躍玩家數 |
 
-**Refresh Frequency**: Real-time (5-minute delay)
-
----
-
-## 5. Compliance Reports
-
-### 5.1 MGA Regulatory Report (Malta Gaming Authority)
-
-**Required Content**:
-
-| Requirement | Description |
-|-------------|-------------|
-| Total GGR | Breakdown by game type |
-| Total Bets / Total Wins | Aggregate figures |
-| Player Count | By jurisdiction |
-| RTP Verification | Actual RTP vs declared RTP |
-| Responsible Gaming Metrics | Self-exclusion count, deposit limit settings |
-
-**Submission Frequency**: Monthly (T+30)
+**更新頻率**：每小時 (T+0)
 
 ---
 
-### 5.2 AML/KYC Report (Anti-Money Laundering / Know Your Customer)
+### 3.3 活動績效報表
 
-**Key Indicators**:
+**關鍵指標**：
 
-| Indicator | Description |
-|-----------|-------------|
-| High-Value Transactions | Single transactions exceeding $10,000 |
-| Suspicious Activity Reports (SAR) | Filed SAR count |
-| KYC Verification Rate | Percentage of verified players |
-| EDD Required Cases | Enhanced Due Diligence cases |
-| SOF Verification Rate | Source of Funds verification completion |
+| 指標 | 說明 |
+|------|------|
+| 紅利發放 / 兌換 | 總紅利金額和兌換率 |
+| 投注完成率 | 完成紅利要求的玩家百分比 |
+| CPA | 每次獲客成本 |
+| ROI | 活動投資回報率 |
+| 紅利濫用偵測 | 偵測到的紅利濫用率 |
 
-**Refresh Frequency**: Daily (T+1)
-
----
-
-## 6. Report Export Requirements
-
-### 6.1 Supported Formats
-
-| Format | Use Case | Maximum Capacity |
-|--------|----------|-----------------|
-| **Excel (XLSX)** | Multi-sheet dimensional reports | 1,048,576 rows |
-| **PDF** | Archival and print-friendly reports | Unlimited pages |
-| **CSV** | Bulk data export for ETL | Billions of rows (streaming) |
-
-### 6.2 Export Rules
-
-| Rule | Description |
-|------|-------------|
-| Small exports (< 100k rows) | Synchronous download |
-| Large exports (> 100k rows) | Asynchronous with email/in-app notification |
-| Download link validity | 24 hours |
-| Concurrent export limit | Maximum 5 per tenant |
+**更新頻率**：每日 (T+1)
 
 ---
 
-## 7. Access Control Requirements
+## 4. 風險控制報表
 
-| Role | Accessible Reports | Restrictions |
-|------|-------------------|--------------|
-| **C-Level Executive** | All platform reports | Cross-tenant view |
-| **Operations Manager** | Operational + Financial reports | Own tenant only |
-| **Risk Analyst** | Risk control reports | All tenants |
-| **Agent** | Commission + downstream player reports | Own hierarchy only |
-| **Finance** | Financial + commission reports | Own tenant only |
-| **BI Analyst** | Self-service query access | Read-only, no PII access |
+### 4.1 可疑投注報表
 
----
+**觸發條件**：
 
-## 8. Business SLAs
+| 偵測類型 | 說明 |
+|---------|------|
+| 對沖 (Hedging) | 偵測到同時相反投注 |
+| 套利 (Arbitrage) | 跨平台價值套利 |
+| 異常勝率 | 勝率超過 55% |
+| 流水異常 | 在短時間內完成大額投注 |
 
-| Report Category | Freshness SLA | Availability SLA | Accuracy |
-|----------------|---------------|-------------------|----------|
-| Real-time Dashboard | < 5 minutes delay | 99.9% | 95%+ (approximate) |
-| T+1 Daily Reports | Available by 03:00 AM | 99.5% | 100% (exact) |
-| Weekly Reports | Available by Monday 06:00 AM | 99.5% | 100% (exact) |
-| Monthly Compliance Reports | Available by 2nd of month | 99% | 100% (auditable) |
+**更新頻率**：即時（5 分鐘延遲）
 
 ---
 
-## 9. Rate Limiting Requirements
+### 4.2 多帳號偵測報表
 
-| Limit Type | Threshold |
-|-----------|-----------|
-| Per user per minute | 10 queries |
-| Per tenant per minute | 100 queries |
-| Export task concurrency | Maximum 5 |
+**偵測維度**：
+
+| 維度 | 說明 |
+|------|------|
+| 設備指紋 | 多個帳號使用同一設備 |
+| IP 地址 | 多個帳號使用同一 IP |
+| 支付方式 | 跨帳號使用相同支付工具 |
+| 行為相似性 | 基於 ML 模型的投注模式分析 |
+
+**更新頻率**：每日 (T+1)
+
+---
+
+### 4.3 提款風險報表
+
+**關鍵指標**：
+
+| 指標 | 說明 |
+|------|------|
+| 高風險提款 | 金額超過 $10,000 |
+| KYC 未驗證提款 | 未完成身份驗證的提款 |
+| 首存紅利濫用 | 存款後立即提款模式 |
+| 平均審批時間 | 提款審查的平均時間 |
+| 拒絕率按原因 | 分類拒絕分析 |
+
+**更新頻率**：即時（5 分鐘延遲）
+
+---
+
+## 5. 合規報表
+
+### 5.1 MGA 監管報表（馬爾他博彩管理局）
+
+**必需內容**：
+
+| 要求 | 說明 |
+|------|------|
+| 總 GGR | 按遊戲類型分解 |
+| 總投注 / 總輸贏 | 總計數字 |
+| 玩家數 | 按司法管轄區 |
+| RTP 驗證 | 實際 RTP vs 宣告 RTP |
+| 負責任博彩指標 | 自我排除數、存款限額設定 |
+
+**提交頻率**：每月 (T+30)
+
+---
+
+### 5.2 AML/KYC 報表（反洗錢 / 了解您的客戶）
+
+**關鍵指標**：
+
+| 指標 | 說明 |
+|------|------|
+| 高價值交易 | 單筆交易超過 $10,000 |
+| 可疑活動報告 (SAR) | 已提交 SAR 數量 |
+| KYC 驗證率 | 已驗證玩家的百分比 |
+| EDD 必需案例 | 增強盡職調查案例 |
+| SOF 驗證率 | 資金來源驗證完成率 |
+
+**更新頻率**：每日 (T+1)
+
+---
+
+## 6. 報表匯出需求
+
+### 6.1 支援格式
+
+| 格式 | 使用場景 | 最大容量 |
+|------|---------|---------|
+| **Excel (XLSX)** | 多工作表維度報表 | 1,048,576 行 |
+| **PDF** | 歸檔和列印友好報表 | 無限頁數 |
+| **CSV** | ETL 批量資料匯出 | 數十億行（串流） |
+
+### 6.2 匯出規則
+
+| 規則 | 說明 |
+|------|------|
+| 小型匯出（< 100k 行） | 同步下載 |
+| 大型匯出（> 100k 行） | 非同步帶郵件/應用內通知 |
+| 下載連結有效期 | 24 小時 |
+| 並發匯出限制 | 每租戶最多 5 個 |
+
+---
+
+## 7. 存取控制需求
+
+| 角色 | 可存取報表 | 限制 |
+|------|-----------|------|
+| **C 級高層** | 所有平台報表 | 跨租戶檢視 |
+| **營運經理** | 營運 + 財務報表 | 僅自己租戶 |
+| **風險分析師** | 風險控制報表 | 所有租戶 |
+| **代理** | 佣金 + 下級玩家報表 | 僅自己層級 |
+| **財務** | 財務 + 佣金報表 | 僅自己租戶 |
+| **BI 分析師** | 自助查詢存取 | 唯讀，無 PII 存取 |
+
+---
+
+## 8. 業務 SLA
+
+| 報表類別 | 新鮮度 SLA | 可用性 SLA | 準確性 |
+|---------|-----------|-----------|--------|
+| 即時儀表板 | < 5 分鐘延遲 | 99.9% | 95%+（近似） |
+| T+1 每日報表 | 在 03:00 AM 前可用 | 99.5% | 100%（準確） |
+| 每週報表 | 在週一 06:00 AM 前可用 | 99.5% | 100%（準確） |
+| 每月合規報表 | 在次月 2 日前可用 | 99% | 100%（可審計） |
+
+---
+
+## 9. 速率限制需求
+
+| 限制類型 | 閾值 |
+|---------|------|
+| 每用戶每分鐘 | 10 個查詢 |
+| 每租戶每分鐘 | 100 個查詢 |
+| 匯出任務並發 | 最多 5 個 |
 
 ---
 

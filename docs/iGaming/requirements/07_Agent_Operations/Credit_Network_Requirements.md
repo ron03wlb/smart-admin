@@ -1,4 +1,4 @@
-# Credit Network Business Requirements
+# 信用網絡業務需求
 
 > **Canonical Source**: [source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md)
 > **View Type**: Business Requirements
@@ -8,82 +8,82 @@
 
 ---
 
-## Acceptance Criteria
+## 驗收標準 (Acceptance Criteria)
 
-- [ ] Dual wallet system: Each player account must have independent Cash Wallet and Credit Wallet with distinct balance tracking
-- [ ] Credit propagation: Parent agents can adjust child credit limits in real-time; total child allocations must not exceed parent available credit
-- [ ] Risk alert thresholds: System automatically sends alerts at 81-90% usage (Warning), reduces allocation cap at 91-99% (High Risk), and freezes betting at 100%+ (Critical)
-- [ ] Position taking calculation: Agent Win/Loss = Player Win/Loss × Agent Position %, with normalization when total positions exceed 100%
-- [ ] Settlement cycle: Weekly settlement completes Phase 1 (Freeze & Calculate), Phase 2 (Payment Collection at >95% on-time rate), Phase 3 (Verification & Reset at 100% accuracy), and Phase 4 (Final Report)
-- [ ] Overdue payment automation: System automatically reduces credit limit by 50% at 4-7 days, freezes limit at 8-14 days, and suspends account at 15+ days
-- [ ] Credit allocation validation: System rejects decrease operations when child used credit exceeds new limit; rejects revoke operations when child used credit > 0
-- [ ] Cascading blowout handling: When agent reaches 100% usage, all downstream players are frozen from betting, parent available credit is reduced, and margin call notification is sent
-
----
-
-## 1. Business Overview
-
-The Credit Network is a unique operating model in the Asian market. The core difference from the Cash Market is the **"play first, settle later"** principle. The system must support credit limit allocation, consumption, and repayment, as well as position taking calculations within the agent hierarchy.
+- [ ] 雙錢包系統：每個玩家帳號必須有獨立的現金錢包和信用錢包，並分別追蹤餘額
+- [ ] 信用傳播：上級代理可即時調整下級信用額度；子級總分配額不得超過上級可用信用額
+- [ ] 風險告警閾值：系統在 81-90% 使用率時自動發送告警（Warning），91-99% 時降低分配上限（High Risk），100%+ 時凍結投注（Critical）
+- [ ] 持倉計算：代理輸贏 = 玩家輸贏 × 代理持倉 %，當總持倉超過 100% 時進行歸一化
+- [ ] 結算週期：週結算完成四階段：Phase 1（凍結與計算），Phase 2（收款，準時率 >95%），Phase 3（驗證與重置，準確率 100%），Phase 4（最終報表）
+- [ ] 逾期付款自動化：系統在 4-7 天自動降低 50% 信用額度，8-14 天凍結額度，15+ 天暫停帳號
+- [ ] 信用分配驗證：當下級已用信用超過新額度時，系統拒絕減少操作；當下級已用信用 > 0 時，系統拒絕撤銷操作
+- [ ] 級聯爆倉處理：當代理達到 100% 使用率時，所有下級玩家凍結投注，上級可用信用減少，並發送保證金催繳通知
 
 ---
 
-## 2. Dual Wallet System
+## 1. 業務概述
 
-To support both cash and credit modes, each player account must have two independent wallets:
-
-| Wallet Type | Description | Key Rules |
-|-------------|-------------|-----------|
-| **Cash Wallet** | Funded through deposits | Balance must be > 0 to place bets |
-| **Credit Wallet** | Credit allocated by parent agent | Bets increase exposure; settlement updates used credit |
-
-### Credit Wallet Key Concepts
-
-| Concept | Definition |
-|---------|------------|
-| **Credit Limit** | Maximum loss amount granted by the parent agent |
-| **Used Credit** | Current unsettled win/loss total |
-| **Available Credit** | Credit Limit minus Used Credit |
-| **Exposure** | Accumulated bet risk before settlement |
-
-**Business Rule**: When placing bets under credit mode, balance is not deducted. Instead, exposure increases. Settlement occurs periodically to update used credit.
+信用網絡是亞洲市場的獨特運營模式。其核心差異在於**「先玩後付」**原則。系統必須支援信用額度分配、消耗、償還，以及代理層級內的持倉計算。
 
 ---
 
-## 3. Credit Propagation (Hierarchy)
+## 2. 雙錢包系統
 
-Credit is distributed from the top level downward in a tree structure:
+為支援現金和信用模式，每個玩家帳號必須有兩個獨立錢包：
 
-**Platform > Master Agent > Agent Level 1 > Agent Level 2 > Player**
+| 錢包類型 | 說明 | 核心規則 |
+|---------|------|---------|
+| **現金錢包 (Cash Wallet)** | 透過存款充值 | 餘額必須 > 0 才能下注 |
+| **信用錢包 (Credit Wallet)** | 由上級代理分配信用額度 | 下注增加暴露風險；結算時更新已用信用 |
 
-### 3.1 Allocation Rules
+### 信用錢包關鍵概念
 
-- Parent agents may adjust child credit limits at any time
-- Allocations flow top-down only
-- Total allocated to children must not exceed parent's available credit
+| 概念 | 定義 |
+|------|------|
+| **信用額度 (Credit Limit)** | 上級代理授予的最大虧損金額 |
+| **已用信用 (Used Credit)** | 當前未結算的輸贏總額 |
+| **可用信用 (Available Credit)** | 信用額度減去已用信用 |
+| **暴露風險 (Exposure)** | 結算前累積的投注風險 |
 
-### 3.2 Risk Alert Thresholds
+**業務規則**：在信用模式下注時，不扣除餘額。相反，暴露風險增加。定期結算時更新已用信用。
 
-| Usage Range | Risk Level | Automated Action | Notification Recipients |
-|-------------|------------|------------------|------------------------|
-| **0-80%** | Normal | None | None |
-| **81-90%** | Warning | Send alert email | Agent + Parent |
-| **91-99%** | High Risk | Reduce child allocation cap | Agent + Parent + Risk Control |
-| **100%+** | Critical | Freeze all downstream betting | All levels + Emergency handling |
+---
 
-### 3.3 Liquidation (Margin Call) Rules
+## 3. 信用傳播（層級結構）
 
-- When child's `Used / Limit > 90%` (warning line), the system sends a notification
-- When `Used >= Limit` (blowout), the system automatically suspends all downstream player betting rights
-- Parent agent's available credit is simultaneously reduced
-- Cascading monitoring: parent usage recalculated after child blowout
+信用從頂層向下以樹狀結構分配：
 
-### 3.4 Credit Network Key Metrics
+**平台 > 總代理 > 一級代理 > 二級代理 > 玩家**
 
-| Level | Agent | Credit Limit | Used Credit | Usage % | Risk Status | Position % | Downstream Allocation |
-|-------|-------|-------------|-------------|---------|-------------|------------|----------------------|
-| Platform | Platform | $10M | $8M | 80% | Normal | 10% | $8M |
-| Master | Master A | $5M | $3.5M | 70% | Normal | 20% | $4M |
-| Master | Master B | $3M | $2.85M | 95% | Margin Call | 15% | $2.8M |
+### 3.1 分配規則
+
+- 上級代理可隨時調整下級信用額度
+- 分配僅能自上而下流動
+- 分配給子級的總額不得超過上級的可用信用
+
+### 3.2 風險告警閾值
+
+| 使用率範圍 | 風險等級 | 自動化動作 | 通知接收者 |
+|-----------|---------|---------|-----------|
+| **0-80%** | 正常 (Normal) | 無 | 無 |
+| **81-90%** | 警告 (Warning) | 發送告警郵件 | 代理 + 上級 |
+| **91-99%** | 高風險 (High Risk) | 降低子級分配上限 | 代理 + 上級 + 風控 |
+| **100%+** | 危急 (Critical) | 凍結所有下級投注 | 所有層級 + 緊急處理 |
+
+### 3.3 爆倉（保證金催繳）規則
+
+- 當下級的 `已用 / 額度 > 90%`（警戒線）時，系統發送通知
+- 當 `已用 >= 額度`（爆倉）時，系統自動暫停所有下級玩家投注權限
+- 上級代理的可用信用同時減少
+- 級聯監控：上級使用率在下級爆倉後重新計算
+
+### 3.4 信用網絡關鍵指標
+
+| 層級 | 代理 | 信用額度 | 已用信用 | 使用率 % | 風險狀態 | 持倉 % | 下級分配額 |
+|------|------|---------|---------|---------|---------|-------|-----------|
+| 平台 | Platform | $10M | $8M | 80% | Normal | 10% | $8M |
+| 總代理 | Master A | $5M | $3.5M | 70% | Normal | 20% | $4M |
+| 總代理 | Master B | $3M | $2.85M | 95% | Margin Call | 15% | $2.8M |
 | L1 | Agent A1 | $2M | $1.2M | 60% | Normal | 40% | $800k |
 | L1 | Agent A2 | $1.5M | $1.5M | 100% | Frozen | 35% | $0 (Blowout) |
 | L1 | Agent A3 | $500k | $300k | 60% | Normal | 30% | $200k |
@@ -93,166 +93,166 @@ Credit is distributed from the top level downward in a tree structure:
 
 ---
 
-## 4. Position Taking Mechanism
+## 4. 持倉機制
 
-Position taking determines how agents and their parents share win/loss risk from players.
+持倉決定代理及其上級如何分擔玩家的輸贏風險。
 
-### 4.1 Position Taking Formula
+### 4.1 持倉公式
 
-**Agent Win/Loss = Player Win/Loss x Agent Position %**
+**代理輸贏 = 玩家輸贏 × 代理持倉 %**
 
-### 4.2 Position Taking Example
+### 4.2 持倉示例
 
-When a player loses $10,000:
+當玩家虧損 $10,000：
 
-| Party | Position % | Amount | Action |
-|-------|-----------|--------|--------|
-| Player | - | -$10,000 | Pays to direct agent |
-| Agent A (Direct) | 40% | +$4,000 | Collects $10k, remits $6k upward |
-| Agent B (Parent) | 30% | +$3,000 | Receives from Agent A |
-| Master Agent C | 20% | +$2,000 | Receives from Agent B |
-| Platform | 10% | +$1,000 | Final platform revenue |
+| 方 | 持倉 % | 金額 | 動作 |
+|-----|-------|------|------|
+| 玩家 | - | -$10,000 | 支付給直屬代理 |
+| Agent A（直屬） | 40% | +$4,000 | 收取 $10k，向上匯款 $6k |
+| Agent B（上級） | 30% | +$3,000 | 從 Agent A 接收 |
+| Master Agent C | 20% | +$2,000 | 從 Agent B 接收 |
+| 平台 (Platform) | 10% | +$1,000 | 最終平台收入 |
 
-### 4.3 Position Taking Normalization
+### 4.3 持倉歸一化
 
-When total declared positions exceed 100%, normalization is applied:
+當總宣告持倉超過 100% 時，應用歸一化：
 
-**Normalization Coefficient = Actual Player Loss / (Player Loss x Total Position %)**
+**歸一化係數 = 實際玩家虧損 / (玩家虧損 × 總持倉 %)**
 
-**Example with 120% total positions**:
+**總持倉 120% 的示例**：
 
-| Agent | Declared Position | Normalized Amount | Actual Share |
-|-------|------------------|-------------------|--------------|
-| Agent L2-A5 | 50% | $41,665 | Collects, keeps share, remits remainder |
-| Agent L1-A1 | 40% | $33,332 | Receives from child, keeps share |
-| Master Agent A | 20% | $16,666 | Receives from child, keeps share |
-| Platform | 10% | $8,333 | Final platform revenue |
-| **Total** | **120%** | **$99,996** | Approximately equals $100,000 |
+| 代理 | 宣告持倉 | 歸一化金額 | 實際份額 |
+|------|---------|-----------|---------|
+| Agent L2-A5 | 50% | $41,665 | 收取，保留份額，匯款餘額 |
+| Agent L1-A1 | 40% | $33,332 | 從下級接收，保留份額 |
+| Master Agent A | 20% | $16,666 | 從下級接收，保留份額 |
+| 平台 (Platform) | 10% | $8,333 | 最終平台收入 |
+| **總計** | **120%** | **$99,996** | 約等於 $100,000 |
 
-### 4.4 Position Constraints
+### 4.4 持倉約束
 
-| Rule | Description |
-|------|-------------|
-| **Max Position** | Child position must not exceed parent-set upper limit |
-| **Auto-Hedge** | Agent may set position to 0% (remit all, earn only commission/rebate) |
-
----
-
-## 5. Settlement Process
-
-### 5.1 Settlement Cycle
-
-Credit networks typically use **weekly** or **monthly** settlement.
-
-| Phase | Time Window | Primary Actions | Responsible Party | Key Metric |
-|-------|------------|-----------------|-------------------|------------|
-| **Phase 1: Freeze & Calculate** | Monday 12:00 - 13:00 | Freeze accounts, calculate positions, generate statements | System Automated | Accuracy: 100% |
-| **Phase 2: Payment Collection** | Monday 13:00 - Friday 18:00 | Agent remittance, transaction verification | Agents | On-time payment rate: > 95% |
-| **Phase 3: Verification & Reset** | Friday 18:00 - Saturday 12:00 | Verify payments, restore credit limits | Parent Agents | Verification accuracy: 100% |
-| **Phase 4: Final Report** | Saturday 12:00 | Generate weekly report, audit report | Platform | Report completeness: 100% |
-
-### 5.2 Settlement Work Orders
-
-The system provides a "settlement ticket" function:
-
-| Field | Options |
-|-------|---------|
-| **Type** | Deposit (remit winnings) / Refill (cover losses) |
-| **Status** | Pending > Reviewed > Completed |
-
-### 5.3 Position Distribution Calculation (Bottom-Up Aggregation)
-
-1. **Step 1**: Calculate Agent L2 position from direct player losses
-2. **Step 2**: Aggregate L1 position from children + direct players
-3. **Step 3**: Aggregate Master Agent position from children
-4. **Step 4**: Calculate final platform revenue
-
-### 5.4 Overdue Payment Rules
-
-| Overdue Days | Automated Action | Credit Impact | Business Impact |
-|-------------|------------------|---------------|-----------------|
-| **0-3 days** | Send collection email | None | None |
-| **4-7 days** | Reduce Credit Limit by 50% | Existing limit halved | Downstream players partially restricted |
-| **8-14 days** | Freeze Credit Limit | Credit Limit = 0 | All downstream cannot bet |
-| **15+ days** | Account suspension + Legal action | Permanently frozen | Close agent account |
-
-### 5.5 Settlement Exception Handling
-
-| Exception Type | Detection Method | Handling Strategy | Notification |
-|---------------|-----------------|-------------------|--------------|
-| Position calculation error | SUM(child_positions) != player_loss | Trigger manual review + rollback | Tech team + Finance |
-| Duplicate settlement | settlement_week already exists | Reject re-execution + alert | System admin |
-| Credit over-limit | Available Credit < 0 after restore | Limit credit to 0 + manual check | Risk control + Parent agent |
-| Payment verification failure | Payment not found | Mark as overdue + send collection notice | Agent + Parent |
+| 規則 | 說明 |
+|------|------|
+| **最大持倉** | 下級持倉不得超過上級設定的上限 |
+| **自動對沖** | 代理可將持倉設為 0%（全部匯款，僅賺取佣金/返水） |
 
 ---
 
-## 6. Credit Allocation Business Rules
+## 5. 結算流程
 
-| Operation Type | Parent Available | Child Used | Allowed? | Automated Action |
-|---------------|-----------------|-----------|----------|------------------|
-| **First allocation** | >= Amount | N/A (new) | Yes | Create child record |
-| **Increase limit** | >= Delta | Any | Yes | Parent allocated += delta |
-| **Decrease limit** | Any | <= New Limit | Yes | Parent allocated -= delta |
-| **Decrease limit** | Any | > New Limit | No | Reject: Child used credit exceeds new limit |
-| **Revoke limit** | Any | > 0 | No | Reject: Must settle child used credit first |
-| **Revoke limit** | Any | = 0 | Yes | Set child limit = 0, parent allocated -= old_limit |
+### 5.1 結算週期
 
-### 6.1 Notification Trigger Rules
+信用網絡通常使用**每週**或**每月**結算。
 
-| Condition | Trigger Threshold | Recipients | Method | Example |
-|-----------|-------------------|------------|--------|---------|
-| Large limit increase | Delta > $10,000 | Child + Parent + Risk | Email + SMS | "Your credit limit increased to $1.5M (+$500k)" |
-| Large position change | Position change > 10% | Child + Parent + Finance | Email | "Position changed from 40% to 50%" |
-| Limit revocation | New Limit < Old Limit | Child + Parent | Email + In-App | "Credit limit reduced to $500k due to [Reason]" |
-| Near limit | Used / Limit > 90% | Child + Parent | Email + SMS | "Warning: 92% credit used ($920k / $1M)" |
-| Over limit | Used > Limit | Child + Parent + Risk | Urgent: Phone + Email | "CRITICAL: Credit limit exceeded. Account frozen." |
+| 階段 | 時間窗口 | 主要動作 | 負責方 | 關鍵指標 |
+|------|--------|---------|--------|---------|
+| **Phase 1: 凍結與計算** | 週一 12:00 - 13:00 | 凍結帳號、計算持倉、生成報表 | 系統自動化 | 準確率：100% |
+| **Phase 2: 收款** | 週一 13:00 - 週五 18:00 | 代理匯款、交易驗證 | 代理 | 準時付款率：> 95% |
+| **Phase 3: 驗證與重置** | 週五 18:00 - 週六 12:00 | 驗證付款、恢復信用額度 | 上級代理 | 驗證準確率：100% |
+| **Phase 4: 最終報表** | 週六 12:00 | 生成週報、審計報告 | 平台 | 報表完整度：100% |
 
----
+### 5.2 結算工單
 
-## 7. Risk Control Rules
+系統提供「結算票據」功能：
 
-### 7.1 Abnormal Position Monitoring
+| 欄位 | 選項 |
+|------|------|
+| **類型** | 存款（匯款盈利）/ 補款（彌補虧損） |
+| **狀態** | Pending > Reviewed > Completed |
 
-If an agent suddenly adjusts position to 100% and downstream players win large amounts, a "joint arbitrage" alert is triggered.
+### 5.3 持倉分配計算（自下而上聚合）
 
-### 7.2 Credit Scoring
+1. **步驟 1**：從直屬玩家虧損計算二級代理持倉
+2. **步驟 2**：從子級 + 直屬玩家聚合一級代理持倉
+3. **步驟 3**：從子級聚合總代理持倉
+4. **步驟 4**：計算最終平台收入
 
-Based on historical settlement punctuality, agents receive a credit score that affects the maximum obtainable credit limit.
+### 5.4 逾期付款規則
 
-### 7.3 Risk Scenario Matrix
+| 逾期天數 | 自動化動作 | 信用影響 | 業務影響 |
+|---------|---------|---------|---------|
+| **0-3 天** | 發送催繳郵件 | 無 | 無 |
+| **4-7 天** | 降低信用額度 50% | 現有額度減半 | 下級玩家部分受限 |
+| **8-14 天** | 凍結信用額度 | 信用額度 = 0 | 所有下級無法投注 |
+| **15+ 天** | 帳號暫停 + 法律行動 | 永久凍結 | 關閉代理帳號 |
 
-| Risk Scenario | Detection Indicator | Threshold | Handling Action |
-|--------------|---------------------|-----------|-----------------|
-| **Joint arbitrage** | Sudden position increase + large player wins | Position change > 50% AND player net win > $100k | Freeze credit + Manual review |
-| **Credit fraud** | New agent high-amount application | Registered < 30 days AND requested > $50k | Reduce limit + Enhanced KYC |
-| **Settlement overdue** | High historical overdue rate | Overdue >= 3 times/year | Lower credit score + Limit restriction |
-| **Multi-account abuse** | Same device multiple agents | Device fingerprint linked >= 3 agents | Block allocation + Investigation |
+### 5.5 結算異常處理
 
-### 7.4 Cascading Impact on Blowout
-
-When an agent reaches 100% usage:
-1. All downstream players are automatically frozen from betting
-2. System sends margin call notification
-3. Parent agent's available credit simultaneously decreases
-4. Cascading monitoring: Parent usage recalculated (may approach warning line)
-5. Settlement frozen: Agent must cover losses before weekly settlement to restore credit
+| 異常類型 | 偵測方法 | 處理策略 | 通知 |
+|---------|---------|---------|------|
+| 持倉計算錯誤 | SUM(child_positions) != player_loss | 觸發人工審查 + 回滾 | 技術團隊 + 財務 |
+| 重複結算 | settlement_week 已存在 | 拒絕重複執行 + 告警 | 系統管理員 |
+| 信用超限 | 恢復後可用信用 < 0 | 限制信用為 0 + 人工檢查 | 風控 + 上級代理 |
+| 付款驗證失敗 | 找不到付款記錄 | 標記為逾期 + 發送催繳通知 | 代理 + 上級 |
 
 ---
 
-## Acceptance Criteria
+## 6. 信用分配業務規則
 
-- [ ] Credit limit allocation flows top-down through agent hierarchy with real-time available credit validation
-- [ ] Child agent credit allocation cannot exceed parent's available credit at any point
-- [ ] Risk alert notifications trigger automatically at 81%, 91%, and 100% credit usage thresholds
-- [ ] Credit freeze activates immediately when agent reaches 100% usage, blocking all downstream betting
-- [ ] Cascading credit monitoring recalculates parent usage within 5 seconds of child blowout
-- [ ] Position taking calculations correctly distribute win/loss across agent hierarchy (with normalization when > 100%)
-- [ ] Weekly settlement cycle completes within defined phases: Freeze (1 hour), Collection (4.5 days), Verification (18 hours)
-- [ ] Overdue payment actions escalate automatically: email (0-3 days), 50% limit reduction (4-7 days), freeze (8-14 days), suspension (15+ days)
-- [ ] Settlement exception handling correctly identifies and routes: calculation errors, duplicate settlements, over-limit conditions, payment failures
-- [ ] Position change notifications send to appropriate recipients for changes > 10% or limit changes > $10,000
-- [ ] Joint arbitrage detection flags agents with sudden position increases (> 50%) combined with large player wins (> $100k)
+| 操作類型 | 上級可用 | 下級已用 | 允許？ | 自動化動作 |
+|---------|---------|---------|--------|----------|
+| **首次分配** | >= 金額 | N/A（新建） | 是 | 建立下級記錄 |
+| **增加額度** | >= 增量 | 任意 | 是 | 上級已分配 += 增量 |
+| **減少額度** | 任意 | <= 新額度 | 是 | 上級已分配 -= 減量 |
+| **減少額度** | 任意 | > 新額度 | 否 | 拒絕：下級已用信用超過新額度 |
+| **撤銷額度** | 任意 | > 0 | 否 | 拒絕：必須先結算下級已用信用 |
+| **撤銷額度** | 任意 | = 0 | 是 | 設定下級額度 = 0，上級已分配 -= 舊額度 |
+
+### 6.1 通知觸發規則
+
+| 條件 | 觸發閾值 | 接收者 | 方式 | 示例 |
+|------|---------|--------|------|------|
+| 大額額度增加 | 增量 > $10,000 | 下級 + 上級 + 風控 | 郵件 + 簡訊 | "您的信用額度已增加至 $1.5M（+$500k）" |
+| 大額持倉變更 | 持倉變更 > 10% | 下級 + 上級 + 財務 | 郵件 | "持倉從 40% 變更為 50%" |
+| 額度撤銷 | 新額度 < 舊額度 | 下級 + 上級 | 郵件 + 應用內 | "信用額度因 [原因] 降至 $500k" |
+| 接近額度 | 已用 / 額度 > 90% | 下級 + 上級 | 郵件 + 簡訊 | "警告：92% 信用已使用（$920k / $1M）" |
+| 超出額度 | 已用 > 額度 | 下級 + 上級 + 風控 | 緊急：電話 + 郵件 | "危急：信用額度已超限。帳號已凍結。" |
+
+---
+
+## 7. 風險控制規則
+
+### 7.1 異常持倉監控
+
+如果代理突然將持倉調整為 100%，且下級玩家贏得大額，將觸發「聯合套利」告警。
+
+### 7.2 信用評分
+
+基於歷史結算準時性，代理獲得信用評分，影響可獲取的最大信用額度。
+
+### 7.3 風險場景矩陣
+
+| 風險場景 | 偵測指標 | 閾值 | 處理動作 |
+|---------|---------|------|---------|
+| **聯合套利** | 突然持倉增加 + 玩家大額盈利 | 持倉變更 > 50% 且玩家淨贏 > $100k | 凍結信用 + 人工審查 |
+| **信用欺詐** | 新代理高額申請 | 註冊 < 30 天且申請 > $50k | 降低額度 + 加強 KYC |
+| **結算逾期** | 歷史逾期率高 | 逾期 >= 3 次/年 | 降低信用評分 + 限制額度 |
+| **多帳號濫用** | 同設備多代理 | 設備指紋關聯 >= 3 個代理 | 阻止分配 + 調查 |
+
+### 7.4 爆倉的級聯影響
+
+當代理達到 100% 使用率時：
+1. 所有下級玩家自動凍結投注
+2. 系統發送保證金催繳通知
+3. 上級代理的可用信用同時減少
+4. 級聯監控：上級使用率重新計算（可能接近警戒線）
+5. 結算凍結：代理必須在週結算前彌補虧損才能恢復信用
+
+---
+
+## 驗收標準 (Acceptance Criteria)
+
+- [ ] 信用額度分配透過代理層級自上而下流動，並即時驗證可用信用
+- [ ] 下級代理信用分配在任何時間點都不得超過上級的可用信用
+- [ ] 風險告警通知在 81%、91% 和 100% 信用使用閾值時自動觸發
+- [ ] 當代理達到 100% 使用率時，信用凍結立即啟動，阻止所有下級投注
+- [ ] 級聯信用監控在下級爆倉後 5 秒內重新計算上級使用率
+- [ ] 持倉計算正確分配代理層級的輸贏（當總持倉 > 100% 時進行歸一化）
+- [ ] 週結算週期在定義的階段內完成：凍結（1 小時），收款（4.5 天），驗證（18 小時）
+- [ ] 逾期付款動作自動升級：郵件（0-3 天），50% 額度降低（4-7 天），凍結（8-14 天），暫停（15+ 天）
+- [ ] 結算異常處理正確識別並路由：計算錯誤、重複結算、超限條件、付款失敗
+- [ ] 持倉變更通知發送給適當接收者（變更 > 10% 或額度變更 > $10,000）
+- [ ] 聯合套利偵測標記突然持倉增加（> 50%）結合大額玩家盈利（> $100k）的代理
 
 ---
 
