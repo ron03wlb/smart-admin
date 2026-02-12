@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 126 (Phase 6: 6, Phase 7-8: 98, Phase 9: 22)
-> **Status**: Phase 9B IN PROGRESS — Batch 20-30 complete (55 files translated)
+> **Total Iterations**: 127 (Phase 6: 6, Phase 7-8: 98, Phase 9: 23)
+> **Status**: Phase 9B IN PROGRESS — Batch 15-31 complete (91/118 files translated)
 
 ---
 
@@ -361,7 +361,7 @@ Priority: Requirements files contain business context suited for Chinese audienc
 
 ---
 
-### 9B: Architecture Translation (118 files) [Status]
+### 9B: Architecture Translation (118 files) [IN PROGRESS]
 
 Priority: Architecture files contain technical design suited for Chinese developer audience.
 
@@ -477,14 +477,55 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/09_Infrastructure/Token_Cache_Performance.md (Token 緩存性能設計 — metadata + footer 標準化)
 - [x] architecture/09_Infrastructure/Token_Edge_Deployment.md (Token 邊緣部署與運維 — metadata + footer 標準化)
 
-#### Batch 31 — Infrastructure (5 files)
-- [ ] architecture/09_Infrastructure/Token_Validation_Architecture.md
-- [ ] architecture/09_Infrastructure/Token_Validation_Service.md
-- [ ] architecture/10_Platform_Management/Data_Pipeline_Architecture.md
-- [ ] architecture/10_Platform_Management/Notification_Architecture.md
-- [ ] architecture/10_Platform_Management/Tenant_Configuration_Architecture.md
+#### Batch 31 — Infrastructure + Platform Management (5 files) ✅ COMPLETE
+- [x] architecture/09_Infrastructure/Token_Validation_Architecture.md (Token 驗證架構 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/Token_Validation_Service.md (Token 驗證服務設計 — metadata + footer 標準化)
+- [x] architecture/10_Platform_Management/Data_Pipeline_Architecture.md (資料管道技術架構 — 標題 + metadata + footer 標準化)
+- [x] architecture/10_Platform_Management/Notification_Architecture.md (通知系統技術架構 — 標題 + metadata + footer 標準化)
+- [x] architecture/10_Platform_Management/Tenant_Configuration_Architecture.md (租戶配置技術架構 — 標題 + metadata + footer 標準化)
 
-**Phase 9B Status**: Batch 20-31 added (60 files). Ready for Ralph Loop execution.
+**Phase 9B Status**: Batch 15-31 complete (91 files). Remaining: 27 files in directories 11-15 (Frontend, Security, Customer Service, Third Party, Responsible Gambling).
+
+#### Batch 32 — Frontend (5 files)
+- [ ] architecture/11_Frontend/AB_Testing_Framework.md
+- [ ] architecture/11_Frontend/Banner_Announcement.md
+- [ ] architecture/11_Frontend/Dynamic_Content_Localization.md
+- [ ] architecture/11_Frontend/Frontend_Layout_Engine.md
+- [ ] architecture/11_Frontend/i18n_Localization.md
+
+#### Batch 33 — Frontend (5 files)
+- [ ] architecture/11_Frontend/Localization_API.md
+- [ ] architecture/11_Frontend/Localization_Workflow.md
+- [ ] architecture/11_Frontend/Marketing_Compliance.md
+- [ ] architecture/11_Frontend/Mobile_App_Architecture.md
+- [ ] architecture/11_Frontend/README.md
+
+#### Batch 34 — Frontend + Security (5 files)
+- [ ] architecture/11_Frontend/SEO_Performance.md
+- [ ] architecture/12_Security/Blind_Index_Architecture.md
+- [ ] architecture/12_Security/Data_Portability_SAR.md
+- [ ] architecture/12_Security/Data_Security_Standard.md
+- [ ] architecture/12_Security/Encryption_Strategy.md
+
+#### Batch 35 — Security (5 files)
+- [ ] architecture/12_Security/GDPR_Data_Deletion.md
+- [ ] architecture/12_Security/ISO27001_Mapping.md
+- [ ] architecture/12_Security/MITM_Detection.md
+- [ ] architecture/12_Security/Payment_Restrictions.md
+- [ ] architecture/12_Security/PCI_DSS_v4_Implementation_Guide.md
+
+#### Batch 36 — Security + CS + Third Party + Responsible Gambling (7 files)
+- [ ] architecture/12_Security/README.md
+- [ ] architecture/12_Security/UK_RTS_Security.md
+- [ ] architecture/13_Customer_Service/CS_Operations_Architecture.md
+- [ ] architecture/13_Customer_Service/CS_Platform_Architecture.md
+- [ ] architecture/14_Third_Party/Third_Party_Integration_Architecture.md
+- [ ] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md
+- [ ] architecture/15_Responsible_Gambling/Player_Protection_API.md
+
+#### Batch 37 — Responsible Gambling (2 files)
+- [ ] architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md
+- [ ] architecture/15_Responsible_Gambling/Session_Protection_Architecture.md
 
 **Phase 9B COMPLETE**: [Summary when done]
 
@@ -557,4 +598,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9B IN PROGRESS — Batch 20-30 complete (55 files: Game Integration + Activity Engine + Risk Engine + Platform Core + Agent/Analytics + Infrastructure)
+**Status**: Phase 9B IN PROGRESS — Batch 15-31 complete (91/118 architecture files), Batch 32-37 remaining (27 files: Frontend, Security, CS, Third Party, Responsible Gambling)
