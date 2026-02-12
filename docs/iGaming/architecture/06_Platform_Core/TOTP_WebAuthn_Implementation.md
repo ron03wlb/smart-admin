@@ -1,15 +1,15 @@
-# TOTP 與 WebAuthn 技術實作
+# TOTP 與 WebAuthn 技術實作（TOTP and WebAuthn Implementation）
 
-> **Canonical Source**: [06-06-02_TOTP_WebAuthn.md](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: None (pure technical)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [06-06-02_TOTP_WebAuthn.md](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
+> **目標讀者**: Architects, Backend Developers
+> **業務需求**: None (pure technical)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1. TOTP 實施原理
+## 1. TOTP 實施原理（TOTP Implementation Principles）
 
-### 1.1 RFC 6238 算法
+### 1.1 RFC 6238 算法（RFC 6238 Algorithm）
 
 **TOTP（Time-based One-Time Password）** 基於 [RFC 6238](https://tools.ietf.org/html/rfc6238) 標準。
 
@@ -85,7 +85,7 @@ print(f"當前 TOTP 驗證碼：{totp_code}")
 
 ---
 
-### 1.2 密鑰生成與共享
+### 1.2 密鑰生成與共享（Secret Generation and Sharing）
 
 **密鑰生成實現**（Java）：
 
@@ -150,7 +150,7 @@ admin@smartadmin.com
 
 ---
 
-### 1.3 密鑰存儲設計
+### 1.3 密鑰存儲設計（Secret Storage Design）
 
 **資料庫 Schema**（PostgreSQL）：
 
@@ -237,15 +237,15 @@ public class TotpSecretEncryption {
 
 ---
 
-## 2. 時間同步處理
+## 2. 時間同步處理（Time Synchronization Handling）
 
-### 2.1 問題描述
+### 2.1 問題描述（Problem Description）
 
 服務器時間與用戶設備時間可能不同步（時差 +/- 5 分鐘）。
 
 **解決方案**：允許 +/- 1 個時間窗口（即驗證前後各 30 秒的驗證碼）。
 
-### 2.2 驗證邏輯實現
+### 2.2 驗證邏輯實現（Verification Logic Implementation）
 
 ```java
 import java.time.Instant;
@@ -284,7 +284,7 @@ public class TotpValidator {
 }
 ```
 
-### 2.3 時間同步測試矩陣
+### 2.3 時間同步測試矩陣（Time Sync Test Matrix）
 
 | 服務器時間 | 用戶設備時間 | 時間差 | 驗證結果 | 說明 |
 |-----------|------------|-------|---------|------|
@@ -294,7 +294,7 @@ public class TotpValidator {
 | 10:00:00 | 10:01:05 | +65s | 失敗 | 超出 +/- 1 窗口範圍 |
 | 10:00:00 | 09:59:25 | -35s | 成功 | 前一個窗口（允許 -1） |
 
-### 2.4 NTP 時間同步配置
+### 2.4 NTP 時間同步配置（NTP Time Sync Configuration）
 
 ```bash
 # 服務器端配置 NTP 自動同步
@@ -313,9 +313,9 @@ ntpq -p
 
 ---
 
-## 3. TOTP 註冊與 WebAuthn 註冊流程
+## 3. TOTP 註冊與 WebAuthn 註冊流程（TOTP and WebAuthn Registration Flow）
 
-### 3.1 端對端註冊序列圖
+### 3.1 端對端註冊序列圖（End-to-End Registration Sequence Diagram）
 
 以下流程圖展示了 TOTP 註冊和 WebAuthn 註冊的完整序列：
 
@@ -410,7 +410,7 @@ sequenceDiagram
     Note over U,DB: 後續登入可使用 TOTP 或 WebAuthn
 ```
 
-### 3.2 TOTP vs WebAuthn 比較
+### 3.2 TOTP vs WebAuthn 比較（TOTP vs WebAuthn Comparison）
 
 | 特性 | TOTP (Google Authenticator) | WebAuthn (生物識別) |
 |------|---------------------------|-------------------|
@@ -420,7 +420,7 @@ sequenceDiagram
 | **離線可用** | 5/5 (完全離線) | 2/5 (需設備連接) |
 | **實施複雜度** | 2/5 (簡單) | 4/5 (需前端集成) |
 
-### 3.3 WebAuthn 資料庫 Schema
+### 3.3 WebAuthn 資料庫結構（WebAuthn Database Schema）
 
 ```sql
 CREATE TABLE t_webauthn_credential (
@@ -438,7 +438,7 @@ CREATE INDEX idx_webauthn_user_id ON t_webauthn_credential(user_id);
 CREATE INDEX idx_webauthn_credential_id ON t_webauthn_credential(credential_id);
 ```
 
-### 3.4 關鍵安全機制
+### 3.4 關鍵安全機制（Key Security Mechanisms）
 
 **TOTP 密鑰保護**:
 - ✅ 密鑰使用 AES-256-GCM 加密存儲
@@ -454,7 +454,7 @@ CREATE INDEX idx_webauthn_credential_id ON t_webauthn_credential(credential_id);
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [MFA_Technical_Architecture.md](./MFA_Technical_Architecture.md) - MFA 系統架構設計
 - [MFA_Compliance_Validation.md](./MFA_Compliance_Validation.md) - 合規驗證技術設計

@@ -1,13 +1,13 @@
-# MFA 技術架構設計
+# MFA 技術架構設計（MFA Technical Architecture Design）
 
-> **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
+> **目標讀者**: Architects, Backend Developers
+> **業務需求**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1. 架構概覽
+## 1. 架構概覽（Architecture Overview）
 
 SmartAdmin iGaming 平台採用 **TOTP（主要）+ SMS OTP（備用）+ Email OTP（最後備用）+ Backup Codes（離線恢復）** 的四層 MFA 架構。
 
@@ -15,9 +15,9 @@ SmartAdmin iGaming 平台採用 **TOTP（主要）+ SMS OTP（備用）+ Email O
 
 ---
 
-## 2. MFA 驗證流程架構
+## 2. MFA 驗證流程架構（MFA Verification Flow Architecture）
 
-### 2.1 驗證入口流程
+### 2.1 驗證入口流程（Verification Entry Flow）
 
 ```mermaid
 graph TD
@@ -38,7 +38,7 @@ graph TD
     I -->|No| B
 ```
 
-### 2.2 方法優先級設計
+### 2.2 方法優先級設計（Method Priority Design）
 
 | 優先級 | 方法 | 觸發條件 | 安全級別 |
 |-------|------|---------|---------|
@@ -49,7 +49,7 @@ graph TD
 
 ---
 
-## 3. MFA 方法選擇決策架構
+## 3. MFA 方法選擇決策架構（MFA Method Selection Decision Architecture）
 
 ```mermaid
 graph TD
@@ -75,9 +75,9 @@ graph TD
 
 ---
 
-## 4. 安全設計
+## 4. 安全設計（Security Design）
 
-### 4.1 威脅建模與 MFA 防禦對照
+### 4.1 威脅建模與 MFA 防禦對照（Threat Modeling and MFA Defense Mapping）
 
 | 威脅類型（STRIDE） | 攻擊場景 | MFA 技術防禦機制 |
 |---------|---------|-----------|
@@ -88,7 +88,7 @@ graph TD
 | **DoS** | 暴力破解登入 | 3 次失敗鎖定 15 分鐘 + Rate Limiting |
 | **Elevation of Privilege** | 橫向移動攻擊 | 高權限角色強制 MFA，權限升級需重新驗證 |
 
-### 4.2 CVSS 3.1 風險評分
+### 4.2 CVSS 3.1 風險評分（CVSS 3.1 Risk Scoring）
 
 ```
 無 MFA 的後台登入系統：
@@ -108,7 +108,7 @@ User Interaction = Required (R) ← 需要受害者掃描 QR Code
 
 MFA 可將安全風險從 High（8.1）降低至 Medium（4.3），降低約 47% 風險。
 
-### 4.3 失敗鎖定機制設計
+### 4.3 失敗鎖定機制設計（Failure Lockout Mechanism Design）
 
 ```mermaid
 graph LR
@@ -122,7 +122,7 @@ graph LR
 
 ---
 
-## 5. 合規技術映射
+## 5. 合規技術映射（Compliance Technical Mapping）
 
 | 合規標準 | 技術要求 | 架構實現 |
 |---------|---------|---------|
@@ -143,7 +143,7 @@ graph LR
 
 ---
 
-## 6. 實施階段
+## 6. 實施階段（Implementation Phases）
 
 | 階段 | 時間範圍 | 技術內容 | 驗收標準 |
 |------|---------|---------|---------|
@@ -153,9 +153,9 @@ graph LR
 
 ---
 
-## 7. SmartAdmin Implementation
+## 7. SmartAdmin 實作（SmartAdmin Implementation）
 
-### 7.1 Service Layer
+### 7.1 Service 層（Service Layer）
 
 ```java
 @Service
@@ -187,7 +187,7 @@ public class MfaService {
 }
 ```
 
-### 7.2 Manager Layer
+### 7.2 Manager 層（Manager Layer）
 
 ```java
 @Component
@@ -222,7 +222,7 @@ public class MfaManager {
 }
 ```
 
-### 7.3 Database Schema
+### 7.3 資料庫結構（Database Schema）
 
 ```sql
 -- MFA secret storage with AES-256-GCM encryption
@@ -258,7 +258,7 @@ CREATE INDEX idx_mfa_audit_user ON t_mfa_audit_log(user_id, created_at DESC);
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md) - MFA 業務需求與方法選擇
 - [TOTP_WebAuthn_Implementation.md](./TOTP_WebAuthn_Implementation.md) - TOTP 算法實現與密鑰管理

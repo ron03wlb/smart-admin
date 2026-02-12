@@ -1,32 +1,32 @@
-# Multi-Tenant Architecture
+# 多租戶架構（Multi-Tenant Architecture）
 
-> **Business Requirements**: [Multi_Tenant_Requirements.md](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md)
-> **Canonical Source**: [`docs/iGaming/source-archive/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Last Synced**: 2026-02-09
+> **業務需求**: [Multi_Tenant_Requirements.md](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md)
+> **規範來源**: [`docs/iGaming/source-archive/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
+> **目標讀者**: Architects, Backend Developers, DevOps Engineers
+> **最後同步**: 2026-02-09
 
 ---
 
-## 1. Architecture Overview
+## 1. 架構概覽（Architecture Overview）
 
 ```mermaid
 graph TB
-    subgraph Platform["Platform Layer"]
-        SA[Super Admin]
+    subgraph Platform["平台層"]
+        SA[超級管理員]
     end
 
-    subgraph Brand_A["Brand A"]
-        BA[Brand Admin]
-        subgraph Tenants_A["Tenants"]
-            T1[Tenant 1<br/>site1.com]
-            T2[Tenant 2<br/>site2.com]
+    subgraph Brand_A["品牌 A"]
+        BA[品牌管理員]
+        subgraph Tenants_A["租戶"]
+            T1[租戶 1<br/>site1.com]
+            T2[租戶 2<br/>site2.com]
         end
     end
 
-    subgraph Brand_B["Brand B"]
-        BB[Brand Admin]
-        subgraph Tenants_B["Tenants"]
-            T3[Tenant 3<br/>site3.com]
+    subgraph Brand_B["品牌 B"]
+        BB[品牌管理員]
+        subgraph Tenants_B["租戶"]
+            T3[租戶 3<br/>site3.com]
         end
     end
 
@@ -36,29 +36,29 @@ graph TB
     BA --> T2
     BB --> T3
 
-    T1 --> A1[Agents]
-    T2 --> A2[Agents]
-    T3 --> A3[Agents]
+    T1 --> A1[代理]
+    T2 --> A2[代理]
+    T3 --> A3[代理]
 ```
 
-**Hierarchy**: `Super Admin -> Brand -> Tenant -> Agent`
+**層級結構**: `超級管理員 -> 品牌 -> 租戶 -> 代理`
 
 ---
 
-## 2. Database Partitioning Strategy
+## 2. 資料庫分區策略（Database Partitioning Strategy）
 
-### 2.1 Data Isolation Approaches
+### 2.1 資料隔離方法（Data Isolation Approaches）
 
 ```mermaid
 graph LR
-    subgraph Option_1["Option 1: Database per Tenant"]
-        DB1[(Tenant 1 DB)]
-        DB2[(Tenant 2 DB)]
-        DB3[(Tenant 3 DB)]
+    subgraph Option_1["方案 1：每個租戶一個資料庫"]
+        DB1[(租戶 1 DB)]
+        DB2[(租戶 2 DB)]
+        DB3[(租戶 3 DB)]
     end
 
-    subgraph Option_2["Option 2: Schema per Tenant"]
-        DB_Main[(Main DB)]
+    subgraph Option_2["方案 2：每個租戶一個 Schema"]
+        DB_Main[(主資料庫)]
         S1[Schema: tenant_1]
         S2[Schema: tenant_2]
         S3[Schema: tenant_3]
@@ -67,22 +67,22 @@ graph LR
         DB_Main --> S3
     end
 
-    subgraph Option_3["Option 3: Row-Level Security"]
-        DB_Shared[(Shared DB)]
+    subgraph Option_3["方案 3：行級安全（Row-Level Security）"]
+        DB_Shared[(共享資料庫)]
         RLS[PostgreSQL RLS]
         DB_Shared --> RLS
     end
 ```
 
-| Strategy | Isolation Level | Cost | Cross-Tenant Query | Recommendation |
+| 策略 | 隔離級別 | 成本 | 跨租戶查詢 | 建議 |
 |----------|-----------------|------|-------------------|----------------|
-| Database per Tenant | Highest | High | Complex | Enterprise customers |
-| Schema per Tenant | Medium | Medium | Moderate | Mid-size deployments |
-| Row-Level (RLS) | Adequate | Low | Simple | **Recommended (SmartAdmin)** |
+| 每個租戶一個資料庫 | 最高 | 高 | 複雜 | 企業客戶 |
+| 每個租戶一個 Schema | 中等 | 中等 | 適中 | 中型部署 |
+| 行級安全（RLS） | 充足 | 低 | 簡單 | **建議（SmartAdmin）** |
 
-### 2.2 Recommended: Row-Level Security with PostgreSQL RLS
+### 2.2 建議方案：PostgreSQL RLS 行級安全（Row-Level Security）
 
-**PostgreSQL RLS Policy Implementation**:
+**PostgreSQL RLS 策略實作**：
 
 ```sql
 -- Enable RLS on player table
@@ -101,7 +101,7 @@ CREATE POLICY brand_access_policy ON t_player
     );
 ```
 
-**Session Context Setup**:
+**Session 上下文設定**：
 
 ```sql
 -- Set tenant context at connection start
@@ -112,9 +112,9 @@ SET app.is_super_admin = 'FALSE';
 
 ---
 
-## 3. API Tenant Context Propagation
+## 3. API 租戶上下文傳播（API Tenant Context Propagation）
 
-### 3.1 JWT Token Structure
+### 3.1 JWT Token 結構
 
 ```json
 {
@@ -128,7 +128,7 @@ SET app.is_super_admin = 'FALSE';
 }
 ```
 
-### 3.2 Tenant Context Holder (ThreadLocal)
+### 3.2 租戶上下文持有者（Tenant Context Holder）（ThreadLocal）
 
 ```java
 /**
@@ -177,7 +177,7 @@ public class TenantContext {
 }
 ```
 
-### 3.3 Tenant Filter Interceptor
+### 3.3 租戶過濾器攔截器（Tenant Filter Interceptor）
 
 ```java
 /**
@@ -234,9 +234,9 @@ public class TenantInterceptor implements HandlerInterceptor {
 
 ---
 
-## 4. MyBatis-Plus Tenant Plugin
+## 4. MyBatis-Plus 租戶插件（MyBatis-Plus Tenant Plugin）
 
-### 4.1 Tenant Line Handler Configuration
+### 4.1 租戶行處理器配置（Tenant Line Handler Configuration）
 
 ```java
 /**
@@ -290,7 +290,7 @@ public class MybatisPlusTenantConfig {
 }
 ```
 
-### 4.2 Entity Base Class
+### 4.2 Entity 基礎類別
 
 ```java
 /**
@@ -327,33 +327,33 @@ public abstract class TenantBaseEntity {
 
 ---
 
-## 5. Impersonation Implementation
+## 5. 模擬實作（Impersonation Implementation）
 
-### 5.1 Admin Impersonation Flow
+### 5.1 管理員模擬流程（Admin Impersonation Flow）
 
 ```mermaid
 sequenceDiagram
-    participant SA as Super Admin
+    participant SA as 超級管理員
     participant API as API Gateway
     participant Auth as Auth Service
     participant Backend as Backend Service
     participant DB as Database
 
     SA->>API: POST /admin/impersonate<br/>{targetTenantId: 789}
-    API->>Auth: Validate super admin role
-    Auth-->>API: Authorized
-    API->>Auth: Generate impersonation token
+    API->>Auth: 驗證超級管理員角色
+    Auth-->>API: 已授權
+    API->>Auth: 生成模擬 token
     Auth-->>API: JWT with impersonated_tenant_id
     API-->>SA: Set-Cookie: impersonation_token
 
     SA->>API: GET /tenant/players<br/>Cookie: impersonation_token
     API->>Backend: Forward with X-Impersonate-Tenant: 789
     Backend->>DB: Query with tenant_id = 789
-    DB-->>Backend: Tenant 789 data
-    Backend-->>SA: Player list (Tenant 789)
+    DB-->>Backend: 租戶 789 資料
+    Backend-->>SA: 玩家列表（租戶 789）
 ```
 
-### 5.2 Impersonation Service
+### 5.2 模擬服務（Impersonation Service）
 
 ```java
 /**
@@ -421,9 +421,9 @@ public class ImpersonationService {
 
 ---
 
-## 6. Brand-Level Aggregation Queries
+## 6. 品牌級別聚合查詢（Brand-Level Aggregation Queries）
 
-### 6.1 Cross-Tenant Report Query
+### 6.1 跨租戶報表查詢（Cross-Tenant Report Query）
 
 ```java
 /**
@@ -472,7 +472,7 @@ public class BrandReportService {
 }
 ```
 
-### 6.2 SQL for Brand Aggregation
+### 6.2 品牌聚合 SQL（SQL for Brand Aggregation）
 
 ```sql
 -- Brand-level financial summary
@@ -497,41 +497,41 @@ ORDER BY t.tenant_name;
 
 ---
 
-## 7. Tenant Data Migration
+## 7. 租戶資料遷移（Tenant Data Migration）
 
-### 7.1 Cross-Brand Transfer Process
+### 7.1 跨品牌轉移流程（Cross-Brand Transfer Process）
 
 ```mermaid
 stateDiagram-v2
     [*] --> ValidationPhase
 
-    ValidationPhase --> PreparationPhase: All checks passed
-    ValidationPhase --> [*]: Validation failed
+    ValidationPhase --> PreparationPhase: 所有檢查通過
+    ValidationPhase --> [*]: 驗證失敗
 
-    PreparationPhase --> MigrationPhase: Backups complete
+    PreparationPhase --> MigrationPhase: 備份完成
 
-    MigrationPhase --> VerificationPhase: Data transferred
+    MigrationPhase --> VerificationPhase: 資料已轉移
 
-    VerificationPhase --> CompletionPhase: Integrity verified
-    VerificationPhase --> RollbackPhase: Verification failed
+    VerificationPhase --> CompletionPhase: 完整性已驗證
+    VerificationPhase --> RollbackPhase: 驗證失敗
 
-    RollbackPhase --> [*]: Rollback complete
-    CompletionPhase --> [*]: Migration complete
+    RollbackPhase --> [*]: 回滾完成
+    CompletionPhase --> [*]: 遷移完成
 
     note right of ValidationPhase
-        Check data integrity
-        Verify target brand capacity
-        Confirm regulatory compliance
+        檢查資料完整性
+        驗證目標品牌容量
+        確認法規合規性
     end note
 
     note right of MigrationPhase
-        Update brand_id references
-        Transfer configuration
-        Migrate player data
+        更新 brand_id 引用
+        轉移配置
+        遷移玩家資料
     end note
 ```
 
-### 7.2 Migration Service
+### 7.2 遷移服務（Migration Service）
 
 ```java
 /**
@@ -597,9 +597,9 @@ public class TenantMigrationManager {
 
 ---
 
-## 8. SmartAdmin Multi-Tenant Implementation
+## 8. SmartAdmin 多租戶實作（SmartAdmin Multi-Tenant Implementation）
 
-### 8.1 Module Structure
+### 8.1 模組結構（Module Structure）
 
 ```
 smartadmin-modules/
@@ -621,7 +621,7 @@ smartadmin-modules/
 │               └── vo/TenantVO.java
 ```
 
-### 8.2 Controller Layer
+### 8.2 Controller 層
 
 ```java
 /**
@@ -658,7 +658,7 @@ public class TenantController {
 }
 ```
 
-### 8.3 Service Layer (with Vavr Option)
+### 8.3 Service 層（使用 Vavr Option）
 
 ```java
 /**
@@ -716,14 +716,14 @@ public class TenantService {
 
 ---
 
-## Related Documents
+## 相關文件（Related Documents）
 
-### Architecture References
-- RBAC Architecture *(planned)* - Permission system implementation
-- Audit Log Architecture *(planned)* - Tenant operation auditing
+### 架構參考（Architecture References）
+- RBAC Architecture *(planned)* - 權限系統實作
+- Audit Log Architecture *(planned)* - 租戶操作審計
 
-### Business Requirements
-- [Multi-Tenant Requirements](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md) - Business requirements view
+### 業務需求（Business Requirements）
+- [Multi-Tenant Requirements](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md) - 業務需求視圖
 
 ---
 

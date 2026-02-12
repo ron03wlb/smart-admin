@@ -1,29 +1,29 @@
-# MFA Technical Evaluation - TOTP, SMS, and WebAuthn
+# MFA 技術評估（MFA Technical Evaluation）— TOTP、SMS 與 WebAuthn
 
-> **Business Requirements**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md)
-> **Audience**: Security Engineers, Backend Developers, Compliance Officers
-> **Last Synced**: 2026-02-09
+> **業務需求**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md)
+> **目標讀者**: Security Engineers、Backend Developers、Compliance Officers
+> **最後同步**: 2026-02-09
 
 ---
 
-## 1. TOTP (Time-Based One-Time Password) RFC 6238
+## 1. TOTP（Time-Based One-Time Password）RFC 6238
 
-### 1.1 Technical Specification
+### 1.1 技術規格（Technical Specification）
 
-**Standard**: RFC 6238 (TOTP: Time-Based One-Time Password Algorithm)
-**Published**: May 2011
-**IETF Status**: Informational
+**標準**: RFC 6238（TOTP: Time-Based One-Time Password Algorithm）
+**發布時間**: 2011年5月
+**IETF 狀態**: Informational
 
-**Algorithm Components**:
-1. **Shared Secret**: Base32-encoded secret key (minimum 160 bits)
-2. **Time Step**: 30 seconds (X = 30)
-3. **Hash Function**: HMAC-SHA1 (default), HMAC-SHA256, or HMAC-SHA512
-4. **Code Length**: 6 digits (recommended) or 8 digits
-5. **Time Window**: ±1 time step (allowing for clock skew)
+**演算法組件**:
+1. **共享密鑰（Shared Secret）**: Base32 編碼的密鑰（最小 160 位元）
+2. **時間步長（Time Step）**: 30 秒（X = 30）
+3. **雜湊函數（Hash Function）**: HMAC-SHA1（預設）、HMAC-SHA256 或 HMAC-SHA512
+4. **驗證碼長度（Code Length）**: 6 位數（建議）或 8 位數
+5. **時間窗口（Time Window）**: ±1 時間步長（允許時鐘偏移）
 
-### 1.2 TOTP Algorithm Implementation
+### 1.2 TOTP 演算法實作（TOTP Algorithm Implementation）
 
-**Formula**:
+**公式**:
 ```
 TOTP(K, T) = HOTP(K, (T - T0) / X)
 
@@ -35,7 +35,7 @@ Where:
 - HOTP: HMAC-based One-Time Password Algorithm (RFC 4226)
 ```
 
-### 1.3 Java Implementation
+### 1.3 Java 實作（Java Implementation）
 
 **TOTPGenerator.java**:
 
@@ -140,7 +140,7 @@ public class TOTPGenerator {
 }
 ```
 
-### 1.4 Secret Generation
+### 1.4 密鑰生成（Secret Generation）
 
 **SecretGenerator.java**:
 
@@ -194,23 +194,23 @@ public class MFASecretGenerator {
 
 ---
 
-## 2. TOTP Secret Encryption
+## 2. TOTP 密鑰加密（TOTP Secret Encryption）
 
-### 2.1 Encryption Standard: AES-256-GCM
+### 2.1 加密標準（Encryption Standard）: AES-256-GCM
 
-**Algorithm**: AES (Advanced Encryption Standard)
-**Mode**: GCM (Galois/Counter Mode) - AEAD (Authenticated Encryption with Associated Data)
-**Key Size**: 256 bits
-**IV Size**: 96 bits (12 bytes) - recommended for GCM
-**Tag Size**: 128 bits (16 bytes) - for authentication
+**演算法**: AES（Advanced Encryption Standard）
+**模式**: GCM（Galois/Counter Mode）- AEAD（Authenticated Encryption with Associated Data）
+**金鑰大小**: 256 位元
+**IV 大小**: 96 位元（12 位元組）- GCM 建議值
+**標籤大小**: 128 位元（16 位元組）- 用於驗證
 
-**Why GCM Mode**:
-- ✅ Provides both confidentiality and authenticity
-- ✅ Resistant to bit-flipping attacks
-- ✅ High performance (hardware acceleration)
-- ✅ NIST recommended (SP 800-38D)
+**為何使用 GCM 模式**:
+- ✅ 同時提供機密性與真實性
+- ✅ 抵抗位元翻轉攻擊
+- ✅ 高效能（硬體加速）
+- ✅ NIST 建議（SP 800-38D）
 
-### 2.2 Secret Encryption Implementation
+### 2.2 密鑰加密實作（Secret Encryption Implementation）
 
 **MFASecretEncryptor.java**:
 
@@ -332,9 +332,9 @@ public class MFASecretEncryptor {
 }
 ```
 
-### 2.3 Database Storage
+### 2.3 資料庫儲存（Database Storage）
 
-**MFA Secret Storage Schema**:
+**MFA 密鑰儲存架構**:
 
 ```sql
 CREATE TABLE t_user_mfa (
@@ -357,146 +357,146 @@ CREATE INDEX idx_user_mfa_user_id ON t_user_mfa(user_id) WHERE enabled = TRUE;
 
 ---
 
-## 3. SMS Security Threat Analysis
+## 3. SMS 安全威脅分析（SMS Security Threat Analysis）
 
-### 3.1 SIM Swap Attack
+### 3.1 SIM 卡交換攻擊（SIM Swap Attack）
 
-**Attack Mechanism**:
-1. Attacker obtains victim's personal information (social engineering)
-2. Attacker contacts mobile carrier, impersonates victim
-3. Carrier transfers victim's phone number to attacker's SIM card
-4. Attacker receives all SMS messages, including OTP codes
+**攻擊機制**:
+1. 攻擊者獲取受害者個人資訊（社交工程）
+2. 攻擊者聯繫電信業者，冒充受害者
+3. 業者將受害者電話號碼轉移至攻擊者的 SIM 卡
+4. 攻擊者接收所有簡訊，包含 OTP 驗證碼
 
-**Technical Flow**:
+**技術流程**:
 ```
-Attacker → Social Engineering → Mobile Carrier
-                                    ↓
-                            SIM Swap Authorized
-                                    ↓
-                    Victim's Number → Attacker's SIM
-                                    ↓
-                            SMS OTP Delivered to Attacker
+攻擊者 → 社交工程 → 電信業者
+                        ↓
+                SIM 卡交換授權
+                        ↓
+        受害者號碼 → 攻擊者 SIM 卡
+                        ↓
+                SMS OTP 傳送至攻擊者
 ```
 
-**Mitigation Strategies**:
-- ✅ Require additional verification for SIM swap requests (PIN, security questions)
-- ✅ Alert users via email when SIM swap detected
-- ✅ Lock MFA settings requiring existing MFA verification to disable
-- ⚠️ Deprecate SMS OTP in favor of TOTP
+**緩解策略**:
+- ✅ SIM 卡交換請求需額外驗證（PIN、安全問題）
+- ✅ 偵測到 SIM 卡交換時透過電子郵件通知使用者
+- ✅ 鎖定 MFA 設定，停用時需現有 MFA 驗證
+- ⚠️ 淘汰 SMS OTP，改用 TOTP
 
-**Real-World Cases**:
-- 2019: Twitter CEO Jack Dorsey's account hacked via SIM swap
-- 2020: $100M+ stolen from cryptocurrency accounts via SIM swap
+**真實案例**:
+- 2019: Twitter CEO Jack Dorsey 帳號透過 SIM 卡交換被駭
+- 2020: 超過 1 億美元加密貨幣帳戶透過 SIM 卡交換被盜
 
-### 3.2 SS7 Protocol Vulnerability
+### 3.2 SS7 協議漏洞（SS7 Protocol Vulnerability）
 
-**SS7 (Signaling System 7)**: Legacy telecom protocol for routing SMS and calls.
+**SS7（Signaling System 7）**: 用於路由簡訊和通話的傳統電信協議。
 
-**Vulnerability**:
-- SS7 allows trusted network nodes to query subscriber location
-- Attackers with access to SS7 network can intercept SMS messages
-- No authentication required for some SS7 commands
+**漏洞**:
+- SS7 允許受信任網路節點查詢用戶位置
+- 擁有 SS7 網路存取權的攻擊者可攔截簡訊
+- 部分 SS7 指令不需驗證
 
-**Attack Flow**:
+**攻擊流程**:
 ```
-Attacker → SS7 Network Access (purchased from dark web)
+攻擊者 → SS7 網路存取（暗網購買）
               ↓
-        Send Location Update (HLR query)
+        發送位置更新（HLR 查詢）
               ↓
-        Intercept SMS OTP (without SIM swap)
+        攔截 SMS OTP（無需 SIM 卡交換）
 ```
 
-**Mitigation**:
-- Mobile carriers must implement SS7 firewalls
-- Platform cannot directly mitigate (carrier-level issue)
-- **Solution**: Deprecate SMS OTP entirely for high-security operations
+**緩解措施**:
+- 電信業者必須實施 SS7 防火牆
+- 平台無法直接緩解（業者層級問題）
+- **解決方案**: 完全淘汰 SMS OTP，改用高安全性操作
 
-### 3.3 SMS OTP Deprecation Timeline (NIST)
+### 3.3 SMS OTP 淘汰時間表（SMS OTP Deprecation Timeline）（NIST）
 
-**NIST SP 800-63B (Digital Identity Guidelines)**:
+**NIST SP 800-63B（數位身分指南）**:
 
-> "Due to the risk that SMS messages may be intercepted or redirected, implementers of new systems SHOULD carefully consider alternative authenticators."
-> - **NIST SP 800-63B** (June 2017, Section 5.1.3.2)
+> "由於 SMS 訊息可能被攔截或重新導向的風險，新系統的實作者應仔細考慮替代驗證器。"
+> - **NIST SP 800-63B**（2017年6月，第 5.1.3.2 節）
 
-**Industry Deprecation Timeline**:
-- **2017**: NIST recommends against SMS OTP for new systems
-- **2020**: Google deprecates SMS OTP for Workspace admins
-- **2021**: Microsoft deprecates SMS OTP for Azure AD (requires TOTP or hardware token)
-- **2023**: Apple deprecates SMS for Apple ID (requires TOTP or hardware key)
-- **2025**: EU PSD2 SCA regulations phase out SMS OTP
+**產業淘汰時間表**:
+- **2017**: NIST 建議新系統不使用 SMS OTP
+- **2020**: Google 淘汰 Workspace 管理員的 SMS OTP
+- **2021**: Microsoft 淘汰 Azure AD 的 SMS OTP（需使用 TOTP 或硬體權杖）
+- **2023**: Apple 淘汰 Apple ID 的 SMS（需使用 TOTP 或硬體金鑰）
+- **2025**: 歐盟 PSD2 SCA 法規逐步淘汰 SMS OTP
 
-**Recommendation**: Use SMS OTP only as fallback for low-risk operations; mandate TOTP for admins.
+**建議**: 僅將 SMS OTP 作為低風險操作的備用方案；管理員強制使用 TOTP。
 
 ---
 
-## 4. FIDO2 / WebAuthn Standards
+## 4. FIDO2 / WebAuthn 標準（FIDO2 / WebAuthn Standards）
 
-### 4.1 FIDO2 Overview
+### 4.1 FIDO2 概述（FIDO2 Overview）
 
 **FIDO2 = CTAP + WebAuthn**:
-- **CTAP (Client-to-Authenticator Protocol)**: Communication between browser and hardware token (e.g., YubiKey)
-- **WebAuthn (Web Authentication API)**: Browser API for passwordless authentication
+- **CTAP（Client-to-Authenticator Protocol）**: 瀏覽器與硬體權杖（如 YubiKey）之間的通訊
+- **WebAuthn（Web Authentication API）**: 用於無密碼驗證的瀏覽器 API
 
-**Key Benefits**:
-- ✅ Phishing-resistant (private key never leaves hardware)
-- ✅ No shared secrets (asymmetric cryptography)
-- ✅ Hardware-backed security (TPM, Secure Enclave)
-- ✅ Industry standard (W3C + FIDO Alliance)
+**主要優勢**:
+- ✅ 抗網路釣魚（私鑰永不離開硬體）
+- ✅ 無共享密鑰（非對稱加密）
+- ✅ 硬體支援的安全性（TPM、Secure Enclave）
+- ✅ 產業標準（W3C + FIDO Alliance）
 
-### 4.2 WebAuthn Registration Flow
+### 4.2 WebAuthn 註冊流程（WebAuthn Registration Flow）
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Browser
-    participant Platform
-    participant Authenticator as Hardware Token
+    participant User as 使用者
+    participant Browser as 瀏覽器
+    participant Platform as 平台
+    participant Authenticator as 硬體權杖
 
-    User->>Browser: Click "Add Security Key"
+    User->>Browser: 點擊「新增安全金鑰」
     Browser->>Platform: POST /api/mfa/webauthn/register/challenge
     Platform-->>Browser: Challenge + options (JSON)
 
     Browser->>Authenticator: navigator.credentials.create()
-    Authenticator->>User: Prompt (touch sensor, PIN)
-    User->>Authenticator: Confirm
+    Authenticator->>User: 提示（觸碰感應器、PIN）
+    User->>Authenticator: 確認
 
-    Authenticator->>Authenticator: Generate key pair (private key stored)
-    Authenticator-->>Browser: Public key + attestation
+    Authenticator->>Authenticator: 生成金鑰對（私鑰儲存）
+    Authenticator-->>Browser: 公鑰 + attestation
 
     Browser->>Platform: POST /api/mfa/webauthn/register/verify
-    Platform->>Platform: Verify attestation
-    Platform->>Platform: Store public key + credential ID
-    Platform-->>Browser: Registration success
+    Platform->>Platform: 驗證 attestation
+    Platform->>Platform: 儲存公鑰 + credential ID
+    Platform-->>Browser: 註冊成功
 ```
 
-### 4.3 WebAuthn Authentication Flow
+### 4.3 WebAuthn 驗證流程（WebAuthn Authentication Flow）
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Browser
-    participant Platform
-    participant Authenticator as Hardware Token
+    participant User as 使用者
+    participant Browser as 瀏覽器
+    participant Platform as 平台
+    participant Authenticator as 硬體權杖
 
-    User->>Browser: Login with Security Key
+    User->>Browser: 使用安全金鑰登入
     Browser->>Platform: POST /api/mfa/webauthn/login/challenge
     Platform-->>Browser: Challenge + credential IDs
 
     Browser->>Authenticator: navigator.credentials.get()
-    Authenticator->>User: Prompt (touch sensor)
-    User->>Authenticator: Confirm
+    Authenticator->>User: 提示（觸碰感應器）
+    User->>Authenticator: 確認
 
-    Authenticator->>Authenticator: Sign challenge with private key
-    Authenticator-->>Browser: Signature + credential ID
+    Authenticator->>Authenticator: 使用私鑰簽署 challenge
+    Authenticator-->>Browser: 簽章 + credential ID
 
     Browser->>Platform: POST /api/mfa/webauthn/login/verify
-    Platform->>Platform: Verify signature with stored public key
-    Platform-->>Browser: Authentication success (JWT tokens)
+    Platform->>Platform: 使用儲存的公鑰驗證簽章
+    Platform-->>Browser: 驗證成功（JWT tokens）
 ```
 
-### 4.4 WebAuthn Java Implementation (Spring Boot)
+### 4.4 WebAuthn Java 實作（WebAuthn Java Implementation）（Spring Boot）
 
-**WebAuthnService.java** (using Yubico java-webauthn-server library):
+**WebAuthnService.java**（使用 Yubico java-webauthn-server 函式庫）:
 
 ```java
 @Service
@@ -570,76 +570,76 @@ public class WebAuthnService {
 
 ---
 
-## 5. Security Comparison Matrix
+## 5. 安全性比較矩陣（Security Comparison Matrix）
 
-### 5.1 Technical Comparison
+### 5.1 技術比較（Technical Comparison）
 
-| Feature | TOTP | SMS OTP | Email OTP | Hardware Token (FIDO2) |
+| 特性 | TOTP | SMS OTP | Email OTP | 硬體權杖（Hardware Token, FIDO2） |
 |---------|------|---------|-----------|------------------------|
-| **Algorithm** | HMAC-SHA1 (RFC 6238) | N/A (telecom) | N/A | ECDSA P-256 / RSA 2048 |
-| **Offline Capability** | ✅ Yes | ❌ No (requires network) | ❌ No | ✅ Yes |
-| **Phishing Resistance** | ⚠️ Partial (code can be phished) | ❌ No | ❌ No | ✅ Yes (domain-bound) |
-| **SIM Swap Vulnerable** | ✅ No | ❌ Yes | ✅ No | ✅ No |
-| **SS7 Attack Vulnerable** | ✅ No | ❌ Yes | ✅ No | ✅ No |
-| **Device Dependency** | ⚠️ Phone/app | ⚠️ Phone | ⚠️ Email access | ⚠️ Hardware token |
-| **Cost per User** | $0 | $0.05-$0.10 per SMS | $0 | $50-$70 (one-time) |
-| **Setup Complexity** | Medium (QR scan) | Low (automatic) | Low (automatic) | High (USB/NFC pairing) |
-| **NIST Recommendation** | ✅ Recommended | ⚠️ Deprecated | ⚠️ Not recommended | ✅ Recommended (AAL3) |
+| **演算法** | HMAC-SHA1（RFC 6238） | N/A（電信） | N/A | ECDSA P-256 / RSA 2048 |
+| **離線能力** | ✅ 是 | ❌ 否（需網路） | ❌ 否 | ✅ 是 |
+| **抗網路釣魚** | ⚠️ 部分（驗證碼可能被釣魚） | ❌ 否 | ❌ 否 | ✅ 是（網域綁定） |
+| **SIM 卡交換漏洞** | ✅ 否 | ❌ 是 | ✅ 否 | ✅ 否 |
+| **SS7 攻擊漏洞** | ✅ 否 | ❌ 是 | ✅ 否 | ✅ 否 |
+| **裝置依賴性** | ⚠️ 手機/應用程式 | ⚠️ 手機 | ⚠️ 電子郵件存取 | ⚠️ 硬體權杖 |
+| **每位使用者成本** | $0 | $0.05-$0.10 每則簡訊 | $0 | $50-$70（一次性） |
+| **設定複雜度** | 中（QR Code 掃描） | 低（自動） | 低（自動） | 高（USB/NFC 配對） |
+| **NIST 建議** | ✅ 建議 | ⚠️ 已淘汰 | ⚠️ 不建議 | ✅ 建議（AAL3） |
 
-### 5.2 Attack Surface Analysis
+### 5.2 攻擊面分析（Attack Surface Analysis）
 
-**TOTP Attack Vectors**:
-- ⚠️ Phishing: User enters code on fake login page
-  - Mitigation: Short validity window (30s), user education
-- ⚠️ Device theft: Physical access to phone
-  - Mitigation: Require device PIN/biometric to access app
-- ⚠️ Backup code theft: Stored insecurely
-  - Mitigation: Encrypt backup codes, require MFA to view
+**TOTP 攻擊向量**:
+- ⚠️ 網路釣魚: 使用者在假登入頁面輸入驗證碼
+  - 緩解: 短有效期（30秒）、使用者教育
+- ⚠️ 裝置失竊: 實體存取手機
+  - 緩解: 需裝置 PIN/生物辨識才能存取應用程式
+- ⚠️ 備份碼失竊: 儲存不安全
+  - 緩解: 加密備份碼，需 MFA 才能查看
 
-**SMS OTP Attack Vectors**:
-- ❌ **SIM Swap** (High Risk): Attacker obtains phone number
-- ❌ **SS7 Hijacking** (Medium Risk): Telecom-level interception
-- ❌ **Phishing** (High Risk): Code can be intercepted
-- ❌ **Malware** (Medium Risk): SMS-reading malware on phone
+**SMS OTP 攻擊向量**:
+- ❌ **SIM 卡交換**（高風險）: 攻擊者取得電話號碼
+- ❌ **SS7 劫持**（中風險）: 電信層級攔截
+- ❌ **網路釣魚**（高風險）: 驗證碼可被攔截
+- ❌ **惡意軟體**（中風險）: 手機上的簡訊讀取惡意軟體
 
-**Hardware Token (FIDO2) Attack Vectors**:
-- ⚠️ Physical theft: Attacker steals token
-  - Mitigation: Require PIN/biometric to use token
-- ⚠️ Supply chain: Compromised hardware (rare)
-  - Mitigation: Purchase from trusted vendors (Yubico, Google Titan)
+**硬體權杖（FIDO2）攻擊向量**:
+- ⚠️ 實體失竊: 攻擊者竊取權杖
+  - 緩解: 需 PIN/生物辨識才能使用權杖
+- ⚠️ 供應鏈: 受損硬體（罕見）
+  - 緩解: 從可信供應商購買（Yubico、Google Titan）
 
-### 5.3 Compliance Alignment
+### 5.3 合規性對齊（Compliance Alignment）
 
-| Regulation | TOTP | SMS OTP | Hardware Token (FIDO2) |
+| 法規 | TOTP | SMS OTP | 硬體權杖（Hardware Token, FIDO2） |
 |-----------|------|---------|------------------------|
-| **NIST AAL2** (Moderate Assurance) | ✅ Approved | ⚠️ Restricted (with conditions) | ✅ Approved |
-| **NIST AAL3** (High Assurance) | ❌ Insufficient | ❌ Prohibited | ✅ Required |
-| **PSD2 SCA** (EU Payments) | ✅ Compliant | ⚠️ Allowed until 2025 | ✅ Compliant |
-| **GDPR Art. 32** (Data Protection) | ✅ Adequate | ⚠️ Questionable (due to SMS risks) | ✅ Strong |
-| **UKGC LCCP** (Gaming License) | ✅ Acceptable | ⚠️ Acceptable with warnings | ✅ Preferred |
-| **MGA B2C/183/2010** | ✅ Mandatory for admins | ❌ Not sufficient alone | ✅ Recommended |
+| **NIST AAL2**（中度保證） | ✅ 核准 | ⚠️ 受限（有條件） | ✅ 核准 |
+| **NIST AAL3**（高度保證） | ❌ 不足 | ❌ 禁止 | ✅ 必要 |
+| **PSD2 SCA**（歐盟支付） | ✅ 合規 | ⚠️ 2025年前允許 | ✅ 合規 |
+| **GDPR Art. 32**（資料保護） | ✅ 充足 | ⚠️ 可疑（SMS 風險） | ✅ 強 |
+| **UKGC LCCP**（博彩執照） | ✅ 可接受 | ⚠️ 可接受但有警告 | ✅ 首選 |
+| **MGA B2C/183/2010** | ✅ 管理員強制 | ❌ 單獨使用不足 | ✅ 建議 |
 
-### 5.4 Cost-Benefit Analysis
+### 5.4 成本效益分析（Cost-Benefit Analysis）
 
-**Scenario: 200 Admin Users**
+**情境: 200 位管理員使用者**
 
-| Method | Setup Cost | Annual Cost | Security Level | Recommendation |
+| 方法 | 設定成本 | 年度成本 | 安全等級 | 建議 |
 |--------|-----------|-------------|----------------|----------------|
-| **TOTP only** | $0 | $0 | High (5/5) | ✅ **Cost-effective baseline** |
-| **TOTP + SMS fallback** | $500 (integration) | $3,600 (SMS fees) | High (5/5) | ✅ Good balance |
-| **TOTP + Hardware Token** | $10,000 (tokens) | $0 | Very High (5/5) | ⚠️ Only for AAL3 compliance |
-| **SMS only** | $500 | $3,600 | Low (2/5) | ❌ **Not recommended** |
+| **僅 TOTP** | $0 | $0 | 高（5/5） | ✅ **符合成本效益的基準** |
+| **TOTP + SMS 備用** | $500（整合） | $3,600（簡訊費） | 高（5/5） | ✅ 良好平衡 |
+| **TOTP + 硬體權杖** | $10,000（權杖） | $0 | 極高（5/5） | ⚠️ 僅適用 AAL3 合規 |
+| **僅 SMS** | $500 | $3,600 | 低（2/5） | ❌ **不建議** |
 
-**ROI Calculation**:
-- **Risk Reduction**: TOTP reduces account compromise risk from 8.1 CVSS (High) to 4.3 (Medium)
-- **Cost of Breach**: Average iGaming platform breach costs $500K-$2M
-- **Expected Loss Reduction**: TOTP ($0/year) vs. potential breach ($1M) = ∞% ROI
+**ROI 計算**:
+- **風險降低**: TOTP 將帳號入侵風險從 8.1 CVSS（高）降至 4.3（中）
+- **資料外洩成本**: 平均 iGaming 平台資料外洩成本 $500K-$2M
+- **預期損失降低**: TOTP（$0/年）vs. 潛在外洩（$1M）= ∞% ROI
 
 ---
 
-## 6. Implementation Recommendations
+## 6. 實作建議（Implementation Recommendations）
 
-### 6.1 Mandatory TOTP for High-Risk Roles
+### 6.1 高風險角色強制 TOTP（Mandatory TOTP for High-Risk Roles）
 
 ```java
 @Component
@@ -676,42 +676,42 @@ public class MFAEnforcementPolicy {
 }
 ```
 
-### 6.2 Gradual Migration from SMS to TOTP
+### 6.2 從 SMS 逐步遷移至 TOTP（Gradual Migration from SMS to TOTP）
 
-**Phase 1** (Month 1-3): Encourage TOTP adoption
-- Send emails encouraging users to switch from SMS to TOTP
-- Highlight security benefits
+**階段 1**（第 1-3 個月）: 鼓勵採用 TOTP
+- 發送電子郵件鼓勵使用者從 SMS 切換至 TOTP
+- 強調安全優勢
 
-**Phase 2** (Month 4-6): Deprecate SMS for new accounts
-- New admin accounts must use TOTP
-- Existing SMS users can continue (grandfathered)
+**階段 2**（第 4-6 個月）: 新帳號淘汰 SMS
+- 新管理員帳號必須使用 TOTP
+- 現有 SMS 使用者可繼續（既有權利）
 
-**Phase 3** (Month 7-12): Mandatory migration
-- All users must migrate to TOTP by deadline
-- Provide migration guides and support
+**階段 3**（第 7-12 個月）: 強制遷移
+- 所有使用者必須在期限前遷移至 TOTP
+- 提供遷移指南和支援
 
-**Phase 4** (Month 13+): SMS completely removed
-- SMS OTP disabled platform-wide
+**階段 4**（第 13 個月+）: 完全移除 SMS
+- 平台全面停用 SMS OTP
 
 ---
 
-## 7. Related Documents
+## 7. 相關文件（Related Documents）
 
-### Business Requirements
-- [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md) - MFA method selection, risk analysis, decision matrix
+### 業務需求（Business Requirements）
+- [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/MFA_Architecture_Spec.md) - MFA 方法選擇、風險分析、決策矩陣
 
-### Technical Implementation
-- [MFA_Login_Recovery_Technical.md](MFA_Login_Recovery_Technical.md) - Two-phase login, trusted device tokens
-- [MFA_Compliance_Technical.md](MFA_Compliance_Technical.md) - Audit logs, backup codes, compliance validation
+### 技術實作（Technical Implementation）
+- [MFA_Login_Recovery_Technical.md](MFA_Login_Recovery_Technical.md) - 兩階段登入、信任裝置權杖
+- [MFA_Compliance_Technical.md](MFA_Compliance_Technical.md) - 稽核日誌、備份碼、合規驗證
 
-### Security Standards
-- **NIST SP 800-63B**: Digital Identity Guidelines (AAL2/AAL3)
-- **RFC 6238**: TOTP Specification
-- **RFC 4226**: HOTP Specification
+### 安全標準（Security Standards）
+- **NIST SP 800-63B**: 數位身分指南（AAL2/AAL3）
+- **RFC 6238**: TOTP 規格
+- **RFC 4226**: HOTP 規格
 - **W3C WebAuthn Level 2**: Web Authentication API
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-09
-**Maintainer**: Security Team
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-09
+**維護者**: Security Team
