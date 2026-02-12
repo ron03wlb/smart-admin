@@ -1,41 +1,41 @@
-# Credit Network Technical Architecture
+# 信用網絡技術架構（Credit Network Technical Architecture）
 
-> **Business Requirements**: [Credit Network Requirements](../../requirements/07_Agent_Operations/Credit_Network_Requirements.md)
-> **Canonical Source**: [source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
-
----
-
-## 1. System Architecture Overview
-
-The Credit Network system manages hierarchical credit allocation, position taking calculations, and periodic settlement across the agent tree structure. It uses distributed locking, optimistic concurrency control, and event-driven architecture.
+> **業務需求**: [信用網絡需求（Credit Network Requirements）](../../requirements/07_Agent_Operations/Credit_Network_Requirements.md)
+> **規範來源**: [source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md)
+> **視角**: 技術架構（Technical Architecture）
+> **目標讀者**: 架構師、後端開發人員（Architects, Backend Developers）
 
 ---
 
-## 2. Credit Propagation Tree Architecture
+## 1. 系統架構概覽（System Architecture Overview）
+
+信用網絡（Credit Network）系統管理分層的信用額度分配、持倉（Position Taking）計算以及跨代理樹結構的定期結算（Settlement）。它使用分佈式鎖、樂觀並發控制和事件驅動架構。
+
+---
+
+## 2. 信用傳播樹架構（Credit Propagation Tree Architecture）
 
 ```mermaid
 graph TB
-    subgraph "Platform Level"
-        P["Platform<br/>Total Credit Pool: $10M<br/>Allocated: $8M<br/>Available: $2M<br/>Company Position: 10%"]
+    subgraph "平台層級（Platform Level）"
+        P["平台<br/>總信用池：$10M<br/>已分配：$8M<br/>可用：$2M<br/>公司持倉：10%"]
     end
 
-    subgraph "Master Agent Level"
-        P -->|Allocate $5M<br/>Position: 20%| M1["Master Agent A<br/>Credit Limit: $5M<br/>Used: $3.5M<br/>Usage: 70%"]
+    subgraph "總代理層級（Master Agent Level）"
+        P -->|分配 $5M<br/>持倉：20%| M1["總代理 A<br/>信用額度：$5M<br/>已使用：$3.5M<br/>使用率：70%"]
 
-        P -->|Allocate $3M<br/>Position: 15%| M2["Master Agent B<br/>Credit Limit: $3M<br/>Used: $2.85M<br/>Usage: 95% ALERT"]
+        P -->|分配 $3M<br/>持倉：15%| M2["總代理 B<br/>信用額度：$3M<br/>已使用：$2.85M<br/>使用率：95% 警報"]
     end
 
-    subgraph "Agent L1 Level"
-        M1 -->|Allocate $2M| A1["Agent L1-A1<br/>Usage: 60%"]
-        M1 -->|Allocate $1.5M| A2["Agent L1-A2<br/>Usage: 100% FROZEN"]
-        M2 -->|Allocate $2.8M| A4["Agent L1-A4<br/>Usage: 93% WARNING"]
+    subgraph "代理 L1 層級（Agent L1 Level）"
+        M1 -->|分配 $2M| A1["代理 L1-A1<br/>使用率：60%"]
+        M1 -->|分配 $1.5M| A2["代理 L1-A2<br/>使用率：100% 凍結"]
+        M2 -->|分配 $2.8M| A4["代理 L1-A4<br/>使用率：93% 警告"]
     end
 
-    subgraph "Player Level"
-        A1 -->|Players: 50| PG1["Player Group 1<br/>Net Loss: $100k"]
-        A4 -->|Players: 100| PG3["Player Group 3<br/>Net Loss: $2.6M"]
+    subgraph "玩家層級（Player Level）"
+        A1 -->|玩家數：50| PG1["玩家群組 1<br/>淨虧損：$100k"]
+        A4 -->|玩家數：100| PG3["玩家群組 3<br/>淨虧損：$2.6M"]
     end
 
     style P fill:#E6E6FA
@@ -47,34 +47,34 @@ graph TB
 
 ---
 
-## 3. Credit Allocation Flow (Concurrency Control)
+## 3. 信用分配流程（Credit Allocation Flow）- 並發控制（Concurrency Control）
 
 ```mermaid
 flowchart TD
-    START[Parent Agent Allocates Credit to Child] --> INPUT[Input: child_agent_id, amount, position_%]
+    START[父代理分配信用給子代理] --> INPUT[輸入：child_agent_id、amount、position_%]
 
-    INPUT --> VALIDATE1{Input Validation}
-    VALIDATE1 -->|amount <= 0| ERR1[Error: Invalid Amount]
-    VALIDATE1 -->|position_% > 100| ERR2[Error: Invalid Position %]
+    INPUT --> VALIDATE1{輸入驗證}
+    VALIDATE1 -->|amount <= 0| ERR1[錯誤：無效金額]
+    VALIDATE1 -->|position_% > 100| ERR2[錯誤：無效持倉百分比]
     VALIDATE1 -->|OK| LOCK
 
-    LOCK["Acquire Distributed Lock<br/>Redis: SET NX credit:parent:$id TTL=30s"] --> LOCK_CHECK{Lock Acquired?}
-    LOCK_CHECK -->|No - Retry < 3| WAIT["Wait - Exponential Backoff<br/>Retry 1: 100ms<br/>Retry 2: 200ms<br/>Retry 3: 400ms"]
+    LOCK["獲取分佈式鎖<br/>Redis: SET NX credit:parent:$id TTL=30s"] --> LOCK_CHECK{鎖獲取成功？}
+    LOCK_CHECK -->|否 - 重試 < 3| WAIT["等待 - 指數退避<br/>重試 1：100ms<br/>重試 2：200ms<br/>重試 3：400ms"]
     WAIT --> LOCK
-    LOCK_CHECK -->|No - Retry >= 3| ERR4["Error: Lock Timeout"]
-    LOCK_CHECK -->|Yes| READ_PARENT
+    LOCK_CHECK -->|否 - 重試 >= 3| ERR4["錯誤：鎖超時"]
+    LOCK_CHECK -->|是| READ_PARENT
 
-    READ_PARENT["Read Parent Credit Record<br/>SELECT * FROM agent_credit<br/>WHERE agent_id = parent FOR UPDATE"] --> VERSION_CHECK{Version Matches?}
-    VERSION_CHECK -->|No| RETRY_VERSION{Retry Count < 3?}
-    RETRY_VERSION -->|Yes| READ_PARENT
-    RETRY_VERSION -->|No| ERR5["Error: Optimistic Lock Conflict"]
+    READ_PARENT["讀取父代理信用記錄<br/>SELECT * FROM agent_credit<br/>WHERE agent_id = parent FOR UPDATE"] --> VERSION_CHECK{版本匹配？}
+    VERSION_CHECK -->|否| RETRY_VERSION{重試次數 < 3？}
+    RETRY_VERSION -->|是| READ_PARENT
+    RETRY_VERSION -->|否| ERR5["錯誤：樂觀鎖衝突"]
 
-    VERSION_CHECK -->|Yes| CALC_AVAILABLE
-    CALC_AVAILABLE["Calculate Available Credit:<br/>available = parent.limit - parent.used - parent.allocated_to_children"]
+    VERSION_CHECK -->|是| CALC_AVAILABLE
+    CALC_AVAILABLE["計算可用信用：<br/>available = parent.limit - parent.used - parent.allocated_to_children"]
 
-    CALC_AVAILABLE --> AVAILABLE_CHECK{available >= amount?}
-    AVAILABLE_CHECK -->|No| ERR6["Error: Insufficient Parent Credit"]
-    AVAILABLE_CHECK -->|Yes| UPDATE_PARENT
+    CALC_AVAILABLE --> AVAILABLE_CHECK{available >= amount？}
+    AVAILABLE_CHECK -->|否| ERR6["錯誤：父代理信用不足"]
+    AVAILABLE_CHECK -->|是| UPDATE_PARENT
 
     UPDATE_PARENT["UPDATE agent_credit SET<br/>allocated_to_children += amount,<br/>version = version + 1<br/>WHERE agent_id = parent AND version = $current_version"]
 
@@ -83,9 +83,9 @@ flowchart TD
     UPDATE_CHILD --> INSERT_AUDIT["INSERT INTO credit_allocation_audit<br/>(parent_id, child_id, old_limit, new_limit, delta, reason, operator)"]
 
     INSERT_AUDIT --> COMMIT[COMMIT Transaction]
-    COMMIT --> RELEASE_LOCK["Release Redis Lock<br/>DEL credit:parent:$id"]
-    RELEASE_LOCK --> PUBLISH_EVENT["Publish Event to Kafka:<br/>topic: agent.credit.allocated"]
-    PUBLISH_EVENT --> SUCCESS["Return Success"]
+    COMMIT --> RELEASE_LOCK["釋放 Redis 鎖<br/>DEL credit:parent:$id"]
+    RELEASE_LOCK --> PUBLISH_EVENT["發佈事件到 Kafka：<br/>topic: agent.credit.allocated"]
+    PUBLISH_EVENT --> SUCCESS["返回成功"]
 
     style SUCCESS fill:#90EE90
     style ERR1 fill:#FFB6C1
@@ -98,19 +98,19 @@ flowchart TD
 
 ---
 
-## 4. Concurrency Control Design
+## 4. 並發控制設計（Concurrency Control Design）
 
-| Concurrency Problem | Scenario | Solution | Implementation |
-|---------------------|----------|----------|----------------|
-| **Duplicate allocation** | Parent simultaneously allocates to 2 children, total exceeds available | Redis distributed lock | `SET NX credit:parent:${id}` TTL=30s |
-| **Version conflict** | 2 operations simultaneously modify parent's `allocated_to_children` | Optimistic locking | `WHERE version = ? AND UPDATE version = version + 1` |
-| **Over-allocation** | Child A receives credit, parent's available insufficient for Child B | Pessimistic locking | `SELECT ... FOR UPDATE` |
-| **Revocation conflict** | Parent revokes credit while child is using it | Check child used credit | `child.used_credit <= new_limit` |
-| **Deadlock** | Parent A locks Child B, Parent B locks Child A | Ordered locking | Always lock `MIN(parent_id, child_id)` first |
+| 並發問題 | 場景 | 解決方案 | 實現方式 |
+|---------|------|---------|---------|
+| **重複分配** | 父代理同時分配給 2 個子代理，總額超過可用額度 | Redis 分佈式鎖 | `SET NX credit:parent:${id}` TTL=30s |
+| **版本衝突** | 2 個操作同時修改父代理的 `allocated_to_children` | 樂觀鎖 | `WHERE version = ? AND UPDATE version = version + 1` |
+| **超額分配** | 子代理 A 收到信用，父代理可用額度不足以分配給子代理 B | 悲觀鎖 | `SELECT ... FOR UPDATE` |
+| **撤銷衝突** | 父代理撤銷信用時子代理正在使用 | 檢查子代理已使用信用 | `child.used_credit <= new_limit` |
+| **死鎖** | 父代理 A 鎖定子代理 B，父代理 B 鎖定子代理 A | 有序加鎖 | 始終先鎖定 `MIN(parent_id, child_id)` |
 
 ---
 
-## 5. Weekly Settlement Sequence
+## 5. 每週結算序列（Weekly Settlement Sequence）
 
 ```mermaid
 sequenceDiagram
@@ -123,23 +123,23 @@ sequenceDiagram
     participant DB
     participant NotificationService
 
-    Note over CronJob,NotificationService: Weekly Settlement - Monday 12:00 AM
+    Note over CronJob,NotificationService: 每週結算 - 週一 12:00 AM
 
     rect rgb(255, 230, 230)
-        Note over CronJob,DB: Phase 1: Freeze & Calculate (12:00 - 13:00)
+        Note over CronJob,DB: 階段 1：凍結與計算（12:00 - 13:00）
 
         CronJob->>SettlementService: triggerWeeklySettlement(week=W-1)
         SettlementService->>DB: BEGIN TRANSACTION (SERIALIZABLE)
         SettlementService->>DB: UPDATE credit_accounts SET status='FROZEN'
 
-        loop For each Agent L2 (Bottom-Up)
+        loop 每個代理 L2（自下而上）
             SettlementService->>AgentL2: calculatePosition(week=W-1)
             AgentL2->>DB: SELECT SUM(player_bets - player_wins) FROM player_transactions
             DB-->>AgentL2: net_player_loss = $100,000
             AgentL2->>DB: INSERT INTO settlement_records (agent_id, week, own_share, to_parent)
         end
 
-        loop For each Agent L1
+        loop 每個代理 L1
             AgentL1->>DB: SELECT SUM(to_parent) FROM settlement_records WHERE parent_id = L1
             AgentL1->>DB: INSERT INTO settlement_records
         end
@@ -148,14 +148,14 @@ sequenceDiagram
     end
 
     rect rgb(230, 255, 230)
-        Note over SettlementService,NotificationService: Phase 2: Payment Collection (Mon 13:00 - Fri 18:00)
+        Note over SettlementService,NotificationService: 階段 2：收款（週一 13:00 - 週五 18:00）
 
-        NotificationService->>AgentL2: Email: "You owe $50k. Deadline: Friday 18:00"
+        NotificationService->>AgentL2: Email："您欠款 $50k。截止日期：週五 18:00"
         AgentL2->>SettlementService: submitPaymentProof(txn_id, amount)
     end
 
     rect rgb(230, 230, 255)
-        Note over SettlementService,Platform: Phase 3: Verification & Reset (Fri 18:00 - Sat 12:00)
+        Note over SettlementService,Platform: 階段 3：驗證與重置（週五 18:00 - 週六 12:00）
 
         SettlementService->>DB: UPDATE agent_credit SET used_credit = 0, status = 'ACTIVE'
     end
@@ -163,9 +163,9 @@ sequenceDiagram
 
 ---
 
-## 6. Database Schema
+## 6. 資料庫架構（Database Schema）
 
-### 6.1 agent_credit Table
+### 6.1 agent_credit 表
 
 ```sql
 CREATE TABLE agent_credit (
@@ -190,7 +190,7 @@ CREATE TABLE agent_credit (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 6.2 settlement_records Table
+### 6.2 settlement_records 表
 
 ```sql
 CREATE TABLE settlement_records (
@@ -215,7 +215,7 @@ CREATE TABLE settlement_records (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 6.3 credit_allocation_audit Table
+### 6.3 credit_allocation_audit 表
 
 ```sql
 CREATE TABLE credit_allocation_audit (
@@ -239,7 +239,7 @@ CREATE TABLE credit_allocation_audit (
 
 ---
 
-## 7. Kafka Event Schema
+## 7. Kafka 事件架構（Kafka Event Schema）
 
 ```json
 {
@@ -259,15 +259,15 @@ CREATE TABLE credit_allocation_audit (
 }
 ```
 
-**Downstream Consumers**:
-- **Risk Management Service**: Monitor abnormal credit changes (e.g., sudden 100% increase)
-- **Notification Service**: Send email/SMS notifications
-- **Analytics Service**: Track credit allocation trends, agent activity
-- **Audit Service**: Archive audit logs (7-year retention)
+**下游消費者**：
+- **風險管理服務（Risk Management Service）**：監控異常信用變更（例如突然 100% 增加）
+- **通知服務（Notification Service）**：發送電子郵件/簡訊通知
+- **分析服務（Analytics Service）**：追蹤信用分配趨勢、代理活動
+- **審計服務（Audit Service）**：歸檔審計日誌（7 年保留期）
 
 ---
 
-## 8. Error Code Definitions
+## 8. 錯誤碼定義（Error Code Definitions）
 
 ```java
 public enum CreditErrorCode {
@@ -293,9 +293,9 @@ public enum CreditErrorCode {
 
 ---
 
-## 9. Risk Control Integration
+## 9. 風險控制整合（Risk Control Integration）
 
-The credit network risk detection must integrate with the risk framework for real-time monitoring.
+信用網絡風險檢測必須與風險框架整合以進行實時監控。
 
 ```java
 /**
@@ -331,23 +331,23 @@ public class CreditRiskAssessmentService {
 
 ---
 
-## 10. SmartAdmin Architecture Mapping
+## 10. SmartAdmin 架構映射（SmartAdmin Architecture Mapping）
 
-| Layer | Class | Responsibility |
-|-------|-------|---------------|
-| **Controller** | `CreditNetworkController` | REST API endpoints for credit allocation |
-| **Service** | `CreditNetworkService` | Business logic, single-table queries via Dao |
-| **Manager** | `CreditSettlementManager` | @Transactional settlement operations, multi-table writes |
-| **Dao** | `AgentCreditDao` | MyBatis Plus mapper for agent_credit table |
-| **Entity** | `AgentCreditEntity` | Database entity mapping |
+| 層級 | 類別 | 職責 |
+|-----|------|------|
+| **Controller** | `CreditNetworkController` | 信用分配的 REST API 端點 |
+| **Service** | `CreditNetworkService` | 業務邏輯，通過 Dao 進行單表查詢 |
+| **Manager** | `CreditSettlementManager` | @Transactional 結算操作，多表寫入 |
+| **Dao** | `AgentCreditDao` | agent_credit 表的 MyBatis Plus mapper |
+| **Entity** | `AgentCreditEntity` | 資料庫實體映射 |
 
-**Key Architectural Rules**:
-- `@Transactional(rollbackFor = Throwable.class)` in Manager only
-- Service uses `io.vavr.control.Option` for nullable returns
-- Constructor injection via `@RequiredArgsConstructor` + `private final`
+**關鍵架構規則**：
+- `@Transactional(rollbackFor = Throwable.class)` 僅在 Manager 層
+- Service 使用 `io.vavr.control.Option` 處理可空返回值
+- 通過 `@RequiredArgsConstructor` + `private final` 進行構造器注入
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-09
-**Maintenance Team**: Agent Network Team & Backend Team
+**文檔版本**: 4.0.0
+**最後更新**: 2026-02-09
+**維護團隊**: 代理網絡團隊與後端團隊（Agent Network Team & Backend Team）

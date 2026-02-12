@@ -1,75 +1,75 @@
-# BI Dashboard & Data Pipeline Technical Architecture
+# BI 儀表板與資料管道技術架構（BI Dashboard & Data Pipeline Technical Architecture）
 
-> **Business Requirements**: [BI Dashboard Requirements](../../requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md)
-> **Canonical Source**: [source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md](../../source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
-
----
-
-## 1. Architecture Overview
-
-The BI Dashboard system uses a Lambda Architecture variant with dual processing paths. Stream processing (Flink) handles real-time metrics, while batch processing (Spark) ensures 100% data accuracy for T+1 reports.
+> **業務需求**: [BI Dashboard Requirements](../../requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md)
+> **規範來源**: [source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md](../../source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md)
+> **視角**: Technical Architecture
+> **目標讀者**: Architects, Backend Developers
 
 ---
 
-## 2. Complete Data Pipeline Architecture
+## 1. 架構概覽（Architecture Overview）
+
+BI 儀表板系統採用 Lambda Architecture 變體，具備雙重處理路徑。串流處理（Stream Processing，Flink）處理即時指標，而批次處理（Batch Processing，Spark）確保 T+1 報表的 100% 資料準確性。
+
+---
+
+## 2. 完整資料管道架構（Complete Data Pipeline Architecture）
 
 ```mermaid
 flowchart TD
-    subgraph SOURCES[Data Sources]
-        DB1[(MySQL OLTP<br/>Players, Transactions<br/>Game rounds, VIP)]
-        DB2[(MongoDB<br/>Game logs<br/>Event tracking)]
-        KAFKA_SRC[Kafka Topics<br/>Business events<br/>Real-time trades]
+    subgraph SOURCES[資料來源<br/>Data Sources]
+        DB1[(MySQL OLTP<br/>玩家、交易<br/>遊戲回合、VIP)]
+        DB2[(MongoDB<br/>遊戲日誌<br/>事件追蹤)]
+        KAFKA_SRC[Kafka Topics<br/>業務事件<br/>即時交易]
     end
 
-    subgraph CDC[Change Data Capture]
-        DEBEZIUM[Debezium<br/>MySQL Binlog listener<br/>Mongo Oplog listener]
+    subgraph CDC[變更資料捕獲<br/>Change Data Capture]
+        DEBEZIUM[Debezium<br/>MySQL Binlog 監聽器<br/>Mongo Oplog 監聽器]
     end
 
     DB1 -->|Binlog| DEBEZIUM
     DB2 -->|Oplog| DEBEZIUM
 
-    subgraph STREAMING[Stream Processing]
-        KAFKA[(Kafka<br/>Topics: db.transactions<br/>db.players, game.rounds<br/>Retention: 7 days)]
-        FLINK[Flink Streaming<br/>Real-time aggregation<br/>Window computation<br/>CEP rules]
-        REDIS[(Redis<br/>Real-time metrics cache<br/>Online count, deposits<br/>TTL: 5 min)]
+    subgraph STREAMING[串流處理<br/>Stream Processing]
+        KAFKA[(Kafka<br/>Topics: db.transactions<br/>db.players, game.rounds<br/>保留期: 7 天)]
+        FLINK[Flink Streaming<br/>即時聚合<br/>視窗計算<br/>CEP 規則]
+        REDIS[(Redis<br/>即時指標快取<br/>線上人數、存款<br/>TTL: 5 分鐘)]
     end
 
-    DEBEZIUM -->|Publish| KAFKA
+    DEBEZIUM -->|發布| KAFKA
     KAFKA_SRC --> KAFKA
-    KAFKA -->|Subscribe| FLINK
-    FLINK -->|Write metrics| REDIS
+    KAFKA -->|訂閱| FLINK
+    FLINK -->|寫入指標| REDIS
 
-    subgraph BATCH[Batch Processing]
-        S3[(S3 Data Lake<br/>Format: Parquet<br/>Partition: date/tenant_id<br/>Retention: Permanent)]
-        SPARK[Spark Batch Jobs<br/>Schedule: Airflow<br/>Execute: 02:00 AM<br/>Cleaning + Masking + Aggregation]
+    subgraph BATCH[批次處理<br/>Batch Processing]
+        S3[(S3 Data Lake<br/>格式: Parquet<br/>分區: date/tenant_id<br/>保留期: 永久)]
+        SPARK[Spark 批次作業<br/>排程: Airflow<br/>執行時間: 02:00 AM<br/>清洗 + 遮罩 + 聚合)]
     end
 
-    KAFKA -->|Kafka Connect batch| S3
-    S3 -->|Read previous day| SPARK
+    KAFKA -->|Kafka Connect 批次| S3
+    S3 -->|讀取前一天資料| SPARK
 
-    subgraph DWH[Data Warehouse]
-        CLICKHOUSE[(ClickHouse / Doris<br/>ODS - DWD - DWS - ADS<br/>Partition: date + tenant_id)]
+    subgraph DWH[資料倉儲<br/>Data Warehouse]
+        CLICKHOUSE[(ClickHouse / Doris<br/>ODS - DWD - DWS - ADS<br/>分區: date + tenant_id)]
     end
 
-    SPARK -->|Write layered tables| CLICKHOUSE
-    FLINK -->|Write real-time tables| CLICKHOUSE
+    SPARK -->|寫入分層表| CLICKHOUSE
+    FLINK -->|寫入即時表| CLICKHOUSE
 
-    subgraph APPS[Application Layer]
-        DASHBOARD[Operations Dashboard<br/>Real-time monitoring<br/>KPI tracking]
-        REPORT[Report Center<br/>Business reports<br/>Agent settlement]
-        ALERT[Alert System<br/>Risk alerts<br/>Anomaly detection]
+    subgraph APPS[應用層<br/>Application Layer]
+        DASHBOARD[營運儀表板<br/>即時監控<br/>KPI 追蹤]
+        REPORT[報表中心<br/>業務報表<br/>代理商結算]
+        ALERT[告警系統<br/>風險告警<br/>異常偵測]
     end
 
     CLICKHOUSE --> DASHBOARD
     CLICKHOUSE --> REPORT
     REDIS --> ALERT
 
-    subgraph GOVERNANCE[Data Governance]
-        MASKING[Data Masking<br/>PII protection<br/>Sensitive field encryption]
-        QUALITY[Data Quality<br/>Completeness checks<br/>Consistency validation]
-        LINEAGE[Data Lineage<br/>Source tracking<br/>Impact analysis]
+    subgraph GOVERNANCE[資料治理<br/>Data Governance]
+        MASKING[資料遮罩<br/>PII 保護<br/>敏感欄位加密]
+        QUALITY[資料品質<br/>完整性檢查<br/>一致性驗證]
+        LINEAGE[資料血緣<br/>來源追蹤<br/>影響分析]
     end
 
     SPARK -.-> MASKING
@@ -86,30 +86,30 @@ flowchart TD
 
 ---
 
-## 3. Data Layering Architecture Detail
+## 3. 資料分層架構詳情（Data Layering Architecture Detail）
 
 ```mermaid
 flowchart TD
-    subgraph ODS["ODS Layer - Operational Data Store"]
-        ODS_DESC["1:1 mapping with business DB<br/>No transformation<br/>Full history retention<br/>Update: Near real-time CDC<br/>Retention: Permanent"]
+    subgraph ODS["ODS 層 - 操作資料存儲<br/>Operational Data Store"]
+        ODS_DESC["與業務資料庫 1:1 映射<br/>無轉換<br/>保留完整歷史<br/>更新: 準即時 CDC<br/>保留期: 永久"]
     end
 
-    subgraph DWD["DWD Layer - Data Warehouse Detail"]
-        DWD_DESC["Data cleaning + PII masking<br/>Field standardization<br/>Dimension association<br/>Update: T+1 batch<br/>Retention: 2 years"]
+    subgraph DWD["DWD 層 - 資料倉儲明細層<br/>Data Warehouse Detail"]
+        DWD_DESC["資料清洗 + PII 遮罩<br/>欄位標準化<br/>維度關聯<br/>更新: T+1 批次<br/>保留期: 2 年"]
     end
 
-    subgraph DWS["DWS Layer - Data Warehouse Summary"]
-        DWS_DESC["Time dimension aggregation<br/>Business dimension aggregation<br/>Pre-calculated metrics<br/>Update: T+1 batch<br/>Retention: 3 years"]
+    subgraph DWS["DWS 層 - 資料倉儲匯總層<br/>Data Warehouse Summary"]
+        DWS_DESC["時間維度聚合<br/>業務維度聚合<br/>預計算指標<br/>更新: T+1 批次<br/>保留期: 3 年"]
     end
 
-    subgraph ADS["ADS Layer - Application Data Service"]
-        ADS_DESC["Application-specific wide tables<br/>Highly optimized for queries<br/>Update: T+1 or real-time<br/>Retention: 6 months"]
+    subgraph ADS["ADS 層 - 應用資料服務層<br/>Application Data Service"]
+        ADS_DESC["應用專用寬表<br/>高度查詢最佳化<br/>更新: T+1 或即時<br/>保留期: 6 個月"]
     end
 
-    ODS -->|"Spark ETL<br/>Cleaning + Masking"| DWD
-    DWD -->|"Spark SQL<br/>Aggregation"| DWS
-    DWS -->|"Spark SQL<br/>Wide table build"| ADS
-    DWD -.->|"Direct aggregation<br/>(some scenarios)"| ADS
+    ODS -->|"Spark ETL<br/>清洗 + 遮罩"| DWD
+    DWD -->|"Spark SQL<br/>聚合"| DWS
+    DWS -->|"Spark SQL<br/>寬表建構"| ADS
+    DWD -.->|"直接聚合<br/>（部分場景）"| ADS
 
     style ODS fill:#E3F2FD
     style DWD fill:#FFF9C4
@@ -119,27 +119,27 @@ flowchart TD
 
 ---
 
-## 4. Real-time vs Batch Processing Decision Matrix
+## 4. 即時 vs 批次處理決策矩陣（Real-time vs Batch Processing Decision Matrix）
 
 ```mermaid
 flowchart TD
-    START[New Report Requirement] --> LATENCY{Latency Requirement?}
+    START[新報表需求] --> LATENCY{延遲需求？}
 
-    LATENCY -->|< 5 seconds| RT[Real-time Path]
-    LATENCY -->|5s - 1 minute| NRT[Near Real-time Path]
-    LATENCY -->|> 1 minute / T+1| BATCH[Batch Path]
+    LATENCY -->|< 5 秒| RT[即時路徑]
+    LATENCY -->|5秒 - 1 分鐘| NRT[準即時路徑]
+    LATENCY -->|> 1 分鐘 / T+1| BATCH[批次路徑]
 
-    RT --> RT_COMPLEX{Query Complexity?}
-    RT_COMPLEX -->|Simple SUM/COUNT| RT_REDIS["Solution A: Redis<br/>Latency: < 1ms<br/>QPS: 10K+<br/>Cost: High (memory)"]
-    RT_COMPLEX -->|GROUP BY + JOIN| RT_FLINK["Solution B: Flink SQL<br/>Latency: < 5s<br/>QPS: 1K+<br/>Cost: Medium-High"]
+    RT --> RT_COMPLEX{查詢複雜度？}
+    RT_COMPLEX -->|簡單 SUM/COUNT| RT_REDIS["方案 A: Redis<br/>延遲: < 1ms<br/>QPS: 10K+<br/>成本: 高（記憶體）"]
+    RT_COMPLEX -->|GROUP BY + JOIN| RT_FLINK["方案 B: Flink SQL<br/>延遲: < 5s<br/>QPS: 1K+<br/>成本: 中高"]
 
-    NRT --> NRT_COMPLETE{Data Completeness?}
-    NRT_COMPLETE -->|99%+ OK| NRT_STREAM["Solution C: Flink to ClickHouse<br/>Latency: 5-60s<br/>QPS: 500+"]
-    NRT_COMPLETE -->|100% Required| NRT_HYBRID["Solution D: Hybrid Mode<br/>Flink real-time + Spark batch correction"]
+    NRT --> NRT_COMPLETE{資料完整性？}
+    NRT_COMPLETE -->|99%+ 可接受| NRT_STREAM["方案 C: Flink 到 ClickHouse<br/>延遲: 5-60秒<br/>QPS: 500+"]
+    NRT_COMPLETE -->|需要 100%| NRT_HYBRID["方案 D: 混合模式<br/>Flink 即時 + Spark 批次修正"]
 
-    BATCH --> BATCH_VOL{Data Volume?}
-    BATCH_VOL -->|< 100M rows| BATCH_SPARK["Solution E: Spark Batch<br/>100% complete<br/>Cost: Low"]
-    BATCH_VOL -->|> 100M rows| BATCH_OPT["Solution F: Optimized Batch<br/>Partitioned parallel<br/>Materialized views"]
+    BATCH --> BATCH_VOL{資料量？}
+    BATCH_VOL -->|< 1 億筆| BATCH_SPARK["方案 E: Spark 批次<br/>100% 完整<br/>成本: 低"]
+    BATCH_VOL -->|> 1 億筆| BATCH_OPT["方案 F: 最佳化批次<br/>分區並行<br/>物化視圖"]
 
     style RT_REDIS fill:#FFCDD2
     style RT_FLINK fill:#E1BEE7
@@ -149,86 +149,86 @@ flowchart TD
     style BATCH_OPT fill:#B2DFDB
 ```
 
-### 4.1 Solution Comparison Matrix
+### 4.1 方案比較矩陣（Solution Comparison Matrix）
 
-| Solution | Latency | Completeness | Query Complexity | Cost/Month | QPS | Use Case |
+| 方案 | 延遲 | 完整性 | 查詢複雜度 | 月成本 | QPS | 使用場景 |
 |----------|---------|-------------|-----------------|-----------|-----|----------|
-| **A: Redis** | < 1ms | May miss | Simple (SUM/COUNT) | ~$600 | 10K+ | Online count, today's deposits |
-| **B: Flink SQL** | < 5s | 99%+ | Medium (GROUP BY) | ~$3,000 | 1K+ | Real-time leaderboard |
-| **C: Flink->CH** | 5-60s | 99%+ | High (any SQL) | ~$4,500 | 500+ | Operations dashboard |
-| **D: Hybrid** | RT + T+1 fix | 100% | Very high | ~$7,000 | 500+ | Financial reports |
-| **E: Spark Batch** | T+1 | 100% | Very high | ~$1,500 | N/A | Business reports |
-| **F: Optimized** | T+1 | 100% | Very high | ~$10,000 | N/A | PB-scale analytics |
+| **A: Redis** | < 1ms | 可能遺漏 | 簡單（SUM/COUNT） | ~$600 | 10K+ | 線上人數、今日存款 |
+| **B: Flink SQL** | < 5s | 99%+ | 中等（GROUP BY） | ~$3,000 | 1K+ | 即時排行榜 |
+| **C: Flink->CH** | 5-60s | 99%+ | 高（任意 SQL） | ~$4,500 | 500+ | 營運儀表板 |
+| **D: 混合模式** | 即時 + T+1 修正 | 100% | 非常高 | ~$7,000 | 500+ | 財務報表 |
+| **E: Spark 批次** | T+1 | 100% | 非常高 | ~$1,500 | N/A | 業務報表 |
+| **F: 最佳化批次** | T+1 | 100% | 非常高 | ~$10,000 | N/A | PB 級分析 |
 
-### 4.2 Report-to-Solution Mapping
+### 4.2 報表與方案對應（Report-to-Solution Mapping）
 
-| Report | Latency Need | Complexity | Completeness | Solution |
+| 報表 | 延遲需求 | 複雜度 | 完整性 | 方案 |
 |--------|-------------|-----------|-------------|----------|
-| Online player count | < 1s | Simple COUNT | Approximate OK | A: Redis |
-| Today's deposit total | < 5s | Simple SUM | Approximate OK | A: Redis |
-| Real-time game leaderboard | < 5s | GROUP BY + ORDER | 99%+ | B: Flink SQL |
-| Operations KPI dashboard | < 1 min | Multi-dimension | 99%+ | C: Flink->CH |
-| Daily financial report | T+1 | Multi-table JOIN | 100% | E: Spark Batch |
-| Agent settlement | T+1 | Complex | 100% | D: Hybrid |
-| Risk real-time alerts | < 5s | CEP rules | 99%+ | B: Flink SQL |
-| Player LTV analysis | T+1 | ML model | 100% | F: Optimized |
+| 線上玩家數 | < 1s | 簡單 COUNT | 近似值可接受 | A: Redis |
+| 今日存款總額 | < 5s | 簡單 SUM | 近似值可接受 | A: Redis |
+| 即時遊戲排行榜 | < 5s | GROUP BY + ORDER | 99%+ | B: Flink SQL |
+| 營運 KPI 儀表板 | < 1 分鐘 | 多維度 | 99%+ | C: Flink->CH |
+| 每日財務報表 | T+1 | 多表 JOIN | 100% | E: Spark 批次 |
+| 代理商結算 | T+1 | 複雜 | 100% | D: 混合模式 |
+| 風險即時告警 | < 5s | CEP 規則 | 99%+ | B: Flink SQL |
+| 玩家 LTV 分析 | T+1 | ML 模型 | 100% | F: 最佳化批次 |
 
 ---
 
-## 5. Key Design Decisions
+## 5. 關鍵設計決策（Key Design Decisions）
 
-### 5.1 Why Data Lake (S3)?
+### 5.1 為何使用 Data Lake（S3）？
 
 ```java
 /**
- * Data Lake design rationale:
- * 1. ClickHouse DELETE is expensive; S3 serves as immutable data source
- * 2. Supports data backfill, recalculation, ML training
- * 3. S3 Glacier cost: $0.004/GB/month
+ * Data Lake 設計理由：
+ * 1. ClickHouse DELETE 成本高；S3 作為不可變資料來源
+ * 2. 支援資料回填、重新計算、ML 訓練
+ * 3. S3 Glacier 成本：$0.004/GB/月
  */
 ```
 
-### 5.2 Why Both Flink and Spark?
+### 5.2 為何同時使用 Flink 和 Spark？
 
 ```java
 /**
- * Dual processing engine rationale:
- * - Flink: Stream processor, millisecond latency, ideal for real-time aggregation
- * - Spark: Batch processor, supports complex ETL logic, preferred for T+1 reports
- * - Complementary: Flink handles real-time, Spark handles batch
+ * 雙處理引擎理由：
+ * - Flink：串流處理器，毫秒級延遲，適合即時聚合
+ * - Spark：批次處理器，支援複雜 ETL 邏輯，適合 T+1 報表
+ * - 互補性：Flink 處理即時，Spark 處理批次
  */
 ```
 
-### 5.3 Why Redis TTL is 5 Minutes?
+### 5.3 為何 Redis TTL 是 5 分鐘？
 
 ```java
 /**
- * Redis cache TTL design:
- * - Purpose: Cache for high-frequency dashboard queries (refreshed every 10s)
- * - Strategy: Data older than 5 min is queried from ClickHouse
- * - Cost: Redis memory is expensive ($0.15/GB/hour), not suitable for long-term storage
+ * Redis 快取 TTL 設計：
+ * - 目的：為高頻率儀表板查詢（每 10 秒刷新）提供快取
+ * - 策略：超過 5 分鐘的資料從 ClickHouse 查詢
+ * - 成本：Redis 記憶體昂貴（$0.15/GB/小時），不適合長期存儲
  */
 ```
 
-### 5.4 Why ClickHouse Over MySQL?
+### 5.4 為何選擇 ClickHouse 而非 MySQL？
 
 ```java
 /**
- * OLAP engine selection:
- * - Performance: Columnar storage, 100-1000x faster for aggregation queries
- * - Example: SUM(amount) over 1 billion rows: MySQL (30s+), ClickHouse (< 1s)
- * - Limitation: Does not support frequent UPDATE/DELETE, OLAP only
+ * OLAP 引擎選擇：
+ * - 效能：列式存儲，聚合查詢快 100-1000 倍
+ * - 範例：對 10 億筆記錄執行 SUM(amount)：MySQL（30秒+），ClickHouse（< 1秒）
+ * - 限制：不支援頻繁 UPDATE/DELETE，僅限 OLAP
  */
 ```
 
 ---
 
-## 6. ETL Quality Control
+## 6. ETL 品質控制（ETL Quality Control）
 
-### 6.1 Quality Checks Per Layer
+### 6.1 每層品質檢查（Quality Checks Per Layer）
 
 ```sql
--- ODS to DWD check: Record count consistency
+-- ODS 到 DWD 檢查：記錄數一致性
 SELECT
     'ods_transactions' AS source,
     COUNT(*) AS source_count,
@@ -238,7 +238,7 @@ SELECT
 FROM ods_transactions
 WHERE date = '2026-02-08';
 
--- DWD to DWS check: Aggregation accuracy
+-- DWD 到 DWS 檢查：聚合準確性
 SELECT
     date,
     SUM(amount) AS dwd_total,
@@ -249,43 +249,43 @@ FROM dwd_transaction_detail
 WHERE date = '2026-02-08';
 ```
 
-### 6.2 Quality Threshold Rules
+### 6.2 品質閾值規則（Quality Threshold Rules）
 
-| Check | Threshold | Action on Failure |
+| 檢查項目 | 閾值 | 失敗時動作 |
 |-------|-----------|-------------------|
-| Record count mismatch | > 0.1% difference | Block downstream ETL + alert |
-| NULL value percentage | > 5% | Alert data engineering |
-| Duplicate records | > 0 | Block downstream ETL + alert |
-| Anomaly rate | > 5% | Halt pipeline + alert |
+| 記錄數不符 | > 0.1% 差異 | 阻擋下游 ETL + 告警 |
+| NULL 值百分比 | > 5% | 告警資料工程團隊 |
+| 重複記錄 | > 0 | 阻擋下游 ETL + 告警 |
+| 異常率 | > 5% | 暫停管道 + 告警 |
 
 ---
 
-## 7. Data Correction Implementation
+## 7. 資料修正實作（Data Correction Implementation）
 
 ```sql
--- Idempotent Overwrite: Drop partition and re-run ETL
+-- 冪等覆寫：刪除分區並重新執行 ETL
 ALTER TABLE dws_revenue DROP PARTITION '2023-10-01';
 
--- Re-execute ETL pipeline for specific date
--- Airflow command: airflow trigger_dag etl_dws_revenue --conf '{"date": "2023-10-01"}'
+-- 為特定日期重新執行 ETL 管道
+-- Airflow 命令：airflow trigger_dag etl_dws_revenue --conf '{"date": "2023-10-01"}'
 ```
 
 ---
 
-## 8. Multi-Tenant OLAP Strategy
+## 8. 多租戶 OLAP 策略（Multi-Tenant OLAP Strategy）
 
 ```sql
--- All tables partitioned by tenant_id
--- Queries MUST include tenant_id filter
+-- 所有表按 tenant_id 分區
+-- 查詢必須包含 tenant_id 過濾條件
 
--- Tenant-level query (mandatory)
+-- 租戶級查詢（必須）
 SELECT date, SUM(ggr) AS total_ggr
 FROM dws_daily_revenue
 WHERE tenant_id = 'tenant_001'
   AND date BETWEEN '2026-01-01' AND '2026-01-31'
 GROUP BY date;
 
--- Platform-level query (admin only)
+-- 平台級查詢（僅管理員）
 SELECT tenant_id, SUM(ggr) AS total_ggr
 FROM dws_daily_revenue
 WHERE date BETWEEN '2026-01-01' AND '2026-01-31'
@@ -295,24 +295,24 @@ ORDER BY total_ggr DESC;
 
 ---
 
-## 9. Operational Monitoring
+## 9. 營運監控（Operational Monitoring）
 
-### 9.1 ETL Monitoring Targets
+### 9.1 ETL 監控目標（ETL Monitoring Targets）
 
-| Metric | Target | Alert Threshold |
+| 指標 | 目標 | 告警閾值 |
 |--------|--------|----------------|
-| ETL execution time per layer | < 15 minutes | > 20 minutes |
-| Total ETL pipeline | < 1 hour | > 1.5 hours |
-| ADS layer data available | Before 03:00 AM | After 03:30 AM (SLA: 99.5%) |
-| Data quality check pass | 100% | Any failure |
-| ADS query latency | < 3s (P95) | > 5s |
-| Storage cost (ODS: 70%) | Budget target | > 110% of budget |
+| 每層 ETL 執行時間 | < 15 分鐘 | > 20 分鐘 |
+| 整體 ETL 管道 | < 1 小時 | > 1.5 小時 |
+| ADS 層資料可用時間 | 03:00 AM 前 | 03:30 AM 後（SLA: 99.5%） |
+| 資料品質檢查通過率 | 100% | 任何失敗 |
+| ADS 查詢延遲 | < 3秒（P95） | > 5秒 |
+| 儲存成本（ODS: 70%） | 預算目標 | > 預算 110% |
 
 ---
 
-## 10. SmartAdmin Implementation
+## 10. SmartAdmin 實作（SmartAdmin Implementation）
 
-### 10.1 Dashboard Query Service
+### 10.1 儀表板查詢 Service
 
 ```java
 @Service
@@ -346,7 +346,7 @@ public class DashboardQueryService {
 }
 ```
 
-### 10.2 ETL Quality Manager
+### 10.2 ETL 品質 Manager
 
 ```java
 @Component
@@ -378,7 +378,7 @@ public class EtlQualityManager {
 }
 ```
 
-### 10.3 Database Schema
+### 10.3 資料庫架構（Database Schema）
 
 ```sql
 -- Dashboard KPI metrics table

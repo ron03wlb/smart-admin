@@ -1,64 +1,64 @@
-# Agent System Technical Architecture
+# 代理系統技術架構（Agent System Technical Architecture）
 
-> **Business Requirements**: [Agent System Requirements](../../requirements/07_Agent_Operations/Agent_System_Requirements.md)
-> **Canonical Source**: [source-archive/07_Agent_Center/07-03_Agent_System.md](../../source-archive/07_Agent_Center/07-03_Agent_System.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
-
----
-
-## 1. Architecture Overview
-
-The Agent (Affiliate) System uses a **Closure Table** pattern for hierarchy storage, an event-driven commission calculation engine, and an immutable adjustment ledger for cross-period corrections.
+> **業務需求**: [Agent System Requirements](../../requirements/07_Agent_Operations/Agent_System_Requirements.md)
+> **規範來源**: [source-archive/07_Agent_Center/07-03_Agent_System.md](../../source-archive/07_Agent_Center/07-03_Agent_System.md)
+> **視角**: Technical Architecture
+> **目標讀者**: Architects, Backend Developers
 
 ---
 
-## 2. Hierarchy Storage Design
+## 1. 架構概述（Architecture Overview）
 
-### 2.1 Storage Strategy Comparison
+代理（Agent）系統（又稱聯盟夥伴系統，Affiliate）使用 **Closure Table** 模式進行階層儲存，採用事件驅動的佣金（Commission）計算引擎，以及不可變的調整分類帳用於跨週期修正。
 
-| Strategy | Pros | Cons | Best For |
+---
+
+## 2. 階層儲存設計（Hierarchy Storage Design）
+
+### 2.1 儲存策略比較（Storage Strategy Comparison）
+
+| 策略 | 優點 | 缺點 | 最適用場景 |
 |----------|------|------|----------|
-| **Nested Set** | Fast subtree queries (single query) | Expensive insert/move | Read-heavy workloads |
-| **Closure Table** | Flexible insert/move operations | Higher storage cost | Write-heavy workloads |
+| **Nested Set** | 快速子樹查詢（單次查詢） | 插入/移動操作昂貴 | 讀取密集型工作負載 |
+| **Closure Table** | 靈活的插入/移動操作 | 較高的儲存成本 | 寫入密集型工作負載 |
 
-**Chosen Strategy**: **Closure Table + Path Redundancy Field**
+**選定策略**：**Closure Table + 路徑冗余欄位**
 
-**Rationale**:
-- Agent hierarchy changes frequently (new agents join, transfers between parents)
-- Closure Table supports fast insertion and path queries
-- Path field (`/1/5/12/`) provides fast hierarchy level determination
+**理由**：
+- 代理（Agent）階層變動頻繁（新代理加入、上級轉移）
+- Closure Table 支援快速插入和路徑查詢
+- 路徑欄位（`/1/5/12/`）提供快速階層級別判斷
 
 ---
 
-## 3. Commission Calculation Engine
+## 3. 佣金計算引擎（Commission Calculation Engine）
 
 ```mermaid
 graph TD
-    A[Game Bet Placed] --> B[Event Bus]
-    B --> C[Commission Calculation Engine]
-    C --> D{Calculation Mode}
-    D -->|Revenue Share| E[Net Win Calculation]
-    D -->|Turnover Rebate| F[Valid Bet Calculation]
-    D -->|CPA| G[First Deposit Detection]
-    E --> H[Multi-Level Commission Distribution]
+    A[遊戲下注完成] --> B[Event Bus]
+    B --> C[佣金計算引擎]
+    C --> D{計算模式}
+    D -->|淨營收分成| E[淨贏額計算]
+    D -->|有效投注額返佣| F[有效投注額計算]
+    D -->|CPA| G[首次存款檢測]
+    E --> H[多層級佣金分配]
     F --> H
     G --> H
-    H --> I[Adjustment Wallet Processing]
-    I --> J[Commission Record Table]
-    J --> K[Approval Queue]
+    H --> I[調整錢包處理]
+    I --> J[佣金記錄表]
+    J --> K[審批隊列]
 ```
 
-**Architecture Characteristics**:
-- **Event-Driven**: Bet events trigger commission calculation
-- **Batch Processing**: Daily settlement at 02:00 via scheduled task
-- **Adjustment Ledger**: Adjustment items recorded independently, historical reports immutable
+**架構特性**：
+- **事件驅動**：下注事件觸發佣金計算
+- **批次處理**：每日凌晨 02:00 透過排程任務進行結算（Settlement）
+- **調整分類帳**：調整項目獨立記錄，歷史報表不可變
 
 ---
 
-## 4. Database Schema
+## 4. 資料庫架構（Database Schema）
 
-### 4.1 affiliate_agent Table (Agent Master)
+### 4.1 affiliate_agent Table（代理主表）
 
 ```sql
 CREATE TABLE affiliate_agent (
@@ -83,7 +83,7 @@ CREATE TABLE affiliate_agent (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 4.2 affiliate_hierarchy Table (Closure Table)
+### 4.2 affiliate_hierarchy Table（Closure Table）
 
 ```sql
 CREATE TABLE affiliate_hierarchy (
@@ -99,7 +99,7 @@ CREATE TABLE affiliate_hierarchy (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 4.3 affiliate_commission_plan Table
+### 4.3 affiliate_commission_plan Table（佣金方案表）
 
 ```sql
 CREATE TABLE affiliate_commission_plan (
@@ -125,7 +125,7 @@ CREATE TABLE affiliate_commission_plan (
 -- ]
 ```
 
-### 4.4 affiliate_commission_record Table
+### 4.4 affiliate_commission_record Table（佣金記錄表）
 
 ```sql
 CREATE TABLE affiliate_commission_record (
@@ -149,7 +149,7 @@ CREATE TABLE affiliate_commission_record (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 4.5 affiliate_adjustment Table
+### 4.5 affiliate_adjustment Table（調整記錄表）
 
 ```sql
 CREATE TABLE affiliate_adjustment (
@@ -170,9 +170,9 @@ CREATE TABLE affiliate_adjustment (
 
 ---
 
-## 5. SQL Query Examples
+## 5. SQL 查詢範例（SQL Query Examples）
 
-### 5.1 Query Agent Downline Tree (Closure Table)
+### 5.1 查詢代理下線樹（Query Agent Downline Tree）（Closure Table）
 
 ```sql
 -- Query all downline agents for agent_id=10 (including self)
@@ -185,7 +185,7 @@ WHERE h.ancestor_id = 10
 ORDER BY h.depth, a.agent_id;
 ```
 
-### 5.2 Calculate Monthly Commission (Revenue Share)
+### 5.2 計算月度佣金（Calculate Monthly Commission）（淨營收分成）
 
 ```sql
 SELECT
@@ -211,7 +211,7 @@ FROM (
 GROUP BY agent_id;
 ```
 
-### 5.3 Same IP Detection
+### 5.3 同 IP 檢測（Same IP Detection）
 
 ```sql
 -- Detect agent and downline players sharing same IP
@@ -233,9 +233,9 @@ WHERE p.last_login_ip = (
 
 ---
 
-## 6. SmartAdmin Architecture Implementation
+## 6. SmartAdmin 架構實作（SmartAdmin Architecture Implementation）
 
-### 6.1 AffiliateEntity (Entity Layer)
+### 6.1 AffiliateEntity（Entity 層）
 
 ```java
 package net.lab1024.sa.affiliate.domain.entity;
@@ -272,7 +272,7 @@ public class AffiliateEntity {
 }
 ```
 
-### 6.2 AffiliateCommissionManager (Manager Layer)
+### 6.2 AffiliateCommissionManager（Manager 層）
 
 ```java
 package net.lab1024.sa.affiliate.manager;
@@ -366,7 +366,7 @@ public class AffiliateCommissionManager {
 }
 ```
 
-### 6.3 AffiliateService (Service Layer)
+### 6.3 AffiliateService（Service 層）
 
 ```java
 package net.lab1024.sa.affiliate.service;
@@ -413,7 +413,7 @@ public class AffiliateService {
 }
 ```
 
-### 6.4 AffiliateDao (Dao Layer)
+### 6.4 AffiliateDao（Dao 層）
 
 ```java
 package net.lab1024.sa.affiliate.dao;
@@ -443,7 +443,7 @@ public interface AffiliateDao extends BaseMapper<AffiliateEntity> {
 }
 ```
 
-### 6.5 Negative Carryover Formula Implementation
+### 6.5 負數結轉公式實作（Negative Carryover Formula Implementation）
 
 ```java
 /**
@@ -464,9 +464,9 @@ public BigDecimal calculateCarryover(BigDecimal currentCommission, BigDecimal pr
 
 ---
 
-## 7. API Specifications
+## 7. API 規格（API Specifications）
 
-### 7.1 Referral Link Generation
+### 7.1 推薦連結生成（Referral Link Generation）
 
 **Endpoint**: `POST /api/affiliate/referral-link`
 
@@ -491,7 +491,7 @@ public BigDecimal calculateCarryover(BigDecimal currentCommission, BigDecimal pr
 }
 ```
 
-### 7.2 Player Binding
+### 7.2 玩家綁定（Player Binding）
 
 **Endpoint**: `POST /api/affiliate/bind-player`
 
@@ -506,7 +506,7 @@ public BigDecimal calculateCarryover(BigDecimal currentCommission, BigDecimal pr
 }
 ```
 
-### 7.3 Commission History Query
+### 7.3 佣金歷史查詢（Commission History Query）
 
 **Endpoint**: `GET /api/affiliate/commission/history?agentId=12345&startDate=2026-02-01&endDate=2026-02-28`
 
@@ -533,9 +533,9 @@ public BigDecimal calculateCarryover(BigDecimal currentCommission, BigDecimal pr
 
 ---
 
-## 8. Monitoring & Alerting
+## 8. 監控與告警（Monitoring & Alerting）
 
-### 8.1 Prometheus Alert Rules
+### 8.1 Prometheus 告警規則（Prometheus Alert Rules）
 
 ```yaml
 groups:
@@ -557,18 +557,18 @@ groups:
           summary: "Commission amount anomaly detected"
 ```
 
-### 8.2 Grafana Dashboard Panels
+### 8.2 Grafana 儀表板面板（Grafana Dashboard Panels）
 
-| Panel | Type | Query |
+| 面板 | 類型 | 查詢 |
 |-------|------|-------|
-| Today's Commission Total | Line chart | `sum(affiliate_commission_amount{status="APPROVED"}) by (tenant_id)` |
-| Pending Approval Count | Number panel | `count(affiliate_commission_record{status="PENDING"})` |
-| Calculation Duration | Line chart | `avg(affiliate_commission_calculation_duration_seconds) by (agent_id)` |
-| Top 10 Agents by Commission | Table | Sorted by commission amount |
-| Same IP Detection Alerts | Table | Flagged agent-player IP matches |
+| 今日佣金總額 | 折線圖 | `sum(affiliate_commission_amount{status="APPROVED"}) by (tenant_id)` |
+| 待審批數量 | 數字面板 | `count(affiliate_commission_record{status="PENDING"})` |
+| 計算耗時 | 折線圖 | `avg(affiliate_commission_calculation_duration_seconds) by (agent_id)` |
+| 佣金前 10 名代理 | 表格 | 按佣金金額排序 |
+| 同 IP 檢測告警 | 表格 | 標記的代理-玩家 IP 匹配 |
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-09
-**Maintenance Team**: Product Team & Backend Team
+**文件版本**: 4.0.0
+**最後更新**: 2026-02-09
+**維護團隊**: Product Team & Backend Team

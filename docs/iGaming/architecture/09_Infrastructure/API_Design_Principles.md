@@ -1,14 +1,14 @@
-# API 設計原則 (API Design Principles)
+# API 設計原則（API Design Principles）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md)
+> **視角**: Technical Architecture (Development & DevOps)
 
 ---
 
-## 1. RESTful 核心原則
+## 1. RESTful 核心原則（RESTful Core Principles）
 
-### 1.1 資源導向 (Resource-Oriented)
+### 1.1 資源導向（Resource-Oriented）
 
 ```
 GET /api/v1/players/{id}          # 查詢單個玩家
@@ -22,7 +22,7 @@ GET /api/v1/players/{id}/transactions  # 子資源: 玩家交易
 POST /api/v1/players/{id}/bonuses      # 子資源: 發放紅利
 ```
 
-### 1.2 HTTP 方法語義
+### 1.2 HTTP 方法語義（HTTP Method Semantics）
 
 | 方法 | 語義 | 冪等性 | 安全性 | 使用場景 |
 |------|------|-------|-------|---------|
@@ -32,7 +32,7 @@ POST /api/v1/players/{id}/bonuses      # 子資源: 發放紅利
 | **PATCH** | 部分更新 | No | No | 更新部分字段 |
 | **DELETE** | 刪除資源 | Yes | No | 刪除玩家、取消訂單 |
 
-### 1.3 路徑命名規範
+### 1.3 路徑命名規範（Path Naming Conventions）
 
 ```
 /api/v{version}/{resource}
@@ -48,9 +48,9 @@ POST /api/v1/players/{id}/bonuses      # 子資源: 發放紅利
 
 ---
 
-## 2. 查詢參數規範
+## 2. 查詢參數規範（Query Parameter Standards）
 
-### 2.1 過濾 (Filtering)
+### 2.1 過濾（Filtering）
 
 ```http
 GET /api/v1/players?status=active&kyc_status=verified
@@ -59,20 +59,20 @@ GET /api/v1/players?balance_gt=1000&balance_lte=10000
 GET /api/v1/players?status_in=active,suspended
 ```
 
-### 2.2 排序 (Sorting)
+### 2.2 排序（Sorting）
 
 ```http
 GET /api/v1/players?sort=created_at:desc
 GET /api/v1/players?sort=vip_level:desc,created_at:desc
 ```
 
-### 2.3 分頁 (Pagination)
+### 2.3 分頁（Pagination）
 
 ```http
 GET /api/v1/players?page=1&page_size=20
 ```
 
-### 2.4 字段選擇 (Field Selection)
+### 2.4 字段選擇（Field Selection）
 
 ```http
 GET /api/v1/players?fields=id,username,email
@@ -80,9 +80,9 @@ GET /api/v1/players?fields=id,username,email
 
 ---
 
-## 3. HTTP 狀態碼
+## 3. HTTP 狀態碼（HTTP Status Codes）
 
-### 3.1 成功響應 (2xx)
+### 3.1 成功響應（2xx）
 
 | 狀態碼 | 說明 | 使用場景 |
 |--------|------|---------|
@@ -91,7 +91,7 @@ GET /api/v1/players?fields=id,username,email
 | **202 Accepted** | 已接受 | 異步處理已提交 |
 | **204 No Content** | 無內容 | DELETE 成功 |
 
-### 3.2 客戶端錯誤 (4xx)
+### 3.2 客戶端錯誤（4xx）
 
 | 狀態碼 | 說明 | 使用場景 | 錯誤碼 |
 |--------|------|---------|--------|
@@ -103,7 +103,7 @@ GET /api/v1/players?fields=id,username,email
 | **422** | 無法處理 | 業務規則違反 | 4010 |
 | **429** | 限流 | 超過請求限制 | 4029 |
 
-### 3.3 服務端錯誤 (5xx)
+### 3.3 服務端錯誤（5xx）
 
 | 狀態碼 | 說明 | 使用場景 | 錯誤碼 |
 |--------|------|---------|--------|
@@ -114,9 +114,9 @@ GET /api/v1/players?fields=id,username,email
 
 ---
 
-## 4. 統一響應格式
+## 4. 統一響應格式（Unified Response Format）
 
-### 4.1 成功響應
+### 4.1 成功響應（Success Response）
 
 ```json
 {
@@ -132,7 +132,7 @@ GET /api/v1/players?fields=id,username,email
 }
 ```
 
-### 4.2 錯誤響應
+### 4.2 錯誤響應（Error Response）
 
 ```json
 {
@@ -148,7 +148,7 @@ GET /api/v1/players?fields=id,username,email
 }
 ```
 
-### 4.3 字段說明
+### 4.3 字段說明（Field Description）
 
 | 字段 | 類型 | 說明 |
 |------|------|------|
@@ -161,9 +161,9 @@ GET /api/v1/players?fields=id,username,email
 
 ---
 
-## 5. 請求頭規範
+## 5. 請求頭規範（Request Header Standards）
 
-### 5.1 必須包含
+### 5.1 必須包含（Required Headers）
 
 ```http
 Content-Type: application/json
@@ -173,7 +173,7 @@ X-Tenant-ID: {tenant_id}
 Accept-Language: en-US,zh-TW
 ```
 
-### 5.2 可選包含
+### 5.2 可選包含（Optional Headers）
 
 ```http
 X-Device-ID: {device_fingerprint}
@@ -183,16 +183,16 @@ X-Idempotency-Key: {uuid}  # 用於 POST/PATCH
 
 ---
 
-## 6. API 版本策略
+## 6. API 版本策略（API Versioning Strategy）
 
-### 6.1 URL 版本（推薦）
+### 6.1 URL 版本（URL Versioning, Recommended）
 
 ```
 /api/v1/players
 /api/v2/players
 ```
 
-### 6.2 版本兼容性規則
+### 6.2 版本兼容性規則（Version Compatibility Rules）
 
 **Breaking Changes（需要新版本）**:
 - 刪除字段
@@ -204,7 +204,7 @@ X-Idempotency-Key: {uuid}  # 用於 POST/PATCH
 - 添加可選參數
 - 放寬驗證規則
 
-### 6.3 版本生命週期
+### 6.3 版本生命週期（Version Lifecycle）
 
 ```
 v1 Released: 2025-01-01
@@ -223,9 +223,9 @@ Link: </api/v2/players>; rel="alternate"
 
 ---
 
-## 7. SmartAdmin Implementation
+## 7. SmartAdmin 實作範例（SmartAdmin Implementation）
 
-### 7.1 Controller Layer
+### 7.1 Controller 層（Controller Layer）
 
 ```java
 @RestController
@@ -263,7 +263,7 @@ public class PlayerController {
 }
 ```
 
-### 7.2 Database Schema for API Rate Limiting
+### 7.2 API 速率限制資料庫結構（Database Schema for API Rate Limiting）
 
 ```sql
 -- API rate limit configuration
@@ -299,7 +299,7 @@ CREATE INDEX idx_api_log_tenant ON t_api_request_log(tenant_id, created_at DESC)
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [Authentication Architecture](./Authentication_Architecture.md) - 認證與授權
 - [Common Patterns](./Common_Patterns.md) - 通用 API 模式
