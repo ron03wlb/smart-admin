@@ -1,9 +1,9 @@
 # 技術堆疊（Technology Stack）
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-09_Technology_Stack.md](../../source-archive/00_Foundation/guides/00-09_Technology_Stack.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Business Requirements**: N/A (pure technical document, no requirements counterpart)
-> **Last Synced**: 2026-02-08
+> **目標讀者（Audience）**: 架構師、後端開發人員、DevOps 工程師
+> **業務需求（Business Requirements）**: N/A（純技術文檔，無對應需求文件）
+> **最後同步（Last Synced）**: 2026-02-08
 
 ---
 

@@ -1,9 +1,9 @@
 # 業務邏輯流程 -- 技術實現
 
 > **Canonical Source**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Business Requirements**: [Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md)
-> **Last Synced**: 2026-02-08
+> **目標讀者（Audience）**: 架構師、後端開發人員、DevOps 工程師
+> **業務需求（Business Requirements）**: [Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md)
+> **最後同步（Last Synced）**: 2026-02-08
 
 ---
 
