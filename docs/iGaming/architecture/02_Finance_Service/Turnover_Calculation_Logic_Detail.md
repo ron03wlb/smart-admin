@@ -357,7 +357,341 @@ flowchart TB
 
 ---
 
-## 11. 程式碼索引
+## 11. SmartAdmin 架構實作範例
+
+### 11.1 TurnoverService - 有效投注額查詢服務
+
+```java
+package net.lab1024.sa.business.finance.turnover.service;
+
+import io.vavr.control.Option;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.business.finance.turnover.domain.TurnoverVO;
+import net.lab1024.sa.business.finance.turnover.dao.PlayerWalletDao;
+import net.lab1024.sa.business.finance.turnover.entity.PlayerWalletEntity;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import org.springframework.stereotype.Service;
+
+/**
+ * 有效投注額服務
+ */
+@Service
+@RequiredArgsConstructor
+public class TurnoverService {
+
+    private final PlayerWalletDao playerWalletDao;
+
+    /**
+     * 查詢玩家主錢包有效投注額狀態
+     */
+    public Option<TurnoverVO> getMainWalletTurnoverStatus(Long playerId) {
+        return Option.of(playerWalletDao.selectMainWallet(playerId))
+            .map(wallet -> {
+                TurnoverVO vo = SmartBeanUtil.copy(wallet, TurnoverVO.class);
+                vo.setRemainingTurnover(wallet.getLockAmount());
+                vo.setCompletionRate(calculateCompletionRate(wallet));
+                return vo;
+            });
+    }
+
+    /**
+     * 計算有效投注額完成百分比
+     */
+    private Double calculateCompletionRate(PlayerWalletEntity wallet) {
+        if (wallet.getLockAmount() == null || wallet.getLockAmount() == 0L) {
+            return 100.0;
+        }
+        long initialLock = wallet.getLockAmount() + wallet.getEffectiveStake();
+        if (initialLock == 0L) return 0.0;
+        return (wallet.getEffectiveStake() * 100.0) / initialLock;
+    }
+}
+```
+
+### 11.2 TurnoverManager - 有效投注額結算管理器
+
+```java
+package net.lab1024.sa.business.finance.turnover.manager;
+
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.business.finance.turnover.dao.PlayerWalletDao;
+import net.lab1024.sa.business.finance.turnover.dao.WalletTransactionDao;
+import net.lab1024.sa.business.finance.turnover.entity.PlayerWalletEntity;
+import net.lab1024.sa.business.finance.turnover.entity.WalletTransactionEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * 有效投注額事務管理器
+ * 負責多錢包協調的複雜有效投注額計算與更新
+ */
+@Component
+@RequiredArgsConstructor
+public class TurnoverManager {
+
+    private final PlayerWalletDao playerWalletDao;
+    private final WalletTransactionDao transactionDao;
+
+    /**
+     * 結算投注並更新有效投注額（跨多個錢包）
+     *
+     * @param playerId 玩家 ID
+     * @param betTransactionId 投注交易 ID
+     * @param effectiveStake 本次有效投注額
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void settleBetEffectiveStake(Long playerId, Long betTransactionId, Long effectiveStake) {
+        // 1. 查詢投注記錄
+        WalletTransactionEntity transaction = transactionDao.selectById(betTransactionId);
+        if (transaction == null) {
+            throw new IllegalArgumentException("投注交易不存在: " + betTransactionId);
+        }
+
+        // 2. 更新投注錢包有效投注額
+        PlayerWalletEntity wallet = playerWalletDao.selectById(transaction.getWalletId());
+        if (wallet == null) {
+            throw new IllegalArgumentException("錢包不存在: " + transaction.getWalletId());
+        }
+
+        long newEffectiveStake = wallet.getEffectiveStake() + effectiveStake;
+        long newLockAmount = Math.max(0L, wallet.getLockAmount() - effectiveStake);
+
+        playerWalletDao.updateEffectiveStakeAndLock(
+            wallet.getId(),
+            newEffectiveStake,
+            newLockAmount
+        );
+
+        // 3. 更新交易記錄
+        transactionDao.updateEffectiveStake(betTransactionId, effectiveStake);
+    }
+
+    /**
+     * 批量更新玩家所有活躍促銷錢包有效投注額（每日批次作業）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void batchRecalculatePromotionWallets(List<Long> playerIds) {
+        for (Long playerId : playerIds) {
+            List<PlayerWalletEntity> promoWallets = playerWalletDao.selectActivePromotionWallets(playerId);
+            for (PlayerWalletEntity wallet : promoWallets) {
+                recalculateWagerRequirement(wallet);
+            }
+        }
+    }
+
+    /**
+     * 重新計算促銷錢包有效投注額要求（促銷轉主錢包時使用）
+     */
+    private void recalculateWagerRequirement(PlayerWalletEntity wallet) {
+        long remaining = wallet.getWagerRequirement() - wallet.getEffectiveStake();
+        if (remaining <= 0) {
+            playerWalletDao.markPromotionComplete(wallet.getId());
+        }
+    }
+}
+```
+
+### 11.3 GridAbstractService - 有效投注額計算核心邏輯
+
+```java
+package net.lab1024.sa.business.game.grid.service;
+
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.business.game.grid.domain.GameType;
+import net.lab1024.sa.business.finance.turnover.manager.TurnoverManager;
+import org.springframework.stereotype.Service;
+
+/**
+ * 遊戲網格抽象服務 - 有效投注額計算
+ */
+@Service
+@RequiredArgsConstructor
+public class GridAbstractService {
+
+    private final TurnoverManager turnoverManager;
+
+    /**
+     * 依遊戲類型計算有效投注額
+     *
+     * @param gameType 遊戲類型（體育/電競/真人娛樂城/其他）
+     * @param betAmount 投注金額
+     * @param winAmount 派彩金額
+     * @param lossAmount 虧損金額（體育/電競專用）
+     * @return 有效投注額
+     */
+    protected long getEffectiveStake(GameType gameType, long betAmount, long winAmount, long lossAmount) {
+        return switch (gameType) {
+            case SPORTS, E_SPORTS -> Math.abs(winAmount + lossAmount);
+            case CASINO -> {
+                if (winAmount == betAmount) yield 0L;                  // 和局
+                else if (winAmount > 0) yield Math.min(winAmount, betAmount); // 贏
+                else yield betAmount;                                    // 輸
+            }
+            default -> betAmount;
+        };
+    }
+
+    /**
+     * 計算返水有效投注額（促銷投注需扣除剩餘有效投注額要求）
+     */
+    protected long getRebateEffectiveStake(Long playerId, Long walletId, long effectiveStake, boolean isPromotion) {
+        if (!isPromotion) {
+            return effectiveStake;
+        }
+
+        // 促銷投注：計算剩餘有效投注額要求
+        long remainingRequirement = turnoverManager.calculateRemainingTurnoverRequired(playerId);
+        return Math.max(0L, effectiveStake - remainingRequirement);
+    }
+}
+```
+
+---
+
+## 12. 資料庫 Schema
+
+### 12.1 player_wallet - 玩家錢包表
+
+```sql
+CREATE TABLE t_player_wallet (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id BIGINT NOT NULL,
+    player_id BIGINT NOT NULL,
+    wallet_type VARCHAR(20) NOT NULL COMMENT 'MAIN, PROMOTION',
+    cash BIGINT NOT NULL DEFAULT 0 COMMENT '現金餘額（分）',
+    bonus BIGINT NOT NULL DEFAULT 0 COMMENT '獎金餘額（分）',
+    lock_amount BIGINT NOT NULL DEFAULT 0 COMMENT '鎖定金額（僅主錢包）',
+    clean_amount BIGINT NOT NULL DEFAULT 0 COMMENT '可提領金額',
+    effective_stake BIGINT NOT NULL DEFAULT 0 COMMENT '累計有效投注額',
+    wager_requirement BIGINT COMMENT '有效投注額要求（僅促銷錢包）',
+    promotion_id BIGINT COMMENT '促銷活動 ID（僅促銷錢包）',
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE, COMPLETED, EXPIRED',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    INDEX idx_player_type (player_id, wallet_type),
+    INDEX idx_tenant_player (tenant_id, player_id),
+    INDEX idx_status (status)
+) COMMENT '玩家錢包表';
+
+COMMENT ON COLUMN t_player_wallet.lock_amount IS '鎖定金額：存款或獎金產生的有效投注額要求鎖定金額（僅主錢包有值）';
+COMMENT ON COLUMN t_player_wallet.effective_stake IS '累計有效投注額：用於解鎖 lock_amount 或達成 wager_requirement';
+COMMENT ON COLUMN t_player_wallet.wager_requirement IS '有效投注額要求：促銷錢包必須完成的有效投注額門檻';
+```
+
+### 12.2 wallet_transaction - 錢包交易記錄表
+
+```sql
+CREATE TABLE t_wallet_transaction (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id BIGINT NOT NULL,
+    player_id BIGINT NOT NULL,
+    wallet_id BIGINT NOT NULL,
+    transaction_type VARCHAR(30) NOT NULL COMMENT 'DEPOSIT, WITHDRAW, BET, PAYOUT, PROMOTION',
+    amount BIGINT NOT NULL COMMENT '交易金額（分）',
+    cash_delta BIGINT NOT NULL DEFAULT 0 COMMENT '現金變化',
+    bonus_delta BIGINT NOT NULL DEFAULT 0 COMMENT '獎金變化',
+    lock_delta BIGINT NOT NULL DEFAULT 0 COMMENT 'lockAmount 變化',
+    effective_stake BIGINT NOT NULL DEFAULT 0 COMMENT '本次交易產生的有效投注額',
+    rebate_effective_stake BIGINT NOT NULL DEFAULT 0 COMMENT '可計入返水的有效投注額',
+    is_promotion BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否為促銷投注',
+    game_provider VARCHAR(50) COMMENT '遊戲供應商',
+    game_type VARCHAR(20) COMMENT '遊戲類型（SPORTS/CASINO/E_SPORTS/SLOTS）',
+    bet_id VARCHAR(100) COMMENT '投注單 ID（外部供應商）',
+    status VARCHAR(20) NOT NULL DEFAULT 'COMPLETED' COMMENT 'PENDING, COMPLETED, CANCELLED',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    INDEX idx_player_time (player_id, created_at),
+    INDEX idx_wallet_type (wallet_id, transaction_type),
+    INDEX idx_bet_id (bet_id),
+    INDEX idx_tenant (tenant_id)
+) COMMENT '錢包交易記錄表';
+
+COMMENT ON COLUMN t_wallet_transaction.effective_stake IS '有效投注額：結算時依遊戲類型計算，用於解鎖 lockAmount 或達成 wagerRequirement';
+COMMENT ON COLUMN t_wallet_transaction.rebate_effective_stake IS '返水有效投注額：促銷投注需扣除剩餘有效投注額要求後才可計入返水';
+```
+
+### 12.3 turnover_history - 有效投注額歷史記錄表
+
+```sql
+CREATE TABLE t_turnover_history (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id BIGINT NOT NULL,
+    player_id BIGINT NOT NULL,
+    wallet_id BIGINT NOT NULL,
+    transaction_id BIGINT NOT NULL,
+    effective_stake BIGINT NOT NULL COMMENT '有效投注額',
+    lock_amount_before BIGINT NOT NULL COMMENT '變更前 lockAmount',
+    lock_amount_after BIGINT NOT NULL COMMENT '變更後 lockAmount',
+    game_type VARCHAR(20) COMMENT '遊戲類型',
+    bet_amount BIGINT COMMENT '投注金額',
+    win_amount BIGINT COMMENT '派彩金額',
+    calculation_formula VARCHAR(100) COMMENT '計算公式（用於審計追蹤）',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_player_time (player_id, created_at),
+    INDEX idx_transaction (transaction_id),
+    INDEX idx_tenant (tenant_id)
+) COMMENT '有效投注額變更歷史表（審計追蹤）';
+
+COMMENT ON COLUMN t_turnover_history.calculation_formula IS '計算公式範例: "SPORTS: abs(-500 + (-500)) = 1000" 或 "CASINO_WIN: min(1500, 1000) = 1000"';
+```
+
+### 12.4 關鍵查詢範例
+
+```sql
+-- 查詢玩家剩餘有效投注額要求（提款檢查）
+SELECT
+    (SELECT COALESCE(lock_amount, 0)
+     FROM t_player_wallet
+     WHERE player_id = ? AND wallet_type = 'MAIN' AND deleted = FALSE) +
+    COALESCE(SUM(wager_requirement - effective_stake), 0) AS turnover_required
+FROM t_player_wallet
+WHERE player_id = ?
+  AND wallet_type = 'PROMOTION'
+  AND status = 'ACTIVE'
+  AND deleted = FALSE;
+
+-- 查詢玩家有效投注額完成進度
+SELECT
+    wallet_type,
+    CASE
+        WHEN wallet_type = 'MAIN' THEN lock_amount
+        WHEN wallet_type = 'PROMOTION' THEN wager_requirement
+    END AS total_requirement,
+    effective_stake,
+    CASE
+        WHEN wallet_type = 'MAIN' AND lock_amount > 0
+            THEN ROUND((effective_stake * 100.0) / (lock_amount + effective_stake), 2)
+        WHEN wallet_type = 'PROMOTION' AND wager_requirement > 0
+            THEN ROUND((effective_stake * 100.0) / wager_requirement, 2)
+        ELSE 100.0
+    END AS completion_rate
+FROM t_player_wallet
+WHERE player_id = ? AND deleted = FALSE
+ORDER BY wallet_type;
+
+-- 查詢玩家有效投注額歷史趨勢（過去 30 天）
+SELECT
+    DATE(created_at) AS bet_date,
+    game_type,
+    SUM(effective_stake) AS daily_turnover,
+    COUNT(DISTINCT transaction_id) AS bet_count
+FROM t_turnover_history
+WHERE player_id = ?
+  AND created_at >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+GROUP BY DATE(created_at), game_type
+ORDER BY bet_date DESC, game_type;
+```
+
+---
+
+## 13. 原始程式碼索引
 
 | 功能 | 檔案 | 方法 |
 |------|------|----------|
