@@ -1,8 +1,8 @@
-# 性能監控與告警架構 (Performance Monitoring & Alerting)
+# 性能監控與告警架構（Performance Monitoring & Alerting）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-06 Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-06 Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md)
+> **目標讀者**: DevOps Engineers, SRE, Backend Engineers
 
 ---
 
@@ -206,8 +206,8 @@ flowchart LR
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Performance Optimization](./Performance_Optimization.md) - 性能優化
-- [Deployment Architecture](./Deployment_Architecture.md) - 部署架構
-- [Cost Optimization Architecture](./Cost_Optimization_Architecture.md) - 成本優化
+- [性能優化](./Performance_Optimization.md) — 性能優化規範
+- [部署架構](./Deployment_Architecture.md) — 部署架構與 DevOps 規範
+- [成本優化](./Cost_Optimization_Architecture.md) — 成本優化架構

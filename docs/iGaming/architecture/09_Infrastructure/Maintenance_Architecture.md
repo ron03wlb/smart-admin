@@ -1,8 +1,8 @@
-# 系統維護與優雅停機架構 (Maintenance & Graceful Shutdown)
+# 系統維護與優雅停機架構（Maintenance & Graceful Shutdown）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md)
+> **目標讀者**: Technical Architects, DevOps Engineers, SRE
 
 ---
 
@@ -223,8 +223,8 @@ groups:
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Deployment Architecture](./Deployment_Architecture.md) - 部署架構
-- [Performance Monitoring](./Performance_Monitoring.md) - 監控告警
-- [QA Standards](./QA_Standards.md) - 測試標準
+- [部署架構](./Deployment_Architecture.md) — 部署架構與 DevOps 規範
+- [性能監控](./Performance_Monitoring.md) — 性能監控與告警架構
+- [QA 標準](./QA_Standards.md) — 測試標準與品質保證

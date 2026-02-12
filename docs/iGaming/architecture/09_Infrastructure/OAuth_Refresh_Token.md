@@ -1,8 +1,8 @@
 # OAuth 2.0 Refresh Token 實施方案
 
-> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
-> **Canonical Source**: [09-11 OAuth Refresh Token](../../source-archive/09_Technical_Infrastructure/09-11_OAuth_Refresh_Token_Implementation.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: [合規標準需求](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **規範來源**: [09-11 OAuth Refresh Token](../../source-archive/09_Technical_Infrastructure/09-11_OAuth_Refresh_Token_Implementation.md)
+> **目標讀者**: Security Architects, Backend Engineers
 
 ---
 
@@ -818,8 +818,8 @@ Access Token validation (JWT signature):
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - 多主體 Token 安全
-- [Token Validation Service](./Token_Validation_Service.md) - Token 驗證服務
-- [Authentication Architecture](./Authentication_Architecture.md) - 認證架構
+- [多主體 Token 安全](./Multi_Actor_Token_Security.md) — 多主體 Token 安全方案
+- [Token 驗證服務](./Token_Validation_Service.md) — Token 驗證服務架構
+- [身份驗證架構](./Authentication_Architecture.md) — 認證與授權架構

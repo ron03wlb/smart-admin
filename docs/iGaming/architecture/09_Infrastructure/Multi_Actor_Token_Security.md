@@ -1,8 +1,8 @@
-# 多主體 Token 安全方案 (Multi-Actor Token Security)
+# 多主體 Token 安全方案（Multi-Actor Token Security）
 
-> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
-> **Canonical Source**: [09-12 Multi Actor Token Security](../../source-archive/09_Technical_Infrastructure/09-12_Multi_Actor_Token_Security.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: [合規標準需求](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **規範來源**: [09-12 Multi Actor Token Security](../../source-archive/09_Technical_Infrastructure/09-12_Multi_Actor_Token_Security.md)
+> **目標讀者**: Security Architects, Backend Engineers, DevOps
 
 ---
 
@@ -804,9 +804,9 @@ gantt
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [OAuth Refresh Token](./OAuth_Refresh_Token.md) - OAuth Refresh Token 實施
-- [Token Validation Service](./Token_Validation_Service.md) - Token 驗證服務
-- [Token Validation Architecture](./Token_Validation_Architecture.md) - 驗證架構
-- [Authentication Architecture](./Authentication_Architecture.md) - 認證架構
+- [OAuth Refresh Token](./OAuth_Refresh_Token.md) — OAuth Refresh Token 實施方案
+- [Token 驗證服務](./Token_Validation_Service.md) — Token 驗證服務架構
+- [Token 驗證架構](./Token_Validation_Architecture.md) — 驗證架構設計
+- [身份驗證架構](./Authentication_Architecture.md) — 認證與授權架構

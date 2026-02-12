@@ -1,8 +1,8 @@
-# 性能優化規範 (Performance Optimization)
+# 性能優化規範（Performance Optimization）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-07 Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-07 Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md)
+> **目標讀者**: Backend Engineers, Performance Engineers, DevOps
 
 ---
 
@@ -505,8 +505,8 @@ CREATE TABLE t_performance_baseline (
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Caching Strategy](./Caching_Strategy.md) - JetCache 多級緩存
-- [Stream Processing Architecture](./Stream_Processing_Architecture.md) - Flink 流處理
-- [Cost Optimization Architecture](./Cost_Optimization_Architecture.md) - 成本優化
+- [緩存策略](./Caching_Strategy.md) — JetCache 多級緩存架構
+- [串流處理](./Stream_Processing_Architecture.md) — Flink 串流處理架構
+- [成本優化](./Cost_Optimization_Architecture.md) — 成本優化架構
