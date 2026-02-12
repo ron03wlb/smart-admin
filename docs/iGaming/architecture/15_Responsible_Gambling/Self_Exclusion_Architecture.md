@@ -1,15 +1,15 @@
-# Self-Exclusion Architecture (自我排除技術架構)
+# 自我排除技術架構
 
-> **Business Requirements**: [Self_Exclusion_Requirements.md](../../requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md)
-> **Canonical Source**: [15-01_Self_Exclusion.md](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md), [15-09_Self_Exclusion_Reconciliation.md](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [Self_Exclusion_Requirements.md](../../requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md)
+> **規範來源**: [15-01_Self_Exclusion.md](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md), [15-09_Self_Exclusion_Reconciliation.md](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員
 
 ---
 
-## 1. Database Schema
+## 1. 資料庫結構
 
-### 1.1 Exclusion Record Table
+### 1.1 排除紀錄表
 
 ```sql
 CREATE TABLE t_exclusion_record (
@@ -39,7 +39,7 @@ CREATE TABLE t_exclusion_record (
 );
 ```
 
-### 1.2 Gamstop Sync Log Table
+### 1.2 Gamstop 同步日誌表
 
 ```sql
 CREATE TABLE t_gamstop_sync_log (
@@ -68,7 +68,7 @@ CREATE TABLE t_gamstop_sync_log (
 );
 ```
 
-### 1.3 Gamstop Reconciliation Discrepancy Table
+### 1.3 Gamstop 對帳差異表
 
 ```sql
 CREATE TABLE t_gamstop_reconciliation_discrepancy (
@@ -102,7 +102,7 @@ CREATE TABLE t_gamstop_reconciliation_discrepancy (
 );
 ```
 
-### 1.4 Reconciliation Report Table
+### 1.4 對帳報告表
 
 ```sql
 CREATE TABLE t_gamstop_reconciliation_report (
@@ -134,7 +134,7 @@ CREATE TABLE t_gamstop_reconciliation_report (
 
 ---
 
-## 2. Service Implementation
+## 2. 服務實作
 
 ### 2.1 SelfExclusionService
 
@@ -346,7 +346,7 @@ public class SelfExclusionService {
 }
 ```
 
-### 2.2 GamstopClient
+### 2.2 Gamstop 用戶端
 
 ```java
 @Component
@@ -417,9 +417,9 @@ public class GamstopClient {
 
 ---
 
-## 3. Reconciliation Service
+## 3. 對帳服務
 
-### 3.1 GamstopReconciliationReportService
+### 3.1 Gamstop 對帳報告服務
 
 ```java
 @Service
@@ -467,7 +467,7 @@ public class GamstopReconciliationReportService {
 }
 ```
 
-### 3.2 Daily Reconciliation SQL
+### 3.2 每日對帳 SQL
 
 ```sql
 -- Daily Gamstop sync reconciliation
@@ -511,9 +511,9 @@ LEFT JOIN gamstop_list gl ON lp.gamstop_reference = gl.player_reference;
 
 ---
 
-## 4. Sequence Diagrams
+## 4. 時序圖
 
-### 4.1 Gamstop Integration Flow
+### 4.1 Gamstop 整合流程
 
 ```mermaid
 sequenceDiagram
@@ -522,72 +522,72 @@ sequenceDiagram
     participant DB as Local Database
     participant Alert as Alert System
 
-    Note over Platform,Gamstop: Real-time check (every registration/login)
+    Note over Platform,Gamstop: 即時檢查（每次註冊/登入）
     Platform->>Gamstop: POST /api/v1/check<br/>{firstName, lastName, dob, postcode}
     Gamstop-->>Platform: {isExcluded: true/false, endDate, reference}
 
-    alt Player is excluded
-        Platform->>DB: Update exclusion_status = GAMSTOP
-        Platform->>Platform: Block deposits/gaming
+    alt 玩家已被排除
+        Platform->>DB: 更新 exclusion_status = GAMSTOP
+        Platform->>Platform: 封鎖存款/遊戲
     end
 
-    Note over Platform,Gamstop: Daily full sync (03:00 UTC)
+    Note over Platform,Gamstop: 每日完整同步（03:00 UTC）
     Platform->>Gamstop: GET /api/v1/full-list?date=2026-02-06
-    Gamstop-->>Platform: CSV: [Player exclusion list]
-    Platform->>DB: Compare with local player table
+    Gamstop-->>Platform: CSV: [玩家排除清單]
+    Platform->>DB: 與本地玩家表比對
 
-    alt Discrepancy found
-        Platform->>Alert: P0 Alert: Sync discrepancy
-        Platform->>DB: Immediately freeze account
+    alt 發現差異
+        Platform->>Alert: P0 告警：同步差異
+        Platform->>DB: 立即凍結帳戶
     end
 ```
 
-### 4.2 Daily Reconciliation Flow
+### 4.2 每日對帳流程
 
 ```mermaid
 flowchart TD
-    A[Daily 03:00 UTC Trigger] --> B[Download Gamstop Full List]
-    B --> C[Load Local Active Players]
-    C --> D{Compare Each Record}
+    A[每日 03:00 UTC 觸發] --> B[下載 Gamstop 完整清單]
+    B --> C[載入本地活躍玩家]
+    C --> D{逐筆比對}
 
-    D -->|Gamstop excluded<br/>Local active| E[Mismatch Type A<br/>Immediately freeze]
-    D -->|Local excluded<br/>Gamstop none| F[Mismatch Type B<br/>Verify exclusion type]
-    D -->|Both match| G[Record as MATCHED]
+    D -->|Gamstop 已排除<br/>本地仍活躍| E[差異類型 A<br/>立即凍結]
+    D -->|本地已排除<br/>Gamstop 無紀錄| F[差異類型 B<br/>驗證排除類型]
+    D -->|兩端吻合| G[記錄為 MATCHED]
 
-    E --> H[Send P0 Alert]
-    E --> I[Record Violation Event]
+    E --> H[發送 P0 告警]
+    E --> I[記錄違規事件]
 
-    F --> J{Local exclusion type?}
-    J -->|GAMSTOP| K[Possible Gamstop delay]
-    J -->|SELF_EXCLUSION| L[Normal - local only]
+    F --> J{本地排除類型？}
+    J -->|GAMSTOP| K[可能為 Gamstop 延遲]
+    J -->|SELF_EXCLUSION| L[正常 — 僅本地]
     J -->|OPERATOR| L
 
-    G --> M[Generate Reconciliation Report]
+    G --> M[產生對帳報告]
     H --> M
     K --> M
     L --> M
 
-    M --> N[Send to Finance/Compliance Team]
+    M --> N[發送至財務/合規團隊]
 ```
 
-### 4.3 Type A Discrepancy State Machine
+### 4.3 類型 A 差異狀態機
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Detected: Reconciliation finds mismatch
+    [*] --> Detected: 對帳發現差異
 
-    Detected --> Freeze: Immediately freeze account
-    Freeze --> Alert: Send P0 alert
-    Alert --> Investigate: Launch investigation
+    Detected --> Freeze: 立即凍結帳戶
+    Freeze --> Alert: 發送 P0 告警
+    Alert --> Investigate: 啟動調查
 
-    Investigate --> Breach: Confirm violation
-    Investigate --> SystemBug: Confirm system issue
+    Investigate --> Breach: 確認違規
+    Investigate --> SystemBug: 確認系統問題
 
-    Breach --> Report: Report to UKGC (24h)
-    Breach --> Refund: Evaluate refund
+    Breach --> Report: 向 UKGC 報告（24 小時內）
+    Breach --> Refund: 評估退款
 
-    SystemBug --> Fix: Fix issue
-    Fix --> PostMortem: Post-mortem analysis
+    SystemBug --> Fix: 修復問題
+    Fix --> PostMortem: 事後分析
 
     Report --> [*]
     Refund --> [*]
@@ -596,21 +596,21 @@ stateDiagram-v2
 
 ---
 
-## 5. Monitoring & Alerting
+## 5. 監控與告警
 
-### 5.1 Key Metrics
+### 5.1 關鍵指標
 
-| Metric | Prometheus Name | Alert Threshold |
-|--------|----------------|-----------------|
-| Self-exclusion requests | `rg_self_exclusion_requests_total` | Day-over-day > 100% |
-| Exclusion activations | `rg_self_exclusion_activated_total` | - |
-| Gamstop sync latency | `gamstop_sync_latency_seconds` | > 30s |
-| Gamstop sync failures | `gamstop_sync_failures_total` | > 0 |
-| Daily discrepancies | `gamstop_reconciliation_discrepancies_total` | > 0 (Type A) |
-| Sync failure rate | `gamstop_sync_failure_rate` | > 1% |
-| Pending discrepancies | `gamstop_pending_discrepancies_gauge` | > 0 (over 24h) |
+| 指標 | Prometheus 名稱 | 告警閾值 |
+|------|----------------|----------|
+| 自我排除請求 | `rg_self_exclusion_requests_total` | 日環比 > 100% |
+| 排除生效數 | `rg_self_exclusion_activated_total` | - |
+| Gamstop 同步延遲 | `gamstop_sync_latency_seconds` | > 30 秒 |
+| Gamstop 同步失敗 | `gamstop_sync_failures_total` | > 0 |
+| 每日差異數 | `gamstop_reconciliation_discrepancies_total` | > 0（類型 A） |
+| 同步失敗率 | `gamstop_sync_failure_rate` | > 1% |
+| 待處理差異 | `gamstop_pending_discrepancies_gauge` | > 0（超過 24 小時） |
 
-### 5.2 Alert Configuration
+### 5.2 告警配置
 
 ```yaml
 alerts:
@@ -633,7 +633,7 @@ alerts:
 
 ---
 
-## 6. Integration Test
+## 6. 整合測試
 
 ```java
 @SpringBootTest
@@ -675,12 +675,12 @@ class SelfExclusionServiceTest {
 
 ---
 
-## Related Documents
+## 相關文件
 
-- [Self_Exclusion_Requirements.md](../../requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md) - Business requirements
-- [Deposit_Loss_Limits_Architecture.md](Deposit_Loss_Limits_Architecture.md) - Deposit & loss limits architecture
-- [Player_Protection_API.md](Player_Protection_API.md) - Unified API architecture
+- [Self_Exclusion_Requirements.md](../../requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md) — 業務需求
+- [Deposit_Loss_Limits_Architecture.md](Deposit_Loss_Limits_Architecture.md) — 存款及虧損限額架構
+- [Player_Protection_API.md](Player_Protection_API.md) — 統一 API 架構
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+**返回**: [負責任博弈模組](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming 首頁](../../source-archive/README.md)

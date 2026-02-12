@@ -1,15 +1,15 @@
-# Session Protection Architecture (會話保護技術架構)
+# 會話保護技術架構
 
-> **Business Requirements**: [Session_Protection_Requirements.md](../../requirements/15_Responsible_Gambling/Session_Protection_Requirements.md)
-> **Canonical Source**: [15-03_Cooling_Off_Period.md](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md), [15-04_Session_Management.md](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md), [15-05_Reality_Checks.md](../../source-archive/15_Responsible_Gambling/15-05_Reality_Checks.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [Session_Protection_Requirements.md](../../requirements/15_Responsible_Gambling/Session_Protection_Requirements.md)
+> **規範來源**: [15-03_Cooling_Off_Period.md](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md), [15-04_Session_Management.md](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md), [15-05_Reality_Checks.md](../../source-archive/15_Responsible_Gambling/15-05_Reality_Checks.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員
 
 ---
 
-## 1. Database Schema
+## 1. 資料庫結構
 
-### 1.1 Cooling-Off Record Table
+### 1.1 冷靜期紀錄表
 
 ```sql
 CREATE TABLE t_cooling_off_record (
@@ -39,7 +39,7 @@ CREATE TABLE t_cooling_off_record (
 );
 ```
 
-### 1.2 Session Setting Table
+### 1.2 會話設定表
 
 ```sql
 CREATE TABLE t_session_setting (
@@ -58,7 +58,7 @@ CREATE TABLE t_session_setting (
 );
 ```
 
-### 1.3 Session Record Table
+### 1.3 會話紀錄表
 
 ```sql
 CREATE TABLE t_session_record (
@@ -95,7 +95,7 @@ CREATE TABLE t_session_record (
 );
 ```
 
-### 1.4 Mandatory Break Record Table
+### 1.4 強制休息紀錄表
 
 ```sql
 CREATE TABLE t_mandatory_break_record (
@@ -114,7 +114,7 @@ CREATE TABLE t_mandatory_break_record (
 );
 ```
 
-### 1.5 Reality Check Record Table
+### 1.5 現實檢查紀錄表
 
 ```sql
 CREATE TABLE t_reality_check_record (
@@ -145,9 +145,9 @@ CREATE TABLE t_reality_check_record (
 
 ---
 
-## 2. Service Implementation
+## 2. 服務實作
 
-### 2.1 CoolingOffManager and CoolingOffService
+### 2.1 CoolingOffManager 與 CoolingOffService
 
 ```java
 /**
@@ -259,7 +259,7 @@ public class CoolingOffService {
 }
 ```
 
-### 2.2 SessionManagementService
+### 2.2 會話管理服務
 
 ```java
 /**
@@ -409,7 +409,7 @@ public class SessionManagementService {
 }
 ```
 
-### 2.3 RealityCheckManager and RealityCheckService
+### 2.3 RealityCheckManager 與 RealityCheckService
 
 ```java
 /**
@@ -512,7 +512,7 @@ public class RealityCheckService {
 }
 ```
 
-### 2.4 Game Round Awareness
+### 2.4 遊戲回合感知
 
 ```java
 @Service
@@ -547,7 +547,7 @@ public class GameRoundAwareRealityCheck {
 
 ---
 
-## 3. Access Interceptor
+## 3. 存取攔截器
 
 ```java
 @Component
@@ -602,7 +602,7 @@ public class PlayerAccessInterceptor implements HandlerInterceptor {
 
 ---
 
-## 4. WebSocket Integration
+## 4. WebSocket 整合
 
 ```java
 @Component
@@ -640,62 +640,62 @@ public class SessionWebSocketHandler implements WebSocketHandler {
 
 ---
 
-## 5. Architecture Diagram
+## 5. 架構圖
 
 ```mermaid
 flowchart TD
-    A[Player Login] --> B{Check Protection Status}
+    A[玩家登入] --> B{檢查保護狀態}
 
-    B -->|Excluded| C[Block Access]
-    B -->|Cooling Off| D[Limited Access]
-    B -->|Active| E[Start Session]
+    B -->|已排除| C[封鎖存取]
+    B -->|冷靜期中| D[限制存取]
+    B -->|正常| E[開始會話]
 
-    E --> F[Session Monitor]
+    E --> F[會話監控]
 
-    F --> G[Duration Timer]
-    F --> H[Activity Tracker]
-    F --> I[Reality Check Timer]
-    F --> J[Mandatory Break Checker]
+    F --> G[持續時間計時器]
+    F --> H[活動追蹤器]
+    F --> I[現實檢查計時器]
+    F --> J[強制休息檢查器]
 
-    G -->|Limit Reached| K[Duration Limit Popup]
-    H -->|Idle Timeout| L[Auto Logout]
-    I -->|Interval Reached| M[Reality Check Popup]
-    J -->|Trigger Met| N[Forced Break]
+    G -->|達到上限| K[持續時間上限彈窗]
+    H -->|閒置逾時| L[自動登出]
+    I -->|達到間隔| M[現實檢查彈窗]
+    J -->|觸發條件達成| N[強制休息]
 
-    M -->|Continue| F
-    M -->|Stop| O[End Session]
-    K -->|Continue| F
-    K -->|Stop| O
+    M -->|繼續| F
+    M -->|停止| O[結束會話]
+    K -->|繼續| F
+    K -->|停止| O
     N --> O
     L --> O
 
-    O --> P[Save Statistics]
-    P --> Q[Record History]
+    O --> P[儲存統計資料]
+    P --> Q[記錄歷史]
 ```
 
 ---
 
-## 6. Monitoring
+## 6. 監控
 
-| Metric | Prometheus Name | Description |
-|--------|----------------|-------------|
-| Cooling-off activations | `rg_cooling_off_started_total` | By duration |
-| Active cooling-off players | `rg_cooling_off_active_gauge` | Real-time count |
-| Average session duration | `session_duration_seconds_avg` | All sessions |
-| Session timeout rate | `session_timeout_rate` | Idle timeout percentage |
-| Mandatory break triggers | `mandatory_break_total` | By reason |
-| Reality check triggers | `reality_check_triggered_total` | Total count |
-| Reality check continue rate | `reality_check_continue_rate` | Continue percentage |
-| Fast skip rate | `reality_check_fast_skip_rate` | <5sec response rate |
-
----
-
-## Related Documents
-
-- [Session_Protection_Requirements.md](../../requirements/15_Responsible_Gambling/Session_Protection_Requirements.md) - Business requirements
-- [Self_Exclusion_Architecture.md](Self_Exclusion_Architecture.md) - Self-exclusion architecture
-- [Player_Protection_API.md](Player_Protection_API.md) - Unified API architecture
+| 指標 | Prometheus 名稱 | 說明 |
+|------|----------------|------|
+| 冷靜期啟動數 | `rg_cooling_off_started_total` | 依持續時間分類 |
+| 冷靜期中玩家數 | `rg_cooling_off_active_gauge` | 即時計數 |
+| 平均會話持續時間 | `session_duration_seconds_avg` | 所有會話 |
+| 會話逾時率 | `session_timeout_rate` | 閒置逾時百分比 |
+| 強制休息觸發數 | `mandatory_break_total` | 依原因分類 |
+| 現實檢查觸發數 | `reality_check_triggered_total` | 總計數 |
+| 現實檢查繼續率 | `reality_check_continue_rate` | 繼續遊戲百分比 |
+| 快速跳過率 | `reality_check_fast_skip_rate` | < 5 秒回應率 |
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+## 相關文件
+
+- [Session_Protection_Requirements.md](../../requirements/15_Responsible_Gambling/Session_Protection_Requirements.md) — 業務需求
+- [Self_Exclusion_Architecture.md](Self_Exclusion_Architecture.md) — 自我排除架構
+- [Player_Protection_API.md](Player_Protection_API.md) — 統一 API 架構
+
+---
+
+**返回**: [負責任博弈模組](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming 首頁](../../source-archive/README.md)
