@@ -318,7 +318,44 @@ Priority: Requirements files contain business context suited for Chinese audienc
 - [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md (metadata headers 翻譯)
 - [x] requirements/13_Customer_Service/CS_Platform_Requirements.md (metadata headers 翻譯)
 
-**Note**: Batches 7-14 will cover remaining ~29 requirements files with English metadata headers. Full file list: `find docs/iGaming/requirements -name '*.md' | sort`
+#### Batch 7 — Risk Compliance (5 files)
+- [ ] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md
+- [ ] requirements/05_Risk_Compliance/KYC_AML_Requirements.md
+- [ ] requirements/05_Risk_Compliance/ML_Requirements.md
+- [ ] requirements/05_Risk_Compliance/Player_Protection_Requirements.md
+- [ ] requirements/05_Risk_Compliance/README.md
+
+#### Batch 8 — Governance/Agent Operations (5 files)
+- [ ] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md
+- [ ] requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md
+- [ ] requirements/06_Governance_Licensing/README.md
+- [ ] requirements/07_Agent_Operations/Agent_System_Requirements.md
+- [ ] requirements/07_Agent_Operations/Credit_Network_Requirements.md
+
+#### Batch 9 — Metrics/Analytics/Infrastructure (4 files)
+- [ ] requirements/07_Metrics_KPIs/README.md
+- [ ] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md
+- [ ] requirements/09_Infrastructure_Requirements/Cost_Optimization_Requirements.md
+- [ ] requirements/09_Infrastructure_Requirements/QA_Standards_Requirements.md
+
+#### Batch 10 — Platform/Frontend (4 files)
+- [ ] requirements/10_Platform_Operations/Data_Pipeline_Requirements.md
+- [ ] requirements/10_Platform_Operations/Notification_Requirements.md
+- [ ] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md
+- [ ] requirements/11_Frontend_Experience/Mobile_App_Requirements.md
+
+#### Batch 11 — Security/Customer Service (3 files)
+- [ ] requirements/12_Security_Compliance/Compliance_Standards_Requirements.md
+- [ ] requirements/12_Security_Compliance/Payment_Security_Requirements.md
+- [ ] requirements/13_Customer_Service/CS_Operations_Requirements.md
+
+#### Batch 12 — Integration/Responsible Gambling (6 files)
+- [ ] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md
+- [ ] requirements/15_Responsible_Gambling/Affordability_Requirements.md
+- [ ] requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md
+- [ ] requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md
+- [ ] requirements/15_Responsible_Gambling/Session_Protection_Requirements.md
+- [ ] requirements/README.md
 
 **Phase 9A COMPLETE**: [Summary when done]
 
