@@ -216,13 +216,14 @@ while true; do
   MINS=$(( (ELAPSED % 3600) / 60 ))
 
   # Progress stats from progress.md
-  DONE=$(grep -c '^- \[x\]' "$PROGRESS_FILE" 2>/dev/null || echo "0")
-  TODO=$(grep -c '^- \[ \]' "$PROGRESS_FILE" 2>/dev/null || echo "0")
-  STUCK=$(grep -c '^- \[!\]' "$PROGRESS_FILE" 2>/dev/null || echo "0")
-  # Set default to 0 if empty
-  DONE=${DONE:-0}
-  TODO=${TODO:-0}
-  STUCK=${STUCK:-0}
+  # Note: grep -c returns exit 1 when count=0, so use || true to suppress
+  DONE=$(grep -c '^- \[x\]' "$PROGRESS_FILE" 2>/dev/null) || true
+  TODO=$(grep -c '^- \[ \]' "$PROGRESS_FILE" 2>/dev/null) || true
+  STUCK=$(grep -c '^- \[!\]' "$PROGRESS_FILE" 2>/dev/null) || true
+  # Ensure numeric (default 0 if empty)
+  DONE=${DONE:-0}; DONE=${DONE//[^0-9]/}; DONE=${DONE:-0}
+  TODO=${TODO:-0}; TODO=${TODO//[^0-9]/}; TODO=${TODO:-0}
+  STUCK=${STUCK:-0}; STUCK=${STUCK//[^0-9]/}; STUCK=${STUCK:-0}
   TOTAL=$((DONE + TODO + STUCK))
   if [ "$TOTAL" -gt 0 ]; then
     PCT=$((DONE * 100 / TOTAL))
