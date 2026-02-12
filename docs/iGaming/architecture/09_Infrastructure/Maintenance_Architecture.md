@@ -223,6 +223,212 @@ groups:
 
 ---
 
+## 9. Java 實作
+
+### 9.1 MaintenanceService (Service Layer)
+
+```java
+package net.lab1024.sa.infrastructure.maintenance;
+
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+/**
+ * 系統維護服務
+ *
+ * @author SmartAdmin Team
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class MaintenanceService {
+
+    private final MaintenanceDao maintenanceDao;
+    private final MaintenanceManager maintenanceManager;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String PLATFORM_STATUS_KEY = "platform:status";
+
+    /**
+     * 查詢當前維護狀態
+     */
+    public Option<MaintenanceVO> getCurrentStatus() {
+        return Option.of(redisTemplate.opsForValue().get(PLATFORM_STATUS_KEY))
+            .map(status -> {
+                MaintenanceVO vo = new MaintenanceVO();
+                vo.setStatus(status);
+                vo.setCheckTime(LocalDateTime.now());
+                return vo;
+            });
+    }
+
+    /**
+     * 觸發優雅停機（ACTIVE → DRAINING）
+     */
+    public ResponseDTO<String> triggerDraining(MaintenanceForm form) {
+        return Try.of(() -> {
+            // 驗證當前狀態
+            String currentStatus = redisTemplate.opsForValue().get(PLATFORM_STATUS_KEY);
+            if (!"ACTIVE".equals(currentStatus)) {
+                return ResponseDTO.error("系統不在 ACTIVE 狀態，無法觸發排水");
+            }
+
+            // 委託 Manager 執行事務
+            maintenanceManager.startDraining(form);
+
+            return ResponseDTO.ok("排水模式已啟動");
+        }).getOrElseGet(ex -> {
+            log.error("觸發排水失敗", ex);
+            return ResponseDTO.error("觸發排水失敗: " + ex.getMessage());
+        });
+    }
+}
+```
+
+### 9.2 MaintenanceManager (Manager Layer)
+
+```java
+package net.lab1024.sa.infrastructure.maintenance;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * 維護管理器（處理事務性操作）
+ *
+ * @author SmartAdmin Team
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class MaintenanceManager {
+
+    private final MaintenanceDao maintenanceDao;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final WebSocketMessageSender messageSender;
+
+    /**
+     * 開始排水模式（需事務保證一致性）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void startDraining(MaintenanceForm form) {
+        // 1. 記錄維護事件
+        MaintenanceEventEntity event = MaintenanceEventEntity.builder()
+            .eventType("DRAINING_START")
+            .scheduledTime(form.getScheduledTime())
+            .triggerBy(form.getTriggerBy())
+            .reason(form.getReason())
+            .createdAt(LocalDateTime.now())
+            .build();
+        maintenanceDao.insert(event);
+
+        // 2. 切換 Redis 狀態
+        redisTemplate.opsForValue().set("platform:status", "DRAINING");
+        redisTemplate.opsForValue().set("platform:draining_start",
+            String.valueOf(System.currentTimeMillis()));
+
+        // 3. 推送 WebSocket 公告
+        messageSender.broadcast("MAINTENANCE_WARN",
+            "系統將於 " + form.getScheduledTime() + " 進入維護");
+
+        log.info("排水模式已啟動，排程時間: {}, 觸發者: {}",
+            form.getScheduledTime(), form.getTriggerBy());
+    }
+
+    /**
+     * 強制切換至維護模式
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void forceMaintenance(Long eventId) {
+        // 1. 標記未完成事務
+        List<Long> activeTransactions = maintenanceDao.findActiveTransactions();
+        activeTransactions.forEach(txId -> {
+            maintenanceDao.updateTransactionStatus(txId, "PENDING_INVESTIGATION");
+        });
+
+        // 2. 切換至 MAINTENANCE
+        redisTemplate.opsForValue().set("platform:status", "MAINTENANCE");
+
+        // 3. 記錄維護開始
+        maintenanceDao.updateEventStatus(eventId, "MAINTENANCE_ACTIVE", LocalDateTime.now());
+
+        log.warn("強制切換至維護模式，未完成事務數: {}", activeTransactions.size());
+    }
+}
+```
+
+---
+
+## 10. SQL Schema
+
+### 10.1 維護事件表
+
+```sql
+-- 維護事件記錄表
+CREATE TABLE t_maintenance_event (
+    id BIGSERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    scheduled_time TIMESTAMP NOT NULL,
+    actual_time TIMESTAMP,
+    trigger_by VARCHAR(100) NOT NULL,
+    reason TEXT,
+    status VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_maintenance_scheduled ON t_maintenance_event(scheduled_time);
+CREATE INDEX idx_maintenance_status ON t_maintenance_event(status);
+
+COMMENT ON TABLE t_maintenance_event IS '維護事件記錄表';
+COMMENT ON COLUMN t_maintenance_event.event_type IS '事件類型 (DRAINING_START, MAINTENANCE_ACTIVE, MAINTENANCE_COMPLETED)';
+COMMENT ON COLUMN t_maintenance_event.scheduled_time IS '排程時間';
+COMMENT ON COLUMN t_maintenance_event.actual_time IS '實際發生時間';
+COMMENT ON COLUMN t_maintenance_event.trigger_by IS '觸發者 (Admin User ID)';
+COMMENT ON COLUMN t_maintenance_event.reason IS '維護原因';
+COMMENT ON COLUMN t_maintenance_event.status IS '狀態 (SCHEDULED, IN_PROGRESS, COMPLETED, FAILED)';
+```
+
+### 10.2 維護期間未完成事務表
+
+```sql
+-- 維護期間待調查事務表
+CREATE TABLE t_maintenance_pending_transaction (
+    id BIGSERIAL PRIMARY KEY,
+    maintenance_event_id BIGINT NOT NULL REFERENCES t_maintenance_event(id),
+    transaction_id BIGINT NOT NULL,
+    transaction_type VARCHAR(50) NOT NULL,
+    player_id BIGINT NOT NULL,
+    amount DECIMAL(18, 4),
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING_INVESTIGATION',
+    resolution VARCHAR(500),
+    resolved_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_pending_tx_event ON t_maintenance_pending_transaction(maintenance_event_id);
+CREATE INDEX idx_pending_tx_player ON t_maintenance_pending_transaction(player_id);
+CREATE INDEX idx_pending_tx_status ON t_maintenance_pending_transaction(status);
+
+COMMENT ON TABLE t_maintenance_pending_transaction IS '維護期間待調查事務表';
+COMMENT ON COLUMN t_maintenance_pending_transaction.transaction_type IS '事務類型 (WITHDRAWAL, GAME_ROUND, DEPOSIT)';
+COMMENT ON COLUMN t_maintenance_pending_transaction.resolution IS '處理結果說明';
+```
+
+---
+
 ## 相關文件
 
 - [部署架構](./Deployment_Architecture.md) — 部署架構與 DevOps 規範

@@ -206,6 +206,252 @@ flowchart LR
 
 ---
 
+## 6. Java 實作
+
+### 6.1 PerformanceMetricsService (Service Layer)
+
+```java
+package net.lab1024.sa.infrastructure.monitoring;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.vavr.control.Option;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * 性能指標服務
+ *
+ * @author SmartAdmin Team
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PerformanceMetricsService {
+
+    private final PerformanceMetricsDao metricsDao;
+    private final PerformanceAlertManager alertManager;
+    private final MeterRegistry meterRegistry;
+
+    /**
+     * 查詢最近 N 分鐘的 P99 延遲
+     */
+    public Option<Double> getP99Latency(String endpoint, int minutes) {
+        return Option.ofOptional(
+            metricsDao.queryLatencyPercentile(endpoint, 0.99, minutes)
+        );
+    }
+
+    /**
+     * 記錄 API 請求指標（委託 Micrometer）
+     */
+    public void recordApiRequest(String endpoint, long durationMs, int statusCode) {
+        // 使用 Micrometer 記錄指標
+        Timer.builder("http.server.requests")
+            .tag("uri", endpoint)
+            .tag("status", String.valueOf(statusCode))
+            .register(meterRegistry)
+            .record(java.time.Duration.ofMillis(durationMs));
+
+        // 錯誤率計數器
+        if (statusCode >= 500) {
+            Counter.builder("http.server.errors")
+                .tag("uri", endpoint)
+                .tag("status", String.valueOf(statusCode))
+                .register(meterRegistry)
+                .increment();
+        }
+    }
+
+    /**
+     * 檢查是否觸發告警閾值
+     */
+    public void checkAlertThresholds(String metricName, double value) {
+        metricsDao.findAlertRuleByMetric(metricName)
+            .ifPresent(rule -> {
+                if (value > rule.getThreshold()) {
+                    alertManager.triggerAlert(rule, value);
+                }
+            });
+    }
+}
+```
+
+### 6.2 PerformanceAlertManager (Manager Layer)
+
+```java
+package net.lab1024.sa.infrastructure.monitoring;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+/**
+ * 性能告警管理器（處理告警事務）
+ *
+ * @author SmartAdmin Team
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class PerformanceAlertManager {
+
+    private final AlertHistoryDao alertHistoryDao;
+    private final SlackNotifier slackNotifier;
+    private final PagerDutyClient pagerDutyClient;
+
+    /**
+     * 觸發告警（需事務保證通知記錄一致性）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void triggerAlert(AlertRuleEntity rule, double currentValue) {
+        // 1. 記錄告警歷史
+        AlertHistoryEntity history = AlertHistoryEntity.builder()
+            .ruleId(rule.getId())
+            .metricName(rule.getMetricName())
+            .threshold(rule.getThreshold())
+            .currentValue(currentValue)
+            .priority(rule.getPriority())
+            .status("TRIGGERED")
+            .triggeredAt(LocalDateTime.now())
+            .build();
+        alertHistoryDao.insert(history);
+
+        // 2. 路由通知
+        switch (rule.getPriority()) {
+            case "P0":
+                pagerDutyClient.sendAlert(rule, currentValue);
+                break;
+            case "P1":
+            case "P2":
+                slackNotifier.sendToChannel(rule, currentValue);
+                break;
+            case "P3":
+                // Email 通知（異步）
+                break;
+        }
+
+        log.warn("告警觸發: {} = {} (閾值: {}), 優先級: {}",
+            rule.getMetricName(), currentValue, rule.getThreshold(), rule.getPriority());
+    }
+
+    /**
+     * 批量解除告警（系統恢復時調用）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void resolveAlerts(String metricName) {
+        List<AlertHistoryEntity> activeAlerts =
+            alertHistoryDao.findActiveAlerts(metricName);
+
+        activeAlerts.forEach(alert -> {
+            alert.setStatus("RESOLVED");
+            alert.setResolvedAt(LocalDateTime.now());
+            alertHistoryDao.updateById(alert);
+        });
+
+        log.info("告警已解除: {}, 數量: {}", metricName, activeAlerts.size());
+    }
+}
+```
+
+---
+
+## 7. SQL Schema
+
+### 7.1 告警規則表
+
+```sql
+-- 告警規則配置表
+CREATE TABLE t_alert_rule (
+    id BIGSERIAL PRIMARY KEY,
+    metric_name VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    threshold DECIMAL(18, 4) NOT NULL,
+    comparison_operator VARCHAR(10) NOT NULL DEFAULT '>',
+    priority VARCHAR(10) NOT NULL,
+    duration_seconds INT NOT NULL DEFAULT 300,
+    notification_channels TEXT[],
+    runbook_url VARCHAR(500),
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_alert_metric ON t_alert_rule(metric_name);
+CREATE INDEX idx_alert_enabled ON t_alert_rule(enabled);
+
+COMMENT ON TABLE t_alert_rule IS '告警規則配置表';
+COMMENT ON COLUMN t_alert_rule.metric_name IS '指標名稱 (api_p99_latency, error_rate, cpu_usage)';
+COMMENT ON COLUMN t_alert_rule.threshold IS '告警閾值';
+COMMENT ON COLUMN t_alert_rule.comparison_operator IS '比較運算符 (>, <, >=, <=, ==)';
+COMMENT ON COLUMN t_alert_rule.priority IS '優先級 (P0, P1, P2, P3)';
+COMMENT ON COLUMN t_alert_rule.duration_seconds IS '持續時間（秒）：指標超過閾值持續多久才觸發';
+COMMENT ON COLUMN t_alert_rule.notification_channels IS '通知渠道陣列 (pagerduty, slack, email)';
+```
+
+### 7.2 告警歷史表
+
+```sql
+-- 告警歷史記錄表
+CREATE TABLE t_alert_history (
+    id BIGSERIAL PRIMARY KEY,
+    rule_id BIGINT NOT NULL REFERENCES t_alert_rule(id),
+    metric_name VARCHAR(100) NOT NULL,
+    threshold DECIMAL(18, 4) NOT NULL,
+    current_value DECIMAL(18, 4) NOT NULL,
+    priority VARCHAR(10) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'TRIGGERED',
+    triggered_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP,
+    resolution_note TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_alert_hist_rule ON t_alert_history(rule_id);
+CREATE INDEX idx_alert_hist_status ON t_alert_history(status);
+CREATE INDEX idx_alert_hist_triggered ON t_alert_history(triggered_at);
+CREATE INDEX idx_alert_hist_metric ON t_alert_history(metric_name);
+
+COMMENT ON TABLE t_alert_history IS '告警歷史記錄表';
+COMMENT ON COLUMN t_alert_history.status IS '狀態 (TRIGGERED, RESOLVED, ACKNOWLEDGED, MUTED)';
+COMMENT ON COLUMN t_alert_history.resolution_note IS '解除原因說明';
+```
+
+### 7.3 性能指標時序表
+
+```sql
+-- 性能指標時序數據表（建議使用 TimescaleDB 或 InfluxDB）
+CREATE TABLE t_performance_metric (
+    id BIGSERIAL PRIMARY KEY,
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value DECIMAL(18, 4) NOT NULL,
+    tags JSONB,
+    recorded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_perf_metric_name ON t_performance_metric(metric_name);
+CREATE INDEX idx_perf_recorded ON t_performance_metric(recorded_at);
+CREATE INDEX idx_perf_tags ON t_performance_metric USING GIN (tags);
+
+COMMENT ON TABLE t_performance_metric IS '性能指標時序數據表';
+COMMENT ON COLUMN t_performance_metric.tags IS '標籤 JSON (endpoint, tenant_id, status_code)';
+COMMENT ON COLUMN t_performance_metric.recorded_at IS '記錄時間';
+
+-- 分區策略（時序數據建議按月分區）
+-- CREATE TABLE t_performance_metric_2026_01 PARTITION OF t_performance_metric
+-- FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
+```
+
+---
+
 ## 相關文件
 
 - [性能優化](./Performance_Optimization.md) — 性能優化規範
