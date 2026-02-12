@@ -212,3 +212,17 @@ This rule is commented out but preserved for future reference.
 - **Expected Impact**: Zero human intervention for rate limit handling, 48-hour continuous execution capability
 - **Test Coverage**: Verified daily reset (4pm/2am/12pm), 5-hour limit, and exponential backoff patterns
 - **Reference**: Plan v1.2.0 in `C:\Users\ron.chang\.claude\plans\elegant-pondering-sparrow.md`
+
+### P18: Validation scripts must exclude source-archive/ (Added 2026-02-12)
+- **Problem**: `check-terminology-consistency-zh-tw.sh` v1.0 counted all 380 files (including 191 READ-ONLY source-archive files), reporting 90% consistency when editable files were actually at 94%
+- **Root Cause**: Script used `find "$target" -name "*.md"` without excluding source-archive directory
+- **Fix**: Added source-archive/ skip rule in check_file() + smart compound term exclusion for "流水"
+- **Impact**: Consistency score jumped from 90% → 100% after script enhancement + 2 terminology fixes
+- **Lesson**: Any validation script scanning docs/iGaming/ must skip source-archive/ (per P1 guardrail)
+- **Compound Terms**: "流水" in compound forms (流水要求/進度/計算/對帳/操縱) is legitimate and should NOT be flagged
+
+### 2026-02-12: Optimized Phase 9C from 6 batches to 2 commits
+- Original plan: 6 batches (Batch 38-43) for 91% → 100% terminology consistency
+- Actual execution: 2 commits in ~30 minutes
+- Key insight: source-archive/ exclusion + smart compound term detection resolved most "issues"
+- Only 2 actual terminology fixes needed: 充值→存款, 存取款→存提款
