@@ -7,7 +7,7 @@
 set -euo pipefail
 
 # ===== Configuration =====
-MAX_ITERATIONS=${1:-120}
+MAX_ITERATIONS=${1:-20}  # Temporary: 20 iterations for testing (was 120)
 
 # Dynamically detect project root (cross-platform)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -145,6 +145,56 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
     }
 
   ITERATION_START_TIME=$(date +%s)
+
+  # ===== Post-iteration validation (Phase 1 quality gates) =====
+  echo -e "${CYAN}🔍 Running post-translation validation...${NC}"
+
+  # Get files modified in this iteration (iGaming docs only)
+  TRANSLATED_FILES=$(git diff --name-only HEAD~1 2>/dev/null | grep '^docs/iGaming/.*\.md$' || true)
+
+  if [ -n "$TRANSLATED_FILES" ]; then
+    VALIDATION_FAILED=0
+
+    echo "  Files to validate: $(echo "$TRANSLATED_FILES" | wc -l)"
+
+    # Run 4 validation scripts (non-blocking - warnings only)
+    if bash scripts/check-technical-terms.sh $TRANSLATED_FILES 2>&1 | tee -a "$LOG_FILE"; then
+      echo "  ✓ Technical terms check: PASS"
+    else
+      echo "  ✗ Technical terms check: FAIL (see log)"
+      ((VALIDATION_FAILED++))
+    fi
+
+    if bash scripts/validate-zh-tw-encoding.sh $TRANSLATED_FILES 2>&1 | tee -a "$LOG_FILE"; then
+      echo "  ✓ Encoding check: PASS"
+    else
+      echo "  ✗ Encoding check: FAIL (see log)"
+      ((VALIDATION_FAILED++))
+    fi
+
+    if bash scripts/check-terminology-consistency-zh-tw.sh $TRANSLATED_FILES 2>&1 | tee -a "$LOG_FILE"; then
+      echo "  ✓ Terminology check: PASS"
+    else
+      echo "  ⚠ Terminology check: WARNING (non-blocking)"
+    fi
+
+    if bash scripts/validate-mermaid.sh $TRANSLATED_FILES 2>&1 | tee -a "$LOG_FILE"; then
+      echo "  ✓ Mermaid syntax check: PASS"
+    else
+      echo "  ✗ Mermaid syntax check: FAIL (see log)"
+      ((VALIDATION_FAILED++))
+    fi
+
+    if [ $VALIDATION_FAILED -gt 0 ]; then
+      echo -e "${YELLOW}⚠️ $VALIDATION_FAILED validation check(s) failed (warnings logged)${NC}"
+    else
+      echo -e "${GREEN}✅ All validation checks passed!${NC}"
+    fi
+
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Validation: $VALIDATION_FAILED failures" >> "$LOG_FILE"
+  else
+    echo "  No iGaming files modified in this iteration (skipping validation)"
+  fi
 
   # ===== Check completion signal =====
   if echo "$OUTPUT" | grep -q "RALPH_COMPLETE"; then
