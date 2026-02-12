@@ -68,6 +68,391 @@ flowchart TD
 - 租戶配置更新: 需要 "governance:tenant:approve" 權限
 - 加密金鑰輪換: 需要 "governance:security:approve" 權限
 
+### 1.2 Java 實現（Java Implementation）
+
+#### 1.2.1 Service 層 — 治理審批服務
+
+```java
+package net.lab1024.sa.business.governance;
+
+import io.vavr.control.Option;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * 治理審批服務
+ * 負責審批工作流邏輯、權限驗證與決策路由
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class GovernanceApprovalService {
+
+    private final GovernancePolicyDao governancePolicyDao;
+    private final ComplianceAuditTrailDao complianceAuditTrailDao;
+    private final GovernanceApprovalManager governanceApprovalManager;
+    private final PermissionService permissionService;
+    private final NotificationService notificationService;
+
+    /**
+     * 提交治理請求
+     *
+     * @param requestType 請求類型（ROLE_CHANGE, TENANT_CONFIG, SECURITY_POLICY, ENCRYPTION_KEY）
+     * @param requestDetails 請求詳情 JSON
+     * @param requesterId 請求者 ID
+     * @param requesterIp 請求者 IP
+     * @return 審計追蹤記錄
+     */
+    public GovernanceRequestVO submitRequest(
+        String requestType, String requestDetails, Long requesterId, String requesterIp
+    ) {
+        // 1. 查詢適用的治理策略
+        Option<GovernancePolicyEntity> policyOpt = governancePolicyDao.findByRequestType(requestType);
+
+        if (policyOpt.isEmpty()) {
+            throw new RuntimeException("No governance policy found for request type: " + requestType);
+        }
+
+        GovernancePolicyEntity policy = policyOpt.get();
+
+        // 2. 驗證請求者權限
+        boolean hasPermission = permissionService.checkPermission(
+            requesterId, policy.getRequiredPermission()
+        );
+
+        if (!hasPermission) {
+            // 拒絕請求 - 無權限
+            return governanceApprovalManager.rejectRequestDueToPermission(
+                requestType, requestDetails, requesterId, requesterIp, policy.getPolicyId()
+            );
+        }
+
+        // 3. 檢查自動批准條件
+        if (policy.getRequiresApproval() && checkAutoApproveConditions(requestDetails, policy)) {
+            // 自動批准
+            return governanceApprovalManager.autoApproveRequest(
+                requestType, requestDetails, requesterId, requesterIp, policy.getPolicyId()
+            );
+        }
+
+        // 4. 需要人工審批 - 建立待處理請求
+        if (policy.getRequiresApproval()) {
+            return governanceApprovalManager.createPendingRequest(
+                requestType, requestDetails, requesterId, requesterIp, policy.getPolicyId()
+            );
+        }
+
+        // 5. 無需審批 - 直接執行
+        return governanceApprovalManager.autoApproveRequest(
+            requestType, requestDetails, requesterId, requesterIp, policy.getPolicyId()
+        );
+    }
+
+    /**
+     * 審批者處理待處理請求
+     *
+     * @param auditId 審計追蹤 ID
+     * @param decision 決策（APPROVED, REJECTED, ESCALATED）
+     * @param approverId 審批者 ID
+     * @param approvalReason 審批原因
+     */
+    public void processApproval(
+        Long auditId, String decision, Long approverId, String approvalReason
+    ) {
+        // 查詢待處理的審計記錄
+        ComplianceAuditTrailEntity audit = complianceAuditTrailDao.selectById(auditId)
+            .getOrElseThrow(() -> new RuntimeException("Audit record not found: " + auditId));
+
+        // 驗證審批者權限
+        GovernancePolicyEntity policy = governancePolicyDao.selectById(audit.getPolicyId())
+            .getOrElseThrow(() -> new RuntimeException("Policy not found: " + audit.getPolicyId()));
+
+        boolean isAuthorizedApprover = permissionService.checkPermission(
+            approverId, policy.getRequiredPermission()
+        );
+
+        if (!isAuthorizedApprover) {
+            throw new RuntimeException("User is not authorized to approve this request");
+        }
+
+        // 根據決策執行操作
+        switch (decision) {
+            case "APPROVED" -> governanceApprovalManager.approveRequest(auditId, approverId, approvalReason);
+            case "REJECTED" -> governanceApprovalManager.rejectRequest(auditId, approverId, approvalReason);
+            case "ESCALATED" -> governanceApprovalManager.escalateRequest(auditId, approverId, approvalReason);
+            default -> throw new IllegalArgumentException("Invalid decision: " + decision);
+        }
+    }
+
+    /**
+     * 查詢待處理的治理請求（分頁）
+     *
+     * @param approverRoleIds 審批者角色 ID 列表
+     * @param pageNum 頁碼
+     * @param pageSize 每頁大小
+     * @return 分頁結果
+     */
+    public PageResult<GovernanceRequestVO> listPendingRequests(
+        List<Long> approverRoleIds, int pageNum, int pageSize
+    ) {
+        return complianceAuditTrailDao.selectPendingByRoles(approverRoleIds, pageNum, pageSize)
+            .map(page -> SmartPageUtil.convert2PageResult(page, GovernanceRequestVO.class));
+    }
+
+    /**
+     * 檢查自動批准條件
+     */
+    private boolean checkAutoApproveConditions(String requestDetails, GovernancePolicyEntity policy) {
+        if (policy.getAutoApproveConditions() == null) {
+            return false;
+        }
+
+        // 解析自動批准條件（簡化示例 - 實際應使用規則引擎）
+        Map<String, Object> conditions = JsonUtil.parseObject(
+            policy.getAutoApproveConditions(), new TypeReference<Map<String, Object>>() {}
+        );
+
+        Map<String, Object> details = JsonUtil.parseObject(
+            requestDetails, new TypeReference<Map<String, Object>>() {}
+        );
+
+        // 示例：金額小於閾值自動批准
+        if (conditions.containsKey("amount_less_than")) {
+            BigDecimal threshold = new BigDecimal(conditions.get("amount_less_than").toString());
+            BigDecimal requestAmount = new BigDecimal(details.getOrDefault("amount", "0").toString());
+            return requestAmount.compareTo(threshold) < 0;
+        }
+
+        return false;
+    }
+}
+```
+
+#### 1.2.2 Manager 層 — 治理審批管理器
+
+```java
+package net.lab1024.sa.business.governance;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/**
+ * 治理審批管理器
+ * 負責審批狀態變更、審計日誌寫入與通知發送
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class GovernanceApprovalManager {
+
+    private final ComplianceAuditTrailDao complianceAuditTrailDao;
+    private final GovernanceExecutor governanceExecutor;
+    private final NotificationService notificationService;
+
+    /**
+     * 建立待處理的治理請求
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public GovernanceRequestVO createPendingRequest(
+        String requestType, String requestDetails, Long requesterId,
+        String requesterIp, Long policyId
+    ) {
+        String auditNo = generateAuditNo();
+
+        ComplianceAuditTrailEntity audit = ComplianceAuditTrailEntity.builder()
+            .auditNo(auditNo)
+            .policyId(policyId)
+            .requestType(requestType)
+            .requestDetails(requestDetails)
+            .requesterId(requesterId)
+            .requesterIp(requesterIp)
+            .approvalStatus("PENDING")
+            .executionStatus("NOT_STARTED")
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        complianceAuditTrailDao.insert(audit);
+
+        // 通知審批者佇列
+        notificationService.notifyApprovers(policyId, audit.getAuditId());
+
+        log.info("Governance request created: auditNo={}, requestType={}, requesterId={}",
+            auditNo, requestType, requesterId);
+
+        return SmartBeanUtil.copy(audit, GovernanceRequestVO.class);
+    }
+
+    /**
+     * 自動批准請求（無需人工審批）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public GovernanceRequestVO autoApproveRequest(
+        String requestType, String requestDetails, Long requesterId,
+        String requesterIp, Long policyId
+    ) {
+        String auditNo = generateAuditNo();
+
+        ComplianceAuditTrailEntity audit = ComplianceAuditTrailEntity.builder()
+            .auditNo(auditNo)
+            .policyId(policyId)
+            .requestType(requestType)
+            .requestDetails(requestDetails)
+            .requesterId(requesterId)
+            .requesterIp(requesterIp)
+            .approvalStatus("AUTO_APPROVED")
+            .executionStatus("NOT_STARTED")
+            .approvedAt(LocalDateTime.now())
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        complianceAuditTrailDao.insert(audit);
+
+        // 立即執行治理操作
+        executeGovernanceAction(audit);
+
+        log.info("Governance request auto-approved: auditNo={}, requestType={}",
+            auditNo, requestType);
+
+        return SmartBeanUtil.copy(audit, GovernanceRequestVO.class);
+    }
+
+    /**
+     * 拒絕請求（權限不足）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public GovernanceRequestVO rejectRequestDueToPermission(
+        String requestType, String requestDetails, Long requesterId,
+        String requesterIp, Long policyId
+    ) {
+        String auditNo = generateAuditNo();
+
+        ComplianceAuditTrailEntity audit = ComplianceAuditTrailEntity.builder()
+            .auditNo(auditNo)
+            .policyId(policyId)
+            .requestType(requestType)
+            .requestDetails(requestDetails)
+            .requesterId(requesterId)
+            .requesterIp(requesterIp)
+            .approvalStatus("REJECTED")
+            .approvalDecision("Insufficient permissions")
+            .executionStatus("NOT_STARTED")
+            .approvedAt(LocalDateTime.now())
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        complianceAuditTrailDao.insert(audit);
+
+        log.warn("Governance request rejected (permission denied): auditNo={}, requesterId={}",
+            auditNo, requesterId);
+
+        return SmartBeanUtil.copy(audit, GovernanceRequestVO.class);
+    }
+
+    /**
+     * 審批者批准請求
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void approveRequest(Long auditId, Long approverId, String approvalReason) {
+        complianceAuditTrailDao.updateApprovalStatus(
+            auditId, "APPROVED", approverId, approvalReason, LocalDateTime.now()
+        );
+
+        // 執行治理操作
+        ComplianceAuditTrailEntity audit = complianceAuditTrailDao.selectById(auditId)
+            .getOrElseThrow(() -> new RuntimeException("Audit not found: " + auditId));
+
+        executeGovernanceAction(audit);
+
+        // 通知請求者
+        notificationService.notifyRequester(audit.getRequesterId(), "請求已批准", approvalReason);
+
+        log.info("Governance request approved: auditId={}, approverId={}", auditId, approverId);
+    }
+
+    /**
+     * 審批者拒絕請求
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void rejectRequest(Long auditId, Long approverId, String approvalReason) {
+        complianceAuditTrailDao.updateApprovalStatus(
+            auditId, "REJECTED", approverId, approvalReason, LocalDateTime.now()
+        );
+
+        ComplianceAuditTrailEntity audit = complianceAuditTrailDao.selectById(auditId)
+            .getOrElseThrow(() -> new RuntimeException("Audit not found: " + auditId));
+
+        // 通知請求者
+        notificationService.notifyRequester(audit.getRequesterId(), "請求已拒絕", approvalReason);
+
+        log.info("Governance request rejected: auditId={}, approverId={}", auditId, approverId);
+    }
+
+    /**
+     * 升級請求至高級審批者
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void escalateRequest(Long auditId, Long approverId, String escalationReason) {
+        complianceAuditTrailDao.updateApprovalStatus(
+            auditId, "ESCALATED", approverId, escalationReason, LocalDateTime.now()
+        );
+
+        ComplianceAuditTrailEntity audit = complianceAuditTrailDao.selectById(auditId)
+            .getOrElseThrow(() -> new RuntimeException("Audit not found: " + auditId));
+
+        // 通知高級審批者
+        notificationService.notifySeniorApprovers(audit.getPolicyId(), auditId, escalationReason);
+
+        log.info("Governance request escalated: auditId={}, approverId={}", auditId, approverId);
+    }
+
+    /**
+     * 執行治理操作（基於請求類型）
+     */
+    private void executeGovernanceAction(ComplianceAuditTrailEntity audit) {
+        try {
+            // 更新執行狀態為進行中
+            complianceAuditTrailDao.updateExecutionStatus(audit.getAuditId(), "IN_PROGRESS");
+
+            // 根據請求類型路由到不同執行器
+            String resultDetails = governanceExecutor.execute(audit.getRequestType(), audit.getRequestDetails());
+
+            // 更新執行狀態為成功
+            complianceAuditTrailDao.updateExecutionResult(
+                audit.getAuditId(), "SUCCESS", resultDetails, null
+            );
+
+            log.info("Governance action executed successfully: auditId={}, requestType={}",
+                audit.getAuditId(), audit.getRequestType());
+
+        } catch (Exception e) {
+            // 更新執行狀態為失敗
+            complianceAuditTrailDao.updateExecutionResult(
+                audit.getAuditId(), "FAILED", null, e.getMessage()
+            );
+
+            log.error("Governance action execution failed: auditId={}", audit.getAuditId(), e);
+        }
+    }
+
+    /**
+     * 生成審計編號（格式：AUDIT-YYYYMMDD-HHMMSS-UUID）
+     */
+    private String generateAuditNo() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        String uuid = UUID.randomUUID().toString().substring(0, 8);
+        return "AUDIT-" + timestamp + "-" + uuid;
+    }
+}
+```
+
 ---
 
 ## 2. 多租戶架構（Multi-Tenant Architecture）
