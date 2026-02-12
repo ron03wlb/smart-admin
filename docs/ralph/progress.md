@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 125 (Phase 6: 6, Phase 7-8: 98, Phase 9: 21)
-> **Status**: Phase 9B IN PROGRESS — Batch 20-29 complete (50 files translated)
+> **Total Iterations**: 126 (Phase 6: 6, Phase 7-8: 98, Phase 9: 22)
+> **Status**: Phase 9B IN PROGRESS — Batch 20-30 complete (55 files translated)
 
 ---
 
@@ -470,12 +470,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/09_Infrastructure/Performance_Monitoring.md (性能監控與告警架構 — metadata + footer 標準化)
 - [x] architecture/09_Infrastructure/Performance_Optimization.md (性能優化規範 — metadata + footer 標準化)
 
-#### Batch 30 — Infrastructure (5 files)
-- [ ] architecture/09_Infrastructure/QA_Standards.md
-- [ ] architecture/09_Infrastructure/README.md
-- [ ] architecture/09_Infrastructure/Stream_Processing_Architecture.md
-- [ ] architecture/09_Infrastructure/Token_Cache_Performance.md
-- [ ] architecture/09_Infrastructure/Token_Edge_Deployment.md
+#### Batch 30 — Infrastructure (5 files) ✅ COMPLETE
+- [x] architecture/09_Infrastructure/QA_Standards.md (測試驗收標準架構 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/README.md (基礎設施索引 — 全文翻譯)
+- [x] architecture/09_Infrastructure/Stream_Processing_Architecture.md (串流處理架構 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/Token_Cache_Performance.md (Token 緩存性能設計 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/Token_Edge_Deployment.md (Token 邊緣部署與運維 — metadata + footer 標準化)
 
 #### Batch 31 — Infrastructure (5 files)
 - [ ] architecture/09_Infrastructure/Token_Validation_Architecture.md
@@ -557,4 +557,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9B IN PROGRESS — Batch 20-29 complete (50 files: Game Integration + Activity Engine + Risk Engine + Platform Core + Agent/Analytics + Infrastructure)
+**Status**: Phase 9B IN PROGRESS — Batch 20-30 complete (55 files: Game Integration + Activity Engine + Risk Engine + Platform Core + Agent/Analytics + Infrastructure)
