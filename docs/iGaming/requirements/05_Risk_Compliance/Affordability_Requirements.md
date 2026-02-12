@@ -1,208 +1,209 @@
-# Affordability Assessment Requirements (可負擔性評估業務需求)
+# 可負擔性評估業務需求（Affordability Assessment Requirements）
 
 > **Canonical Source**: [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
 > **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Architecture**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
+> **Related Doc**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---
 
-## 1. Business Context
+## 1. 業務背景（Business Context）
 
-Affordability Assessment is a core regulatory requirement under UKGC 2025 rules. The system evaluates a player's financial capacity, ensuring gambling activity remains within affordable limits. Failure to comply exposes the operator to license sanctions, fines, and reputational damage.
+可負擔性評估（Affordability Assessment）是 UKGC 2025 規則下的核心監管要求。系統評估玩家的財務能力，確保博弈活動保持在可負擔範圍內。未能合規將使營運商面臨牌照制裁、罰款和聲譽損害。
 
 ---
 
-## 2. Regulatory Mandate Summary
+## 2. 監管規定摘要（Regulatory Mandate Summary）
 
-| Regulator | Regulation | Effective Date | Primary Mandate |
+| 監管機構 | 法規 | 生效日期 | 主要規定 |
 |-----------|-----------|----------------|-----------------|
-| **UKGC** | 2025 New Rules | 2025-01 | Mandatory financial affordability assessments |
-| **Netherlands** | KOA Remote Gambling | 2024 | Annual affordability self-declaration |
-| **Germany** | GlueStV 2021 | 2021 | Hard cap of EUR 1,000 per month |
+| **UKGC** | 2025 New Rules | 2025-01 | 強制性財務可負擔性評估 |
+| **Netherlands** | KOA Remote Gambling | 2024 | 年度可負擔性自我申報 |
+| **Germany** | GlueStV 2021 | 2021 | 每月 EUR 1,000 硬上限 |
 
 ---
 
-## 3. UK 2025 Rules -- Assessment Triggers
+## 3. UK 2025 規則 -- 評估觸發條件（Assessment Triggers）
 
-### 3.1 Annual Net Loss Triggers
+### 3.1 年度淨損失觸發（Annual Net Loss Triggers）
 
-UKGC lowered the mandatory financial assessment thresholds significantly:
+UKGC 顯著降低了強制財務評估門檻：
 
-| Trigger Condition | Pre-2025 Threshold | 2025 Threshold |
+| 觸發條件 | 2025 前門檻 | 2025 門檻 |
 |-------------------|-------------------|----------------|
-| Annual net loss | GBP 2,000/year | GBP 500/year |
-| Deposit velocity | None | GBP 500 in multiple deposits within 24 hours |
-| High-risk flagging | Operator discretion | Mandatory rules |
+| 年度淨損失 | GBP 2,000/年 | GBP 500/年 |
+| 存款速度 | 無 | 24 小時內多次存款達 GBP 500 |
+| 高風險標記 | 營運商自行決定 | 強制性規則 |
 
-### 3.2 Assessment Tiers
+### 3.2 評估等級（Assessment Tiers）
 
-Each tier carries specific obligations for the operator:
+每個等級對營運商有特定義務：
 
-| Tier | Trigger Condition | Required Action |
+| 等級 | 觸發條件 | 必要行動 |
 |------|-------------------|-----------------|
-| **Basic** | Net loss GBP 125 -- GBP 500 | Display warning message to player |
-| **Enhanced** | Net loss GBP 500 -- GBP 2,000 | Player self-declaration form |
-| **Full** | Net loss exceeding GBP 2,000 | Third-party data verification |
+| **Basic** | 淨損失 GBP 125 -- GBP 500 | 向玩家顯示警告訊息 |
+| **Enhanced** | 淨損失 GBP 500 -- GBP 2,000 | 玩家自我申報表單 |
+| **Full** | 淨損失超過 GBP 2,000 | 第三方數據驗證 |
 
-### 3.3 Self-Declaration Data Points (Enhanced Tier)
+### 3.3 自我申報數據點（Self-Declaration Data Points，Enhanced Tier）
 
-Players must declare the following:
+玩家必須申報以下資訊：
 
-| Data Point | Purpose |
+| 數據點 | 目的 |
 |------------|---------|
-| Annual income range | Establish baseline earnings |
-| Housing status (own / rent / family) | Assess fixed living costs |
-| Household size | Factor dependents into affordability |
-| Monthly disposable income | Determine gambling budget headroom |
+| 年收入範圍 | 建立基準收入 |
+| 住房狀況（自有 / 租賃 / 家庭） | 評估固定生活成本 |
+| 家庭規模 | 將被撫養人納入可負擔性考量 |
+| 月可支配收入 | 確定博弈預算空間 |
 
-### 3.4 Third-Party Verification Sources (Full Tier)
+### 3.4 第三方驗證來源（Third-Party Verification Sources，Full Tier）
 
-| Source | Data Provided |
+| 來源 | 提供數據 |
 |--------|--------------|
-| Open Banking | Real-time bank account balances and transaction history |
-| Credit Reference Agency (Experian, Equifax) | Credit file, income verification, financial commitments |
-| Public financial records | Insolvency, county court judgments |
+| Open Banking | 即時銀行帳戶餘額和交易歷史 |
+| Credit Reference Agency (Experian, Equifax) | 信用檔案、收入驗證、財務承諾 |
+| 公共財務記錄 | 破產、郡法院判決 |
 
 ---
 
-## 4. Monthly Net Deposit Trigger (UKGC 2025-02-28)
+## 4. 月度淨存款觸發（Monthly Net Deposit Trigger，UKGC 2025-02-28）
 
-Effective 28 February 2025, a separate and parallel trigger applies based on monthly net deposits.
+自 2025 年 2 月 28 日起，基於月度淨存款的獨立平行觸發器生效。
 
-### 4.1 Rule Definition
+### 4.1 規則定義（Rule Definition）
 
-| Attribute | Value |
+| 屬性 | 值 |
 |-----------|-------|
-| Calculation period | Rolling 30 days |
-| Formula | Total Deposits minus Total Withdrawals |
-| Threshold | GBP 150 or more |
-| Effective date | 2025-02-28 |
+| 計算週期 | 滾動 30 天 |
+| 公式 | 總存款減去總提款 |
+| 門檻 | GBP 150 或以上 |
+| 生效日期 | 2025-02-28 |
 
-This rule operates **independently** of the annual net loss rules and both may trigger simultaneously.
+此規則與年度淨損失規則**獨立運作**，兩者可能同時觸發。
 
-### 4.2 Trigger Comparison Matrix
+### 4.2 觸發比較矩陣（Trigger Comparison Matrix）
 
-| Rule Type | Calculation Period | Formula | Thresholds | Effective |
+| 規則類型 | 計算週期 | 公式 | 門檻 | 生效日期 |
 |-----------|--------------------|---------|------------|-----------|
-| Annual net loss | Rolling 12 months | Loss amount minus winnings | GBP 125 / GBP 500 / GBP 2,000 | 2025-01 |
-| Monthly net deposit | Rolling 30 days | Deposits minus withdrawals | GBP 150 | 2025-02-28 |
+| 年度淨損失 | 滾動 12 個月 | 損失金額減去贏款 | GBP 125 / GBP 500 / GBP 2,000 | 2025-01 |
+| 月度淨存款 | 滾動 30 天 | 存款減去提款 | GBP 150 | 2025-02-28 |
 
-### 4.3 Relationship Between Triggers
+### 4.3 觸發器之間的關係（Relationship Between Triggers）
 
-Player activity is evaluated against both trigger types:
+玩家活動根據兩種觸發類型進行評估：
 
-- Annual net loss at or above GBP 125 triggers Basic assessment (warning)
-- Annual net loss at or above GBP 500 triggers Enhanced assessment (self-declaration)
-- Annual net loss at or above GBP 2,000 triggers Full assessment (third-party verification)
-- Monthly net deposit at or above GBP 150 triggers Financial Vulnerability Basic Check (may escalate based on combined risk indicators)
+- 年度淨損失達到或超過 GBP 125 觸發 Basic 評估（警告）
+- 年度淨損失達到或超過 GBP 500 觸發 Enhanced 評估（自我申報）
+- 年度淨損失達到或超過 GBP 2,000 觸發 Full 評估（第三方驗證）
+- 月度淨存款達到或超過 GBP 150 觸發財務脆弱性基礎檢查（可能根據綜合風險指標升級）
 
 ---
 
-## 5. Financial Vulnerability Detection
+## 5. 財務脆弱性檢測（Financial Vulnerability Detection）
 
-The system must detect behavioural indicators of financial vulnerability in real time.
+系統必須即時檢測財務脆弱性的行為指標。
 
-### 5.1 Vulnerability Indicators
+### 5.1 脆弱性指標（Vulnerability Indicators）
 
-| Indicator | Definition | Severity |
+| 指標 | 定義 | 嚴重程度 |
 |-----------|-----------|----------|
-| **Chasing losses** | Player increases stake by more than 50% immediately after a loss, occurring 3 or more times in 20 bets | HIGH |
-| **Deposit velocity** | 5 or more deposits within 24 hours totalling more than GBP 500 | MEDIUM |
-| **Unusual pattern** | Deviations from established betting pattern (time-of-day, stake size, game type) | MEDIUM |
+| **追逐損失（Chasing losses）** | 玩家在損失後立即將賭注增加 50% 以上，在 20 次投注中發生 3 次或以上 | HIGH |
+| **存款速度（Deposit velocity）** | 24 小時內 5 次或以上存款，總額超過 GBP 500 | MEDIUM |
+| **異常模式（Unusual pattern）** | 偏離既定投注模式（時段、賭注大小、遊戲類型） | MEDIUM |
 
-### 5.2 Severity-Based Response Policy
+### 5.2 基於嚴重程度的回應政策（Severity-Based Response Policy）
 
-| Severity | Required Platform Action |
+| 嚴重程度 | 平台必要行動 |
 |----------|------------------------|
-| **HIGH** | Trigger full affordability assessment; send care message to player |
-| **MEDIUM** | Display in-session warning message about responsible gambling |
-| **LOW** | Log indicator for monitoring; no immediate player-facing action |
+| **HIGH** | 觸發完整可負擔性評估；向玩家發送關懷訊息 |
+| **MEDIUM** | 顯示遊戲中關於負責任博弈的警告訊息 |
+| **LOW** | 記錄指標以供監控；無即時玩家面向行動 |
 
 ---
 
-## 6. Recommended Limit Calculation Policy
+## 6. 建議限額計算政策（Recommended Limit Calculation Policy）
 
-When a player completes a self-declaration, the platform calculates a recommended monthly deposit limit.
+當玩家完成自我申報時，平台計算建議的月度存款限額。
 
-### 6.1 Calculation Rules
+### 6.1 計算規則（Calculation Rules）
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|------------|
-| Base calculation | 10% of declared monthly disposable income |
-| Household adjustment | Reduce by 20% if household size exceeds 2 |
-| Minimum floor | GBP 50 per month |
-| Maximum cap | GBP 2,000 per month |
+| 基礎計算 | 申報月可支配收入的 10% |
+| 家庭調整 | 如家庭規模超過 2 人，減少 20% |
+| 最低下限 | 每月 GBP 50 |
+| 最高上限 | 每月 GBP 2,000 |
 
-### 6.2 Limit Application Policy
+### 6.2 限額應用政策（Limit Application Policy）
 
-| Assessment Result | Limit Application | Player Choice |
+| 評估結果 | 限額應用 | 玩家選擇 |
 |-------------------|-------------------|---------------|
-| PASSED (Enhanced) | Recommended limit presented | Player may accept or set a lower custom limit |
-| PASSED (Full) | Limit applied automatically | Player may request lower limit but not higher |
-| FAILED (Full) | Limit forced immediately | No player override; account may be restricted |
+| PASSED (Enhanced) | 顯示建議限額 | 玩家可接受或設定較低的自訂限額 |
+| PASSED (Full) | 自動應用限額 | 玩家可請求較低限額但不能提高 |
+| FAILED (Full) | 立即強制限額 | 無玩家覆蓋權；帳戶可能被限制 |
 
 ---
 
-## 7. Assessment Validity and Renewal
+## 7. 評估有效期與續期（Assessment Validity and Renewal）
 
-| Assessment Type | Validity Period | Renewal Process |
+| 評估類型 | 有效期 | 續期流程 |
 |----------------|----------------|-----------------|
-| Enhanced (self-declaration) | 3 months | Player completes new declaration |
-| Full (third-party verification) | 6 months | New third-party check required |
+| Enhanced（自我申報） | 3 個月 | 玩家完成新申報 |
+| Full（第三方驗證） | 6 個月 | 需要新的第三方檢查 |
 
-If a player's existing assessment covers the required tier and has not expired, no new assessment is triggered.
+如玩家現有評估涵蓋所需等級且未過期，則不會觸發新評估。
 
 ---
 
-## 8. Compliance Reporting Requirements
+## 8. 合規報告要求（Compliance Reporting Requirements）
 
-### 8.1 Monthly Reports
+### 8.1 月度報告（Monthly Reports）
 
-| Report | Frequency | Content |
+| 報告 | 頻率 | 內容 |
 |--------|-----------|---------|
-| Assessment Statistics | Monthly | Total triggered, pass rate, limit distribution by tier |
-| Vulnerability Detection | Monthly | Detection counts by indicator type, resolution outcomes |
-| Limit Enforcement | Monthly | Forced limit count, player response (accepted / appealed) |
+| 評估統計 | 月度 | 總觸發次數、通過率、按等級限額分佈 |
+| 脆弱性檢測 | 月度 | 按指標類型的檢測數量、解決結果 |
+| 限額執行 | 月度 | 強制限額數量、玩家反應（接受 / 上訴） |
 
-### 8.2 Key Performance Indicators
+### 8.2 關鍵績效指標（Key Performance Indicators）
 
-| KPI | Description |
+| KPI | 描述 |
 |-----|------------|
-| Assessment trigger rate | Number of assessments triggered per active player cohort |
-| Assessment pass rate | Ratio of PASSED to total assessments |
-| Average recommended limit | Mean monthly limit recommended across all assessments |
-| Vulnerability detection rate | Number of vulnerability indicators detected per active player |
+| 評估觸發率 | 每活躍玩家群組觸發的評估數量 |
+| 評估通過率 | PASSED 與總評估的比率 |
+| 平均建議限額 | 所有評估中建議的月度限額平均值 |
+| 脆弱性檢測率 | 每活躍玩家檢測到的脆弱性指標數量 |
 
 ---
 
-## 9. Acceptance Criteria
+## 9. 驗收標準（Acceptance Criteria）
 
-- [ ] Annual net loss triggers apply correctly: GBP 125 (Basic), GBP 500 (Enhanced), GBP 2,000 (Full)
-- [ ] Monthly net deposit trigger fires at GBP 150 within rolling 30-day window
-- [ ] Enhanced tier requires self-declaration form with income, housing, household size, disposable income
-- [ ] Full tier integrates third-party verification (Open Banking, Credit Reference Agency)
-- [ ] Recommended limit calculation: 10% of disposable income, -20% for household >2, floor GBP 50, cap GBP 2,000
-- [ ] Assessment validity periods enforced: Enhanced = 3 months, Full = 6 months
-- [ ] Financial vulnerability indicators detected in real-time (chasing losses, deposit velocity, unusual patterns)
-- [ ] HIGH severity triggers full assessment + care message automatically
-- [ ] Monthly compliance reports include assessment statistics, vulnerability detection, limit enforcement
-- [ ] FAILED Full assessment applies forced limit with no player override
+可負擔性評估系統必須滿足以下驗收標準：
+
+- [ ] **觸發檢測**：年度淨損失（GBP 125/500/2,000）和月度淨存款（GBP 150）觸發在交易結算後 30 分鐘內檢測到
+- [ ] **分層評估執行**：Basic（警告訊息）、Enhanced（自我申報表單）和 Full（第三方驗證）評估根據觸發等級正確執行
+- [ ] **自我申報收集**：Enhanced 等級玩家提交收入、住房狀況、家庭規模和可支配收入，驗證確保數據完整性
+- [ ] **第三方整合**：Full 等級評估查詢 Open Banking API、Credit Reference Agency（Experian/Equifax）和公共記錄，P99 延遲 <5 秒
+- [ ] **限額計算**：系統使用 5% 可支配收入（basic）、10%（enhanced）或第三方驗證數據（full）計算月度消費限額，並具備覆蓋審批工作流程
+- [ ] **限額執行**：當玩家超過可負擔性衍生限額時，即時阻止存款和下注操作
+- [ ] **評估有效性**：Enhanced（3 個月）和 Full（6 個月）評估在有效期內不會重新觸發，除非玩家超過新等級
+- [ ] **脆弱性檢測**：即時監控標記存款速度（2 小時內 3 次以上存款）、極端損失（存款損失 50%）和快速增長（月度存款增加 >200%）
+- [ ] **合規報告**：月度報告包括評估觸發率、通過率、平均建議限額和脆弱性檢測數量，數據差異 ≤1%
 
 ---
 
-## 10. Related Business Requirements
+## 10. 相關業務需求（Related Business Requirements）
 
-| Document | Relationship |
+| 文檔 | 關係 |
 |----------|-------------|
-| Deposit Limits | Affordability limits feed into the deposit limit system |
-| Loss Limits | Net loss calculations share data with loss limit enforcement |
-| KYC / AML | Full assessments may share data with KYC verification |
-| UKGC Compliance | Affordability is a subset of overall UKGC licence compliance |
+| Deposit Limits | 可負擔性限額輸入至存款限額系統 |
+| Loss Limits | 淨損失計算與損失限額執行共享數據 |
+| KYC / AML | Full 評估可能與 KYC 驗證共享數據 |
+| UKGC Compliance | 可負擔性是 UKGC 整體牌照合規的子集 |
 
-### Technical Implementation
+### 技術實現（Technical Implementation）
 
-→ **[Affordability Assessment Implementation](../../architecture/05_Risk_Engine/Affordability_Implementation.md)** - Light/enhanced/full assessment algorithms, bank API integration, income verification workflows, limit enforcement mechanisms, and real-time monitoring dashboards
+→ **[Affordability Assessment Implementation](../../architecture/05_Risk_Engine/Affordability_Implementation.md)** - Light/enhanced/full 評估演算法、銀行 API 整合、收入驗證工作流程、限額執行機制和即時監控儀表板
 
 ---
 

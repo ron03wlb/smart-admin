@@ -1,57 +1,57 @@
-# 06 Governance Licensing
+# 06 治理與授權（Governance Licensing）
 
-> **Audience**: Executives, Product Managers, Compliance Officers
-> **Status**: Phase 6 Complete - 6 split documents + source index
-
----
-
-## Split Documents
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Multi-Tenant Requirements](Multi_Tenant_Requirements.md) | Tenant hierarchy, data isolation, billing models | [source](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
-| [MFA Requirements](MFA_Requirements.md) | Authentication policies, compliance requirements | [source](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md) |
-| [MFA Compliance Requirements](MFA_Compliance_Requirements.md) | MFA audit policies, regulatory mandates, compliance checklists | [source](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md) |
-| [MFA Recovery Requirements](MFA_Recovery_Requirements.md) | Recovery options, identity verification, account recovery compliance | [source](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) |
-| [MFA Architecture Spec](MFA_Architecture_Spec.md) | MFA method selection criteria, authentication policies, user experience | [source](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) |
-| [Governance Requirements](Governance_Requirements.md) | Multi-tenant policies, RBAC requirements, audit logging, data encryption standards | [source](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md) |
-
-## Source Index
-
-### Access Control & Permissions
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| RBAC Permissions | Role-based access control, permission management | [source](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) |
-| Audit Log | System audit logging, compliance trail | [source](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) |
-| Approval Workflow | Multi-level approval processes, authorization chains | [source](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) |
-| Data Security | Data protection, encryption, access controls | [source](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) |
-
-### Multi-Factor Authentication
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| MFA Architecture | Multi-factor authentication design | [source](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) |
-| TOTP WebAuthn | Time-based OTP and WebAuthn implementation | [source](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md) |
-| MFA Recovery Flow | Account recovery procedures | [source](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) |
-| MFA Compliance Audit | MFA compliance and audit requirements | [source](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md) |
-
-### Licensing & Jurisdictions
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| Compliance Timeline | Regulatory compliance deadlines and milestones | [source](../../source-archive/06_Platform_Governance/06-12_Compliance_Timeline.md) |
-| Multi-Jurisdiction Filing | Cross-jurisdiction regulatory filing alignment | [source](../../source-archive/06_Platform_Governance/06-13_Multi_Jurisdiction_Filing_Alignment.md) |
-| Brazil SPA Compliance | Brazilian SPA regulatory requirements | [source](../../source-archive/06_Platform_Governance/06-10_Brazil_SPA_Compliance.md) |
-| PAGCOR Curacao | PAGCOR and Curacao licensing requirements | [source](../../source-archive/06_Platform_Governance/06-11_PAGCOR_Curacao.md) |
-
-### Agent Center
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| Credit Network Logic | Agent credit network, hierarchical credit management | [source](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) |
-| Agent System | Agent management, commission structures | [source](../../source-archive/07_Agent_Center/07-03_Agent_System.md) |
+> **受眾（Audience）**: 高階主管、產品經理、合規官
+> **狀態（Status）**: Phase 6 完成 - 6 份拆分文檔 + 來源索引
 
 ---
 
-**Last Updated**: 2026-02-08
+## 拆分文檔（Split Documents）
+
+| 文檔 | 描述 | 來源 |
+|----------|-------------|--------|
+| [多租戶需求（Multi-Tenant Requirements）](Multi_Tenant_Requirements.md) | 租戶層級、數據隔離、計費模型 | [source](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
+| [MFA 需求](MFA_Requirements.md) | 身份驗證政策、合規要求 | [source](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md) |
+| [MFA 合規需求（MFA Compliance Requirements）](MFA_Compliance_Requirements.md) | MFA 審計政策、監管要求、合規檢查清單 | [source](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md) |
+| [MFA 恢復需求（MFA Recovery Requirements）](MFA_Recovery_Requirements.md) | 恢復選項、身份驗證、帳戶恢復合規 | [source](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) |
+| [MFA 架構規範（MFA Architecture Spec）](MFA_Architecture_Spec.md) | MFA 方法選擇標準、驗證政策、用戶體驗 | [source](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) |
+| [治理需求（Governance Requirements）](Governance_Requirements.md) | 多租戶政策、RBAC 要求、審計日誌、數據加密標準 | [source](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md) |
+
+## 來源索引（Source Index）
+
+### 存取控制與權限
+
+| 文檔 | 描述 | 來源 |
+|----------|-------------|--------|
+| RBAC Permissions | 基於角色的存取控制、權限管理 | [source](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) |
+| Audit Log | 系統審計日誌、合規軌跡 | [source](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) |
+| Approval Workflow | 多級審批流程、授權鏈 | [source](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) |
+| Data Security | 數據保護、加密、存取控制 | [source](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) |
+
+### 多因素身份驗證
+
+| 文檔 | 描述 | 來源 |
+|----------|-------------|--------|
+| MFA Architecture | 多因素身份驗證設計 | [source](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) |
+| TOTP WebAuthn | 基於時間的 OTP 和 WebAuthn 實施 | [source](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md) |
+| MFA Recovery Flow | 帳戶恢復程序 | [source](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) |
+| MFA Compliance Audit | MFA 合規和審計要求 | [source](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md) |
+
+### 授權與司法管轄區
+
+| 文檔 | 描述 | 來源 |
+|----------|-------------|--------|
+| Compliance Timeline | 監管合規截止日期和里程碑 | [source](../../source-archive/06_Platform_Governance/06-12_Compliance_Timeline.md) |
+| Multi-Jurisdiction Filing | 跨司法管轄區監管申報對齊 | [source](../../source-archive/06_Platform_Governance/06-13_Multi_Jurisdiction_Filing_Alignment.md) |
+| Brazil SPA Compliance | 巴西 SPA 監管要求 | [source](../../source-archive/06_Platform_Governance/06-10_Brazil_SPA_Compliance.md) |
+| PAGCOR Curacao | PAGCOR 和 Curacao 授權要求 | [source](../../source-archive/06_Platform_Governance/06-11_PAGCOR_Curacao.md) |
+
+### 代理中心
+
+| 文檔 | 描述 | 來源 |
+|----------|-------------|--------|
+| Credit Network Logic | 代理信用網絡、分層信用管理 | [source](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) |
+| Agent System | 代理管理、佣金結構 | [source](../../source-archive/07_Agent_Center/07-03_Agent_System.md) |
+
+---
+
+**最後更新（Last Updated）**: 2026-02-08

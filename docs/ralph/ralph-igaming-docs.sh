@@ -166,7 +166,7 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
   fi
 
   # ===== Enhanced rate limit + 5-hour window detection =====
-  if echo "$OUTPUT" | grep -qiE "(rate.?limit|usage.?limit|capacity|overloaded|429|5.?hour|five.?hour)"; then
+  if echo "$OUTPUT" | grep -qiE "(rate.?limit|usage.?limit|capacity|overloaded|429|5.?hour|five.?hour|hit.+limit|your.+limit|resets [0-9]+am)"; then
     echo -e "${YELLOW}⚠️ API limit detected${NC}"
 
     # Check if 5-hour limit specifically

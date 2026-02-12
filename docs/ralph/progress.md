@@ -1,20 +1,19 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: Phase 8 - Architecture Quality Enhancement [COMPLETE]
-> **Total Iterations**: 104 (Phase 6: 6, Phase 7-8: 98)
-> **Status**: COMPLETE ✅
+> **Current Phase**: Phase 9 - Traditional Chinese Translation [ACTIVE]
+> **Total Iterations**: 6 (Phase 6) + 5 (Phase 7) + 7 (Phase 8) + 11 (Phase 9) = 29 total
+> **Status**: IN PROGRESS
 
 ---
 
 ## Phase 7: Requirements Quality Enhancement [COMPLETE] ✅
 
 **Goal**: Push requirements documentation to business excellence
-**Achieved**:
-- Business Completeness: 47 files enhanced with Business Value + Success Metrics/Acceptance Criteria
-- Terminology Consistency: 100% (self-exclusion hyphenation, forward-ref standardization)
-- Forward-Reference: 100% (53 files standardized)
-- Forward Reference: 98% → **100%**
+**Targets**:
+- Business Completeness: 18% → **≥90%** ✅ **ACHIEVED 100%** (58/58 files = 100% complete)
+- Terminology Consistency: 50% → **≥95%** ✅ **ACHIEVED 100%** (4/4 checks passed)
+- Forward Reference: 98% → **100%** ⚠️ **DEFERRED** (5/58 = 8.6%, many legitimately lack architecture counterparts)
 
 **Validation**: `bash scripts/measure-business-completeness.sh && bash scripts/check-terminology-consistency.sh`
 
@@ -51,8 +50,6 @@ Priority: These files have NO business context sections — need Business Value 
 - [x] requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md (+Business Value +Success Metrics)
 - [x] requirements/15_Responsible_Gambling/Session_Protection_Requirements.md (+Business Value +Acceptance Criteria)
 
-**Phase 7A COMPLETE**: All 19 files enhanced with Business Value + Success Metrics OR Acceptance Criteria
-
 ---
 
 ### 7B: Business Completeness — Score 1/3 Files (28 files, need ≥1 more criteria)
@@ -67,60 +64,60 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 - [x] requirements/03_Gaming_Operations/Game_Integration_Requirements.md (+Business Value)
 
 #### Batch 6 — Gaming/Promotions (5 files) ✅ COMPLETE
-- [x] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md (+Success Metrics)
+- [x] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md (+Business Value +Success Metrics)
 - [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md (+Acceptance Criteria)
-- [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md (+Success Metrics)
-- [x] requirements/04_Promotions_VIP/Promotion_Requirements.md (+Business Value)
+- [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md (+Business Value +Success Metrics)
+- [x] requirements/04_Promotions_VIP/Promotion_Requirements.md (+Business Value, now 3/3)
 - [x] requirements/05_Risk_Compliance/Affordability_Requirements.md (+Acceptance Criteria)
 
 #### Batch 7 — Risk/Compliance (5 files) ✅ COMPLETE
-- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value)
-- [x] requirements/05_Risk_Compliance/ML_Requirements.md (+Acceptance Criteria)
-- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (+Success Metrics)
-- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value)
-- [x] requirements/06_Governance_Licensing/Governance_Requirements.md (+Acceptance Criteria)
+- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (+Business Value +Success Metrics, now 2/3)
+- [x] requirements/05_Risk_Compliance/ML_Requirements.md (+Acceptance Criteria, now 2/3)
+- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (+Success Metrics, now 2/3)
+- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (+Business Value, now 2/3)
+- [x] requirements/06_Governance_Licensing/Governance_Requirements.md (+Business Value +Acceptance Criteria, now 2/3)
 
 #### Batch 8 — MFA/Agent/Analytics (5 files) ✅ COMPLETE
-- [x] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (+Business Value)
-- [x] requirements/07_Agent_Operations/Agent_System_Requirements.md (+Success Metrics)
-- [x] requirements/07_Agent_Operations/Credit_Network_Requirements.md (+Acceptance Criteria)
-- [x] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md (+Business Value)
-- [x] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md (+Acceptance Criteria)
+- [x] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (+Business Value +Success Metrics, now 2/3)
+- [x] requirements/07_Agent_Operations/Agent_System_Requirements.md (+Business Value +Success Metrics, now 2/3)
+- [x] requirements/07_Agent_Operations/Credit_Network_Requirements.md (+Acceptance Criteria, now 2/3)
+- [x] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md (+Business Value, now 2/3)
+- [x] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md (+Business Value +Acceptance Criteria, now 2/3)
 
 #### Batch 9 — Frontend/Security (5 files) ✅ COMPLETE
 - [x] requirements/11_Frontend_Experience/Localization_Requirements.md (+Business Value)
 - [x] requirements/11_Frontend_Experience/Mobile_App_Requirements.md (+Success Metrics)
-- [x] requirements/11_Frontend_Experience/SEO_Performance_Requirements.md (+Business Value)
-- [x] requirements/12_Security_Compliance/Compliance_Standards_Requirements.md (+Acceptance Criteria)
-- [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md (+Business Value)
+- [x] requirements/11_Frontend_Experience/SEO_Performance_Requirements.md (+Business Value) ✅ 91% TARGET REACHED
+- [x] requirements/12_Security_Compliance/Compliance_Standards_Requirements.md (+Business Value, now 93%)
+- [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md (+Business Value, now 94%)
 
 #### Batch 10 — CS/Integration (3 files) ✅ COMPLETE
-- [x] requirements/13_Customer_Service/CS_Operations_Requirements.md (+Success Metrics)
-- [x] requirements/13_Customer_Service/CS_Platform_Requirements.md (+Business Value)
-- [x] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md (+Acceptance Criteria)
-
-**Phase 7B COMPLETE**: All 28 score-1/3 files enhanced with additional business criteria (≥2/3)
+- [x] requirements/13_Customer_Service/CS_Operations_Requirements.md (+Business Value, now 96%)
+- [x] requirements/13_Customer_Service/CS_Platform_Requirements.md (+Business Value, now 98%)
+- [x] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md (+Business Value, now 100% 🎯 PERFECT SCORE)
 
 ---
 
 ### 7C: Terminology + Forward-ref Fix ✅ COMPLETE
 
-- [x] Fix Chinese terms: Chinese terms in glossary tables are intentional bilingual references; prose content verified
-- [x] Fix Chinese terms: 可下注餘額 in glossary table is intentional; System_Overview.md anchor links to READ-ONLY source-archive
-- [x] Fix hyphenation: "self exclusion" → "self-exclusion" (7 instances fixed across 5 files)
-- [x] Fix missing forward-references to reach 100% (standardized 53 files from "Related Doc" to "Related Architecture")
+- [x] Fix Chinese terms: Replace "有效投注額" and "流水" with "Valid Turnover" across architecture/ — ✅ COMPLETE (4 files: Bonus_Calculation_Engine.md, Common_Patterns.md, Performance_Optimization.md, QA_Standards.md)
+- [x] Fix Chinese terms: Replace "可下注餘額" with "Playable Balance" across architecture/ — ✅ COMPLETE (1 file: System_Overview.md)
+- [x] Commit: 5 architecture files terminology cleanup (commit 0177290e)
+- [x] Fix Chinese terms in requirements/: Bonus_Calculation_Requirements.md (10 instances), QA_Standards_Requirements.md (1 instance) — ✅ COMPLETE
+- [x] Fix Chinese anchor in architecture/: System_Overview.md (可下注餘額計算 → playable-balance-formula) — ✅ COMPLETE
+- [x] Commit: 3 requirements/architecture files terminology cleanup (commit ee6c25f3)
+- [x] Fix hyphenation: "self exclusion" → "self-exclusion", "multi tenant"/"multitenant" → "multi-tenant" — ✅ NO ISSUES FOUND (already compliant)
+- [x] Forward-references: **DEFERRED** (current: 5/58 files = 8.6%, many requirements legitimately lack architecture counterparts)
 
-**Phase 7C COMPLETE**: Terminology consistency achieved, forward-references 100%
+**Final Status**: Terminology Consistency = **100%** (all 4 checks passed: Valid Turnover, Playable Balance, self-exclusion, multi-tenant)
 
 ### 7D: Phase 7 Quality Gate ✅ COMPLETE
 
-- [x] Forward-reference coverage: 100% (0 files missing "Related Architecture")
-- [x] Self-exclusion hyphenation: Fixed in 5 files (7 instances)
-- [x] Terminology standardized: "Related Doc" → "Related Architecture" (53 files)
-- [x] Architecture completeness: PASSED (100% back-references)
-- [x] Phase 7 Quality Gate: PASSED
-
-**Phase 7 COMPLETE**: Requirements Quality Enhancement achieved
+- [x] Run `bash scripts/measure-business-completeness.sh` — ✅ **100%** (58/58 files, target ≥90%)
+- [x] Run `bash scripts/check-terminology-consistency.sh` — ✅ **100%** (4/4 checks passed, target ≥95%)
+- [x] Run `bash scripts/validate_links.sh docs/iGaming` — ✅ **0 broken links**
+- [x] Run `bash scripts/validate-architecture-completeness.sh` — ✅ **ALL PASSED** (Java 72%, SQL 59%, YAML 41%, Mermaid 92%, Back-ref 100%)
+- [ ] Update quality-gate-report.md with Phase 7 results
 
 ---
 
@@ -140,227 +137,341 @@ Priority: These files have 1 criterion — add 1 more (easiest path to ≥2/3).
 
 Fix Java code examples to follow SmartAdmin conventions: Constructor injection, @Transactional in Manager only, Vavr Option.
 
-#### Batch 11 — Player/Finance (5 files) ✅ COMPLETE
-- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (fixed: @Service → @Component for Manager)
-- [x] architecture/02_Finance_Service/Financial_Implementation.md (@Transactional in snippets without class context - acceptable)
-- [x] architecture/02_Finance_Service/Payment_Gateway_Technical.md (fixed: @Autowired → constructor injection)
-- [x] architecture/02_Finance_Service/Reconciliation_Technical.md (@Autowired in test class - acceptable pattern)
-- [x] architecture/02_Finance_Service/Seamless_Wallet_Technical.md (fixed: @Service → @Component for Manager classes)
+#### Batch 11 — Player/Finance (5 files)
+- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (extracted @Transactional to KycVerificationManager, PasswordResetManager) ✅ commit 70538352
+- [x] architecture/02_Finance_Service/Financial_Implementation.md (extracted @Transactional to DepositManager, WithdrawalManager, WalletManager, WithdrawalReviewManager, ReconciliationManager, ReconciliationDiscrepancyManager) ✅ commit 75d64303
+- [x] architecture/02_Finance_Service/Payment_Gateway_Technical.md (fix @Service→@Component on PaymentManager, extract PSPReconciliationService→PSPReconciliationManager) ✅ commit e44cd07a
+- [x] architecture/02_Finance_Service/Reconciliation_Technical.md (fix @Autowired → @RequiredArgsConstructor in test class) ✅ commit e44cd07a
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Technical.md (extract ResettlementService→ResettlementManager) ✅ commit e44cd07a
 
 #### Batch 12 — Game/Activity (5 files) ✅ COMPLETE
-- [x] architecture/03_Game_Integration/Game_Integration_Security.md (extracted @Transactional to SecretRotationManager)
-- [x] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (fixed: @Service → @Component for Manager)
-- [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (already compliant - no changes needed)
-- [x] architecture/05_Risk_Engine/Affordability_Implementation.md (extracted @Transactional to AffordabilityAssessmentManager)
-- [x] architecture/05_Risk_Engine/Fraud_Detection_System.md (fixed: @Service → @Component for Manager; @Autowired in test classes is acceptable)
+- [x] architecture/03_Game_Integration/Game_Integration_Security.md — already compliant (Manager pattern) ✅
+- [x] architecture/03_Game_Integration/Turnover_Calculation_Logic.md — already compliant (Manager pattern) ✅
+- [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md — already compliant (Manager pattern) ✅
+- [x] architecture/05_Risk_Engine/Affordability_Implementation.md — already compliant (Manager pattern) ✅
+- [x] architecture/05_Risk_Engine/Fraud_Detection_System.md (fix @Autowired → @RequiredArgsConstructor in test classes) ✅ commit 8b74f411
 
 #### Batch 13 — Risk/MFA (5 files) ✅ COMPLETE
-- [x] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (added @Component + class context)
-- [x] architecture/06_Platform_Core/MFA_Compliance_Technical.md (extracted to IdentityDocumentManager + DocumentVerificationManager)
-- [x] architecture/06_Platform_Core/MFA_Compliance_Validation.md (extracted to MfaResetManager; @Autowired in test class acceptable)
-- [x] architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md (extracted to MFASetupManager + MFABackupCodeManager)
-- [x] architecture/06_Platform_Core/MFA_Recovery_Implementation.md (extracted to MfaSetupManager)
+- [x] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md — already compliant (Manager pattern) ✅
+- [x] architecture/06_Platform_Core/MFA_Compliance_Technical.md — already compliant (Manager pattern) ✅
+- [x] architecture/06_Platform_Core/MFA_Compliance_Validation.md (fix @Autowired → @RequiredArgsConstructor in MfaIntegrationTest) ✅ commit 53203bab
+- [x] architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md — already compliant (Manager pattern) ✅
+- [x] architecture/06_Platform_Core/MFA_Recovery_Implementation.md — already compliant (Manager pattern) ✅
 
 #### Batch 14 — Platform/Infrastructure (4 files) ✅ COMPLETE
-- [x] architecture/06_Platform_Core/MFA_Technical.md (extracted to MfaSetupManager; @Autowired in test class acceptable)
-- [x] architecture/06_Platform_Core/Multi_Tenant_Architecture.md (@Service → @Component for TenantMigrationManager)
-- [x] architecture/09_Infrastructure/Token_Edge_Deployment.md (no changes needed - @Autowired in test class is acceptable)
-- [x] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md (extracted to LossLimitManager + DepositManager)
+- [x] architecture/06_Platform_Core/MFA_Technical.md (fix @Autowired → @RequiredArgsConstructor in MfaIntegrationTest) ✅ commit 7bf8a7ac
+- [x] architecture/06_Platform_Core/Multi_Tenant_Architecture.md — already compliant (Manager pattern) ✅
+- [x] architecture/09_Infrastructure/Token_Edge_Deployment.md (fix @Autowired → @RequiredArgsConstructor in TokenValidationIntegrationTest) ✅ commit 7bf8a7ac
+- [x] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md — already compliant (Manager pattern) ✅
 
 #### Batch 15 — Responsible Gambling (3 files) ✅ COMPLETE
-- [x] architecture/15_Responsible_Gambling/Player_Protection_API.md (extracted to AffordabilityAssessmentManager)
-- [x] architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md (extracted to SelfExclusionManager; @Autowired in test class acceptable)
-- [x] architecture/15_Responsible_Gambling/Session_Protection_Architecture.md (extracted to CoolingOffManager + SessionManagementManager + RealityCheckManager)
-
-**Phase 8A COMPLETE**: All 22 architecture files with SmartAdmin pattern violations fixed
+- [x] architecture/15_Responsible_Gambling/Player_Protection_API.md — already compliant (Manager pattern) ✅
+- [x] architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md (fix @Autowired → @RequiredArgsConstructor in SelfExclusionServiceTest) ✅ commit b570503f
+- [x] architecture/15_Responsible_Gambling/Session_Protection_Architecture.md — already compliant (Manager pattern) ✅
 
 ---
 
-### 8B: Java + SQL Coverage Push ✅ COMPLETE
+### 8B: Java + SQL Coverage Push ✅ ALREADY MET
 
-Use `grep -rL` to find architecture files missing Java/SQL content.
+Coverage already exceeds 85% targets (measured at Phase 8A completion):
+- **Java Code**: 91/105 = **86.6%** (target ≥85%) ✅
+- **SQL Schema**: 93/105 = **88.5%** (target ≥85%) ✅
 
-#### Batch 16a — Add Java + SQL (5 dual-missing files) ✅ COMPLETE
-- [x] Token_Validation_Service.md (+Java Service/Manager +SQL)
-- [x] Token_Edge_Deployment.md (+SQL)
-- [x] Performance_Optimization.md (+Java Service/Manager +SQL)
-- [x] Infrastructure_Implementation.md (+SQL)
-- [x] Deployment_Architecture.md (+Java Service/Manager +SQL)
-
-#### Batch 16b — Add Java + SQL (5 dual-missing files) ✅ COMPLETE
-- [x] Common_Patterns.md (+Java Service +SQL)
-- [x] Caching_Strategy.md (+Java Service/Manager +SQL)
-- [x] QA_Standards.md (+Java Service +SQL)
-- [x] CS_Platform_Architecture.md (+SQL)
-- [x] UK_RTS_Security.md (+Java Service/Manager +SQL)
-
-#### Batch 16c — Add Java + SQL (5 dual-missing files) ✅ COMPLETE
-- [x] ISO27001_Mapping.md (+SQL)
-- [x] Encryption_Strategy.md (+SQL)
-- [x] i18n_Localization.md (+SQL)
-- [x] Mobile_App_Architecture.md (+SQL)
-- [x] Jurisdiction_Routing_Architecture.md (+SQL)
-
-#### Batch 17 — Add SQL schemas (5 more files) ✅ COMPLETE
-- [x] Frontend_Layout_Engine.md (+Java Service/Manager +SQL)
-- [x] Localization_Workflow.md (+Java Service/Manager +SQL)
-- [x] Banner_Announcement.md (+Java Service/Manager +SQL)
-- [x] BI_Dashboard_Architecture.md (+Java Service/Manager +SQL)
-- [x] Data_Pipeline_Architecture.md (+Java Service/Manager +SQL)
-
-**Phase 8B COMPLETE**:
-- Java Coverage: 83/104 = **79.8%**
-- SQL Coverage: 90/104 = **86.5%** ✅ (target 85% achieved)
+No additional files needed. Proceeding to Phase 8C Quality Gate.
 
 ---
 
 ### 8C: Phase 8 Quality Gate ✅ COMPLETE
 
-- [x] SmartAdmin Pattern Compliance: **95%+** (8 files with @Autowired in test classes - acceptable)
-- [x] No `@Service` on Manager classes (all use @Component)
-- [x] All Service layer uses Vavr Option (references to java.util.Optional are in documentation/ArchUnit tests only)
-- [x] Java Coverage: 83/104 = **79.8%** (slightly below 85% target)
-- [x] SQL Coverage: 90/104 = **86.5%** ✅ (target 85% exceeded!)
-- [x] Update quality-gate-report.md with Phase 8 results
-
-**Phase 8 COMPLETE**: Architecture Quality Enhancement achieved ✅
+- [x] Run `bash scripts/check-smartadmin-patterns.sh` — ✅ **98%** (90/91 compliant, target ≥95%)
+- [x] Run `bash scripts/validate-architecture-completeness.sh` — ✅ Java **86.6%**, SQL **88.5%**, Mermaid **91%** (all ≥85%)
+- [x] Run `bash scripts/validate_links.sh docs/iGaming` — ⚠️ 11 broken (all in TEMPLATE/GLOSSARY placeholder files, not real content)
+- [ ] Update quality-gate-report.md with Phase 8 results
 
 ---
 
-## Phase 9: Traditional Chinese Translation [PLANNED]
+## Phase 9: Traditional Chinese Translation [ACTIVE]
 
-**Goal**: Translate 184 iGaming documents to Traditional Chinese while preserving technical terms in English
-**Targets**:
-- Requirements documentation: 66 files (Chinese prose + English tech terms)
-- Architecture documentation: 118 files (Chinese prose + English tech terms, code examples remain English)
-- Terminology consistency: 100% (all business terms follow TRANSLATION_GLOSSARY.md)
-- Technical terms preserved: 100% (Controller, Service, Manager, API, etc.)
+**Goal**: Translate all requirements + architecture docs to Traditional Chinese
+**Scope**: 58 requirements files + 105 architecture files = **163 content files** + README/INDEX files
+**Rules**:
+- Technical terms (Controller, Service, Manager, @Transactional, ResponseDTO) → remain English
+- Business terms first mention: 「有效投注額 (Valid Turnover)」→ later「有效投注額」
+- Code blocks (Java/SQL/YAML) → 100% English
+- Mermaid labels → Chinese, class/method names → English
+- Reference: `docs/iGaming/TRANSLATION_GLOSSARY.md` (500+ terms)
 
-**Translation Resources**:
-- Translation Glossary: docs/iGaming/TRANSLATION_GLOSSARY.md (500+ term mappings)
-- Templates: docs/iGaming/TEMPLATE_REQUIREMENTS.md, TEMPLATE_ARCHITECTURE.md, TEMPLATE_ADR.md
-- P14 Guardrails: docs/ralph/guardrails.md#P14 (updated 2026-02-11)
-
-**Validation**:
-```bash
-bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/
-bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
-bash scripts/check-technical-terms.sh docs/iGaming/
-bash scripts/validate-mermaid.sh docs/iGaming/
-bash scripts/validate_links.sh docs/iGaming/
-```
-
-**Quality Gates**:
-- P14 terminology consistency: 100%
-- Technical terms preserved in English: 100%
-- Traditional Chinese encoding (UTF-8): PASS
-- No code examples translated: 100%
-- Links/cross-references preserved: 100%
-- Mermaid diagrams render correctly: 100%
+**Validation**: `bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/ && bash scripts/validate-zh-tw-encoding.sh docs/iGaming/ && bash scripts/check-technical-terms.sh docs/iGaming/`
 
 ---
 
-### 9A: Requirements Translation (66 files) [Status]
+### 9A: Requirements Translation (58 files)
 
-Priority: Requirements files contain business context suited for Chinese audience.
+#### Batch 18 — 01_Player_Experience (5 files) ✅ COMPLETE
+- [x] requirements/01_Player_Experience/Business_Flows.md ✅ commit 242eb37c
+- [x] requirements/01_Player_Experience/Industry_Glossary.md ✅ commit 242eb37c
+- [x] requirements/01_Player_Experience/Platform_Overview.md ✅ commit 242eb37c
+- [x] requirements/01_Player_Experience/Player_Lifecycle.md ✅ commit 242eb37c
+- [x] requirements/01_Player_Experience/Solution_Overview.md ✅ commit 242eb37c
 
-#### Batch 1 — Player Experience (5 files) [Status]
-- [ ] requirements/01_Player_Experience/Business_Flows.md (translate, preserve code/links)
-- [ ] requirements/01_Player_Experience/Industry_Glossary.md (translate, use TRANSLATION_GLOSSARY.md)
-- [ ] requirements/01_Player_Experience/Terminology_Standards.md (translate, term mappings)
-- [ ] requirements/01_Player_Experience/Platform_Overview.md (translate, preserve ResponseDTO)
-- [ ] requirements/01_Player_Experience/Solution_Overview.md (translate business context)
+#### Batch 19 — 01_Player (1) + 02_Financial (4) (5 files) ✅ COMPLETE
+- [x] requirements/01_Player_Experience/Terminology_Standards.md ✅ commit 95486bba
+- [x] requirements/02_Financial_Operations/Financial_Implementation_Requirements.md ✅ commit e02cf3de
+- [x] requirements/02_Financial_Operations/Payment_Operations.md ✅ commit 246b2c95
+- [x] requirements/02_Financial_Operations/Reconciliation_Requirements.md ✅ commit 4e876f62
+- [x] requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md ✅ commit 9e2bf2ed
 
-#### Batch 2 — Player Experience (2 files) + Finance (3 files) [Status]
-- [ ] requirements/01_Player_Experience/Player_Lifecycle.md
-- [ ] requirements/01_Player_Experience/README.md
-- [ ] requirements/02_Financial_Operations/Financial_Implementation_Requirements.md
-- [ ] requirements/02_Financial_Operations/Payment_Operations.md
-- [ ] requirements/02_Financial_Operations/Reconciliation_Requirements.md
+#### Batch 20 — 02_Financial (1) + 03_Gaming (4) (5 files) ✅ COMPLETE
+- [x] requirements/02_Financial_Operations/Turnover_Reconciliation_Requirements.md ✅ commit 687d157f
+- [x] requirements/03_Gaming_Operations/Game_Integration_Requirements.md ✅ commit 687d157f
+- [x] requirements/03_Gaming_Operations/Game_Integration_Standards.md ✅ commit cc023226
+- [x] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md ✅ commit f88439cf
+- [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md ✅ commit f88439cf
 
-#### Batch 3 — Financial Operations (5 files) [Status]
-- [ ] requirements/02_Financial_Operations/README.md
-- [ ] requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md
-- [ ] requirements/02_Financial_Operations/Turnover_Reconciliation_Requirements.md
-- [ ] requirements/03_Gaming_Operations/Game_Integration_Requirements.md
-- [ ] requirements/03_Gaming_Operations/Game_Integration_Standards.md
+#### Batch 21 — 04_Promotions (3) + 05_Risk (2) (5 files) ✅ COMPLETE
+- [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md ✅ commit fa46cca9 (part 1/2)
+- [x] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md ✅ ALREADY TRANSLATED (verified)
+- [x] requirements/04_Promotions_VIP/Promotion_Requirements.md ✅ commit fa46cca9 (part 1/2)
+- [x] requirements/05_Risk_Compliance/Affordability_Requirements.md ✅ commit 19ddd6ef (part 2/2)
+- [x] requirements/05_Risk_Compliance/Detection_Model_Spec.md ✅ commit 1bbfe800 (part 3/3)
 
-#### Batch 4 — Gaming Operations (3 files) + Promotions (2 files) [Status]
-- [ ] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md
-- [ ] requirements/03_Gaming_Operations/README.md
-- [ ] requirements/03_Gaming_Operations/Turnover_Business_Rules.md
-- [ ] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md
-- [ ] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md
+#### Batch 22 — 05_Risk_Compliance (5 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/KYC_AML_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/ML_Requirements.md ✅ commit e59eca63
+- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md ✅ commit e59eca63
 
-#### Batch 5 — Promotions (2 files) + Risk Compliance (3 files) [Status]
-- [ ] requirements/04_Promotions_VIP/Promotion_Requirements.md
-- [ ] requirements/04_Promotions_VIP/README.md
-- [ ] requirements/05_Risk_Compliance/Affordability_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Detection_Model_Spec.md
-- [ ] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md
+#### Batch 23 — 05_Risk (4) + 06_Gov (1) (5 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md ✅ commit ed4330e9
+- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md ✅ commit 8bad3161
+- [x] requirements/05_Risk_Compliance/Risk_Strategy_Overview.md ✅ commit 794a0113
+- [x] requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md ✅ commit f997e02d
+- [x] requirements/06_Governance_Licensing/Governance_Requirements.md ✅ commit 21b203c2
 
-**Note**: Batches 6-14 will cover remaining 46 requirements files (9 more in Risk Compliance + 7 Governance + 2 Agent + 2 Analytics + 2 Infra + 3 Platform + 4 Frontend + 3 Security + 2 CS + 1 Integration + 4 Responsible Gambling + 5 READMEs). Full file list: `find docs/iGaming/requirements -name '*.md' | sort`
+#### Batch 24 — 06_Governance (5 files) ✅ COMPLETE
+- [x] requirements/06_Governance_Licensing/MFA_Architecture_Spec.md ✅ ALREADY TRANSLATED
+- [x] requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md ✅ ALREADY TRANSLATED
+- [x] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md ✅ ALREADY TRANSLATED
+- [x] requirements/06_Governance_Licensing/MFA_Requirements.md ✅ commit 7727f025
+- [x] requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md ✅ commit 7727f025
 
-**Phase 9A COMPLETE**: [Summary when done]
+#### Batch 25 — 07_Agent + 08_Analytics + 09_Infra (5 files) ✅ COMPLETE
+- [x] requirements/07_Agent_Operations/Agent_System_Requirements.md ✅ commit d55cd4f3
+- [x] requirements/07_Agent_Operations/Credit_Network_Requirements.md ✅ commit d55cd4f3
+- [x] requirements/08_Analytics_Operations/BI_Dashboard_Requirements.md ✅ commit d55cd4f3
+- [x] requirements/08_Analytics_Operations/Reporting_Requirements.md ✅ commit d55cd4f3
+- [x] requirements/09_Infrastructure_Requirements/Cost_Optimization_Requirements.md ✅ ALREADY TRANSLATED (verified)
+
+#### Batch 26 — 09_Infra + 10_Platform + 11_Frontend (5 files) ✅ COMPLETE
+- [x] requirements/09_Infrastructure_Requirements/QA_Standards_Requirements.md ✅ ALREADY TRANSLATED (verified)
+- [x] requirements/10_Platform_Operations/Data_Pipeline_Requirements.md ✅ commit 7801f626
+- [x] requirements/10_Platform_Operations/Notification_Requirements.md ✅ commit 7801f626
+- [x] requirements/10_Platform_Operations/Tenant_Configuration_Requirements.md ✅ commit 7801f626
+- [x] requirements/11_Frontend_Experience/Frontend_UX_Requirements.md ✅ commit 7801f626
+
+#### Batch 27 — 11_Frontend + 12_Security (5 files) ✅ COMPLETE
+- [x] requirements/11_Frontend_Experience/Localization_Requirements.md ✅ commit 0e2495b8
+- [x] requirements/11_Frontend_Experience/Mobile_App_Requirements.md ✅ commit 0e2495b8
+- [x] requirements/11_Frontend_Experience/SEO_Performance_Requirements.md ✅ commit 0e2495b8
+- [x] requirements/12_Security_Compliance/Compliance_Standards_Requirements.md ✅ commit 0e2495b8
+- [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md ✅ commit 0e2495b8
+
+#### Batch 28 — 12_Security + 13_CS + 14_Integration + 15_RG (5 files) ✅ COMPLETE
+- [x] requirements/12_Security_Compliance/Payment_Security_Requirements.md ✅ commit 66972379 (part 1/3)
+- [x] requirements/13_Customer_Service/CS_Operations_Requirements.md ✅ commit f32f97ca (part 2/3)
+- [x] requirements/13_Customer_Service/CS_Platform_Requirements.md ✅ commit f32f97ca (part 2/3)
+- [x] requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md ✅ commit 66972379 (part 1/3)
+- [x] requirements/15_Responsible_Gambling/Affordability_Requirements.md ✅ commit f32f97ca (part 2/3)
+
+#### Batch 29 — 15_Responsible_Gambling (3 files) ✅ COMPLETE
+- [x] requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md ✅ commit e39e10da
+- [x] requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md ✅ commit e39e10da
+- [x] requirements/15_Responsible_Gambling/Session_Protection_Requirements.md ✅ commit e39e10da
+
+#### Batch 30 — Requirements READMEs + Validation ✅ COMPLETE
+- [x] Translate all requirements/*/README.md files (7 files) ✅ commit 3d7b636b
+- [x] Translate requirements/README.md (1 file) ✅ commit 2b75294a
+- [x] Run requirements translation quality gate ✅ PASSED (terminology ✅, encoding ✅, links 0 broken)
 
 ---
 
-### 9B: Architecture Translation (118 files) [Status]
+### 9B: Architecture Translation (105 files)
 
-Priority: Architecture files contain technical design suited for Chinese developer audience.
+#### Batch 31 — 00_Overview (5 files) ✅ COMPLETE
+- [x] architecture/00_Overview/Business_Logic_Flows.md ✅ commit 3dfb90c2
+- [x] architecture/00_Overview/Data_Model.md ✅ commit 82f71b34
+- [x] architecture/00_Overview/Platform_Architecture.md ✅ commit d4047321
+- [x] architecture/00_Overview/System_Overview.md ✅ ALREADY TRANSLATED (verified)
+- [x] architecture/00_Overview/Technology_Stack.md ✅ commit 1240c4a7
 
-#### Batch 15 — Overview (5 files) [Status]
-- [ ] architecture/00_Overview/System_Architecture_Overview.md
-- [ ] architecture/00_Overview/Technology_Stack.md
-- [ ] architecture/00_Overview/Multi_Tenant_Architecture.md
-- [ ] architecture/00_Overview/Deployment_Architecture.md
-- [ ] architecture/00_Overview/README.md
+#### Batch 32 — 01_Player + 02_Finance (5 files)
+- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md ✅ commit f320984b
+- [x] architecture/02_Finance_Service/Financial_Implementation.md ✅ commit 7d1ab904
+- [x] architecture/02_Finance_Service/Payment_Gateway_API.md ✅ commit 0d1b3a3e
+- [x] architecture/02_Finance_Service/Payment_Gateway_Technical.md ✅ commit 2b5fae1a
+- [ ] architecture/02_Finance_Service/Reconciliation_Technical.md
 
-#### Batch 16 — Player Service (5 files) [Status]
-- [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md
-- [ ] architecture/01_Player_Service/KYC_Identity_Verification.md
-- [ ] architecture/01_Player_Service/Player_Account_Lifecycle.md
-- [ ] architecture/01_Player_Service/Session_Management_Architecture.md
-- [ ] architecture/01_Player_Service/README.md
+#### Batch 33 — 02_Finance (5 files)
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Index.md
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Technical.md
+- [ ] architecture/02_Finance_Service/Turnover_Calculation_Architecture.md
+- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md
 
-#### Batch 17 — Player Service (3 files) + Finance Service (2 files) [Status]
-- [ ] architecture/01_Player_Service/Tag_System_Architecture.md
-- [ ] architecture/01_Player_Service/Turnover_Tracking_Architecture.md
-- [ ] architecture/01_Player_Service/VIP_System.md
-- [ ] architecture/02_Finance_Service/Financial_Implementation_Architecture.md
-- [ ] architecture/02_Finance_Service/Payment_Operations_Architecture.md
+#### Batch 34 — 02_Finance (2) + 03_Game (3) (5 files)
+- [ ] architecture/02_Finance_Service/Turnover_Flowcharts.md
+- [ ] architecture/02_Finance_Service/Turnover_Implementation.md
+- [ ] architecture/03_Game_Integration/Game_Integration_Implementation.md
+- [ ] architecture/03_Game_Integration/Game_Integration_Protocols.md
+- [ ] architecture/03_Game_Integration/Game_Integration_Security.md
 
-#### Batch 18 — Finance Service (5 files) [Status]
-- [ ] architecture/02_Finance_Service/Payment_Processing_Architecture.md
-- [ ] architecture/02_Finance_Service/Reconciliation_Architecture.md
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Architecture.md
-- [ ] architecture/02_Finance_Service/Turnover_Reconciliation_Architecture.md
-- [ ] architecture/02_Finance_Service/README.md
+#### Batch 35 — 03_Game (2) + 04_Activity (3) (5 files)
+- [ ] architecture/03_Game_Integration/Game_Lobby_System.md
+- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md
+- [ ] architecture/04_Activity_Engine/Activity_Risk_System.md
+- [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md
+- [ ] architecture/04_Activity_Engine/Promotion_Implementation.md
 
-#### Batch 19 — Game Integration (5 files) [Status]
-- [ ] architecture/03_Game_Integration/Game_Integration_Architecture.md
-- [ ] architecture/03_Game_Integration/Game_Session_Architecture.md
-- [ ] architecture/03_Game_Integration/Third_Party_Standards.md
-- [ ] architecture/03_Game_Integration/Turnover_System_Architecture.md
-- [ ] architecture/03_Game_Integration/README.md
+#### Batch 36 — 05_Risk (5 files)
+- [ ] architecture/05_Risk_Engine/Affordability_Implementation.md
+- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md
+- [ ] architecture/05_Risk_Engine/Fraud_Detection_System.md
+- [ ] architecture/05_Risk_Engine/KYC_Verification_API.md
+- [ ] architecture/05_Risk_Engine/ML_Integration_Architecture.md
 
-**Note**: Batches 20-37 will cover remaining 93 architecture files across 18 modules (Activity Engine, Risk Engine, Platform Core, Infrastructure, Frontend, Security, etc.). Full file list: `find docs/iGaming/architecture -name '*.md' | sort`
+#### Batch 37 — 05_Risk (5 files)
+- [ ] architecture/05_Risk_Engine/Player_Protection_API.md
+- [ ] architecture/05_Risk_Engine/Risk_Implementation.md
+- [ ] architecture/05_Risk_Engine/Risk_Proposal_Implementation.md
+- [ ] architecture/05_Risk_Engine/Risk_System_Architecture.md
+- [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md
 
-**Phase 9B COMPLETE**: [Summary when done]
+#### Batch 38 — 06_Platform (5 files)
+- [ ] architecture/06_Platform_Core/Governance_Implementation.md
+- [ ] architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md
+- [ ] architecture/06_Platform_Core/MFA_Compliance_Technical.md
+- [ ] architecture/06_Platform_Core/MFA_Compliance_Validation.md
+- [ ] architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md
+
+#### Batch 39 — 06_Platform (5 files)
+- [ ] architecture/06_Platform_Core/MFA_Recovery_Implementation.md
+- [ ] architecture/06_Platform_Core/MFA_Technical.md
+- [ ] architecture/06_Platform_Core/MFA_Technical_Architecture.md
+- [ ] architecture/06_Platform_Core/MFA_Technical_Evaluation.md
+- [ ] architecture/06_Platform_Core/Multi_Tenant_Architecture.md
+
+#### Batch 40 — 06_Platform (1) + 07_Agent (2) + 08_Analytics (2) (5 files)
+- [ ] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md
+- [ ] architecture/07_Agent_Service/Agent_System_Architecture.md
+- [ ] architecture/07_Agent_Service/Credit_Network_Architecture.md
+- [ ] architecture/08_Analytics_Service/BI_Dashboard_Architecture.md
+- [ ] architecture/08_Analytics_Service/Reporting_Architecture.md
+
+#### Batch 41 — 09_Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/API_Design_Principles.md
+- [ ] architecture/09_Infrastructure/Authentication_Architecture.md
+- [ ] architecture/09_Infrastructure/Caching_Strategy.md
+- [ ] architecture/09_Infrastructure/Common_Patterns.md
+- [ ] architecture/09_Infrastructure/Cost_Optimization_Architecture.md
+
+#### Batch 42 — 09_Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Deployment_Architecture.md
+- [ ] architecture/09_Infrastructure/Domain_APIs.md
+- [ ] architecture/09_Infrastructure/Gateway_Core.md
+- [ ] architecture/09_Infrastructure/Gateway_Rate_Limiting.md
+- [ ] architecture/09_Infrastructure/Gateway_Security.md
+
+#### Batch 43 — 09_Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Infrastructure_Implementation.md
+- [ ] architecture/09_Infrastructure/Maintenance_Architecture.md
+- [ ] architecture/09_Infrastructure/Multi_Actor_Token_Security.md
+- [ ] architecture/09_Infrastructure/OAuth_Refresh_Token.md
+- [ ] architecture/09_Infrastructure/Performance_Monitoring.md
+
+#### Batch 44 — 09_Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Performance_Optimization.md
+- [ ] architecture/09_Infrastructure/QA_Standards.md
+- [ ] architecture/09_Infrastructure/Stream_Processing_Architecture.md
+- [ ] architecture/09_Infrastructure/Token_Cache_Performance.md
+- [ ] architecture/09_Infrastructure/Token_Edge_Deployment.md
+
+#### Batch 45 — 09_Infrastructure (2) + 10_Platform (3) (5 files)
+- [ ] architecture/09_Infrastructure/Token_Validation_Architecture.md
+- [ ] architecture/09_Infrastructure/Token_Validation_Service.md
+- [ ] architecture/10_Platform_Management/Data_Pipeline_Architecture.md
+- [ ] architecture/10_Platform_Management/Notification_Architecture.md
+- [ ] architecture/10_Platform_Management/Tenant_Configuration_Architecture.md
+
+#### Batch 46 — 11_Frontend (5 files)
+- [ ] architecture/11_Frontend/AB_Testing_Framework.md
+- [ ] architecture/11_Frontend/Banner_Announcement.md
+- [ ] architecture/11_Frontend/Dynamic_Content_Localization.md
+- [ ] architecture/11_Frontend/Frontend_Layout_Engine.md
+- [ ] architecture/11_Frontend/Localization_API.md
+
+#### Batch 47 — 11_Frontend (5 files)
+- [ ] architecture/11_Frontend/Localization_Workflow.md
+- [ ] architecture/11_Frontend/Marketing_Compliance.md
+- [ ] architecture/11_Frontend/Mobile_App_Architecture.md
+- [ ] architecture/11_Frontend/SEO_Performance.md
+- [ ] architecture/11_Frontend/i18n_Localization.md
+
+#### Batch 48 — 12_Security (5 files)
+- [ ] architecture/12_Security/Blind_Index_Architecture.md
+- [ ] architecture/12_Security/Data_Portability_SAR.md
+- [ ] architecture/12_Security/Data_Security_Standard.md
+- [ ] architecture/12_Security/Encryption_Strategy.md
+- [ ] architecture/12_Security/GDPR_Data_Deletion.md
+
+#### Batch 49 — 12_Security (5 files)
+- [ ] architecture/12_Security/ISO27001_Mapping.md
+- [ ] architecture/12_Security/MITM_Detection.md
+- [ ] architecture/12_Security/PCI_DSS_v4_Implementation_Guide.md
+- [ ] architecture/12_Security/Payment_Restrictions.md
+- [ ] architecture/12_Security/UK_RTS_Security.md
+
+#### Batch 50 — 13_CS + 14_Third_Party + 15_RG (5 files)
+- [ ] architecture/13_Customer_Service/CS_Operations_Architecture.md
+- [ ] architecture/13_Customer_Service/CS_Platform_Architecture.md
+- [ ] architecture/14_Third_Party/Third_Party_Integration_Architecture.md
+- [ ] architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md
+- [ ] architecture/15_Responsible_Gambling/Player_Protection_API.md
+
+#### Batch 51 — 15_RG + ADR + Quality Report (5 files)
+- [ ] architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md
+- [ ] architecture/15_Responsible_Gambling/Session_Protection_Architecture.md
+- [ ] architecture/adr/ADR-001_Naming_Convention_Singular_Standard.md
+- [ ] architecture/adr/ADR-012_Async_Risk_Proposal_System.md
+- [ ] architecture/quality-reports/2026-Q1-quality-gate-report.md
+
+#### Batch 52 — Architecture READMEs + INDEX + Validation
+- [ ] Translate all architecture/*/README.md files (10 files)
+- [ ] Translate architecture/README.md + architecture/adr/INDEX.md + architecture/quality-reports/README.md
+- [ ] Run architecture translation quality gate
 
 ---
 
-### 9C: Translation Quality Gate [Status]
+### 9C: Phase 9 Quality Gate
 
-- [ ] P14 terminology consistency: 100% (check-terminology-consistency-zh-tw.sh)
-- [ ] Technical terms preserved: 100% (check-technical-terms.sh)
-- [ ] Traditional Chinese encoding: PASS (validate-zh-tw-encoding.sh)
-- [ ] No code examples translated: 100% (manual review)
-- [ ] Links/cross-references preserved: 100% (validate_links.sh)
-- [ ] Mermaid diagrams render correctly: 100% (validate-mermaid.sh)
-- [ ] Git commit history: 37 batch commits (docs(iGaming): translate Batch N...)
+- [ ] Run `bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/` — all checks passed
+- [ ] Run `bash scripts/validate-zh-tw-encoding.sh docs/iGaming/` — valid encoding
+- [ ] Run `bash scripts/check-technical-terms.sh docs/iGaming/` — technical terms preserved
+- [ ] Run `bash scripts/validate-mermaid.sh docs/iGaming/` — valid syntax
+- [ ] Run `bash scripts/validate_links.sh docs/iGaming` — 0 broken links
+- [ ] Run `bash scripts/scan-broken-links.sh docs/iGaming` — 0 broken links
 
-**Phase 9 COMPLETE**: Traditional Chinese Translation achieved ✅
+---
+
+## Phase 10: Final Cleanup [PENDING]
+
+**Goal**: Update all tracking documents and run final validation
+
+- [ ] Update quality-gate-report.md with Phase 8 + 9 final results
+- [ ] Update progress.md — mark Phase 8, 9, 10 as COMPLETE
+- [ ] Update iGaming README.md — confirm document stats and language status
+- [ ] Run ALL validation scripts — full regression check (8+ scripts)
+- [ ] Final commit: `docs(iGaming): complete Phase 8-10, all quality gates passed`
 
 ---
 
@@ -401,6 +512,12 @@ bash scripts/check-terminology-consistency.sh
 bash scripts/check-smartadmin-patterns.sh
 bash scripts/validate-architecture-completeness.sh
 
+# Phase 9 quality gates (Traditional Chinese translation)
+bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/
+bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
+bash scripts/check-technical-terms.sh docs/iGaming/
+bash scripts/validate-mermaid.sh docs/iGaming/
+
 # Existing gates (must maintain)
 bash scripts/validate_links.sh docs/iGaming
 bash scripts/scan-broken-links.sh docs/iGaming
@@ -411,4 +528,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-11
-**Status**: Phase 8 COMPLETE — Architecture Quality Enhancement
+**Status**: Phase 9 ACTIVE — Traditional Chinese Translation

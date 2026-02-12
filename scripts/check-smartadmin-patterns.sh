@@ -42,7 +42,8 @@ with open('$file', 'r') as f:
     content = f.read()
 java_blocks = re.findall(r'\`\`\`java(.*?)\`\`\`', content, re.DOTALL)
 for block in java_blocks:
-    if '@Autowired' in block:
+    # Match actual @Autowired annotations (line starts with optional whitespace + @Autowired)
+    if re.search(r'^\s*@Autowired', block, re.MULTILINE):
         sys.exit(1)
 sys.exit(0)
 " 2>/dev/null; then
@@ -74,6 +75,7 @@ sys.exit(0)
     fi
 
     # Check 3: @Transactional outside Manager layer context
+    # Improved: check nearest class declaration before each @Transactional
     if grep -qE '@Transactional' "$file" 2>/dev/null; then
         if python3 -c "
 import re, sys
@@ -81,9 +83,19 @@ with open('$file', 'r') as f:
     content = f.read()
 java_blocks = re.findall(r'\`\`\`java(.*?)\`\`\`', content, re.DOTALL)
 for block in java_blocks:
-    if '@Transactional' in block:
-        # Check if it's in a Service class (violation) vs Manager class (OK)
-        if re.search(r'class\s+\w+Service\b', block):
+    if '@Transactional' not in block:
+        continue
+    # Find all class declarations and @Transactional annotation positions
+    # Use ^\s*@Transactional to match only actual annotations, not comments
+    class_decls = [(m.start(), m.group(1)) for m in re.finditer(r'class\s+(\w+)', block)]
+    trans_pos = [m.start() for m in re.finditer(r'^\s*@Transactional', block, re.MULTILINE)]
+    for tpos in trans_pos:
+        # Find nearest class declaration before this @Transactional
+        nearest_class = None
+        for cpos, cname in class_decls:
+            if cpos < tpos:
+                nearest_class = cname
+        if nearest_class and nearest_class.endswith('Service') and not nearest_class.endswith('Manager'):
             sys.exit(1)
 sys.exit(0)
 " 2>/dev/null; then

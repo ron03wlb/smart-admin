@@ -1,179 +1,180 @@
-# Risk Requirements Summary
+# 風險需求總結（Risk Requirements Summary）
 
 > **Canonical Source**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
 > **Audience**: Executives, Risk Officers, Compliance Managers
-> **Related Architecture**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
+> **Related Doc**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---
 
-## 1. Overview
+## 1. 概述（Overview）
 
-This document summarizes the business requirements for the iGaming platform risk control system, covering the risk rule engine, fraud detection, and agent credit management. These requirements ensure effective risk mitigation, regulatory compliance, and financial protection across all platform operations.
-
----
-
-## Business Value
-
-This feature delivers value by:
-- Protecting platform revenue through real-time fraud detection with configurable risk rules that adapt to evolving threats
-- Reducing financial losses via device fingerprinting, behavioral analysis, and ML-driven anomaly detection (target: >90% precision, <5% false positive rate)
-- Enabling efficient operations by automating risk escalation procedures with defined response times (immediate to 24 hours based on severity)
-- Managing agent credit risk through real-time monitoring, threshold-based alerts, and automated freeze mechanisms at critical utilization levels
-- Meeting regulatory compliance requirements for AML monitoring, risk reporting, and audit trail documentation
+本文件總結 iGaming 平台風險控制系統的業務需求，涵蓋風險規則引擎、欺詐偵測和代理信用管理。這些需求確保在所有平台運營中有效降低風險、遵守監管規定並保護財務安全。
 
 ---
 
-## 2. Risk Rule Engine Requirements
+## 業務價值（Business Value）
 
-**Business Goal**: Establish a configurable, real-time risk rule engine that evaluates transactions and player behavior against dynamic risk rules, producing accurate risk scores for decision-making.
+本風險控制系統透過以下方式提供關鍵價值：
 
-### Detection Categories
+- **財務保護**：即時欺詐偵測和預防可將優惠濫用損失降低 40%，防止多帳號利用，並透過準確的風險評分和自動封鎖高風險交易來保護營運商收入
+- **監管合規**：自動化 AML 報告閾值監控和特定司法管轄區的合規規則執行確保監管遵從，降低罰款風險，並在 UKGC、MGA 和其他司法管轄區維護營運執照完整性
+- **營運效率**：可配置的規則引擎與動態規則載入消除 70% 風險案件的人工介入，透過基於 ML 的欺詐偵測將誤報率從 15% 降至 <5%，減少 30% 的人工審核工作量
+- **代理網路風險管理**：即時信用監控防止代理信用溢出場景，自動化佣金結算準確性，並保護平台免受多層代理階層中的連鎖信用暴露
+- **可擴展性**：配置驅動的風險規則能夠在無需更改程式碼的情況下快速部署新的偵測策略，支援平台擴展至具有特定司法管轄區合規要求的新市場
 
-| Category | Description | Examples |
+---
+
+## 2. 風險規則引擎需求（Risk Rule Engine Requirements）
+
+**業務目標**：建立可配置的即時風險規則引擎，根據動態風險規則評估交易和玩家行為，為決策提供準確的風險評分。
+
+### 偵測類別（Detection Categories）
+
+| 類別 | 描述 | 範例 |
 |----------|-------------|---------|
-| Transaction Risk | Abnormal financial patterns | Rapid deposits/withdrawals, unusual amounts, velocity violations |
-| Behavioral Risk | Suspicious player activity | Multiple account usage, irregular playing patterns, bot-like behavior |
-| Compliance Risk | Regulatory threshold triggers | AML reporting thresholds, jurisdiction-specific limits |
-| Operational Risk | System and process anomalies | Unusual admin operations, configuration changes |
+| 交易風險（Transaction Risk） | 異常財務模式 | 快速存款/提款、異常金額、速度違規 |
+| 行為風險（Behavioral Risk） | 可疑玩家活動 | 多帳號使用、不規則遊玩模式、機器人行為 |
+| 合規風險（Compliance Risk） | 監管閾值觸發 | AML 報告閾值、司法管轄區特定限制 |
+| 營運風險（Operational Risk） | 系統和流程異常 | 異常管理員操作、配置變更 |
 
-### Functional Requirements
+### 功能需求（Functional Requirements）
 
-| ID | Requirement | Priority | Acceptance Criteria |
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| RISK-ENGINE-01 | Rule engine execution | Critical | All configured rules execute correctly on matching events |
-| RISK-ENGINE-02 | Dynamic rule loading | Critical | New rules take effect without system restart |
-| RISK-ENGINE-03 | Rule priority management | High | Conflicting rules resolve according to priority hierarchy |
-| RISK-ENGINE-04 | Risk score accuracy | Critical | Risk scores are calculated correctly per defined formulas |
+| RISK-ENGINE-01 | 規則引擎執行 | Critical | 所有已配置規則在匹配事件時正確執行 |
+| RISK-ENGINE-02 | 動態規則載入 | Critical | 新規則在無需系統重啟的情況下生效 |
+| RISK-ENGINE-03 | 規則優先級管理 | High | 衝突規則根據優先級階層解決 |
+| RISK-ENGINE-04 | 風險評分準確性 | Critical | 風險評分按定義的公式正確計算 |
 
-### Escalation Procedures
+### 升級程序（Escalation Procedures）
 
-| Risk Level | Score Range | Action | Response Time |
+| 風險等級 | 評分範圍 | 操作 | 回應時間 |
 |-----------|------------|--------|---------------|
-| Low | 0-30 | Log and monitor | 24 hours |
-| Medium | 31-60 | Flag for review | 4 hours |
-| High | 61-85 | Escalate to risk team | 1 hour |
-| Critical | 86-100 | Auto-block + immediate escalation | Immediate |
+| Low | 0-30 | 記錄並監控 | 24 小時 |
+| Medium | 31-60 | 標記以供審核 | 4 小時 |
+| High | 61-85 | 升級至風險團隊 | 1 小時 |
+| Critical | 86-100 | 自動封鎖 + 立即升級 | 立即 |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- Rule engine executes all configured rules correctly
-- Dynamic rule loading functions without service interruption
-- Rule priorities resolve correctly when multiple rules match
-- Risk scores are calculated accurately
+- 規則引擎正確執行所有已配置規則
+- 動態規則載入在無服務中斷的情況下運作
+- 當多個規則匹配時，規則優先級正確解決
+- 風險評分準確計算
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| Rule Conflicts | Multiple rules match the same event with conflicting actions | Define clear priority hierarchy with conflict resolution logic |
-| Performance Degradation | Too many rules cause slow evaluation | Optimize rule execution with indexing and early-exit strategies |
-| Hot Update Failure | Rule changes do not take effect immediately | Implement versioned rule deployment with validation |
+| 規則衝突 | 多個規則匹配同一事件但有衝突操作 | 定義清晰的優先級階層與衝突解決邏輯 |
+| 效能下降 | 過多規則導致評估緩慢 | 透過索引和早期退出策略優化規則執行 |
+| 熱更新失敗 | 規則變更未立即生效 | 實施帶驗證的版本化規則部署 |
 
 ---
 
-## 3. Fraud Detection Requirements
+## 3. 欺詐偵測需求（Fraud Detection Requirements）
 
-**Business Goal**: Detect and prevent fraudulent activities through device fingerprinting, behavioral analysis, and machine learning models while maintaining an acceptable false positive rate.
+**業務目標**：透過設備指紋識別、行為分析和機器學習模型偵測和防止欺詐活動，同時維持可接受的誤報率。
 
-### Fraud Detection Categories
+### 欺詐偵測類別（Fraud Detection Categories）
 
-| Category | Detection Method | Key Signals |
+| 類別 | 偵測方法 | 關鍵信號 |
 |----------|-----------------|-------------|
-| Multi-Accounting | Device fingerprint matching | Same device, similar registration patterns |
-| Bonus Abuse | Pattern analysis | Systematic bonus claiming across accounts |
-| Collusion | Network analysis | Coordinated play between linked accounts |
-| Bot Detection | Behavioral analysis | Inhuman speed, repetitive patterns |
-| Money Laundering | Transaction monitoring | Structuring, rapid fund movement |
+| 多帳號（Multi-Accounting） | 設備指紋匹配 | 相同設備、類似註冊模式 |
+| 優惠濫用（Bonus Abuse） | 模式分析 | 跨帳號的系統性優惠領取 |
+| 串通（Collusion） | 網路分析 | 關聯帳號間的協同遊玩 |
+| 機器人偵測（Bot Detection） | 行為分析 | 非人類速度、重複模式 |
+| 洗錢（Money Laundering） | 交易監控 | 結構化、快速資金移動 |
 
-### Functional Requirements
+### 功能需求（Functional Requirements）
 
-| ID | Requirement | Priority | Acceptance Criteria |
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| RISK-FRAUD-01 | Device fingerprint generation | Critical | Unique fingerprints generated for all player devices |
-| RISK-FRAUD-02 | Anomaly behavior detection | Critical | Suspicious behaviors are flagged with configurable sensitivity |
-| RISK-FRAUD-03 | ML model accuracy | High | Model precision meets defined threshold (target: >90%) |
-| RISK-FRAUD-04 | False positive control | High | False positive rate stays within acceptable range (target: <5%) |
+| RISK-FRAUD-01 | 設備指紋生成 | Critical | 為所有玩家設備生成唯一指紋 |
+| RISK-FRAUD-02 | 異常行為偵測 | Critical | 可疑行為以可配置的靈敏度標記 |
+| RISK-FRAUD-03 | ML 模型準確性 | High | 模型精度達到定義閾值（目標：>90%） |
+| RISK-FRAUD-04 | 誤報控制 | High | 誤報率保持在可接受範圍內（目標：<5%） |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- Device fingerprints are correctly generated and matched
-- Anomaly detection identifies suspicious behavior effectively
-- ML model accuracy meets defined thresholds
-- False positive rate is controlled within acceptable limits
+- 設備指紋正確生成並匹配
+- 異常偵測有效識別可疑行為
+- ML 模型準確性達到定義閾值
+- 誤報率控制在可接受限制內
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| High False Positives | Legitimate players flagged as fraudulent | Tune detection thresholds, implement appeal workflows |
-| Model Drift | Historical models degrade on new data patterns | Schedule periodic model retraining with fresh data |
-| Insufficient Features | Missing key risk features reduce detection accuracy | Continuously expand feature engineering with new signals |
+| 高誤報 | 合法玩家被標記為欺詐 | 調整偵測閾值，實施申訴工作流程 |
+| 模型漂移 | 歷史模型在新數據模式上降級 | 定期使用新數據重新訓練模型 |
+| 特徵不足 | 缺少關鍵風險特徵降低偵測準確性 | 持續使用新信號擴展特徵工程 |
 
 ---
 
-## 4. Agent Credit Management Requirements
+## 4. 代理信用管理需求（Agent Credit Management Requirements）
 
-**Business Goal**: Manage agent credit lines with accurate allocation, real-time risk monitoring, and proper settlement across multi-level agent hierarchies.
+**業務目標**：透過準確的分配、即時風險監控和跨多層代理階層的適當結算來管理代理信用額度。
 
-### Credit Management Structure
+### 信用管理結構（Credit Management Structure）
 
-| Component | Description |
+| 組件 | 描述 |
 |-----------|-------------|
-| Credit Allocation | Maximum credit line assigned to each agent based on risk profile |
-| Sub-Agent Limits | Cascading credit limits through agent hierarchy |
-| Settlement Cycle | Periodic settlement of agent positions and commissions |
-| Risk Monitoring | Real-time tracking of credit utilization and exposure |
+| 信用分配（Credit Allocation） | 根據風險檔案為每個代理分配的最大信用額度 |
+| 子代理限制（Sub-Agent Limits） | 透過代理階層的級聯信用限制 |
+| 結算週期（Settlement Cycle） | 代理頭寸和佣金的定期結算 |
+| 風險監控（Risk Monitoring） | 信用使用率和暴露的即時追蹤 |
 
-### Functional Requirements
+### 功能需求（Functional Requirements）
 
-| ID | Requirement | Priority | Acceptance Criteria |
+| ID | 需求 | 優先級 | 驗收標準 |
 |----|-------------|----------|---------------------|
-| RISK-CREDIT-01 | Credit line calculation | Critical | Credit limits are accurately calculated per agent risk profile |
-| RISK-CREDIT-02 | Risk alert triggers | Critical | Alerts fire when credit utilization exceeds defined thresholds |
-| RISK-CREDIT-03 | Commission settlement accuracy | High | Agent commission settlements reconcile correctly |
-| RISK-CREDIT-04 | Credit freeze mechanism | High | Agent credit can be frozen immediately upon risk trigger |
+| RISK-CREDIT-01 | 信用額度計算 | Critical | 根據代理風險檔案準確計算信用限制 |
+| RISK-CREDIT-02 | 風險警報觸發 | Critical | 當信用使用率超過定義閾值時觸發警報 |
+| RISK-CREDIT-03 | 佣金結算準確性 | High | 代理佣金結算正確對帳 |
+| RISK-CREDIT-04 | 信用凍結機制 | High | 風險觸發時可立即凍結代理信用 |
 
-### Escalation Procedures
+### 升級程序（Escalation Procedures）
 
-| Utilization Level | Action |
+| 使用率等級 | 操作 |
 |------------------|--------|
-| 0-70% | Normal operation |
-| 71-85% | Warning notification to agent and platform |
-| 86-95% | Restrict new player registrations under agent |
-| 96-100% | Freeze agent credit, escalate to management |
+| 0-70% | 正常運作 |
+| 71-85% | 向代理和平台發送警告通知 |
+| 86-95% | 限制代理下的新玩家註冊 |
+| 96-100% | 凍結代理信用，升級至管理層 |
 
-### Compliance Checklist
+### 合規檢查清單（Compliance Checklist）
 
-- Credit line calculations are correct for all agents
-- Risk alerts trigger promptly at defined thresholds
-- Commission settlements are accurate
-- Credit freeze mechanism activates effectively
+- 所有代理的信用額度計算正確
+- 風險警報在定義閾值時及時觸發
+- 佣金結算準確
+- 信用凍結機制有效啟動
 
-### Known Risks
+### 已知風險（Known Risks）
 
-| Risk | Description | Mitigation |
+| 風險 | 描述 | 緩解措施 |
 |------|-------------|------------|
-| Credit Overflow | Sub-agent bets exceed allocated credit line | Real-time credit check before bet acceptance |
-| Settlement Delay | Commission settlement lag creates financial exposure | Automate settlement with daily reconciliation |
-| Hierarchy Calculation Error | Multi-level allocation miscalculates cascading limits | Validate hierarchical credit distribution with automated tests |
+| 信用溢出 | 子代理投注超過分配的信用額度 | 投注接受前的即時信用檢查 |
+| 結算延遲 | 佣金結算延遲造成財務暴露 | 透過每日對帳自動化結算 |
+| 階層計算錯誤 | 多層分配錯誤計算級聯限制 | 透過自動化測試驗證階層式信用分配 |
 
 ---
 
-## 5. Reference Documents
+## 5. 參考文件（Reference Documents）
 
-| Area | Reference |
+| 領域 | 參考 |
 |------|-----------|
-| Risk Framework | 05-01 Risk Framework |
-| Fraud Detection | 05-02 Fraud Detection |
-| Risk Proposal Workflow | 05-05 Risk Proposal Workflow |
-| Agent Credit Risk | 05-04 Agent Credit Risk |
-| Credit Network Logic | 07-02 Credit Network Logic |
-| Withdrawal Risk | 01-05 Withdrawal Risk |
+| 風險框架 | 05-01 Risk Framework |
+| 欺詐偵測 | 05-02 Fraud Detection |
+| 風險提案工作流程 | 05-05 Risk Proposal Workflow |
+| 代理信用風險 | 05-04 Agent Credit Risk |
+| 信用網路邏輯 | 07-02 Credit Network Logic |
+| 提款風險 | 01-05 Withdrawal Risk |
 
-### Technical Implementation
+### 技術實施（Technical Implementation）
 
-→ **[Risk Implementation Architecture](../../architecture/05_Risk_Engine/Risk_Implementation.md)** - Risk scoring engine, fraud detection algorithms, KYC/AML verification workflows, real-time monitoring dashboards, and compliance reporting systems
+→ **[Risk Implementation Architecture](../../architecture/05_Risk_Engine/Risk_Implementation.md)** - 風險評分引擎、欺詐偵測演算法、KYC/AML 驗證工作流程、即時監控儀表板和合規報告系統
 
 ---
 

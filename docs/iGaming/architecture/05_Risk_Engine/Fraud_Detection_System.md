@@ -965,10 +965,10 @@ groups:
 
 ```java
 @SpringBootTest
+@RequiredArgsConstructor
 class RiskProposalServiceTest {
 
-    @Autowired
-    private RiskProposalService riskProposalService;
+    private final RiskProposalService riskProposalService;
 
     @MockBean
     private RiskProposalDao riskProposalDao;
@@ -1019,6 +1019,7 @@ class RiskProposalServiceTest {
 ```java
 @SpringBootTest
 @Testcontainers
+@RequiredArgsConstructor
 class WithdrawalDeferredRiskCheckIntegrationTest {
 
     @Container
@@ -1027,11 +1028,9 @@ class WithdrawalDeferredRiskCheckIntegrationTest {
         .withUsername("test")
         .withPassword("test");
 
-    @Autowired
-    private WithdrawalSagaService withdrawalSagaService;
+    private final WithdrawalSagaService withdrawalSagaService;
 
-    @Autowired
-    private RiskProposalDao riskProposalDao;
+    private final RiskProposalDao riskProposalDao;
 
     @Test
     void testDeferredRiskCheck_NoSuspiciousAmount_ShouldProceed() {

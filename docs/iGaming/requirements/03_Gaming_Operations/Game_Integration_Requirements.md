@@ -1,180 +1,180 @@
-# Game Integration Requirements
+# 遊戲整合需求（Game Integration Requirements）
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
-> **Audience**: Executives, Product Managers
-> **Related Architecture**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
+> **Audience**: 高階主管、產品經理
+> **Related Doc**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
 > **Last Synced**: 2026-02-09
 >
-> **Refinement Note**: Technical details (Token generation Java code, HMAC-SHA256 signature algorithm, Base64 encoding, Redis anti-replay blacklist, Three-layer idempotency defense, Stalled transaction recovery jobs, Rate limiting Redisson implementation) moved to Architecture layer. This document focuses on business requirements only.
+> **精煉說明**：技術細節（Token 生成 Java 程式碼、HMAC-SHA256 簽章演算法、Base64 編碼、Redis 防重放黑名單、三層冪等防禦、停滯交易恢復作業、速率限制 Redisson 實作）已移至架構層。本文件僅專注於業務需求。
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
-The game integration system delivers critical business value by:
-- **Unified Player Experience**: Seamless Wallet enables players to use a single balance across all Game Providers without manual transfers
-- **Revenue Protection**: Idempotent transaction processing eliminates duplicate debit/credit risks that could cause financial losses
-- **Security Compliance**: Token-based authentication with anti-replay protection satisfies gaming license security requirements
-- **Operational Efficiency**: Automated error recovery resolves 90%+ of stalled transactions within 10 minutes without manual intervention
-- **Market Agility**: Standardized onboarding accelerates new GP integration from months to weeks
+此遊戲供應商整合框架提供關鍵價值：
 
----
-
-## 1. Overview
-
-This document defines the business requirements for integrating new Game Providers (GPs) into the iGaming platform. It covers the core functional areas that must be supported, the partnership standards, and the acceptance criteria for each integration milestone.
+- **加速市場進入**：標準化的無縫錢包 API 和基於 Token 的身份驗證能快速上線新遊戲供應商，縮短新遊戲內容的上市時間並提升競爭力
+- **保護收入完整性**：三層冪等防禦防止網路重試期間的重複扣款/入帳，自動錯誤恢復在 10 分鐘內解決停滯交易，完整審計追蹤確保零未記錄交易
+- **建立玩家信任**：所有遊戲供應商的單一統一錢包消除玩家資金轉移摩擦，即時餘額同步確保準確的「可下注餘額（Playable Balance）」顯示，失敗交易的自動退款保持玩家信心
+- **最小化安全風險**：基於 Token 的身份驗證（5 分鐘有效期）和防重放保護防止未授權遊戲存取，IP 白名單和 TLS 1.2+ 強制執行阻擋惡意回呼，速率限制保護 API 免於濫用
 
 ---
 
-## 2. Core Integration Capabilities
+## 1. 概述（Overview）
 
-The platform must support the following capabilities when onboarding a new Game Provider:
+本文件定義將新遊戲供應商（GP, Game Provider）整合到 iGaming 平台的業務需求。涵蓋必須支援的核心功能區域、合作夥伴標準，以及每個整合里程碑的驗收標準。
 
-| Capability | Description | Business Priority |
+---
+
+## 2. 核心整合能力（Core Integration Capabilities）
+
+平台在上線新遊戲供應商時必須支援以下能力：
+
+| 能力 | 說明 | 業務優先級 |
 |-----------|-------------|-------------------|
-| Seamless Wallet API | Unified wallet allowing players to use a single balance across all games from any GP | Critical |
-| Token-Based Authentication | Secure session validation between the platform and GP systems | Critical |
-| Idempotent Transaction Processing | Guarantee that duplicate requests (e.g., network retries) do not result in duplicate debits or credits | Critical |
-| Transaction Cancellation | Ability to reverse a completed bet transaction upon GP request | High |
-| Error Recovery | Automated detection and resolution of stalled or inconsistent transactions | High |
-| Real-Time Balance Query | GP can query a player's current playable balance at any time | Critical |
+| Seamless Wallet API（無縫錢包 API） | 統一錢包，允許玩家在任何 GP 的所有遊戲中使用單一餘額 | 關鍵 |
+| Token-Based Authentication（基於 Token 的身份驗證） | 平台與 GP 系統之間的安全會話驗證 | 關鍵 |
+| Idempotent Transaction Processing（冪等交易處理） | 保證重複請求（例如網路重試）不會導致重複扣款或入帳 | 關鍵 |
+| Transaction Cancellation（交易取消） | 在 GP 請求時能夠撤銷已完成的投注交易 | 高 |
+| Error Recovery（錯誤恢復） | 自動偵測和解決停滯或不一致的交易 | 高 |
+| Real-Time Balance Query（即時餘額查詢） | GP 可隨時查詢玩家當前的可下注餘額 | 關鍵 |
 
 ---
 
-## 3. Seamless Wallet Functional Requirements
+## 3. 無縫錢包功能需求（Seamless Wallet Functional Requirements）
 
-### 3.1 Supported Operations
+### 3.1 支援的操作
 
-The Seamless Wallet integration must support four primary operations:
+無縫錢包整合必須支援四個主要操作：
 
-| Operation | Business Rule | Expected Outcome |
+| 操作 | 業務規則 | 預期結果 |
 |-----------|--------------|------------------|
-| **Debit (Bet Placement)** | Deduct the bet amount from the player's wallet when a bet is placed | Player balance decreases; transaction is recorded |
-| **Credit (Win Payout)** | Add the win amount to the player's wallet when a round resolves | Player balance increases; transaction is recorded |
-| **Cancel (Transaction Reversal)** | Reverse a previously completed debit or credit on GP request | Original transaction is reversed; balance is restored |
-| **Balance Inquiry** | Return the player's current playable balance | GP receives up-to-date balance for display |
+| **Debit（扣款 - 下注）** | 當下注時從玩家錢包扣除投注金額 | 玩家餘額減少；交易被記錄 |
+| **Credit（入帳 - 派彩）** | 當回合結算時將贏額加入玩家錢包 | 玩家餘額增加；交易被記錄 |
+| **Cancel（取消 - 交易撤銷）** | 根據 GP 請求撤銷先前完成的扣款或入帳 | 原始交易被撤銷；餘額恢復 |
+| **Balance Inquiry（餘額查詢）** | 回傳玩家當前的可下注餘額 | GP 接收最新餘額以供顯示 |
 
-### 3.2 Transaction Integrity Rules
+### 3.2 交易完整性規則
 
-| Rule | Description |
+| 規則 | 說明 |
 |------|-------------|
-| Single-use request identifiers | Every transaction request from a GP must carry a unique request ID |
-| Idempotent responses | Repeated requests with the same request ID must return the same result without re-processing |
-| Atomic balance updates | Each debit or credit must fully succeed or fully fail; partial updates are not permitted |
-| Audit trail | Every transaction must be recorded with timestamp, player ID, GP ID, round ID, and amount |
+| 單次使用請求識別碼 | 來自 GP 的每個交易請求必須攜帶唯一的請求 ID |
+| 冪等回應 | 使用相同請求 ID 的重複請求必須回傳相同結果而不重新處理 |
+| 原子性餘額更新 | 每次扣款或入帳必須完全成功或完全失敗；不允許部分更新 |
+| 審計追蹤 | 每筆交易必須記錄時間戳記、玩家 ID、GP ID、回合 ID 和金額 |
 
 ---
 
-## 4. Security Requirements
+## 4. 安全需求（Security Requirements）
 
-### 4.1 Token Authentication Standards
+### 4.1 Token 身份驗證標準
 
-| Requirement | Specification |
+| 需求 | 規格 |
 |------------|---------------|
-| Token composition | Must include player ID, tenant ID, timestamp, and cryptographic signature |
-| Signature algorithm | Industry-standard cryptographic signature |
-| Token validity window | Maximum 5 minutes (configurable) |
-| Anti-replay protection | Each token must be single-use; used tokens must be rejected |
-| Encoding | Secure encoding for transport |
+| Token 組成 | 必須包含玩家 ID、租戶 ID、時間戳記和密碼學簽章 |
+| 簽章演算法 | 行業標準密碼學簽章 |
+| Token 有效期窗口 | 最長 5 分鐘（可配置） |
+| 防重放保護 | 每個 Token 必須單次使用；已使用的 Token 必須被拒絕 |
+| 編碼 | 用於傳輸的安全編碼 |
 
-→ **[Token Authentication Implementation](../../architecture/03_Game_Integration/Game_Integration_Security.md#token-authentication)** - HMAC-SHA256 algorithm, Base64 encoding, Java generateToken/validateToken methods
+→ **[Token 身份驗證實作](../../architecture/03_Game_Integration/Game_Integration_Security.md#token-authentication)** - HMAC-SHA256 演算法、Base64 編碼、Java generateToken/validateToken 方法
 
-### 4.2 GP Onboarding Security Checklist
+### 4.2 GP 上線安全檢查清單
 
-| Item | Requirement |
+| 項目 | 需求 |
 |------|------------|
-| IP whitelisting | GP callback endpoints must be IP-whitelisted |
-| HTTPS enforcement | All API communications must use TLS 1.2 or higher |
-| API key rotation | GP API keys must support periodic rotation without downtime |
-| Rate limiting | API endpoints must enforce per-GP rate limits to prevent abuse |
+| IP 白名單 | GP 回呼端點必須在 IP 白名單中 |
+| HTTPS 強制執行 | 所有 API 通訊必須使用 TLS 1.2 或更高版本 |
+| API 金鑰輪換 | GP API 金鑰必須支援定期輪換而不停機 |
+| 速率限制 | API 端點必須對每個 GP 執行速率限制以防止濫用 |
 
-→ **[Security Implementation Details](../../architecture/03_Game_Integration/Game_Integration_Security.md#security-checklist)** - IP whitelisting configuration, TLS 1.2+ setup, rate limiting (Redisson), Redis anti-replay blacklist
+→ **[安全實作細節](../../architecture/03_Game_Integration/Game_Integration_Security.md#security-checklist)** - IP 白名單配置、TLS 1.2+ 設定、速率限制（Redisson）、Redis 防重放黑名單
 
 ---
 
-## 5. Error Recovery Requirements
+## 5. 錯誤恢復需求（Error Recovery Requirements）
 
-### 5.1 Stalled Transaction Policy
+### 5.1 停滯交易政策
 
-| Scenario | Business Rule | Maximum Resolution Time |
+| 場景 | 業務規則 | 最大解決時間 |
 |----------|--------------|------------------------|
-| Network timeout during debit | System must auto-detect and recover stalled transactions | 10 minutes |
-| GP callback failure | System must retry or query GP for authoritative status | 10 minutes |
-| Inconsistent state (debit recorded, GP says failed) | System must refund the player automatically | 10 minutes |
-| Unknown transaction at GP | System must treat as failed and refund the player | 10 minutes |
+| 扣款期間網路逾時 | 系統必須自動偵測和恢復停滯交易 | 10 分鐘 |
+| GP 回呼失敗 | 系統必須重試或查詢 GP 以取得權威狀態 | 10 分鐘 |
+| 不一致狀態（扣款已記錄，GP 說失敗） | 系統必須自動退款給玩家 | 10 分鐘 |
+| GP 端未知交易 | 系統必須視為失敗並退款給玩家 | 10 分鐘 |
 
-### 5.2 Recovery Verification
+### 5.2 恢復驗證
 
-After every automated recovery, the system must:
-- Record the recovery action in the audit log
-- Send an alert notification if the transaction status was FAILED or NOT_FOUND
-- Ensure the player's balance is consistent with the resolved state
+每次自動恢復後，系統必須：
+- 在審計日誌中記錄恢復動作
+- 如果交易狀態為 FAILED 或 NOT_FOUND，發送警報通知
+- 確保玩家餘額與解決的狀態一致
 
-→ **[Stalled Transaction Auto-Recovery](../../architecture/03_Game_Integration/Game_Integration_Security.md#auto-recovery)** - Scheduled job configuration, SQL queries, GP status query API integration, refund automation
-
----
-
-## 6. Planned Capabilities (Phase 5+)
-
-### 6.1 Seamless Wallet API Advanced Features
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Free Spin Support | Planned | GP-initiated free spins with platform-funded bonus balance |
-| Jackpot Contribution | Planned | Progressive jackpot contribution deducted per bet |
-| Multi-Currency Support | Planned | Single wallet supporting bets in multiple currencies with real-time conversion |
-
-### 6.2 Turnover Calculation Logic
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Three-Layer Validation | Planned | Layer 1 (Risk), Layer 2 (Finance), Layer 3 (Activity) turnover validation |
-| Game Weight Configuration | Planned | Different game types contribute at different rates to wagering requirements |
-| Free Spin Turnover Exclusion | Planned | Free spin bets typically excluded from wagering requirement calculations |
+→ **[停滯交易自動恢復](../../architecture/03_Game_Integration/Game_Integration_Security.md#auto-recovery)** - 排程作業配置、SQL 查詢、GP 狀態查詢 API 整合、退款自動化
 
 ---
 
-## 7. Acceptance Criteria
+## 6. 規劃功能（階段 5+）（Planned Capabilities - Phase 5+）
 
-### 7.1 Integration Verification Checklist
+### 6.1 Seamless Wallet API 進階功能
 
-| Criterion | Validation Method |
+| 功能 | 狀態 | 說明 |
+|---------|--------|-------------|
+| Free Spin Support（免費旋轉支援） | 規劃中 | GP 發起的免費旋轉，由平台資助的紅利餘額 |
+| Jackpot Contribution（累積獎金貢獻） | 規劃中 | 每筆投注扣除累積獎金貢獻 |
+| Multi-Currency Support（多幣別支援） | 規劃中 | 單一錢包支援多種幣別投注並即時轉換 |
+
+### 6.2 投注額計算邏輯
+
+| 功能 | 狀態 | 說明 |
+|---------|--------|-------------|
+| Three-Layer Validation（三層驗證） | 規劃中 | Layer 1（風控）、Layer 2（財務）、Layer 3（活動）投注額驗證 |
+| Game Weight Configuration（遊戲權重配置） | 規劃中 | 不同遊戲類型對投注要求的貢獻率不同 |
+| Free Spin Turnover Exclusion（免費旋轉投注額排除） | 規劃中 | 免費旋轉投注通常不計入投注要求計算 |
+
+---
+
+## 7. 驗收標準（Acceptance Criteria）
+
+### 7.1 整合驗證檢查清單
+
+| 標準 | 驗證方法 |
 |-----------|------------------|
-| Token authentication works correctly (signature, expiry, anti-replay) | Automated test suite |
-| Idempotency verified (duplicate requests return identical results) | Load test with duplicate request injection |
-| Concurrency verified (1,000 TPS without duplicate debits) | Concurrent load test |
-| Cancel transaction correctly refunds player | Functional test |
-| Error recovery mechanism operates within SLA | Chaos engineering test (network partition simulation) |
-| Stalled transactions auto-recover | Scheduled task validation |
-| All game transactions recorded in audit log | Audit log inspection |
+| Token 身份驗證正確運作（簽章、過期、防重放） | 自動化測試套件 |
+| 冪等性已驗證（重複請求回傳相同結果） | 注入重複請求的負載測試 |
+| 並發性已驗證（1,000 TPS 無重複扣款） | 並發負載測試 |
+| 取消交易正確退款給玩家 | 功能測試 |
+| 錯誤恢復機制在 SLA 內運作 | 混沌工程測試（網路分區模擬） |
+| 停滯交易自動恢復 | 排程任務驗證 |
+| 所有遊戲交易記錄在審計日誌中 | 審計日誌檢查 |
 
-### 7.2 Common Integration Pitfalls
+### 7.2 常見整合陷阱
 
-| Pitfall | Mitigation |
+| 陷阱 | 緩解措施 |
 |---------|-----------|
-| Token replay attacks | Mandatory single-use token enforcement with server-side tracking |
-| Idempotency layer failure | Multi-layer defense mechanism must be operational |
-| Lock timeout too short | Lock hold time must exceed maximum business execution time |
-| Stalled transaction accumulation | Automated recovery task must be monitored for continuous operation |
+| Token 重放攻擊 | 強制執行單次使用 Token 並進行伺服器端追蹤 |
+| 冪等層失敗 | 多層防禦機制必須運作 |
+| 鎖定逾時過短 | 鎖定持有時間必須超過最大業務執行時間 |
+| 停滯交易累積 | 自動恢復任務必須監控以確保持續運作 |
 
-→ **[Idempotency Implementation](../../architecture/03_Game_Integration/Game_Integration_Security.md#idempotency-defense)** - Three-layer defense (Redis cache + DB unique constraint + Distributed lock), timeout configuration, fallback mechanisms
+→ **[冪等性實作](../../architecture/03_Game_Integration/Game_Integration_Security.md#idempotency-defense)** - 三層防禦（Redis 快取 + DB 唯一約束 + 分散式鎖）、逾時配置、備援機制
 
 ---
 
-## Related Documents
+## 相關文件（Related Documents）
 
-### Business References
-- [Turnover Business Rules](./Turnover_Business_Rules.md) - Wagering and turnover requirements
+### 業務參考
+- [Turnover Business Rules](./Turnover_Business_Rules.md) - 投注額和投注要求規則
 
-### Technical Implementation
+### 技術實作
 
-→ **[Game Integration Implementation](../../architecture/03_Game_Integration/Game_Integration_Implementation.md)** - Complete game provider integration patterns, API specifications, token generation/validation algorithms, error handling, and testing strategies
+→ **[遊戲整合實作](../../architecture/03_Game_Integration/Game_Integration_Implementation.md)** - 完整遊戲供應商整合模式、API 規格、Token 生成/驗證演算法、錯誤處理和測試策略
 
-**Additional Technical References**:
-- [Turnover Calculation Logic (Architecture)](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md) - Turnover calculation technical design
+**額外技術參考**：
+- [投注額計算邏輯（架構）](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md) - 投注額計算技術設計
 
 ---
 
 **Document Version**: 4.0.0
 **Last Updated**: 2026-02-08
-**Maintainers**: Product Team & Game Integration Team
+**Maintainers**: 產品團隊與遊戲整合團隊

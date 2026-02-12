@@ -1,4 +1,4 @@
-# Notification System Business Requirements
+# 通知系統業務需求（Notification System Business Requirements）
 
 > **Canonical Source**: [source-archive/10_Platform_Management/10-03_Notification_Architecture.md](../../source-archive/10_Platform_Management/10-03_Notification_Architecture.md)
 > **View Type**: Business Requirements
@@ -8,189 +8,189 @@
 
 ---
 
-## 1. Business Overview
+## 1. 業務概述（Business Overview）
 
-The Notification Service is the platform's **single outbound communication channel**, responsible for managing all user-facing messages. It addresses three key pain points: **channel fragmentation**, **template maintenance difficulty**, and **cost overruns**.
+通知服務是平台的**單一出站通訊通道**，負責管理所有面向用戶的訊息。它解決三個關鍵痛點：**通道碎片化**、**模板維護困難**和**成本超支**。
 
 ---
 
-## 2. Channel Categories
+## 2. 通道類別（Channel Categories）
 
-### 2.1 Transactional Messages (High Priority)
+### 2.1 交易訊息（Transactional Messages，高優先級）
 
-| Channel | Use Cases | Expected Delivery |
+| 通道 | 使用場景 | 預期交付時間 |
 |---------|----------|-------------------|
-| **SMS** | OTP verification codes, password reset | < 2 seconds |
-| **Email** | Registration confirmation, password reset, account alerts | < 5 seconds |
-| **Telegram/WhatsApp** | OTP codes (cost-free alternative to SMS) | < 1 second |
+| **SMS** | OTP 驗證碼、密碼重設 | < 2 秒 |
+| **Email** | 註冊確認、密碼重設、帳戶告警 | < 5 秒 |
+| **Telegram/WhatsApp** | OTP 驗證碼（SMS 的免費替代方案） | < 1 秒 |
 
-### 2.2 Marketing Messages (Low Priority)
+### 2.2 行銷訊息（Marketing Messages，低優先級）
 
-| Channel | Use Cases | Expected Delivery |
+| 通道 | 使用場景 | 預期交付時間 |
 |---------|----------|-------------------|
-| **App Push** | Promotions, bonus notifications, game announcements | < 5 seconds |
-| **In-App Message** | Site inbox messages, news | Real-time |
-| **IM Integration** | Telegram Bot, Line OA, WhatsApp Business | < 5 seconds |
-| **Email** | Newsletter, promotional campaigns | < 10 seconds |
+| **App Push** | 促銷活動、紅利通知、遊戲公告 | < 5 秒 |
+| **站內訊息（In-App Message）** | 站內信箱訊息、新聞 | 即時 |
+| **IM 整合** | Telegram Bot、Line OA、WhatsApp Business | < 5 秒 |
+| **Email** | 電子報、促銷活動 | < 10 秒 |
 
 ---
 
-## 3. Smart Routing Business Rules
+## 3. 智慧路由業務規則（Smart Routing Business Rules）
 
-The system automatically selects the optimal channel based on **cost** and **delivery rate**.
+系統根據**成本**和**交付率**自動選擇最佳通道。
 
-### 3.1 Transactional Routing Priority
+### 3.1 交易訊息路由優先級（Transactional Routing Priority）
 
-| Priority | Channel | Cost per Message | Delivery Rate | Fallback Condition |
+| 優先級 | 通道 | 每則訊息成本 | 交付率 | 回退條件 |
 |----------|---------|-----------------|---------------|-------------------|
-| 1st | Telegram/WhatsApp | $0 (free) | 95-98% | User not found, timeout |
-| 2nd | SMS | $0.05 | 99.5% | Invalid phone, provider outage |
-| Final | Manual Review | - | - | All channels failed |
+| 第 1 | Telegram/WhatsApp | $0（免費） | 95-98% | 找不到用戶、超時 |
+| 第 2 | SMS | $0.05 | 99.5% | 無效電話、供應商中斷 |
+| 最終 | 人工審查 | - | - | 所有通道失敗 |
 
-**Business Rule**: Always attempt free channels first. Only fall back to paid SMS when free channels are unavailable or fail.
+**業務規則**：始終先嘗試免費通道。僅當免費通道不可用或失敗時才回退到付費 SMS。
 
-### 3.2 Marketing Routing Priority
+### 3.2 行銷訊息路由優先級（Marketing Routing Priority）
 
-| Priority | Channel | Cost per Message | Delivery Rate | Fallback Condition |
+| 優先級 | 通道 | 每則訊息成本 | 交付率 | 回退條件 |
 |----------|---------|-----------------|---------------|-------------------|
-| 1st | App Push (FCM) | $0 (free) | 85% | Token invalid, timeout |
-| 2nd | Email | $0.001 | 92% | Invalid email, quota exceeded |
-| Persistent | In-App Inbox | $0 | 100% (if viewed) | Always saved |
+| 第 1 | App Push (FCM) | $0（免費） | 85% | Token 無效、超時 |
+| 第 2 | Email | $0.001 | 92% | 無效 email、配額超限 |
+| 持久 | 站內信箱 | $0 | 100%（如果查看） | 始終儲存 |
 
-**Business Rule**: Marketing messages are always persisted to the inbox regardless of push/email delivery.
+**業務規則**：無論 push/email 交付如何，行銷訊息始終持久化到信箱。
 
-### 3.3 24-Hour Read Check (Marketing Only)
+### 3.3 24 小時已讀檢查（Marketing Only）
 
-If a push notification is not read within 24 hours, a follow-up email reminder is automatically sent.
+如果推送通知在 24 小時內未讀取，系統自動發送後續 email 提醒。
 
 ---
 
-## 4. Cost Optimization Rules
+## 4. 成本優化規則（Cost Optimization Rules）
 
-### 4.1 Channel Cost Comparison
+### 4.1 通道成本比較（Channel Cost Comparison）
 
-| Channel | Cost per Message | Cost per 100,000 Messages | Delivery Rate | Effective Cost per Delivered |
+| 通道 | 每則訊息成本 | 10 萬則訊息成本 | 交付率 | 有效交付成本 |
 |---------|-----------------|--------------------------|---------------|----------------------------|
-| **Telegram/WhatsApp** | $0 | $0 | 95-98% | $0 (optimal) |
-| **App Push (FCM)** | $0 | $0 | 85% | $0 (free but lower delivery) |
+| **Telegram/WhatsApp** | $0 | $0 | 95-98% | $0（最優） |
+| **App Push (FCM)** | $0 | $0 | 85% | $0（免費但交付率較低） |
 | **Email** | $0.001 | $100 | 92% | $0.00109 |
-| **SMS** | $0.05 | $5,000 | 99.5% | $0.05025 (most expensive) |
+| **SMS** | $0.05 | $5,000 | 99.5% | $0.05025（最昂貴） |
 
-### 4.2 Cost Optimization Strategies
+### 4.2 成本優化策略（Cost Optimization Strategies）
 
-| Strategy | Description | Savings |
+| 策略 | 描述 | 節省 |
 |----------|-------------|---------|
-| **Prioritize free channels** | Telegram/WhatsApp before SMS | Up to $0.05 per message |
-| **Batch sending** | Merge same-template messages | Reduce provider API calls |
-| **Smart degradation** | Delay non-critical messages during peak | Reduce load costs |
-| **Provider negotiation** | Volume discounts at > 100k messages/month | 20-40% discount |
-| **Self-hosted SMTP** | For email volume > 1M messages/month | 80% email cost reduction |
+| **優先免費通道** | Telegram/WhatsApp 優於 SMS | 每則訊息最多節省 $0.05 |
+| **批次發送** | 合併相同模板訊息 | 減少供應商 API 呼叫 |
+| **智慧降級** | 高峰期延遲非關鍵訊息 | 降低負載成本 |
+| **供應商談判** | 每月 > 10 萬則訊息時的批量折扣 | 20-40% 折扣 |
+| **自架 SMTP** | email 量 > 100 萬則/月時 | email 成本降低 80% |
 
 ---
 
-## 5. Template Management Rules
+## 5. 模板管理規則（Template Management Rules）
 
-### 5.1 Template Requirements
+### 5.1 模板要求（Template Requirements）
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| **No Hardcoded Content** | All message content must use template codes |
-| **Multi-language Support** | Templates reference translation keys, not hardcoded text |
-| **Fallback Language** | If translation service fails, use English default |
-| **Version Control** | Template changes tracked with versioning |
+| **禁止硬編碼內容** | 所有訊息內容必須使用模板代碼 |
+| **多語言支援** | 模板引用翻譯鍵，而非硬編碼文本 |
+| **語言回退** | 如果翻譯服務失敗，使用英文預設 |
+| **版本控制** | 模板變更追蹤版本 |
 
-### 5.2 Template Example
+### 5.2 模板範例（Template Example）
 
-| Template Code | Purpose | Variables |
+| 模板代碼 | 用途 | 變數 |
 |--------------|---------|-----------|
-| `OTP_REGISTER` | Registration verification code | `code`, `expire_minutes` |
-| `OTP_LOGIN` | Login verification code | `code`, `expire_minutes` |
-| `PASSWORD_RESET` | Password reset link | `reset_link`, `expire_hours` |
-| `PROMOTION_BONUS` | Bonus promotion notification | `bonus_amount`, `wagering_requirement` |
-| `WITHDRAWAL_APPROVED` | Withdrawal approval notice | `amount`, `account_last4` |
+| `OTP_REGISTER` | 註冊驗證碼 | `code`, `expire_minutes` |
+| `OTP_LOGIN` | 登入驗證碼 | `code`, `expire_minutes` |
+| `PASSWORD_RESET` | 密碼重設連結 | `reset_link`, `expire_hours` |
+| `PROMOTION_BONUS` | 紅利促銷通知 | `bonus_amount`, `wagering_requirement` |
+| `WITHDRAWAL_APPROVED` | 提款核准通知 | `amount`, `account_last4` |
 
 ---
 
-## 6. Rate Limiting & Anti-Abuse
+## 6. 速率限制與反濫用（Rate Limiting & Anti-Abuse）
 
-### 6.1 Rate Limits
+### 6.1 速率限制（Rate Limits）
 
-| Limit Type | Threshold | Purpose |
+| 限制類型 | 門檻 | 目的 |
 |-----------|-----------|---------|
-| **Global OTP Cap** | Max 5 OTP messages per phone per hour | Prevent malicious SMS cost abuse |
-| **Cool-down Period** | 60-second minimum between sends | Prevent rapid-fire requests |
-| **Daily Marketing Cap** | Max 3 marketing messages per user per day | Prevent user annoyance |
+| **全域 OTP 上限** | 每小時每個電話號碼最多 5 則 OTP 訊息 | 防止惡意 SMS 成本濫用 |
+| **冷卻期** | 發送間隔最少 60 秒 | 防止快速連續請求 |
+| **每日行銷上限** | 每用戶每天最多 3 則行銷訊息 | 防止用戶困擾 |
 
-### 6.2 Do Not Disturb (DND) Rules
+### 6.2 免打擾規則（Do Not Disturb, DND Rules）
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| **Quiet Hours** | Marketing messages are not sent between 22:00 - 08:00 local time |
-| **Queue Behavior** | Messages during quiet hours are queued and sent at 08:00 |
-| **Exception** | Transactional messages (OTP, security alerts) ignore DND |
+| **安靜時段** | 本地時間 22:00 - 08:00 間不發送行銷訊息 |
+| **佇列行為** | 安靜時段的訊息會排隊並在 08:00 發送 |
+| **例外** | 交易訊息（OTP、安全告警）忽略免打擾 |
 
-### 6.3 Deduplication
+### 6.3 去重（Deduplication）
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| **Window** | Same user + same template within 60 seconds = duplicate |
-| **Action** | Return error with cool-down remaining time |
-| **Purpose** | Prevent accidental double-sends |
+| **視窗** | 相同用戶 + 相同模板在 60 秒內 = 重複 |
+| **動作** | 返回錯誤並附帶剩餘冷卻時間 |
+| **目的** | 防止意外重複發送 |
 
 ---
 
-## 7. Inbox (Message Center) Requirements
+## 7. 信箱（站內訊息中心）需求（Inbox Requirements）
 
-### 7.1 Inbox Features
+### 7.1 信箱功能（Inbox Features）
 
-| Feature | Description |
+| 功能 | 描述 |
 |---------|-------------|
-| **Message List** | Chronological list of all marketing messages |
-| **Read/Unread Status** | Visual indicator for unread messages |
-| **Deep Link** | Each message can link to a specific page/promotion |
-| **Auto-Expiry** | Messages automatically removed after 30 days |
+| **訊息列表** | 所有行銷訊息的時間順序列表 |
+| **已讀/未讀狀態** | 未讀訊息的視覺指示器 |
+| **深層連結** | 每則訊息可連結到特定頁面/促銷活動 |
+| **自動到期** | 訊息 30 天後自動移除 |
 
-### 7.2 Inbox Business Rules
+### 7.2 信箱業務規則（Inbox Business Rules）
 
-| Rule | Description |
+| 規則 | 描述 |
 |------|-------------|
-| Only marketing messages saved to inbox | Transactional (OTP) messages are not persisted |
-| Messages expire after 30 days | Automatic cleanup |
-| Maximum 100 messages per user | Oldest messages removed when exceeded |
+| 僅行銷訊息儲存到信箱 | 交易訊息（OTP）不持久化 |
+| 訊息 30 天後到期 | 自動清理 |
+| 每用戶最多 100 則訊息 | 超過時移除最舊訊息 |
 
 ---
 
-## 8. Security Requirements
+## 8. 安全需求（Security Requirements）
 
-| Requirement | Description |
+| 需求 | 描述 |
 |-------------|-------------|
-| **Encrypted Storage** | Phone numbers and emails in notification logs must be encrypted |
-| **Content Filtering** | Automatic scan for prohibited marketing terms (e.g., "guaranteed win") |
-| **Audit Trail** | Complete log of all sent notifications with status and cost |
-| **PII Masking** | Phone/email masked in operational reports |
+| **加密儲存** | 通知日誌中的電話號碼和 email 必須加密 |
+| **內容過濾** | 自動掃描禁止的行銷術語（例如「保證獲勝」） |
+| **審計追蹤** | 所有已發送通知的完整日誌，包含狀態與成本 |
+| **PII 遮罩** | 營運報表中電話/email 遮罩 |
 
 ---
 
-## 9. Failure Handling Business Rules
+## 9. 失敗處理業務規則（Failure Handling Business Rules）
 
-| Scenario | Business Impact | Expected Behavior |
+| 場景 | 業務影響 | 預期行為 |
 |----------|----------------|-------------------|
-| **Primary channel fails** | Message not delivered | Automatic fallback to next channel |
-| **All channels fail** | Critical message lost | Alert operations team + queue for manual review |
-| **Provider quota exceeded** | Messages delayed | Queue with delay until quota resets |
-| **User contact invalid** | Permanent delivery failure | Mark user for contact verification |
+| **主通道失敗** | 訊息未交付 | 自動回退到下一通道 |
+| **所有通道失敗** | 關鍵訊息遺失 | 告警營運團隊 + 排隊等待人工審查 |
+| **供應商配額超限** | 訊息延遲 | 排隊延遲直到配額重置 |
+| **用戶聯絡方式無效** | 永久交付失敗 | 標記用戶以進行聯絡驗證 |
 
 ---
 
-## 10. Business KPIs
+## 10. 業務 KPI（Business KPIs）
 
-| KPI | Target | Measurement |
+| KPI | 目標 | 測量 |
 |-----|--------|-------------|
-| **OTP Delivery Rate** | > 99% | Successful deliveries / total sends |
-| **Marketing Open Rate** | > 15% | Opened / delivered |
-| **Average Delivery Time** | < 3 seconds (transactional) | Send to delivery confirmation |
-| **Monthly Communication Cost** | Optimize 30% vs pure SMS | Actual cost / theoretical SMS-only cost |
-| **Channel Fallback Rate** | < 5% | Fallback events / total sends |
+| **OTP 交付率** | > 99% | 成功交付 / 總發送 |
+| **行銷開啟率** | > 15% | 開啟 / 交付 |
+| **平均交付時間** | < 3 秒（交易） | 發送到交付確認 |
+| **每月通訊成本** | 相較純 SMS 優化 30% | 實際成本 / 理論純 SMS 成本 |
+| **通道回退率** | < 5% | 回退事件 / 總發送 |
 
 ---
 

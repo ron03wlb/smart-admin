@@ -794,13 +794,12 @@ groups:
 ```java
 @SpringBootTest
 @AutoConfigureMockMvc
+@RequiredArgsConstructor
 class TokenValidationIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Test
     @DisplayName("TC-TV-004: Validate blacklisted Token")

@@ -638,10 +638,10 @@ alerts:
 ```java
 @SpringBootTest
 @Transactional
+@RequiredArgsConstructor
 class SelfExclusionServiceTest {
 
-    @Autowired
-    private SelfExclusionService selfExclusionService;
+    private final SelfExclusionService selfExclusionService;
 
     @Test
     void testShortTermExclusionImmediateEffect() {

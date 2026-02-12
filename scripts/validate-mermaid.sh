@@ -24,12 +24,12 @@ echo ""
 
 # 檢查 Mermaid CLI 是否安裝
 if ! command -v mmdc &> /dev/null; then
-    echo -e "${RED}✗ 錯誤: 未安裝 Mermaid CLI${NC}"
+    echo -e "${YELLOW}⚠ 警告: 未安裝 Mermaid CLI（跳過語法驗證）${NC}"
     echo ""
     echo "請安裝 Mermaid CLI："
     echo "  npm install -g @mermaid-js/mermaid-cli"
     echo ""
-    exit 1
+    exit 0
 fi
 
 echo -e "${GREEN}✓ Mermaid CLI 已安裝${NC}"

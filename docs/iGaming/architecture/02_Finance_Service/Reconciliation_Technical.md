@@ -1105,6 +1105,7 @@ public class ReconciliationTestFixtures {
 ```java
 @SpringBootTest
 @Testcontainers
+@RequiredArgsConstructor
 class ReconciliationIntegrationTest {
 
     @Container
@@ -1114,8 +1115,7 @@ class ReconciliationIntegrationTest {
     static GenericContainer<?> redis = new GenericContainer<>("redis:7")
         .withExposedPorts(6379);
 
-    @Autowired
-    private ReconciliationService reconciliationService;
+    private final ReconciliationService reconciliationService;
 
     @Test
     void shouldMatchPerfectTransactions() {

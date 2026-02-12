@@ -1,4 +1,4 @@
-# Agent System Business Requirements
+# 代理系統業務需求
 
 > **Canonical Source**: [source-archive/07_Agent_Center/07-03_Agent_System.md](../../source-archive/07_Agent_Center/07-03_Agent_System.md)
 > **View Type**: Business Requirements
@@ -8,210 +8,234 @@
 
 ---
 
-## 1. Business Overview
+## 業務價值 (Business Value)
 
-The Agent (Affiliate) System is the core customer acquisition engine for the iGaming platform. It supports **unlimited hierarchy levels** and tenant-isolated agent structures. The system accommodates both **credit/position taking** and **pure commission** business models.
+此功能交付的價值：
+- **驅動客戶獲取引擎**：無限層級代理系統支援可擴展的合作夥伴網絡，同時支援信用/承攬和純佣金模式，滿足多樣化市場需求
+- **減少人工結算開銷**：自動化佣金計算（每日/每週/每月週期）配合調整錢包，消除 90%+ 的人工財務操作
+- **防範代理欺詐**：風控機制（同 IP 偵測、佣金異常告警、閾值重置政策）保護平台營收，防止自佣欺詐和聯合套利
+- **提升代理留存率**：代理門戶自助報表工具（下級玩家報表、輸贏報表、佣金歷史）減少 70% 客服工單並提升代理滿意度
+- **確保監管合規**：負結轉規則、審批工作流、審計軌跡滿足 MGA/UKGC 代理佣金透明度要求
 
----
+## 成功指標 (Success Metrics)
 
-## 2. Agent Hierarchy & Relationships
-
-### 2.1 Binding Rules
-
-| Rule | Description |
-|------|-------------|
-| **Binding Method** | Via referral link or invitation code |
-| **Binding Duration** | Permanent, or configurable protection period (e.g., 30 days) |
-| **Protection Period** | During this period, the player cannot be reassigned to another agent |
-
-### 2.2 Hierarchy Structure
-
-**Master Agent (Total Agent) > Level 1 Agent > Level 2 Agent > ... > Player**
-
-The system supports two operating models:
-
-| Model | Description | Revenue Source |
-|-------|-------------|----------------|
-| **Position Taking (Credit)** | Agent shares win/loss risk with platform | Position-based profit/loss sharing |
-| **Pure Commission** | Agent earns commission only, no risk exposure | Commission on player activity |
+| 指標 | 目標 | 衡量方式 |
+|------|------|---------|
+| 代理獲取成本 | < $200/代理 | 營銷支出 / 新增代理數 |
+| 每代理玩家數 | > 50 活躍玩家 | 平均每代理活躍玩家數 |
+| 佣金支付比率 | 25-40% of GGR | 總佣金 / GGR |
+| 準時結算率 | > 95% | 準時結算 / 總結算數 |
+| 代理留存率 | > 80% 年度 | 活躍代理 / 總代理數 |
+| 佣金審批週期 | < 24 小時 | 從計算到審批的時間 |
+| 負結轉解決率 | < 5% 代理 | 負結轉超過 3 個月的代理比例 |
+| 風險偵測準確率 | > 90% | 真陽性 / 總標記數 |
 
 ---
 
-## 3. Commission Calculation
+## 1. 業務概述
 
-### 3.1 Commission Plan Types
+代理（Affiliate）系統是 iGaming 平台的核心客戶獲取引擎。它支援**無限層級**和租戶隔離的代理結構。系統同時支援**信用/承攬**和**純佣金**業務模式。
 
-| Plan Type | Basis | Example |
-|-----------|-------|---------|
-| **Revenue Share** | Net Win = Bet - Win - Bonus - Fee | Net Win < $100k (30%), $100k-$500k (40%), > $500k (50%) |
-| **Turnover Rebate** | Valid Bet Amount | Baccarat 0.8%, Slots 1.0% |
-| **CPA (Cost Per Acquisition)** | Per qualifying new depositing player | $100 per player with first deposit >= $50 |
+---
 
-### 3.2 Tiered Revenue Share Schedule
+## 2. 代理層級與關係
 
-| Net Win Range | Commission Rate |
-|--------------|----------------|
+### 2.1 綁定規則
+
+| 規則 | 說明 |
+|------|------|
+| **綁定方式** | 透過推薦連結或邀請碼 |
+| **綁定期限** | 永久，或可配置保護期（例如 30 天） |
+| **保護期** | 在此期間，玩家無法重新分配給其他代理 |
+
+### 2.2 層級結構
+
+**總代理 (Master Agent) > 一級代理 > 二級代理 > ... > 玩家**
+
+系統支援兩種運營模式：
+
+| 模式 | 說明 | 收入來源 |
+|------|------|---------|
+| **承攬 (Position Taking / Credit)** | 代理與平台共擔輸贏風險 | 基於持倉的盈虧分成 |
+| **純佣金 (Pure Commission)** | 代理僅賺取佣金，無風險暴露 | 基於玩家活動的佣金 |
+
+---
+
+## 3. 佣金計算
+
+### 3.1 佣金方案類型
+
+| 方案類型 | 基準 | 示例 |
+|---------|------|------|
+| **收入分成 (Revenue Share)** | 淨盈利 = 投注 - 輸贏 - 紅利 - 手續費 | 淨盈利 < $100k (30%), $100k-$500k (40%), > $500k (50%) |
+| **流水返佣 (Turnover Rebate)** | 有效投注額 (Valid Bet Amount) | 百家樂 0.8%, 老虎機 1.0% |
+| **CPA (Cost Per Acquisition)** | 每個符合條件的首存玩家 | 首存 >= $50 的玩家 $100 |
+
+### 3.2 階梯式收入分成計畫
+
+| 淨盈利範圍 | 佣金比率 |
+|-----------|---------|
 | < $100,000 | 30% |
 | $100,000 - $500,000 | 40% |
 | > $500,000 | 50% |
 
-### 3.3 Settlement Cycles
+### 3.3 結算週期
 
-| Cycle | Execution Time | Use Case |
-|-------|---------------|----------|
-| **Daily** | Every day at 02:00 | High-volume agents |
-| **Weekly** | Every Monday | Standard agents |
-| **Monthly** | 1st of each month | Master agents |
-
----
-
-## 4. Adjustment Wallet & Late Settlement
-
-The Adjustment Wallet resolves issues with cross-period bets and historical corrections.
-
-### 4.1 Core Principles
-
-- Historical settled reports are **immutable** and cannot be modified
-- Adjustments are recorded as separate entries in the current period
-- Both manual and system-automated adjustments are supported
-
-### 4.2 Adjustment Scenarios
-
-| Scenario | Description | Handling |
-|----------|-------------|----------|
-| **Late Arrival** | Previous period bet settled in current period | Add ADJUSTMENT entry in current period |
-| **Bet Rollback** | Game provider cancels a bet | Add negative ADJUSTMENT in current period |
-| **Manual Adjustment** | Finance team corrects an error | Add MANUAL ADJUSTMENT with approval |
-
-### 4.3 Commission Calculation Formula
-
-**Current Period Payable = Current Period Commission + Previous Period Carryover + Adjustments (Manual/System)**
+| 週期 | 執行時間 | 使用場景 |
+|------|---------|---------|
+| **每日 (Daily)** | 每天 02:00 | 高流量代理 |
+| **每週 (Weekly)** | 每週一 | 標準代理 |
+| **每月 (Monthly)** | 每月 1 日 | 總代理 |
 
 ---
 
-## 5. Negative Carryover Rules
+## 4. 調整錢包與延遲結算
 
-### 5.1 Definition
+調整錢包用於解決跨週期投注和歷史更正問題。
 
-When the current month's Net Win is negative (players win big), the agent's commission becomes negative. This negative value carries forward to the next month.
+### 4.1 核心原則
 
-### 5.2 Formula
+- 歷史已結算報表**不可變更**，無法修改
+- 調整記錄為當前週期的獨立條目
+- 支援人工調整和系統自動調整
+
+### 4.2 調整場景
+
+| 場景 | 說明 | 處理方式 |
+|------|------|---------|
+| **延遲到達 (Late Arrival)** | 前期投注在當期結算 | 在當期新增 ADJUSTMENT 條目 |
+| **投注回滾 (Bet Rollback)** | 遊戲供應商取消投注 | 在當期新增負值 ADJUSTMENT |
+| **人工調整 (Manual Adjustment)** | 財務團隊更正錯誤 | 新增 MANUAL ADJUSTMENT（需審批） |
+
+### 4.3 佣金計算公式
+
+**當期應付 = 當期佣金 + 前期結轉 + 調整（人工/系統）**
+
+---
+
+## 5. 負結轉規則
+
+### 5.1 定義
+
+當本月淨盈利為負（玩家贏大錢）時，代理的佣金變為負值。此負值將結轉至下個月。
+
+### 5.2 公式
 
 **Carryover_Next = Min(0, Current_Commission + Carryover_Previous)**
 
-### 5.3 Example
+### 5.3 示例
 
-| Period | Commission | Carryover In | Net Amount | Carryover Out |
-|--------|-----------|-------------|------------|---------------|
-| January | +$8,000 | -$10,000 | -$2,000 (not paid) | -$2,000 |
-| February | +$5,000 | -$2,000 | +$3,000 (paid) | $0 |
+| 週期 | 佣金 | 結轉入 | 淨金額 | 結轉出 |
+|------|-----|--------|--------|--------|
+| 一月 | +$8,000 | -$10,000 | -$2,000（不支付） | -$2,000 |
+| 二月 | +$5,000 | -$2,000 | +$3,000（支付） | $0 |
 
-### 5.4 Reset Mechanisms
+### 5.4 重置機制
 
-| Reset Type | Condition | Description |
-|-----------|-----------|-------------|
-| **Threshold Reset** | Negative value < -$1,000,000 (configurable) | Platform absorbs 50% to prevent agent loss |
-| **Time Reset** | January 1st annually (optional) | Used to incentivize new year promotions |
-| **Active Activity** | Agent inactive for 3+ consecutive months | Reset benefit suspended if no new active players |
-
----
-
-## 6. Commission Approval Process
-
-### 6.1 Approval Workflow
-
-1. System automatically calculates commission report (status: Pending)
-2. Finance team reviews commission data (excludes arbitrage and anomalies)
-3. Supervisor approves
-4. Commission released to agent wallet
-
-### 6.2 Approval Roles
-
-| Role | Responsibility |
-|------|---------------|
-| **System** | Auto-calculate and generate pending report |
-| **Finance Staff** | Review data accuracy, flag anomalies |
-| **Finance Supervisor** | Final approval |
-| **System** | Transfer to agent wallet after approval |
+| 重置類型 | 條件 | 說明 |
+|---------|------|------|
+| **閾值重置 (Threshold Reset)** | 負值 < -$1,000,000（可配置） | 平台吸收 50% 以防止代理虧損 |
+| **時間重置 (Time Reset)** | 每年 1 月 1 日（可選） | 用於激勵新年促銷 |
+| **活躍限制 (Active Activity)** | 代理連續 3+ 個月不活躍 | 若無新活躍玩家則暫停重置福利 |
 
 ---
 
-## 7. Agent Portal
+## 6. 佣金審批流程
 
-The agent portal is a separate login entry from the player frontend.
+### 6.1 審批工作流
 
-### 7.1 Dashboard
+1. 系統自動計算佣金報表（狀態：Pending）
+2. 財務團隊審查佣金資料（排除套利和異常）
+3. 主管審批
+4. 佣金釋放至代理錢包
 
-| Widget | Description |
-|--------|-------------|
-| **Today's New Members** | Count of newly registered players under this agent |
-| **Today's Commission** | Estimated commission for the current day |
-| **Active Players** | Number of active players (bet in last 30 days) |
+### 6.2 審批角色
 
-### 7.2 Promotional Tools
-
-| Tool | Description |
-|------|-------------|
-| **Referral Link Generator** | Create unique referral links for campaigns |
-| **Banner Downloads** | Download promotional banner materials |
-| **QR Code** | Auto-generated QR code for referral link |
-
-### 7.3 Reports Available
-
-| Report | Description |
-|--------|-------------|
-| **Downstream Player Report** | List of all players under this agent |
-| **Win/Loss Report** | Player win/loss summary by period |
-| **Commission History** | Historical commission records with status |
+| 角色 | 職責 |
+|------|------|
+| **系統 (System)** | 自動計算並生成待審報表 |
+| **財務人員 (Finance Staff)** | 審查資料準確性，標記異常 |
+| **財務主管 (Finance Supervisor)** | 最終審批 |
+| **系統 (System)** | 審批後轉帳至代理錢包 |
 
 ---
 
-## 8. Risk Control
+## 7. 代理門戶
 
-### 8.1 Same IP Detection
+代理門戶是與玩家前端獨立的登入入口。
 
-When an agent and their downstream players use the same IP address, the account is flagged as abnormal (possible self-commission fraud).
+### 7.1 儀表板
 
-| Detection | Rule | Action |
-|-----------|------|--------|
-| Same IP | Agent login IP matches player login IP | Flag agent account |
-| High frequency | Agent creates multiple players from same IP in short time | Lock agent account |
-| Commission spike | Abnormal commission increase coinciding with same-IP activity | Trigger investigation |
+| 小工具 | 說明 |
+|--------|------|
+| **今日新增會員** | 此代理下新註冊玩家數 |
+| **今日佣金** | 當日預估佣金 |
+| **活躍玩家** | 活躍玩家數（最近 30 天有投注） |
 
-### 8.2 Commission Amount Anomaly
+### 7.2 推廣工具
 
-| Indicator | Threshold | Action |
-|-----------|-----------|--------|
-| Single agent commission | > $100,000 per period | Flag for review |
-| Negative carryover | > $100,000 negative | Requires manual audit |
-| Consecutive negative months | 3+ months | Flag downstream player anomaly |
+| 工具 | 說明 |
+|------|------|
+| **推薦連結生成器** | 為活動建立獨特推薦連結 |
+| **橫幅下載** | 下載推廣橫幅素材 |
+| **QR 碼** | 自動生成推薦連結的 QR 碼 |
 
----
+### 7.3 可用報表
 
-## 9. Business KPIs
-
-| KPI | Target | Measurement |
-|-----|--------|-------------|
-| **Agent Acquisition Cost** | < $200/agent | Marketing spend / new agents |
-| **Player per Agent** | > 50 active players | Average active players per agent |
-| **Commission Payout Ratio** | 25-40% of GGR | Total commission / GGR |
-| **On-time Settlement Rate** | > 95% | Settled on time / total settlements |
-| **Agent Retention** | > 80% annual | Active agents / total agents |
+| 報表 | 說明 |
+|------|------|
+| **下級玩家報表** | 此代理下所有玩家清單 |
+| **輸贏報表** | 按週期的玩家輸贏摘要 |
+| **佣金歷史** | 歷史佣金記錄及狀態 |
 
 ---
 
-## Success Metrics
+## 8. 風險控制
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Agent Acquisition Cost | < $200 per agent | Total marketing spend / new agent registrations |
-| Players per Agent | > 50 active players | Average active players per agent (bet in last 30 days) |
-| Commission Payout Ratio | 25-40% of GGR | Total commission paid / Gross Gaming Revenue |
-| On-time Settlement Rate | > 95% | Settlements completed on schedule / total settlements |
-| Agent Retention | > 80% annually | Active agents (logged in within 90 days) / total registered agents |
-| Same-IP Fraud Detection Rate | 100% detection | All agent-player IP matches flagged automatically |
-| Commission Calculation Accuracy | 100% | Zero commission calculation errors after system approval |
-| Negative Carryover Resolution | Within 6 months | Average time to clear negative carryover balance |
+### 8.1 同 IP 偵測
+
+當代理與其下級玩家使用相同 IP 地址時，帳號將被標記為異常（可能的自佣欺詐）。
+
+| 偵測類型 | 規則 | 動作 |
+|---------|------|------|
+| 同 IP | 代理登入 IP 與玩家登入 IP 相同 | 標記代理帳號 |
+| 高頻率 | 代理在短時間內從同一 IP 建立多個玩家 | 鎖定代理帳號 |
+| 佣金激增 | 佣金異常增長且同時出現同 IP 活動 | 觸發調查 |
+
+### 8.2 佣金金額異常
+
+| 指標 | 閾值 | 動作 |
+|------|------|------|
+| 單一代理佣金 | > $100,000 每週期 | 標記以供審查 |
+| 負結轉 | > $100,000 負值 | 需人工審計 |
+| 連續負月份 | 3+ 個月 | 標記下級玩家異常 |
+
+---
+
+## 9. 業務 KPI
+
+| KPI | 目標 | 衡量方式 |
+|-----|------|---------|
+| **代理獲取成本** | < $200/代理 | 營銷支出 / 新增代理數 |
+| **每代理玩家數** | > 50 活躍玩家 | 平均每代理活躍玩家數 |
+| **佣金支付比率** | 25-40% of GGR | 總佣金 / GGR |
+| **準時結算率** | > 95% | 準時結算 / 總結算數 |
+| **代理留存率** | > 80% 年度 | 活躍代理 / 總代理數 |
+
+---
+
+## 成功指標 (Success Metrics)
+
+| 指標 | 目標 | 衡量方式 |
+|------|------|---------|
+| 代理獲取成本 | < $200 每代理 | 總營銷支出 / 新代理註冊數 |
+| 每代理玩家數 | > 50 活躍玩家 | 平均每代理活躍玩家數（最近 30 天有投注） |
+| 佣金支付比率 | 25-40% of GGR | 總佣金支付 / 總遊戲收入 |
+| 準時結算率 | > 95% | 準時完成的結算 / 總結算數 |
+| 代理留存率 | > 80% 年度 | 活躍代理（90 天內登入）/ 總註冊代理數 |
+| 同 IP 欺詐偵測率 | 100% 偵測 | 所有代理-玩家 IP 匹配自動標記 |
+| 佣金計算準確率 | 100% | 系統審批後零佣金計算錯誤 |
+| 負結轉解決時間 | 6 個月內 | 清除負結轉餘額的平均時間 |
 
 ---
 

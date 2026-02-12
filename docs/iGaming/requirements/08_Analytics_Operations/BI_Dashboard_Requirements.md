@@ -1,4 +1,4 @@
-# BI Dashboard & Data Pipeline Business Requirements
+# BI 儀表板與資料管道業務需求
 
 > **Canonical Source**: [source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md](../../source-archive/08_Analytics_BI/08-04_Reporting_Architecture.md)
 > **View Type**: Business Requirements
@@ -8,185 +8,196 @@
 
 ---
 
-## 1. Business Overview
+## 業務價值 (Business Value)
 
-The BI Dashboard and Data Pipeline system addresses the operational analytics needs of the iGaming platform. It provides real-time monitoring for operations teams, historical analysis for executives, and compliance reporting for regulators. The system supports both immediate operational decisions (within seconds) and strategic analysis (next-day reports).
-
----
-
-## Business Value
-
-This feature delivers value by:
-- Enabling real-time operational decisions through Hot Path data (< 5 second delay) for risk alerts, capacity monitoring, and incident response
-- Supporting strategic business decisions through T+1 reports with 100% data completeness for settlement reconciliation and compliance
-- Ensuring multi-tenant data isolation with mandatory tenant_id filtering on all queries, protecting operator data privacy
-- Meeting regulatory requirements through automated compliance reporting with 7+ year data retention for audit purposes
-- Protecting player privacy through systematic PII masking (name, phone, ID, email) before data enters the analytics layer
-- Enabling business self-service through ad-hoc queries, custom dashboards, and scheduled reports without engineering dependency
+此功能交付的價值：
+- **實現即時營運決策**：熱路徑資料交付（< 5 秒）使營運團隊能立即偵測並回應容量問題、支付供應商故障和風險告警，防止收入損失
+- **支援策略規劃**：T+1 高層儀表板提供玩家 LTV 趨勢和市場績效，支援市場擴張和合作夥伴管理的數據驅動決策
+- **滿足監管合規要求**：自動化合規報表交付（每月、每年）確保及時提交給 UKGC、MGA 和審計團隊，避免罰款
+- **減少人工報表工作量**：自助分析和預建模板消除 80%+ 對工程團隊的人工資料提取請求
+- **確保財務結算資料準確性**：冷路徑 (T+1) 100% 資料完整性確保準確的代理結算和對帳，防止爭議和退款
 
 ---
 
-## 2. Dashboard Requirements by Role
+## 1. 業務概述
 
-### 2.1 Operations Dashboard (Real-time)
-
-| Widget | Metric | Refresh Rate | Purpose |
-|--------|--------|-------------|---------|
-| Online Players | Current connected users | Every 10 seconds | Capacity monitoring |
-| Today's Deposits | Cumulative deposit total | Every 5 minutes | Revenue tracking |
-| Today's GGR | Gross Gaming Revenue | Every hour | Revenue monitoring |
-| Risk Alerts | Active risk event count | Real-time | Incident response |
-| PSP Status | Payment provider availability | Every minute | Service monitoring |
-
-### 2.2 Executive Dashboard (T+1)
-
-| Widget | Metric | Refresh Rate | Purpose |
-|--------|--------|-------------|---------|
-| Monthly P&L | Profit & Loss statement | Daily | Financial health |
-| Player LTV Trends | Lifetime value by segment | Weekly | Strategic planning |
-| Market Performance | Revenue by jurisdiction | Daily | Market expansion decisions |
-| Agent Network Health | Top agents, commission ratios | Weekly | Partner management |
-| Compliance Status | Regulatory report readiness | Monthly | Risk mitigation |
-
-### 2.3 Self-Service Analytics
-
-| Capability | Description | Target Users |
-|-----------|-------------|-------------|
-| Ad-hoc Queries | Free-form query builder | BI Analysts |
-| Pre-built Templates | Standard analysis templates | Operations team |
-| Custom Dashboards | Drag-and-drop dashboard builder | All authorized users |
-| Scheduled Reports | Automated periodic report delivery | Managers |
+BI 儀表板和資料管道系統滿足 iGaming 平台的營運分析需求。它為營運團隊提供即時監控，為高層提供歷史分析，為監管機構提供合規報告。系統支援即時營運決策（秒級）和策略分析（次日報表）。
 
 ---
 
-## 3. Data Timeliness Requirements
+## 業務價值 (Business Value)
 
-### 3.1 Data Path Categories
-
-| Path Type | Maximum Delay | Data Completeness | Use Case |
-|-----------|--------------|-------------------|----------|
-| **Hot Path** | < 5 seconds | May have gaps | Operations monitoring, risk alerts |
-| **Warm Path** | 5-60 seconds | High (99%+) | Real-time dashboards, anomaly detection |
-| **Cold Path** | Next day (T+1) | 100% complete | Business reports, settlement reconciliation |
-
-### 3.2 Report Freshness Requirements
-
-| Report Type | Delivery Time | Stakeholder |
-|-------------|--------------|-------------|
-| Real-time KPI Dashboard | Continuous (< 5 min delay) | Operations team |
-| Daily Financial Report | By 03:00 AM next day | Finance team |
-| Weekly Agent Settlement | By Monday 06:00 AM | Agent operations |
-| Monthly Compliance Report | By 2nd of following month | Compliance team |
-| Annual Audit Report | By January 15th | External auditors |
+此功能交付的價值：
+- 透過熱路徑資料（< 5 秒延遲）實現即時營運決策，用於風險告警、容量監控和事件回應
+- 透過 T+1 報表支援策略業務決策，100% 資料完整性用於結算對帳和合規
+- 透過強制 tenant_id 過濾確保多租戶資料隔離，保護營運商資料隱私
+- 透過自動化合規報告滿足監管要求，並保留 7+ 年資料用於審計
+- 透過系統性 PII 遮罩（姓名、電話、ID、郵件）保護玩家隱私，資料進入分析層前完成
+- 透過臨時查詢、自訂儀表板和排程報表實現業務自助服務，無需工程依賴
 
 ---
 
-## 4. Data Quality Requirements
+## 2. 按角色的儀表板需求
 
-### 4.1 Quality Dimensions
+### 2.1 營運儀表板（即時）
 
-| Dimension | Definition | Target |
-|-----------|------------|--------|
-| **Completeness** | All expected records are present | > 99.9% |
-| **Accuracy** | Values match source of truth | 100% (financial), 99%+ (operational) |
-| **Timeliness** | Data available within SLA window | 99.5% |
-| **Consistency** | Same metric yields same result across views | 100% |
-| **Uniqueness** | No duplicate records | 100% |
+| 小工具 | 指標 | 更新頻率 | 用途 |
+|--------|------|---------|------|
+| 線上玩家 | 當前連線用戶數 | 每 10 秒 | 容量監控 |
+| 今日存款 | 累計存款總額 | 每 5 分鐘 | 收入追蹤 |
+| 今日 GGR | 總遊戲收入 | 每小時 | 收入監控 |
+| 風險告警 | 活躍風險事件數 | 即時 | 事件回應 |
+| PSP 狀態 | 支付供應商可用性 | 每分鐘 | 服務監控 |
 
-### 4.2 Data Correction Policy
+### 2.2 高層儀表板（T+1）
 
-When historical transactions are voided or adjusted:
+| 小工具 | 指標 | 更新頻率 | 用途 |
+|--------|------|---------|------|
+| 月度損益 | 損益表 | 每日 | 財務健康 |
+| 玩家 LTV 趨勢 | 按分群的生命週期價值 | 每週 | 策略規劃 |
+| 市場績效 | 按司法管轄區的收入 | 每日 | 市場擴張決策 |
+| 代理網絡健康 | 頂級代理、佣金比率 | 每週 | 合作夥伴管理 |
+| 合規狀態 | 監管報表就緒度 | 每月 | 風險緩解 |
 
-| Policy | Description |
-|--------|-------------|
-| **Immutability** | Historical reports are never modified retroactively |
-| **Idempotent Overwrite** | Recalculate affected date partition from raw data |
-| **Audit Trail** | All corrections logged with timestamp, reason, and operator |
+### 2.3 自助分析
 
----
-
-## 5. Multi-Tenant Data Requirements
-
-### 5.1 Isolation Rules
-
-| Rule | Description |
-|------|-------------|
-| **Logical Isolation** | All tenants share infrastructure, separated by tenant_id |
-| **Mandatory Filtering** | Every query must include tenant_id filter |
-| **Cross-Tenant View** | Only platform-level admins can view across tenants |
-| **Platform Reports** | Aggregated cross-tenant reports (e.g., total platform GGR) available to platform admins only |
-
-### 5.2 Tenant-Level Customization
-
-| Customization | Description |
-|---------------|-------------|
-| Custom KPIs | Tenants can define additional tracking metrics |
-| Report Branding | Tenant logo and colors on exported reports |
-| Dashboard Layout | Customizable widget arrangement |
-| Scheduled Delivery | Tenant-specific report delivery schedule |
+| 能力 | 說明 | 目標用戶 |
+|------|------|---------|
+| 臨時查詢 | 自由形式查詢建構器 | BI 分析師 |
+| 預建模板 | 標準分析模板 | 營運團隊 |
+| 自訂儀表板 | 拖放式儀表板建構器 | 所有授權用戶 |
+| 排程報表 | 自動定期報表交付 | 管理人員 |
 
 ---
 
-## 6. Data Retention Business Rules
+## 3. 資料時效性需求
 
-| Data Category | Retention Period | Storage Tier | Access Pattern |
-|--------------|-----------------|-------------|----------------|
-| **Real-time metrics** | 5 minutes | Hot (in-memory) | Very high frequency |
-| **Recent operational data** | 3 months | Fast (SSD) | High frequency |
-| **Historical reports** | 3 months - 1 year | Standard (HDD) | Moderate frequency |
-| **Archived data** | 1+ years | Cold (object storage) | Audit/compliance only |
-| **Compliance archives** | 7+ years | Cold (object storage) | Regulatory requests only |
+### 3.1 資料路徑類別
 
----
+| 路徑類型 | 最大延遲 | 資料完整性 | 使用場景 |
+|---------|---------|-----------|---------|
+| **熱路徑 (Hot Path)** | < 5 秒 | 可能有缺口 | 營運監控、風險告警 |
+| **溫路徑 (Warm Path)** | 5-60 秒 | 高 (99%+) | 即時儀表板、異常偵測 |
+| **冷路徑 (Cold Path)** | 次日 (T+1) | 100% 完整 | 業務報表、結算對帳 |
 
-## 7. Data Privacy & Masking Requirements
+### 3.2 報表新鮮度需求
 
-All personally identifiable information (PII) must be masked before entering the analytics layer.
-
-| Data Type | Masking Rule | Example |
-|-----------|-------------|---------|
-| **Name** | First and last initial + asterisks | R** C** |
-| **Phone** | Partial digits visible | 0912***789 |
-| **ID Number** | Partial digits visible | A12****89 |
-| **Email** | Partial address visible | r***@gmail.com |
+| 報表類型 | 交付時間 | 利害關係人 |
+|---------|---------|-----------|
+| 即時 KPI 儀表板 | 持續（< 5 分鐘延遲） | 營運團隊 |
+| 每日財務報表 | 次日 03:00 AM 前 | 財務團隊 |
+| 每週代理結算 | 週一 06:00 AM 前 | 代理營運 |
+| 每月合規報表 | 次月 2 日前 | 合規團隊 |
+| 年度審計報表 | 1 月 15 日前 | 外部審計員 |
 
 ---
 
-## 8. Processing Mode Decision Guide
+## 4. 資料品質需求
 
-For product managers evaluating new report requests:
+### 4.1 品質維度
 
-| Question | Answer: Real-time | Answer: Batch (T+1) |
-|----------|-------------------|---------------------|
-| Does the business lose money with a 1-day delay? | Yes | No |
-| Is the metric used for immediate operational decisions? | Yes | No |
-| Does regulatory compliance require real-time monitoring? | Yes | No |
-| Is the calculation simple (counts, sums)? | Suitable for real-time | Either |
-| Does the calculation require complex joins across tables? | Consider batch instead | Yes |
-| Must the data be 100% accurate? | Consider hybrid approach | Yes |
+| 維度 | 定義 | 目標 |
+|------|------|------|
+| **完整性 (Completeness)** | 所有預期記錄都存在 | > 99.9% |
+| **準確性 (Accuracy)** | 值符合真實來源 | 100%（財務），99%+（營運） |
+| **時效性 (Timeliness)** | 資料在 SLA 時間窗口內可用 | 99.5% |
+| **一致性 (Consistency)** | 相同指標在不同檢視中產生相同結果 | 100% |
+| **唯一性 (Uniqueness)** | 無重複記錄 | 100% |
+
+### 4.2 資料更正政策
+
+當歷史交易被作廢或調整時：
+
+| 政策 | 說明 |
+|------|------|
+| **不可變性 (Immutability)** | 歷史報表永不追溯修改 |
+| **冪等覆寫 (Idempotent Overwrite)** | 從原始資料重新計算受影響的日期分區 |
+| **審計軌跡 (Audit Trail)** | 所有更正記錄時間戳、原因和操作者 |
 
 ---
 
-## 9. BI Tool Requirements
+## 5. 多租戶資料需求
 
-### 9.1 Tool Selection Criteria
+### 5.1 隔離規則
 
-| Criterion | Requirement |
-|-----------|-------------|
-| **Self-service** | Business users can build queries without engineering support |
-| **Real-time** | Support for live dashboards with sub-minute refresh |
-| **Export** | Excel, PDF, CSV export capabilities |
-| **Embedding** | Dashboards embeddable in admin portal |
-| **Access Control** | Role-based data access restrictions |
-| **Cost** | Preference for open-source solutions |
+| 規則 | 說明 |
+|------|------|
+| **邏輯隔離** | 所有租戶共享基礎設施，透過 tenant_id 分隔 |
+| **強制過濾** | 每個查詢必須包含 tenant_id 過濾器 |
+| **跨租戶檢視** | 僅平台級管理員可跨租戶檢視 |
+| **平台報表** | 聚合的跨租戶報表（例如總平台 GGR）僅供平台管理員使用 |
 
-### 9.2 Recommended Tool Allocation
+### 5.2 租戶級自訂
 
-| Tool Category | Use Case | Users |
-|--------------|----------|-------|
-| **Real-time Monitoring** | Live KPIs, system health, risk alerts | Operations team |
-| **Self-service Analytics** | Business team queries, player segmentation, campaign analysis | Business analysts |
-| **Advanced Analytics** | Data scientist deep analysis, custom SQL, custom visualizations | Data team |
+| 自訂 | 說明 |
+|------|------|
+| 自訂 KPI | 租戶可定義額外的追蹤指標 |
+| 報表品牌 | 匯出報表上的租戶標誌和顏色 |
+| 儀表板佈局 | 可自訂小工具排列 |
+| 排程交付 | 租戶特定的報表交付排程 |
+
+---
+
+## 6. 資料保留業務規則
+
+| 資料類別 | 保留期限 | 存儲層級 | 存取模式 |
+|---------|---------|---------|---------|
+| **即時指標** | 5 分鐘 | 熱（記憶體中） | 極高頻率 |
+| **近期營運資料** | 3 個月 | 快速 (SSD) | 高頻率 |
+| **歷史報表** | 3 個月 - 1 年 | 標準 (HDD) | 中等頻率 |
+| **歸檔資料** | 1+ 年 | 冷（對象存儲） | 審計/合規僅 |
+| **合規歸檔** | 7+ 年 | 冷（對象存儲） | 僅監管請求 |
+
+---
+
+## 7. 資料隱私與遮罩需求
+
+所有個人可識別資訊 (PII) 必須在進入分析層前進行遮罩。
+
+| 資料類型 | 遮罩規則 | 示例 |
+|---------|---------|------|
+| **姓名** | 首尾字母 + 星號 | R** C** |
+| **電話** | 部分數字可見 | 0912***789 |
+| **ID 號碼** | 部分數字可見 | A12****89 |
+| **郵件** | 部分地址可見 | r***@gmail.com |
+
+---
+
+## 8. 處理模式決策指南
+
+產品經理評估新報表請求時：
+
+| 問題 | 答案：即時 | 答案：批次 (T+1) |
+|------|-----------|-----------------|
+| 業務會因 1 天延遲而損失金錢嗎？ | 是 | 否 |
+| 指標用於立即營運決策嗎？ | 是 | 否 |
+| 監管合規需要即時監控嗎？ | 是 | 否 |
+| 計算簡單（計數、總和）嗎？ | 適合即時 | 任一 |
+| 計算需要跨表複雜連接嗎？ | 考慮批次替代 | 是 |
+| 資料必須 100% 準確嗎？ | 考慮混合方法 | 是 |
+
+---
+
+## 9. BI 工具需求
+
+### 9.1 工具選擇標準
+
+| 標準 | 需求 |
+|------|------|
+| **自助服務** | 業務用戶可在無工程支援下建構查詢 |
+| **即時** | 支援低於分鐘級更新的即時儀表板 |
+| **匯出** | Excel、PDF、CSV 匯出能力 |
+| **嵌入** | 儀表板可嵌入管理入口 |
+| **存取控制** | 基於角色的資料存取限制 |
+| **成本** | 偏好開源解決方案 |
+
+### 9.2 建議工具分配
+
+| 工具類別 | 使用場景 | 用戶 |
+|---------|---------|------|
+| **即時監控** | 即時 KPI、系統健康、風險告警 | 營運團隊 |
+| **自助分析** | 業務團隊查詢、玩家分群、活動分析 | 業務分析師 |
+| **進階分析** | 資料科學家深度分析、自訂 SQL、自訂視覺化 | 資料團隊 |
 
 ---
 

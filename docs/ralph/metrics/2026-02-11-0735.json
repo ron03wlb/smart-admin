@@ -1,0 +1,119 @@
+[
+  {
+    "timestamp": "2026-02-10T23:35:01.880Z",
+    "iteration": 2,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:07.932Z",
+    "iteration": 3,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:14.960Z",
+    "iteration": 4,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 7,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:22.115Z",
+    "iteration": 5,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 8,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:32.129Z",
+    "iteration": 6,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 10,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:37.919Z",
+    "iteration": 7,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 5,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:43.676Z",
+    "iteration": 8,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:49.493Z",
+    "iteration": 9,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-10T23:35:55.204Z",
+    "iteration": 10,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  }
+]

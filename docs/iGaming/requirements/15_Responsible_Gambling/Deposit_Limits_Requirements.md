@@ -1,4 +1,4 @@
-# Deposit & Loss Limits Requirements (存款及虧損限額業務需求)
+# 存款及虧損限額需求
 
 > **Canonical Source**: [15-02_Deposit_Limits.md](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md), [15-06_Loss_Limits.md](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md)
 > **View Type**: Business Requirements
@@ -8,246 +8,270 @@
 
 ---
 
-## Business Value
+## 業務價值
 
-This requirements document delivers strategic value by:
-- **Regulatory Compliance**: Implements UKGC LCCP SR 3.4.1 mandatory pre-deposit limit setup (effective 2025-10-31) and Germany GlüStV EUR 1,000/month cap
-- **Player Harm Prevention**: Establishes asymmetric cooling-off rules (immediate effect for limit decreases, 24-72h delay for increases) preventing impulsive limit removal
-- **Loss Limit Protection**: Differentiates deposit limits (input control) from loss limits (outcome control) with real-time net loss tracking
-- **Reconciliation Assurance**: Mandates zero-tolerance for system-caused limit breaches with UKGC 24-hour reporting requirement
-
----
-
-## Acceptance Criteria
-
-- [ ] Pre-deposit limit setup enforced for all new UKGC players (cannot skip to deposit page)
-- [ ] Daily, weekly, and monthly deposit limits function correctly with UTC 00:00 reset
-- [ ] Limit hierarchy validated: Daily <= Weekly <= Monthly (recommended)
-- [ ] Lowering limits takes effect immediately without cooling-off
-- [ ] Raising limits enters 24-72 hour cooling-off period (per jurisdiction)
-- [ ] Player can cancel limit increase request during cooling-off
-- [ ] Loss limit calculation: Net Loss = Total Bets - Total Wins (real-time)
-- [ ] Betting blocked when loss limit reached; re-enabled when wins reduce net loss
-- [ ] 80% limit warning notification sent to player
-- [ ] System-caused limit breaches trigger P0 alert with UKGC reporting within 24 hours
+本需求文檔提供以下策略價值：
+- **監管合規**：實施 UKGC LCCP SR 3.4.1 強制性存款前限額設定（2025-10-31 生效）及德國 GlüStV EUR 1,000/月上限
+- **玩家傷害預防**：建立不對稱冷卻期規則（限額降低立即生效，限額提高需 24-72 小時延遲）防止衝動性限額移除
+- **虧損限額保護**：區分存款限額（Input）輸入控制）與虧損限額（輸出控制）並提供實時淨虧損追蹤
+- **對帳保障**：對系統導致的限額違規實施零容忍政策，UKGC 要求 24 小時內報告
 
 ---
 
-## 1. Overview
+## 驗收標準
 
-Deposit Limits and Loss Limits are core player protection tools that help players control their gambling expenditure. This document defines the business requirements for both deposit and loss limit management, including time-based limits, cooling-off periods for changes, and reconciliation.
+- [ ] 所有新 UKGC 玩家強制執行存款前限額設定（無法跳過至存款頁面）
+- [ ] 每日、每週及每月存款限額功能正常，UTC 00:00 重置
+- [ ] 限額層級驗證：每日 <= 每週 <= 每月（建議）
+- [ ] 降低限額立即生效，無冷卻期
+- [ ] 提高限額進入 24-72 小時冷卻期（依司法管轄區）
+- [ ] 玩家可在冷卻期內取消限額提高請求
+- [ ] 虧損限額計算：淨虧損 = 總投注 - 總贏彩（實時）
+- [ ] 達到虧損限額時禁止投注；贏彩減少淨虧損時重新啟用
+- [ ] 達到限額 80% 時發送警告通知給玩家
+- [ ] 系統導致的限額違規觸發 P0 警報，並在 24 小時內向 UKGC 報告
 
 ---
 
-## 2. Regulatory Requirements
+## 1. 概述
 
-### 2.1 Deposit Limits
+存款限額 (Deposit Limits) 和虧損限額 (Loss Limits) 是核心玩家保護工具，幫助玩家控制其賭博支出。本文檔定義存款和虧損限額管理的業務需求，包括基於時間的限額、變更冷卻期及對帳機制。
 
-| Regulator | Clause | Limit Types | Special Requirements |
+---
+
+## 2. 業務價值
+
+本功能提供以下價值：
+- **UKGC 2025 合規**：實施強制性存款前限額設定（LCCP SR 3.4.1，2025-10-31 生效），確保所有英國玩家在首次存款前設定限額，避免監管處罰和牌照吊銷
+- **玩家保護**：通過存款限額（控制存入資金）和虧損限額（控制實際損失）提供雙層保護，賦能玩家在安全範圍內賭博並降低問題賭博風險
+- **運營風險緩解**：對帳機制確保系統強制執行的限額永不違規（目標：0 次系統導致的違規），防止退款義務和監管報告事件
+- **多司法管轄區彈性**：支持特定司法管轄區限額規則（德國 EUR 1,000 月度上限、荷蘭默認限額、UKGC 24-72 小時冷卻期），實現跨主要市場合規運營
+
+---
+
+## 3. 驗收標準
+
+- [ ] **存款前限額設定（UKGC 2025-10-31）**：新英國玩家必須在訪問存款頁面前至少設定一個基於時間的限額（每日/每週/每月）- 不允許繞過
+- [ ] **限額降低立即生效**：玩家降低存款或虧損限額時，新限額立即生效並發送確認通知
+- [ ] **限額提高冷卻期**：提高/移除限額觸發 24-72 小時冷卻期（可按司法管轄區配置），玩家可在冷卻期內取消
+- [ ] **層級驗證**：系統強制執行限額層級規則 - 每日 ≤ 每週 ≤ 每月（建議）- 並按順序驗證（每日 → 每週 → 每月）
+- [ ] **虧損限額計算準確性**：淨虧損 = 總投注 - 總贏彩 - 贏彩正確減少累積虧損並在淨虧損低於限額時重新啟用投注
+- [ ] **限額違規預防**：超過當前剩餘限額的存款/投注嘗試將被拒絕，並顯示清晰消息展示剩餘額度
+- [ ] **對帳零容忍**：每日對帳作業檢測並自動報告任何系統導致的限額違規，24 小時內報告至合規團隊（目標：0 次違規）
+- [ ] **接近限額警告**：當任何限額達到 80% 時通知玩家，顯示當前使用量和剩餘金額
+- [ ] **德國司法管轄區上限**：德國玩家無法設定月度存款限額 > EUR 1,000（法定上限）- 系統強制執行此硬限額，無論玩家請求
+
+---
+
+## 4. 監管要求
+
+### 2.1 存款限額
+
+| 監管機構 | 條款 | 限額類型 | 特殊要求 |
 |-----------|--------|------------|---------------------|
-| **UKGC** | LCCP SR 3.4.1 | Daily/Weekly/Monthly | Must prompt before first deposit (2025-10-31) |
-| **MGA** | Player Protection Directive | Daily/Weekly/Monthly | Must provide limit options |
-| **PAGCOR** | Responsible Gaming Guidelines | Daily/Weekly/Monthly | Operator-defined |
-| **Netherlands** | KOA Remote Gambling Act | Daily/Weekly/Monthly | Mandatory upper limits |
-| **Germany** | GlüStV 2021 | Monthly | Mandatory cap at EUR 1,000/month |
+| **UKGC** | LCCP SR 3.4.1 | 每日/每週/每月 | 首次存款前必須提示（2025-10-31） |
+| **MGA** | Player Protection Directive | 每日/每週/每月 | 必須提供限額選項 |
+| **PAGCOR** | Responsible Gaming Guidelines | 每日/每週/每月 | 營運商自定義 |
+| **Netherlands** | KOA Remote Gambling Act | 每日/每週/每月 | 強制性上限 |
+| **Germany** | GlüStV 2021 | 每月 | 強制上限為 EUR 1,000/月 |
 
-### 2.2 Loss Limits (Additional)
+### 2.2 虧損限額（附加）
 
-Loss limits differ from deposit limits in calculation basis:
+虧損限額與存款限額在計算基礎上有所不同：
 
-| Feature | Deposit Limit | Loss Limit |
+| 功能 | 存款限額 (Deposit Limit) | 虧損限額 (Loss Limit) |
 |---------|--------------|------------|
-| **Calculation basis** | Deposit amount | Net loss amount |
-| **Purpose** | Control funds deposited | Control actual losses |
-| **Formula** | Cumulative deposits | Total bets - Total wins |
-| **Win impact** | Not affected | Reduces accumulated loss |
+| **計算基礎** | 存款金額 | 淨虧損金額 |
+| **目的** | 控制存入資金 | 控制實際損失 |
+| **公式** | 累積存款 | 總投注 - 總贏彩 |
+| **贏彩影響** | 不受影響 | 減少累積虧損 |
 
 ---
 
-## 3. Deposit Limit Types
+## 3. 存款限額類型
 
-### 3.1 Time-Based Limits
+### 3.1 基於時間的限額
 
-| Limit Type | Period | Reset Time | Description |
+| 限額類型 | 週期 | 重置時間 | 說明 |
 |-----------|--------|-----------|-------------|
-| Daily limit | 24 hours | UTC 00:00 | Restricts total daily deposits |
-| Weekly limit | 7 days | Monday UTC 00:00 | Restricts total weekly deposits |
-| Monthly limit | 30 days | 1st of month UTC 00:00 | Restricts total monthly deposits |
+| 每日限額 | 24 小時 | UTC 00:00 | 限制每日總存款 |
+| 每週限額 | 7 天 | 週一 UTC 00:00 | 限制每週總存款 |
+| 每月限額 | 30 天 | 每月 1 日 UTC 00:00 | 限制每月總存款 |
 
-### 3.2 Hierarchy Rules
+### 3.2 層級規則
 
-- Monthly limit >= Weekly limit (recommended)
-- Weekly limit >= Daily limit (recommended)
-- Validation order: Daily -> Weekly -> Monthly
-- Any limit reached -> Block deposit
+- 每月限額 >= 每週限額（建議）
+- 每週限額 >= 每日限額（建議）
+- 驗證順序：每日 -> 每週 -> 每月
+- 任何限額達到 -> 阻止存款
 
-### 3.3 Default Limits by Jurisdiction
+### 3.3 依司法管轄區默認限額
 
-| Jurisdiction | Default Daily | Default Weekly | Default Monthly |
+| 司法管轄區 | 默認每日 | 默認每週 | 默認每月 |
 |-------------|--------------|----------------|-----------------|
-| UK | No default | No default | No default |
+| UK | 無默認值 | 無默認值 | 無默認值 |
 | Netherlands | EUR 200 | EUR 700 | EUR 2,000 |
-| Germany | - | - | EUR 1,000 (legal cap) |
+| Germany | - | - | EUR 1,000（法定上限） |
 
 ---
 
-## 4. Business Rules
+## 4. 業務規則
 
-### 4.1 Lowering Limits (Deposit & Loss)
+### 4.1 降低限額（存款及虧損）
 
-- **Effective immediately**, no cooling-off period
-- New limit applies to current period accumulation
-- If current period deposits already exceed new limit: no retroactive action, but block further deposits
-- Confirmation notification sent to player
+- **立即生效**，無冷卻期
+- 新限額適用於當前週期累積
+- 如果當前週期存款已超過新限額：不追溯，但阻止進一步存款
+- 發送確認通知給玩家
 
-### 4.2 Raising Limits (Deposit & Loss)
+### 4.2 提高限額（存款及虧損）
 
-- **24-72 hour cooling-off period** required (per jurisdiction)
-- Player can cancel the request during cooling-off
-- Requires secondary confirmation to take effect
-- Reason recording (optional)
+- **需要 24-72 小時冷卻期**（依司法管轄區）
+- 玩家可在冷卻期內取消請求
+- 需要二次確認才能生效
+- 原因記錄（可選）
 
-### 4.3 Removing Limits
+### 4.3 移除限額
 
-- Same process as raising limits
-- Sets limit to "no limit"
-- Cooling-off period applies
+- 與提高限額相同流程
+- 將限額設定為「無限額」
+- 適用冷卻期
 
 ---
 
-## 5. Pre-Deposit Limit Setup (UKGC 2025-10-31)
+## 5. 存款前限額設定（UKGC 2025-10-31）
 
-### 5.1 Compliance Requirements
+### 5.1 合規要求
 
-Per UKGC LCCP revised SR 3.4.1, effective October 31, 2025:
+根據 UKGC LCCP 修訂版 SR 3.4.1，2025 年 10 月 31 日生效：
 
-| Requirement | Description | Status |
+| 要求 | 說明 | 狀態 |
 |-------------|-------------|--------|
-| **Pre-deposit mandatory setup** | Player must set at least one limit before first deposit | NEW 2025-10-31 |
-| **Limit type selection** | At least one of daily/weekly/monthly | Mandatory |
-| **Cannot be skipped** | No bypass to deposit page without setting limits | Mandatory |
-| **Clear disclosure** | Inform player they can lower limits anytime (immediate effect) | Mandatory |
+| **存款前強制設定** | 玩家必須在首次存款前設定至少一個限額 | 新增 2025-10-31 |
+| **限額類型選擇** | 至少選擇每日/每週/每月之一 | 強制性 |
+| **無法跳過** | 未設定限額不能繞過至存款頁面 | 強制性 |
+| **清晰披露** | 告知玩家可隨時降低限額（立即生效） | 強制性 |
 
-### 5.2 Registration Flow Integration
+### 5.2 註冊流程整合
 
 ```
-Registration -> Account Verification -> Mandatory Limit Setup -> Confirm -> Allow Deposit
-                                           |
-                                           +-- Must complete before accessing deposit page
+註冊 -> 帳戶驗證 -> 強制限額設定 -> 確認 -> 允許存款
+                         |
+                         +-- 必須完成才能訪問存款頁面
 ```
 
 ---
 
-## 6. Loss Limit Calculation
+## 6. 虧損限額計算
 
-### 6.1 Net Loss Formula
-
-```
-Net Loss = Total Bets - Total Wins
-
-Where:
-- Total Bets: All player bets in the calculation period
-- Total Wins: All player winnings (including Jackpots) in the period
-```
-
-### 6.2 Calculation Example
+### 6.1 淨虧損公式
 
 ```
-Scenario: Player sets daily loss limit of $500
+淨虧損 = 總投注 - 總贏彩
 
-Timeline:
-09:00 - Deposit $1,000
-10:00 - Bet $300, Win $100 -> Net Loss: $200
-11:00 - Bet $200, Lose -> Net Loss: $400
-12:00 - Bet $100, Lose -> Net Loss: $500 -> LIMIT REACHED
-12:01 - Attempt to bet -> BLOCKED
-13:00 - Win $150 (from open bet) -> Net Loss: $350 -> CAN CONTINUE
+其中：
+- 總投注：計算週期內玩家所有投注
+- 總贏彩：該週期內所有玩家贏彩（包括累積獎金）
 ```
 
-### 6.3 Limit Breach Behavior Options
+### 6.2 計算範例
 
-| Option | Description | Use Case |
+```
+場景：玩家設定每日虧損限額為 $500
+
+時間線：
+09:00 - 存款 $1,000
+10:00 - 投注 $300，贏 $100 -> 淨虧損：$200
+11:00 - 投注 $200，輸 -> 淨虧損：$400
+12:00 - 投注 $100，輸 -> 淨虧損：$500 -> 達到限額
+12:01 - 嘗試投注 -> 被阻止
+13:00 - 贏 $150（來自未結投注）-> 淨虧損：$350 -> 可繼續
+```
+
+### 6.3 限額違規行為選項
+
+| 選項 | 說明 | 使用場景 |
 |--------|------------|----------|
-| Block betting | Prohibit new bets | Default behavior |
-| Warning + continue | Display warning, player may continue | Some jurisdictions allow |
-| Cooling-off | Mandatory 1-hour pause | Strict mode |
+| 阻止投注 | 禁止新投注 | 默認行為 |
+| 警告 + 繼續 | 顯示警告，玩家可繼續 | 某些司法管轄區允許 |
+| 冷卻期 | 強制 1 小時暫停 | 嚴格模式 |
 
 ---
 
-## 7. Deposit Limit Reconciliation
+## 7. 存款限額對帳
 
-### 7.1 Reconciliation Purpose
+### 7.1 對帳目的
 
-Ensure deposit limits are correctly enforced, preventing system bugs from allowing players to exceed limits.
+確保存款限額被正確強制執行，防止系統錯誤允許玩家超過限額。
 
-**Regulatory requirement**: UKGC LCCP SR 3.4.1 - Limits must be effectively enforced. Any violations must be recorded and reported.
+**監管要求**：UKGC LCCP SR 3.4.1 - 限額必須有效強制執行。任何違規必須記錄並報告。
 
-### 7.2 Breach Handling Matrix
+### 7.2 違規處理矩陣
 
-| Breach Type | Cause | Handling | Reporting |
+| 違規類型 | 原因 | 處理 | 報告 |
 |------------|-------|---------|-----------|
-| **Limit exceeded** | System bug | Refund excess amount + P0 alert | UKGC within 24h |
-| **Limit not set** | UKGC player without limit | Block deposits + force setup | Record |
-| **Near-limit warning** | > 90% usage | Notify player | None |
+| **限額超過** | 系統錯誤 | 退款超額金額 + P0 警報 | UKGC 24 小時內 |
+| **未設定限額** | UKGC 玩家無限額 | 阻止存款 + 強制設定 | 記錄 |
+| **接近限額警告** | > 90% 使用量 | 通知玩家 | 無 |
 
 ---
 
-## 8. Notification Requirements
+## 8. 通知要求
 
-| Event | Timing | Content |
+| 事件 | 時機 | 內容 |
 |-------|--------|---------|
-| Limit set/changed | Immediately | Confirmation with new limit values |
-| Limit decrease | Immediately | New limit effective immediately |
-| Limit increase requested | On request | Cooling-off period info, cancellation option |
-| Limit increase effective | After cooling-off | New limit now active |
-| Approaching limit (80%) | When 80% reached | Current usage, remaining amount |
-| Limit reached | When 100% reached | Limit details, next reset time |
+| 限額設定/變更 | 立即 | 確認新限額值 |
+| 限額降低 | 立即 | 新限額立即生效 |
+| 限額提高請求 | 提交時 | 冷卻期資訊、取消選項 |
+| 限額提高生效 | 冷卻期後 | 新限額現已啟用 |
+| 接近限額（80%） | 達到 80% 時 | 當前使用量、剩餘金額 |
+| 達到限額 | 達到 100% 時 | 限額詳情、下次重置時間 |
 
 ---
 
-## 9. Effectiveness Metrics
+## 9. 有效性指標
 
-| Metric | Target | Description |
+| 指標 | 目標 | 說明 |
 |--------|--------|-------------|
-| Limit adoption rate | > 15% (UKGC) | Players with active limits / active players |
-| Limit breach count | 0 (system) | System-caused limit violations |
-| Limit trigger count | Monitor | How often players hit their limits |
-| Limit adjustment requests | Monitor | Increase vs. decrease ratio |
-| Pending limit increases | Monitor | Volume in cooling-off period |
+| 限額採用率 | > 15%（UKGC） | 有限額的玩家 / 活躍玩家 |
+| 限額違規計數 | 0（系統） | 系統導致的限額違規 |
+| 限額觸發計數 | 監控 | 玩家觸及限額的頻率 |
+| 限額調整請求 | 監控 | 提高 vs. 降低比率 |
+| 待處理限額提高 | 監控 | 冷卻期內數量 |
 
 ---
 
-## 10. Testing Scenarios
+## 10. 測試場景
 
-### Deposit Limits
+### 存款限額
 
-| Scenario | Expected Result |
+| 場景 | 預期結果 |
 |----------|----------------|
-| Deposit amount <= remaining limit | Deposit succeeds |
-| Deposit amount > remaining limit | Reject, show remaining deposit allowance |
-| Lower limit | Immediate effect |
-| Raise limit | Enter 24-hour cooling-off |
-| Cancel during cooling-off | Successfully cancelled, original limit maintained |
-| Cooling-off period ends | New limit auto-activated |
+| 存款金額 <= 剩餘限額 | 存款成功 |
+| 存款金額 > 剩餘限額 | 拒絕，顯示剩餘存款額度 |
+| 降低限額 | 立即生效 |
+| 提高限額 | 進入 24 小時冷卻期 |
+| 冷卻期內取消 | 成功取消，維持原限額 |
+| 冷卻期結束 | 新限額自動啟用 |
 
-### Loss Limits
+### 虧損限額
 
-| Scenario | Expected Result |
+| 場景 | 預期結果 |
 |----------|----------------|
-| Bet when net loss < limit | Bet allowed |
-| Bet when net loss at limit | Bet blocked, show remaining loss allowance |
-| Win reduces net loss below limit | Betting re-enabled |
-| Set daily loss limit | Tracks bets minus wins per day |
+| 淨虧損 < 限額時投注 | 允許投注 |
+| 淨虧損達到限額時投注 | 阻止投注，顯示剩餘虧損額度 |
+| 贏彩減少淨虧損至限額以下 | 重新啟用投注 |
+| 設定每日虧損限額 | 每日追蹤投注減贏彩 |
 
 ---
 
-## Related Documents
+## 相關文檔
 
-- [Self_Exclusion_Requirements.md](Self_Exclusion_Requirements.md) - Self-exclusion
-- [Session_Protection_Requirements.md](Session_Protection_Requirements.md) - Session protection
-- [Affordability_Requirements.md](Affordability_Requirements.md) - Affordability assessment
-- [Deposit_Loss_Limits_Architecture.md](../../architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md) - Technical architecture
+- [Self_Exclusion_Requirements.md](Self_Exclusion_Requirements.md) - 自我排除
+- [Session_Protection_Requirements.md](Session_Protection_Requirements.md) - 會話保護
+- [Affordability_Requirements.md](Affordability_Requirements.md) - 可負擔性評估
+- [Deposit_Loss_Limits_Architecture.md](../../architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md) - 技術架構
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+**返回**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)

@@ -10,26 +10,22 @@
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Financial Protection**: Establishes zero-tolerance testing standards for financial calculations, preventing direct monetary losses and customer trust crises
-- **High-Availability Assurance**: Defines 7 load testing scenarios (login surge, betting peak, withdrawal peak, game launch, 24h stability, spike, breaking point) ensuring platform stability during major events
-- **Quality Gate Enforcement**: Specifies automated performance regression detection (>10% degradation triggers alert) integrated into CI/CD pipeline
-- **Regulatory Compliance**: Documents test coverage requirements (>90% for core financial modules) meeting financial regulatory expectations
-
----
+This QA standards framework delivers value by:
+- **Financial Safety**: Ensuring all financial calculations (commission, balance deduction, turnover validation) are correct with >90% core module coverage, preventing monetary losses from calculation errors, transaction loss, or security vulnerabilities
+- **User Experience Protection**: Validating system stability during peak scenarios (50k logins/min, 100k bets/min, 10k withdrawals/min, 200k game launches/min) to maintain <500ms response time and prevent service degradation during critical business moments
+- **Regulatory Compliance**: Meeting financial regulatory requirements for system stability, data integrity, and zero-tolerance error thresholds through comprehensive layered testing (unit, integration, E2E) and 24-hour continuous stability validation
+- **Operational Confidence**: Reducing deployment risk through pre-release validation gates (all P0/P1 issues resolved, load test sign-off, rollback-verified data scripts, monitoring dashboards configured), enabling safe and frequent releases
+- **Performance Baseline Enforcement**: Automatically detecting performance regression >10% through CI/CD integration, preventing gradual system degradation and ensuring capacity planning is data-driven
 
 ## Acceptance Criteria
 
-- [ ] Core financial module test coverage > 90% including boundary conditions (zero balance, minimal differences)
-- [ ] All API endpoints have corresponding automated test scripts
-- [ ] Daily end-to-end regression tests execute successfully (registration → deposit → game → withdrawal)
-- [ ] Login surge test passes: 50,000 logins/minute with response time < 500ms
-- [ ] Betting peak test passes: 100,000 bets/minute with zero data loss and correct balances
-- [ ] Withdrawal peak test passes: 10,000 withdrawals/minute with queue delay < 30 seconds
-- [ ] Game launch test passes: 200,000 launches/minute with error rate < 0.1%
-- [ ] 24-hour stability test completes without resource degradation
-- [ ] Performance regression detection alerts when metrics degrade > 10%
-- [ ] Pre-release checklist completed: all P0/P1 issues fixed, load test signed off, rollback script verified, monitoring configured
+- [ ] **Core Financial Module Coverage**: Core financial modules (commission calculation, balance deduction, turnover validation) achieve >90% test coverage with boundary condition scenarios included (zero balance, minimal difference, maximum limits) — Section 1
+- [ ] **API Automation Coverage**: 100% of APIs have automated validation scripts covering normal flow, error handling, and concurrent scenarios — Section 1
+- [ ] **E2E Regression Suite**: Daily automated regression tests execute complete player journey (registration → deposit → game launch → withdrawal) with zero failures — Section 1
+- [ ] **Peak Load Validation**: System passes all 7 peak scenario tests (login 50k/min, betting 100k/min, withdrawal 10k/min, game launch 200k/min, 24h continuous run, traffic surge 0→peak in 10s, stress limit test) with performance targets met — Section 2
+- [ ] **Performance Regression Threshold**: CI/CD pipeline automatically fails builds when performance degrades >10% from baseline, with alerts triggered — Section 4
+- [ ] **Pre-Release Gate Compliance**: All P0/P1 issues resolved, load test report approved, data migration scripts rollback-verified, monitoring dashboards configured before production deployment — Section 5
+- [ ] **Test Data Management**: Production data used for testing is properly anonymized, synthetic test data generation supports required volume/diversity, test environment completely isolated from production — Section 3
 
 ---
 
@@ -47,7 +43,7 @@ This requirements document delivers strategic value by:
 
 | 測試層級 | 覆蓋範圍 | 驗收標準 |
 |---------|---------|---------|
-| **基礎驗證** | 佣金計算、餘額扣款、流水檢查等核心運算 | 核心財務模組覆蓋率 > 90%，必須包含邊界條件（如餘額為零、差額極小等情境） |
+| **基礎驗證** | 佣金計算、餘額扣款、Valid Turnover 檢查等核心運算 | 核心財務模組覆蓋率 > 90%，必須包含邊界條件（如餘額為零、差額極小等情境） |
 | **流程驗證** | 各接口串接、第三方回調處理 | 所有接口皆有對應自動化驗證腳本，並發場景驗證必須通過 |
 | **完整流程驗證** | 從註冊、存款、進入遊戲到提款的端到端流程 | 每日自動執行回歸測試，確保既有功能不受影響 |
 

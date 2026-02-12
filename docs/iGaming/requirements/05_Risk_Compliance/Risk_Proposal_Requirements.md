@@ -1,4 +1,4 @@
-# Risk Proposal Workflow Requirements
+# 風險提案工作流程需求（Risk Proposal Workflow Requirements）
 
 > **Canonical Source**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
 > **Audience**: Executives, Compliance Officers, Risk Team Managers
@@ -7,265 +7,265 @@
 
 ---
 
-## 1. Executive Summary
+## 1. 執行摘要（Executive Summary）
 
-SmartAdmin iGaming v2.1.0 introduces a **human-centric** risk proposal review workflow. The design simplifies automated decision logic and routes all suspicious cases to a manual review queue, where reviewers make approve, reject, or partial approve decisions based on specific circumstances.
+SmartAdmin iGaming v2.1.0 引入了**以人為本**的風險提案審核工作流程。此設計簡化了自動化決策邏輯，將所有可疑案件導向人工審核佇列，由審核人員根據具體情況做出批准、拒絕或部分批准的決策。
 
-### 1.1 Core Design Principles
+### 1.1 核心設計原則（Core Design Principles）
 
-| Principle | Description | Business Value |
+| 原則 | 描述 | 業務價值 |
 |-----------|-------------|----------------|
-| **Human-First** | All cases with suspicious amount > 0 generate a manual review proposal | Avoids over-automation, reduces false positive risk |
-| **No Complex Thresholds** | Eliminates $500/$5,000 automatic routing rules | Simplifies decision logic, easier to maintain |
-| **Reviewer Autonomy** | Reviewers can manually escalate complex cases | Flexible response to various scenarios |
-| **Transparent Decisions** | All review actions are fully logged | Meets compliance audit requirements |
+| **人工優先（Human-First）** | 所有可疑金額 > 0 的案件生成人工審核提案 | 避免過度自動化，降低誤報風險 |
+| **無複雜閾值（No Complex Thresholds）** | 消除 $500/$5,000 自動路由規則 | 簡化決策邏輯，更易於維護 |
+| **審核員自主權（Reviewer Autonomy）** | 審核員可手動升級複雜案件 | 靈活應對各種場景 |
+| **透明決策（Transparent Decisions）** | 所有審核操作完整記錄 | 滿足合規稽核要求 |
 
-### 1.2 Key Changes from v2.0.0
+### 1.2 與 v2.0.0 的主要變更（Key Changes from v2.0.0）
 
-| Dimension | Legacy Workflow (v2.0.0) | v2.1.0 Simplified Workflow |
+| 維度 | 傳統工作流程（v2.0.0） | v2.1.0 簡化工作流程 |
 |-----------|--------------------------|---------------------------|
-| **Routing Rules** | Complex threshold-based routing ($500/$5,000) | Unified routing to review queue |
-| **Auto-Approval** | Auto-approve under $500 | No auto-approval; all cases reviewed manually |
-| **Review Tiers** | Mandatory L1/L2 routing | Reviewer-initiated escalation |
-| **SLA Management** | Fixed L1=24h, L2=48h | Priority-based SLA (see Section 2.2) |
-| **Decision Complexity** | Multi-layer automated decisions | Simplified to human decisions |
+| **路由規則** | 基於閾值的複雜路由（$500/$5,000） | 統一路由至審核佇列 |
+| **自動批准** | $500 以下自動批准 | 無自動批准；所有案件人工審核 |
+| **審核層級** | 強制 L1/L2 路由 | 審核員主動升級 |
+| **SLA 管理** | 固定 L1=24h, L2=48h | 基於優先級的 SLA（參見第 2.2 節） |
+| **決策複雜度** | 多層自動化決策 | 簡化為人工決策 |
 
 ---
 
-## 2. Review Queue Management Requirements
+## 2. 審核佇列管理需求（Review Queue Management Requirements）
 
-### 2.1 Priority Classification
+### 2.1 優先級分類（Priority Classification）
 
-All risk proposals MUST be assigned a priority based on the suspicious amount:
+所有風險提案必須根據可疑金額分配優先級：
 
-| Priority | Amount Threshold | Description |
+| 優先級 | 金額閾值 | 描述 |
 |----------|-----------------|-------------|
-| **URGENT** | > $10,000 | Highest priority, requires immediate attention |
-| **HIGH** | > $5,000 | High priority |
-| **MEDIUM** | > $1,000 | Standard priority |
-| **LOW** | <= $1,000 | Low priority |
+| **URGENT** | > $10,000 | 最高優先級，需立即處理 |
+| **HIGH** | > $5,000 | 高優先級 |
+| **MEDIUM** | > $1,000 | 標準優先級 |
+| **LOW** | <= $1,000 | 低優先級 |
 
-**Dynamic Priority Upgrade**: When a proposal exceeds its SLA deadline, the system MUST automatically upgrade its priority (LOW -> MEDIUM -> HIGH -> URGENT).
+**動態優先級升級**：當提案超過其 SLA 期限時，系統必須自動升級其優先級（LOW -> MEDIUM -> HIGH -> URGENT）。
 
-### 2.2 SLA Requirements (v3.0.0 Priority-Based)
+### 2.2 SLA 需求（v3.0.0 基於優先級）
 
-Each priority level has its own SLA and timeout behavior:
+每個優先級層級有其專屬的 SLA 和超時行為：
 
-| Priority | SLA Deadline | Timeout Action | Applicable Scenario |
+| 優先級 | SLA 期限 | 超時操作 | 適用場景 |
 |----------|-------------|----------------|---------------------|
-| **URGENT** | 1 hour | Auto-reject withdrawal | Blacklist / IP ban cases |
-| **HIGH** | 2 hours | Auto-reject withdrawal | Bot detection cases |
-| **MEDIUM** | 24 hours | Auto-reject withdrawal | Abnormal betting patterns |
-| **LOW** | 48 hours | Auto-approve (release) | Data collection cases |
+| **URGENT** | 1 小時 | 自動拒絕提款 | 黑名單 / IP 封鎖案件 |
+| **HIGH** | 2 小時 | 自動拒絕提款 | 機器人偵測案件 |
+| **MEDIUM** | 24 小時 | 自動拒絕提款 | 異常投注模式 |
+| **LOW** | 48 小時 | 自動批准（放行） | 數據收集案件 |
 
-**Key Business Rules**:
-- URGENT/HIGH/MEDIUM proposals that exceed SLA are automatically rejected (safety-first)
-- LOW proposals that exceed SLA are automatically approved (low risk, avoid blocking legitimate players)
-- Warning notifications MUST be sent when a proposal reaches 75% of its SLA deadline
-- SLA monitoring MUST run every 5 minutes
+**關鍵業務規則**：
+- URGENT/HIGH/MEDIUM 提案超過 SLA 將自動拒絕（安全優先）
+- LOW 提案超過 SLA 將自動批准（低風險，避免阻擋合法玩家）
+- 當提案達到其 SLA 期限的 75% 時必須發送警告通知
+- SLA 監控必須每 5 分鐘執行一次
 
-### 2.3 Queue Display and Task Assignment
+### 2.3 佇列顯示與任務分配（Queue Display and Task Assignment）
 
-- The review queue MUST be sorted by priority (descending) then creation time (ascending)
-- Reviewers MUST actively claim tasks (no automatic assignment)
-- Approaching-SLA proposals MUST be highlighted in the queue
+- 審核佇列必須按優先級（降序）然後創建時間（升序）排序
+- 審核員必須主動認領任務（無自動分配）
+- 接近 SLA 期限的提案必須在佇列中突出顯示
 
 ---
 
-## 3. Review Decision Requirements
+## 3. 審核決策需求（Review Decision Requirements）
 
-### 3.1 Decision Types
+### 3.1 決策類型（Decision Types）
 
-The system MUST support four types of review decisions:
+系統必須支援四種審核決策：
 
-| Decision | Description | Post-Decision Action | Status Transition |
+| 決策 | 描述 | 決策後操作 | 狀態轉換 |
 |----------|-------------|---------------------|-------------------|
-| **Approve** | Suspicious amount is legitimate, full release | Unfreeze amount, continue withdrawal | PENDING_REVIEW -> APPROVED |
-| **Reject** | Confirmed violation, deny withdrawal | Keep frozen, execute deduction | PENDING_REVIEW -> REJECTED |
-| **Partial Approve** | Part of the amount is legitimate | Release approved portion, freeze remainder | PENDING_REVIEW -> PARTIAL_APPROVED |
-| **Escalate** | Case too complex for current reviewer | Route to senior analyst | PENDING_REVIEW -> ESCALATED |
+| **Approve（批准）** | 可疑金額合法，全額釋放 | 解凍金額，繼續提款 | PENDING_REVIEW -> APPROVED |
+| **Reject（拒絕）** | 確認違規，拒絕提款 | 保持凍結，執行扣除 | PENDING_REVIEW -> REJECTED |
+| **Partial Approve（部分批准）** | 部分金額合法 | 釋放批准部分，凍結剩餘部分 | PENDING_REVIEW -> PARTIAL_APPROVED |
+| **Escalate（升級）** | 案件對當前審核員過於複雜 | 路由至資深分析師 | PENDING_REVIEW -> ESCALATED |
 
-### 3.2 Decision Business Rules
+### 3.2 決策業務規則（Decision Business Rules）
 
-**Approve**:
-- Full suspicious amount is released back to the player's wallet
-- Withdrawal flow continues normally
-- Review notes are optional
+**Approve（批准）**：
+- 全部可疑金額釋放回玩家錢包
+- 提款流程正常繼續
+- 審核備註為選填
 
-**Reject**:
-- Review notes are MANDATORY (rejection reason must be documented)
-- Frozen amount remains locked and a deduction is processed
-- Player receives a rejection notification
+**Reject（拒絕）**：
+- 審核備註為必填（必須記錄拒絕原因）
+- 凍結金額保持鎖定並執行扣除
+- 玩家收到拒絕通知
 
-**Partial Approve**:
-- Approved amount MUST be greater than zero and less than the total suspicious amount
-- Review notes are MANDATORY
-- Approved portion is released; rejected portion triggers deduction
-- Player receives a partial approval notification with breakdown
+**Partial Approve（部分批准）**：
+- 批准金額必須大於零且小於總可疑金額
+- 審核備註為必填
+- 批准部分釋放；拒絕部分觸發扣除
+- 玩家收到部分批准通知及明細
 
-**Escalate**:
-- Escalation reason is MANDATORY
-- Priority is automatically set to URGENT
-- Senior analyst team is notified
-- The escalated proposal re-enters the review cycle
+**Escalate（升級）**：
+- 升級原因為必填
+- 優先級自動設為 URGENT
+- 通知資深分析師團隊
+- 升級的提案重新進入審核循環
 
 ---
 
-## 4. Compensation Requirements
+## 4. 補償需求（Compensation Requirements）
 
-### 4.1 Compensation Types
+### 4.1 補償類型（Compensation Types）
 
-The system MUST support three types of financial compensation:
+系統必須支援三種財務補償類型：
 
-| Type | Scenario | Fund Direction | Example |
+| 類型 | 場景 | 資金方向 | 範例 |
 |------|----------|---------------|---------|
-| **Refund** | False positive case, return frozen funds | System -> Player Wallet | Player complaint confirmed as no issue |
-| **Adjustment** | Turnover calculation error, compensate difference | System -> Player Wallet | Mistaken turnover deduction, refund difference |
-| **Deduction** | Confirmed violation, seize suspicious amount | Player Wallet -> System | Rejected proposal, frozen funds deducted |
+| **Refund（退款）** | 誤報案件，返還凍結資金 | 系統 -> 玩家錢包 | 玩家投訴確認無問題 |
+| **Adjustment（調整）** | 流水計算錯誤，補償差額 | 系統 -> 玩家錢包 | 誤扣流水，退還差額 |
+| **Deduction（扣除）** | 確認違規，沒收可疑金額 | 玩家錢包 -> 系統 | 拒絕提案，凍結資金扣除 |
 
-### 4.2 Compensation Execution Rules
+### 4.2 補償執行規則（Compensation Execution Rules）
 
-- Every compensation MUST generate a unique compensation record with a tracking number
-- Compensation records MUST track: player ID, type, amount, reason, status, and execution timestamp
-- All wallet balance updates from compensation MUST be atomic (transactional)
+- 每筆補償必須生成唯一的補償記錄及追蹤編號
+- 補償記錄必須追蹤：玩家 ID、類型、金額、原因、狀態和執行時間戳
+- 所有來自補償的錢包餘額更新必須是原子性的（事務性）
 
-### 4.3 Compensation Failure Handling
+### 4.3 補償失敗處理（Compensation Failure Handling）
 
-- Failed compensations MUST be retried using exponential backoff (1s, 2s, 4s)
-- Maximum retry count: 3 attempts
-- After 3 failed retries, the status MUST be set to PERMANENTLY_FAILED
-- Permanently failed compensations MUST trigger an alert for manual intervention
-- Retry scheduler runs every 10 minutes
+- 失敗的補償必須使用指數退避重試（1s, 2s, 4s）
+- 最大重試次數：3 次
+- 3 次重試失敗後，狀態必須設為 PERMANENTLY_FAILED
+- 永久失敗的補償必須觸發人工介入警報
+- 重試排程器每 10 分鐘執行一次
 
 ---
 
-## 5. Reviewer Permission Requirements
+## 5. 審核員權限需求（Reviewer Permission Requirements）
 
-### 5.1 Three-Tier Permission Structure
+### 5.1 三層權限結構（Three-Tier Permission Structure）
 
-| Role | Permission | Responsibilities | Scope |
+| 角色 | 權限 | 職責 | 範圍 |
 |------|-----------|-----------------|-------|
-| **Reviewer** | `risk:proposal:review` | Process all proposals (approve/reject/partial approve/escalate) | All proposals |
-| **Senior Analyst** | `risk:proposal:escalate_review` | Handle escalated cases, provide consultation | ESCALATED proposals |
-| **Compliance Manager** | `risk:proposal:final_decision` | Final decision authority, policy configuration | All proposals + policy config |
+| **Reviewer（審核員）** | `risk:proposal:review` | 處理所有提案（批准/拒絕/部分批准/升級） | 所有提案 |
+| **Senior Analyst（資深分析師）** | `risk:proposal:escalate_review` | 處理升級案件，提供諮詢 | ESCALATED 提案 |
+| **Compliance Manager（合規經理）** | `risk:proposal:final_decision` | 最終決策權，政策配置 | 所有提案 + 政策配置 |
 
-### 5.2 Key Permission Rules (v2.1.0)
+### 5.2 關鍵權限規則（v2.1.0）
 
-- Reviewers CAN process all proposals (no L1/L2 automatic routing)
-- Reviewers CAN manually escalate complex cases
-- NO automatic task assignment; reviewers claim tasks proactively
-- All operations require appropriate Sa-Token permission annotation
+- 審核員可處理所有提案（無 L1/L2 自動路由）
+- 審核員可手動升級複雜案件
+- 無自動任務分配；審核員主動認領任務
+- 所有操作需要適當的 Sa-Token 權限註解
 
-### 5.3 Reviewer Workflow
+### 5.3 審核員工作流程（Reviewer Workflow）
 
-The standard reviewer workflow is:
+標準審核員工作流程為：
 
-1. **Log in** -> View review queue (sorted by priority)
-2. **Claim task** -> Actively select and claim a pending proposal
-3. **Review details** -> Examine bet history, risk rule matches, player profile
-4. **Make decision**:
-   - Simple cases -> Directly approve / reject / partial approve
-   - Complex cases -> Manually escalate to senior analyst
-5. **Document reasoning** -> Fill in review notes (mandatory for reject/partial approve)
-6. **Submit decision** -> System automatically executes compensation logic
-
----
-
-## 6. Workflow Integration Requirements
-
-### 6.1 BPMN Process Requirements
-
-The risk proposal review MUST be managed through a formal workflow engine (Camunda BPMN) with:
-
-- **Start Event**: Triggered when a risk proposal is created
-- **Reviewer Task**: Human task assigned to the risk reviewer group
-- **Decision Gateway**: Routes based on decision type (approve/reject/partial approve/escalate)
-- **Compensation Tasks**: Service tasks that execute the appropriate compensation
-- **Escalation Loop**: Escalated proposals return to the review cycle for senior analyst handling
-- **End Event**: Marks review completion
-
-### 6.2 Workflow Business Rules
-
-- Escalated proposals loop back to the decision gateway after senior analyst review
-- Each decision path triggers the appropriate compensation service task
-- Workflow variables MUST include: proposalId, decisionType, approvedAmount (for partial approve), reviewNotes
+1. **登入** -> 查看審核佇列（按優先級排序）
+2. **認領任務** -> 主動選擇並認領待處理提案
+3. **審核詳情** -> 檢查投注記錄、風險規則匹配、玩家檔案
+4. **做出決策**：
+   - 簡單案件 -> 直接批准 / 拒絕 / 部分批准
+   - 複雜案件 -> 手動升級至資深分析師
+5. **記錄理由** -> 填寫審核備註（拒絕/部分批准為必填）
+6. **提交決策** -> 系統自動執行補償邏輯
 
 ---
 
-## 7. Monitoring and Compliance Requirements
+## 6. 工作流程整合需求（Workflow Integration Requirements）
 
-### 7.1 Key Performance Indicators
+### 6.1 BPMN 流程需求
 
-**Review Efficiency KPIs**:
+風險提案審核必須透過正式的工作流程引擎（Camunda BPMN）管理，包含：
 
-| KPI | Description | Alert Threshold |
+- **Start Event（開始事件）**：當風險提案創建時觸發
+- **Reviewer Task（審核員任務）**：分配給風險審核員群組的人工任務
+- **Decision Gateway（決策閘道）**：根據決策類型路由（批准/拒絕/部分批准/升級）
+- **Compensation Tasks（補償任務）**：執行適當補償的 Service Task
+- **Escalation Loop（升級循環）**：升級的提案返回審核循環由資深分析師處理
+- **End Event（結束事件）**：標記審核完成
+
+### 6.2 工作流程業務規則
+
+- 升級的提案在資深分析師審核後循環回到決策閘道
+- 每個決策路徑觸發適當的補償 Service Task
+- 工作流程變數必須包含：proposalId, decisionType, approvedAmount（部分批准用）, reviewNotes
+
+---
+
+## 7. 監控與合規需求（Monitoring and Compliance Requirements）
+
+### 7.1 關鍵績效指標（Key Performance Indicators）
+
+**審核效率 KPI**：
+
+| KPI | 描述 | 警報閾值 |
 |-----|-------------|-----------------|
-| Review response time (P95) | 95th percentile of time from creation to decision | > 1 hour |
-| Proposal approval rate | Percentage of proposals approved | < 70% or > 95% (abnormal) |
-| SLA violation count | Number of proposals exceeding SLA deadline | > 10 per day |
-| Pending proposal count | Number of proposals awaiting review | > 100 |
+| 審核回應時間（P95） | 從創建到決策的 95 百分位時間 | > 1 小時 |
+| 提案批准率 | 批准提案的百分比 | < 70% 或 > 95%（異常） |
+| SLA 違規次數 | 超過 SLA 期限的提案數量 | > 每日 10 次 |
+| 待處理提案數量 | 等待審核的提案數量 | > 100 |
 
-**Compensation KPIs**:
+**補償 KPI**：
 
-| KPI | Description | Alert Threshold |
+| KPI | 描述 | 警報閾值 |
 |-----|-------------|-----------------|
-| Compensation execution failures | Number of failed compensation operations | > 5 per hour |
-| Compensation retry count | Number of retries needed | > 20 per day |
-| Total compensation amount | Cumulative dollar amount of compensations | (tracking only) |
+| 補償執行失敗次數 | 失敗的補償操作數量 | > 每小時 5 次 |
+| 補償重試次數 | 需要重試的次數 | > 每日 20 次 |
+| 補償總金額 | 補償的累積金額 | （僅追蹤） |
 
-### 7.2 Alert Requirements
+### 7.2 警報需求（Alert Requirements）
 
-The following conditions MUST trigger operational alerts:
+以下情況必須觸發操作警報：
 
-1. **Review latency**: P95 response time exceeds 1 hour (sustained for 10 minutes)
-2. **Queue backlog**: Pending proposals exceed 100 (sustained for 30 minutes)
-3. **SLA violations**: More than 10 SLA violations in a single day
-4. **Compensation failures**: Compensation failure rate exceeds 5 per hour (sustained for 5 minutes)
+1. **審核延遲**：P95 回應時間超過 1 小時（持續 10 分鐘）
+2. **佇列積壓**：待處理提案超過 100（持續 30 分鐘）
+3. **SLA 違規**：單日內超過 10 次 SLA 違規
+4. **補償失敗**：補償失敗率超過每小時 5 次（持續 5 分鐘）
 
-### 7.3 Dashboard Requirements
+### 7.3 儀表板需求（Dashboard Requirements）
 
-A dedicated Grafana dashboard MUST display:
-- Review response time distribution (P50/P95/P99)
-- Proposal approval rate gauge (with color thresholds: red < 70%, yellow 70-80%, green 80-95%, orange > 95%)
-- Pending proposal count (real-time stat)
-- SLA violation trend (hourly rate)
-
----
-
-## 8. Compliance Requirements
-
-### 8.1 Audit Trail
-
-- Every review decision MUST be recorded with: reviewer identity, timestamp, decision type, review notes, approved/rejected amounts
-- Every compensation execution MUST be recorded with: type, amount, reason, execution status
-- Audit records MUST be immutable and retained per regulatory requirements
-
-### 8.2 Regulatory Alignment
-
-- The workflow supports compliance requirements for KYC/AML review processes
-- All suspicious activity is documented and traceable
-- Escalation paths ensure complex cases receive appropriate expertise
+專用的 Grafana 儀表板必須顯示：
+- 審核回應時間分佈（P50/P95/P99）
+- 提案批准率儀表（顏色閾值：紅色 < 70%，黃色 70-80%，綠色 80-95%，橘色 > 95%）
+- 待處理提案數量（即時統計）
+- SLA 違規趨勢（每小時率）
 
 ---
 
-## 9. Change Log
+## 8. 合規需求（Compliance Requirements）
 
-### v2.1.0 Simplification Changes
+### 8.1 稽核軌跡（Audit Trail）
 
-- Eliminated complex threshold-based routing ($500/$5,000 auto-routing)
-- Eliminated mandatory L1/L2 tier routing
-- Introduced unified SLA with priority-based differentiation
-- Implemented reviewer-initiated escalation (no auto-assignment)
-- Established human-first review principle (all suspicious amounts > 0 create proposals)
+- 每個審核決策必須記錄：審核員身份、時間戳、決策類型、審核備註、批准/拒絕金額
+- 每筆補償執行必須記錄：類型、金額、原因、執行狀態
+- 稽核記錄必須不可變更且按監管要求保留
 
-### v3.0.0 Priority-Based SLA
+### 8.2 監管對齊（Regulatory Alignment）
 
-- Introduced per-priority SLA deadlines (URGENT=1h, HIGH=2h, MEDIUM=24h, LOW=48h)
-- Added automatic timeout actions per priority level
-- Added SLA warning notifications at 75% threshold
+- 工作流程支援 KYC/AML 審核流程的合規要求
+- 所有可疑活動均有記錄且可追溯
+- 升級路徑確保複雜案件獲得適當的專業處理
 
 ---
 
-## Related Documentation
+## 9. 變更日誌（Change Log）
 
-→ **[Risk Proposal Implementation](../../architecture/05_Risk_Engine/Risk_Proposal_Implementation.md)** - State machine workflows, approval logic, SLA enforcement mechanisms, compensation execution patterns, and Grafana dashboard configurations
+### v2.1.0 簡化變更
+
+- 消除基於閾值的複雜路由（$500/$5,000 自動路由）
+- 消除強制 L1/L2 層級路由
+- 引入統一 SLA 及基於優先級的差異化
+- 實施審核員主動升級（無自動分配）
+- 建立人工優先審核原則（所有可疑金額 > 0 創建提案）
+
+### v3.0.0 基於優先級的 SLA
+
+- 引入每個優先級的 SLA 期限（URGENT=1h, HIGH=2h, MEDIUM=24h, LOW=48h）
+- 新增每個優先級層級的自動超時操作
+- 新增 SLA 警告通知（75% 閾值）
+
+---
+
+## 相關文件（Related Documentation）
+
+→ **[Risk Proposal Implementation](../../architecture/05_Risk_Engine/Risk_Proposal_Implementation.md)** - 狀態機工作流程、批准邏輯、SLA 強制機制、補償執行模式和 Grafana 儀表板配置

@@ -1,328 +1,328 @@
-# Fraud Detection Requirements
+# 詐騙偵測需求（Fraud Detection Requirements）
 
-## Document Information
+## 文檔資訊
 
-| Property | Value |
+| 屬性 | 值 |
 |----------|-------|
-| **Version** | 1.0.0 |
-| **Last Updated** | 2026-02-08 |
-| **Canonical Source** | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
-| **View Type** | Business Requirements |
-| **Target Audience** | Product Managers, Compliance Officers, Risk Analysts |
-| **Related Architecture** | [Fraud_Detection_System.md](../../architecture/05_Risk_Engine/Fraud_Detection_System.md) |
+| **版本** | 1.0.0 |
+| **最後更新** | 2026-02-08 |
+| **規範來源** | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
+| **視圖類型** | 業務需求（Business Requirements） |
+| **目標讀者** | 產品經理、合規官、風險分析師 |
+| **相關架構** | [Fraud_Detection_System.md](../../architecture/05_Risk_Engine/Fraud_Detection_System.md) |
 
 ---
 
-## Executive Summary
+## 執行摘要
 
-SmartAdmin iGaming v2.1.0 introduces a "Configuration-Driven Risk Control System" that allows operators to configure the handling method for each risk control rule (real-time blocking BLOCK vs. deferred checking FLAG), enabling flexible risk control strategy management.
+SmartAdmin iGaming v2.1.0 引入「配置驅動風控系統（Configuration-Driven Risk Control System）」，允許運營商為每條風控規則配置處理方式（即時阻斷 BLOCK vs. 延後檢查 FLAG），實現靈活的風控策略管理。
 
-### Core Features
+### 核心功能
 
-| Feature | Description | Business Value |
+| 功能 | 描述 | 業務價值 |
 |---------|-------------|----------------|
-| **Configuration-Driven** | action_type determined by database configuration (BLOCK/FLAG/IGNORE) | Adjust risk strategies without code changes |
-| **Human-First** | Generate risk proposals for anomalies, manual review processing | Simplify decision logic, avoid over-automation |
-| **Equal Treatment** | All players go through risk control (no VIP exemptions) | Compliance requirement, fairness principle |
-| **Operator Choice** | Operators decide their own risk control intensity | Improve customer satisfaction, support multi-market strategies |
+| **配置驅動** | action_type 由數據庫配置決定（BLOCK/FLAG/IGNORE） | 無需修改代碼即可調整風控策略 |
+| **人工優先** | 異常行為生成風險提案，人工審核處理 | 簡化決策邏輯，避免過度自動化 |
+| **平等對待** | 所有玩家都經過風控（無 VIP 豁免） | 合規要求，公平原則 |
+| **運營商選擇** | 運營商自行決定風控強度 | 提高客戶滿意度，支持多市場策略 |
 
 ---
 
-## 1. Fraud Types and Prevalence
+## 1. 詐騙類型與發生率
 
-### 1.1 Primary Fraud Categories
+### 1.1 主要詐騙類別
 
-| Fraud Type | Risk Level | Regulatory Requirement |
+| 詐騙類型 | 風險等級 | 監管要求 |
 |------------|------------|------------------------|
-| **Bonus Abuse** | HIGH | UKGC: Each player limited to one account |
-| **Self-Exclusion Evasion** | CRITICAL | UKGC LCCP 17.1.1: Must block excluded players from creating new accounts |
-| **Collusion** | HIGH | Poker/P2P games prohibit multi-accounts |
-| **Money Laundering Structuring** | CRITICAL | AML regulations: Prohibit transaction splitting |
-| **Bot/Automation** | HIGH | Industry standard: Prohibit automated betting |
-| **Arbitrage** | MEDIUM | Same-match hedging, cross-IP arbitrage |
-| **Turnover Manipulation** | MEDIUM | Low-odds washing behavior |
+| **獎金濫用（Bonus Abuse）** | 高 | UKGC: 每位玩家僅限一個帳戶 |
+| **自我排除規避（Self-Exclusion Evasion）** | 極高 | UKGC LCCP 17.1.1: 必須阻止被排除玩家創建新帳戶 |
+| **串通作弊（Collusion）** | 高 | 撲克/P2P 遊戲禁止多帳戶 |
+| **洗錢結構化（Money Laundering Structuring）** | 極高 | AML 法規: 禁止拆分交易 |
+| **機器人/自動化（Bot/Automation）** | 高 | 行業標準: 禁止自動投注 |
+| **套利（Arbitrage）** | 中 | 同場對沖、跨 IP 套利 |
+| **流水操縱（Turnover Manipulation）** | 中 | 低賠率刷流水行為 |
 
-### 1.2 Detection Scenarios by Layer
+### 1.2 分層偵測場景
 
-**Layer 1: Synchronous Blocking (Very Few, <10ms)**
+**Layer 1: 同步阻斷（極少數，<10ms）**
 
-These scenarios result in immediate rejection at the betting request stage using high-speed cache lookups:
+這些場景在投注請求階段使用高速緩存查找立即拒絕：
 
 → **[Fast Cache Implementation](../../architecture/05_Risk_Engine/Fraud_Detection_System.md#layer1-cache)**
 
-- **Blacklisted Players** (confirmed fraudsters)
-- **IP Blocking** (known attack sources)
-- **Account Frozen** (under manual review)
-- **Regulatory Self-Exclusion Lists** (UKGC/MGA requirement)
+- **黑名單玩家（Blacklisted Players）**（確認詐騙者）
+- **IP 封鎖（IP Blocking）**（已知攻擊來源）
+- **帳戶凍結（Account Frozen）**（人工審核中）
+- **監管自我排除清單（Regulatory Self-Exclusion Lists）**（UKGC/MGA 要求）
 
-**Layer 3: Asynchronous BLOCK Rules (Majority, ~5 seconds)**
+**Layer 3: 異步 BLOCK 規則（大多數，~5 秒）**
 
-These rules execute asynchronously after bet success, generating high-priority Risk Proposals:
+這些規則在投注成功後異步執行，生成高優先級風險提案（Risk Proposals）：
 
-- **Bot Detection** - Behavioral pattern analysis
-- **Same Match Hedging** - Requires historical bet queries
-- **Same IP Arbitrage** - Requires correlation analysis
-- **Abnormal Odds Detection** - Requires statistical analysis
-- **Turnover Manipulation** - Requires turnover calculation
+- **機器人偵測（Bot Detection）** - 行為模式分析
+- **同場對沖（Same Match Hedging）** - 需要歷史投注查詢
+- **同 IP 套利（Same IP Arbitrage）** - 需要關聯分析
+- **異常賠率偵測（Abnormal Odds Detection）** - 需要統計分析
+- **流水操縱（Turnover Manipulation）** - 需要流水計算
 
-**Layer 3: Asynchronous FLAG Rules (Medium Priority, ~5 seconds)**
+**Layer 3: 異步 FLAG 規則（中優先級，~5 秒）**
 
-These rules execute asynchronously after bet success, generating medium-priority Risk Proposals:
+這些規則在投注成功後異步執行，生成中優先級風險提案：
 
-- **Cross Match Hedging** - Lower risk
-- **Low Odds Washing** (<1.5 odds) - Requires manual judgment
-- **Abnormal Betting Pattern** - Potential false positives
-- **High Frequency Betting** (>10 bets/min) - Requires trend observation
+- **跨場對沖（Cross Match Hedging）** - 較低風險
+- **低賠率刷流水（Low Odds Washing）**（<1.5 賠率） - 需要人工判斷
+- **異常投注模式（Abnormal Betting Pattern）** - 可能誤判
+- **高頻投注（High Frequency Betting）**（>10 次/分鐘） - 需要觀察趨勢
 
 ---
 
-## 2. Detection Rules and Thresholds
+## 2. 偵測規則與閾值
 
-### 2.1 Risk Rule Configuration
+### 2.1 風險規則配置
 
-| Rule Code | Rule Name | Action Type | Game Types | Description |
+| 規則代碼 | 規則名稱 | 動作類型 | 遊戲類型 | 描述 |
 |-----------|-----------|-------------|------------|-------------|
-| BLACKLIST_PLAYER | Blacklisted Player | BLOCK | All | Player on confirmed fraud blacklist |
-| BOT_DETECTION | Bot Detection | BLOCK | All | Automated/bot behavior detected |
-| IP_BLOCKED | IP Blocked | BLOCK | All | IP on known attack source list |
-| SAME_MATCH_HEDGE | Same Match Hedging | BLOCK | SPORTS | Opposite bets on same match |
-| CROSS_MATCH_HEDGE | Cross Match Hedging | FLAG | SPORTS | Hedging across different matches |
-| LOW_ODDS_WAGERING | Low Odds Washing | FLAG | SPORTS, LIVE | Odds <1.5, potential turnover manipulation |
-| ABNORMAL_PATTERN | Abnormal Pattern | FLAG | All | Unusual betting patterns |
-| HIGH_FREQUENCY | High Frequency Betting | FLAG | All | >10 bets per minute |
+| BLACKLIST_PLAYER | 黑名單玩家 | BLOCK | 全部 | 玩家在確認詐騙黑名單上 |
+| BOT_DETECTION | 機器人偵測 | BLOCK | 全部 | 檢測到自動化/機器人行為 |
+| IP_BLOCKED | IP 封鎖 | BLOCK | 全部 | IP 在已知攻擊來源清單上 |
+| SAME_MATCH_HEDGE | 同場對沖 | BLOCK | SPORTS | 同場比賽相反投注 |
+| CROSS_MATCH_HEDGE | 跨場對沖 | FLAG | SPORTS | 跨不同比賽對沖 |
+| LOW_ODDS_WAGERING | 低賠率刷流水 | FLAG | SPORTS, LIVE | 賠率 <1.5，潛在流水操縱 |
+| ABNORMAL_PATTERN | 異常模式 | FLAG | 全部 | 異常投注模式 |
+| HIGH_FREQUENCY | 高頻投注 | FLAG | 全部 | 每分鐘 >10 次投注 |
 
-### 2.2 Priority Thresholds
+### 2.2 優先級閾值
 
-| Priority | Trigger Condition | Handling Method |
+| 優先級 | 觸發條件 | 處理方式 |
 |----------|-------------------|-----------------|
-| **URGENT** | Amount > $10,000 OR Blacklist/IP Blocked | Immediate block |
-| **HIGH** | Amount > $5,000 OR Bot detection | Block + Manual review |
-| **MEDIUM** | Amount > $1,000 OR Abnormal betting | Manual review |
-| **LOW** | Amount ≤ $1,000 | Normal monitoring |
+| **緊急（URGENT）** | 金額 > $10,000 或 黑名單/IP 封鎖 | 立即阻斷 |
+| **高（HIGH）** | 金額 > $5,000 或 機器人偵測 | 阻斷 + 人工審核 |
+| **中（MEDIUM）** | 金額 > $1,000 或 異常投注 | 人工審核 |
+| **低（LOW）** | 金額 ≤ $1,000 | 正常監控 |
 
-### 2.3 Risk Scoring Factors
+### 2.3 風險評分因素
 
-| Factor | Weight | Cap | Description |
+| 因素 | 權重 | 上限 | 描述 |
 |--------|--------|-----|-------------|
-| Risk Flag Count | +5/occurrence | 30 points | Historical risk flag count |
-| Block Count | +10/occurrence | 40 points | Actual block count |
-| Abnormal Win Rate | +20 | 20 points | Win rate >60% or <30% |
-| Recent Proposals | +3/proposal | 20 points | Risk proposals in last 30 days |
+| 風險標記次數 | +5/次 | 30 分 | 歷史風險標記次數 |
+| 阻斷次數 | +10/次 | 40 分 | 實際阻斷次數 |
+| 異常勝率 | +20 | 20 分 | 勝率 >60% 或 <30% |
+| 近期提案 | +3/個 | 20 分 | 過去 30 天風險提案 |
 
-### 2.4 Risk Level Mapping
+### 2.4 風險等級映射
 
-| Score Range | Risk Level | Handling Recommendation |
+| 分數範圍 | 風險等級 | 處理建議 |
 |-------------|------------|------------------------|
-| 0-49 | LOW | Normal monitoring |
-| 50-79 | MEDIUM | Enhanced monitoring |
-| 80-100 | HIGH | Manual review |
-| Blacklist | BLACKLIST | Reject betting |
+| 0-49 | 低（LOW） | 正常監控 |
+| 50-79 | 中（MEDIUM） | 加強監控 |
+| 80-100 | 高（HIGH） | 人工審核 |
+| 黑名單 | 黑名單（BLACKLIST） | 拒絕投注 |
 
 ---
 
-## 3. Priority Levels and SLAs
+## 3. 優先級別與 SLA
 
-### 3.1 Review SLAs
+### 3.1 審核 SLA
 
-| Priority | Response Time | Resolution Time | Escalation |
+| 優先級 | 響應時間 | 解決時間 | 升級機制 |
 |----------|---------------|-----------------|------------|
-| URGENT | <15 minutes | <1 hour | Immediate manager escalation |
-| HIGH | <1 hour | <4 hours | Escalate after 2 hours |
-| MEDIUM | <4 hours | <24 hours | Escalate after 8 hours |
-| LOW | <24 hours | <72 hours | Normal queue |
+| 緊急（URGENT） | <15 分鐘 | <1 小時 | 立即升級至主管 |
+| 高（HIGH） | <1 小時 | <4 小時 | 2 小時後升級 |
+| 中（MEDIUM） | <4 小時 | <24 小時 | 8 小時後升級 |
+| 低（LOW） | <24 小時 | <72 小時 | 正常排隊 |
 
-### 3.2 Monitoring Thresholds
+### 3.2 監控閾值
 
-| Metric | Alert Threshold | Description |
+| 指標 | 告警閾值 | 描述 |
 |--------|-----------------|-------------|
-| `risk_proposal_pending_count` | >100 | Pending review backlog |
-| `risk_query_duration_ms (P95)` | >200ms | Query performance degradation |
-| `risk_cache_hit_rate` | <90% | Cache hit rate decline |
-| `risk_event_publish_errors` | >10/min | Risk event delivery failures (exceeding threshold indicates system degradation) |
+| `risk_proposal_pending_count` | >100 | 待審核積壓 |
+| `risk_query_duration_ms (P95)` | >200ms | 查詢性能下降 |
+| `risk_cache_hit_rate` | <90% | 緩存命中率下降 |
+| `risk_event_publish_errors` | >10/分鐘 | 風險事件傳遞失敗（超過閾值表示系統退化） |
 
 → **[Event Publishing Architecture](../../architecture/05_Risk_Engine/Fraud_Detection_System.md#event-publishing)**
-| `multi_account_detection_rate` | >5% | Abnormally high multi-account detection |
-| `self_exclusion_bypass_attempts` | >10/day | High bypass attempt rate |
+| `multi_account_detection_rate` | >5% | 多帳戶偵測率異常高 |
+| `self_exclusion_bypass_attempts` | >10/天 | 規避嘗試率高 |
 
 ---
 
-## 4. Compliance Requirements
+## 4. 合規要求
 
-### 4.1 VIP Player Risk Control Notice
+### 4.1 VIP 玩家風控注意事項
 
-> **Compliance Requirement**: Per UKGC LCCP and Entain GBP 17M penalty case lessons, **VIP players must go through exactly the same risk control rules as regular players**.
+> **合規要求**: 根據 UKGC LCCP 及 Entain 1700 萬英鎊罰款案例教訓，**VIP 玩家必須接受與普通玩家完全相同的風控規則**。
 >
-> VIP Level's only impact is:
-> - VIP proposal priority in manual review queue
-> - Dedicated customer service assists with KYC/SOF document preparation
-> - **Does NOT affect** risk rule trigger conditions
-> - **Does NOT affect** AML thresholds
-> - **Does NOT affect** affordability assessment triggers
+> VIP 等級僅影響：
+> - 人工審核隊列中 VIP 提案優先級
+> - 專屬客服協助準備 KYC/SOF 文件
+> - **不影響** 風控規則觸發條件
+> - **不影響** AML 閾值
+> - **不影響** 負擔能力評估觸發
 
-### 4.2 Self-Exclusion Requirements (UKGC LCCP 17.1.1)
+### 4.2 自我排除要求（UKGC LCCP 17.1.1）
 
-Per UKGC LCCP 17.1.1:
+根據 UKGC LCCP 17.1.1：
 
-> "Licensees must have effective procedures to prevent any individual who has made a self-exclusion request from gambling."
+> "持牌人必須建立有效程序，防止任何已提出自我排除請求的個人進行賭博。"
 
-**Registration Check Requirements**:
-- Name fuzzy matching (Levenshtein distance <=2)
-- Date of birth matching
-- Address fuzzy matching
-- Phone number matching (including variants)
-- Email domain matching
-- Gamstop API query (UK market)
+**註冊檢查要求**：
+- 姓名模糊匹配（Levenshtein 距離 <=2）
+- 出生日期匹配
+- 地址模糊匹配
+- 電話號碼匹配（包括變體）
+- 電子郵件域名匹配
+- Gamstop API 查詢（英國市場）
 
-**Login Check Requirements**:
-- Device fingerprint matching
-- IP address matching (recent usage)
-- Behavioral pattern matching
+**登入檢查要求**：
+- 設備指紋匹配
+- IP 地址匹配（近期使用）
+- 行為模式匹配
 
-**Detection Result Handling**:
+**偵測結果處理**：
 
-| Match Type | Action |
+| 匹配類型 | 動作 |
 |------------|--------|
-| Potential Match (Similarity >=70%) | Suspend account, generate high-priority review proposal, 24-hour manual review |
-| Confirmed Match | Immediately freeze account, cancel all pending bets, refund cash balance, forfeit bonus balance (per T&C), notify player, record violation event |
+| 潛在匹配（Potential Match）（相似度 >=70%） | 暫停帳戶，生成高優先級審核提案，24 小時內人工審核 |
+| 確認匹配（Confirmed Match） | 立即凍結帳戶，取消所有待處理投注，退還現金餘額，沒收獎金餘額（依據條款），通知玩家，記錄違規事件 |
 
-### 4.3 Multi-Account Detection Requirements
+### 4.3 多帳戶偵測要求
 
-| Link Type | Risk Level | Handling |
+| 關聯類型 | 風險等級 | 處理方式 |
 |-----------|------------|----------|
-| Same IP + Same Device | CRITICAL | Immediate freeze, manual review |
-| Same IP + Different Device | MEDIUM | Household verification process |
-| Different IP + Same Device | HIGH | Account merge investigation |
-| Same Phone Number | CRITICAL | Not allowed (blocked at registration) |
+| 相同 IP + 相同設備 | 極高（CRITICAL） | 立即凍結，人工審核 |
+| 相同 IP + 不同設備 | 中（MEDIUM） | 家庭帳戶驗證流程 |
+| 不同 IP + 相同設備 | 高（HIGH） | 帳戶合併調查 |
+| 相同電話號碼 | 極高（CRITICAL） | 不允許（註冊時阻斷） |
 
-### 4.4 Household Account Verification
+### 4.4 家庭帳戶驗證
 
-**Legitimate Household Scenarios**:
-- Spouses/partners each have accounts
-- Adult children living with parents
-- Roommates sharing network
+**合法家庭場景**：
+- 配偶/伴侶各有帳戶
+- 成年子女與父母同住
+- 室友共享網路
 
-**Verification Process**:
-1. System detects same-IP multi-accounts -> Trigger verification
-2. Send verification email to all account holders
-3. Each account independently completes KYC verification
-4. Manual review KYC documents (confirm different identities)
-5. Mark as "Verified Household Accounts"
+**驗證流程**：
+1. 系統檢測到相同 IP 多帳戶 → 觸發驗證
+2. 向所有帳戶持有人發送驗證郵件
+3. 每個帳戶獨立完成 KYC 驗證
+4. 人工審核 KYC 文件（確認不同身份）
+5. 標記為「已驗證家庭帳戶（Verified Household Accounts）」
 
-**Household Account Restrictions**:
-- Prohibited from participating in same event/tournament
-- No inter-account transfers/gifts
-- Bonus activities independent (no sharing)
-- P2P games automatically avoid matchups
-
----
-
-## 5. Case Studies and Penalties
-
-### 5.1 Entain GBP 17M Penalty (Reference: 05-03 KYC/AML Section 11)
-
-**Violation**: VIP players received preferential treatment in risk control, bypassing standard AML checks.
-
-**Lessons Learned**:
-- All players must receive equal risk control treatment
-- VIP status cannot exempt from compliance requirements
-- Inadequate source of funds documentation for high-value customers
-
-### 5.2 888 Holdings Penalty
-
-**Violation**: Failed to implement effective self-exclusion procedures, allowing excluded players to continue gambling.
-
-**Lessons Learned**:
-- Multi-channel exclusion must be synchronized
-- Device fingerprinting essential for exclusion enforcement
-- Regular Gamstop integration audits required
-
-### 5.3 Betfred GBP 3.25M Penalty
-
-**Violation**: Inadequate AML controls and customer interaction procedures.
-
-**Lessons Learned**:
-- Automated risk scoring must trigger manual review
-- Documentation of risk decisions required
-- Clear escalation procedures must be implemented
+**家庭帳戶限制**：
+- 禁止參與相同活動/錦標賽
+- 禁止帳戶間轉賬/贈送
+- 獎金活動獨立（不可共享）
+- P2P 遊戲自動避免配對
 
 ---
 
-## 6. Business Value Metrics
+## 5. 案例研究與罰款
 
-### 6.1 Key Performance Indicators
+### 5.1 Entain 1700 萬英鎊罰款（參考：05-03 KYC/AML Section 11）
 
-| KPI | Target | Description |
+**違規行為**: VIP 玩家在風控中獲得優惠待遇，繞過標準 AML 檢查。
+
+**教訓**：
+- 所有玩家必須接受平等風控處理
+- VIP 身份不能豁免合規要求
+- 高價值客戶的資金來源文件不足
+
+### 5.2 888 Holdings 罰款
+
+**違規行為**: 未能實施有效的自我排除程序，允許被排除玩家繼續賭博。
+
+**教訓**：
+- 多渠道排除必須同步
+- 設備指紋對排除執行至關重要
+- 需要定期 Gamstop 整合審計
+
+### 5.3 Betfred 325 萬英鎊罰款
+
+**違規行為**: AML 控制和客戶互動程序不足。
+
+**教訓**：
+- 自動化風險評分必須觸發人工審核
+- 需要記錄風險決策
+- 必須實施清晰的升級程序
+
+---
+
+## 6. 業務價值指標
+
+### 6.1 關鍵績效指標
+
+| KPI | 目標 | 描述 |
 |-----|--------|-------------|
-| Detection Rate | >=95% | Multi-account behavior detection rate |
-| False Positive Rate | <=1% | Incorrect fraud detection rate |
-| Detection Latency - Registration | <100ms | Real-time registration blocking |
-| Detection Latency - Login | <50ms | Real-time login checks |
-| Review SLA Compliance | >=95% | Meeting review time SLAs |
-| Bonus Abuse Prevention | >=90% | Prevented bonus abuse rate |
+| 偵測率 | >=95% | 多帳戶行為偵測率 |
+| 誤判率 | <=1% | 錯誤詐騙偵測率 |
+| 偵測延遲 - 註冊 | <100ms | 即時註冊阻斷 |
+| 偵測延遲 - 登入 | <50ms | 即時登入檢查 |
+| 審核 SLA 合規性 | >=95% | 達到審核時間 SLA |
+| 獎金濫用預防 | >=90% | 防止獎金濫用率 |
 
-### 6.2 Reporting Requirements
+### 6.2 報告要求
 
-**Daily Reports**:
-- New multi-account cases
-- Account freeze/merge count
-- Household account verifications
-- Self-exclusion bypass attempts
-- Gamstop query statistics
+**每日報告**：
+- 新多帳戶案例
+- 帳戶凍結/合併次數
+- 家庭帳戶驗證
+- 自我排除規避嘗試
+- Gamstop 查詢統計
 
-**Weekly Reports**:
-- Detection rate trends
-- False positive analysis
-- Device fingerprint stability
-- Correlation graph complexity analysis
+**每週報告**：
+- 偵測率趨勢
+- 誤判分析
+- 設備指紋穩定性
+- 關聯圖複雜度分析
 
-**Monthly Reports**:
-- Regulatory compliance report
-- Multi-account loss estimation
-- System effectiveness evaluation
+**每月報告**：
+- 監管合規報告
+- 多帳戶損失估算
+- 系統效能評估
 
 ---
 
-## 7. Comparison with Traditional Risk Control
+## 7. 與傳統風控的對比
 
-| Dimension | Traditional (v2.0.0) | Configuration-Driven (v2.1.0) |
+| 維度 | 傳統（v2.0.0） | 配置驅動（v2.1.0） |
 |-----------|---------------------|-------------------------------|
-| **Rule Classification** | Hardcoded P0/P1/P2 (30%/50%/20%) | Configuration-driven (operator chooses BLOCK/FLAG) |
-| **VIP Exemption** | VIP Level >=3 exempt (violation) | All players equal (no exemptions) |
-| **Anomaly Handling** | Complex automated threshold logic | Human review primary |
-| **Strategy Adjustment** | Requires code change + deployment | Update configuration table only |
-| **Flexibility** | Fixed percentages, non-adjustable | Each rule independently configurable |
-| **False Positive Risk** | 5-10% normal players rejected | Zero false positives (bet already succeeded) |
-| **System Availability** | Single point failure | High availability (risk failure doesn't affect betting) |
+| **規則分類** | 硬編碼 P0/P1/P2（30%/50%/20%） | 配置驅動（運營商選擇 BLOCK/FLAG） |
+| **VIP 豁免** | VIP 等級 >=3 豁免（違規） | 所有玩家平等（無豁免） |
+| **異常處理** | 複雜自動化閾值邏輯 | 人工審核為主 |
+| **策略調整** | 需要代碼修改 + 部署 | 僅更新配置表 |
+| **靈活性** | 固定百分比，不可調整 | 每條規則獨立配置 |
+| **誤判風險** | 5-10% 正常玩家被拒絕 | 零誤判（投注已成功） |
+| **系統可用性** | 單點故障 | 高可用性（風控失敗不影響投注） |
 
 ---
 
-## 8. Industry References
+## 8. 行業參考
 
-- **DraftKings/FanDuel (US Market)**: Only blacklist blocks synchronously, all others asynchronous
-- **Bet365 (UK Market)**: Hedge detection analyzed within 5 minutes after bet success
-- **UKGC Compliance Architecture**: Recommends post-hoc risk control + withdrawal-time interception
-
----
-
-## Related Documents
-
-- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Risk system overall architecture
-- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - Withdrawal SAGA process
-- [05-03 KYC/AML](../../source-archive/05_Risk_Control/05-03_KYC_AML.md) - Identity verification and AML
-- [15-01 Self-Exclusion](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md) - Self-exclusion system
-- [06-08 UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK regulatory compliance
+- **DraftKings/FanDuel（美國市場）**: 僅黑名單同步阻斷，其他全部異步
+- **Bet365（英國市場）**: 對沖偵測在投注成功後 5 分鐘內分析
+- **UKGC 合規架構**: 建議事後風控 + 提款時攔截
 
 ---
 
-## Change Log
+## 相關文檔
+
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - 風險系統整體架構
+- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - 提款 SAGA 流程
+- [05-03 KYC/AML](../../source-archive/05_Risk_Control/05-03_KYC_AML.md) - 身份驗證與反洗錢
+- [15-01 Self-Exclusion](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md) - 自我排除系統
+- [06-08 UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - 英國監管合規
+
+---
+
+## 變更日誌
 
 ### v1.0.0 (2026-02-08)
 
-**Initial Version**:
-- Extracted business requirements from source documents
-- Fraud types and prevalence statistics
-- Detection rules and thresholds
-- Priority levels and SLAs
-- Compliance requirements (UKGC, Gamstop)
-- Case studies and penalties
-- Removed all code blocks and technical diagrams
+**初始版本**：
+- 從源文檔提取業務需求
+- 詐騙類型與發生率統計
+- 偵測規則與閾值
+- 優先級別與 SLA
+- 合規要求（UKGC、Gamstop）
+- 案例研究與罰款
+- 移除所有代碼塊與技術圖表

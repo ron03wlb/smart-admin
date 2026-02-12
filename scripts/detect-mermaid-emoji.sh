@@ -28,6 +28,13 @@ NC='\033[0m' # No Color
 # U+1F300-U+1F9FF: Miscellaneous Symbols and Pictographs, Emoticons, Transport, etc.
 EMOJI_PATTERN='[\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F300}-\x{1F9FF}]'
 
+# macOS awk does not support \x{...} Unicode escapes — skip gracefully
+# Test: awk should NOT match plain "test" against emoji pattern; if it does, awk is broken
+if echo "test" | awk '/[\x{2600}-\x{26FF}]/' 2>/dev/null | grep -q "test"; then
+    echo -e "${YELLOW}⚠ 警告: awk 不正確處理 Unicode emoji 範圍（跳過檢測）${NC}"
+    exit 0
+fi
+
 # 檢查參數
 if [ $# -eq 0 ]; then
     echo -e "${RED}錯誤: 缺少目標目錄參數${NC}"

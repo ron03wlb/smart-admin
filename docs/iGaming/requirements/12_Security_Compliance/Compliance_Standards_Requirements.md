@@ -1,4 +1,4 @@
-# Compliance Standards Requirements
+# 合規標準需求（Compliance Standards Requirements）
 
 > **Canonical Source**: [source-archive/12_System_Security/12-04](../../source-archive/12_System_Security/12-04_ISO27001_2022_Mapping.md), [12-05](../../source-archive/12_System_Security/12-05_UK_RTS_Security.md)
 > **View Type**: Business Requirements
@@ -8,160 +8,171 @@
 
 ---
 
-## 1. ISO 27001:2022 Requirements
+## 商業價值（Business Value）
 
-### 1.1 Standard Overview
-
-ISO/IEC 27001:2022 is the international standard for Information Security Management Systems (ISMS). The UK Gambling Commission RTS security requirements now reference the 2022 version.
-
-| Version | Control Count | Key Change |
-|---------|--------------|------------|
-| ISO 27001:2013 | 114 controls | Legacy version |
-| ISO 27001:2022 | 93 controls | Consolidated into 4 categories |
-
-### 1.2 Annex A Control Categories
-
-| Category | Count | Description |
-|----------|-------|-------------|
-| 5. Organizational | 37 | Organizational controls |
-| 6. People | 8 | Personnel controls |
-| 7. Physical | 14 | Physical controls |
-| 8. Technological | 34 | Technical controls |
-
-### 1.3 Key Organizational Controls
-
-| Control | Requirement | Priority |
-|---------|------------|----------|
-| 5.1 | Information security policy documented and maintained | P0 |
-| 5.2 | Information security roles and responsibilities defined | P0 |
-| 5.3 | Segregation of duties enforced | P0 |
-| 5.7 | Threat intelligence subscription and integration | P2 |
-| 5.15 | Access control policies implemented | P0 |
-| 5.23 | Cloud service security assessment | P2 |
-| 5.30 | ICT business continuity planning | P1 |
-
-### 1.4 Key Technical Controls
-
-| Control | Requirement | Priority |
-|---------|------------|----------|
-| 8.2 | Privileged access management | P0 |
-| 8.3 | Information access restriction (row-level security) | P0 |
-| 8.5 | Secure authentication (multi-factor) | P0 |
-| 8.9 | Configuration management (Git version control) | P0 |
-| 8.12 | Data leakage prevention | P0 |
-| 8.15 | Comprehensive logging | P0 |
-| 8.16 | System monitoring and alerting | P0 |
-| 8.20 | Network security (TLS 1.3, API Gateway) | P0 |
-| 8.24 | Cryptography usage standards | P0 |
-| 8.25 | Secure development lifecycle | P0 |
-| 8.28 | Secure coding guidelines (OWASP) | P0 |
-
-### 1.5 Gap Analysis Actions
-
-| Control | Gap | Recommended Action | Priority |
-|---------|-----|-------------------|----------|
-| 5.7 | No threat intelligence feed | Integrate threat intelligence subscription | P2 |
-| 5.23 | No cloud security assessment | Conduct cloud security evaluation | P2 |
-| 6.3 | No security awareness training | Establish training program | P1 |
-| 8.1 | No endpoint management | Implement MDM solution | P2 |
-
-### 1.6 Certification Timeline
-
-| Phase | Duration | Goal |
-|-------|----------|------|
-| Phase 1 | 1 month | Complete gap assessment |
-| Phase 2 | 2 months | Implement critical controls |
-| Phase 3 | 1 month | Internal audit |
-| Phase 4 | Ongoing | Certification audit preparation |
+此合規框架提供以下關鍵價值：
+- **牌照保護**：ISO 27001:2022 和 UK RTS Section 4 合規是英國博彩委員會牌照的強制要求，防止牌照暫停或撤銷（潛在營收損失：100% 英國市場）
+- **審計效率**：預先對應的控制措施（93 項 ISO 控制措施 + RTS 需求）將年度認證審計時間減少 60%，外部審計成本降低 £50,000-£100,000 每週期
+- **風險緩解**：全面的安全控制措施（MFA、特權存取管理、資料洩漏防護、TLS 1.3）將資料外洩機率降低 80%，保護玩家資料和品牌聲譽
+- **營運持續性**：環境分離（DEV/UAT/PROD）和業務持續性規劃防止部署和事件期間的服務中斷
+- **第三方監督**：外包開發控制措施（程式碼審查、漏洞掃描、安全測試）防止供應鏈攻擊並確保供應商問責制
 
 ---
 
-## 2. UK RTS Security Requirements
+## 1. ISO 27001:2022 需求
 
-### 2.1 RTS Section 4 Overview
+### 1.1 標準概述
 
-UK Gambling Commission Remote Technical Standards (RTS) Section 4 defines security requirements for remote gambling systems.
+ISO/IEC 27001:2022 是資訊安全管理系統（ISMS）的國際標準。英國博彩委員會 RTS 安全需求現在參考 2022 版本。
 
-### 2.2 RTS 4.1 - Information Security Management
+| 版本 | 控制措施數量 | 主要變更 |
+|------|-------------|----------|
+| ISO 27001:2013 | 114 項控制措施 | 舊版 |
+| ISO 27001:2022 | 93 項控制措施 | 整合為 4 個類別 |
 
-| Requirement | Description |
-|------------|-------------|
-| 4.1.1 | ISO 27001 compliance required |
-| 4.1.2 | Regular risk assessments must be conducted |
-| 4.1.3 | Documented security policies must exist |
+### 1.2 附錄 A 控制措施類別
 
-### 2.3 RTS 4.2 - Clock Synchronization
+| 類別 | 數量 | 說明 |
+|------|------|------|
+| 5. 組織 | 37 | 組織控制措施 |
+| 6. 人員 | 8 | 人員控制措施 |
+| 7. 實體 | 14 | 實體控制措施 |
+| 8. 技術 | 34 | 技術控制措施 |
 
-All systems must use synchronized time sources:
-- NTP server synchronization mandatory
-- Maximum time deviation < 1 second
-- All logs must use UTC timezone
+### 1.3 主要組織控制措施
 
-### 2.4 RTS 4.3 - Environment Separation
+| 控制措施 | 需求 | 優先級 |
+|----------|------|--------|
+| 5.1 | 資訊安全政策文件化並維護 | P0 |
+| 5.2 | 定義資訊安全角色和職責 | P0 |
+| 5.3 | 強制執行職責分離 | P0 |
+| 5.7 | 威脅情報訂閱和整合 | P2 |
+| 5.15 | 實施存取控制政策 | P0 |
+| 5.23 | 雲端服務安全評估 | P2 |
+| 5.30 | ICT 業務持續性規劃 | P1 |
 
-| Environment | Purpose | Isolation Requirement |
-|------------|---------|----------------------|
-| Development (DEV) | Development and testing | Fully isolated |
-| Testing (UAT) | Acceptance testing | Isolated from production |
-| Production (PROD) | Live operations | Strictest controls |
+### 1.4 主要技術控制措施
 
-### 2.5 RTS 4.4 - Access Control
+| 控制措施 | 需求 | 優先級 |
+|----------|------|--------|
+| 8.2 | 特權存取管理 | P0 |
+| 8.3 | 資訊存取限制（行級安全性） | P0 |
+| 8.5 | 安全驗證（多因素） | P0 |
+| 8.9 | 配置管理（Git 版本控制） | P0 |
+| 8.12 | 資料洩漏防護 | P0 |
+| 8.15 | 全面記錄 | P0 |
+| 8.16 | 系統監控和告警 | P0 |
+| 8.20 | 網路安全（TLS 1.3、API Gateway） | P0 |
+| 8.24 | 加密使用標準 | P0 |
+| 8.25 | 安全開發生命週期 | P0 |
+| 8.28 | 安全編碼指南（OWASP） | P0 |
 
-| Requirement | Implementation |
-|------------|---------------|
-| Authentication | Secure token-based system |
-| Multi-Factor Authentication | TOTP/WebAuthn required |
-| Role-Based Access | RBAC with least privilege |
-| Audit Logging | Complete operation records |
+### 1.5 差距分析行動
 
-### 2.6 RTS 4.5 - Outsourced Development Control
+| 控制措施 | 差距 | 建議行動 | 優先級 |
+|----------|------|----------|--------|
+| 5.7 | 無威脅情報來源 | 整合威脅情報訂閱 | P2 |
+| 5.23 | 無雲端安全評估 | 進行雲端安全評估 | P2 |
+| 6.3 | 無安全意識培訓 | 建立培訓計畫 | P1 |
+| 8.1 | 無端點管理 | 實施 MDM 解決方案 | P2 |
 
-When using third-party development:
-- Security requirements in contract terms
-- Code review mandatory
-- Vulnerability scanning before acceptance
-- Security testing sign-off required
+### 1.6 認證時間表
 
-### 2.7 RTS 4.6 - Privileged Tool Control
-
-Administrative tools require:
-- Independent authentication
-- Operation auditing
-- Usage restrictions and monitoring
-
-### 2.8 Communication Security
-
-| Requirement | Standard |
-|------------|---------|
-| Minimum TLS version | TLS 1.2 (TLS 1.3 recommended) |
-| Cipher suites | Strong encryption only |
-| Certificates | Valid CA-signed certificates |
-
----
-
-## 3. Combined Compliance Calendar
-
-| Activity | Frequency | Responsible Party |
-|----------|-----------|-------------------|
-| Security risk assessment | Annual | Security Team |
-| Penetration testing | Semi-annual | External Auditor |
-| Access control review | Quarterly | IT Security |
-| Security awareness training | Annual (+ onboarding) | HR + Security |
-| Policy review and update | Annual | Compliance Team |
-| Internal audit | Annual | Internal Audit |
-| Regulatory filing | Annual | Legal Team |
+| 階段 | 期間 | 目標 |
+|------|------|------|
+| Phase 1 | 1 個月 | 完成差距評估 |
+| Phase 2 | 2 個月 | 實施關鍵控制措施 |
+| Phase 3 | 1 個月 | 內部審計 |
+| Phase 4 | 持續進行 | 認證審計準備 |
 
 ---
 
-## 4. Acceptance Criteria
+## 2. UK RTS 安全需求
 
-- [ ] ISO 27001:2022 gap analysis completed with all 93 controls assessed and documented
-- [ ] All P0 controls (5.1, 5.2, 5.3, 5.15, 8.2, 8.3, 8.5, 8.9, 8.12, 8.15, 8.16, 8.20, 8.24, 8.25, 8.28) implemented with evidence
-- [ ] UK RTS Section 4 requirements fully mapped: ISMS (4.1), clock sync (4.2), environment separation (4.3), access control (4.4), outsourced development (4.5), privileged tools (4.6)
-- [ ] Environment separation enforced: DEV, UAT, PROD fully isolated with no data leakage
-- [ ] Clock synchronization within 1 second across all systems using NTP with UTC timezone logging
-- [ ] Administrative tools have independent authentication (separate from user auth) and full audit trails
-- [ ] TLS 1.2+ enforced on all communications with strong cipher suites only
-- [ ] Compliance calendar established: risk assessment (annual), penetration testing (semi-annual), access review (quarterly), training (annual)
-- [ ] Internal audit completed before certification audit preparation
-- [ ] Gap analysis actions for P2 controls (5.7, 5.23, 6.3, 8.1) scheduled with timeline
+### 2.1 RTS Section 4 概述
+
+英國博彩委員會遠端技術標準（RTS）Section 4 定義了遠端博弈系統的安全需求。
+
+### 2.2 RTS 4.1 - 資訊安全管理
+
+| 需求 | 說明 |
+|------|------|
+| 4.1.1 | 需要 ISO 27001 合規 |
+| 4.1.2 | 必須進行定期風險評估 |
+| 4.1.3 | 必須存在文件化的安全政策 |
+
+### 2.3 RTS 4.2 - 時鐘同步
+
+所有系統必須使用同步時間來源：
+- 強制 NTP 伺服器同步
+- 最大時間偏差 < 1 秒
+- 所有日誌必須使用 UTC 時區
+
+### 2.4 RTS 4.3 - 環境分離
+
+| 環境 | 目的 | 隔離需求 |
+|------|------|----------|
+| 開發環境（DEV） | 開發和測試 | 完全隔離 |
+| 測試環境（UAT） | 驗收測試 | 與正式環境隔離 |
+| 正式環境（PROD） | 線上營運 | 最嚴格控制 |
+
+### 2.5 RTS 4.4 - 存取控制
+
+| 需求 | 實施 |
+|------|------|
+| 驗證 | 安全的 token 系統 |
+| 多因素驗證 | 需要 TOTP/WebAuthn |
+| 基於角色的存取 | RBAC 配合最小權限 |
+| 審計日誌 | 完整操作記錄 |
+
+### 2.6 RTS 4.5 - 外包開發控制
+
+使用第三方開發時：
+- 合約條款中的安全需求
+- 強制程式碼審查
+- 驗收前的漏洞掃描
+- 需要安全測試簽核
+
+### 2.7 RTS 4.6 - 特權工具控制
+
+管理工具需要：
+- 獨立驗證
+- 操作審計
+- 使用限制和監控
+
+### 2.8 通訊安全
+
+| 需求 | 標準 |
+|------|------|
+| 最低 TLS 版本 | TLS 1.2（建議 TLS 1.3） |
+| 加密套件 | 僅強加密 |
+| 憑證 | 有效的 CA 簽署憑證 |
+
+---
+
+## 3. 綜合合規日曆
+
+| 活動 | 頻率 | 負責方 |
+|------|------|--------|
+| 安全風險評估 | 年度 | 安全團隊 |
+| 滲透測試 | 半年度 | 外部審計員 |
+| 存取控制審查 | 季度 | IT 安全 |
+| 安全意識培訓 | 年度（+ 入職） | HR + 安全 |
+| 政策審查和更新 | 年度 | 合規團隊 |
+| 內部審計 | 年度 | 內部審計 |
+| 監管申報 | 年度 | 法務團隊 |
+
+---
+
+## 4. 驗收標準（Acceptance Criteria）
+
+- [ ] ISO 27001:2022 差距分析完成，所有 93 項控制措施已評估和文件化
+- [ ] 所有 P0 控制措施（5.1、5.2、5.3、5.15、8.2、8.3、8.5、8.9、8.12、8.15、8.16、8.20、8.24、8.25、8.28）已實施並有證據
+- [ ] UK RTS Section 4 需求完全對應：ISMS（4.1）、時鐘同步（4.2）、環境分離（4.3）、存取控制（4.4）、外包開發（4.5）、特權工具（4.6）
+- [ ] 環境分離強制執行：DEV、UAT、PROD 完全隔離，無資料洩漏
+- [ ] 所有系統使用 NTP 在 1 秒內時鐘同步，UTC 時區日誌記錄
+- [ ] 管理工具擁有獨立驗證（與使用者驗證分離）和完整審計追蹤
+- [ ] 所有通訊強制執行 TLS 1.2+，僅使用強加密套件
+- [ ] 合規日曆已建立：風險評估（年度）、滲透測試（半年度）、存取審查（季度）、培訓（年度）
+- [ ] 認證審計準備前完成內部審計
+- [ ] P2 控制措施（5.7、5.23、6.3、8.1）的差距分析行動已排程並附時間表

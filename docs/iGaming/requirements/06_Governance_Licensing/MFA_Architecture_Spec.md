@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
 > **Audience**: Executives, Compliance Officers, Risk Officers
-> **Related Architecture**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
+> **Related Doc**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
 > **Last Synced**: 2026-02-09
 >
 > **Refinement Note**: Technical details (TOTP RFC 6238 specifications, HMAC-SHA1 algorithms, SIM Swap attack vectors, SS7 hijacking, TOTP secret encryption AES/GCM, FIDO2 technical standards) moved to Architecture layer. This document focuses on business risk analysis and decision-making only.
@@ -11,25 +11,24 @@
 
 ## Business Value
 
-This specification delivers strategic value by:
-- **Risk Reduction**: MFA reduces security risk from CVSS 8.1 (High) to 4.3 (Medium), a 47% risk reduction for high-privilege backend accounts
-- **Compliance Readiness**: Satisfies MGA, UKGC, PCI DSS 4.0, and GDPR requirements for multi-factor authentication, avoiding fines up to EUR 20M
-- **Financial Protection**: Prevents credential-based attacks that caused $237K USD loss (2023 industry case) and 120K player data breach (2024)
-- **Defense in Depth**: Implements three-layer MFA architecture (TOTP primary, SMS backup, Backup Codes offline recovery) for business continuity
+MFA (Multi-Factor Authentication) for backend users delivers critical business value by:
+- **Risk Reduction**: Reduces security risk from CVSS 8.1 (High) to 4.3 (Medium), approximately 47% risk reduction by increasing attack complexity
+- **Financial Loss Prevention**: Prevents account takeover attacks like the 2023 Finance Manager phishing incident ($237,000 USD loss) and 2024 Super Admin credential stuffing attack (120,000 player data breach)
+- **Regulatory Compliance**: Meets MGA mandatory requirements (avoiding EUR 50K-500K fines), UKGC recommendations, PCI DSS 4.0 Requirement 8.3.1, and GDPR Art. 32 (avoiding EUR 20M or 4% global revenue penalties)
+- **Operational Security**: Protects high-privilege operations (balance adjustments, withdrawal approvals, risk rule modifications, player data access) with second-factor verification
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] All Super Admin, Finance Manager, and Risk Control roles have mandatory MFA enabled
-- [ ] TOTP (Google Authenticator/Authy) functions as primary MFA method
-- [ ] SMS OTP functions as backup when TOTP is unavailable
-- [ ] Backup Codes (10 one-time recovery codes) are available for offline recovery
-- [ ] Account locks for 15 minutes after 3 consecutive MFA failures
-- [ ] Security alert notification triggers on account lockout
-- [ ] MFA audit log records all events (registration, verification, failure)
-- [ ] MFA implementation passes penetration testing per MGA requirements
-- [ ] Phase 1 (TOTP) completes within 2 weeks, Phase 2 (SMS) within 3 weeks, Phase 3 (Backup Codes) within 4 weeks
+- [ ] All Super Admin, Finance Manager, and Risk Control roles enforce MFA during login (no optional bypass for high-privilege accounts)
+- [ ] TOTP (Google Authenticator) is the primary MFA method (P0), with SMS OTP backup (P1), Email OTP fallback (P2), and Backup Codes emergency recovery (P3)
+- [ ] MFA Secret storage is encrypted using AES-256-GCM with proper key rotation policy
+- [ ] Verification failure policy: 3 consecutive failures trigger 15-minute account lockout with security alert notification
+- [ ] Audit logs capture all MFA events: registration, verification, failures, and recovery attempts
+- [ ] MFA compliance checklist passed (MGA requirements): Secret encryption, audit logging, penetration testing, and no self-service recovery
+- [ ] Decision matrix scoring: Option B (TOTP + SMS) achieves weighted score ≥4.8 (Security 40%, UX 30%, Cost 30%)
+- [ ] Phase-based implementation: TOTP (Week 1-2), SMS OTP (Week 3), Backup Codes (Week 4)
 
 ---
 

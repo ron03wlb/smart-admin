@@ -1,376 +1,396 @@
-# Seamless Wallet Business Requirements
+# Seamless Wallet 業務需求文檔（Business Requirements）
 
 > **Canonical Source**: [03-03_Seamless_Wallet_Analysis.md](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md)
-> **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Architecture**: [Seamless Wallet Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md)
+> **Audience**: 高層主管、產品經理、合規官員
+> **Related Architecture**: [Seamless Wallet 技術實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md)
 > **Last Synced**: 2026-02-09
 >
-> **Refinement Note**: Technical details (scheduled jobs, Redis cache, database constraints, distributed locks, pending queue implementation, idempotency mechanisms) moved to Architecture layer. This document focuses on business rules only.
+> **精煉說明**：技術細節（排程任務、Redis 緩存、資料庫約束、分散式鎖、待處理佇列實現、冪等性機制）已移至架構層。本文檔僅聚焦業務規則。
 
 ---
 
-## 1. Purpose
+## 驗收標準（Acceptance Criteria）
 
-This document defines the business rules, policies, and operational requirements for the Seamless Wallet (Single Wallet) integration with Game Providers (GP). It covers transaction types, settlement rules, player-facing policies, risk scenarios, and compliance requirements.
+- [ ] 平台支援所有四種交易模型（Transaction-Based, Round-Based, Transfer-Based, Result-Only）
+- [ ] Round 生命週期管理正確處理所有狀態（OPEN, CLOSED, TIMEOUT, PENDING_REVIEW, CANCELLED, ADJUSTED）
+- [ ] 孤兒 Round 檢測每 15 分鐘執行一次，並在 > 2 小時後升級處理
+- [ ] 冪等性強制防止相同 txId 重試導致的重複加額（100% 準確率）
+- [ ] 亂序處理使用策略 3（臨時存儲），30 分鐘過期，壓力下自動降級
+- [ ] 並發下注透過分散式鎖防止超額扣款，響應時間 < 200ms
+- [ ] 餘額不足返回錯誤，響應時間 < 100ms（P0 優先級）
+- [ ] 負餘額處理立即鎖定帳戶並觸發 P2 風控警報
+- [ ] Free Spin 配額驗證拒絕過期配額，返回「Free Spin 配額已耗盡」錯誤
+- [ ] 雙錢包扣款遵循配置優先級（預設：Bonus → Cash → Credit），支援混合扣款
+- [ ] 玩家 Token 過期的 Win 請求被接受（玩家合法資產不受結算時間影響）
+- [ ] Jackpot 獎金 > $10,000 觸發人工審批模式或自動加額並凍結帳戶（依 GP 協議）
+- [ ] 每日對帳生成自動化差異報告（Diff Reports），標記不匹配的交易 ID 和金額
+- [ ] 所有 GP 整合強制要求 TransactionId（拒絕缺少必填欄位的請求）
+- [ ] 監控 KPI 達標（亂序 < 0.1%，待處理 < 100，超時升級 < 1%，餘額不足警報 > 30%）
 
 ---
 
-## 2. Game Provider Integration Types
+## 1. 目的（Purpose）
 
-### 2.1 Transaction Model Classification
+本文檔定義與遊戲供應商（GP, Game Provider）進行 Seamless Wallet（單一錢包）整合的業務規則、政策和操作要求。涵蓋交易類型、結算規則、玩家面向政策、風險場景和合規要求。
 
-| Type | Description | Representative Providers | Business Implications |
+---
+
+## 2. 遊戲供應商整合類型（Game Provider Integration Types）
+
+### 2.1 交易模型分類（Transaction Model Classification）
+
+| 類型 | 說明 | 代表供應商 | 業務影響 |
 |:-----|:------------|:------------------------|:---------------------|
-| **Transaction-Based** | Each request is an independent transaction (Debit/Credit) with Amount or Type | PG Soft, JILI | Simplest model. TransactionId must be globally unique. |
-| **Round-Based** | Requests bound to a RoundId. Bet opens a Round, Win closes it. | Evolution, Pragmatic Play | Risk of "orphaned rounds" if Bet succeeds but Win is lost. Requires scheduled monitoring. |
-| **Transfer-Based** | Legacy architecture simulating TransferIn / TransferOut | Certain legacy sportsbooks | Semantic confusion with "transfer wallet." Must ensure actions are system-triggered, not manual. |
-| **Result-Only** | Only sends game results (Win/Loss Amount); no Bet/Win distinction | Certain lottery/card games | Risk control difficulty: cannot validate balance at bet time, may result in negative balance. |
+| **Transaction-Based** | 每個請求為獨立交易（Debit/Credit），帶有 Amount 或 Type | PG Soft, JILI | 最簡單模型。TransactionId 必須全局唯一。 |
+| **Round-Based** | 請求綁定至 RoundId。Bet 開啟 Round，Win 關閉 Round。 | Evolution, Pragmatic Play | 存在「孤兒 Round」風險（Bet 成功但 Win 遺失）。需排程監控。 |
+| **Transfer-Based** | 舊式架構模擬 TransferIn / TransferOut | 特定舊式體育博彩 | 語義混淆（與「轉帳錢包」概念衝突）。必須確保動作為系統觸發，非人工。 |
+| **Result-Only** | 僅發送遊戲結果（Win/Loss Amount），無 Bet/Win 區分 | 特定彩票/牌類遊戲 | 風控困難：無法在下注時驗證餘額，可能導致負餘額。 |
 
-### 2.2 Wallet Behavior Classification
+### 2.2 錢包行為分類（Wallet Behavior Classification）
 
-| Behavior | Description | Risk & Policy |
+| 行為 | 說明 | 風險與政策 |
 |:---------|:------------|:-------------|
-| **GetBalance Only** | GP only queries balance; balance changes recorded internally by GP with periodic settlement | **Extremely high risk.** Not recommended unless operating under a credit model. |
-| **Async Callback** | Platform acknowledges request receipt immediately; actual transaction result delivered asynchronously via callback notification | Requires bidirectional state machine; doubles process complexity. |
-| **Batch Processing** | GP combines multiple player transactions into a single HTTP request | Must support batch transaction processing. Business must decide: All-or-Nothing vs. Partial Success. |
+| **GetBalance Only** | GP 僅查詢餘額；餘額變更由 GP 內部記錄，定期結算 | **極高風險**。不推薦，除非使用信用模式運營。 |
+| **Async Callback** | 平台立即確認請求接收；實際交易結果透過回調通知異步交付 | 需雙向狀態機；流程複雜度翻倍。 |
+| **Batch Processing** | GP 將多個玩家交易合併為單一 HTTP 請求 | 必須支援批次交易處理。業務需決定：全有全無 vs. 部分成功。 |
 
-→ **[Async Response Protocol Technical Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#async-response-protocol)**
+→ **[Async Response Protocol 技術實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#async-response-protocol)**
 
 ---
 
-## 3. Round Lifecycle Management (Round-Based Model)
+## 3. Round 生命週期管理（Round Lifecycle Management）（Round-Based 模型）
 
-### 3.1 Round State Definitions
+### 3.1 Round 狀態定義（Round State Definitions）
 
-| State | Trigger Condition | Automated Action | Manual Intervention |
+| 狀態 | 觸發條件 | 自動化動作 | 人工介入 |
 |-------|------------------|-----------------|-------------------|
-| **OPEN** | Bet request succeeds | Debit balance + create round record | None |
-| **CLOSED** | Win request succeeds | Credit balance + close round | None |
-| **TIMEOUT** | Open for more than 2 hours without Win | Query GP API for final status | If GP API fails, escalate to PENDING_REVIEW |
-| **PENDING_REVIEW** | GP status unknown | Create CS support ticket | Required: CS agent manually closes or cancels |
-| **CANCELLED** | Rollback request received | Refund bet + mark as cancelled | None |
-| **ADJUSTED** | Resettlement request received | Adjust balance (may go negative) | If negative balance results, trigger risk control lock |
+| **OPEN** | Bet 請求成功 | 扣除餘額 + 建立 Round 記錄 | 無 |
+| **CLOSED** | Win 請求成功 | 加額餘額 + 關閉 Round | 無 |
+| **TIMEOUT** | 開啟超過 2 小時無 Win | 查詢 GP API 最終狀態 | 若 GP API 失敗，升級至 PENDING_REVIEW |
+| **PENDING_REVIEW** | GP 狀態未知 | 建立 CS 支援工單 | 必須：CS 人員手動關閉或取消 |
+| **CANCELLED** | 收到 Rollback 請求 | 退款 + 標記為已取消 | 無 |
+| **ADJUSTED** | 收到 Resettlement 請求 | 調整餘額（可能為負） | 若產生負餘額，觸發風控鎖定 |
 
-### 3.2 Orphaned Round Policy
+### 3.2 孤兒 Round 政策（Orphaned Round Policy）
 
-An orphaned round occurs when a Bet succeeds but a Win never arrives.
+孤兒 Round 發生於 Bet 成功但 Win 永遠不到達的情況。
 
-- **Detection**: System checks every 15 minutes for rounds open for more than 2 hours
-- **Resolution**: Query GP API for final status; auto-close if confirmed, or escalate to manual review
-- **Escalation Criteria**:
-  - Round amount greater than $1,000: HIGH priority, 24-hour SLA
-  - Round amount $1,000 or less: MEDIUM priority, 24-hour SLA
+- **檢測**：系統每 15 分鐘檢查開啟超過 2 小時的 Round
+- **解決**：查詢 GP API 最終狀態；若確認則自動關閉，或升級至人工審核
+- **升級標準**：
+  - Round 金額 > $1,000：HIGH 優先級，24 小時 SLA
+  - Round 金額 ≤ $1,000：MEDIUM 優先級，24 小時 SLA
 
-→ **[Orphaned Round Detection Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#orphaned-round-detection)** - Scheduled job configuration, SQL queries, GP API integration
+→ **[孤兒 Round 檢測實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#orphaned-round-detection)** - 排程任務配置、SQL 查詢、GP API 整合
 
-### 3.3 Duplicate Win Policy
+### 3.3 重複 Win 政策（Duplicate Win Policy）
 
-- Duplicate Win requests (same roundId + txId) must return the original execution result
-- No duplicate credit shall be applied
-- Enforcement via duplicate prevention mechanisms
+- 重複 Win 請求（相同 roundId + txId）必須返回原始執行結果
+- 不得重複加額
+- 透過重複防禦機制強制執行
 
-→ **[Idempotency Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#idempotency-defense)** - Three-layer defense (Redis + DB unique constraint + Fallback query)
+→ **[冪等性實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#idempotency-defense)** - 三層防禦（Redis + DB 唯一約束 + Fallback 查詢）
 
-### 3.4 Resettlement Negative Balance Policy
+### 3.4 重新結算負餘額政策（Resettlement Negative Balance Policy）
 
-When a GP claws back overpaid winnings and the player balance is insufficient:
+當 GP 收回多付的獎金且玩家餘額不足時：
 
-- The platform allows the balance to go negative
-- The player account is automatically locked
-- A risk control alert is triggered
-- Recovery follows the negative balance handling policy (see Section 7)
+- 平台允許餘額為負
+- 玩家帳戶自動鎖定
+- 觸發風控警報
+- 恢復流程遵循負餘額處理政策（見第 7 節）
 
 ---
 
-## 4. Transaction Scenarios & Business Rules
+## 4. 交易場景與業務規則（Transaction Scenarios & Business Rules）
 
-### 4.1 Normal Transaction Flow (Happy Path)
+### 4.1 正常交易流程（Normal Transaction Flow）（Happy Path）
 
-**Bet (Debit)**:
-1. GP sends debit request with user, amount, roundId, txId
-2. Platform verifies balance is sufficient
-3. Platform deducts balance, records transaction, returns new balance
+**Bet（扣款）**：
+1. GP 發送扣款請求，包含 user, amount, roundId, txId
+2. 平台驗證餘額充足
+3. 平台扣除餘額、記錄交易、返回新餘額
 
-**Win (Credit)**:
-1. GP sends credit request with user, amount, roundId, txId, refTxId
-2. Platform credits balance, records transaction, returns new balance
-3. The refTxId links the win back to the original bet
+**Win（加額）**：
+1. GP 發送加額請求，包含 user, amount, roundId, txId, refTxId
+2. 平台加額餘額、記錄交易、返回新餘額
+3. refTxId 將 Win 連結回原始 Bet
 
-### 4.2 Insufficient Funds (Scenario A)
+### 4.2 餘額不足（Insufficient Funds）（場景 A）
 
-- When player balance is less than bet amount, the platform returns an INSUFFICIENT_FUNDS error
-- The GP must display an insufficient balance message and prevent game play
-- If a bonus wallet is available and the game supports it, dual-wallet deduction applies (see Section 6)
+- 當玩家餘額 < 下注金額時，平台返回 INSUFFICIENT_FUNDS 錯誤
+- GP 必須顯示餘額不足訊息並阻止遊戲進行
+- 若有 Bonus 錢包可用且遊戲支援，則應用雙錢包扣款（見第 6 節）
 
-### 4.3 Concurrent Betting (Scenario B)
+### 4.3 並發下注（Concurrent Betting）（場景 B）
 
-- When multiple bet requests arrive simultaneously for the same player, the platform must prevent over-deduction
-- Business rule: Only one bet may be processed at a time per player
-- If contention is detected and unresolvable within retry limits, return "System Busy - Retry Later"
+- 當同一玩家的多個下注請求同時到達時，平台必須防止超額扣款
+- 業務規則：每個玩家同一時間僅能處理一個下注
+- 若檢測到競爭且重試限制內無法解決，返回「系統繁忙 - 請稍後重試」
 
-### 4.4 Timeout & Retry (Scenario C)
+### 4.4 超時與重試（Timeout & Retry）（場景 C）
 
-- When a GP times out waiting for a response, it may retry with the same txId
-- Business rule: Retries with the same txId must return the stored original result with no re-execution
-- A transaction without a txId must be rejected with an error
+- 當 GP 等待響應超時時，可能使用相同 txId 重試
+- 業務規則：相同 txId 的重試必須返回存儲的原始結果，不重新執行
+- 無 txId 的交易必須拒絕並返回錯誤
 
-→ **[Idempotency Cache Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#timeout-retry-handling)** - Redis cache, 1-hour TTL, fallback query
+→ **[冪等性緩存實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#timeout-retry-handling)** - Redis 緩存、1 小時 TTL、Fallback 查詢
 
-### 4.5 Out-of-Order Requests (Scenario D)
+### 4.5 亂序請求（Out-of-Order Requests）（場景 D）
 
-When a Win request arrives before its corresponding Bet:
+當 Win 請求在對應 Bet 之前到達時：
 
-| Strategy | Description | Pros | Cons | Recommendation |
+| 策略 | 說明 | 優點 | 缺點 | 建議 |
 |----------|------------|------|------|---------------|
-| **Strategy 1: Immediate Reject** | Return BET_NOT_FOUND error | Simple, stateless | Win may be lost if GP does not retry | Suitable for reliable GPs with retry mechanisms |
-| **Strategy 2: Allow Orphan Win** | Credit win without matching bet | Player does not lose winnings | High risk of double credit; reconciliation difficulty | **Not recommended** except as emergency fallback |
-| **Strategy 3: Temporary Storage** | Store win temporarily (30-minute expiry) | Automated resolution; full audit trail | Higher implementation complexity | **Recommended for production** |
+| **策略 1：立即拒絕** | 返回 BET_NOT_FOUND 錯誤 | 簡單、無狀態 | 若 GP 不重試，Win 可能遺失 | 適用於有重試機制的可靠 GP |
+| **策略 2：允許孤兒 Win** | 無匹配 Bet 仍加額 Win | 玩家不會失去獎金 | 高風險重複加額；對帳困難 | **不推薦**，僅作緊急備案 |
+| **策略 3：臨時存儲** | 臨時存儲 Win（30 分鐘過期） | 自動化解決；完整審計追蹤 | 實現複雜度較高 | **推薦用於生產** |
 
-**Production recommendation**: Strategy 3 as default, with automatic degradation to Strategy 1 under system pressure.
+**生產建議**：策略 3 為預設，系統壓力下自動降級至策略 1。
 
-→ **[Out-of-Order Handling Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#out-of-order-handling)** - Pending queue architecture, Redis storage, TTL configuration, degradation triggers
+→ **[亂序處理實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#out-of-order-handling)** - 待處理佇列架構、Redis 存儲、TTL 配置、降級觸發器
 
-### 4.6 Rollback / Refund (Scenario E)
+### 4.6 回滾 / 退款（Rollback / Refund）（場景 E）
 
-- When a game round is cancelled (e.g., sports event interrupted, system failure), the GP sends a Rollback request
-- Platform finds the original transaction and executes a reverse operation (refund)
-- If the original transaction is not found (bet never arrived), the platform returns Success (goal achieved: no deduction occurred)
+- 當遊戲 Round 被取消（例如：體育賽事中斷、系統故障）時，GP 發送 Rollback 請求
+- 平台查找原始交易並執行反向操作（退款）
+- 若找不到原始交易（Bet 從未到達），平台返回 Success（目標已達成：無扣款發生）
 
-### 4.7 Resettlement / Adjustment (Scenario F)
+### 4.7 重新結算 / 調整（Resettlement / Adjustment）（場景 F）
 
-- When the GP discovers an incorrect payout (e.g., wrong odds), it sends an Adjust request
-- Platform supports multiple credits to the same round, including negative credits (clawback)
-- If clawback causes a negative balance, the platform allows it, locks the account, and triggers a risk alert
-- Manual recovery process: freeze withdrawals, contact player, arrange installment recovery
+- 當 GP 發現錯誤賠付（例如：賠率錯誤）時，發送 Adjust 請求
+- 平台支援對同一 Round 多次加額，包括負額加額（回收）
+- 若回收導致負餘額，平台允許並鎖定帳戶，觸發風控警報
+- 人工恢復流程：凍結提款、聯繫玩家、安排分期回收
 
-### 4.8 Jackpot & Big Win (Scenario I)
+### 4.8 Jackpot 與大獎（Jackpot & Big Win）（場景 I）
 
-- Triggered when a player wins more than $10,000 or hits a progressive jackpot
-- **Manual Approval mode**: GP sends NotifyWin; funds are held pending human review before crediting
-- **Auto Credit mode**: Funds credited immediately, account frozen, risk review triggered
-- Protocol mode depends on the GP agreement
-
----
-
-## 5. Promotion & Bonus Rules
-
-### 5.1 Free Spin / Free Round (Scenario G)
-
-- GP notifies the platform with a Bet amount of 0 and actual Win amount
-- Platform must accept Amount=0 transactions
-- Platform must validate the player's free spin quota before acceptance
-- If quota is exhausted, reject with "Free Spin Quota Exceeded"
-
-### 5.2 Bonus Wallet (Scenario H)
-
-- Players may have both a Cash wallet and a Bonus wallet (e.g., Cash 100 + Bonus 50 for slots only)
-- When the game does not support bonus play, only the Cash wallet is used
-- If Cash balance is insufficient (e.g., bet 120 but Cash is only 100), the platform returns insufficient funds even if total assets are 150
-- When the game supports bonus play, dual-wallet deduction applies (Cash first, then Bonus if insufficient)
+- 當玩家贏得 > $10,000 或中累積 Jackpot 時觸發
+- **人工審批模式**：GP 發送 NotifyWin；資金暫扣待人工審核後加額
+- **自動加額模式**：資金立即加額，帳戶凍結，觸發風控審核
+- 協議模式依 GP 協議而定
 
 ---
 
-## 6. Wallet Deduction Order Policy
+## 5. 促銷與獎金規則（Promotion & Bonus Rules）
 
-### 6.1 Default Deduction Sequence
+### 5.1 Free Spin / Free Round（場景 G）
 
-The system default deduction order is: **Bonus -> Cash -> Credit**
+- GP 通知平台 Bet 金額為 0，實際 Win 金額不為零
+- 平台必須接受 Amount=0 交易
+- 平台必須在接受前驗證玩家的 Free Spin 配額
+- 若配額耗盡，拒絕並返回「Free Spin 配額已耗盡」
 
-### 6.2 Game-Level Override
+### 5.2 Bonus Wallet（獎金錢包）（場景 H）
 
-- Each game or GP may configure a custom `wallet_priority` that overrides the system default
-- The configuration must explicitly mark whether it overrides the default
-
-### 6.3 Deduction Execution Rules
-
-1. Receive Bet request
-2. Check if the game has a custom wallet_priority configuration
-3. If custom configuration exists and override is enabled, use the game configuration
-4. If no custom configuration exists, use the system default
-5. Deduct balance in priority order
-6. Mixed deduction is permitted when the first-priority wallet has insufficient balance (split transaction details must be recorded)
+- 玩家可能同時擁有 Cash 錢包和 Bonus 錢包（例如：Cash 100 + Bonus 50 僅限老虎機）
+- 當遊戲不支援 Bonus 遊玩時，僅使用 Cash 錢包
+- 若 Cash 餘額不足（例如：下注 120 但 Cash 僅 100），即使總資產為 150，平台仍返回餘額不足
+- 當遊戲支援 Bonus 遊玩時，應用雙錢包扣款（Cash 優先，不足時使用 Bonus）
 
 ---
 
-## 7. Negative Balance Handling Policy
+## 6. 錢包扣款順序政策（Wallet Deduction Order Policy）
 
-### 7.1 Decision
+### 6.1 預設扣款順序（Default Deduction Sequence）
 
-Allow negative balance with automatic lock and manual intervention.
+系統預設扣款順序：**Bonus → Cash → Credit**
 
-### 7.2 Trigger Scenarios
+### 6.2 遊戲層級覆寫（Game-Level Override）
 
-GP-initiated Rollback or Resettlement that deducts funds exceeding the player's current balance.
+- 每個遊戲或 GP 可配置自訂 `wallet_priority` 以覆寫系統預設
+- 配置必須明確標記是否覆寫預設
 
-### 7.3 Handling Procedure
+### 6.3 扣款執行規則（Deduction Execution Rules）
 
-1. Force the deduction, setting balance below zero
-2. Immediately change account status to LOCKED or SUSPENDED
-3. Block all new logins, bets, and withdrawals
-4. Send a high-priority alert to the Risk Control team
-5. Only administrators with RISK_MANAGER permission may unlock the account
+1. 接收 Bet 請求
+2. 檢查遊戲是否有自訂 wallet_priority 配置
+3. 若自訂配置存在且啟用覆寫，使用遊戲配置
+4. 若無自訂配置，使用系統預設
+5. 按優先級順序扣除餘額
+6. 允許混合扣款（第一優先錢包不足時，記錄拆分交易明細）
 
 ---
 
-## 8. Authentication & Session Policy
+## 7. 負餘額處理政策（Negative Balance Handling Policy）
 
-### 8.1 Session Expiry Rules
+### 7.1 決策（Decision）
 
-| Request Type | Player Token Expired | Business Rule |
+允許負餘額，自動鎖定並人工介入。
+
+### 7.2 觸發場景（Trigger Scenarios）
+
+GP 發起的 Rollback 或 Resettlement，扣除金額超過玩家當前餘額。
+
+### 7.3 處理程序（Handling Procedure）
+
+1. 強制執行扣款，設定餘額為負
+2. 立即將帳戶狀態改為 LOCKED 或 SUSPENDED
+3. 阻止所有新登入、下注和提款
+4. 向風控團隊發送高優先級警報
+5. 僅具有 RISK_MANAGER 權限的管理員可解鎖帳戶
+
+---
+
+## 8. 身份驗證與 Session 政策（Authentication & Session Policy）
+
+### 8.1 Session 過期規則（Session Expiry Rules）
+
+| 請求類型 | 玩家 Token 過期 | 業務規則 |
 |-------------|---------------------|--------------|
-| **Bet** | Reject (Error: Token Expired) | Player cannot initiate new bets after session expiry |
-| **Win** | **Must Accept** | Bet occurred during valid session; winnings are player's rightful asset regardless of settlement timing |
+| **Bet** | 拒絕（錯誤：Token Expired） | 玩家無法在 Session 過期後發起新下注 |
+| **Win** | **必須接受** | Bet 發生於有效 Session 期間；獎金為玩家合法資產，不受結算時間影響 |
 
 ---
 
-## 9. Currency & Exchange Policy
+## 9. 貨幣與匯兌政策（Currency & Exchange Policy）
 
-### 9.1 Precision Requirement
+### 9.1 精度要求（Precision Requirement）
 
-- All monetary calculations must support 4 decimal places
-- Rounding errors from 0.0001-level cumulative differences must be prevented
+- 所有貨幣計算必須支援 4 位小數
+- 必須防止 0.0001 級別累積差異產生的捨入誤差
 
-### 9.2 Multi-Currency Policy
+### 9.2 多幣種政策（Multi-Currency Policy）
 
-- If the GP does not support the player's currency, an intermediate exchange layer is required
-- **Recommendation**: Configure the GP to operate directly in the player's currency to avoid exchange risk
-- Unit conversion (e.g., cents vs. dollars) must be explicitly defined per GP integration
-
----
-
-## 10. Reconciliation Requirements
-
-### 10.1 Daily Reconciliation
-
-- The platform must download each GP's Transaction Report daily and compare it against the platform records
-- Automated Diff Reports must be generated for: mismatched transaction IDs, mismatched amounts
-
-### 10.2 Extreme Case Policy
-
-Even with retries, edge cases may occur where the GP considers a transaction successful while the platform considers it failed (e.g., internal processing failure after successful response). Daily reconciliation is the safety net for these scenarios.
+- 若 GP 不支援玩家幣種，需中間匯兌層
+- **建議**：配置 GP 直接使用玩家幣種運營，避免匯兌風險
+- 單位轉換（例如：美分 vs. 美元）必須按 GP 整合明確定義
 
 ---
 
-## 11. Scenario Priority Matrix
+## 10. 對帳要求（Reconciliation Requirements）
 
-| Scenario | Detection Point | Priority | Response Time | Risk Level | Automation Level |
+### 10.1 每日對帳（Daily Reconciliation）
+
+- 平台必須每日下載各 GP 的交易報告（Transaction Report）並與平台記錄比對
+- 自動化差異報告（Diff Reports）必須生成：不匹配的交易 ID、不匹配的金額
+
+### 10.2 極端案例政策（Extreme Case Policy）
+
+即使有重試，邊緣案例仍可能發生 GP 認為交易成功而平台認為失敗（例如：成功響應後內部處理失敗）。每日對帳是這些場景的安全網。
+
+---
+
+## 11. 場景優先級矩陣（Scenario Priority Matrix）
+
+| 場景 | 檢測點 | 優先級 | 響應時間 | 風險級別 | 自動化水平 |
 |----------|----------------|----------|--------------|------------|-----------------|
-| A - Insufficient Funds | Bet Request | P0 | < 100ms | LOW | 100% automated |
-| B - Concurrent Race | Bet Request | P0 | < 200ms | MEDIUM | 100% automated (concurrency control) |
-| C - Timeout Retry | Win Timeout | P1 | 2 hours | MEDIUM | 90% automated (active query) |
-| D - Out-of-Order | Win Request | P1 | < 2 hours | MEDIUM | 95% automated (temporary storage) |
-| E - Rollback / Refund | Rollback Request | P1 | < 500ms | MEDIUM | 100% automated |
-| F - Resettlement | Adjust Request | P2 | < 1s | HIGH | 50% automated (negative balance requires manual) |
-| G - Free Spin | Bet Request | P0 | < 100ms | LOW | 100% automated |
-| H - Bonus Wallet | Bet Request | P0 | < 150ms | LOW | 100% automated |
-| I - Jackpot | Win Request | P0 | Manual review | HIGH | 0-50% automated (depends on GP agreement) |
+| A - 餘額不足 | Bet Request | P0 | < 100ms | LOW | 100% 自動化 |
+| B - 並發競爭 | Bet Request | P0 | < 200ms | MEDIUM | 100% 自動化（並發控制） |
+| C - 超時重試 | Win Timeout | P1 | 2 hours | MEDIUM | 90% 自動化（主動查詢） |
+| D - 亂序 | Win Request | P1 | < 2 hours | MEDIUM | 95% 自動化（臨時存儲） |
+| E - 回滾 / 退款 | Rollback Request | P1 | < 500ms | MEDIUM | 100% 自動化 |
+| F - 重新結算 | Adjust Request | P2 | < 1s | HIGH | 50% 自動化（負餘額需人工） |
+| G - Free Spin | Bet Request | P0 | < 100ms | LOW | 100% 自動化 |
+| H - Bonus Wallet | Bet Request | P0 | < 150ms | LOW | 100% 自動化 |
+| I - Jackpot | Win Request | P0 | 人工審核 | HIGH | 0-50% 自動化（依 GP 協議） |
 
-→ **[Concurrency Control & Queue Management](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#concurrency-management)** - Distributed lock (Redisson), pending queue implementation
+→ **[並發控制與佇列管理](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#concurrency-management)** - 分散式鎖（Redisson）、待處理佇列實現
 
 ---
 
-## 12. Exception Handling Decision Table
+## 12. 異常處理決策表（Exception Handling Decision Table）
 
-| Exception Type | Detection Method | Degradation Strategy | Compensation Mechanism | Manual Intervention Threshold |
+| 異常類型 | 檢測方法 | 降級策略 | 補償機制 | 人工介入閾值 |
 |---------------|-----------------|---------------------|----------------------|------------------------------|
-| Lock timeout | 3 retry failures | Return "System Busy" | Player retries | Lock wait exceeds 10s |
-| GP timeout | 2 hours no response | Active GP query | Compensatory credit or refund | Query fails 3 consecutive times |
-| Out-of-order backlog | Temporary storage exceeds 100 | Alert + scale capacity | Extend retention to 4 hours | Storage exceeds 500 |
-| Negative balance | Balance drops below 0 after deduction | Allow negative balance | Freeze withdrawals + manual recovery | Negative balance below -$1,000 |
-| Jackpot anomaly | Amount exceeds $50k | Force manual review | Withhold credit | All jackpots |
-| Transaction history unavailable | Stored result expired | Query transaction records | Rebuild stored result (1-hour retention) | No record in system |
+| 鎖超時 | 3 次重試失敗 | 返回「系統繁忙」 | 玩家重試 | 鎖等待超過 10s |
+| GP 超時 | 2 小時無響應 | 主動查詢 GP | 補償性加額或退款 | 查詢連續 3 次失敗 |
+| 亂序積壓 | 臨時存儲超過 100 | 警報 + 擴容 | 延長保留至 4 小時 | 存儲超過 500 |
+| 負餘額 | 扣款後餘額 < 0 | 允許負餘額 | 凍結提款 + 人工回收 | 負餘額 < -$1,000 |
+| Jackpot 異常 | 金額超過 $50k | 強制人工審核 | 暫扣加額 | 所有 Jackpot |
+| 交易歷史不可用 | 存儲結果過期 | 查詢交易記錄 | 重建存儲結果（1 小時保留） | 系統無記錄 |
 
-→ **[Exception Handling Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#exception-handling)** - Redis cache expiry, database fallback query, pending queue scaling, lock timeout handling
+→ **[異常處理實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#exception-handling)** - Redis 緩存過期、資料庫 Fallback 查詢、待處理佇列擴容、鎖超時處理
 
 ---
 
-## 13. Strategy Switching Policy (Out-of-Order Handling)
+## 13. 策略切換政策（Strategy Switching Policy）（亂序處理）
 
-### 13.1 Degradation Triggers
+### 13.1 降級觸發器（Degradation Triggers）
 
-The system automatically switches between out-of-order handling strategies based on operational conditions:
+系統根據運營條件自動切換亂序處理策略：
 
-| Trigger Condition | Switch To | Recovery Condition |
+| 觸發條件 | 切換至 | 恢復條件 |
 |------------------|-----------|-------------------|
-| Temporary storage backlog exceeds threshold | Strategy 3 to Strategy 1 | Backlog returns to normal for 10 minutes |
-| Storage service unavailable | Strategy 3 to Strategy 1 | Service restored + 5-minute stability |
-| Transaction processing time too high | Strategy 3 to Strategy 1 | Processing time normalized for 10 minutes |
-| System resource pressure too high | Strategy 3 to Strategy 1 | Resource usage normalized for 10 minutes |
-| GP retry rate too low | Strategy 1 to Strategy 2 (emergency) | Manual recovery only |
+| 臨時存儲積壓超過閾值 | 策略 3 → 策略 1 | 積壓恢復正常 10 分鐘 |
+| 存儲服務不可用 | 策略 3 → 策略 1 | 服務恢復 + 5 分鐘穩定 |
+| 交易處理時間過長 | 策略 3 → 策略 1 | 處理時間正常化 10 分鐘 |
+| 系統資源壓力過高 | 策略 3 → 策略 1 | 資源使用正常化 10 分鐘 |
+| GP 重試率過低 | 策略 1 → 策略 2（緊急） | 僅人工恢復 |
 
-→ **[Strategy Switching Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#strategy-switching)** - Specific thresholds (Redis connection, DB latency P99, CPU usage, queue size), monitoring metrics, degradation automation
+→ **[策略切換實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#strategy-switching)** - 具體閾值（Redis 連線、DB 延遲 P99、CPU 使用率、佇列大小）、監控指標、降級自動化
 
-### 13.2 Implementation Guidelines
+### 13.2 實施指南（Implementation Guidelines）
 
-1. **Default strategy**: Strategy 3 (Temporary Storage)
-2. **Automatic degradation**: When system pressure exceeds thresholds, degrade to Strategy 1
-3. **Emergency mode**: When GP retry rate drops below 80%, switch to Strategy 2 (requires manual recovery)
-4. **Automatic recovery**: When system metrics stabilize, auto-upgrade to Strategy 3
-5. **Alerting**: All strategy switches must trigger alerts and audit log entries
+1. **預設策略**：策略 3（臨時存儲）
+2. **自動降級**：系統壓力超過閾值時，降級至策略 1
+3. **緊急模式**：GP 重試率 < 80% 時，切換至策略 2（需人工恢復）
+4. **自動恢復**：系統指標穩定後，自動升級至策略 3
+5. **警報**：所有策略切換必須觸發警報和審計日誌條目
 
 ---
 
-## 14. Monitoring KPIs
+## 14. 監控 KPI（Monitoring KPIs）
 
-| KPI | Formula | Target |
+| KPI | 公式 | 目標 |
 |-----|---------|--------|
-| Out-of-order frequency | (pending_wins_count / total_wins) x 100% | < 0.1% |
-| Pending transaction count | Real-time monitoring | Alert threshold > 100 |
-| Timeout escalation rate | (escalated_to_manual / pending_wins) x 100% | < 1% |
-| Insufficient funds rejection rate | (rejected_insufficient / total_bets) x 100% | Alert if > 30% |
-| Negative balance accumulation | sum(player_negative_balance) | Alert if < -$10,000 |
-| Jackpot frequency | jackpot_win_count per hour | Alert if > 5 per hour |
+| 亂序頻率 | (pending_wins_count / total_wins) x 100% | < 0.1% |
+| 待處理交易數 | 即時監控 | 警報閾值 > 100 |
+| 超時升級率 | (escalated_to_manual / pending_wins) x 100% | < 1% |
+| 餘額不足拒絕率 | (rejected_insufficient / total_bets) x 100% | 警報若 > 30% |
+| 負餘額累積 | sum(player_negative_balance) | 警報若 < -$10,000 |
+| Jackpot 頻率 | jackpot_win_count per hour | 警報若 > 5 per hour |
 
 ---
 
-## 15. Idempotency Requirements
+## 15. 冪等性要求（Idempotency Requirements）
 
-### 15.1 Mandatory TransactionId
+### 15.1 強制 TransactionId（Mandatory TransactionId）
 
-- All GP integrations **must** provide a globally unique `transaction_id` (or `request_id`) in the request header or body
-- Requests without a transaction ID are rejected with an error message indicating missing required field
+- 所有 GP 整合**必須**在請求標頭或主體中提供全局唯一的 `transaction_id`（或 `request_id`）
+- 無 TransactionId 的請求將被拒絕，錯誤訊息指示缺少必填欄位
 
-→ **[API Error Response Codes](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#error-responses)**
+→ **[API 錯誤響應碼](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#error-responses)**
 
-### 15.2 Duplicate Handling
+### 15.2 重複處理（Duplicate Handling）
 
-- Duplicate transaction IDs must return the previously stored response
-- Business logic must never execute twice for the same transaction ID
-- Response retention: 1 hour, unified across all wallet modules
+- 重複的 TransactionId 必須返回先前存儲的響應
+- 業務邏輯對相同 TransactionId 絕不執行兩次
+- 響應保留：1 小時，所有錢包模組統一
 
-→ **[Idempotency Storage Implementation](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#idempotency-storage)** - Redis cache, TTL configuration (3,600 seconds), fallback mechanisms
-
----
-
-## 16. Acceptance Criteria
-
-- [ ] All GP integrations require globally unique `transaction_id` in every request
-- [ ] Duplicate transaction IDs return stored response without re-execution
-- [ ] Insufficient funds returns error within 100ms response time (Scenario A)
-- [ ] Concurrent bet requests for same player processed atomically without over-deduction
-- [ ] Orphaned rounds detected within 15-minute check cycle and escalated after 2 hours
-- [ ] Out-of-order Win requests stored temporarily with 30-minute expiry (Strategy 3)
-- [ ] Resettlement supports negative balance with automatic account lock and risk alert
-- [ ] Jackpot wins above $10,000 trigger manual approval or auto-freeze per GP agreement
-- [ ] Daily reconciliation compares platform records with GP Transaction Reports
-- [ ] Out-of-order frequency maintained at <0.1% and timeout escalation rate at <1%
+→ **[冪等性存儲實現](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#idempotency-storage)** - Redis 緩存、TTL 配置（3,600 秒）、Fallback 機制
 
 ---
 
-## 17. Related Documents
+## 16. 驗收標準（Acceptance Criteria）
 
-### Core Dependencies
-- Unified Wallet Model - Wallet balance updates, locking mechanisms
-- Game Integration Standard - GP API specifications, security design
+- [ ] 所有 GP 整合每個請求都需要全局唯一的 `transaction_id`
+- [ ] 重複的 TransactionId 返回存儲響應，不重新執行
+- [ ] 餘額不足在 100ms 響應時間內返回錯誤（場景 A）
+- [ ] 同一玩家的並發下注請求原子化處理，無超額扣款
+- [ ] 孤兒 Round 在 15 分鐘檢查週期內檢測，2 小時後升級
+- [ ] 亂序 Win 請求臨時存儲，30 分鐘過期（策略 3）
+- [ ] 重新結算支援負餘額，自動鎖定帳戶並觸發風控警報
+- [ ] Jackpot 獎金 > $10,000 觸發人工審批或自動凍結（依 GP 協議）
+- [ ] 每日對帳比對平台記錄與 GP 交易報告
+- [ ] 亂序頻率維持 < 0.1%，超時升級率 < 1%
 
-### Business Integration
-- Turnover Calculation & Reconciliation - Game reconciliation, bet validation
-- Risk Framework - Abnormal betting detection, negative balance alerts
+---
 
-### Extended Reading
-- Game Lobby Management - Game entry management
-- Maintenance Procedures - Game maintenance and balance synchronization
+## 17. 相關文檔（Related Documents）
 
-### Technical Implementation
+### 核心依賴（Core Dependencies）
+- Unified Wallet Model - 錢包餘額更新、鎖定機制
+- Game Integration Standard - GP API 規格、安全設計
 
-→ **[Seamless Wallet Technical Architecture](../../architecture/02_Finance_Service/Seamless_Wallet_Analysis.md)** - Round-based state machine, orphaned round detection, idempotency defense layers, concurrent processing patterns, negative balance handling, and exception recovery strategies
+### 業務整合（Business Integration）
+- Turnover Calculation & Reconciliation - 遊戲對帳、下注驗證
+- Risk Framework - 異常下注檢測、負餘額警報
+
+### 延伸閱讀（Extended Reading）
+- Game Lobby Management - 遊戲入口管理
+- Maintenance Procedures - 遊戲維護與餘額同步
+
+### 技術實現（Technical Implementation）
+
+→ **[Seamless Wallet 技術架構](../../architecture/02_Finance_Service/Seamless_Wallet_Analysis.md)** - Round-based 狀態機、孤兒 Round 檢測、冪等性防禦層、並發處理模式、負餘額處理、異常恢復策略

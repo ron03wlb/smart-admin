@@ -10,24 +10,26 @@
 
 ## Business Value
 
-This requirements document delivers strategic value by:
-- **Cost Reduction**: Targets 37% monthly infrastructure cost reduction (from $2,820 to $1,788), achieving $12,383 annual savings with <6 month payback
-- **Performance Enhancement**: Specifies 418% processing capacity improvement with 84% latency reduction through query offloading and cache optimization
-- **Storage Optimization**: Defines 4-tier data lifecycle (hot/warm/cold/archive) reducing storage costs by 94% while maintaining SLA-appropriate query times
-- **Operational Independence**: Eliminates external monitoring service dependency through self-hosted open-source observability stack (metrics, logs, traces, alerts)
-
----
+This infrastructure cost optimization initiative delivers value by:
+- **Direct Cost Savings**: Reducing monthly infrastructure costs by 37% (from $2,820 to $1,788), achieving annual net savings of $12,383 with a 6-month ROI
+- **Performance Enhancement**: Simultaneously improving system capacity by 418% (>450 TPS) and reducing P99 latency by 84% (<200ms), demonstrating that cost reduction and performance gains are not mutually exclusive
+- **Operational Independence**: Eliminating external monitoring service dependencies by migrating to self-hosted open-source solutions, achieving 100% cost elimination for external monitoring while maintaining full observability (metrics, logs, tracing, alerting)
+- **Data Lifecycle Management**: Implementing tiered storage strategy (hot/warm/cold/archive) based on access patterns, reducing storage costs by 94% while maintaining appropriate query SLAs (50ms for 0-2 months, up to 12 hours for 20+ months)
+- **Scalability Foundation**: Introducing auto-scaling mechanisms for compute resources and query offloading to dedicated analytics engines, supporting business growth without proportional cost increases
 
 ## Success Metrics
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Monthly Infrastructure Cost | < $1,800 | Cloud billing dashboard |
-| Storage Cost Reduction | > 90% | (Original - Current) / Original |
-| System Throughput | > 450 TPS | Load test benchmark |
-| Response Latency (P99) | < 200 ms | APM monitoring |
-| Investment Payback Period | < 7 months | Cumulative savings / Implementation cost |
-| Monitoring Coverage | 100% | Metrics + Logs + Traces + Alerts all functional |
+| Monthly Infrastructure Cost | < $1,800 | 37% reduction from baseline $2,820 (Section 1) |
+| Storage Cost Savings | > 90% | Tiered storage implementation (Section 2: hot/warm/cold/archive) |
+| System Processing Capacity | > 450 TPS | 418% improvement from baseline (Section 1) |
+| P99 Response Latency | < 200ms | 84% reduction from baseline (Section 1) |
+| ROI Period | < 7 months | Annual savings $12,383 divided by implementation cost (Section 1) |
+| Message Queue Retention Cost | 76% reduction | Retention policy adjusted to 7 days with long-term data offloaded (Section 3) |
+| Cache Hit Rate | > 90% | In-process caching reduces distributed cache access by 90%, enabling instance downsizing (Section 4) |
+| External Monitoring Cost | $0 | 100% elimination via self-hosted Prometheus/Loki/Jaeger/AlertManager (Section 5) |
+| Cost Anomaly Detection Coverage | 100% of services | Monthly dashboard with 10% budget threshold alerting (Section 6) |
 
 ---
 
