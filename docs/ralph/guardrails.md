@@ -119,6 +119,26 @@
 - SSOT violations must stay at 0
 - Always run full validation after changes to ensure no regression
 
+### P16: PR-triggered validation mode rules (Added 2026-02-12)
+- Ralph now operates in **PR-triggered mode** (NOT continuous execution)
+- **Validation scope**: ONLY check files changed in the PR (not entire codebase)
+- **Quality gates**: 5 checks (Technical Terms, Encoding, Terminology, Mermaid, Links)
+- **Severity classification**:
+  - **CRITICAL**: Technical Terms (100%) → Immediate PR failure
+  - **HIGH**: Encoding (< 2 errors), Mermaid Syntax (100%) → PR failure
+  - **MEDIUM**: Terminology (>= 95%), Links (< 5%) → Warning (allow merge with review)
+- **Report format**: Markdown with grouped errors by severity
+- **No auto-translation**: Ralph validates only, does not translate
+- **Metrics tracking**: Record validation results to `docs/ralph/metrics/pr-validation-*.json`
+- **Validation scripts**:
+  - `bash scripts/check-technical-terms.sh` - CRITICAL
+  - `bash scripts/validate-zh-tw-encoding.sh` - HIGH
+  - `bash scripts/check-terminology-consistency-zh-tw.sh` - MEDIUM
+  - `bash scripts/validate-mermaid.sh` - HIGH
+- **Integration points**:
+  - Pre-commit Hook: `.git/hooks/pre-commit` (integrated with Spotless)
+  - GitHub Actions: `.github/workflows/igaming-translation-quality.yml`
+
 ---
 
 ## Lessons Learned
@@ -149,3 +169,18 @@
 - Root cause: 91 iterations (#30-#120) burned through with 0 progress (no rate limit sleep)
 - Fix: Added `hit.+limit|your.+limit|resets [0-9]+am` to grep pattern in ralph-igaming-docs.sh line 169
 - Impact: Wasted all 120 iteration quota; only 29 effective iterations completed 65 tasks
+
+### 2026-02-12: Ralph mode switch - Continuous to PR-triggered
+- **Stopped at**: Phase 9 Batch 3 (13/184 files completed, 5%)
+- **Reason**: Transitioning to PR-triggered validation mode for better quality control and cost efficiency
+- **Previous mode**: 24h continuous loop with token monitoring (Mode B - Fresh Context)
+- **New mode**: PR-triggered quality validation (no auto-translation)
+- **Translation execution**: Moved to independent tool (`scripts/translate-igaming-docs.py`)
+- **Quality infrastructure**: Implemented 4 validation scripts + Pre-commit Hook + GitHub Actions
+- **Benefits**:
+  - Better separation of concerns (translation vs validation)
+  - Cost-effective (only run on PR events, not 24/7)
+  - Faster feedback (< 2 min validation vs hours of continuous loop)
+  - Integration with existing Spotless hook
+- **Ralph's new role**: Quality gatekeeper for iGaming documentation translation
+- **Reference**: Phase 1-2 completed in commit `5892b1e3`
