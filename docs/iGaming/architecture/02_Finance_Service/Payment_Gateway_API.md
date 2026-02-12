@@ -1,10 +1,10 @@
-# Payment Gateway API
+# 支付閘道 API（Payment Gateway API）
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 4.0.0
+> **目標讀者（Audience）**: 架構師、後端開發人員
+> **業務需求（Business Requirements）**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
+> **最後同步（Last Synced）**: 2026-02-08
+> **來源版本（Source Version）**: 4.0.0
 
 ---
 

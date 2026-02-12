@@ -1,11 +1,11 @@
-# Financial Implementation Architecture
+# 金融實作架構（Financial Implementation Architecture）
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
-> **Audience**: 架構師、後端開發人員、系統整合工程師
-> **Business Requirements**: [Financial_Implementation_Requirements.md](../../requirements/02_Financial_Operations/Financial_Implementation_Requirements.md)
-> **Last Synced**: 2026-02-09
+> **目標讀者（Audience）**: 架構師、後端開發人員、系統整合工程師
+> **業務需求（Business Requirements）**: [Financial_Implementation_Requirements.md](../../requirements/02_Financial_Operations/Financial_Implementation_Requirements.md)
+> **最後同步（Last Synced）**: 2026-02-09
 >
-> **Technical Focus**: 本文件包含從需求層提取的實作細節（原子性 (Atomicity)、冪等性 (Idempotency)、HMAC-SHA256 演算法、SAGA 補償流程）。
+> **技術焦點（Technical Focus）**: 本文件包含從需求層提取的實作細節（原子性 (Atomicity)、冪等性 (Idempotency)、HMAC-SHA256 演算法、SAGA 補償流程）。
 
 ---
 

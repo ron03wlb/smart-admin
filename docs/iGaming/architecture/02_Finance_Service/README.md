@@ -1,44 +1,44 @@
-# 02 Finance Service
+# 02 金融服務（Finance Service）
 
-> **Audience**: Architects, Backend Developers, DevOps
-> **Status**: Phase 6 Complete - 8 split documents + source index
+> **目標讀者（Audience）**: 架構師、後端開發人員、DevOps
+> **狀態（Status）**: Phase 6 完成 - 8 個拆分文檔 + 來源索引
 
 ---
 
-## Split Documents
+## 拆分文檔
 
-| Document | Description | Source |
+| 文檔 | 描述 | 來源 |
 |----------|-------------|--------|
-| [Payment Gateway API](Payment_Gateway_API.md) | Payment provider API integration, webhooks, callback handling | [source](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) |
-| [Reconciliation Technical](Reconciliation_Technical.md) | Three-way matching engine, scheduled reconciliation jobs, data models | [source](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) |
-| [Financial Implementation](Financial_Implementation.md) | Wallet system architecture, payment gateway API, risk scoring engine, SAGA orchestrator | [source](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md) |
-| [Turnover Flowcharts](Turnover_Flowcharts.md) | Turnover validation flow diagrams, game weight application, bet lifecycle state machine | [source](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) |
-| [Turnover Calculation Architecture](Turnover_Calculation_Architecture.md) | Three-layer validation implementation, event-driven data exchange, SmartAdmin mapping | [source](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) |
-| [Turnover Implementation](Turnover_Implementation.md) | Wallet deduction algorithm, effective stake calculation, lockAmount state transitions | [source](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-03_Implementation_Details.md) |
-| [Seamless Wallet Analysis](Seamless_Wallet_Analysis.md) | Seamless wallet API specs, concurrency control, state machines, exception handling | [source](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) |
-| [Turnover Calculation Logic Detail](Turnover_Calculation_Logic_Detail.md) | effectiveStake formulas, lockAmount lifecycle, rebate calculation, withdrawal turnover | [source](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-02_Calculation_Logic.md) |
+| [支付閘道 API](Payment_Gateway_API.md) | 支付服務提供商 API 整合、Webhook、回呼處理 | [來源](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) |
+| [對帳技術實現](Reconciliation_Technical.md) | 三方比對引擎、定時對帳任務、資料模型 | [來源](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) |
+| [金融實作架構](Financial_Implementation.md) | 錢包系統架構、支付閘道 API、風險評分引擎、SAGA 編排器 | [來源](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md) |
+| [有效投注流程圖](Turnover_Flowcharts.md) | 有效投注驗證流程圖、遊戲權重應用、投注生命週期狀態機 | [來源](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md) |
+| [有效投注計算架構](Turnover_Calculation_Architecture.md) | 三層驗證實作、事件驅動資料交換、SmartAdmin 映射 | [來源](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) |
+| [有效投注實作](Turnover_Implementation.md) | 錢包扣款演算法、有效投注金額計算、鎖定金額狀態轉換 | [來源](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-03_Implementation_Details.md) |
+| [無縫錢包分析](Seamless_Wallet_Analysis.md) | 無縫錢包 API 規格、並發控制、狀態機、異常處理 | [來源](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) |
+| [有效投注計算邏輯詳解](Turnover_Calculation_Logic_Detail.md) | 有效投注金額公式、鎖定金額生命週期、返水計算、提款流水 | [來源](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-02_Calculation_Logic.md) |
 
-## Core Architecture Documents (Source Index)
+## 核心架構文檔（來源索引）
 
-| Document | Description | Source |
+| 文檔 | 描述 | 來源 |
 |----------|-------------|--------|
-| [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) | Multi-currency wallet design, balance management, and ledger structure | [source](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) |
-| [Transaction Processing Flow](../../source-archive/02_Finance_Center/02-07_Transaction_Processing_Flow.md) | End-to-end transaction lifecycle and state machine | [source](../../source-archive/02_Finance_Center/02-07_Transaction_Processing_Flow.md) |
+| [錢包架構](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) | 多幣種錢包設計、餘額管理、帳本結構 | [來源](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) |
+| [交易處理流程](../../source-archive/02_Finance_Center/02-07_Transaction_Processing_Flow.md) | 端到端交易生命週期與狀態機 | [來源](../../source-archive/02_Finance_Center/02-07_Transaction_Processing_Flow.md) |
 
-## Seamless Wallet Technical Documents
+## 無縫錢包技術文檔
 
-| Document | Description | Source |
+| 文檔 | 描述 | 來源 |
 |----------|-------------|--------|
-| [Concurrency Control](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-02_Concurrency.md) | Optimistic locking, race condition handling, and distributed locks | [source](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-02_Concurrency.md) |
-| [Recovery Mechanisms](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-03_Recovery.md) | Transaction rollback, compensation, and failure recovery | [source](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-03_Recovery.md) |
-| [Accounting Integration](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-04_Accounting.md) | Double-entry bookkeeping and GL integration | [source](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-04_Accounting.md) |
+| [並發控制](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-02_Concurrency.md) | 樂觀鎖定、競態條件處理、分佈式鎖 | [來源](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-02_Concurrency.md) |
+| [恢復機制](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-03_Recovery.md) | 交易回滾、補償、故障恢復 | [來源](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-03_Recovery.md) |
+| [會計整合](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-04_Accounting.md) | 複式記帳與總帳整合 | [來源](../../source-archive/02_Finance_Center/seamless-wallet/02-SW-04_Accounting.md) |
 
-## Additional Index
+## 附加索引
 
-| Document | Description |
+| 文檔 | 描述 |
 |----------|-------------|
-| [Seamless Wallet Index](./Seamless_Wallet_Index.md) | Detailed seamless wallet architecture documents |
+| [無縫錢包索引](./Seamless_Wallet_Index.md) | 無縫錢包架構詳細文檔 |
 
 ---
 
-**Last Updated**: 2026-02-08
+**最後更新（Last Updated）**: 2026-02-12

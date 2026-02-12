@@ -1,7 +1,7 @@
 # 支付閘道技術實現（Payment Gateway Technical Implementation）
 
 > **業務需求（Business Requirements）**: [Payment_Operations.md](../../requirements/02_Financial_Operations/Payment_Operations.md)
-> **目標讀者（Audience）**: Backend Developers, DevOps Engineers, Security Engineers
+> **目標讀者（Audience）**: 後端開發人員、DevOps 工程師、安全工程師
 > **最後同步（Last Synced）**: 2026-02-09
 >
 > **文檔目的（Purpose）**: 本文檔包含支付閘道整合的技術實現細節，包括 PSP webhook 處理、簽名驗證、智能路由演算法、定時對帳、安全配置和監控設置。

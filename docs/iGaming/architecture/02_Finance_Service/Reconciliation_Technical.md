@@ -1,11 +1,11 @@
-# Reconciliation System Technical Architecture
+# 對帳系統技術架構（Reconciliation System Technical Architecture）
 
 > **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers, System Integration Engineers
-> **Business Requirements**: [Reconciliation_Requirements.md](../../requirements/02_Financial_Operations/Reconciliation_Requirements.md)
-> **Last Synced**: 2026-02-09
+> **目標讀者（Audience）**: 架構師、後端開發人員、DevOps 工程師、系統整合工程師
+> **業務需求（Business Requirements）**: [Reconciliation_Requirements.md](../../requirements/02_Financial_Operations/Reconciliation_Requirements.md)
+> **最後同步（Last Synced）**: 2026-02-09
 >
-> **Technical Focus**: This document contains implementation details (PostgreSQL/S3 Glacier storage architecture, UTC timezone conversion algorithms, 3DS verification protocols, blockchain confirmation mechanisms) extracted from Requirements layer.
+> **技術焦點（Technical Focus）**: 本文件包含從需求層提取的實作細節（PostgreSQL/S3 Glacier 儲存架構、UTC 時區轉換演算法、3DS 驗證協議、區塊鏈確認機制）。
 
 ---
 
