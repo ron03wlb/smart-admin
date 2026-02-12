@@ -1,10 +1,9 @@
 # 行動應用程式需求（Mobile App Requirements）
 
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-04](../../source-archive/11_Frontend_CMS/11-04_Mobile_App_Architecture.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Mobile Team Leads
-> **Related Architecture**: [Mobile App Architecture](../../architecture/11_Frontend/Mobile_App_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [11-04_Mobile_App_Architecture.md](../../source-archive/11_Frontend_CMS/11-04_Mobile_App_Architecture.md)
+> **目標讀者**: 產品經理、行動端技術負責人
+> **相關架構**: [Mobile_App_Architecture.md](../../architecture/11_Frontend/Mobile_App_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

@@ -1,10 +1,9 @@
 # 資料管道業務需求（Data Pipeline Business Requirements）
 
-> **Canonical Source**: [source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md](../../source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Data Pipeline Architecture](../../architecture/10_Platform_Management/Data_Pipeline_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [10-04_Data_Pipeline_Architecture.md](../../source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Data_Pipeline_Architecture.md](../../architecture/10_Platform_Management/Data_Pipeline_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

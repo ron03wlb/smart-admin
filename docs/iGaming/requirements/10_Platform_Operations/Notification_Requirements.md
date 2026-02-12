@@ -1,10 +1,9 @@
 # 通知系統業務需求（Notification System Business Requirements）
 
-> **Canonical Source**: [source-archive/10_Platform_Management/10-03_Notification_Architecture.md](../../source-archive/10_Platform_Management/10-03_Notification_Architecture.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Notification Architecture](../../architecture/10_Platform_Management/Notification_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [10-03_Notification_Architecture.md](../../source-archive/10_Platform_Management/10-03_Notification_Architecture.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Notification_Architecture.md](../../architecture/10_Platform_Management/Notification_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

@@ -1,14 +1,13 @@
 # 前端使用者體驗需求（Frontend UX Requirements）
 
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-01](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md), [11-02](../../source-archive/11_Frontend_CMS/11-02_Banner_and_Announcement.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, UX Designers, Operations Team
-> **Related Architecture**: [Frontend Layout Engine Architecture](../../architecture/11_Frontend/Frontend_Layout_Engine.md), [Banner Announcement Architecture](../../architecture/11_Frontend/Banner_Announcement.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [11-01_Frontend_Layout_Engine.md](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md), [11-02_Banner_and_Announcement.md](../../source-archive/11_Frontend_CMS/11-02_Banner_and_Announcement.md)
+> **目標讀者**: 產品經理、UX 設計師、營運團隊
+> **相關架構**: [Frontend_Layout_Engine.md](../../architecture/11_Frontend/Frontend_Layout_Engine.md), [Banner_Announcement.md](../../architecture/11_Frontend/Banner_Announcement.md)
+> **最後同步**: 2026-02-09
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
 此功能提供以下價值：
 - **縮短促銷活動上線時間（Reducing Time-to-Market for Promotions）**：無程式碼頁面編輯器消除對工程團隊的依賴，使營運團隊能在數小時而非數天內啟動新活動（部署速度提升 80%+）
@@ -17,7 +16,7 @@
 - **提升玩家參與度（Improving Player Engagement）**：多語言橫幅支援（6+ 種語言加回退邏輯）以及按地理/VIP/時間的定向投放，相較通用活動提升 CTR 2-3 倍
 - **優化行銷投資回報率（Optimizing Marketing ROI）**：橫幅分析（曝光、點擊、CTR、轉換、CVR）搭配 A/B 測試實現數據驅動的活動優化，降低獲客成本 30%+
 
-## Acceptance Criteria
+## 驗收標準（Acceptance Criteria）
 
 - [ ] 無程式碼頁面編輯器允許營運人員透過拖放調整首頁佈局，無需工程支援
 - [ ] 主題切換實現一鍵切換整站配色方案（深色、淺色、節慶限定）
