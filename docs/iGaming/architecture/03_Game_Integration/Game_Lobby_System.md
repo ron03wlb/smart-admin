@@ -401,7 +401,374 @@ Response (200 OK):
 
 ---
 
-## 11. 動態配置（Dynamic Configuration）
+## 11. Java 實作範例（Java Implementation Example）
+
+### 11.1 Service 層（Service Layer）
+
+**GameLobbyService** - 處理遊戲列表查詢、搜尋、篩選（單表讀取，無需 @Transactional）:
+
+```java
+package net.lab1024.sa.business.game.lobby.service;
+
+import com.baomidou.mybatisplus.core.conditions.query.Wrappers;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.game.lobby.dao.GameCategoryDao;
+import net.lab1024.sa.business.game.lobby.dao.GameProviderConfigDao;
+import net.lab1024.sa.business.game.lobby.domain.entity.GameCategoryEntity;
+import net.lab1024.sa.business.game.lobby.domain.entity.GameProviderConfigEntity;
+import net.lab1024.sa.business.game.lobby.domain.form.GameListQueryForm;
+import net.lab1024.sa.business.game.lobby.domain.vo.GameListVO;
+import net.lab1024.sa.business.game.lobby.domain.vo.GameDetailVO;
+import net.lab1024.sa.business.game.lobby.manager.GameLobbyManager;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * GameLobbyService - 遊戲大廳服務層
+ *
+ * 職責：
+ * - 遊戲列表查詢（支援分頁、篩選、搜尋）
+ * - 遊戲詳情查詢
+ * - 遊戲分類查詢
+ * - 供應商配置查詢（單表讀取，無需 @Transactional）
+ * - 快取委派至 Manager 層（避免 @Cacheable 在 Service）
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class GameLobbyService {
+
+    private final GameCategoryDao gameCategoryDao;
+    private final GameProviderConfigDao gameProviderConfigDao;
+    private final GameLobbyManager gameLobbyManager;
+
+    /**
+     * 查詢遊戲列表（支援篩選與分頁）
+     *
+     * @param tenantId 租戶 ID
+     * @param form 遊戲列表查詢表單（category, provider, game_type, search）
+     * @return 分頁遊戲列表
+     */
+    public Option<PageResult<GameListVO>> getGameList(Long tenantId, GameListQueryForm form) {
+        return Try.of(() -> {
+            // 步驟 1: 驗證租戶與分類
+            if (form.getCategory() != null) {
+                validateCategory(tenantId, form.getCategory())
+                    .getOrElseThrow(() -> new IllegalArgumentException("無效的分類: " + form.getCategory()));
+            }
+
+            // 步驟 2: 委派至 Manager 執行快取查詢（L2 Redis Cache）
+            // Manager 層負責快取管理，Service 層僅處理業務邏輯
+            PageResult<GameListVO> result = gameLobbyManager.getCachedGameList(tenantId, form)
+                .getOrElseThrow(() -> new RuntimeException("查詢遊戲列表失敗"));
+
+            log.info("查詢遊戲列表: 租戶 {}, 分類 {}, 供應商 {}, 返回 {} 筆遊戲",
+                tenantId, form.getCategory(), form.getProvider(), result.getList().size());
+
+            return result;
+
+        }).toOption();
+    }
+
+    /**
+     * 查詢遊戲詳情
+     *
+     * @param tenantId 租戶 ID
+     * @param gameId 遊戲 ID（例如：pg_fortune_tiger）
+     * @return 遊戲詳情 VO（包含 RTP、volatility、bet範圍、統計資料）
+     */
+    public Option<GameDetailVO> getGameDetail(Long tenantId, String gameId) {
+        return Try.of(() -> {
+            // 委派至 Manager 執行快取查詢
+            GameDetailVO detail = gameLobbyManager.getCachedGameDetail(tenantId, gameId)
+                .getOrElseThrow(() -> new IllegalArgumentException("遊戲不存在: " + gameId));
+
+            log.info("查詢遊戲詳情: 租戶 {}, 遊戲 ID {}", tenantId, gameId);
+            return detail;
+
+        }).toOption();
+    }
+
+    /**
+     * 查詢遊戲分類列表
+     *
+     * @param tenantId 租戶 ID
+     * @return 分類列表（包含 category_code, category_name, icon_url）
+     */
+    public List<GameCategoryEntity> getCategories(Long tenantId) {
+        return gameCategoryDao.selectList(
+            Wrappers.<GameCategoryEntity>lambdaQuery()
+                .eq(GameCategoryEntity::getTenantId, tenantId)
+                .eq(GameCategoryEntity::getStatus, "ACTIVE")
+                .eq(GameCategoryEntity::getDeleted, false)
+                .orderByAsc(GameCategoryEntity::getSortOrder)
+        );
+    }
+
+    /**
+     * 查詢遊戲供應商列表
+     *
+     * @param tenantId 租戶 ID
+     * @return 供應商列表（包含 provider_code, provider_name, status）
+     */
+    public List<GameProviderConfigEntity> getProviders(Long tenantId) {
+        return gameProviderConfigDao.selectList(
+            Wrappers.<GameProviderConfigEntity>lambdaQuery()
+                .eq(GameProviderConfigEntity::getTenantId, tenantId)
+                .eq(GameProviderConfigEntity::getStatus, "ACTIVE")
+                .eq(GameProviderConfigEntity::getDeleted, false)
+                .orderByDesc(GameProviderConfigEntity::getGameCount)
+        );
+    }
+
+    /**
+     * 驗證分類是否存在且啟用
+     */
+    private Option<GameCategoryEntity> validateCategory(Long tenantId, String categoryCode) {
+        return Option.of(
+            gameCategoryDao.selectOne(
+                Wrappers.<GameCategoryEntity>lambdaQuery()
+                    .eq(GameCategoryEntity::getTenantId, tenantId)
+                    .eq(GameCategoryEntity::getCategoryCode, categoryCode)
+                    .eq(GameCategoryEntity::getStatus, "ACTIVE")
+                    .eq(GameCategoryEntity::getDeleted, false)
+            )
+        );
+    }
+}
+```
+
+### 11.2 Manager 層（Manager Layer）
+
+**GameLobbyManager** - 處理快取管理、遊戲元數據同步、熱門度更新（需要 @Transactional 或 @Cacheable）:
+
+```java
+package net.lab1024.sa.business.game.lobby.manager;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.game.lobby.dao.GameMetadataDao;
+import net.lab1024.sa.business.game.lobby.dao.GameProviderConfigDao;
+import net.lab1024.sa.business.game.lobby.domain.entity.GameMetadataEntity;
+import net.lab1024.sa.business.game.lobby.domain.entity.GameProviderConfigEntity;
+import net.lab1024.sa.business.game.lobby.domain.form.GameListQueryForm;
+import net.lab1024.sa.business.game.lobby.domain.vo.GameListVO;
+import net.lab1024.sa.business.game.lobby.domain.vo.GameDetailVO;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * GameLobbyManager - 遊戲大廳管理層
+ *
+ * 職責：
+ * - L2 快取管理（Redis，TTL 15 分鐘）(@Cacheable)
+ * - 遊戲元數據同步（從 GP API 同步）(@Transactional)
+ * - 熱門度評分更新（每 15 分鐘）(@Transactional)
+ * - 快取失效策略實作
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class GameLobbyManager {
+
+    private final GameMetadataDao gameMetadataDao;
+    private final GameProviderConfigDao gameProviderConfigDao;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    /**
+     * 取得快取的遊戲列表（L2 Redis Cache，TTL 15 分鐘）
+     *
+     * @param tenantId 租戶 ID
+     * @param form 查詢表單
+     * @return 分頁遊戲列表
+     */
+    @Cacheable(
+        value = "game:list",
+        key = "#tenantId + ':' + #form.category + ':' + #form.provider + ':' + #form.page",
+        unless = "#result == null"
+    )
+    public Option<PageResult<GameListVO>> getCachedGameList(Long tenantId, GameListQueryForm form) {
+        return Try.of(() -> {
+            // 查詢資料庫（當快取未命中時）
+            PageResult<GameMetadataEntity> pageResult = SmartPageUtil.convert2PageQuery(
+                form,
+                query -> gameMetadataDao.selectPage(query, buildQueryWrapper(tenantId, form))
+            );
+
+            // 轉換為 VO
+            List<GameListVO> voList = pageResult.getList().stream()
+                .map(entity -> SmartBeanUtil.copy(entity, GameListVO.class))
+                .toList();
+
+            return new PageResult<>(
+                voList,
+                pageResult.getTotal(),
+                pageResult.getPageNum(),
+                pageResult.getPageSize()
+            );
+
+        }).toOption();
+    }
+
+    /**
+     * 取得快取的遊戲詳情（L2 Redis Cache，TTL 15 分鐘）
+     *
+     * @param tenantId 租戶 ID
+     * @param gameId 遊戲 ID
+     * @return 遊戲詳情 VO
+     */
+    @Cacheable(
+        value = "game:detail",
+        key = "#tenantId + ':' + #gameId",
+        unless = "#result == null"
+    )
+    public Option<GameDetailVO> getCachedGameDetail(Long tenantId, String gameId) {
+        return Try.of(() -> {
+            GameMetadataEntity entity = gameMetadataDao.selectOne(
+                Wrappers.<GameMetadataEntity>lambdaQuery()
+                    .eq(GameMetadataEntity::getTenantId, tenantId)
+                    .eq(GameMetadataEntity::getGameId, gameId)
+                    .eq(GameMetadataEntity::getStatus, "ENABLED")
+            );
+
+            if (entity == null) {
+                throw new IllegalArgumentException("遊戲不存在: " + gameId);
+            }
+
+            return SmartBeanUtil.copy(entity, GameDetailVO.class);
+
+        }).toOption();
+    }
+
+    /**
+     * 同步遊戲元數據（從 GP API）
+     *
+     * @param providerCode 供應商代碼
+     * @return 同步的遊戲數量
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public int syncGameMetadataFromProvider(String providerCode) {
+        // 步驟 1: 查詢供應商配置
+        GameProviderConfigEntity providerConfig = gameProviderConfigDao.selectOne(
+            Wrappers.<GameProviderConfigEntity>lambdaQuery()
+                .eq(GameProviderConfigEntity::getProviderCode, providerCode)
+                .eq(GameProviderConfigEntity::getStatus, "ACTIVE")
+        );
+
+        if (providerConfig == null) {
+            log.warn("供應商 {} 未啟用，跳過同步", providerCode);
+            return 0;
+        }
+
+        // 步驟 2: 呼叫 GP API 取得遊戲列表（簡化示例）
+        // 實際應使用 HTTP Client 呼叫 providerConfig.getApiEndpoint()
+        List<GameMetadataEntity> newGames = fetchGamesFromProviderApi(providerConfig);
+
+        // 步驟 3: 批次插入新遊戲（狀態設為 DISABLED，等待審核）
+        int syncedCount = 0;
+        for (GameMetadataEntity game : newGames) {
+            boolean exists = gameMetadataDao.exists(
+                Wrappers.<GameMetadataEntity>lambdaQuery()
+                    .eq(GameMetadataEntity::getGameId, game.getGameId())
+            );
+
+            if (!exists) {
+                game.setStatus("DISABLED"); // 等待運營審核
+                game.setCreatedAt(LocalDateTime.now());
+                gameMetadataDao.insert(game);
+                syncedCount++;
+            }
+        }
+
+        // 步驟 4: 更新供應商配置的同步時間
+        providerConfig.setLastSyncedAt(LocalDateTime.now());
+        providerConfig.setGameCount(providerConfig.getGameCount() + syncedCount);
+        gameProviderConfigDao.updateById(providerConfig);
+
+        log.info("供應商 {} 同步完成: 新增 {} 款遊戲", providerCode, syncedCount);
+        return syncedCount;
+    }
+
+    /**
+     * 更新遊戲熱門度評分（每 15 分鐘執行）
+     *
+     * @return 更新的遊戲數量
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public int updatePopularityScores() {
+        // 步驟 1: 計算過去 24 小時的遊戲熱門度
+        // 實際應查詢 transaction 表聚合統計
+        // 簡化示例：假設已計算出熱門度評分
+
+        // 步驟 2: 批次更新遊戲的熱門度評分
+        // UPDATE game_metadata SET popularity_score = ? WHERE game_id = ?
+
+        log.info("遊戲熱門度評分更新完成");
+        return 0; // 示例返回
+    }
+
+    /**
+     * 清除遊戲列表快取（遊戲啟用/停用時觸發）
+     *
+     * @param tenantId 租戶 ID
+     * @param category 受影響的分類（例如：HOT, NEW）
+     */
+    @CacheEvict(value = "game:list", key = "#tenantId + ':' + #category + ':*'")
+    public void evictGameListCache(Long tenantId, String category) {
+        log.info("清除遊戲列表快取: 租戶 {}, 分類 {}", tenantId, category);
+    }
+
+    /**
+     * 從 GP API 取得遊戲列表（簡化示例）
+     */
+    private List<GameMetadataEntity> fetchGamesFromProviderApi(GameProviderConfigEntity config) {
+        // 實際應使用 HTTP Client 呼叫 GP API
+        // 此處僅返回空列表作為示例
+        return List.of();
+    }
+
+    /**
+     * 建立查詢條件（簡化示例）
+     */
+    private LambdaQueryWrapper<GameMetadataEntity> buildQueryWrapper(Long tenantId, GameListQueryForm form) {
+        // 實際應根據 form.category, form.provider, form.search 建立查詢條件
+        return Wrappers.<GameMetadataEntity>lambdaQuery()
+            .eq(GameMetadataEntity::getTenantId, tenantId)
+            .eq(GameMetadataEntity::getStatus, "ENABLED");
+    }
+}
+```
+
+**SmartAdmin 模式檢查點**:
+- ✅ Constructor injection (`@RequiredArgsConstructor` + `private final`)
+- ✅ Service 層無 `@Transactional` / `@Cacheable`（委派至 Manager）
+- ✅ Manager 層使用 `@Transactional(rollbackFor = Throwable.class)` 和 `@Cacheable`
+- ✅ Service 層使用 Vavr `Option` + `Try`（非 `java.util.Optional`）
+- ✅ SmartBeanUtil 用於 Entity ↔ VO 轉換
+- ✅ SmartPageUtil 用於分頁查詢
+
+---
+
+## 12. 動態配置（Dynamic Configuration）
 
 所有大廳元素（橫幅、遊戲格子、選單、標籤）由 JSON 配置驅動：
 
