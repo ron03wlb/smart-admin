@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 120 (Phase 6: 6, Phase 7-8: 98, Phase 9: 16)
-> **Status**: Phase 9B IN PROGRESS — Batch 20-24 complete (25 files translated)
+> **Total Iterations**: 121 (Phase 6: 6, Phase 7-8: 98, Phase 9: 17)
+> **Status**: Phase 9B IN PROGRESS — Batch 20-25 complete (30 files translated)
 
 ---
 
@@ -435,12 +435,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/06_Platform_Core/MFA_Recovery_Implementation.md (MFA 登入與恢復技術實現)
 - [x] architecture/06_Platform_Core/MFA_Technical.md (MFA 技術架構)
 
-#### Batch 25 — Platform Core (5 files)
-- [ ] architecture/06_Platform_Core/MFA_Technical_Architecture.md
-- [ ] architecture/06_Platform_Core/MFA_Technical_Evaluation.md
-- [ ] architecture/06_Platform_Core/Multi_Tenant_Architecture.md
-- [ ] architecture/06_Platform_Core/README.md
-- [ ] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md
+#### Batch 25 — Platform Core (5 files) ✅ COMPLETE
+- [x] architecture/06_Platform_Core/MFA_Technical_Architecture.md (MFA 技術架構設計 — metadata + header 標準化)
+- [x] architecture/06_Platform_Core/MFA_Technical_Evaluation.md (MFA 技術評估)
+- [x] architecture/06_Platform_Core/Multi_Tenant_Architecture.md (多租戶架構)
+- [x] architecture/06_Platform_Core/README.md (平台核心索引)
+- [x] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md (TOTP 與 WebAuthn 技術實作 — metadata + header 標準化)
 
 #### Batch 26 — Agent/Analytics (4 files) + Infrastructure (1 file)
 - [ ] architecture/07_Agent_Service/Agent_System_Architecture.md
