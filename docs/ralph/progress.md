@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 123 (Phase 6: 6, Phase 7-8: 98, Phase 9: 19)
-> **Status**: Phase 9B IN PROGRESS — Batch 20-27 complete (40 files translated)
+> **Total Iterations**: 125 (Phase 6: 6, Phase 7-8: 98, Phase 9: 21)
+> **Status**: Phase 9B IN PROGRESS — Batch 20-29 complete (50 files translated)
 
 ---
 
@@ -456,19 +456,19 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/09_Infrastructure/Cost_Optimization_Architecture.md (成本優化架構 — metadata + header 標準化)
 - [x] architecture/09_Infrastructure/Deployment_Architecture.md (部署架構與 DevOps 規範 — metadata + header 標準化)
 
-#### Batch 28 — Infrastructure (5 files)
-- [ ] architecture/09_Infrastructure/Domain_APIs.md
-- [ ] architecture/09_Infrastructure/Gateway_Core.md
-- [ ] architecture/09_Infrastructure/Gateway_Rate_Limiting.md
-- [ ] architecture/09_Infrastructure/Gateway_Security.md
-- [ ] architecture/09_Infrastructure/Infrastructure_Implementation.md
+#### Batch 28 — Infrastructure (5 files) ✅ COMPLETE
+- [x] architecture/09_Infrastructure/Domain_APIs.md (領域 API 設計 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Gateway_Core.md (網關核心架構 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Gateway_Rate_Limiting.md (流量控制與限流架構 — metadata + header + table 標準化)
+- [x] architecture/09_Infrastructure/Gateway_Security.md (網關安全與 DDoS 防禦 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Infrastructure_Implementation.md (基礎設施實作 — header + footer 標準化)
 
-#### Batch 29 — Infrastructure (5 files)
-- [ ] architecture/09_Infrastructure/Maintenance_Architecture.md
-- [ ] architecture/09_Infrastructure/Multi_Actor_Token_Security.md
-- [ ] architecture/09_Infrastructure/OAuth_Refresh_Token.md
-- [ ] architecture/09_Infrastructure/Performance_Monitoring.md
-- [ ] architecture/09_Infrastructure/Performance_Optimization.md
+#### Batch 29 — Infrastructure (5 files) ✅ COMPLETE
+- [x] architecture/09_Infrastructure/Maintenance_Architecture.md (系統維護與優雅停機架構 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/Multi_Actor_Token_Security.md (多主體 Token 安全方案 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/OAuth_Refresh_Token.md (OAuth 2.0 Refresh Token 實施方案 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/Performance_Monitoring.md (性能監控與告警架構 — metadata + footer 標準化)
+- [x] architecture/09_Infrastructure/Performance_Optimization.md (性能優化規範 — metadata + footer 標準化)
 
 #### Batch 30 — Infrastructure (5 files)
 - [ ] architecture/09_Infrastructure/QA_Standards.md
@@ -557,4 +557,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9B IN PROGRESS — Batch 20-22 complete (15 files: Game Integration + Activity Engine + Risk Engine)
+**Status**: Phase 9B IN PROGRESS — Batch 20-29 complete (50 files: Game Integration + Activity Engine + Risk Engine + Platform Core + Agent/Analytics + Infrastructure)
