@@ -1,36 +1,36 @@
-# 05 Risk Engine
+# 05 風控引擎（Risk Engine）
 
-> **Audience**: Architects, Backend Developers, DevOps
-> **Status**: Phase 6 Complete - 10 split documents + source index
-
----
-
-## Split Documents
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Risk System Architecture](Risk_System_Architecture.md) | Event-driven risk pipeline, Kafka/Flink integration, ML model serving | [source](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) |
-| [KYC Verification API](KYC_Verification_API.md) | Identity verification service, database schema, API endpoints | [source](../../source-archive/05_Risk_Control/05-03_KYC_AML.md) |
-| [Fraud Detection System](Fraud_Detection_System.md) | ML detection models, rule engine, SpotBugs integration | [source](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
-| [Risk Proposal Implementation](Risk_Proposal_Implementation.md) | Priority calculation service, SLA monitoring, Camunda BPMN workflow, Sa-Token permissions | [source](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
-| [Affordability Implementation](Affordability_Implementation.md) | Affordability scoring algorithms, API endpoints, data integration, monitoring | [source](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md) |
-| [Player Protection API](Player_Protection_API.md) | Self-exclusion service, limit management API, session tracking, GAMSTOP integration | [source](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md) |
-| [ML Integration Architecture](ML_Integration_Architecture.md) | ML training pipeline, model deployment, A/B testing, drift monitoring | [source](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) |
-| [Detection Model Implementation](Detection_Model_Implementation.md) | Five-layer detection architecture, Kafka pipeline, TCC transactions, rule execution | [source](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) |
-| [Turnover Validation Architecture](Turnover_Validation_Architecture.md) | Snapshot SQL schema, validation service, dual-layer architecture, index strategy | [source](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md) |
-| [Risk Implementation](Risk_Implementation.md) | Rule engine architecture (Drools/LiteFlow), risk score calculation, ML integration | [source](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md) |
-
-## Source Index
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| Detection Model | ML detection model architecture | [source](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) |
-| Rule Configuration | Risk rule engine configuration | [source](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) |
-| ML Integration | ML model training and deployment pipeline | [source](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) |
-| Operations Tools | Risk operations tooling | [source](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) |
-| Risk Proposal Workflow | Risk proposal approval system | [source](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
-| Turnover Validation | Turnover validation architecture | [source](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md) |
+> **目標讀者**: 架構師、後端開發、DevOps
+> **狀態**: Phase 6 完成 — 10 份拆分文檔 + 來源索引
 
 ---
 
-**Last Updated**: 2026-02-08
+## 拆分文檔
+
+| 文件 | 說明 | 來源 |
+|------|------|------|
+| [風控系統架構](Risk_System_Architecture.md) | 事件驅動風控管線、Kafka/Flink 整合、ML 模型服務 | [來源](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) |
+| [KYC 驗證 API](KYC_Verification_API.md) | 身份驗證服務、資料庫結構、API 端點 | [來源](../../source-archive/05_Risk_Control/05-03_KYC_AML.md) |
+| [詐騙偵測系統](Fraud_Detection_System.md) | ML 偵測模型、規則引擎、SpotBugs 整合 | [來源](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
+| [風控提案實作](Risk_Proposal_Implementation.md) | 優先級計算服務、SLA 監控、Camunda BPMN 工作流程、Sa-Token 權限 | [來源](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
+| [可負擔性評估實作](Affordability_Implementation.md) | 可負擔性評分演算法、API 端點、數據整合、監控 | [來源](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md) |
+| [玩家保護 API](Player_Protection_API.md) | 自我排除服務、限額管理 API、會話追蹤、GAMSTOP 整合 | [來源](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md) |
+| [ML 整合架構](ML_Integration_Architecture.md) | ML 訓練管線、模型部署、A/B 測試、漂移監控 | [來源](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) |
+| [偵測模型實作](Detection_Model_Implementation.md) | 五層偵測架構、Kafka 管線、TCC 交易、規則執行 | [來源](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) |
+| [有效投注額驗證架構](Turnover_Validation_Architecture.md) | 快照 SQL 結構、驗證服務、雙層架構、索引策略 | [來源](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md) |
+| [風控實作指南](Risk_Implementation.md) | 規則引擎架構（Drools/LiteFlow）、風險評分計算、ML 整合 | [來源](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md) |
+
+## 來源索引
+
+| 文件 | 說明 | 來源 |
+|------|------|------|
+| 偵測模型 | ML 偵測模型架構 | [來源](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) |
+| 規則配置 | 風控規則引擎配置 | [來源](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) |
+| ML 整合 | ML 模型訓練與部署管線 | [來源](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) |
+| 營運工具 | 風控營運工具 | [來源](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) |
+| 風控提案工作流程 | 風控提案審批系統 | [來源](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
+| 有效投注額驗證 | 有效投注額驗證架構 | [來源](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md) |
+
+---
+
+**最後更新**: 2026-02-08

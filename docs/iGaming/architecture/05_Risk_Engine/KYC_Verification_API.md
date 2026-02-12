@@ -1,154 +1,154 @@
-# KYC Verification API Architecture
+# KYC 驗證 API 架構（KYC Verification API Architecture）
 
-> **Canonical Source**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Business Requirements**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/KYC_AML_Requirements.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 4.0.0
-
----
-
-## Overview
-
-This document covers the technical architecture for implementing KYC (Know Your Customer) and AML (Anti-Money Laundering) verification systems in the SmartAdmin iGaming platform. It includes API specifications, database schemas, verification workflows, third-party integrations, and code examples.
+> **規範來源**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
+> **目標讀者**: Architects, Backend Developers, DevOps Engineers
+> **業務需求**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/KYC_AML_Requirements.md)
+> **最後同步**: 2026-02-08
+> **來源版本**: 4.0.0
 
 ---
 
-## 1. Automated Verification Workflow
+## 概述（Overview）
 
-### 1.1 KYC Document Verification Flow
+本文檔涵蓋 SmartAdmin iGaming 平台中實現 KYC（Know Your Customer，身份驗證）和 AML（Anti-Money Laundering，反洗錢）驗證系統的技術架構。包括 API 規格、資料庫架構、驗證工作流程、第三方整合及程式碼範例。
+
+---
+
+## 1. 自動化驗證工作流程（Automated Verification Workflow）
+
+### 1.1 KYC 文件驗證流程（KYC Document Verification Flow）
 
 ```mermaid
 flowchart TD
-    START[Player uploads document] --> OCR[AI OCR Recognition<br/>Provider: Tesseract + AWS Textract<br/>Extract: Name, DOB, ID Number, Expiry]
+    START[玩家上傳文件] --> OCR[AI OCR 識別<br/>提供商: Tesseract + AWS Textract<br/>提取: 姓名、出生日期、證件號碼、有效期]
 
-    OCR --> VALIDATE{Data Completeness Check<br/>Required fields 100% coverage?<br/>Photo clarity >= 300 DPI?}
+    OCR --> VALIDATE{資料完整性檢查<br/>必填欄位 100% 覆蓋？<br/>照片清晰度 >= 300 DPI？}
 
-    VALIDATE -->|Failed| REJECT1[Auto Reject<br/>Reason: Blurry photo/incomplete data<br/>Action: Request re-upload]
+    VALIDATE -->|失敗| REJECT1[自動拒絕<br/>原因: 照片模糊/資料不完整<br/>操作: 要求重新上傳]
 
-    VALIDATE -->|Passed| FACE[Facial Comparison<br/>Provider: AWS Rekognition<br/>Match threshold: >= 85%]
+    VALIDATE -->|通過| FACE[人臉比對<br/>提供商: AWS Rekognition<br/>匹配閾值: >= 85%]
 
-    FACE --> LIVENESS[Liveness Detection<br/>Anti-spoofing: Blink/head turn<br/>Prevent photo attacks]
+    FACE --> LIVENESS[活體檢測<br/>反欺詐: 眨眼/轉頭<br/>防止照片攻擊]
 
-    LIVENESS --> WATCHLIST[Blacklist Check<br/>Data sources:<br/>- Internal fraud list<br/>- Cifas National Fraud Database<br/>- PEPs political persons list]
+    LIVENESS --> WATCHLIST[黑名單檢查<br/>資料來源:<br/>- 內部欺詐名單<br/>- Cifas 國家欺詐資料庫<br/>- PEPs 政治人物名單]
 
-    WATCHLIST -->|Blacklist hit| REJECT2[Auto Block<br/>Action: Permanent ban + Notify compliance team]
+    WATCHLIST -->|命中黑名單| REJECT2[自動封鎖<br/>操作: 永久禁止 + 通知合規團隊]
 
-    WATCHLIST -->|No hit| RISK_SCORE[Risk Scoring<br/>Combined: IP geolocation, Device fingerprint,<br/>Registration source, Historical behavior]
+    WATCHLIST -->|未命中| RISK_SCORE[風險評分<br/>綜合: IP 地理位置、裝置指紋、<br/>註冊來源、歷史行為]
 
-    RISK_SCORE -->|Score < 30| AUTO_APPROVE[Auto Approve<br/>KYC Level ++<br/>Send notification email]
+    RISK_SCORE -->|分數 < 30| AUTO_APPROVE[自動核准<br/>KYC 等級 ++<br/>發送通知郵件]
 
-    RISK_SCORE -->|Score 30-60| MANUAL[Manual Review<br/>Assign to compliance team<br/>SLA: 24 hours]
+    RISK_SCORE -->|分數 30-60| MANUAL[人工審核<br/>指派給合規團隊<br/>SLA: 24 小時]
 
-    RISK_SCORE -->|Score > 60| FLAG[EDD Investigation<br/>Request additional docs (SOF/SOW)<br/>Freeze account until investigation complete]
+    RISK_SCORE -->|分數 > 60| FLAG[EDD 調查<br/>要求額外文件 (SOF/SOW)<br/>凍結帳戶直到調查完成]
 
-    AUTO_APPROVE --> END[End]
+    AUTO_APPROVE --> END[結束]
     MANUAL --> END
     FLAG --> END
     REJECT1 --> END
     REJECT2 --> END
 ```
 
-### 1.2 SAR Reporting Workflow
+### 1.2 SAR 報告工作流程（SAR Reporting Workflow）
 
 ```mermaid
 flowchart TD
-    DETECT[Risk control system detects anomaly] --> ALERT[Generate AML Alert<br/>Risk score >= 80<br/>Auto freeze account]
+    DETECT[風控系統檢測到異常] --> ALERT[生成 AML 警報<br/>風險分數 >= 80<br/>自動凍結帳戶]
 
-    ALERT --> REVIEW[Compliance team review<br/>Investigate: Transaction records, Device fingerprint,<br/>Graph analysis, Historical behavior]
+    ALERT --> REVIEW[合規團隊審查<br/>調查: 交易記錄、裝置指紋、<br/>圖分析、歷史行為]
 
-    REVIEW -->|Reasonable explanation| CLEAR[Unfreeze<br/>Mark as false positive<br/>Adjust risk model]
+    REVIEW -->|合理解釋| CLEAR[解除凍結<br/>標記為誤報<br/>調整風險模型]
 
-    REVIEW -->|Confirmed suspicious| SAR[Submit SAR Report<br/>To regulatory authority:<br/>- UK NCA (7 working days)<br/>- Malta FIAU (15 days)]
+    REVIEW -->|確認可疑| SAR[提交 SAR 報告<br/>至監管機構:<br/>- 英國 NCA (7 個工作日)<br/>- 馬爾他 FIAU (15 天)]
 
-    SAR --> FREEZE[Permanent account freeze<br/>Confiscate winnings<br/>Return principal (case by case)]
+    SAR --> FREEZE[永久凍結帳戶<br/>沒收獎金<br/>退還本金 (個案處理)]
 
-    SAR --> RECORD[Record retention 7 years<br/>Meet AML regulatory requirements<br/>Hash Chain tamper-proofing]
+    SAR --> RECORD[記錄保留 7 年<br/>符合 AML 監管要求<br/>雜湊鏈防篡改]
 ```
 
-### 1.3 PEP Screening Flow
+### 1.3 PEP 篩查流程（PEP Screening Flow）
 
 ```mermaid
 flowchart TD
-    A[New player registration / Periodic re-screening] --> B[PEP list screening<br/>Provider: World-Check, Dow Jones]
+    A[新玩家註冊 / 定期重新篩查] --> B[PEP 名單篩查<br/>提供商: World-Check, Dow Jones]
 
-    B --> C{Name match?}
+    B --> C{姓名匹配？}
 
-    C -->|Exact match| D[Auto trigger EDD<br/>Account restrictions]
-    C -->|Fuzzy match| E[Manual review queue<br/>24h SLA]
-    C -->|No match| F[Normal process]
+    C -->|精確匹配| D[自動觸發 EDD<br/>帳戶限制]
+    C -->|模糊匹配| E[人工審核佇列<br/>24h SLA]
+    C -->|無匹配| F[正常流程]
 
-    D --> G[Request additional documents<br/>SOF + SOW]
-    E --> H{Confirm PEP?}
+    D --> G[要求額外文件<br/>SOF + SOW]
+    E --> H{確認 PEP？}
 
-    H -->|Yes| G
-    H -->|No - Different person| I[Mark as verified non-PEP<br/>Update whitelist]
+    H -->|是| G
+    H -->|否 - 同名不同人| I[標記為已驗證非 PEP<br/>更新白名單]
 
-    G --> J[MLRO approval<br/>Senior management sign-off]
+    G --> J[MLRO 核准<br/>高級管理層簽字]
 
-    J -->|Approved| K[Allow account opening<br/>Ongoing monitoring]
-    J -->|Rejected| L[Refuse service<br/>Record reason]
+    J -->|核准| K[允許開戶<br/>持續監控]
+    J -->|拒絕| L[拒絕服務<br/>記錄原因]
 
-    K --> M[Monthly transaction review<br/>Annual re-screening]
+    K --> M[每月交易審查<br/>年度重新篩查]
 ```
 
-### 1.4 Sanctions Screening and Asset Freeze Flow
+### 1.4 制裁篩查與資產凍結流程（Sanctions Screening and Asset Freeze Flow）
 
 ```mermaid
 flowchart TD
-    A[Sanctions list match] --> B[Immediate account freeze<br/>Prohibit all transactions]
+    A[制裁名單匹配] --> B[立即凍結帳戶<br/>禁止所有交易]
 
-    B --> C[Notify MLRO<br/>Within 30 minutes]
+    B --> C[通知 MLRO<br/>30 分鐘內]
 
-    C --> D[MLRO confirms match<br/>Rule out namesakes]
+    C --> D[MLRO 確認匹配<br/>排除同名異人]
 
-    D --> E{Confirmed match?}
+    D --> E{確認匹配？}
 
-    E -->|Yes| F[Report to regulatory authority<br/>Within 24 hours]
-    E -->|No - False positive| G[Unfreeze account<br/>Record false positive reason]
+    E -->|是| F[報告監管機構<br/>24 小時內]
+    E -->|否 - 誤報| G[解除凍結帳戶<br/>記錄誤報原因]
 
-    F --> H[Maintain freeze<br/>Await regulatory instruction]
+    F --> H[維持凍結<br/>等待監管指示]
 
-    H --> I{Regulatory decision}
+    H --> I{監管決定}
 
-    I -->|Confiscate funds| J[Execute confiscation<br/>Transfer to treasury]
-    I -->|Remove sanctions| K[Unfreeze account<br/>Notify player]
+    I -->|沒收資金| J[執行沒收<br/>轉至國庫]
+    I -->|解除制裁| K[解除凍結帳戶<br/>通知玩家]
 ```
 
-### 1.5 MLRO Approval Flow
+### 1.5 MLRO 核准流程（MLRO Approval Flow）
 
 ```mermaid
 graph TD
-    A[AML alert generated] --> B[Compliance analyst initial review]
-    B --> C{Need SAR?}
+    A[生成 AML 警報] --> B[合規分析師初步審查]
+    B --> C{需要 SAR？}
 
-    C -->|Uncertain| D[Escalate to senior analyst]
-    C -->|No| E[Close alert<br/>Record reason]
-    C -->|Yes| F[Prepare SAR draft]
+    C -->|不確定| D[升級至高級分析師]
+    C -->|否| E[關閉警報<br/>記錄原因]
+    C -->|是| F[準備 SAR 草稿]
 
-    D --> G{Need SAR?}
-    G -->|No| E
-    G -->|Yes| F
+    D --> G{需要 SAR？}
+    G -->|否| E
+    G -->|是| F
 
-    F --> H[MLRO review]
-    H --> I{Approved?}
+    F --> H[MLRO 審查]
+    H --> I{核准？}
 
-    I -->|Needs revision| J[Return for revision]
+    I -->|需要修訂| J[退回修訂]
     J --> F
 
-    I -->|Yes| K[MLRO sign-off]
-    K --> L[Submit to regulatory authority]
-    L --> M[Archive record<br/>7-year retention]
+    I -->|是| K[MLRO 簽字]
+    K --> L[提交至監管機構]
+    L --> M[歸檔記錄<br/>7 年保留]
 
-    I -->|No| N[Record rejection reason]
+    I -->|否| N[記錄拒絕原因]
     N --> E
 ```
 
 ---
 
-## 2. Database Schema
+## 2. 資料庫架構（Database Schema）
 
-### 2.1 KYC Verification Records Table
+### 2.1 KYC 驗證記錄表（KYC Verification Records Table）
 
 ```sql
 CREATE TABLE kyc_verifications (
@@ -192,7 +192,7 @@ CREATE TABLE kyc_verifications (
 ) ENGINE=InnoDB COMMENT='KYC verification records';
 ```
 
-### 2.2 AML Alerts Table
+### 2.2 AML 警報表（AML Alerts Table）
 
 ```sql
 CREATE TABLE aml_alerts (
@@ -233,7 +233,7 @@ CREATE TABLE aml_alerts (
 ) ENGINE=InnoDB COMMENT='AML alerts table';
 ```
 
-### 2.3 PEP Screening Results Table
+### 2.3 PEP 篩查結果表（PEP Screening Results Table）
 
 ```sql
 CREATE TABLE t_pep_screening_result (
@@ -286,7 +286,7 @@ CREATE TABLE t_pep_edd_document (
 ) ENGINE=InnoDB COMMENT='PEP EDD documents';
 ```
 
-### 2.4 Sanctions Screening Log Table
+### 2.4 制裁篩查日誌表（Sanctions Screening Log Table）
 
 ```sql
 CREATE TABLE t_sanctions_screening_log (
@@ -362,7 +362,7 @@ CREATE TABLE t_ctf_alert (
 ) ENGINE=InnoDB COMMENT='CTF alerts table';
 ```
 
-### 2.5 MLRO Decision Log Table
+### 2.5 MLRO 決策日誌表（MLRO Decision Log Table）
 
 ```sql
 CREATE TABLE t_mlro_decision_log (
@@ -389,7 +389,7 @@ CREATE TABLE t_mlro_decision_log (
 ) ENGINE=InnoDB COMMENT='MLRO decision log';
 ```
 
-### 2.6 AML Audit Log Table (7-Year Retention with Hash Chain)
+### 2.6 AML 審計日誌表（AML Audit Log Table）（7 年保留期與雜湊鏈）
 
 ```sql
 -- AML audit log table (regulatory compliant)
@@ -444,9 +444,9 @@ DELIMITER ;
 
 ---
 
-## 3. API Specifications
+## 3. API 規格（API Specifications）
 
-### 3.1 Submit KYC Document
+### 3.1 提交 KYC 文件（Submit KYC Document）
 
 ```java
 /**
@@ -477,7 +477,7 @@ public class KycSubmitForm {
 }
 ```
 
-### 3.2 Query KYC Status
+### 3.2 查詢 KYC 狀態（Query KYC Status）
 
 ```java
 /**
@@ -507,7 +507,7 @@ public class KycStatusVO {
 }
 ```
 
-### 3.3 Admin Manual Review
+### 3.3 管理員人工審核（Admin Manual Review）
 
 ```java
 /**
@@ -537,9 +537,9 @@ public class KycReviewForm {
 
 ---
 
-## 4. Service Layer Implementation
+## 4. Service 層實現（Service Layer Implementation）
 
-### 4.1 PEP Enhanced Due Diligence Service
+### 4.1 PEP 加強盡職調查服務（PEP Enhanced Due Diligence Service）
 
 ```java
 /**
@@ -619,7 +619,7 @@ public class PepEddService {
 }
 ```
 
-### 4.2 Sanctions Screening Service
+### 4.2 制裁篩查服務（Sanctions Screening Service）
 
 ```java
 /**
@@ -676,7 +676,7 @@ public class SanctionsScreeningService {
 }
 ```
 
-### 4.3 Smurfing Detection Service
+### 4.3 分拆洗錢檢測服務（Smurfing Detection Service）
 
 ```java
 /**
@@ -726,7 +726,7 @@ public class SmurfingDetector {
 }
 ```
 
-### 4.4 Risk Scoring Model
+### 4.4 風險評分模型（Risk Scoring Model）
 
 ```java
 /**
@@ -782,9 +782,9 @@ public int calculateKycRiskScore(Long playerId, KycVerificationEntity verificati
 
 ---
 
-## 5. Graph Analysis (Neo4j)
+## 5. 圖分析（Graph Analysis）（Neo4j）
 
-### 5.1 Fund Flow Aggregation Detection
+### 5.1 資金流向聚合檢測（Fund Flow Aggregation Detection）
 
 ```cypher
 // Detect fund flow aggregation (multiple losers -> 1 winner)
@@ -799,7 +799,7 @@ RETURN winner.id, winner.username, loser_count
 ORDER BY loser_count DESC;
 ```
 
-### 5.2 Device Fingerprint Aggregation Detection
+### 5.2 裝置指紋聚合檢測（Device Fingerprint Aggregation Detection）
 
 ```cypher
 // Detect device fingerprint aggregation (multiple accounts on same device)
@@ -811,11 +811,11 @@ RETURN d.fingerprint, collect(p.username) AS accounts, player_count
 ORDER BY player_count DESC;
 ```
 
-**BFS Depth Limit**: 3 levels (to prevent query timeout, single query < 500ms)
+**BFS 深度限制**: 3 層（防止查詢超時，單次查詢 < 500ms）
 
 ---
 
-## 6. KYC Level Upgrade Trigger Rules
+## 6. KYC 等級升級觸發規則（KYC Level Upgrade Trigger Rules）
 
 ```sql
 -- L1 upgrade trigger conditions (UKGC: GBP 2,000 cumulative deposit OR first withdrawal)
@@ -840,70 +840,71 @@ WHERE (single_transaction >= 10000 OR cumulative_deposit >= 50000)
 
 ---
 
-## 7. Third-Party Integration Patterns
+## 7. 第三方整合模式（Third-Party Integration Patterns）
 
-### 7.1 Provider Comparison
+### 7.1 提供商比較（Provider Comparison）
 
-| Provider | Function | Integration Method | Cost |
-|----------|----------|-------------------|------|
-| **Sumsub** | Full KYC flow (OCR + Face + Liveness) | REST API + Webhook | $0.5-2.0/verification |
-| **Jumio** | Identity verification + AML screening | SDK + API | $1.0-3.0/verification |
-| **AWS Rekognition** | Facial comparison + Liveness detection | AWS SDK | $0.001/image |
-| **Tesseract OCR** | Open-source OCR (self-hosted) | Self-Hosted | Free |
-| **Cifas** | UK National Fraud Database | API (1,100+ companies shared) | GBP 5,000/year |
+| 提供商 | 功能 | 整合方式 | 成本 |
+|--------|------|----------|------|
+| **Sumsub** | 完整 KYC 流程 (OCR + 人臉 + 活體) | REST API + Webhook | $0.5-2.0/次驗證 |
+| **Jumio** | 身份驗證 + AML 篩查 | SDK + API | $1.0-3.0/次驗證 |
+| **AWS Rekognition** | 人臉比對 + 活體檢測 | AWS SDK | $0.001/張圖片 |
+| **Tesseract OCR** | 開源 OCR（自架） | Self-Hosted | 免費 |
+| **Cifas** | 英國國家欺詐資料庫 | API (1,100+ 家公司共享) | GBP 5,000/年 |
 
-### 7.2 Recommended Architecture by Scale
+### 7.2 依規模建議架構（Recommended Architecture by Scale）
 
-- **Small operators (< 10K players)**: Sumsub all-in-one (fast deployment)
-- **Medium operators (10K-100K)**: Jumio + AWS Rekognition (cost-optimized)
-- **Large operators (> 100K)**: Self-built OCR + AWS Rekognition (lowest cost)
-
----
-
-## 8. Data Retention Strategy
-
-| Tier | Storage | Retention | Purpose |
-|------|---------|-----------|---------|
-| Hot Data | Elasticsearch | 30 days | Real-time queries |
-| Warm Data | S3 | 1 year | Periodic audits |
-| Cold Data | AWS Glacier | 7 years | Regulatory compliance |
+- **小型營運商（< 10K 玩家）**: Sumsub 全包方案（快速部署）
+- **中型營運商（10K-100K）**: Jumio + AWS Rekognition（成本優化）
+- **大型營運商（> 100K）**: 自建 OCR + AWS Rekognition（成本最低）
 
 ---
 
-## 9. Monitoring and Metrics
+## 8. 資料保留策略（Data Retention Strategy）
 
-### 9.1 KYC Metrics
-
-| Metric | Definition | Target | Formula |
-|--------|------------|--------|---------|
-| **KYC Completion Rate** | Players who completed L1 verification | >= 85% | (L1+ players / Total players) x 100% |
-| **Auto-approval Rate** | Auto-reviewed approvals | >= 90% (L1), >= 70% (L2) | (Auto-approvals / Total submissions) x 100% |
-| **Average Review Time** | Time from submission to result | < 5 min (L1), < 24h (L2) | AVG(reviewed_at - created_at) |
-| **Rejection Rate** | Rejected KYC submissions | < 10% | (REJECTED count / Total submissions) x 100% |
-| **False Positive Rate** | Legitimate players incorrectly rejected | < 2% | (False positives / Total rejections) x 100% |
-
-### 9.2 AML Metrics
-
-| Metric | Definition | Target | Regulatory Requirement |
-|--------|------------|--------|------------------------|
-| **SAR Timeliness Rate** | SAR submitted within deadline | 100% | UKGC: 7 working days, MGA: 15 days |
-| **Alert Resolution Rate** | Alerts closed within 30 days | >= 95% | - |
-| **False Positive Rate** | FALSE_POSITIVE alerts proportion | < 15% | - |
-| **SOF Review Completion Rate** | EDD cases with completed SOF review | 100% | Large transaction mandatory |
+| 層級 | 儲存 | 保留期限 | 用途 |
+|------|------|----------|------|
+| 熱資料 | Elasticsearch | 30 天 | 即時查詢 |
+| 溫資料 | S3 | 1 年 | 定期稽核 |
+| 冷資料 | AWS Glacier | 7 年 | 監管合規 |
 
 ---
 
-## Related Documentation
+## 9. 監控與指標（Monitoring and Metrics）
 
-### Technical References
-- [06-05 Data Security Strategy](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) - Personal data encryption, audit logs
-- [06-04 Approval Workflow System](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - KYC manual review process
-- [09-02-01 Gateway Architecture](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API security, brute force protection
+### 9.1 KYC 指標（KYC Metrics）
 
-### Third-Party Integration
-- [14-01 Third-Party Integration Standards](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md) - Sumsub/Jumio integration guide
+| 指標 | 定義 | 目標 | 公式 |
+|------|------|------|------|
+| **KYC 完成率** | 完成 L1 驗證的玩家比例 | >= 85% | (L1+ 玩家數 / 總玩家數) x 100% |
+| **自動核准率** | 自動審核通過比例 | >= 90% (L1), >= 70% (L2) | (自動核准數 / 總提交數) x 100% |
+| **平均審核時間** | 從提交到結果的時間 | < 5 分鐘 (L1), < 24h (L2) | AVG(reviewed_at - created_at) |
+| **拒絕率** | KYC 提交被拒絕比例 | < 10% | (REJECTED 數量 / 總提交數) x 100% |
+| **誤報率** | 合法玩家被錯誤拒絕比例 | < 2% | (誤報數 / 總拒絕數) x 100% |
+
+### 9.2 AML 指標（AML Metrics）
+
+| 指標 | 定義 | 目標 | 監管要求 |
+|------|------|------|----------|
+| **SAR 及時率** | SAR 在期限內提交比例 | 100% | UKGC: 7 個工作日, MGA: 15 天 |
+| **警報解決率** | 30 天內關閉警報比例 | >= 95% | - |
+| **誤報率** | FALSE_POSITIVE 警報比例 | < 15% | - |
+| **SOF 審查完成率** | EDD 案件完成 SOF 審查比例 | 100% | 大額交易強制要求 |
 
 ---
 
-**Document Maintenance**: Update with API changes and new integration patterns
-**Last Review**: 2026-02-08 (Engineering Team)
+## 相關文檔（Related Documentation）
+
+### 技術參考（Technical References）
+- [06-05 資料安全策略](../../source-archive/06_Platform_Governance/06-05_Data_Security.md) - 個人資料加密、審計日誌
+- [06-04 審批工作流程系統](../../source-archive/06_Platform_Governance/06-04_Approval_Workflow.md) - KYC 人工審核流程
+- [09-02-01 閘道架構](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) - API 安全、暴力破解防護
+
+### 第三方整合（Third-Party Integration）
+- [14-01 第三方整合標準](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md) - Sumsub/Jumio 整合指南
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-08
+**維護團隊**: Engineering Team

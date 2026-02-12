@@ -228,14 +228,14 @@ Kafka Payload:
 | 同場對沖（Same-Match Hedging） | 同場比賽歷史投注查詢，對立結果 |
 | 同 IP 套利（Same-IP Arbitrage） | 共享 IP 帳戶的相關性分析 |
 | 異常賠率偵測（Abnormal Odds Detection） | 賠率選擇分佈的統計分析 |
-| 流水操控（Turnover Manipulation） | 流水速度計算與存款比率對比 |
+| 有效投注額操控（Turnover Manipulation） | 有效投注額速度計算與存款比率對比 |
 
 ### 5.3 Layer 3 -- 非同步 FLAG 規則（Async FLAG Rules）
 
 | 規則 | 偵測方法 |
 |------|----------|
 | 跨場對沖（Cross-Match Hedging） | 跨場比賽投注相關性（較低風險） |
-| 低賠率流水（< 1.5）（Low-Odds Turnover） | 賠率閾值檢查 |
+| 低賠率有效投注額（< 1.5）（Low-Odds Turnover） | 賠率閾值檢查 |
 | 異常投注模式（Abnormal Betting Pattern） | 模式偏離玩家基線 |
 | 高頻投注（> 10次/分鐘）（High-Frequency Betting） | 滑動窗口計數 |
 

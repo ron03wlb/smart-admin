@@ -1,61 +1,61 @@
-# Risk Implementation
+# 風控實作指南（Risk Implementation）
 
-> **Canonical Source**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
-> **Audience**: Architects, Backend Engineers, Data Engineers
-> **Business Requirements**: [Risk_Requirements_Summary.md](../../requirements/05_Risk_Compliance/Risk_Requirements_Summary.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-This document covers the technical implementation of the iGaming platform risk control system, including the risk rule engine, fraud detection algorithms, and agent credit management. All implementations follow SmartAdmin layered architecture patterns.
+> **規範來源**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
+> **目標讀者**: 架構師、後端工程師、數據工程師
+> **業務需求**: [Risk_Requirements_Summary.md](../../requirements/05_Risk_Compliance/Risk_Requirements_Summary.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 2. Risk Rule Engine
+## 1. 概述（Overview）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 05_Risk_Control, 01_Core_Financial_Loop
+本文檔涵蓋 iGaming 平台風控系統的技術實作，包括風控規則引擎、欺詐檢測演算法以及代理信用管理。所有實作遵循 SmartAdmin 分層架構模式。
 
-### Implementation Goal
+---
 
-Design and implement a rule engine architecture integrating Drools/LiteFlow, with dynamic rule configuration and hot-reloading capabilities.
+## 2. 風控規則引擎（Risk Rule Engine）
 
-### Implementation Reading Order
+**狀態**: 已規劃 (Phase 5+)
+**模組**: 05_Risk_Control, 01_Core_Financial_Loop
 
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
-| 1 | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) | S2 Rule Engine | Drools integration |
-| 2 | [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) | S3 Approval Flow | Workflow design |
-| 3 | [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) | S4 Risk Rules | Real-world cases |
+### 實作目標（Implementation Goal）
 
-### SmartAdmin Layer Mapping
+設計並實作整合 Drools/LiteFlow 的規則引擎架構，具備動態規則配置與熱重載能力。
 
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | Risk evaluation API, rule management admin endpoints (`@SaCheckPermission`) |
-| Service | Rule matching logic, risk score aggregation (Vavr Option for optional rule config lookups) |
-| Manager | @Transactional rule persistence + version management, @Cacheable rule cache with hot-reload |
-| Dao | Rule definitions, risk event logs, scoring history via MyBatis Plus |
+### 實作閱讀順序（Implementation Reading Order）
 
-### Rule Engine Architecture
+| 順序 | 文檔 | 章節 | 重點 |
+|------|------|------|------|
+| 1 | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) | S2 Rule Engine | Drools 整合 |
+| 2 | [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) | S3 Approval Flow | 工作流設計 |
+| 3 | [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) | S4 Risk Rules | 真實案例 |
+
+### SmartAdmin 層級映射（SmartAdmin Layer Mapping）
+
+| 層級 | 職責 |
+|------|------|
+| Controller | 風險評估 API、規則管理後台端點 (`@SaCheckPermission`) |
+| Service | 規則匹配邏輯、風險分數聚合 (Vavr Option 用於可選規則配置查詢) |
+| Manager | @Transactional 規則持久化 + 版本管理、@Cacheable 規則快取與熱重載 |
+| Dao | 規則定義、風險事件日誌、評分歷史（透過 MyBatis Plus） |
+
+### 規則引擎架構（Rule Engine Architecture）
 
 ```mermaid
 graph LR
-    A[Risk Event<br/>Kafka Consumer] --> B[Rule Matching<br/>Drools/LiteFlow]
-    B --> C[Score Calculation<br/>Weighted Sum]
-    C --> D{Score<br/>Range?}
-    D -->|0-30| E[Log Only<br/>Async Audit]
-    D -->|31-60| F[Flag for Review<br/>Create Proposal]
-    D -->|61-85| G[Escalate<br/>Notify Risk Team]
-    D -->|86-100| H[Auto-Block<br/>Account Restriction]
+    A[風險事件<br/>Kafka Consumer] --> B[規則匹配<br/>Drools/LiteFlow]
+    B --> C[分數計算<br/>加權求和]
+    C --> D{分數<br/>範圍?}
+    D -->|0-30| E[僅記錄<br/>非同步審計]
+    D -->|31-60| F[標記審查<br/>建立提案]
+    D -->|61-85| G[升級<br/>通知風控團隊]
+    D -->|86-100| H[自動封鎖<br/>帳戶限制]
 
-    B --> I[(Rule Store<br/>@Cacheable)]
-    I -->|Hot Reload| B
+    B --> I[(規則存儲<br/>@Cacheable)]
+    I -->|熱重載| B
 ```
 
-### Risk Score Calculation
+### 風險分數計算（Risk Score Calculation）
 
 ```java
 // Service layer: risk score aggregation
@@ -67,29 +67,29 @@ public RiskScore evaluate(RiskEvent event) {
 }
 ```
 
-### Action Dispatch by Score
+### 分數區間動作分發（Action Dispatch by Score）
 
-| Score Range | Action | Implementation |
-|------------|--------|----------------|
-| 0-30 | Log | Async audit log write (Manager) |
-| 31-60 | Flag for review | Create risk proposal (Manager @Transactional) |
-| 61-85 | Escalate | Notify risk team + create urgent proposal |
-| 86-100 | Auto-block | Immediate account restriction (Manager @Transactional) |
+| 分數範圍 | 動作 | 實作方式 |
+|---------|------|---------|
+| 0-30 | 記錄 | 非同步審計日誌寫入 (Manager) |
+| 31-60 | 標記審查 | 建立風險提案 (Manager @Transactional) |
+| 61-85 | 升級 | 通知風控團隊 + 建立緊急提案 |
+| 86-100 | 自動封鎖 | 立即帳戶限制 (Manager @Transactional) |
 
-### Verification Checklist
+### 驗證清單（Verification Checklist）
 
-- [ ] Rule engine executes correctly
-- [ ] Dynamic rule loading succeeds
-- [ ] Rule priorities are correct
-- [ ] Risk scoring calculations are accurate
+- [ ] 規則引擎執行正確
+- [ ] 動態規則載入成功
+- [ ] 規則優先順序正確
+- [ ] 風險評分計算準確
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Rule Conflicts**: Multiple rules match simultaneously -- implement priority-based resolution with early-exit
-2. **Performance**: Too many rules slow execution -- use indexed rule matching and Drools RETE optimization
-3. **Hot Update Failure**: Rule updates not reflected -- version rules in Manager with @Cacheable eviction on update
+1. **規則衝突**: 多條規則同時匹配 -- 實作基於優先順序的解決機制與提前退出
+2. **效能問題**: 規則過多導致執行緩慢 -- 使用索引規則匹配與 Drools RETE 優化
+3. **熱更新失效**: 規則更新未生效 -- 在 Manager 中實作規則版本控制，更新時使用 @Cacheable 清除快取
 
-### Database Schema
+### 資料庫結構（Database Schema）
 
 ```sql
 -- Risk rule definitions with versioning
@@ -139,33 +139,33 @@ CREATE INDEX idx_risk_assessments_review ON risk_assessments(action_taken, revie
 
 ---
 
-## 3. Fraud Detection Algorithm
+## 3. 欺詐檢測演算法（Fraud Detection Algorithm）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 05_Risk_Control, 01_Player_Center
+**狀態**: 已規劃 (Phase 5+)
+**模組**: 05_Risk_Control, 01_Player_Center
 
-### Implementation Goal
+### 實作目標（Implementation Goal）
 
-Implement device fingerprinting, behavioral analysis, and machine learning model integration for fraud detection.
+實作裝置指紋識別、行為分析以及機器學習模型整合，用於欺詐檢測。
 
-### Implementation Reading Order
+### 實作閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
+| 順序 | 文檔 | 章節 | 重點 |
+|------|------|------|------|
 | 1 | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) | S2 Device Fingerprint | FingerprintJS |
-| 2 | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) | S3 Behavioral Analysis | Anomaly detection |
-| 3 | [01-01 Player Lifecycle](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) | S5 Risk Scoring | Player classification |
+| 2 | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) | S3 Behavioral Analysis | 異常檢測 |
+| 3 | [01-01 Player Lifecycle](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) | S5 Risk Scoring | 玩家分類 |
 
-### SmartAdmin Layer Mapping
+### SmartAdmin 層級映射（SmartAdmin Layer Mapping）
 
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | Fingerprint collection API, fraud report query endpoint |
-| Service | Fingerprint matching, behavioral pattern analysis (Vavr Option for device lookups) |
-| Manager | @Transactional fraud case creation, @Cacheable fingerprint index, ML model inference orchestration |
-| Dao | Device fingerprint store, fraud case records, behavioral event logs |
+| 層級 | 職責 |
+|------|------|
+| Controller | 指紋收集 API、欺詐報告查詢端點 |
+| Service | 指紋匹配、行為模式分析 (Vavr Option 用於裝置查詢) |
+| Manager | @Transactional 欺詐案件建立、@Cacheable 指紋索引、機器學習模型推理協調 |
+| Dao | 裝置指紋存儲、欺詐案件記錄、行為事件日誌 |
 
-### Device Fingerprint Architecture
+### 裝置指紋架構（Device Fingerprint Architecture）
 
 ```
 Browser/App → FingerprintJS SDK → Fingerprint API → Fingerprint Store
@@ -175,7 +175,7 @@ Browser/App → FingerprintJS SDK → Fingerprint API → Fingerprint Store
                                   New Device → Create Record + Flag for Review
 ```
 
-### ML Model Integration
+### 機器學習模型整合（ML Model Integration）
 
 ```java
 // Manager layer: ML model inference with @Cacheable model config
@@ -193,48 +193,48 @@ public FraudScore evaluate(PlayerBehavior behavior) {
 }
 ```
 
-### Verification Checklist
+### 驗證清單（Verification Checklist）
 
-- [ ] Device fingerprints are correctly generated
-- [ ] Anomaly behavior detection is effective
-- [ ] ML model accuracy meets target threshold
-- [ ] False positive rate is within acceptable range
+- [ ] 裝置指紋正確生成
+- [ ] 異常行為檢測有效
+- [ ] 機器學習模型準確度達標
+- [ ] 誤報率在可接受範圍內
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **High False Positives**: Legitimate players misclassified -- tune thresholds, implement human review queue
-2. **Model Drift**: Historical model degrades -- schedule periodic retraining via Snail-Job
-3. **Insufficient Features**: Missing risk signals -- continuously expand feature engineering pipeline
+1. **高誤報率**: 合法玩家被誤判 -- 調整閾值，實作人工審查佇列
+2. **模型漂移**: 歷史模型效能下降 -- 透過 Snail-Job 定期重新訓練
+3. **特徵不足**: 缺少風險信號 -- 持續擴展特徵工程管道
 
 ---
 
-## 4. Agent Credit Management
+## 4. 代理信用管理（Agent Credit Management）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 07_Agent_Center, 05_Risk_Control
+**狀態**: 已規劃 (Phase 5+)
+**模組**: 07_Agent_Center, 05_Risk_Control
 
-### Implementation Goal
+### 實作目標（Implementation Goal）
 
-Implement credit line calculation, risk alerts, commission settlement (share mode), and credit freeze mechanisms.
+實作信用額度計算、風險警報、佣金結算（分成模式）以及信用凍結機制。
 
-### Implementation Reading Order
+### 實作閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
-| 1 | [07-02 Credit Network Logic](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) | S2 Credit Network | Share mode |
-| 2 | [05-04 Agent Credit Risk](../../source-archive/05_Risk_Control/05-04_Agent_Credit_Risk.md) | S3 Risk Control | Credit calculation |
-| 3 | [07-03 Agent System](../../source-archive/07_Agent_Center/07-03_Agent_System.md) | S4 Risk Integration | Agent risk controls |
+| 順序 | 文檔 | 章節 | 重點 |
+|------|------|------|------|
+| 1 | [07-02 Credit Network Logic](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) | S2 Credit Network | 分成模式 |
+| 2 | [05-04 Agent Credit Risk](../../source-archive/05_Risk_Control/05-04_Agent_Credit_Risk.md) | S3 Risk Control | 信用計算 |
+| 3 | [07-03 Agent System](../../source-archive/07_Agent_Center/07-03_Agent_System.md) | S4 Risk Integration | 代理風控 |
 
-### SmartAdmin Layer Mapping
+### SmartAdmin 層級映射（SmartAdmin Layer Mapping）
 
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | Credit query API, settlement API, admin credit management (`@SaCheckPermission`) |
-| Service | Credit calculation, hierarchy traversal (Vavr Option for optional parent-agent lookups) |
-| Manager | @Transactional credit allocation + freeze operations, @Transactional settlement processing, @Cacheable agent hierarchy |
-| Dao | Credit records, settlement history, agent hierarchy via MyBatis Plus |
+| 層級 | 職責 |
+|------|------|
+| Controller | 信用查詢 API、結算 API、管理後台信用管理 (`@SaCheckPermission`) |
+| Service | 信用計算、層級遍歷 (Vavr Option 用於可選上級代理查詢) |
+| Manager | @Transactional 信用分配 + 凍結操作、@Transactional 結算處理、@Cacheable 代理層級結構 |
+| Dao | 信用記錄、結算歷史、代理層級（透過 MyBatis Plus） |
 
-### Credit Calculation Logic
+### 信用計算邏輯（Credit Calculation Logic）
 
 ```java
 // Service layer: credit line calculation
@@ -253,16 +253,16 @@ public CreditAllocation calculateCredit(Long agentId) {
 }
 ```
 
-### Credit Monitoring Thresholds
+### 信用監控閾值（Credit Monitoring Thresholds）
 
-| Utilization | Action | Implementation |
-|------------|--------|----------------|
-| 0-70% | Normal | No action |
-| 71-85% | Warning | Async notification via Manager |
-| 86-95% | Restrict | Block new registrations (Manager @Transactional) |
-| 96-100% | Freeze | Freeze credit + escalate (Manager @Transactional) |
+| 使用率 | 動作 | 實作方式 |
+|-------|------|---------|
+| 0-70% | 正常 | 無動作 |
+| 71-85% | 警告 | 透過 Manager 非同步通知 |
+| 86-95% | 限制 | 封鎖新註冊 (Manager @Transactional) |
+| 96-100% | 凍結 | 凍結信用 + 升級 (Manager @Transactional) |
 
-### Settlement Processing
+### 結算處理（Settlement Processing）
 
 ```java
 // Manager layer: atomic settlement operation
@@ -277,34 +277,34 @@ public void processSettlement(Long agentId, SettlementPeriod period) {
 }
 ```
 
-### Verification Checklist
+### 驗證清單（Verification Checklist）
 
-- [ ] Credit line calculation is correct
-- [ ] Risk alerts trigger promptly
-- [ ] Commission settlement is accurate
-- [ ] Credit freeze mechanism is effective
+- [ ] 信用額度計算正確
+- [ ] 風險警報及時觸發
+- [ ] 佣金結算準確
+- [ ] 信用凍結機制有效
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Credit Overflow**: Sub-agent bets exceed allocated credit -- real-time credit check in Service before bet acceptance
-2. **Settlement Delay**: Commission settlement lag -- automate with Snail-Job scheduled task
-3. **Hierarchy Calculation Error**: Multi-level credit distribution -- validate with automated integration tests
-
----
-
-## 5. Reference Documents
-
-| Area | Document |
-|------|----------|
-| Risk Framework | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) |
-| Fraud Detection | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
-| Risk Proposal Workflow | [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
-| Agent Credit Risk | [05-04 Agent Credit Risk](../../source-archive/05_Risk_Control/05-04_Agent_Credit_Risk.md) |
-| Credit Network Logic | [07-02 Credit Network Logic](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) |
-| Agent System | [07-03 Agent System](../../source-archive/07_Agent_Center/07-03_Agent_System.md) |
+1. **信用溢出**: 下級代理投注超過分配信用 -- 在 Service 接受投注前進行即時信用檢查
+2. **結算延遲**: 佣金結算滯後 -- 使用 Snail-Job 排程任務自動化
+3. **層級計算錯誤**: 多層級信用分配 -- 使用自動化整合測試驗證
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-08
-**Source Version**: 4.0.0
+## 5. 參考文檔（Reference Documents）
+
+| 領域 | 文檔 |
+|------|------|
+| 風控框架 | [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) |
+| 欺詐檢測 | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
+| 風險提案工作流 | [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) |
+| 代理信用風險 | [05-04 Agent Credit Risk](../../source-archive/05_Risk_Control/05-04_Agent_Credit_Risk.md) |
+| 信用網絡邏輯 | [07-02 Credit Network Logic](../../source-archive/07_Agent_Center/07-02_Credit_Network_Logic.md) |
+| 代理系統 | [07-03 Agent System](../../source-archive/07_Agent_Center/07-03_Agent_System.md) |
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-08
+**維護團隊**: iGaming 架構組

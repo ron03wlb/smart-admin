@@ -1,25 +1,25 @@
-# ML Integration Architecture (機器學習風控技術架構)
+# 機器學習整合架構（ML Integration Architecture）
 
-> **Canonical Source**: [05-02-03_ML_Integration.md](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md)
-> **Audience**: Architects, ML Engineers
-> **Business Requirements**: [ML_Requirements.md](../../requirements/05_Risk_Compliance/ML_Requirements.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-This document covers the technical architecture of the ML-based risk detection system, including game-type dimensional rule configuration, player risk profiling, model training pipelines, evaluation metrics, A/B testing, and monitoring infrastructure.
+> **規範來源**: [05-02-03_ML_Integration.md](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md)
+> **目標讀者**: Architects, ML Engineers
+> **業務需求**: [ML_Requirements.md](../../requirements/05_Risk_Compliance/ML_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 2. Game-Type Dimensional Rule Configuration
+## 1. 概述（Overview）
 
-### 2.1 Database Schema: t_risk_rule_config
+本文檔涵蓋基於機器學習的風險檢測系統技術架構,包括遊戲類型維度規則配置、玩家風險畫像、模型訓練管道、評估指標、A/B Testing 以及監控基礎設施。
 
-Rules are filtered by game type and can exclude specific games. The `game_types` column uses JSON arrays for flexible multi-type matching, and `excluded_games` allows granular per-game overrides.
+---
 
-**Query: Select rules applicable to a specific game**
+## 2. 遊戲類型維度規則配置（Game-Type Dimensional Rule Configuration）
+
+### 2.1 數據庫架構：t_risk_rule_config
+
+規則按遊戲類型進行過濾,並可排除特定遊戲。`game_types` 欄位使用 JSON 陣列實現靈活的多類型匹配,`excluded_games` 允許細粒度的單遊戲覆蓋。
+
+**查詢：選擇適用於特定遊戲的規則**
 
 ```sql
 SELECT
@@ -37,7 +37,7 @@ WHERE enabled = TRUE
 ORDER BY rule_category, rule_code;
 ```
 
-### 2.2 Game Type Enum
+### 2.2 遊戲類型枚舉（Game Type Enum）
 
 ```java
 public enum GameType {
@@ -57,7 +57,7 @@ public enum GameType {
 }
 ```
 
-### 2.3 Configuration Examples
+### 2.3 配置範例（Configuration Examples）
 
 ```sql
 -- Sports-only rules
@@ -75,7 +75,7 @@ INSERT INTO t_risk_rule_config (rule_code, rule_name, action_type, game_types) V
 ('BOT_DETECTION', '機器人檢測', 'BLOCK', NULL);
 ```
 
-### 2.4 Game Exclusion Filtering
+### 2.4 遊戲排除過濾（Game Exclusion Filtering）
 
 ```sql
 -- Exclude specific games from a rule
@@ -97,7 +97,7 @@ WHERE enabled = TRUE
   AND deleted = FALSE;
 ```
 
-### 2.5 Dao Implementation
+### 2.5 Dao 實現（Dao Implementation）
 
 ```java
 @Mapper
@@ -128,9 +128,9 @@ public interface RiskRuleConfigDao extends BaseMapper<RiskRuleConfigEntity> {
 
 ---
 
-## 3. Player Risk Profile
+## 3. 玩家風險畫像（Player Risk Profile）
 
-### 3.1 Database Schema: t_player_risk_profile
+### 3.1 數據庫架構：t_player_risk_profile
 
 ```sql
 CREATE TABLE t_player_risk_profile (
@@ -169,7 +169,7 @@ CREATE TABLE t_player_risk_profile (
 ) COMMENT='玩家風險檔案表';
 ```
 
-### 3.2 Risk Score Calculation (Manager Layer)
+### 3.2 風險評分計算（Risk Score Calculation）— Manager 層
 
 ```java
 @Service
@@ -237,7 +237,7 @@ public class PlayerRiskProfileManager {
 }
 ```
 
-### 3.3 Blacklist Check Rule
+### 3.3 黑名單檢查規則（Blacklist Check Rule）
 
 ```java
 public class BlacklistPlayerRule implements RiskRule {
@@ -269,46 +269,46 @@ public class BlacklistPlayerRule implements RiskRule {
 
 ---
 
-## 4. ML Model Training Pipeline
+## 4. ML 模型訓練管道（ML Model Training Pipeline）
 
 ```mermaid
 flowchart LR
-    subgraph Data Preparation
-        A[Historical Data] --> B[Feature Engineering]
-        B --> C[Data Cleansing]
-        C --> D[Train/Validation Split]
+    subgraph 數據準備
+        A[歷史數據] --> B[特徵工程]
+        B --> C[數據清洗]
+        C --> D[訓練/驗證分割]
     end
 
-    subgraph Model Training
-        D --> E[Model Selection<br/>XGBoost/LightGBM]
-        E --> F[Hyperparameter Tuning<br/>Optuna]
-        F --> G[Cross-Validation]
+    subgraph 模型訓練
+        D --> E[模型選擇<br/>XGBoost/LightGBM]
+        E --> F[超參數調優<br/>Optuna]
+        F --> G[交叉驗證]
     end
 
-    subgraph Evaluation & Deployment
-        G --> H[Performance Evaluation<br/>F1, AUC-ROC]
-        H --> I{Pass?}
-        I -->|Yes| J[A/B Test]
-        I -->|No| E
-        J --> K[Production Deploy]
+    subgraph 評估與部署
+        G --> H[性能評估<br/>F1, AUC-ROC]
+        H --> I{通過?}
+        I -->|是| J[A/B Test]
+        I -->|否| E
+        J --> K[生產部署]
     end
 ```
 
 ---
 
-## 5. Model Evaluation Metrics
+## 5. 模型評估指標（Model Evaluation Metrics）
 
-### 5.1 Performance Benchmarks
+### 5.1 性能基準（Performance Benchmarks）
 
-| Model | Use Case | Accuracy Target | Latency Target | Current Maturity |
-|-------|----------|-----------------|----------------|-----------------|
-| Abnormal Betting Detection | Suspicious betting patterns | >= 95% | < 50ms | 4/5 |
-| Multi-Account Detection | Device/behaviour clustering | >= 90% | < 100ms | 4/5 |
-| Bonus Abuse Detection | Bonus exploitation patterns | >= 85% | < 200ms | 3/5 |
-| AML Risk Scoring | Anti-money-laundering grading | >= 80% | < 500ms | 3/5 |
-| Fraudulent Transaction Detection | Payment fraud identification | >= 92% | < 100ms | 4/5 |
+| 模型 | 使用場景 | 準確率目標 | 延遲目標 | 當前成熟度 |
+|------|---------|-----------|---------|-----------|
+| Abnormal Betting Detection | 可疑投注模式檢測 | >= 95% | < 50ms | 4/5 |
+| Multi-Account Detection | 設備/行為聚類 | >= 90% | < 100ms | 4/5 |
+| Bonus Abuse Detection | 紅利濫用模式檢測 | >= 85% | < 200ms | 3/5 |
+| AML Risk Scoring | 反洗錢風險評級 | >= 80% | < 500ms | 3/5 |
+| Fraudulent Transaction Detection | 支付欺詐識別 | >= 92% | < 100ms | 4/5 |
 
-### 5.2 Metric Implementations
+### 5.2 指標實現（Metric Implementations）
 
 ```java
 public class MLModelMetrics {
@@ -357,7 +357,7 @@ public class MLModelMetrics {
 
 ---
 
-## 6. A/B Testing Framework
+## 6. A/B Testing 框架（A/B Testing Framework）
 
 ```java
 @Service
@@ -418,27 +418,27 @@ public class MLABTestService {
 
 ---
 
-## 7. Model Drift Monitoring
+## 7. 模型漂移監控（Model Drift Monitoring）
 
-### 7.1 Drift Detection Strategy
+### 7.1 漂移檢測策略（Drift Detection Strategy）
 
-| Drift Type | Detection Method | Alert Threshold |
-|------------|-----------------|-----------------|
-| Data Drift | Feature distribution changes (KS Test, PSI) | PSI > 0.2 |
-| Concept Drift | Prediction distribution shift, accuracy decline | F1 drop > 5% |
-| Latency Drift | Inference time increase | Latency increase > 50% |
+| 漂移類型 | 檢測方法 | 警報閾值 |
+|---------|---------|---------|
+| Data Drift（數據漂移） | 特徵分佈變化 (KS Test, PSI) | PSI > 0.2 |
+| Concept Drift（概念漂移） | 預測分佈偏移、準確率下降 | F1 下降 > 5% |
+| Latency Drift（延遲漂移） | 推理時間增加 | 延遲增加 > 50% |
 
-### 7.2 Monitoring Actions
+### 7.2 監控動作（Monitoring Actions）
 
-| Condition | Automated Response |
-|-----------|-------------------|
-| PSI > 0.2 | Re-evaluate model; alert ML team |
-| F1 drop > 5% | Trigger retraining pipeline |
-| Latency increase > 50% | Scale infrastructure; optimise model |
+| 條件 | 自動化響應 |
+|------|-----------|
+| PSI > 0.2 | 重新評估模型;警報 ML 團隊 |
+| F1 下降 > 5% | 觸發重新訓練管道 |
+| 延遲增加 > 50% | 擴展基礎設施;優化模型 |
 
 ---
 
-## 8. Prometheus Monitoring Metrics
+## 8. Prometheus 監控指標（Prometheus Monitoring Metrics）
 
 ```yaml
 ml_model_prediction_total:
@@ -465,11 +465,17 @@ ml_model_drift_score:
 
 ---
 
-## 9. Cross-References
+## 9. 交叉引用（Cross-References）
 
-| Topic | Document |
-|-------|----------|
-| Business Requirements | requirements/05_Risk_Compliance/ML_Requirements.md |
-| Detection Model Overview | source/05_Risk_Control/05-02-01_Detection_Model.md |
-| Rule Configuration | source/05_Risk_Control/05-02-02_Rule_Configuration.md |
-| Operations Tools | source/05_Risk_Control/05-02-04_Operations_Tools.md |
+| 主題 | 文檔 |
+|------|------|
+| 業務需求 | requirements/05_Risk_Compliance/ML_Requirements.md |
+| 檢測模型概述 | source/05_Risk_Control/05-02-01_Detection_Model.md |
+| 規則配置 | source/05_Risk_Control/05-02-02_Rule_Configuration.md |
+| 運營工具 | source/05_Risk_Control/05-02-04_Operations_Tools.md |
+
+---
+
+**文檔版本**: v1.0.0
+**最後更新**: 2026-02-12
+**維護團隊**: SmartAdmin Architecture Team

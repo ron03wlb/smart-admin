@@ -1,63 +1,63 @@
-# Player Protection API (玩家保護 API 技術規格)
+# 玩家保護 API 技術規格（Player Protection API）
 
-> **Canonical Source**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/Player_Protection_Requirements.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-This document defines the RESTful API specification for the Player Protection module, covering both player-facing and admin-facing endpoints for responsible gambling tools.
+> **規範來源**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md)
+> **目標讀者**: Architects, Backend Developers
+> **業務需求**: [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/Player_Protection_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 2. API Endpoint Summary
+## 1. 概述（Overview）
 
-### 2.1 Player-Facing Endpoints
+本文檔定義了玩家保護 (Player Protection) 模組的 RESTful API 規格，涵蓋玩家端和管理端的負責任博彩工具接口。
 
-| Endpoint | Method | Description |
+---
+
+## 2. API 端點摘要（API Endpoint Summary）
+
+### 2.1 玩家端接口（Player-Facing Endpoints）
+
+| 端點 | 方法 | 描述 |
 |----------|--------|-------------|
-| `/api/v1/player/protection/settings` | GET | Retrieve all protection settings |
-| `/api/v1/player/protection/settings` | PUT | Update protection settings |
-| `/api/v1/player/protection/deposit-limits` | GET | Retrieve deposit limits |
-| `/api/v1/player/protection/deposit-limits` | PUT | Set deposit limits |
-| `/api/v1/player/protection/loss-limits` | GET | Retrieve loss limits |
-| `/api/v1/player/protection/loss-limits` | PUT | Set loss limits |
-| `/api/v1/player/protection/self-exclusion` | POST | Request self-exclusion |
-| `/api/v1/player/protection/self-exclusion/revoke` | POST | Request exclusion revocation |
-| `/api/v1/player/protection/cooling-off` | POST | Activate cooling-off period |
-| `/api/v1/player/protection/session-limits` | GET | Retrieve session limits |
-| `/api/v1/player/protection/session-limits` | PUT | Set session limits |
-| `/api/v1/player/protection/activity-history` | GET | Retrieve activity history |
-| `/api/v1/player/protection/usage` | GET | Retrieve limit usage |
+| `/api/v1/player/protection/settings` | GET | 獲取所有保護設定 |
+| `/api/v1/player/protection/settings` | PUT | 更新保護設定 |
+| `/api/v1/player/protection/deposit-limits` | GET | 獲取存款限額 |
+| `/api/v1/player/protection/deposit-limits` | PUT | 設定存款限額 |
+| `/api/v1/player/protection/loss-limits` | GET | 獲取虧損限額 |
+| `/api/v1/player/protection/loss-limits` | PUT | 設定虧損限額 |
+| `/api/v1/player/protection/self-exclusion` | POST | 申請自我排除 |
+| `/api/v1/player/protection/self-exclusion/revoke` | POST | 申請撤銷排除 |
+| `/api/v1/player/protection/cooling-off` | POST | 啟動冷靜期 |
+| `/api/v1/player/protection/session-limits` | GET | 獲取會話限制 |
+| `/api/v1/player/protection/session-limits` | PUT | 設定會話限制 |
+| `/api/v1/player/protection/activity-history` | GET | 獲取活動歷史 |
+| `/api/v1/player/protection/usage` | GET | 獲取限額使用情況 |
 
-### 2.2 Admin-Facing Endpoints
+### 2.2 管理端接口（Admin-Facing Endpoints）
 
-| Endpoint | Method | Description |
+| 端點 | 方法 | 描述 |
 |----------|--------|-------------|
-| `/api/v1/admin/protection/exclusions` | GET | List excluded players |
-| `/api/v1/admin/protection/exclusions/{playerId}` | GET | Player exclusion details |
-| `/api/v1/admin/protection/exclusions/{playerId}` | POST | Operator-initiated exclusion |
-| `/api/v1/admin/protection/reports` | GET | Compliance reports |
-| `/api/v1/admin/protection/reports/export` | POST | Export reports |
-| `/api/v1/admin/protection/gamstop/sync` | POST | Gamstop synchronisation |
-| `/api/v1/admin/protection/gamstop/check` | POST | Gamstop lookup |
+| `/api/v1/admin/protection/exclusions` | GET | 列出被排除玩家 |
+| `/api/v1/admin/protection/exclusions/{playerId}` | GET | 玩家排除詳情 |
+| `/api/v1/admin/protection/exclusions/{playerId}` | POST | 操作員發起的排除 |
+| `/api/v1/admin/protection/reports` | GET | 合規報告 |
+| `/api/v1/admin/protection/reports/export` | POST | 導出報告 |
+| `/api/v1/admin/protection/gamstop/sync` | POST | Gamstop 同步 |
+| `/api/v1/admin/protection/gamstop/check` | POST | Gamstop 查詢 |
 
 ---
 
-## 3. Detailed API Specifications
+## 3. 詳細 API 規格（Detailed API Specifications）
 
-### 3.1 Get Protection Settings
+### 3.1 獲取保護設定（Get Protection Settings）
 
-**Request**
+**請求（Request）**
 ```http
 GET /api/v1/player/protection/settings
 Authorization: Bearer {token}
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -93,9 +93,9 @@ Authorization: Bearer {token}
 }
 ```
 
-### 3.2 Set Deposit Limits
+### 3.2 設定存款限額（Set Deposit Limits）
 
-**Request**
+**請求（Request）**
 ```http
 PUT /api/v1/player/protection/deposit-limits
 Authorization: Bearer {token}
@@ -108,7 +108,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -128,14 +128,14 @@ Content-Type: application/json
         "status": "PENDING"
       }
     ],
-    "message": "日限額和週限額已立即生效，月限額提高將於 24 小時後生效"
+    "message": "日限額和週限額已立即生效,月限額提高將於 24 小時後生效"
   }
 }
 ```
 
-### 3.3 Request Self-Exclusion
+### 3.3 申請自我排除（Request Self-Exclusion）
 
-**Request**
+**請求（Request）**
 ```http
 POST /api/v1/player/protection/self-exclusion
 Authorization: Bearer {token}
@@ -148,7 +148,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -159,26 +159,26 @@ Content-Type: application/json
     "startTime": "2026-02-07T10:30:00Z",
     "endTime": "2026-08-07T10:30:00Z",
     "duration": "6M",
-    "message": "自我排除已生效，將於 2026-08-07 結束"
+    "message": "自我排除已生效,將於 2026-08-07 結束"
   }
 }
 ```
 
-**Duration Options**
+**持續時間選項（Duration Options）**
 
-| Value | Description |
+| 值 | 描述 |
 |-------|-------------|
-| `24H` | 24 hours |
-| `7D` | 7 days |
-| `30D` | 30 days |
-| `6M` | 6 months |
-| `1Y` | 1 year |
-| `5Y` | 5 years |
-| `PERMANENT` | Permanent |
+| `24H` | 24 小時 |
+| `7D` | 7 天 |
+| `30D` | 30 天 |
+| `6M` | 6 個月 |
+| `1Y` | 1 年 |
+| `5Y` | 5 年 |
+| `PERMANENT` | 永久 |
 
-### 3.4 Activate Cooling-Off
+### 3.4 啟動冷靜期（Activate Cooling-Off）
 
-**Request**
+**請求（Request）**
 ```http
 POST /api/v1/player/protection/cooling-off
 Authorization: Bearer {token}
@@ -190,7 +190,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -199,20 +199,20 @@ Content-Type: application/json
     "status": "ACTIVE",
     "startTime": "2026-02-07T10:30:00Z",
     "endTime": "2026-02-14T10:30:00Z",
-    "message": "冷靜期已啟動，將於 2026-02-14 自動結束"
+    "message": "冷靜期已啟動,將於 2026-02-14 自動結束"
   }
 }
 ```
 
-### 3.5 Get Limit Usage
+### 3.5 獲取限額使用情況（Get Limit Usage）
 
-**Request**
+**請求（Request）**
 ```http
 GET /api/v1/player/protection/usage
 Authorization: Bearer {token}
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -267,25 +267,25 @@ Authorization: Bearer {token}
 }
 ```
 
-### 3.6 Get Activity History
+### 3.6 獲取活動歷史（Get Activity History）
 
-**Request**
+**請求（Request）**
 ```http
 GET /api/v1/player/protection/activity-history
 Authorization: Bearer {token}
 ```
 
-**Query Parameters**
+**查詢參數（Query Parameters）**
 
-| Parameter | Type | Required | Description |
+| 參數 | 類型 | 必填 | 描述 |
 |-----------|------|----------|-------------|
-| `startDate` | String | No | Start date (YYYY-MM-DD) |
-| `endDate` | String | No | End date (YYYY-MM-DD) |
-| `type` | String | No | Activity type: EXCLUSION, LIMIT_CHANGE, COOLING_OFF, REALITY_CHECK |
-| `page` | Integer | No | Page number (default: 1) |
-| `pageSize` | Integer | No | Page size (default: 20) |
+| `startDate` | String | 否 | 開始日期 (YYYY-MM-DD) |
+| `endDate` | String | 否 | 結束日期 (YYYY-MM-DD) |
+| `type` | String | 否 | 活動類型: EXCLUSION, LIMIT_CHANGE, COOLING_OFF, REALITY_CHECK |
+| `page` | Integer | 否 | 頁碼 (預設: 1) |
+| `pageSize` | Integer | 否 | 每頁大小 (預設: 20) |
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -320,26 +320,26 @@ Authorization: Bearer {token}
 
 ---
 
-## 4. Admin API Specifications
+## 4. 管理端 API 規格（Admin API Specifications）
 
-### 4.1 List Excluded Players
+### 4.1 列出被排除玩家（List Excluded Players）
 
-**Request**
+**請求（Request）**
 ```http
 GET /api/v1/admin/protection/exclusions
 Authorization: Bearer {admin_token}
 ```
 
-**Query Parameters**
+**查詢參數（Query Parameters）**
 
-| Parameter | Type | Description |
+| 參數 | 類型 | 描述 |
 |-----------|------|-------------|
 | `status` | String | ACTIVE, COMPLETED, PENDING_REVOCATION |
 | `type` | String | SELF, OPERATOR, GAMSTOP |
-| `page` | Integer | Page number |
-| `pageSize` | Integer | Page size |
+| `page` | Integer | 頁碼 |
+| `pageSize` | Integer | 每頁大小 |
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -367,9 +367,9 @@ Authorization: Bearer {admin_token}
 }
 ```
 
-### 4.2 Operator-Initiated Exclusion
+### 4.2 操作員發起的排除（Operator-Initiated Exclusion）
 
-**Request**
+**請求（Request）**
 ```http
 POST /api/v1/admin/protection/exclusions/{playerId}
 Authorization: Bearer {admin_token}
@@ -382,7 +382,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -391,28 +391,28 @@ Content-Type: application/json
     "exclusionId": 5002,
     "playerId": 10002,
     "status": "ACTIVE",
-    "message": "玩家已被排除，並已發送通知"
+    "message": "玩家已被排除,並已發送通知"
   }
 }
 ```
 
-### 4.3 Compliance Reports
+### 4.3 合規報告（Compliance Reports）
 
-**Request**
+**請求（Request）**
 ```http
 GET /api/v1/admin/protection/reports
 Authorization: Bearer {admin_token}
 ```
 
-**Query Parameters**
+**查詢參數（Query Parameters）**
 
-| Parameter | Type | Description |
+| 參數 | 類型 | 描述 |
 |-----------|------|-------------|
 | `reportType` | String | MONTHLY, QUARTERLY, ANNUAL |
-| `period` | String | Reporting period (YYYY-MM or YYYY-Q1) |
+| `period` | String | 報告期間 (YYYY-MM 或 YYYY-Q1) |
 | `format` | String | JSON, CSV, PDF |
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -453,9 +453,9 @@ Authorization: Bearer {admin_token}
 }
 ```
 
-### 4.4 Gamstop Lookup
+### 4.4 Gamstop 查詢（Gamstop Lookup）
 
-**Request**
+**請求（Request）**
 ```http
 POST /api/v1/admin/protection/gamstop/check
 Authorization: Bearer {admin_token}
@@ -470,7 +470,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**
+**響應（Response）**
 ```json
 {
   "code": 200,
@@ -485,10 +485,10 @@ Content-Type: application/json
 
 ---
 
-## 5. Database Schema (PostgreSQL)
+## 5. 資料庫結構（Database Schema - PostgreSQL）
 
 ### player_limits
-Stores player-set limits for deposits, losses, and session durations.
+儲存玩家設定的存款、虧損和會話時長限額。
 
 ```sql
 CREATE TABLE player_limits (
@@ -541,14 +541,14 @@ CREATE INDEX idx_player_limits_type_period ON player_limits(limit_type, time_per
 CREATE INDEX idx_player_limits_pending ON player_limits(status, cooldown_ends_at) WHERE status = 'PENDING';
 CREATE INDEX idx_player_limits_reset ON player_limits(reset_at) WHERE status = 'ACTIVE' AND reset_at IS NOT NULL;
 
-COMMENT ON TABLE player_limits IS 'Player-set and admin-set limits for responsible gambling (deposit, loss, session, reality checks)';
-COMMENT ON COLUMN player_limits.cooldown_ends_at IS '24-hour cooldown for limit increases (immediate for decreases)';
-COMMENT ON COLUMN player_limits.current_used_amount IS 'Real-time usage counter (updated by deposit/loss transactions)';
-COMMENT ON COLUMN player_limits.hierarchy_check IS 'Enforces monthly >= weekly >= daily for same limit_type';
+COMMENT ON TABLE player_limits IS '玩家設定和管理員設定的負責任博彩限額（存款、虧損、會話、現實檢查）';
+COMMENT ON COLUMN player_limits.cooldown_ends_at IS '限額提高的 24 小時冷卻期（降低則立即生效）';
+COMMENT ON COLUMN player_limits.current_used_amount IS '實時使用計數器（由存款/虧損交易更新）';
+COMMENT ON COLUMN player_limits.hierarchy_check IS '強制執行同一 limit_type 的月限額 >= 週限額 >= 日限額';
 ```
 
 ### self_exclusions
-Tracks self-exclusion and cooling-off periods (player-initiated or operator-initiated).
+追蹤自我排除 (Self-Exclusion) 和冷靜期 (Cooling-Off) 期間（玩家發起或操作員發起）。
 
 ```sql
 CREATE TABLE self_exclusions (
@@ -611,15 +611,15 @@ CREATE INDEX idx_self_exclusions_pending_revocation ON self_exclusions(status, r
 CREATE INDEX idx_self_exclusions_gamstop ON self_exclusions(gamstop_reference) WHERE gamstop_synced = TRUE;
 CREATE INDEX idx_self_exclusions_type ON self_exclusions(exclusion_type, status);
 
-COMMENT ON TABLE self_exclusions IS 'Self-exclusion and cooling-off periods for responsible gambling compliance (UKGC/MGA)';
-COMMENT ON COLUMN self_exclusions.duration IS 'Exclusion duration: 24H (cooling-off) to PERMANENT (self-exclusion)';
-COMMENT ON COLUMN self_exclusions.gamstop_synced IS 'TRUE if exclusion has been synced with UK Gamstop registry';
-COMMENT ON COLUMN self_exclusions.no_overlap IS 'Prevents concurrent active exclusions for same player';
+COMMENT ON TABLE self_exclusions IS '負責任博彩合規的自我排除和冷靜期（UKGC/MGA）';
+COMMENT ON COLUMN self_exclusions.duration IS '排除持續時間: 24H（冷靜期）到 PERMANENT（自我排除）';
+COMMENT ON COLUMN self_exclusions.gamstop_synced IS 'TRUE 表示排除已與英國 Gamstop 登記系統同步';
+COMMENT ON COLUMN self_exclusions.no_overlap IS '防止同一玩家的並行活動排除';
 ```
 
-### Query Examples
+### 查詢範例（Query Examples）
 
-**Get active limits and usage for a player:**
+**獲取玩家的活動限額和使用情況:**
 ```sql
 SELECT
     limit_type,
@@ -637,7 +637,7 @@ WHERE player_id = 'player-uuid-001'
 ORDER BY limit_type, time_period;
 ```
 
-**Check if player is currently excluded:**
+**檢查玩家當前是否被排除:**
 ```sql
 SELECT
     exclusion_id,
@@ -654,7 +654,7 @@ WHERE player_id = 'player-uuid-001'
 LIMIT 1;
 ```
 
-**Generate compliance report (monthly self-exclusions):**
+**生成合規報告（每月自我排除統計）:**
 ```sql
 SELECT
     exclusion_type,
@@ -670,7 +670,7 @@ GROUP BY exclusion_type
 ORDER BY total_exclusions DESC;
 ```
 
-**Audit limit breaches (deposits exceeding limits):**
+**審計限額違規（超過限額的存款）:**
 ```sql
 SELECT
     pl.player_id,
@@ -689,24 +689,24 @@ ORDER BY (pl.current_used_amount - pl.limit_amount) DESC;
 
 ---
 
-## 6. Error Codes
+## 6. 錯誤碼（Error Codes）
 
-| Error Code | Description | HTTP Status |
+| 錯誤碼 | 描述 | HTTP 狀態碼 |
 |------------|-------------|-------------|
-| `RG_001` | Player is excluded | 403 |
-| `RG_002` | Player is in cooling-off period | 403 |
-| `RG_003` | Deposit limit exceeded | 400 |
-| `RG_004` | Loss limit exceeded | 400 |
-| `RG_005` | Cannot revoke permanent exclusion | 400 |
-| `RG_006` | Exclusion period not yet ended | 400 |
-| `RG_007` | No pending limit change exists | 400 |
-| `RG_008` | Player is in mandatory break | 403 |
-| `RG_009` | Gamstop sync failure | 502 |
-| `RG_010` | Invalid limit hierarchy | 400 |
+| `RG_001` | 玩家已被排除 | 403 |
+| `RG_002` | 玩家處於冷靜期 | 403 |
+| `RG_003` | 存款限額已超過 | 400 |
+| `RG_004` | 虧損限額已超過 | 400 |
+| `RG_005` | 無法撤銷永久排除 | 400 |
+| `RG_006` | 排除期間尚未結束 | 400 |
+| `RG_007` | 不存在待處理的限額變更 | 400 |
+| `RG_008` | 玩家處於強制休息期 | 403 |
+| `RG_009` | Gamstop 同步失敗 | 502 |
+| `RG_010` | 無效的限額層級 | 400 |
 
 ---
 
-## 6. Controller Implementation
+## 6. Controller 實現（Controller Implementation）
 
 ```java
 @RestController
@@ -780,16 +780,16 @@ public class PlayerProtectionController {
 
 ---
 
-## 7. Integration Architecture
+## 7. 整合架構（Integration Architecture）
 
 ```mermaid
 flowchart TD
-    subgraph Player Facing
-        A[Player Client] --> B[PlayerProtectionController]
+    subgraph 玩家端 (Player Facing)
+        A[玩家客戶端<br/>Player Client] --> B[PlayerProtectionController]
     end
 
-    subgraph Admin Facing
-        C[Admin Console] --> D[AdminProtectionController]
+    subgraph 管理端 (Admin Facing)
+        C[管理員控制台<br/>Admin Console] --> D[AdminProtectionController]
     end
 
     subgraph Service Layer
@@ -811,24 +811,30 @@ flowchart TD
         K --> L
     end
 
-    subgraph External Systems
+    subgraph 外部系統 (External Systems)
         L --> M[Gamstop API]
-        L --> N[Notification Service]
+        L --> N[通知服務<br/>Notification Service]
     end
 
-    subgraph Data Layer
+    subgraph 資料層 (Data Layer)
         L --> O[(Protection DB)]
-        L --> P[(Audit Log)]
+        L --> P[(審計日誌<br/>Audit Log)]
     end
 ```
 
 ---
 
-## 8. Cross-References
+## 8. 交叉引用（Cross-References）
 
-| Topic | Document |
+| 主題 | 文檔 |
 |-------|----------|
-| Business Requirements | requirements/05_Risk_Compliance/Player_Protection_Requirements.md |
-| Self-Exclusion Details | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
-| Deposit Limits Details | source/15_Responsible_Gambling/15-02_Deposit_Limits.md |
-| API Design Standards | source/09_Technical_Infrastructure/09-03-04_Domain_APIs.md |
+| 業務需求 | requirements/05_Risk_Compliance/Player_Protection_Requirements.md |
+| 自我排除詳情 | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
+| 存款限額詳情 | source/15_Responsible_Gambling/15-02_Deposit_Limits.md |
+| API 設計標準 | source/09_Technical_Infrastructure/09-03-04_Domain_APIs.md |
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-12
+**維護團隊**: SmartAdmin Architecture Team
