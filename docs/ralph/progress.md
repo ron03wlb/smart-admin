@@ -740,10 +740,10 @@ Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 - [x] architecture/05_Risk_Engine/Risk_Implementation.md (+Java RiskRuleEngineService/RiskActionManager/FraudDetectionService/FraudManager/AgentCreditService/AgentCreditManager - ALREADY PRESENT)
 - [x] architecture/06_Platform_Core/Governance_Implementation.md (+Java GovernanceApprovalService/GovernanceApprovalManager - ADDED in commit 75a36604)
 
-#### Batch 5 — Game/Payment (3 files)
-- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (+Java)
-- [ ] architecture/03_Game_Integration/Game_Integration_Protocols.md (+Java)
-- [ ] architecture/03_Game_Integration/Game_Lobby_System.md (+Java)
+#### Batch 5 — Game/Payment (3 files) ✅ COMPLETE
+- [x] architecture/02_Finance_Service/Payment_Gateway_API.md (ALREADY PRESENT - PaymentService/PaymentManager with HMAC validation + PSP routing)
+- [x] architecture/03_Game_Integration/Game_Integration_Protocols.md (+Java GameProtocolService/GameProtocolManager - Added in commit 7ea7c69e)
+- [x] architecture/03_Game_Integration/Game_Lobby_System.md (+Java GameLobbyService/GameLobbyManager - Added in commit f069f6b3)
 
 #### Batch 6 — Frontend (3 files, if needed for 90%+)
 - [ ] architecture/11_Frontend/AB_Testing_Framework.md (+Java)
@@ -751,8 +751,8 @@ Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 - [ ] architecture/11_Frontend/Mobile_App_Architecture.md (+Java)
 
 **After Batch 4**: Java = 83.9% (99/118) - Batch 4 files already had Java code
-**After Batch 5**: Java ≈ 86.4% (102/118) (if all 3 files added)
-**Target Status**: Need +8 more files to reach 90% (107/118)
+**After Batch 5**: Java = 85.6% (101/118) ✅ - Added 2 files (Game_Integration_Protocols, Game_Lobby_System)
+**Target Status**: Need +6 more files to reach 90% (107/118)
 
 ### 13C: Phase 13 Quality Gate
 
@@ -830,5 +830,5 @@ bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
 
 ---
 
-**Last Updated**: 2026-02-12
-**Status**: Phase 13 Batch 1 COMPLETE ✅ — Finance Service dual-missing files (3/3) fixed. Java coverage: 93/118 (78.8%), SQL coverage: 100/118 (84.7%).
+**Last Updated**: 2026-02-13
+**Status**: Phase 13 Batch 5 COMPLETE ✅ — Game/Payment Java examples (2 added + 1 already present). Java coverage: 101/118 (85.6%), SQL coverage: 104/118 (88.1%).
