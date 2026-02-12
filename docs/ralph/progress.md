@@ -2,7 +2,7 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 106 (Phase 6: 6, Phase 7-8: 98, Phase 9: 2)
+> **Total Iterations**: 108 (Phase 6: 6, Phase 7-8: 98, Phase 9: 4)
 > **Status**: IN PROGRESS 🔄
 
 ---
@@ -299,7 +299,26 @@ Priority: Requirements files contain business context suited for Chinese audienc
 - [x] requirements/05_Risk_Compliance/Detection_Model_Spec.md (檢測模型規格 - Audience 翻譯)
 - [x] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md (詐騙偵測需求 - 已翻譯)
 
-**Note**: Batches 6-14 will cover remaining 46 requirements files (9 more in Risk Compliance + 7 Governance + 2 Agent + 2 Analytics + 2 Infra + 3 Platform + 4 Frontend + 3 Security + 2 CS + 1 Integration + 4 Responsible Gambling + 5 READMEs). Full file list: `find docs/iGaming/requirements -name '*.md' | sort`
+#### Batch 6 — Risk/Governance/Multi-directory metadata (17 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md (metadata headers 翻譯)
+- [x] requirements/05_Risk_Compliance/Risk_Requirements_Summary.md (metadata headers 翻譯)
+- [x] requirements/05_Risk_Compliance/Risk_Strategy_Overview.md (metadata headers 翻譯)
+- [x] requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md (metadata headers 翻譯)
+- [x] requirements/06_Governance_Licensing/Governance_Requirements.md (metadata headers 翻譯)
+- [x] requirements/06_Governance_Licensing/MFA_Architecture_Spec.md (metadata + Business Value + Acceptance Criteria 翻譯)
+- [x] requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md (metadata headers 翻譯)
+- [x] requirements/06_Governance_Licensing/MFA_Requirements.md (metadata headers 翻譯)
+- [x] requirements/01_Player_Experience/Terminology_Standards.md (metadata headers 翻譯)
+- [x] requirements/02_Financial_Operations/Financial_Implementation_Requirements.md (metadata headers 翻譯)
+- [x] requirements/02_Financial_Operations/Reconciliation_Requirements.md (metadata headers 翻譯)
+- [x] requirements/08_Analytics_Operations/Reporting_Requirements.md (metadata headers 翻譯)
+- [x] requirements/10_Platform_Operations/Tenant_Configuration_Requirements.md (metadata headers 翻譯)
+- [x] requirements/11_Frontend_Experience/Localization_Requirements.md (metadata headers 翻譯)
+- [x] requirements/11_Frontend_Experience/SEO_Performance_Requirements.md (metadata headers 翻譯)
+- [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md (metadata headers 翻譯)
+- [x] requirements/13_Customer_Service/CS_Platform_Requirements.md (metadata headers 翻譯)
+
+**Note**: Batches 7-14 will cover remaining ~29 requirements files with English metadata headers. Full file list: `find docs/iGaming/requirements -name '*.md' | sort`
 
 **Phase 9A COMPLETE**: [Summary when done]
 
@@ -309,33 +328,35 @@ Priority: Requirements files contain business context suited for Chinese audienc
 
 Priority: Architecture files contain technical design suited for Chinese developer audience.
 
-#### Batch 15 — Overview (5 files) [Status]
-- [ ] architecture/00_Overview/System_Architecture_Overview.md
-- [ ] architecture/00_Overview/Technology_Stack.md
-- [ ] architecture/00_Overview/Multi_Tenant_Architecture.md
-- [ ] architecture/00_Overview/Deployment_Architecture.md
-- [ ] architecture/00_Overview/README.md
+#### Batch 15 — Overview (6 files) ✅ COMPLETE
+- [x] architecture/00_Overview/System_Overview.md (已翻譯)
+- [x] architecture/00_Overview/Technology_Stack.md (metadata headers 翻譯)
+- [x] architecture/00_Overview/Platform_Architecture.md (已翻譯)
+- [x] architecture/00_Overview/Business_Logic_Flows.md (metadata headers 翻譯)
+- [x] architecture/00_Overview/Data_Model.md (metadata 修正)
+- [x] architecture/00_Overview/README.md (已翻譯)
 
-#### Batch 16 — Player Service (5 files) [Status]
-- [ ] architecture/01_Player_Service/Player_Lifecycle_Implementation.md
-- [ ] architecture/01_Player_Service/KYC_Identity_Verification.md
-- [ ] architecture/01_Player_Service/Player_Account_Lifecycle.md
-- [ ] architecture/01_Player_Service/Session_Management_Architecture.md
-- [ ] architecture/01_Player_Service/README.md
+#### Batch 16 — Player Service (2 files) ✅ COMPLETE
+- [x] architecture/01_Player_Service/Player_Lifecycle_Implementation.md (metadata headers 翻譯)
+- [x] architecture/01_Player_Service/README.md (全文翻譯)
 
-#### Batch 17 — Player Service (3 files) + Finance Service (2 files) [Status]
-- [ ] architecture/01_Player_Service/Tag_System_Architecture.md
-- [ ] architecture/01_Player_Service/Turnover_Tracking_Architecture.md
-- [ ] architecture/01_Player_Service/VIP_System.md
-- [ ] architecture/02_Finance_Service/Financial_Implementation_Architecture.md
-- [ ] architecture/02_Finance_Service/Payment_Operations_Architecture.md
+#### Batch 17 — Finance Service (5 files) ✅ COMPLETE
+- [x] architecture/02_Finance_Service/Financial_Implementation.md (標題 + metadata 翻譯)
+- [x] architecture/02_Finance_Service/Payment_Gateway_API.md (標題 + metadata 翻譯)
+- [x] architecture/02_Finance_Service/Payment_Gateway_Technical.md (Audience 翻譯)
+- [x] architecture/02_Finance_Service/README.md (全文翻譯)
+- [x] architecture/02_Finance_Service/Reconciliation_Technical.md (標題 + metadata 翻譯)
 
 #### Batch 18 — Finance Service (5 files) [Status]
-- [ ] architecture/02_Finance_Service/Payment_Processing_Architecture.md
-- [ ] architecture/02_Finance_Service/Reconciliation_Architecture.md
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Architecture.md
-- [ ] architecture/02_Finance_Service/Turnover_Reconciliation_Architecture.md
-- [ ] architecture/02_Finance_Service/README.md
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Index.md
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Technical.md
+- [ ] architecture/02_Finance_Service/Turnover_Calculation_Architecture.md
+- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md
+
+#### Batch 19 — Finance Service (2 files) + Game Integration (5 files) [Status]
+- [ ] architecture/02_Finance_Service/Turnover_Flowcharts.md
+- [ ] architecture/02_Finance_Service/Turnover_Implementation.md
 
 #### Batch 19 — Game Integration (5 files) [Status]
 - [ ] architecture/03_Game_Integration/Game_Integration_Architecture.md
@@ -410,5 +431,5 @@ bash scripts/validate-requirements-purity.sh
 
 ---
 
-**Last Updated**: 2026-02-11
-**Status**: Phase 9A IN PROGRESS — Requirements Translation (Batch 2/14 COMPLETE)
+**Last Updated**: 2026-02-12
+**Status**: Phase 9B IN PROGRESS — Architecture Translation (Batch 17/37 COMPLETE)
