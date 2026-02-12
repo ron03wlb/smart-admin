@@ -379,7 +379,7 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] Mermaid diagrams render correctly: 76 pre-existing issues (validate-mermaid.sh)
 - [x] Git commit history: 20 batch commits completed
 
-**Terminology Fixes Applied (Iteration #9)**:
+**Terminology Fixes Applied (Iteration #9, Commit 843f8a94)**:
 - Fixed 流水→有效投注額 in 12+ architecture files
 - Fixed 可用餘額→可下注餘額 in 3 files
 - Fixed 充值→存款 in 2 files
