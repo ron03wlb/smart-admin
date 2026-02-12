@@ -1,8 +1,8 @@
-# Token 緩存性能設計 (Token Cache Performance)
+# Token 緩存性能設計（Token Cache Performance）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-13-02 Cache Performance](../../source-archive/09_Technical_Infrastructure/09-13-02_Cache_Performance.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-13-02 Cache Performance](../../source-archive/09_Technical_Infrastructure/09-13-02_Cache_Performance.md)
+> **目標讀者**: Backend Engineers, Performance Engineers
 
 ---
 
@@ -183,9 +183,9 @@ Weighted Avg Latency: ~1.1ms
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Token Validation Service](./Token_Validation_Service.md) - 服務總覽
-- [Token Validation Architecture](./Token_Validation_Architecture.md) - 驗證架構
-- [Token Edge Deployment](./Token_Edge_Deployment.md) - 邊緣部署
-- [Caching Strategy](./Caching_Strategy.md) - JetCache 緩存策略
+- [Token 驗證服務](./Token_Validation_Service.md) — 服務總覽
+- [Token 驗證架構](./Token_Validation_Architecture.md) — 驗證架構設計
+- [Token 邊緣部署](./Token_Edge_Deployment.md) — 邊緣部署架構
+- [緩存策略](./Caching_Strategy.md) — JetCache 多級緩存策略

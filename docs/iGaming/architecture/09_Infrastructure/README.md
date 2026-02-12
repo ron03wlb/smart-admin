@@ -1,67 +1,67 @@
-# 09 Infrastructure
+# 09 基礎設施（Infrastructure）
 
-> **Audience**: Architects, Backend Developers, DevOps
-> **Status**: 21 architecture documents
+> **目標讀者**: Architects, Backend Developers, DevOps
+> **狀態**: 21 份架構文件
 
 ---
 
-## Split Documents
+## 拆分文件
 
-| Document | Description |
-|----------|-------------|
-| [Infrastructure Implementation](Infrastructure_Implementation.md) | API Gateway config, Blue-Green K8s/Istio deployment, Redisson rate limiting |
+| 文件 | 說明 |
+|------|------|
+| [基礎設施實作](Infrastructure_Implementation.md) | API Gateway 配置、Blue-Green K8s/Istio 部署、Redisson 限流 |
 
-## Deployment and Operations
+## 部署與運維
 
-| Document | Description |
-|----------|-------------|
-| [Deployment Architecture](Deployment_Architecture.md) | Infrastructure deployment architecture |
-| [QA Standards](QA_Standards.md) | Quality assurance standards and testing |
-| [Maintenance Architecture](Maintenance_Architecture.md) | System maintenance procedures |
+| 文件 | 說明 |
+|------|------|
+| [部署架構](Deployment_Architecture.md) | 基礎設施部署架構 |
+| [QA 標準](QA_Standards.md) | 品質保證標準與測試 |
+| [系統維護](Maintenance_Architecture.md) | 系統維護程序 |
 
 ## API Gateway
 
-| Document | Description |
-|----------|-------------|
-| [Gateway Core](Gateway_Core.md) | API gateway core architecture |
-| [Gateway Rate Limiting](Gateway_Rate_Limiting.md) | Rate limiting and throttling |
-| [Gateway Security](Gateway_Security.md) | Gateway security configuration |
+| 文件 | 說明 |
+|------|------|
+| [Gateway 核心](Gateway_Core.md) | API Gateway 核心架構 |
+| [Gateway 限流](Gateway_Rate_Limiting.md) | 限流與節流控制 |
+| [Gateway 安全](Gateway_Security.md) | Gateway 安全配置 |
 
-## API Design
+## API 設計
 
-| Document | Description |
-|----------|-------------|
-| [API Design Principles](API_Design_Principles.md) | API design principles and standards |
-| [Authentication Architecture](Authentication_Architecture.md) | API authentication mechanisms |
-| [Common Patterns](Common_Patterns.md) | Common API patterns and conventions |
-| [Domain APIs](Domain_APIs.md) | Domain-specific API specifications |
+| 文件 | 說明 |
+|------|------|
+| [API 設計原則](API_Design_Principles.md) | API 設計原則與標準 |
+| [身份驗證架構](Authentication_Architecture.md) | API 身份驗證機制 |
+| [通用模式](Common_Patterns.md) | API 通用模式與慣例 |
+| [領域 API](Domain_APIs.md) | 領域特定 API 規格 |
 
-## Performance and Optimization
+## 性能與優化
 
-| Document | Description |
-|----------|-------------|
-| [Performance Monitoring](Performance_Monitoring.md) | System performance monitoring |
-| [Performance Optimization](Performance_Optimization.md) | Performance tuning guidelines |
-| [Stream Processing Architecture](Stream_Processing_Architecture.md) | Stream processing architecture |
-| [Caching Strategy](Caching_Strategy.md) | Caching architecture and strategies |
-| [Cost Optimization Architecture](Cost_Optimization_Architecture.md) | Infrastructure cost optimization |
+| 文件 | 說明 |
+|------|------|
+| [性能監控](Performance_Monitoring.md) | 系統性能監控 |
+| [性能優化](Performance_Optimization.md) | 性能調校指南 |
+| [串流處理架構](Stream_Processing_Architecture.md) | 串流處理架構 |
+| [緩存策略](Caching_Strategy.md) | 緩存架構與策略 |
+| [成本優化架構](Cost_Optimization_Architecture.md) | 基礎設施成本優化 |
 
-## Security and Token Management
+## 安全與 Token 管理
 
-| Document | Description |
-|----------|-------------|
-| [OAuth Refresh Token](OAuth_Refresh_Token.md) | OAuth refresh token implementation |
-| [Multi-Actor Token Security](Multi_Actor_Token_Security.md) | Multi-actor token security model |
+| 文件 | 說明 |
+|------|------|
+| [OAuth Refresh Token](OAuth_Refresh_Token.md) | OAuth Refresh Token 實施方案 |
+| [多主體 Token 安全](Multi_Actor_Token_Security.md) | 多主體 Token 安全模型 |
 
-## Token Validation Service
+## Token 驗證服務
 
-| Document | Description |
-|----------|-------------|
-| [Token Validation Service](Token_Validation_Service.md) | Token validation service overview |
-| [Token Validation Architecture](Token_Validation_Architecture.md) | Token validation service architecture |
-| [Token Cache Performance](Token_Cache_Performance.md) | Token cache performance optimization |
-| [Token Edge Deployment](Token_Edge_Deployment.md) | Edge deployment patterns |
+| 文件 | 說明 |
+|------|------|
+| [Token 驗證服務](Token_Validation_Service.md) | Token 驗證服務總覽 |
+| [Token 驗證架構](Token_Validation_Architecture.md) | Token 驗證服務架構 |
+| [Token 緩存性能](Token_Cache_Performance.md) | Token 緩存性能優化 |
+| [Token 邊緣部署](Token_Edge_Deployment.md) | 邊緣部署模式 |
 
 ---
 
-**Last Updated**: 2026-02-09
+**最後更新**: 2026-02-12

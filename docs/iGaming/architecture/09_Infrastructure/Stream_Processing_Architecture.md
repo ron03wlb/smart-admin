@@ -1,8 +1,8 @@
-# 流處理架構 (Stream Processing Architecture)
+# 串流處理架構（Stream Processing Architecture）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-08 Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-08 Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md)
+> **目標讀者**: Data Engineers, Backend Engineers, DevOps
 
 ---
 
@@ -216,8 +216,8 @@ spec:
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Caching Strategy](./Caching_Strategy.md) - JetCache 多級緩存
-- [Performance Optimization](./Performance_Optimization.md) - 性能優化規範
-- [Cost Optimization Architecture](./Cost_Optimization_Architecture.md) - 成本優化
+- [緩存策略](./Caching_Strategy.md) — JetCache 多級緩存架構
+- [性能優化](./Performance_Optimization.md) — 性能優化規範
+- [成本優化](./Cost_Optimization_Architecture.md) — 成本優化架構

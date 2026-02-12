@@ -1,8 +1,8 @@
-# 測試驗收標準架構 (QA Testing Standards Architecture)
+# 測試驗收標準架構（QA Testing Standards Architecture）
 
-> **Business Requirements**: [QA Standards Requirements](../../requirements/09_Infrastructure_Requirements/QA_Standards_Requirements.md)
-> **Canonical Source**: [09-04 QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: [QA 標準需求](../../requirements/09_Infrastructure_Requirements/QA_Standards_Requirements.md)
+> **規範來源**: [09-04 QA Standards](../../source-archive/09_Technical_Infrastructure/09-04_QA_Standards.md)
+> **目標讀者**: QA Engineers, Backend Engineers, DevOps
 
 ---
 
@@ -334,8 +334,8 @@ CREATE INDEX idx_coverage_date ON t_test_coverage(coverage_date DESC);
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Performance Monitoring](./Performance_Monitoring.md) - APM 監控
-- [Deployment Architecture](./Deployment_Architecture.md) - 部署架構
-- [Maintenance Architecture](./Maintenance_Architecture.md) - 維護程序
+- [性能監控](./Performance_Monitoring.md) — APM 監控與告警架構
+- [部署架構](./Deployment_Architecture.md) — 部署架構與 DevOps 規範
+- [系統維護](./Maintenance_Architecture.md) — 系統維護與優雅停機架構

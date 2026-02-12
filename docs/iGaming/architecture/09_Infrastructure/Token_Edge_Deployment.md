@@ -1,8 +1,8 @@
-# Token 邊緣部署與運維 (Token Edge Deployment)
+# Token 邊緣部署與運維（Token Edge Deployment）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-13-03 Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-13-03 Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md)
+> **目標讀者**: DevOps Engineers, Infrastructure Engineers
 
 ---
 
@@ -915,10 +915,10 @@ CREATE INDEX idx_health_az ON t_health_check_log(az_name, service_name, checked_
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Token Validation Service](./Token_Validation_Service.md) - 服務總覽
-- [Token Validation Architecture](./Token_Validation_Architecture.md) - 驗證架構
-- [Token Cache Performance](./Token_Cache_Performance.md) - 緩存策略
-- [Caching Strategy](./Caching_Strategy.md) - JetCache 緩存策略
-- [Performance Monitoring](./Performance_Monitoring.md) - 性能監控
+- [Token 驗證服務](./Token_Validation_Service.md) — 服務總覽
+- [Token 驗證架構](./Token_Validation_Architecture.md) — 驗證架構設計
+- [Token 緩存性能](./Token_Cache_Performance.md) — 緩存性能設計
+- [緩存策略](./Caching_Strategy.md) — JetCache 多級緩存策略
+- [性能監控](./Performance_Monitoring.md) — 性能監控與告警架構
