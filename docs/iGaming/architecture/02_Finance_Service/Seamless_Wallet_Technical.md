@@ -1,73 +1,73 @@
-# Seamless Wallet Technical Implementation
+# 無縫錢包技術實作
 
-> **Business Requirements**: [Seamless_Wallet_Requirements.md](../../requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Last Synced**: 2026-02-09
-
----
-
-## 1. Architecture Overview
-
-The Seamless Wallet technical implementation provides real-time transaction processing between the platform and Game Providers (GP), ensuring atomicity, idempotency, and concurrency safety.
-
-**Key Technical Components**:
-- Round-Based State Machine for transaction lifecycle
-- Three-layer idempotency defense (Redis + DB + Distributed Lock)
-- Orphaned round detection and auto-recovery
-- Negative balance handling with automatic account locking
-- Out-of-order request handling with pending queue
-- Strategy switching for system pressure management
+> **業務需求**: [Seamless_Wallet_Requirements.md](../../requirements/02_Financial_Operations/Seamless_Wallet_Requirements.md)
+> **目標讀者**: 架構師、後端開發者、DevOps 工程師
+> **同步時間**: 2026-02-09
 
 ---
 
-## 2. Round-Based State Machine
+## 1. 架構概述
 
-### 2.1 State Transition Diagram
+無縫錢包 (Seamless Wallet) 技術實作提供平台與遊戲供應商 (GP) 之間的即時交易處理，確保原子性、冪等性和併發安全。
+
+**關鍵技術組件**：
+- 基於回合的狀態機，用於交易生命週期管理
+- 三層冪等防禦（Redis + DB + 分佈式鎖）
+- 孤立回合偵測與自動恢復
+- 負餘額處理與自動帳戶鎖定
+- 亂序請求處理與待處理佇列
+- 系統壓力管理的策略切換
+
+---
+
+## 2. 基於回合的狀態機
+
+### 2.1 狀態轉換圖
 
 ```mermaid
 sequenceDiagram
-    participant GP as Game Provider
+    participant GP as 遊戲供應商
     participant API as Wallet API
     participant Redis as Redis Cache
     participant DB as PostgreSQL
-    participant Queue as Pending Queue
+    participant Queue as 待處理佇列
 
-    GP->>API: Bet Request (roundId, txId, amount)
-    API->>Redis: Check duplicate (txId)
-    Redis-->>API: No duplicate
+    GP->>API: 投注請求 (roundId, txId, amount)
+    API->>Redis: 檢查重複 (txId)
+    Redis-->>API: 無重複
     API->>DB: BEGIN TRANSACTION
     API->>DB: SELECT balance FOR UPDATE
-    DB-->>API: Current balance
-    API->>API: Validate balance >= amount
+    DB-->>API: 目前餘額
+    API->>API: 驗證 balance >= amount
     API->>DB: INSERT INTO t_round (status=OPEN)
-    API->>DB: UPDATE balance (debit)
+    API->>DB: UPDATE balance (扣款)
     API->>DB: COMMIT
-    API-->>GP: Success (new balance)
+    API-->>GP: Success (新餘額)
 
-    Note over GP,API: Round is OPEN, waiting for Win
+    Note over GP,API: 回合為 OPEN，等待派彩
 
-    GP->>API: Win Request (roundId, txId, winAmount)
+    GP->>API: 派彩請求 (roundId, txId, winAmount)
     API->>DB: SELECT round WHERE roundId
-    DB-->>API: Round found (status=OPEN)
+    DB-->>API: 找到回合 (status=OPEN)
     API->>DB: BEGIN TRANSACTION
-    API->>DB: UPDATE balance (credit winAmount)
+    API->>DB: UPDATE balance (增額 winAmount)
     API->>DB: UPDATE t_round SET status=CLOSED
     API->>DB: COMMIT
-    API-->>GP: Success (new balance)
+    API-->>GP: Success (新餘額)
 ```
 
-### 2.2 State Definitions
+### 2.2 狀態定義
 
-| State | Description | Entry Condition | Exit Condition |
+| 狀態 | 說明 | 進入條件 | 離開條件 |
 |-------|-------------|----------------|----------------|
-| **OPEN** | Bet deducted, awaiting win | Bet request succeeds | Win request arrives OR timeout |
-| **CLOSED** | Round completed normally | Win request succeeds | N/A (terminal state) |
-| **TIMEOUT** | No win received within 2 hours | System scheduled check | GP status query OR manual review |
-| **PENDING_REVIEW** | GP status unknown, manual intervention required | GP query fails | CS agent closes OR cancels |
-| **CANCELLED** | Round cancelled, bet refunded | Rollback request OR manual cancellation | N/A (terminal state) |
-| **ADJUSTED** | Resettlement applied | Adjust request from GP | N/A (terminal state) |
+| **OPEN** | 投注已扣除，等待派彩 | 投注請求成功 | 派彩請求到達或逾時 |
+| **CLOSED** | 回合正常完成 | 派彩請求成功 | N/A（終態） |
+| **TIMEOUT** | 2 小時內未收到派彩 | 系統排程檢查 | GP 狀態查詢或人工審核 |
+| **PENDING_REVIEW** | GP 狀態未知，需人工介入 | GP 查詢失敗 | 客服關閉或取消 |
+| **CANCELLED** | 回合取消，投注退還 | 回滾請求或人工取消 | N/A（終態） |
+| **ADJUSTED** | 已套用重新結算 | 來自 GP 的調整請求 | N/A（終態） |
 
-### 2.3 Implementation (Java)
+### 2.3 實作（Java）
 
 ```java
 @Component
@@ -88,7 +88,7 @@ public class RoundLifecycleManager {
                 throw new BusinessException(ErrorCode.SYSTEM_BUSY);
             }
 
-            // Create round record
+            // 建立回合紀錄
             Round round = Round.builder()
                 .roundId(request.getRoundId())
                 .playerId(request.getPlayerId())
@@ -100,7 +100,7 @@ public class RoundLifecycleManager {
 
             roundRepository.save(round);
 
-            // Debit wallet
+            // 扣除錢包餘額
             WalletResponse response = walletService.debit(
                 request.getPlayerId(),
                 request.getAmount(),
@@ -123,14 +123,14 @@ public class RoundLifecycleManager {
 
 ---
 
-## 3. Orphaned Round Detection
+## 3. 孤立回合偵測
 
-### 3.1 Detection SQL
+### 3.1 偵測 SQL
 
-**Scheduled Task** (every 15 minutes):
+**排程任務**（每 15 分鐘執行）：
 
 ```sql
--- Detect orphaned rounds (open for > 2 hours)
+-- 偵測孤立回合（開啟超過 2 小時）
 SELECT
     round_id,
     player_id,
@@ -145,10 +145,10 @@ ORDER BY created_at ASC
 LIMIT 100;
 ```
 
-### 3.2 Auto-Recovery Implementation
+### 3.2 自動恢復實作
 
 ```java
-@Scheduled(cron = "0 */15 * * * *") // Every 15 minutes
+@Scheduled(cron = "0 */15 * * * *") // 每 15 分鐘
 public void detectOrphanedRounds() {
     List<Round> orphanedRounds = roundRepository.findOrphanedRounds(
         LocalDateTime.now().minusHours(2)
@@ -156,25 +156,25 @@ public void detectOrphanedRounds() {
 
     for (Round round : orphanedRounds) {
         try {
-            // Query GP for final round status
+            // 查詢 GP 取得最終回合狀態
             GPRoundStatus gpStatus = gpClient.queryRoundStatus(
                 round.getGpId(),
                 round.getRoundId()
             );
 
             if (gpStatus == GPRoundStatus.COMPLETED) {
-                // Close round with actual win amount
+                // 以實際派彩金額關閉回合
                 closeRound(round.getRoundId(), gpStatus.getWinAmount());
             } else if (gpStatus == GPRoundStatus.CANCELLED) {
-                // Refund bet
+                // 退還投注
                 cancelRound(round.getRoundId());
             } else {
-                // GP status unknown, escalate to manual review
+                // GP 狀態未知，升級至人工審核
                 escalateToManualReview(round);
             }
 
         } catch (GPQueryException e) {
-            // GP query failed, escalate immediately
+            // GP 查詢失敗，立即升級
             escalateToManualReview(round);
         }
     }
@@ -183,30 +183,30 @@ public void detectOrphanedRounds() {
 
 ---
 
-## 4. Idempotency Three-Layer Defense
+## 4. 冪等三層防禦
 
-### 4.1 Architecture Diagram
+### 4.1 架構圖
 
 ```
-Request with txId
+帶有 txId 的請求
        ↓
-[Layer 1: Redis Cache]
-   - 1-hour TTL
-   - O(1) lookup
-   - Fast path (< 5ms)
-       ↓ Cache miss
-[Layer 2: DB Unique Constraint]
+[第 1 層：Redis 快取]
+   - 1 小時 TTL
+   - O(1) 查詢
+   - 快速路徑（< 5ms）
+       ↓ 快取未命中
+[第 2 層：DB 唯一約束]
    - t_transaction.tx_id UNIQUE
-   - UPSERT with ON CONFLICT
-   - Medium path (< 50ms)
-       ↓ Constraint violation
-[Layer 3: Fallback Query]
+   - 使用 ON CONFLICT 的 UPSERT
+   - 中速路徑（< 50ms）
+       ↓ 約束違反
+[第 3 層：回退查詢]
    - SELECT FROM t_transaction WHERE tx_id
-   - Return stored response
-   - Slow path (< 100ms)
+   - 回傳已儲存的回應
+   - 慢速路徑（< 100ms）
 ```
 
-### 4.2 Implementation
+### 4.2 實作
 
 ```java
 @Service
@@ -217,26 +217,26 @@ public class IdempotencyGuard {
     private final TransactionRepository transactionRepository;
 
     public <T> T executeIdempotent(String txId, Supplier<T> action) {
-        // Layer 1: Redis cache check
+        // 第 1 層：Redis 快取檢查
         String cacheKey = "tx:response:" + txId;
         String cachedResponse = redisTemplate.opsForValue().get(cacheKey);
         if (cachedResponse != null) {
             return deserialize(cachedResponse);
         }
 
-        // Layer 2: DB unique constraint check
+        // 第 2 層：DB 唯一約束檢查
         Optional<Transaction> existing = transactionRepository.findByTxId(txId);
         if (existing.isPresent()) {
             T response = deserialize(existing.get().getResponse());
-            // Populate cache for next request
+            // 填充快取供下次請求使用
             redisTemplate.opsForValue().set(cacheKey, serialize(response), 1, TimeUnit.HOURS);
             return response;
         }
 
-        // Execute business logic
+        // 執行業務邏輯
         T response = action.get();
 
-        // Store response in DB and cache
+        // 將回應儲存至 DB 和快取
         Transaction tx = Transaction.builder()
             .txId(txId)
             .response(serialize(response))
@@ -253,9 +253,9 @@ public class IdempotencyGuard {
 
 ---
 
-## 5. Concurrent Processing (Redisson Distributed Lock)
+## 5. 併發處理（Redisson 分佈式鎖）
 
-### 5.1 Lock Configuration
+### 5.1 鎖配置
 
 ```yaml
 # application.yml
@@ -265,11 +265,11 @@ redisson:
     connection-pool-size: 64
     connection-minimum-idle-size: 10
   lock:
-    wait-time: 3000  # 3 seconds
-    lease-time: 10000 # 10 seconds
+    wait-time: 3000  # 3 秒
+    lease-time: 10000 # 10 秒
 ```
 
-### 5.2 Lock Implementation
+### 5.2 鎖實作
 
 ```java
 @Component
@@ -284,13 +284,13 @@ public class ConcurrencyManager {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            // Try to acquire lock (wait 3s, hold max 10s)
+            // 嘗試取得鎖（等待 3 秒，最多持有 10 秒）
             boolean acquired = lock.tryLock(3, 10, TimeUnit.SECONDS);
             if (!acquired) {
                 throw new BusinessException(ErrorCode.SYSTEM_BUSY_RETRY_LATER);
             }
 
-            // Critical section: balance check + debit
+            // 臨界區：餘額檢查 + 扣款
             Wallet wallet = walletRepository.findByPlayerIdForUpdate(playerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.WALLET_NOT_FOUND));
 
@@ -317,9 +317,9 @@ public class ConcurrencyManager {
 
 ---
 
-## 6. Negative Balance Handling
+## 6. 負餘額處理
 
-### 6.1 Resettlement Flow
+### 6.1 重新結算流程
 
 ```java
 @Service
@@ -330,22 +330,22 @@ public class ResettlementService {
     private final AlertService alertService;
 
     public void processResettlement(ResettlementRequest request) {
-        // Delegate transactional work to Manager
+        // 委派交易工作給 Manager
         WalletResponse response = resettlementManager.applyResettlement(request);
 
-        // Non-transactional: trigger alert if negative balance
+        // 非交易性：若負餘額則觸發告警
         if (response.getNewBalance().compareTo(BigDecimal.ZERO) < 0) {
             alertService.sendAlert(
                 AlertLevel.CRITICAL,
-                "Negative Balance Alert",
-                "Player " + request.getPlayerId() + " balance: " + response.getNewBalance()
+                "負餘額告警",
+                "玩家 " + request.getPlayerId() + " 餘額：" + response.getNewBalance()
             );
         }
     }
 }
 ```
 
-**ResettlementManager** (@Transactional in Manager layer):
+**ResettlementManager**（@Transactional 在 Manager 層）：
 
 ```java
 @Component
@@ -357,21 +357,21 @@ public class ResettlementManager {
 
     @Transactional(rollbackFor = Throwable.class)
     public WalletResponse applyResettlement(ResettlementRequest request) {
-        BigDecimal adjustAmount = request.getAdjustAmount(); // Can be negative
+        BigDecimal adjustAmount = request.getAdjustAmount(); // 可為負數
 
-        // Apply adjustment (may result in negative balance)
+        // 套用調整（可能導致負餘額）
         WalletResponse response = walletService.adjust(
             request.getPlayerId(),
             adjustAmount,
             request.getTxId()
         );
 
-        // Check for negative balance - lock account within same transaction
+        // 檢查負餘額 - 在同一交易內鎖定帳戶
         if (response.getNewBalance().compareTo(BigDecimal.ZERO) < 0) {
             accountService.lockAccount(
                 request.getPlayerId(),
                 AccountLockReason.NEGATIVE_BALANCE,
-                "Balance: " + response.getNewBalance()
+                "餘額：" + response.getNewBalance()
             );
         }
 
@@ -380,27 +380,27 @@ public class ResettlementManager {
 }
 ```
 
-### 6.2 Account Lock Implementation
+### 6.2 帳戶鎖定實作
 
 ```sql
--- Lock account and block all operations
+-- 鎖定帳戶並阻止所有操作
 UPDATE t_player_account
 SET status = 'LOCKED',
     lock_reason = 'NEGATIVE_BALANCE',
-    lock_details = 'Balance: -$123.45',
+    lock_details = '餘額：-$123.45',
     locked_at = NOW(),
     updated_at = NOW()
 WHERE player_id = ?;
 
--- Prevent all new bets, deposits, withdrawals
--- (checked in WalletService before every operation)
+-- 阻止所有新投注、存款、提款
+-- （在每次操作前於 WalletService 中檢查）
 ```
 
 ---
 
-## 7. Out-of-Order Handling
+## 7. 亂序處理
 
-### 7.1 Pending Queue Architecture
+### 7.1 待處理佇列架構
 
 ```java
 @Component
@@ -411,13 +411,13 @@ public class OutOfOrderHandler {
     private final RoundRepository roundRepository;
 
     /**
-     * Strategy 3: Temporary Storage (30-minute expiry)
-     * When Win arrives before Bet, store in pending queue
+     * 策略 3：臨時儲存（30 分鐘過期）
+     * 當派彩先於投注到達時，存入待處理佇列
      */
     public void handleOrphanWin(WinRequest request) {
         String pendingKey = "pending:win:" + request.getRoundId();
 
-        // Store win request in Redis (30-minute TTL)
+        // 將派彩請求存入 Redis（30 分鐘 TTL）
         redisTemplate.opsForValue().set(
             pendingKey,
             serialize(request),
@@ -425,21 +425,21 @@ public class OutOfOrderHandler {
             TimeUnit.MINUTES
         );
 
-        // Schedule retry after 5 minutes
+        // 排程 5 分鐘後重試
         scheduleRetry(request.getRoundId(), 5);
     }
 
-    @Scheduled(fixedDelay = 60000) // Every 1 minute
+    @Scheduled(fixedDelay = 60000) // 每 1 分鐘
     public void processPendingWins() {
         Set<String> pendingKeys = redisTemplate.keys("pending:win:*");
 
         for (String key : pendingKeys) {
             String roundId = key.replace("pending:win:", "");
 
-            // Check if Bet has arrived
+            // 檢查投注是否已到達
             Optional<Round> round = roundRepository.findByRoundId(roundId);
             if (round.isPresent() && round.get().getStatus() == RoundStatus.OPEN) {
-                // Bet arrived, process pending Win
+                // 投注已到達，處理待處理派彩
                 WinRequest winRequest = deserialize(redisTemplate.opsForValue().get(key));
                 processWin(winRequest);
                 redisTemplate.delete(key);
@@ -449,7 +449,7 @@ public class OutOfOrderHandler {
 }
 ```
 
-### 7.2 Strategy Switching
+### 7.2 策略切換
 
 ```java
 @Component
@@ -458,23 +458,23 @@ public class StrategyManager {
     private final AtomicInteger pendingQueueSize = new AtomicInteger(0);
 
     public WinResponse handleWin(WinRequest request) {
-        // Check if Bet exists
+        // 檢查投注是否存在
         Optional<Round> round = roundRepository.findByRoundId(request.getRoundId());
 
         if (round.isEmpty()) {
-            // Out-of-order detected
+            // 偵測到亂序
             if (pendingQueueSize.get() > 100) {
-                // Strategy 1: Immediate Reject (degraded mode)
+                // 策略 1：立即拒絕（降級模式）
                 throw new BusinessException(ErrorCode.BET_NOT_FOUND);
             } else {
-                // Strategy 3: Temporary Storage (normal mode)
+                // 策略 3：臨時儲存（正常模式）
                 handleOrphanWin(request);
                 pendingQueueSize.incrementAndGet();
                 return WinResponse.pending();
             }
         }
 
-        // Normal flow: Bet exists
+        // 正常流程：投注存在
         return processWin(request);
     }
 }
@@ -482,9 +482,9 @@ public class StrategyManager {
 
 ---
 
-## 8. Exception Handling
+## 8. 例外處理
 
-### 8.1 Redis Connection Failure
+### 8.1 Redis 連線失敗
 
 ```java
 @Service
@@ -500,17 +500,17 @@ public class ResilientCacheService {
                 Optional.ofNullable(redisTemplate.opsForValue().get(key))
             );
         } catch (CallNotPermittedException e) {
-            // Circuit open, bypass cache
+            // 熔斷器開啟，繞過快取
             return Optional.empty();
         } catch (RedisConnectionException e) {
-            // Connection failed, degrade gracefully
+            // 連線失敗，優雅降級
             return Optional.empty();
         }
     }
 }
 ```
 
-### 8.2 Database Latency P99 Degradation
+### 8.2 資料庫延遲 P99 降級
 
 ```java
 @Component
@@ -534,9 +534,9 @@ public class LatencyMonitor {
 
 ---
 
-## 9. Monitoring Metrics
+## 9. 監控指標
 
-### 9.1 Prometheus Metrics
+### 9.1 Prometheus 指標
 
 ```java
 @Component
@@ -564,9 +564,9 @@ public class WalletMetrics {
 
 ---
 
-## 10. Configuration Reference
+## 10. 配置參考
 
-### 10.1 Redis Configuration
+### 10.1 Redis 配置
 
 ```yaml
 spring:
@@ -582,7 +582,7 @@ spring:
         min-idle: 2
 ```
 
-### 10.2 Database Configuration
+### 10.2 資料庫配置
 
 ```yaml
 spring:
@@ -597,6 +597,6 @@ spring:
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-09
-**Maintainer**: Backend Team
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-09
+**維護團隊**: 後端團隊
