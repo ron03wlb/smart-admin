@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [03-01_Game_Integration_Standard.md](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md)
 > **Audience**: 高階主管、產品經理、營運主管、合規官員
-> **Related Doc**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
+> **Related Architecture**: [Game Integration Protocols (Architecture)](../../architecture/03_Game_Integration/Game_Integration_Protocols.md)
 > **Last Synced**: 2026-02-09
 >
 > **精煉說明**：技術細節（HMAC-SHA256、TLS、Type A/B/C 分類、HTTP 狀態碼）已移至架構層。本文件僅專注於業務需求。

@@ -1,15 +1,15 @@
 {
-  "window_start": "2026-02-11T16:09:22.480Z",
-  "window_end": "2026-02-11T16:39:22.480Z",
+  "window_start": "2026-02-12T01:06:33.177Z",
+  "window_end": "2026-02-12T01:36:33.177Z",
   "accumulated": {
     "input_tokens": 0,
     "output_tokens": 0,
     "cached_tokens": 0,
     "effective_tokens": 0,
-    "api_calls": 7
+    "api_calls": 1
   },
-  "failure_count": 2,
-  "success_count": 5,
+  "failure_count": 0,
+  "success_count": 1,
   "estimated_quota": {
     "tier": "tier-4",
     "input_tpm": 400000,
@@ -19,10 +19,10 @@
   },
   "risk_components": {
     "token_usage_pct": 0,
-    "api_call_rate_pct": 0.47,
-    "failure_rate": 0.2857,
+    "api_call_rate_pct": 0.07,
+    "failure_rate": 0,
     "five_hour_proximity": 0
   },
-  "risk_score": 0.0443,
+  "risk_score": 0.0002,
   "recommendation": "continue"
 }

@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
 > **Audience**: 高階主管、產品經理
-> **Related Doc**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
+> **Related Architecture**: [Game_Integration_Security.md](../../architecture/03_Game_Integration/Game_Integration_Security.md)
 > **Last Synced**: 2026-02-09
 >
 > **精煉說明**：技術細節（Token 生成 Java 程式碼、HMAC-SHA256 簽章演算法、Base64 編碼、Redis 防重放黑名單、三層冪等防禦、停滯交易恢復作業、速率限制 Redisson 實作）已移至架構層。本文件僅專注於業務需求。
