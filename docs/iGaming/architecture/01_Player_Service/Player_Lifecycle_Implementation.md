@@ -1,8 +1,8 @@
 # 玩家生命週期 - 技術實作（Player Lifecycle - Technical Implementation）
 
 > **Canonical Source**: [docs/iGaming/source-archive/01_Player_Center/01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
-> **View**: Technical Architecture (Development & DevOps)
-> **Business Requirements**: [Player_Lifecycle.md](../../requirements/01_Player_Experience/Player_Lifecycle.md)
+> **目標讀者（Audience）**: 開發人員、DevOps 工程師
+> **業務需求（Business Requirements）**: [Player_Lifecycle.md](../../requirements/01_Player_Experience/Player_Lifecycle.md)
 
 ---
 
