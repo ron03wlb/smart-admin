@@ -1,35 +1,34 @@
 # 基礎設施成本優化需求
 
-> **Canonical Source**: [09-10 Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
-> **Related Architecture**: [Cost Optimization Architecture](../../architecture/09_Infrastructure/Cost_Optimization_Architecture.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Last Synced**: 2026-02-09
+> **規範來源**: [09-10_Cost_Optimization.md](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Cost_Optimization_Architecture.md](../../architecture/09_Infrastructure/Cost_Optimization_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
-This infrastructure cost optimization initiative delivers value by:
-- **Direct Cost Savings**: Reducing monthly infrastructure costs by 37% (from $2,820 to $1,788), achieving annual net savings of $12,383 with a 6-month ROI
-- **Performance Enhancement**: Simultaneously improving system capacity by 418% (>450 TPS) and reducing P99 latency by 84% (<200ms), demonstrating that cost reduction and performance gains are not mutually exclusive
-- **Operational Independence**: Eliminating external monitoring service dependencies by migrating to self-hosted open-source solutions, achieving 100% cost elimination for external monitoring while maintaining full observability (metrics, logs, tracing, alerting)
-- **Data Lifecycle Management**: Implementing tiered storage strategy (hot/warm/cold/archive) based on access patterns, reducing storage costs by 94% while maintaining appropriate query SLAs (50ms for 0-2 months, up to 12 hours for 20+ months)
-- **Scalability Foundation**: Introducing auto-scaling mechanisms for compute resources and query offloading to dedicated analytics engines, supporting business growth without proportional cost increases
+此基礎設施成本優化計畫通過以下方式提供價值：
+- **直接成本節省**：將月度基礎設施成本降低 37%（從 $2,820 降至 $1,788），實現年度淨節省 $12,383，6 個月投資回收期
+- **效能提升**：同步將系統容量提升 418%（>450 TPS）並將 P99 延遲降低 84%（<200ms），證明成本降低與效能提升可以並行
+- **營運自主性**：通過遷移至自建開源方案消除外部監控服務依賴，實現外部監控成本 100% 消除，同時維持完整可觀察性（指標、日誌、追蹤、告警）
+- **資料生命週期管理**：基於存取模式實施分層存儲策略（熱/暖/冷/歸檔），存儲成本降低 94%，同時維持適當的查詢 SLA（0-2 個月 50ms，20+ 個月最長 12 小時）
+- **可擴展性基礎**：引入運算資源自動擴縮機制和專用分析引擎查詢分流，支撐業務增長而無需等比例增加成本
 
-## Success Metrics
+## 成功指標（Success Metrics）
 
-| Metric | Target | Measurement |
+| 指標 | 目標 | 測量方式 |
 |--------|--------|-------------|
-| Monthly Infrastructure Cost | < $1,800 | 37% reduction from baseline $2,820 (Section 1) |
-| Storage Cost Savings | > 90% | Tiered storage implementation (Section 2: hot/warm/cold/archive) |
-| System Processing Capacity | > 450 TPS | 418% improvement from baseline (Section 1) |
-| P99 Response Latency | < 200ms | 84% reduction from baseline (Section 1) |
-| ROI Period | < 7 months | Annual savings $12,383 divided by implementation cost (Section 1) |
-| Message Queue Retention Cost | 76% reduction | Retention policy adjusted to 7 days with long-term data offloaded (Section 3) |
-| Cache Hit Rate | > 90% | In-process caching reduces distributed cache access by 90%, enabling instance downsizing (Section 4) |
-| External Monitoring Cost | $0 | 100% elimination via self-hosted Prometheus/Loki/Jaeger/AlertManager (Section 5) |
-| Cost Anomaly Detection Coverage | 100% of services | Monthly dashboard with 10% budget threshold alerting (Section 6) |
+| 月度基礎設施成本 | < $1,800 | 從基線 $2,820 降低 37%（第 1 節） |
+| 存儲成本節省 | > 90% | 分層存儲實施（第 2 節：熱/暖/冷/歸檔） |
+| 系統處理能力 | > 450 TPS | 從基線提升 418%（第 1 節） |
+| P99 回應延遲 | < 200ms | 從基線降低 84%（第 1 節） |
+| 投資回收期 | < 7 個月 | 年度節省 $12,383 除以實施成本（第 1 節） |
+| 訊息管線保留成本 | 降低 76% | 保留策略調整為 7 天，長期資料另行存放（第 3 節） |
+| 快取命中率 | > 90% | 進程內快取降低 90% 分散式快取存取，實現實例降級（第 4 節） |
+| 外部監控成本 | $0 | 通過自建 Prometheus/Loki/Jaeger/AlertManager 100% 消除（第 5 節） |
+| 成本異常偵測覆蓋率 | 100% 服務 | 月度儀表板配合 10% 預算閾值告警（第 6 節） |
 
 ---
 
