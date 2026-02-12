@@ -241,7 +241,329 @@ Kafka Payload:
 
 ---
 
-## 6. 資料庫架構（Database Schema）（PostgreSQL）
+## 6. Java 實現
+
+### 6.1 Service 層 — 風險偵測服務
+
+```java
+package net.lab1024.sa.business.risk;
+
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 風險偵測服務
+ * 負責執行配置驅動的風險規則並產生風險提案
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class DetectionModelService {
+
+    private final DetectionModelDao detectionModelDao;
+    private final DetectionResultDao detectionResultDao;
+    private final RiskProposalManager riskProposalManager;
+    private final DetectionModelExecutor detectionModelExecutor;
+
+    /**
+     * 執行 Layer 3 非同步風險分析
+     *
+     * @param playerId 玩家 ID
+     * @param betId 投注 ID
+     * @param amount 投注金額
+     * @param gameType 遊戲類型
+     * @return 偵測結果列表
+     */
+    public List<DetectionResultVO> analyzeAsyncRisk(Long playerId, Long betId, BigDecimal amount, String gameType) {
+        // 載入已啟用的 Layer 3 規則
+        List<DetectionModelEntity> models = detectionModelDao.findEnabledByLayer(3);
+
+        return models.stream()
+            .map(model -> executeModel(playerId, betId, amount, gameType, model, 3, "BET_PLACED"))
+            .filter(Option::isDefined)
+            .map(Option::get)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 執行 Layer 1 同步黑名單檢查
+     *
+     * @param playerId 玩家 ID
+     * @param clientIp 客戶端 IP
+     * @return 是否通過檢查（true=通過，false=拒絕）
+     */
+    public boolean checkSyncBlacklist(Long playerId, String clientIp) {
+        List<DetectionModelEntity> models = detectionModelDao.findEnabledByLayer(1);
+
+        for (DetectionModelEntity model : models) {
+            Option<DetectionResultVO> result = executeModel(playerId, null, null, null, model, 1, "BLACKLIST_CHECK");
+            if (result.isDefined() && result.get().getMatched()) {
+                // 任一 Layer 1 規則匹配 -> 拒絕投注
+                log.warn("Layer 1 blacklist check failed: playerId={}, model={}", playerId, model.getModelName());
+                return false;
+            }
+        }
+
+        return true; // 通過所有 Layer 1 檢查
+    }
+
+    /**
+     * 執行 Layer 5 提款延遲檢查
+     *
+     * @param playerId 玩家 ID
+     * @param withdrawalId 提款 ID
+     * @return 可疑金額總和
+     */
+    public BigDecimal calculateSuspiciousAmountForWithdrawal(Long playerId, Long withdrawalId) {
+        // 查詢 30 天內未審核的風險提案
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+
+        return detectionResultDao.sumSuspiciousAmountByPlayer(playerId, thirtyDaysAgo)
+            .getOrElse(BigDecimal.ZERO);
+    }
+
+    /**
+     * 執行單一偵測模型
+     */
+    private Option<DetectionResultVO> executeModel(
+        Long playerId, Long betId, BigDecimal amount, String gameType,
+        DetectionModelEntity model, int layer, String eventType
+    ) {
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 執行規則引擎
+            DetectionExecutionResult executionResult = detectionModelExecutor.execute(
+                model, playerId, betId, amount, gameType
+            );
+
+            // 記錄偵測結果
+            DetectionResultEntity entity = DetectionResultEntity.builder()
+                .playerId(playerId)
+                .betId(betId)
+                .modelId(model.getModelId())
+                .layer(layer)
+                .eventType(eventType)
+                .eventTimestamp(LocalDateTime.now())
+                .gameType(gameType)
+                .amount(amount)
+                .matched(executionResult.isMatched())
+                .actionType(model.getActionType())
+                .riskScore(executionResult.getRiskScore())
+                .confidenceLevel(executionResult.getConfidenceLevel())
+                .matchedRules(JsonUtil.toJsonString(executionResult.getMatchedRules()))
+                .detectionReason(executionResult.getReason())
+                .suspiciousAmount(executionResult.getSuspiciousAmount())
+                .processingTimeMs((int) (System.currentTimeMillis() - startTime))
+                .modelVersion(model.getModelVersion())
+                .build();
+
+            detectionResultDao.insert(entity);
+
+            // 如果匹配且為 BLOCK/FLAG，產生風險提案
+            if (executionResult.isMatched() && !model.getActionType().equals("IGNORE")) {
+                String priority = model.getActionType().equals("BLOCK") ? "HIGH" : "MEDIUM";
+                riskProposalManager.createProposal(entity, priority);
+            }
+
+            return Option.of(SmartBeanUtil.copy(entity, DetectionResultVO.class));
+
+        } catch (Exception e) {
+            log.error("Detection model execution failed: model={}, playerId={}",
+                model.getModelName(), playerId, e);
+            return Option.none();
+        }
+    }
+}
+```
+
+### 6.2 Manager 層 — 風險提案管理
+
+```java
+package net.lab1024.sa.business.risk;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 風險提案管理器
+ * 負責產生和管理風險提案（Layer 4 人工審核）
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class RiskProposalManager {
+
+    private final RiskProposalDao riskProposalDao;
+    private final DetectionResultDao detectionResultDao;
+    private final PlayerRiskProfileDao playerRiskProfileDao;
+
+    /**
+     * 產生風險提案（基於偵測結果）
+     *
+     * @param detectionResult 偵測結果
+     * @param priority 優先級（HIGH, MEDIUM, LOW）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void createProposal(DetectionResultEntity detectionResult, String priority) {
+        RiskProposalEntity proposal = RiskProposalEntity.builder()
+            .playerId(detectionResult.getPlayerId())
+            .betId(detectionResult.getBetId())
+            .detectionResultId(detectionResult.getResultId())
+            .priority(priority)
+            .proposalType(detectionResult.getActionType()) // BLOCK or FLAG
+            .detectionReason(detectionResult.getDetectionReason())
+            .suspiciousAmount(detectionResult.getSuspiciousAmount())
+            .riskScore(detectionResult.getRiskScore())
+            .status("PENDING") // 待審核
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        riskProposalDao.insert(proposal);
+
+        // 更新 detection_results 的 risk_proposal_id
+        detectionResultDao.updateProposalId(detectionResult.getResultId(), proposal.getProposalId());
+
+        log.info("Risk proposal created: proposalId={}, priority={}, playerId={}",
+            proposal.getProposalId(), priority, detectionResult.getPlayerId());
+    }
+
+    /**
+     * 審核員處理風險提案
+     *
+     * @param proposalId 提案 ID
+     * @param decision 審核決策（APPROVED, REJECTED, PARTIAL）
+     * @param reviewerId 審核員 ID
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void reviewProposal(Long proposalId, String decision, Long reviewerId) {
+        // 更新提案狀態
+        riskProposalDao.updateReviewDecision(proposalId, decision, reviewerId, LocalDateTime.now());
+
+        // 同步更新 detection_results
+        RiskProposalEntity proposal = riskProposalDao.selectById(proposalId)
+            .getOrElseThrow(() -> new RuntimeException("Proposal not found: " + proposalId));
+
+        detectionResultDao.updateReviewDecision(proposal.getDetectionResultId(), decision, reviewerId);
+
+        // 如果審核結果為 REJECTED，執行處置操作
+        if ("REJECTED".equals(decision)) {
+            applyDispositionActions(proposal);
+        }
+
+        log.info("Risk proposal reviewed: proposalId={}, decision={}, reviewedBy={}",
+            proposalId, decision, reviewerId);
+    }
+
+    /**
+     * 執行處置操作（帳戶凍結、資金標記）
+     */
+    private void applyDispositionActions(RiskProposalEntity proposal) {
+        // 更新玩家風險檔案
+        playerRiskProfileDao.incrementRiskLevel(proposal.getPlayerId());
+
+        // 寫入帳戶凍結日誌
+        AccountFreezeLogEntity freezeLog = AccountFreezeLogEntity.builder()
+            .playerId(proposal.getPlayerId())
+            .reason("RISK_PROPOSAL_REJECTED")
+            .proposalId(proposal.getProposalId())
+            .frozenAt(LocalDateTime.now())
+            .build();
+
+        accountFreezeLogDao.insert(freezeLog);
+
+        // 標記可疑資金
+        if (proposal.getSuspiciousAmount() != null && proposal.getSuspiciousAmount().compareTo(BigDecimal.ZERO) > 0) {
+            SuspiciousFundMarkerEntity marker = SuspiciousFundMarkerEntity.builder()
+                .playerId(proposal.getPlayerId())
+                .amount(proposal.getSuspiciousAmount())
+                .proposalId(proposal.getProposalId())
+                .markedAt(LocalDateTime.now())
+                .build();
+
+            suspiciousFundMarkerDao.insert(marker);
+        }
+
+        log.info("Disposition actions applied: playerId={}, proposalId={}",
+            proposal.getPlayerId(), proposal.getProposalId());
+    }
+}
+
+/**
+ * 偵測模型執行器
+ * 負責實際執行規則引擎邏輯
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class DetectionModelExecutor {
+
+    /**
+     * 執行偵測模型
+     *
+     * @return 執行結果（包含是否匹配、風險分數、匹配規則）
+     */
+    public DetectionExecutionResult execute(
+        DetectionModelEntity model, Long playerId, Long betId,
+        BigDecimal amount, String gameType
+    ) {
+        // 從 rule_definition JSONB 提取規則邏輯
+        String ruleDefinition = model.getRuleDefinition();
+        Map<String, Object> ruleConfig = JsonUtil.parseObject(ruleDefinition, new TypeReference<Map<String, Object>>() {});
+
+        // 根據 model_type 路由到不同偵測邏輯
+        return switch (model.getModelType()) {
+            case "BOT_DETECTION" -> executeBotDetection(playerId, betId, ruleConfig);
+            case "HEDGING" -> executeHedgingDetection(playerId, betId, ruleConfig);
+            case "ARBITRAGE" -> executeArbitrageDetection(playerId, betId, ruleConfig);
+            case "TURNOVER_MANIPULATION" -> executeTurnoverManipulation(playerId, amount, ruleConfig);
+            case "BLACKLIST" -> executeBlacklistCheck(playerId, ruleConfig);
+            default -> {
+                log.warn("Unknown model type: {}", model.getModelType());
+                yield DetectionExecutionResult.noMatch();
+            }
+        };
+    }
+
+    private DetectionExecutionResult executeBotDetection(Long playerId, Long betId, Map<String, Object> ruleConfig) {
+        // 實作機器人偵測邏輯（行為特徵分析）
+        // 示例：檢查投注時機規律性、異常速度等
+        return DetectionExecutionResult.noMatch(); // 簡化示例
+    }
+
+    private DetectionExecutionResult executeHedgingDetection(Long playerId, Long betId, Map<String, Object> ruleConfig) {
+        // 實作對沖偵測邏輯（查詢同場比賽歷史投注）
+        return DetectionExecutionResult.noMatch();
+    }
+
+    private DetectionExecutionResult executeArbitrageDetection(Long playerId, Long betId, Map<String, Object> ruleConfig) {
+        // 實作套利偵測邏輯（共享 IP 帳戶相關性分析）
+        return DetectionExecutionResult.noMatch();
+    }
+
+    private DetectionExecutionResult executeTurnoverManipulation(Long playerId, BigDecimal amount, Map<String, Object> ruleConfig) {
+        // 實作有效投注額操控偵測（速度計算與存款比率）
+        return DetectionExecutionResult.noMatch();
+    }
+
+    private DetectionExecutionResult executeBlacklistCheck(Long playerId, Map<String, Object> ruleConfig) {
+        // 實作黑名單檢查（Redis 查詢）
+        return DetectionExecutionResult.noMatch();
+    }
+}
+```
+
+---
+
+## 7. 資料庫架構（Database Schema）（PostgreSQL）
 
 ### detection_models
 儲存風險偵測模型配置和規則。
