@@ -119,7 +119,11 @@
 - SSOT violations must stay at 0
 - Always run full validation after changes to ensure no regression
 
-### P16: PR-triggered validation mode rules (Added 2026-02-12)
+<!--
+### P16: PR-triggered validation mode rules (Added 2026-02-12) - TEMPORARILY DISABLED
+User decided to restore continuous execution mode for 20-iteration test.
+This rule is commented out but preserved for future reference.
+
 - Ralph now operates in **PR-triggered mode** (NOT continuous execution)
 - **Validation scope**: ONLY check files changed in the PR (not entire codebase)
 - **Quality gates**: 5 checks (Technical Terms, Encoding, Terminology, Mermaid, Links)
@@ -138,6 +142,7 @@
 - **Integration points**:
   - Pre-commit Hook: `.git/hooks/pre-commit` (integrated with Spotless)
   - GitHub Actions: `.github/workflows/igaming-translation-quality.yml`
+-->
 
 ---
 
@@ -184,3 +189,10 @@
   - Integration with existing Spotless hook
 - **Ralph's new role**: Quality gatekeeper for iGaming documentation translation
 - **Reference**: Phase 1-2 completed in commit `5892b1e3`
+
+### 2026-02-12: Ralph mode rollback - PR-triggered to Continuous
+- **Reason**: User requested 20-iteration continuous execution test
+- **Rolled back**: commit `708644a4` (Phase 2 PR-triggered mode)
+- **Kept**: Phase 1 validation scripts (still useful for post-iteration checks)
+- **Impact**: Ralph resumes translation duties (not just validation)
+- **Duration**: Temporary (20 iterations test, then re-evaluate)
