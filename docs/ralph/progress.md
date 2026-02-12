@@ -292,12 +292,12 @@ Priority: Requirements files contain business context suited for Chinese audienc
 - [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md (活動風險控制需求 - Related Doc→Related Architecture + Audience 翻譯)
 - [x] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md (獎金計算引擎 - Audience + Business Value + Success Metrics 翻譯)
 
-#### Batch 5 — Promotions (2 files) + Risk Compliance (3 files) [Status]
-- [ ] requirements/04_Promotions_VIP/Promotion_Requirements.md
-- [ ] requirements/04_Promotions_VIP/README.md
-- [ ] requirements/05_Risk_Compliance/Affordability_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Detection_Model_Spec.md
-- [ ] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md
+#### Batch 5 — Promotions (2 files) + Risk Compliance (3 files) ✅ COMPLETE
+- [x] requirements/04_Promotions_VIP/Promotion_Requirements.md (促銷需求 - Audience 翻譯)
+- [x] requirements/04_Promotions_VIP/README.md (促銷與 VIP 索引 - 術語標準化)
+- [x] requirements/05_Risk_Compliance/Affordability_Requirements.md (可負擔性評估 - Audience + Related Doc→Related Architecture)
+- [x] requirements/05_Risk_Compliance/Detection_Model_Spec.md (檢測模型規格 - Audience 翻譯)
+- [x] requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md (詐騙偵測需求 - 已翻譯)
 
 **Note**: Batches 6-14 will cover remaining 46 requirements files (9 more in Risk Compliance + 7 Governance + 2 Agent + 2 Analytics + 2 Infra + 3 Platform + 4 Frontend + 3 Security + 2 CS + 1 Integration + 4 Responsible Gambling + 5 READMEs). Full file list: `find docs/iGaming/requirements -name '*.md' | sort`
 

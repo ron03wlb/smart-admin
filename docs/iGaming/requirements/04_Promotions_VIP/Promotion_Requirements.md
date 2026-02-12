@@ -1,7 +1,7 @@
 # 促銷需求（Promotion Requirements）
 
 > **Canonical Source**: [00-13_Promotion_Implementation.md](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md)
-> **Audience**: Executives, Product Managers, Operations Teams
+> **Audience**: 高階主管、產品經理、營運團隊
 > **Related Architecture**: [Promotion_Implementation.md](../../architecture/04_Activity_Engine/Promotion_Implementation.md)
 > **Last Synced**: 2026-02-08
 

@@ -1,8 +1,8 @@
 # 可負擔性評估業務需求（Affordability Assessment Requirements）
 
 > **Canonical Source**: [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
-> **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Doc**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
+> **Audience**: 高階主管、合規官、產品經理
+> **Related Architecture**: [Affordability_Implementation.md](../../architecture/05_Risk_Engine/Affordability_Implementation.md)
 > **Last Synced**: 2026-02-08
 
 ---

@@ -1,7 +1,7 @@
 # 檢測模型規格（Detection Model Specification）
 
 > **Canonical Source**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
-> **Audience**: Executives, Risk Operations, Compliance Officers, Product Managers
+> **Audience**: 高階主管、風險營運、合規官、產品經理
 > **Related Architecture**: [Detection_Model_Implementation.md](../../architecture/05_Risk_Engine/Detection_Model_Implementation.md)
 > **Last Synced**: 2026-02-09
 >
