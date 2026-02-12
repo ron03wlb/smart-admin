@@ -1,53 +1,53 @@
-# Game Integration Security Technical Implementation
+# 遊戲整合安全技術實作（Game Integration Security Technical Implementation）
 
-> **Business Requirements**: [Game_Integration_Requirements.md](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md)
-> **Audience**: Architects, Backend Developers, Security Engineers
-> **Last Synced**: 2026-02-09
+> **業務需求**: [Game_Integration_Requirements.md](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md)
+> **目標讀者**: 架構師、後端開發、安全工程師
+> **最後同步**: 2026-02-09
 
 ---
 
-## 1. Architecture Overview
+## 1. 架構概覽（Architecture Overview）
 
-The Game Integration Security system provides secure communication and transaction integrity between the iGaming platform and Game Providers (GPs). It implements defense-in-depth with multiple security layers to protect against replay attacks, tampering, and unauthorized access.
+遊戲整合安全系統提供 iGaming 平台與遊戲供應商（Game Providers, GPs）之間的安全通訊和交易完整性保障。系統實作深度防禦架構，透過多層安全機制防護重放攻擊、數據篡改和未授權存取。
 
-**Key Technical Components**:
-- Token-Based Authentication with HMAC-SHA256 signatures
-- Three-layer idempotency defense (Redis + DB + Distributed Lock)
-- Anti-replay protection with Redis blacklist
-- Stalled transaction auto-recovery with scheduled jobs
-- Rate limiting using Redisson
-- IP whitelisting with Nginx integration
+**核心技術組件**：
+- 基於 HMAC-SHA256 簽章的 Token 驗證機制
+- 三層冪等防禦（Redis + 資料庫 + 分散式鎖）
+- 基於 Redis 黑名單的防重放保護
+- 基於排程任務的停滯交易自動恢復
+- 使用 Redisson 實作的速率限制
+- 與 Nginx 整合的 IP 白名單
 
-### 1.1 Security Verification Layers
+### 1.1 安全驗證層級（Security Verification Layers）
 
-The following diagram illustrates the defense-in-depth security architecture with multiple verification layers:
+下圖展示深度防禦安全架構的多層驗證機制：
 
 ```mermaid
 graph TB
-    Request[Game Provider Request]
+    Request[遊戲供應商請求]
 
     subgraph "Layer 1: Network Security"
-        Nginx[Nginx IP Whitelist<br/>- Check source IP against GP whitelist<br/>- Reject 403 if not whitelisted]
-        RateLimit[Rate Limiter<br/>- Global: 1000 req/s<br/>- Per-GP: 100 req/s<br/>- Return 429 if exceeded]
+        Nginx[Nginx IP 白名單<br/>- 檢查來源 IP 是否在 GP 白名單中<br/>- 若不在白名單則拒絕 403]
+        RateLimit[速率限制器<br/>- 全域限制: 1000 req/s<br/>- 單一 GP 限制: 100 req/s<br/>- 超過限制返回 429]
     end
 
     subgraph "Layer 2: Authentication"
-        APIKey[API Key Validation<br/>- Extract X-GP-ID header<br/>- Validate against GP registry<br/>- Check GP status ACTIVE]
-        Token[Token Validation<br/>- Base64 decode token<br/>- Verify HMAC-SHA256 signature<br/>- Check expiry 5-min window<br/>- Constant-time comparison]
+        APIKey[API Key 驗證<br/>- 提取 X-GP-ID header<br/>- 驗證 GP 註冊資訊<br/>- 檢查 GP 狀態為 ACTIVE]
+        Token[Token 驗證<br/>- Base64 解碼 token<br/>- 驗證 HMAC-SHA256 簽章<br/>- 檢查 5 分鐘有效期<br/>- 常數時間比對]
     end
 
     subgraph "Layer 3: Anti-Replay"
-        Replay[Redis Blacklist Check<br/>- SHA256 hash token<br/>- Check redis token:blacklist:*<br/>- Reject if exists TTL=5min]
+        Replay[Redis 黑名單檢查<br/>- SHA256 雜湊 token<br/>- 檢查 redis token:blacklist:*<br/>- 若存在則拒絕 TTL=5min]
     end
 
     subgraph "Layer 4: Idempotency"
-        Cache[Redis Cache Check<br/>- game:tx:response:txId<br/>- Return cached if exists]
-        DB[DB Unique Constraint<br/>- t_game_transaction.tx_id UNIQUE<br/>- ON CONFLICT DO NOTHING]
-        Lock[Distributed Lock<br/>- Redisson RLock per player<br/>- Prevent race conditions]
+        Cache[Redis 快取檢查<br/>- game:tx:response:txId<br/>- 若存在則返回快取結果]
+        DB[資料庫唯一約束<br/>- t_game_transaction.tx_id UNIQUE<br/>- ON CONFLICT DO NOTHING]
+        Lock[分散式鎖<br/>- Redisson RLock per player<br/>- 防止競態條件]
     end
 
-    Execute[Execute Business Logic<br/>Wallet Debit/Credit]
-    Response[Return Response + Cache]
+    Execute[執行業務邏輯<br/>錢包扣款/加款]
+    Response[返回回應 + 快取]
 
     Request --> Nginx
     Nginx -->|IP Whitelisted| RateLimit
@@ -88,42 +88,42 @@ graph TB
     style Response fill:#f3e5f5
 ```
 
-**Security Layer Responsibilities**:
+**安全層職責**：
 
-1. **Network Security (Layer 1)**:
-   - IP Whitelisting: Nginx `geo` module blocks unauthorized source IPs
-   - Rate Limiting: Redisson rate limiter prevents DDoS and abuse
+1. **網路安全層（Layer 1）**：
+   - IP 白名單：Nginx `geo` 模組阻擋未授權來源 IP
+   - 速率限制：Redisson 速率限制器防止 DDoS 和濫用
 
-2. **Authentication (Layer 2)**:
-   - API Key: Validates GP identity via `X-GP-ID` header
-   - Token: HMAC-SHA256 signature verification with constant-time comparison
+2. **身份驗證層（Layer 2）**：
+   - API Key：透過 `X-GP-ID` header 驗證 GP 身份
+   - Token：HMAC-SHA256 簽章驗證，採用常數時間比對
 
-3. **Anti-Replay (Layer 3)**:
-   - Redis blacklist prevents token reuse within 5-minute validity window
-   - SHA256 token hash reduces Redis key size
+3. **防重放層（Layer 3）**：
+   - Redis 黑名單防止 token 在 5 分鐘有效期內重複使用
+   - SHA256 token 雜湊減少 Redis key 大小
 
-4. **Idempotency (Layer 4)**:
-   - Redis Cache: O(1) lookup for duplicate requests (<5ms)
-   - DB Unique Constraint: Prevents double-execution at database level
-   - Distributed Lock: Prevents race conditions for concurrent first-time execution
+4. **冪等層（Layer 4）**：
+   - Redis 快取：O(1) 查詢重複請求（< 5ms）
+   - 資料庫唯一約束：在資料庫層級防止重複執行
+   - 分散式鎖：防止首次並發執行的競態條件
 
-**Performance Characteristics**:
-- Cache hit (Layer 4.1): ~5ms response time
-- DB hit (Layer 4.2): ~15ms response time
-- New transaction (Layer 4.3): ~50-100ms (includes lock acquisition + business logic)
+**效能特性**：
+- 快取命中（Layer 4.1）：約 5ms 回應時間
+- 資料庫命中（Layer 4.2）：約 15ms 回應時間
+- 新交易（Layer 4.3）：約 50-100ms（包含鎖獲取 + 業務邏輯）
 
 ---
 
-## 2. Token-Based Authentication
+## 2. Token 驗證機制（Token-Based Authentication）
 
-### 2.1 Token Generation
+### 2.1 Token 生成（Token Generation）
 
-**Token Composition**:
+**Token 組成結構**：
 ```
 Base64(playerId|tenantId|timestamp|signature)
 ```
 
-**HMAC-SHA256 Signature Algorithm**:
+**HMAC-SHA256 簽章演算法**：
 
 ```java
 @Service
@@ -194,7 +194,7 @@ public class GameTokenService {
 }
 ```
 
-### 2.2 Token Validation
+### 2.2 Token 驗證（Token Validation）
 
 ```java
 @Service
@@ -286,7 +286,7 @@ public class GameTokenValidator {
 }
 ```
 
-### 2.3 Token Validation Result
+### 2.3 Token 驗證結果（Token Validation Result）
 
 ```java
 @Getter
@@ -327,16 +327,16 @@ public class TokenValidationResult {
 
 ---
 
-## 3. Anti-Replay Protection
+## 3. 防重放保護（Anti-Replay Protection）
 
-### 3.1 Redis Blacklist Implementation
+### 3.1 Redis 黑名單實作（Redis Blacklist Implementation）
 
-**Architecture**:
+**架構**：
 ```
 Token → SHA256 Hash → Redis Blacklist (TTL = Token Validity)
 ```
 
-**Implementation**:
+**實作**：
 
 ```java
 @Service
@@ -391,7 +391,7 @@ public class AntiReplayService {
 }
 ```
 
-### 3.2 Blacklist Monitoring
+### 3.2 黑名單監控（Blacklist Monitoring）
 
 ```java
 @Component
@@ -413,9 +413,9 @@ public class BlacklistMetrics {
 
 ---
 
-## 4. Idempotency Three-Layer Defense
+## 4. 冪等三層防禦（Idempotency Three-Layer Defense）
 
-### 4.1 Architecture Diagram
+### 4.1 架構圖（Architecture Diagram）
 
 ```
 Request (txId)
@@ -435,7 +435,7 @@ Request (txId)
 Execute Business Logic
 ```
 
-### 4.2 Implementation
+### 4.2 實作（Implementation）
 
 ```java
 @Service
@@ -538,7 +538,7 @@ public class GameIdempotencyGuard {
 }
 ```
 
-### 4.3 Database Schema
+### 4.3 資料庫模式（Database Schema）
 
 ```sql
 CREATE TABLE t_game_transaction (
@@ -562,11 +562,11 @@ CREATE INDEX idx_game_tx_gp_created ON t_game_transaction(gp_id, created_at DESC
 
 ---
 
-## 5. Stalled Transaction Auto-Recovery
+## 5. 停滯交易自動恢復（Stalled Transaction Auto-Recovery）
 
-### 5.1 Detection SQL
+### 5.1 偵測 SQL（Detection SQL）
 
-**Scheduled Task** (every 10 minutes):
+**排程任務**（每 10 分鐘執行）：
 
 ```sql
 -- Detect stalled transactions (created > 10 minutes ago, no response)
@@ -585,7 +585,7 @@ ORDER BY created_at ASC
 LIMIT 100;
 ```
 
-### 5.2 Auto-Recovery Implementation
+### 5.2 自動恢復實作（Auto-Recovery Implementation）
 
 ```java
 @Component
@@ -715,9 +715,9 @@ public class StalledTransactionRecoveryJob {
 
 ---
 
-## 6. Rate Limiting
+## 6. 速率限制（Rate Limiting）
 
-### 6.1 Redisson Rate Limiter Configuration
+### 6.1 Redisson 速率限制器配置（Redisson Rate Limiter Configuration）
 
 ```java
 @Configuration
@@ -742,7 +742,7 @@ public class RateLimitConfig {
 }
 ```
 
-### 6.2 Rate Limiter Interceptor
+### 6.2 速率限制攔截器（Rate Limiter Interceptor）
 
 ```java
 @Component
@@ -786,7 +786,7 @@ public class GameAPIRateLimitInterceptor implements HandlerInterceptor {
 }
 ```
 
-### 6.3 Rate Limit Response
+### 6.3 速率限制回應（Rate Limit Response）
 
 ```java
 @Getter
@@ -812,11 +812,11 @@ public class RateLimitResponse {
 
 ---
 
-## 7. IP Whitelisting
+## 7. IP 白名單（IP Whitelisting）
 
-### 7.1 Nginx Configuration
+### 7.1 Nginx 配置（Nginx Configuration）
 
-**File**: `/etc/nginx/conf.d/game-api-ip-whitelist.conf`
+**檔案**：`/etc/nginx/conf.d/game-api-ip-whitelist.conf`
 
 ```nginx
 # IP Whitelist for Game Provider APIs
@@ -863,9 +863,9 @@ server {
 }
 ```
 
-### 7.2 Database-Driven IP Whitelist
+### 7.2 資料庫驅動的 IP 白名單（Database-Driven IP Whitelist）
 
-**Schema**:
+**資料庫模式**：
 
 ```sql
 CREATE TABLE t_gp_ip_whitelist (
@@ -886,7 +886,7 @@ CREATE INDEX idx_gp_ip_whitelist_gp ON t_gp_ip_whitelist(gp_id);
 CREATE INDEX idx_gp_ip_whitelist_ip ON t_gp_ip_whitelist(ip_address, enabled);
 ```
 
-**Implementation**:
+**實作**：
 
 ```java
 @Service
@@ -931,9 +931,9 @@ public class IPWhitelistService {
 
 ---
 
-## 8. Configuration Reference
+## 8. 配置參考（Configuration Reference）
 
-### 8.1 Redis Configuration
+### 8.1 Redis 配置（Redis Configuration）
 
 ```yaml
 spring:
@@ -949,7 +949,7 @@ spring:
         min-idle: 2
 ```
 
-### 8.2 Redisson Configuration
+### 8.2 Redisson 配置（Redisson Configuration）
 
 ```yaml
 # application.yml
@@ -964,7 +964,7 @@ redisson:
     lease-time: 10000  # 10 seconds
 ```
 
-### 8.3 Rate Limiting Configuration
+### 8.3 速率限制配置（Rate Limiting Configuration）
 
 ```yaml
 # application.yml
@@ -978,9 +978,9 @@ game:
 
 ---
 
-## 9. Monitoring Metrics
+## 9. 監控指標（Monitoring Metrics）
 
-### 9.1 Prometheus Metrics
+### 9.1 Prometheus 指標（Prometheus Metrics）
 
 ```java
 @Component
@@ -1022,41 +1022,41 @@ public class GameSecurityMetrics {
 }
 ```
 
-### 9.2 Grafana Dashboard Query Examples
+### 9.2 Grafana 儀表板查詢範例（Grafana Dashboard Query Examples）
 
-**Token Validation Success Rate**:
+**Token 驗證成功率**：
 ```promql
 sum(rate(game_token_validation_total{status="success"}[5m])) /
 sum(rate(game_token_validation_total[5m])) * 100
 ```
 
-**Replay Attack Detection Rate**:
+**重放攻擊偵測率**：
 ```promql
 rate(game_token_replay_attempts[5m])
 ```
 
-**Rate Limit Hit Rate**:
+**速率限制命中率**：
 ```promql
 sum(rate(game_api_rate_limit_hits[5m])) by (type)
 ```
 
-**IP Whitelist Rejection Rate**:
+**IP 白名單拒絕率**：
 ```promql
 sum(rate(game_api_ip_whitelist_rejections[5m])) by (gp_id)
 ```
 
 ---
 
-## 10. Security Best Practices
+## 10. 安全最佳實踐（Security Best Practices）
 
-### 10.1 HMAC Secret Rotation
+### 10.1 HMAC 金鑰輪換（HMAC Secret Rotation）
 
-**Rotation Strategy**:
-- Rotate GP API secrets every 90 days
-- Support dual-key grace period (7 days) during rotation
-- Store secrets in HashiCorp Vault (never in code or DB)
+**輪換策略**：
+- 每 90 天輪換 GP API 金鑰
+- 輪換期間支援雙金鑰寬限期（7 天）
+- 金鑰儲存於 HashiCorp Vault（絕不在程式碼或資料庫中儲存）
 
-**Implementation**:
+**實作**：
 
 ```java
 /**
@@ -1121,9 +1121,9 @@ public class SecretRotationService {
 }
 ```
 
-### 10.2 Timing Attack Prevention
+### 10.2 時序攻擊防護（Timing Attack Prevention）
 
-**Use constant-time comparison for all cryptographic operations**:
+**所有密碼學運算必須使用常數時間比對**：
 
 ```java
 /**
@@ -1145,9 +1145,9 @@ private boolean constantTimeEquals(String a, String b) {
 }
 ```
 
-### 10.3 Redis Security
+### 10.3 Redis 安全（Redis Security）
 
-**Configuration**:
+**配置**：
 ```yaml
 spring:
   redis:
@@ -1155,7 +1155,7 @@ spring:
     ssl: true                     # Use TLS for Redis connections
 ```
 
-**Redis ACL** (Redis 6.0+):
+**Redis ACL**（Redis 6.0+）：
 ```redis
 # Create dedicated user for game integration
 ACL SETUSER game_integration on >strong_password ~token:* ~game:* +@read +@write +setex +del
@@ -1163,14 +1163,14 @@ ACL SETUSER game_integration on >strong_password ~token:* ~game:* +@read +@write
 
 ---
 
-## Related Documents
+## 相關文檔
 
-- [Game_Integration_Requirements.md](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md) - Business requirements for game integration
-- [Seamless_Wallet_Technical.md](../02_Finance_Service/Seamless_Wallet_Technical.md) - Wallet API technical implementation
-- [Game_Integration_Implementation.md](./Game_Integration_Implementation.md) - Full-stack integration guide
+- [Game_Integration_Requirements.md](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md) - 遊戲整合業務需求
+- [Seamless_Wallet_Technical.md](../02_Finance_Service/Seamless_Wallet_Technical.md) - 錢包 API 技術實作
+- [Game_Integration_Implementation.md](./Game_Integration_Implementation.md) - 全端整合指南
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-09
-**Maintainer**: Backend Team & Security Team
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-09
+**維護團隊**: Backend Team & Security Team

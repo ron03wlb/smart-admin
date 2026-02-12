@@ -1,51 +1,51 @@
-# Activity Risk Control System Architecture
+# 活動風控系統架構（Activity Risk Control System Architecture）
 
-> **Canonical Source**: [04-03_Activity_Risk_Control.md](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md)
-> **Audience**: Architects, Backend Developers, DevOps
-> **Business Requirements**: [Activity_Risk_Requirements.md](../../requirements/04_Promotions_VIP/Activity_Risk_Requirements.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-This document covers the technical architecture of the activity risk control system, including detection algorithms, database schemas, API patterns, event processing pipelines, and activity template engine design.
+> **規範來源**: [04-03_Activity_Risk_Control.md](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md)
+> **目標讀者**: 架構師、後端開發、DevOps
+> **業務需求**: [Activity_Risk_Requirements.md](../../requirements/04_Promotions_VIP/Activity_Risk_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 2. Multi-Layer Risk Assessment Architecture
+## 1. 概述（Overview）
+
+本文檔涵蓋活動風控系統的技術架構，包括偵測演算法、資料庫結構、API 模式、事件處理管線，以及活動模板引擎設計。
+
+---
+
+## 2. 多層風險評估架構（Multi-Layer Risk Assessment Architecture）
 
 ```mermaid
 flowchart TB
-    subgraph Input["Input Layer"]
-        EVT[Player Events<br/>bet, deposit, claim]
+    subgraph Input["輸入層"]
+        EVT[玩家事件<br/>投注、存款、領取]
     end
 
-    subgraph Detection["Detection Pipeline"]
-        DEV[Device Layer<br/>Fingerprint, Emulator, GPS]
-        IDN[Identity Layer<br/>KYC, Document, Biometrics]
-        BHV[Behavior Layer<br/>Betting Pattern, Deposit/Withdraw]
-        NET[Network Layer<br/>Fraud Graph, Shared Attributes]
+    subgraph Detection["偵測管線"]
+        DEV[設備層<br/>裝置指紋、模擬器、GPS]
+        IDN[身份層<br/>KYC、文件驗證、生物識別]
+        BHV[行為層<br/>投注模式、存款/提款]
+        NET[網路層<br/>詐欺圖譜、共享屬性]
     end
 
-    subgraph Decision["Decision Engine"]
-        SCORE[Composite Risk Score]
-        RULES[Rule Evaluation]
-        ACTION[Action Dispatch]
+    subgraph Decision["決策引擎"]
+        SCORE[綜合風險評分]
+        RULES[規則評估]
+        ACTION[動作派發]
     end
 
     EVT --> DEV --> IDN --> BHV --> NET --> SCORE
     SCORE --> RULES --> ACTION
-    ACTION -->|BLOCK| BLK[Block Bonus Activation]
-    ACTION -->|FLAG| FLG[Flag for Review]
-    ACTION -->|ALLOW| ALW[Proceed Normally]
+    ACTION -->|BLOCK| BLK[封鎖獎金啟動]
+    ACTION -->|FLAG| FLG[標記待審]
+    ACTION -->|ALLOW| ALW[正常放行]
 ```
 
 ---
 
-## 3. Matched Betting Detection Service
+## 3. 配對投注偵測服務（Matched Betting Detection Service）
 
-### 3.1 Service Implementation
+### 3.1 Service 實作
 
 ```java
 /**
@@ -138,55 +138,55 @@ public class MatchedBettingDetectionService {
 }
 ```
 
-### 3.2 Risk Indicator Weight Configuration
+### 3.2 風險指標權重配置
 
-| Indicator | Flag Code | Weight | Threshold |
-|-----------|-----------|--------|-----------|
-| Pre-match timing | `PRE_MATCH_TIMING` | 20 | Within 15 min of match start |
-| High odds / low risk | `HIGH_ODDS_LOW_RISK` | 30 | Statistical analysis |
-| Near max bet | `NEAR_MAX_BET` | 15 | >90% of max allowed |
-| Rapid turnover | `RAPID_TURNOVER` | 25 | 35x in <12 hours |
-| No recreational betting | `NO_RECREATIONAL` | 20 | Zero casual bets |
+| 指標 | 旗標代碼 | 權重 | 門檻值 |
+|------|---------|------|--------|
+| 賽前時機 | `PRE_MATCH_TIMING` | 20 | 賽事開始前 15 分鐘內 |
+| 高賠率/低風險 | `HIGH_ODDS_LOW_RISK` | 30 | 統計分析 |
+| 接近最大投注額 | `NEAR_MAX_BET` | 15 | >90% 最大允許額度 |
+| 快速完成有效投注額 | `RAPID_TURNOVER` | 25 | 35x 在 <12 小時內 |
+| 無娛樂性投注 | `NO_RECREATIONAL` | 20 | 零休閒投注 |
 
 ---
 
-## 4. Bonus Hunter Detection Service
+## 4. 獎金獵人偵測服務（Bonus Hunter Detection Service）
 
-### 4.1 Risk Score Algorithm
+### 4.1 風險評分演算法
 
 ```
 Score = (DepositPattern x 0.2) + (BettingPattern x 0.3) +
         (WithdrawalPattern x 0.3) + (AccountActivity x 0.2)
 ```
 
-### 4.2 Behavioral Profile
+### 4.2 行為特徵檔案
 
 ```yaml
-Bonus Hunter Behavioral Signatures:
+獎金獵人行為特徵:
 
-  Registration:
-    - Registers only when bonus is active
-    - Uses bonus code or affiliate link
-    - Registration time correlates with promotion launch
+  註冊:
+    - 僅在獎金活動期間註冊
+    - 使用獎金代碼或聯盟連結
+    - 註冊時間與活動上線時間相關
 
-  Deposit:
-    - Deposits exact minimum required amount
-    - Activates bonus immediately after deposit
-    - No subsequent deposit behavior
+  存款:
+    - 存入恰好符合最低要求的金額
+    - 存款後立即啟用獎金
+    - 無後續存款行為
 
-  Betting:
-    - Selects highest-RTP games
-    - Bet amounts near minimum requirement
-    - No recreational bets (small/high-risk)
-    - No game exploration behavior
+  投注:
+    - 選擇最高 RTP 遊戲
+    - 投注額接近最低要求
+    - 無娛樂性投注（小額/高風險）
+    - 無遊戲探索行為
 
-  Withdrawal:
-    - Requests withdrawal immediately after wager completion
-    - Account goes dormant after withdrawal
-    - No return deposits
+  提款:
+    - 完成有效投注額後立即申請提款
+    - 提款後帳戶進入休眠狀態
+    - 無後續存款
 ```
 
-### 4.3 Service Implementation
+### 4.3 Service 實作
 
 ```java
 /**
@@ -264,113 +264,113 @@ public class BonusHunterDetectionService {
 
 ---
 
-## 5. Real-Time Detection Rules Engine
+## 5. 即時偵測規則引擎（Real-Time Detection Rules Engine）
 
-### 5.1 Blocking Rules (Immediate)
+### 5.1 封鎖規則（立即生效）
 
 ```yaml
-Instant Blocking Rules (BLOCK):
+即時封鎖規則 (BLOCK):
 
-  1. Multi-account strong link:
-     Condition: Same device + same bank account
-     Action: Block bonus activation
-     Code: BLOCK_MULTI_ACCOUNT
+  1. 多帳戶強關聯:
+     條件: 相同設備 + 相同銀行帳戶
+     動作: 封鎖獎金啟動
+     代碼: BLOCK_MULTI_ACCOUNT
 
-  2. Known bonus hunter:
-     Condition: Risk score >= 90
-     Action: Block bonus activation
-     Code: BLOCK_BONUS_HUNTER
+  2. 已知獎金獵人:
+     條件: 風險評分 >= 90
+     動作: 封鎖獎金啟動
+     代碼: BLOCK_BONUS_HUNTER
 
-  3. Blacklisted bank:
-     Condition: Bank account on blacklist
-     Action: Block deposit and bonus
-     Code: BLOCK_BLACKLISTED_BANK
+  3. 黑名單銀行:
+     條件: 銀行帳戶在黑名單中
+     動作: 封鎖存款及獎金
+     代碼: BLOCK_BLACKLISTED_BANK
 ```
 
-### 5.2 Flagging Rules (Deferred)
+### 5.2 標記規則（延後處理）
 
 ```yaml
-Delayed Detection Rules (FLAG):
+延後偵測規則 (FLAG):
 
-  1. Rapid turnover completion:
-     Condition: Completion time < 50% of expected
-     Action: Manual review on withdrawal
-     Code: FLAG_RAPID_TURNOVER
+  1. 快速完成有效投注額:
+     條件: 完成時間 < 預期時間 50%
+     動作: 提款時人工審核
+     代碼: FLAG_RAPID_TURNOVER
 
-  2. Matched betting suspicion:
-     Condition: 3+ suspicious indicators
-     Action: Flag for review
-     Code: FLAG_MATCHED_BETTING
+  2. 配對投注嫌疑:
+     條件: 3+ 可疑指標
+     動作: 標記待審
+     代碼: FLAG_MATCHED_BETTING
 
-  3. Bonus hunter suspicion:
-     Condition: Risk score 60-89
-     Action: Restrict future bonuses
-     Code: FLAG_BONUS_HUNTER_SUSPECT
+  3. 獎金獵人嫌疑:
+     條件: 風險評分 60-89
+     動作: 限制未來獎金資格
+     代碼: FLAG_BONUS_HUNTER_SUSPECT
 ```
 
 ---
 
-## 6. Risk Assessment Processing Flow
+## 6. 風險評估處理流程（Risk Assessment Processing Flow）
 
 ```mermaid
 stateDiagram-v2
-    [*] --> BonusClaimed: Player claims bonus
+    [*] --> BonusClaimed: 玩家領取獎金
 
-    BonusClaimed --> RealTimeCheck: Real-time risk check
-    RealTimeCheck --> Blocked: Blocking rule triggered
-    RealTimeCheck --> Flagged: Flagging rule triggered
-    RealTimeCheck --> Normal: Passed checks
+    BonusClaimed --> RealTimeCheck: 即時風控檢查
+    RealTimeCheck --> Blocked: 封鎖規則觸發
+    RealTimeCheck --> Flagged: 標記規則觸發
+    RealTimeCheck --> Normal: 檢查通過
 
-    Blocked --> [*]: Bonus cancelled
+    Blocked --> [*]: 獎金取消
 
-    Flagged --> TurnoverTracking: Turnover tracking
-    TurnoverTracking --> WithdrawalReview: Withdrawal review
-    WithdrawalReview --> Approved: Review passed
-    WithdrawalReview --> Forfeited: Bonus forfeited
+    Flagged --> TurnoverTracking: 有效投注額追蹤
+    TurnoverTracking --> WithdrawalReview: 提款審核
+    WithdrawalReview --> Approved: 審核通過
+    WithdrawalReview --> Forfeited: 獎金沒收
 
-    Normal --> TurnoverCompleted: Turnover completed
-    TurnoverCompleted --> BonusConverted: Bonus converted to cash
+    Normal --> TurnoverCompleted: 有效投注額完成
+    TurnoverCompleted --> BonusConverted: 獎金轉為現金
 
     Approved --> [*]
     Forfeited --> [*]
     BonusConverted --> [*]
 
     note right of Blocked
-        Instant block
-        No manual intervention
+        立即封鎖
+        無需人工介入
     end note
 
     note right of WithdrawalReview
-        Manual review
-        Complete within 24h
+        人工審核
+        24小時內完成
     end note
 ```
 
 ---
 
-## 7. Bonus Forfeiture Processing
+## 7. 獎金沒收處理（Bonus Forfeiture Processing）
 
 ```yaml
-Forfeiture Fund Handling:
+沒收資金處理:
 
-  Bonus balance: Full forfeiture
-  Cash balance: Retained (unless AML-related)
-  Pending bets:
-    - Bonus-funded: Cancel and forfeit
-    - Cash-funded: Settle normally
+  獎金餘額: 全額沒收
+  現金餘額: 保留（除非涉及 AML）
+  未結算注單:
+    - 獎金資助: 取消並沒收
+    - 現金資助: 正常結算
 
-  Post-forfeiture actions:
-    - Send notification email
-    - State violation reason
-    - Provide appeal channel
-    - Retain audit record
+  沒收後動作:
+    - 發送通知郵件
+    - 說明違規原因
+    - 提供申訴管道
+    - 保留審計記錄
 ```
 
 ---
 
-## 8. Database Schema
+## 8. 資料庫結構（Database Schema）
 
-### 8.1 Bonus Risk Assessment Table
+### 8.1 獎金風險評估表
 
 ```sql
 CREATE TABLE t_bonus_risk_assessment (
@@ -392,7 +392,7 @@ CREATE TABLE t_bonus_risk_assessment (
 );
 ```
 
-### 8.2 Matched Betting Detection Table
+### 8.2 配對投注偵測表
 
 ```sql
 CREATE TABLE t_matched_betting_detection (
@@ -413,7 +413,7 @@ CREATE TABLE t_matched_betting_detection (
 );
 ```
 
-### 8.3 Bonus Forfeiture Table
+### 8.3 獎金沒收表
 
 ```sql
 CREATE TABLE t_bonus_forfeiture (
@@ -438,9 +438,9 @@ CREATE TABLE t_bonus_forfeiture (
 
 ---
 
-## 9. Activity Template Engine
+## 9. 活動模板引擎（Activity Template Engine）
 
-### 9.1 Deposit Bonus Template
+### 9.1 存款獎金模板
 
 ```json
 {
@@ -462,7 +462,7 @@ CREATE TABLE t_bonus_forfeiture (
 }
 ```
 
-### 9.2 Daily Check-In Template
+### 9.2 每日簽到模板
 
 ```json
 {
@@ -484,7 +484,7 @@ CREATE TABLE t_bonus_forfeiture (
 }
 ```
 
-### 9.3 Leaderboard Tournament Template
+### 9.3 排行榜錦標賽模板
 
 ```json
 {
@@ -512,43 +512,43 @@ CREATE TABLE t_bonus_forfeiture (
 
 ---
 
-## 10. Dynamic Configuration Architecture
+## 10. 動態配置架構（Dynamic Configuration Architecture）
 
-### 10.1 Configuration Rules
+### 10.1 配置規則
 
-- **No hardcoding**: All rule parameters (thresholds, percentages, game lists) must be externalized to back-office configuration
-- **Configurable scope**:
-  - Trigger conditions: deposit amount, wagering multiplier, eligible games, valid period
-  - Reward parameters: bonus percentage, max cap, target wallet type
-  - Audience targeting: applicable countries, VIP tiers, exclusion lists
+- **禁止硬編碼**: 所有規則參數（門檻值、百分比、遊戲清單）必須外部化至後台配置
+- **可配置範圍**:
+  - 觸發條件: 存款金額、有效投注額倍數、合格遊戲、有效期限
+  - 獎勵參數: 獎金百分比、最大上限、目標錢包類型
+  - 受眾定位: 適用國家、VIP 等級、排除名單
 
-### 10.2 Approval Workflow Integration
+### 10.2 審批工作流程整合
 
 ```mermaid
 flowchart LR
     subgraph Creation
-        A[Maker: Create Draft] --> B[Configure Parameters]
+        A[製作者：建立草稿] --> B[配置參數]
     end
     subgraph Review
-        B --> C{Checker Review}
-        C -->|Approve| D[Status: Active]
-        C -->|Reject| E[Status: Rejected]
+        B --> C{審核者審核}
+        C -->|核准| D[狀態：啟用]
+        C -->|駁回| E[狀態：駁回]
     end
-    subgraph SensitiveChange["Sensitive Change"]
-        D --> F{Budget Increase<br/>or Wager Reduction?}
-        F -->|Yes| G[L2 Approval: CFO]
-        F -->|No| H[Standard Change]
+    subgraph SensitiveChange["敏感變更"]
+        D --> F{預算增加<br/>或投注要求降低？}
+        F -->|是| G[二級審批：CFO]
+        F -->|否| H[標準變更]
     end
 ```
 
 ---
 
-## 11. Monitoring Metrics (Technical)
+## 11. 監控指標（技術）（Monitoring Metrics）
 
-| Metric | Calculation | Alert Threshold | Collection Method |
-|--------|------------|-----------------|-------------------|
-| `bonus_abuse_rate` | Forfeitures / Claims | >5% | Aggregation query on `t_bonus_forfeiture` |
-| `matched_betting_detected` | Detection cases / day | >10 | Count on `t_matched_betting_detection` |
-| `bonus_hunter_score_avg` | AVG(risk_score) | >50 | Aggregation on `t_bonus_risk_assessment` |
-| `turnover_completion_time_avg` | AVG(completed_at - claimed_at) | <24h | Bonus claim history |
-| `bonus_roi` | Incremental NGR / Bonus cost | <1.0 | BI pipeline calculation |
+| 指標 | 計算方式 | 警報門檻值 | 收集方法 |
+|------|---------|-----------|---------|
+| `bonus_abuse_rate` | 沒收次數 / 領取次數 | >5% | 對 `t_bonus_forfeiture` 執行聚合查詢 |
+| `matched_betting_detected` | 偵測案例數 / 日 | >10 | 統計 `t_matched_betting_detection` |
+| `bonus_hunter_score_avg` | AVG(risk_score) | >50 | 對 `t_bonus_risk_assessment` 執行聚合 |
+| `turnover_completion_time_avg` | AVG(completed_at - claimed_at) | <24h | 獎金領取歷史 |
+| `bonus_roi` | 增量 NGR / 獎金成本 | <1.0 | BI 管線計算 |

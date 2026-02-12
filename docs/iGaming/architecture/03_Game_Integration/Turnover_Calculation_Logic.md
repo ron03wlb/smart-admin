@@ -1,46 +1,46 @@
-# Turnover Calculation Logic
+# 有效投注額計算邏輯（Turnover Calculation Logic）
 
-> **Canonical Source**: [source-archive/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 4.0.0
+> **規範來源**: [source-archive/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
+> **目標讀者**: 架構師、後端開發
+> **業務需求**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
+> **最後同步**: 2026-02-08
+> **來源版本**: 4.0.0
 
 ---
 
-## 1. Core Calculation Formula
+## 1. 核心計算公式（Core Calculation Formula）
 
 ```
 ValidTurnover = BetAmount × GameWeight × OddsFactor × StatusFactor × RiskFactor
 ```
 
-Where:
-- **RiskFactor**: `1` (Pass) or `0` (Block/Flag) - Determined by Layer 1
-- **StatusFactor**: `1.0` (WIN/LOSS) or `0` (DRAW/VOID) - Determined by Layer 2
-- **GameWeight**: `1.0` (Slots) to `0.05` (Poker) - Applied by Layer 3
+其中：
+- **RiskFactor**: `1`（通過）或 `0`（封鎖/標記）- 由第一層決定
+- **StatusFactor**: `1.0`（WIN/LOSS）或 `0`（DRAW/VOID）- 由第二層決定
+- **GameWeight**: `1.0`（老虎機）至 `0.05`（撲克）- 由第三層應用
 
 ---
 
-## 2. Three-Layer Validation Architecture
+## 2. 三層驗證架構（Three-Layer Validation Architecture）
 
-### 2.1 Architecture Overview
+### 2.1 架構總覽（Architecture Overview）
 
 ```mermaid
 graph TB
-    subgraph "Player Bet"
-        A["Player Bet<br/>Amount: $100<br/>Game: Baccarat<br/>Odds: 1.95"]
+    subgraph "玩家投注"
+        A["玩家投注<br/>Amount: $100<br/>Game: Baccarat<br/>Odds: 1.95"]
     end
 
-    subgraph "Layer 1: Risk Engine (05-01)"
-        B["Hedge Detection"]
-        C["Arbitrage Detection"]
-        D["Low Odds Filter<br/>Threshold: 1.5"]
+    subgraph "第一層：風控引擎 (05-01)"
+        B["對沖檢測"]
+        C["套利檢測"]
+        D["低賠率過濾<br/>Threshold: 1.5"]
         E["Output: valid_bet<br/>+ action_type<br/>(BLOCK/FLAG/PASS)"]
     end
 
-    subgraph "Layer 2: Finance Center (02-04)"
-        F["Bet Settlement"]
-        G["Record Settlement Status"]
+    subgraph "第二層：財務中心 (02-04)"
+        F["注單結算"]
+        G["記錄結算狀態"]
         H{Bet Status?}
         I["WIN/LOSS<br/>Record Status"]
         J["DRAW/TIE<br/>Record Status"]
@@ -49,8 +49,8 @@ graph TB
         M["Output: valid_bet<br/>(unchanged)"]
     end
 
-    subgraph "Layer 3: Activity System (04-01)"
-        N["Apply Game Weight"]
+    subgraph "第三層：活動系統 (04-01)"
+        N["應用遊戲權重"]
         O{Game Type?}
         P["Slots/Sports<br/>Weight: 1.0"]
         Q["Baccarat<br/>Weight: 0.15"]
@@ -59,10 +59,10 @@ graph TB
         T["Output: activity_valid_turnover"]
     end
 
-    subgraph "Applications"
-        U["Rebate Calculation"]
-        V["Wagering Progress"]
-        W["VIP Upgrade"]
+    subgraph "應用場景"
+        U["返水計算"]
+        V["有效投注額進度"]
+        W["VIP 升級"]
     end
 
     A --> B
@@ -102,9 +102,9 @@ graph TB
 
 ---
 
-## 3. Layer 1: Risk Engine Validation
+## 3. 第一層：風控引擎驗證（Layer 1: Risk Engine Validation）
 
-### 3.1 Risk Validation Result Interface
+### 3.1 風控驗證結果介面（Risk Validation Result Interface）
 
 ```typescript
 interface RiskValidationResult {
@@ -116,34 +116,34 @@ interface RiskValidationResult {
 }
 ```
 
-### 3.2 Hedge Detection Flow
+### 3.2 對沖檢測流程（Hedge Detection Flow）
 
 ```mermaid
 flowchart TD
-    A[Start: Hedge Detection]
-    B["Get bet info<br/>player_id, round_id<br/>selection, amount"]
-    C["Query same Round<br/>all bets from player"]
-    D{"Opposite bets<br/>exist?"}
+    A[開始：對沖檢測]
+    B["取得投注資訊<br/>player_id, round_id<br/>selection, amount"]
+    C["查詢同一回合<br/>玩家所有投注"]
+    D{"是否存在<br/>反向投注？"}
 
-    subgraph Example["Example: Baccarat"]
-        E1[Bet Banker $1000]
-        E2[Bet Player $950]
-        E3["Hedge Detected<br/>Opposite bets"]
+    subgraph Example["範例：百家樂"]
+        E1[投注莊家 $1000]
+        E2[投注閒家 $950]
+        E3["對沖檢測<br/>反向投注"]
     end
 
-    F[Mark as hedge bet]
-    G["action_type = BLOCK<br/>(or FLAG per config)"]
+    F[標記為對沖投注]
+    G["action_type = BLOCK<br/>(或依配置 FLAG)"]
     H[effective_turnover = 0]
-    I[No hedge detected]
-    J[Continue validation]
+    I[未檢測到對沖]
+    J[繼續驗證]
 
-    End([End: Return result])
+    End([結束：返回結果])
 
     A --> B
     B --> C
     C --> D
-    D -->|Yes| F
-    D -->|No| I
+    D -->|是| F
+    D -->|否| I
 
     F --> G
     G --> H
@@ -157,32 +157,32 @@ flowchart TD
     style I fill:#d4edda
 ```
 
-### 3.3 Odds Threshold Validation
+### 3.3 賠率門檻驗證（Odds Threshold Validation）
 
 ```mermaid
 flowchart TD
-    A[Start: Odds Validation]
-    B["Read config<br/>MIN_ODDS_THRESHOLD = 1.5"]
-    C["Get bet odds<br/>odds = 1.95"]
+    A[開始：賠率驗證]
+    B["讀取配置<br/>MIN_ODDS_THRESHOLD = 1.5"]
+    C["取得投注賠率<br/>odds = 1.95"]
     D{odds >= threshold?}
-    E["Odds valid<br/>Pass validation"]
-    F["Low odds bet<br/>action_type = BLOCK"]
+    E["賠率有效<br/>通過驗證"]
+    F["低賠率投注<br/>action_type = BLOCK"]
     G[effective_turnover = 0]
 
-    subgraph Examples["Odds Examples"]
-        EX1[1.95 -> Pass]
-        EX2[1.50 -> Pass]
-        EX3[1.30 -> Reject]
-        EX4[1.01 -> Reject]
+    subgraph Examples["賠率範例"]
+        EX1[1.95 -> 通過]
+        EX2[1.50 -> 通過]
+        EX3[1.30 -> 拒絕]
+        EX4[1.01 -> 拒絕]
     end
 
-    End([Return result])
+    End([返回結果])
 
     A --> B
     B --> C
     C --> D
-    D -->|Yes| E
-    D -->|No| F
+    D -->|是| E
+    D -->|否| F
 
     E --> End
     F --> G
@@ -193,7 +193,7 @@ flowchart TD
     style G fill:#f8d7da
 ```
 
-### 3.4 Layer 1 Processing Logic (v2.1.0)
+### 3.4 第一層處理邏輯（Layer 1 Processing Logic）（v2.1.0）
 
 ```typescript
 // Correct approach (v2.1.0): Short-circuit on Layer 1 rejection
@@ -225,9 +225,9 @@ const valid_turnover_finance = calculateFinanceTurnover(
 
 ---
 
-## 4. Layer 2: Finance Status Recording
+## 4. 第二層：財務狀態記錄（Layer 2: Finance Status Recording）
 
-### 4.1 Status Factor Mapping
+### 4.1 狀態因子對應（Status Factor Mapping）
 
 ```typescript
 /**
@@ -253,35 +253,35 @@ function getStatusFactor(status: BetStatus): number {
 }
 ```
 
-### 4.2 Finance Layer Flow
+### 4.2 財務層流程（Finance Layer Flow）
 
 ```mermaid
 flowchart TD
-    A[Start: Finance Layer]
-    B["Input: valid_bet<br/>= $100<br/>from Layer 1, immutable"]
-    C["Get bet status<br/>bet.status"]
+    A[開始：財務層]
+    B["輸入：valid_bet<br/>= $100<br/>from Layer 1, immutable"]
+    C["取得投注狀態<br/>bet.status"]
     D{Bet Status}
 
-    E["WIN<br/>Player wins"]
+    E["WIN<br/>玩家獲勝"]
     F["Record: settlement_status = WIN<br/>Calculate payout"]
 
-    G["LOSS<br/>Player loses"]
+    G["LOSS<br/>玩家輸"]
     H["Record: settlement_status = LOSS<br/>Calculate payout"]
 
-    I["DRAW/TIE<br/>Draw"]
+    I["DRAW/TIE<br/>平局"]
     J["Record: settlement_status = DRAW<br/>Return stake"]
 
-    K["VOID/CANCEL<br/>Voided"]
+    K["VOID/CANCEL<br/>作廢"]
     L["Record: settlement_status = VOID<br/>Return stake"]
 
-    M["HALF_WIN/HALF_LOSS<br/>Partial result"]
+    M["HALF_WIN/HALF_LOSS<br/>部分結果"]
     N["Record: settlement_status<br/>Calculate partial payout"]
 
-    O["Update database<br/>settlement_status<br/>payout_amount"]
+    O["更新資料庫<br/>settlement_status<br/>payout_amount"]
 
-    P["valid_bet unchanged<br/>= $100<br/>not affected by status"]
+    P["valid_bet 不變<br/>= $100<br/>不受狀態影響"]
 
-    End([Return: valid_bet $100<br/>+ settlement_status])
+    End([返回：valid_bet $100<br/>+ settlement_status])
 
     A --> B
     B --> C
@@ -313,9 +313,9 @@ flowchart TD
 
 ---
 
-## 5. Layer 3: Activity Weight Application
+## 5. 第三層：活動權重應用（Layer 3: Activity Weight Application）
 
-### 5.1 Game Weight Configuration
+### 5.1 遊戲權重配置（Game Weight Configuration）
 
 ```typescript
 /**
@@ -340,45 +340,45 @@ function getGameWeight(gameType: GameType): number {
 }
 ```
 
-### 5.2 Activity Layer Flow
+### 5.2 活動層流程（Activity Layer Flow）
 
 ```mermaid
 flowchart TD
-    A[Start: Activity Layer]
-    B["Input: valid_turnover_finance<br/>= $100"]
-    C["Get game type<br/>game_type"]
+    A[開始：活動層]
+    B["輸入：valid_turnover_finance<br/>= $100"]
+    C["取得遊戲類型<br/>game_type"]
     D{Game Type}
 
-    E["Slots<br/>Slot Machine"]
-    F["game_weight = 1.0<br/>100% contribution"]
+    E["老虎機<br/>Slot Machine"]
+    F["game_weight = 1.0<br/>100% 貢獻"]
 
-    G["Sports<br/>Sports Betting"]
-    H["game_weight = 1.0<br/>100% contribution"]
+    G["體育博彩<br/>Sports Betting"]
+    H["game_weight = 1.0<br/>100% 貢獻"]
 
-    I["Baccarat<br/>Baccarat"]
-    J["game_weight = 0.15<br/>15% contribution"]
+    I["百家樂<br/>Baccarat"]
+    J["game_weight = 0.15<br/>15% 貢獻"]
 
-    K["Blackjack<br/>Blackjack"]
-    L["game_weight = 0.1<br/>10% contribution"]
+    K["21點<br/>Blackjack"]
+    L["game_weight = 0.1<br/>10% 貢獻"]
 
-    M["Roulette<br/>Roulette"]
-    N["game_weight = 0.2<br/>20% contribution"]
+    M["輪盤<br/>Roulette"]
+    N["game_weight = 0.2<br/>20% 貢獻"]
 
-    O["Live Casino<br/>Live Dealer"]
-    P["game_weight = 0.15<br/>15% contribution"]
+    O["真人娛樂場<br/>Live Dealer"]
+    P["game_weight = 0.15<br/>15% 貢獻"]
 
-    Q["Calculate activity turnover<br/>activity_valid_turnover<br/>= finance x weight"]
+    Q["計算活動有效投注額<br/>activity_valid_turnover<br/>= finance x weight"]
 
-    R["Query player bonuses<br/>player_bonuses"]
-    S["Update wagering progress<br/>wagering_completed += activity_valid_turnover"]
-    T["Calculate completion percentage<br/>progress = completed / required"]
+    R["查詢玩家紅利<br/>player_bonuses"]
+    S["更新流水進度<br/>wagering_completed += activity_valid_turnover"]
+    T["計算完成百分比<br/>progress = completed / required"]
 
-    U{Wagering complete?}
-    V["Mark activity complete<br/>status = 'completed'"]
-    W["Unlock withdrawal<br/>Update withdrawable balance"]
-    X["Keep tracking<br/>status = 'active'"]
+    U{流水完成？}
+    V["標記活動完成<br/>status = 'completed'"]
+    W["解鎖提款<br/>Update withdrawable balance"]
+    X["繼續追蹤<br/>status = 'active'"]
 
-    End([Return: Wagering Progress])
+    End([返回：流水進度])
 
     A --> B
     B --> C
@@ -410,8 +410,8 @@ flowchart TD
     S --> T
     T --> U
 
-    U -->|Yes| V
-    U -->|No| X
+    U -->|是| V
+    U -->|否| X
 
     V --> W
     W --> End
@@ -429,19 +429,19 @@ flowchart TD
 
 ---
 
-## 6. Valid Bet Calculation by Game Type
+## 6. 依遊戲類型計算有效投注（Valid Bet Calculation by Game Type）
 
-### 6.1 Calculation Formulas
+### 6.1 計算公式（Calculation Formulas）
 
-| Game Type | Condition | effectiveStake Formula |
-|-----------|-----------|------------------------|
+| 遊戲類型 | 條件 | effectiveStake 公式 |
+|---------|------|-------------------|
 | **SPORTS / E-SPORTS** | - | `|winAmount + lossAmount|` |
-| **CASINO** | Draw (payout == betAmount) | `0` |
-| **CASINO** | Win (winAmount > 0) | `min(winAmount, betAmount)` |
-| **CASINO** | Loss (winAmount == 0) | `betAmount` |
-| **Other Types** | - | `betAmount` |
+| **CASINO** | 平局（payout == betAmount）| `0` |
+| **CASINO** | 獲勝（winAmount > 0）| `min(winAmount, betAmount)` |
+| **CASINO** | 輸（winAmount == 0）| `betAmount` |
+| **其他類型** | - | `betAmount` |
 
-### 6.2 Implementation
+### 6.2 實作（Implementation）
 
 ```typescript
 /**
@@ -479,7 +479,7 @@ function getEffectiveStake(bet: Transaction): number {
 }
 ```
 
-### 6.3 effectiveStake and lockAmount Relationship
+### 6.3 effectiveStake 與 lockAmount 關係
 
 ```typescript
 /**
@@ -494,16 +494,16 @@ function addEffectiveStake(amount: number): void {
 }
 ```
 
-**Example**:
-- Before: lockAmount=500, effectiveStake=100
-- Bet settlement produces effectiveStake=200
-- After: lockAmount=300, effectiveStake=300
+**範例**：
+- 之前：lockAmount=500, effectiveStake=100
+- 注單結算產生 effectiveStake=200
+- 之後：lockAmount=300, effectiveStake=300
 
 ---
 
-## 7. Free Spins Turnover Calculation
+## 7. 免費旋轉有效投注額計算（Free Spins Turnover Calculation）
 
-### 7.1 GGR Calculation Implementation
+### 7.1 GGR 計算實作（GGR Calculation Implementation）
 
 ```typescript
 /**
@@ -548,9 +548,9 @@ public calculateGGR(date: LocalDate): GgrReport {
 
 ---
 
-## 8. Database Schema
+## 8. 資料庫結構（Database Schema）
 
-### 8.1 Wagering Details Table
+### 8.1 流水詳情表（Wagering Details Table）
 
 ```sql
 -- wagering_details table (valid bet records)
@@ -583,7 +583,7 @@ CREATE TABLE wagering_details (
 );
 ```
 
-### 8.2 Wagering Progress Table
+### 8.2 流水進度表（Wagering Progress Table）
 
 ```sql
 -- wagering_progress table (aggregated view)
@@ -604,7 +604,7 @@ CREATE TABLE wagering_progress (
 );
 ```
 
-### 8.3 Recalculation Task Table
+### 8.3 重算任務表（Recalculation Task Table）
 
 ```sql
 -- Recalculation task table
@@ -646,19 +646,19 @@ CREATE TABLE t_turnover_recalculation_task (
 
 ---
 
-## 9. SmartAdmin Layer Mapping
+## 9. SmartAdmin 層級對應（SmartAdmin Layer Mapping）
 
-### 9.1 Layer Responsibilities
+### 9.1 層級職責（Layer Responsibilities）
 
-| Layer | Class Pattern | Responsibility | Annotation Restrictions |
-|-------|---------------|----------------|------------------------|
-| **Controller** | `TurnoverController` | HTTP requests, parameter validation, return ResponseDTO | No @Transactional |
-| **Service** | `TurnoverService` | Business coordination, call Manager/Dao, return Option/Try | No @Transactional |
-| **Manager** | `TurnoverCalculationManager` | Transaction management, cross-table operations, cache control | @Transactional ONLY here |
-| **Dao** | `BetTurnoverRecordDao` | Database CRUD, MyBatis Mapper | No business logic |
-| **Entity** | `BetTurnoverRecordEntity` | Data model, 1:1 table mapping | No business logic |
+| 層級 | 類別模式 | 職責 | 註解限制 |
+|------|---------|------|---------|
+| **Controller** | `TurnoverController` | HTTP 請求、參數驗證、返回 ResponseDTO | 不可使用 @Transactional |
+| **Service** | `TurnoverService` | 業務協調、調用 Manager/Dao、返回 Option/Try | 不可使用 @Transactional |
+| **Manager** | `TurnoverCalculationManager` | 交易管理、跨表操作、快取控制 | 僅此層可使用 @Transactional |
+| **Dao** | `BetTurnoverRecordDao` | 資料庫 CRUD、MyBatis Mapper | 無業務邏輯 |
+| **Entity** | `BetTurnoverRecordEntity` | 資料模型、1:1 表格映射 | 無業務邏輯 |
 
-### 9.2 Entity Layer
+### 9.2 Entity 層
 
 ```java
 @Data
@@ -716,7 +716,7 @@ public class BetTurnoverRecordEntity extends SmartBaseEntity {
 }
 ```
 
-### 9.3 Manager Layer
+### 9.3 Manager 層
 
 ```java
 @Component  // SmartAdmin Pattern: Manager uses @Component, not @Service
@@ -817,7 +817,7 @@ public class TurnoverCalculationManager {
 }
 ```
 
-### 9.4 Service Layer
+### 9.4 Service 層
 
 ```java
 @Service
@@ -864,7 +864,7 @@ public class TurnoverService {
 }
 ```
 
-### 9.5 Controller Layer
+### 9.5 Controller 層
 
 ```java
 @RestController
@@ -905,107 +905,107 @@ public class TurnoverController {
 
 ---
 
-## 10. End-to-End Sequence Diagram
+## 10. 端到端時序圖（End-to-End Sequence Diagram）
 
 ```mermaid
 sequenceDiagram
     autonumber
 
-    participant Player as Player
-    participant Game as Game Provider
-    participant Platform as Platform Core
-    participant Risk as Risk Engine<br/>(05-01)
-    participant Finance as Finance Center<br/>(02-04)
-    participant Activity as Activity System<br/>(04-01)
-    participant Wallet as Wallet System<br/>(02-06)
-    participant DB as Database
+    participant Player as 玩家
+    participant Game as 遊戲供應商
+    participant Platform as 平台核心
+    participant Risk as 風控引擎<br/>(05-01)
+    participant Finance as 財務中心<br/>(02-04)
+    participant Activity as 活動系統<br/>(04-01)
+    participant Wallet as 錢包系統<br/>(02-06)
+    participant DB as 資料庫
 
     rect rgb(240, 248, 255)
-        Note over Player,Game: ===== Phase 1: Betting Phase =====
+        Note over Player,Game: ===== 階段 1：投注階段 =====
     end
 
-    Player->>Game: 1. Place Bet<br/>Amount: $100, Game: Baccarat, Odds: 1.95
+    Player->>Game: 1. 下注<br/>Amount: $100, Game: Baccarat, Odds: 1.95
     Game->>Platform: 2. Debit Request
-    Platform->>Wallet: 3. Lock player funds
-    Wallet->>DB: 4. Update wallet<br/>playable_balance -= 100
-    DB-->>Wallet: 5. Confirm deduction
+    Platform->>Wallet: 3. 鎖定玩家資金
+    Wallet->>DB: 4. 更新錢包<br/>playable_balance -= 100
+    DB-->>Wallet: 5. 確認扣除
     Wallet-->>Platform: 6. Return Transaction ID
     Platform-->>Game: 7. Debit Success
-    Game-->>Player: 8. Bet Confirmed<br/>Round ID: round_12345
+    Game-->>Player: 8. 投注確認<br/>Round ID: round_12345
 
     rect rgb(255, 250, 240)
-        Note over Player,DB: ===== Phase 2: Settlement Phase =====
+        Note over Player,DB: ===== 階段 2：結算階段 =====
     end
 
-    Note over Game: Result: Player wins $195
+    Note over Game: 結果：玩家獲勝 $195
     Game->>Platform: 9. Credit Request<br/>Amount: $195, Status: WIN
-    Platform->>DB: 10. Record bet result<br/>bet_id, status=WIN, win_amount=195
+    Platform->>DB: 10. 記錄投注結果<br/>bet_id, status=WIN, win_amount=195
 
     rect rgb(240, 255, 240)
-        Note over Risk,Activity: ===== Phase 3: Layer 1 Risk Validation =====
+        Note over Risk,Activity: ===== 階段 3：第一層風控驗證 =====
     end
 
     Platform->>Risk: 11. validateTurnover(bet_id)
-    Risk->>Risk: 12a. Hedge Detection
-    Risk->>DB: 12b. Query same-round bets
-    DB-->>Risk: 12c. No hedge detected
-    Risk->>Risk: 13a. Arbitrage Detection
-    Risk->>Risk: 14a. Odds Validation<br/>odds=1.95 >= 1.5
-    Risk-->>Platform: 15. Validation passed<br/>{is_valid: true, valid_bet: 100}
+    Risk->>Risk: 12a. 對沖檢測
+    Risk->>DB: 12b. 查詢同回合投注
+    DB-->>Risk: 12c. 未檢測到對沖
+    Risk->>Risk: 13a. 套利檢測
+    Risk->>Risk: 14a. 賠率驗證<br/>odds=1.95 >= 1.5
+    Risk-->>Platform: 15. 驗證通過<br/>{is_valid: true, valid_bet: 100}
 
     rect rgb(255, 250, 250)
-        Note over Finance,Activity: ===== Phase 4: Layer 2 Finance Recording =====
+        Note over Finance,Activity: ===== 階段 4：第二層財務記錄 =====
     end
 
     Platform->>Finance: 16. recordSettlement(bet_id)
-    Finance->>Finance: 17. Record status<br/>settlement_status = "WIN"
-    Finance->>DB: 19. Update bet record
-    Finance-->>Platform: 20. Return result<br/>{valid_bet: 100, status: 'WIN'}
+    Finance->>Finance: 17. 記錄狀態<br/>settlement_status = "WIN"
+    Finance->>DB: 19. 更新投注記錄
+    Finance-->>Platform: 20. 返回結果<br/>{valid_bet: 100, status: 'WIN'}
 
     rect rgb(248, 240, 255)
-        Note over Activity,Wallet: ===== Phase 5: Layer 3 Game Weight =====
+        Note over Activity,Wallet: ===== 階段 5：第三層遊戲權重 =====
     end
 
     Platform->>Activity: 21. applyGameWeight()
-    Activity->>DB: 22. Query player bonuses
-    DB-->>Activity: 23. Return bonus list
-    Activity->>Activity: 24. Get weight<br/>Baccarat = 0.15
-    Activity->>Activity: 25. Calculate contribution<br/>$100 x 0.15 = $15
-    Activity->>DB: 26. Update progress<br/>wagering_completed += 15
-    Activity-->>Platform: 28. Return progress<br/>{contributed: 15, progress: 0.3%}
+    Activity->>DB: 22. 查詢玩家紅利
+    DB-->>Activity: 23. 返回紅利列表
+    Activity->>Activity: 24. 取得權重<br/>Baccarat = 0.15
+    Activity->>Activity: 25. 計算貢獻<br/>$100 x 0.15 = $15
+    Activity->>DB: 26. 更新進度<br/>wagering_completed += 15
+    Activity-->>Platform: 28. 返回進度<br/>{contributed: 15, progress: 0.3%}
 
     rect rgb(255, 245, 240)
-        Note over Platform,Player: ===== Phase 6: Payout & Notification =====
+        Note over Platform,Player: ===== 階段 6：支付與通知 =====
     end
 
-    Platform->>Wallet: 29. Credit $195 to player
-    Wallet->>DB: 30. Update wallet balance
-    Wallet-->>Platform: 31. Payout success
-    Platform->>Player: 32. Push notification<br/>Won $195, Progress: +$15
+    Platform->>Wallet: 29. 派彩 $195 給玩家
+    Wallet->>DB: 30. 更新錢包餘額
+    Wallet-->>Platform: 31. 支付成功
+    Platform->>Player: 32. 推送通知<br/>獲勝 $195，流水進度：+$15
 ```
 
 ---
 
-## 11. Reconciliation System
+## 11. 對帳系統（Reconciliation System）
 
-### 11.1 Three-Layer Reconciliation
+### 11.1 三層對帳（Three-Layer Reconciliation）
 
-#### Layer 1: Real-time Stream Check
-- **Timing**: 1-5 minutes after `GameEnd` or `Settlement` webhook
-- **Mechanism**: Query GP API for transaction status comparison
-- **Purpose**: Quick fix for latency issues
+#### 第一層：即時流式檢查（Layer 1: Real-time Stream Check）
+- **時機**：`GameEnd` 或 `Settlement` webhook 後 1-5 分鐘
+- **機制**：查詢 GP API 進行交易狀態比對
+- **目的**：快速修復延遲問題
 
-#### Layer 2: Near Real-time Batch
-- **Timing**: Every 10-30 minutes
-- **Mechanism**: Fetch GP history API, Anti-Join with DB
-- **Purpose**: Self-healing for lost callbacks
+#### 第二層：準即時批次（Layer 2: Near Real-time Batch）
+- **時機**：每 10-30 分鐘
+- **機制**：抓取 GP 歷史 API，與資料庫進行 Anti-Join
+- **目的**：自我修復丟失的回調
 
-#### Layer 3: T+1 Daily Settlement
-- **Timing**: Daily at 02:00 after GP produces settlement files
-- **Mechanism**: Full Outer Join comparison
-- **Purpose**: Final settlement reconciliation
+#### 第三層：T+1 每日結算（Layer 3: T+1 Daily Settlement）
+- **時機**：每日 02:00（GP 產生結算檔案後）
+- **機制**：完整外部連接比對
+- **目的**：最終結算對帳
 
-### 11.2 Reconciliation Data Flow
+### 11.2 對帳資料流（Reconciliation Data Flow）
 
 ```mermaid
 graph TD
@@ -1015,70 +1015,70 @@ graph TD
     classDef alert fill:#990000,stroke:#ff3333,stroke-width:2px,color:#fff;
     classDef success fill:#006600,stroke:#00ff00,stroke-width:2px,color:#fff;
 
-    GP_API[Game Provider API/File]:::process -->|1. Fetch/Download| Staging[Staging Area<br/>Raw Data]:::process
+    GP_API[Game Provider API/檔案]:::process -->|1. 抓取/下載| Staging[暫存區<br/>原始資料]:::process
 
-    Platform_DB[(Platform Ledger)]:::database -->|2. Extract| Reconciliation_Engine[Reconciliation Engine]:::process
+    Platform_DB[(平台帳本)]:::database -->|2. 提取| Reconciliation_Engine[對帳引擎]:::process
 
     Staging --> Reconciliation_Engine
 
-    Reconciliation_Engine -->|3. Compare Logic| Logic{Match?}:::decision
+    Reconciliation_Engine -->|3. 比對邏輯| Logic{匹配？}:::decision
 
-    Logic -- Yes --> Mark_Verified[Mark as Verified]:::success
+    Logic -- 是 --> Mark_Verified[標記已驗證]:::success
 
-    Logic -- No: Missing --> Action_Recover[Create Missing Transaction]:::process
+    Logic -- 否：缺失 --> Action_Recover[建立缺失交易]:::process
 
-    Logic -- No: Diff --> Action_Adjust[Create Adjustment Record]:::process
+    Logic -- 否：差異 --> Action_Adjust[建立調整記錄]:::process
 
-    Logic -- No: Ghost --> Alert_Risk[Trigger Risk Alert]:::alert
+    Logic -- 否：幽靈 --> Alert_Risk[觸發風險告警]:::alert
 
-    Action_Recover --> SaveTx[Save Transaction]:::database
+    Action_Recover --> SaveTx[儲存交易]:::database
 
     Action_Adjust --> SaveTx
 
-    Mark_Verified --> End((Process End)):::process
+    Mark_Verified --> End((流程結束)):::process
 
     SaveTx --> Platform_DB
 
-    SaveTx --> CacheRes[Update Redis Cache]:::process
+    SaveTx --> CacheRes[更新 Redis 快取]:::process
 
-    CacheRes --> Resp[Generate Admin Report/API]:::process
+    CacheRes --> Resp[產生管理報告/API]:::process
 ```
 
 ---
 
-## 12. Monitoring & Alerting
+## 12. 監控與告警（Monitoring & Alerting）
 
-### 12.1 Prometheus Metrics
+### 12.1 Prometheus 指標
 
 ```yaml
 metrics:
   # Turnover calculation performance
   - name: finance.turnover.calculation.latency_p99
     type: histogram
-    description: Turnover calculation latency (P99)
+    description: 有效投注額計算延遲（P99）
     unit: milliseconds
     target: "< 100ms"
 
   # Risk engine call success rate
   - name: finance.turnover.risk_engine.call.success_rate
     type: gauge
-    description: Risk engine call success rate
+    description: 風控引擎調用成功率
     target: "> 99.9%"
 
   # Daily reconciliation deviation rate
   - name: finance.turnover.daily_reconciliation.deviation_rate
     type: gauge
-    description: Daily reconciliation deviation rate
+    description: 每日對帳偏差率
     target: "< 0.01%"
 
   # Event publish success rate
   - name: finance.turnover.event_publish.success_rate
     type: gauge
-    description: Kafka event publish success rate
+    description: Kafka 事件發布成功率
     target: "> 99.99%"
 ```
 
-### 12.2 Alert Rules
+### 12.2 告警規則（Alert Rules）
 
 ```yaml
 alerts:
@@ -1105,7 +1105,7 @@ alerts:
 
 ---
 
-## 13. ArchUnit Validation Rules
+## 13. ArchUnit 驗證規則（ArchUnit Validation Rules）
 
 ```java
 @AnalyzeClasses(packages = "net.lab1024.sa.business.module.finance.turnover")
@@ -1153,56 +1153,56 @@ public class TurnoverModuleArchitectureTest {
 
 ---
 
-## 14. Performance Considerations
+## 14. 效能考量（Performance Considerations）
 
-### 14.1 Optimization Strategies
+### 14.1 優化策略（Optimization Strategies）
 
-| Strategy | Implementation | Impact |
-|----------|----------------|--------|
-| **Layer 1 Short-circuit** | BLOCK rule returns immediately, skips Layer 2/3 | ~5% CPU savings |
-| **Distributed Lock** | Redisson lock per bet_id | Prevents duplicate calculation |
-| **Caching** | @Cacheable for turnover records | Reduces DB queries |
-| **Batch Insert** | Async batch write to DB (every 10s or 1000 records) | Reduces write pressure |
-| **Event-driven** | Kafka events for downstream systems | Decoupled architecture |
+| 策略 | 實作 | 影響 |
+|-----|------|-----|
+| **第一層短路** | BLOCK 規則立即返回，跳過第二/三層 | ~5% CPU 節省 |
+| **分散式鎖** | Redisson 鎖（每個 bet_id）| 防止重複計算 |
+| **快取** | @Cacheable 用於有效投注額記錄 | 減少資料庫查詢 |
+| **批次插入** | 非同步批次寫入資料庫（每 10 秒或 1000 筆）| 減少寫入壓力 |
+| **事件驅動** | Kafka 事件用於下游系統 | 解耦架構 |
 
-### 14.2 Hybrid Accumulation Architecture
+### 14.2 混合累積架構（Hybrid Accumulation Architecture）
 
 ```yaml
-Bet Placement:
-  1. Real-time calculate valid bet
-  2. Write to Redis (millisecond level, player can query immediately)
-  3. Async batch write to DB (every 10s or 1000 records)
+下注階段：
+  1. 即時計算有效投注額
+  2. 寫入 Redis（毫秒級，玩家可立即查詢）
+  3. 非同步批次寫入資料庫（每 10 秒或 1000 筆）
 
-Withdrawal:
-  1. Read wagering_progress table directly (millisecond level)
-  2. If target met, allow withdrawal
+提款：
+  1. 直接讀取 wagering_progress 表（毫秒級）
+  2. 若達標，允許提款
 
-Background Reconciliation (Flink):
-  1. Hourly/daily Flink job
-  2. Recalculate wagering progress
-  3. Compare with wagering_progress table
-  4. Alert + auto-correct on discrepancy
+背景對帳 (Flink)：
+  1. 每小時/每日 Flink 作業
+  2. 重新計算流水進度
+  3. 與 wagering_progress 表比對
+  4. 發現差異時告警 + 自動修正
 ```
 
 ---
 
-## 15. Related Documents
+## 15. 相關文檔
 
-### Sub-documents
+### 子文檔
 - [03-04-01 Turnover Core Logic](../../source-archive/03_Game_Center/03-04-01_Turnover_Core_Logic.md)
 - [03-04-02 Three Layer Validation](../../source-archive/03_Game_Center/03-04-02_Three_Layer_Validation.md)
 - [03-04-03 Reconciliation Model](../../source-archive/03_Game_Center/03-04-03_Reconciliation_Model.md)
 - [03-04-04 SmartAdmin Mapping](../../source-archive/03_Game_Center/03-04-04_SmartAdmin_Mapping.md)
 
-### Business Rules
+### 業務規則
 - [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 
-### Architecture Dependencies
+### 架構依賴
 - [SmartAdmin Architecture Rules](../../../../.agent/rules/foundation/F04-architecture-rules.md)
 - [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ---
 
-**Document Version**: 1.0.0 (derived from source v4.0.0)
-**Last Updated**: 2026-02-08
-**Maintainers**: Backend Team, Architecture Team
+**文檔版本**: 1.0.0 (derived from source v4.0.0)
+**最後更新**: 2026-02-08
+**維護團隊**: Backend Team, Architecture Team

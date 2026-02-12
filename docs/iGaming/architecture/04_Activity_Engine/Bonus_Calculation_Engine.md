@@ -1,10 +1,10 @@
-# 獎金計算引擎技術架構 (Bonus Calculation Engine Architecture)
+# 獎金計算引擎技術架構（Bonus Calculation Engine Architecture）
 
-> **Canonical Source**: [source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: [Bonus_Calculation_Requirements.md](../../requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 1.0.0
+> **規範來源**: [source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
+> **目標讀者**: 架構師、後端開發
+> **業務需求**: [Bonus_Calculation_Requirements.md](../../requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md)
+> **最後同步**: 2026-02-08
+> **來源版本**: 1.0.0
 
 ---
 
@@ -183,7 +183,7 @@ sequenceDiagram
 
 ## API 契約定義 (API Contract)
 
-### Base Validation API (Risk Engine)
+### 基礎驗證 API（Base Validation API — Risk Engine）
 
 ```typescript
 // Risk Engine provides this API for cross-module consumption
@@ -308,10 +308,10 @@ Finance 與 Activity 模組均需調用 `RiskEngine.validateTurnover()` 作為�
 
 ---
 
-## Database Schema (PostgreSQL)
+## 資料庫結構（Database Schema — PostgreSQL）
 
-### bonus_rules
-Stores bonus calculation rules and game weight configurations.
+### bonus_rules 表
+儲存獎金計算規則與遊戲權重配置。
 
 ```sql
 CREATE TABLE bonus_rules (
@@ -347,8 +347,8 @@ COMMENT ON COLUMN bonus_rules.weight_factor IS 'Layer 3 game weight: SLOTS=1.0, 
 COMMENT ON COLUMN bonus_rules.status_factors IS 'Layer 2 status factor mapping for WIN/LOSS/DRAW/VOID/HALF_WIN/HALF_LOSS';
 ```
 
-### bonus_calculations
-Tracks bonus progress and three-layer turnover calculations.
+### bonus_calculations 表
+追蹤獎金進度與三層有效投注額計算記錄。
 
 ```sql
 CREATE TABLE bonus_calculations (
@@ -410,9 +410,9 @@ COMMENT ON COLUMN bonus_calculations.layer3_game_weight IS 'Layer 3: Activity ga
 COMMENT ON COLUMN bonus_calculations.rule_snapshot IS 'Immutable snapshot of bonus_rules applied at calculation time';
 ```
 
-### Query Examples
+### 查詢範例（Query Examples）
 
-**Calculate total wagering progress for a bonus:**
+**計算獎金的總有效投注額進度：**
 ```sql
 SELECT
     player_id,
@@ -426,7 +426,7 @@ WHERE calculation_status = 'COMPLETED'
 GROUP BY player_id, bonus_id;
 ```
 
-**Audit rejected turnover by risk code:**
+**依風控代碼審計被拒絕的有效投注額：**
 ```sql
 SELECT
     risk_code,
@@ -440,7 +440,7 @@ GROUP BY risk_code
 ORDER BY rejection_count DESC;
 ```
 
-**Analyze game contribution effectiveness:**
+**分析遊戲貢獻有效性：**
 ```sql
 SELECT
     game_type,
