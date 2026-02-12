@@ -547,7 +547,76 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - Fixed 充值→存款 in 2 files
 - All edits follow TRANSLATION_GLOSSARY.md standards
 
-**Phase 9C Status**: Terminology consistency at 91% (target: 95%). Remaining ~4% are intentional bilingual definitions in glossary/terminology files.
+**Phase 9C Status**: Terminology consistency at 91% (target: 100%). Phase 9C expanded to 6 iterations (Batch 38-43) to achieve 100% terminology consistency goal.
+
+**Goal**: 術語一致性 91% → 100%（用戶要求最高標準）
+
+#### Batch 38 — Terminology Diagnostic [ ]
+- [ ] Create/verify check-terminology-consistency-zh-tw.sh script
+- [ ] Run initial validation and generate baseline report
+- [ ] Identify Top 50 high-frequency terminology errors
+- [ ] Generate error prioritization list
+
+#### Batch 39 — Terminology Fixes Round 1 (Top 1-20) [ ]
+- [ ] Fix terminology errors #1-10 (highest frequency)
+- [ ] Fix terminology errors #11-20
+- [ ] Run validation: confirm 91% → 93%
+- [ ] Git commit batch-39-terminology-fixes
+
+#### Batch 40 — Terminology Fixes Round 2 (Top 21-40) [ ]
+- [ ] Fix terminology errors #21-30 (mid frequency)
+- [ ] Fix terminology errors #31-40
+- [ ] Run validation: confirm 93% → 95%
+- [ ] Git commit batch-40-terminology-fixes
+
+#### Batch 41 — Terminology Fixes Round 3 (Top 41-50 + Edge Cases) [ ]
+- [ ] Fix terminology errors #41-50 (low frequency)
+- [ ] Handle edge cases (glossary bilingual definitions, code examples, Mermaid labels)
+- [ ] Manual review: 10 random files for translation fluency
+- [ ] Run validation: confirm 95% → 97%
+- [ ] Git commit batch-41-terminology-fixes-edge-cases
+
+#### Batch 42 — Deep Terminology Audit (97% → 98%) [ ]
+- [ ] Deep scan with grep for all business terms (TRANSLATION_GLOSSARY.md)
+- [ ] Check Mermaid diagram label consistency
+- [ ] Check cross-file terminology consistency
+- [ ] Verify TRANSLATION_GLOSSARY.md mappings
+- [ ] Run validation: confirm 97% → 98%
+- [ ] Git commit batch-42-deep-audit
+
+#### Batch 43 — Final Terminology Polish (98% → 100%) [ ]
+- [ ] Fix remaining 5-10 errors (low frequency but critical terms)
+- [ ] Verify all technical terms preserved (Service/Manager/Controller/Entity/DTO) 100% English
+- [ ] Final Mermaid diagram check (all labels translated except stateDiagram-v2)
+- [ ] Run all 5 validation scripts: 100% PASS
+- [ ] Update Phase 9C status to COMPLETE ✅
+- [ ] Git commit batch-43-final-terminology-polish
+
+---
+
+### 10: Final Cleanup + Quality Report [PENDING]
+
+**Goal**: 生成詳細版品質報告（~20 頁），最終驗證
+
+#### Batch 44 — Quality Report Generation [ ]
+- [ ] Generate terminology-consistency-trend.md (91% → 100% progress chart)
+- [ ] Generate translation-velocity-report.md (files/iteration, time/file stats)
+- [ ] Generate error-pattern-analysis.md (error types, root causes, fix strategies)
+- [ ] Generate ultrathink-decision-log.md (all key decisions from v1.0.0-v1.4.0)
+- [ ] Generate translation-best-practices.md (success patterns, pitfalls, tools)
+- [ ] Generate quality-report-executive-summary.md (1-page key metrics summary)
+- [ ] Git commit "docs(ralph): Phase 10 quality reports generation"
+
+#### Batch 45 — Regression Validation + Deliverables [ ]
+- [ ] Run all 5 validation scripts (final regression test)
+- [ ] Update progress.md final status (Phase 9C/10 COMPLETE, Total Iterations: 141)
+- [ ] Generate deliverables-checklist.md (all deliverables + status)
+- [ ] Generate final-validation-report.md (all script outputs)
+- [ ] Generate final statistics (184 files, 91%→100%, total time, API usage)
+- [ ] Update plan file to v1.5.0 (Final Completion Report)
+- [ ] Git commit "docs(ralph): Phase 10 final validation and deliverables"
+
+**Phase 10 Status**: PENDING — Will execute after Phase 9C reaches 100% terminology consistency
 
 ---
 
