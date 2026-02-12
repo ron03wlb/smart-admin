@@ -764,7 +764,7 @@ GROUP BY transaction_type;
 |------|------|------|---------|---------|
 | 1 | Turnover Calculation | Three-Layer Validation | 20 分鐘 | Layer 1/2/3 架構 |
 | 2 | Turnover Calculation | Game Weights | 10 分鐘 | 免費轉處理 |
-| 3 | Activity System | Wagering Requirements | 15 分鐘 | 流水計算 |
+| 3 | Activity System | Wagering Requirements | 15 分鐘 | 有效投注額計算 |
 
 **關鍵實作考量**：
 - 免費轉 (Free Spins) 通常不計入有效投注額

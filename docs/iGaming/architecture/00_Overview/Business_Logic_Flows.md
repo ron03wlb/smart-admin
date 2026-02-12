@@ -250,18 +250,18 @@ BigDecimal wageringRequirement = depositAmount.add(bonusAmount).multiply(multipl
 **關鍵參數**：
 - `bonusRate`：存款百分比（例如，0.50 表示 50%）
 - `maxBonus`：最大優惠上限（例如，$500）
-- `multiplier`：流水倍數（例如，20x）
+- `multiplier`：有效投注額倍數（例如，20x）
 
 參考：[Bonus Calculation Engine](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
 
-### 3.2 流水累積邏輯
+### 3.2 有效投注額累積邏輯
 
 ```java
-// 每次下注後，更新流水進度
+// 每次下注後，更新有效投注額進度
 BigDecimal validBet = betAmount.multiply(gameWeight);
 wageringProgress = wageringProgress.add(validBet);
 
-// 檢查是否滿足流水要求
+// 檢查是否滿足有效投注額要求
 if (wageringProgress.compareTo(wageringRequirement) >= 0) {
     convertBonusToCash();
 }
@@ -311,7 +311,7 @@ WHERE player_id = :playerId
 
 **設計注意事項**：
 - `WHERE` 子句確保原子性檢查並鎖定（無競爭條件）
-- 如果可用餘額不足，UPDATE 影響 0 行，應用程式返回錯誤
+- 如果可下注餘額不足，UPDATE 影響 0 行，應用程式返回錯誤
 
 參考：[Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md#fund-locking)
 
@@ -325,7 +325,7 @@ if (!player.isKycVerified()) {
     return RiskDecision.REJECT("KYC_NOT_VERIFIED");
 }
 
-// 第二層：流水檢查
+// 第二層：有效投注額檢查
 BigDecimal requiredTurnover = player.getDeposits().multiply(BigDecimal.ONE); // 1x turnover
 if (player.getTurnover().compareTo(requiredTurnover) < 0) {
     return RiskDecision.REJECT("TURNOVER_NOT_MET");
@@ -749,7 +749,7 @@ public void testTenantIsolation() {
 |------|-----------------|-----------------|
 | 玩家註冊與 KYC | [Business_Flows.md Section 1](../../requirements/01_Player_Experience/Business_Flows.md#1-player-registration-and-kyc) | 本文檔，第 1 節 |
 | 遊戲整合與 Token | [Business_Flows.md Section 2](../../requirements/01_Player_Experience/Business_Flows.md#2-game-launch-and-token-verification) | 本文檔，第 2 節 |
-| 優惠與流水 | [Business_Flows.md Section 3](../../requirements/01_Player_Experience/Business_Flows.md#3-bonus-distribution-and-wagering-requirements) | 本文檔，第 3 節 |
+| 優惠與有效投注額 | [Business_Flows.md Section 3](../../requirements/01_Player_Experience/Business_Flows.md#3-bonus-distribution-and-wagering-requirements) | 本文檔，第 3 節 |
 | 提款與風控 | [Business_Flows.md Section 4](../../requirements/01_Player_Experience/Business_Flows.md#4-withdrawal-review-and-risk-control) | 本文檔，第 4 節 |
 | 有效投注額與對帳 | [Business_Flows.md Section 5](../../requirements/01_Player_Experience/Business_Flows.md#5-turnover-calculation-and-reconciliation) | 本文檔，第 5 節 |
 | 多租戶隔離 | [Business_Flows.md Section 6](../../requirements/01_Player_Experience/Business_Flows.md#6-multi-tenant-data-isolation) | 本文檔，第 6 節 |

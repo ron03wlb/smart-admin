@@ -148,7 +148,7 @@ ValidTurnover = BetAmount
 | 指標類型 | 關鍵指標 | 說明 |
 |---------|---------|------|
 | **玩家** | DAU, MAU, Retention | 活躍度與留存 |
-| **財務** | NGR, GGR, Deposit Rate | 收入與充值 |
+| **財務** | NGR, GGR, Deposit Rate | 收入與存款 |
 | **遊戲** | Rounds, RTP, House Edge | 遊戲表現 |
 | **活動** | Bonus ROI, Conversion | 活動效益 |
 | **風控** | Fraud Rate, False Positive | 風控效能 |

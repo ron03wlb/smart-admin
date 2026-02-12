@@ -54,7 +54,7 @@
 | 錢包類型 | 用途 | 業務規則 |
 |---------|------|---------|
 | **CASH** | 真錢餘額，用於下注和提款 | 所有財務操作的主要錢包 |
-| **BONUS** | 受流水要求限制的促銷資金 | 在達到流水條件前無法提款 |
+| **BONUS** | 受有效投注額要求限制的促銷資金 | 在達到有效投注額條件前無法提款 |
 | **LOCKED** | 暫時凍結的資金（待提款等） | 結算或取消時釋放 |
 
 ### 2.2 可用餘額公式（Available Balance Formula）
@@ -190,7 +190,7 @@
 | KYC 完整性（KYC Completeness） | 15% | 0-15 | VERIFIED=0, PARTIALLY_VERIFIED=8, NOT_VERIFIED=15 |
 | 存提款比（Deposit/Withdrawal Ratio） | 15% | 0-15 | 比率 > 2x 觸發最高風險分數 |
 | 近期提款頻率（Recent Withdrawal Frequency） | 15% | 0-15 | 過去 7 天提款次數，最高 15 |
-| 流水完成度（Turnover Completion） | 15% | 0-15 | 完成要求流水的進度，倒序評分 |
+| 有效投注額完成度（Turnover Completion） | 15% | 0-15 | 完成要求有效投注額的進度，倒序評分 |
 | IP/設備異常（IP/Device Anomaly） | 10% | 0-10 | 設備指紋和 IP 異常檢測 |
 | 多帳號關聯（Multi-Account Correlation） | 10% | 0-10 | 關聯帳號檢測 |
 

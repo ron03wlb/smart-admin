@@ -343,7 +343,7 @@ Promotion bet:
 
 ### 6.2 範例
 
-**範例 1：優惠錢包流水未完成**
+**範例 1：優惠錢包有效投注額未完成**
 
 ```yaml
 effectiveStake: 100
@@ -353,7 +353,7 @@ totalRequirement: 950 + 200 = 1150
 rebateEffectiveStake: MAX(0, 100 - 1150) = 0  # no rebate
 ```
 
-**範例 2：優惠錢包流水已完成**
+**範例 2：優惠錢包有效投注額已完成**
 
 ```yaml
 effectiveStake: 100
@@ -406,7 +406,7 @@ WHERE id = ?
 
 ---
 
-## 8. 端對端演練：優惠錢包流水完成
+## 8. 端對端演練：優惠錢包有效投注額完成
 
 ### 8.1 初始狀態
 
@@ -418,7 +418,7 @@ Main: { cash: 500, bonus: 0, lockAmount: 0, cleanAmount: 500, effectiveStake: 0 
 
 **來源**: `PromotionService.java`（第 69-136 行）
 
-玩家存款 200，獲得 100 獎金，流水要求 = 5 倍（5 * 300 = 1500）。
+玩家存款 200，獲得 100 獎金，有效投注額要求 = 5 倍（5 * 300 = 1500）。
 
 ```yaml
 # Main wallet: deduct 200, add lockAmount 200 (PROMOTION type deduct)
@@ -534,7 +534,7 @@ effectiveStake **不會**按比例分配到各錢包；它會完整累加到接�
 | **其他** | `betAmount` |
 | **累加** | 結算時 `effectiveStake += calculated_value` |
 | **回復** | 取消時 `effectiveStake -= original_value` |
-| **流水檢查** | 優惠完成條件：`effectiveStake >= wagerRequirement` |
+| **有效投注額檢查** | 優惠完成條件：`effectiveStake >= wagerRequirement` |
 
 ### 11.3 返水規則
 

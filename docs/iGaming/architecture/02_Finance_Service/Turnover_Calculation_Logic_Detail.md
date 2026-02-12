@@ -11,10 +11,10 @@
 
 | 術語 | 說明 | 儲存位置 |
 |------|------|----------|
-| **effectiveStake** | 判斷玩家是否達成流水要求的關鍵指標 | `player_wallet.effective_stake` |
+| **effectiveStake** | 判斷玩家是否達成有效投注額要求的關鍵指標 | `player_wallet.effective_stake` |
 | **lockAmount** | 主錢包中的不可提領金額，透過有效投注額解鎖 | `player_wallet.lock_amount`（僅主錢包） |
-| **wagerRequirement** | 促銷錢包必須達成的流水門檻 | `player_wallet.wager_requirement`（僅促銷錢包） |
-| **turnoverRequired** | 玩家必須完成的總流水 = 主錢包 lockAmount + SUM(促銷錢包 wagerRequirement - effectiveStake) | 計算值，非資料庫欄位 |
+| **wagerRequirement** | 促銷錢包必須達成的有效投注額門檻 | `player_wallet.wager_requirement`（僅促銷錢包） |
+| **turnoverRequired** | 玩家必須完成的總有效投注額 = 主錢包 lockAmount + SUM(促銷錢包 wagerRequirement - effectiveStake) | 計算值，非資料庫欄位 |
 | **rebateEffectiveStake** | 可計入返水計算的有效投注額 | `transaction.rebate_effective_stake` |
 
 ---
@@ -60,7 +60,7 @@ flowchart TD
     subgraph REBATE["返水計算"]
         D1[計算 rebateEffectiveStake] --> D2{isPromotion？}
         D2 -->|否| D3["rebateEffectiveStake = effectiveStake"]
-        D2 -->|是| D4[計算剩餘流水要求]
+        D2 -->|是| D4[計算剩餘有效投注額要求]
         D4 --> D5["totalRequirement = SUM(wagerRequirement - effectiveStake) + lockAmount"]
         D5 --> D6["rebateEffectiveStake = max(0, effectiveStake - totalRequirement)"]
     end
@@ -171,7 +171,7 @@ stateDiagram-v2
 
 | 操作 | lockAmount 變化 | 說明 |
 |------|-----------------|------|
-| 存款入帳 | **+金額** | 完成流水才能提款 |
+| 存款入帳 | **+金額** | 完成有效投注額才能提款 |
 | 領取獎金 | **+金額** | 同上 |
 | VIP 獎勵 | **+金額** | 同上 |
 | 下注 | **無變化** | 僅扣除資金，不影響 lockAmount |
@@ -185,7 +185,7 @@ stateDiagram-v2
 
 ---
 
-## 5. 促銷錢包流水邏輯
+## 5. 促銷錢包有效投注額邏輯
 
 ### 5.1 主錢包 vs. 促銷錢包
 
@@ -205,19 +205,19 @@ flowchart LR
         P4[effectiveStake]
     end
 
-    M3 -.->|"主錢包使用 lockAmount<br/>控制流水"| M4
-    P3 -.->|"促銷錢包使用 wagerRequirement<br/>控制流水"| P4
+    M3 -.->|"主錢包使用 lockAmount<br/>控制有效投注額"| M4
+    P3 -.->|"促銷錢包使用 wagerRequirement<br/>控制有效投注額"| P4
 ```
 
 ### 5.2 促銷錢包完成檢查
 
 ```
-促銷錢包流水達成 = (effectiveStake >= wagerRequirement)
+促銷錢包有效投注額達成 = (effectiveStake >= wagerRequirement)
 ```
 
-### 5.3 促銷轉主錢包流水計算
+### 5.3 促銷轉主錢包有效投注額計算
 
-從促銷錢包轉出時，剩餘流水要求按比例轉移：
+從促銷錢包轉出時，剩餘有效投注額要求按比例轉移：
 
 ```
 transferWagerRequirement = (wagerRequirement - effectiveStake) * (transferAmount / (cash + bonus))
@@ -234,7 +234,7 @@ flowchart TD
     A[投注結算] --> B{isPromotion == true？}
     B -->|否| C["rebateEffectiveStake = effectiveStake"]
     B -->|是| D[取得投注關聯的錢包]
-    D --> E[計算剩餘流水要求]
+    D --> E[計算剩餘有效投注額要求]
     E --> F["totalRequirement = SUM(wagerRequirement - effectiveStake) + (openSts ? 0 : lockAmount)"]
     F --> G{effectiveStake > totalRequirement？}
     G -->|是| H["rebateEffectiveStake = effectiveStake - totalRequirement"]
@@ -246,8 +246,8 @@ flowchart TD
 | 投注類型 | 條件 | rebateEffectiveStake |
 |----------|------|----------------------|
 | 非促銷投注 | isPromotion = false | `effectiveStake` |
-| 促銷投注 | 流水已達成 | `effectiveStake` |
-| 促銷投注 | 流水未達成 | `max(0, effectiveStake - remainingRequirement)` |
+| 促銷投注 | 有效投注額已達成 | `effectiveStake` |
+| 促銷投注 | 有效投注額未達成 | `max(0, effectiveStake - remainingRequirement)` |
 
 ### 6.3 程式碼參考
 
@@ -255,7 +255,7 @@ flowchart TD
 
 ---
 
-## 7. 提款流水要求 (turnoverRequired)
+## 7. 提款有效投注額要求 (turnoverRequired)
 
 ### 7.1 公式
 
@@ -265,7 +265,7 @@ turnoverRequired = main.lockAmount + SUM(promo.wagerRequirement - promo.effectiv
 
 其中：
 - `main.lockAmount`：主錢包鎖定金額
-- `SUM(...)`：所有**活躍**促銷錢包剩餘流水要求的總和
+- `SUM(...)`：所有**活躍**促銷錢包剩餘有效投注額要求的總和
 
 ### 7.2 程式碼參考
 
@@ -347,10 +347,10 @@ flowchart TB
 
 ### 10.3 返水計算
 
-- [ ] 促銷投注需完成流水才有返水資格 -- 確認預期行為
+- [ ] 促銷投注需完成有效投注額才有返水資格 -- 確認預期行為
 - [ ] `REBATE_BETTING_LOCKED` 開關邏輯 -- 確認是否需調整
 
-### 10.4 提款流水
+### 10.4 提款有效投注額
 
 - [ ] turnoverRequired 公式正確性 -- 確認
 - [ ] 僅計算「活躍」促銷錢包 -- 確認正確性
@@ -366,7 +366,7 @@ flowchart TB
 | 返水有效投注額 | GridAbstractService.java | `getRebateEffectiveStake()` |
 | 錢包交易處理 | WalletTransaction.java | `deduct()`, `addEffectiveStake()` |
 | 投注結算 | GridService.java | `result()` |
-| 提款流水查詢 | PlayerManager.java | `getBalance()` |
+| 提款有效投注額查詢 | PlayerManager.java | `getBalance()` |
 | 資料庫更新 | PlayerWalletServiceImpl.java | 第 69-86 行 |
 
 ---

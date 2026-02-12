@@ -74,13 +74,13 @@ CREATE TABLE wallet_lock (
 
 ```java
 /**
- * 計算可用餘額（可下注餘額）
+ * 計算可下注餘額
  *
  * 公式：可下注餘額 = 現金錢包餘額 - 鎖定金額 - 待結算投注
  *
  * @param playerId 玩家 ID
  * @param tenantId 租戶 ID
- * @return 可用餘額
+ * @return 可下注餘額
  */
 public BigDecimal calculateAvailableBalance(Long playerId, String tenantId) {
     // 1. 查詢現金錢包

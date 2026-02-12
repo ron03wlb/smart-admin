@@ -525,7 +525,7 @@ flowchart TD
     CheckWhite -- 否 --> BonusZero[活動有效投注額 = 0]:::fail
     CheckWhite -- 是 --> CalcCap[套用最大貢獻上限]:::process
     CalcCap --> CalcBonusTO[6. 計算活動有效投注額<br/>= CappedBet * BonusWeight]:::success
-    BonusZero --> UpdateProgress[更新流水進度]:::process
+    BonusZero --> UpdateProgress[更新有效投注額進度]:::process
     CalcBonusTO --> UpdateProgress
     UpdateProgress --> EndBonus([流程結束]):::startend
     Invalid --> EndNormal
