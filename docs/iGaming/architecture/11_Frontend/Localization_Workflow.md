@@ -1,13 +1,13 @@
-# Localization Workflow Architecture
+# 在地化工作流架構
 
-> **Business Requirements**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-09](../../source-archive/11_Frontend_CMS/11-09_Localization_Workflow.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, Operations
+> **業務需求**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-09](../../source-archive/11_Frontend_CMS/11-09_Localization_Workflow.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、營運人員
 
 ---
 
-## 1. Translation State Machine
+## 1. 翻譯狀態機
 
 ```mermaid
 stateDiagram-v2
@@ -23,16 +23,16 @@ stateDiagram-v2
     Flagged --> Draft: Fixed and resubmitted
 ```
 
-| State | Description | Allowed Actions |
-|-------|-------------|-----------------|
-| **draft** | Translator editing | Edit, Submit |
-| **in_review** | Awaiting reviewer | Approve, Reject, Flag |
-| **approved** | Awaiting publish | Publish |
-| **published** | Live on CDN | Archive |
-| **flagged** | Issue found | Edit, Resubmit |
-| **archived** | Deprecated | Delete |
+| 狀態 | 說明 | 允許操作 |
+|------|------|---------|
+| **draft** | 翻譯人員編輯中 | 編輯、提交 |
+| **in_review** | 等待審核 | 批准、退回、標記 |
+| **approved** | 等待發布 | 發布 |
+| **published** | 已上線至 CDN | 歸檔 |
+| **flagged** | 發現問題 | 編輯、重新提交 |
+| **archived** | 已棄用 | 刪除 |
 
-## 2. Missing Key Auto-Capture
+## 2. 缺失 Key 自動捕獲
 
 ```javascript
 import i18next from 'i18next';
@@ -58,11 +58,11 @@ i18next
   });
 ```
 
-## 3. Batch Import/Export
+## 3. 批次匯入/匯出
 
-### Export Formats
+### 匯出格式
 
-**JSON Export**:
+**JSON 匯出**:
 ```http
 GET /api/v1/i18n/export?lang=zh-TW&namespace=game&format=json
 
@@ -74,7 +74,7 @@ Response:
 }
 ```
 
-**XLIFF Export** (CAT tool standard):
+**XLIFF 匯出**（CAT 工具標準）:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -90,7 +90,7 @@ Response:
 </xliff>
 ```
 
-### Batch Import API
+### 批次匯入 API
 
 ```http
 POST /api/v1/i18n/import
@@ -117,7 +117,7 @@ Response:
 }
 ```
 
-## 4. Crowdin Integration
+## 4. Crowdin 整合
 
 ```mermaid
 sequenceDiagram
@@ -136,9 +136,9 @@ sequenceDiagram
     API->>CDN: 7. Publish to CDN
 ```
 
-## 5. State Transition APIs
+## 5. 狀態轉換 API
 
-**Submit for Review**:
+**提交審核**:
 ```http
 PUT /api/v1/i18n/translations/{key}/submit-for-review
 
@@ -156,7 +156,7 @@ Response:
 }
 ```
 
-**Publish to Production**:
+**發布至正式環境**:
 ```http
 POST /api/v1/i18n/translations/publish
 
@@ -175,18 +175,18 @@ Response:
 }
 ```
 
-## 6. Permission Matrix
+## 6. 權限矩陣
 
-| Role | Permissions | Responsibilities |
-|------|------------|------------------|
-| **Translator** | Edit draft, Submit for review | Translate content |
-| **Reviewer** | Approve/Reject in_review | Quality assurance |
-| **Publisher** | Publish approved to production | Release management |
-| **Admin** | All operations | System administration |
+| 角色 | 權限 | 職責 |
+|------|------|------|
+| **Translator** | 編輯草稿、提交審核 | 翻譯內容 |
+| **Reviewer** | 批准/退回審核中的內容 | 品質保證 |
+| **Publisher** | 發布已批准的內容至正式環境 | 發布管理 |
+| **Admin** | 所有操作 | 系統管理 |
 
 ---
 
-## 7. SmartAdmin Implementation
+## 7. SmartAdmin 實作
 
 ### 7.1 Translation Workflow Service
 

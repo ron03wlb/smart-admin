@@ -1,13 +1,13 @@
-# Marketing Compliance Architecture
+# 行銷合規架構
 
-> **Business Requirements**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-05](../../source-archive/11_Frontend_CMS/11-05_Marketing_Compliance.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, Compliance Engineers
+> **業務需求**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-05](../../source-archive/11_Frontend_CMS/11-05_Marketing_Compliance.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、合規工程師
 
 ---
 
-## 1. Advertising Review Workflow
+## 1. 廣告審核工作流
 
 ```mermaid
 graph TD
@@ -28,9 +28,9 @@ graph TD
     K -->|Issue Found| L[Immediate Takedown]
 ```
 
-## 2. Marketing Consent Matrix (LCCP 5.1.12)
+## 2. 行銷同意矩陣 (LCCP 5.1.12)
 
-### 2.1 Database Schema
+### 2.1 資料庫結構
 
 ```sql
 CREATE TABLE t_player_marketing_consent (
@@ -66,7 +66,7 @@ CREATE TABLE t_marketing_consent_audit (
 ) ENGINE=InnoDB COMMENT='7-year retention';
 ```
 
-### 2.2 Consent API
+### 2.2 同意管理 API
 
 ```java
 @RestController
@@ -103,7 +103,7 @@ public class MarketingConsentController {
 }
 ```
 
-### 2.3 Self-Exclusion End Handler
+### 2.3 自我排除結束處理器
 
 ```java
 @Service
@@ -122,7 +122,7 @@ public class SelfExclusionEndHandler {
 }
 ```
 
-## 3. Marketing Exclusion Query
+## 3. 行銷排除查詢
 
 ```sql
 SELECT p.id, p.email
@@ -138,7 +138,7 @@ WHERE pmp.email_opt_in = TRUE
   );
 ```
 
-## 4. CRM Integration
+## 4. CRM 整合
 
 ```java
 @Service
@@ -157,7 +157,7 @@ public class MarketingCampaignService {
 }
 ```
 
-## 5. Compliance Training Tracking
+## 5. 合規培訓追蹤
 
 ```sql
 CREATE TABLE t_compliance_training_record (
@@ -175,7 +175,7 @@ CREATE TABLE t_compliance_training_record (
 );
 ```
 
-## 6. Monthly Compliance Report
+## 6. 月度合規報告
 
 ```sql
 SELECT

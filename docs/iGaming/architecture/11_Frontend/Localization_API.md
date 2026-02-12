@@ -1,16 +1,16 @@
-# Localization API Architecture
+# 在地化 API 架構
 
-> **Business Requirements**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-10](../../source-archive/11_Frontend_CMS/11-10_Localization_API.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, DevOps
+> **業務需求**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-10](../../source-archive/11_Frontend_CMS/11-10_Localization_API.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、DevOps
 
 ---
 
-## 1. API Endpoint Overview
+## 1. API 端點概覽
 
-| Method | Endpoint | Description | Permission |
-|--------|----------|-------------|------------|
+| 方法 | 端點 | 說明 | 權限 |
+|------|------|------|------|
 | **GET** | `/api/v1/i18n/translations` | Get translation list | Public |
 | **GET** | `/api/v1/i18n/translations/{key}` | Get single translation | Public |
 | **POST** | `/api/v1/i18n/translations` | Create translation | Translator |
@@ -21,7 +21,7 @@
 | **POST** | `/api/v1/i18n/missing-keys` | Report missing key | Public |
 | **POST** | `/api/v1/i18n/translations/{key}/publish` | Publish to CDN | Publisher |
 
-### 1.1 Localization API Architecture
+### 1.1 在地化 API 架構
 
 ```mermaid
 graph TB
@@ -59,15 +59,15 @@ graph TB
     end
 ```
 
-## 2. API Specifications
+## 2. API 規格
 
-### 2.1 Get Translation List
+### 2.1 取得翻譯列表
 
 ```http
 GET /api/v1/i18n/translations?lang=zh-TW&namespace=game&status=published&page=1&page_size=50
 ```
 
-**Response (success)**:
+**回應（成功）**:
 ```json
 {
   "code": 1000,
@@ -97,7 +97,7 @@ GET /api/v1/i18n/translations?lang=zh-TW&namespace=game&status=published&page=1&
 }
 ```
 
-### 2.2 Batch Import
+### 2.2 批次匯入
 
 ```http
 POST /api/v1/i18n/translations/batch
@@ -116,7 +116,7 @@ Authorization: Bearer <jwt_token>
 }
 ```
 
-### 2.3 Publish to CDN
+### 2.3 發布至 CDN
 
 ```http
 POST /api/v1/i18n/translations/publish
@@ -143,10 +143,10 @@ Response:
 }
 ```
 
-## 3. Error Code Specification
+## 3. 錯誤碼規格
 
-| Error Code | HTTP Status | Description | Scenario |
-|------------|-------------|-------------|----------|
+| 錯誤碼 | HTTP 狀態碼 | 說明 | 場景 |
+|--------|-----------|------|------|
 | **1000** | 200 | Success | Normal response |
 | **4001** | 400 | Invalid Input | Wrong language code |
 | **4003** | 403 | Forbidden | Insufficient permissions |
@@ -155,16 +155,16 @@ Response:
 | **4029** | 429 | Too Many Requests | Rate limit exceeded |
 | **5000** | 500 | Internal Server Error | System error |
 
-## 4. Rate Limiting
+## 4. 速率限制
 
-| Client Type | Rate Limit | Description |
-|-------------|-----------|-------------|
+| 客戶端類型 | 速率限制 | 說明 |
+|-----------|---------|------|
 | **Anonymous** | 100 req/min | Public endpoints |
 | **Logged-in Player** | 300 req/min | Authenticated users |
 | **CMS Admin** | 1000 req/min | Backend operations |
 | **Internal Service** | Unlimited | Microservice calls (IP whitelist) |
 
-**Rate Limit Response Headers** (RFC 6585):
+**速率限制回應標頭** (RFC 6585):
 ```http
 HTTP/1.1 429 Too Many Requests
 X-RateLimit-Limit: 100
@@ -173,9 +173,9 @@ X-RateLimit-Reset: 1706356800
 Retry-After: 60
 ```
 
-## 5. Prometheus Monitoring
+## 5. Prometheus 監控
 
-### PromQL Queries
+### PromQL 查詢
 
 **API Response Time (P99)**:
 ```promql
@@ -202,7 +202,7 @@ histogram_quantile(0.99,
 ) * 100
 ```
 
-### AlertManager Rules
+### AlertManager 規則
 
 ```yaml
 groups:
@@ -237,10 +237,10 @@ groups:
           severity: critical
 ```
 
-## 6. Integration Points
+## 6. 整合介面
 
-| Module | Integration | Data Flow |
-|--------|------------|-----------|
+| 模組 | 整合方式 | 資料流向 |
+|------|---------|---------|
 | **Frontend Layout Engine** | API Call | Layout Engine -> i18n API |
 | **Banner Management** | Database JSONB | CMS -> translations table |
 | **Activity System** | Database JSONB | Activity table -> translations |
@@ -248,7 +248,7 @@ groups:
 | **Notification Architecture** | API Call | Notification Service -> i18n API |
 | **Audit Log** | Event Subscription | i18n API -> Audit Log |
 
-## 7. Database Schema
+## 7. 資料庫結構
 
 ### 7.1 localization_keys
 
@@ -353,7 +353,7 @@ CREATE INDEX idx_missing_keys_count ON missing_translation_keys(report_count DES
 CREATE INDEX idx_missing_keys_namespace ON missing_translation_keys(namespace, resolved);
 ```
 
-**Cache Strategy**:
-- L1 (Memory): 5-minute TTL, per-instance cache
-- L2 (Redis): 30-minute TTL, shared across instances
-- CDN: 1-hour edge cache, purged on publish events
+**快取策略**:
+- L1（記憶體）：5 分鐘 TTL，每個實例獨立快取
+- L2（Redis）：30 分鐘 TTL，跨實例共享
+- CDN：1 小時邊緣快取，發布事件時清除

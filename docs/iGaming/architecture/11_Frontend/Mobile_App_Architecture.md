@@ -1,22 +1,22 @@
-# Mobile App Architecture
+# 行動應用架構
 
-> **Business Requirements**: [Mobile App Requirements](../../requirements/11_Frontend_Experience/Mobile_App_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-04](../../source-archive/11_Frontend_CMS/11-04_Mobile_App_Architecture.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Mobile Developers
+> **業務需求**: [Mobile App Requirements](../../requirements/11_Frontend_Experience/Mobile_App_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-04](../../source-archive/11_Frontend_CMS/11-04_Mobile_App_Architecture.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、行動端開發人員
 
 ---
 
-## 1. Framework Comparison
+## 1. 框架比較
 
-| Aspect | Flutter | React Native | Recommendation |
-|--------|---------|--------------|----------------|
-| Language | Dart | JavaScript/TypeScript | RN for frontend teams |
-| Performance | Near-native | Slightly below Flutter | Flutter for game lobby |
-| Hot Update | Not officially supported | CodePush (mature) | RN for iGaming hot update needs |
-| Bundle Size | 15-20MB | 25-30MB | Flutter lighter |
+| 面向 | Flutter | React Native | 建議 |
+|------|---------|--------------|------|
+| 語言 | Dart | JavaScript/TypeScript | RN 適合前端團隊 |
+| 效能 | 接近原生 | 略低於 Flutter | Flutter 適合遊戲大廳 |
+| 熱更新 | 官方未支援 | CodePush（成熟） | RN 適合 iGaming 熱更新需求 |
+| 包大小 | 15-20MB | 25-30MB | Flutter 更輕量 |
 
-## 2. Hot Update (CodePush)
+## 2. 熱更新 (CodePush)
 
 ```javascript
 import codePush from "react-native-code-push";
@@ -30,7 +30,7 @@ const codePushOptions = {
 export default codePush(codePushOptions)(App);
 ```
 
-## 3. Offline Storage
+## 3. 離線存儲
 
 ```javascript
 import { persistStore, persistReducer } from 'redux-persist';
@@ -45,7 +45,7 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 ```
 
-## 4. Push Notification Architecture
+## 4. 推播通知架構
 
 ### 4.1 Deep Linking
 
@@ -63,7 +63,7 @@ messaging().onNotificationOpenedApp(remoteMessage => {
 });
 ```
 
-### 4.2 Anti-Disturbance Config
+### 4.2 防打擾配置
 
 ```javascript
 const pushConfig = {
@@ -73,9 +73,9 @@ const pushConfig = {
 };
 ```
 
-## 5. Performance Optimization
+## 5. 效能優化
 
-### 5.1 Image Caching & List Virtualization
+### 5.1 圖片快取與列表虛擬化
 
 ```javascript
 <FastImage
@@ -93,9 +93,9 @@ const pushConfig = {
 />
 ```
 
-## 6. Security Implementation
+## 6. 安全實作
 
-### 6.1 Error Boundary
+### 6.1 錯誤邊界
 
 ```javascript
 class ErrorBoundary extends React.Component {
@@ -106,16 +106,16 @@ class ErrorBoundary extends React.Component {
 }
 ```
 
-### 6.2 Security Stack
+### 6.2 安全技術堆疊
 
-- **APK Packing**: 360/Tencent hardening
-- **Code Obfuscation**: ProGuard (Android) / Strip Symbols (iOS)
-- **SSL Pinning**: Prevent MITM attacks
-- **API Signature**: Request signing for tamper prevention
-- **Local Encryption**: AES-256 for AsyncStorage
-- **Keychain/KeyStore**: Token storage in system-level secure storage
+- **APK 加固**: 360/騰訊加固
+- **程式碼混淆**: ProGuard (Android) / Strip Symbols (iOS)
+- **SSL Pinning**: 防止 MITM 攻擊
+- **API 簽名**: 請求簽名防篡改
+- **本機加密**: AES-256 加密 AsyncStorage
+- **Keychain/KeyStore**: Token 存儲於系統級安全存儲
 
-## 7. App Lifecycle Management
+## 7. 應用生命週期管理
 
 ```mermaid
 flowchart TD
@@ -139,9 +139,9 @@ flowchart TD
     M --> K
 ```
 
-### 7.1 Background-to-Foreground Delta Sync
+### 7.1 背景轉前景差異同步
 
-When a player returns from background, the app performs a delta sync rather than a full reload:
+當玩家從背景返回時，應用程式執行差異同步而非完整重新載入：
 
 ```javascript
 const DeltaSyncManager = {
@@ -168,9 +168,9 @@ const DeltaSyncManager = {
 };
 ```
 
-## 8. WebSocket Real-Time Updates for Live Betting
+## 8. WebSocket 即時更新（滾球投注）
 
-### 8.1 Connection Architecture
+### 8.1 連線架構
 
 ```mermaid
 flowchart LR
@@ -190,7 +190,7 @@ flowchart LR
     A <-->|wss://ws.platform.com| G
 ```
 
-### 8.2 WebSocket Client Implementation
+### 8.2 WebSocket 客戶端實作
 
 ```javascript
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -238,9 +238,9 @@ class LiveBettingSocket {
 }
 ```
 
-### 8.3 Offline Queue for Bet Placement
+### 8.3 投注離線佇列
 
-When network is unstable, bet requests are queued locally and retried:
+當網路不穩定時，投注請求會在本機排隊並重試：
 
 ```javascript
 const BetQueue = {
@@ -270,7 +270,7 @@ const BetQueue = {
 
 ---
 
-## 9. Database Schema
+## 9. 資料庫結構
 
 ```sql
 -- Mobile app version configuration
