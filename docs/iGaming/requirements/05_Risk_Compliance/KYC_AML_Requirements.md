@@ -4,7 +4,7 @@
 > **目標讀者**: 高管、合規官、產品經理
 > **相關架構**: [KYC_Verification_API.md](../../architecture/05_Risk_Engine/KYC_Verification_API.md)
 > **最後同步**: 2026-02-08
-> **源版本**: 4.0.0
+> **來源版本**: 4.0.0
 
 ---
 

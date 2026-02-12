@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 109 (Phase 6: 6, Phase 7-8: 98, Phase 9: 5)
-> **Status**: IN PROGRESS 🔄 — Phase 9C terminology fixes applied
+> **Total Iterations**: 110 (Phase 6: 6, Phase 7-8: 98, Phase 9: 6)
+> **Status**: IN PROGRESS 🔄 — Phase 9A Batch 7 complete (Risk Compliance)
 
 ---
 
@@ -318,12 +318,12 @@ Priority: Requirements files contain business context suited for Chinese audienc
 - [x] requirements/12_Security_Compliance/Data_Protection_Requirements.md (metadata headers 翻譯)
 - [x] requirements/13_Customer_Service/CS_Platform_Requirements.md (metadata headers 翻譯)
 
-#### Batch 7 — Risk Compliance (5 files)
-- [ ] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md
-- [ ] requirements/05_Risk_Compliance/KYC_AML_Requirements.md
-- [ ] requirements/05_Risk_Compliance/ML_Requirements.md
-- [ ] requirements/05_Risk_Compliance/Player_Protection_Requirements.md
-- [ ] requirements/05_Risk_Compliance/README.md
+#### Batch 7 — Risk Compliance (5 files) ✅ COMPLETE
+- [x] requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md (相關文檔→相關架構 標準化)
+- [x] requirements/05_Risk_Compliance/KYC_AML_Requirements.md (源版本→來源版本 標準化)
+- [x] requirements/05_Risk_Compliance/ML_Requirements.md (已翻譯，無需修改)
+- [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (已翻譯，無需修改)
+- [x] requirements/05_Risk_Compliance/README.md (文檔→文件、描述→說明、來源索引中文化)
 
 #### Batch 8 — Governance/Agent Operations (5 files)
 - [ ] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md
