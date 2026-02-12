@@ -1,12 +1,11 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: Phase 13 (Coverage Enhancement)
-> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12-14)
-> **Tasks Done This Iteration**: 1/3 Batch 1 (Seamless_Wallet_Index.md)
-> **Status**: Phase 12 COMPLETE ✅ — All Mermaid errors in editable files resolved
-> **Java Coverage**: 80/102 (78.4%) → Target: ≥90%
-> **SQL Coverage**: 94/102 (92.2%) → Target: ≥95%
+> **Current Phase**: Phase 13 (Coverage Enhancement) - Batch 1 COMPLETE ✅
+> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12) + 1 (Phase 13 Batch 1)
+> **Tasks Done This Iteration**: 3/3 Batch 1 (Seamless_Wallet_Index, Turnover_Calculation_Logic_Detail, Turnover_Implementation)
+> **Java Coverage**: 93/118 (78.8%) → Target: ≥90% (need +14 files)
+> **SQL Coverage**: 100/118 (84.7%) → Target: ≥95% (need +13 files)
 > **Mermaid Issues**: 0 in editable files ✅ (72 in READ-ONLY source-archive/)
 
 ---
@@ -702,10 +701,10 @@ Priority: Architecture files contain technical design suited for Chinese develop
 
 Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 
-#### Batch 1 — Finance (3 files)
+#### Batch 1 — Finance (3 files) ✅ COMPLETE
 - [x] architecture/02_Finance_Service/Seamless_Wallet_Index.md (+Java WalletService/WalletManager +SQL wallet/transaction tables)
-- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (+Java +SQL)
-- [ ] architecture/02_Finance_Service/Turnover_Implementation.md (+Java +SQL)
+- [x] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (+Java TurnoverService/TurnoverManager/GridAbstractService +SQL player_wallet/wallet_transaction/turnover_history)
+- [x] architecture/02_Finance_Service/Turnover_Implementation.md (+Java GridService/GridSettlementManager/GridAbstractService +SQL player_wallet/transaction/wallet_transaction_history)
 
 #### Batch 2 — Infrastructure (3 files)
 - [ ] architecture/09_Infrastructure/Maintenance_Architecture.md (+Java Service/Manager +SQL)
@@ -813,4 +812,4 @@ bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 11 COMPLETE ✅ — Script optimized (outcome tracking, no-progress detection, summary report). Phase 12-14 task lists ready. Ralph Loop ready to execute.
+**Status**: Phase 13 Batch 1 COMPLETE ✅ — Finance Service dual-missing files (3/3) fixed. Java coverage: 93/118 (78.8%), SQL coverage: 100/118 (84.7%).
