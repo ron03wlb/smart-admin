@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 122 (Phase 6: 6, Phase 7-8: 98, Phase 9: 18)
-> **Status**: Phase 9B IN PROGRESS — Batch 20-26 complete (35 files translated)
+> **Total Iterations**: 123 (Phase 6: 6, Phase 7-8: 98, Phase 9: 19)
+> **Status**: Phase 9B IN PROGRESS — Batch 20-27 complete (40 files translated)
 
 ---
 
@@ -449,12 +449,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/08_Analytics_Service/Reporting_Architecture.md (報表與商業智能技術架構)
 - [x] architecture/09_Infrastructure/API_Design_Principles.md (API 設計原則 — metadata + header 標準化)
 
-#### Batch 27 — Infrastructure (5 files)
-- [ ] architecture/09_Infrastructure/Authentication_Architecture.md
-- [ ] architecture/09_Infrastructure/Caching_Strategy.md
-- [ ] architecture/09_Infrastructure/Common_Patterns.md
-- [ ] architecture/09_Infrastructure/Cost_Optimization_Architecture.md
-- [ ] architecture/09_Infrastructure/Deployment_Architecture.md
+#### Batch 27 — Infrastructure (5 files) ✅ COMPLETE
+- [x] architecture/09_Infrastructure/Authentication_Architecture.md (身份驗證與授權架構 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Caching_Strategy.md (緩存策略架構 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Common_Patterns.md (API 通用模式 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Cost_Optimization_Architecture.md (成本優化架構 — metadata + header 標準化)
+- [x] architecture/09_Infrastructure/Deployment_Architecture.md (部署架構與 DevOps 規範 — metadata + header 標準化)
 
 #### Batch 28 — Infrastructure (5 files)
 - [ ] architecture/09_Infrastructure/Domain_APIs.md
