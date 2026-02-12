@@ -639,6 +639,23 @@ Priority: Architecture files contain technical design suited for Chinese develop
 
 ---
 
+## Phase 11.5: Ralph Immortal Loop Refactor [COMPLETE] ✅
+
+**Goal**: Fix 4 bugs causing Ralph to silently crash, make loop truly immortal
+**Completed**: 2026-02-13
+
+- [x] Fix `set -e` crash bug (remove -e from set command)
+- [x] Fix threshold-checker.sh integration (replaced with simplified quota monitoring)
+- [x] Add pre-iteration quota probe (.rate-limit-until file)
+- [x] Replace all hard exits with sleep-and-retry
+- [x] Disable broken usage-tracker.js (produces 0 tokens)
+- [x] Simplify quota monitoring pipeline (outcome-based, not token-based)
+- [x] Convert to infinite while-true loop
+- [x] Add P22 guardrail documentation
+- [x] Add .rate-limit-until to .gitignore
+
+---
+
 ## Phase 12: Mermaid Repair [COMPLETE] ✅
 
 **Goal**: Fix 72 pre-existing Mermaid rendering issues → 0

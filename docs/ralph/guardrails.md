@@ -221,6 +221,43 @@ This rule is commented out but preserved for future reference.
 - **Lesson**: Any validation script scanning docs/iGaming/ must skip source-archive/ (per P1 guardrail)
 - **Compound Terms**: "流水" in compound forms (流水要求/進度/計算/對帳/操縱) is legitimate and should NOT be flagged
 
+### P19: Mermaid rendering requires mmdc CLI validation (Added 2026-02-12)
+- **Problem**: `validate-mermaid.sh` only checks basic patterns (stateDiagram `<br/>`, `\n` in labels)
+- **Root Cause**: 72 pre-existing Mermaid rendering issues are NOT caught by pattern-based checks
+- **Fix**: Use `npx -p @mermaid-js/mermaid-cli mmdc -i block.mmd -o /dev/null` for actual rendering validation
+- **Impact**: Enables Phase 12 to identify and fix all rendering issues systematically
+- **Installation**: `npx -p @mermaid-js/mermaid-cli mmdc --version` (no global install needed)
+- **Workflow**: Extract each `\`\`\`mermaid ... \`\`\`` block to temp file → run mmdc → check exit code
+
+### P20: Mermaid `<br/>` convention conflict resolution (Added 2026-02-12)
+- **Problem**: `mermaid-syntax-check.yml` says NO `<br/>` in Mermaid; SmartAdmin convention says USE `<br/>`
+- **Root Cause**: Two conflicting CI/CD workflows created at different times with different assumptions
+- **Resolution**: SmartAdmin convention wins (defined in CLAUDE.md, enforced project-wide)
+  - ✅ Use `<br/>` in ALL Mermaid types (graph, flowchart, sequenceDiagram, classDiagram, etc.)
+  - ❌ EXCEPTION: `stateDiagram-v2` CANNOT use `<br/>` (P2 guardrail)
+- **Action**: Phase 14 will update `mermaid-syntax-check.yml` to only check stateDiagram-v2
+- **Impact**: Resolves CI false positives on legitimate line-break tag usage
+
+### P21: Coverage enhancement — dual-missing files first (Added 2026-02-12)
+- **Strategy**: Fix files missing BOTH Java AND SQL before fixing single-missing files
+- **Rationale**: Each dual-fix gives +1 Java AND +1 SQL (2x efficiency per iteration)
+- **Current gaps**: 7 dual-missing, 15 Java-only, 1 SQL-only
+- **Priority order**: (1) Dual-missing → (2) Java-only → (3) SQL-only
+- **Constraint**: All Java code MUST follow SmartAdmin patterns (P13 guardrail)
+
+### P22: Ralph immortal loop — never exit on quota issues (Added 2026-02-13)
+- **Problem**: `set -euo pipefail` + `threshold-checker.sh` exit 1 = script silently crashes
+- **Root Cause**: `set -e` terminates entire script when any command returns non-zero; `threshold-checker.sh` returning exit 1 (REST_RECOMMENDED) triggers this before `THRESHOLD_STATUS=$?` executes
+- **Fix**: Removed `set -e`, replaced all `exit 1/2/3` with sleep-and-retry, added `.rate-limit-until` file
+- **Design Principles**:
+  1. Script only exits on RALPH_COMPLETE or TODO=0
+  2. Rate limit → calculate recovery time → write `.rate-limit-until` → sleep → auto-resume
+  3. 24-hour cycle → 2h rest + reset timer (not exit)
+  4. 5 consecutive rate limits → 4h long rest then reset counter (not exit)
+  5. `.rate-limit-until` file survives script restarts (pre-iteration probe checks it)
+- **Disabled**: usage-tracker.js (produces all-zero token data, inflates failure_rate, triggers false REST)
+- **Simplified**: Quota monitoring uses outcome counters instead of broken Node.js pipeline
+
 ### 2026-02-12: Optimized Phase 9C from 6 batches to 2 commits
 - Original plan: 6 batches (Batch 38-43) for 91% → 100% terminology consistency
 - Actual execution: 2 commits in ~30 minutes
