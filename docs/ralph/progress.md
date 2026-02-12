@@ -1,12 +1,12 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: Phase 12 (Mermaid Repair)
-> **Total Iterations**: 137 (Phase 6-10) + 0 (Phase 12-14)
-> **Status**: Phase 11 COMPLETE ✅ — Script optimized, PROMPT/progress/guardrails updated
+> **Current Phase**: Phase 13 (Coverage Enhancement)
+> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12-14)
+> **Status**: Phase 12 COMPLETE ✅ — All Mermaid errors in editable files resolved
 > **Java Coverage**: 80/102 (78.4%) → Target: ≥90%
 > **SQL Coverage**: 94/102 (92.2%) → Target: ≥95%
-> **Mermaid Issues**: 72 pre-existing → Target: 0
+> **Mermaid Issues**: 0 in editable files ✅ (72 in READ-ONLY source-archive/)
 
 ---
 
@@ -702,7 +702,7 @@ Priority: Architecture files contain technical design suited for Chinese develop
 Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 
 #### Batch 1 — Finance (3 files)
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Index.md (+Java Service/Manager +SQL)
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Index.md (+Java WalletService/WalletManager +SQL wallet/transaction tables)
 - [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (+Java +SQL)
 - [ ] architecture/02_Finance_Service/Turnover_Implementation.md (+Java +SQL)
 
