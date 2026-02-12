@@ -400,7 +400,91 @@ Priority: Architecture files contain technical design suited for Chinese develop
 
 **Note**: Files originally listed (Game_Integration_Architecture.md, Game_Session_Architecture.md, Third_Party_Standards.md, Turnover_System_Architecture.md) do not exist. Batch adjusted to include actual existing files.
 
-**Note**: Batches 20-37 will cover remaining architecture files across 18 modules (Activity Engine, Risk Engine, Platform Core, Infrastructure, Frontend, Security, etc.). Full file list: `find docs/iGaming/architecture -name '*.md' | sort`
+#### Batch 20 — Game Integration (3 files) + Activity Engine (2 files)
+- [ ] architecture/03_Game_Integration/Game_Integration_Security.md
+- [ ] architecture/03_Game_Integration/Game_Lobby_System.md
+- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md
+- [ ] architecture/04_Activity_Engine/Activity_Risk_System.md
+- [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md
+
+#### Batch 21 — Activity Engine (2 files) + Risk Engine (3 files)
+- [ ] architecture/04_Activity_Engine/Promotion_Implementation.md
+- [ ] architecture/04_Activity_Engine/README.md
+- [ ] architecture/05_Risk_Engine/Affordability_Implementation.md
+- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md
+- [ ] architecture/05_Risk_Engine/Fraud_Detection_System.md
+
+#### Batch 22 — Risk Engine (5 files)
+- [ ] architecture/05_Risk_Engine/KYC_Verification_API.md
+- [ ] architecture/05_Risk_Engine/ML_Integration_Architecture.md
+- [ ] architecture/05_Risk_Engine/Player_Protection_API.md
+- [ ] architecture/05_Risk_Engine/README.md
+- [ ] architecture/05_Risk_Engine/Risk_Implementation.md
+
+#### Batch 23 — Risk Engine (3 files) + Platform Core (2 files)
+- [ ] architecture/05_Risk_Engine/Risk_Proposal_Implementation.md
+- [ ] architecture/05_Risk_Engine/Risk_System_Architecture.md
+- [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md
+- [ ] architecture/06_Platform_Core/Governance_Implementation.md
+- [ ] architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md
+
+#### Batch 24 — Platform Core (5 files)
+- [ ] architecture/06_Platform_Core/MFA_Compliance_Technical.md
+- [ ] architecture/06_Platform_Core/MFA_Compliance_Validation.md
+- [ ] architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md
+- [ ] architecture/06_Platform_Core/MFA_Recovery_Implementation.md
+- [ ] architecture/06_Platform_Core/MFA_Technical.md
+
+#### Batch 25 — Platform Core (5 files)
+- [ ] architecture/06_Platform_Core/MFA_Technical_Architecture.md
+- [ ] architecture/06_Platform_Core/MFA_Technical_Evaluation.md
+- [ ] architecture/06_Platform_Core/Multi_Tenant_Architecture.md
+- [ ] architecture/06_Platform_Core/README.md
+- [ ] architecture/06_Platform_Core/TOTP_WebAuthn_Implementation.md
+
+#### Batch 26 — Agent/Analytics (4 files) + Infrastructure (1 file)
+- [ ] architecture/07_Agent_Service/Agent_System_Architecture.md
+- [ ] architecture/07_Agent_Service/Credit_Network_Architecture.md
+- [ ] architecture/08_Analytics_Service/BI_Dashboard_Architecture.md
+- [ ] architecture/08_Analytics_Service/Reporting_Architecture.md
+- [ ] architecture/09_Infrastructure/API_Design_Principles.md
+
+#### Batch 27 — Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Authentication_Architecture.md
+- [ ] architecture/09_Infrastructure/Caching_Strategy.md
+- [ ] architecture/09_Infrastructure/Common_Patterns.md
+- [ ] architecture/09_Infrastructure/Cost_Optimization_Architecture.md
+- [ ] architecture/09_Infrastructure/Deployment_Architecture.md
+
+#### Batch 28 — Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Domain_APIs.md
+- [ ] architecture/09_Infrastructure/Gateway_Core.md
+- [ ] architecture/09_Infrastructure/Gateway_Rate_Limiting.md
+- [ ] architecture/09_Infrastructure/Gateway_Security.md
+- [ ] architecture/09_Infrastructure/Infrastructure_Implementation.md
+
+#### Batch 29 — Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Maintenance_Architecture.md
+- [ ] architecture/09_Infrastructure/Multi_Actor_Token_Security.md
+- [ ] architecture/09_Infrastructure/OAuth_Refresh_Token.md
+- [ ] architecture/09_Infrastructure/Performance_Monitoring.md
+- [ ] architecture/09_Infrastructure/Performance_Optimization.md
+
+#### Batch 30 — Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/QA_Standards.md
+- [ ] architecture/09_Infrastructure/README.md
+- [ ] architecture/09_Infrastructure/Stream_Processing_Architecture.md
+- [ ] architecture/09_Infrastructure/Token_Cache_Performance.md
+- [ ] architecture/09_Infrastructure/Token_Edge_Deployment.md
+
+#### Batch 31 — Infrastructure (5 files)
+- [ ] architecture/09_Infrastructure/Token_Validation_Architecture.md
+- [ ] architecture/09_Infrastructure/Token_Validation_Service.md
+- [ ] architecture/10_Platform_Management/Data_Pipeline_Architecture.md
+- [ ] architecture/10_Platform_Management/Notification_Architecture.md
+- [ ] architecture/10_Platform_Management/Tenant_Configuration_Architecture.md
+
+**Phase 9B Status**: Batch 20-31 added (60 files). Ready for Ralph Loop execution.
 
 **Phase 9B COMPLETE**: [Summary when done]
 
