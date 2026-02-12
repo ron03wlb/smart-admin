@@ -115,6 +115,115 @@ CREATE INDEX idx_player_bonus_expiry ON player_bonus_records(status, expired_at)
 - **錢包整合（Wallet Integration）**: 獎金入帳至錢包必須與獎金記錄創建原子性執行（Manager @Transactional）
 - **規則引擎（Rule Engine）**: 考慮使用 LiteFlow 進行複雜的獎金規則評估鏈
 
+### SmartAdmin 實作範例（SmartAdmin Implementation Example）
+
+**PromotionService - 獎金領取邏輯**:
+```java
+@Service
+@RequiredArgsConstructor
+public class PromotionService {
+    private final PromotionRuleDao promotionRuleDao;
+    private final PlayerBonusRecordDao playerBonusRecordDao;
+    private final PromotionManager promotionManager;
+
+    public Option<BonusClaimVO> claimBonus(Long playerId, String promotionCode, String claimId) {
+        // 1. 查詢促銷活動配置
+        return Option.of(promotionRuleDao.selectByCode(promotionCode))
+            .filter(rule -> "ACTIVE".equals(rule.getStatus()))
+            .filter(rule -> isWithinTimeRange(rule))
+            // 2. 檢查玩家資格
+            .filter(rule -> checkEligibility(playerId, rule))
+            // 3. 檢查重複領取
+            .flatMap(rule -> checkDuplicateClaim(playerId, rule.getId(), claimId)
+                .flatMap(isDuplicate -> isDuplicate
+                    ? Option.none()  // 已領取，返回空
+                    : Option.some(rule)
+                )
+            )
+            // 4. 執行獎金發放（Manager @Transactional）
+            .map(rule -> promotionManager.distributeBonus(playerId, rule, claimId))
+            .map(record -> SmartBeanUtil.copy(record, BonusClaimVO.class));
+    }
+
+    private Boolean isWithinTimeRange(PromotionRuleEntity rule) {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(rule.getStartTime()) && now.isBefore(rule.getEndTime());
+    }
+
+    private Boolean checkEligibility(Long playerId, PromotionRuleEntity rule) {
+        // 實作資格檢查邏輯（首存、VIP 等級、地區限制等）
+        return true;  // 簡化範例
+    }
+
+    private Option<Boolean> checkDuplicateClaim(Long playerId, Long promotionId, String claimId) {
+        return Option.of(
+            playerBonusRecordDao.selectOne(
+                Wrappers.lambdaQuery(PlayerBonusRecordEntity.class)
+                    .eq(PlayerBonusRecordEntity::getPlayerId, playerId)
+                    .eq(PlayerBonusRecordEntity::getPromotionId, promotionId)
+                    .eq(PlayerBonusRecordEntity::getClaimId, claimId)
+            )
+        ).map(record -> true)  // 已存在
+         .orElse(Option.some(false));  // 未領取
+    }
+}
+```
+
+**PromotionManager - 獎金發放事務**:
+```java
+@Component
+@RequiredArgsConstructor
+public class PromotionManager {
+    private final PlayerBonusRecordDao playerBonusRecordDao;
+    private final WalletManager walletManager;
+    private final RedissonClient redissonClient;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public PlayerBonusRecordEntity distributeBonus(Long playerId, PromotionRuleEntity rule, String claimId) {
+        String lockKey = "promotion:claim:" + playerId + ":" + rule.getId();
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            // 取得分散式鎖（最多等待 5 秒，鎖定 10 秒）
+            if (!lock.tryLock(5, 10, TimeUnit.SECONDS)) {
+                throw new BusinessException(ErrorCode.SYSTEM_BUSY);
+            }
+
+            // 1. 創建獎金記錄
+            PlayerBonusRecordEntity bonusRecord = new PlayerBonusRecordEntity();
+            bonusRecord.setPlayerId(playerId);
+            bonusRecord.setPromotionId(rule.getId());
+            bonusRecord.setClaimId(claimId);
+            bonusRecord.setBonusAmount(calculateBonusAmount(playerId, rule));
+            bonusRecord.setWageringRequired(
+                bonusRecord.getBonusAmount().multiply(rule.getWageringMulti())
+            );
+            bonusRecord.setStatus("ACTIVE");
+            bonusRecord.setClaimedAt(LocalDateTime.now());
+            bonusRecord.setExpiredAt(LocalDateTime.now().plusDays(30));
+            playerBonusRecordDao.insert(bonusRecord);
+
+            // 2. 獎金入帳至錢包（原子操作）
+            walletManager.creditBonus(playerId, bonusRecord.getBonusAmount(), claimId);
+
+            return bonusRecord;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private BigDecimal calculateBonusAmount(Long playerId, PromotionRuleEntity rule) {
+        // 根據促銷類型計算獎金金額（首存配對、流水回饋等）
+        return rule.getMaxBonus();  // 簡化範例
+    }
+}
+```
+
 ### 驗證檢查清單（Verification Checklist）
 
 - [ ] 獎金類型配置正確（首存、流水、活動等）

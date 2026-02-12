@@ -211,9 +211,131 @@ export default {
   └── new_year_promo_default.jpg
 ```
 
-## 6. 資料庫結構
+## 6. SmartAdmin 實作範例（SmartAdmin Implementation Example）
 
-### 6.1 localization_contents
+**LocalizationService - 動態內容查詢**:
+```java
+@Service
+@RequiredArgsConstructor
+public class LocalizationService {
+    private final LocalizationContentDao localizationContentDao;
+    private final LocalizationManager localizationManager;
+
+    public Option<LocalizedContentVO> getLocalizedContent(String contentType, Long entityId, String languageCode) {
+        // 查詢在地化內容
+        return Option.of(
+            localizationContentDao.selectOne(
+                Wrappers.lambdaQuery(LocalizationContentEntity.class)
+                    .eq(LocalizationContentEntity::getContentType, contentType)
+                    .eq(LocalizationContentEntity::getEntityId, entityId)
+                    .eq(LocalizationContentEntity::getIsLatest, true)
+                    .eq(LocalizationContentEntity::getTranslationStatus, "published")
+            )
+        ).map(content -> extractLanguage(content, languageCode));
+    }
+
+    private LocalizedContentVO extractLanguage(LocalizationContentEntity content, String lang) {
+        // 從 JSONB 中提取指定語言的翻譯
+        JSONObject translations = JSON.parseObject(content.getTranslations());
+        String localizedText = translations.getString(lang);
+
+        // Fallback to default language if missing
+        if (localizedText == null) {
+            localizedText = translations.getString(content.getDefaultLanguage());
+        }
+
+        LocalizedContentVO vo = new LocalizedContentVO();
+        vo.setContentId(content.getContentId());
+        vo.setContentType(content.getContentType());
+        vo.setEntityId(content.getEntityId());
+        vo.setLanguageCode(lang);
+        vo.setLocalizedText(localizedText);
+        return vo;
+    }
+
+    public PageResult<PromotionListVO> getPromotions(PromotionQueryForm form, String languageCode) {
+        // 分頁查詢促銷活動並在地化內容
+        Page<PromotionEntity> page = SmartPageUtil.convert2PageQuery(form);
+        Page<PromotionEntity> pageResult = promotionDao.selectPage(page,
+            Wrappers.lambdaQuery(PromotionEntity.class)
+                .eq(PromotionEntity::getStatus, "ACTIVE")
+                .between(PromotionEntity::getStartTime, form.getStartTime(), form.getEndTime())
+        );
+
+        List<PromotionListVO> voList = pageResult.getRecords().stream()
+            .map(entity -> {
+                PromotionListVO vo = SmartBeanUtil.copy(entity, PromotionListVO.class);
+                // 取得在地化的標題和描述
+                getLocalizedContent("promotion", entity.getId(), languageCode)
+                    .peek(content -> {
+                        vo.setTitle(extractField(content, "title", languageCode));
+                        vo.setDescription(extractField(content, "description", languageCode));
+                    });
+                return vo;
+            })
+            .collect(Collectors.toList());
+
+        return SmartPageUtil.convert2PageResult(pageResult, voList);
+    }
+
+    private String extractField(LocalizationContentEntity content, String field, String lang) {
+        JSONObject translations = JSON.parseObject(content.getTranslations());
+        return translations.getString(lang + "." + field);
+    }
+}
+```
+
+**LocalizationManager - 發布管理**:
+```java
+@Component
+@RequiredArgsConstructor
+public class LocalizationManager {
+    private final LocalizationContentDao localizationContentDao;
+    private final ContentTranslationDao contentTranslationDao;
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void publishTranslations(String contentType, Long entityId, List<String> languages) {
+        // 1. 獲取最新版本的內容
+        LocalizationContentEntity content = localizationContentDao.selectOne(
+            Wrappers.lambdaQuery(LocalizationContentEntity.class)
+                .eq(LocalizationContentEntity::getContentType, contentType)
+                .eq(LocalizationContentEntity::getEntityId, entityId)
+                .eq(LocalizationContentEntity::getIsLatest, true)
+        );
+
+        // 2. 從 content_translations 同步已審批的翻譯至 JSONB
+        JSONObject translations = new JSONObject();
+        for (String lang : languages) {
+            ContentTranslationEntity translation = contentTranslationDao.selectOne(
+                Wrappers.lambdaQuery(ContentTranslationEntity.class)
+                    .eq(ContentTranslationEntity::getContentId, content.getContentId())
+                    .eq(ContentTranslationEntity::getLanguageCode, lang)
+                    .eq(ContentTranslationEntity::getReviewStatus, "approved")
+            );
+            if (translation != null) {
+                translations.put(lang, translation.getTranslatedText());
+            }
+        }
+
+        // 3. 更新 JSONB 並發布
+        content.setTranslations(translations.toJSONString());
+        content.setTranslationStatus("published");
+        localizationContentDao.updateById(content);
+    }
+
+    @Cacheable(value = "localization:content", key = "#contentType + ':' + #entityId + ':' + #lang")
+    public String getCachedTranslation(String contentType, Long entityId, String lang) {
+        // 緩存策略：5 分鐘 TTL
+        return getLocalizedContent(contentType, entityId, lang)
+            .map(LocalizedContentVO::getLocalizedText)
+            .getOrElse("Fallback text");
+    }
+}
+```
+
+## 7. 資料庫結構
+
+### 7.1 localization_contents
 
 ```sql
 CREATE TABLE localization_contents (
