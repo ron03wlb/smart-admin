@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 115 (Phase 6: 6, Phase 7-8: 98, Phase 9: 11)
-> **Status**: ✅ Phase 9A COMPLETE — All 12 batches (27 files) translated
+> **Total Iterations**: 116 (Phase 6: 6, Phase 7-8: 98, Phase 9: 12)
+> **Status**: Phase 9B IN PROGRESS — Batch 20 complete (5 files translated)
 
 ---
 
@@ -400,12 +400,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 
 **Note**: Files originally listed (Game_Integration_Architecture.md, Game_Session_Architecture.md, Third_Party_Standards.md, Turnover_System_Architecture.md) do not exist. Batch adjusted to include actual existing files.
 
-#### Batch 20 — Game Integration (3 files) + Activity Engine (2 files)
-- [ ] architecture/03_Game_Integration/Game_Integration_Security.md
-- [ ] architecture/03_Game_Integration/Game_Lobby_System.md
-- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md
-- [ ] architecture/04_Activity_Engine/Activity_Risk_System.md
-- [ ] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md
+#### Batch 20 — Game Integration (3 files) + Activity Engine (2 files) ✅ COMPLETE
+- [x] architecture/03_Game_Integration/Game_Integration_Security.md (遊戲整合安全技術實作)
+- [x] architecture/03_Game_Integration/Game_Lobby_System.md (遊戲大廳系統)
+- [x] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (有效投注額計算邏輯)
+- [x] architecture/04_Activity_Engine/Activity_Risk_System.md (活動風控系統架構)
+- [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (metadata 標準化)
 
 #### Batch 21 — Activity Engine (2 files) + Risk Engine (3 files)
 - [ ] architecture/04_Activity_Engine/Promotion_Implementation.md
@@ -557,4 +557,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9C IN PROGRESS — Translation Quality Gate (Terminology fixes: 流水→有效投注額, 可用餘額→可下注餘額, 充值→存款)
+**Status**: Phase 9B IN PROGRESS — Batch 20 complete (Game Integration + Activity Engine, 5 files)
