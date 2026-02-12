@@ -1,10 +1,9 @@
 # 代理系統業務需求
 
-> **Canonical Source**: [source-archive/07_Agent_Center/07-03_Agent_System.md](../../source-archive/07_Agent_Center/07-03_Agent_System.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Agent System Architecture](../../architecture/07_Agent_Service/Agent_System_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [07-03_Agent_System.md](../../source-archive/07_Agent_Center/07-03_Agent_System.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Agent_System_Architecture.md](../../architecture/07_Agent_Service/Agent_System_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

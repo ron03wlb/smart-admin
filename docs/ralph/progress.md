@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 110 (Phase 6: 6, Phase 7-8: 98, Phase 9: 6)
-> **Status**: IN PROGRESS 🔄 — Phase 9A Batch 7 complete (Risk Compliance)
+> **Total Iterations**: 111 (Phase 6: 6, Phase 7-8: 98, Phase 9: 7)
+> **Status**: IN PROGRESS 🔄 — Phase 9A Batch 8 complete (Governance/Agent Operations)
 
 ---
 
@@ -325,12 +325,12 @@ Priority: Requirements files contain business context suited for Chinese audienc
 - [x] requirements/05_Risk_Compliance/Player_Protection_Requirements.md (已翻譯，無需修改)
 - [x] requirements/05_Risk_Compliance/README.md (文檔→文件、描述→說明、來源索引中文化)
 
-#### Batch 8 — Governance/Agent Operations (5 files)
-- [ ] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md
-- [ ] requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md
-- [ ] requirements/06_Governance_Licensing/README.md
-- [ ] requirements/07_Agent_Operations/Agent_System_Requirements.md
-- [ ] requirements/07_Agent_Operations/Credit_Network_Requirements.md
+#### Batch 8 — Governance/Agent Operations (5 files) ✅ COMPLETE
+- [x] requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md (metadata 翻譯 + Business Value→業務價值 + Success Metrics→成功指標)
+- [x] requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md (metadata 翻譯 + Business Value→業務價值 + Acceptance Criteria→驗收標準)
+- [x] requirements/06_Governance_Licensing/README.md (文檔→文件、描述→說明、來源索引中文化)
+- [x] requirements/07_Agent_Operations/Agent_System_Requirements.md (metadata 翻譯: Canonical Source→規範來源等)
+- [x] requirements/07_Agent_Operations/Credit_Network_Requirements.md (metadata 翻譯: Canonical Source→規範來源等)
 
 #### Batch 9 — Metrics/Analytics/Infrastructure (4 files)
 - [ ] requirements/07_Metrics_KPIs/README.md

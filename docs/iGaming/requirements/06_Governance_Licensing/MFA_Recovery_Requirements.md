@@ -1,15 +1,15 @@
 # MFA 登入與恢復要求
 
-> **Canonical Source**: [06-06-03_Recovery_Flow.md](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
-> **Audience**: 高層管理、合規官員、安全運營
-> **Related Architecture**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [06-06-03_Recovery_Flow.md](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
+> **目標讀者**: 高層管理、合規官員、安全運營
+> **相關架構**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/MFA_Login_Recovery_Technical.md)
+> **最後同步**: 2026-02-09
 >
-> **Refinement Note**: 技術細節（Two-Phase Login 序列圖、Trusted Device Token 生成 Java 代碼、Cookie 配置 HttpOnly/Secure/SameSite、MFA Session 存儲 Redis + 5 分鐘 TTL、SHA256 哈希、QR Code 生成）已移至 Architecture 層。本文檔專注於業務政策。
+> **補充說明**: 技術細節（Two-Phase Login 序列圖、Trusted Device Token 生成 Java 代碼、Cookie 配置 HttpOnly/Secure/SameSite、MFA Session 存儲 Redis + 5 分鐘 TTL、SHA256 哈希、QR Code 生成）已移至 Architecture 層。本文檔專注於業務政策。
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
 此功能為業務提供價值：
 - **防止憑證洩露 (Preventing Credential Compromise)**：MFA 添加關鍵的第二認證因素，保護管理功能免受密碼被盜或暴力破解攻擊
@@ -17,7 +17,7 @@
 - **優化管理員生產力 (Optimizing Administrator Productivity)**：信任設備機制（30 天信任期）消除每天多次從同一工作站登入的管理員重複 MFA 提示
 - **減少帳號鎖定摩擦 (Reducing Account Lockout Friction)**：備份碼政策提供緊急恢復路徑，防止可能延遲關鍵運營的管理員鎖定
 
-## Success Metrics
+## 成功指標（Success Metrics）
 
 | 指標 | 目標 | 測量方式 |
 |--------|--------|-------------|
@@ -37,7 +37,7 @@ Multi-Factor Authentication (MFA) 是後台管理平台的強制安全控制。�
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
 此功能為業務提供價值：
 - 通過強制兩階段認證（密碼 + TOTP）保護管理功能免受憑證洩露

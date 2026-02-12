@@ -1,12 +1,13 @@
 # Multi-Tenant 需求（多租戶需求）
 
-> **Canonical Source**: [`docs/iGaming/source-archive/06_Platform_Governance/06-01_Multi_Tenant.md`](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
->
-> **Related Architecture**: [`architecture/06_Platform_Core/Multi_Tenant_Architecture.md`](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md)
+> **規範來源**: [06-01_Multi_Tenant.md](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md)
+> **目標讀者**: 高階主管、產品經理
+> **相關架構**: [Multi_Tenant_Architecture.md](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
 此 Multi-Tenant 架構為業務提供價值：
 - **可擴展性 (Scalability)**：在單一平台基礎設施上支援多個 Brand 和 Tenant，降低每個站點的運營開銷
@@ -15,7 +16,7 @@
 - **階層式控制 (Hierarchical Control)**：提供 Super Admin 全局監督、Brand 層級聚合和 Tenant 層級獨立性，平衡治理與運營自主性
 - **監管合規 (Regulatory Compliance)**：強制執行嚴格的 Tenant 數據隔離，同時支援 Brand 範圍的 SSO 和跨 Tenant 報表（適用於集團運營商）
 
-## Acceptance Criteria
+## 驗收標準（Acceptance Criteria）
 
 - [ ] **Tenant 階層強制執行**：系統正確強制執行 4 層階層（Super Admin → Brand → Tenant → Agent），權限範圍定義於第 4.1 節
 - [ ] **數據隔離驗證**：玩家數據、交易和遊戲會話嚴格按 tenant_id 隔離，無跨 Tenant 數據洩漏（第 5.1 節）
