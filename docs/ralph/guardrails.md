@@ -271,3 +271,19 @@ This rule is commented out but preserved for future reference.
 - **Result**: Java = 104/104 (100%), SQL = 104/104 (100%)
 - **Coverage Files to Exclude**: README.md, INDEX.md, quality-reports/*.md
 - **Lesson**: Coverage metrics should only count actual content files, not navigation/index files
+
+### P24: CI/CD workflow design - SmartAdmin convention alignment (Added 2026-02-13)
+- **Problem**: Phase 14 identified conflict between mermaid-syntax-check.yml (blanket `<br/>` ban) and SmartAdmin convention (USE `<br/>` in all Mermaid types except stateDiagram-v2)
+- **Root Cause**: Two workflows created at different times with different assumptions
+- **Resolution**: SmartAdmin convention wins (defined in CLAUDE.md, project-wide standard)
+- **Implementation**:
+  - ✅ `mermaid-syntax-check.yml`: Replaced blanket check with `detect-statediagram-br.sh` (stateDiagram-v2 only)
+  - ✅ `igaming-translation-quality.yml`: Added 6 quality gates (Technical Terms, Encoding, Terminology, Mermaid, stateDiagram, Coverage)
+  - ✅ Artifact upload: Quality reports saved for 30 days
+  - ✅ source-archive/ exclusion: P1 guardrail enforced in all checks
+- **Quality Gate Structure**:
+  - CRITICAL: Technical Terms (100%) - blocking
+  - HIGH: Encoding, Mermaid Syntax, stateDiagram HTML tag check - blocking
+  - MEDIUM: Terminology (≥95%), Coverage Thresholds (Java ≥90%, SQL ≥95%) - warning
+- **Coverage Calculation**: Uses P23 approach (content files only, excludes README/INDEX/reports)
+- **Lesson**: CI/CD workflows must align with project-wide conventions, not create conflicting standards
