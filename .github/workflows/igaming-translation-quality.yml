@@ -28,6 +28,7 @@ jobs:
           chmod +x scripts/validate-zh-tw-encoding.sh
           chmod +x scripts/check-terminology-consistency-zh-tw.sh
           chmod +x scripts/validate-mermaid.sh
+          chmod +x scripts/detect-statediagram-br.sh
 
       - name: Check technical terms preservation
         id: check-technical-terms
@@ -92,6 +93,66 @@ jobs:
             exit 1
           fi
 
+      - name: Check stateDiagram-v2 <br/> tags
+        id: check-statediagram
+        run: |
+          echo "## stateDiagram-v2 <br/> Check" >> $GITHUB_STEP_SUMMARY
+          # Exclude source-archive/ (READ-ONLY per P1 guardrail)
+          editable_dirs="docs/iGaming/requirements docs/iGaming/architecture docs/iGaming/architecture-decisions"
+
+          has_errors=false
+          for dir in $editable_dirs; do
+            if [ -d "$dir" ]; then
+              if ! bash scripts/detect-statediagram-br.sh "$dir" > /tmp/statediagram-$dir.log 2>&1; then
+                has_errors=true
+              fi
+            fi
+          done
+
+          if [ "$has_errors" = "false" ]; then
+            echo "✅ PASS: No <br/> tags in stateDiagram-v2 (editable files)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Note: source-archive/ excluded (READ-ONLY per P1 guardrail)" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "❌ FAIL: Found <br/> tags in stateDiagram-v2" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat /tmp/statediagram-*.log 2>/dev/null | tail -50 >> $GITHUB_STEP_SUMMARY || true
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Check Java/SQL coverage thresholds
+        id: check-coverage
+        continue-on-error: true
+        run: |
+          echo "## Coverage Threshold Check" >> $GITHUB_STEP_SUMMARY
+
+          # Count content files (exclude README, INDEX, reports)
+          total_content=$(find docs/iGaming/architecture -name "*.md" -type f | \
+            grep -v -E "(README|INDEX|quality-report|trend|analysis|best-practices)" | wc -l)
+
+          # Count files with Java code (exclude README, INDEX, reports, source-archive)
+          java_count=$(find docs/iGaming/architecture -name "*.md" -type f | \
+            grep -v -E "(README|INDEX|quality-report|trend|analysis|best-practices|source-archive)" | \
+            xargs grep -l "^### Java" 2>/dev/null | wc -l || echo 0)
+
+          # Count files with SQL schema (exclude README, INDEX, reports, source-archive)
+          sql_count=$(find docs/iGaming/architecture -name "*.md" -type f | \
+            grep -v -E "(README|INDEX|quality-report|trend|analysis|best-practices|source-archive)" | \
+            xargs grep -l "^### SQL" 2>/dev/null | wc -l || echo 0)
+
+          # Calculate percentages
+          java_pct=$(echo "scale=1; $java_count * 100 / $total_content" | bc)
+          sql_pct=$(echo "scale=1; $sql_count * 100 / $total_content" | bc)
+
+          echo "| Metric | Count | Total | Percentage | Threshold | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|-------|------------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Java Examples | $java_count | $total_content | ${java_pct}% | ≥90% | $([ $(echo "$java_pct >= 90" | bc) -eq 1 ] && echo '✅ PASS' || echo '⚠️ WARNING') |" >> $GITHUB_STEP_SUMMARY
+          echo "| SQL Schemas | $sql_count | $total_content | ${sql_pct}% | ≥95% | $([ $(echo "$sql_pct >= 95" | bc) -eq 1 ] && echo '✅ PASS' || echo '⚠️ WARNING') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Note: Coverage calculated on content files only (excludes README/INDEX/reports)" >> $GITHUB_STEP_SUMMARY
+
       - name: Generate quality report
         if: always()
         run: |
@@ -105,10 +166,27 @@ jobs:
           echo "| Encoding | ${{ steps.check-encoding.outcome == 'success' && '✅ PASS' || '❌ FAIL' }} | HIGH |" >> $GITHUB_STEP_SUMMARY
           echo "| Terminology | ${{ steps.check-terminology.outcome == 'success' && '✅ PASS' || '⚠️ WARNING' }} | MEDIUM |" >> $GITHUB_STEP_SUMMARY
           echo "| Mermaid Syntax | ${{ steps.check-mermaid.outcome == 'success' && '✅ PASS' || '❌ FAIL' }} | HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "| stateDiagram <br/> | ${{ steps.check-statediagram.outcome == 'success' && '✅ PASS' || '❌ FAIL' }} | HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Thresholds | ${{ steps.check-coverage.outcome == 'success' && '✅ PASS' || '⚠️ WARNING' }} | MEDIUM |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Reference" >> $GITHUB_STEP_SUMMARY
           echo "- [Translation Glossary](docs/iGaming/TRANSLATION_GLOSSARY.md)" >> $GITHUB_STEP_SUMMARY
           echo "- [Ralph Guardrails](docs/ralph/guardrails.md)" >> $GITHUB_STEP_SUMMARY
+          echo "- [SmartAdmin Mermaid Standards](CLAUDE.md#mermaid-diagram-standards)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports-${{ github.run_number }}
+          path: |
+            /tmp/technical-terms.log
+            /tmp/encoding.log
+            /tmp/terminology.log
+            /tmp/mermaid.log
+            /tmp/statediagram-*.log
+          retention-days: 30
+          if-no-files-found: ignore
 
       - name: Comment PR (on failure)
         if: failure() && github.event_name == 'pull_request'
@@ -116,20 +194,35 @@ jobs:
         with:
           script: |
             const issue_number = context.issue.number;
+            const failed_checks = [];
+
+            if ('${{ steps.check-technical-terms.outcome }}' === 'failure') {
+              failed_checks.push('❌ Technical Terms (CRITICAL)');
+            }
+            if ('${{ steps.check-encoding.outcome }}' === 'failure') {
+              failed_checks.push('❌ Encoding (HIGH)');
+            }
+            if ('${{ steps.check-mermaid.outcome }}' === 'failure') {
+              failed_checks.push('❌ Mermaid Syntax (HIGH)');
+            }
+            if ('${{ steps.check-statediagram.outcome }}' === 'failure') {
+              failed_checks.push('❌ stateDiagram <br/> tags (HIGH)');
+            }
+
             const body = `## ❌ iGaming Translation Quality Check Failed
 
 Please fix the errors and push again.
 
 **Failed Checks:**
-- ${{ steps.check-technical-terms.outcome == 'failure' && '❌ Technical Terms' || '' }}
-- ${{ steps.check-encoding.outcome == 'failure' && '❌ Encoding' || '' }}
-- ${{ steps.check-mermaid.outcome == 'failure' && '❌ Mermaid Syntax' || '' }}
+${failed_checks.map(c => `- ${c}`).join('\n')}
 
 **Reference:**
 - [TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md)
 - [Ralph Guardrails](docs/ralph/guardrails.md)
+- [SmartAdmin Mermaid Standards](CLAUDE.md#mermaid-diagram-standards)
 
-View detailed logs in the [Actions](${context.payload.repository.html_url}/actions/runs/${context.runId}) tab.
+**Download Quality Reports:**
+View detailed logs and artifacts in the [Actions](${context.payload.repository.html_url}/actions/runs/${context.runId}) tab.
 `;
 
             github.rest.issues.createComment({
