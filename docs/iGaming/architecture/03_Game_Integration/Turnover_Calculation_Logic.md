@@ -1023,13 +1023,13 @@ graph TD
 
     Reconciliation_Engine -->|3. 比對邏輯| Logic{匹配？}:::decision
 
-    Logic -- 是 --> Mark_Verified[標記已驗證]:::success
+    Logic -->|是| Mark_Verified[標記已驗證]:::success
 
-    Logic -- 否：缺失 --> Action_Recover[建立缺失交易]:::process
+    Logic -->|否：缺失| Action_Recover[建立缺失交易]:::process
 
-    Logic -- 否：差異 --> Action_Adjust[建立調整記錄]:::process
+    Logic -->|否：差異| Action_Adjust[建立調整記錄]:::process
 
-    Logic -- 否：幽靈 --> Alert_Risk[觸發風險告警]:::alert
+    Logic -->|否：幽靈| Alert_Risk[觸發風險告警]:::alert
 
     Action_Recover --> SaveTx[儲存交易]:::database
 
