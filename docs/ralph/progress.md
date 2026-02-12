@@ -780,15 +780,15 @@ Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 
 ### 14A: Resolve `<br/>` Conflict
 
-- [ ] Update `.github/workflows/mermaid-syntax-check.yml`: Remove `<br/>` prohibition, replace with stateDiagram-v2-only check (P20 guardrail)
-- [ ] Verify `detect-statediagram-br.sh` works as replacement check
+- [x] Update `.github/workflows/mermaid-syntax-check.yml`: Remove `<br/>` prohibition, replace with stateDiagram-v2-only check (P20 guardrail)
+- [x] Verify `detect-statediagram-br.sh` works as replacement check
 
 ### 14B: Enhance Translation Quality Workflow
 
-- [ ] Add `detect-statediagram-br.sh` as 5th check in `igaming-translation-quality.yml`
-- [ ] Add coverage threshold enforcement (Java ≥ 90%, SQL ≥ 95%)
-- [ ] Add artifact upload for quality reports
-- [ ] Ensure source-archive/ excluded from all checks
+- [x] Add `detect-statediagram-br.sh` as 5th check in `igaming-translation-quality.yml`
+- [x] Add coverage threshold enforcement (Java ≥ 90%, SQL ≥ 95%)
+- [x] Add artifact upload for quality reports
+- [x] Ensure source-archive/ excluded from all checks
 
 ### 14C: Integration Testing
 
@@ -838,4 +838,4 @@ bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
 ---
 
 **Last Updated**: 2026-02-13
-**Status**: Phase 13 Batch 5 COMPLETE ✅ — Game/Payment Java examples (2 added + 1 already present). Java coverage: 101/118 (85.6%), SQL coverage: 104/118 (88.1%).
+**Status**: Phase 14B COMPLETE ✅ — CI/CD workflow enhanced with 6 quality gates (stateDiagram check, coverage thresholds, artifact upload, source-archive exclusion). Phase 14A COMPLETE (resolved <br/> conflict in mermaid-syntax-check.yml).
