@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 118 (Phase 6: 6, Phase 7-8: 98, Phase 9: 14)
-> **Status**: Phase 9B IN PROGRESS — Batch 20-22 complete (15 files translated)
+> **Total Iterations**: 119 (Phase 6: 6, Phase 7-8: 98, Phase 9: 15)
+> **Status**: Phase 9B IN PROGRESS — Batch 20-23 complete (20 files translated)
 
 ---
 
@@ -421,12 +421,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/05_Risk_Engine/README.md (風控引擎索引)
 - [x] architecture/05_Risk_Engine/Risk_Implementation.md (風控實作指南)
 
-#### Batch 23 — Risk Engine (3 files) + Platform Core (2 files)
-- [ ] architecture/05_Risk_Engine/Risk_Proposal_Implementation.md
-- [ ] architecture/05_Risk_Engine/Risk_System_Architecture.md
-- [ ] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md
-- [ ] architecture/06_Platform_Core/Governance_Implementation.md
-- [ ] architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md
+#### Batch 23 — Risk Engine (3 files) + Platform Core (2 files) ✅ COMPLETE
+- [x] architecture/05_Risk_Engine/Risk_Proposal_Implementation.md (風控提案工作流實作)
+- [x] architecture/05_Risk_Engine/Risk_System_Architecture.md (風控系統架構)
+- [x] architecture/05_Risk_Engine/Turnover_Validation_Architecture.md (有效投注額驗證架構)
+- [x] architecture/06_Platform_Core/Governance_Implementation.md (治理實施)
+- [x] architecture/06_Platform_Core/Jurisdiction_Routing_Architecture.md (牌照路由技術架構)
 
 #### Batch 24 — Platform Core (5 files)
 - [ ] architecture/06_Platform_Core/MFA_Compliance_Technical.md
