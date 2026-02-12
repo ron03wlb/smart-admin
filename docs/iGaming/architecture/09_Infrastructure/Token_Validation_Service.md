@@ -1,8 +1,8 @@
-# Token 驗證服務設計 (Token Validation Service)
+# Token 驗證服務設計（Token Validation Service）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-13 Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-13 Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md)
+> **目標讀者**: Security Architects, Backend Engineers
 
 ---
 
@@ -383,8 +383,8 @@ CREATE INDEX idx_metrics_date ON t_token_validation_metrics(metric_date DESC);
 
 ---
 
-## Related Documentation
+## 相關文件
 
-- [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - Multi-actor token security model
-- [OAuth Refresh Token](./OAuth_Refresh_Token.md) - OAuth refresh token implementation
-- [Authentication Architecture](./Authentication_Architecture.md) - Authentication architecture overview
+- [多主體 Token 安全](./Multi_Actor_Token_Security.md) — 多主體 Token 安全模型
+- [OAuth Refresh Token](./OAuth_Refresh_Token.md) — OAuth Refresh Token 實施方案
+- [身份驗證架構](./Authentication_Architecture.md) — 認證架構總覽

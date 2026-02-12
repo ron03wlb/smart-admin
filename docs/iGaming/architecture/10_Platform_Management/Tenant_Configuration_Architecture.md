@@ -1,9 +1,8 @@
-# Tenant Configuration Technical Architecture
+# 租戶配置技術架構（Tenant Configuration Technical Architecture）
 
-> **Business Requirements**: [Tenant Configuration Requirements](../../requirements/10_Platform_Operations/Tenant_Configuration_Requirements.md)
-> **Canonical Source**: [source-archive/10_Platform_Management/10-02_Tenant_Configuration.md](../../source-archive/10_Platform_Management/10-02_Tenant_Configuration.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [租戶配置需求](../../requirements/10_Platform_Operations/Tenant_Configuration_Requirements.md)
+> **規範來源**: [source-archive/10_Platform_Management/10-02_Tenant_Configuration.md](../../source-archive/10_Platform_Management/10-02_Tenant_Configuration.md)
+> **目標讀者**: Architects, Backend Developers
 
 ---
 
@@ -367,6 +366,6 @@ public class ConfigHealthChecker {
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-09
-**Maintenance Team**: Platform Team & DevOps Team
+**文件版本**: 4.0.0
+**最後更新**: 2026-02-12
+**維護團隊**: Platform Team & DevOps Team

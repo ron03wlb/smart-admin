@@ -1,8 +1,8 @@
-# Token 驗證架構 (Token Validation Architecture)
+# Token 驗證架構（Token Validation Architecture）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-13-01 Validation Architecture](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-13-01 Validation Architecture](../../source-archive/09_Technical_Infrastructure/09-13-01_Validation_Architecture.md)
+> **目標讀者**: Security Architects, Backend Engineers
 
 ---
 
@@ -174,8 +174,8 @@ POST /api/token/introspect
 
 ---
 
-## 相關文檔
+## 相關文件
 
-- [Token Validation Service](./Token_Validation_Service.md) - 服務總覽
-- [Token Cache Performance](./Token_Cache_Performance.md) - 緩存策略
-- [Token Edge Deployment](./Token_Edge_Deployment.md) - 邊緣部署
+- [Token 驗證服務](./Token_Validation_Service.md) — 服務總覽
+- [Token 緩存性能](./Token_Cache_Performance.md) — 緩存性能設計
+- [Token 邊緣部署](./Token_Edge_Deployment.md) — 邊緣部署架構

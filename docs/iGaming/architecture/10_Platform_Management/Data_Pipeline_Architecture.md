@@ -1,9 +1,8 @@
-# Data Pipeline Technical Architecture
+# 資料管道技術架構（Data Pipeline Technical Architecture）
 
-> **Business Requirements**: [Data Pipeline Requirements](../../requirements/10_Platform_Operations/Data_Pipeline_Requirements.md)
-> **Canonical Source**: [source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md](../../source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [資料管道需求](../../requirements/10_Platform_Operations/Data_Pipeline_Requirements.md)
+> **規範來源**: [source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md](../../source-archive/10_Platform_Management/10-04_Data_Pipeline_Architecture.md)
+> **目標讀者**: Architects, Backend Developers, Data Engineers
 
 ---
 
@@ -526,6 +525,6 @@ CREATE INDEX idx_retention_layer ON t_data_retention_policy(layer) WHERE enabled
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-09
-**Maintenance Team**: Data Team & Platform Team
+**文件版本**: 4.0.0
+**最後更新**: 2026-02-12
+**維護團隊**: Data Team & Platform Team

@@ -1,9 +1,8 @@
-# Notification System Technical Architecture
+# 通知系統技術架構（Notification System Technical Architecture）
 
-> **Business Requirements**: [Notification Requirements](../../requirements/10_Platform_Operations/Notification_Requirements.md)
-> **Canonical Source**: [source-archive/10_Platform_Management/10-03_Notification_Architecture.md](../../source-archive/10_Platform_Management/10-03_Notification_Architecture.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [通知需求](../../requirements/10_Platform_Operations/Notification_Requirements.md)
+> **規範來源**: [source-archive/10_Platform_Management/10-03_Notification_Architecture.md](../../source-archive/10_Platform_Management/10-03_Notification_Architecture.md)
+> **目標讀者**: Architects, Backend Developers
 
 ---
 
@@ -523,6 +522,6 @@ public class NotificationSecurityService {
 
 ---
 
-**Document Version**: 4.1.0
-**Last Updated**: 2026-02-10
-**Maintenance Team**: Platform Team & DevOps Team
+**文件版本**: 4.1.0
+**最後更新**: 2026-02-12
+**維護團隊**: Platform Team & DevOps Team
