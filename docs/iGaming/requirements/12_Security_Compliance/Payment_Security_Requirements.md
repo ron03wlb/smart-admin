@@ -1,10 +1,9 @@
 # 支付安全需求 (Payment Security Requirements)
 
-> **Canonical Source**: [source-archive/12_System_Security/12-06](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md), [12-07](../../source-archive/12_System_Security/12-07_Data_Portability_SAR.md), [12-08](../../source-archive/12_System_Security/12-08_MITM_Detection.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers, Payment Operations
-> **Related Architecture**: [Payment Restrictions Architecture](../../architecture/12_Security/Payment_Restrictions.md), [Data Portability SAR Architecture](../../architecture/12_Security/Data_Portability_SAR.md), [MITM Detection Architecture](../../architecture/12_Security/MITM_Detection.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [12-06_Payment_Restrictions.md](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md), [12-07_Data_Portability_SAR.md](../../source-archive/12_System_Security/12-07_Data_Portability_SAR.md), [12-08_MITM_Detection.md](../../source-archive/12_System_Security/12-08_MITM_Detection.md)
+> **目標讀者**: 產品經理、合規官、支付營運
+> **相關架構**: [Payment_Restrictions.md](../../architecture/12_Security/Payment_Restrictions.md), [Data_Portability_SAR.md](../../architecture/12_Security/Data_Portability_SAR.md), [MITM_Detection.md](../../architecture/12_Security/MITM_Detection.md)
+> **最後同步**: 2026-02-09
 
 ---
 

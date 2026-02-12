@@ -1,10 +1,9 @@
 # 合規標準需求（Compliance Standards Requirements）
 
-> **Canonical Source**: [source-archive/12_System_Security/12-04](../../source-archive/12_System_Security/12-04_ISO27001_2022_Mapping.md), [12-05](../../source-archive/12_System_Security/12-05_UK_RTS_Security.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Compliance Officers, Security Managers, Auditors
-> **Related Architecture**: [ISO27001 Mapping Architecture](../../architecture/12_Security/ISO27001_Mapping.md), [UK RTS Security Architecture](../../architecture/12_Security/UK_RTS_Security.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [12-04_ISO27001_2022_Mapping.md](../../source-archive/12_System_Security/12-04_ISO27001_2022_Mapping.md), [12-05_UK_RTS_Security.md](../../source-archive/12_System_Security/12-05_UK_RTS_Security.md)
+> **目標讀者**: 合規官、安全經理、審計員
+> **相關架構**: [ISO27001_Mapping.md](../../architecture/12_Security/ISO27001_Mapping.md), [UK_RTS_Security.md](../../architecture/12_Security/UK_RTS_Security.md)
+> **最後同步**: 2026-02-09
 
 ---
 

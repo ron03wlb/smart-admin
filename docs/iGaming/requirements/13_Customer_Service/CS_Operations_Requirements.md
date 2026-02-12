@@ -1,10 +1,9 @@
 # 客服營運需求（Customer Service Operations Requirements）
 
-> **Canonical Source**: [13-02_Customer_Service_Operations.md](../../source-archive/13_Customer_Service/13-02_Customer_Service_Operations.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Customer Service Managers, Operations Directors
-> **Related Architecture**: [CS_Operations_Architecture.md](../../architecture/13_Customer_Service/CS_Operations_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [13-02_Customer_Service_Operations.md](../../source-archive/13_Customer_Service/13-02_Customer_Service_Operations.md)
+> **目標讀者**: 產品經理、客服經理、營運總監
+> **相關架構**: [CS_Operations_Architecture.md](../../architecture/13_Customer_Service/CS_Operations_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 
