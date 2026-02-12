@@ -1,10 +1,9 @@
 # 第三方整合需求 (Third-Party Integration Requirements)
 
-> **Canonical Source**: [source-archive/14_Third_Party_Integration/14-01](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Integration Managers, Operations Team
-> **Related Architecture**: [Third Party Integration Architecture](../../architecture/14_Third_Party/Third_Party_Integration_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [14-01_Third_Party_Integration.md](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md)
+> **目標讀者**: 產品經理、整合經理、營運團隊
+> **相關架構**: [Third_Party_Integration_Architecture.md](../../architecture/14_Third_Party/Third_Party_Integration_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

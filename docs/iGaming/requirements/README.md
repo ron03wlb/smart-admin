@@ -9,7 +9,7 @@
 
 ## 類別導航（Category Navigation）
 
-| 類別 | 描述 | 文檔數量 |
+| 類別 | 說明 | 文件數量 |
 |----------|-------------|-----------|
 | [01_Player_Experience](01_Player_Experience/) | 玩家生命週期、VIP、細分 | 6 |
 | [02_Financial_Operations](02_Financial_Operations/) | 支付、對帳、錢包規則 | 5 |
@@ -33,7 +33,7 @@
 
 ### 01 玩家體驗（Player Experience）（6 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [玩家生命週期（Player Lifecycle）](01_Player_Experience/Player_Lifecycle.md) | 玩家階段、KYC 等級、狀態轉換 |
 | [業務流程（Business Flows）](01_Player_Experience/Business_Flows.md) | 核心業務流程、玩家旅程圖 |
@@ -44,7 +44,7 @@
 
 ### 02 財務運營（Financial Operations）（5 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [支付運營（Payment Operations）](02_Financial_Operations/Payment_Operations.md) | 支付方式、成本、SLA、合規 |
 | [對帳需求（Reconciliation Requirements）](02_Financial_Operations/Reconciliation_Requirements.md) | 三層匹配、差異處理 |
@@ -54,7 +54,7 @@
 
 ### 03 遊戲運營（Gaming Operations）（4 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [投注額業務規則（Turnover Business Rules）](03_Gaming_Operations/Turnover_Business_Rules.md) | 流水要求、遊戲權重 |
 | [遊戲整合需求（Game Integration Requirements）](03_Gaming_Operations/Game_Integration_Requirements.md) | 供應商標準、認證檢查表 |
@@ -63,7 +63,7 @@
 
 ### 04 促銷與 VIP（Promotions & VIP）（3 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [紅利計算需求（Bonus Calculation Requirements）](04_Promotions_VIP/Bonus_Calculation_Requirements.md) | 紅利類型、資格、條款 |
 | [活動風險需求（Activity Risk Requirements）](04_Promotions_VIP/Activity_Risk_Requirements.md) | 紅利濫用政策、配對投注檢測 |
@@ -71,7 +71,7 @@
 
 ### 05 風險與合規（Risk & Compliance）（11 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [風險策略概覽（Risk Strategy Overview）](05_Risk_Compliance/Risk_Strategy_Overview.md) | 欺詐類型、KPI、行業背景 |
 | [KYC/AML 需求](05_Risk_Compliance/KYC_AML_Requirements.md) | 驗證等級、法規 |
@@ -87,7 +87,7 @@
 
 ### 06 治理與授權（Governance & Licensing）（6 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [多租戶需求（Multi-Tenant Requirements）](06_Governance_Licensing/Multi_Tenant_Requirements.md) | 層級結構、數據隔離、計費 |
 | [MFA 需求](06_Governance_Licensing/MFA_Requirements.md) | 驗證政策、合規 |
@@ -98,28 +98,28 @@
 
 ### 07 代理運營（Agent Operations）（2 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [信用網絡需求（Credit Network Requirements）](07_Agent_Operations/Credit_Network_Requirements.md) | 信用額度、結算週期、業務規則 |
 | [代理系統需求（Agent System Requirements）](07_Agent_Operations/Agent_System_Requirements.md) | 代理層級、佣金規則、招募 |
 
 ### 08 分析運營（Analytics Operations）（2 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [報告需求（Reporting Requirements）](08_Analytics_Operations/Reporting_Requirements.md) | 業務報告、KPI 定義、數據維度 |
 | [BI 儀表板需求（BI Dashboard Requirements）](08_Analytics_Operations/BI_Dashboard_Requirements.md) | 儀表板需求、指標定義 |
 
 ### 09 基礎設施需求（Infrastructure Requirements）（2 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [QA 標準需求（QA Standards Requirements）](09_Infrastructure_Requirements/QA_Standards_Requirements.md) | QA 驗收標準、測試覆蓋率 |
 | [成本優化需求（Cost Optimization Requirements）](09_Infrastructure_Requirements/Cost_Optimization_Requirements.md) | 成本控制目標、預算約束 |
 
 ### 10 平台運營（Platform Operations）（3 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [租戶配置需求（Tenant Configuration Requirements）](10_Platform_Operations/Tenant_Configuration_Requirements.md) | 白標配置、租戶自定義 |
 | [通知需求（Notification Requirements）](10_Platform_Operations/Notification_Requirements.md) | 通知場景、渠道優先級 |
@@ -127,7 +127,7 @@
 
 ### 11 前端體驗（Frontend Experience）（4 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [前端 UX 需求（Frontend UX Requirements）](11_Frontend_Experience/Frontend_UX_Requirements.md) | 頁面佈局、橫幅規則 |
 | [SEO 性能需求（SEO Performance Requirements）](11_Frontend_Experience/SEO_Performance_Requirements.md) | SEO 目標、性能 SLA |
@@ -136,7 +136,7 @@
 
 ### 12 安全合規（Security Compliance）（3 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [數據保護需求（Data Protection Requirements）](12_Security_Compliance/Data_Protection_Requirements.md) | GDPR 合規、數據刪除政策 |
 | [合規標準需求（Compliance Standards Requirements）](12_Security_Compliance/Compliance_Standards_Requirements.md) | ISO 27001、UK RTS 合規 |
@@ -144,20 +144,20 @@
 
 ### 13 客戶服務（Customer Service）（2 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [客服平台需求（CS Platform Requirements）](13_Customer_Service/CS_Platform_Requirements.md) | 客服平台、玩家 360 視圖、工單分類 |
 | [客服運營需求（CS Operations Requirements）](13_Customer_Service/CS_Operations_Requirements.md) | 客服運營、SLA 指標、排班 |
 
 ### 14 整合標準（Integration Standards）（1 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [第三方整合需求（Third Party Integration Requirements）](14_Integration_Standards/Third_Party_Integration_Requirements.md) | 第三方商業條件、SLA |
 
 ### 15 負責任博彩（Responsible Gambling）（4 份文檔）
 
-| 文檔 | 關鍵主題 |
+| 文件 | 關鍵主題 |
 |----------|------------|
 | [自我排除需求（Self-Exclusion Requirements）](15_Responsible_Gambling/Self_Exclusion_Requirements.md) | 自我排除類型、監管要求 |
 | [存款限額需求（Deposit Limits Requirements）](15_Responsible_Gambling/Deposit_Limits_Requirements.md) | 存款限額、虧損限額、業務規則 |

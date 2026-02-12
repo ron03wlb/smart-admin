@@ -1,10 +1,9 @@
 # 存款及虧損限額需求
 
-> **Canonical Source**: [15-02_Deposit_Limits.md](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md), [15-06_Loss_Limits.md](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Deposit_Loss_Limits_Architecture.md](../../architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [15-02_Deposit_Limits.md](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md), [15-06_Loss_Limits.md](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Deposit_Loss_Limits_Architecture.md](../../architecture/15_Responsible_Gambling/Deposit_Loss_Limits_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

@@ -1,10 +1,9 @@
 # 可負擔性評估與玩家保護 API 需求（Affordability & Player Protection API Requirements）
 
-> **Canonical Source**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md), [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Player_Protection_API.md](../../architecture/15_Responsible_Gambling/Player_Protection_API.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md), [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Player_Protection_API.md](../../architecture/15_Responsible_Gambling/Player_Protection_API.md)
+> **最後同步**: 2026-02-09
 
 ---
 

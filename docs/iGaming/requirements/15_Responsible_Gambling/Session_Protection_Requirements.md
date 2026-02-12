@@ -1,10 +1,9 @@
 # 會話保護需求
 
-> **Canonical Source**: [15-03_Cooling_Off_Period.md](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md), [15-04_Session_Management.md](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md), [15-05_Reality_Checks.md](../../source-archive/15_Responsible_Gambling/15-05_Reality_Checks.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Session_Protection_Architecture.md](../../architecture/15_Responsible_Gambling/Session_Protection_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [15-03_Cooling_Off_Period.md](../../source-archive/15_Responsible_Gambling/15-03_Cooling_Off_Period.md), [15-04_Session_Management.md](../../source-archive/15_Responsible_Gambling/15-04_Session_Management.md), [15-05_Reality_Checks.md](../../source-archive/15_Responsible_Gambling/15-05_Reality_Checks.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Session_Protection_Architecture.md](../../architecture/15_Responsible_Gambling/Session_Protection_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

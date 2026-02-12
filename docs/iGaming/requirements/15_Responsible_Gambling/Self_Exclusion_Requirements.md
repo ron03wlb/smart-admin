@@ -1,10 +1,9 @@
 # 自我排除需求
 
-> **Canonical Source**: [15-01_Self_Exclusion.md](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md), [15-09_Self_Exclusion_Reconciliation.md](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Architecture**: [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [15-01_Self_Exclusion.md](../../source-archive/15_Responsible_Gambling/15-01_Self_Exclusion.md), [15-09_Self_Exclusion_Reconciliation.md](../../source-archive/15_Responsible_Gambling/15-09_Self_Exclusion_Reconciliation.md)
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 
@@ -163,8 +162,8 @@
 | 進行中的遊戲 | 等待局結束，正常結算 |
 | 預定投注 | 取消並退款 |
 | 體育投注 | 依牌照規則：可等待結果或提前結算 |
-| 獎金（達到流水要求） | 允許提款 |
-| 獎金（未達流水要求） | 沒收 |
+| 獎金（達到投注要求） | 允許提款 |
+| 獎金（未達投注要求） | 沒收 |
 
 ---
 
