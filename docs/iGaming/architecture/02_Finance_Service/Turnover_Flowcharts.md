@@ -1,60 +1,60 @@
-# Turnover Calculation Flowcharts and Sequence Diagrams
+# 有效投注額計算流程圖與時序圖
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md](../../source-archive/02_Finance_Center/02-04-diagrams/02-04-01_Flowcharts_and_Sequences.md)
-> **Audience**: Architects, Backend Developers, Data Engineers
+> **Audience**: 架構師、後端開發人員、數據工程師
 > **Business Requirements**: [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/Turnover_Business_Rules.md)
 > **Last Synced**: 2026-02-08
 
 ---
 
-## Document Purpose
+## 文件目的
 
-This document provides the technical visualization of the iGaming platform's turnover calculation system, including the Three-Layer Validation Architecture, detailed sequence diagrams, flowcharts for each layer, and the bet lifecycle state machine. All diagrams are intended for engineering teams implementing or maintaining the turnover calculation pipeline.
+本文件提供 iGaming 平台有效投注額 (Valid Turnover) 計算系統的技術視覺化呈現，包括三層驗證架構、詳細時序圖、各層流程圖，以及投注生命週期狀態機。所有圖表均供實作或維護有效投注額計算管線的工程團隊使用。
 
-**Version History**:
-- v4.0.0 (2026-01-28): Corrected Layer 2 logic -- removed erroneous `status_factor` dynamic modification of `valid_bet`; adopted Standard Principal Method; added risk marking mechanism and audit traceability support
-- v3.0.0 (2026-01-27): Initial creation
+**版本歷史**:
+- v4.0.0 (2026-01-28): 修正 Layer 2 邏輯——移除錯誤的 `status_factor` 動態修改 `valid_bet`；採用標準本金法 (Standard Principal Method)；新增風險標記機制與稽核追溯支援
+- v3.0.0 (2026-01-27): 初始建立
 
-**Key Design Decisions**:
-- Layer 1 (Risk Engine) makes the one-time determination of `valid_bet`
-- Layer 2 (Finance Center) only records settlement status -- it does NOT modify `valid_bet`
-- Layer 3 (Activity System) applies game weights for activity contribution calculation
+**關鍵設計決策**:
+- Layer 1 (風控引擎 Risk Engine) 一次性決定 `valid_bet`
+- Layer 2 (財務中心 Finance Center) 僅記錄結算狀態——**不修改** `valid_bet`
+- Layer 3 (活動系統 Activity System) 應用遊戲權重計算活動貢獻
 
-**Reference Documents**:
-- Terminology Standards *(planned - source-archive/00_Foundation/00-03_Terminology_Standards)*
+**參考文件**:
+- 術語標準 *(規劃中 - source-archive/00_Foundation/00-03_Terminology_Standards)*
 - [Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
 - [Turnover and Reconciliation Analysis](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 - [Activity Bonus](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md)
 
 ---
 
-## Table of Contents
+## 目錄
 
-1. [Architecture Overview](#1-architecture-overview)
-2. [End-to-End Sequence Diagram](#2-end-to-end-sequence-diagram)
-3. [Main Turnover Calculation Flowchart](#3-main-turnover-calculation-flowchart)
-4. [Layer 1: Risk Engine Validation](#4-layer-1-risk-engine-validation)
-5. [Layer 2: Finance Settlement Recording](#5-layer-2-finance-settlement-recording)
-6. [Layer 3: Activity Weight Application](#6-layer-3-activity-weight-application)
-7. [Bet Lifecycle State Machine](#7-bet-lifecycle-state-machine)
-8. [Calculation Examples](#8-calculation-examples)
-9. [Risk Marking Mechanism](#9-risk-marking-mechanism)
-10. [Design Principles: Layer 2 Does Not Modify Valid Bet](#10-design-principles-layer-2-does-not-modify-valid-bet)
+1. [架構概覽](#1-架構概覽)
+2. [端對端時序圖](#2-端對端時序圖)
+3. [主流程圖](#3-主流程圖)
+4. [Layer 1: 風控引擎驗證](#4-layer-1-風控引擎驗證)
+5. [Layer 2: 財務結算記錄](#5-layer-2-財務結算記錄)
+6. [Layer 3: 活動權重應用](#6-layer-3-活動權重應用)
+7. [投注生命週期狀態機](#7-投注生命週期狀態機)
+8. [計算範例](#8-計算範例)
+9. [風險標記機制](#9-風險標記機制)
+10. [設計原則：Layer 2 不修改 Valid Bet](#10-設計原則layer-2-不修改-valid-bet)
 
 ---
 
-## 1. Architecture Overview
+## 1. 架構概覽
 
-### 1.1 Three-Layer Validation Architecture
+### 1.1 三層驗證架構
 
-The turnover calculation system uses a three-layer validation architecture. Data flows sequentially from player bet through Layer 1 (Risk), Layer 2 (Finance), and Layer 3 (Activity) before reaching application scenarios.
+有效投注額計算系統採用三層驗證架構。資料從玩家投注開始，依序流經 Layer 1 (風控)、Layer 2 (財務)、Layer 3 (活動)，最後到達應用場景。
 
-> **Diagram Complexity**: 24 nodes (optimized with subgraph grouping)
-> **Reading Guide**: Follow the data flow order (Player Bet -> Layer 1 -> Layer 2 -> Layer 3 -> Application Scenarios)
-> **Key Points**:
-> - Layer 1 Risk Validation determines `valid_bet`
-> - Layer 2 only records status, does NOT modify `valid_bet`
-> - Layer 3 applies game weights for activity contribution
+> **圖表複雜度**: 24 個節點（透過 subgraph 分組優化）
+> **閱讀指南**: 按資料流順序閱讀（玩家投注 -> Layer 1 -> Layer 2 -> Layer 3 -> 應用場景）
+> **關鍵要點**:
+> - Layer 1 風控驗證決定 `valid_bet`
+> - Layer 2 僅記錄狀態，**不修改** `valid_bet`
+> - Layer 3 應用遊戲權重計算活動貢獻
 
 ```mermaid
 graph TB
@@ -136,11 +136,11 @@ graph TB
 
 ---
 
-## 2. End-to-End Sequence Diagram
+## 2. 端對端時序圖
 
-### 2.1 Complete Turnover Calculation Sequence
+### 2.1 完整有效投注額計算時序
 
-This sequence diagram shows the full lifecycle of a bet from placement through settlement, three-layer validation, payout, and audit logging.
+此時序圖展示投注從下注到結算、三層驗證、派彩及稽核日誌的完整生命週期。
 
 ```mermaid
 sequenceDiagram
@@ -156,7 +156,7 @@ sequenceDiagram
     participant DB as Database
 
     rect rgb(240, 248, 255)
-        Note over Player,Game: ===== Phase 1: Betting Phase =====
+        Note over Player,Game: ===== 階段 1: 投注階段 =====
     end
 
     Player->>Game: 1. Place Bet<br/>Amount: $100, Game: Baccarat, Odds: 1.95
@@ -169,7 +169,7 @@ sequenceDiagram
     Game-->>Player: 8. Bet Confirmed<br/>Round ID: round_12345
 
     rect rgb(255, 250, 240)
-        Note over Player,DB: ===== Phase 2: Game Settlement Phase =====
+        Note over Player,DB: ===== 階段 2: 遊戲結算階段 =====
     end
 
     Note over Game: Game Result: Player wins $195
@@ -177,7 +177,7 @@ sequenceDiagram
     Platform->>DB: 10. Record bet result<br/>bet_id, status=WIN, win_amount=195
 
     rect rgb(240, 255, 240)
-        Note over Risk,Activity: ===== Phase 3: Turnover Validation (Layer 1 - Risk Engine) =====
+        Note over Risk,Activity: ===== 階段 3: 有效投注額驗證 (Layer 1 - Risk Engine) =====
     end
 
     Platform->>Risk: 11. validateTurnover(bet_id)<br/>{bet_amount: 100, odds: 1.95, game: BACCARAT}
@@ -196,7 +196,7 @@ sequenceDiagram
     Risk-->>Platform: 15. Validation Passed<br/>{is_valid: true,<br/>valid_bet: 100,<br/>risk_status: "PASSED",<br/>filter_reason: null,<br/>risk_rules_applied: []}
 
     rect rgb(255, 250, 250)
-        Note over Finance,Activity: ===== Phase 4: Finance Status Recording (Layer 2) =====
+        Note over Finance,Activity: ===== 階段 4: 財務狀態記錄 (Layer 2) =====
     end
 
     Platform->>Finance: 16. recordSettlement(bet_id)<br/>{valid_bet: 100,<br/>status: WIN}
@@ -211,7 +211,7 @@ sequenceDiagram
     Finance-->>Platform: 20. Return settlement result<br/>{valid_bet: 100 (unchanged),<br/>settlement_status: 'WIN',<br/>payout_amount: 195}
 
     rect rgb(248, 240, 255)
-        Note over Activity,Wallet: ===== Phase 5: Game Weight Application (Layer 3) =====
+        Note over Activity,Wallet: ===== 階段 5: 遊戲權重應用 (Layer 3) =====
     end
 
     Platform->>Activity: 21. applyGameWeight()<br/>{valid_bet: 100,<br/>game_type: BACCARAT}
@@ -231,7 +231,7 @@ sequenceDiagram
     Activity-->>Platform: 28. Return activity contribution<br/>{contributed_amount: 15,<br/>wagering_progress: "0.3%",<br/>remaining: 4985}
 
     rect rgb(255, 245, 240)
-        Note over Platform,Player: ===== Phase 6: Payout and Notification =====
+        Note over Platform,Player: ===== 階段 6: 派彩與通知 =====
     end
 
     Platform->>Wallet: 29. Credit payout to wallet<br/>Credit $195 to player
@@ -241,7 +241,7 @@ sequenceDiagram
     Platform->>Player: 32. Push notification<br/>Won $195<br/>Wagering progress: +$15 (0.3%)
 
     rect rgb(245, 245, 245)
-        Note over Platform,DB: ===== Phase 7: Audit Log =====
+        Note over Platform,DB: ===== 階段 7: 稽核日誌 =====
     end
 
     Platform->>DB: 33. Record audit log<br/>AuditLog.create({<br/>action: "TURNOVER_CALCULATED",<br/>details: {...}<br/>})
@@ -249,17 +249,17 @@ sequenceDiagram
 
 ---
 
-## 3. Main Turnover Calculation Flowchart
+## 3. 主流程圖
 
-### 3.1 Main Flow
+### 3.1 主流程
 
-> **Diagram Complexity**: 26 nodes (optimized with subgraph grouping)
-> **Reading Guide**: Follow the three-layer architecture order (Input -> Layer 1 -> Layer 2 -> Layer 3 -> Update)
-> **Key Decision Points**:
-> - Layer 1: Hedge/Arbitrage/Low Odds -> determines whether `valid_bet` is 0
-> - Layer 2: Bet status branch (WIN/LOSS/DRAW/VOID/HALF) -> records status only
-> - Layer 3: Game type branch (Slots/Baccarat/Blackjack/Roulette) -> applies corresponding weight
-> - Update: Wagering met? -> determines whether to unlock withdrawal
+> **圖表複雜度**: 26 個節點（透過 subgraph 分組優化）
+> **閱讀指南**: 按三層架構順序閱讀（輸入 -> Layer 1 -> Layer 2 -> Layer 3 -> 更新）
+> **關鍵決策點**:
+> - Layer 1: 對沖/套利/低賠率 -> 決定 `valid_bet` 是否為 0
+> - Layer 2: 投注狀態分支 (WIN/LOSS/DRAW/VOID/HALF) -> 僅記錄狀態
+> - Layer 3: 遊戲類型分支 (Slots/Baccarat/Blackjack/Roulette) -> 應用對應權重
+> - 更新: 是否達成流水要求？ -> 決定是否解鎖提款
 
 ```mermaid
 flowchart TD
@@ -365,11 +365,11 @@ flowchart TD
 
 ---
 
-## 4. Layer 1: Risk Engine Validation
+## 4. Layer 1: 風控引擎驗證
 
-### 4.1 Hedge Detection Flow
+### 4.1 對沖偵測流程
 
-The hedge detection process identifies when a player places opposing bets within the same game round (e.g., betting on both Banker and Player in Baccarat).
+對沖偵測流程識別玩家在同一遊戲局中下注對立選項的情況（例如：在百家樂中同時投注莊家和閒家）。
 
 ```mermaid
 flowchart TD
@@ -410,9 +410,9 @@ flowchart TD
     style I fill:#d4edda
 ```
 
-### 4.2 Odds Threshold Check
+### 4.2 賠率門檻檢查
 
-Low-odds bets are filtered to prevent exploitation of near-certain outcomes for wagering requirement completion.
+低賠率投注被過濾，以防止玩家利用幾乎必贏的結果來完成流水要求 (Wagering Requirement)。
 
 ```mermaid
 flowchart TD
@@ -450,11 +450,11 @@ flowchart TD
 
 ---
 
-## 5. Layer 2: Finance Settlement Recording
+## 5. Layer 2: 財務結算記錄
 
-### 5.1 Settlement Status Recording Flow
+### 5.1 結算狀態記錄流程
 
-Layer 2 receives the `valid_bet` value from Layer 1 as an immutable input. It records the settlement status and calculates payout amounts, but **never modifies** the `valid_bet` value.
+Layer 2 接收 Layer 1 輸出的 `valid_bet` 值作為不可變輸入。它記錄結算狀態並計算派彩金額，但**永不修改** `valid_bet` 值。
 
 ```mermaid
 flowchart TD
@@ -517,9 +517,9 @@ flowchart TD
     style N fill:#fff3cd
 ```
 
-### 5.2 Settlement Status vs Valid Bet Reference Table
+### 5.2 結算狀態與 Valid Bet 對照表
 
-**Core Principle**: `valid_bet` is determined once by Layer 1 (Risk Engine). Layer 2 only records settlement status and **does not modify** the `valid_bet` value.
+**核心原則**: `valid_bet` 由 Layer 1 (風控引擎) 一次性決定。Layer 2 僅記錄結算狀態，**不修改** `valid_bet` 值。
 
 ```mermaid
 graph LR
@@ -582,11 +582,11 @@ graph LR
 
 ---
 
-## 6. Layer 3: Activity Weight Application
+## 6. Layer 3: 活動權重應用
 
-### 6.1 Game Weight Application Flow
+### 6.1 遊戲權重應用流程
 
-Layer 3 receives the validated `valid_bet` from the pipeline and applies game-specific weights to calculate the activity contribution amount.
+Layer 3 接收管線驗證後的 `valid_bet`，並應用遊戲特定權重計算活動貢獻金額。
 
 ```mermaid
 flowchart TD
@@ -673,7 +673,7 @@ flowchart TD
     style W fill:#d4edda
 ```
 
-### 6.2 Game Weight Configuration Table
+### 6.2 遊戲權重配置表
 
 ```mermaid
 graph TD
@@ -708,11 +708,11 @@ graph TD
 
 ---
 
-## 7. Bet Lifecycle State Machine
+## 7. 投注生命週期狀態機
 
-### 7.1 Bet Lifecycle (State Machine)
+### 7.1 投注生命週期（狀態機）
 
-This state diagram models the full lifecycle of a bet from placement through settlement and turnover calculation.
+此狀態圖模擬投注從下注到結算及有效投注額計算的完整生命週期。
 
 ```mermaid
 %%{init: {
@@ -798,17 +798,17 @@ stateDiagram-v2
 
 ---
 
-## 8. Calculation Examples
+## 8. 計算範例
 
-### 8.1 Example 1: Baccarat Bet
+### 8.1 範例 1：百家樂投注
 
-**Scenario**: Player participates in a "100% First Deposit Bonus" activity with a 5x wagering requirement.
+**情境**: 玩家參與「100% 首存優惠」活動，流水要求 (Wagering Requirement) 為 5 倍。
 
-**Bet Details**:
-- Deposit: $1,000
-- Bonus: $1,000 (100% Match)
-- Wagering Requirement: ($1,000 + $1,000) x 5 = **$10,000**
-- Current Bet: Baccarat $100, odds 1.95, result: WIN
+**投注詳情**:
+- 存款: $1,000
+- 獎金: $1,000（100% 匹配）
+- 流水要求: ($1,000 + $1,000) x 5 = **$10,000**
+- 本次投注: 百家樂 $100，賠率 1.95，結果：贏
 
 ```mermaid
 graph TB
@@ -861,19 +861,19 @@ graph TB
     style E2 fill:#f8d7da
 ```
 
-**Conclusion**:
-- Risk validation: PASSED
-- Finance turnover: $100
-- Activity turnover: $15 (only 15% contribution due to Baccarat weight)
-- More bets needed to meet wagering requirement
+**結論**:
+- 風控驗證：通過
+- 財務有效投注額：$100
+- 活動有效投注額：$15（因百家樂權重僅 15%）
+- 需要更多投注才能達成流水要求
 
-### 8.2 Example 2: Slots Bet
+### 8.2 範例 2：老虎機投注
 
-**Scenario**: Same player switches to Slots for faster wagering completion.
+**情境**: 同一玩家改玩老虎機以更快完成流水。
 
-**Bet Details**:
-- Current wagering progress: $15 / $10,000 (0.15%)
-- Current bet: Slots $100, result: LOSS
+**投注詳情**:
+- 目前流水進度: $15 / $10,000 (0.15%)
+- 本次投注: 老虎機 $100，結果：輸
 
 ```mermaid
 graph TB
@@ -926,25 +926,25 @@ graph TB
     style E3 fill:#d1ecf1
 ```
 
-**Comparison Analysis**:
+**比較分析**:
 
-| Dimension | Baccarat | Slots |
-|-----------|----------|-------|
-| Bet Amount | $100 | $100 |
-| Risk Validation | Hedge/Odds checks required | Simplified validation |
-| Finance Turnover | $100 | $100 |
-| Game Weight | 0.15 (15%) | 1.0 (100%) |
-| **Activity Turnover** | **$15** | **$100** |
-| Wagering Efficiency | Low (6.67x bets to complete) | High (1x bet to complete) |
+| 維度 | 百家樂 | 老虎機 |
+|------|--------|--------|
+| 投注金額 | $100 | $100 |
+| 風控驗證 | 需對沖/賠率檢查 | 簡化驗證 |
+| 財務有效投注額 | $100 | $100 |
+| 遊戲權重 | 0.15 (15%) | 1.0 (100%) |
+| **活動有效投注額** | **$15** | **$100** |
+| 流水效率 | 低（需 6.67 倍投注才能完成） | 高（1 倍投注即完成） |
 
-### 8.3 Example 3: Hedge Bet Rejected
+### 8.3 範例 3：對沖投注被拒絕
 
-**Scenario**: Player attempts to bet on both Banker and Player in the same Baccarat round.
+**情境**: 玩家嘗試在同一百家樂局中同時投注莊家和閒家。
 
-**Bet Details**:
-- Bet 1: Banker $1,000 (odds 1.95)
-- Bet 2: Player $950 (odds 2.00)
-- Game Result: Banker wins
+**投注詳情**:
+- 投注 1: 莊家 $1,000（賠率 1.95）
+- 投注 2: 閒家 $950（賠率 2.00）
+- 遊戲結果：莊家贏
 
 ```mermaid
 graph TB
@@ -1002,42 +1002,42 @@ graph TB
     style E3 fill:#f8d7da
 ```
 
-**Conclusion**:
-- Hedge bet rejected by risk engine
-- Both bets receive $0 turnover
-- May trigger risk tag: `HEDGE_BETTOR`
+**結論**:
+- 對沖投注被風控引擎拒絕
+- 兩筆投注的有效投注額均為 $0
+- 可能觸發風險標籤：`HEDGE_BETTOR`
 
 ---
 
-## 9. Risk Marking Mechanism
+## 9. 風險標記機制
 
-### 9.1 Why Risk Marking is Needed
+### 9.1 為何需要風險標記
 
-The risk marking mechanism provides audit traceability for every turnover calculation decision. Without it, there is no record of _why_ a particular `valid_bet` value was assigned.
+風險標記機制為每個有效投注額計算決策提供稽核追溯。若無此機制，將無法記錄特定 `valid_bet` 值為何被指派。
 
-**Solution**: Four risk marking fields are added to each bet record.
+**解決方案**: 為每筆投注記錄新增四個風險標記欄位。
 
-### 9.2 Risk Marking Field Definitions
+### 9.2 風險標記欄位定義
 
 #### 9.2.1 risk_status
 
-| Status | Description | valid_bet | Use Case |
-|--------|-------------|-----------|----------|
-| **PASSED** | Risk check passed | = bet_amount | Normal bet |
-| **FILTERED** | Risk filter rejected | = 0 | Hedge, arbitrage, low odds |
-| **PENDING** | Awaiting manual review | = 0 (not counted yet) | Suspicious transaction, high-value bet |
+| 狀態 | 說明 | valid_bet | 使用情境 |
+|------|------|-----------|----------|
+| **PASSED** | 風控檢查通過 | = bet_amount | 正常投注 |
+| **FILTERED** | 被風控過濾器拒絕 | = 0 | 對沖、套利、低賠率 |
+| **PENDING** | 等待人工審核 | = 0（尚未計算） | 可疑交易、高額投注 |
 
 #### 9.2.2 filter_reason
 
-| risk_status | filter_reason Example | Description |
-|-------------|----------------------|-------------|
-| PASSED | null | No filtering |
-| FILTERED | "Hedge bet: simultaneous Banker/Player bet" | Specific reason |
-| FILTERED | "Low odds bet: odds=1.30 < threshold 1.50" | Specific reason |
-| FILTERED | "Arbitrage bet: cross-platform odds difference > 5%" | Specific reason |
-| PENDING | "High-value bet requires manual review: amount > $10,000" | Awaiting review |
+| risk_status | filter_reason 範例 | 說明 |
+|-------------|-------------------|------|
+| PASSED | null | 無過濾 |
+| FILTERED | "Hedge bet: simultaneous Banker/Player bet" | 具體原因 |
+| FILTERED | "Low odds bet: odds=1.30 < threshold 1.50" | 具體原因 |
+| FILTERED | "Arbitrage bet: cross-platform odds difference > 5%" | 具體原因 |
+| PENDING | "High-value bet requires manual review: amount > $10,000" | 等待審核 |
 
-#### 9.2.3 risk_rules_applied (JSON Array)
+#### 9.2.3 risk_rules_applied (JSON 陣列)
 
 ```json
 {
@@ -1061,17 +1061,17 @@ The risk marking mechanism provides audit traceability for every turnover calcul
 
 #### 9.2.4 calculation_version
 
-Supports recalculation when rules are adjusted.
+支援規則調整後的重新計算。
 
-| Version | Change | Effective Date |
-|---------|--------|---------------|
-| v1.0.0 | Initial version, using actual risk method | 2026-01-01 |
-| v1.1.0 | Corrected to Standard Principal Method | 2026-01-28 |
-| v1.2.0 | Adjusted odds threshold 1.3 -> 1.5 | 2026-02-01 |
+| 版本 | 變更 | 生效日期 |
+|------|------|----------|
+| v1.0.0 | 初始版本，使用實際風險法 | 2026-01-01 |
+| v1.1.0 | 修正為標準本金法 | 2026-01-28 |
+| v1.2.0 | 調整賠率門檻 1.3 -> 1.5 | 2026-02-01 |
 
-### 9.3 Audit Trail Example
+### 9.3 稽核追蹤範例
 
-**Query: Why is this bet's valid_bet = 0?**
+**查詢：為何這筆投注的 valid_bet = 0？**
 
 ```
 bet_id: BET_12345
@@ -1082,73 +1082,73 @@ filter_reason: "Hedge bet: simultaneous Banker ($1000) and Player ($950) bet"
 risk_rules_applied: [{"rule_id": "HEDGE_001", "action": "FILTER"}]
 ```
 
-**Conclusion**: The bet was identified as a hedge bet by the risk engine, resulting in `valid_bet = 0`.
+**結論**：該投注被風控引擎識別為對沖投注，因此 `valid_bet = 0`。
 
-### 9.4 Recalculation Support
+### 9.4 重新計算支援
 
-When risk rules are adjusted, the `calculation_version` field enables historical data recalculation. The system can query all bets calculated under a specific version and reprocess them with updated rules.
+當風控規則調整時，`calculation_version` 欄位支援歷史資料重新計算。系統可查詢所有使用特定版本計算的投注，並以更新的規則重新處理。
 
 ---
 
-## 10. Design Principles: Layer 2 Does Not Modify Valid Bet
+## 10. 設計原則：Layer 2 不修改 Valid Bet
 
-### 10.1 Core Principle
+### 10.1 核心原則
 
-> **Key Design Decision**: Layer 2 (Finance Center) only records settlement status and **does not modify** the `valid_bet` value determined by Layer 1 (Risk Engine).
+> **關鍵設計決策**: Layer 2 (財務中心) 僅記錄結算狀態，**不修改** Layer 1 (風控引擎) 決定的 `valid_bet` 值。
 
-### 10.2 Why Finance Layer Should Not Modify Valid Bet
+### 10.2 為何財務層不應修改 Valid Bet
 
-#### 10.2.1 Violation of "Risk Independence" Principle
+#### 10.2.1 違反「風控獨立性」原則
 
-If Layer 1 has already determined `valid_bet`, then Layer 2 dynamically modifying it based on settlement status would mean the risk determination is not the final decision -- creating a logical contradiction.
+如果 Layer 1 已決定 `valid_bet`，那麼 Layer 2 根據結算狀態動態修改它，就意味著風控決定不是最終決策——這造成邏輯矛盾。
 
-**Correct Approach**:
+**正確做法**:
 ```
-Layer 1 (Risk Engine): One-time determination of valid_bet
-  +-- Pass -> valid_bet = bet_amount, risk_status = "PASSED"
-  +-- Reject -> valid_bet = 0, risk_status = "FILTERED", reason = "hedge bet"
+Layer 1 (Risk Engine): 一次性決定 valid_bet
+  +-- 通過 -> valid_bet = bet_amount, risk_status = "PASSED"
+  +-- 拒絕 -> valid_bet = 0, risk_status = "FILTERED", reason = "hedge bet"
 
-Layer 2 (Finance Center): Only records settlement status, does NOT modify valid_bet
+Layer 2 (Finance Center): 僅記錄結算狀態，不修改 valid_bet
   +-- settlement_status = "WIN/LOSS/HALF_WIN/HALF_LOSS/DRAW"
   +-- payout_amount = calculatePayout(bet, status)
 ```
 
-#### 10.2.2 Violation of Fairness Principle
+#### 10.2.2 違反公平性原則
 
-**Problem Scenario**:
+**問題情境**:
 ```
-Two players both bet $100 on sports betting "Handicap -0.25":
-- Player A result: Full win -> valid_bet = $100 (correct)
-- Player B result: Draw (half loss) -> valid_bet = $50 (INCORRECT under old method)
+兩位玩家同樣投注 $100 於體育博彩「讓分 -0.25」:
+- 玩家 A 結果：全贏 -> valid_bet = $100（正確）
+- 玩家 B 結果：和局（半輸）-> valid_bet = $50（舊方法下錯誤）
 
-Contradiction:
-- Same betting behavior
-- Same risk exposure ($100)
-- But different valid_bet -> violates fairness principle
-```
-
-**Correct Approach (Standard Principal Method - Industry Standard)**:
-```
-Player A: Bet $100 -> Full win -> valid_bet = $100
-Player B: Bet $100 -> Half loss -> valid_bet = $100 (NOT $50!)
-
-Rationale:
-- Both players assumed $100 risk at the time of betting
-- Valid Bet should reflect betting behavior, not settlement outcome
-- Simplifies calculation -- no need to wait for settlement to know valid_bet
+矛盾：
+- 相同投注行為
+- 相同風險敞口（$100）
+- 但不同 valid_bet -> 違反公平性原則
 ```
 
-#### 10.2.3 Industry Standard Comparison
+**正確做法（標準本金法 - 行業標準）**:
+```
+玩家 A: 投注 $100 -> 全贏 -> valid_bet = $100
+玩家 B: 投注 $100 -> 半輸 -> valid_bet = $100（不是 $50！）
 
-| Operator | Valid Bet Method | Settlement Impact | Notes |
-|----------|-----------------|-------------------|-------|
-| **Pinnacle** | Standard Principal | None | valid_bet = bet principal |
-| **Betfair** | Standard Principal | None | Full amount regardless of outcome |
-| **Pragmatic Play** | Standard Principal | None | Industry game provider standard |
-| **Evolution Gaming** | Standard Principal | None | Live casino industry standard |
-| **Actual Risk Method** | Dynamic adjustment | Affected | Deprecated, violates fairness |
+理由：
+- 兩位玩家在投注時都承擔 $100 風險
+- Valid Bet 應反映投注行為，而非結算結果
+- 簡化計算——無需等待結算即可知道 valid_bet
+```
 
-### 10.3 Settlement Status and Valid Bet Separation
+#### 10.2.3 行業標準比較
+
+| 營運商 | Valid Bet 方法 | 結算影響 | 備註 |
+|--------|---------------|---------|------|
+| **Pinnacle** | 標準本金法 | 無 | valid_bet = 投注本金 |
+| **Betfair** | 標準本金法 | 無 | 全額計算不論結果 |
+| **Pragmatic Play** | 標準本金法 | 無 | 行業遊戲供應商標準 |
+| **Evolution Gaming** | 標準本金法 | 無 | 真人賭場行業標準 |
+| **實際風險法** | 動態調整 | 受影響 | 已棄用，違反公平性 |
+
+### 10.3 結算狀態與 Valid Bet 分離
 
 ```mermaid
 graph LR
@@ -1181,9 +1181,9 @@ graph LR
 
 ---
 
-## 11. SmartAdmin Implementation
+## 11. SmartAdmin 實作
 
-### 11.1 Service Layer Implementation
+### 11.1 Service 層實作
 
 ```java
 @Service
@@ -1219,7 +1219,7 @@ public class TurnoverValidationService {
 }
 ```
 
-### 11.2 Manager Layer Implementation
+### 11.2 Manager 層實作
 
 ```java
 @Component
@@ -1270,7 +1270,7 @@ public class TurnoverValidationManager {
 }
 ```
 
-### 11.3 Database Schema
+### 11.3 資料庫結構
 
 ```sql
 -- Wagering progress table for bonus tracking
@@ -1296,64 +1296,64 @@ CREATE INDEX idx_wagering_status ON t_wagering_progress(tenant_id, status, updat
 
 ---
 
-## Summary
+## 摘要
 
-### Core Design Principles
+### 核心設計原則
 
-1. **Three-Layer Validation Architecture**
-   - Layer 1 (Risk Engine): One-time determination of `valid_bet`, marks `risk_status`
-   - Layer 2 (Finance Center): Only records settlement status, **does not modify** `valid_bet`
-   - Layer 3 (Activity System): Applies game weights, calculates activity contribution
+1. **三層驗證架構**
+   - Layer 1 (風控引擎)：一次性決定 `valid_bet`，標記 `risk_status`
+   - Layer 2 (財務中心)：僅記錄結算狀態，**不修改** `valid_bet`
+   - Layer 3 (活動系統)：應用遊戲權重，計算活動貢獻
 
-2. **Risk Independence Principle**
-   - After Layer 1 determines `valid_bet`, subsequent layers do not modify it
-   - Uses "Standard Principal Method": `valid_bet = bet_amount` (regardless of outcome)
-   - Settlement status is only used for payout calculation, separated from turnover calculation
+2. **風控獨立性原則**
+   - Layer 1 決定 `valid_bet` 後，後續層級不修改
+   - 採用「標準本金法」：`valid_bet = bet_amount`（不論結果）
+   - 結算狀態僅用於派彩計算，與有效投注額計算分離
 
-3. **Separation of Concerns**
-   - Risk focuses on: hedge detection, arbitrage detection, odds filtering
-   - Finance focuses on: settlement status, payout amount calculation
-   - Activity focuses on: game weight application
+3. **關注點分離**
+   - 風控專注於：對沖偵測、套利偵測、賠率過濾
+   - 財務專注於：結算狀態、派彩金額計算
+   - 活動專注於：遊戲權重應用
 
-4. **Audit Traceability**
-   - Records original data + calculation results + version number
-   - Provides recalculation interface
-   - Complete risk marking (`risk_status`, `filter_reason`)
+4. **稽核追溯**
+   - 記錄原始資料 + 計算結果 + 版本號
+   - 提供重新計算介面
+   - 完整風險標記（`risk_status`、`filter_reason`）
 
-### Key Terminology
+### 關鍵術語
 
-| Term | Definition | Unit | Usage |
-|------|-----------|------|-------|
-| **Bet Amount** | Single original bet amount | Per bet | API interaction, fund deduction |
-| **Turnover** | Time-accumulated sum of bet amounts | Cumulative | GGR calculation, financial reports |
-| **Valid Bet** | Risk-filtered single bet amount | Per bet | Wagering requirements, rebates, VIP |
-| **Wagering Requirement** | Required total valid bet amount | Cumulative | Activity verification, withdrawal limits |
+| 術語 | 定義 | 單位 | 用途 |
+|------|------|------|------|
+| **Bet Amount** (投注額) | 單筆原始投注金額 | 每筆 | API 互動、資金扣款 |
+| **Turnover** (流水) | 一段時間內投注金額的累計總和 | 累計 | GGR 計算、財務報表 |
+| **Valid Bet** (有效投注額) | 經風控過濾後的單筆投注金額 | 每筆 | 流水要求、返水、VIP |
+| **Wagering Requirement** (流水要求) | 所需的有效投注額累計總額 | 累計 | 活動驗證、提款限制 |
 
-### Data Flow Key Metrics
+### 資料流關鍵指標
 
-| Phase | Metric | Formula | Description |
-|-------|--------|---------|-------------|
-| **Layer 1 Output** | valid_bet | Risk determination (bet_amount or 0) | One-time, immutable |
-| **Layer 2 Record** | settlement_status | Records settlement status | Does not affect valid_bet |
-| **Layer 3 Output** | contributed_amount | valid_bet x game_weight | Activity contribution amount |
-| **Progress Tracking** | wagering_progress | sum(contributed) / requirement x 100% | Wagering completion percentage |
+| 階段 | 指標 | 公式 | 說明 |
+|------|------|------|------|
+| **Layer 1 輸出** | valid_bet | 風控決定（bet_amount 或 0） | 一次性、不可變 |
+| **Layer 2 記錄** | settlement_status | 記錄結算狀態 | 不影響 valid_bet |
+| **Layer 3 輸出** | contributed_amount | valid_bet x game_weight | 活動貢獻金額 |
+| **進度追蹤** | wagering_progress | sum(contributed) / requirement x 100% | 流水完成百分比 |
 
-### FAQ
+### 常見問答
 
-**Q1: Why doesn't DRAW/TIE count toward turnover?**
-- A: In a draw, the player's principal is returned with no actual risk, so it does not count toward wagering requirements.
+**Q1: 為何 DRAW/TIE 不計入流水？**
+- A: 和局時玩家本金歸還，無實際風險，因此不計入流水要求。
 
-**Q2: Why is Baccarat weight only 15%?**
-- A: Baccarat has a high RTP (98.94%), low platform risk. The lower weight prevents wagering requirement exploitation.
+**Q2: 為何百家樂權重僅 15%？**
+- A: 百家樂 RTP 高（98.94%），平台風險低。較低權重防止玩家利用它來滿足流水要求。
 
-**Q3: How is hedge betting detected?**
-- A: The system checks whether the same player has opposing bets in the same game round (e.g., betting on both Banker and Player simultaneously).
+**Q3: 如何偵測對沖投注？**
+- A: 系統檢查同一玩家在同一遊戲局中是否有對立投注（例如同時投注莊家和閒家）。
 
-**Q4: Is turnover calculation real-time?**
-- A: Yes, turnover is calculated and progress updated immediately after each bet settlement.
+**Q4: 有效投注額計算是即時的嗎？**
+- A: 是的，每筆投注結算後立即計算有效投注額並更新進度。
 
 ---
 
-**Document Version**: 4.0.0
-**Created**: 2026-01-27
-**Maintained by**: Product Team & Tech Architecture Team
+**文件版本**: 4.0.0
+**建立日期**: 2026-01-27
+**維護團隊**: 產品團隊 & 技術架構團隊

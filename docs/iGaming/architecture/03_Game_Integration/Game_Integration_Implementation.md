@@ -1,29 +1,29 @@
-# Game Integration Implementation
+# 遊戲整合實作
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md)
-> **Audience**: Architects, Backend Developers
+> **Audience**: 架構師、後端開發人員
 > **Business Requirements**: [Game Integration Requirements](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md)
 > **Last Synced**: 2026-02-08
 
 ---
 
-## 1. Overview
+## 1. 概覽
 
-This document covers the technical implementation details for integrating Game Providers (GPs) into the iGaming platform, including the Seamless Wallet API, token verification, idempotency handling, concurrency control, and error recovery mechanisms.
+本文件涵蓋將遊戲供應商 (Game Provider, GP) 整合至 iGaming 平台的技術實作細節，包括無縫錢包 API (Seamless Wallet API)、Token 驗證、冪等性處理、並發控制及錯誤恢復機制。
 
-**Implementation Scope** (Section 5 of the source is fully implemented; Sections 6-7 are planned):
+**實作範圍**（來源文件第 5 節已完整實作；第 6-7 節為規劃中）：
 
-| Task | Status | Description |
-|------|--------|-------------|
-| GP Onboarding via Seamless Wallet | Complete | Full implementation with code examples |
-| Seamless Wallet API Advanced | Planned | Phase 5+ |
-| Turnover Calculation Logic | Planned | Phase 5+ |
+| 任務 | 狀態 | 說明 |
+|------|------|------|
+| 透過無縫錢包進行 GP 接入 | 完成 | 完整實作含程式碼範例 |
+| 無縫錢包 API 進階功能 | 規劃中 | Phase 5+ |
+| 有效投注額計算邏輯 | 規劃中 | Phase 5+ |
 
 ---
 
-## 2. Seamless Wallet API Controller
+## 2. 無縫錢包 API Controller
 
-The Seamless Wallet API exposes four standard endpoints for GP interaction. All endpoints follow the SmartAdmin `ResponseDTO` pattern.
+無縫錢包 API 提供四個標準端點供 GP 互動。所有端點均遵循 SmartAdmin `ResponseDTO` 模式。
 
 ```java
 /**
@@ -91,16 +91,16 @@ public class SeamlessWalletController {
 
 ---
 
-## 3. Token Verification Service
+## 3. Token 驗證服務
 
-### 3.1 Token Structure
+### 3.1 Token 結構
 
 ```text
 Token = Base64( player_id | tenant_id | timestamp | signature )
 Signature = HMAC-SHA256( player_id + "|" + tenant_id + "|" + timestamp, secret_key )
 ```
 
-### 3.2 Verification Flow
+### 3.2 驗證流程
 
 ```mermaid
 flowchart TD
@@ -119,7 +119,7 @@ flowchart TD
     I --> J[Token Valid]
 ```
 
-### 3.3 Implementation
+### 3.3 實作
 
 ```java
 /**
@@ -218,9 +218,9 @@ public class TokenVerificationService {
 
 ---
 
-## 4. Idempotent Transaction Processing (Three-Layer Defense)
+## 4. 冪等交易處理（三層防禦）
 
-### 4.1 Architecture Overview
+### 4.1 架構概覽
 
 ```mermaid
 flowchart TD
@@ -240,7 +240,7 @@ flowchart TD
     J --> R5[Return transaction result]
 ```
 
-### 4.2 Service Implementation
+### 4.2 Service 實作
 
 ```java
 /**
@@ -402,9 +402,9 @@ public class SeamlessWalletService {
 
 ---
 
-## 5. Error Recovery Service
+## 5. 錯誤恢復服務
 
-### 5.1 Recovery Architecture
+### 5.1 恢復架構
 
 ```mermaid
 flowchart TD
@@ -421,7 +421,7 @@ flowchart TD
     I --> J
 ```
 
-### 5.2 Implementation
+### 5.2 實作
 
 ```java
 /**
@@ -530,10 +530,10 @@ public class GameTransactionRecoveryService {
 
 ---
 
-## 6. Database Schema (PostgreSQL)
+## 6. 資料庫結構 (PostgreSQL)
 
 ### game_sessions
-Tracks player game sessions with seamless wallet integration.
+追蹤玩家遊戲會話與無縫錢包整合。
 
 ```sql
 CREATE TABLE game_sessions (
@@ -578,13 +578,13 @@ CREATE INDEX idx_game_sessions_active ON game_sessions(session_status, last_acti
 CREATE INDEX idx_game_sessions_provider ON game_sessions(provider_id, started_at DESC);
 CREATE INDEX idx_game_sessions_game ON game_sessions(game_id, started_at DESC);
 
-COMMENT ON TABLE game_sessions IS 'Player game sessions with seamless wallet integration and session token management';
-COMMENT ON COLUMN game_sessions.session_token IS 'HMAC-SHA256 signed token for seamless wallet API authentication (Base64 encoded)';
-COMMENT ON COLUMN game_sessions.token_expires_at IS 'Token expiry time (typically 5-15 minutes from generation)';
+COMMENT ON TABLE game_sessions IS '玩家遊戲會話與無縫錢包整合及 Session Token 管理';
+COMMENT ON COLUMN game_sessions.session_token IS '用於無縫錢包 API 驗證的 HMAC-SHA256 簽章 Token (Base64 編碼)';
+COMMENT ON COLUMN game_sessions.token_expires_at IS 'Token 過期時間 (通常為產生後 5-15 分鐘)';
 ```
 
 ### game_round_logs
-Logs individual game rounds with transaction history (debit, credit, cancel).
+記錄個別遊戲局與交易歷史 (debit, credit, cancel)。
 
 ```sql
 CREATE TABLE game_round_logs (
@@ -647,16 +647,16 @@ CREATE INDEX idx_game_round_logs_pending ON game_round_logs(transaction_status, 
 CREATE INDEX idx_game_round_logs_failed ON game_round_logs(transaction_status, created_at) WHERE transaction_status IN ('FAILED', 'NOT_FOUND');
 CREATE INDEX idx_game_round_logs_provider ON game_round_logs(provider_id, created_at DESC);
 
-COMMENT ON TABLE game_round_logs IS 'Game round transaction logs for seamless wallet integration (debit, credit, cancel)';
-COMMENT ON COLUMN game_round_logs.request_id IS 'Idempotency key from provider (unique per transaction, used for three-layer defense)';
-COMMENT ON COLUMN game_round_logs.is_duplicate IS 'TRUE if request_id was already processed (idempotency check)';
-COMMENT ON COLUMN game_round_logs.cached_result IS 'TRUE if result was returned from Redis cache (Layer 1 idempotency)';
-COMMENT ON COLUMN game_round_logs.recovery_action IS 'Recovery action taken by scheduled recovery service for stalled transactions';
+COMMENT ON TABLE game_round_logs IS '無縫錢包整合的遊戲局交易日誌 (debit, credit, cancel)';
+COMMENT ON COLUMN game_round_logs.request_id IS '供應商提供的冪等鍵 (每筆交易唯一，用於三層防禦)';
+COMMENT ON COLUMN game_round_logs.is_duplicate IS '若 request_id 已處理則為 TRUE (冪等檢查)';
+COMMENT ON COLUMN game_round_logs.cached_result IS '若結果從 Redis 快取返回則為 TRUE (Layer 1 冪等)';
+COMMENT ON COLUMN game_round_logs.recovery_action IS '排程恢復服務對停滯交易採取的恢復動作';
 ```
 
-### Query Examples
+### 查詢範例
 
-**Session summary for a player:**
+**玩家會話摘要：**
 ```sql
 SELECT
     gs.session_id,
@@ -677,7 +677,7 @@ WHERE gs.player_id = 'player-uuid-001'
 ORDER BY gs.started_at DESC;
 ```
 
-**Idempotency check for incoming request:**
+**請求冪等檢查：**
 ```sql
 SELECT
     round_log_id,
@@ -691,7 +691,7 @@ WHERE request_id = 'provider-request-id-12345'
 LIMIT 1;
 ```
 
-**Find stalled transactions for recovery (PENDING > 10 minutes):**
+**尋找停滯交易進行恢復 (PENDING > 10 分鐘)：**
 ```sql
 SELECT
     round_log_id,
@@ -709,7 +709,7 @@ ORDER BY created_at ASC
 LIMIT 100;
 ```
 
-**Audit failed transactions by provider:**
+**依供應商稽核失敗交易：**
 ```sql
 SELECT
     gp.provider_name,
@@ -725,7 +725,7 @@ GROUP BY gp.provider_id, gp.provider_name
 ORDER BY failed_count DESC;
 ```
 
-**Analyze idempotency effectiveness (cache hit rate):**
+**分析冪等效能（快取命中率）：**
 ```sql
 SELECT
     transaction_type,
@@ -740,47 +740,47 @@ GROUP BY transaction_type;
 
 ---
 
-## 7. Planned: Seamless Wallet API (Phase 5+)
+## 7. 規劃中：無縫錢包 API (Phase 5+)
 
-**Status**: PLANNED
+**狀態**: 規劃中
 
-**Reading Order for Implementation**:
+**實作閱讀順序**：
 
-| Order | Document | Section | Estimated Time | Key Content |
-|-------|----------|---------|---------------|-------------|
-| 1 | Seamless Wallet Analysis | API Design | 15 min | Token verification, idempotency |
-| 2 | Seamless Wallet Analysis | Concurrency Control | 10 min | Redis distributed lock |
-| 3 | Wallet Architecture | Error Recovery | 12 min | Saga pattern |
-
----
-
-## 7. Planned: Turnover Calculation Logic (Phase 5+)
-
-**Status**: PLANNED
-
-**Reading Order for Implementation**:
-
-| Order | Document | Section | Estimated Time | Key Content |
-|-------|----------|---------|---------------|-------------|
-| 1 | Turnover Calculation | Three-Layer Validation | 20 min | Layer 1/2/3 architecture |
-| 2 | Turnover Calculation | Game Weights | 10 min | Free spin handling |
-| 3 | Activity System | Wagering Requirements | 15 min | Wagering calculation |
-
-**Key Implementation Concerns**:
-- Free spins are typically excluded from turnover calculation
-- Sports betting and slot game weights differ significantly
-- Cross-module consistency: wallet, activity, and reconciliation must use the same algorithm
+| 順序 | 文件 | 章節 | 預估時間 | 關鍵內容 |
+|------|------|------|---------|---------|
+| 1 | Seamless Wallet Analysis | API Design | 15 分鐘 | Token 驗證、冪等性 |
+| 2 | Seamless Wallet Analysis | Concurrency Control | 10 分鐘 | Redis 分散式鎖 |
+| 3 | Wallet Architecture | Error Recovery | 12 分鐘 | Saga 模式 |
 
 ---
 
-## Related Documents
+## 7. 規劃中：有效投注額計算邏輯 (Phase 5+)
 
-- [Game Integration Requirements](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md) - Business requirements
-- [Turnover Calculation Logic](./Turnover_Calculation_Logic.md) - Turnover technical design
-- Wallet Architecture *(planned)* - Wallet system design
+**狀態**: 規劃中
+
+**實作閱讀順序**：
+
+| 順序 | 文件 | 章節 | 預估時間 | 關鍵內容 |
+|------|------|------|---------|---------|
+| 1 | Turnover Calculation | Three-Layer Validation | 20 分鐘 | Layer 1/2/3 架構 |
+| 2 | Turnover Calculation | Game Weights | 10 分鐘 | 免費轉處理 |
+| 3 | Activity System | Wagering Requirements | 15 分鐘 | 流水計算 |
+
+**關鍵實作考量**：
+- 免費轉 (Free Spins) 通常不計入有效投注額
+- 體育博彩與老虎機的遊戲權重差異顯著
+- 跨模組一致性：錢包、活動、對帳必須使用相同演算法
 
 ---
 
-**Document Version**: 4.0.0
-**Last Updated**: 2026-02-08
-**Maintainers**: Game Integration Team & Backend Team
+## 相關文件
+
+- [Game Integration Requirements](../../requirements/03_Gaming_Operations/Game_Integration_Requirements.md) - 業務需求
+- [Turnover Calculation Logic](./Turnover_Calculation_Logic.md) - 有效投注額技術設計
+- Wallet Architecture *(規劃中)* - 錢包系統設計
+
+---
+
+**文件版本**: 4.0.0
+**最後更新**: 2026-02-08
+**維護團隊**: 遊戲整合團隊 & 後端團隊
