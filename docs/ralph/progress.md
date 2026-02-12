@@ -347,12 +347,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/02_Finance_Service/README.md (全文翻譯)
 - [x] architecture/02_Finance_Service/Reconciliation_Technical.md (標題 + metadata 翻譯)
 
-#### Batch 18 — Finance Service (5 files) [Status]
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Index.md
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Technical.md
-- [ ] architecture/02_Finance_Service/Turnover_Calculation_Architecture.md
-- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md
+#### Batch 18 — Finance Service (5 files) ✅ COMPLETE
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md (無縫錢包技術架構)
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Index.md (無縫錢包架構索引)
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Technical.md (無縫錢包技術實作)
+- [x] architecture/02_Finance_Service/Turnover_Calculation_Architecture.md (有效投注額計算架構)
+- [x] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (有效投注額計算邏輯詳解)
 
 #### Batch 19 — Finance Service (2 files) + Game Integration (5 files) [Status]
 - [ ] architecture/02_Finance_Service/Turnover_Flowcharts.md
@@ -432,4 +432,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9B IN PROGRESS — Architecture Translation (Batch 17/37 COMPLETE)
+**Status**: Phase 9B IN PROGRESS — Architecture Translation (Batch 18/37 COMPLETE)
