@@ -55,15 +55,102 @@ graph LR
     I -->|熱重載| B
 ```
 
-### 風險分數計算（Risk Score Calculation）
+### 風險分數計算（Risk Score Calculation） — 完整實作
 
 ```java
-// Service layer: risk score aggregation
-public RiskScore evaluate(RiskEvent event) {
-    List<RuleResult> results = ruleEngine.matchAll(event);
-    return results.stream()
-        .map(r -> r.getScore() * r.getWeight())
-        .reduce(0.0, Double::sum);
+package net.lab1024.sa.business.risk;
+
+import io.vavr.control.Option;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+/**
+ * 風險規則引擎服務
+ * 負責規則匹配、風險評分與動作分發
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class RiskRuleEngineService {
+
+    private final RiskRuleDao riskRuleDao;
+    private final RiskAssessmentDao riskAssessmentDao;
+    private final RiskActionManager riskActionManager;
+    private final DroolsRuleEngine droolsRuleEngine;
+
+    /**
+     * 評估風險事件
+     *
+     * @param event 風險事件（存款、提款、投注等）
+     * @return 風險評分結果（0-100）
+     */
+    public RiskScore evaluate(RiskEvent event) {
+        // 載入適用於該事件類型的規則
+        List<RiskRuleEntity> rules = riskRuleDao.findActiveByCategory(event.getCategory());
+
+        // 執行所有規則並收集結果
+        List<RuleResult> results = rules.stream()
+            .map(rule -> droolsRuleEngine.execute(rule, event))
+            .filter(Option::isDefined)
+            .map(Option::get)
+            .collect(Collectors.toList());
+
+        // 加權求和計算總風險分數
+        double totalScore = results.stream()
+            .mapToDouble(r -> r.getScore() * r.getWeight())
+            .sum();
+
+        // 記錄評估結果
+        RiskAssessmentEntity assessment = RiskAssessmentEntity.builder()
+            .eventId(event.getEventId())
+            .playerId(event.getPlayerId())
+            .eventType(event.getEventType())
+            .riskScore((int) Math.round(totalScore))
+            .matchedRules(JsonUtil.toJsonString(results.stream()
+                .map(RuleResult::getRuleCode)
+                .collect(Collectors.toList())))
+            .eventData(JsonUtil.toJsonString(event))
+            .build();
+
+        // 根據分數範圍分發動作
+        String actionTaken = dispatchAction((int) totalScore, assessment);
+        assessment.setActionTaken(actionTaken);
+
+        riskAssessmentDao.insert(assessment);
+
+        return RiskScore.builder()
+            .score((int) totalScore)
+            .actionTaken(actionTaken)
+            .matchedRuleCount(results.size())
+            .build();
+    }
+
+    /**
+     * 根據風險分數分發動作
+     *
+     * @param score 風險分數（0-100）
+     * @param assessment 評估記錄
+     * @return 採取的動作類型
+     */
+    private String dispatchAction(int score, RiskAssessmentEntity assessment) {
+        if (score >= 86) {
+            // 86-100: 自動封鎖
+            riskActionManager.blockAccount(assessment);
+            return "BLOCK";
+        } else if (score >= 61) {
+            // 61-85: 升級至風控團隊
+            riskActionManager.escalateToTeam(assessment);
+            return "ESCALATE";
+        } else if (score >= 31) {
+            // 31-60: 標記審查
+            riskActionManager.flagForReview(assessment);
+            return "FLAG";
+        } else {
+            // 0-30: 僅記錄
+            return "LOG";
+        }
+    }
 }
 ```
 
@@ -175,21 +262,237 @@ Browser/App → FingerprintJS SDK → Fingerprint API → Fingerprint Store
                                   New Device → Create Record + Flag for Review
 ```
 
-### 機器學習模型整合（ML Model Integration）
+### 風險動作管理器（Risk Action Manager）
 
 ```java
-// Manager layer: ML model inference with @Cacheable model config
-@Cacheable("fraud-model-config")
-public ModelConfig getActiveModelConfig() {
-    return modelConfigDao.selectActiveModel();
+package net.lab1024.sa.business.risk;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 風險動作管理器
+ * 負責執行風險評估後的處置操作（封鎖、標記、升級）
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class RiskActionManager {
+
+    private final PlayerDao playerDao;
+    private final RiskProposalDao riskProposalDao;
+    private final NotificationService notificationService;
+
+    /**
+     * 封鎖玩家帳戶（86-100 分）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void blockAccount(RiskAssessmentEntity assessment) {
+        playerDao.updateAccountStatus(assessment.getPlayerId(), "BLOCKED");
+
+        // 建立高優先級風險提案
+        RiskProposalEntity proposal = RiskProposalEntity.builder()
+            .playerId(assessment.getPlayerId())
+            .assessmentId(assessment.getId())
+            .priority("HIGH")
+            .proposalType("AUTO_BLOCK")
+            .reason("自動封鎖：風險分數 >= 86")
+            .riskScore(assessment.getRiskScore())
+            .status("PENDING")
+            .build();
+
+        riskProposalDao.insert(proposal);
+
+        log.warn("Account blocked due to high risk score: playerId={}, score={}",
+            assessment.getPlayerId(), assessment.getRiskScore());
+    }
+
+    /**
+     * 升級至風控團隊（61-85 分）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void escalateToTeam(RiskAssessmentEntity assessment) {
+        RiskProposalEntity proposal = RiskProposalEntity.builder()
+            .playerId(assessment.getPlayerId())
+            .assessmentId(assessment.getId())
+            .priority("MEDIUM")
+            .proposalType("ESCALATE")
+            .reason("升級審查：風險分數 61-85")
+            .riskScore(assessment.getRiskScore())
+            .status("PENDING")
+            .build();
+
+        riskProposalDao.insert(proposal);
+
+        // 通知風控團隊
+        notificationService.notifyRiskTeam("風險升級", assessment);
+
+        log.info("Risk escalated to team: playerId={}, score={}",
+            assessment.getPlayerId(), assessment.getRiskScore());
+    }
+
+    /**
+     * 標記審查（31-60 分）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void flagForReview(RiskAssessmentEntity assessment) {
+        RiskProposalEntity proposal = RiskProposalEntity.builder()
+            .playerId(assessment.getPlayerId())
+            .assessmentId(assessment.getId())
+            .priority("LOW")
+            .proposalType("FLAG")
+            .reason("標記審查：風險分數 31-60")
+            .riskScore(assessment.getRiskScore())
+            .status("PENDING")
+            .build();
+
+        riskProposalDao.insert(proposal);
+
+        log.info("Player flagged for review: playerId={}, score={}",
+            assessment.getPlayerId(), assessment.getRiskScore());
+    }
+
+    /**
+     * 熱重載規則快取
+     */
+    @CacheEvict(value = "riskRules", allEntries = true)
+    @Transactional(rollbackFor = Throwable.class)
+    public void reloadRuleCache() {
+        log.info("Risk rule cache reloaded");
+    }
+}
+```
+
+---
+
+### 機器學習模型整合（ML Model Integration） — 完整實作
+
+```java
+package net.lab1024.sa.business.fraud;
+
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+/**
+ * 欺詐檢測服務
+ * 負責裝置指紋匹配、行為分析與 ML 模型推理
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class FraudDetectionService {
+
+    private final DeviceFingerprintDao deviceFingerprintDao;
+    private final FraudManager fraudManager;
+    private final MLClient mlClient;
+
+    /**
+     * 評估玩家行為的欺詐風險
+     *
+     * @param behavior 玩家行為數據
+     * @return 欺詐分數（0-1.0）
+     */
+    public FraudScore evaluate(PlayerBehavior behavior) {
+        // 獲取當前活躍的 ML 模型配置
+        ModelConfig config = fraudManager.getActiveModelConfig();
+
+        // 執行 ML 模型推理
+        return Try.of(() -> mlClient.predict(behavior, config))
+            .map(this::mapToFraudScore)
+            .onFailure(e -> log.error("ML model prediction failed: playerId={}", behavior.getPlayerId(), e))
+            .toOption()
+            .getOrElse(FraudScore.unknown());
+    }
+
+    /**
+     * 檢查裝置指紋是否為已知裝置
+     *
+     * @param fingerprintId 裝置指紋 ID
+     * @param playerId 玩家 ID
+     * @return 裝置檢查結果
+     */
+    public Option<DeviceFingerprintVO> checkDeviceFingerprint(String fingerprintId, Long playerId) {
+        return deviceFingerprintDao.findByFingerprint(fingerprintId)
+            .filter(device -> device.getPlayerId().equals(playerId));
+    }
+
+    /**
+     * 註冊新裝置指紋
+     */
+    public void registerNewDevice(String fingerprintId, Long playerId, String deviceInfo) {
+        DeviceFingerprintEntity entity = DeviceFingerprintEntity.builder()
+            .fingerprintId(fingerprintId)
+            .playerId(playerId)
+            .deviceInfo(deviceInfo)
+            .firstSeen(LocalDateTime.now())
+            .lastSeen(LocalDateTime.now())
+            .riskLevel("UNKNOWN")
+            .build();
+
+        deviceFingerprintDao.insert(entity);
+
+        // 標記為待審查（新裝置風險）
+        fraudManager.flagNewDeviceForReview(entity);
+    }
+
+    private FraudScore mapToFraudScore(MLPredictionResult result) {
+        return FraudScore.builder()
+            .score(result.getProbability())
+            .confidence(result.getConfidence())
+            .modelVersion(result.getModelVersion())
+            .build();
+    }
 }
 
-// Service layer: fraud evaluation
-public FraudScore evaluate(PlayerBehavior behavior) {
-    ModelConfig config = fraudManager.getActiveModelConfig();
-    return Option.of(mlClient.predict(behavior, config))
-        .map(this::mapToFraudScore)
-        .getOrElse(FraudScore.unknown());
+/**
+ * 欺詐管理器
+ * 負責 ML 模型配置管理與新裝置審查
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class FraudManager {
+
+    private final ModelConfigDao modelConfigDao;
+    private final DeviceFingerprintDao deviceFingerprintDao;
+    private final RiskProposalDao riskProposalDao;
+
+    /**
+     * 獲取當前活躍的 ML 模型配置（帶快取）
+     */
+    @Cacheable(value = "fraud-model-config", unless = "#result == null")
+    public ModelConfig getActiveModelConfig() {
+        return modelConfigDao.selectActiveModel()
+            .getOrElseThrow(() -> new RuntimeException("No active ML model configured"));
+    }
+
+    /**
+     * 標記新裝置待審查
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void flagNewDeviceForReview(DeviceFingerprintEntity device) {
+        RiskProposalEntity proposal = RiskProposalEntity.builder()
+            .playerId(device.getPlayerId())
+            .priority("LOW")
+            .proposalType("NEW_DEVICE")
+            .reason("新裝置指紋檢測")
+            .status("PENDING")
+            .build();
+
+        riskProposalDao.insert(proposal);
+
+        log.info("New device flagged for review: playerId={}, fingerprintId={}",
+            device.getPlayerId(), device.getFingerprintId());
+    }
 }
 ```
 
@@ -234,22 +537,121 @@ public FraudScore evaluate(PlayerBehavior behavior) {
 | Manager | @Transactional 信用分配 + 凍結操作、@Transactional 結算處理、@Cacheable 代理層級結構 |
 | Dao | 信用記錄、結算歷史、代理層級（透過 MyBatis Plus） |
 
-### 信用計算邏輯（Credit Calculation Logic）
+### 信用計算邏輯（Credit Calculation Logic） — 完整實作
 
 ```java
-// Service layer: credit line calculation
-public CreditAllocation calculateCredit(Long agentId) {
-    Agent agent = agentDao.selectById(agentId);
-    return Option.of(agent)
-        .map(a -> {
-            BigDecimal parentCredit = getParentAvailableCredit(a.getParentId());
-            BigDecimal riskFactor = calculateRiskFactor(a);
-            return new CreditAllocation(
-                parentCredit.multiply(riskFactor),
-                a.getLevel()
-            );
-        })
-        .getOrElse(CreditAllocation.empty());
+package net.lab1024.sa.business.agent;
+
+import io.vavr.control.Option;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+
+/**
+ * 代理信用服務
+ * 負責信用額度計算、使用率監控與層級遍歷
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class AgentCreditService {
+
+    private final AgentDao agentDao;
+    private final AgentCreditDao agentCreditDao;
+    private final AgentCreditManager agentCreditManager;
+
+    /**
+     * 計算代理信用額度
+     *
+     * @param agentId 代理 ID
+     * @return 信用分配結果
+     */
+    public CreditAllocation calculateCredit(Long agentId) {
+        return agentDao.selectById(agentId)
+            .map(agent -> {
+                // 獲取上級可用信用
+                BigDecimal parentCredit = getParentAvailableCredit(agent.getParentId());
+
+                // 計算風險係數（基於歷史表現）
+                BigDecimal riskFactor = calculateRiskFactor(agent);
+
+                // 信用額度 = 上級可用信用 × 風險係數
+                BigDecimal allocatedCredit = parentCredit.multiply(riskFactor);
+
+                return CreditAllocation.builder()
+                    .agentId(agentId)
+                    .allocatedCredit(allocatedCredit)
+                    .agentLevel(agent.getLevel())
+                    .riskFactor(riskFactor)
+                    .build();
+            })
+            .getOrElse(CreditAllocation.empty());
+    }
+
+    /**
+     * 檢查信用使用率並觸發警報
+     *
+     * @param agentId 代理 ID
+     * @return 信用使用率（0-100）
+     */
+    public BigDecimal checkCreditUtilization(Long agentId) {
+        return agentCreditDao.findByAgentId(agentId)
+            .map(credit -> {
+                BigDecimal utilizationRate = credit.getUsedCredit()
+                    .divide(credit.getTotalCredit(), 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+
+                // 根據使用率觸發動作
+                triggerActionByUtilization(agentId, utilizationRate);
+
+                return utilizationRate;
+            })
+            .getOrElse(BigDecimal.ZERO);
+    }
+
+    /**
+     * 獲取上級可用信用
+     */
+    private BigDecimal getParentAvailableCredit(Long parentId) {
+        if (parentId == null) {
+            return BigDecimal.valueOf(1000000); // 根代理預設信用
+        }
+
+        return agentCreditDao.findByAgentId(parentId)
+            .map(credit -> credit.getTotalCredit().subtract(credit.getUsedCredit()))
+            .getOrElse(BigDecimal.ZERO);
+    }
+
+    /**
+     * 計算風險係數（0.5-1.0，越高表示信用越好）
+     */
+    private BigDecimal calculateRiskFactor(AgentEntity agent) {
+        // 基於歷史結算記錄、逾期次數、代理層級等計算
+        int overdueCount = agentCreditDao.countOverdueSettlements(agent.getId());
+        BigDecimal baseRiskFactor = BigDecimal.valueOf(1.0);
+
+        // 每次逾期降低 10%
+        BigDecimal penalty = BigDecimal.valueOf(0.1).multiply(BigDecimal.valueOf(overdueCount));
+        return baseRiskFactor.subtract(penalty).max(BigDecimal.valueOf(0.5));
+    }
+
+    /**
+     * 根據信用使用率觸發動作
+     */
+    private void triggerActionByUtilization(Long agentId, BigDecimal utilizationRate) {
+        if (utilizationRate.compareTo(BigDecimal.valueOf(96)) >= 0) {
+            // 96-100%: 凍結信用
+            agentCreditManager.freezeCredit(agentId, "使用率超過 96%");
+        } else if (utilizationRate.compareTo(BigDecimal.valueOf(86)) >= 0) {
+            // 86-95%: 限制新註冊
+            agentCreditManager.restrictNewRegistrations(agentId);
+        } else if (utilizationRate.compareTo(BigDecimal.valueOf(71)) >= 0) {
+            // 71-85%: 警告
+            agentCreditManager.sendCreditWarning(agentId, utilizationRate);
+        }
+    }
 }
 ```
 
@@ -262,18 +664,147 @@ public CreditAllocation calculateCredit(Long agentId) {
 | 86-95% | 限制 | 封鎖新註冊 (Manager @Transactional) |
 | 96-100% | 凍結 | 凍結信用 + 升級 (Manager @Transactional) |
 
-### 結算處理（Settlement Processing）
+### 結算處理（Settlement Processing） — 完整實作
 
 ```java
-// Manager layer: atomic settlement operation
-@Transactional(rollbackFor = Throwable.class)
-public void processSettlement(Long agentId, SettlementPeriod period) {
-    BigDecimal commission = calculateCommission(agentId, period);
-    creditDao.deductSettledAmount(agentId, commission);
-    settlementDao.createRecord(agentId, commission, period);
-    // Cascade settlement to sub-agents
-    List<Long> subAgentIds = agentDao.selectSubAgentIds(agentId);
-    subAgentIds.forEach(subId -> processSettlement(subId, period));
+package net.lab1024.sa.business.agent;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * 代理信用管理器
+ * 負責信用分配、凍結操作與結算處理
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class AgentCreditManager {
+
+    private final AgentDao agentDao;
+    private final AgentCreditDao agentCreditDao;
+    private final SettlementDao settlementDao;
+    private final NotificationService notificationService;
+
+    /**
+     * 處理代理結算（原子性操作，支援多層級級聯）
+     *
+     * @param agentId 代理 ID
+     * @param period 結算週期
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void processSettlement(Long agentId, SettlementPeriod period) {
+        // 計算佣金
+        BigDecimal commission = calculateCommission(agentId, period);
+
+        // 扣除已結算金額
+        agentCreditDao.deductSettledAmount(agentId, commission);
+
+        // 建立結算記錄
+        SettlementEntity settlement = SettlementEntity.builder()
+            .agentId(agentId)
+            .period(period.toString())
+            .commission(commission)
+            .settlementDate(LocalDate.now())
+            .status("COMPLETED")
+            .build();
+
+        settlementDao.insert(settlement);
+
+        // 級聯結算下級代理
+        List<Long> subAgentIds = agentDao.selectSubAgentIds(agentId);
+        subAgentIds.forEach(subId -> processSettlement(subId, period));
+
+        // 清除代理層級結構快取
+        evictAgentHierarchyCache();
+
+        log.info("Settlement processed: agentId={}, period={}, commission={}",
+            agentId, period, commission);
+    }
+
+    /**
+     * 凍結代理信用
+     *
+     * @param agentId 代理 ID
+     * @param reason 凍結原因
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void freezeCredit(Long agentId, String reason) {
+        agentCreditDao.updateFreezeStatus(agentId, true);
+
+        CreditFreezeLogEntity freezeLog = CreditFreezeLogEntity.builder()
+            .agentId(agentId)
+            .reason(reason)
+            .frozenAt(LocalDateTime.now())
+            .build();
+
+        creditFreezeLogDao.insert(freezeLog);
+
+        // 通知代理與風控團隊
+        notificationService.notifyAgent(agentId, "信用已凍結", reason);
+        notificationService.notifyRiskTeam("代理信用凍結", agentId);
+
+        log.warn("Agent credit frozen: agentId={}, reason={}", agentId, reason);
+    }
+
+    /**
+     * 限制新玩家註冊
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void restrictNewRegistrations(Long agentId) {
+        agentDao.updateRegistrationStatus(agentId, "RESTRICTED");
+
+        log.info("New registrations restricted for agent: agentId={}", agentId);
+    }
+
+    /**
+     * 發送信用警告通知
+     */
+    public void sendCreditWarning(Long agentId, BigDecimal utilizationRate) {
+        String message = String.format("信用使用率達 %.2f%%，請注意控制", utilizationRate);
+        notificationService.notifyAgent(agentId, "信用警告", message);
+
+        log.info("Credit warning sent: agentId={}, utilization={}%", agentId, utilizationRate);
+    }
+
+    /**
+     * 獲取代理層級結構（帶快取）
+     */
+    @Cacheable(value = "agentHierarchy", key = "#agentId")
+    public AgentHierarchy getAgentHierarchy(Long agentId) {
+        return agentDao.selectHierarchy(agentId)
+            .getOrElseThrow(() -> new RuntimeException("Agent not found: " + agentId));
+    }
+
+    /**
+     * 清除代理層級結構快取
+     */
+    @CacheEvict(value = "agentHierarchy", allEntries = true)
+    public void evictAgentHierarchyCache() {
+        log.info("Agent hierarchy cache evicted");
+    }
+
+    /**
+     * 計算代理佣金（基於分成模式）
+     */
+    private BigDecimal calculateCommission(Long agentId, SettlementPeriod period) {
+        // 查詢該代理在結算週期內的投注數據
+        BigDecimal totalBetAmount = settlementDao.sumBetAmountByPeriod(agentId, period);
+
+        // 查詢代理佣金比例
+        BigDecimal commissionRate = agentDao.selectById(agentId)
+            .map(AgentEntity::getCommissionRate)
+            .getOrElse(BigDecimal.valueOf(0.05)); // 預設 5%
+
+        return totalBetAmount.multiply(commissionRate);
+    }
 }
 ```
 
