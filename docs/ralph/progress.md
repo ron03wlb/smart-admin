@@ -656,17 +656,18 @@ Priority: Architecture files contain technical design suited for Chinese develop
 
 ### 12B: Batch Repairs (3 files per batch)
 
-**Batch assignments will be populated after 12A Discovery completes.**
+**Discovery Result**: 7 files with actual issues (61 false positives eliminated via improved validation)
+**Issue Type**: Arrow with trailing space `-- ` should be `-->` or `-->|label|`
 
-#### Batch 1 — High-Impact Finance (3 files)
-- [ ] architecture/02_Finance_Service/Turnover_Flowcharts.md (Mermaid fix)
-- [ ] architecture/02_Finance_Service/Reconciliation_Technical.md (Mermaid fix)
-- [ ] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md (Mermaid fix)
+#### Batch 1 — Finance + Game Integration (3 files) ✅ COMPLETE
+- [x] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md (10 arrows fixed)
+- [x] architecture/02_Finance_Service/Turnover_Calculation_Architecture.md (14 arrows fixed: 2 blocks)
+- [x] architecture/03_Game_Integration/Game_Integration_Implementation.md (19 arrows fixed: 3 blocks)
 
-#### Batch 2 — High-Impact Finance + Game (3 files)
-- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (Mermaid fix)
-- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (Mermaid fix)
-- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (Mermaid fix)
+**Batch 1 Result**: 43 arrow syntax issues fixed, validation passes (only 1 file remaining)
+
+#### Batch 2 — Remaining File (1 file)
+- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (4 arrows remaining)
 
 #### Batch 3 — Overview + Infrastructure (3 files)
 - [ ] architecture/00_Overview/Platform_Architecture.md (Mermaid fix)
