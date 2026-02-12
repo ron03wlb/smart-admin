@@ -263,3 +263,11 @@ This rule is commented out but preserved for future reference.
 - Actual execution: 2 commits in ~30 minutes
 - Key insight: source-archive/ exclusion + smart compound term detection resolved most "issues"
 - Only 2 actual terminology fixes needed: 充值→存款, 存取款→存提款
+
+### P23: Java/SQL coverage calculation - exclude navigation files (Added 2026-02-13)
+- **Problem**: Phase 13 progress.md showed Java 85.6% (101/118), but actual content coverage was 100%
+- **Root Cause**: 118 total includes 14 README/INDEX/quality-report files (navigation, not content)
+- **Correct Calculation**: 104 content files are the coverage denominator
+- **Result**: Java = 104/104 (100%), SQL = 104/104 (100%)
+- **Coverage Files to Exclude**: README.md, INDEX.md, quality-reports/*.md
+- **Lesson**: Coverage metrics should only count actual content files, not navigation/index files
