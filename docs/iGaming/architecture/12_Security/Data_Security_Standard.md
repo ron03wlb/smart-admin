@@ -1,13 +1,13 @@
-# Data Security Standard Architecture
+# 資料安全標準架構
 
-> **Business Requirements**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-03](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Security Engineers, Backend Developers
+> **業務需求**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-03](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、安全工程師、後端開發人員
 
 ---
 
-## 1. Encryption Architecture Overview
+## 1. 加密架構總覽
 
 ```text
 +-----------------------------------------------------+
@@ -32,20 +32,20 @@
 +-----------------------------------------------------+
 ```
 
-## 2. PII Classification Matrix
+## 2. PII 分類矩陣
 
-| PII Field | Example | Risk Level | Encryption |
+| PII 欄位 | 範例 | 風險等級 | 加密方式 |
 |-----------|---------|-----------|------------|
-| **Real Name** | "John Doe" | High | AES-256-GCM |
-| **Phone** | "+886912345678" | Critical | AES-256-GCM + Blind Index |
-| **Email** | "player@example.com" | Critical | AES-256-GCM + Blind Index |
-| **Bank Account** | "1234567890" | Critical | AES-256-GCM + Blind Index |
-| **ID Number** | "A123456789" | Critical | AES-256-GCM + Blind Index |
-| **Password** | "P@ssw0rd123" | Critical | **Argon2id Hash** (irreversible) |
-| **Address** | "Taipei..." | Medium | AES-256-GCM |
-| **IP Address** | "1.2.3.4" | Medium | HMAC-SHA256 (Blind Index) |
+| **真實姓名** | "John Doe" | 高 | AES-256-GCM |
+| **電話** | "+886912345678" | 極高 | AES-256-GCM + Blind Index |
+| **電子郵件** | "player@example.com" | 極高 | AES-256-GCM + Blind Index |
+| **銀行帳號** | "1234567890" | 極高 | AES-256-GCM + Blind Index |
+| **身分證號** | "A123456789" | 極高 | AES-256-GCM + Blind Index |
+| **密碼** | "P@ssw0rd123" | 極高 | **Argon2id Hash**（不可逆） |
+| **地址** | "Taipei..." | 中 | AES-256-GCM |
+| **IP 位址** | "1.2.3.4" | 中 | HMAC-SHA256 (Blind Index) |
 
-## 3. Storage Encryption Format
+## 3. 儲存加密格式
 
 ```text
 [Version]:[IV]:[Ciphertext]:[AuthTag]
@@ -54,14 +54,14 @@ Example:
 v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 ```
 
-| Field | Length | Description |
+| 欄位 | 長度 | 說明 |
 |-------|--------|-------------|
-| Version | 2 bytes | Encryption version (for key rotation) |
-| IV | 12 bytes | Random per encryption |
-| Ciphertext | Variable | AES-GCM encrypted data |
-| AuthTag | 16 bytes | GCM authentication tag |
+| Version | 2 bytes | 加密版本（用於金鑰輪換） |
+| IV | 12 bytes | 每次加密隨機產生 |
+| Ciphertext | 可變 | AES-GCM 加密資料 |
+| AuthTag | 16 bytes | GCM 驗證標籤 |
 
-## 4. Blind Index Query Flow
+## 4. Blind Index 查詢流程
 
 ```sql
 -- Write Path:
@@ -77,7 +77,7 @@ v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 -- 4. Decrypt encrypted_phone for display
 ```
 
-## 5. Crypto-Shredding (GDPR Deletion)
+## 5. 密碼學銷毀（GDPR 刪除）
 
 ```text
 Dual-Layer Encryption Architecture:
@@ -93,7 +93,7 @@ DELETE FROM user_keys WHERE player_id = ?
 -> All PII permanently unrecoverable (even with backups)
 ```
 
-## 6. Transport Security
+## 6. 傳輸安全
 
 ```nginx
 server {
@@ -106,47 +106,47 @@ server {
 }
 ```
 
-## 7. Data Masking Rules
+## 7. 資料遮罩規則
 
-| PII Field | Masking Rule | Example |
+| PII 欄位 | 遮罩規則 | 範例 |
 |-----------|-------------|---------|
-| **Name** | Keep first/last char | `David Beckham` -> `D***m` |
-| **Phone** | Keep first 3, last 3 | `0912345678` -> `091****678` |
-| **Email** | Keep first 2 + domain | `david@gmail.com` -> `da***@gmail.com` |
-| **Bank Account** | Keep last 4 | `1234567890` -> `******7890` |
+| **姓名** | 保留首末字元 | `David Beckham` -> `D***m` |
+| **電話** | 保留前 3 後 3 | `0912345678` -> `091****678` |
+| **電子郵件** | 保留前 2 + 域名 | `david@gmail.com` -> `da***@gmail.com` |
+| **銀行帳號** | 保留末 4 碼 | `1234567890` -> `******7890` |
 
-### Role-Based Masking
+### 角色層級遮罩
 
-| Role | Phone | Email | Bank Account |
+| 角色 | 電話 | 電子郵件 | 銀行帳號 |
 |------|-------|-------|-------------|
-| **Player (self)** | Full (2FA required) | Full | Last 4 digits |
-| **CS Level 1** | `091****678` | `da***@gmail.com` | No access |
-| **Risk Control** | Full (approval needed) | Full (approval needed) | Full (approval needed) |
-| **DBA** | Ciphertext (cannot decrypt) | Ciphertext | Ciphertext |
+| **玩家（本人）** | 完整（需 2FA） | 完整 | 末 4 碼 |
+| **客服 Level 1** | `091****678` | `da***@gmail.com` | 無權限 |
+| **風控** | 完整（需審批） | 完整（需審批） | 完整（需審批） |
+| **DBA** | 密文（無法解密） | 密文 | 密文 |
 
-## 8. Compliance Checklist
+## 8. 合規檢查清單
 
 ### GDPR
 
-| Requirement | Status | Implementation |
+| 要求 | 狀態 | 實作方式 |
 |-------------|--------|---------------|
-| Data Minimization | Compliant | Collect only necessary PII |
-| Storage Encryption | Compliant | AES-256-GCM |
-| Transport Encryption | Compliant | TLS 1.3 |
-| Right to Erasure | Compliant | Crypto-Shredding |
-| Data Portability | Compliant | JSON export |
-| Audit Logging | Compliant | All PII access logged |
+| 資料最小化 | 合規 | 僅收集必要 PII |
+| 儲存加密 | 合規 | AES-256-GCM |
+| 傳輸加密 | 合規 | TLS 1.3 |
+| 被遺忘權 | 合規 | Crypto-Shredding |
+| 資料可攜性 | 合規 | JSON 匯出 |
+| 稽核日誌 | 合規 | 所有 PII 存取皆記錄 |
 
 ### PCI-DSS
 
-| Requirement | Status | Implementation |
+| 要求 | 狀態 | 實作方式 |
 |-------------|--------|---------------|
-| No full card storage | Compliant | PSP Token only |
-| Bank account encrypted | Compliant | AES-256-GCM + Blind Index |
-| Password hashing | Compliant | Argon2id |
-| Access control | Compliant | RBAC + IP whitelist |
+| 禁止儲存完整卡號 | 合規 | 僅存 PSP Token |
+| 銀行帳號加密 | 合規 | AES-256-GCM + Blind Index |
+| 密碼雜湊 | 合規 | Argon2id |
+| 存取控制 | 合規 | RBAC + IP 白名單 |
 
-## 9. Data Classification Service
+## 9. 資料分類服務
 
 ```mermaid
 flowchart TD
@@ -208,7 +208,7 @@ public class DataClassificationService {
 }
 ```
 
-## 10. Field-Level Encryption Patterns
+## 10. 欄位層級加密模式
 
 ```java
 @Component
@@ -268,19 +268,19 @@ public class FieldEncryptionHandler implements TypeHandler<String> {
 }
 ```
 
-## 11. Access Control Matrix for Sensitive Data
+## 11. 敏感資料存取控制矩陣
 
-| Data Category | Player (Self) | CS Level 1 | CS Level 2 | Risk Control | Finance | DBA | System Admin |
+| 資料類別 | 玩家（本人） | 客服 Level 1 | 客服 Level 2 | 風控 | 財務 | DBA | 系統管理員 |
 |---------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Bank Account** | Last 4 | No Access | Last 4 | Full (Approval) | Full (Approval) | Ciphertext | No Access |
-| **ID Number** | Masked | No Access | Last 4 | Full (Approval) | No Access | Ciphertext | No Access |
-| **Phone** | Full (2FA) | Masked | Full (Approval) | Full (Approval) | No Access | Ciphertext | No Access |
-| **Email** | Full | Masked | Full | Full | No Access | Ciphertext | No Access |
-| **Real Name** | Full | Masked | Full | Full | Full | Ciphertext | No Access |
-| **IP Address** | No Access | No Access | Hashed | Full | No Access | Hashed | Hashed |
-| **Transaction History** | Own Only | Read (Masked) | Read | Full | Full | No Access | No Access |
+| **銀行帳號** | 末 4 碼 | 無權限 | 末 4 碼 | 完整（需審批） | 完整（需審批） | 密文 | 無權限 |
+| **身分證號** | 遮罩 | 無權限 | 末 4 碼 | 完整（需審批） | 無權限 | 密文 | 無權限 |
+| **電話** | 完整（2FA） | 遮罩 | 完整（需審批） | 完整（需審批） | 無權限 | 密文 | 無權限 |
+| **電子郵件** | 完整 | 遮罩 | 完整 | 完整 | 無權限 | 密文 | 無權限 |
+| **真實姓名** | 完整 | 遮罩 | 完整 | 完整 | 完整 | 密文 | 無權限 |
+| **IP 位址** | 無權限 | 無權限 | 雜湊 | 完整 | 無權限 | 雜湊 | 雜湊 |
+| **交易紀錄** | 僅本人 | 唯讀（遮罩） | 唯讀 | 完整 | 完整 | 無權限 | 無權限 |
 
-### Access Enforcement via Annotations
+### 透過註解強制存取控制
 
 ```java
 @Target(ElementType.METHOD)

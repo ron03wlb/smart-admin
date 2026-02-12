@@ -1,13 +1,13 @@
-# Blind Index Architecture
+# Blind Index 架構
 
-> **Business Requirements**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-03-02](../../source-archive/12_System_Security/12-03-02_Blind_Index_Architecture.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Security Engineers, Database Engineers
+> **業務需求**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-03-02](../../source-archive/12_System_Security/12-03-02_Blind_Index_Architecture.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、安全工程師、資料庫工程師
 
 ---
 
-## 1. Write Path
+## 1. 寫入路徑
 
 ```text
 [Data Write Path]
@@ -25,7 +25,7 @@
    phone_index: "a3f8d9e2c1b4..."  (64 chars)
 ```
 
-## 2. Query Path
+## 2. 查詢路徑
 
 ```text
 [Data Query Path]
@@ -38,12 +38,12 @@
    -> Output: +886912345678
 ```
 
-**Key Properties**:
+**核心特性**:
 - **One-way**: Cannot reverse phone_index to plaintext
 - **Deterministic**: Same input always produces same index (indexable)
 - **Non-comparable**: Cannot perform LIKE, >, < fuzzy queries
 
-## 3. PII Fields Requiring Blind Index
+## 3. 需要 Blind Index 的 PII 欄位
 
 | PII Field | Encrypted Column | Blind Index Column | Query Scenario | Priority |
 |-----------|-----------------|-------------------|----------------|----------|
@@ -53,7 +53,7 @@
 | **Bank Account** | `encrypted_bank_account` | `bank_account_index` | Withdrawal verification | P1 |
 | **IP Address** | - | `ip_index` | Risk analysis, multi-account | P2 |
 
-## 4. Two-Key System
+## 4. 雙金鑰系統
 
 ```text
 Key Hierarchy
@@ -77,7 +77,7 @@ Attacker must breach BOTH independent HSMs for Rainbow Table attack
 | **Blind Index Key (BIK)** | HashiCorp Vault (EU-West-1) | Backend API only | 730 days (2 years) |
 | **Master Encryption Key (MEK)** | AWS KMS CMK | AWS KMS internal | Auto-rotate |
 
-## 5. Key Rotation Strategy
+## 5. 金鑰輪換策略
 
 ```text
 [Phase 1: Prepare New Key (T-30 days)]
@@ -105,29 +105,29 @@ Estimated: 10M users * 0.1ms = ~16.7 minutes
 4. Remove v1 references from config
 ```
 
-## 6. Collision Handling
+## 6. 碰撞處理
 
-### Collision Probability
+### 碰撞機率
 
 - HMAC-SHA256 output space: **2^256**
 - Birthday paradox threshold: **2^128** hashes for 50% collision
 - iGaming platform scale: 10M - 100M players (10^7 - 10^8)
 - **Actual collision probability**: < 10^-60 (effectively zero)
 
-### Strategy: Database UNIQUE Constraint
+### 策略：資料庫 UNIQUE 約束
 
-Enforce UNIQUE constraint on blind index columns. On the extremely rare collision, handle with application-level error and add salt.
+在 Blind Index 欄位上強制 UNIQUE 約束。在極為罕見的碰撞情況下，透過應用層錯誤處理並加入 salt。
 
-## 7. Performance Analysis
+## 7. 效能分析
 
-### Query Performance
+### 查詢效能
 
 | Method | Time Complexity | Actual Time (10M players) |
 |--------|----------------|--------------------------|
 | **Blind Index** | O(1) - B-Tree index | < 5ms |
 | **Full Table Decrypt** | O(n) - decrypt each row | > 5000ms (1000x slower) |
 
-### Write Overhead
+### 寫入開銷
 
 | Operation | Time |
 |-----------|------|
@@ -138,12 +138,12 @@ Enforce UNIQUE constraint on blind index columns. On the extremely rare collisio
 
 Compared to unencrypted write (~0.2ms): **2.8x overhead** (acceptable).
 
-### Storage Overhead
+### 儲存開銷
 
 - Per player: `phone_index` (64B) + `email_index` (64B) + `id_number_index` (64B) = **192 bytes**
 - 10M players: 192 * 10M = **1.8 GB** (acceptable)
 
-## 8. Security: Known Attack Vectors
+## 8. 安全性：已知攻擊向量
 
 | Attack | Threat | Mitigation |
 |--------|--------|-----------|
@@ -151,7 +151,7 @@ Compared to unencrypted write (~0.2ms): **2.8x overhead** (acceptable).
 | **Timing Attack** | Observe HMAC computation time differences | Constant-time comparison |
 | **Inference Attack** | Known plaintext-index pairs leak info | Never expose blind index in API responses |
 
-## 9. Compliance Assessment
+## 9. 合規評估
 
 | Regulation | Requirement | Blind Index Compliance |
 |------------|-------------|----------------------|
@@ -159,9 +159,9 @@ Compared to unencrypted write (~0.2ms): **2.8x overhead** (acceptable).
 | **PCI-DSS** | Bank account hashed/truncated | Compliant (HMAC) |
 | **CCPA** | Searchable for Data Subject Request | Compliant (index lookup) |
 
-## 10. BlindIndexService Java Implementation
+## 10. BlindIndexService Java 實作
 
-### 10.1 HMAC-SHA256 Index Generation
+### 10.1 HMAC-SHA256 索引生成
 
 ```java
 import javax.crypto.Mac;
@@ -215,7 +215,7 @@ public class BlindIndexService {
 }
 ```
 
-### 10.2 MyBatis Mapper for Blind Index Queries
+### 10.2 MyBatis Mapper（Blind Index 查詢）
 
 ```xml
 <!-- PlayerMapper.xml -->
@@ -251,7 +251,7 @@ public class BlindIndexService {
 </mapper>
 ```
 
-### 10.3 Search Flow Diagram
+### 10.3 搜尋流程圖
 
 ```mermaid
 flowchart TD
@@ -265,7 +265,7 @@ flowchart TD
     E -->|No| I[Return: Player not found]
 ```
 
-### 10.4 Database Schema (DDL)
+### 10.4 資料庫結構 (DDL)
 
 ```sql
 CREATE TABLE t_player (

@@ -1,13 +1,13 @@
-# Data Portability & SAR Architecture
+# 資料可攜性與主體存取請求架構
 
-> **Business Requirements**: [Payment Security Requirements](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-07](../../source-archive/12_System_Security/12-07_Data_Portability_SAR.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, Legal/Compliance Team
+> **業務需求**: [Payment Security Requirements](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-07](../../source-archive/12_System_Security/12-07_Data_Portability_SAR.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、法務/合規團隊
 
 ---
 
-## 1. SAR Processing Flow
+## 1. SAR 處理流程
 
 ```mermaid
 stateDiagram-v2
@@ -46,7 +46,7 @@ stateDiagram-v2
     end note
 ```
 
-## 2. SAR Service Implementation
+## 2. SAR Service 實作
 
 ```java
 @Service
@@ -120,7 +120,7 @@ public class SarRequestService {
 }
 ```
 
-## 3. Data Collector Manager
+## 3. 資料收集 Manager
 
 ```java
 @Component
@@ -172,7 +172,7 @@ public class SarDataCollectorManager {
 }
 ```
 
-## 4. Export JSON Format
+## 4. 匯出 JSON 格式
 
 ```json
 {
@@ -208,7 +208,7 @@ public class SarDataCollectorManager {
 }
 ```
 
-## 5. Database Schema
+## 5. 資料庫結構
 
 ```sql
 -- SAR Request Table
@@ -267,7 +267,7 @@ CREATE TABLE t_sar_processing_log (
 );
 ```
 
-## 6. Admin API
+## 6. 管理後台 API
 
 ```java
 @RestController
@@ -313,16 +313,16 @@ public class SarAdminController {
 }
 ```
 
-## 7. Monitoring Metrics
+## 7. 監控指標
 
-| Metric | Description | Alert Threshold |
+| 指標 | 說明 | 告警閾值 |
 |--------|-------------|----------------|
-| `sar_pending_count` | Pending requests | > 10 |
-| `sar_overdue_count` | Overdue requests | > 0 |
-| `sar_avg_processing_days` | Avg processing time | > 20 days |
-| `sar_completion_rate` | Completion rate | < 95% |
+| `sar_pending_count` | 待處理請求數 | > 10 |
+| `sar_overdue_count` | 逾期請求數 | > 0 |
+| `sar_avg_processing_days` | 平均處理時間 | > 20 天 |
+| `sar_completion_rate` | 完成率 | < 95% |
 
-## 8. Data Portability Transfer
+## 8. 資料可攜性傳輸
 
 ```java
 @Service

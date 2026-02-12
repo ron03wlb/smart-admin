@@ -1,15 +1,15 @@
-# Encryption Strategy Architecture
+# 加密策略架構
 
-> **Business Requirements**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-03-01](../../source-archive/12_System_Security/12-03-01_Encryption_Strategy.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Security Engineers, Backend Developers
+> **業務需求**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-03-01](../../source-archive/12_System_Security/12-03-01_Encryption_Strategy.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、安全工程師、後端開發人員
 
 ---
 
-## 1. AES-256-GCM Implementation
+## 1. AES-256-GCM 實作
 
-### Storage Format (Base64 Encoded)
+### 儲存格式（Base64 編碼）
 
 ```text
 [Version]:[IV]:[Ciphertext]:[AuthTag]
@@ -18,20 +18,20 @@ Example:
 v1:a3f8d9e2c1b4:Y3J5cHRvZ3JhcGh5==:4a7b8c9d
 ```
 
-| Field | Length | Description |
+| 欄位 | 長度 | 說明 |
 |-------|--------|-------------|
-| Version | 2 bytes | Encryption version (for key rotation) |
-| IV (Initialization Vector) | 12 bytes | Random, unique per encryption |
-| Ciphertext | Variable | AES-GCM encrypted data |
-| AuthTag | 16 bytes | GCM authentication tag |
+| Version | 2 bytes | 加密版本（用於金鑰輪換） |
+| IV（初始化向量） | 12 bytes | 每次加密隨機產生，唯一 |
+| Ciphertext | 可變 | AES-GCM 加密資料 |
+| AuthTag | 16 bytes | GCM 驗證標籤 |
 
-### Why AES-256-GCM
+### 為何選擇 AES-256-GCM
 
-- **AES-256**: NIST certified, industry standard, quantum-resistant (current)
-- **GCM Mode**: AEAD (Authenticated Encryption with Associated Data) - prevents ciphertext tampering
-- **Performance**: Hardware acceleration (AES-NI) support
+- **AES-256**: NIST 認證、產業標準、抗量子運算（目前）
+- **GCM 模式**: AEAD（附帶關聯資料的認證加密）— 防止密文篡改
+- **效能**: 支援硬體加速（AES-NI）
 
-## 2. TLS Configuration
+## 2. TLS 配置
 
 ```nginx
 server {
@@ -51,46 +51,46 @@ server {
 }
 ```
 
-## 3. Password Hashing: Argon2id
+## 3. 密碼雜湊：Argon2id
 
-### Algorithm Comparison
+### 演算法比較
 
-| Algorithm | Year | Strength | Weakness |
+| 演算法 | 年份 | 優勢 | 弱點 |
 |-----------|------|----------|----------|
-| **MD5** | 1992 | Fast | Broken, prohibited |
-| **bcrypt** | 1999 | CPU-resistant | GPU vulnerable |
-| **PBKDF2** | 2000 | NIST certified | GPU/ASIC vulnerable |
-| **Argon2id** | 2015 | **CPU/GPU/ASIC resistant** | High compute cost (a feature) |
+| **MD5** | 1992 | 快速 | 已破解，禁止使用 |
+| **bcrypt** | 1999 | 抗 CPU 攻擊 | GPU 可破解 |
+| **PBKDF2** | 2000 | NIST 認證 | GPU/ASIC 可破解 |
+| **Argon2id** | 2015 | **抗 CPU/GPU/ASIC** | 高運算成本（為其特性） |
 
-### Recommended Parameters (OWASP)
+### 建議參數（OWASP）
 
-| Parameter | Value | Description |
+| 參數 | 值 | 說明 |
 |-----------|-------|-------------|
-| `time_cost` | 3 | Iterations (target: 0.5-1s) |
-| `memory_cost` | 65536 (64 MB) | Memory consumption, prevents GPU parallelism |
-| `parallelism` | 2 | CPU cores |
-| `salt_len` | 16 bytes | Unique random salt per user |
+| `time_cost` | 3 | 迭代次數（目標：0.5-1 秒） |
+| `memory_cost` | 65536 (64 MB) | 記憶體消耗，防止 GPU 平行運算 |
+| `parallelism` | 2 | CPU 核心數 |
+| `salt_len` | 16 bytes | 每位使用者唯一隨機鹽值 |
 
-## 4. Data Masking Implementation
+## 4. 資料遮罩實作
 
-### Masking Rules
+### 遮罩規則
 
-| PII Field | Masking Rule | Example | Use Case |
+| PII 欄位 | 遮罩規則 | 範例 | 使用場景 |
 |-----------|-------------|---------|----------|
-| **Name** | Keep first/last char | `David Beckham` -> `D***m` | CS query, VIP management |
-| **Phone** | Keep first 3, last 3 | `0912345678` -> `091****678` | CS query, withdrawal review |
-| **Email** | Keep first 2 + domain | `david@gmail.com` -> `da***@gmail.com` | CS query, account settings |
-| **Bank Account** | Keep last 4 | `1234567890` -> `******7890` | Withdrawal review, reports |
-| **ID Number** | Keep first 2, last 2 | `A123456789` -> `A1*****89` | KYC verification |
-| **IP Address** | Keep first 2 octets | `192.168.1.100` -> `192.168.*.*` | Risk analysis, logs |
+| **姓名** | 保留首末字元 | `David Beckham` -> `D***m` | 客服查詢、VIP 管理 |
+| **電話** | 保留前 3 後 3 | `0912345678` -> `091****678` | 客服查詢、提款審核 |
+| **電子郵件** | 保留前 2 + 域名 | `david@gmail.com` -> `da***@gmail.com` | 客服查詢、帳號設定 |
+| **銀行帳號** | 保留末 4 碼 | `1234567890` -> `******7890` | 提款審核、報表 |
+| **身分證號** | 保留前 2 後 2 | `A123456789` -> `A1*****89` | 身份驗證 (KYC) |
+| **IP 位址** | 保留前 2 段 | `192.168.1.100` -> `192.168.*.*` | 風險分析、日誌 |
 
-### Implementation Layer
+### 實作層級
 
-Masking MUST be implemented at the Backend DTO Converter / Serializer layer. Frontend-only masking is prohibited (API response would still contain plaintext).
+遮罩**必須**在後端 DTO Converter / Serializer 層實作。禁止僅在前端遮罩（API 回應仍會包含明文）。
 
-## 5. Key Management Architecture
+## 5. 金鑰管理架構
 
-### Dual-Key Hierarchy
+### 雙層金鑰階層
 
 ```text
 +--------------------------------------------+
@@ -109,7 +109,7 @@ Masking MUST be implemented at the Backend DTO Converter / Serializer layer. Fro
 +--------------------------------------------+
 ```
 
-### IAM Policy (Least Privilege)
+### IAM 政策（最小權限原則）
 
 ```json
 {
@@ -132,9 +132,9 @@ Masking MUST be implemented at the Backend DTO Converter / Serializer layer. Fro
 }
 ```
 
-## 6. Key Rotation Flow
+## 6. 金鑰輪換流程
 
-### 6.1 Automated Rotation Lifecycle
+### 6.1 自動輪換生命週期
 
 ```mermaid
 flowchart TD
@@ -148,13 +148,13 @@ flowchart TD
     G --> H[T+365: Delete Old Key<br/>After full backup cycle]
 ```
 
-- **Frequency**: Auto-rotate CMK every 365 days (AWS KMS managed)
-- **Transition**: Old and new keys coexist for 90 days (graceful migration)
-- **Emergency**: Manual rotation triggered on suspected key compromise
+- **頻率**: 每 365 天自動輪換 CMK（AWS KMS 管理）
+- **過渡期**: 新舊金鑰共存 90 天（平滑遷移）
+- **緊急情況**: 疑似金鑰洩漏時觸發手動輪換
 
-### 6.2 Version-Aware Decryption
+### 6.2 版本感知解密
 
-The version prefix in the ciphertext format (`v1:`, `v2:`) enables seamless key rotation without downtime:
+密文格式中的版本前綴（`v1:`、`v2:`）可實現無停機金鑰輪換：
 
 ```text
 Decryption Logic:
@@ -164,7 +164,7 @@ Decryption Logic:
 4. If version < current, schedule re-encryption
 ```
 
-## 7. AES-256-GCM Encryption Service (Java)
+## 7. AES-256-GCM 加密服務（Java）
 
 ```java
 import javax.crypto.Cipher;
@@ -224,11 +224,11 @@ public class AesGcmEncryptionService {
 }
 ```
 
-## 8. HSM Integration Pattern
+## 8. HSM 整合模式
 
-### 8.1 Envelope Encryption for PII
+### 8.1 PII 信封加密
 
-Envelope encryption separates the data key from the master key. The master key never leaves the HSM boundary.
+信封加密將資料金鑰與主金鑰分離。主金鑰永遠不會離開 HSM 邊界。
 
 ```mermaid
 flowchart LR
@@ -250,7 +250,7 @@ flowchart LR
     end
 ```
 
-### 8.2 HSM Configuration (YAML)
+### 8.2 HSM 配置（YAML）
 
 ```yaml
 encryption:
@@ -269,20 +269,20 @@ encryption:
     re-encryption-rate-per-minute: 5000
 ```
 
-### 8.3 DEK Cache Strategy
+### 8.3 DEK 快取策略
 
-To avoid calling KMS for every decrypt operation, DEKs are cached in-memory with strict TTL:
+為避免每次解密操作都呼叫 KMS，DEK 會在記憶體中快取，並設定嚴格的 TTL：
 
-| Parameter | Value | Rationale |
+| 參數 | 值 | 理由 |
 |-----------|-------|-----------|
-| Cache TTL | 300 seconds | Balance between performance and security |
-| Max entries | 100 | Limit memory footprint (~3.2 KB) |
-| Eviction | LRU | Least recently used keys evicted first |
-| On rotation | Invalidate all | Force fresh DEK fetch after key rotation |
+| Cache TTL | 300 秒 | 效能與安全之間的平衡 |
+| 最大項目數 | 100 | 限制記憶體占用（~3.2 KB） |
+| 淘汰策略 | LRU | 最久未使用的金鑰優先淘汰 |
+| 輪換時 | 全部失效 | 金鑰輪換後強制重新取得 DEK |
 
 ---
 
-## 9. Database Schema
+## 9. 資料庫結構
 
 ```sql
 -- Encryption key metadata (not the keys themselves)

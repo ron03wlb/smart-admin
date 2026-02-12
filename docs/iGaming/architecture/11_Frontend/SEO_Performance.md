@@ -1,15 +1,15 @@
-# SEO & Performance Architecture
+# SEO 與效能架構
 
-> **Business Requirements**: [SEO Performance Requirements](../../requirements/11_Frontend_Experience/SEO_Performance_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-03](../../source-archive/11_Frontend_CMS/11-03_SEO_and_Performance.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Frontend Developers
+> **業務需求**: [SEO Performance Requirements](../../requirements/11_Frontend_Experience/SEO_Performance_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-03](../../source-archive/11_Frontend_CMS/11-03_SEO_and_Performance.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、前端開發人員
 
 ---
 
-## 1. SSR/ISR Rendering Strategy
+## 1. SSR/ISR 渲染策略
 
-### 1.1 Next.js ISR Configuration
+### 1.1 Next.js ISR 配置
 
 ```javascript
 // pages/games/[provider]/[slug].tsx
@@ -47,7 +47,7 @@ export async function getStaticProps({ params }) {
 <meta property="og:url" content="https://www.casino.com/games/pg-soft/mahjong-ways-2" />
 ```
 
-## 2. Hreflang Configuration
+## 2. Hreflang 配置
 
 ```html
 <link rel="alternate" hreflang="en" href="https://www.casino.com/games/slot1" />
@@ -56,7 +56,7 @@ export async function getStaticProps({ params }) {
 <link rel="alternate" hreflang="x-default" href="https://www.casino.com/games/slot1" />
 ```
 
-**Sitemap Integration**:
+**Sitemap 整合**:
 ```xml
 <url>
   <loc>https://www.casino.com/games/slot1</loc>
@@ -65,7 +65,7 @@ export async function getStaticProps({ params }) {
 </url>
 ```
 
-## 3. Structured Data (Schema.org)
+## 3. 結構化資料 (Schema.org)
 
 ```html
 <script type="application/ld+json">
@@ -88,7 +88,7 @@ export async function getStaticProps({ params }) {
 </script>
 ```
 
-## 4. Multi-Layer Cache Architecture
+## 4. 多層快取架構
 
 ```
 +--------------------------------------------+
@@ -109,7 +109,7 @@ export async function getStaticProps({ params }) {
 +--------------------------------------------+
 ```
 
-### Cache-Control Headers
+### Cache-Control 標頭
 
 ```nginx
 # Static resources (versioned)
@@ -123,7 +123,7 @@ location / {
 }
 ```
 
-### Cache Invalidation
+### 快取失效
 
 ```javascript
 async function purgeGameCache(gameSlug) {
@@ -132,7 +132,7 @@ async function purgeGameCache(gameSlug) {
 }
 ```
 
-### 4.1 SEO Content Rendering Pipeline
+### 4.1 SEO 內容渲染流程
 
 ```mermaid
 graph LR
@@ -164,7 +164,7 @@ graph LR
     E -.->|Fallback for<br/>legacy bots| Q
 ```
 
-## 5. Image Optimization
+## 5. 圖片優化
 
 ```html
 <picture>
@@ -174,14 +174,14 @@ graph LR
 </picture>
 ```
 
-**CDN Image Transformation**:
+**CDN 圖片轉換**:
 ```
 https://cdn.casino.com/games/slot1.jpg?w=400&h=300&fit=cover&fm=webp&q=85
 ```
 
-## 6. Performance Monitoring
+## 6. 效能監控
 
-### 6.1 Core Web Vitals Tracking
+### 6.1 Core Web Vitals 追蹤
 
 ```javascript
 import { getCLS, getFID, getLCP } from 'web-vitals';
@@ -216,7 +216,7 @@ getLCP(sendToAnalytics);
 }
 ```
 
-## 7. Database Schema
+## 7. 資料庫結構
 
 ### 7.1 seo_page_configs
 
@@ -311,8 +311,8 @@ CREATE INDEX idx_seo_metrics_crawled ON seo_metrics(last_crawled_at DESC);
 CREATE INDEX idx_seo_metrics_performance ON seo_metrics(performance_score, lcp_value);
 ```
 
-**Monitoring Integration**:
-- Web Vitals data collected via `web-vitals` library and stored in `seo_metrics`
-- Lighthouse CI runs on every deployment and updates `performance_score`, `seo_score`
-- Google Search Console API integration updates `indexed_by_google`, `organic_sessions`
-- Scheduled crawler (Puppeteer) validates rendered HTML and updates `http_status_code`, `response_time_ms`
+**監控整合**:
+- 透過 `web-vitals` 函式庫收集 Web Vitals 資料並存入 `seo_metrics`
+- Lighthouse CI 在每次部署時執行並更新 `performance_score`、`seo_score`
+- Google Search Console API 整合更新 `indexed_by_google`、`organic_sessions`
+- 排程爬蟲（Puppeteer）驗證渲染後的 HTML 並更新 `http_status_code`、`response_time_ms`
