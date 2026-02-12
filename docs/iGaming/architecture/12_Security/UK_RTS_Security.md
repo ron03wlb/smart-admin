@@ -1,13 +1,13 @@
-# UK RTS Security Architecture
+# UK RTS 安全架構
 
-> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-05](../../source-archive/12_System_Security/12-05_UK_RTS_Security.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Security Engineers, Compliance Officers
+> **業務需求**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-05](../../source-archive/12_System_Security/12-05_UK_RTS_Security.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、安全工程師、合規主管
 
 ---
 
-## RTS Compliance Verification Flow
+## RTS 合規驗證流程
 
 ```mermaid
 flowchart TD
@@ -38,17 +38,17 @@ flowchart TD
 
 ---
 
-## 1. RTS 4 Security Requirements Mapping
+## 1. RTS 4 安全要求對照
 
-### RTS 4.1 - Information Security Management
+### RTS 4.1 - 資訊安全管理
 
-| Requirement | Description | Implementation | Status |
-|-------------|-------------|---------------|--------|
-| 4.1.1 | ISO 27001 Compliance | [ISO 27001:2022 Mapping](./ISO27001_Mapping.md) | Implemented |
-| 4.1.2 | Risk Assessment | Regular risk assessments | Implemented |
-| 4.1.3 | Security Policy | CLAUDE.md security guidelines | Implemented |
+| 要求 | 說明 | 實作方式 | 狀態 |
+|------|------|----------|------|
+| 4.1.1 | ISO 27001 合規 | [ISO 27001:2022 Mapping](./ISO27001_Mapping.md) | 已實施 |
+| 4.1.2 | 風險評估 | 定期風險評估 | 已實施 |
+| 4.1.3 | 安全政策 | CLAUDE.md 安全指引 | 已實施 |
 
-### RTS 4.2 - Clock Synchronization
+### RTS 4.2 - 時鐘同步
 
 ```java
 @Configuration
@@ -65,12 +65,12 @@ public class ClockSyncConfig {
 }
 ```
 
-**Configuration Requirements**:
-- NTP server synchronization
-- Maximum time drift < 1 second
-- All logs use UTC
+**配置要求**：
+- NTP 伺服器同步
+- 最大時鐘偏移 < 1 秒
+- 所有日誌使用 UTC
 
-**Clock Synchronization Verification**:
+**時鐘同步驗證**：
 
 ```java
 @Component
@@ -104,13 +104,13 @@ public class ClockSyncVerifier {
 }
 ```
 
-### RTS 4.3 - Environment Separation
+### RTS 4.3 - 環境隔離
 
-| Environment | Purpose | Isolation |
-|-------------|---------|-----------|
-| Development (DEV) | Development testing | Fully isolated |
-| Testing (UAT) | Acceptance testing | Isolated from production |
-| Production (PROD) | Live operations | Strictest controls |
+| 環境 | 用途 | 隔離程度 |
+|------|------|----------|
+| 開發環境 (DEV) | 開發測試 | 完全隔離 |
+| 測試環境 (UAT) | 驗收測試 | 與生產環境隔離 |
+| 生產環境 (PROD) | 正式營運 | 最嚴格控制 |
 
 ```yaml
 spring:
@@ -126,16 +126,16 @@ spring:
     url: ${PROD_DB_URL}
 ```
 
-### RTS 4.4 - Access Control
+### RTS 4.4 - 存取控制
 
-| Requirement | Implementation | SmartAdmin Component |
-|-------------|---------------|---------------------|
-| Authentication | Sa-Token | `@SaCheckLogin` |
-| Multi-Factor Authentication | TOTP/WebAuthn | MFA module |
-| Role-Based Permissions | RBAC | `@SaCheckPermission` |
-| Audit Logging | Complete operation records | Audit Log system |
+| 要求 | 實作方式 | SmartAdmin 元件 |
+|------|----------|----------------|
+| 身份驗證 | Sa-Token | `@SaCheckLogin` |
+| 多因素驗證 | TOTP/WebAuthn | MFA 模組 |
+| 角色權限管理 | RBAC | `@SaCheckPermission` |
+| 稽核日誌 | 完整操作紀錄 | 稽核日誌系統 |
 
-**Sa-Token Access Control Integration**:
+**Sa-Token 存取控制整合**：
 
 ```java
 /**
@@ -167,23 +167,23 @@ public class IgamingAdminController {
 }
 ```
 
-**MFA Enforcement for High-Risk Operations**:
+**高風險操作 MFA 強制要求**：
 
-| Operation Category | MFA Required | Token Lifetime |
-|-------------------|-------------|----------------|
-| Player account freeze | Yes | Single-use |
-| Balance adjustment | Yes | Single-use |
-| Configuration changes | Yes | 5 minutes |
-| Read-only queries | No | Session-based |
+| 操作類別 | 需要 MFA | Token 有效期 |
+|----------|----------|-------------|
+| 玩家帳號凍結 | 是 | 單次使用 |
+| 餘額調整 | 是 | 單次使用 |
+| 配置變更 | 是 | 5 分鐘 |
+| 唯讀查詢 | 否 | Session 期間 |
 
-### RTS 4.5 - Outsourced Development Controls
+### RTS 4.5 - 外包開發控制
 
-- Security requirements in contracts
-- Code review
-- Vulnerability scanning
-- Security testing acceptance
+- 合約中的安全要求
+- 程式碼審查
+- 弱點掃描
+- 安全測試驗收
 
-### RTS 4.6 - Privileged Tool Controls
+### RTS 4.6 - 特權工具控制
 
 ```java
 @Aspect
@@ -205,18 +205,18 @@ public class PrivilegedToolAudit {
 }
 ```
 
-## 2. Communication Security
+## 2. 通訊安全
 
-### TLS Requirements
+### TLS 要求
 
-| Requirement | Configuration | RTS Reference |
-|-------------|--------------|---------------|
-| Minimum Version | TLS 1.2 (recommended 1.3) | RTS 4.1 |
-| Cipher Suites | Strong encryption only | RTS 4.1 |
-| Certificate | Valid CA-issued | RTS 4.1 |
-| Certificate Pinning | Required for mobile apps | Best Practice |
+| 要求 | 配置 | RTS 參照 |
+|------|------|----------|
+| 最低版本 | TLS 1.2（建議 1.3） | RTS 4.1 |
+| 密碼套件 | 僅允許強加密 | RTS 4.1 |
+| 憑證 | 有效的 CA 簽發 | RTS 4.1 |
+| 憑證綁定 | 行動 App 必要 | 最佳實踐 |
 
-**Spring Boot TLS Configuration**:
+**Spring Boot TLS 配置**：
 
 ```yaml
 server:
@@ -230,7 +230,7 @@ server:
     key-store-password: ${SSL_KEYSTORE_PASSWORD}
 ```
 
-**Java SSLContext Configuration (for inter-service mTLS)**:
+**Java SSLContext 配置（服務間 mTLS）**：
 
 ```java
 @Configuration
@@ -276,52 +276,52 @@ public class MtlsConfig {
 }
 ```
 
-**Prohibited Cipher Suites** (must be explicitly disabled):
+**禁用密碼套件**（必須明確停用）：
 
-| Category | Cipher Suite | Reason |
-|----------|-------------|--------|
-| NULL | TLS_NULL_* | No encryption |
-| Export | TLS_RSA_EXPORT_* | Weak key length |
-| RC4 | TLS_RSA_WITH_RC4_* | Known vulnerabilities |
-| DES/3DES | TLS_RSA_WITH_DES_* | Insufficient strength |
-
----
-
-## 3. Penetration Testing Requirements
-
-### RTS Penetration Testing Schedule
-
-| Test Type | Frequency | Scope | Performed By |
-|-----------|-----------|-------|-------------|
-| External penetration test | Annually | All public-facing APIs | Accredited third party |
-| Internal penetration test | Annually | Internal services | Accredited third party |
-| Vulnerability scan | Monthly | Full infrastructure | Automated + manual review |
-| Code security review | Per release | Changed components | Internal + SAST tools |
-
-### Testing Scope
-
-| Component | Test Method | Expected Outcome |
-|-----------|------------|-----------------|
-| API Gateway | OWASP ZAP, Burp Suite | No critical/high findings |
-| Authentication | Credential stuffing simulation | Rate limiting effective |
-| Wallet API | Transaction tampering | Integrity checks pass |
-| Admin portal | Privilege escalation | RBAC enforced |
-| Game provider integration | Man-in-the-middle | mTLS prevents interception |
-
-### Remediation SLA
-
-| Severity | Definition | Remediation Deadline |
-|----------|-----------|---------------------|
-| Critical | Remote code execution, data breach | 24 hours |
-| High | Authentication bypass, privilege escalation | 7 days |
-| Medium | Information disclosure, XSS | 30 days |
-| Low | Best practice deviations | Next release |
+| 類別 | 密碼套件 | 原因 |
+|------|----------|------|
+| NULL | TLS_NULL_* | 無加密 |
+| Export | TLS_RSA_EXPORT_* | 金鑰長度不足 |
+| RC4 | TLS_RSA_WITH_RC4_* | 已知弱點 |
+| DES/3DES | TLS_RSA_WITH_DES_* | 強度不足 |
 
 ---
 
-## 4. SmartAdmin Implementation
+## 3. 滲透測試要求
 
-### 4.1 Compliance Verification Service
+### RTS 滲透測試排程
+
+| 測試類型 | 頻率 | 範圍 | 執行單位 |
+|----------|------|------|----------|
+| 外部滲透測試 | 每年 | 所有公開 API | 認證第三方 |
+| 內部滲透測試 | 每年 | 內部服務 | 認證第三方 |
+| 弱點掃描 | 每月 | 全部基礎設施 | 自動化 + 人工審查 |
+| 程式碼安全審查 | 每次發布 | 變更元件 | 內部 + SAST 工具 |
+
+### 測試範圍
+
+| 元件 | 測試方法 | 預期結果 |
+|------|----------|----------|
+| API Gateway | OWASP ZAP, Burp Suite | 無嚴重/高風險發現 |
+| 身份驗證 | 憑證填充模擬 | 速率限制有效 |
+| 錢包 API | 交易竄改 | 完整性檢查通過 |
+| 管理後台 | 權限提升 | RBAC 強制執行 |
+| 遊戲供應商整合 | 中間人攻擊 | mTLS 阻止攔截 |
+
+### 修復 SLA
+
+| 嚴重程度 | 定義 | 修復期限 |
+|----------|------|----------|
+| 嚴重 | 遠端程式碼執行、資料外洩 | 24 小時 |
+| 高 | 身份驗證繞過、權限提升 | 7 天 |
+| 中 | 資訊揭露、XSS | 30 天 |
+| 低 | 最佳實踐偏差 | 下次發布 |
+
+---
+
+## 4. SmartAdmin 實作
+
+### 4.1 合規驗證 Service
 
 ```java
 @Service
@@ -348,7 +348,7 @@ public class RtsComplianceService {
 }
 ```
 
-### 4.2 Compliance Alert Manager
+### 4.2 合規告警 Manager
 
 ```java
 @Component
@@ -380,7 +380,7 @@ public class ComplianceAlertManager {
 }
 ```
 
-### 4.3 Database Schema
+### 4.3 資料庫結構
 
 ```sql
 -- RTS compliance check records
@@ -463,8 +463,8 @@ CREATE INDEX idx_cert_expiry ON t_tls_certificate(valid_until);
 
 ---
 
-## Related Documents
+## 相關文件
 
-- [ISO 27001:2022 Mapping](./ISO27001_Mapping.md) - ISO control mapping
-- [Data Security Standard](./Data_Security_Standard.md) - Data protection
-- [Encryption Strategy](./Encryption_Strategy.md) - Cryptographic controls
+- [ISO 27001:2022 Mapping](./ISO27001_Mapping.md) — ISO 控制項對照
+- [Data Security Standard](./Data_Security_Standard.md) — 資料保護
+- [Encryption Strategy](./Encryption_Strategy.md) — 密碼學控制

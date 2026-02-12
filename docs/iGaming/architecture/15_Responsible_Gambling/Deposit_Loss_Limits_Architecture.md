@@ -1,15 +1,15 @@
-# Deposit & Loss Limits Architecture (存款及虧損限額技術架構)
+# 存款及虧損限額技術架構
 
-> **Business Requirements**: [Deposit_Limits_Requirements.md](../../requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md)
-> **Canonical Source**: [15-02_Deposit_Limits.md](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md), [15-06_Loss_Limits.md](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [Deposit_Limits_Requirements.md](../../requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md)
+> **規範來源**: [15-02_Deposit_Limits.md](../../source-archive/15_Responsible_Gambling/15-02_Deposit_Limits.md), [15-06_Loss_Limits.md](../../source-archive/15_Responsible_Gambling/15-06_Loss_Limits.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員
 
 ---
 
-## 1. Database Schema
+## 1. 資料庫結構
 
-### 1.1 Deposit Limit Setting Table
+### 1.1 存款限額設定表
 
 ```sql
 CREATE TABLE t_deposit_limit_setting (
@@ -38,7 +38,7 @@ CREATE TABLE t_deposit_limit_setting (
 );
 ```
 
-### 1.2 Deposit Limit History Table
+### 1.2 存款限額歷史表
 
 ```sql
 CREATE TABLE t_deposit_limit_history (
@@ -59,7 +59,7 @@ CREATE TABLE t_deposit_limit_history (
 );
 ```
 
-### 1.3 Deposit Accumulation Table
+### 1.3 存款累計表
 
 ```sql
 CREATE TABLE t_deposit_accumulation (
@@ -74,7 +74,7 @@ CREATE TABLE t_deposit_accumulation (
 );
 ```
 
-### 1.4 Loss Limit Setting Table
+### 1.4 虧損限額設定表
 
 ```sql
 CREATE TABLE t_loss_limit_setting (
@@ -100,7 +100,7 @@ CREATE TABLE t_loss_limit_setting (
 );
 ```
 
-### 1.5 Loss Accumulation Table
+### 1.5 虧損累計表
 
 ```sql
 CREATE TABLE t_loss_accumulation (
@@ -120,7 +120,7 @@ CREATE TABLE t_loss_accumulation (
 );
 ```
 
-### 1.6 Pre-Deposit Limit Setup Table (UKGC 2025-10-31)
+### 1.6 存款前限額設定表（UKGC 2025-10-31）
 
 ```sql
 ALTER TABLE t_player_protection_settings
@@ -146,7 +146,7 @@ CREATE TABLE t_pre_deposit_limit_setup (
 );
 ```
 
-### 1.7 Deposit Limit Reconciliation Table
+### 1.7 存款限額對帳表
 
 ```sql
 CREATE TABLE t_deposit_limit_reconciliation (
@@ -184,7 +184,7 @@ CREATE TABLE t_deposit_limit_reconciliation (
 
 ---
 
-## 2. Service Implementation
+## 2. 服務實作
 
 ### 2.1 DepositLimitService
 
@@ -372,7 +372,7 @@ public class LossLimitService {
 }
 ```
 
-### 2.3 Integration with Payment and Bet Services
+### 2.3 與支付和投注服務整合
 
 ```java
 /**
@@ -464,7 +464,7 @@ public class DepositService {
 
 ---
 
-## 3. Reconciliation SQL
+## 3. 對帳 SQL
 
 ```sql
 -- Daily deposit limit reconciliation
@@ -492,11 +492,11 @@ HAVING status = 'BREACH';
 
 ---
 
-## 4. Deposit/Loss Limit Enforcement Pipeline
+## 4. 存款/虧損限額執行管線
 
-### 4.1 End-to-End Enforcement Flow
+### 4.1 端對端執行流程
 
-The following diagram illustrates the complete enforcement pipeline for deposit and loss limits:
+以下圖表展示存款和虧損限額的完整執行管線：
 
 ```mermaid
 flowchart TD
@@ -572,30 +572,30 @@ flowchart TD
     class RecordDeposit,RecordBet,DailyCheck,WeeklyCheck,MonthlyCheck,DailyLossCheck,WeeklyLossCheck,MonthlyLossCheck processStyle
 ```
 
-### 4.2 Enforcement Rules Summary
+### 4.2 執行規則摘要
 
-**Deposit Limits (Hierarchical Enforcement)**:
-1. **Pre-deposit Setup** (P0): Block if UKGC player without limit setup (2025-10-31)
-2. **Self-Exclusion** (P0): Block all deposits during exclusion period
-3. **Daily Limit** (P1): Check accumulated deposits for current day (UTC 00:00 reset)
-4. **Weekly Limit** (P2): Check accumulated deposits for current week (Monday reset)
-5. **Monthly Limit** (P3): Check accumulated deposits for current calendar month
+**存款限額（階層式執行）**：
+1. **存款前設定** (P0)：UKGC 玩家未設定限額則阻擋 (2025-10-31)
+2. **自我排除** (P0)：排除期間阻擋所有存款
+3. **每日限額** (P1)：檢查當日累計存款（UTC 00:00 重置）
+4. **每週限額** (P2)：檢查當週累計存款（週一重置）
+5. **每月限額** (P3)：檢查當月累計存款
 
-**Loss Limits (Configurable Actions)**:
-- **BLOCK**: Prevent bet placement when limit is exceeded (default)
-- **WARN**: Allow bet but send notification to player (high rollers)
-- **COOLING_OFF**: Trigger 24-hour cooling-off period (regulatory requirement)
+**虧損限額（可配置操作）**：
+- **BLOCK**：超過限額時阻擋投注（預設）
+- **WARN**：允許投注但發送通知（高額玩家）
+- **COOLING_OFF**：觸發 24 小時冷靜期（監管要求）
 
-**Limit Application Order**:
+**限額適用順序**：
 ```
-Pre-deposit Setup (UKGC) → Self-Exclusion → Daily → Weekly → Monthly
+存款前設定 (UKGC) → 自我排除 → 每日 → 每週 → 每月
 ```
 
-If ANY check fails, transaction is blocked immediately (fail-fast pattern).
+任何檢查失敗即立即阻擋交易（fail-fast 模式）。
 
-### 4.3 Accumulation Calculation
+### 4.3 累計計算
 
-**Deposit Accumulation**:
+**存款累計**：
 ```java
 // Period boundaries (UTC)
 LocalDate today = LocalDate.now(ZoneOffset.UTC);
@@ -612,7 +612,7 @@ BigDecimal accumulated = depositAccumulationDao
     .getOrElse(BigDecimal.ZERO);
 ```
 
-**Loss Accumulation**:
+**虧損累計**：
 ```java
 // Net loss calculation
 BigDecimal netLoss = totalStake.subtract(totalWin);
@@ -627,7 +627,7 @@ lossAccumulationDao.updateAccumulation(
 );
 ```
 
-### 4.4 Error Response Format
+### 4.4 錯誤回應格式
 
 ```json
 {
@@ -647,25 +647,25 @@ lossAccumulationDao.updateAccumulation(
 
 ---
 
-## 5. Monitoring
+## 5. 監控
 
-| Metric | Prometheus Name | Description |
-|--------|----------------|-------------|
-| Limit adoption rate | `rg_deposit_limit_adoption_rate` | Players with limits / total players |
-| Limit breaches | `rg_deposit_limit_breaches_total` | By limit type |
-| Limit changes | `rg_deposit_limit_changes_total` | By direction (increase/decrease) |
-| Pending increases | `rg_pending_limit_increases_gauge` | In cooling-off period |
-| Loss limit breaches | `loss_limit_breaches_total` | By limit type |
-| Player loss distribution | `player_loss_distribution` | Loss concentration analysis |
-
----
-
-## Related Documents
-
-- [Deposit_Limits_Requirements.md](../../requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md) - Business requirements
-- [Self_Exclusion_Architecture.md](Self_Exclusion_Architecture.md) - Self-exclusion architecture
-- [Player_Protection_API.md](Player_Protection_API.md) - Unified API architecture
+| 指標 | Prometheus 名稱 | 說明 |
+|------|-----------------|------|
+| 限額採用率 | `rg_deposit_limit_adoption_rate` | 有限額玩家 / 總玩家數 |
+| 限額違規 | `rg_deposit_limit_breaches_total` | 按限額類型 |
+| 限額變更 | `rg_deposit_limit_changes_total` | 按方向（增加/減少） |
+| 待生效增額 | `rg_pending_limit_increases_gauge` | 冷靜期中 |
+| 虧損限額違規 | `loss_limit_breaches_total` | 按限額類型 |
+| 玩家虧損分佈 | `player_loss_distribution` | 虧損集中度分析 |
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+## 相關文件
+
+- [Deposit_Limits_Requirements.md](../../requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md) — 業務需求
+- [Self_Exclusion_Architecture.md](Self_Exclusion_Architecture.md) — 自我排除架構
+- [Player_Protection_API.md](Player_Protection_API.md) — 統一 API 架構
+
+---
+
+**返回**: [負責任博弈模組](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming 首頁](../../source-archive/README.md)

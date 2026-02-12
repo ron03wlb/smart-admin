@@ -1,15 +1,15 @@
-# Customer Service Platform Architecture (客服平台技術架構)
+# 客服平台技術架構
 
-> **Business Requirements**: [CS_Platform_Requirements.md](../../requirements/13_Customer_Service/CS_Platform_Requirements.md)
-> **Canonical Source**: [13-01_CS_Platform_Design.md](../../source-archive/13_Customer_Service/13-01_CS_Platform_Design.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [CS_Platform_Requirements.md](../../requirements/13_Customer_Service/CS_Platform_Requirements.md)
+> **規範來源**: [13-01_CS_Platform_Design.md](../../source-archive/13_Customer_Service/13-01_CS_Platform_Design.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員
 
 ---
 
-## 1. SmartAdmin Architecture Mapping
+## 1. SmartAdmin 架構對應
 
-### 1.1 Entity Layer
+### 1.1 Entity 層
 
 ```java
 @Entity
@@ -45,7 +45,7 @@ public class TicketEntity extends BaseEntity {
 }
 ```
 
-### 1.2 Manager Layer (Transaction Management)
+### 1.2 Manager 層（交易管理）
 
 ```java
 @Manager
@@ -123,7 +123,7 @@ public class TicketAssignmentManager {
 }
 ```
 
-### 1.3 Service Layer (Vavr Option)
+### 1.3 Service 層（Vavr Option）
 
 ```java
 @Service
@@ -185,9 +185,9 @@ public class TicketService {
 
 ---
 
-## 2. Player 360-Degree View Data Integration
+## 2. 玩家 360 度視圖資料整合
 
-### 2.1 Data Source Architecture
+### 2.1 資料來源架構
 
 ```mermaid
 flowchart TD
@@ -211,17 +211,17 @@ flowchart TD
     J --> K[CS Frontend Display]
 ```
 
-### 2.2 Response Time Optimization
+### 2.2 回應時間最佳化
 
-- **Redis cache**: 5-minute TTL for player profile data
-- **Async loading**: Non-critical data (bet history, ticket history) loaded asynchronously
-- **GraphQL**: On-demand query to avoid over-fetching
+- **Redis 快取**：玩家資料 5 分鐘 TTL
+- **非同步載入**：非關鍵資料（投注紀錄、工單紀錄）採非同步載入
+- **GraphQL**：按需查詢避免過度擷取
 
 ---
 
-## 3. Knowledge Base Search Architecture
+## 3. 知識庫搜尋架構
 
-### 3.1 Elasticsearch Integration
+### 3.1 Elasticsearch 整合
 
 ```mermaid
 flowchart LR
@@ -235,26 +235,26 @@ flowchart LR
     G -->|Zero Results| H[Content Gap Report]
 ```
 
-### 3.2 Search Configuration
+### 3.2 搜尋配置
 
 ```
 Elasticsearch Index: knowledge_base
-- Full-text search (synonym support, fuzzy matching)
-- Autocomplete suggestions
-- Search result highlighting
-- Click-through rate tracking (ranking optimization)
+- 全文搜尋（同義詞支援、模糊比對）
+- 自動完成建議
+- 搜尋結果高亮
+- 點擊率追蹤（排序最佳化）
 ```
 
-**Quality Metrics**:
-- Search success rate (found answer + closed ticket): > 70%
-- Average search time: < 5 seconds
-- Zero-result search rate: < 5%
+**品質指標**：
+- 搜尋成功率（找到答案 + 關閉工單）：> 70%
+- 平均搜尋時間：< 5 秒
+- 零結果搜尋率：< 5%
 
 ---
 
-## 4. AI Chatbot Architecture
+## 4. AI 聊天機器人架構
 
-### 4.1 NLU Pipeline
+### 4.1 NLU 管線
 
 ```mermaid
 flowchart TD
@@ -279,7 +279,7 @@ flowchart TD
     N --> O[Agent Takeover]
 ```
 
-### 4.2 Auto-Transfer Conditions
+### 4.2 自動轉接條件
 
 ```java
 public boolean shouldTransferToHuman(ChatContext context) {
@@ -302,19 +302,19 @@ public boolean shouldTransferToHuman(ChatContext context) {
 }
 ```
 
-### 4.3 Training Data Pipeline
+### 4.3 訓練資料管線
 
 ```
-Historical Tickets (100K+) -> Agent Annotations -> Weekly Model Retraining -> Deploy
+歷史工單 (100K+) -> 客服標註 -> 每週模型重訓練 -> 部署
                                     |
-                            FAQ Click Rates -> Ranking Optimization
+                            FAQ 點擊率 -> 排序最佳化
 ```
 
 ---
 
-## 5. SLA Monitoring Architecture
+## 5. SLA 監控架構
 
-### 5.1 SLA Timer Service
+### 5.1 SLA 計時服務
 
 ```java
 @Service
@@ -360,9 +360,9 @@ public class SlaMonitorService {
 
 ---
 
-## 6. Multi-Channel Integration
+## 6. 多管道整合
 
-### 6.1 WebSocket Live Chat
+### 6.1 WebSocket 即時聊天
 
 ```java
 @Component
@@ -411,7 +411,7 @@ public class LiveChatWebSocketHandler implements WebSocketHandler {
 }
 ```
 
-### 6.2 Context Passing on Chat Init
+### 6.2 聊天初始化時的上下文傳遞
 
 ```javascript
 // Frontend: pass player context when initiating chat
@@ -426,19 +426,19 @@ const livechat = new LiveChatClient({
 
 ---
 
-## 7. Foundation Module Dependencies
+## 7. 基礎模組相依性
 
-| Module | Purpose |
-|--------|---------|
-| `foundation.redis-lock` | Ticket assignment concurrency control |
-| `foundation.websocket` | Live Chat real-time communication |
-| `foundation.mq` | SLA alert event publishing |
-| `foundation.cache` | Player 360-degree view caching |
-| `foundation.elasticsearch` | Knowledge base full-text search |
+| 模組 | 用途 |
+|------|------|
+| `foundation.redis-lock` | 工單分配並發控制 |
+| `foundation.websocket` | 即時聊天通訊 |
+| `foundation.mq` | SLA 告警事件發布 |
+| `foundation.cache` | 玩家 360 度視圖快取 |
+| `foundation.elasticsearch` | 知識庫全文搜尋 |
 
 ---
 
-## 8. Performance KPI Dashboard
+## 8. 績效 KPI 儀表板
 
 ```mermaid
 flowchart TD
@@ -462,14 +462,14 @@ flowchart TD
 
 ---
 
-## Related Documents
+## 相關文件
 
-- [CS_Platform_Requirements.md](../../requirements/13_Customer_Service/CS_Platform_Requirements.md) - Business requirements
-- [CS_Operations_Architecture.md](CS_Operations_Architecture.md) - Operations architecture
+- [CS_Platform_Requirements.md](../../requirements/13_Customer_Service/CS_Platform_Requirements.md) — 業務需求
+- [CS_Operations_Architecture.md](CS_Operations_Architecture.md) — 營運架構
 
 ---
 
-## 9. Database Schema
+## 9. 資料庫結構
 
 ```sql
 -- Customer service ticket table
@@ -557,4 +557,4 @@ CREATE INDEX idx_article_category ON t_knowledge_article(category, status);
 
 ---
 
-**Return**: [Customer Service Module](../../source-archive/13_Customer_Service/README.md) | [iGaming Home](../../source-archive/README.md)
+**返回**: [客服模組](../../source-archive/13_Customer_Service/README.md) | [iGaming 首頁](../../source-archive/README.md)

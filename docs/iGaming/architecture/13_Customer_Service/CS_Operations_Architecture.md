@@ -1,15 +1,15 @@
-# Customer Service Operations Architecture (客服營運技術架構)
+# 客服營運技術架構
 
-> **Business Requirements**: [CS_Operations_Requirements.md](../../requirements/13_Customer_Service/CS_Operations_Requirements.md)
-> **Canonical Source**: [13-02_Customer_Service_Operations.md](../../source-archive/13_Customer_Service/13-02_Customer_Service_Operations.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
+> **業務需求**: [CS_Operations_Requirements.md](../../requirements/13_Customer_Service/CS_Operations_Requirements.md)
+> **規範來源**: [13-02_Customer_Service_Operations.md](../../source-archive/13_Customer_Service/13-02_Customer_Service_Operations.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員
 
 ---
 
-## 1. Database Schema
+## 1. 資料庫結構
 
-### 1.1 Agent Entity Table
+### 1.1 客服人員實體表
 
 ```sql
 CREATE TABLE t_cs_agent (
@@ -48,7 +48,7 @@ CREATE TABLE t_cs_agent (
 );
 ```
 
-### 1.2 SLA Configuration Table
+### 1.2 SLA 配置表
 
 ```sql
 CREATE TABLE t_sla_config (
@@ -71,7 +71,7 @@ CREATE TABLE t_sla_config (
 );
 ```
 
-### 1.3 SLA Tracking Table
+### 1.3 SLA 追蹤表
 
 ```sql
 CREATE TABLE t_sla_tracking (
@@ -101,7 +101,7 @@ CREATE TABLE t_sla_tracking (
 );
 ```
 
-### 1.4 Chat Session Table
+### 1.4 聊天 Session 表
 
 ```sql
 CREATE TABLE t_chat_session (
@@ -134,7 +134,7 @@ CREATE TABLE t_chat_session (
 );
 ```
 
-### 1.5 Chat Message Table
+### 1.5 聊天訊息表
 
 ```sql
 CREATE TABLE t_chat_message (
@@ -160,7 +160,7 @@ CREATE TABLE t_chat_message (
 );
 ```
 
-### 1.6 Agent Performance Table
+### 1.6 客服人員績效表
 
 ```sql
 CREATE TABLE t_agent_daily_performance (
@@ -198,9 +198,9 @@ CREATE TABLE t_agent_daily_performance (
 
 ---
 
-## 2. Ticket Routing Service
+## 2. 工單路由服務
 
-### 2.1 Weighted Round-Robin Algorithm
+### 2.1 加權輪詢演算法
 
 ```java
 @Service
@@ -275,9 +275,9 @@ public class TicketRoutingService {
 
 ---
 
-## 3. SLA Automated Monitoring
+## 3. SLA 自動化監控
 
-### 3.1 SLA Monitor Service
+### 3.1 SLA 監控服務
 
 ```java
 @Service
@@ -353,9 +353,9 @@ public class SlaMonitorService {
 
 ---
 
-## 4. Multi-Channel Message Bus
+## 4. 多管道訊息匯流排
 
-### 4.1 Channel Adapter Architecture
+### 4.1 管道適配器架構
 
 ```mermaid
 flowchart TD
@@ -383,7 +383,7 @@ flowchart TD
     M --> A
 ```
 
-### 4.2 Unified Message Format
+### 4.2 統一訊息格式
 
 ```java
 @Data
@@ -409,9 +409,9 @@ public class UnifiedMessage {
 
 ---
 
-## 5. Performance Analytics Pipeline
+## 5. 績效分析管線
 
-### 5.1 Metrics Calculation
+### 5.1 指標計算
 
 ```java
 @Service
@@ -479,7 +479,7 @@ public class AgentPerformanceService {
 
 ---
 
-## 6. Quality Assurance Automation
+## 6. 品質保證自動化
 
 ```java
 @Service
@@ -520,26 +520,26 @@ public class QualityAssuranceService {
 
 ---
 
-## 7. Monitoring
+## 7. 監控
 
-| Metric | Prometheus Name | Description |
-|--------|----------------|-------------|
-| Open tickets by priority | `cs_open_tickets_gauge{priority}` | Real-time count |
-| SLA achievement rate | `cs_sla_achievement_rate` | Rolling 24h |
-| First response time avg | `cs_first_response_seconds_avg` | Average |
-| FCR rate | `cs_fcr_rate` | First Contact Resolution |
-| CSAT score | `cs_csat_score_avg` | Average satisfaction |
-| AI automation rate | `cs_ai_automation_rate` | Auto-resolved percentage |
-| Agent utilization | `cs_agent_utilization_rate` | Busy/Total time |
-| Ticket reopen rate | `cs_ticket_reopen_rate` | Quality indicator |
-
----
-
-## Related Documents
-
-- [CS_Operations_Requirements.md](../../requirements/13_Customer_Service/CS_Operations_Requirements.md) - Business requirements
-- [CS_Platform_Architecture.md](CS_Platform_Architecture.md) - Platform architecture
+| 指標 | Prometheus 名稱 | 說明 |
+|------|-----------------|------|
+| 各優先級未結工單 | `cs_open_tickets_gauge{priority}` | 即時計數 |
+| SLA 達成率 | `cs_sla_achievement_rate` | 滾動 24 小時 |
+| 平均首次回應時間 | `cs_first_response_seconds_avg` | 平均值 |
+| FCR 率 | `cs_fcr_rate` | 首次聯繫解決率 |
+| CSAT 分數 | `cs_csat_score_avg` | 平均滿意度 |
+| AI 自動化率 | `cs_ai_automation_rate` | 自動解決百分比 |
+| 客服人員利用率 | `cs_agent_utilization_rate` | 忙碌/總時間 |
+| 工單重開率 | `cs_ticket_reopen_rate` | 品質指標 |
 
 ---
 
-**Return**: [Customer Service Module](../../source-archive/13_Customer_Service/README.md) | [iGaming Home](../../source-archive/README.md)
+## 相關文件
+
+- [CS_Operations_Requirements.md](../../requirements/13_Customer_Service/CS_Operations_Requirements.md) — 業務需求
+- [CS_Platform_Architecture.md](CS_Platform_Architecture.md) — 平台架構
+
+---
+
+**返回**: [客服模組](../../source-archive/13_Customer_Service/README.md) | [iGaming 首頁](../../source-archive/README.md)

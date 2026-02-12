@@ -1,47 +1,47 @@
-# Player Protection API Architecture (玩家保護 API 技術架構)
+# 玩家保護 API 技術架構
 
-> **Business Requirements**: [Affordability_Requirements.md](../../requirements/15_Responsible_Gambling/Affordability_Requirements.md)
-> **Canonical Source**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md), [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers
-
----
-
-## 1. API Specification
-
-### 1.1 Player-Facing Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/player/protection/settings` | GET | Get all protection settings |
-| `/api/v1/player/protection/settings` | PUT | Update protection settings |
-| `/api/v1/player/protection/deposit-limits` | GET | Get deposit limits |
-| `/api/v1/player/protection/deposit-limits` | PUT | Set deposit limits |
-| `/api/v1/player/protection/loss-limits` | GET | Get loss limits |
-| `/api/v1/player/protection/loss-limits` | PUT | Set loss limits |
-| `/api/v1/player/protection/self-exclusion` | POST | Request self-exclusion |
-| `/api/v1/player/protection/self-exclusion/revoke` | POST | Request exclusion revocation |
-| `/api/v1/player/protection/cooling-off` | POST | Start cooling-off period |
-| `/api/v1/player/protection/session-limits` | GET | Get session limits |
-| `/api/v1/player/protection/session-limits` | PUT | Set session limits |
-| `/api/v1/player/protection/activity-history` | GET | Get activity history |
-| `/api/v1/player/protection/usage` | GET | Get limit usage |
-
-### 1.2 Admin-Facing Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/admin/protection/exclusions` | GET | List excluded players |
-| `/api/v1/admin/protection/exclusions/{playerId}` | GET | Player exclusion details |
-| `/api/v1/admin/protection/exclusions/{playerId}` | POST | Operator-exclude player |
-| `/api/v1/admin/protection/reports` | GET | Compliance reports |
-| `/api/v1/admin/protection/reports/export` | POST | Export reports |
-| `/api/v1/admin/protection/gamstop/sync` | POST | Gamstop sync |
-| `/api/v1/admin/protection/gamstop/check` | POST | Gamstop check |
+> **業務需求**: [Affordability_Requirements.md](../../requirements/15_Responsible_Gambling/Affordability_Requirements.md)
+> **規範來源**: [15-07_Player_Protection_API.md](../../source-archive/15_Responsible_Gambling/15-07_Player_Protection_API.md), [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員
 
 ---
 
-## 2. Controller Implementation
+## 1. API 規格
+
+### 1.1 玩家端端點
+
+| 端點 | 方法 | 說明 |
+|------|------|------|
+| `/api/v1/player/protection/settings` | GET | 取得所有保護設定 |
+| `/api/v1/player/protection/settings` | PUT | 更新保護設定 |
+| `/api/v1/player/protection/deposit-limits` | GET | 取得存款限額 |
+| `/api/v1/player/protection/deposit-limits` | PUT | 設定存款限額 |
+| `/api/v1/player/protection/loss-limits` | GET | 取得虧損限額 |
+| `/api/v1/player/protection/loss-limits` | PUT | 設定虧損限額 |
+| `/api/v1/player/protection/self-exclusion` | POST | 申請自我排除 |
+| `/api/v1/player/protection/self-exclusion/revoke` | POST | 申請撤銷排除 |
+| `/api/v1/player/protection/cooling-off` | POST | 開始冷靜期 |
+| `/api/v1/player/protection/session-limits` | GET | 取得 Session 限制 |
+| `/api/v1/player/protection/session-limits` | PUT | 設定 Session 限制 |
+| `/api/v1/player/protection/activity-history` | GET | 取得活動歷史 |
+| `/api/v1/player/protection/usage` | GET | 取得限額使用量 |
+
+### 1.2 管理端端點
+
+| 端點 | 方法 | 說明 |
+|------|------|------|
+| `/api/v1/admin/protection/exclusions` | GET | 列出排除玩家 |
+| `/api/v1/admin/protection/exclusions/{playerId}` | GET | 玩家排除詳情 |
+| `/api/v1/admin/protection/exclusions/{playerId}` | POST | 營運商排除玩家 |
+| `/api/v1/admin/protection/reports` | GET | 合規報告 |
+| `/api/v1/admin/protection/reports/export` | POST | 匯出報告 |
+| `/api/v1/admin/protection/gamstop/sync` | POST | Gamstop 同步 |
+| `/api/v1/admin/protection/gamstop/check` | POST | Gamstop 檢查 |
+
+---
+
+## 2. Controller 實作
 
 ```java
 @RestController
@@ -115,9 +115,9 @@ public class PlayerProtectionController {
 
 ---
 
-## 3. API Response Examples
+## 3. API 回應範例
 
-### 3.1 Protection Settings Overview
+### 3.1 保護設定概覽
 
 ```json
 {
@@ -148,7 +148,7 @@ public class PlayerProtectionController {
 }
 ```
 
-### 3.2 Limit Usage Response
+### 3.2 限額使用量回應
 
 ```json
 {
@@ -171,7 +171,7 @@ public class PlayerProtectionController {
 
 ---
 
-## 4. Affordability Assessment Database Schema
+## 4. 負擔能力評估資料庫結構
 
 ```sql
 CREATE TABLE t_affordability_assessment (
@@ -230,7 +230,7 @@ CREATE TABLE t_financial_vulnerability_indicator (
 
 ---
 
-## 5. Affordability Assessment Service
+## 5. 負擔能力評估服務
 
 ```java
 /**
@@ -425,7 +425,7 @@ public class AffordabilityAssessmentService {
 }
 ```
 
-### 5.1 Monthly Net Deposit SQL
+### 5.1 每月淨存款 SQL
 
 ```sql
 SELECT
@@ -443,7 +443,7 @@ HAVING monthly_net_deposit >= 150;
 
 ---
 
-## 6. Open Banking Integration
+## 6. Open Banking 整合
 
 ```java
 @Component
@@ -486,7 +486,7 @@ public class OpenBankingClient {
 
 ---
 
-## 7. Architecture Overview
+## 7. 架構概覽
 
 ```mermaid
 flowchart TD
@@ -514,30 +514,30 @@ flowchart TD
 
 ---
 
-## 8. Error Codes
+## 8. 錯誤代碼
 
-| Code | Description |
-|------|-------------|
-| `RG_001` | Player is excluded |
-| `RG_002` | Already in cooling-off |
-| `RG_003` | Deposit limit exceeded |
-| `RG_004` | Loss limit exceeded |
-| `RG_005` | Cannot revoke permanent exclusion |
-| `RG_006` | Exclusion period not ended |
-| `RG_007` | No pending limit changes |
-| `RG_008` | Mandatory break in progress |
-| `RG_009` | Gamstop sync failed |
-| `RG_010` | Invalid limit settings |
-
----
-
-## Related Documents
-
-- [Affordability_Requirements.md](../../requirements/15_Responsible_Gambling/Affordability_Requirements.md) - Business requirements
-- [Self_Exclusion_Architecture.md](Self_Exclusion_Architecture.md) - Self-exclusion architecture
-- [Deposit_Loss_Limits_Architecture.md](Deposit_Loss_Limits_Architecture.md) - Limits architecture
-- [Session_Protection_Architecture.md](Session_Protection_Architecture.md) - Session protection
+| 代碼 | 說明 |
+|------|------|
+| `RG_001` | 玩家已被排除 |
+| `RG_002` | 已在冷靜期中 |
+| `RG_003` | 存款限額超出 |
+| `RG_004` | 虧損限額超出 |
+| `RG_005` | 無法撤銷永久排除 |
+| `RG_006` | 排除期間尚未結束 |
+| `RG_007` | 無待處理限額變更 |
+| `RG_008` | 強制休息進行中 |
+| `RG_009` | Gamstop 同步失敗 |
+| `RG_010` | 限額設定無效 |
 
 ---
 
-**Return**: [Responsible Gambling Module](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming Home](../../source-archive/README.md)
+## 相關文件
+
+- [Affordability_Requirements.md](../../requirements/15_Responsible_Gambling/Affordability_Requirements.md) — 業務需求
+- [Self_Exclusion_Architecture.md](Self_Exclusion_Architecture.md) — 自我排除架構
+- [Deposit_Loss_Limits_Architecture.md](Deposit_Loss_Limits_Architecture.md) — 限額架構
+- [Session_Protection_Architecture.md](Session_Protection_Architecture.md) — Session 保護
+
+---
+
+**返回**: [負責任博弈模組](../../source-archive/15_Responsible_Gambling/README.md) | [iGaming 首頁](../../source-archive/README.md)

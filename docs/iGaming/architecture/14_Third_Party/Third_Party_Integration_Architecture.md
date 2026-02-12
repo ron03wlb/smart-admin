@@ -1,44 +1,44 @@
-# Third-Party Integration Architecture
+# 第三方整合架構
 
-> **Business Requirements**: [Third-Party Integration Requirements](../../requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md)
-> **Canonical Source**: [source-archive/14_Third_Party_Integration/14-01](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, DevOps Engineers
+> **業務需求**: [Third-Party Integration Requirements](../../requirements/14_Integration_Standards/Third_Party_Integration_Requirements.md)
+> **規範來源**: [source-archive/14_Third_Party_Integration/14-01](../../source-archive/14_Third_Party_Integration/14-01_Third_Party_Integration.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、DevOps 工程師
 
 ---
 
-## 1. Integration Categories
+## 1. 整合類別
 
-### 1.1 KYC/AML Providers
+### 1.1 KYC/AML 供應商
 
-| Provider | Service | Integration | Cost |
-|----------|---------|-------------|------|
-| **Onfido** | ID verification, facial recognition | REST API | ~$2/check |
-| **Jumio** | Document verification | REST API + Webhook | ~$1.5/check |
-| **ComplyAdvantage** | AML screening | REST API | ~$0.5/check |
-| **Sumsub** | Comprehensive KYC | REST API + SDK | ~$3/check |
+| 供應商 | 服務 | 整合方式 | 成本 |
+|--------|------|----------|------|
+| **Onfido** | 身份驗證、人臉辨識 | REST API | ~$2/次 |
+| **Jumio** | 文件驗證 | REST API + Webhook | ~$1.5/次 |
+| **ComplyAdvantage** | AML 篩查 | REST API | ~$0.5/次 |
+| **Sumsub** | 綜合 KYC | REST API + SDK | ~$3/次 |
 
-### 1.2 Marketing Tools
+### 1.2 行銷工具
 
-| Tool Type | Provider | Purpose | Integration |
-|-----------|----------|---------|-------------|
-| **Email** | SendGrid, AWS SES | Transactional, marketing email | REST API |
-| **SMS** | Twilio, Vonage | OTP, withdrawal notifications | REST API |
-| **Push** | OneSignal, Firebase | App push notifications | SDK + REST API |
-| **CRM** | Braze, Customer.io | Player lifecycle management | REST API + Webhook |
+| 工具類型 | 供應商 | 用途 | 整合方式 |
+|----------|--------|------|----------|
+| **Email** | SendGrid, AWS SES | 交易型、行銷郵件 | REST API |
+| **SMS** | Twilio, Vonage | OTP、提款通知 | REST API |
+| **推播** | OneSignal, Firebase | App 推播通知 | SDK + REST API |
+| **CRM** | Braze, Customer.io | 玩家生命週期管理 | REST API + Webhook |
 
-### 1.3 Analytics Tools
+### 1.3 分析工具
 
-| Tool | Purpose | Integration |
-|------|---------|-------------|
-| **Google Analytics 4** | Traffic, user behavior | gtag.js SDK |
-| **Mixpanel** | Product analytics, funnels | JavaScript SDK |
-| **Amplitude** | Retention, event tracking | JavaScript SDK |
-| **Segment** | Data pipeline (unified) | JS SDK + Server API |
+| 工具 | 用途 | 整合方式 |
+|------|------|----------|
+| **Google Analytics 4** | 流量、使用者行為 | gtag.js SDK |
+| **Mixpanel** | 產品分析、漏斗 | JavaScript SDK |
+| **Amplitude** | 留存、事件追蹤 | JavaScript SDK |
+| **Segment** | 資料管線（統一） | JS SDK + Server API |
 
-### 1.4 Integration Hub Architecture
+### 1.4 整合中樞架構
 
-The platform uses a centralized integration hub with adapter patterns, circuit breakers, and fallback strategies for resilient third-party service integration.
+平台採用集中式整合中樞，結合適配器模式、斷路器和降級策略，實現彈性的第三方服務整合。
 
 ```mermaid
 graph TB
@@ -97,26 +97,26 @@ graph TB
     style F1 fill:#ffebee
 ```
 
-**Hub Components**:
-- **Adapters**: Normalize provider-specific APIs to platform standard interfaces
-- **Circuit Breakers**: Prevent cascading failures (Open/Closed/Half-Open states)
-- **Fallback Strategies**: Graceful degradation (queue, manual process, local log)
-- **Response Handler**: Unified error handling and response normalization
-- **Audit Logger**: Complete audit trail for compliance
-- **Retry Queue**: Exponential backoff retry mechanism (Redis-backed)
-- **Metrics Collector**: Prometheus metrics for monitoring
+**中樞元件**：
+- **Adapters**：將供應商特定 API 標準化為平台標準介面
+- **Circuit Breakers**：防止連鎖故障（Open/Closed/Half-Open 狀態）
+- **降級策略**：優雅降級（佇列、人工處理、本地日誌）
+- **回應處理器**：統一錯誤處理與回應標準化
+- **稽核日誌**：完整的合規稽核軌跡
+- **重試佇列**：指數退避重試機制（Redis 支援）
+- **指標收集器**：Prometheus 監控指標
 
-**Circuit Breaker Thresholds**:
-- **PSP**: 5% error rate over 5 minutes → OPEN (fallback to queue)
-- **KYC**: 10% error rate over 10 minutes → OPEN (fallback to manual review)
-- **Email**: 20% error rate over 15 minutes → OPEN (fallback to queue)
-- **Analytics**: 50% error rate over 30 minutes → OPEN (fallback to local log)
+**斷路器閾值**：
+- **PSP**：5 分鐘內 5% 錯誤率 → OPEN（降級至佇列）
+- **KYC**：10 分鐘內 10% 錯誤率 → OPEN（降級至人工審查）
+- **Email**：15 分鐘內 20% 錯誤率 → OPEN（降級至佇列）
+- **Analytics**：30 分鐘內 50% 錯誤率 → OPEN（降級至本地日誌）
 
 ---
 
-## 2. Integration Patterns
+## 2. 整合模式
 
-### 2.1 Segment Event Tracking
+### 2.1 Segment 事件追蹤
 
 ```javascript
 // Frontend: track player deposit event
@@ -155,20 +155,20 @@ messaging.requestPermission()
 </script>
 ```
 
-## 3. Webhook Retry Strategy
+## 3. Webhook 重試策略
 
-**Exponential Backoff**:
+**指數退避**：
 
-| Retry | Delay | Cumulative |
-|-------|-------|-----------|
-| 1st | 5s | 5s |
-| 2nd | 10s | 15s |
-| 3rd | 20s | 35s |
-| 4th | 40s | 1m 15s |
-| 5th | 80s | 2m 35s |
-| 6th (final) | 160s | 5m 15s |
+| 重試次數 | 延遲 | 累計 |
+|----------|------|------|
+| 第 1 次 | 5s | 5s |
+| 第 2 次 | 10s | 15s |
+| 第 3 次 | 20s | 35s |
+| 第 4 次 | 40s | 1m 15s |
+| 第 5 次 | 80s | 2m 35s |
+| 第 6 次（最終） | 160s | 5m 15s |
 
-**Configuration**:
+**配置**：
 ```yaml
 webhook:
   max_retries: 6
@@ -185,7 +185,7 @@ webhook:
     pagerduty_severity: high
 ```
 
-## 4. API Key Management (HashiCorp Vault)
+## 4. API 金鑰管理（HashiCorp Vault）
 
 ```text
 Vault Secrets Engine:
@@ -201,16 +201,16 @@ Vault Secrets Engine:
     +-- api_key: "SG.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-### Key Rotation Policy
+### 金鑰輪換政策
 
-| Service Type | Rotation Cycle | Automated | Trigger |
-|-------------|---------------|-----------|---------|
-| PSP API Key | 90 days | Yes | Scheduled + suspicious activity |
-| Internal Service Key | 30 days | Yes | Scheduled |
-| Webhook Secret | On demand | No | Suspected compromise |
-| Database Password | 180 days | Yes | Scheduled |
+| 服務類型 | 輪換週期 | 自動化 | 觸發條件 |
+|----------|----------|--------|----------|
+| PSP API 金鑰 | 90 天 | 是 | 排程 + 可疑活動 |
+| 內部服務金鑰 | 30 天 | 是 | 排程 |
+| Webhook Secret | 按需 | 否 | 疑似洩漏 |
+| 資料庫密碼 | 180 天 | 是 | 排程 |
 
-### Terraform + Vault Auto-Rotation
+### Terraform + Vault 自動輪換
 
 ```hcl
 resource "vault_generic_secret" "nuvei_api_key" {
@@ -236,26 +236,26 @@ resource "random_password" "nuvei_secret" {
 }
 ```
 
-## 5. Rate Limiting Configuration
+## 5. 速率限制配置
 
-| Service | Limit | Window | Over-Limit Action |
-|---------|-------|--------|-------------------|
-| **Onfido KYC** | 100 req/min | 60s | Queue + 429 error |
-| **SendGrid Email** | 1000 req/hour | 3600s | Queue + delayed send |
-| **GP Game Launch** | 500 req/min | 60s | Return cached URL |
-| **Google Analytics** | Unlimited | - | - |
+| 服務 | 限制 | 時間窗口 | 超限處理 |
+|------|------|----------|----------|
+| **Onfido KYC** | 100 req/min | 60s | 排入佇列 + 429 錯誤 |
+| **SendGrid Email** | 1000 req/hour | 3600s | 排入佇列 + 延遲發送 |
+| **GP 遊戲啟動** | 500 req/min | 60s | 返回快取 URL |
+| **Google Analytics** | 無限制 | - | - |
 
-## 6. Service Degradation Strategy
+## 6. 服務降級策略
 
-| Service Type | Priority | Impact When Down | Fallback |
-|-------------|----------|------------------|----------|
-| **PSP** | Critical | No deposits/withdrawals | Switch to backup PSP |
-| **KYC Provider** | Important | Cannot complete verification | Manual review process |
-| **Game Provider** | Important | Specific games unavailable | Show maintenance notice |
-| **Email Service** | Optional | Delayed email delivery | Queue + retry later |
-| **Analytics** | Optional | Cannot track events | Local log recording |
+| 服務類型 | 優先級 | 中斷影響 | 降級方案 |
+|----------|--------|----------|----------|
+| **PSP** | 嚴重 | 無法存取款 | 切換至備用 PSP |
+| **KYC 供應商** | 重要 | 無法完成驗證 | 人工審查流程 |
+| **遊戲供應商** | 重要 | 特定遊戲無法使用 | 顯示維護通知 |
+| **Email 服務** | 選用 | 郵件延遲寄送 | 排入佇列 + 稍後重試 |
+| **Analytics** | 選用 | 無法追蹤事件 | 本地日誌記錄 |
 
-### Fallback Implementation
+### 降級實作
 
 ```java
 @Manager
@@ -281,9 +281,9 @@ public class ThirdPartyServiceManager {
 }
 ```
 
-## 7. Monitoring & Alerting
+## 7. 監控與告警
 
-### Health Check Dashboard
+### 健康檢查儀表板
 
 ```text
 Third-Party Service Health (Last 1 Hour)
@@ -328,19 +328,19 @@ groups:
           summary: "Onfido KYC P99 latency > 5s"
 ```
 
-### Service Recovery Detection
+### 服務恢復偵測
 
-- Health check interval: 30 seconds
-- Recovery condition: 3 consecutive passes (availability > 95%)
-- Auto-switch back to primary service with recovery event logged
+- 健康檢查間隔：30 秒
+- 恢復條件：連續 3 次通過（可用性 > 95%）
+- 自動切回主要服務並記錄恢復事件
 
 ---
 
-## 8. Database Schema
+## 8. 資料庫結構
 
-### 8.1 Third-Party Integrations Table
+### 8.1 第三方整合表
 
-The `third_party_integrations` table stores configuration and health status for all third-party service integrations.
+`third_party_integrations` 表儲存所有第三方服務整合的配置和健康狀態。
 
 ```sql
 CREATE TABLE third_party_integrations (
@@ -378,9 +378,9 @@ COMMENT ON COLUMN third_party_integrations.fallback_strategy IS 'Strategy when c
 COMMENT ON COLUMN third_party_integrations.vault_secret_path IS 'HashiCorp Vault secret path for API credentials (NEVER store credentials in this table)';
 ```
 
-### 8.2 Integration Audit Logs Table
+### 8.2 整合稽核日誌表
 
-The `integration_audit_logs` table stores complete audit trail of all third-party API interactions for debugging and compliance.
+`integration_audit_logs` 表儲存所有第三方 API 互動的完整稽核軌跡，用於除錯和合規。
 
 ```sql
 CREATE TABLE integration_audit_logs (
@@ -422,9 +422,9 @@ COMMENT ON COLUMN integration_audit_logs.circuit_breaker_state IS 'Circuit break
 COMMENT ON COLUMN integration_audit_logs.fallback_triggered IS 'Whether fallback strategy was used due to circuit breaker OPEN';
 ```
 
-### 8.3 Example Queries
+### 8.3 範例查詢
 
-**Query integration health status**:
+**查詢整合健康狀態**：
 ```sql
 SELECT
     tpi.service_name,
@@ -441,7 +441,7 @@ WHERE tpi.deleted = false
 ORDER BY tpi.service_type, tpi.is_healthy DESC;
 ```
 
-**Query API performance metrics**:
+**查詢 API 效能指標**：
 ```sql
 SELECT
     tpi.service_name,
@@ -459,7 +459,7 @@ GROUP BY tpi.service_name, ial.operation
 ORDER BY error_count DESC, avg_response_ms DESC;
 ```
 
-**Query circuit breaker events**:
+**查詢斷路器事件**：
 ```sql
 SELECT
     tpi.service_name,
@@ -475,7 +475,7 @@ GROUP BY tpi.service_name, ial.circuit_breaker_state
 ORDER BY last_event DESC;
 ```
 
-**Query failed requests for debugging**:
+**查詢失敗請求以除錯**：
 ```sql
 SELECT
     ial.log_id,
