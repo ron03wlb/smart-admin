@@ -24,59 +24,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Check Mermaid <br/> tags
+      - name: Check stateDiagram-v2 <br/> tags (SmartAdmin Convention)
         run: |
-          echo "檢查 Mermaid 圖表語法..."
+          echo "檢查 stateDiagram-v2 語法（SmartAdmin 專案標準）..."
+          echo ""
+          echo "規則："
+          echo "  ✅ 一般 Mermaid 圖表: 使用 <br/> 換行（專案標準）"
+          echo "  ❌ stateDiagram-v2: 不可使用 <br/>（Mermaid 限制）"
+          echo ""
 
-          # 找出所有包含 Mermaid 的 Markdown 檔案
-          md_files=$(find docs .claude/skills -name "*.md" -type f 2>/dev/null || echo "")
-
-          if [ -z "$md_files" ]; then
-            echo "✅ 未找到需要檢查的 Markdown 檔案"
+          # 使用 detect-statediagram-br.sh 進行專業檢測
+          if [ -f "scripts/detect-statediagram-br.sh" ]; then
+            bash scripts/detect-statediagram-br.sh docs/iGaming
+          else
+            echo "⚠️ 警告: 未找到 detect-statediagram-br.sh，跳過檢查"
             exit 0
           fi
-
-          has_errors=false
-
-          for file in $md_files; do
-            # 檢查 Mermaid 區塊是否包含 <br/>
-            if grep -q '```mermaid' "$file"; then
-              # 使用 Python 腳本進行精準檢查（如果存在）
-              if [ -f "scripts/replace_mermaid_br.py" ]; then
-                # 測試模式：僅檢查不修改
-                if CHECK_FILE="$file" python3 -c "
-                  import re, os
-                  from pathlib import Path
-                  c = Path(os.environ['CHECK_FILE']).read_text()
-                  exit(1 if any('<br/>' in m for m in re.findall(r'\`\`\`mermaid\n(.*?)\`\`\`', c, re.DOTALL)) else 0)
-                "; then
-                  :  # 通過檢查
-                else
-                  echo "❌ $file: 發現 <br/> 標籤在 Mermaid 圖表中"
-                  has_errors=true
-                fi
-              else
-                # 降級為簡單檢查
-                if grep -A 100 '```mermaid' "$file" | grep -B 100 '```' | grep -q '<br/>'; then
-                  echo "❌ $file: 發現 <br/> 標籤在 Mermaid 圖表中"
-                  has_errors=true
-                fi
-              fi
-            fi
-          done
-
-          if [ "$has_errors" = true ]; then
-            echo ""
-            echo "錯誤: Mermaid 圖表不應使用 HTML <br/> 標籤"
-            echo "請使用 \\n 進行換行"
-            echo ""
-            echo "修復建議："
-            echo "  1. 本地運行: py scripts/replace_mermaid_br.py <檔案路徑>"
-            echo "  2. 或手動替換 <br/> 為 \\n"
-            exit 1
-          fi
-
-          echo "✅ 所有 Mermaid 圖表語法正確"
 
       - name: Validate Mermaid syntax with mmdc (optional)
         if: false  # 可選：啟用此步驟需要安裝 Mermaid CLI
