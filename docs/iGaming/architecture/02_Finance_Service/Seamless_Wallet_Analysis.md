@@ -468,33 +468,33 @@ flowchart TD
 
     Req["GP 請求 (Debit/Credit)"] --> CheckID{"有 TransactionId？"}
 
-    CheckID -- 否 --> Err400["Error 400: Missing ID"]
+    CheckID -->|否| Err400["Error 400: Missing ID"]
 
-    CheckID -- 是 --> CheckCache{"冪等檢查<br/>(Redis Key 存在？)"}
+    CheckID -->|是| CheckCache{"冪等檢查<br/>(Redis Key 存在？)"}
 
-    CheckCache -- 是 --> ReturnCache["回傳快取回應"]
+    CheckCache -->|是| ReturnCache["回傳快取回應"]
 
-    CheckCache -- 否 --> LoadConfig["載入遊戲配置<br/>(取得錢包優先順序)"]
+    CheckCache -->|否| LoadConfig["載入遊戲配置<br/>(取得錢包優先順序)"]
 
     LoadConfig --> TypeCheck{"請求類型？"}
 
-    TypeCheck -- 扣款 (投注) --> CalcDeduction["計算扣款順序<br/>(例如 獎金優先於現金)"]
+    TypeCheck -->|扣款 (投注)| CalcDeduction["計算扣款順序<br/>(例如 獎金優先於現金)"]
 
     CalcDeduction --> CheckBal{"餘額充足？"}
 
-    CheckBal -- 否 --> ErrFund["Error: Insufficient Funds"]
+    CheckBal -->|否| ErrFund["Error: Insufficient Funds"]
 
-    CheckBal -- 是 --> ExecDebit["對錢包執行扣款"]
+    CheckBal -->|是| ExecDebit["對錢包執行扣款"]
 
-    TypeCheck -- 增額 (派彩/回滾) --> ExecCredit["執行增額/調整"]
+    TypeCheck -->|增額 (派彩/回滾)| ExecCredit["執行增額/調整"]
 
     ExecCredit --> CheckNeg{"結果餘額 < 0？"}
 
-    CheckNeg -- 是 --> LockAcc["更新餘額並<br/>SET STATUS = LOCKED"]
+    CheckNeg -->|是| LockAcc["更新餘額並<br/>SET STATUS = LOCKED"]
 
     LockAcc --> AlertRisk["觸發風控告警"]
 
-    CheckNeg -- 否 --> NormalUpdate["更新餘額"]
+    CheckNeg -->|否| NormalUpdate["更新餘額"]
 
     ExecDebit --> SaveTx["儲存交易日誌"]
 

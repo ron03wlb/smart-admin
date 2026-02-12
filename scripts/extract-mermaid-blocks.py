@@ -40,16 +40,37 @@ def basic_mermaid_validation(block: str) -> List[str]:
     if r'\n' in block and 'stateDiagram-v2' not in block:
         errors.append("Contains \\n in labels (should use <br/>)")
 
-    # Check for unmatched subgraph/end
-    subgraph_count = len(re.findall(r'\bsubgraph\b', block))
-    end_count = len(re.findall(r'\bend\b', block))
-    if subgraph_count != end_count:
-        errors.append(f"Unmatched subgraph/end: {subgraph_count} subgraph, {end_count} end")
+    # Check for unmatched subgraph/end (excluding rect...end in sequenceDiagram)
+    # rect...end is valid in sequenceDiagram, so only check flowchart/graph types
+    if 'sequenceDiagram' not in block:
+        subgraph_count = len(re.findall(r'\bsubgraph\b', block))
+        rect_count = len(re.findall(r'\brect\b', block))
+        end_count = len(re.findall(r'^\s*end\s*$', block, re.MULTILINE))
 
-    # Check for invalid arrow syntax
-    invalid_arrows = re.findall(r'--[^->]', block)
-    if invalid_arrows:
-        errors.append(f"Potentially invalid arrow syntax: {invalid_arrows}")
+        expected_end = subgraph_count + rect_count
+        if expected_end != end_count:
+            errors.append(f"Unmatched block/end: {subgraph_count} subgraph + {rect_count} rect = {expected_end}, but found {end_count} end")
+
+    # Check for invalid arrow syntax (excluding valid ERD and special arrows)
+    # Valid arrows: --> ==> -.-> --x --o --|> (ERD cardinality)
+    # Invalid: --< (missing >), -- (space after) BUT NOT ----- (separator)
+    # Need to check arrows in context, not inside quoted labels or bracket labels
+
+    # Remove quoted strings and bracket labels to avoid false positives from ----- separators
+    block_without_labels = re.sub(r'"[^"]*"', '', block)
+    block_without_labels = re.sub(r"'[^']*'", '', block_without_labels)
+    block_without_labels = re.sub(r'\[[^\]]*\]', '', block_without_labels)  # Remove [...] labels
+    block_without_labels = re.sub(r'\([^\)]*\)', '', block_without_labels)  # Remove (...) labels
+
+    invalid_patterns = [
+        (r'--<(?!>)', "Missing > after arrow head: --<"),
+        (r'(?<![->])\-\-\s+(?![|-])', "Arrow with trailing space: -- "),
+    ]
+
+    for pattern, desc in invalid_patterns:
+        matches = re.findall(pattern, block_without_labels)
+        if matches:
+            errors.append(f"{desc} (found {len(matches)} times)")
 
     return errors
 

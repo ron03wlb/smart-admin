@@ -106,16 +106,16 @@ Signature = HMAC-SHA256( player_id + "|" + tenant_id + "|" + timestamp, secret_k
 flowchart TD
     A[Receive Token] --> B[Base64 Decode]
     B --> C{Format Valid?<br/>4 parts expected}
-    C -- No --> Z[Throw TokenInvalidException]
-    C -- Yes --> D[Extract fields:<br/>playerId, tenantId,<br/>timestamp, signature]
+    C -->|No| Z[Throw TokenInvalidException]
+    C -->|Yes| D[Extract fields:<br/>playerId, tenantId,<br/>timestamp, signature]
     D --> E[Compute expected<br/>HMAC-SHA256 signature]
     E --> F{Signature<br/>matches?}
-    F -- No --> Z
-    F -- Yes --> G{Timestamp<br/>within TTL?}
-    G -- No --> Z
-    G -- Yes --> H{Token in<br/>Redis blacklist?}
-    H -- Yes --> Z
-    H -- No --> I[Add to blacklist<br/>with TTL expiry]
+    F -->|No| Z
+    F -->|Yes| G{Timestamp<br/>within TTL?}
+    G -->|No| Z
+    G -->|Yes| H{Token in<br/>Redis blacklist?}
+    H -->|Yes| Z
+    H -->|No| I[Add to blacklist<br/>with TTL expiry]
     I --> J[Token Valid]
 ```
 
@@ -225,15 +225,15 @@ public class TokenVerificationService {
 ```mermaid
 flowchart TD
     A[Incoming Request<br/>with requestId] --> B{Layer 1:<br/>Redis Cache<br/>Check}
-    B -- Hit --> R1[Return cached result<br/>99% of cases]
-    B -- Miss --> C{Layer 2:<br/>Database<br/>Check}
-    C -- Found --> D[Write back to Redis]
+    B -->|Hit| R1[Return cached result<br/>99% of cases]
+    B -->|Miss| C{Layer 2:<br/>Database<br/>Check}
+    C -->|Found| D[Write back to Redis]
     D --> R2[Return DB result]
-    C -- Not Found --> E{Layer 3:<br/>Distributed Lock<br/>Redisson}
-    E -- Lock Failed --> R3[Throw ConcurrentRequestException]
-    E -- Lock Acquired --> F[Double-check DB]
-    F -- Found --> R4[Return result]
-    F -- Not Found --> G[Execute wallet operation]
+    C -->|Not Found| E{Layer 3:<br/>Distributed Lock<br/>Redisson}
+    E -->|Lock Failed| R3[Throw ConcurrentRequestException]
+    E -->|Lock Acquired| F[Double-check DB]
+    F -->|Found| R4[Return result]
+    F -->|Not Found| G[Execute wallet operation]
     G --> H[Insert transaction record]
     H --> I[Cache result in Redis<br/>TTL: 15 min]
     I --> J[Release lock]
@@ -412,9 +412,9 @@ flowchart TD
     B --> C{For each<br/>stalled tx}
     C --> D[Query GP for<br/>transaction status]
     D --> E{GP Status?}
-    E -- SUCCESS --> F[Update to SUCCESS]
-    E -- FAILED --> G[Refund player<br/>Update to FAILED]
-    E -- NOT_FOUND --> H[Refund player<br/>Update to NOT_FOUND]
+    E -->|SUCCESS| F[Update to SUCCESS]
+    E -->|FAILED| G[Refund player<br/>Update to FAILED]
+    E -->|NOT_FOUND| H[Refund player<br/>Update to NOT_FOUND]
     G --> I[Send alert<br/>notification]
     H --> I
     F --> J[Recovery complete]

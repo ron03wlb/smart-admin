@@ -485,10 +485,10 @@ graph TD
     Platform_DB[(平台帳本)]:::database -->|2. 提取| Reconciliation_Engine[對帳引擎]:::process
     Staging --> Reconciliation_Engine
     Reconciliation_Engine -->|3. 比對邏輯| Logic{符合？}:::decision
-    Logic -- 是 --> Mark_Verified[標記已驗證]:::success
-    Logic -- 否: 缺失 --> Action_Recover[建立缺失交易]:::process
-    Logic -- 否: 差異 --> Action_Adjust[建立調整紀錄]:::process
-    Logic -- 否: 幽靈交易 --> Alert_Risk[觸發風控告警]:::alert
+    Logic -->|是| Mark_Verified[標記已驗證]:::success
+    Logic -->|否: 缺失| Action_Recover[建立缺失交易]:::process
+    Logic -->|否: 差異| Action_Adjust[建立調整紀錄]:::process
+    Logic -->|否: 幽靈交易| Alert_Risk[觸發風控告警]:::alert
     Action_Recover --> SaveTx[儲存交易]:::database
     Action_Adjust --> SaveTx
     Mark_Verified --> End((流程結束)):::process
@@ -512,18 +512,18 @@ flowchart TD
     classDef success fill:#006600,stroke:#00ff00,stroke-width:2px,color:#fff;
 
     Bet([投注結算觸發]):::startend --> CheckStatus{1. 狀態有效？<br/>非和局/取消}:::decision
-    CheckStatus -- 否 --> Invalid[有效投注額 = 0<br/>Effective = 0]:::fail
-    CheckStatus -- 是 --> CheckOdds{2. 賠率 >= 0.5？<br/>反套利}:::decision
-    CheckOdds -- 否 --> Invalid
-    CheckOdds -- 是 --> RiskCheck{3. 風控引擎<br/>驗證？}:::decision
-    RiskCheck -- 否: 對沖 --> Invalid
-    RiskCheck -- 是 --> GeneralCalc[4. 計算一般有效投注額<br/>= Bet * GameWeight]:::process
+    CheckStatus -->|否| Invalid[有效投注額 = 0<br/>Effective = 0]:::fail
+    CheckStatus -->|是| CheckOdds{2. 賠率 >= 0.5？<br/>反套利}:::decision
+    CheckOdds -->|否| Invalid
+    CheckOdds -->|是| RiskCheck{3. 風控引擎<br/>驗證？}:::decision
+    RiskCheck -->|否: 對沖| Invalid
+    RiskCheck -->|是| GeneralCalc[4. 計算一般有效投注額<br/>= Bet * GameWeight]:::process
     GeneralCalc --> HasBonus{5. 有活躍獎金？}:::decision
-    HasBonus -- 否 --> EndNormal([流程結束]):::startend
-    HasBonus -- 是 --> BonusRule[載入獎金規則<br/>白名單、上限、貢獻度]:::process
+    HasBonus -->|否| EndNormal([流程結束]):::startend
+    HasBonus -->|是| BonusRule[載入獎金規則<br/>白名單、上限、貢獻度]:::process
     BonusRule --> CheckWhite{遊戲允許？}:::decision
-    CheckWhite -- 否 --> BonusZero[活動有效投注額 = 0]:::fail
-    CheckWhite -- 是 --> CalcCap[套用最大貢獻上限]:::process
+    CheckWhite -->|否| BonusZero[活動有效投注額 = 0]:::fail
+    CheckWhite -->|是| CalcCap[套用最大貢獻上限]:::process
     CalcCap --> CalcBonusTO[6. 計算活動有效投注額<br/>= CappedBet * BonusWeight]:::success
     BonusZero --> UpdateProgress[更新有效投注額進度]:::process
     CalcBonusTO --> UpdateProgress
