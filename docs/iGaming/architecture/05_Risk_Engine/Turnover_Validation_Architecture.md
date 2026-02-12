@@ -1,87 +1,87 @@
-# Turnover Validation Architecture
+# 有效投注額驗證架構（Turnover Validation Architecture）
 
-> **Canonical Source**: [05-07_Turnover_Validation_Scheme.md](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
-> **Audience**: Architects, Backend Engineers, Database Engineers
-> **Business Requirements**: [Turnover_Validation_Requirements.md](../../requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [05-07_Turnover_Validation_Scheme.md](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
+> **目標讀者**: Architects, Backend Engineers, Database Engineers
+> **業務需求**: [Turnover_Validation_Requirements.md](../../requirements/05_Risk_Compliance/Turnover_Validation_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1. Problem Statement
+## 1. 問題描述（Problem Statement）
 
-### 1.1 Long-Cycle Performance Bottleneck
+### 1.1 長週期性能瓶頸（Long-Cycle Performance Bottleneck）
 
-When a player has not withdrawn for years (3--5 years), the withdrawal process must calculate all turnover since the last withdrawal. Traditional full-scan approaches have severe performance issues:
+當玩家數年未提款（3--5 年）時，提款流程必須計算自上次提款以來的所有有效投注額。傳統的全表掃描方法存在嚴重的性能問題：
 
-| Problem | Impact |
+| 問題 | 影響 |
 |---------|--------|
-| Query Duration | Multi-year data scans can exceed 30 seconds |
-| Database Pressure | Full table scans cause I/O spikes |
-| Timeout Risk | Withdrawal requests fail due to query timeout |
+| 查詢耗時 | 多年數據掃描可能超過 30 秒 |
+| 數據庫壓力 | 全表掃描導致 I/O 峰值 |
+| 超時風險 | 提款請求因查詢超時而失敗 |
 
-### 1.2 Activity Risk Control Gap
+### 1.2 活動風控缺口（Activity Risk Control Gap）
 
-The existing system lacks protection against bonus exploitation:
-- Low-odds betting to complete turnover requirements (arbitrage)
-- Hedge betting to eliminate risk before withdrawing bonus
-- No mechanism to mark invalid turnover contributions
+現有系統缺乏對獎金套利的保護：
+- 低賠率投注以完成投注要求（套利）
+- 對沖投注以消除風險後提取獎金
+- 缺乏標記無效有效投注額貢獻的機制
 
-### 1.3 Turnover Validation Decision Tree
+### 1.3 有效投注額驗證決策樹（Turnover Validation Decision Tree）
 
-The following flowchart illustrates the complete turnover validation flow from withdrawal request through snapshot creation:
+以下流程圖說明了從提款請求到快照創建的完整有效投注額驗證流程：
 
 ```mermaid
 flowchart TD
-    Start[Player Requests Withdrawal]
+    Start[玩家請求提款]
 
-    subgraph "Step 1: Snapshot Retrieval"
-        GetSnapshot[Query Latest Snapshot<br/>snapshotDao.findLatest playerId]
-        CheckSnapshot{Snapshot<br/>Exists?}
-        UseZero[Use TurnoverSnapshot.ZERO<br/>First-time withdrawal]
-        UseSnapshot[Use Last Snapshot<br/>totalValidBet, snapshotTime]
+    subgraph "步驟 1: 快照檢索"
+        GetSnapshot[查詢最新快照<br/>snapshotDao.findLatest playerId]
+        CheckSnapshot{快照<br/>存在?}
+        UseZero[使用 TurnoverSnapshot.ZERO<br/>首次提款]
+        UseSnapshot[使用上次快照<br/>totalValidBet, snapshotTime]
     end
 
-    subgraph "Step 2: Real-Time Aggregation"
-        GetCurrent[Query Current Valid Bet<br/>betRecordDao.sumValidBet playerId]
-        CalcDiff[Calculate Period Turnover<br/>periodValidBet = current - snapshot]
+    subgraph "步驟 2: 實時聚合"
+        GetCurrent[查詢當前有效投注<br/>betRecordDao.sumValidBet playerId]
+        CalcDiff[計算週期有效投注額<br/>periodValidBet = current - snapshot]
     end
 
-    subgraph "Step 3: Bet Validity Rules"
-        CheckBetRules[Apply Validity Rules to Each Bet]
-        LowOdds{Odds < 1.3?}
-        HedgeBet{Hedge Bet<br/>Detected?}
-        MinBetBonus{Min Bet +<br/>Activity Turnover?}
-        SameEventOpp{Same Event<br/>Opposite Bets?}
-        ValidBet[Valid Turnover = Bet Amount]
-        InvalidBet[Valid Turnover = 0]
+    subgraph "步驟 3: 投注有效性規則"
+        CheckBetRules[對每個投注應用有效性規則]
+        LowOdds{賠率 < 1.3?}
+        HedgeBet{檢測到<br/>對沖投注?}
+        MinBetBonus{最低投注 +<br/>活動投注要求?}
+        SameEventOpp{同一賽事<br/>相反投注?}
+        ValidBet[有效投注額 = 投注金額]
+        InvalidBet[有效投注額 = 0]
     end
 
-    subgraph "Step 4: Requirement Calculation"
-        CalcRequired[Calculate Required Turnover<br/>depositAmount × multiplier + bonusAmount × multiplier]
+    subgraph "步驟 4: 要求計算"
+        CalcRequired[計算所需投注要求<br/>depositAmount × multiplier + bonusAmount × multiplier]
         Compare{periodValidBet >=<br/>requiredTurnover?}
     end
 
-    subgraph "Step 5: Risk Proposal Check"
-        QueryProposals[Query Unresolved Risk Proposals<br/>Time Range: lastSnapshotTime → NOW]
-        CheckProposals{Has URGENT/HIGH<br/>Proposals?}
+    subgraph "步驟 5: 風險提案檢查"
+        QueryProposals[查詢未解決的風險提案<br/>時間範圍: lastSnapshotTime → NOW]
+        CheckProposals{存在 URGENT/HIGH<br/>提案?}
     end
 
-    subgraph "Step 6: Validation Result"
-        PassWithRisk[PASS with Risk Warning<br/>Manual Review Required]
-        Pass[PASS<br/>Proceed to Withdrawal]
-        Fail[FAIL<br/>Reject Withdrawal]
+    subgraph "步驟 6: 驗證結果"
+        PassWithRisk[通過但有風險警告<br/>需要人工審核]
+        Pass[通過<br/>繼續提款]
+        Fail[失敗<br/>拒絕提款]
     end
 
-    subgraph "Step 7: Post-Withdrawal Snapshot"
-        CreateSnapshot[Create New Snapshot<br/>INSERT INTO t_player_turnover_snapshot<br/>snapshotType = WITHDRAWAL]
-        SnapshotData[Record:<br/>totalBet, totalValidBet, totalWin<br/>triggerId = withdrawalId]
+    subgraph "步驟 7: 提款後快照"
+        CreateSnapshot[創建新快照<br/>INSERT INTO t_player_turnover_snapshot<br/>snapshotType = WITHDRAWAL]
+        SnapshotData[記錄:<br/>totalBet, totalValidBet, totalWin<br/>triggerId = withdrawalId]
     end
 
     Start --> GetSnapshot
     GetSnapshot --> CheckSnapshot
 
-    CheckSnapshot -->|No| UseZero
-    CheckSnapshot -->|Yes| UseSnapshot
+    CheckSnapshot -->|否| UseZero
+    CheckSnapshot -->|是| UseSnapshot
 
     UseZero --> GetCurrent
     UseSnapshot --> GetCurrent
@@ -90,37 +90,37 @@ flowchart TD
     CalcDiff --> CheckBetRules
 
     CheckBetRules --> LowOdds
-    LowOdds -->|Yes| InvalidBet
-    LowOdds -->|No| HedgeBet
+    LowOdds -->|是| InvalidBet
+    LowOdds -->|否| HedgeBet
 
-    HedgeBet -->|Yes| InvalidBet
-    HedgeBet -->|No| MinBetBonus
+    HedgeBet -->|是| InvalidBet
+    HedgeBet -->|否| MinBetBonus
 
-    MinBetBonus -->|Yes| InvalidBet
-    MinBetBonus -->|No| SameEventOpp
+    MinBetBonus -->|是| InvalidBet
+    MinBetBonus -->|否| SameEventOpp
 
-    SameEventOpp -->|Yes| InvalidBet
-    SameEventOpp -->|No| ValidBet
+    SameEventOpp -->|是| InvalidBet
+    SameEventOpp -->|否| ValidBet
 
     InvalidBet --> CalcRequired
     ValidBet --> CalcRequired
 
     CalcRequired --> Compare
 
-    Compare -->|No| Fail
-    Compare -->|Yes| QueryProposals
+    Compare -->|否| Fail
+    Compare -->|是| QueryProposals
 
     QueryProposals --> CheckProposals
 
-    CheckProposals -->|Yes| PassWithRisk
-    CheckProposals -->|No| Pass
+    CheckProposals -->|是| PassWithRisk
+    CheckProposals -->|否| Pass
 
     Pass --> CreateSnapshot
     CreateSnapshot --> SnapshotData
-    SnapshotData --> End[Withdrawal Approved]
+    SnapshotData --> End[提款批准]
 
-    PassWithRisk --> End2[Escalate to Manual Review]
-    Fail --> End3[Rejection Notification]
+    PassWithRisk --> End2[升級至人工審核]
+    Fail --> End3[拒絕通知]
 
     style GetSnapshot fill:#e1f5ff
     style UseZero fill:#e1f5ff
@@ -145,39 +145,39 @@ flowchart TD
     style SnapshotData fill:#cce5ff
 ```
 
-**Decision Tree Stages**:
+**決策樹階段**：
 
-1. **Snapshot Retrieval**: O(1) index scan on `(player_id, snapshot_time DESC)`
-2. **Real-Time Aggregation**: Query pre-aggregated counter for current valid bets
-3. **Bet Validity Rules**: Apply 4 invalid turnover filters (low-odds, hedge, min-bet-bonus, same-event-opposite)
-4. **Requirement Calculation**: Compare period turnover against deposit/bonus multiplier requirements
-5. **Risk Proposal Check**: Query unresolved proposals within time window aligned with last snapshot
-6. **Validation Result**: 3 outcomes - PASS, PASS with Risk Warning, FAIL
-7. **Post-Withdrawal Snapshot**: Create checkpoint for next validation cycle
+1. **快照檢索（Snapshot Retrieval）**: O(1) 索引掃描於 `(player_id, snapshot_time DESC)`
+2. **實時聚合（Real-Time Aggregation）**: 查詢預聚合計數器以獲取當前有效投注
+3. **投注有效性規則（Bet Validity Rules）**: 應用 4 個無效有效投注額過濾器（低賠率、對沖、最低投注獎金、同賽事相反）
+4. **要求計算（Requirement Calculation）**: 比較週期有效投注額與存款/獎金倍數要求
+5. **風險提案檢查（Risk Proposal Check）**: 查詢與上次快照對齊的時間窗口內的未解決提案
+6. **驗證結果（Validation Result）**: 3 種結果 - 通過、通過但有風險警告、失敗
+7. **提款後快照（Post-Withdrawal Snapshot）**: 為下一個驗證週期創建檢查點
 
-**Performance Characteristics**:
-- Snapshot retrieval: < 5ms (index scan)
-- Valid bet sum: < 10ms (pre-aggregated)
-- Risk proposal query: < 20ms (time-range index scan)
-- Total validation: < 50ms (P95)
+**性能特性**：
+- 快照檢索: < 5ms（索引掃描）
+- 有效投注求和: < 10ms（預聚合）
+- 風險提案查詢: < 20ms（時間範圍索引掃描）
+- 總驗證時間: < 50ms (P95)
 
 ---
 
-## 2. Checkpoint Snapshot Design
+## 2. 檢查點快照設計（Checkpoint Snapshot Design）
 
-### 2.1 Core Mechanism
+### 2.1 核心機制（Core Mechanism）
 
-Record a cumulative turnover snapshot on each successful withdrawal. Subsequent validations compute only the difference.
+在每次成功提款時記錄累積有效投注額快照。後續驗證僅計算差值。
 
-**Validation Formula**:
+**驗證公式**：
 
 ```
-Period Valid Turnover = Current Total Valid Bets (real-time) - Last Snapshot Total Valid Bets
+週期有效投注額 = 當前總有效投注（實時） - 上次快照總有效投注
 ```
 
-**Performance**: O(1) -- constant time regardless of time span.
+**性能**: O(1) -- 無論時間跨度如何都是常數時間。
 
-### 2.2 Database Schema
+### 2.2 數據庫架構（Database Schema）
 
 ```sql
 CREATE TABLE t_player_turnover_snapshot (
@@ -201,17 +201,17 @@ CREATE TABLE t_player_turnover_snapshot (
 CREATE INDEX idx_snapshot_player_latest
     ON t_player_turnover_snapshot (player_id, snapshot_time DESC);
 
-COMMENT ON TABLE t_player_turnover_snapshot IS 'Player turnover snapshot -- created on each successful withdrawal';
-COMMENT ON COLUMN t_player_turnover_snapshot.total_valid_bet IS 'Cumulative valid turnover (excludes invalid bets)';
+COMMENT ON TABLE t_player_turnover_snapshot IS '玩家有效投注額快照 -- 每次成功提款時創建';
+COMMENT ON COLUMN t_player_turnover_snapshot.total_valid_bet IS '累積有效投注額（排除無效投注）';
 ```
 
-**Index Strategy**:
-- Unique constraint on `(player_id, snapshot_time)` prevents duplicate snapshots
-- Descending index on `(player_id, snapshot_time DESC)` optimizes "find latest snapshot" queries
+**索引策略**：
+- `(player_id, snapshot_time)` 上的唯一約束防止重複快照
+- `(player_id, snapshot_time DESC)` 上的降序索引優化「查找最新快照」查詢
 
 ---
 
-## 3. Validation Service Implementation
+## 3. 驗證服務實現（Validation Service Implementation）
 
 ```java
 /**
@@ -278,60 +278,60 @@ public class TurnoverValidationManager {
 }
 ```
 
-**Key Design Notes**:
-- `findLatest()` returns the most recent snapshot using the descending index -- single row fetch
-- `sumValidBet()` uses a pre-aggregated counter or materialized view for O(1) real-time lookup
-- `@Transactional` is placed in the Manager/Service layer per SmartAdmin architecture rules
-- First-time withdrawal uses `TurnoverSnapshot.ZERO` as the baseline (all cumulative values = 0)
+**關鍵設計說明**：
+- `findLatest()` 使用降序索引返回最新快照 -- 單行提取
+- `sumValidBet()` 使用預聚合計數器或物化視圖進行 O(1) 實時查找
+- `@Transactional` 按照 SmartAdmin 架構規則放置在 Manager/Service 層
+- 首次提款使用 `TurnoverSnapshot.ZERO` 作為基線（所有累積值 = 0）
 
 ---
 
-## 4. Time Window Alignment with Risk Proposals
+## 4. 時間窗口與風險提案對齊（Time Window Alignment with Risk Proposals）
 
-The "Full Consistency" principle requires that turnover validation and risk proposal queries use identical time boundaries:
+「完全一致性」原則要求有效投注額驗證和風險提案查詢使用相同的時間邊界：
 
-| Dimension | Query Range | Description |
+| 維度 | 查詢範圍 | 描述 |
 |-----------|-------------|-------------|
-| Risk Proposal Query | Last Snapshot Time --> Now | All unresolved proposals since last withdrawal |
-| Turnover Validation | Last Snapshot Time --> Now | Difference calculation |
-| Long-Cycle Handling | No fixed day limit | Even for 5-year gaps, query all URGENT/HIGH proposals since last snapshot |
+| 風險提案查詢 | 上次快照時間 --> 現在 | 自上次提款以來所有未解決的提案 |
+| 有效投注額驗證 | 上次快照時間 --> 現在 | 差值計算 |
+| 長週期處理 | 無固定天數限制 | 即使是 5 年間隔，也查詢自上次快照以來的所有 URGENT/HIGH 提案 |
 
-This alignment eliminates edge cases where a risk flag from 2 years ago could be missed by a fixed 30-day window.
+這種對齊消除了邊緣情況，即 2 年前的風險標記可能被固定的 30 天窗口遺漏。
 
 ---
 
-## 5. Activity Risk Integration (Dual-Layer Architecture)
+## 5. 活動風險集成（Activity Risk Integration）—— 雙層架構（Dual-Layer Architecture）
 
-### 5.1 Architecture Overview
+### 5.1 架構概覽（Architecture Overview）
 
 ```
 +---------------------------------------------+
-|          Activity Risk Dual-Layer            |
+|          活動風險雙層架構                     |
 +--------------------+------------------------+
-|  Prevention        |  Detection             |
+|  預防層            |  檢測層                 |
 |  (Pre-emptive)     |  (Post-hoc)            |
 +--------------------+------------------------+
-|  - Claim intercept |  - Pre-withdrawal scan |
-|    - IP check      |    - Anomaly proposals |
-|    - Device FP     |    - Risk rule triggers |
-|  - Bet intercept   |  - Reporting           |
-|    - Low odds      |    - Activity ROI      |
-|      --> turnover 0|    - Abuser lists      |
-|    - Hedge bet     |                        |
-|      --> turnover 0|                        |
+|  - 領取攔截        |  - 提款前掃描            |
+|    - IP 檢查       |    - 異常提案            |
+|    - 設備指紋      |    - 風險規則觸發         |
+|  - 投注攔截        |  - 報告                 |
+|    - 低賠率        |    - 活動 ROI           |
+|      --> 有效投注額 0 |    - 濫用者列表         |
+|    - 對沖投注      |                        |
+|      --> 有效投注額 0 |                        |
 +--------------------+------------------------+
 ```
 
-### 5.2 Invalid Turnover Rules
+### 5.2 無效有效投注額規則（Invalid Turnover Rules）
 
-| Rule Code | Condition | Turnover Contribution |
+| 規則代碼 | 條件 | 有效投注額貢獻 |
 |-----------|-----------|----------------------|
-| `LOW_ODDS` | Odds < 1.3 | 0 (zero) |
-| `HEDGE_BET` | Detected hedge bet combination | 0 (zero) |
-| `MIN_BET_BONUS` | Minimum bet amount + activity turnover | 0 (zero) |
-| `SAME_EVENT_OPPOSITE` | Opposite bets on the same event | 0 (zero) |
+| `LOW_ODDS` | 賠率 < 1.3 | 0（零） |
+| `HEDGE_BET` | 檢測到對沖投注組合 | 0（零） |
+| `MIN_BET_BONUS` | 最低投注金額 + 活動投注要求 | 0（零） |
+| `SAME_EVENT_OPPOSITE` | 同一賽事的相反投注 | 0（零） |
 
-### 5.3 Valid Bet Calculation Logic
+### 5.3 有效投注計算邏輯（Valid Bet Calculation Logic）
 
 ```java
 public BigDecimal calculateValidBet(BetRecord bet) {
@@ -352,38 +352,38 @@ public BigDecimal calculateValidBet(BetRecord bet) {
 
 ---
 
-## 6. Data Flow
+## 6. 數據流（Data Flow）
 
-### 6.1 Withdrawal Validation Flow
+### 6.1 提款驗證流程（Withdrawal Validation Flow）
 
 ```
-Player requests withdrawal
+玩家請求提款
     |
     v
 TurnoverValidationService.validateTurnover(playerId, multiplier)
     |
-    +---> snapshotDao.findLatest(playerId)     [O(1) index scan]
+    +---> snapshotDao.findLatest(playerId)     [O(1) 索引掃描]
     |         |
     |         v
-    |     Last snapshot (or ZERO if first time)
+    |     上次快照（如果是首次則為 ZERO）
     |
-    +---> betRecordDao.sumValidBet(playerId)   [O(1) pre-aggregated]
+    +---> betRecordDao.sumValidBet(playerId)   [O(1) 預聚合]
     |         |
     |         v
-    |     Current cumulative valid bets
+    |     當前累積有效投注
     |
-    +---> Calculate: current - lastSnapshot = periodValidBet
+    +---> 計算: current - lastSnapshot = periodValidBet
     |
-    +---> Compare: periodValidBet >= requiredTurnover
+    +---> 比較: periodValidBet >= requiredTurnover
     |
     v
 TurnoverResult { passed: boolean, periodValidBet, requiredTurnover }
 ```
 
-### 6.2 Snapshot Creation Flow
+### 6.2 快照創建流程（Snapshot Creation Flow）
 
 ```
-Withdrawal approved and completed
+提款批准並完成
     |
     v
 TurnoverValidationService.createSnapshot(playerId, withdrawalId)
@@ -400,51 +400,51 @@ INSERT INTO t_player_turnover_snapshot
 
 ---
 
-## 7. UI Integration Points
+## 7. UI 集成點（UI Integration Points）
 
-### 7.1 Proposal Review Page
+### 7.1 提案審核頁面（Proposal Review Page）
 
-- Highlight tags: "Associated Risk", "Activity Arbitrage", "Bonus Chasing"
-- Display associated promotion name and turnover completion progress
+- 突出標籤：「關聯風險」、「活動套利」、「獎金追逐」
+- 顯示關聯促銷名稱和投注要求完成進度
 
-### 7.2 Bet Details Page
+### 7.2 投注詳情頁面（Bet Details Page）
 
-- Invalid turnover labels: `[Low Odds] Turnover: 0.00`, `[Hedge] Turnover: 0.00`
-- Valid turnover percentage statistic per player
+- 無效有效投注額標籤：`[低賠率] 有效投注額: 0.00`、`[對沖] 有效投注額: 0.00`
+- 每個玩家的有效投注額百分比統計
 
 ---
 
-## 8. Performance Characteristics
+## 8. 性能特性（Performance Characteristics）
 
-| Operation | Complexity | Target Latency (P95) |
+| 操作 | 複雜度 | 目標延遲 (P95) |
 |-----------|------------|----------------------|
-| Turnover Validation | O(1) | < 50ms |
-| Snapshot Creation | O(1) per INSERT | < 100ms |
-| Latest Snapshot Lookup | O(1) index scan | < 5ms |
-| Valid Bet Sum | O(1) pre-aggregated | < 10ms |
+| 有效投注額驗證 | O(1) | < 50ms |
+| 快照創建 | O(1) 每次 INSERT | < 100ms |
+| 最新快照查找 | O(1) 索引掃描 | < 5ms |
+| 有效投注求和 | O(1) 預聚合 | < 10ms |
 
 ---
 
-## 9. Acceptance Criteria
+## 9. 驗收標準（Acceptance Criteria）
 
-- Snapshot mechanism: automatic snapshot creation after each successful withdrawal
-- O(1) validation: turnover validation < 50ms (P95), independent of time span
-- Invalid turnover: low-odds / hedge / bonus chasing bets counted as zero
-- Time alignment: risk proposal query window = turnover validation window = last snapshot to present
-- UI alerts: review page shows activity risk tags; bet page marks invalid turnover
-
----
-
-## 10. Related Documents
-
-- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) -- Configuration-driven risk rule engine
-- [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) -- Proposal lifecycle management
-- [05-06 Withdrawal Risk Correlation](../../source-archive/05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md) -- Withdrawal risk scoring
+- 快照機制：每次成功提款後自動創建快照
+- O(1) 驗證：有效投注額驗證 < 50ms (P95)，與時間跨度無關
+- 無效有效投注額：低賠率 / 對沖 / 獎金追逐投注計為零
+- 時間對齊：風險提案查詢窗口 = 有效投注額驗證窗口 = 上次快照至現在
+- UI 警報：審核頁面顯示活動風險標籤；投注頁面標記無效有效投注額
 
 ---
 
-## 11. Version History
+## 10. 相關文檔（Related Documents）
 
-| Version | Date | Changes |
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) -- 配置驅動的風險規則引擎
+- [05-05 Risk Proposal Workflow](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md) -- 提案生命週期管理
+- [05-06 Withdrawal Risk Correlation](../../source-archive/05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md) -- 提款風險評分
+
+---
+
+## 11. 版本歷史（Version History）
+
+| 版本 | 日期 | 變更 |
 |---------|------|---------|
-| 1.0.0 | 2026-02-05 | Initial version -- Checkpoint Snapshot, dual-layer protection, invalid turnover rules |
+| 1.0.0 | 2026-02-05 | 初始版本 -- 檢查點快照、雙層保護、無效有效投注額規則 |

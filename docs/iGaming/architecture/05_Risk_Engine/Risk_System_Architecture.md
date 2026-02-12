@@ -1,64 +1,64 @@
-# Risk Control System Architecture
+# 風控系統架構（Risk Control System Architecture）
 
-> **Business Requirements**: [Risk_Strategy_Overview.md](../../requirements/05_Risk_Compliance/Risk_Strategy_Overview.md)
-> **Canonical Source**: [source-archive/05_Risk_Control/05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Last Synced**: 2026-02-09
-> **Source Version**: 4.0.0
-
----
-
-## Architecture Overview
-
-The risk control system employs an **Event-Driven Architecture (EDA)** achieving:
-- **94.2% true positive rate**
-- **Sub-second latency**
-- **Modular and scalable design**
+> **業務需求**: [Risk_Strategy_Overview.md](../../requirements/05_Risk_Compliance/Risk_Strategy_Overview.md)
+> **規範來源**: [source-archive/05_Risk_Control/05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
+> **目標讀者**: Architects, Backend Developers, DevOps Engineers
+> **最後同步**: 2026-02-09
+> **來源版本**: 4.0.0
 
 ---
 
-## 1. Event-Driven Architecture
+## 架構概述（Architecture Overview）
+
+風控系統採用**事件驅動架構（Event-Driven Architecture, EDA）**，實現：
+- **94.2% 真陽性率**
+- **次秒級延遲**
+- **模組化與可擴展設計**
+
+---
+
+## 1. 事件驅動架構（Event-Driven Architecture）
 
 ```mermaid
 graph TB
-    subgraph "Data Collection Layer"
-        A1["Player Actions<br/>Click stream, Session, Device FP"] --> K1["Kafka: player-events<br/>TPS: 10k+"]
-        A2["Transaction Events<br/>Deposit, Withdraw, Bet"] --> K2["Kafka: transaction-events<br/>TPS: 5k+"]
-        A3["Game Events<br/>Rounds, Results, RTP"] --> K3["Kafka: game-events<br/>TPS: 20k+"]
-        A4["Device Fingerprint<br/>Canvas, WebGL, Audio<br/>65k+ data points"] --> K1
+    subgraph "資料收集層"
+        A1["玩家行為<br/>點擊流、Session、裝置指紋"] --> K1["Kafka: player-events<br/>TPS: 10k+"]
+        A2["交易事件<br/>存款、提款、下注"] --> K2["Kafka: transaction-events<br/>TPS: 5k+"]
+        A3["遊戲事件<br/>遊戲局數、結果、RTP"] --> K3["Kafka: game-events<br/>TPS: 20k+"]
+        A4["裝置指紋<br/>Canvas、WebGL、Audio<br/>65k+ 資料點"] --> K1
     end
 
-    subgraph "Stream Processing Layer"
-        K1 --> F1["Flink Job: Behavior Aggregator<br/>5-min sliding window"]
-        K2 --> F2["Flink Job: Transaction Aggregator<br/>Real-time velocity check"]
-        K3 --> F3["Flink Job: Game Pattern Analyzer<br/>CEP"]
+    subgraph "串流處理層"
+        K1 --> F1["Flink Job: 行為聚合器<br/>5分鐘滑動視窗"]
+        K2 --> F2["Flink Job: 交易聚合器<br/>即時速率檢查"]
+        K3 --> F3["Flink Job: 遊戲模式分析器<br/>CEP"]
 
         F1 --> R1["Redis Feature Store<br/>P99: < 1ms"]
         F2 --> R1
         F3 --> R1
 
-        F1 --> DL["Delta Lake / Iceberg<br/>Batch Analytics"]
+        F1 --> DL["Delta Lake / Iceberg<br/>批次分析"]
         F2 --> DL
         F3 --> DL
     end
 
-    subgraph "Detection Layer"
-        R1 --> E1["Rule Engine - LiteFlow<br/>QPS: 100k+"]
-        R1 --> E2["ML Model - Isolation Forest<br/>P99: < 50ms"]
-        R1 --> E3["Graph Engine - Neo4j<br/>BFS Depth: 3"]
+    subgraph "偵測層"
+        R1 --> E1["規則引擎 - LiteFlow<br/>QPS: 100k+"]
+        R1 --> E2["ML 模型 - Isolation Forest<br/>P99: < 50ms"]
+        R1 --> E3["圖資料庫引擎 - Neo4j<br/>BFS 深度: 3"]
 
-        E1 --> D["Decision Service<br/>Priority Aggregation"]
+        E1 --> D["決策服務<br/>優先級聚合"]
         E2 --> D
         E3 --> D
     end
 
-    subgraph "Action Layer"
-        D --> PRIORITY["Priority Determination<br/>URGENT / HIGH / MEDIUM / LOW"]
+    subgraph "行動層"
+        D --> PRIORITY["優先級判定<br/>URGENT / HIGH / MEDIUM / LOW"]
 
-        PRIORITY -->|URGENT| AC1["Auto Block<br/>Freeze Account"]
-        PRIORITY -->|HIGH| AC2["Auto Block / Review"]
-        PRIORITY -->|MEDIUM| AC3["Manual Review Queue"]
-        PRIORITY -->|LOW| AC4["Normal Flow"]
+        PRIORITY -->|URGENT| AC1["自動阻擋<br/>凍結帳戶"]
+        PRIORITY -->|HIGH| AC2["自動阻擋 / 審核"]
+        PRIORITY -->|MEDIUM| AC3["人工審核佇列"]
+        PRIORITY -->|LOW| AC4["正常流程"]
 
         AC1 --> MQ1[Kafka: risk.priority.urgent]
         AC2 --> MQ2[Kafka: risk.priority.high]
@@ -67,25 +67,25 @@ graph TB
     end
 ```
 
-### Key Components
+### 核心元件（Key Components）
 
-| Component | Technology | Performance | Purpose |
+| 元件 | 技術 | 效能 | 用途 |
 |-----------|------------|-------------|---------|
-| **Message Bus** | Apache Kafka | 35k+ TPS | High-throughput data ingestion |
-| **Stream Processing** | Apache Flink | Sub-second | Complex Event Processing (CEP) |
-| **Feature Store** | Redis Cluster | P99 < 1ms | Low-latency feature lookup |
-| **Rule Engine** | LiteFlow | 100k+ QPS | Deterministic rule execution |
-| **ML Model** | Isolation Forest | P99 < 50ms | Anomaly detection |
-| **Graph Engine** | Neo4j | BFS Depth 3 | Multi-account correlation |
-| **Data Lake** | Delta Lake / Iceberg | Batch | Historical analysis |
+| **訊息匯流排** | Apache Kafka | 35k+ TPS | 高吞吐量資料攝取 |
+| **串流處理** | Apache Flink | 次秒級 | 複雜事件處理（Complex Event Processing, CEP） |
+| **特徵儲存** | Redis Cluster | P99 < 1ms | 低延遲特徵查詢 |
+| **規則引擎** | LiteFlow | 100k+ QPS | 確定性規則執行 |
+| **ML 模型** | Isolation Forest | P99 < 50ms | 異常偵測 |
+| **圖資料庫引擎** | Neo4j | BFS 深度 3 | 多帳戶關聯分析 |
+| **資料湖** | Delta Lake / Iceberg | 批次處理 | 歷史分析 |
 
 ---
 
-## 2. Real-time Detection Sequence
+## 2. 即時偵測流程（Real-time Detection Sequence）
 
 ```mermaid
 sequenceDiagram
-    participant Player
+    participant Player as 玩家
     participant API Gateway
     participant Finance Service
     participant Risk Engine
@@ -94,18 +94,18 @@ sequenceDiagram
     participant ML Model
     participant Neo4j Graph
     participant Kafka
-    participant CS Queue
+    participant CS Queue as 客服佇列
 
-    Note over Player,CS Queue: Real-time Withdrawal Risk Check (Target: < 500ms)
+    Note over Player,CS Queue: 即時提款風險檢查（目標: < 500ms）
 
     Player->>API Gateway: POST /withdraw {amount: 5000}
     API Gateway->>Finance Service: validateWithdrawal(playerId, amount)
     Finance Service->>Risk Engine: checkWithdraw(withdrawalRequest)
     activate Risk Engine
 
-    Note over Risk Engine: Step 1: Feature Collection (< 50ms)
+    Note over Risk Engine: 步驟 1: 特徵收集（< 50ms）
 
-    par Parallel Feature Collection
+    par 並行特徵收集
         Risk Engine->>Redis Feature Store: GET player:${id}:metrics
         Redis Feature Store-->>Risk Engine: {bet_velocity, withdrawal_count}
 
@@ -116,37 +116,37 @@ sequenceDiagram
         Redis Feature Store-->>Risk Engine: {linked_accounts, usage_count}
     end
 
-    Note over Risk Engine: Step 2: Multi-Layer Detection (< 200ms)
+    Note over Risk Engine: 步驟 2: 多層偵測（< 200ms）
 
-    par Parallel Rule Evaluation
+    par 並行規則評估
         Risk Engine->>Rule Engine (LiteFlow): executeChain(WITHDRAWAL_CHECK)
         Rule Engine (LiteFlow)-->>Risk Engine: {priority: MEDIUM}
 
         Risk Engine->>ML Model: predictFraud(features)
         ML Model-->>Risk Engine: {priority: HIGH, probability: 0.72}
 
-        Risk Engine->>Neo4j Graph: MATCH connected accounts
+        Risk Engine->>Neo4j Graph: MATCH 關聯帳戶
         Neo4j Graph-->>Risk Engine: {cluster_size: 4, priority: MEDIUM}
     end
 
-    Note over Risk Engine: Step 3: Decision (< 50ms)
+    Note over Risk Engine: 步驟 3: 決策（< 50ms）
 
     Risk Engine->>Risk Engine: max(MEDIUM, HIGH, MEDIUM) = HIGH
 
-    alt HIGH Priority
+    alt HIGH 優先級
         Risk Engine->>Kafka: publish(risk.manual.review)
         Risk Engine-->>Finance Service: {approved: false, action: MANUAL_REVIEW}
         Finance Service-->>API Gateway: 202 Accepted
-        API Gateway-->>Player: Withdrawal Pending (SLA: 2h)
-        Kafka->>CS Queue: Add Review Task
+        API Gateway-->>Player: 提款待審核（SLA: 2小時）
+        Kafka->>CS Queue: 新增審核任務
     end
 
     deactivate Risk Engine
 ```
 
-### Performance SLA
+### 效能 SLA（Performance SLA）
 
-| API | P99 Latency | P50 Latency | Availability |
+| API | P99 延遲 | P50 延遲 | 可用性 |
 |-----|-------------|-------------|--------------|
 | `validateBet()` | < 100ms | < 30ms | 99.9% |
 | `checkWithdraw()` | < 500ms | < 200ms | 99.95% |
@@ -155,13 +155,13 @@ sequenceDiagram
 
 ---
 
-## 3. API Specifications
+## 3. API 規格（API Specifications）
 
-### 3.1 validateBet (Layer 1 Core Logic) - v2.1.0
+### 3.1 validateBet（Layer 1 核心邏輯）- v2.1.0
 
-**Purpose**: Configuration-driven bet validation with BLOCK/FLAG/PASS modes.
+**用途**: 配置驅動的下注驗證，支援 BLOCK/FLAG/PASS 模式。
 
-**Request**:
+**請求**:
 ```json
 {
   "bet_id": "tx_123456",
@@ -174,7 +174,7 @@ sequenceDiagram
 }
 ```
 
-**Response (BLOCK)**:
+**回應（BLOCK）**:
 ```json
 {
   "is_valid": false,
@@ -185,7 +185,7 @@ sequenceDiagram
 }
 ```
 
-**Response (FLAG)**:
+**回應（FLAG）**:
 ```json
 {
   "is_valid": true,
@@ -199,7 +199,7 @@ sequenceDiagram
 
 ### 3.2 checkWithdraw
 
-**Request**:
+**請求**:
 ```json
 {
   "withdrawal_id": "wd_789012",
@@ -212,7 +212,7 @@ sequenceDiagram
 }
 ```
 
-**Response**:
+**回應**:
 ```json
 {
   "approved": false,
@@ -223,74 +223,74 @@ sequenceDiagram
 }
 ```
 
-### 3.3 Error Codes
+### 3.3 錯誤代碼（Error Codes）
 
-| Code | Name | HTTP Status | Description |
+| 代碼 | 名稱 | HTTP 狀態 | 描述 |
 |------|------|-------------|-------------|
-| `RISK_001` | TURNOVER_NOT_MET | 403 | Turnover requirement not met |
-| `RISK_002` | HEDGE_BET | 403 | Hedge bet detected |
-| `RISK_005` | MULTI_ACCOUNT | 403 | Multi-account correlation |
-| `RISK_007` | BLACKLIST_MATCH | 403 | Blacklist match |
-| `RISK_500` | INTERNAL_ERROR | 500 | Internal engine error |
-| `RISK_504` | TIMEOUT | 504 | Check timeout (> 3s) |
+| `RISK_001` | TURNOVER_NOT_MET | 403 | 未達有效投注額（Valid Turnover）要求 |
+| `RISK_002` | HEDGE_BET | 403 | 偵測到對沖下注 |
+| `RISK_005` | MULTI_ACCOUNT | 403 | 多帳戶關聯 |
+| `RISK_007` | BLACKLIST_MATCH | 403 | 黑名單比對命中 |
+| `RISK_500` | INTERNAL_ERROR | 500 | 引擎內部錯誤 |
+| `RISK_504` | TIMEOUT | 504 | 檢查逾時（> 3秒） |
 
 ---
 
-## 4. Integration Architecture
+## 4. 整合架構（Integration Architecture）
 
 ```
-[Risk Engine Integration Architecture]
+[風控引擎整合架構]
 ┌──────────────────────────────────────────────────────────────────────┐
-│                         Risk Engine Core                             │
+│                         風控引擎核心                                   │
 │                                                                      │
-│  Provided APIs (gRPC/REST):                                          │
-│  ├─ validateBet()          → Activity (04-01)                        │
-│  ├─ validateTurnover()     → Finance (02-04)                         │
-│  ├─ checkWithdraw()        → Finance (02-01)                         │
-│  ├─ assessPlayerRisk()     → VIP (01-02), CRM (07-01)                │
-│  └─ reportFraudIncident()  → CS Platform (11-01)                     │
+│  提供的 API（gRPC/REST）:                                             │
+│  ├─ validateBet()          → 活動系統 (04-01)                         │
+│  ├─ validateTurnover()     → 財務系統 (02-04)                         │
+│  ├─ checkWithdraw()        → 財務系統 (02-01)                         │
+│  ├─ assessPlayerRisk()     → VIP 系統 (01-02)、CRM (07-01)           │
+│  └─ reportFraudIncident()  → 客服平台 (11-01)                         │
 │                                                                      │
-│  Events Published (Kafka):                                           │
-│  ├─ risk.player.flagged    → CS Platform, CRM                        │
-│  ├─ risk.fraud.detected    → Finance, CS Platform                    │
-│  ├─ risk.withdrawal.rejected → Finance, Player Notification          │
-│  └─ risk.model.updated     → Analytics, Audit                        │
+│  發布的事件（Kafka）:                                                  │
+│  ├─ risk.player.flagged    → 客服平台、CRM                            │
+│  ├─ risk.fraud.detected    → 財務系統、客服平台                        │
+│  ├─ risk.withdrawal.rejected → 財務系統、玩家通知                      │
+│  └─ risk.model.updated     → 分析系統、稽核系統                        │
 │                                                                      │
-│  Events Consumed (Kafka):                                            │
-│  ├─ player.registered      → Initialize risk profile                 │
-│  ├─ player.kyc.completed   → Update risk level                       │
-│  ├─ wallet.deposit.completed → Velocity check                        │
-│  └─ game.bet.placed        → Real-time pattern analysis              │
+│  消費的事件（Kafka）:                                                  │
+│  ├─ player.registered      → 初始化風險檔案                            │
+│  ├─ player.kyc.completed   → 更新風險等級                             │
+│  ├─ wallet.deposit.completed → 速率檢查                               │
+│  └─ game.bet.placed        → 即時模式分析                             │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-### Sync vs Async
+### 同步 vs 非同步（Sync vs Async）
 
-| Scenario | Call Method | Reason |
+| 情境 | 呼叫方式 | 原因 |
 |----------|-------------|--------|
-| Pre-withdrawal check | Sync gRPC/REST | Must wait for result |
-| Bet validation | Sync gRPC/REST | Activity needs immediate validity |
-| Player registration | Async Kafka | Non-blocking initialization |
-| Fraud alert | Async Kafka | Notify without blocking |
+| 提款前檢查 | 同步 gRPC/REST | 必須等待結果 |
+| 下注驗證 | 同步 gRPC/REST | 活動系統需要立即有效性結果 |
+| 玩家註冊 | 非同步 Kafka | 非阻塞初始化 |
+| 詐騙警報 | 非同步 Kafka | 通知而不阻塞 |
 
 ---
 
-## 5. Degradation Strategy
+## 5. 降級策略（Degradation Strategy）
 
-| Level | Trigger | Degradation | Business Impact |
+| 等級 | 觸發條件 | 降級措施 | 業務影響 |
 |-------|---------|-------------|-----------------|
-| **Level 0** | P99 < 100ms | Full functionality | None |
-| **Level 1** | P99 > 200ms | Disable graph analysis | 10% drop in correlation accuracy |
-| **Level 2** | P99 > 500ms | Rule engine only | ML disabled, 15% higher miss rate |
-| **Level 3** | Service unavailable | Whitelist pass, others block | Severe impact, emergency fix |
+| **等級 0** | P99 < 100ms | 完整功能 | 無 |
+| **等級 1** | P99 > 200ms | 停用圖資料庫分析 | 關聯準確率下降 10% |
+| **等級 2** | P99 > 500ms | 僅規則引擎 | ML 停用，漏報率提高 15% |
+| **等級 3** | 服務不可用 | 白名單通過，其他阻擋 | 嚴重影響，緊急修復 |
 
-**Auto Recovery**: When metrics normalize for 5 minutes, auto-upgrade to previous level.
+**自動恢復**: 當指標正常化 5 分鐘後，自動升級至前一等級。
 
 ---
 
-## 6. RTP Anomaly Detection
+## 6. RTP 異常偵測（RTP Anomaly Detection）
 
-### 6.1 Calculation Service
+### 6.1 計算服務（Calculation Service）
 
 ```java
 @Service
@@ -323,16 +323,16 @@ public class RtpCalculationService {
 }
 ```
 
-### 6.2 Detection Rules
+### 6.2 偵測規則（Detection Rules）
 
-| Rule | Condition | Risk Level | Action |
+| 規則 | 條件 | 風險等級 | 行動 |
 |------|-----------|------------|--------|
-| Game RTP too high | 24h RTP > Theory + 10% | High | Notify provider + investigate |
-| Game RTP too low | 24h RTP < Theory - 10% | Medium | Monitor + compliance review |
-| Player RTP anomaly | Player RTP > Theory + 20% (100+ rounds) | Critical | Freeze + investigate |
-| RTP clustering | Multiple players same game anomaly | Critical | Suspend game + emergency |
+| 遊戲 RTP 過高 | 24小時 RTP > 理論值 + 10% | 高 | 通知供應商 + 調查 |
+| 遊戲 RTP 過低 | 24小時 RTP < 理論值 - 10% | 中 | 監控 + 合規審查 |
+| 玩家 RTP 異常 | 玩家 RTP > 理論值 + 20%（100+ 局） | 嚴重 | 凍結 + 調查 |
+| RTP 集群異常 | 多位玩家同一遊戲異常 | 嚴重 | 暫停遊戲 + 緊急處理 |
 
-### 6.3 Prometheus Metrics
+### 6.3 Prometheus 指標（Prometheus Metrics）
 
 ```yaml
 game_rtp_current:
@@ -353,9 +353,9 @@ player_rtp_anomaly:
 
 ---
 
-## 7. Configuration-Driven Rules (v2.1.0)
+## 7. 配置驅動規則（Configuration-Driven Rules）- v2.1.0
 
-### 7.1 Database Schema
+### 7.1 資料庫架構（Database Schema）
 
 ```sql
 CREATE TABLE t_risk_rule_config (
@@ -376,7 +376,7 @@ CREATE TABLE t_risk_rule_config (
 ) COMMENT='Risk rule configuration table';
 ```
 
-### 7.2 Sample Configuration
+### 7.2 範例配置（Sample Configuration）
 
 ```sql
 -- BLOCK rules (real-time block)
@@ -390,7 +390,7 @@ INSERT INTO t_risk_rule_config VALUES
 (6, 'LOW_ODDS_WAGERING', 'Low Odds Wagering', 'WAGERING', 'FLAG', true, '{"odds_threshold": 1.5}', '["SPORTS", "LIVE"]', NULL, NULL, NOW());
 ```
 
-### 7.3 SmartAdmin Architecture Mapping
+### 7.3 SmartAdmin 架構映射（SmartAdmin Architecture Mapping）
 
 **Entity**:
 ```java
@@ -410,7 +410,7 @@ public class RiskRuleConfigEntity extends BaseEntity {
 }
 ```
 
-**Service (Vavr Option)**:
+**Service（Vavr Option）**:
 ```java
 public class RiskRuleConfigService {
 
@@ -425,7 +425,7 @@ public class RiskRuleConfigService {
 }
 ```
 
-**Manager (@Transactional)**:
+**Manager（@Transactional）**:
 ```java
 public class RiskRuleConfigManager {
 
@@ -450,79 +450,79 @@ public class RiskRuleConfigManager {
 
 ---
 
-## 8. Monitoring & Alerting
+## 8. 監控與告警（Monitoring & Alerting）
 
-### 8.1 Key Metrics
+### 8.1 關鍵指標（Key Metrics）
 
-| Category | Metric | Normal | Warning | Critical |
+| 類別 | 指標 | 正常 | 警告 | 嚴重 |
 |----------|--------|--------|---------|----------|
-| **Performance** | API P99 Latency | < 100ms | > 200ms | > 500ms |
-| **Performance** | API Error Rate | < 0.1% | > 1% | > 5% |
-| **Business** | Fraud Detection Rate | 0.5-1.5% | < 0.2% or > 3% | < 0.1% or > 5% |
-| **Business** | False Positive Rate | < 5% | > 8% | > 15% |
-| **System** | Kafka Consumer Lag | < 1s | > 10s | > 60s |
+| **效能** | API P99 延遲 | < 100ms | > 200ms | > 500ms |
+| **效能** | API 錯誤率 | < 0.1% | > 1% | > 5% |
+| **業務** | 詐騙偵測率 | 0.5-1.5% | < 0.2% 或 > 3% | < 0.1% 或 > 5% |
+| **業務** | 誤報率 | < 5% | > 8% | > 15% |
+| **系統** | Kafka Consumer Lag | < 1秒 | > 10秒 | > 60秒 |
 
-### 8.2 Alert Strategy
+### 8.2 告警策略（Alert Strategy）
 
-**P0 (Immediate - Phone + SMS + PagerDuty)**:
-- Risk system completely unavailable (> 90% API failure)
-- Blacklist function failed (> 50% lookup failures)
-- Large-scale fraud attack (> 1000 events/hour)
+**P0（立即 - 電話 + 簡訊 + PagerDuty）**:
+- 風控系統完全不可用（> 90% API 失敗）
+- 黑名單功能失效（> 50% 查詢失敗）
+- 大規模詐騙攻擊（> 1000 事件/小時）
 
-**P1 (1 hour - Slack + Email)**:
-- API latency > 500ms (> 10 minutes)
-- False positive rate surge (> 15%)
-- Manual review queue backlog (> 300 items)
-
----
-
-## 9. Security & Compliance
-
-### 9.1 API Authentication
-
-**Internal APIs**: mTLS (Mutual TLS)
-- Each calling service holds client certificate
-- Risk engine validates certificate and checks service identity
-- Only whitelisted services can call risk APIs
-
-**External APIs**: API Key + HMAC Signature
-- API Key identifies caller
-- Request body signed with HMAC-SHA256
-- Rate limiting (1000 requests/minute)
-
-### 9.2 Audit Trail
-
-**Retention**:
-- Hot data (Elasticsearch): 30 days
-- Warm data (S3): 1 year
-- Cold data (Glacier): 7 years (AML compliance)
-
-**Tamper-proof**:
-- Each log generates HMAC hash
-- Daily Hash Chain integrity verification
-
-### 9.3 GDPR Compliance
-
-**Data Deletion (Right to Erasure)**:
-- Anonymize PII fields (IP, device fingerprint) in `player_risk_profiles`
-- Replace `player_id` with pseudonymized ID in `risk_events`
-- Retain transaction records 7 years (AML requirement) without identifiable info
-- Use Crypto-Shredding (destroy player-specific DEK)
+**P1（1 小時 - Slack + Email）**:
+- API 延遲 > 500ms（持續 > 10 分鐘）
+- 誤報率飆升（> 15%）
+- 人工審核佇列積壓（> 300 項）
 
 ---
 
-## Related Documents
+## 9. 安全與合規（Security & Compliance）
 
-### Core Dependencies
-- Wallet Architecture *(planned)* - Balance monitoring
-- [Turnover_Calculation_Logic.md](../03_Game_Integration/Turnover_Calculation_Logic.md) - Layer 2 integration
+### 9.1 API 認證（API Authentication）
 
-### Technical Reference
-- [Gateway_Core.md](../09_Infrastructure/Gateway_Core.md) - API rate limiting, circuit breaker
-- [Stream_Processing_Architecture.md](../09_Infrastructure/Stream_Processing_Architecture.md) - Kafka/Flink patterns
+**內部 API**: mTLS（Mutual TLS）
+- 每個呼叫服務持有客戶端憑證
+- 風控引擎驗證憑證並檢查服務身份
+- 僅白名單服務可呼叫風控 API
+
+**外部 API**: API Key + HMAC 簽章
+- API Key 識別呼叫者
+- 請求本體使用 HMAC-SHA256 簽章
+- 速率限制（1000 請求/分鐘）
+
+### 9.2 稽核追蹤（Audit Trail）
+
+**保留期限**:
+- 熱資料（Elasticsearch）: 30 天
+- 溫資料（S3）: 1 年
+- 冷資料（Glacier）: 7 年（反洗錢 AML 合規要求）
+
+**防篡改**:
+- 每筆日誌生成 HMAC 雜湊值
+- 每日 Hash Chain 完整性驗證
+
+### 9.3 GDPR 合規（GDPR Compliance）
+
+**資料刪除（被遺忘權，Right to Erasure）**:
+- 匿名化 `player_risk_profiles` 中的 PII 欄位（IP、裝置指紋）
+- 在 `risk_events` 中將 `player_id` 替換為假名化 ID
+- 保留交易記錄 7 年（AML 要求），但不含可識別資訊
+- 使用 Crypto-Shredding（銷毀玩家特定的 DEK）
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-08
-**Maintainer**: Risk Team & Backend Team
+## 相關文件（Related Documents）
+
+### 核心依賴（Core Dependencies）
+- 錢包架構 *(規劃中)* - 餘額監控
+- [Turnover_Calculation_Logic.md](../03_Game_Integration/Turnover_Calculation_Logic.md) - Layer 2 整合
+
+### 技術參考（Technical Reference）
+- [Gateway_Core.md](../09_Infrastructure/Gateway_Core.md) - API 速率限制、熔斷器
+- [Stream_Processing_Architecture.md](../09_Infrastructure/Stream_Processing_Architecture.md) - Kafka/Flink 模式
+
+---
+
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-08
+**維護者**: 風控團隊 & 後端團隊

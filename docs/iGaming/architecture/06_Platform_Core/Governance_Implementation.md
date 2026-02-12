@@ -1,55 +1,55 @@
-# Governance Implementation
+# 治理實施（Governance Implementation）
 
-> **Canonical Source**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
-> **Audience**: Architects, Backend Engineers, Security Engineers
-> **Business Requirements**: [Governance_Requirements.md](../../requirements/06_Governance_Licensing/Governance_Requirements.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
+> **目標讀者**: Architects, Backend Engineers, Security Engineers
+> **業務需求**: [Governance_Requirements.md](../../requirements/06_Governance_Licensing/Governance_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1. Overview
+## 1. 概述（Overview）
 
-This document covers the technical implementation of the iGaming platform governance system, including multi-tenant architecture, RBAC permission system, audit logging, and data encryption strategy. All implementations follow SmartAdmin layered architecture patterns.
+本文件涵蓋 iGaming 平台治理系統的技術實施,包括多租戶架構（Multi-Tenant Architecture）、RBAC 權限系統、審計日誌（Audit Log）和數據加密策略。所有實施均遵循 SmartAdmin 分層架構模式。
 
-### 1.1 Governance Approval Workflow
+### 1.1 治理審批工作流（Governance Approval Workflow）
 
-The governance system enforces approval workflows for critical operations such as role changes, tenant configuration updates, and security policy modifications.
+治理系統對關鍵操作強制執行審批工作流,例如角色變更、租戶配置更新和安全策略修改。
 
 ```mermaid
 flowchart TD
-    A[Governance Request<br/>Initiated] --> B{Request Type}
+    A[治理請求<br/>已啟動] --> B{請求類型}
 
-    B -->|Role Change| C[Role Change Request]
-    B -->|Tenant Config| D[Tenant Config Request]
-    B -->|Security Policy| E[Security Policy Request]
-    B -->|Data Encryption| F[Encryption Key Rotation]
+    B -->|角色變更| C[角色變更請求]
+    B -->|租戶配置| D[租戶配置請求]
+    B -->|安全策略| E[安全策略請求]
+    B -->|數據加密| F[加密金鑰輪換]
 
-    C --> G[Validate Permissions]
+    C --> G[驗證權限]
     D --> G
     E --> G
     F --> G
 
-    G --> H{Has Permission?}
-    H -->|No| I[Reject Request]
-    H -->|Yes| J{Requires Approval?}
+    G --> H{是否有權限?}
+    H -->|否| I[拒絕請求]
+    H -->|是| J{是否需要審批?}
 
-    J -->|No| K[Auto-Approve]
-    J -->|Yes| L[Send to Approver Queue]
+    J -->|否| K[自動批准]
+    J -->|是| L[發送至審批者佇列]
 
-    L --> M{Approval Decision}
-    M -->|Approve| N[Execute Change]
-    M -->|Reject| O[Reject with Reason]
-    M -->|Escalate| P[Escalate to Senior Approver]
+    L --> M{審批決定}
+    M -->|批准| N[執行變更]
+    M -->|拒絕| O[附原因拒絕]
+    M -->|升級| P[升級至高級審批者]
 
     P --> M
 
-    N --> Q[Record Audit Log]
+    N --> Q[記錄審計日誌]
     O --> Q
     K --> Q
 
-    Q --> R[Notify Requester]
+    Q --> R[通知請求者]
 
-    I --> S[Log Rejection]
+    I --> S[記錄拒絕]
 
     style A fill:#e1f5ff
     style N fill:#e8f5e9
@@ -57,212 +57,212 @@ flowchart TD
     style Q fill:#fff4e1
 ```
 
-**Workflow Characteristics**:
-- **Permission-gated**: All requests validated against RBAC permissions
-- **Approval-based**: Critical operations require senior approver consent
-- **Audit-enforced**: All approval decisions logged to compliance_audit_trail
-- **Escalation support**: Approvers can escalate complex decisions
+**工作流特性**:
+- **權限控管（Permission-gated）**: 所有請求均針對 RBAC 權限進行驗證
+- **基於審批（Approval-based）**: 關鍵操作需要高級審批者同意
+- **審計強制（Audit-enforced）**: 所有審批決定記錄至 compliance_audit_trail
+- **升級支援（Escalation support）**: 審批者可升級複雜決定
 
-**Approval Matrix** (examples):
-- Role Permission Change: Requires "governance:role:approve" permission
-- Tenant Config Update: Requires "governance:tenant:approve" permission
-- Encryption Key Rotation: Requires "governance:security:approve" permission
-
----
-
-## 2. Multi-Tenant Architecture
-
-**Status**: PLANNED (Phase 5+)
-**Modules**: 10_Platform_Management, all business modules
-
-### Implementation Goal
-
-Design and implement tenant isolation using schema-based separation, data sharding, and tenant configuration management.
-
-### Implementation Reading Order
-
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
-| 1 | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) | S2 Tenant Model | Schema isolation |
-| 2 | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) | S3 Data Isolation | Sharding strategy |
-| 3 | [02-05 Billing](../../source-archive/02_Finance_Center/02-05_Billing_and_Invoicing.md) | S2 Tenant Billing | Merchant management |
-
-### SmartAdmin Layer Mapping
-
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | Tenant context extraction from request headers |
-| Service | Business logic with tenant-scoped queries (Vavr Option) |
-| Manager | @Transactional tenant data operations, @Cacheable tenant config |
-| Dao | tenant_id filtering on all queries via MyBatis interceptor |
-
-### Verification Checklist
-
-- [ ] Tenant data is fully isolated
-- [ ] Cross-tenant queries are blocked
-- [ ] Tenant configurations load correctly
-- [ ] Tenant billing is accurate
-
-### Common Pitfalls
-
-1. **Data Leakage**: Missing `tenant_id` filter allows cross-tenant access -- enforce via MyBatis interceptor
-2. **Performance**: Multi-tenant queries not using shard keys -- mandate shard-key in all Dao queries
-3. **Configuration Error**: Tenant-specific config not isolated -- use separate config stores with @Cacheable in Manager
+**審批矩陣**（範例）:
+- 角色權限變更: 需要 "governance:role:approve" 權限
+- 租戶配置更新: 需要 "governance:tenant:approve" 權限
+- 加密金鑰輪換: 需要 "governance:security:approve" 權限
 
 ---
 
-## 3. RBAC Permission System
+## 2. 多租戶架構（Multi-Tenant Architecture）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 12_System_Security, 10_Platform_Management
+**狀態**: PLANNED（階段 5+）
+**模組**: 10_Platform_Management, 所有業務模組
 
-### Implementation Goal
+### 實施目標（Implementation Goal）
 
-Build role definitions, permission matrices, and dynamic authorization integrated with Sa-Token.
+使用基於 schema 的分離、數據分片和租戶配置管理來設計和實施租戶隔離。
 
-### Implementation Reading Order
+### 實施閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
-| 1 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S2 Permission Model | RBAC design |
-| 2 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S3 Role Management | Role inheritance |
-| 3 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S4 Permission Verification | Sa-Token integration |
+| 順序 | 文件 | 章節 | 重點 |
+|------|------|------|------|
+| 1 | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) | S2 Tenant Model | Schema 隔離 |
+| 2 | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) | S3 Data Isolation | 分片策略 |
+| 3 | [02-05 Billing](../../source-archive/02_Finance_Center/02-05_Billing_and_Invoicing.md) | S2 Tenant Billing | 商戶管理 |
 
-### SmartAdmin Layer Mapping
+### SmartAdmin 分層映射（SmartAdmin Layer Mapping）
 
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | `@SaCheckPermission` annotation for endpoint authorization |
-| Service | Permission logic, role resolution (Vavr Option for lookups) |
-| Manager | @Cacheable permission cache, @Transactional role mutations |
-| Dao | Role/permission CRUD via MyBatis Plus |
+| 層級 | 職責 |
+|------|------|
+| Controller | 從請求標頭提取租戶上下文 |
+| Service | 具有租戶範圍查詢的業務邏輯（Vavr Option） |
+| Manager | @Transactional 租戶數據操作、@Cacheable 租戶配置 |
+| Dao | 透過 MyBatis 攔截器在所有查詢上進行 tenant_id 過濾 |
 
-### Key Integration Points
+### 驗證清單（Verification Checklist）
 
-- **Sa-Token**: Permission verification via `@SaCheckPermission` annotations
-- **Redis Cache**: Permission data cached via Redisson, invalidated on role change
-- **Manager Layer**: All permission cache operations use `@Cacheable` in Manager (never in Service)
+- [ ] 租戶數據完全隔離
+- [ ] 跨租戶查詢被阻止
+- [ ] 租戶配置正確載入
+- [ ] 租戶計費準確
 
-### Verification Checklist
+### 常見陷阱（Common Pitfalls）
 
-- [ ] Role permissions are correctly configured
-- [ ] Permission verification is accurate
-- [ ] Dynamic authorization takes effect
-- [ ] Permission inheritance is correct
-
-### Common Pitfalls
-
-1. **Permission Explosion**: Too many permissions -- group into categories with hierarchical structure
-2. **Circular Dependency**: Role inheritance cycles -- validate DAG structure on save
-3. **Cache Inconsistency**: Permission changes not reflected -- implement cache eviction in Manager layer
+1. **數據洩漏（Data Leakage）**: 缺少 `tenant_id` 過濾器允許跨租戶存取 -- 透過 MyBatis 攔截器強制執行
+2. **效能（Performance）**: 多租戶查詢未使用分片鍵 -- 在所有 Dao 查詢中強制使用分片鍵
+3. **配置錯誤（Configuration Error）**: 租戶特定配置未隔離 -- 在 Manager 中使用帶有 @Cacheable 的獨立配置存儲
 
 ---
 
-## 4. Audit Log System
+## 3. RBAC 權限系統（RBAC Permission System）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 12_System_Security, all business modules
+**狀態**: PLANNED（階段 5+）
+**模組**: 12_System_Security, 10_Platform_Management
 
-### Implementation Goal
+### 實施目標（Implementation Goal）
 
-Build operation logging, change tracking, and compliance reporting using AOP-based interception.
+構建與 Sa-Token 整合的角色定義、權限矩陣和動態授權。
 
-### Implementation Reading Order
+### 實施閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
-| 1 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S2 Log Model | Event definition |
-| 2 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S3 AOP Interception | Automatic recording |
-| 3 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S4 Query & Analysis | Audit reporting |
+| 順序 | 文件 | 章節 | 重點 |
+|------|------|------|------|
+| 1 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S2 Permission Model | RBAC 設計 |
+| 2 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S3 Role Management | 角色繼承 |
+| 3 | [06-02 RBAC](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) | S4 Permission Verification | Sa-Token 整合 |
 
-### SmartAdmin Layer Mapping
+### SmartAdmin 分層映射（SmartAdmin Layer Mapping）
 
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | `@AuditLog` annotation marks auditable endpoints |
-| AOP Aspect | Intercepts annotated methods, captures before/after state |
-| Service | Audit query logic (Vavr Option for optional audit fields) |
-| Manager | @Transactional async audit log writes |
-| Dao | Append-only audit log table (no UPDATE/DELETE) |
+| 層級 | 職責 |
+|------|------|
+| Controller | `@SaCheckPermission` 註解用於端點授權 |
+| Service | 權限邏輯、角色解析（Vavr Option 用於查找） |
+| Manager | @Cacheable 權限快取、@Transactional 角色變更 |
+| Dao | 透過 MyBatis Plus 進行角色/權限 CRUD |
 
-### Technical Considerations
+### 關鍵整合點（Key Integration Points）
 
-- **Async Writing**: Use `@Async` with virtual threads (Java 21) for non-blocking audit writes
-- **Immutability**: Audit log table must be append-only -- no UPDATE or DELETE operations
-- **Archival**: Implement scheduled archival via Snail-Job for logs older than retention period
-- **Performance**: Asynchronous writing prevents audit overhead from impacting request latency
+- **Sa-Token**: 透過 `@SaCheckPermission` 註解進行權限驗證
+- **Redis Cache**: 權限數據透過 Redisson 快取,在角色變更時失效
+- **Manager Layer**: 所有權限快取操作在 Manager 中使用 `@Cacheable`（絕不在 Service 中）
 
-### Verification Checklist
+### 驗證清單（Verification Checklist）
 
-- [ ] Critical operations are logged
-- [ ] Before/after comparisons are accurate
-- [ ] Audit logs are tamper-proof
-- [ ] Compliance reports are complete
+- [ ] 角色權限配置正確
+- [ ] 權限驗證準確
+- [ ] 動態授權生效
+- [ ] 權限繼承正確
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Missing Critical Operations**: Not all sensitive operations covered -- maintain operation registry
-2. **Performance Impact**: Synchronous writes degrade performance -- use async with virtual threads
-3. **Storage Bloat**: Logs not archived -- schedule periodic archival with retention policies
+1. **權限爆炸（Permission Explosion）**: 權限過多 -- 使用分層結構分組為類別
+2. **循環依賴（Circular Dependency）**: 角色繼承循環 -- 在保存時驗證 DAG 結構
+3. **快取不一致（Cache Inconsistency）**: 權限變更未反映 -- 在 Manager 層實施快取失效
 
 ---
 
-## 5. Data Encryption Strategy
+## 4. 審計日誌系統（Audit Log System）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 12_System_Security, all business modules
+**狀態**: PLANNED（階段 5+）
+**模組**: 12_System_Security, 所有業務模組
 
-### Implementation Goal
+### 實施目標（Implementation Goal）
 
-Implement field-level encryption, KMS integration, and key rotation using MyBatis interceptors.
+使用基於 AOP 的攔截構建操作日誌記錄、變更追蹤和合規報告。
 
-### Implementation Reading Order
+### 實施閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
-|-------|----------|---------|-------|
+| 順序 | 文件 | 章節 | 重點 |
+|------|------|------|------|
+| 1 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S2 Log Model | 事件定義 |
+| 2 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S3 AOP Interception | 自動記錄 |
+| 3 | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) | S4 Query & Analysis | 審計報告 |
+
+### SmartAdmin 分層映射（SmartAdmin Layer Mapping）
+
+| 層級 | 職責 |
+|------|------|
+| Controller | `@AuditLog` 註解標記可審計端點 |
+| AOP Aspect | 攔截已註解的方法,捕獲前/後狀態 |
+| Service | 審計查詢邏輯（Vavr Option 用於可選審計欄位） |
+| Manager | @Transactional 非同步審計日誌寫入 |
+| Dao | 僅附加審計日誌表（無 UPDATE/DELETE） |
+
+### 技術考量（Technical Considerations）
+
+- **非同步寫入（Async Writing）**: 使用帶有虛擬執行緒（Java 21）的 `@Async` 進行非阻塞審計寫入
+- **不可變性（Immutability）**: 審計日誌表必須僅附加 -- 無 UPDATE 或 DELETE 操作
+- **歸檔（Archival）**: 透過 Snail-Job 對超過保留期限的日誌實施定期歸檔
+- **效能（Performance）**: 非同步寫入防止審計開銷影響請求延遲
+
+### 驗證清單（Verification Checklist）
+
+- [ ] 關鍵操作已記錄
+- [ ] 前/後比較準確
+- [ ] 審計日誌防篡改
+- [ ] 合規報告完整
+
+### 常見陷阱（Common Pitfalls）
+
+1. **缺少關鍵操作（Missing Critical Operations）**: 未涵蓋所有敏感操作 -- 維護操作註冊表
+2. **效能影響（Performance Impact）**: 同步寫入降低效能 -- 使用帶有虛擬執行緒的非同步
+3. **儲存膨脹（Storage Bloat）**: 日誌未歸檔 -- 使用保留策略安排定期歸檔
+
+---
+
+## 5. 數據加密策略（Data Encryption Strategy）
+
+**狀態**: PLANNED（階段 5+）
+**模組**: 12_System_Security, 所有業務模組
+
+### 實施目標（Implementation Goal）
+
+使用 MyBatis 攔截器實施欄位級加密、KMS 整合和金鑰輪換。
+
+### 實施閱讀順序（Implementation Reading Order）
+
+| 順序 | 文件 | 章節 | 重點 |
+|------|------|------|------|
 | 1 | [12-03 Data Security](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md) | S2 Encryption Standard | AES-256-GCM |
-| 2 | [12-03-01 Encryption](../../source-archive/12_System_Security/12-03-01_Encryption_Strategy.md) | S3 Field Encryption | MyBatis interceptor |
-| 3 | [12-03-02 Blind Index](../../source-archive/12_System_Security/12-03-02_Blind_Index_Architecture.md) | S2 Blind Index | Searchable encryption |
+| 2 | [12-03-01 Encryption](../../source-archive/12_System_Security/12-03-01_Encryption_Strategy.md) | S3 Field Encryption | MyBatis 攔截器 |
+| 3 | [12-03-02 Blind Index](../../source-archive/12_System_Security/12-03-02_Blind_Index_Architecture.md) | S2 Blind Index | 可搜尋加密 |
 
-### SmartAdmin Layer Mapping
+### SmartAdmin 分層映射（SmartAdmin Layer Mapping）
 
-| Layer | Responsibility |
-|-------|---------------|
-| Controller | No encryption awareness (transparent to API consumers) |
-| Service | Business logic operates on plaintext (decrypted by interceptor) |
-| Manager | @Cacheable for encrypted field cache, @Transactional for key rotation |
-| Dao/Interceptor | MyBatis interceptor handles encrypt-on-write, decrypt-on-read |
-| KMS | External key management service for key storage and rotation |
+| 層級 | 職責 |
+|------|------|
+| Controller | 無加密意識（對 API 使用者透明） |
+| Service | 業務邏輯操作明文（由攔截器解密） |
+| Manager | @Cacheable 用於加密欄位快取、@Transactional 用於金鑰輪換 |
+| Dao/Interceptor | MyBatis 攔截器處理寫入時加密、讀取時解密 |
+| KMS | 外部金鑰管理服務用於金鑰存儲和輪換 |
 
-### Encryption Architecture
+### 加密架構（Encryption Architecture）
 
-| Component | Technology | Purpose |
-|-----------|-----------|---------|
-| Field Encryption | AES-256-GCM | Encrypt PII and financial data at column level |
-| Blind Index | HMAC-SHA256 | Enable searching on encrypted fields |
-| Key Management | External KMS | Centralized key storage with access controls |
-| Key Rotation | Scheduled task | Periodic re-encryption without downtime |
-| MyBatis Interceptor | Custom plugin | Transparent encrypt/decrypt at persistence layer |
+| 元件 | 技術 | 用途 |
+|------|------|------|
+| Field Encryption | AES-256-GCM | 在欄位級別加密 PII 和財務數據 |
+| Blind Index | HMAC-SHA256 | 啟用對加密欄位的搜尋 |
+| Key Management | External KMS | 具有存取控制的集中式金鑰存儲 |
+| Key Rotation | Scheduled task | 無停機的定期重新加密 |
+| MyBatis Interceptor | Custom plugin | 持久層的透明加密/解密 |
 
-### Verification Checklist
+### 驗證清單（Verification Checklist）
 
-- [ ] Sensitive fields are encrypted
-- [ ] KMS integration is successful
-- [ ] Key rotation mechanism works
-- [ ] Encryption performance is acceptable
+- [ ] 敏感欄位已加密
+- [ ] KMS 整合成功
+- [ ] 金鑰輪換機制運作
+- [ ] 加密效能可接受
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Key Management Chaos**: Hardcoded keys or leakage -- use centralized KMS, never embed keys in code
-2. **Weak Algorithms**: Outdated encryption -- enforce AES-256-GCM minimum
-3. **Blind Index Collision**: Hash collisions cause query errors -- use high-entropy hash with sufficient output length
+1. **金鑰管理混亂（Key Management Chaos）**: 硬編碼金鑰或洩漏 -- 使用集中式 KMS,絕不在代碼中嵌入金鑰
+2. **弱演算法（Weak Algorithms）**: 過時的加密 -- 強制執行 AES-256-GCM 最低標準
+3. **盲索引（Blind Index）衝突**: 雜湊衝突導致查詢錯誤 -- 使用具有足夠輸出長度的高熵雜湊
 
 ---
 
-## 6. Reference Documents
+## 6. 參考文件（Reference Documents）
 
-| Area | Document |
-|------|----------|
+| 領域 | 文件 |
+|------|------|
 | Multi-Tenant | [06-01 Multi-Tenant](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
 | RBAC | [06-02 RBAC Permissions](../../source-archive/06_Platform_Governance/06-02_RBAC_Permissions.md) |
 | Audit Log | [06-03 Audit Log](../../source-archive/06_Platform_Governance/06-03_Audit_Log.md) |
@@ -272,11 +272,11 @@ Implement field-level encryption, KMS integration, and key rotation using MyBati
 
 ---
 
-## 7. Database Schema
+## 7. 資料庫結構（Database Schema）
 
-### 7.1 Governance Policies Table
+### 7.1 治理策略表（Governance Policies Table）
 
-The `governance_policies` table stores approval workflow configurations and permission requirements for governance operations.
+`governance_policies` 表存儲審批工作流配置和治理操作的權限要求。
 
 ```sql
 CREATE TABLE governance_policies (
@@ -303,15 +303,15 @@ CREATE INDEX idx_governance_policies_policy_category ON governance_policies(poli
 CREATE INDEX idx_governance_policies_is_active ON governance_policies(is_active) WHERE deleted = false;
 CREATE INDEX idx_governance_policies_created_at ON governance_policies(created_at DESC);
 
-COMMENT ON TABLE governance_policies IS 'Governance approval workflow policies with permission-gated access control';
-COMMENT ON COLUMN governance_policies.approver_role_ids IS 'Array of role IDs authorized to approve requests under this policy';
-COMMENT ON COLUMN governance_policies.approval_threshold IS 'Number of approvals required (1=single approver, 2+=multi-approval)';
-COMMENT ON COLUMN governance_policies.auto_approve_conditions IS 'JSON conditions for automatic approval without human review (e.g., {"amount_less_than": 1000})';
+COMMENT ON TABLE governance_policies IS '治理審批工作流策略,具有權限控管的存取控制';
+COMMENT ON COLUMN governance_policies.approver_role_ids IS '有權在此策略下批准請求的角色 ID 陣列';
+COMMENT ON COLUMN governance_policies.approval_threshold IS '所需的批准數量（1=單一審批者,2+=多重審批）';
+COMMENT ON COLUMN governance_policies.auto_approve_conditions IS '自動批准的 JSON 條件,無需人工審查（例如 {"amount_less_than": 1000}）';
 ```
 
-### 7.2 Compliance Audit Trail Table
+### 7.2 合規審計追蹤表（Compliance Audit Trail Table）
 
-The `compliance_audit_trail` table stores all governance approval decisions and actions for regulatory compliance.
+`compliance_audit_trail` 表存儲所有治理審批決定和操作,用於監管合規。
 
 ```sql
 CREATE TABLE compliance_audit_trail (
@@ -345,15 +345,15 @@ CREATE INDEX idx_compliance_audit_trail_approver_id ON compliance_audit_trail(ap
 CREATE INDEX idx_compliance_audit_trail_created_at ON compliance_audit_trail(created_at DESC);
 CREATE INDEX idx_compliance_audit_trail_approved_at ON compliance_audit_trail(approved_at DESC) WHERE approved_at IS NOT NULL;
 
-COMMENT ON TABLE compliance_audit_trail IS 'Immutable audit trail for all governance approval decisions and execution results (append-only, no DELETE)';
-COMMENT ON COLUMN compliance_audit_trail.request_details IS 'JSON snapshot of the request payload (before state) for change tracking';
-COMMENT ON COLUMN compliance_audit_trail.result_details IS 'JSON snapshot of the action result (after state) for compliance verification';
-COMMENT ON COLUMN compliance_audit_trail.execution_status IS 'Status of the approved action execution (NOT_STARTED → IN_PROGRESS → SUCCESS/FAILED/ROLLED_BACK)';
+COMMENT ON TABLE compliance_audit_trail IS '所有治理審批決定和執行結果的不可變審計追蹤（僅附加,無 DELETE）';
+COMMENT ON COLUMN compliance_audit_trail.request_details IS '請求負載的 JSON 快照（變更追蹤的前狀態）';
+COMMENT ON COLUMN compliance_audit_trail.result_details IS '操作結果的 JSON 快照（合規驗證的後狀態）';
+COMMENT ON COLUMN compliance_audit_trail.execution_status IS '已批准操作執行的狀態（NOT_STARTED → IN_PROGRESS → SUCCESS/FAILED/ROLLED_BACK）';
 ```
 
-### 7.3 Example Queries
+### 7.3 範例查詢（Example Queries）
 
-**Query pending governance requests**:
+**查詢待處理的治理請求**:
 ```sql
 SELECT
     cat.audit_id,
@@ -374,7 +374,7 @@ WHERE cat.approval_status = 'PENDING'
 ORDER BY cat.created_at ASC;
 ```
 
-**Query approval decisions by approver**:
+**按審批者查詢審批決定**:
 ```sql
 SELECT
     au_app.username AS approver_name,
@@ -391,7 +391,7 @@ GROUP BY au_app.username, cat.request_type
 ORDER BY approved_count DESC;
 ```
 
-**Query compliance report for regulation audit**:
+**查詢監管審計的合規報告**:
 ```sql
 SELECT
     cat.audit_no,
@@ -415,6 +415,6 @@ ORDER BY cat.created_at DESC;
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-08
-**Source Version**: 4.0.0
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-08
+**來源版本**: 4.0.0

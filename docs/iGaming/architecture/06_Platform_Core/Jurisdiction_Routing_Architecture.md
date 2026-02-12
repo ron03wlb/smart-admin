@@ -1,35 +1,39 @@
-# Jurisdiction Routing Architecture (牌照路由技術架構)
+# 牌照路由技術架構（Jurisdiction Routing Architecture）
 
-> **Canonical Source**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
-> **Audience**: Architects, Backend Developers
-> **Business Requirements**: [Jurisdiction_Framework_Requirements.md](../../requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-This document describes the technical architecture of the Multi-Jurisdiction routing system, including the GeoIP detection layer, licence routing service, rule engine integration, geo-fencing enforcement, and the compliance dashboard frontend.
+> **規範來源**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
+> **目標讀者**: Architects, Backend Developers
+> **業務需求**: [Jurisdiction_Framework_Requirements.md](../../requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 2. System Architecture
+## 1. 概述（Overview）
+
+本文檔描述多司法管轄區路由系統的技術架構，包括 GeoIP 檢測層、牌照路由服務（Service）、規則引擎整合、地理圍欄（Geo-Fencing）執行，以及合規儀表板前端。
+
+---
+
+## 2. 系統架構（System Architecture）
 
 ```
 +-------------------------------------------------------------------+
-|                 Multi-Jurisdiction Gateway                          |
+|                 多司法管轄區閘道                                      |
+|                 Multi-Jurisdiction Gateway                         |
 +-------------------------------------------------------------------+
 |                                                                     |
 |  +-------------+    +-------------+    +-------------+              |
-|  | GeoIP       |    | License     |    | Rule        |              |
-|  | Detection   |--->| Router      |--->| Engine      |              |
+|  | GeoIP       |    | 牌照        |    | 規則        |              |
+|  | 檢測        |--->| 路由器      |--->| 引擎        |              |
+|  | Detection   |    | Router      |    | Engine      |              |
 |  +-------------+    +-------------+    +-------------+              |
 |         |                  |                  |                      |
 |         v                  v                  v                      |
 |  +--------------------------------------------------------------+  |
-|  |                  Jurisdiction Config Store                     |  |
+|  |                  司法管轄區配置存儲                               |  |
+|  |                  Jurisdiction Config Store                      |  |
 |  |  +---------+  +---------+  +---------+  +---------+           |  |
 |  |  | UKGC    |  | MGA     |  | PAGCOR  |  | Brazil  |           |  |
+|  |  | 規則    |  | 規則    |  | 規則    |  | 規則    |           |  |
 |  |  | Rules   |  | Rules   |  | Rules   |  | Rules   |           |  |
 |  |  +---------+  +---------+  +---------+  +---------+           |  |
 |  +--------------------------------------------------------------+  |
@@ -39,9 +43,9 @@ This document describes the technical architecture of the Multi-Jurisdiction rou
 
 ---
 
-## 3. Data Model
+## 3. 資料模型（Data Model）
 
-### 3.1 Jurisdiction Configuration Entity
+### 3.1 司法管轄區配置 Entity
 
 ```java
 @Data
@@ -114,7 +118,7 @@ public class JurisdictionConfig {
 
 ---
 
-## 4. Licence Routing Service
+## 4. 牌照路由 Service（Licence Routing Service）
 
 ```java
 @Service
@@ -208,7 +212,7 @@ public class JurisdictionRouterService {
 
 ---
 
-## 5. Jurisdiction Rule Engine
+## 5. 司法管轄區規則引擎（Jurisdiction Rule Engine）
 
 ```java
 @Service
@@ -360,7 +364,7 @@ public class JurisdictionRuleEngine {
 
 ---
 
-## 6. Geo-Fencing Service
+## 6. 地理圍欄 Service（Geo-Fencing Service）
 
 ```java
 @Service
@@ -446,7 +450,7 @@ public class GeoFenceService {
 
 ---
 
-## 7. Compliance Dashboard (Frontend)
+## 7. 合規儀表板（前端）（Compliance Dashboard - Frontend）
 
 ```vue
 <template>
@@ -522,34 +526,34 @@ public class GeoFenceService {
 
 ---
 
-## 8. Integration Flow
+## 8. 整合流程（Integration Flow）
 
 ```mermaid
 flowchart TD
-    A[Player Request] --> B{GeoIP Detection}
-    B --> C[Determine Country Code]
-    C --> D{Match Jurisdiction?}
-    D -->|Yes| E[Load Jurisdiction Config]
-    D -->|No| F[Access Denied]
-    E --> G{VPN/Proxy Check}
-    G -->|Clean| H[Apply Rules]
-    G -->|Detected| F
-    H --> I{Registration?}
-    H --> J{Deposit?}
-    H --> K{Game Launch?}
-    I --> L[KYC + Age + Gamstop Rules]
-    J --> M[Payment + Affordability Rules]
-    K --> N[Game Type + Exclusion Rules]
-    L --> O{Violations?}
+    A[玩家請求] --> B{GeoIP 檢測}
+    B --> C[確定國家代碼]
+    C --> D{匹配司法管轄區？}
+    D -->|是| E[載入司法管轄區配置]
+    D -->|否| F[拒絕存取]
+    E --> G{VPN/代理檢查}
+    G -->|正常| H[套用規則]
+    G -->|檢測到| F
+    H --> I{註冊？}
+    H --> J{存款？}
+    H --> K{遊戲啟動？}
+    I --> L[KYC + 年齡 + Gamstop 規則]
+    J --> M[支付 + 可負擔性評估規則]
+    K --> N[遊戲類型 + 自我排除規則]
+    L --> O{違規？}
     M --> O
     N --> O
-    O -->|None| P[Allow Action]
-    O -->|Found| Q[Block with Reason]
+    O -->|無| P[允許操作]
+    O -->|發現| Q[阻止並顯示理由]
 ```
 
 ---
 
-## 9. Database Schema
+## 9. 資料庫架構（Database Schema）
 
 ```sql
 -- Jurisdiction configuration table
@@ -639,13 +643,13 @@ CREATE INDEX idx_rule_violation ON t_jurisdiction_rule_violation(jurisdiction_co
 
 ---
 
-## 10. Cross-References
+## 10. 交叉參考（Cross-References）
 
-| Topic | Document |
+| 主題 | 文件 |
 |-------|----------|
-| Business Requirements | requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md |
-| UKGC Compliance | source/06_Platform_Governance/06-08_UKGC_Compliance.md |
-| MGA Compliance | source/06_Platform_Governance/06-09_MGA_Compliance.md |
-| Brazil SPA Compliance | source/06_Platform_Governance/06-10_Brazil_SPA_Compliance.md |
-| Self-Exclusion | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
-| Multi-Tenant Architecture | architecture/06_Platform_Core/Multi_Tenant_Architecture.md |
+| 業務需求 | requirements/05_Risk_Compliance/Jurisdiction_Framework_Requirements.md |
+| UKGC 合規 | source/06_Platform_Governance/06-08_UKGC_Compliance.md |
+| MGA 合規 | source/06_Platform_Governance/06-09_MGA_Compliance.md |
+| 巴西 SPA 合規 | source/06_Platform_Governance/06-10_Brazil_SPA_Compliance.md |
+| 自我排除 | source/15_Responsible_Gambling/15-01_Self_Exclusion.md |
+| 多租戶架構 | architecture/06_Platform_Core/Multi_Tenant_Architecture.md |

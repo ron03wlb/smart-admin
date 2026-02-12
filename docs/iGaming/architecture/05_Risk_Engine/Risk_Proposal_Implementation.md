@@ -1,25 +1,25 @@
-# Risk Proposal Workflow Implementation
+# 風控提案工作流實作（Risk Proposal Workflow Implementation）
 
-> **Canonical Source**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
-> **Audience**: Architects, Backend Developers, DevOps Engineers
-> **Business Requirements**: [Risk_Proposal_Requirements.md](../../requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Document Information
-
-**Version**: 4.0.0 (v2.1.0 Simplified)
-**Dependencies**:
-- [05-03 KYC/AML Configuration-Driven Risk](../05_Risk_Engine/) - Risk proposal service implementation
-- [05-01 Risk Framework](../05_Risk_Engine/) - Configuration-driven rule engine
-- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 delayed check
+> **規範來源**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
+> **目標讀者**: Architects, Backend Developers, DevOps Engineers
+> **業務需求**: [Risk_Proposal_Requirements.md](../../requirements/05_Risk_Compliance/Risk_Proposal_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1.1 Async Risk Proposal Lifecycle
+## 1. 文件資訊（Document Information）
 
-The risk proposal workflow follows an asynchronous pattern, allowing reviewers to process proposals independently from the triggering event (e.g., withdrawal request).
+**版本（Version）**: 4.0.0 (v2.1.0 Simplified)
+**依賴項（Dependencies）**:
+- [05-03 KYC/AML Configuration-Driven Risk](../05_Risk_Engine/) - 風控提案（Risk Proposal）Service 實作
+- [05-01 Risk Framework](../05_Risk_Engine/) - Configuration-driven 規則引擎
+- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - SAGA Step 2.5 延遲檢查
+
+---
+
+## 1.1 非同步風控提案生命週期（Async Risk Proposal Lifecycle）
+
+風控提案工作流遵循非同步模式，允許審核人員獨立於觸發事件（例如提款請求）處理提案。
 
 ```mermaid
 sequenceDiagram
@@ -27,85 +27,85 @@ sequenceDiagram
     participant R as Risk Engine
     participant P as Risk Proposal Service
     participant Q as Review Queue
-    participant Rev as Reviewer
+    participant Rev as 審核人員
     participant M as Manager Layer
     participant K as Kafka
 
-    %% 1. Create Proposal
-    W->>R: Trigger risk check (withdrawal)
-    R->>R: Detect suspicious pattern
-    R->>P: Create risk proposal
-    P->>P: Calculate priority (URGENT/HIGH/MEDIUM/LOW)
-    P->>Q: Add to review queue
-    P->>K: Publish "proposal.created" event
-    P-->>W: Return proposal ID (async)
+    %% 1. 建立提案
+    W->>R: 觸發風控檢查（提款）
+    R->>R: 偵測可疑模式
+    R->>P: 建立風控提案
+    P->>P: 計算優先級（URGENT/HIGH/MEDIUM/LOW）
+    P->>Q: 加入審核佇列
+    P->>K: 發布 "proposal.created" 事件
+    P-->>W: 返回提案 ID（非同步）
 
-    %% 2. Review Process
-    Rev->>Q: Query pending proposals (sorted by priority)
-    Q-->>Rev: Return proposal list
-    Rev->>P: Claim task (proposalId, reviewerId)
-    P->>P: Update status to "IN_REVIEW"
+    %% 2. 審核流程
+    Rev->>Q: 查詢待審核提案（按優先級排序）
+    Q-->>Rev: 返回提案清單
+    Rev->>P: 認領任務（proposalId, reviewerId）
+    P->>P: 更新狀態為 "IN_REVIEW"
 
-    Rev->>Rev: Analyze proposal (review notes, evidence)
+    Rev->>Rev: 分析提案（審核備註、證據）
 
-    alt Approve
-        Rev->>P: Submit APPROVE decision
+    alt 批准
+        Rev->>P: 提交 APPROVE 決策
         P->>M: approveProposalWithTransaction
-        M->>M: Update proposal status to "APPROVED"
-        M->>W: Unfreeze amount, continue withdrawal
-        M->>K: Publish "proposal.approved" event
-        M-->>P: Success
+        M->>M: 更新提案狀態為 "APPROVED"
+        M->>W: 解凍金額，繼續提款流程
+        M->>K: 發布 "proposal.approved" 事件
+        M-->>P: 成功
         P-->>Rev: 200 OK
-    else Reject
-        Rev->>P: Submit REJECT decision
+    else 拒絕
+        Rev->>P: 提交 REJECT 決策
         P->>M: rejectProposalWithTransaction
-        M->>M: Update proposal status to "REJECTED"
-        M->>W: Execute deduction compensation
-        M->>K: Publish "proposal.rejected" event
-        M-->>P: Success
+        M->>M: 更新提案狀態為 "REJECTED"
+        M->>W: 執行扣款補償
+        M->>K: 發布 "proposal.rejected" 事件
+        M-->>P: 成功
         P-->>Rev: 200 OK
-    else Partial Approve
-        Rev->>P: Submit PARTIAL_APPROVE decision
+    else 部分批准
+        Rev->>P: 提交 PARTIAL_APPROVE 決策
         P->>M: partialApproveProposalWithTransaction
-        M->>M: Update proposal status to "PARTIAL_APPROVED"
-        M->>W: Unfreeze approved amount
-        M->>W: Deduct rejected amount
-        M->>K: Publish "proposal.partial_approved" event
-        M-->>P: Success
+        M->>M: 更新提案狀態為 "PARTIAL_APPROVED"
+        M->>W: 解凍已批准金額
+        M->>W: 扣除被拒金額
+        M->>K: 發布 "proposal.partial_approved" 事件
+        M-->>P: 成功
         P-->>Rev: 200 OK
-    else Escalate
-        Rev->>P: Submit ESCALATE decision
+    else 升級
+        Rev->>P: 提交 ESCALATE 決策
         P->>M: escalateProposalWithTransaction
-        M->>M: Update status to "ESCALATED", priority to "URGENT"
-        M->>Q: Notify senior analysts
-        M->>K: Publish "proposal.escalated" event
-        M-->>P: Success
+        M->>M: 更新狀態為 "ESCALATED"，優先級為 "URGENT"
+        M->>Q: 通知高級分析師
+        M->>K: 發布 "proposal.escalated" 事件
+        M-->>P: 成功
         P-->>Rev: 200 OK
     end
 
-    %% 3. SLA Timeout Handling
-    Note over P: Scheduled task (every 5 min)
-    P->>P: Check SLA expiration (per-priority)
-    alt LOW priority timeout
-        P->>M: Auto-approve (unfreezeAmount)
-        M->>K: Publish "proposal.auto_approved" event
-    else URGENT/HIGH/MEDIUM timeout
-        P->>M: Auto-reject (executeDeduction)
-        M->>K: Publish "proposal.auto_rejected" event
+    %% 3. SLA 超時處理
+    Note over P: 排程任務（每 5 分鐘）
+    P->>P: 檢查 SLA 到期（按優先級）
+    alt LOW 優先級超時
+        P->>M: 自動批准（unfreezeAmount）
+        M->>K: 發布 "proposal.auto_approved" 事件
+    else URGENT/HIGH/MEDIUM 超時
+        P->>M: 自動拒絕（executeDeduction）
+        M->>K: 發布 "proposal.auto_rejected" 事件
     end
 ```
 
-**Key Characteristics**:
-- **Asynchronous**: Withdrawal service does NOT block on proposal creation
-- **Priority-driven**: Queue sorted by priority + creation time
-- **SLA-enforced**: Auto-approve (LOW) or auto-reject (URGENT/HIGH/MEDIUM) on timeout
-- **Event-driven**: All state changes publish Kafka events for audit/analytics
+**關鍵特性**：
+- **非同步（Asynchronous）**: 提款 Service 不會阻塞等待提案建立
+- **優先級驅動（Priority-driven）**: 佇列按優先級 + 建立時間排序
+- **SLA 強制執行（SLA-enforced）**: 超時時自動批准（LOW）或自動拒絕（URGENT/HIGH/MEDIUM）
+- **事件驅動（Event-driven）**: 所有狀態變更都發布 Kafka 事件用於審計/分析
 
 ---
 
-## 2. Review Queue Management
+## 2. 審核佇列管理（Review Queue Management）
 
-### 2.1 Priority Calculation Service
+### 2.1 優先級計算 Service（Priority Calculation Service）
 
 ```java
 /**
@@ -174,7 +174,7 @@ public class RiskProposalPriorityService {
 }
 ```
 
-### 2.2 SLA Monitoring and Timeout Processing (v3.0.0)
+### 2.2 SLA 監控和超時處理（SLA Monitoring and Timeout Processing，v3.0.0）
 
 ```java
 /**
@@ -283,7 +283,7 @@ public class RiskProposalSLAService {
 }
 ```
 
-### 2.3 Review Queue Controller
+### 2.3 審核佇列 Controller（Review Queue Controller）
 
 ```java
 /**
@@ -353,9 +353,9 @@ public class RiskProposalQueueController {
 
 ---
 
-## 3. Review Decision Implementation
+## 3. 審核決策實作（Review Decision Implementation）
 
-### 3.1 Approve Flow
+### 3.1 批准流程（Approve Flow）
 
 **Service Layer**:
 
@@ -399,7 +399,7 @@ public class RiskProposalService {
 }
 ```
 
-**Manager Layer (transactional)**:
+**Manager Layer（事務性）**:
 
 ```java
 /**
@@ -457,7 +457,7 @@ public class RiskProposalManager {
 }
 ```
 
-### 3.2 Reject Flow
+### 3.2 拒絕流程（Reject Flow）
 
 **Service Layer**:
 
@@ -504,7 +504,7 @@ public class RiskProposalService {
 }
 ```
 
-**Manager Layer (transactional)**:
+**Manager Layer（事務性）**:
 
 ```java
 /**
@@ -560,7 +560,7 @@ public class RiskProposalManager {
 }
 ```
 
-### 3.3 Partial Approve Flow
+### 3.3 部分批准流程（Partial Approve Flow）
 
 **Service Layer**:
 
@@ -607,7 +607,7 @@ public class RiskProposalService {
 }
 ```
 
-**Manager Layer (transactional)**:
+**Manager Layer（事務性）**:
 
 ```java
 /**
@@ -670,7 +670,7 @@ public class RiskProposalManager {
 }
 ```
 
-### 3.4 Escalate Flow
+### 3.4 升級流程（Escalate Flow）
 
 **Service Layer**:
 
@@ -716,7 +716,7 @@ public class RiskProposalService {
 }
 ```
 
-**Manager Layer (transactional)**:
+**Manager Layer（事務性）**:
 
 ```java
 /**
@@ -770,9 +770,9 @@ public class RiskProposalManager {
 
 ---
 
-## 4. Compensation Mechanism
+## 4. 補償機制（Compensation Mechanism）
 
-### 4.1 Compensation Service
+### 4.1 補償 Service（Compensation Service）
 
 ```java
 /**
@@ -834,7 +834,7 @@ public class CompensationService {
 }
 ```
 
-### 4.2 Compensation Manager (Transactional)
+### 4.2 補償 Manager（事務性，Compensation Manager, Transactional）
 
 ```java
 /**
@@ -944,7 +944,7 @@ public class CompensationManager {
 }
 ```
 
-### 4.3 Compensation Retry Service
+### 4.3 補償重試 Service（Compensation Retry Service）
 
 ```java
 /**
@@ -1035,9 +1035,9 @@ public class CompensationRetryService {
 
 ---
 
-## 5. Reviewer API and Permission Configuration
+## 5. 審核人員 API 和權限配置（Reviewer API and Permission Configuration）
 
-### 5.1 Permission Annotations (Sa-Token)
+### 5.1 權限註解（Permission Annotations，Sa-Token）
 
 ```java
 /**
@@ -1095,7 +1095,7 @@ public class RiskProposalController {
 }
 ```
 
-### 5.2 Unified Review Decision Controller
+### 5.2 統一審核決策 Controller（Unified Review Decision Controller）
 
 ```java
 /**
@@ -1163,9 +1163,9 @@ public class RiskProposalReviewController {
 
 ---
 
-## 6. Camunda BPMN Workflow Integration
+## 6. Camunda BPMN 工作流整合（Camunda BPMN Workflow Integration）
 
-### 6.1 BPMN Process Definition
+### 6.1 BPMN 流程定義（BPMN Process Definition）
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1268,7 +1268,7 @@ public class RiskProposalReviewController {
 </bpmn:definitions>
 ```
 
-### 6.2 Workflow Service
+### 6.2 工作流 Service（Workflow Service）
 
 ```java
 /**
@@ -1322,28 +1322,28 @@ public class RiskProposalWorkflowService {
 
 ---
 
-## 7. Monitoring and Alerting
+## 7. 監控和告警（Monitoring and Alerting）
 
-### 7.1 Prometheus Metrics
+### 7.1 Prometheus 指標（Prometheus Metrics）
 
-**Review efficiency metrics**:
+**審核效率指標**：
 
-| Metric | Type | Description | Alert Threshold |
-|--------|------|-------------|-----------------|
-| `risk_review_duration_seconds` | Histogram | Review response time (seconds) | P95 > 3600s (1 hour) |
-| `risk_review_approval_rate` | Gauge | Proposal approval rate (%) | < 70% or > 95% |
-| `risk_review_sla_violation_count` | Counter | SLA violation count | > 10/day |
-| `risk_review_pending_count` | Gauge | Pending proposal count | > 100 |
+| 指標 | 類型 | 描述 | 告警閾值 |
+|------|------|------|----------|
+| `risk_review_duration_seconds` | Histogram | 審核響應時間（秒） | P95 > 3600s（1 小時） |
+| `risk_review_approval_rate` | Gauge | 提案批准率（%） | < 70% 或 > 95% |
+| `risk_review_sla_violation_count` | Counter | SLA 違規次數 | > 10/天 |
+| `risk_review_pending_count` | Gauge | 待審核提案數量 | > 100 |
 
-**Compensation metrics**:
+**補償指標**：
 
-| Metric | Type | Description | Alert Threshold |
-|--------|------|-------------|-----------------|
-| `risk_compensation_execution_errors` | Counter | Compensation execution failures | > 5/hour |
-| `risk_compensation_retry_count` | Counter | Compensation retry count | > 20/day |
-| `risk_compensation_amount_total` | Counter | Total compensation amount ($) | - |
+| 指標 | 類型 | 描述 | 告警閾值 |
+|------|------|------|----------|
+| `risk_compensation_execution_errors` | Counter | 補償執行失敗次數 | > 5/小時 |
+| `risk_compensation_retry_count` | Counter | 補償重試次數 | > 20/天 |
+| `risk_compensation_amount_total` | Counter | 總補償金額（$） | - |
 
-### 7.2 Grafana Dashboard Configuration
+### 7.2 Grafana 儀表板配置（Grafana Dashboard Configuration）
 
 ```json
 {
@@ -1420,7 +1420,7 @@ public class RiskProposalWorkflowService {
 }
 ```
 
-### 7.3 Prometheus AlertManager Rules
+### 7.3 Prometheus AlertManager 規則（Prometheus AlertManager Rules）
 
 ```yaml
 groups:
@@ -1473,41 +1473,41 @@ groups:
 
 ---
 
-## 8. Architecture Patterns Summary
+## 8. 架構模式總結（Architecture Patterns Summary）
 
-### 8.1 SmartAdmin Layered Architecture Compliance
+### 8.1 SmartAdmin 分層架構合規性（SmartAdmin Layered Architecture Compliance）
 
-| Layer | Responsibility | Key Pattern |
-|-------|---------------|-------------|
-| **Controller** | API routing, permission check, parameter validation | `@SaCheckPermission`, `ResponseDTO.ok()` |
-| **Service** | Business logic, Vavr `Option` for null safety | `Option.of(...).flatMap(...)` |
-| **Manager** | Transaction management, cross-service coordination | `@Transactional(rollbackFor = Throwable.class)` |
-| **Dao** | Data access via MyBatis Plus | `LambdaQueryWrapper`, `selectList`, `updateById` |
+| 層級 | 職責 | 關鍵模式 |
+|------|------|----------|
+| **Controller** | API 路由、權限檢查、參數驗證 | `@SaCheckPermission`, `ResponseDTO.ok()` |
+| **Service** | 業務邏輯、Vavr `Option` 用於空值安全 | `Option.of(...).flatMap(...)` |
+| **Manager** | 事務管理、跨 Service 協調 | `@Transactional(rollbackFor = Throwable.class)` |
+| **Dao** | 通過 MyBatis Plus 進行資料存取 | `LambdaQueryWrapper`, `selectList`, `updateById` |
 
-### 8.2 Event-Driven Architecture
+### 8.2 事件驅動架構（Event-Driven Architecture）
 
-All state changes publish Kafka events for downstream consumers:
-- `risk.proposal.approved` - Proposal approved
-- `risk.proposal.rejected` - Proposal rejected
-- `risk.proposal.partial_approved` - Proposal partially approved
-- `risk.proposal.escalated` - Proposal escalated
-- `wallet.compensation.refund` - Refund executed
-- `wallet.compensation.deduction` - Deduction executed
+所有狀態變更都發布 Kafka 事件供下游消費者使用：
+- `risk.proposal.approved` - 提案已批准
+- `risk.proposal.rejected` - 提案已拒絕
+- `risk.proposal.partial_approved` - 提案部分批准
+- `risk.proposal.escalated` - 提案已升級
+- `wallet.compensation.refund` - 已執行退款
+- `wallet.compensation.deduction` - 已執行扣款
 
-### 8.3 Key Design Decisions
+### 8.3 關鍵設計決策（Key Design Decisions）
 
-- **Service uses Vavr Option** (NOT java.util.Optional) per ArchUnit enforcement
-- **@Transactional ONLY in Manager layer** (NEVER in Service/Controller)
-- **Constructor injection** via `@RequiredArgsConstructor` + `private final`
-- **Boolean field naming**: `deleted` (NOT `isDeleted`)
+- **Service 使用 Vavr Option**（非 java.util.Optional），符合 ArchUnit 強制執行
+- **@Transactional 僅在 Manager 層**（永遠不在 Service/Controller）
+- **建構子注入**，通過 `@RequiredArgsConstructor` + `private final`
+- **布林欄位命名**: `deleted`（非 `isDeleted`）
 
 ---
 
-## 9. Database Schema
+## 9. 資料庫綱要（Database Schema）
 
-### 9.1 Risk Proposals Table
+### 9.1 風控提案表（Risk Proposals Table）
 
-The `risk_proposals` table stores all risk proposal records with priority-based SLA tracking.
+`risk_proposals` 表儲存所有風控提案記錄，具有基於優先級的 SLA 追蹤。
 
 ```sql
 CREATE TABLE risk_proposals (
@@ -1539,15 +1539,15 @@ CREATE INDEX idx_risk_proposals_reviewer_id ON risk_proposals(reviewer_id) WHERE
 CREATE INDEX idx_risk_proposals_withdrawal_id ON risk_proposals(withdrawal_request_id) WHERE withdrawal_request_id IS NOT NULL;
 CREATE INDEX idx_risk_proposals_created_at ON risk_proposals(created_at DESC);
 
-COMMENT ON TABLE risk_proposals IS 'Risk proposal records with async review workflow, priority-based SLA enforcement';
-COMMENT ON COLUMN risk_proposals.priority IS 'Priority level: URGENT (1h SLA), HIGH (2h), MEDIUM (24h), LOW (48h)';
-COMMENT ON COLUMN risk_proposals.approved_amount IS 'Approved amount after review (0 if rejected, partial if PARTIAL_APPROVED, full if APPROVED)';
-COMMENT ON COLUMN risk_proposals.escalation_reason IS 'Reason for escalating to senior analyst (required if status = ESCALATED)';
+COMMENT ON TABLE risk_proposals IS '風控提案記錄，具有非同步審核工作流、基於優先級的 SLA 強制執行';
+COMMENT ON COLUMN risk_proposals.priority IS '優先級等級：URGENT（1 小時 SLA）、HIGH（2 小時）、MEDIUM（24 小時）、LOW（48 小時）';
+COMMENT ON COLUMN risk_proposals.approved_amount IS '審核後批准的金額（如果拒絕則為 0，如果 PARTIAL_APPROVED 則為部分，如果 APPROVED 則為全額）';
+COMMENT ON COLUMN risk_proposals.escalation_reason IS '升級至高級分析師的原因（如果 status = ESCALATED 則為必填）';
 ```
 
-### 9.2 Risk Proposal Reviews Table
+### 9.2 風控提案審核表（Risk Proposal Reviews Table）
 
-The `risk_proposal_reviews` table stores detailed review history for audit purposes.
+`risk_proposal_reviews` 表儲存詳細的審核歷史記錄以供審計之用。
 
 ```sql
 CREATE TABLE risk_proposal_reviews (
@@ -1572,14 +1572,14 @@ CREATE INDEX idx_risk_proposal_reviews_reviewer_id ON risk_proposal_reviews(revi
 CREATE INDEX idx_risk_proposal_reviews_review_action ON risk_proposal_reviews(review_action);
 CREATE INDEX idx_risk_proposal_reviews_created_at ON risk_proposal_reviews(created_at DESC);
 
-COMMENT ON TABLE risk_proposal_reviews IS 'Complete audit trail of all risk proposal review actions (claim, approve, reject, escalate)';
-COMMENT ON COLUMN risk_proposal_reviews.review_action IS 'Action taken: CLAIM (assign to self), APPROVE, REJECT, PARTIAL_APPROVE, ESCALATE, AUTO_APPROVE/AUTO_REJECT (SLA timeout)';
-COMMENT ON COLUMN risk_proposal_reviews.review_duration_seconds IS 'Time from CLAIM to decision (in seconds), for performance metrics';
+COMMENT ON TABLE risk_proposal_reviews IS '所有風控提案審核操作的完整審計軌跡（認領、批准、拒絕、升級）';
+COMMENT ON COLUMN risk_proposal_reviews.review_action IS '執行的操作：CLAIM（分配給自己）、APPROVE、REJECT、PARTIAL_APPROVE、ESCALATE、AUTO_APPROVE/AUTO_REJECT（SLA 超時）';
+COMMENT ON COLUMN risk_proposal_reviews.review_duration_seconds IS '從 CLAIM 到決策的時間（以秒為單位），用於效能指標';
 ```
 
-### 9.3 Example Queries
+### 9.3 查詢範例（Example Queries）
 
-**Query pending proposals sorted by priority**:
+**查詢按優先級排序的待審核提案**：
 ```sql
 SELECT
     rp.proposal_id,
@@ -1605,7 +1605,7 @@ ORDER BY
 LIMIT 50;
 ```
 
-**Query reviewer performance metrics**:
+**查詢審核人員效能指標**：
 ```sql
 SELECT
     rpr.reviewer_id,
@@ -1624,7 +1624,7 @@ GROUP BY rpr.reviewer_id, au.username
 ORDER BY total_reviews DESC;
 ```
 
-**Query SLA violation candidates**:
+**查詢 SLA 違規候選項**：
 ```sql
 SELECT
     rp.proposal_id,
