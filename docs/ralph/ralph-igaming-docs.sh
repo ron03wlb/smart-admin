@@ -27,6 +27,10 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Rate limit handling
+RATE_LIMIT_RETRY_COUNT=0
+MAX_RATE_LIMIT_RETRIES=5
+
 # ===== Pre-flight checks =====
 echo -e "${GREEN}═══════════════════════════════════════════════${NC}"
 echo -e "${GREEN}  Ralph Wiggum: iGaming Doc Optimization       ${NC}"
@@ -54,6 +58,100 @@ done
 echo -e "${CYAN}Starting loop at $(date)${NC}"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Ralph loop started. Max iterations: $MAX_ITERATIONS" >> "$LOG_FILE"
 echo ""
+
+# ===== Rate Limit Handling Functions =====
+calculate_wait_until() {
+  local RESET_TIME="$1"  # e.g., "4pm" or "2am"
+
+  # Parse hour and am/pm
+  local HOUR=$(echo "$RESET_TIME" | grep -oE "[0-9]+")
+  local AMPM=$(echo "$RESET_TIME" | grep -oE "(am|pm)")
+
+  # Convert to 24-hour format
+  if [ "$AMPM" = "pm" ] && [ "$HOUR" -ne 12 ]; then
+    HOUR=$((HOUR + 12))
+  elif [ "$AMPM" = "am" ] && [ "$HOUR" -eq 12 ]; then
+    HOUR=0
+  fi
+
+  # Get current time in Asia/Taipei timezone
+  local NOW_EPOCH=$(TZ="Asia/Taipei" date +%s)
+  local RESET_EPOCH=$(TZ="Asia/Taipei" date -d "today $HOUR:00" +%s 2>/dev/null || date -v "${HOUR}H" +%s 2>/dev/null)
+
+  # If reset time already passed today, add 24 hours
+  if [ $RESET_EPOCH -le $NOW_EPOCH ]; then
+    RESET_EPOCH=$(TZ="Asia/Taipei" date -d "tomorrow $HOUR:00" +%s 2>/dev/null || date -v +1d -v "${HOUR}H" +%s 2>/dev/null)
+  fi
+
+  # Fallback: if date calculation failed, return 3600 (60 minutes)
+  if [ -z "$RESET_EPOCH" ] || [ "$RESET_EPOCH" = "0" ]; then
+    echo "3600"
+    return 0
+  fi
+
+  local WAIT_SECONDS=$((RESET_EPOCH - NOW_EPOCH))
+
+  # Safety: cap at reasonable value
+  if [ $WAIT_SECONDS -lt 0 ]; then
+    WAIT_SECONDS=3600  # 60 minutes fallback
+  fi
+
+  echo "$WAIT_SECONDS"
+}
+
+handle_rate_limit() {
+  local OUTPUT="$1"
+  local LIMIT_TYPE="unknown"
+
+  # Priority 1: Detect explicit reset time (daily limit)
+  if echo "$OUTPUT" | grep -qE "resets [0-9]+(am|pm)"; then
+    LIMIT_TYPE="daily_reset"
+    RESET_TIME=$(echo "$OUTPUT" | grep -oE "[0-9]+(am|pm)" | head -1)
+    WAIT_SECONDS=$(calculate_wait_until "$RESET_TIME")
+
+    # Cap at 4 hours (safety)
+    if [ $WAIT_SECONDS -gt 14400 ]; then
+      echo -e "${YELLOW}⚠️ Reset time too far ($RESET_TIME). Capping wait at 4 hours...${NC}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] RATE_LIMIT: type=$LIMIT_TYPE, reset=$RESET_TIME, wait=240min (capped), retry=$RATE_LIMIT_RETRY_COUNT" >> "$LOG_FILE"
+      sleep 14400
+    else
+      WAIT_MINUTES=$((WAIT_SECONDS / 60))
+      echo -e "${YELLOW}📅 Daily limit. Waiting until $RESET_TIME ($WAIT_MINUTES min)...${NC}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] RATE_LIMIT: type=$LIMIT_TYPE, reset=$RESET_TIME, wait=${WAIT_MINUTES}min, retry=$RATE_LIMIT_RETRY_COUNT" >> "$LOG_FILE"
+      sleep $WAIT_SECONDS
+    fi
+    return 0
+  fi
+
+  # Priority 2: Detect 5-hour usage limit
+  if echo "$OUTPUT" | grep -qiE "(5.?hour|five.?hour)"; then
+    LIMIT_TYPE="5hour_limit"
+    echo -e "${RED}⏰ 5-hour limit detected. Waiting 60 minutes...${NC}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] RATE_LIMIT: type=$LIMIT_TYPE, wait=60min, retry=$RATE_LIMIT_RETRY_COUNT" >> "$LOG_FILE"
+    sleep 3600
+
+    # Reset quota tracking
+    rm -f "$RALPH_DIR/quota.json" 2>/dev/null || true
+    return 0
+  fi
+
+  # Priority 3: Exponential backoff for unknown limits
+  LIMIT_TYPE="unknown_exponential"
+  ((RATE_LIMIT_RETRY_COUNT++))
+  WAIT_MINUTES=$((5 * (2 ** (RATE_LIMIT_RETRY_COUNT - 1))))
+  [ $WAIT_MINUTES -gt 120 ] && WAIT_MINUTES=120
+
+  echo -e "${YELLOW}🔄 Rate limit retry #$RATE_LIMIT_RETRY_COUNT. Waiting $WAIT_MINUTES min...${NC}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] RATE_LIMIT: type=$LIMIT_TYPE, wait=${WAIT_MINUTES}min, retry=$RATE_LIMIT_RETRY_COUNT" >> "$LOG_FILE"
+  sleep $((WAIT_MINUTES * 60))
+
+  # Safety: exit if stuck for 5+ retries
+  if [ $RATE_LIMIT_RETRY_COUNT -ge $MAX_RATE_LIMIT_RETRIES ]; then
+    echo -e "${RED}🛑 SAFETY EXIT: Rate limit retry limit exceeded ($MAX_RATE_LIMIT_RETRIES attempts)${NC}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] SAFETY_EXIT: rate_limit_retry_exceeded (count=$RATE_LIMIT_RETRY_COUNT)" >> "$LOG_FILE"
+    exit 3
+  fi
+}
 
 # ===== Monitoring Variables (added by usage monitoring system) =====
 LAST_QUOTA_CHECK=$(date +%s)
@@ -189,6 +287,8 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
       echo -e "${YELLOW}⚠️ $VALIDATION_FAILED validation check(s) failed (warnings logged)${NC}"
     else
       echo -e "${GREEN}✅ All validation checks passed!${NC}"
+      # Reset rate limit retry counter on successful iteration
+      RATE_LIMIT_RETRY_COUNT=0
     fi
 
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Validation: $VALIDATION_FAILED failures" >> "$LOG_FILE"
@@ -216,24 +316,14 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
   fi
 
   # ===== Enhanced rate limit + 5-hour window detection =====
-  if echo "$OUTPUT" | grep -qiE "(rate.?limit|usage.?limit|capacity|overloaded|429|5.?hour|five.?hour|hit.+limit|your.+limit|resets [0-9]+am)"; then
+  if echo "$OUTPUT" | grep -qiE "(rate.?limit|usage.?limit|capacity|overloaded|429|5.?hour|five.?hour|hit.+limit|your.+limit|resets [0-9]+(am|pm))"; then
     echo -e "${YELLOW}⚠️ API limit detected${NC}"
 
-    # Check if 5-hour limit specifically
-    if echo "$OUTPUT" | grep -qiE "(5.?hour|five.?hour)"; then
-      echo -e "${RED}🛑 5-HOUR LIMIT detected. Waiting 60 minutes...${NC}"
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] 5-HOUR LIMIT at iteration #$i, sleeping 3600s" >> "$LOG_FILE"
-      sleep 3600
+    # Use hybrid intelligent wait strategy
+    handle_rate_limit "$OUTPUT"
 
-      # Reset quota tracking
-      rm -f "$RALPH_DIR/quota.json" 2>/dev/null || true
-      LAST_QUOTA_CHECK=$(date +%s)
-    else
-      # Regular rate limit
-      echo -e "${YELLOW}Rate limit detected. Waiting 5 minutes...${NC}"
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Rate limit at iteration #$i, sleeping 300s" >> "$LOG_FILE"
-      sleep 300
-    fi
+    # Update last quota check time (for 5-hour limit case)
+    LAST_QUOTA_CHECK=$(date +%s)
 
     continue
   fi

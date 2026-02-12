@@ -196,3 +196,19 @@ This rule is commented out but preserved for future reference.
 - **Kept**: Phase 1 validation scripts (still useful for post-iteration checks)
 - **Impact**: Ralph resumes translation duties (not just validation)
 - **Duration**: Temporary (20 iterations test, then re-evaluate)
+
+### P17: Hybrid intelligent wait strategy for rate limits (Added 2026-02-12)
+- **Problem**: Ralph script misclassified "resets Xpm" daily limit as "regular rate limit", causing ineffective 5-minute retries
+- **Root Cause**: Pattern `resets [0-9]+am` only matched AM times, not PM times like "resets 4pm"
+- **Solution**: Implemented 3-layer hybrid intelligent wait strategy:
+  - **Layer 1**: Daily reset detection (`resets [0-9]+(am|pm)`) - Calculates precise wait time until reset, capped at 4 hours
+  - **Layer 2**: 5-hour limit detection (`5.?hour|five.?hour`) - Fixed 60-minute wait + quota reset
+  - **Layer 3**: Exponential backoff for unknown limits - 5min → 10min → 20min → 40min → 80min → 120min (max)
+- **Safety Mechanism**: Exit after 5 consecutive retry failures (prevents infinite loops)
+- **Cross-Platform**: Fallback logic for macOS/Linux/Windows Git Bash date command differences
+- **Reset Logic**: `RATE_LIMIT_RETRY_COUNT` resets to 0 after successful validation
+- **Logging**: Enhanced with limit type, wait duration, and retry count for transparency
+- **Implementation**: Functions `calculate_wait_until()` and `handle_rate_limit()` in `ralph-igaming-docs.sh`
+- **Expected Impact**: Zero human intervention for rate limit handling, 48-hour continuous execution capability
+- **Test Coverage**: Verified daily reset (4pm/2am/12pm), 5-hour limit, and exponential backoff patterns
+- **Reference**: Plan v1.2.0 in `C:\Users\ron.chang\.claude\plans\elegant-pondering-sparrow.md`
