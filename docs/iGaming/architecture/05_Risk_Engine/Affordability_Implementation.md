@@ -1,50 +1,50 @@
-# Affordability Assessment Implementation (可負擔性評估技術實現)
+# 可負擔性評估技術實作（Affordability Assessment Implementation）
 
-> **Canonical Source**: [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
-> **Audience**: Architects, Backend Developers, DevOps
-> **Business Requirements**: [Affordability_Requirements.md](../../requirements/05_Risk_Compliance/Affordability_Requirements.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [15-08_Affordability_Assessment.md](../../source-archive/15_Responsible_Gambling/15-08_Affordability_Assessment.md)
+> **目標讀者**: Architects, Backend Developers, DevOps
+> **業務需求**: [Affordability_Requirements.md](../../requirements/05_Risk_Compliance/Affordability_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 1. Architecture Overview
+## 1. 架構概覽（Architecture Overview）
 
 ```mermaid
 graph TD
-    A[Player Activity] --> B{Trigger Evaluation}
-    B -->|Annual Net Loss| C[Loss Threshold Check]
-    B -->|Monthly Net Deposit| D[Deposit Threshold Check]
-    B -->|Behavioral| E[Vulnerability Detection]
+    A[玩家活動] --> B{觸發條件評估}
+    B -->|年度淨虧損| C[虧損閾值檢查]
+    B -->|月度淨存款| D[存款閾值檢查]
+    B -->|行為指標| E[脆弱性偵測]
 
-    C -->|GBP 125+| F[Basic: Warning]
-    C -->|GBP 500+| G[Enhanced: Self-Declaration]
-    C -->|GBP 2000+| H[Full: Third-Party Verification]
+    C -->|GBP 125+| F[基礎級：警告]
+    C -->|GBP 500+| G[增強級：自我聲明]
+    C -->|GBP 2000+| H[完整級：第三方驗證]
 
-    D -->|GBP 150+| I[Financial Vulnerability Check]
-    I --> J{Risk Indicator Combination}
-    J -->|Escalate| H
+    D -->|GBP 150+| I[財務脆弱性檢查]
+    I --> J{風險指標組合}
+    J -->|升級| H
 
-    E --> K[Chasing Losses Detection]
-    E --> L[Deposit Velocity Detection]
-    E --> M[Unusual Pattern Detection]
+    E --> K[追逐虧損偵測]
+    E --> L[存款速度偵測]
+    E --> M[異常模式偵測]
 
     K -->|HIGH| H
     L -->|MEDIUM| F
     M -->|MEDIUM| F
 
-    G --> N[Recommended Limit Calculation]
-    H --> O[Open Banking + Credit Reference]
-    O --> P[Full Assessment Analysis]
-    P --> Q{Assessment Result}
-    Q -->|PASSED| R[Apply Recommended Limit]
-    Q -->|FAILED| S[Force Limit + Restrict Account]
+    G --> N[建議限額計算]
+    H --> O[Open Banking + 信用徵信]
+    O --> P[完整評估分析]
+    P --> Q{評估結果}
+    Q -->|PASSED| R[套用建議限額]
+    Q -->|FAILED| S[強制限額 + 限制帳戶]
 ```
 
 ---
 
-## 2. Database Schema
+## 2. 資料庫結構設計（Database Schema）
 
-### 2.1 Affordability Assessment Table
+### 2.1 可負擔性評估表（Affordability Assessment Table）
 
 ```sql
 CREATE TABLE t_affordability_assessment (
@@ -86,7 +86,7 @@ CREATE TABLE t_affordability_assessment (
 );
 ```
 
-### 2.2 Financial Vulnerability Indicator Table
+### 2.2 財務脆弱性指標表（Financial Vulnerability Indicator Table）
 
 ```sql
 CREATE TABLE t_financial_vulnerability_indicator (
@@ -105,7 +105,7 @@ CREATE TABLE t_financial_vulnerability_indicator (
 );
 ```
 
-### 2.3 Schema Extension for Monthly Net Deposit Trigger
+### 2.3 月度淨存款觸發器結構擴展（Schema Extension for Monthly Net Deposit Trigger）
 
 ```sql
 -- Add trigger_type column for new UKGC 2025-02-28 rule
@@ -120,9 +120,9 @@ ON t_transaction (jurisdiction, transaction_date, player_id);
 
 ---
 
-## 3. Monthly Net Deposit Calculation
+## 3. 月度淨存款計算（Monthly Net Deposit Calculation）
 
-### 3.1 SQL Query
+### 3.1 SQL 查詢（SQL Query）
 
 ```sql
 -- Calculate player monthly net deposits (rolling 30 days)
@@ -139,7 +139,7 @@ GROUP BY player_id
 HAVING monthly_net_deposit >= 150;
 ```
 
-### 3.2 Scheduled Task Implementation
+### 3.2 排程任務實作（Scheduled Task Implementation）
 
 ```java
 /**
@@ -183,7 +183,7 @@ public void checkMonthlyNetDepositThreshold() {
 
 ---
 
-## 4. Core Service Implementation
+## 4. 核心服務實作（Core Service Implementation）
 
 ### 4.1 AffordabilityAssessmentService
 
@@ -419,9 +419,9 @@ public class AffordabilityAssessmentService {
 
 ---
 
-## 5. Financial Vulnerability Detection
+## 5. 財務脆弱性偵測（Financial Vulnerability Detection）
 
-### 5.1 Scheduled Detection Service
+### 5.1 排程偵測服務（Scheduled Detection Service）
 
 ```java
 /**
@@ -462,7 +462,7 @@ public void detectFinancialVulnerability() {
 }
 ```
 
-### 5.2 Chasing Losses Algorithm
+### 5.2 追逐虧損演算法（Chasing Losses Algorithm）
 
 ```java
 /**
@@ -492,7 +492,7 @@ private boolean detectChasingLosses(Long playerId) {
 }
 ```
 
-### 5.3 Deposit Velocity Algorithm
+### 5.3 存款速度演算法（Deposit Velocity Algorithm）
 
 ```java
 /**
@@ -516,7 +516,7 @@ private boolean detectDepositVelocity(Long playerId) {
 }
 ```
 
-### 5.4 Indicator Response Handler
+### 5.4 指標回應處理器（Indicator Response Handler）
 
 ```java
 /**
@@ -551,7 +551,7 @@ private void recordAndHandleIndicator(Long playerId, VulnerabilityIndicator indi
 
 ---
 
-## 6. Open Banking Integration
+## 6. Open Banking 整合（Open Banking Integration）
 
 ```java
 @Component
@@ -623,9 +623,9 @@ public class OpenBankingClient {
 
 ---
 
-## 7. Frontend Integration (Vue 3)
+## 7. 前端整合（Frontend Integration - Vue 3）
 
-### 7.1 Affordability Assessment Modal
+### 7.1 可負擔性評估對話框（Affordability Assessment Modal）
 
 ```vue
 <template>
@@ -746,36 +746,42 @@ public class OpenBankingClient {
 
 ---
 
-## 8. Monitoring and Observability
+## 8. 監控與可觀察性（Monitoring and Observability）
 
-### 8.1 Prometheus Metrics
+### 8.1 Prometheus 指標（Prometheus Metrics）
 
-| Metric | Prometheus Name | Description |
-|--------|----------------|-------------|
-| Assessment triggers | `affordability_assessment_triggered_total` | Counter by assessment type |
-| Assessment pass rate | `affordability_assessment_pass_rate` | Gauge: PASSED / TOTAL |
-| Average recommended limit | `affordability_recommended_limit_avg` | Gauge: mean recommended limit |
-| Vulnerability indicators | `vulnerability_indicator_detected_total` | Counter by indicator type |
+| 指標名稱 | Prometheus 名稱 | 說明 |
+|--------|----------------|-----|
+| 評估觸發次數 | `affordability_assessment_triggered_total` | 依評估類型統計的計數器 |
+| 評估通過率 | `affordability_assessment_pass_rate` | 量測值：PASSED / TOTAL |
+| 平均建議限額 | `affordability_recommended_limit_avg` | 量測值：平均建議限額 |
+| 脆弱性指標 | `vulnerability_indicator_detected_total` | 依指標類型統計的計數器 |
 
-### 8.2 Alerting Rules
+### 8.2 告警規則（Alerting Rules）
 
-| Alert | Condition | Severity |
-|-------|-----------|----------|
-| High failure rate | Pass rate drops below 60% for 1 hour | WARNING |
-| Open Banking timeout | API latency exceeds 10 seconds | CRITICAL |
-| Vulnerability spike | Indicator count exceeds 3x baseline in 15 minutes | WARNING |
-
----
-
-## 9. Related Technical Documents
-
-| Document | Relationship |
-|----------|-------------|
-| Deposit Limits | Limit enforcement API consumed by this service |
-| Loss Limits | Net loss calculation shared data source |
-| KYC / AML | Full assessment may share verification data |
-| UKGC Compliance | Affordability forms part of licence compliance framework |
+| 告警名稱 | 觸發條件 | 嚴重程度 |
+|---------|---------|---------|
+| 高失敗率 | 通過率在 1 小時內低於 60% | WARNING |
+| Open Banking 逾時 | API 延遲超過 10 秒 | CRITICAL |
+| 脆弱性指標激增 | 指標數量在 15 分鐘內超過基準值 3 倍 | WARNING |
 
 ---
 
-**Navigation**: [Risk Engine Architecture](../05_Risk_Engine/) | [iGaming Home](../../README.md)
+## 9. 相關技術文件（Related Technical Documents）
+
+| 文件 | 關聯性 |
+|------|-------|
+| Deposit Limits | 本服務使用的限額執行 API |
+| Loss Limits | 共享的淨虧損計算資料來源 |
+| KYC / AML | 完整評估可能共享驗證資料 |
+| UKGC Compliance | 可負擔性評估屬於牌照合規框架的一部分 |
+
+---
+
+**導航**: [Risk Engine Architecture](../05_Risk_Engine/) | [iGaming Home](../../README.md)
+
+---
+
+**文檔版本**: 1.0.0
+**最後更新**: 2026-02-12
+**維護團隊**: Backend Architecture Team

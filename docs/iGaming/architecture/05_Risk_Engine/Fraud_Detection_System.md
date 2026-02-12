@@ -1,75 +1,75 @@
-# Fraud Detection System Architecture
+# 詐騙偵測系統架構（Fraud Detection System Architecture）
 
-> **Business Requirements**: [Fraud_Detection_Requirements.md](../../requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md)
-> **Audience**: Backend Developers, Risk Control Engineers, Data Scientists
-> **Last Synced**: 2026-02-09
+> **業務需求**: [Fraud_Detection_Requirements.md](../../requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md)
+> **目標讀者**: Backend Developers, Risk Control Engineers, Data Scientists
+> **最後同步**: 2026-02-09
 
-## Document Information
+## 文檔資訊（Document Information）
 
-| Property | Value |
+| 屬性 | 值 |
 |----------|-------|
-| **Version** | 1.0.0 |
-| **Last Updated** | 2026-02-08 |
-| **Canonical Source** | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
-| **View Type** | Technical Architecture |
-| **Target Audience** | Architects, Backend Engineers, DevOps, SRE |
-| **Related Doc** | [Fraud_Detection_Requirements.md](../../requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md) |
+| **版本** | 1.0.0 |
+| **最後更新** | 2026-02-08 |
+| **規範來源** | [05-02 Fraud Detection](../../source-archive/05_Risk_Control/05-02_Fraud_Detection.md) |
+| **文檔類型** | Technical Architecture |
+| **目標讀者** | Architects, Backend Engineers, DevOps, SRE |
+| **相關文檔** | [Fraud_Detection_Requirements.md](../../requirements/05_Risk_Compliance/Fraud_Detection_Requirements.md) |
 
 ---
 
-## 1. System Architecture Overview
+## 1. 系統架構概覽（System Architecture Overview）
 
-### 1.1 5-Layer Detection Architecture
+### 1.1 五層偵測架構（5-Layer Detection Architecture）
 
 ```mermaid
 graph TD
-    A[Betting Request<br/>Player Bet Request] --> B{Layer 1: Synchronous Blacklist Check<br/>Response Time: <10ms}
+    A[下注請求<br/>玩家下注請求] --> B{第一層: 同步黑名單檢查<br/>回應時間: <10ms}
 
-    B -->|Redis Cache Query| C{Check Result}
+    B -->|Redis 快取查詢| C{檢查結果}
 
-    C -->|Hit: Blacklist/Frozen/IP Blocked| D[Reject Bet<br/>Return: Clear rejection reason]
+    C -->|命中: 黑名單/凍結/IP 封鎖| D[拒絕下注<br/>回應: 明確拒絕原因]
 
-    C -->|Pass| E[Layer 2: Transaction Processing<br/>TCC Transaction]
+    C -->|通過| E[第二層: 交易處理<br/>TCC Transaction]
 
-    E --> E1[Try Phase: Freeze Resources<br/>Bonus + Cash + Credit]
-    E1 --> E2[Confirm Phase:<br/>Deduct Funds + Write Logs]
-    E2 --> E3[Write outbox_event]
-    E3 --> E4[Commit DB Transaction]
+    E --> E1[Try 階段: 凍結資源<br/>Bonus + Cash + Credit]
+    E1 --> E2[Confirm 階段:<br/>扣款 + 寫入日誌]
+    E2 --> E3[寫入 outbox_event]
+    E3 --> E4[提交 DB Transaction]
 
-    E4 --> F[Bet Success<br/>Player Sees Result]
+    E4 --> F[下注成功<br/>玩家看到結果]
 
-    F -.->|Async Event| G[Layer 3: Async Risk Analysis<br/>Event-Driven]
+    F -.->|非同步事件| G[第三層: 非同步風險分析<br/>事件驅動]
 
     G --> G1[Kafka Consumer<br/>Topic: wallet.debited]
 
-    G1 --> G2[Risk Engine Executes Rules<br/>Load t_risk_rule_config]
+    G1 --> G2[風險引擎執行規則<br/>載入 t_risk_rule_config]
 
-    G2 --> G3{Decision Routing<br/>Based on action_type}
+    G2 --> G3{決策路由<br/>基於 action_type}
 
-    G3 -->|action_type = BLOCK| G4[Create Risk Proposal<br/>Priority: HIGH]
+    G3 -->|action_type = BLOCK| G4[建立風險提案<br/>優先級: HIGH]
 
-    G3 -->|action_type = FLAG| G5[Create Risk Proposal<br/>Priority: MEDIUM]
+    G3 -->|action_type = FLAG| G5[建立風險提案<br/>優先級: MEDIUM]
 
-    G3 -->|action_type = IGNORE| G6[Log Only]
+    G3 -->|action_type = IGNORE| G6[僅記錄日誌]
 
-    G4 --> H[Layer 4: Human Review<br/>Manual Disposition]
+    G4 --> H[第四層: 人工審核<br/>手動處置]
     G5 --> H
 
-    H --> H1[Reviewer Checks Proposal]
-    H1 --> H2{Review Decision}
+    H --> H1[審核員檢查提案]
+    H1 --> H2{審核決策}
 
-    H2 -->|APPROVED| H3[No Action<br/>Continue Monitoring]
-    H2 -->|REJECTED| H4[Freeze Account<br/>Mark Suspicious Funds]
-    H2 -->|PARTIAL| H5[Partial Freeze]
+    H2 -->|APPROVED| H3[無需操作<br/>繼續監控]
+    H2 -->|REJECTED| H4[凍結帳戶<br/>標記可疑資金]
+    H2 -->|PARTIAL| H5[部分凍結]
 
-    F -.->|Player Requests Withdrawal| I[Layer 5: Withdrawal Deferred Check<br/>SAGA Step 2.5]
+    F -.->|玩家申請提款| I[第五層: 提款延遲檢查<br/>SAGA Step 2.5]
 
-    I --> I1[Query Historical Proposals<br/>Time Window: 30 Days]
-    I1 --> I2[Calculate Suspicious Amount]
-    I2 --> I3{Decision}
+    I --> I1[查詢歷史提案<br/>時間窗口: 30 天]
+    I1 --> I2[計算可疑金額]
+    I2 --> I3{決策}
 
-    I3 -->|Suspicious = 0| I4[Continue Withdrawal]
-    I3 -->|Suspicious > 0| I5[Freeze Amount<br/>Route to Review Queue]
+    I3 -->|可疑金額 = 0| I4[繼續提款]
+    I3 -->|可疑金額 > 0| I5[凍結金額<br/>路由至審核隊列]
 
     style A fill:#e1f5ff
     style B fill:#fff4e1
@@ -80,31 +80,31 @@ graph TD
     style I fill:#e1f0ff
 ```
 
-### 1.2 Architecture Design Principles
+### 1.2 架構設計原則（Architecture Design Principles）
 
-| Principle | Implementation | Benefit |
+| 原則 | 實作方式 | 優勢 |
 |-----------|---------------|---------|
-| **Minimize Sync Blocking** | Only check hardcoded rules in Layer 1 | <10ms response, Fail Open |
-| **Bet-First Complete** | TCC ensures bet success before risk analysis | Zero false kills |
-| **Async Risk Analysis** | Kafka + Flink event-driven | Non-blocking, 5s analysis |
-| **Human Review Primary** | Auto-generate proposals, human decides | Avoid ML false positives |
-| **Post-Hoc Fund Interception** | Check at withdrawal time (30 days) | Industry best practice |
+| **最小化同步阻塞** | 第一層僅檢查硬編碼規則 | <10ms 回應時間, Fail Open |
+| **下注優先完成** | TCC 確保下注成功後才進行風險分析 | 零誤殺 |
+| **非同步風險分析** | Kafka + Flink 事件驅動 | 非阻塞, 5s 分析 |
+| **人工審核為主** | 自動生成提案，人工決策 | 避免 ML 誤報 |
+| **事後資金攔截** | 提款時檢查（30 天） | 業界最佳實踐 |
 
 ---
 
-## 2. SmartAdmin Architecture Mapping
+## 2. SmartAdmin 架構對應（SmartAdmin Architecture Mapping）
 
-### 2.1 Layer Mapping
+### 2.1 層級對應（Layer Mapping）
 
-| Layer | Class | Responsibility |
+| 層級 | 類別 | 職責 |
 |-------|-------|----------------|
-| **Controller** | `RiskProposalController` | API interfaces |
-| **Service** | `RiskProposalService` | Business logic (Vavr Option) |
-| **Manager** | `RiskProposalManager` | Transaction management (@Transactional) |
-| **Dao** | `RiskProposalDao` | Data access |
-| **Entity** | `RiskProposalEntity` | Data entity |
+| **Controller** | `RiskProposalController` | API 介面 |
+| **Service** | `RiskProposalService` | 業務邏輯（Vavr Option） |
+| **Manager** | `RiskProposalManager` | 交易管理（@Transactional） |
+| **Dao** | `RiskProposalDao` | 資料存取 |
+| **Entity** | `RiskProposalEntity` | 資料實體 |
 
-### 2.2 Entity Layer - Risk Proposal Entity
+### 2.2 Entity 層 - 風險提案實體（Entity Layer - Risk Proposal Entity）
 
 ```java
 package net.lab1024.sa.business.risk.domain.entity;
@@ -175,7 +175,7 @@ public class RiskProposalEntity extends BaseEntity {
 }
 ```
 
-### 2.3 Dao Layer - Data Access
+### 2.3 Dao 層 - 資料存取（Dao Layer - Data Access）
 
 ```java
 package net.lab1024.sa.business.risk.dao;
@@ -212,7 +212,7 @@ public interface RiskProposalDao extends BaseMapper<RiskProposalEntity> {
 }
 ```
 
-### 2.4 Manager Layer - Transaction Management
+### 2.4 Manager 層 - 交易管理（Manager Layer - Transaction Management）
 
 ```java
 package net.lab1024.sa.business.risk.manager;
@@ -277,7 +277,7 @@ public class RiskProposalManager {
 }
 ```
 
-### 2.5 Service Layer - Business Logic (Vavr Option)
+### 2.5 Service 層 - 業務邏輯（Service Layer - Business Logic with Vavr Option）
 
 ```java
 package net.lab1024.sa.business.risk.service;
@@ -349,7 +349,7 @@ public class RiskProposalService {
 }
 ```
 
-### 2.6 Controller Layer - API Interface
+### 2.6 Controller 層 - API 介面（Controller Layer - API Interface）
 
 ```java
 package net.lab1024.sa.business.risk.controller;
@@ -410,27 +410,27 @@ public class RiskProposalController {
 
 ---
 
-## 3. API Specifications
+## 3. API 規範（API Specifications）
 
-### 3.1 Core APIs
+### 3.1 核心 API（Core APIs）
 
-| Endpoint | Method | Permission | Description |
+| 端點 | 方法 | 權限 | 說明 |
 |----------|--------|------------|-------------|
-| `/risk/proposal/player/{playerId}/pending` | GET | `risk:proposal:query` | Query player pending proposals |
-| `/risk/proposal/query` | POST | `risk:proposal:query` | Paginated query proposals |
-| `/risk/proposal/{proposalId}/approve` | POST | `risk:proposal:approve` | Approve risk proposal |
-| `/risk/multi-account/linkage/{playerId}` | GET | `risk:multi-account:query` | Query account linkage graph |
-| `/risk/multi-account/freeze/{playerId}` | POST | `risk:multi-account:freeze` | Freeze account |
-| `/risk/multi-account/merge` | POST | `risk:multi-account:merge` | Merge accounts |
+| `/risk/proposal/player/{playerId}/pending` | GET | `risk:proposal:query` | 查詢玩家待審核提案 |
+| `/risk/proposal/query` | POST | `risk:proposal:query` | 分頁查詢提案 |
+| `/risk/proposal/{proposalId}/approve` | POST | `risk:proposal:approve` | 批准風險提案 |
+| `/risk/multi-account/linkage/{playerId}` | GET | `risk:multi-account:query` | 查詢帳戶關聯圖 |
+| `/risk/multi-account/freeze/{playerId}` | POST | `risk:multi-account:freeze` | 凍結帳戶 |
+| `/risk/multi-account/merge` | POST | `risk:multi-account:merge` | 合併帳戶 |
 
-### 3.2 Request/Response Examples
+### 3.2 請求/回應範例（Request/Response Examples）
 
-**Query Pending Proposals**:
+**查詢待審核提案**:
 ```
 GET /risk/proposal/player/{playerId}/pending?days=30
 ```
 
-**Response**:
+**回應**:
 ```json
 {
   "code": 1,
@@ -453,9 +453,9 @@ GET /risk/proposal/player/{playerId}/pending?days=30
 
 ---
 
-## 4. Database Schema
+## 4. 資料庫架構（Database Schema）
 
-### 4.1 Risk Proposal Table
+### 4.1 風險提案表（Risk Proposal Table）
 
 ```sql
 CREATE TABLE t_risk_proposal (
@@ -501,7 +501,7 @@ CREATE TABLE t_risk_proposal (
 ) COMMENT='Risk Proposal Table';
 ```
 
-### 4.2 Risk Rule Configuration Table
+### 4.2 風險規則配置表（Risk Rule Configuration Table）
 
 ```sql
 CREATE TABLE t_risk_rule_config (
@@ -523,7 +523,7 @@ CREATE TABLE t_risk_rule_config (
 ) COMMENT='Risk Rule Configuration Table';
 ```
 
-### 4.3 Player Risk Profile Table
+### 4.3 玩家風險檔案表（Player Risk Profile Table）
 
 ```sql
 CREATE TABLE t_player_risk_profile (
@@ -562,7 +562,7 @@ CREATE TABLE t_player_risk_profile (
 ) COMMENT='Player Risk Profile Table';
 ```
 
-### 4.4 Account Linkage Tables
+### 4.4 帳戶關聯表（Account Linkage Tables）
 
 ```sql
 -- Account Linkage Table
@@ -606,7 +606,7 @@ CREATE TABLE t_device_fingerprint (
 );
 ```
 
-### 4.5 Index Design for Performance
+### 4.5 效能索引設計（Index Design for Performance）
 
 ```sql
 -- Optimized proposal query (covering index)
@@ -639,44 +639,44 @@ CREATE INDEX idx_linkage_high_risk ON t_account_linkage (player_id_a, weight)
 
 ---
 
-## 5. ML Model Architecture
+## 5. ML 模型架構（ML Model Architecture）
 
-### 5.1 Model Performance Benchmarks
+### 5.1 模型效能基準（Model Performance Benchmarks）
 
-| Model Type | Purpose | Accuracy Target | Latency Target | Status |
+| 模型類型 | 目的 | 準確率目標 | 延遲目標 | 狀態 |
 |------------|---------|-----------------|----------------|--------|
-| **Abnormal Bet Detection** | Identify suspicious betting patterns | >= 95% | < 50ms | Production |
-| **Multi-Account Detection** | Device/behavior clustering | >= 90% | < 100ms | Production |
-| **Bonus Abuse Detection** | Identify bonus abuse behavior | >= 85% | < 200ms | Beta |
-| **AML Risk Scoring** | AML risk grading | >= 80% | < 500ms | Beta |
-| **Fraud Transaction Detection** | Payment fraud identification | >= 92% | < 100ms | Production |
+| **異常下注偵測** | 識別可疑下注模式 | >= 95% | < 50ms | 生產環境 |
+| **多帳戶偵測** | 裝置/行為聚類 | >= 90% | < 100ms | 生產環境 |
+| **紅利濫用偵測** | 識別紅利濫用行為 | >= 85% | < 200ms | 測試版 |
+| **AML 風險評分** | AML 風險分級 | >= 80% | < 500ms | 測試版 |
+| **詐騙交易偵測** | 支付詐騙識別 | >= 92% | < 100ms | 生產環境 |
 
-### 5.2 Model Training Pipeline
+### 5.2 模型訓練流程（Model Training Pipeline）
 
 ```mermaid
 flowchart LR
-    subgraph Data Preparation
-        A[Historical Data] --> B[Feature Engineering]
-        B --> C[Data Cleaning]
-        C --> D[Train/Validation Split]
+    subgraph 資料準備
+        A[歷史資料] --> B[特徵工程]
+        B --> C[資料清理]
+        C --> D[訓練/驗證切分]
     end
 
-    subgraph Model Training
-        D --> E[Model Selection<br/>XGBoost/LightGBM]
-        E --> F[Hyperparameter Tuning<br/>Optuna]
-        F --> G[Cross Validation]
+    subgraph 模型訓練
+        D --> E[模型選擇<br/>XGBoost/LightGBM]
+        E --> F[超參數調優<br/>Optuna]
+        F --> G[交叉驗證]
     end
 
-    subgraph Evaluation Deployment
-        G --> H[Performance Evaluation<br/>F1, AUC-ROC]
-        H --> I{Pass?}
-        I -->|Yes| J[A/B Testing]
-        I -->|No| E
-        J --> K[Production Deploy]
+    subgraph 評估部署
+        G --> H[效能評估<br/>F1, AUC-ROC]
+        H --> I{通過?}
+        I -->|是| J[A/B 測試]
+        I -->|否| E
+        J --> K[生產部署]
     end
 ```
 
-### 5.3 Model Evaluation Metrics
+### 5.3 模型評估指標（Model Evaluation Metrics）
 
 ```java
 public class MLModelMetrics {
@@ -722,47 +722,47 @@ public class MLModelMetrics {
 }
 ```
 
-### 5.4 Model Drift Monitoring
+### 5.4 模型漂移監控（Model Drift Monitoring）
 
 ```yaml
-Model Drift Monitoring:
-  Data Drift:
-    - Feature distribution changes (KS Test, PSI)
-    - Missing value ratio changes
-    - New category values
+模型漂移監控:
+  資料漂移:
+    - 特徵分佈變化 (KS Test, PSI)
+    - 缺失值比例變化
+    - 新類別值出現
 
-  Concept Drift:
-    - Prediction distribution changes
-    - Accuracy decline trend
-    - False positive rate increase
+  概念漂移:
+    - 預測分佈變化
+    - 準確率下降趨勢
+    - 誤報率上升
 
-  Alert Thresholds:
-    - PSI > 0.2: Re-evaluate model
-    - F1 drop > 5%: Trigger retraining
-    - Latency increase > 50%: Optimize model
+  警報閾值:
+    - PSI > 0.2: 重新評估模型
+    - F1 下降 > 5%: 觸發重新訓練
+    - 延遲增加 > 50%: 優化模型
 ```
 
 ---
 
-## 6. Detection Flow Diagrams
+## 6. 偵測流程圖（Detection Flow Diagrams）
 
-### 6.1 Multi-Account Detection Flow
+### 6.1 多帳戶偵測流程（Multi-Account Detection Flow）
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Detected: System Detection
+    [*] --> Detected: 系統偵測
 
-    Detected --> Review: Weight >= 100
-    Detected --> Frozen: Weight >= 150 or Strong Link
+    Detected --> Review: 權重 >= 100
+    Detected --> Frozen: 權重 >= 150 或強關聯
 
-    Review --> Verified: Confirmed as Household
-    Review --> Frozen: Confirmed as Multi-Account
-    Review --> Cleared: False Positive
+    Review --> Verified: 確認為同住家人
+    Review --> Frozen: 確認為多帳戶
+    Review --> Cleared: 誤報
 
-    Frozen --> Investigation: Manual Investigation
-    Investigation --> Merged: Merge Accounts
-    Investigation --> Terminated: Terminate Account
-    Investigation --> Unfrozen: Unfreeze
+    Frozen --> Investigation: 人工調查
+    Investigation --> Merged: 合併帳戶
+    Investigation --> Terminated: 終止帳戶
+    Investigation --> Unfrozen: 解凍
 
     Verified --> [*]
     Cleared --> [*]
@@ -771,58 +771,58 @@ stateDiagram-v2
     Unfrozen --> [*]
 ```
 
-### 6.2 Identity Farm Detection Flow
+### 6.2 身份農場偵測流程（Identity Farm Detection Flow）
 
 ```mermaid
 stateDiagram-v2
     [*] --> DetectionSignal
 
-    DetectionSignal --> ClusterAnalysis: Multiple Signals Overlap
-    ClusterAnalysis --> FarmIdentified: Confirm Account Group
+    DetectionSignal --> ClusterAnalysis: 多個信號重疊
+    ClusterAnalysis --> FarmIdentified: 確認帳戶群組
 
-    FarmIdentified --> BatchFreeze: Freeze All Related Accounts
+    FarmIdentified --> BatchFreeze: 凍結所有相關帳戶
     note right of BatchFreeze
-        Freeze Reason: Identity Farm
-        Preserve Evidence Snapshot
+        凍結原因: 身份農場
+        保留證據快照
     end note
 
     BatchFreeze --> Investigation
 
-    Investigation --> ConfirmedFraud: Sufficient Evidence
-    Investigation --> PartialUnfreeze: Legitimate Accounts Exist
+    Investigation --> ConfirmedFraud: 證據充分
+    Investigation --> PartialUnfreeze: 存在合法帳戶
 
-    ConfirmedFraud --> BatchTerminate: Terminate All Accounts
-    ConfirmedFraud --> SARReport: Involves Money Laundering
+    ConfirmedFraud --> BatchTerminate: 終止所有帳戶
+    ConfirmedFraud --> SARReport: 涉及洗錢
 
     PartialUnfreeze --> [*]
     BatchTerminate --> [*]
     SARReport --> [*]
 ```
 
-### 6.3 Network Correlation Graph
+### 6.3 網路關聯圖（Network Correlation Graph）
 
 ```mermaid
 graph LR
-    subgraph Player A Network
+    subgraph 玩家 A 網路
         A1[IP: 203.0.113.1]
         A2[Device: FP-001]
         A3[Phone: +886-912-xxx]
     end
 
-    subgraph Player B Network
+    subgraph 玩家 B 網路
         B1[IP: 203.0.113.1]
         B2[Device: FP-002]
         B3[Phone: +886-913-xxx]
     end
 
-    subgraph Player C Network
+    subgraph 玩家 C 網路
         C1[IP: 203.0.113.50]
         C2[Device: FP-001]
         C3[Phone: +886-914-xxx]
     end
 
-    A1 ---|Same IP| B1
-    A2 ---|Same Device| C2
+    A1 ---|相同 IP| B1
+    A2 ---|相同裝置| C2
 
     style A1 fill:#f9f,stroke:#333
     style B1 fill:#f9f,stroke:#333
@@ -832,18 +832,18 @@ graph LR
 
 ---
 
-## 7. Performance Optimization
+## 7. 效能優化（Performance Optimization）
 
-### 7.1 Redis Cache Strategy
+### 7.1 Redis 快取策略（Redis Cache Strategy）
 
-| Cache Level | Key Format | TTL | Purpose |
+| 快取層級 | Key 格式 | TTL | 目的 |
 |-------------|------------|-----|---------|
-| **L1 - Proposal List** | `risk:proposal:player:{playerId}:days:{days}` | 5 min | Player pending proposals |
-| **L2 - Proposal Detail** | `risk:proposal:detail:{proposalId}` | 10 min | Single proposal full info |
-| **L3 - Risk Profile** | `risk:profile:player:{playerId}` | 30 min | Player risk profile |
-| **L4 - Rule Config** | `risk:rule:config:game:{gameType}` | 1 hour | Game type rule config |
+| **L1 - 提案列表** | `risk:proposal:player:{playerId}:days:{days}` | 5 分鐘 | 玩家待審核提案 |
+| **L2 - 提案詳情** | `risk:proposal:detail:{proposalId}` | 10 分鐘 | 單一提案完整資訊 |
+| **L3 - 風險檔案** | `risk:profile:player:{playerId}` | 30 分鐘 | 玩家風險檔案 |
+| **L4 - 規則配置** | `risk:rule:config:game:{gameType}` | 1 小時 | 遊戲類型規則配置 |
 
-### 7.2 Query Performance Optimization
+### 7.2 查詢效能優化（Query Performance Optimization）
 
 ```java
 /**
@@ -867,20 +867,20 @@ public class RiskProposalService {
 }
 ```
 
-### 7.3 Performance Targets
+### 7.3 效能目標（Performance Targets）
 
-| Metric | Target | Alert Threshold |
+| 指標 | 目標 | 警報閾值 |
 |--------|--------|-----------------|
-| Proposal Query (P95) | <100ms | >200ms |
-| Cache Hit Rate | >95% | <90% |
-| Kafka Event Latency | <50ms | >100ms |
-| DB Connection Pool | <50% | >80% |
+| 提案查詢（P95） | <100ms | >200ms |
+| 快取命中率 | >95% | <90% |
+| Kafka 事件延遲 | <50ms | >100ms |
+| DB 連線池使用率 | <50% | >80% |
 
 ---
 
-## 8. Monitoring and Alerting
+## 8. 監控與警報（Monitoring and Alerting）
 
-### 8.1 Prometheus Metrics
+### 8.1 Prometheus 指標（Prometheus Metrics）
 
 ```yaml
 # Business Metrics
@@ -920,7 +920,7 @@ ml_model_drift_score:
   description: "Model drift score (PSI)"
 ```
 
-### 8.2 AlertManager Rules
+### 8.2 AlertManager 規則（AlertManager Rules）
 
 ```yaml
 groups:
@@ -959,9 +959,9 @@ groups:
 
 ---
 
-## 9. Testing Strategy
+## 9. 測試策略（Testing Strategy）
 
-### 9.1 Unit Tests
+### 9.1 單元測試（Unit Tests）
 
 ```java
 @SpringBootTest
@@ -1014,7 +1014,7 @@ class RiskProposalServiceTest {
 }
 ```
 
-### 9.2 Integration Tests
+### 9.2 整合測試（Integration Tests）
 
 ```java
 @SpringBootTest
@@ -1070,29 +1070,29 @@ class WithdrawalDeferredRiskCheckIntegrationTest {
 
 ---
 
-## Related Documents
+## 相關文檔（Related Documents）
 
-- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - Risk system overall architecture
-- [05-02-01 Detection Model](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) - 5-layer architecture details
-- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) - Proposal service & deferred check
-- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) - Multi-dimensional rules
-- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) - Monitoring & alerting
-- [05-02-05 Multi-Account Detection](../../source-archive/05_Risk_Control/05-02-05_Multi_Account_Detection.md) - Device fingerprinting
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) - 風險系統整體架構
+- [05-02-01 Detection Model](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md) - 五層架構詳細說明
+- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) - 提案服務與延遲檢查
+- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) - 多維度規則
+- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) - 監控與警報
+- [05-02-05 Multi-Account Detection](../../source-archive/05_Risk_Control/05-02-05_Multi_Account_Detection.md) - 裝置指紋識別
 
 ---
 
-## Change Log
+## 變更日誌（Change Log）
 
 ### v1.0.0 (2026-02-08)
 
-**Initial Version**:
-- Extracted technical architecture from source documents
-- System architecture overview (5-layer design)
-- SmartAdmin architecture mapping (Controller/Service/Manager/Dao/Entity)
-- API specifications with code examples
-- Database schema with index optimization
-- ML model architecture and training pipeline
-- Mermaid diagrams (detection flows, correlation graphs)
-- Performance optimization strategies
-- Monitoring and alerting configuration
-- Testing strategy with code examples
+**初始版本**:
+- 從源文檔提取技術架構
+- 系統架構概覽（五層設計）
+- SmartAdmin 架構對應（Controller/Service/Manager/Dao/Entity）
+- API 規範與程式碼範例
+- 資料庫架構與索引優化
+- ML 模型架構與訓練流程
+- Mermaid 圖表（偵測流程、關聯圖）
+- 效能優化策略
+- 監控與警報配置
+- 測試策略與程式碼範例

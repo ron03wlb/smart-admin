@@ -1,25 +1,25 @@
-# 04 Activity Engine
+# 04 活動引擎（Activity Engine）
 
-> **Audience**: Architects, Backend Developers, DevOps
-> **Status**: Phase 6 Complete - 3 split documents + source index
-
----
-
-## Split Documents
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| [Bonus Calculation Engine](Bonus_Calculation_Engine.md) | Calculation pipeline, game weight factors, SmartAdmin layer mapping | [source](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md) |
-| [Activity Risk System](Activity_Risk_System.md) | Multi-layer risk assessment, matched betting detection, bonus hunter detection | [source](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md) |
-| [Promotion Implementation](Promotion_Implementation.md) | Bonus engine with Redisson distributed lock, wagering calculation, VIP tier change | [source](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md) |
-
-## Source Index
-
-| Document | Description | Source |
-|----------|-------------|--------|
-| Activity Risk Control | Bonus abuse detection, promotion fraud prevention | [source](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md) |
-| Activity Bonus | Bonus distribution logic, eligibility engine | [source](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) |
+> **目標讀者**: 架構師、後端開發、DevOps
+> **狀態**: Phase 6 完成 — 3 份拆分文檔 + 來源索引
 
 ---
 
-**Last Updated**: 2026-02-08
+## 拆分文檔
+
+| 文件 | 說明 | 來源 |
+|------|------|------|
+| [獎金計算引擎](Bonus_Calculation_Engine.md) | 計算管線、遊戲權重因子、SmartAdmin 層級對應 | [來源](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md) |
+| [活動風控系統](Activity_Risk_System.md) | 多層風險評估、配對投注偵測、獎金獵人偵測 | [來源](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md) |
+| [促銷活動實作](Promotion_Implementation.md) | 使用 Redisson 分散式鎖的獎金引擎、有效投注額計算、VIP 等級變更 | [來源](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md) |
+
+## 來源索引
+
+| 文件 | 說明 | 來源 |
+|------|------|------|
+| 活動風控 | 獎金濫用偵測、促銷詐騙防範 | [來源](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md) |
+| 活動獎金 | 獎金發放邏輯、資格引擎 | [來源](../../source-archive/04_Activity_Center/04-04_Activity_Bonus.md) |
+
+---
+
+**最後更新**: 2026-02-08

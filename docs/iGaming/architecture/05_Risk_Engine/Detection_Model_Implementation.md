@@ -1,118 +1,118 @@
-# Detection Model Implementation
+# 偵測模型技術實作（Detection Model Implementation）
 
-> **Canonical Source**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
-> **Audience**: Architects, Backend Engineers, Risk Team Engineers
-> **Business Requirements**: [Detection_Model_Spec.md](../../requirements/05_Risk_Compliance/Detection_Model_Spec.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [05-02-01_Detection_Model.md](../../source-archive/05_Risk_Control/05-02-01_Detection_Model.md)
+> **目標讀者**: 架構師、後端工程師、風控團隊工程師
+> **業務需求**: [Detection_Model_Spec.md](../../requirements/05_Risk_Compliance/Detection_Model_Spec.md)
+> **最後同步**: 2026-02-09
 >
-> **Technical Focus**: This document contains implementation details (TCC pattern, SAGA flow, rule engine integration) extracted from Requirements layer.
+> **技術重點**: 本文檔包含從需求層提取的實作細節（TCC 模式、SAGA 流程、規則引擎整合）。
 
 ---
 
-## 1. Executive Summary
+## 1. 摘要（Executive Summary）
 
-SmartAdmin iGaming v2.1.0 introduces a Configuration-Driven Risk Control System with a five-layer architecture. This document covers the technical implementation details: system architecture, event-driven processing, rule engine integration, and data flow.
+SmartAdmin iGaming v2.1.0 引入配置驅動的風險控制系統，採用五層架構設計。本文檔涵蓋技術實作細節：系統架構、事件驅動處理、規則引擎整合及數據流動。
 
-### Prerequisites
+### 前置文件（Prerequisites）
 
-- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) -- Configuration-driven rule engine (Section 9)
-- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) -- SAGA Step 2.5 deferred risk check
-- [02-04 Turnover Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) -- Layer 1 processing flow
+- [05-01 Risk Framework](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md) -- 配置驅動規則引擎（第9節）
+- [01-05 Withdrawal Risk](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) -- SAGA Step 2.5 延遲風險檢查
+- [02-04 Turnover Reconciliation](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) -- Layer 1 處理流程
 
 ---
 
-## 2. Configuration-Driven Architecture
+## 2. 配置驅動架構（Configuration-Driven Architecture）
 
-### 2.1 Concept
+### 2.1 概念（Concept）
 
-Configuration-Driven Risk Control decouples rule action types (BLOCK / FLAG / IGNORE) from application code into database configuration tables.
+配置驅動風險控制（Configuration-Driven Risk Control）將規則動作類型（BLOCK / FLAG / IGNORE）從應用程式程式碼解耦至資料庫配置表。
 
 ```
-Configuration-Driven Risk Control =
-    Async Active Risk (BLOCK generates HIGH priority proposal)
-  + Async Passive Risk (FLAG generates MEDIUM priority proposal)
-  + Log-Only (IGNORE)
+配置驅動風險控制 =
+    主動風險（BLOCK 產生 HIGH 優先級提案）
+  + 被動風險（FLAG 產生 MEDIUM 優先級提案）
+  + 僅記錄（IGNORE）
          |                          |                    |
-    Async post-bet analysis    Async post-bet analysis  Log only
-    Generates Risk Proposal    Generates Risk Proposal
-    (Priority: HIGH)           (Priority: MEDIUM)
+    投注後非同步分析          投注後非同步分析        僅記錄
+    產生風險提案              產生風險提案
+    （優先級：HIGH）          （優先級：MEDIUM）
 ```
 
-### 2.2 Design Principles
+### 2.2 設計原則（Design Principles）
 
-- **Synchronous blocking** is limited to: blacklisted players, IP bans, account freezes (Layer 1 fast checks)
-- **All BLOCK/FLAG rules** execute asynchronously after bet success (Layer 3 risk analysis)
-- **BLOCK rules do not reject bets**; they generate high-priority Risk Proposals for human review
-- **Fund interception** occurs at withdrawal time -- deferred check (Layer 5 -- SAGA Step 2.5)
+- **同步阻斷（Synchronous blocking）** 僅限於：黑名單玩家、IP封禁、帳戶凍結（Layer 1 快速檢查）
+- **所有 BLOCK/FLAG 規則** 在投注成功後非同步執行（Layer 3 風險分析）
+- **BLOCK 規則不拒絕投注**；它們為人工審核產生高優先級風險提案
+- **資金攔截** 發生在提款時 -- 延遲檢查（Layer 5 -- SAGA Step 2.5）
 
-### 2.3 Advantages
+### 2.3 優勢（Advantages）
 
-| Advantage | Technical Rationale |
-|-----------|---------------------|
-| Zero false kills | Bet already succeeded; risk only flags post-hoc |
-| High availability | Risk engine failure does not block betting (Fail Open principle) |
-| Low latency | Bet response time unaffected by risk analysis (async processing) |
-| Flexibility | Operators adjust rule priority (HIGH/MEDIUM/LOW) via config |
-| Compliance | Aligned with DraftKings/FanDuel/Bet365/UKGC best practices |
+| 優勢 | 技術理由 |
+|------|----------|
+| 零誤殺 | 投注已成功；風險僅事後標記 |
+| 高可用性 | 風險引擎故障不阻斷投注（Fail Open 原則） |
+| 低延遲 | 投注響應時間不受風險分析影響（非同步處理） |
+| 靈活性 | 營運商透過配置調整規則優先級（HIGH/MEDIUM/LOW） |
+| 合規性 | 符合 DraftKings/FanDuel/Bet365/UKGC 最佳實踐 |
 
 ---
 
-## 3. Five-Layer System Architecture
+## 3. 五層系統架構（Five-Layer System Architecture）
 
 ```mermaid
 graph TD
-    A[Bet Request<br/>Player Bet Request] --> B{Layer 1: Synchronous Blacklist Check<br/>Response Time: <10ms}
+    A[投注請求<br/>玩家投注請求] --> B{Layer 1: 同步黑名單檢查<br/>響應時間: <10ms}
 
-    B -->|Redis Cache Lookup| C{Check Result}
+    B -->|Redis Cache 查詢| C{檢查結果}
 
-    C -->|Hit: Blacklist/Frozen/IP Blocked| D[Reject Bet<br/>Return: Explicit Rejection Reason]
+    C -->|命中: 黑名單/凍結/IP封禁| D[拒絕投注<br/>返回: 明確拒絕原因]
 
-    C -->|Pass| E[Layer 2: TCC Transaction Processing]
+    C -->|通過| E[Layer 2: TCC 交易處理]
 
-    E --> E1[Try Phase: Freeze Resources<br/>Bonus + Cash + Credit]
-    E1 --> E2[Confirm Phase:<br/>Deduct Funds + Write Transaction Logs]
-    E2 --> E3[Write outbox_event]
-    E3 --> E4[Commit DB Transaction]
+    E --> E1[Try Phase: 凍結資源<br/>Bonus + Cash + Credit]
+    E1 --> E2[Confirm Phase:<br/>扣除資金 + 寫入交易日誌]
+    E2 --> E3[寫入 outbox_event]
+    E3 --> E4[提交 DB 交易]
 
-    E4 --> F[Bet Success<br/>Player Sees Bet Result]
+    E4 --> F[投注成功<br/>玩家看到投注結果]
 
-    F -.->|Async Event| G[Layer 3: Async Risk Analysis<br/>Event-Driven]
+    F -.->|非同步事件| G[Layer 3: 非同步風險分析<br/>事件驅動]
 
     G --> G1[Kafka Consumer<br/>Topic: wallet.debited<br/>Payload: player_id, bet_id,<br/>amount, game_type]
 
-    G1 --> G2[Risk Engine Executes All Rules<br/>Load t_risk_rule_config<br/>Execute enabled rules<br/>Return matched_rules]
+    G1 --> G2[Risk Engine 執行所有規則<br/>載入 t_risk_rule_config<br/>執行已啟用規則<br/>返回 matched_rules]
 
-    G2 --> G3{Decision Routing<br/>Based on action_type}
+    G2 --> G3{決策路由<br/>基於 action_type}
 
-    G3 -->|action_type = BLOCK<br/>and matched| G4[Generate Risk Proposal<br/>Priority: HIGH<br/>Mark matched_rules<br/>Calculate suspicious_amount]
+    G3 -->|action_type = BLOCK<br/>且匹配| G4[產生風險提案<br/>優先級: HIGH<br/>標記 matched_rules<br/>計算 suspicious_amount]
 
-    G3 -->|action_type = FLAG<br/>and matched| G5[Generate Risk Proposal<br/>Priority: MEDIUM<br/>Mark flagged_rules]
+    G3 -->|action_type = FLAG<br/>且匹配| G5[產生風險提案<br/>優先級: MEDIUM<br/>標記 flagged_rules]
 
-    G3 -->|action_type = IGNORE| G6[Log Only]
+    G3 -->|action_type = IGNORE| G6[僅記錄]
 
-    G4 --> H[Layer 4: Human Review and Disposition]
+    G4 --> H[Layer 4: 人工審核與處置]
     G5 --> H
 
-    H --> H1[Reviewer Checks Proposal Details]
-    H1 --> H2{Review Decision}
+    H --> H1[審核員檢查提案詳情]
+    H1 --> H2{審核決策}
 
-    H2 -->|APPROVED| H3[No Action<br/>Continue Monitoring]
+    H2 -->|APPROVED| H3[不採取行動<br/>繼續監控]
 
-    H2 -->|REJECTED| H4[Freeze Account + Mark Funds<br/>Update t_player_risk_profile<br/>Write account_freeze_log<br/>Write suspicious_fund_marker]
+    H2 -->|REJECTED| H4[凍結帳戶 + 標記資金<br/>更新 t_player_risk_profile<br/>寫入 account_freeze_log<br/>寫入 suspicious_fund_marker]
 
-    H2 -->|PARTIAL| H5[Partial Freeze]
+    H2 -->|PARTIAL| H5[部分凍結]
 
-    F -.->|Player Requests Withdrawal| I[Layer 5: Withdrawal Deferred Check<br/>SAGA Step 2.5]
+    F -.->|玩家請求提款| I[Layer 5: 提款延遲檢查<br/>SAGA Step 2.5]
 
-    I --> I1[Query Historical Risk Proposals<br/>Time Window: 30 Days]
+    I --> I1[查詢歷史風險提案<br/>時間窗口: 30天]
 
-    I1 --> I2[Calculate Suspicious Amount Sum]
+    I1 --> I2[計算可疑金額總和]
 
-    I2 --> I3{Decision}
+    I2 --> I3{決策}
 
-    I3 -->|Suspicious Amount = 0| I4[Continue Withdrawal]
+    I3 -->|可疑金額 = 0| I4[繼續提款]
 
-    I3 -->|Suspicious Amount > 0| I5[Freeze Amount<br/>Generate Manual Review Proposal<br/>Route to Review Queue]
+    I3 -->|可疑金額 > 0| I5[凍結金額<br/>產生人工審核提案<br/>路由至審核佇列]
 
     style A fill:#e1f5ff
     style B fill:#fff4e1
@@ -140,28 +140,28 @@ graph TD
 
 ---
 
-## 4. Layer Details
+## 4. 層級細節（Layer Details）
 
-### 4.1 Layer 1: Synchronous Blacklist Check (< 10ms)
+### 4.1 Layer 1: 同步黑名單檢查（Synchronous Blacklist Check）（< 10ms）
 
-- **Data source**: Redis cache
-- **Checked conditions**: Blacklisted players, IP bans, frozen accounts, self-exclusion lists (UKGC/MGA)
-- **Fail Open**: If the risk system is down, bets are allowed through by default
+- **資料來源**: Redis 快取
+- **檢查條件**: 黑名單玩家、IP 封禁、凍結帳戶、自我排除清單（Self-Exclusion）（UKGC/MGA）
+- **Fail Open**: 如果風險系統故障，預設允許投注
 
-### 4.2 Layer 2: TCC Transaction Processing
+### 4.2 Layer 2: TCC 交易處理（TCC Transaction Processing）
 
 ```
-Try Phase   --> Freeze resources (Bonus + Cash + Credit)
-Confirm Phase --> Actual deduction + write transaction logs
-                  Write outbox_event
-                  Commit DB transaction
+Try Phase   --> 凍結資源（Bonus + Cash + Credit）
+Confirm Phase --> 實際扣除 + 寫入交易日誌
+                  寫入 outbox_event
+                  提交 DB 交易
 ```
 
-The player sees their bet result immediately after Layer 2 completes.
+Layer 2 完成後，玩家立即看到投注結果。
 
-### 4.3 Layer 3: Async Risk Analysis (Event-Driven, ~5s)
+### 4.3 Layer 3: 非同步風險分析（Async Risk Analysis）（事件驅動，~5秒）
 
-**Event Pipeline**:
+**事件管道（Event Pipeline）**:
 
 ```
 outbox_event --> Kafka Topic: wallet.debited --> Risk Analysis Consumer
@@ -175,76 +175,76 @@ Kafka Payload:
 }
 ```
 
-**Rule Execution Flow**:
+**規則執行流程（Rule Execution Flow）**:
 
 ```
-1. Load enabled rules from t_risk_rule_config
-2. Execute each rule against the bet context
-3. Collect matched_rules
-4. Route by action_type:
-   - BLOCK + matched --> Risk Proposal (Priority: HIGH)
-   - FLAG + matched  --> Risk Proposal (Priority: MEDIUM)
-   - IGNORE          --> Log only
+1. 從 t_risk_rule_config 載入已啟用規則
+2. 對投注上下文執行每條規則
+3. 收集 matched_rules
+4. 依 action_type 路由：
+   - BLOCK + 匹配 --> 風險提案（優先級: HIGH）
+   - FLAG + 匹配  --> 風險提案（優先級: MEDIUM）
+   - IGNORE       --> 僅記錄
 ```
 
-### 4.4 Layer 4: Human Review and Disposition
+### 4.4 Layer 4: 人工審核與處置（Human Review and Disposition）
 
-Review outcomes and their system actions:
+審核結果及其系統行動：
 
-| Decision | System Actions |
-|----------|---------------|
-| APPROVED | No action; continue monitoring |
-| REJECTED | Freeze account; mark suspicious funds; update `t_player_risk_profile`; write `account_freeze_log`; write `suspicious_fund_marker` |
-| PARTIAL | Partial freeze applied |
+| 決策 | 系統行動 |
+|------|----------|
+| APPROVED | 不採取行動；繼續監控 |
+| REJECTED | 凍結帳戶；標記可疑資金；更新 `t_player_risk_profile`；寫入 `account_freeze_log`；寫入 `suspicious_fund_marker` |
+| PARTIAL | 應用部分凍結 |
 
-### 4.5 Layer 5: Withdrawal Deferred Check (SAGA Step 2.5)
+### 4.5 Layer 5: 提款延遲檢查（Withdrawal Deferred Check）（SAGA Step 2.5）
 
 ```
-1. Query historical Risk Proposals (time window: 30 days)
-2. Calculate sum of suspicious_amount across all proposals
-3. Decision:
-   - suspicious_amount = 0 --> Continue withdrawal
-   - suspicious_amount > 0 --> Freeze amount + generate manual review proposal
+1. 查詢歷史風險提案（時間窗口：30天）
+2. 計算所有提案的 suspicious_amount 總和
+3. 決策：
+   - suspicious_amount = 0 --> 繼續提款
+   - suspicious_amount > 0 --> 凍結金額 + 產生人工審核提案
 ```
 
 ---
 
-## 5. Applicable Risk Scenarios
+## 5. 適用風險場景（Applicable Risk Scenarios）
 
-### 5.1 Layer 1 -- Synchronous Block Scenarios
+### 5.1 Layer 1 -- 同步阻斷場景（Synchronous Block Scenarios）
 
-| Scenario | Check Method |
-|----------|-------------|
-| Blacklisted Player | Redis SET lookup |
-| IP Blocked | Redis SET lookup |
-| Account Frozen | Redis hash field check |
-| Self-Exclusion (UKGC/MGA) | Redis SET lookup |
+| 場景 | 檢查方法 |
+|------|----------|
+| 黑名單玩家 | Redis SET 查詢 |
+| IP 封禁 | Redis SET 查詢 |
+| 帳戶凍結 | Redis hash field 檢查 |
+| 自我排除（Self-Exclusion）（UKGC/MGA） | Redis SET 查詢 |
 
-### 5.2 Layer 3 -- Async BLOCK Rules
+### 5.2 Layer 3 -- 非同步 BLOCK 規則（Async BLOCK Rules）
 
-| Rule | Detection Method |
-|------|-----------------|
-| Bot Detection | Behavioural feature analysis (bet timing, pattern regularity) |
-| Same-Match Hedging | Historical bet query for same match, opposite outcomes |
-| Same-IP Arbitrage | Correlation analysis across accounts sharing IP |
-| Abnormal Odds Detection | Statistical analysis of odds selection distribution |
-| Turnover Manipulation | Turnover velocity calculation against deposit ratio |
+| 規則 | 偵測方法 |
+|------|----------|
+| 機器人偵測（Bot Detection） | 行為特徵分析（投注時機、模式規律性） |
+| 同場對沖（Same-Match Hedging） | 同場比賽歷史投注查詢，對立結果 |
+| 同 IP 套利（Same-IP Arbitrage） | 共享 IP 帳戶的相關性分析 |
+| 異常賠率偵測（Abnormal Odds Detection） | 賠率選擇分佈的統計分析 |
+| 流水操控（Turnover Manipulation） | 流水速度計算與存款比率對比 |
 
-### 5.3 Layer 3 -- Async FLAG Rules
+### 5.3 Layer 3 -- 非同步 FLAG 規則（Async FLAG Rules）
 
-| Rule | Detection Method |
-|------|-----------------|
-| Cross-Match Hedging | Cross-match bet correlation (lower risk) |
-| Low-Odds Turnover (< 1.5) | Odds threshold check |
-| Abnormal Betting Pattern | Pattern deviation from player baseline |
-| High-Frequency Betting (> 10/min) | Sliding window count |
+| 規則 | 偵測方法 |
+|------|----------|
+| 跨場對沖（Cross-Match Hedging） | 跨場比賽投注相關性（較低風險） |
+| 低賠率流水（< 1.5）（Low-Odds Turnover） | 賠率閾值檢查 |
+| 異常投注模式（Abnormal Betting Pattern） | 模式偏離玩家基線 |
+| 高頻投注（> 10次/分鐘）（High-Frequency Betting） | 滑動窗口計數 |
 
 ---
 
-## 6. Database Schema (PostgreSQL)
+## 6. 資料庫架構（Database Schema）（PostgreSQL）
 
 ### detection_models
-Stores risk detection model configurations and rules.
+儲存風險偵測模型配置和規則。
 
 ```sql
 CREATE TABLE detection_models (
@@ -291,14 +291,14 @@ CREATE INDEX idx_detection_models_layer_action ON detection_models(layer, action
 CREATE INDEX idx_detection_models_type ON detection_models(model_type) WHERE is_enabled = TRUE;
 CREATE INDEX idx_detection_models_effective ON detection_models(effective_from, effective_to) WHERE is_enabled = TRUE;
 
-COMMENT ON TABLE detection_models IS 'Risk detection model configurations for five-layer risk control system';
-COMMENT ON COLUMN detection_models.layer IS '1=Synchronous blacklist check, 3=Async risk analysis, 5=Withdrawal deferred check';
-COMMENT ON COLUMN detection_models.action_type IS 'BLOCK=Generate HIGH priority proposal, FLAG=Generate MEDIUM priority proposal, IGNORE=Log only';
-COMMENT ON COLUMN detection_models.rule_definition IS 'JSONB configuration for rule-specific logic (SQL queries, ML model params, threshold conditions)';
+COMMENT ON TABLE detection_models IS '五層風險控制系統的風險偵測模型配置';
+COMMENT ON COLUMN detection_models.layer IS '1=同步黑名單檢查, 3=非同步風險分析, 5=提款延遲檢查';
+COMMENT ON COLUMN detection_models.action_type IS 'BLOCK=產生 HIGH 優先級提案, FLAG=產生 MEDIUM 優先級提案, IGNORE=僅記錄';
+COMMENT ON COLUMN detection_models.rule_definition IS 'JSONB 配置，用於規則特定邏輯（SQL 查詢、ML 模型參數、閾值條件）';
 ```
 
 ### detection_results
-Tracks risk detection execution results and matched rules.
+追蹤風險偵測執行結果和匹配規則。
 
 ```sql
 CREATE TABLE detection_results (
@@ -355,15 +355,15 @@ CREATE INDEX idx_detection_results_proposal ON detection_results(risk_proposal_i
 CREATE INDEX idx_detection_results_review_pending ON detection_results(detected_at DESC) WHERE review_decision IS NULL AND matched = TRUE;
 CREATE INDEX idx_detection_results_layer_event ON detection_results(layer, event_type, detected_at DESC);
 
-COMMENT ON TABLE detection_results IS 'Risk detection execution results for all layers (sync, async, withdrawal)';
-COMMENT ON COLUMN detection_results.matched IS 'TRUE if detection rule was triggered, FALSE otherwise';
-COMMENT ON COLUMN detection_results.suspicious_amount IS 'Amount flagged for review or freeze (used in Layer 5 withdrawal check)';
-COMMENT ON COLUMN detection_results.rule_snapshot IS 'Immutable snapshot of detection_models configuration at execution time';
+COMMENT ON TABLE detection_results IS '所有層級（同步、非同步、提款）的風險偵測執行結果';
+COMMENT ON COLUMN detection_results.matched IS 'TRUE 表示偵測規則被觸發，FALSE 表示未觸發';
+COMMENT ON COLUMN detection_results.suspicious_amount IS '標記供審核或凍結的金額（用於 Layer 5 提款檢查）';
+COMMENT ON COLUMN detection_results.rule_snapshot IS '執行時 detection_models 配置的不可變快照';
 ```
 
-### Query Examples
+### 查詢範例（Query Examples）
 
-**Analyze detection model effectiveness:**
+**分析偵測模型效能:**
 ```sql
 SELECT
     dm.model_name,
@@ -381,7 +381,7 @@ GROUP BY dm.model_id, dm.model_name, dm.model_type, dm.action_type
 ORDER BY confirmed_fraud DESC;
 ```
 
-**Calculate suspicious amount for withdrawal deferred check (Layer 5):**
+**計算提款延遲檢查的可疑金額（Layer 5）:**
 ```sql
 SELECT
     player_id,
@@ -397,7 +397,7 @@ WHERE player_id = 'player-uuid-001'
 GROUP BY player_id;
 ```
 
-**Audit Layer 1 synchronous blocks:**
+**審計 Layer 1 同步阻斷:**
 ```sql
 SELECT
     DATE_TRUNC('hour', detected_at) AS hour,
@@ -415,51 +415,59 @@ ORDER BY hour DESC, block_count DESC;
 
 ---
 
-## 7. Architecture Comparison (v2.1.0 vs v3.0.0)
+## 7. 架構比較（Architecture Comparison）（v2.1.0 vs v3.0.0）
 
-| Aspect | v2.1.0 (Synchronous) | v3.0.0 (Async Event-Driven) |
-|--------|----------------------|------------------------------|
-| Risk Trigger Timing | During bet request (sync) | After bet success (async) |
-| BLOCK Rule Handling | Reject bet | Generate HIGH priority proposal |
-| FLAG Rule Handling | Allow bet + generate proposal | Generate MEDIUM priority proposal |
-| Blacklist Check | Mixed with other rules | Independent synchronous check layer |
-| Fund Interception | At bet time (blocking) | At withdrawal time (deferred) |
-| False Positive Rate | 5--10% normal players rejected | Zero false rejections |
-| Availability | SPOF (risk down = bets fail) | HA (risk down does not affect bets) |
-
----
-
-## 7. Key Design Decisions
-
-### 7.1 Minimal Synchronous Blocking (Layer 1)
-- Only hard rules checked: blacklist, IP ban, account freeze
-- Redis cache for < 10ms response time
-- Fail Open: risk system failure defaults to allow
-
-### 7.2 Bet-First Completion (Layer 2)
-- TCC transaction model ensures bet success
-- Player sees result immediately
-- Risk analysis does not impact betting experience
-
-### 7.3 Async Risk Analysis (Layer 3)
-- Kafka + event-driven architecture
-- All rules analysed within ~5 seconds
-- BLOCK/FLAG generate Risk Proposals; bets are never rejected
-
-### 7.4 Human-Primary Review (Layer 4)
-- Automation generates proposals only
-- Final decisions made by human reviewers
-- Avoids ML model false positives
-
-### 7.5 Post-Hoc Fund Interception (Layer 5)
-- Withdrawal triggers historical proposal query (30-day window)
-- Suspicious amounts intercepted at withdrawal stage
-- Aligned with DraftKings/FanDuel/Bet365/UKGC industry practices
+| 面向 | v2.1.0（同步） | v3.0.0（非同步事件驅動） |
+|------|----------------|--------------------------|
+| 風險觸發時機 | 投注請求期間（同步） | 投注成功後（非同步） |
+| BLOCK 規則處理 | 拒絕投注 | 產生 HIGH 優先級提案 |
+| FLAG 規則處理 | 允許投注 + 產生提案 | 產生 MEDIUM 優先級提案 |
+| 黑名單檢查 | 與其他規則混合 | 獨立同步檢查層 |
+| 資金攔截 | 投注時（阻斷） | 提款時（延遲） |
+| 誤報率（False Positive Rate） | 5--10% 正常玩家被拒絕 | 零誤拒 |
+| 可用性（Availability） | SPOF（風險故障 = 投注失敗） | HA（風險故障不影響投注） |
 
 ---
 
-## 8. Related Documents
+## 7. 關鍵設計決策（Key Design Decisions）
 
-- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) -- Risk proposal service and deferred checks
-- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) -- Multi-dimensional risk rules
-- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin architecture mapping and monitoring
+### 7.1 最小同步阻斷（Minimal Synchronous Blocking）（Layer 1）
+- 僅檢查硬規則：黑名單、IP 封禁、帳戶凍結
+- Redis 快取以達成 < 10ms 響應時間
+- Fail Open: 風險系統故障預設為允許
+
+### 7.2 投注優先完成（Bet-First Completion）（Layer 2）
+- TCC 交易模型確保投注成功
+- 玩家立即看到結果
+- 風險分析不影響投注體驗
+
+### 7.3 非同步風險分析（Async Risk Analysis）（Layer 3）
+- Kafka + 事件驅動架構
+- 所有規則在 ~5 秒內分析完成
+- BLOCK/FLAG 產生風險提案；投注絕不被拒絕
+
+### 7.4 人工主導審核（Human-Primary Review）（Layer 4）
+- 自動化僅產生提案
+- 最終決策由人工審核員做出
+- 避免 ML 模型誤報
+
+### 7.5 事後資金攔截（Post-Hoc Fund Interception）（Layer 5）
+- 提款觸發歷史提案查詢（30天窗口）
+- 可疑金額在提款階段攔截
+- 符合 DraftKings/FanDuel/Bet365/UKGC 產業實踐
+
+---
+
+## 8. 相關文件（Related Documents）
+
+- [05-02-02 Rule Configuration](../../source-archive/05_Risk_Control/05-02-02_Rule_Configuration.md) -- 風險提案服務與延遲檢查
+- [05-02-03 ML Integration](../../source-archive/05_Risk_Control/05-02-03_ML_Integration.md) -- 多維度風險規則
+- [05-02-04 Operations Tools](../../source-archive/05_Risk_Control/05-02-04_Operations_Tools.md) -- SmartAdmin 架構映射與監控
+
+---
+
+## 文檔資訊（Document Information）
+
+**文檔版本**: v1.0.0
+**最後更新**: 2026-02-12
+**維護團隊**: SmartAdmin 架構團隊
