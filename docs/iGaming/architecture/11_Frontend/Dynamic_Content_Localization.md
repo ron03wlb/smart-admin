@@ -1,15 +1,15 @@
-# Dynamic Content Localization Architecture
+# 動態內容在地化架構
 
-> **Business Requirements**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-08](../../source-archive/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, Frontend Developers
+> **業務需求**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-08](../../source-archive/11_Frontend_CMS/11-08_Dynamic_Content_Localization.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、前端開發人員
 
 ---
 
-## 1. JSONB Multi-Language Field Design
+## 1. JSONB 多語言欄位設計
 
-**Standard JSONB Format**:
+**標準 JSONB 格式**:
 ```json
 {
   "en": "English text",
@@ -24,20 +24,20 @@
 }
 ```
 
-### Tables Requiring Localization
+### 需要在地化的資料表
 
-| Table | Multi-Language Fields | Example |
-|-------|----------------------|---------|
-| **games** | `name`, `description`, `rules` | Game name, rules |
-| **banners** | `title`, `subtitle`, `cta_text` | Banner title, CTA |
-| **notifications** | `title`, `body` | In-app notifications |
-| **faqs** | `question`, `answer` | FAQ content |
-| **vip_tiers** | `tier_name`, `benefits` | VIP tier names |
-| **payment_methods** | `display_name`, `instructions` | Payment method labels |
+| 資料表 | 多語言欄位 | 範例 |
+|--------|-----------|------|
+| **games** | `name`, `description`, `rules` | 遊戲名稱、規則 |
+| **banners** | `title`, `subtitle`, `cta_text` | Banner 標題、行動呼籲 |
+| **notifications** | `title`, `body` | 應用內通知 |
+| **faqs** | `question`, `answer` | FAQ 內容 |
+| **vip_tiers** | `tier_name`, `benefits` | VIP 等級名稱 |
+| **payment_methods** | `display_name`, `instructions` | 支付方式標籤 |
 
-## 2. API Response Strategies
+## 2. API 回應策略
 
-### Option A: Single-Language Response (Mobile)
+### 方案 A：單語言回應（行動裝置）
 
 ```json
 GET /api/v1/promotions?lang=zh-TW
@@ -58,7 +58,7 @@ Response:
 }
 ```
 
-### Option B: Multi-Language Response (CMS Backend)
+### 方案 B：多語言回應（CMS 後台）
 
 ```json
 GET /api/v1/promotions/123?include_all_languages=true
@@ -83,7 +83,7 @@ Response:
 }
 ```
 
-### 2.1 Dynamic Content Localization Request Flow
+### 2.1 動態內容在地化請求流程
 
 ```mermaid
 sequenceDiagram
@@ -113,7 +113,7 @@ sequenceDiagram
     Note over Client: Render content in<br/>user's language
 ```
 
-## 3. CMS Multi-Language Editor
+## 3. CMS 多語言編輯器
 
 ```html
 <form>
@@ -146,9 +146,9 @@ sequenceDiagram
 </form>
 ```
 
-## 4. Frontend Dynamic Content Rendering
+## 4. 前端動態內容渲染
 
-### React Component
+### React 元件
 
 ```jsx
 import { useTranslation } from 'react-i18next';
@@ -170,7 +170,7 @@ function PromotionCard({ promotion }) {
 }
 ```
 
-### Vue Component
+### Vue 元件
 
 ```vue
 <template>
@@ -199,9 +199,9 @@ export default {
 </script>
 ```
 
-## 5. Localized Image Strategy
+## 5. 在地化圖片策略
 
-**File Naming Convention**: `{resource_name}_{lang}.{ext}`
+**檔案命名規則**: `{resource_name}_{lang}.{ext}`
 
 ```
 /cdn/banners/
@@ -211,7 +211,7 @@ export default {
   └── new_year_promo_default.jpg
 ```
 
-## 6. Database Schema
+## 6. 資料庫結構
 
 ### 6.1 localization_contents
 
@@ -277,9 +277,9 @@ CREATE INDEX idx_ct_status ON content_translations(review_status, translation_me
 CREATE INDEX idx_ct_translator ON content_translations(translator_id);
 ```
 
-**Translation Workflow**:
-1. Content created in `localization_contents` with default language (usually 'en')
-2. Translations added to `content_translations` (manual or machine)
-3. Reviewers approve translations → `review_status = 'approved'`
-4. API layer reads from `translations` JSONB field (denormalized for performance)
-5. Sync job updates `translations` JSONB from approved `content_translations` records
+**翻譯工作流程**:
+1. 在 `localization_contents` 中建立預設語言內容（通常為 'en'）
+2. 在 `content_translations` 中新增翻譯（人工或機器翻譯）
+3. 審核人員審批翻譯 → `review_status = 'approved'`
+4. API 層從 `translations` JSONB 欄位讀取（反正規化以提升效能）
+5. 同步任務從已審批的 `content_translations` 記錄更新 `translations` JSONB

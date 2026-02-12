@@ -1,13 +1,13 @@
-# Frontend Layout Engine Architecture
+# 前端佈局引擎架構
 
-> **Business Requirements**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-01](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Frontend Developers
+> **業務需求**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-01](../../source-archive/11_Frontend_CMS/11-01_Frontend_Layout_Engine.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、前端開發人員
 
 ---
 
-## 1. System Architecture
+## 1. 系統架構
 
 ```mermaid
 flowchart TD
@@ -29,7 +29,7 @@ flowchart TD
     API --> RENDER[Vue 3 Rendering Engine]
 ```
 
-## 2. JSON Configuration Schema
+## 2. JSON 配置結構
 
 ```json
 {
@@ -86,15 +86,15 @@ flowchart TD
 }
 ```
 
-## 3. CDN Distribution
+## 3. CDN 分發
 
-- Configuration saved to database with `status: PUBLISHED`
-- Pushed to CDN (CloudFront/Cloudflare) as JSON file
-- CDN TTL: 5 minutes at edge locations
-- Frontend fetches via `GET /api/v1/layout/config?version=latest`
-- Version checking: only download when local version is stale
+- 配置儲存至資料庫，狀態為 `status: PUBLISHED`
+- 以 JSON 檔案推送至 CDN（CloudFront/Cloudflare）
+- CDN TTL：邊緣節點 5 分鐘
+- 前端透過 `GET /api/v1/layout/config?version=latest` 取得
+- 版本檢查：僅在本機版本過期時下載
 
-## 4. Component Rendering Pipeline
+## 4. 元件渲染流程
 
 ```mermaid
 flowchart LR
@@ -112,9 +112,9 @@ flowchart LR
     SHOW --> TRACK[Track: component_exposure event]
 ```
 
-## 5. A/B Testing Integration
+## 5. A/B 測試整合
 
-Layout engine supports experiment configuration:
+佈局引擎支援實驗配置：
 
 ```javascript
 // Traffic splitting via MurmurHash3
@@ -126,23 +126,23 @@ function assignVariant(userId, experimentId) {
 }
 ```
 
-- `experiment_id` field in layout JSON
-- Hash-based traffic splitting ensures consistency per user
-- Exposure events auto-reported on render
+- 佈局 JSON 中的 `experiment_id` 欄位
+- 基於 Hash 的流量分割確保每位使用者的一致性
+- 渲染時自動回報曝光事件
 
-## 6. Wallet Mode UI Adaptation
+## 6. 錢包模式 UI 適配
 
-Frontend dynamically switches Header based on `player.wallet_mode`:
+前端根據 `player.wallet_mode` 動態切換 Header：
 
-| Mode | Display | Key UI Element |
-|------|---------|---------------|
-| Cash | Balance (Total Cash + Bonus) | Deposit button prominent |
-| Credit | Credit Limit / Used / Available | Quota details + Settlement Countdown |
-| Hybrid | Both Cash + Credit | Payment selector (Cash first vs Credit) |
+| 模式 | 顯示內容 | 關鍵 UI 元素 |
+|------|---------|-------------|
+| Cash | 餘額（現金總額 + 獎金） | 存款按鈕突出顯示 |
+| Credit | 信用額度 / 已用 / 可用 | 額度詳情 + 結算倒計時 |
+| Hybrid | 現金 + 信用均顯示 | 支付選擇器（優先現金 vs 信用） |
 
 ---
 
-## 7. SmartAdmin Implementation
+## 7. SmartAdmin 實作
 
 ### 7.1 Layout Config Service
 
@@ -171,7 +171,7 @@ public class LayoutConfigService {
 }
 ```
 
-### 7.2 Layout Publish Manager
+### 7.2 Layout 發布 Manager
 
 ```java
 @Component
@@ -210,7 +210,7 @@ public class LayoutPublishManager {
 }
 ```
 
-### 7.3 Database Schema
+### 7.3 資料庫結構
 
 ```sql
 -- Layout configuration table

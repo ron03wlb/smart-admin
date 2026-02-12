@@ -1,13 +1,13 @@
-# A/B Testing Framework Architecture
+# A/B 測試框架架構
 
-> **Business Requirements**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-06](../../source-archive/11_Frontend_CMS/11-06_AB_Testing_Framework.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Data Engineers, Frontend Developers
+> **業務需求**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-06](../../source-archive/11_Frontend_CMS/11-06_AB_Testing_Framework.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、資料工程師、前端開發人員
 
 ---
 
-## 1. System Architecture
+## 1. 系統架構
 
 ```text
 +-----------------------------------------------------+
@@ -31,9 +31,9 @@
 +-----------------------------------------------------+
 ```
 
-**Platform Recommendation**: GrowthBook (open-source, self-hosted, full-featured)
+**平台建議**: GrowthBook（開源、可自託管、功能完整）
 
-### 1.1 Variant Assignment Pipeline
+### 1.1 變體分配流程
 
 ```mermaid
 flowchart TD
@@ -57,7 +57,7 @@ flowchart TD
     N --> O
 ```
 
-## 2. Hash-Based Traffic Allocation
+## 2. 基於 Hash 的流量分配
 
 ```javascript
 function assignVariant(playerId, experimentId, variants) {
@@ -82,7 +82,7 @@ const variant = assignVariant('12345', 'homepage-redesign', [
 ]);
 ```
 
-## 3. Experiment Configuration
+## 3. 實驗配置
 
 ```yaml
 experiment:
@@ -115,7 +115,7 @@ experiment:
     - page_load_time
 ```
 
-## 4. Event Tracking
+## 4. 事件追蹤
 
 ```javascript
 // Experiment exposure event
@@ -134,9 +134,9 @@ analytics.track('First Deposit Completed', {
 });
 ```
 
-## 5. Statistical Significance
+## 5. 統計顯著性
 
-### Sample Size Formula
+### 樣本量公式
 
 ```
 n = 2 * (Z_alpha/2 + Z_beta)^2 * sigma^2 / delta^2
@@ -148,7 +148,7 @@ Where:
 - delta: Minimum Detectable Effect (MDE)
 ```
 
-### Auto-Stop Rules
+### 自動停止規則
 
 ```
 Rule 1: Statistical significance reached
@@ -164,7 +164,7 @@ Rule 3: Guardrail metric triggered
   THEN stop_experiment() AND rollback()
 ```
 
-## 6. Experiment Lifecycle
+## 6. 實驗生命週期
 
 ```
 1. Hypothesis -> 2. Design (variants, metrics, sample size)
@@ -175,7 +175,7 @@ Rule 3: Guardrail metric triggered
 -> 7. Winner Rollout (100% traffic, decommission control)
 ```
 
-## 7. Database Schema
+## 7. 資料庫結構
 
 ### 7.1 ab_experiments
 
@@ -250,7 +250,7 @@ CREATE INDEX idx_ab_assign_player ON ab_experiment_assignments(player_id);
 CREATE INDEX idx_ab_assign_converted ON ab_experiment_assignments(experiment_id, converted, conversion_time);
 ```
 
-**Data Retention**:
-- Experiment configs: Retained indefinitely for audit purposes
-- Assignment records: Retained for 2 years after experiment completion
-- Raw event data: Stored in ClickHouse with 6-month retention
+**資料保留策略**:
+- 實驗配置：永久保留供審計使用
+- 分配記錄：實驗完成後保留 2 年
+- 原始事件資料：存放於 ClickHouse，保留 6 個月

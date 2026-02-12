@@ -1,13 +1,13 @@
-# i18n Localization Architecture
+# i18n 國際化架構
 
-> **Business Requirements**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-07](../../source-archive/11_Frontend_CMS/11-07_i18n_Localization.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Frontend Developers, Backend Developers
+> **業務需求**: [Localization Requirements](../../requirements/11_Frontend_Experience/Localization_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-07](../../source-archive/11_Frontend_CMS/11-07_i18n_Localization.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、前端開發人員、後端開發人員
 
 ---
 
-## 1. Translation Service Architecture
+## 1. 翻譯服務架構
 
 ```mermaid
 flowchart LR
@@ -32,9 +32,9 @@ flowchart LR
     OSS -.->|"3. Pull Origin"| CDN
 ```
 
-## 2. Translation Key Management
+## 2. 翻譯 Key 管理
 
-**Namespace Structure**: `module.component.key`
+**命名空間結構**: `module.component.key`
 
 ```javascript
 // Correct: Use Translation Key
@@ -44,7 +44,7 @@ flowchart LR
 <button>Submit</button>
 ```
 
-## 3. Locale Format Standards
+## 3. 地區格式標準
 
 ```javascript
 // Use Intl API for currency formatting
@@ -61,7 +61,7 @@ import 'dayjs/locale/th';
 dayjs().locale('th').format('DD MMMM YYYY');  // "27 มกราคม 2026"
 ```
 
-## 4. RTL Language Support
+## 4. RTL 語言支援
 
 ```javascript
 // Frontend RTL detection
@@ -84,14 +84,14 @@ if (isRTL) {
 }
 ```
 
-## 5. CDN Distribution Strategy
+## 5. CDN 分發策略
 
-**URL Structure**:
+**URL 結構**:
 ```
 https://cdn.casino.com/i18n/{lang}/{namespace}.v{version}.json
 ```
 
-**CloudFront Distribution Settings**:
+**CloudFront 分發設定**:
 ```javascript
 {
   "Origins": [{
@@ -113,7 +113,7 @@ https://cdn.casino.com/i18n/{lang}/{namespace}.v{version}.json
 }
 ```
 
-## 6. Frontend Local Caching
+## 6. 前端本機快取
 
 ```javascript
 // localStorage caching strategy
@@ -132,17 +132,17 @@ Object.keys(localStorage)
   .forEach(k => localStorage.removeItem(k));
 ```
 
-## 7. Language-Specific Considerations
+## 7. 各語言特殊考量
 
-| Language | Key Issue | Solution |
-|----------|-----------|----------|
-| **Thai** | No space word separation | CSS `word-break: break-word` |
-| **Vietnamese** | Extensive diacritics | Noto Sans Vietnamese font |
-| **Arabic** | RTL layout + cursive joining | Logical CSS properties + Noto Sans Arabic |
+| 語言 | 關鍵問題 | 解決方案 |
+|------|---------|---------|
+| **泰語** | 無空格分詞 | CSS `word-break: break-word` |
+| **越南語** | 大量變音符號 | Noto Sans Vietnamese 字型 |
+| **阿拉伯語** | RTL 佈局 + 連體書寫 | 邏輯 CSS 屬性 + Noto Sans Arabic |
 
 ---
 
-## 8. Database Schema
+## 8. 資料庫結構
 
 ```sql
 -- Translation key registry

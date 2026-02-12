@@ -1,13 +1,13 @@
-# Banner & Announcement Architecture
+# Banner 與公告系統架構
 
-> **Business Requirements**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-02](../../source-archive/11_Frontend_CMS/11-02_Banner_and_Announcement.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Frontend Developers, Backend Developers
+> **業務需求**: [Frontend UX Requirements](../../requirements/11_Frontend_Experience/Frontend_UX_Requirements.md)
+> **規範來源**: [source-archive/11_Frontend_CMS/11-02](../../source-archive/11_Frontend_CMS/11-02_Banner_and_Announcement.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、前端開發人員、後端開發人員
 
 ---
 
-## 1. Multi-Language Banner Data Structure
+## 1. 多語言 Banner 資料結構
 
 ```json
 {
@@ -30,7 +30,7 @@
 }
 ```
 
-## 2. Language Fallback Logic
+## 2. 語言回退邏輯
 
 ```typescript
 function getBannerImage(banner: Banner, userLanguage: string): string {
@@ -44,7 +44,7 @@ function getBannerImage(banner: Banner, userLanguage: string): string {
 }
 ```
 
-## 3. Device Targeting
+## 3. 裝置定向
 
 ```typescript
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -56,7 +56,7 @@ const visibleBanners = allBanners.filter(banner => {
 });
 ```
 
-## 4. Approval Workflow
+## 4. 審批工作流
 
 ```mermaid
 graph TD
@@ -70,9 +70,9 @@ graph TD
     F -->|No| H[Pending]
 ```
 
-## 5. CDN Integration
+## 5. CDN 整合
 
-### 5.1 Image Upload Pipeline
+### 5.1 圖片上傳流程
 
 ```
 Upload Flow:
@@ -82,7 +82,7 @@ Upload Flow:
 4. Push to CDN -> https://cdn.platform.com/banners/{banner_id}_{size}.webp
 ```
 
-### 5.2 Responsive Images
+### 5.2 響應式圖片
 
 ```html
 <picture>
@@ -100,7 +100,7 @@ Upload Flow:
 </picture>
 ```
 
-### 5.3 Cache Configuration
+### 5.3 快取配置
 
 ```nginx
 location /banners/ {
@@ -111,7 +111,7 @@ location /banners/ {
 }
 ```
 
-## 6. A/B Testing Configuration
+## 6. A/B 測試配置
 
 ```json
 {
@@ -126,10 +126,10 @@ location /banners/ {
 }
 ```
 
-## 7. Analytics Tracking
+## 7. 數據分析追蹤
 
-| Metric | Event | Formula |
-|--------|-------|---------|
+| 指標 | 事件 | 公式 |
+|------|------|------|
 | Impressions | `impression_event` | COUNT(impression_event) |
 | Clicks | `click_event` | COUNT(click_event) |
 | CTR | - | (Clicks / Impressions) x 100% |
@@ -138,7 +138,7 @@ location /banners/ {
 
 ---
 
-## 8. SmartAdmin Implementation
+## 8. SmartAdmin 實作
 
 ### 8.1 Banner Service
 
@@ -169,7 +169,7 @@ public class BannerService {
 }
 ```
 
-### 8.2 Banner Publish Manager
+### 8.2 Banner 發布 Manager
 
 ```java
 @Component
@@ -207,7 +207,7 @@ public class BannerPublishManager {
 }
 ```
 
-### 8.3 Database Schema
+### 8.3 資料庫結構
 
 ```sql
 -- Banner configuration table
