@@ -1,9 +1,12 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: ALL COMPLETE ✅
-> **Total Iterations**: 137 (Phase 6: 6, Phase 7-8: 98, Phase 9: 29, Phase 9C+10 optimized: 4)
-> **Status**: Phase 10 COMPLETE ✅ — 184 files translated, 100% terminology, 4 quality reports
+> **Current Phase**: Phase 12 (Mermaid Repair)
+> **Total Iterations**: 137 (Phase 6-10) + 0 (Phase 12-14)
+> **Status**: Phase 11 COMPLETE ✅ — Script optimized, PROMPT/progress/guardrails updated
+> **Java Coverage**: 80/102 (78.4%) → Target: ≥90%
+> **SQL Coverage**: 94/102 (92.2%) → Target: ≥95%
+> **Mermaid Issues**: 72 pre-existing → Target: 0
 
 ---
 
@@ -624,25 +627,197 @@ Priority: Architecture files contain technical design suited for Chinese develop
 
 ---
 
+## Phase 11: Script Optimization [COMPLETE] ✅
+
+**Goal**: Increase Ralph efficiency from 24% to 70%+ and prepare for Phase 12-14
+**Completed**: 2026-02-12 (manual execution)
+
+- [x] Update ralph-igaming-docs.sh: MAX_ITERATIONS=80, outcome tracking, no-progress detection, summary report, phase-aware hint
+- [x] Rewrite PROMPT.md for Phase 12-14 tasks
+- [x] Update progress.md with Phase 12-14 task lists
+- [x] Add P19-P21 guardrails (mmdc validation, `<br/>` conflict, dual-missing priority)
+
+---
+
+## Phase 12: Mermaid Repair [IN PROGRESS]
+
+**Goal**: Fix 72 pre-existing Mermaid rendering issues → 0
+**Constraint**: Max 3 files per iteration
+**Validation**: `npx -p @mermaid-js/mermaid-cli mmdc` + `validate-mermaid.sh` + `detect-statediagram-br.sh`
+
+---
+
+### 12A: Discovery (1 iteration) ✅ COMPLETE
+
+- [x] Install mmdc: Network timeout - created Python-based validation script instead
+- [x] Scan all architecture docs with Mermaid blocks (102 files, 254 blocks, 61 issues)
+- [x] Generate categorized issue list: Category A (45 unmatched subgraph/end), Category B (16 invalid arrows)
+- [x] Create batch plan: docs/ralph/mermaid-issues-catalog.md with prioritized batches
+
+### 12B: Batch Repairs (3 files per batch)
+
+**Batch assignments will be populated after 12A Discovery completes.**
+
+#### Batch 1 — High-Impact Finance (3 files)
+- [ ] architecture/02_Finance_Service/Turnover_Flowcharts.md (Mermaid fix)
+- [ ] architecture/02_Finance_Service/Reconciliation_Technical.md (Mermaid fix)
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Analysis.md (Mermaid fix)
+
+#### Batch 2 — High-Impact Finance + Game (3 files)
+- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (Mermaid fix)
+- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (Mermaid fix)
+- [ ] architecture/03_Game_Integration/Turnover_Calculation_Logic.md (Mermaid fix)
+
+#### Batch 3 — Overview + Infrastructure (3 files)
+- [ ] architecture/00_Overview/Platform_Architecture.md (Mermaid fix)
+- [ ] architecture/09_Infrastructure/Multi_Actor_Token_Security.md (Mermaid fix)
+- [ ] architecture/00_Overview/Data_Model.md (Mermaid fix)
+
+#### Batch 4 — Platform Core MFA (3 files)
+- [ ] architecture/06_Platform_Core/MFA_Technical.md (Mermaid fix)
+- [ ] architecture/06_Platform_Core/MFA_Recovery_Implementation.md (Mermaid fix)
+- [ ] architecture/06_Platform_Core/MFA_Compliance_Validation.md (Mermaid fix)
+
+#### Batch 5 — Risk/Security (3 files)
+- [ ] architecture/05_Risk_Engine/KYC_Verification_API.md (Mermaid fix)
+- [ ] architecture/05_Risk_Engine/Fraud_Detection_System.md (Mermaid fix)
+- [ ] architecture/12_Security/PCI_DSS_v4_Implementation_Guide.md (Mermaid fix)
+
+#### Batch 6-15 — Remaining files (to be populated after Discovery)
+- [ ] Remaining Mermaid issues from discovery (3 files per batch)
+
+### 12C: Final Validation
+
+- [ ] Run mmdc on ALL files with Mermaid blocks: 0 rendering errors
+- [ ] `bash scripts/validate-mermaid.sh docs/iGaming/`: PASS
+- [ ] `bash scripts/detect-statediagram-br.sh docs/iGaming/`: PASS
+- [ ] Update quality-gate-report.md with Phase 12 results
+
+**Phase 12 Quality Gate**: Mermaid rendering errors = 0
+
+---
+
+## Phase 13: Coverage Enhancement [PLANNED]
+
+**Goal**: Java 78.4% → 90%+, SQL 92.2% → 95%+
+**Constraint**: Max 5 files per iteration, SmartAdmin patterns mandatory
+**Validation**: `validate-quality-gate.sh` + `check-smartadmin-patterns.sh`
+
+---
+
+### 13A: Dual-Missing Files (Java + SQL, 7 files)
+
+Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
+
+#### Batch 1 — Finance (3 files)
+- [ ] architecture/02_Finance_Service/Seamless_Wallet_Index.md (+Java Service/Manager +SQL)
+- [ ] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (+Java +SQL)
+- [ ] architecture/02_Finance_Service/Turnover_Implementation.md (+Java +SQL)
+
+#### Batch 2 — Infrastructure (3 files)
+- [ ] architecture/09_Infrastructure/Maintenance_Architecture.md (+Java Service/Manager +SQL)
+- [ ] architecture/09_Infrastructure/Performance_Monitoring.md (+Java Service/Manager +SQL)
+- [ ] architecture/09_Infrastructure/Token_Cache_Performance.md (+Java Service/Manager +SQL)
+
+#### Batch 3 — Infrastructure (1 file)
+- [ ] architecture/09_Infrastructure/Token_Validation_Architecture.md (+Java Service/Manager +SQL)
+
+**After 13A**: Java ≈ 85% (87/102), SQL ≈ 99% (101/102)
+
+### 13B: Java-Only Missing Files (target: ≥90%)
+
+#### Batch 4 — Core Business (3 files)
+- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+Java)
+- [ ] architecture/05_Risk_Engine/Risk_Implementation.md (+Java)
+- [ ] architecture/06_Platform_Core/Governance_Implementation.md (+Java)
+
+#### Batch 5 — Game/Payment (3 files)
+- [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (+Java)
+- [ ] architecture/03_Game_Integration/Game_Integration_Protocols.md (+Java)
+- [ ] architecture/03_Game_Integration/Game_Lobby_System.md (+Java)
+
+#### Batch 6 — Frontend (3 files, if needed for 90%+)
+- [ ] architecture/11_Frontend/AB_Testing_Framework.md (+Java)
+- [ ] architecture/11_Frontend/i18n_Localization.md (+Java)
+- [ ] architecture/11_Frontend/Mobile_App_Architecture.md (+Java)
+
+**After Batch 4-5**: Java ≈ 91% (93/102) ✅
+
+### 13C: Phase 13 Quality Gate
+
+- [ ] Java coverage ≥ 90% (`validate-quality-gate.sh`)
+- [ ] SQL coverage ≥ 95% (`validate-quality-gate.sh`)
+- [ ] SmartAdmin pattern compliance (`check-smartadmin-patterns.sh`)
+- [ ] No coverage regressions
+- [ ] Update quality-gate-report.md with Phase 13 results
+
+---
+
+## Phase 14: CI/CD Automation [PLANNED]
+
+**Goal**: Consolidate CI/CD workflows, resolve `<br/>` conflict, add coverage thresholds
+**Validation**: Manual workflow testing via test branch
+
+---
+
+### 14A: Resolve `<br/>` Conflict
+
+- [ ] Update `.github/workflows/mermaid-syntax-check.yml`: Remove `<br/>` prohibition, replace with stateDiagram-v2-only check (P20 guardrail)
+- [ ] Verify `detect-statediagram-br.sh` works as replacement check
+
+### 14B: Enhance Translation Quality Workflow
+
+- [ ] Add `detect-statediagram-br.sh` as 5th check in `igaming-translation-quality.yml`
+- [ ] Add coverage threshold enforcement (Java ≥ 90%, SQL ≥ 95%)
+- [ ] Add artifact upload for quality reports
+- [ ] Ensure source-archive/ excluded from all checks
+
+### 14C: Integration Testing
+
+- [ ] Create test branch with intentional errors (bad terminology, Mermaid issues)
+- [ ] Verify all checks trigger correctly
+- [ ] Verify PR comment appears on failure
+- [ ] Update guardrails.md with final CI/CD notes
+
+### 14D: Phase 14 Quality Gate
+
+- [ ] All workflow checks execute correctly
+- [ ] `<br/>` conflict fully resolved
+- [ ] Quality report summary in GITHUB_STEP_SUMMARY
+- [ ] Documentation updated (guardrails.md)
+
+---
+
 ## Quality Gate Validation
 
 ```bash
-# Phase 7 quality gates
+# Phase 7 quality gates (historical)
 bash scripts/measure-business-completeness.sh
 bash scripts/check-terminology-consistency.sh
 
-# Phase 8 quality gates
+# Phase 8 quality gates (historical)
 bash scripts/check-smartadmin-patterns.sh
 bash scripts/validate-architecture-completeness.sh
+
+# Phase 12 quality gates
+npx -p @mermaid-js/mermaid-cli mmdc --version
+bash scripts/validate-mermaid.sh docs/iGaming/
+bash scripts/detect-statediagram-br.sh docs/iGaming/
+
+# Phase 13 quality gates
+./docs/ralph/validate-quality-gate.sh
+bash scripts/check-smartadmin-patterns.sh
 
 # Existing gates (must maintain)
 bash scripts/validate_links.sh docs/iGaming
 bash scripts/scan-broken-links.sh docs/iGaming
 bash scripts/detect_ssot_violations.sh
 bash scripts/validate-requirements-purity.sh
+bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/
+bash scripts/validate-zh-tw-encoding.sh docs/iGaming/
 ```
 
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9B COMPLETE ✅ — All 118/118 architecture files translated (Batch 15-37). Phase 9A (66 requirements files) + Phase 9B (118 architecture files) = 184 total iGaming documents translated to Traditional Chinese.
+**Status**: Phase 11 COMPLETE ✅ — Script optimized (outcome tracking, no-progress detection, summary report). Phase 12-14 task lists ready. Ralph Loop ready to execute.
