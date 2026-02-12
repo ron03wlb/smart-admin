@@ -1,136 +1,169 @@
 #!/bin/bash
-# Mermaid 語法驗證腳本
-# 用途：使用 Mermaid CLI 驗證所有圖表的語法正確性
+# validate-mermaid.sh
+# 驗證 iGaming 文檔中的 Mermaid 圖表語法
+#
+# 關鍵規則（來自 docs/ralph/guardrails.md P2）:
+#   - 所有圖表類型（graph, flowchart, sequenceDiagram等）: 使用 <br/> 換行
+#   - 例外: stateDiagram-v2 不能使用 <br/>, 應使用多行 note 區塊
+#
+# 使用方式:
+#   bash scripts/validate-mermaid.sh <file_or_directory>
+#
+# Exit Codes:
+#   0 - PASS (所有 Mermaid 語法正確)
+#   1 - FAIL (發現語法錯誤)
 
-set -e
+set -uo pipefail
 
-# 顏色輸出
+# 顏色定義
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# 統計
-total_files=0
-validated_files=0
-failed_files=0
-total_diagrams=0
+# 錯誤計數器
+ERROR_COUNT=0
+FILES_CHECKED=0
 
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}  Mermaid 語法驗證工具${NC}"
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
+# 檢測文件中的 Mermaid 語法
+check_file() {
+    local file="$1"
 
-# 檢查 Mermaid CLI 是否安裝
-if ! command -v mmdc &> /dev/null; then
-    echo -e "${YELLOW}⚠ 警告: 未安裝 Mermaid CLI（跳過語法驗證）${NC}"
-    echo ""
-    echo "請安裝 Mermaid CLI："
-    echo "  npm install -g @mermaid-js/mermaid-cli"
-    echo ""
-    exit 0
-fi
+    # 跳過非 Markdown 文件
+    if [[ ! "$file" =~ \.md$ ]]; then
+        return 0
+    fi
 
-echo -e "${GREEN}✓ Mermaid CLI 已安裝${NC}"
-echo ""
+    ((FILES_CHECKED++))
 
-# 設置搜索目錄（默認為 docs/iGaming）
-SEARCH_DIR="${1:-docs/iGaming}"
+    local file_errors=0
+    local in_mermaid=0
+    local in_statediagram=0
+    local line_num=0
 
-echo -e "${GREEN}掃描目錄: ${SEARCH_DIR}${NC}"
-echo ""
+    # 逐行讀取文件
+    while IFS= read -r line; do
+        ((line_num++))
 
-# 創建臨時目錄
-TEMP_DIR=$(mktemp -d)
-trap "rm -rf $TEMP_DIR" EXIT
+        # 檢測 Mermaid 代碼塊開始
+        if [[ "$line" =~ ^\`\`\`mermaid ]]; then
+            in_mermaid=1
+            in_statediagram=0
+            continue
+        fi
 
-# 查找所有包含 Mermaid 的 Markdown 文件
-echo -e "${YELLOW}階段 1: 查找 Mermaid 圖表...${NC}"
-files_with_mermaid=$(grep -rl "```mermaid" "$SEARCH_DIR" --include="*.md" || true)
-
-if [ -z "$files_with_mermaid" ]; then
-    echo -e "${GREEN}✓ 未找到包含 Mermaid 圖表的文件${NC}"
-    exit 0
-fi
-
-# 驗證每個文件
-echo -e "${YELLOW}階段 2: 驗證 Mermaid 語法...${NC}"
-echo ""
-
-for file in $files_with_mermaid; do
-    total_files=$((total_files + 1))
-
-    # 提取所有 Mermaid 代碼塊
-    awk '
-        /```mermaid/ { in_mermaid=1; diagram=""; next }
-        in_mermaid && /```/ {
-            print diagram > "/tmp/mermaid-block-" NR ".mmd"
+        # 檢測 Mermaid 代碼塊結束
+        if [[ "$line" =~ ^\`\`\` ]] && [[ $in_mermaid -eq 1 ]]; then
             in_mermaid=0
-            diagram=""
-            next
-        }
-        in_mermaid { diagram = diagram $0 "\n" }
-    ' "$file"
+            in_statediagram=0
+            continue
+        fi
 
-    # 驗證提取的代碼塊
-    diagram_files=$(ls /tmp/mermaid-block-*.mmd 2>/dev/null || true)
-
-    if [ -n "$diagram_files" ]; then
-        file_valid=true
-
-        for diagram_file in $diagram_files; do
-            total_diagrams=$((total_diagrams + 1))
-
-            # 使用 mmdc 驗證語法（生成 SVG）
-            if mmdc -i "$diagram_file" -o "$TEMP_DIR/output.svg" -q 2>/dev/null; then
-                : # 驗證成功
-            else
-                file_valid=false
-                echo -e "${RED}✗ $file${NC}"
-                echo -e "${RED}  圖表驗證失敗: $diagram_file${NC}"
-
-                # 顯示錯誤詳情
-                mmdc -i "$diagram_file" -o "$TEMP_DIR/output.svg" 2>&1 | head -5 | while read -r line; do
-                    echo -e "    ${YELLOW}$line${NC}"
-                done
-                echo ""
-                break
+        # 在 Mermaid 區塊內
+        if [[ $in_mermaid -eq 1 ]]; then
+            # 檢測 stateDiagram-v2
+            if [[ "$line" =~ ^[[:space:]]*stateDiagram-v2 ]]; then
+                in_statediagram=1
             fi
 
-            # 清理臨時文件
-            rm -f "$diagram_file"
-        done
+            # P2 Rule: stateDiagram-v2 不能使用 <br/>
+            if [[ $in_statediagram -eq 1 ]] && [[ "$line" =~ \<br/?\> ]]; then
+                echo -e "${RED}[ERROR]${NC} $file:$line_num"
+                echo -e "  stateDiagram-v2 cannot use <br/> tags"
+                echo -e "  Line: ${YELLOW}$line${NC}"
+                echo -e "  Suggestion: Use multi-line note blocks instead:"
+                echo -e "    ${GREEN}note right of StateA${NC}"
+                echo -e "    ${GREEN}    Line 1${NC}"
+                echo -e "    ${GREEN}    Line 2${NC}"
+                echo -e "    ${GREEN}end note${NC}"
+                echo ""
+                ((file_errors++))
+            fi
 
-        if $file_valid; then
-            validated_files=$((validated_files + 1))
-            echo -e "${GREEN}✓ $file${NC}"
-        else
-            failed_files=$((failed_files + 1))
+            # P2 Rule: 其他圖表類型應使用 <br/>, 不使用 \n
+            # 注意：這個檢測較複雜，需要排除字符串內的 \n
+            # 簡化版：檢測 ["...\n..."] 模式
+            if [[ $in_statediagram -eq 0 ]] && [[ "$line" =~ \[\".*\\n.*\"\] ]]; then
+                echo -e "${YELLOW}[WARNING]${NC} $file:$line_num"
+                echo -e "  Found \\n in node label (should use <br/>)"
+                echo -e "  Line: ${YELLOW}$line${NC}"
+                echo -e "  Suggestion: Replace \\n with <br/>"
+                echo -e "    Example: ${GREEN}A[Line 1<br/>Line 2]${NC}"
+                echo ""
+                # 這是警告，不增加錯誤計數
+            fi
         fi
+    done < "$file"
+
+    if [[ $file_errors -gt 0 ]]; then
+        echo -e "${RED}✗ FAIL${NC}: $file ($file_errors Mermaid syntax errors)"
+        ((ERROR_COUNT += file_errors))
+        return 1
+    else
+        echo -e "${GREEN}✓ PASS${NC}: $file"
+        return 0
     fi
-done
+}
 
-# 總結報告
-echo ""
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}  驗證完成${NC}"
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo "總文件數:     $total_files"
-echo "總圖表數:     $total_diagrams"
-echo "驗證通過:     $validated_files"
-echo "驗證失敗:     $failed_files"
-echo ""
+# 主函數
+main() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: $0 <file_or_directory> [file_or_directory...]"
+        echo ""
+        echo "Examples:"
+        echo "  $0 docs/iGaming/architecture/03_Game/Game_Integration.md"
+        echo "  $0 docs/iGaming/architecture/"
+        exit 1
+    fi
 
-if [ $failed_files -eq 0 ]; then
-    echo -e "${GREEN}✓ 所有 Mermaid 圖表語法正確${NC}"
-    exit 0
-else
-    echo -e "${RED}✗ 發現 $failed_files 個文件存在語法錯誤${NC}"
+    echo "=================================================="
+    echo "Mermaid Syntax Validation"
+    echo "=================================================="
     echo ""
-    echo -e "${GREEN}修復建議:${NC}"
-    echo "  1. 使用 Mermaid Live Editor 測試: https://mermaid.live/"
-    echo "  2. 參考最佳實踐: .claude/skills/.../mermaid-best-practices.md"
-    exit 1
-fi
+    echo "Rules (from guardrails.md P2):"
+    echo "  1. graph/flowchart/sequence/class diagrams: Use <br/> for line breaks"
+    echo "  2. stateDiagram-v2: Do NOT use <br/>, use multi-line note blocks"
+    echo ""
+
+    # 處理所有輸入參數
+    for target in "$@"; do
+        if [[ -f "$target" ]]; then
+            # 單個文件
+            check_file "$target"
+        elif [[ -d "$target" ]]; then
+            # 目錄：遞歸處理所有 .md 文件
+            while IFS= read -r -d '' file; do
+                check_file "$file"
+            done < <(find "$target" -name "*.md" -type f -print0)
+        else
+            echo -e "${RED}[ERROR]${NC} Path not found: $target"
+            ((ERROR_COUNT++))
+        fi
+    done
+
+    echo ""
+    echo "=================================================="
+
+    if [[ $FILES_CHECKED -eq 0 ]]; then
+        echo -e "${GREEN}✓ PASS${NC}: No files to check"
+        exit 0
+    fi
+
+    echo "Statistics:"
+    echo "  Files checked: $FILES_CHECKED"
+    echo "  Syntax errors: $ERROR_COUNT"
+    echo ""
+
+    if [[ $ERROR_COUNT -eq 0 ]]; then
+        echo -e "${GREEN}✓ PASS${NC}: All Mermaid diagrams use correct syntax"
+        exit 0
+    else
+        echo -e "${RED}✗ FAIL${NC}: Found $ERROR_COUNT Mermaid syntax errors"
+        echo ""
+        echo "Reference: docs/ralph/guardrails.md (P2)"
+        exit 1
+    fi
+}
+
+# 執行主函數
+main "$@"

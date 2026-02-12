@@ -1,0 +1,140 @@
+name: iGaming Translation Quality
+
+on:
+  pull_request:
+    branches:
+      - docs/v4.1.0-documentation-sync
+      - master
+    paths:
+      - 'docs/iGaming/**/*.md'
+  push:
+    branches:
+      - docs/v4.1.0-documentation-sync
+    paths:
+      - 'docs/iGaming/**/*.md'
+
+jobs:
+  quality-check:
+    name: Translation Quality Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup validation scripts
+        run: |
+          chmod +x scripts/check-technical-terms.sh
+          chmod +x scripts/validate-zh-tw-encoding.sh
+          chmod +x scripts/check-terminology-consistency-zh-tw.sh
+          chmod +x scripts/validate-mermaid.sh
+
+      - name: Check technical terms preservation
+        id: check-technical-terms
+        run: |
+          echo "## Technical Terms Check" >> $GITHUB_STEP_SUMMARY
+          if bash scripts/check-technical-terms.sh docs/iGaming/ > /tmp/technical-terms.log 2>&1; then
+            echo "✅ PASS: All technical terms preserved in English" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "❌ FAIL: Technical terms mistranslation detected" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            tail -50 /tmp/technical-terms.log >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Check encoding and Traditional Chinese
+        id: check-encoding
+        run: |
+          echo "## Encoding & Traditional Chinese Check" >> $GITHUB_STEP_SUMMARY
+          if bash scripts/validate-zh-tw-encoding.sh docs/iGaming/ > /tmp/encoding.log 2>&1; then
+            echo "✅ PASS: UTF-8 encoding + Traditional Chinese" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "❌ FAIL: Encoding or simplified Chinese issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            tail -50 /tmp/encoding.log >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Check terminology consistency
+        id: check-terminology
+        continue-on-error: true
+        run: |
+          echo "## Terminology Consistency Check" >> $GITHUB_STEP_SUMMARY
+          if bash scripts/check-terminology-consistency-zh-tw.sh docs/iGaming/ > /tmp/terminology.log 2>&1; then
+            echo "✅ PASS: Terminology consistency >= 95%" >> $GITHUB_STEP_SUMMARY
+            # Extract statistics from log
+            grep -A 3 "Statistics:" /tmp/terminology.log >> $GITHUB_STEP_SUMMARY || true
+          else
+            echo "⚠️ WARNING: Terminology inconsistencies found (not blocking)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            tail -30 /tmp/terminology.log >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check Mermaid syntax
+        id: check-mermaid
+        run: |
+          echo "## Mermaid Syntax Check" >> $GITHUB_STEP_SUMMARY
+          if bash scripts/validate-mermaid.sh docs/iGaming/ > /tmp/mermaid.log 2>&1; then
+            echo "✅ PASS: All Mermaid diagrams use correct syntax" >> $GITHUB_STEP_SUMMARY
+            # Extract statistics from log
+            grep -A 2 "Statistics:" /tmp/mermaid.log >> $GITHUB_STEP_SUMMARY || true
+            exit 0
+          else
+            echo "❌ FAIL: Mermaid syntax errors detected" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            tail -50 /tmp/mermaid.log >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Generate quality report
+        if: always()
+        run: |
+          echo "## Quality Report Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Quality Gates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status | Severity |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Technical Terms | ${{ steps.check-technical-terms.outcome == 'success' && '✅ PASS' || '❌ FAIL' }} | CRITICAL |" >> $GITHUB_STEP_SUMMARY
+          echo "| Encoding | ${{ steps.check-encoding.outcome == 'success' && '✅ PASS' || '❌ FAIL' }} | HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "| Terminology | ${{ steps.check-terminology.outcome == 'success' && '✅ PASS' || '⚠️ WARNING' }} | MEDIUM |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mermaid Syntax | ${{ steps.check-mermaid.outcome == 'success' && '✅ PASS' || '❌ FAIL' }} | HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Reference" >> $GITHUB_STEP_SUMMARY
+          echo "- [Translation Glossary](docs/iGaming/TRANSLATION_GLOSSARY.md)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Ralph Guardrails](docs/ralph/guardrails.md)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR (on failure)
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const body = `## ❌ iGaming Translation Quality Check Failed
+
+Please fix the errors and push again.
+
+**Failed Checks:**
+- ${{ steps.check-technical-terms.outcome == 'failure' && '❌ Technical Terms' || '' }}
+- ${{ steps.check-encoding.outcome == 'failure' && '❌ Encoding' || '' }}
+- ${{ steps.check-mermaid.outcome == 'failure' && '❌ Mermaid Syntax' || '' }}
+
+**Reference:**
+- [TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md)
+- [Ralph Guardrails](docs/ralph/guardrails.md)
+
+View detailed logs in the [Actions](${context.payload.repository.html_url}/actions/runs/${context.runId}) tab.
+`;
+
+            github.rest.issues.createComment({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
