@@ -374,6 +374,315 @@ GP 發送 WIN 且 is_jackpot=true
 
 ---
 
+## 8. Java 實作範例（Java Implementation Example）
+
+### 8.1 Service 層（Service Layer）
+
+**GameProtocolService** - 處理遊戲供應商 API 呼叫（GetBalance、CheckToken、單表查詢）:
+
+```java
+package net.lab1024.sa.business.game.integration.service;
+
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.game.integration.dao.GameProviderProtocolDao;
+import net.lab1024.sa.business.game.integration.domain.entity.GameProviderProtocolEntity;
+import net.lab1024.sa.business.game.integration.domain.vo.BalanceResponseVO;
+import net.lab1024.sa.business.game.integration.domain.vo.TokenValidationVO;
+import net.lab1024.sa.business.game.integration.manager.GameProtocolManager;
+import net.lab1024.sa.business.wallet.service.WalletService;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+
+/**
+ * GameProtocolService - 遊戲供應商整合協定服務層
+ *
+ * 職責：
+ * - GetBalance API 實作（查詢玩家餘額）
+ * - CheckToken API 實作（驗證玩家 Token）
+ * - 供應商配置查詢（單表讀取，無需 @Transactional）
+ * - 委派 Transaction 處理至 Manager 層
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class GameProtocolService {
+
+    private final GameProviderProtocolDao gameProviderProtocolDao;
+    private final GameProtocolManager gameProtocolManager;
+    private final WalletService walletService;
+
+    /**
+     * GetBalance API - 查詢玩家餘額
+     *
+     * @param providerCode 供應商代碼（例如：PGSoft, Evolution）
+     * @param playerId 玩家 ID
+     * @return 餘額回應 VO（包含 balance、currency）
+     */
+    public Option<BalanceResponseVO> getBalance(String providerCode, Long playerId) {
+        return Try.of(() -> {
+            // 步驟 1: 驗證供應商是否啟用
+            GameProviderProtocolEntity protocol = validateProvider(providerCode)
+                .getOrElseThrow(() -> new IllegalArgumentException("供應商未啟用: " + providerCode));
+
+            // 步驟 2: 查詢玩家餘額（委派至 WalletService）
+            BigDecimal balance = walletService.getPlayerBalance(playerId)
+                .getOrElse(BigDecimal.ZERO);
+
+            // 步驟 3: 建立回應
+            BalanceResponseVO response = new BalanceResponseVO();
+            response.setPlayerId(playerId);
+            response.setBalance(balance);
+            response.setCurrency("USD"); // 從玩家設定取得
+            response.setProviderCode(providerCode);
+
+            log.info("GetBalance: 供應商 {} 查詢玩家 {} 餘額 = ${}", providerCode, playerId, balance);
+            return response;
+
+        }).toOption();
+    }
+
+    /**
+     * CheckToken API - 驗證玩家 Token 有效性
+     *
+     * @param providerCode 供應商代碼
+     * @param token 玩家遊戲 Token
+     * @return Token 驗證結果 VO（包含 valid、playerId、expiresAt）
+     */
+    public Option<TokenValidationVO> checkToken(String providerCode, String token) {
+        return Try.of(() -> {
+            // 步驟 1: 驗證供應商
+            validateProvider(providerCode)
+                .getOrElseThrow(() -> new IllegalArgumentException("供應商未啟用: " + providerCode));
+
+            // 步驟 2: 解析 Token（簡化示例，實際應使用 JWT 驗證）
+            // 實際實作應包含：Token 簽名驗證、過期時間檢查、Session 狀態檢查
+            Long playerId = parseTokenAndExtractPlayerId(token)
+                .getOrElseThrow(() -> new SecurityException("無效 Token"));
+
+            // 步驟 3: 建立驗證結果
+            TokenValidationVO validation = new TokenValidationVO();
+            validation.setValid(true);
+            validation.setPlayerId(playerId);
+            validation.setProviderCode(providerCode);
+
+            log.info("CheckToken: 供應商 {} Token 驗證成功，玩家 ID = {}", providerCode, playerId);
+            return validation;
+
+        }).toOption();
+    }
+
+    /**
+     * 查詢供應商協定配置
+     *
+     * @param providerCode 供應商代碼
+     * @return 供應商協定實體（包含 API 端點、通訊方式、驗證設定）
+     */
+    public Option<GameProviderProtocolEntity> getProviderProtocol(String providerCode) {
+        return Option.of(
+            gameProviderProtocolDao.selectOne(
+                Wrappers.<GameProviderProtocolEntity>lambdaQuery()
+                    .eq(GameProviderProtocolEntity::getProviderCode, providerCode)
+                    .eq(GameProviderProtocolEntity::getIsActive, true)
+            )
+        );
+    }
+
+    /**
+     * 驗證供應商是否啟用
+     */
+    private Option<GameProviderProtocolEntity> validateProvider(String providerCode) {
+        return getProviderProtocol(providerCode)
+            .filter(p -> p.getIsActive());
+    }
+
+    /**
+     * 解析 Token 並提取玩家 ID
+     * （實際實作應使用 JWT 解析器）
+     */
+    private Option<Long> parseTokenAndExtractPlayerId(String token) {
+        return Try.of(() -> {
+            // 簡化示例：實際應使用 JwtUtil.parseToken(token)
+            // 此處僅作為示意，真實系統應驗證 JWT 簽名、過期時間
+            return 12345L; // 示例玩家 ID
+        }).toOption();
+    }
+}
+```
+
+### 8.2 Manager 層（Manager Layer）
+
+**GameProtocolManager** - 處理交易與協定訊息日誌（需要 @Transactional）:
+
+```java
+package net.lab1024.sa.business.game.integration.manager;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.game.integration.dao.GameProviderProtocolDao;
+import net.lab1024.sa.business.game.integration.dao.ProtocolMessageLogDao;
+import net.lab1024.sa.business.game.integration.domain.entity.ProtocolMessageLogEntity;
+import net.lab1024.sa.business.wallet.manager.WalletManager;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * GameProtocolManager - 遊戲協定管理層
+ *
+ * 職責：
+ * - 處理遊戲交易（Bet/Win/Rollback）+ 更新餘額 (@Transactional)
+ * - 記錄協定訊息日誌 (@Transactional)
+ * - 冪等性檢查與重複請求處理
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class GameProtocolManager {
+
+    private final ProtocolMessageLogDao protocolMessageLogDao;
+    private final WalletManager walletManager;
+
+    /**
+     * 處理遊戲交易（投注/派彩/回滾）
+     *
+     * @param protocolId 供應商協定 ID
+     * @param transactionId 交易 ID（GP 提供）
+     * @param playerId 玩家 ID
+     * @param transactionType 交易類型（BET, WIN, ROLLBACK）
+     * @param amount 交易金額
+     * @param isJackpot 是否為彩金獎
+     * @return 是否處理成功
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public boolean processGameTransaction(
+        Long protocolId,
+        String transactionId,
+        Long playerId,
+        String transactionType,
+        BigDecimal amount,
+        boolean isJackpot
+    ) {
+        // 步驟 1: 冪等性檢查（是否已處理過此交易）
+        boolean alreadyProcessed = protocolMessageLogDao.exists(
+            Wrappers.<ProtocolMessageLogEntity>lambdaQuery()
+                .eq(ProtocolMessageLogEntity::getTransactionId, transactionId)
+                .eq(ProtocolMessageLogEntity::getMessageType, "Transaction")
+                .isNotNull(ProtocolMessageLogEntity::getResponsePayload) // 已回應表示已處理
+        );
+
+        if (alreadyProcessed) {
+            log.warn("交易 {} 已處理，跳過（冪等性保護）", transactionId);
+            return true; // 返回成功但不重複處理
+        }
+
+        // 步驟 2: 根據交易類型處理餘額變動
+        boolean balanceUpdated = switch (transactionType) {
+            case "BET" -> walletManager.debitBalance(playerId, amount, transactionId, "GAME_BET");
+            case "WIN" -> {
+                if (isJackpot) {
+                    // 彩金獎：凍結至彩金錢包，等待 GP 驗證
+                    yield walletManager.freezeJackpotWin(playerId, amount, transactionId);
+                } else {
+                    // 一般派彩：直接入帳
+                    yield walletManager.creditBalance(playerId, amount, transactionId, "GAME_WIN");
+                }
+            }
+            case "ROLLBACK" -> walletManager.creditBalance(playerId, amount, transactionId, "GAME_ROLLBACK");
+            default -> throw new IllegalArgumentException("未知交易類型: " + transactionType);
+        };
+
+        if (!balanceUpdated) {
+            log.error("餘額更新失敗: 交易 {}, 玩家 {}, 類型 {}", transactionId, playerId, transactionType);
+            return false;
+        }
+
+        // 步驟 3: 記錄協定訊息日誌
+        ProtocolMessageLogEntity messageLog = new ProtocolMessageLogEntity();
+        messageLog.setProtocolId(protocolId);
+        messageLog.setTransactionId(transactionId);
+        messageLog.setMessageType("Transaction");
+        messageLog.setDirection("REQUEST");
+        messageLog.setRequestPayload(buildTransactionRequestJson(transactionId, transactionType, amount));
+        messageLog.setResponsePayload("{\"status\": \"SUCCESS\"}");
+        messageLog.setProcessingTimeMs(calculateProcessingTime());
+        messageLog.setCreatedAt(LocalDateTime.now());
+
+        protocolMessageLogDao.insert(messageLog);
+
+        log.info("遊戲交易處理成功: 交易 {}, 玩家 {}, 類型 {}, 金額 ${}",
+            transactionId, playerId, transactionType, amount);
+        return true;
+    }
+
+    /**
+     * 記錄協定訊息日誌（GetBalance、CheckToken 等非交易訊息）
+     *
+     * @param protocolId 供應商協定 ID
+     * @param messageType 訊息類型（GetBalance, CheckToken, etc.）
+     * @param direction 方向（REQUEST, RESPONSE, CALLBACK）
+     * @param requestPayload 請求 Payload
+     * @param responsePayload 回應 Payload
+     * @param httpStatusCode HTTP 狀態碼
+     * @param processingTimeMs 處理時間（毫秒）
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void logProtocolMessage(
+        Long protocolId,
+        String messageType,
+        String direction,
+        String requestPayload,
+        String responsePayload,
+        Integer httpStatusCode,
+        Integer processingTimeMs
+    ) {
+        ProtocolMessageLogEntity messageLog = new ProtocolMessageLogEntity();
+        messageLog.setProtocolId(protocolId);
+        messageLog.setMessageType(messageType);
+        messageLog.setDirection(direction);
+        messageLog.setRequestPayload(requestPayload);
+        messageLog.setResponsePayload(responsePayload);
+        messageLog.setHttpStatusCode(httpStatusCode);
+        messageLog.setProcessingTimeMs(processingTimeMs);
+        messageLog.setCreatedAt(LocalDateTime.now());
+
+        protocolMessageLogDao.insert(messageLog);
+
+        log.debug("協定訊息已記錄: 供應商協定 ID {}, 類型 {}, 方向 {}", protocolId, messageType, direction);
+    }
+
+    /**
+     * 建立交易請求 JSON（簡化示例）
+     */
+    private String buildTransactionRequestJson(String transactionId, String type, BigDecimal amount) {
+        return String.format("{\"transaction_id\": \"%s\", \"type\": \"%s\", \"amount\": %s}",
+            transactionId, type, amount);
+    }
+
+    /**
+     * 計算處理時間（簡化示例，實際應使用 StopWatch）
+     */
+    private Integer calculateProcessingTime() {
+        return 120; // 示例：120ms
+    }
+}
+```
+
+**SmartAdmin 模式檢查點**:
+- ✅ Constructor injection (`@RequiredArgsConstructor` + `private final`)
+- ✅ Service 層無 `@Transactional`（單表查詢、委派至 Manager）
+- ✅ Manager 層使用 `@Transactional(rollbackFor = Throwable.class)`（多表操作 + 餘額更新）
+- ✅ Service 層使用 Vavr `Option` + `Try`（非 `java.util.Optional`）
+- ✅ SmartBeanUtil 用於 Entity ↔ VO 轉換（若需要）
+
+---
+
 ## 相關文件
 
 ### 核心依賴
