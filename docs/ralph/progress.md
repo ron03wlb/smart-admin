@@ -1,10 +1,10 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: Phase 13 (Coverage Enhancement) - Batch 3 COMPLETE ✅
-> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12) + 3 (Phase 13 Batch 1-3)
-> **Tasks Done This Iteration**: 1/1 Batch 3 (Token_Validation_Architecture)
-> **Java Coverage**: 97/118 (82.2%) → Target: ≥90% (need +10 files)
+> **Current Phase**: Phase 13 (Coverage Enhancement) - Batch 4 COMPLETE ✅
+> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12) + 4 (Phase 13 Batch 1-4)
+> **Tasks Done This Iteration**: 1/3 Batch 4 (Governance_Implementation - Added Java)
+> **Java Coverage**: 99/118 (83.9%) → Target: ≥90% (need +8 files)
 > **SQL Coverage**: 104/118 (88.1%) → Target: ≥95% (need +8 files)
 > **Mermaid Issues**: 0 in editable files ✅ (72 in READ-ONLY source-archive/)
 
@@ -718,10 +718,10 @@ Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 
 ### 13B: Java-Only Missing Files (target: ≥90%)
 
-#### Batch 4 — Core Business (3 files)
-- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+Java)
-- [ ] architecture/05_Risk_Engine/Risk_Implementation.md (+Java)
-- [ ] architecture/06_Platform_Core/Governance_Implementation.md (+Java)
+#### Batch 4 — Core Business (3 files) ✅ COMPLETE
+- [x] architecture/05_Risk_Engine/Detection_Model_Implementation.md (+Java DetectionModelService/RiskProposalManager/DetectionModelExecutor - ALREADY PRESENT)
+- [x] architecture/05_Risk_Engine/Risk_Implementation.md (+Java RiskRuleEngineService/RiskActionManager/FraudDetectionService/FraudManager/AgentCreditService/AgentCreditManager - ALREADY PRESENT)
+- [x] architecture/06_Platform_Core/Governance_Implementation.md (+Java GovernanceApprovalService/GovernanceApprovalManager - ADDED in commit 75a36604)
 
 #### Batch 5 — Game/Payment (3 files)
 - [ ] architecture/02_Finance_Service/Payment_Gateway_API.md (+Java)
@@ -733,7 +733,9 @@ Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 - [ ] architecture/11_Frontend/i18n_Localization.md (+Java)
 - [ ] architecture/11_Frontend/Mobile_App_Architecture.md (+Java)
 
-**After Batch 4-5**: Java ≈ 91% (93/102) ✅
+**After Batch 4**: Java = 83.9% (99/118) - Batch 4 files already had Java code
+**After Batch 5**: Java ≈ 86.4% (102/118) (if all 3 files added)
+**Target Status**: Need +8 more files to reach 90% (107/118)
 
 ### 13C: Phase 13 Quality Gate
 
