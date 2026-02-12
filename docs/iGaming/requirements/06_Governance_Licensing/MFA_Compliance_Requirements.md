@@ -1,9 +1,9 @@
 # MFA 合規與審計要求
 
-> **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
-> **Audience**: 高層管理、合規官員
-> **Related Doc**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
+> **目標讀者**: 高層管理、合規官員
+> **相關架構**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/MFA_Compliance_Technical.md)
+> **最後同步**: 2026-02-09
 >
 > **Refinement Note**: 技術細節（Backup Code AES-256-GCM 加密、Identity Document S3 上傳實作、Audit Log JSONB 格式 + Kafka 整合、Anomaly Detection 規則實作、HTTP 狀態碼、Redis 快取配置）已移至 Architecture 層。本文檔專注於業務政策、合規要求和運營程序。
 

@@ -1,10 +1,10 @@
 # SEO 與效能需求（SEO & Performance Requirements）
 
-> **Canonical Source**: [source-archive/11_Frontend_CMS/11-03](../../source-archive/11_Frontend_CMS/11-03_SEO_and_Performance.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, SEO Specialists, Performance Engineers
-> **Related Doc**: [SEO Performance Architecture](../../architecture/11_Frontend/SEO_Performance.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [source-archive/11_Frontend_CMS/11-03](../../source-archive/11_Frontend_CMS/11-03_SEO_and_Performance.md)
+> **文件類型**: 業務需求
+> **目標讀者**: 產品經理、SEO 專家、效能工程師
+> **相關架構**: [SEO Performance Architecture](../../architecture/11_Frontend/SEO_Performance.md)
+> **最後同步**: 2026-02-09
 
 ---
 

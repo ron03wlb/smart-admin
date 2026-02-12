@@ -1,10 +1,10 @@
 # MFA 需求 (Multi-Factor Authentication，多因素認證)
 
-> **Canonical Source**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
-> **View Type**: 業務需求
-> **Target Audience**: 產品經理、合規官員
-> **Related Doc**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
+> **文件類型**: 業務需求
+> **目標讀者**: 產品經理、合規官員
+> **相關架構**: [MFA Technical Architecture](../../architecture/06_Platform_Core/MFA_Technical.md)
+> **最後同步**: 2026-02-09
 
 **Related Source Documents**:
 - [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)

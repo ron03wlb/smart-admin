@@ -1,10 +1,10 @@
 # 資料保護需求（Data Protection Requirements）
 
-> **Canonical Source**: [source-archive/12_System_Security/12-03](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md), [12-03-03](../../source-archive/12_System_Security/12-03-03_GDPR_Data_Deletion.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers, Legal Team
-> **Related Doc**: [Data Security Standard Architecture](../../architecture/12_Security/Data_Security_Standard.md), [GDPR Data Deletion Architecture](../../architecture/12_Security/GDPR_Data_Deletion.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [source-archive/12_System_Security/12-03](../../source-archive/12_System_Security/12-03_Data_Security_Standard.md), [12-03-03](../../source-archive/12_System_Security/12-03-03_GDPR_Data_Deletion.md)
+> **文件類型**: 業務需求
+> **目標讀者**: 產品經理、合規官、法務團隊
+> **相關架構**: [Data Security Standard Architecture](../../architecture/12_Security/Data_Security_Standard.md), [GDPR Data Deletion Architecture](../../architecture/12_Security/GDPR_Data_Deletion.md)
+> **最後同步**: 2026-02-09
 
 ---
 

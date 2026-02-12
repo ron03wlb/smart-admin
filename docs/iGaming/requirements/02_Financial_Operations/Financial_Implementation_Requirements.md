@@ -1,9 +1,9 @@
 # 財務實施需求（Financial Implementation Requirements）
 
-> **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
-> **Audience**: Executives, Compliance Officers, Product Managers
-> **Related Doc**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
+> **目標讀者**: 高階主管、合規官、產品經理
+> **相關架構**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
+> **最後同步**: 2026-02-09
 >
 > **Refinement Note**: 技術細節（原子性、冪等性、HMAC-SHA256 演算法、SAGA 流程圖）已移至架構層。本文檔專注於業務需求。
 

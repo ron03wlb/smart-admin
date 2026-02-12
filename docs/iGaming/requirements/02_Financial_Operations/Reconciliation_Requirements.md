@@ -1,9 +1,9 @@
 # 對帳需求（Reconciliation Requirements）
 
-> **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
-> **Audience**: 高層管理人員、合規官、財務團隊、營運經理
-> **Related Doc**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
+> **目標讀者**: 高層管理人員、合規官、財務團隊、營運經理
+> **相關架構**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
+> **最後同步**: 2026-02-09
 >
 > **Refinement Note**: 技術細節（PostgreSQL/S3 Glacier 存儲、UTC 時區轉換算法、3DS 驗證實現、區塊鏈確認次數）已移至架構層。本文檔僅專注於業務需求。
 

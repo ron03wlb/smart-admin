@@ -1,9 +1,9 @@
 # 治理需求（Governance Requirements）
 
-> **Canonical Source**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
-> **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Architecture**: [Governance_Implementation.md](../../architecture/06_Platform_Core/Governance_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [00-15_Governance_Implementation.md](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md)
+> **目標讀者**: 高階主管、產品經理、合規官
+> **相關架構**: [Governance_Implementation.md](../../architecture/06_Platform_Core/Governance_Implementation.md)
+> **最後同步**: 2026-02-08
 
 ---
 

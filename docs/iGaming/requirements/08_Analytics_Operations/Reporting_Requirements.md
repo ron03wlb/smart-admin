@@ -1,10 +1,10 @@
 # 報表與 BI 業務需求
 
-> **Canonical Source**: [source-archive/08_Analytics_BI/08-01_Reporting_BI.md](../../source-archive/08_Analytics_BI/08-01_Reporting_BI.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Compliance Officers
-> **Related Doc**: [Reporting Architecture](../../architecture/08_Analytics_Service/Reporting_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [source-archive/08_Analytics_BI/08-01_Reporting_BI.md](../../source-archive/08_Analytics_BI/08-01_Reporting_BI.md)
+> **文件類型**: 業務需求
+> **目標讀者**: 產品經理、合規官
+> **相關架構**: [Reporting Architecture](../../architecture/08_Analytics_Service/Reporting_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

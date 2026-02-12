@@ -1,9 +1,9 @@
 # 投注與有效投注術語標準
 
-> **Canonical Source**: [00-08_Terminology_Standards.md](../../source-archive/00_Foundation/guides/00-08_Terminology_Standards.md)
-> **Audience**: Executives, Product Managers, Compliance Officers
-> **Related Architecture**: N/A — Reference/glossary document
-> **Last Synced**: 2026-02-08
+> **規範來源**: [00-08_Terminology_Standards.md](../../source-archive/00_Foundation/guides/00-08_Terminology_Standards.md)
+> **目標讀者**: 高階主管、產品經理、合規官
+> **相關架構**: N/A — 參考/術語文件
+> **最後同步**: 2026-02-08
 
 ---
 

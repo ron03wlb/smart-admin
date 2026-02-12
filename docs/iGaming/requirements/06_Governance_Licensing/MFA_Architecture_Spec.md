@@ -1,34 +1,34 @@
 # MFA 架構規格 - 業務需求與方法選擇
 
-> **Canonical Source**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
-> **Audience**: Executives, Compliance Officers, Risk Officers
-> **Related Doc**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
+> **目標讀者**: 高階主管、合規官、風險官
+> **相關架構**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/MFA_Technical_Evaluation.md)
+> **最後同步**: 2026-02-09
 >
-> **Refinement Note**: Technical details (TOTP RFC 6238 specifications, HMAC-SHA1 algorithms, SIM Swap attack vectors, SS7 hijacking, TOTP secret encryption AES/GCM, FIDO2 technical standards) moved to Architecture layer. This document focuses on business risk analysis and decision-making only.
+> **精煉說明**: 技術細節（TOTP RFC 6238 規範、HMAC-SHA1 演算法、SIM Swap 攻擊向量、SS7 劫持、TOTP secret 加密 AES/GCM、FIDO2 技術標準）已移至架構層。本文件僅關注業務風險分析和決策制定。
 
 ---
 
-## Business Value
+## 業務價值
 
-MFA (Multi-Factor Authentication) for backend users delivers critical business value by:
-- **Risk Reduction**: Reduces security risk from CVSS 8.1 (High) to 4.3 (Medium), approximately 47% risk reduction by increasing attack complexity
-- **Financial Loss Prevention**: Prevents account takeover attacks like the 2023 Finance Manager phishing incident ($237,000 USD loss) and 2024 Super Admin credential stuffing attack (120,000 player data breach)
-- **Regulatory Compliance**: Meets MGA mandatory requirements (avoiding EUR 50K-500K fines), UKGC recommendations, PCI DSS 4.0 Requirement 8.3.1, and GDPR Art. 32 (avoiding EUR 20M or 4% global revenue penalties)
-- **Operational Security**: Protects high-privilege operations (balance adjustments, withdrawal approvals, risk rule modifications, player data access) with second-factor verification
+後台用戶的多因素認證（MFA, Multi-Factor Authentication）透過以下方式提供關鍵業務價值：
+- **風險降低**: 將安全風險從 CVSS 8.1（高）降至 4.3（中），透過增加攻擊複雜度實現約 47% 的風險降低
+- **財務損失預防**: 防止帳戶接管攻擊，如 2023 年財務經理釣魚事件（損失 $237,000 USD）和 2024 年 Super Admin 密碼撞庫攻擊（120,000 玩家資料洩露）
+- **監管合規**: 滿足 MGA 強制要求（避免 EUR 50K-500K 罰款）、UKGC 建議、PCI DSS 4.0 Requirement 8.3.1 和 GDPR Art. 32（避免 EUR 20M 或全球營收 4% 的罰款）
+- **營運安全**: 透過第二因素驗證保護高權限操作（餘額調整、提款批准、風控規則修改、玩家資料存取）
 
 ---
 
-## Acceptance Criteria
+## 驗收標準
 
-- [ ] All Super Admin, Finance Manager, and Risk Control roles enforce MFA during login (no optional bypass for high-privilege accounts)
-- [ ] TOTP (Google Authenticator) is the primary MFA method (P0), with SMS OTP backup (P1), Email OTP fallback (P2), and Backup Codes emergency recovery (P3)
-- [ ] MFA Secret storage is encrypted using AES-256-GCM with proper key rotation policy
-- [ ] Verification failure policy: 3 consecutive failures trigger 15-minute account lockout with security alert notification
-- [ ] Audit logs capture all MFA events: registration, verification, failures, and recovery attempts
-- [ ] MFA compliance checklist passed (MGA requirements): Secret encryption, audit logging, penetration testing, and no self-service recovery
-- [ ] Decision matrix scoring: Option B (TOTP + SMS) achieves weighted score ≥4.8 (Security 40%, UX 30%, Cost 30%)
-- [ ] Phase-based implementation: TOTP (Week 1-2), SMS OTP (Week 3), Backup Codes (Week 4)
+- [ ] 所有 Super Admin、Finance Manager 和 Risk Control 角色在登入時強制執行 MFA（高權限帳戶無法選擇性繞過）
+- [ ] TOTP（Google Authenticator）為主要 MFA 方法（P0），SMS OTP 為備用（P1），Email OTP 為後備（P2），Backup Codes 為緊急恢復（P3）
+- [ ] MFA Secret 儲存使用 AES-256-GCM 加密，並具備適當的密鑰輪換政策
+- [ ] 驗證失敗政策：連續 3 次失敗觸發 15 分鐘帳戶鎖定，並發送安全警報通知
+- [ ] 審計日誌捕獲所有 MFA 事件：註冊、驗證、失敗和恢復嘗試
+- [ ] MFA 合規檢查清單通過（MGA 要求）：Secret 加密、審計日誌、滲透測試和禁止自助恢復
+- [ ] 決策矩陣評分：Option B（TOTP + SMS）達到加權分數 ≥4.8（安全性 40%、用戶體驗 30%、成本 30%）
+- [ ] 分階段實施：TOTP（第 1-2 週）、SMS OTP（第 3 週）、Backup Codes（第 4 週）
 
 ---
 

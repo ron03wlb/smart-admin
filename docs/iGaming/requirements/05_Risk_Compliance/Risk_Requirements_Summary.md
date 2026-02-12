@@ -1,9 +1,9 @@
 # 風險需求總結（Risk Requirements Summary）
 
-> **Canonical Source**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
-> **Audience**: Executives, Risk Officers, Compliance Managers
-> **Related Doc**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [00-14_Risk_Implementation.md](../../source-archive/00_Foundation/guides/00-14_Risk_Implementation.md)
+> **目標讀者**: 高階主管、風險官、合規經理
+> **相關架構**: [Risk_Implementation.md](../../architecture/05_Risk_Engine/Risk_Implementation.md)
+> **最後同步**: 2026-02-08
 
 ---
 

@@ -1,9 +1,9 @@
 # 流水驗證需求（Turnover Validation Requirements）
 
-> **Canonical Source**: [05-07_Turnover_Validation_Scheme.md](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
-> **Audience**: Executives, Product Managers, Risk Operations, Compliance Officers
-> **Related Architecture**: [Turnover_Validation_Architecture.md](../../architecture/05_Risk_Engine/Turnover_Validation_Architecture.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [05-07_Turnover_Validation_Scheme.md](../../source-archive/05_Risk_Control/05-07_Turnover_Validation_Scheme.md)
+> **目標讀者**: 高階主管、產品經理、風險營運、合規官
+> **相關架構**: [Turnover_Validation_Architecture.md](../../architecture/05_Risk_Engine/Turnover_Validation_Architecture.md)
+> **最後同步**: 2026-02-08
 
 ---
 

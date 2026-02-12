@@ -1,10 +1,10 @@
 # 風險控制策略概述（Risk Control Strategy Overview）
 
-> **Canonical Source**: [source-archive/05_Risk_Control/05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
-> **Audience**: Executives, Compliance Officers, Business Analysts
-> **Related Architecture**: [Risk_System_Architecture.md](../../architecture/05_Risk_Engine/Risk_System_Architecture.md)
-> **Last Synced**: 2026-02-08
-> **Source Version**: 4.0.0
+> **規範來源**: [source-archive/05_Risk_Control/05-01_Risk_Framework.md](../../source-archive/05_Risk_Control/05-01_Risk_Framework.md)
+> **目標讀者**: 高階主管、合規官、業務分析師
+> **相關架構**: [Risk_System_Architecture.md](../../architecture/05_Risk_Engine/Risk_System_Architecture.md)
+> **最後同步**: 2026-02-08
+> **來源版本**: 4.0.0
 
 ---
 

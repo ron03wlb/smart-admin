@@ -1,10 +1,10 @@
 # 客服平台需求（Customer Service Platform Requirements）
 
-> **Canonical Source**: [13-01_CS_Platform_Design.md](../../source-archive/13_Customer_Service/13-01_CS_Platform_Design.md)
-> **View Type**: Business Requirements
-> **Target Audience**: Product Managers, Customer Service Managers
-> **Related Doc**: [CS_Platform_Architecture.md](../../architecture/13_Customer_Service/CS_Platform_Architecture.md)
-> **Last Synced**: 2026-02-09
+> **規範來源**: [13-01_CS_Platform_Design.md](../../source-archive/13_Customer_Service/13-01_CS_Platform_Design.md)
+> **文件類型**: 業務需求
+> **目標讀者**: 產品經理、客戶服務經理
+> **相關架構**: [CS_Platform_Architecture.md](../../architecture/13_Customer_Service/CS_Platform_Architecture.md)
+> **最後同步**: 2026-02-09
 
 ---
 

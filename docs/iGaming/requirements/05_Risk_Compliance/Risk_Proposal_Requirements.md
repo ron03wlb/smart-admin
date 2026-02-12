@@ -1,9 +1,9 @@
 # 風險提案工作流程需求（Risk Proposal Workflow Requirements）
 
-> **Canonical Source**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
-> **Audience**: Executives, Compliance Officers, Risk Team Managers
-> **Related Architecture**: [Risk_Proposal_Implementation.md](../../architecture/05_Risk_Engine/Risk_Proposal_Implementation.md)
-> **Last Synced**: 2026-02-08
+> **規範來源**: [source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md](../../source-archive/05_Risk_Control/05-05_Risk_Proposal_Workflow.md)
+> **目標讀者**: 高階主管、合規官、風險團隊經理
+> **相關架構**: [Risk_Proposal_Implementation.md](../../architecture/05_Risk_Engine/Risk_Proposal_Implementation.md)
+> **最後同步**: 2026-02-08
 
 ---
 
