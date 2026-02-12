@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/03_Game_Center/03-04_Turnover_Calculation.md](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md)
 > **Audience**: 高階主管、產品經理
-> **Related Doc**: [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)
+> **Related Architecture**: [Turnover_Calculation_Logic.md](../../architecture/03_Game_Integration/Turnover_Calculation_Logic.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 4.0.0
 

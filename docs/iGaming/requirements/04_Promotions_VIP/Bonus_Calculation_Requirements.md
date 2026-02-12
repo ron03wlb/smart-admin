@@ -1,33 +1,33 @@
 # 獎金計算引擎業務需求 (Bonus Calculation Engine Requirements)
 
 > **Canonical Source**: [source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md)
-> **Audience**: Executives, Product Managers
-> **Related Doc**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
+> **Audience**: 高階主管、產品經理
+> **Related Architecture**: [Bonus_Calculation_Engine.md](../../architecture/04_Activity_Engine/Bonus_Calculation_Engine.md)
 > **Last Synced**: 2026-02-08
 > **Source Version**: 1.0.0
 
 ---
 
-## Business Value
+## 業務價值（Business Value）
 
-The Bonus Calculation Engine delivers critical business value by:
-- **Risk Control**: Game contribution rates prevent low house-edge games (e.g., Blackjack ~0.5%) from being exploited to easily complete turnover requirements, protecting bonus budget integrity
-- **Cost Optimization**: Multi-bonus conflict resolution strategies (MAX_REWARD, PRIORITY, TYPE_EXCLUSIVE) control bonus costs by preventing uncontrolled stacking while maintaining player experience
-- **Fraud Prevention**: Valid turnover validation rules block hedge betting and arbitrage strategies, reducing bonus abuse by up to 70%
-- **Financial Accuracy**: Daily reconciliation with ≤0.01% deviation tolerance ensures bonus system integrity and regulatory compliance
+獎金計算引擎提供關鍵業務價值：
+- **風險控制（Risk Control）**：遊戲貢獻率防止低莊家優勢遊戲（如二十一點 ~0.5%）被利用輕易完成流水要求 (Wagering Requirements)，保護獎金預算完整性
+- **成本優化（Cost Optimization）**：多獎金衝突處理策略（MAX_REWARD、PRIORITY、TYPE_EXCLUSIVE）透過防止無控制疊加來控制獎金成本，同時維護玩家體驗
+- **欺詐防範（Fraud Prevention）**：有效投注額 (Valid Turnover) 驗證規則阻擋對沖投注 (Hedge Betting) 和套利策略，可減少高達 70% 的獎金濫用
+- **財務準確性（Financial Accuracy）**：每日對帳偏差容忍 ≤0.01%，確保獎金系統完整性及監管合規
 
 ---
 
-## Success Metrics
+## 成功指標（Success Metrics）
 
-| Metric | Target | Measurement |
+| 指標 | 目標 | 衡量方式 |
 |--------|--------|-------------|
-| Bonus Cost Ratio | ≤15% of revenue | Daily financial reconciliation report |
-| Turnover Completion Rate | ≥30% | Players completing wagering requirements |
-| Conflict Resolution Complaint Rate | ≤2% | Customer service ticket analysis |
-| Reconciliation Deviation | ≤0.01% | Finance System vs Activity System daily variance |
-| Fraud Detection Rate | Block ≥70% of hedge/arbitrage attempts | Risk control alert analysis |
-| Player Activity Switch Frequency | ≤5 times/hour per player | Anti-arbitrage monitoring threshold |
+| 獎金成本比 (Bonus Cost Ratio) | ≤15% 營收 | 每日財務對帳報告 |
+| 流水完成率 (Turnover Completion Rate) | ≥30% | 完成流水要求的玩家比例 |
+| 衝突處理投訴率 | ≤2% | 客服工單分析 |
+| 對帳偏差 (Reconciliation Deviation) | ≤0.01% | 財務系統 vs 活動系統每日差異 |
+| 欺詐偵測率 | 阻擋 ≥70% 對沖/套利嘗試 | 風控警示分析 |
+| 玩家活動切換頻率 | ≤5 次/小時/玩家 | 反套利監控門檻 |
 
 ---
 

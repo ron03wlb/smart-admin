@@ -285,12 +285,12 @@ Priority: Requirements files contain business context suited for Chinese audienc
 - [x] requirements/03_Gaming_Operations/Game_Integration_Requirements.md (遊戲整合需求 - Related Doc→Related Architecture)
 - [x] requirements/03_Gaming_Operations/Game_Integration_Standards.md (遊戲整合標準 - Related Doc→Related Architecture)
 
-#### Batch 4 — Gaming Operations (3 files) + Promotions (2 files) [Status]
-- [ ] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md
-- [ ] requirements/03_Gaming_Operations/README.md
-- [ ] requirements/03_Gaming_Operations/Turnover_Business_Rules.md
-- [ ] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md
-- [ ] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md
+#### Batch 4 — Gaming Operations (3 files) + Promotions (2 files) ✅ COMPLETE
+- [x] requirements/03_Gaming_Operations/Game_Lobby_Requirements.md (遊戲大廳需求 - 已翻譯)
+- [x] requirements/03_Gaming_Operations/README.md (遊戲營運索引 - 術語標準化)
+- [x] requirements/03_Gaming_Operations/Turnover_Business_Rules.md (有效投注額業務規則 - Related Doc→Related Architecture)
+- [x] requirements/04_Promotions_VIP/Activity_Risk_Requirements.md (活動風險控制需求 - Related Doc→Related Architecture + Audience 翻譯)
+- [x] requirements/04_Promotions_VIP/Bonus_Calculation_Requirements.md (獎金計算引擎 - Audience + Business Value + Success Metrics 翻譯)
 
 #### Batch 5 — Promotions (2 files) + Risk Compliance (3 files) [Status]
 - [ ] requirements/04_Promotions_VIP/Promotion_Requirements.md
