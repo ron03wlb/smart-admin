@@ -1,602 +1,603 @@
-# Reconciliation Requirements
+# 對帳需求
 
 > **Canonical Source**: [02-03_Reconciliation_System.md](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md)
-> **Audience**: Executives, Compliance Officers, Finance Team, Operations Managers
+> **目標讀者**: 高階主管、合規官員、財務團隊、營運經理
 > **Related Architecture**: [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md)
-> **Last Synced**: 2026-02-09
+> **最後同步**: 2026-02-09
 >
-> **Refinement Note**: Technical details (PostgreSQL/S3 Glacier storage, UTC timezone conversion algorithms, 3DS verification implementation, blockchain confirmation counts) moved to Architecture layer. This document focuses on business requirements only.
+> **精煉說明**: 技術細節（PostgreSQL/S3 Glacier 儲存、UTC 時區轉換演算法、3DS 驗證實作、區塊鏈確認數）已移至 Architecture 層。本文件僅專注於業務需求。
 
 ---
 
-## Business Value
+## 業務價值 (Business Value)
 
-The reconciliation system delivers critical business value by:
-- **Fund Security**: Three-way matching (Platform ↔ PSP ↔ Bank) prevents fake callback attacks and ensures no unauthorized balance credits
-- **Regulatory Compliance**: 10-year data retention meets UKGC, MGA, and tax requirements; automated SAR/CTR generation satisfies AML obligations
-- **Operational Efficiency**: 100% automated Tier-1 real-time checks + 95% automated Tier-2 batch processing reduces manual workload
-- **Financial Accuracy**: ≥99.5% daily match rate target ensures reliable financial reporting and audit trails
-- **Risk Mitigation**: Immediate P0 alerts for short payments prevent fraud losses; chargeback monitoring protects against excessive dispute rates
-
----
-
-## 1. Business Overview
-
-Reconciliation is the last line of defense for platform fund security and data accuracy. The system compares "Internal Ledger" with "External Statements" and generates financial reports.
+對帳系統提供以下關鍵業務價值：
+- **資金安全**: 三方比對（平台 ↔ PSP ↔ 銀行）防止偽造回調攻擊，確保無未授權餘額入帳
+- **監管合規**: 10 年資料保留期限滿足 UKGC、MGA 及稅務要求；自動化 SAR/CTR 生成滿足 AML 義務
+- **營運效率**: 第一層即時檢查 100% 自動化 + 第二層批次處理 95% 自動化，減少人工工作量
+- **財務準確性**: ≥99.5% 每日匹配率目標確保可靠的財務報表和稽核軌跡
+- **風險緩解**: 短款的即時 P0 警報防止詐欺損失；退款監控防止過高的爭議率
 
 ---
 
-## 2. Core Functional Requirements
+## 1. 業務概述
 
-### 2.1 Three-Way Matching
-
-The system must compare data from three sources:
-
-1. **Platform Orders**: Player deposit/withdrawal records
-2. **PSP Reports**: Actual fund movement records from payment providers
-3. **Bank Statements**: Final fund landing records (when available)
-
-### 2.2 Three-Tier Reconciliation Architecture
-
-| Tier | Execution Frequency | Data Sources | Matching Method | Latency | Primary Purpose | Automation Level |
-|------|---------------------|--------------|-----------------|---------|-----------------|------------------|
-| **Tier 1: Real-time** | Within 30 seconds of transaction | Platform <-> PSP API | Active query verification | < 1 min | Prevent fake callback attacks | 100% Automated |
-| **Tier 2: Batch** | Hourly | Platform <-> PSP API | Batch query comparison | 1 hour | Detect delayed/dropped orders | 95% Automated (exceptions manual) |
-| **Tier 3: T+1 Daily** | Daily at 02:00 AM | Platform <-> PSP <-> Bank | Complete three-way matching | 1 day | Financial reports + Audit | 80% Automated (discrepancies manual) |
-
-### 2.3 Tolerance Configuration
-
-| Tolerance Type | Value | Description |
-|----------------|-------|-------------|
-| Amount Tolerance | 2% or $1 (whichever is smaller) | Acceptable difference range |
-| Time Tolerance | 10 minutes | Fuzzy matching time window |
-| Auto-Approve Threshold | < $10 difference within tolerance | Automatic pass without review |
+對帳是平台資金安全和資料準確性的最後防線。系統比對「內部帳本」與「外部對帳單」並產生財務報表。
 
 ---
 
-## 3. Discrepancy Handling Requirements
+## 2. 核心功能需求
 
-### 3.1 Discrepancy Types
+### 2.1 三方比對
 
-| Type | Definition | Risk Level | Response |
-|------|------------|------------|----------|
-| **Over (Long)** | External has money, platform has no order | MEDIUM | Manual supplement entry |
-| **Short** | Platform has successful order, external has no money | CRITICAL | Immediate alert + freeze player account |
-| **Amount Mismatch** | Platform order $100, actual deposit $90 | VARIES | Configure tolerance range |
+系統必須比對來自三個來源的資料：
 
-### 3.2 Discrepancy Handling Matrix
+1. **平台訂單**: 玩家存款/提款記錄
+2. **PSP 報表**: 支付供應商的實際資金流動記錄
+3. **銀行對帳單**: 最終資金到帳記錄（如可用）
 
-| Discrepancy Type | Amount Range | Risk Level | Response Time | Approval Authority | Automation | Typical Cause |
-|------------------|--------------|------------|---------------|-------------------|------------|---------------|
-| **Over Payment** | < $10 | LOW | 24 hours | Finance Specialist | 80% Auto | Test transactions, dropped orders |
-| | $10-$1000 | MEDIUM | 4 hours | Finance Manager | 50% Auto | Player mis-transfer, dropped orders |
-| | >= $1000 | HIGH | 1 hour | CFO | 0% (Full manual) | Large dropped order, abnormal transfer |
-| **Short Payment** | Any amount | CRITICAL | Immediate | CTO + CFO | 0% (Full manual) | Fake callback, fraud attack |
-| **Amount Mismatch** | < $1 (within tolerance) | LOW | Auto-pass | System Auto | 100% Auto | Exchange rate fluctuation, precision error |
-| | $1-$10 | LOW | 24 hours | System Auto | 100% Auto | Fee deduction, small variance |
-| | $10-$100 | MEDIUM | 4 hours | Finance Manager | 0% (Full manual) | Rate error, fee config error |
-| | >= $100 | HIGH | 1 hour | CFO | 0% (Full manual) | System error, PSP calculation error |
+### 2.2 三層對帳架構
 
-### 3.3 Escalation Path
+| 層級 | 執行頻率 | 資料來源 | 比對方式 | 延遲 | 主要目的 | 自動化程度 |
+|------|---------|---------|---------|------|---------|-----------|
+| **第一層: 即時** | 交易後 30 秒內 | 平台 ↔ PSP API | 主動查詢驗證 | < 1 分鐘 | 防止偽造回調攻擊 | 100% 自動 |
+| **第二層: 批次** | 每小時 | 平台 ↔ PSP API | 批次查詢比對 | 1 小時 | 偵測延遲/遺漏訂單 | 95% 自動（例外人工） |
+| **第三層: T+1 每日** | 每日 02:00 | 平台 ↔ PSP ↔ 銀行 | 完整三方比對 | 1 天 | 財務報表 + 稽核 | 80% 自動（差異人工） |
 
-| Level | Handler | Decision Authority | SLA | Escalation Condition |
-|-------|---------|-------------------|-----|---------------------|
-| **L1** | System Auto | Risk Flag + Reconciliation Exception -> Auto-suspend | Immediate | Auto-triggered |
-| **L2** | Finance Manager | Conflicts < $10,000 | 4h | L1 unresolved |
-| **L3** | CTO + CFO | >= $10,000 or involving SAR | 1h | L2 unresolved |
-| **L4** | Board | Regulatory reports or major funds | 24h | L3 requires board notification |
+### 2.3 容差配置
+
+| 容差類型 | 數值 | 說明 |
+|---------|------|------|
+| 金額容差 | 2% 或 $1（取較小者） | 可接受差異範圍 |
+| 時間容差 | 10 分鐘 | 模糊比對時間窗口 |
+| 自動核准閾值 | 差異 < $10 且在容差內 | 無需審核自動通過 |
 
 ---
 
-## 4. Dispute Resolution Procedures
+## 3. 差異處理需求
 
-### 4.1 Over Payment (Long) Handling
+### 3.1 差異類型
 
-**Step 1: Verify Data Source**
-- Check if PSP transaction is a test environment transaction
-- If test data entered production -> Ignore
+| 類型 | 定義 | 風險等級 | 回應 |
+|------|------|---------|------|
+| **多款（長款）** | 外部有錢，平台無訂單 | 中 | 人工補單 |
+| **短款** | 平台有成功訂單，外部無錢 | 嚴重 | 立即警報 + 凍結玩家帳戶 |
+| **金額不符** | 平台訂單 $100，實際存款 $90 | 視情況 | 配置容差範圍 |
 
-**Step 2: Query Player Account**
-- Search player by PSP report email/phone
-- Check for pending orders with matching amount
+### 3.2 差異處理矩陣
 
-**Step 3: Supplement Order**
-- Auto-supplement conditions: Amount < $100 AND player is trusted
-- Otherwise: Submit for manual review with supporting documents
+| 差異類型 | 金額範圍 | 風險等級 | 回應時間 | 核准權限 | 自動化 | 典型原因 |
+|---------|---------|---------|---------|---------|--------|---------|
+| **多款** | < $10 | 低 | 24 小時 | 財務專員 | 80% 自動 | 測試交易、遺漏訂單 |
+| | $10-$1000 | 中 | 4 小時 | 財務經理 | 50% 自動 | 玩家誤轉、遺漏訂單 |
+| | >= $1000 | 高 | 1 小時 | CFO | 0%（全人工） | 大額遺漏、異常轉帳 |
+| **短款** | 任何金額 | 嚴重 | 立即 | CTO + CFO | 0%（全人工） | 偽造回調、詐欺攻擊 |
+| **金額不符** | < $1（容差內） | 低 | 自動通過 | 系統自動 | 100% 自動 | 匯率波動、精度誤差 |
+| | $1-$10 | 低 | 24 小時 | 系統自動 | 100% 自動 | 手續費扣除、小差異 |
+| | $10-$100 | 中 | 4 小時 | 財務經理 | 0%（全人工） | 匯率錯誤、手續費配置錯誤 |
+| | >= $100 | 高 | 1 小時 | CFO | 0%（全人工） | 系統錯誤、PSP 計算錯誤 |
 
-### 4.2 Short Payment Handling
+### 3.3 升級路徑
 
-**CRITICAL ALERT**: Possible fake callback attack!
-
-**Step 1: Immediate Freeze**
-- Freeze player account immediately
-- Update player status to 'frozen'
-
-**Step 2: Investigation**
-1. Check PSP callback logs (IP, timestamp, signature)
-2. Contact PSP customer service to confirm payment receipt
-3. If PSP confirms no payment -> Rollback player balance
-
-**Step 3: Resolution**
-- Confirmed fraud: Rollback balance + Risk alert + Consider police report (if > $10,000)
-- PSP data issue: Wait for PSP data sync (24-48 hours) then recheck
-
-### 4.3 Amount Mismatch Handling
-
-**Tolerance Check Process**:
-1. Calculate difference: `diff = |platform - psp|`
-2. Calculate percentage: `diff_pct = diff / platform × 100%`
-3. Apply tolerance rules per matrix above
+| 層級 | 處理人 | 決策權限 | SLA | 升級條件 |
+|------|--------|---------|-----|---------|
+| **L1** | 系統自動 | 風險標記 + 對帳例外 → 自動暫停 | 立即 | 自動觸發 |
+| **L2** | 財務經理 | 衝突 < $10,000 | 4 小時 | L1 未解決 |
+| **L3** | CTO + CFO | >= $10,000 或涉及 SAR | 1 小時 | L2 未解決 |
+| **L4** | 董事會 | 監管報告或重大資金 | 24 小時 | L3 需要董事會通知 |
 
 ---
 
-## 5. Daily Closing Process
+## 4. 爭議處理程序
 
-### 5.1 Automated Schedule
+### 4.1 多款（長款）處理
 
-- **Execution Time**: 02:00 AM daily
-- **Target Data**: Previous day's PSP reports (CSV/API)
-- **Matching Method**: Key-Value comparison (Order ID)
+**步驟 1: 驗證資料來源**
+- 檢查 PSP 交易是否為測試環境交易
+- 若測試資料進入生產環境 → 忽略
 
-### 5.2 Daily Report Contents
+**步驟 2: 查詢玩家帳戶**
+- 依 PSP 報表的 email/電話搜尋玩家
+- 檢查是否有金額相符的待處理訂單
 
-| Report Item | Description |
-|-------------|-------------|
-| Total Deposits | Sum of all deposits for the day |
-| Total Withdrawals | Sum of all withdrawals for the day |
-| Fees | Total transaction fees |
-| Discrepancy Count | Number of unmatched records |
-| Discrepancy Amount | Total unmatched amount |
+**步驟 3: 補單**
+- 自動補單條件：金額 < $100 且玩家為信任玩家
+- 否則：提交人工審核並附上佐證文件
+
+### 4.2 短款處理
+
+**嚴重警報**: 可能為偽造回調攻擊！
+
+**步驟 1: 立即凍結**
+- 立即凍結玩家帳戶
+- 更新玩家狀態為「已凍結」
+
+**步驟 2: 調查**
+1. 檢查 PSP 回調日誌（IP、時間戳、簽名）
+2. 聯繫 PSP 客服確認是否收到付款
+3. 若 PSP 確認無付款 → 回滾玩家餘額
+
+**步驟 3: 處理**
+- 確認詐欺：回滾餘額 + 風險警報 + 考慮報警（若 > $10,000）
+- PSP 資料問題：等待 PSP 資料同步（24-48 小時）後重新檢查
+
+### 4.3 金額不符處理
+
+**容差檢查流程**:
+1. 計算差異：`diff = |platform - psp|`
+2. 計算百分比：`diff_pct = diff / platform × 100%`
+3. 依上述矩陣套用容差規則
 
 ---
 
-## 6. Agent Settlement Reconciliation
+## 5. 每日結帳流程
 
-For credit network model operations:
+### 5.1 自動排程
 
-### 6.1 Core Formula
+- **執行時間**: 每日 02:00
+- **目標資料**: 前一日 PSP 報表（CSV/API）
+- **比對方式**: 鍵值比對（訂單 ID）
+
+### 5.2 每日報表內容
+
+| 報表項目 | 說明 |
+|---------|------|
+| 總存款 | 當日所有存款總和 |
+| 總提款 | 當日所有提款總和 |
+| 手續費 | 總交易手續費 |
+| 差異筆數 | 未匹配記錄數 |
+| 差異金額 | 未匹配總金額 |
+
+---
+
+## 6. 代理結算對帳
+
+適用於信用網模式營運：
+
+### 6.1 核心公式
 
 ```
-Net Payable = (Total Win/Loss - Commission) + Adjustment (Late Settlement)
+淨應付 = (總輸贏 - 佣金) + 調整（延遲結算）
 ```
 
-### 6.2 Input Data
+### 6.2 輸入資料
 
-1. **System Report**: System-generated weekly statement
-2. **Manual Input / Bank Statement**: Actual remittance proof (USDT TxID or bank statement)
+1. **系統報表**: 系統生成的週結報表
+2. **人工輸入 / 銀行對帳單**: 實際匯款證明（USDT TxID 或銀行對帳單）
 
-### 6.3 Write-off Logic
+### 6.3 沖銷邏輯
 
-| Condition | Action |
-|-----------|--------|
-| Match (difference < $10) | Auto-execute Credit Reset, restore agent credit limit |
-| Mismatch | Generate Outstanding Debt ticket, freeze agent credit until difference is settled |
-
----
-
-## 7. Alert Notification Rules
-
-| Discrepancy Type | Alert Level | Notification Channel | Recipients | Frequency | Continuous Alert Condition |
-|------------------|-------------|---------------------|------------|-----------|---------------------------|
-| Short Payment | P0 | SMS + Email + Slack | CTO, CFO, Risk Team | Immediate + Every 30 min | Unprocessed |
-| Large Over (>=$10k) | P1 | Email + Slack | CFO, Finance Manager | Immediate + Every 2 hours | Unapproved |
-| Medium Over ($1k-$10k) | P2 | Email | Finance Manager | Immediate + Daily summary | 24h unprocessed |
-| Small Over (<$1k) | P3 | Email | Finance Specialist | Daily summary | No continuous |
-| Large Amount Mismatch (>=$100) | P2 | Email + Slack | Finance Manager | Immediate + Every 4 hours | Unapproved |
-| Small Amount Mismatch (<$100) | P3 | Email | Finance Specialist | Daily summary | No continuous |
-| PSP API Failure | P1 | SMS + Slack | DevOps, Backend Team | Immediate + Every 15 min | Service not restored |
+| 條件 | 動作 |
+|------|------|
+| 匹配（差異 < $10） | 自動執行信用重置，恢復代理信用額度 |
+| 不匹配 | 產生未結帳工單，凍結代理信用直到差異解決 |
 
 ---
 
-## 8. Approval and Permissions
+## 7. 警報通知規則
 
-### 8.1 Manual Adjustment Process
-
-1. Finance staff identifies discrepancy, submits adjustment request
-2. Fill in adjustment reason (required, minimum 20 characters)
-3. Upload supporting documents (bank screenshot, PSP email reply, etc.)
-4. **Mandatory Approval**: Adjustment amount > $0 requires Finance Manager approval
-
-### 8.2 Role Permission Matrix (RBAC)
-
-| Operation | Finance Specialist | Finance Manager | CTO | Super Admin |
-|-----------|-------------------|-----------------|-----|-------------|
-| View Reconciliation Report | Yes | Yes | Yes | Yes |
-| Submit Adjustment Request | Yes | Yes | No | Yes |
-| Approve Adjustment (< $1000) | No | Yes | Yes | Yes |
-| Approve Adjustment (>= $1000) | No | No | Yes | Yes |
-| Modify Reconciliation Rules | No | No | Yes | Yes |
+| 差異類型 | 警報等級 | 通知管道 | 接收者 | 頻率 | 持續警報條件 |
+|---------|---------|---------|--------|------|-------------|
+| 短款 | P0 | SMS + Email + Slack | CTO、CFO、風控團隊 | 立即 + 每 30 分鐘 | 未處理 |
+| 大額多款（>= $10k） | P1 | Email + Slack | CFO、財務經理 | 立即 + 每 2 小時 | 未核准 |
+| 中額多款（$1k-$10k） | P2 | Email | 財務經理 | 立即 + 每日摘要 | 24 小時未處理 |
+| 小額多款（< $1k） | P3 | Email | 財務專員 | 每日摘要 | 無持續 |
+| 大額金額不符（>= $100） | P2 | Email + Slack | 財務經理 | 立即 + 每 4 小時 | 未核准 |
+| 小額金額不符（< $100） | P3 | Email | 財務專員 | 每日摘要 | 無持續 |
+| PSP API 失敗 | P1 | SMS + Slack | DevOps、後端團隊 | 立即 + 每 15 分鐘 | 服務未恢復 |
 
 ---
 
-## 9. Compliance Requirements
+## 8. 核准與權限
 
-### 9.1 Audit Trail Requirements
+### 8.1 人工調整流程
 
-- All manual adjustments must go through dual approval (submitter != approver)
-- Adjustment amount >= $1000 must include supporting documents (bank screenshot, PSP email, etc.)
-- Short payment events must be investigated and reported within 24 hours
-- Audit logs must be retained for 7 years (tax compliance requirement)
-- Monthly reconciliation reports must be submitted to external auditors (if applicable)
-- Discrepancy handling SOP must be reviewed and updated annually (Compliance department responsibility)
+1. 財務人員識別差異，提交調整請求
+2. 填寫調整原因（必填，最少 20 字元）
+3. 上傳佐證文件（銀行截圖、PSP 回覆郵件等）
+4. **強制核准**: 調整金額 > $0 需財務經理核准
 
-### 9.2 Multi-Regulatory Data Retention Requirements
+### 8.2 角色權限矩陣（RBAC）
 
-| Regulator | Reconciliation Data Retention | Game Audit Logs | Key Requirements |
-|-----------|------------------------------|-----------------|------------------|
-| **UKGC** | 5 years | 5 years | Complete transaction history, replay verification |
-| **MGA** | 10 years | 10 years | Immutable timestamps, audit traceability |
-| **PAGCOR** | 5 years | 5 years | Player self-service query |
-| **Curacao** | 3 years | 3 years | Minimum requirement |
-| **Tax Compliance** | 7 years | - | Financial reports and transaction vouchers |
-
-**SmartAdmin Standard**: Adopt **10-year** unified retention period to meet all regulatory requirements.
-
-### 9.3 Data Archival Strategy
-
-The system MUST implement tiered storage based on data age:
-
-| Data Tier | Scope | Access Requirement |
-|-----------|-------|-------------------|
-| Hot Data | Last 90 days | Immediate access (< 100ms) |
-| Warm Data | 90 days - 2 years | Near real-time access (< 1s) |
-| Cold Data | 2 years - 10 years | Acceptable restoration delay (minutes) |
-
-→ **[Technical Storage Implementation](../../architecture/02_Finance_Service/Reconciliation_Technical.md#data-archival)** - PostgreSQL/MySQL configuration, S3 Glacier/Azure Archive setup, partitioning strategies
-
-### 9.4 Monthly Compliance Report
-
-| Report Item | Description | Regulatory Requirement |
-|-------------|-------------|----------------------|
-| Reconciliation Completion Rate | Monthly transactions vs reconciled transactions | UKGC/MGA require 99%+ |
-| Discrepancy Resolution Time | Average processing time | P0 < 1h, P1 < 4h |
-| Manual Adjustment Records | Audit logs for all adjustments | Dual approval + Supporting documents |
-| PSP Reconciliation Rate | Reconciliation success rate by PSP | Identify problem channels |
+| 操作 | 財務專員 | 財務經理 | CTO | 超級管理員 |
+|------|---------|---------|-----|-----------|
+| 檢視對帳報表 | 是 | 是 | 是 | 是 |
+| 提交調整請求 | 是 | 是 | 否 | 是 |
+| 核准調整（< $1000） | 否 | 是 | 是 | 是 |
+| 核准調整（>= $1000） | 否 | 否 | 是 | 是 |
+| 修改對帳規則 | 否 | 否 | 是 | 是 |
 
 ---
 
-## 10. Multi-Currency Exchange Rate Reconciliation
+## 9. 合規需求
 
-### 10.1 Core Principle
+### 9.1 稽核軌跡需求
 
-Record exchange rate snapshot at transaction time, compare with PSP actual settlement rate.
+- 所有人工調整必須經過雙重核准（提交者 != 核准者）
+- 調整金額 >= $1000 必須包含佐證文件（銀行截圖、PSP 郵件等）
+- 短款事件必須在 24 小時內調查並報告
+- 稽核日誌必須保留 7 年（稅務合規要求）
+- 月度對帳報表必須提交給外部稽核師（如適用）
+- 差異處理 SOP 必須每年審核更新（合規部門負責）
 
-### 10.2 Exchange Rate Reconciliation Rules
+### 9.2 多監管資料保留需求
 
-| Variance Range | Handling | Description |
-|----------------|----------|-------------|
-| < 0.5% | Auto-pass | Normal exchange rate fluctuation |
-| 0.5% - 1% | Record alert | Large fluctuation, record but don't block |
-| 1% - 3% | Manual review | Abnormal fluctuation, verify PSP report |
-| > 3% | Suspend transaction | Extreme fluctuation, possible error |
+| 監管機構 | 對帳資料保留 | 遊戲稽核日誌 | 關鍵需求 |
+|---------|-------------|-------------|---------|
+| **UKGC** | 5 年 | 5 年 | 完整交易歷史、重播驗證 |
+| **MGA** | 10 年 | 10 年 | 不可變時間戳、稽核可追溯 |
+| **PAGCOR** | 5 年 | 5 年 | 玩家自助查詢 |
+| **Curacao** | 3 年 | 3 年 | 最低要求 |
+| **稅務合規** | 7 年 | - | 財務報表及交易憑證 |
 
----
+**SmartAdmin 標準**: 採用 **10 年** 統一保留期限以滿足所有監管要求。
 
-## 11. PSP Settlement Cycle Requirements
+### 9.3 資料歸檔策略
 
-### 11.1 Settlement Cycle Configuration
+系統必須根據資料年齡實作分層儲存：
 
-| PSP Type | Settlement Cycle | Reconciliation Strategy |
-|----------|-----------------|------------------------|
-| **Instant Settlement** (PayPal, Crypto) | T+0 | Layer 1 Real-time reconciliation |
-| **Next Day Settlement** (Alipay, some bank cards) | T+1 | Layer 3 Daily reconciliation |
-| **Multi-Day Settlement** (Credit cards, Stripe) | T+2 ~ T+7 | Delayed reconciliation task |
-| **Weekly Settlement** (some bank transfers) | T+7 | Weekly reconciliation task |
+| 資料層級 | 範圍 | 存取需求 |
+|---------|------|---------|
+| 熱資料 | 最近 90 天 | 立即存取（< 100ms） |
+| 溫資料 | 90 天 - 2 年 | 近即時存取（< 1s） |
+| 冷資料 | 2 年 - 10 年 | 可接受復原延遲（分鐘） |
 
-### 11.2 Delayed Reconciliation Requirements
+→ **[技術儲存實作](../../architecture/02_Finance_Service/Reconciliation_Technical.md#data-archival)** - PostgreSQL/MySQL 配置、S3 Glacier/Azure Archive 設定、分割策略
 
-- Mark as pending reconciliation when PSP settlement cycle > T+1
-- Record expected reconciliation date
-- Daily delayed reconciliation task at 03:00
-- Maximum wait period: T+10 before marking as exception for manual handling
+### 9.4 月度合規報表
 
----
-
-## 12. Refund and Chargeback Reconciliation
-
-### 12.1 Refund Types
-
-| Type | Initiator | Timeframe | Process |
-|------|-----------|-----------|---------|
-| **Active Refund** | Operator | 1-30 days after transaction | Operator initiates -> PSP confirms -> Player receives |
-| **Chargeback** | Player's bank | 1-120 days after transaction | Bank notifies -> PSP deducts -> Operator disputes |
-| **Pre-authorization Cancel** | Operator | Within 7 days of authorization | Operator initiates -> PSP cancels |
-
-### 12.2 Chargeback Alert Rules
-
-| Alert Condition | Priority | Response Time |
-|-----------------|----------|---------------|
-| Single Chargeback > $1,000 | P0 | Immediate |
-| Player >= 3 Chargebacks in 30 days | P1 | 4h |
-| Daily Chargeback Rate > 0.5% | P1 | 4h |
-| Monthly Chargeback Rate > 1% | P0 | Immediate |
+| 報表項目 | 說明 | 監管要求 |
+|---------|------|---------|
+| 對帳完成率 | 月交易數 vs 對帳交易數 | UKGC/MGA 要求 99%+ |
+| 差異處理時間 | 平均處理時間 | P0 < 1h、P1 < 4h |
+| 人工調整記錄 | 所有調整的稽核日誌 | 雙重核准 + 佐證文件 |
+| PSP 對帳率 | 各 PSP 對帳成功率 | 識別問題通道 |
 
 ---
 
-## 13. Negative Balance Reconciliation
+## 10. 多幣種匯率對帳
 
-### 13.1 Negative Balance Scenarios
+### 10.1 核心原則
 
-| Scenario | Cause | Typical Amount | Risk Level |
-|----------|-------|----------------|------------|
-| **Chargeback** | Bank refund when insufficient balance | $10 - $10,000 | HIGH |
-| **Game Rollback** | Void/Cancel when insufficient balance | $1 - $500 | MEDIUM |
-| **System Error** | Rollback after duplicate credit | Variable | HIGH |
-| **Bonus Clawback** | Bonus revoked for rule violation | $10 - $5,000 | MEDIUM |
-| **Exchange Rate Adjustment** | Settlement vs transaction rate difference | $1 - $100 | LOW |
+記錄交易時的匯率快照，與 PSP 實際結算匯率比較。
 
-### 13.2 Auto-Processing Rules
+### 10.2 匯率對帳規則
 
-| Condition | Handling | Description |
-|-----------|----------|-------------|
-| Negative balance < $10 | Auto-recover | Deduct from next deposit |
-| Negative balance $10 - $100 | Notify + Wait | 7-day auto-recovery window |
-| Negative balance > $100 | Freeze account | Must recover before unfreezing |
-| Negative balance > $1,000 | Freeze + Risk review | Possible fraud |
-
-### 13.3 Bad Debt Recognition Rules
-
-| Time Condition | Amount Condition | Action |
-|----------------|------------------|--------|
-| > 30 days persistent | Single < $50 | Auto-recognize after 30 days |
-| > 60 days persistent | Single $50-$500 | Manual review recognition |
-| > 60 days persistent | Single > $500 | Legal evaluation for collection potential |
-| > 90 days + VIP player | Any | Extended to 90 days |
-| Under dispute | Any | Do not recognize |
-| Under legal pursuit | Any | Do not recognize |
+| 差異範圍 | 處理 | 說明 |
+|---------|------|------|
+| < 0.5% | 自動通過 | 正常匯率波動 |
+| 0.5% - 1% | 記錄警報 | 大幅波動，記錄但不阻擋 |
+| 1% - 3% | 人工審核 | 異常波動，驗證 PSP 報表 |
+| > 3% | 暫停交易 | 極端波動，可能錯誤 |
 
 ---
 
-## 14. AML/KYC Integration Requirements
+## 11. PSP 結算週期需求
 
-### 14.1 Integration Points
+### 11.1 結算週期配置
 
-| Integration Point | Reconciliation Responsibility | AML/KYC Responsibility | Data Flow |
-|-------------------|------------------------------|----------------------|-----------|
-| **Large Transaction Flagging** | Flag > $10,000 transactions | Generate CTR report | Reconciliation -> AML |
-| **Suspicious Transaction Report** | Identify abnormal patterns | Generate STR report | Reconciliation -> AML |
-| **KYC Status Association** | Verify KYC status | Provide KYC level | KYC -> Reconciliation |
-| **Sanctions Screening** | Transaction party info | List matching | Reconciliation -> AML |
+| PSP 類型 | 結算週期 | 對帳策略 |
+|---------|---------|---------|
+| **即時結算**（PayPal、Crypto） | T+0 | 第一層即時對帳 |
+| **次日結算**（Alipay、部分銀行卡） | T+1 | 第三層每日對帳 |
+| **多日結算**（信用卡、Stripe） | T+2 ~ T+7 | 延遲對帳任務 |
+| **週結算**（部分銀行轉帳） | T+7 | 週對帳任務 |
 
-### 14.2 KYC Level and Transaction Limits
+### 11.2 延遲對帳需求
 
-| KYC Level | Single Limit | Daily Limit | Monthly Limit | Reconciliation Handling |
-|-----------|--------------|-------------|---------------|------------------------|
-| **NONE** | $100 | $500 | $2,000 | Auto-reject if exceeded |
-| **BASIC** | $1,000 | $5,000 | $20,000 | Manual review if exceeded |
-| **ENHANCED** | $10,000 | $50,000 | $200,000 | Auto-flag large transactions |
-| **FULL** | $50,000 | $200,000 | Unlimited | CTR recording only |
+- PSP 結算週期 > T+1 時標記為待對帳
+- 記錄預期對帳日期
+- 每日 03:00 延遲對帳任務
+- 最長等待期限：T+10 後標記為例外進行人工處理
 
 ---
 
-## 15. Cross-Timezone Reconciliation Requirements
+## 12. 退款與拒付對帳
 
-### 15.1 Timezone Unification Requirements
+### 12.1 退款類型
 
-**Core Principle**: All reconciliation MUST use a unified baseline timezone to ensure accurate comparisons across different data sources.
+| 類型 | 發起方 | 時間範圍 | 流程 |
+|------|--------|---------|------|
+| **主動退款** | 營運商 | 交易後 1-30 天 | 營運商發起 → PSP 確認 → 玩家收到 |
+| **拒付 (Chargeback)** | 玩家銀行 | 交易後 1-120 天 | 銀行通知 → PSP 扣款 → 營運商申訴 |
+| **預授權取消** | 營運商 | 授權後 7 天內 | 營運商發起 → PSP 取消 |
 
-**Data Source Considerations**:
-- Platform orders (baseline timezone)
-- PSP reports (may use different timezones)
-- Bank statements (local timezone)
-- Game provider reports (configured per provider)
+### 12.2 拒付警報規則
 
-### 15.2 Time Tolerance Requirements
-
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| Standard Window | Daily reconciliation period | Defines reconciliation day boundary |
-| Tolerance Range | +/- 30 minutes | Handles cross-day boundary transactions |
-| Maximum Delay | 48 hours | Covers weekends and holidays |
-
-→ **[Timezone Conversion Implementation](../../architecture/02_Finance_Service/Reconciliation_Technical.md#timezone-handling)** - UTC conversion algorithms, timezone offset configuration, cross-day identification logic
+| 警報條件 | 優先級 | 回應時間 |
+|---------|--------|---------|
+| 單筆拒付 > $1,000 | P0 | 立即 |
+| 玩家 30 天內 >= 3 次拒付 | P1 | 4 小時 |
+| 每日拒付率 > 0.5% | P1 | 4 小時 |
+| 每月拒付率 > 1% | P0 | 立即 |
 
 ---
 
-## 16. Fund Segregation Verification
+## 13. 負餘額對帳
 
-> **Industry Basis**: UKGC LCCP 4.2.1, MGA Rule 44
-> **Penalty Case**: William Hill 6.2M GBP (2018) - Improper fund segregation
+### 13.1 負餘額情境
 
-### 16.1 Verification Formula
+| 情境 | 原因 | 典型金額 | 風險等級 |
+|------|------|---------|---------|
+| **拒付** | 餘額不足時銀行退款 | $10 - $10,000 | 高 |
+| **遊戲回滾** | 餘額不足時作廢/取消 | $1 - $500 | 中 |
+| **系統錯誤** | 重複入帳後回滾 | 不定 | 高 |
+| **紅利回收** | 違規導致紅利撤銷 | $10 - $5,000 | 中 |
+| **匯率調整** | 結算與交易匯率差異 | $1 - $100 | 低 |
+
+### 13.2 自動處理規則
+
+| 條件 | 處理 | 說明 |
+|------|------|------|
+| 負餘額 < $10 | 自動回收 | 從下次存款扣除 |
+| 負餘額 $10 - $100 | 通知 + 等待 | 7 天自動回收窗口 |
+| 負餘額 > $100 | 凍結帳戶 | 必須回收後才能解凍 |
+| 負餘額 > $1,000 | 凍結 + 風控審核 | 可能詐欺 |
+
+### 13.3 壞帳認列規則
+
+| 時間條件 | 金額條件 | 動作 |
+|---------|---------|------|
+| > 30 天持續 | 單筆 < $50 | 30 天後自動認列 |
+| > 60 天持續 | 單筆 $50-$500 | 人工審核認列 |
+| > 60 天持續 | 單筆 > $500 | 法務評估追討可能性 |
+| > 90 天 + VIP 玩家 | 任何 | 延長至 90 天 |
+| 爭議中 | 任何 | 不認列 |
+| 法律追訴中 | 任何 | 不認列 |
+
+---
+
+## 14. AML/KYC 整合需求
+
+### 14.1 整合點
+
+| 整合點 | 對帳責任 | AML/KYC 責任 | 資料流 |
+|--------|---------|-------------|--------|
+| **大額交易標記** | 標記 > $10,000 交易 | 生成 CTR 報告 | 對帳 → AML |
+| **可疑交易報告** | 識別異常模式 | 生成 STR 報告 | 對帳 → AML |
+| **KYC 狀態關聯** | 驗證 KYC 狀態 | 提供 KYC 等級 | KYC → 對帳 |
+| **制裁名單篩查** | 交易方資訊 | 名單比對 | 對帳 → AML |
+
+### 14.2 KYC 等級與交易限額
+
+| KYC 等級 | 單筆限額 | 每日限額 | 每月限額 | 對帳處理 |
+|---------|---------|---------|---------|---------|
+| **NONE** | $100 | $500 | $2,000 | 超過自動拒絕 |
+| **BASIC** | $1,000 | $5,000 | $20,000 | 超過人工審核 |
+| **ENHANCED** | $10,000 | $50,000 | $200,000 | 大額交易自動標記 |
+| **FULL** | $50,000 | $200,000 | 無限制 | 僅 CTR 記錄 |
+
+---
+
+## 15. 跨時區對帳需求
+
+### 15.1 時區統一需求
+
+**核心原則**: 所有對帳必須使用統一基準時區，確保不同資料來源間的準確比對。
+
+**資料來源考量**:
+- 平台訂單（基準時區）
+- PSP 報表（可能使用不同時區）
+- 銀行對帳單（本地時區）
+- 遊戲供應商報表（依供應商配置）
+
+### 15.2 時間容差需求
+
+| 設定 | 數值 | 目的 |
+|------|------|------|
+| 標準窗口 | 每日對帳期間 | 定義對帳日邊界 |
+| 容差範圍 | +/- 30 分鐘 | 處理跨日邊界交易 |
+| 最大延遲 | 48 小時 | 涵蓋週末和假日 |
+
+→ **[時區轉換實作](../../architecture/02_Finance_Service/Reconciliation_Technical.md#timezone-handling)** - UTC 轉換演算法、時區偏移配置、跨日識別邏輯
+
+---
+
+## 16. 資金隔離驗證
+
+> **行業依據**: UKGC LCCP 4.2.1、MGA Rule 44
+> **罰款案例**: William Hill 620 萬英鎊（2018）- 資金隔離不當
+
+### 16.1 驗證公式
 
 ```
-Trust Account Balance >= Sum(Player Wallet Balances) + In-Transit Deposits - In-Transit Withdrawals + Safety Buffer
+信託帳戶餘額 >= Sum(玩家錢包餘額) + 在途存款 - 在途提款 + 安全緩衝
 ```
 
-### 16.2 Verification Schedule
+### 16.2 驗證排程
 
-**Execution Time**: Daily at 03:00 UTC (after T+1 reconciliation completes)
+**執行時間**: 每日 03:00 UTC（T+1 對帳完成後）
 
-### 16.3 Variance Handling Matrix
+### 16.3 差異處理矩陣
 
-| Variance Type | Range | Risk Level | Handling | SLA |
-|---------------|-------|------------|----------|-----|
-| **Positive** (Bank > Expected) | < 5% | LOW | Record as safety buffer | 24h |
-| | 5-10% | MEDIUM | Investigate GGR settlement delay | 4h |
-| | > 10% | HIGH | Possible wrong credit, immediate investigation | 1h |
-| **Negative** (Bank < Expected) | < 1% | MEDIUM | Check in-transit fund delays | 4h |
-| | 1-5% | HIGH | Suspend large withdrawals (> $10,000) | 1h |
-| | > 5% | **CRITICAL** | Freeze all withdrawals, notify regulators | Immediate |
-
----
-
-## 17. Risk Control and Reconciliation Coordination
-
-> **Industry Basis**: UKGC AML Guidance 2023, ISO 27001 5.3 (Separation of Duties)
-> **Penalty Case**: Entain 17M GBP (2023) - VIP exemption from AML checks
-
-### 17.1 Priority Definition
-
-**Core Principle**: Risk control checks take priority over financial reconciliation; SAR investigation takes priority over all operations.
-
-| Scenario | Risk Decision | Reconciliation Decision | Final Handling | Priority Rule |
-|----------|---------------|------------------------|----------------|---------------|
-| SAR under investigation + Any reconciliation operation | SAR Priority | Suspend | Wait for SAR result | **SAR > All** |
-| Player frozen + Reconciliation discrepancy | Freeze funds | Need reconciliation | Complete risk investigation first | **Risk > Reconciliation** |
-| Short payment + Normal player | No risk | Rollback balance | Execute reconciliation rollback | **Reconciliation Priority** |
-| Large withdrawal + Reconciliation incomplete | Needs review | Unconfirmed | Delay withdrawal | **Risk = Reconciliation** |
-| AML alert + Over payment supplement | AML review | Pending supplement | Complete AML review first | **Risk > Reconciliation** |
-
-### 17.2 VIP No-Exemption Principle
-
-> **CRITICAL**: VIP players must go through **exactly the same** risk control/reconciliation rules as regular players.
-
-**VIP Status Impact Scope**:
-- Can influence: Review queue priority (VIP processed first)
-- Can influence: Customer service response SLA (VIP faster response)
-- Cannot influence: Risk control rule trigger thresholds
-- Cannot influence: AML check process
-- Cannot influence: Discrepancy handling logic
+| 差異類型 | 範圍 | 風險等級 | 處理 | SLA |
+|---------|------|---------|------|-----|
+| **正差異**（銀行 > 預期） | < 5% | 低 | 記錄為安全緩衝 | 24 小時 |
+| | 5-10% | 中 | 調查 GGR 結算延遲 | 4 小時 |
+| | > 10% | 高 | 可能錯誤入帳，立即調查 | 1 小時 |
+| **負差異**（銀行 < 預期） | < 1% | 中 | 檢查在途資金延遲 | 4 小時 |
+| | 1-5% | 高 | 暫停大額提款（> $10,000） | 1 小時 |
+| | > 5% | **嚴重** | 凍結所有提款，通知監管機構 | 立即 |
 
 ---
 
-## 18. Multi-Account Reconciliation
+## 17. 風控與對帳協調
 
-> **Industry Basis**: UKGC AML Guidance, MGA Rule 5.3.3 (Related Account Tracing)
+> **行業依據**: UKGC AML Guidance 2023、ISO 27001 5.3（職責分離）
+> **罰款案例**: Entain 1700 萬英鎊（2023）- VIP 免除 AML 檢查
 
-### 18.1 Related Account Identification Sources
+### 17.1 優先級定義
 
-| Data Source | Identification Signal | Link Strength | Reconciliation Impact |
-|-------------|----------------------|---------------|----------------------|
-| **Neo4j Graph** | Same device fingerprint | HIGH | Merge statistics |
-| **Neo4j Graph** | Same IP + concurrent activity | MEDIUM | Flag for review |
-| **Neo4j Graph** | Payment card association | HIGH | Merge statistics |
-| **Risk System** | Fund aggregation detection | HIGH | Reverse tracing |
-| **AML Alert** | Multi-account same-direction betting | HIGH | Flag both sides |
+**核心原則**: 風控檢查優先於財務對帳；SAR 調查優先於所有操作。
 
-### 18.2 Fund Tracing Rules
+| 情境 | 風控決策 | 對帳決策 | 最終處理 | 優先規則 |
+|------|---------|---------|---------|---------|
+| SAR 調查中 + 任何對帳操作 | SAR 優先 | 暫停 | 等待 SAR 結果 | **SAR > 全部** |
+| 玩家凍結 + 對帳差異 | 凍結資金 | 需對帳 | 先完成風控調查 | **風控 > 對帳** |
+| 短款 + 正常玩家 | 無風險 | 回滾餘額 | 執行對帳回滾 | **對帳優先** |
+| 大額提款 + 對帳未完成 | 需審核 | 未確認 | 延遲提款 | **風控 = 對帳** |
+| AML 警報 + 多款補單 | AML 審核 | 待補單 | 先完成 AML 審核 | **風控 > 對帳** |
 
-| Scenario | Tracing Scope | Handling | Reconciliation Flag |
-|----------|---------------|----------|-------------------|
-| **Confirmed Multi-Account** | All transactions from all linked accounts | Merge GGR statistics | `MULTI_ACCOUNT_LINKED` |
-| **Fund Aggregation** | Loser account -> Winner account | Reverse trace fund flow | `FUND_AGGREGATION` |
-| **Arbitrage Betting** | Hedging accounts on both sides | Flag both | `ARBITRAGE_PAIR` |
-| **Money Laundering Suspect** | Entire linked network | Freeze all + SAR | `AML_SUSPECTED` |
+### 17.2 VIP 不豁免原則
+
+> **重要**: VIP 玩家必須經過與普通玩家**完全相同**的風控/對帳規則。
+
+**VIP 身份影響範圍**:
+- 可影響：審核佇列優先級（VIP 優先處理）
+- 可影響：客服回應 SLA（VIP 更快回應）
+- 不可影響：風控規則觸發閾值
+- 不可影響：AML 檢查流程
+- 不可影響：差異處理邏輯
 
 ---
 
-## 19. Regulatory Reporting Integration
+## 18. 多帳戶對帳
 
-> **Industry Basis**: UKGC Reporting Requirements, MGA Reporting Requirements, Gambling Levy Act 2025
+> **行業依據**: UKGC AML Guidance、MGA Rule 5.3.3（關聯帳戶追蹤）
 
-### 19.1 Report Types and Schedules
+### 18.1 關聯帳戶識別來源
 
-| Report Type | Regulator | Frequency | Source | Format | SLA |
-|-------------|-----------|-----------|--------|--------|-----|
-| **Monthly GGR** | UKGC/MGA | Monthly | T+1 reconciliation results | JSON/CSV | 15th of following month |
-| **Gambling Levy** | UKGC | Monthly | GGR calculation table | UKGC Portal | 28th of following month |
-| **Player Protection** | UKGC | Monthly | Self-exclusion + reconciliation freezes | PDF | 15th of following month |
-| **SAR Summary** | NCA/FIAU | Monthly | AML alerts + reconciliation exceptions | XML | 10th of following month |
-| **Jackpot Report** | All | Immediate | Jackpot reconciliation table | Webhook | Within 24h |
-| **Annual Report** | UKGC/MGA | Annual | Full year reconciliation summary | PDF | 90 days after year end |
+| 資料來源 | 識別信號 | 關聯強度 | 對帳影響 |
+|---------|---------|---------|---------|
+| **Neo4j 圖** | 相同設備指紋 | 高 | 合併統計 |
+| **Neo4j 圖** | 相同 IP + 併發活動 | 中 | 標記審核 |
+| **Neo4j 圖** | 支付卡關聯 | 高 | 合併統計 |
+| **風控系統** | 資金聚集偵測 | 高 | 反向追蹤 |
+| **AML 警報** | 多帳戶同向投注 | 高 | 標記雙方 |
 
-### 19.2 Data Consistency Requirement
+### 18.2 資金追蹤規則
 
-**Verification Formula**:
+| 情境 | 追蹤範圍 | 處理 | 對帳標記 |
+|------|---------|------|---------|
+| **確認多帳戶** | 所有關聯帳戶的所有交易 | 合併 GGR 統計 | `MULTI_ACCOUNT_LINKED` |
+| **資金聚集** | 輸家帳戶 → 贏家帳戶 | 反向追蹤資金流 | `FUND_AGGREGATION` |
+| **套利投注** | 對沖雙方帳戶 | 標記雙方 | `ARBITRAGE_PAIR` |
+| **洗錢嫌疑** | 整個關聯網絡 | 全部凍結 + SAR | `AML_SUSPECTED` |
+
+---
+
+## 19. 監管報告整合
+
+> **行業依據**: UKGC 報告要求、MGA 報告要求、Gambling Levy Act 2025
+
+### 19.1 報告類型與排程
+
+| 報告類型 | 監管機構 | 頻率 | 來源 | 格式 | SLA |
+|---------|---------|------|------|------|-----|
+| **月度 GGR** | UKGC/MGA | 每月 | T+1 對帳結果 | JSON/CSV | 次月 15 日 |
+| **博彩稅** | UKGC | 每月 | GGR 計算表 | UKGC Portal | 次月 28 日 |
+| **玩家保護** | UKGC | 每月 | 自我排除 + 對帳凍結 | PDF | 次月 15 日 |
+| **SAR 摘要** | NCA/FIAU | 每月 | AML 警報 + 對帳例外 | XML | 次月 10 日 |
+| **彩金報告** | 全部 | 立即 | 彩金對帳表 | Webhook | 24 小時內 |
+| **年度報告** | UKGC/MGA | 每年 | 全年對帳摘要 | PDF | 年度結束後 90 天 |
+
+### 19.2 資料一致性需求
+
+**驗證公式**:
 ```
-|Regulatory Report GGR - Reconciliation Report GGR| / Reconciliation Report GGR < 0.01%
+|監管報告 GGR - 對帳報告 GGR| / 對帳報告 GGR < 0.01%
 ```
 
-### 19.3 Gambling Levy Calculation (UKGC 2025)
+### 19.3 博彩稅計算（UKGC 2025）
 
-| Annual GGR Range | Levy Rate | Calculation Basis |
-|------------------|-----------|-------------------|
-| 0 - 1M GBP | 0.1% | Reconciliation GGR |
-| 1M - 50M GBP | 0.25% | Reconciliation GGR |
-| 50M - 250M GBP | 0.5% | Reconciliation GGR |
-| > 250M GBP | 1.1% | Reconciliation GGR |
-
----
-
-## 20. Performance SLA Requirements
-
-### 20.1 Tier-Level SLA
-
-| Tier | Operation | Target Latency | Warning Threshold | Critical Threshold | Alert Priority |
-|------|-----------|----------------|-------------------|-------------------|----------------|
-| **L1 Real-time** | Single transaction verification | < 500ms | > 800ms | > 1s | P0 |
-| **L1 Real-time** | PSP callback processing | < 30s | > 45s | > 60s | P0 |
-| **L2 Batch** | Hourly reconciliation batch | < 5min | > 10min | > 15min | P1 |
-| **L2 Batch** | PSP batch query (1000 records) | < 30s | > 45s | > 60s | P1 |
-| **L3 Daily** | T+1 full reconciliation | < 30min | > 45min | > 1h | P2 |
-| **L3 Daily** | Financial report generation | < 5min | > 10min | > 15min | P2 |
-
-### 20.2 Match Rate SLA
-
-| Metric | Target | Warning | Critical |
-|--------|--------|---------|----------|
-| **Daily Match Rate** | >= 99.5% | < 99% | < 95% |
-| **First-Pass Match Rate** | >= 95% | < 90% | < 80% |
-| **Discrepancy Resolution Time** | < 4h | > 8h | > 24h |
-| **P0 Discrepancy Response** | < 15min | > 30min | > 1h |
-
-### 20.3 Throughput SLA
-
-| Scenario | Design Capacity | Warning Threshold | Critical Threshold |
-|----------|-----------------|-------------------|-------------------|
-| **Transactions Per Second** | 1,000 TPS | > 800 TPS | > 950 TPS |
-| **Hourly Batch Volume** | 50,000 records | > 40,000 records | > 48,000 records |
-| **Daily Total Volume** | 500,000 records | > 400,000 records | > 480,000 records |
+| 年度 GGR 範圍 | 稅率 | 計算依據 |
+|--------------|------|---------|
+| 0 - 100 萬英鎊 | 0.1% | 對帳 GGR |
+| 100 萬 - 5000 萬英鎊 | 0.25% | 對帳 GGR |
+| 5000 萬 - 2.5 億英鎊 | 0.5% | 對帳 GGR |
+| > 2.5 億英鎊 | 1.1% | 對帳 GGR |
 
 ---
 
-## 21. Payment Method Specific Requirements
+## 20. 效能 SLA 需求
 
-### 21.1 Payment Method Classification
+### 20.1 層級 SLA
 
-Different payment methods have different settlement cycles and reconciliation requirements:
+| 層級 | 操作 | 目標延遲 | 警告閾值 | 嚴重閾值 | 警報優先級 |
+|------|------|---------|---------|---------|-----------|
+| **L1 即時** | 單筆交易驗證 | < 500ms | > 800ms | > 1s | P0 |
+| **L1 即時** | PSP 回調處理 | < 30s | > 45s | > 60s | P0 |
+| **L2 批次** | 每小時對帳批次 | < 5 分鐘 | > 10 分鐘 | > 15 分鐘 | P1 |
+| **L2 批次** | PSP 批次查詢（1000 筆） | < 30s | > 45s | > 60s | P1 |
+| **L3 每日** | T+1 完整對帳 | < 30 分鐘 | > 45 分鐘 | > 1 小時 | P2 |
+| **L3 每日** | 財務報表生成 | < 5 分鐘 | > 10 分鐘 | > 15 分鐘 | P2 |
 
-| Category | Payment Methods | Settlement Cycle | Reconciliation Granularity | Special Considerations |
-|----------|-----------------|------------------|---------------------------|----------------------|
-| **Card Payment** | Visa/MC | T+1~T+3 | Transaction level | Chargeback handling required |
-| **E-Wallet** | PayPal/Skrill | T+0~T+1 | Transaction level | Instant notification, currency conversion |
-| **Bank Transfer** | SEPA/Faster Payments | T+1~T+2 | Batch level | Bank reference matching |
-| **Cryptocurrency** | BTC/ETH/USDT | Instant after confirmation | Block level | Confirmation requirements vary |
-| **Prepaid Card** | Paysafecard | T+1 | Transaction level | PIN verification |
-| **Carrier Billing** | Boku/Payforit | T+7~T+30 | Monthly | High refund rate (15-25%) |
+### 20.2 匹配率 SLA
 
-### 21.2 Card Payment Business Rules
+| 指標 | 目標 | 警告 | 嚴重 |
+|------|------|------|------|
+| **每日匹配率** | >= 99.5% | < 99% | < 95% |
+| **首次匹配率** | >= 95% | < 90% | < 80% |
+| **差異處理時間** | < 4 小時 | > 8 小時 | > 24 小時 |
+| **P0 差異回應** | < 15 分鐘 | > 30 分鐘 | > 1 小時 |
 
-**Chargeback Handling**:
-- Process stages: Initial notification → Evidence collection (7-14 days) → Representment → Final ruling (45-120 days)
-- All chargebacks MUST be tracked and reconciled
-- Authorization codes MUST be matched during reconciliation
+### 20.3 吞吐量 SLA
 
-### 21.3 Cryptocurrency Business Rules
-
-**Confirmation Requirements**:
-- Bitcoin transactions require minimum confirmations before finalization
-- Ethereum/USDT transactions require minimum confirmations before finalization
-- All cryptocurrency transactions MUST be verified against blockchain records
-
-### 21.4 Carrier Billing Business Rules
-
-**Refund Provisions**:
-- Settlement cycle: T+30 (monthly)
-- Expected refund rate: 15-25% (industry average)
-- Provision formula: `provision = revenue × historical_refund_rate × 1.2`
-
-→ **[Payment Method Technical Specifications](../../architecture/02_Finance_Service/Reconciliation_Technical.md#payment-methods)** - 3DS verification implementation, blockchain confirmation counts, MNO report parsing, on-chain verification logic
+| 情境 | 設計容量 | 警告閾值 | 嚴重閾值 |
+|------|---------|---------|---------|
+| **每秒交易數** | 1,000 TPS | > 800 TPS | > 950 TPS |
+| **每小時批次量** | 50,000 筆 | > 40,000 筆 | > 48,000 筆 |
+| **每日總量** | 500,000 筆 | > 400,000 筆 | > 480,000 筆 |
 
 ---
 
-## Related Documents
+## 21. 支付方式特定需求
 
-### Business Logic Reference
-- [02-02 Payment Gateway Integration](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP transaction data source
-- [02-04 Turnover and Game Reconciliation Analysis](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - Game reconciliation process
-- [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Balance adjustment logic
+### 21.1 支付方式分類
 
-### Technical Architecture Reference
-- [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md) - Technical implementation details
+不同支付方式有不同的結算週期和對帳需求：
+
+| 類別 | 支付方式 | 結算週期 | 對帳粒度 | 特殊考量 |
+|------|---------|---------|---------|---------|
+| **卡支付** | Visa/MC | T+1~T+3 | 交易級 | 需拒付處理 |
+| **電子錢包** | PayPal/Skrill | T+0~T+1 | 交易級 | 即時通知、幣種轉換 |
+| **銀行轉帳** | SEPA/Faster Payments | T+1~T+2 | 批次級 | 銀行參考號匹配 |
+| **加密貨幣** | BTC/ETH/USDT | 確認後即時 | 區塊級 | 確認數需求各異 |
+| **預付卡** | Paysafecard | T+1 | 交易級 | PIN 驗證 |
+| **電信計費** | Boku/Payforit | T+7~T+30 | 月度 | 高退款率（15-25%） |
+
+### 21.2 卡支付業務規則
+
+**拒付處理**:
+- 處理階段：初始通知 → 證據收集（7-14 天） → 申訴 → 最終裁決（45-120 天）
+- 所有拒付必須追蹤並對帳
+- 對帳時必須匹配授權碼
+
+### 21.3 加密貨幣業務規則
+
+**確認需求**:
+- Bitcoin 交易需最低確認數後才能確定
+- Ethereum/USDT 交易需最低確認數後才能確定
+- 所有加密貨幣交易必須與區塊鏈記錄驗證
+
+### 21.4 電信計費業務規則
+
+**退款準備金**:
+- 結算週期：T+30（月度）
+- 預期退款率：15-25%（行業平均）
+- 準備金公式：`provision = revenue × historical_refund_rate × 1.2`
+
+→ **[支付方式技術規格](../../architecture/02_Finance_Service/Reconciliation_Technical.md#payment-methods)** - 3DS 驗證實作、區塊鏈確認數、MNO 報表解析、鏈上驗證邏輯
 
 ---
 
-**Document Version**: 1.0.0
-**Source Version**: 6.0.0
-**Last Updated**: 2026-02-08
-**Maintainer**: Finance Team
+## 相關文件
 
-**Change Log**:
-- v1.0.0 (2026-02-08): Initial split from canonical source, extracted business requirements view
+### 業務邏輯參考
+- [02-02 支付閘道整合](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) - PSP 交易資料來源
+- [02-04 流水與遊戲對帳分析](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) - 遊戲對帳流程
+- [02-06 錢包架構](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - 餘額調整邏輯
+
+### 技術架構參考
+- [Reconciliation_Technical.md](../../architecture/02_Finance_Service/Reconciliation_Technical.md) - 技術實作細節
+
+---
+
+**文件版本**: 1.0.0
+**來源版本**: 6.0.0
+**最後更新**: 2026-02-11
+**維護者**: 財務團隊
+
+**變更日誌**:
+- v1.0.0 (2026-02-08): 初始從規範來源分離，擷取業務需求視圖
+- v1.0.1 (2026-02-11): 翻譯為繁體中文

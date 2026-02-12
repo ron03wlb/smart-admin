@@ -1,415 +1,416 @@
-# Player Lifecycle - Business Requirements
+# 玩家生命週期 - 業務需求
 
 > **Canonical Source**: [docs/iGaming/source-archive/01_Player_Center/01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
-> **View**: Business Requirements (Product & Operations)
+> **View**: 業務需求（產品與運營）
 > **Related Architecture**: [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)
 
 ---
 
-## Document Purpose
+## 文件用途
 
-This document defines the **business requirements** for Player Lifecycle Management in iGaming platforms. It covers:
-- Player lifecycle stages and transitions
-- KYC requirements by jurisdiction
-- Player segmentation rules (RFM model)
-- VIP tier progression rules
-- Problem gambling indicators
+本文件定義 iGaming 平台**玩家生命週期管理 (Player Lifecycle Management)** 的業務需求。涵蓋內容包括：
+- 玩家生命週期階段與轉換
+- 各司法管轄區 KYC 要求
+- 玩家分群規則（RFM 模型）
+- VIP 等級晉升規則
+- 問題賭博指標
 
-**For technical implementation details** (state machine, API specs, database schema), see [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md).
-
----
-
-## 1. System Overview
-
-### 1.1 Core Purpose
-
-The Player Lifecycle Management (PLM) system is the foundation of the iGaming platform, responsible for managing players from registration, login, identity verification, status transitions, risk assessment, to account closure. The module supports **Multi-Tenant** architecture, ensuring complete data isolation between merchants while supporting Brand-level unified views.
-
-### 1.2 Core Functions
-
-**Identity & Registration Management**:
-- **Multiple Registration Methods**: Account/Password, Phone/OTP, Quick Registration, Social Login (Google, Line, Telegram, Facebook)
-- **Merchant Configuration**: Mandatory phone verification, custom registration fields, default and allowed currencies
-- **Initialization Flow**: Create player record -> Initialize wallet -> Set default VIP tier (Bronze) -> Record device fingerprint
-
-**Security & Risk Control Integration**:
-- **Multi-Factor Authentication (MFA)**: Google Authenticator, SMS OTP, Email OTP
-- **Security Controls**: Remote login alerts, brute force protection, device fingerprinting, duplicate account handling
-- **Risk Assessment**: 0-100 risk scoring system integrating device, payment, behavior, and graph dimensions
-
-**Lifecycle Management**:
-- **Stage Identification**: New User, Active User, Dormant User, Churned User
-- **Tagging System**: Automatic tags (High Value, Dormant, Arbitrage Suspect) + Manual tags (CS Notes)
-- **Status Transitions**: 5-state state machine (ACTIVE, LOCKED, SUSPENDED, PENDING_VERIFICATION, CLOSED)
-
-### 1.3 Design Principles
-
-**Single Source of Truth (SSOT)**:
-- Player account status state machine defined in this document, other modules reference only
-- Risk scoring dimensions defined in Risk Control Framework
-- Wallet creation logic defined in Unified Wallet Model
-
-**Event-Driven Architecture**:
-- Published Events: `player.registered`, `player.kyc.completed`, `player.status.changed`, `player.risk.flagged`
-- Consumed Events: `wallet.deposit.completed`, `game.bet.placed`, `vip.tier.changed`
-
-**Multi-Tenant Isolation**:
-- Data Isolation: `tenant_id` column-level isolation + Row-Level Security (RLS)
-- Configuration Isolation: Each tenant can customize registration fields, KYC levels, risk thresholds
-- Resource Isolation: Independent risk rule sets, blacklists, whitelists
+**技術實作細節**（狀態機、API 規格、資料庫結構），請參閱 [Player_Lifecycle_Implementation.md](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)。
 
 ---
 
-## 2. Lifecycle Stage Definition
+## 1. 系統概述
 
-### 2.1 Lifecycle Stage Matrix
+### 1.1 核心目的
 
-**Overview**: Player lifecycle is divided into 4 main stages, dynamically calculated based on registration time and betting activity.
+玩家生命週期管理 (PLM) 系統是 iGaming 平台的基礎，負責管理玩家從註冊、登入、身份驗證 (KYC)、狀態轉換、風險評估到帳戶關閉的完整流程。該模組支援 **Multi-Tenant** 架構，確保商戶間資料完全隔離，同時支援品牌層級的統一視圖。
 
-| Stage | Definition | Identification Criteria | Business Strategy | Average Duration | Conversion Target |
-|-------|------------|------------------------|-------------------|------------------|-------------------|
-| **New User** | Within 7 days of registration | Days since registration <= 7 | First deposit bonus, onboarding guide | 7 days | First deposit conversion 30-40% |
-| **Active User** | Bet within last 30 days | Last bet date within 30 days | VIP upgrade, exclusive events | 30-90 days | D30 retention 40-50% |
-| **Dormant User** | No bet for 30-90 days | Last bet 30-90 days ago | Reactivation bonus, EDM marketing | 60 days | Reactivation rate 20-30% |
-| **Churned User** | No bet for 90+ days | Last bet 90+ days ago | Large return offers, CS outreach | Permanent | Return rate 5-10% |
+### 1.2 核心功能
 
-### 2.2 Lifecycle Conversion Funnel
+**身份與註冊管理**:
+- **多種註冊方式**: 帳號/密碼、手機/OTP、快速註冊、社交登入（Google、Line、Telegram、Facebook）
+- **商戶配置**: 強制手機驗證、自訂註冊欄位、預設及允許幣種
+- **初始化流程**: 建立玩家記錄 → 初始化錢包 → 設定預設 VIP 等級（Bronze） → 記錄設備指紋
+
+**安全與風控整合**:
+- **多因素認證 (MFA)**: Google Authenticator、SMS OTP、Email OTP
+- **安全控制**: 異地登入警報、暴力破解防護、設備指紋識別、重複帳戶處理
+- **風險評估**: 0-100 風險評分系統，整合設備、支付、行為、關聯圖譜四維度
+
+**生命週期管理**:
+- **階段識別**: 新用戶 (New User)、活躍用戶 (Active User)、沉睡用戶 (Dormant User)、流失用戶 (Churned User)
+- **標籤系統**: 自動標籤（高價值、沉睡、套利嫌疑）+ 人工標籤（客服備註）
+- **狀態轉換**: 5 態狀態機（ACTIVE、LOCKED、SUSPENDED、PENDING_VERIFICATION、CLOSED）
+
+### 1.3 設計原則
+
+**單一事實來源 (Single Source of Truth, SSOT)**:
+- 玩家帳戶狀態機定義於本文件，其他模組僅引用
+- 風險評分維度定義於風控框架
+- 錢包建立邏輯定義於統一錢包模型
+
+**事件驅動架構 (Event-Driven Architecture)**:
+- 發布事件: `player.registered`、`player.kyc.completed`、`player.status.changed`、`player.risk.flagged`
+- 消費事件: `wallet.deposit.completed`、`game.bet.placed`、`vip.tier.changed`
+
+**Multi-Tenant 隔離**:
+- 資料隔離: `tenant_id` 欄位隔離 + Row-Level Security (RLS)
+- 配置隔離: 各租戶可自訂註冊欄位、KYC 等級、風險閾值
+- 資源隔離: 獨立風控規則集、黑名單、白名單
+
+---
+
+## 2. 生命週期階段定義
+
+### 2.1 生命週期階段矩陣
+
+**概述**: 玩家生命週期分為 4 個主要階段，根據註冊時間及投注活動動態計算。
+
+| 階段 | 定義 | 識別標準 | 業務策略 | 平均持續時間 | 轉換目標 |
+|------|------|---------|---------|--------------|---------|
+| **新用戶 (New User)** | 註冊後 7 天內 | 註冊天數 <= 7 | 首存紅利、新手引導 | 7 天 | 首存轉換 30-40% |
+| **活躍用戶 (Active User)** | 過去 30 天內有投注 | 最後投注日期 30 天內 | VIP 升級、專屬活動 | 30-90 天 | D30 留存 40-50% |
+| **沉睡用戶 (Dormant User)** | 30-90 天無投注 | 最後投注 30-90 天前 | 喚醒紅利、EDM 行銷 | 60 天 | 喚醒率 20-30% |
+| **流失用戶 (Churned User)** | 90 天以上無投注 | 最後投注 90 天以上 | 高額回歸優惠、客服外撥 | 永久 | 回歸率 5-10% |
+
+### 2.2 生命週期轉換漏斗
 
 ```
-Registered Users (100%)
-    | First Deposit Conversion 30-40%
-First Deposit Users (30-40%)
-    | Active Retention 40-50%
-Active Users (15-20%)
-    | VIP Conversion 10-15%
-VIP Players (1.5-3%)
+註冊用戶 (100%)
+    | 首存轉換 30-40%
+首存用戶 (30-40%)
+    | 活躍留存 40-50%
+活躍用戶 (15-20%)
+    | VIP 轉換 10-15%
+VIP 玩家 (1.5-3%)
 ```
 
-**Key Performance Indicators (KPIs)**:
-- **First Deposit Conversion**: Percentage depositing within 7 days of registration (Target: 30-40%)
-- **D7 Retention**: Percentage still active on day 7 after registration (Target: 20-30%)
-- **D30 Retention**: Percentage still active on day 30 after registration (Target: 15-20%)
-- **Churn Rate**: Percentage with no bet for 90 days (Target: <40%)
-- **Monthly Active Users (MAU)**: Players with bets in last 30 days
-- **Lifetime Value (LTV)**: Total net revenue from player across entire lifecycle
+**關鍵績效指標 (KPIs)**:
+- **首存轉換率 (First Deposit Conversion)**: 註冊 7 天內存款比例（目標: 30-40%）
+- **D7 留存率**: 註冊後第 7 天仍活躍比例（目標: 20-30%）
+- **D30 留存率**: 註冊後第 30 天仍活躍比例（目標: 15-20%）
+- **流失率 (Churn Rate)**: 90 天無投注比例（目標: <40%）
+- **月活躍用戶 (MAU)**: 過去 30 天內有投注的玩家
+- **生命週期價值 (Lifetime Value, LTV)**: 玩家整個生命週期的淨收入總和
 
-### 2.3 RFM Model Integration
+### 2.3 RFM 模型整合
 
-**RFM Segmentation Matrix** (Recency, Frequency, Monetary):
+**RFM 分群矩陣**（Recency 最近、Frequency 頻率、Monetary 金額）:
 
-| Segment | R (Recency) | F (Frequency) | M (Monetary) | Characteristics | Strategy |
-|---------|-------------|---------------|--------------|-----------------|----------|
-| **Champions** | 5 | 5 | 5 | Recent bet, high frequency, high amount | VIP exclusive events, 1-on-1 service, birthday gifts |
-| **Potential Loyalists** | 4-5 | 3-4 | 3-4 | Recently active, medium frequency and amount | VIP upgrade incentives, exclusive bonuses, increase frequency |
-| **At Risk** | 2-3 | 3-5 | 3-5 | Previously high value, but recently inactive | Reactivation campaigns, exclusive return bonuses, CS calls |
-| **Lost** | 1 | 1-2 | 1-3 | Long-term inactive, low frequency | Large return offers, reactivation ads |
+| 分群 | R (Recency) | F (Frequency) | M (Monetary) | 特徵 | 策略 |
+|------|-------------|---------------|--------------|------|------|
+| **Champions** | 5 | 5 | 5 | 近期投注、高頻、高額 | VIP 專屬活動、1 對 1 服務、生日禮物 |
+| **Potential Loyalists** | 4-5 | 3-4 | 3-4 | 近期活躍、中頻中額 | VIP 升級激勵、專屬紅利、提升頻率 |
+| **At Risk** | 2-3 | 3-5 | 3-5 | 曾經高價值但近期不活躍 | 喚醒活動、專屬回歸紅利、客服致電 |
+| **Lost** | 1 | 1-2 | 1-3 | 長期不活躍、低頻 | 高額回歸優惠、喚醒廣告 |
 
-**RFM Scoring Logic**:
+**RFM 評分邏輯**:
 
-| Dimension | Score 5 | Score 4 | Score 3 | Score 2 | Score 1 |
-|-----------|---------|---------|---------|---------|---------|
-| **R (Days since last bet)** | <= 7 days | 8-30 days | 31-60 days | 61-90 days | > 90 days |
-| **F (Bet count in 90 days)** | >= 100 | 50-99 | 20-49 | 5-19 | < 5 |
-| **M (Total bet in 90 days)** | >= $10,000 | $5,000-9,999 | $1,000-4,999 | $100-999 | < $100 |
+| 維度 | 5 分 | 4 分 | 3 分 | 2 分 | 1 分 |
+|------|-----|-----|-----|-----|-----|
+| **R (距上次投注天數)** | <= 7 天 | 8-30 天 | 31-60 天 | 61-90 天 | > 90 天 |
+| **F (90 天投注次數)** | >= 100 | 50-99 | 20-49 | 5-19 | < 5 |
+| **M (90 天投注總額)** | >= $10,000 | $5,000-9,999 | $1,000-4,999 | $100-999 | < $100 |
 
-### 2.4 Player Tagging System
+### 2.4 玩家標籤系統
 
-**Value Tags**:
-- `VIP_WHALE` - Whale player (Monthly deposit > $50K)
-- `HIGH_ROLLER` - High roller (Monthly deposit $10K-$50K)
-- `REGULAR` - Regular player (Monthly deposit $1K-$10K)
-- `CASUAL` - Casual player (Monthly deposit < $1K)
+**價值標籤**:
+- `VIP_WHALE` - 鯨魚玩家（月存款 > $50K）
+- `HIGH_ROLLER` - 高額玩家（月存款 $10K-$50K）
+- `REGULAR` - 常規玩家（月存款 $1K-$10K）
+- `CASUAL` - 休閒玩家（月存款 < $1K）
 
-**Risk Tags** (Refer to Risk Framework for details):
-- `BONUS_HUNTER` - Bonus hunter (Only plays high RTP games, withdraws immediately after wagering)
-- `ARBITRAGE` - Arbitrager (Hedges bets across multiple platforms)
-- `HEDGER` - Hedger (Multi-account hedging on same platform)
-- `MULTI_ACCOUNT` - Multi-account linked (Same device fingerprint/IP/payment method)
+**風險標籤**（詳見風控框架）:
+- `BONUS_HUNTER` - 獎金獵人（僅玩高 RTP 遊戲，完成流水即提款）
+- `ARBITRAGE` - 套利者（跨平台對沖投注）
+- `HEDGER` - 對沖者（同平台多帳戶對沖）
+- `MULTI_ACCOUNT` - 多帳戶關聯（相同設備指紋/IP/支付方式）
 
-**Behavior Tags**:
-- `SLOT_LOVER` - Slot enthusiast (90% bets on slots)
-- `LIVE_CASINO_FAN` - Live casino fan
-- `SPORTS_BETTOR` - Sports bettor
-- `NIGHT_OWL` - Night owl (Betting concentrated 22:00-06:00)
+**行為標籤**:
+- `SLOT_LOVER` - 老虎機愛好者（90% 投注在老虎機）
+- `LIVE_CASINO_FAN` - 真人娛樂城愛好者
+- `SPORTS_BETTOR` - 體育博彩玩家
+- `NIGHT_OWL` - 夜貓子（投注集中在 22:00-06:00）
 
-**Lifecycle Tags**:
-- `FIRST_DEPOSIT_PENDING` - Pending first deposit
-- `ACTIVE_7D` - Active within 7 days
-- `DORMANT_30D` - Dormant for 30 days
-- `CHURNED_90D` - Churned for 90 days
-
----
-
-## 3. Account Status Definition
-
-### 3.1 Five-Status Definition Table
-
-**Overview**: Player account status uses a state machine pattern to ensure clear, traceable status transitions with degradation protection mechanisms.
-
-| Status Code | Name | Description | Trigger Condition | Business Impact | Auto-Recovery | Player Visibility |
-|-------------|------|-------------|-------------------|-----------------|---------------|-------------------|
-| `ACTIVE` | Active | Default status | Initial state | No restrictions | N/A | Normal |
-| `LOCKED` | Locked | Security lock | 5 consecutive login failures | Login blocked for 30 minutes | Yes (after 30 min) | Shows countdown |
-| `SUSPENDED` | Suspended | Risk freeze | Risk score >= 70 | Deposit/Withdrawal/Betting blocked | No (requires manual review) | Shows appeal entry |
-| `PENDING_VERIFICATION` | Pending Verification | KYC upgrade required | Withdrawal triggers KYC upgrade | Withdrawal limit restricted | Yes (after KYC completion) | Shows pending tasks |
-| `CLOSED` | Closed | Permanently closed | Self-exclusion OR AML violation | Permanently closed | No (irreversible) | Shows closure reason |
-
-### 3.2 Status Transition Rules
-
-**ACTIVE Status Transitions**:
-- ACTIVE -> LOCKED: 5 consecutive login failures within 5 minutes
-- ACTIVE -> SUSPENDED: Risk score >= 70 (HIGH or CRITICAL level)
-- ACTIVE -> PENDING_VERIFICATION: Withdrawal amount exceeds KYC limit
-- ACTIVE -> CLOSED: Self-exclusion or AML violation
-
-**LOCKED Status Transitions**:
-- LOCKED -> ACTIVE: Automatic unlock after 30 minutes
-- LOCKED -> SUSPENDED: Password reset fails 3 times
-
-**SUSPENDED Status Transitions**:
-- SUSPENDED -> ACTIVE: Manual review approval
-- SUSPENDED -> CLOSED: Fraud confirmed
-
-**PENDING_VERIFICATION Status Transitions**:
-- PENDING_VERIFICATION -> ACTIVE: KYC document review approved
-- PENDING_VERIFICATION -> SUSPENDED: KYC document forgery detected
-- PENDING_VERIFICATION -> CLOSED: Identity verification fails 3 times
-
-**CLOSED Status**:
-- Terminal state - no transitions allowed
-
-### 3.3 Status Transition Monitoring
-
-**Key Monitoring Metrics**:
-
-| Metric | Formula | Normal Range | Alert Threshold | Action |
-|--------|---------|--------------|-----------------|--------|
-| **Lock Rate** | LOCKED / ACTIVE | < 2% | > 5% | Check for brute force attacks |
-| **Suspension Rate** | SUSPENDED / ACTIVE | < 1% | > 3% | Review risk rules severity |
-| **Pending Verification Rate** | PENDING_VERIFICATION / ACTIVE | < 5% | > 10% | Review KYC limit settings |
-| **Closure Rate** | CLOSED / TOTAL | < 0.5% | > 2% | Check for abnormal batch closures |
-| **Average Lock Duration** | AVG(unlocked_at - locked_at) | < 30 min | > 2 hours | Check auto-unlock mechanism |
+**生命週期標籤**:
+- `FIRST_DEPOSIT_PENDING` - 待首存
+- `ACTIVE_7D` - 7 天內活躍
+- `DORMANT_30D` - 沉睡 30 天
+- `CHURNED_90D` - 流失 90 天
 
 ---
 
-## 4. KYC Requirements by Jurisdiction
+## 3. 帳戶狀態定義
 
-### 4.1 KYC Level System
+### 3.1 五態定義表
 
-**Tiered Verification System**:
+**概述**: 玩家帳戶狀態採用狀態機模式，確保狀態轉換清晰可追蹤，並具備降級保護機制。
 
-| KYC Level | Verification Content | Single Withdrawal Limit | Cumulative Withdrawal Limit | Upgrade Requirement | Review SLA |
-|-----------|---------------------|-------------------------|----------------------------|---------------------|------------|
-| **L0** (Registration) | Phone OR Email | $500 | $1,000 / month | OTP verification only | Instant |
-| **L1** (Identity Verification) | Document (Passport/ID) + Face | $5,000 | $50,000 / month | Upload document + face match | 1-4 hours |
-| **L2** (Address Verification) | Utility Bill / Bank Statement | $50,000 | Unlimited | Upload address proof | 4-24 hours |
+| 狀態碼 | 名稱 | 說明 | 觸發條件 | 業務影響 | 自動恢復 | 玩家可見性 |
+|--------|------|------|---------|---------|---------|-----------|
+| `ACTIVE` | 活躍 | 預設狀態 | 初始狀態 | 無限制 | N/A | 正常 |
+| `LOCKED` | 鎖定 | 安全鎖定 | 連續 5 次登入失敗 | 登入阻止 30 分鐘 | 是（30 分鐘後） | 顯示倒數 |
+| `SUSPENDED` | 凍結 | 風控凍結 | 風險分數 >= 70 | 存款/提款/投注阻止 | 否（需人工審核） | 顯示申訴入口 |
+| `PENDING_VERIFICATION` | 待驗證 | KYC 升級要求 | 提款觸發 KYC 升級 | 提款額度受限 | 是（KYC 完成後） | 顯示待辦任務 |
+| `CLOSED` | 已關閉 | 永久關閉 | 自我排除 (Self-Exclusion) 或 AML 違規 | 永久關閉 | 否（不可逆） | 顯示關閉原因 |
 
-### 4.2 L1 (Identity Verification) - Accepted Documents
+### 3.2 狀態轉換規則
 
-| Document Type | Required Information | Common Rejection Reasons |
-|---------------|---------------------|-------------------------|
-| **Passport** | Name, DOB, Passport Number, Photo | Expired, blurry photo, glare |
-| **National ID** | Name, DOB, ID Number, Photo | Single side only, screen capture |
-| **Driver's License** | Name, DOB, License Number, Photo | Provisional license not accepted |
+**ACTIVE 狀態轉換**:
+- ACTIVE → LOCKED: 5 分鐘內連續 5 次登入失敗
+- ACTIVE → SUSPENDED: 風險分數 >= 70（HIGH 或 CRITICAL 級別）
+- ACTIVE → PENDING_VERIFICATION: 提款金額超過 KYC 限額
+- ACTIVE → CLOSED: 自我排除 (Self-Exclusion) 或 AML 違規
 
-### 4.3 L2 (Address Verification) - Accepted Documents
+**LOCKED 狀態轉換**:
+- LOCKED → ACTIVE: 30 分鐘後自動解鎖
+- LOCKED → SUSPENDED: 密碼重設失敗 3 次
 
-| Document Type | Required Information | Validity Period | Common Rejection Reasons |
-|---------------|---------------------|-----------------|-------------------------|
-| **Utility Bill** | Name, Address, Issue Date | Within 3 months | Name mismatch, expired |
-| **Bank Statement** | Name, Address, Statement Date | Within 3 months | Partial address shown |
-| **Lease Agreement** | Name, Address, Signing Date | Within 6 months | Informal agreement |
+**SUSPENDED 狀態轉換**:
+- SUSPENDED → ACTIVE: 人工審核通過
+- SUSPENDED → CLOSED: 確認欺詐
 
-### 4.4 Third-Party KYC Providers
+**PENDING_VERIFICATION 狀態轉換**:
+- PENDING_VERIFICATION → ACTIVE: KYC 文件審核通過
+- PENDING_VERIFICATION → SUSPENDED: 偵測到 KYC 文件偽造
+- PENDING_VERIFICATION → CLOSED: 身份驗證失敗 3 次
 
-**Recommended Providers**:
+**CLOSED 狀態**:
+- 終態 - 不允許任何轉換
 
-| Provider | Country Coverage | OCR Accuracy | Liveness Accuracy | Monthly Fee | API Call Cost |
-|----------|-----------------|--------------|-------------------|-------------|---------------|
-| **Sumsub** | 240+ | 98.5% | 99.2% | $500 | $0.50 / call |
-| **Jumio** | 200+ | 97.8% | 98.9% | $800 | $0.70 / call |
-| **Onfido** | 195+ | 98.1% | 99.0% | $600 | $0.60 / call |
+### 3.3 狀態轉換監控
 
-### 4.5 Review Decision Criteria
+**關鍵監控指標**:
 
-**Automatic Approval Criteria**:
-- OCR confidence score >= 95%
-- Face match score >= 98%
-- No blacklist matches
-- Age >= 21
-
-**Manual Review Required**:
-- OCR confidence score < 95%
-- Rare document type
-- Age 18-20 (risk age bracket)
-- Face match score < 98%
-
-**Automatic Rejection**:
-- Blacklisted player
-- Age < 18 (underage)
-
-**Manual Review SLA**:
-
-| Priority | Player Type | Review SLA | Reviewer Assignment |
-|----------|-------------|------------|---------------------|
-| **P0 - Urgent** | VIP Diamond | 30 minutes | Dedicated reviewer (24/7) |
-| **P1 - High** | VIP Platinum/Gold | 2 hours | Priority queue |
-| **P2 - Normal** | Other players | 4 hours | Normal queue |
-| **P3 - Low** | L2 upgrade (non-mandatory) | 24 hours | Batch review |
+| 指標 | 公式 | 正常範圍 | 告警閾值 | 處置動作 |
+|------|------|---------|---------|---------|
+| **鎖定率** | LOCKED / ACTIVE | < 2% | > 5% | 檢查暴力破解攻擊 |
+| **凍結率** | SUSPENDED / ACTIVE | < 1% | > 3% | 檢視風控規則嚴重性 |
+| **待驗證率** | PENDING_VERIFICATION / ACTIVE | < 5% | > 10% | 檢視 KYC 限額設定 |
+| **關閉率** | CLOSED / TOTAL | < 0.5% | > 2% | 檢查異常批次關閉 |
+| **平均鎖定時長** | AVG(unlocked_at - locked_at) | < 30 分鐘 | > 2 小時 | 檢查自動解鎖機制 |
 
 ---
 
-## 5. Player Segmentation Rules
+## 4. 各司法管轄區 KYC 要求
 
-### 5.1 Value-Based Segmentation
+### 4.1 KYC 等級系統
 
-**Deposit-Based Tiers**:
+**分層驗證系統**:
 
-| Tier | Monthly Deposit | Characteristics | Service Level |
-|------|-----------------|-----------------|---------------|
-| **Whale** | > $50,000 | Ultra-high value, personal service | Dedicated VIP manager, 24/7 priority |
-| **High Roller** | $10,000 - $50,000 | High value, frequent large bets | VIP service, priority support |
-| **Regular** | $1,000 - $10,000 | Moderate value, consistent activity | Standard VIP benefits |
-| **Casual** | < $1,000 | Low value, occasional activity | Basic service |
+| KYC 等級 | 驗證內容 | 單筆提款限額 | 累計提款限額 | 升級要求 | 審核 SLA |
+|----------|---------|-------------|-------------|---------|---------|
+| **L0**（註冊） | 手機或 Email | $500 | $1,000/月 | 僅 OTP 驗證 | 即時 |
+| **L1**（身份驗證） | 證件（護照/身份證）+ 人臉 | $5,000 | $50,000/月 | 上傳證件 + 人臉比對 | 1-4 小時 |
+| **L2**（地址驗證） | 帳單/銀行對帳單 | $50,000 | 無限制 | 上傳地址證明 | 4-24 小時 |
 
-### 5.2 Behavior-Based Segmentation
+### 4.2 L1（身份驗證）- 接受文件
 
-**Gaming Preference Segments**:
-- **Slot Enthusiast**: 90%+ of bets on slots
-- **Live Casino Fan**: Primarily plays live dealer games
-- **Sports Bettor**: Primarily bets on sports
-- **Mixed Player**: Balanced activity across game types
+| 文件類型 | 必要資訊 | 常見拒絕原因 |
+|---------|---------|-------------|
+| **護照** | 姓名、出生日期、護照號碼、照片 | 過期、照片模糊、反光 |
+| **國民身份證** | 姓名、出生日期、身份證號碼、照片 | 僅單面、螢幕截圖 |
+| **駕照** | 姓名、出生日期、駕照號碼、照片 | 臨時駕照不接受 |
 
-**Activity Pattern Segments**:
-- **Peak Hour Player**: Active during 18:00-22:00
-- **Night Owl**: Active during 22:00-06:00
-- **Weekend Warrior**: Primarily active on weekends
-- **Daily Player**: Consistent daily activity
+### 4.3 L2（地址驗證）- 接受文件
 
----
+| 文件類型 | 必要資訊 | 有效期限 | 常見拒絕原因 |
+|---------|---------|---------|-------------|
+| **帳單** | 姓名、地址、開立日期 | 3 個月內 | 姓名不符、過期 |
+| **銀行對帳單** | 姓名、地址、對帳單日期 | 3 個月內 | 地址顯示不完整 |
+| **租賃合約** | 姓名、地址、簽約日期 | 6 個月內 | 非正式合約 |
 
-## 6. VIP Tier Progression Rules
+### 4.4 第三方 KYC 供應商
 
-### 6.1 VIP Tier Structure
+**推薦供應商**:
 
-| VIP Tier | Point Threshold | Monthly Requirement | Benefits | Downgrade Protection |
-|----------|-----------------|---------------------|----------|---------------------|
-| **Bronze** | 0 | Default | Basic cashback 0.1% | N/A |
-| **Silver** | 1,000 | 500 pts/month | Cashback 0.3%, Weekly bonus | 1 month grace |
-| **Gold** | 10,000 | 2,000 pts/month | Cashback 0.5%, Dedicated CS | 2 months grace |
-| **Platinum** | 50,000 | 10,000 pts/month | Cashback 0.8%, VIP events | 3 months grace |
-| **Diamond** | 200,000 | 30,000 pts/month | Cashback 1.2%, Personal manager | 6 months grace |
+| 供應商 | 國家覆蓋 | OCR 準確率 | 活體檢測準確率 | 月費 | API 呼叫成本 |
+|--------|---------|-----------|---------------|------|-------------|
+| **Sumsub** | 240+ | 98.5% | 99.2% | $500 | $0.50/次 |
+| **Jumio** | 200+ | 97.8% | 98.9% | $800 | $0.70/次 |
+| **Onfido** | 195+ | 98.1% | 99.0% | $600 | $0.60/次 |
 
-### 6.2 Point Earning Rules
+### 4.5 審核決策標準
 
-**Betting Points**:
-- Slots: 1 point per $10 wagered
-- Live Casino: 1 point per $20 wagered
-- Sports: 1 point per $25 wagered
-- Table Games: 1 point per $20 wagered
+**自動核准標準**:
+- OCR 信心分數 >= 95%
+- 人臉比對分數 >= 98%
+- 無黑名單匹配
+- 年齡 >= 21
 
-**Bonus Points**:
-- First deposit: 2x points
-- Birthday month: 2x points
-- Special promotions: Variable multiplier
+**需人工審核**:
+- OCR 信心分數 < 95%
+- 罕見證件類型
+- 年齡 18-20（風險年齡區間）
+- 人臉比對分數 < 98%
 
-### 6.3 Tier Progression Logic
+**自動拒絕**:
+- 黑名單玩家
+- 年齡 < 18（未成年）
 
-**Upgrade Criteria**:
-- Accumulate required points (no time limit)
-- Automatic upgrade upon reaching threshold
+**人工審核 SLA**:
 
-**Downgrade Criteria**:
-- Fail to meet monthly requirement after grace period
-- Drop to next lower tier (never below Bronze)
-
-**Grace Period Benefits**:
-- Maintain current tier benefits during grace period
-- Warning notification before downgrade
-- One-time save opportunity (special promotion)
+| 優先級 | 玩家類型 | 審核 SLA | 審核員分配 |
+|--------|---------|---------|-----------|
+| **P0 - 緊急** | VIP Diamond | 30 分鐘 | 專屬審核員（24/7） |
+| **P1 - 高** | VIP Platinum/Gold | 2 小時 | 優先隊列 |
+| **P2 - 正常** | 其他玩家 | 4 小時 | 正常隊列 |
+| **P3 - 低** | L2 升級（非強制） | 24 小時 | 批次審核 |
 
 ---
 
-## 7. Problem Gambling Indicators
+## 5. 玩家分群規則
 
-### 7.1 Risk Indicators
+### 5.1 價值導向分群
 
-**Spending Patterns**:
-- Daily deposit exceeds 3x average
-- Multiple deposits within 1 hour
-- Deposit immediately after large loss
-- Chasing losses (increasing bets after losses)
+**存款分層**:
 
-**Time Patterns**:
-- Session exceeds 4 hours continuously
-- Active during late night hours (02:00-06:00)
-- Gaming during work hours consistently
-- Increased frequency over time
+| 等級 | 月存款 | 特徵 | 服務等級 |
+|------|--------|------|---------|
+| **Whale（鯨魚）** | > $50,000 | 超高價值、個人服務 | 專屬 VIP 經理、24/7 優先 |
+| **High Roller（高額玩家）** | $10,000 - $50,000 | 高價值、頻繁大額投注 | VIP 服務、優先支援 |
+| **Regular（常規玩家）** | $1,000 - $10,000 | 中等價值、持續活動 | 標準 VIP 福利 |
+| **Casual（休閒玩家）** | < $1,000 | 低價值、偶爾活動 | 基本服務 |
 
-**Behavioral Indicators**:
-- Multiple failed deposit attempts
-- Contacting support for limit increases
-- Complaints about losses
-- Requesting to close then reopen account
+### 5.2 行為導向分群
 
-### 7.2 Intervention Triggers
+**遊戲偏好分群**:
+- **Slot Enthusiast（老虎機愛好者）**: 90%+ 投注在老虎機
+- **Live Casino Fan（真人娛樂城愛好者）**: 主要玩真人荷官遊戲
+- **Sports Bettor（體育博彩玩家）**: 主要投注體育賽事
+- **Mixed Player（混合玩家）**: 各類遊戲平衡活動
 
-| Risk Level | Indicators | Automated Action | Manual Action |
-|------------|------------|------------------|---------------|
-| **Low** | 1-2 indicators | In-game reminder | None |
-| **Medium** | 3-4 indicators | Reality check popup | CS reach out |
-| **High** | 5+ indicators | Mandatory cool-off | VIP manager call |
-| **Critical** | Pattern matches addiction | Forced self-exclusion | Responsible gambling team |
-
-### 7.3 Player Protection Tools
-
-**Self-Imposed Limits**:
-- Deposit limits (daily/weekly/monthly)
-- Loss limits (daily/weekly/monthly)
-- Wager limits (per bet/daily)
-- Session time limits
-
-**Cool-Off Options**:
-- 24-hour cool-off
-- 7-day cool-off
-- 30-day cool-off
-- Self-exclusion (6 months / permanent)
-
-### 7.4 Regulatory Requirements
-
-**UKGC (UK Gambling Commission)**:
-- Mandatory affordability checks for losses > GBP 1,000/month
-- Source of funds verification required
-- Marketing opt-out easily accessible
-
-**MGA (Malta Gaming Authority)**:
-- Self-exclusion network integration required
-- Reality checks every 60 minutes
-- Session history readily available
+**活動模式分群**:
+- **Peak Hour Player（尖峰時段玩家）**: 18:00-22:00 活躍
+- **Night Owl（夜貓子）**: 22:00-06:00 活躍
+- **Weekend Warrior（週末戰士）**: 主要週末活躍
+- **Daily Player（每日玩家）**: 穩定每日活動
 
 ---
 
-## 8. Related Documents
+## 6. VIP 等級晉升規則
 
-### Business Documents
-- VIP & Loyalty Program Requirements
-- Responsible Gambling Policy
-- AML/KYC Policy
+### 6.1 VIP 等級架構
 
-### Technical Documents
+| VIP 等級 | 積分門檻 | 月維持要求 | 福利 | 降級保護 |
+|----------|---------|-----------|------|---------|
+| **Bronze** | 0 | 預設 | 基本返水 0.1% | N/A |
+| **Silver** | 1,000 | 500 點/月 | 返水 0.3%、週紅利 | 1 個月寬限 |
+| **Gold** | 10,000 | 2,000 點/月 | 返水 0.5%、專屬客服 | 2 個月寬限 |
+| **Platinum** | 50,000 | 10,000 點/月 | 返水 0.8%、VIP 活動 | 3 個月寬限 |
+| **Diamond** | 200,000 | 30,000 點/月 | 返水 1.2%、專屬經理 | 6 個月寬限 |
 
-→ **[Player Lifecycle Implementation](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)** - Complete player journey state machines, API specifications, database schemas, and KYC/AML integration patterns
+### 6.2 積分獲取規則
 
-**Additional References**:
-- Risk Control Framework
-- Unified Wallet Model
+**投注積分**:
+- 老虎機: 每 $10 投注獲得 1 積分
+- 真人娛樂城: 每 $20 投注獲得 1 積分
+- 體育博彩: 每 $25 投注獲得 1 積分
+- 桌遊: 每 $20 投注獲得 1 積分
+
+**獎勵積分**:
+- 首存: 2 倍積分
+- 生日月: 2 倍積分
+- 特別活動: 可變倍數
+
+### 6.3 等級晉升邏輯
+
+**升級標準**:
+- 累積達到所需積分（無時間限制）
+- 達到門檻時自動升級
+
+**降級標準**:
+- 寬限期後未達月維持要求
+- 降至下一較低等級（永不低於 Bronze）
+
+**寬限期福利**:
+- 寬限期內維持現有等級福利
+- 降級前警告通知
+- 一次性保級機會（特別活動）
 
 ---
 
-**Document Version**: 1.0.0
-**Created Date**: 2026-02-08
-**Last Updated**: 2026-02-08
-**Maintainers**: Player Center Team & Product Team
+## 7. 問題賭博指標
 
-**Change History**:
-- 1.0.0 (2026-02-08): Initial version - Split from source document (business requirements view)
+### 7.1 風險指標
+
+**消費模式**:
+- 每日存款超過平均值 3 倍
+- 1 小時內多次存款
+- 大額損失後立即存款
+- 追輸（損失後增加投注）
+
+**時間模式**:
+- 連續遊戲超過 4 小時
+- 深夜時段活躍（02:00-06:00）
+- 持續在工作時間遊戲
+- 頻率隨時間增加
+
+**行為指標**:
+- 多次存款失敗嘗試
+- 聯繫客服要求提高限額
+- 對損失的投訴
+- 請求關閉帳戶後又重新開啟
+
+### 7.2 介入觸發機制
+
+| 風險等級 | 指標數量 | 自動動作 | 人工動作 |
+|---------|---------|---------|---------|
+| **低** | 1-2 個指標 | 遊戲內提醒 | 無 |
+| **中** | 3-4 個指標 | 現實提醒彈窗 | 客服聯繫 |
+| **高** | 5+ 個指標 | 強制冷靜期 | VIP 經理致電 |
+| **嚴重** | 模式符合成癮特徵 | 強制自我排除 (Self-Exclusion) | 負責任博彩團隊 |
+
+### 7.3 玩家保護工具
+
+**自我設定限額**:
+- 存款限額（每日/每週/每月）
+- 損失限額（每日/每週/每月）
+- 投注限額（每筆/每日）
+- 遊戲時間限額
+
+**冷靜期選項**:
+- 24 小時冷靜期
+- 7 天冷靜期
+- 30 天冷靜期
+- 自我排除（6 個月/永久）
+
+### 7.4 監管要求
+
+**UKGC（英國博彩委員會）**:
+- 損失 > GBP 1,000/月需強制負擔能力檢查 (Affordability Check)
+- 需資金來源驗證 (Source of Funds)
+- 行銷退訂需易於存取
+
+**MGA（馬爾他博彩管理局）**:
+- 需整合自我排除網絡
+- 每 60 分鐘現實提醒 (Reality Check)
+- 遊戲歷史需隨時可查
+
+---
+
+## 8. 相關文件
+
+### 業務文件
+- VIP 與忠誠計畫需求
+- 負責任博彩政策
+- AML/KYC 政策
+
+### 技術文件
+
+→ **[玩家生命週期實作](../../architecture/01_Player_Service/Player_Lifecycle_Implementation.md)** - 完整玩家旅程狀態機、API 規格、資料庫結構及 KYC/AML 整合模式
+
+**其他參考**:
+- 風控框架
+- 統一錢包模型
+
+---
+
+**文件版本**: 1.0.0
+**創建日期**: 2026-02-08
+**最後更新**: 2026-02-11
+**維護者**: 玩家中心團隊與產品團隊
+
+**變更歷史**:
+- 1.0.0 (2026-02-08): 初始版本 - 從來源文件分離（業務需求視圖）
+- 1.0.1 (2026-02-11): 翻譯為繁體中文

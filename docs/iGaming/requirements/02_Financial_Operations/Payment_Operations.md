@@ -1,286 +1,286 @@
-# Payment Operations
+# 支付營運
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
-> **Audience**: Executives, Product Managers, Compliance Officers
+> **目標讀者**: 高階主管、產品經理、合規官員
 > **Related Architecture**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
-> **Last Synced**: 2026-02-09
+> **最後同步**: 2026-02-09
 >
-> **Refinement Note**: Technical details (PSP webhook implementation, signature verification algorithms, smart routing code, scheduled reconciliation jobs, connection pool configuration, Prometheus metrics) moved to Architecture layer. This document focuses on business rules only.
+> **精煉說明**: 技術細節（PSP webhook 實作、簽名驗證演算法、智能路由程式碼、排程對帳任務、連接池配置、Prometheus 指標）已移至 Architecture 層。本文件僅專注於業務規則。
 
 ---
 
-## Business Value
+## 業務價值 (Business Value)
 
-This requirements document delivers strategic value by:
-- **Revenue Optimization**: Defines smart routing with weighted factors (Success Rate 50%, Fee 30%, Speed 15%) to maximize transaction success while minimizing costs
-- **Regulatory Compliance**: Documents jurisdiction-specific restrictions (UK credit card ban, PSD2 3DS 2.0, AML wallet scoring) to prevent regulatory violations and associated fines
-- **Operational Efficiency**: Establishes automated reconciliation (every 15 minutes) and severity-based alerting (P0-P3) to minimize manual intervention and reduce failed transaction resolution time
-- **VIP Retention**: Specifies differentiated payment channels for VIP levels (dedicated account manager, fee reductions, expedited settlement) to enhance high-value player experience
-
----
-
-## Success Metrics
-
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Drop Rate | < 1% | (Credits / Total Success) × 100% |
-| Credit Success Rate | > 95% | (Successful Credits / Credit Attempts) × 100% |
-| Average Credit Delay | < 30 min | Time from PSP success to platform credit |
-| Pending Backlog | < 10 orders | Orders pending > 2 hours |
-| Manual Review Rate | < 5% | (Manual / Total Credits) × 100% |
-| PSP API Success Rate | > 99% | (Successful Queries / Total Queries) × 100% |
+本需求文件提供以下策略價值：
+- **營收優化**: 定義智能路由及權重因子（成功率 50%、手續費 30%、速度 15%），在降低成本的同時最大化交易成功率
+- **監管合規**: 記錄各司法管轄區特定限制（英國信用卡禁令、PSD2 3DS 2.0、AML 錢包評分），防止監管違規及相關罰款
+- **營運效率**: 建立自動對帳（每 15 分鐘）及嚴重性分級警報（P0-P3），減少人工介入並縮短失敗交易處理時間
+- **VIP 留存**: 規範 VIP 等級差異化支付通道（專屬客戶經理、手續費減免、加速結算），提升高價值玩家體驗
 
 ---
 
-## 1. Overview
+## 成功指標 (Success Metrics)
 
-The payment operations module is responsible for all interactions with external payment service providers (PSPs), ensuring secure, stable, and automated fund inflows and outflows. The system must support multiple payment methods and dynamic routing capabilities.
-
----
-
-## 2. Supported Payment Methods
-
-### 2.1 Fiat Currency Payments
-
-| Payment Type | Examples | Business Considerations |
-|-------------|----------|------------------------|
-| **Bank Transfer** | Wire Transfer, ACH, SEPA | T+1 to T+3 settlement |
-| **Credit/Debit Card** | VISA, Mastercard, AMEX | Subject to jurisdiction restrictions |
-| **E-Wallet** | LinePay, Momo, GCash, PayPal, Skrill | Regional availability varies |
-
-### 2.2 Cryptocurrency Payments
-
-| Currency | Networks | Special Requirements |
-|----------|----------|---------------------|
-| USDT | TRC20, ERC20 | Real-time exchange rate conversion required |
-| BTC | Bitcoin Network | Wallet address risk scoring for AML |
-| ETH | Ethereum | Gas fee considerations |
-
-**Business Rule**: Platform primary accounts are typically in fiat currency. Crypto payments require integration with exchange rate APIs (e.g., Binance, Oanda) for real-time conversion.
+| 指標 | 目標 | 計算方式 |
+|------|------|---------|
+| 掉單率 (Drop Rate) | < 1% | (入帳數 / 總成功數) × 100% |
+| 入帳成功率 | > 95% | (成功入帳數 / 入帳嘗試數) × 100% |
+| 平均入帳延遲 | < 30 分鐘 | PSP 成功到平台入帳時間 |
+| 待處理積壓 | < 10 筆 | 待處理 > 2 小時的訂單 |
+| 人工審核率 | < 5% | (人工審核 / 總入帳) × 100% |
+| PSP API 成功率 | > 99% | (成功查詢數 / 總查詢數) × 100% |
 
 ---
 
-## 3. Jurisdiction-Specific Restrictions
+## 1. 概述
 
-### 3.1 Credit Card Ban Compliance
-
-| Jurisdiction | Effective Date | Scope | Impact |
-|-------------|---------------|-------|--------|
-| **United Kingdom** | April 2020 | All gambling | Credit cards blocked |
-| **Australia** | April 2026 | Online gambling | Preparation required |
-| **Sweden** | 2025+ | Online brands | Expanding ban |
-| **Germany** | 2021 | All gambling | Complete prohibition |
-
-**Business Requirement**: Payment method whitelist must be dynamically loaded based on player jurisdiction.
-
-### 3.2 Regional PSP Matrix
-
-| Region | Preferred PSP | Primary Payment Methods | Notes |
-|--------|--------------|------------------------|-------|
-| United States | Stripe, Nuvei | Credit Card, ACH | PCI-DSS Level 1 required |
-| European Union | Adyen, Trustly | SEPA, iDEAL, Sofort | PSD2 strong authentication |
-| China | Alipay, WeChat Pay | QR Code payments | Merchant qualification required |
-| Philippines | GCash, PayMaya | E-Wallet | High cash usage market |
-| Brazil | MercadoPago, PagSeguro | Boleto, PIX | PIX real-time transfer dominant |
-| Japan | PayPay, Line Pay, Rakuten Pay | QR Code, E-Wallet | Mobile-first market |
+支付營運模組負責與外部支付服務供應商（PSP）的所有互動，確保安全、穩定且自動化的資金進出。系統必須支援多種支付方式及動態路由能力。
 
 ---
 
-## 4. Payment Routing Rules
+## 2. 支援的支付方式
 
-### 4.1 Smart Routing Principles
+### 2.1 法幣支付
 
-**Dynamic Switching Criteria**:
-- When a payment channel success rate falls below threshold (e.g., 80%), automatically switch to backup channel
-- Route VIP players through dedicated high-speed channels
-- Prioritize local PSPs to reduce cross-border fees and improve success rates
+| 支付類型 | 範例 | 業務考量 |
+|---------|------|---------|
+| **銀行轉帳** | 電匯、ACH、SEPA | T+1 至 T+3 結算 |
+| **信用卡/借記卡** | VISA、Mastercard、AMEX | 受司法管轄區限制 |
+| **電子錢包 (E-Wallet)** | LinePay、Momo、GCash、PayPal、Skrill | 地區可用性各異 |
 
-### 4.2 Routing Weight Factors
+### 2.2 加密貨幣支付
 
-| Factor | Weight | Business Rationale |
-|--------|--------|-------------------|
-| **Success Rate** | 50% | Primary metric affecting player experience and platform losses |
-| **Transaction Fee** | 30% | Cost control; significant impact on high-value transactions |
-| **Settlement Speed** | 15% | User experience; faster crediting improves satisfaction |
-| **VIP Priority** | 5% | Differentiated service for high-value players |
-| **Currency Match** | 3% | Avoid FX losses and additional fees |
+| 幣種 | 網路 | 特殊要求 |
+|------|------|---------|
+| USDT | TRC20、ERC20 | 需即時匯率轉換 |
+| BTC | Bitcoin Network | 錢包地址需 AML 風險評分 |
+| ETH | Ethereum | 需考慮 Gas 費用 |
 
-→ **[Smart Routing Algorithm](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#smart-routing-algorithm)** - Score calculation formula, weighted ranking implementation, real-time PSP selection logic
-
-### 4.3 VIP Channel Benefits
-
-| VIP Level | Channel Benefit | Fee Discount | Priority |
-|-----------|----------------|--------------|----------|
-| VIP 5 | Dedicated account manager | Priority processing | Highest |
-| VIP 4 | Fee reduction -0.5% | Fast track | High |
-| VIP 3 | Expedited settlement (<5 min) | Standard | Medium |
-| VIP 1-2 | Standard PSPs | None | Normal |
+**業務規則**: 平台主帳戶通常為法幣。加密貨幣支付需整合匯率 API（如 Binance、Oanda）進行即時轉換。
 
 ---
 
-## 5. Deposit Business Rules
+## 3. 各司法管轄區特定限制
 
-### 5.1 Deposit Flow Summary
+### 3.1 信用卡禁令合規
 
-1. Player initiates deposit -> System creates order (Pending) -> Redirect to PSP payment page
-2. Player completes payment -> PSP sends callback -> System verifies authenticity
-3. Verification passed -> Credit player balance -> Update order status (Success) -> Send notification
+| 司法管轄區 | 生效日期 | 範圍 | 影響 |
+|-----------|---------|------|------|
+| **英國** | 2020 年 4 月 | 所有博彩 | 信用卡禁止使用 |
+| **澳洲** | 2026 年 4 月 | 線上博彩 | 需提前準備 |
+| **瑞典** | 2025 年以後 | 線上品牌 | 禁令擴大中 |
+| **德國** | 2021 年 | 所有博彩 | 完全禁止 |
 
-→ **[PSP Webhook Integration](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#psp-webhook-integration)** - Signature verification (HMAC-SHA256), callback processing, database updates
+**業務需求**: 支付方式白名單必須根據玩家司法管轄區動態載入。
 
-### 5.2 Amount Limits
+### 3.2 區域 PSP 矩陣
 
-| Limit Type | Configuration Level | Enforcement |
-|-----------|---------------------|-------------|
-| Per-transaction minimum | Merchant configurable | Real-time |
-| Per-transaction maximum | Merchant configurable | Real-time |
-| Daily limit | Player level based | Cumulative check |
-| Monthly limit | VIP level based | Cumulative check |
-
----
-
-## 6. Withdrawal Business Rules
-
-### 6.1 Payout Methods
-
-**Automated Payout (API)**:
-- Small withdrawals (e.g., < $500): Automatic processing
-- Large withdrawals: Manual review required before API trigger
-
-**Manual Payout**:
-- Finance personnel review bank details in back office
-- Manual transfer and completion marking
-
-### 6.2 Approval Thresholds
-
-| Amount Range | Approval Level | SLA | Evidence Required |
-|-------------|---------------|-----|-------------------|
-| < $100 | CS Agent | Immediate | Player request |
-| $100 - $1,000 | CS Manager | 1 hour | Bank verification |
-| $1,000 - $10,000 | CFO | 4 hours | Complete bank statement |
-| > $10,000 | CFO + CEO | 24 hours | Full documentation + video call |
+| 地區 | 首選 PSP | 主要支付方式 | 備註 |
+|------|---------|-------------|------|
+| 美國 | Stripe、Nuvei | 信用卡、ACH | 需 PCI-DSS Level 1 |
+| 歐盟 | Adyen、Trustly | SEPA、iDEAL、Sofort | PSD2 強認證 |
+| 中國 | 支付寶、微信支付 | QR Code 支付 | 需商戶資質 |
+| 菲律賓 | GCash、PayMaya | 電子錢包 | 高現金使用市場 |
+| 巴西 | MercadoPago、PagSeguro | Boleto、PIX | PIX 即時轉帳主導 |
+| 日本 | PayPay、Line Pay、Rakuten Pay | QR Code、電子錢包 | 行動優先市場 |
 
 ---
 
-## 7. Failed Transaction Handling
+## 4. 支付路由規則
 
-### 7.1 Reconciliation Requirements
+### 4.1 智能路由原則
 
-**Automatic Reconciliation**:
-- Frequency: Every 15 minutes
-- Target: Transactions pending > 30 minutes
-- Action: Query PSP status and reconcile
+**動態切換標準**:
+- 當支付通道成功率低於閾值（如 80%）時，自動切換至備用通道
+- VIP 玩家路由至專屬高速通道
+- 優先使用本地 PSP 以降低跨境手續費並提高成功率
 
-→ **[Auto Reconciliation Implementation](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#auto-reconciliation)** - Scheduled job configuration, PSP API integration, SQL queries, status synchronization logic
+### 4.2 路由權重因子
 
-### 7.2 Player Appeal Process
+| 因子 | 權重 | 業務理由 |
+|------|------|---------|
+| **成功率** | 50% | 影響玩家體驗和平台損失的主要指標 |
+| **交易手續費** | 30% | 成本控制；對高額交易影響顯著 |
+| **結算速度** | 15% | 用戶體驗；更快入帳提升滿意度 |
+| **VIP 優先** | 5% | 高價值玩家的差異化服務 |
+| **幣種匹配** | 3% | 避免匯差損失及額外手續費 |
 
-1. Player uploads payment proof (bank transfer screenshot)
-2. CS queries PSP API to verify
-3. If PSP confirms receipt but platform not credited -> Manual credit + audit log
+→ **[智能路由演算法](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#smart-routing-algorithm)** - 分數計算公式、加權排序實作、即時 PSP 選擇邏輯
 
-### 7.3 Severity Classification
+### 4.3 VIP 通道福利
 
-| Scenario | Priority | SLA | Notification Recipients |
-|----------|----------|-----|------------------------|
-| High-value NOT_FOUND (>$1000) | P0 Critical | 15 minutes | Finance + CTO + Security |
-| Drop rate > 3% | P1 High | 1 hour | Finance + CS Manager |
-| Single drop (auto-credited) | P2 Medium | 24 hours | Daily summary |
-| PSP PENDING status | P3 Low | Monitor only | None |
-
----
-
-## 8. SLA Requirements
-
-### 8.1 Performance Targets
-
-| Metric | Definition | Target | Alert Threshold |
-|--------|-----------|--------|-----------------|
-| **Drop Rate** | (Credits / Total Success) x 100% | < 1% | > 3% |
-| **Credit Success Rate** | (Successful Credits / Credit Attempts) x 100% | > 95% | < 90% |
-| **Average Credit Delay** | Time from PSP success to platform credit | < 30 min | > 2 hours |
-| **Pending Backlog** | Orders pending > 2 hours | < 10 | > 50 |
-| **Manual Review Rate** | (Manual / Total Credits) x 100% | < 5% | > 15% |
-| **PSP API Success Rate** | (Successful Queries / Total Queries) x 100% | > 99% | < 95% |
-
-→ **[Performance Monitoring](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#performance-monitoring)** - Prometheus metrics configuration, Grafana dashboards, alert rules (PagerDuty, Slack)
-
-### 8.2 PSP Health Status Thresholds
-
-| Status | Success Rate | Routing Decision | Recovery Criteria |
-|--------|-------------|------------------|-------------------|
-| Healthy | >= 80% | Normal routing | N/A |
-| Degraded | 50-80% | Lower priority (Score x 0.7) | 3 consecutive successes |
-| Unavailable | < 50% | Excluded, use backup | Manual verification |
-| Down | No response | Skip, use next in queue | Emergency alert + manual |
+| VIP 等級 | 通道福利 | 手續費折扣 | 優先級 |
+|----------|---------|-----------|--------|
+| VIP 5 | 專屬客戶經理 | 優先處理 | 最高 |
+| VIP 4 | 手續費減免 -0.5% | 快速通道 | 高 |
+| VIP 3 | 加速結算（< 5 分鐘） | 標準 | 中 |
+| VIP 1-2 | 標準 PSP | 無 | 正常 |
 
 ---
 
-## 9. Compliance Requirements
+## 5. 存款業務規則
 
-### 9.1 Security Standards
+### 5.1 存款流程摘要
 
-| Requirement | Standard | Business Rule |
-|------------|----------|---------------|
-| Card data storage | PCI-DSS Level 1 | Token-only storage; no full card numbers |
-| Payment page | PCI-DSS | Use PSP hosted payment page |
-| Data transmission | Encrypted | All API requests must be encrypted |
-| API key management | Secure vault | Keys stored in secure credential vault |
+1. 玩家發起存款 → 系統建立訂單（Pending）→ 跳轉至 PSP 支付頁面
+2. 玩家完成支付 → PSP 發送回調 → 系統驗證真實性
+3. 驗證通過 → 入帳玩家餘額 → 更新訂單狀態（Success）→ 發送通知
 
-→ **[Security Implementation](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#security-implementation)** - TLS 1.2+ configuration, HashiCorp Vault integration, API key rotation policy
+→ **[PSP Webhook 整合](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#psp-webhook-integration)** - 簽名驗證（HMAC-SHA256）、回調處理、資料庫更新
 
-### 9.2 3D Secure Requirements
+### 5.2 金額限制
 
-| Regulation | Requirement | Impact |
-|-----------|-------------|--------|
-| PSD2 (EU) | Mandatory 3DS 2.0 | All EU card transactions |
-| SCA Exemptions | Low-value (<30 EUR), Recurring | Reduced friction for eligible transactions |
-
-→ **[3DS Integration](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#3ds-integration)** - 3DS 2.0 flow implementation, SCA exemption logic, PSD2 compliance validation
-
-### 9.3 AML Compliance
-
-- Cryptocurrency wallet address risk scoring required
-- Suspicious transaction reporting
-- Cross-reference with sanctions lists
+| 限制類型 | 配置層級 | 執行方式 |
+|---------|---------|---------|
+| 單筆最小金額 | 商戶可配置 | 即時 |
+| 單筆最大金額 | 商戶可配置 | 即時 |
+| 每日限額 | 玩家等級 | 累計檢查 |
+| 每月限額 | VIP 等級 | 累計檢查 |
 
 ---
 
-## 10. Configuration Change Governance
+## 6. 提款業務規則
 
-### 10.1 High-Risk Operations
+### 6.1 出款方式
 
-- Adding/modifying PSP merchant credentials
-- Adjusting routing weights
-- Changing transaction limits
+**自動出款（API）**:
+- 小額提款（如 < $500）：自動處理
+- 大額提款：需人工審核後觸發 API
 
-### 10.2 Change Approval Flow
+**人工出款**:
+- 財務人員在後台審核銀行資訊
+- 人工轉帳並標記完成
 
-1. Technical team submits change request
-2. System calculates impact scope (estimated affected transaction volume)
-3. CFO/CTO review and approval
-4. Scheduled deployment with operations team notification
+### 6.2 核准閾值
 
----
-
-## 11. Related Documentation
-
-### Business References
-- [Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - Deposit crediting logic
-- [Withdrawal Risk Control](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - Withdrawal process and risk control
-- [Reconciliation System](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) - PSP reconciliation process
-
-### Compliance References
-- [Payment Restrictions](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md) - Credit card ban and crypto compliance
-- [Multi-Jurisdiction Framework](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md) - Multi-license payment configuration
-- [UKGC Compliance](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - UK credit card ban details
-
-### Technical Implementation
-
-→ **[Payment Gateway API Architecture](../../architecture/02_Finance_Service/Payment_Gateway_API.md)** - PSP adapter implementation, webhook processing, smart routing algorithm, reconciliation automation, HikariCP tuning, and Prometheus monitoring
+| 金額範圍 | 核准層級 | SLA | 所需證據 |
+|---------|---------|-----|---------|
+| < $100 | 客服專員 | 即時 | 玩家請求 |
+| $100 - $1,000 | 客服主管 | 1 小時 | 銀行驗證 |
+| $1,000 - $10,000 | CFO | 4 小時 | 完整銀行對帳單 |
+| > $10,000 | CFO + CEO | 24 小時 | 完整文件 + 視訊通話 |
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-08
-**Maintainer**: Finance Team
+## 7. 失敗交易處理
+
+### 7.1 對帳需求
+
+**自動對帳**:
+- 頻率：每 15 分鐘
+- 目標：待處理 > 30 分鐘的交易
+- 動作：查詢 PSP 狀態並對帳
+
+→ **[自動對帳實作](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#auto-reconciliation)** - 排程任務配置、PSP API 整合、SQL 查詢、狀態同步邏輯
+
+### 7.2 玩家申訴流程
+
+1. 玩家上傳支付證明（銀行轉帳截圖）
+2. 客服查詢 PSP API 驗證
+3. 若 PSP 確認收款但平台未入帳 → 人工入帳 + 稽核日誌
+
+### 7.3 嚴重性分類
+
+| 情境 | 優先級 | SLA | 通知對象 |
+|------|--------|-----|---------|
+| 高額 NOT_FOUND（> $1000） | P0 嚴重 | 15 分鐘 | 財務 + CTO + 安全 |
+| 掉單率 > 3% | P1 高 | 1 小時 | 財務 + 客服主管 |
+| 單筆掉單（已自動入帳） | P2 中 | 24 小時 | 每日摘要 |
+| PSP PENDING 狀態 | P3 低 | 僅監控 | 無 |
+
+---
+
+## 8. SLA 要求
+
+### 8.1 效能目標
+
+| 指標 | 定義 | 目標 | 告警閾值 |
+|------|------|------|---------|
+| **掉單率** | (入帳數 / 總成功數) × 100% | < 1% | > 3% |
+| **入帳成功率** | (成功入帳 / 入帳嘗試) × 100% | > 95% | < 90% |
+| **平均入帳延遲** | PSP 成功到平台入帳時間 | < 30 分鐘 | > 2 小時 |
+| **待處理積壓** | 待處理 > 2 小時的訂單 | < 10 筆 | > 50 筆 |
+| **人工審核率** | (人工審核 / 總入帳) × 100% | < 5% | > 15% |
+| **PSP API 成功率** | (成功查詢 / 總查詢) × 100% | > 99% | < 95% |
+
+→ **[效能監控](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#performance-monitoring)** - Prometheus 指標配置、Grafana 儀表板、告警規則（PagerDuty、Slack）
+
+### 8.2 PSP 健康狀態閾值
+
+| 狀態 | 成功率 | 路由決策 | 恢復標準 |
+|------|--------|---------|---------|
+| Healthy（健康） | >= 80% | 正常路由 | N/A |
+| Degraded（降級） | 50-80% | 降低優先級（分數 × 0.7） | 連續 3 次成功 |
+| Unavailable（不可用） | < 50% | 排除，使用備用 | 人工驗證 |
+| Down（停機） | 無回應 | 跳過，使用下一個 | 緊急告警 + 人工 |
+
+---
+
+## 9. 合規要求
+
+### 9.1 安全標準
+
+| 要求 | 標準 | 業務規則 |
+|------|------|---------|
+| 卡片資料儲存 | PCI-DSS Level 1 | 僅儲存 Token；不存完整卡號 |
+| 支付頁面 | PCI-DSS | 使用 PSP 託管支付頁面 |
+| 資料傳輸 | 加密 | 所有 API 請求必須加密 |
+| API 金鑰管理 | 安全保險庫 | 金鑰儲存於安全憑證保險庫 |
+
+→ **[安全實作](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#security-implementation)** - TLS 1.2+ 配置、HashiCorp Vault 整合、API 金鑰輪換政策
+
+### 9.2 3D Secure 要求
+
+| 法規 | 要求 | 影響 |
+|------|------|------|
+| PSD2（歐盟） | 強制 3DS 2.0 | 所有歐盟卡片交易 |
+| SCA 豁免 | 小額（< 30 EUR）、定期 | 符合條件交易減少摩擦 |
+
+→ **[3DS 整合](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md#3ds-integration)** - 3DS 2.0 流程實作、SCA 豁免邏輯、PSD2 合規驗證
+
+### 9.3 AML 合規
+
+- 加密貨幣錢包地址需風險評分
+- 可疑交易報告
+- 制裁名單交叉比對
+
+---
+
+## 10. 配置變更治理
+
+### 10.1 高風險操作
+
+- 新增/修改 PSP 商戶憑證
+- 調整路由權重
+- 變更交易限額
+
+### 10.2 變更核准流程
+
+1. 技術團隊提交變更請求
+2. 系統計算影響範圍（預估受影響交易量）
+3. CFO/CTO 審核批准
+4. 排程部署並通知營運團隊
+
+---
+
+## 11. 相關文件
+
+### 業務參考
+- [錢包架構](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md) - 存款入帳邏輯
+- [提款風控](../../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md) - 提款流程與風控
+- [對帳系統](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) - PSP 對帳流程
+
+### 合規參考
+- [支付限制](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md) - 信用卡禁令及加密貨幣合規
+- [多司法管轄區框架](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md) - 多牌照支付配置
+- [UKGC 合規](../../source-archive/06_Platform_Governance/06-08_UKGC_Compliance.md) - 英國信用卡禁令細節
+
+### 技術實作
+
+→ **[支付閘道 API 架構](../../architecture/02_Finance_Service/Payment_Gateway_API.md)** - PSP 適配器實作、webhook 處理、智能路由演算法、對帳自動化、HikariCP 調校及 Prometheus 監控
+
+---
+
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-11
+**維護者**: 財務團隊

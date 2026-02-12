@@ -1,364 +1,364 @@
-# Financial Implementation Requirements
+# 財務實作需求
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-11_Financial_Implementation.md](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md)
-> **Audience**: Executives, Compliance Officers, Product Managers
+> **目標讀者**: 高階主管、合規官員、產品經理
 > **Related Architecture**: [Financial_Implementation.md](../../architecture/02_Finance_Service/Financial_Implementation.md)
-> **Last Synced**: 2026-02-09
+> **最後同步**: 2026-02-09
 >
-> **Refinement Note**: Technical details (atomicity, idempotency, HMAC-SHA256 algorithms, SAGA flow diagrams) moved to Architecture layer. This document focuses on business requirements only.
+> **精煉說明**: 技術細節（原子性、冪等性、HMAC-SHA256 演算法、SAGA 流程圖）已移至 Architecture 層。本文件僅專注於業務需求。
 
 ---
 
-## Business Value
+## 業務價值 (Business Value)
 
-This requirements document delivers strategic value by:
-- **Financial Integrity**: Defines multi-wallet architecture (CASH, BONUS, LOCKED) with precise Available Balance formula ensuring players can never overdraft
-- **Fraud Prevention**: Establishes 7-dimensional risk scoring model (0-100 scale) with automated approval thresholds to block high-risk withdrawals while minimizing friction for legitimate players
-- **Operational Efficiency**: Specifies reconciliation requirements across wallet, deposits, withdrawals, and bets with 99.99% accuracy target and automated discrepancy alerting
-- **Regulatory Compliance**: Mandates comprehensive audit trails for all financial operations, supporting regulatory inspections and dispute resolution
-
----
-
-## Acceptance Criteria
-
-- [ ] Multi-wallet system supports CASH, BONUS, and LOCKED wallet types with independent balance tracking
-- [ ] Available Balance formula correctly calculates: Cash Balance - Locked Amount - Pending Bets (never negative)
-- [ ] Concurrent balance deductions pass stress test at 1,000 TPS without overdraft
-- [ ] Duplicate callback handling is idempotent (same order returns same result)
-- [ ] Withdrawal risk scoring calculates correctly across all 7 dimensions (0-100 scale)
-- [ ] Risk decisions route correctly: 0-29 AUTO_APPROVE, 30-69 MANUAL_REVIEW, 70-100 REJECT
-- [ ] SAGA compensation unlocks wallet when payment gateway submission fails
-- [ ] Daily reconciliation achieves 99.99% wallet balance accuracy
-- [ ] Three-way bet reconciliation (OLTP, GP Report, OLAP) achieves 100% accuracy
-- [ ] All financial operations generate complete audit trail records
+本需求文件提供以下策略價值：
+- **財務完整性**: 定義多錢包架構（CASH、BONUS、LOCKED）及精確的可下注餘額 (Playable Balance) 公式，確保玩家永遠不會透支
+- **詐欺防範**: 建立 7 維度風險評分模型（0-100 分），具備自動核准閾值，可阻擋高風險提款同時減少合法玩家的摩擦
+- **營運效率**: 規範錢包、存款、提款、投注的對帳需求，準確率目標 99.99%，並具備自動化差異警報
+- **監管合規**: 強制所有財務操作具備完整稽核軌跡，支援監管檢查及爭議處理
 
 ---
 
-## 1. Document Purpose
+## 驗收標準 (Acceptance Criteria)
 
-This document defines the **business requirements** for the iGaming platform's core financial processes, including the wallet system, payment gateway integration, withdrawal risk control, and reconciliation system.
-
-**Target Audience**:
-- Product Managers (financial module)
-- Compliance Officers
-- Operations Managers
-- Business Analysts
-
----
-
-## 2. Wallet System Requirements
-
-### 2.1 Multi-Wallet Support
-
-The platform MUST support multiple wallet types per player:
-
-| Wallet Type | Purpose | Business Rule |
-|-------------|---------|---------------|
-| **CASH** | Real-money balance for betting and withdrawals | Primary wallet for all financial operations |
-| **BONUS** | Promotional funds subject to wagering requirements | Cannot be withdrawn until turnover conditions are met |
-| **LOCKED** | Temporarily frozen funds (pending withdrawal, etc.) | Released upon settlement or cancellation |
-
-### 2.2 Available Balance Formula
-
-The system MUST calculate a player's available (bettable) balance using the following formula:
-
-**Available Balance = Cash Wallet Balance - Locked Amount - Pending Bets**
-
-- The result MUST never be negative (floor at zero)
-- The calculation MUST be performed in real-time for every bet placement request
-
-### 2.3 Wallet Lock/Unlock Rules
-
-| Scenario | Lock Trigger | Unlock Trigger |
-|----------|-------------|----------------|
-| Bet placed | Lock bet amount when bet is submitted | Unlock when bet is settled (win/lose) |
-| Withdrawal requested | Lock withdrawal amount at request time | Unlock upon approval, rejection, or timeout |
-| Fraud investigation | Lock suspicious amount upon risk detection | Unlock upon investigation resolution |
-
-**Business Rules**:
-- Wallet lock MUST be recorded with a clear reason and reference ID
-- All lock/unlock operations MUST generate audit trail events
-- Expired lock records MUST be cleaned up periodically
-
-### 2.4 Concurrency and Consistency Requirements
-
-- Concurrent balance deductions MUST be handled safely to prevent overdraft
-- Every debit operation MUST handle duplicate requests correctly
-- The system MUST guarantee data consistency between all system components
-
-→ **[Technical Implementation](../../architecture/02_Finance_Service/Financial_Implementation.md#concurrency-control)** - Atomicity, idempotency, eventual consistency mechanisms
-
-### 2.5 Transaction Event Publishing
-
-All wallet state changes MUST be published as events for downstream consumers:
-- Wallet credited (deposit, win)
-- Wallet debited (bet, withdrawal)
-- Wallet locked / unlocked
-- Events MUST be guaranteed to be delivered (using transactional outbox pattern)
-
-### 2.6 Verification Criteria
-
-- Available balance formula computes correctly across all scenarios
-- Concurrent deduction tests pass at 1,000 TPS
-- Insufficient balance requests are correctly rejected
-- Wallet lock/unlock mechanism operates normally
-- Outbox events achieve 100% delivery success rate
-- Idempotency tests pass (duplicate requests return identical results)
-- Cache and database balances remain eventually consistent
-
-### 2.7 Common Pitfalls
-
-1. **Optimistic lock failures without retry**: Under high concurrency, exponential backoff retry is required
-2. **Expired lock records not cleaned**: A scheduled cleanup process is mandatory
-3. **Cache-DB balance inconsistency**: Must use transactional outbox or periodic reconciliation
-4. **Decimal precision issues**: All monetary values MUST use 4-decimal precision (e.g., DECIMAL(19,4))
+- [ ] 多錢包系統支援 CASH、BONUS、LOCKED 錢包類型，具備獨立餘額追蹤
+- [ ] 可下注餘額 (Playable Balance) 公式正確計算：現金餘額 - 鎖定金額 - 待結算投注（永不為負）
+- [ ] 併發餘額扣減通過 1,000 TPS 壓力測試，無透支情況
+- [ ] 重複回調處理具備冪等性（相同訂單回傳相同結果）
+- [ ] 提款風險評分正確計算所有 7 個維度（0-100 分）
+- [ ] 風險決策正確路由：0-29 AUTO_APPROVE、30-69 MANUAL_REVIEW、70-100 REJECT
+- [ ] 支付閘道提交失敗時 SAGA 補償機制解鎖錢包
+- [ ] 每日對帳達成 99.99% 錢包餘額準確率
+- [ ] 三方投注對帳（OLTP、遊戲供應商報表、OLAP）達成 100% 準確率
+- [ ] 所有財務操作產生完整稽核軌跡記錄
 
 ---
 
-## 3. Payment Gateway Integration Requirements
+## 1. 文件用途
 
-### 3.1 Supported Operations
+本文件定義 iGaming 平台核心財務流程的**業務需求**，包括錢包系統、支付閘道整合、提款風控及對帳系統。
 
-The platform MUST support integration with third-party payment gateways (e.g., Stripe, PayPal, local payment providers) for:
-
-| Operation | Description | Key Requirement |
-|-----------|-------------|-----------------|
-| **Deposit** | Player adds funds to wallet | Signature verification, idempotent callbacks |
-| **Withdrawal** | Player withdraws funds from wallet | Risk control review, async status polling |
-| **Callback Handling** | Gateway notifies payment result | HMAC signature verification, idempotent processing |
-| **Status Query** | Poll for pending withdrawal status | Scheduled polling every 30 seconds, 24-hour timeout |
-
-### 3.2 Deposit Flow Requirements
-
-1. System creates a deposit order with PENDING status
-2. System calls payment gateway to obtain a payment URL or QR code
-3. Player completes payment on the gateway
-4. Gateway sends a callback notification to the system
-5. System verifies signature on the callback
-6. System performs duplicate check (already-processed orders are skipped)
-7. System credits the player's wallet
-8. System sends a deposit success notification to the player
-
-**Business Rules**:
-- Callback signature verification MUST use time-safe comparison (prevent timing attacks)
-- Duplicate callbacks for the same order MUST be handled gracefully (idempotent)
-- All payment events MUST be recorded in the audit log
-
-### 3.3 Withdrawal Flow Requirements
-
-1. Player submits a withdrawal request
-2. System performs risk control evaluation
-3. If risk decision is REJECT, the withdrawal is denied immediately
-4. If risk decision is MANUAL_REVIEW, the order enters the review queue; the risk control team is notified
-5. If risk decision is AUTO_APPROVE, the order is submitted to the payment gateway
-6. System initiates async status polling for the withdrawal
-7. Upon success: wallet is debited, player is notified
-8. Upon failure: locked amount is released, player is notified
-
-**Business Rules**:
-- Any failure path MUST unlock the player's wallet amount
-- Orders not completed within 24 hours MUST be automatically cancelled
-- All withdrawal operations MUST be recorded in the audit log
-
-### 3.4 Signature Verification Requirements
-
-- All payment gateway callbacks MUST be verified using cryptographic signatures
-- Signature comparison MUST use secure comparison methods to prevent timing attacks
-
-→ **[Signature Algorithm Details](../../architecture/02_Finance_Service/Financial_Implementation.md#signature-verification)** - HMAC-SHA256 generation process, parameter sorting, Base64 encoding
-
-### 3.5 Verification Criteria
-
-- Signature verification works correctly
-- Deposit callback duplicate prevention tests pass
-- Withdrawal risk control review flow is complete
-- Wallet amount is correctly unlocked upon withdrawal failure
-- Payment status query scheduled task runs normally
-- Timed-out orders are automatically cancelled
-- All payment events are recorded in the audit log
+**目標讀者**:
+- 產品經理（財務模組）
+- 合規官員
+- 營運經理
+- 業務分析師
 
 ---
 
-## 4. Withdrawal Risk Control Requirements
+## 2. 錢包系統需求
 
-### 4.1 Risk Scoring Model
+### 2.1 多錢包支援
 
-The system MUST evaluate every withdrawal request across 7 risk dimensions:
+平台必須支援每位玩家擁有多種錢包類型：
 
-| Dimension | Weight | Score Range | Description |
-|-----------|--------|-------------|-------------|
-| Player Credit Score | 20% | 0-20 | Inverse of credit score (low credit = high risk) |
-| KYC Completeness | 15% | 0-15 | VERIFIED=0, PARTIALLY_VERIFIED=8, NOT_VERIFIED=15 |
-| Deposit/Withdrawal Ratio | 15% | 0-15 | Ratio > 2x triggers maximum risk score |
-| Recent Withdrawal Frequency | 15% | 0-15 | Number of withdrawals in last 7 days, capped at 15 |
-| Turnover Completion | 15% | 0-15 | Progress toward required wagering, inversely scored |
-| IP/Device Anomaly | 10% | 0-10 | Device fingerprint and IP anomaly detection |
-| Multi-Account Correlation | 10% | 0-10 | Related accounts detection |
+| 錢包類型 | 用途 | 業務規則 |
+|----------|------|---------|
+| **CASH** | 用於投注和提款的真實貨幣餘額 | 所有財務操作的主要錢包 |
+| **BONUS** | 受流水要求約束的促銷資金 | 在滿足有效投注額 (Valid Turnover) 條件前不可提款 |
+| **LOCKED** | 暫時凍結的資金（待提款等） | 結算或取消後釋放 |
 
-**Total Score: 0-100**
+### 2.2 可下注餘額公式
 
-### 4.2 Decision Thresholds
+系統必須使用以下公式計算玩家的可下注餘額 (Playable Balance)：
 
-| Score Range | Decision | Action |
-|-------------|----------|--------|
-| 0-29 | AUTO_APPROVE | Withdrawal proceeds automatically |
-| 30-69 | MANUAL_REVIEW | Sent to review queue for human decision |
-| 70-100 | REJECT | Withdrawal is automatically rejected |
+**可下注餘額 = 現金錢包餘額 - 鎖定金額 - 待結算投注**
 
-### 4.3 Rule Engine Requirements
+- 結果永不為負（最小值為零）
+- 每次投注請求必須即時執行此計算
 
-The risk control chain MUST execute the following steps in sequence:
-1. **Basic Validation**: Player status check (blocked players cannot withdraw), balance check, minimum withdrawal amount check (minimum: 100)
-2. **Risk Scoring**: Multi-dimensional risk score calculation
-3. **Decision**: Route based on score thresholds
-4. **Compensation**: If any step fails, previously locked wallet amounts MUST be unlocked
+### 2.3 錢包鎖定/解鎖規則
 
-### 4.4 Review Workflow State Machine
+| 情境 | 鎖定觸發 | 解鎖觸發 |
+|------|---------|---------|
+| 投注下單 | 投注提交時鎖定投注金額 | 投注結算（贏/輸）時解鎖 |
+| 提款請求 | 請求時鎖定提款金額 | 核准、拒絕或逾時時解鎖 |
+| 詐欺調查 | 偵測到風險時鎖定可疑金額 | 調查結案時解鎖 |
 
-The withdrawal review workflow MUST follow this state machine:
+**業務規則**:
+- 錢包鎖定必須記錄明確的原因和參考 ID
+- 所有鎖定/解鎖操作必須產生稽核軌跡事件
+- 過期的鎖定記錄必須定期清理
 
-- PENDING -> REVIEWING -> APPROVED -> PROCESSING -> SUCCESS
-- REVIEWING -> REJECTED (if reviewer rejects)
+### 2.4 併發與一致性需求
 
-**Business Rules**:
-- Reviewer approval triggers submission to the payment gateway
-- Reviewer rejection unlocks the player's wallet amount and sends a notification
-- All review operations MUST be recorded in the audit log with reviewer identity and comments
+- 併發餘額扣減必須安全處理以防止透支
+- 每個扣款操作必須正確處理重複請求
+- 系統必須保證所有系統元件間的資料一致性
 
-### 4.5 Compensation Requirements
+→ **[技術實作](../../architecture/02_Finance_Service/Financial_Implementation.md#concurrency-control)** - 原子性、冪等性、最終一致性機制
 
-The withdrawal process MUST implement compensation mechanisms to ensure data consistency when failures occur:
+### 2.5 交易事件發布
 
-**Business Rules**:
-- If wallet locking succeeds but payment gateway submission fails, the wallet amount MUST be unlocked
-- If payment gateway submission succeeds but wallet debit fails, the gateway order MUST be cancelled
-- Compensations MUST be executed in reverse order of the original operations
-- If a compensation itself fails, the case MUST be routed to a manual processing queue
-- All compensation actions MUST be logged
+所有錢包狀態變更必須發布為事件供下游消費者使用：
+- 錢包入帳（存款、贏獎）
+- 錢包扣款（投注、提款）
+- 錢包鎖定/解鎖
+- 事件必須保證送達（使用 transactional outbox 模式）
 
-→ **[SAGA Pattern Implementation](../../architecture/02_Finance_Service/Financial_Implementation.md#saga-compensation)** - Technical flow diagram, compensation steps, distributed transaction handling
+### 2.6 驗證標準
 
-### 4.6 Verification Criteria
+- 可下注餘額公式在所有情境下正確計算
+- 併發扣減測試在 1,000 TPS 下通過
+- 餘額不足請求正確拒絕
+- 錢包鎖定/解鎖機制正常運作
+- Outbox 事件達成 100% 送達成功率
+- 冪等性測試通過（重複請求回傳相同結果）
+- 快取與資料庫餘額保持最終一致
 
-- Risk scoring model calculates correctly across all dimensions
-- Auto-approve and auto-reject decisions are accurate
-- Manual review workflow is complete end-to-end
-- Rule engine chain executes successfully
-- Compensation mechanism operates correctly
-- All review operations are recorded in the audit log
-- Stress test: risk control system responds within 500ms at 1,000 TPS
+### 2.7 常見陷阱
 
-### 4.7 Common Pitfalls
-
-1. **Compensation not executed**: Must use proper error handling and compensation framework
-2. **State machine concurrency issues**: Use locking mechanisms to prevent race conditions
-3. **Rule engine misconfiguration**: Thorough testing of rule chain expressions is required
-4. **Audit log gaps**: Every state change MUST be recorded
+1. **樂觀鎖失敗無重試**: 高併發下需要指數退避重試
+2. **過期鎖定記錄未清理**: 必須有排程清理程序
+3. **快取與資料庫餘額不一致**: 必須使用 transactional outbox 或定期對帳
+4. **小數精度問題**: 所有貨幣值必須使用 4 位小數精度（如 DECIMAL(19,4)）
 
 ---
 
-## 5. Reconciliation System Requirements
+## 3. 支付閘道整合需求
 
-### 5.1 Scope of Reconciliation
+### 3.1 支援操作
 
-The system MUST perform daily reconciliation covering:
+平台必須支援與第三方支付閘道（如 Stripe、PayPal、本地支付供應商）整合：
 
-| Category | Internal Source | External Source | Comparison |
-|----------|----------------|-----------------|------------|
-| **Wallet** | System balance (cache) | Database balance | Balance difference |
-| **Deposits** | Deposit order records | Payment gateway daily report | Count and amount differences |
-| **Withdrawals** | Withdrawal order records | Payment gateway daily report | Count and amount differences |
-| **Bets** | Bet order records (OLTP) | Game provider daily report | Count and amount differences |
+| 操作 | 說明 | 關鍵需求 |
+|------|------|---------|
+| **存款 (Deposit)** | 玩家向錢包充值 | 簽名驗證、冪等回調 |
+| **提款 (Withdrawal)** | 玩家從錢包提款 | 風控審核、非同步狀態輪詢 |
+| **回調處理 (Callback)** | 閘道通知支付結果 | HMAC 簽名驗證、冪等處理 |
+| **狀態查詢 (Status Query)** | 輪詢待處理提款狀態 | 每 30 秒排程輪詢、24 小時逾時 |
 
-### 5.2 Three-Way Bet Reconciliation
+### 3.2 存款流程需求
 
-For bet reconciliation, the system MUST perform three-way comparison:
+1. 系統建立 PENDING 狀態的存款訂單
+2. 系統呼叫支付閘道取得支付 URL 或 QR code
+3. 玩家在閘道完成支付
+4. 閘道發送回調通知給系統
+5. 系統驗證回調簽名
+6. 系統執行重複檢查（已處理訂單跳過）
+7. 系統入帳玩家錢包
+8. 系統發送存款成功通知給玩家
 
-1. **OLTP System** (real-time bet records)
-2. **Game Provider Report** (provider's daily settlement data)
-3. **OLAP Data Warehouse** (T+1 ETL data)
+**業務規則**:
+- 回調簽名驗證必須使用時間安全比對（防止時序攻擊）
+- 相同訂單的重複回調必須優雅處理（冪等）
+- 所有支付事件必須記錄在稽核日誌
 
-Any bet appearing in one source but not the others MUST be flagged as a discrepancy.
+### 3.3 提款流程需求
 
-### 5.3 Discrepancy Detection and Alerting
+1. 玩家提交提款請求
+2. 系統執行風控評估
+3. 若風險決策為 REJECT，立即拒絕提款
+4. 若風險決策為 MANUAL_REVIEW，訂單進入審核佇列；通知風控團隊
+5. 若風險決策為 AUTO_APPROVE，訂單提交至支付閘道
+6. 系統啟動提款的非同步狀態輪詢
+7. 成功時：扣款錢包、通知玩家
+8. 失敗時：釋放鎖定金額、通知玩家
 
-- Any difference exceeding 0.01 MUST generate an alert
-- Discrepancy records MUST capture: type, reference ID, system amount, external amount, difference amount
-- All unresolved discrepancies MUST be visible in the operations dashboard
+**業務規則**:
+- 任何失敗路徑必須解鎖玩家錢包金額
+- 24 小時內未完成的訂單必須自動取消
+- 所有提款操作必須記錄在稽核日誌
 
-### 5.4 Discrepancy Resolution Process
+### 3.4 簽名驗證需求
 
-Three resolution actions are available:
+- 所有支付閘道回調必須使用加密簽名驗證
+- 簽名比對必須使用安全比對方法防止時序攻擊
 
-| Action | Description | Use Case |
-|--------|-------------|----------|
-| **ADJUST_SYSTEM** | Correct internal records (e.g., missed order) | System data error |
-| **ADJUST_EXTERNAL** | Request external party to correct their records | Gateway/provider data error |
-| **IGNORE** | Mark as acceptable (small rounding differences) | Minor discrepancies below threshold |
+→ **[簽名演算法細節](../../architecture/02_Finance_Service/Financial_Implementation.md#signature-verification)** - HMAC-SHA256 生成流程、參數排序、Base64 編碼
 
-**Auto-Resolution Rule**: Differences below 0.01 that appear consecutively for 3 or more days are automatically marked as IGNORE.
+### 3.5 驗證標準
 
-### 5.5 Reconciliation Report
-
-- The system MUST generate a daily reconciliation report per tenant
-- The report MUST include: wallet balance comparison, deposit comparison, withdrawal comparison, bet comparison, and discrepancy details
-- Reports MUST be generated automatically after reconciliation completes (scheduled at 02:00 AM daily)
-- All resolution actions MUST be recorded in the audit log
-
-### 5.6 Verification Criteria
-
-- Daily reconciliation scheduled task runs successfully
-- Wallet balance accuracy verified to 99.99% across all data sources
-- Payment gateway reconciliation difference is below 0.01%
-
-→ **[Cache/Database Synchronization Strategy](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#cache-strategy)**
-- Three-way bet reconciliation achieves 100% accuracy
-- Discrepancy alerts are sent in a timely manner
-- Reconciliation reports are generated automatically
-- Discrepancy resolution process is fully recorded in the audit log
-
-### 5.7 Common Pitfalls
-
-1. **Timezone misalignment**: System, payment gateway, and game providers MUST use a unified timezone
-2. **Precision loss**: All monetary values MUST use DECIMAL(19,4) and BigDecimal
-3. **ETL delays**: OLAP data may have T+1 delay; reconciliation logic must account for this
-4. **Accumulated small differences**: 0.01 differences may appear harmless individually but can accumulate significantly over time
+- 簽名驗證正確運作
+- 存款回調重複防護測試通過
+- 提款風控審核流程完整
+- 提款失敗時錢包金額正確解鎖
+- 支付狀態查詢排程任務正常執行
+- 逾時訂單自動取消
+- 所有支付事件記錄在稽核日誌
 
 ---
 
-## 6. Cross-Cutting Business Requirements
+## 4. 提款風控需求
 
-### 6.1 Audit Trail
+### 4.1 風險評分模型
 
-All financial operations MUST generate complete audit records including:
-- Operator identity (system or human)
-- Timestamp
-- Operation type
-- Affected entities (wallet ID, order ID, etc.)
-- Before/after values where applicable
+系統必須在 7 個風險維度評估每筆提款請求：
 
-### 6.2 Multi-Tenant Isolation
+| 維度 | 權重 | 分數範圍 | 說明 |
+|------|------|---------|------|
+| 玩家信用分數 | 20% | 0-20 | 信用分數反比（低信用 = 高風險） |
+| KYC 完成度 | 15% | 0-15 | VERIFIED=0、PARTIALLY_VERIFIED=8、NOT_VERIFIED=15 |
+| 存提款比率 | 15% | 0-15 | 比率 > 2 倍觸發最高風險分數 |
+| 近期提款頻率 | 15% | 0-15 | 過去 7 天提款次數，上限 15 |
+| 流水完成度 | 15% | 0-15 | 達成所需有效投注額 (Valid Turnover) 進度，反向計分 |
+| IP/設備異常 | 10% | 0-10 | 設備指紋及 IP 異常偵測 |
+| 多帳戶關聯 | 10% | 0-10 | 關聯帳戶偵測 |
 
-All financial data MUST be tenant-isolated:
-- Every table MUST include a `tenant_id` column
-- Queries MUST always filter by tenant
-- Reconciliation runs per tenant independently
+**總分: 0-100**
 
-### 6.3 Decimal Precision Standard
+### 4.2 決策閾值
 
-- All monetary values: DECIMAL(19,4) in database, BigDecimal in application code
-- No floating-point types (float/double) for monetary calculations
-- Consistent rounding mode: HALF_UP
+| 分數範圍 | 決策 | 動作 |
+|---------|------|------|
+| 0-29 | AUTO_APPROVE | 提款自動進行 |
+| 30-69 | MANUAL_REVIEW | 送至審核佇列由人工決定 |
+| 70-100 | REJECT | 提款自動拒絕 |
+
+### 4.3 規則引擎需求
+
+風控鏈必須依序執行以下步驟：
+1. **基本驗證**: 玩家狀態檢查（被封鎖玩家不可提款）、餘額檢查、最低提款金額檢查（最低: 100）
+2. **風險評分**: 多維度風險分數計算
+3. **決策**: 根據分數閾值路由
+4. **補償**: 若任一步驟失敗，必須解鎖先前鎖定的錢包金額
+
+### 4.4 審核工作流程狀態機
+
+提款審核工作流程必須遵循此狀態機：
+
+- PENDING → REVIEWING → APPROVED → PROCESSING → SUCCESS
+- REVIEWING → REJECTED（若審核員拒絕）
+
+**業務規則**:
+- 審核員核准觸發提交至支付閘道
+- 審核員拒絕解鎖玩家錢包金額並發送通知
+- 所有審核操作必須記錄在稽核日誌，包含審核員身份和備註
+
+### 4.5 補償需求
+
+提款流程必須實作補償機制，確保失敗時的資料一致性：
+
+**業務規則**:
+- 若錢包鎖定成功但支付閘道提交失敗，必須解鎖錢包金額
+- 若支付閘道提交成功但錢包扣款失敗，必須取消閘道訂單
+- 補償必須以原始操作的相反順序執行
+- 若補償本身失敗，案件必須路由至人工處理佇列
+- 所有補償動作必須記錄日誌
+
+→ **[SAGA 模式實作](../../architecture/02_Finance_Service/Financial_Implementation.md#saga-compensation)** - 技術流程圖、補償步驟、分散式交易處理
+
+### 4.6 驗證標準
+
+- 風險評分模型在所有維度正確計算
+- 自動核准和自動拒絕決策準確
+- 人工審核工作流程端對端完整
+- 規則引擎鏈成功執行
+- 補償機制正確運作
+- 所有審核操作記錄在稽核日誌
+- 壓力測試：風控系統在 1,000 TPS 下 500ms 內回應
+
+### 4.7 常見陷阱
+
+1. **補償未執行**: 必須使用適當的錯誤處理和補償框架
+2. **狀態機併發問題**: 使用鎖機制防止競態條件
+3. **規則引擎配置錯誤**: 需要徹底測試規則鏈表達式
+4. **稽核日誌缺口**: 每次狀態變更必須記錄
 
 ---
 
-## 7. Implementation Sequence
+## 5. 對帳系統需求
 
-The recommended implementation order is:
+### 5.1 對帳範圍
 
-1. **Wallet System** -- Foundation for all financial operations
-2. **Payment Gateway Integration** -- Enables deposits and withdrawals
-3. **Withdrawal Risk Control** -- Adds fraud prevention layer
-4. **Reconciliation System** -- Ensures financial accuracy
+系統必須執行每日對帳，涵蓋：
 
-Each phase should be fully verified before proceeding to the next.
+| 類別 | 內部來源 | 外部來源 | 比對 |
+|------|---------|---------|------|
+| **錢包** | 系統餘額（快取） | 資料庫餘額 | 餘額差異 |
+| **存款** | 存款訂單記錄 | 支付閘道每日報表 | 筆數及金額差異 |
+| **提款** | 提款訂單記錄 | 支付閘道每日報表 | 筆數及金額差異 |
+| **投注** | 投注訂單記錄（OLTP） | 遊戲供應商每日報表 | 筆數及金額差異 |
+
+### 5.2 三方投注對帳
+
+投注對帳必須執行三方比對：
+
+1. **OLTP 系統**（即時投注記錄）
+2. **遊戲供應商報表**（供應商每日結算資料）
+3. **OLAP 資料倉儲**（T+1 ETL 資料）
+
+出現在一個來源但不在其他來源的投注必須標記為差異。
+
+### 5.3 差異偵測與警報
+
+- 任何超過 0.01 的差異必須產生警報
+- 差異記錄必須包含：類型、參考 ID、系統金額、外部金額、差異金額
+- 所有未解決的差異必須在營運儀表板可見
+
+### 5.4 差異處理流程
+
+三種處理動作可用：
+
+| 動作 | 說明 | 使用情境 |
+|------|------|---------|
+| **ADJUST_SYSTEM** | 修正內部記錄（如遺漏訂單） | 系統資料錯誤 |
+| **ADJUST_EXTERNAL** | 要求外部方修正其記錄 | 閘道/供應商資料錯誤 |
+| **IGNORE** | 標記為可接受（小額進位差異） | 低於閾值的微小差異 |
+
+**自動處理規則**: 連續 3 天或以上出現低於 0.01 的差異自動標記為 IGNORE。
+
+### 5.5 對帳報表
+
+- 系統必須按租戶生成每日對帳報表
+- 報表必須包含：錢包餘額比對、存款比對、提款比對、投注比對及差異明細
+- 報表必須在對帳完成後自動生成（每日 02:00 排程）
+- 所有處理動作必須記錄在稽核日誌
+
+### 5.6 驗證標準
+
+- 每日對帳排程任務成功執行
+- 錢包餘額準確率在所有資料來源達 99.99%
+- 支付閘道對帳差異低於 0.01%
+
+→ **[快取/資料庫同步策略](../../architecture/02_Finance_Service/Seamless_Wallet_Technical.md#cache-strategy)**
+- 三方投注對帳達成 100% 準確率
+- 差異警報及時發送
+- 對帳報表自動生成
+- 差異處理流程完整記錄在稽核日誌
+
+### 5.7 常見陷阱
+
+1. **時區不一致**: 系統、支付閘道和遊戲供應商必須使用統一時區
+2. **精度損失**: 所有貨幣值必須使用 DECIMAL(19,4) 和 BigDecimal
+3. **ETL 延遲**: OLAP 資料可能有 T+1 延遲；對帳邏輯必須考慮此點
+4. **累積小差異**: 0.01 差異單獨看似無害，但長期累積可能顯著
+
+---
+
+## 6. 橫切業務需求
+
+### 6.1 稽核軌跡
+
+所有財務操作必須生成完整稽核記錄，包含：
+- 操作者身份（系統或人工）
+- 時間戳
+- 操作類型
+- 受影響實體（錢包 ID、訂單 ID 等）
+- 適用時的變更前/後值
+
+### 6.2 Multi-Tenant 隔離
+
+所有財務資料必須租戶隔離：
+- 每張資料表必須包含 `tenant_id` 欄位
+- 查詢必須始終按租戶過濾
+- 對帳按租戶獨立執行
+
+### 6.3 小數精度標準
+
+- 所有貨幣值：資料庫使用 DECIMAL(19,4)，應用程式碼使用 BigDecimal
+- 貨幣計算禁止使用浮點類型（float/double）
+- 一致的進位模式：HALF_UP
+
+---
+
+## 7. 實作順序
+
+建議實作順序：
+
+1. **錢包系統** -- 所有財務操作的基礎
+2. **支付閘道整合** -- 啟用存款和提款
+3. **提款風控** -- 加入詐欺防範層
+4. **對帳系統** -- 確保財務準確性
+
+每個階段應在進入下一階段前完整驗證。
