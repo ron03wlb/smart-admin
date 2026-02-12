@@ -1,23 +1,23 @@
-# MITM Detection Architecture
+# MITM 偵測架構
 
-> **Business Requirements**: [Payment Security Requirements](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-08](../../source-archive/12_System_Security/12-08_MITM_Detection.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Security Engineers, Backend Developers
+> **業務需求**: [Payment Security Requirements](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-08](../../source-archive/12_System_Security/12-08_MITM_Detection.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、安全工程師、後端開發人員
 
 ---
 
-## 1. Detection Capabilities
+## 1. 偵測能力
 
-| Capability | Description | Detection Latency |
+| 能力 | 說明 | 偵測延遲 |
 |-----------|-------------|-------------------|
-| **TLS Downgrade Detection** | Detect forced TLS version downgrade | Real-time |
-| **Certificate Pinning** | Verify server certificate legitimacy | Real-time |
-| **Session Hijack Detection** | Identify stolen session tokens | Near real-time (<1s) |
-| **DNS Spoofing Detection** | Detect DNS resolution anomalies | Real-time |
-| **Proxy Injection Detection** | Identify malicious proxy interception | Real-time |
+| **TLS 降級偵測** | 偵測強制 TLS 版本降級 | 即時 |
+| **憑證綁定** | 驗證伺服器憑證合法性 | 即時 |
+| **Session 劫持偵測** | 辨識遭竊的 Session Token | 近即時（<1 秒） |
+| **DNS 欺騙偵測** | 偵測 DNS 解析異常 | 即時 |
+| **代理注入偵測** | 辨識惡意代理攔截 | 即時 |
 
-## 2. TLS Security Configuration
+## 2. TLS 安全配置
 
 ```java
 @Configuration
@@ -49,7 +49,7 @@ public class TLSSecurityConfig {
 }
 ```
 
-## 3. Certificate Pinning Service
+## 3. 憑證綁定服務
 
 ```java
 @Service
@@ -85,7 +85,7 @@ public class CertificatePinningService {
 }
 ```
 
-## 4. Session Binding Detector
+## 4. Session 綁定偵測器
 
 ```java
 @Service
@@ -143,7 +143,7 @@ public class SessionBindingDetector {
 }
 ```
 
-## 5. Proxy Detection Service
+## 5. 代理偵測服務
 
 ```java
 @Service
@@ -192,7 +192,7 @@ public class ProxyDetectionService {
 }
 ```
 
-## 6. Real-Time Monitoring Flow
+## 6. 即時監控流程
 
 ```mermaid
 flowchart TD
@@ -215,17 +215,17 @@ flowchart TD
     L -->|No| M[Terminate Session]
 ```
 
-## 7. Alert Rules
+## 7. 告警規則
 
-| Alert Type | Trigger | Severity | Action |
+| 告警類型 | 觸發條件 | 嚴重程度 | 行動 |
 |-----------|---------|----------|--------|
-| **TLS Downgrade** | TLS 1.0/1.1 detected | Critical | Block + Record |
-| **Certificate Pin Fail** | Cert not in pin list | Critical | Block + Investigate |
-| **Session Hijack** | Device + IP both changed | Critical | Terminate session |
-| **Suspicious Proxy** | Multiple proxy signals | High | Step-Up auth |
-| **DNS Anomaly** | Resolution inconsistency | High | Verify + Record |
+| **TLS 降級** | 偵測到 TLS 1.0/1.1 | 嚴重 | 阻斷 + 記錄 |
+| **憑證綁定失敗** | 憑證不在綁定清單中 | 嚴重 | 阻斷 + 調查 |
+| **Session 劫持** | 裝置 + IP 同時變更 | 嚴重 | 終止 Session |
+| **可疑代理** | 多重代理訊號 | 高 | 增強認證 |
+| **DNS 異常** | 解析不一致 | 高 | 驗證 + 記錄 |
 
-## 8. Database Schema
+## 8. 資料庫結構
 
 ```sql
 CREATE TABLE t_mitm_detection_event (
@@ -296,11 +296,11 @@ certificate_pinning_result:
   description: "Certificate pinning verification result"
 ```
 
-## 10. Key KPIs
+## 10. 關鍵 KPI
 
-| Metric | Formula | Target | Alert |
+| 指標 | 計算公式 | 目標 | 告警 |
 |--------|---------|--------|-------|
-| TLS 1.3 Adoption | TLS 1.3 requests / total | > 90% | < 80% |
-| Certificate Pin Failure Rate | Failures / total verifications | < 0.01% | > 0.1% |
-| Session Hijack Detections | Daily CRITICAL events | < 5 | > 20 |
-| Proxy Detection Rate | Proxy requests / total | Monitor | Abnormal increase |
+| TLS 1.3 採用率 | TLS 1.3 請求 / 總請求 | > 90% | < 80% |
+| 憑證綁定失敗率 | 失敗數 / 總驗證數 | < 0.01% | > 0.1% |
+| Session 劫持偵測數 | 每日嚴重事件數 | < 5 | > 20 |
+| 代理偵測率 | 代理請求 / 總請求 | 監控 | 異常增加 |

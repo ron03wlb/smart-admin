@@ -1,22 +1,22 @@
-# Payment Restrictions Architecture
+# 支付限制架構
 
-> **Business Requirements**: [Payment Security Requirements](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-06](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Backend Developers, Compliance Engineers
+> **業務需求**: [Payment Security Requirements](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-06](../../source-archive/12_System_Security/12-06_Payment_Restrictions.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、後端開發人員、合規工程師
 
 ---
 
-## 1. Credit Card Bans by Jurisdiction
+## 1. 各司法管轄區信用卡禁令
 
-| Region | Effective Date | Scope | Status |
+| 地區 | 生效日期 | 範圍 | 狀態 |
 |--------|---------------|-------|--------|
-| **UK** | 2020-04 | All gambling | Complete ban |
-| **Australia** | 2026-04 | Online gambling | Upcoming |
-| **Sweden** | 2025+ | Online brands | Expanded ban |
-| **Germany** | 2021 | All gambling | Complete ban |
+| **英國** | 2020-04 | 所有博弈 | 完全禁止 |
+| **澳洲** | 2026-04 | 線上博弈 | 即將實施 |
+| **瑞典** | 2025+ | 線上品牌 | 擴大禁令 |
+| **德國** | 2021 | 所有博弈 | 完全禁止 |
 
-## 2. Payment Restriction Service
+## 2. 支付限制服務
 
 ```java
 @Service
@@ -82,28 +82,28 @@ public class PaymentRestrictionService {
 }
 ```
 
-## 3. Payment Method Whitelists
+## 3. 支付方式白名單
 
-### UK Allowed Payment Methods
+### 英國允許的支付方式
 
-| Type | Allowed | Notes |
+| 類型 | 允許 | 備註 |
 |------|---------|-------|
-| Debit Card | Yes | Visa/Mastercard debit |
-| Bank Transfer | Yes | Bank transfer |
-| e-Wallet | Yes | PayPal, Skrill, Neteller |
-| Prepaid Card | Yes | Paysafecard |
-| Credit Card | **No** | **Prohibited** |
+| 簽帳卡 | 是 | Visa/Mastercard 簽帳卡 |
+| 銀行轉帳 | 是 | 銀行轉帳 |
+| 電子錢包 | 是 | PayPal、Skrill、Neteller |
+| 預付卡 | 是 | Paysafecard |
+| 信用卡 | **否** | **禁止** |
 
-### Brazil Required Payment Methods
+### 巴西必要的支付方式
 
-| Type | Requirement | Notes |
+| 類型 | 要求 | 備註 |
 |------|------------|-------|
-| **PIX** | **Mandatory** | Brazilian instant payment |
-| Bank Transfer | Recommended | Bank transfer |
-| Boleto | Recommended | Cash payment |
-| Credit Card | Allowed | Currently permitted |
+| **PIX** | **必要** | 巴西即時支付 |
+| 銀行轉帳 | 建議 | 銀行轉帳 |
+| Boleto | 建議 | 現金支付 |
+| 信用卡 | 允許 | 目前允許 |
 
-## 4. Cryptocurrency AML Service
+## 4. 加密貨幣反洗錢服務
 
 ```java
 @Service
@@ -140,15 +140,15 @@ public class CryptoAMLService {
 }
 ```
 
-## 5. Cryptocurrency Regulatory Landscape
+## 5. 加密貨幣監管環境
 
-| Region | Attitude | Notes |
+| 地區 | 態度 | 備註 |
 |--------|----------|-------|
-| UK | Cautious | Full AML required |
-| Malta | Allowed | Regulatory framework required |
-| Curacao | Allowed | More relaxed |
+| 英國 | 審慎 | 完整反洗錢 (AML) 要求 |
+| 馬爾他 | 允許 | 需監管框架 |
+| 庫拉索 | 允許 | 較寬鬆 |
 
-## 6. Transaction Screening Flow
+## 6. 交易篩查流程
 
 ```mermaid
 flowchart TD
@@ -172,7 +172,7 @@ flowchart TD
     style L fill:#4CAF50,color:#fff
 ```
 
-## 7. Velocity Check Implementation
+## 7. 速率檢查實作
 
 ```java
 @Service
@@ -222,19 +222,19 @@ public class VelocityCheckService {
 }
 ```
 
-### Velocity Rule Configuration
+### 速率規則配置
 
-| Window | Max Count | Max Amount (USD) | Action | Notes |
+| 時間窗口 | 最大次數 | 最大金額（USD） | 操作 | 備註 |
 |--------|-----------|-----------------|--------|-------|
-| 1 hour | 5 | 2,000 | Deposit | Standard player |
-| 24 hours | 15 | 10,000 | Deposit | Standard player |
-| 7 days | 50 | 50,000 | Deposit | Standard player |
-| 1 hour | 3 | 5,000 | Withdrawal | Standard player |
-| 24 hours | 5 | 20,000 | Withdrawal | Standard player |
-| 1 hour | 20 | 50,000 | Deposit | VIP player |
-| 24 hours | 50 | 200,000 | Deposit | VIP player |
+| 1 小時 | 5 | 2,000 | 存款 | 一般玩家 |
+| 24 小時 | 15 | 10,000 | 存款 | 一般玩家 |
+| 7 天 | 50 | 50,000 | 存款 | 一般玩家 |
+| 1 小時 | 3 | 5,000 | 提款 | 一般玩家 |
+| 24 小時 | 5 | 20,000 | 提款 | 一般玩家 |
+| 1 小時 | 20 | 50,000 | 存款 | VIP 玩家 |
+| 24 小時 | 50 | 200,000 | 存款 | VIP 玩家 |
 
-## 8. Jurisdiction-Based Payment Rules
+## 8. 基於司法管轄區的支付規則
 
 ```sql
 CREATE TABLE t_jurisdiction_payment_rule (

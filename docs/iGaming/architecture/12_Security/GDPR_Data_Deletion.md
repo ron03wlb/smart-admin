@@ -1,13 +1,13 @@
-# GDPR Data Deletion Architecture
+# GDPR 資料刪除架構
 
-> **Business Requirements**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
-> **Canonical Source**: [source-archive/12_System_Security/12-03-03](../../source-archive/12_System_Security/12-03-03_GDPR_Data_Deletion.md)
-> **View Type**: Technical Architecture
-> **Target Audience**: Architects, Security Engineers, Legal/Compliance Team
+> **業務需求**: [Data Protection Requirements](../../requirements/12_Security_Compliance/Data_Protection_Requirements.md)
+> **規範來源**: [source-archive/12_System_Security/12-03-03](../../source-archive/12_System_Security/12-03-03_GDPR_Data_Deletion.md)
+> **文件類型**: 技術架構
+> **目標讀者**: 架構師、安全工程師、法務/合規團隊
 
 ---
 
-## 1. Crypto-Shredding Architecture
+## 1. 密碼學銷毀架構
 
 ```text
 [Crypto-Shredding Architecture]
@@ -39,26 +39,26 @@ DELETE FROM user_keys WHERE player_id = ?
 -> Even with database backups, data cannot be decrypted
 ```
 
-### Why Traditional Deletion Is Insufficient
+### 為何傳統刪除不足夠
 
-| Method | Problem | Crypto-Shredding Advantage |
+| 方法 | 問題 | Crypto-Shredding 優勢 |
 |--------|---------|---------------------------|
-| `DELETE FROM players` | Backups still contain data | Backup ciphertext permanently unrecoverable |
-| Soft delete (`deleted_at`) | Data still queryable | Key destroyed, cannot decrypt |
-| Overwrite (`VACUUM FULL`) | Extremely costly, slow | Lightweight (delete key only) |
+| `DELETE FROM players` | 備份仍含資料 | 備份密文永久不可復原 |
+| 軟刪除（`deleted_at`） | 資料仍可查詢 | 金鑰銷毀，無法解密 |
+| 覆寫（`VACUUM FULL`） | 成本極高、速度慢 | 輕量（僅刪除金鑰） |
 
-## 2. Data Retention Matrix
+## 2. 資料保留矩陣
 
-| Data Category | Included Fields | GDPR Deletable | Retention Period | Processing |
+| 資料類別 | 包含欄位 | GDPR 可刪除 | 保留期限 | 處理方式 |
 |---------------|----------------|----------------|------------------|------------|
-| **Fully Deletable** | Name, address, preferences, marketing consent | Yes | None | Physical Delete |
-| **Anonymizable** | Game history (bet_id, game_id, amount) | Yes (anonymize) | None | Replace player_id with UUID |
-| **Must Retain (AML)** | Transaction records (deposits, withdrawals) | No (legal obligation) | **5-7 years** | Retain with anonymized player_id |
-| **Must Retain (Tax)** | Winnings records (> threshold) | No (legal obligation) | **7 years** | Retain with anonymized player_id |
-| **Must Retain (Dispute)** | Complaint tickets | No (legal claim) | **6 years** | Retain until claim expires |
-| **Must Retain (Ban)** | Fraud flags, ban reason | No (legitimate interest) | **Permanent** | Retain for fraud prevention |
+| **完全可刪除** | 姓名、地址、偏好設定、行銷同意 | 是 | 無 | 物理刪除 |
+| **可匿名化** | 遊戲紀錄（bet_id、game_id、amount） | 是（匿名化） | 無 | 以 UUID 取代 player_id |
+| **必須保留（反洗錢）** | 交易紀錄（存款、提款） | 否（法律義務） | **5-7 年** | 以匿名化 player_id 保留 |
+| **必須保留（稅務）** | 獎金紀錄（超過門檻） | 否（法律義務） | **7 年** | 以匿名化 player_id 保留 |
+| **必須保留（爭議）** | 投訴工單 | 否（法律訴求） | **6 年** | 保留至訴求時效屆滿 |
+| **必須保留（封禁）** | 詐欺標記、封禁原因 | 否（正當利益） | **永久** | 保留用於防詐欺 |
 
-## 3. Deletion State Machine
+## 3. 刪除狀態機
 
 ```mermaid
 stateDiagram-v2
@@ -74,57 +74,57 @@ stateDiagram-v2
     DELETED --> [*]: Complete
 ```
 
-| State | Description | Player Login? |
+| 狀態 | 說明 | 可否登入？ |
 |-------|-------------|--------------|
-| **ACTIVE** | Normal state | Yes |
-| **DELETION_REQUESTED** | Awaiting confirmation | Yes (can cancel) |
-| **SOFT_DELETED** | 30-day cooling period | No |
-| **SCHEDULED_FOR_DELETION** | In processing queue | No |
-| **DELETION_BLOCKED** | Exception (investigation) | No |
-| **DELETED** | Permanently destroyed | No |
+| **ACTIVE** | 正常狀態 | 是 |
+| **DELETION_REQUESTED** | 等待確認 | 是（可取消） |
+| **SOFT_DELETED** | 30 天冷靜期 | 否 |
+| **SCHEDULED_FOR_DELETION** | 排入處理佇列 | 否 |
+| **DELETION_BLOCKED** | 例外（調查中） | 否 |
+| **DELETED** | 已永久銷毀 | 否 |
 
-## 4. Exception Conditions (Deletion Hold)
+## 4. 例外條件（刪除暫停）
 
-| Scenario | Reason | Resolution | Max Hold |
+| 情境 | 原因 | 解決方式 | 最長暫停 |
 |----------|--------|-----------|----------|
-| **Under Investigation** | AML/Fraud investigation | Investigation complete | 1 year |
-| **Pending Legal Case** | Active litigation | Case resolved | 10 years |
-| **Pending Wagering** | Incomplete bonus wagering | Complete or forfeit bonus | 90 days |
-| **Outstanding Balance** | Balance > $0 | Balance zeroed | Indefinite (notify player) |
-| **Tax Audit** | Audit period active | Audit complete | 7 years |
+| **調查中** | 反洗錢 (AML)/詐欺調查 | 調查完成 | 1 年 |
+| **待審法律案件** | 進行中的訴訟 | 案件結案 | 10 年 |
+| **待完成流水** | 獎金流水未完成 | 完成或放棄獎金 | 90 天 |
+| **未結餘額** | 餘額 > $0 | 餘額歸零 | 不限期（通知玩家） |
+| **稅務稽核** | 稽核期間進行中 | 稽核完成 | 7 年 |
 
-## 5. Execution Workflow
+## 5. 執行流程
 
-### Phase 1: Request and Confirmation (T+0 to T+7 days)
+### 階段 1：請求與確認（T+0 至 T+7 天）
 
-**Trigger Sources**:
-- Player via Account Settings -> "Delete My Account"
-- Player via CS email/live chat
-- Legal team on behalf of player (GDPR Data Subject Request)
+**觸發來源**：
+- 玩家透過帳號設定 → "刪除我的帳號"
+- 玩家透過客服電子郵件/即時聊天
+- 法務團隊代表玩家（GDPR 資料主體請求）
 
-**Double Opt-In Confirmation**:
-- Send confirmation email (7-day validity)
-- Email contains unique confirmation link
+**雙重確認機制**：
+- 發送確認電子郵件（7 天有效期）
+- 電子郵件包含唯一確認連結
 
-### Phase 2: Cooling Period (T+7 to T+37 days)
+### 階段 2：冷靜期（T+7 至 T+37 天）
 
-- Account soft-deleted (login disabled)
-- Player can restore within 30 days
-- Reminder notifications at Day 15 and Day 25
+- 帳號軟刪除（禁止登入）
+- 玩家可在 30 天內恢復
+- 第 15 天和第 25 天發送提醒通知
 
-### Phase 3: Final Destruction (T+37 days)
+### 階段 3：最終銷毀（T+37 天）
 
-- Cron job processes scheduled deletions
-- Execute Crypto-Shredding (destroy DEK)
-- Anonymize retained records (replace player_id)
-- Generate deletion certificate
-- Send confirmation to player email
+- 排程任務處理已排定的刪除
+- 執行 Crypto-Shredding（銷毀 DEK）
+- 匿名化需保留的紀錄（替換 player_id）
+- 產生刪除證書
+- 發送確認至玩家電子郵件
 
-## 6. Compliance Certificate
+## 6. 合規證書
 
-Auto-generated and emailed to player after deletion:
+刪除完成後自動產生並寄送至玩家電子郵件：
 
-| Field | Content |
+| 欄位 | 內容 |
 |-------|---------|
 | Request ID | GDPR-2026-00567 |
 | Player ID | PLY-12345678 (anonymized) |
@@ -134,29 +134,29 @@ Auto-generated and emailed to player after deletion:
 | Data Retained | Transaction records (AML, 7 years), Fraud flags (permanent) |
 | Certificate Hash | SHA256: abc123... |
 
-## 7. Monitoring Metrics
+## 7. 監控指標
 
-| Metric | Target | Alert Threshold |
+| 指標 | 目標 | 告警閾值 |
 |--------|--------|----------------|
 | `deletion_queue_size` | < 100 | > 1000 |
 | `deletion_success_rate` | > 99.5% | < 95% |
 | `deletion_duration_p99` | < 5s | > 10s |
 | `blocked_deletions_count` | < 10/month | > 50/month |
 
-## 8. Technology Stack
+## 8. 技術堆疊
 
-| Component | Recommended | Purpose |
+| 元件 | 建議方案 | 用途 |
 |-----------|------------|---------|
-| **Key Management** | AWS KMS / HashiCorp Vault | DEK/KEK management |
-| **Encryption** | AES-256-GCM | PII encryption |
-| **Task Queue** | Celery / Bull (Redis) | Cron job scheduling |
-| **Event Bus** | Kafka / RabbitMQ | Cross-module notifications |
-| **Audit Log** | Elasticsearch | Compliance tracking |
-| **Email Service** | SendGrid / AWS SES | Confirmation notifications |
+| **金鑰管理** | AWS KMS / HashiCorp Vault | DEK/KEK 管理 |
+| **加密** | AES-256-GCM | PII 加密 |
+| **任務佇列** | Celery / Bull (Redis) | 排程任務排程 |
+| **事件匯流排** | Kafka / RabbitMQ | 跨模組通知 |
+| **稽核日誌** | Elasticsearch | 合規追蹤 |
+| **電子郵件服務** | SendGrid / AWS SES | 確認通知 |
 
-## 9. Data Deletion Pipeline
+## 9. 資料刪除管線
 
-### 9.1 Cross-Service Cascade Flow
+### 9.1 跨服務串聯流程
 
 ```mermaid
 flowchart TD
@@ -244,9 +244,9 @@ public class DataDeletionManager {
 }
 ```
 
-### 9.3 Anonymization SQL
+### 9.3 匿名化 SQL
 
-Records that must be retained for legal reasons (AML, tax) are anonymized rather than deleted:
+因法律原因（反洗錢、稅務）必須保留的紀錄，以匿名化取代刪除：
 
 ```sql
 -- Anonymize player identity while retaining transaction records
@@ -280,7 +280,7 @@ INSERT INTO t_deletion_tombstone (
 );
 ```
 
-### 9.4 Deletion Audit Trail Schema
+### 9.4 刪除稽核軌跡結構
 
 ```sql
 CREATE TABLE t_deletion_audit (
