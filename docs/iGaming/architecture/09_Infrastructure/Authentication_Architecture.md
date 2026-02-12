@@ -1,14 +1,14 @@
-# 身份驗證與授權架構 (Authentication & Authorization Architecture)
+# 身份驗證與授權架構（Authentication & Authorization Architecture）
 
-> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
-> **Canonical Source**: [09-03-02 Authentication](../../source-archive/09_Technical_Infrastructure/09-03-02_Authentication.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **規範來源**: [09-03-02 Authentication](../../source-archive/09_Technical_Infrastructure/09-03-02_Authentication.md)
+> **視角**: Technical Architecture (Development & DevOps)
 
 ---
 
-## 1. JWT 認證架構
+## 1. JWT 認證架構（JWT Authentication Architecture）
 
-### 1.1 JWT 結構
+### 1.1 JWT 結構（JWT Structure）
 
 ```json
 {
@@ -26,14 +26,14 @@
 }
 ```
 
-### 1.2 Token 類型
+### 1.2 Token 類型（Token Types）
 
 | Token 類型 | 有效期 | 存儲位置 | 用途 | 刷新機制 |
 |-----------|--------|---------|------|---------|
 | **Access Token** | 15 分鐘 | LocalStorage | API 訪問 | 通過 Refresh Token |
 | **Refresh Token** | 30 天 | Redis (HttpOnly) | 刷新 Access Token | Token Rotation |
 
-### 1.3 核心安全特性
+### 1.3 核心安全特性（Core Security Features）
 
 - **Token Rotation**: 刷新後舊 Refresh Token 立即失效
 - **Device Fingerprint**: FingerprintJS 設備識別（99.5% 準確率）
@@ -41,9 +41,9 @@
 
 ---
 
-## 2. 多主體認證策略
+## 2. 多主體認證策略（Multi-Actor Authentication Strategy）
 
-### 2.1 策略總覽
+### 2.1 策略總覽（Strategy Overview）
 
 ```mermaid
 flowchart TD
@@ -79,7 +79,7 @@ flowchart TD
 | **第三方** | JWT (OAuth 2.0) | 1 小時 | 7 天 | OAuth 2.0 + Webhook 簽名 |
 | **後台用戶** | JWT (Redis Opaque) | 30 分鐘 | 7 天 | MFA (TOTP/SMS) + IP 限制 |
 
-### 2.2 設計決策分析
+### 2.2 設計決策分析（Design Decision Analysis）
 
 **為何採用差異化策略（選項 B）而非統一 JWT（選項 A）**:
 
@@ -97,9 +97,9 @@ flowchart TD
 
 ---
 
-## 3. RBAC 授權
+## 3. RBAC 授權（RBAC Authorization）
 
-### 3.1 權限檢查流程
+### 3.1 權限檢查流程（Permission Check Flow）
 
 ```
 1. 驗證 Token 有效性
@@ -108,7 +108,7 @@ flowchart TD
 4. 檢查資源所有權 (player_id)
 ```
 
-### 3.2 權限頭
+### 3.2 權限頭（Permission Headers）
 
 ```http
 X-Permission-Required: player:update
@@ -117,7 +117,7 @@ X-Resource-Owner: player:123456
 
 ---
 
-## 4. 限流策略
+## 4. 限流策略（Rate Limiting Strategy）
 
 ```
 # 全局限流
@@ -141,7 +141,7 @@ Retry-After: 60
 
 ---
 
-## 5. 冪等性設計
+## 5. 冪等性設計（Idempotency Design）
 
 ```http
 POST /api/v1/transactions
@@ -158,7 +158,7 @@ X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
 
 ---
 
-## 6. MFA 決策
+## 6. MFA 決策（MFA Decision）
 
 ### 6.1 為何後台用戶強制 MFA 而玩家可選
 
@@ -169,7 +169,7 @@ X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
 
 ---
 
-## 7. SmartAdmin Implementation
+## 7. SmartAdmin 實作範例（SmartAdmin Implementation）
 
 ### 7.1 Authentication Service
 
@@ -272,7 +272,7 @@ public class AuthenticationManager {
 }
 ```
 
-### 7.3 Database Schema
+### 7.3 資料庫結構（Database Schema）
 
 ```sql
 -- User authentication table
@@ -315,7 +315,7 @@ CREATE INDEX idx_api_key_lookup ON t_api_key(api_key) WHERE status = 1;
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [Multi Actor Token Security](./Multi_Actor_Token_Security.md) - 多主體 Token 安全方案
 - [OAuth Refresh Token](./OAuth_Refresh_Token.md) - OAuth Refresh Token 實施

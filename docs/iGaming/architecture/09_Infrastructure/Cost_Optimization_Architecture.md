@@ -1,12 +1,12 @@
-# 成本優化架構 (Cost Optimization Architecture)
+# 成本優化架構（Cost Optimization Architecture）
 
-> **Business Requirements**: [Cost Optimization Requirements](../../requirements/09_Infrastructure_Requirements/Cost_Optimization_Requirements.md)
-> **Canonical Source**: [09-10 Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: [Cost Optimization Requirements](../../requirements/09_Infrastructure_Requirements/Cost_Optimization_Requirements.md)
+> **規範來源**: [09-10 Cost Optimization](../../source-archive/09_Technical_Infrastructure/09-10_Cost_Optimization.md)
+> **視角**: Technical Architecture (Development & DevOps)
 
 ---
 
-## 1. 成本優化總覽
+## 1. 成本優化總覽（Cost Optimization Overview）
 
 | 項目 | 優化前 | 優化後 | 節省 | 節省率 |
 |------|--------|--------|------|--------|
@@ -20,9 +20,9 @@
 
 ---
 
-## 2. 存儲成本優化 (-94%)
+## 2. 存儲成本優化（Storage Cost Optimization, -94%）
 
-### 2.1 日誌分層存儲
+### 2.1 日誌分層存儲（Tiered Log Storage）
 
 ```mermaid
 flowchart LR
@@ -43,7 +43,7 @@ flowchart LR
 | Cold (S3 Glacier) | 1-5min | $0.03/GB | 運營分析 |
 | Archive (Deep Archive) | 12h | $0.02/GB | 審計法務 |
 
-### 2.2 Kafka 日誌保留優化
+### 2.2 Kafka 日誌保留優化（Kafka Log Retention Optimization）
 
 ```properties
 # server.properties
@@ -61,7 +61,7 @@ log.cleanup.policy=delete
 
 ---
 
-## 3. 計算成本 (Flink Cluster)
+## 3. 計算成本（Compute Cost, Flink Cluster）
 
 ```yaml
 # Resource Configuration
@@ -78,7 +78,7 @@ TaskManager (4 replicas):
 Total: $552/mo ($6,624/yr)
 ```
 
-### 3.1 HPA 自動擴縮
+### 3.1 HPA 自動擴縮（HPA Auto-Scaling）
 
 ```yaml
 apiVersion: autoscaling/v2
@@ -104,9 +104,9 @@ spec:
 
 ---
 
-## 4. 基礎設施優化 (-33%)
+## 4. 基礎設施優化（Infrastructure Optimization, -33%）
 
-### 4.1 RDS 實例降級
+### 4.1 RDS 實例降級（RDS Instance Downgrade）
 
 | 項目 | 優化前 | 優化後 | 節省 |
 |------|--------|--------|------|
@@ -117,7 +117,7 @@ spec:
 
 **優化原理**: Flink SQL 分流 OLAP 查詢，PostgreSQL 僅處理 OLTP
 
-### 4.2 Redis 實例降級
+### 4.2 Redis 實例降級（Redis Instance Downgrade）
 
 | 項目 | 優化前 | 優化後 | 節省 |
 |------|--------|--------|------|
@@ -128,9 +128,9 @@ spec:
 
 ---
 
-## 5. 監控成本優化 (-100%)
+## 5. 監控成本優化（Monitoring Cost Optimization, -100%）
 
-### 5.1 遷移至開源方案
+### 5.1 遷移至開源方案（Migration to Open-Source Stack）
 
 ```mermaid
 flowchart TD
@@ -156,7 +156,7 @@ flowchart TD
 | Jaeger | 1.52 | 鏈路追蹤 |
 | Alertmanager | 0.26 | 告警管理 |
 
-### 5.2 Prometheus 配置
+### 5.2 Prometheus 配置（Prometheus Configuration）
 
 ```yaml
 global:
@@ -180,7 +180,7 @@ remote_write:
 
 ---
 
-## 6. 成本監控與告警
+## 6. 成本監控與告警（Cost Monitoring & Alerting）
 
 ### 6.1 AWS Budgets
 
@@ -217,7 +217,7 @@ grafana:
 
 ---
 
-## 7. 實施路線圖
+## 7. 實施路線圖（Implementation Roadmap）
 
 | Phase | 時程 | 內容 | 預期節省 |
 |-------|------|------|---------|
@@ -227,7 +227,7 @@ grafana:
 
 ---
 
-## 8. SmartAdmin Implementation
+## 8. SmartAdmin 實作範例（SmartAdmin Implementation）
 
 ### 8.1 Cost Monitoring Service
 
@@ -278,7 +278,7 @@ public class CostAlertManager {
 }
 ```
 
-### 8.3 Database Schema
+### 8.3 資料庫結構（Database Schema）
 
 ```sql
 -- Cost allocation tracking table
@@ -299,7 +299,7 @@ CREATE INDEX idx_cost_tenant ON t_cost_allocation(tenant_id, month DESC);
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [Performance Optimization](./Performance_Optimization.md) - 性能優化
 - [Stream Processing Architecture](./Stream_Processing_Architecture.md) - Flink 流處理

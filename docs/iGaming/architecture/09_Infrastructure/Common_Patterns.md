@@ -1,21 +1,21 @@
-# API 通用模式 (Common API Patterns)
+# API 通用模式（Common API Patterns）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-03-03 Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-03-03 Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md)
+> **視角**: Technical Architecture (Development & DevOps)
 
 ---
 
-## 1. 統一錯誤碼體系
+## 1. 統一錯誤碼體系（Unified Error Code System）
 
-### 1.1 錯誤碼格式
+### 1.1 錯誤碼格式（Error Code Format）
 
 格式: `XYZZ`
 - **X**: 錯誤類別（1=成功, 4=客戶端錯誤, 5=服務端錯誤）
 - **Y**: 子類別
 - **ZZ**: 具體錯誤
 
-### 1.2 標準錯誤碼表
+### 1.2 標準錯誤碼表（Standard Error Code Table）
 
 #### 成功 (1xxx)
 
@@ -65,9 +65,9 @@
 
 ---
 
-## 2. 分頁排序過濾
+## 2. 分頁排序過濾（Pagination, Sorting & Filtering）
 
-### 2.1 Offset 分頁（小數據集推薦）
+### 2.1 Offset 分頁（Offset Pagination, Recommended for Small Datasets）
 
 ```http
 GET /api/v1/players?page=1&page_size=20
@@ -92,7 +92,7 @@ GET /api/v1/players?page=1&page_size=20
 }
 ```
 
-### 2.2 Cursor 分頁（大數據集/實時流推薦）
+### 2.2 Cursor 分頁（Cursor Pagination, Recommended for Large Datasets）
 
 ```http
 GET /api/v1/transactions?cursor=eyJpZCI6MTIzNDU2fQ&limit=50
@@ -113,14 +113,14 @@ GET /api/v1/transactions?cursor=eyJpZCI6MTIzNDU2fQ&limit=50
 }
 ```
 
-### 2.3 排序語法
+### 2.3 排序語法（Sorting Syntax）
 
 ```http
 GET /api/v1/players?sort=created_at:desc
 GET /api/v1/players?sort=vip_level:desc,created_at:desc
 ```
 
-### 2.4 過濾語法
+### 2.4 過濾語法（Filtering Syntax）
 
 ```http
 # 精確匹配
@@ -135,7 +135,7 @@ GET /api/v1/players?status_in=active,suspended
 
 ---
 
-## 3. SpringDoc OpenAPI 配置
+## 3. SpringDoc OpenAPI 配置（SpringDoc OpenAPI Configuration）
 
 ```java
 @Configuration
@@ -197,7 +197,7 @@ springdoc:
 
 ---
 
-## 4. 統一異常處理器
+## 4. 統一異常處理器（Global Exception Handler）
 
 ```java
 @Slf4j
@@ -234,7 +234,7 @@ public class GlobalExceptionHandler {
 }
 ```
 
-### 4.1 業務異常類
+### 4.1 業務異常類（Business Exception Class）
 
 ```java
 @Getter
@@ -258,9 +258,9 @@ public class BusinessException extends RuntimeException {
 
 ---
 
-## 5. 性能優化模式
+## 5. 性能優化模式（Performance Optimization Patterns）
 
-### 5.1 HTTP 緩存
+### 5.1 HTTP 緩存（HTTP Caching）
 
 ```http
 # 靜態資源（遊戲圖片、前端資源）
@@ -274,7 +274,7 @@ ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 Cache-Control: no-cache, no-store, must-revalidate
 ```
 
-### 5.2 批量操作
+### 5.2 批量操作（Batch Operations）
 
 ```http
 POST /api/v1/players/batch-get
@@ -286,7 +286,7 @@ POST /api/v1/bonuses/batch-create
 
 ---
 
-## 6. SmartAdmin Implementation
+## 6. SmartAdmin 實作範例（SmartAdmin Implementation）
 
 ### 6.1 Error Code Registry Service
 
@@ -307,7 +307,7 @@ public class ErrorCodeService {
 }
 ```
 
-### 6.2 Database Schema
+### 6.2 資料庫結構（Database Schema）
 
 ```sql
 -- Error code registry
@@ -356,7 +356,7 @@ CREATE INDEX idx_exception_code ON t_exception_log(error_code, created_at DESC);
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [API Design Principles](./API_Design_Principles.md) - API 設計原則
 - [Domain APIs](./Domain_APIs.md) - 領域 API 設計

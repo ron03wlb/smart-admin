@@ -1,12 +1,12 @@
-# 緩存策略架構 (Caching Strategy)
+# 緩存策略架構（Caching Strategy）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-09 Caching Strategy](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-09 Caching Strategy](../../source-archive/09_Technical_Infrastructure/09-09_Caching_Strategy.md)
+> **視角**: Technical Architecture (Development & DevOps)
 
 ---
 
-## 1. 架構概覽
+## 1. 架構概覽（Architecture Overview）
 
 採用 **JetCache 2.7.5 + Redisson 3.26.0** 構建多級緩存：
 
@@ -19,7 +19,7 @@
 
 ---
 
-## 2. 多級緩存架構
+## 2. 多級緩存架構（Multi-Level Cache Architecture）
 
 ```mermaid
 flowchart TD
@@ -33,7 +33,7 @@ flowchart TD
     C --> G
 ```
 
-### 2.1 緩存層級
+### 2.1 緩存層級（Cache Levels）
 
 | 層級 | 存儲 | TTL | 命中率 | 延遲 | 容量 |
 |------|------|-----|--------|------|------|
@@ -43,7 +43,7 @@ flowchart TD
 
 ---
 
-## 3. JetCache 配置
+## 3. JetCache 配置（JetCache Configuration）
 
 ### 3.1 Spring Boot 配置
 
@@ -107,7 +107,7 @@ public class WalletService {
 
 ---
 
-## 4. Redisson 分佈式鎖
+## 4. Redisson 分佈式鎖（Redisson Distributed Lock）
 
 ### 4.1 RLock 使用範例
 
@@ -164,7 +164,7 @@ if (!bloomFilter.contains("player:" + playerId)) {
 
 ---
 
-## 5. 緩存一致性
+## 5. 緩存一致性（Cache Consistency）
 
 ### 5.1 Cache-Aside Pattern
 
@@ -195,7 +195,7 @@ flowchart LR
 
 ---
 
-## 6. 緩存預熱 (Cache Warming)
+## 6. 緩存預熱（Cache Warming）
 
 ```java
 @Scheduled(cron = "0 0 * * * ?")  // Every hour
@@ -210,7 +210,7 @@ public void warmUpActivePlayerCache() {
 
 ---
 
-## 7. SmartAdmin Implementation
+## 7. SmartAdmin 實作範例（SmartAdmin Implementation）
 
 ### 7.1 Cache Configuration Service
 
@@ -275,7 +275,7 @@ public class CacheInvalidationManager {
 }
 ```
 
-### 7.3 Database Schema
+### 7.3 資料庫結構（Database Schema）
 
 ```sql
 -- Cache configuration
@@ -331,7 +331,7 @@ CREATE TABLE t_bloom_filter_config (
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [Performance Optimization](./Performance_Optimization.md) - 性能優化規範
 - [Stream Processing Architecture](./Stream_Processing_Architecture.md) - Flink 流處理

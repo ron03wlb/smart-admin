@@ -1,14 +1,14 @@
-# 部署架構與 DevOps 規範
+# 部署架構與 DevOps 規範（Deployment Architecture & DevOps Standards）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md)
+> **視角**: Technical Architecture (Development & DevOps)
 
 ---
 
-## 1. 架構概覽
+## 1. 架構概覽（Architecture Overview）
 
-### 1.1 設計目標
+### 1.1 設計目標（Design Goals）
 
 | 目標 | 指標 |
 |------|------|
@@ -17,7 +17,7 @@
 | **快速回滾** | < 30 秒 |
 | **基礎設施即代碼** | Immutable Infrastructure |
 
-### 1.2 環境策略
+### 1.2 環境策略（Environment Strategy）
 
 ```mermaid
 flowchart LR
@@ -41,11 +41,11 @@ flowchart LR
 
 ---
 
-## 2. 藍綠部署 (Blue-Green Deployment)
+## 2. 藍綠部署（Blue-Green Deployment）
 
 **適用場景**: 所有無狀態服務（API Gateway, Game Service 等）
 
-### 2.1 部署流程
+### 2.1 部署流程（Deployment Flow）
 
 ```mermaid
 flowchart TD
@@ -72,7 +72,7 @@ flowchart TD
     style ROLLBACK3 fill:#FF6B6B
 ```
 
-### 2.2 優勢與限制
+### 2.2 優勢與限制（Advantages & Limitations）
 
 | 面向 | 說明 |
 |------|------|
@@ -83,11 +83,11 @@ flowchart TD
 
 ---
 
-## 3. 金絲雀發布 (Canary Release)
+## 3. 金絲雀發布（Canary Release）
 
 **適用場景**: 核心高風險服務（Wallet Service, Payment Gateway, Risk Engine）
 
-### 3.1 漸進式流量切換
+### 3.1 漸進式流量切換（Progressive Traffic Shifting）
 
 ```mermaid
 flowchart LR
@@ -157,7 +157,7 @@ spec:
           successThreshold: 2
 ```
 
-### 3.3 Istio 流量切分
+### 3.3 Istio 流量切分（Istio Traffic Splitting）
 
 ```yaml
 # Istio VirtualService (Traffic Split)
@@ -189,7 +189,7 @@ spec:
       weight: 5
 ```
 
-### 3.4 監控指標與回滾閾值
+### 3.4 監控指標與回滾閾值（Monitoring Metrics & Rollback Thresholds）
 
 | 指標 | Baseline (Stable) | Canary Target | Alert Threshold (回滾) |
 |------|-------------------|---------------|----------------------|
@@ -199,7 +199,7 @@ spec:
 | Memory Usage | 60% | < 75% | > 90% |
 | Pod Restart Count | 0 | 0 | > 3 |
 
-### 3.5 自動回滾觸發條件
+### 3.5 自動回滾觸發條件（Auto-Rollback Trigger Conditions）
 
 | 觸發器 | 條件 | 回滾動作 |
 |--------|------|---------|
@@ -211,9 +211,9 @@ spec:
 
 ---
 
-## 4. Kubernetes 標準
+## 4. Kubernetes 標準（Kubernetes Standards）
 
-### 4.1 Namespace 隔離
+### 4.1 Namespace 隔離（Namespace Isolation）
 
 | Namespace | 環境 | 用途 |
 |-----------|------|------|
@@ -221,7 +221,7 @@ spec:
 | `igaming-uat` | Staging | QA 驗收 |
 | `igaming-prod` | Production | 生產服務 |
 
-### 4.2 資源限制
+### 4.2 資源限制（Resource Limits）
 
 每個 Pod 必須設定 `requests` 與 `limits`：
 
@@ -235,7 +235,7 @@ resources:
     memory: 8Gi
 ```
 
-### 4.3 健康檢查
+### 4.3 健康檢查（Health Checks）
 
 | 探針 | 路徑 | 用途 |
 |------|------|------|
@@ -245,7 +245,7 @@ resources:
 
 ---
 
-## 5. GitOps 流程 (ArgoCD)
+## 5. GitOps 流程（GitOps with ArgoCD）
 
 ```mermaid
 flowchart LR
@@ -261,7 +261,7 @@ flowchart LR
     style K8S fill:#4CAF50
 ```
 
-### 5.1 流程步驟
+### 5.1 流程步驟（Process Steps）
 
 1. CI Build Docker Image -> Push to ECR
 2. CI Update `helm-charts/values.yaml`（image tag change）
@@ -269,7 +269,7 @@ flowchart LR
 
 ---
 
-## 6. Feature Flag 整合
+## 6. Feature Flag 整合（Feature Flag Integration）
 
 除了流量切換，還可搭配 Feature Flag 進行更細粒度控制：
 
@@ -291,16 +291,16 @@ if (featureFlag) {
 
 ---
 
-## 7. 系統引導與種子資料
+## 7. 系統引導與種子資料（System Bootstrap & Seed Data）
 
-### 7.1 初始管理員 (Seed Admin)
+### 7.1 初始管理員（Seed Admin）
 
 系統首次部署後需透過 K8s Job 注入初始資料：
 - 檢查 `admin_users` 表是否為空
 - 若為空，創建 Super Admin 帳號（冪等操作）
 - 環境變數由 K8s Secrets 管理
 
-### 7.2 基礎配置載入
+### 7.2 基礎配置載入（Base Configuration Loading）
 
 - 字典表：ISO 貨幣代碼、國家代碼、語言列表
 - 預設商戶：`default_tenant`（ID: 1001）
@@ -308,7 +308,7 @@ if (featureFlag) {
 
 ---
 
-## 8. SmartAdmin Implementation
+## 8. SmartAdmin 實作範例（SmartAdmin Implementation）
 
 ### 8.1 Deployment Service
 
@@ -371,7 +371,7 @@ public class DeploymentManager {
 }
 ```
 
-### 8.3 Database Schema
+### 8.3 資料庫結構（Database Schema）
 
 ```sql
 -- Deployment environment configuration
@@ -429,7 +429,7 @@ CREATE TABLE t_seed_data_log (
 
 ---
 
-## 相關文檔
+## 相關文檔（Related Documents）
 
 - [Gateway Core Architecture](./Gateway_Core.md) - API Gateway 架構
 - [Performance Monitoring](./Performance_Monitoring.md) - APM 監控
