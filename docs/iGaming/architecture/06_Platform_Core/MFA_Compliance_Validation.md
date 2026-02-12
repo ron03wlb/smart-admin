@@ -1,21 +1,21 @@
-# MFA Compliance Validation - Technical Architecture
+# MFA 合規驗證（MFA Compliance Validation）- 技術架構（Technical Architecture）
 
-> **Canonical Source**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
-> **Audience**: Architects, Backend Developers, DevOps
-> **Business Requirements**: [MFA Compliance Requirements](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
-> **Last Synced**: 2026-02-08
-
----
-
-## 1. Overview
-
-This document covers the technical implementation of MFA compliance validation, including backup code generation algorithms, audit log database schemas, automated anomaly detection queries, API specifications, and integration test patterns for the SmartAdmin iGaming platform.
+> **規範來源**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
+> **目標讀者**: Architects, Backend Developers, DevOps
+> **業務需求**: [MFA Compliance Requirements](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
+> **最後同步**: 2026-02-08
 
 ---
 
-## 2. Backup Code Implementation
+## 1. 概述（Overview）
 
-### 2.1 Generation Algorithm
+本文檔涵蓋 MFA 合規驗證的技術實現，包括備用碼生成算法、審計日誌數據庫架構、自動化異常檢測查詢、API 規範，以及 SmartAdmin iGaming 平台的集成測試模式。
+
+---
+
+## 2. 備用碼實現（Backup Code Implementation）
+
+### 2.1 生成算法（Generation Algorithm）
 
 ```java
 import java.security.SecureRandom;
@@ -57,7 +57,7 @@ public class BackupCodeGenerator {
 // [1234-5678, 9012-3456, 7890-1234, ...]
 ```
 
-### 2.2 Storage Schema (JSON)
+### 2.2 儲存架構（Storage Schema）（JSON）
 
 ```json
 {
@@ -82,50 +82,50 @@ public class BackupCodeGenerator {
 }
 ```
 
-### 2.3 Backup Code Verification Sequence
+### 2.3 備用碼驗證序列（Backup Code Verification Sequence）
 
 ```mermaid
 sequenceDiagram
-    participant U as User
+    participant U as 使用者
     participant C as Controller
     participant M as MfaManager
     participant D as Database
 
     U->>C: POST /admin/auth/mfa/verify<br/>{backupCode: "1234-5678"}
     C->>M: verifyBackupCode(userId, code)
-    M->>D: Query backup codes (decrypt)
-    D-->>M: JSON backup code array
+    M->>D: 查詢備用碼（解密）
+    D-->>M: JSON 備用碼陣列
 
-    M->>M: Iterate and check backup code match
+    M->>M: 迭代並檢查備用碼匹配
 
-    alt Backup code valid and unused
-        M->>D: Mark backup code as used<br/>used = true
-        M->>D: Record audit log (BACKUP_CODE_USED)
+    alt 備用碼有效且未使用
+        M->>D: 標記備用碼為已使用<br/>used = true
+        M->>D: 記錄審計日誌（BACKUP_CODE_USED）
 
-        alt Remaining backup codes <= 2
-            M->>U: WARNING: Only X codes remaining<br/>Recommend regeneration
+        alt 剩餘備用碼 <= 2
+            M->>U: 警告：僅剩 X 個備用碼<br/>建議重新生成
         end
 
-        M-->>C: Verification success
-        C-->>U: Issue Tokens
-    else Backup code invalid or already used
-        M->>D: Record audit log (BACKUP_CODE_INVALID)
+        M-->>C: 驗證成功
+        C-->>U: 發放 Tokens
+    else 備用碼無效或已使用
+        M->>D: 記錄審計日誌（BACKUP_CODE_INVALID）
         M-->>C: HTTP 401<br/>{error: "INVALID_BACKUP_CODE"}
     end
 ```
 
 ---
 
-## 3. Backup Code Management API
+## 3. 備用碼管理 API（Backup Code Management API）
 
-### 3.1 View Remaining Backup Code Status
+### 3.1 查看剩餘備用碼狀態（View Remaining Backup Code Status）
 
 ```http
 GET /admin/mfa/backup-codes/status
 Authorization: Bearer {accessToken}
 ```
 
-**Response**:
+**回應（Response）**：
 
 ```json
 {
@@ -140,7 +140,7 @@ Authorization: Bearer {accessToken}
 }
 ```
 
-### 3.2 Regenerate Backup Codes
+### 3.2 重新生成備用碼（Regenerate Backup Codes）
 
 ```http
 POST /admin/mfa/backup-codes/regenerate
@@ -152,7 +152,7 @@ Content-Type: application/json
 }
 ```
 
-**Response**:
+**回應（Response）**：
 
 ```json
 {
@@ -170,27 +170,27 @@ Content-Type: application/json
 
 ---
 
-## 4. Device Loss Recovery Implementation
+## 4. 設備遺失恢復實現（Device Loss Recovery Implementation）
 
-### 4.1 Recovery Request Flow
+### 4.1 恢復請求流程（Recovery Request Flow）
 
 ```mermaid
 graph TD
-    A[User Submits Recovery Request] --> B[Verify Identity Document<br/>Passport / License / ID Card]
-    B --> C[Verify Email<br/>Send OTP to Registered Email]
-    C --> D[Verify Phone<br/>Send SMS OTP]
-    D --> E[Security Question Verification<br/>3 Pre-configured Questions]
-    E --> F{All Verifications Passed?}
+    A[使用者提交恢復請求] --> B[驗證身份證件<br/>護照 / 駕照 / 身份證]
+    B --> C[驗證電子郵件<br/>發送 OTP 至註冊郵箱]
+    C --> D[驗證手機<br/>發送 SMS OTP]
+    D --> E[安全問題驗證<br/>3 個預先配置的問題]
+    E --> F{所有驗證通過？}
 
-    F -->|PASS| G[Human Review<br/>Security Team Approval]
-    F -->|FAIL| H[Reject Recovery Request<br/>Contact Customer Service]
+    F -->|通過| G[人工審核<br/>安全團隊批准]
+    F -->|失敗| H[拒絕恢復請求<br/>聯繫客服]
 
-    G --> I[Security Team Login<br/>Force Reset MFA]
-    I --> J[Generate New TOTP Secret<br/>Send to User]
-    J --> K[User Scans New QR Code<br/>Re-activate MFA]
+    G --> I[安全團隊登入<br/>強制重置 MFA]
+    I --> J[生成新的 TOTP Secret<br/>發送給使用者]
+    J --> K[使用者掃描新 QR Code<br/>重新啟用 MFA]
 ```
 
-### 4.2 Recovery Request API
+### 4.2 恢復請求 API（Recovery Request API）
 
 ```http
 POST /admin/mfa/recovery/request
@@ -203,7 +203,7 @@ Content-Type: multipart/form-data
 }
 ```
 
-### 4.3 Recovery Request Database Schema
+### 4.3 恢復請求數據庫架構（Recovery Request Database Schema）
 
 ```sql
 -- t_mfa_recovery_request table
@@ -219,7 +219,7 @@ CREATE TABLE t_mfa_recovery_request (
 );
 ```
 
-### 4.4 Security Team Review Interface
+### 4.4 安全團隊審核介面（Security Team Review Interface）
 
 ```vue
 <template>
@@ -253,7 +253,7 @@ async function approveRequest(record) {
 </script>
 ```
 
-### 4.5 Force Reset MFA Implementation
+### 4.5 強制重置 MFA 實現（Force Reset MFA Implementation）
 
 ```java
 /**
@@ -320,7 +320,7 @@ public class MfaResetService {
 
 ---
 
-## 5. Emergency Contact Database Schema
+## 5. 緊急聯絡人數據庫架構（Emergency Contact Database Schema）
 
 ```sql
 -- t_mfa_emergency_contacts table
@@ -334,7 +334,7 @@ CREATE TABLE t_mfa_emergency_contacts (
 );
 ```
 
-### 5.1 Verification Email Template
+### 5.1 驗證電子郵件範本（Verification Email Template）
 
 ```html
 <p>Hello {{contactName}},</p>
@@ -352,9 +352,9 @@ CREATE TABLE t_mfa_emergency_contacts (
 
 ---
 
-## 6. Role-Based MFA Policy Implementation
+## 6. 基於角色的 MFA 策略實現（Role-Based MFA Policy Implementation）
 
-### 6.1 MFA Policy Service
+### 6.1 MFA 策略服務（MFA Policy Service）
 
 ```java
 @Service
@@ -406,29 +406,29 @@ public class MfaPolicyService {
 }
 ```
 
-### 6.2 First Login Mandatory Setup Flow
+### 6.2 首次登入強制設定流程（First Login Mandatory Setup Flow）
 
 ```mermaid
 graph TD
-    A[User Login] --> B{Password Verification}
-    B -->|PASS| C{Check Role}
+    A[使用者登入] --> B{密碼驗證}
+    B -->|通過| C{檢查角色}
 
-    C -->|High-Risk Role| D{MFA Enabled?}
-    C -->|Low-Risk Role| G[Direct Login]
+    C -->|高風險角色| D{MFA 已啟用？}
+    C -->|低風險角色| G[直接登入]
 
-    D -->|Yes| E[Require MFA Verification]
-    D -->|No| F[Force Redirect to MFA Setup Page<br/>Cannot Skip]
+    D -->|是| E[要求 MFA 驗證]
+    D -->|否| F[強制重定向至 MFA 設定頁面<br/>無法跳過]
 
-    F --> H[Scan QR Code]
-    H --> I[Verify Activation]
+    F --> H[掃描 QR Code]
+    H --> I[驗證啟用]
     I --> E
 
-    E --> J{TOTP Verification}
-    J -->|PASS| G
-    J -->|FAIL| K[Re-enter Code]
+    E --> J{TOTP 驗證}
+    J -->|通過| G
+    J -->|失敗| K[重新輸入代碼]
 ```
 
-### 6.3 Optional MFA Recommendation (Low-Risk Roles)
+### 6.3 可選 MFA 建議（Optional MFA Recommendation）（低風險角色）
 
 ```java
 /**
@@ -447,7 +447,7 @@ public void showMfaRecommendation(Long userId) {
 }
 ```
 
-### 6.4 Frontend MFA Recommendation Banner
+### 6.4 前端 MFA 建議橫幅（Frontend MFA Recommendation Banner）
 
 ```vue
 <template>
@@ -468,32 +468,32 @@ public void showMfaRecommendation(Long userId) {
 </template>
 ```
 
-### 6.5 Decision Framework Diagram
+### 6.5 決策框架圖（Decision Framework Diagram）
 
 ```mermaid
 graph TD
-    A[Role MFA Strategy] --> B{Dimension 1: Risk Exposure}
-    A --> C{Dimension 2: Operation Reversibility}
-    A --> D{Dimension 3: Compliance Requirements}
+    A[角色 MFA 策略] --> B{維度 1：風險暴露}
+    A --> C{維度 2：操作可逆性}
+    A --> D{維度 3：合規要求}
 
-    B --> B1[Super Admin: 5/5<br/>Can modify system config]
-    B --> B2[Finance: 5/5<br/>Can adjust player balances]
-    B --> B3[Customer Service: 3/5<br/>Query-only permissions]
+    B --> B1[Super Admin：5/5<br/>可修改系統配置]
+    B --> B2[Finance：5/5<br/>可調整玩家餘額]
+    B --> B3[Customer Service：3/5<br/>僅查詢權限]
 
-    C --> C1[Super Admin: NO<br/>Irreversible]
-    C --> C2[Finance: NO<br/>Irreversible]
-    C --> C3[Customer Service: YES<br/>Auditable]
+    C --> C1[Super Admin：否<br/>不可逆]
+    C --> C2[Finance：否<br/>不可逆]
+    C --> C3[Customer Service：是<br/>可審計]
 
-    D --> D1[Super Admin: REQUIRED<br/>PCI DSS mandate]
-    D --> D2[Finance: REQUIRED<br/>PCI DSS mandate]
-    D --> D3[Customer Service: RECOMMENDED<br/>GDPR suggestion]
+    D --> D1[Super Admin：必須<br/>PCI DSS 強制要求]
+    D --> D2[Finance：必須<br/>PCI DSS 強制要求]
+    D --> D3[Customer Service：建議<br/>GDPR 建議]
 ```
 
 ---
 
-## 7. Audit Log Database Schema
+## 7. 審計日誌數據庫架構（Audit Log Database Schema）
 
-### 7.1 MFA Audit Log Table
+### 7.1 MFA 審計日誌表（MFA Audit Log Table）
 
 ```sql
 CREATE TABLE t_audit_log_mfa (
@@ -515,7 +515,7 @@ CREATE INDEX idx_mfa_log_event_level ON t_audit_log_mfa(event_level);
 CREATE INDEX idx_mfa_log_created_at ON t_audit_log_mfa(created_at);
 ```
 
-### 7.2 Audit Log Entry Example
+### 7.2 審計日誌條目範例（Audit Log Entry Example）
 
 ```json
 {
@@ -537,9 +537,9 @@ CREATE INDEX idx_mfa_log_created_at ON t_audit_log_mfa(created_at);
 
 ---
 
-## 8. Automated Anomaly Detection Queries
+## 8. 自動化異常檢測查詢（Automated Anomaly Detection Queries）
 
-### 8.1 Rule 1: Multiple MFA Failures in Short Period
+### 8.1 規則 1（Rule 1）：短時間內多次 MFA 失敗（Multiple MFA Failures in Short Period）
 
 ```sql
 -- Detection: >= 3 MFA failures within 5 minutes
@@ -554,12 +554,12 @@ GROUP BY user_id
 HAVING COUNT(*) >= 3;
 ```
 
-**Triggered actions**:
-- Lock account for 15 minutes
-- Send alert to Security Team
-- Send email notification to user
+**觸發動作（Triggered actions）**：
+- 鎖定帳戶 15 分鐘
+- 向安全團隊發送警報
+- 向使用者發送電子郵件通知
 
-### 8.2 Rule 2: Abnormal Geographic Location Login
+### 8.2 規則 2（Rule 2）：異常地理位置登入（Abnormal Geographic Location Login）
 
 ```sql
 -- Detection: Logins from different countries within 1 hour
@@ -578,11 +578,11 @@ WHERE a.event_type = 'MFA_LOGIN_SUCCESS'
   AND get_country(a.ip_address) != get_country(b.ip_address);
 ```
 
-**Triggered actions**:
-- Alert Security Team for manual review
-- Disable trusted device, require full MFA on next login
+**觸發動作（Triggered actions）**：
+- 警報安全團隊進行人工審核
+- 停用受信任設備，下次登入要求完整 MFA
 
-### 8.3 Rule 3: Frequent Backup Code Usage
+### 8.3 規則 3（Rule 3）：頻繁使用備用碼（Frequent Backup Code Usage）
 
 ```sql
 -- Detection: >= 3 backup code uses within 7 days
@@ -596,11 +596,11 @@ GROUP BY user_id
 HAVING COUNT(*) >= 3;
 ```
 
-**Triggered actions**:
-- Warn user to reconfigure TOTP
-- Prompt user about possible device loss
+**觸發動作（Triggered actions）**：
+- 警告使用者重新配置 TOTP
+- 提示使用者可能設備遺失
 
-### 8.4 Rule 4: MFA Disabled for High-Risk Role
+### 8.4 規則 4（Rule 4）：高風險角色停用 MFA（MFA Disabled for High-Risk Role）
 
 ```sql
 -- Detection: MFA disabled for mandatory MFA roles
@@ -615,14 +615,14 @@ WHERE l.event_type = 'MFA_DISABLED'
   AND u.role_code IN ('SUPER_ADMIN', 'FINANCE_MANAGER', 'RISK_CONTROL');
 ```
 
-**Triggered actions**:
-- Immediately alert CTO / CISO
-- Manual review required
-- If unauthorized, lock account as security incident
+**觸發動作（Triggered actions）**：
+- 立即警報 CTO / CISO
+- 需要人工審核
+- 如果未經授權，作為安全事件鎖定帳戶
 
 ---
 
-## 9. Integration Test Examples
+## 9. 集成測試範例（Integration Test Examples）
 
 ```java
 @SpringBootTest
@@ -686,8 +686,8 @@ class MfaIntegrationTest {
 
 ---
 
-## 10. Related Documents
+## 10. 相關文檔（Related Documents）
 
-- [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) - Business requirements and method selection
-- [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md) - TOTP algorithm details
-- [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) - Authentication flow design
+- [06-06-01 MFA Architecture Design](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) - 業務需求和方法選擇
+- [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md) - TOTP 算法細節
+- [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) - 認證流程設計

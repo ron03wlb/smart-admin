@@ -1,51 +1,51 @@
-# MFA Technical Architecture
+# MFA 技術架構（MFA Technical Architecture）
 
-> **Business Requirements**: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Requirements.md)
-> **Canonical Source**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
-> **View**: Technical Architecture (Development & DevOps)
-> **Audience**: Backend Developers, Security Engineers, Compliance Officers
+> **業務需求**: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Requirements.md)
+> **規範來源**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
+> **視角**: Technical Architecture (Development & DevOps)
+> **目標讀者**: Backend Developers, Security Engineers, Compliance Officers
 
-**Related Source Documents**:
+**相關來源文件**:
 - [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
 - [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 
 ---
 
-## 1. Architecture Overview
+## 1. 架構概覽（Architecture Overview）
 
-### 1.1 System Flow
+### 1.1 系統流程（System Flow）
 
 ```mermaid
 graph TD
-    A[User Login] --> B{Password Verification}
-    B -->|PASS| C{MFA Enabled?}
-    B -->|FAIL| Z[Return Error]
+    A[使用者登入] --> B{密碼驗證}
+    B -->|通過| C{MFA 已啟用?}
+    B -->|失敗| Z[返回錯誤]
 
-    C -->|Yes| D{Device Trusted?}
-    C -->|No| G[Issue Token Directly]
+    C -->|是| D{裝置受信任?}
+    C -->|否| G[直接核發 Token]
 
-    D -->|Yes| G
-    D -->|No| E[Require MFA Verification]
+    D -->|是| G
+    D -->|否| E[要求 MFA 驗證]
 
-    E --> F{Select Verification Method}
-    F --> F1[TOTP - Primary]
-    F --> F2[SMS OTP - Backup 1]
-    F --> F3[Backup Code - Backup 2]
+    E --> F{選擇驗證方式}
+    F --> F1[TOTP - 主要方式]
+    F --> F2[SMS OTP - 備用方式 1]
+    F --> F3[Backup Code - 備用方式 2]
 
-    F1 --> H{Verification Success?}
+    F1 --> H{驗證成功?}
     F2 --> H
     F3 --> H
 
-    H -->|PASS| G
-    H -->|FAIL| I[Error Count +1]
-    I --> J{Errors >= 3?}
-    J -->|Yes| K[Lock 15 Minutes]
-    J -->|No| E
+    H -->|通過| G
+    H -->|失敗| I[錯誤次數 +1]
+    I --> J{錯誤次數 >= 3?}
+    J -->|是| K[鎖定 15 分鐘]
+    J -->|否| E
 ```
 
-### 1.2 SmartAdmin Layer Mapping
+### 1.2 SmartAdmin 層級映射（SmartAdmin Layer Mapping）
 
-| Layer | Component | Responsibility |
+| 層級 | 元件 | 職責 |
 |-------|-----------|----------------|
 | **Controller** | `MfaController` | HTTP endpoints, request validation |
 | **Service** | `AdminAuthService` | Login orchestration, token issuance |
@@ -55,13 +55,13 @@ graph TD
 
 ---
 
-## 2. TOTP Implementation
+## 2. TOTP 實作（TOTP Implementation）
 
-### 2.1 RFC 6238 Algorithm
+### 2.1 RFC 6238 演算法（RFC 6238 Algorithm）
 
-**TOTP (Time-based One-Time Password)** is based on [RFC 6238](https://tools.ietf.org/html/rfc6238) standard.
+**TOTP (Time-based One-Time Password)** 基於 [RFC 6238](https://tools.ietf.org/html/rfc6238) 標準。
 
-**Core Algorithm**:
+**核心演算法**:
 
 ```
 TOTP = HOTP(K, T)
@@ -73,7 +73,7 @@ Where:
 - HOTP = HMAC-based One-Time Password (RFC 4226)
 ```
 
-**Python Implementation Reference**:
+**Python 實作參考**:
 
 ```python
 import hmac
@@ -116,18 +116,18 @@ def generate_totp(secret_key: str, time_step: int = 30) -> str:
     return f"{otp:06d}"  # Pad leading zeros
 ```
 
-**Algorithm Security Analysis**:
+**演算法安全性分析**:
 
-| Property | Description | Security Rating |
+| 特性 | 說明 | 安全評級 |
 |----------|-------------|-----------------|
-| **One-way** | HMAC-SHA1 irreversible, cannot derive secret from code | 5/5 |
-| **Time-sensitive** | Code changes every 30 seconds | 5/5 |
-| **Brute-force resistant** | 6 digits (1M possibilities) x 30s window = very low success rate | 4/5 |
-| **Offline verification** | Server and client calculate independently, no network required | 5/5 |
+| **單向性** | HMAC-SHA1 不可逆，無法從驗證碼推導出密鑰 | 5/5 |
+| **時效性** | 驗證碼每 30 秒變更一次 | 5/5 |
+| **抗暴力破解** | 6 位數字 (1M 種可能) x 30 秒視窗 = 極低成功率 | 4/5 |
+| **離線驗證** | 伺服器與客戶端獨立計算，無需網路 | 5/5 |
 
-### 2.2 Secret Key Generation & Sharing
+### 2.2 密鑰生成與共享（Secret Key Generation & Sharing）
 
-**Java Implementation**:
+**Java 實作**:
 
 ```java
 import java.security.SecureRandom;
@@ -169,7 +169,7 @@ public class TotpSecretGenerator {
 }
 ```
 
-**Secret Encryption (AES-256-GCM)**:
+**密鑰加密（Secret Encryption）（AES-256-GCM）**:
 
 ```java
 import javax.crypto.Cipher;
@@ -227,23 +227,23 @@ public class TotpSecretEncryption {
 }
 ```
 
-**Key Management Best Practices**:
+**密鑰管理最佳實踐**:
 
-| Phase | Best Practice | SmartAdmin Implementation |
+| 階段 | 最佳實踐 | SmartAdmin 實作 |
 |-------|---------------|---------------------------|
-| **Generation** | Use `SecureRandom` (NOT `Random`) | `SecureRandom` + 160 bits entropy |
-| **Transmission** | Via QR Code (HTTPS + one-time display) | QR Code shown only once |
-| **Storage** | AES-256-GCM encrypted + KMS managed master key | Integrate AWS KMS / Vault |
-| **Usage** | Decrypt immediately before use, no memory traces | `try-finally` to clear variables |
-| **Destruction** | Delete secret when user disables MFA | `CASCADE DELETE` |
+| **生成** | 使用 `SecureRandom` (不使用 `Random`) | `SecureRandom` + 160 bits entropy |
+| **傳輸** | 透過 QR Code (HTTPS + 一次性顯示) | QR Code 僅顯示一次 |
+| **儲存** | AES-256-GCM 加密 + KMS 管理主密鑰 | 整合 AWS KMS / Vault |
+| **使用** | 使用前立即解密，不留記憶體痕跡 | `try-finally` 清除變數 |
+| **銷毀** | 使用者停用 MFA 時刪除密鑰 | `CASCADE DELETE` |
 
-### 2.3 Time Synchronization
+### 2.3 時間同步（Time Synchronization）
 
-**Problem**: Server time may differ from user device time (+-5 minutes).
+**問題**: 伺服器時間可能與使用者裝置時間不一致（+-5 分鐘）。
 
-**Solution**: Allow +-1 time window (verify codes from previous, current, and next 30-second windows).
+**解決方案**: 允許 +-1 時間視窗（驗證前一個、當前、下一個 30 秒視窗的驗證碼）。
 
-**Java Implementation**:
+**Java 實作**:
 
 ```java
 import java.time.Instant;
@@ -282,17 +282,17 @@ public class TotpValidator {
 }
 ```
 
-**Time Synchronization Test Matrix**:
+**時間同步測試矩陣**:
 
-| Server Time | Device Time | Drift | Result | Notes |
+| 伺服器時間 | 裝置時間 | 時間差 | 結果 | 備註 |
 |-------------|-------------|-------|--------|-------|
-| 10:00:00 | 10:00:00 | 0s | SUCCESS | Perfectly synced |
-| 10:00:00 | 10:00:25 | +25s | SUCCESS | Within current window |
-| 10:00:00 | 10:00:35 | +35s | SUCCESS | Next window (allowed +1) |
-| 10:00:00 | 10:01:05 | +65s | FAIL | Exceeds +-1 window range |
-| 10:00:00 | 09:59:25 | -35s | SUCCESS | Previous window (allowed -1) |
+| 10:00:00 | 10:00:00 | 0s | 成功 | 完全同步 |
+| 10:00:00 | 10:00:25 | +25s | 成功 | 在當前視窗內 |
+| 10:00:00 | 10:00:35 | +35s | 成功 | 下一個視窗（允許 +1） |
+| 10:00:00 | 10:01:05 | +65s | 失敗 | 超出 +-1 視窗範圍 |
+| 10:00:00 | 09:59:25 | -35s | 成功 | 前一個視窗（允許 -1） |
 
-**NTP Configuration**:
+**NTP 配置**:
 
 ```bash
 # Server-side NTP auto-sync
@@ -306,9 +306,9 @@ ntpq -p
 
 ---
 
-## 3. API Specifications
+## 3. API 規格（API Specifications）
 
-### 3.1 Password Login (Phase 1)
+### 3.1 密碼登入（Password Login）（階段 1）
 
 ```http
 POST /admin/auth/login
@@ -321,7 +321,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (MFA Enabled)**:
+**回應（Response）（MFA 已啟用）**:
 
 ```json
 {
@@ -336,7 +336,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (MFA Not Enabled)**:
+**回應（Response）（MFA 未啟用）**:
 
 ```json
 {
@@ -355,7 +355,7 @@ Content-Type: application/json
 }
 ```
 
-### 3.2 MFA Verification (Phase 2)
+### 3.2 MFA 驗證（MFA Verification）（階段 2）
 
 ```http
 POST /admin/auth/mfa/verify
@@ -368,7 +368,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (Success)**:
+**回應（Response）（成功）**:
 
 ```json
 {
@@ -386,7 +386,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (Failure)**:
+**回應（Response）（失敗）**:
 
 ```json
 {
@@ -399,7 +399,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (Account Locked)**:
+**回應（Response）（帳號鎖定）**:
 
 ```json
 {
@@ -413,20 +413,20 @@ Content-Type: application/json
 }
 ```
 
-### 3.3 MFA Setup Endpoints
+### 3.3 MFA 設定端點（MFA Setup Endpoints）
 
-| Endpoint | Method | Description |
+| 端點 | 方法 | 說明 |
 |----------|--------|-------------|
-| `/admin/mfa/setup/init` | POST | Initialize MFA setup (generate secret + QR code) |
-| `/admin/mfa/setup/verify` | POST | Verify and activate MFA |
-| `/admin/mfa/backup-codes/status` | GET | Check remaining backup codes |
-| `/admin/mfa/backup-codes/regenerate` | POST | Regenerate backup codes (requires TOTP) |
+| `/admin/mfa/setup/init` | POST | 初始化 MFA 設定（生成密鑰 + QR Code） |
+| `/admin/mfa/setup/verify` | POST | 驗證並啟用 MFA |
+| `/admin/mfa/backup-codes/status` | GET | 檢查剩餘備用碼 |
+| `/admin/mfa/backup-codes/regenerate` | POST | 重新生成備用碼（需要 TOTP） |
 
 ---
 
-## 4. Database Schema
+## 4. 資料庫結構（Database Schema）
 
-### 4.1 MFA User Table
+### 4.1 MFA 使用者表（MFA User Table）
 
 ```sql
 CREATE TABLE t_admin_user_mfa (
@@ -445,7 +445,7 @@ CREATE INDEX idx_mfa_status ON t_admin_user_mfa(status);
 CREATE INDEX idx_mfa_activated_at ON t_admin_user_mfa(activated_at);
 ```
 
-### 4.2 MFA Audit Log Table
+### 4.2 MFA 稽核日誌表（MFA Audit Log Table）
 
 ```sql
 CREATE TABLE t_audit_log_mfa (
@@ -467,7 +467,7 @@ CREATE INDEX idx_mfa_log_event_level ON t_audit_log_mfa(event_level);
 CREATE INDEX idx_mfa_log_created_at ON t_audit_log_mfa(created_at);
 ```
 
-### 4.3 MFA Recovery Request Table
+### 4.3 MFA 恢復請求表（MFA Recovery Request Table）
 
 ```sql
 CREATE TABLE t_mfa_recovery_request (
@@ -482,7 +482,7 @@ CREATE TABLE t_mfa_recovery_request (
 );
 ```
 
-### 4.4 Emergency Contacts Table
+### 4.4 緊急聯絡人表（Emergency Contacts Table）
 
 ```sql
 CREATE TABLE t_mfa_emergency_contacts (
@@ -495,7 +495,7 @@ CREATE TABLE t_mfa_emergency_contacts (
 );
 ```
 
-### 4.5 Redis Structures
+### 4.5 Redis 資料結構（Redis Structures）
 
 **MFA Session**:
 
@@ -508,7 +508,7 @@ Value: {
 TTL:   300 seconds (5 minutes)
 ```
 
-**Trusted Device**:
+**信任裝置（Trusted Device）**:
 
 ```
 Key:   trusted_device:{userId}:{deviceFingerprint}
@@ -523,7 +523,7 @@ Value: {
 TTL:   2592000 seconds (30 days)
 ```
 
-**MFA Failure Counter**:
+**MFA 失敗計數器（MFA Failure Counter）**:
 
 ```
 Key:   mfa:fail:{userId}
@@ -533,9 +533,9 @@ TTL:   900 seconds (15 minutes)
 
 ---
 
-## 5. Sequence Diagrams
+## 5. 序列圖（Sequence Diagrams）
 
-### 5.1 Two-Phase Authentication Flow
+### 5.1 兩階段認證流程（Two-Phase Authentication Flow）
 
 ```mermaid
 sequenceDiagram
@@ -546,56 +546,56 @@ sequenceDiagram
     participant R as Redis<br/>(MFA Session)
     participant D as Database<br/>(PostgreSQL)
 
-    Note over U,D: Phase 1: Password Verification
+    Note over U,D: 階段 1：密碼驗證
     U->>C: POST /admin/auth/login<br/>{username, password}
     C->>S: login(username, password)
-    S->>D: Query user + verify password
-    D-->>S: User data + mfa_enabled = true
+    S->>D: 查詢使用者 + 驗證密碼
+    D-->>S: 使用者資料 + mfa_enabled = true
 
-    alt MFA Enabled
-        S->>R: Create MFA Session<br/>Key: mfa:session:{userId}<br/>TTL: 5 minutes
+    alt MFA 已啟用
+        S->>R: 建立 MFA Session<br/>Key: mfa:session:{userId}<br/>TTL: 5 minutes
         R-->>S: Session Token
-        S-->>C: Return needMfa = true<br/>+ mfaSessionToken
+        S-->>C: 返回 needMfa = true<br/>+ mfaSessionToken
         C-->>U: HTTP 200<br/>{needMfa: true, mfaSessionToken}
 
-        Note over U: User opens Google Authenticator<br/>Enters 6-digit code
+        Note over U: 使用者開啟 Google Authenticator<br/>輸入 6 位數驗證碼
 
-        Note over U,D: Phase 2: MFA Verification
+        Note over U,D: 階段 2：MFA 驗證
         U->>C: POST /admin/auth/mfa/verify<br/>{mfaSessionToken, totpCode}
         C->>M: verifyTotp(mfaSessionToken, totpCode)
-        M->>R: Check session validity
+        M->>R: 檢查 session 有效性
         R-->>M: userId = 12345
-        M->>D: Get encrypted TOTP Secret
+        M->>D: 取得加密的 TOTP Secret
         D-->>M: encrypted_secret
-        M->>M: Decrypt Secret<br/>Validate TOTP (+-1 window)
+        M->>M: 解密 Secret<br/>驗證 TOTP (+-1 window)
 
-        alt TOTP Verification Success
-            M->>R: Delete MFA Session
-            M->>D: Record audit log (MFA_LOGIN_SUCCESS)
-            M-->>S: Verification success + userId
-            S->>S: Issue Access Token + Refresh Token
+        alt TOTP 驗證成功
+            M->>R: 刪除 MFA Session
+            M->>D: 記錄稽核日誌 (MFA_LOGIN_SUCCESS)
+            M-->>S: 驗證成功 + userId
+            S->>S: 核發 Access Token + Refresh Token
             S-->>C: JWT Tokens
             C-->>U: HTTP 200<br/>{accessToken, refreshToken}
-        else TOTP Verification Failure
+        else TOTP 驗證失敗
             M->>R: mfa:fail:{userId} += 1<br/>TTL: 15 minutes
-            M->>D: Record audit log (MFA_LOGIN_FAILED)
+            M->>D: 記錄稽核日誌 (MFA_LOGIN_FAILED)
 
-            alt Failure count >= 3
-                M->>D: Lock account 15 minutes
-                M->>R: Send security alert
+            alt 失敗次數 >= 3
+                M->>D: 鎖定帳號 15 分鐘
+                M->>R: 發送安全警報
                 M-->>C: HTTP 429<br/>{error: "MFA_LOCKED"}
-            else Failure count < 3
+            else 失敗次數 < 3
                 M-->>C: HTTP 401<br/>{error: "INVALID_TOTP"}
             end
         end
-    else MFA Not Enabled
-        S->>S: Issue Tokens directly
+    else MFA 未啟用
+        S->>S: 直接核發 Tokens
         S-->>C: JWT Tokens
         C-->>U: HTTP 200<br/>{accessToken, refreshToken}
     end
 ```
 
-### 5.2 MFA Registration Flow
+### 5.2 MFA 註冊流程（MFA Registration Flow）
 
 ```mermaid
 sequenceDiagram
@@ -605,87 +605,87 @@ sequenceDiagram
     participant D as Database<br/>(PostgreSQL)
     participant Q as QR Service<br/>(ZXing)
 
-    Note over U: User clicks "Enable MFA"
+    Note over U: 使用者點擊「啟用 MFA」
     U->>C: POST /admin/mfa/setup/init
     C->>M: initMfaSetup(userId)
-    M->>M: Generate TOTP Secret<br/>(SecureRandom + Base32)
-    M->>Q: Generate QR Code PNG<br/>otpauth://totp/...
+    M->>M: 生成 TOTP Secret<br/>(SecureRandom + Base32)
+    M->>Q: 生成 QR Code PNG<br/>otpauth://totp/...
     Q-->>M: Base64 QR Code Image
-    M->>D: Save encrypted Secret<br/>Status = PENDING
-    D-->>M: Save successful
+    M->>D: 儲存加密 Secret<br/>Status = PENDING
+    D-->>M: 儲存成功
     M-->>C: QR Code + Secret (plaintext)
     C-->>U: HTTP 200<br/>{qrCode, secret, backupCodes}
 
-    Note over U: User scans QR Code<br/>Adds to Google Authenticator<br/>Enters first verification code
+    Note over U: 使用者掃描 QR Code<br/>加入到 Google Authenticator<br/>輸入第一次驗證碼
 
     U->>C: POST /admin/mfa/setup/verify<br/>{totpCode}
     C->>M: verifyAndActivate(userId, totpCode)
-    M->>D: Get PENDING status Secret
+    M->>D: 取得 PENDING 狀態 Secret
     D-->>M: encrypted_secret
-    M->>M: Decrypt Secret<br/>Validate TOTP
+    M->>M: 解密 Secret<br/>驗證 TOTP
 
-    alt TOTP Verification Success
-        M->>D: Update Status = ACTIVE<br/>mfa_enabled = true
-        M->>D: Record audit log (MFA_ENABLED)
-        M-->>C: Activation successful
+    alt TOTP 驗證成功
+        M->>D: 更新 Status = ACTIVE<br/>mfa_enabled = true
+        M->>D: 記錄稽核日誌 (MFA_ENABLED)
+        M-->>C: 啟用成功
         C-->>U: HTTP 200<br/>{success: true}
 
-        Note over U: Show success message<br/>Download backup codes
-    else TOTP Verification Failure
+        Note over U: 顯示成功訊息<br/>下載備用碼
+    else TOTP 驗證失敗
         M-->>C: HTTP 401<br/>{error: "INVALID_TOTP"}
-        C-->>U: Prompt to retry
+        C-->>U: 提示重試
     end
 ```
 
-### 5.3 Backup Code Login Flow
+### 5.3 備用碼登入流程（Backup Code Login Flow）
 
 ```mermaid
 sequenceDiagram
-    participant U as User
+    participant U as 使用者
     participant C as Controller
     participant M as MfaManager
     participant D as Database
 
     U->>C: POST /admin/auth/mfa/verify<br/>{backupCode: "1234-5678"}
     C->>M: verifyBackupCode(userId, code)
-    M->>D: Query backup code list (decrypt)
-    D-->>M: JSON backup code array
+    M->>D: 查詢備用碼清單（解密）
+    D-->>M: JSON 備用碼陣列
 
-    M->>M: Iterate and check backup code match
+    M->>M: 迭代檢查備用碼是否匹配
 
-    alt Backup code valid and unused
-        M->>D: Mark backup code as used<br/>used = true
-        M->>D: Record audit log (BACKUP_CODE_USED)
+    alt 備用碼有效且未使用
+        M->>D: 標記備用碼為已使用<br/>used = true
+        M->>D: 記錄稽核日誌 (BACKUP_CODE_USED)
 
-        alt Remaining codes <= 2
-            M->>U: WARNING: Only X codes remaining<br/>Recommend regeneration
+        alt 剩餘備用碼 <= 2
+            M->>U: 警告：僅剩 X 個備用碼<br/>建議重新生成
         end
 
-        M-->>C: Verification success
-        C-->>U: Issue Tokens
-    else Backup code invalid or already used
-        M->>D: Record audit log (BACKUP_CODE_INVALID)
+        M-->>C: 驗證成功
+        C-->>U: 核發 Tokens
+    else 備用碼無效或已使用
+        M->>D: 記錄稽核日誌 (BACKUP_CODE_INVALID)
         M-->>C: HTTP 401<br/>{error: "INVALID_BACKUP_CODE"}
     end
 ```
 
-### 5.4 Trust Device Flow
+### 5.4 信任裝置流程（Trust Device Flow）
 
 ```mermaid
 graph TD
-    A[User Login] --> B{Password Verification}
-    B -->|PASS| C{Check Device Trusted}
-    B -->|FAIL| Z[Return Error]
+    A[使用者登入] --> B{密碼驗證}
+    B -->|通過| C{檢查裝置是否受信任}
+    B -->|失敗| Z[返回錯誤]
 
-    C -->|Yes| D[Skip MFA, Issue Token Directly]
-    C -->|No| E{MFA Enabled?}
+    C -->|是| D[跳過 MFA，直接核發 Token]
+    C -->|否| E{MFA 已啟用?}
 
-    E -->|Yes| F[Require MFA Verification]
-    E -->|No| D
+    E -->|是| F[要求 MFA 驗證]
+    E -->|否| D
 
-    F --> G{User Selects "Trust Device"?}
-    G -->|Yes| H[Generate Device Trust Token<br/>Store to Redis<br/>TTL = 30 days]
-    G -->|No| I[No trust info stored]
+    F --> G{使用者選擇「信任裝置」?}
+    G -->|是| H[生成裝置信任 Token<br/>儲存到 Redis<br/>TTL = 30 天]
+    G -->|否| I[不儲存信任資訊]
 
     H --> J[Set-Cookie: device_trust_token<br/>HttpOnly + Secure + SameSite=Strict]
     I --> J
@@ -694,9 +694,9 @@ graph TD
 
 ---
 
-## 6. Code Examples
+## 6. 程式碼範例（Code Examples）
 
-### 6.1 QR Code Generation (ZXing)
+### 6.1 QR Code 生成（QR Code Generation）（ZXing）
 
 ```java
 import com.google.zxing.BarcodeFormat;
@@ -746,7 +746,7 @@ public class QrCodeGenerator {
 }
 ```
 
-### 6.2 Backup Code Generator
+### 6.2 備用碼生成器（Backup Code Generator）
 
 ```java
 import java.security.SecureRandom;
@@ -784,7 +784,7 @@ public class BackupCodeGenerator {
 }
 ```
 
-### 6.3 MFA Setup Service
+### 6.3 MFA 設定服務（MFA Setup Service）
 
 ```java
 import org.springframework.stereotype.Component;
@@ -915,7 +915,7 @@ public class MfaSetupService {
 }
 ```
 
-### 6.4 MFA Policy Service
+### 6.4 MFA 策略服務（MFA Policy Service）
 
 ```java
 @Service
@@ -967,7 +967,7 @@ public class MfaPolicyService {
 }
 ```
 
-### 6.5 Device Fingerprint (JavaScript)
+### 6.5 裝置指紋（Device Fingerprint）（JavaScript）
 
 ```javascript
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
@@ -996,9 +996,9 @@ const response = await fetch('/admin/auth/login', {
 
 ---
 
-## 7. Anomaly Detection Rules (SQL)
+## 7. 異常偵測規則（Anomaly Detection Rules）（SQL）
 
-### 7.1 Multiple MFA Failures in Short Time
+### 7.1 短時間內多次 MFA 失敗（Multiple MFA Failures in Short Time）
 
 ```sql
 -- Detection: >= 3 MFA failures in 5 minutes
@@ -1013,7 +1013,7 @@ GROUP BY user_id
 HAVING COUNT(*) >= 3;
 ```
 
-### 7.2 Geographic Anomaly Detection
+### 7.2 地理位置異常偵測（Geographic Anomaly Detection）
 
 ```sql
 -- Detection: Login from different countries within 1 hour
@@ -1032,7 +1032,7 @@ WHERE a.event_type = 'MFA_LOGIN_SUCCESS'
   AND get_country(a.ip_address) != get_country(b.ip_address);
 ```
 
-### 7.3 Frequent Backup Code Usage
+### 7.3 頻繁使用備用碼（Frequent Backup Code Usage）
 
 ```sql
 -- Detection: >= 3 backup code uses in 7 days
@@ -1046,7 +1046,7 @@ GROUP BY user_id
 HAVING COUNT(*) >= 3;
 ```
 
-### 7.4 High-Risk MFA Disabled
+### 7.4 高風險 MFA 停用（High-Risk MFA Disabled）
 
 ```sql
 -- Detection: MFA disabled for high-risk roles
@@ -1063,7 +1063,7 @@ WHERE l.event_type = 'MFA_DISABLED'
 
 ---
 
-## 8. Integration Tests
+## 8. 整合測試（Integration Tests）
 
 ```java
 @SpringBootTest
@@ -1127,30 +1127,30 @@ class MfaIntegrationTest {
 
 ---
 
-## 9. Error Codes
+## 9. 錯誤碼（Error Codes）
 
-| Error Code | HTTP Status | Description | Resolution |
+| 錯誤碼 | HTTP 狀態 | 說明 | 解決方案 |
 |------------|-------------|-------------|------------|
-| `INVALID_MFA_SESSION` | 401 | MFA Session Token expired or invalid | Re-execute Phase 1 (password login) |
-| `INVALID_TOTP` | 401 | TOTP verification code incorrect | Prompt user to retry (show remaining attempts) |
-| `MFA_LOCKED` | 429 | Account locked after 3 failures | Display unlock countdown (15 minutes) |
-| `MFA_NOT_ENABLED` | 400 | User called verify without MFA enabled | Guide user to enable MFA |
-| `TIME_SYNC_ERROR` | 500 | Server time not synced with NTP | Trigger ops alert, restart NTP service |
+| `INVALID_MFA_SESSION` | 401 | MFA Session Token 過期或無效 | 重新執行階段 1（密碼登入） |
+| `INVALID_TOTP` | 401 | TOTP 驗證碼錯誤 | 提示使用者重試（顯示剩餘嘗試次數） |
+| `MFA_LOCKED` | 429 | 3 次失敗後帳號鎖定 | 顯示解鎖倒數計時（15 分鐘） |
+| `MFA_NOT_ENABLED` | 400 | 使用者未啟用 MFA 卻呼叫驗證 | 引導使用者啟用 MFA |
+| `TIME_SYNC_ERROR` | 500 | 伺服器時間未與 NTP 同步 | 觸發維運警報，重啟 NTP 服務 |
 
 ---
 
-## 10. Technology Stack
+## 10. 技術堆疊（Technology Stack）
 
-| Component | Technology | Version |
+| 元件 | 技術 | 版本 |
 |-----------|------------|---------|
-| TOTP Algorithm | RFC 6238 (HMAC-SHA1) | - |
-| QR Code Generation | ZXing | 3.5.x |
-| Secret Encryption | AES-256-GCM | - |
-| Key Management | AWS KMS / HashiCorp Vault | - |
-| Device Fingerprint | FingerprintJS | 4.x |
-| Session Storage | Redis | 7.x |
-| Database | PostgreSQL | 16.x |
+| TOTP 演算法 | RFC 6238 (HMAC-SHA1) | - |
+| QR Code 生成 | ZXing | 3.5.x |
+| 密鑰加密 | AES-256-GCM | - |
+| 密鑰管理 | AWS KMS / HashiCorp Vault | - |
+| 裝置指紋 | FingerprintJS | 4.x |
+| Session 儲存 | Redis | 7.x |
+| 資料庫 | PostgreSQL | 16.x |
 
 ---
 
-**End of Document**
+**文件結束**

@@ -1,26 +1,26 @@
-# MFA Compliance and Audit Technical Implementation
+# MFA 合規與審計技術實現（MFA Compliance and Audit Technical Implementation）
 
-> **Business Requirements**: [MFA_Compliance_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
-> **Audience**: Compliance Officers, Security Engineers, Backend Developers
-> **Last Synced**: 2026-02-09
+> **業務需求**: [MFA_Compliance_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md)
+> **目標讀者**: 合規官、安全工程師、後端開發人員
+> **最後同步**: 2026-02-09
 
 ---
 
-## 1. Backup Code Storage and Encryption
+## 1. 備份碼儲存與加密（Backup Code Storage and Encryption）
 
-### 1.1 AES-256-GCM Encryption
+### 1.1 AES-256-GCM 加密（AES-256-GCM Encryption）
 
-**Algorithm**: AES-256-GCM (Galois/Counter Mode)
-**Key Size**: 256 bits
-**IV Size**: 96 bits (12 bytes)
-**Tag Size**: 128 bits (16 bytes)
+**演算法**: AES-256-GCM (Galois/Counter Mode)
+**金鑰大小**: 256 bits
+**初始向量大小**: 96 bits (12 bytes)
+**標籤大小**: 128 bits (16 bytes)
 
-**Why Encrypt Backup Codes**:
-- Backup codes are as sensitive as passwords
-- If stolen, attacker can bypass MFA
-- Encryption prevents theft even if database is compromised
+**為何需要加密備份碼**:
+- 備份碼與密碼同等敏感
+- 若被竊取,攻擊者可繞過 MFA
+- 加密可防止資料庫被入侵時備份碼洩露
 
-### 1.2 Backup Code Encryptor Implementation
+### 1.2 備份碼加密器實現（Backup Code Encryptor Implementation）
 
 ```java
 @Component
@@ -130,7 +130,7 @@ public class BackupCodeEncryptor {
 }
 ```
 
-### 1.3 Database Storage Schema
+### 1.3 資料庫儲存架構（Database Storage Schema）
 
 ```sql
 CREATE TABLE t_mfa_backup_code (
@@ -150,22 +150,22 @@ CREATE INDEX idx_backup_code_user_id ON t_mfa_backup_code(user_id) WHERE used = 
 
 ---
 
-## 2. Identity Document Upload (Account Recovery)
+## 2. 身份證件上傳（帳戶恢復）（Identity Document Upload - Account Recovery）
 
-### 2.1 Document Upload Flow
+### 2.1 證件上傳流程（Document Upload Flow）
 
-**Supported Document Types**:
-- Passport
-- Driver's License
-- National ID Card
-- Utility Bill (proof of address)
+**支援的證件類型**:
+- 護照（Passport）
+- 駕照（Driver's License）
+- 國民身份證（National ID Card）
+- 水電帳單（地址證明）（Utility Bill - proof of address）
 
-**File Format**:
-- Accepted: JPG, PNG, PDF
-- Max Size: 10 MB
-- Resolution: Minimum 1200 x 900 pixels
+**檔案格式**:
+- 接受格式: JPG, PNG, PDF
+- 最大大小: 10 MB
+- 解析度: 最小 1200 x 900 像素
 
-### 2.2 S3 Upload Implementation
+### 2.2 S3 上傳實現（S3 Upload Implementation）
 
 ```java
 /**
@@ -314,7 +314,7 @@ public class IdentityDocumentService {
 }
 ```
 
-### 2.3 Document Verification Workflow
+### 2.3 證件驗證工作流程（Document Verification Workflow）
 
 ```java
 /**
@@ -388,11 +388,11 @@ public class DocumentVerificationService {
 
 ---
 
-## 3. Audit Log Implementation
+## 3. 審計日誌實現（Audit Log Implementation）
 
-### 3.1 JSONB Storage (PostgreSQL)
+### 3.1 JSONB 儲存（PostgreSQL）
 
-**Database Schema**:
+**資料庫架構**:
 
 ```sql
 CREATE TABLE t_mfa_audit_log (
@@ -419,21 +419,21 @@ CREATE INDEX idx_mfa_audit_log_created_at ON t_mfa_audit_log(created_at DESC);
 CREATE INDEX idx_mfa_audit_log_event_data ON t_mfa_audit_log USING GIN (event_data);
 ```
 
-### 3.2 Audit Event Types
+### 3.2 審計事件類型（Audit Event Types）
 
-| Event Type | Description | Retention Period |
-|-----------|-------------|------------------|
-| MFA_ENABLED | User enabled MFA | Permanent |
-| MFA_DISABLED | User disabled MFA | Permanent |
-| MFA_LOGIN_SUCCESS | Successful MFA verification | 90 days |
-| MFA_LOGIN_FAILED | Failed MFA verification | 90 days |
-| MFA_ACCOUNT_LOCKED | Account locked after 3 failed attempts | 365 days |
-| MFA_BACKUP_CODE_USED | Backup code used for login | 365 days |
-| MFA_TRUSTED_DEVICE_ADDED | New trusted device added | 90 days |
-| MFA_RECOVERY_INITIATED | Account recovery initiated | 365 days |
-| MFA_SECURITY_ALERT | Suspicious activity detected | 365 days |
+| 事件類型 | 描述 | 保留期限 |
+|---------|------|---------|
+| MFA_ENABLED | 使用者啟用 MFA | 永久保留 |
+| MFA_DISABLED | 使用者停用 MFA | 永久保留 |
+| MFA_LOGIN_SUCCESS | MFA 驗證成功 | 90 天 |
+| MFA_LOGIN_FAILED | MFA 驗證失敗 | 90 天 |
+| MFA_ACCOUNT_LOCKED | 3 次失敗後帳戶鎖定 | 365 天 |
+| MFA_BACKUP_CODE_USED | 使用備份碼登入 | 365 天 |
+| MFA_TRUSTED_DEVICE_ADDED | 新增受信任裝置 | 90 天 |
+| MFA_RECOVERY_INITIATED | 啟動帳戶恢復 | 365 天 |
+| MFA_SECURITY_ALERT | 偵測到可疑活動 | 365 天 |
 
-### 3.3 Audit Logger Implementation
+### 3.3 審計記錄器實現（Audit Logger Implementation）
 
 ```java
 @Service
@@ -504,7 +504,7 @@ public class MFAAuditLogger {
 }
 ```
 
-### 3.4 Kafka Configuration
+### 3.4 Kafka 配置（Kafka Configuration）
 
 **application.yml**:
 
@@ -523,9 +523,9 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 ```
 
-### 3.5 Example Audit Log Entries
+### 3.5 審計日誌條目範例（Example Audit Log Entries）
 
-**MFA Login Success**:
+**MFA 登入成功**:
 ```json
 {
   "userId": 12345,
@@ -542,7 +542,7 @@ spring:
 }
 ```
 
-**MFA Account Locked**:
+**MFA 帳戶鎖定**:
 ```json
 {
   "userId": 12345,
@@ -565,27 +565,27 @@ spring:
 
 ---
 
-## 4. Anomaly Detection Implementation
+## 4. 異常偵測實現（Anomaly Detection Implementation）
 
-### 4.1 Detection Rules
+### 4.1 偵測規則（Detection Rules）
 
-**Rule 1: Multiple Failed Attempts from New IP**
-- Trigger: ≥ 2 failed MFA attempts from an IP address never seen before
-- Action: Send security alert + require email verification
+**規則 1: 新 IP 地址多次失敗嘗試**
+- 觸發條件: 從未見過的 IP 地址進行 ≥ 2 次 MFA 失敗嘗試
+- 處理動作: 發送安全警報 + 要求電子郵件驗證
 
-**Rule 2: Geographic Anomaly**
-- Trigger: Successful MFA login from country different from user's typical location
-- Action: Send security alert + optional account freeze
+**規則 2: 地理位置異常**
+- 觸發條件: 從與使用者慣用地點不同的國家成功 MFA 登入
+- 處理動作: 發送安全警報 + 可選帳戶凍結
 
-**Rule 3: Excessive Backup Code Usage**
-- Trigger: > 3 backup codes used within 7 days
-- Action: Force MFA device re-registration
+**規則 3: 備份碼過度使用**
+- 觸發條件: 7 天內使用 > 3 個備份碼
+- 處理動作: 強制 MFA 裝置重新註冊
 
-**Rule 4: Trusted Device Token Reuse**
-- Trigger: Same trusted device token used from different IP addresses
-- Action: Invalidate trusted device token + send security alert
+**規則 4: 受信任裝置權杖重複使用**
+- 觸發條件: 同一受信任裝置權杖從不同 IP 地址使用
+- 處理動作: 撤銷受信任裝置權杖 + 發送安全警報
 
-### 4.2 Anomaly Detector Implementation
+### 4.2 異常偵測器實現（Anomaly Detector Implementation）
 
 ```java
 @Service
@@ -747,11 +747,11 @@ public class MFAAnomalyDetector {
 
 ---
 
-## 5. MFA Enforcement Policy
+## 5. MFA 強制執行策略（MFA Enforcement Policy）
 
-### 5.1 Role-Based Configuration
+### 5.1 基於角色的配置（Role-Based Configuration）
 
-**Database Schema**:
+**資料庫架構**:
 
 ```sql
 CREATE TABLE t_role_mfa_config (
@@ -774,7 +774,7 @@ INSERT INTO t_role_mfa_config (role_code, mfa_mandatory, allowed_methods, grace_
 ('MARKETING', FALSE, ARRAY['TOTP', 'SMS'], 0);
 ```
 
-### 5.2 MFAEnforcementService Implementation
+### 5.2 MFAEnforcementService 實現（MFAEnforcementService Implementation）
 
 ```java
 @Service
@@ -849,144 +849,144 @@ public class MFAEnforcementService {
 
 ---
 
-## 6. MFA Challenge-Response Flow
+## 6. MFA 挑戰-回應流程（MFA Challenge-Response Flow）
 
-### 6.1 End-to-End MFA Verification Sequence
+### 6.1 端到端 MFA 驗證序列（End-to-End MFA Verification Sequence）
 
-The following diagram illustrates the complete MFA challenge-response flow from initial login to successful authentication:
+以下圖表說明從初始登入到成功驗證的完整 MFA 挑戰-回應流程:
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant F as Frontend
+    participant U as 使用者
+    participant F as 前端
     participant A as Auth Controller
     participant M as MFA Service
     participant L as MFA Audit Logger
     participant DB as PostgreSQL
 
-    Note over U,DB: Phase 1: Primary Authentication
-    U->>F: Login with username + password
+    Note over U,DB: 階段 1: 主要驗證
+    U->>F: 使用帳號 + 密碼登入
     F->>A: POST /api/auth/login
-    A->>A: Verify credentials
+    A->>A: 驗證憑證
 
-    alt Credentials Invalid
+    alt 憑證無效
         A-->>F: 401 Unauthorized
-        F-->>U: Display error
+        F-->>U: 顯示錯誤
     end
 
-    Note over U,DB: Phase 2: MFA Challenge
+    Note over U,DB: 階段 2: MFA 挑戰
     A->>M: checkMFARequired(userId)
     M->>DB: SELECT * FROM t_user_mfa WHERE user_id = ?
-    DB-->>M: MFA config (enabled, method)
+    DB-->>M: MFA 配置 (enabled, method)
 
-    alt MFA Required
+    alt 需要 MFA
         M->>A: MFA Required: TOTP
         A-->>F: 200 OK + requiresMFA: true + sessionToken
-        F-->>U: Display MFA input form
+        F-->>U: 顯示 MFA 輸入表單
 
-        Note over U,DB: Phase 3: MFA Code Submission
-        U->>F: Enter TOTP code (6-digit)
+        Note over U,DB: 階段 3: MFA 代碼提交
+        U->>F: 輸入 TOTP 代碼 (6 位數)
         F->>A: POST /api/auth/mfa/verify<br/>{sessionToken, code}
 
         A->>M: verifyMFACode(userId, code)
         M->>DB: SELECT totp_secret FROM t_user_mfa
-        DB-->>M: Encrypted TOTP secret
-        M->>M: Decrypt secret (AES-256-GCM)
-        M->>M: Generate expected TOTP<br/>(time window ±1)
+        DB-->>M: 加密的 TOTP 密鑰
+        M->>M: 解密密鑰 (AES-256-GCM)
+        M->>M: 生成預期的 TOTP<br/>(時間窗口 ±1)
 
-        alt Code Valid
+        alt 代碼有效
             M->>L: log(MFA_LOGIN_SUCCESS)
             L->>DB: INSERT INTO t_mfa_audit_log
-            M-->>A: Verification Success
-            A->>A: Generate JWT access token
+            M-->>A: 驗證成功
+            A->>A: 生成 JWT access token
             A-->>F: 200 OK + accessToken + refreshToken
-            F-->>U: Redirect to dashboard
-        else Code Invalid
+            F-->>U: 重導向至儀表板
+        else 代碼無效
             M->>L: log(MFA_LOGIN_FAILED)
             L->>DB: INSERT INTO t_mfa_audit_log
-            M->>M: Increment failedAttempts
+            M->>M: 增加 failedAttempts
 
-            alt Failed Attempts >= 3
-                M->>M: Lock account (15 minutes)
+            alt 失敗次數 >= 3
+                M->>M: 鎖定帳戶 (15 分鐘)
                 M->>L: log(MFA_ACCOUNT_LOCKED)
-                M-->>A: Account Locked
+                M-->>A: 帳戶已鎖定
                 A-->>F: 423 Locked + lockedUntil
-                F-->>U: Account locked message
-            else Failed Attempts < 3
-                M-->>A: Invalid Code (attemptsRemaining)
+                F-->>U: 帳戶鎖定訊息
+            else 失敗次數 < 3
+                M-->>A: 代碼無效 (attemptsRemaining)
                 A-->>F: 401 Unauthorized + attemptsRemaining
-                F-->>U: Display error + retry
+                F-->>U: 顯示錯誤 + 重試
             end
         end
-    else MFA Not Required
-        A->>A: Generate JWT access token
+    else 不需要 MFA
+        A->>A: 生成 JWT access token
         A-->>F: 200 OK + accessToken
-        F-->>U: Redirect to dashboard
+        F-->>U: 重導向至儀表板
     end
 
-    Note over U,DB: Optional: Backup Code Fallback
-    U->>F: Click "Use backup code"
+    Note over U,DB: 可選: 備份碼回退
+    U->>F: 點擊「使用備份碼」
     F->>A: POST /api/auth/mfa/backup-code<br/>{sessionToken, backupCode}
     A->>M: verifyBackupCode(userId, backupCode)
     M->>DB: SELECT * FROM t_mfa_backup_code<br/>WHERE user_id = ? AND used = FALSE
-    DB-->>M: List of backup codes (encrypted)
-    M->>M: Decrypt each code (AES-256-GCM)
-    M->>M: Compare with input
+    DB-->>M: 備份碼清單 (已加密)
+    M->>M: 解密每個代碼 (AES-256-GCM)
+    M->>M: 與輸入比對
 
-    alt Backup Code Valid
+    alt 備份碼有效
         M->>DB: UPDATE t_mfa_backup_code<br/>SET used = TRUE, used_at = NOW()
         M->>L: log(MFA_BACKUP_CODE_USED)
-        M-->>A: Verification Success
+        M-->>A: 驗證成功
         A-->>F: 200 OK + accessToken
-        F-->>U: Redirect to dashboard
-    else Backup Code Invalid
+        F-->>U: 重導向至儀表板
+    else 備份碼無效
         M->>L: log(MFA_LOGIN_FAILED)
-        M-->>A: Invalid Backup Code
+        M-->>A: 備份碼無效
         A-->>F: 401 Unauthorized
-        F-->>U: Display error
+        F-->>U: 顯示錯誤
     end
 ```
 
-### 6.2 Key Security Measures
+### 6.2 關鍵安全措施（Key Security Measures）
 
-**Time-Based Window (TOTP)**:
-- Accept codes from T-30s to T+30s (±1 time step)
-- Prevents replay attacks via time-based invalidation
-- 30-second window = 3 valid codes at any time (T-1, T, T+1)
+**基於時間的窗口（TOTP）**:
+- 接受 T-30s 到 T+30s 的代碼（±1 時間步驟）
+- 透過基於時間的失效防止重放攻擊
+- 30 秒窗口 = 任何時間有 3 個有效代碼（T-1, T, T+1）
 
-**Account Lockout**:
-- 3 failed attempts → 15-minute lockout
-- Lockout duration stored in Redis (expires automatically)
-- Prevents brute-force attacks
+**帳戶鎖定**:
+- 3 次失敗嘗試 → 15 分鐘鎖定
+- 鎖定時長儲存在 Redis（自動過期）
+- 防止暴力破解攻擊
 
-**Backup Code Single-Use**:
-- Each backup code can only be used once
-- `used` flag set to TRUE in database after verification
-- User receives notification when backup code is used
+**備份碼一次性使用**:
+- 每個備份碼僅能使用一次
+- 驗證後在資料庫中將 `used` 標記設為 TRUE
+- 使用備份碼時向使用者發送通知
 
-**Audit Trail**:
-- Every MFA attempt logged to PostgreSQL + Kafka
-- JSONB storage for flexible event data
-- 90-day retention for login events, 365 days for security alerts
-
----
-
-## 7. Related Documents
-
-### Business Requirements
-- [MFA_Compliance_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md) - Backup code specs, recovery flow, audit requirements
-
-### Technical Implementation
-- [MFA_Technical_Evaluation.md](MFA_Technical_Evaluation.md) - TOTP algorithm, AES-256-GCM encryption
-- [MFA_Login_Recovery_Technical.md](MFA_Login_Recovery_Technical.md) - Two-phase login, session storage
-
-### Security Standards
-- **NIST SP 800-63B**: Digital Identity Guidelines (backup authenticators, audit requirements)
-- **GDPR Article 32**: Encryption, logging, and security measures
-- **ISO 27001 A.12.4**: Logging and monitoring
+**審計軌跡**:
+- 每次 MFA 嘗試都記錄到 PostgreSQL + Kafka
+- JSONB 儲存提供靈活的事件資料
+- 登入事件保留 90 天，安全警報保留 365 天
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-09
-**Maintainer**: Compliance Team, Security Team
+## 7. 相關文件（Related Documents）
+
+### 業務需求（Business Requirements）
+- [MFA_Compliance_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Compliance_Requirements.md) - 備份碼規格、恢復流程、審計需求
+
+### 技術實現（Technical Implementation）
+- [MFA_Technical_Evaluation.md](MFA_Technical_Evaluation.md) - TOTP 演算法、AES-256-GCM 加密
+- [MFA_Login_Recovery_Technical.md](MFA_Login_Recovery_Technical.md) - 兩階段登入、會話儲存
+
+### 安全標準（Security Standards）
+- **NIST SP 800-63B**: 數位身份指南（備份驗證器、審計需求）
+- **GDPR Article 32**: 加密、日誌記錄和安全措施
+- **ISO 27001 A.12.4**: 日誌記錄與監控
+
+---
+
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-09
+**維護者**: 合規團隊、安全團隊

@@ -1,19 +1,19 @@
-# MFA Login and Recovery Technical Implementation
+# MFA 登入與復原技術實現（MFA Login and Recovery Technical Implementation）
 
-> **Business Requirements**: [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md)
-> **Audience**: Backend Developers, Security Engineers, DevOps Engineers
-> **Last Synced**: 2026-02-09
+> **業務需求**: [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md)
+> **目標讀者**: Backend Developers, Security Engineers, DevOps Engineers
+> **最後同步**: 2026-02-09
 
 ---
 
-## 1. Two-Phase Login Flow
+## 1. 雙階段登入流程（Two-Phase Login Flow）
 
-### 1.1 Sequence Diagram
+### 1.1 序列圖（Sequence Diagram）
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Frontend
+    participant User as 使用者
+    participant Frontend as 前端
     participant LoginAPI as LoginController
     participant MFAService
     participant Redis
@@ -21,47 +21,47 @@ sequenceDiagram
     participant TokenService
     participant DB as PostgreSQL
 
-    Note over User,DB: Phase 1: Password Verification
+    Note over User,DB: 階段 1: 密碼驗證
 
-    User->>Frontend: Enter username + password
+    User->>Frontend: 輸入使用者名稱 + 密碼
     Frontend->>LoginAPI: POST /api/auth/login<br/>(username, password)
     LoginAPI->>UserService: validatePassword(username, password)
     UserService->>DB: SELECT * FROM t_user WHERE username = ?
     DB-->>UserService: User record
     UserService->>UserService: BCrypt.checkpw(password, hashedPassword)
-    UserService-->>LoginAPI: Password valid
+    UserService-->>LoginAPI: 密碼有效
 
-    LoginAPI->>LoginAPI: Check if MFA enabled
-    alt MFA Enabled
+    LoginAPI->>LoginAPI: 檢查是否啟用 MFA
+    alt MFA 已啟用
         LoginAPI->>MFAService: createMFASession(userId)
-        MFAService->>MFAService: Generate sessionToken (UUID)
-        MFAService->>Redis: SET mfa:session:token<br/>TTL 300s (5 min)
+        MFAService->>MFAService: 產生 sessionToken (UUID)
+        MFAService->>Redis: SET mfa:session:token<br/>TTL 300s (5 分鐘)
         Redis-->>MFAService: OK
         MFAService-->>LoginAPI: MFASession(sessionToken)
         LoginAPI-->>Frontend: HTTP 200 { requireMFA: true, mfaSessionToken }
 
-        Note over User,DB: Phase 2: MFA Verification
+        Note over User,DB: 階段 2: MFA 驗證
 
-        User->>Frontend: Enter 6-digit TOTP code
+        User->>Frontend: 輸入 6 位數 TOTP 驗證碼
         Frontend->>LoginAPI: POST /api/auth/mfa/verify<br/>(mfaSessionToken, totpCode)
         LoginAPI->>Redis: GET mfa:session:token
         Redis-->>LoginAPI: MFASession(userId, createdAt)
 
-        alt Session Expired
+        alt Session 已過期
             LoginAPI-->>Frontend: HTTP 401 { error: "MFA_SESSION_EXPIRED" }
         end
 
         LoginAPI->>MFAService: verifyTOTP(userId, totpCode)
         MFAService->>DB: SELECT encrypted_secret FROM t_user_mfa WHERE user_id = ?
-        DB-->>MFAService: Encrypted TOTP secret
-        MFAService->>MFAService: Decrypt secret (AES-256-GCM)
+        DB-->>MFAService: 加密的 TOTP 密鑰
+        MFAService->>MFAService: 解密密鑰 (AES-256-GCM)
         MFAService->>MFAService: TOTPGenerator.verify(secret, code)
 
-        alt TOTP Invalid
-            MFAService-->>LoginAPI: TOTP verification failed
+        alt TOTP 無效
+            MFAService-->>LoginAPI: TOTP 驗證失敗
             LoginAPI->>Redis: INCR mfa:failed:userId
-            LoginAPI->>Redis: Check failed count >= 3
-            alt Account Locked
+            LoginAPI->>Redis: 檢查失敗次數 >= 3
+            alt 帳號已鎖定
                 LoginAPI->>DB: UPDATE t_user SET locked_until = NOW() + INTERVAL '15 minutes'
                 LoginAPI-->>Frontend: HTTP 423 { error: "MFA_ACCOUNT_LOCKED" }
             else
@@ -69,21 +69,21 @@ sequenceDiagram
             end
         end
 
-        MFAService-->>LoginAPI: TOTP valid
-        LoginAPI->>Redis: DEL mfa:session:token (consume session)
-        LoginAPI->>Redis: DEL mfa:failed:userId (reset counter)
+        MFAService-->>LoginAPI: TOTP 有效
+        LoginAPI->>Redis: DEL mfa:session:token (消耗 session)
+        LoginAPI->>Redis: DEL mfa:failed:userId (重置計數器)
 
         LoginAPI->>TokenService: generateTokens(userId)
         TokenService-->>LoginAPI: AccessToken + RefreshToken
 
-        alt Trust Device Requested
+        alt 請求信任裝置
             LoginAPI->>MFAService: createTrustedDeviceToken(userId, deviceFingerprint, ip, userAgent)
-            MFAService-->>LoginAPI: Trusted device cookie (30 days)
+            MFAService-->>LoginAPI: 信任裝置 cookie (30 天)
         end
 
         LoginAPI-->>Frontend: HTTP 200 { accessToken, refreshToken, trustedDeviceCookie }
 
-    else MFA Not Enabled
+    else MFA 未啟用
         LoginAPI->>TokenService: generateTokens(userId)
         TokenService-->>LoginAPI: AccessToken + RefreshToken
         LoginAPI-->>Frontend: HTTP 200 { accessToken, refreshToken }
@@ -92,16 +92,16 @@ sequenceDiagram
 
 ---
 
-## 2. MFA Session Storage (Redis)
+## 2. MFA Session 儲存（MFA Session Storage）（Redis）
 
-### 2.1 Session Data Structure
+### 2.1 Session 資料結構（Session Data Structure）
 
-**Redis Key Format**:
+**Redis Key 格式**:
 ```
 mfa:session:{sessionToken}
 ```
 
-**Value (JSON)**:
+**值 (JSON)**:
 ```json
 {
   "userId": 12345,
@@ -112,9 +112,9 @@ mfa:session:{sessionToken}
 }
 ```
 
-**TTL**: 300 seconds (5 minutes)
+**TTL**: 300 秒 (5 分鐘)
 
-### 2.2 MFASessionService Implementation
+### 2.2 MFASessionService 實現（MFASessionService Implementation）
 
 ```java
 @Service
@@ -202,15 +202,15 @@ public class MFASessionService {
 }
 ```
 
-### 2.3 Failed Attempt Tracking
+### 2.3 失敗嘗試追蹤（Failed Attempt Tracking）
 
-**Redis Key Format**:
+**Redis Key 格式**:
 ```
 mfa:failed:{userId}
 ```
 
-**Value**: Integer (failed attempt count)
-**TTL**: 15 minutes (auto-unlock)
+**值**: Integer (失敗嘗試次數)
+**TTL**: 15 分鐘 (自動解鎖)
 
 ```java
 @Service
@@ -262,23 +262,23 @@ public class MFALockoutService {
 
 ---
 
-## 3. Trusted Device Token
+## 3. 信任裝置 Token（Trusted Device Token）
 
-### 3.1 Token Generation (SHA256)
+### 3.1 Token 產生（Token Generation）（SHA256）
 
-**Token Composition**:
+**Token 組成**:
 ```
 TrustedDeviceToken = SHA256(userId + deviceFingerprint + ipAddress + userAgent + secret)
 ```
 
-**Cookie Name**: `trusted_device`
-**Attributes**:
-- `HttpOnly`: true (prevent JavaScript access)
-- `Secure`: true (HTTPS only)
-- `SameSite`: Strict (CSRF protection)
-- `Max-Age`: 2592000 seconds (30 days)
+**Cookie 名稱**: `trusted_device`
+**屬性**:
+- `HttpOnly`: true (防止 JavaScript 存取)
+- `Secure`: true (僅 HTTPS)
+- `SameSite`: Strict (CSRF 防護)
+- `Max-Age`: 2592000 秒 (30 天)
 
-### 3.2 TrustedDeviceService Implementation
+### 3.2 TrustedDeviceService 實現（TrustedDeviceService Implementation）
 
 ```java
 @Service
@@ -408,7 +408,7 @@ public class TrustedDeviceService {
 }
 ```
 
-### 3.3 Database Schema
+### 3.3 資料庫架構（Database Schema）
 
 ```sql
 CREATE TABLE t_trusted_device (
@@ -434,25 +434,25 @@ CREATE INDEX idx_trusted_device_token ON t_trusted_device(token) WHERE deleted =
 
 ---
 
-## 4. TOTP QR Code Generation
+## 4. TOTP QR Code 產生（TOTP QR Code Generation）
 
-### 4.1 QR Code Encoding
+### 4.1 QR Code 編碼（QR Code Encoding）
 
-**QR Code Content** (otpauth URI format):
+**QR Code 內容** (otpauth URI 格式):
 ```
 otpauth://totp/SmartAdmin:john.doe@example.com?secret=JBSWY3DPEHPK3PXP&issuer=SmartAdmin&algorithm=SHA1&digits=6&period=30
 ```
 
-**URI Components**:
-- `totp`: TOTP protocol
-- `SmartAdmin`: Issuer name
-- `john.doe@example.com`: Account name (email or username)
-- `secret`: Base32-encoded TOTP secret
-- `algorithm`: Hash algorithm (SHA1, SHA256, or SHA512)
-- `digits`: Code length (6 or 8)
-- `period`: Time step in seconds (30)
+**URI 組成**:
+- `totp`: TOTP 協議
+- `SmartAdmin`: 發行者名稱
+- `john.doe@example.com`: 帳號名稱 (電子郵件或使用者名稱)
+- `secret`: Base32 編碼的 TOTP 密鑰
+- `algorithm`: 雜湊演算法 (SHA1, SHA256, 或 SHA512)
+- `digits`: 驗證碼長度 (6 或 8)
+- `period`: 時間步長（秒） (30)
 
-### 4.2 QRCodeService Implementation
+### 4.2 QRCodeService 實現（QRCodeService Implementation）
 
 ```java
 @Service
@@ -527,7 +527,7 @@ public class MFAQRCodeService {
 }
 ```
 
-### 4.3 MFA Setup Flow
+### 4.3 MFA 設定流程（MFA Setup Flow）
 
 ```java
 /**
@@ -717,11 +717,11 @@ public class MFASetupController {
 
 ---
 
-## 5. Backup Code Implementation
+## 5. 備用碼實現（Backup Code Implementation）
 
-### 5.1 Backup Code Storage
+### 5.1 備用碼儲存（Backup Code Storage）
 
-**Database Schema**:
+**資料庫架構**:
 
 ```sql
 CREATE TABLE t_mfa_backup_code (
@@ -737,7 +737,7 @@ CREATE TABLE t_mfa_backup_code (
 CREATE INDEX idx_backup_code_user_id ON t_mfa_backup_code(user_id);
 ```
 
-### 5.2 BackupCodeService Implementation
+### 5.2 BackupCodeService 實現（BackupCodeService Implementation）
 
 ```java
 /**
@@ -866,11 +866,11 @@ public class MFABackupCodeService {
 
 ---
 
-## 6. Device Fingerprinting
+## 6. 裝置指紋（Device Fingerprinting）
 
-### 6.1 FingerprintJS Integration
+### 6.1 FingerprintJS 整合（FingerprintJS Integration）
 
-**Frontend Implementation** (using FingerprintJS):
+**前端實現** (使用 FingerprintJS):
 
 ```javascript
 // Install: npm install @fingerprintjs/fingerprintjs
@@ -899,7 +899,7 @@ async function handleLogin(username, password, trustDevice) {
 }
 ```
 
-### 6.2 Device Fingerprint Validation
+### 6.2 裝置指紋驗證（Device Fingerprint Validation）
 
 ```java
 @Service
@@ -924,9 +924,9 @@ public class DeviceFingerprintValidator {
 
 ---
 
-## 7. Configuration Reference
+## 7. 配置參考（Configuration Reference）
 
-### 7.1 Redis Configuration
+### 7.1 Redis 配置（Redis Configuration）
 
 **application.yml**:
 
@@ -954,7 +954,7 @@ mfa:
     max-age-days: 30
 ```
 
-### 7.2 Cookie Security Configuration
+### 7.2 Cookie 安全配置（Cookie Security Configuration）
 
 **Spring Security Cookie Configuration**:
 
@@ -977,22 +977,22 @@ public class CookieSecurityConfig {
 
 ---
 
-## 8. Related Documents
+## 8. 相關文件（Related Documents）
 
-### Business Requirements
-- [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md) - MFA session rules, trusted device policy, lockout rules
+### 業務需求（Business Requirements）
+- [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/MFA_Recovery_Requirements.md) - MFA session 規則、信任裝置政策、鎖定規則
 
-### Technical Implementation
-- [MFA_Technical_Evaluation.md](MFA_Technical_Evaluation.md) - TOTP algorithm, secret encryption, security analysis
-- [MFA_Compliance_Technical.md](MFA_Compliance_Technical.md) - Audit logs, compliance validation
+### 技術實現（Technical Implementation）
+- [MFA_Technical_Evaluation.md](MFA_Technical_Evaluation.md) - TOTP 演算法、密鑰加密、安全分析
+- [MFA_Compliance_Technical.md](MFA_Compliance_Technical.md) - 審計日誌、合規驗證
 
-### Security Standards
-- **RFC 6238**: TOTP Specification
+### 安全標準（Security Standards）
+- **RFC 6238**: TOTP 規範
 - **OWASP Session Management Cheat Sheet**
 - **SameSite Cookie Specification**
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-09
-**Maintainer**: Security Team, Backend Team
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-09
+**維護者**: Security Team, Backend Team
