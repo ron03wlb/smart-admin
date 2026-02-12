@@ -2,8 +2,8 @@
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
 > **Current Phase**: Phase 9 - Traditional Chinese Translation
-> **Total Iterations**: 116 (Phase 6: 6, Phase 7-8: 98, Phase 9: 12)
-> **Status**: Phase 9B IN PROGRESS — Batch 20 complete (5 files translated)
+> **Total Iterations**: 117 (Phase 6: 6, Phase 7-8: 98, Phase 9: 13)
+> **Status**: Phase 9B IN PROGRESS — Batch 20-21 complete (10 files translated)
 
 ---
 
@@ -407,12 +407,12 @@ Priority: Architecture files contain technical design suited for Chinese develop
 - [x] architecture/04_Activity_Engine/Activity_Risk_System.md (活動風控系統架構)
 - [x] architecture/04_Activity_Engine/Bonus_Calculation_Engine.md (metadata 標準化)
 
-#### Batch 21 — Activity Engine (2 files) + Risk Engine (3 files)
-- [ ] architecture/04_Activity_Engine/Promotion_Implementation.md
-- [ ] architecture/04_Activity_Engine/README.md
-- [ ] architecture/05_Risk_Engine/Affordability_Implementation.md
-- [ ] architecture/05_Risk_Engine/Detection_Model_Implementation.md
-- [ ] architecture/05_Risk_Engine/Fraud_Detection_System.md
+#### Batch 21 — Activity Engine (2 files) + Risk Engine (3 files) ✅ COMPLETE
+- [x] architecture/04_Activity_Engine/Promotion_Implementation.md (促銷活動實作)
+- [x] architecture/04_Activity_Engine/README.md (活動引擎索引)
+- [x] architecture/05_Risk_Engine/Affordability_Implementation.md (可負擔性評估技術實作)
+- [x] architecture/05_Risk_Engine/Detection_Model_Implementation.md (偵測模型技術實作)
+- [x] architecture/05_Risk_Engine/Fraud_Detection_System.md (詐騙偵測系統架構)
 
 #### Batch 22 — Risk Engine (5 files)
 - [ ] architecture/05_Risk_Engine/KYC_Verification_API.md
@@ -557,4 +557,4 @@ bash scripts/validate-requirements-purity.sh
 ---
 
 **Last Updated**: 2026-02-12
-**Status**: Phase 9B IN PROGRESS — Batch 20 complete (Game Integration + Activity Engine, 5 files)
+**Status**: Phase 9B IN PROGRESS — Batch 20-21 complete (10 files: Game Integration + Activity Engine + Risk Engine)
