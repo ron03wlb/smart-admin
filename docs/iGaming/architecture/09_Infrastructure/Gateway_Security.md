@@ -1,8 +1,8 @@
 # 網關安全與 DDoS 防禦架構 (Gateway Security & DDoS Mitigation)
 
-> **Business Requirements**: [Compliance Standards Requirements](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
-> **Canonical Source**: [09-02-03 Security](../../source-archive/09_Technical_Infrastructure/09-02-03_Security.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: [合規標準需求](../../requirements/12_Security_Compliance/Compliance_Standards_Requirements.md)
+> **規範來源**: [09-02-03 Security](../../source-archive/09_Technical_Infrastructure/09-02-03_Security.md)
+> **目標讀者**: Technical Architecture (Development & DevOps)
 
 ---
 
@@ -291,7 +291,7 @@ services:
 
 ---
 
-## 8. SmartAdmin Implementation
+## 8. SmartAdmin 實作（SmartAdmin Implementation）
 
 ### 8.1 Security Filter Service
 
@@ -326,7 +326,7 @@ public class SecurityFilterService {
 }
 ```
 
-### 8.2 Security Event Manager
+### 8.2 安全事件 Manager（Security Event Manager）
 
 ```java
 @Component
@@ -348,7 +348,7 @@ public class SecurityEventManager {
 }
 ```
 
-### 8.3 Database Schema
+### 8.3 資料庫 Schema（Database Schema）
 
 ```sql
 -- IP whitelist configuration
@@ -384,6 +384,6 @@ CREATE INDEX idx_security_event_ip ON t_security_event(ip_address, created_at DE
 
 ## 相關文檔
 
-- [Gateway Core](./Gateway_Core.md) - 網關核心架構
-- [Gateway Rate Limiting](./Gateway_Rate_Limiting.md) - 流量控制與限流
-- [Performance Monitoring](./Performance_Monitoring.md) - 監控告警
+- [網關核心架構](./Gateway_Core.md)
+- [流量控制與限流](./Gateway_Rate_Limiting.md)
+- [效能監控與告警](./Performance_Monitoring.md)

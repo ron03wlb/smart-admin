@@ -1,8 +1,8 @@
 # 領域 API 設計 (Domain API Design)
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-03-04 Domain APIs](../../source-archive/09_Technical_Infrastructure/09-03-04_Domain_APIs.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-03-04 Domain APIs](../../source-archive/09_Technical_Infrastructure/09-03-04_Domain_APIs.md)
+> **目標讀者**: Technical Architecture (Development & DevOps)
 
 ---
 
@@ -297,7 +297,7 @@ components:
 
 ---
 
-## 5. SmartAdmin Implementation
+## 5. SmartAdmin 實作（SmartAdmin Implementation）
 
 ### 5.1 Player Controller
 
@@ -322,7 +322,7 @@ public class PlayerController {
 }
 ```
 
-### 5.2 Database Schema
+### 5.2 資料庫 Schema（Database Schema）
 
 ```sql
 -- Player management table
@@ -346,6 +346,6 @@ CREATE INDEX idx_player_tenant ON t_player(tenant_id, status);
 
 ## 相關文檔
 
-- [API Design Principles](./API_Design_Principles.md) - API 設計原則
-- [Common Patterns](./Common_Patterns.md) - 通用 API 模式
-- [Authentication Architecture](./Authentication_Architecture.md) - 認證架構
+- [API 設計原則](./API_Design_Principles.md)
+- [API 通用模式](./Common_Patterns.md)
+- [身份驗證與授權架構](./Authentication_Architecture.md)

@@ -1,8 +1,8 @@
 # 流量控制與限流架構 (Rate Limiting & Traffic Control)
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-02-02 Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-02-02 Rate Limiting](../../source-archive/09_Technical_Infrastructure/09-02-02_Rate_Limiting.md)
+> **目標讀者**: Technical Architecture (Development & DevOps)
 
 ---
 
@@ -113,12 +113,12 @@ flowchart TD
     style B4 fill:#FFCDD2
 ```
 
-| Layer | Scope | Limit | Action |
+| 層級 | 範圍 | 限制 | 處置 |
 |-------|-------|-------|--------|
-| **L1: DDoS Protection** | Per IP | 1000 req/s | Block at edge |
-| **L2: Gateway Global** | Per IP | 100 req/s | 429 + Retry-After |
-| **L3: Endpoint-Specific** | Per IP/User | Varies | 429 + Retry-After |
-| **L4: Application** | Per User | Business rules | Business error |
+| **L1: DDoS 防護** | 每 IP | 1000 req/s | 在邊緣攔截 |
+| **L2: Gateway 全域** | 每 IP | 100 req/s | 429 + Retry-After |
+| **L3: 端點級** | 每 IP/User | 依端點而異 | 429 + Retry-After |
+| **L4: 應用層** | 每 User | 業務規則 | 業務錯誤 |
 
 ---
 
@@ -228,7 +228,7 @@ circuit_breaker_trips_total{service="payment-gateway"} = 3
 
 ---
 
-## 5. SmartAdmin Implementation
+## 5. SmartAdmin 實作（SmartAdmin Implementation）
 
 ### 5.1 Rate Limit Service
 
@@ -282,7 +282,7 @@ public class RateLimitManager {
 }
 ```
 
-### 5.3 Database Schema
+### 5.3 資料庫 Schema（Database Schema）
 
 ```sql
 -- Rate limit configuration
@@ -318,6 +318,6 @@ CREATE INDEX idx_circuit_state ON t_circuit_breaker_state(state);
 
 ## 相關文檔
 
-- [Gateway Core](./Gateway_Core.md) - 網關核心架構
-- [Gateway Security](./Gateway_Security.md) - DDoS 防禦與安全
-- [Performance Monitoring](./Performance_Monitoring.md) - 監控告警
+- [網關核心架構](./Gateway_Core.md)
+- [網關安全與 DDoS 防禦](./Gateway_Security.md)
+- [效能監控與告警](./Performance_Monitoring.md)

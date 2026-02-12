@@ -1,8 +1,8 @@
 # 網關核心架構 (Gateway Core Architecture)
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
-> **View**: Technical Architecture (Development & DevOps)
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
+> **目標讀者**: Technical Architecture (Development & DevOps)
 
 ---
 
@@ -255,7 +255,7 @@ Request arrives at Cloudflare
 
 ---
 
-## 5. SmartAdmin Implementation
+## 5. SmartAdmin 實作（SmartAdmin Implementation）
 
 ### 5.1 Gateway Filter Service
 
@@ -284,7 +284,7 @@ public class GatewayFilterService {
 }
 ```
 
-### 5.2 Database Schema
+### 5.2 資料庫 Schema（Database Schema）
 
 ```sql
 -- Gateway route configuration
@@ -320,6 +320,6 @@ CREATE INDEX idx_metrics_route ON t_gateway_metrics(route_name, recorded_at DESC
 
 ## 相關文檔
 
-- [Gateway Rate Limiting](./Gateway_Rate_Limiting.md) - 流量控制與限流
-- [Gateway Security](./Gateway_Security.md) - DDoS 防禦與安全
-- [Authentication Architecture](./Authentication_Architecture.md) - 認證授權
+- [流量控制與限流](./Gateway_Rate_Limiting.md)
+- [網關安全與 DDoS 防禦](./Gateway_Security.md)
+- [身份驗證與授權架構](./Authentication_Architecture.md)

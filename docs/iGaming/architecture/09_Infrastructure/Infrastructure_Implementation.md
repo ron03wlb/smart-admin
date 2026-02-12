@@ -1,38 +1,38 @@
-# Infrastructure Implementation
+# 基礎設施實作（Infrastructure Implementation）
 
-> **Business Requirements**: N/A — Pure technical infrastructure document
-> **Canonical Source**: [00-16_Infrastructure_Implementation.md](../../source-archive/00_Foundation/guides/00-16_Infrastructure_Implementation.md)
-> **Audience**: Architects, DevOps Engineers, Backend Engineers
-> **Last Synced**: 2026-02-09
-
----
-
-## 1. Overview
-
-This document covers the technical implementation of the iGaming platform infrastructure, including API gateway design, Blue-Green deployment strategy, and API rate limiting. All implementations follow SmartAdmin architectural patterns and target production-grade reliability.
-
-**Note**: This document is purely technical with no separate requirements counterpart. All infrastructure decisions are driven by non-functional requirements (availability, scalability, performance).
+> **業務需求**: 不適用 — 純技術基礎設施文件
+> **規範來源**: [00-16_Infrastructure_Implementation.md](../../source-archive/00_Foundation/guides/00-16_Infrastructure_Implementation.md)
+> **目標讀者**: Architects, DevOps Engineers, Backend Engineers
+> **最後同步**: 2026-02-09
 
 ---
 
-## 2. API Gateway Design
+## 1. 概覽（Overview）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 12_Technical_Operations, 10_Platform_Management
+本文檔涵蓋 iGaming 平台基礎設施的技術實作，包括 API Gateway 設計、Blue-Green 部署策略以及 API 速率限制。所有實作均遵循 SmartAdmin 架構模式，並以達成生產級可靠性為目標。
 
-### Implementation Goal
+**注意**：本文檔為純技術內容，無對應的需求文檔。所有基礎設施決策均由非功能性需求（可用性、可擴展性、效能）驅動。
 
-Configure Spring Cloud Gateway with dynamic routing, filter chains (authentication, rate limiting), and circuit breaker integration via Resilience4j.
+---
 
-### Implementation Reading Order
+## 2. API Gateway 設計（API Gateway Design）
 
-| Order | Document | Section | Focus |
+**狀態**：PLANNED（Phase 5+）
+**模組**：12_Technical_Operations, 10_Platform_Management
+
+### 實作目標（Implementation Goal）
+
+配置 Spring Cloud Gateway，具備動態路由、Filter Chain（身份驗證、速率限制）以及透過 Resilience4j 整合的 Circuit Breaker。
+
+### 實作閱讀順序（Implementation Reading Order）
+
+| 順序 | 文檔 | 章節 | 重點 |
 |-------|----------|---------|-------|
-| 1 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S2 Route Config | Dynamic routing |
-| 2 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3 Filter Chain | Auth, rate limiting |
+| 1 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S2 Route Config | 動態路由 |
+| 2 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3 Filter Chain | 身份驗證、速率限制 |
 | 3 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S4 Circuit Breaker | Resilience4j |
 
-### Gateway Architecture
+### Gateway 架構（Gateway Architecture）
 
 ```
 Client Request
@@ -52,17 +52,17 @@ Backend Service (load balanced)
 Response → Client
 ```
 
-### SmartAdmin Layer Mapping
+### SmartAdmin 層級映射（SmartAdmin Layer Mapping）
 
-| Component | Technology | Configuration |
+| 元件 | 技術 | 配置 |
 |-----------|-----------|---------------|
-| Gateway Framework | Spring Cloud Gateway | Reactive routing engine |
-| Auth Filter | Sa-Token | Token validation on every request |
-| Rate Limiter | Redisson | Token bucket algorithm with Redis backend |
-| Circuit Breaker | Resilience4j | Configurable failure thresholds |
-| Load Balancer | Spring Cloud LoadBalancer | Round-robin with health checks |
+| Gateway Framework | Spring Cloud Gateway | Reactive 路由引擎 |
+| Auth Filter | Sa-Token | 每次請求的 Token 驗證 |
+| Rate Limiter | Redisson | Token Bucket 演算法搭配 Redis 後端 |
+| Circuit Breaker | Resilience4j | 可配置的失敗閾值 |
+| Load Balancer | Spring Cloud LoadBalancer | Round-robin 搭配健康檢查 |
 
-### Route Configuration Pattern
+### Route 配置模式（Route Configuration Pattern）
 
 ```yaml
 spring:
@@ -84,7 +84,7 @@ spring:
                 redis-rate-limiter.burstCapacity: 200
 ```
 
-### Filter Chain Order
+### Filter Chain 順序（Filter Chain Order）
 
 ```java
 @Component
@@ -106,39 +106,39 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 }
 ```
 
-### Verification Checklist
+### 驗證檢查清單（Verification Checklist）
 
-- [ ] Route rules are correct
-- [ ] Filter chain operates normally
-- [ ] Circuit breaker is effective
-- [ ] Load balancing is accurate
+- [ ] Route 規則正確
+- [ ] Filter Chain 正常運作
+- [ ] Circuit Breaker 有效
+- [ ] 負載均衡準確
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Route Conflicts**: Multiple routes match the same request -- use specific path predicates with ordering
-2. **Filter Ordering Error**: Auth executed after rate limiting -- ensure auth filter has lowest order value
-3. **Circuit Breaker Thresholds**: Too sensitive or too lenient -- tune based on actual error rates in staging
+1. **Route 衝突**：多個 Route 匹配同一請求 -- 使用具體的 Path Predicate 並搭配排序
+2. **Filter 順序錯誤**：身份驗證在速率限制之後執行 -- 確保 Auth Filter 擁有最低的 Order 值
+3. **Circuit Breaker 閾值**：過於敏感或過於寬鬆 -- 根據 Staging 環境的實際錯誤率進行調整
 
 ---
 
-## 3. Blue-Green Deployment
+## 3. Blue-Green 部署（Blue-Green Deployment）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 12_Technical_Operations
+**狀態**：PLANNED（Phase 5+）
+**模組**：12_Technical_Operations
 
-### Implementation Goal
+### 實作目標（Implementation Goal）
 
-Configure Kubernetes-based Blue-Green deployment with Istio/Nginx traffic switching, rollback strategy, and smoke test validation.
+配置基於 Kubernetes 的 Blue-Green 部署，具備 Istio/Nginx 流量切換、回滾策略以及煙霧測試驗證。
 
-### Implementation Reading Order
+### 實作閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
+| 順序 | 文檔 | 章節 | 重點 |
 |-------|----------|---------|-------|
 | 1 | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | S3 Deployment Strategy | Blue-Green |
 | 2 | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | S4 Traffic Management | Istio/Nginx |
 | 3 | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) | S5 Monitoring Validation | Smoke Test |
 
-### Deployment Architecture
+### 部署架構（Deployment Architecture）
 
 ```
                     ┌──────────────┐
@@ -157,7 +157,7 @@ Configure Kubernetes-based Blue-Green deployment with Istio/Nginx traffic switch
               └───────────┘  └───────────┘
 ```
 
-### Deployment Pipeline
+### 部署流程（Deployment Pipeline）
 
 ```yaml
 # Kubernetes Blue-Green Deployment
@@ -187,7 +187,7 @@ spec:
             periodSeconds: 10
 ```
 
-### Traffic Switching with Istio
+### Istio 流量切換（Traffic Switching with Istio）
 
 ```yaml
 apiVersion: networking.istio.io/v1beta1
@@ -209,7 +209,7 @@ spec:
           weight: 100    # New version (after validation)
 ```
 
-### Smoke Test Strategy
+### 煙霧測試策略（Smoke Test Strategy）
 
 ```bash
 #!/bin/bash
@@ -230,47 +230,47 @@ done
 echo "All smoke tests passed"
 ```
 
-### Rollback Strategy
+### 回滾策略（Rollback Strategy）
 
-| Trigger | Action | Duration |
+| 觸發條件 | 動作 | 持續時間 |
 |---------|--------|----------|
-| Smoke test failure | Automatic rollback to Blue | < 30 seconds |
-| Error rate spike (>5%) | Automatic traffic shift to Blue | < 1 minute |
-| Manual rollback request | Istio weight shift to Blue | < 1 minute |
+| 煙霧測試失敗 | 自動回滾到 Blue | < 30 秒 |
+| 錯誤率飆升（>5%） | 自動將流量切回 Blue | < 1 分鐘 |
+| 手動回滾請求 | Istio 權重切換至 Blue | < 1 分鐘 |
 
-### Verification Checklist
+### 驗證檢查清單（Verification Checklist）
 
-- [ ] Blue/Green environments are independent
-- [ ] Traffic switching is smooth
-- [ ] Rollback mechanism is effective
-- [ ] Monitoring alerts are operational
+- [ ] Blue/Green 環境獨立
+- [ ] 流量切換順暢
+- [ ] 回滾機制有效
+- [ ] 監控告警正常運作
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Database Migration**: Schema version mismatch between Blue/Green -- use backward-compatible migrations only
-2. **State Leakage**: Session/cache not synchronized -- use external Redis for shared state
-3. **Rollback Failure**: DNS cache prevents complete traffic switch -- set low TTL values, use Istio for instant switching
+1. **Database Migration**：Blue/Green 之間的 Schema 版本不匹配 -- 僅使用向後相容的 Migration
+2. **狀態洩漏**：Session/Cache 未同步 -- 使用外部 Redis 作為共享狀態
+3. **回滾失敗**：DNS Cache 阻止完整流量切換 -- 設定低 TTL 值，使用 Istio 進行即時切換
 
 ---
 
-## 4. API Rate Limiting
+## 4. API 速率限制（API Rate Limiting）
 
-**Status**: PLANNED (Phase 5+)
-**Modules**: 12_Technical_Operations, Foundation modules
+**狀態**：PLANNED（Phase 5+）
+**模組**：12_Technical_Operations, Foundation modules
 
-### Implementation Goal
+### 實作目標（Implementation Goal）
 
-Implement token bucket rate limiting with Redis backend, supporting multi-layer limiting (global, per-tenant, per-user) and proper 429 error responses.
+實作基於 Redis 後端的 Token Bucket 速率限制，支援多層限制（全域、每租戶、每使用者）以及適當的 429 錯誤回應。
 
-### Implementation Reading Order
+### 實作閱讀順序（Implementation Reading Order）
 
-| Order | Document | Section | Focus |
+| 順序 | 文檔 | 章節 | 重點 |
 |-------|----------|---------|-------|
 | 1 | [09-03-01 Design Principles](../../source-archive/09_Technical_Infrastructure/09-03-01_Design_Principles.md) | S6 Rate Limiting | Token bucket / leaky bucket |
 | 2 | Foundation Redis Limiter | - | Redisson rate limiter |
 | 3 | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) | S3.4 Rate Limiting Filter | Gateway rate limiting |
 
-### Rate Limiting Architecture
+### 速率限制架構（Rate Limiting Architecture）
 
 ```
 Request → Gateway Rate Limiter (global)
@@ -284,16 +284,16 @@ Request → Gateway Rate Limiter (global)
          Backend Service
 ```
 
-### Multi-Layer Rate Limiting
+### 多層速率限制（Multi-Layer Rate Limiting）
 
-| Layer | Scope | Implementation | Default Limits |
+| 層級 | 範圍 | 實作 | 預設限制 |
 |-------|-------|---------------|----------------|
-| Global | All requests | Gateway filter | 10,000 req/s |
-| Tenant | Per operator | Redisson RRateLimiter | 1,000 req/s |
-| User | Per player | Redisson RRateLimiter | 100 req/s |
-| Endpoint | Per API path | Spring annotation | Varies by endpoint |
+| Global | 所有請求 | Gateway filter | 10,000 req/s |
+| Tenant | 每營運商 | Redisson RRateLimiter | 1,000 req/s |
+| User | 每玩家 | Redisson RRateLimiter | 100 req/s |
+| Endpoint | 每 API 路徑 | Spring annotation | 依端點而異 |
 
-### Token Bucket Implementation
+### Token Bucket 實作（Token Bucket Implementation）
 
 ```java
 @Component
@@ -310,7 +310,7 @@ public class RedisRateLimiter {
 }
 ```
 
-### Endpoint-Level Rate Limiting
+### 端點級速率限制（Endpoint-Level Rate Limiting）
 
 ```java
 // Custom annotation for endpoint-specific rate limiting
@@ -330,7 +330,7 @@ public ResponseDTO<PlayerVO> getProfile() {
 }
 ```
 
-### 429 Error Response
+### 429 錯誤回應（429 Error Response）
 
 ```java
 // Standard rate limit exceeded response
@@ -348,24 +348,24 @@ public class RateLimitFilter implements GlobalFilter {
 }
 ```
 
-### Verification Checklist
+### 驗證檢查清單（Verification Checklist）
 
-- [ ] Rate limiting thresholds are correct
-- [ ] Redis rate limiter operates normally
-- [ ] Multi-layer rate limiting takes effect
-- [ ] 429 error responses are returned correctly
+- [ ] 速率限制閾值正確
+- [ ] Redis Rate Limiter 正常運作
+- [ ] 多層速率限制生效
+- [ ] 429 錯誤回應正確返回
 
-### Common Pitfalls
+### 常見陷阱（Common Pitfalls）
 
-1. **Granularity Too Coarse**: Global-only limiting is too aggressive -- implement multi-layer limiting
-2. **Redis Single Point**: Rate limiter not using Redis Cluster -- configure Redisson with cluster mode
-3. **Sliding Window**: Window not implemented correctly -- use Redisson's built-in RRateLimiter which handles this
+1. **粒度過粗**：僅全域限制過於激進 -- 實作多層限制
+2. **Redis 單點**：Rate Limiter 未使用 Redis Cluster -- 配置 Redisson 為 Cluster 模式
+3. **滑動視窗**：視窗未正確實作 -- 使用 Redisson 內建的 RRateLimiter，其已處理此問題
 
 ---
 
-## 5. Reference Documents
+## 5. 參考文檔（Reference Documents）
 
-| Area | Document |
+| 領域 | 文檔 |
 |------|----------|
 | Gateway Core | [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md) |
 | Deployment | [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md) |
@@ -374,7 +374,7 @@ public class RateLimitFilter implements GlobalFilter {
 
 ---
 
-## 6. Database Schema
+## 6. 資料庫 Schema（Database Schema）
 
 ```sql
 -- Gateway route configuration
@@ -440,6 +440,6 @@ CREATE TABLE t_circuit_breaker_config (
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-02-08
-**Source Version**: 4.0.0
+**文件版本**: 1.0.0
+**最後更新**: 2026-02-08
+**來源版本**: 4.0.0
