@@ -1,11 +1,11 @@
 # iGaming Documentation Optimization Progress
 
 > **Started**: 2026-02-10 (Phase 6 Coverage Enhancement)
-> **Current Phase**: Phase 13 (Coverage Enhancement) - Batch 1 COMPLETE ✅
-> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12) + 1 (Phase 13 Batch 1)
-> **Tasks Done This Iteration**: 3/3 Batch 1 (Seamless_Wallet_Index, Turnover_Calculation_Logic_Detail, Turnover_Implementation)
-> **Java Coverage**: 93/118 (78.8%) → Target: ≥90% (need +14 files)
-> **SQL Coverage**: 100/118 (84.7%) → Target: ≥95% (need +13 files)
+> **Current Phase**: Phase 13 (Coverage Enhancement) - Batch 2 COMPLETE ✅
+> **Total Iterations**: 137 (Phase 6-10) + 3 (Phase 12) + 2 (Phase 13 Batch 1-2)
+> **Tasks Done This Iteration**: 3/3 Batch 2 (Maintenance_Architecture, Performance_Monitoring, Token_Cache_Performance)
+> **Java Coverage**: 96/118 (81.4%) → Target: ≥90% (need +11 files)
+> **SQL Coverage**: 103/118 (87.3%) → Target: ≥95% (need +10 files)
 > **Mermaid Issues**: 0 in editable files ✅ (72 in READ-ONLY source-archive/)
 
 ---
@@ -706,15 +706,15 @@ Fix files missing BOTH Java AND SQL first (P21 guardrail: 2x efficiency).
 - [x] architecture/02_Finance_Service/Turnover_Calculation_Logic_Detail.md (+Java TurnoverService/TurnoverManager/GridAbstractService +SQL player_wallet/wallet_transaction/turnover_history)
 - [x] architecture/02_Finance_Service/Turnover_Implementation.md (+Java GridService/GridSettlementManager/GridAbstractService +SQL player_wallet/transaction/wallet_transaction_history)
 
-#### Batch 2 — Infrastructure (3 files)
-- [ ] architecture/09_Infrastructure/Maintenance_Architecture.md (+Java Service/Manager +SQL)
-- [ ] architecture/09_Infrastructure/Performance_Monitoring.md (+Java Service/Manager +SQL)
-- [ ] architecture/09_Infrastructure/Token_Cache_Performance.md (+Java Service/Manager +SQL)
+#### Batch 2 — Infrastructure (3 files) ✅ COMPLETE
+- [x] architecture/09_Infrastructure/Maintenance_Architecture.md (+MaintenanceService/MaintenanceManager +SQL t_maintenance_event/pending_transaction)
+- [x] architecture/09_Infrastructure/Performance_Monitoring.md (+PerformanceMetricsService/PerformanceAlertManager +SQL t_alert_rule/history/performance_metric)
+- [x] architecture/09_Infrastructure/Token_Cache_Performance.md (+TokenCacheService/TokenInvalidationManager +SQL t_token_cache/blacklist/cache_performance_stats)
 
 #### Batch 3 — Infrastructure (1 file)
 - [ ] architecture/09_Infrastructure/Token_Validation_Architecture.md (+Java Service/Manager +SQL)
 
-**After 13A**: Java ≈ 85% (87/102), SQL ≈ 99% (101/102)
+**After Batch 1-2**: Java = 81.4% (96/118), SQL = 87.3% (103/118)
 
 ### 13B: Java-Only Missing Files (target: ≥90%)
 
