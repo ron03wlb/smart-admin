@@ -32,7 +32,7 @@ echo "── Gate 1: Cross-Reference Completeness ──"
 
 # 1a: Architecture → Requirements back-references
 ARCH_TOTAL=$(find "$ARCH_DIR" -name "*.md" -not -name "README.md" -not -path "*/quality-reports/*" -not -path "*/adr/*" -type f | wc -l | tr -d ' ')
-ARCH_WITH_BACKREF=$(grep -rl 'Business Requirements' "$ARCH_DIR" --include="*.md" | grep -v README.md | grep -v quality-reports | grep -v adr | wc -l | tr -d ' ')
+ARCH_WITH_BACKREF=$(grep -rlE 'Business Requirements|業務需求' "$ARCH_DIR" --include="*.md" | grep -v README.md | grep -v quality-reports | grep -v adr | wc -l | tr -d ' ')
 ARCH_PCT=$((ARCH_WITH_BACKREF * 100 / ARCH_TOTAL))
 
 if [ "$ARCH_PCT" -ge 95 ]; then
@@ -45,7 +45,7 @@ fi
 
 # 1b: Requirements → Architecture forward-references
 REQ_TOTAL=$(find "$REQ_DIR" -name "*.md" -not -name "README.md" -type f | wc -l | tr -d ' ')
-REQ_WITH_FWDREF=$(grep -rl 'Related Architecture\|Related Doc.*architecture\|> \*\*Technical Implementation\*\*:' "$REQ_DIR" --include="*.md" | grep -v README.md | wc -l | tr -d ' ')
+REQ_WITH_FWDREF=$(grep -rlE 'Related Architecture|Related Doc.*architecture|相關架構|> \*\*Technical Implementation\*\*:' "$REQ_DIR" --include="*.md" | grep -v README.md | wc -l | tr -d ' ')
 REQ_PCT=$((REQ_WITH_FWDREF * 100 / REQ_TOTAL))
 
 if [ "$REQ_PCT" -ge 95 ]; then
