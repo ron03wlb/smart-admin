@@ -274,15 +274,34 @@ while true; do
     fi
   fi
 
-  # ===== Check if already complete =====
+  # ===== Pre-iteration quality gate probe (P25) =====
+  # Run quality gate to determine what still needs work
+  GATE_FAILURES=""
+  GATE_EXIT=0
+  if [ -x "$RALPH_DIR/validate-quality-gate.sh" ]; then
+    GATE_OUTPUT=$("$RALPH_DIR/validate-quality-gate.sh" 2>&1) || GATE_EXIT=$?
+    # Extract failing gates for context injection
+    GATE_FAILURES=$(echo "$GATE_OUTPUT" | grep -E '❌|FAIL' | sed 's/\x1B\[[0-9;]*m//g' || true)
+  fi
+
+  # ===== Check if truly complete (TODO=0 AND quality gate passes) =====
   if [ "$TODO" -eq 0 ] && [ "$DONE" -gt 0 ]; then
-    echo -e "${GREEN}════════════════════════════════════════════${NC}"
-    echo -e "${GREEN}  ALL TASKS COMPLETE before iteration #$i!  ${NC}"
-    echo -e "${GREEN}  Runtime: ${HOURS}h ${MINS}m               ${NC}"
-    echo -e "${GREEN}  Tasks completed: $DONE                    ${NC}"
-    echo -e "${GREEN}════════════════════════════════════════════${NC}"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] COMPLETE (pre-check) at iteration #$i" >> "$LOG_FILE"
-    exit 0
+    if [ "$GATE_EXIT" -eq 0 ]; then
+      echo -e "${GREEN}════════════════════════════════════════════${NC}"
+      echo -e "${GREEN}  ALL TASKS COMPLETE + QUALITY GATE PASSED! ${NC}"
+      echo -e "${GREEN}  Iteration: #$i | Runtime: ${HOURS}h ${MINS}m${NC}"
+      echo -e "${GREEN}  Tasks completed: $DONE                    ${NC}"
+      echo -e "${GREEN}════════════════════════════════════════════${NC}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] COMPLETE (pre-check, QG PASSED) at iteration #$i" >> "$LOG_FILE"
+      exit 0
+    else
+      echo -e "${YELLOW}════════════════════════════════════════════${NC}"
+      echo -e "${YELLOW}  Tasks done but QUALITY GATE FAILED        ${NC}"
+      echo -e "${YELLOW}  Continuing to fix failing gates...        ${NC}"
+      echo -e "${YELLOW}════════════════════════════════════════════${NC}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] TODO=0 but QG FAILED, continuing iteration #$i" >> "$LOG_FILE"
+      echo "$GATE_FAILURES" >> "$LOG_FILE"
+    fi
   fi
 
   # ===== Detect current phase for context hints =====
@@ -310,7 +329,11 @@ while true; do
 - Tasks done: $DONE | Tasks remaining: $TODO | Tasks stuck: $STUCK
 - Progress: $PCT%
 - Phase hint: $PHASE_HINT
+- Quality gate status: $([ "$GATE_EXIT" -eq 0 ] && echo 'ALL PASSED' || echo "FAILED — fix these gates before declaring RALPH_COMPLETE")
+$([ -n "$GATE_FAILURES" ] && echo "- Failing gates:
+$GATE_FAILURES" || echo "")
 
+IMPORTANT: Do NOT output RALPH_COMPLETE unless ALL quality gates pass. If quality gates fail, focus on fixing the failing gates.
 Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md first, then execute the next unchecked task." \
     2>&1) || true
 
@@ -403,23 +426,32 @@ Begin immediately. Read docs/ralph/progress.md and docs/ralph/guardrails.md firs
     sleep 60
   fi
 
-  # ===== Check completion signal =====
+  # ===== Check completion signal (P25: only exit if quality gate passes) =====
   if echo "$OUTPUT" | grep -q "RALPH_COMPLETE"; then
-    echo -e "${GREEN}══════════════════════════════════════════════${NC}"
-    echo -e "${GREEN}  RALPH_COMPLETE signal received!              ${NC}"
-    echo -e "${GREEN}  Iteration: #$i                               ${NC}"
-    echo -e "${GREEN}  Runtime: ${HOURS}h ${MINS}m                  ${NC}"
-    echo -e "${GREEN}══════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}══════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}  RALPH_COMPLETE signal received. Verifying... ${NC}"
+    echo -e "${CYAN}══════════════════════════════════════════════${NC}"
 
-    # Final validation
-    echo ""
-    echo "Running final quality gate..."
+    # Run quality gate to verify
+    FINAL_GATE_EXIT=0
     if [ -x "$RALPH_DIR/validate-quality-gate.sh" ]; then
-      "$RALPH_DIR/validate-quality-gate.sh" 2>&1 | tee -a "$LOG_FILE" || true
+      "$RALPH_DIR/validate-quality-gate.sh" 2>&1 | tee -a "$LOG_FILE" || FINAL_GATE_EXIT=$?
     fi
 
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] RALPH_COMPLETE at iteration #$i" >> "$LOG_FILE"
-    exit 0
+    if [ "$FINAL_GATE_EXIT" -eq 0 ]; then
+      echo -e "${GREEN}══════════════════════════════════════════════${NC}"
+      echo -e "${GREEN}  RALPH_COMPLETE + QUALITY GATE PASSED!       ${NC}"
+      echo -e "${GREEN}  Iteration: #$i | Runtime: ${HOURS}h ${MINS}m${NC}"
+      echo -e "${GREEN}══════════════════════════════════════════════${NC}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] RALPH_COMPLETE at iteration #$i (QG PASSED)" >> "$LOG_FILE"
+      exit 0
+    else
+      echo -e "${YELLOW}══════════════════════════════════════════════${NC}"
+      echo -e "${YELLOW}  RALPH_COMPLETE rejected: quality gate FAILED ${NC}"
+      echo -e "${YELLOW}  Continuing to fix failing gates...          ${NC}"
+      echo -e "${YELLOW}══════════════════════════════════════════════${NC}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] RALPH_COMPLETE rejected (QG FAILED) at iteration #$i, continuing" >> "$LOG_FILE"
+    fi
   fi
 
   # ===== Enhanced rate limit + 5-hour window detection =====
