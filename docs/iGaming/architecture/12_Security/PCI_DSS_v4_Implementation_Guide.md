@@ -1,5 +1,6 @@
 # PCI-DSS v4.0 Implementation Guide for iGaming Platform
 
+> **業務需求（Business Requirements）**: [Payment_Security_Requirements.md](../../requirements/12_Security_Compliance/Payment_Security_Requirements.md)
 > **Ralph 循環分析**: Cycle 1 Complete
 > **版本**: 1.0.0
 > **日期**: 2026-02-11

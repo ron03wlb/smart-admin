@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md)
 > **受眾**: 高階主管、產品經理、合規官
-> **相關文件**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
+> **相關架構**: [Payment_Gateway_Technical.md](../../architecture/02_Finance_Service/Payment_Gateway_Technical.md)
 > **最後同步**: 2026-02-09
 >
 > **精簡說明**: 技術細節（PSP webhook 實作、簽章驗證演算法、智慧路由程式碼、排程對帳任務、連線池配置、Prometheus 指標）已移至架構層。本文件僅聚焦於業務規則。

@@ -2,7 +2,7 @@
 
 > **權威來源**: [source-archive/00_Foundation/00-02_Business_Flows.md](../../source-archive/00_Foundation/00-02_Business_Flows.md)
 > **目標讀者**: 高階主管、產品經理、合規人員、QA 團隊
-> **相關文件**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
+> **相關架構**: [Business_Logic_Flows.md](../../architecture/00_Overview/Business_Logic_Flows.md)
 > **最後同步**: 2026-02-08
 
 ---
