@@ -112,67 +112,93 @@ private BigDecimal calculatePendingBets(Long playerId) {
 
 ### 2.3 並發安全的餘額扣減（Redis Lua）
 
+> **SmartAdmin 架構對齊**: 此操作涉及 Redis 分佈式操作 + DB 持久化，依據 SmartAdmin 架構規則必須放置於 **Manager 層**（參見 [F04-architecture-rules](.agent/rules/foundation/F04-architecture-rules.md)）。
+> **合規標準**: PCI-DSS v4 Req 6.2.1（安全開發生命週期）— 金融交易邏輯必須遵循分層架構設計原則。
+
 ```java
 /**
- * 扣減錢包餘額（原子操作）
+ * 錢包 Manager — 負責分佈式鎖協調與交易持久化
  *
- * 使用 Redis Lua script 保證原子性
- *
- * @param request 扣款請求
- * @return 扣款結果
+ * SmartAdmin 架構規則：
+ * - @Transactional 僅限 Manager 層
+ * - 分佈式鎖操作（Redis Lua）由 Manager 協調
+ * - Service 層透過呼叫此 Manager 完成扣款
  */
-public DebitResult debitWallet(DebitRequest request) {
-    String requestId = request.getRequestId();
-    Long walletId = request.getWalletId();
-    BigDecimal amount = request.getAmount();
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class WalletManager {
 
-    // 1. 冪等性檢查（Redis 快速路徑）
-    String cacheKey = "wallet:debit:" + requestId;
-    DebitResult cachedResult = redisTemplate.opsForValue().get(cacheKey);
-    if (cachedResult != null) {
-        log.info("Request {} already processed (cached)", requestId);
-        return cachedResult;
-    }
+    private final StringRedisTemplate redisTemplate;
+    private final WalletDao walletDao;
+    private final WalletTransactionDao walletTransactionDao;
 
-    // 2. 執行 Lua script 進行扣減
-    String luaScript = """
-        local wallet_key = KEYS[1]
-        local amount = tonumber(ARGV[1])
+    /**
+     * 扣減錢包餘額（原子操作）
+     *
+     * 使用 Redis Lua script 保證原子性，同步持久化至 DB
+     * ISO 27001 A.14.2: 安全設計原則 — 交易完整性保證
+     *
+     * @param request 扣款請求
+     * @return 扣款結果
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public DebitResult debitWallet(DebitRequest request) {
+        String requestId = request.getRequestId();
+        Long walletId = request.getWalletId();
+        BigDecimal amount = request.getAmount();
 
-        -- Check balance
-        local balance = tonumber(redis.call('HGET', wallet_key, 'balance'))
-        if balance < amount then
-            return 'INSUFFICIENT_BALANCE'
-        end
+        // 1. 冪等性檢查（Redis 快速路徑）
+        String cacheKey = "wallet:debit:" + requestId;
+        DebitResult cachedResult = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedResult != null) {
+            log.info("Request {} already processed (cached)", requestId);
+            return cachedResult;
+        }
 
-        -- Atomic deduction
-        redis.call('HINCRBYFLOAT', wallet_key, 'balance', -amount)
-        return 'SUCCESS'
-        """;
+        // 2. 執行 Lua script 進行 Redis 餘額扣減
+        String luaScript = """
+            local wallet_key = KEYS[1]
+            local amount = tonumber(ARGV[1])
 
-    String walletKey = "wallet:" + walletId;
-    String result = redisTemplate.execute(
-        RedisScript.of(luaScript, String.class),
-        Collections.singletonList(walletKey),
-        amount.toString()
-    );
+            -- Check balance
+            local balance = tonumber(redis.call('HGET', wallet_key, 'balance'))
+            if balance < amount then
+                return 'INSUFFICIENT_BALANCE'
+            end
 
-    if (!"SUCCESS".equals(result)) {
-        throw new InsufficientBalanceException("Insufficient balance");
-    }
+            -- Atomic deduction
+            redis.call('HINCRBYFLOAT', wallet_key, 'balance', -amount)
+            return 'SUCCESS'
+            """;
 
-    // 3. 持久化到資料庫（非同步）
-    CompletableFuture.runAsync(() -> {
+        String walletKey = "wallet:" + walletId;
+        String result = redisTemplate.execute(
+            RedisScript.of(luaScript, String.class),
+            Collections.singletonList(walletKey),
+            amount.toString()
+        );
+
+        if (!"SUCCESS".equals(result)) {
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+
+        // 3. 同步持久化到資料庫（在 @Transactional 範圍內）
         persistWalletTransaction(request);
-    }, asyncExecutor);
 
-    // 4. 快取結果（15 分鐘）
-    DebitResult debitResult = new DebitResult(requestId, walletId, amount);
-    redisTemplate.opsForValue().set(cacheKey, debitResult, 15, TimeUnit.MINUTES);
+        // 4. 快取結果（15 分鐘）
+        DebitResult debitResult = new DebitResult(requestId, walletId, amount);
+        redisTemplate.opsForValue().set(cacheKey, debitResult, 15, TimeUnit.MINUTES);
 
-    return debitResult;
+        return debitResult;
+    }
 }
 ```
+
+> **設計決策說明**:
+> - **移除非同步持久化**: 原設計使用 `CompletableFuture.runAsync()` 非同步寫入 DB，但這會導致 Redis 與 DB 狀態不一致窗口。改為同步寫入確保 @Transactional 涵蓋完整操作。
+> - **Manager 層放置**: 依據 SmartAdmin F04 規則，涉及 @Transactional 的操作必須在 Manager 層。WalletService 應透過呼叫 `walletManager.debitWallet()` 完成扣款。
+> - **冪等三層防禦**: 此方法為第一層（Redis 快取），完整三層策略請參見 [Seamless_Wallet_Technical.md](Seamless_Wallet_Technical.md#4-冪等三層防禦)。
 
 ### 2.4 錢包鎖定/解鎖機制
 

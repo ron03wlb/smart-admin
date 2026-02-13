@@ -8,6 +8,9 @@
 |-----|------|------|
 | [ADR-001](ADR-001_Naming_Convention_Singular_Standard.md) | 命名規範：單數標準 | ✅ 已採納 |
 | [ADR-012](ADR-012_Async_Risk_Proposal_System.md) | 異步風控提案系統 | ✅ 已採納 |
+| [ADR-013](ADR-013_Distributed_Wallet_Manager_Boundary.md) | 分佈式錢包交易的 Manager 層邊界 | ✅ 已採納 |
+| [ADR-014](ADR-014_TenantIgnore_Safety_Policy.md) | @TenantIgnore 安全使用策略 | ✅ 已採納 |
+| [ADR-015](ADR-015_Idempotency_Three_Layer_Defense.md) | 冪等策略三層防禦標準 | ✅ 已採納 |
 
 ## ADR 格式
 

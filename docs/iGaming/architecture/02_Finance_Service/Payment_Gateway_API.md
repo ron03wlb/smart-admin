@@ -442,6 +442,282 @@ ORDER BY created_at ASC;
 
 ---
 
+## 2.4. Java 實作範例（Java Implementation Example）
+
+### 2.4.1 Service 層（Service Layer）
+
+**PaymentService** - 存款訂單建立與 PSP 路由:
+
+```java
+package net.lab1024.sa.business.payment.service;
+
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.payment.dao.PaymentTransactionDao;
+import net.lab1024.sa.business.payment.domain.entity.PaymentTransactionEntity;
+import net.lab1024.sa.business.payment.domain.form.DepositRequestForm;
+import net.lab1024.sa.business.payment.domain.vo.DepositResponseVO;
+import net.lab1024.sa.business.payment.manager.PaymentManager;
+import net.lab1024.sa.business.payment.psp.PspRouter;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+/**
+ * PaymentService - 支付服務層
+ *
+ * 職責：
+ * - 存款訂單建立 (無 @Transactional，直接呼叫 Dao)
+ * - PSP 智能路由選擇
+ * - 對帳查詢 (委派至 Manager 執行交易)
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+    private final PaymentTransactionDao paymentTransactionDao;
+    private final PaymentManager paymentManager;
+    private final PspRouter pspRouter;
+
+    /**
+     * 建立存款訂單
+     *
+     * @param playerId 玩家 ID
+     * @param form 存款請求表單
+     * @return 存款回應 (redirect_url, transaction_id, expires_at)
+     */
+    public Option<DepositResponseVO> createDepositOrder(Long playerId, DepositRequestForm form) {
+        return Try.of(() -> {
+            // 步驟 1: 智能路由選擇 PSP
+            String selectedPsp = pspRouter.selectBestPsp(
+                playerId,
+                form.getAmount(),
+                form.getPaymentMethod(),
+                form.getCurrency(),
+                form.getCountryCode()
+            ).getOrElse("nuvei");
+
+            log.info("玩家 {} 存款 ${} {}，選中 PSP: {}",
+                playerId, form.getAmount(), form.getCurrency(), selectedPsp);
+
+            // 步驟 2: 建立 PENDING 訂單 (單表 INSERT，無需 @Transactional)
+            PaymentTransactionEntity entity = SmartBeanUtil.copy(form, PaymentTransactionEntity.class);
+            entity.setPlayerId(playerId);
+            entity.setPspCode(selectedPsp);
+            entity.setStatus("PENDING");
+            entity.setType("DEPOSIT");
+            entity.setTransactionId(generateTransactionId());
+            entity.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+
+            paymentTransactionDao.insert(entity);
+
+            // 步驟 3: 呼叫 PSP API (委派至 Manager - 包含 HTTP 呼叫 + UPDATE)
+            return paymentManager.requestPspPayment(entity);
+
+        }).toOption();
+    }
+
+    /**
+     * 查詢超時交易用於對帳
+     *
+     * @param timeoutMinutes 超時分鐘數 (預設 30)
+     * @return 待對帳交易列表
+     */
+    public List<PaymentTransactionEntity> findTimeoutTransactions(int timeoutMinutes) {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(timeoutMinutes);
+        return paymentTransactionDao.selectList(
+            Wrappers.<PaymentTransactionEntity>lambdaQuery()
+                .eq(PaymentTransactionEntity::getStatus, "PENDING")
+                .lt(PaymentTransactionEntity::getCreatedAt, cutoffTime)
+                .orderByAsc(PaymentTransactionEntity::getCreatedAt)
+        );
+    }
+
+    private String generateTransactionId() {
+        return "txn_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+            + "_" + RandomStringUtils.randomNumeric(6);
+    }
+}
+```
+
+### 2.4.2 Manager 層（Manager Layer）
+
+**PaymentManager** - 處理 PSP HTTP 呼叫與訂單更新 (需要 @Transactional):
+
+```java
+package net.lab1024.sa.business.payment.manager;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.business.payment.dao.PaymentTransactionDao;
+import net.lab1024.sa.business.payment.dao.PaymentAuditLogDao;
+import net.lab1024.sa.business.payment.domain.entity.PaymentTransactionEntity;
+import net.lab1024.sa.business.payment.domain.entity.PaymentAuditLogEntity;
+import net.lab1024.sa.business.payment.domain.vo.DepositResponseVO;
+import net.lab1024.sa.business.payment.psp.NuveiClient;
+import net.lab1024.sa.business.wallet.manager.WalletManager;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+/**
+ * PaymentManager - 支付管理層
+ *
+ * 職責：
+ * - PSP API 呼叫 + 訂單狀態更新 (@Transactional)
+ * - Webhook 回調處理 + 餘額入賬 (@Transactional)
+ * - 對帳自動入賬 (@Transactional)
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class PaymentManager {
+
+    private final PaymentTransactionDao paymentTransactionDao;
+    private final PaymentAuditLogDao paymentAuditLogDao;
+    private final WalletManager walletManager;
+    private final NuveiClient nuveiClient;
+
+    /**
+     * 請求 PSP 支付 URL
+     *
+     * @param transaction 支付交易實體
+     * @return 存款回應 VO (redirect_url, expires_at)
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public DepositResponseVO requestPspPayment(PaymentTransactionEntity transaction) {
+        // 步驟 1: 呼叫 PSP API 取得 redirect_url
+        NuveiPaymentResponse pspResponse = nuveiClient.createPayment(
+            transaction.getAmount(),
+            transaction.getCurrency(),
+            transaction.getTransactionId()
+        );
+
+        // 步驟 2: 更新訂單 (psp_order_id, redirect_url)
+        transaction.setPspOrderId(pspResponse.getPaymentToken());
+        transaction.setRedirectUrl(pspResponse.getRedirectUrl());
+        paymentTransactionDao.updateById(transaction);
+
+        // 步驟 3: 記錄審計日誌
+        PaymentAuditLogEntity auditLog = new PaymentAuditLogEntity();
+        auditLog.setTransactionId(transaction.getTransactionId());
+        auditLog.setEventType("ORDER_CREATED");
+        auditLog.setOperatorType("SYSTEM");
+        paymentAuditLogDao.insert(auditLog);
+
+        return SmartBeanUtil.copy(transaction, DepositResponseVO.class);
+    }
+
+    /**
+     * 處理 Webhook 回調 - 入賬玩家餘額
+     *
+     * @param transactionId 交易 ID
+     * @param pspTransactionId PSP 交易 ID
+     * @return 是否成功入賬
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public boolean processWebhookCallback(String transactionId, String pspTransactionId) {
+        // 步驟 1: 冪等檢查 (FOR UPDATE 鎖定)
+        PaymentTransactionEntity transaction = paymentTransactionDao.selectOne(
+            Wrappers.<PaymentTransactionEntity>lambdaQuery()
+                .eq(PaymentTransactionEntity::getTransactionId, transactionId)
+        );
+
+        if (transaction == null || !"PENDING".equals(transaction.getStatus())) {
+            log.warn("交易 {} 狀態非 PENDING，跳過入賬", transactionId);
+            return false;
+        }
+
+        // 步驟 2: 更新訂單狀態為 SUCCESS
+        transaction.setStatus("SUCCESS");
+        transaction.setPspTransactionId(pspTransactionId);
+        transaction.setCompletedAt(LocalDateTime.now());
+        transaction.setCreditFlag(true);
+        transaction.setCreditAt(LocalDateTime.now());
+        transaction.setCreditSource("WEBHOOK");
+        paymentTransactionDao.updateById(transaction);
+
+        // 步驟 3: 入賬玩家餘額 (委派至 WalletManager)
+        walletManager.creditBalance(
+            transaction.getPlayerId(),
+            transaction.getAmount(),
+            transactionId,
+            "DEPOSIT"
+        );
+
+        // 步驟 4: 記錄審計日誌
+        PaymentAuditLogEntity auditLog = new PaymentAuditLogEntity();
+        auditLog.setTransactionId(transactionId);
+        auditLog.setEventType("WEBHOOK_RECEIVED");
+        auditLog.setOperatorType("SYSTEM");
+        auditLog.setRequestBody(pspTransactionId);
+        paymentAuditLogDao.insert(auditLog);
+
+        log.info("交易 {} 入賬成功，金額: ${}", transactionId, transaction.getAmount());
+        return true;
+    }
+
+    /**
+     * 對帳自動入賬 (針對超時交易)
+     *
+     * @param transaction 交易實體
+     * @param pspTransactionId PSP 確認的交易 ID
+     * @return 是否入賬成功
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public boolean reconcileAndCredit(PaymentTransactionEntity transaction, String pspTransactionId) {
+        // 冪等檢查
+        if (!"PENDING".equals(transaction.getStatus()) || transaction.getCreditFlag()) {
+            log.warn("交易 {} 已入賬或非 PENDING 狀態", transaction.getTransactionId());
+            return false;
+        }
+
+        // 更新訂單狀態
+        transaction.setStatus("SUCCESS");
+        transaction.setPspTransactionId(pspTransactionId);
+        transaction.setCompletedAt(LocalDateTime.now());
+        transaction.setCreditFlag(true);
+        transaction.setCreditAt(LocalDateTime.now());
+        transaction.setCreditSource("RECONCILIATION");
+        paymentTransactionDao.updateById(transaction);
+
+        // 入賬餘額
+        walletManager.creditBalance(
+            transaction.getPlayerId(),
+            transaction.getAmount(),
+            transaction.getTransactionId(),
+            "DEPOSIT_RECONCILIATION"
+        );
+
+        // 審計日誌
+        PaymentAuditLogEntity auditLog = new PaymentAuditLogEntity();
+        auditLog.setTransactionId(transaction.getTransactionId());
+        auditLog.setEventType("RECONCILIATION_CREDITED");
+        auditLog.setOperatorType("SYSTEM");
+        paymentAuditLogDao.insert(auditLog);
+
+        log.info("對帳入賬成功: 交易 {}, 金額 ${}", transaction.getTransactionId(), transaction.getAmount());
+        return true;
+    }
+}
+```
+
+**SmartAdmin 模式檢查點**:
+- ✅ Constructor injection (`@RequiredArgsConstructor` + `private final`)
+- ✅ Service 無 `@Transactional` (單表 CRUD 直接呼叫 Dao)
+- ✅ Manager 使用 `@Transactional(rollbackFor = Throwable.class)` (多表操作 + HTTP 呼叫)
+- ✅ Service 使用 Vavr `Option` + `Try` (非 `java.util.Optional`)
+- ✅ SmartBeanUtil 用於 Entity ↔ VO 轉換
+
+---
+
 ## 3. 智能路由演算法（Smart Routing Algorithm）
 
 ### 3.1 路由架構概覽（Routing Architecture Overview）

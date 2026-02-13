@@ -63,6 +63,26 @@
 | **短路回傳** | is_valid=false 回傳 0 | 信任第 1 層結果 | 信任第 2 層結果 |
 | **效能影響** | 所有投注執行 | 僅通過第 1 層的投注（~95%）| 僅有活躍獎金的投注 |
 
+### 1.3 儲存策略（Storage Strategy）
+
+> **合規標準**: MGA Player Protection Directive 3.2 — 有效投注額計算過程必須可審計追溯，中間結果必須持久化。
+
+**設計決策：單一反正規化表 `t_bet_turnover_record`**
+
+| 層 | 計算模式 | 儲存欄位 | 寫入時機 | 備註 |
+|---|---------|---------|---------|------|
+| 第 1 層（風控） | **即時計算**（投注結算時） | `effective_turnover_base`, `action_type`, `matched_rules` | 投注結算時（bet settlement） | 與風控引擎同步執行 |
+| 第 2 層（財務） | **即時計算**（投注結算時） | `status_factor`, `valid_turnover_finance` | 投注結算時（第 1 層通過後） | 依賴遊戲結果（WIN/LOSS/DRAW） |
+| 第 3 層（活動） | **即時計算**（投注結算時） | `game_weight`, `activity_valid_turnover` | 投注結算時（第 2 層完成後） | 僅當玩家有活躍獎金時執行 |
+| 每日聚合 | **批次計算**（每日 02:00） | `t_daily_reconciliation_report` | T+1 對帳排程 | 用於每日監控和審計 |
+
+**選擇單一反正規化表的理由**：
+1. **查詢效能**: 報表查詢只需 1 次 JOIN（vs 3 次 JOIN），對於即時儀表板至關重要
+2. **審計完整性**: 單一記錄包含三層結果，MGA 審計時可一次性呈現完整計算鏈
+3. **原子性**: 三層計算在同一個 @Transactional 內完成，由 `TurnoverManager` 協調（SmartAdmin Manager 層）
+
+**資料庫 Schema**: 完整定義見 [Section 11.1](#111-完整資料庫結構)
+
 ---
 
 ## 2. 分層處理實作

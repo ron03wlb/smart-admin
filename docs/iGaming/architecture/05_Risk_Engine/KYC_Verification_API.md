@@ -537,6 +537,33 @@ public class KycReviewForm {
 
 ---
 
+## SmartAdmin 層級映射（SmartAdmin Layer Mapping）
+
+> **合規標準**:
+> - UK RTS 5A.1: KYC 驗證必須在玩家註冊後 72 小時內完成
+> - MGA AML Directive: 交易監控必須為即時或準即時
+> - GDPR Art 35: 涉及大規模個人資料處理的功能須進行數據保護影響評估
+
+以下映射明確標注每個合規功能在 SmartAdmin 分層架構中的歸屬：
+
+| 合規功能 | SmartAdmin 層級 | 類別名稱 | 歸屬理由 | 合規標準 |
+|---------|----------------|---------|---------|---------|
+| KYC 文件提交 API | **Controller** | `KycController` | REST API 入口，權限檢查 `@SaCheckPermission` | UK RTS 5A.1 |
+| KYC 驗證業務邏輯 | **Service** | `KycService` | 業務協調：呼叫 OCR → 人臉比對 → 黑名單，不涉及 @Transactional | UK RTS 5A.1 |
+| KYC 狀態持久化 | **Manager** | `KycManager` | 多表寫入（t_kyc_verification + t_kyc_audit_log），需要 `@Transactional(rollbackFor = Throwable.class)` | GDPR Art 35 |
+| AML 即時交易監控 | **Service** | `AmlMonitoringService` | 即時風險評分，無 @Transactional，可直接呼叫 Dao 讀取 | MGA AML Directive |
+| AML 警報持久化 | **Manager** | `AmlAlertManager` | 警報寫入 + 審計日誌寫入，需要 @Transactional | MGA AML Directive |
+| 風控提案生成 | **Manager** | `RiskProposalManager` | 異步提案建立 + 狀態更新，需要 @Transactional（參見 [ADR-012](../adr/ADR-012_Async_Risk_Proposal_System.md)） | MGA AML |
+| 自我排除執行 | **Service** | `SelfExclusionService` | 協調凍結：通知 WalletManager + SessionGuard + NotificationService | NCPG / GamCare |
+| 自我排除狀態變更 | **Manager** | `SelfExclusionManager` | 帳戶鎖定 + 交易凍結，需要 @Transactional | NCPG / GamCare |
+
+**關鍵設計原則**:
+- **Service 層**: 業務協調、風險評分計算、合規邏輯判斷。使用 `io.vavr.control.Option`
+- **Manager 層**: 所有涉及 @Transactional 的持久化操作。使用 `@Component` + `@RequiredArgsConstructor`
+- **自我排除執行**: 由 Service 協調多個 Manager 和 Service，確保所有平台元件同步凍結
+
+---
+
 ## 4. Service 層實現（Service Layer Implementation）
 
 ### 4.1 PEP 加強盡職調查服務（PEP Enhanced Due Diligence Service）

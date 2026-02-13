@@ -38,6 +38,17 @@ SmartAdmin v3.x 的風控系統採用**實時阻斷模式**，存在以下關鍵
 
 採用 **Flag（標記）模式** 的異步風控提案系統，替代現有的實時阻斷模式。
 
+### SmartAdmin 層級映射
+
+| 異步風控組件 | SmartAdmin 層級 | 備註 |
+|------------|----------------|------|
+| 風控規則評估 | **Service** (`RiskEvaluationService`) | 即時計算，不涉及 @Transactional |
+| 風控提案建立 | **Manager** (`RiskProposalManager`) | 多表寫入，`@Transactional(rollbackFor = Throwable.class)` |
+| 取款風控關聯 | **Service** (`WithdrawalRiskService`) | 查詢已有提案，協調審核流程 |
+| 人工審核狀態更新 | **Manager** (`RiskReviewManager`) | 狀態機轉換 + 審計日誌 |
+
+> 完整合規功能層級映射請參見 [KYC_Verification_API.md — SmartAdmin 層級映射](../05_Risk_Engine/KYC_Verification_API.md#smartadmin-層級映射smartadmin-layer-mapping)
+
 ### 核心原則
 
 1. **投注時**：實時檢測 + 標記異常 + 生成提案（不阻斷投注）

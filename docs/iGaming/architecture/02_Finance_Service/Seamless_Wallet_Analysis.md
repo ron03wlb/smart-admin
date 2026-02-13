@@ -111,6 +111,11 @@ stateDiagram-v2
 
 ## 3. 冪等性實作
 
+> **交叉引用 — 冪等策略三文件導航**:
+> - [Seamless_Wallet_Technical.md](Seamless_Wallet_Technical.md#4-冪等三層防禦) — 三層架構圖（Redis → DB UNIQUE → Fallback Query）+ Java IdempotencyGuard 實作
+> - [Financial_Implementation.md](Financial_Implementation.md#23-並發安全的餘額扣減redis-lua) — WalletManager 中 Redis 快取層的實際扣款應用
+> - **本文件** (Seamless_Wallet_Analysis.md) — 逾時重試時序圖 + 組件設計分析
+
 ### 3.1 逾時與重試時序圖
 
 ```mermaid

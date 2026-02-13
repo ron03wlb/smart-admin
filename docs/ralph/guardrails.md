@@ -300,3 +300,33 @@ This rule is commented out but preserved for future reference.
   - `requirements/01_Player_Experience/Business_Flows.md` - Changed "相關文件" to "相關架構"
   - `requirements/02_Financial_Operations/Payment_Operations.md` - Changed "相關文件" to "相關架構"
 - **Lesson**: After translation phases, ALL validation scripts must update to bilingual pattern matching (English OR Chinese)
+
+### P26: Architecture conflicts must have ADR (Added 2026-02-13)
+- **Problem**: Phase 15 identified 7 design concept conflicts (4 HIGH, 3 MEDIUM) between iGaming docs and SmartAdmin architecture rules
+- **Root Cause**: Architecture documents were written without explicit mapping to SmartAdmin layered architecture constraints
+- **Rule**: All HIGH severity architecture conflicts MUST be documented as formal ADR before being resolved
+- **Implementation**: ADR-013 (Manager boundary), ADR-014 (@TenantIgnore safety), ADR-015 (Idempotency standard)
+- **Lesson**: New architecture documents should include a "SmartAdmin Layer Mapping" section upfront to prevent conflicts from accumulating
+
+### P27: Distributed lock operations must be in Manager layer (Added 2026-02-13)
+- **Problem**: Financial_Implementation.md Section 2.3 showed Redis Lua script + async DB persistence without clear class declaration
+- **Root Cause**: Code example lacked class-level context, making layer assignment ambiguous
+- **Rule**: Any code example that uses Redisson locks, Redis Lua scripts, or @Transactional MUST:
+  1. Include full class declaration with `@Component` / `@RequiredArgsConstructor`
+  2. Be placed in a Manager class (not Service)
+  3. Use `@Transactional(rollbackFor = Throwable.class)` — not bare @Transactional
+  4. Use synchronous DB persistence (not CompletableFuture.runAsync)
+- **SmartAdmin Reference**: [F04-architecture-rules.md](.agent/rules/foundation/F04-architecture-rules.md)
+- **Lesson**: Code examples in architecture docs are read as implementation guidance — incomplete examples lead to incorrect implementations
+
+### P28: @TenantIgnore must have whitelist documentation (Added 2026-02-13)
+- **Problem**: Multi_Tenant_Architecture.md used @TenantIgnore without documenting which tables are permitted or forbidden
+- **Security Risk**: Unrestricted use could expose player PII (GDPR), payment data (PCI-DSS), or KYC documents
+- **Rule**: Any document that shows @TenantIgnore usage MUST include:
+  1. Allowed tables/scenarios whitelist
+  2. Forbidden tables/scenarios (with risk level and violated standard)
+  3. Audit logging requirements
+  4. ArchUnit enforcement recommendation
+- **Compliance Standards**: PCI-DSS v4 Req 7.2.1, GDPR Art 25, ISO 27001 A.9.2
+- **ADR Reference**: [ADR-014](docs/iGaming/architecture/adr/ADR-014_TenantIgnore_Safety_Policy.md)
+- **Lesson**: Security-critical annotations need explicit usage policies, not just code examples

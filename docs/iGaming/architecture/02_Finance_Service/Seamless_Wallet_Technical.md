@@ -185,6 +185,11 @@ public void detectOrphanedRounds() {
 
 ## 4. 冪等三層防禦
 
+> **交叉引用 — 冪等策略三文件導航**:
+> - **本文件** (Seamless_Wallet_Technical.md) — 三層架構圖 + Java 實作（IdempotencyGuard）
+> - [Financial_Implementation.md](Financial_Implementation.md#23-並發安全的餘額扣減redis-lua) — WalletManager 中 Redis 快取層的實際扣款應用
+> - [Seamless_Wallet_Analysis.md](Seamless_Wallet_Analysis.md#3-冪等性實作) — 逾時重試時序圖 + 組件設計分析
+
 ### 4.1 架構圖
 
 ```
@@ -224,9 +229,9 @@ public class IdempotencyGuard {
             return deserialize(cachedResponse);
         }
 
-        // 第 2 層：DB 唯一約束檢查
-        Optional<Transaction> existing = transactionRepository.findByTxId(txId);
-        if (existing.isPresent()) {
+        // 第 2 層：DB 唯一約束檢查（SmartAdmin: Service 層使用 Vavr Option）
+        Option<Transaction> existing = transactionRepository.findByTxId(txId);
+        if (existing.isDefined()) {
             T response = deserialize(existing.get().getResponse());
             // 填充快取供下次請求使用
             redisTemplate.opsForValue().set(cacheKey, serialize(response), 1, TimeUnit.HOURS);
@@ -314,6 +319,65 @@ public class ConcurrencyManager {
     }
 }
 ```
+
+### 5.3 鎖順序協議（Lock Ordering Protocol）
+
+狀態機（Section 2）與分佈式鎖（Section 5.2）的交互必須遵循以下順序保證，避免死鎖和資料不一致：
+
+**鎖獲取順序規則**:
+
+```
+1. 冪等檢查（鎖外）     → 重複請求直接返回快取結果，無需獲取鎖
+2. 玩家級鎖（外層鎖）    → wallet:lock:{playerId}，防止同一玩家並發操作
+3. 回合級鎖（內層鎖）    → round:lock:{playerId}，防止同一回合並發結算
+4. 狀態轉換（鎖內）      → 在鎖保護範圍內完成 OPEN → CLOSED/CANCELLED
+5. DB 持久化（鎖內）     → @Transactional 在 Manager 層
+6. 釋放鎖（finally）     → 逆序釋放：回合鎖 → 玩家鎖
+```
+
+**請求處理流程圖**:
+
+```mermaid
+sequenceDiagram
+    participant GP as 遊戲供應商
+    participant Guard as IdempotencyGuard
+    participant Lock as Redisson Lock
+    participant Manager as RoundLifecycleManager
+    participant DB as PostgreSQL
+
+    GP->>Guard: 派彩請求 (roundId, txId, amount)
+
+    Note over Guard: 第 1 步：冪等檢查（鎖外）
+    Guard->>Guard: Redis 快取查詢 txId
+    alt txId 已存在
+        Guard-->>GP: 返回快取結果（無需獲取鎖）
+    end
+
+    Note over Lock: 第 2 步：獲取玩家級鎖
+    Guard->>Lock: tryLock(wallet:lock:{playerId})
+    Lock-->>Guard: 鎖已獲取
+
+    Note over Manager: 第 3 步：狀態轉換（鎖內）
+    Guard->>Manager: processWin(request)
+    Manager->>DB: SELECT round WHERE roundId AND status=OPEN
+    Manager->>DB: BEGIN TRANSACTION
+    Manager->>DB: UPDATE balance += amount
+    Manager->>DB: UPDATE round SET status=CLOSED
+    Manager->>DB: INSERT wallet_transaction
+    Manager->>DB: COMMIT
+    Manager-->>Guard: WalletResponse
+
+    Note over Lock: 第 4 步：釋放鎖
+    Guard->>Lock: unlock(wallet:lock:{playerId})
+
+    Guard-->>GP: Success (新餘額)
+```
+
+**關鍵保證**:
+1. **冪等攔截在鎖外**: 重複請求不消耗鎖資源，保護系統吞吐量
+2. **狀態轉換在鎖內**: 所有 `round.status` 變更都在 Redisson 鎖保護範圍內完成
+3. **@Transactional 在 Manager 層**: 由 `RoundLifecycleManager` 處理（SmartAdmin 架構規則）
+4. **無巢狀鎖**: 投注和派彩操作只獲取玩家級鎖，避免死鎖風險
 
 ---
 
@@ -436,9 +500,9 @@ public class OutOfOrderHandler {
         for (String key : pendingKeys) {
             String roundId = key.replace("pending:win:", "");
 
-            // 檢查投注是否已到達
-            Optional<Round> round = roundRepository.findByRoundId(roundId);
-            if (round.isPresent() && round.get().getStatus() == RoundStatus.OPEN) {
+            // 檢查投注是否已到達（SmartAdmin: Vavr Option）
+            Option<Round> round = roundRepository.findByRoundId(roundId);
+            if (round.isDefined() && round.get().getStatus() == RoundStatus.OPEN) {
                 // 投注已到達，處理待處理派彩
                 WinRequest winRequest = deserialize(redisTemplate.opsForValue().get(key));
                 processWin(winRequest);
@@ -458,8 +522,8 @@ public class StrategyManager {
     private final AtomicInteger pendingQueueSize = new AtomicInteger(0);
 
     public WinResponse handleWin(WinRequest request) {
-        // 檢查投注是否存在
-        Optional<Round> round = roundRepository.findByRoundId(request.getRoundId());
+        // 檢查投注是否存在（SmartAdmin: Vavr Option）
+        Option<Round> round = roundRepository.findByRoundId(request.getRoundId());
 
         if (round.isEmpty()) {
             // 偵測到亂序
@@ -494,17 +558,17 @@ public class ResilientCacheService {
     private final StringRedisTemplate redisTemplate;
     private final CircuitBreaker circuitBreaker;
 
-    public Optional<String> get(String key) {
+    public Option<String> get(String key) {
         try {
             return circuitBreaker.executeSupplier(() ->
-                Optional.ofNullable(redisTemplate.opsForValue().get(key))
+                Option.of(redisTemplate.opsForValue().get(key))
             );
         } catch (CallNotPermittedException e) {
             // 熔斷器開啟，繞過快取
-            return Optional.empty();
+            return Option.none();
         } catch (RedisConnectionException e) {
             // 連線失敗，優雅降級
-            return Optional.empty();
+            return Option.none();
         }
     }
 }

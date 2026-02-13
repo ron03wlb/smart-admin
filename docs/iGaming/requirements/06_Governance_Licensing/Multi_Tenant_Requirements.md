@@ -111,7 +111,20 @@
 2. **Brand 層級聚合**：Brand Admin 可查看跨 Tenant 的聚合數據，但未經模擬無法修改個別 Tenant 記錄
 3. **無跨 Brand 訪問**：Brand A 無法訪問 Brand B 的任何數據
 
-### 5.2 共享數據考量
+### 5.2 跨租戶查詢白名單限制（Cross-Tenant Query Whitelist）
+
+當 Brand Admin 或 Super Admin 需要執行跨租戶聚合查詢時，系統必須遵循以下業務規則：
+
+1. **白名單制度**：僅允許特定場景繞過租戶隔離（品牌聚合報表、全局管理操作、租戶遷移）
+2. **禁止訪問敏感資料**：跨租戶查詢**禁止**返回玩家 PII 明細（email、電話、身份證號）、錢包餘額明細、KYC 文件或支付憑證
+3. **審計追蹤**：每次跨租戶查詢必須記錄操作者、時間、查詢範圍和返回資料量
+4. **最小權限原則**：跨租戶查詢僅限於 Super Admin 和 Brand Admin 角色
+
+> **合規依據**: PCI-DSS v4 Req 7.2.1（最小權限）、GDPR Art 25（數據保護設計）
+
+→ **[技術實作 — @TenantIgnore Safety Matrix](../../architecture/06_Platform_Core/Multi_Tenant_Architecture.md#63-tenantignore-安全使用策略tenant-bypass-safety-matrix)** — 白名單表清單、ArchUnit 強制檢查、審計日誌要求
+
+### 5.3 共享數據考量
 
 | 數據類型 | 共享層級 | 需求 |
 |-----------|--------------|-------------|

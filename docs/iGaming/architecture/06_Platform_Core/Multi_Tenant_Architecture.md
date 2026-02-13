@@ -495,6 +495,53 @@ GROUP BY t.tenant_id, t.tenant_name
 ORDER BY t.tenant_name;
 ```
 
+### 6.3 @TenantIgnore 安全使用策略（Tenant Bypass Safety Matrix）
+
+> **合規標準**:
+> - PCI-DSS v4 Req 7.2.1: 基於最小權限原則的訪問控制 — 繞過租戶過濾器必須限定在明確授權的場景
+> - GDPR Art 25: 數據保護設計（Data Protection by Design） — 跨租戶數據訪問必須有安全防護
+> - ISO 27001 A.9.2: 用戶訪問管理 — 所有租戶繞過操作必須記錄審計日誌
+
+**@TenantIgnore 允許使用的場景白名單**:
+
+| 允許場景 | 操作表 | 授權角色 | 審計要求 | 備註 |
+|---------|--------|---------|---------|------|
+| 品牌級別財務聚合報表 | `t_transaction`（唯讀聚合） | Super Admin, Brand Admin | 必須記錄查詢者、時間、brand_id | 僅 SELECT + GROUP BY |
+| 品牌級別玩家統計 | `t_player`（唯讀計數） | Super Admin, Brand Admin | 必須記錄查詢者、時間 | 禁止返回 PII 明細 |
+| 全局遊戲供應商管理 | `t_game_provider` | Super Admin | 標準審計日誌 | 全局共享資料表 |
+| 全局風控規則管理 | `t_risk_rule_global` | Super Admin | 標準審計日誌 | 全局預設規則 |
+| 跨 Brand 租戶遷移 | 多表（見 Section 7.2） | Super Admin | 完整遷移審計追蹤 | 僅在 TenantMigrationManager 內 |
+
+**禁止使用 @TenantIgnore 的場景**:
+
+| 禁止場景 | 受保護表 | 風險等級 | 違反標準 |
+|---------|---------|---------|---------|
+| 玩家 PII 明細查詢 | `t_player`（含 email, phone, id_number） | 極高 | GDPR Art 25, PCI-DSS 3.4 |
+| 錢包餘額直接訪問 | `t_wallet`, `t_wallet_transaction` | 極高 | PCI-DSS 7.2.1 |
+| KYC 文件訪問 | `t_kyc_document` | 極高 | GDPR Art 9, UK RTS 5A |
+| 支付憑證訪問 | `t_payment_credential` | 極高 | PCI-DSS 3.4, 4.1 |
+
+**ArchUnit 強制檢查建議**:
+
+```java
+@ArchTest
+static final ArchRule tenantIgnoreOnlyInAllowedClasses =
+    methods().that().areAnnotatedWith(TenantIgnore.class)
+        .should().beDeclaredInClassesThat()
+        .haveSimpleNameEndingWith("ReportService")
+        .orShould().beDeclaredInClassesThat()
+        .haveSimpleNameEndingWith("MigrationManager")
+        .because("@TenantIgnore 僅限於報表 Service 和遷移 Manager 使用 (PCI-DSS v4 Req 7.2.1)");
+```
+
+**審計日誌要求**:
+
+所有使用 `@TenantIgnore` 的方法必須在執行時記錄：
+1. **操作者身份**（userId, role）
+2. **訪問範圍**（brandId, 時間範圍）
+3. **返回數據量**（記錄數，不記錄明細）
+4. **訪問原因**（報表查詢 / 遷移操作 / 全局管理）
+
 ---
 
 ## 7. 租戶資料遷移（Tenant Data Migration）
