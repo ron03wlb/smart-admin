@@ -287,3 +287,16 @@ This rule is commented out but preserved for future reference.
   - MEDIUM: Terminology (≥95%), Coverage Thresholds (Java ≥90%, SQL ≥95%) - warning
 - **Coverage Calculation**: Uses P23 approach (content files only, excludes README/INDEX/reports)
 - **Lesson**: CI/CD workflows must align with project-wide conventions, not create conflicting standards
+
+### P25: Quality gate validation must support bilingual patterns (Added 2026-02-13)
+- **Problem**: After Phase 9 Traditional Chinese translation, cross-reference validation failed (16% Arch→Req, 18% Req→Arch) due to English-only pattern matching
+- **Root Cause**: `validate-quality-gate.sh` searched only for English terms ("Business Requirements", "Related Architecture"), but Phase 9 translated these to Chinese ("業務需求", "相關架構")
+- **Fix**: Enhanced validation patterns to support BOTH English AND Chinese:
+  - Architecture → Requirements: `grep -rlE 'Business Requirements|業務需求'`
+  - Requirements → Architecture: `grep -rlE 'Related Architecture|Related Doc.*architecture|相關架構'`
+- **Result**: Cross-reference coverage jumped from 16%/18% → 99%/96% → **100%/100%** (after fixing 3 missing links)
+- **Missing Files Fixed**:
+  - `architecture/12_Security/PCI_DSS_v4_Implementation_Guide.md` - Added "業務需求" link
+  - `requirements/01_Player_Experience/Business_Flows.md` - Changed "相關文件" to "相關架構"
+  - `requirements/02_Financial_Operations/Payment_Operations.md` - Changed "相關文件" to "相關架構"
+- **Lesson**: After translation phases, ALL validation scripts must update to bilingual pattern matching (English OR Chinese)
