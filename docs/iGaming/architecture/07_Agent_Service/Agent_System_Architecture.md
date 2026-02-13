@@ -58,10 +58,10 @@ graph TD
 
 ## 4. 資料庫架構（Database Schema）
 
-### 4.1 affiliate_agent Table（代理主表）
+### 4.1 t_affiliate_agent Table（代理主表）
 
 ```sql
-CREATE TABLE affiliate_agent (
+CREATE TABLE t_affiliate_agent (
     agent_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     username VARCHAR(50) NOT NULL,
@@ -83,10 +83,10 @@ CREATE TABLE affiliate_agent (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 4.2 affiliate_hierarchy Table（Closure Table）
+### 4.2 t_affiliate_hierarchy Table（Closure Table）
 
 ```sql
-CREATE TABLE affiliate_hierarchy (
+CREATE TABLE t_affiliate_hierarchy (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     ancestor_id BIGINT NOT NULL,
@@ -99,10 +99,10 @@ CREATE TABLE affiliate_hierarchy (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 4.3 affiliate_commission_plan Table（佣金方案表）
+### 4.3 t_affiliate_commission_plan Table（佣金方案表）
 
 ```sql
-CREATE TABLE affiliate_commission_plan (
+CREATE TABLE t_affiliate_commission_plan (
     plan_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     plan_name VARCHAR(100) NOT NULL,
@@ -125,10 +125,10 @@ CREATE TABLE affiliate_commission_plan (
 -- ]
 ```
 
-### 4.4 affiliate_commission_record Table（佣金記錄表）
+### 4.4 t_affiliate_commission_record Table（佣金記錄表）
 
 ```sql
-CREATE TABLE affiliate_commission_record (
+CREATE TABLE t_affiliate_commission_record (
     record_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     agent_id BIGINT NOT NULL,
@@ -149,10 +149,10 @@ CREATE TABLE affiliate_commission_record (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 4.5 affiliate_adjustment Table（調整記錄表）
+### 4.5 t_affiliate_adjustment Table（調整記錄表）
 
 ```sql
-CREATE TABLE affiliate_adjustment (
+CREATE TABLE t_affiliate_adjustment (
     adjustment_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     agent_id BIGINT NOT NULL,
@@ -177,8 +177,8 @@ CREATE TABLE affiliate_adjustment (
 ```sql
 -- Query all downline agents for agent_id=10 (including self)
 SELECT a.*
-FROM affiliate_agent a
-INNER JOIN affiliate_hierarchy h
+FROM t_affiliate_agent a
+INNER JOIN t_affiliate_hierarchy h
     ON h.descendant_id = a.agent_id
 WHERE h.ancestor_id = 10
     AND h.tenant_id = 'tenant_001'
@@ -200,7 +200,7 @@ FROM (
     SELECT
         ag.agent_id,
         SUM(b.bet_amount - b.win_amount) AS net_win
-    FROM affiliate_agent ag
+    FROM t_affiliate_agent ag
     INNER JOIN player p ON p.referrer_agent_id = ag.agent_id
     INNER JOIN bet_record b ON b.player_id = p.player_id
     WHERE ag.agent_id = 10
@@ -221,7 +221,7 @@ SELECT
     p.player_id,
     p.username AS player_username,
     p.last_login_ip
-FROM affiliate_agent ag
+FROM t_affiliate_agent ag
 INNER JOIN player p ON p.referrer_agent_id = ag.agent_id
 WHERE p.last_login_ip = (
     SELECT last_login_ip
@@ -251,7 +251,7 @@ import java.time.LocalDateTime;
  * Affiliate agent entity
  */
 @Data
-@TableName("affiliate_agent")
+@TableName("t_affiliate_agent")
 public class AffiliateEntity {
 
     @TableId(type = IdType.AUTO)
@@ -433,8 +433,8 @@ public interface AffiliateDao extends BaseMapper<AffiliateEntity> {
 
     @Select("""
         SELECT a.*
-        FROM affiliate_agent a
-        INNER JOIN affiliate_hierarchy h
+        FROM t_affiliate_agent a
+        INNER JOIN t_affiliate_hierarchy h
             ON h.descendant_id = a.agent_id
         WHERE h.ancestor_id = #{ancestorId}
         ORDER BY h.depth, a.agent_id
@@ -562,7 +562,7 @@ groups:
 | 面板 | 類型 | 查詢 |
 |-------|------|-------|
 | 今日佣金總額 | 折線圖 | `sum(affiliate_commission_amount{status="APPROVED"}) by (tenant_id)` |
-| 待審批數量 | 數字面板 | `count(affiliate_commission_record{status="PENDING"})` |
+| 待審批數量 | 數字面板 | `count(t_affiliate_commission_record{status="PENDING"})` |
 | 計算耗時 | 折線圖 | `avg(affiliate_commission_calculation_duration_seconds) by (agent_id)` |
 | 佣金前 10 名代理 | 表格 | 按佣金金額排序 |
 | 同 IP 檢測告警 | 表格 | 標記的代理-玩家 IP 匹配 |

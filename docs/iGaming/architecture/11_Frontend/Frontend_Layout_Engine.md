@@ -272,3 +272,16 @@ CREATE TABLE t_component_exposure (
 
 CREATE INDEX idx_exposure_component ON t_component_exposure(component_id, exposed_at DESC);
 ```
+
+---
+
+## 合規缺口說明（Compliance Gap Notes）
+
+> **WCAG 2.1 Level AA 缺口**: 目前前端佈局引擎尚未涵蓋 WCAG 2.1 Level AA 無障礙要求。依據歐盟《歐洲無障礙法案》（European Accessibility Act, EAA）和部分博弈監管機構要求，前端元件需符合：
+> - **1.4.3 Contrast (Minimum)**: 文字對比度至少 4.5:1
+> - **2.1.1 Keyboard**: 所有功能可透過鍵盤操作
+> - **2.4.7 Focus Visible**: 焦點指示器清晰可見
+> - **4.1.2 Name, Role, Value**: 所有 UI 元件具備 ARIA 標籤
+>
+> **待辦**: 需建立獨立文件 `Accessibility_Requirements.md` 規劃 WCAG 2.1 Level AA 完整合規需求。
+> **相關**: [SEO_Performance.md](SEO_Performance.md) — 效能與無障礙指標、[Mobile_App_Architecture.md](Mobile_App_Architecture.md) — 行動裝置無障礙

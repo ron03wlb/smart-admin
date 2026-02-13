@@ -675,6 +675,17 @@ class SelfExclusionServiceTest {
 
 ---
 
+## 合規缺口說明（Compliance Gap Notes）
+
+> **負責任博弈成效量化缺口**: 目前自我排除架構實現了強制排除機制，但缺乏成效量化指標（Effectiveness Metrics）：
+> - **排除後復賭率（Relapse Rate）**: 自我排除期滿後 6 個月內恢復高頻投注的玩家比例
+> - **排除觸發及時性**: 從問題賭博行為偵測到啟動自我排除的平均時間
+> - **跨平台排除覆蓋率**: 透過 GAMSTOP / 第三方排除系統同步的成功率
+>
+> **待辦**: 需補充成效量化 KPI 定義及監控儀表板設計。
+
+---
+
 ## 相關文件
 
 - [Self_Exclusion_Requirements.md](../../requirements/15_Responsible_Gambling/Self_Exclusion_Requirements.md) — 業務需求

@@ -523,6 +523,17 @@ public class RiskRuleConfigManager {
 
 ---
 
+## 合規缺口說明（Compliance Gap Notes）
+
+> **6AMLD 合規缺口**: 目前風控系統涵蓋 FATF 建議和 5AMLD（第五反洗錢指令），但尚未完全對齊 6AMLD（第六反洗錢指令, Sixth Anti-Money Laundering Directive）的新增要求：
+> - **刑事責任擴展（Criminal Liability Extension）**: 法人實體直接承擔刑事責任
+> - **22 種核心犯罪行為（22 Predicate Offences）**: 含稅務犯罪、環境犯罪的擴展清單
+> - **輔助犯罪（Aiding & Abetting）**: 協助洗錢行為的偵測
+>
+> **待辦**: 需建立獨立文件 `6AMLD_Compliance_Requirements.md` 規劃完整合規需求，並更新 KYC/AML 交易監控規則。
+
+---
+
 **文件版本**: 1.0.0
 **最後更新**: 2026-02-08
 **維護者**: 風控團隊 & 後端團隊

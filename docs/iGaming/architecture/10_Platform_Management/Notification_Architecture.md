@@ -377,11 +377,11 @@ routing_config:
 
 ## 11. PostgreSQL Schema
 
-### 11.1 notification_templates
+### 11.1 t_notification_template
 
 ```sql
 -- Notification template definition
-CREATE TABLE notification_templates (
+CREATE TABLE t_notification_template (
     template_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     template_code VARCHAR(50) UNIQUE NOT NULL,  -- e.g., OTP_REGISTER
     category VARCHAR(30) NOT NULL,               -- TRANSACTIONAL, MARKETING
@@ -396,15 +396,15 @@ CREATE TABLE notification_templates (
 );
 
 -- Indexes
-CREATE INDEX idx_notification_templates_code ON notification_templates (template_code);
-CREATE INDEX idx_notification_templates_category ON notification_templates (category) WHERE is_active = TRUE;
+CREATE INDEX idx_t_notification_template_code ON t_notification_template (template_code);
+CREATE INDEX idx_t_notification_template_category ON t_notification_template (category) WHERE is_active = TRUE;
 ```
 
-### 11.2 notification_delivery_logs
+### 11.2 t_notification_delivery_log
 
 ```sql
 -- Notification delivery audit trail
-CREATE TABLE notification_delivery_logs (
+CREATE TABLE t_notification_delivery_log (
     log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     notification_id VARCHAR(50) UNIQUE NOT NULL,  -- Business ID: ntf-abc123
     template_code VARCHAR(50) NOT NULL,
@@ -425,10 +425,10 @@ CREATE TABLE notification_delivery_logs (
 );
 
 -- Indexes
-CREATE INDEX idx_notification_logs_user_id ON notification_delivery_logs (user_id, created_at DESC);
-CREATE INDEX idx_notification_logs_status ON notification_delivery_logs (status, created_at DESC);
-CREATE INDEX idx_notification_logs_template ON notification_delivery_logs (template_code, created_at DESC);
-CREATE INDEX idx_notification_logs_cost ON notification_delivery_logs (sent_at DESC, cost_usd DESC);  -- Cost analytics
+CREATE INDEX idx_notification_logs_user_id ON t_notification_delivery_log (user_id, created_at DESC);
+CREATE INDEX idx_notification_logs_status ON t_notification_delivery_log (status, created_at DESC);
+CREATE INDEX idx_notification_logs_template ON t_notification_delivery_log (template_code, created_at DESC);
+CREATE INDEX idx_notification_logs_cost ON t_notification_delivery_log (sent_at DESC, cost_usd DESC);  -- Cost analytics
 ```
 
 ### 11.3 Query Examples
@@ -441,7 +441,7 @@ SELECT
     SUM(cost_usd) AS total_cost,
     AVG(delivery_time_ms) AS avg_latency_ms,
     SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS delivery_rate_pct
-FROM notification_delivery_logs
+FROM t_notification_delivery_log
 WHERE sent_at >= CURRENT_DATE - INTERVAL '1 day'
 GROUP BY channel_used
 ORDER BY total_cost DESC;
@@ -454,8 +454,8 @@ SELECT
     l.sent_at,
     t.title_i18n->>'en_US' AS title,
     t.category
-FROM notification_delivery_logs l
-JOIN notification_templates t ON l.template_code = t.template_code
+FROM t_notification_delivery_log l
+JOIN t_notification_template t ON l.template_code = t.template_code
 WHERE l.user_id = '12345'
 ORDER BY l.sent_at DESC
 LIMIT 20;
@@ -465,7 +465,7 @@ SELECT
     DATE_TRUNC('day', sent_at) AS date,
     COUNT(*) AS fallback_count,
     SUM(cost_usd) AS fallback_cost
-FROM notification_delivery_logs
+FROM t_notification_delivery_log
 WHERE fallback_reason LIKE '%Telegram%'
   AND channel_used = 'SMS'
   AND sent_at >= CURRENT_DATE - INTERVAL '7 days'
@@ -479,7 +479,7 @@ SELECT
     COUNT(*) AS sent_count,
     AVG(delivery_time_ms) AS avg_latency_ms,
     SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS delivery_rate_pct
-FROM notification_delivery_logs
+FROM t_notification_delivery_log
 WHERE sent_at >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY template_code, channel_used
 ORDER BY sent_count DESC;

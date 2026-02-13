@@ -323,8 +323,8 @@ public class MfaResetService {
 ## 5. 緊急聯絡人數據庫架構（Emergency Contact Database Schema）
 
 ```sql
--- t_mfa_emergency_contacts table
-CREATE TABLE t_mfa_emergency_contacts (
+-- t_mfa_emergency_contact table
+CREATE TABLE t_mfa_emergency_contact (
     user_id             BIGINT NOT NULL REFERENCES t_admin_user(user_id),
     contact_user_id     BIGINT NOT NULL REFERENCES t_admin_user(user_id),
     contact_type        VARCHAR(20) NOT NULL,   -- COLLEAGUE / MANAGER

@@ -110,6 +110,8 @@ MFA 可將安全風險從 High（8.1）降低至 Medium（4.3），降低約 47%
 
 ### 4.3 失敗鎖定機制設計（Failure Lockout Mechanism Design）
 
+> **獨立狀態釐清**：MFA 設備鎖定（`t_mfa_secret.status = LOCKED`，3 次失敗 / 15 分鐘）與玩家帳號鎖定（`account_status = LOCKED`，5 次登入失敗 / 30 分鐘）為**獨立狀態**，解鎖需分別處理。MFA 設備解鎖不影響帳號狀態，反之亦然。帳號狀態機見 → [Data_Model.md Section 3.1](../00_Overview/Data_Model.md)
+
 ```mermaid
 graph LR
     A[用戶輸入 MFA Code] --> B{驗證}

@@ -152,8 +152,8 @@ Game Provider (遊戲提供商)
 | 狀態碼（State Code） | 觸發條件（Trigger Condition） | 業務影響（Business Impact） | 恢復路徑（Recovery Path） |
 |-----------|------------------|-----------------|---------------|
 | `ACTIVE` | 預設狀態 | 無限制 | N/A |
-| `LOCKED` | 連續 5 次登入失敗 | 登入禁止 30 分鐘 | 密碼重設 OR 自動解鎖 |
-| `SUSPENDED` | 風險分數 >= 70 | 存款/提款/投注禁止 | 人工審核通過 |
+| `LOCKED` | 連續 5 次登入失敗（與 MFA 鎖定獨立） | 登入禁止 30 分鐘 | 密碼重設 OR 自動解鎖 |
+| `SUSPENDED` | 累計風險檔案分數 (Cumulative Profile Risk Score) >= 70 | 存款/提款/投注禁止 | 人工審核通過 |
 | `PENDING_VERIFICATION` | 提款觸發 KYC 升級 | 提款限額（<$1000） | KYC 驗證通過 |
 | `CLOSED` | 自我排除 OR AML 違規 | 所有操作禁止，永久性 | 不可恢復 |
 
@@ -163,7 +163,7 @@ Game Provider (遊戲提供商)
 stateDiagram-v2
     [*] --> ACTIVE : 註冊完成
     ACTIVE --> LOCKED : 連續 5 次登入失敗
-    ACTIVE --> SUSPENDED : 風險分數 >= 70
+    ACTIVE --> SUSPENDED : 累計風險檔案分數 >= 70
     ACTIVE --> PENDING_VERIFICATION : 提款觸發 KYC 升級
     ACTIVE --> CLOSED : 自我排除
 
@@ -177,6 +177,10 @@ stateDiagram-v2
 
     CLOSED --> [*] : 永久關閉
 ```
+
+> **風險分數領域釐清（Risk Score Domain Clarification）**:
+> - **累計風險檔案分數 (Cumulative Profile Risk Score)**：由 KYC 狀態、存款模式、投注行為等長期累積，觸發帳號級動作（SUSPENDED）。詳見 → [Risk_System_Architecture.md](../05_Risk_Engine/Risk_System_Architecture.md)
+> - **單次交易風險分數 (Per-Transaction Risk Score)**：每次提款請求即時評估，觸發訂單級動作（OrderStatus.REVIEWING）。詳見 → [Financial_Implementation.md](../02_Finance_Service/Financial_Implementation.md) Section 7.3
 
 **狀態轉換 SQL 範例（State Transition SQL Examples）**:
 
@@ -220,6 +224,8 @@ WHERE account_status = 'LOCKED'
 | `ROLLBACK` | 餘額回滾進行中 | REFUNDED | 釋放鎖定餘額 |
 | `REFUNDED` | 已退款 | [終態] | 餘額解鎖 |
 | `REJECTED` | 審核拒絕 | REFUNDED | 風險/人工拒絕 |
+
+> **持久化映射說明（Persistence Mapping）**: `RISK_CHECK`、`KYC_REQUIRED`、`MANUAL_REVIEW` 為業務概念狀態，在 `OrderStatus` 枚舉中統一以 `REVIEWING` 持久化。細分狀態透過 `review_type` 欄位區分。詳見 → [Financial_Implementation.md](../02_Finance_Service/Financial_Implementation.md) Section 7.3
 
 **SAGA 編排流程圖（SAGA Orchestration Flow Diagram）**:
 
@@ -426,14 +432,16 @@ INSERT INTO player_status_audit_log (
 
 ### 5.2 錢包表（Wallet Table）（`wallets`）
 
-**可下注餘額公式（Playable Balance Formula）**:
+**錢包總覽餘額公式（Wallet Overview Balance Formula）**— 用於前台顯示，包含所有錢包類型：
 
 > **SSOT**: 完整計算邏輯見 [02-06_Wallet_Architecture.md](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ```text
-可下注餘額 = 現金 + 紅利 + (信用額度 - 已用信用) - 鎖定餘額
-Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
+錢包總覽餘額 = 現金 + 紅利 + (信用額度 - 已用信用) - 鎖定餘額
+Wallet Overview Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 ```
+
+> **注意**：此公式為前台顯示用途。即時投注扣款使用不同公式（僅現金錢包），詳見 → [Financial_Implementation.md Section 2.2](../02_Finance_Service/Financial_Implementation.md)
 
 **並發控制（Concurrency Control）**:
 - 使用 `version` 欄位進行樂觀鎖
@@ -482,12 +490,15 @@ Playable Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked Balance
 
 ```text
 第一層：風險引擎驗證（即時）
-    | 有效投注標記
+    | BLOCK → 短路回傳（跳過第 2/3 層）
+    | PASS → 有效投注標記
 第二層：金融層驗證（批次）
     | 流水資料匯總
 第三層：活動層應用（觸發）
     | 活動進度更新
 ```
+
+> **短路行為（Short-Circuit Behavior）**: 第一層（風險驗證）BLOCK 時立即回傳 `is_valid=false`，不執行第二/三層。SSOT 詳見 → [Turnover_Calculation_Architecture.md](../02_Finance_Service/Turnover_Calculation_Architecture.md)
 
 ### 6.3 多租戶資料隔離（Multi-Tenant Data Isolation）
 

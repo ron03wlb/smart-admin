@@ -12,6 +12,15 @@
 
 本文檔涵蓋 SmartAdmin iGaming 平台中實現 KYC（Know Your Customer，身份驗證）和 AML（Anti-Money Laundering，反洗錢）驗證系統的技術架構。包括 API 規格、資料庫架構、驗證工作流程、第三方整合及程式碼範例。
 
+> **FATF 40 建議對齊聲明**: 本模組覆蓋以下 FATF (Financial Action Task Force) 建議：
+> - **Rec 10 (CDD)**: 客戶盡職調查 — 見 Section 1.1 KYC 文件驗證流程
+> - **Rec 6 (TFS)**: 定向金融制裁 — 見 Section 1.4 制裁篩查（OFAC SDN、UN、EU、UK 名單）
+> - **Rec 12 (PEPs)**: 政治公眾人物 — 見 Section 2.3 PEP 篩查結果表（`t_pep_screening_result`）
+> - **Rec 20 (STR)**: 可疑交易報告 — 見 Section 2.2 AML 警報表（`t_aml_alert`）及 SAR 報告欄位
+> - **Rec 11 (Record keeping)**: 記錄保存 — 見 Section 2.6 AML 審計日誌表（7 年保留期、雜湊鏈防篡改）
+>
+> **缺口**: FATF Rec 16（電匯規則）尚未完整涵蓋，需於加密貨幣支付整合時補充 Travel Rule 實作。
+
 ---
 
 ## 1. 自動化驗證工作流程（Automated Verification Workflow）
@@ -151,7 +160,7 @@ graph TD
 ### 2.1 KYC 驗證記錄表（KYC Verification Records Table）
 
 ```sql
-CREATE TABLE kyc_verifications (
+CREATE TABLE t_kyc_verification (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     player_id BIGINT NOT NULL,
     tenant_id BIGINT NOT NULL,
@@ -195,7 +204,7 @@ CREATE TABLE kyc_verifications (
 ### 2.2 AML 警報表（AML Alerts Table）
 
 ```sql
-CREATE TABLE aml_alerts (
+CREATE TABLE t_aml_alert (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     player_id BIGINT NOT NULL,
     tenant_id BIGINT NOT NULL,
@@ -393,7 +402,7 @@ CREATE TABLE t_mlro_decision_log (
 
 ```sql
 -- AML audit log table (regulatory compliant)
-CREATE TABLE aml_audit_logs (
+CREATE TABLE t_aml_audit_log (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id BIGINT NOT NULL,
     player_id BIGINT,
@@ -420,15 +429,15 @@ CREATE TABLE aml_audit_logs (
 
 -- Hash Chain verification trigger
 DELIMITER //
-CREATE TRIGGER aml_audit_logs_hash_chain
-BEFORE INSERT ON aml_audit_logs
+CREATE TRIGGER t_aml_audit_log_hash_chain
+BEFORE INSERT ON t_aml_audit_log
 FOR EACH ROW
 BEGIN
     DECLARE prev_hash VARCHAR(64);
 
     -- Get previous record hash
     SELECT hash_value INTO prev_hash
-    FROM aml_audit_logs
+    FROM t_aml_audit_log
     WHERE tenant_id = NEW.tenant_id
     ORDER BY id DESC
     LIMIT 1;

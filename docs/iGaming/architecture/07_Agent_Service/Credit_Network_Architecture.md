@@ -64,7 +64,7 @@ flowchart TD
     LOCK_CHECK -->|否 - 重試 >= 3| ERR4["錯誤：鎖超時"]
     LOCK_CHECK -->|是| READ_PARENT
 
-    READ_PARENT["讀取父代理信用記錄<br/>SELECT * FROM agent_credit<br/>WHERE agent_id = parent FOR UPDATE"] --> VERSION_CHECK{版本匹配？}
+    READ_PARENT["讀取父代理信用記錄<br/>SELECT * FROM t_agent_credit<br/>WHERE agent_id = parent FOR UPDATE"] --> VERSION_CHECK{版本匹配？}
     VERSION_CHECK -->|否| RETRY_VERSION{重試次數 < 3？}
     RETRY_VERSION -->|是| READ_PARENT
     RETRY_VERSION -->|否| ERR5["錯誤：樂觀鎖衝突"]
@@ -76,11 +76,11 @@ flowchart TD
     AVAILABLE_CHECK -->|否| ERR6["錯誤：父代理信用不足"]
     AVAILABLE_CHECK -->|是| UPDATE_PARENT
 
-    UPDATE_PARENT["UPDATE agent_credit SET<br/>allocated_to_children += amount,<br/>version = version + 1<br/>WHERE agent_id = parent AND version = $current_version"]
+    UPDATE_PARENT["UPDATE t_agent_credit SET<br/>allocated_to_children += amount,<br/>version = version + 1<br/>WHERE agent_id = parent AND version = $current_version"]
 
-    UPDATE_PARENT --> UPDATE_CHILD["UPDATE agent_credit SET<br/>credit_limit = new_amount,<br/>position_percent = new_position"]
+    UPDATE_PARENT --> UPDATE_CHILD["UPDATE t_agent_credit SET<br/>credit_limit = new_amount,<br/>position_percent = new_position"]
 
-    UPDATE_CHILD --> INSERT_AUDIT["INSERT INTO credit_allocation_audit<br/>(parent_id, child_id, old_limit, new_limit, delta, reason, operator)"]
+    UPDATE_CHILD --> INSERT_AUDIT["INSERT INTO t_credit_allocation_audit<br/>(parent_id, child_id, old_limit, new_limit, delta, reason, operator)"]
 
     INSERT_AUDIT --> COMMIT[COMMIT Transaction]
     COMMIT --> RELEASE_LOCK["釋放 Redis 鎖<br/>DEL credit:parent:$id"]
@@ -136,12 +136,12 @@ sequenceDiagram
             SettlementService->>AgentL2: calculatePosition(week=W-1)
             AgentL2->>DB: SELECT SUM(player_bets - player_wins) FROM player_transactions
             DB-->>AgentL2: net_player_loss = $100,000
-            AgentL2->>DB: INSERT INTO settlement_records (agent_id, week, own_share, to_parent)
+            AgentL2->>DB: INSERT INTO t_settlement_record (agent_id, week, own_share, to_parent)
         end
 
         loop 每個代理 L1
-            AgentL1->>DB: SELECT SUM(to_parent) FROM settlement_records WHERE parent_id = L1
-            AgentL1->>DB: INSERT INTO settlement_records
+            AgentL1->>DB: SELECT SUM(to_parent) FROM t_settlement_record WHERE parent_id = L1
+            AgentL1->>DB: INSERT INTO t_settlement_record
         end
 
         SettlementService->>DB: COMMIT
@@ -157,7 +157,7 @@ sequenceDiagram
     rect rgb(230, 230, 255)
         Note over SettlementService,Platform: 階段 3：驗證與重置（週五 18:00 - 週六 12:00）
 
-        SettlementService->>DB: UPDATE agent_credit SET used_credit = 0, status = 'ACTIVE'
+        SettlementService->>DB: UPDATE t_agent_credit SET used_credit = 0, status = 'ACTIVE'
     end
 ```
 
@@ -165,10 +165,10 @@ sequenceDiagram
 
 ## 6. 資料庫架構（Database Schema）
 
-### 6.1 agent_credit 表
+### 6.1 t_agent_credit 表
 
 ```sql
-CREATE TABLE agent_credit (
+CREATE TABLE t_agent_credit (
     agent_id BIGINT PRIMARY KEY,
     tenant_id VARCHAR(32) NOT NULL,
     parent_id BIGINT,
@@ -190,10 +190,10 @@ CREATE TABLE agent_credit (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 6.2 settlement_records 表
+### 6.2 t_settlement_record 表
 
 ```sql
-CREATE TABLE settlement_records (
+CREATE TABLE t_settlement_record (
     record_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     agent_id BIGINT NOT NULL,
@@ -215,10 +215,10 @@ CREATE TABLE settlement_records (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### 6.3 credit_allocation_audit 表
+### 6.3 t_credit_allocation_audit 表
 
 ```sql
-CREATE TABLE credit_allocation_audit (
+CREATE TABLE t_credit_allocation_audit (
     audit_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(32) NOT NULL,
     parent_id BIGINT NOT NULL,
@@ -338,7 +338,7 @@ public class CreditRiskAssessmentService {
 | **Controller** | `CreditNetworkController` | 信用分配的 REST API 端點 |
 | **Service** | `CreditNetworkService` | 業務邏輯，通過 Dao 進行單表查詢 |
 | **Manager** | `CreditSettlementManager` | @Transactional 結算操作，多表寫入 |
-| **Dao** | `AgentCreditDao` | agent_credit 表的 MyBatis Plus mapper |
+| **Dao** | `AgentCreditDao` | t_agent_credit 表的 MyBatis Plus mapper |
 | **Entity** | `AgentCreditEntity` | 資料庫實體映射 |
 
 **關鍵架構規則**：

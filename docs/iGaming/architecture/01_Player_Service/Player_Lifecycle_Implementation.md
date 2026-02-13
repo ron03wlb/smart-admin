@@ -87,7 +87,18 @@ stateDiagram-v2
     end note
 ```
 
-### 1.2 KYC 升級流程（KYC Upgrade Flow）
+### 1.2 KYC 等級映射（KYC Level Mapping）
+
+> **跨模組映射**：玩家域使用 `L0/L1/L2/L3`，租戶/合規域使用 `NONE/BASIC/ENHANCED/FULL`
+
+| 玩家域（Player Domain） | 合規域（Compliance Domain） | 說明 | 提款限額 |
+|---|---|---|---|
+| `L0` | `NONE` | 僅電話/郵箱 | $500 |
+| `L1` | `BASIC` | 身份已驗證（ID + 活體） | $5,000 |
+| `L2` | `ENHANCED` | 地址已驗證 | $50,000 |
+| `L3` | `FULL` | 資金來源已驗證 | 無限額 |
+
+### 1.3 KYC 升級流程（KYC Upgrade Flow）
 
 ```mermaid
 flowchart TD
@@ -180,7 +191,7 @@ flowchart TD
 ### 2.1 Players Table
 
 ```sql
-CREATE TABLE t_players (
+CREATE TABLE t_player (
     player_id BIGSERIAL PRIMARY KEY,
     tenant_id INT NOT NULL,
     username VARCHAR(64) NOT NULL,
@@ -194,7 +205,7 @@ CREATE TABLE t_players (
     -- Lifecycle Stage (NEW_USER, ACTIVE_USER, DORMANT_USER, CHURNED_USER)
     lifecycle_stage VARCHAR(32),
 
-    -- KYC
+    -- KYC (L0/L1/L2/L3 映射見下方 KYC 等級映射表)
     current_kyc_level VARCHAR(8) DEFAULT 'L0',
     pending_kyc_level VARCHAR(8),
     kyc_verified_at TIMESTAMP,
@@ -242,20 +253,20 @@ CREATE TABLE t_players (
     CONSTRAINT uk_players_tenant_phone UNIQUE (tenant_id, phone_number)
 );
 
-CREATE INDEX idx_players_tenant_id ON t_players(tenant_id);
-CREATE INDEX idx_players_account_status ON t_players(account_status);
-CREATE INDEX idx_players_lifecycle_stage ON t_players(lifecycle_stage);
-CREATE INDEX idx_players_risk_level ON t_players(risk_level);
-CREATE INDEX idx_players_vip_tier ON t_players(vip_tier);
-CREATE INDEX idx_players_last_bet_date ON t_players(last_bet_date);
+CREATE INDEX idx_players_tenant_id ON t_player(tenant_id);
+CREATE INDEX idx_players_account_status ON t_player(account_status);
+CREATE INDEX idx_players_lifecycle_stage ON t_player(lifecycle_stage);
+CREATE INDEX idx_players_risk_level ON t_player(risk_level);
+CREATE INDEX idx_players_vip_tier ON t_player(vip_tier);
+CREATE INDEX idx_players_last_bet_date ON t_player(last_bet_date);
 ```
 
 ### 2.2 Player Devices Table
 
 ```sql
-CREATE TABLE t_player_devices (
+CREATE TABLE t_player_device (
     device_record_id BIGSERIAL PRIMARY KEY,
-    player_id BIGINT NOT NULL REFERENCES t_players(player_id),
+    player_id BIGINT NOT NULL REFERENCES t_player(player_id),
     tenant_id INT NOT NULL,
     device_id VARCHAR(64) NOT NULL,
     device_fingerprint JSONB,
@@ -268,15 +279,15 @@ CREATE TABLE t_player_devices (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_player_devices_player_id ON t_player_devices(player_id);
-CREATE INDEX idx_player_devices_device_id ON t_player_devices(device_id);
-CREATE UNIQUE INDEX idx_player_devices_unique ON t_player_devices(player_id, device_id);
+CREATE INDEX idx_player_devices_player_id ON t_player_device(player_id);
+CREATE INDEX idx_player_devices_device_id ON t_player_device(device_id);
+CREATE UNIQUE INDEX idx_player_devices_unique ON t_player_device(player_id, device_id);
 ```
 
 ### 2.3 Player Login Logs Table
 
 ```sql
-CREATE TABLE t_player_login_logs (
+CREATE TABLE t_player_login_log (
     log_id BIGSERIAL PRIMARY KEY,
     player_id BIGINT NOT NULL,
     tenant_id INT NOT NULL,
@@ -290,16 +301,16 @@ CREATE TABLE t_player_login_logs (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_player_login_logs_player_id ON t_player_login_logs(player_id);
-CREATE INDEX idx_player_login_logs_created_at ON t_player_login_logs(created_at);
+CREATE INDEX idx_player_login_logs_player_id ON t_player_login_log(player_id);
+CREATE INDEX idx_player_login_logs_created_at ON t_player_login_log(created_at);
 ```
 
 ### 2.4 KYC Verification Tasks Table
 
 ```sql
-CREATE TABLE t_kyc_verification_tasks (
+CREATE TABLE t_kyc_verification_task (
     task_id BIGSERIAL PRIMARY KEY,
-    player_id BIGINT NOT NULL REFERENCES t_players(player_id),
+    player_id BIGINT NOT NULL REFERENCES t_player(player_id),
     tenant_id INT NOT NULL,
     current_level VARCHAR(8) NOT NULL,
     target_level VARCHAR(8) NOT NULL,
@@ -312,8 +323,8 @@ CREATE TABLE t_kyc_verification_tasks (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_kyc_tasks_player_id ON t_kyc_verification_tasks(player_id);
-CREATE INDEX idx_kyc_tasks_status ON t_kyc_verification_tasks(status);
+CREATE INDEX idx_kyc_tasks_player_id ON t_kyc_verification_task(player_id);
+CREATE INDEX idx_kyc_tasks_status ON t_kyc_verification_task(status);
 ```
 
 ---
@@ -463,11 +474,11 @@ import java.time.LocalDateTime;
 /**
  * Player Entity
  *
- * Database Table: t_players
+ * Database Table: t_player
  * SSOT: Player account status authoritative definition
  */
 @Data
-@TableName(value = "t_players", autoResultMap = true)
+@TableName(value = "t_player", autoResultMap = true)
 public class PlayerEntity {
 
     @TableId(type = IdType.AUTO)
@@ -1272,7 +1283,7 @@ class PlayerLifecycleArchitectureTest {
 
 ```sql
 -- Cron Job: Execute every 5 minutes
-UPDATE t_players
+UPDATE t_player
 SET account_status = 'ACTIVE',
     locked_until = NULL,
     failed_login_attempts = 0,
@@ -1426,7 +1437,7 @@ public class AppealManager {
 
 ```sql
 -- Reopen account (requires executive approval)
-UPDATE t_players
+UPDATE t_player
 SET account_status = 'ACTIVE',
     closed_at = NULL,
     closed_reason = NULL,

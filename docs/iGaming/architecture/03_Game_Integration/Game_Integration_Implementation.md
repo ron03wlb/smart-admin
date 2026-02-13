@@ -11,6 +11,14 @@
 
 本文件涵蓋將遊戲供應商 (Game Provider, GP) 整合至 iGaming 平台的技術實作細節，包括無縫錢包 API (Seamless Wallet API)、Token 驗證、冪等性處理、並發控制及錯誤恢復機制。
 
+> **GLI-33 / eCOGRA 合規缺口**: 目前遊戲整合模組尚未涵蓋 RNG (Random Number Generator) 公平性認證。依據 GLI-33 標準（Gaming Laboratories International — Event Wagering Systems）和 eCOGRA（eCommerce and Online Gaming Regulation and Assurance）要求，平台必須：
+> - 驗證遊戲供應商的 RNG 認證狀態（GLI-33 Section 2.3）
+> - 記錄遊戲局結果的統計分布以供稽核（eCOGRA Payout Verification）
+> - 確保遊戲結果不可被平台或供應商單方面篡改（GLI-33 Section 3.1 Integrity）
+>
+> **待辦**: 需建立獨立文件 `Game_Fairness_Certification_Roadmap.md` 完整規劃 RNG 認證流程（預計 Phase 5+ 排入）。
+> **相關參考**: [Game_Integration_Security.md](Game_Integration_Security.md) — Token 完整性驗證、[Risk_System_Architecture.md](../05_Risk_Engine/Risk_System_Architecture.md) — 遊戲 RTP 異常偵測
+
 **實作範圍**（來源文件第 5 節已完整實作；第 6-7 節為規劃中）：
 
 | 任務 | 狀態 | 說明 |
@@ -532,11 +540,11 @@ public class GameTransactionRecoveryService {
 
 ## 6. 資料庫結構 (PostgreSQL)
 
-### game_sessions
+### t_game_session
 追蹤玩家遊戲會話與無縫錢包整合。
 
 ```sql
-CREATE TABLE game_sessions (
+CREATE TABLE t_game_session (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     player_id UUID NOT NULL REFERENCES players(player_id),
@@ -572,26 +580,26 @@ CREATE TABLE game_sessions (
     CONSTRAINT valid_game_mode CHECK (game_mode IN ('REAL', 'DEMO'))
 );
 
-CREATE INDEX idx_game_sessions_player ON game_sessions(player_id, started_at DESC);
-CREATE INDEX idx_game_sessions_token ON game_sessions(session_token) WHERE session_status = 'ACTIVE';
-CREATE INDEX idx_game_sessions_active ON game_sessions(session_status, last_activity_at) WHERE session_status = 'ACTIVE';
-CREATE INDEX idx_game_sessions_provider ON game_sessions(provider_id, started_at DESC);
-CREATE INDEX idx_game_sessions_game ON game_sessions(game_id, started_at DESC);
+CREATE INDEX idx_t_game_session_player ON t_game_session(player_id, started_at DESC);
+CREATE INDEX idx_t_game_session_token ON t_game_session(session_token) WHERE session_status = 'ACTIVE';
+CREATE INDEX idx_t_game_session_active ON t_game_session(session_status, last_activity_at) WHERE session_status = 'ACTIVE';
+CREATE INDEX idx_t_game_session_provider ON t_game_session(provider_id, started_at DESC);
+CREATE INDEX idx_t_game_session_game ON t_game_session(game_id, started_at DESC);
 
-COMMENT ON TABLE game_sessions IS '玩家遊戲會話與無縫錢包整合及 Session Token 管理';
-COMMENT ON COLUMN game_sessions.session_token IS '用於無縫錢包 API 驗證的 HMAC-SHA256 簽章 Token (Base64 編碼)';
-COMMENT ON COLUMN game_sessions.token_expires_at IS 'Token 過期時間 (通常為產生後 5-15 分鐘)';
+COMMENT ON TABLE t_game_session IS '玩家遊戲會話與無縫錢包整合及 Session Token 管理';
+COMMENT ON COLUMN t_game_session.session_token IS '用於無縫錢包 API 驗證的 HMAC-SHA256 簽章 Token (Base64 編碼)';
+COMMENT ON COLUMN t_game_session.token_expires_at IS 'Token 過期時間 (通常為產生後 5-15 分鐘)';
 ```
 
-### game_round_logs
+### t_game_round_log
 記錄個別遊戲局與交易歷史 (debit, credit, cancel)。
 
 ```sql
-CREATE TABLE game_round_logs (
+CREATE TABLE t_game_round_log (
     round_log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     player_id UUID NOT NULL REFERENCES players(player_id),
-    session_id UUID NOT NULL REFERENCES game_sessions(session_id),
+    session_id UUID NOT NULL REFERENCES t_game_session(session_id),
     game_id UUID NOT NULL REFERENCES games(game_id),
     provider_id UUID NOT NULL REFERENCES game_providers(provider_id),
 
@@ -639,19 +647,19 @@ CREATE TABLE game_round_logs (
     CONSTRAINT cancel_has_original CHECK (transaction_type != 'CANCEL' OR original_request_id IS NOT NULL)
 );
 
-CREATE INDEX idx_game_round_logs_player ON game_round_logs(player_id, created_at DESC);
-CREATE INDEX idx_game_round_logs_session ON game_round_logs(session_id, created_at DESC);
-CREATE INDEX idx_game_round_logs_round ON game_round_logs(round_id, transaction_type);
-CREATE INDEX idx_game_round_logs_request ON game_round_logs(request_id) WHERE transaction_status = 'SUCCESS';
-CREATE INDEX idx_game_round_logs_pending ON game_round_logs(transaction_status, created_at) WHERE transaction_status = 'PENDING';
-CREATE INDEX idx_game_round_logs_failed ON game_round_logs(transaction_status, created_at) WHERE transaction_status IN ('FAILED', 'NOT_FOUND');
-CREATE INDEX idx_game_round_logs_provider ON game_round_logs(provider_id, created_at DESC);
+CREATE INDEX idx_t_game_round_log_player ON t_game_round_log(player_id, created_at DESC);
+CREATE INDEX idx_t_game_round_log_session ON t_game_round_log(session_id, created_at DESC);
+CREATE INDEX idx_t_game_round_log_round ON t_game_round_log(round_id, transaction_type);
+CREATE INDEX idx_t_game_round_log_request ON t_game_round_log(request_id) WHERE transaction_status = 'SUCCESS';
+CREATE INDEX idx_t_game_round_log_pending ON t_game_round_log(transaction_status, created_at) WHERE transaction_status = 'PENDING';
+CREATE INDEX idx_t_game_round_log_failed ON t_game_round_log(transaction_status, created_at) WHERE transaction_status IN ('FAILED', 'NOT_FOUND');
+CREATE INDEX idx_t_game_round_log_provider ON t_game_round_log(provider_id, created_at DESC);
 
-COMMENT ON TABLE game_round_logs IS '無縫錢包整合的遊戲局交易日誌 (debit, credit, cancel)';
-COMMENT ON COLUMN game_round_logs.request_id IS '供應商提供的冪等鍵 (每筆交易唯一，用於三層防禦)';
-COMMENT ON COLUMN game_round_logs.is_duplicate IS '若 request_id 已處理則為 TRUE (冪等檢查)';
-COMMENT ON COLUMN game_round_logs.cached_result IS '若結果從 Redis 快取返回則為 TRUE (Layer 1 冪等)';
-COMMENT ON COLUMN game_round_logs.recovery_action IS '排程恢復服務對停滯交易採取的恢復動作';
+COMMENT ON TABLE t_game_round_log IS '無縫錢包整合的遊戲局交易日誌 (debit, credit, cancel)';
+COMMENT ON COLUMN t_game_round_log.request_id IS '供應商提供的冪等鍵 (每筆交易唯一，用於三層防禦)';
+COMMENT ON COLUMN t_game_round_log.is_duplicate IS '若 request_id 已處理則為 TRUE (冪等檢查)';
+COMMENT ON COLUMN t_game_round_log.cached_result IS '若結果從 Redis 快取返回則為 TRUE (Layer 1 冪等)';
+COMMENT ON COLUMN t_game_round_log.recovery_action IS '排程恢復服務對停滯交易採取的恢復動作';
 ```
 
 ### 查詢範例
@@ -669,7 +677,7 @@ SELECT
     gs.total_win_amount,
     gs.net_result,
     (gs.ended_at - gs.started_at) AS session_duration
-FROM game_sessions gs
+FROM t_game_session gs
 INNER JOIN games g ON gs.game_id = g.game_id
 WHERE gs.player_id = 'player-uuid-001'
     AND gs.session_status = 'COMPLETED'
@@ -686,7 +694,7 @@ SELECT
     transaction_status,
     balance_after,
     is_duplicate
-FROM game_round_logs
+FROM t_game_round_log
 WHERE request_id = 'provider-request-id-12345'
 LIMIT 1;
 ```
@@ -702,7 +710,7 @@ SELECT
     transaction_amount,
     created_at,
     (NOW() - created_at) AS stalled_duration
-FROM game_round_logs
+FROM t_game_round_log
 WHERE transaction_status = 'PENDING'
     AND created_at < NOW() - INTERVAL '10 minutes'
 ORDER BY created_at ASC
@@ -717,7 +725,7 @@ SELECT
     SUM(grl.transaction_amount) AS total_failed_amount,
     COUNT(DISTINCT grl.player_id) AS affected_players,
     STRING_AGG(DISTINCT grl.failure_reason, '; ') AS failure_reasons
-FROM game_round_logs grl
+FROM t_game_round_log grl
 INNER JOIN game_providers gp ON grl.provider_id = gp.provider_id
 WHERE grl.transaction_status = 'FAILED'
     AND grl.created_at >= NOW() - INTERVAL '24 hours'
@@ -733,7 +741,7 @@ SELECT
     COUNT(*) FILTER (WHERE cached_result = TRUE) AS cache_hits,
     COUNT(*) FILTER (WHERE is_duplicate = TRUE AND NOT cached_result) AS db_hits,
     (COUNT(*) FILTER (WHERE cached_result = TRUE)::DECIMAL / COUNT(*) * 100)::DECIMAL(5,2) AS cache_hit_rate
-FROM game_round_logs
+FROM t_game_round_log
 WHERE created_at >= NOW() - INTERVAL '1 hour'
 GROUP BY transaction_type;
 ```

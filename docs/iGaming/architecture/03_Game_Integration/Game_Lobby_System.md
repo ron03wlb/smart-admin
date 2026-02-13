@@ -100,7 +100,7 @@ GameDiscoveryJob (每 4 小時)
 
 ```sql
 -- 遊戲分類配置（多租戶）
-CREATE TABLE game_categories (
+CREATE TABLE t_game_category (
     id              BIGSERIAL PRIMARY KEY,
     category_code   VARCHAR(32) NOT NULL,   -- HOT, NEW, JACKPOT, SLOT, LIVE
     category_name   JSONB NOT NULL,         -- {"zh": "熱門", "en": "Hot Games"}
@@ -113,10 +113,10 @@ CREATE TABLE game_categories (
     deleted         BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE UNIQUE INDEX idx_game_categories_tenant_code ON game_categories(tenant_id, category_code);
+CREATE UNIQUE INDEX idx_t_game_category_tenant_code ON t_game_category(tenant_id, category_code);
 
 -- 遊戲供應商配置（每個租戶啟用）
-CREATE TABLE game_provider_configs (
+CREATE TABLE t_game_provider_config (
     id              BIGSERIAL PRIMARY KEY,
     provider_code   VARCHAR(32) NOT NULL,   -- PG, PRAGMATIC, EVOLUTION
     provider_name   VARCHAR(128) NOT NULL,
@@ -133,8 +133,8 @@ CREATE TABLE game_provider_configs (
     deleted         BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE UNIQUE INDEX idx_provider_configs_tenant ON game_provider_configs(tenant_id, provider_code);
-CREATE INDEX idx_provider_configs_status ON game_provider_configs(status);
+CREATE UNIQUE INDEX idx_provider_configs_tenant ON t_game_provider_config(tenant_id, provider_code);
+CREATE INDEX idx_provider_configs_status ON t_game_provider_config(status);
 ```
 
 ---

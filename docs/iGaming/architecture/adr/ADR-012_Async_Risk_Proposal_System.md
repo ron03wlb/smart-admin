@@ -343,10 +343,10 @@ public WithdrawalRiskEvaluationVO evaluate(WithdrawalRiskEvaluationForm form) {
 
 ### 資料庫設計
 
-#### 風控提案表（risk_proposals）
+#### 風控提案表（t_risk_proposal）
 
 ```sql
-CREATE TABLE risk_proposals (
+CREATE TABLE t_risk_proposal (
     id BIGSERIAL PRIMARY KEY,
     player_id BIGINT NOT NULL,
     bet_id BIGINT,                      -- 關聯投注ID
@@ -370,21 +370,21 @@ CREATE TABLE risk_proposals (
 );
 
 -- 索引設計
-CREATE INDEX idx_risk_proposals_player_status
-    ON risk_proposals(player_id, status, created_at DESC);
+CREATE INDEX idx_t_risk_proposal_player_status
+    ON t_risk_proposal(player_id, status, created_at DESC);
 
-CREATE INDEX idx_risk_proposals_pending
-    ON risk_proposals(status, created_at)
+CREATE INDEX idx_t_risk_proposal_pending
+    ON t_risk_proposal(status, created_at)
     WHERE status = 'PENDING_REVIEW';
 
-CREATE INDEX idx_risk_proposals_game_type
-    ON risk_proposals(game_type, created_at DESC);
+CREATE INDEX idx_t_risk_proposal_game_type
+    ON t_risk_proposal(game_type, created_at DESC);
 ```
 
-#### 取款風控關聯表（withdrawal_risk_correlations）
+#### 取款風控關聯表（t_withdrawal_risk_correlation）
 
 ```sql
-CREATE TABLE withdrawal_risk_correlations (
+CREATE TABLE t_withdrawal_risk_correlation (
     id BIGSERIAL PRIMARY KEY,
     withdrawal_id BIGINT NOT NULL,
     player_id BIGINT NOT NULL,
@@ -402,10 +402,10 @@ CREATE TABLE withdrawal_risk_correlations (
 
 -- 索引設計
 CREATE INDEX idx_withdrawal_correlations_player
-    ON withdrawal_risk_correlations(player_id, evaluated_at DESC);
+    ON t_withdrawal_risk_correlation(player_id, evaluated_at DESC);
 
 CREATE INDEX idx_withdrawal_correlations_decision
-    ON withdrawal_risk_correlations(decision, evaluated_at DESC);
+    ON t_withdrawal_risk_correlation(decision, evaluated_at DESC);
 ```
 
 ---
@@ -710,7 +710,7 @@ public void onDepositCompleted(DepositCompletedEvent event) {
 - 可按玩家 ID/時間查詢
 
 **本方案**：
-- `risk_proposals` 表記錄所有提案
+- `t_risk_proposal` 表記錄所有提案
 - 邏輯刪除（`deleted` 字段）
 - 索引優化（`player_id + created_at DESC`）
 

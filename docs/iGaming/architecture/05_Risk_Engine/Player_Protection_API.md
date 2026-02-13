@@ -487,11 +487,11 @@ Content-Type: application/json
 
 ## 5. 資料庫結構（Database Schema - PostgreSQL）
 
-### player_limits
+### t_player_limit
 儲存玩家設定的存款、虧損和會話時長限額。
 
 ```sql
-CREATE TABLE player_limits (
+CREATE TABLE t_player_limit (
     limit_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     player_id UUID NOT NULL REFERENCES players(player_id),
@@ -509,7 +509,7 @@ CREATE TABLE player_limits (
 
     -- Change management
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- 'PENDING', 'ACTIVE', 'SUPERSEDED', 'CANCELLED'
-    pending_change_id UUID REFERENCES player_limits(limit_id), -- Links to future limit change
+    pending_change_id UUID REFERENCES t_player_limit(limit_id), -- Links to future limit change
     cooldown_ends_at TIMESTAMPTZ, -- For limit increases (24-hour cooldown)
 
     -- Usage tracking
@@ -531,27 +531,27 @@ CREATE TABLE player_limits (
     CONSTRAINT hierarchy_check CHECK (
         -- Monthly >= Weekly >= Daily
         (time_period = 'DAILY') OR
-        (time_period = 'WEEKLY' AND limit_amount >= (SELECT limit_amount FROM player_limits WHERE player_id = player_limits.player_id AND time_period = 'DAILY' AND status = 'ACTIVE' AND limit_type = player_limits.limit_type LIMIT 1)) OR
-        (time_period = 'MONTHLY' AND limit_amount >= (SELECT limit_amount FROM player_limits WHERE player_id = player_limits.player_id AND time_period = 'WEEKLY' AND status = 'ACTIVE' AND limit_type = player_limits.limit_type LIMIT 1))
+        (time_period = 'WEEKLY' AND limit_amount >= (SELECT limit_amount FROM t_player_limit WHERE player_id = t_player_limit.player_id AND time_period = 'DAILY' AND status = 'ACTIVE' AND limit_type = t_player_limit.limit_type LIMIT 1)) OR
+        (time_period = 'MONTHLY' AND limit_amount >= (SELECT limit_amount FROM t_player_limit WHERE player_id = t_player_limit.player_id AND time_period = 'WEEKLY' AND status = 'ACTIVE' AND limit_type = t_player_limit.limit_type LIMIT 1))
     )
 );
 
-CREATE INDEX idx_player_limits_player ON player_limits(player_id, status, effective_from) WHERE status = 'ACTIVE';
-CREATE INDEX idx_player_limits_type_period ON player_limits(limit_type, time_period) WHERE status = 'ACTIVE';
-CREATE INDEX idx_player_limits_pending ON player_limits(status, cooldown_ends_at) WHERE status = 'PENDING';
-CREATE INDEX idx_player_limits_reset ON player_limits(reset_at) WHERE status = 'ACTIVE' AND reset_at IS NOT NULL;
+CREATE INDEX idx_t_player_limit_player ON t_player_limit(player_id, status, effective_from) WHERE status = 'ACTIVE';
+CREATE INDEX idx_t_player_limit_type_period ON t_player_limit(limit_type, time_period) WHERE status = 'ACTIVE';
+CREATE INDEX idx_t_player_limit_pending ON t_player_limit(status, cooldown_ends_at) WHERE status = 'PENDING';
+CREATE INDEX idx_t_player_limit_reset ON t_player_limit(reset_at) WHERE status = 'ACTIVE' AND reset_at IS NOT NULL;
 
-COMMENT ON TABLE player_limits IS '玩家設定和管理員設定的負責任博彩限額（存款、虧損、會話、現實檢查）';
-COMMENT ON COLUMN player_limits.cooldown_ends_at IS '限額提高的 24 小時冷卻期（降低則立即生效）';
-COMMENT ON COLUMN player_limits.current_used_amount IS '實時使用計數器（由存款/虧損交易更新）';
-COMMENT ON COLUMN player_limits.hierarchy_check IS '強制執行同一 limit_type 的月限額 >= 週限額 >= 日限額';
+COMMENT ON TABLE t_player_limit IS '玩家設定和管理員設定的負責任博彩限額（存款、虧損、會話、現實檢查）';
+COMMENT ON COLUMN t_player_limit.cooldown_ends_at IS '限額提高的 24 小時冷卻期（降低則立即生效）';
+COMMENT ON COLUMN t_player_limit.current_used_amount IS '實時使用計數器（由存款/虧損交易更新）';
+COMMENT ON COLUMN t_player_limit.hierarchy_check IS '強制執行同一 limit_type 的月限額 >= 週限額 >= 日限額';
 ```
 
-### self_exclusions
+### t_self_exclusion
 追蹤自我排除 (Self-Exclusion) 和冷靜期 (Cooling-Off) 期間（玩家發起或操作員發起）。
 
 ```sql
-CREATE TABLE self_exclusions (
+CREATE TABLE t_self_exclusion (
     exclusion_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     player_id UUID NOT NULL REFERENCES players(player_id),
@@ -595,26 +595,26 @@ CREATE TABLE self_exclusions (
     CONSTRAINT no_overlap CHECK (
         -- Prevent overlapping active exclusions for same player
         NOT EXISTS (
-            SELECT 1 FROM self_exclusions se2
-            WHERE se2.player_id = self_exclusions.player_id
-                AND se2.exclusion_id != self_exclusions.exclusion_id
+            SELECT 1 FROM t_self_exclusion se2
+            WHERE se2.player_id = t_self_exclusion.player_id
+                AND se2.exclusion_id != t_self_exclusion.exclusion_id
                 AND se2.status = 'ACTIVE'
-                AND se2.start_time < self_exclusions.end_time
-                AND se2.end_time > self_exclusions.start_time
+                AND se2.start_time < t_self_exclusion.end_time
+                AND se2.end_time > t_self_exclusion.start_time
         )
     )
 );
 
-CREATE INDEX idx_self_exclusions_player ON self_exclusions(player_id, status, start_time DESC);
-CREATE INDEX idx_self_exclusions_active ON self_exclusions(status, end_time) WHERE status = 'ACTIVE';
-CREATE INDEX idx_self_exclusions_pending_revocation ON self_exclusions(status, revocation_requested_at) WHERE status = 'PENDING_REVOCATION';
-CREATE INDEX idx_self_exclusions_gamstop ON self_exclusions(gamstop_reference) WHERE gamstop_synced = TRUE;
-CREATE INDEX idx_self_exclusions_type ON self_exclusions(exclusion_type, status);
+CREATE INDEX idx_t_self_exclusion_player ON t_self_exclusion(player_id, status, start_time DESC);
+CREATE INDEX idx_t_self_exclusion_active ON t_self_exclusion(status, end_time) WHERE status = 'ACTIVE';
+CREATE INDEX idx_t_self_exclusion_pending_revocation ON t_self_exclusion(status, revocation_requested_at) WHERE status = 'PENDING_REVOCATION';
+CREATE INDEX idx_t_self_exclusion_gamstop ON t_self_exclusion(gamstop_reference) WHERE gamstop_synced = TRUE;
+CREATE INDEX idx_t_self_exclusion_type ON t_self_exclusion(exclusion_type, status);
 
-COMMENT ON TABLE self_exclusions IS '負責任博彩合規的自我排除和冷靜期（UKGC/MGA）';
-COMMENT ON COLUMN self_exclusions.duration IS '排除持續時間: 24H（冷靜期）到 PERMANENT（自我排除）';
-COMMENT ON COLUMN self_exclusions.gamstop_synced IS 'TRUE 表示排除已與英國 Gamstop 登記系統同步';
-COMMENT ON COLUMN self_exclusions.no_overlap IS '防止同一玩家的並行活動排除';
+COMMENT ON TABLE t_self_exclusion IS '負責任博彩合規的自我排除和冷靜期（UKGC/MGA）';
+COMMENT ON COLUMN t_self_exclusion.duration IS '排除持續時間: 24H（冷靜期）到 PERMANENT（自我排除）';
+COMMENT ON COLUMN t_self_exclusion.gamstop_synced IS 'TRUE 表示排除已與英國 Gamstop 登記系統同步';
+COMMENT ON COLUMN t_self_exclusion.no_overlap IS '防止同一玩家的並行活動排除';
 ```
 
 ### 查詢範例（Query Examples）
@@ -629,7 +629,7 @@ SELECT
     (limit_amount - current_used_amount) AS remaining,
     (current_used_amount / limit_amount * 100)::DECIMAL(5,2) AS usage_percentage,
     reset_at
-FROM player_limits
+FROM t_player_limit
 WHERE player_id = 'player-uuid-001'
     AND status = 'ACTIVE'
     AND effective_from <= NOW()
@@ -646,7 +646,7 @@ SELECT
     start_time,
     end_time,
     status
-FROM self_exclusions
+FROM t_self_exclusion
 WHERE player_id = 'player-uuid-001'
     AND status = 'ACTIVE'
     AND start_time <= NOW()
@@ -663,7 +663,7 @@ SELECT
     COUNT(*) FILTER (WHERE status = 'COMPLETED') AS completed_this_month,
     COUNT(*) FILTER (WHERE status = 'REVOKED') AS revoked,
     AVG(EXTRACT(EPOCH FROM (COALESCE(actual_end_time, end_time, NOW()) - start_time)) / 86400)::DECIMAL(10,2) AS avg_duration_days
-FROM self_exclusions
+FROM t_self_exclusion
 WHERE created_at >= DATE_TRUNC('month', NOW())
     AND created_at < DATE_TRUNC('month', NOW()) + INTERVAL '1 month'
 GROUP BY exclusion_type
@@ -680,7 +680,7 @@ SELECT
     pl.current_used_amount,
     (pl.current_used_amount - pl.limit_amount) AS breach_amount,
     pl.reset_at
-FROM player_limits pl
+FROM t_player_limit pl
 WHERE pl.status = 'ACTIVE'
     AND pl.limit_amount IS NOT NULL
     AND pl.current_used_amount > pl.limit_amount

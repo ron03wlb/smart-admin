@@ -303,7 +303,7 @@ public class LocalizationManager {
                 .eq(LocalizationContentEntity::getIsLatest, true)
         );
 
-        // 2. 從 content_translations 同步已審批的翻譯至 JSONB
+        // 2. 從 t_content_translation 同步已審批的翻譯至 JSONB
         JSONObject translations = new JSONObject();
         for (String lang : languages) {
             ContentTranslationEntity translation = contentTranslationDao.selectOne(
@@ -335,10 +335,10 @@ public class LocalizationManager {
 
 ## 7. 資料庫結構
 
-### 7.1 localization_contents
+### 7.1 t_localization_content
 
 ```sql
-CREATE TABLE localization_contents (
+CREATE TABLE t_localization_content (
     content_id BIGSERIAL PRIMARY KEY,
     content_type VARCHAR(50) NOT NULL CHECK (content_type IN ('promotion', 'banner', 'faq', 'notification', 'game', 'vip_tier', 'payment_method')),
     entity_id BIGINT NOT NULL,  -- Foreign key to actual entity (promotion_id, banner_id, etc.)
@@ -363,17 +363,17 @@ CREATE TABLE localization_contents (
     UNIQUE(content_type, entity_id, field_name, version)
 );
 
-CREATE INDEX idx_loc_content_type_entity ON localization_contents(content_type, entity_id);
-CREATE INDEX idx_loc_status_latest ON localization_contents(translation_status, is_latest);
-CREATE INDEX idx_loc_translations_gin ON localization_contents USING gin(translations jsonb_path_ops);
+CREATE INDEX idx_loc_content_type_entity ON t_localization_content(content_type, entity_id);
+CREATE INDEX idx_loc_status_latest ON t_localization_content(translation_status, is_latest);
+CREATE INDEX idx_loc_translations_gin ON t_localization_content USING gin(translations jsonb_path_ops);
 ```
 
-### 6.2 content_translations
+### 6.2 t_content_translation
 
 ```sql
-CREATE TABLE content_translations (
+CREATE TABLE t_content_translation (
     translation_id BIGSERIAL PRIMARY KEY,
-    content_id BIGINT NOT NULL REFERENCES localization_contents(content_id),
+    content_id BIGINT NOT NULL REFERENCES t_localization_content(content_id),
     language_code VARCHAR(10) NOT NULL,  -- ISO 639-1 + ISO 3166-1 (e.g., 'zh-TW')
     translated_text TEXT NOT NULL,
 
@@ -394,14 +394,14 @@ CREATE TABLE content_translations (
     UNIQUE(content_id, language_code)
 );
 
-CREATE INDEX idx_ct_content_lang ON content_translations(content_id, language_code);
-CREATE INDEX idx_ct_status ON content_translations(review_status, translation_method);
-CREATE INDEX idx_ct_translator ON content_translations(translator_id);
+CREATE INDEX idx_ct_content_lang ON t_content_translation(content_id, language_code);
+CREATE INDEX idx_ct_status ON t_content_translation(review_status, translation_method);
+CREATE INDEX idx_ct_translator ON t_content_translation(translator_id);
 ```
 
 **翻譯工作流程**:
-1. 在 `localization_contents` 中建立預設語言內容（通常為 'en'）
-2. 在 `content_translations` 中新增翻譯（人工或機器翻譯）
+1. 在 `t_localization_content` 中建立預設語言內容（通常為 'en'）
+2. 在 `t_content_translation` 中新增翻譯（人工或機器翻譯）
 3. 審核人員審批翻譯 → `review_status = 'approved'`
 4. API 層從 `translations` JSONB 欄位讀取（反正規化以提升效能）
-5. 同步任務從已審批的 `content_translations` 記錄更新 `translations` JSONB
+5. 同步任務從已審批的 `t_content_translation` 記錄更新 `translations` JSONB

@@ -189,3 +189,14 @@ WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
 GROUP BY DATE_FORMAT(created_at, '%Y-%m')
 ORDER BY report_month DESC;
 ```
+
+---
+
+## 合規缺口說明（Compliance Gap Notes）
+
+> **UKGC LCCP 3.1 缺口**: 目前行銷合規模組尚未完全涵蓋 UKGC（UK Gambling Commission）LCCP（Licence Conditions and Codes of Practice）3.1 條款「公平開放行銷」（Fair and Open Marketing）要求：
+> - **行銷內容公平性**: 所有促銷條件（流水倍數、最大贏取額、有效期）必須在行銷素材中清晰標示
+> - **脆弱群體保護**: 禁止對自我排除玩家和已標記問題賭博玩家發送行銷訊息
+> - **年齡驗證**: 所有行銷管道必須確認收件人年齡 >= 18
+>
+> **相關**: [Self_Exclusion_Architecture.md](../../architecture/15_Responsible_Gambling/Self_Exclusion_Architecture.md) — 自我排除玩家清單整合

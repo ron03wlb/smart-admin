@@ -27,11 +27,13 @@
 
 ## 2. 錢包系統實作
 
+> **MGA 資金隔離要求**: 錢包系統中的玩家餘額在財務層面必須與營運資金隔離（MGA Player Protection Directive 2018）。`t_wallet` 記錄的 `balance` 代表玩家應得資金，對應銀行端的獨立信託帳戶。資金隔離審計程序的完整設計需獨立文件規劃。
+
 ### 2.1 資料庫 Schema
 
 ```sql
 -- Wallet master table
-CREATE TABLE wallet (
+CREATE TABLE t_wallet (
     wallet_id BIGINT PRIMARY KEY,
     player_id BIGINT NOT NULL,
     tenant_id VARCHAR(50) NOT NULL,
@@ -46,7 +48,7 @@ CREATE TABLE wallet (
 );
 
 -- Wallet transaction records
-CREATE TABLE wallet_transaction (
+CREATE TABLE t_wallet_transaction (
     transaction_id BIGINT PRIMARY KEY,
     wallet_id BIGINT NOT NULL,
     transaction_type VARCHAR(20) NOT NULL, -- DEPOSIT, WITHDRAW, BET, WIN
@@ -59,7 +61,7 @@ CREATE TABLE wallet_transaction (
 );
 
 -- Wallet lock records
-CREATE TABLE wallet_lock (
+CREATE TABLE t_wallet_lock (
     lock_id BIGINT PRIMARY KEY,
     wallet_id BIGINT NOT NULL,
     lock_amount DECIMAL(19,4) NOT NULL,
@@ -70,13 +72,22 @@ CREATE TABLE wallet_lock (
 );
 ```
 
-### 2.2 可下注餘額計算
+> **鎖定金額雙軌設計說明**：
+> - `t_wallet.locked_amount` 為**彙總欄位**，代表該錢包所有未釋放鎖定的總額
+> - `t_wallet_lock` 為**明細表**，記錄每筆鎖定的原因、金額和關聯訂單
+> - **一致性保證**：`t_wallet.locked_amount = SUM(t_wallet_lock.lock_amount WHERE wallet_id = ?)`
+> - **更新機制**：每次 `lockWalletAmount()` / `unlockWalletAmount()` 在同一 `@Transactional` 中同步更新兩者（參見 Section 2.4）
+> - **設計理由**：彙總欄位提供 O(1) 餘額查詢效能，明細表提供完整審計軌跡
+
+### 2.2 即時投注可用餘額計算（Betting Available Balance）
+
+> **公式上下文**：此公式僅適用於即時投注扣款（現金錢包）。前台顯示用的錢包總覽餘額（含紅利、信用額度）見 → [Data_Model.md Section 5.2](../00_Overview/Data_Model.md)
 
 ```java
 /**
- * 計算可下注餘額
+ * 計算即時投注可用餘額
  *
- * 公式：可下注餘額 = 現金錢包餘額 - 鎖定金額 - 待結算投注
+ * 公式：可用餘額 = 現金錢包餘額 - 鎖定金額 - 待結算投注
  *
  * @param playerId 玩家 ID
  * @param tenantId 租戶 ID
@@ -114,6 +125,7 @@ private BigDecimal calculatePendingBets(Long playerId) {
 
 > **SmartAdmin 架構對齊**: 此操作涉及 Redis 分佈式操作 + DB 持久化，依據 SmartAdmin 架構規則必須放置於 **Manager 層**（參見 [F04-architecture-rules](../../../../.agent/rules/foundation/F04-architecture-rules.md)）。
 > **合規標準**: PCI-DSS v4 Req 6.2.1（安全開發生命週期）— 金融交易邏輯必須遵循分層架構設計原則。
+> **鎖順序協議**: 涉及多資源鎖定時，必須遵循 [Seamless_Wallet_Technical.md Section 5.3 鎖順序協議](Seamless_Wallet_Technical.md#53-鎖順序協議lock-ordering-protocol)，確保一致的鎖定取得順序（Wallet → Transaction → Lock），避免死鎖。
 
 ```java
 /**
@@ -186,9 +198,9 @@ public class WalletManager {
         // 3. 同步持久化到資料庫（在 @Transactional 範圍內）
         persistWalletTransaction(request);
 
-        // 4. 快取結果（15 分鐘）
+        // 4. 快取結果（ADR-015：統一冪等 TTL 為 3600 秒 / 1 小時）
         DebitResult debitResult = new DebitResult(requestId, walletId, amount);
-        redisTemplate.opsForValue().set(cacheKey, debitResult, 15, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(cacheKey, debitResult, 1, TimeUnit.HOURS);
 
         return debitResult;
     }
@@ -309,7 +321,7 @@ public class WalletManager {
 
 ```sql
 -- Outbox event table
-CREATE TABLE outbox_event (
+CREATE TABLE t_outbox_event (
     event_id BIGINT PRIMARY KEY,
     aggregate_type VARCHAR(50) NOT NULL, -- WALLET, BET, WITHDRAWAL
     aggregate_id VARCHAR(64) NOT NULL,
@@ -569,6 +581,8 @@ public class PaymentSignatureUtil {
 ```
 
 ### 3.3 存款服務實作
+
+> **KYC 閘控整合**: 存款和提款操作須遵循 [Player_Lifecycle_Implementation.md](../01_Player_Service/Player_Lifecycle_Implementation.md) 定義的帳戶狀態機。帳戶狀態為 `PENDING_VERIFICATION` 的玩家在 KYC 驗證完成前，其提款功能受限（存款不受影響，但可能觸發額外 AML 檢查）。
 
 ```java
 /**
@@ -1174,13 +1188,16 @@ public class CompensationNode extends NodeComponent {
 
 ### 4.3 審核工作流狀態機
 
+> **概念狀態映射（Conceptual State Mapping）**: `REVIEWING` 為持久化狀態，涵蓋三種業務概念狀態：`RISK_CHECK`（風險檢測）、`KYC_REQUIRED`（KYC 升級）、`MANUAL_REVIEW`（人工審核），以 `review_type` 欄位區分。完整業務狀態機見 → [Data_Model.md Section 3.2](../00_Overview/Data_Model.md)
+
 ```java
 /**
  * 提款審核狀態機
  *
- * 狀態轉換：
+ * 狀態轉換（持久化層）：
  * PENDING -> REVIEWING -> APPROVED -> PROCESSING -> SUCCESS
  *                      -> REJECTED
+ * 其中 REVIEWING 涵蓋概念狀態：RISK_CHECK / KYC_REQUIRED / MANUAL_REVIEW
  */
 @Component
 @RequiredArgsConstructor
@@ -1296,6 +1313,13 @@ public class WithdrawalReviewManager {
 
 ### 4.4 SAGA 補償編排器
 
+> **跨服務交易邊界說明**: 以下 SAGA 編排器協調多個 Manager 層的 `@Transactional` 操作。每個 Manager 方法擁有**獨立的本地交易邊界**，跨服務一致性由 SAGA 補償模式保證（非分佈式交易）。例如：
+> - `walletManager.lockWalletAmount()` — 本地交易（Wallet DB）
+> - `paymentGateway.createWithdrawal()` — 外部 PSP 呼叫（無交易邊界）
+> - `walletManager.debitWallet()` — 本地交易（Wallet DB）
+>
+> 若任一步驟失敗，SAGA 反向執行補償操作以恢復一致性。
+
 ```java
 /**
  * 提款 SAGA 編排器
@@ -1403,7 +1427,7 @@ interface CompensationAction {
 
 ```sql
 -- 每日財務對帳表
-CREATE TABLE daily_financial_reconciliation (
+CREATE TABLE t_daily_financial_reconciliation (
     recon_id BIGINT PRIMARY KEY,
     tenant_id VARCHAR(50) NOT NULL,
     recon_date DATE NOT NULL,
@@ -1443,7 +1467,7 @@ CREATE TABLE daily_financial_reconciliation (
 );
 
 -- 對帳差異明細表
-CREATE TABLE reconciliation_discrepancy (
+CREATE TABLE t_reconciliation_discrepancy (
     discrepancy_id BIGINT PRIMARY KEY,
     recon_id BIGINT NOT NULL,
     discrepancy_type VARCHAR(30) NOT NULL, -- WALLET, DEPOSIT, WITHDRAWAL, BET

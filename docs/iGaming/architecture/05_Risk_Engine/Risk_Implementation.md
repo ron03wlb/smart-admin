@@ -180,7 +180,7 @@ public class RiskRuleEngineService {
 
 ```sql
 -- Risk rule definitions with versioning
-CREATE TABLE risk_rules (
+CREATE TABLE t_risk_rule (
     id              BIGSERIAL PRIMARY KEY,
     rule_code       VARCHAR(64) NOT NULL UNIQUE,
     rule_name       VARCHAR(128) NOT NULL,
@@ -199,11 +199,11 @@ CREATE TABLE risk_rules (
     deleted         BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE INDEX idx_risk_rules_category ON risk_rules(category, status);
-CREATE INDEX idx_risk_rules_tenant ON risk_rules(tenant_id, status);
+CREATE INDEX idx_t_risk_rule_category ON t_risk_rule(category, status);
+CREATE INDEX idx_t_risk_rule_tenant ON t_risk_rule(tenant_id, status);
 
 -- Risk assessment event log
-CREATE TABLE risk_assessments (
+CREATE TABLE t_risk_assessment (
     id              BIGSERIAL PRIMARY KEY,
     event_id        VARCHAR(64) NOT NULL UNIQUE,  -- idempotency
     player_id       BIGINT NOT NULL,
@@ -219,9 +219,9 @@ CREATE TABLE risk_assessments (
     created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_risk_assessments_player ON risk_assessments(player_id, created_at DESC);
-CREATE INDEX idx_risk_assessments_score ON risk_assessments(risk_score) WHERE risk_score >= 60;
-CREATE INDEX idx_risk_assessments_review ON risk_assessments(action_taken, review_result) WHERE review_result IS NULL;
+CREATE INDEX idx_t_risk_assessment_player ON t_risk_assessment(player_id, created_at DESC);
+CREATE INDEX idx_t_risk_assessment_score ON t_risk_assessment(risk_score) WHERE risk_score >= 60;
+CREATE INDEX idx_t_risk_assessment_review ON t_risk_assessment(action_taken, review_result) WHERE review_result IS NULL;
 ```
 
 ---

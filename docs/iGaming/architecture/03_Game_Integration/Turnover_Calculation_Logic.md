@@ -553,8 +553,8 @@ public calculateGGR(date: LocalDate): GgrReport {
 ### 8.1 流水詳情表（Wagering Details Table）
 
 ```sql
--- wagering_details table (valid bet records)
-CREATE TABLE wagering_details (
+-- t_wagering_detail table (valid bet records)
+CREATE TABLE t_wagering_detail (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   bet_id VARCHAR(64) NOT NULL UNIQUE,
   player_id BIGINT NOT NULL,
@@ -586,8 +586,8 @@ CREATE TABLE wagering_details (
 ### 8.2 流水進度表（Wagering Progress Table）
 
 ```sql
--- wagering_progress table (aggregated view)
-CREATE TABLE wagering_progress (
+-- t_wagering_progress table (aggregated view)
+CREATE TABLE t_wagering_progress (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   player_id BIGINT NOT NULL,
   promotion_id BIGINT NOT NULL,
@@ -1174,13 +1174,13 @@ public class TurnoverModuleArchitectureTest {
   3. 非同步批次寫入資料庫（每 10 秒或 1000 筆）
 
 提款：
-  1. 直接讀取 wagering_progress 表（毫秒級）
+  1. 直接讀取 t_wagering_progress 表（毫秒級）
   2. 若達標，允許提款
 
 背景對帳 (Flink)：
   1. 每小時/每日 Flink 作業
   2. 重新計算流水進度
-  3. 與 wagering_progress 表比對
+  3. 與 t_wagering_progress 表比對
   4. 發現差異時告警 + 自動修正
 ```
 

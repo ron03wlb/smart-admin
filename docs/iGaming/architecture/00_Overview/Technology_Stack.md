@@ -706,6 +706,7 @@ flowchart LR
 
 ```sql
 -- Flink SQL: Define CDC Source Table
+-- ADR-001 豁免：Flink CDC 來源表（非業務應用表），不適用 t_ 前綴規範
 CREATE TABLE player_wallet_cdc (
     tenant_id STRING,
     player_id STRING,

@@ -35,7 +35,7 @@ graph TB
     L1Cache --> L2Cache[L2: Redis Cache<br/>TTL: 30 min]
     L1Cache2 --> L2Cache
 
-    L2Cache --> DB[(PostgreSQL<br/>localization_keys<br/>localization_values)]
+    L2Cache --> DB[(PostgreSQL<br/>t_localization_key<br/>t_localization_value)]
 
     API1 --> CDN[CDN Edge Cache<br/>CloudFlare/Akamai]
     API2 --> CDN
@@ -227,7 +227,7 @@ groups:
           severity: warning
 
       - alert: MissingTranslationKeysHigh
-        expr: increase(missing_translation_keys_total[1h]) > 100
+        expr: increase(t_missing_translation_key_total[1h]) > 100
         labels:
           severity: warning
 
@@ -441,10 +441,10 @@ public class LocalizationPublishManager {
 
 ## 8. 資料庫結構
 
-### 8.1 localization_keys
+### 8.1 t_localization_key
 
 ```sql
-CREATE TABLE localization_keys (
+CREATE TABLE t_localization_key (
     key_id BIGSERIAL PRIMARY KEY,
     key_name VARCHAR(200) UNIQUE NOT NULL,  -- e.g., 'game.slot.freespin_won'
     namespace VARCHAR(50) NOT NULL,  -- e.g., 'game', 'bonus', 'common'
@@ -469,17 +469,17 @@ CREATE TABLE localization_keys (
     created_by BIGINT REFERENCES t_employee(employee_id)
 );
 
-CREATE INDEX idx_loc_keys_namespace ON localization_keys(namespace, status);
-CREATE INDEX idx_loc_keys_status ON localization_keys(status, last_used_at);
-CREATE INDEX idx_loc_keys_name ON localization_keys(key_name);
+CREATE INDEX idx_loc_keys_namespace ON t_localization_key(namespace, status);
+CREATE INDEX idx_loc_keys_status ON t_localization_key(status, last_used_at);
+CREATE INDEX idx_loc_keys_name ON t_localization_key(key_name);
 ```
 
-### 7.2 localization_values
+### 7.2 t_localization_value
 
 ```sql
-CREATE TABLE localization_values (
+CREATE TABLE t_localization_value (
     value_id BIGSERIAL PRIMARY KEY,
-    key_id BIGINT NOT NULL REFERENCES localization_keys(key_id),
+    key_id BIGINT NOT NULL REFERENCES t_localization_key(key_id),
     language_code VARCHAR(10) NOT NULL,  -- ISO 639-1 + ISO 3166-1 (e.g., 'zh-TW')
     translated_value TEXT NOT NULL,
 
@@ -508,16 +508,16 @@ CREATE TABLE localization_values (
     UNIQUE(key_id, language_code, version)
 );
 
-CREATE INDEX idx_loc_values_key_lang ON localization_values(key_id, language_code);
-CREATE INDEX idx_loc_values_status ON localization_values(status, is_latest);
-CREATE INDEX idx_loc_values_published ON localization_values(published_at, cdn_version);
-CREATE INDEX idx_loc_values_translator ON localization_values(translator_id);
+CREATE INDEX idx_loc_values_key_lang ON t_localization_value(key_id, language_code);
+CREATE INDEX idx_loc_values_status ON t_localization_value(status, is_latest);
+CREATE INDEX idx_loc_values_published ON t_localization_value(published_at, cdn_version);
+CREATE INDEX idx_loc_values_translator ON t_localization_value(translator_id);
 ```
 
-### 7.3 missing_translation_keys
+### 7.3 t_missing_translation_key
 
 ```sql
-CREATE TABLE missing_translation_keys (
+CREATE TABLE t_missing_translation_key (
     report_id BIGSERIAL PRIMARY KEY,
     key_name VARCHAR(200) NOT NULL,
     namespace VARCHAR(50),
@@ -539,9 +539,9 @@ CREATE TABLE missing_translation_keys (
     resolved_by BIGINT REFERENCES t_employee(employee_id)
 );
 
-CREATE INDEX idx_missing_keys_lang ON missing_translation_keys(language_code, resolved);
-CREATE INDEX idx_missing_keys_count ON missing_translation_keys(report_count DESC, resolved);
-CREATE INDEX idx_missing_keys_namespace ON missing_translation_keys(namespace, resolved);
+CREATE INDEX idx_missing_keys_lang ON t_missing_translation_key(language_code, resolved);
+CREATE INDEX idx_missing_keys_count ON t_missing_translation_key(report_count DESC, resolved);
+CREATE INDEX idx_missing_keys_namespace ON t_missing_translation_key(namespace, resolved);
 ```
 
 **快取策略**:

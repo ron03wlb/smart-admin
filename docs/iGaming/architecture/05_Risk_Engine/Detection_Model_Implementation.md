@@ -429,7 +429,7 @@ public class RiskProposalManager {
 
         riskProposalDao.insert(proposal);
 
-        // 更新 detection_results 的 risk_proposal_id
+        // 更新 t_detection_result 的 risk_proposal_id
         detectionResultDao.updateProposalId(detectionResult.getResultId(), proposal.getProposalId());
 
         log.info("Risk proposal created: proposalId={}, priority={}, playerId={}",
@@ -448,7 +448,7 @@ public class RiskProposalManager {
         // 更新提案狀態
         riskProposalDao.updateReviewDecision(proposalId, decision, reviewerId, LocalDateTime.now());
 
-        // 同步更新 detection_results
+        // 同步更新 t_detection_result
         RiskProposalEntity proposal = riskProposalDao.selectById(proposalId)
             .getOrElseThrow(() -> new RuntimeException("Proposal not found: " + proposalId));
 
@@ -565,11 +565,11 @@ public class DetectionModelExecutor {
 
 ## 7. 資料庫架構（Database Schema）（PostgreSQL）
 
-### detection_models
+### t_detection_model
 儲存風險偵測模型配置和規則。
 
 ```sql
-CREATE TABLE detection_models (
+CREATE TABLE t_detection_model (
     model_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     model_name VARCHAR(100) NOT NULL,
@@ -608,28 +608,28 @@ CREATE TABLE detection_models (
     CONSTRAINT valid_priority CHECK (priority IN ('HIGH', 'MEDIUM', 'LOW'))
 );
 
-CREATE INDEX idx_detection_models_tenant ON detection_models(tenant_id) WHERE is_enabled = TRUE;
-CREATE INDEX idx_detection_models_layer_action ON detection_models(layer, action_type) WHERE is_enabled = TRUE;
-CREATE INDEX idx_detection_models_type ON detection_models(model_type) WHERE is_enabled = TRUE;
-CREATE INDEX idx_detection_models_effective ON detection_models(effective_from, effective_to) WHERE is_enabled = TRUE;
+CREATE INDEX idx_t_detection_model_tenant ON t_detection_model(tenant_id) WHERE is_enabled = TRUE;
+CREATE INDEX idx_t_detection_model_layer_action ON t_detection_model(layer, action_type) WHERE is_enabled = TRUE;
+CREATE INDEX idx_t_detection_model_type ON t_detection_model(model_type) WHERE is_enabled = TRUE;
+CREATE INDEX idx_t_detection_model_effective ON t_detection_model(effective_from, effective_to) WHERE is_enabled = TRUE;
 
-COMMENT ON TABLE detection_models IS '五層風險控制系統的風險偵測模型配置';
-COMMENT ON COLUMN detection_models.layer IS '1=同步黑名單檢查, 3=非同步風險分析, 5=提款延遲檢查';
-COMMENT ON COLUMN detection_models.action_type IS 'BLOCK=產生 HIGH 優先級提案, FLAG=產生 MEDIUM 優先級提案, IGNORE=僅記錄';
-COMMENT ON COLUMN detection_models.rule_definition IS 'JSONB 配置，用於規則特定邏輯（SQL 查詢、ML 模型參數、閾值條件）';
+COMMENT ON TABLE t_detection_model IS '五層風險控制系統的風險偵測模型配置';
+COMMENT ON COLUMN t_detection_model.layer IS '1=同步黑名單檢查, 3=非同步風險分析, 5=提款延遲檢查';
+COMMENT ON COLUMN t_detection_model.action_type IS 'BLOCK=產生 HIGH 優先級提案, FLAG=產生 MEDIUM 優先級提案, IGNORE=僅記錄';
+COMMENT ON COLUMN t_detection_model.rule_definition IS 'JSONB 配置，用於規則特定邏輯（SQL 查詢、ML 模型參數、閾值條件）';
 ```
 
-### detection_results
+### t_detection_result
 追蹤風險偵測執行結果和匹配規則。
 
 ```sql
-CREATE TABLE detection_results (
+CREATE TABLE t_detection_result (
     result_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     player_id UUID NOT NULL REFERENCES players(player_id),
     bet_id UUID REFERENCES bets(bet_id),
     withdrawal_id UUID REFERENCES withdrawals(withdrawal_id),
-    model_id UUID NOT NULL REFERENCES detection_models(model_id),
+    model_id UUID NOT NULL REFERENCES t_detection_model(model_id),
 
     -- Detection context
     layer INT NOT NULL, -- 1, 3, or 5
@@ -656,7 +656,7 @@ CREATE TABLE detection_results (
     -- Processing metadata
     processing_time_ms INT, -- Execution time in milliseconds
     model_version VARCHAR(20),
-    rule_snapshot JSONB, -- Snapshot of detection_models at execution time
+    rule_snapshot JSONB, -- Snapshot of t_detection_model at execution time
 
     -- Audit trail
     detected_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -669,18 +669,18 @@ CREATE TABLE detection_results (
     CONSTRAINT valid_review_decision CHECK (review_decision IS NULL OR review_decision IN ('APPROVED', 'REJECTED', 'PARTIAL'))
 );
 
-CREATE INDEX idx_detection_results_player ON detection_results(player_id, detected_at DESC);
-CREATE INDEX idx_detection_results_bet ON detection_results(bet_id) WHERE bet_id IS NOT NULL;
-CREATE INDEX idx_detection_results_withdrawal ON detection_results(withdrawal_id) WHERE withdrawal_id IS NOT NULL;
-CREATE INDEX idx_detection_results_matched ON detection_results(matched, action_type, detected_at DESC) WHERE matched = TRUE;
-CREATE INDEX idx_detection_results_proposal ON detection_results(risk_proposal_id) WHERE risk_proposal_id IS NOT NULL;
-CREATE INDEX idx_detection_results_review_pending ON detection_results(detected_at DESC) WHERE review_decision IS NULL AND matched = TRUE;
-CREATE INDEX idx_detection_results_layer_event ON detection_results(layer, event_type, detected_at DESC);
+CREATE INDEX idx_t_detection_result_player ON t_detection_result(player_id, detected_at DESC);
+CREATE INDEX idx_t_detection_result_bet ON t_detection_result(bet_id) WHERE bet_id IS NOT NULL;
+CREATE INDEX idx_t_detection_result_withdrawal ON t_detection_result(withdrawal_id) WHERE withdrawal_id IS NOT NULL;
+CREATE INDEX idx_t_detection_result_matched ON t_detection_result(matched, action_type, detected_at DESC) WHERE matched = TRUE;
+CREATE INDEX idx_t_detection_result_proposal ON t_detection_result(risk_proposal_id) WHERE risk_proposal_id IS NOT NULL;
+CREATE INDEX idx_t_detection_result_review_pending ON t_detection_result(detected_at DESC) WHERE review_decision IS NULL AND matched = TRUE;
+CREATE INDEX idx_t_detection_result_layer_event ON t_detection_result(layer, event_type, detected_at DESC);
 
-COMMENT ON TABLE detection_results IS '所有層級（同步、非同步、提款）的風險偵測執行結果';
-COMMENT ON COLUMN detection_results.matched IS 'TRUE 表示偵測規則被觸發，FALSE 表示未觸發';
-COMMENT ON COLUMN detection_results.suspicious_amount IS '標記供審核或凍結的金額（用於 Layer 5 提款檢查）';
-COMMENT ON COLUMN detection_results.rule_snapshot IS '執行時 detection_models 配置的不可變快照';
+COMMENT ON TABLE t_detection_result IS '所有層級（同步、非同步、提款）的風險偵測執行結果';
+COMMENT ON COLUMN t_detection_result.matched IS 'TRUE 表示偵測規則被觸發，FALSE 表示未觸發';
+COMMENT ON COLUMN t_detection_result.suspicious_amount IS '標記供審核或凍結的金額（用於 Layer 5 提款檢查）';
+COMMENT ON COLUMN t_detection_result.rule_snapshot IS '執行時 t_detection_model 配置的不可變快照';
 ```
 
 ### 查詢範例（Query Examples）
@@ -696,8 +696,8 @@ SELECT
     COUNT(*) FILTER (WHERE dr.review_decision = 'REJECTED') AS confirmed_fraud,
     (COUNT(*) FILTER (WHERE dr.review_decision = 'REJECTED')::DECIMAL / NULLIF(COUNT(*) FILTER (WHERE dr.matched = TRUE), 0))::DECIMAL(5,4) AS precision,
     AVG(dr.processing_time_ms) AS avg_processing_time_ms
-FROM detection_models dm
-INNER JOIN detection_results dr ON dm.model_id = dr.model_id
+FROM t_detection_model dm
+INNER JOIN t_detection_result dr ON dm.model_id = dr.model_id
 WHERE dr.detected_at >= NOW() - INTERVAL '30 days'
 GROUP BY dm.model_id, dm.model_name, dm.model_type, dm.action_type
 ORDER BY confirmed_fraud DESC;
@@ -711,7 +711,7 @@ SELECT
     COUNT(*) FILTER (WHERE action_type = 'BLOCK') AS high_priority_flags,
     COUNT(*) FILTER (WHERE action_type = 'FLAG') AS medium_priority_flags,
     MAX(detected_at) AS latest_detection
-FROM detection_results
+FROM t_detection_result
 WHERE player_id = 'player-uuid-001'
     AND matched = TRUE
     AND review_decision IS NULL -- Pending review
@@ -727,7 +727,7 @@ SELECT
     COUNT(*) AS block_count,
     COUNT(DISTINCT player_id) AS unique_players,
     AVG(processing_time_ms) AS avg_processing_time_ms
-FROM detection_results
+FROM t_detection_result
 WHERE layer = 1
     AND matched = TRUE
     AND detected_at >= NOW() - INTERVAL '24 hours'

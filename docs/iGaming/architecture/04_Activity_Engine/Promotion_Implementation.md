@@ -63,7 +63,7 @@ graph TB
 
 ```sql
 -- Promotion rule configuration
-CREATE TABLE promotion_rules (
+CREATE TABLE t_promotion_rule (
     id              BIGSERIAL PRIMARY KEY,
     promotion_code  VARCHAR(64) NOT NULL UNIQUE,
     promotion_name  VARCHAR(128) NOT NULL,
@@ -81,14 +81,14 @@ CREATE TABLE promotion_rules (
     deleted         BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE INDEX idx_promotion_rules_tenant_status ON promotion_rules(tenant_id, status);
-CREATE INDEX idx_promotion_rules_time ON promotion_rules(start_time, end_time);
+CREATE INDEX idx_t_promotion_rule_tenant_status ON t_promotion_rule(tenant_id, status);
+CREATE INDEX idx_t_promotion_rule_time ON t_promotion_rule(start_time, end_time);
 
 -- Player bonus claim records
-CREATE TABLE player_bonus_records (
+CREATE TABLE t_player_bonus_record (
     id                  BIGSERIAL PRIMARY KEY,
     player_id           BIGINT NOT NULL,
-    promotion_id        BIGINT NOT NULL REFERENCES promotion_rules(id),
+    promotion_id        BIGINT NOT NULL REFERENCES t_promotion_rule(id),
     claim_id            VARCHAR(64) NOT NULL UNIQUE,  -- idempotency key
     bonus_amount        NUMERIC(18,2) NOT NULL,
     wagering_required   NUMERIC(18,2) NOT NULL DEFAULT 0,
@@ -103,9 +103,9 @@ CREATE TABLE player_bonus_records (
     deleted             BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE UNIQUE INDEX idx_player_bonus_dedup ON player_bonus_records(player_id, promotion_id, claim_id);
-CREATE INDEX idx_player_bonus_status ON player_bonus_records(player_id, status);
-CREATE INDEX idx_player_bonus_expiry ON player_bonus_records(status, expired_at) WHERE status = 'ACTIVE';
+CREATE UNIQUE INDEX idx_player_bonus_dedup ON t_player_bonus_record(player_id, promotion_id, claim_id);
+CREATE INDEX idx_player_bonus_status ON t_player_bonus_record(player_id, status);
+CREATE INDEX idx_player_bonus_expiry ON t_player_bonus_record(status, expired_at) WHERE status = 'ACTIVE';
 ```
 
 ### 關鍵技術考量（Key Technical Considerations）

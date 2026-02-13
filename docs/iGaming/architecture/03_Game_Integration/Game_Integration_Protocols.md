@@ -134,7 +134,7 @@ Currency: VND (23000)     ──>  convertCurrency()      ──>   Currency: US
 #### 4.3.1 供應商協定設定
 
 ```sql
-CREATE TABLE game_provider_protocols (
+CREATE TABLE t_game_provider_protocol (
     protocol_id BIGSERIAL PRIMARY KEY,
     provider_code VARCHAR(50) NOT NULL UNIQUE,
     provider_name VARCHAR(100) NOT NULL,
@@ -153,21 +153,21 @@ CREATE TABLE game_provider_protocols (
     updated_by VARCHAR(50) NOT NULL
 );
 
-CREATE INDEX idx_game_provider_protocols_provider_code ON game_provider_protocols(provider_code);
-CREATE INDEX idx_game_provider_protocols_provider_type ON game_provider_protocols(provider_type);
-CREATE INDEX idx_game_provider_protocols_is_active ON game_provider_protocols(is_active);
+CREATE INDEX idx_t_game_provider_protocol_provider_code ON t_game_provider_protocol(provider_code);
+CREATE INDEX idx_t_game_provider_protocol_provider_type ON t_game_provider_protocol(provider_type);
+CREATE INDEX idx_t_game_provider_protocol_is_active ON t_game_provider_protocol(is_active);
 
-COMMENT ON TABLE game_provider_protocols IS '遊戲供應商整合協定設定（Type A/B/C 對映、通訊方式、驗證設定）';
-COMMENT ON COLUMN game_provider_protocols.provider_type IS 'A=PG-like 單一端點, B=Evolution-like Debit/Credit, C=Seamless Webhook';
-COMMENT ON COLUMN game_provider_protocols.retry_policy IS '重試行為的 JSON 設定（max_retries、backoff_multiplier、timeout）';
+COMMENT ON TABLE t_game_provider_protocol IS '遊戲供應商整合協定設定（Type A/B/C 對映、通訊方式、驗證設定）';
+COMMENT ON COLUMN t_game_provider_protocol.provider_type IS 'A=PG-like 單一端點, B=Evolution-like Debit/Credit, C=Seamless Webhook';
+COMMENT ON COLUMN t_game_provider_protocol.retry_policy IS '重試行為的 JSON 設定（max_retries、backoff_multiplier、timeout）';
 ```
 
 #### 4.3.2 協定訊息日誌
 
 ```sql
-CREATE TABLE protocol_message_logs (
+CREATE TABLE t_protocol_message_log (
     log_id BIGSERIAL PRIMARY KEY,
-    protocol_id BIGINT NOT NULL REFERENCES game_provider_protocols(protocol_id),
+    protocol_id BIGINT NOT NULL REFERENCES t_game_provider_protocol(protocol_id),
     transaction_id VARCHAR(100), -- Nullable for non-transactional messages (e.g., CheckToken)
     message_type VARCHAR(50) NOT NULL, -- GetBalance, Transaction, CheckToken, Callback, etc.
     direction VARCHAR(10) NOT NULL CHECK (direction IN ('REQUEST', 'RESPONSE', 'CALLBACK')),
@@ -182,15 +182,15 @@ CREATE TABLE protocol_message_logs (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_protocol_message_logs_protocol_id ON protocol_message_logs(protocol_id);
-CREATE INDEX idx_protocol_message_logs_transaction_id ON protocol_message_logs(transaction_id);
-CREATE INDEX idx_protocol_message_logs_message_type ON protocol_message_logs(message_type);
-CREATE INDEX idx_protocol_message_logs_created_at ON protocol_message_logs(created_at DESC);
-CREATE INDEX idx_protocol_message_logs_error_code ON protocol_message_logs(error_code) WHERE error_code IS NOT NULL;
+CREATE INDEX idx_t_protocol_message_log_protocol_id ON t_protocol_message_log(protocol_id);
+CREATE INDEX idx_t_protocol_message_log_transaction_id ON t_protocol_message_log(transaction_id);
+CREATE INDEX idx_t_protocol_message_log_message_type ON t_protocol_message_log(message_type);
+CREATE INDEX idx_t_protocol_message_log_created_at ON t_protocol_message_log(created_at DESC);
+CREATE INDEX idx_t_protocol_message_log_error_code ON t_protocol_message_log(error_code) WHERE error_code IS NOT NULL;
 
-COMMENT ON TABLE protocol_message_logs IS '遊戲供應商 API 互動的完整稽核軌跡（請求/回應/回呼訊息）';
-COMMENT ON COLUMN protocol_message_logs.direction IS 'REQUEST=平台→GP, RESPONSE=GP→平台, CALLBACK=GP→平台 (Webhook/WebSocket)';
-COMMENT ON COLUMN protocol_message_logs.processing_time_ms IS 'API 呼叫持續時間（毫秒）用於效能監控';
+COMMENT ON TABLE t_protocol_message_log IS '遊戲供應商 API 互動的完整稽核軌跡（請求/回應/回呼訊息）';
+COMMENT ON COLUMN t_protocol_message_log.direction IS 'REQUEST=平台→GP, RESPONSE=GP→平台, CALLBACK=GP→平台 (Webhook/WebSocket)';
+COMMENT ON COLUMN t_protocol_message_log.processing_time_ms IS 'API 呼叫持續時間（毫秒）用於效能監控';
 ```
 
 **使用範例**：
@@ -203,8 +203,8 @@ SELECT
     pml.error_message,
     pml.processing_time_ms,
     pml.created_at
-FROM protocol_message_logs pml
-JOIN game_provider_protocols gpp ON pml.protocol_id = gpp.protocol_id
+FROM t_protocol_message_log pml
+JOIN t_game_provider_protocol gpp ON pml.protocol_id = gpp.protocol_id
 WHERE gpp.provider_code = 'PGSoft'
   AND pml.error_code IS NOT NULL
   AND pml.created_at > NOW() - INTERVAL '1 hour'

@@ -660,6 +660,17 @@ lossAccumulationDao.updateAccumulation(
 
 ---
 
+## 合規缺口說明（Compliance Gap Notes）
+
+> **限額成效量化缺口**: 目前存款/虧損限額架構實現了限額強制執行，但缺乏成效量化：
+> - **限額觸發保護率**: 觸發限額後玩家資金損失減少的比例
+> - **限額調整模式**: 玩家頻繁上調限額的偵測及預警
+> - **冷卻期有效性**: 限額調整冷卻期（72 小時）對衝動行為抑制的量化效果
+>
+> **待辦**: 需補充限額成效 KPI 定義及與 Self_Exclusion 的聯動觸發規則。
+
+---
+
 ## 相關文件
 
 - [Deposit_Limits_Requirements.md](../../requirements/15_Responsible_Gambling/Deposit_Limits_Requirements.md) — 業務需求

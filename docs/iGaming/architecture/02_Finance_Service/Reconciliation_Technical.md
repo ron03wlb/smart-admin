@@ -909,6 +909,14 @@ graph TD
 
 ## 13. Fund Segregation Verification Flow
 
+> **MGA Rule 44 季度稽核缺口**: 目前資金隔離驗證為 T+1 每日對帳，尚未涵蓋 MGA（Malta Gaming Authority）Rule 44 要求的季度獨立稽核（Quarterly Independent Audit）。需補充：
+> - 季度資金隔離報告產生排程
+> - 獨立稽核師介面（API / 報表匯出）
+> - 資金隔離違規自動升級至 CFO/CTO
+>
+> **待辦**: 需建立獨立文件 `Fund_Segregation_Audit_Framework.md` 規劃完整稽核流程。
+> **相關**: [Payment_Gateway_API.md](Payment_Gateway_API.md) — 支付閘道交叉驗證
+
 ```mermaid
 sequenceDiagram
     participant Recon as T+1 Recon Engine

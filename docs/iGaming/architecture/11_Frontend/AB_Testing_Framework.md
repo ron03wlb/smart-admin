@@ -177,10 +177,10 @@ Rule 3: Guardrail metric triggered
 
 ## 7. 資料庫結構
 
-### 7.1 ab_experiments
+### 7.1 t_ab_experiment
 
 ```sql
-CREATE TABLE ab_experiments (
+CREATE TABLE t_ab_experiment (
     experiment_id BIGSERIAL PRIMARY KEY,
     experiment_key VARCHAR(100) UNIQUE NOT NULL,  -- e.g., 'homepage-redesign'
     experiment_name VARCHAR(200) NOT NULL,
@@ -212,16 +212,16 @@ CREATE TABLE ab_experiments (
     created_by BIGINT REFERENCES t_employee(employee_id)
 );
 
-CREATE INDEX idx_ab_exp_status ON ab_experiments(status, start_date);
-CREATE INDEX idx_ab_exp_key ON ab_experiments(experiment_key);
+CREATE INDEX idx_ab_exp_status ON t_ab_experiment(status, start_date);
+CREATE INDEX idx_ab_exp_key ON t_ab_experiment(experiment_key);
 ```
 
-### 7.2 ab_experiment_assignments
+### 7.2 t_ab_experiment_assignment
 
 ```sql
-CREATE TABLE ab_experiment_assignments (
+CREATE TABLE t_ab_experiment_assignment (
     assignment_id BIGSERIAL PRIMARY KEY,
-    experiment_id BIGINT NOT NULL REFERENCES ab_experiments(experiment_id),
+    experiment_id BIGINT NOT NULL REFERENCES t_ab_experiment(experiment_id),
     player_id BIGINT NOT NULL REFERENCES t_player(player_id),
     variant_name VARCHAR(50) NOT NULL,
 
@@ -245,9 +245,9 @@ CREATE TABLE ab_experiment_assignments (
     UNIQUE(experiment_id, player_id)
 );
 
-CREATE INDEX idx_ab_assign_exp_variant ON ab_experiment_assignments(experiment_id, variant_name);
-CREATE INDEX idx_ab_assign_player ON ab_experiment_assignments(player_id);
-CREATE INDEX idx_ab_assign_converted ON ab_experiment_assignments(experiment_id, converted, conversion_time);
+CREATE INDEX idx_ab_assign_exp_variant ON t_ab_experiment_assignment(experiment_id, variant_name);
+CREATE INDEX idx_ab_assign_player ON t_ab_experiment_assignment(player_id);
+CREATE INDEX idx_ab_assign_converted ON t_ab_experiment_assignment(experiment_id, converted, conversion_time);
 ```
 
 **資料保留策略**:

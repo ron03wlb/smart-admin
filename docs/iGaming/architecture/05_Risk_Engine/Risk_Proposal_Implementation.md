@@ -1507,10 +1507,10 @@ groups:
 
 ### 9.1 風控提案表（Risk Proposals Table）
 
-`risk_proposals` 表儲存所有風控提案記錄，具有基於優先級的 SLA 追蹤。
+`t_risk_proposal` 表儲存所有風控提案記錄，具有基於優先級的 SLA 追蹤。
 
 ```sql
-CREATE TABLE risk_proposals (
+CREATE TABLE t_risk_proposal (
     proposal_id BIGSERIAL PRIMARY KEY,
     proposal_no VARCHAR(50) NOT NULL UNIQUE,
     player_id BIGINT NOT NULL,
@@ -1527,32 +1527,32 @@ CREATE TABLE risk_proposals (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT fk_risk_proposals_player FOREIGN KEY (player_id) REFERENCES players(player_id),
-    CONSTRAINT fk_risk_proposals_withdrawal FOREIGN KEY (withdrawal_request_id) REFERENCES withdrawal_requests(request_id),
-    CONSTRAINT fk_risk_proposals_reviewer FOREIGN KEY (reviewer_id) REFERENCES admin_users(user_id)
+    CONSTRAINT fk_t_risk_proposal_player FOREIGN KEY (player_id) REFERENCES players(player_id),
+    CONSTRAINT fk_t_risk_proposal_withdrawal FOREIGN KEY (withdrawal_request_id) REFERENCES withdrawal_requests(request_id),
+    CONSTRAINT fk_t_risk_proposal_reviewer FOREIGN KEY (reviewer_id) REFERENCES admin_users(user_id)
 );
 
-CREATE INDEX idx_risk_proposals_player_id ON risk_proposals(player_id);
-CREATE INDEX idx_risk_proposals_status ON risk_proposals(status) WHERE deleted = false;
-CREATE INDEX idx_risk_proposals_priority_created ON risk_proposals(priority DESC, created_at ASC) WHERE status IN ('PENDING_REVIEW', 'IN_REVIEW', 'ESCALATED');
-CREATE INDEX idx_risk_proposals_reviewer_id ON risk_proposals(reviewer_id) WHERE reviewer_id IS NOT NULL;
-CREATE INDEX idx_risk_proposals_withdrawal_id ON risk_proposals(withdrawal_request_id) WHERE withdrawal_request_id IS NOT NULL;
-CREATE INDEX idx_risk_proposals_created_at ON risk_proposals(created_at DESC);
+CREATE INDEX idx_t_risk_proposal_player_id ON t_risk_proposal(player_id);
+CREATE INDEX idx_t_risk_proposal_status ON t_risk_proposal(status) WHERE deleted = false;
+CREATE INDEX idx_t_risk_proposal_priority_created ON t_risk_proposal(priority DESC, created_at ASC) WHERE status IN ('PENDING_REVIEW', 'IN_REVIEW', 'ESCALATED');
+CREATE INDEX idx_t_risk_proposal_reviewer_id ON t_risk_proposal(reviewer_id) WHERE reviewer_id IS NOT NULL;
+CREATE INDEX idx_t_risk_proposal_withdrawal_id ON t_risk_proposal(withdrawal_request_id) WHERE withdrawal_request_id IS NOT NULL;
+CREATE INDEX idx_t_risk_proposal_created_at ON t_risk_proposal(created_at DESC);
 
-COMMENT ON TABLE risk_proposals IS '風控提案記錄，具有非同步審核工作流、基於優先級的 SLA 強制執行';
-COMMENT ON COLUMN risk_proposals.priority IS '優先級等級：URGENT（1 小時 SLA）、HIGH（2 小時）、MEDIUM（24 小時）、LOW（48 小時）';
-COMMENT ON COLUMN risk_proposals.approved_amount IS '審核後批准的金額（如果拒絕則為 0，如果 PARTIAL_APPROVED 則為部分，如果 APPROVED 則為全額）';
-COMMENT ON COLUMN risk_proposals.escalation_reason IS '升級至高級分析師的原因（如果 status = ESCALATED 則為必填）';
+COMMENT ON TABLE t_risk_proposal IS '風控提案記錄，具有非同步審核工作流、基於優先級的 SLA 強制執行';
+COMMENT ON COLUMN t_risk_proposal.priority IS '優先級等級：URGENT（1 小時 SLA）、HIGH（2 小時）、MEDIUM（24 小時）、LOW（48 小時）';
+COMMENT ON COLUMN t_risk_proposal.approved_amount IS '審核後批准的金額（如果拒絕則為 0，如果 PARTIAL_APPROVED 則為部分，如果 APPROVED 則為全額）';
+COMMENT ON COLUMN t_risk_proposal.escalation_reason IS '升級至高級分析師的原因（如果 status = ESCALATED 則為必填）';
 ```
 
 ### 9.2 風控提案審核表（Risk Proposal Reviews Table）
 
-`risk_proposal_reviews` 表儲存詳細的審核歷史記錄以供審計之用。
+`t_risk_proposal_review` 表儲存詳細的審核歷史記錄以供審計之用。
 
 ```sql
-CREATE TABLE risk_proposal_reviews (
+CREATE TABLE t_risk_proposal_review (
     review_id BIGSERIAL PRIMARY KEY,
-    proposal_id BIGINT NOT NULL REFERENCES risk_proposals(proposal_id),
+    proposal_id BIGINT NOT NULL REFERENCES t_risk_proposal(proposal_id),
     reviewer_id BIGINT NOT NULL REFERENCES admin_users(user_id),
     review_action VARCHAR(30) NOT NULL CHECK (review_action IN ('CLAIM', 'APPROVE', 'REJECT', 'PARTIAL_APPROVE', 'ESCALATE', 'AUTO_APPROVE', 'AUTO_REJECT')),
     approved_amount NUMERIC(15, 2), -- Nullable for CLAIM/ESCALATE actions
@@ -1564,17 +1564,17 @@ CREATE TABLE risk_proposal_reviews (
     new_status VARCHAR(30) NOT NULL, -- Status after this review
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT fk_risk_proposal_reviews_proposal FOREIGN KEY (proposal_id) REFERENCES risk_proposals(proposal_id)
+    CONSTRAINT fk_t_risk_proposal_review_proposal FOREIGN KEY (proposal_id) REFERENCES t_risk_proposal(proposal_id)
 );
 
-CREATE INDEX idx_risk_proposal_reviews_proposal_id ON risk_proposal_reviews(proposal_id);
-CREATE INDEX idx_risk_proposal_reviews_reviewer_id ON risk_proposal_reviews(reviewer_id);
-CREATE INDEX idx_risk_proposal_reviews_review_action ON risk_proposal_reviews(review_action);
-CREATE INDEX idx_risk_proposal_reviews_created_at ON risk_proposal_reviews(created_at DESC);
+CREATE INDEX idx_t_risk_proposal_review_proposal_id ON t_risk_proposal_review(proposal_id);
+CREATE INDEX idx_t_risk_proposal_review_reviewer_id ON t_risk_proposal_review(reviewer_id);
+CREATE INDEX idx_t_risk_proposal_review_review_action ON t_risk_proposal_review(review_action);
+CREATE INDEX idx_t_risk_proposal_review_created_at ON t_risk_proposal_review(created_at DESC);
 
-COMMENT ON TABLE risk_proposal_reviews IS '所有風控提案審核操作的完整審計軌跡（認領、批准、拒絕、升級）';
-COMMENT ON COLUMN risk_proposal_reviews.review_action IS '執行的操作：CLAIM（分配給自己）、APPROVE、REJECT、PARTIAL_APPROVE、ESCALATE、AUTO_APPROVE/AUTO_REJECT（SLA 超時）';
-COMMENT ON COLUMN risk_proposal_reviews.review_duration_seconds IS '從 CLAIM 到決策的時間（以秒為單位），用於效能指標';
+COMMENT ON TABLE t_risk_proposal_review IS '所有風控提案審核操作的完整審計軌跡（認領、批准、拒絕、升級）';
+COMMENT ON COLUMN t_risk_proposal_review.review_action IS '執行的操作：CLAIM（分配給自己）、APPROVE、REJECT、PARTIAL_APPROVE、ESCALATE、AUTO_APPROVE/AUTO_REJECT（SLA 超時）';
+COMMENT ON COLUMN t_risk_proposal_review.review_duration_seconds IS '從 CLAIM 到決策的時間（以秒為單位），用於效能指標';
 ```
 
 ### 9.3 查詢範例（Example Queries）
@@ -1591,7 +1591,7 @@ SELECT
     rp.status,
     rp.created_at,
     EXTRACT(EPOCH FROM (NOW() - rp.created_at)) AS wait_time_seconds
-FROM risk_proposals rp
+FROM t_risk_proposal rp
 WHERE rp.status IN ('PENDING_REVIEW', 'ESCALATED')
   AND rp.deleted = false
 ORDER BY
@@ -1616,7 +1616,7 @@ SELECT
     COUNT(*) FILTER (WHERE rpr.review_action = 'PARTIAL_APPROVE') AS partial_approve_count,
     COUNT(*) FILTER (WHERE rpr.review_action = 'ESCALATE') AS escalate_count,
     ROUND(AVG(rpr.review_duration_seconds), 2) AS avg_review_duration_seconds
-FROM risk_proposal_reviews rpr
+FROM t_risk_proposal_review rpr
 JOIN admin_users au ON rpr.reviewer_id = au.user_id
 WHERE rpr.created_at > NOW() - INTERVAL '30 days'
   AND rpr.review_action IN ('APPROVE', 'REJECT', 'PARTIAL_APPROVE', 'ESCALATE')
@@ -1645,7 +1645,7 @@ SELECT
             WHEN 'MEDIUM' THEN 24
             WHEN 'LOW' THEN 48
         END * 100, 2) AS sla_usage_percentage
-FROM risk_proposals rp
+FROM t_risk_proposal rp
 WHERE rp.status IN ('PENDING_REVIEW', 'IN_REVIEW', 'ESCALATED')
   AND rp.deleted = false
   AND EXTRACT(EPOCH FROM (NOW() - rp.created_at)) / 3600 >

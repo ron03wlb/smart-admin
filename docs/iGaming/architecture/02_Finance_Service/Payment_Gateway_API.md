@@ -16,6 +16,7 @@ Payment Gateway 整合多個外部 PSP (Payment Service Provider，支付服務�
 - 容錯式故障轉移機制
 - 冪等交易處理
 - PCI-DSS 合規的資料處理
+- **MGA 客戶資金隔離 (Fund Segregation)**: 玩家資金必須與營運資金分離存放於獨立信託帳戶，確保營運商破產時玩家資金受保護（MGA Player Protection Directive 2018）。具體實作需獨立文件規劃。
 
 ---
 
@@ -221,8 +222,8 @@ CREATE TABLE t_payment_transaction (
 
     -- Status tracking
     status                  VARCHAR(20) NOT NULL,  -- PENDING, SUCCESS, FAILED, EXPIRED
-    error_code              VARCHAR(50),           -- INSUFFICIENT_FUNDS, INVALID_CARD, etc.
-    error_message           VARCHAR(500),
+    error_code              VARCHAR(50),           -- PSP 原始錯誤碼（字串形式，如 INSUFFICIENT_FUNDS, INVALID_CARD）
+    error_message           VARCHAR(500),          -- 內部處理時映射至 SmartAdmin ErrorCode enum（參見 Seamless_Wallet_Technical.md ErrorCode 定義）
 
     -- URLs and expiry
     redirect_url            VARCHAR(500),
@@ -1107,11 +1108,14 @@ flowchart TD
 
 ### 5.2 冪等保護（Idempotency Protection）
 
-| 機制 | 實作 | TTL | 目的 |
-|-----------|---------------|-----|---------|
-| **Redis 鎖** | `SET NX callback:{txn_id} 1 EX 60` | 60 秒 | 防止並發回調處理 |
-| **資料庫狀態** | `WHERE status = 'PENDING' AND UPDATE status = 'SUCCESS'` | N/A | 確保唯一狀態轉換 |
-| **唯一約束** | `UNIQUE (transaction_id, psp_transaction_id)` | N/A | 防止重複入賬 |
+> **ADR-015 對齊**: PSP 回調冪等保護遵循 [ADR-015 冪等三層防禦](../adr/ADR-015_Idempotency_Three_Layer_Defense.md) 架構標準。
+> 完整三層防禦技術規格請參見 [Seamless_Wallet_Technical.md Section 4 冪等三層防禦](Seamless_Wallet_Technical.md#4-冪等三層防禦)。
+
+| ADR-015 層級 | 機制 | 實作 | TTL | 目的 |
+|------------|-----------|---------------|-----|---------|
+| **Layer 1（快取）** | Redis 鎖 | `SET NX callback:{txn_id} 1 EX 60` | 60 秒 | 防止並發回調處理 |
+| **Layer 2（DB 約束）** | 資料庫狀態 | `WHERE status = 'PENDING' AND UPDATE status = 'SUCCESS'` | N/A | 確保唯一狀態轉換 |
+| **Layer 3（唯一約束）** | 唯一約束 | `UNIQUE (transaction_id, psp_transaction_id)` | N/A | 防止重複入賬 |
 
 ### 5.3 3D Secure 實作（3D Secure Implementation）
 

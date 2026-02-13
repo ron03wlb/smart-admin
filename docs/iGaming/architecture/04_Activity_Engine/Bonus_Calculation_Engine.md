@@ -310,11 +310,11 @@ Finance 與 Activity 模組均需調用 `RiskEngine.validateTurnover()` 作為�
 
 ## 資料庫結構（Database Schema — PostgreSQL）
 
-### bonus_rules 表
+### t_bonus_rule 表
 儲存獎金計算規則與遊戲權重配置。
 
 ```sql
-CREATE TABLE bonus_rules (
+CREATE TABLE t_bonus_rule (
     rule_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     promotion_id UUID NOT NULL REFERENCES promotions(promotion_id),
@@ -338,20 +338,20 @@ CREATE TABLE bonus_rules (
     CONSTRAINT valid_odds CHECK (odds_threshold IS NULL OR odds_threshold > 0)
 );
 
-CREATE INDEX idx_bonus_rules_promotion ON bonus_rules(promotion_id) WHERE is_active = TRUE;
-CREATE INDEX idx_bonus_rules_game_category ON bonus_rules(game_category) WHERE is_active = TRUE;
-CREATE INDEX idx_bonus_rules_effective ON bonus_rules(effective_from, effective_to) WHERE is_active = TRUE;
+CREATE INDEX idx_t_bonus_rule_promotion ON t_bonus_rule(promotion_id) WHERE is_active = TRUE;
+CREATE INDEX idx_t_bonus_rule_game_category ON t_bonus_rule(game_category) WHERE is_active = TRUE;
+CREATE INDEX idx_t_bonus_rule_effective ON t_bonus_rule(effective_from, effective_to) WHERE is_active = TRUE;
 
-COMMENT ON TABLE bonus_rules IS 'Bonus calculation rules including game weights and turnover validation factors';
-COMMENT ON COLUMN bonus_rules.weight_factor IS 'Layer 3 game weight: SLOTS=1.0, BACCARAT=0.15, BLACKJACK=0.10';
-COMMENT ON COLUMN bonus_rules.status_factors IS 'Layer 2 status factor mapping for WIN/LOSS/DRAW/VOID/HALF_WIN/HALF_LOSS';
+COMMENT ON TABLE t_bonus_rule IS 'Bonus calculation rules including game weights and turnover validation factors';
+COMMENT ON COLUMN t_bonus_rule.weight_factor IS 'Layer 3 game weight: SLOTS=1.0, BACCARAT=0.15, BLACKJACK=0.10';
+COMMENT ON COLUMN t_bonus_rule.status_factors IS 'Layer 2 status factor mapping for WIN/LOSS/DRAW/VOID/HALF_WIN/HALF_LOSS';
 ```
 
-### bonus_calculations 表
+### t_bonus_calculation 表
 追蹤獎金進度與三層有效投注額計算記錄。
 
 ```sql
-CREATE TABLE bonus_calculations (
+CREATE TABLE t_bonus_calculation (
     calculation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
     player_id UUID NOT NULL REFERENCES players(player_id),
@@ -386,7 +386,7 @@ CREATE TABLE bonus_calculations (
     completed_at TIMESTAMPTZ,
 
     -- Audit trail
-    rule_snapshot JSONB NOT NULL, -- Snapshot of applied bonus_rules
+    rule_snapshot JSONB NOT NULL, -- Snapshot of applied t_bonus_rule
     event_metadata JSONB, -- Original Kafka event data
 
     CONSTRAINT valid_factors CHECK (
@@ -397,17 +397,17 @@ CREATE TABLE bonus_calculations (
     CONSTRAINT valid_progression CHECK (progress_after >= progress_before)
 );
 
-CREATE INDEX idx_bonus_calc_player ON bonus_calculations(player_id, bonus_id);
-CREATE INDEX idx_bonus_calc_status ON bonus_calculations(calculation_status, calculated_at);
-CREATE INDEX idx_bonus_calc_game_round ON bonus_calculations(game_round_id);
-CREATE INDEX idx_bonus_calc_promotion ON bonus_calculations(promotion_id, calculated_at);
-CREATE INDEX idx_bonus_calc_risk_code ON bonus_calculations(risk_code) WHERE risk_code != 'VALID';
+CREATE INDEX idx_bonus_calc_player ON t_bonus_calculation(player_id, bonus_id);
+CREATE INDEX idx_bonus_calc_status ON t_bonus_calculation(calculation_status, calculated_at);
+CREATE INDEX idx_bonus_calc_game_round ON t_bonus_calculation(game_round_id);
+CREATE INDEX idx_bonus_calc_promotion ON t_bonus_calculation(promotion_id, calculated_at);
+CREATE INDEX idx_bonus_calc_risk_code ON t_bonus_calculation(risk_code) WHERE risk_code != 'VALID';
 
-COMMENT ON TABLE bonus_calculations IS 'Three-layer turnover calculation audit trail for bonus wagering progress';
-COMMENT ON COLUMN bonus_calculations.layer1_risk_factor IS 'Layer 1: Risk Engine validation (0=rejected, 1=valid)';
-COMMENT ON COLUMN bonus_calculations.layer2_status_factor IS 'Layer 2: Finance status factor (WIN=1.0, DRAW=0, HALF_WIN=0.5)';
-COMMENT ON COLUMN bonus_calculations.layer3_game_weight IS 'Layer 3: Activity game weight (SLOTS=1.0, BACCARAT=0.15)';
-COMMENT ON COLUMN bonus_calculations.rule_snapshot IS 'Immutable snapshot of bonus_rules applied at calculation time';
+COMMENT ON TABLE t_bonus_calculation IS 'Three-layer turnover calculation audit trail for bonus wagering progress';
+COMMENT ON COLUMN t_bonus_calculation.layer1_risk_factor IS 'Layer 1: Risk Engine validation (0=rejected, 1=valid)';
+COMMENT ON COLUMN t_bonus_calculation.layer2_status_factor IS 'Layer 2: Finance status factor (WIN=1.0, DRAW=0, HALF_WIN=0.5)';
+COMMENT ON COLUMN t_bonus_calculation.layer3_game_weight IS 'Layer 3: Activity game weight (SLOTS=1.0, BACCARAT=0.15)';
+COMMENT ON COLUMN t_bonus_calculation.rule_snapshot IS 'Immutable snapshot of t_bonus_rule applied at calculation time';
 ```
 
 ### 查詢範例（Query Examples）
@@ -420,7 +420,7 @@ SELECT
     SUM(layer3_activity_turnover) AS total_wagered,
     MAX(required_total) AS wagering_requirement,
     (SUM(layer3_activity_turnover) / MAX(required_total) * 100)::DECIMAL(5,2) AS completion_percentage
-FROM bonus_calculations
+FROM t_bonus_calculation
 WHERE calculation_status = 'COMPLETED'
     AND bonus_id = 'bonus-uuid-001'
 GROUP BY player_id, bonus_id;
@@ -433,7 +433,7 @@ SELECT
     COUNT(*) AS rejection_count,
     SUM(bet_amount) AS total_bet_amount,
     SUM(layer1_effective_base) AS lost_turnover
-FROM bonus_calculations
+FROM t_bonus_calculation
 WHERE calculation_status = 'REJECTED'
     AND calculated_at >= NOW() - INTERVAL '7 days'
 GROUP BY risk_code
@@ -448,7 +448,7 @@ SELECT
     SUM(layer2_valid_turnover) AS finance_turnover,
     SUM(layer3_activity_turnover) AS activity_turnover,
     (SUM(layer3_activity_turnover) / NULLIF(SUM(layer2_valid_turnover), 0))::DECIMAL(5,4) AS effective_contribution_rate
-FROM bonus_calculations
+FROM t_bonus_calculation
 WHERE calculation_status = 'COMPLETED'
     AND calculated_at >= NOW() - INTERVAL '30 days'
 GROUP BY game_type

@@ -485,7 +485,7 @@ CREATE TABLE t_mfa_recovery_request (
 ### 4.4 緊急聯絡人表（Emergency Contacts Table）
 
 ```sql
-CREATE TABLE t_mfa_emergency_contacts (
+CREATE TABLE t_mfa_emergency_contact (
     user_id             BIGINT NOT NULL REFERENCES t_admin_user(user_id),
     contact_user_id     BIGINT NOT NULL REFERENCES t_admin_user(user_id),
     contact_type        VARCHAR(20) NOT NULL,           -- COLLEAGUE / MANAGER
