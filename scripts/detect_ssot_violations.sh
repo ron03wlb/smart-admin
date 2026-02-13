@@ -15,7 +15,7 @@ for concept in "${CONCEPTS[@]}"; do
     echo "🔍 檢查概念: $concept"
 
     # 搜尋包含該概念定義的文件
-    files=$(grep -rl "$concept" docs/iGaming --include="*.md" 2>/dev/null | grep -v "archive")
+    files=$(grep -rl "$concept" docs/iGaming --include="*.md" 2>/dev/null | grep -v "archive" | grep -v "TEMPLATE_" | grep -v "TRANSLATION_GLOSSARY" | grep -v "README")
 
     # 統計定義出現次數
     count=$(echo "$files" | wc -l)

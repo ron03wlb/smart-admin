@@ -56,7 +56,7 @@ for file in $(find $ARCH_DIR -name "*.md" -not -name "README.md"); do
     if [[ "$file" == */adr/* ]]; then
         # ADR files are architecture decision records, no business requirements needed
         BACKREF_COUNT=$((BACKREF_COUNT + 1))
-    elif grep -qE '> \*\*Business Requirements\*\*|> \*\*需求文檔\*\*|requirements/' "$file" 2>/dev/null; then
+    elif grep -qE '> \*\*Business Requirements\*\*|> \*\*需求文檔\*\*|> \*\*業務需求|requirements/' "$file" 2>/dev/null; then
         BACKREF_COUNT=$((BACKREF_COUNT + 1))
     else
         echo "⚠️  Missing backref: $filename"

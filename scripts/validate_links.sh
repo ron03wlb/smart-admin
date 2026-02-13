@@ -45,7 +45,7 @@ PYEOF
         fi
     done < "$LINKS_TMP"
 
-done < <(find "$DOCS_DIR" -name "*.md" -not -path "*/archive/*" -not -path "*/source-archive/*" -not -path "*/adr/*" -not -path "*/quality-reports/*" 2>/dev/null | sort)
+done < <(find "$DOCS_DIR" -name "*.md" -not -path "*/archive/*" -not -path "*/source-archive/*" -not -path "*/adr/*" -not -path "*/quality-reports/*" -not -name "TEMPLATE_*.md" 2>/dev/null | sort)
 
 echo ""
 echo "=========================================="

@@ -23,7 +23,7 @@
 
 - [ ] 所有 Super Admin、Finance Manager 和 Risk Control 角色在登入時強制執行 MFA（高權限帳戶無法選擇性繞過）
 - [ ] TOTP（Google Authenticator）為主要 MFA 方法（P0），SMS OTP 為備用（P1），Email OTP 為後備（P2），Backup Codes 為緊急恢復（P3）
-- [ ] MFA Secret 儲存使用 AES-256-GCM 加密，並具備適當的密鑰輪換政策
+- [ ] MFA Secret 儲存使用對稱加密保護，並具備適當的密鑰輪換政策
 - [ ] 驗證失敗政策：連續 3 次失敗觸發 15 分鐘帳戶鎖定，並發送安全警報通知
 - [ ] 審計日誌捕獲所有 MFA 事件：註冊、驗證、失敗和恢復嘗試
 - [ ] MFA 合規檢查清單通過（MGA 要求）：Secret 加密、審計日誌、滲透測試和禁止自助恢復

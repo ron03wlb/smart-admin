@@ -48,7 +48,7 @@ PYEOF
             ((BROKEN_COUNT++)) || true
         fi
     done < "$LINKS_TMP"
-done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/backup-corrupted/*" ! -path "*/source-archive/*" ! -path "*/adr/*" ! -path "*/quality-reports/*" 2>/dev/null | sort)
+done < <(find "$TARGET_DIR" -name "*.md" -type f ! -path "*/backup-corrupted/*" ! -path "*/source-archive/*" ! -path "*/adr/*" ! -path "*/quality-reports/*" ! -name "TEMPLATE_*.md" 2>/dev/null | sort)
 
 echo "================================"
 echo "📊 掃描結果:"

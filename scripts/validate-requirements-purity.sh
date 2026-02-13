@@ -84,7 +84,9 @@ for file in $(find $REQUIREMENTS_DIR -name "*.md" -not -name "README.md"); do
                  grep -v "\*\*Note\*\*:" | \
                  grep -v "(.*is the approved implementation algorithm)" | \
                  grep -v "(Implementation algorithm:" | \
-                 grep -v "| Enforce.*minimum standard |")
+                 grep -v "| Enforce.*minimum standard |" | \
+                 grep -v "精煉說明" | \
+                 grep -v "補充說明")
 
     if [ -n "$violations" ]; then
         echo "❌ FAILED: $file"

@@ -112,7 +112,7 @@ private BigDecimal calculatePendingBets(Long playerId) {
 
 ### 2.3 並發安全的餘額扣減（Redis Lua）
 
-> **SmartAdmin 架構對齊**: 此操作涉及 Redis 分佈式操作 + DB 持久化，依據 SmartAdmin 架構規則必須放置於 **Manager 層**（參見 [F04-architecture-rules](.agent/rules/foundation/F04-architecture-rules.md)）。
+> **SmartAdmin 架構對齊**: 此操作涉及 Redis 分佈式操作 + DB 持久化，依據 SmartAdmin 架構規則必須放置於 **Manager 層**（參見 [F04-architecture-rules](../../../../.agent/rules/foundation/F04-architecture-rules.md)）。
 > **合規標準**: PCI-DSS v4 Req 6.2.1（安全開發生命週期）— 金融交易邏輯必須遵循分層架構設計原則。
 
 ```java

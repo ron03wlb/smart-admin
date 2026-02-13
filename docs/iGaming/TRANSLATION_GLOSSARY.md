@@ -666,7 +666,7 @@ flowchart TD
 - [docs/ralph/guardrails.md](../ralph/guardrails.md) - Ralph Loop P14 術語標準化規則
 - [CLAUDE.md](../../CLAUDE.md) - SmartAdmin AI 助手文檔語言規範
 - [docs/ralph/progress.md](../ralph/progress.md) - Ralph Loop 執行進度
-- [C:\Users\ron.chang\.claude\plans\robust-weaving-pinwheel.md](C:\Users\ron.chang\.claude\plans\robust-weaving-pinwheel.md) - iGaming 文檔繁體中文化計劃 v2.0.0
+- iGaming 文檔繁體中文化計劃 v2.0.0（原始計劃檔已歸檔）
 
 ---
 
