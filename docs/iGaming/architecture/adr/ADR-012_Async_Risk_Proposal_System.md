@@ -5,9 +5,9 @@
 **決策者**: iGaming 技術團隊
 
 **相關文檔**:
-- [P1-07: 取款風控關聯技術規格](../05_Risk_Control/05-06_Withdrawal_Risk_Correlation.md)
-- [實時風控引擎需求分析](../../.claude/skills/extended/domain/igame-pm-analyst/examples/risk-control.md)
-- [Fraud Detection Quick Reference](../../.claude/skills/extended/domain/fraud-detection-pattern-generator/knowledge/quick-reference.md)
+- [P1-07: 取款風控關聯（參見風控提案實作）](../05_Risk_Engine/07_Risk_Proposal_Implementation.md)
+- [實時風控引擎需求分析](../../../../.claude/skills/extended/domain/igame-pm-analyst/examples/risk-control.md)
+- [Fraud Detection Quick Reference](../../../../.claude/skills/extended/domain/fraud-detection-pattern-generator/knowledge/quick-reference.md)
 
 ---
 
@@ -47,7 +47,7 @@ SmartAdmin v3.x 的風控系統採用**實時阻斷模式**，存在以下關鍵
 | 取款風控關聯 | **Service** (`WithdrawalRiskService`) | 查詢已有提案，協調審核流程 |
 | 人工審核狀態更新 | **Manager** (`RiskReviewManager`) | 狀態機轉換 + 審計日誌 |
 
-> 完整合規功能層級映射請參見 [KYC_Verification_API.md — SmartAdmin 層級映射](../05_Risk_Engine/KYC_Verification_API.md#smartadmin-層級映射smartadmin-layer-mapping)
+> 完整合規功能層級映射請參見 [KYC_Verification_API.md — SmartAdmin 層級映射](../05_Risk_Engine/06_KYC_Verification_API.md#smartadmin-層級映射smartadmin-layer-mapping)
 
 ### 核心原則
 
@@ -866,8 +866,8 @@ public void cleanupOldRiskData() {
 4. [Enhanced Due Diligence For High Risk Customers](https://financialcrimeacademy.org/enhanced-due-diligence-for-high-risk-customers/)
 
 ### 相關 ADR
-- [ADR 007: Flink 實時流處理](007-flink-real-time-stream-processing.md)
-- [ADR 011: LiteFlow 規則引擎遷移](011-liteflow-migration.md)
+- ADR 007: Flink 實時流處理（計畫中）
+- ADR 011: LiteFlow 規則引擎遷移（計畫中）
 
 ---
 

@@ -9,10 +9,10 @@
 
 | 文件 | 說明 | 來源 |
 |----------|-------------|--------|
-| [有效投注額業務規則（Turnover Business Rules）](Turnover_Business_Rules.md) | 流水要求 (Wagering Requirements)、遊戲權重、業務規則 | [source](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) |
-| [遊戲整合需求（Game Integration Requirements）](Game_Integration_Requirements.md) | 遊戲供應商 (Game Provider) 合作標準、認證要求、SLA 期望 | [source](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md) |
-| [遊戲整合標準（Game Integration Standards）](Game_Integration_Standards.md) | 供應商 API 標準、認證檢查表、SLA 期望 | [source](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) |
-| [遊戲大廳需求（Game Lobby Requirements）](Game_Lobby_Requirements.md) | 大廳組織、遊戲分類、搜尋/篩選 UX、推薦策略 | [source](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) |
+| [有效投注額業務規則（Turnover Business Rules）](01_Turnover_Business_Rules.md) | 流水要求 (Wagering Requirements)、遊戲權重、業務規則 | [source](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) |
+| [遊戲整合需求（Game Integration Requirements）](02_Game_Integration_Requirements.md) | 遊戲供應商 (Game Provider) 合作標準、認證要求、SLA 期望 | [source](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md) |
+| [遊戲整合標準（Game Integration Standards）](03_Game_Integration_Standards.md) | 供應商 API 標準、認證檢查表、SLA 期望 | [source](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) |
+| [遊戲大廳需求（Game Lobby Requirements）](04_Game_Lobby_Requirements.md) | 大廳組織、遊戲分類、搜尋/篩選 UX、推薦策略 | [source](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) |
 
 ## 來源索引（Source Index）
 

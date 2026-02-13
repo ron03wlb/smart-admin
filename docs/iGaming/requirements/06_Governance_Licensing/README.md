@@ -9,12 +9,12 @@
 
 | 文件 | 說明 | 來源 |
 |----------|-------------|--------|
-| [多租戶需求（Multi-Tenant Requirements）](Multi_Tenant_Requirements.md) | 租戶層級、數據隔離、計費模型 | [source](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
-| [MFA 需求](MFA_Requirements.md) | 身份驗證政策、合規要求 | [source](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md) |
-| [MFA 合規需求（MFA Compliance Requirements）](MFA_Compliance_Requirements.md) | MFA 審計政策、監管要求、合規檢查清單 | [source](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md) |
-| [MFA 恢復需求（MFA Recovery Requirements）](MFA_Recovery_Requirements.md) | 恢復選項、身份驗證、帳戶恢復合規 | [source](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) |
-| [MFA 架構規範（MFA Architecture Spec）](MFA_Architecture_Spec.md) | MFA 方法選擇標準、驗證政策、用戶體驗 | [source](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) |
-| [治理需求（Governance Requirements）](Governance_Requirements.md) | 多租戶政策、RBAC 要求、審計日誌、數據加密標準 | [source](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md) |
+| [多租戶需求（Multi-Tenant Requirements）](01_Multi_Tenant_Requirements.md) | 租戶層級、數據隔離、計費模型 | [source](../../source-archive/06_Platform_Governance/06-01_Multi_Tenant.md) |
+| [MFA 需求](04_MFA_Requirements.md) | 身份驗證政策、合規要求 | [source](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md) |
+| [MFA 合規需求（MFA Compliance Requirements）](05_MFA_Compliance_Requirements.md) | MFA 審計政策、監管要求、合規檢查清單 | [source](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md) |
+| [MFA 恢復需求（MFA Recovery Requirements）](06_MFA_Recovery_Requirements.md) | 恢復選項、身份驗證、帳戶恢復合規 | [source](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md) |
+| [MFA 架構規範（MFA Architecture Spec）](03_MFA_Architecture_Spec.md) | MFA 方法選擇標準、驗證政策、用戶體驗 | [source](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md) |
+| [治理需求（Governance Requirements）](02_Governance_Requirements.md) | 多租戶政策、RBAC 要求、審計日誌、數據加密標準 | [source](../../source-archive/00_Foundation/guides/00-15_Governance_Implementation.md) |
 
 ## 來源索引（Source Index）
 

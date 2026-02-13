@@ -9,9 +9,9 @@
 
 | 文件 | 說明 | 來源 |
 |----------|-------------|--------|
-| [獎金計算需求（Bonus Calculation Requirements）](Bonus_Calculation_Requirements.md) | 獎金類型、資格標準、條款條件 | [source](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md) |
-| [活動風險需求（Activity Risk Requirements）](Activity_Risk_Requirements.md) | 獎金濫用 (Bonus Abuse) 政策、速率限制、風險門檻、升級程序 | [source](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md) |
-| [促銷需求（Promotion Requirements）](Promotion_Requirements.md) | 促銷類型、資格規則、流水遊戲權重 (Wagering Game Weight)、VIP 等級結構 | [source](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md) |
+| [獎金計算需求（Bonus Calculation Requirements）](01_Bonus_Calculation_Requirements.md) | 獎金類型、資格標準、條款條件 | [source](../../source-archive/04_Activity_Center/04-02_Bonus_Calculation_Engine.md) |
+| [活動風險需求（Activity Risk Requirements）](02_Activity_Risk_Requirements.md) | 獎金濫用 (Bonus Abuse) 政策、速率限制、風險門檻、升級程序 | [source](../../source-archive/04_Activity_Center/04-03_Activity_Risk_Control.md) |
+| [促銷需求（Promotion Requirements）](03_Promotion_Requirements.md) | 促銷類型、資格規則、流水遊戲權重 (Wagering Game Weight)、VIP 等級結構 | [source](../../source-archive/00_Foundation/guides/00-13_Promotion_Implementation.md) |
 
 ## 來源索引（Source Index）
 

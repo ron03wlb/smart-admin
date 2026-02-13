@@ -9,11 +9,11 @@
 
 | 文件 | 說明 | 來源 |
 |----------|-------------|--------|
-| [支付營運（Payment Operations）](Payment_Operations.md) | 支付方式 (Payment Methods)、成本、SLA、合規要求 | [source](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) |
-| [對帳需求（Reconciliation Requirements）](Reconciliation_Requirements.md) | 三層匹配、差異處理、週期政策 | [source](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) |
-| [財務實作需求（Financial Implementation Requirements）](Financial_Implementation_Requirements.md) | 錢包系統 (Wallet System)、支付閘道 (Payment Gateway)、提款風控、對帳業務規則 | [source](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md) |
-| [流水對帳需求（Turnover Reconciliation Requirements）](Turnover_Reconciliation_Requirements.md) | 有效投注額 (Valid Turnover) 業務規則、狀態因子、遊戲權重、對帳政策 | [source](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) |
-| [無縫錢包需求（Seamless Wallet Requirements）](Seamless_Wallet_Requirements.md) | 無縫錢包 (Seamless Wallet) 交易類型、結算規則、玩家導向政策 | [source](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) |
+| [支付營運（Payment Operations）](03_Payment_Operations.md) | 支付方式 (Payment Methods)、成本、SLA、合規要求 | [source](../../source-archive/02_Finance_Center/02-02_Payment_Gateway_Integration.md) |
+| [對帳需求（Reconciliation Requirements）](04_Reconciliation_Requirements.md) | 三層匹配、差異處理、週期政策 | [source](../../source-archive/02_Finance_Center/02-03_Reconciliation_System.md) |
+| [財務實作需求（Financial Implementation Requirements）](02_Financial_Implementation_Requirements.md) | 錢包系統 (Wallet System)、支付閘道 (Payment Gateway)、提款風控、對帳業務規則 | [source](../../source-archive/00_Foundation/guides/00-11_Financial_Implementation.md) |
+| [流水對帳需求（Turnover Reconciliation Requirements）](05_Turnover_Reconciliation_Requirements.md) | 有效投注額 (Valid Turnover) 業務規則、狀態因子、遊戲權重、對帳政策 | [source](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md) |
+| [無縫錢包需求（Seamless Wallet Requirements）](01_Seamless_Wallet_Requirements.md) | 無縫錢包 (Seamless Wallet) 交易類型、結算規則、玩家導向政策 | [source](../../source-archive/03_Game_Center/03-03_Seamless_Wallet_Analysis.md) |
 
 ## 來源索引（Source Index）
 

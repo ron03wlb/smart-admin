@@ -9,10 +9,10 @@
 
 | 文件 | 說明 | 來源 |
 |------|------|------|
-| [Turnover Calculation Logic](Turnover_Calculation_Logic.md) | 三層驗證、SmartAdmin 對映、計算演算法 | [source](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) |
-| [Game Integration Implementation](Game_Integration_Implementation.md) | 無縫錢包 API Controller、Token 驗證、三層冪等性 | [source](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md) |
-| [Game Integration Protocols](Game_Integration_Protocols.md) | API 協定、供應商適配層、資料正規化、Webhook 規格 | [source](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) |
-| [Game Lobby System](Game_Lobby_System.md) | 遊戲大廳服務架構、多層快取、Elasticsearch 搜尋、排序 | [source](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) |
+| [Turnover Calculation Logic](04_Turnover_Calculation_Logic.md) | 三層驗證、SmartAdmin 對映、計算演算法 | [source](../../source-archive/03_Game_Center/03-04_Turnover_Calculation.md) |
+| [Game Integration Implementation](02_Game_Integration_Implementation.md) | 無縫錢包 API Controller、Token 驗證、三層冪等性 | [source](../../source-archive/00_Foundation/guides/00-12_Game_Integration_Implementation.md) |
+| [Game Integration Protocols](01_Game_Integration_Protocols.md) | API 協定、供應商適配層、資料正規化、Webhook 規格 | [source](../../source-archive/03_Game_Center/03-01_Game_Integration_Standard.md) |
+| [Game Lobby System](05_Game_Lobby_System.md) | 遊戲大廳服務架構、多層快取、Elasticsearch 搜尋、排序 | [source](../../source-archive/03_Game_Center/03-02_Game_Lobby_Management.md) |
 
 ## 核心整合文件（來源索引）
 

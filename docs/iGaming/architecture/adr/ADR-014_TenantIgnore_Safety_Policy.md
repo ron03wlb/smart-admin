@@ -5,8 +5,8 @@
 **決策者**: iGaming 技術團隊
 
 **相關文檔**:
-- [Multi_Tenant_Architecture.md](../06_Platform_Core/Multi_Tenant_Architecture.md) — Section 6.3 Tenant Bypass Safety Matrix
-- [Multi_Tenant_Requirements.md](../../requirements/06_Governance_Licensing/Multi_Tenant_Requirements.md) — Section 5.2 跨租戶查詢白名單
+- [Multi_Tenant_Architecture.md](../06_Platform_Core/01_Multi_Tenant_Architecture.md) — Section 6.3 Tenant Bypass Safety Matrix
+- [Multi_Tenant_Requirements.md](../../requirements/06_Governance_Licensing/01_Multi_Tenant_Requirements.md) — Section 5.2 跨租戶查詢白名單
 
 ---
 

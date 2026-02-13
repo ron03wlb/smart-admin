@@ -5,9 +5,9 @@
 **決策者**: iGaming 技術團隊
 
 **相關文檔**:
-- [Seamless_Wallet_Technical.md](../02_Finance_Service/Seamless_Wallet_Technical.md) — Section 4 冪等三層防禦 + Section 5.3 鎖順序協議
-- [Financial_Implementation.md](../02_Finance_Service/Financial_Implementation.md) — Section 2.3 WalletManager Redis 快取層
-- [Seamless_Wallet_Analysis.md](../02_Finance_Service/Seamless_Wallet_Analysis.md) — Section 3 逾時重試時序圖
+- [Seamless_Wallet_Technical.md](../02_Finance_Service/03_Seamless_Wallet_Technical.md) — Section 4 冪等三層防禦 + Section 5.3 鎖順序協議
+- [Financial_Implementation.md](../02_Finance_Service/04_Financial_Implementation.md) — Section 2.3 WalletManager Redis 快取層
+- [Seamless_Wallet_Analysis.md](../02_Finance_Service/02_Seamless_Wallet_Analysis.md) — Section 3 逾時重試時序圖
 
 ---
 

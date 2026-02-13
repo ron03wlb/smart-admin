@@ -9,7 +9,7 @@
 
 | 文檔 | 描述 | 來源 |
 |----------|-------------|--------|
-| [玩家生命週期實作](Player_Lifecycle_Implementation.md) | 狀態機設計、資料庫架構、API 端點、事件驅動通知 | [來源](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) |
+| [玩家生命週期實作](01_Player_Lifecycle_Implementation.md) | 狀態機設計、資料庫架構、API 端點、事件驅動通知 | [來源](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md) |
 
 ## 來源索引
 
