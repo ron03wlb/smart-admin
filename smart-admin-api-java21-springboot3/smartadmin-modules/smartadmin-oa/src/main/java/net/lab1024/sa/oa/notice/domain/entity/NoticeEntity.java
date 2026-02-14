@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 通知公告
@@ -13,8 +15,9 @@ import lombok.Data;
  * @since 2022-08-12 21:40:39 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_notice")
-public class NoticeEntity {
+public class NoticeEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long noticeId;
@@ -61,8 +64,4 @@ public class NoticeEntity {
   private Boolean deletedFlag;
 
   private Long createUserId;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

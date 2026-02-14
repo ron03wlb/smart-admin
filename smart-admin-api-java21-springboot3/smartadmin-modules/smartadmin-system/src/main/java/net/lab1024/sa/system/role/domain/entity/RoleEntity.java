@@ -3,8 +3,9 @@ package net.lab1024.sa.system.role.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 角色
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2022-03-07 18:54:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_role")
-public class RoleEntity {
+public class RoleEntity extends SmartAdminBaseEntity {
   /** 主键id */
   @TableId(type = IdType.AUTO)
   private Long roleId;
@@ -27,10 +29,4 @@ public class RoleEntity {
 
   /** 角色备注 */
   private String remark;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
 }

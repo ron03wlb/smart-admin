@@ -3,9 +3,10 @@ package net.lab1024.sa.support.loginlog.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 登录日志
@@ -15,8 +16,9 @@ import lombok.Data;
  */
 @TableName("t_login_log")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
-public class LoginLogEntity {
+public class LoginLogEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long loginLogId;
@@ -47,8 +49,4 @@ public class LoginLogEntity {
 
   /** 登录类型 */
   private Integer loginResult;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 单据序列号 表结构
@@ -17,11 +19,12 @@ import lombok.NoArgsConstructor;
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("t_serial_number_record")
-public class SerialNumberRecordEntity {
+public class SerialNumberRecordEntity extends SmartAdminBaseEntity {
 
   /** 单号id */
   @TableId(type = IdType.NONE)
@@ -38,8 +41,4 @@ public class SerialNumberRecordEntity {
 
   /** 数量 */
   private Long count;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

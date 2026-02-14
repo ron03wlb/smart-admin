@@ -128,22 +128,24 @@ class OperateLogServiceTest {
   // ==================== Helper Methods ====================
 
   private OperateLogEntity createTestOperateLogEntity() {
-    return OperateLogEntity.builder()
-        .operateLogId(1L)
-        .operateUserId(1L)
-        .operateUserType(1)
-        .operateUserName("admin")
-        .module("系統管理")
-        .content("查詢用戶列表")
-        .url("/api/system/employee/list")
-        .method("GET")
-        .param("{}")
-        .response("{\"code\":0}")
-        .ip("127.0.0.1")
-        .ipRegion("本機")
-        .userAgent("Chrome")
-        .successFlag(1)
-        .createTime(LocalDateTime.now())
-        .build();
+    OperateLogEntity entity =
+        OperateLogEntity.builder()
+            .operateLogId(1L)
+            .operateUserId(1L)
+            .operateUserType(1)
+            .operateUserName("admin")
+            .module("系統管理")
+            .content("查詢用戶列表")
+            .url("/api/system/employee/list")
+            .method("GET")
+            .param("{}")
+            .response("{\"code\":0}")
+            .ip("127.0.0.1")
+            .ipRegion("本機")
+            .userAgent("Chrome")
+            .successFlag(1)
+            .build();
+    entity.setCreateTime(LocalDateTime.now());
+    return entity;
   }
 }

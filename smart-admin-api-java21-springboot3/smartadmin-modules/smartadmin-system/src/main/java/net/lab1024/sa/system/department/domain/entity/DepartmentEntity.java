@@ -5,8 +5,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 部门实体类
@@ -15,8 +16,9 @@ import lombok.Data;
  * @since 2022-01-12 20:37:48 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "t_department")
-public class DepartmentEntity {
+public class DepartmentEntity extends SmartAdminBaseEntity {
 
   /** 主键id */
   @TableId(type = IdType.AUTO)
@@ -34,10 +36,4 @@ public class DepartmentEntity {
 
   /** 排序 */
   private Integer sort;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
 }

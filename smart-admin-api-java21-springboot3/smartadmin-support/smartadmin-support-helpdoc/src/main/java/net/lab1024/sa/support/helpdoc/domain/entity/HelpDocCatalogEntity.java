@@ -3,11 +3,12 @@ package net.lab1024.sa.support.helpdoc.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 帮助文档的 类型
@@ -16,11 +17,12 @@ import lombok.NoArgsConstructor;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_help_doc_catalog")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HelpDocCatalogEntity {
+public class HelpDocCatalogEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long helpDocCatalogId;
@@ -33,8 +35,4 @@ public class HelpDocCatalogEntity {
 
   /** 排序 */
   private Integer sort;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

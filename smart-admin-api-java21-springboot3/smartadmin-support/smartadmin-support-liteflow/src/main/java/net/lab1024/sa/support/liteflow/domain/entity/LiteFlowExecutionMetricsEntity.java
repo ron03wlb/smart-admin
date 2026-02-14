@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * LiteFlow 執行指標聚合實體（每日統計）
@@ -14,8 +15,9 @@ import lombok.Data;
  * @since 2026-02-02
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_liteflow_execution_metrics")
-public class LiteFlowExecutionMetricsEntity {
+public class LiteFlowExecutionMetricsEntity extends SmartAdminBaseEntity {
 
   /** 指標ID（主鍵） */
   @TableId(type = IdType.AUTO)
@@ -44,10 +46,4 @@ public class LiteFlowExecutionMetricsEntity {
 
   /** 最小執行時間（毫秒） */
   private Integer minExecutionTime;
-
-  /** 創建時間 */
-  private LocalDateTime createTime;
-
-  /** 更新時間 */
-  private LocalDateTime updateTime;
 }

@@ -179,17 +179,19 @@ class LoginLogServiceTest {
   // ==================== Helper Methods ====================
 
   private LoginLogEntity createTestLoginLogEntity() {
-    return LoginLogEntity.builder()
-        .loginLogId(1L)
-        .userId(1L)
-        .userType(UserTypeEnum.ADMIN_EMPLOYEE.getValue())
-        .userName("admin")
-        .loginIp("127.0.0.1")
-        .loginIpRegion("本機")
-        .loginDevice("Chrome")
-        .loginResult(LoginLogResultEnum.LOGIN_SUCCESS.getValue())
-        .createTime(LocalDateTime.now())
-        .build();
+    LoginLogEntity entity =
+        LoginLogEntity.builder()
+            .loginLogId(1L)
+            .userId(1L)
+            .userType(UserTypeEnum.ADMIN_EMPLOYEE.getValue())
+            .userName("admin")
+            .loginIp("127.0.0.1")
+            .loginIpRegion("本機")
+            .loginDevice("Chrome")
+            .loginResult(LoginLogResultEnum.LOGIN_SUCCESS.getValue())
+            .build();
+    entity.setCreateTime(LocalDateTime.now());
+    return entity;
   }
 
   private LoginLogVO createTestLoginLogVO() {

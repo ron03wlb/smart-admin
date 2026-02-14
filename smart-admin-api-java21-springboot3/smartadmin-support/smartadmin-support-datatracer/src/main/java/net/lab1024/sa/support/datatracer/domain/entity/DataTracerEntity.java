@@ -3,8 +3,9 @@ package net.lab1024.sa.support.datatracer.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 import net.lab1024.sa.support.datatracer.constant.DataTracerTypeEnum;
 
 /**
@@ -14,8 +15,9 @@ import net.lab1024.sa.support.datatracer.constant.DataTracerTypeEnum;
  * @since 2022-07-23 19:38:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_data_tracer")
-public class DataTracerEntity {
+public class DataTracerEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long dataTracerId;
@@ -55,10 +57,4 @@ public class DataTracerEntity {
 
   /** 请求头 */
   private String userAgent;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
 }

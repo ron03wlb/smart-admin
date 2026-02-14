@@ -3,8 +3,9 @@ package net.lab1024.sa.business.brand.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * Brand Entity
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2026-01-24
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_brand")
-public class BrandEntity {
+public class BrandEntity extends SmartAdminBaseEntity {
 
   /** Brand ID */
   @TableId(type = IdType.AUTO)
@@ -37,10 +39,4 @@ public class BrandEntity {
 
   /** Soft delete flag */
   private Boolean deletedFlag;
-
-  /** Update time */
-  private LocalDateTime updateTime;
-
-  /** Create time */
-  private LocalDateTime createTime;
 }

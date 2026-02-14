@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 import net.lab1024.sa.support.serialnumber.constant.SerialNumberIdEnum;
 import net.lab1024.sa.support.serialnumber.constant.SerialNumberRuleTypeEnum;
 
@@ -15,8 +17,9 @@ import net.lab1024.sa.support.serialnumber.constant.SerialNumberRuleTypeEnum;
  * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_serial_number")
-public class SerialNumberEntity {
+public class SerialNumberEntity extends SmartAdminBaseEntity {
 
   /**
    * 主键id
@@ -53,8 +56,4 @@ public class SerialNumberEntity {
 
   /** 上次产生的单号时间 */
   private LocalDateTime lastTime;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

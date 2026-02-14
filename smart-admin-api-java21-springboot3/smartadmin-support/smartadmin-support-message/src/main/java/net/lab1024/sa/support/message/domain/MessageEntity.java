@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 import net.lab1024.sa.support.message.constant.MessageTypeEnum;
 
 /**
@@ -14,8 +16,9 @@ import net.lab1024.sa.support.message.constant.MessageTypeEnum;
  * @since 2024/06/22 20:20
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_message")
-public class MessageEntity {
+public class MessageEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long messageId;
@@ -51,8 +54,4 @@ public class MessageEntity {
 
   /** 已读时间 */
   private LocalDateTime readTime;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

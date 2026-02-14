@@ -3,8 +3,9 @@ package net.lab1024.sa.support.reload.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * t_reload_item 数据表 实体类
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2015-03-02 19:11:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_reload_item")
-public class ReloadItemEntity {
+public class ReloadItemEntity extends SmartAdminBaseEntity {
 
   /** 加载项标签 */
   @TableId(type = IdType.INPUT)
@@ -25,10 +27,4 @@ public class ReloadItemEntity {
 
   /** 运行标识 */
   private String identification;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
 }

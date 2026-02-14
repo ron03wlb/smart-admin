@@ -3,8 +3,9 @@ package net.lab1024.sa.support.helpdoc.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 帮助文档
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_help_doc")
-public class HelpDocEntity {
+public class HelpDocEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long helpDocId;
@@ -45,8 +47,4 @@ public class HelpDocEntity {
 
   /** 作者 */
   private String author;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

@@ -1,12 +1,11 @@
 package net.lab1024.sa.system.employee.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 员工 实体表
@@ -15,8 +14,9 @@ import lombok.Data;
  * @since 2021-12-09 22:57:49 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_employee")
-public class EmployeeEntity {
+public class EmployeeEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long employeeId;
@@ -62,10 +62,4 @@ public class EmployeeEntity {
 
   /** 备注 */
   private String remark;
-
-  @TableField(fill = FieldFill.INSERT_UPDATE)
-  private LocalDateTime updateTime;
-
-  @TableField(fill = FieldFill.INSERT)
-  private LocalDateTime createTime;
 }

@@ -3,8 +3,9 @@ package net.lab1024.sa.system.menu.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 import net.lab1024.sa.system.menu.constant.MenuTypeEnum;
 
 /**
@@ -14,8 +15,9 @@ import net.lab1024.sa.system.menu.constant.MenuTypeEnum;
  * @since 2022-03-06 22:04:37 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "t_menu")
-public class MenuEntity {
+public class MenuEntity extends SmartAdminBaseEntity {
 
   /** 菜单ID */
   @TableId(type = IdType.AUTO)
@@ -76,14 +78,8 @@ public class MenuEntity {
   /** 删除状态 */
   private Boolean deletedFlag;
 
-  /** 创建时间 */
-  private LocalDateTime createTime;
-
   /** 创建人 */
   private Long createUserId;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
 
   /** 更新人 */
   private Long updateUserId;

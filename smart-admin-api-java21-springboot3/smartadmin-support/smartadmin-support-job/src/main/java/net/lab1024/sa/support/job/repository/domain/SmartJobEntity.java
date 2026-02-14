@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 import net.lab1024.sa.support.job.constant.SmartJobTriggerTypeEnum;
 
 /**
@@ -14,8 +16,9 @@ import net.lab1024.sa.support.job.constant.SmartJobTriggerTypeEnum;
  * @since 2024/6/17 21:30
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_smart_job")
-public class SmartJobEntity {
+public class SmartJobEntity extends SmartAdminBaseEntity {
 
   /** 任务id */
   @TableId(type = IdType.AUTO)
@@ -59,8 +62,4 @@ public class SmartJobEntity {
   private Boolean deletedFlag;
 
   private String updateName;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

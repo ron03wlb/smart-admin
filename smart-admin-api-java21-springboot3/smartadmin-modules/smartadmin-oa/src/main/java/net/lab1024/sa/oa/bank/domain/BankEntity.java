@@ -3,8 +3,9 @@ package net.lab1024.sa.oa.bank.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 import net.lab1024.sa.support.datatracer.annoation.DataTracerFieldLabel;
 
 /**
@@ -14,8 +15,9 @@ import net.lab1024.sa.support.datatracer.annoation.DataTracerFieldLabel;
  * @since 2022/6/23 21:59:22 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_oa_bank")
-public class BankEntity {
+public class BankEntity extends SmartAdminBaseEntity {
 
   /** 银行信息ID */
   @TableId(type = IdType.AUTO)
@@ -57,10 +59,4 @@ public class BankEntity {
 
   /** 创建人ID */
   private String createUserName;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
 }

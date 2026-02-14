@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 系统更新日志
@@ -14,8 +15,9 @@ import lombok.Data;
  * @since 2022-09-26 14:53:50 Copyright 1024创新实验室
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_change_log")
-public class ChangeLogEntity {
+public class ChangeLogEntity extends SmartAdminBaseEntity {
 
   /** 更新日志id */
   @TableId(type = IdType.AUTO)
@@ -38,10 +40,4 @@ public class ChangeLogEntity {
 
   /** 跳转链接 */
   private String link;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
 }

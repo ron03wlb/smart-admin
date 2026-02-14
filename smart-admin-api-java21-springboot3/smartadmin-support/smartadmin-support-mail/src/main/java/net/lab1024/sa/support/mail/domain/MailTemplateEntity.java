@@ -3,8 +3,9 @@ package net.lab1024.sa.support.mail.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 邮件模板
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2024/8/5 Copyright <a href="https://1024lab.net">1024创新实验室</a> ，Since 2012
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_mail_template")
-public class MailTemplateEntity {
+public class MailTemplateEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.NONE)
   private String templateCode;
@@ -30,8 +32,4 @@ public class MailTemplateEntity {
 
   /** 禁用标识 */
   private Boolean disableFlag;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

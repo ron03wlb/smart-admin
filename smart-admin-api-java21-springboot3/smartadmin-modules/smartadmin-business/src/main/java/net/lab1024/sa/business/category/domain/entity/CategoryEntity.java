@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import net.lab1024.sa.business.category.constant.CategoryTypeEnum;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 类目 实体类
@@ -15,8 +16,9 @@ import net.lab1024.sa.business.category.constant.CategoryTypeEnum;
  * @since 2021/08/05 21:26:58 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_category")
-public class CategoryEntity implements Serializable {
+public class CategoryEntity extends SmartAdminBaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,8 +49,4 @@ public class CategoryEntity implements Serializable {
 
   /** 备注 */
   private String remark;
-
-  private LocalDateTime updateTime;
-
-  private LocalDateTime createTime;
 }

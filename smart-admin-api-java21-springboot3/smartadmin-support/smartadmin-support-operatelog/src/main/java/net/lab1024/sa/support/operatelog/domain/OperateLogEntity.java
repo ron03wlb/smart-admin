@@ -3,11 +3,12 @@ package net.lab1024.sa.support.operatelog.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 操作记录
@@ -16,11 +17,12 @@ import lombok.NoArgsConstructor;
  * @since 2021-12-08 20:48:52 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("t_operate_log")
-public class OperateLogEntity {
+public class OperateLogEntity extends SmartAdminBaseEntity {
 
   /** 主键id */
   @TableId(type = IdType.AUTO)
@@ -67,10 +69,4 @@ public class OperateLogEntity {
 
   /** 失败原因 */
   private String failReason;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
 }

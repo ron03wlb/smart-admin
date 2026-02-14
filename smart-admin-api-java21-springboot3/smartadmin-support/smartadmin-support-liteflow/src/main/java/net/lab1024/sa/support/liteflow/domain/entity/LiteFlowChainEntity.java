@@ -3,8 +3,9 @@ package net.lab1024.sa.support.liteflow.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * LiteFlow 流程定義實體
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2026-02-02
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_liteflow_chain")
-public class LiteFlowChainEntity {
+public class LiteFlowChainEntity extends SmartAdminBaseEntity {
 
   /** 流程ID（主鍵） */
   @TableId(type = IdType.AUTO)
@@ -50,15 +52,9 @@ public class LiteFlowChainEntity {
   /** 創建人姓名 */
   private String createUserName;
 
-  /** 創建時間 */
-  private LocalDateTime createTime;
-
   /** 更新人ID */
   private Long updateUserId;
 
   /** 更新人姓名 */
   private String updateUserName;
-
-  /** 更新時間 */
-  private LocalDateTime updateTime;
 }

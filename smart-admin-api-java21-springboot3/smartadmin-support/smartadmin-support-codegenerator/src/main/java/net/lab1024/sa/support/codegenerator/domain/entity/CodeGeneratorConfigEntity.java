@@ -3,8 +3,9 @@ package net.lab1024.sa.support.codegenerator.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 代码生成-配置
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2022/6/23 21:59:22 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_code_generator_config")
-public class CodeGeneratorConfigEntity {
+public class CodeGeneratorConfigEntity extends SmartAdminBaseEntity {
 
   /** 表名 */
   @TableId(type = IdType.NONE)
@@ -40,10 +42,4 @@ public class CodeGeneratorConfigEntity {
 
   /** 详情 */
   private String detail;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
 }

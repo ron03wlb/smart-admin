@@ -3,8 +3,9 @@ package net.lab1024.sa.support.table.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 自定义表格列
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2022-08-12 22:52:21 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_table_column")
-public class TableColumnEntity {
+public class TableColumnEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
   private Long tableColumnId;
@@ -30,8 +32,4 @@ public class TableColumnEntity {
 
   /** 表列 */
   private String columns;
-
-  private LocalDateTime createTime;
-
-  private LocalDateTime updateTime;
 }

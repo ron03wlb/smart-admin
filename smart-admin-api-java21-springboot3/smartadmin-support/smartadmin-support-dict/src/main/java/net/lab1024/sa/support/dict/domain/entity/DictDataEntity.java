@@ -3,8 +3,9 @@ package net.lab1024.sa.support.dict.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
 
 /**
  * 字典数据表 实体类
@@ -13,8 +14,9 @@ import lombok.Data;
  * @since 2025-03-25 23:12:59 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_dict_data")
-public class DictDataEntity {
+public class DictDataEntity extends SmartAdminBaseEntity {
 
   /** 字典数据id */
   @TableId(type = IdType.AUTO)
@@ -37,10 +39,4 @@ public class DictDataEntity {
 
   /** 禁用状态 */
   private Boolean disabledFlag;
-
-  /** 创建时间 */
-  private LocalDateTime createTime;
-
-  /** 更新时间 */
-  private LocalDateTime updateTime;
 }

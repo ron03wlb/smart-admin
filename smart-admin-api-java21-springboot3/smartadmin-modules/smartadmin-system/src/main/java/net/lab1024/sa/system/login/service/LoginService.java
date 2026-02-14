@@ -8,7 +8,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import io.vavr.control.Option;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -416,7 +415,6 @@ public class LoginService implements StpInterface {
             .loginIp(requestUser.getIp())
             .loginIpRegion(IpGeolocationUtil.getRegion(requestUser.getIp()))
             .loginResult(LoginLogResultEnum.LOGIN_OUT.getValue())
-            .createTime(LocalDateTime.now())
             .build();
     loginLogService.log(loginEntity);
 
@@ -442,7 +440,6 @@ public class LoginService implements StpInterface {
             .remark(remark)
             .loginDevice(loginDeviceEnum.getDesc())
             .loginResult(result.getValue())
-            .createTime(LocalDateTime.now())
             .build();
     loginLogService.log(loginEntity);
   }
