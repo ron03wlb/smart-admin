@@ -49,6 +49,10 @@ for file in $NEW_FILES; do
     if [[ "$file" =~ 000_improve/ ]]; then
         continue
     fi
+    # 跳過 implementation 目錄 (Phase-based naming: 00-name.md)
+    if [[ "$file" =~ implementation/ ]]; then
+        continue
+    fi
     # 驗證格式
     if [[ ! "$filename" =~ ^[0-9]{2}-[0-9]{2}(-[0-9]{2})?_.+\.md$ ]]; then
         echo "❌ 命名格式錯誤: $file"

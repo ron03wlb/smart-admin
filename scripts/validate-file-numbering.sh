@@ -50,6 +50,10 @@ while IFS= read -r file; do
         if [[ "$file" =~ reports/ ]]; then
             continue
         fi
+        # 允許 implementation 目錄 (Phase-based naming: 00-name.md)
+        if [[ "$file" =~ implementation/ ]]; then
+            continue
+        fi
         # 允許 .templates 目錄
         if [[ "$file" =~ \.templates/ ]]; then
             continue

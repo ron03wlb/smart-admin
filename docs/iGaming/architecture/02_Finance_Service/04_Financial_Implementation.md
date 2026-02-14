@@ -37,15 +37,45 @@ CREATE TABLE t_wallet (
     wallet_id BIGINT PRIMARY KEY,
     player_id BIGINT NOT NULL,
     tenant_id VARCHAR(50) NOT NULL,
-    wallet_type VARCHAR(20) NOT NULL, -- CASH, BONUS, LOCKED
+    wallet_type VARCHAR(20) NOT NULL, -- CASH, BONUS, CREDIT
     balance DECIMAL(19,4) NOT NULL DEFAULT 0.0000,
     locked_amount DECIMAL(19,4) NOT NULL DEFAULT 0.0000,
     version INT NOT NULL DEFAULT 0, -- Optimistic lock
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    UNIQUE(player_id, wallet_type),
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE(player_id, wallet_type, tenant_id),
     INDEX idx_player_tenant (player_id, tenant_id)
 );
+
+-- Bonus wallet extension table (per-activity bonus details)
+CREATE TABLE t_wallet_bonus_ext (
+    id BIGINT PRIMARY KEY,
+    wallet_id BIGINT NOT NULL REFERENCES t_wallet(wallet_id),
+    bonus_id BIGINT NOT NULL,                           -- Associated activity/promotion
+    balance DECIMAL(19,4) NOT NULL DEFAULT 0.0000,      -- This bonus's remaining balance
+    wagering_requirement DECIMAL(19,4) NOT NULL,         -- Required turnover amount
+    wagered_amount DECIMAL(19,4) NOT NULL DEFAULT 0,     -- Completed turnover
+    expires_at TIMESTAMP,                                -- Expiry date
+    game_restriction JSONB,                              -- Game-specific restrictions
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',        -- ACTIVE, EXPIRED, COMPLETED, FORFEITED
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    INDEX idx_wallet_status (wallet_id, status),
+    INDEX idx_expires (expires_at, status)
+);
+
+-- Credit wallet extension table (agent credit system, Phase 2+)
+-- CREATE TABLE t_wallet_credit_ext (
+--     wallet_id BIGINT PRIMARY KEY REFERENCES t_wallet(wallet_id),
+--     credit_limit DECIMAL(19,4) NOT NULL,
+--     credit_used DECIMAL(19,4) NOT NULL DEFAULT 0,
+--     settlement_cycle VARCHAR(20),
+--     agent_id BIGINT NOT NULL,
+--     last_settled_at TIMESTAMP,
+--     created_at TIMESTAMP NOT NULL,
+--     updated_at TIMESTAMP NOT NULL
+-- );
 
 -- Wallet transaction records
 CREATE TABLE t_wallet_transaction (
@@ -60,7 +90,7 @@ CREATE TABLE t_wallet_transaction (
     INDEX idx_wallet_time (wallet_id, created_at)
 );
 
--- Wallet lock records
+-- Wallet lock records (locking mechanism, NOT a wallet type)
 CREATE TABLE t_wallet_lock (
     lock_id BIGINT PRIMARY KEY,
     wallet_id BIGINT NOT NULL,
@@ -71,6 +101,18 @@ CREATE TABLE t_wallet_lock (
     INDEX idx_wallet_ref (wallet_id, reference_id)
 );
 ```
+
+> **錢包類型設計說明**：
+> - **CASH**（現金錢包）：真金白銀，可投注、可提款。每位玩家必有 1 筆。
+> - **BONUS**（優惠錢包）：活動贈金，受流水要求限制。主表記錄匯總餘額（0~1 筆），`t_wallet_bonus_ext` 記錄每筆活動 Bonus 明細（0~N 筆）。
+> - **CREDIT**（信用額度）：代理信用體系，僅限信用模式玩家。Phase 2+ 實作，主表 `wallet_type` 預留此值。
+> - **LOCKED 不是錢包類型**：凍結資金是 CASH 錢包上的「扣住機制」，透過 `locked_amount` 欄位 + `t_wallet_lock` 明細表實現。
+
+> **BONUS 匯總機制**：
+> - `t_wallet` 中 BONUS 類型只有 1 筆記錄，`balance` = 所有活動 Bonus 餘額的匯總
+> - `t_wallet_bonus_ext` 記錄每筆活動 Bonus 的明細（流水要求、過期時間、遊戲限制）
+> - 扣款時按 `t_wallet_bonus_ext` 優先順序（先過期的先扣）逐筆扣減，再回寫主表匯總
+> - 一致性保證：`t_wallet.balance (BONUS) = SUM(t_wallet_bonus_ext.balance WHERE wallet_id = ? AND status = 'ACTIVE')`
 
 > **鎖定金額雙軌設計說明**：
 > - `t_wallet.locked_amount` 為**彙總欄位**，代表該錢包所有未釋放鎖定的總額

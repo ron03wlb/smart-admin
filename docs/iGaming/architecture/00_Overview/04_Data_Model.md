@@ -29,7 +29,8 @@ erDiagram
 
     %% Wallet & Transactions
     WALLET ||--o{ TRANSACTION : records
-    WALLET ||--o{ BONUS_WALLET : has_bonus
+    WALLET ||--o{ BONUS_WALLET_EXT : has_bonus_details
+    WALLET ||--o{ WALLET_LOCK : has_locks
     TRANSACTION }o--|| GAME : relates_to
     TRANSACTION }o--|| PSP : processed_by
 
@@ -85,19 +86,25 @@ Super Admin (系統層級)
 ### 2.2 第二層：金融核心（Layer 2: Financial Core）
 
 ```
-Player Wallet (玩家錢包)
-    +-- Cash Balance (現金餘額)
-    +-- Bonus Balance (紅利餘額)
-    +-- Credit Balance (信用額度)
+Player Wallet (玩家錢包主表 t_wallet)
+    +-- CASH (現金錢包)     — 必有，1 筆/玩家
+    +-- BONUS (優惠錢包)    — 匯總餘額，0~1 筆/玩家
+    +-- CREDIT (信用額度)   — Phase 2+，0~1 筆/玩家
+    |
+    +-- Bonus Extension (t_wallet_bonus_ext)  — 每筆活動 Bonus 明細
+    +-- Wallet Lock (t_wallet_lock)           — 鎖定機制明細（非錢包類型）
 ```
+
+> **設計決策**：採用「主表 + 擴展表」混合方案。`t_wallet` 統一管理所有錢包類型的 `balance` 和 `locked_amount`，特殊欄位透過擴展表承載。LOCKED 不是錢包類型，而是 CASH 錢包上的「扣住機制」。詳見 → [Financial_Implementation.md §2.1](../02_Finance_Service/Financial_Implementation.md)
 
 **核心實體（Core Entities）**:
 
 | 實體（Entity） | 表名（Table Name） | 說明（Description） |
 |--------|-----------|-------------|
-| Wallet | `wallets` | 統一錢包主表 |
-| Transaction | `transactions` | 所有資金流動記錄 |
-| Bonus Wallet | `bonus_wallets` | 紅利子錢包 |
+| Wallet | `t_wallet` | 統一錢包主表（wallet_type: CASH, BONUS, CREDIT） |
+| Bonus Wallet Extension | `t_wallet_bonus_ext` | 每筆活動 Bonus 明細（流水要求、過期時間、遊戲限制） |
+| Wallet Lock | `t_wallet_lock` | 鎖定機制明細（待結算注單、待審核提款） |
+| Transaction | `t_wallet_transaction` | 所有資金流動記錄 |
 | Withdrawal Request | `withdrawal_requests` | 提款申請 |
 | Deposit Record | `deposit_records` | 存款記錄 |
 
@@ -392,7 +399,9 @@ INSERT INTO player_status_audit_log (
 | `players` | `tenant_id` | `tenants` | N:1 | RESTRICT | 玩家屬於租戶 |
 | `players` | `agent_id` | `agents` | N:1 | SET NULL | 推薦代理（可空） |
 | `players` | `vip_level_id` | `vip_levels` | N:1 | SET NULL | VIP 層級 |
-| `wallets` | `player_id` | `players` | 1:1 | CASCADE | 錢包綁定玩家 |
+| `t_wallet` | `player_id` | `players` | N:1 | CASCADE | 錢包綁定玩家（每玩家 1~3 筆） |
+| `t_wallet_bonus_ext` | `wallet_id` | `t_wallet` | N:1 | CASCADE | BONUS 活動明細 |
+| `t_wallet_lock` | `wallet_id` | `t_wallet` | N:1 | CASCADE | 鎖定機制明細 |
 | **交易領域（Transaction Domain）** |
 | `transactions` | `player_id` | `players` | N:1 | RESTRICT | 交易擁有者 |
 | `transactions` | `wallet_id` | `wallets` | N:1 | RESTRICT | 關聯錢包 |
@@ -430,7 +439,17 @@ INSERT INTO player_status_audit_log (
 - `password_hash`: Argon2id 演算法，參數 m=65536, t=3, p=4
 - `kyc_status`: 支援增強盡職調查（Enhanced Due Diligence, EDD）流程
 
-### 5.2 錢包表（Wallet Table）（`wallets`）
+### 5.2 錢包表（Wallet Table）（`t_wallet`）
+
+**錢包類型（Wallet Types）**:
+
+| wallet_type | 說明 | 記錄數/玩家 | Phase |
+|-------------|------|------------|-------|
+| `CASH` | 現金錢包 — 真金白銀，可投注、可提款 | 1 筆（必有） | P1 |
+| `BONUS` | 優惠錢包 — 匯總餘額，明細在 `t_wallet_bonus_ext` | 0~1 筆 | P1 |
+| `CREDIT` | 信用額度 — 代理信用體系，僅限信用模式玩家 | 0~1 筆 | P2+ |
+
+> **LOCKED 不是錢包類型**：凍結資金透過 `t_wallet.locked_amount`（匯總）+ `t_wallet_lock`（明細）的雙軌設計處理，資金始終留在 CASH 錢包中。
 
 **錢包總覽餘額公式（Wallet Overview Balance Formula）**— 用於前台顯示，包含所有錢包類型：
 
@@ -442,6 +461,10 @@ Wallet Overview Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked B
 ```
 
 > **注意**：此公式為前台顯示用途。即時投注扣款使用不同公式（僅現金錢包），詳見 → [Financial_Implementation.md Section 2.2](../02_Finance_Service/04_Financial_Implementation.md)
+
+**BONUS 匯總機制（Bonus Aggregation）**:
+- `t_wallet` 中 BONUS 類型的 `balance` = 所有 ACTIVE 狀態 `t_wallet_bonus_ext.balance` 的加總
+- 投注扣款時按擴展表優先順序（先過期的先扣）逐筆扣減，再回寫主表匯總
 
 **並發控制（Concurrency Control）**:
 - 使用 `version` 欄位進行樂觀鎖
