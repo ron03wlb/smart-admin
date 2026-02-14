@@ -3,8 +3,8 @@ package net.lab1024.sa.common.core.util;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.TextStyle;
@@ -19,13 +19,13 @@ import java.util.Locale;
 public class SmartLocalDateUtil {
 
   /**
-   * 格式化 LocalDateTime 返回对应格式字符串
+   * 格式化 OffsetDateTime 返回对应格式字符串
    *
    * @param time
    * @param formatterEnum {@link SmartDateFormatterEnum}
    * @return
    */
-  public static String format(LocalDateTime time, SmartDateFormatterEnum formatterEnum) {
+  public static String format(OffsetDateTime time, SmartDateFormatterEnum formatterEnum) {
     return time.format(formatterEnum.getFormatter());
   }
 
@@ -41,14 +41,14 @@ public class SmartLocalDateUtil {
   }
 
   /**
-   * 解析时间字符串 返回LocalDateTime
+   * 解析时间字符串 返回 OffsetDateTime (UTC)
    *
    * @param time
    * @param formatterEnum {@link SmartDateFormatterEnum}
    * @return
    */
-  public static LocalDateTime parse(String time, SmartDateFormatterEnum formatterEnum) {
-    return LocalDateTime.parse(time, formatterEnum.getFormatter());
+  public static OffsetDateTime parse(String time, SmartDateFormatterEnum formatterEnum) {
+    return OffsetDateTime.parse(time, formatterEnum.getFormatter());
   }
 
   /**
@@ -68,8 +68,8 @@ public class SmartLocalDateUtil {
    * @param time
    * @return
    */
-  public static Long getTimestamp(LocalDateTime time) {
-    return time.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+  public static Long getTimestamp(OffsetDateTime time) {
+    return time.toInstant().toEpochMilli();
   }
 
   /**
@@ -101,8 +101,8 @@ public class SmartLocalDateUtil {
     return formatToChineseWeek(localDate).replace("星期", "周");
   }
 
-  public static LocalDateTime toLocalDateTime(Date date) {
-    return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+  public static OffsetDateTime toOffsetDateTime(Date date) {
+    return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toOffsetDateTime();
   }
 
   /**
@@ -112,19 +112,7 @@ public class SmartLocalDateUtil {
    * @return
    */
   public static Long getDayBalanceTime(ChronoUnit unit) {
-    LocalDateTime now = LocalDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
     return Duration.between(now, now.plusDays(1L).with(LocalTime.MIN)).get(unit);
   }
-
-  // public static void main(String[] args) {
-  // System.out.println(
-  // SmartLocalDateUtil.format(LocalDateTime.now(),
-  // SmartDateFormatterEnum.YMD_HMS));
-  // System.out.println(
-  // SmartLocalDateUtil.format(LocalDateTime.now(),
-  // SmartDateFormatterEnum.YMD_HM));
-  // System.out.println(
-  // SmartLocalDateUtil.parse("2021-10-15 10:10:00",
-  // SmartDateFormatterEnum.YMD_HMS));
-  // }
 }

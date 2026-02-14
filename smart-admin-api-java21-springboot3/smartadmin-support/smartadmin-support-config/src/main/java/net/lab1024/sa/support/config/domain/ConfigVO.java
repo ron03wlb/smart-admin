@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.config.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -28,8 +28,8 @@ public class ConfigVO {
   private String remark;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "上次修改时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

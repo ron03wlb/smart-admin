@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.serialnumber.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +31,7 @@ public class SerialNumberGenerateResultBO {
   private Long lastNumber;
 
   /** 上次生成的时间 */
-  private LocalDateTime lastTime;
+  private OffsetDateTime lastTime;
 
   /** 生成的 number 集合 */
   private List<Long> numberList;

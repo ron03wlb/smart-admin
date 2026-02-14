@@ -2,7 +2,8 @@ package net.lab1024.sa.support.serialnumber.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -143,7 +144,7 @@ public class SerialNumberRedisService extends SerialNumberBaseService {
           SerialNumberGenerateResultBO.builder()
               .serialNumberId(serialNumberInfo.getSerialNumberId())
               .lastNumber(increaseResult)
-              .lastTime(LocalDateTime.now())
+              .lastTime(OffsetDateTime.now(ZoneOffset.UTC))
               .numberList(numberList)
               .isReset(false)
               .build();

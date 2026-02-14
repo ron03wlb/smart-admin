@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.liteflow.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -42,5 +42,5 @@ public class LiteFlowExecutionLogVO {
   private String errorStack;
 
   @Schema(description = "創建時間")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

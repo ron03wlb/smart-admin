@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.request.RequestUser;
 import net.lab1024.sa.common.core.domain.response.PageResult;
@@ -365,7 +366,7 @@ class SmartJobServiceTest {
     entity.setEnabledFlag(true);
     entity.setDeletedFlag(false);
     entity.setSort(1);
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 
@@ -387,7 +388,7 @@ class SmartJobServiceTest {
     vo.setJobId(1);
     vo.setJobName("測試任務");
     vo.setSuccessFlag(1);
-    vo.setExecuteStartTime(LocalDateTime.now());
+    vo.setExecuteStartTime(OffsetDateTime.now(ZoneOffset.UTC));
     vo.setExecuteTimeMillis(100L);
     return vo;
   }

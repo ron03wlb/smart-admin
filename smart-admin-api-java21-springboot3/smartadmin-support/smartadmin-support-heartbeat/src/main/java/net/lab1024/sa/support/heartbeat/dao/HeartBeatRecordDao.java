@@ -2,7 +2,7 @@ package net.lab1024.sa.support.heartbeat.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import net.lab1024.sa.support.heartbeat.domain.HeartBeatRecordEntity;
 import net.lab1024.sa.support.heartbeat.domain.HeartBeatRecordQueryForm;
@@ -27,7 +27,7 @@ public interface HeartBeatRecordDao extends BaseMapper<HeartBeatRecordEntity> {
    * @param heartBeatTime
    */
   void updateHeartBeatTimeById(
-      @Param("id") Long id, @Param("heartBeatTime") LocalDateTime heartBeatTime);
+      @Param("id") Long id, @Param("heartBeatTime") OffsetDateTime heartBeatTime);
 
   /**
    * 查询心跳日志

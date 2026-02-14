@@ -2,7 +2,8 @@ package net.lab1024.sa.support.job.constant;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -68,9 +69,9 @@ public class SmartJobUtil {
    * @param num
    * @return
    */
-  public static List<LocalDateTime> queryNextTimeFromLast(
-      String triggerType, String triggerVal, LocalDateTime lastExecuteTime, int num) {
-    List<LocalDateTime> nextTimeList = null;
+  public static List<OffsetDateTime> queryNextTimeFromLast(
+      String triggerType, String triggerVal, OffsetDateTime lastExecuteTime, int num) {
+    List<OffsetDateTime> nextTimeList = null;
     if (SmartJobTriggerTypeEnum.CRON.equalsValue(triggerType)) {
       nextTimeList = SmartJobUtil.queryNextTime(triggerVal, lastExecuteTime, num);
     } else if (SmartJobTriggerTypeEnum.FIXED_DELAY.equalsValue(triggerType)) {
@@ -88,15 +89,15 @@ public class SmartJobUtil {
    * @param num
    * @return
    */
-  public static List<LocalDateTime> queryNextTimeFromNow(
-      String triggerType, String triggerVal, LocalDateTime lastExecuteTime, int num) {
-    LocalDateTime nowTime = LocalDateTime.now();
-    List<LocalDateTime> nextTimeList = null;
+  public static List<OffsetDateTime> queryNextTimeFromNow(
+      String triggerType, String triggerVal, OffsetDateTime lastExecuteTime, int num) {
+    OffsetDateTime nowTime = OffsetDateTime.now(ZoneOffset.UTC);
+    List<OffsetDateTime> nextTimeList = null;
     if (SmartJobTriggerTypeEnum.CRON.equalsValue(triggerType)) {
       nextTimeList = SmartJobUtil.queryNextTime(triggerVal, nowTime, num);
     } else if (SmartJobTriggerTypeEnum.FIXED_DELAY.equalsValue(triggerType)) {
       Integer fixedDelay = getFixedDelayVal(triggerVal);
-      LocalDateTime startTime =
+      OffsetDateTime startTime =
           null == lastExecuteTime || lastExecuteTime.plusSeconds(fixedDelay).isBefore(nowTime)
               ? nowTime
               : lastExecuteTime;
@@ -113,13 +114,13 @@ public class SmartJobUtil {
    * @param num
    * @return
    */
-  public static List<LocalDateTime> queryNextTime(String cron, LocalDateTime startTime, int num) {
+  public static List<OffsetDateTime> queryNextTime(String cron, OffsetDateTime startTime, int num) {
     if (null == startTime) {
       return Collections.emptyList();
     }
     CronExpression parse = CronExpression.parse(cron);
-    List<LocalDateTime> timeList = new ArrayList<>(num);
-    LocalDateTime lastTime = startTime;
+    List<OffsetDateTime> timeList = new ArrayList<>(num);
+    OffsetDateTime lastTime = startTime;
     for (int i = 0; i < num; i++) {
       lastTime = parse.next(lastTime);
       timeList.add(lastTime);
@@ -135,13 +136,13 @@ public class SmartJobUtil {
    * @param num
    * @return
    */
-  public static List<LocalDateTime> queryNextTime(
-      Integer fixDelaySecond, LocalDateTime startTime, int num) {
+  public static List<OffsetDateTime> queryNextTime(
+      Integer fixDelaySecond, OffsetDateTime startTime, int num) {
     if (null == startTime) {
       return Collections.emptyList();
     }
-    List<LocalDateTime> timeList = new ArrayList<>(num);
-    LocalDateTime lastTime = startTime;
+    List<OffsetDateTime> timeList = new ArrayList<>(num);
+    OffsetDateTime lastTime = startTime;
     for (int i = 0; i < num; i++) {
       lastTime = lastTime.plusSeconds(fixDelaySecond);
       timeList.add(lastTime);

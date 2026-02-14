@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.liteflow.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -39,8 +39,8 @@ public class LiteFlowChainVO {
   private String remark;
 
   @Schema(description = "創建時間")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新時間")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

@@ -3,7 +3,7 @@ package net.lab1024.sa.support.reload.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -34,5 +34,5 @@ public class ReloadResultEntity {
   private String exception;
 
   /** 创建时间 */
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

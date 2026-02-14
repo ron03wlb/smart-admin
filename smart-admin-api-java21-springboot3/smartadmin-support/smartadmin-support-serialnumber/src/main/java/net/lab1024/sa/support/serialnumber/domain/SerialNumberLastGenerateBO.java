@@ -1,10 +1,8 @@
 package net.lab1024.sa.support.serialnumber.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +27,6 @@ public class SerialNumberLastGenerateBO {
   private Long lastNumber;
 
   /** 上次生成的时间 */
-  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-  @JsonSerialize(using = LocalDateTimeSerializer.class)
-  private LocalDateTime lastTime;
+  @JsonSerialize(using = OffsetDateTimeSerializer.class)
+  private OffsetDateTime lastTime;
 }

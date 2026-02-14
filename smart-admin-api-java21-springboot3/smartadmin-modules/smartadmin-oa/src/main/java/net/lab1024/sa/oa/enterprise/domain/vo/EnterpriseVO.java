@@ -2,7 +2,7 @@ package net.lab1024.sa.oa.enterprise.domain.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
 import net.lab1024.sa.oa.enterprise.constant.EnterpriseTypeEnum;
@@ -77,8 +77,8 @@ public class EnterpriseVO {
   private String createUserName;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

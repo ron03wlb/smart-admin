@@ -2,7 +2,7 @@ package net.lab1024.sa.api.business.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -38,8 +38,8 @@ public class BrandDTO implements Serializable {
   private Boolean disabledFlag;
 
   @Schema(description = "更新時間")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   @Schema(description = "創建時間")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

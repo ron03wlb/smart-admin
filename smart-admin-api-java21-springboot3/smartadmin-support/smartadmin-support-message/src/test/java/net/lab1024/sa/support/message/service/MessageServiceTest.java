@@ -6,7 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.domain.response.PageResult;
@@ -257,7 +258,7 @@ class MessageServiceTest {
     vo.setTitle("測試消息");
     vo.setContent("這是測試消息內容");
     vo.setReadFlag(false);
-    vo.setCreateTime(LocalDateTime.now());
+    vo.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return vo;
   }
 

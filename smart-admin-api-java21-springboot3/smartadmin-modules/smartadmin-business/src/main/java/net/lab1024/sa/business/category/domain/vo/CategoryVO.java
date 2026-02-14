@@ -1,7 +1,7 @@
 package net.lab1024.sa.business.category.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.business.category.constant.CategoryTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -36,7 +36,7 @@ public class CategoryVO {
   @Schema(description = "类目id")
   private Long categoryId;
 
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

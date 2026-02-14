@@ -3,7 +3,7 @@ package net.lab1024.sa.support.liteflow.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -45,5 +45,5 @@ public class LiteFlowExecutionLogEntity {
   private String errorStack;
 
   /** 創建時間 */
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

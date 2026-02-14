@@ -2,7 +2,8 @@ package net.lab1024.sa.support.liteflow.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.support.liteflow.dao.LiteFlowExecutionMetricsDao;
@@ -54,7 +55,7 @@ public class LiteFlowMetricsManager {
       metrics.setAvgExecutionTime((int) executionTime);
       metrics.setMaxExecutionTime((int) executionTime);
       metrics.setMinExecutionTime((int) executionTime);
-      metrics.setCreateTime(LocalDateTime.now());
+      metrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
       metricsDao.insert(metrics);
 
@@ -75,7 +76,7 @@ public class LiteFlowMetricsManager {
       metrics.setAvgExecutionTime(newAvg);
       metrics.setMaxExecutionTime(Math.max(metrics.getMaxExecutionTime(), (int) executionTime));
       metrics.setMinExecutionTime(Math.min(metrics.getMinExecutionTime(), (int) executionTime));
-      metrics.setUpdateTime(LocalDateTime.now());
+      metrics.setUpdateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
       metricsDao.updateById(metrics);
     }

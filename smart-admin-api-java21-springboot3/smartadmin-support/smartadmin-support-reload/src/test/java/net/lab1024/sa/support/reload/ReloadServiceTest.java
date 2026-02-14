@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.support.reload.dao.ReloadItemDao;
@@ -164,7 +165,7 @@ class ReloadServiceTest {
     vo.setTag("DICT_RELOAD");
     vo.setArgs("{}");
     vo.setResult(true);
-    vo.setCreateTime(LocalDateTime.now());
+    vo.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return vo;
   }
 
@@ -181,7 +182,7 @@ class ReloadServiceTest {
     entity.setTag("DICT_RELOAD");
     entity.setIdentification("v1");
     entity.setArgs("{}");
-    entity.setUpdateTime(LocalDateTime.now());
+    entity.setUpdateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 }

@@ -2,7 +2,8 @@ package net.lab1024.sa.common.mq.kafka.dlq;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.config.KafkaProperties;
@@ -39,7 +40,7 @@ public class DeadLetterServiceImpl implements DeadLetterService {
             .value(record.value())
             .exceptionMessage(ex.getMessage())
             .exceptionStackTrace(getStackTrace(ex))
-            .failedAt(LocalDateTime.now())
+            .failedAt(OffsetDateTime.now(ZoneOffset.UTC))
             .retryCount(kafkaProperties.getDeadLetterQueue().getRetry().getMaxAttempts())
             .build();
 

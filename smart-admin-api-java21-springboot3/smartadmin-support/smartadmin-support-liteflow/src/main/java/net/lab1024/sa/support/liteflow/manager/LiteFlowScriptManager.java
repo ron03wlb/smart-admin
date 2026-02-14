@@ -1,7 +1,8 @@
 package net.lab1024.sa.support.liteflow.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.code.UserErrorCode;
@@ -64,7 +65,7 @@ public class LiteFlowScriptManager {
     entity.setRemark(form.getRemark());
     entity.setCreateUserId(userId);
     entity.setCreateUserName(userName);
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     scriptDao.insert(entity);
 
@@ -103,7 +104,7 @@ public class LiteFlowScriptManager {
     entity.setRemark(form.getRemark());
     entity.setUpdateUserId(userId);
     entity.setUpdateUserName(userName);
-    entity.setUpdateTime(LocalDateTime.now());
+    entity.setUpdateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     scriptDao.updateById(entity);
 
@@ -138,7 +139,7 @@ public class LiteFlowScriptManager {
     entity.setDeletedFlag(1);
     entity.setUpdateUserId(userId);
     entity.setUpdateUserName(userName);
-    entity.setUpdateTime(LocalDateTime.now());
+    entity.setUpdateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     scriptDao.updateById(entity);
 

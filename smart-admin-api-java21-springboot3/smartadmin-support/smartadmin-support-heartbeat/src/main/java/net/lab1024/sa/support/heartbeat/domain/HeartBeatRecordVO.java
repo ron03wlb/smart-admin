@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.heartbeat.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -25,8 +25,8 @@ public class HeartBeatRecordVO {
   private Integer processNo;
 
   @Schema(description = "进程开启时间")
-  private LocalDateTime processStartTime;
+  private OffsetDateTime processStartTime;
 
   @Schema(description = "心跳当前时间")
-  private LocalDateTime heartBeatTime;
+  private OffsetDateTime heartBeatTime;
 }

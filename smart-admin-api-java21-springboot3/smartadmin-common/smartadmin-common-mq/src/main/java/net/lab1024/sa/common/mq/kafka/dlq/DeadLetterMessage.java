@@ -1,6 +1,6 @@
 package net.lab1024.sa.common.mq.kafka.dlq;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Builder;
 import lombok.Data;
 
@@ -36,7 +36,7 @@ public class DeadLetterMessage {
   private String exceptionStackTrace;
 
   /** 失败时间 */
-  private LocalDateTime failedAt;
+  private OffsetDateTime failedAt;
 
   /** 重试次数 */
   private Integer retryCount;

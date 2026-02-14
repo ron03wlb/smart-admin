@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.codegenerator.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -20,5 +20,5 @@ public class TableVO {
   private String tableComment;
 
   @Schema(description = "配置时间")
-  private LocalDateTime configTime;
+  private OffsetDateTime configTime;
 }

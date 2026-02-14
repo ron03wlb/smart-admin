@@ -1,7 +1,7 @@
 package net.lab1024.sa.api.oa.dto;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -56,8 +56,8 @@ public class EnterpriseDTO implements Serializable {
   private Boolean deletedFlag;
 
   /** 創建時間 */
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   /** 更新時間 */
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

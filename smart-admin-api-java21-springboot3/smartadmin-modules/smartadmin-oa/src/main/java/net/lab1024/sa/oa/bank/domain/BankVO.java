@@ -1,7 +1,7 @@
 package net.lab1024.sa.oa.bank.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -47,8 +47,8 @@ public class BankVO {
   private String createUserName;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

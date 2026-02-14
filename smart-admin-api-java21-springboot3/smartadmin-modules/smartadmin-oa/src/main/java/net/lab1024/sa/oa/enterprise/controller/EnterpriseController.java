@@ -6,7 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,9 @@ public class EnterpriseController {
     }
 
     String watermark = ((RequestEmployee) SmartRequestUtil.getRequestUser()).getActualName();
-    watermark += SmartLocalDateUtil.format(LocalDateTime.now(), SmartDateFormatterEnum.YMD_HMS);
+    watermark +=
+        SmartLocalDateUtil.format(
+            OffsetDateTime.now(ZoneOffset.UTC), SmartDateFormatterEnum.YMD_HMS);
 
     SmartExcelUtil.exportExcelWithWatermark(
         response, "企业基本信息.xlsx", "企业信息", EnterpriseExcelVO.class, data, watermark);

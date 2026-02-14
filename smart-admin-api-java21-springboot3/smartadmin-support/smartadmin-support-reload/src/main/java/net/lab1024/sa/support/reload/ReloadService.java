@@ -1,6 +1,7 @@
 package net.lab1024.sa.support.reload;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.code.UserErrorCode;
@@ -54,7 +55,7 @@ public class ReloadService {
       return ResponseDTO.error(UserErrorCode.DATA_NOT_EXIST);
     }
     reloadItemEntity.setIdentification(reloadForm.getIdentification());
-    reloadItemEntity.setUpdateTime(LocalDateTime.now());
+    reloadItemEntity.setUpdateTime(OffsetDateTime.now(ZoneOffset.UTC));
     reloadItemEntity.setArgs(reloadForm.getArgs());
     reloadItemDao.updateById(reloadItemEntity);
     return ResponseDTO.ok();

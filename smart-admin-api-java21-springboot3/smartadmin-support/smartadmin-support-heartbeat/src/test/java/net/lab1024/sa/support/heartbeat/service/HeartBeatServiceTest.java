@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -93,8 +94,8 @@ class HeartBeatServiceTest {
     vo.setProjectPath("/app");
     vo.setServerIp("192.168.1.1");
     vo.setProcessNo(12345);
-    vo.setProcessStartTime(LocalDateTime.now());
-    vo.setHeartBeatTime(LocalDateTime.now());
+    vo.setProcessStartTime(OffsetDateTime.now(ZoneOffset.UTC));
+    vo.setHeartBeatTime(OffsetDateTime.now(ZoneOffset.UTC));
     return vo;
   }
 }

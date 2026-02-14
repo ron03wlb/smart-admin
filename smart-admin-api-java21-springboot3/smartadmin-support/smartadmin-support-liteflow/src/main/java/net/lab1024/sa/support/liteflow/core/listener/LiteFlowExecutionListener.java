@@ -3,7 +3,8 @@ package net.lab1024.sa.support.liteflow.core.listener;
 import com.yomahub.liteflow.flow.LiteflowResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +125,7 @@ public class LiteFlowExecutionListener {
         log.setErrorStack(getStackTrace(exception));
       }
 
-      log.setCreateTime(LocalDateTime.now());
+      log.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
       logDao.insert(log);
 
       LiteFlowExecutionListener.log.info(

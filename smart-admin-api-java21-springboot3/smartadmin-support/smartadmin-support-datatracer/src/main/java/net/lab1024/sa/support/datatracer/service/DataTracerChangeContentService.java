@@ -327,6 +327,9 @@ public class DataTracerChangeContentService {
       fieldContent = this.getRelateDisplayValue(fieldValue, dataTracerFieldSql);
     } else if (fieldValue instanceof Date) {
       fieldContent = DateUtil.formatDateTime((Date) fieldValue);
+    } else if (fieldValue instanceof java.time.OffsetDateTime odt) {
+      fieldContent =
+          odt.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     } else if (fieldValue instanceof LocalDateTime) {
       fieldContent = LocalDateTimeUtil.formatNormal((LocalDateTime) fieldValue);
     } else if (fieldValue instanceof LocalDate) {

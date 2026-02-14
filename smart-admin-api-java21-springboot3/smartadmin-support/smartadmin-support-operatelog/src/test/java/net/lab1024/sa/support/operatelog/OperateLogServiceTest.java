@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -145,7 +146,7 @@ class OperateLogServiceTest {
             .userAgent("Chrome")
             .successFlag(1)
             .build();
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 }

@@ -9,7 +9,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
 import net.lab1024.sa.common.core.domain.response.PageResult;
@@ -382,7 +383,7 @@ class NoticeEmployeeServiceTest {
     NoticeEmployeeVO vo = new NoticeEmployeeVO();
     vo.setNoticeId(id);
     vo.setTitle(title);
-    vo.setPublishTime(LocalDateTime.now().minusDays(1));
+    vo.setPublishTime(OffsetDateTime.now(ZoneOffset.UTC).minusDays(1));
     return vo;
   }
 

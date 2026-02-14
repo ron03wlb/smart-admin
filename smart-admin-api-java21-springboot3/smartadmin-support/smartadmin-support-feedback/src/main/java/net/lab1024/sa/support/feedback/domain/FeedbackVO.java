@@ -3,7 +3,7 @@ package net.lab1024.sa.support.feedback.domain;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -41,8 +41,8 @@ public class FeedbackVO {
   private Integer userType;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

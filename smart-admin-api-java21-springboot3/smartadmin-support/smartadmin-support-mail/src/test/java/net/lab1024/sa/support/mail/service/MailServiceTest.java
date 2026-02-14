@@ -6,7 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import jakarta.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,7 +220,7 @@ class MailServiceTest {
     entity.setTemplateType(MailTemplateTypeEnum.STRING.name());
     entity.setTemplateContent("Your verification code is: ${code}");
     entity.setDisableFlag(false);
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 }

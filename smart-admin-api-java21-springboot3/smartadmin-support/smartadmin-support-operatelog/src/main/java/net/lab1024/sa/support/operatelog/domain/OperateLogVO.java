@@ -1,8 +1,7 @@
 package net.lab1024.sa.support.operatelog.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -62,10 +61,8 @@ public class OperateLogVO {
   private String failReason;
 
   @Schema(description = "更新时间")
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   @Schema(description = "创建时间")
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

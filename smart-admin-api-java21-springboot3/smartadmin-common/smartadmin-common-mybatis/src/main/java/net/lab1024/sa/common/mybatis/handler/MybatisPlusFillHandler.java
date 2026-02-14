@@ -1,8 +1,8 @@
 package net.lab1024.sa.common.mybatis.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
@@ -23,17 +23,17 @@ public class MybatisPlusFillHandler implements MetaObjectHandler {
   @Override
   public void insertFill(MetaObject metaObject) {
     if (metaObject.hasSetter(CREATE_TIME)) {
-      this.fillStrategy(metaObject, CREATE_TIME, LocalDateTime.now(ZoneId.systemDefault()));
+      this.fillStrategy(metaObject, CREATE_TIME, OffsetDateTime.now(ZoneOffset.UTC));
     }
     if (metaObject.hasSetter(UPDATE_TIME)) {
-      this.fillStrategy(metaObject, UPDATE_TIME, LocalDateTime.now(ZoneId.systemDefault()));
+      this.fillStrategy(metaObject, UPDATE_TIME, OffsetDateTime.now(ZoneOffset.UTC));
     }
   }
 
   @Override
   public void updateFill(MetaObject metaObject) {
     if (metaObject.hasSetter(UPDATE_TIME)) {
-      this.fillStrategy(metaObject, UPDATE_TIME, LocalDateTime.now(ZoneId.systemDefault()));
+      this.fillStrategy(metaObject, UPDATE_TIME, OffsetDateTime.now(ZoneOffset.UTC));
     }
   }
 }

@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.support.file.json.deserializer.FileKeyVoDeserializer;
@@ -41,7 +41,7 @@ public class NoticeAddForm {
 
   @Schema(description = "发布时间")
   @NotNull(message = "发布时间不能为空")
-  private LocalDateTime publishTime;
+  private OffsetDateTime publishTime;
 
   @Schema(description = "纯文本内容")
   @NotNull(message = "文本内容不能为空")

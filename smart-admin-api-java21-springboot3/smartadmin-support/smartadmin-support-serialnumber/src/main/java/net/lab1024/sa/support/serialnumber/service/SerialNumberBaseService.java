@@ -3,7 +3,8 @@ package net.lab1024.sa.support.serialnumber.service;
 import com.google.common.collect.Lists;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -188,7 +189,7 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
     return SerialNumberGenerateResultBO.builder()
         .serialNumberId(serialNumberInfo.getSerialNumberId())
         .lastNumber(lastNumber)
-        .lastTime(LocalDateTime.now())
+        .lastTime(OffsetDateTime.now(ZoneOffset.UTC))
         .numberList(numberList)
         .isReset(isReset)
         .build();
@@ -223,7 +224,7 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
    */
   private boolean isResetInitNumber(
       final SerialNumberLastGenerateBO lastGenerate, final SerialNumberInfoBO serialNumberInfo) {
-    final LocalDateTime lastTime = lastGenerate.getLastTime();
+    final OffsetDateTime lastTime = lastGenerate.getLastTime();
     if (lastTime == null) {
       return true;
     }
@@ -234,7 +235,7 @@ public abstract class SerialNumberBaseService implements SerialNumberService {
     final int lastTimeMonth = lastTime.getMonthValue();
     final int lastTimeDay = lastTime.getDayOfYear();
 
-    final LocalDateTime now = LocalDateTime.now();
+    final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
     switch (serialNumberRuleTypeEnum) {
       case YEAR:

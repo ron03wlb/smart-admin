@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.domain.response.PageResult;
@@ -120,7 +121,7 @@ class SecurityLoginServiceTest {
       UserTypeEnum userType = UserTypeEnum.ADMIN_EMPLOYEE;
       LoginFailEntity failEntity = createTestLoginFailEntity();
       failEntity.setLoginFailCount(5);
-      failEntity.setLoginLockBeginTime(LocalDateTime.now().minusHours(1));
+      failEntity.setLoginLockBeginTime(OffsetDateTime.now(ZoneOffset.UTC).minusHours(1));
 
       when(securityConfigProvider.getLoginFailMaxTimes()).thenReturn(5);
       when(securityConfigProvider.getLoginFailLockSeconds()).thenReturn(1800); // 30 分鐘
@@ -142,7 +143,7 @@ class SecurityLoginServiceTest {
       UserTypeEnum userType = UserTypeEnum.ADMIN_EMPLOYEE;
       LoginFailEntity failEntity = createTestLoginFailEntity();
       failEntity.setLoginFailCount(5);
-      failEntity.setLoginLockBeginTime(LocalDateTime.now().minusMinutes(5));
+      failEntity.setLoginLockBeginTime(OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(5));
 
       when(securityConfigProvider.getLoginFailMaxTimes()).thenReturn(5);
       when(securityConfigProvider.getLoginFailLockSeconds()).thenReturn(1800); // 30 分鐘

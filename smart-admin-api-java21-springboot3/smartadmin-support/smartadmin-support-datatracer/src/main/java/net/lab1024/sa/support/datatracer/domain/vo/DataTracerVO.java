@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.datatracer.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -56,5 +56,5 @@ public class DataTracerVO {
   private String ipRegion;
 
   @Schema(description = "操作时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

@@ -1,7 +1,7 @@
 package net.lab1024.sa.system.position.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -29,8 +29,8 @@ public class PositionVO {
   private String remark;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

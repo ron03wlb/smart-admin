@@ -2,7 +2,7 @@ package net.lab1024.sa.business.goods.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.business.goods.constant.GoodsStatusEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -43,7 +43,7 @@ public class GoodsVO {
   @Schema(description = "商品分类")
   private String categoryName;
 
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

@@ -3,7 +3,7 @@ package net.lab1024.sa.oa.notice.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
@@ -35,7 +35,7 @@ public class NoticeEntity extends SmartAdminBaseEntity {
   private Boolean scheduledPublishFlag;
 
   /** 发布时间 */
-  private LocalDateTime publishTime;
+  private OffsetDateTime publishTime;
 
   /** 内容 纯文本 */
   private String contentText;

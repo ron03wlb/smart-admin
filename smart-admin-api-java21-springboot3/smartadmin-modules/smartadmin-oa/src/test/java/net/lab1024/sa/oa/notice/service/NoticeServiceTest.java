@@ -7,7 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -86,7 +87,7 @@ class NoticeServiceTest {
       queryForm.setPageSize(10L);
 
       NoticeVO noticeVO = createTestNoticeVO(1L, "測試通知");
-      noticeVO.setPublishTime(LocalDateTime.now().minusDays(1));
+      noticeVO.setPublishTime(OffsetDateTime.now(ZoneOffset.UTC).minusDays(1));
       when(noticeDao.query(any(), any())).thenReturn(Collections.singletonList(noticeVO));
 
       // When
@@ -338,7 +339,7 @@ class NoticeServiceTest {
       NoticeEntity noticeEntity = createTestNoticeEntity(noticeId, "通知");
       noticeEntity.setNoticeTypeId(1L);
       noticeEntity.setAllVisibleFlag(true);
-      noticeEntity.setPublishTime(LocalDateTime.now().minusDays(1));
+      noticeEntity.setPublishTime(OffsetDateTime.now(ZoneOffset.UTC).minusDays(1));
 
       NoticeTypeEntity noticeType = createTestNoticeType(1L, "通知類型");
 

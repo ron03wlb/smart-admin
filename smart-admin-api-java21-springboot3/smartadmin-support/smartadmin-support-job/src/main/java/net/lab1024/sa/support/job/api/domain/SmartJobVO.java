@@ -2,7 +2,7 @@ package net.lab1024.sa.support.job.api.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -42,7 +42,7 @@ public class SmartJobVO {
   private Boolean enabledFlag;
 
   @Schema(description = "最后一执行时间")
-  private LocalDateTime lastExecuteTime;
+  private OffsetDateTime lastExecuteTime;
 
   @Schema(description = "最后一次执行记录id")
   private Long lastExecuteLogId;
@@ -55,13 +55,13 @@ public class SmartJobVO {
 
   private String updateName;
 
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "上次执行记录")
   private SmartJobLogVO lastJobLog;
 
   @Schema(description = "未来N次任务执行时间")
-  private List<LocalDateTime> nextJobExecuteTimeList;
+  private List<OffsetDateTime> nextJobExecuteTimeList;
 }

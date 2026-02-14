@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.domain.response.PageResult;
@@ -190,7 +191,7 @@ class LoginLogServiceTest {
             .loginDevice("Chrome")
             .loginResult(LoginLogResultEnum.LOGIN_SUCCESS.getValue())
             .build();
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 
@@ -202,7 +203,7 @@ class LoginLogServiceTest {
     vo.setUserName("admin");
     vo.setLoginIp("127.0.0.1");
     vo.setLoginResult(LoginLogResultEnum.LOGIN_SUCCESS.getValue());
-    vo.setCreateTime(LocalDateTime.now());
+    vo.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return vo;
   }
 }

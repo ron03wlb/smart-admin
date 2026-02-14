@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -230,7 +231,7 @@ class HelpDocServiceTest {
     vo.setTitle("測試文檔");
     vo.setHelpDocCatalogId(1L);
     vo.setSort(1);
-    vo.setCreateTime(LocalDateTime.now());
+    vo.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return vo;
   }
 
@@ -265,7 +266,7 @@ class HelpDocServiceTest {
     entity.setContentHtml("<p>測試內容</p>");
     entity.setHelpDocCatalogId(1L);
     entity.setSort(1);
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 

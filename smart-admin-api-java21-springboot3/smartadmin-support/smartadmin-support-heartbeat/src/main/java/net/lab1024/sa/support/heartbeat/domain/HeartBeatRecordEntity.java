@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -33,8 +33,8 @@ public class HeartBeatRecordEntity implements Serializable {
   private Integer processNo;
 
   /** 进程开启时间 */
-  private LocalDateTime processStartTime;
+  private OffsetDateTime processStartTime;
 
   /** 心跳当前时间 */
-  private LocalDateTime heartBeatTime;
+  private OffsetDateTime heartBeatTime;
 }

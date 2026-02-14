@@ -234,8 +234,9 @@ public class CodeGeneratorTemplateService {
     Map<String, Object> variablesMap = new HashMap<>();
 
     Map<String, Object> basicMap = BeanUtil.beanToMap(basic);
-    basicMap.put("frontDate", DateUtil.formatLocalDateTime(basic.getFrontDate()));
-    basicMap.put("backendDate", DateUtil.formatLocalDateTime(basic.getBackendDate()));
+    basicMap.put("frontDate", DateUtil.formatLocalDateTime(basic.getFrontDate().toLocalDateTime()));
+    basicMap.put(
+        "backendDate", DateUtil.formatLocalDateTime(basic.getBackendDate().toLocalDateTime()));
 
     variablesMap.put("basic", basicMap);
     variablesMap.put("fields", fields);

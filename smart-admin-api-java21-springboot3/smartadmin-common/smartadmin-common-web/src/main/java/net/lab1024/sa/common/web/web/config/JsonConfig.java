@@ -4,13 +4,14 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import net.lab1024.sa.common.web.web.json.serializer.LongJsonSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -31,14 +32,16 @@ public class JsonConfig {
   @Bean
   public Jackson2ObjectMapperBuilderCustomizer customizer() {
     return builder -> {
+      // LocalDate serializers (unchanged — dates have no timezone)
       builder.deserializers(
           new LocalDateDeserializer(DatePattern.NORM_DATE_FORMAT.getDateTimeFormatter()));
-      builder.deserializers(
-          new LocalDateTimeDeserializer(DatePattern.NORM_DATETIME_FORMAT.getDateTimeFormatter()));
       builder.serializers(
           new LocalDateSerializer(DatePattern.NORM_DATE_FORMAT.getDateTimeFormatter()));
-      builder.serializers(
-          new LocalDateTimeSerializer(DatePattern.NORM_DATETIME_FORMAT.getDateTimeFormatter()));
+      // OffsetDateTime serializer (ISO-8601 format with offset)
+      // Deserialization handled by Spring Boot's auto-configured JavaTimeModule (ISO-8601 default)
+      builder.serializerByType(
+          OffsetDateTime.class,
+          com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer.INSTANCE);
       builder.serializerByType(Long.class, LongJsonSerializer.INSTANCE);
       builder.serializerByType(Long.TYPE, LongJsonSerializer.INSTANCE);
       builder.serializerByType(BigInteger.class, ToStringSerializer.instance);
@@ -47,26 +50,31 @@ public class JsonConfig {
   }
 
   /**
-   * string 转为 LocalDateTime 配置类
+   * string 转为 OffsetDateTime 配置类
    *
    * @author 卓大
    */
   @Configuration
-  public static class StringToLocalDateTime implements Converter<String, LocalDateTime> {
+  public static class StringToOffsetDateTime implements Converter<String, OffsetDateTime> {
 
     @Override
-    public LocalDateTime convert(String str) {
+    public OffsetDateTime convert(String str) {
       if (StringUtils.isBlank(str)) {
         return null;
       }
-      LocalDateTime localDateTime;
       try {
-        localDateTime =
-            LocalDateTimeUtil.parse(str, DatePattern.NORM_DATETIME_FORMAT.getDateTimeFormatter());
+        return OffsetDateTime.parse(str, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
       } catch (DateTimeParseException e) {
-        throw new RuntimeException("请输入正确的日期格式：yyyy-MM-dd HH:mm:ss", e);
+        // Fallback: try legacy format "yyyy-MM-dd HH:mm:ss" and assume UTC
+        try {
+          LocalDateTime ldt =
+              LocalDateTimeUtil.parse(str, DatePattern.NORM_DATETIME_FORMAT.getDateTimeFormatter());
+          return ldt.atOffset(ZoneOffset.UTC);
+        } catch (DateTimeParseException e2) {
+          throw new RuntimeException(
+              "请输入正确的日期格式：ISO-8601 (e.g. 2026-01-01T00:00:00Z) 或 yyyy-MM-dd HH:mm:ss", e2);
+        }
       }
-      return localDateTime;
     }
   }
 

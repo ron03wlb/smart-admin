@@ -3,7 +3,7 @@ package net.lab1024.sa.support.securityprotect.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,5 +44,5 @@ public class LoginFailEntity extends SmartAdminBaseEntity {
   private Integer loginFailCount;
 
   /** 连续登录失败锁定开始时间 */
-  private LocalDateTime loginLockBeginTime;
+  private OffsetDateTime loginLockBeginTime;
 }

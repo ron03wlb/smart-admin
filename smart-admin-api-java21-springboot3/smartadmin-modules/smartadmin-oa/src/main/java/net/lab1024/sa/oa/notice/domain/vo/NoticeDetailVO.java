@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.support.file.json.serializer.FileKeyVoSerializer;
 
@@ -49,7 +49,7 @@ public class NoticeDetailVO {
 
   @Schema(description = "发布时间")
   @NotNull(message = "发布时间不能为空")
-  private LocalDateTime publishTime;
+  private OffsetDateTime publishTime;
 
   @Schema(description = "作者")
   @NotBlank(message = "作者不能为空")
@@ -72,8 +72,8 @@ public class NoticeDetailVO {
   private Long createUserName;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

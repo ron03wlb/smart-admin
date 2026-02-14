@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.job.api.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -29,7 +29,7 @@ public class SmartJobLogVO {
   private Integer successFlag;
 
   @Schema(description = "开始执行时间")
-  private LocalDateTime executeStartTime;
+  private OffsetDateTime executeStartTime;
 
   @Schema(description = "执行时长-毫秒")
   private Long executeTimeMillis;
@@ -38,7 +38,7 @@ public class SmartJobLogVO {
   private String executeResult;
 
   @Schema(description = "执行结束时间")
-  private LocalDateTime executeEndTime;
+  private OffsetDateTime executeEndTime;
 
   @Schema(description = "ip")
   private String ip;
@@ -51,5 +51,5 @@ public class SmartJobLogVO {
 
   private String createName;
 
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

@@ -6,7 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -278,7 +279,7 @@ class ChangeLogServiceTest {
     vo.setUpdateVersion("v1.0.0");
     vo.setContent("功能更新");
     vo.setPublicDate(LocalDate.now());
-    vo.setCreateTime(LocalDateTime.now());
+    vo.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return vo;
   }
 
@@ -310,7 +311,7 @@ class ChangeLogServiceTest {
     entity.setContent("功能更新");
     entity.setPublicDate(LocalDate.now());
     entity.setType(1);
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 }

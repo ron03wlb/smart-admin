@@ -2,7 +2,7 @@ package net.lab1024.sa.support.job.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +118,7 @@ public class SmartJobService {
       }
       // 计算未来5次执行时间
       if (jobVO.getEnabledFlag()) {
-        List<LocalDateTime> nextTimeList =
+        List<OffsetDateTime> nextTimeList =
             SmartJobUtil.queryNextTimeFromNow(
                 jobVO.getTriggerType(), jobVO.getTriggerValue(), jobVO.getLastExecuteTime(), 5);
         jobVO.setNextJobExecuteTimeList(nextTimeList);

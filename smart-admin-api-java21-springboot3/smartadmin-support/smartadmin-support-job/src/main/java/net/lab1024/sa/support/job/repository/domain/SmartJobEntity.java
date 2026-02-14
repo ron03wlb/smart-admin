@@ -3,7 +3,7 @@ package net.lab1024.sa.support.job.repository.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
@@ -47,7 +47,7 @@ public class SmartJobEntity extends SmartAdminBaseEntity {
   private Boolean enabledFlag;
 
   /** 最后一执行时间 */
-  private LocalDateTime lastExecuteTime;
+  private OffsetDateTime lastExecuteTime;
 
   /** 最后一次执行记录id */
   private Long lastExecuteLogId;

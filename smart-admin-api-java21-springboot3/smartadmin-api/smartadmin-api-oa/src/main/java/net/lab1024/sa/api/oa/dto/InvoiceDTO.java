@@ -1,7 +1,7 @@
 package net.lab1024.sa.api.oa.dto;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -53,8 +53,8 @@ public class InvoiceDTO implements Serializable {
   private Boolean disabledFlag;
 
   /** 更新時間 */
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   /** 創建時間 */
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

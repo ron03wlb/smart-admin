@@ -1,7 +1,8 @@
 package net.lab1024.sa.support.securityprotect.service;
 
 import io.vavr.control.Option;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -138,11 +139,11 @@ public class SecurityPasswordService {
       return false;
     }
 
-    LocalDateTime nextUpdateTime =
+    OffsetDateTime nextUpdateTime =
         passwordLogEntity
             .getCreateTime()
             .plusDays(securityConfigProvider.getRegularChangePasswordDays());
-    return nextUpdateTime.isBefore(LocalDateTime.now());
+    return nextUpdateTime.isBefore(OffsetDateTime.now(ZoneOffset.UTC));
   }
 
   /**

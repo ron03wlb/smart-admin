@@ -5,8 +5,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public final class HeartBeatRunnable implements Runnable {
   private Integer processNo;
 
   /** 进程开启时间 */
-  private LocalDateTime processStartTime;
+  private OffsetDateTime processStartTime;
 
   private IHeartBeatRecordHandler recordHandler;
 
@@ -57,8 +57,8 @@ public final class HeartBeatRunnable implements Runnable {
     }
 
     this.processStartTime =
-        LocalDateTime.ofInstant(
-            Instant.ofEpochMilli(runtimeMXBean.getStartTime()), ZoneId.systemDefault());
+        OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(runtimeMXBean.getStartTime()), ZoneOffset.UTC);
   }
 
   @Override
@@ -68,7 +68,7 @@ public final class HeartBeatRunnable implements Runnable {
     heartBeatRecord.setServerIp(StringUtils.join(this.serverIps, ";"));
     heartBeatRecord.setProcessNo(this.processNo);
     heartBeatRecord.setProcessStartTime(this.processStartTime);
-    heartBeatRecord.setHeartBeatTime(LocalDateTime.now());
+    heartBeatRecord.setHeartBeatTime(OffsetDateTime.now(ZoneOffset.UTC));
     recordHandler.handler(heartBeatRecord);
   }
 }

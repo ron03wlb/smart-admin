@@ -3,7 +3,7 @@ package net.lab1024.sa.support.helpdoc.domain.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.support.file.json.serializer.FileKeyVoSerializer;
@@ -51,10 +51,10 @@ public class HelpDocDetailVO {
   private Integer userViewCount;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   @Schema(description = "关联项目")
   private List<HelpDocRelationVO> relationList;

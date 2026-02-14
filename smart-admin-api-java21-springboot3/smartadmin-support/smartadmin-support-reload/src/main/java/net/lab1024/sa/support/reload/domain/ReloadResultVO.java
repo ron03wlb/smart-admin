@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.reload.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -26,5 +26,5 @@ public class ReloadResultVO {
   private String exception;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

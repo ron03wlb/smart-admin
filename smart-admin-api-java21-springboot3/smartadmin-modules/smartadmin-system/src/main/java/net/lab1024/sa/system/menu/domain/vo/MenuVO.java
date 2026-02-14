@@ -2,7 +2,7 @@ package net.lab1024.sa.system.menu.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.system.menu.domain.form.MenuBaseForm;
@@ -23,13 +23,13 @@ public class MenuVO extends MenuBaseForm implements Serializable {
   private Long menuId;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "创建人")
   private Long createUserId;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   @Schema(description = "更新人")
   private Long updateUserId;

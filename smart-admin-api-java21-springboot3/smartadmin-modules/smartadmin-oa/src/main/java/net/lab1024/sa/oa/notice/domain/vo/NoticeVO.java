@@ -1,7 +1,7 @@
 package net.lab1024.sa.oa.notice.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -35,7 +35,7 @@ public class NoticeVO {
   private Boolean publishFlag;
 
   @Schema(description = "发布时间")
-  private LocalDateTime publishTime;
+  private OffsetDateTime publishTime;
 
   @Schema(description = "作者")
   private String author;
@@ -59,8 +59,8 @@ public class NoticeVO {
   private String createUserName;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "更新时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

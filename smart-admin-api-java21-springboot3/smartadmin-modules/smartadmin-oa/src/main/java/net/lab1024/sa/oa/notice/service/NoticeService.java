@@ -2,7 +2,8 @@ package net.lab1024.sa.oa.notice.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Maps;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class NoticeService {
   public PageResult<NoticeVO> query(NoticeQueryForm queryForm) {
     Page<?> page = SmartPageUtil.convert2PageQuery(queryForm);
     List<NoticeVO> list = noticeDao.query(page, queryForm);
-    LocalDateTime now = LocalDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
     list.forEach(e -> e.setPublishFlag(e.getPublishTime().isBefore(now)));
     return SmartPageUtil.convert2PageResult(page, list);
   }
@@ -79,7 +80,7 @@ public class NoticeService {
     NoticeEntity noticeEntity = SmartBeanUtil.copy(addForm, NoticeEntity.class);
     // 发布时间：不是定时发布时 默认为 当前
     if (!addForm.getScheduledPublishFlag()) {
-      noticeEntity.setPublishTime(LocalDateTime.now());
+      noticeEntity.setPublishTime(OffsetDateTime.now(ZoneOffset.UTC));
     }
     // 保存数据
     noticeManager.saveTransaction(noticeEntity, addForm.getVisibleRangeList());
@@ -197,7 +198,7 @@ public class NoticeService {
     updateFormVO.setNoticeTypeName(noticeType != null ? noticeType.getNoticeTypeName() : null);
     updateFormVO.setPublishFlag(
         updateFormVO.getPublishTime() != null
-            && updateFormVO.getPublishTime().isBefore(LocalDateTime.now()));
+            && updateFormVO.getPublishTime().isBefore(OffsetDateTime.now(ZoneOffset.UTC)));
 
     if (!updateFormVO.getAllVisibleFlag()) {
       List<NoticeVisibleRangeVO> noticeVisibleRangeList = noticeDao.queryVisibleRange(noticeId);

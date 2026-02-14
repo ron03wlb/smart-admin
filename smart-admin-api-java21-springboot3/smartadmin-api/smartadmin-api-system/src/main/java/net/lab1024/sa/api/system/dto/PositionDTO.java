@@ -1,13 +1,12 @@
 package net.lab1024.sa.api.system.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -56,12 +55,10 @@ public class PositionDTO implements Serializable {
   private String remark;
 
   @Schema(description = "Create time")
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "Update time")
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   /** Validation group for create operations */
   public interface Create {}

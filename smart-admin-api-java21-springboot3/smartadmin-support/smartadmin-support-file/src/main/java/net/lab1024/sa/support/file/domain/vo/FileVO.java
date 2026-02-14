@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.file.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -48,5 +48,5 @@ public class FileVO {
   private String fileUrl;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

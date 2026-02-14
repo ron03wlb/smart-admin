@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.loginlog.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -44,5 +44,5 @@ public class LoginLogVO {
 
   private String loginDevice;
 
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

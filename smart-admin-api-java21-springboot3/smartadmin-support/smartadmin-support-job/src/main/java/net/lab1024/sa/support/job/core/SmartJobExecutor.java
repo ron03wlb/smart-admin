@@ -3,7 +3,8 @@ package net.lab1024.sa.support.job.core;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import com.baomidou.lock.LockInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.ipgeo.util.IpGeolocationUtil;
@@ -65,13 +66,13 @@ public class SmartJobExecutor implements Runnable {
       if (null == dbJobEntity) {
         return;
       }
-      LocalDateTime lastExecuteTime = dbJobEntity.getLastExecuteTime();
+      OffsetDateTime lastExecuteTime = dbJobEntity.getLastExecuteTime();
       if (null != lastExecuteTime) {
-        LocalDateTime nextTime =
+        OffsetDateTime nextTime =
             SmartJobUtil.queryNextTimeFromLast(
                     jobEntity.getTriggerType(), jobEntity.getTriggerValue(), lastExecuteTime, 1)
                 .get(0);
-        if (LocalDateTime.now().isBefore(nextTime)) {
+        if (OffsetDateTime.now(ZoneOffset.UTC).isBefore(nextTime)) {
           return;
         }
       }
@@ -95,7 +96,7 @@ public class SmartJobExecutor implements Runnable {
    */
   public SmartJobLogEntity execute(String executorName) {
     // 保存执行记录
-    LocalDateTime startTime = LocalDateTime.now();
+    OffsetDateTime startTime = OffsetDateTime.now(ZoneOffset.UTC);
     Long logId = this.saveLogBeforeExecute(jobEntity, executorName, startTime);
 
     // 执行计时
@@ -137,7 +138,7 @@ public class SmartJobExecutor implements Runnable {
    * @return 返回执行记录id
    */
   private Long saveLogBeforeExecute(
-      SmartJobEntity jobEntity, String executorName, LocalDateTime executeTime) {
+      SmartJobEntity jobEntity, String executorName, OffsetDateTime executeTime) {
     Integer jobId = jobEntity.getJobId();
     // 保存执行记录
     SmartJobLogEntity logEntity = new SmartJobLogEntity();

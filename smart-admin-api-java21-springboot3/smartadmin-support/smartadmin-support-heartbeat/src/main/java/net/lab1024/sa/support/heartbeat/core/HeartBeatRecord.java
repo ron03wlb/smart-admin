@@ -1,6 +1,6 @@
 package net.lab1024.sa.support.heartbeat.core;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -22,8 +22,8 @@ public class HeartBeatRecord {
   private Integer processNo;
 
   /** 进程开启时间 */
-  private LocalDateTime processStartTime;
+  private OffsetDateTime processStartTime;
 
   /** 心跳当前时间 */
-  private LocalDateTime heartBeatTime;
+  private OffsetDateTime heartBeatTime;
 }

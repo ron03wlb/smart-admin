@@ -1,7 +1,7 @@
 package net.lab1024.sa.business.brand.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -33,8 +33,8 @@ public class BrandVO {
   private Integer status;
 
   @Schema(description = "Last update time")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 
   @Schema(description = "Creation time")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

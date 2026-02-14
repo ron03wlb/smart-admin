@@ -32,7 +32,10 @@ public enum SmartDateFormatterEnum {
   HMS(DateTimeFormatter.ofPattern("HH:mm:ss")),
 
   /** 日期格式 ：时分 HH:mm 例：10:15 */
-  HM(DateTimeFormatter.ofPattern("HH:mm"));
+  HM(DateTimeFormatter.ofPattern("HH:mm")),
+
+  /** ISO-8601 with offset, e.g. 2026-02-14T10:30:00+00:00 */
+  ISO_OFFSET_DATE_TIME(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
   private transient DateTimeFormatter formatter;
 

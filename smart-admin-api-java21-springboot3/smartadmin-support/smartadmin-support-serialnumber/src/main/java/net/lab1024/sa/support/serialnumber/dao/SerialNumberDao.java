@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.serialnumber.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import net.lab1024.sa.support.serialnumber.domain.SerialNumberEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -33,5 +33,5 @@ public interface SerialNumberDao extends BaseMapper<SerialNumberEntity> {
   void updateLastNumberAndTime(
       @Param("serialNumberId") Integer serialNumberId,
       @Param("lastNumber") Long lastNumber,
-      @Param("lastTime") LocalDateTime lastTime);
+      @Param("lastTime") OffsetDateTime lastTime);
 }

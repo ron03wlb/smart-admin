@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.helpdoc.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -29,7 +29,7 @@ public class HelpDocViewRecordVO {
   private String firstUserAgent;
 
   @Schema(description = "首次查看时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "最后一次 ip")
   private String lastIp;
@@ -38,5 +38,5 @@ public class HelpDocViewRecordVO {
   private String lastUserAgent;
 
   @Schema(description = "最后一次查看时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

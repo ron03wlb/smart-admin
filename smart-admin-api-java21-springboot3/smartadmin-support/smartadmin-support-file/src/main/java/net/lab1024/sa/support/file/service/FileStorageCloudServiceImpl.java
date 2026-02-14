@@ -1,7 +1,6 @@
 package net.lab1024.sa.support.file.service;
 
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +8,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -89,7 +87,8 @@ public class FileStorageCloudServiceImpl implements IFileStorageService {
     String fileType = FilenameUtils.getExtension(originalFileName);
     String uuid = IdUtil.fastSimpleUUID();
     String time =
-        LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_FORMATTER);
+        DatePattern.PURE_DATETIME_FORMATTER.format(
+            java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC));
     String fileKey = path + uuid + "_" + time + "." + fileType;
 
     // 文件名称 URL 编码

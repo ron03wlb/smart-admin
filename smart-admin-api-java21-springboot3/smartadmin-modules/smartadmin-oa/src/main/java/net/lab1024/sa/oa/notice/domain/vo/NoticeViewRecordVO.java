@@ -1,7 +1,7 @@
 package net.lab1024.sa.oa.notice.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -32,7 +32,7 @@ public class NoticeViewRecordVO {
   private String firstUserAgent;
 
   @Schema(description = "首次查看时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "最后一次 ip")
   private String lastIp;
@@ -41,5 +41,5 @@ public class NoticeViewRecordVO {
   private String lastUserAgent;
 
   @Schema(description = "最后一次查看时间")
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

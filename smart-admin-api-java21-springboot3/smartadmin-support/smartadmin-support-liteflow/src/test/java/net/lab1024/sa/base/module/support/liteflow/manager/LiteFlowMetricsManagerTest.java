@@ -6,7 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import net.lab1024.sa.support.liteflow.dao.LiteFlowExecutionMetricsDao;
 import net.lab1024.sa.support.liteflow.domain.entity.LiteFlowExecutionMetricsEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,7 +118,7 @@ class LiteFlowMetricsManagerTest {
     existingMetrics.setAvgExecutionTime(100);
     existingMetrics.setMaxExecutionTime(150);
     existingMetrics.setMinExecutionTime(50);
-    existingMetrics.setCreateTime(LocalDateTime.now());
+    existingMetrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     when(metricsDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existingMetrics);
     when(metricsDao.updateById(any(LiteFlowExecutionMetricsEntity.class))).thenReturn(1);
@@ -163,7 +164,7 @@ class LiteFlowMetricsManagerTest {
     existingMetrics.setAvgExecutionTime(100);
     existingMetrics.setMaxExecutionTime(150);
     existingMetrics.setMinExecutionTime(50);
-    existingMetrics.setCreateTime(LocalDateTime.now());
+    existingMetrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     when(metricsDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existingMetrics);
     when(metricsDao.updateById(any(LiteFlowExecutionMetricsEntity.class))).thenReturn(1);
@@ -199,7 +200,7 @@ class LiteFlowMetricsManagerTest {
     existingMetrics.setAvgExecutionTime(100);
     existingMetrics.setMaxExecutionTime(150);
     existingMetrics.setMinExecutionTime(80); // 現有最小值
-    existingMetrics.setCreateTime(LocalDateTime.now());
+    existingMetrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     when(metricsDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existingMetrics);
     when(metricsDao.updateById(any(LiteFlowExecutionMetricsEntity.class))).thenReturn(1);
@@ -234,7 +235,7 @@ class LiteFlowMetricsManagerTest {
     existingMetrics.setAvgExecutionTime(100);
     existingMetrics.setMaxExecutionTime(200);
     existingMetrics.setMinExecutionTime(50);
-    existingMetrics.setCreateTime(LocalDateTime.now());
+    existingMetrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     when(metricsDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existingMetrics);
     when(metricsDao.updateById(any(LiteFlowExecutionMetricsEntity.class))).thenReturn(1);
@@ -268,7 +269,7 @@ class LiteFlowMetricsManagerTest {
     existingMetrics.setAvgExecutionTime(100); // (100 + 100 + 100) / 3 = 100
     existingMetrics.setMaxExecutionTime(100);
     existingMetrics.setMinExecutionTime(100);
-    existingMetrics.setCreateTime(LocalDateTime.now());
+    existingMetrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     when(metricsDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existingMetrics);
     when(metricsDao.updateById(any(LiteFlowExecutionMetricsEntity.class))).thenReturn(1);
@@ -304,7 +305,7 @@ class LiteFlowMetricsManagerTest {
     initialMetrics.setAvgExecutionTime(0);
     initialMetrics.setMaxExecutionTime(0);
     initialMetrics.setMinExecutionTime(Integer.MAX_VALUE);
-    initialMetrics.setCreateTime(LocalDateTime.now());
+    initialMetrics.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
 
     when(metricsDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(initialMetrics);
     when(metricsDao.updateById(any(LiteFlowExecutionMetricsEntity.class))).thenReturn(1);

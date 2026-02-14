@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import net.lab1024.sa.common.core.domain.code.UserErrorCode;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.support.liteflow.core.executor.SmartFlowExecutor;
@@ -64,7 +65,7 @@ class LiteFlowChainManagerTest {
     entity.setRemark("測試備註");
     entity.setCreateUserId(TEST_USER_ID);
     entity.setCreateUserName(TEST_USER_NAME);
-    entity.setCreateTime(LocalDateTime.now());
+    entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;
   }
 

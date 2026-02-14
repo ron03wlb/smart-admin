@@ -3,7 +3,7 @@ package net.lab1024.sa.support.codegenerator.domain.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -33,7 +33,7 @@ public class CodeBasic {
 
   @Schema(description = "前端时间")
   @NotNull(message = "1.基础命名 前端时间 不能为空")
-  private LocalDateTime frontDate;
+  private OffsetDateTime frontDate;
 
   @Schema(description = "后端作者")
   @NotBlank(message = "1.基础命名 后端作者 不能为空")
@@ -41,7 +41,7 @@ public class CodeBasic {
 
   @Schema(description = "后端时间")
   @NotNull(message = "1.基础命名 后端时间 不能为空")
-  private LocalDateTime backendDate;
+  private OffsetDateTime backendDate;
 
   @Schema(description = "版权信息")
   @NotNull(message = "1.基础命名 版权信息 不能为空")

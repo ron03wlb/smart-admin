@@ -3,7 +3,7 @@ package net.lab1024.sa.system.employee.domain.vo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.GenderEnum;
@@ -49,7 +49,7 @@ public class EmployeeVO implements Serializable {
   private String departmentName;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @Schema(description = "角色列表")
   private List<Long> roleIdList;

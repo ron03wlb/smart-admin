@@ -1,7 +1,7 @@
 package net.lab1024.sa.support.message.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.swagger.annotation.SchemaEnum;
@@ -40,8 +40,8 @@ public class MessageVO {
   private Boolean readFlag;
 
   @Schema(description = "已读时间")
-  private LocalDateTime readTime;
+  private OffsetDateTime readTime;
 
   @Schema(description = "创建时间")
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

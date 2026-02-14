@@ -3,7 +3,7 @@ package net.lab1024.sa.support.serialnumber.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
@@ -55,5 +55,5 @@ public class SerialNumberEntity extends SmartAdminBaseEntity {
   private Long lastNumber;
 
   /** 上次产生的单号时间 */
-  private LocalDateTime lastTime;
+  private OffsetDateTime lastTime;
 }

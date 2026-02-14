@@ -3,7 +3,7 @@ package net.lab1024.sa.support.job.repository.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -32,13 +32,13 @@ public class SmartJobLogEntity {
   private Integer successFlag;
 
   /** 开始执行时间 */
-  private LocalDateTime executeStartTime;
+  private OffsetDateTime executeStartTime;
 
   /** 执行时长-毫秒 */
   private Long executeTimeMillis;
 
   /** 执行结束时间 */
-  private LocalDateTime executeEndTime;
+  private OffsetDateTime executeEndTime;
 
   /** 执行结果 描述 可选 */
   private String executeResult;
@@ -54,5 +54,5 @@ public class SmartJobLogEntity {
 
   private String createName;
 
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 }

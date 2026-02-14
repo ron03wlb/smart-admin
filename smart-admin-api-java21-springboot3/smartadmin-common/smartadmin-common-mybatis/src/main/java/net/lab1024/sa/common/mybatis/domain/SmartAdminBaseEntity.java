@@ -2,7 +2,7 @@ package net.lab1024.sa.common.mybatis.domain;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -18,8 +18,8 @@ import lombok.Data;
 public abstract class SmartAdminBaseEntity {
 
   @TableField(fill = FieldFill.INSERT)
-  private LocalDateTime createTime;
+  private OffsetDateTime createTime;
 
   @TableField(fill = FieldFill.INSERT_UPDATE)
-  private LocalDateTime updateTime;
+  private OffsetDateTime updateTime;
 }

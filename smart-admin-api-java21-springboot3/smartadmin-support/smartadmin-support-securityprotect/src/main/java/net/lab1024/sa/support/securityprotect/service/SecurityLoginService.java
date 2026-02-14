@@ -1,8 +1,8 @@
 package net.lab1024.sa.support.securityprotect.service;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.code.UserErrorCode;
@@ -70,12 +70,12 @@ public class SecurityLoginService {
     if (loginFailEntity
         .getLoginLockBeginTime()
         .plusSeconds(securityConfigProvider.getLoginFailLockSeconds())
-        .isBefore(LocalDateTime.now())) {
+        .isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
       // 过了锁定时间
       return ResponseDTO.ok(loginFailEntity);
     }
 
-    LocalDateTime unlockTime =
+    OffsetDateTime unlockTime =
         loginFailEntity
             .getLoginLockBeginTime()
             .plusSeconds(securityConfigProvider.getLoginFailLockSeconds());
@@ -85,7 +85,8 @@ public class SecurityLoginService {
             LOGIN_LOCK_MSG,
             loginFailEntity.getLoginFailCount(),
             securityConfigProvider.getLoginFailLockSeconds() / 60,
-            LocalDateTimeUtil.formatNormal(unlockTime)));
+            unlockTime.format(
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
   }
 
   /**
@@ -108,7 +109,7 @@ public class SecurityLoginService {
     // 登录失败
     int loginFailCount = loginFailEntity == null ? 1 : loginFailEntity.getLoginFailCount() + 1;
     boolean lockFlag = loginFailCount >= securityConfigProvider.getLoginFailMaxTimes();
-    LocalDateTime lockBeginTime = lockFlag ? LocalDateTime.now() : null;
+    OffsetDateTime lockBeginTime = lockFlag ? OffsetDateTime.now(ZoneOffset.UTC) : null;
 
     LoginFailEntity loginFail = loginFailEntity;
     if (loginFail == null) {
@@ -132,7 +133,7 @@ public class SecurityLoginService {
 
     // 提示信息
     if (lockFlag) {
-      LocalDateTime unlockTime =
+      OffsetDateTime unlockTime =
           loginFail
               .getLoginLockBeginTime()
               .plusSeconds(securityConfigProvider.getLoginFailLockSeconds());
@@ -140,7 +141,7 @@ public class SecurityLoginService {
           LOGIN_LOCK_MSG,
           loginFail.getLoginFailCount(),
           securityConfigProvider.getLoginFailLockSeconds() / 60,
-          LocalDateTimeUtil.formatNormal(unlockTime));
+          unlockTime.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     } else {
       return String.format(
           LOGIN_FAIL_MSG,
