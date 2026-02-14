@@ -95,7 +95,7 @@ Player Wallet (玩家錢包主表 t_wallet)
     +-- Wallet Lock (t_wallet_lock)           — 鎖定機制明細（非錢包類型）
 ```
 
-> **設計決策**：採用「主表 + 擴展表」混合方案。`t_wallet` 統一管理所有錢包類型的 `balance` 和 `locked_amount`，特殊欄位透過擴展表承載。LOCKED 不是錢包類型，而是 CASH 錢包上的「扣住機制」。詳見 → [Financial_Implementation.md §2.1](../02_Finance_Service/Financial_Implementation.md)
+> **設計決策**：採用「主表 + 擴展表」混合方案。`t_wallet` 統一管理所有錢包類型的 `balance` 和 `locked_amount`，特殊欄位透過擴展表承載。LOCKED 不是錢包類型，而是 CASH 錢包上的「扣住機制」。詳見 → [Financial_Implementation.md §2.1](../02_Finance_Service/04_Financial_Implementation.md)
 
 **核心實體（Core Entities）**:
 

@@ -1291,7 +1291,7 @@ CREATE INDEX idx_{table_name}_tenant_id ON t_new_table(tenant_id);
 
 ### SmartAdmin 核心
 - [MybatisPlusConfig.java](../../../smart-admin-api-java21-springboot3/smartadmin-common/smartadmin-common-mybatis/src/main/java/net/lab1024/sa/common/mybatis/config/MybatisPlusConfig.java) -- 現有 MyBatis-Plus 配置
-- [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md) -- SmartAdmin 開發模式
+- [SmartAdmin Patterns](../../../.claude/shared/knowledge/smartadmin-patterns.md) -- SmartAdmin 開發模式
 
 ### 需求文件
 - [Multi_Tenant_Requirements.md](../requirements/06_Governance_Licensing/01_Multi_Tenant_Requirements.md) -- 多租戶業務需求

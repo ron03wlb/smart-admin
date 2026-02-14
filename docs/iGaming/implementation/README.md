@@ -4,7 +4,7 @@ SmartAdmin v4.1.0 iGaming 基礎建設實作設計文檔索引。
 
 **架構決策**：進化式模組化單體 (Evolutionary Modular Monolith)，不引入 Spring Cloud。
 
-**計畫文件**：[Implementation Plan](../../../.claude/plans/stateless-hopping-noodle.md)
+**計畫文件**：Implementation Plan（位於 `.claude/plans/stateless-hopping-noodle.md`，僅本地開發環境可見）
 
 ---
 
@@ -64,7 +64,7 @@ SmartAdmin v4.1.0 iGaming 基礎建設實作設計文檔索引。
 
 ## 閱讀順序建議
 
-1. **先讀計畫**: [Implementation Plan](../../../.claude/plans/stateless-hopping-noodle.md) - 理解整體架構決策與分階段策略
+1. **先讀計畫**: Implementation Plan（`.claude/plans/stateless-hopping-noodle.md`）- 理解整體架構決策與分階段策略
 2. **Phase 0 按順序**: module-structure -> multi-tenant -> event-driven -> database-schema
 3. **Phase 1-3 按需求**: 根據開發優先級閱讀對應 Phase 文檔
 
