@@ -1,0 +1,29 @@
+#############################################################################################################
+#                                                                                                           #
+# SmartAdmin v4.1.0 Supabase Profile 配置                                                                    #
+# 此配置會覆蓋 application.yaml (dev) 中的對應設定                                                             #
+# 使用方式: IntelliJ VM Options 加上 -Dspring.profiles.active=supabase                                        #
+#                                                                                                           #
+#############################################################################################################
+
+# Supabase PostgreSQL 數據源配置（Direct Connection）
+spring:
+  datasource:
+    url: jdbc:postgresql://db.vrerqanwgphvfyenjbsd.supabase.co:5432/postgres
+    username: postgres
+    password: ${SUPABASE_DB_PASSWORD:smart_admin_pwd}
+    driver-class-name: org.postgresql.Driver
+
+    # HikariCP 連接池配置（針對 Supabase 優化）
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10    # Supabase 免費版連線數限制
+      connection-timeout: 30000
+      idle-timeout: 300000     # 5 分鐘
+      max-lifetime: 900000     # 15 分鐘（Supabase 有 idle timeout）
+      keepalive-time: 60000    # 每分鐘 keepalive 防止連線被關閉
+
+# SmartJob/Kafka 禁用（Supabase 環境無 Kafka）
+smart:
+  kafka:
+    enabled: false

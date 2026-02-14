@@ -1,0 +1,212 @@
+# Smart Admin 21 - Docker Compose Configuration
+# 項目名稱: smart-admin-21
+# 環境: dev
+# 使用方式:
+#   啟動所有服務:        docker compose up -d
+#   啟動包含前端:        docker compose --profile frontend up -d
+#   切換到 Supabase:     設置 .env 中 DB_MODE=supabase
+
+name: smart-admin-21
+
+services:
+  # ===========================================
+  # PostgreSQL - 本地開發數據庫
+  # ===========================================
+  # postgres:
+    # image: postgres:16-alpine
+    # container_name: sa21-postgres
+    # restart: unless-stopped
+    # environment:
+      # POSTGRES_USER: ${POSTGRES_USER:-smartadmin}
+      # POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SmartAdmin@2024}
+      # POSTGRES_DB: ${POSTGRES_DB:-smart_admin}
+      # TZ: Asia/Taipei
+    # ports:
+      # - "${POSTGRES_PORT:-5432}:5432"
+    # volumes:
+      # - postgres_data:/var/lib/postgresql/data
+      # - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    # healthcheck:
+      # test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartadmin} -d ${POSTGRES_DB:-smart_admin}" ]
+      # interval: 10s
+      # timeout: 5s
+      # retries: 5
+    # networks:
+      # - sa21-network
+
+  # ===========================================
+  # Redis - 緩存服務
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: sa21-redis
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sa21-network
+
+  # ===========================================
+  # Kafka - 消息隊列（KRaft 模式，無需 Zookeeper）
+  # ===========================================
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: sa21-kafka
+    restart: unless-stopped
+    environment:
+      # KRaft 模式配置
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:${KAFKA_PORT:-9094}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # 性能配置
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # Cluster ID
+      CLUSTER_ID: sa21-kafka-cluster
+    ports:
+      - "${KAFKA_PORT:-9094}:9094"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - sa21-network
+
+  # ===========================================
+  # Nginx - 反向代理
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: sa21-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - redis
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sa21-network
+
+  # ===========================================
+  # MinIO - 對象存儲（S3 兼容）
+  # ===========================================
+  minio:
+    image: minio/minio:RELEASE.2024-01-18T22-51-28Z
+    container_name: sa21-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-smartadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-SmartAdmin@2024}
+      MINIO_REGION_NAME: ${MINIO_REGION:-us-east-1}
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - sa21-network
+
+  # ===========================================
+  # MinIO Initialization - Bucket 設置
+  # ===========================================
+  minio-init:
+    image: minio/mc:latest
+    container_name: sa21-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+      mc mb --ignore-existing local/$${MINIO_BUCKET_NAME};
+      mc anonymous set download local/$${MINIO_BUCKET_NAME}/public;
+      mc ilm add --expiry-days 1 local/$${MINIO_BUCKET_NAME}/temp || true;
+      echo '===========================================';
+      echo 'MinIO initialization completed!';
+      echo 'Bucket: $${MINIO_BUCKET_NAME}';
+      echo 'Console: http://localhost:9001';
+      echo '===========================================';
+      "
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-smartadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-SmartAdmin@2024}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-dev-smart-admin}
+    networks:
+      - sa21-network
+
+  # ===========================================
+  # Frontend - 前端應用（可選）
+  # 使用 profile 控制: docker compose --profile frontend up -d
+  # ===========================================
+  frontend:
+    build:
+      context: ../smart-admin-web
+      dockerfile: Dockerfile
+    container_name: sa21-web
+    restart: unless-stopped
+    profiles:
+      - frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: ${API_URL:-http://localhost:8080}
+    networks:
+      - sa21-network
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  sa21-network:
+    name: sa21-network
+    driver: bridge
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  postgres_data:
+    name: sa21-postgres-data
+  redis_data:
+    name: sa21-redis-data
+  kafka_data:
+    name: sa21-kafka-data
+  minio_data:
+    name: sa21-minio-data

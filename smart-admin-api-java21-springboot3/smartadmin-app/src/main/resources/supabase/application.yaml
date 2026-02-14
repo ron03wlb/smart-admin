@@ -1,0 +1,242 @@
+#############################################################################################################
+#                                                                                                           #
+# SmartAdmin v4.1.0 統一應用配置文件（Supabase 環境）                                                           #
+# 此配置繼承 smartadmin-common 和 smartadmin-support 各模塊的 AutoConfiguration                                #
+#                                                                                                           #
+#############################################################################################################
+
+# 項目配置: 名稱、日誌目錄
+project:
+  name: smartadmin-app
+  log-directory: ${user.home}/logs/smart_admin_v4/${project.name}/${spring.profiles.active}
+
+# 項目端口和 URL 根路徑
+server:
+  port: 1024
+  servlet:
+    context-path: /
+
+  # Tomcat access log 配置
+  tomcat:
+    basedir: ${project.log-directory}/tomcat-logs
+    accesslog:
+      enabled: true
+      max-days: 7
+      pattern: "%t %{X-Forwarded-For}i %a %r %s (%D ms) %I (%B byte)"
+
+# 環境
+spring:
+  profiles:
+    active: '@profiles.active@'
+
+  # Java 21 Virtual Threads 配置（I/O 密集型任務性能提升 30-50%）
+  threads:
+    virtual:
+      enabled: true
+
+  # 郵件配置（測試環境 - 禁用連接測試）
+  mail:
+    host: smtp.163.com
+    port: 465
+    username: lab1024@163.com
+    password: LAB1024LAB
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            socketFactory:
+              class: com.sun.mail.util.MailSSLSocketFactory
+              fallback: false
+        debug: false
+
+  # Supabase PostgreSQL 數據源配置
+  datasource:
+    url: jdbc:postgresql://aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
+    username: postgres.vrerqanwgphvfyenjbsd
+    password: ${SUPABASE_DB_PASSWORD:smart_admin_pwd}
+    driver-class-name: org.postgresql.Driver
+
+    # HikariCP 連接池配置（針對 Supabase 優化）
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10    # Supabase 免費版連線數限制
+      connection-timeout: 30000
+      idle-timeout: 300000     # 5 分鐘
+      max-lifetime: 900000     # 15 分鐘（Supabase 有 idle timeout）
+      keepalive-time: 60000    # 每分鐘 keepalive 防止連線被關閉
+
+  # Redis 配置（使用本地 Redis）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 1
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 5
+          max-idle: 3
+          min-idle: 1
+          max-wait: 30000ms
+
+  # Jackson JSON 序列化配置
+  jackson:
+    serialization:
+      write-enums-using-to-string: true
+      write-dates-as-timestamps: false
+    deserialization:
+      read-enums-using-to-string: true
+      fail-on-unknown-properties: false
+    default-property-inclusion: always
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  # 文件上傳大小限制
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 10MB
+
+  # 緩存類型
+  cache:
+    type: redis
+
+# Management 端點配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  health:
+    mail:
+      enabled: false
+
+# Sa-Token 配置（完整版）
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 2592000  # 30 天
+  active-timeout: -1
+  is-concurrent: false
+  is-share: false
+  token-style: simple-uuid
+  auto-renew: true
+  is-log: true
+  log-level: debug
+  is-print: false
+  is-read-cookie: false
+
+# MyBatis Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: net.lab1024.sa.**.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+# SpringDoc/OpenAPI 配置
+springdoc:
+  swagger-ui:
+    enabled: true
+    doc-expansion: none
+    tags-sorter: alpha
+    server-base-url: http://localhost:1024
+  api-docs:
+    enabled: true
+
+# Knife4j API 文檔配置
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
+  basic:
+    enable: false
+    username: api
+    password: 1024
+
+# SmartAdmin Support 模塊配置
+# 心跳配置
+heart-beat:
+  interval-seconds: 300
+
+# 熱加載配置
+reload:
+  interval-seconds: 300
+
+# 跨域配置
+access-control-allow-origin: '*'
+
+# 文件上傳配置
+file:
+  storage:
+    mode: local
+    local:
+      upload-path: ${user.home}/uploads/smart_admin_v4/
+      url-prefix:
+    cloud:
+      region: us-east-1
+      endpoint: localhost:9000
+      bucket-name: dev-smart-admin
+      access-key: smartadmin
+      secret-key: SmartAdmin@2024
+      url-prefix: http://localhost:9000/dev-smart-admin/
+      private-url-expire-seconds: 3600
+
+# HTTP 連接池配置
+http:
+  pool:
+    max-total: 20
+    connect-timeout: 50000
+    read-timeout: 50000
+    write-timeout: 50000
+    keep-alive: 300000
+
+# SmartJob 排程配置
+smart:
+  job:
+    enabled: true
+    init-delay: 10
+    core-pool-size: 2
+    db-refresh-enabled: true
+    db-refresh-interval: 60
+
+  # Kafka 消息配置（Supabase 環境暫時禁用）
+  kafka:
+    enabled: false
+
+  # LiteFlow 規則引擎配置
+  liteflow:
+    enabled: false
+    database-enabled: true
+    execution-log-enabled: true
+    metrics-enabled: true
+    log-retention-days: 30
+    reload-interval: 0
+    default-script-type: qlexpress
+    async-enabled: false
+    max-thread-pool-size: 10
+    execution-timeout: 30000
+
+# JetCache 二級緩存配置
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson2
+      limit: 1000
+      expireAfterWriteInMillis: 1800000  # 30 分鐘
+  remote:
+    default:
+      type: redis.lettuce
+      keyConvertor: fastjson2
+      valueEncoder: java
+      valueDecoder: java
+      expireAfterWriteInMillis: 7200000  # 2 小時
+      uri: redis://${spring.data.redis.host:localhost}:${spring.data.redis.port:6379}/${spring.data.redis.database:1}

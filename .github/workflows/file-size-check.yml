@@ -1,0 +1,46 @@
+name: File Size Check
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**/*.md'
+      - '.claude/skills/**/*.md'
+  push:
+    branches:
+      - master
+      - 'feature/**'
+    paths:
+      - 'docs/**/*.md'
+      - '.claude/skills/**/*.md'
+
+jobs:
+  file-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check file sizes
+        run: |
+          MAX_LINES=2500
+          LARGE_FILES=0
+
+          echo "🔍 檢查文件大小 (限制: $MAX_LINES lines)..."
+
+          for file in $(find docs/iGaming -name "*.md" -type f); do
+            lines=$(wc -l < "$file")
+            if [ $lines -gt $MAX_LINES ]; then
+              echo "⚠️  超大文件: $file ($lines lines, 限制 $MAX_LINES)"
+              LARGE_FILES=$((LARGE_FILES + 1))
+            fi
+          done
+
+          if [ $LARGE_FILES -le 5 ]; then
+            echo "✅ 超大文件數量符合規範 ($LARGE_FILES <= 5 個)"
+            exit 0
+          else
+            echo "❌ 超大文件數量過多 ($LARGE_FILES > 5)"
+            echo ""
+            echo "建議: 將超大文件拆分為多個子文件，每個 <2500 行"
+            echo "參考: Week 6 Gateway 拆分範例 (1,131 lines → 3 files)"
+            exit 1
+          fi

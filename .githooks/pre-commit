@@ -1,0 +1,88 @@
+#!/bin/bash
+# ====================================================================
+# SmartAdmin Skills Pre-Commit Hook
+# ====================================================================
+# Purpose: Automatically validate skills consistency before each commit
+# Installation:
+#   git config core.hooksPath .githooks
+#   chmod +x .githooks/pre-commit (Linux/Mac only)
+# ====================================================================
+
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo ""
+echo "🔧 Running pre-commit skills validation..."
+echo ""
+
+# ====================================================================
+# Check if .claude/skills files are being committed
+# ====================================================================
+skills_changed=false
+
+# Check if any skills-related files are staged
+if git diff --cached --name-only | grep -q "^\.claude/skills/"; then
+    skills_changed=true
+elif git diff --cached --name-only | grep -q "^CLAUDE\.md$"; then
+    skills_changed=true
+elif git diff --cached --name-only | grep -q "^\.claude/META\.md$"; then
+    skills_changed=true
+elif git diff --cached --name-only | grep -q "^\.claude/skills/VERSIONS\.yml$"; then
+    skills_changed=true
+fi
+
+# If no skills-related files changed, skip validation
+if [ "$skills_changed" = false ]; then
+    echo -e "${GREEN}✅ No skills-related files changed, skipping validation${NC}"
+    echo ""
+    exit 0
+fi
+
+# ====================================================================
+# Run Skills Consistency Validation
+# ====================================================================
+echo "📊 Validating skills consistency..."
+echo ""
+
+# Check if validation script exists
+if [ ! -f ".claude/scripts/validate-skill-consistency.sh" ]; then
+    echo -e "${RED}❌ ERROR: Validation script not found!${NC}"
+    echo "   Expected: .claude/scripts/validate-skill-consistency.sh"
+    echo ""
+    echo "   This hook requires the validation script to function."
+    echo "   Please ensure the script exists before committing."
+    exit 1
+fi
+
+# Run validation script
+if bash .claude/scripts/validate-skill-consistency.sh; then
+    echo ""
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}✅ Pre-commit validation passed!${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    exit 0
+else
+    echo ""
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${RED}❌ Pre-commit validation FAILED!${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${YELLOW}🔧 Fix the errors above before committing.${NC}"
+    echo ""
+    echo -e "${YELLOW}Troubleshooting:${NC}"
+    echo "   1. Review the validation errors above"
+    echo "   2. Fix the inconsistencies in .claude/skills/"
+    echo "   3. Run manually: bash .claude/scripts/validate-skill-consistency.sh"
+    echo "   4. Try committing again after fixing"
+    echo ""
+    echo -e "${YELLOW}To bypass this check (NOT recommended):${NC}"
+    echo "   git commit --no-verify"
+    echo ""
+    exit 1
+fi

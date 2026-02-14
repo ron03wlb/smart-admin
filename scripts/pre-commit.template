@@ -1,0 +1,66 @@
+#!/bin/sh
+
+echo "=== SmartAdmin Pre-commit Checks ==="
+
+# 1. Spotless 格式化檢查
+echo "[1/4] Running Spotless..."
+cd smart-admin-api-java21-springboot3 && ./gradlew spotlessApply
+if [ $? -ne 0 ]; then
+    echo "❌ Spotless check failed"
+    exit 1
+fi
+cd ..
+
+# 2. Mermaid 語法檢查（針對 iGaming 文檔）
+echo "[2/4] Checking Mermaid syntax..."
+
+CHANGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$')
+
+if [ -n "$CHANGED_MD_FILES" ]; then
+    # 檢查 style 語法錯誤（節點名包含空格但未加引號）
+    STYLE_ERRORS=$(echo "$CHANGED_MD_FILES" | xargs grep -n '^\s*style [^"]*\s[^"]*fill:' 2>/dev/null || true)
+
+    if [ -n "$STYLE_ERRORS" ]; then
+        echo "❌ Mermaid style syntax error detected:"
+        echo "$STYLE_ERRORS"
+        echo ""
+        echo "Fix: Node IDs with spaces must be quoted."
+        echo "Example: style \"Node Name\" fill:#color"
+        exit 1
+    fi
+
+    # 檢查顏色碼污染（包含非十六進制字符）
+    COLOR_ERRORS=$(echo "$CHANGED_MD_FILES" | xargs grep -nP 'fill:#[0-9A-Fa-f]*[^0-9A-Fa-f,\s]' 2>/dev/null || true)
+
+    if [ -n "$COLOR_ERRORS" ]; then
+        echo "❌ Invalid color code detected in Mermaid style:"
+        echo "$COLOR_ERRORS"
+        echo ""
+        echo "Fix: Use valid hex color codes (e.g., #FFEB82, #333366)"
+        exit 1
+    fi
+
+    # 檢查逗號分隔的樣式屬性（Type D）
+    COMMA_ERRORS=$(echo "$CHANGED_MD_FILES" | xargs grep -nP '^\s*style\s+\S+\s+fill:#[0-9A-Fa-f]+,' 2>/dev/null || true)
+
+    if [ -n "$COMMA_ERRORS" ]; then
+        echo "❌ Comma-separated style properties detected (not supported by Mermaid):"
+        echo "$COMMA_ERRORS"
+        echo ""
+        echo "Fix: Remove comma-separated properties, keep only fill"
+        echo "Example: style NODE fill:#E3F2FD,stroke:#1976D2 → style NODE fill:#E3F2FD"
+        exit 1
+    fi
+
+    echo "✅ Mermaid syntax checks passed"
+else
+    echo "⏭️  No Markdown files changed"
+fi
+
+# 3. Java 編譯檢查（可選，根據項目需求）
+# echo "[3/4] Running Java compilation check..."
+# cd smart-admin-api-java21-springboot3 && ./gradlew compileJava
+# cd ..
+
+# 4. 最終確認
+echo "[4/4] All pre-commit checks passed ✅"

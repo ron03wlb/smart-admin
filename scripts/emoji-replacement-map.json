@@ -1,0 +1,317 @@
+{
+  "$schema": "emoji-replacement-map-schema.json",
+  "version": "1.0.0",
+  "description": "Mermaid Emoji 語義映射 - 用於將 emoji 替換為安全的替代品",
+  "author": "Claude Sonnet 4.5",
+  "last_updated": "2026-02-05",
+
+  "rating_stars": {
+    "⭐⭐⭐⭐⭐": {
+      "text": "Rating: 5/5",
+      "class": "rating-5",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px",
+      "semantic": "最高評級 - 優秀",
+      "use_cases": ["安全性評分", "VIP 難度", "功能完整度"]
+    },
+    "⭐⭐⭐⭐": {
+      "text": "Rating: 4/5",
+      "class": "rating-4",
+      "style": "fill:#8BC34A,stroke:#558B2F,stroke-width:2px",
+      "semantic": "高評級 - 良好",
+      "use_cases": ["推薦等級", "質量評分"]
+    },
+    "⭐⭐⭐": {
+      "text": "Rating: 3/5",
+      "class": "rating-3",
+      "style": "fill:#FFC107,stroke:#F57C00,stroke-width:2px",
+      "semantic": "中等評級 - 可接受",
+      "use_cases": ["基礎功能", "最低要求"]
+    },
+    "⭐⭐": {
+      "text": "Rating: 2/5",
+      "class": "rating-2",
+      "style": "fill:#FF9800,stroke:#E65100,stroke-width:2px",
+      "semantic": "低評級 - 需改進",
+      "use_cases": ["不推薦", "風險項"]
+    },
+    "⭐": {
+      "text": "Rating: 1/5",
+      "class": "rating-1",
+      "style": "fill:#FF5722,stroke:#BF360C,stroke-width:2px",
+      "semantic": "最低評級 - 禁用",
+      "use_cases": ["已棄用", "不安全"]
+    }
+  },
+
+  "status_indicators": {
+    "✅": {
+      "text": "PASS",
+      "class": "status-ok",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#FFFFFF",
+      "semantic": "成功 - 通過驗證",
+      "use_cases": ["測試通過", "驗證成功", "需求滿足"]
+    },
+    "❌": {
+      "text": "FAIL",
+      "class": "status-fail",
+      "style": "fill:#F44336,stroke:#C62828,stroke-width:2px,color:#FFFFFF",
+      "semantic": "失敗 - 未通過驗證",
+      "use_cases": ["測試失敗", "驗證失敗", "需求未滿足"]
+    },
+    "⚠️": {
+      "text": "WARN",
+      "class": "status-warning",
+      "style": "fill:#FFC107,stroke:#F57C00,stroke-width:2px,color:#000000",
+      "semantic": "警告 - 需要注意",
+      "use_cases": ["警告信息", "潛在風險", "需審核"]
+    },
+    "ℹ️": {
+      "text": "INFO",
+      "class": "status-info",
+      "style": "fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#FFFFFF",
+      "semantic": "信息 - 提示",
+      "use_cases": ["提示信息", "說明"]
+    },
+    "🚨": {
+      "text": "ALERT",
+      "class": "status-alert",
+      "style": "fill:#D32F2F,stroke:#B71C1C,stroke-width:3px,color:#FFFFFF",
+      "semantic": "緊急警報 - 立即處理",
+      "use_cases": ["安全事件", "系統故障", "緊急情況"]
+    }
+  },
+
+  "traffic_lights": {
+    "🟢": {
+      "text": "LOW",
+      "class": "risk-low",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#FFFFFF",
+      "semantic": "低風險 - 安全",
+      "use_cases": ["風險等級", "警報級別", "優先級"]
+    },
+    "🟡": {
+      "text": "MEDIUM",
+      "class": "risk-medium",
+      "style": "fill:#FFC107,stroke:#F57C00,stroke-width:2px,color:#000000",
+      "semantic": "中等風險 - 注意",
+      "use_cases": ["風險等級", "警報級別", "優先級"]
+    },
+    "🔴": {
+      "text": "HIGH",
+      "class": "risk-high",
+      "style": "fill:#F44336,stroke:#C62828,stroke-width:2px,color:#FFFFFF",
+      "semantic": "高風險 - 危險",
+      "use_cases": ["風險等級", "警報級別", "優先級"]
+    },
+    "🟠": {
+      "text": "ELEVATED",
+      "class": "risk-elevated",
+      "style": "fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#FFFFFF",
+      "semantic": "提升風險 - 謹慎",
+      "use_cases": ["風險等級", "警報級別"]
+    }
+  },
+
+  "financial": {
+    "💰": {
+      "text": "$",
+      "class": "financial-amount",
+      "style": "fill:#FFC107,stroke:#F57C00,stroke-width:2px,color:#000000",
+      "semantic": "金額 - 財務相關",
+      "use_cases": ["獎金金額", "交易價值", "餘額"]
+    },
+    "💵": {
+      "text": "USD",
+      "class": "financial-currency",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#FFFFFF",
+      "semantic": "貨幣 - 美元",
+      "use_cases": ["貨幣類型", "匯率"]
+    },
+    "💳": {
+      "text": "CARD",
+      "class": "financial-payment",
+      "style": "fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#FFFFFF",
+      "semantic": "支付方式 - 信用卡",
+      "use_cases": ["支付方式", "充值", "提款"]
+    },
+    "🏦": {
+      "text": "BANK",
+      "class": "financial-bank",
+      "style": "fill:#607D8B,stroke:#37474F,stroke-width:2px,color:#FFFFFF",
+      "semantic": "銀行 - 金融機構",
+      "use_cases": ["銀行轉帳", "金融機構"]
+    }
+  },
+
+  "vip_tiers": {
+    "💎": {
+      "text": "VIP",
+      "class": "vip-diamond",
+      "style": "fill:#9C27B0,stroke:#4A148C,stroke-width:3px,color:#FFFFFF",
+      "semantic": "VIP 等級 - 鑽石",
+      "use_cases": ["最高 VIP 等級", "特權功能"]
+    },
+    "👑": {
+      "text": "KING",
+      "class": "vip-crown",
+      "style": "fill:#FFD700,stroke:#FFA000,stroke-width:3px,color:#000000",
+      "semantic": "VIP 等級 - 王者",
+      "use_cases": ["高級 VIP", "特殊會員"]
+    },
+    "🎖️": {
+      "text": "ELITE",
+      "class": "vip-medal",
+      "style": "fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#FFFFFF",
+      "semantic": "VIP 等級 - 精英",
+      "use_cases": ["精英會員", "高級會員"]
+    }
+  },
+
+  "game_related": {
+    "🎮": {
+      "text": "GAME",
+      "class": "game-controller",
+      "style": "fill:#673AB7,stroke:#311B92,stroke-width:2px,color:#FFFFFF",
+      "semantic": "遊戲 - 控制器",
+      "use_cases": ["遊戲模塊", "遊戲功能"]
+    },
+    "🎰": {
+      "text": "SLOT",
+      "class": "game-slot",
+      "style": "fill:#E91E63,stroke:#880E4F,stroke-width:2px,color:#FFFFFF",
+      "semantic": "遊戲 - 老虎機",
+      "use_cases": ["老虎機遊戲", "博彩遊戲"]
+    },
+    "🎲": {
+      "text": "DICE",
+      "class": "game-dice",
+      "style": "fill:#009688,stroke:#004D40,stroke-width:2px,color:#FFFFFF",
+      "semantic": "遊戲 - 骰子",
+      "use_cases": ["骰子遊戲", "隨機性"]
+    },
+    "🃏": {
+      "text": "CARD",
+      "class": "game-card",
+      "style": "fill:#795548,stroke:#3E2723,stroke-width:2px,color:#FFFFFF",
+      "semantic": "遊戲 - 撲克牌",
+      "use_cases": ["撲克遊戲", "紙牌遊戲"]
+    }
+  },
+
+  "user_actions": {
+    "🔐": {
+      "text": "LOCK",
+      "class": "action-lock",
+      "style": "fill:#607D8B,stroke:#37474F,stroke-width:2px,color:#FFFFFF",
+      "semantic": "操作 - 鎖定",
+      "use_cases": ["帳戶鎖定", "安全鎖定"]
+    },
+    "🔓": {
+      "text": "UNLOCK",
+      "class": "action-unlock",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#FFFFFF",
+      "semantic": "操作 - 解鎖",
+      "use_cases": ["帳戶解鎖", "權限開通"]
+    },
+    "🔄": {
+      "text": "SYNC",
+      "class": "action-sync",
+      "style": "fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#FFFFFF",
+      "semantic": "操作 - 同步",
+      "use_cases": ["數據同步", "刷新"]
+    },
+    "🔔": {
+      "text": "NOTIFY",
+      "class": "action-notify",
+      "style": "fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#FFFFFF",
+      "semantic": "操作 - 通知",
+      "use_cases": ["推送通知", "提醒"]
+    }
+  },
+
+  "process_states": {
+    "⏳": {
+      "text": "PENDING",
+      "class": "state-pending",
+      "style": "fill:#FFC107,stroke:#F57C00,stroke-width:2px,color:#000000",
+      "semantic": "狀態 - 等待中",
+      "use_cases": ["審核中", "處理中"]
+    },
+    "⏱️": {
+      "text": "TIMEOUT",
+      "class": "state-timeout",
+      "style": "fill:#FF5722,stroke:#BF360C,stroke-width:2px,color:#FFFFFF",
+      "semantic": "狀態 - 超時",
+      "use_cases": ["超時錯誤", "過期"]
+    },
+    "✔️": {
+      "text": "DONE",
+      "class": "state-done",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#FFFFFF",
+      "semantic": "狀態 - 完成",
+      "use_cases": ["任務完成", "流程結束"]
+    },
+    "🔄": {
+      "text": "IN-PROGRESS",
+      "class": "state-progress",
+      "style": "fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#FFFFFF",
+      "semantic": "狀態 - 進行中",
+      "use_cases": ["正在處理", "進行中"]
+    }
+  },
+
+  "security": {
+    "🔒": {
+      "text": "SECURE",
+      "class": "security-locked",
+      "style": "fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#FFFFFF",
+      "semantic": "安全 - 已加密",
+      "use_cases": ["加密連接", "安全通道"]
+    },
+    "🔑": {
+      "text": "KEY",
+      "class": "security-key",
+      "style": "fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#FFFFFF",
+      "semantic": "安全 - 密鑰",
+      "use_cases": ["API 密鑰", "訪問令牌"]
+    },
+    "🛡️": {
+      "text": "SHIELD",
+      "class": "security-shield",
+      "style": "fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#FFFFFF",
+      "semantic": "安全 - 防護",
+      "use_cases": ["防護機制", "安全策略"]
+    },
+    "👮": {
+      "text": "GUARD",
+      "class": "security-guard",
+      "style": "fill:#3F51B5,stroke:#1A237E,stroke-width:2px,color:#FFFFFF",
+      "semantic": "安全 - 守衛",
+      "use_cases": ["訪問控制", "權限檢查"]
+    }
+  },
+
+  "priority": {
+    "🔥": {
+      "text": "CRITICAL",
+      "class": "priority-critical",
+      "style": "fill:#D32F2F,stroke:#B71C1C,stroke-width:3px,color:#FFFFFF",
+      "semantic": "優先級 - 緊急",
+      "use_cases": ["緊急任務", "關鍵問題"]
+    },
+    "⚡": {
+      "text": "URGENT",
+      "class": "priority-urgent",
+      "style": "fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#FFFFFF",
+      "semantic": "優先級 - 緊急",
+      "use_cases": ["高優先級", "快速處理"]
+    },
+    "📌": {
+      "text": "PINNED",
+      "class": "priority-pinned",
+      "style": "fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#FFFFFF",
+      "semantic": "優先級 - 置頂",
+      "use_cases": ["置頂項", "重要"]
+    }
+  }
+}

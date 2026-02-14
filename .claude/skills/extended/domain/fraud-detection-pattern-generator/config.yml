@@ -1,0 +1,167 @@
+# ====================================================================
+# Fraud Detection Pattern Generator - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P1 (Important Business Logic)
+# Category: Domain
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "fraud-detection-pattern-generator"
+  version: "1.0.0"
+  priority: "P1"
+  type: "atomic"
+  category: "domain"
+  description: "Generate complete fraud detection and risk control systems for iGaming platforms"
+  ai_description: |
+    Generates comprehensive fraud detection patterns for iGaming platforms following
+    Malta Gaming Authority (MGA) and Curacao compliance requirements.
+
+    Core detection patterns:
+    - Multi-Account Detection: Device fingerprinting, IP analysis, coordinated behavior
+    - Bonus Abuse Detection: Velocity checks, low-risk wagering, arbitrage exploitation
+    - Suspicious Betting Patterns: Arbitrage betting, matched betting, syndicate detection
+    - Payment Fraud Detection: Card testing, chargeback prevention, stolen card detection
+    - Real-Time Risk Scoring: Composite risk calculation with auto-action triggers
+    - KYC Integration: Progressive KYC triggers based on risk scores
+
+    Generates:
+    - Service layer implementations (Service + Manager with @Transactional)
+    - Database schemas (PostgreSQL) for fraud tracking
+    - Real-time risk scoring with Redis caching
+    - Event-driven fraud detection (async processing)
+    - Alert system integration for high-risk events
+
+    Use when implementing fraud detection, risk control, KYC/AML automation,
+    or compliance features for iGaming platforms.
+
+  tags:
+    - "fraud-detection"
+    - "risk-control"
+    - "kyc"
+    - "aml"
+    - "compliance"
+    - "igaming"
+    - "bonus-abuse"
+    - "multi-account"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "fraud"
+    - "risk control"
+    - "bonus abuse"
+    - "multi-account"
+    - "suspicious transactions"
+    - "KYC automation"
+    - "AML screening"
+    - "iGaming compliance"
+    - "arbitrage betting"
+    - "chargeback prevention"
+    - "device fingerprint"
+    - "risk scoring"
+
+  patterns:
+    - "detect\\s+(fraud|multi-account|bonus\\s+abuse)"
+    - "implement\\s+risk\\s+control"
+    - "prevent\\s+(bonus\\s+abuse|arbitrage)"
+    - "automate\\s+KYC\\s+triggers"
+
+  exclude_keywords:
+    - "remove fraud detection"
+    - "disable risk control"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 20
+    total_minutes: 20
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "unit-tests"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - ".agent/rules/foundation/10-architecture-rules.md"
+    - "docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md"
+    - "docs/iGame/technical-specs/P1-important/06-real-time-risk-engine.md"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+    - name: "postgresql"
+      version: ">=14.0"
+      required: true
+      description: "Required for fraud tracking database schemas"
+
+output:
+  generates:
+    - "*.java"
+    - "*.sql"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/main/resources/db/migration"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "igaming_context"
+      rule: "iGaming technical specs must exist"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify fraud detection code compiles successfully"
+      command: "./gradlew :smartadmin-app:compileJava"
+
+    - check: "unit-tests"
+      description: "Run fraud detection unit tests"
+      command: "./gradlew :smartadmin-app:test --tests *Fraud*"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: null
+
+  external_links:
+    - title: "KYC/AML Automation Spec"
+      url: "../../../docs/iGame/technical-specs/P0-critical/04-kyc-aml-automation.md"
+
+    - title: "Real-Time Risk Engine Spec"
+      url: "../../../docs/iGame/technical-specs/P1-important/06-real-time-risk-engine.md"
+
+    - title: "Malta Gaming Authority Compliance"
+      url: "https://www.mga.org.mt/"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "fraud_patterns_generated"

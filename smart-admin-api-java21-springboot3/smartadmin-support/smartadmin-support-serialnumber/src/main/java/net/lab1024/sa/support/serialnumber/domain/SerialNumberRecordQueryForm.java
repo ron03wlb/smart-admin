@@ -1,0 +1,22 @@
+package net.lab1024.sa.support.serialnumber.domain;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.core.domain.request.PageParam;
+
+/**
+ * 单据序列号 生成记录 查询
+ *
+ * @author 1024创新实验室-主任: 卓大
+ * @since 2022-03-25 21:46:07 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class SerialNumberRecordQueryForm extends PageParam {
+
+  @Schema(description = "单号id")
+  @NotNull(message = "单号id不能为空")
+  private Integer serialNumberId;
+}

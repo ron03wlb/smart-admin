@@ -1,0 +1,267 @@
+package {{package}};
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import java.util.List;
+import net.lab1024.sa.admin.BaseIntegrationTest;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * {{className}} Integration Tests
+ *
+ * <p>Tests {{className}} with real Spring context, database, and dependencies.
+ *
+ * <p><b>Testing Strategy:</b>
+ *
+ * <ul>
+ *   <li>Uses real Spring beans (not mocks)
+ *   <li>Verifies database persistence
+ *   <li>Tests ResponseDTO structure
+ *   <li>Validates business logic with actual data
+ *   <li>@Transactional causes auto-rollback after each test
+ * </ul>
+ *
+ * @author Claude Code (smartadmin-integration-test skill)
+ * @since {{date}}
+ */
+@SpringBootTest
+@Transactional
+@DisplayName("{{className}} Integration Tests")
+class {{className}}IntegrationTest extends BaseIntegrationTest {
+
+  @Autowired private {{className}} {{fieldName}};
+
+  @Autowired private {{entityName}}Dao {{entityFieldName}}Dao;
+
+  // TODO: Add other required DAOs for FK dependencies and verification
+
+  private Long testDependencyId; // TODO: Rename based on FK dependency
+
+  @BeforeEach
+  void setUp() {
+    // TODO: Create FK dependencies (departments, roles, etc.)
+    // Example:
+    // DepartmentEntity dept = {{entityName}}TestFixture.createDepartment("Test Dept");
+    // departmentDao.insert(dept);
+    // testDepartmentId = dept.getDepartmentId();
+  }
+
+  @Nested
+  @DisplayName("add{{entityName}}() Tests")
+  class Add{{entityName}}Tests {
+
+    @Test
+    @DisplayName("Should add {{entityLower}} and persist to database")
+    void add{{entityName}}_ValidForm_PersistsToDatabase() {
+      // Given
+      {{entityName}}AddForm form = {{entityName}}TestFixture.createAddForm(testDependencyId);
+
+      // When
+      ResponseDTO<Long> response = {{fieldName}}.add{{entityName}}(form);
+
+      // Then - Verify ResponseDTO
+      assertNotNull(response, "Response should not be null");
+      assertTrue(response.getOk(), "Expected success but got error: " + response.getMsg());
+      assertNotNull(response.getData(), "{{entityName}} ID should not be null");
+
+      // Then - Verify database state
+      Long {{entityLower}}Id = response.getData();
+      {{entityName}}Entity saved = {{entityFieldName}}Dao.selectById({{entityLower}}Id);
+      assertNotNull(saved, "{{entityName}} should be saved in database");
+
+      // Then - Verify all fields
+      assertEquals(form.get{{fieldName1}}(), saved.get{{fieldName1}}());
+      // TODO: Add assertions for other fields
+    }
+
+    @Test
+    @DisplayName("Should fail when required field is missing")
+    void add{{entityName}}_MissingRequiredField_ReturnsError() {
+      // Given
+      {{entityName}}AddForm form = {{entityName}}TestFixture.createAddForm(testDependencyId);
+      form.set{{requiredField}}(null); // Missing required field
+
+      // When
+      ResponseDTO<Long> response = {{fieldName}}.add{{entityName}}(form);
+
+      // Then
+      assertFalse(response.getOk(), "Expected error but got success");
+      // TODO: Add specific error code assertion if applicable
+    }
+
+    @Test
+    @DisplayName("Should fail when FK dependency does not exist")
+    void add{{entityName}}_InvalidForeignKey_ReturnsError() {
+      // Given
+      {{entityName}}AddForm form = {{entityName}}TestFixture.createAddForm(99999L); // Non-existent FK
+
+      // When
+      ResponseDTO<Long> response = {{fieldName}}.add{{entityName}}(form);
+
+      // Then
+      assertFalse(response.getOk(), "Expected error for invalid FK");
+      // TODO: Verify error message mentions FK issue
+    }
+  }
+
+  @Nested
+  @DisplayName("update{{entityName}}() Tests")
+  class Update{{entityName}}Tests {
+
+    private Long test{{entityName}}Id;
+
+    @BeforeEach
+    void setUp() {
+      // Create test {{entityLower}} for update tests
+      {{entityName}}Entity entity = {{entityName}}TestFixture.createEntity(testDependencyId);
+      {{entityFieldName}}Dao.insert(entity);
+      test{{entityName}}Id = entity.get{{entityName}}Id();
+    }
+
+    @Test
+    @DisplayName("Should update {{entityLower}} and persist changes")
+    void update{{entityName}}_ValidForm_PersistsChanges() {
+      // Given
+      {{entityName}}UpdateForm form = {{entityName}}TestFixture.createUpdateForm(test{{entityName}}Id);
+      form.set{{fieldName1}}("Updated Value");
+
+      // When
+      ResponseDTO<String> response = {{fieldName}}.update{{entityName}}(form);
+
+      // Then - Verify ResponseDTO
+      assertTrue(response.getOk(), "Expected success: " + response.getMsg());
+
+      // Then - Verify database state
+      {{entityName}}Entity updated = {{entityFieldName}}Dao.selectById(test{{entityName}}Id);
+      assertNotNull(updated);
+      assertEquals("Updated Value", updated.get{{fieldName1}}());
+      assertNotNull(updated.getUpdateTime(), "Update time should be set");
+    }
+
+    @Test
+    @DisplayName("Should fail when {{entityLower}} does not exist")
+    void update{{entityName}}_NonexistentId_ReturnsError() {
+      // Given
+      {{entityName}}UpdateForm form = {{entityName}}TestFixture.createUpdateForm(99999L);
+
+      // When
+      ResponseDTO<String> response = {{fieldName}}.update{{entityName}}(form);
+
+      // Then
+      assertFalse(response.getOk(), "Expected error for nonexistent ID");
+    }
+  }
+
+  @Nested
+  @DisplayName("query{{entityName}}() Tests")
+  class Query{{entityName}}Tests {
+
+    @BeforeEach
+    void setUp() {
+      // Insert test data
+      for (int i = 0; i < 5; i++) {
+        {{entityName}}Entity entity = {{entityName}}TestFixture.createEntity(testDependencyId);
+        {{entityFieldName}}Dao.insert(entity);
+      }
+    }
+
+    @Test
+    @DisplayName("Should return paginated results")
+    void query{{entityName}}_WithPagination_ReturnsPaginatedResults() {
+      // Given
+      {{entityName}}QueryForm queryForm = {{entityName}}TestFixture.createQueryForm();
+      queryForm.setPageNum(1);
+      queryForm.setPageSize(10);
+
+      // When
+      ResponseDTO<PageResult<{{entityName}}VO>> response = {{fieldName}}.query{{entityName}}(queryForm);
+
+      // Then - Verify ResponseDTO
+      assertTrue(response.getOk(), "Expected success: " + response.getMsg());
+      assertNotNull(response.getData(), "PageResult should not be null");
+
+      // Then - Verify PageResult structure
+      PageResult<{{entityName}}VO> page = response.getData();
+      assertNotNull(page.getList(), "List should not be null");
+      assertTrue(page.getTotal() >= 5, "Should have at least 5 records");
+      assertTrue(page.getList().size() <= 10, "Should not exceed page size");
+    }
+
+    @Test
+    @DisplayName("Should return empty results when no matches")
+    void query{{entityName}}_NoMatches_ReturnsEmptyResults() {
+      // Given
+      {{entityName}}QueryForm queryForm = {{entityName}}TestFixture.createQueryForm();
+      queryForm.set{{searchField}}("nonexistent_value");
+
+      // When
+      ResponseDTO<PageResult<{{entityName}}VO>> response = {{fieldName}}.query{{entityName}}(queryForm);
+
+      // Then
+      assertTrue(response.getOk());
+      PageResult<{{entityName}}VO> page = response.getData();
+      assertEquals(0, page.getTotal(), "Total should be 0 for no matches");
+      assertTrue(page.getList().isEmpty(), "List should be empty");
+    }
+  }
+
+  @Nested
+  @DisplayName("delete{{entityName}}() Tests")
+  class Delete{{entityName}}Tests {
+
+    private Long test{{entityName}}Id;
+
+    @BeforeEach
+    void setUp() {
+      // Create test {{entityLower}} for delete tests
+      {{entityName}}Entity entity = {{entityName}}TestFixture.createEntity(testDependencyId);
+      {{entityFieldName}}Dao.insert(entity);
+      test{{entityName}}Id = entity.get{{entityName}}Id();
+    }
+
+    @Test
+    @DisplayName("Should soft delete {{entityLower}}")
+    void delete{{entityName}}_ExistingId_MarksAsDeleted() {
+      // When
+      ResponseDTO<String> response = {{fieldName}}.delete{{entityName}}(test{{entityName}}Id);
+
+      // Then - Verify ResponseDTO
+      assertTrue(response.getOk(), "Expected success: " + response.getMsg());
+
+      // Then - Verify soft delete (record still exists but deleted_flag = true)
+      {{entityName}}Entity deleted = {{entityFieldName}}Dao.selectById(test{{entityName}}Id);
+      assertNotNull(deleted, "Record should still exist");
+      assertTrue(deleted.getDeletedFlag(), "Deleted flag should be true");
+
+      // Then - Verify not returned in queries
+      List<{{entityName}}Entity> active =
+          {{entityFieldName}}Dao.selectList(
+              Wrappers.<{{entityName}}Entity>lambdaQuery()
+                  .eq({{entityName}}Entity::getDeletedFlag, false));
+      assertFalse(
+          active.stream().anyMatch(e -> e.get{{entityName}}Id().equals(test{{entityName}}Id)),
+          "Deleted {{entityLower}} should not appear in active list");
+    }
+
+    @Test
+    @DisplayName("Should fail when {{entityLower}} does not exist")
+    void delete{{entityName}}_NonexistentId_ReturnsError() {
+      // When
+      ResponseDTO<String> response = {{fieldName}}.delete{{entityName}}(99999L);
+
+      // Then
+      assertFalse(response.getOk(), "Expected error for nonexistent ID");
+    }
+  }
+
+  // TODO: Add more test classes for other methods as needed
+}

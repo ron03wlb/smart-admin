@@ -1,0 +1,75 @@
+# ====================================================================
+# SmartAdmin Testing Suite - Skill Configuration
+# ====================================================================
+# Version: 2.0.0
+# Priority: P2 (Nice-to-have Tools)
+# Category: Composite
+# Type: Composite (Mode-based)
+# ====================================================================
+
+metadata:
+  name: "smartadmin-testing-suite"
+  version: "2.0.0"
+  priority: "P2"
+  type: "composite"
+  category: "composite"
+  description: "Comprehensive testing suite with multiple test modes (integration tests, test fixtures, unit tests, E2E tests)"
+  ai_description: |
+    Unified testing solution providing multiple test modes for SmartAdmin's layered architecture.
+    Consolidates smartadmin-integration-test, test-fixture-generator, test-driven-development,
+    and webapp-testing into a single orchestrator.
+
+    Modes:
+    - integration: Integration tests with Testcontainers (default)
+    - fixtures: Test data builders for complex domain objects
+    - unit: Unit tests with mocks (TDD workflow)
+    - e2e: End-to-end tests with Cypress/Playwright
+    - all: Complete test suite generation
+
+  tags: ["testing", "integration-test", "test-fixtures", "tdd", "e2e"]
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords: ["create tests", "integration test", "test fixture", "TDD", "E2E test", "Testcontainers"]
+  patterns: ["create.*test", "generate.*test"]
+  exclude_keywords: ["remove test"]
+
+execution:
+  type: "mode-based"
+  modes:
+    - id: "integration"
+      name: "Integration Tests"
+      file: "modes/mode-1-integration.md"
+      estimated_minutes: 10
+    - id: "fixtures"
+      name: "Test Fixtures"
+      file: "modes/mode-2-fixtures.md"
+      estimated_minutes: 5
+    - id: "unit"
+      name: "Unit Tests (TDD)"
+      file: "modes/mode-3-unit.md"
+      estimated_minutes: 8
+    - id: "e2e"
+      name: "E2E Tests"
+      file: "modes/mode-4-e2e.md"
+      estimated_minutes: 15
+    - id: "all"
+      name: "All Test Types"
+      file: "modes/mode-all.md"
+      estimated_minutes: 20
+  timeout: { per_phase_minutes: 20, total_minutes: 60 }
+  quality_gates: { run_after_execution: true }
+
+dependencies:
+  skills: []
+  consolidated_from:
+    - smartadmin-integration-test
+    - test-fixture-generator
+
+output: { generates: ["*Test.java"], target_directories: ["smart-admin-api-java21-springboot3/smartadmin-app/src/test/java"], templates: {} }
+validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [{ check: "tests_pass" }] }
+compatibility: { deprecated: false }
+documentation: { skill_md: "SKILL.md", readme: null }
+monitoring: { track_usage: true, log_executions: true, metrics: ["execution_time", "modes_executed"] }

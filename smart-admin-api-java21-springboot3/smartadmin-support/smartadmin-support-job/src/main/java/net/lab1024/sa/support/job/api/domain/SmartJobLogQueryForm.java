@@ -1,0 +1,35 @@
+package net.lab1024.sa.support.job.api.domain;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.lab1024.sa.common.core.domain.request.PageParam;
+import org.hibernate.validator.constraints.Length;
+
+/**
+ * 定时任务-执行记录 分页查询
+ *
+ * @author huke
+ * @since 2024/6/17 20:50
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class SmartJobLogQueryForm extends PageParam {
+
+  @Schema(description = "搜索词|可选")
+  @Length(max = 50, message = "搜索词最多50字符")
+  private String searchWord;
+
+  @Schema(description = "任务id|可选")
+  private Integer jobId;
+
+  @Schema(description = "是否成功|可选")
+  private Integer successFlag;
+
+  @Schema(description = "开始时间|可选", example = "2024-06-06")
+  private LocalDate startTime;
+
+  @Schema(description = "截止时间|可选", example = "2025-10-15")
+  private LocalDate endTime;
+}

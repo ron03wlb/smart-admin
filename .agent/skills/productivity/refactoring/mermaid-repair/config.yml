@@ -1,0 +1,26 @@
+name: mermaid-repair
+version: "1.0.0"
+priority: P2
+category: refactoring
+status: stable
+description: "Automated Mermaid diagram syntax validation and repair for SmartAdmin"
+
+execution:
+  type: single-shot
+  timeout_minutes: 10
+  modes:
+    - validate: "Check for errors without fixing"
+    - fix: "Detect and fix errors"
+    - dry-run: "Show what would be fixed"
+
+error_types:
+  - "Type A: Node ID space not quoted"
+  - "Type B: Color code pollution"
+  - "Type D: Comma-separated style properties"
+  - "Type F: stateDiagram-v2 <br/> not supported"
+
+smartadmin_spec:
+  line_break_tag: "<br/>"
+  exception: "stateDiagram-v2 does NOT support <br/>"
+
+related_rules: []

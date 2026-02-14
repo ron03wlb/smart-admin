@@ -1,0 +1,31 @@
+name: full-text-search-integration
+version: "2.0.0"
+priority: P2
+category: integration
+status: stable
+description: "Elasticsearch 全文搜索整合"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "進階全文搜索"
+  - "模糊搜索/自動完成"
+  - "業務聚合分析"
+  - "日誌搜索"
+
+search_types:
+  - "full-text: 全文搜索"
+  - "fuzzy: 模糊搜索"
+  - "phrase: 短語搜索"
+  - "autocomplete: 自動完成"
+
+sync_strategies:
+  - "dual-write: 雙寫"
+  - "CDC: 變更捕獲"
+  - "ETL: 批量同步"
+
+outputs:
+  - "Document 映射類"
+  - "搜索 API"
+  - "聚合查詢"
+  - "同步配置"

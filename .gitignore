@@ -1,25 +1,95 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Compiled Java files
+*.class
+**/target/
+**/build/
+**/out/
+
+# Log files
+*.log
+**/logs/
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
 
-### STS ###
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Gradle
+.gradle/
+build/
+**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
 
-### IntelliJ IDEA ###
-.idea
+# IDE - IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
 
-### front ###
-**/dist
-**/node_modules
-**/.vscode
+# IDE - VS Code
+.vscode/
 
+# IDE - Eclipse
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+
+# Other
+HELP.md
+
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+**/venv*/
+**/venv-*/
+
+# AI / Tooling / IDE
+.gemini/
+.windsurf/
+**/.obsidian/
+
+# Claude IDE local configuration (contains sensitive data)
+.claude/settings.local.json
+.claude/*.local.*
+.claude/**/settings.local.json
+!.claude/settings.local.json.example
+
+# Environment variables (contains sensitive data)
+.env.local
+*.local.env
+
+backup/
+docs/ralph/.env
+docs/ralph/.rate-limit-until

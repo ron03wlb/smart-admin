@@ -1,0 +1,93 @@
+[
+  {
+    "timestamp": "2026-02-11T16:52:05.158Z",
+    "iteration": 50,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 8,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T16:52:13.353Z",
+    "iteration": 51,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 8,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T16:52:22.550Z",
+    "iteration": 52,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 9,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T16:52:30.429Z",
+    "iteration": 53,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 8,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T16:52:39.499Z",
+    "iteration": 54,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 9,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T16:52:47.691Z",
+    "iteration": 55,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 8,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T16:52:55.662Z",
+    "iteration": 56,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 8,
+    "success": true
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "timestamp": "2026-02-12T14:06:37.556Z",
+    "iteration": 1,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 2,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-12T14:06:43.382Z",
+    "iteration": 2,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-12T14:06:49.293Z",
+    "iteration": 3,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 6,
+    "success": true
+  }
+]

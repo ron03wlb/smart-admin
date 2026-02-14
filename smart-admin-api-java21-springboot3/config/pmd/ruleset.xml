@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="SmartAdmin Custom PMD Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+         https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        SmartAdmin 项目自定义 PMD 规则集 - 与 ArchUnit 和项目规范保持一致
+
+        配置策略 (2026-01-22):
+        - 选项 A: 放宽代码风格规则，专注于实际 bug 检测
+        - 排除 final 关键字强制要求 (MethodArgumentCouldBeFinal, LocalVariableCouldBeFinal)
+        - 排除变量名长度限制 (LongVariable - Jackson 框架参数)
+        - 排除数字格式化要求 (UseUnderscoresInNumericLiterals)
+        - 保留所有最佳实践、性能、安全、错误检测规则
+
+        理由: SmartAdmin 已有严格的 Checkstyle 规则保证代码风格一致性，
+              PMD 应专注于检测实际的 bug 和潜在问题，而非代码美学偏好。
+    </description>
+
+    <!-- Exclude sample/demo code from all PMD checks -->
+    <!-- Rationale: Sample code demonstrates API usage patterns, not production best practices -->
+    <exclude-pattern>.*/module/business/sample/.*</exclude-pattern>
+
+    <!-- ==================== Best Practices ==================== -->
+    <rule ref="category/java/bestpractices.xml">
+        <!-- 排除日誌級別檢查規則 - SmartAdmin 使用 SLF4J 佔位符已優化延遲格式化 -->
+        <exclude name="GuardLogStatement"/>
+    </rule>
+
+    <!-- ==================== Code Style ==================== -->
+    <!-- 只保留严重影响可读性的规则 -->
+    <rule ref="category/java/codestyle.xml/ShortMethodName"/>
+    <rule ref="category/java/codestyle.xml/ShortClassName"/>
+
+    <!-- 排除过于严格的代码风格规则 - 选项 A: 放宽 PMD 规则 -->
+    <rule ref="category/java/codestyle.xml">
+        <!-- Lombok 和构造函数相关 -->
+        <exclude name="AtLeastOneConstructor"/>  <!-- Lombok @RequiredArgsConstructor -->
+        <exclude name="OnlyOneReturn"/>          <!-- 多返回点提高可读性 -->
+        <exclude name="CommentDefaultAccessModifier"/>
+
+        <!-- Final 关键字相关 - SmartAdmin 不强制使用 final -->
+        <exclude name="MethodArgumentCouldBeFinal"/>  <!-- 参数可以是 final -->
+        <exclude name="LocalVariableCouldBeFinal"/>   <!-- 局部变量可以是 final -->
+
+        <!-- 变量名长度 - 允许短变量名和长变量名 -->
+        <exclude name="LongVariable"/>   <!-- deserializationContext, serializerProvider -->
+        <exclude name="ShortVariable"/>  <!-- o, e, c, PC, H5, YM, MD, x, y, g 等常用简写 -->
+
+        <!-- 数字和字面量格式化 -->
+        <exclude name="UseUnderscoresInNumericLiterals"/>  <!-- 9007199254740991L -->
+
+        <!-- 代码结构风格 - 不强制字段位置 -->
+        <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>  <!-- 枚举等场景字段可在后面 -->
+
+        <!-- 注解风格 -->
+        <exclude name="UnnecessaryAnnotationValueElement"/>  <!-- @Value("value") vs @Value -->
+
+        <!-- 完全限定名 -->
+        <exclude name="UnnecessaryFullyQualifiedName"/>  <!-- 显式类名提高可读性 -->
+
+        <!-- 语言学命名 - setter 返回值模式 -->
+        <exclude name="LinguisticNaming"/>  <!-- 流式 API setScale() 返回自身 -->
+    </rule>
+
+    <!-- ==================== Performance ==================== -->
+    <!-- 性能规则也可能产生误报，排除特定场景 -->
+    <rule ref="category/java/performance.xml">
+        <exclude name="RedundantFieldInitializer"/>  <!-- 显式初始化提高可读性 -->
+        <exclude name="BigIntegerInstantiation"/>    <!-- new BigDecimal("0") vs BigDecimal.ZERO -->
+    </rule>
+
+    <!-- ==================== Design ==================== -->
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <!-- 方法复杂度阈值 -->
+            <property name="methodReportLevel" value="15"/>
+            <property name="classReportLevel" value="80"/>
+        </properties>
+    </rule>
+
+    <!-- ==================== Error Prone ==================== -->
+    <rule ref="category/java/errorprone.xml">
+        <!-- 排除误报较多的规则 -->
+        <exclude name="AvoidDuplicateLiterals"/>  <!-- 自定义配置 -->
+    </rule>
+
+    <!-- 自定义重复字面量检测规则 -->
+    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+        <properties>
+            <!-- 出现4次以上才警告（MyBatis字段名场景） -->
+            <property name="maxDuplicateLiterals" value="3"/>
+            <property name="minimumLength" value="3"/>
+            <property name="skipAnnotations" value="true"/>
+        </properties>
+    </rule>
+
+    <!-- ==================== Security ==================== -->
+    <rule ref="category/java/security.xml"/>
+
+</ruleset>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Allow underscore-separated method names in test files (BDD-style naming) -->
+    <!-- Example: login_CaptchaValidationFailure_ReturnsError -->
+    <suppress checks="MethodName" files=".*Test\.java$"/>
+
+    <!-- Allow star imports in test files for readability -->
+    <suppress checks="AvoidStarImport" files=".*Test\.java$"/>
+</suppressions>

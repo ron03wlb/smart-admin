@@ -1,0 +1,26 @@
+# Test Fixture Generator Configuration
+name: test-fixture-generator
+version: "2.0.0"
+priority: P0
+category: testing
+status: stable
+
+description: "Generate test data builders for complex domain objects"
+
+when_to_use:
+  - "Need test data for Entity/Form/VO"
+  - "Creating reusable test fixtures"
+  - "Setting up integration test data"
+
+pattern:
+  name: "AtomicInteger Builder"
+  description: "Uses AtomicInteger for unique test values"
+
+generated_methods:
+  - "createEntity()"
+  - "createAddForm()"
+  - "createUpdateForm(Long id)"
+  - "createQueryForm()"
+
+related_rules:
+  - "quality-tools/Q06-jacoco-coverage-rules.md"

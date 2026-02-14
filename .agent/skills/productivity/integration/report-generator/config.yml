@@ -1,0 +1,32 @@
+name: report-generator
+version: "2.0.0"
+priority: P2
+category: integration
+status: stable
+description: "報表匯出生成 (Excel/PDF/CSV)"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "列表資料匯出"
+  - "生成 PDF 報表"
+  - "CSV 資料導出"
+  - "大檔案異步處理"
+
+export_formats:
+  - "Excel (EasyExcel)"
+  - "PDF (iText/JasperReports)"
+  - "CSV"
+
+features:
+  - "欄位映射"
+  - "樣式設定"
+  - "分組匯出"
+  - "異步處理"
+  - "進度回報"
+
+outputs:
+  - "匯出服務類"
+  - "匯出 VO 模型"
+  - "下載 API"
+  - "異步任務"

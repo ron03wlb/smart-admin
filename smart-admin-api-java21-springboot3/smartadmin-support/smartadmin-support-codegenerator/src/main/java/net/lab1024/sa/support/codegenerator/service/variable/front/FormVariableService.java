@@ -1,0 +1,87 @@
+package net.lab1024.sa.support.codegenerator.service.variable.front;
+
+import cn.hutool.core.bean.BeanUtil;
+import com.google.common.base.CaseFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import net.lab1024.sa.common.core.util.SmartStringUtil;
+import net.lab1024.sa.support.codegenerator.constant.CodeFrontComponentEnum;
+import net.lab1024.sa.support.codegenerator.domain.form.CodeGeneratorConfigForm;
+import net.lab1024.sa.support.codegenerator.domain.model.CodeField;
+import net.lab1024.sa.support.codegenerator.domain.model.CodeInsertAndUpdateField;
+import net.lab1024.sa.support.codegenerator.service.variable.CodeGenerateBaseVariableService;
+
+/**
+ * @author 1024创新实验室-主任:卓大
+ * @since 2022/9/29 17:20:41 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+public class FormVariableService extends CodeGenerateBaseVariableService {
+
+  @Override
+  public boolean isSupport(CodeGeneratorConfigForm form) {
+    return true;
+  }
+
+  @Override
+  public Map<String, Object> getInjectVariablesMap(CodeGeneratorConfigForm form) {
+    Map<String, Object> variablesMap = new HashMap<>();
+    List<Map<String, Object>> fieldsVariableList = new ArrayList<>();
+    List<CodeInsertAndUpdateField> fieldList = form.getInsertAndUpdate().getFieldList();
+
+    java.util.Set<String> frontImportSet = new HashSet<>();
+
+    for (CodeInsertAndUpdateField field : fieldList) {
+      // 不存在 添加 和 更新
+      if (!(field.getInsertFlag() || field.getUpdateFlag())) {
+        continue;
+      }
+
+      Map<String, Object> objectMap = BeanUtil.beanToMap(field);
+
+      CodeField codeField = getCodeFieldByColumnName(field.getColumnName(), form);
+      if (codeField == null) {
+        continue;
+      }
+      objectMap.put("label", codeField.getLabel());
+      objectMap.put("fieldName", codeField.getFieldName());
+      objectMap.put("dict", codeField.getDict());
+
+      if (SmartStringUtil.isNotBlank(codeField.getEnumName())) {
+        String upperUnderscoreEnum =
+            CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, codeField.getEnumName());
+        objectMap.put("upperUnderscoreEnum", upperUnderscoreEnum);
+      }
+
+      fieldsVariableList.add(objectMap);
+
+      if (CodeFrontComponentEnum.ENUM_SELECT.equalsValue(field.getFrontComponent())) {
+        frontImportSet.add(
+            "import SmartEnumSelect from '/@/components/framework/smart-enum-select/index.vue';");
+      }
+
+      if (CodeFrontComponentEnum.BOOLEAN_SELECT.equalsValue(field.getFrontComponent())) {
+        frontImportSet.add(
+            "import BooleanSelect from '/@/components/framework/boolean-select/index.vue';");
+      }
+
+      if (CodeFrontComponentEnum.DICT_SELECT.equalsValue(field.getFrontComponent())) {
+        frontImportSet.add("import DictSelect from '/@/components/support/dict-select/index.vue';");
+        frontImportSet.add("import { DICT_CODE_ENUM } from '/@/constants/support/dict-const.js';");
+      }
+
+      if (CodeFrontComponentEnum.FILE_UPLOAD.equalsValue(field.getFrontComponent())) {
+        frontImportSet.add(
+            "import { FILE_FOLDER_TYPE_ENUM } from '/@/constants/support/file-const';");
+        frontImportSet.add("import FileUpload from '/@/components/support/file-upload/index.vue';");
+      }
+    }
+
+    variablesMap.put("formFields", fieldsVariableList);
+    variablesMap.put("frontImportList", new ArrayList<>(frontImportSet));
+
+    return variablesMap;
+  }
+}

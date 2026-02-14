@@ -1,0 +1,264 @@
+# ====================================================================
+# Mermaid Repair Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Created: 2026-02-03
+# Priority: P2 (Productivity/Refactoring)
+# Type: Atomic
+# Category: Documentation Repair
+# ====================================================================
+
+metadata:
+  name: "mermaid-repair"
+  version: "1.0.0"
+  priority: "P2"
+  type: "atomic"
+  category: "refactoring"
+  visibility: "public"
+  preferred_via: "user_invoked"
+  status: "stable"
+
+  description: |
+    Automated Mermaid diagram syntax validation and repair for SmartAdmin's
+    special rendering environment (uses <br/> instead of \n).
+
+    Purpose:
+    - Fix style syntax errors (node ID quoting, color code cleanup)
+    - Validate Mermaid syntax across project files
+    - Batch repair multiple files
+    - Prevent future errors via pre-commit hook
+
+    Key SmartAdmin Difference:
+    - Uses <br/> HTML tags for line breaks (NOT standard \n)
+    - sequenceDiagram Note blocks MUST use <br/>
+    - stateDiagram-v2 does NOT support <br/>
+
+  aliases:
+    - "fix-mermaid"
+    - "mermaid-fix"
+    - "diagram-repair"
+    - "validate-mermaid"
+
+  tags:
+    - documentation
+    - mermaid
+    - diagram
+    - syntax-fix
+    - validation
+    - smartadmin-specific
+
+# ====================================================================
+# Trigger Configuration
+# ====================================================================
+triggers:
+  keywords:
+    - "mermaid repair"
+    - "mermaid syntax error"
+    - "fix mermaid style"
+    - "mermaid parse error"
+    - "diagram render failed"
+    - "mermaid validation"
+    - "style syntax error"
+    - "color code pollution"
+
+  patterns:
+    - "fix mermaid.*in"
+    - "validate mermaid.*in"
+    - "repair.*mermaid"
+    - "mermaid.*not rendering"
+
+  file_patterns:
+    - "*.md"
+    - "docs/**/*.md"
+
+# ====================================================================
+# Execution Configuration
+# ====================================================================
+execution:
+  type: "single-shot"
+  timeout_minutes: 10
+  requires_confirmation: false
+  safe_mode: true
+
+  modes:
+    - id: "validate"
+      name: "Validation Only"
+      description: "Check for errors without fixing"
+      flag: "--validate"
+
+    - id: "fix"
+      name: "Auto-fix"
+      description: "Detect and fix errors"
+      flag: "--fix"
+
+    - id: "dry-run"
+      name: "Dry Run"
+      description: "Show what would be fixed without applying"
+      flag: "--dry-run"
+
+# ====================================================================
+# Error Detection Rules
+# ====================================================================
+detection_rules:
+  type_a_node_id_space:
+    name: "Node ID Space Not Quoted"
+    severity: "high"
+    regex: '^\s*style\s+[^"]*\s[^"]*fill:'
+    description: "Node IDs with spaces must be quoted"
+    fix_strategy: "auto_quote"
+
+  type_b_color_pollution:
+    name: "Color Code Pollution"
+    severity: "high"
+    regex: 'fill:#[0-9A-Fa-f]*[^0-9A-Fa-f,\s]'
+    description: "Color codes contain non-hex characters"
+    fix_strategy: "clean_hex"
+
+  type_c_duplicate_style:
+    name: "Duplicate Style Keyword"
+    severity: "medium"
+    regex: 'style\s+style'
+    description: "Duplicate style keyword"
+    fix_strategy: "remove_duplicate"
+
+# ====================================================================
+# Input/Output Configuration
+# ====================================================================
+input:
+  required_params:
+    - name: "target"
+      type: "String"
+      description: "File path or directory to process"
+      example: "docs/iGaming/"
+
+  optional_params:
+    - name: "mode"
+      type: "String"
+      description: "Execution mode: validate, fix, dry-run"
+      default: "validate"
+
+    - name: "recursive"
+      type: "boolean"
+      description: "Process directories recursively"
+      default: true
+
+output:
+  reports:
+    - "repair-report.md": "Summary of detected/fixed errors"
+    - "validation-report.md": "Syntax validation results"
+
+  metrics:
+    - "files_scanned": "Number of files processed"
+    - "errors_found": "Total errors detected"
+    - "errors_fixed": "Total errors repaired"
+    - "type_a_fixes": "Node ID quote fixes"
+    - "type_b_fixes": "Color code cleanup fixes"
+
+# ====================================================================
+# SmartAdmin Mermaid Specification
+# ====================================================================
+smartadmin_spec:
+  line_break_tag: "<br/>"
+  line_break_not_supported: "\\n"
+  note: "SmartAdmin rendering environment requires HTML <br/> tags"
+
+  diagram_specific_rules:
+    flowchart:
+      line_break: "<br/>"
+      node_label_quotes: "optional when using <br/>"
+
+    sequenceDiagram:
+      note_blocks: "MUST use <br/>"
+
+    stateDiagram-v2:
+      br_support: false
+      workaround: "Use multi-line note blocks"
+
+# ====================================================================
+# Scripts
+# ====================================================================
+scripts:
+  - name: "fix_style_syntax.py"
+    path: "scripts/fix_style_syntax.py"
+    purpose: "Fix style syntax in single file"
+    usage: "python scripts/fix_style_syntax.py <file_path>"
+
+  - name: "validate_mermaid.py"
+    path: "scripts/validate_mermaid.py"
+    purpose: "Validate Mermaid syntax"
+    usage: "python scripts/validate_mermaid.py <file_path>"
+
+  - name: "batch_repair.py"
+    path: "scripts/batch_repair.py"
+    purpose: "Batch repair multiple files"
+    usage: "python scripts/batch_repair.py <directory>"
+
+# ====================================================================
+# Quality Standards
+# ====================================================================
+quality_standards:
+  scan_speed: ">100 files/second"
+  repair_accuracy: ">99%"
+  false_positive_rate: "<1%"
+
+# ====================================================================
+# Pre-commit Hook Integration
+# ====================================================================
+precommit_hook:
+  enabled: true
+  check_on_stage: "*.md"
+  block_on_error: true
+  auto_fix: false
+
+  detection_commands:
+    style_errors: |
+      grep -n '^\s*style [^"]*\s[^"]*fill:' "$file"
+    color_errors: |
+      grep -nP 'fill:#[0-9A-Fa-f]*[^0-9A-Fa-f,\s]' "$file"
+
+# ====================================================================
+# References
+# ====================================================================
+references:
+  internal:
+    - "knowledge/error-patterns.md"
+    - "knowledge/smartadmin-mermaid-spec.md"
+    - "examples/example-1-style-fix.md"
+
+  external:
+    - name: "Mermaid Official Documentation"
+      url: "https://mermaid.js.org/"
+
+    - name: "Mermaid Live Editor"
+      url: "https://mermaid.live/"
+
+  smartadmin_docs:
+    - "CLAUDE.md#mermaid-diagram-standards"
+    - ".claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/knowledge/mermaid-best-practices.md"
+
+# ====================================================================
+# Examples
+# ====================================================================
+examples:
+  - name: "Batch Repair Directory"
+    trigger: "/mermaid-repair docs/iGaming/ --fix"
+    description: "Fix all Mermaid errors in iGaming docs"
+    expected_output: |
+      Scanned: 45 files
+      Fixed: 4 files (12 errors)
+        - Type A (Node ID): 7 fixes
+        - Type B (Color): 5 fixes
+
+  - name: "Validate Only"
+    trigger: "/mermaid-repair docs/ --validate"
+    description: "Check for errors without fixing"
+    expected_output: "Validation report with error locations"
+
+  - name: "Single File Fix"
+    trigger: "/mermaid-repair README.md --fix"
+    description: "Fix errors in single file"
+    expected_output: "Fixed errors in README.md"
+
+# ====================================================================
+# END OF CONFIG
+# ====================================================================

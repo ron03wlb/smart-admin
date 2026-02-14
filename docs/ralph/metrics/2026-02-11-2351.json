@@ -1,0 +1,28 @@
+[
+  {
+    "timestamp": "2026-02-11T15:51:14.365Z",
+    "iteration": 16,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 338,
+    "success": true
+  },
+  {
+    "timestamp": "2026-02-11T15:51:47.021Z",
+    "iteration": 17,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "cached": 0,
+      "total": 0
+    },
+    "api_calls": 1,
+    "duration_seconds": 32,
+    "success": true
+  }
+]

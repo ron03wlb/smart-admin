@@ -1,0 +1,291 @@
+name: SmartAdmin Skills Governance
+
+on:
+  push:
+    branches: [master, develop, 'refactor/**']
+  pull_request:
+    branches: [master, develop]
+  workflow_dispatch:
+
+jobs:
+  # ============================================================
+  # Job 1: Validate Skills Structure
+  # ============================================================
+  validate-skills:
+    name: Validate Skills Structure
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install yq v4
+        run: |
+          YQ_VERSION=v4.44.5
+          echo "Attempting to install yq v${YQ_VERSION}..."
+
+          # Remove existing yq to avoid conflicts
+          sudo rm -f /usr/bin/yq /usr/local/bin/yq
+
+          # Download and install yq v4
+          wget -q https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /tmp/yq || {
+            echo "❌ Failed to download yq, will use grep fallback"
+            exit 0
+          }
+
+          sudo mv /tmp/yq /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+
+          # Verify installation
+          if /usr/local/bin/yq --version | grep -q "version v4"; then
+            echo "✅ Successfully installed yq v4"
+            /usr/local/bin/yq --version
+            # Add to PATH explicitly
+            echo "/usr/local/bin" >> $GITHUB_PATH
+          else
+            echo "❌ yq installation failed, will use grep fallback"
+            sudo rm -f /usr/local/bin/yq
+          fi
+
+      - name: Debug environment
+        run: |
+          echo "=== Environment Debug ==="
+          echo "Working directory: $(pwd)"
+          echo "yq location: $(command -v yq || echo 'not found')"
+          echo "yq version: $(yq --version 2>&1 || echo 'failed')"
+          echo "Registry file: $(ls -la .claude/skills/skill-registry.yml || echo 'not found')"
+          echo "Script file: $(ls -la .claude/scripts/verify-skill-registry.sh || echo 'not found')"
+          echo ""
+          echo "=== Testing yq extraction ==="
+          yq eval '.skills.*.path' .claude/skills/skill-registry.yml 2>&1 | head -5 || echo "yq failed"
+          echo ""
+          echo "=== Testing grep fallback ==="
+          grep 'path:' .claude/skills/skill-registry.yml | sed 's/.*path: *"\([^"]*\)".*/\1/' | head -5 || echo "grep failed"
+
+      - name: Validate skill structures
+        run: bash .claude/scripts/verify-skill-registry.sh
+
+      - name: Check dependency graph
+        run: python3 .claude/scripts/validate-dependency-graph.py
+
+      - name: Check version consistency
+        run: bash .claude/scripts/check-version-consistency.sh
+
+  # ============================================================
+  # Job 2: Architecture Tests
+  # ============================================================
+  architecture-tests:
+    name: ArchUnit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: smart-admin-api-java21-springboot3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run ArchUnit tests
+        run: ./gradlew :sa-admin:test --tests ArchitectureTest
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-test-results
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/tests/
+
+  # ============================================================
+  # Job 3: Quality Tools (Parallel Matrix)
+  # ============================================================
+  quality-tools:
+    name: Quality Tools (${{ matrix.tool }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [checkstyle, pmd, spotbugs]
+    defaults:
+      run:
+        working-directory: smart-admin-api-java21-springboot3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Run ${{ matrix.tool }}
+        run: |
+          case "${{ matrix.tool }}" in
+            checkstyle)
+              ./gradlew :sa-admin:checkstyleMain :sa-admin:checkstyleTest
+              ;;
+            pmd)
+              ./gradlew :sa-admin:checkPmdPriority
+              ;;
+            spotbugs)
+              ./gradlew :sa-admin:spotbugsMain
+              ;;
+          esac
+
+      - name: Upload ${{ matrix.tool }} reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.tool }}-reports
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/${{ matrix.tool }}/
+
+  # ============================================================
+  # Job 4: Code Coverage (JaCoCo)
+  # ============================================================
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: smart-admin-api-java21-springboot3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Run tests with coverage
+        run: ./gradlew :sa-admin:test :sa-admin:jacocoTestReport
+
+      - name: Verify coverage threshold
+        run: ./gradlew :sa-admin:jacocoTestCoverageVerification
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: codecov/codecov-action@v4
+        with:
+          files: smart-admin-api-java21-springboot3/sa-admin/build/reports/jacoco/test/jacocoTestReport.xml
+          flags: unittests
+          name: codecov-umbrella
+
+  # ============================================================
+  # Job 5: PostgreSQL Analysis (with Testcontainers)
+  # ============================================================
+  postgres-analysis:
+    name: PostgreSQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: contains(github.event.head_commit.message, 'database') || contains(github.event.head_commit.message, 'postgresql')
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test_pwd
+          POSTGRES_USER: test_user
+          POSTGRES_DB: smartadmin_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    defaults:
+      run:
+        working-directory: smart-admin-api-java21-springboot3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Run PostgreSQL analysis
+        run: |
+          # Note: This would invoke the postgresql-best-practices skill
+          # For CI, we can run basic DB health checks
+          echo "PostgreSQL analysis placeholder (requires skill implementation)"
+
+      - name: Upload analysis reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgres-analysis-reports
+          path: docs/performance/
+
+  # ============================================================
+  # Job 6: Quality Gate Summary
+  # ============================================================
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [validate-skills, architecture-tests, quality-tools, code-coverage]
+    if: always()
+    steps:
+      - name: Check job results
+        run: |
+          echo "=== Quality Gate Summary ==="
+          echo "validate-skills: ${{ needs.validate-skills.result }}"
+          echo "architecture-tests: ${{ needs.architecture-tests.result }}"
+          echo "quality-tools: ${{ needs.quality-tools.result }}"
+          echo "code-coverage: ${{ needs.code-coverage.result }}"
+
+          if [[ "${{ needs.validate-skills.result }}" != "success" ]] || \
+             [[ "${{ needs.architecture-tests.result }}" != "success" ]] || \
+             [[ "${{ needs.quality-tools.result }}" != "success" ]] || \
+             [[ "${{ needs.code-coverage.result }}" != "success" ]]; then
+            echo "❌ Quality gate FAILED"
+            exit 1
+          else
+            echo "✅ Quality gate PASSED"
+            exit 0
+          fi
+
+      - name: Post summary
+        run: |
+          echo "### ✅ Quality Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Skills Validation | ${{ needs.validate-skills.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Architecture Tests | ${{ needs.architecture-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality Tools | ${{ needs.quality-tools.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Coverage | ${{ needs.code-coverage.result }} |" >> $GITHUB_STEP_SUMMARY

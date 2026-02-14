@@ -1,0 +1,123 @@
+package net.lab1024.sa.support.helpdoc.service;
+
+import io.vavr.control.Option;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartBeanUtil;
+import net.lab1024.sa.support.helpdoc.dao.HelpDocCatalogDao;
+import net.lab1024.sa.support.helpdoc.dao.HelpDocDao;
+import net.lab1024.sa.support.helpdoc.domain.entity.HelpDocCatalogEntity;
+import net.lab1024.sa.support.helpdoc.domain.form.HelpDocCatalogAddForm;
+import net.lab1024.sa.support.helpdoc.domain.form.HelpDocCatalogUpdateForm;
+import net.lab1024.sa.support.helpdoc.domain.vo.HelpDocCatalogVO;
+import net.lab1024.sa.support.helpdoc.domain.vo.HelpDocVO;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
+
+/**
+ * 帮助文档 目录
+ *
+ * @author 1024创新实验室-主任: 卓大
+ * @since 2022-08-20 23:11:42 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@Service
+@RequiredArgsConstructor
+@SuppressWarnings("PMD.LongVariable")
+public class HelpDocCatalogService {
+
+  private final HelpDocCatalogDao helpDocCatalogDao;
+
+  private final HelpDocDao helpDocDao;
+
+  /**
+   * 查询全部目录
+   *
+   * @return
+   */
+  public List<HelpDocCatalogVO> getAll() {
+    return SmartBeanUtil.copyList(helpDocCatalogDao.selectList(null), HelpDocCatalogVO.class);
+  }
+
+  /**
+   * 添加目录
+   *
+   * @param helpDocCatalogAddForm
+   * @return
+   */
+  public synchronized ResponseDTO<String> add(final HelpDocCatalogAddForm helpDocCatalogAddForm) {
+    final List<HelpDocCatalogVO> helpDocCatalogList = getAll();
+    final Option<HelpDocCatalogVO> exist =
+        Option.ofOptional(
+            helpDocCatalogList.stream()
+                .filter(e -> helpDocCatalogAddForm.getName().equals(e.getName()))
+                .findFirst());
+    if (exist.isDefined()) {
+      return ResponseDTO.userErrorParam("存在相同名称的目录了");
+    }
+
+    helpDocCatalogDao.insert(SmartBeanUtil.copy(helpDocCatalogAddForm, HelpDocCatalogEntity.class));
+    return ResponseDTO.ok();
+  }
+
+  /**
+   * 更新目录
+   *
+   * @param updateForm
+   * @return
+   */
+  public synchronized ResponseDTO<String> update(final HelpDocCatalogUpdateForm updateForm) {
+    final HelpDocCatalogEntity helpDocCatalogEntity =
+        helpDocCatalogDao.selectById(updateForm.getHelpDocCatalogId());
+    if (helpDocCatalogEntity == null) {
+      return ResponseDTO.userErrorParam("目录不存在");
+    }
+
+    final List<HelpDocCatalogVO> helpDocCatalogList = getAll();
+    final Option<HelpDocCatalogVO> exist =
+        Option.ofOptional(
+            helpDocCatalogList.stream()
+                .filter(e -> updateForm.getName().equals(e.getName()))
+                .findFirst());
+    if (exist.isDefined()
+        && !exist.get().getHelpDocCatalogId().equals(updateForm.getHelpDocCatalogId())) {
+      return ResponseDTO.userErrorParam("存在相同名称的目录了");
+    }
+    helpDocCatalogDao.updateById(SmartBeanUtil.copy(updateForm, HelpDocCatalogEntity.class));
+    return ResponseDTO.ok();
+  }
+
+  /**
+   * 删除目录（如果有子目录、或者有帮助文档，则不能删除）
+   *
+   * @param helpDocCatalogId
+   * @return
+   */
+  public synchronized ResponseDTO<String> delete(final Long helpDocCatalogId) {
+    if (helpDocCatalogId == null) {
+      return ResponseDTO.ok();
+    }
+
+    final HelpDocCatalogEntity helpDocCatalogEntity =
+        helpDocCatalogDao.selectById(helpDocCatalogId);
+    if (helpDocCatalogEntity == null) {
+      return ResponseDTO.userErrorParam("目录不存在");
+    }
+
+    // 如果有子目录，则不能删除
+    final Option<HelpDocCatalogVO> existOptional =
+        Option.ofOptional(
+            getAll().stream().filter(e -> helpDocCatalogId.equals(e.getParentId())).findFirst());
+    if (existOptional.isDefined()) {
+      return ResponseDTO.userErrorParam("存在子目录：" + existOptional.get().getName());
+    }
+
+    // 查询是否有帮助文档
+    final List<HelpDocVO> helpDocVOList = helpDocDao.queryHelpDocByCatalogId(helpDocCatalogId);
+    if (CollectionUtils.isNotEmpty(helpDocVOList)) {
+      return ResponseDTO.userErrorParam("目录下存在文档，不能删除");
+    }
+    helpDocCatalogDao.deleteById(helpDocCatalogId);
+    return ResponseDTO.ok();
+  }
+}

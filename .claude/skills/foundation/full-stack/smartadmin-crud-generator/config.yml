@@ -1,0 +1,235 @@
+# ====================================================================
+# SmartAdmin Full-Stack CRUD Generator - Skill Configuration
+# ====================================================================
+# Version: 2.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Full-stack
+# Type: Composite
+# ====================================================================
+
+metadata:
+  name: "smartadmin-crud-generator"
+  version: "2.0.0"
+  priority: "P0"
+  type: "composite"
+  category: "full-stack"
+  description: "Generate complete full-stack CRUD module (Backend + Frontend + API Docs + Tests)"
+  ai_description: |
+    Generates complete CRUD modules from entity specifications - automatically creates:
+    - Backend: Entity, Dao, Manager, Service, Controller, Domain objects (Form/VO/QueryForm)
+    - Frontend: Vue 3 list view, form modal, API client, TypeScript types
+    - API Documentation: Swagger/Knife4j annotations
+    - Tests: Unit tests + Integration tests with Testcontainers
+
+    v2.0.0 Composite Architecture (2026-01-27):
+    This skill consolidates 4 previously separate skills into a unified
+    phase-based workflow:
+    - Phase 1 (Backend): Former smartadmin-mybatis
+    - Phase 2 (Frontend): Former smartadmin-vue-crud
+    - Phase 3 (API Docs): Former smartadmin-api-docs
+    - Phase 4 (Tests): Integration test patterns
+
+    Supports independent phase execution (--backend-only, --frontend-only, etc.)
+    or complete workflow (--all-phases). Reduces CRUD generation time from
+    45 minutes (4 separate skills) to 20 minutes (unified workflow).
+
+  tags:
+    - "crud"
+    - "code-generation"
+    - "full-stack"
+    - "backend"
+    - "frontend"
+    - "vue3"
+    - "mybatis-plus"
+    - "scaffolding"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "create CRUD module"
+    - "generate CRUD"
+    - "scaffold module"
+    - "generate entity"
+    - "create business module"
+    - "full-stack CRUD"
+    - "implement CRUD operations"
+    - "generate full-stack code"
+
+  patterns:
+    - "create\\s+(\\w+)\\s+CRUD\\s+module"
+    - "generate\\s+CRUD\\s+for\\s+(\\w+)"
+    - "scaffold\\s+module\\s+for\\s+(\\w+)"
+    - "create\\s+business\\s+module\\s+for\\s+(\\w+)"
+
+  exclude_keywords:
+    - "delete CRUD module"
+    - "remove entity"
+
+execution:
+  type: "phase-based"
+
+  phases:
+    - id: "phase-1"
+      name: "Backend Generation"
+      file: "phases/phase-1-backend.md"
+      required: true
+      estimated_minutes: 10
+      description: "Generate Entity, Dao, Manager, Service, Controller, Domain objects (Form/VO/QueryForm)"
+
+    - id: "phase-2"
+      name: "Frontend Generation"
+      file: "phases/phase-2-frontend.md"
+      required: false
+      estimated_minutes: 8
+      description: "Generate Vue 3 list view, form modal/drawer, API client, TypeScript types"
+
+    - id: "phase-3"
+      name: "API Documentation Generation"
+      file: "phases/phase-3-api-docs.md"
+      required: false
+      estimated_minutes: 3
+      description: "Generate Swagger/Knife4j annotations for API documentation"
+
+    - id: "phase-4"
+      name: "Test Generation"
+      file: "phases/phase-4-tests.md"
+      required: false
+      estimated_minutes: 7
+      description: "Generate unit tests and integration tests with Testcontainers"
+
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 60
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+      - "archunit"
+      - "unit-tests"
+
+dependencies:
+  skills:
+    - "test-fixture-generator"  # For Phase 4 test data builders
+
+  required_files:
+    - ".agent/rules/foundation/10-architecture-rules.md"
+    - ".claude/shared/knowledge/smartadmin-patterns.md"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+    - name: "node"
+      version: ">=18.0"
+      required: false  # Only for frontend phase
+
+output:
+  generates:
+    - "*.java"
+    - "*.vue"
+    - "*.ts"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/smartadmin-business/src/main/java"
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java"
+    - "smart-admin-web/src/views"
+    - "smart-admin-web/src/api"
+
+  templates:
+    entity: "templates/Entity.java.template"
+    dao: "templates/Dao.java.template"
+    manager: "templates/Manager.java.template"
+    service: "templates/Service.java.template"
+    controller: "templates/Controller.java.template"
+    form: "templates/Form.java.template"
+    vo: "templates/VO.java.template"
+    query_form: "templates/QueryForm.java.template"
+    vue_list: "templates/list-view.vue.template"
+    vue_form: "templates/form-modal.vue.template"
+    api_client: "templates/api-client.ts.template"
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "gradle_available"
+      rule: "Gradle 8.0+ must be available"
+      command: "gradle --version"
+
+    - check: "entity_not_exists"
+      rule: "Entity should not already exist (or user confirmed overwrite)"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify generated code compiles successfully"
+      command: "./gradlew :smartadmin-app:compileJava"
+
+    - check: "archunit"
+      description: "Verify ArchitectureTest passes for generated code"
+      command: "./gradlew :smartadmin-app:test --tests ArchitectureTest"
+
+    - check: "unit-tests"
+      description: "Run unit tests for generated code"
+      command: "./gradlew :smartadmin-app:test --tests *ServiceTest"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+  # Consolidated skills (now part of this composite skill)
+  consolidated_from:
+    - skill: "smartadmin-mybatis"
+      phase: "phase-1-backend"
+      migration_date: "2026-01-27"
+      status: "soft-deprecated"
+
+    - skill: "smartadmin-vue-crud"
+      phase: "phase-2-frontend"
+      migration_date: "2026-01-27"
+      status: "soft-deprecated"
+
+    - skill: "smartadmin-api-docs"
+      phase: "phase-3-api-docs"
+      migration_date: "2026-01-27"
+      status: "soft-deprecated"
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: "README.md"
+  examples_dir: "examples"
+  references_dir: null
+
+  external_links:
+    - title: "SmartAdmin Patterns"
+      url: "../../shared/knowledge/smartadmin-patterns.md"
+
+    - title: "Architecture Rules"
+      url: "../../../.agent/rules/foundation/10-architecture-rules.md"
+
+    - title: "MyBatis-Plus Documentation"
+      url: "https://baomidou.com/"
+
+    - title: "Vue 3 Documentation"
+      url: "https://vuejs.org/"
+
+    - title: "Ant Design Vue"
+      url: "https://antdv.com/"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "phases_executed"
+    - "lines_of_code_generated"

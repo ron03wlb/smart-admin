@@ -1,0 +1,45 @@
+# LiteFlow SQL 配置源示例
+# 將此配置添加到 sa-admin/src/main/resources/application.yaml
+
+smart:
+  liteflow:
+    enabled: true  # 啟用 LiteFlow 模塊
+    execution-log-enabled: true  # 啟用執行日誌
+    metrics-enabled: true  # 啟用指標統計
+
+liteflow:
+  # 啟用 SQL 配置源
+  rule-source: sql
+
+  # SQL 數據源配置
+  rule-source-ext-data-map:
+    # 數據庫連接（可選，如果已有 Spring DataSource 則不需要）
+    url: jdbc:postgresql://localhost:5432/smartadmin
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: password
+
+    # 應用名稱（必須，用於過濾規則）
+    applicationName: smartadmin
+
+    # Chain 表配置
+    chainTableName: t_liteflow_chain  # 流程定義表
+    chainNameField: chain_code  # 流程編碼字段
+    elDataField: chain_data  # EL 表達式字段
+    chainEnableField: status  # 狀態字段（1=啟用, 0=禁用）
+
+    # Script 表配置
+    scriptTableName: t_liteflow_script  # 腳本節點表
+    scriptIdField: script_code  # 腳本編碼字段
+    scriptNameField: script_name  # 腳本名稱字段
+    scriptDataField: script_data  # 腳本內容字段
+    scriptTypeField: script_type  # 腳本類型字段（qlexpress/groovy/javascript）
+    scriptLanguageField: script_type  # 腳本語言字段
+
+    # 自動重載配置（可選）
+    pollingEnabled: true  # 啟用輪詢
+    pollingIntervalSeconds: 60  # 輪詢間隔（秒）
+    pollingStartSeconds: 60  # 啟動延遲（秒）
+
+    # SQL 日誌（可選）
+    sqlLogEnabled: true  # 啟用 SQL 日誌

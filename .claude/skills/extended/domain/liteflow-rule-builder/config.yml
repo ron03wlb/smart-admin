@@ -1,0 +1,144 @@
+# ====================================================================
+# LiteFlow Rule Builder - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P1 (Important Business Logic)
+# Category: Business Logic
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "liteflow-rule-builder"
+  version: "1.0.0"
+  priority: "P1"
+  type: "atomic"
+  category: "business-logic"
+  description: "Generate LiteFlow rule DSL (EL expressions and QLExpress scripts) from natural language descriptions"
+  ai_description: |
+    Generates complete LiteFlow flow orchestration rules from natural language
+    descriptions - automatically creates EL expression chains, QLExpress scripts,
+    database configurations, and integration code following SmartAdmin patterns.
+
+    Core LiteFlow patterns:
+    - Sequential Execution (THEN): Execute nodes in strict order (A → B → C)
+    - Conditional Branching (IF): Execute based on condition
+    - Parallel Execution (WHEN): Execute multiple nodes simultaneously
+    - Switch/Case Logic (SWITCH): Route based on multiple conditions
+    - Loop Execution (FOR/WHILE): Iterate over collections
+
+    Generates:
+    - EL expression chains for workflow structure
+    - QLExpress script nodes for business logic
+    - Database insert statements (t_liteflow_chain, t_liteflow_script)
+    - Service layer integration code
+    - Execution examples and test scenarios
+
+    Use when implementing business rule orchestration, approval workflows,
+    validation chains, or migrating from Evrete rules.
+
+  tags:
+    - "liteflow"
+    - "workflow"
+    - "business-rules"
+    - "orchestration"
+    - "el-expression"
+    - "qlexpress"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "create LiteFlow chain"
+    - "create LiteFlow rule"
+    - "business workflow"
+    - "approval flow"
+    - "validation chain"
+    - "flow orchestration"
+    - "conditional logic"
+    - "parallel execution"
+    - "migrate from Evrete"
+
+  patterns:
+    - "create\\s+(\\w+)\\s+workflow"
+    - "implement\\s+(\\w+)\\s+approval\\s+flow"
+    - "generate\\s+LiteFlow\\s+chain\\s+for\\s+(\\w+)"
+
+  exclude_keywords:
+    - "delete LiteFlow chain"
+    - "remove workflow"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 20
+    total_minutes: 20
+
+  quality_gates:
+    run_after_execution: false  # LiteFlow rules are database-based, no compilation
+
+dependencies:
+  skills: []
+
+  required_files:
+    - "docs/plans/liteflow/README.md"
+    - "docs/plans/liteflow/architecture.md"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.sql"
+    - "*.java"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/main/resources/db/migration"
+    - "smart-admin-api-java21-springboot3/smartadmin-modules/src/main/java"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+  post_execution:
+    - check: "sql_syntax"
+      description: "Verify SQL statements are valid"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: null
+
+  external_links:
+    - title: "LiteFlow Official Documentation"
+      url: "https://liteflow.cc/"
+
+    - title: "SmartAdmin LiteFlow Plans"
+      url: "../../../docs/plans/liteflow/README.md"
+
+    - title: "QLExpress Documentation"
+      url: "https://github.com/alibaba/QLExpress"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "chains_generated"

@@ -1,0 +1,30 @@
+name: i18n-generator
+version: "2.0.0"
+priority: P2
+category: integration
+status: stable
+description: "國際化 (i18n) 生成"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "添加多語言支援"
+  - "創建翻譯文件"
+  - "語言切換功能"
+  - "錯誤訊息國際化"
+
+supported_locales:
+  - "zh_TW: 繁體中文"
+  - "zh_CN: 簡體中文"
+  - "en: English"
+  - "ja: 日本語"
+
+technologies:
+  backend: "Spring MessageSource"
+  frontend: "Vue I18n"
+
+outputs:
+  - "MessageSource 配置"
+  - "翻譯文件 (properties/JSON)"
+  - "Vue I18n 配置"
+  - "語言切換組件"

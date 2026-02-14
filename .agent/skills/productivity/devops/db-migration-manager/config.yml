@@ -1,0 +1,32 @@
+name: db-migration-manager
+version: "2.0.0"
+priority: P2
+category: devops
+status: stable
+description: "資料庫遷移腳本生成與管理"
+
+output_language: "繁體中文"
+
+when_to_use:
+  - "創建新資料表"
+  - "修改資料表結構"
+  - "添加索引"
+  - "資料遷移"
+
+tools_supported:
+  - "Flyway"
+  - "Liquibase"
+
+databases_supported:
+  - "PostgreSQL"
+  - "MySQL"
+
+naming_conventions:
+  table_prefix: "t_"
+  index_prefix: "idx_"
+  version_format: "V{major}.{minor}.{patch}__{description}.sql"
+
+outputs:
+  - "遷移腳本 (SQL/XML)"
+  - "回滾腳本"
+  - "欄位註解"

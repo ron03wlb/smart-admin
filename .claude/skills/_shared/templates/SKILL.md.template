@@ -1,0 +1,728 @@
+---
+# YAML Frontmatter for AI Parsing
+skill_name: "{{SKILL_NAME}}"
+version: "{{VERSION}}"
+priority: "{{P0|P1|P2}}"
+type: "{{atomic|composite|orchestrator}}"
+category: "{{category}}"
+last_updated: "{{YYYY-MM-DD}}"
+---
+
+# {{Skill Name}} - Complete Reference
+
+**Version**: {{VERSION}}
+**Priority**: {{P0|P1|P2}}
+**Type**: {{atomic|composite|orchestrator}}
+**Category**: {{category}}
+**Status**: {{stable|experimental|deprecated}}
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Quick Start](#quick-start)
+3. [When to Use This Skill](#when-to-use-this-skill)
+4. [Trigger Keywords](#trigger-keywords)
+5. [Technical Specifications](#technical-specifications)
+6. [Execution Modes](#execution-modes)
+7. [Input Requirements](#input-requirements)
+8. [Output Artifacts](#output-artifacts)
+9. [Dependencies](#dependencies)
+10. [Implementation Details](#implementation-details)
+11. [Decision Trees](#decision-trees)
+12. [Edge Cases](#edge-cases)
+13. [Examples](#examples)
+14. [Quality Gates](#quality-gates)
+15. [Troubleshooting](#troubleshooting)
+16. [References](#references)
+17. [Version History](#version-history)
+
+---
+
+## Overview
+
+### Purpose
+
+{{
+1-2 paragraphs explaining:
+- What this skill does
+- Why it exists
+- What problem it solves
+- How it fits into the SmartAdmin ecosystem
+}}
+
+**Example**:
+```
+This skill generates complete CRUD modules for SmartAdmin applications,
+including Entity, Dao, Manager, Service, Controller, Vue components,
+TypeScript API clients, and integration tests. It consolidates what
+previously required 4 separate skills into a unified, phase-based workflow.
+```
+
+### Key Capabilities
+
+- ✅ **Capability 1**: {{Description}}
+- ✅ **Capability 2**: {{Description}}
+- ✅ **Capability 3**: {{Description}}
+- ✅ **Capability 4**: {{Description}}
+
+### Architecture Integration
+
+{{Explain how this skill integrates with SmartAdmin's architecture}}
+
+**Example**:
+```
+This skill generates code following SmartAdmin's strict layered architecture:
+Controller → Service → Manager → Dao → Entity
+
+It enforces ArchUnit rules:
+- Service MUST use io.vavr.control.Option (NOT java.util.Optional)
+- @Transactional ONLY in Manager layer
+- Constructor injection via @RequiredArgsConstructor
+```
+
+---
+
+## Quick Start
+
+### Basic Usage
+
+{{Simplest way to use this skill}}
+
+```bash
+# Example command
+/{{skill-command}} {{entity-name}}
+
+# What it does
+{{Brief description of result}}
+```
+
+### Common Commands
+
+```bash
+# Command 1: {{Description}}
+/{{skill-command}} {{args-1}}
+
+# Command 2: {{Description}}
+/{{skill-command}} {{args-2}}
+
+# Command 3: {{Description}}
+/{{skill-command}} {{args-3}}
+```
+
+---
+
+## When to Use This Skill
+
+### ✅ Use When
+
+- {{Scenario 1 where this skill should be used}}
+- {{Scenario 2 where this skill should be used}}
+- {{Scenario 3 where this skill should be used}}
+
+**Example Scenarios**:
+- User requests: "Create a new employee management module"
+- User requests: "Generate CRUD for Order entity"
+- User requests: "Scaffold a complete module for Brand management"
+
+### ❌ Don't Use When
+
+- {{Scenario 1 where this skill should NOT be used}}
+- {{Scenario 2 where this skill should NOT be used}}
+- {{Scenario 3 where this skill should NOT be used}}
+
+**Anti-Patterns**:
+- User requests: "Delete the CRUD module" (use manual deletion instead)
+- User requests: "Modify existing CRUD logic" (use manual editing instead)
+- User requests: "Add custom business logic" (use manual implementation instead)
+
+---
+
+## Trigger Keywords
+
+### Primary Keywords
+
+**When user mentions these phrases, strongly consider using this skill:**
+
+- "{{keyword 1}}"  {{# e.g., "create CRUD module"}}
+- "{{keyword 2}}"  {{# e.g., "generate entity"}}
+- "{{keyword 3}}"  {{# e.g., "scaffold module"}}
+
+### Secondary Keywords
+
+**When user mentions these phrases, evaluate if this skill applies:**
+
+- "{{related term 1}}"  {{# e.g., "new business module"}}
+- "{{related term 2}}"  {{# e.g., "add entity"}}
+- "{{related term 3}}"  {{# e.g., "create controller"}}
+
+### Pattern Matching
+
+**Regex patterns that should trigger this skill:**
+
+- `{{regex pattern 1}}`  {{# e.g., "generate\\s+(\\w+)\\s+CRUD"}}
+- `{{regex pattern 2}}`  {{# e.g., "create\\s+module\\s+for\\s+(\\w+)"}}
+
+### Anti-Patterns (Exclusions)
+
+**When user mentions these phrases, do NOT use this skill:**
+
+- "{{exclude keyword 1}}"  {{# e.g., "delete CRUD"}}
+- "{{exclude keyword 2}}"  {{# e.g., "remove module"}}
+
+---
+
+## Technical Specifications
+
+### System Requirements
+
+**Minimum Requirements**:
+- {{Requirement 1}}  {{# e.g., "Java 21+"}}
+- {{Requirement 2}}  {{# e.g., "Gradle 8.0+"}}
+- {{Requirement 3}}  {{# e.g., "Node.js 18+"}}
+
+**Recommended Requirements**:
+- {{Recommended 1}}
+- {{Recommended 2}}
+
+### Supported Environments
+
+- ✅ {{Environment 1}}  {{# e.g., "SmartAdmin v4.0.0+"}}
+- ✅ {{Environment 2}}  {{# e.g., "Spring Boot 3.5.4+"}}
+- ❌ {{Unsupported 1}}  {{# e.g., "SmartAdmin v3.x (deprecated)"}}
+
+---
+
+## Execution Modes
+
+{{For phase-based or mode-based skills only. Delete if type=single-shot}}
+
+### Phase-Based Execution
+
+{{For composite skills with phases}}
+
+#### Phase 1: {{Phase Name}}
+
+**Purpose**: {{What this phase does}}
+
+**Input**: {{What this phase requires}}
+
+**Output**: {{What this phase generates}}
+
+**Estimated Time**: {{X minutes}}
+
+**Example**:
+```bash
+# Execute this phase only
+/{{skill-command}} {{entity}} --phase-1-only
+
+# What gets generated
+{{List of files/artifacts}}
+```
+
+#### Phase 2: {{Phase Name}}
+
+{{Repeat for each phase}}
+
+### Mode-Based Execution
+
+{{For composite skills with modes}}
+
+#### Mode 1: {{Mode Name}}
+
+**Purpose**: {{What this mode does}}
+
+**When to Use**: {{Scenarios}}
+
+**Example**:
+```bash
+# Execute this mode
+/{{skill-command}} {{target}} --mode={{mode-1}}
+
+# What it does
+{{Description}}
+```
+
+#### Mode 2: {{Mode Name}}
+
+{{Repeat for each mode}}
+
+---
+
+## Input Requirements
+
+### Required Parameters
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `{{param1}}` | {{type}} | {{description}} | `{{example}}` |
+| `{{param2}}` | {{type}} | {{description}} | `{{example}}` |
+
+### Optional Parameters
+
+| Parameter | Type | Default | Description | Example |
+|-----------|------|---------|-------------|---------|
+| `{{opt1}}` | {{type}} | {{default}} | {{description}} | `{{example}}` |
+| `{{opt2}}` | {{type}} | {{default}} | {{description}} | `{{example}}` |
+
+### Input Validation Rules
+
+- ✅ **Rule 1**: {{Validation rule}}
+- ✅ **Rule 2**: {{Validation rule}}
+- ❌ **Invalid**: {{What's not allowed}}
+
+**Example**:
+```
+✅ Valid entity name: Employee, Order, Brand (PascalCase)
+❌ Invalid: employee, order-item, brand_123 (lowercase, hyphens, numbers)
+```
+
+---
+
+## Output Artifacts
+
+### Generated Files
+
+{{List all files this skill generates}}
+
+**Backend Files** ({{count}} files):
+```
+{{artifact-root}}/
+├── entity/{{EntityName}}.java
+├── dao/{{EntityName}}Dao.java
+├── manager/{{EntityName}}Manager.java
+├── service/{{EntityName}}Service.java
+└── controller/{{EntityName}}Controller.java
+```
+
+**Frontend Files** ({{count}} files):
+```
+{{artifact-root}}/
+├── {{entity-name}}-list.vue
+├── {{entity-name}}-form-modal.vue
+└── {{entity-name}}-api.ts
+```
+
+### Modified Files
+
+{{List files this skill modifies}}
+
+- `{{file-path-1}}` - {{What gets modified}}
+- `{{file-path-2}}` - {{What gets modified}}
+
+### Report Files
+
+{{List any report files generated}}
+
+- `{{report-path-1}}` - {{Description}}
+- `{{report-path-2}}` - {{Description}}
+
+---
+
+## Dependencies
+
+### Required Skills
+
+{{List other skills this skill depends on}}
+
+- **{{skill-name-1}}**: {{Why it's needed}}
+- **{{skill-name-2}}**: {{Why it's needed}}
+
+### Required Files
+
+{{List files that must exist in the codebase}}
+
+- `{{file-path-1}}` - {{Purpose}}
+- `{{file-path-2}}` - {{Purpose}}
+
+### External Tools
+
+{{List external tools required}}
+
+| Tool | Version | Purpose | Check Command |
+|------|---------|---------|---------------|
+| {{tool1}} | {{version}} | {{purpose}} | `{{check-cmd}}` |
+| {{tool2}} | {{version}} | {{purpose}} | `{{check-cmd}}` |
+
+---
+
+## Implementation Details
+
+### Algorithm/Workflow
+
+{{Step-by-step explanation of how this skill works}}
+
+**Step 1: {{Step Name}}**
+{{Detailed description}}
+
+```
+{{Code example or pseudocode}}
+```
+
+**Step 2: {{Step Name}}**
+{{Detailed description}}
+
+**Step 3: {{Step Name}}**
+{{Detailed description}}
+
+### Pattern Detection
+
+{{How this skill identifies which pattern to apply}}
+
+**Decision Logic**:
+```
+IF user_request MATCHES "{{pattern1}}"
+  THEN apply {{approach1}}
+ELSE IF user_request MATCHES "{{pattern2}}"
+  THEN apply {{approach2}}
+ELSE
+  ASK user for clarification
+END IF
+```
+
+### Code Generation Strategy
+
+{{How this skill generates code}}
+
+**Template-Based**:
+- Uses templates from: `{{template-dir}}/`
+- Variables replaced: `{{variable-list}}`
+- Naming conventions: `{{naming-rules}}`
+
+**Pattern-Based**:
+- Analyzes existing code patterns
+- Replicates architectural style
+- Maintains consistency
+
+---
+
+## Decision Trees
+
+### When to Use Which Mode/Phase
+
+{{Decision tree for choosing execution mode}}
+
+```
+┌─ User wants backend only?
+│   └─ YES → Use --backend-only (Phase 1)
+│   └─ NO  → Continue
+│
+├─ User wants frontend only?
+│   └─ YES → Use --frontend-only (Phase 2)
+│   └─ NO  → Continue
+│
+├─ User wants complete module?
+│   └─ YES → Use --all-phases
+│   └─ NO  → Ask for clarification
+```
+
+### Error Handling Decision Tree
+
+{{How to handle different error scenarios}}
+
+```
+┌─ Error: Entity already exists
+│   ├─ Check if user wants to overwrite
+│   │   └─ YES → Overwrite with warning
+│   │   └─ NO  → Abort with safe exit
+│
+├─ Error: Invalid entity name
+│   ├─ Suggest valid name format
+│   └─ Ask user to retry
+│
+└─ Error: Missing dependencies
+    ├─ List missing dependencies
+    └─ Provide installation instructions
+```
+
+---
+
+## Edge Cases
+
+### Edge Case 1: {{Scenario}}
+
+**Description**: {{What is the edge case}}
+
+**Detection**: {{How to detect this edge case}}
+
+**Handling**: {{How this skill handles it}}
+
+**Example**:
+```bash
+# Command
+/{{skill-command}} {{edge-case-input}}
+
+# What happens
+{{Expected behavior}}
+```
+
+### Edge Case 2: {{Scenario}}
+
+{{Repeat for each edge case}}
+
+---
+
+## Examples
+
+### Example 1: Basic Usage (Happy Path)
+
+**User Request**:
+```
+"Create a CRUD module for Employee management"
+```
+
+**Skill Execution**:
+```bash
+/{{skill-command}} Employee --all-phases
+```
+
+**Generated Artifacts**:
+```
+Backend (5 files):
+- EmployeeEntity.java (155 lines)
+- EmployeeDao.java (45 lines)
+- EmployeeManager.java (78 lines)
+- EmployeeService.java (120 lines)
+- EmployeeController.java (95 lines)
+
+Frontend (3 files):
+- employee-list.vue (230 lines)
+- employee-form-modal.vue (180 lines)
+- employee-api.ts (65 lines)
+
+Tests (2 files):
+- EmployeeServiceIntegrationTest.java (145 lines)
+- EmployeeTestFixture.java (55 lines)
+
+Total: 10 files, ~1,168 lines of code
+```
+
+**Execution Time**: ~20 minutes
+
+### Example 2: Backend Only
+
+**User Request**:
+```
+"Generate only the backend Dao layer for Order"
+```
+
+**Skill Execution**:
+```bash
+/{{skill-command}} Order --backend-only
+```
+
+**Generated Artifacts**:
+```
+Backend (5 files):
+- OrderEntity.java
+- OrderDao.java
+- OrderManager.java (with @Transactional)
+- OrderService.java (with io.vavr.control.Option)
+- OrderController.java (with ResponseDTO)
+
+Total: 5 files, ~493 lines of code
+```
+
+**Execution Time**: ~10 minutes
+
+### Example 3: Complex Entity with Relationships
+
+**User Request**:
+```
+"Create a CRUD module for Product with Category relationship"
+```
+
+**Skill Execution**:
+```bash
+/{{skill-command}} Product --with-relations=Category
+```
+
+**Generated Artifacts**:
+{{List artifacts including relationship handling}}
+
+**Execution Time**: ~25 minutes
+
+### Example 4: Edge Case - Existing Entity
+
+**User Request**:
+```
+"Generate CRUD for Employee" (Employee already exists)
+```
+
+**Skill Execution**:
+```bash
+/{{skill-command}} Employee --all-phases
+```
+
+**What Happens**:
+1. Skill detects existing Employee entity
+2. Prompts user: "Employee entity already exists. Overwrite? (yes/no)"
+3. If yes: Backs up existing files to `.backup/` and proceeds
+4. If no: Aborts safely with message
+
+---
+
+## Quality Gates
+
+### Pre-Execution Validation
+
+**Checks performed before execution**:
+
+1. **{{Check 1}}**: {{Description}}
+   - Command: `{{validation-command}}`
+   - Expected: {{Expected result}}
+   - On failure: {{Action}}
+
+2. **{{Check 2}}**: {{Description}}
+   - Command: `{{validation-command}}`
+   - Expected: {{Expected result}}
+   - On failure: {{Action}}
+
+### Post-Execution Validation
+
+**Checks performed after execution**:
+
+1. **{{Check 1}}**: {{Description}}
+   - Command: `{{validation-command}}`
+   - Expected: {{Expected result}}
+   - On failure: {{Action}}
+
+2. **{{Check 2}}**: {{Description}}
+   - Command: `{{validation-command}}`
+   - Expected: {{Expected result}}
+   - On failure: {{Action}}
+
+**Example**:
+```bash
+# Post-execution validation sequence
+./gradlew :smartadmin-app:compileJava      # Must compile successfully
+./gradlew :smartadmin-app:test --tests ArchitectureTest  # Must pass ArchUnit rules
+./gradlew :smartadmin-app:test --tests *ServiceIntegrationTest  # Must pass integration tests
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution | Prevention |
+|-------|-------|----------|------------|
+| {{Issue 1}} | {{Root cause}} | {{How to fix}} | {{How to prevent}} |
+| {{Issue 2}} | {{Root cause}} | {{How to fix}} | {{How to prevent}} |
+| {{Issue 3}} | {{Root cause}} | {{How to fix}} | {{How to prevent}} |
+
+### Error Messages
+
+#### Error: {{Error Message}}
+
+**Meaning**: {{What this error means}}
+
+**Cause**: {{Why this error occurs}}
+
+**Solution**:
+```bash
+# Step 1: {{Action}}
+{{command}}
+
+# Step 2: {{Action}}
+{{command}}
+
+# Step 3: {{Action}}
+{{command}}
+```
+
+#### Error: {{Error Message}}
+
+{{Repeat for each common error}}
+
+### Debugging Tips
+
+- **Tip 1**: {{Debugging advice}}
+- **Tip 2**: {{Debugging advice}}
+- **Tip 3**: {{Debugging advice}}
+
+---
+
+## References
+
+### Related Skills
+
+- **[{{skill-name-1}}](../{{skill-path-1}}/SKILL.md)** - {{Relationship}}
+- **[{{skill-name-2}}](../{{skill-path-2}}/SKILL.md)** - {{Relationship}}
+
+### Related Rules
+
+- **[{{rule-name-1}}]({{rule-path-1}})** - {{Relevance}}
+- **[{{rule-name-2}}]({{rule-path-2}})** - {{Relevance}}
+
+### Related Patterns
+
+- **[{{pattern-name-1}}]({{pattern-path-1}})** - {{Application}}
+- **[{{pattern-name-2}}]({{pattern-path-2}})** - {{Application}}
+
+### External Documentation
+
+- **{{External Doc 1}}**: {{URL}} - {{Purpose}}
+- **{{External Doc 2}}**: {{URL}} - {{Purpose}}
+
+---
+
+## Version History
+
+### {{VERSION}} ({{YYYY-MM-DD}})
+
+**Type**: {{Major|Minor|Patch}}
+
+**Changes**:
+- ✅ {{Change 1}}
+- ✅ {{Change 2}}
+- 🐛 {{Bug fix 1}}
+- 🐛 {{Bug fix 2}}
+- 📚 {{Documentation update}}
+
+**Breaking Changes**:
+- {{Breaking change 1}} (if any)
+
+**Migration Guide**:
+{{Migration instructions if breaking changes}}
+
+### {{PREVIOUS_VERSION}} ({{YYYY-MM-DD}})
+
+{{Previous version details}}
+
+---
+
+**Document Version**: {{VERSION}}
+**Last Updated**: {{YYYY-MM-DD}}
+**Maintainer**: SmartAdmin Team
+**License**: MIT
+
+---
+
+## TEMPLATE USAGE NOTES
+
+**For Skill Creators**:
+1. Replace all `{{placeholders}}` with actual content
+2. Delete sections marked as {{For X only}} if not applicable
+3. Ensure all examples are realistic and tested
+4. Keep language formal and machine-parseable (for AI agents)
+5. Include ALL edge cases and boundary conditions
+6. Target length: 1500-2000 lines (comprehensive reference)
+7. Validate with AI agents before publishing
+
+**Quality Checklist**:
+- [ ] All {{placeholders}} replaced
+- [ ] All examples tested and verified
+- [ ] Edge cases documented
+- [ ] Error messages listed
+- [ ] Troubleshooting guide complete
+- [ ] References and links valid
+- [ ] Version history updated
+- [ ] Frontmatter metadata accurate
+
+**See Also**:
+- README.md.template (human-friendly quick start)
+- config.yml.template (machine-readable metadata)
+- skill-structure-template/ (complete directory example)

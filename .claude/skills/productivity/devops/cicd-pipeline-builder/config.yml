@@ -1,0 +1,102 @@
+# ====================================================================
+# CI/CD Pipeline Builder - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P2 (Nice-to-have Tools)
+# Category: Infrastructure
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "cicd-pipeline-builder"
+  version: "1.0.0"
+  priority: "P2"
+  type: "atomic"
+  category: "infrastructure"
+  description: "Automate CI/CD pipeline setup for SmartAdmin with GitHub Actions or GitLab CI"
+  ai_description: |
+    Automates CI/CD pipeline configuration for SmartAdmin projects with comprehensive
+    workflows for build, test, quality analysis, and deployment.
+
+    Core capabilities:
+    - GitHub Actions Workflow Generation: Complete CI/CD with matrix builds
+    - GitLab CI Pipeline Configuration: Multi-stage pipelines (build/test/deploy)
+    - Service Container Setup: PostgreSQL, Redis for integration tests
+    - Quality Gate Integration: SpotBugs, PMD, Checkstyle, ArchUnit
+    - Deployment Automation: Dev/Staging/Production environments
+
+    Use when setting up CI/CD, after project initialization, when integration tests
+    need automation, or configuring deployment automation.
+
+  tags:
+    - "cicd"
+    - "github-actions"
+    - "gitlab-ci"
+    - "deployment"
+    - "automation"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "CI/CD"
+    - "GitHub Actions"
+    - "GitLab CI"
+    - "deployment automation"
+    - "quality gates"
+    - "continuous integration"
+
+  patterns:
+    - "set up.*CI"
+    - "create.*pipeline"
+    - "add.*GitHub Actions"
+
+  exclude_keywords:
+    - "remove CI/CD"
+
+execution:
+  type: "single-shot"
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 15
+  quality_gates:
+    run_after_execution: false
+
+dependencies:
+  skills: []
+  required_files: []
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.yml"
+    - "*.yaml"
+  target_directories:
+    - ".github/workflows"
+    - ".gitlab-ci.yml"
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+  post_execution:
+    - check: "yaml_syntax"
+
+compatibility:
+  deprecated: false
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "pipelines_generated"

@@ -1,0 +1,178 @@
+<template>
+  <a-modal
+    v-model:visible="visible"
+    :title="modalTitle"
+    :width="640"
+    :confirm-loading="confirmLoading"
+    @ok="handleSubmit"
+    @cancel="handleCancel"
+  >
+    <a-form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      :label-col="{ span: 6 }"
+      :wrapper-col="{ span: 16 }"
+    >
+      {{#FORM_FIELDS}}
+      <a-form-item label="{{FIELD_LABEL}}" name="{{FIELD_NAME}}">
+        {{#IF_INPUT}}
+        <a-input v-model:value="formData.{{FIELD_NAME}}" placeholder="Enter {{FIELD_LABEL_LOWER}}" />
+        {{/IF_INPUT}}
+        {{#IF_NUMBER}}
+        <a-input-number v-model:value="formData.{{FIELD_NAME}}" placeholder="Enter {{FIELD_LABEL_LOWER}}" style="width: 100%" />
+        {{/IF_NUMBER}}
+        {{#IF_TEXTAREA}}
+        <a-textarea
+          v-model:value="formData.{{FIELD_NAME}}"
+          placeholder="Enter {{FIELD_LABEL_LOWER}}"
+          :rows="4"
+          :maxlength="{{MAX_LENGTH}}"
+          show-count
+        />
+        {{/IF_TEXTAREA}}
+        {{#IF_SELECT}}
+        <a-select v-model:value="formData.{{FIELD_NAME}}" placeholder="Select {{FIELD_LABEL_LOWER}}"{{#IF_MULTIPLE}} mode="multiple"{{/IF_MULTIPLE}}>
+          {{#OPTIONS}}
+          <a-select-option :value="{{VALUE}}">{{LABEL}}</a-select-option>
+          {{/OPTIONS}}
+        </a-select>
+        {{/IF_SELECT}}
+        {{#IF_RADIO}}
+        <a-radio-group v-model:value="formData.{{FIELD_NAME}}">
+          {{#OPTIONS}}
+          <a-radio :value="{{VALUE}}">{{LABEL}}</a-radio>
+          {{/OPTIONS}}
+        </a-radio-group>
+        {{/IF_RADIO}}
+        {{#IF_CHECKBOX}}
+        <a-checkbox-group v-model:value="formData.{{FIELD_NAME}}" :options="{{OPTIONS_VAR}}" />
+        {{/IF_CHECKBOX}}
+        {{#IF_DATE}}
+        <a-date-picker v-model:value="formData.{{FIELD_NAME}}" value-format="YYYY-MM-DD" style="width: 100%" />
+        {{/IF_DATE}}
+        {{#IF_DATETIME}}
+        <a-date-picker v-model:value="formData.{{FIELD_NAME}}" show-time value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
+        {{/IF_DATETIME}}
+        {{#IF_SWITCH}}
+        <a-switch v-model:checked="formData.{{FIELD_NAME}}" />
+        {{/IF_SWITCH}}
+      </a-form-item>
+      {{/FORM_FIELDS}}
+    </a-form>
+  </a-modal>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, computed, watch } from 'vue';
+import { message } from 'ant-design-vue';
+import type { FormInstance, Rule } from 'ant-design-vue/es/form';
+import { {{MODULE_NAME}}Api } from '@/api/{{MODULE_NAME}}-api';
+import type { {{MODULE_CLASS}}VO, {{MODULE_CLASS}}AddForm, {{MODULE_CLASS}}UpdateForm } from '@/types/{{MODULE_NAME}}-types';
+
+// Props
+interface Props {
+  visible: boolean;
+  record?: {{MODULE_CLASS}}VO | null;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  record: null,
+});
+
+// Emits
+const emit = defineEmits<{
+  'update:visible': [value: boolean];
+  success: [];
+}>();
+
+// Form ref
+const formRef = ref<FormInstance>();
+const confirmLoading = ref(false);
+
+// Form data
+const formData = reactive<{{MODULE_CLASS}}AddForm>({
+  {{#FORM_DEFAULT_VALUES}}
+  {{FIELD_NAME}}: {{DEFAULT_VALUE}},
+  {{/FORM_DEFAULT_VALUES}}
+});
+
+// Validation rules
+const rules: Record<string, Rule[]> = {
+  {{#VALIDATION_RULES}}
+  {{FIELD_NAME}}: [
+    {{#RULES}}
+    {{#IF_REQUIRED}}{ required: true, message: '{{MESSAGE}}', trigger: '{{TRIGGER}}' },{{/IF_REQUIRED}}
+    {{#IF_MIN_MAX}}{ min: {{MIN}}, max: {{MAX}}, message: '{{MESSAGE}}', trigger: '{{TRIGGER}}' },{{/IF_MIN_MAX}}
+    {{#IF_PATTERN}}{ pattern: {{PATTERN}}, message: '{{MESSAGE}}', trigger: '{{TRIGGER}}' },{{/IF_PATTERN}}
+    {{#IF_TYPE}}{ type: '{{TYPE}}', message: '{{MESSAGE}}', trigger: '{{TRIGGER}}' },{{/IF_TYPE}}
+    {{/RULES}}
+  ],
+  {{/VALIDATION_RULES}}
+};
+
+// Computed
+const isEdit = computed(() => !!props.record);
+const modalTitle = computed(() => (isEdit.value ? 'Edit {{MODULE_TITLE}}' : 'Add {{MODULE_TITLE}}'));
+
+// Watch record changes
+watch(
+  () => props.record,
+  (newRecord) => {
+    if (newRecord) {
+      Object.assign(formData, {
+        {{#FORM_FIELD_NAMES}}
+        {{FIELD_NAME}}: newRecord.{{FIELD_NAME}},
+        {{/FORM_FIELD_NAMES}}
+      });
+    } else {
+      resetForm();
+    }
+  },
+  { immediate: true }
+);
+
+// Form handlers
+const handleSubmit = async () => {
+  try {
+    await formRef.value?.validate();
+    confirmLoading.value = true;
+
+    let response;
+    if (isEdit.value) {
+      const updateForm: {{MODULE_CLASS}}UpdateForm = {
+        id: props.record!.id,
+        ...formData,
+      };
+      response = await {{MODULE_NAME}}Api.update(updateForm);
+    } else {
+      response = await {{MODULE_NAME}}Api.add(formData);
+    }
+
+    if (response.ok) {
+      message.success(isEdit.value ? 'Updated successfully' : 'Added successfully');
+      emit('success');
+      emit('update:visible', false);
+    } else {
+      message.error(response.msg || 'Operation failed');
+    }
+  } catch (error) {
+    console.error('Submit error:', error);
+  } finally {
+    confirmLoading.value = false;
+  }
+};
+
+const handleCancel = () => {
+  emit('update:visible', false);
+};
+
+const resetForm = () => {
+  formRef.value?.resetFields();
+  Object.assign(formData, {
+    {{#FORM_RESET_VALUES}}
+    {{FIELD_NAME}}: {{RESET_VALUE}},
+    {{/FORM_RESET_VALUES}}
+  });
+};
+</script>

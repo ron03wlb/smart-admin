@@ -1,0 +1,227 @@
+package net.lab1024.sa.support.file.service;
+
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.domain.code.UserErrorCode;
+import net.lab1024.sa.common.core.domain.constant.StringConst;
+import net.lab1024.sa.common.core.domain.request.RequestUser;
+import net.lab1024.sa.common.core.domain.response.PageResult;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.util.SmartStringUtil;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
+import net.lab1024.sa.common.security.service.FileSecurityService;
+import net.lab1024.sa.common.security.service.SecurityConfigProvider;
+import net.lab1024.sa.common.validation.util.SmartEnumUtil;
+import net.lab1024.sa.support.file.constant.FileFolderTypeEnum;
+import net.lab1024.sa.support.file.dao.FileDao;
+import net.lab1024.sa.support.file.domain.entity.FileEntity;
+import net.lab1024.sa.support.file.domain.form.FileQueryForm;
+import net.lab1024.sa.support.file.domain.vo.FileDownloadVO;
+import net.lab1024.sa.support.file.domain.vo.FileUploadVO;
+import net.lab1024.sa.support.file.domain.vo.FileVO;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ * 文件服务
+ *
+ * @author 1024创新实验室: 罗伊
+ * @since 2019年10月11日 15:34:47 Copyright <a href="https://1024lab.net">1024创新实验室</a>
+ */
+@Service
+@RequiredArgsConstructor
+public class FileService {
+
+  /** 文件名最大长度 */
+  private static final int FILE_NAME_MAX_LENGTH = 100;
+
+  private final IFileStorageService fileStorageService;
+
+  private final FileDao fileDao;
+
+  private final FileSecurityService fileSecurityService;
+
+  private final SecurityConfigProvider securityConfigProvider;
+
+  /**
+   * 文件上传服务
+   *
+   * @param file
+   * @param folderType 文件夹类型
+   * @return
+   */
+  public ResponseDTO<FileUploadVO> fileUpload(
+      MultipartFile file, Integer folderType, RequestUser requestUser) {
+    FileFolderTypeEnum folderTypeEnum =
+        SmartEnumUtil.getEnumByValue(folderType, FileFolderTypeEnum.class);
+    if (null == folderTypeEnum) {
+      return ResponseDTO.userErrorParam("文件夹错误");
+    }
+
+    if (null == file || file.getSize() == 0) {
+      return ResponseDTO.userErrorParam("上传文件不能为空");
+    }
+
+    // 校验文件名称
+    String originalFilename = file.getOriginalFilename();
+    if (StringUtils.isBlank(originalFilename)) {
+      return ResponseDTO.userErrorParam("上传文件名称不能为空");
+    }
+
+    if (originalFilename.length() > FILE_NAME_MAX_LENGTH) {
+      return ResponseDTO.userErrorParam("文件名称最大长度为：" + FILE_NAME_MAX_LENGTH);
+    }
+
+    // 校验文件大小以及安全性
+    ResponseDTO<String> validateFile = checkFileSecurity(file);
+    if (!validateFile.getOk()) {
+      return ResponseDTO.error(validateFile);
+    }
+
+    // 进行上传
+    ResponseDTO<FileUploadVO> response =
+        fileStorageService.upload(file, folderTypeEnum.getFolder());
+    if (!response.getOk()) {
+      return response;
+    }
+
+    // 上传成功 保存记录数据库
+    FileUploadVO uploadVO = response.getData();
+    FileEntity fileEntity = new FileEntity();
+    fileEntity.setFolderType(folderTypeEnum.getValue());
+    fileEntity.setFileName(originalFilename);
+    fileEntity.setFileSize(file.getSize());
+    fileEntity.setFileKey(uploadVO.getFileKey());
+    fileEntity.setFileType(uploadVO.getFileType());
+    // 使用 Vavr Option 安全設置創建者信息，避免 NPE
+    if (requestUser != null) {
+      fileEntity.setCreatorId(requestUser.getUserId());
+      fileEntity.setCreatorName(requestUser.getUserName());
+      // 安全處理 getUserType() 可能返回 null 的情況
+      fileEntity.setCreatorUserType(
+          io.vavr.control.Option.of(requestUser.getUserType())
+              .map(userType -> userType.getValue())
+              .getOrNull());
+    }
+    fileDao.insert(fileEntity);
+
+    // 将fileId 返回给前端
+    uploadVO.setFileId(fileEntity.getFileId());
+
+    return response;
+  }
+
+  /**
+   * 批量获取文件信息
+   *
+   * @param fileKeyList
+   * @return
+   */
+  public List<FileVO> getFileList(List<String> fileKeyList) {
+    if (CollectionUtils.isEmpty(fileKeyList)) {
+      return Lists.newArrayList();
+    }
+
+    // 查询数据库，并获取 file url
+    java.util.Set<String> fileKeySet = new HashSet<>(fileKeyList);
+    Map<String, FileVO> fileMap =
+        fileDao.selectByFileKeyList(fileKeySet).stream()
+            .collect(Collectors.toMap(FileVO::getFileKey, Function.identity()));
+
+    for (FileVO fileVO : fileMap.values()) {
+      ResponseDTO<String> fileUrlResponse = fileStorageService.getFileUrl(fileVO.getFileKey());
+      if (fileUrlResponse.getOk()) {
+        fileVO.setFileUrl(fileUrlResponse.getData());
+      }
+    }
+
+    // 返回结果
+    List<FileVO> result = Lists.newArrayListWithCapacity(fileKeyList.size());
+    for (String fileKey : fileKeyList) {
+      FileVO fileVO = fileMap.get(fileKey);
+      if (fileVO != null) {
+        result.add(fileVO);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * 根据文件绝对路径 获取文件URL 支持单个 key 逗号分隔的形式
+   *
+   * @param fileKeys
+   * @return
+   */
+  public ResponseDTO<String> getFileUrl(String fileKeys) {
+    if (StringUtils.isBlank(fileKeys)) {
+      return ResponseDTO.error(UserErrorCode.PARAM_ERROR);
+    }
+
+    List<String> fileKeyArray = StrUtil.split(fileKeys, StringConst.SEPARATOR);
+    List<String> fileUrlList = Lists.newArrayListWithCapacity(fileKeyArray.size());
+    for (String fileKey : fileKeyArray) {
+      ResponseDTO<String> fileUrlResponse = fileStorageService.getFileUrl(fileKey);
+      if (fileUrlResponse.getOk()) {
+        fileUrlList.add(fileUrlResponse.getData());
+      }
+    }
+    return ResponseDTO.ok(SmartStringUtil.join(StringConst.SEPARATOR, fileUrlList));
+  }
+
+  /** 根据文件服务类型 和 FileKey 下载文件 */
+  public ResponseDTO<FileDownloadVO> getDownloadFile(String fileKey, String userAgent) {
+    FileVO fileVO = fileDao.getByFileKey(fileKey);
+    if (fileVO == null) {
+      return ResponseDTO.userErrorParam("文件不存在");
+    }
+
+    // 根据文件服务类 获取对应文件服务 查询 url
+    ResponseDTO<FileDownloadVO> download = fileStorageService.download(fileKey);
+    if (download.getOk()) {
+      download.getData().getMetadata().setFileName(fileVO.getFileName());
+    }
+    return download;
+  }
+
+  /** 分页查询 */
+  public PageResult<FileVO> queryPage(FileQueryForm queryForm) {
+    Page<?> page = SmartPageUtil.convert2PageQuery(queryForm);
+    List<FileVO> list = fileDao.queryPage(page, queryForm);
+    return SmartPageUtil.convert2PageResult(page, list);
+  }
+
+  /**
+   * 校验文件安全性
+   *
+   * @param file 上传的文件
+   * @return 校验结果
+   */
+  private ResponseDTO<String> checkFileSecurity(MultipartFile file) {
+    // 检验文件大小
+    io.vavr.control.Option<String> sizeError =
+        fileSecurityService.checkFileSize(file, securityConfigProvider.getMaxUploadFileSizeMb());
+    if (sizeError.isDefined()) {
+      return ResponseDTO.userErrorParam(sizeError.get());
+    }
+
+    // 文件类型安全检测
+    if (securityConfigProvider.isFileDetectEnabled()) {
+      io.vavr.control.Option<String> typeError = fileSecurityService.checkFileType(file);
+      if (typeError.isDefined()) {
+        return ResponseDTO.userErrorParam(typeError.get());
+      }
+    }
+
+    return ResponseDTO.ok();
+  }
+}

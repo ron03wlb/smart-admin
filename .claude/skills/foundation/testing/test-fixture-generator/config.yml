@@ -1,0 +1,143 @@
+# ====================================================================
+# Test Fixture Generator - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Testing
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "test-fixture-generator"
+  version: "1.0.0"
+  priority: "P0"
+  type: "atomic"
+  category: "testing"
+  description: "Generate reusable test fixture builders for complex domain objects (Entity, Form, VO)"
+  ai_description: |
+    Generates reusable test fixture builders following SmartAdmin's EmployeeTestFixture
+    pattern for integration tests.
+
+    Core pattern components:
+    - Uniqueness Counter: AtomicInteger for sequential IDs to avoid constraint violations
+    - Static Factory Methods: No constructors, only static methods
+    - Default Builder: Creates entity/form/VO with all required fields populated
+    - Override Variants: Parameter-based customization for specific test scenarios
+    - Related Entity Factories: Create FK dependencies (e.g., Department for Employee)
+    - Utility Helpers: resetCounter(), uniquePhone(), uniqueEmail()
+
+    Benefits:
+    - Eliminates inline test data boilerplate (10+ lines → 1 line)
+    - Guarantees uniqueness via counters (no constraint violations)
+    - Provides fluent API for overrides
+    - Integrates with @Transactional test rollback
+    - Supports complex object graphs (related entities)
+
+    Use when writing integration tests that need test data builders, or when
+    agent creates inline test data setup instead of reusable fixture class.
+
+  tags:
+    - "test-fixture"
+    - "test-data-builder"
+    - "integration-testing"
+    - "testing"
+    - "builder-pattern"
+    - "test-utilities"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "test fixture"
+    - "test data builder"
+    - "generate fixture"
+    - "create test data"
+    - "integration test setup"
+    - "EmployeeTestFixture"
+    - "AtomicInteger"
+    - "unique test values"
+
+  patterns:
+    - "generate\\s+test\\s+fixture\\s+for\\s+(\\w+)"
+    - "create\\s+test\\s+data\\s+builder\\s+for\\s+(\\w+)"
+    - "create\\s+(\\w+)TestFixture"
+
+  exclude_keywords:
+    - "delete test fixture"
+    - "remove fixture"
+
+execution:
+  type: "single-shot"
+
+  timeout:
+    per_phase_minutes: 10
+    total_minutes: 10
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "compilation"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java"
+
+  tools:
+    - name: "gradle"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*TestFixture.java"
+
+  target_directories:
+    - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java"
+
+  templates: {}
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "entity_exists"
+      rule: "Target entity class must exist"
+
+  post_execution:
+    - check: "compilation"
+      description: "Verify test fixture code compiles successfully"
+      command: "./gradlew :smartadmin-app:compileTestJava"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: null
+
+  external_links:
+    - title: "SmartAdmin Testing Strategy"
+      url: "../../../docs/testing/testing-strategy.md"
+
+    - title: "Builder Pattern (Gang of Four)"
+      url: "https://en.wikipedia.org/wiki/Builder_pattern"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "fixtures_generated"

@@ -1,0 +1,37 @@
+# ====================================================================
+# Scheduled Task Manager - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P2 (Nice-to-have Tools)
+# Category: Infrastructure
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "scheduled-task-manager"
+  version: "1.0.0"
+  priority: "P2"
+  type: "atomic"
+  category: "infrastructure"
+  description: "Generate XXL-Job/Snail-Job integration for scheduled tasks, cron jobs, and batch processing"
+  tags: ["scheduled-tasks", "xxl-job", "snail-job", "cron", "batch-processing"]
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords: ["scheduled task", "cron job", "XXL-Job", "Snail-Job", "batch processing"]
+  patterns: ["create.*scheduled.*task", "add.*cron.*job"]
+  exclude_keywords: ["remove scheduled task"]
+
+execution:
+  type: "single-shot"
+  timeout: { per_phase_minutes: 20, total_minutes: 20 }
+  quality_gates: { run_after_execution: true }
+
+dependencies: { skills: [], required_files: [], tools: [] }
+output: { generates: ["*.java"], target_directories: ["smart-admin-api-java21-springboot3/smartadmin-app/src/main/java"], templates: {} }
+validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [{ check: "compilation" }] }
+compatibility: { deprecated: false }
+documentation: { skill_md: "SKILL.md", readme: null }
+monitoring: { track_usage: true, log_executions: true, metrics: ["execution_time", "success_rate"] }

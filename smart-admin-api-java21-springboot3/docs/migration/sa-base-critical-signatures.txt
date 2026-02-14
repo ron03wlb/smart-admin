@@ -1,0 +1,7 @@
+sa-base/foundation/core/src/main/java/net/lab1024/sa/base/core/util/SmartRequestUtil.java:import net.lab1024.sa.common.core.domain.RequestUser;
+sa-base/foundation/core/src/main/java/net/lab1024/sa/base/core/util/SmartPageUtil.java:import net.lab1024.sa.common.core.domain.PageParam;
+sa-base/foundation/core/src/main/java/net/lab1024/sa/base/core/util/SmartPageUtil.java:import net.lab1024.sa.common.core.domain.PageResult;
+sa-base/infrastructure/mybatis/src/main/java/net/lab1024/sa/base/mybatis/util/SmartPageUtil.java:import net.lab1024.sa.common.core.domain.PageParam;
+sa-base/infrastructure/mybatis/src/main/java/net/lab1024/sa/base/mybatis/util/SmartPageUtil.java:import net.lab1024.sa.common.core.domain.PageResult;
+sa-base/infrastructure/web/src/main/java/net/lab1024/sa/base/web/util/SmartRequestUtil.java:import net.lab1024.sa.common.core.domain.RequestUser;
+sa-base/infrastructure/web/src/main/java/net/lab1024/sa/base/web/util/SmartResponseUtil.java:import net.lab1024.sa.common.core.domain.ResponseDTO;

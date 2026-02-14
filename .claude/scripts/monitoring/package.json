@@ -1,0 +1,23 @@
+{
+  "name": "smartadmin-skills-monitoring",
+  "version": "1.0.0",
+  "description": "SmartAdmin Skills Usage Monitoring System - Phase 1 MVP",
+  "main": "log-skill-usage.js",
+  "scripts": {
+    "log": "node log-skill-usage.js",
+    "aggregate": "node aggregate-metrics.js",
+    "report": "node generate-weekly-report.js",
+    "test": "node log-skill-usage.js --event=start --skill=test --trigger='test trigger' && node aggregate-metrics.js"
+  },
+  "keywords": [
+    "monitoring",
+    "skills",
+    "metrics",
+    "smartadmin"
+  ],
+  "author": "SmartAdmin Team",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^9.0.1"
+  }
+}

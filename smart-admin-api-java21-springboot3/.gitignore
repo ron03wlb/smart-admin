@@ -1,0 +1,46 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle Wrapper
+# Keep the wrapper jar but ignore other wrapper files if regenerating
+# gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Build outputs
+bin/
+target/
+
+# ===== Project-specific temporary files =====
+# Temporary output files (analysis and comparison)
+compile_output.txt
+dependencies-before*.txt
+pmd-output.txt
+checkstyle-output.txt
+spotbugs-output.txt
+
+# Malformed log directories (Spring placeholder not resolved)
+${spring:project.log-directory}/
+${*}/

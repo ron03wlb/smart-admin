@@ -1,0 +1,56 @@
+name: Mermaid Syntax Check
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**/*.md'
+      - '.claude/skills/**/*.md'
+  push:
+    branches:
+      - master
+      - feature/**
+    paths:
+      - 'docs/**/*.md'
+      - '.claude/skills/**/*.md'
+
+jobs:
+  mermaid-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check stateDiagram-v2 <br/> tags (SmartAdmin Convention)
+        run: |
+          echo "檢查 stateDiagram-v2 語法（SmartAdmin 專案標準）..."
+          echo ""
+          echo "規則："
+          echo "  ✅ 一般 Mermaid 圖表: 使用 <br/> 換行（專案標準）"
+          echo "  ❌ stateDiagram-v2: 不可使用 <br/>（Mermaid 限制）"
+          echo ""
+
+          # 使用 detect-statediagram-br.sh 進行專業檢測
+          if [ -f "scripts/detect-statediagram-br.sh" ]; then
+            bash scripts/detect-statediagram-br.sh docs/iGaming
+          else
+            echo "⚠️ 警告: 未找到 detect-statediagram-br.sh，跳過檢查"
+            exit 0
+          fi
+
+      - name: Validate Mermaid syntax with mmdc (optional)
+        if: false  # 可選：啟用此步驟需要安裝 Mermaid CLI
+        run: |
+          npm install -g @mermaid-js/mermaid-cli
+          echo "使用 Mermaid CLI 驗證圖表語法..."
+
+          # 找出所有 Mermaid 檔案並驗證
+          find docs .claude/skills -name "*.md" -type f | while read -r file; do
+            if grep -q '```mermaid' "$file"; then
+              echo "驗證: $file"
+              # 提取 Mermaid 區塊並驗證（需要實現提取邏輯）
+            fi
+          done

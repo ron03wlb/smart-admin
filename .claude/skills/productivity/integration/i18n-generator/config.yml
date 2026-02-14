@@ -1,0 +1,37 @@
+# ====================================================================
+# i18n Generator - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P2 (Nice-to-have Tools)
+# Category: Infrastructure
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "i18n-generator"
+  version: "1.0.0"
+  priority: "P2"
+  type: "atomic"
+  category: "infrastructure"
+  description: "Generate internationalization (i18n) support for SmartAdmin applications (backend MessageSource + frontend Vue I18n)"
+  tags: ["i18n", "internationalization", "multi-language", "locale"]
+  author: "SmartAdmin Team"
+  last_updated: "2026-01-29"
+  status: "stable"
+
+triggers:
+  keywords: ["i18n", "internationalization", "multi-language", "translation", "locale"]
+  patterns: ["add.*i18n", "implement.*internationalization"]
+  exclude_keywords: ["remove i18n"]
+
+execution:
+  type: "single-shot"
+  timeout: { per_phase_minutes: 20, total_minutes: 20 }
+  quality_gates: { run_after_execution: true }
+
+dependencies: { skills: [], required_files: [], tools: [] }
+output: { generates: ["*.java", "*.json"], target_directories: ["smart-admin-api-java21-springboot3/smartadmin-app/src/main/resources", "smart-admin-web/src/locales"], templates: {} }
+validation: { pre_execution: [{ check: "codebase_structure" }], post_execution: [{ check: "compilation" }] }
+compatibility: { deprecated: false }
+documentation: { skill_md: "SKILL.md", readme: null }
+monitoring: { track_usage: true, log_executions: true, metrics: ["execution_time", "success_rate"] }

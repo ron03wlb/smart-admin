@@ -1,0 +1,254 @@
+name: SmartAdmin CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '21'
+  GRADLE_VERSION: '8.11'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: smartadmin_test
+          POSTGRES_USER: smartadmin
+          POSTGRES_PASSWORD: smartadmin123
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better caching
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test --no-daemon --stacktrace
+        working-directory: smart-admin-api-java21-springboot3
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g -Dorg.gradle.daemon=false"
+
+      - name: Run Unit Tests
+        run: ./gradlew :smartadmin-app:test -x integrationTest --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+      - name: Run Integration Tests
+        run: ./gradlew :smartadmin-app:integrationTest --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          DATABASE_URL: jdbc:postgresql://localhost:5432/smartadmin_test
+          DATABASE_USERNAME: smartadmin
+          DATABASE_PASSWORD: smartadmin123
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+      - name: Run Architecture Tests
+        run: ./gradlew :smartadmin-app:test --tests "*ArchitectureTest" --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Generate Test Report
+        if: always()
+        run: ./gradlew :smartadmin-app:testReport --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/tests/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/test-results/
+          retention-days: 30
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Run SpotBugs
+        run: ./gradlew :smartadmin-app:spotbugsMain --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+        continue-on-error: true
+
+      - name: Run PMD
+        run: ./gradlew :smartadmin-app:pmdMain --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+        continue-on-error: true
+
+      - name: Run Checkstyle
+        run: ./gradlew :smartadmin-app:checkstyleMain --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+        continue-on-error: true
+
+      - name: Upload Quality Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/spotbugs/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/pmd/
+            smart-admin-api-java21-springboot3/smartadmin-app/build/reports/checkstyle/
+          retention-days: 30
+
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [build-and-test, code-quality]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build JAR
+        run: ./gradlew :smartadmin-app:bootJar --no-daemon
+        working-directory: smart-admin-api-java21-springboot3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: smartadmin/api
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: smart-admin-api-java21-springboot3
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: build-docker
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: development
+      url: https://dev.smartadmin.example.com
+
+    steps:
+      - name: Deploy to Dev Environment
+        run: |
+          echo "Deploying to development environment..."
+          # Add your deployment commands here
+          # Example: kubectl set image deployment/smartadmin-api smartadmin-api=smartadmin/api:develop-${{ github.sha }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-docker
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment:
+      name: staging
+      url: https://staging.smartadmin.example.com
+
+    steps:
+      - name: Deploy to Staging Environment
+        run: |
+          echo "Deploying to staging environment..."
+          # Add your deployment commands here
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment:
+      name: production
+      url: https://smartadmin.example.com
+
+    steps:
+      - name: Deploy to Production Environment
+        run: |
+          echo "Deploying to production environment..."
+          # Add your deployment commands here
+          # Typically requires manual approval in GitHub Actions
