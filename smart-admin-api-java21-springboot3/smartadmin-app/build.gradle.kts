@@ -15,15 +15,23 @@ val activeEnv: String by lazy {
 
 dependencies {
     // ==================== Starter 依賴 ====================
-    implementation(project(":smartadmin-starter:smartadmin-starter-all")) {
-        // Temporarily exclude LiteFlow - requires additional SQL database configuration
-        exclude(group = "net.lab1024", module = "smartadmin-support-liteflow")
-    }
+    implementation(project(":smartadmin-starter:smartadmin-starter-all"))
 
     // ==================== Business Modules ====================
     implementation(project(":smartadmin-modules:smartadmin-system"))
     implementation(project(":smartadmin-modules:smartadmin-business"))
     implementation(project(":smartadmin-modules:smartadmin-oa"))
+
+    // ==================== iGaming Modules ====================
+    implementation(project(":smartadmin-igaming:smartadmin-igaming-wallet"))
+    implementation(project(":smartadmin-igaming:smartadmin-igaming-player"))
+    implementation(project(":smartadmin-igaming:smartadmin-igaming-game"))
+    implementation(project(":smartadmin-igaming:smartadmin-igaming-activity"))
+    implementation(project(":smartadmin-igaming:smartadmin-igaming-risk"))
+    implementation(project(":smartadmin-igaming:smartadmin-igaming-agent"))
+
+    // ==================== Resilience4j ====================
+    implementation(libs.resilience4j.spring.boot3)
 
     // ==================== API Contract Layer (Optional) ====================
     // 如果需要暴露 API 契約給外部調用（例如微服務化準備）
@@ -34,6 +42,10 @@ dependencies {
     // Lombok annotation processor
     annotationProcessor(libs.lombok)
 
+    // ==================== Database Migration ====================
+    runtimeOnly(libs.flyway.core)
+    runtimeOnly(libs.flyway.database.postgresql)
+
     // ==================== Testing Dependencies ====================
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.archunit.junit5)
@@ -41,10 +53,15 @@ dependencies {
     // H2 in-memory database for tests
     testRuntimeOnly("com.h2database:h2")
 
-    // Testcontainers for integration tests (Redis, PostgreSQL)
+    // Testcontainers for integration tests (PostgreSQL, Kafka, Redis)
     testImplementation(platform(libs.testcontainers.bom))
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.kafka)
+
+    // Async assertion helper for Kafka consumer verification
+    testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
 tasks {

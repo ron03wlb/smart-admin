@@ -52,6 +52,7 @@ awsSdkS3 = "2.31.78"
 
 # Workflow & Rules
 liteflow = "2.15.3"
+resilience4j = "2.2.0"
 
 # Other
 smartdb = "1.2.0"
@@ -95,11 +96,16 @@ spring-security-crypto = { module = "org.springframework.security:spring-securit
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 p6spy = { module = "p6spy:p6spy", version.ref = "p6spy" }
 
+# Database Migration
+flyway-core = { module = "org.flywaydb:flyway-core" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+
 # Testing - Testcontainers
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
 testcontainers = { module = "org.testcontainers:testcontainers" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
+testcontainers-kafka = { module = "org.testcontainers:kafka" }
 
 # MyBatis-Plus
 mybatis-plus-spring-boot-starter = { module = "com.baomidou:mybatis-plus-spring-boot3-starter" }
@@ -145,6 +151,9 @@ commons-pool2 = { module = "org.apache.commons:commons-pool2" }
 liteflow-spring-boot-starter = { module = "com.yomahub:liteflow-spring-boot-starter", version.ref = "liteflow" }
 liteflow-script-qlexpress = { module = "com.yomahub:liteflow-script-qlexpress", version.ref = "liteflow" }
 liteflow-rule-sql = { module = "com.yomahub:liteflow-rule-sql", version.ref = "liteflow" }
+
+# Resilience4j
+resilience4j-spring-boot3 = { module = "io.github.resilience4j:resilience4j-spring-boot3", version.ref = "resilience4j" }
 
 # Template Engines
 velocity-engine-core = { module = "org.apache.velocity:velocity-engine-core", version.ref = "velocity" }
