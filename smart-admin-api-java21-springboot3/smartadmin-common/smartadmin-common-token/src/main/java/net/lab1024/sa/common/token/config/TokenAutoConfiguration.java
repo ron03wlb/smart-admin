@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
  * @since 2026-01-21
  */
 @AutoConfiguration
-@Import({TokenConfig.class})
+@Import({TokenConfig.class, StpLogicConfig.class})
 public class TokenAutoConfiguration {
   // AutoConfiguration marker class
 }

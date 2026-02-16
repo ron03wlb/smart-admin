@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +17,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MybatisPlusFillHandler implements MetaObjectHandler {
 
+  public static final String TENANT_ID = "tenantId";
+
   public static final String CREATE_TIME = "createTime";
 
   public static final String UPDATE_TIME = "updateTime";
 
   @Override
   public void insertFill(MetaObject metaObject) {
+    if (metaObject.hasSetter(TENANT_ID)) {
+      Long tenantId = TenantContext.getTenantId();
+      if (tenantId != null) {
+        this.fillStrategy(metaObject, TENANT_ID, tenantId);
+      }
+    }
     if (metaObject.hasSetter(CREATE_TIME)) {
       this.fillStrategy(metaObject, CREATE_TIME, OffsetDateTime.now(ZoneOffset.UTC));
     }

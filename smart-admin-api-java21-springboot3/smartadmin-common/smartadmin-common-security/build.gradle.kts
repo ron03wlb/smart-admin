@@ -23,6 +23,9 @@ dependencies {
     // Spring Web (for MultipartFile) - compileOnly as consumer provides it
     compileOnly("org.springframework.boot:spring-boot-starter-web")
 
+    // MyBatis BaseTypeHandler (compileOnly — consumer provides at runtime)
+    compileOnly(libs.mybatis.plus.spring.boot.starter)
+
     // Spring Security Crypto (for Argon2 password encoding)
     api("org.springframework.security:spring-security-crypto")
 

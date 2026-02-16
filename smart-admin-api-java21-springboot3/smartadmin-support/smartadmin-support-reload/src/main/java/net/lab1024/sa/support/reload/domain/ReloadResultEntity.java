@@ -35,4 +35,7 @@ public class ReloadResultEntity {
 
   /** 创建时间 */
   private OffsetDateTime createTime;
+
+  /** 租户ID */
+  private Long tenantId;
 }

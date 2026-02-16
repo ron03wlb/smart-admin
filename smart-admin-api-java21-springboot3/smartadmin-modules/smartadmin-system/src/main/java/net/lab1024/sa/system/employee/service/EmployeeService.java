@@ -1,6 +1,5 @@
 package net.lab1024.sa.system.employee.service;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
+import net.lab1024.sa.common.token.admin.StpAdminUtil;
 import net.lab1024.sa.support.securityprotect.service.SecurityPasswordService;
 import net.lab1024.sa.system.department.dao.DepartmentDao;
 import net.lab1024.sa.system.department.domain.entity.DepartmentEntity;
@@ -299,7 +299,7 @@ public class EmployeeService {
     // 如果原本是啟用狀態（false），現在變成禁用（true），需要強制退出登錄
     if (!employeeEntity.getDisabledFlag()) {
       // 强制退出登录
-      StpUtil.logout(UserTypeEnum.ADMIN_EMPLOYEE.getValue() + StringConst.COLON + employeeId);
+      StpAdminUtil.logout(UserTypeEnum.ADMIN_EMPLOYEE.getValue() + StringConst.COLON + employeeId);
     }
 
     return ResponseDTO.ok();
@@ -329,7 +329,7 @@ public class EmployeeService {
 
     for (Long employeeId : employeeIdList) {
       // 强制退出登录
-      StpUtil.logout(UserTypeEnum.ADMIN_EMPLOYEE.getValue() + StringConst.COLON + employeeId);
+      StpAdminUtil.logout(UserTypeEnum.ADMIN_EMPLOYEE.getValue() + StringConst.COLON + employeeId);
     }
     return ResponseDTO.ok();
   }

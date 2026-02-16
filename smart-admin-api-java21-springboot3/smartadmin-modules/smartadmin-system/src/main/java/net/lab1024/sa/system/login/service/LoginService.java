@@ -1,7 +1,6 @@
 package net.lab1024.sa.system.login.service;
 
 import cn.dev33.satoken.stp.StpInterface;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -32,9 +31,12 @@ import net.lab1024.sa.common.core.domain.constant.StringConst;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.domain.request.RequestUser;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.core.util.SmartStringUtil;
 import net.lab1024.sa.common.ipgeo.util.IpGeolocationUtil;
+import net.lab1024.sa.common.token.admin.StpAdminUtil;
+import net.lab1024.sa.common.token.constant.SaTokenSessionConst;
 import net.lab1024.sa.common.validation.util.SmartEnumUtil;
 import net.lab1024.sa.support.config.ConfigKeyEnum;
 import net.lab1024.sa.support.config.ConfigService;
@@ -177,7 +179,8 @@ public class LoginService implements StpInterface {
               + StringConst.COLON
               + employeeEntity.getEmployeeId();
       // 万能密码登录只能登录30分钟
-      StpUtil.login(saTokenLoginId, 1800);
+      StpAdminUtil.login(saTokenLoginId, 1800);
+      bindTenantToSession();
 
     } else {
 
@@ -212,13 +215,21 @@ public class LoginService implements StpInterface {
             : ResponseDTO.error(UserErrorCode.LOGIN_FAIL_WILL_LOCK, msg);
       }
 
+      // Lazy migration: upgrade password hash if using old Argon2 params (D10)
+      if (protectPasswordService.needsPasswordHashUpgrade(employeeEntity.getLoginPwd())) {
+        String upgradedHash = protectPasswordService.getEncryptPwd(saltPassword);
+        employeeDao.updatePassword(employeeEntity.getEmployeeId(), upgradedHash);
+        log.info("Password hash upgraded for employee: {}", employeeEntity.getEmployeeId());
+      }
+
       String saTokenLoginId =
           UserTypeEnum.ADMIN_EMPLOYEE.getValue()
               + StringConst.COLON
               + employeeEntity.getEmployeeId();
 
       // 登录
-      StpUtil.login(saTokenLoginId, String.valueOf(loginDeviceEnum.getDesc()));
+      StpAdminUtil.login(saTokenLoginId, String.valueOf(loginDeviceEnum.getDesc()));
+      bindTenantToSession();
 
       // 移除邮箱验证码
       deleteEmailCode(employeeEntity.getEmployeeId());
@@ -232,7 +243,7 @@ public class LoginService implements StpInterface {
         employeeEntity.getEmployeeId(), UserTypeEnum.ADMIN_EMPLOYEE);
 
     // 获取登录结果信息
-    String token = StpUtil.getTokenValue();
+    String token = StpAdminUtil.getTokenValue();
     LoginResultVO loginResultVO = getLoginResult(requestEmployee, token);
 
     // 保存登录记录
@@ -287,7 +298,7 @@ public class LoginService implements StpInterface {
     loginResultVO.setNeedUpdatePwdFlag(needChangePasswordFlag);
 
     // 万能密码登录，则不需要设置强制修改密码
-    String loginIdByToken = (String) StpUtil.getLoginIdByToken(token);
+    String loginIdByToken = (String) StpAdminUtil.getLoginIdByToken(token);
     if (loginIdByToken != null && loginIdByToken.startsWith(SUPER_PASSWORD_LOGIN_ID_PREFIX)) {
       loginResultVO.setNeedUpdatePwdFlag(false);
     }
@@ -400,7 +411,7 @@ public class LoginService implements StpInterface {
   public ResponseDTO<String> logout(RequestUser requestUser) {
 
     // sa token 登出
-    StpUtil.logout();
+    StpAdminUtil.logout();
 
     // 清除用户登录信息缓存和权限信息
     this.clearLoginEmployeeCache(requestUser.getUserId());
@@ -446,6 +457,11 @@ public class LoginService implements StpInterface {
 
   @Override
   public List<String> getPermissionList(Object loginId, String loginType) {
+    // Player permissions handled by PlayerLoginService (future iGaming phase)
+    if ("player".equals(loginType)) {
+      return Collections.emptyList();
+    }
+
     Long employeeId = this.getEmployeeIdByLoginId((String) loginId);
     if (employeeId == null) {
       return Collections.emptyList();
@@ -457,6 +473,10 @@ public class LoginService implements StpInterface {
 
   @Override
   public List<String> getRoleList(Object loginId, String loginType) {
+    if ("player".equals(loginType)) {
+      return Collections.emptyList();
+    }
+
     Long employeeId = this.getEmployeeIdByLoginId((String) loginId);
     if (employeeId == null) {
       return Collections.emptyList();
@@ -588,6 +608,18 @@ public class LoginService implements StpInterface {
   public void clearLoginEmployeeCache(Long employeeId) {
     loginManager.clearUserPermission(employeeId);
     loginManager.clearUserLoginInfo(employeeId);
+  }
+
+  /** Bind tenantId and timezone from TenantContext to Sa-Token session */
+  private void bindTenantToSession() {
+    Long currentTenantId = TenantContext.getTenantId();
+    if (currentTenantId != null) {
+      StpAdminUtil.getSession().set(SaTokenSessionConst.TENANT_ID, currentTenantId);
+      String tz = TenantContext.getTimezone();
+      if (tz != null) {
+        StpAdminUtil.getSession().set(SaTokenSessionConst.TIMEZONE, tz);
+      }
+    }
   }
 
   /** 根据角色id集合，查询其所有的菜单权限 */

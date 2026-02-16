@@ -14,6 +14,11 @@ dependencies {
     // Spring Kafka (version managed by Spring Boot BOM)
     api("org.springframework.kafka:spring-kafka")
 
+    // Domain Event Infrastructure
+    api(project(":smartadmin-common:smartadmin-common-json"))   // JsonUtil for event serialization
+    api(project(":smartadmin-common:smartadmin-common-redis"))  // StringRedisTemplate + RedissonClient
+    api("org.springframework:spring-jdbc")                      // JdbcTemplate for idempotent Layer 2
+
     // Vavr (for Option)
     api("io.vavr:vavr")
 

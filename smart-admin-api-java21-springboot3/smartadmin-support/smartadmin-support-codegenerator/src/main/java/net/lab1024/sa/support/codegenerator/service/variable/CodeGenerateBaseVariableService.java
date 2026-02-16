@@ -25,7 +25,7 @@ public abstract class CodeGenerateBaseVariableService {
 
   private static final String BIG_DECIMAL = "BigDecimal";
   private static final String LOCAL_DATE = "LocalDate";
-  private static final String LOCAL_DATE_TIME = "LocalDateTime";
+  private static final String OFFSET_DATE_TIME = "OffsetDateTime";
 
   public abstract Map<String, Object> getInjectVariablesMap(CodeGeneratorConfigForm form);
 
@@ -168,8 +168,8 @@ public abstract class CodeGenerateBaseVariableService {
       return IMPORT_PREFIX + "java.math.BigDecimal;";
     } else if (LOCAL_DATE.equals(javaType)) {
       return IMPORT_PREFIX + "java.time.LocalDate;";
-    } else if (LOCAL_DATE_TIME.equals(javaType)) {
-      return IMPORT_PREFIX + "java.time.LocalDateTime;";
+    } else if (OFFSET_DATE_TIME.equals(javaType)) {
+      return IMPORT_PREFIX + "java.time.OffsetDateTime;";
     } else {
 
       return null;

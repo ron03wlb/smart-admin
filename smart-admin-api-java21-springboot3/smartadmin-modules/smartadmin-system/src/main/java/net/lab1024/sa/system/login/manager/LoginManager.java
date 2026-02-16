@@ -18,6 +18,7 @@ import net.lab1024.sa.common.core.domain.UserPermission;
 import net.lab1024.sa.common.core.domain.constant.StringConst;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.support.file.service.IFileStorageService;
 import net.lab1024.sa.system.department.dao.DepartmentDao;
@@ -86,6 +87,7 @@ public class LoginManager {
     // 基础信息
     RequestEmployee requestEmployee = SmartBeanUtil.copy(employeeEntity, RequestEmployee.class);
     requestEmployee.setUserType(UserTypeEnum.ADMIN_EMPLOYEE);
+    requestEmployee.setTenantId(TenantContext.getTenantId());
 
     // 部门信息
     DepartmentVO department = departmentDao.selectDepartmentVO(employeeEntity.getDepartmentId());

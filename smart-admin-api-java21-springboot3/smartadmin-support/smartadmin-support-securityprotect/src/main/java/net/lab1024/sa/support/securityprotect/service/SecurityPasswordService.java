@@ -166,4 +166,14 @@ public class SecurityPasswordService {
   public boolean matchesPwd(String password, String encodedPassword) {
     return passwordEncryptService.matches(password, encodedPassword);
   }
+
+  /**
+   * Check if password hash needs upgrade to current Argon2 parameters (lazy migration, D10).
+   *
+   * @param encodedPassword the stored Argon2 hash
+   * @return true if hash uses older/different parameters than current config
+   */
+  public boolean needsPasswordHashUpgrade(String encodedPassword) {
+    return passwordEncryptService.needsUpgrade(encodedPassword);
+  }
 }

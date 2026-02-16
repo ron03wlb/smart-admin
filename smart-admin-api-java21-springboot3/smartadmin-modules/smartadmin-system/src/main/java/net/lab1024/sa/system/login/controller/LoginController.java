@@ -1,6 +1,5 @@
 package net.lab1024.sa.system.login.controller;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +10,7 @@ import net.lab1024.sa.common.captcha.CaptchaVO;
 import net.lab1024.sa.common.core.annotation.NoNeedLogin;
 import net.lab1024.sa.common.core.domain.constant.RequestHeaderConst;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.token.admin.StpAdminUtil;
 import net.lab1024.sa.common.web.web.util.SmartRequestUtil;
 import net.lab1024.sa.support.securityprotect.service.Level3ProtectConfigService;
 import net.lab1024.sa.system.constant.AdminSwaggerTagConst;
@@ -53,7 +53,7 @@ public class LoginController {
   @GetMapping("/login/getLoginInfo")
   @Operation(summary = "获取登录结果信息  @author 卓大")
   public ResponseDTO<LoginResultVO> getLoginInfo() {
-    String tokenValue = StpUtil.getTokenValue();
+    String tokenValue = StpAdminUtil.getTokenValue();
     LoginResultVO loginResult =
         loginService.getLoginResult(
             (RequestEmployee) SmartRequestUtil.getRequestUser(), tokenValue);

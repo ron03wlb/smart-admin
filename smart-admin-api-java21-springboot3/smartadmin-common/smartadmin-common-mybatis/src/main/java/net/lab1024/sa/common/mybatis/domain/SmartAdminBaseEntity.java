@@ -18,6 +18,9 @@ import lombok.Data;
 public abstract class SmartAdminBaseEntity {
 
   @TableField(fill = FieldFill.INSERT)
+  private Long tenantId;
+
+  @TableField(fill = FieldFill.INSERT)
   private OffsetDateTime createTime;
 
   @TableField(fill = FieldFill.INSERT_UPDATE)

@@ -37,11 +37,11 @@ public class JsonConfig {
           new LocalDateDeserializer(DatePattern.NORM_DATE_FORMAT.getDateTimeFormatter()));
       builder.serializers(
           new LocalDateSerializer(DatePattern.NORM_DATE_FORMAT.getDateTimeFormatter()));
-      // OffsetDateTime serializer (ISO-8601 format with offset)
+      // OffsetDateTime serializer — converts UTC to tenant's timezone (ISO-8601 output)
       // Deserialization handled by Spring Boot's auto-configured JavaTimeModule (ISO-8601 default)
       builder.serializerByType(
           OffsetDateTime.class,
-          com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer.INSTANCE);
+          new net.lab1024.sa.common.web.web.json.serializer.TenantTimezoneSerializer());
       builder.serializerByType(Long.class, LongJsonSerializer.INSTANCE);
       builder.serializerByType(Long.TYPE, LongJsonSerializer.INSTANCE);
       builder.serializerByType(BigInteger.class, ToStringSerializer.instance);

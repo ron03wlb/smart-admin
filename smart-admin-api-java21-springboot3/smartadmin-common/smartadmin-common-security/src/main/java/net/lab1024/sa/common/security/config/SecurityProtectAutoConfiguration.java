@@ -5,6 +5,7 @@ import net.lab1024.sa.common.security.service.PasswordComplexityService;
 import net.lab1024.sa.common.security.service.PasswordEncryptService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Bean;
  * @since 2025-01-20 Copyright <a href="https://1024lab.net">1024创新实验室</a>
  */
 @AutoConfiguration
+@EnableConfigurationProperties(Argon2Properties.class)
 public class SecurityProtectAutoConfiguration {
 
   /**
@@ -36,8 +38,8 @@ public class SecurityProtectAutoConfiguration {
    */
   @Bean
   @ConditionalOnMissingBean(PasswordEncryptService.class)
-  public PasswordEncryptService passwordEncryptService() {
-    return new PasswordEncryptService();
+  public PasswordEncryptService passwordEncryptService(Argon2Properties argon2Properties) {
+    return new PasswordEncryptService(argon2Properties);
   }
 
   /**

@@ -67,6 +67,9 @@ public class RequestEmployee implements RequestUser, Serializable {
   @Schema(description = "请求user-agent")
   private String userAgent;
 
+  @Schema(description = "租户ID")
+  private Long tenantId;
+
   @Override
   public Long getUserId() {
     return employeeId;
@@ -75,5 +78,10 @@ public class RequestEmployee implements RequestUser, Serializable {
   @Override
   public String getUserName() {
     return actualName;
+  }
+
+  @Override
+  public Long getTenantId() {
+    return tenantId;
   }
 }

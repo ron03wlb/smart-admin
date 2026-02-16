@@ -67,6 +67,20 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
+  # Flyway 資料庫版本管理
+  # Flyway uses superuser for DDL migrations (separate from app datasource)
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: "0"
+    baseline-description: "Existing SmartAdmin schema"
+    validate-on-migrate: true
+    out-of-order: false
+    table: flyway_schema_history
+    user: postgres
+    password: postgres
+
   # Redis 配置
   data:
     redis:
@@ -91,8 +105,8 @@ spring:
       read-enums-using-to-string: true
       fail-on-unknown-properties: false
     default-property-inclusion: always
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss    # Overridden by TenantTimezoneSerializer for OffsetDateTime
+    time-zone: UTC                        # DB stores UTC; tenant conversion handled by serializer
 
   # 文件上傳大小限制
   servlet:
@@ -236,9 +250,18 @@ smart:
         max-interval: 10000
         multiplier: 2.0
 
+  # Argon2id 密碼雜湊配置（iGaming 合規：OWASP 2024）
+  security:
+    argon2:
+      salt-length: 16
+      hash-length: 32
+      parallelism: 4
+      memory: 65536
+      iterations: 3
+
   # LiteFlow 規則引擎配置
   liteflow:
-    enabled: false  # 暫時禁用 - SQLXmlELParser 需要額外配置
+    enabled: true  # D11 決策：直接啟用 + 空規則
     database-enabled: true
     execution-log-enabled: true
     metrics-enabled: true
@@ -248,6 +271,38 @@ smart:
     async-enabled: false
     max-thread-pool-size: 10
     execution-timeout: 30000
+
+# LiteFlow SQL 規則存儲配置（liteflow-spring-boot-starter 原生配置）
+liteflow:
+  rule-source: sql
+  rule-source-ext-data-map:
+    url: jdbc:postgresql://localhost:5432/smart_admin
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    applicationName: smartadmin
+    # Chain 表映射
+    chainTableName: t_liteflow_chain
+    chainNameField: chain_code
+    elDataField: chain_data
+    chainEnableField: status
+    # Script 表映射
+    scriptTableName: t_liteflow_script
+    scriptIdField: script_code
+    scriptNameField: script_name
+    scriptDataField: script_data
+    scriptTypeField: script_type
+    scriptLanguageField: script_type
+    # 輪詢配置（禁用 — 使用 SmartReload 手動觸發）
+    pollingEnabled: false
+
+# 多租戶配置
+tenant:
+  enabled: false
+  default-timezone: UTC
+  base-domain: example.com
+  rls:
+    enabled: false  # Enable after switching datasource to smartadmin_app
 
 # JetCache 二級緩存配置
 jetcache:
@@ -267,3 +322,36 @@ jetcache:
       valueDecoder: java
       expireAfterWriteInMillis: 7200000  # 2 小時
       uri: redis://${spring.data.redis.host:localhost}:${spring.data.redis.port:6379}/${spring.data.redis.database:1}
+
+# Resilience4j 斷路器配置（iGaming PSP/GP 外部呼叫保護）
+resilience4j:
+  circuitbreaker:
+    configs:
+      pspDefault:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        slow-call-duration-threshold: 5s
+        slow-call-rate-threshold: 80
+      gpDefault:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 60s
+        permitted-number-of-calls-in-half-open-state: 3
+        slow-call-duration-threshold: 10s
+        slow-call-rate-threshold: 80
+  retry:
+    configs:
+      pspDefault:
+        max-attempts: 3
+        wait-duration: 1s
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2.0
+        retry-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException

@@ -40,4 +40,9 @@ public interface RequestUser {
    * @return String
    */
   String getUserAgent();
+
+  /** 获取租户ID（默认返回null，由多租户实现类覆盖） */
+  default Long getTenantId() {
+    return null;
+  }
 }

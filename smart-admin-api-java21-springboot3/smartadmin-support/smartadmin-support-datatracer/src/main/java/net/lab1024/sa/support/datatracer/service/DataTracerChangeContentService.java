@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -330,8 +329,6 @@ public class DataTracerChangeContentService {
     } else if (fieldValue instanceof java.time.OffsetDateTime odt) {
       fieldContent =
           odt.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    } else if (fieldValue instanceof LocalDateTime) {
-      fieldContent = LocalDateTimeUtil.formatNormal((LocalDateTime) fieldValue);
     } else if (fieldValue instanceof LocalDate) {
       fieldContent = LocalDateTimeUtil.formatNormal((LocalDate) fieldValue);
     } else if (fieldValue instanceof BigDecimal) {

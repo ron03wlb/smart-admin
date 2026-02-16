@@ -37,4 +37,7 @@ public class HeartBeatRecordEntity implements Serializable {
 
   /** 心跳当前时间 */
   private OffsetDateTime heartBeatTime;
+
+  /** 租户ID */
+  private Long tenantId;
 }

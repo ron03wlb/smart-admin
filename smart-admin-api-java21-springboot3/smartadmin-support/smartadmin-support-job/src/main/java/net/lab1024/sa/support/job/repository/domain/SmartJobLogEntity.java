@@ -55,4 +55,7 @@ public class SmartJobLogEntity {
   private String createName;
 
   private OffsetDateTime createTime;
+
+  /** 租户ID */
+  private Long tenantId;
 }

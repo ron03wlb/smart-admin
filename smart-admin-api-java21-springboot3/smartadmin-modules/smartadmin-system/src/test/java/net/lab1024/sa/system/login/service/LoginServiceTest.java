@@ -11,7 +11,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import cn.dev33.satoken.stp.StpUtil;
 import io.vavr.control.Option;
 import java.util.List;
 import net.lab1024.sa.common.apiencrypt.service.ApiEncryptService;
@@ -22,6 +21,7 @@ import net.lab1024.sa.common.core.domain.UserPermission;
 import net.lab1024.sa.common.core.domain.enumeration.UserTypeEnum;
 import net.lab1024.sa.common.core.domain.request.RequestUser;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.token.admin.StpAdminUtil;
 import net.lab1024.sa.support.config.ConfigService;
 import net.lab1024.sa.support.loginlog.LoginLogService;
 import net.lab1024.sa.support.mail.service.MailService;
@@ -229,13 +229,13 @@ class LoginServiceTest {
       // Given
       RequestUser requestUser = createTestRequestUser(1L, "admin");
 
-      try (MockedStatic<StpUtil> mockedStpUtil = mockStatic(StpUtil.class)) {
+      try (MockedStatic<StpAdminUtil> mockedStpAdminUtil = mockStatic(StpAdminUtil.class)) {
         // When
         ResponseDTO<String> result = loginService.logout(requestUser);
 
         // Then
         assertThat(result.getOk()).isTrue();
-        mockedStpUtil.verify(StpUtil::logout);
+        mockedStpAdminUtil.verify(StpAdminUtil::logout);
         verify(loginManager).clearUserPermission(1L);
         verify(loginManager).clearUserLoginInfo(1L);
       }

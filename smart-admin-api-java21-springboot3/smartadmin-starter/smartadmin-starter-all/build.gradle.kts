@@ -23,6 +23,9 @@ dependencies {
     // ==================== 開發工具 ====================
     api(project(":smartadmin-common:smartadmin-common-devtools"))
 
+    // ==================== 多租戶 ====================
+    api(project(":smartadmin-common:smartadmin-common-tenant"))
+
     // ==================== Support 模塊（17 個）====================
     api(project(":smartadmin-support:smartadmin-support-job"))
     api(project(":smartadmin-support:smartadmin-support-config"))

@@ -31,6 +31,7 @@ include(
     "smartadmin-common:smartadmin-common-repeat-submit",
     "smartadmin-common:smartadmin-common-data-masking",
     "smartadmin-common:smartadmin-common-security",
+    "smartadmin-common:smartadmin-common-tenant",
 
     // === smartadmin-support: Business Support (17 modules) ===
     "smartadmin-support:smartadmin-support-config",
@@ -58,10 +59,20 @@ include(
     "smartadmin-modules:smartadmin-business",
     "smartadmin-modules:smartadmin-oa",
 
-    // === smartadmin-api: API Contract Layer (3 modules) ===
+    // === smartadmin-igaming: iGaming Business Modules (7 modules) ===
+    "smartadmin-igaming:smartadmin-igaming-common",
+    "smartadmin-igaming:smartadmin-igaming-wallet",
+    "smartadmin-igaming:smartadmin-igaming-player",
+    "smartadmin-igaming:smartadmin-igaming-game",
+    "smartadmin-igaming:smartadmin-igaming-activity",
+    "smartadmin-igaming:smartadmin-igaming-risk",
+    "smartadmin-igaming:smartadmin-igaming-agent",
+
+    // === smartadmin-api: API Contract Layer (4 modules) ===
     "smartadmin-api:smartadmin-api-system",
     "smartadmin-api:smartadmin-api-business",
     "smartadmin-api:smartadmin-api-oa",
+    "smartadmin-api:smartadmin-api-igaming",
 
     // === smartadmin-starter: Starter Combinations (2 modules) ===
     "smartadmin-starter:smartadmin-starter-web",

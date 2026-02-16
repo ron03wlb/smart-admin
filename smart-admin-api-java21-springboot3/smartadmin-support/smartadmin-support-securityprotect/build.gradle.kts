@@ -30,6 +30,9 @@ dependencies {
     // SA Common Security (foundation module)
     api(project(":smartadmin-common:smartadmin-common-security"))
 
+    // SA Common Token (StpAdminUtil facade)
+    api(project(":smartadmin-common:smartadmin-common-token"))
+
     // SA Support - Config service dependency
     api(project(":smartadmin-support:smartadmin-support-config"))
 

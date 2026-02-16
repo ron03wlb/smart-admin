@@ -46,4 +46,7 @@ public class LiteFlowExecutionLogEntity {
 
   /** 創建時間 */
   private OffsetDateTime createTime;
+
+  /** 租戶ID */
+  private Long tenantId;
 }

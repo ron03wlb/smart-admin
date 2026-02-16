@@ -1,7 +1,6 @@
 package net.lab1024.sa.support.codegenerator.service;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.IdUtil;
@@ -234,9 +233,16 @@ public class CodeGeneratorTemplateService {
     Map<String, Object> variablesMap = new HashMap<>();
 
     Map<String, Object> basicMap = BeanUtil.beanToMap(basic);
-    basicMap.put("frontDate", DateUtil.formatLocalDateTime(basic.getFrontDate().toLocalDateTime()));
     basicMap.put(
-        "backendDate", DateUtil.formatLocalDateTime(basic.getBackendDate().toLocalDateTime()));
+        "frontDate",
+        basic
+            .getFrontDate()
+            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    basicMap.put(
+        "backendDate",
+        basic
+            .getBackendDate()
+            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
     variablesMap.put("basic", basicMap);
     variablesMap.put("fields", fields);

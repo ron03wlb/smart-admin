@@ -1,0 +1,22 @@
+-- ============================================================================
+-- V1__baseline.sql - SmartAdmin v4.1.0 Schema Baseline
+-- ============================================================================
+-- This is an intentionally empty baseline migration.
+--
+-- SmartAdmin's existing PostgreSQL schema was created before Flyway was
+-- introduced. The "baseline-on-migrate" configuration handles this:
+--
+--   For EXISTING databases:
+--     Flyway marks this as "baselined" and skips it.
+--     Future migrations (V2+) will execute normally.
+--
+--   For NEW databases:
+--     The schema must be created externally (e.g., via init.sql or manual DDL)
+--     before Flyway runs. V2+ migrations then apply incremental changes.
+--
+-- Future migrations in this directory:
+--   V2__add_tenant_id.sql            (G1.5: ADD COLUMN tenant_id to 45 tables)
+--   V3__timestamptz_migration.sql    (G2: ALTER COLUMN ... TYPE TIMESTAMPTZ)
+--   V4__unique_constraint_tenant.sql (G15: Composite UNIQUE indexes)
+--   V5__rls_policies.sql             (G11: Row-Level Security)
+-- ============================================================================

@@ -1,6 +1,5 @@
 package net.lab1024.sa.support.securityprotect.service;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -10,6 +9,7 @@ import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.security.domain.Level3ProtectConfigForm;
 import net.lab1024.sa.common.security.service.SecurityConfigProvider;
+import net.lab1024.sa.common.token.admin.StpAdminUtil;
 import net.lab1024.sa.support.config.ConfigKeyEnum;
 import net.lab1024.sa.support.config.ConfigService;
 import org.springframework.context.annotation.DependsOn;
@@ -124,9 +124,11 @@ public class Level3ProtectConfigService implements SecurityConfigProvider {
 
     // 设置 最低活跃时间（单位：秒）
     if (this.loginActiveTimeoutSeconds > 0) {
-      StpUtil.getStpLogic().getConfigOrGlobal().setActiveTimeout(getLoginActiveTimeoutSeconds());
+      StpAdminUtil.getStpLogic()
+          .getConfigOrGlobal()
+          .setActiveTimeout(getLoginActiveTimeoutSeconds());
     } else {
-      StpUtil.getStpLogic().getConfigOrGlobal().setActiveTimeout(-1);
+      StpAdminUtil.getStpLogic().getConfigOrGlobal().setActiveTimeout(-1);
     }
   }
 
