@@ -1,11 +1,11 @@
 # iGaming 基礎設施缺口分析：SmartAdmin 需先完成的基建項目
 
 > **文件類型**：設計文件 (Design Document)
-> **版本**：1.11.0
+> **版本**：1.12.0
 > **日期**：2026-02-17
 > **狀態**：已確認 (Confirmed) — 所有技術決策已完成（D1-D11）
 > **前置依賴**：Phase 0-3 實作設計文件（9 份，11K+ 行）
-> **變更紀錄**：v1.11.0 — G12 Testcontainers Kafka/Redis 擴展完成（v1.10.0 — G10 ArchUnit iGaming 邊界規則完成 / v1.9.0 — G16 Argon2id 參數強化完成，Sprint 4 全部完成 / v1.8.0 — G8 LiteFlow 配置整合完成 / v1.7.0 — G7 Resilience4j Circuit Breaker 完成 / v1.6.0 — G6 財務精度工具完成 / v1.5.0 — G5 AES-256-GCM 欄位加密 + Blind Index 完成，Sprint 3 全部完成 / v1.4.0 — G4 DomainEvent + Kafka 冪等消費框架完成 / v1.3.3 — G9 iGaming Module 腳手架完成 / v1.3.2 — G2.5 清理 / v1.3.1 — G2 TIMESTAMPTZ 遷移 / v1.3.0 — G11 RLS 完成 / v1.2.1 — 確認 D8-D11 / v1.2.0 — 新增 5 個缺口 / v1.1.0 — 原始碼驗證 + D1-D7 決策）
+> **變更紀錄**：v1.12.0 — Sprint 2 全部完成（G1 Multi-Tenant + G3 Flyway + G11 RLS + G13 Sa-Token + G14 Virtual Thread + G15 UNIQUE + G1.5 數據遷移），後端 18/20 gaps 完成 / v1.11.0 — G12 Testcontainers 完成 / v1.10.0 — G10 ArchUnit 完成 / v1.9.0 — G16+Sprint 4 完成 / v1.8.0 — G8 / v1.7.0 — G7 / v1.6.0 — G6 / v1.5.0 — G5+Sprint 3 完成 / v1.4.0 — G4 / v1.3.x — G9+G2+G2.5+G11 / v1.2.x — D8-D11+5 新缺口 / v1.1.0 — 原始碼驗證+D1-D7
 
 ## Context
 
@@ -45,10 +45,10 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 | # | 缺口項目 | 優先級 | 複雜度 | 阻塞 Phase | 建置位置 |
 |---|---------|--------|--------|-----------|---------|
-| **G0** | **BaseEntity 共用基類提取** (NEW v1.2.0) | **P0** | **M** | Phase 0 (G1+G2 前置) | smartadmin-common-mybatis |
-| G1 | Multi-Tenant 基礎設施（**全域版**） | P0 | **XXL** | Phase 0 (全部) | smartadmin-common-mybatis + 所有現有 Entity + 新模組 |
+| **G0** | **BaseEntity 共用基類提取** ✅ DONE | **P0** | **M** | Phase 0 (G1+G2 前置) | SmartAdminBaseEntity (tenantId + OffsetDateTime + deleted) |
+| G1 | Multi-Tenant 基礎設施（**全域版**） ✅ DONE | P0 | **XXL** | Phase 0 (全部) | TenantContext + SmartTenantLineHandler + BaseEntity tenantId + MybatisPlusFillHandler |
 | G2 | OffsetDateTime / TIMESTAMPTZ **全面遷移** ✅ DONE | P0 | **XXL→M** | Phase 0 (全部) | App 層已完成(G0)，DB TIMESTAMPTZ + 清理 |
-| G3 | Flyway 資料庫版本管理（全專案） | P0 | **L+** | Phase 0 (DDL) | smartadmin-app + 新依賴 + baseline + MySQL DDL 重寫 |
+| G3 | Flyway 資料庫版本管理（全專案） ✅ DONE | P0 | **L+** | Phase 0 (DDL) | V1-V7 migrations (baseline, tenant_id, RLS, TIMESTAMPTZ, idempotent) |
 | G4 | DomainEvent + Kafka 冪等消費框架 ✅ DONE | P0 | L | Phase 0 (事件驅動) | smartadmin-common-mq |
 | G5 | AES-256-GCM 欄位加密 + Blind Index ✅ DONE | P0 | L | Phase 2 (Player PII) | smartadmin-common-security |
 | G6 | 財務精度工具 (DECIMAL 19,4 + HALF_EVEN) ✅ DONE | P1 | S | Phase 1 (Wallet) | smartadmin-igaming-common |
@@ -56,13 +56,13 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 | G8 | LiteFlow 配置整合 + SQL Rule 存儲 ✅ DONE | P1 | **M-** | Phase 1 (Wallet/VIP) | smartadmin-app 配置啟用 + SQL 規則存儲 |
 | G9 | 8 個新 Gradle Module 腳手架 ✅ DONE | P1 | M | Phase 0 (模組結構) | settings.gradle.kts |
 | G10 | ArchUnit iGaming 邊界規則 ✅ DONE | P2 | S | Phase 0 (品質) | smartadmin-app IgamingArchitectureTest (13 rules) |
-| G11 | PostgreSQL RLS 政策 + pg_partman | **P0** | **XL** | Phase 0 (DB 層) | SQL migrations（77+ 表全域 RLS，併入 G1） |
+| G11 | PostgreSQL RLS 政策 + pg_partman ✅ DONE | **P0** | **XL** | Phase 0 (DB 層) | V5__rls_policies.sql（77+ 表全域 RLS，併入 G1） |
 | G12 | Testcontainers Kafka/Redis 擴展 ✅ DONE | P2 | S | Phase 0 (測試) | AbstractIntegrationTestBase (PostgreSQL + Kafka + Redis) |
-| **G13** | **Sa-Token 多租戶認證適配** (NEW v1.2.0) | **P0** | **M** | Phase 0 (認證) | smartadmin-common-token + smartadmin-system |
-| **G14** | **Virtual Thread + TenantContext 相容性** (NEW v1.2.0) | **P0** | **S** | Phase 0 (G1 前置) | smartadmin-common-mybatis + smartadmin-common-mq |
-| **G15** | **UNIQUE Constraint + tenant_id 衝突改造** (NEW v1.2.0) | **P0** | **M** | Phase 0 (G1.5 聯動) | Flyway migrations + Dao/Mapper |
+| **G13** | **Sa-Token 多租戶認證適配** ✅ DONE | **P0** | **M** | Phase 0 (認證) | StpAdminUtil + StpPlayerUtil + LoginService tenant binding |
+| **G14** | **Virtual Thread + TenantContext 相容性** ✅ DONE | **P0** | **S** | Phase 0 (G1 前置) | TenantTaskDecorator + 設計決策完成 |
+| **G15** | **UNIQUE Constraint + tenant_id 衝突改造** ✅ DONE | **P0** | **M** | Phase 0 (G1.5 聯動) | V4__unique_constraint_tenant.sql |
 | **G16** | **Argon2id 參數強化** ✅ DONE | **P1** | **S** | Phase 2 (Player) | smartadmin-common-security + LoginService lazy migration |
-| **G1.5** | **全域 tenant_id 數據遷移** (NEW v1.1.0) | **P0** | **M** | Phase 0 (數據) | Flyway migration（D4 衍生） |
+| **G1.5** | **全域 tenant_id 數據遷移** ✅ DONE | **P0** | **M** | Phase 0 (數據) | V2__add_tenant_id.sql (default tenant + NOT NULL) |
 | **G2.3** | **前端 ISO-8601 + 多租戶 UI 適配** (UPDATED v1.2.0) | **P1** | **M+** | Phase 0 (前端) | 前端團隊（D3+G13 衍生） |
 | **G2.5** | **MySQL DDL → PostgreSQL 重寫** ✅ DONE | **P1** | **S** | Phase 0 (DDL) | `sa-admin/build/` 殘留清理（D7 衍生） |
 
@@ -99,7 +99,7 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 ---
 
-### G1: Multi-Tenant 基礎設施（全域版）【P0-Critical / XXL】
+### G1: Multi-Tenant 基礎設施（全域版）【P0-Critical / XXL】✅ DONE
 
 > **v1.1.0 更新**：D4 決策確認**全域加 tenant_id**（所有現有表 + iGaming 新表），範圍從 XL 升級為 XXL。
 
@@ -216,7 +216,7 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 ---
 
-### G3: Flyway 資料庫版本管理（全專案）【P0-Critical / L+】
+### G3: Flyway 資料庫版本管理（全專案）【P0-Critical / L+】✅ DONE
 
 > **v1.1.0 更新**：發現 `sa-admin/build/` 中存在 4 個 MySQL 語法 DDL 殘留。D6 決策全專案引入 Flyway，D7 決策重寫 MySQL DDL 為 PostgreSQL。複雜度升為 L+。
 
@@ -482,7 +482,7 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 ## 新增缺口（v1.1.0 原始碼驗證發現）
 
-### G1.5: 全域 tenant_id 數據遷移 【P0-Critical / M】（NEW）
+### G1.5: 全域 tenant_id 數據遷移 【P0-Critical / M】✅ DONE
 
 > 因 D4 決策（全域加 tenant_id）衍生的新缺口。
 
@@ -537,7 +537,7 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 ## 新增缺口（v1.2.0 深度驗證發現）
 
-### G13: Sa-Token 多租戶認證適配【P0-Critical / M】（NEW v1.2.0）
+### G13: Sa-Token 多租戶認證適配【P0-Critical / M】✅ DONE
 
 > **v1.2.0 新增**：原始碼驗證發現 Sa-Token 為單租戶模式，整個 codebase 僅 5 個檔案使用 `StpUtil`，無任何 tenant-aware 邏輯。多租戶環境下 Token 必須攜帶 `tenantId`，否則無法區分不同租戶用戶。
 > **v1.2.1 更新**：D9 決策確認使用**獨立 StpLogic** — Admin（`StpAdminUtil`）和 Player（`StpPlayerUtil`）各自擁有完全獨立的 Token 體系。
@@ -576,7 +576,7 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 ---
 
-### G14: Virtual Thread + TenantContext 相容性策略【P0-Critical / S】（NEW v1.2.0）
+### G14: Virtual Thread + TenantContext 相容性策略【P0-Critical / S】✅ DONE
 
 > **v1.2.0 新增**：SmartAdmin 已啟用 `spring.threads.virtual.enabled: true`（Java 21 Virtual Threads）。G1 計畫用 ThreadLocal 實現 TenantContext，需要明確跨線程傳遞策略。
 
@@ -671,8 +671,8 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 ## 建置順序（依賴鏈 Critical Path）
 
 ```
-Sprint 0.5: 基礎提取（G1+G2 的必要前置）【v1.2.0 新增】
-└── G0: BaseEntity 共用基類提取 ──── 45+ Entity 改繼承 BaseEntity
+Sprint 0.5: 基礎提取（G1+G2 的必要前置）✅ ALL DONE
+└── G0: BaseEntity 共用基類提取 ✅ ──── SmartAdminBaseEntity (tenantId + OffsetDateTime + deleted)
     ├── 定義 SmartAdminBaseEntity（tenantId + createTime/updateTime as OffsetDateTime + deleted）
     └── MybatisPlusFillHandler 擴展（tenantId 自動填充準備）
 
@@ -686,16 +686,16 @@ Sprint 1: 骨架 + 時間遷移（依賴 Sprint 0.5 BaseEntity）✅ ALL DONE
 ├── G14: Virtual Thread + TenantContext 策略確認 ✅ ── 設計決策完成
 └── G2.5: MySQL DDL → PostgreSQL 重寫 ✅ ── sa-admin/ 刪除（build artifacts）
 
-Sprint 2: 租戶全域化 + 認證 + 資料庫基礎（D4 全域 tenant_id）
-├── G3: Flyway baseline ──────────────── DDL 管理 + TIMESTAMPTZ + tenant_id migration
-├── G1: Multi-Tenant interceptor ────────── 全域版本（BaseEntity 已含 tenantId）
+Sprint 2: 租戶全域化 + 認證 + 資料庫基礎（D4 全域 tenant_id）✅ ALL DONE
+├── G3: Flyway baseline ✅ ──────────────── V1-V7 migrations (baseline → idempotent_key)
+├── G1: Multi-Tenant interceptor ✅ ────────── TenantContext + SmartTenantLineHandler + tenantId 自動填充
 │   ├── TenantContext + TenantInterceptor + TaskDecorator（G14 實現）
 │   ├── TenantLineInnerInterceptor
 │   └── Kafka Header 注入/恢復（G14 實現）
-├── G13: Sa-Token 多租戶認證適配 ────── Token 攜帶 tenantId + 雙帳戶體系
-├── G1.5: 現有數據 tenant_id 填充 ────── default 填充 + NOT NULL 約束
-├── G15: UNIQUE Constraint 改造 ────── 複合唯一索引重建
-└── G11: RLS（77+ 表全域）+ pg_partman ── DB 層租戶隔離
+├── G13: Sa-Token 多租戶認證適配 ✅ ────── StpAdminUtil/StpPlayerUtil + session tenant binding
+├── G1.5: 現有數據 tenant_id 填充 ✅ ────── V2__add_tenant_id.sql default 填充 + NOT NULL
+├── G15: UNIQUE Constraint 改造 ✅ ────── V4__unique_constraint_tenant.sql 複合唯一索引
+└── G11: RLS（77+ 表全域）✅ ────────── V5__rls_policies.sql DB 層租戶隔離
 
 Sprint 3: 事件 + 加密 ✅ DONE
 ├── G4: DomainEvent + 冪等框架 ✅ ────── 事件驅動的基礎
@@ -770,11 +770,11 @@ Sprint 5: 品質門禁
 
 ## 總結
 
-**20 個缺口項目**（v1.2.0 更新：v1.1.0 的 15 個 + 新增 5 個）：
-- **P0 (Critical)**: 11 項 — G0(M), G1(XXL), G1.5(M), G2(XXL), G3(L+), G4(L), G5(L), G11(XL, 併入G1), G13(M), G14(S), G15(M)
-- **P1 (High)**: 6 項 — G6(S), G7(S), G8(M-), G16(S), G2.3(M+), G2.5(S)
-- **P1 → Sprint 1**: G9(M)（Module 腳手架）
-- **P2 (Medium)**: 2 項 — G10(S), G12(S)
+**20 個缺口項目** — **18/20 完成（90%）**，剩餘 2 項（G2.3 前端、G0 BaseEntity 標記）：
+- **P0 (Critical)**: 11 項 — 全部 ✅ DONE（G0, G1, G1.5, G2, G3, G4, G5, G11, G13, G14, G15）
+- **P1 (High)**: 6 項 — 5/6 ✅ DONE（G6, G7, G8, G16, G2.5）— G2.3 需前端團隊
+- **P1 → Sprint 1**: G9 ✅ DONE
+- **P2 (Medium)**: 2 項 — 全部 ✅ DONE（G10, G12）
 
 ### 風險矩陣（v1.2.0 更新）
 
