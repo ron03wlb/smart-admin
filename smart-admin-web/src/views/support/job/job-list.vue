@@ -73,7 +73,11 @@
             rowKey="jobId"
             :pagination="false"
           >
-            <template #bodyCell="{ record, column }">
+            <template #bodyCell="{ text, record, column }">
+              <template v-if="column.dataIndex === 'updateTime'">
+                {{ formatDateTime(text) }}
+              </template>
+
               <template v-if="column.dataIndex === 'jobClass'">
                 <a-tooltip>
                   <template #title>{{ record.jobClass }}</template>
@@ -164,6 +168,7 @@
   import JobFormModal from './components/job-form-modal.vue';
   import JobLogListModal from './components/job-log-list-modal.vue';
   import { SmartLoading } from '/@/components/framework/smart-loading/index.js';
+  import { formatDateTime } from '/@/lib/datetime-util';
   const activeKey = ref('1');
   const columns = ref([
     {

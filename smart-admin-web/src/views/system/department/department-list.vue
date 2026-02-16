@@ -42,7 +42,10 @@
       :defaultExpandedRowKeys="defaultExpandedRowList"
       :pagination="false"
     >
-      <template #bodyCell="{ record, column }">
+      <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'updateTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'action'">
           <div class="smart-table-operate">
             <a-button @click="addDepartment(record)" v-privilege="'system:department:add'" type="link">添加下级</a-button>
@@ -73,6 +76,7 @@
   import { SmartLoading } from '/@/components/framework/smart-loading';
   import DepartmentFormModal from './components/department-form-modal.vue';
   import { smartSentry } from '/@/lib/smart-sentry';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const DEPARTMENT_PARENT_ID = 0;
 

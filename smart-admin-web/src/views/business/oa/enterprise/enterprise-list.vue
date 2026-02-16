@@ -71,6 +71,9 @@
       bordered
     >
       <template #bodyCell="{ column, record, text }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'disabledFlag'">
           {{ text ? '禁用' : '启用' }}
         </template>
@@ -120,6 +123,7 @@
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   // --------------------------- 企业表格 列 ---------------------------
 

@@ -64,7 +64,11 @@
       rowKey="jobId"
       :pagination="false"
     >
-      <template #bodyCell="{ record, column }">
+      <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'updateTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'jobClass'">
           <a-tooltip>
             <template #title>{{ record.jobClass }}</template>
@@ -134,6 +138,7 @@
   import JobLogListModal from './job-log-list-modal.vue';
   import {TABLE_ID_CONST} from "/@/constants/support/table-id-const.js";
   import TableOperator from "/@/components/support/table-operator/index.vue";
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const columns = ref([
     {

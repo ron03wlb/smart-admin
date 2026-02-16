@@ -88,6 +88,9 @@
       bordered
     >
       <template #bodyCell="{ column, record, text }">
+        <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'publishTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'title'">
           <a @click="toDetail(record.noticeId)">{{ text }}</a>
         </template>
@@ -142,6 +145,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const queryFormState = {
     noticeTypeId: undefined, //分类

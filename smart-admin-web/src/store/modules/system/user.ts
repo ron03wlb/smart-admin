@@ -15,6 +15,7 @@ import { MENU_TYPE_ENUM } from '/@/constants/system/menu-const';
 import { messageApi } from '/@/api/support/message-api.js';
 import { smartSentry } from '/@/lib/smart-sentry.js';
 import { localRead, localSave, localRemove } from '/@/utils/local-util';
+import { useTenantStore } from '/@/store/modules/system/tenant';
 
 
 export const useUserStore = defineStore({
@@ -128,6 +129,8 @@ export const useUserStore = defineStore({
       localRemove(localKey.HOME_QUICK_ENTRY);
       localRemove(localKey.NOTICE_READ);
       localRemove(localKey.TO_BE_DONE);
+      // 清除租戶上下文（G2.3）
+      useTenantStore().clearTenantInfo();
     },
     // 查询未读消息数量
     async queryUnreadMessageCount() {

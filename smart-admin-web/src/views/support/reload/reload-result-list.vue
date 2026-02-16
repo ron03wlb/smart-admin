@@ -17,6 +17,10 @@
     </a-button>
     <a-table :scroll="{ y: 350 }" size="small" bordered rowKey="id" class="smart-margin-top10" :dataSource="tableData" :columns="columns">
       <template #bodyCell="{ text, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'result'">
           <a-tag :color="text ? 'success' : 'error'">{{ text ? '成功' : '失败' }}</a-tag>
         </template>
@@ -32,7 +36,8 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue';
   import { reloadApi } from '/@/api/support/reload-api';
-import { smartSentry } from '/@/lib/smart-sentry';
+  import { smartSentry } from '/@/lib/smart-sentry';
+  import { formatDateTime } from '/@/lib/datetime-util';
   defineExpose({
     showModal,
   });

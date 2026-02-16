@@ -30,4 +30,8 @@ export default {
   NOTICE_READ: `${KEY_PREFIX}notice_read`,
   // 待办
   TO_BE_DONE: `${KEY_PREFIX}to_be_done`,
+  // 多租戶
+  TENANT_ID: `${KEY_PREFIX}tenant_id`,
+  TENANT_CODE: `${KEY_PREFIX}tenant_code`,
+  TENANT_TIMEZONE: `${KEY_PREFIX}tenant_timezone`,
 };

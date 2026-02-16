@@ -62,7 +62,11 @@
       size="small"
       bordered
     >
-      <template #bodyCell="{ column, record }">
+      <template #bodyCell="{ text, column, record }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'title'">
           <router-link tag="a" target="_blank" :to="{ path: '/help-doc/detail', query: { helpDocId: record.helpDocId } }">{{
             record.title
@@ -106,6 +110,7 @@
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const props = defineProps({
     // 目录id

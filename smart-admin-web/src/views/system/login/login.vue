@@ -133,6 +133,7 @@
   import LocalStorageKeyConst from '/@/constants/local-storage-key-const.js';
   import { useDictStore } from '/@/store/modules/system/dict.js';
   import {dictApi} from "/@/api/support/dict-api.js";
+  import { useTenantStore } from '/@/store/modules/system/tenant';
 
   //--------------------- 登录表单 ---------------------------------
 
@@ -200,6 +201,14 @@
         message.success('登录成功');
         //更新用户信息到pinia
         useUserStore().setUserLoginInfo(res.data);
+        // 多租戶上下文（G2.3）
+        if (res.data.tenantId) {
+          useTenantStore().setTenantInfo({
+            tenantId: res.data.tenantId,
+            timezone: res.data.timezone || 'Asia/Taipei',
+            tenantCode: res.data.tenantCode || 'default',
+          });
+        }
         // 初始化数据字典
         const dictRes = await dictApi.getAllDictData();
         useDictStore().initData(dictRes.data);

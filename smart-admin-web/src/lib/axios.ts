@@ -41,6 +41,17 @@ smartAxios.interceptors.request.use(
     } else {
       delete config.headers[TOKEN_HEADER];
     }
+
+    // 多租戶 headers（G2.3）
+    const tenantId = localRead(LocalStorageKeyConst.TENANT_ID);
+    if (tenantId) {
+      config.headers['X-Tenant-Id'] = tenantId;
+    }
+    const tenantTimezone = localRead(LocalStorageKeyConst.TENANT_TIMEZONE);
+    if (tenantTimezone) {
+      config.headers['X-Timezone'] = tenantTimezone;
+    }
+
     return config;
   },
   (error) => {

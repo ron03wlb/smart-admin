@@ -76,6 +76,10 @@
       :row-selection="{ selectedRowKeys: selectedRowKeyList, onChange: onSelectChange }"
     >
       <template #bodyCell="{ text, column }">
+        <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'updateTime' || column.dataIndex === 'loginLockBeginTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'userType'">
           <span>{{ $smartEnumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
         </template>
@@ -116,6 +120,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   // ---------------------------- 表格列 ----------------------------
 

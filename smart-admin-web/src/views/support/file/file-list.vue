@@ -76,6 +76,10 @@
       :pagination="false"
     >
       <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'folderType'">
           <span>{{ $smartEnumPlugin.getDescByValue('FILE_FOLDER_TYPE_ENUM', text) }}</span>
         </template>
@@ -132,6 +136,7 @@
   import FilePreviewModal from '/@/components/support/file-preview-modal/index.vue';
   import FileUpload from '/@/components/support/file-upload/index.vue';
   import { FILE_FOLDER_TYPE_ENUM } from '/@/constants/support/file-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
   // ---------------------------- 表格列 ----------------------------
 
   const columns = ref([

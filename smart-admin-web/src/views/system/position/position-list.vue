@@ -65,6 +65,9 @@
       :row-selection="{ selectedRowKeys: selectedRowKeyList, onChange: onSelectChange }"
     >
       <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'action'">
           <div class="smart-table-operate">
             <a-button @click="showForm(record)" type="link">编辑</a-button>
@@ -104,6 +107,7 @@
   import PositionForm from './position-form.vue';
   import _ from 'lodash';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
   // ---------------------------- 表格列 ----------------------------
 
   const columns = ref([

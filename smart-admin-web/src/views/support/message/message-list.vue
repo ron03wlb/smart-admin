@@ -52,6 +52,10 @@
     <!---------- 表格 begin ----------->
     <a-table size="small" :dataSource="tableData" :columns="columns" rowKey="telephoneId" bordered :loading="tableLoading" :pagination="false">
       <template #bodyCell="{ record, column, text }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'readFlag'">
           {{ text ? '已读' : '未读' }}
         </template>
@@ -96,6 +100,7 @@
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import MessageSendForm from './components/message-send-form.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
   // ---------------------------- 表格列 ----------------------------
 
   const columns = ref([

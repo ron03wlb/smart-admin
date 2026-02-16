@@ -75,6 +75,10 @@
       :row-selection="{ selectedRowKeys: selectedRowKeyList, onChange: onSelectChange }"
     >
       <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'updateTime' || column.dataIndex === 'publicDate'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'updateVersion'">
           <a-button @click="showModal(record)" type="link">{{ text }}</a-button>
         </template>
@@ -129,6 +133,7 @@
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import ChangeLogModal from './change-log-modal.vue';
   import ChangeLogForm from './change-log-form.vue';
+  import { formatDateTime } from '/@/lib/datetime-util';
   // ---------------------------- 表格列 ----------------------------
 
   const columns = ref([

@@ -46,7 +46,11 @@
       </a-row>
 
       <a-table size="small" :loading="tableLoading" bordered :dataSource="tableData" :columns="columns" rowKey="configId" :pagination="false">
-        <template #bodyCell="{ record, column }">
+        <template #bodyCell="{ text, record, column }">
+          <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'updateTime'">
+            {{ formatDateTime(text) }}
+          </template>
+
           <template v-if="column.dataIndex === 'action'">
             <div class="smart-table-operate">
               <a-button @click="toEditOrAdd(record)" v-privilege="'support:config:update'" type="link">编辑</a-button>
@@ -81,6 +85,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const columns = ref([
     {

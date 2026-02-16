@@ -37,6 +37,9 @@
     </a-form>
     <a-table rowKey="employeeId" :columns="tableColumns" :dataSource="tableData" :pagination="false" :loading="tableLoading" size="small" bordered>
       <template #bodyCell="{ column, record, text }">
+        <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'updateTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'employeeName'"> {{ text }}({{ record.departmentName }}) </template>
         <template v-if="column.dataIndex === 'firstIp'"> {{ text }} ({{ record.firstDevice }}) </template>
         <template v-if="column.dataIndex === 'lastIp'"> {{ text }} ({{ record.lastDevice }}) </template>
@@ -64,6 +67,7 @@
   import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '/@/constants/common-const';
   import DepartmentTreeSelect from '/@/components/system/department-tree-select/index.vue';
   import uaparser from 'ua-parser-js';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const props = defineProps({
     noticeId: {

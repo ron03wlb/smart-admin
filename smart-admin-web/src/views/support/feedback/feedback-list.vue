@@ -44,6 +44,10 @@
   <a-card size="small">
     <a-table rowKey="feedbackId" :dataSource="tableData" :columns="tableColumns" :pagination="false" :loading="tableLoading" size="small" bordered>
       <template #bodyCell="{ text, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'feedbackAttachment'">
           <FilePreview :fileList="text" type="picture" />
         </template>
@@ -77,6 +81,7 @@
   import { feedbackApi } from '/@/api/support/feedback-api';
   import FilePreview from '/@/components/support/file-preview/index.vue';
   import { smartSentry } from '/@/lib/smart-sentry';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   // ----------------------- 表格列 --------------------------------------
   const tableColumns = reactive([

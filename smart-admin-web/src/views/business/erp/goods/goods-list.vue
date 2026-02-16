@@ -114,6 +114,9 @@
         <SmartHeaderCell v-model:value="queryForm[column.filterOptions?.key || column.dataIndex]" :column="column" @change="queryData" />
       </template>
       <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'goodsName'">
           {{ text }}
         </template>
@@ -202,6 +205,7 @@
   import SmartHeaderCell from '/@/components/support/table-header-cell/index.vue';
   import { DICT_CODE_ENUM } from '/@/constants/support/dict-const.js';
   import DictLabel from '/@/components/support/dict-label/index.vue';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   // ---------------------------- 表格列 ----------------------------
 

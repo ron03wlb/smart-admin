@@ -57,6 +57,10 @@
     </a-row>
     <a-table size="small" :loading="tableLoading" :dataSource="tableData" :columns="columns" bordered rowKey="operateLogId" :pagination="false">
       <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'response'">
           <a-typography-text v-if="text && text.ok">{{ text ? text.msg : '-' }}</a-typography-text>
           <a-typography-text v-else type="warning">{{ text ? text.msg : '-' }}</a-typography-text>
@@ -110,6 +114,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const columns = ref([
     {

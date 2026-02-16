@@ -46,6 +46,9 @@
 
     <a-table rowKey="noticeId" :columns="tableColumns" :dataSource="tableData" :pagination="false" :loading="tableLoading" bordered size="small">
       <template #bodyCell="{ column, record, text }">
+        <template v-if="column.dataIndex === 'publishTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'title'">
           <span v-show="record.viewFlag">
             <a @click="toDetail(record.noticeId)" style="color: #8c8c8c">【{{ record.noticeTypeName }}】{{ text }}（已读）</a>
@@ -84,6 +87,7 @@
   import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '/@/constants/common-const';
   import { noticeApi } from '/@/api/business/oa/notice-api';
   import { smartSentry } from '/@/lib/smart-sentry';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const tableColumns = reactive([
     {

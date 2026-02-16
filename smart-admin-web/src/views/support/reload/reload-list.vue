@@ -44,7 +44,11 @@
       rowKey="tag"
       :pagination="false"
     >
-      <template #bodyCell="{ record, column }">
+      <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime' || column.dataIndex === 'updateTime'">
+          {{ formatDateTime(text) }}
+        </template>
+
         <template v-if="column.dataIndex === 'action'">
           <div class="smart-table-operate">
             <a-button @click="doReload(record.tag)" v-privilege="'support:reload:execute'" type="link">执行</a-button>
@@ -66,6 +70,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   //------------------------ 表格渲染 ---------------------
 

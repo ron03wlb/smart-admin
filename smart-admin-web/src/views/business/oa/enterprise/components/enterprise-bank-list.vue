@@ -51,7 +51,10 @@
       <TableOperator class="smart-margin-bottom5" v-model="columns" :tableId="TABLE_ID_CONST.BUSINESS.OA.ENTERPRISE_BANK" :refresh="ajaxQuery" />
     </a-row>
     <a-table :scroll="{ x: 1300 }" size="small" :dataSource="tableData" bordered :columns="columns" rowKey="bankId" :pagination="false">
-      <template #bodyCell="{ record, column }">
+      <template #bodyCell="{ text, record, column }">
+        <template v-if="column.dataIndex === 'createTime'">
+          {{ formatDateTime(text) }}
+        </template>
         <template v-if="column.dataIndex === 'disabledFlag'">
           {{ record.disabledFlag ? '禁用' : '启用' }}
         </template>
@@ -95,6 +98,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   const props = defineProps({
     enterpriseId: {

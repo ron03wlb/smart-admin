@@ -67,7 +67,13 @@
       :columns="columns"
       rowKey="goodsId"
       :pagination="false"
-    />
+    >
+      <template #bodyCell="{ text, column }">
+        <template v-if="column.dataIndex === 'processStartTime' || column.dataIndex === 'heartBeatTime'">
+          {{ formatDateTime(text) }}
+        </template>
+      </template>
+    </a-table>
     <div class="smart-query-table-page">
       <a-pagination
         showSizeChanger
@@ -92,6 +98,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+  import { formatDateTime } from '/@/lib/datetime-util';
 
   //------------------------ 时间选择 ---------------------
   const defaultChooseTimeRange = defaultTimeRanges;
