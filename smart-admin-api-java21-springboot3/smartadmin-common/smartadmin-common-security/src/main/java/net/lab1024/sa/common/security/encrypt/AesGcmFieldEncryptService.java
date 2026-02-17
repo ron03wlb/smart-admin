@@ -83,6 +83,13 @@ public class AesGcmFieldEncryptService {
 
     try {
       String[] parts = encryptedValue.split(":", 3);
+      if (parts.length < 3) {
+        throw new FieldEncryptException(
+            "Corrupted encrypted value: expected format 'v1:{iv}:{ciphertext}', got "
+                + parts.length
+                + " parts",
+            null);
+      }
       byte[] iv = Base64.getDecoder().decode(parts[1]);
       byte[] ciphertext = Base64.getDecoder().decode(parts[2]);
 

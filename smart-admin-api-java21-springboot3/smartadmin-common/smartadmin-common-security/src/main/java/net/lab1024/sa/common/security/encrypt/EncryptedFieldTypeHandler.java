@@ -28,7 +28,7 @@ import org.apache.ibatis.type.JdbcType;
 @Slf4j
 public class EncryptedFieldTypeHandler extends BaseTypeHandler<String> {
 
-  private static AesGcmFieldEncryptService encryptService;
+  private static volatile AesGcmFieldEncryptService encryptService;
 
   /**
    * Set the encryption service instance (called by auto-configuration)
@@ -46,8 +46,10 @@ public class EncryptedFieldTypeHandler extends BaseTypeHandler<String> {
     if (encryptService != null) {
       ps.setString(i, encryptService.encrypt(parameter));
     } else {
-      log.warn("EncryptedFieldTypeHandler: encryptService not initialized, storing plaintext");
-      ps.setString(i, parameter);
+      throw new IllegalStateException(
+          "EncryptedFieldTypeHandler: encryptService not initialized. "
+              + "Refusing to store plaintext. Ensure smart.field-encrypt.enabled=true "
+              + "and FieldEncryptAutoConfiguration has been loaded.");
     }
   }
 

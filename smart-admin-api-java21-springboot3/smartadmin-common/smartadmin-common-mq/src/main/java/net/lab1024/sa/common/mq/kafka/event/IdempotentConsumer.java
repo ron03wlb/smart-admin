@@ -17,9 +17,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * <p>Layer 1: Redis SETNX (fast duplicate check, < 5ms)
  *
- * <p>Layer 2: DB t_idempotent_key UNIQUE constraint (< 50ms)
+ * <p>Layer 2: Redisson distributed lock (concurrent protection)
  *
- * <p>Layer 3: Redisson distributed lock (concurrent protection)
+ * <p>Layer 3: DB t_idempotent_key UNIQUE constraint (final safety net)
  *
  * @param <T> message type
  * @author iGaming Team
@@ -59,21 +59,20 @@ public abstract class IdempotentConsumer<T> extends AbstractKafkaListener<T> {
       return;
     }
 
-    // === Layer 3: Distributed lock for concurrent protection ===
+    // === Layer 2: Distributed lock for concurrent protection ===
     String lockKey = "lock:event:" + eventId;
     RLock lock = redissonClient.getLock(lockKey);
 
     try {
       boolean acquired = lock.tryLock(LOCK_WAIT_SECONDS, LOCK_LEASE_SECONDS, TimeUnit.SECONDS);
       if (!acquired) {
-        log.warn("Failed to acquire lock for event: eventId={}", eventId);
-        // Remove Redis key so retry can re-attempt
-        redisTemplate.delete(redisKey);
-        return;
+        log.warn("Failed to acquire lock for event: eventId={}, will retry via Kafka", eventId);
+        throw new EventProcessingException(
+            "Failed to acquire distributed lock for event: " + eventId);
       }
 
       try {
-        // === Layer 2: DB UNIQUE constraint as final safety net ===
+        // === Layer 3: DB UNIQUE constraint as final safety net ===
         insertIdempotentKey(eventId, event.getEventType());
 
         // Delegate to subclass business logic
@@ -85,12 +84,11 @@ public abstract class IdempotentConsumer<T> extends AbstractKafkaListener<T> {
             event.getEventType());
 
       } catch (DuplicateKeyException e) {
-        log.info("Event duplicate detected at Layer 2 (DB): eventId={}", eventId);
+        log.info("Event duplicate detected at Layer 3 (DB): eventId={}", eventId);
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      log.error("Lock acquisition interrupted: eventId={}", eventId, e);
-      redisTemplate.delete(redisKey);
+      throw new EventProcessingException("Lock acquisition interrupted for event: " + eventId, e);
     } finally {
       if (lock.isHeldByCurrentThread()) {
         lock.unlock();

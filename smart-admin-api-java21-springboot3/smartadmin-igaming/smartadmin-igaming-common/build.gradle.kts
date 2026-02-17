@@ -12,6 +12,9 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-core"))
     api(project(":smartadmin-common:smartadmin-common-mybatis"))
 
+    // Multi-Tenant (TenantContext in common-core, config in common-tenant)
+    api(project(":smartadmin-common:smartadmin-common-tenant"))
+
     // Vavr - Functional programming (MANDATORY)
     api("io.vavr:vavr")
 

@@ -28,6 +28,11 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-json"))
     api(project(":smartadmin-common:smartadmin-common-cache"))
 
+    // iGaming Infrastructure (Multi-Tenant, Encryption, Kafka)
+    api(project(":smartadmin-common:smartadmin-common-tenant"))
+    api(project(":smartadmin-common:smartadmin-common-security"))
+    api(project(":smartadmin-common:smartadmin-common-mq"))
+
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))
