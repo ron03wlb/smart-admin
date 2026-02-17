@@ -34,6 +34,11 @@ check_file() {
         return 0
     fi
 
+    # 跳過 source-archive (READ-ONLY per P1 guardrail)
+    if [[ "$file" == *"/source-archive/"* ]]; then
+        return 0
+    fi
+
     ((FILES_CHECKED++))
 
     local file_errors=0
