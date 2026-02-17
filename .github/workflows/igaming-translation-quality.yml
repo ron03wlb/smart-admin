@@ -209,21 +209,22 @@ jobs:
               failed_checks.push('❌ stateDiagram <br/> tags (HIGH)');
             }
 
-            const body = `## ❌ iGaming Translation Quality Check Failed
-
-Please fix the errors and push again.
-
-**Failed Checks:**
-${failed_checks.map(c => `- ${c}`).join('\n')}
-
-**Reference:**
-- [TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md)
-- [Ralph Guardrails](docs/ralph/guardrails.md)
-- [SmartAdmin Mermaid Standards](CLAUDE.md#mermaid-diagram-standards)
-
-**Download Quality Reports:**
-View detailed logs and artifacts in the [Actions](${context.payload.repository.html_url}/actions/runs/${context.runId}) tab.
-`;
+            const body = [
+              '## ❌ iGaming Translation Quality Check Failed',
+              '',
+              'Please fix the errors and push again.',
+              '',
+              '**Failed Checks:**',
+              ...failed_checks.map(c => '- ' + c),
+              '',
+              '**Reference:**',
+              '- [TRANSLATION_GLOSSARY.md](docs/iGaming/TRANSLATION_GLOSSARY.md)',
+              '- [Ralph Guardrails](docs/ralph/guardrails.md)',
+              '- [SmartAdmin Mermaid Standards](CLAUDE.md#mermaid-diagram-standards)',
+              '',
+              '**Download Quality Reports:**',
+              'View detailed logs and artifacts in the [Actions](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') tab.',
+            ].join('\n');
 
             github.rest.issues.createComment({
               issue_number: issue_number,

@@ -1,11 +1,11 @@
 # iGaming 基礎設施缺口分析：SmartAdmin 需先完成的基建項目
 
 > **文件類型**：設計文件 (Design Document)
-> **版本**：1.12.0
+> **版本**：1.13.0
 > **日期**：2026-02-17
-> **狀態**：已確認 (Confirmed) — 所有技術決策已完成（D1-D11）
+> **狀態**：已確認 (Confirmed) — 所有技術決策已完成（D1-D11），**20/20 缺口全部完成**
 > **前置依賴**：Phase 0-3 實作設計文件（9 份，11K+ 行）
-> **變更紀錄**：v1.12.0 — Sprint 2 全部完成（G1 Multi-Tenant + G3 Flyway + G11 RLS + G13 Sa-Token + G14 Virtual Thread + G15 UNIQUE + G1.5 數據遷移），後端 18/20 gaps 完成 / v1.11.0 — G12 Testcontainers 完成 / v1.10.0 — G10 ArchUnit 完成 / v1.9.0 — G16+Sprint 4 完成 / v1.8.0 — G8 / v1.7.0 — G7 / v1.6.0 — G6 / v1.5.0 — G5+Sprint 3 完成 / v1.4.0 — G4 / v1.3.x — G9+G2+G2.5+G11 / v1.2.x — D8-D11+5 新缺口 / v1.1.0 — 原始碼驗證+D1-D7
+> **變更紀錄**：v1.13.0 — G2.3 前端 ISO-8601 + 多租戶 UI 適配完成（datetime-util.ts + tenant Pinia store + axios headers + 24 list pages formatDateTime），**20/20 gaps 全部完成 (100%)** / v1.12.0 — Sprint 2 全部完成（G1 Multi-Tenant + G3 Flyway + G11 RLS + G13 Sa-Token + G14 Virtual Thread + G15 UNIQUE + G1.5 數據遷移），後端 18/20 gaps 完成 / v1.11.0 — G12 Testcontainers 完成 / v1.10.0 — G10 ArchUnit 完成 / v1.9.0 — G16+Sprint 4 完成 / v1.8.0 — G8 / v1.7.0 — G7 / v1.6.0 — G6 / v1.5.0 — G5+Sprint 3 完成 / v1.4.0 — G4 / v1.3.x — G9+G2+G2.5+G11 / v1.2.x — D8-D11+5 新缺口 / v1.1.0 — 原始碼驗證+D1-D7
 
 ## Context
 
@@ -63,7 +63,7 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 | **G15** | **UNIQUE Constraint + tenant_id 衝突改造** ✅ DONE | **P0** | **M** | Phase 0 (G1.5 聯動) | V4__unique_constraint_tenant.sql |
 | **G16** | **Argon2id 參數強化** ✅ DONE | **P1** | **S** | Phase 2 (Player) | smartadmin-common-security + LoginService lazy migration |
 | **G1.5** | **全域 tenant_id 數據遷移** ✅ DONE | **P0** | **M** | Phase 0 (數據) | V2__add_tenant_id.sql (default tenant + NOT NULL) |
-| **G2.3** | **前端 ISO-8601 + 多租戶 UI 適配** (UPDATED v1.2.0) | **P1** | **M+** | Phase 0 (前端) | 前端團隊（D3+G13 衍生） |
+| **G2.3** | **前端 ISO-8601 + 多租戶 UI 適配** ✅ DONE | **P1** | **M+** | Phase 0 (前端) | datetime-util.ts + tenant store + axios headers + 24 list pages |
 | **G2.5** | **MySQL DDL → PostgreSQL 重寫** ✅ DONE | **P1** | **S** | Phase 0 (DDL) | `sa-admin/build/` 殘留清理（D7 衍生） |
 
 ---
@@ -500,24 +500,52 @@ iGaming 實作文件（Phase 0-3，共 9 份設計文件、11K+ 行）定義了�
 
 ---
 
-### G2.3: 前端 ISO-8601 + 多租戶 UI 適配 【P1-High / M+】（UPDATED v1.2.0）
+### G2.3: 前端 ISO-8601 + 多租戶 UI 適配 【P1-High / M+】✅ DONE
 
 > 因 D3 決策（API 時間格式改為 ISO-8601）+ G13（Sa-Token 多租戶）衍生的綜合前端需求。v1.2.0 擴展範圍，複雜度從 M 升為 M+。
+
+**狀態**：✅ 已完成（v1.13.0, 2026-02-17）
+
+**已建置項目：**
+1. `src/lib/datetime-util.ts` — ISO-8601 解析/格式化工具（dayjs utc/timezone/customParseFormat plugins）
+   - `formatDateTime(isoString)` → `"2026-02-14 18:30:00"`（顯示用）
+   - `formatDate(isoString)` → `"2026-02-14"`
+   - `toApiDateTime(dayjsValue)` → ISO-8601 字串（提交 API 用）
+   - `parseApiDateTime(isoString)` → dayjs 實例（兼容舊格式 fallback）
+2. `src/store/modules/system/tenant.ts` — 租戶 Pinia store（tenantId, timezone, tenantCode）
+   - `setTenantInfo(data)` — 登入後設定租戶上下文 + localStorage 持久化
+   - `clearTenantInfo()` — 登出時清除
+3. `src/constants/local-storage-key-const.ts` — +3 tenant keys（TENANT_ID, TENANT_CODE, TENANT_TIMEZONE）
+4. `src/lib/axios.ts` — request interceptor 注入 `X-Tenant-Id` + `X-Timezone` headers
+5. `src/views/system/login/login.vue` — 登入成功後存儲租戶上下文（tenantId, timezone, tenantCode）
+6. `src/store/modules/system/user.ts` — logout 時 `clearTenantInfo()`
+7. `src/lib/default-time-ranges.ts` — +timezone-aware `createTimeRanges(tz)` composable
+8. **24 個 list 頁面** — `#bodyCell` slot 加入 `formatDateTime(text)` 格式化時間欄位
+   - support 模組（15 頁面）：operate-log, login-log, login-fail, change-log, feedback, file, heart-beat, config, job, deleted-job, message, reload, reload-result, help-doc-list, help-doc-view-record
+   - business 模組（6 頁面）：goods, enterprise, enterprise-bank, enterprise-invoice, notice, notice-employee, notice-view-record
+   - system 模組（3 頁面）：department, position, serial-number
+
+**設計決策**：
+- D1: axios interceptor 使用 `localRead` 而非 `useTenantStore()` 避免 Pinia 循環依賴
+- D2: 保留原 `defaultTimeRanges` export 向後兼容，新增 `createTimeRanges(tz)` composable
+- D3: DatePicker `@change` handlers（22 files）暫不修改，依賴後端 fallback 解析舊格式
+
+**規格文件**：`docs/iGaming/implementation/g2.3-frontend-adaptation-spec.md`（906 行）
+
+**原始需求（保留紀錄）：**
 
 **問題 1（原 v1.1.0）**：API 時間格式從 `"2026-02-14 10:30:00"` 變為 `"2026-02-14T10:30:00+00:00"`，前端需全面適配。
 
 **問題 2（v1.2.0 新增）**：多租戶認證需前端配合傳遞 tenant 資訊。
 
 **影響範圍：**
-1. 所有時間顯示元件的格式化邏輯
-2. 表單提交的時間格式（DatePicker 等元件）
-3. 時區轉換邏輯（UTC → 用戶本地時區顯示）
-4. 時間比較和計算邏輯
-5. **前端 Login API 需傳 `tenantId` 參數**（G13 衍生）(v1.2.0 補充)
-6. **API 請求 Header 攜帶 tenant 資訊**（或從 URL 路徑/子域名推斷）(v1.2.0 補充)
-7. **租戶切換 UI 邏輯**（如有多租戶管理需求）(v1.2.0 補充)
-
-**需要跨團隊協調**：此為前端工作，需前端團隊配合。後端在 G2 + G13 完成後即產生此需求。
+1. 所有時間顯示元件的格式化邏輯 ✅
+2. 表單提交的時間格式（DatePicker 等元件）— P2 deferred（後端 fallback 可解析）
+3. 時區轉換邏輯（UTC → 用戶本地時區顯示）✅（後端 TenantTimezoneSerializer 已轉換）
+4. 時間比較和計算邏輯 ✅（dayjs 原生支援 ISO-8601）
+5. **前端 Login API 需傳 `tenantId` 參數**（G13 衍生）✅
+6. **API 請求 Header 攜帶 tenant 資訊** ✅（X-Tenant-Id + X-Timezone）
+7. **租戶切換 UI 邏輯**（如有多租戶管理需求）— P2 deferred
 
 ---
 
@@ -710,7 +738,7 @@ Sprint 4: 金融 + 規則引擎 ✅ ALL DONE
 Sprint 5: 品質門禁
 ├── G10: ArchUnit iGaming 規則 ✅ ────────── 13 boundary rules + BUSINESS_CLASSES patch
 ├── G12: Testcontainers Kafka/Redis ✅ ─────── PostgreSQL + Kafka + Redis 三容器基礎類
-└── G2.3: 前端 ISO-8601 + 多租戶 UI 適配驗收 ── 需前端團隊完成後驗收
+└── G2.3: 前端 ISO-8601 + 多租戶 UI 適配 ✅ ── datetime-util.ts + tenant store + 24 list pages
 ```
 
 **Sprint 間不可跳過**：Sprint 0.5 → Sprint 1 → Sprint 2 為嚴格順序依賴。Sprint 3 依賴 Sprint 2（Flyway 管理 idempotent_key/outbox 表）。Sprint 4 可與 Sprint 3 部分平行。
@@ -770,10 +798,9 @@ Sprint 5: 品質門禁
 
 ## 總結
 
-**20 個缺口項目** — **18/20 完成（90%）**，剩餘 2 項（G2.3 前端、G0 BaseEntity 標記）：
+**20 個缺口項目** — **20/20 全部完成（100%）** :
 - **P0 (Critical)**: 11 項 — 全部 ✅ DONE（G0, G1, G1.5, G2, G3, G4, G5, G11, G13, G14, G15）
-- **P1 (High)**: 6 項 — 5/6 ✅ DONE（G6, G7, G8, G16, G2.5）— G2.3 需前端團隊
-- **P1 → Sprint 1**: G9 ✅ DONE
+- **P1 (High)**: 7 項 — 全部 ✅ DONE（G2.3, G6, G7, G8, G9, G16, G2.5）
 - **P2 (Medium)**: 2 項 — 全部 ✅ DONE（G10, G12）
 
 ### 風險矩陣（v1.2.0 更新）
@@ -805,10 +832,10 @@ Sprint 5: 品質門禁
 
 ### 需要跨團隊協調的事項
 
-1. **前端團隊**：ISO-8601 時間格式適配 + 多租戶 UI 適配（D3 決策 + G13，G2.3 範圍擴展）
-2. **DBA/運維**：全域 tenant_id DDL 遷移策略 + UNIQUE constraint 審查（D4 決策，G1.5 + G15）
-3. **QA 團隊**：Big-bang 遷移的回歸測試計畫（D2 決策）
-4. **安全團隊**：Argon2id 參數合規確認 + PII 加密範圍確認（G16 + G5）(v1.2.0 新增)
+1. ~~**前端團隊**：ISO-8601 時間格式適配 + 多租戶 UI 適配~~ → ✅ G2.3 已完成（datetime-util.ts + tenant store + 24 list pages）
+2. ~~**DBA/運維**：全域 tenant_id DDL 遷移策略 + UNIQUE constraint 審查~~ → ✅ G1.5 + G15 已完成
+3. **QA 團隊**：Big-bang 遷移的回歸測試計畫（D2 決策）— 待 QA 排程
+4. ~~**安全團隊**：Argon2id 參數合規確認 + PII 加密範圍確認~~ → ✅ G16 + G5 已完成
 
 ---
 
