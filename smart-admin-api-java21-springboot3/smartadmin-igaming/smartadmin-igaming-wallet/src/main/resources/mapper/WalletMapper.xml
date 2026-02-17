@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.wallet.dao.WalletDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.wallet.domain.vo.WalletVO">
+        SELECT
+            wallet_id,
+            player_id,
+            currency_code,
+            wallet_type,
+            balance,
+            locked_amount,
+            (balance - locked_amount) AS available_balance,
+            create_time,
+            update_time
+        FROM t_wallet
+        <where>
+            deleted = FALSE
+            <if test="query.playerId != null">
+                AND player_id = #{query.playerId}
+            </if>
+            <if test="query.walletType != null">
+                AND wallet_type = #{query.walletType}
+            </if>
+            <if test="query.currencyCode != null and query.currencyCode != ''">
+                AND currency_code = #{query.currencyCode}
+            </if>
+        </where>
+        ORDER BY wallet_id ASC
+    </select>
+
+</mapper>

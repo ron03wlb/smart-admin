@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.wallet.domain.vo.WalletTransactionVO">
+        SELECT
+            transaction_id,
+            wallet_id,
+            player_id,
+            transaction_type,
+            amount,
+            balance_before,
+            balance_after,
+            request_id,
+            reference_type,
+            reference_id,
+            description,
+            create_time
+        FROM t_wallet_transaction
+        <where>
+            wallet_id = #{query.walletId}
+            <if test="query.transactionType != null">
+                AND transaction_type = #{query.transactionType}
+            </if>
+            <if test="query.startTime != null">
+                AND create_time &gt;= #{query.startTime}
+            </if>
+            <if test="query.endTime != null">
+                AND create_time &lt; #{query.endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>
