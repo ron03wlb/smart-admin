@@ -291,7 +291,7 @@ stateDiagram-v2
 ```
 
 **❌ 錯誤做法**:
-```mermaid
+```
 # ❌ 錯誤 - 使用 <br/> 標籤
 stateDiagram-v2
     A --> B: Event<br/>Action<br/>Result
@@ -317,7 +317,7 @@ stateDiagram-v2
 ```
 
 **❌ 錯誤做法**:
-```mermaid
+```
 # ❌ 錯誤 - 單行 note + <br/> 標籤
 stateDiagram-v2
     note right of STATE : Text<br/>More<br/>Info
@@ -344,7 +344,7 @@ stateDiagram-v2
 ### 錯誤 1: 使用 HTML 標籤
 
 **❌ 錯誤**:
-```mermaid
+```
 stateDiagram-v2
     A --> B: Event<br/>Action
 ```

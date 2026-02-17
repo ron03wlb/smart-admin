@@ -208,15 +208,15 @@ RT_v1_1001_50001_a3b2c1d4e5f6_ab12cd34
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Active: 登入成功<br/>生成 Access + Refresh Token
+    [*] --> Active: 登入成功 / 生成 Access + Refresh Token
 
     Active --> NearExpiry: Access Token 剩餘<5分鐘
-    NearExpiry --> Active: 刷新成功<br/>舊 Refresh Token 撤銷
+    NearExpiry --> Active: 刷新成功 / 舊 Refresh Token 撤銷
 
     Active --> Expired: Access Token 過期（15min）
     Expired --> Active: 使用 Refresh Token 刷新
 
-    Active --> Revoked: 用戶登出<br/>或管理員強制撤銷
+    Active --> Revoked: 用戶登出或管理員強制撤銷
     Expired --> Revoked: Refresh Token 過期（30天）
     NearExpiry --> Revoked: 刷新失敗（簽名不匹配）
 

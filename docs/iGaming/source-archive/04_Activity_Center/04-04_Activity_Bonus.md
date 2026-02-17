@@ -278,59 +278,123 @@ flowchart TD
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING_ISSUE: 規則引擎匹配成功 <br/>創建獎勵記錄
+    [*] --> PENDING_ISSUE: 規則引擎匹配成功 / 創建獎勵記錄
 
-    PENDING_ISSUE --> ISSUED: 風控審核通過<br/>錢包服務執行發放<br/>━━━━━━━━━━━━<br/>Actions:<br/>• wallet.creditBonus(amount)<br/>• 創建 wagering_requirement<br/>• 發送通知
+    PENDING_ISSUE --> ISSUED: 風控審核通過 / 錢包服務執行發放
 
-    PENDING_ISSUE --> REJECTED: 風控審核拒絕 <br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 多帳號檢測<br/>• 獎金獵人模式 <br/>• 預算耗盡<br/>Actions:<br/>• 標記 status=REJECTED<br/>• 記錄拒絕原因<br/>• 通知運營團隊
+    PENDING_ISSUE --> REJECTED: 風控審核拒絕
 
-    ISSUED --> ACTIVE: 玩家首次使用紅利投注<br/>或手動激活<br/>━━━━━━━━━━━━<br/>Actions:<br/>• 開始流水追蹤<br/>• activated_at = NOW()<br/>• 計時器開始 (有效期倒計時)
+    ISSUED --> ACTIVE: 玩家首次使用紅利投注或手動激活
 
-    ISSUED --> FORFEITED: 未激活超時<br/>━━━━━━━━━━━━<br/>Condition:<br/>• NOW() > issued_at + grace_period<br/>• grace_period = 7 days (default)<br/>Actions:<br/>• wallet.debitBonus(amount)<br/>• status = FORFEITED<br/>• 釋放活動預算
+    ISSUED --> FORFEITED: 未激活超時
 
-    ACTIVE --> WAGERING: 流水累積中<br/>━━━━━━━━━━━━<br/>每次投注事件:<br/>• effective_turnover += bet × game_weight<br/>• progress = effective_turnover / required_turnover × 100%<br/>• 實時更新進度條
+    ACTIVE --> WAGERING: 流水累積中
 
-    WAGERING --> WAGERING: 持續投注累積流水<br/>━━━━━━━━━━━━<br/>Validation Checks:<br/>• 投注額 <= maxBet (anti-abuse)<br/>• 遊戲在 eligible_games 列表<br/>• 無對沖/套利檢測
+    WAGERING --> WAGERING: 持續投注累積流水
 
-    WAGERING --> CLEARING_COMPLETED: 流水達標 100%<br/>━━━━━━━━━━━━<br/>Condition:<br/>• effective_turnover >= required_turnover<br/>Actions:<br/>• 觸發結算流程<br/>• 鎖定 bonus_balance (防篡改)
+    WAGERING --> CLEARING_COMPLETED: 流水達標 100%
 
-    WAGERING --> EXPIRED: 有效期內未完成流水<br/>━━━━━━━━━━━━<br/>Condition:<br/>• NOW() > expires_at<br/>• effective_turnover < required_turnover<br/>Actions:<br/>• wallet.debitBonus(remaining_balance)<br/>• 扣除未完成部分<br/>• 記錄完成率
+    WAGERING --> EXPIRED: 有效期內未完成流水
 
-    WAGERING --> CANCELLED_BY_PLAYER: 玩家主動取消紅利<br/>━━━━━━━━━━━━<br/>Actions:<br/>• wallet.debitBonus(bonus_balance)<br/>• 清空流水進度<br/>• 不影響已發放的派彩
+    WAGERING --> CANCELLED_BY_PLAYER: 玩家主動取消紅利
 
-    WAGERING --> CANCELLED_BY_ADMIN: 運營/風控強制取消<br/>━━━━━━━━━━━━<br/>Reasons:<br/>• 玩家違規 (多帳號被發現)<br/>• 活動緊急下架<br/>Actions:<br/>• wallet.debitBonus(bonus_balance)<br/>• 記錄取消原因<br/>• 必要時回滾派彩
+    WAGERING --> CANCELLED_BY_ADMIN: 運營/風控強制取消
 
-    CLEARING_COMPLETED --> CONVERTED_TO_CASH: 紅利轉現金<br/>━━━━━━━━━━━━<br/>Conversion Process:<br/>1️⃣ Calculate final_balance<br/>2️⃣ wallet.debitBonus(final_balance)<br/>3️⃣ wallet.creditCash(final_balance)<br/>4️⃣ status = CONVERTED
+    CLEARING_COMPLETED --> CONVERTED_TO_CASH: 紅利轉現金
 
-    CONVERTED_TO_CASH --> WITHDRAWABLE: 可提款狀態<br/>━━━━━━━━━━━━<br/>玩家可自由操作:<br/>• 繼續投注<br/>• 發起提款<br/>Actions:<br/>• 解除提款限制<br/>• 標記 bonus_id 已完成
+    CONVERTED_TO_CASH --> WITHDRAWABLE: 可提款狀態
 
-    CLEARING_COMPLETED --> CAPPED: 超過最大派彩上限<br/>━━━━━━━━━━━━<br/>Condition:<br/>• final_balance > max_cashout_cap<br/>Example:<br/>• bonus = $50<br/>• max_cashout = $500<br/>• player_balance = $800 (超限)<br/>Actions:<br/>• wallet.debitBonus($800)<br/>• wallet.creditCash($500)<br/>• 扣除超額部分 $300
+    CLEARING_COMPLETED --> CAPPED: 超過最大派彩上限
 
     CAPPED --> WITHDRAWABLE: 扣除超額後可提款
 
-    WITHDRAWABLE --> WITHDRAWN: 玩家成功提款<br/>━━━━━━━━━━━━<br/>Actions:<br/>• 執行提款流程<br/>• 標記 withdrawn_at<br/>• 歸檔獎勵記錄
+    WITHDRAWABLE --> WITHDRAWN: 玩家成功提款
 
-    WITHDRAWN --> [*]: 生命週期結束<br/>━━━━━━━━━━━━<br/>Final Actions:<br/>• 計算 bonus_ROI<br/>• 更新玩家分群<br/>• 生成財務報表
+    WITHDRAWN --> [*]: 生命週期結束
 
-    REJECTED --> [*]: 生命週期結束<br/>未發放
-    FORFEITED --> [*]: 生命週期結束<br/>未使用
-    EXPIRED --> [*]: 生命週期結束<br/>未完成流水
-    CANCELLED_BY_PLAYER --> [*]: 生命週期結束<br/>玩家主動放棄
-    CANCELLED_BY_ADMIN --> [*]: 生命週期結束<br/>強制取消
+    REJECTED --> [*]: 生命週期結束 / 未發放
+    FORFEITED --> [*]: 生命週期結束 / 未使用
+    EXPIRED --> [*]: 生命週期結束 / 未完成流水
+    CANCELLED_BY_PLAYER --> [*]: 生命週期結束 / 玩家主動放棄
+    CANCELLED_BY_ADMIN --> [*]: 生命週期結束 / 強制取消
 
-    note right of PENDING_ISSUE : 初始狀態<br/>━━━━━━━━<br/>風控審核窗口期<br/>典型時長: < 5 秒
+    note right of PENDING_ISSUE
+        初始狀態
+        ━━━━━━━━
+        風控審核窗口期
+        典型時長: < 5 秒
+    end note
 
-    note right of ACTIVE : 激活狀態<br/>━━━━━━━━<br/>玩家可使用紅利投注<br/>但未開始追蹤流水<br/>(某些活動需手動激活)
+    note right of ISSUED
+        Actions:
+        • wallet.creditBonus(amount)
+        • 創建 wagering_requirement
+        • 發送通知
+    end note
 
-    note right of WAGERING : 流水累積階段<br/>━━━━━━━━<br/>核心業務邏輯:<br/>• 實時計算有效流水<br/>• 檢測濫用行為<br/>• 更新進度通知<br/><br/>典型耗時:<br/>• 休閒玩家: 7-14 天<br/>• 高頻玩家: 1-3 天
+    note right of ACTIVE
+        激活狀態
+        ━━━━━━━━
+        玩家可使用紅利投注
+        但未開始追蹤流水
+        (某些活動需手動激活)
+    end note
 
-    note right of CLEARING_COMPLETED : 結算狀態<br/>━━━━━━━━<br/>流水達標後的臨界點<br/>需決定:<br/>• 是否超過 max_cashout<br/>• 最終可提現金額
+    note right of WAGERING
+        流水累積階段
+        ━━━━━━━━
+        核心業務邏輯:
+        • 實時計算有效流水
+        • 檢測濫用行為
+        • 更新進度通知
+        ━━━━━━━━
+        典型耗時:
+        • 休閒玩家: 7-14 天
+        • 高頻玩家: 1-3 天
+    end note
 
-    note right of WITHDRAWABLE : 可提款狀態<br/>━━━━━━━━<br/>紅利已轉為現金<br/>玩家可自由支配<br/>此時才算 "真正獲利"
+    note right of CLEARING_COMPLETED
+        結算狀態
+        ━━━━━━━━
+        流水達標後的臨界點
+        需決定:
+        • 是否超過 max_cashout
+        • 最終可提現金額
+    end note
 
-    note left of EXPIRED : 超時失效<br/>━━━━━━━━<br/>常見原因:<br/>• 流水倍數設置過高<br/>• 玩家遊戲頻率低<br/>• 遊戲貢獻率設置過低<br/><br/>運營優化:<br/>• 監控 expiry_rate<br/>• 調整 wager_multiplier
+    note right of WITHDRAWABLE
+        可提款狀態
+        ━━━━━━━━
+        紅利已轉為現金
+        玩家可自由支配
+        此時才算 "真正獲利"
+    end note
 
-    note left of CANCELLED_BY_ADMIN : 強制取消<br/>━━━━━━━━<br/>需留存證據:<br/>• 操作者 ID<br/>• 取消原因<br/>• 佐證文件<br/><br/>合規要求:<br/>• 玩家有權申訴<br/>• 7 天內必須回覆
+    note left of EXPIRED
+        超時失效
+        ━━━━━━━━
+        常見原因:
+        • 流水倍數設置過高
+        • 玩家遊戲頻率低
+        • 遊戲貢獻率設置過低
+        ━━━━━━━━
+        運營優化:
+        • 監控 expiry_rate
+        • 調整 wager_multiplier
+    end note
+
+    note left of CANCELLED_BY_ADMIN
+        強制取消
+        ━━━━━━━━
+        需留存證據:
+        • 操作者 ID
+        • 取消原因
+        • 佐證文件
+        ━━━━━━━━
+        合規要求:
+        • 玩家有權申訴
+        • 7 天內必須回覆
+    end note
 ```
 
 **狀態轉換觸發條件矩陣**：

@@ -716,15 +716,23 @@ stateDiagram-v2
     state "Turnover Calc (流水計算)" as S_Turnover
 
     %% 1. 初始階段
-    [*] --> S_Pending : 玩家下注<br/>(扣除餘額)
+    [*] --> S_Pending : 玩家下注 (扣除餘額)
 
     %% 修復點：將筆記移到 state 定義之外，並明確指向 S_Pending
-    note right of S_Pending : Status: PENDING<br/>Turnover: 0<br/>Reason: 等待GP確認
+    note right of S_Pending
+        Status: PENDING
+        Turnover: 0
+        Reason: 等待GP確認
+    end note
 
-    S_Pending --> S_Running : GP確認接受<br/>(遊戲開始)
+    S_Pending --> S_Running : GP確認接受 (遊戲開始)
 
     %% 2. 進行階段
-    note right of S_Running : Status: RUNNING<br/>Turnover: 0<br/>Reason: 賽果未出
+    note right of S_Running
+        Status: RUNNING
+        Turnover: 0
+        Reason: 賽果未出
+    end note
 
     S_Running --> S_Settlement : 接收賽果
 
@@ -744,8 +752,14 @@ stateDiagram-v2
         [*] --> Res_Cancel
         
         %% 內部狀態的筆記
-        note right of Res_Win : 賠付因子 > 1.0<br/>流水 100%
-        note right of Res_Draw : 賠付因子 1.0<br/>流水 0%
+        note right of Res_Win
+            賠付因子 > 1.0
+            流水 100%
+        end note
+        note right of Res_Draw
+            賠付因子 1.0
+            流水 0%
+        end note
     }
 
     %% 4. 資金流向與流水計算

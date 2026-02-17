@@ -1427,11 +1427,23 @@ stateDiagram-v2
     COMPLETED --> [*] : 提款完成
     REFUNDED --> [*] : 退款完成
 
-    note right of RISK_CHECK : SAGA Step 1: 風險評估<br/>SAGA Step 2: KYC/AML 驗證<br/>SAGA Step 2.5: 延遲風控檢查
+    note right of RISK_CHECK
+        SAGA Step 1: 風險評估
+        SAGA Step 2: KYC/AML 驗證
+        SAGA Step 2.5: 延遲風控檢查
+    end note
 
-    note right of PROCESSING : SAGA Step 4: 支付執行<br/>包含重試機制 (最多 3 次)
+    note right of PROCESSING
+        SAGA Step 4: 支付執行
+        包含重試機制 (最多 3 次)
+    end note
 
-    note right of ROLLBACK : SAGA 補償流程:<br/>- 解鎖餘額<br/>- 回滾交易<br/>- 發送通知
+    note right of ROLLBACK
+        SAGA 補償流程:
+        - 解鎖餘額
+        - 回滾交易
+        - 發送通知
+    end note
 ```
 
 **狀態轉換觸發示例** (PostgreSQL):

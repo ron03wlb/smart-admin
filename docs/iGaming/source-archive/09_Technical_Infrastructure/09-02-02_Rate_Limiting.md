@@ -143,7 +143,7 @@ plugins:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> CLOSED: 系統啟動<br/>Initial State
+    [*] --> CLOSED: 系統啟動 / Initial State
 
     state CLOSED {
         [*] --> Monitoring
@@ -152,33 +152,54 @@ stateDiagram-v2
         ErrorTracking --> Monitoring
     }
 
-    CLOSED --> OPEN: 觸發條件:<br/>- Error Rate > 50% (last 10 requests)<br/>- OR Timeout Rate > 50%<br/>- OR Avg Latency > 5000ms
+    CLOSED --> OPEN: Error Rate > 50% or Timeout > 50% or Latency > 5000ms
 
     state OPEN {
         [*] --> FailFast
-        FailFast --> ReturnError: 立即返回<br/>503 Service Unavailable<br/>(不調用上游)
+        FailFast --> ReturnError: 立即返回 503 (不調用上游)
         ReturnError --> Timer: 等待 30 秒
         Timer --> FailFast
     }
 
-    OPEN --> HALF_OPEN: 30 秒後<br/>嘗試探測
+    OPEN --> HALF_OPEN: 30 秒後嘗試探測
 
     state HALF_OPEN {
         [*] --> ProbeRequest
-        ProbeRequest --> WaitResponse: 發送 1 個探測請求<br/>到上游服務
+        ProbeRequest --> WaitResponse: 發送 1 個探測請求到上游服務
     }
 
-    HALF_OPEN --> CLOSED: ✅ 探測成功<br/>- Status Code: 2xx<br/>- Latency < 2000ms<br/>→ 重置計數器<br/>→ 恢復正常運營
+    HALF_OPEN --> CLOSED: 探測成功 (2xx + Latency < 2000ms)
 
-    HALF_OPEN --> OPEN: ❌ 探測失敗<br/>- Status Code: 5xx<br/>- OR Timeout<br/>→ 重新跳閘<br/>→ 回到 30 秒等待
+    HALF_OPEN --> OPEN: 探測失敗 (5xx or Timeout)
 
-    CLOSED --> CLOSED: 錯誤率 < 50%<br/>持續監控
+    CLOSED --> CLOSED: 錯誤率 < 50% / 持續監控
 
-    note right of CLOSED : 正常狀態 (CLOSED):<br/>- 所有請求轉發至上游<br/>- 監控指標:<br/>  * Error Rate (5xx)<br/>  * Timeout Rate<br/>  * Avg Latency<br/>- 滑動窗口: 最近 10 個請求
+    note right of CLOSED
+        正常狀態 (CLOSED):
+        - 所有請求轉發至上游
+        - 監控指標:
+          * Error Rate (5xx)
+          * Timeout Rate
+          * Avg Latency
+        - 滑動窗口: 最近 10 個請求
+    end note
 
-    note right of OPEN : 跳閘狀態 (OPEN):<br/>- 快速失敗 (Fail-Fast)<br/>- 不調用上游服務<br/>- 減輕上游壓力<br/>- 防止雪崩效應<br/>- 固定等待: 30 秒
+    note right of OPEN
+        跳閘狀態 (OPEN):
+        - 快速失敗 (Fail-Fast)
+        - 不調用上游服務
+        - 減輕上游壓力
+        - 防止雪崩效應
+        - 固定等待: 30 秒
+    end note
 
-    note right of HALF_OPEN : 半開狀態 (HALF_OPEN):<br/>- 發送探測請求<br/>- 驗證上游是否恢復<br/>- 成功 → CLOSED<br/>- 失敗 → OPEN (重新跳閘)
+    note right of HALF_OPEN
+        半開狀態 (HALF_OPEN):
+        - 發送探測請求
+        - 驗證上游是否恢復
+        - 成功 → CLOSED
+        - 失敗 → OPEN (重新跳閘)
+    end note
 ```
 
 **狀態轉換詳細說明**:

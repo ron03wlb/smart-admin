@@ -125,9 +125,19 @@ stateDiagram-v2
     Decreasing --> Zero: lockAmount <= 0
     Zero --> [*]: 可自由提款
     
-    note right of Locked : lockAmount 產生條件:<br/>- DEPOSIT<br/>- PROMOTION<br/>- VIP<br/>- RED_ENVELOPES<br/>- WALLET_DEPOSIT
-    
-    note right of Decreasing : 每次結算減少<br/>lockAmount = max(0, lockAmount - effectiveStake)
+    note right of Locked
+        lockAmount 產生條件:
+        - DEPOSIT
+        - PROMOTION
+        - VIP
+        - RED_ENVELOPES
+        - WALLET_DEPOSIT
+    end note
+
+    note right of Decreasing
+        每次結算減少
+        lockAmount = max(0, lockAmount - effectiveStake)
+    end note
 ```
 
 ### 4.2 lockAmount 變化時機
