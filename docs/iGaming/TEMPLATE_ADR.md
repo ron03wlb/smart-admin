@@ -29,7 +29,7 @@
 **範例**：
 隨著平台玩家數量增長至 100 萬+，現有的單數據庫架構面臨性能瓶頸。尤其在高峰時段（晚上 8-11 點），數據庫 CPU 使用率達到 95%，導致玩家註冊 (Player Registration) 和存款 (Deposit) 接口響應時間超過 3 秒，嚴重影響用戶體驗。
 
-此外，隨著業務拓展至多個市場（馬耳他、英國、亞洲），我們需要支持多租戶架構 (Multi-Tenant Architecture)，確保不同運營商的數據完全隔離 (Data Isolation)，符合 GDPR（通用數據保護條例）和 PCI-DSS（PCI 數據安全標準）合規要求。
+此外，隨著業務拓展至多個市場（馬耳他、英國、亞洲），我們需要支持 Multi-Tenant Architecture，確保不同運營商的資料完全隔離 (Data Isolation)，符合 GDPR（通用資料保護條例）和 PCI-DSS（PCI 資料安全標準）合規要求。
 
 ### 1.2 問題陳述
 

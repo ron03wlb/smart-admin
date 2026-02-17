@@ -1860,7 +1860,7 @@ class PlayerLifecycleArchitectureTest {
 - [11-01 客服平台設計](../13_Customer_Service/13-01_CS_Platform_Design.md) - 玩家 360 視圖整合
 
 **平台配置**:
-- [07-01 多租戶架構](../06_Platform_Governance/06-01_Multi_Tenant.md) - 租戶級配置
+- [07-01 Multi-Tenant Architecture](../06_Platform_Governance/06-01_Multi_Tenant.md) - 租戶級配置
 - [07-02 租戶配置管理](../10_Platform_Management/10-02_Tenant_Configuration.md) - 註冊開關、IP 限制配置
 - [08-05 本地化系統](../11_Frontend_CMS/11-07_i18n_Localization.md) - 多語言註冊頁面
 

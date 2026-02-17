@@ -32,10 +32,29 @@ check_file() {
         return 0
     fi
 
-    # 跳過 TRANSLATION_GLOSSARY.md（詞彙表本身包含中文術語）
-    if [[ "$file" =~ TRANSLATION_GLOSSARY\.md$ ]]; then
+    # 跳過詞彙表和術語定義文件（這些文件本身包含中文術語解釋）
+    if [[ "$file" =~ TRANSLATION_GLOSSARY\.md$ ]] || [[ "$file" =~ Industry_Terminology\.md$ ]] || [[ "$file" =~ Industry_Glossary\.md$ ]]; then
         return 0
     fi
+
+    # 建立非代碼塊行號列表（排除 ``` 區塊內的內容）
+    local non_code_lines=""
+    local in_code_block=0
+    local lnum=0
+    while IFS= read -r line; do
+        ((lnum++))
+        if [[ "$line" =~ ^\`\`\` ]]; then
+            if [[ $in_code_block -eq 0 ]]; then
+                in_code_block=1
+            else
+                in_code_block=0
+            fi
+            continue
+        fi
+        if [[ $in_code_block -eq 0 ]]; then
+            non_code_lines="$non_code_lines $lnum"
+        fi
+    done < "$file"
 
     # 定義常見誤翻模式（技術術語的中文翻譯，應保持英文）
     # 格式: "中文誤翻|正確英文術語"
@@ -55,17 +74,19 @@ check_file() {
         "響應對象|ResponseDTO"
         "分頁結果|PageResult"
 
-        # Spring 注解（不應翻譯）
+        # Spring 注解（不應翻譯 — 使用具體注解短語避免誤報）
         "事務注解|@Transactional"
-        "構造器注入|@RequiredArgsConstructor"
-        "權限檢查|@SaCheckPermission"
-        "無需登入|@NoNeedLogin"
+        "構造器注入注解|@RequiredArgsConstructor"
+        "權限檢查注解|@SaCheckPermission"
+        "免登入注解|@NoNeedLogin"
         "緩存注解|@Cacheable"
         "服務類標註|@Service"
         "組件標註|@Component"
         "控制器標註|@RestController"
 
-        # 常見技術術語（在代碼/技術上下文中不應翻譯）
+        # 常見技術術語全名誤翻（僅當完整短語被翻譯時才視為錯誤）
+        # 注意：「多租戶架構」「令牌」「行級安全」「消息隊列」等已收錄在
+        # TRANSLATION_GLOSSARY.md 中作為接受的繁體中文翻譯，不在此檢測
         "應用程式介面|API"
         "超文本傳輸協議|HTTP"
         "安全超文本傳輸協議|HTTPS"
@@ -73,18 +94,11 @@ check_file() {
         "配置文件格式|YAML"
         "數據庫系統|PostgreSQL"
         "緩存數據庫|Redis"
-        "消息隊列|Kafka"
-        "多租戶架構|Multi-Tenant"
-        "行級安全|Row-Level Security"
-        "令牌|Token"
-        "授權協議|OAuth"
-        "單點登入|SSO"
-        "傳輸層安全|TLS"
 
         # Vavr 類型（不應翻譯）
-        "可選類型|Option"
-        "異常處理|Try"
-        "二選一類型|Either"
+        "可選類型|Option (Vavr)"
+        "異常處理類型|Try (Vavr)"
+        "二選一類型|Either (Vavr)"
     )
 
     # 檢測每個誤翻模式
@@ -113,8 +127,13 @@ check_file() {
                     continue
                 fi
 
-                # 跳過代碼塊（包含 ```)
-                if [[ "$line_content" =~ \`\`\` ]]; then
+                # 跳過代碼塊內的行
+                if [[ "$line_content" =~ \`\`\` ]] || [[ ! " $non_code_lines " =~ " $line_num " ]]; then
+                    continue
+                fi
+
+                # 跳過已包含正確英文術語的行（例如：使用 @RequiredArgsConstructor 構造器注入）
+                if [[ "$line_content" == *"$english_term"* ]]; then
                     continue
                 fi
 
@@ -131,15 +150,26 @@ check_file() {
 
     # 檢測類名誤翻模式（例如：PlayerService 不應翻成"玩家服務"）
     # 模式：中文 + Service/Controller/Manager/Dao/Repository/Entity/VO/DTO
-    local class_misuse=$(grep -nE '[\u4e00-\u9fff]+(Service|Controller|Manager|Dao|Repository|Entity|VO|DTO|Form)' "$file" 2>/dev/null || true)
+    # 注意：使用字面 Unicode 字符範圍（一=U+4E00, 鿿=U+9FFF），避免 \u 轉義在 macOS BSD grep 不支援
+    local class_misuse=$(grep -nE '[一-鿿]+(Service|Controller|Manager|Dao|Repository|Entity|VO|DTO|Form)' "$file" 2>/dev/null || true)
 
     if [[ -n "$class_misuse" ]]; then
         while IFS= read -r match; do
             local line_num="${match%%:*}"
             local line_content="${match#*:}"
 
-            # 跳過代碼塊
-            if [[ "$line_content" =~ \`\`\` ]]; then
+            # 跳過代碼塊內的行
+            if [[ "$line_content" =~ \`\`\` ]] || [[ ! " $non_code_lines " =~ " $line_num " ]]; then
+                continue
+            fi
+
+            # 跳過標題行（### 7.3 Manager - ClassName 等格式）
+            if [[ "$line_content" =~ ^[[:space:]]*[\>\#] ]]; then
+                continue
+            fi
+
+            # 跳過表格行
+            if [[ "$line_content" =~ \| ]]; then
                 continue
             fi
 

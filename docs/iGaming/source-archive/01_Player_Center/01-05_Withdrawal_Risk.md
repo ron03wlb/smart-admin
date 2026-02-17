@@ -776,7 +776,7 @@ flowchart LR
 **分佈式事務處理**：
 
 - 採用 SAGA 模式替代 2PC（避免協調器單點故障）    
-- Outbox Pattern 確保資料庫與消息隊列的原子性    
+- Outbox Pattern 確保資料庫與 Kafka Message Queue 的原子性
 - 冪等性設計：每個支付操作使用唯一 Idempotency-Key    
 
 **RTO/RPO 目標**：

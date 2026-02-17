@@ -78,7 +78,7 @@
 **文件**: [00-00-05_Governance_Implementation.md](./implementation-guides/00-00-05_Governance_Implementation.md)
 
 **包含任務**：
-14. 實作多租戶架構（租戶隔離、數據分片、租戶配置）
+14. 實作 Multi-Tenant Architecture（租戶隔離、資料分片、租戶配置）
 15. 設計 RBAC 權限系統（角色定義、權限矩陣、動態授權）
 16. 建立審計日誌系統（操作日誌、變更追蹤、合規報表）
 17. 實作數據加密策略（字段加密、KMS 整合、密鑰輪換）
@@ -94,7 +94,7 @@
 **包含任務**：
 18. 設計 API 閘道（Spring Cloud Gateway、路由規則、熔斷器）
 19. 建立 Blue-Green 部署（Kubernetes 配置、流量切換、回滾）
-20. 實作 API 限流機制（令牌桶算法、Redis 限流、分層限流）
+20. 實作 API 限流機制（Token Bucket 算法、Redis 限流、分層限流）
 
 **關鍵模塊**: 12_Technical_Operations, Foundation 模塊
 
