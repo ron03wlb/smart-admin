@@ -32,7 +32,8 @@ class ArchitectureTest {
                       && !location.contains("/adapter/")
                       && !location.contains("/advice/")
                       && !location.contains("/config/")
-                      && !location.contains("/datascope/")) // 排除 DataScope（動態權限 AOP）
+                      && !location.contains("/datascope/") // 排除 DataScope（動態權限 AOP）
+                      && !location.contains("/test/")) // 排除測試類
           .importPackages("net.lab1024.sa");
 
   // 全部類（用於其他規則）
