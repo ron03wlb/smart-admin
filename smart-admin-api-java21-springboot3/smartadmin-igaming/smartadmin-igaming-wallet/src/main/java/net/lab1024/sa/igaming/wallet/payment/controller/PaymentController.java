@@ -10,6 +10,7 @@ import net.lab1024.sa.igaming.common.code.PaymentErrorCode;
 import net.lab1024.sa.igaming.common.constant.IgamingSwaggerTagConst;
 import net.lab1024.sa.igaming.wallet.payment.domain.form.DepositRequestForm;
 import net.lab1024.sa.igaming.wallet.payment.domain.form.PaymentOrderQueryForm;
+import net.lab1024.sa.igaming.wallet.payment.domain.form.WithdrawRequestForm;
 import net.lab1024.sa.igaming.wallet.payment.domain.vo.DepositResponseVO;
 import net.lab1024.sa.igaming.wallet.payment.domain.vo.PaymentOrderVO;
 import net.lab1024.sa.igaming.wallet.payment.psp.PspAdapterFactory;
@@ -39,6 +40,13 @@ public class PaymentController {
   @PostMapping("/igaming/payment/deposit")
   public ResponseDTO<DepositResponseVO> createDeposit(@RequestBody @Valid DepositRequestForm form) {
     return paymentService.createDeposit(form);
+  }
+
+  @Operation(summary = "Create withdrawal order")
+  @PostMapping("/igaming/payment/withdraw")
+  public ResponseDTO<PaymentOrderVO> createWithdrawal(
+      @RequestBody @Valid WithdrawRequestForm form) {
+    return paymentService.createWithdrawal(form);
   }
 
   @Operation(summary = "Get payment order by ID")

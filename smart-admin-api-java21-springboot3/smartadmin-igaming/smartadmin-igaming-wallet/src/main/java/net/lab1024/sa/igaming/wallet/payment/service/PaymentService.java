@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -12,18 +13,26 @@ import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.igaming.common.code.PaymentErrorCode;
+import net.lab1024.sa.igaming.common.code.WalletErrorCode;
+import net.lab1024.sa.igaming.common.constant.LockReasonEnum;
 import net.lab1024.sa.igaming.common.constant.PaymentOrderStatusEnum;
 import net.lab1024.sa.igaming.common.constant.PaymentOrderTypeEnum;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
+import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
+import net.lab1024.sa.igaming.wallet.domain.entity.WalletLockEntity;
+import net.lab1024.sa.igaming.wallet.manager.WalletManager;
 import net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao;
 import net.lab1024.sa.igaming.wallet.payment.dao.PspDao;
 import net.lab1024.sa.igaming.wallet.payment.domain.dto.PspDepositRequest;
 import net.lab1024.sa.igaming.wallet.payment.domain.dto.PspDepositResponse;
+import net.lab1024.sa.igaming.wallet.payment.domain.dto.PspWithdrawRequest;
+import net.lab1024.sa.igaming.wallet.payment.domain.dto.PspWithdrawResponse;
 import net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity;
 import net.lab1024.sa.igaming.wallet.payment.domain.entity.PspEntity;
 import net.lab1024.sa.igaming.wallet.payment.domain.form.DepositRequestForm;
 import net.lab1024.sa.igaming.wallet.payment.domain.form.PaymentOrderQueryForm;
+import net.lab1024.sa.igaming.wallet.payment.domain.form.WithdrawRequestForm;
 import net.lab1024.sa.igaming.wallet.payment.domain.vo.DepositResponseVO;
 import net.lab1024.sa.igaming.wallet.payment.domain.vo.PaymentOrderVO;
 import net.lab1024.sa.igaming.wallet.payment.manager.PaymentManager;
@@ -48,6 +57,8 @@ public class PaymentService {
   private final PaymentOrderDao paymentOrderDao;
   private final PspDao pspDao;
   private final WalletDao walletDao;
+  private final WalletLockDao walletLockDao;
+  private final WalletManager walletManager;
   private final PaymentManager paymentManager;
   private final PspAdapterFactory pspAdapterFactory;
 
@@ -182,6 +193,122 @@ public class PaymentService {
   }
 
   /**
+   * Create a withdrawal order with balance lock and initiate PSP withdrawal.
+   *
+   * <p>Flow: idempotency check → load wallet → verify available balance → lock funds → load PSP →
+   * create order → call PSP → update order.
+   *
+   * @param form withdraw request form
+   * @return payment order VO
+   */
+  public ResponseDTO<PaymentOrderVO> createWithdrawal(WithdrawRequestForm form) {
+    // Idempotency Layer 1: check requestId
+    PaymentOrderEntity existing =
+        paymentOrderDao.selectOne(
+            Wrappers.<PaymentOrderEntity>lambdaQuery()
+                .eq(PaymentOrderEntity::getRequestId, form.getRequestId()));
+    if (existing != null) {
+      return ResponseDTO.ok(SmartBeanUtil.copy(existing, PaymentOrderVO.class));
+    }
+
+    // Load wallet
+    WalletEntity wallet = walletDao.selectById(form.getWalletId());
+    if (wallet == null || wallet.getDeleted()) {
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
+    }
+
+    // Check available balance (balance - lockedAmount)
+    BigDecimal available = wallet.getBalance().subtract(wallet.getLockedAmount());
+    if (available.compareTo(form.getAmount()) < 0) {
+      return ResponseDTO.userErrorParam(WalletErrorCode.INSUFFICIENT_BALANCE.getMsg());
+    }
+
+    // Resolve PSP
+    String pspCode = form.getPspCode() != null ? form.getPspCode() : resolveDefaultPsp();
+    PspEntity pspConfig = findEnabledPsp(pspCode);
+    if (pspConfig == null) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PSP_NOT_FOUND.getMsg());
+    }
+
+    // Validate amount range
+    if (pspConfig.getMinWithdrawal() != null
+        && form.getAmount().compareTo(pspConfig.getMinWithdrawal()) < 0) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.WITHDRAWAL_AMOUNT_OUT_OF_RANGE.getMsg());
+    }
+    if (pspConfig.getMaxWithdrawal() != null
+        && form.getAmount().compareTo(pspConfig.getMaxWithdrawal()) > 0) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.WITHDRAWAL_AMOUNT_OUT_OF_RANGE.getMsg());
+    }
+
+    // Lock funds in wallet
+    WalletLockEntity lockEntity = new WalletLockEntity();
+    lockEntity.setWalletId(wallet.getWalletId());
+    lockEntity.setLockAmount(form.getAmount());
+    lockEntity.setLockReason(LockReasonEnum.WITHDRAWAL_PENDING.getValue());
+    lockEntity.setReferenceId(form.getRequestId());
+
+    wallet.setLockedAmount(wallet.getLockedAmount().add(form.getAmount()));
+    walletManager.lockFunds(wallet, lockEntity);
+
+    // Create order (PENDING)
+    String orderNo = generateOrderNo();
+    PaymentOrderEntity order = new PaymentOrderEntity();
+    order.setOrderNo(orderNo);
+    order.setPlayerId(wallet.getPlayerId());
+    order.setWalletId(wallet.getWalletId());
+    order.setOrderType(PaymentOrderTypeEnum.WITHDRAWAL.getValue());
+    order.setAmount(form.getAmount());
+    order.setCurrencyCode(
+        form.getCurrencyCode() != null ? form.getCurrencyCode() : wallet.getCurrencyCode());
+    order.setStatus(PaymentOrderStatusEnum.PENDING.getValue());
+    order.setPspCode(pspCode);
+    order.setRequestId(form.getRequestId());
+    order.setDescription(form.getDescription());
+
+    try {
+      paymentManager.createOrder(order);
+    } catch (DuplicateKeyException e) {
+      // Idempotency Layer 2: concurrent insert — unlock funds and return error
+      wallet.setLockedAmount(wallet.getLockedAmount().subtract(form.getAmount()));
+      walletManager.unlockFunds(wallet, lockEntity.getLockId());
+      return ResponseDTO.userErrorParam(PaymentErrorCode.DUPLICATE_REQUEST.getMsg());
+    }
+
+    // Call PSP adapter
+    Option<PaymentProviderAdapter> adapterOpt = pspAdapterFactory.getAdapter(pspCode);
+    if (adapterOpt.isEmpty()) {
+      paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PSP_UNAVAILABLE.getMsg());
+    }
+
+    PspWithdrawRequest pspRequest =
+        PspWithdrawRequest.builder()
+            .orderId(orderNo)
+            .amount(form.getAmount())
+            .currency(order.getCurrencyCode())
+            .build();
+
+    Either<String, PspWithdrawResponse> pspResult = adapterOpt.get().withdraw(pspRequest);
+
+    if (pspResult.isLeft()) {
+      // PSP rejected — mark order FAILED, unlock funds
+      paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
+      wallet = walletDao.selectById(form.getWalletId());
+      wallet.setLockedAmount(wallet.getLockedAmount().subtract(form.getAmount()));
+      walletManager.unlockFunds(wallet, lockEntity.getLockId());
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PSP_UNAVAILABLE.getMsg());
+    }
+
+    // Update order with PSP response
+    PspWithdrawResponse pspResponse = pspResult.get();
+    order.setPspTransactionId(pspResponse.getPspTransactionId());
+    order.setStatus(PaymentOrderStatusEnum.PROCESSING.getValue());
+    paymentManager.updateOrderPspResponse(order);
+
+    return ResponseDTO.ok(SmartBeanUtil.copy(order, PaymentOrderVO.class));
+  }
+
+  /**
    * Process PSP webhook callback for deposit.
    *
    * <p>Idempotency: CAS update (status=PENDING → SUCCESS). If CAS fails, the callback is a
@@ -227,6 +354,71 @@ public class PaymentService {
   }
 
   /**
+   * Process PSP webhook callback for withdrawal.
+   *
+   * <p>On SUCCESS: debit wallet balance + unlock frozen funds. On FAILURE: mark order FAILED +
+   * unlock frozen funds (refund).
+   *
+   * @param orderNo platform order number
+   * @param pspTransactionId PSP transaction ID
+   * @param callbackPayload raw callback payload for audit
+   * @param success whether PSP reports success
+   * @return success or error response
+   */
+  public ResponseDTO<String> processWithdrawalCallback(
+      String orderNo, String pspTransactionId, String callbackPayload, boolean success) {
+    // Load order
+    PaymentOrderEntity order =
+        paymentOrderDao.selectOne(
+            Wrappers.<PaymentOrderEntity>lambdaQuery().eq(PaymentOrderEntity::getOrderNo, orderNo));
+    if (order == null) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND.getMsg());
+    }
+
+    // Idempotency: only process PENDING or PROCESSING orders
+    if (!order.getStatus().equals(PaymentOrderStatusEnum.PENDING.getValue())
+        && !order.getStatus().equals(PaymentOrderStatusEnum.PROCESSING.getValue())) {
+      return ResponseDTO.ok("Already processed");
+    }
+
+    // Store callback payload for audit
+    order.setCallbackPayload(callbackPayload);
+    order.setPspTransactionId(pspTransactionId);
+
+    // Load wallet
+    WalletEntity wallet = walletDao.selectById(order.getWalletId());
+    if (wallet == null || wallet.getDeleted()) {
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
+    }
+
+    // Find lock record for this withdrawal
+    WalletLockEntity lockEntity =
+        walletLockDao.selectOne(
+            Wrappers.<WalletLockEntity>lambdaQuery()
+                .eq(WalletLockEntity::getWalletId, order.getWalletId())
+                .eq(WalletLockEntity::getReferenceId, order.getRequestId())
+                .eq(WalletLockEntity::getLockReason, LockReasonEnum.WITHDRAWAL_PENDING.getValue()));
+
+    if (success) {
+      // Debit wallet + unlock funds + update order to SUCCESS
+      String debitRequestId = "withdrawal_debit_" + order.getOrderNo();
+      Long lockId = lockEntity != null ? lockEntity.getLockId() : null;
+      paymentManager.completeWithdrawal(order, wallet, debitRequestId, lockId);
+      return ResponseDTO.ok("Withdrawal completed");
+    } else {
+      // Withdrawal failed — mark order FAILED and unlock funds (refund)
+      paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
+      if (lockEntity != null) {
+        // Reload wallet for fresh version
+        wallet = walletDao.selectById(order.getWalletId());
+        wallet.setLockedAmount(wallet.getLockedAmount().subtract(lockEntity.getLockAmount()));
+        walletManager.unlockFunds(wallet, lockEntity.getLockId());
+      }
+      return ResponseDTO.ok("Withdrawal failed, funds unlocked");
+    }
+  }
+
+  /**
    * Process PSP webhook callback (generic entry point from Controller).
    *
    * <p>Parses the callback payload to extract orderNo and pspTransactionId, then delegates to the
@@ -238,7 +430,6 @@ public class PaymentService {
    */
   public ResponseDTO<String> processCallback(String pspCode, String payload) {
     // Parse callback payload — Phase 1.5 uses simple JSON field extraction
-    // In production, each PSP adapter would have its own payload parser
     String orderNo = extractField(payload, "order_id");
     String pspTransactionId = extractField(payload, "psp_transaction_id");
     String status = extractField(payload, "status");
@@ -247,17 +438,28 @@ public class PaymentService {
       return ResponseDTO.userErrorParam(PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND.getMsg());
     }
 
-    if ("SUCCESS".equalsIgnoreCase(status)) {
-      return processDepositCallback(orderNo, pspTransactionId, payload);
-    }
-
-    // For non-success status, mark order as FAILED
+    // Load order to determine type (deposit vs withdrawal)
     PaymentOrderEntity order =
         paymentOrderDao.selectOne(
             Wrappers.<PaymentOrderEntity>lambdaQuery().eq(PaymentOrderEntity::getOrderNo, orderNo));
-    if (order != null) {
-      paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
+    if (order == null) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND.getMsg());
     }
+
+    boolean isSuccess = "SUCCESS".equalsIgnoreCase(status);
+
+    // Route to appropriate handler based on order type
+    if (order.getOrderType().equals(PaymentOrderTypeEnum.WITHDRAWAL.getValue())) {
+      return processWithdrawalCallback(orderNo, pspTransactionId, payload, isSuccess);
+    }
+
+    // Deposit handling
+    if (isSuccess) {
+      return processDepositCallback(orderNo, pspTransactionId, payload);
+    }
+
+    // Non-success deposit → mark FAILED
+    paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
     return ResponseDTO.ok("Callback processed");
   }
 
