@@ -11,6 +11,7 @@ import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
+import net.lab1024.sa.igaming.common.code.WalletErrorCode;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
@@ -127,7 +128,7 @@ public class WalletService {
                 .eq(WalletEntity::getWalletType, form.getWalletType())
                 .eq(WalletEntity::getDeleted, false));
     if (existing != null) {
-      return ResponseDTO.userErrorParam("Wallet already exists for this player and type");
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_ALREADY_EXISTS.getMsg());
     }
 
     WalletEntity entity = new WalletEntity();
@@ -141,7 +142,7 @@ public class WalletService {
     try {
       walletManager.createWallet(entity);
     } catch (DuplicateKeyException e) {
-      return ResponseDTO.userErrorParam("Wallet already exists for this player and type");
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_ALREADY_EXISTS.getMsg());
     }
 
     WalletVO vo = SmartBeanUtil.copy(entity, WalletVO.class);
@@ -162,7 +163,7 @@ public class WalletService {
   public ResponseDTO<WalletTransactionVO> credit(WalletCreditForm form) {
     // Validate transaction type direction
     if (!CREDIT_TYPES.contains(form.getTransactionType())) {
-      return ResponseDTO.userErrorParam("Invalid transaction type for credit operation");
+      return ResponseDTO.userErrorParam(WalletErrorCode.INVALID_CREDIT_TYPE.getMsg());
     }
 
     // Idempotency Layer 1: check requestId
@@ -177,7 +178,7 @@ public class WalletService {
     // Load wallet
     WalletEntity wallet = walletDao.selectById(form.getWalletId());
     if (wallet == null || wallet.getDeleted()) {
-      return ResponseDTO.userErrorParam("Wallet does not exist");
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
     }
 
     // Build transaction record
@@ -218,7 +219,7 @@ public class WalletService {
   public ResponseDTO<WalletTransactionVO> debit(WalletDebitForm form) {
     // Validate transaction type direction
     if (!DEBIT_TYPES.contains(form.getTransactionType())) {
-      return ResponseDTO.userErrorParam("Invalid transaction type for debit operation");
+      return ResponseDTO.userErrorParam(WalletErrorCode.INVALID_DEBIT_TYPE.getMsg());
     }
 
     // Idempotency Layer 1: check requestId
@@ -233,13 +234,13 @@ public class WalletService {
     // Load wallet
     WalletEntity wallet = walletDao.selectById(form.getWalletId());
     if (wallet == null || wallet.getDeleted()) {
-      return ResponseDTO.userErrorParam("Wallet does not exist");
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
     }
 
     // Check available balance
     BigDecimal available = wallet.getBalance().subtract(wallet.getLockedAmount());
     if (available.compareTo(form.getAmount()) < 0) {
-      return ResponseDTO.userErrorParam("Insufficient available balance");
+      return ResponseDTO.userErrorParam(WalletErrorCode.INSUFFICIENT_BALANCE.getMsg());
     }
 
     // Build transaction record
@@ -279,13 +280,13 @@ public class WalletService {
     // Load wallet
     WalletEntity wallet = walletDao.selectById(form.getWalletId());
     if (wallet == null || wallet.getDeleted()) {
-      return ResponseDTO.userErrorParam("Wallet does not exist");
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
     }
 
     // Check available balance
     BigDecimal available = wallet.getBalance().subtract(wallet.getLockedAmount());
     if (available.compareTo(form.getLockAmount()) < 0) {
-      return ResponseDTO.userErrorParam("Insufficient available balance for locking");
+      return ResponseDTO.userErrorParam(WalletErrorCode.INSUFFICIENT_BALANCE_FOR_LOCK.getMsg());
     }
 
     // Build lock entity
@@ -317,19 +318,19 @@ public class WalletService {
     // Load lock record
     WalletLockEntity lockEntity = walletLockDao.selectById(lockId);
     if (lockEntity == null) {
-      return ResponseDTO.userErrorParam("Lock record does not exist");
+      return ResponseDTO.userErrorParam(WalletErrorCode.LOCK_NOT_FOUND.getMsg());
     }
 
     // Load wallet
     WalletEntity wallet = walletDao.selectById(lockEntity.getWalletId());
     if (wallet == null || wallet.getDeleted()) {
-      return ResponseDTO.userErrorParam("Wallet does not exist");
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
     }
 
     // Guard: lockedAmount must not go negative
     BigDecimal newLockedAmount = wallet.getLockedAmount().subtract(lockEntity.getLockAmount());
     if (newLockedAmount.compareTo(BigDecimal.ZERO) < 0) {
-      return ResponseDTO.userErrorParam("Locked amount inconsistency detected");
+      return ResponseDTO.userErrorParam(WalletErrorCode.LOCKED_AMOUNT_INCONSISTENCY.getMsg());
     }
 
     // Update wallet lockedAmount

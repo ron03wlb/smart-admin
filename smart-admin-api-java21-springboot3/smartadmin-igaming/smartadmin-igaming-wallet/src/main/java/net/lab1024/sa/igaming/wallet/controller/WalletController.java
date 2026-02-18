@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.igaming.common.code.WalletErrorCode;
 import net.lab1024.sa.igaming.common.constant.IgamingSwaggerTagConst;
 import net.lab1024.sa.igaming.wallet.domain.form.WalletCreateForm;
 import net.lab1024.sa.igaming.wallet.domain.form.WalletCreditForm;
@@ -49,7 +50,7 @@ public class WalletController {
     return walletService
         .getWallet(walletId)
         .map(ResponseDTO::ok)
-        .getOrElse(() -> ResponseDTO.userErrorParam("Wallet does not exist"));
+        .getOrElse(() -> ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg()));
   }
 
   @Operation(summary = "Create a new wallet")
