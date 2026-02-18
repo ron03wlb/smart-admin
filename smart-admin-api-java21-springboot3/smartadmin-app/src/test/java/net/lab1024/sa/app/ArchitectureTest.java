@@ -36,9 +36,11 @@ class ArchitectureTest {
                       && !location.contains("/test/")) // 排除測試類
           .importPackages("net.lab1024.sa");
 
-  // 全部類（用於其他規則）
+  // 全部生產類（排除測試類 — 測試中的 @Autowired 欄位注入是 Spring Boot 標準模式）
   private static final JavaClasses CLASSES =
-      new ClassFileImporter().importPackages("net.lab1024.sa");
+      new ClassFileImporter()
+          .withImportOption(location -> !location.contains("/test/"))
+          .importPackages("net.lab1024.sa");
 
   @Test
   void layeredArchitectureShouldBeRespected() {
