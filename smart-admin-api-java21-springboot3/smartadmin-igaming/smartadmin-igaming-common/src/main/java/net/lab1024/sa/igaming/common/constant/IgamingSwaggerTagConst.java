@@ -12,6 +12,8 @@ public final class IgamingSwaggerTagConst {
 
   public static final String PLAYER = "iGaming-玩家管理";
 
+  public static final String PAYMENT = "iGaming-支付管理";
+
   public static final String GAME = "iGaming-遊戲管理";
 
   private IgamingSwaggerTagConst() {}
