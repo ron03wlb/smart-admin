@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.wallet.payment.domain.vo.PaymentOrderVO">
+        SELECT
+            payment_order_id,
+            order_no,
+            player_id,
+            wallet_id,
+            order_type,
+            amount,
+            currency_code,
+            status,
+            psp_code,
+            psp_transaction_id,
+            description,
+            create_time,
+            update_time
+        FROM t_payment_order
+        <where>
+            <if test="query.playerId != null">
+                AND player_id = #{query.playerId}
+            </if>
+            <if test="query.orderType != null">
+                AND order_type = #{query.orderType}
+            </if>
+            <if test="query.status != null">
+                AND status = #{query.status}
+            </if>
+            <if test="query.pspCode != null and query.pspCode != ''">
+                AND psp_code = #{query.pspCode}
+            </if>
+        </where>
+        ORDER BY payment_order_id DESC
+    </select>
+
+</mapper>
