@@ -226,6 +226,63 @@ public class PaymentService {
     return ResponseDTO.ok("Deposit completed");
   }
 
+  /**
+   * Process PSP webhook callback (generic entry point from Controller).
+   *
+   * <p>Parses the callback payload to extract orderNo and pspTransactionId, then delegates to the
+   * appropriate handler based on order type.
+   *
+   * @param pspCode PSP identifier
+   * @param payload raw callback payload (JSON)
+   * @return success or error response
+   */
+  public ResponseDTO<String> processCallback(String pspCode, String payload) {
+    // Parse callback payload — Phase 1.5 uses simple JSON field extraction
+    // In production, each PSP adapter would have its own payload parser
+    String orderNo = extractField(payload, "order_id");
+    String pspTransactionId = extractField(payload, "psp_transaction_id");
+    String status = extractField(payload, "status");
+
+    if (orderNo == null || orderNo.isEmpty()) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND.getMsg());
+    }
+
+    if ("SUCCESS".equalsIgnoreCase(status)) {
+      return processDepositCallback(orderNo, pspTransactionId, payload);
+    }
+
+    // For non-success status, mark order as FAILED
+    PaymentOrderEntity order =
+        paymentOrderDao.selectOne(
+            Wrappers.<PaymentOrderEntity>lambdaQuery().eq(PaymentOrderEntity::getOrderNo, orderNo));
+    if (order != null) {
+      paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
+    }
+    return ResponseDTO.ok("Callback processed");
+  }
+
+  private String extractField(String json, String fieldName) {
+    // Simple JSON field extraction — avoids adding a JSON parsing dependency
+    String pattern = "\"" + fieldName + "\"";
+    int idx = json.indexOf(pattern);
+    if (idx < 0) {
+      return null;
+    }
+    int colonIdx = json.indexOf(':', idx + pattern.length());
+    if (colonIdx < 0) {
+      return null;
+    }
+    int startQuote = json.indexOf('"', colonIdx + 1);
+    if (startQuote < 0) {
+      return null;
+    }
+    int endQuote = json.indexOf('"', startQuote + 1);
+    if (endQuote < 0) {
+      return null;
+    }
+    return json.substring(startQuote + 1, endQuote);
+  }
+
   private PspEntity findEnabledPsp(String pspCode) {
     return pspDao.selectOne(
         Wrappers.<PspEntity>lambdaQuery()

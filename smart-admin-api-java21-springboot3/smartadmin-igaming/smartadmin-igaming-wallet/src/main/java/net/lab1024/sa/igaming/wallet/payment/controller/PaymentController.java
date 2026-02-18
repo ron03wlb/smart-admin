@@ -12,11 +12,13 @@ import net.lab1024.sa.igaming.wallet.payment.domain.form.DepositRequestForm;
 import net.lab1024.sa.igaming.wallet.payment.domain.form.PaymentOrderQueryForm;
 import net.lab1024.sa.igaming.wallet.payment.domain.vo.DepositResponseVO;
 import net.lab1024.sa.igaming.wallet.payment.domain.vo.PaymentOrderVO;
+import net.lab1024.sa.igaming.wallet.payment.psp.PspAdapterFactory;
 import net.lab1024.sa.igaming.wallet.payment.service.PaymentService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
 
   private final PaymentService paymentService;
+  private final PspAdapterFactory pspAdapterFactory;
 
   @Operation(summary = "Create deposit order")
   @PostMapping("/igaming/payment/deposit")
@@ -53,5 +56,32 @@ public class PaymentController {
   public ResponseDTO<PageResult<PaymentOrderVO>> queryPaymentOrders(
       @RequestBody @Valid PaymentOrderQueryForm queryForm) {
     return paymentService.queryPaymentOrders(queryForm);
+  }
+
+  @Operation(summary = "PSP webhook callback handler")
+  @PostMapping("/igaming/payment/callback/{pspCode}")
+  public ResponseDTO<String> handleCallback(
+      @PathVariable String pspCode,
+      @RequestHeader(value = "X-PSP-Signature", required = false) String signature,
+      @RequestHeader(value = "X-PSP-Timestamp", required = false) Long timestamp,
+      @RequestBody String payload) {
+    // Verify PSP adapter exists
+    if (pspAdapterFactory.getAdapter(pspCode).isEmpty()) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.PSP_NOT_FOUND.getMsg());
+    }
+
+    // Verify signature via adapter
+    boolean signatureValid =
+        pspAdapterFactory
+            .getAdapter(pspCode)
+            .get()
+            .verifyCallback(
+                payload, signature != null ? signature : "", timestamp != null ? timestamp : 0L);
+    if (!signatureValid) {
+      return ResponseDTO.userErrorParam(PaymentErrorCode.CALLBACK_SIGNATURE_INVALID.getMsg());
+    }
+
+    // Delegate to service for processing
+    return paymentService.processCallback(pspCode, payload);
   }
 }

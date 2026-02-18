@@ -33,6 +33,9 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-security"))
     api(project(":smartadmin-common:smartadmin-common-mq"))
 
+    // Resilience4j — PSP circuit breaker
+    api(libs.resilience4j.spring.boot3)
+
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))
