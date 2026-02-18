@@ -5,7 +5,9 @@ import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.igaming.common.constant.PaymentOrderStatusEnum;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
+import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
+import net.lab1024.sa.igaming.wallet.domain.entity.WalletLockEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
 import net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentManager {
 
   private final PaymentOrderDao paymentOrderDao;
+  private final WalletLockDao walletLockDao;
   private final WalletManager walletManager;
 
   /**
@@ -133,8 +136,14 @@ public class PaymentManager {
 
     WalletTransactionEntity result = walletManager.debit(wallet, transaction);
 
-    // Unlock frozen funds
-    walletManager.unlockFunds(wallet, lockId);
+    // Unlock frozen funds — update lockedAmount on entity before unlockFunds
+    if (lockId != null) {
+      WalletLockEntity lockEntity = walletLockDao.selectById(lockId);
+      if (lockEntity != null) {
+        wallet.setLockedAmount(wallet.getLockedAmount().subtract(lockEntity.getLockAmount()));
+        walletManager.unlockFunds(wallet, lockId);
+      }
+    }
 
     return result;
   }
