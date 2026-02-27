@@ -1,7 +1,12 @@
 package net.lab1024.sa.igaming.wallet.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao;
@@ -32,6 +37,7 @@ public class WalletManager {
   private final WalletDao walletDao;
   private final WalletTransactionDao walletTransactionDao;
   private final WalletLockDao walletLockDao;
+  private final DomainEventPublisher domainEventPublisher;
 
   /**
    * Create a new wallet.
@@ -73,6 +79,8 @@ public class WalletManager {
           Wrappers.<WalletTransactionEntity>lambdaQuery()
               .eq(WalletTransactionEntity::getRequestId, transaction.getRequestId()));
     }
+
+    publishWalletEvent("WALLET_CREDITED", wallet, transaction);
     return transaction;
   }
 
@@ -101,6 +109,8 @@ public class WalletManager {
           Wrappers.<WalletTransactionEntity>lambdaQuery()
               .eq(WalletTransactionEntity::getRequestId, transaction.getRequestId()));
     }
+
+    publishWalletEvent("WALLET_DEBITED", wallet, transaction);
     return transaction;
   }
 
@@ -140,5 +150,26 @@ public class WalletManager {
       throw new OptimisticLockingFailureException("Wallet version conflict, please retry");
     }
     walletLockDao.deleteById(lockId);
+  }
+
+  private void publishWalletEvent(
+      String eventType, WalletEntity wallet, WalletTransactionEntity transaction) {
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("walletId", wallet.getWalletId());
+    node.put("playerId", wallet.getPlayerId());
+    node.put("transactionType", transaction.getTransactionType());
+    node.put("amount", transaction.getAmount().toPlainString());
+    node.put("balanceBefore", transaction.getBalanceBefore().toPlainString());
+    node.put("balanceAfter", transaction.getBalanceAfter().toPlainString());
+    node.put("requestId", transaction.getRequestId());
+
+    domainEventPublisher.publish(
+        IgamingKafkaConst.Topic.WALLET_EVENTS,
+        DomainEvent.builder()
+            .eventType(eventType)
+            .aggregateType("Wallet")
+            .aggregateId(String.valueOf(wallet.getWalletId()))
+            .payload(node)
+            .build());
   }
 }

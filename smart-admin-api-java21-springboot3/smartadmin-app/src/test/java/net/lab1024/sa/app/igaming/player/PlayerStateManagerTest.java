@@ -2,9 +2,13 @@ package net.lab1024.sa.app.igaming.player;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.constant.PlayerStatusEnum;
 import net.lab1024.sa.igaming.player.dao.PlayerAuditLogDao;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
@@ -31,6 +35,7 @@ class PlayerStateManagerTest {
 
   @Mock private PlayerDao playerDao;
   @Mock private PlayerAuditLogDao playerAuditLogDao;
+  @Mock private DomainEventPublisher domainEventPublisher;
 
   @InjectMocks private PlayerStateManager playerStateManager;
 
@@ -54,6 +59,8 @@ class PlayerStateManagerTest {
       assertThat(result.getOk()).isTrue();
       verify(playerDao).updateById(player);
       verify(playerAuditLogDao).insert(any(PlayerAuditLogEntity.class));
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.PLAYER_EVENTS), any(DomainEvent.class));
     }
 
     @Test
@@ -99,6 +106,22 @@ class PlayerStateManagerTest {
     }
 
     @Test
+    @DisplayName("ACTIVE → SELF_EXCLUDED 成功")
+    void active_to_selfExcluded() {
+      PlayerEntity player = buildPlayer(PlayerStatusEnum.ACTIVE);
+      when(playerDao.updateById(any(PlayerEntity.class))).thenReturn(1);
+      when(playerAuditLogDao.insert(any(PlayerAuditLogEntity.class))).thenReturn(1);
+
+      ResponseDTO<Void> result =
+          playerStateManager.transitionStatus(
+              player, PlayerStatusEnum.SELF_EXCLUDED, "player", "self-exclusion request");
+
+      assertThat(result.getOk()).isTrue();
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.PLAYER_EVENTS), any(DomainEvent.class));
+    }
+
+    @Test
     @DisplayName("PENDING_VERIFICATION → ACTIVE 成功")
     void pending_to_active() {
       PlayerEntity player = buildPlayer(PlayerStatusEnum.PENDING_VERIFICATION);
@@ -136,6 +159,19 @@ class PlayerStateManagerTest {
     @DisplayName("CLOSED → ACTIVE 拒絕 (CLOSED 是終態)")
     void closed_to_active_rejected() {
       PlayerEntity player = buildPlayer(PlayerStatusEnum.CLOSED);
+
+      ResponseDTO<Void> result =
+          playerStateManager.transitionStatus(
+              player, PlayerStatusEnum.ACTIVE, "admin", "reopen attempt");
+
+      assertThat(result.getOk()).isFalse();
+      verify(playerDao, never()).updateById(any(PlayerEntity.class));
+    }
+
+    @Test
+    @DisplayName("SELF_EXCLUDED → ACTIVE 拒絕 (SELF_EXCLUDED 是終態)")
+    void selfExcluded_to_active_rejected() {
+      PlayerEntity player = buildPlayer(PlayerStatusEnum.SELF_EXCLUDED);
 
       ResponseDTO<Void> result =
           playerStateManager.transitionStatus(

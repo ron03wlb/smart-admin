@@ -18,5 +18,7 @@ public final class IgamingSwaggerTagConst {
 
   public static final String ACTIVITY = "iGaming-活動管理";
 
+  public static final String RISK = "iGaming-風控管理";
+
   private IgamingSwaggerTagConst() {}
 }

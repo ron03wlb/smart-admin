@@ -18,6 +18,7 @@ public enum PlayerStatusEnum implements BaseEnum {
   SUSPENDED(3, "停權"),
   PENDING_VERIFICATION(4, "待驗證"),
   CLOSED(5, "關閉"),
+  SELF_EXCLUDED(6, "自我排除"),
   ;
 
   private final Integer value;

@@ -1,10 +1,16 @@
 package net.lab1024.sa.igaming.game.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.code.GameErrorCode;
 import net.lab1024.sa.igaming.common.constant.ReconciliationStatusEnum;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
@@ -49,6 +55,7 @@ public class GameTransactionManager {
   private final GameWeightConfigDao gameWeightConfigDao;
   private final WalletDao walletDao;
   private final WalletManager walletManager;
+  private final DomainEventPublisher domainEventPublisher;
 
   /**
    * Execute debit (bet placement).
@@ -119,6 +126,13 @@ public class GameTransactionManager {
       log.info("Idempotent debit Layer 2: transactionId={}", form.getTransactionId());
     }
 
+    // Publish BET_PLACED event
+    publishGameEvent(
+        "BET_PLACED",
+        form.getPlayerId(),
+        tenantId,
+        buildBetPlacedPayload(form, weightedTurnover, balanceAfter));
+
     // Build response
     CallbackResponseVO response = new CallbackResponseVO();
     response.setTransactionId(form.getTransactionId());
@@ -182,6 +196,13 @@ public class GameTransactionManager {
     round.setStatus(RoundStatusEnum.SETTLED.getValue());
     gameRoundDao.updateById(round);
 
+    // Publish ROUND_SETTLED event
+    publishGameEvent(
+        "ROUND_SETTLED",
+        form.getPlayerId(),
+        tenantId,
+        buildRoundSettledPayload(form, balanceAfter));
+
     CallbackResponseVO response = new CallbackResponseVO();
     response.setTransactionId(form.getTransactionId());
     response.setBalance(balanceAfter);
@@ -243,6 +264,13 @@ public class GameTransactionManager {
     round.setStatus(RoundStatusEnum.CANCELLED.getValue());
     gameRoundDao.updateById(round);
 
+    // Publish BET_CANCELLED event
+    publishGameEvent(
+        "BET_CANCELLED",
+        form.getPlayerId(),
+        tenantId,
+        buildBetCancelledPayload(form, round, balanceAfter));
+
     CallbackResponseVO response = new CallbackResponseVO();
     response.setTransactionId(form.getOriginalTransactionId());
     response.setBalance(balanceAfter);
@@ -256,6 +284,52 @@ public class GameTransactionManager {
             .eq(WalletEntity::getPlayerId, playerId)
             .eq(WalletEntity::getWalletType, WalletTypeEnum.CASH.getValue())
             .eq(WalletEntity::getDeleted, false));
+  }
+
+  @SuppressWarnings("FutureReturnValueIgnored")
+  private void publishGameEvent(String eventType, Long playerId, Long tenantId, JsonNode payload) {
+    domainEventPublisher.publish(
+        IgamingKafkaConst.Topic.GAME_EVENTS,
+        DomainEvent.builder()
+            .eventType(eventType)
+            .aggregateType("GameRound")
+            .aggregateId(String.valueOf(playerId))
+            .tenantId(tenantId)
+            .payload(payload)
+            .build());
+  }
+
+  private JsonNode buildBetPlacedPayload(
+      CallbackDebitForm form, BigDecimal weightedTurnover, BigDecimal balanceAfter) {
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("playerId", form.getPlayerId());
+    node.put("transactionId", form.getTransactionId());
+    node.put("roundId", form.getRoundId());
+    node.put("gameCode", form.getGameCode());
+    node.put("amount", form.getAmount().toPlainString());
+    node.put("weightedTurnover", weightedTurnover.toPlainString());
+    node.put("balanceAfter", balanceAfter.toPlainString());
+    return node;
+  }
+
+  private JsonNode buildRoundSettledPayload(CallbackCreditForm form, BigDecimal balanceAfter) {
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("playerId", form.getPlayerId());
+    node.put("transactionId", form.getTransactionId());
+    node.put("roundId", form.getRoundId());
+    node.put("payoutAmount", form.getPayoutAmount().toPlainString());
+    node.put("balanceAfter", balanceAfter.toPlainString());
+    return node;
+  }
+
+  private JsonNode buildBetCancelledPayload(
+      CallbackRollbackForm form, GameRoundEntity round, BigDecimal balanceAfter) {
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("playerId", form.getPlayerId());
+    node.put("originalTransactionId", form.getOriginalTransactionId());
+    node.put("refundAmount", round.getBetAmount().toPlainString());
+    node.put("balanceAfter", balanceAfter.toPlainString());
+    return node;
   }
 
   private BigDecimal calculateWeightedTurnover(

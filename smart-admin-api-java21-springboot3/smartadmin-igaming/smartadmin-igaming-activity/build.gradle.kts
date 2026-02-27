@@ -16,6 +16,8 @@ dependencies {
     api(project(":smartadmin-igaming:smartadmin-igaming-player"))
     // Job scheduling
     api(project(":smartadmin-support:smartadmin-support-job"))
+    // Kafka MQ (for event consuming)
+    api(project(":smartadmin-common:smartadmin-common-mq"))
 
     // Spring Boot
     api(libs.spring.boot.starter.web)

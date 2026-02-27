@@ -2,11 +2,15 @@ package net.lab1024.sa.app.igaming.game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
@@ -46,6 +50,7 @@ class GameTransactionManagerTest {
   @Mock private GameWeightConfigDao gameWeightConfigDao;
   @Mock private WalletDao walletDao;
   @Mock private WalletManager walletManager;
+  @Mock private DomainEventPublisher domainEventPublisher;
   @InjectMocks private GameTransactionManager gameTransactionManager;
 
   @Nested
@@ -71,6 +76,8 @@ class GameTransactionManagerTest {
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getBalance()).isEqualByComparingTo("90.00");
       verify(gameRoundDao).insert(any(GameRoundEntity.class));
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.GAME_EVENTS), any(DomainEvent.class));
     }
 
     @Test
@@ -150,6 +157,8 @@ class GameTransactionManagerTest {
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.SETTLED.getValue());
       verify(gameRoundDao).updateById(round);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.GAME_EVENTS), any(DomainEvent.class));
     }
 
     @Test
@@ -191,6 +200,8 @@ class GameTransactionManagerTest {
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.CANCELLED.getValue());
       verify(gameRoundDao).updateById(round);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.GAME_EVENTS), any(DomainEvent.class));
     }
 
     @Test

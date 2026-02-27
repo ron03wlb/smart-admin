@@ -1,9 +1,14 @@
 package net.lab1024.sa.igaming.player.manager;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.code.PlayerErrorCode;
 import net.lab1024.sa.igaming.common.constant.PlayerStatusEnum;
 import net.lab1024.sa.igaming.player.dao.PlayerAuditLogDao;
@@ -29,7 +34,11 @@ public class PlayerStateManager {
   private static final Map<PlayerStatusEnum, Set<PlayerStatusEnum>> VALID_TRANSITIONS =
       Map.of(
           PlayerStatusEnum.ACTIVE,
-              Set.of(PlayerStatusEnum.LOCKED, PlayerStatusEnum.SUSPENDED, PlayerStatusEnum.CLOSED),
+              Set.of(
+                  PlayerStatusEnum.LOCKED,
+                  PlayerStatusEnum.SUSPENDED,
+                  PlayerStatusEnum.CLOSED,
+                  PlayerStatusEnum.SELF_EXCLUDED),
           PlayerStatusEnum.LOCKED, Set.of(PlayerStatusEnum.ACTIVE, PlayerStatusEnum.SUSPENDED),
           PlayerStatusEnum.SUSPENDED, Set.of(PlayerStatusEnum.ACTIVE, PlayerStatusEnum.CLOSED),
           PlayerStatusEnum.PENDING_VERIFICATION,
@@ -37,6 +46,7 @@ public class PlayerStateManager {
 
   private final PlayerDao playerDao;
   private final PlayerAuditLogDao playerAuditLogDao;
+  private final DomainEventPublisher domainEventPublisher;
 
   /**
    * Transition player status with validation and audit logging.
@@ -72,7 +82,29 @@ public class PlayerStateManager {
     auditLog.setReason(reason);
     playerAuditLogDao.insert(auditLog);
 
+    publishStatusChanged(
+        player.getPlayerId(), oldStatusValue, newStatus.getValue(), operator, reason);
+
     return ResponseDTO.ok();
+  }
+
+  @SuppressWarnings("FutureReturnValueIgnored")
+  private void publishStatusChanged(
+      Long playerId, Integer oldStatus, Integer newStatus, String operator, String reason) {
+    ObjectNode payload = JsonNodeFactory.instance.objectNode();
+    payload.put("playerId", playerId);
+    payload.put("oldStatus", oldStatus);
+    payload.put("newStatus", newStatus);
+    payload.put("operator", operator);
+    payload.put("reason", reason);
+    domainEventPublisher.publish(
+        IgamingKafkaConst.Topic.PLAYER_EVENTS,
+        DomainEvent.builder()
+            .eventType("PLAYER_STATUS_CHANGED")
+            .aggregateType("Player")
+            .aggregateId(String.valueOf(playerId))
+            .payload(payload)
+            .build());
   }
 
   private PlayerStatusEnum resolveStatus(Integer value) {

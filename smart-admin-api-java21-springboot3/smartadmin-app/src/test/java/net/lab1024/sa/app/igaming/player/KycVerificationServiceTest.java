@@ -4,14 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
+import java.util.List;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.common.constant.KycDocumentTypeEnum;
 import net.lab1024.sa.igaming.common.constant.KycLevelEnum;
+import net.lab1024.sa.igaming.common.constant.KycVerificationStatusEnum;
 import net.lab1024.sa.igaming.player.dao.KycDocumentDao;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.KycDocumentEntity;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
+import net.lab1024.sa.igaming.player.domain.vo.KycDocumentVO;
 import net.lab1024.sa.igaming.player.manager.KycApprovalManager;
 import net.lab1024.sa.igaming.player.service.KycVerificationService;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("KycVerificationService 單元測試")
+@SuppressWarnings("unchecked")
 class KycVerificationServiceTest {
 
   @Mock private PlayerDao playerDao;
@@ -138,6 +143,132 @@ class KycVerificationServiceTest {
     }
   }
 
+  // ==================== submitL2Document ====================
+
+  @Nested
+  @DisplayName("submitL2Document L2 文件提交")
+  class SubmitL2Test {
+
+    @Test
+    @DisplayName("L1 玩家提交 L2 文件 — 成功 (需人工審核)")
+    void submitL2_success() {
+      PlayerEntity player = buildPlayer(KycLevelEnum.L1);
+      when(playerDao.selectById(1L)).thenReturn(player);
+
+      ResponseDTO<Void> result =
+          kycVerificationService.submitL2Document(
+              1L, KycDocumentTypeEnum.PASSPORT, "https://cdn/doc.jpg");
+
+      assertThat(result.getOk()).isTrue();
+      verify(kycDocumentDao).insert(any(KycDocumentEntity.class));
+      // L2 documents are NOT auto-approved
+      verifyNoInteractions(kycApprovalManager);
+    }
+
+    @Test
+    @DisplayName("L0 玩家提交 L2 文件 — 被拒 (需先完成 L1)")
+    void submitL2_kycLevelInsufficient() {
+      PlayerEntity player = buildPlayer(KycLevelEnum.L0);
+      when(playerDao.selectById(1L)).thenReturn(player);
+
+      ResponseDTO<Void> result =
+          kycVerificationService.submitL2Document(
+              1L, KycDocumentTypeEnum.PASSPORT, "https://cdn/doc.jpg");
+
+      assertThat(result.getOk()).isFalse();
+      verify(kycDocumentDao, never()).insert(any(KycDocumentEntity.class));
+    }
+
+    @Test
+    @DisplayName("玩家不存在 — 回傳錯誤")
+    void submitL2_playerNotFound() {
+      when(playerDao.selectById(99L)).thenReturn(null);
+
+      ResponseDTO<Void> result =
+          kycVerificationService.submitL2Document(
+              99L, KycDocumentTypeEnum.PASSPORT, "https://cdn/doc.jpg");
+
+      assertThat(result.getOk()).isFalse();
+    }
+  }
+
+  // ==================== L2 review ====================
+
+  @Nested
+  @DisplayName("L2 文件審核")
+  class ReviewL2Test {
+
+    @Test
+    @DisplayName("核准 L2 文件 — 成功")
+    void approveL2_success() {
+      KycDocumentEntity document = buildDocument(KycVerificationStatusEnum.PENDING);
+      when(kycDocumentDao.selectById(20L)).thenReturn(document);
+
+      ResponseDTO<Void> result = kycVerificationService.approveL2Document(20L, "Looks good");
+
+      assertThat(result.getOk()).isTrue();
+      verify(kycApprovalManager).approveKycL2(document, "Looks good");
+    }
+
+    @Test
+    @DisplayName("拒絕 L2 文件 — 成功")
+    void rejectL2_success() {
+      KycDocumentEntity document = buildDocument(KycVerificationStatusEnum.PENDING);
+      when(kycDocumentDao.selectById(20L)).thenReturn(document);
+
+      ResponseDTO<Void> result = kycVerificationService.rejectL2Document(20L, "Blurry photo");
+
+      assertThat(result.getOk()).isTrue();
+      verify(kycApprovalManager).rejectKycL2(document, "Blurry photo");
+    }
+
+    @Test
+    @DisplayName("文件不存在 — 回傳錯誤")
+    void approveL2_documentNotFound() {
+      when(kycDocumentDao.selectById(99L)).thenReturn(null);
+
+      ResponseDTO<Void> result = kycVerificationService.approveL2Document(99L, "Looks good");
+
+      assertThat(result.getOk()).isFalse();
+      verifyNoInteractions(kycApprovalManager);
+    }
+
+    @Test
+    @DisplayName("已審核文件 — 回傳錯誤")
+    void approveL2_alreadyReviewed() {
+      KycDocumentEntity document = buildDocument(KycVerificationStatusEnum.APPROVED);
+      when(kycDocumentDao.selectById(20L)).thenReturn(document);
+
+      ResponseDTO<Void> result = kycVerificationService.approveL2Document(20L, "Looks good");
+
+      assertThat(result.getOk()).isFalse();
+      verifyNoInteractions(kycApprovalManager);
+    }
+  }
+
+  // ==================== queryPendingDocuments ====================
+
+  @Nested
+  @DisplayName("查詢待審核文件")
+  class QueryPendingTest {
+
+    @Test
+    @DisplayName("queryPendingDocuments — 回傳 VO 列表")
+    void queryPending_returnsList() {
+      KycDocumentEntity doc1 = buildDocument(KycVerificationStatusEnum.PENDING);
+      doc1.setKycDocumentId(1L);
+      doc1.setPlayerId(10L);
+
+      when(kycDocumentDao.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(doc1));
+
+      List<KycDocumentVO> result = kycVerificationService.queryPendingDocuments();
+
+      assertThat(result).hasSize(1);
+      assertThat(result.get(0).getKycDocumentId()).isEqualTo(1L);
+      assertThat(result.get(0).getPlayerId()).isEqualTo(10L);
+    }
+  }
+
   // ==================== helpers ====================
 
   private PlayerEntity buildPlayer(KycLevelEnum kycLevel) {
@@ -147,5 +278,15 @@ class KycVerificationServiceTest {
     player.setKycLevel(kycLevel.getValue());
     player.setDeleted(false);
     return player;
+  }
+
+  private KycDocumentEntity buildDocument(KycVerificationStatusEnum status) {
+    KycDocumentEntity document = new KycDocumentEntity();
+    document.setKycDocumentId(20L);
+    document.setPlayerId(1L);
+    document.setDocumentType(KycDocumentTypeEnum.PASSPORT.getValue());
+    document.setDocumentUrl("https://cdn/doc.jpg");
+    document.setVerificationStatus(status.getValue());
+    return document;
   }
 }

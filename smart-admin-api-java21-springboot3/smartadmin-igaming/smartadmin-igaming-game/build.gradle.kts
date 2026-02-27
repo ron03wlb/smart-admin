@@ -31,6 +31,9 @@ dependencies {
     // iGaming Wallet (for seamless wallet integration)
     api(project(":smartadmin-igaming:smartadmin-igaming-wallet"))
 
+    // Kafka MQ (for domain event publishing)
+    api(project(":smartadmin-common:smartadmin-common-mq"))
+
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))
