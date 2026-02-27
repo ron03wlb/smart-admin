@@ -34,6 +34,9 @@ dependencies {
     // Kafka MQ (for domain event publishing)
     api(project(":smartadmin-common:smartadmin-common-mq"))
 
+    // Distributed lock (Lock4j + Redisson)
+    api(project(":smartadmin-common:smartadmin-common-redis-lock"))
+
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))

@@ -2,11 +2,12 @@ package net.lab1024.sa.app.igaming.game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.adapter.GpSignatureVerifier;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
@@ -17,6 +18,7 @@ import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.manager.GameTransactionManager;
 import net.lab1024.sa.igaming.game.service.GameCallbackService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,22 @@ class GameCallbackServiceTest {
   @Mock private GpSignatureVerifier gpSignatureVerifier;
   @Mock private GameRoundDao gameRoundDao;
   @Mock private GameTransactionManager gameTransactionManager;
+  @Mock private LockService lockService;
   @InjectMocks private GameCallbackService gameCallbackService;
+
+  @BeforeEach
+  @SuppressWarnings("unchecked")
+  void setupLockService() {
+    // Default: lock service delegates to supplier (transparent pass-through)
+    // Use lenient() because not all tests reach the lock acquisition step
+    lenient()
+        .when(lockService.executeWithLock(anyString(), anyLong(), anyLong(), any(Supplier.class)))
+        .thenAnswer(
+            invocation -> {
+              Supplier<?> supplier = invocation.getArgument(3);
+              return supplier.get();
+            });
+  }
 
   @Nested
   @DisplayName("processDebit 下注回呼")
@@ -90,6 +107,22 @@ class GameCallbackServiceTest {
       ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form, 1L);
       assertThat(result.getOk()).isFalse();
     }
+
+    @Test
+    @DisplayName("鎖定取得失敗 — 返回 LOCK_ACQUISITION_FAILED")
+    @SuppressWarnings("unchecked")
+    void processDebit_lockAcquisitionFailed() {
+      CallbackDebitForm form = buildDebitForm();
+      when(gpSignatureVerifier.verify(anyString(), anyString(), any(), any())).thenReturn(true);
+      when(gameRoundDao.selectByTransactionId("tx-001")).thenReturn(null);
+
+      // Override default lock behavior to throw
+      when(lockService.executeWithLock(anyString(), anyLong(), anyLong(), any(Supplier.class)))
+          .thenThrow(new IllegalStateException("Lock acquisition failed"));
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form, 1L);
+      assertThat(result.getOk()).isFalse();
+    }
   }
 
   @Nested
@@ -112,6 +145,20 @@ class GameCallbackServiceTest {
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.SETTLED.getValue());
     }
+
+    @Test
+    @DisplayName("鎖定取得失敗 — 返回錯誤")
+    @SuppressWarnings("unchecked")
+    void processCredit_lockAcquisitionFailed() {
+      CallbackCreditForm form = buildCreditForm();
+      when(gpSignatureVerifier.verify(anyString(), anyString(), any(), any())).thenReturn(true);
+
+      when(lockService.executeWithLock(anyString(), anyLong(), anyLong(), any(Supplier.class)))
+          .thenThrow(new IllegalStateException("Lock failed"));
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processCredit(form, 1L);
+      assertThat(result.getOk()).isFalse();
+    }
   }
 
   @Nested
@@ -133,6 +180,36 @@ class GameCallbackServiceTest {
       ResponseDTO<CallbackResponseVO> result = gameCallbackService.processRollback(form, 1L);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.CANCELLED.getValue());
+    }
+  }
+
+  @Nested
+  @DisplayName("queryRound 查詢 Round 狀態")
+  class QueryRoundTest {
+
+    @Test
+    @DisplayName("查詢成功 — 返回 Round 狀態")
+    @SuppressWarnings("unchecked")
+    void queryRound_success() {
+      GameRoundEntity round = new GameRoundEntity();
+      round.setTransactionId("tx-001");
+      round.setStatus(RoundStatusEnum.SETTLED.getValue());
+      when(gameRoundDao.selectOne(any())).thenReturn(round);
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-001", 1L);
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getTransactionId()).isEqualTo("tx-001");
+      assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.SETTLED.getValue());
+    }
+
+    @Test
+    @DisplayName("Round 不存在 — 返回錯誤")
+    @SuppressWarnings("unchecked")
+    void queryRound_notFound() {
+      when(gameRoundDao.selectOne(any())).thenReturn(null);
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-999", 1L);
+      assertThat(result.getOk()).isFalse();
     }
   }
 

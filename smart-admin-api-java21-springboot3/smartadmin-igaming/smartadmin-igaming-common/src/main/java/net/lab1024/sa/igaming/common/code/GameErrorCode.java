@@ -41,6 +41,14 @@ public enum GameErrorCode {
   // --- Reconciliation (30450-30459) ---
   RECONCILIATION_FAILED(30450, "Reconciliation failed"),
   AMOUNT_MISMATCH(30451, "Transaction amount mismatch"),
+
+  // --- Seamless Wallet (30460-30479) ---
+  ROUND_NOT_OPEN(30460, "Round is not in OPEN state"),
+  ROUND_TIMEOUT(30461, "Round has timed out"),
+  PLAYER_WALLET_NOT_FOUND(30462, "Player cash wallet not found"),
+  LOCK_ACQUISITION_FAILED(30463, "Could not acquire distributed lock, try again"),
+  ROUND_PENDING_REVIEW(30464, "Round is under manual review"),
+  INVALID_STATE_TRANSITION(30465, "Invalid round state transition"),
   ;
 
   private final int code;

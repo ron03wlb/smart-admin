@@ -12,6 +12,7 @@ import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
+import net.lab1024.sa.igaming.common.constant.WalletTypeEnum;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
 import net.lab1024.sa.igaming.game.dao.GameWeightConfigDao;
@@ -59,12 +60,11 @@ class GameTransactionManagerTest {
 
     @Test
     @DisplayName("成功 — 建立 round + 扣款")
-    @SuppressWarnings("unchecked")
     void executeDebit_success() {
       CallbackDebitForm form = buildDebitForm();
 
       WalletEntity wallet = buildWallet();
-      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(wallet);
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
 
       WalletTransactionEntity txEntity = new WalletTransactionEntity();
       txEntity.setBalanceAfter(new BigDecimal("90.00"));
@@ -82,10 +82,9 @@ class GameTransactionManagerTest {
 
     @Test
     @DisplayName("錢包不存在 — 失敗")
-    @SuppressWarnings("unchecked")
     void executeDebit_walletNotFound() {
       CallbackDebitForm form = buildDebitForm();
-      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(null);
 
       ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeDebit(form, 1L);
 
@@ -94,12 +93,11 @@ class GameTransactionManagerTest {
 
     @Test
     @DisplayName("DuplicateKey — Layer 2 冪等性")
-    @SuppressWarnings("unchecked")
     void executeDebit_duplicateKey() {
       CallbackDebitForm form = buildDebitForm();
 
       WalletEntity wallet = buildWallet();
-      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(wallet);
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
 
       WalletTransactionEntity txEntity = new WalletTransactionEntity();
       txEntity.setBalanceAfter(new BigDecimal("90.00"));
@@ -117,13 +115,12 @@ class GameTransactionManagerTest {
 
     @Test
     @DisplayName("餘額不足 — 失敗")
-    @SuppressWarnings("unchecked")
     void executeDebit_insufficientBalance() {
       CallbackDebitForm form = buildDebitForm();
       form.setAmount(new BigDecimal("200.00")); // More than wallet balance
 
       WalletEntity wallet = buildWallet(); // balance=100, locked=0
-      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(wallet);
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
 
       ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeDebit(form, 1L);
 
@@ -145,7 +142,7 @@ class GameTransactionManagerTest {
       when(gameRoundDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(round);
 
       WalletEntity wallet = buildWallet();
-      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(wallet);
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
 
       WalletTransactionEntity txEntity = new WalletTransactionEntity();
       txEntity.setBalanceAfter(new BigDecimal("120.00"));
@@ -180,7 +177,6 @@ class GameTransactionManagerTest {
 
     @Test
     @DisplayName("成功 — 退款 + CANCELLED")
-    @SuppressWarnings("unchecked")
     void executeRollback_success() {
       CallbackRollbackForm form = buildRollbackForm();
 
@@ -188,7 +184,7 @@ class GameTransactionManagerTest {
       when(gameRoundDao.selectByTransactionId("tx-001")).thenReturn(round);
 
       WalletEntity wallet = buildWallet();
-      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(wallet);
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
 
       WalletTransactionEntity txEntity = new WalletTransactionEntity();
       txEntity.setBalanceAfter(new BigDecimal("110.00"));
@@ -213,6 +209,159 @@ class GameTransactionManagerTest {
       ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeRollback(form, 1L);
 
       assertThat(result.getOk()).isFalse();
+    }
+  }
+
+  @Nested
+  @DisplayName("executeTimeout 逾時處理")
+  class ExecuteTimeoutTest {
+
+    @Test
+    @DisplayName("OPEN -> TIMEOUT — 成功")
+    void executeTimeout_success() {
+      GameRoundEntity round = buildRound();
+      round.setRoundId(100L);
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      gameTransactionManager.executeTimeout(100L);
+
+      assertThat(round.getStatus()).isEqualTo(RoundStatusEnum.TIMEOUT.getValue());
+      verify(gameRoundDao).updateById(round);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.GAME_EVENTS), any(DomainEvent.class));
+    }
+
+    @Test
+    @DisplayName("已非 OPEN — 跳過")
+    void executeTimeout_notOpen_skip() {
+      GameRoundEntity round = buildRound();
+      round.setRoundId(100L);
+      round.setStatus(RoundStatusEnum.SETTLED.getValue());
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      gameTransactionManager.executeTimeout(100L);
+
+      verify(gameRoundDao, never()).updateById(any(GameRoundEntity.class));
+    }
+
+    @Test
+    @DisplayName("Round 不存在 — 跳過")
+    void executeTimeout_notFound_skip() {
+      when(gameRoundDao.selectById(100L)).thenReturn(null);
+
+      gameTransactionManager.executeTimeout(100L);
+
+      verify(gameRoundDao, never()).updateById(any(GameRoundEntity.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("executeResettlement 重新結算")
+  class ExecuteResettlementTest {
+
+    @Test
+    @DisplayName("增加派彩 — credit wallet + ADJUSTED")
+    void executeResettlement_creditDelta() {
+      GameRoundEntity round = buildSettledRound();
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      WalletEntity wallet = buildWallet();
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
+
+      WalletTransactionEntity txEntity = new WalletTransactionEntity();
+      txEntity.setBalanceAfter(new BigDecimal("110.00"));
+      when(walletManager.credit(any(WalletEntity.class), any(WalletTransactionEntity.class)))
+          .thenReturn(txEntity);
+
+      // Original payout = 20, new = 30, delta = +10 (credit)
+      ResponseDTO<CallbackResponseVO> result =
+          gameTransactionManager.executeResettlement(100L, new BigDecimal("30.00"), "req-001", 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.ADJUSTED.getValue());
+      verify(walletManager).credit(any(), any());
+      verify(gameRoundDao).updateById(round);
+    }
+
+    @Test
+    @DisplayName("減少派彩 — debit wallet + ADJUSTED")
+    void executeResettlement_debitDelta() {
+      GameRoundEntity round = buildSettledRound();
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      WalletEntity wallet = buildWallet();
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(wallet);
+
+      WalletTransactionEntity txEntity = new WalletTransactionEntity();
+      txEntity.setBalanceAfter(new BigDecimal("90.00"));
+      when(walletManager.debit(any(WalletEntity.class), any(WalletTransactionEntity.class)))
+          .thenReturn(txEntity);
+
+      // Original payout = 20, new = 10, delta = -10 (debit)
+      ResponseDTO<CallbackResponseVO> result =
+          gameTransactionManager.executeResettlement(100L, new BigDecimal("10.00"), "req-002", 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.ADJUSTED.getValue());
+      verify(walletManager).debit(any(), any());
+    }
+
+    @Test
+    @DisplayName("非 SETTLED 狀態 — 拒絕")
+    void executeResettlement_invalidState() {
+      GameRoundEntity round = buildRound(); // status = OPEN
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      ResponseDTO<CallbackResponseVO> result =
+          gameTransactionManager.executeResettlement(100L, new BigDecimal("30.00"), "req-003", 1L);
+
+      assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("delta=0 — 直接返回 ADJUSTED（無錢包操作）")
+    void executeResettlement_zeroDelta() {
+      GameRoundEntity round = buildSettledRound();
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      // Same payout amount, delta = 0
+      ResponseDTO<CallbackResponseVO> result =
+          gameTransactionManager.executeResettlement(100L, new BigDecimal("20.00"), "req-004", 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.ADJUSTED.getValue());
+      verify(walletManager, never()).credit(any(), any());
+      verify(walletManager, never()).debit(any(), any());
+    }
+  }
+
+  @Nested
+  @DisplayName("markPendingReview 待審核標記")
+  class MarkPendingReviewTest {
+
+    @Test
+    @DisplayName("成功 — 設定 PENDING_REVIEW + 發佈事件")
+    void markPendingReview_success() {
+      GameRoundEntity round = buildRound();
+      round.setRoundId(100L);
+      when(gameRoundDao.selectById(100L)).thenReturn(round);
+
+      gameTransactionManager.markPendingReview(100L, "GP unavailable");
+
+      assertThat(round.getStatus()).isEqualTo(RoundStatusEnum.PENDING_REVIEW.getValue());
+      verify(gameRoundDao).updateById(round);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.GAME_EVENTS), any(DomainEvent.class));
+    }
+
+    @Test
+    @DisplayName("Round 不存在 — 跳過")
+    void markPendingReview_notFound_skip() {
+      when(gameRoundDao.selectById(100L)).thenReturn(null);
+
+      gameTransactionManager.markPendingReview(100L, "GP unavailable");
+
+      verify(gameRoundDao, never()).updateById(any(GameRoundEntity.class));
     }
   }
 
@@ -268,6 +417,14 @@ class GameTransactionManagerTest {
     round.setPayoutAmount(BigDecimal.ZERO);
     round.setStatus(RoundStatusEnum.OPEN.getValue());
     round.setDeleted(false);
+    return round;
+  }
+
+  private GameRoundEntity buildSettledRound() {
+    GameRoundEntity round = buildRound();
+    round.setRoundId(100L);
+    round.setStatus(RoundStatusEnum.SETTLED.getValue());
+    round.setPayoutAmount(new BigDecimal("20.00"));
     return round;
   }
 }

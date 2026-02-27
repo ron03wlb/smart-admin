@@ -19,6 +19,7 @@ public enum TransactionTypeEnum implements BaseEnum {
   WIN(4, "派彩"),
   BONUS(5, "紅利"),
   ADJUSTMENT(6, "調整"),
+  ROLLBACK(7, "回滾"),
   ;
 
   private final Integer value;

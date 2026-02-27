@@ -17,6 +17,9 @@ public enum RoundStatusEnum implements BaseEnum {
   SETTLED(2, "已結算"),
   CANCELLED(3, "已取消"),
   VOIDED(4, "已作廢"),
+  TIMEOUT(5, "逾時"),
+  ADJUSTED(6, "已調整"),
+  PENDING_REVIEW(7, "待審核"),
   ;
 
   private final Integer value;

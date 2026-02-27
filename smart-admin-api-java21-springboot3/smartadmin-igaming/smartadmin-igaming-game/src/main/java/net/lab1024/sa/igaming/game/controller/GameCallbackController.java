@@ -11,9 +11,11 @@ import net.lab1024.sa.igaming.game.domain.form.CallbackDebitForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.service.GameCallbackService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -51,5 +53,13 @@ public class GameCallbackController {
       @RequestBody @Valid CallbackRollbackForm form,
       @RequestHeader(value = "X-Tenant-Id", defaultValue = "1") Long tenantId) {
     return gameCallbackService.processRollback(form, tenantId);
+  }
+
+  @Operation(summary = "Query round status")
+  @GetMapping("/igaming/game/callback/query")
+  public ResponseDTO<CallbackResponseVO> query(
+      @RequestParam String gpRoundId,
+      @RequestHeader(value = "X-Tenant-Id", defaultValue = "1") Long tenantId) {
+    return gameCallbackService.queryRound(gpRoundId, tenantId);
   }
 }

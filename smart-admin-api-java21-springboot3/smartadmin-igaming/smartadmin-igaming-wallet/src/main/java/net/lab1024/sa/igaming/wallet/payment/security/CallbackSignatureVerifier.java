@@ -13,6 +13,10 @@ import org.springframework.stereotype.Component;
  * <p>Uses constant-time comparison to prevent timing attacks. Validates timestamp to prevent replay
  * attacks (5-minute tolerance).
  *
+ * <p>For PSP callback verification, callers should use {@link
+ * net.lab1024.sa.igaming.wallet.payment.service.PspSecretService#getDecryptedWebhookSecret} to
+ * obtain the secret, then pass it to {@link #verify}.
+ *
  * @author iGaming Team
  * @since 2026-02-18
  */

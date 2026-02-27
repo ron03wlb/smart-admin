@@ -1,12 +1,14 @@
 package net.lab1024.sa.igaming.wallet.payment.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.security.encrypt.EncryptedFieldTypeHandler;
 
 /**
  * PSP (Payment Service Provider) configuration entity.
@@ -16,7 +18,7 @@ import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("t_psp")
+@TableName(value = "t_psp", autoResultMap = true)
 public class PspEntity extends SmartAdminBaseEntity {
 
   @TableId(type = IdType.AUTO)
@@ -28,8 +30,10 @@ public class PspEntity extends SmartAdminBaseEntity {
 
   private String apiBaseUrl;
 
+  @TableField(typeHandler = EncryptedFieldTypeHandler.class)
   private String apiKeyEncrypted;
 
+  @TableField(typeHandler = EncryptedFieldTypeHandler.class)
   private String webhookSecretEncrypted;
 
   private Boolean enabled;

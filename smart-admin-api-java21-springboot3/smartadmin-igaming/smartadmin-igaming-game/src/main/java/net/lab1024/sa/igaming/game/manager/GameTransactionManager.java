@@ -243,7 +243,7 @@ public class GameTransactionManager {
     WalletTransactionEntity transaction = new WalletTransactionEntity();
     transaction.setWalletId(wallet.getWalletId());
     transaction.setPlayerId(wallet.getPlayerId());
-    transaction.setTransactionType(TransactionTypeEnum.ADJUSTMENT.getValue());
+    transaction.setTransactionType(TransactionTypeEnum.ROLLBACK.getValue());
     transaction.setAmount(round.getBetAmount());
     transaction.setBalanceBefore(balanceBefore);
     transaction.setBalanceAfter(balanceAfter);
@@ -278,12 +278,153 @@ public class GameTransactionManager {
     return ResponseDTO.ok(response);
   }
 
+  /**
+   * Execute timeout (OPEN -> TIMEOUT).
+   *
+   * <p>Called by MissingSettlementPollJob for rounds that have been OPEN longer than the configured
+   * threshold (typically 2 hours). No wallet mutation — just a status change.
+   *
+   * @param roundId the round ID to mark as timed out
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public void executeTimeout(Long roundId) {
+    GameRoundEntity round = gameRoundDao.selectById(roundId);
+    if (round == null || !RoundStatusEnum.OPEN.getValue().equals(round.getStatus())) {
+      return;
+    }
+    round.setStatus(RoundStatusEnum.TIMEOUT.getValue());
+    gameRoundDao.updateById(round);
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("roundId", roundId);
+    node.put("playerId", round.getPlayerId());
+    node.put("gpRoundId", round.getGpRoundId());
+    publishGameEvent("ROUND_TIMEOUT", round.getPlayerId(), round.getTenantId(), node);
+
+    log.info("Round timed out: roundId={}, gpRoundId={}", roundId, round.getGpRoundId());
+  }
+
+  /**
+   * Execute resettlement (SETTLED -> ADJUSTED).
+   *
+   * <p>Admin-triggered operation that adjusts the payout amount for an already-settled round. If
+   * the new payout is higher, credits the difference; if lower, debits the difference.
+   *
+   * @param roundId the round ID to adjust
+   * @param newPayoutAmount the corrected payout amount
+   * @param requestId idempotency key for the wallet transaction
+   * @param tenantId tenant ID
+   * @return callback response with updated balance
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public ResponseDTO<CallbackResponseVO> executeResettlement(
+      Long roundId, BigDecimal newPayoutAmount, String requestId, Long tenantId) {
+    GameRoundEntity round = gameRoundDao.selectById(roundId);
+    if (round == null) {
+      return ResponseDTO.userErrorParam(GameErrorCode.ROUND_NOT_FOUND.getMsg());
+    }
+    if (!RoundStatusEnum.SETTLED.getValue().equals(round.getStatus())) {
+      return ResponseDTO.userErrorParam(GameErrorCode.INVALID_STATE_TRANSITION.getMsg());
+    }
+
+    BigDecimal delta = newPayoutAmount.subtract(round.getPayoutAmount());
+    if (delta.compareTo(BigDecimal.ZERO) == 0) {
+      CallbackResponseVO response = new CallbackResponseVO();
+      response.setTransactionId(round.getTransactionId());
+      response.setStatus(RoundStatusEnum.ADJUSTED.getValue());
+      return ResponseDTO.ok(response);
+    }
+
+    WalletEntity wallet = findCashWallet(round.getPlayerId());
+    if (wallet == null) {
+      return ResponseDTO.userErrorParam(GameErrorCode.PLAYER_WALLET_NOT_FOUND.getMsg());
+    }
+
+    BigDecimal balanceBefore = wallet.getBalance();
+    BigDecimal balanceAfter = balanceBefore.add(delta);
+
+    WalletTransactionEntity transaction = new WalletTransactionEntity();
+    transaction.setWalletId(wallet.getWalletId());
+    transaction.setPlayerId(wallet.getPlayerId());
+    transaction.setTransactionType(TransactionTypeEnum.ADJUSTMENT.getValue());
+    transaction.setAmount(delta);
+    transaction.setBalanceBefore(balanceBefore);
+    transaction.setBalanceAfter(balanceAfter);
+    transaction.setRequestId(requestId);
+    transaction.setReferenceType("RESETTLEMENT");
+    transaction.setReferenceId(String.valueOf(roundId));
+    transaction.setDescription("Resettlement: round " + round.getGpRoundId());
+
+    wallet.setBalance(balanceAfter);
+
+    try {
+      if (delta.compareTo(BigDecimal.ZERO) > 0) {
+        walletManager.credit(wallet, transaction);
+      } else {
+        walletManager.debit(wallet, transaction);
+      }
+    } catch (OptimisticLockingFailureException e) {
+      return ResponseDTO.userErrorParam(GameErrorCode.DEBIT_FAILED.getMsg());
+    }
+
+    round.setPayoutAmount(newPayoutAmount);
+    round.setStatus(RoundStatusEnum.ADJUSTED.getValue());
+    gameRoundDao.updateById(round);
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("roundId", roundId);
+    node.put("playerId", round.getPlayerId());
+    node.put("oldPayout", round.getPayoutAmount().toPlainString());
+    node.put("newPayout", newPayoutAmount.toPlainString());
+    node.put("delta", delta.toPlainString());
+    node.put("balanceAfter", balanceAfter.toPlainString());
+    publishGameEvent("ROUND_ADJUSTED", round.getPlayerId(), tenantId, node);
+
+    log.info("Round resettled: roundId={}, delta={}, newBalance={}", roundId, delta, balanceAfter);
+
+    CallbackResponseVO response = new CallbackResponseVO();
+    response.setTransactionId(round.getTransactionId());
+    response.setBalance(balanceAfter);
+    response.setStatus(RoundStatusEnum.ADJUSTED.getValue());
+    return ResponseDTO.ok(response);
+  }
+
+  /**
+   * Mark round as pending review.
+   *
+   * <p>Triggered when the GP is unavailable during reconciliation and the round status cannot be
+   * determined. Operations team must manually investigate within 24h SLA.
+   *
+   * @param roundId the round ID
+   * @param reason the reason for manual review
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public void markPendingReview(Long roundId, String reason) {
+    GameRoundEntity round = gameRoundDao.selectById(roundId);
+    if (round == null) {
+      return;
+    }
+    round.setStatus(RoundStatusEnum.PENDING_REVIEW.getValue());
+    gameRoundDao.updateById(round);
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("roundId", roundId);
+    node.put("playerId", round.getPlayerId());
+    node.put("gpRoundId", round.getGpRoundId());
+    node.put("reason", reason);
+    publishGameEvent("ROUND_PENDING_REVIEW", round.getPlayerId(), round.getTenantId(), node);
+
+    log.info("Round marked for review: roundId={}, reason={}", roundId, reason);
+  }
+
+  /**
+   * Load player's CASH wallet with DB pessimistic lock (Layer 2).
+   *
+   * <p>Uses SELECT FOR UPDATE to prevent concurrent modifications at the database level. The row
+   * lock is held until the enclosing @Transactional method commits or rolls back.
+   */
   private WalletEntity findCashWallet(Long playerId) {
-    return walletDao.selectOne(
-        Wrappers.<WalletEntity>lambdaQuery()
-            .eq(WalletEntity::getPlayerId, playerId)
-            .eq(WalletEntity::getWalletType, WalletTypeEnum.CASH.getValue())
-            .eq(WalletEntity::getDeleted, false));
+    return walletDao.selectForUpdate(playerId, WalletTypeEnum.CASH.getValue());
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
