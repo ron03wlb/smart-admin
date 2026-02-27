@@ -20,5 +20,9 @@ public final class IgamingSwaggerTagConst {
 
   public static final String RISK = "iGaming-風控管理";
 
+  public static final String AGENT_CREDIT = "iGaming-信用網絡";
+
+  public static final String AGENT_AFFILIATE = "iGaming-代理佣金";
+
   private IgamingSwaggerTagConst() {}
 }

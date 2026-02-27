@@ -19,6 +19,7 @@ public final class IgamingKafkaConst {
     public static final String GAME_EVENTS = "igaming.game.events";
     public static final String ACTIVITY_EVENTS = "igaming.activity.events";
     public static final String AUDIT_EVENTS = "igaming.audit.events";
+    public static final String AGENT_EVENTS = "igaming.agent.events";
 
     private Topic() {}
   }
@@ -32,6 +33,7 @@ public final class IgamingKafkaConst {
     public static final String AUDIT = "igaming-audit-group";
     public static final String RECONCILIATION = "igaming-reconciliation-group";
     public static final String ANALYTICS = "igaming-analytics-group";
+    public static final String AGENT = "igaming-agent-group";
 
     private Group() {}
   }
