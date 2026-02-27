@@ -2,6 +2,7 @@ package net.lab1024.sa.app.igaming.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,6 +10,9 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateAdjustmentDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateAgentDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateCommissionPlanDao;
@@ -43,6 +47,7 @@ class AffiliateCommissionManagerTest {
   @Mock private AffiliateCommissionPlanDao affiliateCommissionPlanDao;
   @Mock private AffiliateCommissionRecordDao affiliateCommissionRecordDao;
   @Mock private AffiliateAdjustmentDao affiliateAdjustmentDao;
+  @Mock private DomainEventPublisher domainEventPublisher;
   @InjectMocks private AffiliateCommissionManager affiliateCommissionManager;
 
   private static final Long TENANT_ID = 1L;
@@ -78,6 +83,14 @@ class AffiliateCommissionManagerTest {
       verify(affiliateHierarchyDao).insert(hierCaptor.capture());
       AffiliateHierarchyEntity self = hierCaptor.getValue();
       assertThat(self.getDepth()).isEqualTo(0);
+
+      // Event published
+      ArgumentCaptor<DomainEvent> eventCaptor = ArgumentCaptor.forClass(DomainEvent.class);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), eventCaptor.capture());
+      DomainEvent event = eventCaptor.getValue();
+      assertThat(event.getEventType()).isEqualTo("AGENT_REGISTERED");
+      assertThat(event.getAggregateType()).isEqualTo("AffiliateAgent");
     }
 
     @Test
@@ -155,6 +168,12 @@ class AffiliateCommissionManagerTest {
       assertThat(result.getNetAmount()).isEqualByComparingTo("30000.0000");
       assertThat(result.getStatus()).isEqualTo(CommissionRecordStatusEnum.PENDING.getValue());
       verify(affiliateCommissionRecordDao).insert(any(AffiliateCommissionRecordEntity.class));
+
+      // Event published
+      ArgumentCaptor<DomainEvent> eventCaptor = ArgumentCaptor.forClass(DomainEvent.class);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), eventCaptor.capture());
+      assertThat(eventCaptor.getValue().getEventType()).isEqualTo("COMMISSION_ISSUED");
     }
 
     @Test
@@ -253,6 +272,10 @@ class AffiliateCommissionManagerTest {
       assertThat(agent.getTotalCommission()).isEqualByComparingTo("60000");
       verify(affiliateCommissionRecordDao).updateById(record);
       verify(affiliateAgentDao).updateById(agent);
+
+      // Event published
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), any(DomainEvent.class));
     }
 
     @Test
@@ -302,6 +325,10 @@ class AffiliateCommissionManagerTest {
       assertThat(record.getStatus()).isEqualTo(CommissionRecordStatusEnum.REJECTED.getValue());
       assertThat(record.getApprovedAt()).isNotNull();
       verify(affiliateCommissionRecordDao).updateById(record);
+
+      // Event published
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), any(DomainEvent.class));
     }
   }
 

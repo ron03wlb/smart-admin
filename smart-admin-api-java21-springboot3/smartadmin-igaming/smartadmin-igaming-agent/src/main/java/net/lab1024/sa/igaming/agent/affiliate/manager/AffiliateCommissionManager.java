@@ -1,5 +1,7 @@
 package net.lab1024.sa.igaming.agent.affiliate.manager;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -8,6 +10,9 @@ import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateAdjustmentDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateAgentDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateCommissionPlanDao;
@@ -42,6 +47,7 @@ public class AffiliateCommissionManager {
   private final AffiliateCommissionPlanDao affiliateCommissionPlanDao;
   private final AffiliateCommissionRecordDao affiliateCommissionRecordDao;
   private final AffiliateAdjustmentDao affiliateAdjustmentDao;
+  private final DomainEventPublisher domainEventPublisher;
 
   /**
    * Create agent with closure table hierarchy entries.
@@ -107,6 +113,17 @@ public class AffiliateCommissionManager {
         agent.getUsername(),
         level,
         form.getParentAgentId());
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("agentId", agent.getAgentId());
+    node.put("username", agent.getUsername());
+    node.put("level", level);
+    if (form.getParentAgentId() != null) {
+      node.put("parentAgentId", form.getParentAgentId());
+    }
+    publishAgentEvent(
+        "AGENT_REGISTERED", "AffiliateAgent", String.valueOf(agent.getAgentId()), node);
+
     return agent;
   }
 
@@ -158,6 +175,14 @@ public class AffiliateCommissionManager {
         grossAmount,
         carryover,
         netAmount);
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("agentId", agentId);
+    node.put("netAmount", netAmount.toPlainString());
+    node.put("planType", plan.getPlanType());
+    node.put("settlementDate", settlementDate.toString());
+    publishAgentEvent("COMMISSION_ISSUED", "Commission", String.valueOf(agentId), node);
+
     return record;
   }
 
@@ -184,6 +209,13 @@ public class AffiliateCommissionManager {
 
     log.info(
         "Commission approved: recordId={}, agentId={}", form.getRecordId(), record.getAgentId());
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("recordId", form.getRecordId());
+    node.put("agentId", record.getAgentId());
+    node.put("netAmount", record.getNetAmount().toPlainString());
+    publishAgentEvent(
+        "COMMISSION_APPROVED", "Commission", String.valueOf(form.getRecordId()), node);
   }
 
   /**
@@ -202,6 +234,12 @@ public class AffiliateCommissionManager {
 
     log.info(
         "Commission rejected: recordId={}, agentId={}", form.getRecordId(), record.getAgentId());
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("recordId", form.getRecordId());
+    node.put("agentId", record.getAgentId());
+    publishAgentEvent(
+        "COMMISSION_REJECTED", "Commission", String.valueOf(form.getRecordId()), node);
   }
 
   /**
@@ -249,6 +287,18 @@ public class AffiliateCommissionManager {
       return grossRevenue;
     }
     return BigDecimal.ZERO;
+  }
+
+  private void publishAgentEvent(
+      String eventType, String aggregateType, String aggregateId, ObjectNode payload) {
+    domainEventPublisher.publish(
+        IgamingKafkaConst.Topic.AGENT_EVENTS,
+        DomainEvent.builder()
+            .eventType(eventType)
+            .aggregateType(aggregateType)
+            .aggregateId(aggregateId)
+            .payload(payload)
+            .build());
   }
 
   private AffiliateCommissionRecordEntity findLastApprovedRecord(Long agentId, Long tenantId) {

@@ -2,12 +2,16 @@ package net.lab1024.sa.app.igaming.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.agent.credit.dao.AgentCreditDao;
 import net.lab1024.sa.igaming.agent.credit.dao.CreditAllocationAuditDao;
 import net.lab1024.sa.igaming.agent.credit.dao.SettlementRecordDao;
@@ -33,6 +37,7 @@ class CreditSettlementManagerTest {
   @Mock private AgentCreditDao agentCreditDao;
   @Mock private SettlementRecordDao settlementRecordDao;
   @Mock private CreditAllocationAuditDao creditAllocationAuditDao;
+  @Mock private DomainEventPublisher domainEventPublisher;
   @InjectMocks private CreditSettlementManager creditSettlementManager;
 
   private static final Long TENANT_ID = 1L;
@@ -94,6 +99,15 @@ class CreditSettlementManagerTest {
       assertThat(audit.getNewLimit()).isEqualByComparingTo("10000");
       assertThat(audit.getDelta()).isEqualByComparingTo("10000");
       assertThat(audit.getOperator()).isEqualTo("admin");
+
+      // Event published
+      ArgumentCaptor<DomainEvent> eventCaptor = ArgumentCaptor.forClass(DomainEvent.class);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), eventCaptor.capture());
+      DomainEvent event = eventCaptor.getValue();
+      assertThat(event.getEventType()).isEqualTo("CREDIT_ALLOCATED");
+      assertThat(event.getAggregateType()).isEqualTo("AgentCredit");
+      assertThat(event.getAggregateId()).isEqualTo("200");
     }
 
     @Test
@@ -183,6 +197,10 @@ class CreditSettlementManagerTest {
       assertThat(audit.getOldLimit()).isEqualByComparingTo("20000");
       assertThat(audit.getNewLimit()).isEqualByComparingTo("12000");
       assertThat(audit.getDelta()).isEqualByComparingTo("-8000");
+
+      // Event published
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), any(DomainEvent.class));
     }
   }
 
@@ -244,6 +262,10 @@ class CreditSettlementManagerTest {
 
       assertThat(results).isEmpty();
       verify(settlementRecordDao, never()).insert(any(SettlementRecordEntity.class));
+
+      // Settlement event still published (with 0 records)
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), any(DomainEvent.class));
     }
   }
 
@@ -268,6 +290,12 @@ class CreditSettlementManagerTest {
       assertThat(record.getPaymentTxnId()).isEqualTo("TXN-ABC-123");
       assertThat(record.getVerifiedAt()).isNotNull();
       verify(settlementRecordDao).updateById(record);
+
+      // Event published
+      ArgumentCaptor<DomainEvent> eventCaptor = ArgumentCaptor.forClass(DomainEvent.class);
+      verify(domainEventPublisher)
+          .publish(eq(IgamingKafkaConst.Topic.AGENT_EVENTS), eventCaptor.capture());
+      assertThat(eventCaptor.getValue().getEventType()).isEqualTo("PAYMENT_VERIFIED");
     }
   }
 }

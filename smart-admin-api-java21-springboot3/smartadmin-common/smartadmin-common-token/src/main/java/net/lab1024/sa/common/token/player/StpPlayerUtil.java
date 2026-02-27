@@ -48,4 +48,12 @@ public final class StpPlayerUtil {
   public static boolean isLogin() {
     return stpPlayerLogic.isLogin();
   }
+
+  public static Object getLoginId() {
+    return stpPlayerLogic.getLoginId();
+  }
+
+  public static long getLoginIdAsLong() {
+    return stpPlayerLogic.getLoginIdAsLong();
+  }
 }

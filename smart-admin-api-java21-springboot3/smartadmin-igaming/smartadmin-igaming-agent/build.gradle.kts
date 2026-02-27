@@ -28,6 +28,9 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-json"))
     api(project(":smartadmin-common:smartadmin-common-cache"))
 
+    // Kafka MQ (for event publishing)
+    api(project(":smartadmin-common:smartadmin-common-mq"))
+
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))

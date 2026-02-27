@@ -1,5 +1,7 @@
 package net.lab1024.sa.igaming.agent.credit.manager;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -7,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.agent.credit.dao.AgentCreditDao;
 import net.lab1024.sa.igaming.agent.credit.dao.CreditAllocationAuditDao;
 import net.lab1024.sa.igaming.agent.credit.dao.SettlementRecordDao;
@@ -35,6 +40,7 @@ public class CreditSettlementManager {
   private final AgentCreditDao agentCreditDao;
   private final SettlementRecordDao settlementRecordDao;
   private final CreditAllocationAuditDao creditAllocationAuditDao;
+  private final DomainEventPublisher domainEventPublisher;
 
   /**
    * Execute credit allocation from parent to child agent.
@@ -112,6 +118,12 @@ public class CreditSettlementManager {
         childId,
         amount,
         child.getCreditLimit());
+
+    publishAgentEvent(
+        "CREDIT_ALLOCATED",
+        "AgentCredit",
+        String.valueOf(childId),
+        buildAllocatePayload(parentId, childId, amount, positionPct));
   }
 
   /**
@@ -166,6 +178,13 @@ public class CreditSettlementManager {
         childId,
         oldLimit,
         newLimit);
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("parentId", parentId);
+    node.put("childId", childId);
+    node.put("newLimit", newLimit.toPlainString());
+    node.put("delta", delta.negate().toPlainString());
+    publishAgentEvent("CREDIT_RECALLED", "AgentCredit", String.valueOf(childId), node);
   }
 
   /**
@@ -214,6 +233,13 @@ public class CreditSettlementManager {
         tenantId,
         settlementWeek,
         results.size());
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("tenantId", tenantId);
+    node.put("settlementWeek", settlementWeek);
+    node.put("recordCount", results.size());
+    publishAgentEvent("SETTLEMENT_COMPLETED", "Settlement", settlementWeek, node);
+
     return results;
   }
 
@@ -236,5 +262,35 @@ public class CreditSettlementManager {
         settlementRecordId,
         txnId,
         record.getAgentId());
+
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("settlementRecordId", settlementRecordId);
+    node.put("txnId", txnId);
+    node.put("agentId", record.getAgentId());
+    publishAgentEvent("PAYMENT_VERIFIED", "Settlement", String.valueOf(settlementRecordId), node);
+  }
+
+  private ObjectNode buildAllocatePayload(
+      Long parentId, Long childId, BigDecimal amount, BigDecimal positionPct) {
+    ObjectNode node = JsonNodeFactory.instance.objectNode();
+    node.put("parentId", parentId);
+    node.put("childId", childId);
+    node.put("amount", amount.toPlainString());
+    if (positionPct != null) {
+      node.put("positionPercent", positionPct.toPlainString());
+    }
+    return node;
+  }
+
+  private void publishAgentEvent(
+      String eventType, String aggregateType, String aggregateId, ObjectNode payload) {
+    domainEventPublisher.publish(
+        IgamingKafkaConst.Topic.AGENT_EVENTS,
+        DomainEvent.builder()
+            .eventType(eventType)
+            .aggregateType(aggregateType)
+            .aggregateId(aggregateId)
+            .payload(payload)
+            .build());
   }
 }
