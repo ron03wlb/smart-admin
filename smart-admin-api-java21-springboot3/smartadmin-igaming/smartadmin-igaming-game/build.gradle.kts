@@ -28,9 +28,13 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-json"))
     api(project(":smartadmin-common:smartadmin-common-cache"))
 
+    // iGaming Wallet (for seamless wallet integration)
+    api(project(":smartadmin-igaming:smartadmin-igaming-wallet"))
+
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))
+    api(project(":smartadmin-support:smartadmin-support-job"))
 
     // API Documentation
     compileOnly(libs.knife4j.openapi3.jakarta)

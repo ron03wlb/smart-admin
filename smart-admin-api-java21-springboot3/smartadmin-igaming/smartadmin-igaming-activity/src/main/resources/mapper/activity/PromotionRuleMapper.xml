@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.activity.dao.PromotionRuleDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.activity.domain.vo.PromotionRuleVO">
+        SELECT rule_id, promotion_code, promotion_name, promotion_type, status,
+               start_time, end_time, min_deposit, bonus_rate, max_bonus,
+               wagering_multiplier, max_claims_per_player, bonus_expiry_days,
+               game_restriction, create_time, update_time
+        FROM t_promotion_rule
+        WHERE deleted = FALSE
+        <if test="query.keyword != null and query.keyword != ''">
+            AND (promotion_name LIKE CONCAT('%', #{query.keyword}, '%')
+                 OR promotion_code LIKE CONCAT('%', #{query.keyword}, '%'))
+        </if>
+        <if test="query.promotionType != null">
+            AND promotion_type = #{query.promotionType}
+        </if>
+        <if test="query.status != null">
+            AND status = #{query.status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByCode" resultType="net.lab1024.sa.igaming.activity.domain.entity.PromotionRuleEntity">
+        SELECT *
+        FROM t_promotion_rule
+        WHERE tenant_id = #{tenantId}
+              AND promotion_code = #{promotionCode}
+              AND deleted = FALSE
+    </select>
+
+    <select id="selectActiveRules" resultType="net.lab1024.sa.igaming.activity.domain.entity.PromotionRuleEntity">
+        SELECT *
+        FROM t_promotion_rule
+        WHERE tenant_id = #{tenantId}
+              AND status = 1
+              AND deleted = FALSE
+              AND start_time &lt;= NOW()
+              AND end_time &gt;= NOW()
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

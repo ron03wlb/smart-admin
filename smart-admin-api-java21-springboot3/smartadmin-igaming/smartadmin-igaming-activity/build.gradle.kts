@@ -10,6 +10,12 @@ dependencies {
     api(project(":smartadmin-api:smartadmin-api-igaming"))
     // iGaming Common
     api(project(":smartadmin-igaming:smartadmin-igaming-common"))
+    // iGaming cross-module dependencies (Activity is an aggregation module)
+    api(project(":smartadmin-igaming:smartadmin-igaming-wallet"))
+    api(project(":smartadmin-igaming:smartadmin-igaming-game"))
+    api(project(":smartadmin-igaming:smartadmin-igaming-player"))
+    // Job scheduling
+    api(project(":smartadmin-support:smartadmin-support-job"))
 
     // Spring Boot
     api(libs.spring.boot.starter.web)

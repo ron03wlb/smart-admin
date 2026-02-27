@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.game.dao.GameDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.game.domain.vo.GameVO">
+        SELECT
+            g.game_id,
+            g.game_code,
+            g.game_name,
+            g.category,
+            gp.provider_code,
+            g.thumbnail_url,
+            g.play_count,
+            g.enabled,
+            g.create_time
+        FROM t_game g
+        JOIN t_game_provider gp ON g.provider_id = gp.provider_id
+        <where>
+            g.deleted = FALSE
+            <if test="query.keyword != null and query.keyword != ''">
+                AND (g.game_name ILIKE CONCAT('%', #{query.keyword}, '%')
+                     OR g.game_code ILIKE CONCAT('%', #{query.keyword}, '%'))
+            </if>
+            <if test="query.category != null">
+                AND g.category = #{query.category}
+            </if>
+            <if test="query.providerCode != null and query.providerCode != ''">
+                AND gp.provider_code = #{query.providerCode}
+            </if>
+            <if test="query.enabled != null">
+                AND g.enabled = #{query.enabled}
+            </if>
+        </where>
+        ORDER BY g.play_count DESC, g.game_id DESC
+    </select>
+
+    <select id="selectEnabledGamesByTenant" resultType="net.lab1024.sa.igaming.game.domain.vo.GameVO">
+        SELECT
+            g.game_id,
+            g.game_code,
+            g.game_name,
+            g.category,
+            gp.provider_code,
+            g.thumbnail_url,
+            g.play_count,
+            g.enabled,
+            g.create_time
+        FROM t_game g
+        JOIN t_game_provider gp ON g.provider_id = gp.provider_id
+        WHERE g.deleted = FALSE AND g.enabled = TRUE
+              AND gp.deleted = FALSE AND gp.enabled = TRUE
+        ORDER BY g.play_count DESC
+    </select>
+
+    <select id="selectGamesByTenantAndCategory" resultType="net.lab1024.sa.igaming.game.domain.vo.GameVO">
+        SELECT
+            g.game_id,
+            g.game_code,
+            g.game_name,
+            g.category,
+            gp.provider_code,
+            g.thumbnail_url,
+            g.play_count,
+            g.enabled,
+            g.create_time
+        FROM t_game g
+        JOIN t_game_provider gp ON g.provider_id = gp.provider_id
+        WHERE g.deleted = FALSE AND g.enabled = TRUE
+              AND gp.deleted = FALSE AND gp.enabled = TRUE
+              AND g.category = #{category}
+        ORDER BY g.play_count DESC
+    </select>
+
+</mapper>

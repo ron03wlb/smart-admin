@@ -42,6 +42,10 @@ public class IgamingArchitectureTest {
           .consideringAllDependencies()
           .optionalLayer("Controller")
           .definedBy("..igaming..controller..")
+          .optionalLayer("Job")
+          .definedBy("..igaming..job..")
+          .optionalLayer("Adapter")
+          .definedBy("..igaming..adapter..")
           .optionalLayer("Service")
           .definedBy("..igaming..service..")
           .optionalLayer("Manager")
@@ -50,15 +54,19 @@ public class IgamingArchitectureTest {
           .definedBy("..igaming..dao..")
           .whereLayer("Controller")
           .mayNotBeAccessedByAnyLayer()
+          .whereLayer("Job")
+          .mayNotBeAccessedByAnyLayer()
+          .whereLayer("Adapter")
+          .mayOnlyBeAccessedByLayers("Service", "Manager")
           .whereLayer("Service")
-          .mayOnlyBeAccessedByLayers("Controller")
+          .mayOnlyBeAccessedByLayers("Controller", "Job")
           .whereLayer("Manager")
-          .mayOnlyBeAccessedByLayers("Service")
+          .mayOnlyBeAccessedByLayers("Service", "Manager", "Job")
           .whereLayer("Dao")
-          .mayOnlyBeAccessedByLayers("Manager", "Service")
+          .mayOnlyBeAccessedByLayers("Manager", "Service", "Adapter")
           .as(
               "iGaming modules must follow SmartAdmin layered architecture"
-                  + " (Controller -> Service -> Manager -> Dao)");
+                  + " (Controller/Job -> Service -> Manager -> Dao, Adapter -> Dao)");
 
   // ========== Section 2: No Cyclic Dependencies ==========
 
@@ -184,12 +192,11 @@ public class IgamingArchitectureTest {
           .resideInAPackage("..igaming.activity..")
           .should()
           .dependOnClassesThat()
-          .resideInAnyPackage(
-              "..igaming.player..", "..igaming.game..", "..igaming.risk..", "..igaming.agent..")
+          .resideInAnyPackage("..igaming.risk..", "..igaming.agent..")
           .allowEmptyShould(true)
           .as(
-              "Activity module must not directly depend on other iGaming business modules"
-                  + " (except Wallet via API contract)");
+              "Activity module must not depend on Risk/Agent modules"
+                  + " (Activity is an aggregation module, allowed: Wallet, Game, Player)");
 
   @ArchTest
   static final ArchRule riskModuleIsolation =

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.game.dao.GameProviderDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.game.domain.vo.GameProviderVO">
+        SELECT
+            provider_id,
+            provider_code,
+            provider_name,
+            api_url,
+            callback_url,
+            enabled,
+            health_status,
+            last_health_check,
+            create_time,
+            update_time
+        FROM t_game_provider
+        <where>
+            deleted = FALSE
+            <if test="query.providerCode != null and query.providerCode != ''">
+                AND provider_code = #{query.providerCode}
+            </if>
+            <if test="query.healthStatus != null">
+                AND health_status = #{query.healthStatus}
+            </if>
+            <if test="query.enabled != null">
+                AND enabled = #{query.enabled}
+            </if>
+        </where>
+        ORDER BY provider_id DESC
+    </select>
+
+    <select id="selectEnabledProviders" resultType="net.lab1024.sa.igaming.game.domain.entity.GameProviderEntity">
+        SELECT *
+        FROM t_game_provider
+        WHERE deleted = FALSE AND enabled = TRUE
+        ORDER BY provider_id
+    </select>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.player.dao.PlayerDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.player.domain.vo.PlayerVO">
+        SELECT
+            player_id,
+            username,
+            status,
+            kyc_level,
+            vip_level,
+            registration_ip,
+            last_login_time,
+            create_time,
+            update_time
+        FROM t_player
+        <where>
+            deleted = FALSE
+            <if test="query.username != null and query.username != ''">
+                AND username LIKE CONCAT('%', #{query.username}, '%')
+            </if>
+            <if test="query.status != null">
+                AND status = #{query.status}
+            </if>
+            <if test="query.kycLevel != null">
+                AND kyc_level = #{query.kycLevel}
+            </if>
+            <if test="query.vipLevel != null">
+                AND vip_level = #{query.vipLevel}
+            </if>
+        </where>
+        ORDER BY player_id DESC
+    </select>
+
+</mapper>

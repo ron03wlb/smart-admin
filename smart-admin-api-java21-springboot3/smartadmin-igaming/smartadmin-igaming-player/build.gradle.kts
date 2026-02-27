@@ -10,6 +10,8 @@ dependencies {
     api(project(":smartadmin-api:smartadmin-api-igaming"))
     // iGaming Common
     api(project(":smartadmin-igaming:smartadmin-igaming-common"))
+    // iGaming Wallet (registration creates wallet)
+    api(project(":smartadmin-igaming:smartadmin-igaming-wallet"))
 
     // Spring Boot
     api(libs.spring.boot.starter.web)
@@ -28,9 +30,10 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-json"))
     api(project(":smartadmin-common:smartadmin-common-cache"))
 
-    // iGaming Infrastructure (Multi-Tenant, Encryption, Kafka)
+    // iGaming Infrastructure (Multi-Tenant, Encryption, Token, Kafka)
     api(project(":smartadmin-common:smartadmin-common-tenant"))
     api(project(":smartadmin-common:smartadmin-common-security"))
+    api(project(":smartadmin-common:smartadmin-common-token"))
     api(project(":smartadmin-common:smartadmin-common-mq"))
 
     // SA Support

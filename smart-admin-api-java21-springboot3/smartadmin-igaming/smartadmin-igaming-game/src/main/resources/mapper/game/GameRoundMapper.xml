@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.game.dao.GameRoundDao">
+
+    <select id="selectByTransactionId" resultType="net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity">
+        SELECT *
+        FROM t_game_round
+        WHERE transaction_id = #{transactionId}
+              AND deleted = FALSE
+    </select>
+
+    <select id="selectUnsettledRoundsOlderThan" resultType="net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity">
+        SELECT *
+        FROM t_game_round
+        WHERE status = 1
+              AND deleted = FALSE
+              AND create_time &lt; NOW() - (#{minutes} || ' minutes')::INTERVAL
+        ORDER BY create_time
+    </select>
+
+    <select id="selectByProviderAndDate" resultType="net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity">
+        SELECT *
+        FROM t_game_round
+        WHERE provider_code = #{providerCode}
+              AND deleted = FALSE
+              AND create_time::DATE = #{date}
+        ORDER BY create_time
+    </select>
+
+    <select id="sumWeightedTurnoverByPlayer" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(weighted_turnover), 0)
+        FROM t_game_round
+        WHERE player_id = #{playerId}
+              AND tenant_id = #{tenantId}
+              AND status = 2
+              AND deleted = FALSE
+    </select>
+
+</mapper>

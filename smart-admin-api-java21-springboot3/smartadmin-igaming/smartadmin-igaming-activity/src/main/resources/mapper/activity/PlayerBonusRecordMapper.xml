@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao">
+
+    <select id="queryPage" resultType="net.lab1024.sa.igaming.activity.domain.vo.PlayerBonusRecordVO">
+        SELECT r.record_id, r.player_id, p.promotion_code, p.promotion_name,
+               r.bonus_amount, r.wagering_required, r.wagering_completed,
+               r.status, r.claimed_at, r.completed_at, r.expired_at
+        FROM t_player_bonus_record r
+        LEFT JOIN t_promotion_rule p ON r.rule_id = p.rule_id
+        WHERE r.deleted = FALSE
+        <if test="query.playerId != null">
+            AND r.player_id = #{query.playerId}
+        </if>
+        <if test="query.status != null">
+            AND r.status = #{query.status}
+        </if>
+        ORDER BY r.claimed_at DESC
+    </select>
+
+    <select id="selectActiveByPlayerId" resultType="net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity">
+        SELECT *
+        FROM t_player_bonus_record
+        WHERE player_id = #{playerId}
+              AND status = 2
+              AND deleted = FALSE
+    </select>
+
+    <select id="countClaimsByPlayerAndRule" resultType="int">
+        SELECT COUNT(*)
+        FROM t_player_bonus_record
+        WHERE player_id = #{playerId}
+              AND rule_id = #{ruleId}
+              AND deleted = FALSE
+    </select>
+
+    <select id="selectExpiredActive" resultType="net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity">
+        SELECT *
+        FROM t_player_bonus_record
+        WHERE status = 2
+              AND expired_at &lt; NOW()
+              AND deleted = FALSE
+        ORDER BY expired_at
+        LIMIT #{batchSize}
+    </select>
+
+</mapper>

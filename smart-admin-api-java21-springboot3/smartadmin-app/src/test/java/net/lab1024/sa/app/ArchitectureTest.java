@@ -18,8 +18,9 @@ import org.junit.jupiter.api.Test;
  */
 class ArchitectureTest {
 
-  // 只檢查業務模塊（business, system, oa, igaming）的分層架構
+  // 只檢查業務模塊（business, system, oa）的分層架構
   // Support 模塊作為基礎設施層，有不同的架構規則
+  // iGaming 模塊有自己的 IgamingArchitectureTest（含 Adapter/Job 層定義）
   // 排除非標準層：adapter, advice, config, plugin, datascope (特殊 AOP 模塊)
   private static final JavaClasses BUSINESS_CLASSES =
       new ClassFileImporter()
@@ -27,8 +28,7 @@ class ArchitectureTest {
               location ->
                   (location.contains("/business/")
                           || location.contains("/system/")
-                          || location.contains("/oa/")
-                          || location.contains("/igaming/"))
+                          || location.contains("/oa/"))
                       && !location.contains("/adapter/")
                       && !location.contains("/advice/")
                       && !location.contains("/config/")
