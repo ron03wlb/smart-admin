@@ -101,6 +101,12 @@ class PaymentIntegrationTest {
   static class TestConfig {
 
     @org.springframework.context.annotation.Bean
+    public net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher domainEventPublisher() {
+      return org.mockito.Mockito.mock(
+          net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher.class);
+    }
+
+    @org.springframework.context.annotation.Bean
     public com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor
         mybatisPlusInterceptor() {
       var interceptor = new com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor();

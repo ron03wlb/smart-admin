@@ -122,6 +122,12 @@ class PlayerIntegrationTest {
     }
 
     @Bean
+    public net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher domainEventPublisher() {
+      return org.mockito.Mockito.mock(
+          net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher.class);
+    }
+
+    @Bean
     public PasswordEncryptService passwordEncryptService() {
       return new PasswordEncryptService(new Argon2Properties());
     }

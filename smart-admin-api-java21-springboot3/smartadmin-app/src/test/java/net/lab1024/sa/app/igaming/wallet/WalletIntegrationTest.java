@@ -118,6 +118,12 @@ class WalletIntegrationTest {
               com.baomidou.mybatisplus.annotation.DbType.POSTGRE_SQL));
       return interceptor;
     }
+
+    @Bean
+    public net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher domainEventPublisher() {
+      return org.mockito.Mockito.mock(
+          net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher.class);
+    }
   }
 
   private static final Long TEST_TENANT_ID = 1L;

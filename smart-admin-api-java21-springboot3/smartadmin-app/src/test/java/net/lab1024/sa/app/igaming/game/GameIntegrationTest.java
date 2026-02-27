@@ -114,6 +114,12 @@ class GameIntegrationTest {
     }
 
     @Bean
+    public net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher domainEventPublisher() {
+      return org.mockito.Mockito.mock(
+          net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher.class);
+    }
+
+    @Bean
     public AesGcmFieldEncryptService aesGcmFieldEncryptService() throws Exception {
       KeyGenerator keyGen = KeyGenerator.getInstance("AES");
       keyGen.init(256);
