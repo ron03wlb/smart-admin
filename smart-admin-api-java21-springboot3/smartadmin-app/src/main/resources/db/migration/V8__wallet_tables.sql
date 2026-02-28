@@ -73,14 +73,14 @@ CREATE TABLE t_wallet_transaction (
     create_time       TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 
     CONSTRAINT uk_wallet_transaction_request UNIQUE (request_id),
-    CONSTRAINT ck_wallet_transaction_type CHECK (transaction_type IN (1, 2, 3, 4, 5, 6))
+    CONSTRAINT ck_wallet_transaction_type CHECK (transaction_type IN (1, 2, 3, 4, 5, 6, 7))
 );
 
 COMMENT ON TABLE t_wallet_transaction IS '錢包交易記錄 (不可變)';
 COMMENT ON COLUMN t_wallet_transaction.transaction_id IS '交易唯一標識';
 COMMENT ON COLUMN t_wallet_transaction.wallet_id IS '所屬錢包 ID';
 COMMENT ON COLUMN t_wallet_transaction.player_id IS '玩家 ID';
-COMMENT ON COLUMN t_wallet_transaction.transaction_type IS '交易類型: 1=存款, 2=提款, 3=下注, 4=派彩, 5=紅利, 6=調整';
+COMMENT ON COLUMN t_wallet_transaction.transaction_type IS '交易類型: 1=存款, 2=提款, 3=下注, 4=派彩, 5=紅利, 6=調整, 7=回滾';
 COMMENT ON COLUMN t_wallet_transaction.amount IS '交易金額';
 COMMENT ON COLUMN t_wallet_transaction.balance_before IS '交易前餘額';
 COMMENT ON COLUMN t_wallet_transaction.balance_after IS '交易後餘額';

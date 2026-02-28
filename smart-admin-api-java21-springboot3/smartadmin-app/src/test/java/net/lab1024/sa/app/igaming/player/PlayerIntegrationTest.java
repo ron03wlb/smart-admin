@@ -92,6 +92,7 @@ class PlayerIntegrationTest {
   })
   @Import({
     net.lab1024.sa.common.mybatis.handler.MybatisPlusFillHandler.class,
+    net.lab1024.sa.app.igaming.config.IntegrationTestMockBeans.class,
   })
   @ComponentScan(
       basePackages = {

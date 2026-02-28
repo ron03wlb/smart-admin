@@ -22,7 +22,12 @@ public interface AgentCreditDao extends BaseMapper<AgentCreditEntity> {
       @Param("agentId") Long agentId, @Param("tenantId") Long tenantId);
 
   @Select(
-      "SELECT * FROM t_agent_credit WHERE parent_id = #{parentId} AND tenant_id = #{tenantId} AND deleted = FALSE")
+      "<script>"
+          + "SELECT * FROM t_agent_credit WHERE "
+          + "<if test='parentId != null'>parent_id = #{parentId}</if>"
+          + "<if test='parentId == null'>parent_id IS NULL</if>"
+          + " AND tenant_id = #{tenantId} AND deleted = FALSE"
+          + "</script>")
   List<AgentCreditEntity> findByParentIdAndTenantId(
       @Param("parentId") Long parentId, @Param("tenantId") Long tenantId);
 }

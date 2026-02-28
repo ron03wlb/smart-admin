@@ -83,6 +83,7 @@ class PaymentIntegrationTest {
   })
   @Import({
     net.lab1024.sa.common.mybatis.handler.MybatisPlusFillHandler.class,
+    net.lab1024.sa.app.igaming.config.IntegrationTestMockBeans.class,
   })
   @ComponentScan(
       basePackages = {
@@ -158,6 +159,9 @@ class PaymentIntegrationTest {
         // V9: payment tables
         ScriptUtils.executeSqlScript(
             conn, new ClassPathResource("db/migration/V9__payment_tables.sql"));
+        // V16: payment reconciliation (adds reconciliation_status column)
+        ScriptUtils.executeSqlScript(
+            conn, new ClassPathResource("db/migration/V16__payment_reconciliation.sql"));
       } catch (SQLException e) {
         throw new RuntimeException("Failed to initialize payment test schema", e);
       }
