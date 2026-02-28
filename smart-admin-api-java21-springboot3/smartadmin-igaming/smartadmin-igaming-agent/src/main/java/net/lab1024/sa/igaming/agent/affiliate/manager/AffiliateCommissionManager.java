@@ -28,6 +28,7 @@ import net.lab1024.sa.igaming.agent.affiliate.domain.form.CommissionApprovalForm
 import net.lab1024.sa.igaming.common.constant.AgentStatusEnum;
 import net.lab1024.sa.igaming.common.constant.CommissionPlanTypeEnum;
 import net.lab1024.sa.igaming.common.constant.CommissionRecordStatusEnum;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,7 +123,10 @@ public class AffiliateCommissionManager {
       node.put("parentAgentId", form.getParentAgentId());
     }
     publishAgentEvent(
-        "AGENT_REGISTERED", "AffiliateAgent", String.valueOf(agent.getAgentId()), node);
+        DomainEventTypeConst.AGENT_REGISTERED,
+        "AffiliateAgent",
+        String.valueOf(agent.getAgentId()),
+        node);
 
     return agent;
   }
@@ -181,7 +185,8 @@ public class AffiliateCommissionManager {
     node.put("netAmount", netAmount.toPlainString());
     node.put("planType", plan.getPlanType());
     node.put("settlementDate", settlementDate.toString());
-    publishAgentEvent("COMMISSION_ISSUED", "Commission", String.valueOf(agentId), node);
+    publishAgentEvent(
+        DomainEventTypeConst.COMMISSION_ISSUED, "Commission", String.valueOf(agentId), node);
 
     return record;
   }
@@ -215,7 +220,10 @@ public class AffiliateCommissionManager {
     node.put("agentId", record.getAgentId());
     node.put("netAmount", record.getNetAmount().toPlainString());
     publishAgentEvent(
-        "COMMISSION_APPROVED", "Commission", String.valueOf(form.getRecordId()), node);
+        DomainEventTypeConst.COMMISSION_APPROVED,
+        "Commission",
+        String.valueOf(form.getRecordId()),
+        node);
   }
 
   /**
@@ -239,7 +247,10 @@ public class AffiliateCommissionManager {
     node.put("recordId", form.getRecordId());
     node.put("agentId", record.getAgentId());
     publishAgentEvent(
-        "COMMISSION_REJECTED", "Commission", String.valueOf(form.getRecordId()), node);
+        DomainEventTypeConst.COMMISSION_REJECTED,
+        "Commission",
+        String.valueOf(form.getRecordId()),
+        node);
   }
 
   /**

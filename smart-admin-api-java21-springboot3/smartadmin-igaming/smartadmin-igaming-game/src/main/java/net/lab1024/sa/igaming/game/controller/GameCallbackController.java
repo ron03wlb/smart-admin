@@ -36,8 +36,7 @@ public class GameCallbackController {
   @Operation(summary = "GP debit callback (bet placement)")
   @PostMapping("/igaming/game/callback/debit")
   public ResponseDTO<CallbackResponseVO> debit(
-      @RequestBody @Valid CallbackDebitForm form,
-      @RequestHeader(value = "X-Tenant-Id", defaultValue = "1") Long tenantId) {
+      @RequestBody @Valid CallbackDebitForm form, @RequestHeader("X-Tenant-Id") Long tenantId) {
     return gameCallbackService.processDebit(form, tenantId);
   }
 
@@ -45,8 +44,7 @@ public class GameCallbackController {
   @Operation(summary = "GP credit callback (win settlement)")
   @PostMapping("/igaming/game/callback/credit")
   public ResponseDTO<CallbackResponseVO> credit(
-      @RequestBody @Valid CallbackCreditForm form,
-      @RequestHeader(value = "X-Tenant-Id", defaultValue = "1") Long tenantId) {
+      @RequestBody @Valid CallbackCreditForm form, @RequestHeader("X-Tenant-Id") Long tenantId) {
     return gameCallbackService.processCredit(form, tenantId);
   }
 
@@ -54,8 +52,7 @@ public class GameCallbackController {
   @Operation(summary = "GP rollback callback (bet cancellation)")
   @PostMapping("/igaming/game/callback/rollback")
   public ResponseDTO<CallbackResponseVO> rollback(
-      @RequestBody @Valid CallbackRollbackForm form,
-      @RequestHeader(value = "X-Tenant-Id", defaultValue = "1") Long tenantId) {
+      @RequestBody @Valid CallbackRollbackForm form, @RequestHeader("X-Tenant-Id") Long tenantId) {
     return gameCallbackService.processRollback(form, tenantId);
   }
 
@@ -63,8 +60,7 @@ public class GameCallbackController {
   @Operation(summary = "Query round status")
   @GetMapping("/igaming/game/callback/query")
   public ResponseDTO<CallbackResponseVO> query(
-      @RequestParam String gpRoundId,
-      @RequestHeader(value = "X-Tenant-Id", defaultValue = "1") Long tenantId) {
+      @RequestParam String gpRoundId, @RequestHeader("X-Tenant-Id") Long tenantId) {
     return gameCallbackService.queryRound(gpRoundId, tenantId);
   }
 }

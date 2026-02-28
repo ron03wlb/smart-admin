@@ -2,6 +2,7 @@ package net.lab1024.sa.app.igaming.config;
 
 import java.util.function.Supplier;
 import net.lab1024.sa.common.redislock.LockService;
+import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class IntegrationTestMockBeans {
+
+  @Bean
+  public IgamingProperties igamingProperties() {
+    return new IgamingProperties();
+  }
 
   @Bean
   public LockService lockService() {

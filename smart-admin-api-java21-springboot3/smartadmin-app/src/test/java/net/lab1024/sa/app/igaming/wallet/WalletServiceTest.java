@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.function.Supplier;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.redislock.LockService;
+import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.LockReasonEnum;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
 import net.lab1024.sa.igaming.common.constant.WalletTypeEnum;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -62,6 +64,7 @@ class WalletServiceTest {
   @Mock private WalletBonusExtDao walletBonusExtDao;
   @Mock private WalletManager walletManager;
   @Mock private LockService lockService;
+  @Spy private IgamingProperties igamingProperties = new IgamingProperties();
 
   @InjectMocks private WalletService walletService;
 

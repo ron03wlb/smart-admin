@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.util.function.Supplier;
 import net.lab1024.sa.common.redislock.LockService;
+import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.LockReasonEnum;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
 import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -53,6 +55,7 @@ class WalletServiceLockTest {
   @Mock private WalletBonusExtDao walletBonusExtDao;
   @Mock private WalletManager walletManager;
   @Mock private LockService lockService;
+  @Spy private IgamingProperties igamingProperties = new IgamingProperties();
 
   @InjectMocks private WalletService walletService;
 

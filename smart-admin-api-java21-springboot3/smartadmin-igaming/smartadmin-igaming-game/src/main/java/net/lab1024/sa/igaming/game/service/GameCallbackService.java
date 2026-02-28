@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.code.GameErrorCode;
+import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.game.adapter.GpSignatureVerifier;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity;
@@ -40,13 +41,12 @@ public class GameCallbackService {
 
   private static final String WALLET_LOCK_PREFIX = "wallet:lock:";
   private static final String ROUND_LOCK_PREFIX = "round:lock:";
-  private static final long LOCK_WAIT_MS = 3000;
-  private static final long LOCK_LEASE_MS = 10000;
 
   private final GpSignatureVerifier gpSignatureVerifier;
   private final GameRoundDao gameRoundDao;
   private final GameTransactionManager gameTransactionManager;
   private final LockService lockService;
+  private final IgamingProperties igamingProperties;
 
   /**
    * Process debit callback (bet placement).
@@ -77,13 +77,13 @@ public class GameCallbackService {
     try {
       return lockService.executeWithLock(
           WALLET_LOCK_PREFIX + form.getPlayerId(),
-          LOCK_WAIT_MS,
-          LOCK_LEASE_MS,
+          igamingProperties.getLock().getWaitMs(),
+          igamingProperties.getLock().getLeaseMs(),
           () ->
               lockService.executeWithLock(
                   ROUND_LOCK_PREFIX + form.getPlayerId() + ":" + form.getRoundId(),
-                  LOCK_WAIT_MS,
-                  LOCK_LEASE_MS,
+                  igamingProperties.getLock().getWaitMs(),
+                  igamingProperties.getLock().getLeaseMs(),
                   () -> gameTransactionManager.executeDebit(form, tenantId)));
     } catch (IllegalStateException e) {
       log.warn("Lock acquisition failed for debit: playerId={}", form.getPlayerId());
@@ -110,13 +110,13 @@ public class GameCallbackService {
     try {
       return lockService.executeWithLock(
           WALLET_LOCK_PREFIX + form.getPlayerId(),
-          LOCK_WAIT_MS,
-          LOCK_LEASE_MS,
+          igamingProperties.getLock().getWaitMs(),
+          igamingProperties.getLock().getLeaseMs(),
           () ->
               lockService.executeWithLock(
                   ROUND_LOCK_PREFIX + form.getPlayerId() + ":" + form.getRoundId(),
-                  LOCK_WAIT_MS,
-                  LOCK_LEASE_MS,
+                  igamingProperties.getLock().getWaitMs(),
+                  igamingProperties.getLock().getLeaseMs(),
                   () -> gameTransactionManager.executeCredit(form, tenantId)));
     } catch (IllegalStateException e) {
       log.warn("Lock acquisition failed for credit: playerId={}", form.getPlayerId());
@@ -143,8 +143,8 @@ public class GameCallbackService {
     try {
       return lockService.executeWithLock(
           WALLET_LOCK_PREFIX + form.getPlayerId(),
-          LOCK_WAIT_MS,
-          LOCK_LEASE_MS,
+          igamingProperties.getLock().getWaitMs(),
+          igamingProperties.getLock().getLeaseMs(),
           () -> gameTransactionManager.executeRollback(form, tenantId));
     } catch (IllegalStateException e) {
       log.warn("Lock acquisition failed for rollback: playerId={}", form.getPlayerId());

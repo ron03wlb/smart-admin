@@ -87,7 +87,7 @@ class PlayerControllerTest {
       ResponseDTO<Void> result = playerController.changePlayerStatus(1L, 999, "admin", "violation");
 
       assertThat(result.getOk()).isFalse();
-      assertThat(result.getMsg()).isEqualTo("Invalid status value");
+      assertThat(result.getMsg()).isEqualTo(PlayerErrorCode.INVALID_STATUS_VALUE.getMsg());
       verifyNoInteractions(playerService);
     }
   }
@@ -115,7 +115,7 @@ class PlayerControllerTest {
       ResponseDTO<Void> result = playerController.changeVipLevel(1L, 999, "promotion");
 
       assertThat(result.getOk()).isFalse();
-      assertThat(result.getMsg()).isEqualTo("Invalid VIP level value");
+      assertThat(result.getMsg()).isEqualTo(PlayerErrorCode.INVALID_VIP_LEVEL_VALUE.getMsg());
       verifyNoInteractions(playerService);
     }
   }
@@ -131,7 +131,7 @@ class PlayerControllerTest {
           playerController.submitKycDocument(1L, 999, "https://example.com/doc.jpg");
 
       assertThat(result.getOk()).isFalse();
-      assertThat(result.getMsg()).isEqualTo("Invalid document type");
+      assertThat(result.getMsg()).isEqualTo(PlayerErrorCode.INVALID_DOCUMENT_TYPE.getMsg());
       verifyNoInteractions(kycVerificationService);
     }
   }

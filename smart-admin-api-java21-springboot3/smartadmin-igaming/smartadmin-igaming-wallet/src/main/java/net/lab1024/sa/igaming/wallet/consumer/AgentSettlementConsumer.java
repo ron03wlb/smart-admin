@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.wallet.service.WalletService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -24,9 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AgentSettlementConsumer {
-
-  private static final String COMMISSION_APPROVED = "COMMISSION_APPROVED";
-  private static final String SETTLEMENT_COMPLETED = "SETTLEMENT_COMPLETED";
 
   private final WalletService walletService;
 
@@ -47,7 +45,7 @@ public class AgentSettlementConsumer {
     }
 
     String eventType = event.getEventType();
-    if (SETTLEMENT_COMPLETED.equals(eventType)) {
+    if (DomainEventTypeConst.SETTLEMENT_COMPLETED.equals(eventType)) {
       log.info(
           "[AGENT] Settlement completed: eventId={}, aggregateId={}",
           event.getEventId(),
@@ -55,7 +53,7 @@ public class AgentSettlementConsumer {
       return;
     }
 
-    if (!COMMISSION_APPROVED.equals(eventType)) {
+    if (!DomainEventTypeConst.COMMISSION_APPROVED.equals(eventType)) {
       return;
     }
 

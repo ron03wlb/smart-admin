@@ -39,6 +39,11 @@ public enum PlayerErrorCode {
   // --- KYC (30330-30339) ---
   KYC_LEVEL_INSUFFICIENT(30330, "KYC level insufficient for this operation"),
   KYC_DOCUMENT_NOT_FOUND(30331, "KYC document does not exist"),
+
+  // --- Parameter Validation (30340-30349) ---
+  INVALID_STATUS_VALUE(30340, "Invalid player status value"),
+  INVALID_VIP_LEVEL_VALUE(30341, "Invalid VIP level value"),
+  INVALID_DOCUMENT_TYPE(30342, "Invalid KYC document type"),
   ;
 
   private final int code;

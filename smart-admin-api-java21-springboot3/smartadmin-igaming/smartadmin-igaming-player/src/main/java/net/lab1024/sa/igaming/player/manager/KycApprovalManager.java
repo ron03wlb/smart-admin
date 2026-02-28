@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.common.constant.KycLevelEnum;
 import net.lab1024.sa.igaming.common.constant.KycVerificationStatusEnum;
 import net.lab1024.sa.igaming.player.dao.KycDocumentDao;
@@ -92,7 +93,7 @@ public class KycApprovalManager {
     domainEventPublisher.publish(
         IgamingKafkaConst.Topic.PLAYER_EVENTS,
         DomainEvent.builder()
-            .eventType("KYC_UPDATED")
+            .eventType(DomainEventTypeConst.KYC_UPDATED)
             .aggregateType("Player")
             .aggregateId(String.valueOf(playerId))
             .payload(payload)

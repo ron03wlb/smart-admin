@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -24,9 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PlayerEventConsumer {
-
-  private static final String PLAYER_SUSPENDED = "PLAYER_SUSPENDED";
-  private static final String PLAYER_SELF_EXCLUDED = "PLAYER_SELF_EXCLUDED";
 
   private final WalletManager walletManager;
 
@@ -47,7 +45,8 @@ public class PlayerEventConsumer {
     }
 
     String eventType = event.getEventType();
-    if (!PLAYER_SUSPENDED.equals(eventType) && !PLAYER_SELF_EXCLUDED.equals(eventType)) {
+    if (!DomainEventTypeConst.PLAYER_SUSPENDED.equals(eventType)
+        && !DomainEventTypeConst.PLAYER_SELF_EXCLUDED.equals(eventType)) {
       return;
     }
 

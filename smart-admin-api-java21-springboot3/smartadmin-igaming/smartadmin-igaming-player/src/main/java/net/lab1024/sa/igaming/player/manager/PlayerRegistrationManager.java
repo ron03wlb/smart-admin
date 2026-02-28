@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
@@ -56,7 +57,7 @@ public class PlayerRegistrationManager {
     domainEventPublisher.publish(
         IgamingKafkaConst.Topic.PLAYER_EVENTS,
         DomainEvent.builder()
-            .eventType("PLAYER_REGISTERED")
+            .eventType(DomainEventTypeConst.PLAYER_REGISTERED)
             .aggregateType("Player")
             .aggregateId(String.valueOf(player.getPlayerId()))
             .payload(payload)

@@ -11,6 +11,7 @@ import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
@@ -88,7 +89,7 @@ public class WalletManager {
               .eq(WalletTransactionEntity::getRequestId, transaction.getRequestId()));
     }
 
-    publishWalletEvent("WALLET_CREDITED", wallet, transaction);
+    publishWalletEvent(DomainEventTypeConst.WALLET_CREDITED, wallet, transaction);
     return transaction;
   }
 
@@ -118,7 +119,7 @@ public class WalletManager {
               .eq(WalletTransactionEntity::getRequestId, transaction.getRequestId()));
     }
 
-    publishWalletEvent("WALLET_DEBITED", wallet, transaction);
+    publishWalletEvent(DomainEventTypeConst.WALLET_DEBITED, wallet, transaction);
     return transaction;
   }
 
@@ -191,7 +192,7 @@ public class WalletManager {
               .eq(WalletTransactionEntity::getRequestId, transaction.getRequestId()));
     }
 
-    publishWalletEvent("BONUS_CREDITED", bonusWallet, transaction);
+    publishWalletEvent(DomainEventTypeConst.BONUS_CREDITED, bonusWallet, transaction);
     return transaction;
   }
 
@@ -247,7 +248,7 @@ public class WalletManager {
               .eq(WalletTransactionEntity::getRequestId, transaction.getRequestId()));
     }
 
-    publishWalletEvent("BONUS_DEBITED", bonusWallet, transaction);
+    publishWalletEvent(DomainEventTypeConst.BONUS_DEBITED, bonusWallet, transaction);
     return transaction;
   }
 
@@ -323,7 +324,7 @@ public class WalletManager {
     creditTx.setDescription("Bonus conversion credit: ext " + bonusExt.getId());
     walletTransactionDao.insert(creditTx);
 
-    publishWalletEvent("BONUS_CONVERTED", cashWallet, creditTx);
+    publishWalletEvent(DomainEventTypeConst.BONUS_CONVERTED, cashWallet, creditTx);
     log.info(
         "Bonus converted: extId={}, amount={}, playerId={}",
         bonusExt.getId(),

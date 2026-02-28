@@ -18,6 +18,7 @@ import net.lab1024.sa.igaming.agent.credit.dao.SettlementRecordDao;
 import net.lab1024.sa.igaming.agent.credit.domain.entity.AgentCreditEntity;
 import net.lab1024.sa.igaming.agent.credit.domain.entity.CreditAllocationAuditEntity;
 import net.lab1024.sa.igaming.agent.credit.domain.entity.SettlementRecordEntity;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.common.constant.PaymentVerifyStatusEnum;
 import net.lab1024.sa.igaming.common.constant.SettlementPhaseEnum;
 import org.springframework.stereotype.Component;
@@ -120,7 +121,7 @@ public class CreditSettlementManager {
         child.getCreditLimit());
 
     publishAgentEvent(
-        "CREDIT_ALLOCATED",
+        DomainEventTypeConst.CREDIT_ALLOCATED,
         "AgentCredit",
         String.valueOf(childId),
         buildAllocatePayload(parentId, childId, amount, positionPct));
@@ -184,7 +185,8 @@ public class CreditSettlementManager {
     node.put("childId", childId);
     node.put("newLimit", newLimit.toPlainString());
     node.put("delta", delta.negate().toPlainString());
-    publishAgentEvent("CREDIT_RECALLED", "AgentCredit", String.valueOf(childId), node);
+    publishAgentEvent(
+        DomainEventTypeConst.CREDIT_RECALLED, "AgentCredit", String.valueOf(childId), node);
   }
 
   /**
@@ -238,7 +240,8 @@ public class CreditSettlementManager {
     node.put("tenantId", tenantId);
     node.put("settlementWeek", settlementWeek);
     node.put("recordCount", results.size());
-    publishAgentEvent("SETTLEMENT_COMPLETED", "Settlement", settlementWeek, node);
+    publishAgentEvent(
+        DomainEventTypeConst.SETTLEMENT_COMPLETED, "Settlement", settlementWeek, node);
 
     return results;
   }
@@ -267,7 +270,11 @@ public class CreditSettlementManager {
     node.put("settlementRecordId", settlementRecordId);
     node.put("txnId", txnId);
     node.put("agentId", record.getAgentId());
-    publishAgentEvent("PAYMENT_VERIFIED", "Settlement", String.valueOf(settlementRecordId), node);
+    publishAgentEvent(
+        DomainEventTypeConst.PAYMENT_VERIFIED,
+        "Settlement",
+        String.valueOf(settlementRecordId),
+        node);
   }
 
   private ObjectNode buildAllocatePayload(

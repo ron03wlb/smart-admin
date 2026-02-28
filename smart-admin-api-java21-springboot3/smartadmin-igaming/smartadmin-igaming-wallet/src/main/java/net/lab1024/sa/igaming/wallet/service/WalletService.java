@@ -14,6 +14,7 @@ import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.code.WalletErrorCode;
+import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
 import net.lab1024.sa.igaming.common.constant.WalletTypeEnum;
@@ -68,17 +69,13 @@ public class WalletService {
           TransactionTypeEnum.BET.getValue(),
           TransactionTypeEnum.ADJUSTMENT.getValue());
 
-  /** Distributed lock timeout: 3 seconds to acquire, 10 seconds hold. */
-  private static final long LOCK_ACQUIRE_TIMEOUT = 3000;
-
-  private static final long LOCK_EXPIRE = 10000;
-
   private final WalletDao walletDao;
   private final WalletTransactionDao walletTransactionDao;
   private final WalletLockDao walletLockDao;
   private final WalletBonusExtDao walletBonusExtDao;
   private final WalletManager walletManager;
   private final LockService lockService;
+  private final IgamingProperties igamingProperties;
 
   /**
    * Get wallet by ID.
@@ -149,7 +146,10 @@ public class WalletService {
     WalletEntity entity = new WalletEntity();
     entity.setPlayerId(form.getPlayerId());
     entity.setWalletType(form.getWalletType());
-    entity.setCurrencyCode(form.getCurrencyCode() != null ? form.getCurrencyCode() : "USD");
+    entity.setCurrencyCode(
+        form.getCurrencyCode() != null
+            ? form.getCurrencyCode()
+            : igamingProperties.getWallet().getDefaultCurrency());
     entity.setBalance(BigDecimal.ZERO);
     entity.setLockedAmount(BigDecimal.ZERO);
     entity.setDeleted(false);
@@ -184,8 +184,8 @@ public class WalletService {
     String lockKey = "wallet:lock:" + form.getWalletId();
     return lockService.executeWithLock(
         lockKey,
-        LOCK_ACQUIRE_TIMEOUT,
-        LOCK_EXPIRE,
+        igamingProperties.getLock().getWaitMs(),
+        igamingProperties.getLock().getLeaseMs(),
         () -> {
           // Idempotency Layer 1: check requestId
           WalletTransactionEntity existing =
@@ -248,8 +248,8 @@ public class WalletService {
     String lockKey = "wallet:lock:" + form.getWalletId();
     return lockService.executeWithLock(
         lockKey,
-        LOCK_ACQUIRE_TIMEOUT,
-        LOCK_EXPIRE,
+        igamingProperties.getLock().getWaitMs(),
+        igamingProperties.getLock().getLeaseMs(),
         () -> {
           // Idempotency Layer 1: check requestId
           WalletTransactionEntity existing =
@@ -311,8 +311,8 @@ public class WalletService {
     String lockKey = "wallet:lock:" + form.getWalletId();
     return lockService.executeWithLock(
         lockKey,
-        LOCK_ACQUIRE_TIMEOUT,
-        LOCK_EXPIRE,
+        igamingProperties.getLock().getWaitMs(),
+        igamingProperties.getLock().getLeaseMs(),
         () -> {
           // Load wallet
           WalletEntity wallet = walletDao.selectById(form.getWalletId());
@@ -363,8 +363,8 @@ public class WalletService {
     String lockKey = "wallet:lock:" + lockEntity.getWalletId();
     return lockService.executeWithLock(
         lockKey,
-        LOCK_ACQUIRE_TIMEOUT,
-        LOCK_EXPIRE,
+        igamingProperties.getLock().getWaitMs(),
+        igamingProperties.getLock().getLeaseMs(),
         () -> {
           // Re-load wallet under lock for consistency
           WalletEntity wallet = walletDao.selectById(lockEntity.getWalletId());
@@ -403,8 +403,8 @@ public class WalletService {
     String lockKey = "wallet:bonus:lock:" + form.getPlayerId();
     return lockService.executeWithLock(
         lockKey,
-        LOCK_ACQUIRE_TIMEOUT,
-        LOCK_EXPIRE,
+        igamingProperties.getLock().getWaitMs(),
+        igamingProperties.getLock().getLeaseMs(),
         () -> {
           // Idempotency Layer 1: check requestId
           WalletTransactionEntity existing =

@@ -12,6 +12,7 @@ import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.code.GameErrorCode;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.common.constant.ReconciliationStatusEnum;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
@@ -128,7 +129,7 @@ public class GameTransactionManager {
 
     // Publish BET_PLACED event
     publishGameEvent(
-        "BET_PLACED",
+        DomainEventTypeConst.BET_PLACED,
         form.getPlayerId(),
         tenantId,
         buildBetPlacedPayload(form, weightedTurnover, balanceAfter));
@@ -198,7 +199,7 @@ public class GameTransactionManager {
 
     // Publish ROUND_SETTLED event
     publishGameEvent(
-        "ROUND_SETTLED",
+        DomainEventTypeConst.ROUND_SETTLED,
         form.getPlayerId(),
         tenantId,
         buildRoundSettledPayload(form, balanceAfter));
@@ -266,7 +267,7 @@ public class GameTransactionManager {
 
     // Publish BET_CANCELLED event
     publishGameEvent(
-        "BET_CANCELLED",
+        DomainEventTypeConst.BET_CANCELLED,
         form.getPlayerId(),
         tenantId,
         buildBetCancelledPayload(form, round, balanceAfter));
@@ -299,7 +300,8 @@ public class GameTransactionManager {
     node.put("roundId", roundId);
     node.put("playerId", round.getPlayerId());
     node.put("gpRoundId", round.getGpRoundId());
-    publishGameEvent("ROUND_TIMEOUT", round.getPlayerId(), round.getTenantId(), node);
+    publishGameEvent(
+        DomainEventTypeConst.ROUND_TIMEOUT, round.getPlayerId(), round.getTenantId(), node);
 
     log.info("Round timed out: roundId={}, gpRoundId={}", roundId, round.getGpRoundId());
   }
@@ -378,7 +380,7 @@ public class GameTransactionManager {
     node.put("newPayout", newPayoutAmount.toPlainString());
     node.put("delta", delta.toPlainString());
     node.put("balanceAfter", balanceAfter.toPlainString());
-    publishGameEvent("ROUND_ADJUSTED", round.getPlayerId(), tenantId, node);
+    publishGameEvent(DomainEventTypeConst.ROUND_ADJUSTED, round.getPlayerId(), tenantId, node);
 
     log.info("Round resettled: roundId={}, delta={}, newBalance={}", roundId, delta, balanceAfter);
 
@@ -412,7 +414,8 @@ public class GameTransactionManager {
     node.put("playerId", round.getPlayerId());
     node.put("gpRoundId", round.getGpRoundId());
     node.put("reason", reason);
-    publishGameEvent("ROUND_PENDING_REVIEW", round.getPlayerId(), round.getTenantId(), node);
+    publishGameEvent(
+        DomainEventTypeConst.ROUND_PENDING_REVIEW, round.getPlayerId(), round.getTenantId(), node);
 
     log.info("Round marked for review: roundId={}, reason={}", roundId, reason);
   }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.risk.consumer.RiskEventConsumer;
 import net.lab1024.sa.igaming.risk.domain.RiskEvent;
 import net.lab1024.sa.igaming.risk.service.RiskEvaluationService;
@@ -35,7 +36,7 @@ class RiskEventConsumerTest {
     @Test
     @DisplayName("BET_PLACED 事件觸發風控評估")
     void bet_placed_triggers_evaluation() {
-      DomainEvent event = buildDomainEvent("BET_PLACED", "100");
+      DomainEvent event = buildDomainEvent(DomainEventTypeConst.BET_PLACED, "100");
       String json = JsonUtil.toJson(event);
 
       riskEventConsumer.onEvent(json);
@@ -46,7 +47,7 @@ class RiskEventConsumerTest {
     @Test
     @DisplayName("WITHDRAWAL_REQUESTED 事件觸發風控評估")
     void withdrawal_requested_triggers_evaluation() {
-      DomainEvent event = buildDomainEvent("WITHDRAWAL_REQUESTED", "200");
+      DomainEvent event = buildDomainEvent(DomainEventTypeConst.WITHDRAWAL_REQUESTED, "200");
       String json = JsonUtil.toJson(event);
 
       riskEventConsumer.onEvent(json);
@@ -57,7 +58,7 @@ class RiskEventConsumerTest {
     @Test
     @DisplayName("PLAYER_LOGIN 事件觸發風控評估")
     void player_login_triggers_evaluation() {
-      DomainEvent event = buildDomainEvent("PLAYER_LOGIN", "300");
+      DomainEvent event = buildDomainEvent(DomainEventTypeConst.PLAYER_LOGIN, "300");
       String json = JsonUtil.toJson(event);
 
       riskEventConsumer.onEvent(json);
@@ -68,7 +69,7 @@ class RiskEventConsumerTest {
     @Test
     @DisplayName("非風控相關事件不觸發評估")
     void irrelevant_event_skipped() {
-      DomainEvent event = buildDomainEvent("ROUND_SETTLED", "100");
+      DomainEvent event = buildDomainEvent(DomainEventTypeConst.ROUND_SETTLED, "100");
       String json = JsonUtil.toJson(event);
 
       riskEventConsumer.onEvent(json);
@@ -87,7 +88,7 @@ class RiskEventConsumerTest {
     @Test
     @DisplayName("評估服務異常不影響消費者")
     void evaluation_failure_handled() {
-      DomainEvent event = buildDomainEvent("BET_PLACED", "100");
+      DomainEvent event = buildDomainEvent(DomainEventTypeConst.BET_PLACED, "100");
       String json = JsonUtil.toJson(event);
 
       org.mockito.Mockito.doThrow(new RuntimeException("eval failed"))

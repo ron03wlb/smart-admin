@@ -16,6 +16,7 @@ import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
 import net.lab1024.sa.igaming.common.constant.BonusRecordStatusEnum;
 import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.dao.GameWeightConfigDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameEntity;
@@ -125,7 +126,7 @@ public class WageringProgressManager {
     domainEventPublisher.publish(
         IgamingKafkaConst.Topic.ACTIVITY_EVENTS,
         DomainEvent.builder()
-            .eventType("WAGERING_COMPLETED")
+            .eventType(DomainEventTypeConst.WAGERING_COMPLETED)
             .tenantId(record.getTenantId())
             .aggregateType("BONUS_RECORD")
             .aggregateId(String.valueOf(record.getRecordId()))

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.function.Supplier;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.redislock.LockService;
+import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.adapter.GpSignatureVerifier;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -41,6 +43,7 @@ class GameCallbackServiceTest {
   @Mock private GameRoundDao gameRoundDao;
   @Mock private GameTransactionManager gameTransactionManager;
   @Mock private LockService lockService;
+  @Spy private IgamingProperties igamingProperties = new IgamingProperties();
   @InjectMocks private GameCallbackService gameCallbackService;
 
   @BeforeEach

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.wallet.service.WalletService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BonusCompletionConsumer {
 
-  private static final String EVENT_TYPE_WAGERING_COMPLETED = "WAGERING_COMPLETED";
-
   private final WalletService walletService;
 
   @KafkaListener(
@@ -40,7 +39,7 @@ public class BonusCompletionConsumer {
       return;
     }
 
-    if (event == null || !EVENT_TYPE_WAGERING_COMPLETED.equals(event.getEventType())) {
+    if (event == null || !DomainEventTypeConst.WAGERING_COMPLETED.equals(event.getEventType())) {
       return;
     }
 

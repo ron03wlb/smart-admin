@@ -10,6 +10,7 @@ import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.code.PlayerErrorCode;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.common.constant.PlayerStatusEnum;
 import net.lab1024.sa.igaming.player.dao.PlayerAuditLogDao;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
@@ -100,7 +101,7 @@ public class PlayerStateManager {
     domainEventPublisher.publish(
         IgamingKafkaConst.Topic.PLAYER_EVENTS,
         DomainEvent.builder()
-            .eventType("PLAYER_STATUS_CHANGED")
+            .eventType(DomainEventTypeConst.PLAYER_STATUS_CHANGED)
             .aggregateType("Player")
             .aggregateId(String.valueOf(playerId))
             .payload(payload)

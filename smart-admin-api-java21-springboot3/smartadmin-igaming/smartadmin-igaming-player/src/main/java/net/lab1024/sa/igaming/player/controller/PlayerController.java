@@ -77,7 +77,7 @@ public class PlayerController {
       @RequestParam String reason) {
     PlayerStatusEnum statusEnum = findEnum(PlayerStatusEnum.values(), newStatus);
     if (statusEnum == null) {
-      return ResponseDTO.userErrorParam("Invalid status value");
+      return ResponseDTO.userErrorParam(PlayerErrorCode.INVALID_STATUS_VALUE.getMsg());
     }
     return playerService.changePlayerStatus(playerId, statusEnum, operator, reason);
   }
@@ -89,7 +89,7 @@ public class PlayerController {
       @RequestParam Long playerId, @RequestParam Integer newLevel, @RequestParam String reason) {
     VipLevelEnum levelEnum = findEnum(VipLevelEnum.values(), newLevel);
     if (levelEnum == null) {
-      return ResponseDTO.userErrorParam("Invalid VIP level value");
+      return ResponseDTO.userErrorParam(PlayerErrorCode.INVALID_VIP_LEVEL_VALUE.getMsg());
     }
     return playerService.changeVipLevel(playerId, levelEnum, reason);
   }
@@ -103,7 +103,7 @@ public class PlayerController {
       @RequestParam String documentUrl) {
     KycDocumentTypeEnum typeEnum = findEnum(KycDocumentTypeEnum.values(), documentType);
     if (typeEnum == null) {
-      return ResponseDTO.userErrorParam("Invalid document type");
+      return ResponseDTO.userErrorParam(PlayerErrorCode.INVALID_DOCUMENT_TYPE.getMsg());
     }
     return kycVerificationService.submitL1Document(playerId, typeEnum, documentUrl);
   }

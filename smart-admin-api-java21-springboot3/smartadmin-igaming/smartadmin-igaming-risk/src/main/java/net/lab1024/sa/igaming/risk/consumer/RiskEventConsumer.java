@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.risk.domain.RiskEvent;
 import net.lab1024.sa.igaming.risk.service.RiskEvaluationService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -20,10 +21,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RiskEventConsumer {
-
-  private static final String BET_PLACED = "BET_PLACED";
-  private static final String WITHDRAWAL_REQUESTED = "WITHDRAWAL_REQUESTED";
-  private static final String PLAYER_LOGIN = "PLAYER_LOGIN";
 
   private final RiskEvaluationService riskEvaluationService;
 
@@ -66,9 +63,9 @@ public class RiskEventConsumer {
   }
 
   private boolean isRiskRelevant(String eventType) {
-    return BET_PLACED.equals(eventType)
-        || WITHDRAWAL_REQUESTED.equals(eventType)
-        || PLAYER_LOGIN.equals(eventType);
+    return DomainEventTypeConst.BET_PLACED.equals(eventType)
+        || DomainEventTypeConst.WITHDRAWAL_REQUESTED.equals(eventType)
+        || DomainEventTypeConst.PLAYER_LOGIN.equals(eventType);
   }
 
   private RiskEvent toRiskEvent(DomainEvent domainEvent) {
