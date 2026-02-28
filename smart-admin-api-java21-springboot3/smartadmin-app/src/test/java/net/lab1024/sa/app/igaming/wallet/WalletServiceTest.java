@@ -3,16 +3,21 @@ package net.lab1024.sa.app.igaming.wallet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.vavr.control.Option;
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.constant.LockReasonEnum;
 import net.lab1024.sa.igaming.common.constant.TransactionTypeEnum;
 import net.lab1024.sa.igaming.common.constant.WalletTypeEnum;
+import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao;
@@ -28,6 +33,7 @@ import net.lab1024.sa.igaming.wallet.domain.vo.WalletTransactionVO;
 import net.lab1024.sa.igaming.wallet.domain.vo.WalletVO;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
 import net.lab1024.sa.igaming.wallet.service.WalletService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,9 +59,20 @@ class WalletServiceTest {
   @Mock private WalletDao walletDao;
   @Mock private WalletTransactionDao walletTransactionDao;
   @Mock private WalletLockDao walletLockDao;
+  @Mock private WalletBonusExtDao walletBonusExtDao;
   @Mock private WalletManager walletManager;
+  @Mock private LockService lockService;
 
   @InjectMocks private WalletService walletService;
+
+  /** Stub LockService to pass through — so existing business logic tests work unchanged. */
+  @SuppressWarnings("unchecked")
+  @BeforeEach
+  void setupLockMock() {
+    lenient()
+        .when(lockService.executeWithLock(anyString(), anyLong(), anyLong(), any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(3)).get());
+  }
 
   // ==================== getWallet ====================
 

@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
 import net.lab1024.sa.igaming.common.constant.BonusRecordStatusEnum;
@@ -43,6 +44,7 @@ class WageringProgressManagerTest {
   @Mock private WalletBonusExtDao walletBonusExtDao;
   @Mock private GameDao gameDao;
   @Mock private GameWeightConfigDao gameWeightConfigDao;
+  @Mock private DomainEventPublisher domainEventPublisher;
 
   @InjectMocks
   private net.lab1024.sa.igaming.activity.manager.WageringProgressManager wageringProgressManager;
@@ -201,6 +203,7 @@ class WageringProgressManagerTest {
   private PlayerBonusRecordEntity buildActiveRecord() {
     PlayerBonusRecordEntity record = new PlayerBonusRecordEntity();
     record.setRecordId(1L);
+    record.setTenantId(1L);
     record.setPlayerId(1L);
     record.setRuleId(1L);
     record.setClaimId("claim-001");
