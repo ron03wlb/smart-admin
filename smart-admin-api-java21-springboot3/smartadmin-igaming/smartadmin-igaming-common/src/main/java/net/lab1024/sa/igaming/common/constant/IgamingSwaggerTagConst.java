@@ -24,5 +24,7 @@ public final class IgamingSwaggerTagConst {
 
   public static final String AGENT_AFFILIATE = "iGaming-代理佣金";
 
+  public static final String REPORT = "iGaming-財務報表";
+
   private IgamingSwaggerTagConst() {}
 }

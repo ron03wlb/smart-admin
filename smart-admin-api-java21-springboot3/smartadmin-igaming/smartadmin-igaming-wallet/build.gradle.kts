@@ -25,6 +25,7 @@ dependencies {
     api(project(":smartadmin-common:smartadmin-common-mybatis"))
     api(project(":smartadmin-common:smartadmin-common-swagger"))
     api(project(":smartadmin-common:smartadmin-common-redis"))
+    api(project(":smartadmin-common:smartadmin-common-redis-lock"))
     api(project(":smartadmin-common:smartadmin-common-json"))
     api(project(":smartadmin-common:smartadmin-common-cache"))
 
@@ -39,6 +40,7 @@ dependencies {
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))
+    api(project(":smartadmin-support:smartadmin-support-job"))
 
     // API Documentation
     compileOnly(libs.knife4j.openapi3.jakarta)

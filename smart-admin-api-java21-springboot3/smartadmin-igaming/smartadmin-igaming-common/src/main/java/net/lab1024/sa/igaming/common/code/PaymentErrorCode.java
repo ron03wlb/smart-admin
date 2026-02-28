@@ -35,6 +35,11 @@ public enum PaymentErrorCode {
   // --- Callback Security (30240-30249) ---
   CALLBACK_SIGNATURE_INVALID(30240, "Callback signature verification failed"),
   CALLBACK_TIMESTAMP_EXPIRED(30241, "Callback timestamp expired"),
+
+  // --- Reconciliation (30250-30259) ---
+  RECONCILIATION_NOT_FOUND(30250, "Reconciliation record not found"),
+  RECONCILIATION_ALREADY_COMPLETED(30251, "Reconciliation already completed for this date"),
+  PSP_REPORT_UNAVAILABLE(30252, "PSP reconciliation report unavailable"),
   ;
 
   private final int code;

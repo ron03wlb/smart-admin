@@ -1,5 +1,6 @@
 package net.lab1024.sa.igaming.player.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -43,6 +44,7 @@ public class PlayerController {
 
   @Operation(summary = "Get player by ID")
   @GetMapping("/igaming/player/get/{playerId}")
+  @SaCheckPermission("player:info:query")
   public ResponseDTO<PlayerVO> getPlayer(@PathVariable Long playerId) {
     return playerService
         .getPlayer(playerId)
@@ -52,6 +54,7 @@ public class PlayerController {
 
   @Operation(summary = "Query players with pagination")
   @PostMapping("/igaming/player/query")
+  @SaCheckPermission("player:info:query")
   public ResponseDTO<PageResult<PlayerVO>> queryPlayers(
       @RequestBody @Valid PlayerQueryForm queryForm) {
     return playerService.queryPlayers(queryForm);
@@ -59,12 +62,14 @@ public class PlayerController {
 
   @Operation(summary = "Update player profile")
   @PutMapping("/igaming/player/update")
+  @SaCheckPermission("player:info:operate")
   public ResponseDTO<Void> updatePlayer(@RequestBody @Valid PlayerUpdateForm form) {
     return playerService.updatePlayer(form);
   }
 
   @Operation(summary = "Change player status")
   @PostMapping("/igaming/player/status/change")
+  @SaCheckPermission("player:info:operate")
   public ResponseDTO<Void> changePlayerStatus(
       @RequestParam Long playerId,
       @RequestParam Integer newStatus,
@@ -79,6 +84,7 @@ public class PlayerController {
 
   @Operation(summary = "Change player VIP level")
   @PostMapping("/igaming/player/vip/change")
+  @SaCheckPermission("player:info:operate")
   public ResponseDTO<Void> changeVipLevel(
       @RequestParam Long playerId, @RequestParam Integer newLevel, @RequestParam String reason) {
     VipLevelEnum levelEnum = findEnum(VipLevelEnum.values(), newLevel);
@@ -90,6 +96,7 @@ public class PlayerController {
 
   @Operation(summary = "Submit KYC L1 document")
   @PostMapping("/igaming/player/kyc/submit")
+  @SaCheckPermission("player:kyc:operate")
   public ResponseDTO<Void> submitKycDocument(
       @RequestParam Long playerId,
       @RequestParam Integer documentType,
@@ -103,6 +110,7 @@ public class PlayerController {
 
   @Operation(summary = "Check withdrawal eligibility by KYC level")
   @GetMapping("/igaming/player/kyc/check/{playerId}")
+  @SaCheckPermission("player:kyc:query")
   public ResponseDTO<Void> checkWithdrawalEligibility(
       @PathVariable Long playerId, @RequestParam BigDecimal amount) {
     return kycVerificationService.checkWithdrawalEligibility(playerId, amount);

@@ -1,12 +1,17 @@
 package net.lab1024.sa.igaming.activity.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
+import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
+import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
 import net.lab1024.sa.igaming.common.constant.BonusRecordStatusEnum;
@@ -36,6 +41,7 @@ public class WageringProgressManager {
   private final WalletBonusExtDao walletBonusExtDao;
   private final GameDao gameDao;
   private final GameWeightConfigDao gameWeightConfigDao;
+  private final DomainEventPublisher domainEventPublisher;
 
   /**
    * Update wagering progress for all active bonuses of a player.
@@ -106,6 +112,25 @@ public class WageringProgressManager {
 
     log.info(
         "Bonus completed: recordId={}, playerId={}", record.getRecordId(), record.getPlayerId());
+
+    publishWageringCompleted(record);
+  }
+
+  @SuppressWarnings("FutureReturnValueIgnored")
+  private void publishWageringCompleted(PlayerBonusRecordEntity record) {
+    ObjectNode payload = JsonNodeFactory.instance.objectNode();
+    payload.put("bonusExtId", record.getWalletBonusExtId());
+    payload.put("playerId", record.getPlayerId());
+    payload.put("recordId", record.getRecordId());
+    domainEventPublisher.publish(
+        IgamingKafkaConst.Topic.ACTIVITY_EVENTS,
+        DomainEvent.builder()
+            .eventType("WAGERING_COMPLETED")
+            .tenantId(record.getTenantId())
+            .aggregateType("BONUS_RECORD")
+            .aggregateId(String.valueOf(record.getRecordId()))
+            .payload(payload)
+            .build());
   }
 
   private BigDecimal calculateEffectiveBet(Long tenantId, String gameCode, BigDecimal betAmount) {

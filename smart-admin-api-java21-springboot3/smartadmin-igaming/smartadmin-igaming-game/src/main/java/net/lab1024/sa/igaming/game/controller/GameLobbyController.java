@@ -1,5 +1,6 @@
 package net.lab1024.sa.igaming.game.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,18 +38,21 @@ public class GameLobbyController {
 
   @Operation(summary = "Search games with pagination")
   @PostMapping("/igaming/game/lobby/search")
+  @SaCheckPermission("game:lobby:query")
   public ResponseDTO<PageResult<GameVO>> searchGames(@RequestBody @Valid GameQueryForm form) {
     return gameLobbyService.searchGames(form);
   }
 
   @Operation(summary = "Get popular games by tenant")
   @GetMapping("/igaming/game/lobby/popular")
+  @SaCheckPermission("game:lobby:query")
   public ResponseDTO<List<GameVO>> getPopularGames(@RequestParam Long tenantId) {
     return gameLobbyService.getPopularGames(tenantId);
   }
 
   @Operation(summary = "Get game by ID")
   @GetMapping("/igaming/game/get/{gameId}")
+  @SaCheckPermission("game:lobby:query")
   public ResponseDTO<GameVO> getGame(@PathVariable Long gameId) {
     return gameService
         .getGame(gameId)
@@ -58,12 +62,14 @@ public class GameLobbyController {
 
   @Operation(summary = "Add a new game to catalog")
   @PostMapping("/igaming/game/add")
+  @SaCheckPermission("game:lobby:operate")
   public ResponseDTO<GameVO> addGame(@RequestBody @Valid GameAddForm form) {
     return gameService.addGame(form);
   }
 
   @Operation(summary = "Toggle game enabled/disabled")
   @PostMapping("/igaming/game/toggle/{gameId}")
+  @SaCheckPermission("game:lobby:operate")
   public ResponseDTO<Void> toggleGame(@PathVariable Long gameId, @RequestParam boolean enabled) {
     return gameService.toggleGameEnabled(gameId, enabled);
   }

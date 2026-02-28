@@ -1,5 +1,6 @@
 package net.lab1024.sa.igaming.activity.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class BonusClaimController {
 
   @Operation(summary = "Claim a bonus")
   @PostMapping("/igaming/activity/bonus/claim")
+  @SaCheckPermission("activity:bonus:operate")
   public ResponseDTO<BonusClaimResultVO> claimBonus(@RequestBody @Valid BonusClaimForm form) {
     Long playerId = StpPlayerUtil.getLoginIdAsLong();
     Long tenantId = TenantContext.getTenantId();
@@ -45,6 +47,7 @@ public class BonusClaimController {
 
   @Operation(summary = "Query bonus records for a player")
   @PostMapping("/igaming/activity/bonus/records")
+  @SaCheckPermission("activity:bonus:query")
   public ResponseDTO<PageResult<PlayerBonusRecordVO>> queryBonusRecords(
       @RequestBody @Valid WageringProgressQueryForm form) {
     Long playerId = StpPlayerUtil.getLoginIdAsLong();
@@ -53,6 +56,7 @@ public class BonusClaimController {
 
   @Operation(summary = "Get wagering progress for a bonus record")
   @GetMapping("/igaming/activity/bonus/progress/{recordId}")
+  @SaCheckPermission("activity:bonus:query")
   public ResponseDTO<WageringProgressVO> getWageringProgress(@PathVariable Long recordId) {
     Long playerId = StpPlayerUtil.getLoginIdAsLong();
     return bonusClaimService

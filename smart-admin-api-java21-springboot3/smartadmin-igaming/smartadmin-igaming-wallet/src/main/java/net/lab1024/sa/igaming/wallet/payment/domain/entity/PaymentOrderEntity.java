@@ -55,6 +55,12 @@ public class PaymentOrderEntity extends SmartAdminBaseEntity {
 
   private String description;
 
+  /**
+   * Reconciliation status. See {@link
+   * net.lab1024.sa.igaming.common.constant.ReconciliationStatusEnum}.
+   */
+  private Integer reconciliationStatus;
+
   /** Optimistic lock version. */
   @Version private Integer version;
 }

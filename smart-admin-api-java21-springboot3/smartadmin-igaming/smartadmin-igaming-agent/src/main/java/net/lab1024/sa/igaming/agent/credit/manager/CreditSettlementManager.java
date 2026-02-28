@@ -282,6 +282,7 @@ public class CreditSettlementManager {
     return node;
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void publishAgentEvent(
       String eventType, String aggregateType, String aggregateId, ObjectNode payload) {
     domainEventPublisher.publish(

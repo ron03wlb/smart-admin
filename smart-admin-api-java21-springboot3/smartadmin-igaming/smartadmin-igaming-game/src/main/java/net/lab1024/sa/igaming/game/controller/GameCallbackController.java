@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.annotation.NoNeedLogin;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.common.constant.IgamingSwaggerTagConst;
 import net.lab1024.sa.igaming.game.domain.form.CallbackCreditForm;
@@ -31,6 +32,7 @@ public class GameCallbackController {
 
   private final GameCallbackService gameCallbackService;
 
+  @NoNeedLogin
   @Operation(summary = "GP debit callback (bet placement)")
   @PostMapping("/igaming/game/callback/debit")
   public ResponseDTO<CallbackResponseVO> debit(
@@ -39,6 +41,7 @@ public class GameCallbackController {
     return gameCallbackService.processDebit(form, tenantId);
   }
 
+  @NoNeedLogin
   @Operation(summary = "GP credit callback (win settlement)")
   @PostMapping("/igaming/game/callback/credit")
   public ResponseDTO<CallbackResponseVO> credit(
@@ -47,6 +50,7 @@ public class GameCallbackController {
     return gameCallbackService.processCredit(form, tenantId);
   }
 
+  @NoNeedLogin
   @Operation(summary = "GP rollback callback (bet cancellation)")
   @PostMapping("/igaming/game/callback/rollback")
   public ResponseDTO<CallbackResponseVO> rollback(
@@ -55,6 +59,7 @@ public class GameCallbackController {
     return gameCallbackService.processRollback(form, tenantId);
   }
 
+  @NoNeedLogin
   @Operation(summary = "Query round status")
   @GetMapping("/igaming/game/callback/query")
   public ResponseDTO<CallbackResponseVO> query(

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.lab1024.sa.common.core.annotation.NoNeedLogin;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.common.constant.IgamingSwaggerTagConst;
 import net.lab1024.sa.igaming.player.domain.form.PlayerLoginForm;
@@ -27,18 +28,21 @@ public class PlayerAuthController {
 
   private final PlayerAuthService playerAuthService;
 
+  @NoNeedLogin
   @Operation(summary = "Register a new player")
   @PostMapping("/igaming/player/auth/register")
   public ResponseDTO<PlayerAuthVO> register(@RequestBody @Valid PlayerRegisterForm form) {
     return playerAuthService.register(form);
   }
 
+  @NoNeedLogin
   @Operation(summary = "Player login")
   @PostMapping("/igaming/player/auth/login")
   public ResponseDTO<PlayerAuthVO> login(@RequestBody @Valid PlayerLoginForm form) {
     return playerAuthService.login(form);
   }
 
+  @NoNeedLogin
   @Operation(summary = "Player logout")
   @PostMapping("/igaming/player/auth/logout")
   public ResponseDTO<Void> logout() {

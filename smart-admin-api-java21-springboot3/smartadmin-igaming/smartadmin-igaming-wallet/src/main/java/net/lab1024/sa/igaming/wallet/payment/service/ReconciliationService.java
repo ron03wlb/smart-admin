@@ -12,15 +12,16 @@ import net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao;
 import net.lab1024.sa.igaming.wallet.payment.domain.dto.PspQueryResponse;
 import net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity;
 import net.lab1024.sa.igaming.wallet.payment.manager.PaymentManager;
+import net.lab1024.sa.igaming.wallet.payment.manager.PaymentReconciliationManager;
 import net.lab1024.sa.igaming.wallet.payment.psp.PaymentProviderAdapter;
 import net.lab1024.sa.igaming.wallet.payment.psp.PspAdapterFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Reconciliation Service — polls PSP for pending order status (Layer 2 reconciliation).
+ * Reconciliation Service — orchestrates Layer 2 polling and integrates with Layer 1/3.
  *
- * <p>Phase 1.5 only implements poll-based reconciliation for stale pending orders. Phase 2 will add
- * batch file reconciliation (Layer 3).
+ * <p>Layer 2 polls PSP for stale pending orders. On success/failure, marks the order's
+ * reconciliation status via {@link PaymentReconciliationManager}.
  *
  * @author iGaming Team
  * @since 2026-02-18
@@ -32,6 +33,7 @@ public class ReconciliationService {
 
   private final PaymentOrderDao paymentOrderDao;
   private final PaymentManager paymentManager;
+  private final PaymentReconciliationManager reconciliationManager;
   private final PspAdapterFactory pspAdapterFactory;
   private final PaymentService paymentService;
 
@@ -109,10 +111,12 @@ public class ReconciliationService {
     if (order.getOrderType().equals(PaymentOrderTypeEnum.DEPOSIT.getValue())) {
       paymentService.processDepositCallback(
           order.getOrderNo(), order.getPspTransactionId(), "reconciliation");
+      reconciliationManager.markCompensated(order.getOrderNo());
       return true;
     } else if (order.getOrderType().equals(PaymentOrderTypeEnum.WITHDRAWAL.getValue())) {
       paymentService.processWithdrawalCallback(
           order.getOrderNo(), order.getPspTransactionId(), "reconciliation", true);
+      reconciliationManager.markCompensated(order.getOrderNo());
       return true;
     }
     return false;
@@ -125,6 +129,7 @@ public class ReconciliationService {
     } else {
       paymentManager.failOrder(order, PaymentOrderStatusEnum.FAILED);
     }
+    reconciliationManager.markCompensated(order.getOrderNo());
     return true;
   }
 }

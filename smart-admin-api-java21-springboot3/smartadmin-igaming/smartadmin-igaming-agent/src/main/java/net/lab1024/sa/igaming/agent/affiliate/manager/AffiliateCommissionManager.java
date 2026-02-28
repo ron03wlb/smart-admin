@@ -289,6 +289,7 @@ public class AffiliateCommissionManager {
     return BigDecimal.ZERO;
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void publishAgentEvent(
       String eventType, String aggregateType, String aggregateId, ObjectNode payload) {
     domainEventPublisher.publish(

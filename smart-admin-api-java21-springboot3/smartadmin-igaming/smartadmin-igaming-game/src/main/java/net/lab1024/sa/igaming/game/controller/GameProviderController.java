@@ -1,5 +1,6 @@
 package net.lab1024.sa.igaming.game.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,6 +36,7 @@ public class GameProviderController {
 
   @Operation(summary = "Get game provider by ID")
   @GetMapping("/igaming/game/provider/get/{providerId}")
+  @SaCheckPermission("game:provider:query")
   public ResponseDTO<GameProviderVO> getProvider(@PathVariable Long providerId) {
     return gameProviderService
         .getProvider(providerId)
@@ -44,6 +46,7 @@ public class GameProviderController {
 
   @Operation(summary = "Query game providers with pagination")
   @PostMapping("/igaming/game/provider/query")
+  @SaCheckPermission("game:provider:query")
   public ResponseDTO<PageResult<GameProviderVO>> queryProviders(
       @RequestBody @Valid GameProviderQueryForm form) {
     return gameProviderService.queryProviders(form);
@@ -51,24 +54,28 @@ public class GameProviderController {
 
   @Operation(summary = "Add a new game provider")
   @PostMapping("/igaming/game/provider/add")
+  @SaCheckPermission("game:provider:operate")
   public ResponseDTO<GameProviderVO> addProvider(@RequestBody @Valid GameProviderAddForm form) {
     return gameProviderService.addProvider(form);
   }
 
   @Operation(summary = "Update game provider configuration")
   @PutMapping("/igaming/game/provider/update")
+  @SaCheckPermission("game:provider:operate")
   public ResponseDTO<Void> updateProvider(@RequestBody @Valid GameProviderUpdateForm form) {
     return gameProviderService.updateProvider(form);
   }
 
   @Operation(summary = "Enable a game provider")
   @PostMapping("/igaming/game/provider/enable/{providerId}")
+  @SaCheckPermission("game:provider:operate")
   public ResponseDTO<Void> enableProvider(@PathVariable Long providerId) {
     return gameProviderService.enableProvider(providerId);
   }
 
   @Operation(summary = "Disable a game provider")
   @PostMapping("/igaming/game/provider/disable/{providerId}")
+  @SaCheckPermission("game:provider:operate")
   public ResponseDTO<Void> disableProvider(@PathVariable Long providerId) {
     return gameProviderService.disableProvider(providerId);
   }
