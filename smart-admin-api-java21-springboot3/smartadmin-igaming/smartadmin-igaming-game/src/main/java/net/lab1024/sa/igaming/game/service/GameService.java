@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.igaming.common.code.GameErrorCode;
@@ -46,12 +47,16 @@ public class GameService {
   }
 
   public ResponseDTO<GameVO> addGame(GameAddForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     GameEntity entity = SmartBeanUtil.copy(form, GameEntity.class);
     entity.setPlayCount(0L);
     entity.setEnabled(true);
     entity.setDeleted(false);
     gameDao.insert(entity);
-    gameCacheManager.evictGameCache(entity.getTenantId());
+    gameCacheManager.evictGameCache(tenantId);
     return ResponseDTO.ok(SmartBeanUtil.copy(entity, GameVO.class));
   }
 

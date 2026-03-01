@@ -51,6 +51,9 @@ public class PromotionRuleService {
 
   public ResponseDTO<PromotionRuleVO> addRule(PromotionRuleAddForm form) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
 
     PromotionRuleEntity entity = SmartBeanUtil.copy(form, PromotionRuleEntity.class);
     entity.setStatus(PromotionStatusEnum.ACTIVE.getValue());

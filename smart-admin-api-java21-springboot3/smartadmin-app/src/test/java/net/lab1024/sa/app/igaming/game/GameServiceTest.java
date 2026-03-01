@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import io.vavr.control.Option;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameEntity;
 import net.lab1024.sa.igaming.game.domain.form.GameAddForm;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -80,17 +83,21 @@ class GameServiceTest {
     @Test
     @DisplayName("新增成功 → 返回 GameVO + 快取失效")
     void addGame_success() {
-      GameAddForm form = new GameAddForm();
-      form.setProviderId(10L);
-      form.setGameCode("SLOT_001");
-      form.setGameName("Lucky Spin");
-      form.setCategory(1);
+      try (MockedStatic<TenantContext> tc = Mockito.mockStatic(TenantContext.class)) {
+        tc.when(TenantContext::getTenantId).thenReturn(1L);
 
-      ResponseDTO<GameVO> result = gameService.addGame(form);
+        GameAddForm form = new GameAddForm();
+        form.setProviderId(10L);
+        form.setGameCode("SLOT_001");
+        form.setGameName("Lucky Spin");
+        form.setCategory(1);
 
-      assertThat(result.getOk()).isTrue();
-      verify(gameDao).insert(any(GameEntity.class));
-      verify(gameCacheManager).evictGameCache(any());
+        ResponseDTO<GameVO> result = gameService.addGame(form);
+
+        assertThat(result.getOk()).isTrue();
+        verify(gameDao).insert(any(GameEntity.class));
+        verify(gameCacheManager).evictGameCache(1L);
+      }
     }
   }
 
