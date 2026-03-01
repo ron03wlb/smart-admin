@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.dao.PromotionRuleDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
@@ -22,12 +23,16 @@ import net.lab1024.sa.igaming.activity.service.BonusClaimService;
 import net.lab1024.sa.igaming.common.code.ActivityErrorCode;
 import net.lab1024.sa.igaming.common.constant.BonusRecordStatusEnum;
 import net.lab1024.sa.igaming.common.constant.PromotionStatusEnum;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -46,6 +51,19 @@ class BonusClaimServiceTest {
   @Mock private PromotionCacheManager promotionCacheManager;
   @Mock private BonusDistributionManager bonusDistributionManager;
   @InjectMocks private BonusClaimService bonusClaimService;
+
+  private MockedStatic<TenantContext> tenantContextMock;
+
+  @BeforeEach
+  void setUp() {
+    tenantContextMock = Mockito.mockStatic(TenantContext.class);
+    tenantContextMock.when(TenantContext::getTenantId).thenReturn(1L);
+  }
+
+  @AfterEach
+  void tearDown() {
+    tenantContextMock.close();
+  }
 
   @Nested
   @DisplayName("claimBonus")
@@ -69,7 +87,7 @@ class BonusClaimServiceTest {
       form.setPromotionCode("FIRST100");
       form.setClaimId("claim-001");
 
-      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form, 1L);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getRecordId()).isEqualTo(100L);
@@ -85,7 +103,7 @@ class BonusClaimServiceTest {
       form.setPromotionCode("INVALID");
       form.setClaimId("claim-001");
 
-      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form, 1L);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).contains(ActivityErrorCode.PROMOTION_NOT_FOUND.getMsg());
@@ -102,7 +120,7 @@ class BonusClaimServiceTest {
       form.setPromotionCode("FIRST100");
       form.setClaimId("claim-001");
 
-      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form, 1L);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).contains(ActivityErrorCode.PROMOTION_DISABLED.getMsg());
@@ -119,7 +137,7 @@ class BonusClaimServiceTest {
       form.setPromotionCode("FIRST100");
       form.setClaimId("claim-001");
 
-      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form, 1L);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).contains(ActivityErrorCode.PROMOTION_EXPIRED.getMsg());
@@ -137,7 +155,7 @@ class BonusClaimServiceTest {
       form.setPromotionCode("FIRST100");
       form.setClaimId("claim-001");
 
-      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form, 1L);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).contains(ActivityErrorCode.MAX_CLAIMS_REACHED.getMsg());
@@ -155,7 +173,7 @@ class BonusClaimServiceTest {
       form.setPromotionCode("FIRST100");
       form.setClaimId("claim-dup");
 
-      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form, 1L);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(1L, form);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).contains(ActivityErrorCode.ALREADY_CLAIMED.getMsg());

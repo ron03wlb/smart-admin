@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.domain.form.GameQueryForm;
@@ -35,7 +36,8 @@ public class GameLobbyService {
     return ResponseDTO.ok(result);
   }
 
-  public ResponseDTO<List<GameVO>> getPopularGames(Long tenantId) {
+  public ResponseDTO<List<GameVO>> getPopularGames() {
+    Long tenantId = TenantContext.getTenantId();
     List<GameVO> allGames = gameCacheManager.getGameListByTenant(tenantId);
     List<GameVO> popular =
         allGames.stream()

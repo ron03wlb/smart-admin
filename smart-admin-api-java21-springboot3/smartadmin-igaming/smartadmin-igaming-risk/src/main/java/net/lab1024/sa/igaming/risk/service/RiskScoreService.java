@@ -7,6 +7,7 @@ import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.igaming.risk.dao.RiskScoreDao;
@@ -44,7 +45,8 @@ public class RiskScoreService {
     return ResponseDTO.ok(pageResult);
   }
 
-  public ResponseDTO<RiskScoreVO> getByPlayerId(Long playerId, Long tenantId) {
+  public ResponseDTO<RiskScoreVO> getByPlayerId(Long playerId) {
+    Long tenantId = TenantContext.getTenantId();
     return Option.of(riskScoreDao.findByPlayerIdAndTenantId(playerId, tenantId))
         .map(e -> SmartBeanUtil.copy(e, RiskScoreVO.class))
         .map(ResponseDTO::ok)

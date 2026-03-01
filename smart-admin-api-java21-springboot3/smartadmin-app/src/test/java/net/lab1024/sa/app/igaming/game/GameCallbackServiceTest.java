@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.util.function.Supplier;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
@@ -19,6 +20,7 @@ import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.manager.GameTransactionManager;
 import net.lab1024.sa.igaming.game.service.GameCallbackService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +28,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -46,9 +50,13 @@ class GameCallbackServiceTest {
   @Spy private IgamingProperties igamingProperties = new IgamingProperties();
   @InjectMocks private GameCallbackService gameCallbackService;
 
+  private MockedStatic<TenantContext> tenantContextMock;
+
   @BeforeEach
   @SuppressWarnings("unchecked")
   void setupLockService() {
+    tenantContextMock = Mockito.mockStatic(TenantContext.class);
+    tenantContextMock.when(TenantContext::getTenantId).thenReturn(1L);
     // Default: lock service delegates to supplier (transparent pass-through)
     // Use lenient() because not all tests reach the lock acquisition step
     lenient()
@@ -58,6 +66,11 @@ class GameCallbackServiceTest {
               Supplier<?> supplier = invocation.getArgument(3);
               return supplier.get();
             });
+  }
+
+  @AfterEach
+  void tearDown() {
+    tenantContextMock.close();
   }
 
   @Nested
@@ -77,7 +90,7 @@ class GameCallbackServiceTest {
       responseVO.setStatus(RoundStatusEnum.OPEN.getValue());
       when(gameTransactionManager.executeDebit(form, 1L)).thenReturn(ResponseDTO.ok(responseVO));
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getTransactionId()).isEqualTo("tx-001");
       verify(gameTransactionManager).executeDebit(form, 1L);
@@ -94,7 +107,7 @@ class GameCallbackServiceTest {
       existing.setStatus(RoundStatusEnum.OPEN.getValue());
       when(gameRoundDao.selectByTransactionId("tx-001")).thenReturn(existing);
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getTransactionId()).isEqualTo("tx-001");
     }
@@ -107,7 +120,7 @@ class GameCallbackServiceTest {
       when(gpSignatureVerifier.verify(anyString(), anyString(), eq("bad-sig"), any()))
           .thenReturn(false);
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
       assertThat(result.getOk()).isFalse();
     }
 
@@ -123,7 +136,7 @@ class GameCallbackServiceTest {
       when(lockService.executeWithLock(anyString(), anyLong(), anyLong(), any(Supplier.class)))
           .thenThrow(new IllegalStateException("Lock acquisition failed"));
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
       assertThat(result.getOk()).isFalse();
     }
   }
@@ -144,7 +157,7 @@ class GameCallbackServiceTest {
       responseVO.setStatus(RoundStatusEnum.SETTLED.getValue());
       when(gameTransactionManager.executeCredit(form, 1L)).thenReturn(ResponseDTO.ok(responseVO));
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processCredit(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processCredit(form);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.SETTLED.getValue());
     }
@@ -159,7 +172,7 @@ class GameCallbackServiceTest {
       when(lockService.executeWithLock(anyString(), anyLong(), anyLong(), any(Supplier.class)))
           .thenThrow(new IllegalStateException("Lock failed"));
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processCredit(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processCredit(form);
       assertThat(result.getOk()).isFalse();
     }
   }
@@ -180,7 +193,7 @@ class GameCallbackServiceTest {
       responseVO.setStatus(RoundStatusEnum.CANCELLED.getValue());
       when(gameTransactionManager.executeRollback(form, 1L)).thenReturn(ResponseDTO.ok(responseVO));
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processRollback(form, 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processRollback(form);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.CANCELLED.getValue());
     }
@@ -199,7 +212,7 @@ class GameCallbackServiceTest {
       round.setStatus(RoundStatusEnum.SETTLED.getValue());
       when(gameRoundDao.selectOne(any())).thenReturn(round);
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-001", 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-001");
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getTransactionId()).isEqualTo("tx-001");
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.SETTLED.getValue());
@@ -211,7 +224,7 @@ class GameCallbackServiceTest {
     void queryRound_notFound() {
       when(gameRoundDao.selectOne(any())).thenReturn(null);
 
-      ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-999", 1L);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-999");
       assertThat(result.getOk()).isFalse();
     }
   }

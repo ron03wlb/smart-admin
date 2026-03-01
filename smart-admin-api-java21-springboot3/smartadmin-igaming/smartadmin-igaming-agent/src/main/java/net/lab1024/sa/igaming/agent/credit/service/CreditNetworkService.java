@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.igaming.agent.credit.dao.AgentCreditDao;
 import net.lab1024.sa.igaming.agent.credit.dao.SettlementRecordDao;
@@ -39,10 +40,10 @@ public class CreditNetworkService {
    * Get a single agent's credit information.
    *
    * @param agentId agent ID
-   * @param tenantId tenant ID
    * @return agent credit VO
    */
-  public ResponseDTO<AgentCreditVO> getAgentCredit(Long agentId, Long tenantId) {
+  public ResponseDTO<AgentCreditVO> getAgentCredit(Long agentId) {
+    Long tenantId = TenantContext.getTenantId();
     return Option.of(agentCreditDao.findByAgentIdAndTenantId(agentId, tenantId))
         .map(this::toAgentCreditVO)
         .map(ResponseDTO::ok)
@@ -53,10 +54,10 @@ public class CreditNetworkService {
    * Get all downline (children) credits for a parent agent.
    *
    * @param parentId parent agent ID
-   * @param tenantId tenant ID
    * @return list of child agent credit VOs
    */
-  public ResponseDTO<List<AgentCreditVO>> getDownlineCredits(Long parentId, Long tenantId) {
+  public ResponseDTO<List<AgentCreditVO>> getDownlineCredits(Long parentId) {
+    Long tenantId = TenantContext.getTenantId();
     List<AgentCreditEntity> children = agentCreditDao.findByParentIdAndTenantId(parentId, tenantId);
     List<AgentCreditVO> vos = children.stream().map(this::toAgentCreditVO).toList();
     return ResponseDTO.ok(vos);

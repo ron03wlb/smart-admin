@@ -340,7 +340,7 @@ class RiskIntegrationTest {
       // Create profile first
       riskScoreManager.updateProfileScore(PLAYER_ID, TEST_TENANT_ID, 35);
 
-      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(PLAYER_ID, TEST_TENANT_ID);
+      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(PLAYER_ID);
       assertThat(result.getSuccess()).isTrue();
       assertThat(result.getData().getPlayerId()).isEqualTo(PLAYER_ID);
       assertThat(result.getData().getCumulativeScore()).isEqualByComparingTo("35");
@@ -349,7 +349,7 @@ class RiskIntegrationTest {
     @Test
     @DisplayName("查詢不存在的玩家 → 返回錯誤")
     void shouldReturnErrorForNonexistentPlayer() {
-      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(999L, TEST_TENANT_ID);
+      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(999L);
       assertThat(result.getSuccess()).isFalse();
     }
   }
@@ -505,8 +505,7 @@ class RiskIntegrationTest {
       assertThat(persistedProposal.getAssessmentId()).isEqualTo(assessment.getAssessmentId());
 
       // Step 5: Query via service
-      ResponseDTO<RiskScoreVO> scoreResult =
-          riskScoreService.getByPlayerId(PLAYER_ID, TEST_TENANT_ID);
+      ResponseDTO<RiskScoreVO> scoreResult = riskScoreService.getByPlayerId(PLAYER_ID);
       assertThat(scoreResult.getSuccess()).isTrue();
       assertThat(scoreResult.getData().getCumulativeScore()).isEqualByComparingTo("65");
     }

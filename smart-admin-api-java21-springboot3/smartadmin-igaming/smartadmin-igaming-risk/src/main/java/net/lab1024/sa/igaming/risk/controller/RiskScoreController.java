@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,8 +41,7 @@ public class RiskScoreController {
   @Operation(summary = "Get risk score by player ID")
   @GetMapping("/igaming/risk/score/player/{playerId}")
   @SaCheckPermission("risk:score:query")
-  public ResponseDTO<RiskScoreVO> getByPlayerId(
-      @PathVariable Long playerId, @RequestParam Long tenantId) {
-    return riskScoreService.getByPlayerId(playerId, tenantId);
+  public ResponseDTO<RiskScoreVO> getByPlayerId(@PathVariable Long playerId) {
+    return riskScoreService.getByPlayerId(playerId);
   }
 }

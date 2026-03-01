@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateAgentDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateCommissionPlanDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateCommissionRecordDao;
@@ -24,12 +25,16 @@ import net.lab1024.sa.igaming.agent.affiliate.domain.vo.CommissionRecordVO;
 import net.lab1024.sa.igaming.agent.affiliate.manager.AffiliateCommissionManager;
 import net.lab1024.sa.igaming.agent.affiliate.service.AffiliateService;
 import net.lab1024.sa.igaming.common.code.AgentErrorCode;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +49,19 @@ class AffiliateServiceTest {
   @InjectMocks private AffiliateService affiliateService;
 
   private static final Long TENANT_ID = 1L;
+
+  private MockedStatic<TenantContext> tenantContextMock;
+
+  @BeforeEach
+  void setUp() {
+    tenantContextMock = Mockito.mockStatic(TenantContext.class);
+    tenantContextMock.when(TenantContext::getTenantId).thenReturn(TENANT_ID);
+  }
+
+  @AfterEach
+  void tearDown() {
+    tenantContextMock.close();
+  }
 
   private AffiliateAgentEntity buildAgent(Long agentId, String username) {
     AffiliateAgentEntity e = new AffiliateAgentEntity();
@@ -113,7 +131,7 @@ class AffiliateServiceTest {
       AffiliateAgentEntity entity = buildAgent(100L, "agent01");
       when(affiliateAgentDao.selectById(100L)).thenReturn(entity);
 
-      ResponseDTO<AffiliateAgentVO> result = affiliateService.getAgentById(100L, TENANT_ID);
+      ResponseDTO<AffiliateAgentVO> result = affiliateService.getAgentById(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getAgentId()).isEqualTo(100L);
@@ -124,7 +142,7 @@ class AffiliateServiceTest {
     void not_found_returns_error() {
       when(affiliateAgentDao.selectById(999L)).thenReturn(null);
 
-      ResponseDTO<AffiliateAgentVO> result = affiliateService.getAgentById(999L, TENANT_ID);
+      ResponseDTO<AffiliateAgentVO> result = affiliateService.getAgentById(999L);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).isEqualTo(AgentErrorCode.AGENT_NOT_FOUND.getMsg());
@@ -137,7 +155,7 @@ class AffiliateServiceTest {
       entity.setTenantId(999L);
       when(affiliateAgentDao.selectById(100L)).thenReturn(entity);
 
-      ResponseDTO<AffiliateAgentVO> result = affiliateService.getAgentById(100L, TENANT_ID);
+      ResponseDTO<AffiliateAgentVO> result = affiliateService.getAgentById(100L);
 
       assertThat(result.getOk()).isFalse();
     }
@@ -166,8 +184,7 @@ class AffiliateServiceTest {
       AffiliateAgentEntity agent200 = buildAgent(200L, "child01");
       when(affiliateAgentDao.selectBatchIds(List.of(200L))).thenReturn(List.of(agent200));
 
-      ResponseDTO<List<AffiliateAgentVO>> result =
-          affiliateService.getDownlineTree(100L, TENANT_ID);
+      ResponseDTO<List<AffiliateAgentVO>> result = affiliateService.getDownlineTree(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).hasSize(1);
@@ -184,8 +201,7 @@ class AffiliateServiceTest {
 
       when(affiliateHierarchyDao.findDescendants(100L, TENANT_ID)).thenReturn(List.of(self));
 
-      ResponseDTO<List<AffiliateAgentVO>> result =
-          affiliateService.getDownlineTree(100L, TENANT_ID);
+      ResponseDTO<List<AffiliateAgentVO>> result = affiliateService.getDownlineTree(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).isEmpty();
@@ -207,8 +223,7 @@ class AffiliateServiceTest {
       r1.setStatus(1);
       when(affiliateCommissionRecordDao.findPendingByTenantId(TENANT_ID)).thenReturn(List.of(r1));
 
-      ResponseDTO<List<CommissionRecordVO>> result =
-          affiliateService.getPendingApprovals(TENANT_ID);
+      ResponseDTO<List<CommissionRecordVO>> result = affiliateService.getPendingApprovals();
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).hasSize(1);

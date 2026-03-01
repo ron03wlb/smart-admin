@@ -46,8 +46,8 @@ public class GameLobbyController {
   @Operation(summary = "Get popular games by tenant")
   @GetMapping("/igaming/game/lobby/popular")
   @SaCheckPermission("game:lobby:query")
-  public ResponseDTO<List<GameVO>> getPopularGames(@RequestParam Long tenantId) {
-    return gameLobbyService.getPopularGames(tenantId);
+  public ResponseDTO<List<GameVO>> getPopularGames() {
+    return gameLobbyService.getPopularGames();
   }
 
   @Operation(summary = "Get game by ID")

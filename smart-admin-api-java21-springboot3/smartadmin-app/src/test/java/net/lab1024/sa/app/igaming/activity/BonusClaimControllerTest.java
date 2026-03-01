@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import io.vavr.control.Option;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
-import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.token.player.StpPlayerUtil;
 import net.lab1024.sa.igaming.activity.controller.BonusClaimController;
 import net.lab1024.sa.igaming.activity.domain.form.BonusClaimForm;
@@ -26,8 +25,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * BonusClaimController unit tests — context extraction (StpPlayerUtil/TenantContext) and Option
- * handling.
+ * BonusClaimController unit tests — context extraction (StpPlayerUtil) and Option handling.
  *
  * @author iGaming Team
  * @since 2026-02-17
@@ -45,23 +43,21 @@ class BonusClaimControllerTest {
   class ClaimBonusTests {
 
     @Test
-    @DisplayName("mockStatic playerId + tenantId → 驗證 Service 呼叫參數正確")
+    @DisplayName("mockStatic playerId → 驗證 Service 呼叫參數正確")
     void claimBonus_success() {
-      try (MockedStatic<StpPlayerUtil> stpMock = mockStatic(StpPlayerUtil.class);
-          MockedStatic<TenantContext> tenantMock = mockStatic(TenantContext.class)) {
+      try (MockedStatic<StpPlayerUtil> stpMock = mockStatic(StpPlayerUtil.class)) {
 
         stpMock.when(StpPlayerUtil::getLoginIdAsLong).thenReturn(100L);
-        tenantMock.when(TenantContext::getTenantId).thenReturn(1L);
 
         BonusClaimForm form = new BonusClaimForm();
         BonusClaimResultVO resultVO = new BonusClaimResultVO();
-        when(bonusClaimService.claimBonus(100L, form, 1L)).thenReturn(ResponseDTO.ok(resultVO));
+        when(bonusClaimService.claimBonus(100L, form)).thenReturn(ResponseDTO.ok(resultVO));
 
         ResponseDTO<BonusClaimResultVO> result = bonusClaimController.claimBonus(form);
 
         assertThat(result.getOk()).isTrue();
         assertThat(result.getData()).isEqualTo(resultVO);
-        verify(bonusClaimService).claimBonus(100L, form, 1L);
+        verify(bonusClaimService).claimBonus(100L, form);
       }
     }
   }

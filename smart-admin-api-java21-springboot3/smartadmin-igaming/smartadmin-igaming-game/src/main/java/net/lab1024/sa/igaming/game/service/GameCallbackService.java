@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.code.GameErrorCode;
 import net.lab1024.sa.igaming.common.config.IgamingProperties;
@@ -52,10 +53,9 @@ public class GameCallbackService {
    * Process debit callback (bet placement).
    *
    * @param form debit form from GP
-   * @param tenantId current tenant
    * @return callback response with transactionId and balance
    */
-  public ResponseDTO<CallbackResponseVO> processDebit(CallbackDebitForm form, Long tenantId) {
+  public ResponseDTO<CallbackResponseVO> processDebit(CallbackDebitForm form) {
     // Verify GP signature
     String payload = form.getProviderCode() + form.getTransactionId() + form.getAmount();
     if (!gpSignatureVerifier.verify(
@@ -72,6 +72,8 @@ public class GameCallbackService {
       response.setStatus(existing.getStatus());
       return ResponseDTO.ok(response);
     }
+
+    Long tenantId = TenantContext.getTenantId();
 
     // Acquire distributed locks (Layer 1 concurrency) then delegate to Manager
     try {
@@ -95,16 +97,17 @@ public class GameCallbackService {
    * Process credit callback (win settlement).
    *
    * @param form credit form from GP
-   * @param tenantId current tenant
    * @return callback response with transactionId and balance
    */
-  public ResponseDTO<CallbackResponseVO> processCredit(CallbackCreditForm form, Long tenantId) {
+  public ResponseDTO<CallbackResponseVO> processCredit(CallbackCreditForm form) {
     // Verify GP signature
     String payload = form.getProviderCode() + form.getTransactionId() + form.getPayoutAmount();
     if (!gpSignatureVerifier.verify(
         form.getProviderCode(), payload, form.getSignature(), form.getTimestamp())) {
       return ResponseDTO.userErrorParam(GameErrorCode.INVALID_SIGNATURE.getMsg());
     }
+
+    Long tenantId = TenantContext.getTenantId();
 
     // Acquire distributed locks then delegate to Manager
     try {
@@ -128,16 +131,17 @@ public class GameCallbackService {
    * Process rollback callback (bet cancellation).
    *
    * @param form rollback form from GP
-   * @param tenantId current tenant
    * @return callback response with transactionId and balance
    */
-  public ResponseDTO<CallbackResponseVO> processRollback(CallbackRollbackForm form, Long tenantId) {
+  public ResponseDTO<CallbackResponseVO> processRollback(CallbackRollbackForm form) {
     // Verify GP signature
     String payload = form.getProviderCode() + form.getOriginalTransactionId();
     if (!gpSignatureVerifier.verify(
         form.getProviderCode(), payload, form.getSignature(), form.getTimestamp())) {
       return ResponseDTO.userErrorParam(GameErrorCode.INVALID_SIGNATURE.getMsg());
     }
+
+    Long tenantId = TenantContext.getTenantId();
 
     // Acquire player-level distributed lock then delegate to Manager
     try {
@@ -156,10 +160,10 @@ public class GameCallbackService {
    * Query round status (read-only, no lock required).
    *
    * @param gpRoundId GP round identifier
-   * @param tenantId current tenant
    * @return callback response with round status
    */
-  public ResponseDTO<CallbackResponseVO> queryRound(String gpRoundId, Long tenantId) {
+  public ResponseDTO<CallbackResponseVO> queryRound(String gpRoundId) {
+    Long tenantId = TenantContext.getTenantId();
     GameRoundEntity round =
         gameRoundDao.selectOne(
             Wrappers.<GameRoundEntity>lambdaQuery()

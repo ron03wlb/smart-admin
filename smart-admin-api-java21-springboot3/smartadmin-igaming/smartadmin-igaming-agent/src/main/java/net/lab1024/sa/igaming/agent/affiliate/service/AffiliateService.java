@@ -4,6 +4,7 @@ import io.vavr.control.Option;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.core.util.SmartBeanUtil;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateAgentDao;
 import net.lab1024.sa.igaming.agent.affiliate.dao.AffiliateCommissionPlanDao;
@@ -62,10 +63,10 @@ public class AffiliateService {
    * Get agent by ID.
    *
    * @param agentId agent ID
-   * @param tenantId tenant ID
    * @return agent VO
    */
-  public ResponseDTO<AffiliateAgentVO> getAgentById(Long agentId, Long tenantId) {
+  public ResponseDTO<AffiliateAgentVO> getAgentById(Long agentId) {
+    Long tenantId = TenantContext.getTenantId();
     return Option.of(affiliateAgentDao.selectById(agentId))
         .filter(e -> tenantId.equals(e.getTenantId()))
         .map(e -> SmartBeanUtil.copy(e, AffiliateAgentVO.class))
@@ -77,10 +78,10 @@ public class AffiliateService {
    * Get downline tree for an agent (via closure table).
    *
    * @param agentId ancestor agent ID
-   * @param tenantId tenant ID
    * @return list of descendant agent VOs
    */
-  public ResponseDTO<List<AffiliateAgentVO>> getDownlineTree(Long agentId, Long tenantId) {
+  public ResponseDTO<List<AffiliateAgentVO>> getDownlineTree(Long agentId) {
+    Long tenantId = TenantContext.getTenantId();
     List<AffiliateHierarchyEntity> descendants =
         affiliateHierarchyDao.findDescendants(agentId, tenantId);
     List<Long> descendantIds =
@@ -102,10 +103,10 @@ public class AffiliateService {
   /**
    * Get pending commission records for a tenant.
    *
-   * @param tenantId tenant ID
    * @return list of pending commission record VOs
    */
-  public ResponseDTO<List<CommissionRecordVO>> getPendingApprovals(Long tenantId) {
+  public ResponseDTO<List<CommissionRecordVO>> getPendingApprovals() {
+    Long tenantId = TenantContext.getTenantId();
     List<AffiliateCommissionRecordEntity> records =
         affiliateCommissionRecordDao.findPendingByTenantId(tenantId);
     List<CommissionRecordVO> vos =

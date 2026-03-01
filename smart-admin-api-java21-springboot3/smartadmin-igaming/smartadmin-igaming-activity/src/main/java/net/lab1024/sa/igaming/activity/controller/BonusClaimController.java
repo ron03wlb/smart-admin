@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
-import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.token.player.StpPlayerUtil;
 import net.lab1024.sa.igaming.activity.domain.form.BonusClaimForm;
 import net.lab1024.sa.igaming.activity.domain.form.WageringProgressQueryForm;
@@ -41,8 +40,7 @@ public class BonusClaimController {
   @SaCheckPermission("activity:bonus:operate")
   public ResponseDTO<BonusClaimResultVO> claimBonus(@RequestBody @Valid BonusClaimForm form) {
     Long playerId = StpPlayerUtil.getLoginIdAsLong();
-    Long tenantId = TenantContext.getTenantId();
-    return bonusClaimService.claimBonus(playerId, form, tenantId);
+    return bonusClaimService.claimBonus(playerId, form);
   }
 
   @Operation(summary = "Query bonus records for a player")

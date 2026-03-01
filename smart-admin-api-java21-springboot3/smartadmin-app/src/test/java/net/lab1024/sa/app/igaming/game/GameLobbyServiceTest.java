@@ -8,16 +8,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.domain.form.GameQueryForm;
 import net.lab1024.sa.igaming.game.domain.vo.GameVO;
 import net.lab1024.sa.igaming.game.manager.GameCacheManager;
 import net.lab1024.sa.igaming.game.service.GameLobbyService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -33,6 +38,19 @@ class GameLobbyServiceTest {
   @Mock private GameDao gameDao;
   @Mock private GameCacheManager gameCacheManager;
   @InjectMocks private GameLobbyService gameLobbyService;
+
+  private MockedStatic<TenantContext> tenantContextMock;
+
+  @BeforeEach
+  void setUp() {
+    tenantContextMock = Mockito.mockStatic(TenantContext.class);
+    tenantContextMock.when(TenantContext::getTenantId).thenReturn(1L);
+  }
+
+  @AfterEach
+  void tearDown() {
+    tenantContextMock.close();
+  }
 
   @Test
   @DisplayName("searchGames 分頁搜索 — 返回成功")
@@ -62,7 +80,7 @@ class GameLobbyServiceTest {
     }
     when(gameCacheManager.getGameListByTenant(1L)).thenReturn(games);
 
-    ResponseDTO<List<GameVO>> result = gameLobbyService.getPopularGames(1L);
+    ResponseDTO<List<GameVO>> result = gameLobbyService.getPopularGames();
     assertThat(result.getOk()).isTrue();
     assertThat(result.getData()).hasSize(20);
     // Verify sorted by playCount descending
@@ -77,7 +95,7 @@ class GameLobbyServiceTest {
     vo.setPlayCount(100L);
     when(gameCacheManager.getGameListByTenant(1L)).thenReturn(List.of(vo));
 
-    ResponseDTO<List<GameVO>> result = gameLobbyService.getPopularGames(1L);
+    ResponseDTO<List<GameVO>> result = gameLobbyService.getPopularGames();
     assertThat(result.getOk()).isTrue();
     assertThat(result.getData()).hasSize(1);
   }

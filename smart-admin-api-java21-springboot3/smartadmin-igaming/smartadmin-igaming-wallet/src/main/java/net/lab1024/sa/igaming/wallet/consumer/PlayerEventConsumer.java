@@ -3,6 +3,7 @@ package net.lab1024.sa.igaming.wallet.consumer;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -51,6 +52,9 @@ public class PlayerEventConsumer {
     }
 
     try {
+      if (event.getTenantId() != null) {
+        TenantContext.setTenantId(event.getTenantId());
+      }
       freezePlayerWallets(event);
     } catch (Exception e) {
       log.error(
@@ -58,6 +62,8 @@ public class PlayerEventConsumer {
           event.getEventId(),
           e.getMessage(),
           e);
+    } finally {
+      TenantContext.clear();
     }
   }
 

@@ -202,15 +202,13 @@ class AgentIntegrationTest {
       assertThat(result.getOk()).isTrue();
 
       // Verify child credit
-      ResponseDTO<AgentCreditVO> childCredit =
-          creditNetworkService.getAgentCredit(200L, TEST_TENANT_ID);
+      ResponseDTO<AgentCreditVO> childCredit = creditNetworkService.getAgentCredit(200L);
       assertThat(childCredit.getOk()).isTrue();
       assertThat(childCredit.getData().getCreditLimit()).isEqualByComparingTo("30000");
       assertThat(childCredit.getData().getPositionPercent()).isEqualByComparingTo("40");
 
       // Verify parent allocated_to_children updated
-      ResponseDTO<AgentCreditVO> parentCredit =
-          creditNetworkService.getAgentCredit(100L, TEST_TENANT_ID);
+      ResponseDTO<AgentCreditVO> parentCredit = creditNetworkService.getAgentCredit(100L);
       assertThat(parentCredit.getData().getAllocatedToChildren()).isEqualByComparingTo("30000");
       assertThat(parentCredit.getData().getAvailableCredit()).isEqualByComparingTo("70000");
     }
@@ -250,8 +248,7 @@ class AgentIntegrationTest {
       ResponseDTO<String> result = creditNetworkService.reclaimCredit(form, "admin");
       assertThat(result.getOk()).isTrue();
 
-      ResponseDTO<AgentCreditVO> childCredit =
-          creditNetworkService.getAgentCredit(200L, TEST_TENANT_ID);
+      ResponseDTO<AgentCreditVO> childCredit = creditNetworkService.getAgentCredit(200L);
       assertThat(childCredit.getData().getCreditLimit()).isEqualByComparingTo("15000");
     }
 
@@ -262,8 +259,7 @@ class AgentIntegrationTest {
       seedAgentCredit(200L, 100L, "20000");
       seedAgentCredit(201L, 100L, "30000");
 
-      ResponseDTO<List<AgentCreditVO>> result =
-          creditNetworkService.getDownlineCredits(100L, TEST_TENANT_ID);
+      ResponseDTO<List<AgentCreditVO>> result = creditNetworkService.getDownlineCredits(100L);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).hasSize(2);
     }
@@ -394,8 +390,7 @@ class AgentIntegrationTest {
       childForm.setTenantId(TEST_TENANT_ID);
       affiliateService.registerAgent(childForm);
 
-      ResponseDTO<List<AffiliateAgentVO>> result =
-          affiliateService.getDownlineTree(parentId, TEST_TENANT_ID);
+      ResponseDTO<List<AffiliateAgentVO>> result = affiliateService.getDownlineTree(parentId);
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).hasSize(1);
       assertThat(result.getData().get(0).getUsername()).isEqualTo("tree_child");
@@ -443,8 +438,7 @@ class AgentIntegrationTest {
       affiliateCommissionManager.calculateAndIssueCommission(
           agentId, TEST_TENANT_ID, LocalDate.of(2026, 2, 17), new BigDecimal("100000"));
 
-      ResponseDTO<List<CommissionRecordVO>> pending =
-          affiliateService.getPendingApprovals(TEST_TENANT_ID);
+      ResponseDTO<List<CommissionRecordVO>> pending = affiliateService.getPendingApprovals();
       assertThat(pending.getData()).hasSize(1);
 
       CommissionApprovalForm approvalForm = new CommissionApprovalForm();
@@ -454,8 +448,7 @@ class AgentIntegrationTest {
       assertThat(approveResult.getOk()).isTrue();
 
       // After approval, pending list should be empty
-      ResponseDTO<List<CommissionRecordVO>> afterApproval =
-          affiliateService.getPendingApprovals(TEST_TENANT_ID);
+      ResponseDTO<List<CommissionRecordVO>> afterApproval = affiliateService.getPendingApprovals();
       assertThat(afterApproval.getData()).isEmpty();
     }
 

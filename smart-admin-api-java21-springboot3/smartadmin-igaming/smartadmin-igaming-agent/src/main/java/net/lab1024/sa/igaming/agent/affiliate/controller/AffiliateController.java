@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -44,24 +43,22 @@ public class AffiliateController {
   @Operation(summary = "Get agent by ID")
   @GetMapping("/igaming/agent/affiliate/{agentId}")
   @SaCheckPermission("agent:affiliate:query")
-  public ResponseDTO<AffiliateAgentVO> getAgent(
-      @PathVariable Long agentId, @RequestParam Long tenantId) {
-    return affiliateService.getAgentById(agentId, tenantId);
+  public ResponseDTO<AffiliateAgentVO> getAgent(@PathVariable Long agentId) {
+    return affiliateService.getAgentById(agentId);
   }
 
   @Operation(summary = "Get downline tree for an agent")
   @GetMapping("/igaming/agent/affiliate/downline/{agentId}")
   @SaCheckPermission("agent:affiliate:query")
-  public ResponseDTO<List<AffiliateAgentVO>> getDownline(
-      @PathVariable Long agentId, @RequestParam Long tenantId) {
-    return affiliateService.getDownlineTree(agentId, tenantId);
+  public ResponseDTO<List<AffiliateAgentVO>> getDownline(@PathVariable Long agentId) {
+    return affiliateService.getDownlineTree(agentId);
   }
 
   @Operation(summary = "Get pending commission approvals")
   @GetMapping("/igaming/agent/affiliate/commissions/pending")
   @SaCheckPermission("agent:affiliate:commission")
-  public ResponseDTO<List<CommissionRecordVO>> getPendingApprovals(@RequestParam Long tenantId) {
-    return affiliateService.getPendingApprovals(tenantId);
+  public ResponseDTO<List<CommissionRecordVO>> getPendingApprovals() {
+    return affiliateService.getPendingApprovals();
   }
 
   @Operation(summary = "Approve a commission record")

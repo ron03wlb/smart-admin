@@ -2,6 +2,7 @@ package net.lab1024.sa.igaming.risk.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -51,6 +52,9 @@ public class RiskEventConsumer {
     }
 
     try {
+      if (domainEvent.getTenantId() != null) {
+        TenantContext.setTenantId(domainEvent.getTenantId());
+      }
       RiskEvent riskEvent = toRiskEvent(domainEvent);
       riskEvaluationService.evaluateAndDispatch(riskEvent);
     } catch (Exception e) {
@@ -59,6 +63,8 @@ public class RiskEventConsumer {
           eventType,
           domainEvent.getAggregateId(),
           e);
+    } finally {
+      TenantContext.clear();
     }
   }
 

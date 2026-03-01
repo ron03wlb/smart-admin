@@ -37,17 +37,15 @@ public class CreditNetworkController {
   @Operation(summary = "Get agent credit info")
   @GetMapping("/igaming/agent/credit/{agentId}")
   @SaCheckPermission("agent:credit:query")
-  public ResponseDTO<AgentCreditVO> getAgentCredit(
-      @PathVariable Long agentId, @RequestParam Long tenantId) {
-    return creditNetworkService.getAgentCredit(agentId, tenantId);
+  public ResponseDTO<AgentCreditVO> getAgentCredit(@PathVariable Long agentId) {
+    return creditNetworkService.getAgentCredit(agentId);
   }
 
   @Operation(summary = "Get downline credits for a parent agent")
   @GetMapping("/igaming/agent/credit/downline/{parentId}")
   @SaCheckPermission("agent:credit:query")
-  public ResponseDTO<List<AgentCreditVO>> getDownlineCredits(
-      @PathVariable Long parentId, @RequestParam Long tenantId) {
-    return creditNetworkService.getDownlineCredits(parentId, tenantId);
+  public ResponseDTO<List<AgentCreditVO>> getDownlineCredits(@PathVariable Long parentId) {
+    return creditNetworkService.getDownlineCredits(parentId);
   }
 
   @Operation(summary = "Allocate credit from parent to child")

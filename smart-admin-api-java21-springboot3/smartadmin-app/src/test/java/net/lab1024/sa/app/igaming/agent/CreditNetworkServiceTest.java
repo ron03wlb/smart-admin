@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.agent.credit.dao.AgentCreditDao;
 import net.lab1024.sa.igaming.agent.credit.dao.SettlementRecordDao;
 import net.lab1024.sa.igaming.agent.credit.domain.entity.AgentCreditEntity;
@@ -21,12 +22,16 @@ import net.lab1024.sa.igaming.agent.credit.domain.vo.SettlementRecordVO;
 import net.lab1024.sa.igaming.agent.credit.manager.CreditSettlementManager;
 import net.lab1024.sa.igaming.agent.credit.service.CreditNetworkService;
 import net.lab1024.sa.igaming.common.code.AgentErrorCode;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +44,19 @@ class CreditNetworkServiceTest {
   @InjectMocks private CreditNetworkService creditNetworkService;
 
   private static final Long TENANT_ID = 1L;
+
+  private MockedStatic<TenantContext> tenantContextMock;
+
+  @BeforeEach
+  void setUp() {
+    tenantContextMock = Mockito.mockStatic(TenantContext.class);
+    tenantContextMock.when(TenantContext::getTenantId).thenReturn(TENANT_ID);
+  }
+
+  @AfterEach
+  void tearDown() {
+    tenantContextMock.close();
+  }
 
   private AgentCreditEntity buildCreditEntity(Long agentId, Long parentId, String limit) {
     AgentCreditEntity e = new AgentCreditEntity();
@@ -68,7 +86,7 @@ class CreditNetworkServiceTest {
       AgentCreditEntity entity = buildCreditEntity(100L, null, "50000");
       when(agentCreditDao.findByAgentIdAndTenantId(100L, TENANT_ID)).thenReturn(entity);
 
-      ResponseDTO<AgentCreditVO> result = creditNetworkService.getAgentCredit(100L, TENANT_ID);
+      ResponseDTO<AgentCreditVO> result = creditNetworkService.getAgentCredit(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getAgentId()).isEqualTo(100L);
@@ -81,7 +99,7 @@ class CreditNetworkServiceTest {
     void not_found_returns_error() {
       when(agentCreditDao.findByAgentIdAndTenantId(999L, TENANT_ID)).thenReturn(null);
 
-      ResponseDTO<AgentCreditVO> result = creditNetworkService.getAgentCredit(999L, TENANT_ID);
+      ResponseDTO<AgentCreditVO> result = creditNetworkService.getAgentCredit(999L);
 
       assertThat(result.getOk()).isFalse();
       assertThat(result.getMsg()).isEqualTo(AgentErrorCode.CREDIT_NOT_FOUND.getMsg());
@@ -95,7 +113,7 @@ class CreditNetworkServiceTest {
       entity.setAllocatedToChildren(new BigDecimal("20000"));
       when(agentCreditDao.findByAgentIdAndTenantId(100L, TENANT_ID)).thenReturn(entity);
 
-      ResponseDTO<AgentCreditVO> result = creditNetworkService.getAgentCredit(100L, TENANT_ID);
+      ResponseDTO<AgentCreditVO> result = creditNetworkService.getAgentCredit(100L);
 
       assertThat(result.getData().getAvailableCredit()).isEqualByComparingTo("20000");
     }
@@ -114,8 +132,7 @@ class CreditNetworkServiceTest {
       AgentCreditEntity c2 = buildCreditEntity(201L, 100L, "20000");
       when(agentCreditDao.findByParentIdAndTenantId(100L, TENANT_ID)).thenReturn(List.of(c1, c2));
 
-      ResponseDTO<List<AgentCreditVO>> result =
-          creditNetworkService.getDownlineCredits(100L, TENANT_ID);
+      ResponseDTO<List<AgentCreditVO>> result = creditNetworkService.getDownlineCredits(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).hasSize(2);
@@ -126,8 +143,7 @@ class CreditNetworkServiceTest {
     void no_children_returns_empty() {
       when(agentCreditDao.findByParentIdAndTenantId(100L, TENANT_ID)).thenReturn(List.of());
 
-      ResponseDTO<List<AgentCreditVO>> result =
-          creditNetworkService.getDownlineCredits(100L, TENANT_ID);
+      ResponseDTO<List<AgentCreditVO>> result = creditNetworkService.getDownlineCredits(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData()).isEmpty();

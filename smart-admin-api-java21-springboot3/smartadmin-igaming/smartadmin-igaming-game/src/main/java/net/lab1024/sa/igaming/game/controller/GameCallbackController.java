@@ -15,7 +15,6 @@ import net.lab1024.sa.igaming.game.service.GameCallbackService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,32 +34,28 @@ public class GameCallbackController {
   @NoNeedLogin
   @Operation(summary = "GP debit callback (bet placement)")
   @PostMapping("/igaming/game/callback/debit")
-  public ResponseDTO<CallbackResponseVO> debit(
-      @RequestBody @Valid CallbackDebitForm form, @RequestHeader("X-Tenant-Id") Long tenantId) {
-    return gameCallbackService.processDebit(form, tenantId);
+  public ResponseDTO<CallbackResponseVO> debit(@RequestBody @Valid CallbackDebitForm form) {
+    return gameCallbackService.processDebit(form);
   }
 
   @NoNeedLogin
   @Operation(summary = "GP credit callback (win settlement)")
   @PostMapping("/igaming/game/callback/credit")
-  public ResponseDTO<CallbackResponseVO> credit(
-      @RequestBody @Valid CallbackCreditForm form, @RequestHeader("X-Tenant-Id") Long tenantId) {
-    return gameCallbackService.processCredit(form, tenantId);
+  public ResponseDTO<CallbackResponseVO> credit(@RequestBody @Valid CallbackCreditForm form) {
+    return gameCallbackService.processCredit(form);
   }
 
   @NoNeedLogin
   @Operation(summary = "GP rollback callback (bet cancellation)")
   @PostMapping("/igaming/game/callback/rollback")
-  public ResponseDTO<CallbackResponseVO> rollback(
-      @RequestBody @Valid CallbackRollbackForm form, @RequestHeader("X-Tenant-Id") Long tenantId) {
-    return gameCallbackService.processRollback(form, tenantId);
+  public ResponseDTO<CallbackResponseVO> rollback(@RequestBody @Valid CallbackRollbackForm form) {
+    return gameCallbackService.processRollback(form);
   }
 
   @NoNeedLogin
   @Operation(summary = "Query round status")
   @GetMapping("/igaming/game/callback/query")
-  public ResponseDTO<CallbackResponseVO> query(
-      @RequestParam String gpRoundId, @RequestHeader("X-Tenant-Id") Long tenantId) {
-    return gameCallbackService.queryRound(gpRoundId, tenantId);
+  public ResponseDTO<CallbackResponseVO> query(@RequestParam String gpRoundId) {
+    return gameCallbackService.queryRound(gpRoundId);
   }
 }

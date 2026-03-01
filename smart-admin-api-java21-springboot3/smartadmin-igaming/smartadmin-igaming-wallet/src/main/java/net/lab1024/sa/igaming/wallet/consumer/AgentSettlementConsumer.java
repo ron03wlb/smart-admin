@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -58,6 +59,9 @@ public class AgentSettlementConsumer {
     }
 
     try {
+      if (event.getTenantId() != null) {
+        TenantContext.setTenantId(event.getTenantId());
+      }
       processCommissionApproved(event);
     } catch (Exception e) {
       log.error(
@@ -65,6 +69,8 @@ public class AgentSettlementConsumer {
           event.getEventId(),
           e.getMessage(),
           e);
+    } finally {
+      TenantContext.clear();
     }
   }
 

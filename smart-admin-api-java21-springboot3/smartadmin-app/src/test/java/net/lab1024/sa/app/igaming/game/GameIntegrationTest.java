@@ -212,8 +212,7 @@ class GameIntegrationTest {
       insertGame();
 
       CallbackDebitForm form = buildDebitForm("tx-it-001", "10.0000");
-      ResponseDTO<CallbackResponseVO> result =
-          gameCallbackService.processDebit(form, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getTransactionId()).isEqualTo("tx-it-001");
@@ -238,12 +237,10 @@ class GameIntegrationTest {
       insertGame();
 
       CallbackDebitForm form = buildDebitForm("tx-it-idem", "10.0000");
-      ResponseDTO<CallbackResponseVO> first =
-          gameCallbackService.processDebit(form, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> first = gameCallbackService.processDebit(form);
       assertThat(first.getOk()).isTrue();
 
-      ResponseDTO<CallbackResponseVO> second =
-          gameCallbackService.processDebit(form, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> second = gameCallbackService.processDebit(form);
       assertThat(second.getOk()).isTrue();
       assertThat(second.getData().getTransactionId()).isEqualTo("tx-it-idem");
     }
@@ -256,8 +253,7 @@ class GameIntegrationTest {
       insertGame();
 
       CallbackDebitForm form = buildDebitForm("tx-it-insuf", "10.0000");
-      ResponseDTO<CallbackResponseVO> result =
-          gameCallbackService.processDebit(form, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
 
       assertThat(result.getOk()).isFalse();
     }
@@ -278,12 +274,11 @@ class GameIntegrationTest {
 
       // First: debit
       CallbackDebitForm debitForm = buildDebitForm("tx-it-credit-001", "10.0000");
-      gameCallbackService.processDebit(debitForm, TEST_TENANT_ID);
+      gameCallbackService.processDebit(debitForm);
 
       // Then: credit
       CallbackCreditForm creditForm = buildCreditForm("tx-it-credit-002", "round-001", "25.0000");
-      ResponseDTO<CallbackResponseVO> result =
-          gameCallbackService.processCredit(creditForm, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processCredit(creditForm);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.SETTLED.getValue());
@@ -309,12 +304,11 @@ class GameIntegrationTest {
 
       // First: debit
       CallbackDebitForm debitForm = buildDebitForm("tx-it-rb-001", "10.0000");
-      gameCallbackService.processDebit(debitForm, TEST_TENANT_ID);
+      gameCallbackService.processDebit(debitForm);
 
       // Then: rollback
       CallbackRollbackForm rollbackForm = buildRollbackForm("tx-it-rb-001");
-      ResponseDTO<CallbackResponseVO> result =
-          gameCallbackService.processRollback(rollbackForm, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processRollback(rollbackForm);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.CANCELLED.getValue());
@@ -366,8 +360,7 @@ class GameIntegrationTest {
       insertWeightConfig(1, new BigDecimal("0.5000"));
 
       CallbackDebitForm form = buildDebitForm("tx-it-wt-001", "100.0000");
-      ResponseDTO<CallbackResponseVO> result =
-          gameCallbackService.processDebit(form, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
 
       assertThat(result.getOk()).isTrue();
       GameRoundEntity round = gameRoundDao.selectByTransactionId("tx-it-wt-001");
@@ -382,8 +375,7 @@ class GameIntegrationTest {
       insertGame();
 
       CallbackDebitForm form = buildDebitForm("tx-it-wt-002", "100.0000");
-      ResponseDTO<CallbackResponseVO> result =
-          gameCallbackService.processDebit(form, TEST_TENANT_ID);
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processDebit(form);
 
       assertThat(result.getOk()).isTrue();
       GameRoundEntity round = gameRoundDao.selectByTransactionId("tx-it-wt-002");

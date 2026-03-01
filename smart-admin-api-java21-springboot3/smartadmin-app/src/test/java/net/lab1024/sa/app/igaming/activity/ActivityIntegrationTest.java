@@ -332,8 +332,7 @@ class ActivityIntegrationTest {
       form.setPromotionCode("CLAIM001");
       form.setClaimId("claim-it-001");
 
-      ResponseDTO<BonusClaimResultVO> result =
-          bonusClaimService.claimBonus(PLAYER_ID, form, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(PLAYER_ID, form);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getBonusAmount()).isEqualByComparingTo("50.0000");
@@ -356,14 +355,12 @@ class ActivityIntegrationTest {
       form.setPromotionCode("IDEM001");
       form.setClaimId("claim-it-idem");
 
-      ResponseDTO<BonusClaimResultVO> first =
-          bonusClaimService.claimBonus(PLAYER_ID, form, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> first = bonusClaimService.claimBonus(PLAYER_ID, form);
       assertThat(first.getOk()).isTrue();
 
       // Second claim with same claimId → rejected
       clearCaches();
-      ResponseDTO<BonusClaimResultVO> second =
-          bonusClaimService.claimBonus(PLAYER_ID, form, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> second = bonusClaimService.claimBonus(PLAYER_ID, form);
       assertThat(second.getOk()).isFalse();
     }
 
@@ -381,8 +378,7 @@ class ActivityIntegrationTest {
       form.setPromotionCode("DIS001");
       form.setClaimId("claim-it-dis");
 
-      ResponseDTO<BonusClaimResultVO> result =
-          bonusClaimService.claimBonus(PLAYER_ID, form, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(PLAYER_ID, form);
       assertThat(result.getOk()).isFalse();
     }
 
@@ -393,8 +389,7 @@ class ActivityIntegrationTest {
       form.setPromotionCode("NOTEXIST");
       form.setClaimId("claim-it-notfound");
 
-      ResponseDTO<BonusClaimResultVO> result =
-          bonusClaimService.claimBonus(PLAYER_ID, form, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> result = bonusClaimService.claimBonus(PLAYER_ID, form);
       assertThat(result.getOk()).isFalse();
     }
   }
@@ -415,8 +410,7 @@ class ActivityIntegrationTest {
       BonusClaimForm claimForm = new BonusClaimForm();
       claimForm.setPromotionCode("WP001");
       claimForm.setClaimId("claim-wp-001");
-      ResponseDTO<BonusClaimResultVO> claimed =
-          bonusClaimService.claimBonus(PLAYER_ID, claimForm, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> claimed = bonusClaimService.claimBonus(PLAYER_ID, claimForm);
       Long recordId = claimed.getData().getRecordId();
 
       insertGameProvider();
@@ -443,8 +437,7 @@ class ActivityIntegrationTest {
       BonusClaimForm claimForm = new BonusClaimForm();
       claimForm.setPromotionCode("WP002");
       claimForm.setClaimId("claim-wp-002");
-      ResponseDTO<BonusClaimResultVO> claimed =
-          bonusClaimService.claimBonus(PLAYER_ID, claimForm, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> claimed = bonusClaimService.claimBonus(PLAYER_ID, claimForm);
       Long recordId = claimed.getData().getRecordId();
 
       insertGameProvider();
@@ -482,8 +475,7 @@ class ActivityIntegrationTest {
       BonusClaimForm claimForm = new BonusClaimForm();
       claimForm.setPromotionCode("WP003");
       claimForm.setClaimId("claim-wp-003");
-      ResponseDTO<BonusClaimResultVO> claimed =
-          bonusClaimService.claimBonus(PLAYER_ID, claimForm, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> claimed = bonusClaimService.claimBonus(PLAYER_ID, claimForm);
       Long recordId = claimed.getData().getRecordId();
 
       insertGameProvider();
@@ -518,8 +510,7 @@ class ActivityIntegrationTest {
       BonusClaimForm claimForm = new BonusClaimForm();
       claimForm.setPromotionCode("FORF001");
       claimForm.setClaimId("claim-forf-001");
-      ResponseDTO<BonusClaimResultVO> claimed =
-          bonusClaimService.claimBonus(PLAYER_ID, claimForm, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> claimed = bonusClaimService.claimBonus(PLAYER_ID, claimForm);
       Long recordId = claimed.getData().getRecordId();
 
       // Verify wallet was credited
@@ -551,8 +542,7 @@ class ActivityIntegrationTest {
       BonusClaimForm claimForm = new BonusClaimForm();
       claimForm.setPromotionCode("EXP001");
       claimForm.setClaimId("claim-exp-001");
-      ResponseDTO<BonusClaimResultVO> claimed =
-          bonusClaimService.claimBonus(PLAYER_ID, claimForm, TEST_TENANT_ID);
+      ResponseDTO<BonusClaimResultVO> claimed = bonusClaimService.claimBonus(PLAYER_ID, claimForm);
       Long recordId = claimed.getData().getRecordId();
 
       // Manually set expired_at to past so selectExpiredActive picks it up

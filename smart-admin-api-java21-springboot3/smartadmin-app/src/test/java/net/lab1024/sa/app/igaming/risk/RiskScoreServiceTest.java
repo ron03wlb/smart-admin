@@ -5,16 +5,21 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.risk.dao.RiskScoreDao;
 import net.lab1024.sa.igaming.risk.domain.entity.RiskScoreEntity;
 import net.lab1024.sa.igaming.risk.domain.vo.RiskScoreVO;
 import net.lab1024.sa.igaming.risk.service.RiskScoreService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,6 +28,19 @@ class RiskScoreServiceTest {
 
   @Mock private RiskScoreDao riskScoreDao;
   @InjectMocks private RiskScoreService riskScoreService;
+
+  private MockedStatic<TenantContext> tenantContextMock;
+
+  @BeforeEach
+  void setUp() {
+    tenantContextMock = Mockito.mockStatic(TenantContext.class);
+    tenantContextMock.when(TenantContext::getTenantId).thenReturn(1L);
+  }
+
+  @AfterEach
+  void tearDown() {
+    tenantContextMock.close();
+  }
 
   @Nested
   @DisplayName("getByPlayerId 測試")
@@ -40,7 +58,7 @@ class RiskScoreServiceTest {
       entity.setAutoLocked(false);
       when(riskScoreDao.findByPlayerIdAndTenantId(100L, 1L)).thenReturn(entity);
 
-      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(100L, 1L);
+      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(100L);
 
       assertThat(result.getOk()).isTrue();
       assertThat(result.getData().getPlayerId()).isEqualTo(100L);
@@ -52,7 +70,7 @@ class RiskScoreServiceTest {
     void get_nonexistent_score() {
       when(riskScoreDao.findByPlayerIdAndTenantId(999L, 1L)).thenReturn(null);
 
-      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(999L, 1L);
+      ResponseDTO<RiskScoreVO> result = riskScoreService.getByPlayerId(999L);
 
       assertThat(result.getOk()).isFalse();
     }

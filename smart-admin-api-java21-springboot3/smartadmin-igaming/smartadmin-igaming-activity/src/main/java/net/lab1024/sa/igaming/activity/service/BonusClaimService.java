@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.dao.PromotionRuleDao;
@@ -46,8 +47,8 @@ public class BonusClaimService {
   private final PromotionCacheManager promotionCacheManager;
   private final BonusDistributionManager bonusDistributionManager;
 
-  public ResponseDTO<BonusClaimResultVO> claimBonus(
-      Long playerId, BonusClaimForm form, Long tenantId) {
+  public ResponseDTO<BonusClaimResultVO> claimBonus(Long playerId, BonusClaimForm form) {
+    Long tenantId = TenantContext.getTenantId();
 
     // Look up promotion rule
     PromotionRuleEntity rule =
