@@ -38,6 +38,9 @@ public class GameLobbyService {
 
   public ResponseDTO<List<GameVO>> getPopularGames() {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     List<GameVO> allGames = gameCacheManager.getGameListByTenant(tenantId);
     List<GameVO> popular =
         allGames.stream()

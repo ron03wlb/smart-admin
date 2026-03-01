@@ -44,10 +44,16 @@ public class BonusCompletionConsumer {
       return;
     }
 
+    if (event.getTenantId() == null) {
+      log.warn(
+          "Event missing tenantId, skipping: eventId={}, eventType={}",
+          event.getEventId(),
+          event.getEventType());
+      return;
+    }
+
     try {
-      if (event.getTenantId() != null) {
-        TenantContext.setTenantId(event.getTenantId());
-      }
+      TenantContext.setTenantId(event.getTenantId());
       processWageringCompleted(event);
     } catch (Exception e) {
       log.error(

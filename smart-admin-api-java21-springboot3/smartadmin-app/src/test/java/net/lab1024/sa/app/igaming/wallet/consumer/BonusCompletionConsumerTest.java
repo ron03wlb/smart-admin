@@ -64,6 +64,7 @@ class BonusCompletionConsumerTest {
               .eventId("evt-001")
               .aggregateType("Activity")
               .aggregateId("10")
+              .tenantId(1L)
               .payload(payload)
               .build();
 
@@ -97,6 +98,7 @@ class BonusCompletionConsumerTest {
               .eventId("evt-003")
               .aggregateType("Activity")
               .aggregateId("30")
+              .tenantId(1L)
               .build();
 
       bonusCompletionConsumer.onActivityEvent(MAPPER.writeValueAsString(event));
@@ -116,6 +118,29 @@ class BonusCompletionConsumerTest {
               .eventId("evt-004")
               .aggregateType("Activity")
               .aggregateId("40")
+              .tenantId(1L)
+              .payload(payload)
+              .build();
+
+      bonusCompletionConsumer.onActivityEvent(MAPPER.writeValueAsString(event));
+
+      verifyNoInteractions(walletService);
+    }
+
+    @Test
+    @DisplayName("tenantId 為 null — 跳過處理")
+    void nullTenantId_skips() throws JsonProcessingException {
+      ObjectNode payload = MAPPER.createObjectNode();
+      payload.put("bonusExtId", 10L);
+      payload.put("playerId", 100L);
+
+      DomainEvent event =
+          DomainEvent.builder()
+              .eventType("WAGERING_COMPLETED")
+              .eventId("evt-null-tenant")
+              .aggregateType("Activity")
+              .aggregateId("10")
+              .tenantId(null)
               .payload(payload)
               .build();
 

@@ -49,6 +49,9 @@ public class BonusClaimService {
 
   public ResponseDTO<BonusClaimResultVO> claimBonus(Long playerId, BonusClaimForm form) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
 
     // Look up promotion rule
     PromotionRuleEntity rule =

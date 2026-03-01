@@ -74,6 +74,9 @@ public class GameCallbackService {
     }
 
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
 
     // Acquire distributed locks (Layer 1 concurrency) then delegate to Manager
     try {
@@ -108,6 +111,9 @@ public class GameCallbackService {
     }
 
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
 
     // Acquire distributed locks then delegate to Manager
     try {
@@ -142,6 +148,9 @@ public class GameCallbackService {
     }
 
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
 
     // Acquire player-level distributed lock then delegate to Manager
     try {
@@ -164,6 +173,9 @@ public class GameCallbackService {
    */
   public ResponseDTO<CallbackResponseVO> queryRound(String gpRoundId) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     GameRoundEntity round =
         gameRoundDao.selectOne(
             Wrappers.<GameRoundEntity>lambdaQuery()

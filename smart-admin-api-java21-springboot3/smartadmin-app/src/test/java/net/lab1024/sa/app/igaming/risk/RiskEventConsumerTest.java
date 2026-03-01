@@ -6,12 +6,15 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.lang.reflect.Field;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.risk.consumer.RiskEventConsumer;
 import net.lab1024.sa.igaming.risk.domain.RiskEvent;
 import net.lab1024.sa.igaming.risk.service.RiskEvaluationService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,10 +27,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("RiskEventConsumer 測試")
 class RiskEventConsumerTest {
 
+  private static final ObjectMapper MAPPER =
+      new ObjectMapper().registerModule(new JavaTimeModule());
+
+  @BeforeAll
+  static void initJsonUtil() throws Exception {
+    Field field = JsonUtil.class.getDeclaredField("staticMapper");
+    field.setAccessible(true);
+    if (field.get(null) == null) {
+      field.set(null, MAPPER);
+    }
+  }
+
   @Mock private RiskEvaluationService riskEvaluationService;
   @InjectMocks private RiskEventConsumer riskEventConsumer;
-
-  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Nested
   @DisplayName("onEvent 測試")
@@ -86,6 +99,27 @@ class RiskEventConsumerTest {
     }
 
     @Test
+    @DisplayName("tenantId 為 null — 跳過處理")
+    void nullTenantId_skips() {
+      DomainEvent event = new DomainEvent();
+      event.setEventType(DomainEventTypeConst.BET_PLACED);
+      event.setEventId("evt-null-tenant");
+      event.setAggregateId("100");
+      event.setTenantId(null);
+
+      ObjectNode payload = MAPPER.createObjectNode();
+      payload.put("playerId", 100L);
+      payload.put("amount", "100.00");
+      payload.put("playerBalance", "5000.00");
+      event.setPayload(payload);
+
+      String json = JsonUtil.toJson(event);
+      riskEventConsumer.onEvent(json);
+
+      verify(riskEvaluationService, never()).evaluateAndDispatch(any());
+    }
+
+    @Test
     @DisplayName("評估服務異常不影響消費者")
     void evaluation_failure_handled() {
       DomainEvent event = buildDomainEvent(DomainEventTypeConst.BET_PLACED, "100");
@@ -107,7 +141,7 @@ class RiskEventConsumerTest {
     event.setAggregateId(aggregateId);
     event.setTenantId(1L);
 
-    ObjectNode payload = objectMapper.createObjectNode();
+    ObjectNode payload = MAPPER.createObjectNode();
     payload.put("playerId", Long.parseLong(aggregateId));
     payload.put("amount", "100.00");
     payload.put("playerBalance", "5000.00");

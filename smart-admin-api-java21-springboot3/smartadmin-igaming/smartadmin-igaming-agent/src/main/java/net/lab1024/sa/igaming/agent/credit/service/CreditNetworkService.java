@@ -44,6 +44,9 @@ public class CreditNetworkService {
    */
   public ResponseDTO<AgentCreditVO> getAgentCredit(Long agentId) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     return Option.of(agentCreditDao.findByAgentIdAndTenantId(agentId, tenantId))
         .map(this::toAgentCreditVO)
         .map(ResponseDTO::ok)
@@ -58,6 +61,9 @@ public class CreditNetworkService {
    */
   public ResponseDTO<List<AgentCreditVO>> getDownlineCredits(Long parentId) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     List<AgentCreditEntity> children = agentCreditDao.findByParentIdAndTenantId(parentId, tenantId);
     List<AgentCreditVO> vos = children.stream().map(this::toAgentCreditVO).toList();
     return ResponseDTO.ok(vos);
@@ -71,8 +77,12 @@ public class CreditNetworkService {
    * @return success or error response
    */
   public ResponseDTO<String> allocateCredit(CreditAllocateForm form, String operator) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     AgentCreditEntity parent =
-        agentCreditDao.findByAgentIdAndTenantId(form.getParentId(), form.getTenantId());
+        agentCreditDao.findByAgentIdAndTenantId(form.getParentId(), tenantId);
     if (parent == null) {
       return ResponseDTO.userErrorParam(AgentErrorCode.CREDIT_NOT_FOUND.getMsg());
     }
@@ -91,7 +101,7 @@ public class CreditNetworkService {
         form.getChildId(),
         form.getAmount(),
         form.getPositionPercent(),
-        form.getTenantId(),
+        tenantId,
         operator,
         form.getReason());
     return ResponseDTO.ok();
@@ -105,8 +115,11 @@ public class CreditNetworkService {
    * @return success or error response
    */
   public ResponseDTO<String> reclaimCredit(CreditRecallForm form, String operator) {
-    AgentCreditEntity child =
-        agentCreditDao.findByAgentIdAndTenantId(form.getChildId(), form.getTenantId());
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
+    AgentCreditEntity child = agentCreditDao.findByAgentIdAndTenantId(form.getChildId(), tenantId);
     if (child == null) {
       return ResponseDTO.userErrorParam(AgentErrorCode.CREDIT_NOT_FOUND.getMsg());
     }
@@ -119,7 +132,7 @@ public class CreditNetworkService {
         form.getParentId(),
         form.getChildId(),
         form.getNewLimit(),
-        form.getTenantId(),
+        tenantId,
         operator,
         form.getReason());
     return ResponseDTO.ok();
@@ -132,9 +145,12 @@ public class CreditNetworkService {
    * @return list of settlement record VOs
    */
   public ResponseDTO<List<SettlementRecordVO>> triggerSettlement(SettlementTriggerForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     List<SettlementRecordEntity> records =
-        creditSettlementManager.triggerWeeklySettlement(
-            form.getTenantId(), form.getSettlementWeek());
+        creditSettlementManager.triggerWeeklySettlement(tenantId, form.getSettlementWeek());
     List<SettlementRecordVO> vos =
         records.stream().map(e -> SmartBeanUtil.copy(e, SettlementRecordVO.class)).toList();
     return ResponseDTO.ok(vos);

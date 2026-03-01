@@ -47,9 +47,15 @@ public class AffiliateService {
    * @return created agent VO
    */
   public ResponseDTO<AffiliateAgentVO> registerAgent(AffiliateRegisterForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
+    // Override form tenantId with TenantContext (authoritative source)
+    form.setTenantId(tenantId);
     // Check username uniqueness
     AffiliateAgentEntity existing =
-        affiliateAgentDao.findByUsernameAndTenantId(form.getUsername(), form.getTenantId());
+        affiliateAgentDao.findByUsernameAndTenantId(form.getUsername(), tenantId);
     if (existing != null) {
       return ResponseDTO.userErrorParam(AgentErrorCode.AGENT_USERNAME_DUPLICATE.getMsg());
     }
@@ -67,6 +73,9 @@ public class AffiliateService {
    */
   public ResponseDTO<AffiliateAgentVO> getAgentById(Long agentId) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     return Option.of(affiliateAgentDao.selectById(agentId))
         .filter(e -> tenantId.equals(e.getTenantId()))
         .map(e -> SmartBeanUtil.copy(e, AffiliateAgentVO.class))
@@ -82,6 +91,9 @@ public class AffiliateService {
    */
   public ResponseDTO<List<AffiliateAgentVO>> getDownlineTree(Long agentId) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     List<AffiliateHierarchyEntity> descendants =
         affiliateHierarchyDao.findDescendants(agentId, tenantId);
     List<Long> descendantIds =
@@ -107,6 +119,9 @@ public class AffiliateService {
    */
   public ResponseDTO<List<CommissionRecordVO>> getPendingApprovals() {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     List<AffiliateCommissionRecordEntity> records =
         affiliateCommissionRecordDao.findPendingByTenantId(tenantId);
     List<CommissionRecordVO> vos =

@@ -66,6 +66,7 @@ class AgentSettlementConsumerTest {
               .eventId("evt-001")
               .aggregateType("Commission")
               .aggregateId("42")
+              .tenantId(1L)
               .payload(payload)
               .build();
 
@@ -122,6 +123,7 @@ class AgentSettlementConsumerTest {
               .eventId("evt-004")
               .aggregateType("Commission")
               .aggregateId("50")
+              .tenantId(1L)
               .build();
 
       agentSettlementConsumer.onAgentEvent(MAPPER.writeValueAsString(event));
@@ -141,6 +143,30 @@ class AgentSettlementConsumerTest {
               .eventId("evt-005")
               .aggregateType("Commission")
               .aggregateId("60")
+              .tenantId(1L)
+              .payload(payload)
+              .build();
+
+      agentSettlementConsumer.onAgentEvent(MAPPER.writeValueAsString(event));
+
+      verifyNoInteractions(walletService);
+    }
+
+    @Test
+    @DisplayName("tenantId 為 null — 跳過處理")
+    void nullTenantId_skips() throws JsonProcessingException {
+      ObjectNode payload = MAPPER.createObjectNode();
+      payload.put("agentId", 500L);
+      payload.put("netAmount", "1234.5678");
+      payload.put("recordId", 42L);
+
+      DomainEvent event =
+          DomainEvent.builder()
+              .eventType("COMMISSION_APPROVED")
+              .eventId("evt-null-tenant")
+              .aggregateType("Commission")
+              .aggregateId("42")
+              .tenantId(null)
               .payload(payload)
               .build();
 

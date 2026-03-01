@@ -66,6 +66,7 @@ class PlayerEventConsumerTest {
               .eventId("evt-001")
               .aggregateType("Player")
               .aggregateId("100")
+              .tenantId(1L)
               .payload(payload)
               .build();
 
@@ -88,6 +89,7 @@ class PlayerEventConsumerTest {
               .eventId("evt-002")
               .aggregateType("Player")
               .aggregateId("200")
+              .tenantId(1L)
               .payload(payload)
               .build();
 
@@ -108,6 +110,7 @@ class PlayerEventConsumerTest {
               .eventId("evt-004")
               .aggregateType("Player")
               .aggregateId("400")
+              .tenantId(1L)
               .build();
 
       playerEventConsumer.onPlayerEvent(MAPPER.writeValueAsString(event));
@@ -141,11 +144,29 @@ class PlayerEventConsumerTest {
               .eventId("evt-006")
               .aggregateType("Player")
               .aggregateId("not-a-number")
+              .tenantId(1L)
               .build();
 
       playerEventConsumer.onPlayerEvent(MAPPER.writeValueAsString(event));
 
       verify(walletManager, never()).freezePlayerWallets(anyLong());
+    }
+
+    @Test
+    @DisplayName("tenantId 為 null — 跳過處理")
+    void nullTenantId_skips() throws JsonProcessingException {
+      DomainEvent event =
+          DomainEvent.builder()
+              .eventType("PLAYER_SUSPENDED")
+              .eventId("evt-null-tenant")
+              .aggregateType("Player")
+              .aggregateId("100")
+              .tenantId(null)
+              .build();
+
+      playerEventConsumer.onPlayerEvent(MAPPER.writeValueAsString(event));
+
+      verifyNoInteractions(walletManager);
     }
 
     @Test

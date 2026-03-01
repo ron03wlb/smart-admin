@@ -51,10 +51,16 @@ public class RiskEventConsumer {
       return;
     }
 
+    if (domainEvent.getTenantId() == null) {
+      log.warn(
+          "Event missing tenantId, skipping: eventId={}, eventType={}",
+          domainEvent.getEventId(),
+          eventType);
+      return;
+    }
+
     try {
-      if (domainEvent.getTenantId() != null) {
-        TenantContext.setTenantId(domainEvent.getTenantId());
-      }
+      TenantContext.setTenantId(domainEvent.getTenantId());
       RiskEvent riskEvent = toRiskEvent(domainEvent);
       riskEvaluationService.evaluateAndDispatch(riskEvent);
     } catch (Exception e) {

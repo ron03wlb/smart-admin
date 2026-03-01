@@ -51,10 +51,16 @@ public class PlayerEventConsumer {
       return;
     }
 
+    if (event.getTenantId() == null) {
+      log.warn(
+          "Event missing tenantId, skipping: eventId={}, eventType={}",
+          event.getEventId(),
+          eventType);
+      return;
+    }
+
     try {
-      if (event.getTenantId() != null) {
-        TenantContext.setTenantId(event.getTenantId());
-      }
+      TenantContext.setTenantId(event.getTenantId());
       freezePlayerWallets(event);
     } catch (Exception e) {
       log.error(

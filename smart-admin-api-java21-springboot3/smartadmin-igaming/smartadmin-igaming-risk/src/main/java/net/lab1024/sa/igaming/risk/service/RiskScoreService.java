@@ -47,6 +47,9 @@ public class RiskScoreService {
 
   public ResponseDTO<RiskScoreVO> getByPlayerId(Long playerId) {
     Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     return Option.of(riskScoreDao.findByPlayerIdAndTenantId(playerId, tenantId))
         .map(e -> SmartBeanUtil.copy(e, RiskScoreVO.class))
         .map(ResponseDTO::ok)
