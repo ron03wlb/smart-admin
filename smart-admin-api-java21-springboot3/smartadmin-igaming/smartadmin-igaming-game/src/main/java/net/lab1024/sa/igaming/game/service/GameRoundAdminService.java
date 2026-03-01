@@ -10,6 +10,7 @@ import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity;
+import net.lab1024.sa.igaming.game.domain.form.GameRoundPendingReviewForm;
 import net.lab1024.sa.igaming.game.domain.form.ResettlementForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.manager.GameTransactionManager;
@@ -71,5 +72,36 @@ public class GameRoundAdminService {
       log.warn("Lock acquisition failed for resettlement: roundId={}", form.getRoundId());
       return ResponseDTO.userErrorParam(GameErrorCode.LOCK_ACQUISITION_FAILED.getMsg());
     }
+  }
+
+  /**
+   * Mark a game round as pending review.
+   *
+   * @param form pending review form with roundId and reason
+   * @return success or error response
+   */
+  public ResponseDTO<String> markPendingReview(GameRoundPendingReviewForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
+
+    GameRoundEntity round = gameRoundDao.selectById(form.getRoundId());
+    if (round == null) {
+      return ResponseDTO.userErrorParam(GameErrorCode.ROUND_NOT_FOUND.getMsg());
+    }
+    if (!RoundStatusEnum.OPEN.getValue().equals(round.getStatus())
+        && !RoundStatusEnum.SETTLED.getValue().equals(round.getStatus())) {
+      return ResponseDTO.userErrorParam(GameErrorCode.INVALID_STATE_TRANSITION.getMsg());
+    }
+
+    gameTransactionManager.markPendingReview(form.getRoundId(), form.getReason());
+
+    log.info(
+        "Round marked as pending review: roundId={}, reason={}, tenantId={}",
+        form.getRoundId(),
+        form.getReason(),
+        tenantId);
+    return ResponseDTO.ok();
   }
 }

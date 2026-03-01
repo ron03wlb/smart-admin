@@ -13,6 +13,7 @@ import net.lab1024.sa.igaming.common.config.IgamingProperties;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity;
+import net.lab1024.sa.igaming.game.domain.form.GameRoundPendingReviewForm;
 import net.lab1024.sa.igaming.game.domain.form.ResettlementForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.manager.GameTransactionManager;
@@ -135,6 +136,54 @@ class GameRoundAdminServiceTest {
     form.setNewPayoutAmount(new BigDecimal("30.00"));
     form.setRequestId("req-001");
     return form;
+  }
+
+  @Test
+  @DisplayName("markPendingReview — 成功標記待審核")
+  void markPendingReview_success() {
+    GameRoundPendingReviewForm form = new GameRoundPendingReviewForm();
+    form.setRoundId(1L);
+    form.setReason("Suspicious activity");
+
+    GameRoundEntity round = buildSettledRound();
+    when(gameRoundDao.selectById(1L)).thenReturn(round);
+
+    ResponseDTO<String> result = gameRoundAdminService.markPendingReview(form);
+
+    assertThat(result.getOk()).isTrue();
+    verify(gameTransactionManager).markPendingReview(1L, "Suspicious activity");
+  }
+
+  @Test
+  @DisplayName("markPendingReview — Round 不存在返回錯誤")
+  void markPendingReview_roundNotFound() {
+    GameRoundPendingReviewForm form = new GameRoundPendingReviewForm();
+    form.setRoundId(999L);
+    form.setReason("Test");
+
+    when(gameRoundDao.selectById(999L)).thenReturn(null);
+
+    ResponseDTO<String> result = gameRoundAdminService.markPendingReview(form);
+
+    assertThat(result.getOk()).isFalse();
+    verifyNoInteractions(gameTransactionManager);
+  }
+
+  @Test
+  @DisplayName("markPendingReview — 狀態非 OPEN/SETTLED 返回錯誤")
+  void markPendingReview_invalidStatus() {
+    GameRoundPendingReviewForm form = new GameRoundPendingReviewForm();
+    form.setRoundId(1L);
+    form.setReason("Test");
+
+    GameRoundEntity round = buildSettledRound();
+    round.setStatus(RoundStatusEnum.CANCELLED.getValue());
+    when(gameRoundDao.selectById(1L)).thenReturn(round);
+
+    ResponseDTO<String> result = gameRoundAdminService.markPendingReview(form);
+
+    assertThat(result.getOk()).isFalse();
+    verifyNoInteractions(gameTransactionManager);
   }
 
   private GameRoundEntity buildSettledRound() {

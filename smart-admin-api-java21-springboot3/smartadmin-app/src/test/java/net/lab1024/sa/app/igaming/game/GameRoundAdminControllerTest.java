@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.controller.GameRoundAdminController;
+import net.lab1024.sa.igaming.game.domain.form.GameRoundPendingReviewForm;
 import net.lab1024.sa.igaming.game.domain.form.ResettlementForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.service.GameRoundAdminService;
@@ -66,5 +67,20 @@ class GameRoundAdminControllerTest {
 
     assertThat(result.getOk()).isFalse();
     verify(gameRoundAdminService).resettle(form);
+  }
+
+  @Test
+  @DisplayName("markPendingReview → 成功委託 service")
+  void markPendingReview_success() {
+    GameRoundPendingReviewForm form = new GameRoundPendingReviewForm();
+    form.setRoundId(1L);
+    form.setReason("Suspicious activity");
+
+    when(gameRoundAdminService.markPendingReview(form)).thenReturn(ResponseDTO.ok());
+
+    ResponseDTO<String> result = gameRoundAdminController.markPendingReview(form);
+
+    assertThat(result.getOk()).isTrue();
+    verify(gameRoundAdminService).markPendingReview(form);
   }
 }

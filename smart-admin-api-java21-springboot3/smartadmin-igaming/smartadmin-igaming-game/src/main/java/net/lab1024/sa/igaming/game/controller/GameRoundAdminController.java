@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.common.constant.IgamingSwaggerTagConst;
+import net.lab1024.sa.igaming.game.domain.form.GameRoundPendingReviewForm;
 import net.lab1024.sa.igaming.game.domain.form.ResettlementForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.service.GameRoundAdminService;
@@ -32,5 +33,13 @@ public class GameRoundAdminController {
   @PostMapping("/igaming/admin/game/round/resettle")
   public ResponseDTO<CallbackResponseVO> resettle(@RequestBody @Valid ResettlementForm form) {
     return gameRoundAdminService.resettle(form);
+  }
+
+  @SaCheckPermission("game:round:admin")
+  @Operation(summary = "Mark game round as pending review")
+  @PostMapping("/igaming/admin/game/round/pending-review")
+  public ResponseDTO<String> markPendingReview(
+      @RequestBody @Valid GameRoundPendingReviewForm form) {
+    return gameRoundAdminService.markPendingReview(form);
   }
 }
