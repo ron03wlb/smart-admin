@@ -30,6 +30,10 @@ public class RiskScoreService {
 
   @SuppressWarnings("unchecked")
   public ResponseDTO<PageResult<RiskScoreVO>> queryPage(RiskScoreQueryForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     Page<RiskScoreEntity> page = (Page<RiskScoreEntity>) SmartPageUtil.convert2PageQuery(form);
 
     LambdaQueryWrapper<RiskScoreEntity> wrapper =

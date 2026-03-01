@@ -139,5 +139,27 @@ class WageringEventConsumerTest {
 
       verifyNoInteractions(wageringProgressManager);
     }
+
+    @Test
+    @DisplayName("BET_PLACED tenantId 為 null — 跳過處理")
+    void betPlaced_nullTenantId_skips() throws JsonProcessingException {
+      ObjectNode payload = JsonNodeFactory.instance.objectNode();
+      payload.put("playerId", 1L);
+      payload.put("gameCode", "slot-001");
+      payload.put("amount", "50.00");
+
+      DomainEvent event =
+          DomainEvent.builder()
+              .eventType("BET_PLACED")
+              .aggregateType("GameRound")
+              .aggregateId("1")
+              .tenantId(null)
+              .payload(payload)
+              .build();
+
+      wageringEventConsumer.onGameEvent(MAPPER.writeValueAsString(event));
+
+      verifyNoInteractions(wageringProgressManager);
+    }
   }
 }

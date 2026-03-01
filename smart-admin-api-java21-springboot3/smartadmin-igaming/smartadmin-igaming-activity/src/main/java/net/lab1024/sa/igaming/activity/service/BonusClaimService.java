@@ -89,6 +89,10 @@ public class BonusClaimService {
 
   public ResponseDTO<PageResult<PlayerBonusRecordVO>> queryBonusRecords(
       Long playerId, WageringProgressQueryForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     form.setPlayerId(playerId);
     Page<?> page = SmartPageUtil.convert2PageQuery(form);
     List<PlayerBonusRecordVO> list = playerBonusRecordDao.queryPage(page, form);
@@ -97,6 +101,10 @@ public class BonusClaimService {
   }
 
   public Option<WageringProgressVO> getWageringProgress(Long playerId, Long recordId) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return Option.none();
+    }
     PlayerBonusRecordEntity record = playerBonusRecordDao.selectById(recordId);
     if (record == null || record.getDeleted() || !record.getPlayerId().equals(playerId)) {
       return Option.none();

@@ -136,6 +136,10 @@ public class AffiliateService {
    * @return success or error response
    */
   public ResponseDTO<String> approveCommission(CommissionApprovalForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     AffiliateCommissionRecordEntity record =
         affiliateCommissionRecordDao.selectById(form.getRecordId());
     if (record == null) {
@@ -153,6 +157,10 @@ public class AffiliateService {
    * @return success or error response
    */
   public ResponseDTO<String> rejectCommission(CommissionApprovalForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     AffiliateCommissionRecordEntity record =
         affiliateCommissionRecordDao.selectById(form.getRecordId());
     if (record == null) {
@@ -170,6 +178,10 @@ public class AffiliateService {
    * @return plan entity or error
    */
   public ResponseDTO<AffiliateCommissionPlanEntity> getCommissionPlan(Long planId) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     return Option.of(affiliateCommissionPlanDao.selectById(planId))
         .map(ResponseDTO::ok)
         .getOrElse(

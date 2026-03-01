@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.json.util.JsonUtil;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -51,7 +52,17 @@ public class WageringEventConsumer {
       return;
     }
 
+    Long tenantId = event.getTenantId();
+    if (tenantId == null) {
+      log.warn(
+          "Event missing tenantId, skipping: eventId={}, eventType={}",
+          event.getEventId(),
+          EVENT_TYPE_BET_PLACED);
+      return;
+    }
+
     try {
+      TenantContext.setTenantId(tenantId);
       processBetPlaced(event);
     } catch (Exception e) {
       log.error(
@@ -59,6 +70,8 @@ public class WageringEventConsumer {
           event.getEventId(),
           e.getMessage(),
           e);
+    } finally {
+      TenantContext.clear();
     }
   }
 

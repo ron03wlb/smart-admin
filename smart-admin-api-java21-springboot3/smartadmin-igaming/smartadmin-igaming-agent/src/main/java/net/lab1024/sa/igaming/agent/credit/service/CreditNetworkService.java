@@ -164,6 +164,10 @@ public class CreditNetworkService {
    * @return success or error response
    */
   public ResponseDTO<String> verifyPayment(Long settlementRecordId, String txnId) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     SettlementRecordEntity record = settlementRecordDao.selectById(settlementRecordId);
     if (record == null) {
       return ResponseDTO.userErrorParam(AgentErrorCode.SETTLEMENT_NOT_FOUND.getMsg());

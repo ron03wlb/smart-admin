@@ -30,6 +30,10 @@ public class GameLobbyService {
   private final GameCacheManager gameCacheManager;
 
   public ResponseDTO<PageResult<GameVO>> searchGames(GameQueryForm form) {
+    Long tenantId = TenantContext.getTenantId();
+    if (tenantId == null) {
+      return ResponseDTO.userErrorParam("Tenant context not initialized");
+    }
     Page<?> page = SmartPageUtil.convert2PageQuery(form);
     List<GameVO> list = gameDao.queryPage(page, form);
     PageResult<GameVO> result = SmartPageUtil.convert2PageResult(page, list);
