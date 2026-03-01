@@ -14,5 +14,6 @@ public class CallbackResponseVO {
 
   private String transactionId;
   private BigDecimal balance;
+  private BigDecimal bonusBalance;
   private Integer status;
 }

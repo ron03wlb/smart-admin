@@ -5,21 +5,28 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.function.Supplier;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.common.redislock.LockService;
 import net.lab1024.sa.igaming.common.config.IgamingProperties;
+import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.game.adapter.GpSignatureVerifier;
 import net.lab1024.sa.igaming.game.dao.GameRoundDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameRoundEntity;
+import net.lab1024.sa.igaming.game.domain.form.CallbackBalanceForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackCreditForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackDebitForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.manager.GameTransactionManager;
 import net.lab1024.sa.igaming.game.service.GameCallbackService;
+import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
+import net.lab1024.sa.igaming.wallet.dao.WalletDao;
+import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
+import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +55,8 @@ class GameCallbackServiceTest {
   @Mock private GameTransactionManager gameTransactionManager;
   @Mock private LockService lockService;
   @Spy private IgamingProperties igamingProperties = new IgamingProperties();
+  @Mock private WalletDao walletDao;
+  @Mock private WalletBonusExtDao walletBonusExtDao;
   @InjectMocks private GameCallbackService gameCallbackService;
 
   private MockedStatic<TenantContext> tenantContextMock;
@@ -227,6 +236,97 @@ class GameCallbackServiceTest {
       ResponseDTO<CallbackResponseVO> result = gameCallbackService.queryRound("gp-round-999");
       assertThat(result.getOk()).isFalse();
     }
+  }
+
+  @Nested
+  @DisplayName("processBalance 餘額查詢")
+  class ProcessBalanceTest {
+
+    @Test
+    @DisplayName("成功 — 返回 CASH + BONUS 餘額")
+    @SuppressWarnings("unchecked")
+    void processBalance_success() {
+      CallbackBalanceForm form = buildBalanceForm();
+      when(gpSignatureVerifier.verify(anyString(), anyString(), any(), any())).thenReturn(true);
+
+      WalletEntity cashWallet = new WalletEntity();
+      cashWallet.setWalletId(1L);
+      cashWallet.setPlayerId(1L);
+      cashWallet.setBalance(new BigDecimal("100.00"));
+      cashWallet.setLockedAmount(BigDecimal.ZERO);
+      when(walletDao.selectOne(any())).thenReturn(cashWallet).thenReturn(null);
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processBalance(form);
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getBalance()).isEqualByComparingTo("100.00");
+    }
+
+    @Test
+    @DisplayName("簽名錯誤 — 拒絕")
+    void processBalance_invalidSignature() {
+      CallbackBalanceForm form = buildBalanceForm();
+      form.setSignature("bad-sig");
+      when(gpSignatureVerifier.verify(anyString(), anyString(), eq("bad-sig"), any()))
+          .thenReturn(false);
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processBalance(form);
+      assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("錢包不存在 — 返回錯誤")
+    @SuppressWarnings("unchecked")
+    void processBalance_walletNotFound() {
+      CallbackBalanceForm form = buildBalanceForm();
+      when(gpSignatureVerifier.verify(anyString(), anyString(), any(), any())).thenReturn(true);
+      when(walletDao.selectOne(any())).thenReturn(null);
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processBalance(form);
+      assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("有 BONUS — 返回合併餘額")
+    @SuppressWarnings("unchecked")
+    void processBalance_withBonus() {
+      CallbackBalanceForm form = buildBalanceForm();
+      form.setGameCode("slot-001");
+      when(gpSignatureVerifier.verify(anyString(), anyString(), any(), any())).thenReturn(true);
+
+      WalletEntity cashWallet = new WalletEntity();
+      cashWallet.setWalletId(1L);
+      cashWallet.setPlayerId(1L);
+      cashWallet.setBalance(new BigDecimal("100.00"));
+      cashWallet.setLockedAmount(BigDecimal.ZERO);
+
+      WalletEntity bonusWallet = new WalletEntity();
+      bonusWallet.setWalletId(2L);
+      bonusWallet.setPlayerId(1L);
+      bonusWallet.setBalance(new BigDecimal("50.00"));
+      bonusWallet.setLockedAmount(BigDecimal.ZERO);
+
+      // First selectOne call = CASH wallet, second = BONUS wallet
+      when(walletDao.selectOne(any())).thenReturn(cashWallet).thenReturn(bonusWallet);
+
+      WalletBonusExtEntity bonusExt = new WalletBonusExtEntity();
+      bonusExt.setWalletId(2L);
+      bonusExt.setBalance(new BigDecimal("50.00"));
+      bonusExt.setStatus(BonusStatusEnum.ACTIVE.getValue());
+      bonusExt.setGameRestriction(null);
+      when(walletBonusExtDao.selectList(any())).thenReturn(List.of(bonusExt));
+
+      ResponseDTO<CallbackResponseVO> result = gameCallbackService.processBalance(form);
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getBalance()).isEqualByComparingTo("150.00");
+      assertThat(result.getData().getBonusBalance()).isEqualByComparingTo("50.00");
+    }
+  }
+
+  private CallbackBalanceForm buildBalanceForm() {
+    CallbackBalanceForm form = new CallbackBalanceForm();
+    form.setProviderCode("mock");
+    form.setPlayerId(1L);
+    return form;
   }
 
   private CallbackDebitForm buildDebitForm() {

@@ -2,9 +2,11 @@ package net.lab1024.sa.igaming.game.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -12,6 +14,7 @@ import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.common.code.GameErrorCode;
+import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
 import net.lab1024.sa.igaming.common.constant.DomainEventTypeConst;
 import net.lab1024.sa.igaming.common.constant.ReconciliationStatusEnum;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
@@ -26,7 +29,10 @@ import net.lab1024.sa.igaming.game.domain.form.CallbackCreditForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackDebitForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
+import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
+import net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao;
+import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
@@ -50,63 +56,114 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameTransactionManager {
 
   private static final BigDecimal DEFAULT_WEIGHT = BigDecimal.ONE;
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final GameRoundDao gameRoundDao;
   private final GameDao gameDao;
   private final GameWeightConfigDao gameWeightConfigDao;
   private final WalletDao walletDao;
+  private final WalletBonusExtDao walletBonusExtDao;
+  private final WalletTransactionDao walletTransactionDao;
   private final WalletManager walletManager;
   private final DomainEventPublisher domainEventPublisher;
 
   /**
-   * Execute debit (bet placement).
+   * Execute debit (bet placement) with multi-wallet priority: BONUS → CASH.
    *
-   * <p>Creates a game round and debits the player's CASH wallet atomically. DuplicateKeyException
-   * on transactionId is caught for Layer 2 idempotency.
+   * <p>When a player has eligible BONUS balance for the game, it is deducted first (FIFO by
+   * expiry). Any remaining amount is deducted from the CASH wallet. Each wallet debit produces its
+   * own transaction record with a distinct requestId for idempotency.
    */
   @Transactional(rollbackFor = Throwable.class)
   public ResponseDTO<CallbackResponseVO> executeDebit(CallbackDebitForm form, Long tenantId) {
-    // Find player's CASH wallet
-    WalletEntity wallet = findCashWallet(form.getPlayerId());
-    if (wallet == null) {
+    // 1. Find player's CASH wallet (required)
+    WalletEntity cashWallet = findCashWallet(form.getPlayerId());
+    if (cashWallet == null) {
       return ResponseDTO.userErrorParam(GameErrorCode.INSUFFICIENT_BALANCE.getMsg());
     }
 
-    // Check available balance
-    BigDecimal available = wallet.getBalance().subtract(wallet.getLockedAmount());
-    if (available.compareTo(form.getAmount()) < 0) {
+    // 2. Find BONUS wallet (optional)
+    WalletEntity bonusWallet = findBonusWallet(form.getPlayerId());
+
+    // 3. Calculate eligible bonus balance for this game
+    BigDecimal eligibleBonus = BigDecimal.ZERO;
+    if (bonusWallet != null) {
+      eligibleBonus = calculateEligibleBonusForGame(bonusWallet.getWalletId(), form.getGameCode());
+    }
+
+    // 4. Determine debit allocation: BONUS first, then CASH
+    BigDecimal betAmount = form.getAmount();
+    BigDecimal bonusDebit = eligibleBonus.min(betAmount);
+    BigDecimal cashDebit = betAmount.subtract(bonusDebit);
+
+    // 5. Check CASH available balance covers the cash portion
+    BigDecimal cashAvailable = cashWallet.getBalance().subtract(cashWallet.getLockedAmount());
+    if (cashAvailable.compareTo(cashDebit) < 0) {
       return ResponseDTO.userErrorParam(GameErrorCode.INSUFFICIENT_BALANCE.getMsg());
     }
 
-    // Build wallet transaction and update balance
-    BigDecimal balanceBefore = wallet.getBalance();
-    BigDecimal balanceAfter = balanceBefore.subtract(form.getAmount());
+    // 6. Debit BONUS wallet if applicable
+    BigDecimal bonusBalanceAfter = BigDecimal.ZERO;
+    if (bonusDebit.compareTo(BigDecimal.ZERO) > 0 && bonusWallet != null) {
+      BigDecimal bonusBefore = bonusWallet.getBalance();
+      bonusBalanceAfter = bonusBefore.subtract(bonusDebit);
 
-    WalletTransactionEntity transaction = new WalletTransactionEntity();
-    transaction.setWalletId(wallet.getWalletId());
-    transaction.setPlayerId(wallet.getPlayerId());
-    transaction.setTransactionType(TransactionTypeEnum.BET.getValue());
-    transaction.setAmount(form.getAmount().negate());
-    transaction.setBalanceBefore(balanceBefore);
-    transaction.setBalanceAfter(balanceAfter);
-    transaction.setRequestId(form.getTransactionId());
-    transaction.setReferenceType("GAME_ROUND");
-    transaction.setReferenceId(form.getRoundId());
-    transaction.setDescription("Game bet: " + form.getGameCode());
+      WalletTransactionEntity bonusTx = new WalletTransactionEntity();
+      bonusTx.setWalletId(bonusWallet.getWalletId());
+      bonusTx.setPlayerId(bonusWallet.getPlayerId());
+      bonusTx.setTransactionType(TransactionTypeEnum.BET.getValue());
+      bonusTx.setAmount(bonusDebit.negate());
+      bonusTx.setBalanceBefore(bonusBefore);
+      bonusTx.setBalanceAfter(bonusBalanceAfter);
+      bonusTx.setRequestId(form.getTransactionId() + ":bonus");
+      bonusTx.setReferenceType("GAME_ROUND");
+      bonusTx.setReferenceId(form.getRoundId());
+      bonusTx.setDescription("Game bet (bonus): " + form.getGameCode());
 
-    wallet.setBalance(balanceAfter);
+      bonusWallet.setBalance(bonusBalanceAfter);
 
-    try {
-      walletManager.debit(wallet, transaction);
-    } catch (OptimisticLockingFailureException e) {
-      return ResponseDTO.userErrorParam(GameErrorCode.DEBIT_FAILED.getMsg());
+      try {
+        walletManager.debitBonus(bonusWallet, bonusTx, bonusDebit);
+      } catch (OptimisticLockingFailureException e) {
+        return ResponseDTO.userErrorParam(GameErrorCode.DEBIT_FAILED.getMsg());
+      }
     }
 
-    // Calculate weighted turnover (inline from removed GameWeightService)
+    // 7. Debit CASH wallet if applicable
+    BigDecimal cashBalanceAfter = cashWallet.getBalance();
+    if (cashDebit.compareTo(BigDecimal.ZERO) > 0) {
+      BigDecimal cashBefore = cashWallet.getBalance();
+      cashBalanceAfter = cashBefore.subtract(cashDebit);
+
+      WalletTransactionEntity cashTx = new WalletTransactionEntity();
+      cashTx.setWalletId(cashWallet.getWalletId());
+      cashTx.setPlayerId(cashWallet.getPlayerId());
+      cashTx.setTransactionType(TransactionTypeEnum.BET.getValue());
+      cashTx.setAmount(cashDebit.negate());
+      cashTx.setBalanceBefore(cashBefore);
+      cashTx.setBalanceAfter(cashBalanceAfter);
+      cashTx.setRequestId(
+          bonusDebit.compareTo(BigDecimal.ZERO) > 0
+              ? form.getTransactionId() + ":cash"
+              : form.getTransactionId());
+      cashTx.setReferenceType("GAME_ROUND");
+      cashTx.setReferenceId(form.getRoundId());
+      cashTx.setDescription("Game bet (cash): " + form.getGameCode());
+
+      cashWallet.setBalance(cashBalanceAfter);
+
+      try {
+        walletManager.debit(cashWallet, cashTx);
+      } catch (OptimisticLockingFailureException e) {
+        return ResponseDTO.userErrorParam(GameErrorCode.DEBIT_FAILED.getMsg());
+      }
+    }
+
+    // 8. Calculate weighted turnover
     BigDecimal weightedTurnover =
         calculateWeightedTurnover(tenantId, form.getGameCode(), form.getAmount());
 
-    // Create game round
+    // 9. Create game round
     GameRoundEntity round = new GameRoundEntity();
     round.setTenantId(tenantId);
     round.setPlayerId(form.getPlayerId());
@@ -127,17 +184,18 @@ public class GameTransactionManager {
       log.info("Idempotent debit Layer 2: transactionId={}", form.getTransactionId());
     }
 
-    // Publish BET_PLACED event
+    // 10. Publish BET_PLACED event with bonus/cash breakdown
     publishGameEvent(
         DomainEventTypeConst.BET_PLACED,
         form.getPlayerId(),
         tenantId,
-        buildBetPlacedPayload(form, weightedTurnover, balanceAfter));
+        buildBetPlacedPayload(form, weightedTurnover, cashBalanceAfter, bonusDebit, cashDebit));
 
-    // Build response
+    // 11. Build response
     CallbackResponseVO response = new CallbackResponseVO();
     response.setTransactionId(form.getTransactionId());
-    response.setBalance(balanceAfter);
+    response.setBalance(cashBalanceAfter);
+    response.setBonusBalance(bonusBalanceAfter);
     response.setStatus(RoundStatusEnum.OPEN.getValue());
     return ResponseDTO.ok(response);
   }
@@ -212,9 +270,10 @@ public class GameTransactionManager {
   }
 
   /**
-   * Execute rollback (bet cancellation).
+   * Execute rollback (bet cancellation) with dual-wallet refund support.
    *
-   * <p>Refunds the player's CASH wallet and marks the round as CANCELLED.
+   * <p>Looks up original debit transactions by requestId pattern to determine which wallets were
+   * debited (BONUS, CASH, or both), then refunds each accordingly.
    */
   @Transactional(rollbackFor = Throwable.class)
   public ResponseDTO<CallbackResponseVO> executeRollback(CallbackRollbackForm form, Long tenantId) {
@@ -231,34 +290,88 @@ public class GameTransactionManager {
       return ResponseDTO.ok(response);
     }
 
-    // Find player's CASH wallet
-    WalletEntity wallet = findCashWallet(form.getPlayerId());
-    if (wallet == null) {
+    // Find original debit transactions to determine refund allocation
+    String origTxId = form.getOriginalTransactionId();
+    WalletTransactionEntity bonusOrigTx = findTransactionByRequestId(origTxId + ":bonus");
+    WalletTransactionEntity cashOrigTx = findTransactionByRequestId(origTxId + ":cash");
+    WalletTransactionEntity singleOrigTx =
+        (bonusOrigTx == null && cashOrigTx == null) ? findTransactionByRequestId(origTxId) : null;
+
+    // Refund BONUS wallet if there was a bonus debit
+    BigDecimal bonusBalanceAfter = BigDecimal.ZERO;
+    if (bonusOrigTx != null) {
+      BigDecimal bonusRefund = bonusOrigTx.getAmount().abs();
+      WalletEntity bonusWallet = findBonusWallet(form.getPlayerId());
+      if (bonusWallet != null) {
+        BigDecimal bonusBefore = bonusWallet.getBalance();
+        bonusBalanceAfter = bonusBefore.add(bonusRefund);
+
+        WalletTransactionEntity bonusRefundTx = new WalletTransactionEntity();
+        bonusRefundTx.setWalletId(bonusWallet.getWalletId());
+        bonusRefundTx.setPlayerId(bonusWallet.getPlayerId());
+        bonusRefundTx.setTransactionType(TransactionTypeEnum.ROLLBACK.getValue());
+        bonusRefundTx.setAmount(bonusRefund);
+        bonusRefundTx.setBalanceBefore(bonusBefore);
+        bonusRefundTx.setBalanceAfter(bonusBalanceAfter);
+        bonusRefundTx.setRequestId("rollback:" + origTxId + ":bonus");
+        bonusRefundTx.setReferenceType("GAME_ROUND_ROLLBACK");
+        bonusRefundTx.setReferenceId(String.valueOf(round.getRoundId()));
+        bonusRefundTx.setDescription("Rollback bonus bet: " + origTxId);
+
+        bonusWallet.setBalance(bonusBalanceAfter);
+
+        try {
+          walletManager.credit(bonusWallet, bonusRefundTx);
+        } catch (OptimisticLockingFailureException e) {
+          return ResponseDTO.userErrorParam(GameErrorCode.ROLLBACK_FAILED.getMsg());
+        }
+      }
+    }
+
+    // Refund CASH wallet
+    WalletEntity cashWallet = findCashWallet(form.getPlayerId());
+    if (cashWallet == null) {
       return ResponseDTO.userErrorParam(GameErrorCode.ROLLBACK_FAILED.getMsg());
     }
 
-    // Build wallet transaction (refund) and update balance
-    BigDecimal balanceBefore = wallet.getBalance();
-    BigDecimal balanceAfter = balanceBefore.add(round.getBetAmount());
+    BigDecimal cashRefund;
+    if (cashOrigTx != null) {
+      cashRefund = cashOrigTx.getAmount().abs();
+    } else if (singleOrigTx != null) {
+      cashRefund = singleOrigTx.getAmount().abs();
+    } else if (bonusOrigTx != null) {
+      // Only bonus was debited, no cash refund needed
+      cashRefund = BigDecimal.ZERO;
+    } else {
+      // Fallback: refund full bet amount to CASH (legacy rounds without transaction records)
+      cashRefund = round.getBetAmount();
+    }
 
-    WalletTransactionEntity transaction = new WalletTransactionEntity();
-    transaction.setWalletId(wallet.getWalletId());
-    transaction.setPlayerId(wallet.getPlayerId());
-    transaction.setTransactionType(TransactionTypeEnum.ROLLBACK.getValue());
-    transaction.setAmount(round.getBetAmount());
-    transaction.setBalanceBefore(balanceBefore);
-    transaction.setBalanceAfter(balanceAfter);
-    transaction.setRequestId("rollback:" + form.getOriginalTransactionId());
-    transaction.setReferenceType("GAME_ROUND_ROLLBACK");
-    transaction.setReferenceId(String.valueOf(round.getRoundId()));
-    transaction.setDescription("Rollback bet: " + form.getOriginalTransactionId());
+    BigDecimal cashBalanceAfter = cashWallet.getBalance();
+    if (cashRefund.compareTo(BigDecimal.ZERO) > 0) {
+      BigDecimal cashBefore = cashWallet.getBalance();
+      cashBalanceAfter = cashBefore.add(cashRefund);
 
-    wallet.setBalance(balanceAfter);
+      WalletTransactionEntity cashRefundTx = new WalletTransactionEntity();
+      cashRefundTx.setWalletId(cashWallet.getWalletId());
+      cashRefundTx.setPlayerId(cashWallet.getPlayerId());
+      cashRefundTx.setTransactionType(TransactionTypeEnum.ROLLBACK.getValue());
+      cashRefundTx.setAmount(cashRefund);
+      cashRefundTx.setBalanceBefore(cashBefore);
+      cashRefundTx.setBalanceAfter(cashBalanceAfter);
+      cashRefundTx.setRequestId(
+          cashOrigTx != null ? "rollback:" + origTxId + ":cash" : "rollback:" + origTxId);
+      cashRefundTx.setReferenceType("GAME_ROUND_ROLLBACK");
+      cashRefundTx.setReferenceId(String.valueOf(round.getRoundId()));
+      cashRefundTx.setDescription("Rollback cash bet: " + origTxId);
 
-    try {
-      walletManager.credit(wallet, transaction);
-    } catch (OptimisticLockingFailureException e) {
-      return ResponseDTO.userErrorParam(GameErrorCode.ROLLBACK_FAILED.getMsg());
+      cashWallet.setBalance(cashBalanceAfter);
+
+      try {
+        walletManager.credit(cashWallet, cashRefundTx);
+      } catch (OptimisticLockingFailureException e) {
+        return ResponseDTO.userErrorParam(GameErrorCode.ROLLBACK_FAILED.getMsg());
+      }
     }
 
     // Update round to CANCELLED
@@ -270,11 +383,12 @@ public class GameTransactionManager {
         DomainEventTypeConst.BET_CANCELLED,
         form.getPlayerId(),
         tenantId,
-        buildBetCancelledPayload(form, round, balanceAfter));
+        buildBetCancelledPayload(form, round, cashBalanceAfter));
 
     CallbackResponseVO response = new CallbackResponseVO();
     response.setTransactionId(form.getOriginalTransactionId());
-    response.setBalance(balanceAfter);
+    response.setBalance(cashBalanceAfter);
+    response.setBonusBalance(bonusBalanceAfter);
     response.setStatus(RoundStatusEnum.CANCELLED.getValue());
     return ResponseDTO.ok(response);
   }
@@ -430,6 +544,61 @@ public class GameTransactionManager {
     return walletDao.selectForUpdate(playerId, WalletTypeEnum.CASH.getValue());
   }
 
+  private WalletEntity findBonusWallet(Long playerId) {
+    return walletDao.selectForUpdate(playerId, WalletTypeEnum.BONUS.getValue());
+  }
+
+  private WalletTransactionEntity findTransactionByRequestId(String requestId) {
+    return walletTransactionDao.selectOne(
+        Wrappers.<WalletTransactionEntity>lambdaQuery()
+            .eq(WalletTransactionEntity::getRequestId, requestId));
+  }
+
+  /**
+   * Calculate eligible bonus balance for a specific game (within transaction, using locked data).
+   */
+  private BigDecimal calculateEligibleBonusForGame(Long bonusWalletId, String gameCode) {
+    List<WalletBonusExtEntity> activeRecords =
+        walletBonusExtDao.selectList(
+            Wrappers.<WalletBonusExtEntity>lambdaQuery()
+                .eq(WalletBonusExtEntity::getWalletId, bonusWalletId)
+                .eq(WalletBonusExtEntity::getStatus, BonusStatusEnum.ACTIVE.getValue())
+                .gt(WalletBonusExtEntity::getBalance, BigDecimal.ZERO));
+
+    BigDecimal eligible = BigDecimal.ZERO;
+    for (WalletBonusExtEntity ext : activeRecords) {
+      if (isGameEligible(ext.getGameRestriction(), gameCode)) {
+        eligible = eligible.add(ext.getBalance());
+      }
+    }
+    return eligible;
+  }
+
+  private boolean isGameEligible(String gameRestriction, String gameCode) {
+    if (gameRestriction == null || gameRestriction.isBlank()) {
+      return true;
+    }
+    if (gameCode == null || gameCode.isBlank()) {
+      return true;
+    }
+    try {
+      JsonNode node = OBJECT_MAPPER.readTree(gameRestriction);
+      JsonNode allowedGames = node.get("allowedGames");
+      if (allowedGames != null && allowedGames.isArray()) {
+        for (JsonNode game : allowedGames) {
+          if (gameCode.equals(game.asText())) {
+            return true;
+          }
+        }
+        return false;
+      }
+      return true;
+    } catch (Exception e) {
+      log.warn("Failed to parse gameRestriction: {}", gameRestriction, e);
+      return false;
+    }
+  }
+
   @SuppressWarnings("FutureReturnValueIgnored")
   private void publishGameEvent(String eventType, Long playerId, Long tenantId, JsonNode payload) {
     domainEventPublisher.publish(
@@ -444,15 +613,21 @@ public class GameTransactionManager {
   }
 
   private JsonNode buildBetPlacedPayload(
-      CallbackDebitForm form, BigDecimal weightedTurnover, BigDecimal balanceAfter) {
+      CallbackDebitForm form,
+      BigDecimal weightedTurnover,
+      BigDecimal cashBalanceAfter,
+      BigDecimal bonusDebit,
+      BigDecimal cashDebit) {
     ObjectNode node = JsonNodeFactory.instance.objectNode();
     node.put("playerId", form.getPlayerId());
     node.put("transactionId", form.getTransactionId());
     node.put("roundId", form.getRoundId());
     node.put("gameCode", form.getGameCode());
     node.put("amount", form.getAmount().toPlainString());
+    node.put("bonusDebit", bonusDebit.toPlainString());
+    node.put("cashDebit", cashDebit.toPlainString());
     node.put("weightedTurnover", weightedTurnover.toPlainString());
-    node.put("balanceAfter", balanceAfter.toPlainString());
+    node.put("cashBalanceAfter", cashBalanceAfter.toPlainString());
     return node;
   }
 

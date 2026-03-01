@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.lab1024.sa.common.core.annotation.NoNeedLogin;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.common.constant.IgamingSwaggerTagConst;
+import net.lab1024.sa.igaming.game.domain.form.CallbackBalanceForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackCreditForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackDebitForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
@@ -50,6 +51,13 @@ public class GameCallbackController {
   @PostMapping("/igaming/game/callback/rollback")
   public ResponseDTO<CallbackResponseVO> rollback(@RequestBody @Valid CallbackRollbackForm form) {
     return gameCallbackService.processRollback(form);
+  }
+
+  @NoNeedLogin
+  @Operation(summary = "GP balance query")
+  @GetMapping("/igaming/game/callback/balance")
+  public ResponseDTO<CallbackResponseVO> balance(@Valid CallbackBalanceForm form) {
+    return gameCallbackService.processBalance(form);
   }
 
   @NoNeedLogin

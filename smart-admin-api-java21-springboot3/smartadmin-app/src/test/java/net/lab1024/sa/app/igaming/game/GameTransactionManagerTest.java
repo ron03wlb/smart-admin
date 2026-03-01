@@ -7,10 +7,12 @@ import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
+import java.util.List;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
+import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
 import net.lab1024.sa.igaming.common.constant.RoundStatusEnum;
 import net.lab1024.sa.igaming.common.constant.WalletTypeEnum;
 import net.lab1024.sa.igaming.game.dao.GameDao;
@@ -22,7 +24,10 @@ import net.lab1024.sa.igaming.game.domain.form.CallbackDebitForm;
 import net.lab1024.sa.igaming.game.domain.form.CallbackRollbackForm;
 import net.lab1024.sa.igaming.game.domain.vo.CallbackResponseVO;
 import net.lab1024.sa.igaming.game.manager.GameTransactionManager;
+import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
+import net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao;
+import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
@@ -50,6 +55,8 @@ class GameTransactionManagerTest {
   @Mock private GameDao gameDao;
   @Mock private GameWeightConfigDao gameWeightConfigDao;
   @Mock private WalletDao walletDao;
+  @Mock private WalletBonusExtDao walletBonusExtDao;
+  @Mock private WalletTransactionDao walletTransactionDao;
   @Mock private WalletManager walletManager;
   @Mock private DomainEventPublisher domainEventPublisher;
   @InjectMocks private GameTransactionManager gameTransactionManager;
@@ -125,6 +132,101 @@ class GameTransactionManagerTest {
       ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeDebit(form, 1L);
 
       assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("BONUS 優先 — 全額 BONUS 扣款，不動 CASH")
+    @SuppressWarnings("unchecked")
+    void executeDebit_bonusFirst() {
+      CallbackDebitForm form = buildDebitForm(); // amount=10.00
+
+      WalletEntity cashWallet = buildWallet(); // balance=100
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(cashWallet);
+
+      WalletEntity bonusWallet = buildBonusWallet(new BigDecimal("50.00"));
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.BONUS.getValue())).thenReturn(bonusWallet);
+
+      WalletBonusExtEntity bonusExt = new WalletBonusExtEntity();
+      bonusExt.setWalletId(2L);
+      bonusExt.setBalance(new BigDecimal("50.00"));
+      bonusExt.setStatus(BonusStatusEnum.ACTIVE.getValue());
+      bonusExt.setGameRestriction(null); // all games eligible
+      when(walletBonusExtDao.selectList(any())).thenReturn(List.of(bonusExt));
+
+      ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeDebit(form, 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getBalance()).isEqualByComparingTo("100.00"); // CASH untouched
+      assertThat(result.getData().getBonusBalance()).isEqualByComparingTo("40.00"); // 50-10
+      verify(walletManager).debitBonus(any(), any(), any());
+      verify(walletManager, never()).debit(any(), any());
+    }
+
+    @Test
+    @DisplayName("BONUS 部分 + CASH 部分 — 雙錢包扣款")
+    @SuppressWarnings("unchecked")
+    void executeDebit_bonusPartialCash() {
+      CallbackDebitForm form = buildDebitForm();
+      form.setAmount(new BigDecimal("30.00")); // bonus=20, cash=10
+
+      WalletEntity cashWallet = buildWallet(); // balance=100
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(cashWallet);
+
+      WalletEntity bonusWallet = buildBonusWallet(new BigDecimal("20.00"));
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.BONUS.getValue())).thenReturn(bonusWallet);
+
+      WalletBonusExtEntity bonusExt = new WalletBonusExtEntity();
+      bonusExt.setWalletId(2L);
+      bonusExt.setBalance(new BigDecimal("20.00"));
+      bonusExt.setStatus(BonusStatusEnum.ACTIVE.getValue());
+      bonusExt.setGameRestriction(null);
+      when(walletBonusExtDao.selectList(any())).thenReturn(List.of(bonusExt));
+
+      WalletTransactionEntity txEntity = new WalletTransactionEntity();
+      txEntity.setBalanceAfter(new BigDecimal("90.00"));
+      when(walletManager.debit(any(WalletEntity.class), any(WalletTransactionEntity.class)))
+          .thenReturn(txEntity);
+
+      ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeDebit(form, 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getBalance()).isEqualByComparingTo("90.00"); // 100-10
+      assertThat(result.getData().getBonusBalance()).isEqualByComparingTo("0.00"); // 20-20
+      verify(walletManager).debitBonus(any(), any(), any());
+      verify(walletManager).debit(any(), any());
+    }
+
+    @Test
+    @DisplayName("遊戲限制不符 — BONUS 不可用，全額 CASH")
+    @SuppressWarnings("unchecked")
+    void executeDebit_gameNotEligible() {
+      CallbackDebitForm form = buildDebitForm(); // gameCode=slot-001, amount=10
+
+      WalletEntity cashWallet = buildWallet(); // balance=100
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(cashWallet);
+
+      WalletEntity bonusWallet = buildBonusWallet(new BigDecimal("50.00"));
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.BONUS.getValue())).thenReturn(bonusWallet);
+
+      WalletBonusExtEntity bonusExt = new WalletBonusExtEntity();
+      bonusExt.setWalletId(2L);
+      bonusExt.setBalance(new BigDecimal("50.00"));
+      bonusExt.setStatus(BonusStatusEnum.ACTIVE.getValue());
+      bonusExt.setGameRestriction("{\"allowedGames\": [\"live-001\"]}"); // slot-001 NOT eligible
+      when(walletBonusExtDao.selectList(any())).thenReturn(List.of(bonusExt));
+
+      WalletTransactionEntity txEntity = new WalletTransactionEntity();
+      txEntity.setBalanceAfter(new BigDecimal("90.00"));
+      when(walletManager.debit(any(WalletEntity.class), any(WalletTransactionEntity.class)))
+          .thenReturn(txEntity);
+
+      ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeDebit(form, 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getBalance()).isEqualByComparingTo("90.00"); // 100-10
+      assertThat(result.getData().getBonusBalance()).isEqualByComparingTo("0.00"); // no bonus used
+      verify(walletManager, never()).debitBonus(any(), any(), any());
+      verify(walletManager).debit(any(), any());
     }
   }
 
@@ -209,6 +311,44 @@ class GameTransactionManagerTest {
       ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeRollback(form, 1L);
 
       assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("雙錢包退款 — BONUS + CASH 均退回")
+    @SuppressWarnings("unchecked")
+    void executeRollback_dualWallet() {
+      CallbackRollbackForm form = buildRollbackForm();
+
+      GameRoundEntity round = buildRound();
+      round.setBetAmount(new BigDecimal("30.00"));
+      when(gameRoundDao.selectByTransactionId("tx-001")).thenReturn(round);
+
+      // Original debit transactions: bonus=-20, cash=-10
+      WalletTransactionEntity bonusOrigTx = new WalletTransactionEntity();
+      bonusOrigTx.setAmount(new BigDecimal("-20.00"));
+      WalletTransactionEntity cashOrigTx = new WalletTransactionEntity();
+      cashOrigTx.setAmount(new BigDecimal("-10.00"));
+      when(walletTransactionDao.selectOne(any())).thenReturn(bonusOrigTx).thenReturn(cashOrigTx);
+
+      // Wallets
+      WalletEntity bonusWallet = buildBonusWallet(new BigDecimal("30.00"));
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.BONUS.getValue())).thenReturn(bonusWallet);
+
+      WalletEntity cashWallet = buildWallet(); // balance=100
+      when(walletDao.selectForUpdate(1L, WalletTypeEnum.CASH.getValue())).thenReturn(cashWallet);
+
+      WalletTransactionEntity refundTx = new WalletTransactionEntity();
+      refundTx.setBalanceAfter(BigDecimal.ZERO);
+      when(walletManager.credit(any(WalletEntity.class), any(WalletTransactionEntity.class)))
+          .thenReturn(refundTx);
+
+      ResponseDTO<CallbackResponseVO> result = gameTransactionManager.executeRollback(form, 1L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getStatus()).isEqualTo(RoundStatusEnum.CANCELLED.getValue());
+      assertThat(result.getData().getBonusBalance()).isEqualByComparingTo("50.00"); // 30+20
+      assertThat(result.getData().getBalance()).isEqualByComparingTo("110.00"); // 100+10
+      verify(walletManager, times(2)).credit(any(), any());
     }
   }
 
@@ -399,6 +539,16 @@ class GameTransactionManagerTest {
     wallet.setWalletId(1L);
     wallet.setPlayerId(1L);
     wallet.setBalance(new BigDecimal("100.00"));
+    wallet.setLockedAmount(BigDecimal.ZERO);
+    wallet.setDeleted(false);
+    return wallet;
+  }
+
+  private WalletEntity buildBonusWallet(BigDecimal balance) {
+    WalletEntity wallet = new WalletEntity();
+    wallet.setWalletId(2L);
+    wallet.setPlayerId(1L);
+    wallet.setBalance(balance);
     wallet.setLockedAmount(BigDecimal.ZERO);
     wallet.setDeleted(false);
     return wallet;
