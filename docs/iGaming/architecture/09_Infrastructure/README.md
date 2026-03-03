@@ -45,6 +45,7 @@
 | [串流處理架構](15_Stream_Processing_Architecture.md) | 串流處理架構 |
 | [緩存策略](14_Caching_Strategy.md) | 緩存架構與策略 |
 | [成本優化架構](16_Cost_Optimization_Architecture.md) | 基礎設施成本優化 |
+| [容量規劃分析](23_Capacity_Planning_Analysis.md) ⭐ NEW | 容量規劃分析（100K 用戶、10K DAU、120 TPS、$3.05M/年） |
 
 ## 安全與 Token 管理
 
