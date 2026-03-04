@@ -241,8 +241,7 @@ public class MfaRecoveryService {
         () -> {
           // Validate recovery code format (8 digits)
           if (SmartStringUtil.isEmpty(recoveryCode) || recoveryCode.length() != 8) {
-            log.warn(
-                "[MFA Recovery] Invalid recovery code format - EmployeeId: {}", employeeId);
+            log.warn("[MFA Recovery] Invalid recovery code format - EmployeeId: {}", employeeId);
             return false;
           }
 
@@ -250,8 +249,7 @@ public class MfaRecoveryService {
           MfaRecoveryRequestEntity request =
               mfaRecoveryRequestDao.selectApprovedByEmployeeId(employeeId);
           if (request == null) {
-            log.warn(
-                "[MFA Recovery] No valid recovery request found - EmployeeId: {}", employeeId);
+            log.warn("[MFA Recovery] No valid recovery request found - EmployeeId: {}", employeeId);
             return false;
           }
 

@@ -206,15 +206,13 @@ public class MfaRecoveryManager {
   public ResponseDTO<Void> resetMfaWithCodeTransaction(Long employeeId, String recoveryCode) {
 
     // Find approved recovery request
-    MfaRecoveryRequestEntity request =
-        mfaRecoveryRequestDao.selectApprovedByEmployeeId(employeeId);
+    MfaRecoveryRequestEntity request = mfaRecoveryRequestDao.selectApprovedByEmployeeId(employeeId);
     if (request == null) {
       return ResponseDTO.userErrorParam("恢復碼無效或已過期");
     }
 
     // Verify recovery code hash
-    boolean verified =
-        passwordEncryptService.matches(recoveryCode, request.getRecoveryCodeHash());
+    boolean verified = passwordEncryptService.matches(recoveryCode, request.getRecoveryCodeHash());
     if (!verified) {
       return ResponseDTO.userErrorParam("恢復碼錯誤");
     }

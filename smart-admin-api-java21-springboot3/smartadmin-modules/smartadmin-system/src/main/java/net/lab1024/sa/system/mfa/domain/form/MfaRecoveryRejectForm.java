@@ -22,7 +22,10 @@ public class MfaRecoveryRejectForm {
   @NotNull(message = "恢復請求 ID 不能為空")
   private Long recoveryId;
 
-  @Schema(description = "拒絕原因", example = "身份驗證信息不足，請聯繫 IT 部門", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(
+      description = "拒絕原因",
+      example = "身份驗證信息不足，請聯繫 IT 部門",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @NotBlank(message = "拒絕原因不能為空")
   @Length(min = 10, max = 500, message = "拒絕原因長度必須在10-500字符之間")
   private String rejectionReason;
