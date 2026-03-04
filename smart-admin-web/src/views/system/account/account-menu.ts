@@ -36,4 +36,9 @@ export const ACCOUNT_MENU = {
     menuName: '操作日志',
     components: markRaw(defineAsyncComponent(() => import('./components/operate-log/index.vue'))),
   },
+  MFA: {
+    menuId: 'mfa',
+    menuName: '多因素認證',
+    components: markRaw(defineAsyncComponent(() => import('./components/mfa/index.vue'))),
+  },
 };
