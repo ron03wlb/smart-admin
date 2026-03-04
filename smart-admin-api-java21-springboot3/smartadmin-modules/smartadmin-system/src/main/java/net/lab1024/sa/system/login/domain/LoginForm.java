@@ -35,4 +35,17 @@ public class LoginForm extends CaptchaForm {
 
   @Schema(description = "邮箱验证码")
   private String emailCode;
+
+  /** MFA token (6-digit TOTP or 8-digit backup code) */
+  @Schema(description = "MFA驗證碼（6位TOTP或8位備份碼）", example = "123456")
+  private String mfaToken;
+
+  /** Trust this device for 30 days */
+  @Schema(description = "信任此設備（30天內無需MFA）", example = "false")
+  private Boolean trustDevice = false;
+
+  /** Device name (if trust device) */
+  @Schema(description = "設備名稱（例如：我的iPhone 15）", example = "我的筆記本電腦")
+  @Length(max = 100, message = "設備名稱最多100字符")
+  private String deviceName;
 }

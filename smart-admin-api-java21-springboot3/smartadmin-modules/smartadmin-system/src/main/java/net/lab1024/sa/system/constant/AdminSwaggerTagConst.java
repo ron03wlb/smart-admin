@@ -47,5 +47,7 @@ public class AdminSwaggerTagConst extends SwaggerTagConst {
     public static final String SYSTEM_POSITION = "系统-职务管理";
 
     public static final String SYSTEM_MESSAGE = "系统-消息";
+
+    public static final String SYSTEM_MFA = "系统-多因素认证";
   }
 }

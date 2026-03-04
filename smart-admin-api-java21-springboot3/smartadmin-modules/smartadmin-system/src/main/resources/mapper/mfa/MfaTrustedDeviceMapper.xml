@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.system.mfa.dao.MfaTrustedDeviceDao">
+
+    <!-- Select all trusted devices by employee ID -->
+    <select id="selectByEmployeeId" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaTrustedDeviceEntity">
+        SELECT *
+        FROM t_mfa_trusted_device
+        WHERE employee_id = #{employeeId}
+          AND deleted = FALSE
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- Select valid trusted device by fingerprint -->
+    <select id="selectValidByFingerprint" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaTrustedDeviceEntity">
+        SELECT *
+        FROM t_mfa_trusted_device
+        WHERE employee_id = #{employeeId}
+          AND device_fingerprint = #{deviceFingerprint}
+          AND trusted_until > NOW()
+          AND deleted = FALSE
+        LIMIT 1
+    </select>
+
+    <!-- Check if device is trusted -->
+    <select id="isTrustedDevice" resultType="java.lang.Boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM t_mfa_trusted_device
+            WHERE employee_id = #{employeeId}
+              AND device_fingerprint = #{deviceFingerprint}
+              AND trusted_until > NOW()
+              AND deleted = FALSE
+        )
+    </select>
+
+    <!-- Soft delete trusted device -->
+    <update id="deleteByDeviceId">
+        UPDATE t_mfa_trusted_device
+        SET deleted = TRUE,
+            update_time = NOW()
+        WHERE device_id = #{deviceId}
+          AND deleted = FALSE
+    </update>
+
+</mapper>

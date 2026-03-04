@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.system.mfa.dao.MfaBackupCodeDao">
+
+    <!-- Select all backup codes by employee ID -->
+    <select id="selectByEmployeeId" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaBackupCodeEntity">
+        SELECT *
+        FROM t_mfa_backup_code
+        WHERE employee_id = #{employeeId}
+          AND deleted = FALSE
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- Select unused backup codes by employee ID -->
+    <select id="selectUnusedByEmployeeId" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaBackupCodeEntity">
+        SELECT *
+        FROM t_mfa_backup_code
+        WHERE employee_id = #{employeeId}
+          AND used = FALSE
+          AND deleted = FALSE
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- Count unused backup codes by employee ID -->
+    <select id="countUnused" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_mfa_backup_code
+        WHERE employee_id = #{employeeId}
+          AND used = FALSE
+          AND deleted = FALSE
+    </select>
+
+    <!-- Soft delete all backup codes for employee -->
+    <update id="deleteByEmployeeId">
+        UPDATE t_mfa_backup_code
+        SET deleted = TRUE,
+            update_time = NOW()
+        WHERE employee_id = #{employeeId}
+          AND deleted = FALSE
+    </update>
+
+</mapper>

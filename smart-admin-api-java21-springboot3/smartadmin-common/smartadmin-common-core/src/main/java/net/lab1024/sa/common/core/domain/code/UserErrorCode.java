@@ -33,7 +33,13 @@ public enum UserErrorCode implements ErrorCode {
   LOGIN_FAIL_LOCK(30010, "登录连续失败已经被锁定，无法登录"),
   LOGIN_FAIL_WILL_LOCK(30011, "登录连续失败将会锁定提醒"),
 
-  LOGIN_ACTIVE_TIMEOUT(30012, "长时间未操作系统，需要重新登录");
+  LOGIN_ACTIVE_TIMEOUT(30012, "长时间未操作系统，需要重新登录"),
+
+  // MFA Multi-Factor Authentication Error Codes (40100-40199)
+  MFA_REQUIRED(40100, "需要輸入多因素認證碼"),
+  MFA_VERIFY_FAIL(40101, "多因素認證碼錯誤"),
+  MFA_NOT_ENABLED(40102, "MFA 未啟用"),
+  MFA_ENFORCED(40103, "您的角色需要強制啟用 MFA，請先在個人中心設置");
 
   private final int code;
 

@@ -103,6 +103,16 @@ public class LoginService implements StpInterface {
 
   private final LoginManager loginManager;
 
+  private final net.lab1024.sa.system.mfa.service.MfaService mfaService;
+
+  private final net.lab1024.sa.system.mfa.service.MfaTrustedDeviceService mfaTrustedDeviceService;
+
+  private final net.lab1024.sa.system.mfa.service.MfaBackupCodeService mfaBackupCodeService;
+
+  private final net.lab1024.sa.system.mfa.dao.MfaConfigDao mfaConfigDao;
+
+  private final net.lab1024.sa.common.security.encrypt.AesGcmFieldEncryptService encryptService;
+
   /** 获取验证码 */
   public ResponseDTO<CaptchaVO> getCaptcha() {
     return ResponseDTO.ok(captchaService.generateCaptcha());
@@ -214,6 +224,14 @@ public class LoginService implements StpInterface {
             ? ResponseDTO.userErrorParam("登录名或密码错误！")
             : ResponseDTO.error(UserErrorCode.LOGIN_FAIL_WILL_LOCK, msg);
       }
+
+      // ========== MFA CHECK POINT ==========
+      ResponseDTO<String> mfaCheckResult =
+          checkMfaRequired(employeeEntity, loginForm, ip, userAgent);
+      if (!mfaCheckResult.getOk()) {
+        return ResponseDTO.error(mfaCheckResult);
+      }
+      // =====================================
 
       // Lazy migration: upgrade password hash if using old Argon2 params (D10)
       if (protectPasswordService.needsPasswordHashUpgrade(employeeEntity.getLoginPwd())) {
@@ -636,5 +654,98 @@ public class LoginService implements StpInterface {
     }
     List<MenuEntity> menuEntityList = roleMenuDao.selectMenuListByRoleIdList(roleIdList, false);
     return SmartBeanUtil.copyList(menuEntityList, MenuVO.class);
+  }
+
+  /**
+   * Check if MFA is required for login
+   *
+   * <p>This method performs a 6-step MFA verification process:
+   *
+   * <ol>
+   *   <li>Check if MFA is enabled for the employee
+   *   <li>Check if MFA is enforced by role (mandatory for certain roles)
+   *   <li>Check if the current device is trusted (30-day trust period)
+   *   <li>Verify MFA token if provided (6-digit TOTP or 8-digit backup code)
+   *   <li>Update last verified timestamp
+   *   <li>Create trusted device if requested
+   * </ol>
+   *
+   * @param employeeEntity Employee entity
+   * @param loginForm Login form with MFA token
+   * @param ip Client IP address
+   * @param userAgent Client User-Agent
+   * @return ResponseDTO with success or error
+   */
+  private ResponseDTO<String> checkMfaRequired(
+      EmployeeEntity employeeEntity, LoginForm loginForm, String ip, String userAgent) {
+
+    Long employeeId = employeeEntity.getEmployeeId();
+
+    // Step 1: Check if MFA is enabled
+    Option<Boolean> mfaEnabledOpt = mfaService.isEnabled(employeeId);
+    if (!mfaEnabledOpt.getOrElse(false)) {
+      // MFA not enabled, check if it's enforced by role
+      io.vavr.control.Try<Boolean> mfaRequiredTry = mfaService.isMfaRequired(employeeId);
+      if (mfaRequiredTry.getOrElse(false)) {
+        return ResponseDTO.error(UserErrorCode.MFA_ENFORCED, "您的角色需要強制啟用 MFA，請先在個人中心設置");
+      }
+      return ResponseDTO.ok(); // MFA not enforced, allow login
+    }
+
+    // Step 2: Check if device is trusted (30-day trust period)
+    String fingerprint = mfaTrustedDeviceService.generateDeviceFingerprint(ip, userAgent);
+    io.vavr.control.Try<Boolean> trustedTry =
+        mfaTrustedDeviceService.isTrustedDevice(employeeId, fingerprint);
+    if (trustedTry.getOrElse(false)) {
+      return ResponseDTO.ok(); // Trusted device, skip MFA verification
+    }
+
+    // Step 3: Verify MFA token
+    String mfaToken = loginForm.getMfaToken();
+    if (SmartStringUtil.isEmpty(mfaToken)) {
+      return ResponseDTO.error(UserErrorCode.MFA_REQUIRED, "需要輸入多因素認證碼");
+    }
+
+    // Step 4: Get MFA config and verify token
+    net.lab1024.sa.system.mfa.domain.entity.MfaConfigEntity config =
+        mfaConfigDao.selectByEmployeeId(employeeId);
+    if (config == null) {
+      return ResponseDTO.error(UserErrorCode.MFA_NOT_ENABLED, "MFA 配置異常，請重新設置");
+    }
+
+    String secret = encryptService.decrypt(config.getSecretEncrypted());
+    boolean verified = false;
+
+    // Try TOTP verification (6 digits)
+    if (mfaToken.matches("^[0-9]{6}$")) {
+      verified = mfaService.verifyTotpToken(secret, mfaToken).getOrElse(false);
+    }
+
+    // Try backup code verification (8 digits)
+    if (!verified && mfaToken.matches("^[0-9]{8}$")) {
+      verified = mfaBackupCodeService.verifyBackupCode(employeeId, mfaToken, ip).getOrElse(false);
+    }
+
+    if (!verified) {
+      // Record login failure
+      securityLoginService.recordLoginFail(
+          employeeEntity.getEmployeeId(),
+          UserTypeEnum.ADMIN_EMPLOYEE,
+          employeeEntity.getLoginName(),
+          null);
+      return ResponseDTO.error(UserErrorCode.MFA_VERIFY_FAIL, "多因素認證碼錯誤");
+    }
+
+    // Step 5: Update last verified timestamp
+    config.setLastVerifiedAt(java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC));
+    mfaConfigDao.updateById(config);
+
+    // Step 6: Create trusted device if requested
+    if (Boolean.TRUE.equals(loginForm.getTrustDevice())) {
+      mfaTrustedDeviceService.addTrustedDevice(
+          employeeId, fingerprint, loginForm.getDeviceName(), ip, userAgent);
+    }
+
+    return ResponseDTO.ok();
   }
 }

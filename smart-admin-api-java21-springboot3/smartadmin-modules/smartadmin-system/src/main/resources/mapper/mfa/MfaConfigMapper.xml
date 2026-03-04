@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.system.mfa.dao.MfaConfigDao">
+
+    <!-- Select MFA configuration by employee ID -->
+    <select id="selectByEmployeeId" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaConfigEntity">
+        SELECT *
+        FROM t_mfa_config
+        WHERE employee_id = #{employeeId}
+          AND deleted = FALSE
+        LIMIT 1
+    </select>
+
+    <!-- Select enabled MFA configuration by employee ID -->
+    <select id="selectEnabledByEmployeeId" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaConfigEntity">
+        SELECT *
+        FROM t_mfa_config
+        WHERE employee_id = #{employeeId}
+          AND mfa_enabled = TRUE
+          AND deleted = FALSE
+        LIMIT 1
+    </select>
+
+    <!-- Check if employee has MFA enabled -->
+    <select id="isMfaEnabled" resultType="java.lang.Boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM t_mfa_config
+            WHERE employee_id = #{employeeId}
+              AND mfa_enabled = TRUE
+              AND deleted = FALSE
+        )
+    </select>
+
+</mapper>

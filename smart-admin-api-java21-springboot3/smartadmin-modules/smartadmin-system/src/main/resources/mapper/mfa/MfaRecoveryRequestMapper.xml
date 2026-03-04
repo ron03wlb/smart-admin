@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.system.mfa.dao.MfaRecoveryRequestDao">
+
+    <!-- Select recovery request by employee ID and status -->
+    <select id="selectByEmployeeIdAndStatus" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaRecoveryRequestEntity">
+        SELECT *
+        FROM t_mfa_recovery_request
+        WHERE employee_id = #{employeeId}
+          AND status = #{status}
+          AND deleted = FALSE
+        LIMIT 1
+    </select>
+
+    <!-- Select all pending recovery requests -->
+    <select id="selectPendingRequests" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaRecoveryRequestEntity">
+        SELECT *
+        FROM t_mfa_recovery_request
+        WHERE status = 1
+          AND deleted = FALSE
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- Select recovery request by ID and status -->
+    <select id="selectByIdAndStatus" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaRecoveryRequestEntity">
+        SELECT *
+        FROM t_mfa_recovery_request
+        WHERE recovery_id = #{recoveryId}
+          AND status = #{status}
+          AND deleted = FALSE
+        LIMIT 1
+    </select>
+
+    <!-- Batch update expired recovery codes -->
+    <update id="updateExpiredRecoveryCodes">
+        UPDATE t_mfa_recovery_request
+        SET status = 4,
+            update_time = NOW()
+        WHERE status = 2
+          AND used = FALSE
+          AND expires_at < NOW()
+          AND deleted = FALSE
+    </update>
+
+    <!-- Select approved recovery request by employee ID (non-expired, non-used) -->
+    <select id="selectApprovedByEmployeeId" resultType="net.lab1024.sa.system.mfa.domain.entity.MfaRecoveryRequestEntity">
+        SELECT *
+        FROM t_mfa_recovery_request
+        WHERE employee_id = #{employeeId}
+          AND status = 2
+          AND used = FALSE
+          AND expires_at > NOW()
+          AND deleted = FALSE
+        LIMIT 1
+    </select>
+
+</mapper>
