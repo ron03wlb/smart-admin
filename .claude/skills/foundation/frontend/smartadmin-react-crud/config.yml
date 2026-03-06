@@ -1,0 +1,219 @@
+# ====================================================================
+# SmartAdmin React CRUD Generator - Skill Configuration
+# ====================================================================
+# Version: 1.0.0
+# Priority: P0 (Critical Foundation)
+# Category: Frontend
+# Type: Atomic
+# ====================================================================
+
+metadata:
+  name: "smartadmin-react-crud"
+  version: "1.0.0"
+  priority: "P0"
+  type: "atomic"
+  category: "frontend"
+  description: "Generate complete React CRUD module (List component + Form modal + API client + Tests)"
+  ai_description: |
+    Generates complete React 19 CRUD modules from entity specifications - automatically creates:
+    - TypeScript Types: QueryForm, VO, AddForm, UpdateForm (100% compatible with backend DTOs)
+    - API Client: Axios wrapper with ResponseModel/PageResult handling
+    - List Component: React TSX with Table, Pagination, Search, PrivilegeButton
+    - Form Modal: Add/Edit mode with Form validation and API submission
+    - Tests: Vitest + React Testing Library with 80%+ coverage
+
+    v1.0.0 Architecture (2026-03-06):
+    This skill provides React 19 + TypeScript + Ant Design 5 + Redux Toolkit CRUD generation,
+    parallel to the existing smartadmin-crud-generator (Vue 3 version). Uses phase-based
+    execution for maximum control and flexibility.
+
+    Key Features:
+    - 100% TypeScript type safety (backend ↔ frontend alignment)
+    - usePrivilege Hook integration (aligns with @SaCheckPermission)
+    - ResponseModel error handling
+    - Phase-based execution (5 phases: Types → API → List → Form → Tests)
+    - Reduces CRUD generation time from 4-6 hours to 30 minutes (92% improvement)
+
+  tags:
+    - "react"
+    - "react-19"
+    - "crud"
+    - "code-generation"
+    - "frontend"
+    - "typescript"
+    - "antd"
+    - "ant-design"
+    - "redux-toolkit"
+    - "vitest"
+    - "scaffolding"
+
+  author: "SmartAdmin Team"
+  last_updated: "2026-03-06"
+  status: "stable"
+
+triggers:
+  keywords:
+    - "create React CRUD module"
+    - "generate React CRUD"
+    - "scaffold React module"
+    - "React CRUD generator"
+    - "create React component"
+    - "generate React form"
+    - "React list component"
+    - "React table component"
+
+  patterns:
+    - "create\\s+React\\s+CRUD\\s+module\\s+for\\s+(\\w+)"
+    - "generate\\s+React\\s+CRUD\\s+for\\s+(\\w+)"
+    - "scaffold\\s+React\\s+module\\s+for\\s+(\\w+)"
+    - "create\\s+(\\w+)\\s+React\\s+CRUD"
+
+  exclude_keywords:
+    - "delete React module"
+    - "remove React component"
+    - "Vue CRUD"
+
+execution:
+  type: "phase-based"
+
+  phases:
+    - id: "phase-1"
+      name: "TypeScript Types Generation"
+      file: "phases/phase-1-types.md"
+      required: true
+      estimated_minutes: 3
+      description: "Generate TypeScript types (QueryForm, VO, AddForm, UpdateForm) - 100% compatible with backend DTOs"
+
+    - id: "phase-2"
+      name: "API Client Generation"
+      file: "phases/phase-2-api-client.md"
+      required: true
+      estimated_minutes: 5
+      description: "Generate API client with postRequest/getRequest wrapper and ResponseModel handling"
+
+    - id: "phase-3"
+      name: "List Component Generation"
+      file: "phases/phase-3-list-component.md"
+      required: true
+      estimated_minutes: 8
+      description: "Generate React list component with Table, Pagination, Search, PrivilegeButton"
+
+    - id: "phase-4"
+      name: "Form Modal Generation"
+      file: "phases/phase-4-form-modal.md"
+      required: true
+      estimated_minutes: 6
+      description: "Generate form modal with Add/Edit mode, validation, and API submission"
+
+    - id: "phase-5"
+      name: "Test Generation"
+      file: "phases/phase-5-tests.md"
+      required: false
+      estimated_minutes: 3
+      description: "Generate Vitest + React Testing Library tests with 80%+ coverage"
+
+  timeout:
+    per_phase_minutes: 15
+    total_minutes: 60
+
+  quality_gates:
+    run_after_execution: true
+    checks:
+      - "typescript-compile"
+      - "vitest"
+      - "eslint"
+
+dependencies:
+  skills: []
+
+  required_files:
+    - ".agent/rules/foundation/F04-architecture-rules.md"
+    - ".claude/shared/knowledge/smartadmin-patterns.md"
+
+  tools:
+    - name: "node"
+      version: ">=18.0"
+      required: true
+
+    - name: "npm"
+      version: ">=8.0"
+      required: true
+
+output:
+  generates:
+    - "*.ts"
+    - "*.tsx"
+
+  target_directories:
+    - "smart-admin-web-react/src/api"
+    - "smart-admin-web-react/src/views"
+    - "smart-admin-web-react/src/__tests__"
+
+  templates: null
+
+validation:
+  pre_execution:
+    - check: "codebase_structure"
+      rule: "Must be in SmartAdmin project root"
+
+    - check: "node_available"
+      rule: "Node.js 18.0+ must be available"
+      command: "node --version"
+
+    - check: "react_project_exists"
+      rule: "smart-admin-web-react/ directory must exist"
+
+  post_execution:
+    - check: "typescript-compile"
+      description: "Verify generated TypeScript code compiles successfully"
+      command: "cd smart-admin-web-react && npm run type-check"
+
+    - check: "vitest"
+      description: "Run Vitest tests for generated code (80%+ coverage required)"
+      command: "cd smart-admin-web-react && npm run test"
+
+    - check: "eslint"
+      description: "Lint generated code with ESLint"
+      command: "cd smart-admin-web-react && npm run lint"
+
+compatibility:
+  deprecated: false
+  deprecation_phase: null
+  replacement_skill: null
+  migration_guide_url: null
+  deprecated_since: null
+  removal_date: null
+
+documentation:
+  skill_md: "SKILL.md"
+  readme: null
+  examples_dir: null
+  references_dir: null
+
+  external_links:
+    - title: "SmartAdmin Patterns"
+      url: "../../shared/knowledge/smartadmin-patterns.md"
+
+    - title: "Architecture Rules"
+      url: "../../../.agent/rules/foundation/F04-architecture-rules.md"
+
+    - title: "React 19 Documentation"
+      url: "https://react.dev/"
+
+    - title: "Ant Design React"
+      url: "https://ant.design/"
+
+    - title: "Redux Toolkit"
+      url: "https://redux-toolkit.js.org/"
+
+    - title: "Vitest"
+      url: "https://vitest.dev/"
+
+monitoring:
+  track_usage: true
+  log_executions: true
+  metrics:
+    - "execution_time"
+    - "success_rate"
+    - "phases_executed"
+    - "lines_of_code_generated"

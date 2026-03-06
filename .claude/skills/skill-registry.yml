@@ -7,9 +7,9 @@
 # ====================================================================
 
 version: "3.2.0"
-last_updated: "2026-02-07"
-total_skills: 36
-active_skills: 32
+last_updated: "2026-03-06"
+total_skills: 37
+active_skills: 33
 deprecated_skills: 4
 
 # ====================================================================
@@ -85,6 +85,26 @@ skills:
     aliases: ["vavr", "refactor-vavr"]
     status: "stable"
     description: "Refactor Service layer to use Vavr Option/Try/Either patterns"
+    depends_on: []
+    depended_by: []
+
+  # Frontend Skills
+  smartadmin-react-crud:
+    path: "foundation/frontend/smartadmin-react-crud"
+    priority: "P0"
+    type: "atomic"
+    category: "frontend"
+    visibility: "public"
+    preferred_via: "user_invoked"
+    aliases: ["react-crud", "gen-react-crud"]
+    status: "stable"
+    description: "Generate React 19 CRUD modules (List + Form + API + Tests) with TypeScript, Ant Design 5, Redux Toolkit"
+    phases:
+      - "phase-1-types"
+      - "phase-2-api-client"
+      - "phase-3-list-component"
+      - "phase-4-form-modal"
+      - "phase-5-tests"
     depends_on: []
     depended_by: []
 

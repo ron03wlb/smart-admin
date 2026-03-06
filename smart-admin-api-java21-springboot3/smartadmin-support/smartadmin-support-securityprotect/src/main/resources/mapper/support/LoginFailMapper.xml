@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.support.securityprotect.dao.LoginFailDao">
+
+    <!-- 根据用户id和类型查询 -->
+    <select id="selectByUserIdAndUserType"
+            resultType="net.lab1024.sa.support.securityprotect.domain.entity.LoginFailEntity">
+        SELECT *
+        FROM t_login_fail
+        WHERE user_id = #{userId}
+          AND user_type = #{userType}
+    </select>
+
+    <!-- 根据用户id和类型删除 -->
+    <delete id="deleteByUserIdAndUserType">
+        DELETE FROM t_login_fail
+        WHERE user_id = #{userId}
+          AND user_type = #{userType}
+    </delete>
+
+    <!-- 分页查询 -->
+    <select id="queryPage"
+            resultType="net.lab1024.sa.support.securityprotect.domain.vo.LoginFailVO">
+        SELECT *
+        FROM t_login_fail
+        <where>
+            <if test="queryForm.userId != null">
+                AND user_id = #{queryForm.userId}
+            </if>
+            <if test="queryForm.userType != null">
+                AND user_type = #{queryForm.userType}
+            </if>
+            <if test="queryForm.loginName != null and queryForm.loginName != ''">
+                AND login_name LIKE CONCAT('%', #{queryForm.loginName}, '%')
+            </if>
+            <if test="queryForm.lockFlag != null">
+                AND lock_flag = #{queryForm.lockFlag}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>
