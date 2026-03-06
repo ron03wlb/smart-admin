@@ -20,6 +20,7 @@
 | Paginated query | `SmartPageUtil.convert2PageQuery(form)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#pagination-pattern) |
 | Bean copy | `SmartBeanUtil.copy(source, Target.class)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#bean-conversion) |
 | Transaction | `@Transactional` in Manager only | [→](.claude/shared/knowledge/smartadmin-patterns.md#transaction-management) |
+| Boolean → SMALLINT | `typeHandler=BooleanToSmallintTypeHandler` | [→](.agent/rules/technology/database/D03-postgresql-mybatis.md#mandatory-boolean-type-handling-smallint-mapping) |
 
 **Complete Patterns**: [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
 

@@ -137,7 +137,7 @@ User Request Classification
 |------|-------------|------|
 | D01-postgresql-basics.md | Table creation, types, indexes | [technology/database/D01-postgresql-basics.md](technology/database/D01-postgresql-basics.md) |
 | D02-postgresql-advanced.md | JSONB, arrays, CTE, window functions | [technology/database/D02-postgresql-advanced.md](technology/database/D02-postgresql-advanced.md) |
-| D03-postgresql-mybatis.md | **PostgreSQL + MyBatis Plus Integration**: Configuration, TypeHandlers (JSONB/Arrays), SQL Optimization, MySQL Migration, Vavr Integration, Performance Tuning | [technology/database/D03-postgresql-mybatis.md](technology/database/D03-postgresql-mybatis.md) |
+| D03-postgresql-mybatis.md | **PostgreSQL + MyBatis Plus Integration**: Configuration, TypeHandlers (JSONB/Arrays/Boolean-SMALLINT), SQL Optimization, MySQL Migration, Vavr Integration, Performance Tuning | [technology/database/D03-postgresql-mybatis.md](technology/database/D03-postgresql-mybatis.md) |
 | D04-mybatis-plus-core.md | LambdaQueryWrapper, pagination, IEnum | [technology/database/D04-mybatis-plus-core.md](technology/database/D04-mybatis-plus-core.md) |
 | ~~D05-postgresql-mybatis-integration.md~~ | ⚠️ Deprecated → Redirects to D03-postgresql-mybatis.md | [technology/database/D05-postgresql-mybatis-integration.md](technology/database/D05-postgresql-mybatis-integration.md) |
 | ~~D06-mybatis-plus-postgresql.md~~ | ⚠️ Deprecated → Redirects to D03-postgresql-mybatis.md | [technology/database/D06-mybatis-plus-postgresql.md](technology/database/D06-mybatis-plus-postgresql.md) |

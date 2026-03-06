@@ -253,6 +253,305 @@ public class Article {
 
 ---
 
+## 【Mandatory】Boolean Type Handling (SMALLINT Mapping)
+
+### Background
+
+PostgreSQL typically uses `SMALLINT` (2-byte integer) to store Boolean values for compatibility with external systems and legacy databases, while Java uses `Boolean` type. This mapping requires explicit type conversion to avoid runtime errors.
+
+**Key Challenge**: PostgreSQL strictly distinguishes between types and refuses implicit `SMALLINT = BOOLEAN` conversion, unlike MySQL which allows `TINYINT(1) = BOOLEAN` auto-conversion.
+
+### TypeHandler Implementation
+
+SmartAdmin provides `BooleanToSmallintTypeHandler` for automatic conversion:
+
+```java
+package net.lab1024.sa.common.mybatis.typehandler;
+
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
+
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+/**
+ * Boolean → SMALLINT TypeHandler
+ * - Java Boolean → PostgreSQL SMALLINT
+ * - true → 1, false → 0, null → null
+ */
+@MappedTypes(Boolean.class)
+@MappedJdbcTypes(JdbcType.SMALLINT)
+public class BooleanToSmallintTypeHandler extends BaseTypeHandler<Boolean> {
+
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i, Boolean parameter, JdbcType jdbcType) throws SQLException {
+        ps.setShort(i, parameter ? (short) 1 : (short) 0);
+    }
+
+    @Override
+    public Boolean getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        short value = rs.getShort(columnName);
+        return rs.wasNull() ? null : value == 1;
+    }
+
+    @Override
+    public Boolean getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        short value = rs.getShort(columnIndex);
+        return rs.wasNull() ? null : value == 1;
+    }
+
+    @Override
+    public Boolean getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        short value = cs.getShort(columnIndex);
+        return cs.wasNull() ? null : value == 1;
+    }
+}
+```
+
+### Entity Layer Usage
+
+```java
+package net.lab1024.sa.system.employee.domain.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
+
+@Data
+@TableName("t_employee")
+public class EmployeeEntity {
+    @TableId(type = IdType.AUTO)
+    private Long employeeId;
+
+    private String loginName;
+
+    /** Disabled flag: 0=enabled, 1=disabled */
+    @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
+    private Boolean disabledFlag;
+
+    /** Deleted flag: 0=not deleted, 1=deleted */
+    @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
+    private Boolean deletedFlag;
+}
+```
+
+> **Note**: `@TableField(typeHandler=...)` only affects MyBatis Plus auto-generated CRUD methods. Hand-written XML SQL requires explicit typeHandler declaration (see below).
+
+---
+
+### 【CRITICAL】XML Mapper Parameter Binding Rules
+
+**Rule 1: Mandatory typeHandler Declaration**
+
+All Boolean parameters mapped to PostgreSQL SMALLINT columns **MUST** explicitly specify `typeHandler` attribute in XML Mapper files.
+
+```xml
+<!-- ❌ WRONG: Missing typeHandler (causes PSQLException) -->
+<select id="getByLoginName">
+    SELECT * FROM t_employee
+    WHERE login_name = #{loginName}
+      AND deleted_flag = #{deletedFlag}
+</select>
+
+<!-- ✅ CORRECT: Explicit typeHandler declaration -->
+<select id="getByLoginName">
+    SELECT * FROM t_employee
+    WHERE login_name = #{loginName}
+      AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT,
+          typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+</select>
+```
+
+**Rule 2: Common Patterns Requiring TypeHandler**
+
+Apply typeHandler to Boolean parameters in these scenarios:
+
+1. **WHERE Clause Queries**:
+```xml
+<select id="queryEmployee">
+    SELECT * FROM t_employee
+    <where>
+        <if test="queryForm.deletedFlag != null">
+            AND deleted_flag = #{queryForm.deletedFlag, jdbcType=SMALLINT,
+                typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        </if>
+    </where>
+</select>
+```
+
+2. **UPDATE SET Statements**:
+```xml
+<update id="updateDisableFlag">
+    UPDATE t_employee
+    SET disabled_flag = #{disabledFlag, jdbcType=SMALLINT,
+        typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+    WHERE employee_id = #{employeeId}
+</update>
+```
+
+3. **INSERT VALUES Statements**:
+```xml
+<insert id="insertEmployee">
+    INSERT INTO t_employee (login_name, deleted_flag)
+    VALUES (#{loginName}, #{deletedFlag, jdbcType=SMALLINT,
+        typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler})
+</insert>
+```
+
+4. **Collection Parameter Binding**:
+```xml
+<select id="batchQuery">
+    SELECT * FROM t_employee
+    WHERE employee_id IN
+    <foreach collection="employeeIds" item="id" separator="," open="(" close=")">
+        #{id}
+    </foreach>
+    AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT,
+        typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+</select>
+```
+
+**Rule 3: Error Diagnosis**
+
+When PostgreSQL throws this error:
+
+```
+org.postgresql.util.PSQLException: ERROR: operator does not exist: smallint = boolean
+Hint: No operator matches the given name and argument types. You might need to add explicit type casts.
+Position: 111
+
+SQL: SELECT * FROM t_employee WHERE deleted_flag = ?
+Parameters: false(Boolean)
+```
+
+**Diagnosis Steps**:
+1. Locate the SQL line number (Position: 111 → approximately character 111 in SQL)
+2. Find the parameter binding (`deleted_flag = ?`)
+3. Check if `typeHandler=BooleanToSmallintTypeHandler` is present
+4. If missing → Add typeHandler attribute
+
+**Rule 4: Validation Commands**
+
+**Pre-commit Validation** (planned in follow-up improvements):
+```bash
+# Validate all Boolean parameters in XML Mapper files
+bash .claude/scripts/validate-mybatis-boolean-params.sh
+```
+
+**Gradle Validation** (planned in follow-up improvements):
+```bash
+# Run automated validation task
+./gradlew validateMyBatisBooleanParams
+```
+
+**Manual Validation** (current approach):
+```bash
+# Search for potential violations
+cd smart-admin-api-java21-springboot3
+
+# Find deleted_flag without typeHandler
+grep -rn "deleted_flag\s*=\s*#{" --include="*.xml" . | grep -v "typeHandler="
+
+# Find disabled_flag without typeHandler
+grep -rn "disabled_flag\s*=\s*#{" --include="*.xml" . | grep -v "typeHandler="
+
+# Expected result: No output (all parameters have typeHandler)
+```
+
+### Affected Fields
+
+Common SmartAdmin Boolean fields using SMALLINT mapping:
+
+| Field Name | Type | Values | Description |
+|------------|------|--------|-------------|
+| `deletedFlag` | SMALLINT | 0=active, 1=deleted | Soft delete flag |
+| `disabledFlag` | SMALLINT | 0=enabled, 1=disabled | Enable/disable flag |
+| `administratorFlag` | SMALLINT | 0=normal, 1=admin | Admin privilege flag |
+| `lockedFlag` | SMALLINT | 0=unlocked, 1=locked | Account lock flag |
+
+> **Convention**: All `*Flag` fields with Boolean Java type mapped to PostgreSQL SMALLINT require explicit typeHandler.
+
+### PostgreSQL Type System Limitation
+
+**Why PostgreSQL Refuses Implicit Conversion**:
+
+PostgreSQL's type system is stricter than MySQL:
+
+```sql
+-- PostgreSQL (STRICT)
+❌ SELECT * FROM t_employee WHERE deleted_flag = FALSE;
+   ERROR: operator does not exist: smallint = boolean
+
+✅ SELECT * FROM t_employee WHERE deleted_flag = 0;
+   Success
+
+-- MySQL (PERMISSIVE)
+✅ SELECT * FROM t_employee WHERE deleted_flag = FALSE;
+   Success (auto-converts TINYINT(1) ↔ BOOLEAN)
+```
+
+**Design Rationale**:
+- PostgreSQL: Explicit type safety prevents runtime errors
+- MySQL: Implicit conversion for developer convenience
+- SmartAdmin: Uses TypeHandler for PostgreSQL compatibility while maintaining Java Boolean semantics
+
+### Migration from MySQL
+
+When migrating from MySQL to PostgreSQL:
+
+1. **Database Column Type**:
+```sql
+-- MySQL
+deleted_flag TINYINT(1) NOT NULL DEFAULT 0
+
+-- PostgreSQL
+deleted_flag SMALLINT NOT NULL DEFAULT 0
+```
+
+2. **Entity Field Type** (no change):
+```java
+// Both MySQL and PostgreSQL use same Java type
+private Boolean deletedFlag;
+```
+
+3. **XML Mapper Files** (critical change):
+```xml
+<!-- MySQL (no typeHandler needed) -->
+WHERE deleted_flag = #{deletedFlag}
+
+<!-- PostgreSQL (typeHandler REQUIRED) -->
+WHERE deleted_flag = #{deletedFlag, jdbcType=SMALLINT,
+    typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+```
+
+### Checklist
+
+#### Entity Layer
+- [ ] Entity uses `@TableField(typeHandler = BooleanToSmallintTypeHandler.class)`
+- [ ] Boolean field names follow convention (e.g., `deletedFlag`, `disabledFlag`)
+
+#### XML Mapper Layer
+- [ ] All Boolean parameters explicitly specify typeHandler attribute
+- [ ] WHERE clauses with Boolean conditions use typeHandler
+- [ ] UPDATE SET statements with Boolean values use typeHandler
+- [ ] INSERT VALUES statements with Boolean values use typeHandler
+
+#### Testing & Validation
+- [ ] Test null value conversion (null → null, not 0)
+- [ ] Test true/false conversion (true → 1, false → 0)
+- [ ] Pre-commit hook validation passes (after implementation)
+- [ ] No PSQLException "operator does not exist: smallint = boolean" errors
+
+#### Database Schema
+- [ ] PostgreSQL columns use SMALLINT type (not BOOLEAN)
+- [ ] Default values use numeric literals (DEFAULT 0, not DEFAULT FALSE)
+- [ ] CHECK constraints use numeric ranges (CHECK (deleted_flag IN (0, 1)))
+
+---
+
 ## 【Mandatory】SQL Statement Optimization
 
 ### 1. Prohibit SELECT *
