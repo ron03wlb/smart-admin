@@ -138,6 +138,61 @@ subprojects {
         }
     }
 
+    // Custom task to validate MyBatis Boolean parameters (PostgreSQL SMALLINT compatibility)
+    // Prevents "operator does not exist: smallint = boolean" errors at runtime
+    tasks.register("validateMyBatisBooleanParams") {
+        group = "verification"
+        description = "Validate Boolean parameters in MyBatis XML mappers have explicit typeHandler"
+
+        doLast {
+            // Script is in repository root, one level above smart-admin-api-java21-springboot3
+            val repoRoot = rootProject.projectDir.parentFile
+            val scriptPath = file("${repoRoot}/.claude/scripts/validate-mybatis-boolean-params.sh")
+
+            if (!scriptPath.exists()) {
+                throw GradleException(
+                    """
+                    ❌ Validation script not found: ${scriptPath.absolutePath}
+
+                    Expected location: .claude/scripts/validate-mybatis-boolean-params.sh (in repository root)
+                    Please ensure the pre-commit hook setup is complete.
+                    """.trimIndent()
+                )
+            }
+
+            println("🔍 MyBatis Boolean Parameter Validation")
+            println("   Script: ${scriptPath.absolutePath}")
+            println()
+
+            // Execute script with relative path from repository root to avoid Windows path issues
+            val result = exec {
+                commandLine("bash", ".claude/scripts/validate-mybatis-boolean-params.sh")
+                workingDir = repoRoot
+                isIgnoreExitValue = true
+            }
+
+            if (result.exitValue != 0) {
+                throw GradleException(
+                    """
+                    ❌ MyBatis Boolean parameter validation FAILED
+
+                    Details: Boolean parameters mapped to PostgreSQL SMALLINT columns
+                    must explicitly specify typeHandler attribute.
+
+                    Fix: Add typeHandler=BooleanToSmallintTypeHandler to all Boolean parameters
+                    See: .agent/rules/technology/database/D03-postgresql-mybatis.md#mandatory-boolean-type-handling-smallint-mapping
+                    """.trimIndent()
+                )
+            }
+            println("✅ MyBatis Boolean parameter validation: PASS")
+        }
+    }
+
+    // Integrate MyBatis validation into check task
+    tasks.named("check") {
+        dependsOn("validateMyBatisBooleanParams")
+    }
+
     // SpotBugs Configuration
     configure<com.github.spotbugs.snom.SpotBugsExtension> {
         val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
