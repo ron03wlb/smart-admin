@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running MyBatis Boolean Parameter Validation..."
+
+if bash .claude/scripts/validate-mybatis-boolean-params.sh; then
+    echo "✅ MyBatis Boolean parameters: PASS"
+else
+    echo "❌ MyBatis Boolean parameters: FAIL"
+    echo "ℹ️  See: .agent/rules/technology/database/D03-postgresql-mybatis.md#mandatory-boolean-type-handling-smallint-mapping"
+    echo "⚠️  Use 'git commit --no-verify' to bypass (NOT recommended)"
+    exit 1
+fi
