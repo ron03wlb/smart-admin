@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.system.mfa.dao.MfaAuditLogDao;
 import net.lab1024.sa.system.mfa.domain.entity.MfaAuditLogEntity;
 import net.lab1024.sa.system.mfa.service.MfaBackupCodeService;
-import net.lab1024.sa.system.mfa.service.MfaService;
 import net.lab1024.sa.system.mfa.service.MfaTrustedDeviceService;
+import net.lab1024.sa.system.mfa.util.TotpUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MfaVerificationManager {
 
-  private final MfaService mfaService;
   private final MfaBackupCodeService mfaBackupCodeService;
   private final MfaTrustedDeviceService mfaTrustedDeviceService;
   private final MfaAuditLogDao mfaAuditLogDao;
@@ -53,8 +52,7 @@ public class MfaVerificationManager {
       Long employeeId, String secret, String token, String ipAddress, String userAgent) {
 
     boolean verified =
-        mfaService
-            .verifyTotpToken(secret, token)
+        TotpUtils.verifyTotpToken(secret, token)
             .getOrElse(
                 () -> {
                   log.error("Failed to verify TOTP token for employee ID: {}", employeeId);

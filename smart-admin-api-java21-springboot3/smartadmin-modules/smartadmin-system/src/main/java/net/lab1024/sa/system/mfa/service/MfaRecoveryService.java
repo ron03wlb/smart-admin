@@ -95,7 +95,7 @@ public class MfaRecoveryService {
 
     // Validate employee exists
     EmployeeEntity employee = employeeDao.selectById(employeeId);
-    if (employee == null || Boolean.TRUE.equals(employee.getDeleted())) {
+    if (employee == null || Boolean.TRUE.equals(employee.getDeletedFlag())) {
       return ResponseDTO.userErrorParam("員工不存在");
     }
 

@@ -3,7 +3,6 @@ package net.lab1024.sa.system.mfa.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import java.security.SecureRandom;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ import net.lab1024.sa.system.mfa.domain.form.MfaVerifyForm;
 import net.lab1024.sa.system.mfa.domain.vo.MfaSetupInitVO;
 import net.lab1024.sa.system.mfa.domain.vo.MfaStatusVO;
 import net.lab1024.sa.system.mfa.manager.MfaSetupManager;
-import net.lab1024.sa.system.mfa.manager.MfaVerificationManager;
+import net.lab1024.sa.system.mfa.util.TotpUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,69 +52,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MfaService {
 
-  private static final String ISSUER = "SmartAdmin";
-  private static final int TIME_STEP_SECONDS = 30;
-  private static final int TOKEN_LENGTH = 6;
-  private static final int TIME_WINDOW_TOLERANCE = 1;
-
   private final MfaConfigDao mfaConfigDao;
   private final MfaSetupManager mfaSetupManager;
-  private final MfaVerificationManager mfaVerificationManager;
   private final MfaBackupCodeService mfaBackupCodeService;
   private final MfaTrustedDeviceService mfaTrustedDeviceService;
   private final AesGcmFieldEncryptService encryptService;
   private final EmployeeDao employeeDao;
-
-  /**
-   * Generate a random TOTP secret (160-bit / 20 bytes).
-   *
-   * <p>Returns Base32-encoded secret suitable for QR code generation.
-   *
-   * @return TOTP secret (Base32-encoded)
-   */
-  public Try<String> generateTotpSecret() {
-    return Try.of(
-        () -> {
-          SecureRandom random = new SecureRandom();
-          byte[] secretBytes = new byte[20]; // 160 bits
-          random.nextBytes(secretBytes);
-          // Use Base32 encoding (standard for TOTP)
-          return base32Encode(secretBytes);
-        });
-  }
-
-  /**
-   * Verify TOTP token against secret.
-   *
-   * <p>Supports ±1 time window tolerance (90 seconds total).
-   *
-   * @param secret TOTP secret (Base32-encoded)
-   * @param token 6-digit TOTP token entered by user
-   * @return true if token is valid, false otherwise
-   */
-  public Try<Boolean> verifyTotpToken(String secret, String token) {
-    return Try.of(
-        () -> {
-          if (token == null || token.length() != TOKEN_LENGTH) {
-            return false;
-          }
-
-          long currentTimeStep = System.currentTimeMillis() / 1000 / TIME_STEP_SECONDS;
-
-          // Check current time window and ±1 adjacent windows (total 3 windows)
-          for (int i = -TIME_WINDOW_TOLERANCE; i <= TIME_WINDOW_TOLERANCE; i++) {
-            long timeStep = currentTimeStep + i;
-            String expectedToken = generateTotpToken(secret, timeStep);
-            if (token.equals(expectedToken)) {
-              log.debug("TOTP token verified successfully (time offset: {} windows)", i);
-              return true;
-            }
-          }
-
-          log.warn("TOTP token verification failed: invalid token");
-          return false;
-        });
-  }
 
   /**
    * Check if MFA is enabled for the given employee.
@@ -157,118 +99,6 @@ public class MfaService {
         });
   }
 
-  /**
-   * Generate TOTP token for the given secret and time step.
-   *
-   * @param secret TOTP secret (Base32-encoded)
-   * @param timeStep Time step (Unix timestamp / 30)
-   * @return 6-digit TOTP token
-   */
-  private String generateTotpToken(String secret, long timeStep) throws Exception {
-    byte[] secretBytes = base32Decode(secret);
-    byte[] message = longToBytes(timeStep);
-
-    // HMAC-SHA1
-    javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA1");
-    javax.crypto.spec.SecretKeySpec spec = new javax.crypto.spec.SecretKeySpec(secretBytes, "RAW");
-    mac.init(spec);
-    byte[] hash = mac.doFinal(message);
-
-    // Dynamic truncation (RFC 4226)
-    int offset = hash[hash.length - 1] & 0x0F;
-    int binary =
-        ((hash[offset] & 0x7F) << 24)
-            | ((hash[offset + 1] & 0xFF) << 16)
-            | ((hash[offset + 2] & 0xFF) << 8)
-            | (hash[offset + 3] & 0xFF);
-
-    int otp = binary % (int) Math.pow(10, TOKEN_LENGTH);
-    return String.format("%0" + TOKEN_LENGTH + "d", otp);
-  }
-
-  /** Convert long to byte array (big-endian). */
-  private byte[] longToBytes(long value) {
-    byte[] result = new byte[8];
-    for (int i = 7; i >= 0; i--) {
-      result[i] = (byte) (value & 0xFF);
-      value >>= 8;
-    }
-    return result;
-  }
-
-  /**
-   * Base32 encoding (RFC 4648).
-   *
-   * <p>Standard Base32 alphabet: A-Z, 2-7 (32 characters)
-   */
-  private String base32Encode(byte[] data) {
-    String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    StringBuilder result = new StringBuilder();
-    int buffer = 0;
-    int bitsLeft = 0;
-
-    for (byte b : data) {
-      buffer = (buffer << 8) | (b & 0xFF);
-      bitsLeft += 8;
-      while (bitsLeft >= 5) {
-        result.append(alphabet.charAt((buffer >> (bitsLeft - 5)) & 0x1F));
-        bitsLeft -= 5;
-      }
-    }
-
-    if (bitsLeft > 0) {
-      result.append(alphabet.charAt((buffer << (5 - bitsLeft)) & 0x1F));
-    }
-
-    // Padding (optional for TOTP, but included for standard compliance)
-    while (result.length() % 8 != 0) {
-      result.append('=');
-    }
-
-    return result.toString();
-  }
-
-  /** Base32 decoding (RFC 4648). */
-  private byte[] base32Decode(String encoded) {
-    String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    encoded = encoded.toUpperCase().replaceAll("=", "");
-
-    int buffer = 0;
-    int bitsLeft = 0;
-    java.io.ByteArrayOutputStream result = new java.io.ByteArrayOutputStream();
-
-    for (char c : encoded.toCharArray()) {
-      int value = alphabet.indexOf(c);
-      if (value == -1) {
-        throw new IllegalArgumentException("Invalid Base32 character: " + c);
-      }
-
-      buffer = (buffer << 5) | value;
-      bitsLeft += 5;
-
-      if (bitsLeft >= 8) {
-        result.write((buffer >> (bitsLeft - 8)) & 0xFF);
-        bitsLeft -= 8;
-      }
-    }
-
-    return result.toByteArray();
-  }
-
-  /**
-   * Generate QR code URL for Google Authenticator.
-   *
-   * <p>Format: otpauth://totp/{issuer}:{username}?secret={secret}&issuer={issuer}
-   *
-   * @param username Employee username (or email)
-   * @param secret TOTP secret (Base32-encoded)
-   * @return QR code URL
-   */
-  public String generateQrCodeUrl(String username, String secret) {
-    return String.format(
-        "otpauth://totp/%s:%s?secret=%s&issuer=%s", ISSUER, username, secret, ISSUER);
-  }
-
   // ============ Controller API Methods ============
 
   /**
@@ -289,12 +119,12 @@ public class MfaService {
 
       // Generate TOTP secret
       String secret =
-          generateTotpSecret()
+          TotpUtils.generateTotpSecret()
               .getOrElseThrow(e -> new RuntimeException("Failed to generate TOTP secret", e));
 
       // Generate QR code URL
       String accountName = employee.getLoginName();
-      String qrCodeUrl = generateQrCodeUrl(accountName, secret);
+      String qrCodeUrl = TotpUtils.generateQrCodeUrl(accountName, secret);
 
       // Generate QR code data URL (Base64 image)
       String qrCodeDataUrl = generateQrCodeDataUrl(qrCodeUrl);
@@ -305,7 +135,7 @@ public class MfaService {
       vo.setQrCodeUrl(qrCodeUrl);
       vo.setQrCodeDataUrl(qrCodeDataUrl);
       vo.setAccountName(accountName);
-      vo.setIssuer(ISSUER);
+      vo.setIssuer("SmartAdmin");
 
       return ResponseDTO.ok(vo);
     } catch (Exception e) {
@@ -338,12 +168,12 @@ public class MfaService {
 
       // Generate new secret for verification
       String secret =
-          generateTotpSecret()
+          TotpUtils.generateTotpSecret()
               .getOrElseThrow(e -> new RuntimeException("Failed to generate TOTP secret", e));
 
       // Verify TOTP token
       boolean verified =
-          verifyTotpToken(secret, form.getTotpToken())
+          TotpUtils.verifyTotpToken(secret, form.getTotpToken())
               .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
 
       if (!verified) {
@@ -407,7 +237,7 @@ public class MfaService {
       // Decrypt secret and verify TOTP
       String secret = encryptService.decrypt(config.getSecretEncrypted());
       boolean verified =
-          verifyTotpToken(secret, totpToken)
+          TotpUtils.verifyTotpToken(secret, totpToken)
               .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
 
       if (!verified) {
@@ -488,16 +318,34 @@ public class MfaService {
       // Try TOTP verification (6 digits)
       if (mfaToken.matches("^[0-9]{6}$")) {
         String secret = encryptService.decrypt(config.getSecretEncrypted());
-        verified =
-            mfaVerificationManager.verifyTotpTokenTransaction(
-                employeeId, secret, mfaToken, ipAddress, userAgent);
+        // Use TotpUtils for pure computation verification
+        verified = TotpUtils.verifyTotpToken(secret, mfaToken).getOrElse(false);
+
+        if (verified) {
+          // Record successful TOTP verification
+          mfaSetupManager.recordMfaVerificationAuditTransaction(
+              employeeId, "MFA_VERIFY_TOTP", true, ipAddress, userAgent, null);
+        } else {
+          // Record failed TOTP verification
+          mfaSetupManager.recordMfaVerificationAuditTransaction(
+              employeeId, "MFA_VERIFY_TOTP", false, ipAddress, userAgent, "Invalid TOTP token");
+        }
       }
 
       // Try backup code verification (8 digits)
       if (!verified && mfaToken.matches("^[0-9]{8}$")) {
         verified =
-            mfaVerificationManager.verifyBackupCodeTransaction(
-                employeeId, mfaToken, ipAddress, userAgent);
+            mfaBackupCodeService.verifyBackupCode(employeeId, mfaToken, ipAddress).getOrElse(false);
+
+        if (verified) {
+          // Record successful backup code verification
+          mfaSetupManager.recordMfaVerificationAuditTransaction(
+              employeeId, "BACKUP_CODE_USED", true, ipAddress, userAgent, null);
+        } else {
+          // Record failed backup code verification
+          mfaSetupManager.recordMfaVerificationAuditTransaction(
+              employeeId, "BACKUP_CODE_USED", false, ipAddress, userAgent, "Invalid backup code");
+        }
       }
 
       if (!verified) {
@@ -509,12 +357,14 @@ public class MfaService {
 
       // Add trusted device if requested
       if (Boolean.TRUE.equals(form.getTrustDevice())) {
-        mfaVerificationManager.addTrustedDeviceTransaction(
-            employeeId,
-            mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent),
-            form.getDeviceName(),
-            ipAddress,
-            userAgent);
+        String fingerprint =
+            mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent);
+        mfaTrustedDeviceService.addTrustedDevice(
+            employeeId, fingerprint, form.getDeviceName(), ipAddress, userAgent);
+
+        // Record trusted device addition
+        mfaSetupManager.recordMfaAuditLogTransaction(
+            employeeId, "TRUSTED_DEVICE_ADDED", "SUCCESS", ipAddress, userAgent, null);
       }
 
       return ResponseDTO.ok("MFA 驗證成功");
@@ -547,7 +397,7 @@ public class MfaService {
       // Decrypt secret and verify TOTP
       String secret = encryptService.decrypt(config.getSecretEncrypted());
       boolean verified =
-          verifyTotpToken(secret, totpToken)
+          TotpUtils.verifyTotpToken(secret, totpToken)
               .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
 
       if (!verified) {

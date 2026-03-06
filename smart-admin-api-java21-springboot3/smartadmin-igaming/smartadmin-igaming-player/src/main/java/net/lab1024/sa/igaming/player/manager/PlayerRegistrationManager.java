@@ -2,7 +2,9 @@ package net.lab1024.sa.igaming.player.manager;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
@@ -23,13 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author iGaming Team
  * @since 2026-02-18
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlayerRegistrationManager {
 
   private final PlayerDao playerDao;
   private final WalletDao walletDao;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Register a player and create their wallet atomically.
@@ -54,13 +57,16 @@ public class PlayerRegistrationManager {
     ObjectNode payload = JsonNodeFactory.instance.objectNode();
     payload.put("playerId", player.getPlayerId());
     payload.put("username", player.getUsername());
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.PLAYER_EVENTS,
-        DomainEvent.builder()
-            .eventType(DomainEventTypeConst.PLAYER_REGISTERED)
-            .aggregateType("Player")
-            .aggregateId(String.valueOf(player.getPlayerId()))
-            .payload(payload)
-            .build());
+
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.PLAYER_EVENTS,
+                DomainEvent.builder()
+                    .eventType(DomainEventTypeConst.PLAYER_REGISTERED)
+                    .aggregateType("Player")
+                    .aggregateId(String.valueOf(player.getPlayerId()))
+                    .payload(payload)
+                    .build()));
   }
 }

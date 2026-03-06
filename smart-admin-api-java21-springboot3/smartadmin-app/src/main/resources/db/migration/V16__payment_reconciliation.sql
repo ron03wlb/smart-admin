@@ -11,16 +11,16 @@
 -- Part A: Add reconciliation_status to existing t_payment_order
 -- =====================================================================
 
-ALTER TABLE t_payment_order ADD COLUMN reconciliation_status SMALLINT NOT NULL DEFAULT 1;
+ALTER TABLE t_payment_order ADD COLUMN IF NOT EXISTS reconciliation_status SMALLINT NOT NULL DEFAULT 1;
 COMMENT ON COLUMN t_payment_order.reconciliation_status IS '對帳狀態: 1=PENDING, 2=VERIFIED, 3=MISMATCH, 4=COMPENSATED, 5=RECONCILED';
 
-CREATE INDEX idx_payment_order_recon_status ON t_payment_order (reconciliation_status);
+CREATE INDEX IF NOT EXISTS idx_payment_order_recon_status ON t_payment_order (reconciliation_status);
 
 -- =====================================================================
 -- Part B: t_payment_reconciliation (Daily per-PSP Summary)
 -- =====================================================================
 
-CREATE TABLE t_payment_reconciliation (
+CREATE TABLE IF NOT EXISTS t_payment_reconciliation (
     reconciliation_id           BIGSERIAL       PRIMARY KEY,
     tenant_id                   BIGINT          NOT NULL,
     reconciliation_date         DATE            NOT NULL,
@@ -57,14 +57,14 @@ COMMENT ON COLUMN t_payment_reconciliation.total_platform_amount IS '平台端�
 COMMENT ON COLUMN t_payment_reconciliation.amount_difference IS '金額差異';
 COMMENT ON COLUMN t_payment_reconciliation.status IS '對帳狀態: ReconciliationStatusEnum';
 
-CREATE INDEX idx_pay_recon_tenant ON t_payment_reconciliation (tenant_id);
-CREATE INDEX idx_pay_recon_date ON t_payment_reconciliation (reconciliation_date DESC);
+CREATE INDEX IF NOT EXISTS idx_pay_recon_tenant ON t_payment_reconciliation (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_pay_recon_date ON t_payment_reconciliation (reconciliation_date DESC);
 
 -- =====================================================================
 -- Part C: t_reconciliation_exception (Discrepancy Records)
 -- =====================================================================
 
-CREATE TABLE t_reconciliation_exception (
+CREATE TABLE IF NOT EXISTS t_reconciliation_exception (
     exception_id        BIGSERIAL       PRIMARY KEY,
     tenant_id           BIGINT          NOT NULL,
     reconciliation_id   BIGINT          REFERENCES t_payment_reconciliation(reconciliation_id),
@@ -93,9 +93,9 @@ COMMENT ON COLUMN t_reconciliation_exception.resolution_status IS '處理狀態:
 COMMENT ON COLUMN t_reconciliation_exception.notes IS '備註';
 COMMENT ON COLUMN t_reconciliation_exception.resolved_at IS '解決時間';
 
-CREATE INDEX idx_recon_exc_order ON t_reconciliation_exception (order_no);
-CREATE INDEX idx_recon_exc_tenant ON t_reconciliation_exception (tenant_id);
-CREATE INDEX idx_recon_exc_recon_id ON t_reconciliation_exception (reconciliation_id);
+CREATE INDEX IF NOT EXISTS idx_recon_exc_order ON t_reconciliation_exception (order_no);
+CREATE INDEX IF NOT EXISTS idx_recon_exc_tenant ON t_reconciliation_exception (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_recon_exc_recon_id ON t_reconciliation_exception (reconciliation_id);
 
 -- =====================================================================
 -- Part D: RLS Policies

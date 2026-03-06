@@ -20,7 +20,7 @@
 -- Part A: t_risk_rule_param (Risk Rule Parameter Configuration)
 -- =====================================================================
 
-CREATE TABLE t_risk_rule_param (
+CREATE TABLE IF NOT EXISTS t_risk_rule_param (
     rule_param_id           BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     rule_type               SMALLINT        NOT NULL,
@@ -55,13 +55,13 @@ COMMENT ON COLUMN t_risk_rule_param.params_json IS '額外參數 (JSONB)';
 COMMENT ON COLUMN t_risk_rule_param.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_risk_rule_param.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_risk_rule_tenant_type ON t_risk_rule_param (tenant_id, rule_type) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_risk_rule_tenant_type ON t_risk_rule_param (tenant_id, rule_type) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part B: t_risk_assessment (Per-Transaction Risk Assessment Log)
 -- =====================================================================
 
-CREATE TABLE t_risk_assessment (
+CREATE TABLE IF NOT EXISTS t_risk_assessment (
     assessment_id           BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     player_id               BIGINT          NOT NULL,
@@ -90,15 +90,15 @@ COMMENT ON COLUMN t_risk_assessment.decision IS '決策: 1=自動通過, 2=待�
 COMMENT ON COLUMN t_risk_assessment.rule_results_json IS '各規則執行結果 (JSONB)';
 COMMENT ON COLUMN t_risk_assessment.processing_time_ms IS '處理耗時 (毫秒)';
 
-CREATE INDEX idx_assessment_player ON t_risk_assessment (player_id);
-CREATE INDEX idx_assessment_tenant_event ON t_risk_assessment (tenant_id, event_type);
-CREATE INDEX idx_assessment_created ON t_risk_assessment (create_time);
+CREATE INDEX IF NOT EXISTS idx_assessment_player ON t_risk_assessment (player_id);
+CREATE INDEX IF NOT EXISTS idx_assessment_tenant_event ON t_risk_assessment (tenant_id, event_type);
+CREATE INDEX IF NOT EXISTS idx_assessment_created ON t_risk_assessment (create_time);
 
 -- =====================================================================
 -- Part C: t_risk_score (Player Cumulative Risk Profile)
 -- =====================================================================
 
-CREATE TABLE t_risk_score (
+CREATE TABLE IF NOT EXISTS t_risk_score (
     risk_score_id           BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     player_id               BIGINT          NOT NULL,
@@ -125,14 +125,14 @@ COMMENT ON COLUMN t_risk_score.last_assessment_time IS '最近一次評估時間
 COMMENT ON COLUMN t_risk_score.auto_locked IS '是否因風險自動凍結';
 COMMENT ON COLUMN t_risk_score.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_risk_score_player_tenant ON t_risk_score (player_id, tenant_id);
-CREATE INDEX idx_risk_score_level ON t_risk_score (risk_level);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_risk_score_player_tenant ON t_risk_score (player_id, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_risk_score_level ON t_risk_score (risk_level);
 
 -- =====================================================================
 -- Part D: t_risk_proposal (Risk Review Proposals)
 -- =====================================================================
 
-CREATE TABLE t_risk_proposal (
+CREATE TABLE IF NOT EXISTS t_risk_proposal (
     proposal_id             BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     player_id               BIGINT          NOT NULL,
@@ -164,15 +164,15 @@ COMMENT ON COLUMN t_risk_proposal.sla_deadline IS 'SLA 截止時間';
 COMMENT ON COLUMN t_risk_proposal.resolved_at IS '解決時間';
 COMMENT ON COLUMN t_risk_proposal.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_proposal_tenant_status ON t_risk_proposal (tenant_id, status);
-CREATE INDEX idx_proposal_player ON t_risk_proposal (player_id);
-CREATE INDEX idx_proposal_sla ON t_risk_proposal (sla_deadline, status) WHERE status IN (1, 2);
+CREATE INDEX IF NOT EXISTS idx_proposal_tenant_status ON t_risk_proposal (tenant_id, status);
+CREATE INDEX IF NOT EXISTS idx_proposal_player ON t_risk_proposal (player_id);
+CREATE INDEX IF NOT EXISTS idx_proposal_sla ON t_risk_proposal (sla_deadline, status) WHERE status IN (1, 2);
 
 -- =====================================================================
 -- Part E: t_geo_restriction (Restricted Jurisdictions)
 -- =====================================================================
 
-CREATE TABLE t_geo_restriction (
+CREATE TABLE IF NOT EXISTS t_geo_restriction (
     geo_restriction_id      BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     country_code            VARCHAR(3)      NOT NULL,
@@ -193,7 +193,7 @@ COMMENT ON COLUMN t_geo_restriction.restriction_type IS '限制類型: 1=完全�
 COMMENT ON COLUMN t_geo_restriction.reason IS '限制原因';
 COMMENT ON COLUMN t_geo_restriction.enabled IS '是否啟用';
 
-CREATE UNIQUE INDEX uk_geo_country_tenant ON t_geo_restriction (country_code, tenant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_geo_country_tenant ON t_geo_restriction (country_code, tenant_id);
 
 -- =====================================================================
 -- Part F: RLS Policies (Row-Level Security)

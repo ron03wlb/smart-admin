@@ -23,7 +23,7 @@
 -- Part A: t_mfa_recovery_request (MFA Recovery Requests)
 -- =====================================================================
 
-CREATE TABLE t_mfa_recovery_request (
+CREATE TABLE IF NOT EXISTS t_mfa_recovery_request (
     recovery_id         BIGSERIAL       PRIMARY KEY,
     employee_id         BIGINT          NOT NULL,
     tenant_id           BIGINT,
@@ -66,14 +66,14 @@ COMMENT ON COLUMN t_mfa_recovery_request.used_at IS '恢復碼使用時間';
 COMMENT ON COLUMN t_mfa_recovery_request.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_mfa_recovery_request.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_mfa_recovery_employee ON t_mfa_recovery_request (employee_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_recovery_tenant ON t_mfa_recovery_request (tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_recovery_status ON t_mfa_recovery_request (status, create_time DESC) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_recovery_expires ON t_mfa_recovery_request (expires_at) WHERE deleted = FALSE AND used = FALSE;
-CREATE INDEX idx_mfa_recovery_approver ON t_mfa_recovery_request (approver_id, approved_at DESC) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_employee ON t_mfa_recovery_request (employee_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_tenant ON t_mfa_recovery_request (tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_status ON t_mfa_recovery_request (status, create_time DESC) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_expires ON t_mfa_recovery_request (expires_at) WHERE deleted = FALSE AND used = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_approver ON t_mfa_recovery_request (approver_id, approved_at DESC) WHERE deleted = FALSE;
 
 -- Partial unique index: One PENDING request per employee (active records only)
-CREATE UNIQUE INDEX uk_mfa_recovery_employee_pending ON t_mfa_recovery_request (employee_id)
+CREATE UNIQUE INDEX IF NOT EXISTS uk_mfa_recovery_employee_pending ON t_mfa_recovery_request (employee_id)
     WHERE deleted = FALSE AND status = 1;
 
 -- =====================================================================

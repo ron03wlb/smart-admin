@@ -17,7 +17,7 @@
 -- Part A: t_payment_order (Unified Deposit/Withdrawal Order)
 -- =====================================================================
 
-CREATE TABLE t_payment_order (
+CREATE TABLE IF NOT EXISTS t_payment_order (
     payment_order_id    BIGSERIAL       PRIMARY KEY,
     order_no            VARCHAR(64)     NOT NULL,
     player_id           BIGINT          NOT NULL,
@@ -60,17 +60,17 @@ COMMENT ON COLUMN t_payment_order.callback_payload IS '回調原始 payload (審
 COMMENT ON COLUMN t_payment_order.request_id IS '冪等鍵';
 COMMENT ON COLUMN t_payment_order.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_payment_order_player_time ON t_payment_order (player_id, create_time DESC);
-CREATE INDEX idx_payment_order_status_time ON t_payment_order (status, create_time DESC);
-CREATE INDEX idx_payment_order_psp_code ON t_payment_order (psp_code, create_time DESC);
-CREATE INDEX idx_payment_order_tenant ON t_payment_order (tenant_id, create_time DESC);
-CREATE INDEX idx_payment_order_wallet ON t_payment_order (wallet_id);
+CREATE INDEX IF NOT EXISTS idx_payment_order_player_time ON t_payment_order (player_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_payment_order_status_time ON t_payment_order (status, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_payment_order_psp_code ON t_payment_order (psp_code, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_payment_order_tenant ON t_payment_order (tenant_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_payment_order_wallet ON t_payment_order (wallet_id);
 
 -- =====================================================================
 -- Part B: t_psp (PSP Configuration)
 -- =====================================================================
 
-CREATE TABLE t_psp (
+CREATE TABLE IF NOT EXISTS t_psp (
     psp_id                      BIGSERIAL       PRIMARY KEY,
     psp_code                    VARCHAR(30)     NOT NULL,
     psp_name                    VARCHAR(100)    NOT NULL,
@@ -106,7 +106,7 @@ COMMENT ON COLUMN t_psp.max_deposit IS '最高存款金額';
 COMMENT ON COLUMN t_psp.min_withdrawal IS '最低提款金額';
 COMMENT ON COLUMN t_psp.max_withdrawal IS '最高提款金額';
 
-CREATE INDEX idx_psp_tenant_enabled ON t_psp (tenant_id, enabled);
+CREATE INDEX IF NOT EXISTS idx_psp_tenant_enabled ON t_psp (tenant_id, enabled);
 
 -- =====================================================================
 -- Part C: RLS Policies (Row-Level Security)
@@ -140,4 +140,5 @@ GRANT USAGE, SELECT ON SEQUENCE t_psp_psp_id_seq TO smartadmin_app;
 -- =====================================================================
 
 INSERT INTO t_psp (psp_code, psp_name, api_base_url, enabled, priority, supported_currencies, min_deposit, max_deposit, min_withdrawal, max_withdrawal, tenant_id)
-VALUES ('mock', 'Mock PSP (Testing)', 'http://localhost:9999', TRUE, 999, 'USD,EUR,GBP', 10.0000, 10000.0000, 20.0000, 50000.0000, 1);
+VALUES ('mock', 'Mock PSP (Testing)', 'http://localhost:9999', TRUE, 999, 'USD,EUR,GBP', 10.0000, 10000.0000, 20.0000, 50000.0000, 1)
+ON CONFLICT DO NOTHING;

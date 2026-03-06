@@ -19,7 +19,7 @@
 -- Part A: t_wallet (Master Wallet)
 -- =====================================================================
 
-CREATE TABLE t_wallet (
+CREATE TABLE IF NOT EXISTS t_wallet (
     wallet_id       BIGSERIAL       PRIMARY KEY,
     player_id       BIGINT          NOT NULL,
     tenant_id       BIGINT          NOT NULL,
@@ -50,14 +50,14 @@ COMMENT ON COLUMN t_wallet.locked_amount IS '鎖定金額 (= SUM(t_wallet_lock.l
 COMMENT ON COLUMN t_wallet.version IS '樂觀鎖版本號';
 COMMENT ON COLUMN t_wallet.deleted IS '軟刪除標記';
 
-CREATE INDEX idx_wallet_player_tenant ON t_wallet (player_id, tenant_id);
-CREATE INDEX idx_wallet_tenant ON t_wallet (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_player_tenant ON t_wallet (player_id, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_tenant ON t_wallet (tenant_id);
 
 -- =====================================================================
 -- Part B: t_wallet_transaction (Transaction Log — Append-Only)
 -- =====================================================================
 
-CREATE TABLE t_wallet_transaction (
+CREATE TABLE IF NOT EXISTS t_wallet_transaction (
     transaction_id    BIGSERIAL       PRIMARY KEY,
     wallet_id         BIGINT          NOT NULL REFERENCES t_wallet(wallet_id),
     player_id         BIGINT          NOT NULL,
@@ -88,16 +88,16 @@ COMMENT ON COLUMN t_wallet_transaction.request_id IS '冪等鍵 (Idempotency Lay
 COMMENT ON COLUMN t_wallet_transaction.reference_type IS '關聯類型 (DEPOSIT_ORDER, ROUND, BONUS 等)';
 COMMENT ON COLUMN t_wallet_transaction.reference_id IS '關聯 ID';
 
-CREATE INDEX idx_wallet_txn_wallet_time ON t_wallet_transaction (wallet_id, create_time DESC);
-CREATE INDEX idx_wallet_txn_player_type ON t_wallet_transaction (player_id, transaction_type, create_time DESC);
-CREATE INDEX idx_wallet_txn_tenant ON t_wallet_transaction (tenant_id, create_time DESC);
-CREATE INDEX idx_wallet_txn_ref ON t_wallet_transaction (reference_type, reference_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_txn_wallet_time ON t_wallet_transaction (wallet_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_wallet_txn_player_type ON t_wallet_transaction (player_id, transaction_type, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_wallet_txn_tenant ON t_wallet_transaction (tenant_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_wallet_txn_ref ON t_wallet_transaction (reference_type, reference_id);
 
 -- =====================================================================
 -- Part C: t_wallet_bonus_ext (Bonus Detail Extension)
 -- =====================================================================
 
-CREATE TABLE t_wallet_bonus_ext (
+CREATE TABLE IF NOT EXISTS t_wallet_bonus_ext (
     id                    BIGSERIAL       PRIMARY KEY,
     wallet_id             BIGINT          NOT NULL REFERENCES t_wallet(wallet_id),
     bonus_id              BIGINT          NOT NULL,
@@ -124,14 +124,14 @@ COMMENT ON COLUMN t_wallet_bonus_ext.expires_at IS '紅利過期時間';
 COMMENT ON COLUMN t_wallet_bonus_ext.game_restriction IS '遊戲限制 (JSONB)';
 COMMENT ON COLUMN t_wallet_bonus_ext.status IS '狀態: 1=有效, 2=過期, 3=完成, 4=沒收';
 
-CREATE INDEX idx_wallet_bonus_ext_wallet_status ON t_wallet_bonus_ext (wallet_id, status);
-CREATE INDEX idx_wallet_bonus_ext_expires ON t_wallet_bonus_ext (expires_at, status) WHERE status = 1;
+CREATE INDEX IF NOT EXISTS idx_wallet_bonus_ext_wallet_status ON t_wallet_bonus_ext (wallet_id, status);
+CREATE INDEX IF NOT EXISTS idx_wallet_bonus_ext_expires ON t_wallet_bonus_ext (expires_at, status) WHERE status = 1;
 
 -- =====================================================================
 -- Part D: t_wallet_lock (Lock Detail Records)
 -- =====================================================================
 
-CREATE TABLE t_wallet_lock (
+CREATE TABLE IF NOT EXISTS t_wallet_lock (
     lock_id         BIGSERIAL       PRIMARY KEY,
     wallet_id       BIGINT          NOT NULL REFERENCES t_wallet(wallet_id),
     lock_amount     DECIMAL(19,4)   NOT NULL,
@@ -151,8 +151,8 @@ COMMENT ON COLUMN t_wallet_lock.lock_reason IS '鎖定原因: 1=下注待結算,
 COMMENT ON COLUMN t_wallet_lock.reference_id IS '關聯訂單/注單 ID';
 COMMENT ON COLUMN t_wallet_lock.expires_at IS '鎖定過期時間';
 
-CREATE INDEX idx_wallet_lock_wallet_ref ON t_wallet_lock (wallet_id, reference_id);
-CREATE INDEX idx_wallet_lock_expires ON t_wallet_lock (expires_at) WHERE expires_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_wallet_lock_wallet_ref ON t_wallet_lock (wallet_id, reference_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_lock_expires ON t_wallet_lock (expires_at) WHERE expires_at IS NOT NULL;
 
 -- =====================================================================
 -- Part E: RLS Policies (Row-Level Security)

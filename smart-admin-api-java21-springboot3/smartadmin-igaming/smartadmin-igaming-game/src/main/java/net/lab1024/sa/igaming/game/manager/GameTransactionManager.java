@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
@@ -65,7 +66,7 @@ public class GameTransactionManager {
   private final WalletBonusExtDao walletBonusExtDao;
   private final WalletTransactionDao walletTransactionDao;
   private final WalletManager walletManager;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Execute debit (bet placement) with multi-wallet priority: BONUS → CASH.
@@ -601,15 +602,17 @@ public class GameTransactionManager {
 
   @SuppressWarnings("FutureReturnValueIgnored")
   private void publishGameEvent(String eventType, Long playerId, Long tenantId, JsonNode payload) {
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.GAME_EVENTS,
-        DomainEvent.builder()
-            .eventType(eventType)
-            .aggregateType("GameRound")
-            .aggregateId(String.valueOf(playerId))
-            .tenantId(tenantId)
-            .payload(payload)
-            .build());
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.GAME_EVENTS,
+                DomainEvent.builder()
+                    .eventType(eventType)
+                    .aggregateType("GameRound")
+                    .aggregateId(String.valueOf(playerId))
+                    .tenantId(tenantId)
+                    .payload(payload)
+                    .build()));
   }
 
   private JsonNode buildBetPlacedPayload(

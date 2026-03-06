@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
@@ -41,7 +42,7 @@ public class CreditSettlementManager {
   private final AgentCreditDao agentCreditDao;
   private final SettlementRecordDao settlementRecordDao;
   private final CreditAllocationAuditDao creditAllocationAuditDao;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Execute credit allocation from parent to child agent.
@@ -292,13 +293,15 @@ public class CreditSettlementManager {
   @SuppressWarnings("FutureReturnValueIgnored")
   private void publishAgentEvent(
       String eventType, String aggregateType, String aggregateId, ObjectNode payload) {
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.AGENT_EVENTS,
-        DomainEvent.builder()
-            .eventType(eventType)
-            .aggregateType(aggregateType)
-            .aggregateId(aggregateId)
-            .payload(payload)
-            .build());
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.AGENT_EVENTS,
+                DomainEvent.builder()
+                    .eventType(eventType)
+                    .aggregateType(aggregateType)
+                    .aggregateId(aggregateId)
+                    .payload(payload)
+                    .build()));
   }
 }

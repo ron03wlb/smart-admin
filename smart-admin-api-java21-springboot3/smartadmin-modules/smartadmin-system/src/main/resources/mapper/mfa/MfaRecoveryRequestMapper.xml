@@ -38,7 +38,7 @@
             update_time = NOW()
         WHERE status = 2
           AND used = FALSE
-          AND expires_at < NOW()
+          AND expires_at &lt; NOW()
           AND deleted = FALSE
     </update>
 
@@ -49,7 +49,7 @@
         WHERE employee_id = #{employeeId}
           AND status = 2
           AND used = FALSE
-          AND expires_at > NOW()
+          AND expires_at &gt; NOW()
           AND deleted = FALSE
         LIMIT 1
     </select>

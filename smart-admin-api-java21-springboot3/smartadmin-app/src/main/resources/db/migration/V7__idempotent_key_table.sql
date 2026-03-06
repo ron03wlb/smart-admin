@@ -2,7 +2,7 @@
 -- V7: Idempotent key table for event consumer deduplication (ADR-015)
 -- =====================================================================
 
-CREATE TABLE t_idempotent_key (
+CREATE TABLE IF NOT EXISTS t_idempotent_key (
     id              BIGSERIAL       PRIMARY KEY,
     event_id        VARCHAR(64)     NOT NULL,
     event_type      VARCHAR(128)    NOT NULL,
@@ -16,4 +16,4 @@ COMMENT ON COLUMN t_idempotent_key.event_type IS '事件類型（用於審計追
 COMMENT ON COLUMN t_idempotent_key.created_at IS '建立時間';
 
 -- Index for cleanup job (remove records older than 7 days)
-CREATE INDEX idx_idempotent_key_created_at ON t_idempotent_key (created_at);
+CREATE INDEX IF NOT EXISTS idx_idempotent_key_created_at ON t_idempotent_key (created_at);

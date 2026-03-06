@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
@@ -42,7 +43,7 @@ public class WageringProgressManager {
   private final WalletBonusExtDao walletBonusExtDao;
   private final GameDao gameDao;
   private final GameWeightConfigDao gameWeightConfigDao;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Update wagering progress for all active bonuses of a player.
@@ -123,15 +124,18 @@ public class WageringProgressManager {
     payload.put("bonusExtId", record.getWalletBonusExtId());
     payload.put("playerId", record.getPlayerId());
     payload.put("recordId", record.getRecordId());
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.ACTIVITY_EVENTS,
-        DomainEvent.builder()
-            .eventType(DomainEventTypeConst.WAGERING_COMPLETED)
-            .tenantId(record.getTenantId())
-            .aggregateType("BONUS_RECORD")
-            .aggregateId(String.valueOf(record.getRecordId()))
-            .payload(payload)
-            .build());
+
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.ACTIVITY_EVENTS,
+                DomainEvent.builder()
+                    .eventType(DomainEventTypeConst.WAGERING_COMPLETED)
+                    .tenantId(record.getTenantId())
+                    .aggregateType("BONUS_RECORD")
+                    .aggregateId(String.valueOf(record.getRecordId()))
+                    .payload(payload)
+                    .build()));
   }
 
   private BigDecimal calculateEffectiveBet(Long tenantId, String gameCode, BigDecimal betAmount) {

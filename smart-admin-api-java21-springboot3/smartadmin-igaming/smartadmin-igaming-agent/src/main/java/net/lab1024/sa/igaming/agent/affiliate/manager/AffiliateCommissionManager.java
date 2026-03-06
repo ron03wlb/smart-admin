@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
@@ -48,7 +49,7 @@ public class AffiliateCommissionManager {
   private final AffiliateCommissionPlanDao affiliateCommissionPlanDao;
   private final AffiliateCommissionRecordDao affiliateCommissionRecordDao;
   private final AffiliateAdjustmentDao affiliateAdjustmentDao;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Create agent with closure table hierarchy entries.
@@ -303,14 +304,16 @@ public class AffiliateCommissionManager {
   @SuppressWarnings("FutureReturnValueIgnored")
   private void publishAgentEvent(
       String eventType, String aggregateType, String aggregateId, ObjectNode payload) {
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.AGENT_EVENTS,
-        DomainEvent.builder()
-            .eventType(eventType)
-            .aggregateType(aggregateType)
-            .aggregateId(aggregateId)
-            .payload(payload)
-            .build());
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.AGENT_EVENTS,
+                DomainEvent.builder()
+                    .eventType(eventType)
+                    .aggregateType(aggregateType)
+                    .aggregateId(aggregateId)
+                    .payload(payload)
+                    .build()));
   }
 
   private AffiliateCommissionRecordEntity findLastApprovedRecord(Long agentId, Long tenantId) {

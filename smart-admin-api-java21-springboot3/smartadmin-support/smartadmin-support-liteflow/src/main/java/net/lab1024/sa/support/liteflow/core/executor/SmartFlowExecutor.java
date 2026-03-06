@@ -2,8 +2,8 @@ package net.lab1024.sa.support.liteflow.core.executor;
 
 import com.yomahub.liteflow.core.FlowExecutor;
 import com.yomahub.liteflow.flow.LiteflowResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,10 +16,11 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class SmartFlowExecutor {
 
-  private final FlowExecutor flowExecutor;
+  /** LiteFlow flow executor (optional - only available when LiteFlow is enabled). */
+  @Autowired(required = false)
+  private FlowExecutor flowExecutor;
 
   /**
    * 執行流程（同步）
@@ -29,6 +30,12 @@ public class SmartFlowExecutor {
    * @return 流程執行結果
    */
   public LiteflowResponse execute(String chainCode, Object... params) {
+    // Null check for optional FlowExecutor
+    if (flowExecutor == null) {
+      log.debug("LiteFlow disabled - flow execution skipped: chainCode={}", chainCode);
+      throw new IllegalStateException("LiteFlow is disabled. Cannot execute flow: " + chainCode);
+    }
+
     try {
       log.info("執行 LiteFlow 流程: chainCode={}", chainCode);
       LiteflowResponse response = flowExecutor.execute2Resp(chainCode, null, params);
@@ -57,6 +64,12 @@ public class SmartFlowExecutor {
    * <p>從數據庫重新加載所有流程定義和腳本節點
    */
   public void reloadRule() {
+    // Null check for optional FlowExecutor
+    if (flowExecutor == null) {
+      log.debug("LiteFlow disabled - rule reload skipped");
+      return;
+    }
+
     log.info("重新加載 LiteFlow 規則");
     flowExecutor.reloadRule();
   }

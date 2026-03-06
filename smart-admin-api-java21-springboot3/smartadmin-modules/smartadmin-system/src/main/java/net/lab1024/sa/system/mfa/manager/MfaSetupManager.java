@@ -187,4 +187,82 @@ public class MfaSetupManager {
       mfaConfigDao.updateById(config);
     }
   }
+
+  /**
+   * Record MFA verification audit log (transaction method).
+   *
+   * <p>Used by MfaService to record TOTP/backup code verification attempts.
+   *
+   * @param employeeId Employee ID
+   * @param eventType Event type (e.g., "MFA_VERIFY_TOTP", "BACKUP_CODE_USED")
+   * @param success Verification result (true = success, false = failure)
+   * @param ipAddress IP address
+   * @param userAgent User-Agent
+   * @param errorMessage Error message (if failed)
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public void recordMfaVerificationAuditTransaction(
+      Long employeeId,
+      String eventType,
+      boolean success,
+      String ipAddress,
+      String userAgent,
+      String errorMessage) {
+
+    MfaAuditLogEntity auditLog = new MfaAuditLogEntity();
+    auditLog.setEmployeeId(employeeId);
+    auditLog.setEventType(eventType);
+    auditLog.setEventResult(success ? "SUCCESS" : "FAILURE");
+    auditLog.setSeverity(success ? "INFO" : "WARNING");
+    auditLog.setIpAddress(ipAddress);
+    auditLog.setUserAgent(userAgent);
+    auditLog.setDeleted(false);
+    if (!success && errorMessage != null) {
+      auditLog.setErrorMessage(errorMessage);
+    }
+    mfaAuditLogDao.insert(auditLog);
+
+    log.info(
+        "MFA verification audit: employee={}, event={}, result={}",
+        employeeId,
+        eventType,
+        success ? "SUCCESS" : "FAILURE");
+  }
+
+  /**
+   * Record general MFA audit log (transaction method).
+   *
+   * <p>Used for recording non-verification MFA events (e.g., trusted device added).
+   *
+   * @param employeeId Employee ID
+   * @param eventType Event type (e.g., "TRUSTED_DEVICE_ADDED")
+   * @param eventResult Event result ("SUCCESS", "FAILURE")
+   * @param ipAddress IP address
+   * @param userAgent User-Agent
+   * @param errorMessage Error message (if any)
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public void recordMfaAuditLogTransaction(
+      Long employeeId,
+      String eventType,
+      String eventResult,
+      String ipAddress,
+      String userAgent,
+      String errorMessage) {
+
+    MfaAuditLogEntity auditLog = new MfaAuditLogEntity();
+    auditLog.setEmployeeId(employeeId);
+    auditLog.setEventType(eventType);
+    auditLog.setEventResult(eventResult);
+    auditLog.setSeverity("INFO");
+    auditLog.setIpAddress(ipAddress);
+    auditLog.setUserAgent(userAgent);
+    auditLog.setDeleted(false);
+    if (errorMessage != null) {
+      auditLog.setErrorMessage(errorMessage);
+    }
+    mfaAuditLogDao.insert(auditLog);
+
+    log.info("MFA audit: employee={}, event={}, result={}", employeeId, eventType, eventResult);
+  }
 }

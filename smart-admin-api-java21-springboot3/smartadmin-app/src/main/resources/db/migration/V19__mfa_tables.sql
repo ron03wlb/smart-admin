@@ -19,7 +19,7 @@
 -- Part A: t_mfa_config (MFA Configuration)
 -- =====================================================================
 
-CREATE TABLE t_mfa_config (
+CREATE TABLE IF NOT EXISTS t_mfa_config (
     mfa_config_id       BIGSERIAL       PRIMARY KEY,
     employee_id         BIGINT          NOT NULL,
     tenant_id           BIGINT,
@@ -52,15 +52,15 @@ COMMENT ON COLUMN t_mfa_config.last_verified_at IS '最後驗證時間';
 COMMENT ON COLUMN t_mfa_config.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_mfa_config.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_mfa_config_employee ON t_mfa_config (employee_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_config_tenant ON t_mfa_config (tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_config_enabled ON t_mfa_config (employee_id, mfa_enabled) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_config_employee ON t_mfa_config (employee_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_config_tenant ON t_mfa_config (tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_config_enabled ON t_mfa_config (employee_id, mfa_enabled) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part B: t_mfa_backup_code (MFA Backup Codes)
 -- =====================================================================
 
-CREATE TABLE t_mfa_backup_code (
+CREATE TABLE IF NOT EXISTS t_mfa_backup_code (
     backup_code_id      BIGSERIAL       PRIMARY KEY,
     employee_id         BIGINT          NOT NULL,
     tenant_id           BIGINT,
@@ -83,15 +83,15 @@ COMMENT ON COLUMN t_mfa_backup_code.used_at IS '使用時間';
 COMMENT ON COLUMN t_mfa_backup_code.used_ip IS '使用 IP';
 COMMENT ON COLUMN t_mfa_backup_code.deleted IS '軟刪除標記';
 
-CREATE INDEX idx_mfa_backup_code_employee ON t_mfa_backup_code (employee_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_backup_code_tenant ON t_mfa_backup_code (tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_backup_code_used ON t_mfa_backup_code (employee_id, used) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_backup_code_employee ON t_mfa_backup_code (employee_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_backup_code_tenant ON t_mfa_backup_code (tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_backup_code_used ON t_mfa_backup_code (employee_id, used) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part C: t_mfa_trusted_device (MFA Trusted Devices)
 -- =====================================================================
 
-CREATE TABLE t_mfa_trusted_device (
+CREATE TABLE IF NOT EXISTS t_mfa_trusted_device (
     device_id           BIGSERIAL       PRIMARY KEY,
     employee_id         BIGINT          NOT NULL,
     tenant_id           BIGINT,
@@ -116,16 +116,16 @@ COMMENT ON COLUMN t_mfa_trusted_device.user_agent IS '用戶代理字串';
 COMMENT ON COLUMN t_mfa_trusted_device.trusted_until IS '信任截止時間 (30天後)';
 COMMENT ON COLUMN t_mfa_trusted_device.deleted IS '軟刪除標記';
 
-CREATE INDEX idx_mfa_trusted_device_employee ON t_mfa_trusted_device (employee_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_trusted_device_tenant ON t_mfa_trusted_device (tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_trusted_device_fingerprint ON t_mfa_trusted_device (employee_id, device_fingerprint) WHERE deleted = FALSE;
-CREATE INDEX idx_mfa_trusted_device_expiry ON t_mfa_trusted_device (trusted_until) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_trusted_device_employee ON t_mfa_trusted_device (employee_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_trusted_device_tenant ON t_mfa_trusted_device (tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_trusted_device_fingerprint ON t_mfa_trusted_device (employee_id, device_fingerprint) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_mfa_trusted_device_expiry ON t_mfa_trusted_device (trusted_until) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part D: t_mfa_audit_log (MFA Audit Logging)
 -- =====================================================================
 
-CREATE TABLE t_mfa_audit_log (
+CREATE TABLE IF NOT EXISTS t_mfa_audit_log (
     log_id              BIGSERIAL       PRIMARY KEY,
     employee_id         BIGINT          NOT NULL,
     tenant_id           BIGINT,
@@ -154,10 +154,10 @@ COMMENT ON COLUMN t_mfa_audit_log.user_agent IS '用戶代理字串';
 COMMENT ON COLUMN t_mfa_audit_log.error_message IS '錯誤訊息';
 COMMENT ON COLUMN t_mfa_audit_log.deleted IS '軟刪除標記';
 
-CREATE INDEX idx_mfa_audit_log_employee ON t_mfa_audit_log (employee_id, create_time DESC);
-CREATE INDEX idx_mfa_audit_log_tenant ON t_mfa_audit_log (tenant_id);
-CREATE INDEX idx_mfa_audit_log_severity ON t_mfa_audit_log (severity, create_time DESC);
-CREATE INDEX idx_mfa_audit_log_event_type ON t_mfa_audit_log (event_type, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_mfa_audit_log_employee ON t_mfa_audit_log (employee_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_mfa_audit_log_tenant ON t_mfa_audit_log (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_mfa_audit_log_severity ON t_mfa_audit_log (severity, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_mfa_audit_log_event_type ON t_mfa_audit_log (event_type, create_time DESC);
 
 -- =====================================================================
 -- Part E: RLS Policies (Row-Level Security)

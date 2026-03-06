@@ -123,246 +123,294 @@ ALTER TABLE t_help_doc_view_record ENABLE ROW LEVEL SECURITY;
 --   TO smartadmin_app: Only applies to app role; superuser unaffected
 
 -- System module (8 tables)
+DROP POLICY IF EXISTS tenant_isolation ON t_employee;
 CREATE POLICY tenant_isolation ON t_employee
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_department;
 CREATE POLICY tenant_isolation ON t_department
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_position;
 CREATE POLICY tenant_isolation ON t_position
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_role;
 CREATE POLICY tenant_isolation ON t_role
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_role_employee;
 CREATE POLICY tenant_isolation ON t_role_employee
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_role_menu;
 CREATE POLICY tenant_isolation ON t_role_menu
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_role_data_scope;
 CREATE POLICY tenant_isolation ON t_role_data_scope
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_menu;
 CREATE POLICY tenant_isolation ON t_menu
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
 -- Business module (3 tables)
+DROP POLICY IF EXISTS tenant_isolation ON t_goods;
 CREATE POLICY tenant_isolation ON t_goods
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_category;
 CREATE POLICY tenant_isolation ON t_category
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_brand;
 CREATE POLICY tenant_isolation ON t_brand
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
 -- OA module (6 tables)
+DROP POLICY IF EXISTS tenant_isolation ON t_oa_invoice;
 CREATE POLICY tenant_isolation ON t_oa_invoice
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_notice;
 CREATE POLICY tenant_isolation ON t_notice
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_notice_type;
 CREATE POLICY tenant_isolation ON t_notice_type
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_oa_bank;
 CREATE POLICY tenant_isolation ON t_oa_bank
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_oa_enterprise;
 CREATE POLICY tenant_isolation ON t_oa_enterprise
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_oa_enterprise_employee;
 CREATE POLICY tenant_isolation ON t_oa_enterprise_employee
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
 -- Support BaseEntity tables (24 tables)
+DROP POLICY IF EXISTS tenant_isolation ON t_config;
 CREATE POLICY tenant_isolation ON t_config
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_dict;
 CREATE POLICY tenant_isolation ON t_dict
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_dict_data;
 CREATE POLICY tenant_isolation ON t_dict_data
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_file;
 CREATE POLICY tenant_isolation ON t_file
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_feedback;
 CREATE POLICY tenant_isolation ON t_feedback
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_help_doc_catalog;
 CREATE POLICY tenant_isolation ON t_help_doc_catalog
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_help_doc;
 CREATE POLICY tenant_isolation ON t_help_doc
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_message;
 CREATE POLICY tenant_isolation ON t_message
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_mail_template;
 CREATE POLICY tenant_isolation ON t_mail_template
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_operate_log;
 CREATE POLICY tenant_isolation ON t_operate_log
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_login_log;
 CREATE POLICY tenant_isolation ON t_login_log
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_login_fail;
 CREATE POLICY tenant_isolation ON t_login_fail
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_password_log;
 CREATE POLICY tenant_isolation ON t_password_log
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_reload_item;
 CREATE POLICY tenant_isolation ON t_reload_item
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_serial_number;
 CREATE POLICY tenant_isolation ON t_serial_number
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_serial_number_record;
 CREATE POLICY tenant_isolation ON t_serial_number_record
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_table_column;
 CREATE POLICY tenant_isolation ON t_table_column
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_change_log;
 CREATE POLICY tenant_isolation ON t_change_log
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_code_generator_config;
 CREATE POLICY tenant_isolation ON t_code_generator_config
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_data_tracer;
 CREATE POLICY tenant_isolation ON t_data_tracer
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_smart_job;
 CREATE POLICY tenant_isolation ON t_smart_job
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_liteflow_chain;
 CREATE POLICY tenant_isolation ON t_liteflow_chain
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_liteflow_script;
 CREATE POLICY tenant_isolation ON t_liteflow_script
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_liteflow_execution_metrics;
 CREATE POLICY tenant_isolation ON t_liteflow_execution_metrics
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
 -- Support Non-BaseEntity tables (4 tables)
+DROP POLICY IF EXISTS tenant_isolation ON t_reload_result;
 CREATE POLICY tenant_isolation ON t_reload_result
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_smart_job_log;
 CREATE POLICY tenant_isolation ON t_smart_job_log
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_liteflow_execution_log;
 CREATE POLICY tenant_isolation ON t_liteflow_execution_log
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_heart_beat_record;
 CREATE POLICY tenant_isolation ON t_heart_beat_record
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
 -- V4 Backfill tables (3 tables)
+DROP POLICY IF EXISTS tenant_isolation ON t_notice_visible_range;
 CREATE POLICY tenant_isolation ON t_notice_visible_range
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_notice_view_record;
 CREATE POLICY tenant_isolation ON t_notice_view_record
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)
     WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT);
 
+DROP POLICY IF EXISTS tenant_isolation ON t_help_doc_view_record;
 CREATE POLICY tenant_isolation ON t_help_doc_view_record
     FOR ALL TO smartadmin_app
     USING (tenant_id = current_setting('app.current_tenant_id', true)::BIGINT)

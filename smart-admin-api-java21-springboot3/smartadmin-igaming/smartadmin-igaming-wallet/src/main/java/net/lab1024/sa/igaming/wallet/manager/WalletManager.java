@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
@@ -46,7 +47,14 @@ public class WalletManager {
   private final WalletTransactionDao walletTransactionDao;
   private final WalletLockDao walletLockDao;
   private final WalletBonusExtDao walletBonusExtDao;
-  private final DomainEventPublisher domainEventPublisher;
+
+  /**
+   * Domain event publisher (optional - only available when Kafka is enabled).
+   *
+   * <p>When Kafka is disabled (smart.kafka.enabled=false), this field will be empty and wallet
+   * events will not be published.
+   */
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Create a new wallet.
@@ -367,13 +375,15 @@ public class WalletManager {
     node.put("balanceAfter", transaction.getBalanceAfter().toPlainString());
     node.put("requestId", transaction.getRequestId());
 
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.WALLET_EVENTS,
-        DomainEvent.builder()
-            .eventType(eventType)
-            .aggregateType("Wallet")
-            .aggregateId(String.valueOf(wallet.getWalletId()))
-            .payload(node)
-            .build());
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.WALLET_EVENTS,
+                DomainEvent.builder()
+                    .eventType(eventType)
+                    .aggregateType("Wallet")
+                    .aggregateId(String.valueOf(wallet.getWalletId()))
+                    .payload(node)
+                    .build()));
   }
 }

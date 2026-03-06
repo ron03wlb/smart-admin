@@ -17,7 +17,7 @@
 -- Part A: t_promotion_rule (Promotion Rule Configuration)
 -- =====================================================================
 
-CREATE TABLE t_promotion_rule (
+CREATE TABLE IF NOT EXISTS t_promotion_rule (
     rule_id                 BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     promotion_code          VARCHAR(64)     NOT NULL,
@@ -61,15 +61,15 @@ COMMENT ON COLUMN t_promotion_rule.game_restriction IS '遊戲限制規則 (JSON
 COMMENT ON COLUMN t_promotion_rule.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_promotion_rule.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_promo_code_tenant ON t_promotion_rule (promotion_code, tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_promo_tenant_status ON t_promotion_rule (tenant_id, status);
-CREATE INDEX idx_promo_type ON t_promotion_rule (promotion_type);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_promo_code_tenant ON t_promotion_rule (promotion_code, tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_promo_tenant_status ON t_promotion_rule (tenant_id, status);
+CREATE INDEX IF NOT EXISTS idx_promo_type ON t_promotion_rule (promotion_type);
 
 -- =====================================================================
 -- Part B: t_player_bonus_record (Player Bonus Claim Records)
 -- =====================================================================
 
-CREATE TABLE t_player_bonus_record (
+CREATE TABLE IF NOT EXISTS t_player_bonus_record (
     record_id               BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     player_id               BIGINT          NOT NULL,
@@ -108,11 +108,11 @@ COMMENT ON COLUMN t_player_bonus_record.wallet_bonus_ext_id IS '關聯 t_wallet_
 COMMENT ON COLUMN t_player_bonus_record.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_player_bonus_record.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_bonus_claim ON t_player_bonus_record (player_id, rule_id, claim_id, tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_bonus_player ON t_player_bonus_record (player_id);
-CREATE INDEX idx_bonus_tenant_status ON t_player_bonus_record (tenant_id, status);
-CREATE INDEX idx_bonus_rule ON t_player_bonus_record (rule_id);
-CREATE INDEX idx_bonus_expired ON t_player_bonus_record (expired_at, status) WHERE status = 2;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_bonus_claim ON t_player_bonus_record (player_id, rule_id, claim_id, tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_bonus_player ON t_player_bonus_record (player_id);
+CREATE INDEX IF NOT EXISTS idx_bonus_tenant_status ON t_player_bonus_record (tenant_id, status);
+CREATE INDEX IF NOT EXISTS idx_bonus_rule ON t_player_bonus_record (rule_id);
+CREATE INDEX IF NOT EXISTS idx_bonus_expired ON t_player_bonus_record (expired_at, status) WHERE status = 2;
 
 -- =====================================================================
 -- Part C: RLS Policies (Row-Level Security)

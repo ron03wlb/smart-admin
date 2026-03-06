@@ -58,6 +58,7 @@ import net.lab1024.sa.system.login.domain.RequestEmployee;
 import net.lab1024.sa.system.login.manager.LoginManager;
 import net.lab1024.sa.system.menu.domain.entity.MenuEntity;
 import net.lab1024.sa.system.menu.domain.vo.MenuVO;
+import net.lab1024.sa.system.mfa.util.TotpUtils;
 import net.lab1024.sa.system.role.dao.RoleEmployeeDao;
 import net.lab1024.sa.system.role.dao.RoleMenuDao;
 import net.lab1024.sa.system.role.domain.vo.RoleVO;
@@ -718,7 +719,7 @@ public class LoginService implements StpInterface {
 
     // Try TOTP verification (6 digits)
     if (mfaToken.matches("^[0-9]{6}$")) {
-      verified = mfaService.verifyTotpToken(secret, mfaToken).getOrElse(false);
+      verified = TotpUtils.verifyTotpToken(secret, mfaToken).getOrElse(false);
     }
 
     // Try backup code verification (8 digits)

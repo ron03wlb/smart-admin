@@ -2,7 +2,9 @@ package net.lab1024.sa.igaming.player.manager;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
@@ -25,13 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author iGaming Team
  * @since 2026-02-18
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KycApprovalManager {
 
   private final PlayerDao playerDao;
   private final KycDocumentDao kycDocumentDao;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Approve KYC L1 document and upgrade player KYC level.
@@ -90,13 +93,16 @@ public class KycApprovalManager {
     payload.put("playerId", playerId);
     payload.put("kycLevel", kycLevel != null ? kycLevel.getValue() : -1);
     payload.put("kycDocumentId", kycDocumentId);
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.PLAYER_EVENTS,
-        DomainEvent.builder()
-            .eventType(DomainEventTypeConst.KYC_UPDATED)
-            .aggregateType("Player")
-            .aggregateId(String.valueOf(playerId))
-            .payload(payload)
-            .build());
+
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.PLAYER_EVENTS,
+                DomainEvent.builder()
+                    .eventType(DomainEventTypeConst.KYC_UPDATED)
+                    .aggregateType("Player")
+                    .aggregateId(String.valueOf(playerId))
+                    .payload(payload)
+                    .build()));
   }
 }

@@ -19,7 +19,7 @@
 -- Part A: t_player (Master Player)
 -- =====================================================================
 
-CREATE TABLE t_player (
+CREATE TABLE IF NOT EXISTS t_player (
     player_id           BIGSERIAL       PRIMARY KEY,
     tenant_id           BIGINT          NOT NULL,
     username            VARCHAR(50)     NOT NULL,
@@ -62,17 +62,17 @@ COMMENT ON COLUMN t_player.last_login_time IS '最後登入時間';
 COMMENT ON COLUMN t_player.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_player.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_player_username_tenant ON t_player (tenant_id, username) WHERE deleted = FALSE;
-CREATE INDEX idx_player_email_blind ON t_player (email_blind_idx) WHERE deleted = FALSE;
-CREATE INDEX idx_player_phone_blind ON t_player (phone_blind_idx) WHERE deleted = FALSE;
-CREATE INDEX idx_player_tenant ON t_player (tenant_id);
-CREATE INDEX idx_player_status ON t_player (tenant_id, status);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_player_username_tenant ON t_player (tenant_id, username) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_player_email_blind ON t_player (email_blind_idx) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_player_phone_blind ON t_player (phone_blind_idx) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_player_tenant ON t_player (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_player_status ON t_player (tenant_id, status);
 
 -- =====================================================================
 -- Part B: t_kyc_document (KYC Document Verification)
 -- =====================================================================
 
-CREATE TABLE t_kyc_document (
+CREATE TABLE IF NOT EXISTS t_kyc_document (
     kyc_document_id     BIGSERIAL       PRIMARY KEY,
     tenant_id           BIGINT          NOT NULL,
     player_id           BIGINT          NOT NULL REFERENCES t_player(player_id),
@@ -95,14 +95,14 @@ COMMENT ON COLUMN t_kyc_document.document_url IS '文件 URL';
 COMMENT ON COLUMN t_kyc_document.verification_status IS '審核狀態: 1=待審核, 2=通過, 3=拒絕';
 COMMENT ON COLUMN t_kyc_document.reviewer_comment IS '審核備註';
 
-CREATE INDEX idx_kyc_doc_player ON t_kyc_document (player_id);
-CREATE INDEX idx_kyc_doc_tenant ON t_kyc_document (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_kyc_doc_player ON t_kyc_document (player_id);
+CREATE INDEX IF NOT EXISTS idx_kyc_doc_tenant ON t_kyc_document (tenant_id);
 
 -- =====================================================================
 -- Part C: t_vip_change_log (VIP Level Change Audit)
 -- =====================================================================
 
-CREATE TABLE t_vip_change_log (
+CREATE TABLE IF NOT EXISTS t_vip_change_log (
     log_id              BIGSERIAL       PRIMARY KEY,
     tenant_id           BIGINT          NOT NULL,
     player_id           BIGINT          NOT NULL,
@@ -120,14 +120,14 @@ COMMENT ON COLUMN t_vip_change_log.old_level IS '舊 VIP 等級';
 COMMENT ON COLUMN t_vip_change_log.new_level IS '新 VIP 等級';
 COMMENT ON COLUMN t_vip_change_log.reason IS '變更原因';
 
-CREATE INDEX idx_vip_log_player ON t_vip_change_log (player_id, create_time DESC);
-CREATE INDEX idx_vip_log_tenant ON t_vip_change_log (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_vip_log_player ON t_vip_change_log (player_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_vip_log_tenant ON t_vip_change_log (tenant_id);
 
 -- =====================================================================
 -- Part D: t_player_audit_log (Player Status Change Audit)
 -- =====================================================================
 
-CREATE TABLE t_player_audit_log (
+CREATE TABLE IF NOT EXISTS t_player_audit_log (
     audit_id            BIGSERIAL       PRIMARY KEY,
     tenant_id           BIGINT          NOT NULL,
     player_id           BIGINT          NOT NULL,
@@ -147,8 +147,8 @@ COMMENT ON COLUMN t_player_audit_log.new_status IS '新狀態';
 COMMENT ON COLUMN t_player_audit_log.operator IS '操作者 (admin username / system)';
 COMMENT ON COLUMN t_player_audit_log.reason IS '變更原因';
 
-CREATE INDEX idx_player_audit_player ON t_player_audit_log (player_id, create_time DESC);
-CREATE INDEX idx_player_audit_tenant ON t_player_audit_log (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_player_audit_player ON t_player_audit_log (player_id, create_time DESC);
+CREATE INDEX IF NOT EXISTS idx_player_audit_tenant ON t_player_audit_log (tenant_id);
 
 -- =====================================================================
 -- Part E: RLS Policies (Row-Level Security)

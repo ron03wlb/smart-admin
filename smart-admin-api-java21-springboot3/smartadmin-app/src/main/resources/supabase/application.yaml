@@ -138,6 +138,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    type-handlers-package: net.lab1024.sa.common.mybatis.typehandler
 
 # SpringDoc/OpenAPI 配置
 springdoc:

@@ -1,11 +1,13 @@
 package net.lab1024.sa.system.employee.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 
 /**
  * 员工 实体表
@@ -52,12 +54,15 @@ public class EmployeeEntity extends SmartAdminBaseEntity {
   private Long positionId;
 
   /** 是否为超级管理员: 0 不是，1是 */
+  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean administratorFlag;
 
   /** 是否被禁用 0否1是 */
+  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean disabledFlag;
 
   /** 是否删除0否 1是 */
+  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   /** 备注 */

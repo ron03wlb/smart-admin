@@ -29,6 +29,11 @@ spring:
   profiles:
     active: '@profiles.active@'
 
+  # 排除 LiteFlow auto-configuration（暫時禁用，缺少 liteflow-rule-sql 依賴）
+  autoconfigure:
+    exclude:
+      - com.yomahub.liteflow.springboot.LiteflowAutoConfiguration
+
   # Java 21 Virtual Threads 配置（I/O 密集型任務性能提升 30-50%）
   threads:
     virtual:
@@ -76,7 +81,7 @@ spring:
     baseline-version: "0"
     baseline-description: "Existing SmartAdmin schema"
     validate-on-migrate: true
-    out-of-order: false
+    out-of-order: true
     table: flyway_schema_history
     user: postgres
     password: postgres
@@ -151,6 +156,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    type-handlers-package: net.lab1024.sa.common.mybatis.typehandler
 
 # SpringDoc/OpenAPI 配置
 springdoc:
@@ -220,7 +226,7 @@ smart:
 
   # Kafka 消息配置
   kafka:
-    enabled: true
+    enabled: false  # 暫時禁用 Kafka（Kafka 服務未運行）
     bootstrap-servers: localhost:9094
     producer:
       acks: all
@@ -261,7 +267,7 @@ smart:
 
   # LiteFlow 規則引擎配置
   liteflow:
-    enabled: true  # D11 決策：直接啟用 + 空規則
+    enabled: false  # 暫時禁用（缺少 liteflow-rule-sql 依賴）
     database-enabled: true
     execution-log-enabled: true
     metrics-enabled: true
@@ -272,29 +278,43 @@ smart:
     max-thread-pool-size: 10
     execution-timeout: 30000
 
+  # Field encryption configuration (AES-256-GCM for TOTP secrets)
+  # Added: 2026-03-04 - MFA TOTP secret encryption
+  field-encrypt:
+    enabled: true
+    # Data Encryption Key (256-bit AES, Base64-encoded)
+    # ⚠️ CRITICAL: Keep this secret secure, rotate periodically
+    # Development environment only - DO NOT use in production
+    dek: OQcGYSHEPPzSpI7aQvffTZPRoVSa6NA2YfdflWZewr4=
+    # Blind Index Key (HMAC-SHA256, Base64-encoded)
+    # Used for searchable encryption (e.g., searching encrypted fields)
+    # Development environment only - DO NOT use in production
+    blind-index-key: rBLUDiID+A8fMOM+s/FnkQdLxpeTkuJ5gA8Mm2rGJQ4=
+
 # LiteFlow SQL 規則存儲配置（liteflow-spring-boot-starter 原生配置）
-liteflow:
-  rule-source: sql
-  rule-source-ext-data-map:
-    url: jdbc:postgresql://localhost:5432/smart_admin
-    driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    applicationName: smartadmin
-    # Chain 表映射
-    chainTableName: t_liteflow_chain
-    chainNameField: chain_code
-    elDataField: chain_data
-    chainEnableField: status
-    # Script 表映射
-    scriptTableName: t_liteflow_script
-    scriptIdField: script_code
-    scriptNameField: script_name
-    scriptDataField: script_data
-    scriptTypeField: script_type
-    scriptLanguageField: script_type
-    # 輪詢配置（禁用 — 使用 SmartReload 手動觸發）
-    pollingEnabled: false
+# 暫時禁用（缺少 liteflow-rule-sql 依賴）
+#liteflow:
+#  rule-source: sql
+#  rule-source-ext-data-map:
+#    url: jdbc:postgresql://localhost:5432/smart_admin
+#    driverClassName: org.postgresql.Driver
+#    username: postgres
+#    password: postgres
+#    applicationName: smartadmin
+#    # Chain 表映射
+#    chainTableName: t_liteflow_chain
+#    chainNameField: chain_code
+#    elDataField: chain_data
+#    chainEnableField: status
+#    # Script 表映射
+#    scriptTableName: t_liteflow_script
+#    scriptIdField: script_code
+#    scriptNameField: script_name
+#    scriptDataField: script_data
+#    scriptTypeField: script_type
+#    scriptLanguageField: script_type
+#    # 輪詢配置（禁用 — 使用 SmartReload 手動觸發）
+#    pollingEnabled: false
 
 # 多租戶配置
 tenant:
@@ -355,3 +375,11 @@ resilience4j:
         retry-exceptions:
           - java.io.IOException
           - java.util.concurrent.TimeoutException
+
+# Logging 配置（診斷 TypeHandler 註冊問題）
+logging:
+  level:
+    root: INFO
+    org.apache.ibatis: DEBUG
+    org.mybatis.spring: DEBUG
+    net.lab1024.sa.common.mybatis.typehandler: DEBUG

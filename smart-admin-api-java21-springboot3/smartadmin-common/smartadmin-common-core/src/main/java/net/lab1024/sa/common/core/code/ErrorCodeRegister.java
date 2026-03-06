@@ -23,8 +23,8 @@ public class ErrorCodeRegister {
     // 意外 错误码
     register(UnexpectedErrorCode.class, 20001, 30000);
 
-    // 用户 通用错误码
-    register(UserErrorCode.class, 30001, 40000);
+    // 用户 通用错误码 (包含 MFA 錯誤碼 40100-40199)
+    register(UserErrorCode.class, 30001, 40200);
   }
 
   public static int initialize() {

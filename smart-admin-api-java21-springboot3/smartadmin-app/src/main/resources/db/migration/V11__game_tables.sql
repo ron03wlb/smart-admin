@@ -21,7 +21,7 @@
 -- Part A: t_game_provider (Game Provider Configuration)
 -- =====================================================================
 
-CREATE TABLE t_game_provider (
+CREATE TABLE IF NOT EXISTS t_game_provider (
     provider_id         BIGSERIAL       PRIMARY KEY,
     tenant_id           BIGINT          NOT NULL,
     provider_code       VARCHAR(32)     NOT NULL,
@@ -56,14 +56,14 @@ COMMENT ON COLUMN t_game_provider.last_health_check IS '最後健康檢查時間
 COMMENT ON COLUMN t_game_provider.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_game_provider.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_gp_code_tenant ON t_game_provider (provider_code, tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_gp_tenant ON t_game_provider (tenant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_gp_code_tenant ON t_game_provider (provider_code, tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_gp_tenant ON t_game_provider (tenant_id);
 
 -- =====================================================================
 -- Part B: t_game (Game Catalog)
 -- =====================================================================
 
-CREATE TABLE t_game (
+CREATE TABLE IF NOT EXISTS t_game (
     game_id             BIGSERIAL       PRIMARY KEY,
     provider_id         BIGINT          NOT NULL REFERENCES t_game_provider(provider_id),
     tenant_id           BIGINT          NOT NULL,
@@ -94,15 +94,15 @@ COMMENT ON COLUMN t_game.enabled IS '是否啟用';
 COMMENT ON COLUMN t_game.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_game.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_game_code_tenant ON t_game (game_code, tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_game_tenant_category ON t_game (tenant_id, category);
-CREATE INDEX idx_game_provider ON t_game (provider_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_game_code_tenant ON t_game (game_code, tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_game_tenant_category ON t_game (tenant_id, category);
+CREATE INDEX IF NOT EXISTS idx_game_provider ON t_game (provider_id);
 
 -- =====================================================================
 -- Part C: t_game_round (Game Round Records — Seamless Wallet Core)
 -- =====================================================================
 
-CREATE TABLE t_game_round (
+CREATE TABLE IF NOT EXISTS t_game_round (
     round_id                BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     player_id               BIGINT          NOT NULL,
@@ -141,16 +141,16 @@ COMMENT ON COLUMN t_game_round.reconciliation_status IS '對帳狀態: 1=待核�
 COMMENT ON COLUMN t_game_round.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_game_round.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_round_player ON t_game_round (player_id);
-CREATE INDEX idx_round_provider_date ON t_game_round (provider_code, create_time);
-CREATE INDEX idx_round_status ON t_game_round (status, reconciliation_status);
-CREATE INDEX idx_round_tenant ON t_game_round (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_round_player ON t_game_round (player_id);
+CREATE INDEX IF NOT EXISTS idx_round_provider_date ON t_game_round (provider_code, create_time);
+CREATE INDEX IF NOT EXISTS idx_round_status ON t_game_round (status, reconciliation_status);
+CREATE INDEX IF NOT EXISTS idx_round_tenant ON t_game_round (tenant_id);
 
 -- =====================================================================
 -- Part D: t_reconciliation (Daily Reconciliation Summary)
 -- =====================================================================
 
-CREATE TABLE t_reconciliation (
+CREATE TABLE IF NOT EXISTS t_reconciliation (
     reconciliation_id               BIGSERIAL       PRIMARY KEY,
     tenant_id                       BIGINT          NOT NULL,
     reconciliation_date             DATE            NOT NULL,
@@ -180,14 +180,14 @@ COMMENT ON COLUMN t_reconciliation.missing_count IS '缺失筆數 (GP 有、平�
 COMMENT ON COLUMN t_reconciliation.extra_count IS '多餘筆數 (平台有、GP 無)';
 COMMENT ON COLUMN t_reconciliation.status IS '對帳狀態: 1=待核對, 2=已驗證, 3=不符, 4=已補償, 5=已調和';
 
-CREATE UNIQUE INDEX uk_recon_date_provider_tenant ON t_reconciliation (reconciliation_date, provider_code, tenant_id);
-CREATE INDEX idx_recon_tenant ON t_reconciliation (tenant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_recon_date_provider_tenant ON t_reconciliation (reconciliation_date, provider_code, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_recon_tenant ON t_reconciliation (tenant_id);
 
 -- =====================================================================
 -- Part E: t_game_weight_config (Per-Tenant Game Category Weights)
 -- =====================================================================
 
-CREATE TABLE t_game_weight_config (
+CREATE TABLE IF NOT EXISTS t_game_weight_config (
     config_id       BIGSERIAL       PRIMARY KEY,
     tenant_id       BIGINT          NOT NULL,
     game_category   SMALLINT        NOT NULL,

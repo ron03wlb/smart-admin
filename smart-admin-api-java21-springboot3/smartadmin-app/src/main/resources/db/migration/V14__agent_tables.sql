@@ -26,7 +26,7 @@
 -- Part A: t_agent_credit (Agent Credit Limit Tracking)
 -- =====================================================================
 
-CREATE TABLE t_agent_credit (
+CREATE TABLE IF NOT EXISTS t_agent_credit (
     agent_credit_id         BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     agent_id                BIGINT          NOT NULL,
@@ -63,14 +63,14 @@ COMMENT ON COLUMN t_agent_credit.last_settlement_time IS '最近結算時間';
 COMMENT ON COLUMN t_agent_credit.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_agent_credit.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_agent_credit_agent_tenant ON t_agent_credit (agent_id, tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_agent_credit_parent ON t_agent_credit (parent_id, tenant_id) WHERE deleted = FALSE;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_agent_credit_agent_tenant ON t_agent_credit (agent_id, tenant_id) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_agent_credit_parent ON t_agent_credit (parent_id, tenant_id) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part B: t_settlement_record (Weekly/Monthly Settlement Records)
 -- =====================================================================
 
-CREATE TABLE t_settlement_record (
+CREATE TABLE IF NOT EXISTS t_settlement_record (
     settlement_record_id    BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     agent_id                BIGINT          NOT NULL,
@@ -106,14 +106,14 @@ COMMENT ON COLUMN t_settlement_record.payment_status IS '付款狀態: 1=待付,
 COMMENT ON COLUMN t_settlement_record.payment_txn_id IS '付款交易 ID';
 COMMENT ON COLUMN t_settlement_record.verified_at IS '驗證時間';
 
-CREATE UNIQUE INDEX uk_settlement_agent_week ON t_settlement_record (agent_id, settlement_week, tenant_id);
-CREATE INDEX idx_settlement_week ON t_settlement_record (settlement_week, tenant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_settlement_agent_week ON t_settlement_record (agent_id, settlement_week, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_settlement_week ON t_settlement_record (settlement_week, tenant_id);
 
 -- =====================================================================
 -- Part C: t_credit_allocation_audit (Immutable Audit Trail)
 -- =====================================================================
 
-CREATE TABLE t_credit_allocation_audit (
+CREATE TABLE IF NOT EXISTS t_credit_allocation_audit (
     audit_id                BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     parent_id               BIGINT          NOT NULL,
@@ -142,14 +142,14 @@ COMMENT ON COLUMN t_credit_allocation_audit.new_position IS '新持倉 %';
 COMMENT ON COLUMN t_credit_allocation_audit.reason IS '操作原因';
 COMMENT ON COLUMN t_credit_allocation_audit.operator IS '操作人';
 
-CREATE INDEX idx_audit_parent ON t_credit_allocation_audit (parent_id, tenant_id);
-CREATE INDEX idx_audit_child ON t_credit_allocation_audit (child_id, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_audit_parent ON t_credit_allocation_audit (parent_id, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_audit_child ON t_credit_allocation_audit (child_id, tenant_id);
 
 -- =====================================================================
 -- Part D: t_affiliate_agent (Agent Master Data)
 -- =====================================================================
 
-CREATE TABLE t_affiliate_agent (
+CREATE TABLE IF NOT EXISTS t_affiliate_agent (
     agent_id                BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     username                VARCHAR(64)     NOT NULL,
@@ -186,15 +186,15 @@ COMMENT ON COLUMN t_affiliate_agent.referral_code IS '推薦碼 (唯一)';
 COMMENT ON COLUMN t_affiliate_agent.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_affiliate_agent.version IS '樂觀鎖版本號';
 
-CREATE UNIQUE INDEX uk_affiliate_username_tenant ON t_affiliate_agent (username, tenant_id) WHERE deleted = FALSE;
-CREATE UNIQUE INDEX uk_affiliate_referral_code ON t_affiliate_agent (referral_code, tenant_id) WHERE referral_code IS NOT NULL AND deleted = FALSE;
-CREATE INDEX idx_affiliate_parent ON t_affiliate_agent (parent_agent_id, tenant_id) WHERE deleted = FALSE;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_affiliate_username_tenant ON t_affiliate_agent (username, tenant_id) WHERE deleted = FALSE;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_affiliate_referral_code ON t_affiliate_agent (referral_code, tenant_id) WHERE referral_code IS NOT NULL AND deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_affiliate_parent ON t_affiliate_agent (parent_agent_id, tenant_id) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part E: t_affiliate_hierarchy (Closure Table for Agent Tree)
 -- =====================================================================
 
-CREATE TABLE t_affiliate_hierarchy (
+CREATE TABLE IF NOT EXISTS t_affiliate_hierarchy (
     hierarchy_id            BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     ancestor_id             BIGINT          NOT NULL,
@@ -211,14 +211,14 @@ COMMENT ON COLUMN t_affiliate_hierarchy.ancestor_id IS '祖先代理 ID';
 COMMENT ON COLUMN t_affiliate_hierarchy.descendant_id IS '後代代理 ID';
 COMMENT ON COLUMN t_affiliate_hierarchy.depth IS '深度 (0=自身)';
 
-CREATE UNIQUE INDEX uk_hierarchy_ancestor_descendant ON t_affiliate_hierarchy (ancestor_id, descendant_id, tenant_id);
-CREATE INDEX idx_hierarchy_descendant ON t_affiliate_hierarchy (descendant_id, tenant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_hierarchy_ancestor_descendant ON t_affiliate_hierarchy (ancestor_id, descendant_id, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_hierarchy_descendant ON t_affiliate_hierarchy (descendant_id, tenant_id);
 
 -- =====================================================================
 -- Part F: t_affiliate_commission_plan (Commission Tier Configuration)
 -- =====================================================================
 
-CREATE TABLE t_affiliate_commission_plan (
+CREATE TABLE IF NOT EXISTS t_affiliate_commission_plan (
     plan_id                 BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     plan_name               VARCHAR(128)    NOT NULL,
@@ -250,13 +250,13 @@ COMMENT ON COLUMN t_affiliate_commission_plan.enabled IS '是否啟用';
 COMMENT ON COLUMN t_affiliate_commission_plan.deleted IS '軟刪除標記';
 COMMENT ON COLUMN t_affiliate_commission_plan.version IS '樂觀鎖版本號';
 
-CREATE INDEX idx_plan_tenant_type ON t_affiliate_commission_plan (tenant_id, plan_type) WHERE deleted = FALSE;
+CREATE INDEX IF NOT EXISTS idx_plan_tenant_type ON t_affiliate_commission_plan (tenant_id, plan_type) WHERE deleted = FALSE;
 
 -- =====================================================================
 -- Part G: t_affiliate_commission_record (Commission Settlement Records)
 -- =====================================================================
 
-CREATE TABLE t_affiliate_commission_record (
+CREATE TABLE IF NOT EXISTS t_affiliate_commission_record (
     record_id               BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     agent_id                BIGINT          NOT NULL,
@@ -289,14 +289,14 @@ COMMENT ON COLUMN t_affiliate_commission_record.status IS '狀態: 1=待審核, 
 COMMENT ON COLUMN t_affiliate_commission_record.approved_by IS '審核人';
 COMMENT ON COLUMN t_affiliate_commission_record.approved_at IS '審核時間';
 
-CREATE UNIQUE INDEX uk_commission_agent_date ON t_affiliate_commission_record (agent_id, settlement_date, tenant_id);
-CREATE INDEX idx_commission_status ON t_affiliate_commission_record (tenant_id, status);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_commission_agent_date ON t_affiliate_commission_record (agent_id, settlement_date, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_commission_status ON t_affiliate_commission_record (tenant_id, status);
 
 -- =====================================================================
 -- Part H: t_affiliate_adjustment (Immutable Adjustment Ledger)
 -- =====================================================================
 
-CREATE TABLE t_affiliate_adjustment (
+CREATE TABLE IF NOT EXISTS t_affiliate_adjustment (
     adjustment_id           BIGSERIAL       PRIMARY KEY,
     tenant_id               BIGINT          NOT NULL,
     agent_id                BIGINT          NOT NULL,
@@ -323,7 +323,7 @@ COMMENT ON COLUMN t_affiliate_adjustment.target_settlement_date IS '目標結算
 COMMENT ON COLUMN t_affiliate_adjustment.reason IS '調整原因';
 COMMENT ON COLUMN t_affiliate_adjustment.created_by IS '建立人';
 
-CREATE INDEX idx_adjustment_agent ON t_affiliate_adjustment (agent_id, tenant_id);
+CREATE INDEX IF NOT EXISTS idx_adjustment_agent ON t_affiliate_adjustment (agent_id, tenant_id);
 
 -- =====================================================================
 -- Part I: RLS Policies (Row-Level Security)

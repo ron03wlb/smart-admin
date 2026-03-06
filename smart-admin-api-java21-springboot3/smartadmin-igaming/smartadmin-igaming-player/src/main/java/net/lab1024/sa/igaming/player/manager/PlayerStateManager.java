@@ -3,8 +3,10 @@ package net.lab1024.sa.igaming.player.manager;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author iGaming Team
  * @since 2026-02-18
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlayerStateManager {
@@ -47,7 +50,7 @@ public class PlayerStateManager {
 
   private final PlayerDao playerDao;
   private final PlayerAuditLogDao playerAuditLogDao;
-  private final DomainEventPublisher domainEventPublisher;
+  private final Optional<DomainEventPublisher> domainEventPublisher;
 
   /**
    * Transition player status with validation and audit logging.
@@ -98,14 +101,17 @@ public class PlayerStateManager {
     payload.put("newStatus", newStatus);
     payload.put("operator", operator);
     payload.put("reason", reason);
-    domainEventPublisher.publish(
-        IgamingKafkaConst.Topic.PLAYER_EVENTS,
-        DomainEvent.builder()
-            .eventType(DomainEventTypeConst.PLAYER_STATUS_CHANGED)
-            .aggregateType("Player")
-            .aggregateId(String.valueOf(playerId))
-            .payload(payload)
-            .build());
+
+    domainEventPublisher.ifPresent(
+        publisher ->
+            publisher.publish(
+                IgamingKafkaConst.Topic.PLAYER_EVENTS,
+                DomainEvent.builder()
+                    .eventType(DomainEventTypeConst.PLAYER_STATUS_CHANGED)
+                    .aggregateType("Player")
+                    .aggregateId(String.valueOf(playerId))
+                    .payload(payload)
+                    .build()));
   }
 
   private PlayerStatusEnum resolveStatus(Integer value) {

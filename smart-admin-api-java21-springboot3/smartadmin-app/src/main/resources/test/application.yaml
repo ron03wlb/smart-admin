@@ -61,6 +61,7 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
+    type-handlers-package: net.lab1024.sa.common.mybatis.typehandler
 
 # 多租戶（測試環境關閉）
 tenant:
