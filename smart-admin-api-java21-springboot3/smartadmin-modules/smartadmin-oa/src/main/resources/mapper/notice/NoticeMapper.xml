@@ -80,7 +80,7 @@
                 AND t_employee.actual_name = #{query.createUserName}
             </if>
             <if test="query.deletedFlag != null">
-                AND t_notice.deleted_flag = #{query.deletedFlag}
+                AND t_notice.deleted_flag = #{query.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="query.createTimeBegin != null">
                 AND TO_CHAR(t_notice.create_time, 'YYYY-MM-DD') &gt;= #{query.createTimeBegin}
@@ -132,7 +132,7 @@
             )
             </if>
 
-            and t_notice.deleted_flag = #{deletedFlag}
+            and t_notice.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             and t_notice.publish_time &lt; now()
             <if test="query.noticeTypeId != null">
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}
@@ -187,7 +187,7 @@
                 )
             </if>
             and t_notice.all_visible_flag = true
-            and t_notice.deleted_flag = #{deletedFlag}
+            and t_notice.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             and t_notice.publish_time &lt; now()
             <if test="query.noticeTypeId != null">
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}

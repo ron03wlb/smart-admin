@@ -3,7 +3,7 @@
 <mapper namespace="net.lab1024.sa.business.goods.dao.GoodsDao">
     <update id="batchUpdateDeleted">
         update t_goods
-        set deleted_flag = #{deletedFlag}
+        set deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         WHERE goods_id IN
         <foreach collection="goodsIdList" open="(" close=")" separator="," item="item">
             #{item}
@@ -30,7 +30,7 @@
                 AND shelves_flag = #{query.shelvesFlag}
             </if>
             <if test="query.deletedFlag != null">
-                AND deleted_flag = #{query.deletedFlag}
+                AND deleted_flag = #{query.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">
