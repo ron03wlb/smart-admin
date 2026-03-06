@@ -1,0 +1,107 @@
+/**
+ * 登錄頁面樣式
+ *
+ * @author SmartAdmin Team
+ * @date 2026-03-04
+ */
+
+.loginContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.desc {
+  flex: 1;
+  max-width: 500px;
+  color: white;
+  padding: 0 60px;
+}
+
+.desc h1 {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: white;
+}
+
+.desc p {
+  font-size: 18px;
+  line-height: 1.8;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.login {
+  background: white;
+  border-radius: 12px;
+  padding: 48px 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 32px;
+  color: #333;
+}
+
+.captchaRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.captchaInput {
+  flex: 1;
+}
+
+.captchaImage {
+  width: 120px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s;
+}
+
+.captchaImage:hover {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .loginContainer {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .desc {
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .desc h1 {
+    font-size: 36px;
+  }
+
+  .desc p {
+    font-size: 16px;
+  }
+
+  .login {
+    max-width: 100%;
+    padding: 32px 24px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+}
