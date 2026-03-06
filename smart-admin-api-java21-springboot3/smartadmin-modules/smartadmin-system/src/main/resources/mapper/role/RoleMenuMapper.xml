@@ -25,7 +25,7 @@
         left join t_role_menu on t_role_menu.menu_id = t_menu.menu_id
         <where>
             <if test="deletedFlag != null">
-                and t_menu.deleted_flag = #{deletedFlag}
+                and t_menu.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="roleIdList != null and roleIdList.size > 0">
                 and t_role_menu.role_id in

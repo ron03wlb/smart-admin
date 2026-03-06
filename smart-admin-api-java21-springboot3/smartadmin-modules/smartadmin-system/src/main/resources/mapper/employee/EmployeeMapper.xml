@@ -25,17 +25,17 @@
                 </foreach>
             </if>
             <if test="queryForm.disabledFlag != null">
-                AND t_employee.disabled_flag = #{queryForm.disabledFlag}
+                AND t_employee.disabled_flag = #{queryForm.disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="queryForm.deletedFlag != null">
-                AND t_employee.deleted_flag = #{queryForm.deletedFlag}
+                AND t_employee.deleted_flag = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
 
     <update id="updateDisableFlag">
         UPDATE t_employee
-        SET disabled_flag = #{disabledFlag}
+        SET disabled_flag = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         WHERE employee_id = #{employeeId}
     </update>
 
@@ -45,7 +45,7 @@
         <where>
             login_name = #{loginName}
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
@@ -56,7 +56,7 @@
         <where>
             actual_name = #{actualName}
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
@@ -67,7 +67,7 @@
         <where>
             phone = #{phone}
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
@@ -78,7 +78,7 @@
         <where>
             email = #{email}
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
@@ -92,7 +92,7 @@
     <select id="countByDepartmentId" resultType="integer">
         SELECT count(1) FROM t_employee
         WHERE
-        department_id = #{departmentId} AND deleted_flag = #{deletedFlag}
+        department_id = #{departmentId} AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
     </select>
 
     <select id="selectByDepartmentId" resultType="net.lab1024.sa.system.employee.domain.entity.EmployeeEntity">
@@ -101,7 +101,7 @@
         <where>
             department_id = #{departmentId}
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         ORDER BY create_time DESC
@@ -116,7 +116,7 @@
                 #{item}
             </foreach>
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
@@ -130,7 +130,7 @@
                 #{item}
             </foreach>
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         ORDER BY create_time DESC
@@ -141,7 +141,7 @@
         FROM t_employee
         <where>
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
@@ -152,7 +152,7 @@
         <where>
             department_id = #{departmentId}
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag}
+                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         ORDER BY create_time DESC
@@ -183,10 +183,10 @@
         LEFT JOIN t_department ON t_department.department_id = t_employee.department_id
         <where>
             <if test="disabledFlag != null">
-                AND t_employee.disabled_flag = #{disabledFlag}
+                AND t_employee.disabled_flag = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="deletedFlag != null">
-                AND t_employee.deleted_flag = #{deletedFlag}
+                AND t_employee.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
     </select>
