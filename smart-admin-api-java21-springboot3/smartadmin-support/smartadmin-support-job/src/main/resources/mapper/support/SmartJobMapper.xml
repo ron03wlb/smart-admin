@@ -4,7 +4,7 @@
 
     <update id="updateDeletedFlag">
         update t_smart_job
-        set deleted_flag = #{deletedFlag}
+        set deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         where job_id = #{jobId}
     </update>
 
@@ -26,7 +26,7 @@
                 AND enabled_flag = #{query.enabledFlag}
             </if>
             <if test="query.deletedFlag != null">
-                AND deleted_flag = #{query.deletedFlag}
+                AND deleted_flag = #{query.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">
