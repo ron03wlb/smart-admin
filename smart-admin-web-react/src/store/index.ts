@@ -18,19 +18,21 @@ import {
 import storage from 'redux-persist/lib/storage'; // LocalStorage
 
 import userReducer from './slices/userSlice';
+import menuReducer from './slices/menuSlice';
 
 // ================================= Redux Persist 配置 =================================
 
 const persistConfig = {
   key: 'smart_admin_root', // LocalStorage 鍵名
   storage,
-  whitelist: ['user'], // 只持久化 user slice（對應 Vue 的 localStorage 快取）
+  whitelist: ['user', 'menu'], // 持久化 user 和 menu slice
 };
 
 // ================================= Root Reducer =================================
 
 const rootReducer = combineReducers({
   user: userReducer,
+  menu: menuReducer,
   // 未來可添加更多 slices：
   // appConfig: appConfigReducer,
   // dict: dictReducer,

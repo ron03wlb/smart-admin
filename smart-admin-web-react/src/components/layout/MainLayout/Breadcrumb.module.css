@@ -1,0 +1,29 @@
+/**
+ * Breadcrumb 樣式
+ */
+
+.breadcrumb-container {
+  padding: 16px 24px;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.breadcrumb-item-link {
+  cursor: pointer;
+  color: #1890ff;
+  transition: color 0.3s;
+}
+
+.breadcrumb-item-link:hover {
+  color: #40a9ff;
+}
+
+.breadcrumb-item-current {
+  color: rgba(0, 0, 0, 0.85);
+  cursor: default;
+}
+
+.breadcrumb-item-icon {
+  margin-right: 4px;
+}

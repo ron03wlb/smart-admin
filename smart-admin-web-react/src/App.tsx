@@ -11,6 +11,7 @@ import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { store, persistor } from '@/store';
 import { router } from '@/router';
+import { ErrorBoundary } from '@/components/framework/error';
 import './App.css';
 
 export default function App() {
@@ -18,7 +19,9 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ConfigProvider locale={zhCN}>
-          <RouterProvider router={router} />
+          <ErrorBoundary>
+            <RouterProvider router={router} />
+          </ErrorBoundary>
         </ConfigProvider>
       </PersistGate>
     </Provider>

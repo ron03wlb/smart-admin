@@ -1,0 +1,106 @@
+/**
+ * Sidebar 側邊菜單樣式
+ *
+ * @author Claude AI Assistant
+ * @since 2026-03-06
+ */
+
+/* ================================= Sidebar Container ================================= */
+
+.sidebar-container {
+  overflow: auto;
+  background: #001529;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+  height: 100%;
+}
+
+/* ================================= Trigger Button ================================= */
+
+.sidebar-trigger {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #002140;
+}
+
+.sidebar-trigger:hover {
+  background: #003a70;
+}
+
+.sidebar-trigger-icon {
+  font-size: 18px;
+  color: #fff;
+  transition: transform 0.3s;
+}
+
+.sidebar-trigger-icon:hover {
+  transform: scale(1.2);
+}
+
+/* ================================= Menu ================================= */
+
+.sidebar-menu {
+  border-right: none;
+  user-select: none;
+}
+
+/* 菜單項樣式 */
+.sidebar-menu :global(.ant-menu-item),
+.sidebar-menu :global(.ant-menu-submenu-title) {
+  margin: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+/* 選中菜單項樣式 */
+.sidebar-menu :global(.ant-menu-item-selected) {
+  background-color: #1890ff !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+/* 菜單項 hover 樣式 */
+.sidebar-menu :global(.ant-menu-item:hover),
+.sidebar-menu :global(.ant-menu-submenu-title:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* 子菜單展開樣式 */
+.sidebar-menu :global(.ant-menu-submenu-open) > :global(.ant-menu-submenu-title) {
+  color: #1890ff;
+}
+
+/* ================================= Scrollbar ================================= */
+
+.sidebar-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+  background: #001529;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ================================= Responsive ================================= */
+
+/* 移動端（< 768px）：側邊欄默認隱藏 */
+@media (max-width: 768px) {
+  .sidebar-container {
+    position: fixed;
+    z-index: 1000;
+  }
+}

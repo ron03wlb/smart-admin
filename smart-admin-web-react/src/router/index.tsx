@@ -7,6 +7,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Login from '@/views/Login';
 import Home from '@/views/Home';
+import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from './ProtectedRoute';
 
 /**
@@ -18,12 +19,23 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: '/home',
+    path: '/',
     element: (
       <ProtectedRoute>
-        <Home />
+        <MainLayout />
       </ProtectedRoute>
     ),
+    children: [
+      {
+        path: 'home',
+        element: <Home />,
+      },
+      // 未來添加其他子路由
+      // {
+      //   path: 'player/list',
+      //   element: <PlayerList />,
+      // },
+    ],
   },
   // 404 頁面（未來添加）
   // {
