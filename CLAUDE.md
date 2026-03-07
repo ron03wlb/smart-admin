@@ -337,9 +337,9 @@ graph TD
 
 **CRITICAL**: stateDiagram-v2 has different syntax requirements than other Mermaid diagram types.
 
-**❌ Do NOT use `<br/>` in stateDiagram-v2:**
-- ❌ Transition labels: `A --> B: Event<br/>Action` (will fail)
-- ❌ Note blocks: `note right of A : Text<br/>More` (will fail)
+**❌ Do NOT use HTML line break tags in stateDiagram-v2:**
+- ❌ Transition labels with HTML breaks (will fail)
+- ❌ Note blocks with HTML breaks (will fail)
 
 **✅ Correct stateDiagram-v2 syntax:**
 ```mermaid
@@ -371,126 +371,58 @@ stateDiagram-v2
 
 ## Specialized Skills
 
-SmartAdmin 提供兩套並行的技能系統：
+SmartAdmin 提供兩套並行的技能系統（v4.0.0 優化後）：
 
 ### 1. Claude Code 技能系統 (`.claude/skills/`)
 **適用對象**：Claude Code CLI 使用者
-**技能數量**：36個（P0:6, P1:10, P2:16, Deprecated:4）
+**技能數量**：15個（P0:7, P1:8）
 **詳細說明**：[.claude/skills/README.md](.claude/skills/README.md)
 
 **組織結構**:
 ```
 .claude/skills/
-├── foundation/      (P0 - 6 skills: Critical foundation)
+├── foundation/      (P0 - 7 skills: Critical foundation)
 │   ├── backend/     (3 skills: ArchUnit, Security, Vavr)
-│   ├── full-stack/  (2 skills: CRUD, Integration Test)
+│   ├── frontend/    (1 skill: React CRUD)
+│   ├── full-stack/  (2 skills: CRUD Generator, Integration Test)
 │   └── testing/     (1 skill: Test Fixture)
-├── extended/        (P1 - 10 skills: Domain, Orchestration, Quality)
-│   ├── domain/      (5 skills: iGaming + LiteFlow)
-│   ├── orchestration/ (2 skills: batch-plan, quality-gate)
-│   └── quality/     (3 skills: concurrency, spring-pattern, naming-checker)
-├── productivity/    (P2 - 16 skills: DevOps, Integration, Composite, Refactoring)
-│   ├── devops/      (5 skills: APM, CI/CD, DB migration, scheduling, WebSocket)
-│   ├── integration/ (6 skills: Cache, Search, i18n, MQ, Reports, PostgreSQL)
-│   ├── composite/   (2 skills: Performance suite, Testing suite)
-│   └── refactoring/ (3 skills: Manager extractor, Markdown quality, Mermaid repair)
-└── lifecycle/       (Deprecated - 4 skills with migration guides)
+└── extended/        (P1 - 8 skills: Domain, Quality)
+    ├── domain/      (3 skills: iGaming PM, iGaming Feature Builder, LiteFlow)
+    └── quality/     (5 skills: Concurrency, Spring, Naming, Manager Extractor, PostgreSQL)
 ```
 
-**P0 Skills (Foundation)** - 6 skills:
-- **Backend** (3 skills):
-  - **[archunit-test-generator](.claude/skills/foundation/backend/archunit-test-generator/)** - Generate ArchUnit tests for architecture enforcement
-  - **[security-hardening-pro](.claude/skills/foundation/backend/security-hardening-pro/)** - SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection, audit logging
-  - **[vavr-refactoring-assistant](.claude/skills/foundation/backend/vavr-refactoring-assistant/)** - Refactor Service layer to use Vavr Option/Try/Either patterns (moved from productivity/)
-- **Full-stack** (2 skills):
-  - **[smartadmin-crud-generator](.claude/skills/foundation/full-stack/smartadmin-crud-generator/)** - Composite full-stack CRUD (Backend + Frontend + API Docs + Tests) with phase-based execution
-  - **[smartadmin-integration-test](.claude/skills/foundation/full-stack/smartadmin-integration-test/)** - Spring Boot integration tests with Testcontainers
-- **Testing** (1 skill):
-  - **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders for complex domain objects
+**P0 Skills (Foundation)** - 7 skills:
+- **[archunit-test-generator](.claude/skills/foundation/backend/archunit-test-generator/)** - ArchUnit tests for architecture enforcement
+- **[security-hardening-pro](.claude/skills/foundation/backend/security-hardening-pro/)** - SM2/SM3/SM4, data masking, XSS/CSRF
+- **[vavr-refactoring-assistant](.claude/skills/foundation/backend/vavr-refactoring-assistant/)** - Vavr Option/Try/Either refactoring
+- **[smartadmin-react-crud](.claude/skills/foundation/frontend/smartadmin-react-crud/)** - React 19 CRUD (TypeScript, Ant Design 5)
+- **[smartadmin-crud-generator](.claude/skills/foundation/full-stack/smartadmin-crud-generator/)** - Full-stack CRUD (Backend + Frontend + Tests)
+- **[smartadmin-integration-test](.claude/skills/foundation/full-stack/smartadmin-integration-test/)** - Testcontainers integration tests
+- **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders
 
-**P1 Skills (Extended)** - 10 skills:
-- Domain (5 skills):
-  - **[fraud-detection-pattern-generator](.claude/skills/extended/domain/fraud-detection-pattern-generator/)** - iGaming fraud detection, risk control, KYC/AML compliance
-  - **[igame-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming domain features (VIP system, Wallet API, Bonus engine)
-  - **[igame-pm-analyst](.claude/skills/extended/domain/igame-pm-analyst/)** - iGaming產品經理分析助手 (Ultrathink深度分析、PRD生成)
-  - **[igaming-multi-tenant-wallet-pm](.claude/skills/extended/domain/igaming-multi-tenant-wallet-pm/)** - Multi-tenant architecture & seamless wallet design (phase-based)
-  - **[liteflow-rule-builder](.claude/skills/extended/domain/liteflow-rule-builder/)** - Generate LiteFlow DSL (EL expressions, QLExpress scripts) for business workflows
-- Orchestration (2 skills):
-  - **[batch-plan-executor](.claude/skills/extended/orchestration/batch-plan-executor/)** - Batch plan execution orchestrator with conflict detection
-  - **[quality-gate-orchestrator](.claude/skills/extended/orchestration/quality-gate-orchestrator/)** - Multi-tool quality gate orchestration (Checkstyle, PMD, SpotBugs, ArchUnit)
-- Quality (3 skills):
-  - **[concurrency-safety-auditor](.claude/skills/extended/quality/concurrency-safety-auditor/)** - Concurrency safety audit with ⭐⭐⭐⭐⭐ risk rating, SpotBugs custom detectors, check-then-act pattern detection
-  - **[spring-pattern-checker](.claude/skills/extended/quality/spring-pattern-checker/)** - Validate Spring patterns: @Transactional placement, dependency injection, layered architecture compliance
-  - **[naming-convention-checker](.claude/skills/extended/quality/naming-convention-checker/)** - Validate SmartAdmin naming conventions (singular table names, class naming, field naming)
+**P1 Skills (Extended)** - 8 skills:
+- **[igaming-pm-analyst](.claude/skills/extended/domain/igame-pm-analyst/)** - iGaming PM (PRD, multi-tenant, seamless wallet, compliance)
+- **[igaming-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming features (VIP, Wallet, Bonus, Fraud detection)
+- **[liteflow-rule-builder](.claude/skills/extended/domain/liteflow-rule-builder/)** - LiteFlow DSL for business workflows
+- **[concurrency-safety-auditor](.claude/skills/extended/quality/concurrency-safety-auditor/)** - Concurrency audit with risk rating
+- **[spring-pattern-checker](.claude/skills/extended/quality/spring-pattern-checker/)** - Spring pattern validation
+- **[naming-convention-checker](.claude/skills/extended/quality/naming-convention-checker/)** - SmartAdmin naming validation
+- **[smartadmin-manager-extractor](.claude/skills/extended/quality/smartadmin-manager-extractor/)** - Auto-extract @Transactional to Manager (83% time saving)
+- **[postgresql-best-practices](.claude/skills/extended/quality/postgresql-best-practices/)** - PostgreSQL performance analysis
 
-**P2 Skills (Productivity)** - 16 skills:
-- DevOps (5): APM integration, CI/CD pipeline, DB migration, scheduled tasks, WebSocket/SSE
-- Integration (6): Cache strategy, Elasticsearch, i18n, message queue, report export, PostgreSQL best practices
-- Composite (2): smartadmin-performance-suite, smartadmin-testing-suite
-- Analysis (1): java-performance-pro (soft-deprecated)
-- Refactoring (3): smartadmin-manager-extractor, markdown-quality-checker, **mermaid-repair** ⭐ NEW
-
-→ **[Complete Skills Catalog](.claude/skills/README.md)** - Full hierarchical structure, trigger keywords, and execution modes
+→ **[Complete Skills Catalog](.claude/skills/README.md)**
 
 ---
 
 ### 2. Antigravity/通用AI 技能系統 (`.agent/skills/`)
 **適用對象**：Antigravity, Gemini, 及其他AI助手
-**技能數量**：32個（P0:6, P1:10, P2:16）
+**技能數量**：14個（P0:6, P1:8）— 同 .claude/ 但不含 React CRUD
 **詳細說明**：[.agent/skills/README.md](.agent/skills/README.md)
-
-**與 .claude/ 同步**：使用 `scripts/sync-skill-registries.py` 驗證同步狀態
-
-**系統分界**：
-- `.claude/skills/` 使用 Claude Code 特定的技能調用機制
-- `.agent/skills/` 使用通用的AI指令格式
-- 兩者**不應重複**，各有專門用途
 
 **選擇指南**：
 - 使用 Claude Code CLI → 參考 `.claude/skills/`
 - 使用 Antigravity 或其他AI → 參考 `.agent/skills/`
 - 架構規則統一在 `.agent/rules/` 中
-
----
-
-### Week 4-5 New Skills (v3.0.0)
-
-**1. postgresql-best-practices (P2 - Integration)**
-- **Path**: `.claude/skills/productivity/integration/postgresql-best-practices/`
-- **Purpose**: PostgreSQL performance analysis and optimization
-- **Capabilities**:
-  - HikariCP connection pool analysis (utilization formula: `connections = (core_count × 2) + effective_spindle_count`)
-  - N+1 query detection via P6Spy log parsing
-  - EXPLAIN ANALYZE automation for slow queries
-  - Index recommendations from `pg_stat_user_tables`
-- **Triggers**: "database performance", "PostgreSQL optimization", "HikariCP tuning", "N+1 query"
-- **Output**: Comprehensive performance report (Markdown) with actionable recommendations
-- **Time Saving**: Identifies 97.6% timeout error reductions in production cases
-
-**2. smartadmin-manager-extractor (P2 - Refactoring)**
-- **Path**: `.claude/skills/productivity/refactoring/smartadmin-manager-extractor/`
-- **Purpose**: Auto-extract `@Transactional` methods from Service to Manager layer
-- **Capabilities**:
-  - JavaParser AST manipulation for code refactoring
-  - ArchUnit test integration for violation detection
-  - Triple validation: Compile + ArchUnit + Tests
-  - Git-safe rollback mechanism
-- **Triggers**: "extract to Manager", "transactionalMustUseRollbackForThrowable fails", "refactor transaction"
-- **Time Saving**: 83% reduction (30 minutes → 5 minutes per refactoring)
-- **Safety**: Creates Git stash before execution, auto-rollback on failure
-
-**3. concurrency-safety-auditor (P1 - Quality)**
-- **Path**: `.claude/skills/extended/quality/concurrency-safety-auditor/`
-- **Purpose**: Concurrency safety audit with risk rating system
-- **Capabilities**:
-  - SpotBugs custom detectors for 8 concurrency patterns
-  - ⭐⭐⭐⭐⭐ risk rating (Probability × Impact × Actual Harm)
-  - Check-then-act pattern detection (non-atomic operations)
-  - Double-checked locking detection
-  - ConcurrentHashMap misuse detection
-- **Triggers**: "concurrency", "thread safety", "race condition", "deadlock detection"
-- **Output**: Concurrency audit report with risk assessment and fix recommendations
-- **Risk Formula**: `Risk Score = (Probability × 0.4) + (Impact × 0.35) + (Actual Harm × 0.25)`
 
 ## Quality Tool Patterns
 

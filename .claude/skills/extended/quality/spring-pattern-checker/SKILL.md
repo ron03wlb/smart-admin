@@ -1,4 +1,4 @@
-﻿---
+---
 name: spring-pattern-checker
 description: SmartAdmin Spring Pattern Checker - Validates code compliance with SmartAdmin's Spring-specific conventions (@Transactional placement, dependency injection, layered architecture calls, Spring Bean naming). Use when creating/modifying Spring Bean classes, during code review, or when ArchitectureTest fails. Triggers on @Component, @Service, @Controller, @RestController annotations or explicit /spring command.
 ---

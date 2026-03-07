@@ -1,72 +1,53 @@
 {
   "$schema": "skill-aliases-schema",
-  "description": "Skill alias mappings for deprecated skills and shorthand aliases",
-  "version": "1.2.0",
-  "last_updated": "2026-02-07",
+  "description": "Skill alias mappings for shorthand invocation",
+  "version": "2.0.0",
+  "last_updated": "2026-03-07",
   "aliases": {
-    "java-performance-pro": {
-      "redirect_to": "smartadmin-performance-suite",
-      "args": "--mode=diagnose",
-      "reason": "java-performance-pro deprecated since 2026-02-06; consolidated into smartadmin-performance-suite",
-      "removal_date": "2026-06-30"
-    },
-    "smartadmin-mybatis": {
-      "redirect_to": "smartadmin-crud-generator",
-      "args": "--backend-only",
-      "reason": "smartadmin-mybatis deprecated since 2026-01-27; consolidated into smartadmin-crud-generator",
-      "removal_date": "2026-06-30"
-    },
-    "smartadmin-vue-crud": {
-      "redirect_to": "smartadmin-crud-generator",
-      "args": "--frontend-only",
-      "reason": "smartadmin-vue-crud deprecated since 2026-01-27; consolidated into smartadmin-crud-generator",
-      "removal_date": "2026-06-30"
-    },
-    "smartadmin-api-docs": {
-      "redirect_to": "smartadmin-crud-generator",
-      "args": "--docs-only",
-      "reason": "smartadmin-api-docs deprecated since 2026-01-27; consolidated into smartadmin-crud-generator",
-      "removal_date": "2026-06-30"
-    },
     "spring": {
       "redirect_to": "spring-pattern-checker",
       "args": "",
-      "reason": "Shorthand alias for spring-pattern-checker skill"
+      "reason": "Shorthand alias"
     },
     "naming": {
       "redirect_to": "naming-convention-checker",
       "args": "",
-      "reason": "Shorthand alias for naming-convention-checker skill"
-    },
-    "mermaid": {
-      "redirect_to": "mermaid-repair",
-      "args": "",
-      "reason": "Shorthand alias for mermaid-repair skill"
+      "reason": "Shorthand alias"
     },
     "crud": {
       "redirect_to": "smartadmin-crud-generator",
       "args": "",
-      "reason": "Shorthand alias for smartadmin-crud-generator skill"
+      "reason": "Shorthand alias"
     },
     "vavr": {
       "redirect_to": "vavr-refactoring-assistant",
       "args": "",
-      "reason": "Shorthand alias for vavr-refactoring-assistant skill"
+      "reason": "Shorthand alias"
     },
     "archunit": {
       "redirect_to": "archunit-test-generator",
       "args": "",
-      "reason": "Shorthand alias for archunit-test-generator skill"
+      "reason": "Shorthand alias"
     },
     "security": {
       "redirect_to": "security-hardening-pro",
       "args": "",
-      "reason": "Shorthand alias for security-hardening-pro skill"
+      "reason": "Shorthand alias"
     },
-    "perf": {
-      "redirect_to": "smartadmin-performance-suite",
-      "args": "--mode=diagnose",
-      "reason": "Shorthand alias for smartadmin-performance-suite skill"
+    "igaming-pm": {
+      "redirect_to": "igaming-pm-analyst",
+      "args": "",
+      "reason": "Shorthand alias"
+    },
+    "igaming": {
+      "redirect_to": "igaming-feature-builder",
+      "args": "",
+      "reason": "Shorthand alias"
+    },
+    "postgres": {
+      "redirect_to": "postgresql-best-practices",
+      "args": "",
+      "reason": "Shorthand alias"
     }
   }
 }

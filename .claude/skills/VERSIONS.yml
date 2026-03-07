@@ -1,280 +1,33 @@
-# ====================================================================
-# SmartAdmin Skills - Central Version Registry
-# ====================================================================
-# Purpose: Single Source of Truth for all skill versions
-# Usage: ./scripts/sync-skill-versions.sh --dry-run (check) or --update (sync)
-# Last Sync: 2026-01-30T22:30:00Z
-# ====================================================================
+# SmartAdmin Skills - Version Registry v4.0.0
+# Last Updated: 2026-03-07
 
-schema_version: "1.0.0"
-registry_version: "3.2.0"
-last_updated: "2026-02-07"
+schema_version: "2.0.0"
+registry_version: "4.0.0"
+last_updated: "2026-03-07"
 
-# ====================================================================
-# Foundation Skills (P0 - Critical)
-# ====================================================================
+# P0 Foundation (7 skills)
 foundation:
   backend:
-    archunit-test-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-23"
-      status: "stable"
-      changelog: "Initial stable release with 7 ArchUnit DSL patterns"
-
-    security-hardening-pro:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "SM2/SM3/SM4 encryption, data masking, XSS/CSRF protection"
-
-    vavr-refactoring-assistant:
-      version: "1.0.0"
-      last_updated: "2026-01-23"
-      status: "stable"
-      changelog: "Service layer Vavr Option/Try/Either migration"
-
-  full_stack:
-    smartadmin-crud-generator:
-      version: "2.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Full-stack CRUD with phase-based execution (Backend + Frontend + API + Tests)"
-
-    smartadmin-integration-test:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Spring Boot integration tests with Testcontainers"
-
+    archunit-test-generator: { version: "1.0.0", status: "stable" }
+    security-hardening-pro: { version: "1.0.0", status: "stable" }
+    vavr-refactoring-assistant: { version: "1.0.0", status: "stable" }
+  frontend:
+    smartadmin-react-crud: { version: "1.0.0", status: "stable" }
+  full-stack:
+    smartadmin-crud-generator: { version: "1.1.0", status: "stable" }
+    smartadmin-integration-test: { version: "1.0.0", status: "stable" }
   testing:
-    test-fixture-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Test data builders for complex domain objects"
+    test-fixture-generator: { version: "1.0.0", status: "stable" }
 
-# ====================================================================
-# Extended Skills (P1 - Important)
-# ====================================================================
+# P1 Extended (8 skills)
 extended:
   domain:
-    fraud-detection-pattern-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "iGaming fraud detection, KYC/AML compliance"
-
-    igame-feature-builder:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "VIP system, Wallet API, Bonus engine"
-
-    igame-pm-analyst:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Ultrathink深度分析、PRD生成"
-
-    igaming-multi-tenant-wallet-pm:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Multi-tenant architecture & seamless wallet design"
-
-    liteflow-rule-builder:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "LiteFlow DSL generation (EL expressions, QLExpress scripts)"
-
-  orchestration:
-    batch-plan-executor:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Batch plan execution with conflict detection"
-
-    quality-gate-orchestrator:
-      version: "1.0.0"
-      last_updated: "2026-01-26"
-      status: "stable"
-      changelog: "Multi-tool quality gate (Checkstyle, PMD, SpotBugs, ArchUnit)"
-
+    igaming-pm-analyst: { version: "2.0.0", status: "stable" }
+    igaming-feature-builder: { version: "2.0.0", status: "stable" }
+    liteflow-rule-builder: { version: "1.0.0", status: "stable" }
   quality:
-    concurrency-safety-auditor:
-      version: "1.0.0"
-      last_updated: "2026-01-29"
-      status: "stable"
-      changelog: "Concurrency audit with ⭐⭐⭐⭐⭐ risk rating system"
-
-    spring-pattern-checker:
-      version: "1.0.0"
-      last_updated: "2026-01-30"
-      status: "stable"
-      changelog: "Spring pattern validation: @Transactional, DI, layered architecture"
-
-    naming-convention-checker:
-      version: "1.0.0"
-      last_updated: "2026-02-02"
-      status: "stable"
-      changelog: "Validate SmartAdmin naming conventions (singular table names, class naming, field naming)"
-
-# ====================================================================
-# Productivity Skills (P2 - Nice-to-have)
-# ====================================================================
-productivity:
-  devops:
-    apm-integration:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "SkyWalking APM integration"
-
-    cicd-pipeline-builder:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "GitLab CI/CD pipeline generation"
-
-    db-migration-manager:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Flyway/Liquibase migration management"
-
-    scheduled-task-manager:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Snail-Job scheduled task integration"
-
-    websocket-sse-realtime-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "WebSocket/SSE real-time communication"
-
-  integration:
-    cache-strategy-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Cache-Aside, Read/Write-Through strategies"
-
-    full-text-search-integration:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Elasticsearch full-text search integration"
-
-    i18n-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "i18n message keys and translations"
-
-    message-queue-pattern-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Kafka/RabbitMQ producer-consumer patterns"
-
-    postgresql-best-practices:
-      version: "1.0.0"
-      last_updated: "2026-01-27"
-      status: "stable"
-      changelog: "HikariCP tuning, N+1 detection, EXPLAIN ANALYZE automation"
-
-    report-generator:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "EasyExcel report generation with streaming export"
-
-  composite:
-    smartadmin-performance-suite:
-      version: "2.0.0"
-      last_updated: "2026-01-27"
-      status: "stable"
-      changelog: "Comprehensive performance analysis (12 tools, 3 modes)"
-
-    smartadmin-testing-suite:
-      version: "2.0.0"
-      last_updated: "2026-01-25"
-      status: "stable"
-      changelog: "Complete testing solution (Unit + Integration + E2E + Performance)"
-
-  refactoring:
-    smartadmin-manager-extractor:
-      version: "1.0.0"
-      last_updated: "2026-01-27"
-      status: "stable"
-      changelog: "Extract @Transactional methods to Manager layer (83% time saving)"
-
-    markdown-quality-checker:
-      version: "1.0.0"
-      last_updated: "2026-02-02"
-      status: "stable"
-      changelog: "Detect and fix Markdown/Mermaid quality issues (closing fences, syntax, links)"
-
-    mermaid-repair:
-      version: "1.0.0"
-      last_updated: "2026-02-06"
-      status: "stable"
-      changelog: "Mermaid diagram syntax validation and repair for SmartAdmin <br/> environment"
-
-# ====================================================================
-# Deprecated Skills (Lifecycle)
-# ====================================================================
-lifecycle:
-  deprecated:
-    java-performance-pro:
-      version: "1.0.0"
-      last_updated: "2026-02-06"
-      status: "soft-deprecated"
-      deprecation_phase: "soft"
-      removal_date: "2026-06-30"
-      replacement: "smartadmin-performance-suite (--mode=diagnose)"
-      changelog: "JVM profiling - DEPRECATED, use smartadmin-performance-suite"
-
-    smartadmin-api-docs:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "soft-deprecated"
-      deprecation_phase: "soft"
-      removal_date: "2026-06-30"
-      replacement: "smartadmin-crud-generator (phase-3-api-docs)"
-      changelog: "Replaced by CRUD generator API docs phase"
-
-    smartadmin-mybatis:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "soft-deprecated"
-      deprecation_phase: "soft"
-      removal_date: "2026-06-30"
-      replacement: "smartadmin-crud-generator (phase-1-backend)"
-      changelog: "Replaced by CRUD generator backend phase"
-
-    smartadmin-vue-crud:
-      version: "1.0.0"
-      last_updated: "2026-01-25"
-      status: "soft-deprecated"
-      deprecation_phase: "soft"
-      removal_date: "2026-06-30"
-      replacement: "smartadmin-crud-generator (phase-2-frontend)"
-      changelog: "Replaced by CRUD generator frontend phase"
-
-# ====================================================================
-# Version Sync Metadata
-# ====================================================================
-sync_metadata:
-  last_sync_time: "2026-02-07T18:00:00Z"
-  sync_tool_version: "1.0.0"
-  total_skills: 36
-  synced_skills: 36
-  conflicts: 0
-  notes: |
-    Registry consistency fix: Added mermaid-repair, unified java-performance-pro
-    deprecation status, fixed all category mappings.
-    Use sync-skill-versions.sh to maintain consistency.
+    concurrency-safety-auditor: { version: "1.0.0", status: "stable" }
+    spring-pattern-checker: { version: "1.0.0", status: "stable" }
+    naming-convention-checker: { version: "1.0.0", status: "stable" }
+    smartadmin-manager-extractor: { version: "1.0.0", status: "stable" }
+    postgresql-best-practices: { version: "1.0.0", status: "stable" }

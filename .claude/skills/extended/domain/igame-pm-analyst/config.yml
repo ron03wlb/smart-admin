@@ -1,58 +1,16 @@
-# ====================================================================
-# iGame PM Analyst - Skill Configuration
-# ====================================================================
-# Version: 1.0.0
-# Priority: P1 (Important Business Logic)
-# Category: Domain
-# Type: Atomic (Analyst/Orchestrator hybrid)
-# ====================================================================
+# igaming-pm-analyst - Skill Configuration
+# Merged from: igame-pm-analyst + igaming-multi-tenant-wallet-pm
+# Version: 2.0.0
 
 metadata:
-  name: "igame-pm-analyst"
-  version: "1.0.0"
+  name: "igaming-pm-analyst"
+  version: "2.0.0"
   priority: "P1"
   type: "atomic"
   category: "domain"
-  description: "iGaming包網產品經理分析助手 - 專注於博弈平台需求分析的智能PM"
-  ai_description: |
-    專為iGaming包網平台設計的智能產品經理助手，基於第一性原理與SmartAdmin
-    架構提供專業的需求分析與技術方案建議。
-
-    核心能力:
-    - Ultrathink深度分析: 運用第一性原理拆解需求本質
-    - JTBD框架應用: 識別用戶真實待辦任務 (Jobs To Be Done)
-    - 偽需求過濾: 反向思考識別無價值需求
-    - SmartAdmin架構映射: 完美對齊分層架構規範 (Controller→Service→Manager→Dao)
-    - iGame風險識別: 資金安全/性能/合規三大風險評估
-    - 繁體中文PRD生成: 標準化需求分析報告
-    - 互動式需求澄清: 智能提問引導需求明確化
-
-    輸出物類型:
-    - 需求分析報告 (PRD.md) - 包含 Why/What/How 完整分析
-    - 需求澄清問題 - 當需求不明確時的精準提問
-    - 風險評估清單 - 資金安全🔴/性能🟡/合規🟡/技術債🟢
-    - SmartAdmin架構設計建議 - 分層設計 + Foundation模組依賴
-
-    協作流程:
-    - 調用來源: business-analyst (自動檢測iGame關鍵詞)
-    - 調用目標: java-architect (傳遞需求分析結果)
-    - 工作流: business-analyst → igame-pm-analyst → java-architect
-
-    Use when analyzing iGaming requirements, generating PRDs, risk assessment,
-    or providing SmartAdmin architecture recommendations for gaming platforms.
-
-  tags:
-    - "igaming"
-    - "product-management"
-    - "requirement-analysis"
-    - "prd"
-    - "risk-assessment"
-    - "traditional-chinese"
-    - "ultrathink"
-    - "jtbd"
-
-  author: "SmartAdmin Team"
-  last_updated: "2026-01-29"
+  description: "iGaming PM assistant - requirement analysis, PRD generation, multi-tenant architecture, seamless wallet specification, regional compliance"
+  tags: ["igaming", "product-management", "prd", "multi-tenant", "seamless-wallet", "compliance"]
+  last_updated: "2026-03-07"
   status: "stable"
 
 triggers:
@@ -61,102 +19,28 @@ triggers:
     - "包網"
     - "博弈"
     - "遊戲平台"
+    - "multi-tenant"
+    - "white-label"
+    - "seamless wallet"
     - "錢包"
-    - "存款"
-    - "提款"
     - "風控"
     - "VIP"
-    - "優惠"
-    - "返水"
-    - "傭金"
-    - "遊戲聚合"
-    - "供應商"
     - "多租戶"
-    - "需求分析"
-    - "PRD"
-
-  patterns:
-    - "需要開發\\s+(VIP|錢包|風控|遊戲).*功能"
-    - "分析.*需求"
-    - "生成.*PRD"
-
-  exclude_keywords:
-    - "刪除 PM 分析"
-    - "移除需求分析"
 
 execution:
-  type: "single-shot"
-
+  type: "phase-based"
+  phases: ["requirement-gathering", "multi-tenant-design", "seamless-wallet-design", "regional-compliance"]
   timeout:
-    per_phase_minutes: 10
-    total_minutes: 10
-
-  quality_gates:
-    run_after_execution: false  # PM analysis doesn't generate code
+    total_minutes: 60
 
 dependencies:
-  skills: []
-
   required_files:
     - "docs/iGame/technical-specs/"
     - ".claude/shared/knowledge/smartadmin-patterns.md"
-    - ".agent/rules/foundation/10-architecture-rules.md"
-
-  tools: []  # No build tools required for PM analysis
 
 output:
-  generates:
-    - "*.md"  # PRD, risk assessment, clarification questions
-
-  target_directories:
-    - "docs/requirements/"  # Generated requirement documents
-
-  templates:
-    prd: "knowledge/prd-template.md"
-
-validation:
-  pre_execution:
-    - check: "igaming_specs_exist"
-      rule: "iGaming technical specs must exist"
-
-    - check: "knowledge_base_complete"
-      rule: "PM knowledge base files must exist (igame-concepts.yaml, pattern-mapping.yaml)"
-
-  post_execution:
-    - check: "prd_completeness"
-      description: "Verify PRD contains all required sections"
-
-    - check: "architecture_alignment"
-      description: "Verify SmartAdmin architecture compliance in recommendations"
+  generates: ["*.md"]
+  target_directories: ["docs/requirements/"]
 
 compatibility:
   deprecated: false
-  deprecation_phase: null
-  replacement_skill: null
-  migration_guide_url: null
-  deprecated_since: null
-  removal_date: null
-
-documentation:
-  skill_md: null  # Uses README.md and prompt.md instead
-  readme: "README.md"
-  examples_dir: "examples"
-  references_dir: "knowledge"
-
-  external_links:
-    - title: "iGame Technical Specs"
-      url: "../../../docs/iGame/technical-specs/"
-
-    - title: "SmartAdmin Patterns"
-      url: "../../../.claude/shared/knowledge/smartadmin-patterns.md"
-
-    - title: "Architecture Rules"
-      url: "../../../.agent/rules/foundation/10-architecture-rules.md"
-
-monitoring:
-  track_usage: true
-  log_executions: true
-  metrics:
-    - "execution_time"
-    - "prd_generated"
-    - "requirements_clarified"
