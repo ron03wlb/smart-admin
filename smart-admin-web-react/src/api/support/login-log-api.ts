@@ -20,6 +20,8 @@ export interface LoginLogVO {
 }
 
 export interface LoginLogQueryForm {
+  userName?: string;
+  ip?: string;
   pageNum: number;
   pageSize: number;
   startDate?: string;
