@@ -9,9 +9,10 @@ import type {
   RoleVO,
   RoleAddForm,
   RoleUpdateForm,
-  DataScopeVO,
+  DataScopeDefinition,
   RoleDataScopeVO,
   RoleEmployeeQueryForm,
+  RoleEmployeeVO,
   RoleBatchEmployeeForm,
 } from '@/types/role.types';
 
@@ -30,20 +31,20 @@ export const roleApi = {
 
   // --- Data Scope ---
 
-  /** Get data scope list */
-  getDataScopeList: () => getRequest<DataScopeVO[]>('/dataScope/list'),
+  /** Get data scope list (all scope type definitions) */
+  getDataScopeList: () => getRequest<DataScopeDefinition[]>('/dataScope/list'),
 
-  /** Get role data scope */
+  /** Get role data scope selections */
   getRoleDataScopeList: (roleId: number) => getRequest<RoleDataScopeVO[]>(`/role/dataScope/getRoleDataScopeList/${roleId}`),
 
   /** Update role data scope */
-  updateRoleDataScope: (data: { roleId: number; dataScopeList: RoleDataScopeVO[] }) =>
+  updateRoleDataScope: (data: { roleId: number; dataScopeItemList: RoleDataScopeVO[] }) =>
     postRequest<void>('/role/dataScope/updateRoleDataScopeList', data),
 
   // --- Role Employees ---
 
   /** Query role employees */
-  queryEmployee: (data: RoleEmployeeQueryForm) => postRequest<PageResult<any>>('/role/employee/queryEmployee', data),
+  queryEmployee: (data: RoleEmployeeQueryForm) => postRequest<PageResult<RoleEmployeeVO>>('/role/employee/queryEmployee', data),
 
   /** Remove employee from role */
   removeEmployee: (employeeId: number, roleId: number) =>
@@ -54,7 +55,7 @@ export const roleApi = {
     postRequest<void>('/role/employee/batchRemoveRoleEmployee', data),
 
   /** Get all employees by role ID */
-  getAllEmployeeByRoleId: (roleId: number) => getRequest<any[]>(`/role/employee/getAllEmployeeByRoleId/${roleId}`),
+  getAllEmployeeByRoleId: (roleId: number) => getRequest<RoleEmployeeVO[]>(`/role/employee/getAllEmployeeByRoleId/${roleId}`),
 
   /** Batch add employees to role */
   batchAddEmployee: (data: RoleBatchEmployeeForm) =>
