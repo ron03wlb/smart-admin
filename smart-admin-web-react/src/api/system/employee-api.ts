@@ -79,4 +79,19 @@ export const employeeApi = {
   queryAll: (params?: { roleId?: number; disabledFlag?: number }) => {
     return getRequest<EmployeeVO[]>('/employee/queryAll', params);
   },
+
+  // --- Account Center ---
+
+  /** Update personal center info */
+  updateCenter: (data: any) => postRequest<void>(`${BASE_URL}/update/center`, data),
+
+  /** Update avatar */
+  updateAvatar: (data: { avatarUrl: string }) => postRequest<void>(`${BASE_URL}/update/avatar`, data),
+
+  /** Update password */
+  updatePassword: (data: { oldPassword: string; newPassword: string }) =>
+    postRequest<void>(`${BASE_URL}/update/password`, data),
+
+  /** Check password complexity setting */
+  getPasswordComplexityEnabled: () => getRequest<boolean>(`${BASE_URL}/password/complexity/enabled`),
 };
