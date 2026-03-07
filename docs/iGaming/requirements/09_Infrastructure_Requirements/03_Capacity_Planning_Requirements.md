@@ -22,7 +22,7 @@
 |------|------|---------|---------|
 | 峰值 TPS | > 120 TPS | API Gateway 監控（目標 300 TPS 容量） | 支持 10,000 DAU 峰值並發，確保投注不中斷 |
 | P99 回應延遲 | < 200ms | APM 監控（Prometheus） | 保證玩家投注、提款等核心操作的流暢體驗 |
-| 數據庫 QPS | > 280 QPS | PostgreSQL pg_stat_statements（目標 1,000 QPS） | 確保資料存取性能，支持即時投注額計算 |
+| 數據庫 QPS | > 280 QPS | 數據庫性能監控工具（目標 1,000 QPS） | 確保資料存取性能，支持即時投注額計算 |
 | 存儲容量 | 1.5 TB（2 年） | 定期容量檢查 | 滿足法規要求（投注記錄 2 年、財務交易 7 年） |
 | 月度基礎設施成本 | < $30,000 | 雲成本儀表板 | 控制運營成本，確保財務健康 |
 | 每 DAU 成本 | < $3.00/月 | 總成本 ÷ DAU（行業基準 $2-5） | 與競爭對手持平，保持成本競爭力 |
@@ -81,7 +81,7 @@ iGaming 平台需要在項目初期進行容量規劃，以：
 | 審計日誌 | 1 年 | 182 GB | 合規審計、安全事件調查 | ISO 27001、PCI-DSS |
 | 財務交易 | 7 年 | 126 GB | 稅務申報、反洗錢（AML）調查 | 國際稅法、AML 法規 |
 | 玩家 KYC 文檔 | 永久 | 500 MB | 身份驗證、合規審查 | KYC/AML 監管要求 |
-| **總計（PostgreSQL）** | - | **1.5 TB** | - | - |
+| **總計（主數據庫）** | - | **1.5 TB** | - | - |
 
 **業務影響**：
 - **合規風險**：未滿足數據保留要求可能導致許可證吊銷、罰款（最高 $500K）
@@ -111,7 +111,7 @@ iGaming 平台需要在項目初期進行容量規劃，以：
 
 | 要求 | 目標 | 實現方式 | 業務影響 |
 |------|------|---------|---------|
-| 服務可用性 | 99.9% | 微服務雙實例、PostgreSQL 主從複製 | 每月最多 43 分鐘停機，損失 $3,000 營收 |
+| 服務可用性 | 99.9% | 服務冗餘部署、數據庫主從備援 | 每月最多 43 分鐘停機，損失 $3,000 營收 |
 | 數據備份 | RPO < 1 小時 | 每小時增量備份 + 每日全量備份 | 最多丟失 1 小時數據（約 $420 營收） |
 | 災備恢復 | RTO < 4 小時 | Multi-AZ 部署、自動故障轉移 | 快速恢復服務，最小化營收損失 |
 | 監控告警 | < 5 分鐘發現故障 | Prometheus + Grafana + AlertManager | 及時發現問題，減少影響範圍 |
@@ -131,8 +131,8 @@ iGaming 平台需要在項目初期進行容量規劃，以：
 
 **範圍**：
 - 6 個核心微服務（player、wallet、payment、bet、bonus、risk）
-- 單 PostgreSQL 實例（無分片）
-- Redis 單實例（無集群）
+- 單一數據庫實例（無分片）
+- 單一緩存實例（無集群）
 - 基礎監控（Prometheus + Grafana）
 
 **成本預算**：
@@ -157,9 +157,9 @@ iGaming 平台需要在項目初期進行容量規劃，以：
 
 **範圍**：
 - 12 個核心微服務（新增 turnover、reconciliation、notification、report、tenant、game-integration）
-- PostgreSQL 主從複製（1 master + 2 replicas）
-- Redis 集群（3 節點 + 3 Sentinel）
-- Kafka + Flink（流處理）
+- 數據庫主從備援（1 主 + 2 備援）
+- 分散式緩存集群（3 節點 + 高可用監控）
+- 訊息佇列 + 串流處理引擎
 
 **成本預算**：
 - 基礎設施：$25,000/月
@@ -216,7 +216,7 @@ iGaming 平台需要在項目初期進行容量規劃，以：
 | 許可證申請延遲（6 個月） | 高 | 高 | 推遲上線，損失 6 個月營收 | 提前 6 個月申請，選擇多個管轄區（Malta + Curacao） |
 | 支付網關拒絕（風險評估） | 中 | 高 | 無法收款，業務中斷 | 集成 3+ 支付網關，動態路由，保持備用通道 |
 | KYC 準確度不足（< 30%） | 中 | 中 | 人工審核成本增加 50% | 人工審核備份，逐步優化 OCR，選擇高準確率供應商 |
-| 數據洩露（玩家個資） | 低 | 極高 | 罰款 $500K + 信譽損失 | 加密（AES-256-GCM）、審計日誌、滲透測試、責任保險 |
+| 數據洩露（玩家個資） | 低 | 極高 | 罰款 $500K + 信譽損失 | 業界標準加密、審計日誌、滲透測試、責任保險 |
 | DDoS 攻擊（峰值流量 10 倍） | 中 | 高 | 系統癱瘓，損失 $10K/日 | CloudFlare + AWS Shield，限流策略，備用容量 |
 | 關鍵人員離職（架構師） | 中 | 中 | 開發延遲 2-3 個月 | 知識文檔化、團隊交叉培訓、技術 PMO 制度 |
 
@@ -242,9 +242,9 @@ iGaming 平台需要在項目初期進行容量規劃，以：
 ## 相關文件
 
 - **技術實作**：[23_Capacity_Planning_Analysis.md](../../architecture/09_Infrastructure/23_Capacity_Planning_Analysis.md) - 詳細技術架構、服務器配置、成本明細
-- **業務流程**：[Business_Flows.md](../01_Player_Experience/Business_Flows.md) - 6 個核心業務流程（玩家註冊、投注、提款等）
+- **業務流程**：[Business_Flows.md](../01_Player_Experience/05_Business_Flows.md) - 6 個核心業務流程（玩家註冊、投注、提款等）
 - **成本優化**：[Cost_Optimization_Requirements.md](02_Cost_Optimization_Requirements.md) - 成本優化策略（降低 37%）
-- **風控策略**：[../05_Risk_Compliance/Risk_Strategy_Overview.md](../05_Risk_Compliance/Risk_Strategy_Overview.md) - 風險評分、欺詐檢測
+- **風控策略**：[01_Risk_Strategy_Overview.md](../05_Risk_Compliance/01_Risk_Strategy_Overview.md) - 風險評分、欺詐檢測
 
 ---
 

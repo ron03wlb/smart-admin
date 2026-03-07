@@ -36,11 +36,11 @@
 | **日活躍用戶（DAU）** | 10,000 (10%) | 行業平均轉化率 8-12% |
 | **月活躍用戶（MAU）** | 30,000 (30%) | DAU × 3 倍（週末效應） |
 | **峰值並發** | 2,000 (20% DAU) | 晚間 20:00-24:00 黃金時段 |
-| **多租戶品牌數** | 5 個 tenant | 根據 [Multi_Tenant_Architecture.md](../06_Platform_Core/Multi_Tenant_Architecture.md) |
+| **多租戶品牌數** | 5 個 tenant | 根據 [Multi_Tenant_Architecture.md](../06_Platform_Core/01_Multi_Tenant_Architecture.md) |
 
 ### 2.2 業務流程負載分析
 
-基於 [Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md) 的 6 個核心流程：
+基於 [Business_Flows.md](../../requirements/01_Player_Experience/05_Business_Flows.md) 的 6 個核心流程：
 
 #### 流程 1: 玩家註冊與 KYC
 - **日新增用戶**: 100-500 用戶/天（增長期）
@@ -235,29 +235,29 @@
 | 微服務名稱 | 對應文檔 | 核心功能 | 依賴 |
 |-----------|---------|---------|------|
 | **player-service** | [01_Player_Service](../01_Player_Service/) | 註冊、KYC、玩家狀態機 | PostgreSQL, Redis |
-| **wallet-service** | [Wallet_API.md](../02_Finance_Service/Wallet_API.md) | 餘額管理、資金鎖定、可下注餘額 | PostgreSQL, Redis, Kafka |
-| **payment-service** | [Payment_Processing.md](../02_Finance_Service/Payment_Processing.md) | 存款、提款、支付網關集成 | PostgreSQL, Stripe/Adyen |
+| **wallet-service** | [Seamless_Wallet_Index.md](../02_Finance_Service/01_Seamless_Wallet_Index.md) | 餘額管理、資金鎖定、可下注餘額 | PostgreSQL, Redis, Kafka |
+| **payment-service** | [Payment_Gateway_API.md](../02_Finance_Service/05_Payment_Gateway_API.md) | 存款、提款、支付網關集成 | PostgreSQL, Stripe/Adyen |
 | **game-integration-service** | [03_Game_Integration](../03_Game_Integration/) | Token 驗證、GP API、遊戲啟動 | Redis, PostgreSQL |
-| **bet-service** | [Bet_Handling.md](../03_Game_Integration/Bet_Handling.md) | Debit/Credit、投注記錄、冪等性 | PostgreSQL, Redis, Kafka |
-| **turnover-service** | [Turnover_Calculation.md](../02_Finance_Service/Turnover_Calculation.md) | 有效投注、投注要求追蹤 | PostgreSQL, Kafka, Flink |
+| **bet-service** | [Game_Integration_Implementation.md](../03_Game_Integration/02_Game_Integration_Implementation.md) | Debit/Credit、投注記錄、冪等性 | PostgreSQL, Redis, Kafka |
+| **turnover-service** | [Turnover_Calculation_Architecture.md](../02_Finance_Service/08_Turnover_Calculation_Architecture.md) | 有效投注、投注要求追蹤 | PostgreSQL, Kafka, Flink |
 | **bonus-service** | [04_Activity_Engine](../04_Activity_Engine/) | 獎金發放、投注要求、轉現金 | PostgreSQL, Redis |
 | **risk-service** | [05_Risk_Engine](../05_Risk_Engine/) | 風險評分、欺詐檢測、規則引擎 | PostgreSQL, Kafka, Flink, ML |
-| **reconciliation-service** | [Reconciliation.md](../02_Finance_Service/Reconciliation.md) | 三層驗證、GP API Pull、差異檢測 | PostgreSQL, Kafka, ClickHouse |
-| **notification-service** | [Notification_Service.md](../10_Platform_Management/Notification_Service.md) | 郵件、簡訊、站內信 | PostgreSQL, SES, Twilio |
+| **reconciliation-service** | [Reconciliation_Technical.md](../02_Finance_Service/07_Reconciliation_Technical.md) | 三層驗證、GP API Pull、差異檢測 | PostgreSQL, Kafka, ClickHouse |
+| **notification-service** | [Notification_Architecture.md](../10_Platform_Management/02_Notification_Architecture.md) | 郵件、簡訊、站內信 | PostgreSQL, SES, Twilio |
 | **report-service** | [08_Analytics_Service](../08_Analytics_Service/) | BI 報表、數據倉儲 | ClickHouse, PostgreSQL |
-| **tenant-service** | [Multi_Tenant_Architecture.md](../06_Platform_Core/Multi_Tenant_Architecture.md) | 租戶管理、Schema 路由 | PostgreSQL, Redis |
+| **tenant-service** | [Multi_Tenant_Architecture.md](../06_Platform_Core/01_Multi_Tenant_Architecture.md) | 租戶管理、Schema 路由 | PostgreSQL, Redis |
 
 #### 基礎設施微服務（8 個）
 
 | 微服務名稱 | 對應文檔 | 核心功能 |
 |-----------|---------|---------|
-| **api-gateway** | [gateway](gateway/) | Kong/Nginx、限流、路由 |
-| **auth-service** | [authentication](authentication/) | JWT Token 簽發、OAuth、MFA |
-| **token-validation-service** | [token-validation](token-validation/) | Token 緩存、多 Actor 驗證 |
-| **cache-service** | [caching](caching/) | Redis 集群管理 |
-| **stream-processing-service** | [streaming](streaming/) | Kafka/Flink、實時投注額 |
-| **monitoring-service** | [performance](performance/) | APM、日誌聚合、告警 |
-| **config-service** | [Configuration.md](../06_Platform_Core/Configuration.md) | Spring Cloud Config、租戶配置 |
+| **api-gateway** | [Gateway_Core.md](01_Gateway_Core.md) | Kong/Nginx、限流、路由 |
+| **auth-service** | [Authentication_Architecture.md](05_Authentication_Architecture.md) | JWT Token 簽發、OAuth、MFA |
+| **token-validation-service** | [Token_Validation_Architecture.md](19_Token_Validation_Architecture.md) | Token 緩存、多 Actor 驗證 |
+| **cache-service** | [Caching_Strategy.md](14_Caching_Strategy.md) | Redis 集群管理 |
+| **stream-processing-service** | [Stream_Processing_Architecture.md](15_Stream_Processing_Architecture.md) | Kafka/Flink、實時投注額 |
+| **monitoring-service** | [Performance_Monitoring.md](12_Performance_Monitoring.md) | APM、日誌聚合、告警 |
+| **config-service** | [Tenant_Configuration_Architecture.md](../10_Platform_Management/01_Tenant_Configuration_Architecture.md) | Spring Cloud Config、租戶配置 |
 | **scheduler-service** | - | Snail-Job、對帳任務、報表生成 |
 
 **總微服務數**: **20 個**
@@ -1033,8 +1033,8 @@ quadrantChart
 ## 相關文件（Related Documents）
 
 - **業務需求**：[03_Capacity_Planning_Requirements.md](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md)
-- **業務流程**：[Business_Flows.md](../../requirements/01_Player_Experience/Business_Flows.md)
-- **多租戶架構**：[Multi_Tenant_Architecture.md](../06_Platform_Core/Multi_Tenant_Architecture.md)
+- **業務流程**：[Business_Flows.md](../../requirements/01_Player_Experience/05_Business_Flows.md)
+- **多租戶架構**：[Multi_Tenant_Architecture.md](../06_Platform_Core/01_Multi_Tenant_Architecture.md)
 - **成本優化**：[16_Cost_Optimization_Architecture.md](16_Cost_Optimization_Architecture.md)
 - **質量報告**：[2026-Q1-quality-gate-report.md](../quality-reports/2026-Q1-quality-gate-report.md)
 
