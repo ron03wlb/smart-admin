@@ -20,13 +20,17 @@ import storage from 'redux-persist/lib/storage'; // LocalStorage
 import userReducer from './slices/userSlice';
 import menuReducer from './slices/menuSlice';
 import tagNavReducer from './slices/tagNavSlice';
+import appConfigReducer from './slices/appConfigSlice';
+import dictReducer from './slices/dictSlice';
+import spinReducer from './slices/spinSlice';
+import tenantReducer from './slices/tenantSlice';
 
 // ================================= Redux Persist 配置 =================================
 
 const persistConfig = {
   key: 'smart_admin_root', // LocalStorage 鍵名
   storage,
-  whitelist: ['user', 'menu', 'tagNav'], // 持久化 user, menu, tagNav
+  whitelist: ['user', 'menu', 'tagNav', 'appConfig', 'tenant'], // 持久化
 };
 
 // ================================= Root Reducer =================================
@@ -35,6 +39,10 @@ const rootReducer = combineReducers({
   user: userReducer,
   menu: menuReducer,
   tagNav: tagNavReducer,
+  appConfig: appConfigReducer,
+  dict: dictReducer,
+  spin: spinReducer,
+  tenant: tenantReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

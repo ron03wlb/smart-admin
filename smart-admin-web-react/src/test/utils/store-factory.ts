@@ -3,7 +3,7 @@
  *
  * 功能：
  * 1. createTestStore() - 創建隔離的測試 Store（無 Redux Persist）
- * 2. createMockUserState() - 創建測試用 UserState
+ * 2. createMock*State() - 創建各 slice 的測試狀態
  *
  * 使用場景：
  * - 單元測試：使用 createTestStore()（快速、隔離）
@@ -17,24 +17,18 @@ import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '@/store/slices/userSlice';
 import menuReducer from '@/store/slices/menuSlice';
 import tagNavReducer from '@/store/slices/tagNavSlice';
+import appConfigReducer, { APP_CONFIG_DEFAULTS } from '@/store/slices/appConfigSlice';
+import dictReducer from '@/store/slices/dictSlice';
+import spinReducer from '@/store/slices/spinSlice';
+import tenantReducer from '@/store/slices/tenantSlice';
 import type { UserState } from '@/types/user.types';
 import type { MenuState } from '@/store/slices/menuSlice';
 import type { TagNavState } from '@/store/slices/tagNavSlice';
+import type { AppConfigState } from '@/types/app-config.types';
+import type { DictState } from '@/store/slices/dictSlice';
+import type { SpinState } from '@/store/slices/spinSlice';
+import type { TenantState } from '@/store/slices/tenantSlice';
 
-/**
- * 創建測試用 UserState
- *
- * @param overrides - 可選覆寫字段
- * @returns 完整的 UserState 對象
- *
- * @example
- * ```typescript
- * const userState = createMockUserState({
- *   administratorFlag: true,
- *   employeeName: 'Admin User',
- * });
- * ```
- */
 export function createMockUserState(overrides?: Partial<UserState>): UserState {
   return {
     token: 'test-token',
@@ -50,20 +44,6 @@ export function createMockUserState(overrides?: Partial<UserState>): UserState {
   };
 }
 
-/**
- * 創建測試用 MenuState
- *
- * @param overrides - 可選覆寫字段
- * @returns 完整的 MenuState 對象
- *
- * @example
- * ```typescript
- * const menuState = createMockMenuState({
- *   collapsed: true,
- *   selectedMenuId: '11',
- * });
- * ```
- */
 export function createMockMenuState(overrides?: Partial<MenuState>): MenuState {
   return {
     collapsed: false,
@@ -73,13 +53,41 @@ export function createMockMenuState(overrides?: Partial<MenuState>): MenuState {
   };
 }
 
-/**
- * Create test TagNavState
- */
 export function createMockTagNavState(overrides?: Partial<TagNavState>): TagNavState {
   return {
     tagList: [],
     activeKey: '',
+    ...overrides,
+  };
+}
+
+export function createMockAppConfigState(overrides?: Partial<AppConfigState>): AppConfigState {
+  return {
+    ...APP_CONFIG_DEFAULTS,
+    ...overrides,
+  };
+}
+
+export function createMockDictState(overrides?: Partial<DictState>): DictState {
+  return {
+    dictList: [],
+    dictMap: {},
+    ...overrides,
+  };
+}
+
+export function createMockSpinState(overrides?: Partial<SpinState>): SpinState {
+  return {
+    loading: false,
+    ...overrides,
+  };
+}
+
+export function createMockTenantState(overrides?: Partial<TenantState>): TenantState {
+  return {
+    tenantId: '',
+    tenantName: '',
+    timezone: 'UTC',
     ...overrides,
   };
 }
@@ -91,52 +99,37 @@ export interface TestStorePreloadedState {
   user?: Partial<UserState>;
   menu?: Partial<MenuState>;
   tagNav?: Partial<TagNavState>;
+  appConfig?: Partial<AppConfigState>;
+  dict?: Partial<DictState>;
+  spin?: Partial<SpinState>;
+  tenant?: Partial<TenantState>;
 }
 
 /**
  * 創建隔離的測試 Store（無 Redux Persist）
- *
- * @param overrides - 可選覆寫 UserState 和 MenuState 字段
- * @returns 測試用 Redux Store
- *
- * @example
- * ```typescript
- * // 創建超級管理員 Store
- * const adminStore = createTestStore({
- *   user: { administratorFlag: true },
- * });
- *
- * // 創建有權限的 Store
- * const storeWithPermissions = createTestStore({
- *   user: {
- *     pointsList: [
- *       { webPerms: 'system:user:add', ... },
- *       { webPerms: 'system:user:edit', ... },
- *     ],
- *   },
- * });
- *
- * // 創建折疊菜單的 Store
- * const storeWithCollapsedMenu = createTestStore({
- *   menu: { collapsed: true, selectedMenuId: '11' },
- * });
- * ```
  */
 export function createTestStore(overrides?: TestStorePreloadedState | Partial<UserState>) {
   // 兼容舊的 API（直接傳入 Partial<UserState>）
   let userOverrides: Partial<UserState> = {};
   let menuOverrides: Partial<MenuState> = {};
   let tagNavOverrides: Partial<TagNavState> = {};
+  let appConfigOverrides: Partial<AppConfigState> = {};
+  let dictOverrides: Partial<DictState> = {};
+  let spinOverrides: Partial<SpinState> = {};
+  let tenantOverrides: Partial<TenantState> = {};
 
   if (overrides) {
-    // 檢查是否為新的 TestStorePreloadedState 格式
-    if ('user' in overrides || 'menu' in overrides || 'tagNav' in overrides) {
+    const sliceKeys = ['user', 'menu', 'tagNav', 'appConfig', 'dict', 'spin', 'tenant'];
+    if (sliceKeys.some((key) => key in overrides)) {
       const typedOverrides = overrides as TestStorePreloadedState;
       userOverrides = typedOverrides.user || {};
       menuOverrides = typedOverrides.menu || {};
       tagNavOverrides = typedOverrides.tagNav || {};
+      appConfigOverrides = typedOverrides.appConfig || {};
+      dictOverrides = typedOverrides.dict || {};
+      spinOverrides = typedOverrides.spin || {};
+      tenantOverrides = typedOverrides.tenant || {};
     } else {
-      // 舊的 API（直接傳入 Partial<UserState>）
       userOverrides = overrides as Partial<UserState>;
     }
   }
@@ -146,11 +139,19 @@ export function createTestStore(overrides?: TestStorePreloadedState | Partial<Us
       user: userReducer,
       menu: menuReducer,
       tagNav: tagNavReducer,
+      appConfig: appConfigReducer,
+      dict: dictReducer,
+      spin: spinReducer,
+      tenant: tenantReducer,
     },
     preloadedState: {
       user: createMockUserState(userOverrides),
       menu: createMockMenuState(menuOverrides),
       tagNav: createMockTagNavState(tagNavOverrides),
+      appConfig: createMockAppConfigState(appConfigOverrides),
+      dict: createMockDictState(dictOverrides),
+      spin: createMockSpinState(spinOverrides),
+      tenant: createMockTenantState(tenantOverrides),
     },
   });
 }

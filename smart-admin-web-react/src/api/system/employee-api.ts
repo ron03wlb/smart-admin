@@ -5,7 +5,7 @@
  */
 
 import { postRequest, getRequest } from '@/api/base/request';
-import type { PageResult } from '@/api/base/response.model';
+import type { PageResult } from '@/api/base/page.model';
 import type {
   EmployeeQueryForm,
   EmployeeVO,
@@ -70,5 +70,13 @@ export const employeeApi = {
    */
   batchDelete: (batchDeleteForm: EmployeeBatchDeleteForm) => {
     return postRequest<void>(`${BASE_URL}/batchDelete`, batchDeleteForm);
+  },
+
+  /**
+   * Query all employees (no pagination)
+   * Backend: GET /employee/queryAll
+   */
+  queryAll: (params?: { roleId?: number; disabledFlag?: number }) => {
+    return getRequest<EmployeeVO[]>('/employee/queryAll', params);
   },
 };

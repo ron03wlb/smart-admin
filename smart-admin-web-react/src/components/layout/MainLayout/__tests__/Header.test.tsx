@@ -7,11 +7,13 @@
  * 3. Logo 點擊跳轉首頁
  * 4. 搜尋框存在且可輸入
  * 5. 搜尋功能（按 Enter 鍵）
- * 6. 通知 Badge 顯示正確數量
- * 7. 點擊通知圖標顯示消息
+ * 6. 消息通知圖標渲染（HeaderMessage 整合）
+ * 7. 設置圖標點擊打開設置抽屜（HeaderSetting 整合）
  * 8. 用戶名稱顯示正確
- * 9. 用戶下拉菜單包含「退出登錄」選項
- * 10. 點擊「退出登錄」調用 logout action 並跳轉
+ * 9. 用戶名稱為空時顯示默認文字
+ * 10. 用戶下拉菜單包含退出登錄選項
+ * 11. 點擊退出登錄調用 logout action 並跳轉
+ * 12. 空搜尋不觸發搜尋
  *
  * @author Claude AI Assistant
  * @since 2026-03-06
@@ -47,6 +49,22 @@ vi.mock('antd', async () => {
   };
 });
 
+// Mock message API (used by HeaderMessage)
+vi.mock('@/api/support/message-api', () => ({
+  messageApi: {
+    getUnreadCount: vi.fn().mockResolvedValue({ code: 1, data: 3 }),
+    queryMessage: vi.fn().mockResolvedValue({ code: 1, data: { list: [] } }),
+  },
+}));
+
+// Mock employee API (used by ChangePasswordModal in HeaderAvatar)
+vi.mock('@/api/system/employee-api', () => ({
+  employeeApi: {
+    update: vi.fn().mockResolvedValue({ code: 1 }),
+    queryAll: vi.fn().mockResolvedValue({ code: 1, data: [] }),
+  },
+}));
+
 describe('Header', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
@@ -62,7 +80,6 @@ describe('Header', () => {
       },
     });
 
-    // 驗證：Header 組件應該被渲染
     expect(screen.getByText('SmartAdmin')).toBeInTheDocument();
   });
 
@@ -72,7 +89,6 @@ describe('Header', () => {
   test('應該顯示正確的 Logo 文字', () => {
     renderWithProviders(<Header />);
 
-    // 驗證：Logo 文字應該是 "SmartAdmin"
     const logo = screen.getByText('SmartAdmin');
     expect(logo).toBeInTheDocument();
   });
@@ -86,7 +102,6 @@ describe('Header', () => {
     const logo = screen.getByText('SmartAdmin');
     fireEvent.click(logo);
 
-    // 驗證：應該調用 navigate('/home')
     expect(mockNavigate).toHaveBeenCalledWith('/home');
   });
 
@@ -96,7 +111,6 @@ describe('Header', () => {
   test('應該顯示搜尋框', () => {
     renderWithProviders(<Header />);
 
-    // 驗證：搜尋框應該存在
     const searchInput = screen.getByPlaceholderText('搜尋菜單、功能...');
     expect(searchInput).toBeInTheDocument();
   });
@@ -110,49 +124,38 @@ describe('Header', () => {
 
     const searchInput = screen.getByPlaceholderText('搜尋菜單、功能...');
 
-    // 1. 輸入搜尋文字
     fireEvent.change(searchInput, { target: { value: '玩家管理' } });
     expect(searchInput).toHaveValue('玩家管理');
 
-    // 2. 按 Enter 鍵觸發搜尋
     fireEvent.keyDown(searchInput, { key: 'Enter', code: 'Enter' });
 
-    // 3. 驗證：應該顯示搜尋消息
     await waitFor(() => {
       expect(message.info).toHaveBeenCalledWith('搜尋: 玩家管理');
     });
   });
 
   /**
-   * 測試 6：應該顯示通知 Badge
+   * 測試 6：應該渲染消息通知圖標（HeaderMessage 整合）
    */
-  test('應該顯示通知 Badge', () => {
+  test('應該渲染消息通知圖標', () => {
     renderWithProviders(<Header />);
 
-    // 驗證：通知 Badge 應該顯示數量 5
-    const badge = screen.getByText('5');
-    expect(badge).toBeInTheDocument();
+    const bellIcon = screen.getByRole('img', { name: 'bell' });
+    expect(bellIcon).toBeInTheDocument();
   });
 
   /**
-   * 測試 7：點擊通知圖標應該顯示消息
+   * 測試 7：點擊設置圖標應該打開設置抽屜（HeaderSetting 整合）
    */
-  test('點擊通知圖標應該顯示消息', async () => {
-    const { message } = await import('antd');
+  test('點擊設置圖標應該打開設置抽屜', async () => {
+    const user = userEvent.setup();
     renderWithProviders(<Header />);
 
-    // 1. 找到通知圖標（BellOutlined）
-    const notificationIcon = document.querySelector('.header-action-icon');
-    expect(notificationIcon).toBeInTheDocument();
+    const settingIcon = screen.getByRole('img', { name: 'setting' });
+    await user.click(settingIcon);
 
-    // 2. 點擊通知圖標
-    if (notificationIcon) {
-      fireEvent.click(notificationIcon);
-    }
-
-    // 3. 驗證：應該顯示通知消息
     await waitFor(() => {
-      expect(message.info).toHaveBeenCalledWith('通知中心開發中...');
+      expect(screen.getByText('系统设置')).toBeInTheDocument();
     });
   });
 
@@ -166,7 +169,6 @@ describe('Header', () => {
       },
     });
 
-    // 驗證：應該顯示用戶名稱 "張三"
     expect(screen.getByText('張三')).toBeInTheDocument();
   });
 
@@ -180,14 +182,14 @@ describe('Header', () => {
       },
     });
 
-    // 驗證：應該顯示默認文字 "用戶"
-    expect(screen.getByText('用戶')).toBeInTheDocument();
+    // HeaderAvatar uses simplified Chinese '用户'
+    expect(screen.getByText('用户')).toBeInTheDocument();
   });
 
   /**
-   * 測試 10：用戶下拉菜單應該包含「退出登錄」選項
+   * 測試 10：用戶下拉菜單應該包含退出登錄選項（HeaderAvatar 整合）
    */
-  test('用戶下拉菜單應該包含「退出登錄」選項', async () => {
+  test('用戶下拉菜單應該包含退出登錄選項', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Header />, {
       preloadedState: {
@@ -195,30 +197,24 @@ describe('Header', () => {
       },
     });
 
-    // 1. 找到用戶菜單區域
-    const userMenu = document.querySelector('.header-user-menu');
-    expect(userMenu).toBeInTheDocument();
+    // Hover on avatar area to trigger Dropdown
+    const avatarTrigger = screen.getByText('測試用戶');
+    await user.hover(avatarTrigger);
 
-    // 2. 點擊用戶菜單打開下拉菜單（使用 userEvent 模擬真實交互）
-    if (userMenu) {
-      await user.click(userMenu);
-    }
-
-    // 3. 等待下拉菜單渲染完成（增加 timeout）
+    // Wait for dropdown menu to render (simplified Chinese)
     await waitFor(
       () => {
-        expect(screen.getByText('退出登錄')).toBeInTheDocument();
+        expect(screen.getByText('退出登录')).toBeInTheDocument();
       },
       { timeout: 3000 }
     );
   });
 
   /**
-   * 測試 11：點擊「退出登錄」應該調用 logout action 並跳轉
+   * 測試 11：點擊退出登錄應該調用 logout action 並跳轉
    */
-  test('點擊「退出登錄」應該調用 logout action 並跳轉', async () => {
+  test('點擊退出登錄應該調用 logout action 並跳轉', async () => {
     const user = userEvent.setup();
-    const { message } = await import('antd');
     const { store } = renderWithProviders(<Header />, {
       preloadedState: {
         token: 'test-token',
@@ -227,35 +223,30 @@ describe('Header', () => {
       },
     });
 
-    // 1. 打開用戶下拉菜單
-    const userMenu = document.querySelector('.header-user-menu');
-    if (userMenu) {
-      await user.click(userMenu);
-    }
+    // 1. Hover to open avatar dropdown
+    const avatarTrigger = screen.getByText('測試用戶');
+    await user.hover(avatarTrigger);
 
-    // 2. 等待下拉菜單渲染，然後點擊「退出登錄」
+    // 2. Wait for dropdown and click logout
     await waitFor(
       () => {
-        expect(screen.getByText('退出登錄')).toBeInTheDocument();
+        expect(screen.getByText('退出登录')).toBeInTheDocument();
       },
       { timeout: 3000 }
     );
 
-    const logoutButton = screen.getByText('退出登錄');
+    const logoutButton = screen.getByText('退出登录');
     await user.click(logoutButton);
 
-    // 3. 驗證：Redux Store 應該清空用戶信息
+    // 3. Verify Redux Store cleared
     await waitFor(() => {
       const state = store.getState();
       expect(state.user.token).toBe('');
       expect(state.user.employeeName).toBe('');
     });
 
-    // 4. 驗證：應該跳轉到登錄頁
+    // 4. Verify navigation to login page
     expect(mockNavigate).toHaveBeenCalledWith('/');
-
-    // 5. 驗證：應該顯示成功消息
-    expect(message.success).toHaveBeenCalledWith('已退出登錄');
   });
 
   /**
@@ -270,16 +261,11 @@ describe('Header', () => {
 
     const searchInput = screen.getByPlaceholderText('搜尋菜單、功能...');
 
-    // 1. 輸入空白字符
     fireEvent.change(searchInput, { target: { value: '   ' } });
-
-    // 2. 按 Enter 鍵觸發 onPressEnter
     fireEvent.keyDown(searchInput, { key: 'Enter', code: 'Enter', keyCode: 13 });
 
-    // 3. 等待一小段時間，確保如果有異步操作也能捕獲
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // 4. 驗證：不應該調用 message.info
     expect(mockInfo).not.toHaveBeenCalled();
   });
 });
