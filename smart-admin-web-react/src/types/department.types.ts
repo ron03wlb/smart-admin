@@ -6,17 +6,19 @@ export interface DepartmentVO {
   departmentId: number;
   departmentName: string;
   parentId: number;
-  sortValue: number;
-  managerEmployeeId?: number;
+  sort: number;
+  managerId?: number;
   managerName?: string;
+  createTime?: string;
+  updateTime?: string;
   children?: DepartmentVO[];
 }
 
 export interface DepartmentAddForm {
   departmentName: string;
   parentId: number;
-  sortValue?: number;
-  managerEmployeeId?: number;
+  sort?: number;
+  managerId?: number;
 }
 
 export interface DepartmentUpdateForm extends DepartmentAddForm {

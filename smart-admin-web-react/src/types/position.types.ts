@@ -5,21 +5,22 @@
 export interface PositionVO {
   positionId: number;
   positionName: string;
-  level: string;
-  sortValue: number;
-  remark: string;
+  positionLevel?: string;
+  sort: number;
+  remark?: string;
+  createTime?: string;
 }
 
 export interface PositionQueryForm {
   pageNum: number;
   pageSize: number;
-  positionName?: string;
+  keywords?: string;
 }
 
 export interface PositionAddForm {
   positionName: string;
-  level?: string;
-  sortValue?: number;
+  positionLevel?: string;
+  sort?: number;
   remark?: string;
 }
 
