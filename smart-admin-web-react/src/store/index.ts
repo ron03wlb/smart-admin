@@ -19,13 +19,14 @@ import storage from 'redux-persist/lib/storage'; // LocalStorage
 
 import userReducer from './slices/userSlice';
 import menuReducer from './slices/menuSlice';
+import tagNavReducer from './slices/tagNavSlice';
 
 // ================================= Redux Persist 配置 =================================
 
 const persistConfig = {
   key: 'smart_admin_root', // LocalStorage 鍵名
   storage,
-  whitelist: ['user', 'menu'], // 持久化 user 和 menu slice
+  whitelist: ['user', 'menu', 'tagNav'], // 持久化 user, menu, tagNav
 };
 
 // ================================= Root Reducer =================================
@@ -33,10 +34,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   user: userReducer,
   menu: menuReducer,
-  // 未來可添加更多 slices：
-  // appConfig: appConfigReducer,
-  // dict: dictReducer,
-  // tenant: tenantReducer,
+  tagNav: tagNavReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

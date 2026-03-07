@@ -1,60 +1,58 @@
 /**
- * MainLayout 主佈局組件
+ * MainLayout Main Layout Component
  *
- * 功能：
- * 1. 整合 Header、Sidebar、Breadcrumb 組件
- * 2. 使用 Ant Design Layout 構建嵌套佈局
- * 3. 提供 Outlet 用於子路由渲染
- * 4. 響應式設計（移動端自動適配）
+ * Features:
+ * 1. Integrates Header, Sidebar, Breadcrumb, TagNav components
+ * 2. Uses Ant Design Layout for nested layout
+ * 3. Keep-Alive via CSS display:none (KeepAliveOutlet)
+ * 4. Responsive design
  *
- * 佈局結構：
- * <Layout>                            // 外層容器
- *   <Sidebar />                       // 側邊菜單
- *   <Layout>                          // 右側主容器
- *     <Header />                      // 頂部導航
- *     <Breadcrumb />                  // 麵包屑
- *     <Content>                       // 內容區域
- *       <Outlet />                    // 子路由出口
+ * Layout structure:
+ * <Layout>
+ *   <Sidebar />
+ *   <Layout>
+ *     <Header />
+ *     <Breadcrumb />
+ *     <TagNav />
+ *     <Content>
+ *       <KeepAliveOutlet />
  *     </Content>
  *   </Layout>
  * </Layout>
- *
- * @author Claude AI Assistant
- * @since 2026-03-06
  */
 
 import React from 'react';
 import { Layout } from 'antd';
-import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Breadcrumb from './Breadcrumb';
+import TagNav from '@/components/layout/TagNav';
+import KeepAliveOutlet from './KeepAliveOutlet';
 import styles from './MainLayout.module.css';
 
 const { Content } = Layout;
 
-/**
- * MainLayout 主佈局組件
- */
 const MainLayout: React.FC = () => {
   return (
     <Layout className={styles.mainLayoutContainer} data-testid="main-layout">
-      {/* 側邊菜單 */}
+      {/* Sidebar menu */}
       <Sidebar />
 
-      {/* 右側主容器 */}
+      {/* Right content area */}
       <Layout className={styles.mainLayoutContentWrapper}>
-        {/* 頂部導航 */}
+        {/* Top navigation */}
         <Header />
 
-        {/* 麵包屑 */}
+        {/* Breadcrumb */}
         <Breadcrumb />
 
-        {/* 內容區域 */}
+        {/* Multi-tab navigation */}
+        <TagNav />
+
+        {/* Content area with Keep-Alive */}
         <Content className={styles.mainLayoutContent}>
           <div className={styles.mainLayoutContentInner}>
-            {/* 子路由渲染出口 */}
-            <Outlet />
+            <KeepAliveOutlet />
           </div>
         </Content>
       </Layout>

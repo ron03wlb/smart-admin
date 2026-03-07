@@ -1,68 +1,78 @@
 /**
- * 首頁組件（純內容組件）
+ * Home Page Component
  *
- * 注意：此組件現在被 MainLayout 包裹，不需要處理佈局邏輯。
- * MainLayout 已經提供了 Header、Sidebar、Breadcrumb 等佈局元素。
+ * Dashboard layout with header, notices, charts, and utility cards.
+ * Corresponds to Vue's system/home/index.vue
  *
- * @author SmartAdmin Team
- * @date 2026-03-04
- * @updated 2026-03-06
+ * Layout:
+ * ┌─────────────────────────────────────────┐
+ * │ HomeHeader (greeting, calendar, info)    │
+ * ├──────────────────────┬──────────────────┤
+ * │ Announcements        │ Changelog        │
+ * │ Notifications        │ To-do tasks      │
+ * │ Pie chart            │                  │
+ * │ Bar chart            │                  │
+ * │ Gradient chart (full width)             │
+ * └──────────────────────┴──────────────────┘
  */
-import { Button, Space, Typography, Divider } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { selectEmployeeName, selectAdministratorFlag, logout } from '@/store/slices/userSlice';
-import { PrivilegeButton } from '@/components/framework/privilege';
+import React from 'react';
+import { Row, Col } from 'antd';
+import HomeHeader from './components/HomeHeader';
+import HomeNotice from './components/HomeNotice';
+import PieChart from './components/charts/PieChart';
+import CategoryChart from './components/charts/CategoryChart';
+import GradientChart from './components/charts/GradientChart';
+import ToBeDoneCard from './components/ToBeDoneCard';
+import ChangelogCard from './components/ChangelogCard';
 
-const { Title, Paragraph, Text } = Typography;
-
-/**
- * 首頁組件
- *
- * 職責：
- * - 顯示歡迎信息
- * - 提供快捷操作（測試權限按鈕、登出按鈕）
- * - 未來將整合 Dashboard 儀表板（Task 10）
- */
 export default function Home() {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const employeeName = useAppSelector(selectEmployeeName);
-  const isAdmin = useAppSelector(selectAdministratorFlag);
-
-  /**
-   * 登出處理
-   */
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/');
-  };
-
   return (
-    <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-      <Title level={2}>SmartAdmin React 首頁</Title>
+    <div>
+      {/* Header section */}
+      <HomeHeader />
 
-      <Paragraph style={{ fontSize: '16px', marginTop: '24px' }}>
-        歡迎，<Text strong>{employeeName}</Text>！
-        {isAdmin && <Text type="danger">（超級管理員）</Text>}
-      </Paragraph>
+      {/* Main content grid */}
+      <Row gutter={[10, 10]}>
+        {/* Left section (16 cols / 67%) */}
+        <Col xs={24} lg={16}>
+          <Row gutter={[10, 10]}>
+            {/* Announcements */}
+            <Col xs={24} sm={12}>
+              <HomeNotice title="公告" noticeTypeId={1} />
+            </Col>
+            {/* Notifications */}
+            <Col xs={24} sm={12}>
+              <HomeNotice title="通知" noticeTypeId={2} />
+            </Col>
+            {/* Pie chart */}
+            <Col xs={24} sm={12}>
+              <PieChart />
+            </Col>
+            {/* Bar chart */}
+            <Col xs={24} sm={12}>
+              <CategoryChart />
+            </Col>
+            {/* Gradient chart (full width) */}
+            <Col span={24}>
+              <GradientChart />
+            </Col>
+          </Row>
+        </Col>
 
-      <Divider />
-
-      <Space size="middle" style={{ marginTop: '32px' }}>
-        <PrivilegeButton
-          permissionCode="system:user:add"
-          type="primary"
-        >
-          新增用戶（測試權限按鈕）
-        </PrivilegeButton>
-
-        <Button onClick={handleLogout}>登出</Button>
-      </Space>
-
-      <Paragraph style={{ marginTop: '48px', color: '#8c8c8c' }}>
-        註：Dashboard 儀表板將在 Phase 1 Task 10 實施
-      </Paragraph>
+        {/* Right section (8 cols / 33%) */}
+        <Col xs={24} lg={8}>
+          <Row gutter={[10, 10]}>
+            {/* Changelog */}
+            <Col span={24}>
+              <ChangelogCard />
+            </Col>
+            {/* To-do tasks */}
+            <Col span={24}>
+              <ToBeDoneCard />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
     </div>
   );
 }

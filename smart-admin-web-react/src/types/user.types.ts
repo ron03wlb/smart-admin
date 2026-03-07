@@ -52,13 +52,13 @@ export interface MenuItem {
   /** 路由路徑 */
   path?: string;
 
-  /** 組件路徑 */
+  /** 組件路徑（如 /system/employee/employee-list.vue） */
   component?: string;
 
   /** 圖標 */
   icon?: string;
 
-  /** 父菜單 ID */
+  /** 父菜單 ID（0 為頂級） */
   parentId?: string;
 
   /** 排序 */
@@ -69,6 +69,24 @@ export interface MenuItem {
 
   /** 是否禁用 */
   disabledFlag: boolean;
+
+  /** 是否緩存（keep-alive） */
+  cacheFlag?: boolean;
+
+  /** 是否為外鏈 iframe */
+  frameFlag?: boolean;
+
+  /** 外鏈地址 */
+  frameUrl?: string;
+
+  /** 是否已刪除 */
+  deletedFlag?: boolean;
+
+  /** 前端權限標識 */
+  webPerms?: string;
+
+  /** 後端權限標識 */
+  apiPerms?: string;
 
   /** 子菜單列表 */
   children?: MenuItem[];
@@ -93,8 +111,11 @@ export interface UserState {
   /** 功能點權限列表（對應 Vue pointsList） */
   pointsList: MenuPoint[];
 
-  /** 菜單樹 */
+  /** 菜單樹（側邊欄顯示用，已構建父子結構） */
   menuTree: MenuItem[];
+
+  /** 有路由的菜單列表（動態路由生成用，扁平結構） */
+  menuRouterList: MenuItem[];
 
   /** 部門 ID */
   departmentId?: string;

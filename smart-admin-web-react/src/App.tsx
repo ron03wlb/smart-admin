@@ -6,11 +6,11 @@
  */
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { RouterProvider } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { store, persistor } from '@/store';
-import { router } from '@/router';
+import AppRoutes from '@/router/AppRoutes';
 import { ErrorBoundary } from '@/components/framework/error';
 import './App.css';
 
@@ -20,7 +20,9 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <ConfigProvider locale={zhCN}>
           <ErrorBoundary>
-            <RouterProvider router={router} />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
           </ErrorBoundary>
         </ConfigProvider>
       </PersistGate>

@@ -7,6 +7,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { UserState, LoginResult, MenuPoint } from '@/types/user.types';
+import { buildMenuTree } from '@/utils/routeBuilder';
 
 /**
  * 初始狀態
@@ -18,6 +19,7 @@ const initialState: UserState = {
   administratorFlag: false,
   pointsList: [],
   menuTree: [],
+  menuRouterList: [],
   departmentId: '',
   departmentName: '',
 };
@@ -33,31 +35,30 @@ export const userSlice = createSlice({
      * 設置用戶登錄信息（對應 Vue setUserLoginInfo）
      */
     setUserLoginInfo: (state, action: PayloadAction<LoginResult>) => {
-      const { token, employeeId, employeeName, administratorFlag, menuList } =
+      const { token, employeeId, employeeName, administratorFlag, menuList, departmentId, departmentName } =
         action.payload;
 
       state.token = token;
       state.employeeId = employeeId;
       state.employeeName = employeeName;
       state.administratorFlag = administratorFlag;
+      state.departmentId = departmentId || '';
+      state.departmentName = departmentName || '';
 
       // 過濾功能點（對應 Vue 的過濾邏輯）
-      // 只保留 menuType === 'POINTS' 且可見且未禁用的記錄
       state.pointsList = menuList.filter(
         (menu) =>
-          'menuType' in menu &&
           menu.menuType === 'POINTS' &&
           menu.visibleFlag &&
           !menu.disabledFlag
       ) as MenuPoint[];
 
-      // 過濾菜單樹（目錄和菜單，不包含功能點）
-      state.menuTree = menuList.filter(
-        (menu) =>
-          'menuType' in menu &&
-          (menu.menuType === 'CATALOG' || menu.menuType === 'MENU') &&
-          menu.visibleFlag &&
-          !menu.disabledFlag
+      // 構建菜單樹（用於側邊欄顯示）
+      state.menuTree = buildMenuTree(menuList);
+
+      // 存儲有路由的菜單列表（用於動態路由生成）
+      state.menuRouterList = menuList.filter(
+        (menu) => (menu.path || menu.frameUrl) && !menu.deletedFlag
       );
     },
 
@@ -92,6 +93,7 @@ export const userSlice = createSlice({
       state.administratorFlag = false;
       state.pointsList = [];
       state.menuTree = [];
+      state.menuRouterList = [];
       state.departmentId = '';
       state.departmentName = '';
     },
@@ -134,6 +136,12 @@ export const selectPointsList = (state: { user: UserState }) =>
  */
 export const selectMenuTree = (state: { user: UserState }) =>
   state.user.menuTree;
+
+/**
+ * 選擇器：獲取有路由的菜單列表
+ */
+export const selectMenuRouterList = (state: { user: UserState }) =>
+  state.user.menuRouterList;
 
 /**
  * 選擇器：檢查是否已登錄

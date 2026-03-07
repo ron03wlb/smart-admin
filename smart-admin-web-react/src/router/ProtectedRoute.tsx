@@ -32,7 +32,7 @@ interface ProtectedRouteProps {
  */
 export default function ProtectedRoute({
   children,
-  redirectTo = '/',
+  redirectTo = '/login',
 }: ProtectedRouteProps) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 

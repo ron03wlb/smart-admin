@@ -16,8 +16,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '@/store/slices/userSlice';
 import menuReducer from '@/store/slices/menuSlice';
+import tagNavReducer from '@/store/slices/tagNavSlice';
 import type { UserState } from '@/types/user.types';
 import type { MenuState } from '@/store/slices/menuSlice';
+import type { TagNavState } from '@/store/slices/tagNavSlice';
 
 /**
  * 創建測試用 UserState
@@ -41,6 +43,7 @@ export function createMockUserState(overrides?: Partial<UserState>): UserState {
     administratorFlag: false,
     pointsList: [],
     menuTree: [],
+    menuRouterList: [],
     departmentId: undefined,
     departmentName: undefined,
     ...overrides,
@@ -71,11 +74,23 @@ export function createMockMenuState(overrides?: Partial<MenuState>): MenuState {
 }
 
 /**
+ * Create test TagNavState
+ */
+export function createMockTagNavState(overrides?: Partial<TagNavState>): TagNavState {
+  return {
+    tagList: [],
+    activeKey: '',
+    ...overrides,
+  };
+}
+
+/**
  * 測試 Store 的 PreloadedState 類型
  */
 export interface TestStorePreloadedState {
   user?: Partial<UserState>;
   menu?: Partial<MenuState>;
+  tagNav?: Partial<TagNavState>;
 }
 
 /**
@@ -111,13 +126,15 @@ export function createTestStore(overrides?: TestStorePreloadedState | Partial<Us
   // 兼容舊的 API（直接傳入 Partial<UserState>）
   let userOverrides: Partial<UserState> = {};
   let menuOverrides: Partial<MenuState> = {};
+  let tagNavOverrides: Partial<TagNavState> = {};
 
   if (overrides) {
     // 檢查是否為新的 TestStorePreloadedState 格式
-    if ('user' in overrides || 'menu' in overrides) {
+    if ('user' in overrides || 'menu' in overrides || 'tagNav' in overrides) {
       const typedOverrides = overrides as TestStorePreloadedState;
       userOverrides = typedOverrides.user || {};
       menuOverrides = typedOverrides.menu || {};
+      tagNavOverrides = typedOverrides.tagNav || {};
     } else {
       // 舊的 API（直接傳入 Partial<UserState>）
       userOverrides = overrides as Partial<UserState>;
@@ -128,10 +145,12 @@ export function createTestStore(overrides?: TestStorePreloadedState | Partial<Us
     reducer: {
       user: userReducer,
       menu: menuReducer,
+      tagNav: tagNavReducer,
     },
     preloadedState: {
       user: createMockUserState(userOverrides),
       menu: createMockMenuState(menuOverrides),
+      tagNav: createMockTagNavState(tagNavOverrides),
     },
   });
 }

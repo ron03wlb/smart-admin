@@ -16,6 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { MenuProps } from 'antd';
 import type { MenuItem } from '@/types/user.types';
 import { selectMenuTree } from '@/store/slices/userSlice';
+import { getIconByName } from '@/utils/iconMap';
 import {
   selectCollapsed,
   selectOpenKeys,
@@ -77,7 +78,7 @@ function convertToMenuItems(menuList: MenuItem[]): Required<MenuProps>['items'] 
   return menuList.map((menu) => ({
     key: menu.menuId,
     label: menu.menuName,
-    icon: menu.icon ? undefined : undefined, // TODO: 實現圖標映射
+    icon: getIconByName(menu.icon),
     children: menu.children && menu.children.length > 0 ? convertToMenuItems(menu.children) : undefined,
   }));
 }
@@ -88,6 +89,9 @@ function convertToMenuItems(menuList: MenuItem[]): Required<MenuProps>['items'] 
  * 優先匹配更具體的路徑（先遞迴查找子菜單，再匹配當前菜單）
  */
 function findMenuIdByPath(menuList: MenuItem[], pathname: string): string {
+  // 標準化路徑（確保以 / 開頭，去除尾部 /）
+  const normalizedPath = pathname.replace(/\/$/, '') || '/';
+
   for (const menu of menuList) {
     // 先遞迴查找子菜單（優先匹配更具體的路徑）
     if (menu.children && menu.children.length > 0) {
@@ -97,9 +101,12 @@ function findMenuIdByPath(menuList: MenuItem[], pathname: string): string {
       }
     }
 
-    // 再匹配當前路徑
-    if (menu.path && pathname.startsWith(menu.path)) {
-      return menu.menuId;
+    // 精確匹配路徑
+    if (menu.path) {
+      const menuPath = (menu.path.startsWith('/') ? menu.path : `/${menu.path}`).replace(/\/$/, '');
+      if (normalizedPath === menuPath) {
+        return menu.menuId;
+      }
     }
   }
   return '';
