@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DuplicateKeyException;
 
 /**
  * PlayerAuthService unit tests.
@@ -104,6 +105,22 @@ class PlayerAuthServiceTest {
       assertThat(result.getOk()).isFalse();
       verify(playerRegistrationManager, never()).registerPlayer(any(), any());
     }
+
+    @Test
+    @DisplayName("DuplicateKeyException 併發註冊回傳錯誤")
+    void register_duplicateKeyException_rejected() {
+      PlayerRegisterForm form = buildRegisterForm();
+      when(playerDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+      when(passwordEncryptService.encrypt("Password123")).thenReturn("$argon2id$hash");
+      when(blindIndexService.computeIndex("test@email.com")).thenReturn("emailidx");
+      when(blindIndexService.computeIndex("1234567890")).thenReturn("phoneidx");
+      when(playerRegistrationManager.registerPlayer(any(), any()))
+          .thenThrow(new DuplicateKeyException("Duplicate entry"));
+
+      ResponseDTO<PlayerAuthVO> result = playerAuthService.register(form);
+
+      assertThat(result.getOk()).isFalse();
+    }
   }
 
   // ==================== login ====================
@@ -166,6 +183,50 @@ class PlayerAuthServiceTest {
       ResponseDTO<PlayerAuthVO> result = playerAuthService.login(form);
 
       assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("停權帳號拒絕登入")
+    void login_suspendedAccount_rejected() {
+      PlayerLoginForm form = buildLoginForm();
+      PlayerEntity player = buildActivePlayer();
+      player.setStatus(PlayerStatusEnum.SUSPENDED.getValue());
+      when(playerDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(player);
+
+      ResponseDTO<PlayerAuthVO> result = playerAuthService.login(form);
+
+      assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("已關閉帳號拒絕登入")
+    void login_closedAccount_rejected() {
+      PlayerLoginForm form = buildLoginForm();
+      PlayerEntity player = buildActivePlayer();
+      player.setStatus(PlayerStatusEnum.CLOSED.getValue());
+      when(playerDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(player);
+
+      ResponseDTO<PlayerAuthVO> result = playerAuthService.login(form);
+
+      assertThat(result.getOk()).isFalse();
+    }
+  }
+
+  // ==================== logout ====================
+
+  @Nested
+  @DisplayName("logout 玩家登出")
+  class LogoutTest {
+
+    @Test
+    @DisplayName("成功登出")
+    void logout_success() {
+      try (MockedStatic<StpPlayerUtil> mocked = mockStatic(StpPlayerUtil.class)) {
+        ResponseDTO<Void> result = playerAuthService.logout();
+
+        assertThat(result.getOk()).isTrue();
+        mocked.verify(() -> StpPlayerUtil.logout());
+      }
     }
   }
 

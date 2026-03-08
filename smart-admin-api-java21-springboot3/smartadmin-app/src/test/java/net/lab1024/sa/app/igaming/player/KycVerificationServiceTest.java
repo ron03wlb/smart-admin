@@ -246,6 +246,79 @@ class KycVerificationServiceTest {
     }
   }
 
+  // ==================== getKycDocument ====================
+
+  @Nested
+  @DisplayName("getKycDocument 取得 KYC 文件")
+  class GetKycDocumentTest {
+
+    @Test
+    @DisplayName("成功取得文件")
+    void getKycDocument_success() {
+      KycDocumentEntity document = buildDocument(KycVerificationStatusEnum.PENDING);
+      when(kycDocumentDao.selectById(20L)).thenReturn(document);
+
+      ResponseDTO<KycDocumentVO> result = kycVerificationService.getKycDocument(20L);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData().getKycDocumentId()).isEqualTo(20L);
+      assertThat(result.getData().getPlayerId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("文件不存在 — 回傳錯誤")
+    void getKycDocument_notFound() {
+      when(kycDocumentDao.selectById(99L)).thenReturn(null);
+
+      ResponseDTO<KycDocumentVO> result = kycVerificationService.getKycDocument(99L);
+
+      assertThat(result.getOk()).isFalse();
+    }
+  }
+
+  // ==================== withdrawal boundary ====================
+
+  @Nested
+  @DisplayName("提款邊界值測試")
+  class WithdrawalBoundaryTest {
+
+    @Test
+    @DisplayName("L0 玩家剛好 $500 允許提款")
+    void l0_exactlyAtLimit() {
+      PlayerEntity player = buildPlayer(KycLevelEnum.L0);
+      when(playerDao.selectById(1L)).thenReturn(player);
+
+      ResponseDTO<Void> result =
+          kycVerificationService.checkWithdrawalEligibility(1L, new BigDecimal("500"));
+
+      assertThat(result.getOk()).isTrue();
+    }
+
+    @Test
+    @DisplayName("L1 玩家剛好 $5000 允許提款")
+    void l1_exactlyAtLimit() {
+      PlayerEntity player = buildPlayer(KycLevelEnum.L1);
+      when(playerDao.selectById(1L)).thenReturn(player);
+
+      ResponseDTO<Void> result =
+          kycVerificationService.checkWithdrawalEligibility(1L, new BigDecimal("5000"));
+
+      assertThat(result.getOk()).isTrue();
+    }
+
+    @Test
+    @DisplayName("L1 玩家 $5001 超限拒絕提款")
+    void l1_exceedsLimit() {
+      PlayerEntity player = buildPlayer(KycLevelEnum.L1);
+      when(playerDao.selectById(1L)).thenReturn(player);
+
+      ResponseDTO<Void> result =
+          kycVerificationService.checkWithdrawalEligibility(1L, new BigDecimal("5001"));
+
+      assertThat(result.getOk()).isFalse();
+    }
+  }
+
   // ==================== queryPendingDocuments ====================
 
   @Nested

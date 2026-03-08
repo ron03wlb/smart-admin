@@ -5,13 +5,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.vavr.control.Option;
+import java.util.List;
+import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
+import net.lab1024.sa.common.mybatis.util.SmartPageUtil;
 import net.lab1024.sa.common.security.encrypt.BlindIndexService;
 import net.lab1024.sa.igaming.common.constant.PlayerStatusEnum;
 import net.lab1024.sa.igaming.common.constant.VipLevelEnum;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
+import net.lab1024.sa.igaming.player.domain.form.PlayerQueryForm;
 import net.lab1024.sa.igaming.player.domain.form.PlayerUpdateForm;
 import net.lab1024.sa.igaming.player.domain.vo.PlayerVO;
 import net.lab1024.sa.igaming.player.manager.PlayerStateManager;
@@ -23,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -84,6 +90,73 @@ class PlayerServiceTest {
     }
   }
 
+  // ==================== queryPlayers ====================
+
+  @Nested
+  @DisplayName("queryPlayers 分頁查詢")
+  class QueryPlayersTest {
+
+    @Test
+    @DisplayName("分頁查詢返回結果")
+    void queryPlayers_success() {
+      PlayerQueryForm queryForm = new PlayerQueryForm();
+      queryForm.setPageNum(1L);
+      queryForm.setPageSize(10L);
+
+      PlayerVO vo = new PlayerVO();
+      vo.setPlayerId(1L);
+      vo.setUsername("player1");
+
+      try (MockedStatic<SmartPageUtil> mocked = mockStatic(SmartPageUtil.class)) {
+        Page<Object> page = new Page<>(1, 10);
+        page.setTotal(1L);
+        mocked.when(() -> SmartPageUtil.convert2PageQuery(queryForm)).thenReturn(page);
+        when(playerDao.queryPage(any(Page.class), any(PlayerQueryForm.class)))
+            .thenReturn(List.of(vo));
+        PageResult<PlayerVO> pageResult = new PageResult<>();
+        pageResult.setList(List.of(vo));
+        pageResult.setTotal(1L);
+        mocked
+            .when(() -> SmartPageUtil.convert2PageResult(any(Page.class), any(List.class)))
+            .thenReturn(pageResult);
+
+        ResponseDTO<PageResult<PlayerVO>> result = playerService.queryPlayers(queryForm);
+
+        assertThat(result.getOk()).isTrue();
+        assertThat(result.getData().getList()).hasSize(1);
+        assertThat(result.getData().getTotal()).isEqualTo(1L);
+      }
+    }
+
+    @Test
+    @DisplayName("空結果返回空列表")
+    void queryPlayers_empty() {
+      PlayerQueryForm queryForm = new PlayerQueryForm();
+      queryForm.setPageNum(1L);
+      queryForm.setPageSize(10L);
+
+      try (MockedStatic<SmartPageUtil> mocked = mockStatic(SmartPageUtil.class)) {
+        Page<Object> page = new Page<>(1, 10);
+        page.setTotal(0L);
+        mocked.when(() -> SmartPageUtil.convert2PageQuery(queryForm)).thenReturn(page);
+        when(playerDao.queryPage(any(Page.class), any(PlayerQueryForm.class)))
+            .thenReturn(List.of());
+        PageResult<PlayerVO> pageResult = new PageResult<>();
+        pageResult.setList(List.of());
+        pageResult.setTotal(0L);
+        mocked
+            .when(() -> SmartPageUtil.convert2PageResult(any(Page.class), any(List.class)))
+            .thenReturn(pageResult);
+
+        ResponseDTO<PageResult<PlayerVO>> result = playerService.queryPlayers(queryForm);
+
+        assertThat(result.getOk()).isTrue();
+        assertThat(result.getData().getList()).isEmpty();
+        assertThat(result.getData().getTotal()).isEqualTo(0L);
+      }
+    }
+  }
+
   // ==================== updatePlayer ====================
 
   @Nested
@@ -117,6 +190,61 @@ class PlayerServiceTest {
       PlayerUpdateForm form = new PlayerUpdateForm();
       form.setPlayerId(999L);
       form.setEmail("new@email.com");
+
+      ResponseDTO<Void> result = playerService.updatePlayer(form);
+
+      assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("成功更新手機號碼")
+    void updatePlayer_phone_success() {
+      PlayerEntity player = buildPlayer();
+      when(playerDao.selectById(1L)).thenReturn(player);
+      when(blindIndexService.computeIndex("09001234567")).thenReturn("phoneidx");
+      when(playerDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null); // no duplicate
+      when(playerDao.updateById(any(PlayerEntity.class))).thenReturn(1);
+
+      PlayerUpdateForm form = new PlayerUpdateForm();
+      form.setPlayerId(1L);
+      form.setPhone("09001234567");
+
+      ResponseDTO<Void> result = playerService.updatePlayer(form);
+
+      assertThat(result.getOk()).isTrue();
+      verify(playerDao).updateById(any(PlayerEntity.class));
+    }
+
+    @Test
+    @DisplayName("手機號碼重複拒絕更新")
+    void updatePlayer_duplicatePhone_rejected() {
+      PlayerEntity player = buildPlayer();
+      when(playerDao.selectById(1L)).thenReturn(player);
+      when(blindIndexService.computeIndex("09001234567")).thenReturn("phoneidx");
+      when(playerDao.selectOne(any(LambdaQueryWrapper.class)))
+          .thenReturn(new PlayerEntity()); // duplicate exists
+
+      PlayerUpdateForm form = new PlayerUpdateForm();
+      form.setPlayerId(1L);
+      form.setPhone("09001234567");
+
+      ResponseDTO<Void> result = playerService.updatePlayer(form);
+
+      assertThat(result.getOk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Email 重複拒絕更新")
+    void updatePlayer_duplicateEmail_rejected() {
+      PlayerEntity player = buildPlayer();
+      when(playerDao.selectById(1L)).thenReturn(player);
+      when(blindIndexService.computeIndex("dup@email.com")).thenReturn("dupidx");
+      when(playerDao.selectOne(any(LambdaQueryWrapper.class)))
+          .thenReturn(new PlayerEntity()); // duplicate exists
+
+      PlayerUpdateForm form = new PlayerUpdateForm();
+      form.setPlayerId(1L);
+      form.setEmail("dup@email.com");
 
       ResponseDTO<Void> result = playerService.updatePlayer(form);
 
