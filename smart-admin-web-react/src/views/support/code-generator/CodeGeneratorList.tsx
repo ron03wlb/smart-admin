@@ -12,6 +12,8 @@ import { codeGeneratorApi } from '@/api/support/code-generator-api';
 import type { TableInfo, CodeGeneratorQueryForm } from '@/types/code-generator.types';
 import { CodeGeneratorConfigDrawer } from './components/form/CodeGeneratorConfigDrawer';
 import type { CodeGeneratorConfigDrawerRef } from './components/form/CodeGeneratorConfigDrawer';
+import PreviewDrawer from './components/preview/PreviewDrawer';
+import type { PreviewDrawerRef } from './components/preview/PreviewDrawer';
 
 const PAGE_SIZE_OPTIONS = ['10', '15', '20', '30', '50', '100'];
 
@@ -48,6 +50,7 @@ export default function CodeGeneratorList() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const configDrawerRef = useRef<CodeGeneratorConfigDrawerRef>(null);
+  const previewDrawerRef = useRef<PreviewDrawerRef>(null);
 
   const fetchData = useCallback(async (form: CodeGeneratorQueryForm) => {
     setLoading(true);
@@ -81,8 +84,7 @@ export default function CodeGeneratorList() {
   };
 
   const showPreview = (record: TableInfo) => {
-    // Preview will be implemented in Sprint 5.5
-    message.info(`预览功能开发中: ${record.tableName}`);
+    previewDrawerRef.current?.open(record);
   };
 
   const download = (record: TableInfo) => {
@@ -150,6 +152,7 @@ export default function CodeGeneratorList() {
       </Card>
 
       <CodeGeneratorConfigDrawer ref={configDrawerRef} onReloadList={() => fetchData(queryForm)} />
+      <PreviewDrawer ref={previewDrawerRef} />
     </div>
   );
 }

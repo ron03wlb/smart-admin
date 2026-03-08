@@ -1,0 +1,41 @@
+/**
+ * PreviewDrawer code block styles
+ */
+.codeBlock {
+  position: relative;
+  background: #0d1117;
+  border-radius: 6px;
+  overflow: auto;
+  max-height: calc(100vh - 250px);
+}
+
+.codeBlock pre {
+  margin: 0;
+  padding: 16px;
+}
+
+.codeBlock code {
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+.codeActions {
+  position: sticky;
+  top: 0;
+  float: right;
+  padding: 8px;
+  z-index: 10;
+}
+
+.codeActions button {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.codeActions button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
