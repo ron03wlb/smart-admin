@@ -22,11 +22,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ visible, onCl
     try {
       const values = await form.validateFields();
       SmartLoading.show();
-      const res = await employeeApi.update({
-        employeeId: 0, // Will be handled by backend from token
+      const res = await employeeApi.updatePassword({
         oldPassword: values.oldPassword,
         newPassword: values.newPassword,
-      } as any);
+      });
       if (res.code === 1) {
         message.success('密码修改成功');
         form.resetFields();

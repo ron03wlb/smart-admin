@@ -8,7 +8,7 @@ import { Drawer, Table, Input, Button, Space, DatePicker, Tag } from 'antd';
 import { jobApi } from '@/api/support/job-api';
 import type { JobLogVO } from '@/api/support/job-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -26,7 +26,7 @@ const JobLogListModal: React.FC<Props> = ({ open, jobId, onClose }) => {
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
   const [successFilter, setSuccessFilter] = useState<boolean | undefined>();
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
 
   const queryList = useCallback(async (page: number) => {
     if (!jobId) return;
@@ -71,7 +71,7 @@ const JobLogListModal: React.FC<Props> = ({ open, jobId, onClose }) => {
         <Input style={{ width: 160 }} value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="关键词" allowClear />
         <Button type={successFilter === true ? 'primary' : 'default'} onClick={() => setSuccessFilter(successFilter === true ? undefined : true)}>成功</Button>
         <Button type={successFilter === false ? 'primary' : 'default'} danger onClick={() => setSuccessFilter(successFilter === false ? undefined : false)}>失败</Button>
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={() => { setPageNum(1); queryList(1); }}>查询</Button>
       </Space>
       <Table rowKey="jobLogId" columns={columns} dataSource={data} loading={loading} size="small"

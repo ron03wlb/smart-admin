@@ -9,7 +9,7 @@ import { Card, Table, Input, Button, Space, DatePicker, Alert } from 'antd';
 import { heartBeatApi } from '@/api/support/heart-beat-api';
 import type { HeartBeatVO } from '@/api/support/heart-beat-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -20,7 +20,7 @@ const HeartBeatList: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
 
   const queryList = useCallback(async (page: number) => {
     setLoading(true);
@@ -81,7 +81,7 @@ const HeartBeatList: React.FC = () => {
           placeholder="项目路径/IP"
           allowClear
         />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button onClick={handleReset}>重置</Button>
       </Space>

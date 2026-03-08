@@ -7,6 +7,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Row, Col, Tree, Input, Typography, Divider, Empty, Table, Space } from 'antd';
 import { helpDocApi, helpDocCatalogApi } from '@/api/support/help-doc-api';
+import { sanitizeHtml } from '@/utils/sanitize';
 import type { HelpDocVO, HelpDocCatalogVO } from '@/api/support/help-doc-api';
 import type { DataNode } from 'antd/es/tree';
 import type { ColumnsType } from 'antd/es/table';
@@ -112,7 +113,7 @@ const HelpDocUserView: React.FC = () => {
                 <Text type="secondary">创建：{currentDoc.createTime}</Text>
               </Space>
               <Divider />
-              <div dangerouslySetInnerHTML={{ __html: currentDoc.contentHtml || '' }} style={{ minHeight: 200, lineHeight: 1.8 }} />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(currentDoc.contentHtml || '') }} style={{ minHeight: 200, lineHeight: 1.8 }} />
               <Divider />
               <Title level={5}>浏览记录</Title>
               <Table

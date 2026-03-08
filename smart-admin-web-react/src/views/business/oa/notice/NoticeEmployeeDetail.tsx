@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Typography, Divider, Space, Spin } from 'antd';
 import { useSearchParams } from 'react-router-dom';
 import { noticeApi } from '@/api/business/oa/notice-api';
+import { sanitizeHtml } from '@/utils/sanitize';
 import type { NoticeVO } from '@/api/business/oa/notice-api';
 
 const { Title, Text } = Typography;
@@ -40,7 +41,7 @@ const NoticeEmployeeDetail: React.FC = () => {
         </Space>
       </div>
       <Divider />
-      <div dangerouslySetInnerHTML={{ __html: notice.contentHtml || '' }} style={{ lineHeight: 1.8, minHeight: 300 }} />
+      <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(notice.contentHtml || '') }} style={{ lineHeight: 1.8, minHeight: 300 }} />
     </Card>
   );
 };

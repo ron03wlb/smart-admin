@@ -9,7 +9,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { helpDocApi } from '@/api/support/help-doc-api';
 import type { HelpDocVO } from '@/api/support/help-doc-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 import HelpDocFormDrawer from './HelpDocFormDrawer';
 
 const { RangePicker } = DatePicker;
@@ -25,7 +25,7 @@ const HelpDocList: React.FC<Props> = ({ helpDocCatalogId }) => {
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentDoc, setCurrentDoc] = useState<HelpDocVO | undefined>();
 
@@ -88,7 +88,7 @@ const HelpDocList: React.FC<Props> = ({ helpDocCatalogId }) => {
     <>
       <Space style={{ marginBottom: 16 }} wrap>
         <Input style={{ width: 200 }} value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="标题/作者" allowClear />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>新建</Button>
       </Space>

@@ -27,6 +27,8 @@ export interface OperateLogVO {
 export interface OperateLogQueryForm {
   pageNum: number;
   pageSize: number;
+  keywords?: string;
+  operateUserName?: string;
   startDate?: string;
   endDate?: string;
   successFlag?: boolean;

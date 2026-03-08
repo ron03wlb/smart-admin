@@ -16,6 +16,9 @@ export interface MessageVO {
 export interface MessageQueryForm {
   pageNum: number;
   pageSize: number;
+  keywords?: string;
+  startDate?: string;
+  endDate?: string;
   readFlag?: boolean;
   messageType?: number;
 }
@@ -23,7 +26,7 @@ export interface MessageQueryForm {
 export interface MessageSendForm {
   title: string;
   content: string;
-  messageType: number;
+  messageType?: number;
   receiverUserIdList: number[];
   dataId?: number;
 }

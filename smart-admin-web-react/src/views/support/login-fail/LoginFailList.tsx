@@ -9,7 +9,7 @@ import { Card, Table, Input, Button, Space, DatePicker, Tag, Modal, message, Rad
 import { loginFailApi } from '@/api/support/login-fail-api';
 import type { LoginFailVO } from '@/api/support/login-fail-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -21,7 +21,7 @@ const LoginFailList: React.FC = () => {
   const [pageNum, setPageNum] = useState(1);
   const [loginName, setLoginName] = useState('');
   const [lockFlag, setLockFlag] = useState<boolean | undefined>();
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
 
   const queryList = useCallback(async (page: number) => {
@@ -109,7 +109,7 @@ const LoginFailList: React.FC = () => {
           <Radio.Button value={true}>已锁定</Radio.Button>
           <Radio.Button value={false}>未锁定</Radio.Button>
         </Radio.Group>
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button onClick={handleReset}>重置</Button>
         <Button danger onClick={handleBatchUnlock} disabled={selectedRowKeys.length === 0}>

@@ -8,7 +8,7 @@ import { Card, Table, Input, Button, Space, DatePicker } from 'antd';
 import { fileApi } from '@/api/support/file-api';
 import type { FileVO } from '@/types/file.types';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -27,7 +27,7 @@ const FileList: React.FC = () => {
   const [pageNum, setPageNum] = useState(1);
   const [fileName, setFileName] = useState('');
   const [fileKey, setFileKey] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
 
   const queryList = useCallback(async (page: number) => {
     setLoading(true);
@@ -39,7 +39,7 @@ const FileList: React.FC = () => {
         endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
         pageNum: page,
         pageSize: PAGE_SIZE,
-      } as any);
+      });
       if (res.code === 1 && res.data) {
         setData(res.data.list || []);
         setTotal(res.data.total || 0);
@@ -88,7 +88,7 @@ const FileList: React.FC = () => {
       <Space style={{ marginBottom: 16 }} wrap>
         <Input style={{ width: 160 }} value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="文件名" allowClear />
         <Input style={{ width: 160 }} value={fileKey} onChange={(e) => setFileKey(e.target.value)} placeholder="FileKey" allowClear />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button onClick={handleReset}>重置</Button>
       </Space>

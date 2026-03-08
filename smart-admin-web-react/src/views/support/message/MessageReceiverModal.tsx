@@ -38,10 +38,10 @@ const MessageReceiverModal: React.FC<Props> = ({ open, selectedIds, onCancel, on
     setLoading(true);
     try {
       const res = await employeeApi.query({
-        keywords,
+        keyword: keywords,
         pageNum: page,
         pageSize: PAGE_SIZE,
-      } as any);
+      });
       if (res.code === 1 && res.data) {
         setData((res.data.list || []) as unknown as EmployeeItem[]);
         setTotal(res.data.total || 0);

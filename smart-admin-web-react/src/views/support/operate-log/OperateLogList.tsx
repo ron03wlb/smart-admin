@@ -9,7 +9,7 @@ import { operateLogApi } from '@/api/support/operate-log-api';
 import type { OperateLogVO } from '@/api/support/operate-log-api';
 import type { ColumnsType } from 'antd/es/table';
 import OperateLogDetailModal from './OperateLogDetailModal';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -21,7 +21,7 @@ const OperateLogList: React.FC = () => {
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
   const [userName, setUserName] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [successFilter, setSuccessFilter] = useState<boolean | undefined>();
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailLog, setDetailLog] = useState<OperateLogVO | null>(null);
@@ -37,7 +37,7 @@ const OperateLogList: React.FC = () => {
         successFlag: successFilter,
         pageNum: page,
         pageSize: PAGE_SIZE,
-      } as any);
+      });
       if (res.code === 1 && res.data) {
         setData(res.data.list || []);
         setTotal(res.data.total || 0);
@@ -100,7 +100,7 @@ const OperateLogList: React.FC = () => {
       <Space style={{ marginBottom: 16 }} wrap>
         <Input style={{ width: 160 }} value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="模块/操作内容" allowClear />
         <Input style={{ width: 120 }} value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="操作人" allowClear />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type={successFilter === true ? 'primary' : 'default'} onClick={() => setSuccessFilter(successFilter === true ? undefined : true)}>成功</Button>
         <Button type={successFilter === false ? 'primary' : 'default'} danger onClick={() => setSuccessFilter(successFilter === false ? undefined : false)}>失败</Button>
         <Button type="primary" onClick={handleSearch}>查询</Button>

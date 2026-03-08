@@ -9,7 +9,7 @@ import { Card, Table, Input, Button, Space, DatePicker, Tag } from 'antd';
 import { loginLogApi } from '@/api/support/login-log-api';
 import type { LoginLogVO } from '@/api/support/login-log-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -27,7 +27,7 @@ const LoginLogList: React.FC = () => {
   const [pageNum, setPageNum] = useState(1);
   const [userName, setUserName] = useState('');
   const [ip, setIp] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
 
   const queryList = useCallback(async (page: number) => {
     setLoading(true);
@@ -100,7 +100,7 @@ const LoginLogList: React.FC = () => {
           placeholder="IP"
           allowClear
         />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button onClick={handleReset}>重置</Button>
       </Space>

@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Tabs, Descriptions, Tag, Spin, Typography, Divider } from 'antd';
 import { useSearchParams } from 'react-router-dom';
 import { noticeApi } from '@/api/business/oa/notice-api';
+import { sanitizeHtml } from '@/utils/sanitize';
 import type { NoticeVO } from '@/api/business/oa/notice-api';
 import NoticeViewRecordList from './NoticeViewRecordList';
 
@@ -47,7 +48,7 @@ const NoticeDetail: React.FC = () => {
             <>
               <Typography.Title level={4} style={{ textAlign: 'center' }}>{notice.title}</Typography.Title>
               <Divider />
-              <div dangerouslySetInnerHTML={{ __html: notice.contentHtml || '' }} style={{ lineHeight: 1.8 }} />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(notice.contentHtml || '') }} style={{ lineHeight: 1.8 }} />
             </>
           ),
         },

@@ -46,7 +46,7 @@ const MessageSendForm: React.FC<Props> = ({ open, onCancel, onSuccess }) => {
         title: values.title,
         content: values.content,
         receiverUserIdList: receivers.map((r) => r.employeeId),
-      } as any);
+      });
       message.success('发送成功');
       form.resetFields();
       setReceivers([]);

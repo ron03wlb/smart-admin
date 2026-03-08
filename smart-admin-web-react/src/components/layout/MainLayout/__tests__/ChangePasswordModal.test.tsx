@@ -7,7 +7,7 @@ import ChangePasswordModal from '../ChangePasswordModal';
 
 vi.mock('@/api/system/employee-api', () => ({
   employeeApi: {
-    update: vi.fn().mockResolvedValue({ code: 1 }),
+    updatePassword: vi.fn().mockResolvedValue({ code: 1 }),
   },
 }));
 
@@ -45,7 +45,7 @@ describe('ChangePasswordModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'OK' }));
 
     await waitFor(() => {
-      expect(employeeApi.update).toHaveBeenCalledWith(
+      expect(employeeApi.updatePassword).toHaveBeenCalledWith(
         expect.objectContaining({ oldPassword: 'OldPass1', newPassword: 'NewPass1a' }),
       );
     }, { timeout: 5000 });

@@ -69,7 +69,7 @@ const EmployeeTableSelectModal: React.FC<EmployeeTableSelectModalProps> = ({
         departmentId,
         pageNum: page,
         pageSize: PAGE_SIZE,
-      } as any);
+      });
       if (res.code === 1 && res.data) {
         setTableData(res.data.list || []);
         setTotal(res.data.total || 0);

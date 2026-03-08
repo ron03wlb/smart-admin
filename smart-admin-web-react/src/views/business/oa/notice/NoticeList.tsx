@@ -9,7 +9,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { noticeApi, noticeTypeApi } from '@/api/business/oa/notice-api';
 import type { NoticeVO, NoticeTypeVO } from '@/api/business/oa/notice-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 import NoticeFormDrawer from './NoticeFormDrawer';
 
 const { RangePicker } = DatePicker;
@@ -22,7 +22,7 @@ const NoticeList: React.FC = () => {
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
   const [noticeTypeId, setNoticeTypeId] = useState<number | undefined>();
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [noticeTypes, setNoticeTypes] = useState<NoticeTypeVO[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [currentNotice, setCurrentNotice] = useState<NoticeVO | undefined>();
@@ -97,7 +97,7 @@ const NoticeList: React.FC = () => {
         <Input style={{ width: 200 }} value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="标题/文号" allowClear />
         <Select style={{ width: 120 }} value={noticeTypeId} onChange={setNoticeTypeId} placeholder="分类" allowClear
           options={noticeTypes.map((t) => ({ label: t.noticeTypeName, value: t.noticeTypeId }))} />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button onClick={handleReset}>重置</Button>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>新建</Button>

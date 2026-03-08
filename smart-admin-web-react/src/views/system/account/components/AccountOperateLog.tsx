@@ -9,7 +9,7 @@ import { Table, DatePicker, Button, Tag, Space } from 'antd';
 import { operateLogApi } from '@/api/support/operate-log-api';
 import type { OperateLogVO } from '@/api/support/operate-log-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -19,7 +19,7 @@ const AccountOperateLog: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [successFilter, setSuccessFilter] = useState<boolean | undefined>();
 
   const queryLogs = useCallback(async (page: number) => {
@@ -68,7 +68,7 @@ const AccountOperateLog: React.FC = () => {
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type={successFilter === true ? 'primary' : 'default'} onClick={() => setSuccessFilter(true)}>成功</Button>
         <Button type={successFilter === false ? 'primary' : 'default'} danger onClick={() => setSuccessFilter(false)}>失败</Button>
         <Button onClick={() => setSuccessFilter(undefined)}>全部</Button>

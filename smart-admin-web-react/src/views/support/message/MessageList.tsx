@@ -10,7 +10,7 @@ import { messageApi } from '@/api/support/message-api';
 import type { MessageVO } from '@/types/message.types';
 import type { ColumnsType } from 'antd/es/table';
 import MessageSendForm from './MessageSendForm';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -21,7 +21,7 @@ const MessageList: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [sendFormOpen, setSendFormOpen] = useState(false);
 
   const queryList = useCallback(async (page: number) => {
@@ -33,7 +33,7 @@ const MessageList: React.FC = () => {
         endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
         pageNum: page,
         pageSize: PAGE_SIZE,
-      } as any);
+      });
       if (res.code === 1 && res.data) {
         setData(res.data.list || []);
         setTotal(res.data.total || 0);
@@ -83,7 +83,7 @@ const MessageList: React.FC = () => {
     <Card>
       <Space style={{ marginBottom: 16 }} wrap>
         <Input style={{ width: 200 }} value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="标题/内容" allowClear />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Button type="primary" onClick={handleSearch}>查询</Button>
         <Button onClick={handleReset}>重置</Button>
         <Button type="primary" onClick={() => setSendFormOpen(true)}>发送消息</Button>

@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Table, Input, Button, DatePicker, Select, Space, Drawer, Typography } from 'antd';
 import { messageApi } from '@/api/support/message-api';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+import type { DateRangeValue } from '@/types/date-range.types';
 
 const { RangePicker } = DatePicker;
 const PAGE_SIZE = 10;
@@ -30,7 +30,7 @@ const AccountMessage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
   const [keywords, setKeywords] = useState('');
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [readFlag, setReadFlag] = useState<boolean | undefined>();
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailMessage, setDetailMessage] = useState<MessageVO | null>(null);
@@ -45,7 +45,7 @@ const AccountMessage: React.FC = () => {
         startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
         readFlag,
-      } as any);
+      });
       if (res.code === 1 && res.data) {
         setData(res.data.list || []);
         setTotal(res.data.total || 0);
@@ -105,7 +105,7 @@ const AccountMessage: React.FC = () => {
           placeholder="搜索标题/内容"
           allowClear
         />
-        <RangePicker value={dateRange} onChange={(val) => setDateRange(val as any)} />
+        <RangePicker value={dateRange} onChange={(val) => setDateRange(val)} />
         <Select
           style={{ width: 100 }}
           value={readFlag}

@@ -20,6 +20,8 @@ export interface FileQueryForm {
   fileKey?: string;
   fileName?: string;
   fileType?: string;
+  startDate?: string;
+  endDate?: string;
   createTimeBegin?: string;
   createTimeEnd?: string;
 }
