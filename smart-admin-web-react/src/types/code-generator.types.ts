@@ -71,22 +71,33 @@ export interface InsertAndUpdateField extends FieldConfig {
 // ==================== Delete ====================
 
 export interface DeleteConfig {
-  deleteType: string;
+  deleteType?: string;
   deleteName?: string;
+  isSupportDelete?: boolean;
+  isPhysicallyDeleted?: boolean;
 }
 
 // ==================== Query Fields ====================
 
-export interface QueryFieldConfig extends FieldConfig {
+export interface QueryFieldConfig {
   queryType: string;
-  visible: boolean;
+  label?: string;
+  fieldName?: string;
+  columnNameList?: string[] | string | null;
+  width?: string;
+  visible?: boolean;
 }
 
 // ==================== Table Fields ====================
 
-export interface TableFieldConfig extends FieldConfig {
-  visible: boolean;
-  width?: number;
+export interface TableFieldConfig {
+  columnName: string;
+  visible?: boolean;
+  showFlag?: boolean;
+  label?: string;
+  fieldName?: string;
+  width?: number | null;
+  ellipsisFlag?: boolean;
 }
 
 // ==================== Full Config ====================
@@ -104,12 +115,13 @@ export interface CodeGeneratorConfig {
 
 // ==================== Config Update Request ====================
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ConfigUpdateRequest {
   tableName: string;
   basic: BasicConfig;
   fields: FieldConfig[];
-  insertAndUpdate: InsertAndUpdateConfig;
-  insertAndUpdateFields: InsertAndUpdateField[];
+  insertAndUpdate: InsertAndUpdateConfig & { fieldList?: unknown[] };
+  insertAndUpdateFields?: InsertAndUpdateField[];
   deleteInfo: DeleteConfig;
   queryFields: QueryFieldConfig[];
   tableFields: TableFieldConfig[];
