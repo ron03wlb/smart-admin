@@ -11,6 +11,8 @@ import { useAppSelector } from '@/store/hooks';
 import { selectIsLoggedIn, selectMenuRouterList } from '@/store/slices/userSlice';
 import { buildDynamicRoutes } from '@/utils/routeBuilder';
 import Login from '@/views/Login';
+import Login2 from '@/views/Login2/Login2';
+import Login3 from '@/views/Login3/Login3';
 import Home from '@/views/Home';
 import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from './ProtectedRoute';
@@ -33,6 +35,16 @@ export default function AppRoutes() {
       {
         path: '/login',
         element: isLoggedIn ? <Navigate to="/home" replace /> : <Login />,
+      },
+
+      // Login 變體頁面（公開）
+      {
+        path: '/login2',
+        element: isLoggedIn ? <Navigate to="/home" replace /> : <Login2 />,
+      },
+      {
+        path: '/login3',
+        element: isLoggedIn ? <Navigate to="/home" replace /> : <Login3 />,
       },
 
       // 受保護的路由（需要登入）
