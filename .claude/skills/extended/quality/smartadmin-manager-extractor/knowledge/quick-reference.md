@@ -634,5 +634,5 @@ Before committing Manager extraction:
 **See Also**:
 - [Manager Layer Patterns](../references/manager-layer-patterns.md) - Detailed Manager patterns
 - [Extraction Example](../examples/extraction-example.md) - Real-world extraction
-- [Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md) - Architecture rules
+- [Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md) - Architecture rules
 - [ArchUnit Test Generator](./../../../foundation/backend/archunit-test-generator/) - Generate ArchUnit tests

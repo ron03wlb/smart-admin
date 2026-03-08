@@ -116,7 +116,7 @@ dependencies:
     - "test-fixture-generator"  # For Phase 4 test data builders
 
   required_files:
-    - ".agent/rules/foundation/10-architecture-rules.md"
+    - ".agent/rules/foundation/F04-architecture-rules.md"
     - ".claude/shared/knowledge/smartadmin-patterns.md"
 
   tools:
@@ -214,7 +214,7 @@ documentation:
       url: "../../shared/knowledge/smartadmin-patterns.md"
 
     - title: "Architecture Rules"
-      url: "../../../.agent/rules/foundation/10-architecture-rules.md"
+      url: "../../../.agent/rules/foundation/F04-architecture-rules.md"
 
     - title: "MyBatis-Plus Documentation"
       url: "https://baomidou.com/"

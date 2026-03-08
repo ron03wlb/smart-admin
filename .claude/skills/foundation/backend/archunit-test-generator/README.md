@@ -122,7 +122,7 @@ static final ArchRule serviceNaming =
         .that().resideInAPackage("..service..")
         .and().areNotInterfaces()
         .should().haveSimpleNameEndingWith(LAYER_SERVICE)
-        .because("Service classes must follow naming convention (rule: 01-naming-conventions.md)");
+        .because("Service classes must follow naming convention (rule: F01-naming-conventions.md)");
 ```
 
 **Verification:**
@@ -178,10 +178,10 @@ SmartAdmin has **23 architecture rule files** totaling 6,530+ lines:
 
 | Rule File | Current Coverage | Skill Enables |
 |-----------|------------------|---------------|
-| `10-architecture-rules.md` | ✅ `layerDependencies` | Additional naming/annotation tests |
-| `09-manager-layer.md` | ✅ `managerShouldNotAccessBusinessService` | @Transactional/cache tests |
+| `F04-architecture-rules.md` | ✅ `layerDependencies` | Additional naming/annotation tests |
+| `F03-manager-layer.md` | ✅ `managerShouldNotAccessBusinessService` | @Transactional/cache tests |
 | `08-vavr-fundamentals.md` | ❌ None | ✅ `serviceUsesVavrOption` |
-| `01-naming-conventions.md` | Partial | ✅ Boolean field naming |
+| `F01-naming-conventions.md` | Partial | ✅ Boolean field naming |
 | `04-exception-logging.md` | ❌ None | ✅ ResponseDTO return type |
 
 **Skill Impact:** Enables auto-generation for **15+ missing tests** across rule files.

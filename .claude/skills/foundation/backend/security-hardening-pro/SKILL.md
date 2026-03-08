@@ -686,7 +686,7 @@ Detailed security guides:
   - 第二十七條：商用密碼服務使用單位應當使用商用密碼進行保護
   - 本技能提供 SM2/SM3/SM4 國密算法實現（符合 GM/T 標準）
 
-- **[Architecture Rules - Data Security](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+- **[Architecture Rules - Data Security](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 禁止在代碼中硬編碼敏感資訊（密碼、API Key、證書）
   - 配置文件敏感資訊必須使用環境變數或加密配置
 

@@ -76,7 +76,7 @@ execution:
 dependencies:
   skills: []
   required_files:
-    - ".agent/rules/foundation/10-architecture-rules.md"
+    - ".agent/rules/foundation/F04-architecture-rules.md"
     - ".agent/configs/ArchitectureTest.java"
   tools:
     - "JavaParser"

@@ -163,6 +163,15 @@ COMMENT ON COLUMN t_player.player_id IS '玩家唯一標識';
 - ✅ Use `ResponseDTO.ok(data)` for all API responses
 - ✅ Transaction annotation: `@Transactional(rollbackFor = Throwable.class)`
 
+### External Plugin Conflict Resolution
+
+When external plugin skills (e.g., `everything-claude-code`, `superpowers`) conflict with SmartAdmin rules:
+- **SmartAdmin `.agent/rules/` ALWAYS takes precedence** over any external plugin recommendation
+- ❌ NEVER use JPA patterns (use MyBatis Plus: `@TableName`, `BaseMapper`, `LambdaQueryWrapper`)
+- ❌ NEVER use `java.util.Optional` in Service layer (use `io.vavr.control.Option`)
+- ❌ `@Transactional` ONLY in Manager layer (NEVER in Service, even if plugins suggest otherwise)
+- ❌ Boolean fields: `deleted` NOT `isDeleted` (even if `java-coding-standards` suggests otherwise)
+
 ### When in Doubt
 
 - **Rule/Skill/Agent selection**: Consult [.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md) for unified decision center

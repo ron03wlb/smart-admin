@@ -30,7 +30,7 @@ From `.agent/rules/`, identified rules without existing `archunit_test` frontmat
 | Rule File | Rule Description | Selection Reason |
 |-----------|------------------|------------------|
 | `04-exception-logging.md` | SLF4J Facade Usage | High-value enforcement, common violation pattern |
-| `01-naming-conventions.md` | Boolean Field Naming | SmartAdmin-specific pattern, testable with custom ArchCondition |
+| `F01-naming-conventions.md` | Boolean Field Naming | SmartAdmin-specific pattern, testable with custom ArchCondition |
 | ~~`02-oop-principles.md`~~ | @Override Annotation | ❌ Skipped - Not well-suited for ArchUnit static analysis |
 
 ### Final Selection
@@ -40,7 +40,7 @@ From `.agent/rules/`, identified rules without existing `archunit_test` frontmat
    - **DSL**: `noClasses().should().dependOnClassesThat().resideInAnyPackage()`
    - **Complexity**: Medium (framework detection)
 
-2. **Boolean Field Naming** (`01-naming-conventions.md`)
+2. **Boolean Field Naming** (`F01-naming-conventions.md`)
    - **Pattern**: Custom ArchCondition with field name inspection
    - **DSL**: `fields().should(new ArchCondition<JavaField>())`
    - **Complexity**: High (requires custom predicate logic)
@@ -135,7 +135,7 @@ static final ArchRule noBooleanFieldWithIsPrefix =
                 }
             }
         })
-        .because("POJO boolean fields must not use 'is' prefix (rule: 01-naming-conventions.md)");
+        .because("POJO boolean fields must not use 'is' prefix (rule: F01-naming-conventions.md)");
 ```
 
 **Key Design Decisions**:
@@ -505,7 +505,7 @@ static final ArchRule useSLF4JFacade =
  *   <li>原因：部分序列化框架（如 MyBatis）可能导致 is 字段双重前缀问题
  * </ul>
  *
- * <p>规则来源：01-naming-conventions.md
+ * <p>规则来源：F01-naming-conventions.md
  */
 @ArchTest
 static final ArchRule noBooleanFieldWithIsPrefix =
@@ -521,7 +521,7 @@ static final ArchRule noBooleanFieldWithIsPrefix =
                 if (fieldName.startsWith("is") && fieldName.length() > 2
                     && Character.isUpperCase(fieldName.charAt(2))) {
                     String message = String.format(
-                        "Boolean field %s.%s starts with 'is' prefix, should use '%s' instead (Rule: 01-naming-conventions.md)",
+                        "Boolean field %s.%s starts with 'is' prefix, should use '%s' instead (Rule: F01-naming-conventions.md)",
                         field.getOwner().getSimpleName(),
                         fieldName,
                         Character.toLowerCase(fieldName.charAt(2)) + fieldName.substring(3)
@@ -530,7 +530,7 @@ static final ArchRule noBooleanFieldWithIsPrefix =
                 }
             }
         })
-        .because("POJO boolean fields must not use 'is' prefix (rule: 01-naming-conventions.md)");
+        .because("POJO boolean fields must not use 'is' prefix (rule: F01-naming-conventions.md)");
 ```
 
 ---

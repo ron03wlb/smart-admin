@@ -78,7 +78,7 @@ execution:
 dependencies:
   skills: []
   required_files:
-    - ".agent/rules/foundation/01-naming-conventions.md"
+    - ".agent/rules/foundation/F01-naming-conventions.md"
     - ".agent/configs/ArchitectureTest.java"
     - "docs/IGaming/architecture-decisions/ADR-001-Naming-Convention-Singular-Standard.md"
   tools:

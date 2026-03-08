@@ -317,8 +317,8 @@ references:
       url: "https://www.archunit.org/userguide/html/000_Index.html"
 
   smartadmin_rules:
-    - ".agent/rules/foundation/10-architecture-rules.md"
-    - ".agent/rules/foundation/09-manager-layer.md"
+    - ".agent/rules/foundation/F04-architecture-rules.md"
+    - ".agent/rules/foundation/F03-manager-layer.md"
 
 # ====================================================================
 # END OF CONFIG

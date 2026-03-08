@@ -94,7 +94,7 @@ smartadmin-app/src/test/java/net/lab1024/sa/{module}/{feature}/
 - [foundation/F01-naming-conventions.md](../../rules/foundation/F01-naming-conventions.md)
 - [foundation/F04-architecture-rules.md](../../rules/foundation/F04-architecture-rules.md)
 - [technology/functional/P01-vavr-fundamentals.md](../../rules/technology/functional/P01-vavr-fundamentals.md)
-- [technology/database/09-mybatis-plus-core.md](../../rules/technology/database/09-mybatis-plus-core.md)
+- [technology/database/D04-mybatis-plus-core.md](../../rules/technology/database/D04-mybatis-plus-core.md)
 
 ## Example Session
 

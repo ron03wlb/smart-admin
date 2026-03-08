@@ -246,7 +246,7 @@ dependencies {
 
 - [提取範例](examples/extraction-example.md)
 - [Manager 層模式](references/manager-layer-patterns.md)
-- [SmartAdmin 架構規則](../../../../.agent/rules/foundation/10-architecture-rules.md)
+- [SmartAdmin 架構規則](../../../../.agent/rules/foundation/F04-architecture-rules.md)
 
 ---
 
@@ -261,18 +261,18 @@ dependencies {
 
 ### 強制要求
 
-- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md)**
   - 本技能自動提取 Service 層的 @Transactional 方法至 Manager 層
   - 確保 @Transactional 包含 `rollbackFor = Throwable.class`
   - Manager 層命名規範（XXXManager）
   - Manager 層事務管理職責
 
-- **[Architecture Rules - Transaction Management](./../../../.agent/rules/foundation/10-architecture-rules.md#transactionalMustBeInManagerLayer)**
+- **[Architecture Rules - Transaction Management](./../../../.agent/rules/foundation/F04-architecture-rules.md#transactionalMustBeInManagerLayer)**
   - 自動修復 ArchUnit 測試違規：`transactionalMustBeInManagerLayer()`
   - 確保分層架構合規：Controller → Service → Manager → Dao
   - 構造器注入模式（@RequiredArgsConstructor）
 
-- **[Dependency Injection](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+- **[Dependency Injection](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 生成的 Manager 類使用構造器注入
   - private final 欄位聲明
   - @RequiredArgsConstructor 註解

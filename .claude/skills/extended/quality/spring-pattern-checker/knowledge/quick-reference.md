@@ -79,7 +79,7 @@ public class UserManager {
 **Why This Rule**: Transaction boundaries must be explicit and managed in dedicated layer to prevent hidden transaction nesting and ensure proper rollback scope.
 
 **References**:
-- `.agent/rules/foundation/09-manager-layer.md`
+- `.agent/rules/foundation/F03-manager-layer.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md#transaction-management`
 
 ---
@@ -144,7 +144,7 @@ private final $1 $2;
 
 **References**:
 - `.claude/shared/knowledge/smartadmin-patterns.md#dependency-injection`
-- `.agent/rules/foundation/01-naming-conventions.md`
+- `.agent/rules/foundation/F01-naming-conventions.md`
 
 ---
 
@@ -231,7 +231,7 @@ public class UserManager {
 
 **References**:
 - `.claude/shared/knowledge/smartadmin-patterns.md#mandatory-layered-architecture`
-- `.agent/rules/foundation/10-architecture-rules.md`
+- `.agent/rules/foundation/F04-architecture-rules.md`
 
 ---
 
@@ -285,7 +285,7 @@ public class ProductDao { }
 **Why This Rule**: Ensures code consistency, makes layer identification immediate, improves code navigation.
 
 **References**:
-- `.agent/rules/foundation/01-naming-conventions.md`
+- `.agent/rules/foundation/F01-naming-conventions.md`
 
 ---
 
@@ -659,4 +659,4 @@ cd smart-admin-api-java21-springboot3
 - [Spring Rules Detailed](../references/spring-rules-detailed.md) - Complete rule explanations
 - [Examples Guide](examples.md) - Real SmartAdmin violation fixes
 - [SmartAdmin Patterns](../../../../.claude/shared/knowledge/smartadmin-patterns.md) - Complete pattern reference
-- [Architecture Rules](../../../../.agent/rules/foundation/10-architecture-rules.md) - Comprehensive architecture rules
+- [Architecture Rules](../../../../.agent/rules/foundation/F04-architecture-rules.md) - Comprehensive architecture rules

@@ -5,7 +5,7 @@
 **User Request:**
 > "Create ArchUnit test to enforce that Boolean fields cannot start with 'is' prefix (use 'deleted', not 'isDeleted')"
 
-**Source Rule:** `.agent/foundation/01-naming-conventions.md`
+**Source Rule:** `.agent/foundation/FF01-naming-conventions.md`
 
 ---
 
@@ -86,7 +86,7 @@ private Boolean deleted;
  *   <li>區域變數 - 僅限制類別欄位
  * </ul>
  *
- * <p>規則來源：01-naming-conventions.md
+ * <p>規則來源：F01-naming-conventions.md
  */
 @ArchTest
 static final ArchRule booleanFieldsNoIsPrefix =
@@ -122,7 +122,7 @@ static final ArchRule booleanFieldsNoIsPrefix =
 
                     String message = String.format(
                         "Field %s in %s should be named '%s' instead of '%s' " +
-                        "(Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md)",
+                        "(Boolean fields must not use 'is' prefix - rule: F01-naming-conventions.md)",
                         field.getFullName(),
                         field.getOwner().getSimpleName(),
                         suggestedName,
@@ -132,7 +132,7 @@ static final ArchRule booleanFieldsNoIsPrefix =
                 }
             }
         })
-        .because("Boolean fields in POJO classes must not use 'is' prefix (rule: 01-naming-conventions.md)");
+        .because("Boolean fields in POJO classes must not use 'is' prefix (rule: F01-naming-conventions.md)");
 ```
 
 ---
@@ -173,7 +173,7 @@ static final ArchRule booleanFieldsNoIsPrefix = ...
 
 ### Step 7: Update Rule File Frontmatter
 
-**Edit:** `.agent/foundation/01-naming-conventions.md`
+**Edit:** `.agent/foundation/FF01-naming-conventions.md`
 
 **Before:**
 ```yaml
@@ -245,9 +245,9 @@ $ ./gradlew :smartadmin-app:test --tests 'ArchitectureTest#booleanFieldsNoIsPref
 ArchitectureTest > booleanFieldsNoIsPrefix FAILED
     java.lang.AssertionError: Architecture Violation [Priority: MEDIUM] - Rule 'fields that have boolean type and are declared in classes that reside in any package ['..entity..', '..domain..', '..vo..', '..dto..', '..form..'] should not start with 'is' followed by uppercase letter' was violated (2 times):
 
-    Field net.lab1024.sa.business.example.entity.BooleanFieldViolationExample.isDeleted in BooleanFieldViolationExample should be named 'deleted' instead of 'isDeleted' (Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md) in (BooleanFieldViolationExample.java:14)
+    Field net.lab1024.sa.business.example.entity.BooleanFieldViolationExample.isDeleted in BooleanFieldViolationExample should be named 'deleted' instead of 'isDeleted' (Boolean fields must not use 'is' prefix - rule: F01-naming-conventions.md) in (BooleanFieldViolationExample.java:14)
 
-    Field net.lab1024.sa.business.example.entity.BooleanFieldViolationExample.isActive in BooleanFieldViolationExample should be named 'active' instead of 'isActive' (Boolean fields must not use 'is' prefix - rule: 01-naming-conventions.md) in (BooleanFieldViolationExample.java:20)
+    Field net.lab1024.sa.business.example.entity.BooleanFieldViolationExample.isActive in BooleanFieldViolationExample should be named 'active' instead of 'isActive' (Boolean fields must not use 'is' prefix - rule: F01-naming-conventions.md) in (BooleanFieldViolationExample.java:20)
 ```
 
 **✅ SUCCESS:** Test correctly catches both violations!
@@ -400,7 +400,7 @@ BUILD SUCCESSFUL in 3s
 ## Skill Application Summary
 
 **Without Skill:**
-1. Read entire 01-naming-conventions.md (300+ lines)
+1. Read entire F01-naming-conventions.md (300+ lines)
 2. Attempt basic DSL → fails (no "startsWith" predicate)
 3. Search ArchUnit documentation for custom predicates
 4. Struggle with `DescribedPredicate` vs. `ArchCondition`

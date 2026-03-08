@@ -298,7 +298,7 @@ dependencies {
   - 安全發布（Safe Publication）
   - 並發集合使用模式
 
-- **[Architecture Rules](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+- **[Architecture Rules](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - Manager 層事務管理（與並發安全相關）
   - Service 層無狀態要求（避免共享狀態）
 

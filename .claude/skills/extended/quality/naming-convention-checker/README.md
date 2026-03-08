@@ -103,7 +103,7 @@ static final ArchRule tableNameMustBeSingular = classes()
 
 ## 相關文檔
 
-- [01-naming-conventions.md](.agent/rules/foundation/01-naming-conventions.md) - 第 7 節
+- [F01-naming-conventions.md](.agent/rules/foundation/F01-naming-conventions.md) - 第 7 節
 - [ADR-001: Naming Convention Singular Standard](../../../docs/IGaming/architecture-decisions/ADR-001-Naming-Convention-Singular-Standard.md)
 - [SKILL.md](./SKILL.md) - 詳細技能文檔
 

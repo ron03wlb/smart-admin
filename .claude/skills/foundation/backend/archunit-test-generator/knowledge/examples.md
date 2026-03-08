@@ -12,7 +12,7 @@ static final ArchRule managerShouldNotAccessBusinessService =
         .that().resideInAPackage("..manager..")
         .should().dependOnClassesThat()
         .resideInAPackage("net.lab1024.sa..service..")
-        .because("Manager 層禁止調用業務 Service 層 (rule: 09-manager-layer.md)");
+        .because("Manager 層禁止調用業務 Service 層 (rule: F03-manager-layer.md)");
 ```
 
 **Violation Example**:
@@ -49,7 +49,7 @@ static final ArchRule transactionalOnlyInManager =
         .that().areAnnotatedWith(Transactional.class)
         .should().beDeclaredInClassesThat()
         .haveSimpleNameEndingWith("Manager")
-        .because("@Transactional must only be used in Manager layer (rule: 09-manager-layer.md)");
+        .because("@Transactional must only be used in Manager layer (rule: F03-manager-layer.md)");
 ```
 
 **Violation Example**:

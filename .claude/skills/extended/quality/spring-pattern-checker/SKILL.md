@@ -109,7 +109,7 @@ public class UserManager {
 **Why**: Transaction boundaries must be explicit and managed in a dedicated layer to prevent hidden transaction nesting and ensure proper rollback scope.
 
 **References**:
-- `.agent/foundation/09-manager-layer.md`
+- `.agent/foundation/F03-manager-layer.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md#transaction-management`
 
 ### Rule 2: Dependency Injection Style
@@ -147,7 +147,7 @@ public class UserService {
 
 **References**:
 - `.claude/shared/knowledge/smartadmin-patterns.md#dependency-injection`
-- `.agent/foundation/01-naming-conventions.md`
+- `.agent/foundation/F01-naming-conventions.md`
 
 ### Rule 3: Layered Architecture Calls
 **CRITICAL**: Strict call hierarchy enforcement
@@ -218,7 +218,7 @@ public class UserManager {
 
 **References**:
 - `.claude/shared/knowledge/smartadmin-patterns.md#mandatory-layered-architecture`
-- `.agent/foundation/10-architecture-rules.md`
+- `.agent/foundation/F04-architecture-rules.md`
 
 ### Rule 4: Spring Bean Naming Conventions
 **HIGH**: Class names must match annotation type
@@ -249,7 +249,7 @@ public class EmployeeManager { }  // CORRECT
 - `@Repository` / MyBatis Plus Mapper → `*Dao`
 
 **References**:
-- `.agent/foundation/01-naming-conventions.md`
+- `.agent/foundation/F01-naming-conventions.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md#layer-responsibilities`
 
 ### Rule 5: Logging Best Practices (v4.1.0)
@@ -364,7 +364,7 @@ public class EmployeeManager {
 \`\`\`
 
 **References**:
-- [Manager Layer Rules](.agent/foundation/09-manager-layer.md)
+- [Manager Layer Rules](.agent/foundation/F03-manager-layer.md)
 - [Transaction Management](.claude/shared/knowledge/smartadmin-patterns.md#transaction-management)
 
 ---
@@ -379,9 +379,9 @@ cd smart-admin-api-java21-springboot3
 
 **Documentation:**
 - [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
-- [Manager Layer Rules](.agent/foundation/09-manager-layer.md)
-- [Architecture Rules](.agent/foundation/10-architecture-rules.md)
-- [Naming Conventions](.agent/foundation/01-naming-conventions.md)
+- [Manager Layer Rules](.agent/foundation/F03-manager-layer.md)
+- [Architecture Rules](.agent/foundation/F04-architecture-rules.md)
+- [Naming Conventions](.agent/foundation/F01-naming-conventions.md)
 
 **Detailed References** (read when needed):
 - `references/spring-rules-detailed.md` - Complete rule specifications
@@ -410,17 +410,17 @@ cd smart-admin-api-java21-springboot3
 
 ### 強制要求
 
-- **[Architecture Rules - Transaction Management](./../../../.agent/rules/foundation/10-architecture-rules.md#transactionalMustBeInManagerLayer)**
+- **[Architecture Rules - Transaction Management](./../../../.agent/rules/foundation/F04-architecture-rules.md#transactionalMustBeInManagerLayer)**
   - @Transactional 僅允許在 Manager 層
   - 本技能檢測 Service 層的 @Transactional 違規（ArchUnit 補充）
   - 檢測缺少 `rollbackFor = Throwable.class` 參數
 
-- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md)**
   - Manager 層事務管理職責
   - @Transactional 必須包含 rollbackFor 參數
   - Service → Manager 重構指引
 
-- **[Dependency Injection Rules](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+- **[Dependency Injection Rules](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 禁止 @Autowired 欄位注入
   - 強制使用構造器注入（@RequiredArgsConstructor）
   - 本技能檢測欄位注入違規

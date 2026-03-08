@@ -16,7 +16,7 @@ static final ArchRule managerNoService =
 static final ArchRule managerNoService =
     noClasses().that().resideInAPackage("..manager..")
         .should().dependOnClassesThat().resideInAPackage("..service..")
-        .because("Manager layer prohibits calling Service layer (rule: 09-manager-layer.md)");
+        .because("Manager layer prohibits calling Service layer (rule: F03-manager-layer.md)");
 ```
 
 ---
@@ -104,7 +104,7 @@ public class TestController {
 **Why**: Maintains bidirectional traceability
 
 ```yaml
-# .agent/rules/foundation/09-manager-layer.md
+# .agent/rules/foundation/F03-manager-layer.md
 ---
 trigger: always_on
 description: Manager Layer Architecture Rules

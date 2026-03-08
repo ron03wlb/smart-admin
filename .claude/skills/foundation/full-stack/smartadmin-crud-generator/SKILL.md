@@ -393,13 +393,13 @@ For detailed implementation patterns:
 
 ### 強制要求
 
-- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 嚴格遵循 Controller → Service → Manager → Dao 分層架構
   - Service 層使用 `io.vavr.control.Option`（禁止 `java.util.Optional`）
   - 構造器注入（@RequiredArgsConstructor + private final）
   - ResponseDTO 統一響應格式
 
-- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+- **[Naming Conventions](./../../../.agent/rules/foundation/F01-naming-conventions.md)**
   - 類別命名：XXXController, XXXService, XXXManager, XXXDao
   - Entity 命名：XXXEntity（不是 XXXDomain, XXXPO, XXXDO）
   - Form 命名：XXXAddForm, XXXUpdateForm, XXXQueryForm
@@ -407,7 +407,7 @@ For detailed implementation patterns:
   - 布林欄位：`deleted` 不是 `isDeleted`
   - 表名：單數形式（`t_employee` 不是 `t_employees`）
 
-- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md)**
   - Service 若需 @Transactional → 提取至 Manager 層
   - @Transactional 必須包含 `rollbackFor = Throwable.class`
   - Manager 層處理跨表事務和快取邏輯
@@ -420,7 +420,7 @@ For detailed implementation patterns:
   - Pagination Pattern - SmartPageUtil 分頁處理
   - Bean Conversion - SmartBeanUtil 對象轉換
 
-- **[Dependency Injection](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+- **[Dependency Injection](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 構造器注入強制要求（禁止 @Autowired 欄位注入）
 
 - **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**

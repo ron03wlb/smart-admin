@@ -137,7 +137,7 @@
         "t_performance_metrics",
         "t_user_metrics"
       ],
-      "reference": ".agent/rules/foundation/01-naming-conventions.md (Section 7)"
+      "reference": ".agent/rules/foundation/F01-naming-conventions.md (Section 7)"
     },
     {
       "pattern": "_statistics$",
@@ -147,7 +147,7 @@
         "t_game_statistics",
         "t_financial_statistics"
       ],
-      "reference": ".agent/rules/foundation/01-naming-conventions.md (Section 7)"
+      "reference": ".agent/rules/foundation/F01-naming-conventions.md (Section 7)"
     },
     {
       "pattern": "_analytics$",
@@ -157,7 +157,7 @@
         "t_behavior_analytics",
         "t_web_analytics"
       ],
-      "reference": ".agent/rules/foundation/01-naming-conventions.md (Section 7)"
+      "reference": ".agent/rules/foundation/F01-naming-conventions.md (Section 7)"
     }
   ],
 

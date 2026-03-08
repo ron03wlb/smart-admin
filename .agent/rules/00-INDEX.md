@@ -202,35 +202,27 @@ User Request Classification
 | "generate backend only", "create Dao/Manager/Service" | **smartadmin-crud-generator --backend-only** | Backend-only generation | `/crud Order --backend-only` |
 | "create Vue component", "frontend CRUD" | **smartadmin-crud-generator --frontend-only** | Frontend-only generation | `/crud Customer --frontend-only` |
 | **Testing** ||||
-| "create integration test", "test with database" | **smartadmin-testing-suite --mode=integration** | Service layer integration tests with Testcontainers | `/test EmployeeService --mode=integration` |
-| "create test fixture", "test data builder" | **smartadmin-testing-suite --mode=fixtures** | Test fixture generators with AtomicInteger | `/test Employee --mode=fixtures` |
-| **Performance Optimization** ||||
-| "slow endpoint", "N+1 queries", "diagnose performance" | **smartadmin-performance-suite --mode=diagnose** | Profile, detect N+1, JVM analysis | `/performance /api/employees/list --mode=diagnose` |
-| "implement caching", "optimize query" | **smartadmin-performance-suite --mode=optimize** | Multi-level caching (Caffeine + Redis) | `/performance ProductService --mode=optimize` |
-| "setup monitoring", "APM integration" | **smartadmin-performance-suite --mode=monitor** | Skywalking, Micrometer, Grafana | `/performance OrderService --mode=monitor` |
-| "complete performance investigation" | **smartadmin-performance-suite --workflow** | Integrated diagnose → optimize → monitor | `/performance /api/orders/query --workflow` |
+| "create integration test", "test with database" | **smartadmin-integration-test** | Service layer integration tests with Testcontainers | Generate integration test for EmployeeService |
+| "create test fixture", "test data builder" | **test-fixture-generator** | Test fixture generators with AtomicInteger | Generate test fixtures for Employee |
 | **Functional Programming** ||||
 | "refactor to Vavr", "convert Optional", "use Try" | **vavr-refactoring-assistant** | Refactor Optional → Option, try-catch → Try | `/vavr UserService.findById` |
 | **Architecture Testing** ||||
 | "generate ArchUnit test", "enforce architecture rule" | **archunit-test-generator** | Generate architecture tests from .agent/rules/*.md | `/archunit serviceUsesVavrOption` |
 | **Workflow Orchestration** ||||
 | "create workflow", "LiteFlow rule", "approval flow" | **liteflow-rule-builder** | Generate LiteFlow EL + QLExpress rules | `/liteflow "order approval with risk check"` |
-| **Fraud Detection (iGaming)** ||||
-| "fraud detection", "multi-account", "bonus abuse", "risk control" | **fraud-detection-pattern-generator** | iGaming fraud patterns with real-time scoring | `/fraud multi-account-detection` |
-| **Quality Gate** ||||
-| "quality gate", "pre-merge check", "CI/CD validation" | **quality-gate-orchestrator** | Multi-tool orchestration (ArchUnit, Checkstyle, PMD, SpotBugs) | `/quality-gate check` |
+| **Quality** ||||
 | "thread safety", "race condition", "concurrency audit" | **concurrency-safety-auditor** | 8-pattern concurrency detection with risk rating | `/concurrency-audit ThreadPool` |
 | "@Transactional placement", "Spring patterns", "DI check" | **spring-pattern-checker** | Spring-specific pattern validation | `/spring-check Service layer` |
 | "naming conventions", "class naming", "table naming" | **naming-convention-checker** | SmartAdmin naming validation | `/naming-check Employee` |
 | **iGaming Domain** ||||
 | "iGaming requirements", "PRD generation", "feature analysis" | **igame-pm-analyst** | iGaming product analysis (繁體中文 PRD) | `/igame-pm VIP system` |
-| "multi-tenant", "white-label", "seamless wallet" | **igaming-multi-tenant-wallet-pm** | Phase-based architecture design | `/wallet-pm --phase=3` |
-| **Documentation Repair** ||||
-| "mermaid syntax error", "diagram repair", "style fix" | **mermaid-repair** | SmartAdmin Mermaid syntax validation and repair | `/mermaid-repair docs/iGaming/` |
-| **Plan Orchestration** ||||
-| "batch execute plans", "run multiple plans", "parallel execution", "orchestrate plans" | **batch-plan-executor** | Auto-detect plan types, conflict detection, parallel/serial execution | `/batch-execute --auto` |
-| "execute mixed plans", "CRUD + testing batch", "migration workflow" | **batch-plan-executor --scan-dir** | Scan directory and execute all plans with conflict analysis | `/batch-execute --scan-dir=docs/plans/liteflow/` |
-| "dry-run plans", "simulate execution", "check conflicts" | **batch-plan-executor --dry-run** | Pre-execution risk assessment without actual execution | `/batch-execute --dry-run plan1.md plan2.md` |
+| "iGaming features", "VIP tier", "wallet deposit", "bonus" | **igaming-feature-builder** | iGaming feature implementation | Implement VIP tier system |
+| **Security** ||||
+| "security", "encryption", "data masking", "XSS", "CSRF" | **security-hardening-pro** | SM2/SM3/SM4, data masking, XSS/CSRF protection | Security audit for UserController |
+| **Manager Extraction** ||||
+| "extract to Manager", "@Transactional violation", "ArchUnit fail" | **smartadmin-manager-extractor** | Auto-extract @Transactional to Manager layer (83% time saving) | Extract @Transactional from OrderService |
+| **PostgreSQL** ||||
+| "database performance", "HikariCP", "N+1 detection", "EXPLAIN ANALYZE" | **postgresql-best-practices** | PostgreSQL performance analysis and optimization | Analyze slow queries in EmployeeDao |
 
 ### 2.3 Skill Combination Patterns
 
@@ -240,29 +232,15 @@ User Request Classification
 # Generates: Backend + Frontend + Tests + API Docs (~20 minutes)
 ```
 
-#### Pattern 2: Performance Investigation Workflow
+#### Pattern 2: TDD with Integration Tests
 ```bash
-/performance /api/employees/list --workflow
-# Runs: Diagnose → Optimize → Monitor (~30 minutes)
+# Use smartadmin-integration-test skill for Service layer tests
+# Use test-fixture-generator skill for test data builders
 ```
 
-#### Pattern 3: TDD with Integration Tests
+#### Pattern 3: Vavr Refactoring
 ```bash
-/test EmployeeService --mode=integration
-# Generates: BaseIntegrationTest + fixtures + integration tests
-```
-
-#### Pattern 4: Batch Plan Execution
-```bash
-# Auto-scan and execute all plans in a directory
-/batch-execute --scan-dir=docs/plans/liteflow/
-
-# Execute specific plans with conflict detection
-/batch-execute plan1.md plan2.md plan3.md
-
-# Dry-run mode for risk assessment
-/batch-execute --dry-run --auto
-# Generates: Conflict analysis + execution plan + time estimation
+# Use vavr-refactoring-assistant to refactor Optional → Option, try-catch → Try
 ```
 
 ---
@@ -445,8 +423,7 @@ mvn test -Dtest=ArchitectureTest   # Architecture test
 | "Create Mapper"       | Rules: [01](foundation/F01-naming-conventions.md), [09](technology/database/D04-mybatis-plus-core.md), [05](technology/database/D01-postgresql-basics.md) | LambdaQueryWrapper |
 | "Create Entity"       | Rules: [01](foundation/F01-naming-conventions.md), [05](technology/database/D01-postgresql-basics.md) | @TableName, JSONB/Array |
 | "CRUD module"         | Skill: **smartadmin-crud-generator** | `/crud Product --all-phases` |
-| "integration test"    | Skill: **smartadmin-testing-suite** | `/test EmployeeService --mode=integration` |
-| "slow query"          | Skill: **smartadmin-performance-suite** | `/performance /api/orders --workflow` |
+| "integration test"    | Skill: **smartadmin-integration-test** | Testcontainers, Service layer tests |
 | "Code Review"         | Agent: **code-reviewer** → Rules: [10](foundation/F04-architecture-rules.md), [08](technology/functional/P01-vavr-fundamentals.md), [01](foundation/F01-naming-conventions.md) | ArchUnit, Vavr, Naming |
 | "Architecture Review" | Agent: **architect-reviewer** | Layer boundaries, dependencies |
 | "Java implementation" | Agent: **java-architect** | Spring Boot patterns |
@@ -456,8 +433,10 @@ mvn test -Dtest=ArchitectureTest   # Architecture test
 | "Transaction"         | Rules: [F03-manager](foundation/F03-manager-layer.md) | @Transactional in Manager |
 | "commit"              | Rules: [W02-commit](workflows/W02-commit-message-conventions.md) | Conventional Commits Format |
 | "workflow"            | Skill: **liteflow-rule-builder** | LiteFlow EL + QLExpress |
-| "fraud detection"     | Skill: **fraud-detection-pattern-generator** | Multi-account, Bonus abuse |
-| "quality gate"        | Skill: **quality-gate-orchestrator** | ArchUnit, Checkstyle, PMD, SpotBugs |
+| "security"            | Skill: **security-hardening-pro** | SM2/SM3/SM4, data masking |
+| "naming conventions"  | Skill: **naming-convention-checker** | SmartAdmin naming validation |
+| "extract Manager"     | Skill: **smartadmin-manager-extractor** | @Transactional to Manager layer |
+| "database performance"| Skill: **postgresql-best-practices** | HikariCP, N+1, EXPLAIN ANALYZE |
 | "deploy"              | Agent: **devops-engineer** | CI/CD, Docker, Kubernetes |
 | "optimize database"   | Agent: **postgres-pro** | Query plans, indexes |
 | "resilience"          | Agent: **chaos-engineer** | Chaos experiments |

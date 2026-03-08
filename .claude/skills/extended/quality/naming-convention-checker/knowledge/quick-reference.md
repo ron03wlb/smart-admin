@@ -539,7 +539,7 @@ Before committing naming convention changes:
 ---
 
 **See Also**:
-- [Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md) - Complete naming standards
+- [Naming Conventions](./../../../.agent/rules/foundation/F01-naming-conventions.md) - Complete naming standards
 - [Naming Exceptions](../references/naming-exceptions.md) - Detailed exemption rules
 - [ArchUnit Test Generator](./../../../foundation/backend/archunit-test-generator/) - Generate ArchUnit tests
 - [SmartAdmin Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md) - Domain object patterns

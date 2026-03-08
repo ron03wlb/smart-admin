@@ -206,7 +206,7 @@ noClasses().should().dependOnClassesThat()...  // ❌ WRONG (transitive)
 **Error Message**: (No error, but violates SmartAdmin standards)
 
 **Fix**: ALWAYS add .because() with rule file reference
-.because("@Transactional must only be used in Manager layer (rule: 09-manager-layer.md)")
+.because("@Transactional must only be used in Manager layer (rule: F03-manager-layer.md)")
 
 ---
 

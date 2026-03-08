@@ -146,7 +146,7 @@ dependencies:
 
   # Required files in codebase (OPTIONAL)
   required_files:
-    - "{{required-file-1}}"  # e.g., ".agent/rules/foundation/10-architecture-rules.md"
+    - "{{required-file-1}}"  # e.g., ".agent/rules/foundation/F04-architecture-rules.md"
     - "{{required-file-2}}"  # e.g., ".claude/shared/knowledge/smartadmin-patterns.md"
 
   # External tools required (OPTIONAL)
@@ -253,7 +253,7 @@ documentation:
       url: "../../shared/knowledge/smartadmin-patterns.md"
 
     - title: "Architecture Rules"
-      url: "../../../.agent/rules/foundation/10-architecture-rules.md"
+      url: "../../../.agent/rules/foundation/F04-architecture-rules.md"
 
 # ====================================================================
 # Monitoring & Analytics (OPTIONAL)

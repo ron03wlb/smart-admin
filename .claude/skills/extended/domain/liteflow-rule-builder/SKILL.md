@@ -208,7 +208,7 @@ See [dsl-examples.md](examples/dsl-examples.md#red-phase-baseline-test) for expe
 ### Mandatory Requirements
 
 - **[Architecture Rules](../../../.agent/rules/foundation/F04-architecture-rules.md)** - LiteFlow chain calls in Service layer, complex execution (multi-table transactions) in Manager layer, constructor injection
-- **[Dependency Injection](../../../.agent/rules/technology/patterns/07-dependency-injection.md)** - LiteFlow nodes (@LiteflowComponent) use constructor injection (no @Autowired field injection)
+- **[Dependency Injection](../../../.agent/rules/foundation/F04-architecture-rules.md)** - LiteFlow nodes (@LiteflowComponent) use constructor injection (no @Autowired field injection)
 
 ### Reference Guidelines
 

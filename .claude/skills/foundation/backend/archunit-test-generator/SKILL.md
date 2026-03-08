@@ -70,7 +70,7 @@ static final ArchRule transactionalOnlyInManager =
     methods()
         .that().areAnnotatedWith(Transactional.class)
         .should().beDeclaredInClassesThat().haveSimpleNameEndingWith("Manager")
-        .because("@Transactional must only be used in Manager layer (rule: 09-manager-layer.md)");
+        .because("@Transactional must only be used in Manager layer (rule: F03-manager-layer.md)");
 ```
 
 **Key Characteristics:**
@@ -92,7 +92,7 @@ static final ArchRule managerShouldNotAccessBusinessService =
     noClasses()
         .that().resideInAPackage("..manager..")
         .should().dependOnClassesThat().resideInAPackage("net.lab1024.sa..service..")
-        .because("Manager 層禁止調用業務 Service 層（嚴格執行，規則：09-manager-layer.md）");
+        .because("Manager 層禁止調用業務 Service 層（嚴格執行，規則：F03-manager-layer.md）");
 ```
 
 **Key Characteristics:**
@@ -115,7 +115,7 @@ static final ArchRule noFieldInjection =
         .that().areDeclaredInClassesThat()
         .resideInAnyPackage("..controller..", "..service..", "..manager..")
         .should().notBeAnnotatedWith(Autowired.class)
-        .because("Use constructor injection with @RequiredArgsConstructor (rule: 10-architecture-rules.md)");
+        .because("Use constructor injection with @RequiredArgsConstructor (rule: F04-architecture-rules.md)");
 ```
 
 **Key Characteristics:**
@@ -205,7 +205,7 @@ static final ArchRule transactionalRollbackForThrowable =
                 }
             }
         })
-        .because("@Transactional must rollback on all throwables including errors (rule: 09-manager-layer.md)");
+        .because("@Transactional must rollback on all throwables including errors (rule: F03-manager-layer.md)");
 ```
 
 **Key Characteristics:**
@@ -391,7 +391,7 @@ static final ArchRule managerNoService =
 static final ArchRule managerNoService =
     noClasses().that().resideInAPackage("..manager..")
         .should().dependOnClassesThat().resideInAPackage("..service..")
-        .because("Manager layer prohibits calling Service layer (rule: 09-manager-layer.md)");
+        .because("Manager layer prohibits calling Service layer (rule: F03-manager-layer.md)");
 ```
 
 **Why:** `.because()` clause documents WHY the rule exists and traces back to source documentation.
@@ -489,7 +489,7 @@ SmartAdmin uses Traditional Chinese for comments:
  *
  * <p>Manager 只能向下調用 DAO/Mapper，不能向上調用業務 Service
  *
- * <p>規則來源：09-manager-layer.md
+ * <p>規則來源：F03-manager-layer.md
  */
 ```
 
@@ -505,7 +505,7 @@ Before completing test generation:
 - [ ] No duplicate test for same rule
 - [ ] Correct ArchUnit pattern selected (see decision matrix)
 - [ ] Uses class constants where applicable
-- [ ] `.because()` clause references rule file (e.g., "rule: 09-manager-layer.md")
+- [ ] `.because()` clause references rule file (e.g., "rule: F03-manager-layer.md")
 - [ ] Javadoc explains rule and exemptions
 - [ ] Test compiles: `./gradlew :smartadmin-app:compileTestJava`
 - [ ] Test runs: `./gradlew :smartadmin-app:test --tests ArchitectureTest`
@@ -572,7 +572,7 @@ User: "I need to validate layered architecture dependencies for the Employee mod
 
 ### 強制要求
 
-- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/10-architecture-rules.md)**
+- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 本技能為所有 ArchUnit 測試的生成器
   - 涵蓋全部 21 條架構規則的測試生成
   - 關鍵規則包含：
@@ -581,19 +581,19 @@ User: "I need to validate layered architecture dependencies for the Employee mod
     - `serviceUsesVavrOption()` - Service 層必須使用 Vavr Option
     - `noFieldInjection()` - 禁止使用 @Autowired 欄位注入
 
-- **[Manager Layer Rules](./../../../.agent/rules/foundation/09-manager-layer.md)**
+- **[Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md)**
   - Manager 層事務管理規則
   - @Transactional 必須包含 `rollbackFor = Throwable.class`
   - Manager 層命名規範（XXXManager 而非 XXXManagerImpl）
 
-- **[Naming Conventions](./../../../.agent/rules/foundation/01-naming-conventions.md)**
+- **[Naming Conventions](./../../../.agent/rules/foundation/F01-naming-conventions.md)**
   - 類別命名驗證（Controller, Service, Manager, Dao 後綴）
   - 布林欄位命名（`deleted` 不是 `isDeleted`）
   - 包名結構驗證
 
 ### 參考指引
 
-- **[Dependency Injection Rules](./../../../.agent/rules/foundation/07-dependency-injection.md)**
+- **[Dependency Injection Rules](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 構造器注入強制要求（@RequiredArgsConstructor + private final）
   - 禁止欄位注入的 ArchUnit 驗證
 

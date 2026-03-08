@@ -41,7 +41,7 @@ public class LiteFlowExecutionMetricsEntity {
 - `t_liteflow_execution_metrics` - LiteFlow 規則引擎執行指標
 
 **參考文檔**:
-- [.agent/rules/foundation/01-naming-conventions.md](../../../../.agent/rules/foundation/01-naming-conventions.md) - Section 7
+- [.agent/rules/foundation/F01-naming-conventions.md](../../../../.agent/rules/foundation/F01-naming-conventions.md) - Section 7
 - [ADR-001: Naming Convention Singular Standard](../../../../docs/IGaming/architecture-decisions/ADR-001-Naming-Convention-Singular-Standard.md)
 
 ---
@@ -152,7 +152,7 @@ public class BehaviorAnalyticsEntity {
 #### Step 2: 更新文檔
 
 在以下文件中添加豁免規則：
-1. `.agent/rules/foundation/01-naming-conventions.md` (Section 7)
+1. `.agent/rules/foundation/F01-naming-conventions.md` (Section 7)
 2. `patterns/table-name-patterns.json` (exemptions 數組)
 3. `references/naming-exceptions.md` (本文件)
 4. `docs/IGaming/architecture-decisions/ADR-001-Naming-Convention-Singular-Standard.md`

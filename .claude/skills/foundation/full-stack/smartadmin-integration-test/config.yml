@@ -83,7 +83,7 @@ dependencies:
     - "test-fixture-generator"  # For test data builders
 
   required_files:
-    - ".agent/rules/foundation/10-architecture-rules.md"
+    - ".agent/rules/foundation/F04-architecture-rules.md"
     - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/app/BaseIntegrationTest.java"
 
   tools:
