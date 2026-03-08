@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { renderWithProviders } from '@/test/utils/test-utils';
@@ -60,15 +60,13 @@ describe('MenuList', () => {
   });
 
   it('should open drawer when add button clicked', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<MenuList />);
 
     await waitFor(() => {
       expect(screen.getByText('系统管理')).toBeInTheDocument();
     });
 
-    const addButton = screen.getByRole('button', { name: /新\s*建/ });
-    await user.click(addButton);
+    fireEvent.click(screen.getByRole('button', { name: /新\s*建/ }));
 
     await waitFor(() => {
       expect(screen.getByText('添加菜单')).toBeInTheDocument();
@@ -76,7 +74,6 @@ describe('MenuList', () => {
   });
 
   it('should reset search on reset button click', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<MenuList />);
 
     await waitFor(() => {
@@ -84,10 +81,9 @@ describe('MenuList', () => {
     });
 
     const searchInput = screen.getByPlaceholderText('名称/路径/组件/权限');
-    await user.type(searchInput, '员工');
+    fireEvent.change(searchInput, { target: { value: '员工' } });
 
-    const resetButton = screen.getByRole('button', { name: /重\s*置/ });
-    await user.click(resetButton);
+    fireEvent.click(screen.getByRole('button', { name: /重\s*置/ }));
 
     expect(searchInput).toHaveValue('');
   });

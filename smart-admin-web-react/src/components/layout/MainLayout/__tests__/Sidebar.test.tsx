@@ -236,21 +236,17 @@ describe('Sidebar', () => {
     expect(store.getState().menu.collapsed).toBe(false);
 
     // 2. 找到折疊按鈕
-    const triggerButton = document.querySelector('.sidebar-trigger');
+    const triggerButton = screen.getByTestId('sidebar-trigger');
     expect(triggerButton).toBeInTheDocument();
 
     // 3. 點擊折疊按鈕
-    if (triggerButton) {
-      fireEvent.click(triggerButton);
-    }
+    fireEvent.click(triggerButton);
 
     // 4. 驗證：collapsed 狀態應該變為 true
     expect(store.getState().menu.collapsed).toBe(true);
 
     // 5. 再次點擊折疊按鈕
-    if (triggerButton) {
-      fireEvent.click(triggerButton);
-    }
+    fireEvent.click(triggerButton);
 
     // 6. 驗證：collapsed 狀態應該變為 false
     expect(store.getState().menu.collapsed).toBe(false);
@@ -278,10 +274,8 @@ describe('Sidebar', () => {
     expect(store.getState().menu.openKeys).toEqual(['1']);
 
     // 2. 點擊折疊按鈕
-    const triggerButton = document.querySelector('.sidebar-trigger');
-    if (triggerButton) {
-      fireEvent.click(triggerButton);
-    }
+    const triggerButton = screen.getByTestId('sidebar-trigger');
+    fireEvent.click(triggerButton);
 
     // 3. 驗證：折疊後 openKeys 應該被清空
     expect(store.getState().menu.collapsed).toBe(true);

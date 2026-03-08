@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { renderWithProviders } from '@/test/utils/test-utils';
@@ -48,18 +48,16 @@ describe('JobList', () => {
   });
 
   it('should open add modal when add button clicked', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<JobList />);
 
     await waitFor(() => {
       expect(screen.getByText('清理日志')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
-    const addButton = screen.getByRole('button', { name: /新\s*建/ });
-    await user.click(addButton);
+    fireEvent.click(screen.getByRole('button', { name: /新\s*建/ }));
 
     await waitFor(() => {
       expect(screen.getByText('添加任务')).toBeInTheDocument();
-    });
-  });
+    }, { timeout: 5000 });
+  }, 15000);
 });

@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { renderWithProviders } from '@/test/utils/test-utils';
@@ -63,7 +63,6 @@ describe('PositionList', () => {
   });
 
   it('should handle search and reset', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<PositionList />);
 
     await waitFor(() => {
@@ -71,10 +70,9 @@ describe('PositionList', () => {
     });
 
     const input = screen.getByPlaceholderText('关键字查询');
-    await user.type(input, '工程师');
+    fireEvent.change(input, { target: { value: '工程师' } });
 
-    const searchButton = screen.getByText('查询');
-    await user.click(searchButton);
+    fireEvent.click(screen.getByText('查询'));
 
     await waitFor(() => {
       expect(positionApi.queryPage).toHaveBeenCalledWith(
@@ -82,8 +80,7 @@ describe('PositionList', () => {
       );
     });
 
-    const resetButton = screen.getByText('重置');
-    await user.click(resetButton);
+    fireEvent.click(screen.getByText('重置'));
 
     await waitFor(() => {
       expect(positionApi.queryPage).toHaveBeenCalledWith(

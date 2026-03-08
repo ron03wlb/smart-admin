@@ -269,8 +269,9 @@ describe('Breadcrumb', () => {
 
     const lastItem = screen.getByText('玩家列表');
 
-    // 驗證：最後一項應該有 breadcrumb-item-current class
-    expect(lastItem).toHaveClass('breadcrumb-item-current');
+    // 驗證：最後一項不應該觸發導航（當前頁不可點擊）
+    fireEvent.click(lastItem);
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   /**

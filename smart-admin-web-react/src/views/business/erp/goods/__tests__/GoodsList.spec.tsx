@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { renderWithProviders } from '@/test/utils/test-utils';
@@ -43,15 +43,13 @@ describe('GoodsList', () => {
   });
 
   it('should open add drawer when add button clicked', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<GoodsList />);
 
     await waitFor(() => {
       expect(screen.getByText('笔记本电脑')).toBeInTheDocument();
     });
 
-    const addButton = screen.getByRole('button', { name: /新\s*建/ });
-    await user.click(addButton);
+    fireEvent.click(screen.getByRole('button', { name: /新\s*建/ }));
 
     await waitFor(() => {
       expect(screen.getByText('添加商品')).toBeInTheDocument();
