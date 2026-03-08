@@ -6,6 +6,7 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import { Drawer, Form, Input, InputNumber, TreeSelect, Button, Space, message } from 'antd';
+import RichTextEditor from '@/components/RichTextEditor/RichTextEditor';
 import { helpDocApi, helpDocCatalogApi } from '@/api/support/help-doc-api';
 import type { HelpDocVO, HelpDocCatalogVO } from '@/api/support/help-doc-api';
 
@@ -100,7 +101,7 @@ const HelpDocFormDrawer: React.FC<Props> = ({ open, helpDoc, onClose, onSuccess 
           <InputNumber min={0} style={{ width: '100%' }} />
         </Form.Item>
         <Form.Item label="内容" name="contentHtml" rules={[{ required: true, message: '请输入文档内容' }]}>
-          <Input.TextArea rows={16} placeholder="请输入文档内容（支持HTML）" />
+          <RichTextEditor placeholder="请输入文档内容" />
         </Form.Item>
       </Form>
     </Drawer>

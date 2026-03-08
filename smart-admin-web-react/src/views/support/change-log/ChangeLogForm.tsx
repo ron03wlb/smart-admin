@@ -5,6 +5,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, DatePicker, Radio, message } from 'antd';
+import RichTextEditor from '@/components/RichTextEditor/RichTextEditor';
 import { changeLogApi } from '@/api/support/change-log-api';
 import type { ChangeLogVO } from '@/api/support/change-log-api';
 import dayjs from 'dayjs';
@@ -78,7 +79,7 @@ const ChangeLogForm: React.FC<Props> = ({ open, changeLog, onCancel, onSuccess }
           <Input placeholder="可选，例如 https://example.com" maxLength={500} />
         </Form.Item>
         <Form.Item label="更新内容" name="content" rules={[{ required: true, message: '请输入更新内容' }]}>
-          <Input.TextArea rows={12} maxLength={5000} placeholder="请输入更新内容" />
+          <RichTextEditor placeholder="请输入更新内容" />
         </Form.Item>
       </Form>
     </Modal>

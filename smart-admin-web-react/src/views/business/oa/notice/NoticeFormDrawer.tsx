@@ -6,6 +6,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Input, Select, Radio, DatePicker, Button, Space, message } from 'antd';
+import RichTextEditor from '@/components/RichTextEditor/RichTextEditor';
 import { noticeApi } from '@/api/business/oa/notice-api';
 import type { NoticeVO, NoticeTypeVO } from '@/api/business/oa/notice-api';
 import dayjs from 'dayjs';
@@ -104,7 +105,7 @@ const NoticeFormDrawer: React.FC<Props> = ({ open, notice, noticeTypes, onClose,
           </Form.Item>
         )}
         <Form.Item label="内容" name="contentHtml" rules={[{ required: true, message: '请输入内容' }]}>
-          <Input.TextArea rows={12} placeholder="请输入公告内容（支持HTML）" />
+          <RichTextEditor placeholder="请输入公告内容" />
         </Form.Item>
       </Form>
     </Drawer>

@@ -1,0 +1,148 @@
+.rich-text-editor {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rich-text-editor:focus-within {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+}
+
+/* Toolbar */
+.rich-text-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.rich-text-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+}
+
+.rich-text-toolbar button:hover {
+  background: #e8e8e8;
+}
+
+.rich-text-toolbar button.is-active {
+  background: #1677ff;
+  color: #fff;
+}
+
+.rich-text-toolbar button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rich-text-toolbar-divider {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: #d9d9d9;
+}
+
+/* Editor content */
+.rich-text-content {
+  min-height: 200px;
+  padding: 12px 16px;
+  outline: none;
+}
+
+.rich-text-content p {
+  margin: 0 0 0.5em;
+}
+
+.rich-text-content h2 {
+  font-size: 1.3em;
+  margin: 0.8em 0 0.4em;
+}
+
+.rich-text-content h3 {
+  font-size: 1.1em;
+  margin: 0.6em 0 0.3em;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.rich-text-content blockquote {
+  border-left: 3px solid #d9d9d9;
+  padding-left: 1em;
+  margin: 0.5em 0;
+  color: #666;
+}
+
+.rich-text-content pre {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.rich-text-content code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.rich-text-content a {
+  color: #1677ff;
+  text-decoration: underline;
+}
+
+/* Table styles */
+.rich-text-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5em 0;
+}
+
+.rich-text-content th,
+.rich-text-content td {
+  border: 1px solid #d9d9d9;
+  padding: 6px 12px;
+  min-width: 60px;
+}
+
+.rich-text-content th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.rich-text-content hr {
+  border: none;
+  border-top: 1px solid #d9d9d9;
+  margin: 1em 0;
+}
+
+/* Placeholder */
+.rich-text-content.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #bfbfbf;
+  pointer-events: none;
+  height: 0;
+}
