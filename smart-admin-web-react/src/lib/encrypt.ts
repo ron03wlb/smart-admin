@@ -38,43 +38,6 @@ function stringToHex(str: string): string {
 }
 
 /*
- * -------------------- ※ AES Encryption/Decryption begin ※ --------------------
- *
- * 1. AES supports key lengths: 128-bit, 192-bit, 256-bit (using 128-bit here)
- * 2. AES requires 128-bit key = 16 bytes
- * 3. Frontend uses UCS-2 or UTF-16 encoding, letters/numbers/symbols = 1 byte each
- * 4. Key composition: 16 letters/numbers/symbols
- *
- * -------------------- ※ AES Encryption/Decryption end ※ --------------------
- */
-const AES_KEY = '1024lab__1024lab';
-
-const AES = {
-  encryptData: function (data: unknown): string {
-    // AES encrypt and convert to base64
-    const utf8Data = CryptoJS.enc.Utf8.parse(object2string(data));
-    const key = CryptoJS.enc.Utf8.parse(AES_KEY);
-    const encrypted = CryptoJS.AES.encrypt(utf8Data, key, {
-      mode: CryptoJS.mode.ECB,
-      padding: CryptoJS.pad.Pkcs7,
-    });
-    return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-  },
-
-  decryptData: function (data: string): string {
-    // Step 1: Base64 decode
-    const words = CryptoJS.enc.Base64.parse(data);
-
-    // Step 2: AES decrypt
-    const key = CryptoJS.enc.Utf8.parse(AES_KEY);
-    return CryptoJS.AES.decrypt({ ciphertext: words }, key, {
-      mode: CryptoJS.mode.ECB,
-      padding: CryptoJS.pad.Pkcs7,
-    }).toString(CryptoJS.enc.Utf8);
-  },
-};
-
-/*
  * -------------------- ※ SM4 Encryption/Decryption begin ※ --------------------
  *
  * 1. SM4 (Chinese National Standard) requires 128-bit key = 16 bytes
@@ -108,7 +71,6 @@ const SM4 = {
 
 // Default to SM4 algorithm (Chinese National Standard)
 const EncryptObject = SM4;
-// const EncryptObject = AES;
 
 /**
  * Encrypt data using SM4 algorithm

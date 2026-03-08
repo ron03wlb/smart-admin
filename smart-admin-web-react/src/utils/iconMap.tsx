@@ -16,7 +16,7 @@ import * as Icons from '@ant-design/icons';
 export function getIconByName(iconName?: string): React.ReactNode {
   if (!iconName) return undefined;
 
-  const IconComponent = (Icons as Record<string, React.ComponentType>)[iconName];
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType>)[iconName];
   if (IconComponent) {
     return React.createElement(IconComponent);
   }

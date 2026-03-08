@@ -46,7 +46,7 @@ export default function Login() {
   // Captcha state
   const [captchaImage, setCaptchaImage] = useState<string>('');
   const [captchaUuid, setCaptchaUuid] = useState<string>('');
-  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Form state
   const [loading, setLoading] = useState(false);

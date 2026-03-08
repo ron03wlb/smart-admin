@@ -21,8 +21,10 @@ export interface RouteMeta {
 }
 
 // Vite glob 導入所有 views 下的 .tsx 組件
-const modules: Record<string, () => Promise<{ default: React.ComponentType }>> =
-  import.meta.glob('../views/**/*.tsx');
+const modules = import.meta.glob('../views/**/*.tsx') as Record<
+  string,
+  () => Promise<{ default: React.ComponentType }>
+>;
 
 /**
  * 未遷移頁面的佔位組件

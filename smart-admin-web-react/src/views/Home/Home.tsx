@@ -15,7 +15,6 @@
  * │ Gradient chart (full width)             │
  * └──────────────────────┴──────────────────┘
  */
-import React from 'react';
 import { Row, Col } from 'antd';
 import HomeHeader from './components/HomeHeader';
 import HomeNotice from './components/HomeNotice';
