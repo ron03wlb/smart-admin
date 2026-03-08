@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
@@ -14,10 +15,10 @@ import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
 import net.lab1024.sa.igaming.player.manager.PlayerRegistrationManager;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -34,7 +35,13 @@ class PlayerRegistrationManagerTest {
   @Mock private PlayerDao playerDao;
   @Mock private WalletDao walletDao;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private PlayerRegistrationManager playerRegistrationManager;
+  private PlayerRegistrationManager playerRegistrationManager;
+
+  @BeforeEach
+  void setUp() {
+    playerRegistrationManager =
+        new PlayerRegistrationManager(playerDao, walletDao, Optional.of(domainEventPublisher));
+  }
 
   @Test
   @DisplayName("成功 — 建立玩家 + 錢包 + 發佈 PLAYER_REGISTERED 事件")

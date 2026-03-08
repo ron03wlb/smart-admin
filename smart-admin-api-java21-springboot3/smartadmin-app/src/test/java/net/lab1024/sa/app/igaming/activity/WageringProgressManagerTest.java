@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
@@ -21,11 +22,11 @@ import net.lab1024.sa.igaming.game.dao.GameWeightConfigDao;
 import net.lab1024.sa.igaming.game.domain.entity.GameEntity;
 import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -46,8 +47,18 @@ class WageringProgressManagerTest {
   @Mock private GameWeightConfigDao gameWeightConfigDao;
   @Mock private DomainEventPublisher domainEventPublisher;
 
-  @InjectMocks
   private net.lab1024.sa.igaming.activity.manager.WageringProgressManager wageringProgressManager;
+
+  @BeforeEach
+  void setUp() {
+    wageringProgressManager =
+        new net.lab1024.sa.igaming.activity.manager.WageringProgressManager(
+            playerBonusRecordDao,
+            walletBonusExtDao,
+            gameDao,
+            gameWeightConfigDao,
+            Optional.of(domainEventPublisher));
+  }
 
   @Nested
   @DisplayName("updateWageringProgress")

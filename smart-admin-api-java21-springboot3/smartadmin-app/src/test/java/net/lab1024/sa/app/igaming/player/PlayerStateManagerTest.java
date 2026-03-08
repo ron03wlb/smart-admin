@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -15,11 +16,11 @@ import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerAuditLogEntity;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
 import net.lab1024.sa.igaming.player.manager.PlayerStateManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -36,8 +37,13 @@ class PlayerStateManagerTest {
   @Mock private PlayerDao playerDao;
   @Mock private PlayerAuditLogDao playerAuditLogDao;
   @Mock private DomainEventPublisher domainEventPublisher;
+  private PlayerStateManager playerStateManager;
 
-  @InjectMocks private PlayerStateManager playerStateManager;
+  @BeforeEach
+  void setUp() {
+    playerStateManager =
+        new PlayerStateManager(playerDao, playerAuditLogDao, Optional.of(domainEventPublisher));
+  }
 
   // ==================== Valid Transitions ====================
 

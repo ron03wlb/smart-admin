@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
@@ -21,12 +22,12 @@ import net.lab1024.sa.igaming.agent.credit.domain.entity.SettlementRecordEntity;
 import net.lab1024.sa.igaming.agent.credit.manager.CreditSettlementManager;
 import net.lab1024.sa.igaming.common.constant.PaymentVerifyStatusEnum;
 import net.lab1024.sa.igaming.common.constant.SettlementPhaseEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -38,9 +39,19 @@ class CreditSettlementManagerTest {
   @Mock private SettlementRecordDao settlementRecordDao;
   @Mock private CreditAllocationAuditDao creditAllocationAuditDao;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private CreditSettlementManager creditSettlementManager;
+  private CreditSettlementManager creditSettlementManager;
 
   private static final Long TENANT_ID = 1L;
+
+  @BeforeEach
+  void setUp() {
+    creditSettlementManager =
+        new CreditSettlementManager(
+            agentCreditDao,
+            settlementRecordDao,
+            creditAllocationAuditDao,
+            Optional.of(domainEventPublisher));
+  }
 
   private AgentCreditEntity buildCreditEntity(
       Long agentId, Long parentId, String limit, String used, String allocated) {

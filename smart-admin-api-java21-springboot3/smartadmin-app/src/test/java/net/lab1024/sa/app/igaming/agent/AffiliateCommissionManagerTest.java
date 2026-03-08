@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
@@ -29,12 +30,12 @@ import net.lab1024.sa.igaming.agent.affiliate.manager.AffiliateCommissionManager
 import net.lab1024.sa.igaming.common.constant.AgentStatusEnum;
 import net.lab1024.sa.igaming.common.constant.CommissionPlanTypeEnum;
 import net.lab1024.sa.igaming.common.constant.CommissionRecordStatusEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -48,7 +49,19 @@ class AffiliateCommissionManagerTest {
   @Mock private AffiliateCommissionRecordDao affiliateCommissionRecordDao;
   @Mock private AffiliateAdjustmentDao affiliateAdjustmentDao;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private AffiliateCommissionManager affiliateCommissionManager;
+  private AffiliateCommissionManager affiliateCommissionManager;
+
+  @BeforeEach
+  void setUp() {
+    affiliateCommissionManager =
+        new AffiliateCommissionManager(
+            affiliateAgentDao,
+            affiliateHierarchyDao,
+            affiliateCommissionPlanDao,
+            affiliateCommissionRecordDao,
+            affiliateAdjustmentDao,
+            Optional.of(domainEventPublisher));
+  }
 
   private static final Long TENANT_ID = 1L;
 

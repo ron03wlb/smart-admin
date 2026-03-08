@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
@@ -31,11 +32,11 @@ import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
@@ -59,7 +60,21 @@ class GameTransactionManagerTest {
   @Mock private WalletTransactionDao walletTransactionDao;
   @Mock private WalletManager walletManager;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private GameTransactionManager gameTransactionManager;
+  private GameTransactionManager gameTransactionManager;
+
+  @BeforeEach
+  void setUp() {
+    gameTransactionManager =
+        new GameTransactionManager(
+            gameRoundDao,
+            gameDao,
+            gameWeightConfigDao,
+            walletDao,
+            walletBonusExtDao,
+            walletTransactionDao,
+            walletManager,
+            Optional.of(domainEventPublisher));
+  }
 
   @Nested
   @DisplayName("executeDebit 下注扣款")

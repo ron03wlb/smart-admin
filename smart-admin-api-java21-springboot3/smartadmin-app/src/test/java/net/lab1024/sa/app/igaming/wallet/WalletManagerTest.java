@@ -8,20 +8,22 @@ import static org.mockito.Mockito.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
+import java.util.Optional;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
+import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletLockDao;
 import net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
@@ -41,8 +43,20 @@ class WalletManagerTest {
   @Mock private WalletDao walletDao;
   @Mock private WalletTransactionDao walletTransactionDao;
   @Mock private WalletLockDao walletLockDao;
+  @Mock private WalletBonusExtDao walletBonusExtDao;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private WalletManager walletManager;
+  private WalletManager walletManager;
+
+  @BeforeEach
+  void setUp() {
+    walletManager =
+        new WalletManager(
+            walletDao,
+            walletTransactionDao,
+            walletLockDao,
+            walletBonusExtDao,
+            Optional.of(domainEventPublisher));
+  }
 
   @Nested
   @DisplayName("credit 入款")

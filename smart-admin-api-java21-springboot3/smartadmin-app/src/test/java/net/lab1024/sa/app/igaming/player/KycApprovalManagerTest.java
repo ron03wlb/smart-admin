@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
@@ -15,11 +16,11 @@ import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.KycDocumentEntity;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
 import net.lab1024.sa.igaming.player.manager.KycApprovalManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -36,7 +37,13 @@ class KycApprovalManagerTest {
   @Mock private PlayerDao playerDao;
   @Mock private KycDocumentDao kycDocumentDao;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private KycApprovalManager kycApprovalManager;
+  private KycApprovalManager kycApprovalManager;
+
+  @BeforeEach
+  void setUp() {
+    kycApprovalManager =
+        new KycApprovalManager(playerDao, kycDocumentDao, Optional.of(domainEventPublisher));
+  }
 
   @Nested
   @DisplayName("KYC L1 審核")

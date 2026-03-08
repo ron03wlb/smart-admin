@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,11 +33,11 @@ import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity;
 import net.lab1024.sa.igaming.wallet.manager.WalletManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -64,7 +65,21 @@ class GameConcurrencyIntegrationTest {
   @Mock private WalletBonusExtDao walletBonusExtDao;
   @Mock private WalletTransactionDao walletTransactionDao;
   @Mock private DomainEventPublisher domainEventPublisher;
-  @InjectMocks private GameTransactionManager gameTransactionManager;
+  private GameTransactionManager gameTransactionManager;
+
+  @BeforeEach
+  void setUp() {
+    gameTransactionManager =
+        new GameTransactionManager(
+            gameRoundDao,
+            gameDao,
+            gameWeightConfigDao,
+            walletDao,
+            walletBonusExtDao,
+            walletTransactionDao,
+            walletManager,
+            Optional.of(domainEventPublisher));
+  }
 
   @Test
   @DisplayName("完整 6-step 生命週期: Bet → Win → Resettlement → Adjusted")
