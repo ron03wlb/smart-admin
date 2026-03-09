@@ -13,6 +13,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Spin } from 'antd';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import DynamicPage from '@/components/DynamicPage';
 
 // ==================== 懶加載組件 ====================
 
@@ -79,6 +80,11 @@ export const router = createBrowserRouter([
             <HomePage />
           </LazyLoad>
         ),
+      },
+      // 動態路由：根據菜單配置動態渲染頁面
+      {
+        path: '*',
+        element: <DynamicPage />,
       },
     ],
   },

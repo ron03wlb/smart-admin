@@ -67,8 +67,8 @@ export default function HomePage() {
         <p>✅ Week 2 Day 1: 登錄頁面 Part 1（表單驗證）</p>
         <p>✅ Week 2 Day 2: 登錄頁面 Part 2（MFA 支持）</p>
         <p>✅ Week 2 Day 3: userSlice 完整遷移（菜單樹構建 - 427 行）</p>
-        <p>⏳ Week 2 Day 4: 首頁 + 側邊欄菜單（進行中）</p>
-        <p style={{ color: '#999' }}>⏸️ Week 2 Day 5: 動態路由加載</p>
+        <p>✅ Week 2 Day 4: 首頁 + 側邊欄菜單（動態菜單渲染）</p>
+        <p>⏳ Week 2 Day 5: 動態路由加載（進行中）</p>
       </Card>
     </div>
   );
