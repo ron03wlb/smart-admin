@@ -1,9 +1,11 @@
 /**
- * Redux Store 配置（with Redux Persist）
+ * Redux Store 配置
+ * 使用 Redux Toolkit + Redux Persist
  *
- * @author SmartAdmin Team
- * @date 2026-03-04
+ * @Author: SmartAdmin React Team
+ * @Date: 2026-03-09
  */
+
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistStore,
@@ -15,55 +17,47 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // LocalStorage
+import storage from 'redux-persist/lib/storage'; // localStorage
 
 import userReducer from './slices/userSlice';
-import menuReducer from './slices/menuSlice';
-import tagNavReducer from './slices/tagNavSlice';
-import appConfigReducer from './slices/appConfigSlice';
-import dictReducer from './slices/dictSlice';
-import spinReducer from './slices/spinSlice';
-import tenantReducer from './slices/tenantSlice';
 
-// ================================= Redux Persist 配置 =================================
-
-const persistConfig = {
-  key: 'smart_admin_root', // LocalStorage 鍵名
-  storage,
-  whitelist: ['user', 'menu', 'tagNav', 'appConfig', 'tenant'], // 持久化
-};
-
-// ================================= Root Reducer =================================
+// ==================== Root Reducer ====================
 
 const rootReducer = combineReducers({
   user: userReducer,
-  menu: menuReducer,
-  tagNav: tagNavReducer,
-  appConfig: appConfigReducer,
-  dict: dictReducer,
-  spin: spinReducer,
-  tenant: tenantReducer,
+  // 未來可添加更多 slices: dict, menu, appConfig, etc.
 });
+
+// ==================== Redux Persist 配置 ====================
+
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+  whitelist: ['user'], // 只持久化 user slice
+};
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// ================================= Store 配置 =================================
+// ==================== Store 配置 ====================
 
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // 忽略 redux-persist 的 action 類型
+        // 忽略 Redux Persist 的 actions
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: import.meta.env.DEV, // 開發環境啟用 Redux DevTools
+  devTools: process.env.NODE_ENV !== 'production', // 開發環境啟用 Redux DevTools
 });
+
+// ==================== Persistor ====================
 
 export const persistor = persistStore(store);
 
-// ================================= TypeScript 類型 =================================
+// ==================== TypeScript 類型定義 ====================
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
