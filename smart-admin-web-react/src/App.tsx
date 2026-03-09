@@ -1,31 +1,17 @@
-/**
- * App 根組件
- *
- * @author SmartAdmin Team
- * @date 2026-03-04
- */
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { BrowserRouter } from 'react-router-dom';
+import React from 'react';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import { store, persistor } from '@/store';
-import AppRoutes from '@/router/AppRoutes';
-import { ErrorBoundary } from '@/components/framework/error';
-import './App.css';
 
-export default function App() {
+function App() {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ConfigProvider locale={zhCN}>
-          <ErrorBoundary>
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </ErrorBoundary>
-        </ConfigProvider>
-      </PersistGate>
-    </Provider>
+    <ConfigProvider locale={zhCN}>
+      <div style={{ padding: '50px', textAlign: 'center' }}>
+        <h1>SmartAdmin React - Phase 1 POC</h1>
+        <p>專案初始化成功！</p>
+        <p>React {React.version} + TypeScript + Vite + Ant Design 5</p>
+      </div>
+    </ConfigProvider>
   );
 }
+
+export default App;
