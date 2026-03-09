@@ -18,6 +18,7 @@ import net.lab1024.sa.system.mfa.domain.form.MfaVerifyForm;
 import net.lab1024.sa.system.mfa.domain.vo.MfaSetupInitVO;
 import net.lab1024.sa.system.mfa.domain.vo.MfaStatusVO;
 import net.lab1024.sa.system.mfa.manager.MfaSetupManager;
+import net.lab1024.sa.system.mfa.manager.MfaVerificationManager;
 import net.lab1024.sa.system.mfa.util.TotpUtils;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,7 @@ public class MfaService {
 
   private final MfaConfigDao mfaConfigDao;
   private final MfaSetupManager mfaSetupManager;
+  private final MfaVerificationManager mfaVerificationManager;
   private final MfaBackupCodeService mfaBackupCodeService;
   private final MfaTrustedDeviceService mfaTrustedDeviceService;
   private final AesGcmFieldEncryptService encryptService;
@@ -159,8 +161,7 @@ public class MfaService {
     try {
       Long employeeId = form.getEmployeeId();
 
-      // Get temporary secret from session/cache (TODO: implement caching in Phase 2)
-      // For now, retrieve from most recent init call
+      // Validate existing config
       MfaConfigEntity existingConfig = mfaConfigDao.selectByEmployeeId(employeeId);
       if (existingConfig != null && existingConfig.getMfaEnabled()) {
         return ResponseDTO.userErrorParam("MFA 已啟用，無需重複設定");
@@ -183,24 +184,22 @@ public class MfaService {
       // Encrypt secret
       String encryptedSecret = encryptService.encrypt(secret);
 
-      // Enable MFA (transactional: save config + generate backup codes)
+      // Delegate to Manager for complete transactional operation
       List<String> backupCodes =
-          mfaSetupManager.enableMfaTransaction(
-              employeeId, encryptedSecret, true, ipAddress, userAgent);
-
-      // Add trusted device if requested
-      if (Boolean.TRUE.equals(form.getTrustDevice())) {
-        String fingerprint =
-            mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent);
-        mfaTrustedDeviceService.addTrustedDevice(
-            employeeId, fingerprint, form.getDeviceName(), ipAddress, userAgent);
-      }
+          mfaSetupManager.enableMfaWithTrustedDeviceTransaction(
+              employeeId,
+              encryptedSecret,
+              true,
+              ipAddress,
+              userAgent,
+              form.getTrustDevice(),
+              form.getDeviceName());
 
       // Build response with backup codes
       MfaSetupInitVO vo = new MfaSetupInitVO();
       vo.setBackupCodes(backupCodes);
-      vo.setSecret(secret); // Return for reference
-      vo.setAccountName(employeeDao.selectById(employeeId).getLoginName()); // Get employee name
+      vo.setSecret(secret);
+      vo.setAccountName(employeeDao.selectById(employeeId).getLoginName());
 
       return ResponseDTO.ok(vo);
     } catch (Exception e) {
@@ -234,20 +233,13 @@ public class MfaService {
         return ResponseDTO.userErrorParam("您的角色需要強制啟用 MFA，無法禁用");
       }
 
-      // Decrypt secret and verify TOTP
+      // Decrypt secret
       String secret = encryptService.decrypt(config.getSecretEncrypted());
-      boolean verified =
-          TotpUtils.verifyTotpToken(secret, totpToken)
-              .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
 
-      if (!verified) {
-        return ResponseDTO.userErrorParam("TOTP 驗證碼錯誤");
-      }
+      // Delegate to Manager for transactional operation (includes TOTP verification)
+      return mfaSetupManager.disableMfaWithVerificationTransaction(
+          employeeId, secret, totpToken, ipAddress, userAgent);
 
-      // Disable MFA (transactional: soft delete config + backup codes)
-      mfaSetupManager.disableMfaTransaction(employeeId, ipAddress, userAgent);
-
-      return ResponseDTO.ok("MFA 已成功禁用");
     } catch (Exception e) {
       log.error("Failed to disable MFA for employee: {}", employeeId, e);
       return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, e.getMessage());
@@ -313,61 +305,19 @@ public class MfaService {
         return ResponseDTO.userErrorParam("MFA 未啟用");
       }
 
-      boolean verified = false;
+      // Decrypt secret
+      String secret = encryptService.decrypt(config.getSecretEncrypted());
 
-      // Try TOTP verification (6 digits)
-      if (mfaToken.matches("^[0-9]{6}$")) {
-        String secret = encryptService.decrypt(config.getSecretEncrypted());
-        // Use TotpUtils for pure computation verification
-        verified = TotpUtils.verifyTotpToken(secret, mfaToken).getOrElse(false);
+      // Delegate to Manager for complete transactional operation
+      return mfaVerificationManager.verifyMfaWithTrustedDeviceTransaction(
+          employeeId,
+          secret,
+          mfaToken,
+          ipAddress,
+          userAgent,
+          form.getTrustDevice(),
+          form.getDeviceName());
 
-        if (verified) {
-          // Record successful TOTP verification
-          mfaSetupManager.recordMfaVerificationAuditTransaction(
-              employeeId, "MFA_VERIFY_TOTP", true, ipAddress, userAgent, null);
-        } else {
-          // Record failed TOTP verification
-          mfaSetupManager.recordMfaVerificationAuditTransaction(
-              employeeId, "MFA_VERIFY_TOTP", false, ipAddress, userAgent, "Invalid TOTP token");
-        }
-      }
-
-      // Try backup code verification (8 digits)
-      if (!verified && mfaToken.matches("^[0-9]{8}$")) {
-        verified =
-            mfaBackupCodeService.verifyBackupCode(employeeId, mfaToken, ipAddress).getOrElse(false);
-
-        if (verified) {
-          // Record successful backup code verification
-          mfaSetupManager.recordMfaVerificationAuditTransaction(
-              employeeId, "BACKUP_CODE_USED", true, ipAddress, userAgent, null);
-        } else {
-          // Record failed backup code verification
-          mfaSetupManager.recordMfaVerificationAuditTransaction(
-              employeeId, "BACKUP_CODE_USED", false, ipAddress, userAgent, "Invalid backup code");
-        }
-      }
-
-      if (!verified) {
-        return ResponseDTO.userErrorParam("MFA 驗證碼錯誤");
-      }
-
-      // Update last verified timestamp
-      mfaSetupManager.updateLastVerifiedTransaction(employeeId);
-
-      // Add trusted device if requested
-      if (Boolean.TRUE.equals(form.getTrustDevice())) {
-        String fingerprint =
-            mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent);
-        mfaTrustedDeviceService.addTrustedDevice(
-            employeeId, fingerprint, form.getDeviceName(), ipAddress, userAgent);
-
-        // Record trusted device addition
-        mfaSetupManager.recordMfaAuditLogTransaction(
-            employeeId, "TRUSTED_DEVICE_ADDED", "SUCCESS", ipAddress, userAgent, null);
-      }
-
-      return ResponseDTO.ok("MFA 驗證成功");
     } catch (Exception e) {
       log.error("Failed to verify MFA for employee: {}", form.getEmployeeId(), e);
       return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, e.getMessage());
@@ -394,25 +344,13 @@ public class MfaService {
         return ResponseDTO.userErrorParam("MFA 未啟用");
       }
 
-      // Decrypt secret and verify TOTP
+      // Decrypt secret
       String secret = encryptService.decrypt(config.getSecretEncrypted());
-      boolean verified =
-          TotpUtils.verifyTotpToken(secret, totpToken)
-              .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
 
-      if (!verified) {
-        return ResponseDTO.userErrorParam("TOTP 驗證碼錯誤");
-      }
+      // Delegate to Manager for transactional operation (includes TOTP verification)
+      return mfaSetupManager.regenerateBackupCodesWithVerificationTransaction(
+          employeeId, secret, totpToken, ipAddress, userAgent);
 
-      // Regenerate backup codes (transactional)
-      List<String> backupCodes =
-          mfaSetupManager.regenerateBackupCodesTransaction(employeeId, ipAddress, userAgent);
-
-      // Build response
-      MfaSetupInitVO vo = new MfaSetupInitVO();
-      vo.setBackupCodes(backupCodes);
-
-      return ResponseDTO.ok(vo);
     } catch (Exception e) {
       log.error("Failed to regenerate backup codes for employee: {}", employeeId, e);
       return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, e.getMessage());
@@ -457,6 +395,20 @@ public class MfaService {
       log.error("Failed to add trusted device for employee: {}", employeeId, e);
       return ResponseDTO.error(SystemErrorCode.SYSTEM_ERROR, e.getMessage());
     }
+  }
+
+  /**
+   * Verify TOTP token (utility method for LoginService integration).
+   *
+   * <p>This is a lightweight validation method that does not require transactions. Used by
+   * LoginService to verify MFA tokens during the login flow.
+   *
+   * @param secret Plain (decrypted) TOTP secret
+   * @param totpToken 6-digit TOTP token
+   * @return Try containing verification result (true if valid, false otherwise)
+   */
+  public Try<Boolean> verifyTotpToken(String secret, String totpToken) {
+    return TotpUtils.verifyTotpToken(secret, totpToken);
   }
 
   /**

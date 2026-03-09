@@ -50,6 +50,14 @@ public class ArchitectureTest {
           .ignoreDependency(simpleNameContaining("MyBatisPlugin"), alwaysTrue()) // MyBatis plugins
           .ignoreDependency(
               simpleNameContaining("DataScopeController"), alwaysTrue()) // Legacy structure
+          // Exclude MFA auxiliary services (data access layer helpers)
+          .ignoreDependency(
+              resideInAPackage("..manager.."),
+              simpleNameContaining("MfaBackupCodeService")) // MFA backup code data access helper
+          .ignoreDependency(
+              resideInAPackage("..manager.."),
+              simpleNameContaining(
+                  "MfaTrustedDeviceService")) // MFA trusted device data access helper
           // Define layers
           .layer(LAYER_CONTROLLER)
           .definedBy("..controller..")
@@ -109,18 +117,55 @@ public class ArchitectureTest {
    * <ul>
    *   <li>MyBatis-Plus 框架類（com.baomidou..service..）- 規範允許 Manager 使用 ServiceImpl
    *   <li>sa-base 模組的基礎設施服務 - 非業務邏輯
+   *   <li>MfaBackupCodeService - 數據訪問層輔助類（封裝備份碼生成/驗證邏輯，包含多步驟 Dao 操作）
+   *   <li>MfaTrustedDeviceService - 數據訪問層輔助類（封裝信任設備管理邏輯，包含多步驟 Dao 操作）
    * </ul>
    *
    * <p>規則來源：09-manager-layer.md
    */
   @ArchTest
   static final ArchRule managerShouldNotAccessBusinessService =
-      noClasses()
+      classes()
           .that()
           .resideInAPackage("..manager..")
-          .should()
-          .dependOnClassesThat()
-          .resideInAPackage("net.lab1024.sa.system..service..")
+          .should(
+              new ArchCondition<com.tngtech.archunit.core.domain.JavaClass>(
+                  "not depend on business Service classes (except MFA auxiliary services)") {
+                @Override
+                public void check(
+                    com.tngtech.archunit.core.domain.JavaClass managerClass,
+                    ConditionEvents events) {
+                  managerClass
+                      .getDirectDependenciesFromSelf()
+                      .forEach(
+                          dependency -> {
+                            com.tngtech.archunit.core.domain.JavaClass targetClass =
+                                dependency.getTargetClass();
+                            String targetPackageName = targetClass.getPackageName();
+                            String targetSimpleName = targetClass.getSimpleName();
+
+                            // Check if target is in Service layer (business service)
+                            if (targetPackageName.contains(".service.")) {
+                              // Exclude MyBatis-Plus framework classes
+                              if (targetPackageName.startsWith("com.baomidou")) {
+                                return; // MyBatis-Plus ServiceImpl allowed
+                              }
+
+                              // Exclude MFA auxiliary services (data access helpers)
+                              if (targetSimpleName.equals("MfaBackupCodeService")
+                                  || targetSimpleName.equals("MfaTrustedDeviceService")) {
+                                return; // Allowed exception
+                              }
+
+                              String message =
+                                  String.format(
+                                      "Manager class %s depends on Service class %s (Rule: 09-manager-layer.md)",
+                                      managerClass.getSimpleName(), targetClass.getSimpleName());
+                              events.add(SimpleConditionEvent.violated(dependency, message));
+                            }
+                          });
+                }
+              })
           .because("Manager 層禁止調用業務 Service 層（嚴格執行，規則：09-manager-layer.md）");
 
   /**

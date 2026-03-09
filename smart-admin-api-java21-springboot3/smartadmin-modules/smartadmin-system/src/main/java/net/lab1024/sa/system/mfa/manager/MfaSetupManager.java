@@ -5,12 +5,16 @@ import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.system.mfa.dao.MfaAuditLogDao;
 import net.lab1024.sa.system.mfa.dao.MfaBackupCodeDao;
 import net.lab1024.sa.system.mfa.dao.MfaConfigDao;
 import net.lab1024.sa.system.mfa.domain.entity.MfaAuditLogEntity;
 import net.lab1024.sa.system.mfa.domain.entity.MfaConfigEntity;
+import net.lab1024.sa.system.mfa.domain.vo.MfaSetupInitVO;
 import net.lab1024.sa.system.mfa.service.MfaBackupCodeService;
+import net.lab1024.sa.system.mfa.service.MfaTrustedDeviceService;
+import net.lab1024.sa.system.mfa.util.TotpUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +45,7 @@ public class MfaSetupManager {
   private final MfaBackupCodeDao mfaBackupCodeDao;
   private final MfaAuditLogDao mfaAuditLogDao;
   private final MfaBackupCodeService mfaBackupCodeService;
+  private final MfaTrustedDeviceService mfaTrustedDeviceService;
 
   /**
    * Enable MFA for employee (transaction method).
@@ -264,5 +269,209 @@ public class MfaSetupManager {
     mfaAuditLogDao.insert(auditLog);
 
     log.info("MFA audit: employee={}, event={}, result={}", employeeId, eventType, eventResult);
+  }
+
+  /**
+   * Enable MFA with optional trusted device (transaction method).
+   *
+   * <p>Atomic operation includes:
+   *
+   * <ul>
+   *   <li>Create MFA configuration
+   *   <li>Generate backup codes
+   *   <li>Add trusted device (if requested)
+   *   <li>Record audit log
+   * </ul>
+   *
+   * @param employeeId Employee ID
+   * @param encryptedSecret TOTP secret (already AES-256-GCM encrypted)
+   * @param qrCodeConfirmed Whether QR code was scanned and confirmed
+   * @param ipAddress IP address of the request
+   * @param userAgent User-Agent string
+   * @param trustDevice Whether to add trusted device
+   * @param deviceName Device name (required if trustDevice = true)
+   * @return List of 10 plaintext backup codes (only shown once to user)
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public List<String> enableMfaWithTrustedDeviceTransaction(
+      Long employeeId,
+      String encryptedSecret,
+      Boolean qrCodeConfirmed,
+      String ipAddress,
+      String userAgent,
+      Boolean trustDevice,
+      String deviceName) {
+
+    // Create MFA configuration
+    MfaConfigEntity config = new MfaConfigEntity();
+    config.setEmployeeId(employeeId);
+    config.setMfaEnabled(true);
+    config.setMfaType("TOTP");
+    config.setSecretEncrypted(encryptedSecret);
+    config.setBackupCodesGenerated(false);
+    config.setQrCodeConfirmed(qrCodeConfirmed);
+    config.setEnforcedByRole(false);
+    config.setDeleted(false);
+    mfaConfigDao.insert(config);
+
+    // Generate backup codes
+    List<String> backupCodes =
+        mfaBackupCodeService
+            .generateBackupCodes(employeeId)
+            .getOrElseThrow(e -> new RuntimeException("Failed to generate backup codes", e));
+
+    // Update config to mark backup codes as generated
+    config.setBackupCodesGenerated(true);
+    mfaConfigDao.updateById(config);
+
+    // Add trusted device if requested
+    if (Boolean.TRUE.equals(trustDevice)) {
+      String fingerprint = mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent);
+      mfaTrustedDeviceService
+          .addTrustedDevice(employeeId, fingerprint, deviceName, ipAddress, userAgent)
+          .getOrElseThrow(e -> new RuntimeException("Failed to add trusted device", e));
+    }
+
+    // Audit log
+    MfaAuditLogEntity auditLog = new MfaAuditLogEntity();
+    auditLog.setEmployeeId(employeeId);
+    auditLog.setEventType("MFA_ENABLED");
+    auditLog.setEventResult("SUCCESS");
+    auditLog.setSeverity("INFO");
+    auditLog.setIpAddress(ipAddress);
+    auditLog.setUserAgent(userAgent);
+    auditLog.setDeleted(false);
+    mfaAuditLogDao.insert(auditLog);
+
+    log.info("MFA enabled successfully for employee ID: {} from IP: {}", employeeId, ipAddress);
+
+    return backupCodes;
+  }
+
+  /**
+   * Disable MFA with TOTP verification (transaction method).
+   *
+   * <p>Atomic operation includes:
+   *
+   * <ul>
+   *   <li>Verify TOTP token
+   *   <li>Soft delete MFA configuration
+   *   <li>Soft delete all backup codes
+   *   <li>Record audit log
+   * </ul>
+   *
+   * @param employeeId Employee ID
+   * @param secret Decrypted TOTP secret
+   * @param totpToken TOTP token for verification
+   * @param ipAddress IP address of the request
+   * @param userAgent User-Agent string
+   * @return Success response or error
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public ResponseDTO<String> disableMfaWithVerificationTransaction(
+      Long employeeId, String secret, String totpToken, String ipAddress, String userAgent) {
+
+    // Verify TOTP
+    boolean verified =
+        TotpUtils.verifyTotpToken(secret, totpToken)
+            .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
+
+    if (!verified) {
+      // Record failed verification audit
+      recordMfaVerificationAuditTransaction(
+          employeeId, "MFA_DISABLE_ATTEMPT", false, ipAddress, userAgent, "Invalid TOTP token");
+      return ResponseDTO.userErrorParam("TOTP 驗證碼錯誤");
+    }
+
+    // Soft delete MFA configuration
+    MfaConfigEntity config = mfaConfigDao.selectByEmployeeId(employeeId);
+    if (config != null) {
+      config.setDeleted(true);
+      mfaConfigDao.updateById(config);
+    }
+
+    // Soft delete all backup codes
+    mfaBackupCodeDao.deleteByEmployeeId(employeeId);
+
+    // Audit log
+    MfaAuditLogEntity auditLog = new MfaAuditLogEntity();
+    auditLog.setEmployeeId(employeeId);
+    auditLog.setEventType("MFA_DISABLED");
+    auditLog.setEventResult("SUCCESS");
+    auditLog.setSeverity("WARNING");
+    auditLog.setIpAddress(ipAddress);
+    auditLog.setUserAgent(userAgent);
+    auditLog.setDeleted(false);
+    mfaAuditLogDao.insert(auditLog);
+
+    log.info("MFA disabled for employee ID: {} from IP: {}", employeeId, ipAddress);
+
+    return ResponseDTO.ok("MFA 已成功禁用");
+  }
+
+  /**
+   * Regenerate backup codes with TOTP verification (transaction method).
+   *
+   * <p>Atomic operation includes:
+   *
+   * <ul>
+   *   <li>Verify TOTP token
+   *   <li>Soft delete old backup codes
+   *   <li>Generate new backup codes
+   *   <li>Record audit log
+   * </ul>
+   *
+   * @param employeeId Employee ID
+   * @param secret Decrypted TOTP secret
+   * @param totpToken TOTP token for verification
+   * @param ipAddress IP address of the request
+   * @param userAgent User-Agent string
+   * @return MfaSetupInitVO containing new backup codes
+   */
+  @Transactional(rollbackFor = Throwable.class)
+  public ResponseDTO<MfaSetupInitVO> regenerateBackupCodesWithVerificationTransaction(
+      Long employeeId, String secret, String totpToken, String ipAddress, String userAgent) {
+
+    // Verify TOTP
+    boolean verified =
+        TotpUtils.verifyTotpToken(secret, totpToken)
+            .getOrElseThrow(e -> new RuntimeException("Failed to verify TOTP token", e));
+
+    if (!verified) {
+      // Record failed verification audit
+      recordMfaVerificationAuditTransaction(
+          employeeId,
+          "BACKUP_CODE_REGENERATE_ATTEMPT",
+          false,
+          ipAddress,
+          userAgent,
+          "Invalid TOTP token");
+      return ResponseDTO.userErrorParam("TOTP 驗證碼錯誤");
+    }
+
+    // Generate new backup codes (automatically deletes old ones)
+    List<String> backupCodes =
+        mfaBackupCodeService
+            .generateBackupCodes(employeeId)
+            .getOrElseThrow(e -> new RuntimeException("Failed to regenerate backup codes", e));
+
+    // Audit log
+    MfaAuditLogEntity auditLog = new MfaAuditLogEntity();
+    auditLog.setEmployeeId(employeeId);
+    auditLog.setEventType("BACKUP_CODES_REGENERATED");
+    auditLog.setEventResult("SUCCESS");
+    auditLog.setSeverity("INFO");
+    auditLog.setIpAddress(ipAddress);
+    auditLog.setUserAgent(userAgent);
+    auditLog.setDeleted(false);
+    mfaAuditLogDao.insert(auditLog);
+
+    log.info("Backup codes regenerated for employee ID: {} from IP: {}", employeeId, ipAddress);
+
+    // Build response
+    MfaSetupInitVO vo = new MfaSetupInitVO();
+    vo.setBackupCodes(backupCodes);
+
+    return ResponseDTO.ok(vo);
   }
 }
