@@ -1,75 +1,93 @@
 /**
- * 權限檢查 Hooks（對應 Vue v-privilege 指令）
+ * usePrivilege Hook
+ * 權限檢查 Hook，用於判斷用戶是否擁有特定權限
  *
- * @author SmartAdmin Team
- * @date 2026-03-04
+ * 參考：Vue 版本 smart-admin-web/src/directives/privilege.ts (30 行)
+ * 遷移：v-privilege 指令 → usePrivilege Hook + PrivilegeButton 組件
+ *
+ * @Author: SmartAdmin React Team
+ * @Date: 2026-03-09
  */
-import { useMemo } from 'react';
+
 import { useAppSelector } from '@/store/hooks';
 import { selectAdministratorFlag, selectPointsList } from '@/store/slices/userSlice';
 
 /**
- * 權限檢查 Hook（對應 Vue v-privilege 指令）
+ * 權限檢查 Hook
  *
- * @param permissionCode 權限編碼（如 'system:user:add'）
- * @returns boolean 是否有權限
+ * @param permission 權限代碼（例如：'goods:add'）
+ * @returns 是否有權限
  *
  * @example
- * const canAdd = usePrivilege('system:user:add');
- * if (canAdd) {
- *   // 顯示新增按鈕
+ * ```tsx
+ * const hasAddPermission = usePrivilege('goods:add');
+ *
+ * if (hasAddPermission) {
+ *   return <Button>新建商品</Button>;
  * }
+ * ```
  */
-export function usePrivilege(permissionCode: string): boolean {
+export function usePrivilege(permission: string): boolean {
   const administratorFlag = useAppSelector(selectAdministratorFlag);
   const pointsList = useAppSelector(selectPointsList);
 
-  return useMemo(() => {
-    // 超級管理員直接放行（對應 Vue 的 administratorFlag 檢查）
-    if (administratorFlag) {
-      return true;
-    }
+  // 管理員擁有所有權限
+  if (administratorFlag) {
+    return true;
+  }
 
-    // 空權限列表則無權限
-    if (!pointsList || pointsList.length === 0) {
-      return false;
-    }
-
-    // 檢查權限點列表（對應 Vue 的 _.some(pointsList, ['webPerms', code])）
-    return pointsList.some((point) => point.webPerms === permissionCode);
-  }, [administratorFlag, pointsList, permissionCode]);
+  // 檢查權限列表中是否包含該權限
+  return pointsList.some((point) => point.webPerms === permission);
 }
 
 /**
  * 批量權限檢查 Hook
  *
- * @param permissionCodes 權限編碼數組
- * @returns Record<string, boolean> 權限映射表
+ * @param permissions 權限代碼數組
+ * @returns 是否擁有所有權限
  *
  * @example
- * const permissions = usePrivileges(['system:user:add', 'system:user:edit', 'system:user:delete']);
- * // { 'system:user:add': true, 'system:user:edit': false, 'system:user:delete': false }
+ * ```tsx
+ * const hasAllPermissions = usePrivileges(['goods:add', 'goods:edit']);
+ * ```
  */
-export function usePrivileges(permissionCodes: string[]): Record<string, boolean> {
+export function usePrivileges(permissions: string[]): boolean {
   const administratorFlag = useAppSelector(selectAdministratorFlag);
   const pointsList = useAppSelector(selectPointsList);
 
-  return useMemo(() => {
-    const result: Record<string, boolean> = {};
+  // 管理員擁有所有權限
+  if (administratorFlag) {
+    return true;
+  }
 
-    if (administratorFlag) {
-      // 超管全部返回 true
-      permissionCodes.forEach((code) => {
-        result[code] = true;
-      });
-      return result;
-    }
+  // 檢查是否擁有所有權限
+  return permissions.every((permission) =>
+    pointsList.some((point) => point.webPerms === permission)
+  );
+}
 
-    // 批量檢查
-    permissionCodes.forEach((code) => {
-      result[code] = pointsList.some((point) => point.webPerms === code);
-    });
+/**
+ * 任一權限檢查 Hook
+ *
+ * @param permissions 權限代碼數組
+ * @returns 是否擁有任一權限
+ *
+ * @example
+ * ```tsx
+ * const hasAnyPermission = useAnyPrivilege(['goods:add', 'goods:edit']);
+ * ```
+ */
+export function useAnyPrivilege(permissions: string[]): boolean {
+  const administratorFlag = useAppSelector(selectAdministratorFlag);
+  const pointsList = useAppSelector(selectPointsList);
 
-    return result;
-  }, [administratorFlag, pointsList, permissionCodes]);
+  // 管理員擁有所有權限
+  if (administratorFlag) {
+    return true;
+  }
+
+  // 檢查是否擁有任一權限
+  return permissions.some((permission) =>
+    pointsList.some((point) => point.webPerms === permission)
+  );
 }
