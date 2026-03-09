@@ -13,7 +13,7 @@ import { Form, Input, Button, Checkbox, Card, Typography, message, Row, Col } fr
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { login, selectUserLoading, selectUserError } from '@/store/slices/userSlice';
+import { login, getLoginInfo, selectUserLoading, selectUserError } from '@/store/slices/userSlice';
 import { loginApi } from '@/api/system/loginApi';
 import type { LoginForm as LoginFormType } from '@/api/system/loginApi';
 
@@ -192,8 +192,16 @@ export default function LoginPage() {
 
       if (login.fulfilled.match(result)) {
         message.success('登錄成功！');
-        // 登錄成功後跳轉首頁
-        navigate('/home');
+
+        // 登錄成功後獲取用戶信息（菜單、權限等）
+        const infoResult = await dispatch(getLoginInfo());
+
+        if (getLoginInfo.fulfilled.match(infoResult)) {
+          // 用戶信息獲取成功，跳轉首頁
+          navigate('/home');
+        } else {
+          message.error('獲取用戶信息失敗');
+        }
       }
     } catch (err) {
       console.error('登錄失敗:', err);

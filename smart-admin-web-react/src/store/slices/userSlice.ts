@@ -12,6 +12,18 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginApi, LoginForm } from '@/api/system/loginApi';
 import type { RootState } from '../index';
 import { LOCAL_STORAGE_KEYS } from '@/constants/storageKeys';
+import { MenuItem, PermissionPoint } from '@/types/menu';
+import {
+  buildMenuTree,
+  buildMenuParentIdListMap,
+  filterMenuTreeForDisplay,
+  extractPermissionPoints,
+  generateRouteList,
+} from '@/utils/menuTreeUtils';
+import {
+  convertMenuVOListToMenuItems,
+  convertPointVOListToPermissionPoints,
+} from '@/utils/menuConverter';
 
 // ==================== State 類型定義 ====================
 
@@ -31,11 +43,20 @@ interface UserState {
   /** 是否管理員 */
   administratorFlag: boolean;
 
-  /** 菜單樹 */
-  menuTree: any[];
+  /** 完整菜單樹（含功能點） */
+  menuTree: MenuItem[];
+
+  /** 顯示用菜單樹（不含功能點） */
+  displayMenuTree: MenuItem[];
 
   /** 權限點列表 */
-  pointsList: any[];
+  pointsList: PermissionPoint[];
+
+  /** 菜單路由列表 */
+  menuRouterList: string[];
+
+  /** 菜單父ID映射表（用於麵包屑導航） */
+  menuParentIdListMap: Record<number, number[]>;
 
   /** 加載狀態 */
   loading: boolean;
@@ -53,7 +74,10 @@ const initialState: UserState = {
   loginName: '',
   administratorFlag: false,
   menuTree: [],
+  displayMenuTree: [],
   pointsList: [],
+  menuRouterList: [],
+  menuParentIdListMap: {},
   loading: false,
   error: null,
 };
@@ -84,6 +108,8 @@ export const login = createAsyncThunk(
 /**
  * 獲取登錄信息 AsyncThunk
  * 包含菜單、權限等信息
+ *
+ * 核心邏輯參考：Vue 版本 setUserLoginInfo() - line 173-346
  */
 export const getLoginInfo = createAsyncThunk(
   'user/getLoginInfo',
@@ -92,7 +118,39 @@ export const getLoginInfo = createAsyncThunk(
       const response = await loginApi.getLoginInfo();
 
       if (response.ok && response.data) {
-        return response.data;
+        const loginInfo = response.data;
+
+        // ========== 0. 轉換 API 類型為內部類型 ==========
+        const menuItemsList = convertMenuVOListToMenuItems(loginInfo.menuTreeList || []);
+        const permissionPoints = convertPointVOListToPermissionPoints(loginInfo.pointList || []);
+
+        // ========== 1. 構建菜單樹 ==========
+        const menuTree = buildMenuTree(menuItemsList);
+
+        // ========== 2. 過濾顯示用菜單樹（不含功能點） ==========
+        const displayMenuTree = filterMenuTreeForDisplay(menuTree);
+
+        // ========== 3. 提取權限點列表（從菜單列表中） ==========
+        const menuPointsList = extractPermissionPoints(menuItemsList);
+
+        // 合併菜單權限點和獨立權限點
+        const pointsList = [...menuPointsList, ...permissionPoints];
+
+        // ========== 4. 生成路由列表 ==========
+        const menuRouterList = generateRouteList(menuTree);
+
+        // ========== 5. 構建菜單父ID映射表 ==========
+        const menuParentIdListMap = buildMenuParentIdListMap(menuTree);
+
+        // 返回處理後的數據
+        return {
+          ...loginInfo,
+          menuTree,
+          displayMenuTree,
+          pointsList,
+          menuRouterList,
+          menuParentIdListMap,
+        };
       } else {
         return rejectWithValue(response.msg || '獲取登錄信息失敗');
       }
@@ -153,7 +211,10 @@ export const userSlice = createSlice({
       state.loginName = '';
       state.administratorFlag = false;
       state.menuTree = [];
+      state.displayMenuTree = [];
       state.pointsList = [];
+      state.menuRouterList = [];
+      state.menuParentIdListMap = {};
       state.error = null;
 
       localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_TOKEN);
@@ -192,20 +253,28 @@ export const userSlice = createSlice({
         state.employeeName = action.payload.employeeName;
         state.loginName = action.payload.loginName;
         state.administratorFlag = action.payload.administratorFlag;
-        state.menuTree = action.payload.menuTreeList || [];
-        state.pointsList = action.payload.pointList || [];
+
+        // 使用處理後的菜單數據（已在 AsyncThunk 中處理）
+        state.menuTree = action.payload.menuTree || [];
+        state.displayMenuTree = action.payload.displayMenuTree || [];
+        state.pointsList = action.payload.pointsList || [];
+        state.menuRouterList = action.payload.menuRouterList || [];
+        state.menuParentIdListMap = action.payload.menuParentIdListMap || {};
 
         // 存儲用戶信息到 localStorage
-        localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify({
-          employeeId: action.payload.employeeId,
-          employeeName: action.payload.employeeName,
-          loginName: action.payload.loginName,
-          administratorFlag: action.payload.administratorFlag,
-        }));
+        localStorage.setItem(
+          LOCAL_STORAGE_KEYS.USER_INFO,
+          JSON.stringify({
+            employeeId: action.payload.employeeId,
+            employeeName: action.payload.employeeName,
+            loginName: action.payload.loginName,
+            administratorFlag: action.payload.administratorFlag,
+          })
+        );
       })
       .addCase(getLoginInfo.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || '獲取登錄信息失敗';
+        state.error = (action.payload as string) || '獲取登錄信息失敗';
       });
 
     // ========== logout ==========
@@ -223,7 +292,10 @@ export const userSlice = createSlice({
         state.loginName = '';
         state.administratorFlag = false;
         state.menuTree = [];
+        state.displayMenuTree = [];
         state.pointsList = [];
+        state.menuRouterList = [];
+        state.menuParentIdListMap = {};
 
         // 清除 localStorage
         localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_TOKEN);
@@ -231,13 +303,16 @@ export const userSlice = createSlice({
       })
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || '退出登錄失敗';
+        state.error = (action.payload as string) || '退出登錄失敗';
 
         // 即使退出失敗，也清除本地狀態
         state.token = '';
         state.employeeId = '';
         state.menuTree = [];
+        state.displayMenuTree = [];
         state.pointsList = [];
+        state.menuRouterList = [];
+        state.menuParentIdListMap = {};
         localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_TOKEN);
         localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_INFO);
       });
@@ -254,7 +329,10 @@ export const selectUserInfo = (state: RootState) => ({
   administratorFlag: state.user.administratorFlag,
 });
 export const selectMenuTree = (state: RootState) => state.user.menuTree;
+export const selectDisplayMenuTree = (state: RootState) => state.user.displayMenuTree;
 export const selectPointsList = (state: RootState) => state.user.pointsList;
+export const selectMenuRouterList = (state: RootState) => state.user.menuRouterList;
+export const selectMenuParentIdListMap = (state: RootState) => state.user.menuParentIdListMap;
 export const selectAdministratorFlag = (state: RootState) => state.user.administratorFlag;
 export const selectUserLoading = (state: RootState) => state.user.loading;
 export const selectUserError = (state: RootState) => state.user.error;
