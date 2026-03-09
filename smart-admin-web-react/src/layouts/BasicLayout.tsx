@@ -8,9 +8,9 @@
  * @Date: 2026-03-09
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Layout, Menu, Button, Avatar, Dropdown } from 'antd';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -20,7 +20,8 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { selectUserInfo, logout } from '@/store/slices/userSlice';
+import { selectUserInfo, selectDisplayMenuTree, logout } from '@/store/slices/userSlice';
+import { formatMenuTreeForAntd } from '@/utils/menuFormatter';
 
 const { Header, Sider, Content } = Layout;
 
@@ -30,12 +31,12 @@ const { Header, Sider, Content } = Layout;
  */
 export default function BasicLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
 
   // Redux State
   const userInfo = useAppSelector(selectUserInfo);
-  // TODO: Week 2 Day 4 - 動態菜單從 menuTree 生成
-  // const menuTree = useAppSelector(selectMenuTree);
+  const displayMenuTree = useAppSelector(selectDisplayMenuTree);
 
   // Local State
   const [collapsed, setCollapsed] = useState(false);
@@ -68,16 +69,30 @@ export default function BasicLayout() {
   ];
 
   /**
-   * 側邊欄菜單項（默認首頁）
-   * TODO: 後續從 Redux menuTree 動態生成
+   * 側邊欄菜單項
+   * 從 Redux displayMenuTree 動態生成
    */
-  const menuItems: MenuProps['items'] = [
-    {
+  const menuItems: MenuProps['items'] = useMemo(() => {
+    // 添加默認首頁菜單
+    const homeMenu = {
       key: '/home',
       icon: <HomeOutlined />,
       label: '首頁',
-    },
-  ];
+    };
+
+    // 轉換動態菜單
+    const dynamicMenus = formatMenuTreeForAntd(displayMenuTree);
+
+    // 合併首頁和動態菜單
+    return [homeMenu, ...(dynamicMenus || [])];
+  }, [displayMenuTree]);
+
+  /**
+   * 當前選中的菜單項（基於路由路徑）
+   */
+  const selectedKeys = useMemo(() => {
+    return [location.pathname];
+  }, [location.pathname]);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -102,7 +117,7 @@ export default function BasicLayout() {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['/home']}
+          selectedKeys={selectedKeys}
           items={menuItems}
           onClick={handleMenuClick}
         />

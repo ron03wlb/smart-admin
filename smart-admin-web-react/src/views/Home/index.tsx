@@ -58,12 +58,17 @@ export default function HomePage() {
       </Row>
 
       <Card style={{ marginTop: 24 }}>
-        <Title level={4}>Phase 1 進度</Title>
+        <Title level={4}>Phase 1 POC 進度</Title>
         <p>✅ Week 1 Day 1: 專案初始化與基礎配置</p>
         <p>✅ Week 1 Day 2: HTTP 客戶端 + API 層</p>
         <p>✅ Week 1 Day 3: Redux Store 基礎架構</p>
-        <p>✅ Week 1 Day 4: 權限系統 POC</p>
-        <p>⏳ Week 1 Day 5: 路由基礎架構（進行中）</p>
+        <p>✅ Week 1 Day 4: 權限系統 POC（usePrivilege Hook）</p>
+        <p>✅ Week 1 Day 5: 路由基礎架構（BasicLayout + ProtectedRoute）</p>
+        <p>✅ Week 2 Day 1: 登錄頁面 Part 1（表單驗證）</p>
+        <p>✅ Week 2 Day 2: 登錄頁面 Part 2（MFA 支持）</p>
+        <p>✅ Week 2 Day 3: userSlice 完整遷移（菜單樹構建 - 427 行）</p>
+        <p>⏳ Week 2 Day 4: 首頁 + 側邊欄菜單（進行中）</p>
+        <p style={{ color: '#999' }}>⏸️ Week 2 Day 5: 動態路由加載</p>
       </Card>
     </div>
   );
