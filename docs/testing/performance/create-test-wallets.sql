@@ -100,7 +100,6 @@ BEGIN
             balance,
             locked_amount,
             currency_code,
-            status,
             deleted,
             version,
             tenant_id,
@@ -113,7 +112,6 @@ BEGIN
             10000.0000,  -- balance: 10,000 CNY
             0.0000,      -- locked_amount: 0 (no funds locked initially)
             'CNY',       -- currency_code
-            1,           -- status: ACTIVE
             FALSE,       -- deleted
             0,           -- version (optimistic lock)
             1,           -- tenant_id
