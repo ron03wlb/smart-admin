@@ -17,6 +17,9 @@
 --   psql -h localhost -U smartadmin_user -d smartadmin_igaming -f create-test-wallets.sql
 -- =====================================================================
 
+-- Enable pgcrypto extension for digest() function (SHA-256 blind index)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 DO $$
 DECLARE
     i INT;
