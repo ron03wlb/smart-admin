@@ -9,8 +9,6 @@ import net.lab1024.sa.system.mfa.dao.MfaAuditLogDao;
 import net.lab1024.sa.system.mfa.dao.MfaConfigDao;
 import net.lab1024.sa.system.mfa.domain.entity.MfaAuditLogEntity;
 import net.lab1024.sa.system.mfa.domain.entity.MfaConfigEntity;
-import net.lab1024.sa.system.mfa.service.MfaBackupCodeService;
-import net.lab1024.sa.system.mfa.service.MfaTrustedDeviceService;
 import net.lab1024.sa.system.mfa.util.TotpUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +28,8 @@ public class MfaVerificationManager {
 
   private final MfaConfigDao mfaConfigDao;
   private final MfaAuditLogDao mfaAuditLogDao;
-  private final MfaBackupCodeService mfaBackupCodeService;
-  private final MfaTrustedDeviceService mfaTrustedDeviceService;
+  private final MfaBackupCodeManager mfaBackupCodeManager;
+  private final MfaTrustedDeviceManager mfaTrustedDeviceManager;
 
   /**
    * Verify MFA with optional trusted device creation (transaction method).
@@ -91,7 +89,7 @@ public class MfaVerificationManager {
     // Try backup code verification (8 digits)
     if (!verified && mfaToken.matches("^[0-9]{8}$")) {
       verified =
-          mfaBackupCodeService.verifyBackupCode(employeeId, mfaToken, ipAddress).getOrElse(false);
+          mfaBackupCodeManager.verifyBackupCode(employeeId, mfaToken, ipAddress).getOrElse(false);
       verificationMethod = "BACKUP_CODE";
 
       if (verified) {
@@ -122,8 +120,8 @@ public class MfaVerificationManager {
 
     // Add trusted device if requested
     if (Boolean.TRUE.equals(trustDevice)) {
-      String fingerprint = mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent);
-      mfaTrustedDeviceService
+      String fingerprint = mfaTrustedDeviceManager.generateDeviceFingerprint(ipAddress, userAgent);
+      mfaTrustedDeviceManager
           .addTrustedDevice(employeeId, fingerprint, deviceName, ipAddress, userAgent)
           .getOrElseThrow(e -> new RuntimeException("Failed to add trusted device", e));
 

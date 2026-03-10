@@ -12,8 +12,6 @@ import net.lab1024.sa.system.mfa.dao.MfaConfigDao;
 import net.lab1024.sa.system.mfa.domain.entity.MfaAuditLogEntity;
 import net.lab1024.sa.system.mfa.domain.entity.MfaConfigEntity;
 import net.lab1024.sa.system.mfa.domain.vo.MfaSetupInitVO;
-import net.lab1024.sa.system.mfa.service.MfaBackupCodeService;
-import net.lab1024.sa.system.mfa.service.MfaTrustedDeviceService;
 import net.lab1024.sa.system.mfa.util.TotpUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +42,8 @@ public class MfaSetupManager {
   private final MfaConfigDao mfaConfigDao;
   private final MfaBackupCodeDao mfaBackupCodeDao;
   private final MfaAuditLogDao mfaAuditLogDao;
-  private final MfaBackupCodeService mfaBackupCodeService;
-  private final MfaTrustedDeviceService mfaTrustedDeviceService;
+  private final MfaBackupCodeManager mfaBackupCodeManager;
+  private final MfaTrustedDeviceManager mfaTrustedDeviceManager;
 
   /**
    * Enable MFA for employee (transaction method).
@@ -81,7 +79,7 @@ public class MfaSetupManager {
 
     // Generate backup codes
     List<String> backupCodes =
-        mfaBackupCodeService
+        mfaBackupCodeManager
             .generateBackupCodes(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to generate backup codes", e));
 
@@ -157,7 +155,7 @@ public class MfaSetupManager {
 
     // Generate new backup codes (automatically deletes old ones)
     List<String> backupCodes =
-        mfaBackupCodeService
+        mfaBackupCodeManager
             .generateBackupCodes(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to regenerate backup codes", e));
 
@@ -316,7 +314,7 @@ public class MfaSetupManager {
 
     // Generate backup codes
     List<String> backupCodes =
-        mfaBackupCodeService
+        mfaBackupCodeManager
             .generateBackupCodes(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to generate backup codes", e));
 
@@ -326,8 +324,8 @@ public class MfaSetupManager {
 
     // Add trusted device if requested
     if (Boolean.TRUE.equals(trustDevice)) {
-      String fingerprint = mfaTrustedDeviceService.generateDeviceFingerprint(ipAddress, userAgent);
-      mfaTrustedDeviceService
+      String fingerprint = mfaTrustedDeviceManager.generateDeviceFingerprint(ipAddress, userAgent);
+      mfaTrustedDeviceManager
           .addTrustedDevice(employeeId, fingerprint, deviceName, ipAddress, userAgent)
           .getOrElseThrow(e -> new RuntimeException("Failed to add trusted device", e));
     }
@@ -451,7 +449,7 @@ public class MfaSetupManager {
 
     // Generate new backup codes (automatically deletes old ones)
     List<String> backupCodes =
-        mfaBackupCodeService
+        mfaBackupCodeManager
             .generateBackupCodes(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to regenerate backup codes", e));
 
