@@ -1,33 +1,35 @@
 /**
- * Home Page (Placeholder)
- * 首頁（占位符）
+ * Home Page
+ * 首頁（集成國際化）
  *
  * 參考：Vue 版本 smart-admin-web/src/views/home/home.vue
- * 將在 Week 2 Day 4 完整實現
  *
  * @Author: SmartAdmin React Team
- * @Date: 2026-03-09
+ * @Date: 2026-03-10
  */
 
 import { Card, Typography, Row, Col, Statistic } from 'antd';
-import { UserOutlined, ShoppingOutlined, DollarOutlined } from '@ant-design/icons';
+import { UserOutlined, ShoppingOutlined, FileOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 
 /**
- * 首頁占位符
- * Week 2 Day 4 將實現完整的首頁儀表板、統計數據等功能
+ * 首頁
+ * 展示系統概覽和 i18n 國際化功能
  */
 export default function HomePage() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <Title level={2}>歡迎使用 SmartAdmin React</Title>
+      <Title level={2}>{t('menu.home')}</Title>
 
       <Row gutter={16} style={{ marginTop: 24 }}>
         <Col span={8}>
           <Card>
             <Statistic
-              title="用戶總數"
+              title={t('menu.system.user')}
               value={1128}
               prefix={<UserOutlined />}
               valueStyle={{ color: '#3f8600' }}
@@ -37,7 +39,7 @@ export default function HomePage() {
         <Col span={8}>
           <Card>
             <Statistic
-              title="商品總數"
+              title={t('menu.business.goods')}
               value={935}
               prefix={<ShoppingOutlined />}
               valueStyle={{ color: '#1890ff' }}
@@ -47,11 +49,10 @@ export default function HomePage() {
         <Col span={8}>
           <Card>
             <Statistic
-              title="總銷售額"
-              value={98500}
-              prefix={<DollarOutlined />}
+              title={t('menu.support.file')}
+              value={532}
+              prefix={<FileOutlined />}
               valueStyle={{ color: '#cf1322' }}
-              precision={2}
             />
           </Card>
         </Col>
@@ -68,7 +69,11 @@ export default function HomePage() {
         <p>✅ Week 2 Day 2: 登錄頁面 Part 2（MFA 支持）</p>
         <p>✅ Week 2 Day 3: userSlice 完整遷移（菜單樹構建 - 427 行）</p>
         <p>✅ Week 2 Day 4: 首頁 + 側邊欄菜單（動態菜單渲染）</p>
-        <p>⏳ Week 2 Day 5: 動態路由加載（進行中）</p>
+        <p>✅ Week 2 Day 5: 動態路由加載（React.lazy 懶加載）</p>
+        <p>✅ Week 3: 通用組件庫建設（10+ 組件，188 單元測試）</p>
+        <p>✅ Week 4 Day 1-3: Redux Slices（appConfig、role、tenant）</p>
+        <p>✅ Week 4 Day 4: 國際化集成（react-i18next + Ant Design Locale）</p>
+        <p>⏳ Week 4 Day 5: Keep-alive 緩存機制（進行中）</p>
       </Card>
     </div>
   );

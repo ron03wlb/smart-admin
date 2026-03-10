@@ -19,9 +19,11 @@ import {
   HomeOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { selectUserInfo, selectDisplayMenuTree, logout } from '@/store/slices/userSlice';
 import { formatMenuTreeForAntd } from '@/utils/menuFormatter';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
 const { Header, Sider, Content } = Layout;
 
@@ -30,6 +32,7 @@ const { Header, Sider, Content } = Layout;
  * 提供應用的整體佈局結構
  */
 export default function BasicLayout() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -63,7 +66,7 @@ export default function BasicLayout() {
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: '退出登錄',
+      label: t('login.logout'),
       onClick: handleLogout,
     },
   ];
@@ -77,7 +80,7 @@ export default function BasicLayout() {
     const homeMenu = {
       key: '/home',
       icon: <HomeOutlined />,
-      label: '首頁',
+      label: t('menu.home'),
     };
 
     // 轉換動態菜單
@@ -85,7 +88,7 @@ export default function BasicLayout() {
 
     // 合併首頁和動態菜單
     return [homeMenu, ...(dynamicMenus || [])];
-  }, [displayMenuTree]);
+  }, [displayMenuTree, t]);
 
   /**
    * 當前選中的菜單項（基於路由路徑）
@@ -143,13 +146,16 @@ export default function BasicLayout() {
             style={{ fontSize: 16, width: 64, height: 64 }}
           />
 
-          {/* 右側：用戶信息 */}
-          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-              <Avatar icon={<UserOutlined />} style={{ marginRight: 8 }} />
-              <span>{userInfo.employeeName || userInfo.loginName || '用戶'}</span>
-            </div>
-          </Dropdown>
+          {/* 右側：語言切換 + 用戶信息 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <LanguageSwitcher />
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+              <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <Avatar icon={<UserOutlined />} style={{ marginRight: 8 }} />
+                <span>{userInfo.employeeName || userInfo.loginName || '用戶'}</span>
+              </div>
+            </Dropdown>
+          </div>
         </Header>
 
         {/* 主內容區域 */}
