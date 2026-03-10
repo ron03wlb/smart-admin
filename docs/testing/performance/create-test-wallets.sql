@@ -20,6 +20,18 @@
 -- Enable pgcrypto extension for digest() function (SHA-256 blind index)
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- =====================================================================
+-- Cleanup: Delete existing test data before creating new test wallets
+-- =====================================================================
+DELETE FROM t_wallet
+WHERE player_id IN (
+    SELECT player_id FROM t_player
+    WHERE username LIKE 'test_player_%' AND tenant_id = 1
+);
+
+DELETE FROM t_player
+WHERE username LIKE 'test_player_%' AND tenant_id = 1;
+
 DO $$
 DECLARE
     i INT;
@@ -79,47 +91,43 @@ BEGIN
             NOW(),
             NOW()
         )
-        ON CONFLICT (username) DO NOTHING
         RETURNING player_id INTO v_player_id;
 
-        -- Check if player was created (not a duplicate)
-        IF v_player_id IS NOT NULL THEN
-            -- Insert CASH wallet for this player
-            INSERT INTO t_wallet (
-                player_id,
-                wallet_type,
-                balance,
-                locked_amount,
-                currency_code,
-                status,
-                deleted,
-                version,
-                tenant_id,
-                create_time,
-                update_time
-            )
-            VALUES (
-                v_player_id,
-                1,  -- wallet_type: CASH
-                10000.0000,  -- balance: 10,000 CNY
-                0.0000,      -- locked_amount: 0 (no funds locked initially)
-                'CNY',       -- currency_code
-                1,           -- status: ACTIVE
-                FALSE,       -- deleted
-                0,           -- version (optimistic lock)
-                1,           -- tenant_id
-                NOW(),
-                NOW()
-            )
-            RETURNING wallet_id INTO v_wallet_id;
+        -- Insert CASH wallet for this player
+        INSERT INTO t_wallet (
+            player_id,
+            wallet_type,
+            balance,
+            locked_amount,
+            currency_code,
+            status,
+            deleted,
+            version,
+            tenant_id,
+            create_time,
+            update_time
+        )
+        VALUES (
+            v_player_id,
+            1,  -- wallet_type: CASH
+            10000.0000,  -- balance: 10,000 CNY
+            0.0000,      -- locked_amount: 0 (no funds locked initially)
+            'CNY',       -- currency_code
+            1,           -- status: ACTIVE
+            FALSE,       -- deleted
+            0,           -- version (optimistic lock)
+            1,           -- tenant_id
+            NOW(),
+            NOW()
+        )
+        RETURNING wallet_id INTO v_wallet_id;
 
-            v_created_count := v_created_count + 1;
+        v_created_count := v_created_count + 1;
 
-            -- Log progress every 10 wallets
-            IF v_created_count % 10 = 0 THEN
-                RAISE NOTICE 'Created % test wallets... (Player ID: %, Wallet ID: %)',
-                    v_created_count, v_player_id, v_wallet_id;
-            END IF;
+        -- Log progress every 10 wallets
+        IF v_created_count % 10 = 0 THEN
+            RAISE NOTICE 'Created % test wallets... (Player ID: %, Wallet ID: %)',
+                v_created_count, v_player_id, v_wallet_id;
         END IF;
     END LOOP;
 
