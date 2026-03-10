@@ -18,6 +18,21 @@ export const LOCAL_STORAGE_KEYS = {
 
   /** 主題模式 */
   THEME_MODE: 'THEME_MODE',
+
+  /** 應用配置 */
+  APP_CONFIG: 'APP_CONFIG',
+
+  /** 租戶 ID */
+  TENANT_ID: 'TENANT_ID',
+
+  /** 租戶時區 */
+  TENANT_TIMEZONE: 'TENANT_TIMEZONE',
+
+  /** 租戶代碼 */
+  TENANT_CODE: 'TENANT_CODE',
 } as const;
+
+// 向後兼容的別名
+export const STORAGE_KEYS = LOCAL_STORAGE_KEYS;
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS];

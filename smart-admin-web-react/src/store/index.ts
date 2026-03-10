@@ -22,6 +22,9 @@ import storage from 'redux-persist/lib/storage'; // localStorage
 import userReducer from './slices/userSlice';
 import dictReducer from './slices/dictSlice';
 import spinReducer from './slices/spinSlice';
+import appConfigReducer from './slices/appConfigSlice';
+import roleReducer from './slices/roleSlice';
+import tenantReducer from './slices/tenantSlice';
 
 // ==================== Root Reducer ====================
 
@@ -29,7 +32,10 @@ const rootReducer = combineReducers({
   user: userReducer,
   dict: dictReducer,
   spin: spinReducer,
-  // 未來可添加更多 slices: menu, appConfig, etc.
+  appConfig: appConfigReducer,
+  role: roleReducer,
+  tenant: tenantReducer,
+  // 未來可添加更多 slices: tagNav, menu, etc.
 });
 
 // ==================== Redux Persist 配置 ====================
@@ -38,7 +44,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['user', 'dict'], // 持久化 user 和 dict slices
+  whitelist: ['user', 'dict', 'appConfig', 'tenant'], // 持久化 user、dict、appConfig 和 tenant slices
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

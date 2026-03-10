@@ -1,103 +1,258 @@
 /**
- * App Configuration Redux Slice
+ * App Config Slice
+ * 應用配置狀態管理
  *
- * Manages layout, theme, language, and UI preferences.
- * Corresponds to Vue's store/modules/system/app-config.ts
+ * @Author: SmartAdmin React Team
+ * @Date: 2026-03-10
  */
-import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
-import type { RootState } from '@/store';
-import type { AppConfigState } from '@/types/app-config.types';
 
-export const APP_CONFIG_DEFAULTS: AppConfigState = {
-  language: 'zh_CN',
-  layout: 'side',
-  sideMenuWidth: 200,
-  pageTagLocation: 'center',
-  darkModeFlag: false,
-  sideMenuTheme: 'dark',
-  colorIndex: 0,
-  pageWidth: '99%',
-  borderRadius: 6,
-  menuSingleExpandFlag: true,
-  pageTagFlag: true,
-  pageTagStyle: 'chrome',
-  breadCrumbFlag: true,
-  footerFlag: true,
-  helpDocFlag: true,
-  helpDocExpandFlag: false,
-  watermarkFlag: true,
-  websiteName: 'SmartAdmin 3.X',
-  primaryColor: '#1677ff',
-  compactFlag: false,
-  fullScreenFlag: false,
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { AppConfig, LanguageType, LayoutType, ThemeType, PageTagLocationType, PageTagStyleType } from '@/types/appConfig';
+import { appDefaultConfig } from '@/config/appDefaultConfig';
+import { STORAGE_KEYS } from '@/constants/storageKeys';
+
+/**
+ * 從 localStorage 讀取初始狀態
+ */
+function loadInitialState(): AppConfig {
+  try {
+    const savedConfig = localStorage.getItem(STORAGE_KEYS.APP_CONFIG);
+    if (savedConfig) {
+      const parsedConfig = JSON.parse(savedConfig) as AppConfig;
+      // 合併默認配置和保存的配置（確保新增的字段有默認值）
+      return { ...appDefaultConfig, ...parsedConfig };
+    }
+  } catch (error) {
+    console.error('Failed to load app config from localStorage:', error);
+  }
+  return appDefaultConfig;
+}
+
+/**
+ * 獲取初始化語言（用於 i18n 初始化）
+ */
+export const getInitializedLanguage = (): LanguageType => {
+  try {
+    const savedConfig = localStorage.getItem(STORAGE_KEYS.APP_CONFIG);
+    if (savedConfig) {
+      const parsedConfig = JSON.parse(savedConfig) as AppConfig;
+      return parsedConfig.language || appDefaultConfig.language;
+    }
+  } catch (error) {
+    console.error('Failed to get initialized language:', error);
+  }
+  return appDefaultConfig.language;
 };
+
+const initialState: AppConfig = loadInitialState();
 
 const appConfigSlice = createSlice({
   name: 'appConfig',
-  initialState: { ...APP_CONFIG_DEFAULTS },
+  initialState,
   reducers: {
-    /** Update one or more config fields */
-    updateAppConfig(state, action: PayloadAction<Partial<AppConfigState>>) {
-      Object.assign(state, action.payload);
+    /**
+     * 重置為默認配置
+     */
+    reset: () => {
+      return appDefaultConfig;
     },
-    /** Reset all config to defaults */
-    resetAppConfig() {
-      return { ...APP_CONFIG_DEFAULTS };
-    },
-    /** Toggle dark mode */
-    toggleDarkMode(state) {
-      state.darkModeFlag = !state.darkModeFlag;
-    },
-    /** Set layout mode */
-    setLayout(state, action: PayloadAction<AppConfigState['layout']>) {
-      state.layout = action.payload;
-    },
-    /** Set language */
-    setLanguage(state, action: PayloadAction<AppConfigState['language']>) {
+
+    /**
+     * 設置語言
+     */
+    setLanguage: (state, action: PayloadAction<LanguageType>) => {
       state.language = action.payload;
     },
-    /** Toggle full screen */
-    toggleFullScreen(state) {
-      state.fullScreenFlag = !state.fullScreenFlag;
+
+    /**
+     * 設置布局
+     */
+    setLayout: (state, action: PayloadAction<LayoutType>) => {
+      state.layout = action.payload;
     },
-    /** Show help doc */
-    showHelpDoc(state) {
+
+    /**
+     * 設置側邊菜單主題
+     */
+    setSideMenuTheme: (state, action: PayloadAction<ThemeType>) => {
+      state.sideMenuTheme = action.payload;
+    },
+
+    /**
+     * 設置標籤頁位置
+     */
+    setPageTagLocation: (state, action: PayloadAction<PageTagLocationType>) => {
+      state.pageTagLocation = action.payload;
+    },
+
+    /**
+     * 設置側邊菜單寬度
+     */
+    setSideMenuWidth: (state, action: PayloadAction<number>) => {
+      state.sideMenuWidth = action.payload;
+    },
+
+    /**
+     * 切換夜間模式
+     */
+    toggleDarkMode: (state) => {
+      state.darkModeFlag = !state.darkModeFlag;
+    },
+
+    /**
+     * 設置主題顏色索引
+     */
+    setColorIndex: (state, action: PayloadAction<number>) => {
+      state.colorIndex = action.payload;
+    },
+
+    /**
+     * 設置主題顏色
+     */
+    setPrimaryColor: (state, action: PayloadAction<string>) => {
+      state.primaryColor = action.payload;
+    },
+
+    /**
+     * 設置頁面寬度
+     */
+    setPageWidth: (state, action: PayloadAction<string>) => {
+      state.pageWidth = action.payload;
+    },
+
+    /**
+     * 設置圓角
+     */
+    setBorderRadius: (state, action: PayloadAction<number>) => {
+      state.borderRadius = action.payload;
+    },
+
+    /**
+     * 切換菜單單一展開模式
+     */
+    toggleMenuSingleExpand: (state) => {
+      state.menuSingleExpandFlag = !state.menuSingleExpandFlag;
+    },
+
+    /**
+     * 切換標籤頁顯示
+     */
+    togglePageTag: (state) => {
+      state.pageTagFlag = !state.pageTagFlag;
+    },
+
+    /**
+     * 設置標籤頁樣式
+     */
+    setPageTagStyle: (state, action: PayloadAction<PageTagStyleType>) => {
+      state.pageTagStyle = action.payload;
+    },
+
+    /**
+     * 切換面包屑顯示
+     */
+    toggleBreadCrumb: (state) => {
+      state.breadCrumbFlag = !state.breadCrumbFlag;
+    },
+
+    /**
+     * 切換頁腳顯示
+     */
+    toggleFooter: (state) => {
+      state.footerFlag = !state.footerFlag;
+    },
+
+    /**
+     * 切換幫助文檔顯示
+     */
+    toggleHelpDoc: (state) => {
+      state.helpDocFlag = !state.helpDocFlag;
+    },
+
+    /**
+     * 顯示幫助文檔
+     */
+    showHelpDoc: (state) => {
       state.helpDocExpandFlag = true;
     },
-    /** Hide help doc */
-    hideHelpDoc(state) {
+
+    /**
+     * 隱藏幫助文檔
+     */
+    hideHelpDoc: (state) => {
       state.helpDocExpandFlag = false;
+    },
+
+    /**
+     * 切換水印顯示
+     */
+    toggleWatermark: (state) => {
+      state.watermarkFlag = !state.watermarkFlag;
+    },
+
+    /**
+     * 設置網站名稱
+     */
+    setWebsiteName: (state, action: PayloadAction<string>) => {
+      state.websiteName = action.payload;
+    },
+
+    /**
+     * 切換緊湊模式
+     */
+    toggleCompact: (state) => {
+      state.compactFlag = !state.compactFlag;
+    },
+
+    /**
+     * 開始全屏
+     */
+    startFullScreen: (state) => {
+      state.fullScreenFlag = true;
+    },
+
+    /**
+     * 退出全屏
+     */
+    exitFullScreen: (state) => {
+      state.fullScreenFlag = false;
+    },
+
+    /**
+     * 更新配置（批量更新）
+     */
+    updateConfig: (state, action: PayloadAction<Partial<AppConfig>>) => {
+      return { ...state, ...action.payload };
     },
   },
 });
 
 export const {
-  updateAppConfig,
-  resetAppConfig,
-  toggleDarkMode,
-  setLayout,
+  reset,
   setLanguage,
-  toggleFullScreen,
+  setLayout,
+  setSideMenuTheme,
+  setPageTagLocation,
+  setSideMenuWidth,
+  toggleDarkMode,
+  setColorIndex,
+  setPrimaryColor,
+  setPageWidth,
+  setBorderRadius,
+  toggleMenuSingleExpand,
+  togglePageTag,
+  setPageTagStyle,
+  toggleBreadCrumb,
+  toggleFooter,
+  toggleHelpDoc,
   showHelpDoc,
   hideHelpDoc,
+  toggleWatermark,
+  setWebsiteName,
+  toggleCompact,
+  startFullScreen,
+  exitFullScreen,
+  updateConfig,
 } = appConfigSlice.actions;
 
-// Selectors
-export const selectAppConfig = (state: RootState) => state.appConfig;
-export const selectLanguage = (state: RootState) => state.appConfig.language;
-export const selectLayout = (state: RootState) => state.appConfig.layout;
-export const selectDarkMode = (state: RootState) => state.appConfig.darkModeFlag;
-export const selectPageTagFlag = (state: RootState) => state.appConfig.pageTagFlag;
-export const selectBreadCrumbFlag = (state: RootState) => state.appConfig.breadCrumbFlag;
-export const selectFooterFlag = (state: RootState) => state.appConfig.footerFlag;
-export const selectSideMenuTheme = (state: RootState) => state.appConfig.sideMenuTheme;
-export const selectSideMenuWidth = (state: RootState) => state.appConfig.sideMenuWidth;
-export const selectPrimaryColor = (state: RootState) => state.appConfig.primaryColor;
-export const selectColorIndex = (state: RootState) => state.appConfig.colorIndex;
-export const selectCompactFlag = (state: RootState) => state.appConfig.compactFlag;
-export const selectWatermarkFlag = (state: RootState) => state.appConfig.watermarkFlag;
-export const selectPageTagStyle = (state: RootState) => state.appConfig.pageTagStyle;
-
-export type { AppConfigState };
 export default appConfigSlice.reducer;
