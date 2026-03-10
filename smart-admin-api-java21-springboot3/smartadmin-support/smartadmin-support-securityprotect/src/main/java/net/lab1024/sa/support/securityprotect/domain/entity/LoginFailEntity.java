@@ -1,6 +1,7 @@
 package net.lab1024.sa.support.securityprotect.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.OffsetDateTime;
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 
 /**
  * 登录失败记录
@@ -38,6 +40,7 @@ public class LoginFailEntity extends SmartAdminBaseEntity {
   private String loginName;
 
   /** 锁定状态 */
+  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean lockFlag;
 
   /** 登录失败次数 */
