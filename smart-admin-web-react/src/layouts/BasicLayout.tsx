@@ -10,7 +10,7 @@
 
 import { useState, useMemo } from 'react';
 import { Layout, Menu, Button, Avatar, Dropdown } from 'antd';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -24,6 +24,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { selectUserInfo, selectDisplayMenuTree, logout } from '@/store/slices/userSlice';
 import { formatMenuTreeForAntd } from '@/utils/menuFormatter';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import KeepAliveOutlet from '@/components/KeepAliveOutlet';
 
 const { Header, Sider, Content } = Layout;
 
@@ -168,8 +169,8 @@ export default function BasicLayout() {
             borderRadius: 8,
           }}
         >
-          {/* 渲染子路由 */}
-          <Outlet />
+          {/* 渲染子路由（支持 Keep-alive 緩存） */}
+          <KeepAliveOutlet />
         </Content>
       </Layout>
     </Layout>

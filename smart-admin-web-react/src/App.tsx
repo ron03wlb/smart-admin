@@ -14,6 +14,7 @@ import type { Locale } from 'antd/es/locale';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import i18n from 'i18next';
+import { AliveScope } from 'react-activation';
 import type { RootState } from './store';
 import type { LanguageType } from './types/appConfig';
 import { router } from './router';
@@ -61,7 +62,9 @@ function App() {
 
   return (
     <ConfigProvider locale={antdLocale}>
-      <RouterProvider router={router} />
+      <AliveScope>
+        <RouterProvider router={router} />
+      </AliveScope>
     </ConfigProvider>
   );
 }
