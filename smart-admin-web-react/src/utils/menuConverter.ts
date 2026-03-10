@@ -51,7 +51,10 @@ export function convertMenuVOListToMenuItems(menuVOList: MenuVO[]): MenuItem[] {
  * @param menuId 對應的菜單ID（從菜單列表中提取）
  * @returns 內部權限點類型
  */
-export function convertPointVOToPermissionPoint(pointVO: PointVO, menuId: number = 0): PermissionPoint {
+export function convertPointVOToPermissionPoint(
+  pointVO: PointVO,
+  menuId: number = 0
+): PermissionPoint {
   return {
     menuId: menuId,
     webPerms: pointVO.webPerms,
@@ -66,5 +69,5 @@ export function convertPointVOToPermissionPoint(pointVO: PointVO, menuId: number
  * @returns 內部權限點列表
  */
 export function convertPointVOListToPermissionPoints(pointVOList: PointVO[]): PermissionPoint[] {
-  return pointVOList.map((point) => convertPointVOToPermissionPoint(point));
+  return pointVOList.map(point => convertPointVOToPermissionPoint(point));
 }

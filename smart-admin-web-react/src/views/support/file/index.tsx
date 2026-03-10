@@ -21,9 +21,7 @@ export default function FilePage() {
         <Paragraph>
           路由路徑：<code>/support/file</code>
         </Paragraph>
-        <Paragraph type="secondary">
-          完整的文件上傳、下載、預覽功能將在後續階段實現。
-        </Paragraph>
+        <Paragraph type="secondary">完整的文件上傳、下載、預覽功能將在後續階段實現。</Paragraph>
       </Card>
     </div>
   );

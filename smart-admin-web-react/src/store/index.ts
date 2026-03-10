@@ -20,12 +20,16 @@ import {
 import storage from 'redux-persist/lib/storage'; // localStorage
 
 import userReducer from './slices/userSlice';
+import dictReducer from './slices/dictSlice';
+import spinReducer from './slices/spinSlice';
 
 // ==================== Root Reducer ====================
 
 const rootReducer = combineReducers({
   user: userReducer,
-  // 未來可添加更多 slices: dict, menu, appConfig, etc.
+  dict: dictReducer,
+  spin: spinReducer,
+  // 未來可添加更多 slices: menu, appConfig, etc.
 });
 
 // ==================== Redux Persist 配置 ====================
@@ -34,7 +38,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['user'], // 只持久化 user slice
+  whitelist: ['user', 'dict'], // 持久化 user 和 dict slices
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -43,7 +47,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         // 忽略 Redux Persist 的 actions

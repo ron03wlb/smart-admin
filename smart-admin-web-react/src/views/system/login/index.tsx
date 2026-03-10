@@ -60,9 +60,12 @@ export default function LoginPage() {
         if (captchaRefreshInterval) {
           clearInterval(captchaRefreshInterval);
         }
-        const interval = setInterval(() => {
-          getCaptcha();
-        }, (expireSeconds - 5) * 1000);
+        const interval = setInterval(
+          () => {
+            getCaptcha();
+          },
+          (expireSeconds - 5) * 1000
+        );
         setCaptchaRefreshInterval(interval);
       }
     } catch (err) {
@@ -259,22 +262,12 @@ export default function LoginPage() {
           size="large"
         >
           {/* 用戶名 */}
-          <Form.Item
-            name="loginName"
-            rules={[{ required: true, message: '請輸入用戶名' }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="用戶名"
-              autoComplete="username"
-            />
+          <Form.Item name="loginName" rules={[{ required: true, message: '請輸入用戶名' }]}>
+            <Input prefix={<UserOutlined />} placeholder="用戶名" autoComplete="username" />
           </Form.Item>
 
           {/* 密碼 */}
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: '請輸入密碼' }]}
-          >
+          <Form.Item name="password" rules={[{ required: true, message: '請輸入密碼' }]}>
             <Input.Password
               prefix={<LockOutlined />}
               placeholder="密碼"
@@ -290,11 +283,7 @@ export default function LoginPage() {
             >
               <Row gutter={8}>
                 <Col span={14}>
-                  <Input
-                    prefix={<SafetyOutlined />}
-                    placeholder="郵箱驗證碼"
-                    autoComplete="off"
-                  />
+                  <Input prefix={<SafetyOutlined />} placeholder="郵箱驗證碼" autoComplete="off" />
                 </Col>
                 <Col span={10}>
                   <Button
@@ -302,9 +291,7 @@ export default function LoginPage() {
                     disabled={emailCodeButtonDisabled}
                     style={{ width: '100%', height: 40 }}
                   >
-                    {emailCodeCountdown > 0
-                      ? `${emailCodeCountdown}秒後重試`
-                      : '發送驗證碼'}
+                    {emailCodeCountdown > 0 ? `${emailCodeCountdown}秒後重試` : '發送驗證碼'}
                   </Button>
                 </Col>
               </Row>
@@ -312,17 +299,10 @@ export default function LoginPage() {
           )}
 
           {/* 驗證碼 */}
-          <Form.Item
-            name="captchaCode"
-            rules={[{ required: true, message: '請輸入驗證碼' }]}
-          >
+          <Form.Item name="captchaCode" rules={[{ required: true, message: '請輸入驗證碼' }]}>
             <Row gutter={8}>
               <Col span={14}>
-                <Input
-                  prefix={<SafetyOutlined />}
-                  placeholder="驗證碼"
-                  autoComplete="off"
-                />
+                <Input prefix={<SafetyOutlined />} placeholder="驗證碼" autoComplete="off" />
               </Col>
               <Col span={10}>
                 {captchaImage ? (
@@ -339,10 +319,7 @@ export default function LoginPage() {
                     }}
                   />
                 ) : (
-                  <Button
-                    onClick={getCaptcha}
-                    style={{ width: '100%', height: 40 }}
-                  >
+                  <Button onClick={getCaptcha} style={{ width: '100%', height: 40 }}>
                     載入驗證碼
                   </Button>
                 )}
@@ -353,10 +330,7 @@ export default function LoginPage() {
           {/* 記住密碼 */}
           <Form.Item>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Checkbox
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              >
+              <Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)}>
                 記住密碼
               </Checkbox>
               <Text type="secondary" style={{ fontSize: 13 }}>
@@ -367,13 +341,7 @@ export default function LoginPage() {
 
           {/* 登錄按鈕 */}
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              block
-              style={{ height: 40 }}
-            >
+            <Button type="primary" htmlType="submit" loading={loading} block style={{ height: 40 }}>
               登錄
             </Button>
           </Form.Item>

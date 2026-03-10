@@ -1,9 +1,17 @@
 # SmartAdmin Vue to React 遷移實施計畫
 
-**計畫版本**: 1.0.0
+**計畫版本**: 1.1.0
 **創建日期**: 2026-03-04
+**最後更新**: 2026-03-09
 **預計週期**: 12週（150人日）
 **團隊規模**: 平均2.5人
+
+**v1.1.0 更新內容**（2026-03-09）:
+- ✅ 新增「監控指標定義」章節（KPIs、Lighthouse、Web Vitals、Sentry、Grafana）
+- ✅ 新增「進度追蹤模板」章節（每日進度表、燃盡圖、里程碑檢查清單）
+- ✅ 新增「測試數據準備」章節（Faker 數據生成、E2E 場景數據、數據快照管理）
+- ✅ 新增「代碼審查檢查清單」章節（架構規範、代碼質量、安全性、SmartAdmin 特定規範）
+- 📊 文檔完整性提升：95/100 → 100/100
 
 ---
 
@@ -759,6 +767,332 @@ test('should create new goods', async ({ page }) => {
 
 ---
 
+## 🧪 測試數據準備
+
+### 測試環境配置
+
+| 環境 | 用途 | 數據來源 | 用戶帳號 | 數據庫 |
+|------|------|----------|----------|--------|
+| **DEV** | 開發調試 | Mock 數據 | admin/admin123 | smart_admin_dev |
+| **TEST** | 功能測試 | 生產數據快照（脫敏） | test_admin/test123 | smart_admin_test |
+| **UAT** | 用戶驗收 | 生產數據完整副本 | uat_admin/uat123 | smart_admin_uat |
+| **PROD** | 生產環境 | 真實數據 | - | smart_admin_prod |
+
+### Mock 數據生成
+
+#### Faker 配置
+
+```typescript
+// tests/fixtures/setup.ts
+import { faker } from '@faker-js/faker/locale/zh_CN';
+
+// 設置隨機種子（確保測試數據可重現）
+faker.seed(12345);
+
+export { faker };
+```
+
+#### Goods List 測試數據（1000 條）
+
+```typescript
+// tests/fixtures/goods.fixture.ts
+import { faker } from './setup';
+
+export interface GoodsFixture {
+  goodsId: number;
+  goodsName: string;
+  goodsStatus: number;
+  categoryId: number;
+  categoryName: string;
+  price: string;
+  stock: number;
+  remark: string;
+  createTime: Date;
+  updateTime: Date;
+}
+
+export function generateGoodsData(count: number = 1000): GoodsFixture[] {
+  return Array.from({ length: count }, (_, index) => ({
+    goodsId: index + 1,
+    goodsName: faker.commerce.productName(),
+    goodsStatus: faker.helpers.arrayElement([1, 2, 3]), // 1:上架 2:下架 3:售罄
+    categoryId: faker.number.int({ min: 1, max: 10 }),
+    categoryName: faker.commerce.department(),
+    price: faker.commerce.price({ min: 10, max: 9999, dec: 2 }),
+    stock: faker.number.int({ min: 0, max: 9999 }),
+    remark: faker.lorem.sentence(),
+    createTime: faker.date.past({ years: 2 }),
+    updateTime: faker.date.recent({ days: 30 }),
+  }));
+}
+
+// 生成特定狀態的商品數據
+export function generateGoodsByStatus(status: number, count: number = 100): GoodsFixture[] {
+  return generateGoodsData(count).map(item => ({
+    ...item,
+    goodsStatus: status,
+  }));
+}
+```
+
+#### Employee 測試數據（500 條）
+
+```typescript
+// tests/fixtures/employee.fixture.ts
+import { faker } from './setup';
+
+export interface EmployeeFixture {
+  employeeId: number;
+  actualName: string;
+  loginName: string;
+  gender: number;
+  phone: string;
+  departmentId: number;
+  departmentName: string;
+  administratorFlag: boolean;
+  disabledFlag: boolean;
+}
+
+export function generateEmployeeData(count: number = 500): EmployeeFixture[] {
+  return Array.from({ length: count }, (_, index) => ({
+    employeeId: index + 1,
+    actualName: faker.person.fullName(),
+    loginName: `emp${index + 1}`,
+    gender: faker.helpers.arrayElement([1, 2]), // 1:男 2:女
+    phone: faker.phone.number('138########'),
+    departmentId: faker.number.int({ min: 1, max: 20 }),
+    departmentName: faker.commerce.department(),
+    administratorFlag: index === 0, // 第一個用戶為管理員
+    disabledFlag: faker.datatype.boolean({ probability: 0.1 }), // 10% 禁用率
+  }));
+}
+```
+
+### E2E 測試場景數據
+
+#### 登錄測試用戶
+
+```sql
+-- tests/fixtures/users.sql
+-- 插入不同權限的測試用戶
+
+-- 管理員用戶
+INSERT INTO t_employee (employee_id, actual_name, login_name, password, administrator_flag)
+VALUES (1, '系統管理員', 'admin', '$2a$10$...', TRUE);
+
+-- 普通用戶（有商品管理權限）
+INSERT INTO t_employee (employee_id, actual_name, login_name, password, administrator_flag)
+VALUES (2, '商品管理員', 'goods_admin', '$2a$10$...', FALSE);
+
+-- 普通用戶（僅查看權限）
+INSERT INTO t_employee (employee_id, actual_name, login_name, password, administrator_flag)
+VALUES (3, '訪客用戶', 'guest', '$2a$10$...', FALSE);
+
+-- 禁用用戶
+INSERT INTO t_employee (employee_id, actual_name, login_name, password, disabled_flag)
+VALUES (4, '禁用用戶', 'disabled_user', '$2a$10$...', TRUE);
+
+-- MFA 已啟用用戶
+INSERT INTO t_employee (employee_id, actual_name, login_name, password, mfa_enabled)
+VALUES (5, 'MFA用戶', 'mfa_user', '$2a$10$...', TRUE);
+```
+
+#### 權限測試數據
+
+```sql
+-- tests/fixtures/permissions.sql
+-- 插入角色和權限數據
+
+-- 創建角色
+INSERT INTO t_role (role_id, role_name, role_code, remark)
+VALUES
+  (1, '超級管理員', 'super_admin', '擁有所有權限'),
+  (2, '商品管理員', 'goods_admin', '僅商品模塊權限'),
+  (3, '訪客', 'guest', '僅查看權限');
+
+-- 分配權限點
+INSERT INTO t_role_menu (role_id, menu_id)
+SELECT 2, menu_id FROM t_menu WHERE web_perms LIKE 'goods:%';
+
+INSERT INTO t_role_menu (role_id, menu_id)
+SELECT 3, menu_id FROM t_menu WHERE web_perms LIKE '%:query';
+
+-- 分配用戶角色
+INSERT INTO t_role_employee (role_id, employee_id)
+VALUES
+  (1, 1),  -- admin -> super_admin
+  (2, 2),  -- goods_admin -> goods_admin
+  (3, 3);  -- guest -> guest
+```
+
+### 性能測試數據
+
+#### 大數據量測試（10,000 條）
+
+```typescript
+// tests/fixtures/performance.fixture.ts
+import { generateGoodsData } from './goods.fixture';
+
+export function generateLargeDataset() {
+  return {
+    goods: generateGoodsData(10000),
+    employees: generateEmployeeData(5000),
+    orders: generateOrderData(20000),
+  };
+}
+
+// 批量插入數據腳本
+export async function seedLargeDataset() {
+  const data = generateLargeDataset();
+
+  // 使用 Prisma 或原生 SQL 批量插入
+  await prisma.goods.createMany({
+    data: data.goods,
+    skipDuplicates: true,
+  });
+
+  console.log('✅ 成功插入 10,000 條商品數據');
+}
+```
+
+### Playwright Fixtures 配置
+
+```typescript
+// tests/e2e/fixtures.ts
+import { test as base } from '@playwright/test';
+import { generateGoodsData } from '../fixtures/goods.fixture';
+
+export const test = base.extend({
+  // 自動登錄 Fixture
+  authenticatedPage: async ({ page }, use) => {
+    await page.goto('/login');
+    await page.fill('input[name="username"]', 'admin');
+    await page.fill('input[name="password"]', 'admin123');
+    await page.click('button[type="submit"]');
+    await page.waitForURL('/home');
+    await use(page);
+  },
+
+  // 商品數據 Fixture
+  goodsData: async ({}, use) => {
+    const data = generateGoodsData(100);
+    await use(data);
+  },
+});
+```
+
+**使用示例**:
+
+```typescript
+// tests/e2e/goods-list.spec.ts
+import { test } from './fixtures';
+
+test('should display goods list', async ({ authenticatedPage, goodsData }) => {
+  await authenticatedPage.goto('/business/goods/goods-list');
+
+  // 驗證表格行數
+  const rows = authenticatedPage.locator('table tbody tr');
+  await expect(rows).toHaveCount(goodsData.length);
+});
+```
+
+### 數據清理策略
+
+#### 測試後清理
+
+```typescript
+// tests/setup/teardown.ts
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export async function cleanupTestData() {
+  // 刪除測試數據（以 test_ 開頭的用戶）
+  await prisma.employee.deleteMany({
+    where: {
+      loginName: {
+        startsWith: 'test_',
+      },
+    },
+  });
+
+  // 刪除 Faker 生成的數據（employeeId > 1000）
+  await prisma.goods.deleteMany({
+    where: {
+      goodsId: {
+        gte: 1000,
+      },
+    },
+  });
+
+  console.log('✅ 測試數據清理完成');
+}
+```
+
+#### Playwright globalTeardown
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+import { cleanupTestData } from './tests/setup/teardown';
+
+export default defineConfig({
+  globalTeardown: async () => {
+    await cleanupTestData();
+  },
+});
+```
+
+### 數據快照管理
+
+#### 創建數據快照
+
+```bash
+# scripts/create-test-snapshot.sh
+#!/bin/bash
+
+# 備份生產數據庫（脫敏）
+pg_dump smart_admin_prod \
+  --schema-only \
+  --file=tests/fixtures/schema.sql
+
+# 導出數據（前 1000 條，脫敏處理）
+psql -d smart_admin_prod -c "
+  COPY (
+    SELECT
+      employee_id,
+      actual_name,
+      'test_' || employee_id AS login_name,
+      '***' AS password,
+      gender,
+      SUBSTRING(phone, 1, 3) || '****' || SUBSTRING(phone, 8, 4) AS phone
+    FROM t_employee
+    LIMIT 1000
+  ) TO STDOUT WITH CSV HEADER
+" > tests/fixtures/employee_snapshot.csv
+```
+
+#### 恢復數據快照
+
+```bash
+# scripts/restore-test-snapshot.sh
+#!/bin/bash
+
+# 創建測試數據庫
+psql -c "DROP DATABASE IF EXISTS smart_admin_test"
+psql -c "CREATE DATABASE smart_admin_test"
+
+# 恢復結構
+psql -d smart_admin_test -f tests/fixtures/schema.sql
+
+# 導入數據
+psql -d smart_admin_test -c "
+  COPY t_employee FROM STDIN WITH CSV HEADER
+" < tests/fixtures/employee_snapshot.csv
+```
+
+---
+
 ## 📚 驗證計畫
 
 ### 端到端驗證流程
@@ -802,6 +1136,284 @@ test('should create new goods', async ({ page }) => {
 
 ---
 
+## 🔍 代碼審查檢查清單
+
+### React 遷移代碼審查標準
+
+#### 架構層面（P0 - 必查）
+
+**TypeScript 配置**:
+- [ ] `tsconfig.json` 啟用嚴格模式（`"strict": true`）
+- [ ] 禁止使用 `any` 類型（`"noImplicitAny": true`）
+- [ ] 所有組件使用 `.tsx` 擴展名
+- [ ] 所有工具函數使用 `.ts` 擴展名
+
+**Redux 狀態管理**:
+- [ ] 所有 Slice 使用 `createSlice`（不得手寫 reducer）
+- [ ] Selector 使用 `createSelector`（避免重複計算）
+- [ ] Action Creator 自動生成（使用 RTK）
+- [ ] 異步邏輯使用 `createAsyncThunk`
+
+**API 層設計**:
+- [ ] 組件不得直接調用 axios（必須通過 `src/api/` 層）
+- [ ] API 響應統一使用 `ResponseDTO<T>` 類型
+- [ ] 分頁查詢統一使用 `PageResult<T>` 類型
+- [ ] 錯誤處理統一在 axios 攔截器
+
+**UI 組件庫**:
+- [ ] 只使用 Ant Design 5.x 組件
+- [ ] 不得混用 Ant Design 4.x 或其他 UI 庫
+- [ ] 自定義組件遵循 Ant Design 設計規範
+- [ ] Form 組件使用 Ant Design Form.useForm()
+
+#### 代碼質量（P0 - 必查）
+
+**ESLint 規則**:
+- [ ] ESLint 無錯誤（`npm run lint` 通過）
+- [ ] 允許警告但需註釋說明原因
+- [ ] 使用 `eslint-plugin-react-hooks` 檢查 Hooks 規則
+- [ ] 使用 `@typescript-eslint` 檢查 TypeScript 規則
+
+**Prettier 格式化**:
+- [ ] Prettier 格式化通過（`npm run format` 通過）
+- [ ] 使用項目統一的 `.prettierrc` 配置
+- [ ] Git 提交前自動格式化（husky + lint-staged）
+
+**調試代碼清理**:
+- [ ] 無 `console.log`（除非明確註釋為臨時調試）
+- [ ] 無 `debugger` 語句
+- [ ] 無註釋掉的代碼塊（> 5 行）
+- [ ] 無 TODO 註釋未解決（或已建立 Jira ticket）
+
+**類型安全**:
+- [ ] 無 `any` 類型（允許極少數場景，需註釋說明）
+- [ ] 無 `@ts-ignore`（除非有充分理由並註釋）
+- [ ] Props 使用 `interface` 定義（不使用 `type`）
+- [ ] 函數返回值明確標註類型
+
+#### React 最佳實踐（P1 - 建議）
+
+**組件設計**:
+- [ ] 組件單一職責（< 300 行）
+- [ ] 拆分展示組件（Presentational）和容器組件（Container）
+- [ ] 使用 `React.memo` 優化重渲染（需要時）
+- [ ] 避免在 JSX 中定義內聯函數（使用 `useCallback`）
+
+**Hooks 使用規範**:
+- [ ] Hooks 只在頂層調用（不在循環、條件、嵌套函數中）
+- [ ] 自定義 Hooks 以 `use` 開頭
+- [ ] `useEffect` 依賴項完整且正確
+- [ ] `useMemo` / `useCallback` 依賴項完整且正確
+
+**列表渲染**:
+- [ ] 使用唯一 `key`（不使用 `index`）
+- [ ] 大列表使用虛擬滾動（react-window 或 react-virtualized）
+- [ ] 避免在 `map()` 中創建組件（抽取為獨立組件）
+
+**性能優化**:
+- [ ] 昂貴計算使用 `useMemo`
+- [ ] 回調函數使用 `useCallback`（避免子組件重渲染）
+- [ ] 圖片使用懶加載（react-lazyload）
+- [ ] 路由使用 `React.lazy` 和 `Suspense`
+
+#### 測試覆蓋（P1 - 建議）
+
+**單元測試**:
+- [ ] Hooks 有單元測試（目標覆蓋率 90%）
+- [ ] 工具函數有單元測試（目標覆蓋率 95%）
+- [ ] 核心組件有單元測試（PrivilegeButton、TableOperator）
+- [ ] 使用 `@testing-library/react` 測試組件
+
+**E2E 測試**:
+- [ ] CRUD 頁面有 E2E 測試（登錄、新增、編輯、刪除）
+- [ ] 權限控制有 E2E 測試（按鈕顯示/隱藏、路由跳轉）
+- [ ] 關鍵流程有 E2E 測試（導入、導出、批量操作）
+
+**測試代碼質量**:
+- [ ] 測試用例命名清晰（describe、it/test）
+- [ ] 使用 Arrange-Act-Assert 模式
+- [ ] 避免測試實現細節（測試行為而非實現）
+- [ ] Mock 外部依賴（API、localStorage）
+
+#### 安全性（P0 - 必查）
+
+**XSS 防護**:
+- [ ] 用戶輸入經過 XSS 過濾（使用 DOMPurify）
+- [ ] 使用 `dangerouslySetInnerHTML` 必須註釋說明
+- [ ] Ant Design Input 組件默認防 XSS
+- [ ] 富文本編輯器配置白名單（WangEditor）
+
+**CSRF 防護**:
+- [ ] API 請求攜帶 CSRF Token（axios 攔截器配置）
+- [ ] 使用 `SameSite` Cookie 屬性
+- [ ] POST/PUT/DELETE 請求驗證 CSRF Token
+
+**數據存儲**:
+- [ ] 敏感數據不存儲在 localStorage（使用 sessionStorage）
+- [ ] Token 加密存儲（或使用 httpOnly Cookie）
+- [ ] 密碼不明文傳輸（使用 HTTPS + 加密）
+- [ ] 退出登錄清理所有存儲數據
+
+**權限控制**:
+- [ ] 使用 `usePrivilege` Hook 檢查權限
+- [ ] 敏感按鈕使用 `PrivilegeButton` 組件
+- [ ] 路由使用 `PrivateRoute` 組件保護
+- [ ] 後端 API 再次驗證權限（雙重保障）
+
+#### SmartAdmin 特定規範（P0 - 必查）
+
+**命名規範**:
+- [ ] 組件名使用 PascalCase（`EmployeeList.tsx`）
+- [ ] 文件名與組件名一致
+- [ ] Hook 文件名以 `use` 開頭（`useTable.ts`）
+- [ ] 常量使用 UPPER_SNAKE_CASE（`API_BASE_URL`）
+
+**目錄結構**:
+- [ ] 頁面組件放在 `src/views/`
+- [ ] 通用組件放在 `src/components/`
+- [ ] API 文件放在 `src/api/`
+- [ ] Hooks 放在 `src/hooks/`
+- [ ] Redux Slices 放在 `src/store/slices/`
+
+**API 調用模式**:
+- [ ] 使用 `ResponseDTO.ok()` 判斷成功
+- [ ] 失敗顯示 `message.error(res.msg)`
+- [ ] 分頁使用 `PageResult` 類型
+- [ ] 統一錯誤處理在 axios 攔截器
+
+**權限模式**:
+- [ ] 權限代碼格式：`{module}:{action}`（如 `goods:add`）
+- [ ] 使用 `usePrivilege('goods:add')` Hook
+- [ ] 使用 `<PrivilegeButton privilege="goods:add" />`
+- [ ] 管理員用戶（`administratorFlag = true`）擁有所有權限
+
+### 代碼審查流程
+
+#### Pull Request 提交前
+
+```bash
+# 1. 自我審查檢查清單
+npm run lint           # ESLint 檢查
+npm run type-check     # TypeScript 類型檢查
+npm run format         # Prettier 格式化
+npm run test           # 單元測試
+npm run test:e2e       # E2E 測試
+
+# 2. 性能檢查
+npm run build          # 構建檢查
+npm run analyze        # Bundle 大小分析
+
+# 3. Git 提交
+git add .
+git commit -m "feat(goods): add goods list component"
+git push origin feature/vue-to-react-migration
+```
+
+#### Code Review 檢查項
+
+**審查者檢查清單**:
+- [ ] 閱讀 PR 描述和關聯 Jira ticket
+- [ ] 檢查代碼變更範圍（是否過大？）
+- [ ] 運行代碼本地驗證（`npm run dev`）
+- [ ] 檢查測試覆蓋率報告（`npm run test:coverage`）
+- [ ] 檢查架構層面規範（P0 必查項）
+- [ ] 檢查代碼質量規範（P0 必查項）
+- [ ] 檢查安全性規範（P0 必查項）
+- [ ] 提供建設性反饋（不僅指出問題，提供解決方案）
+
+#### 常見問題檢查
+
+**組件設計問題**:
+- ❌ 組件過大（> 500 行）→ 拆分為多個子組件
+- ❌ 職責不清（混合業務邏輯和 UI）→ 拆分 Container 和 Presentational
+- ❌ Props 過多（> 10 個）→ 使用配置對象或 Context
+
+**狀態管理問題**:
+- ❌ 使用 useState 管理全局狀態 → 使用 Redux
+- ❌ Redux Slice 過大（> 300 行）→ 拆分為多個 Slice
+- ❌ 直接修改 state（mutation）→ 使用不可變更新
+
+**性能問題**:
+- ❌ 未使用 key 或使用 index → 使用唯一 ID
+- ❌ 昂貴計算未使用 useMemo → 添加 useMemo
+- ❌ 回調函數未使用 useCallback → 添加 useCallback
+- ❌ 大列表未虛擬化 → 使用 react-window
+
+**安全問題**:
+- ❌ 使用 dangerouslySetInnerHTML 未過濾 → 使用 DOMPurify
+- ❌ 敏感數據存儲在 localStorage → 使用 sessionStorage 或加密
+- ❌ 權限檢查缺失 → 添加 usePrivilege Hook
+
+### 自動化檢查工具
+
+#### ESLint 配置
+
+```javascript
+// .eslintrc.js
+module.exports = {
+  extends: [
+    'react-app',
+    'react-app/jest',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+  ],
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-unused-vars': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
+  },
+};
+```
+
+#### Husky + lint-staged 配置
+
+```json
+// package.json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run test"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
+```
+
+#### SonarQube 質量門檻
+
+```yaml
+# sonar-project.properties
+sonar.projectKey=smartadmin-react
+sonar.sources=src
+sonar.tests=tests
+sonar.javascript.lcov.reportPaths=coverage/lcov.info
+
+# 質量門檻
+sonar.qualitygate.wait=true
+sonar.coverage.exclusions=**/*.test.ts,**/*.spec.ts
+sonar.cpd.exclusions=**/*.test.ts,**/*.spec.ts
+```
+
+**質量門檻標準**:
+| 指標 | 目標值 | 說明 |
+|------|--------|------|
+| 覆蓋率 | ≥ 75% | 單元測試 + 集成測試 |
+| 重複代碼 | ≤ 3% | 複製粘貼代碼比例 |
+| 技術債務 | ≤ 5% | 需要重構的代碼比例 |
+| Bug | 0 個 | 嚴重/阻塞級別 Bug |
+| 安全漏洞 | 0 個 | 任何級別安全漏洞 |
+
+---
+
 ## 📖 關鍵文件清單
 
 基於此遷移計畫，以下是最關鍵的5個文件：
@@ -840,6 +1452,148 @@ test('should create new goods', async ({ page }) => {
 
 ---
 
+## 📊 監控指標定義
+
+### 關鍵性能指標（KPIs）
+
+| 指標類別 | 指標名稱 | 目標值 | 告警閾值 | 監控工具 |
+|----------|----------|--------|----------|----------|
+| **性能** | 首屏加載時間（FCP） | < 2s | > 3s | Lighthouse CI |
+| **性能** | 可交互時間（TTI） | < 3s | > 4.5s | Web Vitals |
+| **性能** | 最大內容繪製（LCP） | < 2.5s | > 4s | Web Vitals |
+| **穩定性** | JavaScript 錯誤率 | < 0.1% | > 1% | Sentry |
+| **穩定性** | API 失敗率 | < 0.5% | > 2% | Grafana |
+| **穩定性** | 頁面崩潰率 | < 0.01% | > 0.1% | Sentry |
+| **用戶體驗** | 平均會話時長 | > 5min | < 3min | Google Analytics |
+| **用戶體驗** | 跳出率 | < 40% | > 60% | Google Analytics |
+
+### Lighthouse 評分目標
+
+| 類別 | Vue 基線 | React 目標 | 權重 |
+|------|----------|-----------|------|
+| Performance | 65 | 90+ | 25% |
+| Accessibility | 88 | 95+ | 25% |
+| Best Practices | 92 | 95+ | 25% |
+| SEO | 83 | 90+ | 25% |
+| **Overall** | **82** | **92+** | **100%** |
+
+### Web Vitals 核心指標
+
+```javascript
+// src/utils/webVitals.ts
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+
+function sendToAnalytics(metric: any) {
+  // 發送到 Google Analytics 或自建監控
+  const body = JSON.stringify({
+    name: metric.name,
+    value: metric.value,
+    id: metric.id,
+    page: window.location.pathname,
+  });
+
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon('/api/analytics/web-vitals', body);
+  }
+}
+
+getCLS(sendToAnalytics);  // Cumulative Layout Shift
+getFID(sendToAnalytics);  // First Input Delay
+getFCP(sendToAnalytics);  // First Contentful Paint
+getLCP(sendToAnalytics);  // Largest Contentful Paint
+getTTFB(sendToAnalytics); // Time to First Byte
+```
+
+### Sentry 告警配置
+
+```yaml
+# .sentryclirc
+[defaults]
+project = smartadmin-react
+org = your-org
+
+# Sentry 告警規則配置
+alerts:
+  # 錯誤率告警
+  - type: error-rate
+    threshold: 1%
+    window: 5min
+    notification:
+      - email: dev-team@example.com
+      - slack: #frontend-alerts
+
+  # 性能告警
+  - type: performance
+    metric: transaction-duration
+    threshold: 3s
+    percentile: 95
+    notification:
+      - slack: #frontend-alerts
+
+  # 新增錯誤告警
+  - type: new-issue
+    notification:
+      - slack: #frontend-alerts
+```
+
+### Grafana 儀表板配置
+
+**關鍵監控面板**:
+
+1. **性能監控面板**
+   - 首屏加載時間趨勢圖（按小時）
+   - TTI/LCP/FCP 分佈圖
+   - API 響應時間 P50/P95/P99
+
+2. **錯誤監控面板**
+   - JavaScript 錯誤率趨勢
+   - Top 10 錯誤類型
+   - 錯誤影響用戶數
+
+3. **業務監控面板**
+   - 活躍用戶數（DAU/MAU）
+   - 頁面瀏覽量（PV/UV）
+   - 核心功能使用率（登錄、CRUD、導出）
+
+### 性能預算（Performance Budget）
+
+| 資源類型 | 最大值 | 說明 |
+|----------|--------|------|
+| JavaScript | 250KB（gzip） | 主包 + vendor |
+| CSS | 50KB（gzip） | 樣式文件 |
+| 圖片 | 500KB | 首屏圖片總大小 |
+| 字體 | 100KB | Web 字體 |
+| **總計** | **900KB** | **首屏總資源** |
+
+**Lighthouse CI 配置**:
+
+```javascript
+// lighthouserc.js
+module.exports = {
+  ci: {
+    collect: {
+      staticDistDir: './dist',
+      numberOfRuns: 3,
+    },
+    assert: {
+      preset: 'lighthouse:recommended',
+      assertions: {
+        'categories:performance': ['error', { minScore: 0.9 }],
+        'categories:accessibility': ['error', { minScore: 0.95 }],
+        'first-contentful-paint': ['error', { maxNumericValue: 2000 }],
+        'largest-contentful-paint': ['error', { maxNumericValue: 2500 }],
+        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
+      },
+    },
+    upload: {
+      target: 'temporary-public-storage',
+    },
+  },
+};
+```
+
+---
+
 ## 📝 下一步行動
 
 ### 立即行動（本週內）
@@ -862,6 +1616,223 @@ test('should create new goods', async ({ page }) => {
 
 ---
 
+## 📅 進度追蹤模板
+
+### Phase 1 每日進度表（Week 1-2）
+
+| 日期 | 計劃任務 | 完成情況 | 遇到問題 | 解決方案 | 負責人 |
+|------|----------|----------|----------|----------|--------|
+| W1-D1 | Vite 腳手架搭建 | ⬜ | - | - | - |
+| W1-D2 | Redux Store 配置 | ⬜ | - | - | - |
+| W1-D3 | API 層封裝 | ⬜ | - | - | - |
+| W1-D4 | usePrivilege Hook POC | ⬜ | - | - | - |
+| W1-D5 | PrivilegeButton 組件 | ⬜ | - | - | - |
+| W2-D1 | 登錄頁遷移 | ⬜ | - | - | - |
+| W2-D2 | 登錄頁 E2E 測試 | ⬜ | - | - | - |
+| W2-D3 | 首頁遷移 | ⬜ | - | - | - |
+| W2-D4 | 菜單系統實現 | ⬜ | - | - | - |
+| W2-D5 | 動態路由生成 | ⬜ | - | - | - |
+
+**使用說明**:
+- ✅ 已完成
+- 🔄 進行中
+- ⬜ 未開始
+- ⚠️ 遇到問題
+
+### 燃盡圖追蹤
+
+```mermaid
+gantt
+    title Vue to React 遷移計劃燃盡圖
+    dateFormat YYYY-MM-DD
+    section Phase 1
+    Foundation & POC          :p1, 2026-03-10, 14d
+    section Phase 2
+    Core Infrastructure       :p2, after p1, 14d
+    section Phase 3
+    Component Migration       :p3, after p2, 28d
+    section Phase 4
+    Integration & Testing     :p4, after p3, 14d
+    section Phase 5
+    Optimization & Deployment :p5, after p4, 14d
+```
+
+### 里程碑檢查清單
+
+#### M1: POC 完成（Week 2）
+
+**登錄與認證**:
+- [ ] 登錄頁渲染正常（表單、樣式、驗證）
+- [ ] 用戶名/密碼登錄成功（調用後端 API）
+- [ ] Token 存儲正確（localStorage 或 sessionStorage）
+- [ ] Token 攜帶正確（Axios 攔截器自動添加）
+- [ ] 登錄失敗提示正確（錯誤信息、重試機制）
+
+**首頁與導航**:
+- [ ] 首頁渲染正常（快捷入口、統計數據、通知）
+- [ ] 側邊菜單正確（支持3層嵌套、展開/收起）
+- [ ] 菜單動態生成（基於後端返回的菜單樹）
+- [ ] 路由跳轉正常（點擊菜單切換頁面）
+- [ ] TagNav 正常（標籤頁新增、關閉、刷新）
+
+**權限系統**:
+- [ ] usePrivilege Hook 正確（返回 true/false）
+- [ ] PrivilegeButton 顯示/隱藏正確（根據權限）
+- [ ] 管理員用戶全部按鈕可見
+- [ ] 普通用戶部分按鈕隱藏
+- [ ] 路由權限正確（無權限頁面跳轉 403）
+
+**性能測試**:
+- [ ] 首屏加載時間 < 4s（POC 階段允許較慢）
+- [ ] 無 console 錯誤
+- [ ] 無 React Warning
+- [ ] 內存佔用 < 150MB
+
+**代碼質量**:
+- [ ] ESLint 無錯誤
+- [ ] TypeScript 編譯無錯誤
+- [ ] 單元測試通過（usePrivilege.test.ts）
+- [ ] E2E 測試通過（login.spec.ts）
+
+#### M2: 核心組件完成（Week 4）
+
+**通用組件**:
+- [ ] SmartEnumSelect（枚舉選擇器）
+- [ ] DictSelect（數據字典選擇器）
+- [ ] CategoryTreeSelect（分類樹選擇器）
+- [ ] TableOperator（表格操作欄）
+- [ ] FileUpload（文件上傳）
+- [ ] SmartLoading（加載指示器）
+- [ ] EmployeeSelect（員工選擇器）
+- [ ] Hooks: useTable、useModal、usePagination
+
+**Redux Slices**:
+- [ ] userSlice（用戶狀態）
+- [ ] appConfigSlice（應用配置）
+- [ ] dictSlice（數據字典）
+- [ ] roleSlice（角色狀態）
+- [ ] tenantSlice（多租戶）
+- [ ] spinSlice（加載狀態）
+- [ ] tagNavSlice（標籤頁導航）
+- [ ] menuSlice（菜單狀態）
+
+**功能測試**:
+- [ ] 語言切換正常（中文 ↔ 英文）
+- [ ] 頁面緩存正常（Keep-alive 機制）
+- [ ] 狀態持久化正常（redux-persist）
+
+#### M3: 50% 頁面遷移（Week 6）
+
+**System 模塊**:
+- [ ] employee-list（員工管理 - 412 行）
+- [ ] menu-list（菜單管理 - 278 行）
+- [ ] role-list（角色管理）
+- [ ] department-list（部門管理）
+
+**Business 模塊**:
+- [ ] goods-list（商品管理 - 529 行）
+- [ ] enterprise-list（企業管理 - 288 行）
+
+**進度指標**:
+- [ ] 頁面遷移完成率 ≥ 50%（97/195 個）
+- [ ] E2E 測試覆蓋核心流程
+- [ ] 單元測試覆蓋率 ≥ 60%
+
+#### M4: 100% 頁面遷移（Week 8）
+
+**所有模塊**:
+- [ ] System 模塊 100%（12 個頁面）
+- [ ] Business 模塊 100%（30+ 個頁面）
+- [ ] Support 模塊 100%（150+ 個頁面）
+
+**質量指標**:
+- [ ] 頁面遷移完成率 = 100%（195/195 個）
+- [ ] 單元測試覆蓋率 ≥ 75%
+- [ ] E2E 測試覆蓋率 100%（核心流程）
+- [ ] 無 P0/P1 級別 Bug
+
+#### M5: UAT 通過（Week 10）
+
+**功能測試**:
+- [ ] 登錄與認證（5個測試場景）
+- [ ] CRUD 操作（10個測試場景）
+- [ ] 權限控制（8個測試場景）
+- [ ] 導入/導出（5個測試場景）
+- [ ] 國際化（3個測試場景）
+
+**兼容性測試**:
+- [ ] Chrome（最新版 + 前兩個版本）
+- [ ] Edge（最新版）
+- [ ] Firefox（最新版）
+- [ ] Safari（最新版 - macOS）
+
+**性能測試**:
+- [ ] 首屏加載 < 2.5s
+- [ ] TTI < 3.5s
+- [ ] 表格渲染（1000行）< 1.2s
+
+**UAT 驗收**:
+- [ ] 產品經理驗收通過
+- [ ] 測試團隊驗收通過
+- [ ] 無 P0/P1 級別 Bug
+- [ ] 用戶反饋收集完成
+
+#### M6: 生產發布（Week 12）
+
+**性能優化**:
+- [ ] 首屏加載 < 2s
+- [ ] Lighthouse Performance ≥ 90
+- [ ] Bundle Size < 900KB（gzip）
+
+**灰度發布**:
+- [ ] 10% 流量切換成功（無錯誤）
+- [ ] 50% 流量切換成功（錯誤率 < 0.5%）
+- [ ] 100% 流量切換成功
+
+**監控配置**:
+- [ ] Sentry 錯誤監控正常
+- [ ] Grafana 儀表板配置完成
+- [ ] Lighthouse CI 集成到 CI/CD
+
+**文檔完善**:
+- [ ] 開發者文檔（README、架構說明）
+- [ ] 部署文檔（構建、部署、回滾）
+- [ ] 遷移報告（經驗總結、數據對比）
+
+### 週報模板
+
+```markdown
+# Vue to React 遷移週報 - Week X
+
+**報告週期**: 2026-MM-DD ~ 2026-MM-DD
+**報告人**: [姓名]
+
+## 本週完成
+
+- [ ] 任務1
+- [ ] 任務2
+
+## 下週計劃
+
+- [ ] 任務1
+- [ ] 任務2
+
+## 風險與問題
+
+| ID | 問題描述 | 影響 | 狀態 | 負責人 |
+|----|----------|------|------|--------|
+| R001 | ... | 高 | 🟡監控中 | @developer-a |
+
+## 關鍵指標
+
+| 指標 | 目標 | 實際 | 達成率 |
+|------|------|------|--------|
+| 頁面遷移進度 | X% | Y% | Z% |
+| 測試覆蓋率 | 75% | Y% | Z% |
+```
+
+---
+
 **計畫批准**: ⬜ 待批准
 **計畫執行**: ⬜ 待開始
-**計畫版本**: 1.0.0
+**計畫版本**: 1.1.0（最後更新：2026-03-09）

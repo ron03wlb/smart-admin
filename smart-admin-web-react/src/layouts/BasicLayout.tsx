@@ -126,7 +126,15 @@ export default function BasicLayout() {
       {/* 右側內容區域 */}
       <Layout>
         {/* 頂部導航欄 */}
-        <Header style={{ padding: '0 16px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Header
+          style={{
+            padding: '0 16px',
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           {/* 左側：折疊按鈕 */}
           <Button
             type="text"

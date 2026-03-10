@@ -163,22 +163,19 @@ export const getLoginInfo = createAsyncThunk(
 /**
  * 退出登錄 AsyncThunk
  */
-export const logout = createAsyncThunk(
-  'user/logout',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await loginApi.logout();
+export const logout = createAsyncThunk('user/logout', async (_, { rejectWithValue }) => {
+  try {
+    const response = await loginApi.logout();
 
-      if (response.ok) {
-        return;
-      } else {
-        return rejectWithValue(response.msg || '退出登錄失敗');
-      }
-    } catch (error: any) {
-      return rejectWithValue(error.message || '網絡錯誤');
+    if (response.ok) {
+      return;
+    } else {
+      return rejectWithValue(response.msg || '退出登錄失敗');
     }
+  } catch (error: any) {
+    return rejectWithValue(error.message || '網絡錯誤');
   }
-);
+});
 
 // ==================== Slice ====================
 
@@ -204,7 +201,7 @@ export const userSlice = createSlice({
     /**
      * 清除用戶狀態（本地退出）
      */
-    clearUserState: (state) => {
+    clearUserState: state => {
       state.token = '';
       state.employeeId = '';
       state.employeeName = '';
@@ -221,10 +218,10 @@ export const userSlice = createSlice({
       localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_INFO);
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // ========== login ==========
     builder
-      .addCase(login.pending, (state) => {
+      .addCase(login.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -238,12 +235,12 @@ export const userSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || '登錄失敗';
+        state.error = (action.payload as string) || '登錄失敗';
       });
 
     // ========== getLoginInfo ==========
     builder
-      .addCase(getLoginInfo.pending, (state) => {
+      .addCase(getLoginInfo.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -279,11 +276,11 @@ export const userSlice = createSlice({
 
     // ========== logout ==========
     builder
-      .addCase(logout.pending, (state) => {
+      .addCase(logout.pending, state => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(logout.fulfilled, (state) => {
+      .addCase(logout.fulfilled, state => {
         // 清除所有狀態
         state.loading = false;
         state.token = '';

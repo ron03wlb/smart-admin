@@ -37,7 +37,7 @@ export function usePrivilege(permission: string): boolean {
   }
 
   // 檢查權限列表中是否包含該權限
-  return pointsList.some((point) => point.webPerms === permission);
+  return pointsList.some(point => point.webPerms === permission);
 }
 
 /**
@@ -61,9 +61,7 @@ export function usePrivileges(permissions: string[]): boolean {
   }
 
   // 檢查是否擁有所有權限
-  return permissions.every((permission) =>
-    pointsList.some((point) => point.webPerms === permission)
-  );
+  return permissions.every(permission => pointsList.some(point => point.webPerms === permission));
 }
 
 /**
@@ -87,7 +85,5 @@ export function useAnyPrivilege(permissions: string[]): boolean {
   }
 
   // 檢查是否擁有任一權限
-  return permissions.some((permission) =>
-    pointsList.some((point) => point.webPerms === permission)
-  );
+  return permissions.some(permission => pointsList.some(point => point.webPerms === permission));
 }

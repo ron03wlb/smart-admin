@@ -29,9 +29,7 @@ export default function DynamicPage() {
         status="404"
         title="404"
         subTitle="抱歉，您訪問的頁面不存在"
-        extra={
-          <Navigate to="/home" replace />
-        }
+        extra={<Navigate to="/home" replace />}
       />
     );
   }

@@ -1,0 +1,17 @@
+/**
+ * FileUpload Component Styles
+ * 文件上傳組件樣式
+ */
+
+.file-upload-container {
+  display: inline-block;
+}
+
+.file-upload-container .ant-upload-picture-card-wrapper {
+  display: flex;
+}
+
+.file-upload-container .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}

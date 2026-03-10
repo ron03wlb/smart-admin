@@ -25,9 +25,7 @@ export default function EmployeePage() {
         <Paragraph>
           路由路徑：<code>/system/employee</code>
         </Paragraph>
-        <Paragraph type="secondary">
-          完整的 CRUD 功能將在後續階段實現。
-        </Paragraph>
+        <Paragraph type="secondary">完整的 CRUD 功能將在後續階段實現。</Paragraph>
       </Card>
     </div>
   );

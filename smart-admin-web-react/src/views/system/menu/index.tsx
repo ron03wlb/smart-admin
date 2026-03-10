@@ -21,9 +21,7 @@ export default function MenuPage() {
         <Paragraph>
           路由路徑：<code>/system/menu</code>
         </Paragraph>
-        <Paragraph type="secondary">
-          完整的菜單樹管理功能將在後續階段實現。
-        </Paragraph>
+        <Paragraph type="secondary">完整的菜單樹管理功能將在後續階段實現。</Paragraph>
       </Card>
     </div>
   );

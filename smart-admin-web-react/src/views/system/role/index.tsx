@@ -21,9 +21,7 @@ export default function RolePage() {
         <Paragraph>
           路由路徑：<code>/system/role</code>
         </Paragraph>
-        <Paragraph type="secondary">
-          完整的角色權限管理功能將在後續階段實現。
-        </Paragraph>
+        <Paragraph type="secondary">完整的角色權限管理功能將在後續階段實現。</Paragraph>
       </Card>
     </div>
   );

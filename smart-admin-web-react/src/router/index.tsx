@@ -22,7 +22,11 @@ import DynamicPage from '@/components/DynamicPage';
  * 提供加載中狀態
  */
 const LazyLoad = ({ children }: { children: React.ReactNode }) => {
-  return <Suspense fallback={<Spin size="large" style={{ marginTop: '20%', display: 'block' }} />}>{children}</Suspense>;
+  return (
+    <Suspense fallback={<Spin size="large" style={{ marginTop: '20%', display: 'block' }} />}>
+      {children}
+    </Suspense>
+  );
 };
 
 // ==================== 頁面組件懶加載 ====================

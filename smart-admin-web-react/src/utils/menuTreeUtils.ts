@@ -23,10 +23,10 @@ export function buildMenuTree(menuList: MenuItem[]): MenuItem[] {
   }
 
   // 過濾出頂級菜單（parentId 為 0 或 null）
-  const rootMenus = menuList.filter((menu) => !menu.parentId || menu.parentId === 0);
+  const rootMenus = menuList.filter(menu => !menu.parentId || menu.parentId === 0);
 
   // 構建每個頂級菜單的子樹
-  const menuTree = rootMenus.map((menu) => buildMenuChildren(menu, menuList));
+  const menuTree = rootMenus.map(menu => buildMenuChildren(menu, menuList));
 
   // 按 sort 排序
   return menuTree.sort((a, b) => a.sort - b.sort);
@@ -44,12 +44,12 @@ export function buildMenuChildren(parentMenu: MenuItem, allMenus: MenuItem[]): M
   const menu = { ...parentMenu };
 
   // 找到所有子菜單
-  const children = allMenus.filter((item) => item.parentId === menu.menuId);
+  const children = allMenus.filter(item => item.parentId === menu.menuId);
 
   if (children.length > 0) {
     // 遞歸構建子菜單並排序
     menu.children = children
-      .map((child) => buildMenuChildren(child, allMenus))
+      .map(child => buildMenuChildren(child, allMenus))
       .sort((a, b) => a.sort - b.sort);
   }
 
@@ -70,7 +70,7 @@ export function buildMenuParentIdListMap(menuTree: MenuItem[]): Record<number, n
   const map: Record<number, number[]> = {};
 
   const traverse = (menus: MenuItem[], parentIds: number[] = []) => {
-    menus.forEach((menu) => {
+    menus.forEach(menu => {
       // 當前菜單的所有父ID + 自身ID
       const currentPath = [...parentIds, menu.menuId];
       map[menu.menuId] = currentPath;
@@ -95,8 +95,8 @@ export function buildMenuParentIdListMap(menuTree: MenuItem[]): Record<number, n
  */
 export function filterMenuTreeForDisplay(menuTree: MenuItem[]): MenuItem[] {
   return menuTree
-    .filter((menu) => menu.menuType !== MenuTypeEnum.POINTS && menu.visibleFlag)
-    .map((menu) => ({
+    .filter(menu => menu.menuType !== MenuTypeEnum.POINTS && menu.visibleFlag)
+    .map(menu => ({
       ...menu,
       children: menu.children ? filterMenuTreeForDisplay(menu.children) : undefined,
     }));
@@ -111,8 +111,8 @@ export function filterMenuTreeForDisplay(menuTree: MenuItem[]): MenuItem[] {
  */
 export function extractPermissionPoints(menuList: MenuItem[]): PermissionPoint[] {
   return menuList
-    .filter((menu) => menu.menuType === MenuTypeEnum.POINTS && menu.webPerms)
-    .map((menu) => ({
+    .filter(menu => menu.menuType === MenuTypeEnum.POINTS && menu.webPerms)
+    .map(menu => ({
       menuId: menu.menuId,
       webPerms: menu.webPerms!,
       menuName: menu.menuName,
@@ -130,7 +130,7 @@ export function generateRouteList(menuTree: MenuItem[]): string[] {
   const routes: string[] = [];
 
   const traverse = (menus: MenuItem[]) => {
-    menus.forEach((menu) => {
+    menus.forEach(menu => {
       // 只添加菜單類型且有路徑的項
       if (menu.menuType === MenuTypeEnum.MENU && menu.path) {
         routes.push(menu.path);
