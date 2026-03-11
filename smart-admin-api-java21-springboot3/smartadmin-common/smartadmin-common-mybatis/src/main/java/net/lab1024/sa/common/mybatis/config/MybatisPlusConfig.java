@@ -2,6 +2,7 @@ package net.lab1024.sa.common.mybatis.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import net.lab1024.sa.common.mybatis.handler.SmartTenantLineHandler;
@@ -23,7 +24,7 @@ public class MybatisPlusConfig {
   @Value("${tenant.enabled:false}")
   private boolean tenantEnabled;
 
-  /** 分页插件 + 多租户插件 */
+  /** 分页插件 + 多租户插件 + 乐观锁插件 */
   @Bean
   public MybatisPlusInterceptor paginationInterceptor() {
     MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
@@ -33,6 +34,9 @@ public class MybatisPlusConfig {
       tenantInterceptor.setTenantLineHandler(new SmartTenantLineHandler());
       interceptor.addInnerInterceptor(tenantInterceptor);
     }
+
+    // 乐观锁插件 (optimistic locking for @Version annotated entities)
+    interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
 
     interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
     return interceptor;
