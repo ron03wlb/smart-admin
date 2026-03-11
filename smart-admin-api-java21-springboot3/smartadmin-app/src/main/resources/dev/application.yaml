@@ -60,8 +60,8 @@ spring:
   # 數據源配置（PostgreSQL）
   datasource:
     url: jdbc:postgresql://localhost:5432/smart_admin
-    username: postgres
-    password: postgres
+    username: smartadmin
+    password: SmartAdmin@2024
     driver-class-name: org.postgresql.Driver
 
     # HikariCP 連接池配置
@@ -83,8 +83,8 @@ spring:
     validate-on-migrate: true
     out-of-order: true
     table: flyway_schema_history
-    user: postgres
-    password: postgres
+    user: smartadmin
+    password: SmartAdmin@2024
 
   # Redis 配置
   data:
@@ -226,7 +226,7 @@ smart:
 
   # Kafka 消息配置
   kafka:
-    enabled: false  # 暫時禁用 Kafka（Kafka 服務未運行）
+    enabled: true  # 啟用 Kafka（Kafka 服務已運行）
     bootstrap-servers: localhost:9094
     producer:
       acks: all

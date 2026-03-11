@@ -185,6 +185,10 @@ GRANT USAGE, SELECT ON SEQUENCE t_approval_delegation_delegation_id_seq TO smart
 ALTER TABLE t_payment_order ADD COLUMN IF NOT EXISTS approval_required BOOLEAN NOT NULL DEFAULT FALSE;
 COMMENT ON COLUMN t_payment_order.approval_required IS '是否需要人工審批 (TRUE=需要審批, FALSE=自動審批或存款訂單)';
 
+-- Add deleted column for soft delete support (consistent with other iGaming tables)
+ALTER TABLE t_payment_order ADD COLUMN IF NOT EXISTS deleted BOOLEAN NOT NULL DEFAULT FALSE;
+COMMENT ON COLUMN t_payment_order.deleted IS '軟刪除標記 (TRUE=已刪除, FALSE=正常)';
+
 CREATE INDEX IF NOT EXISTS idx_payment_order_approval_required ON t_payment_order (approval_required, status) WHERE order_type = 2 AND deleted = FALSE;
 
 -- =====================================================================

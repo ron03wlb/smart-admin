@@ -34,8 +34,8 @@ class FinancialReportServiceTest {
   @Mock private WalletTransactionDao walletTransactionDao;
   @InjectMocks private FinancialReportService financialReportService;
 
-  private final LocalDate START = LocalDate.of(2026, 2, 1);
-  private final LocalDate END = LocalDate.of(2026, 2, 28);
+  private static final LocalDate START = LocalDate.of(2026, 2, 1);
+  private static final LocalDate END = LocalDate.of(2026, 2, 28);
 
   @Nested
   @DisplayName("GGR 計算")

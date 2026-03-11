@@ -123,11 +123,11 @@ public class SecurityLoginService {
               .userId(userId)
               .userType(userType.getValue())
               .loginName(loginName)
-              .tenantId(tenantId)
               .loginFailCount(loginFailCount)
               .lockFlag(lockFlag)
               .loginLockBeginTime(lockBeginTime)
               .build();
+      loginFail.setTenantId(tenantId);
       loginFailDao.insert(loginFail);
     } else {
       loginFail.setLoginLockBeginTime(lockBeginTime);
