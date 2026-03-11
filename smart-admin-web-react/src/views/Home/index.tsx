@@ -70,10 +70,11 @@ export default function HomePage() {
         <p>✅ Week 2 Day 3: userSlice 完整遷移（菜單樹構建 - 427 行）</p>
         <p>✅ Week 2 Day 4: 首頁 + 側邊欄菜單（動態菜單渲染）</p>
         <p>✅ Week 2 Day 5: 動態路由加載（React.lazy 懶加載）</p>
-        <p>✅ Week 3: 通用組件庫建設（10+ 組件，188 單元測試）</p>
-        <p>✅ Week 4 Day 1-3: Redux Slices（appConfig、role、tenant）</p>
-        <p>✅ Week 4 Day 4: 國際化集成（react-i18next + Ant Design Locale）</p>
-        <p>⏳ Week 4 Day 5: Keep-alive 緩存機制（進行中）</p>
+        <p>✅ Week 3: 通用組件庫建設（10 組件，188 單元測試）</p>
+        <p>✅ Week 4 Day 1-3: Redux Slices（appConfig、role、tenant，80 測試）</p>
+        <p>✅ Week 4 Day 4: 國際化集成（react-i18next + Ant Design）</p>
+        <p>✅ Week 4 Day 5: Keep-alive 緩存機制（react-activation）</p>
+        <p>⏳ Week 4 收尾: 剩餘 Slices 實作（進行中）</p>
       </Card>
     </div>
   );
