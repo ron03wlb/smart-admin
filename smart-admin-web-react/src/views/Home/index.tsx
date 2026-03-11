@@ -60,21 +60,14 @@ export default function HomePage() {
 
       <Card style={{ marginTop: 24 }}>
         <Title level={4}>Phase 1 POC 進度</Title>
-        <p>✅ Week 1 Day 1: 專案初始化與基礎配置</p>
-        <p>✅ Week 1 Day 2: HTTP 客戶端 + API 層</p>
-        <p>✅ Week 1 Day 3: Redux Store 基礎架構</p>
-        <p>✅ Week 1 Day 4: 權限系統 POC（usePrivilege Hook）</p>
-        <p>✅ Week 1 Day 5: 路由基礎架構（BasicLayout + ProtectedRoute）</p>
-        <p>✅ Week 2 Day 1: 登錄頁面 Part 1（表單驗證）</p>
-        <p>✅ Week 2 Day 2: 登錄頁面 Part 2（MFA 支持）</p>
-        <p>✅ Week 2 Day 3: userSlice 完整遷移（菜單樹構建 - 427 行）</p>
-        <p>✅ Week 2 Day 4: 首頁 + 側邊欄菜單（動態菜單渲染）</p>
-        <p>✅ Week 2 Day 5: 動態路由加載（React.lazy 懶加載）</p>
-        <p>✅ Week 3: 通用組件庫建設（10 組件，188 單元測試）</p>
-        <p>✅ Week 4 Day 1-3: Redux Slices（appConfig、role、tenant，80 測試）</p>
-        <p>✅ Week 4 Day 4: 國際化集成（react-i18next + Ant Design）</p>
-        <p>✅ Week 4 Day 5: Keep-alive 緩存機制（react-activation）</p>
-        <p>⏳ Week 4 收尾: 剩餘 Slices 實作（進行中）</p>
+        <p>✅ Week 1: 專案初始化 + HTTP 客戶端 + Redux Store + 權限系統 + 路由</p>
+        <p>✅ Week 2: 登錄頁面（表單驗證 + MFA）+ userSlice + 首頁 + 動態路由</p>
+        <p>✅ Week 3: 通用組件庫（10 組件，188 單元測試）</p>
+        <p>✅ Week 4: Redux Slices（4 slices，91 測試）+ i18n + Keep-alive</p>
+        <p style={{ marginTop: 16, fontWeight: 'bold', color: '#52c41a' }}>
+          🎉 M2 里程碑達成！累計 279 測試，覆蓋率 &gt; 80%
+        </p>
+        <p style={{ marginTop: 8 }}>⏳ 下一步：Phase 3 組件遷移（準備中）</p>
       </Card>
     </div>
   );
