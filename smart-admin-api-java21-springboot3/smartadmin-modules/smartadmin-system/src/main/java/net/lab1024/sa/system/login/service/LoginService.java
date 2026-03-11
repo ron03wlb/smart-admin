@@ -220,6 +220,7 @@ public class LoginService implements StpInterface {
                 employeeEntity.getEmployeeId(),
                 UserTypeEnum.ADMIN_EMPLOYEE,
                 employeeEntity.getLoginName(),
+                employeeEntity.getTenantId(),
                 loginFailEntityResponseDTO.getData());
         return msg == null
             ? ResponseDTO.userErrorParam("登录名或密码错误！")
@@ -733,6 +734,7 @@ public class LoginService implements StpInterface {
           employeeEntity.getEmployeeId(),
           UserTypeEnum.ADMIN_EMPLOYEE,
           employeeEntity.getLoginName(),
+          employeeEntity.getTenantId(),
           null);
       return ResponseDTO.error(UserErrorCode.MFA_VERIFY_FAIL, "多因素認證碼錯誤");
     }

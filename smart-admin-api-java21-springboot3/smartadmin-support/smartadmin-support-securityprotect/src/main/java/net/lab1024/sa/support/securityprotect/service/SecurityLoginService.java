@@ -95,11 +95,16 @@ public class SecurityLoginService {
    * @param userId 用户ID
    * @param userType 用户类型
    * @param loginName 登录名
+   * @param tenantId 租户ID
    * @param loginFailEntity 登录失败实体
    * @return 提示消息
    */
   public String recordLoginFail(
-      Long userId, UserTypeEnum userType, String loginName, LoginFailEntity loginFailEntity) {
+      Long userId,
+      UserTypeEnum userType,
+      String loginName,
+      Long tenantId,
+      LoginFailEntity loginFailEntity) {
 
     // 若登录最大失败次数小于1，无需记录
     if (securityConfigProvider.getLoginFailMaxTimes() < SecurityConst.MIN_FAIL_TIMES_THRESHOLD) {
@@ -118,6 +123,7 @@ public class SecurityLoginService {
               .userId(userId)
               .userType(userType.getValue())
               .loginName(loginName)
+              .tenantId(tenantId)
               .loginFailCount(loginFailCount)
               .lockFlag(lockFlag)
               .loginLockBeginTime(lockBeginTime)
