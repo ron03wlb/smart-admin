@@ -94,6 +94,7 @@ public class PaymentManager {
     transaction.setReferenceType("PAYMENT_ORDER");
     transaction.setReferenceId(order.getOrderNo());
     transaction.setDescription("Deposit via " + order.getPspCode());
+    transaction.setTenantId(wallet.getTenantId()); // FIX: Set tenant_id from wallet
 
     return walletManager.credit(wallet, transaction);
   }
@@ -133,6 +134,7 @@ public class PaymentManager {
     transaction.setReferenceType("PAYMENT_ORDER");
     transaction.setReferenceId(order.getOrderNo());
     transaction.setDescription("Withdrawal via " + order.getPspCode());
+    transaction.setTenantId(wallet.getTenantId()); // FIX: Set tenant_id from wallet
 
     WalletTransactionEntity result = walletManager.debit(wallet, transaction);
 

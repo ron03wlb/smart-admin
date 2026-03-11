@@ -217,6 +217,7 @@ public class WalletService {
           transaction.setReferenceType(form.getReferenceType());
           transaction.setReferenceId(form.getReferenceId());
           transaction.setDescription(form.getDescription());
+          transaction.setTenantId(wallet.getTenantId()); // Fix: set tenant_id from wallet
 
           // Update wallet balance
           wallet.setBalance(balanceAfter);
@@ -287,6 +288,7 @@ public class WalletService {
           transaction.setReferenceType(form.getReferenceType());
           transaction.setReferenceId(form.getReferenceId());
           transaction.setDescription(form.getDescription());
+          transaction.setTenantId(wallet.getTenantId()); // Fix: set tenant_id from wallet
 
           // Update wallet balance
           wallet.setBalance(balanceAfter);
@@ -452,6 +454,7 @@ public class WalletService {
           transaction.setReferenceType("BONUS_CREDIT");
           transaction.setReferenceId(String.valueOf(form.getBonusId()));
           transaction.setDescription(form.getDescription());
+          transaction.setTenantId(bonusWallet.getTenantId()); // Fix: set tenant_id from wallet
 
           // Update wallet balance
           bonusWallet.setBalance(balanceAfter);

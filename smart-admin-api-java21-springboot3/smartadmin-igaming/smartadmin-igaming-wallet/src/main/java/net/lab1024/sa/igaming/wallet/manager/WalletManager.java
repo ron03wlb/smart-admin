@@ -315,6 +315,7 @@ public class WalletManager {
     debitTx.setReferenceType("BONUS_CONVERT");
     debitTx.setReferenceId(String.valueOf(bonusExt.getId()));
     debitTx.setDescription("Bonus conversion debit: ext " + bonusExt.getId());
+    debitTx.setTenantId(bonusWallet.getTenantId()); // Fix: set tenant_id from wallet
     walletTransactionDao.insert(debitTx);
 
     // Record credit transaction on CASH wallet
@@ -330,6 +331,7 @@ public class WalletManager {
     creditTx.setReferenceType("BONUS_CONVERT");
     creditTx.setReferenceId(String.valueOf(bonusExt.getId()));
     creditTx.setDescription("Bonus conversion credit: ext " + bonusExt.getId());
+    creditTx.setTenantId(cashWallet.getTenantId()); // Fix: set tenant_id from wallet
     walletTransactionDao.insert(creditTx);
 
     publishWalletEvent(DomainEventTypeConst.BONUS_CONVERTED, cashWallet, creditTx);

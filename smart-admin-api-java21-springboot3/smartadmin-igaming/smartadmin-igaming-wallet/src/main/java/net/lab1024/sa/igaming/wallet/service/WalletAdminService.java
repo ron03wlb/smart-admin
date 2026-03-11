@@ -130,6 +130,7 @@ public class WalletAdminService {
           transaction.setReferenceType("ADMIN_ADJUST");
           transaction.setReferenceId(String.valueOf(tenantId));
           transaction.setDescription(form.getReason());
+          transaction.setTenantId(wallet.getTenantId()); // FIX: Set tenant_id from wallet
 
           // Update wallet balance
           wallet.setBalance(balanceAfter);
