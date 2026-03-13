@@ -45,6 +45,7 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/support/login-fail': lazy(() => import('@/views/support/login-fail')),
   '/support/operate-log': lazy(() => import('@/views/support/operate-log')),
   '/support/change-log': lazy(() => import('@/views/support/change-log')),
+  '/support/job': lazy(() => import('@/views/support/job')),
 
   // 更多路由映射將在實現對應頁面時添加...
   // 例如：'/business/notice', '/business/category' 等
