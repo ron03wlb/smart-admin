@@ -28,15 +28,26 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/system/employee': lazy(() => import('@/views/system/employee')),
   '/system/role': lazy(() => import('@/views/system/role')),
   '/system/menu': lazy(() => import('@/views/system/menu')),
+  '/system/position': lazy(() => import('@/views/system/position')),
+  '/system/department': lazy(() => import('@/views/system/department')),
 
   // ==================== Business 模塊 ====================
   '/business/goods': lazy(() => import('@/views/business/goods')),
+  '/business/enterprise': lazy(() => import('@/views/business/enterprise')),
+  '/business/notice': lazy(() => import('@/views/business/notice')),
+  '/business/category': lazy(() => import('@/views/business/category')),
 
   // ==================== Support 模塊 ====================
   '/support/file': lazy(() => import('@/views/support/file')),
+  '/support/config': lazy(() => import('@/views/support/config')),
+  '/support/feedback': lazy(() => import('@/views/support/feedback')),
+  '/support/login-log': lazy(() => import('@/views/support/login-log')),
+  '/support/login-fail': lazy(() => import('@/views/support/login-fail')),
+  '/support/operate-log': lazy(() => import('@/views/support/operate-log')),
+  '/support/change-log': lazy(() => import('@/views/support/change-log')),
 
   // 更多路由映射將在實現對應頁面時添加...
-  // 例如：'/system/department', '/business/category', '/support/feedback' 等
+  // 例如：'/business/notice', '/business/category' 等
 };
 
 // ==================== 動態路由生成 ====================
