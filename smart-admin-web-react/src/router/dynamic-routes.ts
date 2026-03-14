@@ -54,6 +54,8 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/support/reload': lazy(() => import('@/views/support/reload')),
   '/support/api-encrypt': lazy(() => import('@/views/support/api-encrypt')),
   '/support/message': lazy(() => import('@/views/support/message')),
+  '/support/level3-protect': lazy(() => import('@/views/support/level3-protect')),
+  '/support/level3-protect/data-masking': lazy(() => import('@/views/support/level3-protect/data-masking')),
 
   // 更多路由映射將在實現對應頁面時添加...
   // 例如：'/business/notice', '/business/category' 等
