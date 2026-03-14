@@ -53,6 +53,7 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/support/heart-beat': lazy(() => import('@/views/support/heart-beat')),
   '/support/reload': lazy(() => import('@/views/support/reload')),
   '/support/api-encrypt': lazy(() => import('@/views/support/api-encrypt')),
+  '/support/message': lazy(() => import('@/views/support/message')),
 
   // 更多路由映射將在實現對應頁面時添加...
   // 例如：'/business/notice', '/business/category' 等
