@@ -59,6 +59,7 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/support/message': lazy(() => import('@/views/support/message')),
   '/support/level3-protect': lazy(() => import('@/views/support/level3-protect')),
   '/support/level3-protect/data-masking': lazy(() => import('@/views/support/level3-protect/data-masking')),
+  '/support/code-generator': lazy(() => import('@/views/support/code-generator')),
 
   // 更多路由映射將在實現對應頁面時添加...
   // 例如：'/business/notice', '/business/category' 等

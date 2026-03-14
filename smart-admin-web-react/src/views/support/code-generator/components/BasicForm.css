@@ -1,0 +1,15 @@
+.basic-form-container {
+  display: flex;
+}
+
+.preview-title {
+  font-weight: 600;
+  margin: 5px 0px;
+}
+
+.preview-block {
+  font-size: 14px;
+  padding: 10px 5px;
+  background-color: #f5f5f5;
+  margin-bottom: 16px;
+}
