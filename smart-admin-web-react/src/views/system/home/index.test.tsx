@@ -31,6 +31,11 @@ vi.mock('@/api/support/changeLogApi', () => ({
   },
 }));
 
+// Mock echarts-for-react to avoid Canvas rendering issues in test environment
+vi.mock('echarts-for-react', () => ({
+  default: ({ option }: any) => <div data-testid="echarts-mock">{option?.series?.[0]?.name || 'Chart'}</div>,
+}));
+
 describe('HomePage', () => {
   let store: any;
 
@@ -116,6 +121,22 @@ describe('HomePage', () => {
       expect(screen.getByText('聯繫我們')).toBeInTheDocument();
       expect(screen.getByText('更新日誌')).toBeInTheDocument();
       expect(screen.getByText('待辦工作')).toBeInTheDocument();
+    });
+  });
+
+  it('應該顯示圖表組件', async () => {
+    render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <HomePage />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('加班統計')).toBeInTheDocument();
+      expect(screen.getByText('銷量統計')).toBeInTheDocument();
+      expect(screen.getByText('代碼提交量')).toBeInTheDocument();
     });
   });
 });

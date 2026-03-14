@@ -14,6 +14,9 @@ import HomeNotice from './components/HomeNotice';
 import OfficialAccountCard from './components/OfficialAccountCard';
 import ChangelogCard from './components/ChangelogCard';
 import ToBeDoneCard from './components/ToBeDoneCard';
+import PieChart from './components/charts/PieChart';
+import CategoryChart from './components/charts/CategoryChart';
+import GradientChart from './components/charts/GradientChart';
 import './index.css';
 
 const HomePage: React.FC = () => {
@@ -41,23 +44,17 @@ const HomePage: React.FC = () => {
               <HomeNotice title="通知" noticeTypeId={2} />
             </Col>
 
-            {/* 圖表組件 - Phase 2 實現 */}
+            {/* 圖表組件 */}
             <Col span={12}>
-              <div style={{ height: 300, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                Pie Chart (Phase 2)
-              </div>
+              <PieChart />
             </Col>
 
             <Col span={12}>
-              <div style={{ height: 300, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                Category Chart (Phase 2)
-              </div>
+              <CategoryChart />
             </Col>
 
             <Col span={24}>
-              <div style={{ height: 300, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                Gradient Chart (Phase 2)
-              </div>
+              <GradientChart />
             </Col>
           </Row>
         </Col>
