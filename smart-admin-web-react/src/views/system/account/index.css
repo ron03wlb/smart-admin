@@ -1,0 +1,28 @@
+/**
+ * Account Page Styles
+ * 個人中心樣式
+ *
+ * 參考：Vue 版本 smart-admin-web/src/views/system/account/index.vue
+ */
+
+.account-container {
+  display: flex;
+  height: calc(100vh - 150px);
+  padding: 20px;
+}
+
+.account-menu-list {
+  width: 180px;
+  height: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.account-content {
+  flex: 1;
+  margin-left: 10px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  overflow-y: auto;
+}

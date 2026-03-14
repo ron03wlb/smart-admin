@@ -30,6 +30,7 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/system/menu': lazy(() => import('@/views/system/menu')),
   '/system/position': lazy(() => import('@/views/system/position')),
   '/system/department': lazy(() => import('@/views/system/department')),
+  '/system/account': lazy(() => import('@/views/system/account')),
 
   // ==================== Business 模塊 ====================
   '/business/goods': lazy(() => import('@/views/business/goods')),

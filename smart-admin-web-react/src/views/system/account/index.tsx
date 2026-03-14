@@ -1,53 +1,101 @@
 /**
- * Account Center Index
+ * Account Page
+ * 個人中心主頁面
  *
- * Corresponds to Vue's system/account/index.vue (105L)
- * Tab-based container for personal center sub-pages.
+ * 參考：Vue 版本 smart-admin-web/src/views/system/account/index.vue
+ *
+ * @Author: SmartAdmin React Team
+ * @Date: 2026-03-14
  */
-import React, { useState } from 'react';
-import { Card, Menu } from 'antd';
-import {
-  UserOutlined,
-  LockOutlined,
-  MailOutlined,
-  FileTextOutlined,
-  HistoryOutlined,
-} from '@ant-design/icons';
-import AccountCenter from './components/AccountCenter';
-import AccountPassword from './components/AccountPassword';
-import AccountMessage from './components/AccountMessage';
-import AccountLoginLog from './components/AccountLoginLog';
-import AccountOperateLog from './components/AccountOperateLog';
 
-const MENU_ITEMS = [
-  { key: 'center', label: '个人中心', icon: <UserOutlined />, component: AccountCenter },
-  { key: 'password', label: '修改密码', icon: <LockOutlined />, component: AccountPassword },
-  { key: 'message', label: '我的消息', icon: <MailOutlined />, component: AccountMessage },
-  { key: 'loginLog', label: '登录日志', icon: <HistoryOutlined />, component: AccountLoginLog },
-  { key: 'operateLog', label: '操作日志', icon: <FileTextOutlined />, component: AccountOperateLog },
-];
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Menu, Badge, Spin } from 'antd';
+import { getAccountMenuList, getAccountMenuById, type AccountMenuItem } from './accountMenu';
+import { useAppSelector } from '@/store/hooks';
+import './index.css';
 
-const AccountIndex: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('center');
+const AccountPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const menuList = getAccountMenuList();
+  const [selectedMenu, setSelectedMenu] = useState<AccountMenuItem>(menuList[0]);
 
-  const ActiveComponent = MENU_ITEMS.find((m) => m.key === activeKey)?.component || AccountCenter;
+  // 從 Redux 獲取未讀消息數（如果有的話）
+  // const unreadMessageCount = useAppSelector((state) => state.user.unreadMessageCount || 0);
+  const unreadMessageCount = 0; // 暫時硬編碼
+
+  /**
+   * 初始化和路由參數處理
+   */
+  useEffect(() => {
+    const menuId = searchParams.get('menuId');
+    if (menuId) {
+      const menu = getAccountMenuById(menuId);
+      if (menu) {
+        setSelectedMenu(menu);
+      }
+    }
+  }, [searchParams]);
+
+  /**
+   * 選擇菜單
+   */
+  const handleSelectMenu = (menuId: string) => {
+    const menu = getAccountMenuById(menuId);
+    if (menu) {
+      setSelectedMenu(menu);
+      setSearchParams({ menuId });
+    }
+  };
+
+  /**
+   * 渲染菜單項標籤（帶未讀消息徽章）
+   */
+  const renderMenuLabel = (menu: AccountMenuItem) => {
+    if (menu.menuId === 'message' && unreadMessageCount > 0) {
+      return (
+        <span>
+          {menu.menuName}
+          <Badge count={unreadMessageCount} style={{ marginLeft: 10 }} />
+        </span>
+      );
+    }
+    return menu.menuName;
+  };
+
+  /**
+   * 菜單項配置
+   */
+  const menuItems = menuList.map((menu) => ({
+    key: menu.menuId,
+    label: renderMenuLabel(menu),
+  }));
+
+  /**
+   * 動態渲染選中的組件
+   */
+  const SelectedComponent = selectedMenu.component;
 
   return (
-    <div style={{ display: 'flex', gap: 16, height: '100%' }}>
-      <Card style={{ width: 200, flexShrink: 0 }} styles={{ body: { padding: 0 } }}>
+    <div className="account-container">
+      {/* 左側菜單 */}
+      <div className="account-menu-list">
         <Menu
           mode="inline"
-          selectedKeys={[activeKey]}
-          onSelect={({ key }) => setActiveKey(key)}
-          style={{ borderRight: 'none' }}
-          items={MENU_ITEMS.map(({ key, label, icon }) => ({ key, label, icon }))}
+          selectedKeys={[selectedMenu.menuId]}
+          items={menuItems}
+          onClick={({ key }) => handleSelectMenu(key)}
         />
-      </Card>
-      <Card style={{ flex: 1, overflow: 'auto' }}>
-        <ActiveComponent />
-      </Card>
+      </div>
+
+      {/* 右側內容區 */}
+      <div className="account-content">
+        <Suspense fallback={<Spin size="large" style={{ display: 'block', margin: '100px auto' }} />}>
+          <SelectedComponent />
+        </Suspense>
+      </div>
     </div>
   );
 };
 
-export default AccountIndex;
+export default AccountPage;
