@@ -5,26 +5,17 @@
  * 參考：Vue 版本 smart-admin-web/src/api/system/employee-api.ts
  *
  * @Author: SmartAdmin React Team
- * @Date: 2026-03-10
+ * @Date: 2026-03-11
  */
 
 import request from '@/utils/request';
-import { ResponseDTO } from '@/types/response';
-
-/**
- * 員工基本信息
- */
-export interface EmployeeVO {
-  employeeId: number;
-  actualName: string;
-  loginName: string;
-  phone?: string;
-  departmentId: number;
-  departmentName?: string;
-  isDisabled: boolean;
-  isLeave: boolean;
-  remark?: string;
-}
+import { ResponseDTO, PageResult } from '@/api/types/response';
+import type {
+  EmployeeVO,
+  EmployeeQueryForm,
+  EmployeeAddForm,
+  EmployeeUpdateForm,
+} from '@/views/system/employee/types';
 
 /**
  * 員工 API
@@ -41,7 +32,7 @@ export const employeeApi = {
    * 查詢員工（分頁）
    * @param params 查詢參數
    */
-  queryEmployee: (params: any): Promise<ResponseDTO<any>> => {
+  queryEmployee: (params: EmployeeQueryForm): Promise<ResponseDTO<PageResult<EmployeeVO>>> => {
     return request.post('/employee/query', params);
   },
 
@@ -56,8 +47,9 @@ export const employeeApi = {
   /**
    * 添加員工
    * @param params 員工信息
+   * @returns 返回新員工的初始密碼
    */
-  addEmployee: (params: any): Promise<ResponseDTO<void>> => {
+  addEmployee: (params: EmployeeAddForm): Promise<ResponseDTO<string>> => {
     return request.post('/employee/add', params);
   },
 
@@ -65,7 +57,7 @@ export const employeeApi = {
    * 更新員工信息
    * @param params 員工信息
    */
-  updateEmployee: (params: any): Promise<ResponseDTO<void>> => {
+  updateEmployee: (params: EmployeeUpdateForm): Promise<ResponseDTO<void>> => {
     return request.post('/employee/update', params);
   },
 
@@ -96,8 +88,9 @@ export const employeeApi = {
   /**
    * 重置員工密碼
    * @param employeeId 員工 ID
+   * @returns 返回新密碼
    */
-  resetPassword: (employeeId: number): Promise<ResponseDTO<void>> => {
+  resetPassword: (employeeId: number): Promise<ResponseDTO<string>> => {
     return request.get(`/employee/update/password/reset/${employeeId}`);
   },
 };

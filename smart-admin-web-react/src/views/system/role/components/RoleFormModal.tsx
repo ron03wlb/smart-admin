@@ -1,68 +1,178 @@
 /**
- * Role Form Modal
+ * Role Form Modal Component
+ * 角色表單 Modal 組件
  *
- * Corresponds to Vue's role/components/role-form-modal/index.vue
- * Add/edit role with roleName, roleCode, remark fields.
+ * @Author: SmartAdmin React Team
+ * @Date: 2026-03-11
  */
+
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, message } from 'antd';
-import { roleApi } from '@/api/system/role-api';
-import type { RoleVO } from '@/types/role.types';
+import { Form, Input, message, Modal } from 'antd';
+import { roleApi } from '@/api/system/roleApi';
+import type { RoleVO, RoleAddForm, RoleUpdateForm, RoleFormData } from '../types';
+import { useModal } from '@/hooks/useModal';
+import { ROLE_VALIDATION } from '@/constants/system/roleConst';
 
 interface RoleFormModalProps {
-  open: boolean;
-  role?: RoleVO;
+  visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
+  initialData?: RoleVO;
 }
 
-const RoleFormModal: React.FC<RoleFormModalProps> = ({ open, role, onCancel, onSuccess }) => {
-  const [form] = Form.useForm();
-  const isEdit = !!role?.roleId;
+export default function RoleFormModal({
+  visible,
+  onCancel,
+  onSuccess,
+  initialData,
+}: RoleFormModalProps) {
+  const [form] = Form.useForm<RoleFormData>();
+  const [loading, setLoading] = React.useState(false);
 
-  useEffect(() => {
-    if (open) {
-      if (role) {
-        form.setFieldsValue(role);
-      } else {
-        form.resetFields();
-      }
-    }
-  }, [open, role, form]);
+  const { isEditMode } = useModal<RoleVO>({
+    editIdField: 'roleId',
+    recordData: initialData,
+  });
 
-  const handleSubmit = async () => {
-    const values = await form.validateFields();
-    if (isEdit) {
-      await roleApi.update({ ...values, roleId: role!.roleId });
-    } else {
-      await roleApi.add(values);
-    }
-    message.success(`${isEdit ? '编辑' : '添加'}成功`);
-    onSuccess();
+  /**
+   * 表單驗證規則
+   */
+  const rules = {
+    roleName: [
+      { required: true, message: '請輸入角色名稱' },
+      { max: ROLE_VALIDATION.NAME_MAX_LENGTH, message: `角色名稱最多${ROLE_VALIDATION.NAME_MAX_LENGTH}個字符` },
+    ],
+    roleCode: [
+      { required: true, message: '請輸入角色編碼' },
+      { max: ROLE_VALIDATION.CODE_MAX_LENGTH, message: `角色編碼最多${ROLE_VALIDATION.CODE_MAX_LENGTH}個字符` },
+      {
+        pattern: /^[a-zA-Z0-9_]+$/,
+        message: '角色編碼只能包含字母、數字和下劃線',
+      },
+    ],
+    remark: [
+      { max: ROLE_VALIDATION.REMARK_MAX_LENGTH, message: `備註最多${ROLE_VALIDATION.REMARK_MAX_LENGTH}個字符` },
+    ],
   };
+
+  /**
+   * 表單提交
+   */
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
+
+      if (isEditMode && initialData) {
+        // 編輯模式
+        const updateForm: RoleUpdateForm = {
+          roleId: initialData.roleId,
+          roleName: values.roleName!,
+          roleCode: values.roleCode!,
+          remark: values.remark,
+        };
+
+        const res = await roleApi.updateRole(updateForm);
+        if (res.ok) {
+          message.success('更新成功');
+          onSuccess();
+        }
+      } else {
+        // 新增模式
+        const addForm: RoleAddForm = {
+          roleName: values.roleName!,
+          roleCode: values.roleCode!,
+          remark: values.remark,
+        };
+
+        const res = await roleApi.addRole(addForm);
+        if (res.ok) {
+          message.success('新增成功');
+          onSuccess();
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error(error.message || (isEditMode ? '更新失敗' : '新增失敗'));
+      }
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Modal 關閉處理
+   */
+  const handleCancel = () => {
+    form.resetFields();
+    onCancel();
+  };
+
+  /**
+   * 初始化表單數據（編輯模式）
+   */
+  useEffect(() => {
+    if (visible && initialData) {
+      form.setFieldsValue({
+        roleName: initialData.roleName,
+        roleCode: initialData.roleCode,
+        remark: initialData.remark,
+      });
+    } else if (visible && !initialData) {
+      form.resetFields();
+    }
+  }, [visible, initialData, form]);
 
   return (
     <Modal
-      title={isEdit ? '编辑角色' : '添加角色'}
-      open={open}
-      width={600}
-      onCancel={onCancel}
+      title={isEditMode ? '編輯角色' : '新增角色'}
+      open={visible}
       onOk={handleSubmit}
+      onCancel={handleCancel}
+      confirmLoading={loading}
+      width={600}
       destroyOnClose
     >
-      <Form form={form} labelCol={{ span: 4 }}>
-        <Form.Item label="角色名称" name="roleName" rules={[{ required: true, message: '请输入角色名称' }]}>
-          <Input placeholder="请输入角色名称" />
+      <Form
+        form={form}
+        layout="vertical"
+        preserve={false}
+        style={{ marginTop: 16 }}
+      >
+        <Form.Item
+          label="角色名稱"
+          name="roleName"
+          rules={rules.roleName}
+        >
+          <Input placeholder="請輸入角色名稱" maxLength={ROLE_VALIDATION.NAME_MAX_LENGTH} />
         </Form.Item>
-        <Form.Item label="角色编码" name="roleCode" rules={[{ required: true, message: '请输入角色编码' }]}>
-          <Input placeholder="请输入角色编码" />
+
+        <Form.Item
+          label="角色編碼"
+          name="roleCode"
+          rules={rules.roleCode}
+          tooltip="只能包含字母、數字和下劃線"
+        >
+          <Input
+            placeholder="請輸入角色編碼（如：admin, manager）"
+            maxLength={ROLE_VALIDATION.CODE_MAX_LENGTH}
+          />
         </Form.Item>
-        <Form.Item label="角色备注" name="remark">
-          <Input placeholder="请输入角色备注" />
+
+        <Form.Item
+          label="備註"
+          name="remark"
+          rules={rules.remark}
+        >
+          <Input.TextArea
+            placeholder="請輸入備註（可選）"
+            maxLength={ROLE_VALIDATION.REMARK_MAX_LENGTH}
+            showCount
+            rows={4}
+          />
         </Form.Item>
       </Form>
     </Modal>
   );
-};
-
-export default RoleFormModal;
+}

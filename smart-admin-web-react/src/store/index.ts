@@ -25,6 +25,7 @@ import spinReducer from './slices/spinSlice';
 import appConfigReducer from './slices/appConfigSlice';
 import roleReducer from './slices/roleSlice';
 import tenantReducer from './slices/tenantSlice';
+import tagNavReducer from './slices/tagNavSlice';
 
 // ==================== Root Reducer ====================
 
@@ -35,7 +36,7 @@ const rootReducer = combineReducers({
   appConfig: appConfigReducer,
   role: roleReducer,
   tenant: tenantReducer,
-  // 未來可添加更多 slices: tagNav, menu, etc.
+  tagNav: tagNavReducer,
 });
 
 // ==================== Redux Persist 配置 ====================
@@ -44,7 +45,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['user', 'dict', 'appConfig', 'tenant'], // 持久化 user、dict、appConfig 和 tenant slices
+  whitelist: ['user', 'dict', 'appConfig', 'tenant', 'tagNav'], // 持久化 user、dict、appConfig、tenant 和 tagNav slices
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
