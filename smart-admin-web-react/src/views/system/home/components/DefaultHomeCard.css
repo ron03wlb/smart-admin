@@ -1,0 +1,25 @@
+.default-home-card-container {
+  height: 100%;
+}
+
+.default-home-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.default-home-card-title::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 0;
+  width: 3px;
+  height: 18px;
+  background-color: #1890ff;
+}
+
+.default-home-card-title .title-text {
+  font-weight: 500;
+}

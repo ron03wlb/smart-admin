@@ -70,4 +70,22 @@ export const noticeApi = {
   getUpdateNoticeInfo: (noticeId: number): Promise<ResponseDTO<NoticeVO>> => {
     return request.get(`/oa/notice/getUpdateVO/${noticeId}`);
   },
+
+  // ---------------- 員工查看通知公告 -----------------------
+
+  /**
+   * 員工查詢通知公告列表
+   * @param params 查詢條件
+   */
+  queryEmployeeNotice: (params: NoticeQueryForm): Promise<ResponseDTO<PageResult<NoticeVO>>> => {
+    return request.post('/oa/notice/employee/query', params);
+  },
+
+  /**
+   * 員工查看通知公告詳情
+   * @param noticeId 公告ID
+   */
+  viewEmployeeNotice: (noticeId: number): Promise<ResponseDTO<NoticeVO>> => {
+    return request.get(`/oa/notice/employee/view/${noticeId}`);
+  },
 };

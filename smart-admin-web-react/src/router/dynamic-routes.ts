@@ -25,6 +25,8 @@ import { lazy, ComponentType } from 'react';
  */
 export const viewModules: Record<string, ComponentType<any>> = {
   // ==================== System 模塊 ====================
+  '/home': lazy(() => import('@/views/system/home')),
+  '/system/home': lazy(() => import('@/views/system/home')),
   '/system/employee': lazy(() => import('@/views/system/employee')),
   '/system/role': lazy(() => import('@/views/system/role')),
   '/system/menu': lazy(() => import('@/views/system/menu')),

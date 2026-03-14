@@ -1,0 +1,35 @@
+.home-notice-content-wrapper {
+  height: 150px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.home-notice-content-wrapper ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.home-notice-content-wrapper ul li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.home-notice-content-wrapper ul li .content {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  margin-right: 5px;
+}
+
+.home-notice-content-wrapper ul li .time {
+  flex-shrink: 0;
+  color: #666;
+  min-width: 75px;
+}
+
+.home-notice-content-wrapper ul li.read a {
+  color: #666 !important;
+}

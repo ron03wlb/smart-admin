@@ -1,0 +1,68 @@
+.home-header-card {
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 0;
+}
+
+.home-header-card .ant-card-body {
+  padding: 16px;
+}
+
+.home-header-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.page-header-heading {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+  margin-bottom: 8px;
+}
+
+.page-header-subtitle {
+  margin-left: 20px;
+}
+
+.page-header-extra {
+  display: flex;
+  align-items: center;
+}
+
+.home-header-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-content {
+  width: 100%;
+}
+
+.last-login-info {
+  font-size: 13px;
+  color: #333;
+  overflow-wrap: break-word;
+  padding: 0;
+  margin: 1px 0 0 0;
+}
+
+.sentence {
+  display: block;
+  font-size: 12px;
+  color: #acacac;
+  overflow-wrap: break-word;
+  padding: 5px 0 0 0;
+  margin: 6px 0 0 0;
+}
+
+.sentence:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
