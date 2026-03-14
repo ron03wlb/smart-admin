@@ -46,6 +46,13 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/support/operate-log': lazy(() => import('@/views/support/operate-log')),
   '/support/change-log': lazy(() => import('@/views/support/change-log')),
   '/support/job': lazy(() => import('@/views/support/job')),
+  '/support/serial-number': lazy(() => import('@/views/support/serial-number')),
+  '/support/dict': lazy(() => import('@/views/support/dict')),
+  '/support/help-doc': lazy(() => import('@/views/support/help-doc')),
+  '/support/cache': lazy(() => import('@/views/support/cache')),
+  '/support/heart-beat': lazy(() => import('@/views/support/heart-beat')),
+  '/support/reload': lazy(() => import('@/views/support/reload')),
+  '/support/api-encrypt': lazy(() => import('@/views/support/api-encrypt')),
 
   // 更多路由映射將在實現對應頁面時添加...
   // 例如：'/business/notice', '/business/category' 等

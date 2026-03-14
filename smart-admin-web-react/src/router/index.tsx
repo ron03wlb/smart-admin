@@ -48,6 +48,12 @@ const HomePage = lazy(() => import('@/views/home'));
  */
 const BasicLayout = lazy(() => import('@/layouts/BasicLayout'));
 
+/**
+ * 錯誤頁面
+ */
+const NotFoundPage = lazy(() => import('@/views/system/error/404'));
+const ForbiddenPage = lazy(() => import('@/views/system/error/403'));
+
 // ==================== 路由配置 ====================
 
 /**
@@ -60,6 +66,22 @@ export const router = createBrowserRouter([
     element: (
       <LazyLoad>
         <LoginPage />
+      </LazyLoad>
+    ),
+  },
+  {
+    path: '/403',
+    element: (
+      <LazyLoad>
+        <ForbiddenPage />
+      </LazyLoad>
+    ),
+  },
+  {
+    path: '/404',
+    element: (
+      <LazyLoad>
+        <NotFoundPage />
       </LazyLoad>
     ),
   },
