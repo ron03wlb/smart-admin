@@ -39,6 +39,7 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/business/enterprise': lazy(() => import('@/views/business/enterprise')),
   '/business/notice': lazy(() => import('@/views/business/notice')),
   '/business/category': lazy(() => import('@/views/business/category')),
+  '/business/goods-catalog': lazy(() => import('@/views/business/erp/catalog')),
 
   // ==================== Support 模塊 ====================
   '/support/file': lazy(() => import('@/views/support/file')),
