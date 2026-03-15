@@ -20,6 +20,11 @@ import {
 import type { TableInfo } from '@/api/support/codeGeneratorApi';
 import { codeGeneratorApi } from '@/api/support/codeGeneratorApi';
 import BasicForm from './BasicForm';
+import FieldListForm from './FieldListForm';
+import InsertUpdateForm from './InsertUpdateForm';
+import DeleteForm from './DeleteForm';
+import QueryFieldForm from './QueryFieldForm';
+import TableFieldForm from './TableFieldForm';
 
 interface ConfigDrawerProps {
   onReload?: () => void;
@@ -37,6 +42,11 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
   const [tableConfig, setTableConfig] = useState<any>({});
 
   const basicFormRef = useRef<any>(null);
+  const fieldListFormRef = useRef<any>(null);
+  const insertUpdateFormRef = useRef<any>(null);
+  const deleteFormRef = useRef<any>(null);
+  const queryFieldFormRef = useRef<any>(null);
+  const tableFieldFormRef = useRef<any>(null);
 
   /**
    * 顯示 Drawer
@@ -56,8 +66,13 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
       setTableColumns(columnsResult.data || []);
       setTableConfig(configResult.data || {});
 
-      // 設置基礎表單數據
+      // 設置所有表單數據
       basicFormRef.current?.setData(configResult.data, table);
+      fieldListFormRef.current?.setData(columnsResult.data, configResult.data);
+      insertUpdateFormRef.current?.setData(columnsResult.data, configResult.data);
+      deleteFormRef.current?.setData(columnsResult.data, configResult.data);
+      queryFieldFormRef.current?.setData(columnsResult.data, configResult.data);
+      tableFieldFormRef.current?.setData(columnsResult.data, configResult.data);
     } catch (error) {
       message.error('加載配置失敗');
       console.error('Load config error:', error);
@@ -76,25 +91,33 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
    */
   const handleSave = async () => {
     try {
-      // 驗證基礎表單
+      // 驗證所有表單
       const basicValid = await basicFormRef.current?.validateForm();
-      if (!basicValid) {
-        message.error('請檢查【1.基礎命名】表單，有參數驗證錯誤');
+      const insertUpdateValid = await insertUpdateFormRef.current?.validateForm();
+      const deleteValid = await deleteFormRef.current?.validateForm();
+
+      if (!basicValid || !insertUpdateValid || !deleteValid) {
+        message.error('請檢查表單，有參數驗證錯誤');
         return;
       }
 
-      // 獲取基礎表單數據
+      // 獲取所有表單數據
       const basicData = basicFormRef.current?.getFormData();
+      const fieldsData = fieldListFormRef.current?.getFormData() || [];
+      const insertAndUpdateData = insertUpdateFormRef.current?.getFormData() || {};
+      const deleteData = deleteFormRef.current?.getFormData() || {};
+      const queryFieldsData = queryFieldFormRef.current?.getFormData() || [];
+      const tableFieldsData = tableFieldFormRef.current?.getFormData() || [];
 
       // 提交配置
       await codeGeneratorApi.updateConfig({
         tableName: tableInfo!.tableName,
         basic: basicData,
-        fields: [],
-        insertAndUpdate: {},
-        deleteInfo: {},
-        queryFields: [],
-        tableFields: [],
+        fields: fieldsData,
+        insertAndUpdate: insertAndUpdateData,
+        deleteInfo: deleteData,
+        queryFields: queryFieldsData,
+        tableFields: tableFieldsData,
       });
 
       message.success('保存成功');
@@ -133,7 +156,7 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
           2.字段列表
         </span>
       ),
-      children: <div>字段列表（Phase 2 實現）</div>,
+      children: <FieldListForm ref={fieldListFormRef} />,
     },
     {
       key: '3',
@@ -143,7 +166,7 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
           3.增加、修改
         </span>
       ),
-      children: <div>增加、修改（Phase 2 實現）</div>,
+      children: <InsertUpdateForm ref={insertUpdateFormRef} />,
     },
     {
       key: '4',
@@ -153,7 +176,7 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
           4.刪除
         </span>
       ),
-      children: <div>刪除（Phase 2 實現）</div>,
+      children: <DeleteForm ref={deleteFormRef} />,
     },
     {
       key: '5',
@@ -163,7 +186,7 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
           5.查詢條件
         </span>
       ),
-      children: <div>查詢條件（Phase 2 實現）</div>,
+      children: <QueryFieldForm ref={queryFieldFormRef} />,
     },
     {
       key: '6',
@@ -173,7 +196,7 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
           6.列表
         </span>
       ),
-      children: <div>列表（Phase 2 實現）</div>,
+      children: <TableFieldForm ref={tableFieldFormRef} />,
     },
   ];
 
