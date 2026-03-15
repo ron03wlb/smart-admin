@@ -33,7 +33,7 @@ public interface SmartJobDao extends BaseMapper<SmartJobEntity> {
    * @param jobId
    * @return
    */
-  void updateDeletedFlag(@Param("jobId") Integer jobId, @Param("deletedFlag") Boolean deletedFlag);
+  void updateDeletedFlag(@Param("jobId") Integer jobId, @Param("deleted") Boolean deleted);
 
   /**
    * 根据 任务class 查找

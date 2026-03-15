@@ -364,7 +364,7 @@ class SmartJobServiceTest {
     entity.setTriggerType(SmartJobTriggerTypeEnum.CRON.getValue());
     entity.setTriggerValue("0 0 * * * ?");
     entity.setEnabledFlag(true);
-    entity.setDeletedFlag(false);
+    entity.setDeleted(false);
     entity.setSort(1);
     entity.setCreateTime(OffsetDateTime.now(ZoneOffset.UTC));
     return entity;

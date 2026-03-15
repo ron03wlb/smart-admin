@@ -154,7 +154,7 @@ public class SmartJobService {
 
     // 校验重复的执行类
     SmartJobEntity existJobClass = jobDao.selectByJobClass(addForm.getJobClass());
-    if (null != existJobClass && !existJobClass.getDeletedFlag()) {
+    if (null != existJobClass && !existJobClass.getDeleted()) {
       return ResponseDTO.userErrorParam("已经存在相同的执行类");
     }
 
@@ -193,7 +193,7 @@ public class SmartJobService {
     // 校验重复的执行类
     SmartJobEntity existJobClass = jobDao.selectByJobClass(updateForm.getJobClass());
     if (null != existJobClass
-        && !existJobClass.getDeletedFlag()
+        && !existJobClass.getDeleted()
         && !existJobClass.getJobId().equals(jobId)) {
       return ResponseDTO.userErrorParam("已经存在相同的执行类");
     }

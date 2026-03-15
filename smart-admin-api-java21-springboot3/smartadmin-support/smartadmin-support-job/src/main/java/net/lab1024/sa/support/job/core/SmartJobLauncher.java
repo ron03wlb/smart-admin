@@ -108,7 +108,7 @@ public class SmartJobLauncher {
         continue;
       }
       // 任务删除
-      if (jobEntity.getDeletedFlag()) {
+      if (jobEntity.getDeleted()) {
         continue;
       }
       // 查找任务实现类
@@ -144,7 +144,7 @@ public class SmartJobLauncher {
   private static boolean isNeedUpdate(SmartJobEntity oldJob, SmartJobEntity newJob) {
     // cron为空时 fixedDelay 才有意义
     return !Objects.equals(oldJob.getEnabledFlag(), newJob.getEnabledFlag())
-        || !Objects.equals(oldJob.getDeletedFlag(), newJob.getDeletedFlag())
+        || !Objects.equals(oldJob.getDeleted(), newJob.getDeleted())
         || !Objects.equals(oldJob.getTriggerType(), newJob.getTriggerType())
         || !Objects.equals(oldJob.getTriggerValue(), newJob.getTriggerValue())
         || !Objects.equals(oldJob.getJobClass(), newJob.getJobClass());

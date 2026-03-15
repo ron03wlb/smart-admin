@@ -31,5 +31,5 @@ public class SmartJobQueryForm extends PageParam {
   private Boolean enabledFlag;
 
   @Schema(description = "是否删除|可选")
-  private Boolean deletedFlag;
+  private Boolean deleted;
 }
