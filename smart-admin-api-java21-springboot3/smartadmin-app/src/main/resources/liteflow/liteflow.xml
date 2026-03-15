@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LiteFlow 規則配置文件
+
+  說明：定義 Turnover Calculation 的核心 chain
+-->
+<flow>
+    <chain name="turnover_calculation_main">
+        THEN(riskFilterNode, statusFactorNode, gameWeightNode, turnoverAggregateNode)
+    </chain>
+
+    <!-- Node 定義將通過 @LiteflowComponent 註解自動註冊 -->
+</flow>

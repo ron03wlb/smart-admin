@@ -39,6 +39,7 @@ dependencies {
     // SA Support
     api(project(":smartadmin-support:smartadmin-support-operatelog"))
     api(project(":smartadmin-support:smartadmin-support-datatracer"))
+    api(project(":smartadmin-support:smartadmin-support-liteflow"))
 
     // API Documentation
     compileOnly(libs.knife4j.openapi3.jakarta)

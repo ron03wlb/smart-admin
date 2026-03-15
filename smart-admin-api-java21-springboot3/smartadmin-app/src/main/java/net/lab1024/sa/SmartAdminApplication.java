@@ -30,12 +30,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
 @ComponentScan(SmartAdminApplication.COMPONENT_SCAN)
 @MapperScan(value = SmartAdminApplication.COMPONENT_SCAN, annotationClass = Mapper.class)
-@SpringBootApplication(
-    exclude = {
-      UserDetailsServiceAutoConfiguration.class,
-      com.yomahub.liteflow.springboot.config.LiteflowMainAutoConfiguration
-          .class // 暫時禁用 LiteFlow（缺少 liteflow-rule-sql 依賴）
-    })
+@SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
 public class SmartAdminApplication {
 
   public static final String COMPONENT_SCAN = "net.lab1024.sa";
