@@ -38,7 +38,7 @@ import {
   DISABLED_FLAG_LABELS,
   DISABLED_FLAG_COLORS,
 } from '@/constants/business/enterpriseConst';
-import { PrivilegeButton } from '@/components/permission/PrivilegeButton';
+import { PrivilegeButton } from '@/components/PrivilegeButton';
 import EnterpriseFormModal from './components/EnterpriseFormModal';
 
 const { RangePicker } = DatePicker;
