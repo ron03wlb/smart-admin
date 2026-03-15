@@ -6,7 +6,7 @@
         <if test="menuIdList != null and menuIdList.size > 0">
             <foreach collection="menuIdList" item="item" separator=";">
                 update t_menu
-                set deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler},
+                set deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler},
                 update_user_id = #{updateUserId}
                 where menu_id = #{item}
             </foreach>
@@ -19,13 +19,13 @@
         from t_menu
         where menu_name = #{menuName}
           and parent_id = #{parentId}
-          and deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler} limit 1
+          and deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler} limit 1
     </select>
     <select id="queryMenuList" resultType="net.lab1024.sa.system.menu.domain.vo.MenuVO">
         select * from t_menu
-        where deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        where deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         <if test="disabledFlag != null">
-            and disabled_flag = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            and disabled = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         </if>
         <if test="menuTypeList != null and menuTypeList.size > 0">
             and menu_type in
@@ -40,7 +40,7 @@
         select *
         from t_menu
         where parent_id = #{menuId}
-          and deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+          and deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
           and menu_type = #{menuType}
     </select>
 
@@ -49,7 +49,7 @@
         select t_menu.* from t_menu
         left join t_role_menu on t_role_menu.menu_id = t_menu.menu_id
         left join t_role_employee on t_role_employee.role_id = t_role_menu.role_id
-        where t_menu.disabled_flag = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler} and t_menu.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        where t_menu.disabled = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler} and t_menu.deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         <if test="employeeId != null">
             and t_role_employee.employee_id = #{employeeId}
         </if>
@@ -57,15 +57,15 @@
     <select id="queryMenuByType" resultType="net.lab1024.sa.system.menu.domain.entity.MenuEntity">
         select *
         from t_menu
-        where disabled_flag = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
-          and deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        where disabled = #{disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+          and deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
           and menu_type = #{menuType}
     </select>
     <select id="getByWebPerms" resultType="net.lab1024.sa.system.menu.domain.entity.MenuEntity">
         select *
         from t_menu
         where web_perms = #{webPerms}
-          and deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler} limit 1
+          and deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler} limit 1
     </select>
     <select id="selectMenuIdByParentIdList" resultType="java.lang.Long">
         <if test="menuIdList != null and menuIdList.size > 0">

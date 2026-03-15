@@ -40,7 +40,7 @@ public class LoginFailEntity extends SmartAdminBaseEntity {
   private String loginName;
 
   /** 锁定状态 */
-  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
+  @TableField(value = "locked", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean lockFlag;
 
   /** 登录失败次数 */

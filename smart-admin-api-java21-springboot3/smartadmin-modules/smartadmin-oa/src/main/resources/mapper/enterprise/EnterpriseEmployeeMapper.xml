@@ -86,7 +86,7 @@
             )
         </if>
         <if test="queryForm.deletedFlag != null">
-            AND t_employee.deleted_flag = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            AND t_employee.deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         </if>
     </select>
 

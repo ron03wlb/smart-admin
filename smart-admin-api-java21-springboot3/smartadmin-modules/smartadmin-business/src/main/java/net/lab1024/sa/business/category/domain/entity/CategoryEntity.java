@@ -1,6 +1,7 @@
 package net.lab1024.sa.business.category.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.business.category.constant.CategoryTypeEnum;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 
 /**
  * 类目 实体类
@@ -39,12 +41,14 @@ public class CategoryEntity extends SmartAdminBaseEntity implements Serializable
   private Long parentId;
 
   /** 是否禁用 */
+  @TableField(value = "disabled", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean disabledFlag;
 
   /** 排序 */
   private Integer sort;
 
   /** 删除状态 */
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   /** 备注 */

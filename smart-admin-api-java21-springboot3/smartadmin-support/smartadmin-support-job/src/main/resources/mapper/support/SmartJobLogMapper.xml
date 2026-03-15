@@ -18,7 +18,7 @@
                 AND job_id = #{query.jobId}
             </if>
             <if test="query.successFlag != null">
-                AND success_flag = #{query.successFlag}
+                AND success = #{query.successFlag}
             </if>
             <if test="query.startTime != null">
                 AND TO_CHAR(execute_start_time, 'YYYY-MM-DD') &gt;= #{query.startTime}

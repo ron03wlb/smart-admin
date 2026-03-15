@@ -1,6 +1,7 @@
 package net.lab1024.sa.support.operatelog.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -65,6 +66,7 @@ public class OperateLogEntity extends SmartAdminBaseEntity {
   private String userAgent;
 
   /** 请求结果 0失败 1成功 */
+  @TableField(value = "success")
   private Integer successFlag;
 
   /** 失败原因 */

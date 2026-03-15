@@ -1,12 +1,14 @@
 package net.lab1024.sa.business.goods.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 
 /**
  * 商品 实体类
@@ -38,9 +40,11 @@ public class GoodsEntity extends SmartAdminBaseEntity {
   private BigDecimal price;
 
   /** 上架状态 */
+  @TableField(value = "shelves", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean shelvesFlag;
 
   /** 删除状态 */
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   /** 备注 */

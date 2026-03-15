@@ -1,11 +1,13 @@
 package net.lab1024.sa.system.menu.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 import net.lab1024.sa.system.menu.constant.MenuTypeEnum;
 
 /**
@@ -46,18 +48,22 @@ public class MenuEntity extends SmartAdminBaseEntity {
   private String component;
 
   /** 是否为外链 */
+  @TableField(value = "frame", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean frameFlag;
 
   /** 外链地址 */
   private String frameUrl;
 
   /** 是否缓存 */
+  @TableField(value = "cache", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean cacheFlag;
 
   /** 显示状态 */
+  @TableField(value = "visible", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean visibleFlag;
 
   /** 禁用状态 */
+  @TableField(value = "disabled", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean disabledFlag;
 
   /** 后端权限字符串 */
@@ -76,6 +82,7 @@ public class MenuEntity extends SmartAdminBaseEntity {
   private Long contextMenuId;
 
   /** 删除状态 */
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   /** 创建人 */

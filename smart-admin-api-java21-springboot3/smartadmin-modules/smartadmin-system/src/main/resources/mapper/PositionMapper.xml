@@ -8,7 +8,7 @@
         *
         FROM t_position
         <where>
-            deleted_flag = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             <!--关键字查询-->
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
                 AND INSTR(t_position.position_name,#{queryForm.keywords})
@@ -20,6 +20,6 @@
     <select id="queryList" resultType="net.lab1024.sa.system.position.domain.vo.PositionVO">
         SELECT *
         FROM t_position
-        where deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        where deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
     </select>
 </mapper>

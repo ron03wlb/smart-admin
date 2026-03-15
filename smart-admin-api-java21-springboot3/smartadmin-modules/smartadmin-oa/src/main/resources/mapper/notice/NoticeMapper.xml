@@ -7,8 +7,8 @@
         t_notice.notice_id,
         t_notice.notice_type_id,
         t_notice.title,
-        t_notice.all_visible_flag,
-        t_notice.scheduled_publish_flag,
+        t_notice.all_visible,
+        t_notice.scheduled_publish,
         t_notice.publish_time,
         t_notice.content_text,
         t_notice.content_html,
@@ -18,7 +18,7 @@
         t_notice.source,
         t_notice.author,
         t_notice.document_number,
-        t_notice.deleted_flag,
+        t_notice.deleted,
         t_notice.create_user_id,
         t_notice.update_time,
         t_notice.create_time
@@ -50,7 +50,7 @@
     <!-- ================================== 通知公告【主表】相关 ================================== -->
     <update id="updateDeletedFlag">
         update t_notice
-        set deleted_flag = true
+        set deleted = true
         where notice_id = #{noticeId}
     </update>
 
@@ -80,7 +80,7 @@
                 AND t_employee.actual_name = #{query.createUserName}
             </if>
             <if test="query.deletedFlag != null">
-                AND t_notice.deleted_flag = #{query.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+                AND t_notice.deleted = #{query.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="query.createTimeBegin != null">
                 AND TO_CHAR(t_notice.create_time, 'YYYY-MM-DD') &gt;= #{query.createTimeBegin}
@@ -128,11 +128,11 @@
                     )
                     or ( t_notice_visible_range.data_type = #{employeeDataType} and t_notice_visible_range.data_id = #{requestEmployeeId} )
                 )
-                or t_notice.all_visible_flag = true
+                or t_notice.all_visible = true
             )
             </if>
 
-            and t_notice.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            and t_notice.deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             and t_notice.publish_time &lt; now()
             <if test="query.noticeTypeId != null">
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}
@@ -186,8 +186,8 @@
                 #{requestEmployeeId} )
                 )
             </if>
-            and t_notice.all_visible_flag = true
-            and t_notice.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            and t_notice.all_visible = true
+            and t_notice.deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             and t_notice.publish_time &lt; now()
             <if test="query.noticeTypeId != null">
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}

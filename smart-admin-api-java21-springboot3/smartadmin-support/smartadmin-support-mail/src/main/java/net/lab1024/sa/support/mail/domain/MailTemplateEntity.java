@@ -1,11 +1,13 @@
 package net.lab1024.sa.support.mail.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 
 /**
  * 邮件模板
@@ -31,5 +33,6 @@ public class MailTemplateEntity extends SmartAdminBaseEntity {
   private String templateContent;
 
   /** 禁用标识 */
+  @TableField(value = "disabled", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean disableFlag;
 }

@@ -4,7 +4,7 @@
 
     <update id="updateDeletedFlag">
         update t_smart_job
-        set deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        set deleted = #{deleted, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         where job_id = #{jobId}
     </update>
 
@@ -23,10 +23,10 @@
                 AND trigger_type = #{query.triggerType}
             </if>
             <if test="query.enabledFlag != null">
-                AND enabled_flag = #{query.enabledFlag}
+                AND enabled = #{query.enabledFlag}
             </if>
-            <if test="query.deletedFlag != null">
-                AND deleted_flag = #{query.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            <if test="query.deleted != null">
+                AND deleted = #{query.deleted, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">

@@ -29,7 +29,7 @@
                 AND (INSTR(url,#{query.requestKeywords}) OR INSTR(method,#{query.requestKeywords}) OR INSTR(param,#{query.requestKeywords}) OR INSTR(response,#{query.requestKeywords}))
             </if>
             <if test="query.successFlag != null">
-                AND success_flag = #{query.successFlag}
+                AND success = #{query.successFlag}
             </if>
         </where>
         order by create_time desc

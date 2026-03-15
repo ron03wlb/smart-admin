@@ -1,12 +1,14 @@
 package net.lab1024.sa.oa.notice.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 
 /**
  * 通知公告
@@ -29,9 +31,11 @@ public class NoticeEntity extends SmartAdminBaseEntity {
   private String title;
 
   /** 是否全部可见 */
+  @TableField(value = "all_visible", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean allVisibleFlag;
 
   /** 是否定时发布 */
+  @TableField(value = "scheduled_publish", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean scheduledPublishFlag;
 
   /** 发布时间 */
@@ -61,6 +65,7 @@ public class NoticeEntity extends SmartAdminBaseEntity {
   /** 文号 */
   private String documentNumber;
 
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   private Long createUserId;

@@ -1,12 +1,14 @@
 package net.lab1024.sa.support.message.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 import net.lab1024.sa.support.message.constant.MessageTypeEnum;
 
 /**
@@ -50,6 +52,7 @@ public class MessageEntity extends SmartAdminBaseEntity {
   private String content;
 
   /** 是否已读 */
+  @TableField(value = "read", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean readFlag;
 
   /** 已读时间 */

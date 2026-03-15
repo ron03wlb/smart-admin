@@ -1,12 +1,14 @@
 package net.lab1024.sa.support.job.repository.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 import net.lab1024.sa.support.job.constant.SmartJobTriggerTypeEnum;
 
 /**
@@ -44,6 +46,7 @@ public class SmartJobEntity extends SmartAdminBaseEntity {
   private String param;
 
   /** 是否启用 */
+  @TableField(value = "enabled", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean enabledFlag;
 
   /** 最后一执行时间 */
@@ -59,7 +62,8 @@ public class SmartJobEntity extends SmartAdminBaseEntity {
   private Integer sort;
 
   /** 是否删除 */
-  private Boolean deletedFlag;
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
+  private Boolean deleted;
 
   private String updateName;
 }

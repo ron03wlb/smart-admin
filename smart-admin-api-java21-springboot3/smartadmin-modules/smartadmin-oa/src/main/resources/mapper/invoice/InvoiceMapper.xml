@@ -3,7 +3,7 @@
 <mapper namespace="net.lab1024.sa.oa.invoice.dao.InvoiceDao">
     <update id="deleteInvoice">
         UPDATE t_oa_invoice
-        SET deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        SET deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         WHERE invoice_id = #{invoiceId}
     </update>
     <select id="queryByAccountNumber"
@@ -12,7 +12,7 @@
         FROM t_oa_invoice
         WHERE enterprise_id = #{enterpriseId}
         AND account_number = #{accountNumber}
-        AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        AND deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         <if test="excludeInvoiceId != null">
             AND invoice_id != #{excludeInvoiceId}
         </if>
@@ -23,7 +23,7 @@
         FROM t_oa_invoice 
         LEFT JOIN t_oa_enterprise  ON t_oa_invoice.enterprise_id = t_oa_enterprise.enterprise_id
         <where>
-            t_oa_invoice.deleted_flag = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+            t_oa_invoice.deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
                 AND (INSTR(t_oa_invoice.invoice_heads,#{queryForm.keywords}) OR INSTR(t_oa_invoice.account_number,#{queryForm.keywords}) OR
                 INSTR(t_oa_invoice.create_user_name,#{queryForm.keywords}))
@@ -35,7 +35,7 @@
                 AND TO_CHAR(t_oa_invoice.create_time, 'YYYY-MM-DD') &lt;= #{queryForm.endTime}
             </if>
             <if test="queryForm.disabledFlag != null">
-                AND t_oa_invoice.disabled_flag = #{queryForm.disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+                AND t_oa_invoice.disabled = #{queryForm.disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="queryForm.enterpriseId != null">
                 AND t_oa_invoice.enterprise_id = #{queryForm.enterpriseId}
@@ -51,6 +51,6 @@
         FROM t_oa_invoice
         LEFT JOIN t_oa_enterprise  ON t_oa_invoice.enterprise_id = t_oa_enterprise.enterprise_id
         WHERE t_oa_invoice.invoice_id = #{invoiceId}
-          AND t_oa_invoice.deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+          AND t_oa_invoice.deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
     </select>
 </mapper>

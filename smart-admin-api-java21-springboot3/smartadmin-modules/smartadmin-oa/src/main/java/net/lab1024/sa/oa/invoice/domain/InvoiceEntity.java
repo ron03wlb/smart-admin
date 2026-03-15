@@ -1,11 +1,13 @@
 package net.lab1024.sa.oa.invoice.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.lab1024.sa.common.mybatis.domain.SmartAdminBaseEntity;
+import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
 import net.lab1024.sa.support.datatracer.annoation.DataTracerFieldLabel;
 
 /**
@@ -48,10 +50,12 @@ public class InvoiceEntity extends SmartAdminBaseEntity {
 
   /** 禁用状态 */
   @DataTracerFieldLabel("禁用状态")
+  @TableField(value = "disabled", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean disabledFlag;
 
   /** 删除状态 */
   @DataTracerFieldLabel("删除状态")
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   /** 创建人ID */

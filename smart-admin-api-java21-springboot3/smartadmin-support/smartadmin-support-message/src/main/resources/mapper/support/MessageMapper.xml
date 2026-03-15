@@ -5,12 +5,12 @@
     <!-- 更新已读状态 -->
     <update id="updateReadFlag">
         UPDATE t_message
-        SET read_flag = #{readFlag},
+        SET read = #{readFlag},
             read_time = now()
         WHERE message_id = #{messageId}
           AND receiver_user_type = #{receiverUserType}
           AND receiver_user_id = #{receiverUserId}
-          AND read_flag != #{readFlag}
+          AND read != #{readFlag}
     </update>
 
     <!-- 分页查询消息 -->
@@ -32,7 +32,7 @@
                 )
             </if>
             <if test="query.readFlag != null">
-                AND read_flag = #{query.readFlag}
+                AND read = #{query.readFlag}
             </if>
             <if test="query.startDate != null">
                 AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= TO_CHAR(#{query.startDate}, 'YYYY-MM-DD')
@@ -51,6 +51,6 @@
         FROM t_message
         where receiver_user_type = #{receiverUserType}
           AND receiver_user_id = #{receiverUserId}
-          AND read_flag = false
+          AND read = false
     </select>
 </mapper>

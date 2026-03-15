@@ -1,6 +1,7 @@
 package net.lab1024.sa.support.job.repository.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.OffsetDateTime;
@@ -29,6 +30,7 @@ public class SmartJobLogEntity {
   private String param;
 
   /** 执行结果 是否成功 */
+  @TableField(value = "success")
   private Integer successFlag;
 
   /** 开始执行时间 */

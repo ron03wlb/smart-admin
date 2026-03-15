@@ -9,7 +9,7 @@
         WHERE
         parent_id IN
         <foreach collection="parentIdList" open="(" separator="," close=")" item="id">#{id}</foreach>
-        AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        AND deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         ORDER BY sort ASC
     </select>
 
@@ -22,7 +22,7 @@
         parent_id IN
         <foreach collection="parentIdList" open="(" separator="," close=")" item="id">#{id}</foreach>
         AND category_type = #{categoryType}
-        AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        AND deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         ORDER BY sort ASC
     </select>
 
@@ -30,7 +30,7 @@
             resultType="net.lab1024.sa.business.category.domain.entity.CategoryEntity">
         SELECT * FROM t_category
         WHERE category_type = #{categoryType}
-        AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+        AND deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
         ORDER BY sort ASC
     </select>
 
@@ -48,7 +48,7 @@
                 AND category_name = #{categoryName}
             </if>
             <if test="deletedFlag != null">
-                AND deleted_flag = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+                AND deleted = #{deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         LIMIT 1

@@ -8,7 +8,7 @@
         t_dict.dict_name,
         t_dict.dict_code,
         t_dict.remark,
-        t_dict.disabled_flag,
+        t_dict.disabled,
         t_dict.create_time,
         t_dict.update_time
     </sql>
@@ -29,7 +29,7 @@
             </if>
             <!--禁用状态-->
             <if test="queryForm.disabledFlag != null">
-                AND t_dict.disabled_flag = #{queryForm.disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
+                AND t_dict.disabled = #{queryForm.disabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
         </where>
         <if test="queryForm.sortItemList == null or queryForm.sortItemList.size == 0">

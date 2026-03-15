@@ -54,15 +54,15 @@ public class EmployeeEntity extends SmartAdminBaseEntity {
   private Long positionId;
 
   /** 是否为超级管理员: 0 不是，1是 */
-  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
+  @TableField(value = "administrator", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean administratorFlag;
 
   /** 是否被禁用 0否1是 */
-  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
+  @TableField(value = "disabled", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean disabledFlag;
 
   /** 是否删除0否 1是 */
-  @TableField(typeHandler = BooleanToSmallintTypeHandler.class)
+  @TableField(value = "deleted", typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deletedFlag;
 
   /** 备注 */

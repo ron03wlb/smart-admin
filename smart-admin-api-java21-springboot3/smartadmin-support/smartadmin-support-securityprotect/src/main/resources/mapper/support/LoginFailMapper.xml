@@ -34,7 +34,7 @@
                 AND login_name LIKE CONCAT('%', #{queryForm.loginName}, '%')
             </if>
             <if test="queryForm.lockFlag != null">
-                AND lock_flag = #{queryForm.lockFlag}
+                AND locked = #{queryForm.lockFlag}
             </if>
         </where>
         ORDER BY create_time DESC

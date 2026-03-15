@@ -29,7 +29,7 @@
         t_employee.actual_name,
         t_employee.phone,
         t_employee.department_id,
-        t_employee.disabled_flag,
+        t_employee.disabled,
         t_employee.remark,
         t_employee.update_time,
         t_employee.create_time
@@ -58,7 +58,7 @@
                t_employee.actual_name,
                t_employee.phone,
                t_employee.department_id,
-               t_employee.disabled_flag,
+               t_employee.disabled,
                t_employee.remark,
                t_employee.update_time,
                t_employee.create_time
