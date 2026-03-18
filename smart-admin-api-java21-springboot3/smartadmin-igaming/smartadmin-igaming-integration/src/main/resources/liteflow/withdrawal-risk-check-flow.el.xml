@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow>
+  <!--
+    Withdrawal Risk Check Flow
+
+    This LiteFlow chain orchestrates withdrawal risk assessment by executing three risk check
+    components in sequence:
+
+    1. kycLevelCheck - Validates KYC verification level meets withdrawal threshold
+    2. amlTurnoverCheck - Validates minimum AML turnover requirement (1x deposits)
+    3. withdrawalVelocityCheck - Validates withdrawal frequency limits (max 5/24h)
+
+    Each component contributes a risk score (0-100) to the shared WithdrawalRiskContext.
+    The final decision is made by WithdrawalRiskCheckService based on weighted total score:
+
+    - Score 0-29: AUTO_APPROVED (low risk)
+    - Score 30-69: PENDING_REVIEW (manual approval required)
+    - Score 70-100: AUTO_REJECTED (critical risk, blocked)
+
+    Component Weights:
+    - KYC Level Check: 3.0 (highest priority)
+    - AML Turnover Check: 2.0 (medium priority)
+    - Withdrawal Velocity Check: 1.0 (lowest priority)
+  -->
+
+  <chain name="withdrawal_risk_check_main">
+    THEN(
+      kycLevelCheck,
+      amlTurnoverCheck,
+      withdrawalVelocityCheck
+    )
+  </chain>
+</flow>

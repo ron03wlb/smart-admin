@@ -21,7 +21,7 @@ public final class DomainEventTypeConst {
   public static final String ROUND_ADJUSTED = "ROUND_ADJUSTED";
   public static final String ROUND_PENDING_REVIEW = "ROUND_PENDING_REVIEW";
 
-  // --- Wallet Events (published by WalletManager) ---
+  // --- Wallet Events (published by WalletManager, BonusConversionIntegrationService) ---
   public static final String WALLET_CREDITED = "WALLET_CREDITED";
   public static final String WALLET_DEBITED = "WALLET_DEBITED";
   public static final String BONUS_CREDITED = "BONUS_CREDITED";
@@ -36,8 +36,11 @@ public final class DomainEventTypeConst {
   public static final String PLAYER_LOGIN = "PLAYER_LOGIN";
   public static final String KYC_UPDATED = "KYC_UPDATED";
 
-  // --- Activity Events (published by WageringProgressManager) ---
+  // --- Activity Events (published by WageringProgressManager, FirstDepositBonusIntegrationService,
+  // TurnoverIntegrationService) ---
   public static final String WAGERING_COMPLETED = "WAGERING_COMPLETED";
+  public static final String WAGERING_PROGRESS_UPDATED = "WAGERING_PROGRESS_UPDATED";
+  public static final String FIRST_DEPOSIT_COMPLETED = "FIRST_DEPOSIT_COMPLETED";
 
   // --- Agent Events (published by CreditSettlementManager, AffiliateCommissionManager) ---
   public static final String CREDIT_ALLOCATED = "CREDIT_ALLOCATED";
