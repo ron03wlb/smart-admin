@@ -6,7 +6,7 @@
  * @Date: 2026-03-14
  */
 
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Modal, Form, Input, InputNumber, message } from 'antd';
 import { serialNumberApi } from '@/api/support/serialNumberApi';
 import type { SerialNumberVO, SerialNumberGenerateForm } from '../types';

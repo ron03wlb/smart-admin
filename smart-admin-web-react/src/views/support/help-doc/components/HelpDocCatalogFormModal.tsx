@@ -6,7 +6,7 @@
  * @Date: 2026-03-14
  */
 
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Modal, Form, Input, InputNumber, message } from 'antd';
 import { helpDocCatalogApi } from '@/api/support/helpDocCatalogApi';
 import type { HelpDocCatalogFormData } from '../types';

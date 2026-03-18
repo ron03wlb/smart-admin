@@ -26,7 +26,7 @@ import {
   FullscreenExitOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { PrivilegeButton } from '@/components/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import './index.css';
 
 export interface TableOperatorButton {

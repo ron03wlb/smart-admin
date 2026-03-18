@@ -6,7 +6,7 @@
  * @Date: 2026-03-11
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -35,7 +35,7 @@ import {
   NOTICE_TABLE_COLUMNS_WIDTH,
   VISIBLE_FLAG_LABELS,
 } from '@/constants/business/noticeConst';
-import { PrivilegeButton } from '@/components/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import NoticeFormDrawer from './components/NoticeFormDrawer';
 
 const { confirm } = Modal;

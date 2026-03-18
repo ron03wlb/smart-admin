@@ -9,7 +9,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useTable } from './useTable';
-import type { UseTableOptions } from './useTable';
 
 describe('useTable', () => {
   // Mock API 函數

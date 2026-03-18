@@ -94,7 +94,6 @@ describe('loginFailApi', () => {
         {
           loginFailId: 1,
           userId: 100,
-          userName: '張三',
           userType: 1,
           loginName: 'zhangsan',
           loginFailCount: 5,

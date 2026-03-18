@@ -272,7 +272,7 @@ describe('employeeApi', () => {
 
       vi.mocked(request.post).mockResolvedValue(mockResponse);
 
-      const result = await employeeApi.batchDeleteEmployee(employeeIdList);
+      await employeeApi.batchDeleteEmployee(employeeIdList);
 
       expect(request.post).toHaveBeenCalledWith('/employee/update/batch/delete', employeeIdList);
       expect(result.ok).toBe(true);
@@ -290,7 +290,7 @@ describe('employeeApi', () => {
 
       vi.mocked(request.post).mockResolvedValue(mockResponse);
 
-      const result = await employeeApi.batchDeleteEmployee(employeeIdList);
+      await employeeApi.batchDeleteEmployee(employeeIdList);
 
       expect(request.post).toHaveBeenCalledWith('/employee/update/batch/delete', employeeIdList);
     });

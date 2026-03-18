@@ -14,10 +14,9 @@
  * @Date: 2026-03-10
  */
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Select, SelectProps } from 'antd';
 import { getValueDescList } from '@/utils/smart-enum';
-import { SmartEnumItem } from '@/types/smart-enum';
 
 export interface SmartEnumSelectProps<T = number | string> extends Omit<SelectProps<T>, 'options'> {
   /**

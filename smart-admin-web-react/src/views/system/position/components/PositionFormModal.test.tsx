@@ -57,7 +57,7 @@ describe('PositionFormModal', () => {
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
-      isEditMode: false,
+      isEdit: false,
     });
   });
 
@@ -99,7 +99,7 @@ describe('PositionFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: PositionFormData = {
@@ -117,7 +117,7 @@ describe('PositionFormModal', () => {
 
     it('should have update button in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: PositionFormData = {
@@ -259,7 +259,7 @@ describe('PositionFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       vi.mocked(positionApi.updatePosition).mockResolvedValue({
@@ -291,7 +291,7 @@ describe('PositionFormModal', () => {
 
     it('should handle API error in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       vi.mocked(positionApi.updatePosition).mockRejectedValue(new Error('API Error'));

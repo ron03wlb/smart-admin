@@ -26,8 +26,8 @@ export interface DictVO {
 export interface DictQueryForm {
   keywords?: string; // 編碼/名稱/備註
   disabledFlag?: number | null; // 0-啟用, 1-禁用, null-全部
-  pageNum: number;
-  pageSize: number;
+  pageNum?: number;
+  pageSize?: number;
 }
 
 /**

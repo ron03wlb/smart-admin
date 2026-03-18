@@ -35,9 +35,8 @@ export default function GoodsFormDrawer({
   const [form] = Form.useForm<GoodsFormData>();
   const [loading, setLoading] = React.useState(false);
 
-  const { isEditMode } = useModal<GoodsVO>({
-    editIdField: 'goodsId',
-    recordData: initialData,
+  const { isEdit } = useModal<GoodsVO>({
+    defaultFormData: initialData,
   });
 
   /**
@@ -79,7 +78,7 @@ export default function GoodsFormDrawer({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode && initialData) {
+      if (isEdit && initialData) {
         // 編輯模式
         const updateForm: GoodsUpdateForm = {
           goodsId: initialData.goodsId,
@@ -117,7 +116,7 @@ export default function GoodsFormDrawer({
       }
     } catch (error) {
       if (error instanceof Error) {
-        message.error(error.message || (isEditMode ? '更新失敗' : '新增失敗'));
+        message.error(error.message || (isEdit ? '更新失敗' : '新增失敗'));
       }
       console.error(error);
     } finally {
@@ -162,7 +161,7 @@ export default function GoodsFormDrawer({
 
   return (
     <Drawer
-      title={isEditMode ? '編輯商品' : '新增商品'}
+      title={isEdit ? '編輯商品' : '新增商品'}
       open={visible}
       onClose={handleCancel}
       width={500}

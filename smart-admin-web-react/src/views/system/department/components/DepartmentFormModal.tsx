@@ -32,9 +32,8 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
   const [form] = Form.useForm();
 
   // 使用 useModal hook 判斷新增/編輯模式
-  const { isEditMode } = useModal({
-    editIdField: 'departmentId',
-    recordData: initialData,
+  const { isEdit } = useModal({
+    defaultFormData: initialData,
   });
 
   // ==================== Form Initialization ====================
@@ -73,7 +72,7 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
     try {
       const values = await form.validateFields();
 
-      if (isEditMode) {
+      if (isEdit) {
         // 編輯模式：檢查上級部門不能是自己
         if (values.parentId === initialData!.departmentId) {
           message.warning('上級部門不能為自己');
@@ -108,7 +107,7 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
       if (error.errorFields) {
         message.error('參數驗證錯誤，請仔細填寫表單數據！');
       } else {
-        message.error(isEditMode ? '更新失敗' : '添加失敗');
+        message.error(isEdit ? '更新失敗' : '添加失敗');
       }
     }
   };
@@ -125,11 +124,11 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
 
   return (
     <Modal
-      title={isEditMode ? '編輯部門' : '添加部門'}
+      title={isEdit ? '編輯部門' : '添加部門'}
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}
-      okText={isEditMode ? '更新' : '保存'}
+      okText={isEdit ? '更新' : '保存'}
       cancelText="取消"
       width={600}
       destroyOnClose

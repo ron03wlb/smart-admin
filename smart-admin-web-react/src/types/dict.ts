@@ -35,10 +35,12 @@ export interface DictDataItem {
  * 字典查詢表單
  */
 export interface DictQueryForm {
+  keywords?: string; // 編碼/名稱/備註
   dictCode?: string;
   dictName?: string;
-  pageNum: number;
-  pageSize: number;
+  disabledFlag?: number | null; // 0-啟用, 1-禁用, null-全部
+  pageNum?: number;
+  pageSize?: number;
 }
 
 /**

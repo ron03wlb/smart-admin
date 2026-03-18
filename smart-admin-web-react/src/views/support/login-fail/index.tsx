@@ -34,36 +34,46 @@ const LoginFailList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 使用 useTable Hook（默認查詢已鎖定記錄）
-  const {
-    data: tableData,
-    loading: tableLoading,
-    pagination,
-    handleTableChange,
-    refreshTable,
-  } = useTable<LoginFailVO, LoginFailQueryForm>(
-    loginFailApi.queryPage,
-    form,
-    { lockFlag: 1 }, // 默認查詢已鎖定
-  );
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<LoginFailVO, LoginFailQueryForm>({
+    defaultQueryForm: {
+      loginName: undefined,
+      lockFlag: 1,
+      loginLockBeginTimeBegin: undefined,
+      loginLockBeginTimeEnd: undefined,
+    },
+    pagination: { pageNum: 1, pageSize: 10 },
+    queryApi: loginFailApi.queryPage,
+    autoQuery: false,
+  });
 
   // 初始化時加載數據
   useEffect(() => {
     if (hasQueryPermission) {
       form.setFieldsValue({ lockFlag: 1 }); // 設置默認值
-      refreshTable();
+      query();
     }
-  }, [hasQueryPermission, refreshTable, form]);
+  }, [hasQueryPermission, query, form]);
 
   // 處理搜索
   const handleSearch = () => {
-    refreshTable();
+    const values = form.getFieldsValue();
+    setQueryForm((prev) => ({
+      ...prev,
+      loginName: values.loginName,
+      lockFlag: values.lockFlag,
+      loginLockBeginTimeBegin: values.loginLockBeginTimeBegin,
+      loginLockBeginTimeEnd: values.loginLockBeginTimeEnd,
+      pageNum: 1,
+    }));
+    setTimeout(() => query(), 0);
   };
 
   // 處理重置
   const handleReset = () => {
     form.resetFields();
     form.setFieldsValue({ lockFlag: undefined }); // 重置為全部
-    refreshTable();
+    reset();
+    setTimeout(() => query(), 0);
   };
 
   // 處理日期範圍變化
@@ -76,8 +86,10 @@ const LoginFailList: React.FC = () => {
 
   // 處理鎖定狀態變化
   const handleLockFlagChange = (e: any) => {
-    form.setFieldsValue({ lockFlag: e.target.value });
-    refreshTable();
+    const lockFlag = e.target.value;
+    form.setFieldsValue({ lockFlag });
+    setQueryForm((prev) => ({ ...prev, lockFlag, pageNum: 1 }));
+    setTimeout(() => query(), 0);
   };
 
   // 行選擇配置
@@ -106,7 +118,7 @@ const LoginFailList: React.FC = () => {
           await loginFailApi.batchDelete(selectedRowKeys as number[]);
           message.success('解鎖成功');
           setSelectedRowKeys([]);
-          refreshTable();
+          query();
         } catch (error) {
           message.error('解鎖失敗');
         }
@@ -272,9 +284,25 @@ const LoginFailList: React.FC = () => {
           rowKey="loginFailId"
           columns={columns}
           dataSource={tableData}
-          loading={tableLoading}
-          pagination={pagination}
-          onChange={handleTableChange}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 條`,
+            onChange: (page, pageSize) => {
+              const values = form.getFieldsValue();
+              setQueryForm((prev) => ({
+                ...prev,
+                ...values,
+                pageNum: page,
+                pageSize,
+              }));
+              setTimeout(() => query(), 0);
+            },
+          }}
           rowSelection={rowSelection}
           size="small"
           bordered

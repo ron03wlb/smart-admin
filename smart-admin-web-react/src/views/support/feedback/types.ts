@@ -63,11 +63,11 @@ export interface FeedbackQueryForm {
   /**
    * 頁碼
    */
-  pageNum: number;
+  pageNum?: number;
   /**
    * 每頁數量
    */
-  pageSize: number;
+  pageSize?: number;
 }
 
 /**

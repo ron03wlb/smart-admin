@@ -58,9 +58,8 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
 
   // ==================== Modal Mode Detection ====================
 
-  const { isEditMode } = useModal({
-    editIdField: 'configId',
-    recordData: initialData,
+  const { isEdit } = useModal({
+    defaultFormData: initialData,
   });
 
   // ==================== Form Initialization ====================
@@ -87,7 +86,7 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode) {
+      if (isEdit) {
         // 編輯模式
         await configApi.updateConfig({
           ...values,
@@ -105,7 +104,7 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
       if (error.errorFields) {
         message.error('參數驗證錯誤，請仔細填寫表單數據！');
       } else {
-        message.error(isEditMode ? '更新失敗' : '添加失敗');
+        message.error(isEdit ? '更新失敗' : '添加失敗');
       }
     } finally {
       setLoading(false);
@@ -124,13 +123,13 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
 
   return (
     <Modal
-      title={isEditMode ? '編輯配置' : '添加配置'}
+      title={isEdit ? '編輯配置' : '添加配置'}
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}
       confirmLoading={loading}
       width={600}
-      okText={isEditMode ? '確認' : '確認'}
+      okText={isEdit ? '確認' : '確認'}
       cancelText="取消"
       destroyOnClose
     >

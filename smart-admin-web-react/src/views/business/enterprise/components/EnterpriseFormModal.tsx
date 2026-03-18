@@ -38,9 +38,8 @@ export default function EnterpriseFormModal({
   const [form] = Form.useForm<EnterpriseFormData>();
   const [loading, setLoading] = React.useState(false);
 
-  const { isEditMode } = useModal<EnterpriseVO>({
-    editIdField: 'enterpriseId',
-    recordData: initialData,
+  const { isEdit } = useModal<EnterpriseVO>({
+    defaultFormData: initialData,
   });
 
   /**
@@ -102,7 +101,7 @@ export default function EnterpriseFormModal({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode && initialData) {
+      if (isEdit && initialData) {
         // 編輯模式
         const updateForm: EnterpriseUpdateForm = {
           enterpriseId: initialData.enterpriseId,
@@ -152,7 +151,7 @@ export default function EnterpriseFormModal({
       }
     } catch (error) {
       if (error instanceof Error) {
-        message.error(error.message || (isEditMode ? '更新失敗' : '新增失敗'));
+        message.error(error.message || (isEdit ? '更新失敗' : '新增失敗'));
       }
       console.error(error);
     } finally {
@@ -199,7 +198,7 @@ export default function EnterpriseFormModal({
 
   return (
     <Modal
-      title={isEditMode ? '編輯企業' : '新增企業'}
+      title={isEdit ? '編輯企業' : '新增企業'}
       open={visible}
       onCancel={handleCancel}
       onOk={handleSubmit}

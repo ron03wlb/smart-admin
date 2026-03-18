@@ -29,6 +29,6 @@ export interface LoginFailQueryForm {
   lockFlag?: number; // 0-未鎖定, 1-已鎖定, undefined-全部
   loginLockBeginTimeBegin?: string;
   loginLockBeginTimeEnd?: string;
-  pageNum: number;
-  pageSize: number;
+  pageNum?: number;
+  pageSize?: number;
 }

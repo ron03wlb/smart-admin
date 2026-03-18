@@ -37,9 +37,8 @@ export default function NoticeFormDrawer({
   const [form] = Form.useForm<NoticeFormData>();
   const [loading, setLoading] = React.useState(false);
 
-  const { isEditMode } = useModal<NoticeVO>({
-    editIdField: 'noticeId',
-    recordData: initialData,
+  const { isEdit } = useModal<NoticeVO>({
+    defaultFormData: initialData,
   });
 
   /**
@@ -86,7 +85,7 @@ export default function NoticeFormDrawer({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode && initialData) {
+      if (isEdit && initialData) {
         // 編輯模式
         const updateForm: NoticeUpdateForm = {
           noticeId: initialData.noticeId,
@@ -126,7 +125,7 @@ export default function NoticeFormDrawer({
       }
     } catch (error) {
       if (error instanceof Error) {
-        message.error(error.message || (isEditMode ? '更新失敗' : '新增失敗'));
+        message.error(error.message || (isEdit ? '更新失敗' : '新增失敗'));
       }
       console.error(error);
     } finally {
@@ -168,7 +167,7 @@ export default function NoticeFormDrawer({
 
   return (
     <Drawer
-      title={isEditMode ? '編輯通知公告' : '新增通知公告'}
+      title={isEdit ? '編輯通知公告' : '新增通知公告'}
       open={visible}
       onClose={handleCancel}
       width={800}

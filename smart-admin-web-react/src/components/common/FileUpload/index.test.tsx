@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
 import FileUpload from './index';

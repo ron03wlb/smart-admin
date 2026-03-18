@@ -31,7 +31,6 @@ const languageOptions: Array<{ key: LanguageType; label: string }> = [
  * 語言切換器組件
  */
 export default function LanguageSwitcher() {
-  const { t } = useTranslation();
   const dispatch = useDispatch();
   const currentLanguage = useSelector((state: RootState) => state.appConfig.language);
 

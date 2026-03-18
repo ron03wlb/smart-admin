@@ -57,7 +57,7 @@ describe('DepartmentFormModal', () => {
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
-      isEditMode: false,
+      isEdit: false,
     });
   });
 
@@ -98,7 +98,7 @@ describe('DepartmentFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: DepartmentFormData = {
@@ -116,7 +116,7 @@ describe('DepartmentFormModal', () => {
 
     it('should have update button in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: DepartmentFormData = {
@@ -234,7 +234,7 @@ describe('DepartmentFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       vi.mocked(departmentApi.updateDepartment).mockResolvedValue({
@@ -266,7 +266,7 @@ describe('DepartmentFormModal', () => {
 
     it('should prevent parent from being self', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: DepartmentFormData = {

@@ -9,7 +9,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useModal } from './useModal';
-import type { UseModalOptions } from './useModal';
 
 interface TestFormData {
   id?: number;

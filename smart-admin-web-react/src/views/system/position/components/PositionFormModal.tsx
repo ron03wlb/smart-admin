@@ -59,9 +59,8 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
 
   // ==================== Modal Mode Detection ====================
 
-  const { isEditMode } = useModal({
-    editIdField: 'positionId',
-    recordData: initialData,
+  const { isEdit } = useModal({
+    defaultFormData: initialData,
   });
 
   // ==================== Form Initialization ====================
@@ -91,7 +90,7 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode) {
+      if (isEdit) {
         // 編輯模式
         await positionApi.updatePosition({
           ...values,
@@ -109,7 +108,7 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
       if (error.errorFields) {
         message.error('參數驗證錯誤，請仔細填寫表單數據！');
       } else {
-        message.error(isEditMode ? '更新失敗' : '添加失敗');
+        message.error(isEdit ? '更新失敗' : '添加失敗');
       }
     } finally {
       setLoading(false);
@@ -128,13 +127,13 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
 
   return (
     <Modal
-      title={isEditMode ? '編輯職位' : '添加職位'}
+      title={isEdit ? '編輯職位' : '添加職位'}
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}
       confirmLoading={loading}
       width={600}
-      okText={isEditMode ? '更新' : '保存'}
+      okText={isEdit ? '更新' : '保存'}
       cancelText="取消"
       destroyOnClose
     >

@@ -8,7 +8,7 @@
  * @Date: 2026-03-11
  */
 
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Card,
   Input,
@@ -30,7 +30,7 @@ import {
 import type { TableColumnsType } from 'antd';
 import { useTable } from '@/hooks/useTable';
 import { usePrivilege } from '@/hooks/usePrivilege';
-import { PrivilegeButton } from '@/components/permission/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import { employeeApi } from '@/api/system/employeeApi';
 import type { EmployeeVO, EmployeeQueryForm, EmployeeFormData } from './types';
 import {

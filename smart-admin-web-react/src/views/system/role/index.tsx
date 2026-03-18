@@ -6,14 +6,14 @@
  * @Date: 2026-03-11
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Input, message, Modal, Row, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, SearchOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { roleApi } from '@/api/system/roleApi';
 import type { RoleVO, RoleQueryForm } from './types';
 import { ROLE_PERMISSION, ROLE_TABLE_COLUMNS_WIDTH } from '@/constants/system/roleConst';
-import { PrivilegeButton } from '@/components/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import RoleFormModal from './components/RoleFormModal';
 
 const { confirm } = Modal;

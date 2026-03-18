@@ -13,7 +13,7 @@
  * @Date: 2026-03-10
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { TreeSelect, TreeSelectProps, message } from 'antd';
 import { queryCategoryTree, CategoryTreeNode } from '@/api/business/categoryApi';
 

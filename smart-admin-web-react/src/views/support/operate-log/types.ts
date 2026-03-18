@@ -37,12 +37,13 @@ export interface OperateLogVO {
  * 操作日誌查詢表單
  */
 export interface OperateLogQueryForm {
+  searchWord?: string; // 搜索關鍵字（用戶名/模塊/操作內容）
   keywords?: string; // 操作關鍵字：模塊/操作內容
   requestKeywords?: string; // 請求關鍵字：請求地址/請求方法/請求參數/返回結果
   userName?: string;
   successFlag?: number; // 0-失敗, 1-成功, undefined-全部
   startDate?: string;
   endDate?: string;
-  pageNum: number;
-  pageSize: number;
+  pageNum?: number;
+  pageSize?: number;
 }

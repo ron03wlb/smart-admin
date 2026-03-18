@@ -8,7 +8,7 @@
  * @Date: 2026-03-12
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Card,
   Form,
@@ -31,7 +31,7 @@ import {
 import type { TableColumnsType } from 'antd';
 import { useTable } from '@/hooks/useTable';
 import { usePrivilege } from '@/hooks/usePrivilege';
-import { PrivilegeButton } from '@/components/permission/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import { positionApi } from '@/api/system/positionApi';
 import type { PositionVO, PositionQueryForm, PositionFormData } from './types';
 import {

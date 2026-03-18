@@ -73,9 +73,8 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
 
   // ==================== Modal Mode Detection ====================
 
-  const { isEditMode } = useModal({
-    editIdField: 'employeeId',
-    recordData: initialData,
+  const { isEdit } = useModal({
+    defaultFormData: initialData,
   });
 
   // ==================== Load Role List ====================
@@ -125,7 +124,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode) {
+      if (isEdit) {
         // 編輯模式
         await employeeApi.updateEmployee({
           ...values,
@@ -147,7 +146,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
       if (error.errorFields) {
         message.error('參數驗證錯誤，請仔細填寫表單數據！');
       } else {
-        message.error(isEditMode ? '更新失敗' : '添加失敗');
+        message.error(isEdit ? '更新失敗' : '添加失敗');
       }
     } finally {
       setLoading(false);
@@ -166,13 +165,13 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
 
   return (
     <Modal
-      title={isEditMode ? '編輯員工' : '添加員工'}
+      title={isEdit ? '編輯員工' : '添加員工'}
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}
       confirmLoading={loading}
       width={600}
-      okText={isEditMode ? '更新' : '保存'}
+      okText={isEdit ? '更新' : '保存'}
       cancelText="取消"
       destroyOnClose
     >
@@ -232,7 +231,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
             { required: true, message: '登錄賬號不能為空' },
             { max: EMPLOYEE_VALIDATION.LOGIN_NAME_MAX_LENGTH, message: `登錄賬號不能大於${EMPLOYEE_VALIDATION.LOGIN_NAME_MAX_LENGTH}個字符` },
           ]}
-          extra={!isEditMode && <span style={{ color: '#8c8c8c' }}>初始密碼默認為：隨機</span>}
+          extra={!isEdit && <span style={{ color: '#8c8c8c' }}>初始密碼默認為：隨機</span>}
         >
           <Input placeholder="請輸入登錄名" />
         </Form.Item>

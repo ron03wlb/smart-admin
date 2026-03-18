@@ -6,7 +6,7 @@
  * @Date: 2026-03-11
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -17,7 +17,6 @@ import {
   Modal,
   Radio,
   Row,
-  Select,
   Space,
   Table,
   Tag,
@@ -39,7 +38,7 @@ import {
   GOODS_STATUS_COLORS,
   SHELVES_FLAG_LABELS,
 } from '@/constants/business/goodsConst';
-import { PrivilegeButton } from '@/components/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import GoodsFormDrawer from './components/GoodsFormDrawer';
 
 const { confirm } = Modal;

@@ -6,7 +6,7 @@
  * @Date: 2026-03-14
  */
 
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Modal, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { serialNumberApi } from '@/api/support/serialNumberApi';

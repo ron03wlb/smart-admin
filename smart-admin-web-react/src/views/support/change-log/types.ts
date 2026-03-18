@@ -55,6 +55,8 @@ export interface ChangeLogQueryForm {
   pageNum?: number;
   /** 每頁條數 */
   pageSize?: number;
+  /** 是否查詢總記錄數（分頁優化） */
+  searchCount?: boolean;
 }
 
 /**

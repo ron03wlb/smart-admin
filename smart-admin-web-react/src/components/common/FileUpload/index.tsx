@@ -18,7 +18,7 @@
  * @Date: 2026-03-10
  */
 
-import React, { useState, useCallback, useImperativeHandle, forwardRef, useMemo } from 'react';
+import { useState, useCallback, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { Upload, Modal, Button, message } from 'antd';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';

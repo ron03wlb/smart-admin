@@ -34,7 +34,7 @@ import {
 } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { usePrivilege } from '@/hooks/usePrivilege';
-import { PrivilegeButton } from '@/components/permission/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import { menuApi } from '@/api/system/menuApi';
 import type { MenuVO, MenuQueryForm, MenuFormData, MenuTypeEnum } from './types';
 import {

@@ -69,7 +69,7 @@ describe('EmployeeFormModal', () => {
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
-      isEditMode: false,
+      isEdit: false,
     });
   });
 
@@ -112,7 +112,7 @@ describe('EmployeeFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: EmployeeFormData = {
@@ -134,7 +134,7 @@ describe('EmployeeFormModal', () => {
 
     it('should not show initial password hint in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: EmployeeFormData = {
@@ -320,7 +320,7 @@ describe('EmployeeFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       vi.mocked(employeeApi.updateEmployee).mockResolvedValue({

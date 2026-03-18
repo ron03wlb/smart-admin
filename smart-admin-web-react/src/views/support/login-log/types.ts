@@ -73,6 +73,10 @@ export interface LoginLogVO {
  */
 export interface LoginLogQueryForm {
   /**
+   * 搜索關鍵字（用戶名/IP）
+   */
+  searchWord?: string;
+  /**
    * 用戶 ID
    */
   userId?: number;
@@ -99,9 +103,9 @@ export interface LoginLogQueryForm {
   /**
    * 頁碼
    */
-  pageNum: number;
+  pageNum?: number;
   /**
    * 每頁數量
    */
-  pageSize: number;
+  pageSize?: number;
 }

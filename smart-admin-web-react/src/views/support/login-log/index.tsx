@@ -32,16 +32,16 @@ const LoginLogList: React.FC = () => {
   const hasQueryPermission = usePrivilege(LOGIN_LOG_PERMISSION.QUERY);
 
   // 使用 useTable Hook
-  const {
-    data: tableData,
-    loading: tableLoading,
-    pagination,
-    handleTableChange,
-    refreshTable,
-  } = useTable<LoginLogVO, LoginLogQueryForm>(
-    loginLogApi.queryPage,
-    form,
-  );
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<LoginLogVO, LoginLogQueryForm>({
+    defaultQueryForm: {
+      searchWord: undefined,
+      startDate: undefined,
+      endDate: undefined,
+    },
+    pagination: { pageNum: 1, pageSize: 10 },
+    queryApi: loginLogApi.queryPage,
+    autoQuery: false,
+  });
 
   // 解析 UserAgent 並添加到數據中
   const parsedTableData = useMemo(() => {
@@ -67,19 +67,28 @@ const LoginLogList: React.FC = () => {
   // 初始化時加載數據
   useEffect(() => {
     if (hasQueryPermission) {
-      refreshTable();
+      query();
     }
-  }, [hasQueryPermission, refreshTable]);
+  }, [hasQueryPermission, query]);
 
   // 處理搜索
   const handleSearch = () => {
-    refreshTable();
+    const values = form.getFieldsValue();
+    setQueryForm((prev) => ({
+      ...prev,
+      searchWord: values.searchWord,
+      startDate: values.startDate,
+      endDate: values.endDate,
+      pageNum: 1,
+    }));
+    setTimeout(() => query(), 0);
   };
 
   // 處理重置
   const handleReset = () => {
     form.resetFields();
-    refreshTable();
+    reset();
+    setTimeout(() => query(), 0);
   };
 
   // 處理日期範圍變化
@@ -253,9 +262,25 @@ const LoginLogList: React.FC = () => {
           rowKey="loginLogId"
           columns={columns}
           dataSource={parsedTableData}
-          loading={tableLoading}
-          pagination={pagination}
-          onChange={handleTableChange}
+          loading={loading}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 條`,
+            onChange: (page, pageSize) => {
+              const values = form.getFieldsValue();
+              setQueryForm((prev) => ({
+                ...prev,
+                ...values,
+                pageNum: page,
+                pageSize,
+              }));
+              setTimeout(() => query(), 0);
+            },
+          }}
           size="small"
           bordered
         />

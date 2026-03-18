@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
 import SmartLoadingComponent from './index';

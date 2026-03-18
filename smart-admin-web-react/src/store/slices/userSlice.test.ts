@@ -59,29 +59,35 @@ const mockMenuItems: MenuItem[] = [
     menuId: 1,
     menuName: '系統管理',
     menuType: 1,
-    frontPath: '/system',
+    path: '/system',
     parentId: 0,
     sort: 1,
     perms: '',
+    visibleFlag: true,
+    disabledFlag: false,
     children: [
       {
         menuId: 2,
         menuName: '用戶管理',
         menuType: 2,
-        frontPath: '/system/user',
+        path: '/system/user',
         parentId: 1,
         sort: 1,
         perms: 'system:user:query',
+        visibleFlag: true,
+        disabledFlag: false,
         children: [],
       },
       {
         menuId: 3,
         menuName: '角色管理',
         menuType: 2,
-        frontPath: '/system/role',
+        path: '/system/role',
         parentId: 1,
         sort: 2,
         perms: 'system:role:query',
+        visibleFlag: true,
+        disabledFlag: false,
         children: [],
       },
     ],
@@ -90,19 +96,23 @@ const mockMenuItems: MenuItem[] = [
     menuId: 4,
     menuName: '業務管理',
     menuType: 1,
-    frontPath: '/business',
+    path: '/business',
     parentId: 0,
     sort: 2,
     perms: '',
+    visibleFlag: true,
+    disabledFlag: false,
     children: [
       {
         menuId: 5,
         menuName: '商品管理',
         menuType: 2,
-        frontPath: '/business/goods',
+        path: '/business/goods',
         parentId: 4,
         sort: 1,
         perms: 'business:goods:query',
+        visibleFlag: true,
+        disabledFlag: false,
         children: [],
       },
     ],
@@ -110,9 +120,9 @@ const mockMenuItems: MenuItem[] = [
 ];
 
 const mockPermissionPoints: PermissionPoint[] = [
-  { webPerms: 'system:user:add', permsName: '新增用戶' },
-  { webPerms: 'system:user:edit', permsName: '編輯用戶' },
-  { webPerms: 'system:user:delete', permsName: '刪除用戶' },
+  { menuId: 101, webPerms: 'system:user:add', menuName: '新增用戶' },
+  { menuId: 102, webPerms: 'system:user:edit', menuName: '編輯用戶' },
+  { menuId: 103, webPerms: 'system:user:delete', menuName: '刪除用戶' },
 ];
 
 const mockLoginInfo = {
@@ -144,8 +154,8 @@ const mockLoginInfo = {
     },
   ],
   pointList: [
-    { webPerms: 'system:user:add', permsName: '新增用戶' },
-    { webPerms: 'system:user:edit', permsName: '編輯用戶' },
+    { menuId: 201, webPerms: 'system:user:add', menuName: '新增用戶' },
+    { menuId: 202, webPerms: 'system:user:edit', menuName: '編輯用戶' },
   ],
 };
 

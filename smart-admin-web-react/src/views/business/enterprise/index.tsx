@@ -6,7 +6,7 @@
  * @Date: 2026-03-11
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -38,7 +38,7 @@ import {
   DISABLED_FLAG_LABELS,
   DISABLED_FLAG_COLORS,
 } from '@/constants/business/enterpriseConst';
-import { PrivilegeButton } from '@/components/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import EnterpriseFormModal from './components/EnterpriseFormModal';
 
 const { RangePicker } = DatePicker;

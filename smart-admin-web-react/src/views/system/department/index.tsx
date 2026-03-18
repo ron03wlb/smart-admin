@@ -27,7 +27,7 @@ import {
 } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { usePrivilege } from '@/hooks/usePrivilege';
-import { PrivilegeButton } from '@/components/permission/PrivilegeButton';
+import PrivilegeButton from '@/components/PrivilegeButton';
 import { departmentApi } from '@/api/system/departmentApi';
 import type { DepartmentVO, DepartmentFormData } from './types';
 import {

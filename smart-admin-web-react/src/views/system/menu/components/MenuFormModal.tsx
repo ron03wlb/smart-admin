@@ -39,9 +39,8 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
   const [menuType, setMenuType] = useState<MenuTypeEnum>(MenuTypeEnum.CATALOG);
 
   // 使用 useModal hook 判斷新增/編輯模式
-  const { isEditMode } = useModal({
-    editIdField: 'menuId',
-    recordData: initialData,
+  const { isEdit } = useModal({
+    defaultFormData: initialData,
   });
 
   // ==================== Form Initialization ====================
@@ -105,7 +104,7 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
         parentId: values.parentId || MENU_CONSTANTS.TOP_PARENT_ID,
       };
 
-      if (isEditMode) {
+      if (isEdit) {
         const updateForm: MenuUpdateForm = {
           ...params,
           menuId: initialData!.menuId!,
@@ -125,7 +124,7 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
       if (error.errorFields) {
         message.error('參數驗證錯誤，請仔細填寫表單數據！');
       } else {
-        message.error(isEditMode ? '更新失敗' : '添加失敗');
+        message.error(isEdit ? '更新失敗' : '添加失敗');
       }
     }
   };
@@ -149,7 +148,7 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
 
   return (
     <Drawer
-      title={isEditMode ? '編輯菜單' : '添加菜單'}
+      title={isEdit ? '編輯菜單' : '添加菜單'}
       open={visible}
       onClose={handleCancel}
       width={600}

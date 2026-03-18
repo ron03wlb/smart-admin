@@ -29,9 +29,8 @@ export default function RoleFormModal({
   const [form] = Form.useForm<RoleFormData>();
   const [loading, setLoading] = React.useState(false);
 
-  const { isEditMode } = useModal<RoleVO>({
-    editIdField: 'roleId',
-    recordData: initialData,
+  const { isEdit } = useModal<RoleVO>({
+    defaultFormData: initialData,
   });
 
   /**
@@ -63,7 +62,7 @@ export default function RoleFormModal({
       const values = await form.validateFields();
       setLoading(true);
 
-      if (isEditMode && initialData) {
+      if (isEdit && initialData) {
         // 編輯模式
         const updateForm: RoleUpdateForm = {
           roleId: initialData.roleId,
@@ -93,7 +92,7 @@ export default function RoleFormModal({
       }
     } catch (error) {
       if (error instanceof Error) {
-        message.error(error.message || (isEditMode ? '更新失敗' : '新增失敗'));
+        message.error(error.message || (isEdit ? '更新失敗' : '新增失敗'));
       }
       console.error(error);
     } finally {
@@ -126,7 +125,7 @@ export default function RoleFormModal({
 
   return (
     <Modal
-      title={isEditMode ? '編輯角色' : '新增角色'}
+      title={isEdit ? '編輯角色' : '新增角色'}
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}

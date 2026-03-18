@@ -57,7 +57,7 @@ describe('ConfigFormModal', () => {
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
-      isEditMode: false,
+      isEdit: false,
     });
   });
 
@@ -99,7 +99,7 @@ describe('ConfigFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       const editData: ConfigFormData = {
@@ -246,7 +246,7 @@ describe('ConfigFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       vi.mocked(configApi.updateConfig).mockResolvedValue({
@@ -278,7 +278,7 @@ describe('ConfigFormModal', () => {
 
     it('should handle API error in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
-        isEditMode: true,
+        isEdit: true,
       });
 
       vi.mocked(configApi.updateConfig).mockRejectedValue(new Error('API Error'));
