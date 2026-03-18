@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import CategoryTreeSelect from './index';
 import * as categoryApi from '@/api/business/categoryApi';
 
@@ -36,6 +36,7 @@ describe('CategoryTreeSelect', () => {
       categoryName: '電子產品',
       parentId: 0,
       categoryType: 1,
+      disabledFlag: false,
       value: 1,
       title: '電子產品',
       key: 1,
@@ -45,6 +46,7 @@ describe('CategoryTreeSelect', () => {
           categoryName: '手機',
           parentId: 1,
           categoryType: 1,
+          disabledFlag: false,
           value: 2,
           title: '手機',
           key: 2,
@@ -140,7 +142,7 @@ describe('CategoryTreeSelect', () => {
     it('當 API 返回錯誤時應該顯示錯誤消息', async () => {
       vi.mocked(categoryApi.queryCategoryTree).mockResolvedValue({
         ok: false,
-        data: null,
+        data: [],
         msg: '查詢失敗',
         code: 500,
       });

@@ -9,7 +9,6 @@
 import { Dropdown, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store';
 import { setLanguage } from '@/store/slices/appConfigSlice';

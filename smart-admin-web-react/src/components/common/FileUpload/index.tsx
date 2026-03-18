@@ -22,6 +22,7 @@ import { useState, useCallback, useImperativeHandle, forwardRef, useMemo } from 
 import { Upload, Modal, Button, message } from 'antd';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';
+import type { RcFile, UploadRequestOption } from 'rc-upload/lib/interface';
 import { fileApi, FileUploadResponse } from '@/api/support/fileApi';
 import { SmartLoading } from '@/utils/SmartLoading';
 import { FILE_FOLDER_TYPE_ENUM } from '@/constants/support/fileConst';
@@ -124,7 +125,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
    * 上傳前校驗
    */
   const beforeUpload: UploadProps['beforeUpload'] = useCallback(
-    (file, files) => {
+    (file: RcFile, files: RcFile[]) => {
       // 檢查文件數量
       if (fileList.length + files.length > maxUploadSize) {
         showErrorMsgOnce(`最多支持上傳 ${maxUploadSize} 個文件哦！`);
@@ -136,7 +137,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
         const suffixIndex = file.name.lastIndexOf('.');
         const fileSuffix = file.name.substring(suffixIndex <= -1 ? 0 : suffixIndex);
         if (accept.indexOf(fileSuffix) === -1) {
-          showErrorMsgOnce(`只支持上傳 ${accept.replaceAll(',', ' ')} 格式的文件`);
+          showErrorMsgOnce(`只支持上傳 ${accept.split(',').join(' ')} 格式的文件`);
           return false;
         }
       }
@@ -155,7 +156,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
    * 自定義上傳請求
    */
   const customRequest: UploadProps['customRequest'] = useCallback(
-    async options => {
+    async (options: UploadRequestOption) => {
       SmartLoading.show();
       try {
         const formData = new FormData();
@@ -206,7 +207,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
    * 文件列表變化處理
    */
   const handleChange: UploadProps['onChange'] = useCallback(
-    info => {
+    (info: { file: UploadFile; fileList: UploadFile[] }) => {
       // 只處理移除操作（上傳操作在 customRequest 中處理）
       if (info.file.status === 'removed') {
         setFileList(prev => {
@@ -225,7 +226,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
   /**
    * 預覽處理
    */
-  const handlePreview: UploadProps['onPreview'] = useCallback(async file => {
+  const handlePreview: UploadProps['onPreview'] = useCallback(async (file: UploadFile) => {
     const response = file.response as FileUploadResponse | undefined;
     if (!response) {
       return;

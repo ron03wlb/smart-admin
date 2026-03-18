@@ -53,3 +53,15 @@ export const categoryApi = {
     return request.get(`/category/delete/${categoryId}`);
   },
 };
+
+/**
+ * 命名導出：queryCategoryTree 函數
+ * 用於 CategoryTreeSelect 組件
+ */
+export const queryCategoryTree = categoryApi.queryCategoryTree;
+
+/**
+ * 類型別名：CategoryTreeNode
+ * 實際上就是 CategoryVO（包含 children 屬性用於樹形結構）
+ */
+export type CategoryTreeNode = CategoryVO;

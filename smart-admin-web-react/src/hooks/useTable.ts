@@ -158,7 +158,7 @@ export function useTable<TData = any, TQueryForm extends Record<string, any> = R
     pagination: paginationConfig = {},
     queryApi,
     autoQuery = true,
-    rowSelection = false,
+    rowSelection: _rowSelection = false,
   } = options;
 
   const defaultPageNum = paginationConfig.pageNum || 1;
@@ -228,7 +228,7 @@ export function useTable<TData = any, TQueryForm extends Record<string, any> = R
    * 處理表格變化（分頁、排序、篩選）
    */
   const handleTableChange = useCallback(
-    (pagination: TablePaginationConfig, filters: any, sorter: SorterResult<TData> | SorterResult<TData>[]) => {
+    (pagination: TablePaginationConfig, _filters: any, sorter: SorterResult<TData> | SorterResult<TData>[]) => {
       // 更新分頁
       const newQueryForm = {
         ...queryForm,
@@ -263,7 +263,7 @@ export function useTable<TData = any, TQueryForm extends Record<string, any> = R
   /**
    * 處理行選擇變化
    */
-  const handleRowSelectionChange = useCallback((selectedRowKeys: React.Key[], selectedRows: TData[]) => {
+  const handleRowSelectionChange = useCallback((selectedRowKeys: React.Key[], _selectedRows: TData[]) => {
     setSelectedRowKeys(selectedRowKeys);
   }, []);
 
