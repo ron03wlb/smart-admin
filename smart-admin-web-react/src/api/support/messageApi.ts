@@ -9,7 +9,7 @@
  */
 
 import request from '@/utils/request';
-import type { ResponseDTO, PageResult } from '@/types/response';
+import type { ResponseDTO, PageResult } from '@/api/types/response';
 
 /**
  * 消息查詢表單

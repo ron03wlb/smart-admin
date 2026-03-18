@@ -7,7 +7,7 @@
  */
 
 import request from '@/utils/request';
-import type { ResponseDTO, PageResult } from '@/types/response';
+import type { ResponseDTO, PageResult } from '@/api/types/response';
 import type {
   HelpDocVO,
   HelpDocQueryForm,

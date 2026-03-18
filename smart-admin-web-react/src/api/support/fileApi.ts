@@ -9,7 +9,7 @@
  */
 
 import request from '@/utils/request';
-import { ResponseDTO } from '@/types/response';
+import { ResponseDTO } from '@/api/types/response';
 
 /**
  * 文件上傳響應數據

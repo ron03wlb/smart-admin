@@ -9,7 +9,7 @@
  */
 
 import request from '@/utils/request';
-import type { ResponseDTO } from '@/types/response';
+import type { ResponseDTO } from '@/api/types/response';
 
 /**
  * 數據脫敏示例 VO

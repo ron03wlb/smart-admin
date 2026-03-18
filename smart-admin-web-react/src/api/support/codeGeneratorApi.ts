@@ -6,7 +6,7 @@
  * @Date: 2026-03-15
  */
 
-import type { PageResult, ResponseDTO } from '@/types/common';
+import type { PageResult, ResponseDTO } from '@/api/types/response';
 import request from '@/utils/request';
 
 /**

@@ -101,9 +101,9 @@ export interface JobQueryForm {
   /** 刪除標記 */
   deletedFlag?: boolean;
   /** 頁碼 */
-  pageNum: number;
+  pageNum?: number;
   /** 每頁條數 */
-  pageSize: number;
+  pageSize?: number;
 }
 
 /**

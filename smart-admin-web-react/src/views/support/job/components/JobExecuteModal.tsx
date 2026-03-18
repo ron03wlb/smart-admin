@@ -8,7 +8,7 @@
  * @Date: 2026-03-13
  */
 
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Modal, Form, Input, Alert, message } from 'antd';
 import { jobApi } from '@/api/support/jobApi';
 import { JOB_VALIDATION } from '@/constants/support/jobConst';
@@ -44,7 +44,6 @@ const JobExecuteModal = forwardRef<{ show: (rowData: JobVO) => void }, JobExecut
 
       try {
         setLoading(true);
-        const values = form.getFieldsValue();
 
         const executeForm: JobExecuteForm = {
           jobId: jobData.jobId,

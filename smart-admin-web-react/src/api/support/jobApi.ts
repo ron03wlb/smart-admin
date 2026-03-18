@@ -10,7 +10,7 @@
  */
 
 import request from '@/utils/request';
-import type { ResponseDTO, PageResult } from '@/types/common';
+import type { ResponseDTO, PageResult } from '@/api/types/response';
 import type {
   JobVO,
   JobQueryForm,

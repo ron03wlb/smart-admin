@@ -26,7 +26,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined, ReloadOutlined, CheckOutlined, WarningOutlined } from '@ant-design/icons';
 import { jobApi } from '@/api/support/jobApi';
 import type { JobLogVO, JobLogQueryForm } from '../types';
-import type { PageResult } from '@/types/common';
+import type { PageResult } from '@/api/types/response';
 
 const { RangePicker } = DatePicker;
 
@@ -298,7 +298,7 @@ const JobLogDrawer: React.FC<JobLogDrawerProps> = ({ visible, jobId, jobName, on
 
         <Form.Item name="dateRange" label="執行時間">
           <RangePicker
-            onChange={(dates, dateStrings) => {
+            onChange={(_, dateStrings) => {
               setQueryForm({
                 ...queryForm,
                 startTime: dateStrings[0] || undefined,

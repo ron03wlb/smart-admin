@@ -9,7 +9,7 @@
  * @Date: 2026-03-13
  */
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Form,
   Input,
@@ -42,7 +42,6 @@ import {
   JOB_TABLE_COLUMNS_WIDTH,
 } from '@/constants/support/jobConst';
 import type { JobVO, JobQueryForm, JobEnabledUpdateForm } from './types';
-import { JobTriggerTypeEnum } from './types';
 import JobFormModal from './components/JobFormModal';
 import JobExecuteModal from './components/JobExecuteModal';
 import JobLogDrawer from './components/JobLogDrawer';
@@ -66,10 +65,17 @@ const JobManagement: React.FC = () => {
   const [logDrawerVisible, setLogDrawerVisible] = useState(false);
   const [currentJob, setCurrentJob] = useState<{ jobId: number; jobName: string } | undefined>();
 
-  const { tableData, loading, pagination, queryData, resetQuery } = useTable<JobVO, JobQueryForm>(
-    jobApi.queryJob,
-    { pageNum: 1, pageSize: 10 }
-  );
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<JobVO, JobQueryForm>({
+    defaultQueryForm: {
+      searchWord: undefined,
+      triggerType: undefined,
+      enabledFlag: undefined,
+      deletedFlag: false,
+    },
+    pagination: { pageNum: 1, pageSize: 10 },
+    queryApi: jobApi.queryJob,
+    autoQuery: true,
+  });
 
   // 處理執行類簡化顯示（只顯示類名最後部分）
   const handleJobClass = (jobClass: string): string => {
@@ -86,12 +92,6 @@ const JobManagement: React.FC = () => {
 
   // 處理啟用狀態切換
   const handleEnabledUpdate = async (checked: boolean, record: JobVO) => {
-    // 設置該行的 loading 狀態
-    const newData = tableData.map((item) =>
-      item.jobId === record.jobId ? { ...item, enabledLoading: true } : item
-    );
-    queryData({ ...form.getFieldsValue(), pageNum: pagination.current });
-
     try {
       const updateForm: JobEnabledUpdateForm = {
         jobId: record.jobId,
@@ -102,21 +102,13 @@ const JobManagement: React.FC = () => {
       // 重新查詢任務詳情以獲取最新的 nextJobExecuteTimeList
       const res = await jobApi.queryJobInfo(record.jobId);
       if (res.ok && res.data) {
-        const updatedData = tableData.map((item) =>
-          item.jobId === record.jobId ? { ...res.data, enabledLoading: false } : item
-        );
-        queryData({ ...form.getFieldsValue(), pageNum: pagination.current });
+        query();
       }
 
       message.success('更新成功');
     } catch (error) {
-      // 恢復原狀態
-      const revertedData = tableData.map((item) =>
-        item.jobId === record.jobId
-          ? { ...item, enabledFlag: !checked, enabledLoading: false }
-          : item
-      );
-      queryData({ ...form.getFieldsValue(), pageNum: pagination.current });
+      message.error('更新失敗');
+      query();
     }
   };
 
@@ -131,7 +123,7 @@ const JobManagement: React.FC = () => {
       onOk: async () => {
         await jobApi.deleteJob(record.jobId);
         message.success('刪除成功');
-        queryData();
+        query();
       },
     });
   };
@@ -140,14 +132,24 @@ const JobManagement: React.FC = () => {
   const handleSearch = () => {
     const values = form.getFieldsValue();
     const deletedFlag = activeTab === 'deleted';
-    queryData({ ...values, deletedFlag, pageNum: 1 });
+    setQueryForm((prev) => ({
+      ...prev,
+      searchWord: values.searchWord,
+      triggerType: values.triggerType,
+      enabledFlag: values.enabledFlag,
+      deletedFlag,
+      pageNum: 1,
+    }));
+    setTimeout(() => query(), 0);
   };
 
   // 處理重置
   const handleReset = () => {
     form.resetFields();
     const deletedFlag = activeTab === 'deleted';
-    resetQuery({ deletedFlag });
+    reset();
+    setQueryForm((prev) => ({ ...prev, deletedFlag }));
+    setTimeout(() => query(), 0);
   };
 
   // 處理查看執行記錄
@@ -161,7 +163,9 @@ const JobManagement: React.FC = () => {
     setActiveTab(key as 'active' | 'deleted');
     form.resetFields();
     const deletedFlag = key === 'deleted';
-    resetQuery({ deletedFlag });
+    reset();
+    setQueryForm((prev) => ({ ...prev, deletedFlag }));
+    setTimeout(() => query(), 0);
   };
 
   // 處理新增
@@ -398,7 +402,14 @@ const JobManagement: React.FC = () => {
               onChange: (page, pageSize) => {
                 const values = form.getFieldsValue();
                 const deletedFlag = activeTab === 'deleted';
-                queryData({ ...values, deletedFlag, pageNum: page, pageSize });
+                setQueryForm((prev) => ({
+                  ...prev,
+                  ...values,
+                  deletedFlag,
+                  pageNum: page,
+                  pageSize,
+                }));
+                setTimeout(() => query(), 0);
               },
             }}
             scroll={{ x: 1800 }}
@@ -460,7 +471,14 @@ const JobManagement: React.FC = () => {
               onChange: (page, pageSize) => {
                 const values = form.getFieldsValue();
                 const deletedFlag = activeTab === 'deleted';
-                queryData({ ...values, deletedFlag, pageNum: page, pageSize });
+                setQueryForm((prev) => ({
+                  ...prev,
+                  ...values,
+                  deletedFlag,
+                  pageNum: page,
+                  pageSize,
+                }));
+                setTimeout(() => query(), 0);
               },
             }}
             scroll={{ x: 1800 }}
@@ -470,8 +488,8 @@ const JobManagement: React.FC = () => {
         </Tabs.TabPane>
       </Tabs>
 
-      <JobFormModal ref={formModalRef} onSuccess={queryData} />
-      <JobExecuteModal ref={executeModalRef} onSuccess={queryData} />
+      <JobFormModal ref={formModalRef} onSuccess={query} />
+      <JobExecuteModal ref={executeModalRef} onSuccess={query} />
       <JobLogDrawer
         visible={logDrawerVisible}
         jobId={currentJob?.jobId}
