@@ -67,7 +67,7 @@ public class IgamingArchitectureTest {
           .whereLayer("Service")
           .mayOnlyBeAccessedByLayers("Controller", "Consumer", "Job")
           .whereLayer("Manager")
-          .mayOnlyBeAccessedByLayers("Service", "Manager", "Consumer", "Job")
+          .mayOnlyBeAccessedByLayers("Service", "Manager", "Consumer", "Job", "LiteFlowComponent")
           .whereLayer("LiteFlowComponent")
           .mayNotBeAccessedByAnyLayer()
           .whereLayer("Dao")

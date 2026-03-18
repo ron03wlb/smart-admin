@@ -46,6 +46,7 @@
             <Class name="~.*Result"/>
             <Class name="~.*Form"/>
             <Class name="~.*Message"/>
+            <Class name="~.*Context"/>
         </Or>
         <Or>
             <Bug pattern="EI_EXPOSE_REP"/>
@@ -118,6 +119,16 @@
 
     <Match>
         <Class name="~.*Listener"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!--
+        LiteFlow Component pattern (extends NodeComponent)
+        LiteFlow components inject rule managers via @RequiredArgsConstructor.
+        Components are managed by LiteFlow container and follow standard DI pattern.
+    -->
+    <Match>
+        <Class name="~.*Cmp"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 

@@ -45,6 +45,17 @@ import net.lab1024.sa.igaming.activity.turnover.manager.TurnoverRiskActionRuleMa
 @RequiredArgsConstructor
 public class RiskFilterCmp extends NodeComponent {
 
+  // Risk level thresholds
+  private static final int RISK_SCORE_CRITICAL_THRESHOLD = 70;
+  private static final int RISK_SCORE_HIGH_THRESHOLD = 50;
+  private static final int RISK_SCORE_MEDIUM_THRESHOLD = 30;
+
+  // Risk action types
+  private static final int RISK_ACTION_BLOCK = 3;
+
+  // Default comparison operator
+  private static final String DEFAULT_COMPARISON_OPERATOR = ">=";
+
   private final TurnoverOddsThresholdRuleManager oddsThresholdRuleManager;
   private final TurnoverRiskActionRuleManager riskActionRuleManager;
 
@@ -119,18 +130,17 @@ public class RiskFilterCmp extends NodeComponent {
    * @return true if comparison passes, false otherwise
    */
   private boolean compareOdds(BigDecimal oddsValue, BigDecimal threshold, String operator) {
-    if (operator == null) {
-      operator = ">="; // Default to >=
-    }
+    // Use default operator if not specified
+    String effectiveOperator = (operator != null) ? operator : DEFAULT_COMPARISON_OPERATOR;
 
-    return switch (operator) {
+    return switch (effectiveOperator) {
       case ">=" -> oddsValue.compareTo(threshold) >= 0;
       case ">" -> oddsValue.compareTo(threshold) > 0;
       case "<=" -> oddsValue.compareTo(threshold) <= 0;
       case "<" -> oddsValue.compareTo(threshold) < 0;
       case "=" -> oddsValue.compareTo(threshold) == 0;
       default -> {
-        log.warn("Unknown comparison operator: {}, defaulting to >=", operator);
+        log.warn("Unknown comparison operator: {}, defaulting to >=", effectiveOperator);
         yield oddsValue.compareTo(threshold) >= 0;
       }
     };
@@ -168,7 +178,7 @@ public class RiskFilterCmp extends NodeComponent {
     ctx.setTurnoverFactor(rule.getTurnoverFactor());
 
     // Check if bet should be blocked
-    if (rule.getActionType() == 3) { // RA_BLOCK
+    if (rule.getActionType() == RISK_ACTION_BLOCK) {
       ctx.markRejected("RISK_SCORE_HIGH");
     }
   }
@@ -180,11 +190,11 @@ public class RiskFilterCmp extends NodeComponent {
    * @return risk level (1: LOW, 2: MEDIUM, 3: HIGH, 4: CRITICAL)
    */
   private int determineRiskLevel(int riskScore) {
-    if (riskScore >= 70) {
+    if (riskScore >= RISK_SCORE_CRITICAL_THRESHOLD) {
       return 4; // CRITICAL
-    } else if (riskScore >= 50) {
+    } else if (riskScore >= RISK_SCORE_HIGH_THRESHOLD) {
       return 3; // HIGH
-    } else if (riskScore >= 30) {
+    } else if (riskScore >= RISK_SCORE_MEDIUM_THRESHOLD) {
       return 2; // MEDIUM
     } else {
       return 1; // LOW
