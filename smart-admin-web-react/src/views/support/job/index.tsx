@@ -22,6 +22,7 @@ import {
   Modal,
   message,
   Tooltip,
+  Tabs,
 } from 'antd';
 import {
   SearchOutlined,
@@ -44,6 +45,7 @@ import type { JobVO, JobQueryForm, JobEnabledUpdateForm } from './types';
 import { JobTriggerTypeEnum } from './types';
 import JobFormModal from './components/JobFormModal';
 import JobExecuteModal from './components/JobExecuteModal';
+import JobLogDrawer from './components/JobLogDrawer';
 
 const JobManagement: React.FC = () => {
   const [form] = Form.useForm();
@@ -55,6 +57,14 @@ const JobManagement: React.FC = () => {
   const hasDeletePrivilege = usePrivilege(JOB_PERMISSION.DELETE);
   const hasExecutePrivilege = usePrivilege(JOB_PERMISSION.EXECUTE);
   const hasUpdateEnabledPrivilege = usePrivilege(JOB_PERMISSION.UPDATE_ENABLED);
+  const hasLogQueryPrivilege = usePrivilege(JOB_PERMISSION.LOG_QUERY);
+
+  // Tab狀態
+  const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
+
+  // 執行記錄Drawer狀態
+  const [logDrawerVisible, setLogDrawerVisible] = useState(false);
+  const [currentJob, setCurrentJob] = useState<{ jobId: number; jobName: string } | undefined>();
 
   const { tableData, loading, pagination, queryData, resetQuery } = useTable<JobVO, JobQueryForm>(
     jobApi.queryJob,
@@ -129,13 +139,29 @@ const JobManagement: React.FC = () => {
   // 處理查詢
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    queryData({ ...values, pageNum: 1 });
+    const deletedFlag = activeTab === 'deleted';
+    queryData({ ...values, deletedFlag, pageNum: 1 });
   };
 
   // 處理重置
   const handleReset = () => {
     form.resetFields();
-    resetQuery();
+    const deletedFlag = activeTab === 'deleted';
+    resetQuery({ deletedFlag });
+  };
+
+  // 處理查看執行記錄
+  const handleViewLog = (record: JobVO) => {
+    setCurrentJob({ jobId: record.jobId, jobName: record.jobName });
+    setLogDrawerVisible(true);
+  };
+
+  // 處理Tab切換
+  const handleTabChange = (key: string) => {
+    setActiveTab(key as 'active' | 'deleted');
+    form.resetFields();
+    const deletedFlag = key === 'deleted';
+    resetQuery({ deletedFlag });
   };
 
   // 處理新增
@@ -283,7 +309,7 @@ const JobManagement: React.FC = () => {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: JOB_TABLE_COLUMNS_WIDTH.action,
+      width: 260,
       render: (_, record) => (
         <Space size="small">
           {hasUpdatePrivilege && (
@@ -294,6 +320,11 @@ const JobManagement: React.FC = () => {
           {hasExecutePrivilege && (
             <Button type="link" size="small" onClick={() => handleExecute(record)}>
               執行
+            </Button>
+          )}
+          {hasLogQueryPrivilege && (
+            <Button type="link" size="small" onClick={() => handleViewLog(record)}>
+              執行記錄
             </Button>
           )}
           {hasDeletePrivilege && (
@@ -308,72 +339,145 @@ const JobManagement: React.FC = () => {
 
   return (
     <div className="job-management">
-      <div className="search-form">
-        <Form form={form} layout="inline">
-          <Form.Item label="關鍵字" name="searchWord">
-            <Input placeholder="請輸入關鍵字" style={{ width: 200 }} maxLength={30} />
-          </Form.Item>
-          <Form.Item label="觸發類型" name="triggerType">
-            <Select placeholder="請選擇觸發類型" allowClear style={{ width: 155 }}>
-              {Object.entries(JOB_TRIGGER_TYPE_LABELS).map(([value, label]) => (
-                <Select.Option key={value} value={value}>
-                  {label}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item label="狀態" name="enabledFlag">
-            <Select placeholder="請選擇狀態" allowClear style={{ width: 150 }}>
-              <Select.Option value={true}>開啟</Select.Option>
-              <Select.Option value={false}>停止</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item>
-            <Space>
-              {hasQueryPrivilege && (
-                <>
-                  <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-                    查詢
-                  </Button>
-                  <Button icon={<ReloadOutlined />} onClick={handleReset}>
-                    重置
-                  </Button>
-                </>
-              )}
-              {hasAddPrivilege && (
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-                  添加任務
-                </Button>
-              )}
-            </Space>
-          </Form.Item>
-        </Form>
-      </div>
+      <Tabs activeKey={activeTab} onChange={handleTabChange}>
+        <Tabs.TabPane tab="有效任務" key="active">
+          <div className="search-form">
+            <Form form={form} layout="inline">
+              <Form.Item label="關鍵字" name="searchWord">
+                <Input placeholder="請輸入關鍵字" style={{ width: 200 }} maxLength={30} />
+              </Form.Item>
+              <Form.Item label="觸發類型" name="triggerType">
+                <Select placeholder="請選擇觸發類型" allowClear style={{ width: 155 }}>
+                  {Object.entries(JOB_TRIGGER_TYPE_LABELS).map(([value, label]) => (
+                    <Select.Option key={value} value={value}>
+                      {label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item label="狀態" name="enabledFlag">
+                <Select placeholder="請選擇狀態" allowClear style={{ width: 150 }}>
+                  <Select.Option value={true}>開啟</Select.Option>
+                  <Select.Option value={false}>停止</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item>
+                <Space>
+                  {hasQueryPrivilege && (
+                    <>
+                      <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+                        查詢
+                      </Button>
+                      <Button icon={<ReloadOutlined />} onClick={handleReset}>
+                        重置
+                      </Button>
+                    </>
+                  )}
+                  {hasAddPrivilege && (
+                    <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+                      添加任務
+                    </Button>
+                  )}
+                </Space>
+              </Form.Item>
+            </Form>
+          </div>
 
-      <Table
-        rowKey="jobId"
-        columns={columns}
-        dataSource={tableData}
-        loading={loading}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total) => `共 ${total} 條`,
-          onChange: (page, pageSize) => {
-            const values = form.getFieldsValue();
-            queryData({ ...values, pageNum: page, pageSize });
-          },
-        }}
-        scroll={{ x: 1800 }}
-        size="small"
-        bordered
-      />
+          <Table
+            rowKey="jobId"
+            columns={columns}
+            dataSource={tableData}
+            loading={loading}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total) => `共 ${total} 條`,
+              onChange: (page, pageSize) => {
+                const values = form.getFieldsValue();
+                const deletedFlag = activeTab === 'deleted';
+                queryData({ ...values, deletedFlag, pageNum: page, pageSize });
+              },
+            }}
+            scroll={{ x: 1800 }}
+            size="small"
+            bordered
+          />
+        </Tabs.TabPane>
+
+        <Tabs.TabPane tab="已刪除任務" key="deleted">
+          <div className="search-form">
+            <Form form={form} layout="inline">
+              <Form.Item label="關鍵字" name="searchWord">
+                <Input placeholder="請輸入關鍵字" style={{ width: 200 }} maxLength={30} />
+              </Form.Item>
+              <Form.Item label="觸發類型" name="triggerType">
+                <Select placeholder="請選擇觸發類型" allowClear style={{ width: 155 }}>
+                  {Object.entries(JOB_TRIGGER_TYPE_LABELS).map(([value, label]) => (
+                    <Select.Option key={value} value={value}>
+                      {label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item label="狀態" name="enabledFlag">
+                <Select placeholder="請選擇狀態" allowClear style={{ width: 150 }}>
+                  <Select.Option value={true}>開啟</Select.Option>
+                  <Select.Option value={false}>停止</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item>
+                <Space>
+                  {hasQueryPrivilege && (
+                    <>
+                      <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+                        查詢
+                      </Button>
+                      <Button icon={<ReloadOutlined />} onClick={handleReset}>
+                        重置
+                      </Button>
+                    </>
+                  )}
+                </Space>
+              </Form.Item>
+            </Form>
+          </div>
+
+          <Table
+            rowKey="jobId"
+            columns={columns}
+            dataSource={tableData}
+            loading={loading}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total) => `共 ${total} 條`,
+              onChange: (page, pageSize) => {
+                const values = form.getFieldsValue();
+                const deletedFlag = activeTab === 'deleted';
+                queryData({ ...values, deletedFlag, pageNum: page, pageSize });
+              },
+            }}
+            scroll={{ x: 1800 }}
+            size="small"
+            bordered
+          />
+        </Tabs.TabPane>
+      </Tabs>
 
       <JobFormModal ref={formModalRef} onSuccess={queryData} />
       <JobExecuteModal ref={executeModalRef} onSuccess={queryData} />
+      <JobLogDrawer
+        visible={logDrawerVisible}
+        jobId={currentJob?.jobId}
+        jobName={currentJob?.jobName}
+        onClose={() => setLogDrawerVisible(false)}
+      />
     </div>
   );
 };

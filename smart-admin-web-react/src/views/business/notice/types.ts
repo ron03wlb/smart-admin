@@ -38,6 +38,12 @@ export interface NoticeVO {
   /** 發布時間 */
   publishTime?: string;
 
+  /** 發布日期 (YYYY-MM-DD) */
+  publishDate?: string;
+
+  /** 已讀標記 */
+  viewFlag?: boolean;
+
   /** 創建人姓名 */
   createUserName?: string;
 

@@ -52,9 +52,9 @@ export interface ChangeLogQueryForm {
   /** 跳轉鏈接 */
   link?: string;
   /** 頁碼 */
-  pageNum: number;
+  pageNum?: number;
   /** 每頁條數 */
-  pageSize: number;
+  pageSize?: number;
 }
 
 /**
@@ -94,7 +94,7 @@ export interface ChangeLogFormData {
   updateVersion: string;
   type: number;
   publishAuthor: string;
-  publicDate: string | Date;
+  publicDate: any; // Dayjs object from DatePicker
   content: string;
   link?: string;
 }

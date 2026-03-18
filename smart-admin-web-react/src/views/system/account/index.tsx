@@ -20,9 +20,8 @@ const AccountPage: React.FC = () => {
   const menuList = getAccountMenuList();
   const [selectedMenu, setSelectedMenu] = useState<AccountMenuItem>(menuList[0]);
 
-  // 從 Redux 獲取未讀消息數（如果有的話）
-  // const unreadMessageCount = useAppSelector((state) => state.user.unreadMessageCount || 0);
-  const unreadMessageCount = 0; // 暫時硬編碼
+  // 從 Redux 獲取未讀消息數
+  const unreadMessageCount = useAppSelector((state) => state.user.unreadMessageCount || 0);
 
   /**
    * 初始化和路由參數處理

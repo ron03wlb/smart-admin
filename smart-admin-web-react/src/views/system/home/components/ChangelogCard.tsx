@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { Empty, Badge } from 'antd';
 import { changeLogApi } from '@/api/support/changeLogApi';
 import type { ChangeLogVO } from '@/views/support/change-log/types';
+import { CHANGE_LOG_TYPE_LABELS } from '@/constants/support/changeLogConst';
 import DefaultHomeCard from './DefaultHomeCard';
 import './ChangelogCard.css';
 
@@ -68,7 +69,7 @@ const ChangelogCard: React.FC = () => {
             <li key={index} className="un-read">
               <a className="content" onClick={() => handleDetail(item)}>
                 <Badge status="processing" />
-                版本 {item.version}
+                {CHANGE_LOG_TYPE_LABELS[item.type as keyof typeof CHANGE_LOG_TYPE_LABELS]}：{item.updateVersion} 版本
               </a>
               <span className="time">{item.publicDate}</span>
             </li>

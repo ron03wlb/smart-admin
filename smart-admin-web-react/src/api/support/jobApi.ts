@@ -18,6 +18,8 @@ import type {
   JobUpdateForm,
   JobEnabledUpdateForm,
   JobExecuteForm,
+  JobLogVO,
+  JobLogQueryForm,
 } from '@/views/support/job/types';
 
 /**
@@ -78,5 +80,13 @@ export const jobApi = {
    */
   deleteJob: (jobId: number): Promise<ResponseDTO<string>> => {
     return request.get(`/support/job/delete?jobId=${jobId}`);
+  },
+
+  /**
+   * 查詢執行記錄
+   * @param params 查詢參數
+   */
+  queryJobLog: (params: JobLogQueryForm): Promise<ResponseDTO<PageResult<JobLogVO>>> => {
+    return request.post('/support/job/log/query', params);
   },
 };

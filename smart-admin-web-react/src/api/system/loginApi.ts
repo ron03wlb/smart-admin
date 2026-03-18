@@ -79,6 +79,9 @@ export interface LoginInfo {
 
   /** 權限點列表 */
   pointList: PointVO[];
+
+  /** 未讀消息數量 */
+  unreadMessageCount?: number;
 }
 
 /**

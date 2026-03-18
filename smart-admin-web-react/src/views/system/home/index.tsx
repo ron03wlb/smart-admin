@@ -17,6 +17,7 @@ import ToBeDoneCard from './components/ToBeDoneCard';
 import PieChart from './components/charts/PieChart';
 import CategoryChart from './components/charts/CategoryChart';
 import GradientChart from './components/charts/GradientChart';
+import GaugeChart from './components/charts/GaugeChart';
 import './index.css';
 
 const HomePage: React.FC = () => {
@@ -44,7 +45,7 @@ const HomePage: React.FC = () => {
               <HomeNotice title="通知" noticeTypeId={2} />
             </Col>
 
-            {/* 圖表組件 */}
+            {/* 圖表組件 - 2行2列 */}
             <Col span={12}>
               <PieChart />
             </Col>
@@ -53,7 +54,11 @@ const HomePage: React.FC = () => {
               <CategoryChart />
             </Col>
 
-            <Col span={24}>
+            <Col span={12}>
+              <GaugeChart percent={78} />
+            </Col>
+
+            <Col span={12}>
               <GradientChart />
             </Col>
           </Row>

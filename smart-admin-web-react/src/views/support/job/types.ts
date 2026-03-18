@@ -61,14 +61,30 @@ export interface JobLogVO {
   logId: number;
   /** 任務 ID */
   jobId: number;
+  /** 任務名稱 */
+  jobName?: string;
+  /** 執行參數 */
+  param?: string;
+  /** 是否成功 (1:成功, 0:失敗) */
+  successFlag: number;
   /** 執行開始時間 */
   executeStartTime?: string;
   /** 執行結束時間 */
   executeEndTime?: string;
+  /** 執行用時(毫秒) */
+  executeTimeMillis?: number;
   /** 執行結果 */
   executeResult?: string;
-  /** 是否成功 */
-  successFlag: boolean;
+  /** IP地址 */
+  ip?: string;
+  /** 進程ID */
+  processId?: string;
+  /** 程序目錄 */
+  programPath?: string;
+  /** 執行人 */
+  createName?: string;
+  /** 創建時間 */
+  createTime?: string;
 }
 
 /**
@@ -162,6 +178,27 @@ export interface JobFormData {
   enabledFlag: boolean;
   remark?: string;
   sort?: number;
+}
+
+/**
+ * Job Log Query Form
+ * 執行記錄查詢表單
+ */
+export interface JobLogQueryForm {
+  /** 任務ID (必填) */
+  jobId: number;
+  /** 搜索詞 (執行參數搜索) */
+  searchWord?: string;
+  /** 是否成功 (1:成功, 0:失敗) */
+  successFlag?: number;
+  /** 開始時間 (YYYY-MM-DD) */
+  startTime?: string;
+  /** 結束時間 (YYYY-MM-DD) */
+  endTime?: string;
+  /** 頁碼 */
+  pageNum: number;
+  /** 每頁條數 */
+  pageSize: number;
 }
 
 /**

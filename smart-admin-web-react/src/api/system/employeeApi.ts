@@ -93,4 +93,27 @@ export const employeeApi = {
   resetPassword: (employeeId: number): Promise<ResponseDTO<string>> => {
     return request.get(`/employee/update/password/reset/${employeeId}`);
   },
+
+  /**
+   * 獲取單個員工信息
+   * @param employeeId 員工 ID
+   */
+  getEmployee: (employeeId: number): Promise<ResponseDTO<EmployeeVO>> => {
+    return request.get(`/employee/${employeeId}`);
+  },
+
+  /**
+   * 更新員工密碼
+   * @param params 密碼信息
+   */
+  updateEmployeePassword: (params: { oldPassword: string; newPassword: string }): Promise<ResponseDTO<void>> => {
+    return request.post('/employee/update/password', params);
+  },
+
+  /**
+   * 獲取密碼複雜度配置
+   */
+  getPasswordComplexityEnabled: (): Promise<ResponseDTO<boolean>> => {
+    return request.get('/employee/security/password/complexity/enabled');
+  },
 };

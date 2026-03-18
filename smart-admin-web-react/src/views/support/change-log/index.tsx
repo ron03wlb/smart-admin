@@ -13,16 +13,17 @@ import { Button, Form, Input, DatePicker, Row, Col, Table, Tag, Modal, Space, me
 import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { RangePickerProps } from 'antd/es/date-picker';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import { useTable } from '@/hooks/useTable';
 import { changeLogApi } from '@/api/support/changeLogApi';
 import { CHANGE_LOG_PERMISSION, CHANGE_LOG_TYPE_LABELS, CHANGE_LOG_TYPE_COLORS, CHANGE_LOG_TABLE_COLUMNS_WIDTH } from '@/constants/support/changeLogConst';
 import type { ChangeLogVO, ChangeLogQueryForm } from './types';
 import ChangeLogFormModal from './components/ChangeLogFormModal';
+import ChangeLogDetailModal from './components/ChangeLogDetailModal';
 import PrivilegeButton from '@/components/PrivilegeButton';
-import SmartEnumSelect from '@/components/SmartEnumSelect';
-import TableOperator from '@/components/TableOperator';
+import SmartEnumSelect from '@/components/common/SmartEnumSelect';
+import TableOperator from '@/components/common/TableOperator';
 
 const { RangePicker } = DatePicker;
 
@@ -39,31 +40,43 @@ const rangePresets: RangePickerProps['presets'] = [
 const ChangeLogManagement: React.FC = () => {
   const [form] = Form.useForm();
   const formModalRef = useRef<{ show: (rowData?: ChangeLogVO) => void }>(null);
+  const detailModalRef = useRef<{ show: (record: ChangeLogVO) => void }>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 使用 useTable Hook
-  const { tableData, loading, pagination, queryData, resetQuery } = useTable<ChangeLogVO, ChangeLogQueryForm>(
-    changeLogApi.queryPage,
-    {
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<ChangeLogVO, ChangeLogQueryForm>({
+    defaultQueryForm: {
+      type: undefined,
+      keyword: undefined,
+      publicDateBegin: undefined,
+      publicDateEnd: undefined,
+      createTime: undefined,
+      link: undefined,
+    },
+    pagination: {
       pageNum: 1,
       pageSize: 10,
-    }
-  );
+    },
+    queryApi: changeLogApi.queryPage,
+    autoQuery: true,
+  });
 
   /**
    * 搜索
    */
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    const params: ChangeLogQueryForm = {
-      ...values,
+    setQueryForm((prev) => ({
+      ...prev,
+      type: values.type,
+      keyword: values.keyword,
       publicDateBegin: values.publicDate?.[0] ? dayjs(values.publicDate[0]).format('YYYY-MM-DD') : undefined,
       publicDateEnd: values.publicDate?.[1] ? dayjs(values.publicDate[1]).format('YYYY-MM-DD') : undefined,
       createTime: values.createTime ? dayjs(values.createTime).format('YYYY-MM-DD') : undefined,
-      pageNum: 1,
-      pageSize: pagination.pageSize,
-    };
-    queryData(params);
+      link: undefined,
+      pageNum: 1, // Reset to first page on search
+    }));
+    query();
   };
 
   /**
@@ -71,7 +84,7 @@ const ChangeLogManagement: React.FC = () => {
    */
   const handleReset = () => {
     form.resetFields();
-    resetQuery();
+    reset();
   };
 
   /**
@@ -79,6 +92,13 @@ const ChangeLogManagement: React.FC = () => {
    */
   const handleShowForm = (record?: ChangeLogVO) => {
     formModalRef.current?.show(record);
+  };
+
+  /**
+   * 顯示詳情 Modal
+   */
+  const handleShowDetail = (record: ChangeLogVO) => {
+    detailModalRef.current?.show(record);
   };
 
   /**
@@ -95,7 +115,7 @@ const ChangeLogManagement: React.FC = () => {
         try {
           await changeLogApi.delete(record.changeLogId);
           message.success('刪除成功');
-          queryData();
+          query();
         } catch (error) {
           console.error('Delete failed:', error);
         }
@@ -123,7 +143,7 @@ const ChangeLogManagement: React.FC = () => {
           await changeLogApi.batchDelete(selectedRowKeys as number[]);
           message.success('批量刪除成功');
           setSelectedRowKeys([]);
-          queryData();
+          query();
         } catch (error) {
           console.error('Batch delete failed:', error);
         }
@@ -140,6 +160,11 @@ const ChangeLogManagement: React.FC = () => {
       dataIndex: 'updateVersion',
       width: CHANGE_LOG_TABLE_COLUMNS_WIDTH.updateVersion,
       ellipsis: true,
+      render: (text: string, record: ChangeLogVO) => (
+        <Button type="link" onClick={() => handleShowDetail(record)}>
+          {text}
+        </Button>
+      ),
     },
     {
       title: '更新類型',
@@ -285,7 +310,7 @@ const ChangeLogManagement: React.FC = () => {
           </Space>
         </Col>
         <Col>
-          <TableOperator columns={columns} refresh={queryData} />
+          <TableOperator onRefresh={query} showRefresh />
         </Col>
       </Row>
 
@@ -303,7 +328,10 @@ const ChangeLogManagement: React.FC = () => {
       />
 
       {/* 表單 Modal */}
-      <ChangeLogFormModal ref={formModalRef} onSuccess={queryData} />
+      <ChangeLogFormModal ref={formModalRef} onSuccess={query} />
+
+      {/* 詳情 Modal */}
+      <ChangeLogDetailModal ref={detailModalRef} />
     </div>
   );
 };

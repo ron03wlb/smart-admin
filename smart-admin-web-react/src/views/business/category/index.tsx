@@ -30,7 +30,7 @@ export default function CategoryManagement() {
   // State
   const [tableData, setTableData] = useState<CategoryVO[]>([]);
   const [loading, setLoading] = useState(false);
-  const [categoryType, setCategoryType] = useState<CategoryTypeEnum>(1); // 默認商品分類
+  const [categoryType] = useState<CategoryTypeEnum>(1); // 默認商品分類
   const formModalRef = useRef<{ show: (parentId?: number, rowData?: CategoryVO) => void }>(null);
 
   /**
@@ -100,7 +100,7 @@ export default function CategoryManagement() {
       dataIndex: 'categoryType',
       key: 'categoryType',
       width: 100,
-      render: (categoryType: number) => CATEGORY_TYPE_LABELS[categoryType] || '-',
+      render: (categoryType: number) => CATEGORY_TYPE_LABELS[categoryType as keyof typeof CATEGORY_TYPE_LABELS] || '-',
     },
     {
       title: '排序',

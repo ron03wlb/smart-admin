@@ -58,6 +58,9 @@ interface UserState {
   /** 菜單父ID映射表（用於麵包屑導航） */
   menuParentIdListMap: Record<number, number[]>;
 
+  /** 未讀消息數量 */
+  unreadMessageCount: number;
+
   /** 加載狀態 */
   loading: boolean;
 
@@ -78,6 +81,7 @@ const initialState: UserState = {
   pointsList: [],
   menuRouterList: [],
   menuParentIdListMap: {},
+  unreadMessageCount: 0,
   loading: false,
   error: null,
 };
@@ -212,6 +216,7 @@ export const userSlice = createSlice({
       state.pointsList = [];
       state.menuRouterList = [];
       state.menuParentIdListMap = {};
+      state.unreadMessageCount = 0;
       state.error = null;
 
       localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_TOKEN);
@@ -250,6 +255,7 @@ export const userSlice = createSlice({
         state.employeeName = action.payload.employeeName;
         state.loginName = action.payload.loginName;
         state.administratorFlag = action.payload.administratorFlag;
+        state.unreadMessageCount = action.payload.unreadMessageCount || 0;
 
         // 使用處理後的菜單數據（已在 AsyncThunk 中處理）
         state.menuTree = action.payload.menuTree || [];
@@ -293,6 +299,7 @@ export const userSlice = createSlice({
         state.pointsList = [];
         state.menuRouterList = [];
         state.menuParentIdListMap = {};
+        state.unreadMessageCount = 0;
 
         // 清除 localStorage
         localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_TOKEN);
@@ -310,6 +317,7 @@ export const userSlice = createSlice({
         state.pointsList = [];
         state.menuRouterList = [];
         state.menuParentIdListMap = {};
+        state.unreadMessageCount = 0;
         localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_TOKEN);
         localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_INFO);
       });

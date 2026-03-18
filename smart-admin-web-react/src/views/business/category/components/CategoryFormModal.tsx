@@ -81,20 +81,26 @@ const CategoryFormModal = forwardRef<{ show: (parentId?: number, rowData?: Categ
         const values = await form.validateFields();
         setLoading(true);
 
-        // 構造請求參數
-        const params = {
-          ...values,
-          categoryType,
-          parentId,
-        };
-
-        if (isEdit) {
+        if (isEdit && values.categoryId) {
           // 更新
-          await categoryApi.updateCategory(params);
+          await categoryApi.updateCategory({
+            categoryId: values.categoryId,
+            categoryName: values.categoryName!,
+            categoryType,
+            parentId,
+            sort: values.sort,
+            remark: values.remark,
+          });
           message.success('更新成功');
         } else {
           // 新增
-          await categoryApi.addCategory(params);
+          await categoryApi.addCategory({
+            categoryName: values.categoryName!,
+            categoryType,
+            parentId,
+            sort: values.sort,
+            remark: values.remark,
+          });
           message.success('添加成功');
         }
 

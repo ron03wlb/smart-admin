@@ -49,6 +49,18 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(libs.spring.boot.starter.test)
 
+    // Testcontainers
+    testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("org.testcontainers:postgresql:1.19.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+
+    // AssertJ for fluent assertions
+    testImplementation("org.assertj:assertj-core:3.24.2")
+
+    // Mockito for unit tests
+    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.8.0")
+
     // Lombok
     api(libs.lombok)
     annotationProcessor(libs.lombok)
