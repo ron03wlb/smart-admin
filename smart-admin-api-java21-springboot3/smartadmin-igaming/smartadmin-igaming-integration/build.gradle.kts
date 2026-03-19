@@ -58,6 +58,8 @@ dependencies {
     testImplementation(libs.testcontainers.junit.jupiter)
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.kafka)
+    testImplementation("org.flywaydb:flyway-core")  // For Flyway migration tests
+    testImplementation("org.flywaydb:flyway-database-postgresql")  // PostgreSQL support
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Lombok

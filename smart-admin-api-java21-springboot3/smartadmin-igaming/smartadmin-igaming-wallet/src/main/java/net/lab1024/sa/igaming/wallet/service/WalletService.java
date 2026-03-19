@@ -95,6 +95,30 @@ public class WalletService {
   }
 
   /**
+   * Get wallet by player ID and wallet type.
+   *
+   * @param playerId player identifier
+   * @param walletType wallet type (1=CASH, 2=BONUS)
+   * @return ResponseDTO with wallet VO if found, error if not found
+   */
+  public ResponseDTO<WalletVO> getWallet(Long playerId, Integer walletType) {
+    WalletEntity entity =
+        walletDao.selectOne(
+            Wrappers.<WalletEntity>lambdaQuery()
+                .eq(WalletEntity::getPlayerId, playerId)
+                .eq(WalletEntity::getWalletType, walletType)
+                .eq(WalletEntity::getDeleted, false));
+
+    if (entity == null) {
+      return ResponseDTO.userErrorParam(WalletErrorCode.WALLET_NOT_FOUND.getMsg());
+    }
+
+    WalletVO vo = SmartBeanUtil.copy(entity, WalletVO.class);
+    vo.setAvailableBalance(entity.getBalance().subtract(entity.getLockedAmount()));
+    return ResponseDTO.ok(vo);
+  }
+
+  /**
    * Query wallets with pagination.
    *
    * @param queryForm query parameters

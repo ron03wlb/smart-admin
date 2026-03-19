@@ -1,0 +1,163 @@
+# SmartAdmin iGaming Integration - Test Configuration
+#
+# This configuration is used by integration tests with @ActiveProfiles("test").
+# Database connection properties are dynamically overridden by Testcontainers via @DynamicPropertySource.
+#
+# Integration module requires:
+# - PostgreSQL 16 (Testcontainers)
+# - Redis (for LockService, Testcontainers recommended)
+# - Kafka (for DomainEventPublisher, embedded or disabled)
+
+spring:
+  application:
+    name: smartadmin-igaming-integration-test
+
+  # Allow bean definition overriding (for test mock beans)
+  main:
+    allow-bean-definition-overriding: true
+
+  # Datasource (overridden by Testcontainers @DynamicPropertySource)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+      leak-detection-threshold: 60000
+
+  # Flyway migrations (initialize database schema)
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    baseline-version: 0
+    out-of-order: true
+
+  # JPA/Hibernate (disabled - using MyBatis Plus)
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  # Kafka (disabled for tests, events will be published but not consumed)
+  kafka:
+    enabled: false
+    bootstrap-servers: localhost:9092  # Placeholder, not used when disabled
+
+  # Redis (embedded Redis for tests - will be overridden by Testcontainers if configured)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  # Cache (use simple in-memory cache for tests)
+  cache:
+    type: simple
+
+# MyBatis Plus
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: true
+      logic-not-delete-value: false
+
+# LiteFlow (disabled for Player/Wallet/Bonus integration tests)
+# LiteFlow is only required for:
+# - TurnoverCalculationIntegrationTest (Turnover calculation with risk rules)
+# - WithdrawalRiskCheckService (Withdrawal risk assessment)
+# Disabling prevents TurnoverCalculationService @PostConstruct from triggering FlowExecutor initialization
+liteflow:
+  enable: false
+  rule-source-ext-data:
+    # Use classpath rule source for tests (EL XML files)
+    data-source: xml
+    xml-path: liteflow/**/*.el.xml
+  print-banner: false
+  print-execution-log: true
+  when-max-workers: 4
+  queue-limit: 200
+
+# Sa-Token
+sa-token:
+  # Token name
+  token-name: satoken
+  # Token validity period (unit: second)
+  timeout: 2592000
+  # Whether to allow concurrent login for the same account
+  is-concurrent: true
+  # Whether to share Token between multiple terminals of the same account
+  is-share: false
+  # Token style (uuid, simple-uuid, random-32, random-64, random-128, tik)
+  token-style: uuid
+  # Whether to output operation logs
+  is-log: false
+
+# Redisson (use simple standalone mode for tests)
+redisson:
+  config: |
+    singleServerConfig:
+      address: "redis://localhost:6379"
+      database: 0
+      connectionPoolSize: 8
+      connectionMinimumIdleSize: 2
+
+# Logging
+logging:
+  level:
+    root: INFO
+    net.lab1024.sa: DEBUG
+    net.lab1024.sa.igaming: DEBUG
+    net.lab1024.sa.common.redislock: DEBUG
+    org.testcontainers: INFO
+    com.github.dockerjava: WARN
+    org.springframework.test: DEBUG
+    org.springframework.boot.test: DEBUG
+    com.yomahub.liteflow: DEBUG
+    org.mybatis: DEBUG
+    org.apache.ibatis: DEBUG
+    org.springframework.kafka: WARN  # Kafka disabled, suppress warnings
+    org.springframework.data.redis: DEBUG
+
+# Security Configuration
+smart:
+  security:
+    argon2:
+      enabled: true
+      salt-length: 16
+      hash-length: 32
+      parallelism: 1
+      memory: 65536
+      iterations: 3
+  # Field encryption (AES-256-GCM for PII data)
+  field-encrypt:
+    enabled: true
+    # Test Data Encryption Key (Base64-encoded 256-bit AES key) - DO NOT use in production
+    # Generated from: echo -n "0123456789ABCDEF0123456789ABCDEF" | base64
+    dek: MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=
+    # Test Blind Index Key (Base64-encoded HMAC-SHA256 key) - DO NOT use in production
+    # Generated from: echo -n "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" | base64
+    blind-index-key: MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUYwMTIzNDU2Nzg5QUJDREVGMDI0MzQ1Njc4OUFCQ0RFRg==
+
+# Project Configuration
+project:
+  name: smartadmin-igaming-integration-test  # Required by SystemEnvironmentConfig
+
+# Test-specific properties
+test:
+  tenant-id: 1
+  operator-id: 1
+  mock-date-time: 2026-03-18T10:00:00Z

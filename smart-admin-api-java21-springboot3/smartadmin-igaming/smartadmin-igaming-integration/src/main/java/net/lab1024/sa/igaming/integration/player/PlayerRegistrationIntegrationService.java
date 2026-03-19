@@ -106,24 +106,20 @@ public class PlayerRegistrationIntegrationService {
         "Player registered successfully: playerId={}, username={}", playerId, player.getUsername());
 
     // ==================================================================================
-    // Step 2: Create CASH wallet (Wallet module)
+    // Step 2: Query existing CASH wallet (created by PlayerAuthService)
     // ==================================================================================
-    WalletCreateForm cashWalletForm = new WalletCreateForm();
-    cashWalletForm.setPlayerId(playerId);
-    cashWalletForm.setWalletType(WalletTypeEnum.CASH.getValue());
-    cashWalletForm.setCurrencyCode(form.getCurrencyCode());
-
-    ResponseDTO<WalletVO> cashWalletResult = walletService.createWallet(cashWalletForm);
+    // Note: PlayerAuthService.register() already creates CASH wallet atomically with player
+    // We query the existing wallet instead of creating a duplicate
+    ResponseDTO<WalletVO> cashWalletResult =
+        walletService.getWallet(playerId, WalletTypeEnum.CASH.getValue());
     if (!cashWalletResult.getOk()) {
       log.error(
-          "CASH wallet creation failed: playerId={}, error={}",
-          playerId,
-          cashWalletResult.getMsg());
+          "CASH wallet query failed: playerId={}, error={}", playerId, cashWalletResult.getMsg());
       return ResponseDTO.error(cashWalletResult);
     }
 
     WalletVO cashWallet = cashWalletResult.getData();
-    log.info("CASH wallet created: walletId={}, playerId={}", cashWallet.getWalletId(), playerId);
+    log.info("CASH wallet retrieved: walletId={}, playerId={}", cashWallet.getWalletId(), playerId);
 
     // ==================================================================================
     // Step 3: Create BONUS wallet (Wallet module)
