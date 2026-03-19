@@ -127,18 +127,43 @@ public class PlayerRegistrationTestFixture {
   }
 
   /**
-   * Create a payment order entity with default values.
+   * Create a payment order entity with default values (without wallet ID).
+   *
+   * <p><b>NOTE:</b> This method does NOT set wallet_id, which will cause database constraint
+   * violation when inserting. Use {@link #createPaymentOrder(Long, Long, String, BigDecimal,
+   * Integer)} instead to provide wallet ID.
    *
    * @param playerId player identifier
    * @param orderNo platform order number
    * @param amount deposit amount
    * @param status order status (1: PENDING, 2: PROCESSING, 3: SUCCESS, 4: FAILED)
    * @return payment order entity ready for DAO insertion
+   * @deprecated Use {@link #createPaymentOrder(Long, Long, String, BigDecimal, Integer)} with
+   *     wallet ID parameter
    */
+  @Deprecated
   public static PaymentOrderEntity createPaymentOrder(
       Long playerId, String orderNo, BigDecimal amount, Integer status) {
+    return createPaymentOrder(playerId, null, orderNo, amount, status);
+  }
+
+  /**
+   * Create a payment order entity with wallet ID.
+   *
+   * <p>This method includes wallet_id to satisfy database NOT NULL constraint.
+   *
+   * @param playerId player identifier
+   * @param walletId wallet identifier (CASH wallet for deposits)
+   * @param orderNo platform order number
+   * @param amount deposit amount
+   * @param status order status (1: PENDING, 2: PROCESSING, 3: SUCCESS, 4: FAILED)
+   * @return payment order entity ready for DAO insertion
+   */
+  public static PaymentOrderEntity createPaymentOrder(
+      Long playerId, Long walletId, String orderNo, BigDecimal amount, Integer status) {
     PaymentOrderEntity entity = new PaymentOrderEntity();
     entity.setPlayerId(playerId);
+    entity.setWalletId(walletId); // ✅ Set wallet ID
     entity.setOrderNo(orderNo);
     entity.setOrderType(1); // DEPOSIT
     entity.setStatus(status);
@@ -146,6 +171,8 @@ public class PlayerRegistrationTestFixture {
     entity.setCurrencyCode("USD");
     entity.setPspCode("MOCK_PSP");
     entity.setPspTransactionId("PSP-TX-" + System.currentTimeMillis());
+    entity.setRequestId(
+        "REQ-" + orderNo + "-" + System.currentTimeMillis()); // ✅ Set request ID for idempotency
     return entity;
   }
 

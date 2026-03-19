@@ -210,11 +210,23 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
         playerRegistrationService.registerPlayerWithWallet(regForm);
     Long playerId = regResult.getData().getPlayer().getPlayerId();
 
+    // Arrange - Get CASH wallet ID
+    Long cashWalletId =
+        regResult.getData().getWallets().stream()
+            .filter(w -> w.getWalletType().equals(WalletTypeEnum.CASH.getValue()))
+            .findFirst()
+            .map(w -> w.getWalletId())
+            .orElseThrow(() -> new IllegalStateException("CASH wallet not found"));
+
     // Arrange - Create payment order
     String orderNo = PlayerRegistrationTestFixture.generateUniqueOrderNo("DEP");
     PaymentOrderEntity order =
         PlayerRegistrationTestFixture.createPaymentOrder(
-            playerId, orderNo, new BigDecimal("100.00"), PaymentOrderStatusEnum.PENDING.getValue());
+            playerId,
+            cashWalletId,
+            orderNo,
+            new BigDecimal("100.00"),
+            PaymentOrderStatusEnum.PENDING.getValue());
     paymentOrderDao.insert(order);
 
     // Arrange - Deposit callback form
@@ -272,11 +284,20 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
         playerRegistrationService.registerPlayerWithWallet(regForm);
     Long playerId = regResult.getData().getPlayer().getPlayerId();
 
+    // Arrange - Get CASH wallet ID
+    Long cashWalletId =
+        regResult.getData().getWallets().stream()
+            .filter(w -> w.getWalletType().equals(WalletTypeEnum.CASH.getValue()))
+            .findFirst()
+            .map(w -> w.getWalletId())
+            .orElseThrow(() -> new IllegalStateException("CASH wallet not found"));
+
     // Arrange - First deposit (SUCCESS)
     String firstOrderNo = PlayerRegistrationTestFixture.generateUniqueOrderNo("DEP");
     PaymentOrderEntity firstOrder =
         PlayerRegistrationTestFixture.createPaymentOrder(
             playerId,
+            cashWalletId,
             firstOrderNo,
             new BigDecimal("100.00"),
             PaymentOrderStatusEnum.SUCCESS.getValue());
@@ -287,6 +308,7 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
     PaymentOrderEntity secondOrder =
         PlayerRegistrationTestFixture.createPaymentOrder(
             playerId,
+            cashWalletId,
             secondOrderNo,
             new BigDecimal("200.00"),
             PaymentOrderStatusEnum.PENDING.getValue());
@@ -318,11 +340,23 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
         playerRegistrationService.registerPlayerWithWallet(regForm);
     Long playerId = regResult.getData().getPlayer().getPlayerId();
 
+    // Arrange - Get CASH wallet ID
+    Long cashWalletId =
+        regResult.getData().getWallets().stream()
+            .filter(w -> w.getWalletType().equals(WalletTypeEnum.CASH.getValue()))
+            .findFirst()
+            .map(w -> w.getWalletId())
+            .orElseThrow(() -> new IllegalStateException("CASH wallet not found"));
+
     // Arrange - Payment order
     String orderNo = PlayerRegistrationTestFixture.generateUniqueOrderNo("DEP");
     PaymentOrderEntity order =
         PlayerRegistrationTestFixture.createPaymentOrder(
-            playerId, orderNo, new BigDecimal("100.00"), PaymentOrderStatusEnum.PENDING.getValue());
+            playerId,
+            cashWalletId,
+            orderNo,
+            new BigDecimal("100.00"),
+            PaymentOrderStatusEnum.PENDING.getValue());
     paymentOrderDao.insert(order);
 
     // Act - Process first deposit
