@@ -8,6 +8,26 @@
  * @Date: 2026-03-13
  */
 
+import { SmartEnum } from '@/types/smart-enum';
+
+/**
+ * 更新類型枚舉（SmartEnum 格式，用於 SmartEnumSelect）
+ */
+export const CHANGE_LOG_TYPE_ENUM: SmartEnum<number> = {
+  MAJOR: {
+    value: 1,
+    desc: '重大更新',
+  },
+  FEATURE: {
+    value: 2,
+    desc: '功能更新',
+  },
+  BUGFIX: {
+    value: 3,
+    desc: 'Bug修復',
+  },
+};
+
 /**
  * 系統更新日誌權限點
  */

@@ -10,6 +10,7 @@
 
 import { SmartEnum, SmartEnumItem, SmartEnumWrapper } from '@/types/smart-enum';
 import * as COMMON_CONST from '@/constants/common-const';
+import { CHANGE_LOG_TYPE_ENUM } from '@/constants/support/changeLogConst';
 
 // 所有枚舉常量的集合
 const SMART_ENUM_WRAPPER: SmartEnumWrapper = {
@@ -19,6 +20,7 @@ const SMART_ENUM_WRAPPER: SmartEnumWrapper = {
   DATA_TYPE_ENUM: COMMON_CONST.DATA_TYPE_ENUM,
   USER_STATUS_ENUM: COMMON_CONST.USER_STATUS_ENUM,
   DELETED_FLAG_ENUM: COMMON_CONST.DELETED_FLAG_ENUM,
+  CHANGE_LOG_TYPE_ENUM: CHANGE_LOG_TYPE_ENUM,
 };
 
 /**
