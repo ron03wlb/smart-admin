@@ -16,8 +16,6 @@ import {
   Button,
   Table,
   Space,
-  Row,
-  Col,
 } from 'antd';
 import {
   SearchOutlined,
@@ -42,7 +40,7 @@ import { ConfigFormModal } from './components/ConfigFormModal';
  */
 export default function ConfigPage() {
   const [form] = Form.useForm();
-  const hasAddPrivilege = usePrivilege(CONFIG_PERMISSION.ADD);
+  // const _hasAddPrivilege = usePrivilege(CONFIG_PERMISSION.ADD);
   const hasUpdatePrivilege = usePrivilege(CONFIG_PERMISSION.UPDATE);
 
   // ==================== Modal State ====================

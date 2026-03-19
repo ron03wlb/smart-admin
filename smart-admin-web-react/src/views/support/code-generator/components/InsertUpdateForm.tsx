@@ -17,7 +17,7 @@ export interface InsertUpdateFormRef {
   validateForm: () => Promise<boolean>;
 }
 
-const InsertUpdateForm = forwardRef<InsertUpdateFormRef>((props, ref) => {
+const InsertUpdateForm = forwardRef<InsertUpdateFormRef>((_props, ref) => {
   const [form] = Form.useForm();
   const [isSupportInsertAndUpdate, setIsSupportInsertAndUpdate] = useState(true);
   const [pageType, setPageType] = useState('modal');

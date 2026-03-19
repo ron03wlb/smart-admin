@@ -105,7 +105,7 @@ describe('SmartLoadingComponent', () => {
     });
 
     it('應該響應多次狀態切換', async () => {
-      const { container } = render(
+      render(
         <Wrapper>
           <SmartLoadingComponent />
         </Wrapper>
@@ -166,7 +166,6 @@ describe('SmartLoadingComponent', () => {
       SmartLoading.show();
 
       await waitFor(() => {
-        const container = document.querySelector('.smart-loading-container');
         expect(container).toBeInTheDocument();
         expect(container).toHaveClass('smart-loading-container');
       });

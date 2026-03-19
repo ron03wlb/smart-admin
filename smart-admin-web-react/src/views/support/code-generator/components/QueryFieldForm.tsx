@@ -26,7 +26,7 @@ interface QueryFieldData {
   queryFlag?: boolean;
 }
 
-const QueryFieldForm = forwardRef<QueryFieldFormRef>((props, ref) => {
+const QueryFieldForm = forwardRef<QueryFieldFormRef>((_props, ref) => {
   const [dataSource, setDataSource] = useState<QueryFieldData[]>([]);
 
   /**

@@ -23,7 +23,7 @@ export interface PreviewModalRef {
   showModal: (table: TableInfo) => void;
 }
 
-const PreviewModal = forwardRef<PreviewModalRef>((props, ref) => {
+const PreviewModal = forwardRef<PreviewModalRef>((_props, ref) => {
   const [open, setOpen] = useState(false);
   const [languageType, setLanguageType] = useState(LANGUAGE_LIST[0]);
   const [activeFileKey, setActiveFileKey] = useState(JS_FILE_LIST[0]);

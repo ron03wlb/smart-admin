@@ -8,7 +8,7 @@
  * @Date: 2026-03-11
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   Input,
@@ -41,12 +41,9 @@ import {
   MENU_PERMISSION,
   MENU_TYPE_LABELS,
   MENU_TYPE_COLORS,
-  PERMS_TYPE_LABELS,
-  FLAG_LABELS,
   MENU_TABLE_COLUMNS_WIDTH,
   MENU_CONSTANTS,
 } from '@/constants/system/menuConst';
-import { formatDateTime } from '@/utils/date';
 import MenuFormModal from './components/MenuFormModal';
 
 const { Title } = Typography;

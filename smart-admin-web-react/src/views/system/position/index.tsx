@@ -46,10 +46,10 @@ import { PositionFormModal } from './components/PositionFormModal';
  */
 export default function PositionPage() {
   const [form] = Form.useForm();
-  const hasAddPrivilege = usePrivilege(POSITION_PERMISSION.ADD);
+  // const _hasAddPrivilege = usePrivilege(POSITION_PERMISSION.ADD);
   const hasUpdatePrivilege = usePrivilege(POSITION_PERMISSION.UPDATE);
   const hasDeletePrivilege = usePrivilege(POSITION_PERMISSION.DELETE);
-  const hasBatchDeletePrivilege = usePrivilege(POSITION_PERMISSION.BATCH_DELETE);
+  // const _hasBatchDeletePrivilege = usePrivilege(POSITION_PERMISSION.BATCH_DELETE);
 
   // ==================== Modal State ====================
 

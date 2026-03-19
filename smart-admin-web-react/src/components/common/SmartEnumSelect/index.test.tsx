@@ -30,10 +30,7 @@ describe('SmartEnumSelect', () => {
     });
 
     it('應該接受 onChange 回調', async () => {
-      let selectedValue: number | undefined;
-      const handleChange = (value: number) => {
-        selectedValue = value;
-      };
+      const handleChange = vi.fn();
 
       render(
         <SmartEnumSelect<number>
@@ -108,7 +105,6 @@ describe('SmartEnumSelect', () => {
       render(<SmartEnumSelect enumName="FLAG_NUMBER_ENUM" placeholder="請選擇性別" />);
 
       // Ant Design Select 的 placeholder 在 DOM 中渲染
-      const placeholder = screen.queryByText('請選擇性別');
       // 由於 Select 的 placeholder 實現方式，這裡只驗證組件渲染
       expect(document.querySelector('.ant-select')).toBeInTheDocument();
     });

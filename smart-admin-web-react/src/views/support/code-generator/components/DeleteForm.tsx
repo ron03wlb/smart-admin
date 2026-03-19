@@ -17,7 +17,7 @@ export interface DeleteFormRef {
   validateForm: () => Promise<boolean>;
 }
 
-const DeleteForm = forwardRef<DeleteFormRef>((props, ref) => {
+const DeleteForm = forwardRef<DeleteFormRef>((_props, ref) => {
   const [form] = Form.useForm();
 
   /**

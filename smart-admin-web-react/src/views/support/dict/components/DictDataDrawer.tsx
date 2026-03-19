@@ -181,7 +181,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
           checked={record.enabled}
           checkedChildren="啟用中"
           unCheckedChildren="已禁用"
-          onChange={(checked) => handleChangeDisabled(checked, record)}
+          onChange={(_checked) => handleChangeDisabled(checked, record)}
         />
       ),
     },

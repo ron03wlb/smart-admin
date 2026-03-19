@@ -50,9 +50,9 @@ const { Search } = Input;
  */
 export default function EmployeePage() {
   const { t } = useTranslation();
-  const hasAddPrivilege = usePrivilege(EMPLOYEE_PERMISSION.ADD);
+  // const _hasAddPrivilege = usePrivilege(EMPLOYEE_PERMISSION.ADD);
   const hasUpdatePrivilege = usePrivilege(EMPLOYEE_PERMISSION.UPDATE);
-  const hasDeletePrivilege = usePrivilege(EMPLOYEE_PERMISSION.DELETE);
+  // const _hasDeletePrivilege = usePrivilege(EMPLOYEE_PERMISSION.DELETE);
   const hasResetPasswordPrivilege = usePrivilege(EMPLOYEE_PERMISSION.RESET_PASSWORD);
   const hasDisabledPrivilege = usePrivilege(EMPLOYEE_PERMISSION.DISABLED);
 

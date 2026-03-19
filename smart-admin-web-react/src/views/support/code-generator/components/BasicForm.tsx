@@ -32,7 +32,7 @@ interface FormData {
   copyright?: string;
 }
 
-const BasicForm = forwardRef<BasicFormRef>((props, ref) => {
+const BasicForm = forwardRef<BasicFormRef>((_props, ref) => {
   const [form] = Form.useForm<FormData>();
   const [tablePrefix, setTablePrefix] = useState('t_');
   const [currentTable, setCurrentTable] = useState<TableInfo | null>(null);

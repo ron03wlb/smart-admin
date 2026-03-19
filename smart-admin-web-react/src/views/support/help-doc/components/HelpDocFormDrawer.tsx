@@ -136,10 +136,10 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
       form.resetFields();
     };
 
-    const changeAttachment = (fileList: FileInfo[]) => {
-      setDefaultFileList(fileList);
-      form.setFieldsValue({ attachment: fileList });
-    };
+    // const changeAttachment = (fileList: FileInfo[]) => {
+    //   setDefaultFileList(fileList);
+    //   form.setFieldsValue({ attachment: fileList });
+    // };
 
     return (
       <Drawer

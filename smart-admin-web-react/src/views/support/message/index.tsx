@@ -109,7 +109,7 @@ const MessageListPage: React.FC = () => {
   /**
    * 日期範圍變更
    */
-  const handleDateChange = (dates: any, dateStrings: [string, string]) => {
+  const handleDateChange = (  _dates: any, dateStrings: [string, string]) => {
     setQueryForm((prev) => ({
       ...prev,
       startDate: dateStrings[0] || undefined,
