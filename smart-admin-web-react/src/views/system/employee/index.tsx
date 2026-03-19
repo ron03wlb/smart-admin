@@ -8,7 +8,7 @@
  * @Date: 2026-03-11
  */
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   Card,
   Input,
@@ -38,7 +38,6 @@ import {
   GENDER_LABELS,
   EMPLOYEE_TABLE_COLUMNS_WIDTH,
 } from '@/constants/system/employeeConst';
-import { useTranslation } from 'react-i18next';
 import { EmployeeFormModal, type AddEmployeeSuccessData } from './components/EmployeeFormModal';
 import { PasswordDisplayModal } from './components/PasswordDisplayModal';
 
@@ -49,7 +48,7 @@ const { Search } = Input;
  * 員工管理頁面
  */
 export default function EmployeePage() {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   // const _hasAddPrivilege = usePrivilege(EMPLOYEE_PERMISSION.ADD);
   const hasUpdatePrivilege = usePrivilege(EMPLOYEE_PERMISSION.UPDATE);
   // const _hasDeletePrivilege = usePrivilege(EMPLOYEE_PERMISSION.DELETE);
