@@ -157,7 +157,7 @@ describe('SmartLoadingComponent', () => {
 
   describe('樣式類名', () => {
     it('應該應用 smart-loading-container 類名', async () => {
-      render(
+      const { container } = render(
         <Wrapper>
           <SmartLoadingComponent />
         </Wrapper>
@@ -166,8 +166,7 @@ describe('SmartLoadingComponent', () => {
       SmartLoading.show();
 
       await waitFor(() => {
-        expect(container).toBeInTheDocument();
-        expect(container).toHaveClass('smart-loading-container');
+        expect(container.querySelector('.smart-loading-container')).toBeInTheDocument();
       });
     });
   });

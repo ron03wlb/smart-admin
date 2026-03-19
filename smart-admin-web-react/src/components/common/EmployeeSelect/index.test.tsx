@@ -236,7 +236,7 @@ describe('EmployeeSelect', () => {
       const mockQueryAll = vi.mocked(employeeApi.queryAll);
       mockQueryAll.mockResolvedValue({
         ok: false,
-        data: null,
+        data: undefined as any,
         code: 0,
         msg: 'error',
       });

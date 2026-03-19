@@ -187,7 +187,7 @@ export default function RolePage() {
           <PrivilegeButton
             type="link"
             size="small"
-            permission={ROLE_PERMISSION.UPDATE}
+            privilege={ROLE_PERMISSION.UPDATE}
             onClick={() => handleEdit(record)}
           >
             編輯
@@ -196,7 +196,7 @@ export default function RolePage() {
             type="link"
             size="small"
             danger
-            permission={ROLE_PERMISSION.DELETE}
+            privilege={ROLE_PERMISSION.DELETE}
             onClick={() => handleDelete(record)}
           >
             刪除
@@ -238,7 +238,7 @@ export default function RolePage() {
           <PrivilegeButton
             type="primary"
             icon={<PlusOutlined />}
-            permission={ROLE_PERMISSION.ADD}
+            privilege={ROLE_PERMISSION.ADD}
             onClick={handleAdd}
           >
             新增角色

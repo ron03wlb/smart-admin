@@ -6,7 +6,7 @@
  * @Date: 2026-03-10
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import SmartEnumSelect from './index';
 

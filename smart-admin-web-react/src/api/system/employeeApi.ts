@@ -117,3 +117,8 @@ export const employeeApi = {
     return request.get('/employee/security/password/complexity/enabled');
   },
 };
+
+/**
+ * 重新導出類型：用於測試和其他模塊
+ */
+export type { EmployeeVO, EmployeeQueryForm, EmployeeAddForm, EmployeeUpdateForm };
