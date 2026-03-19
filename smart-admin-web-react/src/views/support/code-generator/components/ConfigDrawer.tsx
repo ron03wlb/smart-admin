@@ -38,8 +38,8 @@ const ConfigDrawer = forwardRef<ConfigDrawerRef, ConfigDrawerProps>(({ onReload 
   const [open, setOpen] = useState(false);
   const [activeKey, setActiveKey] = useState('1');
   const [tableInfo, setTableInfo] = useState<TableInfo | null>(null);
-  const [tableColumns, setTableColumns] = useState<any[]>([]);
-  const [tableConfig, setTableConfig] = useState<any>({});
+  const [_tableColumns, setTableColumns] = useState<any[]>([]);
+  const [_tableConfig, setTableConfig] = useState<any>({});
 
   const basicFormRef = useRef<any>(null);
   const fieldListFormRef = useRef<any>(null);

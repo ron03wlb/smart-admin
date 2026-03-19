@@ -2,6 +2,9 @@ import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
+// TypeScript global type declaration
+declare const global: typeof globalThis;
+
 // 每個測試後自動清理
 afterEach(() => {
   cleanup();

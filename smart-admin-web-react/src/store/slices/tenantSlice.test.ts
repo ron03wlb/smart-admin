@@ -6,6 +6,9 @@
  * @Date: 2026-03-10
  */
 
+// TypeScript global type declaration
+declare const global: typeof globalThis;
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import tenantReducer, {
   setTenantInfo,

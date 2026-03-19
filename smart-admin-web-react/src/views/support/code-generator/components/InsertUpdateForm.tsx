@@ -20,13 +20,13 @@ export interface InsertUpdateFormRef {
 const InsertUpdateForm = forwardRef<InsertUpdateFormRef>((_props, ref) => {
   const [form] = Form.useForm();
   const [isSupportInsertAndUpdate, setIsSupportInsertAndUpdate] = useState(true);
-  const [pageType, setPageType] = useState('modal');
+  const [_pageType, setPageType] = useState('modal');
   const [countPerLine, setCountPerLine] = useState(1);
 
   /**
    * 設置數據
    */
-  const setData = (columns: any[], config: any) => {
+  const setData = (_columns: any[], config: any) => {
     const insertAndUpdate = config?.insertAndUpdate || {};
 
     const formData = {
