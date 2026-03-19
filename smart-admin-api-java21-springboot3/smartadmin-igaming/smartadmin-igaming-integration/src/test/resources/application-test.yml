@@ -40,6 +40,12 @@ spring:
     hibernate:
       ddl-auto: none
 
+# Tenant Configuration (Multi-Tenancy)
+tenant:
+  enabled: true
+  rls:
+    enabled: false  # Test environment uses MyBatis Plus interceptor, not PostgreSQL RLS
+
   # Kafka (disabled for tests, events will be published but not consumed)
   kafka:
     enabled: false

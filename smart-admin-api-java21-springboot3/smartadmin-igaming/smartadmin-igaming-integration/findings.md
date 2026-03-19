@@ -316,6 +316,93 @@ ERROR: current transaction is aborted, commands ignored until end of transaction
 2. **Priority 2**: Fix multi-tenant isolation tests (2 tests)
 3. **Priority 3**: Fix form validation test (1 test)
 
+---
+
+## Phase 2 Fixes Applied (2026-03-19 16:00)
+
+**Test Status**: 7/10 tests passing (70% pass rate) - UP from 5/10 (50%)
+
+### Fix #4: Missing t_wallet_bonus_ext Table (RESOLVED)
+- **File**: `V002.5__create_wallet_bonus_ext.sql` → Renamed to `V004.5__create_wallet_bonus_ext.sql`
+- **Root Cause**: Flyway migration order issue - V002.5 executed before V004, but referenced `t_player_bonus_record` table created in V004
+- **Solution**: Renamed migration to V004.5 to execute after V004__create_activity_tables.sql
+- **Schema Created**:
+  - 11 columns: id, wallet_id, bonus_id, balance, wagering_requirement, wagered_amount, expires_at, game_restriction, status, tenant_id, deleted, timestamps
+  - 2 foreign key constraints: wallet_id → t_wallet, bonus_id → t_player_bonus_record
+  - 2 check constraints: balance >= 0, wagered_amount validation
+  - 4 indexes: wallet, bonus, status, tenant
+- **Impact**: Fixed Flyway migration error, enabled bonus distribution tests to run
+
+### Fix #5: Tenant Interceptor Not Enabled (RESOLVED)
+- **File**: `application-test.yml`
+- **Root Cause**: Missing `tenant.enabled: true` configuration caused MyBatis-Plus TenantLineInnerInterceptor not to register
+- **Solution**: Added tenant configuration block:
+  ```yaml
+  tenant:
+    enabled: true
+    rls:
+      enabled: false  # Test uses MyBatis Plus interceptor, not PostgreSQL RLS
+  ```
+- **Impact**: Fixed 2 tenant isolation tests (shouldIsolateTenantData, shouldIsolateWalletAcrossTenants) ✅
+
+### Fix #6: Service Validation Added (PARTIALLY RESOLVED)
+- **File**: `PlayerRegistrationIntegrationService.java`
+- **Changes**:
+  1. Added `@Validated` annotation to class declaration
+  2. Added `@Valid` annotation to `registerPlayerWithWallet()` method parameter
+- **Result**: Validation now triggers correctly, throwing `ConstraintViolationException` for invalid input
+- **Issue**: Test `shouldValidateRegistrationFormConstraints` expects `ResponseDTO.error` but gets exception instead
+- **Status**: Validation is working, but test needs to be updated to expect exception handling ⚠️
+
+---
+
+## Current Test Status (2026-03-19 16:00) - Phase 2 Complete
+
+**Progress**: 7/10 tests passing (70% pass rate)
+
+### Passing Tests ✅ (7)
+1. `shouldRegisterPlayerWithWallets()` - Player registration with CASH and BONUS wallets
+2. `shouldRegisterWithReferralCode()` - Player registration with referral code
+3. `shouldFailDuplicateUsername()` - Duplicate username validation
+4. `shouldNotAwardBonusOnSecondDeposit()` - Second deposit does not trigger bonus
+5. `shouldHandleInvalidDepositCallback()` - Invalid deposit callback handling
+6. `shouldIsolateTenantData()` - **FIXED** ✅ - Tenant data isolation working
+7. `shouldIsolateWalletAcrossTenants()` - **FIXED** ✅ - Wallet tenant isolation working
+
+### Failing Tests ❌ (3)
+1. `shouldAwardFirstDepositBonus()` - AssertionFailedError at line 254 (bonusAmount assertion)
+2. `shouldHandleFirstDepositWithoutPromotion()` - AssertionFailedError at line 372 (bonusAmount=0 assertion)
+3. `shouldValidateRegistrationFormConstraints()` - ConstraintViolationException at line 483 (validation working, test expects different behavior)
+
+---
+
+## Analysis of Remaining Failures
+
+### Failure 1 & 2: Bonus Logic Issues
+**Common Pattern**: Both tests fail on bonus amount assertions
+- Test 1: Expects bonusAmount=50.00 (50% of 100 deposit)
+- Test 2: Expects bonusAmount=0.00 (no promotion active)
+
+**Possible Causes**:
+1. Test data setup incomplete (PromotionRuleEntity not inserted correctly)
+2. BonusDistributionManager logic issue
+3. WalletBonusExtEntity not created/populated correctly
+4. Missing FK relationship data
+
+**Investigation Needed**: Check test setup code for bonus rule creation
+
+### Failure 3: Validation Test Design Issue
+**Issue**: @Validated/@Valid correctly throws ConstraintViolationException, but test expects ResponseDTO.error
+
+**Options**:
+A. Update test to expect exception: `assertThrows(ConstraintViolationException.class, ...)`
+B. Add exception handler to convert exceptions to ResponseDTO
+C. Remove @Validated/@Valid and do manual validation in service
+
+**Recommendation**: Option A (update test) - Spring validation pattern is correct
+
+---
+
 ## Fixes Applied (Summary)
 
 ### Fix #1: Payment Order wallet_id (RESOLVED)

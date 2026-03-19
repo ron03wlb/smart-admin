@@ -3,6 +3,7 @@ package net.lab1024.sa.igaming.integration.player;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import net.lab1024.sa.igaming.wallet.domain.form.WalletCreateForm;
 import net.lab1024.sa.igaming.wallet.domain.vo.WalletVO;
 import net.lab1024.sa.igaming.wallet.service.WalletService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Player registration integration service - orchestrates end-to-end player onboarding.
@@ -60,6 +62,7 @@ import org.springframework.stereotype.Service;
  * @see WalletService#createWallet(WalletCreateForm)
  * @see DomainEventPublisher#publish(String, DomainEvent)
  */
+@Validated
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -79,7 +82,7 @@ public class PlayerRegistrationIntegrationService {
    * @return registration result with player info, wallets, and bonus eligibility status
    */
   public ResponseDTO<PlayerRegistrationResultVO> registerPlayerWithWallet(
-      PlayerRegistrationIntegrationForm form) {
+      @Valid PlayerRegistrationIntegrationForm form) {
 
     log.info("Starting integrated player registration: username={}", form.getUsername());
 
