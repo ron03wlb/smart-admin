@@ -18,19 +18,34 @@ import { CATEGORY_PERMISSION, CATEGORY_TYPE_LABELS, DISABLED_STATUS_LABELS } fro
 import type { CategoryVO, CategoryTypeEnum } from './types';
 import CategoryFormModal from './components/CategoryFormModal';
 
+export interface CategoryTreeTableProps {
+  /**
+   * 分類類型（必填）
+   * 1: 商品分類 (GOODS)
+   * 2: 演示分類 (DEMO)
+   */
+  categoryType: CategoryTypeEnum;
+  /**
+   * 權限前綴（可選）
+   * 例如: 'custom:' 會將權限從 'category:add' 變為 'custom:category:add'
+   */
+  privilegePrefix?: string;
+}
+
 /**
- * 分類管理頁面（樹形表格）
+ * 分類樹形表格組件（可復用）
+ *
+ * 可用於不同類型的分類管理（商品分類、演示分類等）
  */
-export default function CategoryManagement() {
-  const hasAddPrivilege = usePrivilege(CATEGORY_PERMISSION.ADD);
-  const hasAddChildPrivilege = usePrivilege(CATEGORY_PERMISSION.ADD_CHILD);
-  const hasUpdatePrivilege = usePrivilege(CATEGORY_PERMISSION.UPDATE);
-  const hasDeletePrivilege = usePrivilege(CATEGORY_PERMISSION.DELETE);
+export function CategoryTreeTable({ categoryType, privilegePrefix = '' }: CategoryTreeTableProps) {
+  const hasAddPrivilege = usePrivilege(`${privilegePrefix}${CATEGORY_PERMISSION.ADD}`);
+  const hasAddChildPrivilege = usePrivilege(`${privilegePrefix}${CATEGORY_PERMISSION.ADD_CHILD}`);
+  const hasUpdatePrivilege = usePrivilege(`${privilegePrefix}${CATEGORY_PERMISSION.UPDATE}`);
+  const hasDeletePrivilege = usePrivilege(`${privilegePrefix}${CATEGORY_PERMISSION.DELETE}`);
 
   // State
   const [tableData, setTableData] = useState<CategoryVO[]>([]);
   const [loading, setLoading] = useState(false);
-  const [categoryType] = useState<CategoryTypeEnum>(1); // 默認商品分類
   const formModalRef = useRef<{ show: (parentId?: number, rowData?: CategoryVO) => void }>(null);
 
   /**
@@ -193,4 +208,12 @@ export default function CategoryManagement() {
       <CategoryFormModal ref={formModalRef} categoryType={categoryType} onSuccess={loadCategoryTree} />
     </Card>
   );
+}
+
+/**
+ * 默認導出：商品分類管理頁面
+ * （保持向後兼容）
+ */
+export default function CategoryManagement() {
+  return <CategoryTreeTable categoryType={1} />;
 }
