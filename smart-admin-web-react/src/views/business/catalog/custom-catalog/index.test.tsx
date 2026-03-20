@@ -50,6 +50,13 @@ const createMockStore = () =>
           actualName: '管理員',
           phone: '13800138000',
         },
+        menuTreeList: [],
+        pointsList: [
+          'custom:category:add',
+          'custom:category:addChild',
+          'custom:category:update',
+          'custom:category:delete',
+        ].map((perm, index) => ({ webPerms: perm, menuId: index + 1 })),
         privilegeList: [
           'custom:category:add',
           'custom:category:addChild',
@@ -57,14 +64,17 @@ const createMockStore = () =>
           'custom:category:delete',
         ],
         roleList: [],
+        administratorFlag: false,
         isLoggedIn: true,
         loading: false,
         error: null,
       },
       dict: {
         dictData: {},
+        dictMap: {},
         loading: false,
         error: null,
+        lastFetched: null,
       },
     },
   });
