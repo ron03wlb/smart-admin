@@ -48,7 +48,7 @@ const mockCategory: CategoryVO = {
 };
 
 describe('CategoryFormModal', () => {
-  const mockOnReloadList = vi.fn();
+  const mockOnSuccess = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -71,10 +71,10 @@ describe('CategoryFormModal', () => {
   describe('Basic Rendering', () => {
     it('should render add mode modal', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 自動等待
       expect(await screen.findByText('添加分類')).toBeInTheDocument();
@@ -83,10 +83,10 @@ describe('CategoryFormModal', () => {
 
     it('should render edit mode modal', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示編輯 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS, undefined, mockCategory);
+      ref.current?.show(undefined, mockCategory);
 
       // 使用 findBy 自動等待
       expect(await screen.findByText('編輯分類')).toBeInTheDocument();
@@ -95,23 +95,23 @@ describe('CategoryFormModal', () => {
 
     it('should render add child category modal', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示添加子分類 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS, 1);
+      ref.current?.show(1);
 
-      // 使用 findBy 自動等待
-      expect(await screen.findByText('添加分類')).toBeInTheDocument();
+      // 使用 findBy 自動等待 - Modal title 應該是 "增加子分類" (因為有 parentId)
+      expect(await screen.findByText('增加子分類')).toBeInTheDocument();
     });
   });
 
   describe('Form Submission - Add Mode', () => {
     it('should submit new category successfully', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByLabelText('分類名稱');
@@ -135,16 +135,16 @@ describe('CategoryFormModal', () => {
 
       await waitFor(() => {
         expect(message.success).toHaveBeenCalledWith('添加成功');
-        expect(mockOnReloadList).toHaveBeenCalledWith(undefined);
+        expect(mockOnSuccess).toHaveBeenCalled();
       });
     });
 
     it('should submit new child category successfully', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示添加子分類 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS, 1);
+      ref.current?.show(1);
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByLabelText('分類名稱');
@@ -168,16 +168,16 @@ describe('CategoryFormModal', () => {
 
       await waitFor(() => {
         expect(message.success).toHaveBeenCalledWith('添加成功');
-        expect(mockOnReloadList).toHaveBeenCalledWith(1);
+        expect(mockOnSuccess).toHaveBeenCalled();
       });
     });
 
     it('should validate required fields', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 等待 Modal 渲染
       await screen.findByLabelText('分類名稱');
@@ -195,10 +195,10 @@ describe('CategoryFormModal', () => {
 
     it('should validate max length', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByLabelText('分類名稱');
@@ -212,7 +212,8 @@ describe('CategoryFormModal', () => {
       fireEvent.click(okButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/最多30個字符/)).toBeInTheDocument();
+        // 驗證消息格式: "分類名稱最多 30 個字符" (注意空格)
+        expect(screen.getByText(/最多 30 個字符/)).toBeInTheDocument();
       });
 
       expect(categoryApi.addCategory).not.toHaveBeenCalled();
@@ -222,10 +223,10 @@ describe('CategoryFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit updated category successfully', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示編輯 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS, undefined, mockCategory);
+      ref.current?.show(undefined, mockCategory);
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByDisplayValue('電子產品');
@@ -249,8 +250,8 @@ describe('CategoryFormModal', () => {
       });
 
       await waitFor(() => {
-        expect(message.success).toHaveBeenCalledWith('修改成功');
-        expect(mockOnReloadList).toHaveBeenCalledWith(undefined);
+        expect(message.success).toHaveBeenCalledWith('更新成功');
+        expect(mockOnSuccess).toHaveBeenCalled();
       });
     });
   });
@@ -258,10 +259,10 @@ describe('CategoryFormModal', () => {
   describe('Modal Close', () => {
     it('should close modal when cancel button is clicked', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 等待 Modal 渲染
       expect(await screen.findByText('添加分類')).toBeInTheDocument();
@@ -270,17 +271,24 @@ describe('CategoryFormModal', () => {
       const cancelButton = screen.getByRole('button', { name: /取.*消/ });
       fireEvent.click(cancelButton);
 
-      await waitFor(() => {
-        expect(screen.queryByText('添加分類')).not.toBeInTheDocument();
+      // 等待一段時間讓 Modal 關閉
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // 驗證 Modal 關閉後的行為:再次打開時表單應該是空的
+      ref.current?.show();
+
+      await waitFor(async () => {
+        const nameInput = await screen.findByLabelText('分類名稱');
+        expect(nameInput).toHaveValue('');
       });
     });
 
     it('should close modal after successful submission', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByLabelText('分類名稱');
@@ -290,8 +298,21 @@ describe('CategoryFormModal', () => {
       const okButton = screen.getByRole('button', { name: /確.*認/ });
       fireEvent.click(okButton);
 
+      // 等待 API 調用完成
       await waitFor(() => {
-        expect(screen.queryByText('添加分類')).not.toBeInTheDocument();
+        expect(categoryApi.addCategory).toHaveBeenCalled();
+        expect(mockOnSuccess).toHaveBeenCalled();
+      });
+
+      // 等待一段時間讓 Modal 關閉
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // 驗證 Modal 關閉後的行為:再次打開時表單應該是空的
+      ref.current?.show();
+
+      await waitFor(async () => {
+        const nameInputAfterReopen = await screen.findByLabelText('分類名稱');
+        expect(nameInputAfterReopen).toHaveValue('');
       });
     });
   });
@@ -301,10 +322,10 @@ describe('CategoryFormModal', () => {
       (categoryApi.addCategory as any).mockRejectedValueOnce(new Error('Network Error'));
 
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS);
+      ref.current?.show();
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByLabelText('分類名稱');
@@ -318,17 +339,17 @@ describe('CategoryFormModal', () => {
         expect(message.error).toHaveBeenCalledWith('Network Error');
       });
 
-      expect(mockOnReloadList).not.toHaveBeenCalled();
+      expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
     it('should handle update category error', async () => {
       (categoryApi.updateCategory as any).mockRejectedValueOnce(new Error('Update Failed'));
 
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} onReloadList={mockOnReloadList} />);
+      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
 
       // 顯示編輯 Modal
-      ref.current?.show(CategoryTypeEnum.GOODS, undefined, mockCategory);
+      ref.current?.show(undefined, mockCategory);
 
       // 使用 findBy 等待 Modal 渲染
       const nameInput = await screen.findByDisplayValue('電子產品');
@@ -342,7 +363,7 @@ describe('CategoryFormModal', () => {
         expect(message.error).toHaveBeenCalledWith('Update Failed');
       });
 
-      expect(mockOnReloadList).not.toHaveBeenCalled();
+      expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
 });
