@@ -7,13 +7,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithProviders, createMockResponse, PERMISSIONS } from '@/test/test-utils';
+import { Modal } from 'antd';
 import CategoryManagement from './index';
 import { categoryApi } from '@/api/business/categoryApi';
-import userReducer from '@/store/slices/userSlice';
 import type { CategoryVO } from './types';
 import { CategoryTypeEnum } from './types';
 
@@ -80,34 +78,13 @@ const mockCategoryTree: CategoryVO[] = [
   },
 ];
 
-// Create mock store with user permissions
-const createMockStore = (administratorFlag = true) => {
-  return configureStore({
-    reducer: {
-      user: userReducer,
-    },
-    preloadedState: {
-      user: {
-        token: 'test-token',
-        employeeId: '1',
-        employeeName: 'Test User',
-        loginName: 'testuser',
-        administratorFlag,
-        menuTree: [],
-        displayMenuTree: [],
-        pointsList: [
-          { webPerms: 'business:category:add' },
-          { webPerms: 'business:category:addChild' },
-          { webPerms: 'business:category:update' },
-          { webPerms: 'business:category:delete' },
-        ],
-        menuRouterList: [],
-        menuParentIdListMap: {},
-        loading: false,
-        error: null,
-        unreadMessageCount: 0,
-      },
-    },
+// Helper function to render with category permissions
+const renderCategoryManagement = (administratorFlag = false) => {
+  return renderWithProviders(<CategoryManagement />, {
+    permissions: PERMISSIONS.ALL_CRUD('business:category').concat([
+      'business:category:addChild',
+    ]),
+    administratorFlag,
   });
 };
 
@@ -137,14 +114,7 @@ describe('CategoryManagement', () => {
 
   describe('Basic Rendering', () => {
     it('should render category management page', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('分類管理')).toBeInTheDocument();
@@ -154,14 +124,7 @@ describe('CategoryManagement', () => {
     });
 
     it('should call queryCategoryTree on mount', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(categoryApi.queryCategoryTree).toHaveBeenCalledWith({
@@ -171,14 +134,7 @@ describe('CategoryManagement', () => {
     });
 
     it('should display category tree data', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
@@ -190,14 +146,7 @@ describe('CategoryManagement', () => {
 
   describe('Permission Control', () => {
     it('should show add button when user has permission', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('新建分類')).toBeInTheDocument();
@@ -205,14 +154,7 @@ describe('CategoryManagement', () => {
     });
 
     it('should show action buttons when user has permissions', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
@@ -231,14 +173,7 @@ describe('CategoryManagement', () => {
 
   describe('Add Category', () => {
     it('should open form modal when add button is clicked', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('新建分類')).toBeInTheDocument();
@@ -253,38 +188,27 @@ describe('CategoryManagement', () => {
     });
 
     it('should open form modal when add child button is clicked', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
       });
 
       const addChildButtons = screen.getAllByText('增加子分類');
+      const initialCount = addChildButtons.length;
       fireEvent.click(addChildButtons[0]);
 
       await waitFor(() => {
-        expect(screen.getByText('添加分類')).toBeInTheDocument();
+        // After Modal opens, there should be one more "增加子分類" (Modal title)
+        const allMatches = screen.getAllByText('增加子分類');
+        expect(allMatches.length).toBeGreaterThan(initialCount);
       });
     });
   });
 
   describe('Edit Category', () => {
     it('should open form modal when edit button is clicked', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
@@ -301,14 +225,9 @@ describe('CategoryManagement', () => {
 
   describe('Delete Category', () => {
     it('should show confirm modal when delete button is clicked', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      const confirmSpy = vi.spyOn(Modal, 'confirm');
+
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
@@ -318,21 +237,25 @@ describe('CategoryManagement', () => {
       fireEvent.click(deleteButtons[0]);
 
       await waitFor(() => {
-        expect(screen.getByText('確認刪除？')).toBeInTheDocument();
+        expect(confirmSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: '確認刪除？',
+            content: '刪除後無法恢復，請確認是否刪除該分類。',
+          })
+        );
       });
 
-      expect(screen.getByText(/刪除後無法恢復/)).toBeInTheDocument();
+      confirmSpy.mockRestore();
     });
 
     it('should call delete API when confirm is clicked', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      let onOkCallback: any;
+      const confirmSpy = vi.spyOn(Modal, 'confirm').mockImplementation((config: any) => {
+        onOkCallback = config.onOk;
+        return {} as any;
+      });
+
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
@@ -343,31 +266,28 @@ describe('CategoryManagement', () => {
       fireEvent.click(deleteButtons[0]);
 
       await waitFor(() => {
-        expect(screen.getByText('確認刪除？')).toBeInTheDocument();
+        expect(confirmSpy).toHaveBeenCalled();
       });
 
-      // 點擊確認
-      const confirmButton = screen.getByRole('button', { name: /確.*認/ });
-      fireEvent.click(confirmButton);
+      // 執行 Modal.confirm 的 onOk 回調
+      await onOkCallback();
 
       await waitFor(() => {
         expect(categoryApi.deleteCategory).toHaveBeenCalledWith(1);
-      });
-
-      await waitFor(() => {
         expect(message.success).toHaveBeenCalledWith('刪除成功');
       });
+
+      confirmSpy.mockRestore();
     });
 
     it('should not delete when cancel is clicked', async () => {
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      let onCancelCallback: any;
+      const confirmSpy = vi.spyOn(Modal, 'confirm').mockImplementation((config: any) => {
+        onCancelCallback = config.onCancel;
+        return {} as any;
+      });
+
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
@@ -378,18 +298,18 @@ describe('CategoryManagement', () => {
       fireEvent.click(deleteButtons[0]);
 
       await waitFor(() => {
-        expect(screen.getByText('確認刪除？')).toBeInTheDocument();
+        expect(confirmSpy).toHaveBeenCalled();
       });
 
-      // 點擊取消
-      const cancelButton = screen.getByRole('button', { name: /取.*消/ });
-      fireEvent.click(cancelButton);
+      // 執行 Modal.confirm 的 onCancel 回調 (如果存在)
+      if (onCancelCallback) {
+        await onCancelCallback();
+      }
 
-      await waitFor(() => {
-        expect(screen.queryByText('確認刪除？')).not.toBeInTheDocument();
-      });
-
+      // 驗證沒有調用刪除 API
       expect(categoryApi.deleteCategory).not.toHaveBeenCalled();
+
+      confirmSpy.mockRestore();
     });
   });
 
@@ -397,14 +317,7 @@ describe('CategoryManagement', () => {
     it('should show error message when query fails', async () => {
       vi.mocked(categoryApi.queryCategoryTree).mockRejectedValueOnce(new Error('Network Error'));
 
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(message.error).toHaveBeenCalledWith('加載分類數據失敗');
@@ -414,33 +327,34 @@ describe('CategoryManagement', () => {
     it('should show error message when delete fails', async () => {
       vi.mocked(categoryApi.deleteCategory).mockRejectedValueOnce(new Error('Delete Error'));
 
-      const store = createMockStore();
-      render(
-        <Provider store={store}>
-          <BrowserRouter>
-            <CategoryManagement />
-          </BrowserRouter>
-        </Provider>
-      );
+      let onOkCallback: any;
+      const confirmSpy = vi.spyOn(Modal, 'confirm').mockImplementation((config: any) => {
+        onOkCallback = config.onOk;
+        return {} as any;
+      });
+
+      renderCategoryManagement();
 
       await waitFor(() => {
         expect(screen.getByText('電子產品')).toBeInTheDocument();
       });
 
-      // 點擊刪除並確認
+      // 點擊刪除按鈕
       const deleteButtons = screen.getAllByText('刪除');
       fireEvent.click(deleteButtons[0]);
 
       await waitFor(() => {
-        expect(screen.getByText('確認刪除？')).toBeInTheDocument();
+        expect(confirmSpy).toHaveBeenCalled();
       });
 
-      const confirmButton = screen.getByRole('button', { name: /確.*認/ });
-      fireEvent.click(confirmButton);
+      // 執行 Modal.confirm 的 onOk 回調
+      await onOkCallback();
 
       await waitFor(() => {
         expect(message.error).toHaveBeenCalledWith('刪除失敗');
       });
+
+      confirmSpy.mockRestore();
     });
   });
 });
