@@ -49,6 +49,7 @@ public class BonusDistributionManager {
    *
    * @param playerId player ID
    * @param rule promotion rule
+   * @param depositAmount deposit amount for bonus calculation (nullable for fixed-amount bonuses)
    * @param claimId idempotency key
    * @param tenantId tenant ID
    * @return the created bonus record
@@ -57,7 +58,11 @@ public class BonusDistributionManager {
    */
   @Transactional(rollbackFor = Throwable.class)
   public PlayerBonusRecordEntity distributeBonus(
-      Long playerId, PromotionRuleEntity rule, String claimId, Long tenantId) {
+      Long playerId,
+      PromotionRuleEntity rule,
+      BigDecimal depositAmount,
+      String claimId,
+      Long tenantId) {
 
     // Atomic max-claims check inside @Transactional (prevents TOCTOU race condition)
     if (rule.getMaxClaimsPerPlayer() != null) {
@@ -68,7 +73,23 @@ public class BonusDistributionManager {
     }
 
     OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-    BigDecimal bonusAmount = rule.getMaxBonus();
+
+    // Calculate bonus amount
+    BigDecimal bonusAmount;
+    if (depositAmount != null) {
+      // Deposit-based bonus: calculate depositAmount * bonusRate, capped at maxBonus
+      BigDecimal calculatedBonus = depositAmount.multiply(rule.getBonusRate());
+      bonusAmount = calculatedBonus.min(rule.getMaxBonus());
+      log.info(
+          "Bonus calculated: depositAmount={}, bonusRate={}, calculatedBonus={}, finalBonusAmount={}",
+          depositAmount,
+          rule.getBonusRate(),
+          calculatedBonus,
+          bonusAmount);
+    } else {
+      // Fixed bonus (e.g., ACTIVITY, FREE_SPIN): use maxBonus directly
+      bonusAmount = rule.getMaxBonus();
+    }
     BigDecimal wageringRequired =
         bonusAmount.multiply(
             rule.getWageringMultiplier() != null ? rule.getWageringMultiplier() : BigDecimal.ONE);

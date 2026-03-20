@@ -28,7 +28,6 @@ import net.lab1024.sa.igaming.integration.payment.domain.vo.DepositResultVO;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletEntity;
 import net.lab1024.sa.igaming.wallet.domain.form.WalletBonusCreditForm;
-import net.lab1024.sa.igaming.wallet.domain.vo.WalletTransactionVO;
 import net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao;
 import net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity;
 import net.lab1024.sa.igaming.wallet.payment.service.PaymentService;
@@ -278,27 +277,12 @@ public class FirstDepositBonusIntegrationService {
     PromotionRuleEntity rule = firstDepositRuleOpt.get();
     String claimId = "first_deposit_" + playerId + "_" + System.currentTimeMillis();
 
-    // Distribute bonus (creates PlayerBonusRecordEntity + WageringProgress)
+    // Distribute bonus (creates PlayerBonusRecordEntity + credits BONUS wallet)
+    // NOTE: BonusDistributionManager.distributeBonus() handles the entire bonus distribution
+    // flow, including creating the bonus record, wagering progress, AND crediting the BONUS
+    // wallet. We do NOT need to call walletService.creditBonus() separately.
     PlayerBonusRecordEntity bonusRecord =
-        bonusDistributionManager.distributeBonus(playerId, rule, claimId, tenantId);
-
-    // Credit BONUS wallet
-    WalletBonusCreditForm bonusCreditForm = new WalletBonusCreditForm();
-    bonusCreditForm.setPlayerId(playerId);
-    bonusCreditForm.setAmount(bonusRecord.getBonusAmount());
-    bonusCreditForm.setBonusId(bonusRecord.getRecordId());
-    bonusCreditForm.setWageringRequirement(bonusRecord.getWageringRequired());
-    bonusCreditForm.setExpiresAt(bonusRecord.getExpiredAt());
-    bonusCreditForm.setRequestId(claimId); // Idempotency
-    bonusCreditForm.setDescription("First deposit bonus: " + rule.getPromotionName());
-
-    ResponseDTO<WalletTransactionVO> creditResult = walletService.creditBonus(bonusCreditForm);
-    if (!creditResult.getOk()) {
-      log.error(
-          "Failed to credit BONUS wallet: playerId={}, error={}", playerId, creditResult.getMsg());
-      // Bonus record already created, but wallet credit failed - manual intervention required
-      throw new IllegalStateException("BONUS wallet credit failed: " + creditResult.getMsg());
-    }
+        bonusDistributionManager.distributeBonus(playerId, rule, depositAmount, claimId, tenantId);
 
     return Option.of(bonusRecord);
   }

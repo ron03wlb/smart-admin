@@ -79,6 +79,12 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   void setUp() {
     // Reset tenant context before each test
     TenantContext.setTenantId(1L);
+
+    // Clean up promotion rules and bonus records from previous tests
+    // This prevents "shouldHandleFirstDepositWithoutPromotion" from finding leftover rules
+    bonusRecordDao.delete(Wrappers.lambdaQuery());
+    promotionRuleDao.delete(Wrappers.lambdaQuery());
+    paymentOrderDao.delete(Wrappers.lambdaQuery());
   }
 
   @AfterEach
@@ -478,13 +484,11 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
     invalidForm.setUsername("ab"); // Too short (min 3 chars)
     invalidForm.setPassword("Test@1234");
 
-    // Act - Registration attempt
-    ResponseDTO<PlayerRegistrationResultVO> result =
-        playerRegistrationService.registerPlayerWithWallet(invalidForm);
-
-    // Assert - Validation error returned
-    assertThat(result.getOk()).isFalse();
-    // Note: Jakarta Validation occurs before service invocation
-    // If this test fails, it means validation is bypassed
+    // Act & Assert - Jakarta Validation should throw ConstraintViolationException
+    // Note: Validation occurs at method entry (before service logic executes)
+    org.assertj.core.api.Assertions.assertThatThrownBy(
+            () -> playerRegistrationService.registerPlayerWithWallet(invalidForm))
+        .isInstanceOf(jakarta.validation.ConstraintViolationException.class)
+        .hasMessageContaining("username must be 3-50 characters");
   }
 }

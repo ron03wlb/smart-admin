@@ -71,7 +71,8 @@ public class BonusClaimService {
     PlayerBonusRecordEntity record;
     try {
       record =
-          bonusDistributionManager.distributeBonus(playerId, rule, form.getClaimId(), tenantId);
+          bonusDistributionManager.distributeBonus(
+              playerId, rule, null, form.getClaimId(), tenantId);
     } catch (DuplicateKeyException e) {
       return ResponseDTO.userErrorParam(ActivityErrorCode.ALREADY_CLAIMED.getMsg());
     } catch (IllegalStateException e) {
