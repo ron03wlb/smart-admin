@@ -254,7 +254,7 @@ describe('usePagination', () => {
       const { result } = renderHook(() =>
         usePagination({
           total: 100,
-          pageSize: 10,
+          defaultPageSize: 10,
         })
       );
 

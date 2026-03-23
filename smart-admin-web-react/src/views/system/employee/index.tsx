@@ -205,7 +205,21 @@ export default function EmployeePage() {
    * 處理編輯員工
    */
   const handleEdit = (record: EmployeeVO) => {
-    setFormInitialData(record as EmployeeFormData);
+    // 轉換 EmployeeVO 到 EmployeeFormData (boolean → number)
+    const formData: EmployeeFormData = {
+      employeeId: record.employeeId,
+      actualName: record.actualName,
+      phone: record.phone,
+      departmentId: record.departmentId,
+      loginName: record.loginName,
+      email: record.email,
+      gender: record.gender,
+      disabledFlag: record.disabledFlag ? 1 : 0,
+      leaveFlag: record.leaveFlag ? 1 : 0,
+      positionId: record.positionId,
+      roleIdList: record.roleIdList,
+    };
+    setFormInitialData(formData);
     setFormModalVisible(true);
   };
 

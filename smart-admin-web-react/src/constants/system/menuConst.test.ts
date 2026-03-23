@@ -114,18 +114,16 @@ describe('menuConst', () => {
         'operate',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(MENU_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
-          typeof MENU_TABLE_COLUMNS_WIDTH[
-            column as keyof typeof MENU_TABLE_COLUMNS_WIDTH
-          ]
+          typeof MENU_TABLE_COLUMNS_WIDTH[column as keyof typeof MENU_TABLE_COLUMNS_WIDTH]
         ).toBe('number');
       });
     });
 
     it('should have reasonable width values', () => {
-      Object.values(MENU_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(MENU_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(300);
       });
@@ -161,8 +159,8 @@ describe('menuConst', () => {
 
   describe('FLAG_LABELS', () => {
     it('should have correct flag labels', () => {
-      expect(FLAG_LABELS[true as any]).toBe('是');
-      expect(FLAG_LABELS[false as any]).toBe('否');
+      expect(FLAG_LABELS['true']).toBe('是');
+      expect(FLAG_LABELS['false']).toBe('否');
     });
 
     it('should only have two flag options', () => {

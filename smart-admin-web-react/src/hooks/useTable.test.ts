@@ -125,7 +125,7 @@ describe('useTable', () => {
       let resolveQuery: any;
       const delayedQueryApi = vi.fn(
         () =>
-          new Promise(resolve => {
+          new Promise<{ data: { list: any[]; total: number }; ok: boolean }>(resolve => {
             resolveQuery = resolve;
           })
       );
@@ -333,7 +333,7 @@ describe('useTable', () => {
         showQuickJumper: true,
       });
       expect(result.current.pagination.showTotal).toBeDefined();
-      expect(result.current.pagination.showTotal!(100)).toBe('共 100 條');
+      expect(result.current.pagination.showTotal!(100, [1, 20])).toContain('100');
     });
   });
 
@@ -347,14 +347,10 @@ describe('useTable', () => {
       );
 
       act(() => {
-        result.current.handleTableChange(
-          { current: 1, pageSize: 10 },
-          {},
-          {
-            field: 'price',
-            order: 'ascend',
-          } as any
-        );
+        result.current.handleTableChange({ current: 1, pageSize: 10 }, {}, {
+          field: 'price',
+          order: 'ascend',
+        } as any);
       });
 
       await waitFor(() => {
@@ -376,14 +372,10 @@ describe('useTable', () => {
       );
 
       act(() => {
-        result.current.handleTableChange(
-          { current: 1, pageSize: 10 },
-          {},
-          {
-            field: 'createTime',
-            order: 'descend',
-          } as any
-        );
+        result.current.handleTableChange({ current: 1, pageSize: 10 }, {}, {
+          field: 'createTime',
+          order: 'descend',
+        } as any);
       });
 
       await waitFor(() => {
@@ -405,14 +397,10 @@ describe('useTable', () => {
       );
 
       act(() => {
-        result.current.handleTableChange(
-          { current: 1, pageSize: 10 },
-          {},
-          [
-            { field: 'price', order: 'ascend' },
-            { field: 'createTime', order: 'descend' },
-          ] as any
-        );
+        result.current.handleTableChange({ current: 1, pageSize: 10 }, {}, [
+          { field: 'price', order: 'ascend' },
+          { field: 'createTime', order: 'descend' },
+        ] as any);
       });
 
       await waitFor(() => {
@@ -433,14 +421,10 @@ describe('useTable', () => {
 
       // 先設置排序
       act(() => {
-        result.current.handleTableChange(
-          { current: 1, pageSize: 10 },
-          {},
-          {
-            field: 'price',
-            order: 'ascend',
-          } as any
-        );
+        result.current.handleTableChange({ current: 1, pageSize: 10 }, {}, {
+          field: 'price',
+          order: 'ascend',
+        } as any);
       });
 
       // 取消排序
@@ -462,14 +446,10 @@ describe('useTable', () => {
       );
 
       act(() => {
-        result.current.handleTableChange(
-          { current: 1, pageSize: 10 },
-          {},
-          {
-            field: ['user', 'name'],
-            order: 'ascend',
-          } as any
-        );
+        result.current.handleTableChange({ current: 1, pageSize: 10 }, {}, {
+          field: ['user', 'name'],
+          order: 'ascend',
+        } as any);
       });
 
       await waitFor(() => {

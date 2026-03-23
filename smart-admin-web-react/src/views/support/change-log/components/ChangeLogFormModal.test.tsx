@@ -26,7 +26,7 @@ vi.mock('@/components/common/SmartEnumSelect', () => ({
     <select
       data-testid="enum-select"
       value={value}
-      onChange={(e) => onChange?.(Number(e.target.value))}
+      onChange={e => onChange?.(Number(e.target.value))}
       {...props}
     >
       <option value="">請選擇</option>
@@ -52,7 +52,7 @@ const mockChangeLogData: ChangeLogVO = {
 };
 
 describe('ChangeLogFormModal', () => {
-  let onSuccess: ReturnType<typeof vi.fn>;
+  let onSuccess: () => void;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -97,7 +97,9 @@ describe('ChangeLogFormModal', () => {
     });
 
     // Verify form fields are pre-filled
-    const versionInput = screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0') as HTMLInputElement;
+    const versionInput = screen.getByPlaceholderText(
+      '請輸入版本號，例如：v1.0.0'
+    ) as HTMLInputElement;
     expect(versionInput.value).toBe('v1.0.0');
 
     const authorInput = screen.getByPlaceholderText('請輸入發布人') as HTMLInputElement;

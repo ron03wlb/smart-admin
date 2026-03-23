@@ -363,9 +363,9 @@ describe('userSlice', () => {
       const action = await getLoginInfo()(vi.fn(), vi.fn(), {});
 
       // pointsList 應該包含菜單權限點 + 獨立權限點
-      expect(action.payload.pointsList).toBeDefined();
-      expect(Array.isArray(action.payload.pointsList)).toBe(true);
-      expect(action.payload.pointsList.length).toBeGreaterThan(0);
+      expect((action.payload as any).pointsList).toBeDefined();
+      expect(Array.isArray((action.payload as any).pointsList)).toBe(true);
+      expect((action.payload as any).pointsList.length).toBeGreaterThan(0);
     });
 
     it('rejected - 應該設置 error', async () => {
@@ -578,8 +578,8 @@ describe('userSlice', () => {
       const action = await getLoginInfo()(vi.fn(), vi.fn(), {});
 
       expect(action.type).toBe(getLoginInfo.fulfilled.type);
-      expect(action.payload.menuTree).toEqual([]);
-      expect(action.payload.pointsList).toEqual([]);
+      expect((action.payload as any).menuTree).toEqual([]);
+      expect((action.payload as any).pointsList).toEqual([]);
     });
 
     it('應該保持狀態不可變性', () => {

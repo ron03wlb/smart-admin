@@ -215,9 +215,9 @@ export default function EnterprisePage() {
       dataIndex: 'type',
       key: 'type',
       width: ENTERPRISE_TABLE_COLUMNS_WIDTH.type,
-      render: (type) => (
-        <Tag color={ENTERPRISE_TYPE_COLORS[type]}>
-          {ENTERPRISE_TYPE_LABELS[type]}
+      render: (type: number) => (
+        <Tag color={ENTERPRISE_TYPE_COLORS[type as keyof typeof ENTERPRISE_TYPE_COLORS]}>
+          {ENTERPRISE_TYPE_LABELS[type as keyof typeof ENTERPRISE_TYPE_LABELS]}
         </Tag>
       ),
     },
@@ -268,7 +268,7 @@ export default function EnterprisePage() {
           <PrivilegeButton
             type="link"
             size="small"
-            permission={ENTERPRISE_PERMISSION.UPDATE}
+            privilege={ENTERPRISE_PERMISSION.UPDATE}
             onClick={() => handleEdit(record.enterpriseId)}
           >
             編輯
@@ -277,7 +277,7 @@ export default function EnterprisePage() {
             type="link"
             size="small"
             danger
-            permission={ENTERPRISE_PERMISSION.DELETE}
+            privilege={ENTERPRISE_PERMISSION.DELETE}
             onClick={() => handleDelete(record)}
           >
             刪除
@@ -305,10 +305,7 @@ export default function EnterprisePage() {
             </Col>
             <Col>
               <Form.Item label="創建時間">
-                <RangePicker
-                  onChange={handleDateChange}
-                  style={{ width: 300 }}
-                />
+                <RangePicker onChange={handleDateChange} style={{ width: 300 }} />
               </Form.Item>
             </Col>
             <Col>
@@ -329,7 +326,7 @@ export default function EnterprisePage() {
           <PrivilegeButton
             type="primary"
             icon={<PlusOutlined />}
-            permission={ENTERPRISE_PERMISSION.ADD}
+            privilege={ENTERPRISE_PERMISSION.ADD}
             onClick={handleAdd}
           >
             新建企業
@@ -348,7 +345,7 @@ export default function EnterprisePage() {
             total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             pageSizeOptions: ['10', '20', '50', '100'],
             onChange: handlePageChange,
           }}

@@ -9,8 +9,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Form, Input, Button, Table, Card, DatePicker, Space, Tag } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 import { loginLogApi } from '@/api/support/loginLogApi';
 import { useTable } from '@/hooks/useTable';
 import { formatDateTime } from '@/utils/date';
@@ -163,7 +162,7 @@ const LoginLogList: React.FC = () => {
       key: 'loginResult',
       width: LOGIN_LOG_TABLE_COLUMNS_WIDTH.loginResult,
       render: (loginResult: number) => {
-        const resultMap = {
+        const resultMap: Record<number, { value: number; label: string; color: string }> = {
           [LOGIN_RESULT_ENUM.LOGIN_SUCCESS.value]: LOGIN_RESULT_ENUM.LOGIN_SUCCESS,
           [LOGIN_RESULT_ENUM.LOGIN_FAIL.value]: LOGIN_RESULT_ENUM.LOGIN_FAIL,
           [LOGIN_RESULT_ENUM.LOGIN_OUT.value]: LOGIN_RESULT_ENUM.LOGIN_OUT,

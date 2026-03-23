@@ -232,7 +232,7 @@ describe('MessageSendForm', () => {
     // Note: 此測試驗證批量消息生成邏輯（一對多）
     // 需要完整的接收者選擇流程才能驗證
     // receiverUserIdList.map() 生成正確數量的消息對象
-    const _mockReceiverIds = [1, 2, 3];
+    // const mockReceiverIds = [1, 2, 3]; // Reserved for future implementation
 
     vi.mocked(messageApi.sendMessages).mockResolvedValue({
       code: 200,

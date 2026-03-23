@@ -23,7 +23,7 @@ vi.mock('@/api/support/reloadApi', () => ({
 
 // Mock usePrivilege Hook
 vi.mock('@/hooks/usePrivilege', () => ({
-  usePrivilege: vi.fn((permission: string) => {
+  usePrivilege: vi.fn((_permission: string) => {
     // 默認所有權限都返回 true
     return true;
   }),
@@ -91,7 +91,9 @@ describe('ReloadListPage', () => {
 
     // Verify introduction alert is displayed
     expect(screen.getByText(/Smart-Reload 心跳服務介紹/)).toBeInTheDocument();
-    expect(screen.getByText(/簡介：SmartReload是一個可以在不重啟進程的情況下動態重新加載配置/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/簡介：SmartReload是一個可以在不重啟進程的情況下動態重新加載配置/)
+    ).toBeInTheDocument();
   });
 
   it('should display execute button when user has execute privilege', async () => {

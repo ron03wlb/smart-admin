@@ -10,7 +10,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Form, Input, Button, Table, Card, DatePicker, Space, Tag, Radio, Typography } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 import { operateLogApi } from '@/api/support/operateLogApi';
 import { useTable } from '@/hooks/useTable';
 import { formatDateTime } from '@/utils/date';

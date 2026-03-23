@@ -8,7 +8,7 @@
 
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Modal, Row, Col, Typography, Card, Spin } from 'antd';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 import { operateLogApi } from '@/api/support/operateLogApi';
 import { formatDateTime } from '@/utils/date';
 import type { OperateLogVO } from '../types';

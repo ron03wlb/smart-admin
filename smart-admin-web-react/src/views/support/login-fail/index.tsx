@@ -7,9 +7,22 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Table, Card, DatePicker, Space, Tag, Radio, Modal, message } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Table,
+  Card,
+  DatePicker,
+  Space,
+  Tag,
+  Radio,
+  Modal,
+  message,
+} from 'antd';
+import type { TableProps } from 'antd';
 import { SearchOutlined, ReloadOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { ColumnsType, TableRowSelection } from 'antd/es/table';
+import type { ColumnsType } from 'antd/es/table';
 import { loginFailApi } from '@/api/support/loginFailApi';
 import { useTable } from '@/hooks/useTable';
 import { formatDateTime } from '@/utils/date';
@@ -34,7 +47,10 @@ const LoginFailList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 使用 useTable Hook（默認查詢已鎖定記錄）
-  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<LoginFailVO, LoginFailQueryForm>({
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<
+    LoginFailVO,
+    LoginFailQueryForm
+  >({
     defaultQueryForm: {
       loginName: undefined,
       lockFlag: 1,
@@ -57,7 +73,7 @@ const LoginFailList: React.FC = () => {
   // 處理搜索
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    setQueryForm((prev) => ({
+    setQueryForm(prev => ({
       ...prev,
       loginName: values.loginName,
       lockFlag: values.lockFlag,
@@ -88,12 +104,12 @@ const LoginFailList: React.FC = () => {
   const handleLockFlagChange = (e: any) => {
     const lockFlag = e.target.value;
     form.setFieldsValue({ lockFlag });
-    setQueryForm((prev) => ({ ...prev, lockFlag, pageNum: 1 }));
+    setQueryForm(prev => ({ ...prev, lockFlag, pageNum: 1 }));
     setTimeout(() => query(), 0);
   };
 
   // 行選擇配置
-  const rowSelection: TableRowSelection<LoginFailVO> = {
+  const rowSelection: TableProps<LoginFailVO>['rowSelection'] = {
     selectedRowKeys,
     onChange: (keys: React.Key[]) => {
       setSelectedRowKeys(keys);
@@ -163,9 +179,10 @@ const LoginFailList: React.FC = () => {
       key: 'lockFlag',
       width: LOGIN_FAIL_TABLE_COLUMNS_WIDTH.lockFlag,
       render: (lockFlag: number) => {
-        const lock = lockFlag === LOCK_FLAG_ENUM.LOCKED.value
-          ? LOCK_FLAG_ENUM.LOCKED
-          : LOCK_FLAG_ENUM.UNLOCKED;
+        const lock =
+          lockFlag === LOCK_FLAG_ENUM.LOCKED.value
+            ? LOCK_FLAG_ENUM.LOCKED
+            : LOCK_FLAG_ENUM.UNLOCKED;
         return <Tag color={lock.color}>{lock.label}</Tag>;
       },
     },
@@ -196,9 +213,7 @@ const LoginFailList: React.FC = () => {
   if (!hasQueryPermission) {
     return (
       <Card>
-        <div style={{ textAlign: 'center', padding: '50px 0' }}>
-          您沒有權限查看登錄失敗列表
-        </div>
+        <div style={{ textAlign: 'center', padding: '50px 0' }}>您沒有權限查看登錄失敗列表</div>
       </Card>
     );
   }
@@ -208,37 +223,19 @@ const LoginFailList: React.FC = () => {
       {/* 搜索表單 */}
       <Card size="small" style={{ marginBottom: 16 }}>
         <Form form={form} layout="inline">
-          <Form.Item
-            name="loginName"
-            label="登錄名"
-            style={{ marginBottom: 16 }}
-          >
-            <Input
-              placeholder="登錄名"
-              allowClear
-              style={{ width: 300 }}
-            />
+          <Form.Item name="loginName" label="登錄名" style={{ marginBottom: 16 }}>
+            <Input placeholder="登錄名" allowClear style={{ width: 300 }} />
           </Form.Item>
 
-          <Form.Item
-            name="lockFlag"
-            label="快速篩選"
-            style={{ marginBottom: 16 }}
-          >
-            <Radio.Group
-              onChange={handleLockFlagChange}
-              buttonStyle="solid"
-            >
+          <Form.Item name="lockFlag" label="快速篩選" style={{ marginBottom: 16 }}>
+            <Radio.Group onChange={handleLockFlagChange} buttonStyle="solid">
               <Radio.Button value={undefined}>全部</Radio.Button>
               <Radio.Button value={1}>已鎖定</Radio.Button>
               <Radio.Button value={0}>未鎖定</Radio.Button>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item
-            label="鎖定時間"
-            style={{ marginBottom: 16 }}
-          >
+          <Form.Item label="鎖定時間" style={{ marginBottom: 16 }}>
             <RangePicker
               format="YYYY-MM-DD"
               onChange={handleDateRangeChange}
@@ -248,17 +245,10 @@ const LoginFailList: React.FC = () => {
 
           <Form.Item style={{ marginBottom: 16 }}>
             <Space>
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-              >
+              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                 查詢
               </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleReset}
-              >
+              <Button icon={<ReloadOutlined />} onClick={handleReset}>
                 重置
               </Button>
             </Space>
@@ -291,10 +281,10 @@ const LoginFailList: React.FC = () => {
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             onChange: (page, pageSize) => {
               const values = form.getFieldsValue();
-              setQueryForm((prev) => ({
+              setQueryForm(prev => ({
                 ...prev,
                 ...values,
                 pageNum: page,

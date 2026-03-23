@@ -13,7 +13,7 @@ import { Modal, Form, Input, Select, Alert, message, Row, Col } from 'antd';
 import { useModal } from '@/hooks/useModal';
 import { employeeApi } from '@/api/system/employeeApi';
 import { roleApi } from '@/api/system/roleApi';
-import type { EmployeeFormData, GenderEnum } from '../types';
+import type { EmployeeFormData, EmployeeAddForm } from '../types';
 import { EMPLOYEE_VALIDATION } from '@/constants/system/employeeConst';
 
 const { Option } = Select;
@@ -118,18 +118,18 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
       if (isEdit) {
         // 編輯模式
         await employeeApi.updateEmployee({
-          ...values,
+          ...(values as EmployeeAddForm),
           employeeId: initialData!.employeeId!,
         });
         message.success('更新成功');
         onSuccess();
       } else {
         // 新增模式
-        const response = await employeeApi.addEmployee(values);
+        const response = await employeeApi.addEmployee(values as EmployeeAddForm);
         message.success('添加成功');
         // 傳遞登錄名和密碼給父組件
         onSuccess({
-          loginName: values.loginName!,
+          loginName: (values as EmployeeAddForm).loginName,
           password: response.data!,
         });
       }
