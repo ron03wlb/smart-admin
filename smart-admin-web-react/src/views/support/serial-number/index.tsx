@@ -156,13 +156,14 @@ const SerialNumberList: React.FC = () => {
           description={
             <div>
               <pre style={{ marginBottom: 16 }}>
-{`簡介：SerialNumber是一個可以根據不同的日期、規則生成一系列特別單號的功能，比如訂單號、合同號、採購單號等等。
+                {`簡介：SerialNumber是一個可以根據不同的日期、規則生成一系列特別單號的功能，比如訂單號、合同號、採購單號等等。
 原理：內部有三種實現方式： 1) 基於內存鎖實現 （不支持分布式和集群）；  2) 基於redis鎖實現 ；  3) 基於Mysql 鎖for update 實現
 - 支持隨機生成和查詢生成記錄
 - 支持動態配置`}
               </pre>
               <div style={{ color: 'red' }}>
-                系統默認使用"內存鎖"類型，若修改，請將後端代碼 @Service 注解加到對應的實現類上：SerialNumberInternService、SerialNumberMysqlService、SerialNumberRedisService
+                系統默認使用"內存鎖"類型，若修改，請將後端代碼 @Service
+                注解加到對應的實現類上：SerialNumberInternService、SerialNumberMysqlService、SerialNumberRedisService
               </div>
             </div>
           }

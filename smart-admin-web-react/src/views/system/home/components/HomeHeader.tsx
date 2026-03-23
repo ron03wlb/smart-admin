@@ -12,7 +12,6 @@ import { Card, Typography, Row } from 'antd';
 import { AlertOutlined, SmileOutlined } from '@ant-design/icons';
 import { useAppSelector } from '@/store/hooks';
 import { useMemo } from 'react';
-import UAParser from 'ua-parser-js';
 import './HomeHeader.css';
 
 const { Text } = Typography;

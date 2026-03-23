@@ -23,7 +23,7 @@ vi.mock('@/api/support/serialNumberApi', () => ({
 
 // Mock usePrivilege Hook
 vi.mock('@/hooks/usePrivilege', () => ({
-  usePrivilege: vi.fn((permission: string) => {
+  usePrivilege: vi.fn((_permission: string) => {
     // 默認所有權限都返回 true
     return true;
   }),
@@ -103,7 +103,9 @@ describe('SerialNumberListPage', () => {
 
     // Verify introduction alert is displayed
     expect(screen.getByText(/SerialNumber 單號生成器介紹：/)).toBeInTheDocument();
-    expect(screen.getByText(/簡介：SerialNumber是一個可以根據不同的日期、規則生成一系列特別單號的功能/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/簡介：SerialNumber是一個可以根據不同的日期、規則生成一系列特別單號的功能/)
+    ).toBeInTheDocument();
   });
 
   it('should display generate button when user has generate privilege', async () => {
@@ -125,7 +127,7 @@ describe('SerialNumberListPage', () => {
     expect(generateButtons.length).toBe(2);
 
     // Verify buttons are enabled
-    generateButtons.forEach((button) => {
+    generateButtons.forEach(button => {
       expect(button).not.toBeDisabled();
     });
   });
@@ -149,7 +151,7 @@ describe('SerialNumberListPage', () => {
     expect(recordButtons.length).toBe(2);
 
     // Verify buttons are enabled
-    recordButtons.forEach((button) => {
+    recordButtons.forEach(button => {
       expect(button).not.toBeDisabled();
     });
   });
@@ -195,6 +197,8 @@ describe('SerialNumberListPage', () => {
         total: 0,
         pageNum: 1,
         pageSize: 10,
+        pages: 0,
+        emptyFlag: true,
       },
     });
 
@@ -254,7 +258,7 @@ describe('SerialNumberListPage', () => {
   it('should display table loading state', async () => {
     // Create a Promise that won't resolve immediately
     let resolvePromise: (value: any) => void;
-    const promise = new Promise((resolve) => {
+    const promise = new Promise(resolve => {
       resolvePromise = resolve;
     });
 

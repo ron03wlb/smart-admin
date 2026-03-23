@@ -22,26 +22,44 @@ const mockEmployeeData = [
   {
     employeeId: 1,
     actualName: '張三',
+    gender: 1,
+    loginName: 'zhangsan',
+    departmentId: 1,
     departmentName: '技術部',
     positionName: '工程師',
     phone: '13800138001',
     email: 'zhangsan@example.com',
+    administratorFlag: false,
+    disabledFlag: false,
+    leaveFlag: false,
   },
   {
     employeeId: 2,
     actualName: '李四',
+    gender: 1,
+    loginName: 'lisi',
+    departmentId: 2,
     departmentName: '市場部',
     positionName: '經理',
     phone: '13800138002',
     email: 'lisi@example.com',
+    administratorFlag: false,
+    disabledFlag: false,
+    leaveFlag: false,
   },
   {
     employeeId: 3,
     actualName: '王五',
+    gender: 2,
+    loginName: 'wangwu',
+    departmentId: 3,
     departmentName: '財務部',
     positionName: '會計',
     phone: '13800138003',
     email: 'wangwu@example.com',
+    administratorFlag: false,
+    disabledFlag: false,
+    leaveFlag: false,
   },
 ];
 
@@ -60,6 +78,8 @@ describe('MessageReceiverModal', () => {
         total: 3,
         pageNum: 1,
         pageSize: 10,
+        pages: 1,
+        emptyFlag: false,
       },
     });
   });
@@ -271,6 +291,8 @@ describe('MessageReceiverModal', () => {
         total: 0,
         pageNum: 1,
         pageSize: 10,
+        pages: 0,
+        emptyFlag: true,
       },
     });
 
@@ -305,10 +327,7 @@ describe('MessageReceiverModal', () => {
     });
 
     await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '查詢員工列表失敗:',
-        expect.any(Error)
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith('查詢員工列表失敗:', expect.any(Error));
     });
 
     consoleErrorSpy.mockRestore();
@@ -328,6 +347,8 @@ describe('MessageReceiverModal', () => {
         total: 30,
         pageNum: 1,
         pageSize: 10,
+        pages: 3,
+        emptyFlag: false,
       },
     });
 
@@ -371,6 +392,8 @@ describe('MessageReceiverModal', () => {
         total: 50,
         pageNum: 1,
         pageSize: 10,
+        pages: 5,
+        emptyFlag: false,
       },
     });
 

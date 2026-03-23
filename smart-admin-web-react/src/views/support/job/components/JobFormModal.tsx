@@ -11,10 +11,7 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Modal, Form, Input, InputNumber, Switch, Radio, message } from 'antd';
 import { jobApi } from '@/api/support/jobApi';
-import {
-  JOB_VALIDATION,
-  JOB_TRIGGER_TYPE_LABELS,
-} from '@/constants/support/jobConst';
+import { JOB_VALIDATION, JOB_TRIGGER_TYPE_LABELS } from '@/constants/support/jobConst';
 import type { JobVO, JobFormData, JobAddForm, JobUpdateForm } from '../types';
 import { JobTriggerTypeEnum } from '../types';
 
@@ -154,11 +151,7 @@ const JobFormModal = forwardRef<{ show: (rowData?: JobVO) => void }, JobFormModa
             />
           </Form.Item>
 
-          <Form.Item
-            label="排序"
-            name="sort"
-            rules={[{ required: true, message: '請輸入排序' }]}
-          >
+          <Form.Item label="排序" name="sort" rules={[{ required: true, message: '請輸入排序' }]}>
             <InputNumber
               placeholder="值越小越靠前"
               min={-99999999}
@@ -195,7 +188,7 @@ const JobFormModal = forwardRef<{ show: (rowData?: JobVO) => void }, JobFormModa
             name="triggerType"
             rules={[{ required: true, message: '請選擇觸發類型' }]}
           >
-            <Radio.Group onChange={(e) => setTriggerType(e.target.value)}>
+            <Radio.Group onChange={e => setTriggerType(e.target.value)}>
               <Radio.Button value={JobTriggerTypeEnum.CRON}>
                 {JOB_TRIGGER_TYPE_LABELS.CRON}
               </Radio.Button>

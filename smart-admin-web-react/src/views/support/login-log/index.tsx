@@ -32,7 +32,10 @@ const LoginLogList: React.FC = () => {
   const hasQueryPermission = usePrivilege(LOGIN_LOG_PERMISSION.QUERY);
 
   // 使用 useTable Hook
-  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<LoginLogVO, LoginLogQueryForm>({
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<
+    LoginLogVO,
+    LoginLogQueryForm
+  >({
     defaultQueryForm: {
       searchWord: undefined,
       startDate: undefined,
@@ -45,21 +48,21 @@ const LoginLogList: React.FC = () => {
 
   // 解析 UserAgent 並添加到數據中
   const parsedTableData = useMemo(() => {
-    return tableData.map((log) => {
+    return tableData.map(log => {
       if (!log.userAgent) {
         return { ...log, browser: '', os: '', device: '' };
       }
 
-      const parser = new UAParser(log.userAgent);
-      const browser = parser.getBrowser();
-      const os = parser.getOS();
-      const device = parser.getDevice();
+      const parser = UAParser(log.userAgent);
+      const browser = parser.browser;
+      const os = parser.os;
+      const device = parser.device;
 
       return {
         ...log,
-        browser: browser.name || '',
-        os: os.name || '',
-        device: device.vendor && device.model ? `${device.vendor} ${device.model}` : '',
+        browser: browser?.name || '',
+        os: os?.name || '',
+        device: device?.vendor && device?.model ? `${device.vendor} ${device.model}` : '',
       };
     });
   }, [tableData]);
@@ -74,7 +77,7 @@ const LoginLogList: React.FC = () => {
   // 處理搜索
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    setQueryForm((prev) => ({
+    setQueryForm(prev => ({
       ...prev,
       searchWord: values.searchWord,
       startDate: values.startDate,
@@ -100,7 +103,7 @@ const LoginLogList: React.FC = () => {
   };
 
   // 表格列定義
-  const columns: ColumnsType<LoginLogVO> = [
+  const columns = [
     {
       title: '用戶ID',
       dataIndex: 'userId',
@@ -150,7 +153,7 @@ const LoginLogList: React.FC = () => {
       key: 'userAgent',
       width: LOGIN_LOG_TABLE_COLUMNS_WIDTH.userAgent,
       ellipsis: true,
-      render: (_: string, record: LoginLogVO & { browser?: string; os?: string; device?: string }) => (
+      render: (_: string, record: LoginLogVO) => (
         <div>{`${record.browser || ''} / ${record.os || ''} / ${record.device || ''}`}</div>
       ),
     },
@@ -189,9 +192,7 @@ const LoginLogList: React.FC = () => {
   if (!hasQueryPermission) {
     return (
       <Card>
-        <div style={{ textAlign: 'center', padding: '50px 0' }}>
-          您沒有權限查看登錄日誌列表
-        </div>
+        <div style={{ textAlign: 'center', padding: '50px 0' }}>您沒有權限查看登錄日誌列表</div>
       </Card>
     );
   }
@@ -201,34 +202,15 @@ const LoginLogList: React.FC = () => {
       {/* 搜索表單 */}
       <Card size="small" style={{ marginBottom: 16 }}>
         <Form form={form} layout="inline">
-          <Form.Item
-            name="userName"
-            label="用戶名稱"
-            style={{ marginBottom: 16 }}
-          >
-            <Input
-              placeholder="用戶名稱"
-              allowClear
-              style={{ width: 200 }}
-            />
+          <Form.Item name="userName" label="用戶名稱" style={{ marginBottom: 16 }}>
+            <Input placeholder="用戶名稱" allowClear style={{ width: 200 }} />
           </Form.Item>
 
-          <Form.Item
-            name="ip"
-            label="用戶IP"
-            style={{ marginBottom: 16 }}
-          >
-            <Input
-              placeholder="IP"
-              allowClear
-              style={{ width: 150 }}
-            />
+          <Form.Item name="ip" label="用戶IP" style={{ marginBottom: 16 }}>
+            <Input placeholder="IP" allowClear style={{ width: 150 }} />
           </Form.Item>
 
-          <Form.Item
-            label="時間"
-            style={{ marginBottom: 16 }}
-          >
+          <Form.Item label="時間" style={{ marginBottom: 16 }}>
             <RangePicker
               format="YYYY-MM-DD"
               onChange={handleDateRangeChange}
@@ -238,17 +220,10 @@ const LoginLogList: React.FC = () => {
 
           <Form.Item style={{ marginBottom: 16 }}>
             <Space>
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-              >
+              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                 查詢
               </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleReset}
-              >
+              <Button icon={<ReloadOutlined />} onClick={handleReset}>
                 重置
               </Button>
             </Space>
@@ -269,10 +244,10 @@ const LoginLogList: React.FC = () => {
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             onChange: (page, pageSize) => {
               const values = form.getFieldsValue();
-              setQueryForm((prev) => ({
+              setQueryForm(prev => ({
                 ...prev,
                 ...values,
                 pageNum: page,

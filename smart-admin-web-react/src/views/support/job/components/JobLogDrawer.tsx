@@ -10,18 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Drawer,
-  Table,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Button,
-  Space,
-  Tag,
-  message,
-} from 'antd';
+import { Drawer, Table, Form, Input, Select, DatePicker, Button, Space, Tag, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined, ReloadOutlined, CheckOutlined, WarningOutlined } from '@ant-design/icons';
 import { jobApi } from '@/api/support/jobApi';
@@ -262,19 +251,12 @@ const JobLogDrawer: React.FC<JobLogDrawerProps> = ({ visible, jobId, jobName, on
       destroyOnClose
     >
       {/* 查詢表單 */}
-      <Form
-        form={form}
-        layout="inline"
-        style={{ marginBottom: 16 }}
-        onFinish={queryJobLog}
-      >
+      <Form form={form} layout="inline" style={{ marginBottom: 16 }} onFinish={queryJobLog}>
         <Form.Item name="searchWord" label="關鍵字">
           <Input
             placeholder="請輸入關鍵字"
             value={queryForm.searchWord}
-            onChange={(e) =>
-              setQueryForm({ ...queryForm, searchWord: e.target.value })
-            }
+            onChange={e => setQueryForm({ ...queryForm, searchWord: e.target.value })}
             maxLength={30}
             allowClear
             style={{ width: 200 }}
@@ -285,9 +267,7 @@ const JobLogDrawer: React.FC<JobLogDrawerProps> = ({ visible, jobId, jobName, on
           <Select
             placeholder="請選擇"
             value={queryForm.successFlag}
-            onChange={(value) =>
-              setQueryForm({ ...queryForm, successFlag: value })
-            }
+            onChange={value => setQueryForm({ ...queryForm, successFlag: value })}
             allowClear
             style={{ width: 120 }}
           >
@@ -311,11 +291,7 @@ const JobLogDrawer: React.FC<JobLogDrawerProps> = ({ visible, jobId, jobName, on
 
         <Form.Item>
           <Space>
-            <Button
-              type="primary"
-              icon={<SearchOutlined />}
-              onClick={queryJobLog}
-            >
+            <Button type="primary" icon={<SearchOutlined />} onClick={queryJobLog}>
               查詢
             </Button>
             <Button icon={<ReloadOutlined />} onClick={handleReset}>
@@ -337,7 +313,7 @@ const JobLogDrawer: React.FC<JobLogDrawerProps> = ({ visible, jobId, jobName, on
           total: pagination.total,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total) => `共 ${total} 條`,
+          showTotal: total => `共 ${total} 條`,
         }}
         onChange={handleTableChange}
         scroll={{ x: 1200 }}

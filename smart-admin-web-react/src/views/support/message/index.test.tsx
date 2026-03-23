@@ -51,6 +51,8 @@ describe('MessageListPage', () => {
         total: 1,
         pageNum: 1,
         pageSize: 10,
+        pages: 1,
+        emptyFlag: false,
       },
       ok: true,
       msg: '',

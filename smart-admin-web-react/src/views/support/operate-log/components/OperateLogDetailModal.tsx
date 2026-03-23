@@ -55,14 +55,14 @@ const OperateLogDetailModal = forwardRef<OperateLogDetailModalRef>((_, ref) => {
 
         // 解析 UserAgent
         if (data.userAgent) {
-          const parser = new UAParser(data.userAgent);
-          const browser = parser.getBrowser();
-          const os = parser.getOS();
-          const device = parser.getDevice();
+          const parser = UAParser(data.userAgent);
+          const browser = parser.browser;
+          const os = parser.os;
+          const device = parser.device;
 
-          data.browser = browser.name || '';
-          data.os = os.name || '';
-          data.device = device.vendor && device.model ? `${device.vendor} ${device.model}` : '';
+          data.browser = browser?.name || '';
+          data.os = os?.name || '';
+          data.device = device?.vendor && device?.model ? `${device.vendor} ${device.model}` : '';
         }
 
         setDetail(data);
@@ -108,7 +108,9 @@ const OperateLogDetailModal = forwardRef<OperateLogDetailModalRef>((_, ref) => {
                   </Row>
                   <Row style={{ marginBottom: 12 }}>
                     <Col span={24}>
-                      客戶端：{[detail.os, detail.browser, detail.device].filter(Boolean).join(' / ') || '-'}
+                      客戶端：
+                      {[detail.os, detail.browser, detail.device].filter(Boolean).join(' / ') ||
+                        '-'}
                     </Col>
                   </Row>
                 </Col>
@@ -132,7 +134,9 @@ const OperateLogDetailModal = forwardRef<OperateLogDetailModalRef>((_, ref) => {
                 <Col span={24}>方法：{detail.method}</Col>
               </Row>
               <Row style={{ marginBottom: 12 }}>
-                <Col span={24}>說明：{detail.module} - {detail.content}</Col>
+                <Col span={24}>
+                  說明：{detail.module} - {detail.content}
+                </Col>
               </Row>
             </div>
 

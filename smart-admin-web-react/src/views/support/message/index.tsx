@@ -85,7 +85,7 @@ const MessageListPage: React.FC = () => {
    * 搜索
    */
   const handleSearch = () => {
-    setQueryForm((prev) => ({ ...prev, pageNum: 1 }));
+    setQueryForm(prev => ({ ...prev, pageNum: 1 }));
     setTimeout(() => queryData(), 0);
   };
 
@@ -109,8 +109,8 @@ const MessageListPage: React.FC = () => {
   /**
    * 日期範圍變更
    */
-  const handleDateChange = (  _dates: any, dateStrings: [string, string]) => {
-    setQueryForm((prev) => ({
+  const handleDateChange = (_dates: any, dateStrings: [string, string]) => {
+    setQueryForm(prev => ({
       ...prev,
       startDate: dateStrings[0] || undefined,
       endDate: dateStrings[1] || undefined,
@@ -121,7 +121,7 @@ const MessageListPage: React.FC = () => {
    * 分頁變更
    */
   const handlePageChange = (page: number, pageSize: number) => {
-    setQueryForm((prev) => ({ ...prev, pageNum: page, pageSize }));
+    setQueryForm(prev => ({ ...prev, pageNum: page, pageSize }));
   };
 
   /**
@@ -228,7 +228,7 @@ const MessageListPage: React.FC = () => {
                 style={{ width: 150 }}
                 placeholder="關鍵詞"
                 value={queryForm.searchWord}
-                onChange={(e) => setQueryForm((prev) => ({ ...prev, searchWord: e.target.value }))}
+                onChange={e => setQueryForm(prev => ({ ...prev, searchWord: e.target.value }))}
               />
             </Form.Item>
           </Col>
@@ -240,7 +240,7 @@ const MessageListPage: React.FC = () => {
                 allowClear
                 options={MESSAGE_TYPE_OPTIONS}
                 value={queryForm.messageType}
-                onChange={(value) => setQueryForm((prev) => ({ ...prev, messageType: value }))}
+                onChange={value => setQueryForm(prev => ({ ...prev, messageType: value }))}
               />
             </Form.Item>
           </Col>
@@ -252,7 +252,7 @@ const MessageListPage: React.FC = () => {
                 allowClear
                 options={READ_FLAG_OPTIONS}
                 value={queryForm.readFlag}
-                onChange={(value) => setQueryForm((prev) => ({ ...prev, readFlag: value }))}
+                onChange={value => setQueryForm(prev => ({ ...prev, readFlag: value }))}
               />
             </Form.Item>
           </Col>
@@ -315,7 +315,7 @@ const MessageListPage: React.FC = () => {
             pageSize={queryForm.pageSize}
             total={total}
             onChange={handlePageChange}
-            showTotal={(total) => `共 ${total} 條`}
+            showTotal={total => `共 ${total} 條`}
             pageSizeOptions={['10', '20', '30', '50']}
           />
         </Row>

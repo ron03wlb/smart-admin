@@ -37,7 +37,10 @@ const OperateLogList: React.FC = () => {
   const detailModalRef = useRef<{ show: (id: number) => void }>(null);
 
   // 使用 useTable Hook
-  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<OperateLogVO, OperateLogQueryForm>({
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<
+    OperateLogVO,
+    OperateLogQueryForm
+  >({
     defaultQueryForm: {
       searchWord: undefined,
       successFlag: undefined,
@@ -51,19 +54,19 @@ const OperateLogList: React.FC = () => {
 
   // 解析 UserAgent 並解析 response
   const parsedTableData = useMemo(() => {
-    return tableData.map((log) => {
+    return tableData.map(log => {
       const parsed = { ...log };
 
       // 解析 UserAgent
       if (log.userAgent) {
-        const parser = new UAParser(log.userAgent);
-        const browser = parser.getBrowser();
-        const os = parser.getOS();
-        const device = parser.getDevice();
+        const parser = UAParser(log.userAgent);
+        const browser = parser.browser;
+        const os = parser.os;
+        const device = parser.device;
 
-        parsed.browser = browser.name || '';
-        parsed.os = os.name || '';
-        parsed.device = device.vendor && device.model ? `${device.vendor} ${device.model}` : '';
+        parsed.browser = browser?.name || '';
+        parsed.os = os?.name || '';
+        parsed.device = device?.vendor && device?.model ? `${device.vendor} ${device.model}` : '';
       }
 
       // 解析 response JSON
@@ -89,7 +92,7 @@ const OperateLogList: React.FC = () => {
   // 處理搜索
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    setQueryForm((prev) => ({
+    setQueryForm(prev => ({
       ...prev,
       searchWord: values.searchWord,
       successFlag: values.successFlag,
@@ -119,7 +122,7 @@ const OperateLogList: React.FC = () => {
   const handleSuccessFlagChange = (e: any) => {
     const successFlag = e.target.value;
     form.setFieldsValue({ successFlag });
-    setQueryForm((prev) => ({ ...prev, successFlag, pageNum: 1 }));
+    setQueryForm(prev => ({ ...prev, successFlag, pageNum: 1 }));
     setTimeout(() => query(), 0);
   };
 
@@ -185,11 +188,7 @@ const OperateLogList: React.FC = () => {
         if (typeof response === 'object') {
           const msg = response.msg || '-';
           const isOk = response.ok === true;
-          return (
-            <Typography.Text type={isOk ? 'success' : 'warning'}>
-              {msg}
-            </Typography.Text>
-          );
+          return <Typography.Text type={isOk ? 'success' : 'warning'}>{msg}</Typography.Text>;
         }
         return response;
       },
@@ -225,9 +224,10 @@ const OperateLogList: React.FC = () => {
       key: 'successFlag',
       width: OPERATE_LOG_TABLE_COLUMNS_WIDTH.successFlag,
       render: (successFlag: number) => {
-        const status = successFlag === SUCCESS_FLAG_ENUM.SUCCESS.value
-          ? SUCCESS_FLAG_ENUM.SUCCESS
-          : SUCCESS_FLAG_ENUM.FAILURE;
+        const status =
+          successFlag === SUCCESS_FLAG_ENUM.SUCCESS.value
+            ? SUCCESS_FLAG_ENUM.SUCCESS
+            : SUCCESS_FLAG_ENUM.FAILURE;
         return <Tag color={status.color}>{status.label}</Tag>;
       },
     },
@@ -253,9 +253,7 @@ const OperateLogList: React.FC = () => {
   if (!hasQueryPermission) {
     return (
       <Card>
-        <div style={{ textAlign: 'center', padding: '50px 0' }}>
-          您沒有權限查看操作日誌列表
-        </div>
+        <div style={{ textAlign: 'center', padding: '50px 0' }}>您沒有權限查看操作日誌列表</div>
       </Card>
     );
   }
@@ -265,23 +263,11 @@ const OperateLogList: React.FC = () => {
       {/* 搜索表單 */}
       <Card size="small" style={{ marginBottom: 16 }}>
         <Form form={form} layout="inline">
-          <Form.Item
-            name="keywords"
-            label="操作關鍵字"
-            style={{ marginBottom: 16 }}
-          >
-            <Input
-              placeholder="模塊/操作內容"
-              allowClear
-              style={{ width: 150 }}
-            />
+          <Form.Item name="keywords" label="操作關鍵字" style={{ marginBottom: 16 }}>
+            <Input placeholder="模塊/操作內容" allowClear style={{ width: 150 }} />
           </Form.Item>
 
-          <Form.Item
-            name="requestKeywords"
-            label="請求關鍵字"
-            style={{ marginBottom: 16 }}
-          >
+          <Form.Item name="requestKeywords" label="請求關鍵字" style={{ marginBottom: 16 }}>
             <Input
               placeholder="請求地址/請求方法/請求參數/返回結果"
               allowClear
@@ -289,22 +275,11 @@ const OperateLogList: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            name="userName"
-            label="用戶名稱"
-            style={{ marginBottom: 16 }}
-          >
-            <Input
-              placeholder="用戶名稱"
-              allowClear
-              style={{ width: 100 }}
-            />
+          <Form.Item name="userName" label="用戶名稱" style={{ marginBottom: 16 }}>
+            <Input placeholder="用戶名稱" allowClear style={{ width: 100 }} />
           </Form.Item>
 
-          <Form.Item
-            label="請求時間"
-            style={{ marginBottom: 16 }}
-          >
+          <Form.Item label="請求時間" style={{ marginBottom: 16 }}>
             <RangePicker
               format="YYYY-MM-DD"
               onChange={handleDateRangeChange}
@@ -312,15 +287,8 @@ const OperateLogList: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            name="successFlag"
-            label="狀態"
-            style={{ marginBottom: 16 }}
-          >
-            <Radio.Group
-              onChange={handleSuccessFlagChange}
-              buttonStyle="solid"
-            >
+          <Form.Item name="successFlag" label="狀態" style={{ marginBottom: 16 }}>
+            <Radio.Group onChange={handleSuccessFlagChange} buttonStyle="solid">
               <Radio.Button value={undefined}>全部</Radio.Button>
               <Radio.Button value={1}>成功</Radio.Button>
               <Radio.Button value={0}>失敗</Radio.Button>
@@ -329,17 +297,10 @@ const OperateLogList: React.FC = () => {
 
           <Form.Item style={{ marginBottom: 16 }}>
             <Space>
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-              >
+              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                 查詢
               </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleReset}
-              >
+              <Button icon={<ReloadOutlined />} onClick={handleReset}>
                 重置
               </Button>
             </Space>
@@ -360,10 +321,10 @@ const OperateLogList: React.FC = () => {
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             onChange: (page, pageSize) => {
               const values = form.getFieldsValue();
-              setQueryForm((prev) => ({
+              setQueryForm(prev => ({
                 ...prev,
                 ...values,
                 pageNum: page,

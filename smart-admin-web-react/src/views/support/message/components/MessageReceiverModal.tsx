@@ -74,7 +74,7 @@ const MessageReceiverModal = forwardRef<MessageReceiverModalRef, MessageReceiver
      * 搜索
      */
     const handleSearch = () => {
-      setQueryForm((prev) => ({
+      setQueryForm(prev => ({
         ...prev,
         keyword: prev.searchWord,
         pageNum: 1,
@@ -118,7 +118,7 @@ const MessageReceiverModal = forwardRef<MessageReceiverModalRef, MessageReceiver
      */
     const handleOk = () => {
       const employeeIds = selectedRowKeys;
-      const employeeNames = selectedRows.map((row) => row.actualName);
+      const employeeNames = selectedRows.map(row => row.actualName);
       onConfirm(employeeIds, employeeNames);
       setVisible(false);
     };
@@ -127,7 +127,7 @@ const MessageReceiverModal = forwardRef<MessageReceiverModalRef, MessageReceiver
      * 分頁變更
      */
     const handlePageChange = (page: number, pageSize: number) => {
-      setQueryForm((prev) => ({ ...prev, pageNum: page, pageSize }));
+      setQueryForm(prev => ({ ...prev, pageNum: page, pageSize }));
       setTimeout(() => queryList(), 0);
     };
 
@@ -185,7 +185,7 @@ const MessageReceiverModal = forwardRef<MessageReceiverModalRef, MessageReceiver
               style={{ width: 250 }}
               placeholder="請輸入姓名"
               value={queryForm.searchWord}
-              onChange={(e) => setQueryForm((prev) => ({ ...prev, searchWord: e.target.value }))}
+              onChange={e => setQueryForm(prev => ({ ...prev, searchWord: e.target.value }))}
             />
           </Form.Item>
           <Form.Item>
@@ -220,7 +220,7 @@ const MessageReceiverModal = forwardRef<MessageReceiverModalRef, MessageReceiver
             pageSize={queryForm.pageSize}
             total={total}
             onChange={handlePageChange}
-            showTotal={(total) => `共 ${total} 條`}
+            showTotal={total => `共 ${total} 條`}
             pageSizeOptions={['10', '20', '30', '50']}
           />
         </Row>

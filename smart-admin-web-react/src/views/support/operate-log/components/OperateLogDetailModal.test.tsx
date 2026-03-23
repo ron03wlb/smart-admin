@@ -20,7 +20,7 @@ vi.mock('@/api/support/operateLogApi', () => ({
 }));
 
 vi.mock('@/utils/date', () => ({
-  formatDateTime: vi.fn((date) => date || '-'),
+  formatDateTime: vi.fn(date => date || '-'),
 }));
 
 import { operateLogApi } from '@/api/support/operateLogApi';
@@ -40,7 +40,7 @@ const mockOperateLogDetail: OperateLogVO = {
   userAgent:
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   successFlag: 1,
-  failReason: null,
+  failReason: undefined,
   createTime: '2026-03-15 10:30:00',
 };
 
@@ -198,7 +198,10 @@ describe('OperateLogDetailModal', () => {
       ref.current?.show(1);
 
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch operate log detail:', expect.any(Error));
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          'Failed to fetch operate log detail:',
+          expect.any(Error)
+        );
       });
 
       consoleErrorSpy.mockRestore();

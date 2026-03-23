@@ -10,7 +10,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import MessageSendForm from './MessageSendForm';
 import { messageApi } from '@/api/support/messageApi';
-import { message } from 'antd';
 
 // Mock messageApi
 vi.mock('@/api/support/messageApi', () => ({
@@ -97,6 +96,7 @@ describe('MessageSendForm', () => {
       code: 200,
       ok: true,
       msg: 'success',
+      data: undefined,
     });
 
     render(<MessageSendForm ref={ref} onSuccess={mockOnSuccess} />);
@@ -193,7 +193,9 @@ describe('MessageSendForm', () => {
 
     // 關閉 Modal（查找取消按鈕）
     const cancelButtons = screen.getAllByRole('button');
-    const cancelButton = cancelButtons.find(btn => btn.textContent === '取消' || btn.textContent === '關閉');
+    const cancelButton = cancelButtons.find(
+      btn => btn.textContent === '取消' || btn.textContent === '關閉'
+    );
 
     if (cancelButton) {
       fireEvent.click(cancelButton);
@@ -230,12 +232,13 @@ describe('MessageSendForm', () => {
     // Note: 此測試驗證批量消息生成邏輯（一對多）
     // 需要完整的接收者選擇流程才能驗證
     // receiverUserIdList.map() 生成正確數量的消息對象
-    const mockReceiverIds = [1, 2, 3];
+    const _mockReceiverIds = [1, 2, 3];
 
     vi.mocked(messageApi.sendMessages).mockResolvedValue({
       code: 200,
       ok: true,
       msg: 'success',
+      data: undefined,
     });
 
     render(<MessageSendForm ref={ref} onSuccess={mockOnSuccess} />);

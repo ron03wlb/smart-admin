@@ -33,7 +33,9 @@ vi.mock('@/api/support/changeLogApi', () => ({
 
 // Mock echarts-for-react to avoid Canvas rendering issues in test environment
 vi.mock('echarts-for-react', () => ({
-  default: ({ option }: any) => <div data-testid="echarts-mock">{option?.series?.[0]?.name || 'Chart'}</div>,
+  default: ({ option }: any) => (
+    <div data-testid="echarts-mock">{option?.series?.[0]?.name || 'Chart'}</div>
+  ),
 }));
 
 describe('HomePage', () => {
@@ -45,7 +47,7 @@ describe('HomePage', () => {
     // Create mock store
     store = configureStore({
       reducer: {
-        user: userReducer,
+        user: userReducer as any,
       },
       preloadedState: {
         user: {

@@ -20,7 +20,13 @@ interface DefaultHomeCardProps {
   children?: React.ReactNode;
 }
 
-const DefaultHomeCard: React.FC<DefaultHomeCardProps> = ({ icon, title, extra, onExtraClick, children }) => {
+const DefaultHomeCard: React.FC<DefaultHomeCardProps> = ({
+  icon,
+  title,
+  extra,
+  onExtraClick,
+  children,
+}) => {
   // 動態獲取 Ant Design 圖標
   const IconComponent = icon ? (AntdIcons as any)[icon] : null;
 
@@ -31,9 +37,7 @@ const DefaultHomeCard: React.FC<DefaultHomeCardProps> = ({ icon, title, extra, o
     </div>
   );
 
-  const cardExtra = extra ? (
-    <a onClick={onExtraClick}>{extra}</a>
-  ) : null;
+  const cardExtra = extra ? <a onClick={onExtraClick}>{extra}</a> : null;
 
   return (
     <div className="default-home-card-container">

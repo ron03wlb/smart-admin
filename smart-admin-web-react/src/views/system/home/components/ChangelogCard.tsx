@@ -54,7 +54,7 @@ const ChangelogCard: React.FC = () => {
   /**
    * 查看詳情
    */
-  const handleDetail = (item: ChangeLogVO) => {
+  const handleDetail = (_item: ChangeLogVO) => {
     // 可以打開 Modal 顯示詳情，這裡簡化為導航到列表頁
     navigate('/support/change-log');
   };
@@ -69,7 +69,8 @@ const ChangelogCard: React.FC = () => {
             <li key={index} className="un-read">
               <a className="content" onClick={() => handleDetail(item)}>
                 <Badge status="processing" />
-                {CHANGE_LOG_TYPE_LABELS[item.type as keyof typeof CHANGE_LOG_TYPE_LABELS]}：{item.updateVersion} 版本
+                {CHANGE_LOG_TYPE_LABELS[item.type as keyof typeof CHANGE_LOG_TYPE_LABELS]}：
+                {item.updateVersion} 版本
               </a>
               <span className="time">{item.publicDate}</span>
             </li>

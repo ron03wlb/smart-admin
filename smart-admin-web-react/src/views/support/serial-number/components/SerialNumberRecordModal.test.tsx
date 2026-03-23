@@ -51,6 +51,8 @@ describe('SerialNumberRecordModal', () => {
         total: 2,
         pageNum: 1,
         pageSize: 10,
+        pages: 1,
+        emptyFlag: false,
       },
     });
 
@@ -85,6 +87,8 @@ describe('SerialNumberRecordModal', () => {
         total: 2,
         pageNum: 1,
         pageSize: 10,
+        pages: 1,
+        emptyFlag: false,
       },
     });
 
@@ -117,6 +121,8 @@ describe('SerialNumberRecordModal', () => {
         total: 0,
         pageNum: 1,
         pageSize: 10,
+        pages: 0,
+        emptyFlag: true,
       },
     });
 
@@ -147,6 +153,8 @@ describe('SerialNumberRecordModal', () => {
         total: 20,
         pageNum: 1,
         pageSize: 10,
+        pages: 2,
+        emptyFlag: false,
       },
     });
 
@@ -183,6 +191,8 @@ describe('SerialNumberRecordModal', () => {
         total: 20,
         pageNum: 2,
         pageSize: 10,
+        pages: 2,
+        emptyFlag: false,
       },
     });
 
@@ -212,6 +222,8 @@ describe('SerialNumberRecordModal', () => {
         total: 50,
         pageNum: 1,
         pageSize: 10,
+        pages: 5,
+        emptyFlag: false,
       },
     });
 
@@ -240,6 +252,8 @@ describe('SerialNumberRecordModal', () => {
         total: 50,
         pageNum: 1,
         pageSize: 20,
+        pages: 3,
+        emptyFlag: false,
       },
     });
 
@@ -273,6 +287,8 @@ describe('SerialNumberRecordModal', () => {
         total: 25,
         pageNum: 1,
         pageSize: 10,
+        pages: 3,
+        emptyFlag: false,
       },
     });
 
@@ -300,6 +316,8 @@ describe('SerialNumberRecordModal', () => {
         total: 0,
         pageNum: 1,
         pageSize: 10,
+        pages: 0,
+        emptyFlag: true,
       },
     });
 
@@ -358,6 +376,8 @@ describe('SerialNumberRecordModal', () => {
         total: 2,
         pageNum: 1,
         pageSize: 10,
+        pages: 1,
+        emptyFlag: false,
       },
     });
 
@@ -397,6 +417,8 @@ describe('SerialNumberRecordModal', () => {
         total: 30,
         pageNum: 1,
         pageSize: 10,
+        pages: 3,
+        emptyFlag: false,
       },
     });
 

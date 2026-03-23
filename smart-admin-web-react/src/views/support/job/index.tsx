@@ -65,7 +65,10 @@ const JobManagement: React.FC = () => {
   const [logDrawerVisible, setLogDrawerVisible] = useState(false);
   const [currentJob, setCurrentJob] = useState<{ jobId: number; jobName: string } | undefined>();
 
-  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<JobVO, JobQueryForm>({
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<
+    JobVO,
+    JobQueryForm
+  >({
     defaultQueryForm: {
       searchWord: undefined,
       triggerType: undefined,
@@ -132,7 +135,7 @@ const JobManagement: React.FC = () => {
   const handleSearch = () => {
     const values = form.getFieldsValue();
     const deletedFlag = activeTab === 'deleted';
-    setQueryForm((prev) => ({
+    setQueryForm(prev => ({
       ...prev,
       searchWord: values.searchWord,
       triggerType: values.triggerType,
@@ -148,7 +151,7 @@ const JobManagement: React.FC = () => {
     form.resetFields();
     const deletedFlag = activeTab === 'deleted';
     reset();
-    setQueryForm((prev) => ({ ...prev, deletedFlag }));
+    setQueryForm(prev => ({ ...prev, deletedFlag }));
     setTimeout(() => query(), 0);
   };
 
@@ -164,7 +167,7 @@ const JobManagement: React.FC = () => {
     form.resetFields();
     const deletedFlag = key === 'deleted';
     reset();
-    setQueryForm((prev) => ({ ...prev, deletedFlag }));
+    setQueryForm(prev => ({ ...prev, deletedFlag }));
     setTimeout(() => query(), 0);
   };
 
@@ -214,8 +217,7 @@ const JobManagement: React.FC = () => {
       render: (text: string) => {
         const color =
           JOB_TRIGGER_TYPE_COLORS[text as keyof typeof JOB_TRIGGER_TYPE_COLORS] || 'default';
-        const label =
-          JOB_TRIGGER_TYPE_LABELS[text as keyof typeof JOB_TRIGGER_TYPE_LABELS] || text;
+        const label = JOB_TRIGGER_TYPE_LABELS[text as keyof typeof JOB_TRIGGER_TYPE_LABELS] || text;
         return <Tag color={color}>{label}</Tag>;
       },
     },
@@ -256,7 +258,7 @@ const JobManagement: React.FC = () => {
             title={
               <>
                 <div>下次執行（預估時間）</div>
-                {record.nextJobExecuteTimeList.map((time) => (
+                {record.nextJobExecuteTimeList.map(time => (
                   <div key={time}>{time}</div>
                 ))}
               </>
@@ -276,7 +278,7 @@ const JobManagement: React.FC = () => {
           checked={value}
           checkedChildren="已啟用"
           unCheckedChildren="已禁用"
-          onChange={(checked) => handleEnabledUpdate(checked, record)}
+          onChange={checked => handleEnabledUpdate(checked, record)}
           loading={record.enabledLoading}
           disabled={!hasUpdateEnabledPrivilege}
         />
@@ -398,11 +400,11 @@ const JobManagement: React.FC = () => {
               total: pagination.total,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total) => `共 ${total} 條`,
+              showTotal: total => `共 ${total} 條`,
               onChange: (page, pageSize) => {
                 const values = form.getFieldsValue();
                 const deletedFlag = activeTab === 'deleted';
-                setQueryForm((prev) => ({
+                setQueryForm(prev => ({
                   ...prev,
                   ...values,
                   deletedFlag,
@@ -467,11 +469,11 @@ const JobManagement: React.FC = () => {
               total: pagination.total,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total) => `共 ${total} 條`,
+              showTotal: total => `共 ${total} 條`,
               onChange: (page, pageSize) => {
                 const values = form.getFieldsValue();
                 const deletedFlag = activeTab === 'deleted';
-                setQueryForm((prev) => ({
+                setQueryForm(prev => ({
                   ...prev,
                   ...values,
                   deletedFlag,

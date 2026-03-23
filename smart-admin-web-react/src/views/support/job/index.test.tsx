@@ -29,7 +29,7 @@ vi.mock('@/api/support/jobApi', () => ({
 
 // Mock usePrivilege Hook
 vi.mock('@/hooks/usePrivilege', () => ({
-  usePrivilege: vi.fn((permission: string) => {
+  usePrivilege: vi.fn((_permission: string) => {
     // 默認所有權限都返回 true
     return true;
   }),
@@ -63,6 +63,8 @@ const mockJobList: JobVO[] = [
     updateName: 'admin',
     updateTime: '2026-03-19 10:00:00',
     lastJobLog: {
+      logId: 1,
+      jobId: 1,
       successFlag: 1,
       executeStartTime: '2026-03-19 09:50:00',
       executeResult: '執行成功',
@@ -82,6 +84,8 @@ const mockJobList: JobVO[] = [
     updateName: 'admin',
     updateTime: '2026-03-19 09:00:00',
     lastJobLog: {
+      logId: 2,
+      jobId: 2,
       successFlag: 0,
       executeStartTime: '2026-03-19 08:50:00',
       executeResult: '執行失敗：連接超時',
@@ -484,6 +488,8 @@ describe('JobManagement', () => {
         total: 30,
         pageNum: 1,
         pageSize: 10,
+        pages: 3,
+        emptyFlag: false,
       },
     });
 
@@ -522,6 +528,8 @@ describe('JobManagement', () => {
         total: 0,
         pageNum: 1,
         pageSize: 10,
+        pages: 0,
+        emptyFlag: true,
       },
     });
 

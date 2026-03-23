@@ -53,7 +53,7 @@ const JobExecuteModal = forwardRef<{ show: (rowData: JobVO) => void }, JobExecut
         await jobApi.executeJob(executeForm);
 
         // 延遲 2 秒後再提示刷新（讓任務有時間執行）
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         message.success('執行成功');
         setVisible(false);
