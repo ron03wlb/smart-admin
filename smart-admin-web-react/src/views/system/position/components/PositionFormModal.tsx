@@ -9,13 +9,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  message,
-} from 'antd';
+import { Modal, Form, Input, InputNumber, message } from 'antd';
 import { useModal } from '@/hooks/useModal';
 import { positionApi } from '@/api/system/positionApi';
 import type { PositionFormData } from '../types';
@@ -149,7 +143,10 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
           name="positionName"
           rules={[
             { required: true, message: '職位名稱不能為空' },
-            { max: POSITION_VALIDATION.NAME_MAX_LENGTH, message: `職位名稱不能大於${POSITION_VALIDATION.NAME_MAX_LENGTH}個字符` },
+            {
+              max: POSITION_VALIDATION.NAME_MAX_LENGTH,
+              message: `職位名稱不能大於${POSITION_VALIDATION.NAME_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <Input placeholder="請輸入職位名稱" />
@@ -159,7 +156,10 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
           label="職級"
           name="positionLevel"
           rules={[
-            { max: POSITION_VALIDATION.LEVEL_MAX_LENGTH, message: `職級不能大於${POSITION_VALIDATION.LEVEL_MAX_LENGTH}個字符` },
+            {
+              max: POSITION_VALIDATION.LEVEL_MAX_LENGTH,
+              message: `職級不能大於${POSITION_VALIDATION.LEVEL_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <Input placeholder="請輸入職級" />
@@ -168,9 +168,7 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
         <Form.Item
           label="排序（值越大越靠前）"
           name="sort"
-          rules={[
-            { required: true, message: '排序不能為空' },
-          ]}
+          rules={[{ required: true, message: '排序不能為空' }]}
         >
           <InputNumber
             placeholder="請輸入排序"
@@ -185,7 +183,10 @@ export const PositionFormModal: React.FC<PositionFormModalProps> = ({
           label="備註"
           name="remark"
           rules={[
-            { max: POSITION_VALIDATION.REMARK_MAX_LENGTH, message: `備註不能大於${POSITION_VALIDATION.REMARK_MAX_LENGTH}個字符` },
+            {
+              max: POSITION_VALIDATION.REMARK_MAX_LENGTH,
+              message: `備註不能大於${POSITION_VALIDATION.REMARK_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <TextArea

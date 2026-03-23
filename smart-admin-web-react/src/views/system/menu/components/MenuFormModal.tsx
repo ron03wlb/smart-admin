@@ -202,7 +202,7 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
       >
         {/* 菜單類型 */}
         <Form.Item label="菜單類型" name="menuType">
-          <Radio.Group buttonStyle="solid" onChange={(e) => handleMenuTypeChange(e.target.value)}>
+          <Radio.Group buttonStyle="solid" onChange={e => handleMenuTypeChange(e.target.value)}>
             {Object.entries(MENU_TYPE_LABELS).map(([key, label]) => (
               <Radio.Button key={key} value={Number(key)}>
                 {label}

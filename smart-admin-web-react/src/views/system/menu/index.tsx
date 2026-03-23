@@ -117,7 +117,7 @@ export default function MenuPage() {
    * 構建菜單樹
    */
   const buildMenuTree = (data: MenuVO[], parentId: number): MenuVO[] => {
-    const children = data.filter((item) => item.parentId === parentId);
+    const children = data.filter(item => item.parentId === parentId);
 
     if (children.length === 0) {
       return [];
@@ -125,7 +125,7 @@ export default function MenuPage() {
 
     return children
       .sort((a, b) => a.sort - b.sort)
-      .map((item) => {
+      .map(item => {
         const node = { ...item };
         const subChildren = buildMenuTree(data, item.menuId);
         if (subChildren.length > 0) {
@@ -139,7 +139,7 @@ export default function MenuPage() {
    * 過濾菜單（根據查詢條件）
    */
   const filterMenuByQueryForm = (data: MenuVO[], form: MenuQueryForm): MenuVO[] => {
-    return data.filter((menu) => {
+    return data.filter(menu => {
       // 關鍵字搜索
       if (form.keywords) {
         const keyword = form.keywords.toLowerCase();
@@ -188,7 +188,7 @@ export default function MenuPage() {
   const getAllKeys = (data: MenuVO[]): React.Key[] => {
     const keys: React.Key[] = [];
     const traverse = (nodes: MenuVO[]) => {
-      nodes.forEach((node) => {
+      nodes.forEach(node => {
         keys.push(node.menuId);
         if (node.children) {
           traverse(node.children);
@@ -223,7 +223,7 @@ export default function MenuPage() {
   };
 
   useEffect(() => {
-    if (Object.values(queryForm).every((v) => v === undefined)) {
+    if (Object.values(queryForm).every(v => v === undefined)) {
       queryMenuList();
     }
   }, [queryForm, queryMenuList]);
@@ -252,14 +252,14 @@ export default function MenuPage() {
       dataIndex: 'icon',
       key: 'icon',
       width: MENU_TABLE_COLUMNS_WIDTH.icon,
-      render: (icon) => (icon ? <span>{icon}</span> : '-'),
+      render: icon => (icon ? <span>{icon}</span> : '-'),
     },
     {
       title: '路由',
       dataIndex: 'path',
       key: 'path',
       width: MENU_TABLE_COLUMNS_WIDTH.path,
-      render: (text) => text || '-',
+      render: text => text || '-',
     },
     {
       title: '組件/外鏈',
@@ -279,7 +279,7 @@ export default function MenuPage() {
       dataIndex: 'webPerms',
       key: 'webPerms',
       width: MENU_TABLE_COLUMNS_WIDTH.webPerms,
-      render: (text) => text || '-',
+      render: text => text || '-',
       ellipsis: true,
     },
     {
@@ -287,7 +287,7 @@ export default function MenuPage() {
       dataIndex: 'apiPerms',
       key: 'apiPerms',
       width: MENU_TABLE_COLUMNS_WIDTH.apiPerms,
-      render: (text) => text || '-',
+      render: text => text || '-',
       ellipsis: true,
     },
     {
@@ -316,12 +316,7 @@ export default function MenuPage() {
           )}
 
           {hasDeletePrivilege && (
-            <Button
-              type="link"
-              size="small"
-              danger
-              onClick={() => handleSingleDelete(record)}
-            >
+            <Button type="link" size="small" danger onClick={() => handleSingleDelete(record)}>
               刪除
             </Button>
           )}
@@ -399,9 +394,7 @@ export default function MenuPage() {
       return;
     }
 
-    const selectedMenus = menuList.filter((menu) =>
-      selectedRowKeys.includes(menu.menuId)
-    );
+    const selectedMenus = menuList.filter(menu => selectedRowKeys.includes(menu.menuId));
     confirmBatchDelete(selectedMenus);
   };
 
@@ -409,7 +402,7 @@ export default function MenuPage() {
    * 確認批量刪除
    */
   const confirmBatchDelete = (menuArray: MenuVO[]) => {
-    const menuNames = menuArray.map((menu) => menu.menuName).join('、');
+    const menuNames = menuArray.map(menu => menu.menuName).join('、');
 
     Modal.confirm({
       title: '確認刪除',
@@ -420,7 +413,7 @@ export default function MenuPage() {
       cancelText: '取消',
       onOk: async () => {
         try {
-          const menuIdList = menuArray.map((menu) => menu.menuId);
+          const menuIdList = menuArray.map(menu => menu.menuId);
           await menuApi.batchDeleteMenu(menuIdList);
           message.success('刪除成功');
           setSelectedRowKeys([]);
@@ -459,9 +452,7 @@ export default function MenuPage() {
                     placeholder="菜單名稱/路由地址/組件路徑/權限字符串"
                     style={{ width: 300 }}
                     value={queryForm.keywords}
-                    onChange={(e) =>
-                      setQueryForm({ ...queryForm, keywords: e.target.value })
-                    }
+                    onChange={e => setQueryForm({ ...queryForm, keywords: e.target.value })}
                   />
                 </Form.Item>
               </Col>
@@ -472,7 +463,7 @@ export default function MenuPage() {
                     placeholder="請選擇類型"
                     style={{ width: 120 }}
                     value={queryForm.menuType}
-                    onChange={(value) => setQueryForm({ ...queryForm, menuType: value })}
+                    onChange={value => setQueryForm({ ...queryForm, menuType: value })}
                     allowClear
                   >
                     {Object.entries(MENU_TYPE_LABELS).map(([key, label]) => (
@@ -490,9 +481,7 @@ export default function MenuPage() {
                     placeholder="請選擇"
                     style={{ width: 120 }}
                     value={queryForm.disabledFlag}
-                    onChange={(value) =>
-                      setQueryForm({ ...queryForm, disabledFlag: value })
-                    }
+                    onChange={value => setQueryForm({ ...queryForm, disabledFlag: value })}
                     allowClear
                   >
                     <Option value={false}>否</Option>
@@ -528,9 +517,7 @@ export default function MenuPage() {
                       placeholder="請選擇"
                       style={{ width: 120 }}
                       value={queryForm.frameFlag}
-                      onChange={(value) =>
-                        setQueryForm({ ...queryForm, frameFlag: value })
-                      }
+                      onChange={value => setQueryForm({ ...queryForm, frameFlag: value })}
                       allowClear
                     >
                       <Option value={false}>否</Option>
@@ -545,9 +532,7 @@ export default function MenuPage() {
                       placeholder="請選擇"
                       style={{ width: 120 }}
                       value={queryForm.cacheFlag}
-                      onChange={(value) =>
-                        setQueryForm({ ...queryForm, cacheFlag: value })
-                      }
+                      onChange={value => setQueryForm({ ...queryForm, cacheFlag: value })}
                       allowClear
                     >
                       <Option value={false}>否</Option>
@@ -562,9 +547,7 @@ export default function MenuPage() {
                       placeholder="請選擇"
                       style={{ width: 120 }}
                       value={queryForm.visibleFlag}
-                      onChange={(value) =>
-                        setQueryForm({ ...queryForm, visibleFlag: value })
-                      }
+                      onChange={value => setQueryForm({ ...queryForm, visibleFlag: value })}
                       allowClear
                     >
                       <Option value={false}>否</Option>
@@ -609,7 +592,7 @@ export default function MenuPage() {
           rowSelection={rowSelection}
           expandable={{
             expandedRowKeys,
-            onExpandedRowsChange: (keys) => setExpandedRowKeys(keys),
+            onExpandedRowsChange: keys => setExpandedRowKeys([...keys]),
           }}
           bordered
           size="small"

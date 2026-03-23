@@ -63,8 +63,8 @@ describe('EmployeeFormModal', () => {
       ok: true,
       msg: 'Success',
       data: [
-        { roleId: 1, roleName: '管理員' },
-        { roleId: 2, roleName: '普通用戶' },
+        { roleId: 1, roleName: '管理員', roleCode: 'ADMIN' },
+        { roleId: 2, roleName: '普通用戶', roleCode: 'USER' },
       ],
     });
 

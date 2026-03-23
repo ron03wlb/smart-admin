@@ -9,16 +9,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  Form,
-  Input,
-  Select,
-  Alert,
-  message,
-  Row,
-  Col,
-} from 'antd';
+import { Modal, Form, Input, Select, Alert, message, Row, Col } from 'antd';
 import { useModal } from '@/hooks/useModal';
 import { employeeApi } from '@/api/system/employeeApi';
 import { roleApi } from '@/api/system/roleApi';
@@ -138,8 +129,8 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
         message.success('添加成功');
         // 傳遞登錄名和密碼給父組件
         onSuccess({
-          loginName: values.loginName,
-          password: response.data,
+          loginName: values.loginName!,
+          password: response.data!,
         });
       }
     } catch (error: any) {
@@ -196,7 +187,10 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           name="actualName"
           rules={[
             { required: true, message: '姓名不能為空' },
-            { max: EMPLOYEE_VALIDATION.NAME_MAX_LENGTH, message: `姓名不能大於${EMPLOYEE_VALIDATION.NAME_MAX_LENGTH}個字符` },
+            {
+              max: EMPLOYEE_VALIDATION.NAME_MAX_LENGTH,
+              message: `姓名不能大於${EMPLOYEE_VALIDATION.NAME_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <Input placeholder="請輸入姓名" />
@@ -229,7 +223,10 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           name="loginName"
           rules={[
             { required: true, message: '登錄賬號不能為空' },
-            { max: EMPLOYEE_VALIDATION.LOGIN_NAME_MAX_LENGTH, message: `登錄賬號不能大於${EMPLOYEE_VALIDATION.LOGIN_NAME_MAX_LENGTH}個字符` },
+            {
+              max: EMPLOYEE_VALIDATION.LOGIN_NAME_MAX_LENGTH,
+              message: `登錄賬號不能大於${EMPLOYEE_VALIDATION.LOGIN_NAME_MAX_LENGTH}個字符`,
+            },
           ]}
           extra={!isEdit && <span style={{ color: '#8c8c8c' }}>初始密碼默認為：隨機</span>}
         >
@@ -275,27 +272,16 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           </Col>
         </Row>
 
-        <Form.Item
-          label="職務"
-          name="positionId"
-        >
+        <Form.Item label="職務" name="positionId">
           <Select placeholder="請選擇職務" allowClear>
             {/* TODO: 集成 PositionSelect 組件 */}
             <Option value={1}>默認職務</Option>
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="角色"
-          name="roleIdList"
-        >
-          <Select
-            mode="multiple"
-            placeholder="請選擇角色"
-            optionFilterProp="children"
-            allowClear
-          >
-            {roleList.map((role) => (
+        <Form.Item label="角色" name="roleIdList">
+          <Select mode="multiple" placeholder="請選擇角色" optionFilterProp="children" allowClear>
+            {roleList.map(role => (
               <Option key={role.roleId} value={role.roleId}>
                 {role.roleName}
               </Option>

@@ -58,9 +58,10 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
         message: `部門名稱不能大於${DEPARTMENT_VALIDATION.NAME_MAX_LENGTH}個字符`,
       },
     ],
-    parentId: initialData?.parentId !== DEPARTMENT_CONSTANTS.TOP_PARENT_ID
-      ? [{ required: true, message: '上級部門不能為空' }]
-      : [],
+    parentId:
+      initialData?.parentId !== DEPARTMENT_CONSTANTS.TOP_PARENT_ID
+        ? [{ required: true, message: '上級部門不能為空' }]
+        : [],
   };
 
   // ==================== Form Submission ====================
@@ -142,21 +143,13 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
       >
         {/* 上級部門（僅非頂級部門顯示） */}
         {initialData?.parentId !== DEPARTMENT_CONSTANTS.TOP_PARENT_ID && (
-          <Form.Item
-            label="上級部門"
-            name="parentId"
-            rules={rules.parentId}
-          >
+          <Form.Item label="上級部門" name="parentId" rules={rules.parentId}>
             <Input placeholder="上級部門ID（後續實現 DepartmentTreeSelect）" disabled />
           </Form.Item>
         )}
 
         {/* 部門名稱 */}
-        <Form.Item
-          label="部門名稱"
-          name="departmentName"
-          rules={rules.departmentName}
-        >
+        <Form.Item label="部門名稱" name="departmentName" rules={rules.departmentName}>
           <Input placeholder="請輸入部門名稱" />
         </Form.Item>
 
@@ -166,15 +159,8 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
         </Form.Item>
 
         {/* 部門排序 */}
-        <Form.Item
-          label="部門排序（值越大越靠前）"
-          name="sort"
-        >
-          <InputNumber
-            style={{ width: '100%' }}
-            min={0}
-            placeholder="請輸入部門排序"
-          />
+        <Form.Item label="部門排序（值越大越靠前）" name="sort">
+          <InputNumber style={{ width: '100%' }} min={0} placeholder="請輸入部門排序" />
         </Form.Item>
       </Form>
     </Modal>

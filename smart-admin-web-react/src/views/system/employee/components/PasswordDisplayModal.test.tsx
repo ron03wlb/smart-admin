@@ -249,36 +249,21 @@ describe('PasswordDisplayModal', () => {
   describe('Different Password Scenarios', () => {
     it('should display short password', () => {
       const shortPassword = 'abc123';
-      render(
-        <PasswordDisplayModal
-          {...mockProps}
-          password={shortPassword}
-        />
-      );
+      render(<PasswordDisplayModal {...mockProps} password={shortPassword} />);
 
       expect(screen.getByText(shortPassword)).toBeInTheDocument();
     });
 
     it('should display long password', () => {
       const longPassword = 'Abc123!@#DefGhiJklMnoPqrStuVwxYz123456789';
-      render(
-        <PasswordDisplayModal
-          {...mockProps}
-          password={longPassword}
-        />
-      );
+      render(<PasswordDisplayModal {...mockProps} password={longPassword} />);
 
       expect(screen.getByText(longPassword)).toBeInTheDocument();
     });
 
     it('should display password with special characters', () => {
       const specialPassword = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-      render(
-        <PasswordDisplayModal
-          {...mockProps}
-          password={specialPassword}
-        />
-      );
+      render(<PasswordDisplayModal {...mockProps} password={specialPassword} />);
 
       expect(screen.getByText(specialPassword)).toBeInTheDocument();
     });
@@ -292,12 +277,7 @@ describe('PasswordDisplayModal', () => {
 
       expect(screen.getByText('zhangsan')).toBeInTheDocument();
 
-      rerender(
-        <PasswordDisplayModal
-          {...mockProps}
-          loginName="admin"
-        />
-      );
+      rerender(<PasswordDisplayModal {...mockProps} loginName="admin" />);
 
       expect(screen.getByText('admin')).toBeInTheDocument();
     });

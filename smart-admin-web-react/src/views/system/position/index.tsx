@@ -61,6 +61,8 @@ export default function PositionPage() {
   } = useTable<PositionVO, PositionQueryForm>({
     defaultQueryForm: {
       keywords: undefined,
+      pageNum: 1,
+      pageSize: 10,
     },
     pagination: { pageNum: 1, pageSize: 10 },
     queryApi: positionApi.queryPage,

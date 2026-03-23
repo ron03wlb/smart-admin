@@ -9,16 +9,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  Card,
-  Input,
-  Button,
-  Table,
-  Space,
-  Modal,
-  message,
-  Typography,
-} from 'antd';
+import { Card, Input, Button, Table, Space, Modal, message, Typography } from 'antd';
 import {
   SearchOutlined,
   ReloadOutlined,
@@ -102,13 +93,13 @@ export default function DepartmentPage() {
    * 構建部門樹
    */
   const buildDepartmentTree = (data: DepartmentVO[], parentId: number): DepartmentVO[] => {
-    const children = data.filter((item) => item.parentId === parentId);
+    const children = data.filter(item => item.parentId === parentId);
 
     if (children.length === 0) {
       return [];
     }
 
-    return children.map((item) => {
+    return children.map(item => {
       const node = { ...item };
       const subChildren = buildDepartmentTree(data, item.departmentId);
       if (subChildren.length > 0) {
@@ -123,7 +114,7 @@ export default function DepartmentPage() {
    */
   const departmentMap = useMemo(() => {
     const map = new Map<number, DepartmentVO>();
-    departmentList.forEach((dept) => {
+    departmentList.forEach(dept => {
       map.set(dept.departmentId, dept);
     });
     return map;
@@ -143,30 +134,30 @@ export default function DepartmentPage() {
     }
 
     // 篩選包含關鍵字的部門
-    const matchedDepartments = departmentList.filter((dept) =>
+    const matchedDepartments = departmentList.filter(dept =>
       dept.departmentName.includes(keyword.trim())
     );
 
     // 遞歸找出所有相關的父級部門
     const relatedDepartments: DepartmentVO[] = [];
-    matchedDepartments.forEach((dept) => {
+    matchedDepartments.forEach(dept => {
       recursiveFindParents(dept.departmentId, relatedDepartments);
     });
 
     // 構建樹形數據
-    const filteredTree = buildDepartmentTree(relatedDepartments, DEPARTMENT_CONSTANTS.TOP_PARENT_ID);
+    const filteredTree = buildDepartmentTree(
+      relatedDepartments,
+      DEPARTMENT_CONSTANTS.TOP_PARENT_ID
+    );
     setDepartmentTreeData(filteredTree);
   };
 
   /**
    * 遞歸查找父級部門
    */
-  const recursiveFindParents = (
-    departmentId: number,
-    resultList: DepartmentVO[]
-  ) => {
+  const recursiveFindParents = (departmentId: number, resultList: DepartmentVO[]) => {
     const dept = departmentMap.get(departmentId);
-    if (!dept || resultList.some((item) => item.departmentId === departmentId)) {
+    if (!dept || resultList.some(item => item.departmentId === departmentId)) {
       return;
     }
 
@@ -200,7 +191,7 @@ export default function DepartmentPage() {
       dataIndex: 'managerName',
       key: 'managerName',
       width: DEPARTMENT_TABLE_COLUMNS_WIDTH.managerName,
-      render: (text) => text || '-',
+      render: text => text || '-',
     },
     {
       title: '排序',
@@ -213,14 +204,14 @@ export default function DepartmentPage() {
       dataIndex: 'createTime',
       key: 'createTime',
       width: DEPARTMENT_TABLE_COLUMNS_WIDTH.createTime,
-      render: (text) => (text ? formatDateTime(text) : '-'),
+      render: text => (text ? formatDateTime(text) : '-'),
     },
     {
       title: '更新時間',
       dataIndex: 'updateTime',
       key: 'updateTime',
       width: DEPARTMENT_TABLE_COLUMNS_WIDTH.updateTime,
-      render: (text) => (text ? formatDateTime(text) : '-'),
+      render: text => (text ? formatDateTime(text) : '-'),
     },
     {
       title: '操作',
@@ -346,24 +337,16 @@ export default function DepartmentPage() {
               allowClear
               style={{ width: 300 }}
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={e => setKeyword(e.target.value)}
               onSearch={handleSearch}
               enterButton={
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  disabled={!hasQueryPrivilege}
-                >
+                <Button type="primary" icon={<SearchOutlined />} disabled={!hasQueryPrivilege}>
                   查詢
                 </Button>
               }
             />
 
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={handleReset}
-              disabled={!hasQueryPrivilege}
-            >
+            <Button icon={<ReloadOutlined />} onClick={handleReset} disabled={!hasQueryPrivilege}>
               重置
             </Button>
 
@@ -387,7 +370,7 @@ export default function DepartmentPage() {
           pagination={false}
           expandable={{
             expandedRowKeys,
-            onExpandedRowsChange: (keys) => setExpandedRowKeys(keys),
+            onExpandedRowsChange: keys => setExpandedRowKeys([...keys]),
           }}
           bordered
           size="small"

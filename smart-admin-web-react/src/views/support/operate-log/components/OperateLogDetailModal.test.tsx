@@ -29,6 +29,7 @@ const mockOperateLogDetail: OperateLogVO = {
   operateLogId: 1,
   operateUserId: 100,
   operateUserName: '測試用戶',
+  operateUserType: 1,
   url: '/api/employee/add',
   method: 'POST',
   module: '員工管理',

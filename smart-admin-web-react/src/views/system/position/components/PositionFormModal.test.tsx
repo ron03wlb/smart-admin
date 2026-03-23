@@ -50,7 +50,8 @@ describe('PositionFormModal', () => {
   };
 
   const findSubmitButton = () => findModalButton('.ant-modal-footer .ant-btn-primary');
-  const findCancelButton = () => findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
+  const findCancelButton = () =>
+    findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
 
   beforeEach(() => {
     vi.clearAllMocks();
