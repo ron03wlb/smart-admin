@@ -28,19 +28,19 @@ const Center: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   // 從 Redux 獲取當前用戶信息
-  const currentUser = useAppSelector((state) => state.user.userInfo);
+  const employeeId = useAppSelector(state => state.user.employeeId);
 
   /**
    * 獲取員工信息
    */
   const getEmployeeInfo = async () => {
-    if (!currentUser?.employeeId) {
+    if (!employeeId) {
       return;
     }
 
     try {
       setLoading(true);
-      const result = await employeeApi.getEmployee(currentUser.employeeId);
+      const result = await employeeApi.getEmployee(Number(employeeId));
       form.setFieldsValue({
         loginName: result.data.loginName,
         departmentId: result.data.departmentId,
@@ -76,7 +76,7 @@ const Center: React.FC = () => {
 
       setLoading(true);
       await employeeApi.updateEmployee({
-        employeeId: currentUser?.employeeId!,
+        employeeId: Number(employeeId),
         ...values,
       });
       message.success('個人信息更新成功');
@@ -107,7 +107,11 @@ const Center: React.FC = () => {
             <Input placeholder="部門" disabled />
           </Form.Item>
 
-          <Form.Item label="員工名稱" name="actualName" rules={[{ required: true, message: '請輸入員工名稱' }]}>
+          <Form.Item
+            label="員工名稱"
+            name="actualName"
+            rules={[{ required: true, message: '請輸入員工名稱' }]}
+          >
             <Input placeholder="請輸入員工名稱" />
           </Form.Item>
 
@@ -129,9 +133,7 @@ const Center: React.FC = () => {
           <Form.Item
             label="郵箱"
             name="email"
-            rules={[
-              { type: 'email', message: '請輸入有效的郵箱地址' },
-            ]}
+            rules={[{ type: 'email', message: '請輸入有效的郵箱地址' }]}
           >
             <Input placeholder="請輸入郵箱" />
           </Form.Item>

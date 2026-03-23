@@ -51,7 +51,8 @@ describe('EmployeeFormModal', () => {
   };
 
   const findSubmitButton = () => findModalButton('.ant-modal-footer .ant-btn-primary');
-  const findCancelButton = () => findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
+  const findCancelButton = () =>
+    findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -69,8 +70,18 @@ describe('EmployeeFormModal', () => {
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
+      visible: false,
+      setVisible: vi.fn(),
+      formData: {},
+      setFormData: vi.fn(),
       isEdit: false,
-    });
+      loading: false,
+      setLoading: vi.fn(),
+      open: vi.fn(),
+      close: vi.fn(),
+      handleSubmit: vi.fn(),
+      reset: vi.fn(),
+    } as any);
   });
 
   // ==================== 基本渲染測試 ====================
@@ -112,8 +123,18 @@ describe('EmployeeFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       const editData: EmployeeFormData = {
         employeeId: 1,
@@ -134,8 +155,18 @@ describe('EmployeeFormModal', () => {
 
     it('should not show initial password hint in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       const editData: EmployeeFormData = {
         employeeId: 1,
@@ -320,8 +351,18 @@ describe('EmployeeFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       vi.mocked(employeeApi.updateEmployee).mockResolvedValue({
         code: 200,

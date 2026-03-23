@@ -50,15 +50,26 @@ describe('ConfigFormModal', () => {
   };
 
   const findSubmitButton = () => findModalButton('.ant-modal-footer .ant-btn-primary');
-  const findCancelButton = () => findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
+  const findCancelButton = () =>
+    findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
+      visible: false,
+      setVisible: vi.fn(),
+      formData: {},
+      setFormData: vi.fn(),
       isEdit: false,
-    });
+      loading: false,
+      setLoading: vi.fn(),
+      open: vi.fn(),
+      close: vi.fn(),
+      handleSubmit: vi.fn(),
+      reset: vi.fn(),
+    } as any);
   });
 
   // ==================== 基本渲染測試 ====================
@@ -99,8 +110,18 @@ describe('ConfigFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       const editData: ConfigFormData = {
         configId: 1,
@@ -246,8 +267,18 @@ describe('ConfigFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       vi.mocked(configApi.updateConfig).mockResolvedValue({
         code: 200,
@@ -278,8 +309,18 @@ describe('ConfigFormModal', () => {
 
     it('should handle API error in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       vi.mocked(configApi.updateConfig).mockRejectedValue(new Error('API Error'));
 

@@ -36,41 +36,41 @@ vi.mock('@/api/business/categoryApi', () => ({
 }));
 
 // Create mock store
-const createMockStore = () =>
-  configureStore({
+const createMockStore = () => {
+  const permissions = ['category:add', 'category:addChild', 'category:update', 'category:delete'];
+  const pointsList = permissions.map((perm, index) => ({ webPerms: perm, menuId: index + 1 }));
+
+  return configureStore({
     reducer: {
       user: userReducer,
       dict: dictReducer,
     },
     preloadedState: {
       user: {
-        userInfo: {
-          employeeId: 1,
-          loginName: 'admin',
-          actualName: '管理員',
-          phone: '13800138000',
-        },
-        menuTreeList: [],
-        pointsList: ['category:add', 'category:addChild', 'category:update', 'category:delete'].map((perm, index) => ({
-          webPerms: perm,
-          menuId: index + 1,
-        })),
-        privilegeList: ['category:add', 'category:addChild', 'category:update', 'category:delete'],
-        roleList: [],
+        token: 'mock-token',
+        employeeId: '1',
+        employeeName: '管理員',
+        loginName: 'admin',
         administratorFlag: false,
-        isLoggedIn: true,
+        menuTree: [],
+        displayMenuTree: [],
+        pointsList,
+        menuRouterList: [],
+        menuParentIdListMap: {},
+        unreadMessageCount: 0,
         loading: false,
         error: null,
       },
       dict: {
-        dictData: {},
+        dictList: [],
         dictMap: {},
         loading: false,
         error: null,
-        lastFetched: null,
+        lastUpdated: null,
       },
     },
   });
+};
 
 describe('GoodsCatalog', () => {
   let store: ReturnType<typeof createMockStore>;

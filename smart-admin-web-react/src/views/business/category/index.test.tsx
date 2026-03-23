@@ -8,7 +8,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { renderWithProviders, createMockResponse, PERMISSIONS } from '@/test/test-utils';
+import { renderWithProviders, PERMISSIONS } from '@/test/test-utils';
 import { Modal } from 'antd';
 import CategoryManagement from './index';
 import { categoryApi } from '@/api/business/categoryApi';
@@ -81,9 +81,7 @@ const mockCategoryTree: CategoryVO[] = [
 // Helper function to render with category permissions
 const renderCategoryManagement = (administratorFlag = false) => {
   return renderWithProviders(<CategoryManagement />, {
-    permissions: PERMISSIONS.ALL_CRUD('business:category').concat([
-      'business:category:addChild',
-    ]),
+    permissions: PERMISSIONS.ALL_CRUD('business:category').concat(['business:category:addChild']),
     administratorFlag,
   });
 };

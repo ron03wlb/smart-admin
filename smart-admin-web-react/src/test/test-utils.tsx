@@ -18,7 +18,7 @@ import roleReducer from '@/store/slices/roleSlice';
 import spinReducer from '@/store/slices/spinSlice';
 import tagNavReducer from '@/store/slices/tagNavSlice';
 import tenantReducer from '@/store/slices/tenantSlice';
-import type { PermissionPoint } from '@/types/system/menu';
+import type { PermissionPoint } from '@/types/menu';
 
 /**
  * 創建測試用的 Redux Store
@@ -54,45 +54,44 @@ export function createTestStore(
     },
     preloadedState: {
       user: {
-        userInfo: userInfo || {
-          employeeId: 1,
-          loginName: 'admin',
-          actualName: '管理員',
-          phone: '13800138000',
-        },
-        menuTreeList: [],
-        pointsList,
-        privilegeList: permissions,
-        roleList: [],
+        token: 'mock-token',
+        employeeId: '1',
+        employeeName: userInfo?.actualName || '管理員',
+        loginName: userInfo?.loginName || 'admin',
         administratorFlag,
-        isLoggedIn: true,
+        menuTree: [],
+        displayMenuTree: [],
+        pointsList,
+        menuRouterList: [],
+        menuParentIdListMap: {},
+        unreadMessageCount: 0,
         loading: false,
         error: null,
       },
       dict: {
-        dictData,
-        dictMap: {},
+        dictList: [],
+        dictMap: dictData || {},
         loading: false,
         error: null,
-        lastFetched: null,
+        lastUpdated: null,
       },
       role: {
-        roleList: [],
-        loading: false,
-        error: null,
+        checkedData: [],
+        treeMap: {},
       },
       spin: {
         loading: false,
       },
       tagNav: {
         tags: [],
-        activeKey: '',
+        activeTagPath: '',
+        keepAliveEnabled: true,
+        cachedPaths: [],
       },
       tenant: {
-        tenantList: [],
-        currentTenant: null,
-        loading: false,
-        error: null,
+        tenantId: null,
+        timezone: 'Asia/Taipei',
+        tenantCode: 'default',
       },
     },
   });

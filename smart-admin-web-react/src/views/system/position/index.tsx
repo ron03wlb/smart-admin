@@ -9,18 +9,7 @@
  */
 
 import { useState } from 'react';
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Space,
-  Row,
-  Col,
-  Modal,
-  message,
-} from 'antd';
+import { Card, Form, Input, Button, Table, Space, Row, Col, Modal, message } from 'antd';
 import {
   SearchOutlined,
   ReloadOutlined,
@@ -62,7 +51,7 @@ export default function PositionPage() {
     tableData,
     loading,
     pagination,
-    queryForm,
+    queryForm: _queryForm,
     setQueryForm,
     selectedRowKeys,
     query,
@@ -84,8 +73,8 @@ export default function PositionPage() {
    * 處理查詢
    */
   const handleQuery = () => {
-    form.validateFields().then((values) => {
-      setQueryForm({ keywords: values.keywords?.trim() });
+    form.validateFields().then(values => {
+      setQueryForm(prev => ({ ...prev, keywords: values.keywords?.trim() }));
       query();
     });
   };
@@ -95,7 +84,7 @@ export default function PositionPage() {
    */
   const handleReset = () => {
     form.resetFields();
-    setQueryForm({ keywords: undefined });
+    setQueryForm(prev => ({ ...prev, keywords: undefined }));
     reset();
   };
 
@@ -146,12 +135,7 @@ export default function PositionPage() {
             </Button>
           )}
           {hasDeletePrivilege && (
-            <Button
-              type="link"
-              size="small"
-              danger
-              onClick={() => handleDelete(record.positionId)}
-            >
+            <Button type="link" size="small" danger onClick={() => handleDelete(record.positionId)}>
               刪除
             </Button>
           )}
@@ -298,12 +282,12 @@ export default function PositionPage() {
           dataSource={tableData}
           loading={loading}
           pagination={{
-            current: pagination.pageNum,
+            current: pagination.current,
             pageSize: pagination.pageSize,
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
           }}
           onChange={handleTableChange}
           rowSelection={{

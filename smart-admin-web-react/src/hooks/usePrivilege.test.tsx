@@ -14,7 +14,7 @@ interface TestUserState {
 const createTestStore = (userState: TestUserState) => {
   return configureStore({
     reducer: {
-      user: userReducer,
+      user: userReducer as any,
     },
     preloadedState: {
       user: {

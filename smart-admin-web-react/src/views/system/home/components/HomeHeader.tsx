@@ -18,7 +18,7 @@ import './HomeHeader.css';
 const { Text } = Typography;
 
 const HomeHeader: React.FC = () => {
-  const userInfo = useAppSelector((state) => state.user.userInfo);
+  const employeeName = useAppSelector(state => state.user.employeeName);
 
   /**
    * 歡迎語（根據時間）
@@ -39,47 +39,17 @@ const HomeHeader: React.FC = () => {
       greeting = '晚上好，';
     }
 
-    return greeting + (userInfo?.actualName || '用戶');
-  }, [userInfo]);
+    return greeting + (employeeName || '用戶');
+  }, [employeeName]);
 
   /**
    * 上次登錄信息
+   * TODO: 待後端提供 lastLoginTime, lastLoginUserAgent, lastLoginIp 等數據後完善
    */
   const lastLoginInfo = useMemo(() => {
-    let info = '';
-
-    if (userInfo?.lastLoginTime) {
-      info = `上次登錄: ${userInfo.lastLoginTime}`;
-    }
-
-    if (userInfo?.lastLoginUserAgent) {
-      const ua = new UAParser(userInfo.lastLoginUserAgent);
-      info += '; 設備:';
-
-      if (ua.getBrowser().name) {
-        info += ` ${ua.getBrowser().name}`;
-      }
-
-      if (ua.getOS().name) {
-        info += ` ${ua.getOS().name}`;
-      }
-
-      const device = ua.getDevice().vendor ? `${ua.getDevice().vendor} ${ua.getDevice().model}` : null;
-      if (device) {
-        info += ` ${device}`;
-      }
-    }
-
-    if (userInfo?.lastLoginIpRegion) {
-      info += `; ${userInfo.lastLoginIpRegion}`;
-    }
-
-    if (userInfo?.lastLoginIp) {
-      info += `; ${userInfo.lastLoginIp}`;
-    }
-
-    return info || '暫無登錄記錄';
-  }, [userInfo]);
+    // 目前 UserState 中沒有上次登錄相關數據，暫時顯示歡迎消息
+    return '歡迎使用 SmartAdmin 管理系統';
+  }, []);
 
   /**
    * 當前日期信息
@@ -116,7 +86,7 @@ const HomeHeader: React.FC = () => {
         <div className="page-header-heading">
           <div className="page-header-title">{welcomeSentence}</div>
           <div className="page-header-subtitle">
-            <Text type="secondary">所屬部門： {userInfo?.departmentName || '未知'}</Text>
+            <Text type="secondary">登錄帳號： {employeeName || '未知'}</Text>
           </div>
         </div>
 

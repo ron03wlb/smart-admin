@@ -9,29 +9,15 @@
  */
 
 import { useState } from 'react';
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Table,
-  Space,
-} from 'antd';
-import {
-  SearchOutlined,
-  ReloadOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { Card, Form, Input, Button, Table, Space } from 'antd';
+import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { useTable } from '@/hooks/useTable';
 import { usePrivilege } from '@/hooks/usePrivilege';
 import PrivilegeButton from '@/components/PrivilegeButton';
 import { configApi } from '@/api/support/configApi';
 import type { ConfigVO, ConfigQueryForm, ConfigFormData } from './types';
-import {
-  CONFIG_PERMISSION,
-  CONFIG_TABLE_COLUMNS_WIDTH,
-} from '@/constants/support/configConst';
+import { CONFIG_PERMISSION, CONFIG_TABLE_COLUMNS_WIDTH } from '@/constants/support/configConst';
 import { formatDateTime } from '@/utils/date';
 import { ConfigFormModal } from './components/ConfigFormModal';
 
@@ -54,7 +40,7 @@ export default function ConfigPage() {
     tableData,
     loading,
     pagination,
-    queryForm,
+    queryForm: _queryForm,
     setQueryForm,
     query,
     reset,
@@ -62,6 +48,8 @@ export default function ConfigPage() {
   } = useTable<ConfigVO, ConfigQueryForm>({
     defaultQueryForm: {
       configKey: undefined,
+      pageNum: 1,
+      pageSize: 10,
     },
     pagination: { pageNum: 1, pageSize: 10 },
     queryApi: configApi.queryPage,
@@ -74,8 +62,8 @@ export default function ConfigPage() {
    * 處理查詢
    */
   const handleQuery = () => {
-    form.validateFields().then((values) => {
-      setQueryForm({ configKey: values.configKey?.trim() });
+    form.validateFields().then(values => {
+      setQueryForm(prev => ({ ...prev, configKey: values.configKey?.trim() }));
       query();
     });
   };
@@ -85,7 +73,7 @@ export default function ConfigPage() {
    */
   const handleReset = () => {
     form.resetFields();
-    setQueryForm({ configKey: undefined });
+    setQueryForm(prev => ({ ...prev, configKey: undefined }));
     reset();
   };
 
@@ -220,12 +208,12 @@ export default function ConfigPage() {
           dataSource={tableData}
           loading={loading}
           pagination={{
-            current: pagination.pageNum,
+            current: pagination.current,
             pageSize: pagination.pageSize,
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
           }}
           onChange={handleTableChange}
           scroll={{ x: 1200 }}

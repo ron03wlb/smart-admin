@@ -91,11 +91,11 @@ const EmployeeSelect: React.FC<EmployeeSelectProps> = props => {
     return employeeList
       .filter(employee => {
         // 篩選禁用員工
-        if (!showDisabled && employee.isDisabled) {
+        if (!showDisabled && employee.disabledFlag) {
           return false;
         }
         // 篩選離職員工
-        if (!showLeave && employee.isLeave) {
+        if (!showLeave && employee.leaveFlag) {
           return false;
         }
         return true;

@@ -14,7 +14,6 @@ import type {
   GoodsAddForm,
   GoodsUpdateForm,
   GoodsFormData,
-  GoodsStatusEnum,
 } from '../types';
 import { useModal } from '@/hooks/useModal';
 import { GOODS_VALIDATION, GOODS_STATUS_LABELS } from '@/constants/business/goodsConst';
@@ -207,18 +206,11 @@ export default function GoodsFormDrawer({
           rules={rules.categoryId}
           tooltip="TODO: 應使用 CategoryTree 組件"
         >
-          <InputNumber
-            placeholder="請輸入商品分類ID（暫時）"
-            style={{ width: '100%' }}
-            min={1}
-          />
+          <InputNumber placeholder="請輸入商品分類ID（暫時）" style={{ width: '100%' }} min={1} />
         </Form.Item>
 
         <Form.Item label="商品名稱" name="goodsName" rules={rules.goodsName}>
-          <Input
-            placeholder="請輸入商品名稱"
-            maxLength={GOODS_VALIDATION.NAME_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入商品名稱" maxLength={GOODS_VALIDATION.NAME_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item label="商品狀態" name="goodsStatus" rules={rules.goodsStatus}>
@@ -237,11 +229,7 @@ export default function GoodsFormDrawer({
           rules={rules.place}
           tooltip="TODO: 應使用 DictSelect 組件"
         >
-          <Select
-            mode="tags"
-            placeholder="請輸入產地（支援多選）"
-            style={{ width: '100%' }}
-          >
+          <Select mode="tags" placeholder="請輸入產地（支援多選）" style={{ width: '100%' }}>
             <Select.Option value="中國">中國</Select.Option>
             <Select.Option value="日本">日本</Select.Option>
             <Select.Option value="美國">美國</Select.Option>

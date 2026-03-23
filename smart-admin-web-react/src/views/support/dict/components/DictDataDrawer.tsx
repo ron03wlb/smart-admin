@@ -8,7 +8,13 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { Drawer, Form, Input, Button, Table, Switch, Space, message, Modal } from 'antd';
-import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { dictApi } from '@/api/support/dictApi';
 import { usePrivilege } from '@/hooks/usePrivilege';
@@ -26,12 +32,7 @@ export interface DictDataDrawerProps {
   onClose: () => void;
 }
 
-const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
-  visible,
-  dictId,
-  dictCode,
-  onClose,
-}) => {
+const DictDataDrawer: React.FC<DictDataDrawerProps> = ({ visible, dictId, dictCode, onClose }) => {
   const [form] = Form.useForm();
   const hasAddPrivilege = usePrivilege(DICT_DATA_PERMISSION.ADD);
   const hasUpdatePrivilege = usePrivilege(DICT_DATA_PERMISSION.UPDATE);
@@ -58,13 +59,20 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
       setTableLoading(true);
       const res = await dictApi.queryDictData(dictId);
 
-      // 轉換 enabled 字段
-      const dataWithEnabled = res.data.map((item) => ({
-        ...item,
-        enabled: !item.disabledFlag,
+      // 轉換為 DictDataVO 格式
+      const dataWithEnabled = res.data.map(item => ({
+        dictDataId: 0, // TODO: 需要從 API 返回
+        dictId: dictId,
+        dictCode: item.dictCode,
+        dataValue: item.dataValue,
+        dataLabel: item.dataLabel,
+        sortOrder: item.dataSort,
+        remark: item.remark,
+        disabledFlag: item.dictDisabledFlag ? 1 : 0,
+        enabled: !item.dictDisabledFlag,
       }));
 
-      setDictDataList(dataWithEnabled);
+      setDictDataList(dataWithEnabled as any);
     } catch (error) {
       console.error('Failed to fetch dict data:', error);
     } finally {
@@ -83,7 +91,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
 
   // 前端過濾數據
   const filteredTableData = useMemo(() => {
-    return dictDataList.filter((item) => {
+    return dictDataList.filter(item => {
       // 關鍵字過濾
       let keywordsMatch = true;
       if (keywords) {
@@ -114,7 +122,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
   };
 
   // 處理啟用/禁用切換
-  const handleChangeDisabled = async (checked: boolean, record: DictDataVO) => {
+  const handleChangeDisabled = async (_checked: boolean, record: DictDataVO) => {
     try {
       await dictApi.updateDictDataDisabled(record.dictDataId);
       message.success('操作成功');
@@ -181,7 +189,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
           checked={record.enabled}
           checkedChildren="啟用中"
           unCheckedChildren="已禁用"
-          onChange={(_checked) => handleChangeDisabled(checked, record)}
+          onChange={_checked => handleChangeDisabled(_checked, record)}
         />
       ),
     },
@@ -236,7 +244,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
           <Form.Item label="關鍵字">
             <Input
               value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
+              onChange={e => setKeywords(e.target.value)}
               placeholder="關鍵字"
               allowClear
               style={{ width: 300 }}
@@ -244,11 +252,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
           </Form.Item>
 
           <Form.Item label="禁用">
-            <BooleanSelect
-              value={disabledFlag}
-              onChange={setDisabledFlag}
-              style={{ width: 150 }}
-            />
+            <BooleanSelect value={disabledFlag} onChange={setDisabledFlag} style={{ width: 150 }} />
           </Form.Item>
 
           <Form.Item>
@@ -301,9 +305,7 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({
           bordered
         />
 
-        <div style={{ marginTop: 16, textAlign: 'right' }}>
-          共計 {filteredTableData.length} 條
-        </div>
+        <div style={{ marginTop: 16, textAlign: 'right' }}>共計 {filteredTableData.length} 條</div>
       </Drawer>
 
       {/* 字典值表單 Modal */}

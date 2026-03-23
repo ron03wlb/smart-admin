@@ -50,15 +50,26 @@ describe('DepartmentFormModal', () => {
   };
 
   const findSubmitButton = () => findModalButton('.ant-modal-footer .ant-btn-primary');
-  const findCancelButton = () => findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
+  const findCancelButton = () =>
+    findModalButton('.ant-modal-footer .ant-btn:not(.ant-btn-primary)');
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Mock useModal default (add mode)
     vi.mocked(useModal).mockReturnValue({
+      visible: false,
+      setVisible: vi.fn(),
+      formData: {},
+      setFormData: vi.fn(),
       isEdit: false,
-    });
+      loading: false,
+      setLoading: vi.fn(),
+      open: vi.fn(),
+      close: vi.fn(),
+      handleSubmit: vi.fn(),
+      reset: vi.fn(),
+    } as any);
   });
 
   // ==================== 基本渲染測試 ====================
@@ -98,8 +109,18 @@ describe('DepartmentFormModal', () => {
   describe('Basic Rendering - Edit Mode', () => {
     it('should render in edit mode', () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       const editData: DepartmentFormData = {
         departmentId: 1,
@@ -116,8 +137,18 @@ describe('DepartmentFormModal', () => {
 
     it('should have update button in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       const editData: DepartmentFormData = {
         departmentId: 1,
@@ -234,8 +265,18 @@ describe('DepartmentFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit form successfully in edit mode', async () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       vi.mocked(departmentApi.updateDepartment).mockResolvedValue({
         code: 200,
@@ -266,8 +307,18 @@ describe('DepartmentFormModal', () => {
 
     it('should prevent parent from being self', async () => {
       vi.mocked(useModal).mockReturnValue({
+        visible: false,
+        setVisible: vi.fn(),
+        formData: {},
+        setFormData: vi.fn(),
         isEdit: true,
-      });
+        loading: false,
+        setLoading: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
+        handleSubmit: vi.fn(),
+        reset: vi.fn(),
+      } as any);
 
       const editData: DepartmentFormData = {
         departmentId: 5,

@@ -322,11 +322,7 @@ describe('userSlice', () => {
         msg: 'API 錯誤',
       });
 
-      const result = await login(mockLoginForm)(
-        vi.fn(),
-        vi.fn(),
-        {}
-      );
+      const result = await login(mockLoginForm)(vi.fn(), vi.fn(), {});
 
       expect(result.type).toBe(login.rejected.type);
     });
@@ -454,6 +450,7 @@ describe('userSlice', () => {
           2: [0, 1],
           3: [0, 1],
         },
+        unreadMessageCount: 0,
         loading: false,
         error: null,
       },

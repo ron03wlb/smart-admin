@@ -9,18 +9,7 @@
  */
 
 import { useState } from 'react';
-import {
-  Card,
-  Input,
-  Button,
-  Table,
-  Space,
-  Radio,
-  Tag,
-  Typography,
-  Modal,
-  message,
-} from 'antd';
+import { Card, Input, Button, Table, Space, Radio, Tag, Typography, Modal, message } from 'antd';
 import {
   SearchOutlined,
   ReloadOutlined,
@@ -146,9 +135,7 @@ export default function EmployeePage() {
       dataIndex: 'disabledFlag',
       width: EMPLOYEE_TABLE_COLUMNS_WIDTH.disabledFlag,
       render: (disabledFlag: boolean) => (
-        <Tag color={disabledFlag ? 'error' : 'processing'}>
-          {disabledFlag ? '禁用' : '啟用'}
-        </Tag>
+        <Tag color={disabledFlag ? 'error' : 'processing'}>{disabledFlag ? '禁用' : '啟用'}</Tag>
       ),
     },
     {
@@ -330,10 +317,7 @@ export default function EmployeePage() {
 
           {/* Search Bar */}
           <Space style={{ marginBottom: 16, width: '100%' }} wrap>
-            <Radio.Group
-              value={queryForm.disabledFlag}
-              onChange={handleStatusChange}
-            >
+            <Radio.Group value={queryForm.disabledFlag} onChange={handleStatusChange}>
               <Radio.Button value={undefined}>全部</Radio.Button>
               <Radio.Button value={false}>啟用</Radio.Button>
               <Radio.Button value={true}>禁用</Radio.Button>
@@ -367,10 +351,7 @@ export default function EmployeePage() {
               添加成員
             </PrivilegeButton>
 
-            <PrivilegeButton
-              privilege={EMPLOYEE_PERMISSION.DELETE}
-              onClick={handleBatchDelete}
-            >
+            <PrivilegeButton privilege={EMPLOYEE_PERMISSION.DELETE} onClick={handleBatchDelete}>
               批量刪除
             </PrivilegeButton>
           </Space>
@@ -383,12 +364,12 @@ export default function EmployeePage() {
           dataSource={tableData}
           loading={loading}
           pagination={{
-            current: pagination.pageNum,
+            current: pagination.current,
             pageSize: pagination.pageSize,
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             pageSizeOptions: ['10', '20', '50', '100'],
           }}
           onChange={handleTableChange}

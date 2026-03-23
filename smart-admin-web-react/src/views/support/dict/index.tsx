@@ -8,7 +8,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Card, Table, Switch, Space, message, Modal } from 'antd';
-import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { dictApi } from '@/api/support/dictApi';
 import { usePrivilege } from '@/hooks/usePrivilege';
@@ -39,7 +45,9 @@ const DictList: React.FC = () => {
   const [dictFormModalVisible, setDictFormModalVisible] = useState(false);
   const [dictDataDrawerVisible, setDictDataDrawerVisible] = useState(false);
   const [currentDict, setCurrentDict] = useState<DictVO | undefined>();
-  const [currentDictForData, setCurrentDictForData] = useState<{ dictId: number; dictCode: string } | undefined>();
+  const [currentDictForData, setCurrentDictForData] = useState<
+    { dictId: number; dictCode: string } | undefined
+  >();
 
   // 查詢數據
   const fetchData = async () => {
@@ -95,7 +103,7 @@ const DictList: React.FC = () => {
   };
 
   // 處理啟用/禁用切換
-  const handleChangeDisabled = async (checked: boolean, record: DictVO) => {
+  const handleChangeDisabled = async (_checked: boolean, record: DictVO) => {
     try {
       await dictApi.updateDisabled(record.dictId);
       message.success('操作成功');
@@ -184,7 +192,7 @@ const DictList: React.FC = () => {
           checked={record.enabled}
           checkedChildren="啟用中"
           unCheckedChildren="已禁用"
-          onChange={(_checked) => handleChangeDisabled(checked, record)}
+          onChange={_checked => handleChangeDisabled(_checked, record)}
         />
       ),
     },
@@ -280,7 +288,7 @@ const DictList: React.FC = () => {
             total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共${total}條`,
+            showTotal: total => `共${total}條`,
             onChange: handleTableChange,
           }}
           rowSelection={{
