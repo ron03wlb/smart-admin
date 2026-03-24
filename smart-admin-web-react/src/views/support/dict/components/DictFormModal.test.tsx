@@ -74,7 +74,14 @@ describe('DictFormModal', () => {
     });
 
     it('should render edit mode modal', () => {
-      render(<DictFormModal visible={true} dict={mockDict} onClose={mockOnClose} onSuccess={mockOnSuccess} />);
+      render(
+        <DictFormModal
+          visible={true}
+          dict={mockDict}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       expect(screen.getByText('編輯字典')).toBeInTheDocument();
     });
@@ -132,7 +139,14 @@ describe('DictFormModal', () => {
 
   describe('Form Submission - Edit Mode', () => {
     it('should submit updated dict successfully', async () => {
-      render(<DictFormModal visible={true} dict={mockDict} onClose={mockOnClose} onSuccess={mockOnSuccess} />);
+      render(
+        <DictFormModal
+          visible={true}
+          dict={mockDict}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // Update name
       const nameInput = screen.getByDisplayValue('性別');

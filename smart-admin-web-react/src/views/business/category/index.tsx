@@ -14,7 +14,11 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { usePrivilege } from '@/hooks/usePrivilege';
 import { categoryApi } from '@/api/business/categoryApi';
-import { CATEGORY_PERMISSION, CATEGORY_TYPE_LABELS, DISABLED_STATUS_LABELS } from '@/constants/business/categoryConst';
+import {
+  CATEGORY_PERMISSION,
+  CATEGORY_TYPE_LABELS,
+  DISABLED_STATUS_LABELS,
+} from '@/constants/business/categoryConst';
 import type { CategoryVO, CategoryTypeEnum } from './types';
 import CategoryFormModal from './components/CategoryFormModal';
 
@@ -115,7 +119,8 @@ export function CategoryTreeTable({ categoryType, privilegePrefix = '' }: Catego
       dataIndex: 'categoryType',
       key: 'categoryType',
       width: 100,
-      render: (categoryType: number) => CATEGORY_TYPE_LABELS[categoryType as keyof typeof CATEGORY_TYPE_LABELS] || '-',
+      render: (categoryType: number) =>
+        CATEGORY_TYPE_LABELS[categoryType as keyof typeof CATEGORY_TYPE_LABELS] || '-',
     },
     {
       title: '排序',
@@ -205,7 +210,11 @@ export function CategoryTreeTable({ categoryType, privilegePrefix = '' }: Catego
       />
 
       {/* 表單模態框 */}
-      <CategoryFormModal ref={formModalRef} categoryType={categoryType} onSuccess={loadCategoryTree} />
+      <CategoryFormModal
+        ref={formModalRef}
+        categoryType={categoryType}
+        onSuccess={loadCategoryTree}
+      />
     </Card>
   );
 }

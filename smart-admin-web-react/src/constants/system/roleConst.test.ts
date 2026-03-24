@@ -7,11 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  ROLE_PERMISSION,
-  ROLE_VALIDATION,
-  ROLE_TABLE_COLUMNS_WIDTH,
-} from './roleConst';
+import { ROLE_PERMISSION, ROLE_VALIDATION, ROLE_TABLE_COLUMNS_WIDTH } from './roleConst';
 
 describe('roleConst', () => {
   // ==================== ROLE_PERMISSION Tests ====================

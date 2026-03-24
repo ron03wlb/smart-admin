@@ -8,7 +8,11 @@
 
 import request from '@/utils/request';
 import { ResponseDTO, PageResult } from '@/api/types/response';
-import type { PositionVO, PositionFormData, PositionQueryForm } from '@/views/system/position/types';
+import type {
+  PositionVO,
+  PositionFormData,
+  PositionQueryForm,
+} from '@/views/system/position/types';
 
 /**
  * 職位 API

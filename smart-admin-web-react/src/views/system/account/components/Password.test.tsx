@@ -284,10 +284,13 @@ describe('Password', () => {
       await new Promise(resolve => setTimeout(resolve, 200));
 
       // Wait for form reset to complete - re-query the input to get fresh DOM state
-      await waitFor(() => {
-        const updatedOldPasswordInput = screen.getByLabelText('原密碼') as HTMLInputElement;
-        expect(updatedOldPasswordInput.value).toBe('');
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          const updatedOldPasswordInput = screen.getByLabelText('原密碼') as HTMLInputElement;
+          expect(updatedOldPasswordInput.value).toBe('');
+        },
+        { timeout: 3000 }
+      );
     });
 
     it('should submit with complex password when complexity is enabled', async () => {
@@ -335,7 +338,9 @@ describe('Password', () => {
   describe('Error Handling', () => {
     it('should handle API error when loading complexity config', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      (employeeApi.getPasswordComplexityEnabled as any).mockRejectedValue(new Error('Network error'));
+      (employeeApi.getPasswordComplexityEnabled as any).mockRejectedValue(
+        new Error('Network error')
+      );
 
       render(<Password />);
 
@@ -386,7 +391,7 @@ describe('Password', () => {
     it('should show loading state while submitting', async () => {
       // Mock a delayed API call
       let resolvePromise: any;
-      const delayedPromise = new Promise((resolve) => {
+      const delayedPromise = new Promise(resolve => {
         resolvePromise = resolve;
       });
 
@@ -412,7 +417,9 @@ describe('Password', () => {
 
       // Check loading state immediately after click
       await waitFor(() => {
-        const loadingButton = screen.getByRole('button', { name: /修改密碼/i }) as HTMLButtonElement;
+        const loadingButton = screen.getByRole('button', {
+          name: /修改密碼/i,
+        }) as HTMLButtonElement;
         expect(loadingButton.className).toContain('ant-btn-loading');
       });
 

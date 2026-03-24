@@ -8,7 +8,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { departmentApi } from './departmentApi';
-import type { DepartmentVO, DepartmentAddForm, DepartmentUpdateForm } from '@/views/system/department/types';
+import type {
+  DepartmentVO,
+  DepartmentAddForm,
+  DepartmentUpdateForm,
+} from '@/views/system/department/types';
 import type { ResponseDTO } from '@/api/types/response';
 
 // Mock request module

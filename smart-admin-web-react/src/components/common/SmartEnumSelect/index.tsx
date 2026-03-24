@@ -16,6 +16,7 @@
 
 import { useMemo } from 'react';
 import { Select, SelectProps } from 'antd';
+import type { DefaultOptionType } from 'antd/es/select';
 import { getValueDescList } from '@/utils/smart-enum';
 
 export interface SmartEnumSelectProps<T = number | string> extends Omit<SelectProps<T>, 'options'> {
@@ -73,7 +74,7 @@ function SmartEnumSelect<T = number | string>(props: SmartEnumSelectProps<T>) {
         label: item.desc,
         value: item.value,
         disabled: disabledOptions.includes(item.value),
-      }));
+      })) as DefaultOptionType[];
   }, [enumName, disabledOptions, hiddenOptions]);
 
   /**

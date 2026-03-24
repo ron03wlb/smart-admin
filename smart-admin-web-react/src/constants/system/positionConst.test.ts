@@ -70,18 +70,16 @@ describe('positionConst', () => {
         'operate',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(POSITION_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
-          typeof POSITION_TABLE_COLUMNS_WIDTH[
-            column as keyof typeof POSITION_TABLE_COLUMNS_WIDTH
-          ]
+          typeof POSITION_TABLE_COLUMNS_WIDTH[column as keyof typeof POSITION_TABLE_COLUMNS_WIDTH]
         ).toBe('number');
       });
     });
 
     it('should have reasonable width values', () => {
-      Object.values(POSITION_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(POSITION_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(500);
       });

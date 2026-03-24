@@ -13,7 +13,10 @@ import type { ColumnsType } from 'antd/es/table';
 import { feedbackApi } from '@/api/support/feedbackApi';
 import { useTable } from '@/hooks/useTable';
 import { formatDateTime } from '@/utils/date';
-import { FEEDBACK_PERMISSION, FEEDBACK_TABLE_COLUMNS_WIDTH } from '@/constants/support/feedbackConst';
+import {
+  FEEDBACK_PERMISSION,
+  FEEDBACK_TABLE_COLUMNS_WIDTH,
+} from '@/constants/support/feedbackConst';
 import { usePrivilege } from '@/hooks/usePrivilege';
 import type { FeedbackVO, FeedbackQueryForm } from './types';
 
@@ -27,7 +30,10 @@ const FeedbackList: React.FC = () => {
   const hasQueryPermission = usePrivilege(FEEDBACK_PERMISSION.QUERY);
 
   // 使用 useTable Hook
-  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<FeedbackVO, FeedbackQueryForm>({
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<
+    FeedbackVO,
+    FeedbackQueryForm
+  >({
     defaultQueryForm: {
       searchWord: undefined,
       startDate: undefined,
@@ -48,7 +54,7 @@ const FeedbackList: React.FC = () => {
   // 處理搜索
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    setQueryForm((prev) => ({
+    setQueryForm(prev => ({
       ...prev,
       searchWord: values.searchWord,
       startDate: values.startDate,
@@ -153,9 +159,7 @@ const FeedbackList: React.FC = () => {
   if (!hasQueryPermission) {
     return (
       <Card>
-        <div style={{ textAlign: 'center', padding: '50px 0' }}>
-          您沒有權限查看意見反饋列表
-        </div>
+        <div style={{ textAlign: 'center', padding: '50px 0' }}>您沒有權限查看意見反饋列表</div>
       </Card>
     );
   }
@@ -165,22 +169,11 @@ const FeedbackList: React.FC = () => {
       {/* 搜索表單 */}
       <Card size="small" style={{ marginBottom: 16 }}>
         <Form form={form} layout="inline">
-          <Form.Item
-            name="searchWord"
-            label="關鍵字"
-            style={{ marginBottom: 16 }}
-          >
-            <Input
-              placeholder="反饋內容/創建人"
-              allowClear
-              style={{ width: 240 }}
-            />
+          <Form.Item name="searchWord" label="關鍵字" style={{ marginBottom: 16 }}>
+            <Input placeholder="反饋內容/創建人" allowClear style={{ width: 240 }} />
           </Form.Item>
 
-          <Form.Item
-            label="創建日期"
-            style={{ marginBottom: 16 }}
-          >
+          <Form.Item label="創建日期" style={{ marginBottom: 16 }}>
             <RangePicker
               format="YYYY-MM-DD"
               onChange={handleDateRangeChange}
@@ -190,17 +183,10 @@ const FeedbackList: React.FC = () => {
 
           <Form.Item style={{ marginBottom: 16 }}>
             <Space>
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
-              >
+              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                 查詢
               </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleReset}
-              >
+              <Button icon={<ReloadOutlined />} onClick={handleReset}>
                 重置
               </Button>
             </Space>
@@ -221,10 +207,10 @@ const FeedbackList: React.FC = () => {
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             onChange: (page, pageSize) => {
               const values = form.getFieldsValue();
-              setQueryForm((prev) => ({
+              setQueryForm(prev => ({
                 ...prev,
                 ...values,
                 pageNum: page,

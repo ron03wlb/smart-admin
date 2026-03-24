@@ -10,10 +10,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Form, Input, Button, Card, Table, Space, DatePicker, Modal } from 'antd';
 import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs, { type Dayjs } from 'dayjs';
+import { type Dayjs } from 'dayjs';
 import { helpDocApi } from '@/api/support/helpDocApi';
 import { usePrivilege } from '@/hooks/usePrivilege';
-import { HELP_DOC_PERMISSION, HELP_DOC_TABLE_COLUMNS_WIDTH } from '@/constants/support/helpDocConst';
+import {
+  HELP_DOC_PERMISSION,
+  HELP_DOC_TABLE_COLUMNS_WIDTH,
+} from '@/constants/support/helpDocConst';
 import type { HelpDocVO, HelpDocQueryForm } from '../types';
 import HelpDocFormDrawer, { type HelpDocFormDrawerRef } from './HelpDocFormDrawer';
 import { Link } from 'react-router-dom';
@@ -91,7 +94,7 @@ const HelpDocList: React.FC<HelpDocListProps> = ({ helpDocCatalogId }) => {
     fetchData();
   };
 
-  const handleCreateDateChange = (dates: [Dayjs, Dayjs] | null) => {
+  const handleCreateDateChange = (dates: any, _dateStrings: [string, string]) => {
     setCreateDate(dates);
     if (dates) {
       form.setFieldsValue({
@@ -185,21 +188,12 @@ const HelpDocList: React.FC<HelpDocListProps> = ({ helpDocCatalogId }) => {
       render: (_: any, record: HelpDocVO) => (
         <div>
           {hasUpdatePrivilege && (
-            <Button
-              type="link"
-              size="small"
-              onClick={() => handleAddOrUpdate(record.helpDocId)}
-            >
+            <Button type="link" size="small" onClick={() => handleAddOrUpdate(record.helpDocId)}>
               編輯
             </Button>
           )}
           {hasDeletePrivilege && (
-            <Button
-              type="link"
-              size="small"
-              danger
-              onClick={() => handleDelete(record.helpDocId)}
-            >
+            <Button type="link" size="small" danger onClick={() => handleDelete(record.helpDocId)}>
               刪除
             </Button>
           )}
@@ -218,7 +212,7 @@ const HelpDocList: React.FC<HelpDocListProps> = ({ helpDocCatalogId }) => {
         <Form.Item label="關鍵字">
           <Input
             value={form.getFieldValue('keywords')}
-            onChange={(e) => form.setFieldValue('keywords', e.target.value)}
+            onChange={e => form.setFieldValue('keywords', e.target.value)}
             placeholder="標題、作者"
             style={{ width: 300 }}
           />
@@ -267,11 +261,7 @@ const HelpDocList: React.FC<HelpDocListProps> = ({ helpDocCatalogId }) => {
       <Card size="small" style={{ flex: 1 }}>
         <div style={{ marginBottom: 16 }}>
           {hasAddPrivilege && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => handleAddOrUpdate()}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => handleAddOrUpdate()}>
               新建
             </Button>
           )}
@@ -288,7 +278,7 @@ const HelpDocList: React.FC<HelpDocListProps> = ({ helpDocCatalogId }) => {
             total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共${total}條`,
+            showTotal: total => `共${total}條`,
             onChange: handleTableChange,
           }}
           size="small"

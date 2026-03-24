@@ -291,7 +291,7 @@ describe('useModal', () => {
       let resolveSubmit: any;
       const onSubmit = vi.fn(
         () =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             resolveSubmit = resolve;
           })
       );

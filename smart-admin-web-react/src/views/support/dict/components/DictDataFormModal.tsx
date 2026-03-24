@@ -98,12 +98,7 @@ const DictDataFormModal: React.FC<DictDataFormModalProps> = ({
       width={600}
       destroyOnClose
     >
-      <Form
-        form={form}
-        labelCol={{ span: 5 }}
-        wrapperCol={{ span: 16 }}
-        style={{ marginTop: 20 }}
-      >
+      <Form form={form} labelCol={{ span: 5 }} wrapperCol={{ span: 16 }} style={{ marginTop: 20 }}>
         <Form.Item name="dictDataId" hidden>
           <Input />
         </Form.Item>
@@ -142,11 +137,7 @@ const DictDataFormModal: React.FC<DictDataFormModalProps> = ({
         </Form.Item>
 
         <Form.Item label="備註" name="remark">
-          <Input.TextArea
-            rows={4}
-            placeholder="請輸入備註"
-            style={{ resize: 'none' }}
-          />
+          <Input.TextArea rows={4} placeholder="請輸入備註" style={{ resize: 'none' }} />
         </Form.Item>
       </Form>
     </Modal>

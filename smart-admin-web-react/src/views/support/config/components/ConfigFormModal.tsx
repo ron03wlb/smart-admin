@@ -9,12 +9,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  Form,
-  Input,
-  message,
-} from 'antd';
+import { Modal, Form, Input, message } from 'antd';
 import { useModal } from '@/hooks/useModal';
 import { configApi } from '@/api/support/configApi';
 import type { ConfigFormData } from '../types';
@@ -133,17 +128,16 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
       cancelText="取消"
       destroyOnClose
     >
-      <Form
-        form={form}
-        layout="horizontal"
-        labelCol={{ span: 5 }}
-      >
+      <Form form={form} layout="horizontal" labelCol={{ span: 5 }}>
         <Form.Item
           label="參數 Key"
           name="configKey"
           rules={[
             { required: true, message: '請輸入參數 Key' },
-            { max: CONFIG_VALIDATION.KEY_MAX_LENGTH, message: `參數 Key 不能大於${CONFIG_VALIDATION.KEY_MAX_LENGTH}個字符` },
+            {
+              max: CONFIG_VALIDATION.KEY_MAX_LENGTH,
+              message: `參數 Key 不能大於${CONFIG_VALIDATION.KEY_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <Input placeholder="請輸入參數 Key" />
@@ -154,7 +148,10 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
           name="configName"
           rules={[
             { required: true, message: '請輸入參數名稱' },
-            { max: CONFIG_VALIDATION.NAME_MAX_LENGTH, message: `參數名稱不能大於${CONFIG_VALIDATION.NAME_MAX_LENGTH}個字符` },
+            {
+              max: CONFIG_VALIDATION.NAME_MAX_LENGTH,
+              message: `參數名稱不能大於${CONFIG_VALIDATION.NAME_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <Input placeholder="請輸入參數名稱" />
@@ -165,7 +162,10 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
           name="configValue"
           rules={[
             { required: true, message: '請輸入參數值' },
-            { max: CONFIG_VALIDATION.VALUE_MAX_LENGTH, message: `參數值不能大於${CONFIG_VALIDATION.VALUE_MAX_LENGTH}個字符` },
+            {
+              max: CONFIG_VALIDATION.VALUE_MAX_LENGTH,
+              message: `參數值不能大於${CONFIG_VALIDATION.VALUE_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <Input placeholder="請輸入參數值" />
@@ -175,7 +175,10 @@ export const ConfigFormModal: React.FC<ConfigFormModalProps> = ({
           label="備註"
           name="remark"
           rules={[
-            { max: CONFIG_VALIDATION.REMARK_MAX_LENGTH, message: `備註不能大於${CONFIG_VALIDATION.REMARK_MAX_LENGTH}個字符` },
+            {
+              max: CONFIG_VALIDATION.REMARK_MAX_LENGTH,
+              message: `備註不能大於${CONFIG_VALIDATION.REMARK_MAX_LENGTH}個字符`,
+            },
           ]}
         >
           <TextArea

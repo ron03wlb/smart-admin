@@ -157,7 +157,7 @@ export function useModal<TFormData extends Record<string, any>>(
   const close = useCallback(() => {
     setVisible(false);
 
-      // 重置表單
+    // 重置表單
     setFormData(defaultFormData);
 
     // 執行關閉回調

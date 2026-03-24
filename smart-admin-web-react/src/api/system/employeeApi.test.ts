@@ -8,7 +8,12 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { employeeApi } from './employeeApi';
-import type { EmployeeVO, EmployeeQueryForm, EmployeeAddForm, EmployeeUpdateForm } from '@/views/system/employee/types';
+import type {
+  EmployeeVO,
+  EmployeeQueryForm,
+  EmployeeAddForm,
+  EmployeeUpdateForm,
+} from '@/views/system/employee/types';
 import type { ResponseDTO, PageResult } from '@/api/types/response';
 
 // Mock request module
@@ -166,7 +171,9 @@ describe('employeeApi', () => {
 
       const result = await employeeApi.queryEmployeeByDeptId(departmentId);
 
-      expect(request.get).toHaveBeenCalledWith(`/employee/getAllEmployeeByDepartmentId/${departmentId}`);
+      expect(request.get).toHaveBeenCalledWith(
+        `/employee/getAllEmployeeByDepartmentId/${departmentId}`
+      );
       expect(result).toEqual(mockResponse);
     });
   });

@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Alert, Form, Input, Button, Table, DatePicker, Space } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs, { type Dayjs } from 'dayjs';
+import { type Dayjs } from 'dayjs';
 import { heartBeatApi } from '@/api/support/heartBeatApi';
 import { HEART_BEAT_TABLE_COLUMNS_WIDTH } from '@/constants/support/heartBeatConst';
 import type { HeartBeatVO, HeartBeatQueryForm } from './types';
@@ -67,7 +67,7 @@ const HeartBeatListPage: React.FC = () => {
     fetchData();
   };
 
-  const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
+  const handleDateChange = (dates: any, _dateStrings: [string, string]) => {
     setCreateDateRange(dates);
     if (dates) {
       form.setFieldsValue({
@@ -123,7 +123,7 @@ const HeartBeatListPage: React.FC = () => {
         message={<h4>Smart-Heart-Beat 心跳服務介紹：</h4>}
         description={
           <pre>
-{`簡介：Smart-Heart-Beat 是心跳服務，用於監測Java應用的狀態等其他信息。
+            {`簡介：Smart-Heart-Beat 是心跳服務，用於監測Java應用的狀態等其他信息。
 原理：Java後端會在項目啟動的時候開啟一個線程，每隔一段時間將該應用的IP、進程號更新到數據庫t_heart_beat_record表中。
 
 用途：
@@ -141,18 +141,14 @@ const HeartBeatListPage: React.FC = () => {
         <Form.Item label="關鍵字">
           <Input
             value={form.getFieldValue('keywords')}
-            onChange={(e) => form.setFieldValue('keywords', e.target.value)}
+            onChange={e => form.setFieldValue('keywords', e.target.value)}
             placeholder="關鍵字"
             style={{ width: 300 }}
           />
         </Form.Item>
 
         <Form.Item label="心跳時間">
-          <RangePicker
-            value={createDateRange}
-            onChange={handleDateChange}
-            style={{ width: 240 }}
-          />
+          <RangePicker value={createDateRange} onChange={handleDateChange} style={{ width: 240 }} />
         </Form.Item>
 
         <Form.Item name="pageNum" hidden>
@@ -194,7 +190,7 @@ const HeartBeatListPage: React.FC = () => {
           total,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total) => `共${total}條`,
+          showTotal: total => `共${total}條`,
           onChange: handleTableChange,
         }}
         size="small"

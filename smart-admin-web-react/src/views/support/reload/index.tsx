@@ -90,20 +90,12 @@ const ReloadListPage: React.FC = () => {
       render: (_: any, record: ReloadVO) => (
         <div>
           {hasExecutePrivilege && (
-            <Button
-              type="link"
-              size="small"
-              onClick={() => handleDoReload(record.tag)}
-            >
+            <Button type="link" size="small" onClick={() => handleDoReload(record.tag)}>
               執行
             </Button>
           )}
           {hasResultPrivilege && (
-            <Button
-              type="link"
-              size="small"
-              onClick={() => handleShowResult(record.tag)}
-            >
+            <Button type="link" size="small" onClick={() => handleShowResult(record.tag)}>
               查看結果
             </Button>
           )}
@@ -118,7 +110,7 @@ const ReloadListPage: React.FC = () => {
         message={<h4>Smart-Reload 心跳服務介紹：</h4>}
         description={
           <pre>
-{`簡介：SmartReload是一個可以在不重啟進程的情況下動態重新加載配置或者執行某些預先設置的代碼。
+            {`簡介：SmartReload是一個可以在不重啟進程的情況下動態重新加載配置或者執行某些預先設置的代碼。
 
 原理：
 - Java後端會在項目啟動的時候開啟一個Daemon線程，這個Daemon線程會每隔幾秒輪詢t_smart_item表的狀態。

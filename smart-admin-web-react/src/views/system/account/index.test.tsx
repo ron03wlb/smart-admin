@@ -33,7 +33,7 @@ describe('AccountPage', () => {
     // Create mock store
     store = configureStore({
       reducer: {
-        user: userReducer,
+        user: userReducer as any,
       },
       preloadedState: {
         user: {

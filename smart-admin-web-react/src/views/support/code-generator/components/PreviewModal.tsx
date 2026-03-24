@@ -117,11 +117,14 @@ const PreviewModal = forwardRef<PreviewModalRef>((_props, ref) => {
    * 複製代碼
    */
   const handleCopy = () => {
-    navigator.clipboard.writeText(codeContent).then(() => {
-      message.success('複製成功');
-    }).catch(() => {
-      message.error('複製失敗');
-    });
+    navigator.clipboard
+      .writeText(codeContent)
+      .then(() => {
+        message.success('複製成功');
+      })
+      .catch(() => {
+        message.error('複製失敗');
+      });
   };
 
   // 暴露方法給父組件
@@ -145,7 +148,7 @@ const PreviewModal = forwardRef<PreviewModalRef>((_props, ref) => {
   /**
    * Tabs 配置
    */
-  const fileTabs = getFileList().map((file) => ({
+  const fileTabs = getFileList().map(file => ({
     key: file,
     label: file,
   }));
@@ -161,11 +164,7 @@ const PreviewModal = forwardRef<PreviewModalRef>((_props, ref) => {
     >
       {/* 語言選擇和下載按鈕 */}
       <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <Radio.Group
-          value={languageType}
-          onChange={handleLanguageChange}
-          buttonStyle="solid"
-        >
+        <Radio.Group value={languageType} onChange={handleLanguageChange} buttonStyle="solid">
           <Radio.Button value={LANGUAGE_LIST[0]}>JavaScript代碼</Radio.Button>
           <Radio.Button value={LANGUAGE_LIST[1]}>TypeScript代碼</Radio.Button>
           <Radio.Button value={LANGUAGE_LIST[2]}>Java代碼</Radio.Button>

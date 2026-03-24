@@ -10,14 +10,25 @@
 
 import React, { useState, useRef } from 'react';
 import { Button, Form, Input, DatePicker, Row, Col, Table, Tag, Modal, Space, message } from 'antd';
-import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
 
 import { useTable } from '@/hooks/useTable';
 import { changeLogApi } from '@/api/support/changeLogApi';
-import { CHANGE_LOG_PERMISSION, CHANGE_LOG_TYPE_LABELS, CHANGE_LOG_TYPE_COLORS, CHANGE_LOG_TABLE_COLUMNS_WIDTH } from '@/constants/support/changeLogConst';
+import {
+  CHANGE_LOG_PERMISSION,
+  CHANGE_LOG_TYPE_LABELS,
+  CHANGE_LOG_TYPE_COLORS,
+  CHANGE_LOG_TABLE_COLUMNS_WIDTH,
+} from '@/constants/support/changeLogConst';
 import type { ChangeLogVO, ChangeLogQueryForm } from './types';
 import ChangeLogFormModal from './components/ChangeLogFormModal';
 import ChangeLogDetailModal from './components/ChangeLogDetailModal';
@@ -44,7 +55,10 @@ const ChangeLogManagement: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 使用 useTable Hook
-  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<ChangeLogVO, ChangeLogQueryForm>({
+  const { tableData, loading, pagination, query, reset, setQueryForm } = useTable<
+    ChangeLogVO,
+    ChangeLogQueryForm
+  >({
     defaultQueryForm: {
       type: undefined,
       keyword: undefined,
@@ -66,12 +80,16 @@ const ChangeLogManagement: React.FC = () => {
    */
   const handleSearch = () => {
     const values = form.getFieldsValue();
-    setQueryForm((prev) => ({
+    setQueryForm(prev => ({
       ...prev,
       type: values.type,
       keyword: values.keyword,
-      publicDateBegin: values.publicDate?.[0] ? dayjs(values.publicDate[0]).format('YYYY-MM-DD') : undefined,
-      publicDateEnd: values.publicDate?.[1] ? dayjs(values.publicDate[1]).format('YYYY-MM-DD') : undefined,
+      publicDateBegin: values.publicDate?.[0]
+        ? dayjs(values.publicDate[0]).format('YYYY-MM-DD')
+        : undefined,
+      publicDateEnd: values.publicDate?.[1]
+        ? dayjs(values.publicDate[1]).format('YYYY-MM-DD')
+        : undefined,
       createTime: values.createTime ? dayjs(values.createTime).format('YYYY-MM-DD') : undefined,
       link: undefined,
       pageNum: 1, // Reset to first page on search
@@ -171,7 +189,10 @@ const ChangeLogManagement: React.FC = () => {
       dataIndex: 'type',
       width: CHANGE_LOG_TABLE_COLUMNS_WIDTH.type,
       render: (type: number) => (
-        <Tag color={CHANGE_LOG_TYPE_COLORS[type as keyof typeof CHANGE_LOG_TYPE_COLORS]} icon={<CheckCircleOutlined />}>
+        <Tag
+          color={CHANGE_LOG_TYPE_COLORS[type as keyof typeof CHANGE_LOG_TYPE_COLORS]}
+          icon={<CheckCircleOutlined />}
+        >
           {CHANGE_LOG_TYPE_LABELS[type as keyof typeof CHANGE_LOG_TYPE_LABELS]}
         </Tag>
       ),
@@ -199,7 +220,14 @@ const ChangeLogManagement: React.FC = () => {
       dataIndex: 'link',
       width: CHANGE_LOG_TABLE_COLUMNS_WIDTH.link,
       ellipsis: true,
-      render: (link?: string) => (link ? <a href={link} target="_blank" rel="noreferrer">{link}</a> : '-'),
+      render: (link?: string) =>
+        link ? (
+          <a href={link} target="_blank" rel="noreferrer">
+            {link}
+          </a>
+        ) : (
+          '-'
+        ),
     },
     {
       title: '創建時間',
@@ -220,10 +248,19 @@ const ChangeLogManagement: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: ChangeLogVO) => (
         <Space>
-          <PrivilegeButton privilege={CHANGE_LOG_PERMISSION.UPDATE} type="link" onClick={() => handleShowForm(record)}>
+          <PrivilegeButton
+            privilege={CHANGE_LOG_PERMISSION.UPDATE}
+            type="link"
+            onClick={() => handleShowForm(record)}
+          >
             編輯
           </PrivilegeButton>
-          <PrivilegeButton privilege={CHANGE_LOG_PERMISSION.DELETE} type="link" danger onClick={() => handleDelete(record)}>
+          <PrivilegeButton
+            privilege={CHANGE_LOG_PERMISSION.DELETE}
+            type="link"
+            danger
+            onClick={() => handleDelete(record)}
+          >
             刪除
           </PrivilegeButton>
         </Space>

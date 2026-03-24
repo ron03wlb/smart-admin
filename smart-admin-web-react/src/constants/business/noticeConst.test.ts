@@ -66,7 +66,7 @@ describe('noticeConst', () => {
     });
 
     it('should have positive numbers for all widths', () => {
-      Object.values(NOTICE_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(NOTICE_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
       });
     });

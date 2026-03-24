@@ -152,7 +152,6 @@ describe('SmartLoadingComponent', () => {
         expect(spin).toBeInTheDocument();
       });
     });
-
   });
 
   describe('樣式類名', () => {

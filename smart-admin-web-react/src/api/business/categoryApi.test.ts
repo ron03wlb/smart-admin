@@ -27,7 +27,7 @@ describe('categoryApi', () => {
     it('should call POST /category/tree with correct params', async () => {
       const mockParams = { categoryType: 1 };
       const mockResponse = { data: [{ categoryId: 1, categoryName: '測試分類' }] };
-      
+
       vi.mocked(request.post).mockResolvedValueOnce(mockResponse);
 
       const result = await categoryApi.queryCategoryTree(mockParams);

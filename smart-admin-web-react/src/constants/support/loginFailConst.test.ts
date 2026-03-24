@@ -61,7 +61,7 @@ describe('loginFailConst', () => {
         'updateTime',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(LOGIN_FAIL_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
           typeof LOGIN_FAIL_TABLE_COLUMNS_WIDTH[
@@ -72,7 +72,7 @@ describe('loginFailConst', () => {
     });
 
     it('should have reasonable width values', () => {
-      Object.values(LOGIN_FAIL_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(LOGIN_FAIL_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(500);
       });

@@ -75,7 +75,9 @@ describe('DictDataDrawer', () => {
     });
 
     it('should not render when visible is false', () => {
-      render(<DictDataDrawer visible={false} dictId={10} dictCode="GENDER" onClose={mockOnClose} />);
+      render(
+        <DictDataDrawer visible={false} dictId={10} dictCode="GENDER" onClose={mockOnClose} />
+      );
 
       expect(screen.queryByText('字典值')).not.toBeInTheDocument();
     });
@@ -144,7 +146,9 @@ describe('DictDataDrawer', () => {
 
   describe('Drawer Close', () => {
     it('should call onClose when drawer is closed', async () => {
-      const { container } = render(<DictDataDrawer visible={true} dictId={10} dictCode="GENDER" onClose={mockOnClose} />);
+      const { container } = render(
+        <DictDataDrawer visible={true} dictId={10} dictCode="GENDER" onClose={mockOnClose} />
+      );
 
       await waitFor(() => {
         expect(screen.getByText('字典值')).toBeInTheDocument();

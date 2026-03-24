@@ -101,8 +101,14 @@ describe('tenantSlice', () => {
       );
 
       expect(global.localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEYS.TENANT_ID, '200');
-      expect(global.localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEYS.TENANT_TIMEZONE, 'Asia/Tokyo');
-      expect(global.localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEYS.TENANT_CODE, 'jp-tenant');
+      expect(global.localStorage.setItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.TENANT_TIMEZONE,
+        'Asia/Tokyo'
+      );
+      expect(global.localStorage.setItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.TENANT_CODE,
+        'jp-tenant'
+      );
     });
 
     it('應該處理 tenantId 為 null 的情況', () => {
@@ -160,7 +166,10 @@ describe('tenantSlice', () => {
 
     it('應該將租戶代碼保存到 localStorage', () => {
       tenantReducer(undefined, setTenantCode('demo-tenant'));
-      expect(global.localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEYS.TENANT_CODE, 'demo-tenant');
+      expect(global.localStorage.setItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.TENANT_CODE,
+        'demo-tenant'
+      );
     });
   });
 

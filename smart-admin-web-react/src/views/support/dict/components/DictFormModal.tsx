@@ -18,12 +18,7 @@ export interface DictFormModalProps {
   onSuccess: () => void;
 }
 
-const DictFormModal: React.FC<DictFormModalProps> = ({
-  visible,
-  dict,
-  onClose,
-  onSuccess,
-}) => {
+const DictFormModal: React.FC<DictFormModalProps> = ({ visible, dict, onClose, onSuccess }) => {
   const [form] = Form.useForm<DictFormData>();
   const [loading, setLoading] = useState(false);
 
@@ -86,12 +81,7 @@ const DictFormModal: React.FC<DictFormModalProps> = ({
       width={600}
       destroyOnClose
     >
-      <Form
-        form={form}
-        labelCol={{ span: 5 }}
-        wrapperCol={{ span: 19 }}
-        style={{ marginTop: 20 }}
-      >
+      <Form form={form} labelCol={{ span: 5 }} wrapperCol={{ span: 19 }} style={{ marginTop: 20 }}>
         <Form.Item name="dictId" hidden>
           <Input />
         </Form.Item>
@@ -113,11 +103,7 @@ const DictFormModal: React.FC<DictFormModalProps> = ({
         </Form.Item>
 
         <Form.Item label="備註" name="remark">
-          <Input.TextArea
-            rows={4}
-            placeholder="請輸入備註"
-            style={{ resize: 'none' }}
-          />
+          <Input.TextArea rows={4} placeholder="請輸入備註" style={{ resize: 'none' }} />
         </Form.Item>
       </Form>
     </Modal>

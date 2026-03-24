@@ -149,7 +149,7 @@ const tagNavSlice = createSlice({
      * 移除所有標籤
      * 僅保留固定標籤
      */
-    removeAllTags: (state) => {
+    removeAllTags: state => {
       state.tags = state.tags.filter(tag => tag.fixed);
       state.cachedPaths = state.tags.map(tag => tag.path);
       // 激活第一個固定標籤
@@ -185,7 +185,7 @@ const tagNavSlice = createSlice({
     /**
      * 切換 Keep-Alive 狀態
      */
-    toggleKeepAlive: (state) => {
+    toggleKeepAlive: state => {
       state.keepAliveEnabled = !state.keepAliveEnabled;
       if (!state.keepAliveEnabled) {
         // 禁用時清空緩存列表

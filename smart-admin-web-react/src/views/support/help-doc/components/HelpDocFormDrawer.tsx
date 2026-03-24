@@ -58,7 +58,7 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
 
         setContentHtml(data.contentHtml);
 
-        const relationIdList = data.relationList ? data.relationList.map((e) => e.relationId) : [];
+        const relationIdList = data.relationList ? data.relationList.map(e => e.relationId) : [];
         if (relationIdList.length === 1 && relationIdList[0] === 0) {
           setRelateHomeFlag(true);
         } else {
@@ -159,20 +159,12 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
         }
         destroyOnClose
       >
-        <Form
-          form={form}
-          labelCol={{ span: 3 }}
-          wrapperCol={{ span: 20 }}
-        >
+        <Form form={form} labelCol={{ span: 3 }} wrapperCol={{ span: 20 }}>
           <Form.Item name="helpDocId" hidden>
             <Input />
           </Form.Item>
 
-          <Form.Item
-            label="標題"
-            name="title"
-            rules={[{ required: true, message: '請輸入標題' }]}
-          >
+          <Form.Item label="標題" name="title" rules={[{ required: true, message: '請輸入標題' }]}>
             <Input placeholder="請輸入標題" />
           </Form.Item>
 
@@ -184,26 +176,18 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
             <HelpDocCatalogTreeSelect />
           </Form.Item>
 
-          <Form.Item
-            label="作者"
-            name="author"
-            rules={[{ required: true, message: '請輸入作者' }]}
-          >
+          <Form.Item label="作者" name="author" rules={[{ required: true, message: '請輸入作者' }]}>
             <Input placeholder="請輸入作者" />
           </Form.Item>
 
-          <Form.Item
-            label="排序"
-            name="sort"
-            rules={[{ required: true, message: '請輸入排序' }]}
-          >
+          <Form.Item label="排序" name="sort" rules={[{ required: true, message: '請輸入排序' }]}>
             <InputNumber placeholder="值越小越靠前" style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item label="是否首頁顯示">
             <Radio.Group
               value={relateHomeFlag}
-              onChange={(e) => setRelateHomeFlag(e.target.value)}
+              onChange={e => setRelateHomeFlag(e.target.value)}
               buttonStyle="solid"
             >
               <Radio.Button value={true}>首頁顯示</Radio.Button>
@@ -226,7 +210,7 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
             {/* TODO: 集成富文本編輯器（ReactQuill, Draft.js, 或其他） */}
             <TextArea
               value={contentHtml}
-              onChange={(e) => setContentHtml(e.target.value)}
+              onChange={e => setContentHtml(e.target.value)}
               rows={10}
               placeholder="TODO: 需要集成富文本編輯器組件（建議使用 ReactQuill 或 Draft.js）"
             />

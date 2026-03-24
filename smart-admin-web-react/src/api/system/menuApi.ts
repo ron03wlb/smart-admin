@@ -8,11 +8,7 @@
 
 import request from '@/utils/request';
 import type { ResponseDTO } from '@/api/types/response';
-import type {
-  MenuVO,
-  MenuAddForm,
-  MenuUpdateForm,
-} from '@/views/system/menu/types';
+import type { MenuVO, MenuAddForm, MenuUpdateForm } from '@/views/system/menu/types';
 
 /**
  * 菜單管理 API

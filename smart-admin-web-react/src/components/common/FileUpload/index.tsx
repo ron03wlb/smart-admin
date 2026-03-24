@@ -106,20 +106,23 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
   /**
    * 顯示錯誤提示（只顯示一次）
    */
-  const showErrorMsgOnce = useCallback((content: string) => {
-    if (showErrorModalFlag) {
-      Modal.error({
-        title: '提示',
-        content,
-        okType: 'danger',
-        centered: true,
-        onOk() {
-          setShowErrorModalFlag(true);
-        },
-      });
-      setShowErrorModalFlag(false);
-    }
-  }, [showErrorModalFlag]);
+  const showErrorMsgOnce = useCallback(
+    (content: string) => {
+      if (showErrorModalFlag) {
+        Modal.error({
+          title: '提示',
+          content,
+          okType: 'danger',
+          centered: true,
+          onOk() {
+            setShowErrorModalFlag(true);
+          },
+        });
+        setShowErrorModalFlag(false);
+      }
+    },
+    [showErrorModalFlag]
+  );
 
   /**
    * 上傳前校驗
@@ -300,9 +303,7 @@ const FileUpload = forwardRef<FileUploadRef, FileUploadProps>((props, ref) => {
                 <div className="ant-upload-text">{buttonText}</div>
               </div>
             )}
-            {listType === 'text' && (
-              <Button icon={<UploadOutlined />}>{buttonText}</Button>
-            )}
+            {listType === 'text' && <Button icon={<UploadOutlined />}>{buttonText}</Button>}
           </>
         )}
       </Upload>

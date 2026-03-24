@@ -44,7 +44,9 @@ export const serialNumberApi = {
    * @param form 查詢表單
    * @returns 分頁結果
    */
-  queryRecord: (form: SerialNumberRecordQueryForm): Promise<ResponseDTO<PageResult<SerialNumberRecordVO>>> => {
+  queryRecord: (
+    form: SerialNumberRecordQueryForm
+  ): Promise<ResponseDTO<PageResult<SerialNumberRecordVO>>> => {
     return request.post('/support/serialNumber/queryRecord', form);
   },
 };

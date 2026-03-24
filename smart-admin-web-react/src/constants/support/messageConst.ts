@@ -36,7 +36,7 @@ export const MESSAGE_RECEIVE_TYPE_ENUM = {
  * 獲取消息類型描述
  */
 export function getMessageTypeLabel(value: number): string {
-  const entry = Object.values(MESSAGE_TYPE_ENUM).find((item) => item.value === value);
+  const entry = Object.values(MESSAGE_TYPE_ENUM).find(item => item.value === value);
   return entry?.label || '未知';
 }
 
@@ -44,14 +44,14 @@ export function getMessageTypeLabel(value: number): string {
  * 獲取接收人類型描述
  */
 export function getMessageReceiveTypeLabel(value: number): string {
-  const entry = Object.values(MESSAGE_RECEIVE_TYPE_ENUM).find((item) => item.value === value);
+  const entry = Object.values(MESSAGE_RECEIVE_TYPE_ENUM).find(item => item.value === value);
   return entry?.label || '未知';
 }
 
 /**
  * 消息類型選項（用於 Select 組件）
  */
-export const MESSAGE_TYPE_OPTIONS = Object.values(MESSAGE_TYPE_ENUM).map((item) => ({
+export const MESSAGE_TYPE_OPTIONS = Object.values(MESSAGE_TYPE_ENUM).map(item => ({
   value: item.value,
   label: item.label,
 }));
@@ -59,7 +59,7 @@ export const MESSAGE_TYPE_OPTIONS = Object.values(MESSAGE_TYPE_ENUM).map((item) 
 /**
  * 接收人類型選項（用於 Select 組件）
  */
-export const MESSAGE_RECEIVE_TYPE_OPTIONS = Object.values(MESSAGE_RECEIVE_TYPE_ENUM).map((item) => ({
+export const MESSAGE_RECEIVE_TYPE_OPTIONS = Object.values(MESSAGE_RECEIVE_TYPE_ENUM).map(item => ({
   value: item.value,
   label: item.label,
 }));

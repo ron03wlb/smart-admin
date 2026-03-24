@@ -71,9 +71,7 @@ const ReloadResultModal = forwardRef<ReloadResultModalRef>((_, ref) => {
       dataIndex: 'result',
       key: 'result',
       render: (result: boolean) => (
-        <Tag color={result ? 'success' : 'error'}>
-          {result ? '成功' : '失敗'}
-        </Tag>
+        <Tag color={result ? 'success' : 'error'}>{result ? '成功' : '失敗'}</Tag>
       ),
     },
     {
@@ -90,13 +88,7 @@ const ReloadResultModal = forwardRef<ReloadResultModalRef>((_, ref) => {
   ];
 
   return (
-    <Modal
-      open={visible}
-      title="reload結果列表"
-      width="60%"
-      footer={null}
-      onCancel={handleCancel}
-    >
+    <Modal open={visible} title="reload結果列表" width="60%" footer={null} onCancel={handleCancel}>
       <Button
         type="primary"
         size="small"
@@ -117,10 +109,10 @@ const ReloadResultModal = forwardRef<ReloadResultModalRef>((_, ref) => {
         bordered
         scroll={{ y: 350 }}
         expandable={{
-          expandedRowRender: (record) => (
+          expandedRowRender: record => (
             <pre style={{ margin: 0, fontSize: 12 }}>{record.exception}</pre>
           ),
-          rowExpandable: (record) => !!record.exception,
+          rowExpandable: record => !!record.exception,
         }}
       />
     </Modal>

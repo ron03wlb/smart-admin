@@ -23,7 +23,7 @@ const DeleteForm = forwardRef<DeleteFormRef>((_props, ref) => {
   /**
    * 設置數據
    */
-  const setData = (columns: any[], config: any) => {
+  const setData = (_columns: any[], config: any) => {
     const deleteInfo = config?.deleteInfo || {};
 
     const formData = {
@@ -45,7 +45,7 @@ const DeleteForm = forwardRef<DeleteFormRef>((_props, ref) => {
    * 驗證表單
    */
   const validateForm = (): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       form
         .validateFields()
         .then(() => {

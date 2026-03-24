@@ -240,7 +240,13 @@ const TableOperator: React.FC<TableOperatorProps> = props => {
 
           {/* 刷新按鈕 */}
           {showRefresh && (
-            <Button type="text" size="small" icon={<ReloadOutlined />} onClick={onRefresh} title="刷新" />
+            <Button
+              type="text"
+              size="small"
+              icon={<ReloadOutlined />}
+              onClick={onRefresh}
+              title="刷新"
+            />
           )}
 
           {/* 全屏按鈕 */}
@@ -256,7 +262,13 @@ const TableOperator: React.FC<TableOperatorProps> = props => {
 
           {/* 列設置按鈕 */}
           {showColumnSetting && (
-            <Button type="text" size="small" icon={<SettingOutlined />} onClick={onColumnSettingClick} title="列設置" />
+            <Button
+              type="text"
+              size="small"
+              icon={<SettingOutlined />}
+              onClick={onColumnSettingClick}
+              title="列設置"
+            />
           )}
         </Space>
       </div>

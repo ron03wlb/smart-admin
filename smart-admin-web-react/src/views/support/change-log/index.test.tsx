@@ -54,9 +54,7 @@ describe('ChangeLogManagement', () => {
     vi.clearAllMocks();
 
     // Mock queryPage response using test-utils helper
-    (changeLogApi.queryPage as any).mockResolvedValue(
-      createMockPageResponse(mockChangeLogData, 2)
-    );
+    (changeLogApi.queryPage as any).mockResolvedValue(createMockPageResponse(mockChangeLogData, 2));
   });
 
   it('should render change log management page', async () => {

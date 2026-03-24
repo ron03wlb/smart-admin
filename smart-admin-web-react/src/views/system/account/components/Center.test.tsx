@@ -311,7 +311,7 @@ describe('Center', () => {
     it('should show loading state while submitting', async () => {
       // Mock a delayed API call
       let resolvePromise: any;
-      const delayedPromise = new Promise((resolve) => {
+      const delayedPromise = new Promise(resolve => {
         resolvePromise = resolve;
       });
 
@@ -334,7 +334,9 @@ describe('Center', () => {
 
       // Check loading state
       await waitFor(() => {
-        const loadingButton = screen.getByRole('button', { name: /更新個人信息/i }) as HTMLButtonElement;
+        const loadingButton = screen.getByRole('button', {
+          name: /更新個人信息/i,
+        }) as HTMLButtonElement;
         expect(loadingButton.className).toContain('ant-btn-loading');
       });
 

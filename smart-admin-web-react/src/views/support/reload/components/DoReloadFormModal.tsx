@@ -74,11 +74,7 @@ const DoReloadFormModal = forwardRef<DoReloadFormModalRef, DoReloadFormModalProp
         onCancel={handleCancel}
         confirmLoading={loading}
       >
-        <Form
-          form={form}
-          labelCol={{ span: 5 }}
-          style={{ marginTop: 20 }}
-        >
+        <Form form={form} labelCol={{ span: 5 }} style={{ marginTop: 20 }}>
           <Form.Item label="標籤" name="tag">
             <Input disabled />
           </Form.Item>
@@ -91,11 +87,7 @@ const DoReloadFormModal = forwardRef<DoReloadFormModalRef, DoReloadFormModalProp
             <Input placeholder="請輸入運行標識" />
           </Form.Item>
 
-          <Form.Item
-            label="參數"
-            name="args"
-            rules={[{ required: true, message: '請輸入參數值' }]}
-          >
+          <Form.Item label="參數" name="args" rules={[{ required: true, message: '請輸入參數值' }]}>
             <Input placeholder="請輸入參數" />
           </Form.Item>
         </Form>

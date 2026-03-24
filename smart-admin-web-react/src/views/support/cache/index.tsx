@@ -29,7 +29,7 @@ const CacheListPage: React.FC = () => {
     try {
       setTableLoading(true);
       const res = await cacheApi.getAllCacheNames();
-      setTableData(res.data.map((key) => ({ key })));
+      setTableData(res.data.map(key => ({ key })));
     } catch (error) {
       console.error('Failed to fetch cache names:', error);
     } finally {
@@ -82,20 +82,12 @@ const CacheListPage: React.FC = () => {
       render: (_: any, record: CacheItem) => (
         <div>
           {hasDeletePrivilege && (
-            <Button
-              type="link"
-              size="small"
-              onClick={() => handleRemove(record.key)}
-            >
+            <Button type="link" size="small" onClick={() => handleRemove(record.key)}>
               清除
             </Button>
           )}
           {hasKeysPrivilege && (
-            <Button
-              type="link"
-              size="small"
-              onClick={() => handleGetAllKeys(record.key)}
-            >
+            <Button type="link" size="small" onClick={() => handleGetAllKeys(record.key)}>
               獲取所有key
             </Button>
           )}
@@ -110,7 +102,7 @@ const CacheListPage: React.FC = () => {
         message={<h4>緩存介紹：</h4>}
         description={
           <pre>
-{`簡介：SmartAdmin使用的是SpringCache進行管理緩存，SpringCache有多種實現方式，本項目默認採用的是caffeine。
+            {`簡介：SmartAdmin使用的是SpringCache進行管理緩存，SpringCache有多種實現方式，本項目默認採用的是caffeine。
 Caffeine：
 - Caffeine是一個進程內部緩存框架，使用了Java 8最新的[StampedLock]樂觀鎖技術，極大提高緩存並發吞吐量，一個高性能的 Java 緩存庫，被稱為最快緩存。
 其他：

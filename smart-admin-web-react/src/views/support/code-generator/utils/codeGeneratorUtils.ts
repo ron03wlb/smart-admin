@@ -19,7 +19,7 @@ export function convertUpperCamel(str: string): string {
   return str
     .toLowerCase()
     .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join('');
 }
 
@@ -42,19 +42,9 @@ export function convertLowerHyphen(str: string): string {
  */
 export const LANGUAGE_LIST = ['js', 'ts', 'java'];
 
-export const JS_FILE_LIST = [
-  'js/list.vue',
-  'js/form.vue',
-  'js/api.js',
-  'js/const.js',
-];
+export const JS_FILE_LIST = ['js/list.vue', 'js/form.vue', 'js/api.js', 'js/const.js'];
 
-export const TS_FILE_LIST = [
-  'ts/list.vue',
-  'ts/form.vue',
-  'ts/api.ts',
-  'ts/const.ts',
-];
+export const TS_FILE_LIST = ['ts/list.vue', 'ts/form.vue', 'ts/api.ts', 'ts/const.ts'];
 
 export const JAVA_DOMAIN_FILE_LIST = [
   'Entity.java',

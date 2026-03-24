@@ -111,7 +111,7 @@ const tenantSlice = createSlice({
     /**
      * 清除租戶信息
      */
-    clearTenantInfo: (state) => {
+    clearTenantInfo: state => {
       state.tenantId = null;
       state.timezone = 'Asia/Taipei';
       state.tenantCode = 'default';
@@ -137,13 +137,7 @@ const tenantSlice = createSlice({
   },
 });
 
-export const {
-  setTenantInfo,
-  setTenantId,
-  setTimezone,
-  setTenantCode,
-  clearTenantInfo,
-  reset,
-} = tenantSlice.actions;
+export const { setTenantInfo, setTenantId, setTimezone, setTenantCode, clearTenantInfo, reset } =
+  tenantSlice.actions;
 
 export default tenantSlice.reducer;

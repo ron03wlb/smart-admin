@@ -21,7 +21,7 @@ const AccountPage: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState<AccountMenuItem>(menuList[0]);
 
   // 從 Redux 獲取未讀消息數
-  const unreadMessageCount = useAppSelector((state) => state.user.unreadMessageCount || 0);
+  const unreadMessageCount = useAppSelector(state => state.user.unreadMessageCount || 0);
 
   /**
    * 初始化和路由參數處理
@@ -65,7 +65,7 @@ const AccountPage: React.FC = () => {
   /**
    * 菜單項配置
    */
-  const menuItems = menuList.map((menu) => ({
+  const menuItems = menuList.map(menu => ({
     key: menu.menuId,
     label: renderMenuLabel(menu),
   }));
@@ -89,7 +89,9 @@ const AccountPage: React.FC = () => {
 
       {/* 右側內容區 */}
       <div className="account-content">
-        <Suspense fallback={<Spin size="large" style={{ display: 'block', margin: '100px auto' }} />}>
+        <Suspense
+          fallback={<Spin size="large" style={{ display: 'block', margin: '100px auto' }} />}
+        >
           <SelectedComponent />
         </Suspense>
       </div>

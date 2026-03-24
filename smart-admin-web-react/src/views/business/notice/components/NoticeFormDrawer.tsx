@@ -208,16 +208,13 @@ export default function NoticeFormDrawer({
     >
       <Form form={form} layout="vertical" preserve={false} style={{ marginTop: 16 }}>
         <Form.Item label="公告標題" name="title" rules={rules.title}>
-          <Input
-            placeholder="請輸入公告標題"
-            maxLength={NOTICE_VALIDATION.TITLE_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入公告標題" maxLength={NOTICE_VALIDATION.TITLE_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item label="分類" name="noticeTypeId" rules={rules.noticeTypeId}>
           <Select
             placeholder="請選擇分類"
-            options={noticeTypeList.map((item) => ({
+            options={noticeTypeList.map(item => ({
               label: item.noticeTypeName,
               value: item.noticeTypeId,
             }))}
@@ -237,17 +234,11 @@ export default function NoticeFormDrawer({
         </Form.Item>
 
         <Form.Item label="作者" name="author" rules={rules.author}>
-          <Input
-            placeholder="請輸入作者"
-            maxLength={NOTICE_VALIDATION.AUTHOR_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入作者" maxLength={NOTICE_VALIDATION.AUTHOR_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item label="來源" name="source" rules={rules.source}>
-          <Input
-            placeholder="請輸入來源"
-            maxLength={NOTICE_VALIDATION.SOURCE_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入來源" maxLength={NOTICE_VALIDATION.SOURCE_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item label="可見範圍" name="allVisibleFlag" rules={rules.allVisibleFlag}>

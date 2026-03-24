@@ -204,14 +204,24 @@ describe('TableOperator', () => {
       const handleFullscreenChange = vi.fn();
 
       const { rerender } = render(
-        <TableOperator showFullscreen fullscreen={false} onFullscreenChange={handleFullscreenChange} />
+        <TableOperator
+          showFullscreen
+          fullscreen={false}
+          onFullscreenChange={handleFullscreenChange}
+        />
       );
 
       let fullscreenButton = screen.getByTitle('全屏');
       expect(fullscreenButton).toBeInTheDocument();
 
       // 切換為全屏狀態
-      rerender(<TableOperator showFullscreen fullscreen={true} onFullscreenChange={handleFullscreenChange} />);
+      rerender(
+        <TableOperator
+          showFullscreen
+          fullscreen={true}
+          onFullscreenChange={handleFullscreenChange}
+        />
+      );
 
       fullscreenButton = screen.getByTitle('退出全屏');
       expect(fullscreenButton).toBeInTheDocument();

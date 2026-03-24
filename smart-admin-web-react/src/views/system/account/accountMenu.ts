@@ -71,5 +71,5 @@ export function getAccountMenuList(): AccountMenuItem[] {
  * 根據 menuId 獲取菜單項
  */
 export function getAccountMenuById(menuId: string): AccountMenuItem | undefined {
-  return Object.values(ACCOUNT_MENU).find((menu) => menu.menuId === menuId);
+  return Object.values(ACCOUNT_MENU).find(menu => menu.menuId === menuId);
 }

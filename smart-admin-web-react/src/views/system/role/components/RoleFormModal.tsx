@@ -39,18 +39,27 @@ export default function RoleFormModal({
   const rules = {
     roleName: [
       { required: true, message: '請輸入角色名稱' },
-      { max: ROLE_VALIDATION.NAME_MAX_LENGTH, message: `角色名稱最多${ROLE_VALIDATION.NAME_MAX_LENGTH}個字符` },
+      {
+        max: ROLE_VALIDATION.NAME_MAX_LENGTH,
+        message: `角色名稱最多${ROLE_VALIDATION.NAME_MAX_LENGTH}個字符`,
+      },
     ],
     roleCode: [
       { required: true, message: '請輸入角色編碼' },
-      { max: ROLE_VALIDATION.CODE_MAX_LENGTH, message: `角色編碼最多${ROLE_VALIDATION.CODE_MAX_LENGTH}個字符` },
+      {
+        max: ROLE_VALIDATION.CODE_MAX_LENGTH,
+        message: `角色編碼最多${ROLE_VALIDATION.CODE_MAX_LENGTH}個字符`,
+      },
       {
         pattern: /^[a-zA-Z0-9_]+$/,
         message: '角色編碼只能包含字母、數字和下劃線',
       },
     ],
     remark: [
-      { max: ROLE_VALIDATION.REMARK_MAX_LENGTH, message: `備註最多${ROLE_VALIDATION.REMARK_MAX_LENGTH}個字符` },
+      {
+        max: ROLE_VALIDATION.REMARK_MAX_LENGTH,
+        message: `備註最多${ROLE_VALIDATION.REMARK_MAX_LENGTH}個字符`,
+      },
     ],
   };
 
@@ -133,17 +142,8 @@ export default function RoleFormModal({
       width={600}
       destroyOnClose
     >
-      <Form
-        form={form}
-        layout="vertical"
-        preserve={false}
-        style={{ marginTop: 16 }}
-      >
-        <Form.Item
-          label="角色名稱"
-          name="roleName"
-          rules={rules.roleName}
-        >
+      <Form form={form} layout="vertical" preserve={false} style={{ marginTop: 16 }}>
+        <Form.Item label="角色名稱" name="roleName" rules={rules.roleName}>
           <Input placeholder="請輸入角色名稱" maxLength={ROLE_VALIDATION.NAME_MAX_LENGTH} />
         </Form.Item>
 
@@ -159,11 +159,7 @@ export default function RoleFormModal({
           />
         </Form.Item>
 
-        <Form.Item
-          label="備註"
-          name="remark"
-          rules={rules.remark}
-        >
+        <Form.Item label="備註" name="remark" rules={rules.remark}>
           <Input.TextArea
             placeholder="請輸入備註（可選）"
             maxLength={ROLE_VALIDATION.REMARK_MAX_LENGTH}

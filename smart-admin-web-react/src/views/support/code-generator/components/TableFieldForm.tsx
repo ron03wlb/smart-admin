@@ -32,7 +32,7 @@ const TableFieldForm = forwardRef<TableFieldFormRef>((_props, ref) => {
   /**
    * 設置數據
    */
-  const setData = (columns: any[], config: any) => {
+  const setData = (columns: any[], _config: any) => {
     // 簡化版：直接使用原始列數據
     setDataSource(columns || []);
   };

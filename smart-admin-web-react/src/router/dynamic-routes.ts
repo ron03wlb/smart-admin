@@ -59,7 +59,9 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/support/api-encrypt': lazy(() => import('@/views/support/api-encrypt')),
   '/support/message': lazy(() => import('@/views/support/message')),
   '/support/level3-protect': lazy(() => import('@/views/support/level3-protect')),
-  '/support/level3-protect/data-masking': lazy(() => import('@/views/support/level3-protect/data-masking')),
+  '/support/level3-protect/data-masking': lazy(
+    () => import('@/views/support/level3-protect/data-masking')
+  ),
   '/support/code-generator': lazy(() => import('@/views/support/code-generator')),
 
   // 更多路由映射將在實現對應頁面時添加...

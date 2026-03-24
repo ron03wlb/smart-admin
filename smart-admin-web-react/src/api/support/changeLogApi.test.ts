@@ -9,7 +9,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from '@/utils/request';
 import { changeLogApi } from './changeLogApi';
-import type { ChangeLogQueryForm, ChangeLogAddForm, ChangeLogUpdateForm } from '@/views/support/change-log/types';
+import type {
+  ChangeLogQueryForm,
+  ChangeLogAddForm,
+  ChangeLogUpdateForm,
+} from '@/views/support/change-log/types';
 
 // Mock request module
 vi.mock('@/utils/request', () => ({

@@ -113,17 +113,17 @@ const Password: React.FC = () => {
             <Input.Password placeholder="請輸入新密碼" autoComplete="off" />
           </Form.Item>
 
-          <Form.Item
-            label="確認密碼"
-            name="confirmPwd"
-            rules={passwordRules}
-            help={passwordTips}
-          >
+          <Form.Item label="確認密碼" name="confirmPwd" rules={passwordRules} help={passwordTips}>
             <Input.Password placeholder="請輸入確認密碼" autoComplete="off" />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" onClick={handleSubmit} loading={loading} style={{ marginTop: 20 }}>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              loading={loading}
+              style={{ marginTop: 20 }}
+            >
               修改密碼
             </Button>
           </Form.Item>

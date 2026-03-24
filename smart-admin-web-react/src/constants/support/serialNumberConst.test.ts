@@ -23,7 +23,7 @@ describe('serialNumberConst', () => {
     it('權限點應該是 as const 類型', () => {
       const permissions = Object.values(SERIAL_NUMBER_PERMISSION);
       expect(permissions).toHaveLength(2);
-      expect(permissions.every((p) => typeof p === 'string')).toBe(true);
+      expect(permissions.every(p => typeof p === 'string')).toBe(true);
     });
   });
 
@@ -43,7 +43,7 @@ describe('serialNumberConst', () => {
 
     it('所有列寬度應該是正數', () => {
       const widths = Object.values(SERIAL_NUMBER_TABLE_COLUMNS_WIDTH);
-      expect(widths.every((w) => w > 0)).toBe(true);
+      expect(widths.every(w => w > 0)).toBe(true);
     });
 
     it('應該有10個列定義', () => {
@@ -63,7 +63,7 @@ describe('serialNumberConst', () => {
 
     it('所有記錄列寬度應該是正數', () => {
       const widths = Object.values(SERIAL_NUMBER_RECORD_TABLE_COLUMNS_WIDTH);
-      expect(widths.every((w) => w > 0)).toBe(true);
+      expect(widths.every(w => w > 0)).toBe(true);
     });
 
     it('應該有5個記錄列定義', () => {

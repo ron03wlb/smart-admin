@@ -50,14 +50,9 @@ describe('employeeConst', () => {
   describe('EMPLOYEE_VALIDATION', () => {
     describe('PHONE_REGEX', () => {
       it('should validate correct Chinese phone numbers', () => {
-        const validPhones = [
-          '13800138000',
-          '15912345678',
-          '18612345678',
-          '19912345678',
-        ];
+        const validPhones = ['13800138000', '15912345678', '18612345678', '19912345678'];
 
-        validPhones.forEach((phone) => {
+        validPhones.forEach(phone => {
           expect(EMPLOYEE_VALIDATION.PHONE_REGEX.test(phone)).toBe(true);
         });
       });
@@ -65,13 +60,13 @@ describe('employeeConst', () => {
       it('should reject invalid phone numbers', () => {
         const invalidPhones = [
           '12345678901', // 不以 1[3-9] 開頭
-          '1381234567',  // 少於 11 位
+          '1381234567', // 少於 11 位
           '138123456789', // 多於 11 位
-          'abcdefghijk',  // 非數字
-          '12812345678',  // 第二位不在 3-9 範圍
+          'abcdefghijk', // 非數字
+          '12812345678', // 第二位不在 3-9 範圍
         ];
 
-        invalidPhones.forEach((phone) => {
+        invalidPhones.forEach(phone => {
           expect(EMPLOYEE_VALIDATION.PHONE_REGEX.test(phone)).toBe(false);
         });
       });
@@ -86,7 +81,7 @@ describe('employeeConst', () => {
           'user123@test-site.com',
         ];
 
-        validEmails.forEach((email) => {
+        validEmails.forEach(email => {
           expect(EMPLOYEE_VALIDATION.EMAIL_REGEX.test(email)).toBe(true);
         });
       });
@@ -97,10 +92,10 @@ describe('employeeConst', () => {
           '@example.com',
           'user@',
           'user @example.com', // 空格
-          'user@example',      // 沒有頂級域名
+          'user@example', // 沒有頂級域名
         ];
 
-        invalidEmails.forEach((email) => {
+        invalidEmails.forEach(email => {
           expect(EMPLOYEE_VALIDATION.EMAIL_REGEX.test(email)).toBe(false);
         });
       });
@@ -170,15 +165,17 @@ describe('employeeConst', () => {
         'operate',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(EMPLOYEE_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
-        expect(typeof EMPLOYEE_TABLE_COLUMNS_WIDTH[column as keyof typeof EMPLOYEE_TABLE_COLUMNS_WIDTH]).toBe('number');
+        expect(
+          typeof EMPLOYEE_TABLE_COLUMNS_WIDTH[column as keyof typeof EMPLOYEE_TABLE_COLUMNS_WIDTH]
+        ).toBe('number');
       });
     });
 
     it('should have reasonable width values', () => {
       // 驗證寬度為正數
-      Object.values(EMPLOYEE_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(EMPLOYEE_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(300); // 合理的最大寬度
       });

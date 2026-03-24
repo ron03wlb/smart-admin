@@ -77,20 +77,22 @@ export const fileApi = {
    * @param fileKey 文件 Key
    */
   downLoadFile: (fileKey: string): Promise<void> => {
-    return request.get('/support/file/downLoad', {
-      params: { fileKey },
-      responseType: 'blob',
-    }).then((response: any) => {
-      // 創建 blob URL 並觸發下載
-      const blob = new Blob([response]);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileKey;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    });
+    return request
+      .get('/support/file/downLoad', {
+        params: { fileKey },
+        responseType: 'blob',
+      })
+      .then((response: any) => {
+        // 創建 blob URL 並觸發下載
+        const blob = new Blob([response]);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileKey;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      });
   },
 };

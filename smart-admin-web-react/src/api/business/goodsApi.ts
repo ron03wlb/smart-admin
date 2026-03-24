@@ -8,7 +8,12 @@
 
 import request from '@/utils/request';
 import type { ResponseDTO, PageResult } from '@/api/types/response';
-import type { GoodsVO, GoodsQueryForm, GoodsAddForm, GoodsUpdateForm } from '@/views/business/goods/types';
+import type {
+  GoodsVO,
+  GoodsQueryForm,
+  GoodsAddForm,
+  GoodsUpdateForm,
+} from '@/views/business/goods/types';
 
 /**
  * 商品管理 API

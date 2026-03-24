@@ -7,11 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  CONFIG_PERMISSION,
-  CONFIG_VALIDATION,
-  CONFIG_TABLE_COLUMNS_WIDTH,
-} from './configConst';
+import { CONFIG_PERMISSION, CONFIG_VALIDATION, CONFIG_TABLE_COLUMNS_WIDTH } from './configConst';
 
 describe('configConst', () => {
   // ==================== 權限點測試 ====================
@@ -72,18 +68,16 @@ describe('configConst', () => {
         'operate',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(CONFIG_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
-          typeof CONFIG_TABLE_COLUMNS_WIDTH[
-            column as keyof typeof CONFIG_TABLE_COLUMNS_WIDTH
-          ]
+          typeof CONFIG_TABLE_COLUMNS_WIDTH[column as keyof typeof CONFIG_TABLE_COLUMNS_WIDTH]
         ).toBe('number');
       });
     });
 
     it('should have reasonable width values', () => {
-      Object.values(CONFIG_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(CONFIG_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(500);
       });

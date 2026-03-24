@@ -13,7 +13,9 @@ import { helpDocCatalogApi } from '@/api/support/helpDocCatalogApi';
 import { usePrivilege } from '@/hooks/usePrivilege';
 import { HELP_DOC_CATALOG_PERMISSION } from '@/constants/support/helpDocConst';
 import type { HelpDocCatalogVO } from '../types';
-import HelpDocCatalogFormModal, { type HelpDocCatalogFormModalRef } from './HelpDocCatalogFormModal';
+import HelpDocCatalogFormModal, {
+  type HelpDocCatalogFormModalRef,
+} from './HelpDocCatalogFormModal';
 import type { DataNode } from 'antd/es/tree';
 
 const { confirm } = Modal;
@@ -61,7 +63,7 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
         setHelpDocCatalogTreeData(buildHelpDocCatalogTree(data, HELP_DOC_CATALOG_PARENT_ID));
 
         const map = new Map<number, HelpDocCatalogVO>();
-        data.forEach((e) => {
+        data.forEach(e => {
           map.set(e.helpDocCatalogId, e);
         });
         setIdInfoMap(map);
@@ -76,10 +78,13 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
       }
     };
 
-    const buildHelpDocCatalogTree = (data: HelpDocCatalogVO[], parentId: number): HelpDocCatalogVO[] => {
-      let children = data.filter((e) => e.parentId === parentId) || [];
+    const buildHelpDocCatalogTree = (
+      data: HelpDocCatalogVO[],
+      parentId: number
+    ): HelpDocCatalogVO[] => {
+      let children = data.filter(e => e.parentId === parentId) || [];
       children = children.sort((a, b) => a.sort - b.sort);
-      children.forEach((e) => {
+      children.forEach(e => {
         e.children = buildHelpDocCatalogTree(data, e.helpDocCatalogId);
       });
       updateHelpDocCatalogPreIdAndNextId(children);
@@ -122,7 +127,9 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
 
     const onSearch = () => {
       if (!keywords) {
-        setHelpDocCatalogTreeData(buildHelpDocCatalogTree(helpDocCatalogList, HELP_DOC_CATALOG_PARENT_ID));
+        setHelpDocCatalogTreeData(
+          buildHelpDocCatalogTree(helpDocCatalogList, HELP_DOC_CATALOG_PARENT_ID)
+        );
         return;
       }
 
@@ -131,14 +138,16 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
         return;
       }
 
-      const filterCatalog = originData.filter((e) => e.name.indexOf(keywords) > -1);
+      const filterCatalog = originData.filter(e => e.name.indexOf(keywords) > -1);
       const filterHelpDocCatalogList: HelpDocCatalogVO[] = [];
 
-      filterCatalog.forEach((e) => {
+      filterCatalog.forEach(e => {
         recursionFilterHelpDocCatalog(filterHelpDocCatalogList, e.helpDocCatalogId, false);
       });
 
-      setHelpDocCatalogTreeData(buildHelpDocCatalogTree(filterHelpDocCatalogList, HELP_DOC_CATALOG_PARENT_ID));
+      setHelpDocCatalogTreeData(
+        buildHelpDocCatalogTree(filterHelpDocCatalogList, HELP_DOC_CATALOG_PARENT_ID)
+      );
     };
 
     const recursionFilterHelpDocCatalog = (
@@ -147,7 +156,7 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
       unshift: boolean
     ) => {
       const info = idInfoMap.get(id);
-      if (!info || resList.some((e) => e.helpDocCatalogId === id)) {
+      if (!info || resList.some(e => e.helpDocCatalogId === id)) {
         return;
       }
       if (unshift) {
@@ -195,7 +204,7 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
             if (selectedKeys.length > 0) {
               selectedKey = selectedKeys[0] as number;
               if (selectedKey === id) {
-                const selectInfo = helpDocCatalogList.find((e) => e.helpDocCatalogId === id);
+                const selectInfo = helpDocCatalogList.find(e => e.helpDocCatalogId === id);
                 if (selectInfo && selectInfo.parentId) {
                   selectedKey = selectInfo.parentId;
                 }
@@ -226,7 +235,7 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
       refresh,
     }));
 
-    const treeData = helpDocCatalogTreeData.map((item) => convertToTreeNode(item));
+    const treeData = helpDocCatalogTreeData.map(item => convertToTreeNode(item));
 
     function convertToTreeNode(item: HelpDocCatalogVO): DataNode {
       const node: DataNode = {
@@ -261,7 +270,7 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
       };
 
       if (item.children && item.children.length > 0) {
-        node.children = item.children.map((child) => convertToTreeNode(child));
+        node.children = item.children.map(child => convertToTreeNode(child));
       }
 
       return node;
@@ -273,11 +282,18 @@ const HelpDocCatalogTree = forwardRef<HelpDocCatalogTreeRef, HelpDocCatalogTreeP
           <Row>
             <Input
               value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
+              onChange={e => setKeywords(e.target.value)}
               placeholder="請輸入目錄名稱"
             />
           </Row>
-          <Row style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, marginBottom: 10 }}>
+          <Row
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: 10,
+              marginBottom: 10,
+            }}
+          >
             <span>
               排序
               {showSortFlag && ' （越小越靠前） '}

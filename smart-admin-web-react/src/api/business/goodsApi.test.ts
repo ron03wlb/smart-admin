@@ -8,7 +8,12 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { goodsApi } from './goodsApi';
-import type { GoodsVO, GoodsQueryForm, GoodsAddForm, GoodsUpdateForm } from '@/views/business/goods/types';
+import type {
+  GoodsVO,
+  GoodsQueryForm,
+  GoodsAddForm,
+  GoodsUpdateForm,
+} from '@/views/business/goods/types';
 import { GoodsStatusEnum } from '@/views/business/goods/types';
 import type { ResponseDTO, PageResult } from '@/api/types/response';
 
@@ -58,6 +63,8 @@ describe('goodsApi', () => {
           total: 1,
           pageNum: 1,
           pageSize: 10,
+          pages: 1,
+          emptyFlag: false,
         },
       };
 
@@ -80,6 +87,8 @@ describe('goodsApi', () => {
           total: 0,
           pageNum: 1,
           pageSize: 10,
+          pages: 0,
+          emptyFlag: true,
         },
       };
 

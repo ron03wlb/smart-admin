@@ -59,13 +59,13 @@ const BasicForm = forwardRef<BasicFormRef>((_props, ref) => {
     const frontDate = basic?.frontDate
       ? dayjs(basic.frontDate)
       : table.createTime
-      ? dayjs(table.createTime)
-      : dayjs();
+        ? dayjs(table.createTime)
+        : dayjs();
     const backendDate = basic?.backendDate
       ? dayjs(basic.backendDate)
       : table.createTime
-      ? dayjs(table.createTime)
-      : dayjs();
+        ? dayjs(table.createTime)
+        : dayjs();
 
     const initialValues: FormData = {
       moduleName,
@@ -98,7 +98,7 @@ const BasicForm = forwardRef<BasicFormRef>((_props, ref) => {
    * 驗證表單
    */
   const validateForm = (): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       form
         .validateFields()
         .then(() => {
@@ -186,10 +186,7 @@ const BasicForm = forwardRef<BasicFormRef>((_props, ref) => {
 
   const backendConstNameList = useMemo(() => {
     const moduleName = formValues.moduleName || '';
-    return [
-      `枚舉類：${moduleName}Enum.java`,
-      `常量類：${moduleName}Const.java`,
-    ];
+    return [`枚舉類：${moduleName}Enum.java`, `常量類：${moduleName}Const.java`];
   }, [formValues.moduleName]);
 
   /**
@@ -223,7 +220,12 @@ const BasicForm = forwardRef<BasicFormRef>((_props, ref) => {
  * @Date:       ${formValues.backendDate?.format('YYYY-MM-DD HH:mm:ss') || ''}
  * @Copyright   ${formValues.copyright || ''}
  */`;
-  }, [formValues.description, formValues.backendAuthor, formValues.backendDate, formValues.copyright]);
+  }, [
+    formValues.description,
+    formValues.backendAuthor,
+    formValues.backendDate,
+    formValues.copyright,
+  ]);
 
   /**
    * 預覽 Tabs
@@ -295,12 +297,8 @@ const BasicForm = forwardRef<BasicFormRef>((_props, ref) => {
           wrapperCol={{ span: 16 }}
           onValuesChange={handleValuesChange}
         >
-          <Form.Item label="表">
-            {currentTable?.tableName || ''}
-          </Form.Item>
-          <Form.Item label="表備註">
-            {currentTable?.tableComment || ''}
-          </Form.Item>
+          <Form.Item label="表">{currentTable?.tableName || ''}</Form.Item>
+          <Form.Item label="表備註">{currentTable?.tableComment || ''}</Form.Item>
           <Form.Item label="表前綴">
             <Input
               value={tablePrefix}

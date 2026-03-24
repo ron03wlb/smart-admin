@@ -39,6 +39,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '1',
     dataLabel: '中國',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
   {
     dictCode: 'GOODS_PLACE',
@@ -46,6 +47,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '2',
     dataLabel: '美國',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
   {
     dictCode: 'GOODS_PLACE',
@@ -53,6 +55,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '3',
     dataLabel: '日本',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
   {
     dictCode: 'USER_STATUS',
@@ -60,6 +63,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '1',
     dataLabel: '啟用',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
   {
     dictCode: 'USER_STATUS',
@@ -67,6 +71,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '0',
     dataLabel: '禁用',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
   {
     dictCode: 'ORDER_STATUS',
@@ -74,6 +79,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '10',
     dataLabel: '待支付',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
   {
     dictCode: 'ORDER_STATUS',
@@ -81,6 +87,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '20',
     dataLabel: '已支付',
     dictDisabledFlag: false,
+    dataSort: 1,
   },
 ];
 
@@ -149,6 +156,7 @@ describe('dictSlice', () => {
           dataValue: '1',
           dataLabel: '選項1',
           dictDisabledFlag: false,
+          dataSort: 1,
         },
         {
           dictCode: 'TEST_CODE',
@@ -156,6 +164,7 @@ describe('dictSlice', () => {
           dataValue: '2',
           dataLabel: '選項2',
           dictDisabledFlag: false,
+          dataSort: 2,
         },
       ];
 
@@ -240,9 +249,7 @@ describe('dictSlice', () => {
   describe('Selectors - 基礎', () => {
     const mockState: Partial<RootState> = {
       dict: {
-        dictList: [
-          { dictCode: 'TEST_DICT', dictName: '測試字典', disabledFlag: false },
-        ],
+        dictList: [{ dictCode: 'TEST_DICT', dictName: '測試字典', disabledFlag: false }],
         dictMap: {
           TEST_DICT: [
             {
@@ -251,6 +258,7 @@ describe('dictSlice', () => {
               dataValue: '1',
               dataLabel: '選項1',
               dictDisabledFlag: false,
+              dataSort: 1,
             },
           ],
         },
@@ -339,7 +347,9 @@ describe('dictSlice', () => {
 
     it('多值查詢 - 應該返回逗號分隔的 labels', () => {
       expect(selectDictLabel(mockState as RootState, 'GOODS_PLACE', '1,2')).toBe('中國,美國');
-      expect(selectDictLabel(mockState as RootState, 'GOODS_PLACE', '1,2,3')).toBe('中國,美國,日本');
+      expect(selectDictLabel(mockState as RootState, 'GOODS_PLACE', '1,2,3')).toBe(
+        '中國,美國,日本'
+      );
       expect(selectDictLabel(mockState as RootState, 'GOODS_PLACE', '2,3')).toBe('美國,日本');
     });
 
@@ -391,7 +401,9 @@ describe('dictSlice', () => {
       // ORDER_STATUS 有 '10' 和 '20'
       expect(selectDictLabel(mockState as RootState, 'ORDER_STATUS', '10')).toBe('待支付');
       expect(selectDictLabel(mockState as RootState, 'ORDER_STATUS', '20')).toBe('已支付');
-      expect(selectDictLabel(mockState as RootState, 'ORDER_STATUS', '10,20')).toBe('待支付,已支付');
+      expect(selectDictLabel(mockState as RootState, 'ORDER_STATUS', '10,20')).toBe(
+        '待支付,已支付'
+      );
     });
   });
 
@@ -424,7 +436,7 @@ describe('dictSlice', () => {
     });
 
     it('應該支持手動初始化字典（initDictData）', () => {
-      let state = dictReducer(undefined, initDictData(mockDictDataList));
+      const state = dictReducer(undefined, initDictData(mockDictDataList));
 
       expect(state.dictList).toHaveLength(3);
       expect(state.dictMap['GOODS_PLACE']).toHaveLength(3);
@@ -460,6 +472,7 @@ describe('dictSlice', () => {
           dataValue: String(i),
           dataLabel: `選項${i}`,
           dictDisabledFlag: false,
+          dataSort: i,
         });
       }
 

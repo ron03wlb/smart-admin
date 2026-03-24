@@ -66,7 +66,9 @@ describe('helpDocCatalogApi', () => {
 
       await helpDocCatalogApi.delete(catalogId);
 
-      expect(request.get).toHaveBeenCalledWith(`/support/helpDoc/helpDocCatalog/delete/${catalogId}`);
+      expect(request.get).toHaveBeenCalledWith(
+        `/support/helpDoc/helpDocCatalog/delete/${catalogId}`
+      );
     });
   });
 });

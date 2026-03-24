@@ -7,7 +7,14 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { AppConfig, LanguageType, LayoutType, ThemeType, PageTagLocationType, PageTagStyleType } from '@/types/appConfig';
+import type {
+  AppConfig,
+  LanguageType,
+  LayoutType,
+  ThemeType,
+  PageTagLocationType,
+  PageTagStyleType,
+} from '@/types/appConfig';
 import { appDefaultConfig } from '@/config/appDefaultConfig';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 
@@ -95,7 +102,7 @@ const appConfigSlice = createSlice({
     /**
      * 切換夜間模式
      */
-    toggleDarkMode: (state) => {
+    toggleDarkMode: state => {
       state.darkModeFlag = !state.darkModeFlag;
     },
 
@@ -130,14 +137,14 @@ const appConfigSlice = createSlice({
     /**
      * 切換菜單單一展開模式
      */
-    toggleMenuSingleExpand: (state) => {
+    toggleMenuSingleExpand: state => {
       state.menuSingleExpandFlag = !state.menuSingleExpandFlag;
     },
 
     /**
      * 切換標籤頁顯示
      */
-    togglePageTag: (state) => {
+    togglePageTag: state => {
       state.pageTagFlag = !state.pageTagFlag;
     },
 
@@ -151,42 +158,42 @@ const appConfigSlice = createSlice({
     /**
      * 切換面包屑顯示
      */
-    toggleBreadCrumb: (state) => {
+    toggleBreadCrumb: state => {
       state.breadCrumbFlag = !state.breadCrumbFlag;
     },
 
     /**
      * 切換頁腳顯示
      */
-    toggleFooter: (state) => {
+    toggleFooter: state => {
       state.footerFlag = !state.footerFlag;
     },
 
     /**
      * 切換幫助文檔顯示
      */
-    toggleHelpDoc: (state) => {
+    toggleHelpDoc: state => {
       state.helpDocFlag = !state.helpDocFlag;
     },
 
     /**
      * 顯示幫助文檔
      */
-    showHelpDoc: (state) => {
+    showHelpDoc: state => {
       state.helpDocExpandFlag = true;
     },
 
     /**
      * 隱藏幫助文檔
      */
-    hideHelpDoc: (state) => {
+    hideHelpDoc: state => {
       state.helpDocExpandFlag = false;
     },
 
     /**
      * 切換水印顯示
      */
-    toggleWatermark: (state) => {
+    toggleWatermark: state => {
       state.watermarkFlag = !state.watermarkFlag;
     },
 
@@ -200,21 +207,21 @@ const appConfigSlice = createSlice({
     /**
      * 切換緊湊模式
      */
-    toggleCompact: (state) => {
+    toggleCompact: state => {
       state.compactFlag = !state.compactFlag;
     },
 
     /**
      * 開始全屏
      */
-    startFullScreen: (state) => {
+    startFullScreen: state => {
       state.fullScreenFlag = true;
     },
 
     /**
      * 退出全屏
      */
-    exitFullScreen: (state) => {
+    exitFullScreen: state => {
       state.fullScreenFlag = false;
     },
 

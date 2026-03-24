@@ -8,7 +8,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { feedbackApi } from './feedbackApi';
-import type { FeedbackVO, FeedbackQueryForm, FeedbackAddForm } from '@/views/support/feedback/types';
+import type {
+  FeedbackVO,
+  FeedbackQueryForm,
+  FeedbackAddForm,
+} from '@/views/support/feedback/types';
 
 // Mock request module
 vi.mock('@/utils/request', () => ({

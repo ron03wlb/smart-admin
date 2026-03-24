@@ -67,7 +67,7 @@ describe('operateLogConst', () => {
         'action',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(OPERATE_LOG_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
           typeof OPERATE_LOG_TABLE_COLUMNS_WIDTH[
@@ -78,7 +78,7 @@ describe('operateLogConst', () => {
     });
 
     it('should have reasonable width values', () => {
-      Object.values(OPERATE_LOG_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(OPERATE_LOG_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(500);
       });

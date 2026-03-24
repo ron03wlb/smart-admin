@@ -108,6 +108,8 @@ describe('noticeApi', () => {
           total: 1,
           pageNum: 1,
           pageSize: 10,
+          pages: 1,
+          emptyFlag: false,
         },
       };
 
@@ -130,6 +132,8 @@ describe('noticeApi', () => {
           total: 0,
           pageNum: 1,
           pageSize: 10,
+          pages: 0,
+          emptyFlag: true,
         },
       };
 

@@ -133,7 +133,11 @@ const Level3ProtectPage: React.FC = () => {
             {`1.三級等保是中國國家等級保護認證中的最高級別認證，該認證包含了五個等級保護安全技術要求和五個安全管理要求，共涉及測評分類73類，要求非常嚴格。
 2.三級等保是地市級以上國家機關、重要企事業單位需要達成的認證，在金融行業中，可以看作是除了銀行機構以外最高級別的信息安全等級保護。
 3.具體三級等保要求，請查看"1024創新實驗室"寫的相關文檔 `}
-            <a href="https://smartadmin.vip/views/level3protect/basic.html" target="_blank" rel="noreferrer">
+            <a
+              href="https://smartadmin.vip/views/level3protect/basic.html"
+              target="_blank"
+              rel="noreferrer"
+            >
               三級等保文檔
             </a>
           </pre>
@@ -166,7 +170,13 @@ const Level3ProtectPage: React.FC = () => {
             extra="連續登錄失敗超過一定次數，則需要鎖定；默認5次；0則不鎖定；"
             rules={[{ required: true, message: '請輸入最大連續登錄失敗次數' }]}
           >
-            <InputNumber min={0} max={10} placeholder="最大連續登錄失敗次數" addonAfter="次" style={{ width: 200 }} />
+            <InputNumber
+              min={0}
+              max={10}
+              placeholder="最大連續登錄失敗次數"
+              addonAfter="次"
+              style={{ width: 200 }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -175,7 +185,12 @@ const Level3ProtectPage: React.FC = () => {
             extra="連續登錄失敗鎖定的時間；默認30分鐘，0則不鎖定"
             rules={[{ required: true, message: '請輸入連續登錄失敗鎖定分鐘' }]}
           >
-            <InputNumber min={0} placeholder="連續登錄失敗鎖定分鐘" addonAfter="分鐘" style={{ width: 200 }} />
+            <InputNumber
+              min={0}
+              placeholder="連續登錄失敗鎖定分鐘"
+              addonAfter="分鐘"
+              style={{ width: 200 }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -184,7 +199,12 @@ const Level3ProtectPage: React.FC = () => {
             extra="如：登錄1小時沒操作自動退出當前登錄狀態；默認30分鐘"
             rules={[{ required: true, message: '請輸入登錄後無操作自動退出的分鐘' }]}
           >
-            <InputNumber min={-1} placeholder="登錄後無操作自動退出的分鐘" addonAfter="分鐘" style={{ width: 200 }} />
+            <InputNumber
+              min={-1}
+              placeholder="登錄後無操作自動退出的分鐘"
+              addonAfter="分鐘"
+              style={{ width: 200 }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -202,7 +222,13 @@ const Level3ProtectPage: React.FC = () => {
             extra="定期修改密碼時間間隔，默認3個月"
             rules={[{ required: true, message: '請輸入定期修改密碼時間間隔' }]}
           >
-            <InputNumber min={-1} max={6} placeholder="定期修改密碼時間間隔" addonAfter="月" style={{ width: 200 }} />
+            <InputNumber
+              min={-1}
+              max={6}
+              placeholder="定期修改密碼時間間隔"
+              addonAfter="月"
+              style={{ width: 200 }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -211,7 +237,13 @@ const Level3ProtectPage: React.FC = () => {
             extra="定期修改密碼不允許重複次數，默認：3次以內密碼不能相同"
             rules={[{ required: true, message: '請輸入定期修改密碼不允許重複次數' }]}
           >
-            <InputNumber min={-1} max={6} placeholder="相同密碼不允許重複次數" addonAfter="次" style={{ width: 200 }} />
+            <InputNumber
+              min={-1}
+              max={6}
+              placeholder="相同密碼不允許重複次數"
+              addonAfter="次"
+              style={{ width: 200 }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -229,7 +261,12 @@ const Level3ProtectPage: React.FC = () => {
             extra="上傳文件大小限制，默認 50 mb ( 0 表示不限制)"
             rules={[{ required: true, message: '請輸入上傳文件大小限制' }]}
           >
-            <InputNumber min={0} placeholder="上傳文件大小限制" addonAfter="mb(兆)" style={{ width: 200 }} />
+            <InputNumber
+              min={0}
+              placeholder="上傳文件大小限制"
+              addonAfter="mb(兆)"
+              style={{ width: 200 }}
+            />
           </Form.Item>
 
           <br />

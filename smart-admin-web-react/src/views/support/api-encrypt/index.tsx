@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { Alert, Card, Form, Input, InputNumber, Button, Row, Col, Space } from 'antd';
 import { message } from 'antd';
-import { apiEncryptApi, type EncryptTestForm } from '@/api/support/apiEncryptApi';
+import { apiEncryptApi } from '@/api/support/apiEncryptApi';
 
 const ApiEncryptPage: React.FC = () => {
   // ==================== 一、請求加密 ====================

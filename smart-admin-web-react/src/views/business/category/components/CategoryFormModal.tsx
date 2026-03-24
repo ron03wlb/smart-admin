@@ -21,10 +21,14 @@ interface CategoryFormModalProps {
   onSuccess: () => void;
 }
 
+export interface CategoryFormModalRef {
+  show: (parentId?: number, rowData?: CategoryVO) => void;
+}
+
 /**
  * 分類表單模態框
  */
-const CategoryFormModal = forwardRef<{ show: (parentId?: number, rowData?: CategoryVO) => void }, CategoryFormModalProps>(
+const CategoryFormModal = forwardRef<CategoryFormModalRef, CategoryFormModalProps>(
   ({ categoryType, onSuccess }, ref) => {
     const [form] = Form.useForm<CategoryFormData>();
     const [visible, setVisible] = useState(false);
@@ -128,7 +132,12 @@ const CategoryFormModal = forwardRef<{ show: (parentId?: number, rowData?: Categ
         width={600}
         destroyOnClose
       >
-        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }} style={{ marginTop: 24 }}>
+        <Form
+          form={form}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 16 }}
+          style={{ marginTop: 24 }}
+        >
           <Form.Item name="categoryId" hidden>
             <Input />
           </Form.Item>
@@ -146,22 +155,39 @@ const CategoryFormModal = forwardRef<{ show: (parentId?: number, rowData?: Categ
             label="分類名稱"
             rules={[
               { required: true, message: '請輸入分類名稱' },
-              { max: CATEGORY_VALIDATION.NAME_MAX_LENGTH, message: `分類名稱最多 ${CATEGORY_VALIDATION.NAME_MAX_LENGTH} 個字符` },
+              {
+                max: CATEGORY_VALIDATION.NAME_MAX_LENGTH,
+                message: `分類名稱最多 ${CATEGORY_VALIDATION.NAME_MAX_LENGTH} 個字符`,
+              },
             ]}
           >
             <Input placeholder="請輸入分類名稱" maxLength={CATEGORY_VALIDATION.NAME_MAX_LENGTH} />
           </Form.Item>
 
-          <Form.Item name="sort" label="排序" rules={[{ type: 'number', min: 0, message: '排序必須大於等於 0' }]}>
+          <Form.Item
+            name="sort"
+            label="排序"
+            rules={[{ type: 'number', min: 0, message: '排序必須大於等於 0' }]}
+          >
             <InputNumber placeholder="請輸入排序" min={0} style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item
             name="remark"
             label="備註"
-            rules={[{ max: CATEGORY_VALIDATION.REMARK_MAX_LENGTH, message: `備註最多 ${CATEGORY_VALIDATION.REMARK_MAX_LENGTH} 個字符` }]}
+            rules={[
+              {
+                max: CATEGORY_VALIDATION.REMARK_MAX_LENGTH,
+                message: `備註最多 ${CATEGORY_VALIDATION.REMARK_MAX_LENGTH} 個字符`,
+              },
+            ]}
           >
-            <TextArea rows={4} placeholder="請輸入備註" maxLength={CATEGORY_VALIDATION.REMARK_MAX_LENGTH} showCount />
+            <TextArea
+              rows={4}
+              placeholder="請輸入備註"
+              maxLength={CATEGORY_VALIDATION.REMARK_MAX_LENGTH}
+              showCount
+            />
           </Form.Item>
         </Form>
       </Modal>

@@ -228,9 +228,7 @@ export default function GoodsPage() {
       key: 'goodsStatus',
       width: GOODS_TABLE_COLUMNS_WIDTH.goodsStatus,
       render: (status: GoodsStatusEnum) => (
-        <Tag color={GOODS_STATUS_COLORS[status]}>
-          {GOODS_STATUS_LABELS[status]}
-        </Tag>
+        <Tag color={GOODS_STATUS_COLORS[status]}>{GOODS_STATUS_LABELS[status]}</Tag>
       ),
     },
     {
@@ -280,7 +278,7 @@ export default function GoodsPage() {
           <PrivilegeButton
             type="link"
             size="small"
-            permission={GOODS_PERMISSION.UPDATE}
+            privilege={GOODS_PERMISSION.UPDATE}
             onClick={() => handleEdit(record)}
           >
             編輯
@@ -289,7 +287,7 @@ export default function GoodsPage() {
             type="link"
             size="small"
             danger
-            permission={GOODS_PERMISSION.DELETE}
+            privilege={GOODS_PERMISSION.DELETE}
             onClick={() => handleDelete(record)}
           >
             刪除
@@ -343,7 +341,7 @@ export default function GoodsPage() {
             <PrivilegeButton
               type="primary"
               icon={<PlusOutlined />}
-              permission={GOODS_PERMISSION.ADD}
+              privilege={GOODS_PERMISSION.ADD}
               onClick={handleAdd}
             >
               新增商品
@@ -351,7 +349,7 @@ export default function GoodsPage() {
             <PrivilegeButton
               danger
               icon={<DeleteOutlined />}
-              permission={GOODS_PERMISSION.BATCH_DELETE}
+              privilege={GOODS_PERMISSION.BATCH_DELETE}
               onClick={handleBatchDelete}
               disabled={selectedRowKeys.length === 0}
             >
@@ -368,7 +366,7 @@ export default function GoodsPage() {
           loading={loading}
           rowSelection={{
             selectedRowKeys,
-            onChange: (keys) => setSelectedRowKeys(keys as number[]),
+            onChange: keys => setSelectedRowKeys(keys as number[]),
           }}
           pagination={{
             current: pageNum,
@@ -376,7 +374,7 @@ export default function GoodsPage() {
             total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             pageSizeOptions: ['10', '20', '50', '100'],
             onChange: handlePageChange,
           }}

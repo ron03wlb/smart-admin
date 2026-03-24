@@ -264,7 +264,7 @@ export default function NoticePage() {
           <PrivilegeButton
             type="link"
             size="small"
-            permission={NOTICE_PERMISSION.UPDATE}
+            privilege={NOTICE_PERMISSION.UPDATE}
             onClick={() => handleEdit(record)}
           >
             編輯
@@ -273,7 +273,7 @@ export default function NoticePage() {
             type="link"
             size="small"
             danger
-            permission={NOTICE_PERMISSION.DELETE}
+            privilege={NOTICE_PERMISSION.DELETE}
             onClick={() => handleDelete(record)}
           >
             刪除
@@ -295,7 +295,7 @@ export default function NoticePage() {
                   placeholder="請選擇分類"
                   allowClear
                   style={{ width: 120 }}
-                  options={noticeTypeList.map((item) => ({
+                  options={noticeTypeList.map(item => ({
                     label: item.noticeTypeName,
                     value: item.noticeTypeId,
                   }))}
@@ -350,7 +350,7 @@ export default function NoticePage() {
           <PrivilegeButton
             type="primary"
             icon={<PlusOutlined />}
-            permission={NOTICE_PERMISSION.ADD}
+            privilege={NOTICE_PERMISSION.ADD}
             onClick={handleAdd}
           >
             新增通知公告
@@ -369,7 +369,7 @@ export default function NoticePage() {
             total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             pageSizeOptions: ['10', '20', '50', '100'],
             onChange: handlePageChange,
           }}

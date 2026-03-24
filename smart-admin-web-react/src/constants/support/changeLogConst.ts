@@ -71,9 +71,9 @@ export const CHANGE_LOG_TYPE_LABELS = {
  * 更新類型顏色映射（Ant Design Tag color）
  */
 export const CHANGE_LOG_TYPE_COLORS = {
-  1: 'red',      // 重大更新 - 紅色
-  2: 'blue',     // 功能更新 - 藍色
-  3: 'green',    // Bug修復 - 綠色
+  1: 'red', // 重大更新 - 紅色
+  2: 'blue', // 功能更新 - 藍色
+  3: 'green', // Bug修復 - 綠色
 } as const;
 
 /**

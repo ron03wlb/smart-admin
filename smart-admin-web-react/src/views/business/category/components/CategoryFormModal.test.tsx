@@ -71,7 +71,13 @@ describe('CategoryFormModal', () => {
   describe('Basic Rendering', () => {
     it('should render add mode modal', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -83,7 +89,13 @@ describe('CategoryFormModal', () => {
 
     it('should render edit mode modal', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示編輯 Modal
       ref.current?.show(undefined, mockCategory);
@@ -95,7 +107,13 @@ describe('CategoryFormModal', () => {
 
     it('should render add child category modal', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示添加子分類 Modal
       ref.current?.show(1);
@@ -108,7 +126,13 @@ describe('CategoryFormModal', () => {
   describe('Form Submission - Add Mode', () => {
     it('should submit new category successfully', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -141,7 +165,13 @@ describe('CategoryFormModal', () => {
 
     it('should submit new child category successfully', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示添加子分類 Modal
       ref.current?.show(1);
@@ -174,7 +204,13 @@ describe('CategoryFormModal', () => {
 
     it('should validate required fields', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -195,7 +231,13 @@ describe('CategoryFormModal', () => {
 
     it('should validate max length', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -223,7 +265,13 @@ describe('CategoryFormModal', () => {
   describe('Form Submission - Edit Mode', () => {
     it('should submit updated category successfully', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示編輯 Modal
       ref.current?.show(undefined, mockCategory);
@@ -259,7 +307,13 @@ describe('CategoryFormModal', () => {
   describe('Modal Close', () => {
     it('should close modal when cancel button is clicked', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -272,7 +326,7 @@ describe('CategoryFormModal', () => {
       fireEvent.click(cancelButton);
 
       // 等待一段時間讓 Modal 關閉
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // 驗證 Modal 關閉後的行為:再次打開時表單應該是空的
       ref.current?.show();
@@ -285,7 +339,13 @@ describe('CategoryFormModal', () => {
 
     it('should close modal after successful submission', async () => {
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -305,7 +365,7 @@ describe('CategoryFormModal', () => {
       });
 
       // 等待一段時間讓 Modal 關閉
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // 驗證 Modal 關閉後的行為:再次打開時表單應該是空的
       ref.current?.show();
@@ -322,7 +382,13 @@ describe('CategoryFormModal', () => {
       (categoryApi.addCategory as any).mockRejectedValueOnce(new Error('Network Error'));
 
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示 Modal
       ref.current?.show();
@@ -346,7 +412,13 @@ describe('CategoryFormModal', () => {
       (categoryApi.updateCategory as any).mockRejectedValueOnce(new Error('Update Failed'));
 
       const ref = createRef<CategoryFormModalRef>();
-      render(<CategoryFormModal ref={ref} categoryType={CategoryTypeEnum.GOODS} onSuccess={mockOnSuccess} />);
+      render(
+        <CategoryFormModal
+          ref={ref}
+          categoryType={CategoryTypeEnum.GOODS}
+          onSuccess={mockOnSuccess}
+        />
+      );
 
       // 顯示編輯 Modal
       ref.current?.show(undefined, mockCategory);

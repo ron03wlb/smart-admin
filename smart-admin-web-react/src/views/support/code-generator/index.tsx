@@ -11,7 +11,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Form, Input, Button, Card, Table, Space, message } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { codeGeneratorApi, type TableInfo, type TableQueryForm } from '@/api/support/codeGeneratorApi';
+import {
+  codeGeneratorApi,
+  type TableInfo,
+  type TableQueryForm,
+} from '@/api/support/codeGeneratorApi';
 import type { PageResult } from '@/api/types/response';
 import ConfigDrawer from './components/ConfigDrawer';
 import PreviewModal from './components/PreviewModal';
@@ -205,7 +209,7 @@ const CodeGeneratorPage: React.FC = () => {
             total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             onChange: handlePageChange,
           }}
         />

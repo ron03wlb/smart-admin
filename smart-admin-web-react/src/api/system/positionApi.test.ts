@@ -8,7 +8,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { positionApi } from './positionApi';
-import type { PositionVO, PositionQueryForm, PositionFormData } from '@/views/system/position/types';
+import type {
+  PositionVO,
+  PositionQueryForm,
+  PositionFormData,
+} from '@/views/system/position/types';
 import type { ResponseDTO, PageResult } from '@/api/types/response';
 
 // Mock request module

@@ -103,7 +103,7 @@ describe('enterpriseConst', () => {
     });
 
     it('should have positive numbers for all widths', () => {
-      Object.values(ENTERPRISE_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(ENTERPRISE_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
       });
     });

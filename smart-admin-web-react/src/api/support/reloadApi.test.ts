@@ -32,7 +32,13 @@ describe('reloadApi', () => {
       const mockResponse = {
         code: 200,
         data: [
-          { tag: 'test', identification: 'id1', args: 'args1', createTime: '2024-01-01', updateTime: '2024-01-02' },
+          {
+            tag: 'test',
+            identification: 'id1',
+            args: 'args1',
+            createTime: '2024-01-01',
+            updateTime: '2024-01-02',
+          },
         ],
         ok: true,
       };
@@ -74,9 +80,7 @@ describe('reloadApi', () => {
       const tag = 'test-tag';
       const mockResponse = {
         code: 200,
-        data: [
-          { id: 1, tag: 'test-tag', args: 'args', result: true, createTime: '2024-01-01' },
-        ],
+        data: [{ id: 1, tag: 'test-tag', args: 'args', result: true, createTime: '2024-01-01' }],
         ok: true,
       };
 

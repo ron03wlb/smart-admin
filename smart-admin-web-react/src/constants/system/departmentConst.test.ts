@@ -58,7 +58,7 @@ describe('departmentConst', () => {
         'operate',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(DEPARTMENT_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
           typeof DEPARTMENT_TABLE_COLUMNS_WIDTH[
@@ -69,7 +69,7 @@ describe('departmentConst', () => {
     });
 
     it('should have reasonable width values', () => {
-      Object.values(DEPARTMENT_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(DEPARTMENT_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(500);
       });

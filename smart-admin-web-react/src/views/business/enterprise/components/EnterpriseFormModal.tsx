@@ -208,10 +208,7 @@ export default function EnterpriseFormModal({
     >
       <Form form={form} layout="vertical" preserve={false} style={{ marginTop: 16 }}>
         <Form.Item label="企業名稱" name="enterpriseName" rules={rules.enterpriseName}>
-          <Input
-            placeholder="請輸入企業名稱"
-            maxLength={ENTERPRISE_VALIDATION.NAME_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入企業名稱" maxLength={ENTERPRISE_VALIDATION.NAME_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item
@@ -236,17 +233,11 @@ export default function EnterpriseFormModal({
         </Form.Item>
 
         <Form.Item label="聯系人" name="contact" rules={rules.contact}>
-          <Input
-            placeholder="請輸入聯系人"
-            maxLength={ENTERPRISE_VALIDATION.CONTACT_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入聯系人" maxLength={ENTERPRISE_VALIDATION.CONTACT_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item label="聯系電話" name="contactPhone" rules={rules.contactPhone}>
-          <Input
-            placeholder="請輸入聯系電話"
-            maxLength={ENTERPRISE_VALIDATION.PHONE_MAX_LENGTH}
-          />
+          <Input placeholder="請輸入聯系電話" maxLength={ENTERPRISE_VALIDATION.PHONE_MAX_LENGTH} />
         </Form.Item>
 
         <Form.Item label="郵箱" name="email" rules={rules.email}>
@@ -269,28 +260,16 @@ export default function EnterpriseFormModal({
           />
         </Form.Item>
 
-        <Form.Item
-          label="企業 Logo"
-          name="enterpriseLogo"
-          tooltip="TODO: 應使用文件上傳組件"
-        >
+        <Form.Item label="企業 Logo" name="enterpriseLogo" tooltip="TODO: 應使用文件上傳組件">
           <Input placeholder="Logo URL（暫用文本，後續應使用文件上傳組件）" />
         </Form.Item>
 
-        <Form.Item
-          label="營業執照"
-          name="businessLicense"
-          tooltip="TODO: 應使用文件上傳組件"
-        >
+        <Form.Item label="營業執照" name="businessLicense" tooltip="TODO: 應使用文件上傳組件">
           <Input placeholder="營業執照 URL（暫用文本，後續應使用文件上傳組件）" />
         </Form.Item>
 
         <Form.Item label="啟用狀態" name="disabledFlag" valuePropName="checked">
-          <Switch
-            checkedChildren="禁用"
-            unCheckedChildren="啟用"
-            defaultChecked={false}
-          />
+          <Switch checkedChildren="禁用" unCheckedChildren="啟用" defaultChecked={false} />
         </Form.Item>
       </Form>
     </Modal>

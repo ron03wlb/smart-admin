@@ -43,7 +43,10 @@ describe('apiEncryptApi', () => {
 
       const result = await apiEncryptApi.testRequestEncrypt(mockFormData);
 
-      expect(request.post).toHaveBeenCalledWith('/support/apiEncrypt/testRequestEncrypt', mockFormData);
+      expect(request.post).toHaveBeenCalledWith(
+        '/support/apiEncrypt/testRequestEncrypt',
+        mockFormData
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -60,7 +63,10 @@ describe('apiEncryptApi', () => {
 
       const result = await apiEncryptApi.testResponseEncrypt(mockFormData);
 
-      expect(request.post).toHaveBeenCalledWith('/support/apiEncrypt/testResponseEncrypt', mockFormData);
+      expect(request.post).toHaveBeenCalledWith(
+        '/support/apiEncrypt/testResponseEncrypt',
+        mockFormData
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -77,7 +83,10 @@ describe('apiEncryptApi', () => {
 
       const result = await apiEncryptApi.testDecryptAndEncrypt(mockFormData);
 
-      expect(request.post).toHaveBeenCalledWith('/support/apiEncrypt/testDecryptAndEncrypt', mockFormData);
+      expect(request.post).toHaveBeenCalledWith(
+        '/support/apiEncrypt/testDecryptAndEncrypt',
+        mockFormData
+      );
       expect(result).toEqual(mockResponse);
     });
   });

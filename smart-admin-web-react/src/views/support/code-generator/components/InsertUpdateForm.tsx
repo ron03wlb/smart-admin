@@ -53,7 +53,7 @@ const InsertUpdateForm = forwardRef<InsertUpdateFormRef>((_props, ref) => {
    * 驗證表單
    */
   const validateForm = (): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       form
         .validateFields()
         .then(() => {
@@ -94,7 +94,7 @@ const InsertUpdateForm = forwardRef<InsertUpdateFormRef>((_props, ref) => {
             form={form}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
-            onValuesChange={(changedValues) => {
+            onValuesChange={changedValues => {
               if ('isSupportInsertAndUpdate' in changedValues) {
                 setIsSupportInsertAndUpdate(changedValues.isSupportInsertAndUpdate);
               }
@@ -106,11 +106,7 @@ const InsertUpdateForm = forwardRef<InsertUpdateFormRef>((_props, ref) => {
               }
             }}
           >
-            <Form.Item
-              label="是否支持"
-              name="isSupportInsertAndUpdate"
-              initialValue={true}
-            >
+            <Form.Item label="是否支持" name="isSupportInsertAndUpdate" initialValue={true}>
               <Radio.Group buttonStyle="solid">
                 <Radio.Button value={true}>支持</Radio.Button>
                 <Radio.Button value={false}>不支持添加、修改</Radio.Button>

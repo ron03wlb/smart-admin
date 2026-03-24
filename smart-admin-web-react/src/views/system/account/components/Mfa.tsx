@@ -9,13 +9,7 @@
 import { Result } from 'antd';
 
 const Mfa: React.FC = () => {
-  return (
-    <Result
-      status="info"
-      title="多因素認證"
-      subTitle="多因素認證功能開發中，敬請期待..."
-    />
-  );
+  return <Result status="info" title="多因素認證" subTitle="多因素認證功能開發中，敬請期待..." />;
 };
 
 export default Mfa;

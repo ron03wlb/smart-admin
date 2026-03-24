@@ -106,7 +106,10 @@ export const employeeApi = {
    * 更新員工密碼
    * @param params 密碼信息
    */
-  updateEmployeePassword: (params: { oldPassword: string; newPassword: string }): Promise<ResponseDTO<void>> => {
+  updateEmployeePassword: (params: {
+    oldPassword: string;
+    newPassword: string;
+  }): Promise<ResponseDTO<void>> => {
     return request.post('/employee/update/password', params);
   },
 

@@ -70,18 +70,16 @@ describe('loginLogConst', () => {
         'createTime',
       ];
 
-      requiredColumns.forEach((column) => {
+      requiredColumns.forEach(column => {
         expect(LOGIN_LOG_TABLE_COLUMNS_WIDTH).toHaveProperty(column);
         expect(
-          typeof LOGIN_LOG_TABLE_COLUMNS_WIDTH[
-            column as keyof typeof LOGIN_LOG_TABLE_COLUMNS_WIDTH
-          ]
+          typeof LOGIN_LOG_TABLE_COLUMNS_WIDTH[column as keyof typeof LOGIN_LOG_TABLE_COLUMNS_WIDTH]
         ).toBe('number');
       });
     });
 
     it('should have reasonable width values', () => {
-      Object.values(LOGIN_LOG_TABLE_COLUMNS_WIDTH).forEach((width) => {
+      Object.values(LOGIN_LOG_TABLE_COLUMNS_WIDTH).forEach(width => {
         expect(width).toBeGreaterThan(0);
         expect(width).toBeLessThanOrEqual(500);
       });

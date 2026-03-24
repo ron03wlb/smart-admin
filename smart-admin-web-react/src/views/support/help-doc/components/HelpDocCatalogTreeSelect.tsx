@@ -26,9 +26,9 @@ export interface HelpDocCatalogTreeSelectRef {
  * 構建目錄樹
  */
 function buildHelpDocCatalogTree(data: HelpDocCatalogVO[], parentId: number): HelpDocCatalogVO[] {
-  let children = data.filter((e) => e.parentId === parentId) || [];
+  let children = data.filter(e => e.parentId === parentId) || [];
   children = children.sort((a, b) => a.sort - b.sort);
-  children.forEach((e) => {
+  children.forEach(e => {
     e.children = buildHelpDocCatalogTree(data, e.helpDocCatalogId);
   });
   updateHelpDocCatalogPreIdAndNextId(children);
@@ -56,46 +56,47 @@ function updateHelpDocCatalogPreIdAndNextId(data: HelpDocCatalogVO[]) {
   }
 }
 
-const HelpDocCatalogTreeSelect = forwardRef<HelpDocCatalogTreeSelectRef, HelpDocCatalogTreeSelectProps>(
-  ({ value, onChange, multiple = false, style }, ref) => {
-    const [treeData, setTreeData] = useState<HelpDocCatalogVO[]>([]);
+const HelpDocCatalogTreeSelect = forwardRef<
+  HelpDocCatalogTreeSelectRef,
+  HelpDocCatalogTreeSelectProps
+>(({ value, onChange, multiple = false, style }, ref) => {
+  const [treeData, setTreeData] = useState<HelpDocCatalogVO[]>([]);
 
-    useEffect(() => {
-      queryCatalogTree();
-    }, []);
+  useEffect(() => {
+    queryCatalogTree();
+  }, []);
 
-    const queryCatalogTree = async () => {
-      try {
-        const res = await helpDocCatalogApi.getAll();
-        const children = buildHelpDocCatalogTree(res.data, 0);
-        setTreeData(children);
-      } catch (error) {
-        console.error('Failed to fetch catalog tree:', error);
-      }
-    };
+  const queryCatalogTree = async () => {
+    try {
+      const res = await helpDocCatalogApi.getAll();
+      const children = buildHelpDocCatalogTree(res.data, 0);
+      setTreeData(children);
+    } catch (error) {
+      console.error('Failed to fetch catalog tree:', error);
+    }
+  };
 
-    useImperativeHandle(ref, () => ({
-      queryCatalogTree,
-    }));
+  useImperativeHandle(ref, () => ({
+    queryCatalogTree,
+  }));
 
-    return (
-      <TreeSelect
-        value={value}
-        onChange={onChange}
-        treeData={treeData}
-        fieldNames={{ label: 'name', value: 'helpDocCatalogId', children: 'children' }}
-        showSearch
-        style={style || { width: '100%' }}
-        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-        placeholder="請選擇目錄"
-        allowClear
-        treeDefaultExpandAll
-        multiple={multiple}
-        treeNodeFilterProp="name"
-      />
-    );
-  }
-);
+  return (
+    <TreeSelect
+      value={value}
+      onChange={onChange}
+      treeData={treeData}
+      fieldNames={{ label: 'name', value: 'helpDocCatalogId', children: 'children' }}
+      showSearch
+      style={style || { width: '100%' }}
+      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+      placeholder="請選擇目錄"
+      allowClear
+      treeDefaultExpandAll
+      multiple={multiple}
+      treeNodeFilterProp="name"
+    />
+  );
+});
 
 HelpDocCatalogTreeSelect.displayName = 'HelpDocCatalogTreeSelect';
 
