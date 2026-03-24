@@ -7,12 +7,13 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Drawer, Table, Input, Button, Space, message, Modal, Tag, Alert } from 'antd';
+import { Drawer, Table, Input, Button, Space, message, Modal, Tag } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { SearchOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SearchOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { roleApi } from '@/api/system/roleApi';
 import type { RoleVO, RoleEmployeeVO, RoleEmployeeQueryForm } from '../types';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/common-const';
+import EmployeeTableSelectModal from './EmployeeTableSelectModal';
 
 interface RoleEmployeeDrawerProps {
   visible: boolean;
@@ -36,6 +37,9 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
 
   // 選中的員工 IDs
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  // 員工選擇 Modal 顯示狀態
+  const [employeeSelectModalVisible, setEmployeeSelectModalVisible] = useState(false);
 
   /**
    * 查詢員工列表
@@ -157,6 +161,37 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
   };
 
   /**
+   * 打開員工選擇 Modal
+   */
+  const handleOpenEmployeeSelect = () => {
+    setEmployeeSelectModalVisible(true);
+  };
+
+  /**
+   * 批量添加員工
+   */
+  const handleAddEmployees = async (employeeIds: number[]) => {
+    if (!role) return;
+
+    try {
+      const res = await roleApi.batchAddRoleEmployee({
+        roleId: role.roleId,
+        employeeIdList: employeeIds,
+      });
+
+      if (res.ok) {
+        message.success(`成功添加 ${employeeIds.length} 名員工`);
+        setEmployeeSelectModalVisible(false);
+        queryEmployeeList();
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error(error.message || '添加失敗');
+      }
+    }
+  };
+
+  /**
    * 表格列定義
    */
   const columns: ColumnsType<RoleEmployeeVO> = [
@@ -273,14 +308,10 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
           <Button onClick={handleReset}>重置</Button>
         </Space>
 
-        <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
-          <Alert
-            message="注意"
-            description="添加員工功能開發中。您可以從員工管理頁面將角色分配給員工。"
-            type="info"
-            showIcon
-            closable
-          />
+        <Space style={{ marginBottom: 16 }}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenEmployeeSelect}>
+            添加員工
+          </Button>
           <Button
             danger
             icon={<DeleteOutlined />}
@@ -304,6 +335,14 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
           bordered
         />
       </Drawer>
+
+      {/* 員工選擇 Modal */}
+      <EmployeeTableSelectModal
+        visible={employeeSelectModalVisible}
+        onCancel={() => setEmployeeSelectModalVisible(false)}
+        onConfirm={handleAddEmployees}
+        excludeEmployeeIds={tableData.map((emp) => emp.employeeId)}
+      />
     </>
   );
 }
