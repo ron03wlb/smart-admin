@@ -20,15 +20,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 /**
  * Flyway Migration Integration Test.
  *
- * <p>Validates that all 5 Flyway migration scripts execute successfully and create the expected
+ * <p>Validates that all 11 Flyway migration scripts execute successfully and create the expected
  * database schema:
  *
  * <ul>
- *   <li>17 tables (Player, Wallet x3, Payment, Activity x7, Risk x5)
+ *   <li>23 tables (Player, Wallet x4, Payment, Activity x7, Risk x5, Game x3, LiteFlow x2)
  *   <li>60+ indexes (UNIQUE, composite, partial)
  *   <li>20+ foreign key constraints
  *   <li>15+ CHECK constraints
  *   <li>Complete table and column comments
+ *   <li>LiteFlow turnover calculation chain pre-seeded
  * </ul>
  *
  * <p><b>Test Strategy:</b> Uses Testcontainers to spin up PostgreSQL 16 container, runs Flyway
@@ -99,16 +100,17 @@ class FlywayMigrationIntegrationTest {
         }
       }
 
-      // Verify all 6 migrations executed
+      // Verify all 11 migrations executed (including V004.5)
       assertThat(appliedMigrations)
-          .as("應該執行 6 個 migration scripts")
-          .containsExactly("001", "002", "003", "004", "005", "006");
+          .as("應該執行 11 個 migration scripts")
+          .containsExactly(
+              "001", "002", "003", "004", "004.5", "005", "006", "007", "008", "009", "010");
     }
   }
 
   @Test
-  @DisplayName("應該創建所有 17 張表")
-  void shouldCreate17Tables() throws Exception {
+  @DisplayName("應該創建所有 23 張表")
+  void shouldCreate23Tables() throws Exception {
     try (Connection conn = dataSource.getConnection();
         Statement stmt = conn.createStatement()) {
       // Query all tables in public schema
@@ -122,8 +124,8 @@ class FlywayMigrationIntegrationTest {
         tables.add(rs.getString("table_name"));
       }
 
-      // Verify 17 tables + 1 flyway_schema_history
-      assertThat(tables).as("應該創建 17 張業務表 + flyway_schema_history").hasSize(18);
+      // Verify 23 tables + 1 flyway_schema_history
+      assertThat(tables).as("應該創建 23 張業務表 + flyway_schema_history").hasSize(24);
 
       // Verify expected tables exist
       assertThat(tables)
@@ -134,6 +136,8 @@ class FlywayMigrationIntegrationTest {
               "t_wallet",
               "t_wallet_transaction",
               "t_wallet_lock",
+              // Wallet bonus extension (1) - V004.5
+              "t_wallet_bonus_ext",
               // Payment module (1)
               "t_payment_order",
               // Activity module (7)
@@ -149,7 +153,15 @@ class FlywayMigrationIntegrationTest {
               "t_risk_proposal",
               "t_risk_score",
               "t_risk_rule_param",
-              "t_geo_restriction");
+              "t_geo_restriction",
+              // Game module (2) - V007
+              "t_game",
+              "t_game_provider",
+              // Game weight config (1) - V008
+              "t_game_weight_config",
+              // LiteFlow module (2) - V009
+              "t_liteflow_chain",
+              "t_liteflow_script");
     }
   }
 
@@ -325,9 +337,49 @@ class FlywayMigrationIntegrationTest {
       String description = rs.getString("description");
       boolean success = rs.getBoolean("success");
 
-      assertThat(version).as("最新 schema version 應為 006").isEqualTo("006");
-      assertThat(description).as("最新 migration 描述").contains("seed initial data");
+      assertThat(version).as("最新 schema version 應為 010").isEqualTo("010");
+      assertThat(description).as("最新 migration 描述").contains("seed liteflow turnover chain");
       assertThat(success).as("最新 migration 應該成功").isTrue();
+    }
+  }
+
+  @Test
+  @DisplayName("應該插入 LiteFlow turnover calculation chain")
+  void shouldInsertTurnoverCalculationChain() throws Exception {
+    try (Connection conn = dataSource.getConnection();
+        Statement stmt = conn.createStatement()) {
+      // Verify chain exists
+      ResultSet rs =
+          stmt.executeQuery(
+              "SELECT COUNT(*) FROM t_liteflow_chain WHERE chain_code = 'turnover_calculation_main'"
+                  + " AND deleted_flag = 0");
+
+      assertThat(rs.next()).as("應該有查詢結果").isTrue();
+      long count = rs.getLong(1);
+      assertThat(count).as("應該存在 turnover_calculation_main chain").isEqualTo(1L);
+
+      // Verify chain details
+      ResultSet detailRs =
+          stmt.executeQuery(
+              "SELECT chain_name, chain_type, status, chain_data FROM t_liteflow_chain WHERE"
+                  + " chain_code = 'turnover_calculation_main'");
+
+      assertThat(detailRs.next()).as("應該有 chain 詳細資料").isTrue();
+
+      String chainName = detailRs.getString("chain_name");
+      int chainType = detailRs.getInt("chain_type");
+      int status = detailRs.getInt("status");
+      String chainData = detailRs.getString("chain_data");
+
+      assertThat(chainName).as("Chain 名稱").isEqualTo("流水計算主流程");
+      assertThat(chainType).as("Chain 類型應為串行流程").isEqualTo(1);
+      assertThat(status).as("Chain 狀態應為啟用").isEqualTo(1);
+      assertThat(chainData)
+          .as("Chain EL 表達式應包含所有 4 個 nodes")
+          .contains("riskFilterNode")
+          .contains("statusFactorNode")
+          .contains("gameWeightNode")
+          .contains("turnoverAggregateNode");
     }
   }
 }

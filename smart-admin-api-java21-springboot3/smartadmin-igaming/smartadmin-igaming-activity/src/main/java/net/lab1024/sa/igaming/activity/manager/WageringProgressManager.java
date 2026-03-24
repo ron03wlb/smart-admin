@@ -64,13 +64,33 @@ public class WageringProgressManager {
       return 0;
     }
 
-    // Calculate effective bet with game weight
-    BigDecimal effectiveBet = calculateEffectiveBet(tenantId, gameCode, betAmount);
+    // NOTE: betAmount parameter is actually activityValidTurnover from TurnoverCalculationService
+    // It has already been calculated through LiteFlow 3-layer verification:
+    // - Layer 1: Risk Filter (odds threshold + risk score)
+    // - Layer 2: Status Factor (settlement status)
+    // - Layer 3: Game Weight (game category weight)
+    // DO NOT recalculate game weight here, as it would result in double weight application
+    BigDecimal effectiveBet = betAmount;
+
+    log.info(
+        "Updating wagering progress: playerId={}, gameCode={}, effectiveBet={}, activeRecordsCount={}",
+        playerId,
+        gameCode,
+        effectiveBet,
+        activeRecords.size());
 
     int updated = 0;
     for (PlayerBonusRecordEntity record : activeRecords) {
-      BigDecimal newCompleted = record.getWageringCompleted().add(effectiveBet);
+      BigDecimal oldCompleted = record.getWageringCompleted();
+      BigDecimal newCompleted = oldCompleted.add(effectiveBet);
       record.setWageringCompleted(newCompleted);
+
+      log.info(
+          "Record update: recordId={}, oldCompleted={}, effectiveBet={}, newCompleted={}",
+          record.getRecordId(),
+          oldCompleted,
+          effectiveBet,
+          newCompleted);
 
       // Update WalletBonusExt wageredAmount
       if (record.getWalletBonusExtId() != null) {

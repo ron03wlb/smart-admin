@@ -66,11 +66,16 @@ public class BonusConversionIntegrationService {
   private final DomainEventPublisher domainEventPublisher;
 
   /**
-   * Query wagering progress for a player's active bonuses.
+   * Query wagering progress for a player's active or completed bonuses.
    *
-   * <p>This method retrieves all active bonuses for a player and calculates the wagering progress
-   * for each one. It is typically called by the frontend to display wagering progress to the
-   * player.
+   * <p>This method retrieves all active and completed bonuses for a player and calculates the
+   * wagering progress for each one. It is typically called by the frontend to display wagering
+   * progress to the player.
+   *
+   * <p><b>Why Include COMPLETED Status?</b> When wagering reaches 100%, the bonus status changes
+   * from ACTIVE to COMPLETED. However, the actual bonus-to-cash conversion may happen
+   * asynchronously (via Kafka event). During this brief window, players should still see the
+   * completed bonus in their wagering progress list (showing 100% progress, ready for conversion).
    *
    * @param playerId player ID
    * @return list of wagering progress VOs
@@ -80,7 +85,10 @@ public class BonusConversionIntegrationService {
         playerBonusRecordDao.selectList(
             Wrappers.<PlayerBonusRecordEntity>lambdaQuery()
                 .eq(PlayerBonusRecordEntity::getPlayerId, playerId)
-                .eq(PlayerBonusRecordEntity::getStatus, BonusRecordStatusEnum.ACTIVE.getValue())
+                .in(
+                    PlayerBonusRecordEntity::getStatus,
+                    BonusRecordStatusEnum.ACTIVE.getValue(),
+                    BonusRecordStatusEnum.COMPLETED.getValue())
                 .orderByDesc(PlayerBonusRecordEntity::getCreateTime));
 
     List<WageringProgressVO> progressList =

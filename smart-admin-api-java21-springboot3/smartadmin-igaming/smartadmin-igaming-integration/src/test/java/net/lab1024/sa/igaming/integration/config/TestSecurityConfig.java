@@ -16,6 +16,7 @@ import net.lab1024.sa.common.core.domain.SystemEnvironment;
 import net.lab1024.sa.common.core.enumeration.SystemEnvironmentEnum;
 import net.lab1024.sa.common.token.player.StpPlayerLogic;
 import net.lab1024.sa.common.token.player.StpPlayerUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -137,13 +138,13 @@ public class TestSecurityConfig {
   /**
    * Provides a mock FlowExecutor for tests.
    *
-   * <p>This mock implementation bypasses LiteFlow initialization when liteflow.enable=false. Tests
-   * that need actual LiteFlow functionality should enable it in their test profile.
+   * <p>This mock implementation bypasses LiteFlow initialization when smart.liteflow.enabled=false.
+   * Tests that need actual LiteFlow functionality should enable it in their test profile.
    *
    * <p><b>Why Mock Instead of Real?</b>
    *
    * <ul>
-   *   <li>Avoids LiteFlow SQL parser initialization errors when liteflow.enable=false
+   *   <li>Avoids LiteFlow SQL parser initialization errors when smart.liteflow.enabled=false
    *   <li>Integration tests focus on Player/Wallet/Bonus flow, not LiteFlow rules
    *   <li>LiteFlow functionality is tested separately in TurnoverCalculationIntegrationTest
    * </ul>
@@ -151,7 +152,11 @@ public class TestSecurityConfig {
    * @return mock FlowExecutor instance using Mockito
    */
   @Bean
-  @Primary
+  @ConditionalOnProperty(
+      prefix = "smart.liteflow",
+      name = "enabled",
+      havingValue = "false",
+      matchIfMissing = false)
   public FlowExecutor mockFlowExecutor() {
     FlowExecutor mockExecutor = mock(FlowExecutor.class);
 

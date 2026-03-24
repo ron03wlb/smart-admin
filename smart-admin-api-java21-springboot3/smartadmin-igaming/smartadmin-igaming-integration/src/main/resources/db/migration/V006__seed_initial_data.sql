@@ -115,7 +115,7 @@ INSERT INTO t_turnover_game_weight_rule (tenant_id, rule_code, rule_name, game_c
 
 INSERT INTO t_turnover_status_factor_rule (tenant_id, rule_code, rule_name, settlement_status, factor_percentage, effective_from, effective_to, status, deleted, version) VALUES
 (1, 'SF-WIN-100', 'Win Status 100% Factor', 1, 100.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 years', 1, FALSE, 0),
-(1, 'SF-LOSS-100', 'Loss Status 100% Factor', 2, 100.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 years', 1, FALSE, 0),
+(1, 'SF-LOSS-0', 'Loss Status 0% Factor', 2, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 years', 1, FALSE, 0),
 (1, 'SF-DRAW-0', 'Draw Status 0% Factor', 3, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 years', 1, FALSE, 0),
 (1, 'SF-TIE-0', 'Tie Status 0% Factor', 4, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 years', 1, FALSE, 0),
 (1, 'SF-VOID-0', 'Void Status 0% Factor', 5, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '10 years', 1, FALSE, 0),

@@ -1,14 +1,11 @@
 package net.lab1024.sa.igaming.activity.turnover.service;
 
-import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.activity.turnover.domain.TurnoverContext;
 import net.lab1024.sa.support.liteflow.core.executor.SmartFlowExecutor;
-import net.lab1024.sa.support.liteflow.domain.form.LiteFlowChainAddForm;
-import net.lab1024.sa.support.liteflow.manager.LiteFlowChainManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,67 +35,8 @@ import org.springframework.stereotype.Service;
 public class TurnoverCalculationService {
 
   private static final String CHAIN_CODE = "turnover_calculation_main";
-  private static final String CHAIN_NAME = "流水計算主流程";
-  private static final String CHAIN_EL =
-      "THEN(riskFilterNode, statusFactorNode, gameWeightNode, turnoverAggregateNode)";
 
   private final SmartFlowExecutor flowExecutor;
-  private final LiteFlowChainManager chainManager;
-
-  /**
-   * Initialize LiteFlow chain on application startup.
-   *
-   * <p>This method ensures the turnover calculation chain exists in the database. If the chain
-   * already exists, it will be skipped.
-   */
-  @PostConstruct
-  public void initializeChain() {
-    try {
-      // Check if chain already exists
-      if (chainExists()) {
-        log.info("LiteFlow chain already exists: chainCode={}", CHAIN_CODE);
-        return;
-      }
-
-      // Create chain definition
-      LiteFlowChainAddForm form = new LiteFlowChainAddForm();
-      form.setChainName(CHAIN_NAME);
-      form.setChainCode(CHAIN_CODE);
-      form.setChainType(1); // Normal serial flow
-      form.setChainData(CHAIN_EL);
-      form.setRemark("Turnover calculation chain for bet settlement - 3-layer verification");
-
-      // Add chain via manager (transaction + reload)
-      ResponseDTO<String> response = chainManager.add(form, 0L, "SYSTEM");
-
-      if (response.getOk()) {
-        log.info(
-            "LiteFlow chain initialized successfully: chainCode={}, chainEL={}",
-            CHAIN_CODE,
-            CHAIN_EL);
-      } else {
-        log.error("Failed to initialize LiteFlow chain: {}", response.getMsg());
-      }
-    } catch (Exception e) {
-      log.error("Error initializing LiteFlow chain", e);
-      // Don't throw - allow application to start even if chain initialization fails
-    }
-  }
-
-  /**
-   * Check if chain already exists in database.
-   *
-   * @return true if chain exists, false otherwise
-   */
-  private boolean chainExists() {
-    try {
-      // Try to reload the chain - if it exists, this will succeed
-      flowExecutor.reloadRule();
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
-  }
 
   /**
    * Calculate turnover for a bet settlement.

@@ -15,7 +15,8 @@ import net.lab1024.sa.igaming.activity.turnover.manager.TurnoverStatusFactorRule
  * <p>Status factor logic:
  *
  * <ul>
- *   <li><b>WIN/LOSS/HALF_WIN/HALF_LOSS</b> (status 1,2,7,8): 100% - full turnover counts
+ *   <li><b>WIN/HALF_WIN/HALF_LOSS</b> (status 1,7,8): 100% - full turnover counts
+ *   <li><b>LOSS</b> (status 2): 0% - no turnover (player-friendly wagering rule)
  *   <li><b>DRAW/TIE/VOID/CANCEL/RUNNING</b> (status 3,4,5,6,9): 0% - no turnover (bet cancelled or
  *       unsettled)
  * </ul>

@@ -48,7 +48,11 @@ public class LiteFlowCacheManager {
    */
   public void evictChain(String chainCode) {
     log.debug("清除 Chain 緩存: chainCode={}", chainCode);
-    chainCache.remove(chainCode);
+    if (chainCache != null) {
+      chainCache.remove(chainCode);
+    } else {
+      log.warn("chainCache is null, skipping eviction for chainCode={}", chainCode);
+    }
   }
 
   /**
@@ -58,7 +62,11 @@ public class LiteFlowCacheManager {
    */
   public void evictScript(String scriptCode) {
     log.debug("清除 Script 緩存: scriptCode={}", scriptCode);
-    scriptCache.remove(scriptCode);
+    if (scriptCache != null) {
+      scriptCache.remove(scriptCode);
+    } else {
+      log.warn("scriptCache is null, skipping eviction for scriptCode={}", scriptCode);
+    }
   }
 
   /**
@@ -68,7 +76,15 @@ public class LiteFlowCacheManager {
    */
   public void evictAll() {
     log.info("清除所有 LiteFlow 緩存");
-    chainCache.unwrap(com.github.benmanes.caffeine.cache.Cache.class).invalidateAll();
-    scriptCache.unwrap(com.github.benmanes.caffeine.cache.Cache.class).invalidateAll();
+    if (chainCache != null) {
+      chainCache.unwrap(com.github.benmanes.caffeine.cache.Cache.class).invalidateAll();
+    } else {
+      log.warn("chainCache is null, skipping cache invalidation");
+    }
+    if (scriptCache != null) {
+      scriptCache.unwrap(com.github.benmanes.caffeine.cache.Cache.class).invalidateAll();
+    } else {
+      log.warn("scriptCache is null, skipping cache invalidation");
+    }
   }
 }

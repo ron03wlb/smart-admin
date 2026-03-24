@@ -43,6 +43,13 @@ public class SmartFlowExecutor {
       log.info("執行 LiteFlow 流程: chainCode={}", chainCode);
       LiteflowResponse response = executor.execute2Resp(chainCode, null, params);
 
+      // Check for null response (should not happen, but defensive programming)
+      if (response == null) {
+        log.error("流程執行返回 null: chainCode={}", chainCode);
+        throw new IllegalStateException(
+            "LiteFlow execution returned null response for chain: " + chainCode);
+      }
+
       if (response.isSuccess()) {
         log.info("流程執行成功: chainCode={}, 執行步驟={}", chainCode, response.getExecuteStepStrWithTime());
       } else {

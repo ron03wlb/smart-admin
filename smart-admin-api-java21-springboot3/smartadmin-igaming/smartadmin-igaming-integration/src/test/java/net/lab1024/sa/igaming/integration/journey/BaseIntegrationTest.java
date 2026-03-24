@@ -2,6 +2,8 @@ package net.lab1024.sa.igaming.integration.journey;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import net.lab1024.sa.common.core.tenant.TenantContext;
+import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
+import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
@@ -67,6 +69,8 @@ public abstract class BaseIntegrationTest {
 
   @Autowired private WalletDao walletDao;
 
+  @Autowired private PlayerBonusRecordDao bonusRecordDao;
+
   /**
    * Clean up test data before each test to ensure clean state.
    *
@@ -88,20 +92,28 @@ public abstract class BaseIntegrationTest {
     System.out.println("[@BeforeEach] Cleaning database for tenant " + TenantContext.getTenantId());
 
     // Count existing data before cleanup
+    long bonusCountBefore =
+        bonusRecordDao.selectCount(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
     long walletCountBefore = walletDao.selectCount(new LambdaQueryWrapper<WalletEntity>());
     long playerCountBefore = playerDao.selectCount(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println(
         "[@BeforeEach] Before cleanup: "
+            + bonusCountBefore
+            + " bonus records, "
             + walletCountBefore
             + " wallets, "
             + playerCountBefore
             + " players");
 
-    // Clean up wallets first (foreign key constraint to players)
+    // ✅ FIXED: Clean up bonus records first (foreign key to players)
+    int bonusDeleted = bonusRecordDao.delete(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
+    System.out.println("[@BeforeEach] Deleted " + bonusDeleted + " bonus records");
+
+    // Then clean up wallets (foreign key constraint to players)
     int walletsDeleted = walletDao.delete(new LambdaQueryWrapper<WalletEntity>());
     System.out.println("[@BeforeEach] Deleted " + walletsDeleted + " wallets");
 
-    // Then clean up players
+    // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println("[@BeforeEach] Deleted " + playersDeleted + " players");
   }
@@ -126,20 +138,28 @@ public abstract class BaseIntegrationTest {
     System.out.println("[@AfterEach] Cleaning database for tenant " + TenantContext.getTenantId());
 
     // Count existing data before cleanup
+    long bonusCountBefore =
+        bonusRecordDao.selectCount(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
     long walletCountBefore = walletDao.selectCount(new LambdaQueryWrapper<WalletEntity>());
     long playerCountBefore = playerDao.selectCount(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println(
         "[@AfterEach] Before cleanup: "
+            + bonusCountBefore
+            + " bonus records, "
             + walletCountBefore
             + " wallets, "
             + playerCountBefore
             + " players");
 
-    // Clean up wallets first (foreign key constraint to players)
+    // ✅ FIXED: Clean up bonus records first (foreign key to players)
+    int bonusDeleted = bonusRecordDao.delete(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
+    System.out.println("[@AfterEach] Deleted " + bonusDeleted + " bonus records");
+
+    // Then clean up wallets (foreign key constraint to players)
     int walletsDeleted = walletDao.delete(new LambdaQueryWrapper<WalletEntity>());
     System.out.println("[@AfterEach] Deleted " + walletsDeleted + " wallets");
 
-    // Then clean up players
+    // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println("[@AfterEach] Deleted " + playersDeleted + " players");
 
@@ -223,5 +243,10 @@ public abstract class BaseIntegrationTest {
             String.format(
                 "singleServerConfig:\n  address: \"redis://%s:%d\"\n  database: 0",
                 redis.getHost(), redis.getFirstMappedPort()));
+
+    // LiteFlow database configuration (CRITICAL: Must match Testcontainers PostgreSQL)
+    registry.add("liteflow.rule-source-ext-data-map.url", postgres::getJdbcUrl);
+    registry.add("liteflow.rule-source-ext-data-map.username", postgres::getUsername);
+    registry.add("liteflow.rule-source-ext-data-map.password", postgres::getPassword);
   }
 }

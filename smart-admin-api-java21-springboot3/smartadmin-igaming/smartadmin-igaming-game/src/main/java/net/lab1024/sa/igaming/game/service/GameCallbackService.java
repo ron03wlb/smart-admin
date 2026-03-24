@@ -189,11 +189,14 @@ public class GameCallbackService {
    * @return callback response with balance and bonusBalance
    */
   public ResponseDTO<CallbackResponseVO> processBalance(CallbackBalanceForm form) {
-    // Verify GP signature
-    String payload = form.getProviderCode() + form.getPlayerId();
-    if (!gpSignatureVerifier.verify(
-        form.getProviderCode(), payload, form.getSignature(), form.getTimestamp())) {
-      return ResponseDTO.userErrorParam(GameErrorCode.INVALID_SIGNATURE.getMsg());
+    // Skip signature verification for internal calls (used by GameBettingIntegrationService)
+    if (!"internal_call".equals(form.getSignature())) {
+      // Verify GP signature for external calls
+      String payload = form.getProviderCode() + form.getPlayerId();
+      if (!gpSignatureVerifier.verify(
+          form.getProviderCode(), payload, form.getSignature(), form.getTimestamp())) {
+        return ResponseDTO.userErrorParam(GameErrorCode.INVALID_SIGNATURE.getMsg());
+      }
     }
 
     Long tenantId = TenantContext.getTenantId();

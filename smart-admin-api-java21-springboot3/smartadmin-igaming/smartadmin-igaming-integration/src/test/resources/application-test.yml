@@ -77,21 +77,39 @@ mybatis-plus:
   global-config:
     banner: false
     db-config:
-      logic-delete-field: deleted
-      logic-delete-value: true
-      logic-not-delete-value: false
+      logic-delete-field: deletedFlag  # ✅ FIXED: Match LiteFlowChainEntity.deletedFlag and V009 schema deleted_flag
+      logic-delete-value: 1  # ✅ FIXED: Match V009 schema (1=已刪除)
+      logic-not-delete-value: 0  # ✅ FIXED: Match V009 schema (0=未刪除)
 
-# LiteFlow (disabled for Player/Wallet/Bonus integration tests)
-# LiteFlow is only required for:
+# LiteFlow (ENABLED for GameBettingJourneyIntegrationTest)
+# LiteFlow is required for:
+# - GameBettingJourneyIntegrationTest (Game betting + Turnover calculation + Wagering progress)
 # - TurnoverCalculationIntegrationTest (Turnover calculation with risk rules)
 # - WithdrawalRiskCheckService (Withdrawal risk assessment)
-# Disabling prevents TurnoverCalculationService @PostConstruct from triggering FlowExecutor initialization
 liteflow:
-  enable: false
-  rule-source-ext-data:
-    # Use classpath rule source for tests (EL XML files)
-    data-source: xml
-    xml-path: liteflow/**/*.el.xml
+  enable: true  # ✅ FIXED: Was false, causing turnover calculation to fail
+  # ✅ FIXED: Use database-driven rules with complete configuration
+  # ⚠️ NOTE: Database URL will be dynamically overridden by @DynamicPropertySource in tests
+  rule-source-ext-data-map:
+    applicationName: smartadmin-igaming-integration-test
+    url: jdbc:postgresql://localhost:5432/testdb
+    driverClassName: org.postgresql.Driver
+    username: test
+    password: test
+    # Chain 表映射 (matches V009 t_liteflow_chain)
+    chainTableName: t_liteflow_chain
+    chainNameField: chain_code  # ✅ FIXED: LiteFlow uses this as the unique chain identifier (matches execute(chainCode, ctx))
+    elDataField: chain_data
+    chainEnableField: status
+    # Script 表映射 (matches V009 t_liteflow_script)
+    scriptTableName: t_liteflow_script
+    scriptIdField: script_id_name
+    scriptNameField: script_name
+    scriptDataField: script_data
+    scriptTypeField: script_type
+    scriptLanguageField: script_type
+    # 輪詢配置（禁用 — 使用手動觸發）
+    pollingEnabled: false
   print-banner: false
   print-execution-log: true
   when-max-workers: 4
@@ -140,6 +158,9 @@ logging:
 
 # Security Configuration
 smart:
+  # LiteFlow Configuration (required for real LiteFlow execution in tests)
+  liteflow:
+    enabled: true
   security:
     argon2:
       enabled: true
