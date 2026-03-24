@@ -182,7 +182,7 @@ export const dictSlice = createSlice({
       })
       .addCase(fetchAllDictData.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : '獲取字典數據失敗';
       });
   },
 });

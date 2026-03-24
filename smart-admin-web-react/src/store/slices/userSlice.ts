@@ -240,7 +240,7 @@ export const userSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || '登錄失敗';
+        state.error = typeof action.payload === 'string' ? action.payload : '登錄失敗';
       });
 
     // ========== getLoginInfo ==========
@@ -277,7 +277,7 @@ export const userSlice = createSlice({
       })
       .addCase(getLoginInfo.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || '獲取登錄信息失敗';
+        state.error = typeof action.payload === 'string' ? action.payload : '獲取登錄信息失敗';
       });
 
     // ========== logout ==========
@@ -307,7 +307,7 @@ export const userSlice = createSlice({
       })
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || '退出登錄失敗';
+        state.error = typeof action.payload === 'string' ? action.payload : '退出登錄失敗';
 
         // 即使退出失敗，也清除本地狀態
         state.token = '';
