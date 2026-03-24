@@ -18,6 +18,8 @@ import {
   MENU_TYPE_LABELS,
   PERMS_TYPE_LABELS,
 } from '@/constants/system/menuConst';
+import MenuTreeSelect from './MenuTreeSelect';
+import IconSelect from './IconSelect';
 
 interface MenuFormModalProps {
   visible: boolean;
@@ -59,6 +61,18 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
 
   // ==================== Form Validation Rules ====================
 
+  /**
+   * 權限格式正則：module:resource:action
+   * 例如: system:menu:add
+   */
+  const PERMISSION_PATTERN = /^[a-z0-9]+:[a-z0-9]+:[a-z0-9]+$/;
+
+  /**
+   * 多個權限格式正則（逗號分隔）
+   * 例如: system:menu:add,system:menu:update
+   */
+  const MULTI_PERMISSION_PATTERN = /^[a-z0-9]+:[a-z0-9]+:[a-z0-9]+(,[a-z0-9]+:[a-z0-9]+:[a-z0-9]+)*$/;
+
   const rules = {
     menuName: [
       { required: true, message: '菜單名稱不能為空' },
@@ -87,6 +101,18 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
             },
           ]
         : [],
+    webPerms: [
+      {
+        pattern: PERMISSION_PATTERN,
+        message: '權限格式錯誤！正確格式：module:resource:action（例如：system:menu:add）',
+      },
+    ],
+    apiPerms: [
+      {
+        pattern: MULTI_PERMISSION_PATTERN,
+        message: '權限格式錯誤！正確格式：module:resource:action，多個用逗號分隔（例如：system:menu:add,system:menu:update）',
+      },
+    ],
   };
 
   // ==================== Form Submission ====================
@@ -215,8 +241,25 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
         <Form.Item
           label={menuType === MenuTypeEnum.CATALOG ? '上級目錄' : '上級菜單'}
           name="parentId"
+          help={
+            menuType === MenuTypeEnum.CATALOG
+              ? '目錄的上級只能是目錄或頂級'
+              : menuType === MenuTypeEnum.MENU
+                ? '菜單的上級只能是目錄'
+                : '功能點的上級只能是菜單'
+          }
         >
-          <Input placeholder="上級菜單ID（後續實現 MenuTreeSelect）" />
+          <MenuTreeSelect
+            menuType={menuType}
+            currentMenuId={initialData?.menuId}
+            placeholder={
+              menuType === MenuTypeEnum.CATALOG
+                ? '請選擇上級目錄'
+                : menuType === MenuTypeEnum.MENU
+                  ? '請選擇上級目錄'
+                  : '請選擇上級菜單'
+            }
+          />
         </Form.Item>
 
         {/* 目錄、菜單共用欄位 */}
@@ -226,8 +269,8 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
               <Input placeholder="請輸入菜單名稱" />
             </Form.Item>
 
-            <Form.Item label="菜單圖標" name="icon">
-              <Input placeholder="請輸入菜單圖標（後續實現 IconSelect）" />
+            <Form.Item label="菜單圖標" name="icon" help="選擇 Ant Design 常用圖標">
+              <IconSelect placeholder="請選擇菜單圖標" />
             </Form.Item>
 
             {menuType === MenuTypeEnum.MENU && (
@@ -286,8 +329,16 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
               <Input placeholder="請輸入功能點名稱" />
             </Form.Item>
 
-            <Form.Item label="功能點關聯菜單" name="contextMenuId">
-              <Input placeholder="關聯菜單ID（後續實現 MenuTreeSelect）" />
+            <Form.Item
+              label="功能點關聯菜單"
+              name="contextMenuId"
+              help="選擇該功能點所屬的菜單頁面（用於權限控制）"
+            >
+              <MenuTreeSelect
+                menuType={MenuTypeEnum.MENU}
+                currentMenuId={initialData?.menuId}
+                placeholder="請選擇關聯菜單"
+              />
             </Form.Item>
 
             <Form.Item label="功能點狀態" name="disabledFlag" valuePropName="checked">
@@ -307,17 +358,19 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
             <Form.Item
               label="前端權限"
               name="webPerms"
-              help="用於前端按鈕等功能的展示和隱藏，搭配v-privilege使用"
+              rules={rules.webPerms}
+              help="格式：module:resource:action（例如：system:menu:add）"
             >
-              <Input placeholder="請輸入前端權限" />
+              <Input placeholder="例如：system:menu:add" />
             </Form.Item>
 
             <Form.Item
               label="後端權限"
               name="apiPerms"
-              help="後端@SaCheckPermission中的權限字符串，多個以英文逗號,分割"
+              rules={rules.apiPerms}
+              help="格式：module:resource:action，多個用逗號分隔（例如：system:menu:add,system:menu:update）"
             >
-              <Input placeholder="請輸入後端權限" />
+              <Input placeholder="例如：system:menu:add,system:menu:update" />
             </Form.Item>
           </>
         )}
