@@ -71,6 +71,12 @@ public abstract class BaseIntegrationTest {
 
   @Autowired private PlayerBonusRecordDao bonusRecordDao;
 
+  @Autowired private net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao walletBonusExtDao;
+
+  @Autowired private net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao walletTransactionDao;
+
+  @Autowired private net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao paymentOrderDao;
+
   /**
    * Clean up test data before each test to ensure clean state.
    *
@@ -92,12 +98,30 @@ public abstract class BaseIntegrationTest {
     System.out.println("[@BeforeEach] Cleaning database for tenant " + TenantContext.getTenantId());
 
     // Count existing data before cleanup
+    long paymentOrderCountBefore =
+        paymentOrderDao.selectCount(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity>());
+    long transactionCountBefore =
+        walletTransactionDao.selectCount(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity>());
+    long bonusExtCountBefore =
+        walletBonusExtDao.selectCount(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity>());
     long bonusCountBefore =
         bonusRecordDao.selectCount(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
     long walletCountBefore = walletDao.selectCount(new LambdaQueryWrapper<WalletEntity>());
     long playerCountBefore = playerDao.selectCount(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println(
         "[@BeforeEach] Before cleanup: "
+            + paymentOrderCountBefore
+            + " payment orders, "
+            + transactionCountBefore
+            + " transactions, "
+            + bonusExtCountBefore
+            + " bonus ext records, "
             + bonusCountBefore
             + " bonus records, "
             + walletCountBefore
@@ -105,7 +129,28 @@ public abstract class BaseIntegrationTest {
             + playerCountBefore
             + " players");
 
-    // ✅ FIXED: Clean up bonus records first (foreign key to players)
+    // ✅ FIXED: Clean up payment orders first (foreign key to wallets and players)
+    int paymentOrdersDeleted =
+        paymentOrderDao.delete(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity>());
+    System.out.println("[@BeforeEach] Deleted " + paymentOrdersDeleted + " payment orders");
+
+    // Then clean up wallet transactions (foreign key to wallets)
+    int transactionsDeleted =
+        walletTransactionDao.delete(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity>());
+    System.out.println("[@BeforeEach] Deleted " + transactionsDeleted + " wallet transactions");
+
+    // Then clean up wallet bonus ext (foreign key to bonus records)
+    int bonusExtDeleted =
+        walletBonusExtDao.delete(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity>());
+    System.out.println("[@BeforeEach] Deleted " + bonusExtDeleted + " wallet bonus ext records");
+
+    // Then clean up bonus records (foreign key to players)
     int bonusDeleted = bonusRecordDao.delete(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
     System.out.println("[@BeforeEach] Deleted " + bonusDeleted + " bonus records");
 
@@ -138,12 +183,30 @@ public abstract class BaseIntegrationTest {
     System.out.println("[@AfterEach] Cleaning database for tenant " + TenantContext.getTenantId());
 
     // Count existing data before cleanup
+    long paymentOrderCountBefore =
+        paymentOrderDao.selectCount(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity>());
+    long transactionCountBefore =
+        walletTransactionDao.selectCount(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity>());
+    long bonusExtCountBefore =
+        walletBonusExtDao.selectCount(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity>());
     long bonusCountBefore =
         bonusRecordDao.selectCount(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
     long walletCountBefore = walletDao.selectCount(new LambdaQueryWrapper<WalletEntity>());
     long playerCountBefore = playerDao.selectCount(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println(
         "[@AfterEach] Before cleanup: "
+            + paymentOrderCountBefore
+            + " payment orders, "
+            + transactionCountBefore
+            + " transactions, "
+            + bonusExtCountBefore
+            + " bonus ext records, "
             + bonusCountBefore
             + " bonus records, "
             + walletCountBefore
@@ -151,7 +214,28 @@ public abstract class BaseIntegrationTest {
             + playerCountBefore
             + " players");
 
-    // ✅ FIXED: Clean up bonus records first (foreign key to players)
+    // ✅ FIXED: Clean up payment orders first (foreign key to wallets and players)
+    int paymentOrdersDeleted =
+        paymentOrderDao.delete(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity>());
+    System.out.println("[@AfterEach] Deleted " + paymentOrdersDeleted + " payment orders");
+
+    // Then clean up wallet transactions (foreign key to wallets)
+    int transactionsDeleted =
+        walletTransactionDao.delete(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletTransactionEntity>());
+    System.out.println("[@AfterEach] Deleted " + transactionsDeleted + " wallet transactions");
+
+    // Then clean up wallet bonus ext (foreign key to bonus records)
+    int bonusExtDeleted =
+        walletBonusExtDao.delete(
+            new LambdaQueryWrapper<
+                net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity>());
+    System.out.println("[@AfterEach] Deleted " + bonusExtDeleted + " wallet bonus ext records");
+
+    // Then clean up bonus records (foreign key to players)
     int bonusDeleted = bonusRecordDao.delete(new LambdaQueryWrapper<PlayerBonusRecordEntity>());
     System.out.println("[@AfterEach] Deleted " + bonusDeleted + " bonus records");
 
@@ -191,7 +275,8 @@ public abstract class BaseIntegrationTest {
       new PostgreSQLContainer<>("postgres:16-alpine")
           .withDatabaseName("testdb")
           .withUsername("test")
-          .withPassword("test");
+          .withPassword("test")
+          .withReuse(true); // ✅ CRITICAL FIX: Enable container reuse to prevent port changes
 
   /**
    * Redis 7 container shared across all integration tests.
@@ -215,7 +300,9 @@ public abstract class BaseIntegrationTest {
   @Container
   @SuppressWarnings("resource")
   static GenericContainer<?> redis =
-      new GenericContainer<>(DockerImageName.parse("redis:7-alpine")).withExposedPorts(6379);
+      new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+          .withExposedPorts(6379)
+          .withReuse(true); // ✅ CRITICAL FIX: Enable container reuse to prevent port changes
 
   /**
    * Configure Spring Boot datasource and Redis properties dynamically from Testcontainers.

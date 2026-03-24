@@ -44,9 +44,11 @@ class FlywayMigrationIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgres =
       new PostgreSQLContainer<>("postgres:16-alpine")
-          .withDatabaseName("testdb")
+          .withDatabaseName("flyway_testdb") // ✅ Use different DB name to avoid conflicts with
+          // BaseIntegrationTest
           .withUsername("test")
-          .withPassword("test");
+          .withPassword("test")
+          .withReuse(true); // ✅ Enable container reuse with unique DB name
 
   private static DataSource dataSource;
   private static Flyway flyway;
