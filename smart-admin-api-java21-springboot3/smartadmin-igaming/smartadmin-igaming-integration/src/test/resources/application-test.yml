@@ -92,6 +92,7 @@ liteflow:
   # ⚠️ NOTE: Database URL will be dynamically overridden by @DynamicPropertySource in tests
   rule-source-ext-data-map:
     applicationName: smartadmin-igaming-integration-test
+    sqlSessionFactoryName: "sqlSessionFactory"  # ✅ CRITICAL FIX: MyBatis Plus integration requires this
     url: jdbc:postgresql://localhost:5432/testdb
     driverClassName: org.postgresql.Driver
     username: test
