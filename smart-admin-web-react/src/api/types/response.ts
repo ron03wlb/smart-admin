@@ -8,9 +8,9 @@
 
 /**
  * 標準響應結構
- * @template T 數據類型
+ * @template T 數據類型（必須明確指定，不允許隱式 any）
  */
-export interface ResponseDTO<T = any> {
+export interface ResponseDTO<T> {
   /** 響應碼（200 成功，其他為錯誤碼） */
   code: number;
 
@@ -29,9 +29,9 @@ export interface ResponseDTO<T = any> {
 
 /**
  * 分頁結果
- * @template T 列表數據類型
+ * @template T 列表數據類型（必須明確指定，不允許隱式 any）
  */
-export interface PageResult<T = any> {
+export interface PageResult<T> {
   /** 當前頁碼 */
   pageNum: number;
 
@@ -53,9 +53,9 @@ export interface PageResult<T = any> {
 
 /**
  * 分頁響應（包含 ResponseDTO 和 PageResult）
- * @template T 列表數據類型
+ * @template T 列表數據類型（必須明確指定，不允許隱式 any）
  */
-export type PageResponseDTO<T = any> = ResponseDTO<PageResult<T>>;
+export type PageResponseDTO<T> = ResponseDTO<PageResult<T>>;
 
 /**
  * 選項數據結構（用於下拉選擇等）
@@ -70,6 +70,9 @@ export interface OptionVO {
   /** 是否禁用 */
   disabled?: boolean;
 
-  /** 擴展數據 */
-  [key: string]: any;
+  /** 子選項（用於級聯選擇） */
+  children?: OptionVO[];
+
+  /** 擴展數據（使用 unknown 確保類型安全） */
+  [key: string]: unknown;
 }

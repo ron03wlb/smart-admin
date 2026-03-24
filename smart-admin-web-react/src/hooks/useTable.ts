@@ -65,7 +65,9 @@ export interface UseTableOptions<TData, TQueryForm> {
    * @param queryForm 查詢表單（包含分頁和排序信息）
    * @returns Promise<{ list: TData[], total: number }>
    */
-  queryApi?: (queryForm: any) => Promise<{ data: { list: TData[]; total: number }; ok: boolean }>;
+  queryApi?: (
+    queryForm: TQueryForm & PaginationConfig & { sortItemList?: SortItem[] }
+  ) => Promise<{ data: { list: TData[]; total: number }; ok: boolean }>;
 
   /**
    * 是否在 mount 時自動查詢
@@ -139,7 +141,11 @@ export interface UseTableResult<TData, TQueryForm> {
   /**
    * 處理分頁變化
    */
-  handleTableChange: (pagination: TablePaginationConfig, filters: any, sorter: SorterResult<TData> | SorterResult<TData>[]) => void;
+  handleTableChange: (
+    pagination: TablePaginationConfig,
+    filters: Record<string, any>,
+    sorter: SorterResult<TData> | SorterResult<TData>[]
+  ) => void;
 
   /**
    * 處理行選擇變化
@@ -171,7 +177,9 @@ export function useTable<TData = any, TQueryForm extends Record<string, any> = R
   const [loading, setLoading] = useState(false);
 
   // 查詢表單（包含分頁和排序）
-  const [queryForm, setQueryForm] = useState<TQueryForm & PaginationConfig & { sortItemList?: SortItem[] }>({
+  const [queryForm, setQueryForm] = useState<
+    TQueryForm & PaginationConfig & { sortItemList?: SortItem[] }
+  >({
     ...defaultQueryForm,
     pageNum: defaultPageNum,
     pageSize: defaultPageSize,
@@ -228,7 +236,11 @@ export function useTable<TData = any, TQueryForm extends Record<string, any> = R
    * 處理表格變化（分頁、排序、篩選）
    */
   const handleTableChange = useCallback(
-    (pagination: TablePaginationConfig, _filters: any, sorter: SorterResult<TData> | SorterResult<TData>[]) => {
+    (
+      pagination: TablePaginationConfig,
+      _filters: Record<string, any>,
+      sorter: SorterResult<TData> | SorterResult<TData>[]
+    ) => {
       // 更新分頁
       const newQueryForm = {
         ...queryForm,
@@ -263,9 +275,12 @@ export function useTable<TData = any, TQueryForm extends Record<string, any> = R
   /**
    * 處理行選擇變化
    */
-  const handleRowSelectionChange = useCallback((selectedRowKeys: React.Key[], _selectedRows: TData[]) => {
-    setSelectedRowKeys(selectedRowKeys);
-  }, []);
+  const handleRowSelectionChange = useCallback(
+    (selectedRowKeys: React.Key[], _selectedRows: TData[]) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    []
+  );
 
   /**
    * 組裝 Ant Design Table 分頁配置

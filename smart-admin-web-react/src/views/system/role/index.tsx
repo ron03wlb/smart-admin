@@ -15,6 +15,9 @@ import type { RoleVO, RoleQueryForm } from './types';
 import { ROLE_PERMISSION, ROLE_TABLE_COLUMNS_WIDTH } from '@/constants/system/roleConst';
 import PrivilegeButton from '@/components/PrivilegeButton';
 import RoleFormModal from './components/RoleFormModal';
+import RoleMenuModal from './components/RoleMenuModal';
+import RoleEmployeeDrawer from './components/RoleEmployeeDrawer';
+import RoleDataScopeModal from './components/RoleDataScopeModal';
 
 const { confirm } = Modal;
 
@@ -27,6 +30,18 @@ export default function RolePage() {
   // Form Modal state
   const [formModalVisible, setFormModalVisible] = useState(false);
   const [formInitialData, setFormInitialData] = useState<RoleVO | undefined>(undefined);
+
+  // Role Menu Modal state
+  const [menuModalVisible, setMenuModalVisible] = useState(false);
+  const [menuModalRole, setMenuModalRole] = useState<RoleVO | undefined>(undefined);
+
+  // Role Employee Drawer state
+  const [employeeDrawerVisible, setEmployeeDrawerVisible] = useState(false);
+  const [employeeDrawerRole, setEmployeeDrawerRole] = useState<RoleVO | undefined>(undefined);
+
+  // Role Data Scope Modal state
+  const [dataScopeModalVisible, setDataScopeModalVisible] = useState(false);
+  const [dataScopeModalRole, setDataScopeModalRole] = useState<RoleVO | undefined>(undefined);
 
   /**
    * 查詢角色列表
@@ -60,7 +75,7 @@ export default function RolePage() {
     }
 
     const keyword = keywords.toLowerCase();
-    const filtered = roleList.filter((role) => {
+    const filtered = roleList.filter(role => {
       return (
         role.roleName?.toLowerCase().includes(keyword) ||
         role.roleCode?.toLowerCase().includes(keyword) ||
@@ -138,6 +153,70 @@ export default function RolePage() {
     setFormInitialData(undefined);
   };
 
+  /**
+   * 打開菜單權限 Modal
+   */
+  const handleOpenMenuModal = (record: RoleVO) => {
+    setMenuModalRole(record);
+    setMenuModalVisible(true);
+  };
+
+  /**
+   * 菜單權限 Modal 成功回調
+   */
+  const handleMenuModalSuccess = () => {
+    setMenuModalVisible(false);
+    setMenuModalRole(undefined);
+  };
+
+  /**
+   * 菜單權限 Modal 取消回調
+   */
+  const handleMenuModalCancel = () => {
+    setMenuModalVisible(false);
+    setMenuModalRole(undefined);
+  };
+
+  /**
+   * 打開員工管理 Drawer
+   */
+  const handleOpenEmployeeDrawer = (record: RoleVO) => {
+    setEmployeeDrawerRole(record);
+    setEmployeeDrawerVisible(true);
+  };
+
+  /**
+   * 員工管理 Drawer 關閉回調
+   */
+  const handleEmployeeDrawerClose = () => {
+    setEmployeeDrawerVisible(false);
+    setEmployeeDrawerRole(undefined);
+  };
+
+  /**
+   * 打開數據範圍 Modal
+   */
+  const handleOpenDataScopeModal = (record: RoleVO) => {
+    setDataScopeModalRole(record);
+    setDataScopeModalVisible(true);
+  };
+
+  /**
+   * 數據範圍 Modal 成功回調
+   */
+  const handleDataScopeModalSuccess = () => {
+    setDataScopeModalVisible(false);
+    setDataScopeModalRole(undefined);
+  };
+
+  /**
+   * 數據範圍 Modal 取消回調
+   */
+  const handleDataScopeModalCancel = () => {
+    setDataScopeModalVisible(false);
+    setDataScopeModalRole(undefined);
+  };
+
   useEffect(() => {
     fetchRoleList();
   }, []);
@@ -180,10 +259,34 @@ export default function RolePage() {
     {
       title: '操作',
       key: 'operate',
-      width: ROLE_TABLE_COLUMNS_WIDTH.operate,
+      width: 280,
       fixed: 'right',
       render: (_: unknown, record: RoleVO) => (
-        <Space size="small">
+        <Space size="small" wrap>
+          <PrivilegeButton
+            type="link"
+            size="small"
+            privilege={ROLE_PERMISSION.MENU_UPDATE}
+            onClick={() => handleOpenMenuModal(record)}
+          >
+            菜單權限
+          </PrivilegeButton>
+          <PrivilegeButton
+            type="link"
+            size="small"
+            privilege={ROLE_PERMISSION.EMPLOYEE_VIEW}
+            onClick={() => handleOpenEmployeeDrawer(record)}
+          >
+            員工管理
+          </PrivilegeButton>
+          <PrivilegeButton
+            type="link"
+            size="small"
+            privilege={ROLE_PERMISSION.DATA_SCOPE_UPDATE}
+            onClick={() => handleOpenDataScopeModal(record)}
+          >
+            數據範圍
+          </PrivilegeButton>
           <PrivilegeButton
             type="link"
             size="small"
@@ -254,7 +357,7 @@ export default function RolePage() {
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 條`,
+            showTotal: total => `共 ${total} 條`,
             defaultPageSize: 10,
             pageSizeOptions: ['10', '20', '50', '100'],
           }}
@@ -268,6 +371,29 @@ export default function RolePage() {
         onCancel={handleFormCancel}
         onSuccess={handleFormSuccess}
         initialData={formInitialData}
+      />
+
+      {/* Menu Permission Modal */}
+      <RoleMenuModal
+        visible={menuModalVisible}
+        onCancel={handleMenuModalCancel}
+        onSuccess={handleMenuModalSuccess}
+        role={menuModalRole}
+      />
+
+      {/* Employee Management Drawer */}
+      <RoleEmployeeDrawer
+        visible={employeeDrawerVisible}
+        onClose={handleEmployeeDrawerClose}
+        role={employeeDrawerRole}
+      />
+
+      {/* Data Scope Modal */}
+      <RoleDataScopeModal
+        visible={dataScopeModalVisible}
+        onCancel={handleDataScopeModalCancel}
+        onSuccess={handleDataScopeModalSuccess}
+        role={dataScopeModalRole}
       />
     </div>
   );

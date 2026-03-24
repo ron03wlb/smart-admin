@@ -21,6 +21,24 @@ export const ROLE_PERMISSION = {
 
   /** 查詢權限 */
   QUERY: 'system:role:query',
+
+  /** 菜單權限更新 */
+  MENU_UPDATE: 'system:role:menu:update',
+
+  /** 員工查看 */
+  EMPLOYEE_VIEW: 'system:role:employee:view',
+
+  /** 員工添加 */
+  EMPLOYEE_ADD: 'system:role:employee:add',
+
+  /** 員工刪除 */
+  EMPLOYEE_DELETE: 'system:role:employee:delete',
+
+  /** 員工批量刪除 */
+  EMPLOYEE_BATCH_DELETE: 'system:role:employee:batch:delete',
+
+  /** 數據範圍更新 */
+  DATA_SCOPE_UPDATE: 'system:role:dataScope:update',
 } as const;
 
 /**
