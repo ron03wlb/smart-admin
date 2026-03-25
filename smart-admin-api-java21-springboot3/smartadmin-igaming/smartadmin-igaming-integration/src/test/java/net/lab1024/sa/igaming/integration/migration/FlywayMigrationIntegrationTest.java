@@ -20,7 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 /**
  * Flyway Migration Integration Test.
  *
- * <p>Validates that all 11 Flyway migration scripts execute successfully and create the expected
+ * <p>Validates that all 13 Flyway migration scripts execute successfully and create the expected
  * database schema:
  *
  * <ul>
@@ -39,6 +39,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * @since 2026-03-19
  */
 @Testcontainers
+@DisplayName("Flyway Migration Integration Test")
 class FlywayMigrationIntegrationTest {
 
   @Container
@@ -102,11 +103,12 @@ class FlywayMigrationIntegrationTest {
         }
       }
 
-      // Verify all 11 migrations executed (including V004.5)
+      // Verify all 13 migrations executed (including V004.5, V011, V012)
       assertThat(appliedMigrations)
-          .as("應該執行 11 個 migration scripts")
+          .as("應該執行 13 個 migration scripts")
           .containsExactly(
-              "001", "002", "003", "004", "004.5", "005", "006", "007", "008", "009", "010");
+              "001", "002", "003", "004", "004.5", "005", "006", "007", "008", "009", "010", "011",
+              "012");
     }
   }
 
@@ -339,8 +341,8 @@ class FlywayMigrationIntegrationTest {
       String description = rs.getString("description");
       boolean success = rs.getBoolean("success");
 
-      assertThat(version).as("最新 schema version 應為 010").isEqualTo("010");
-      assertThat(description).as("最新 migration 描述").contains("seed liteflow turnover chain");
+      assertThat(version).as("最新 schema version 應為 012").isEqualTo("012");
+      assertThat(description).as("最新 migration 描述").contains("add turnover rule indexes");
       assertThat(success).as("最新 migration 應該成功").isTrue();
     }
   }
@@ -354,7 +356,7 @@ class FlywayMigrationIntegrationTest {
       ResultSet rs =
           stmt.executeQuery(
               "SELECT COUNT(*) FROM t_liteflow_chain WHERE chain_code = 'turnover_calculation_main'"
-                  + " AND deleted_flag = 0");
+                  + " AND deleted = false");
 
       assertThat(rs.next()).as("應該有查詢結果").isTrue();
       long count = rs.getLong(1);
