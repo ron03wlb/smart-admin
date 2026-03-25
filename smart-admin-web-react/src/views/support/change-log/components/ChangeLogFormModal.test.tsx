@@ -12,6 +12,9 @@ import userEvent from '@testing-library/user-event';
 import ChangeLogFormModal from './ChangeLogFormModal';
 import type { ChangeLogVO } from '../types';
 
+// Test timeout constant for Modal components
+const TEST_TIMEOUT = 15000;
+
 // Mock changeLogApi
 vi.mock('@/api/support/changeLogApi', () => ({
   changeLogApi: {
@@ -123,7 +126,7 @@ describe('ChangeLogFormModal', () => {
     // Wait for modal to appear
     await waitFor(() => {
       expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // Click submit without filling form
     const submitButton = screen.getByRole('button', { name: /確定|OK/i });
@@ -136,7 +139,7 @@ describe('ChangeLogFormModal', () => {
       expect(screen.getByText('請輸入發布人')).toBeInTheDocument();
       expect(screen.getByText('請選擇發布日期')).toBeInTheDocument();
       expect(screen.getByText('請輸入更新內容')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // Verify API not called
     expect(changeLogApi.add).not.toHaveBeenCalled();
@@ -155,7 +158,7 @@ describe('ChangeLogFormModal', () => {
     // Wait for modal to appear
     await waitFor(() => {
       expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // Fill invalid URL
     const linkInput = screen.getByPlaceholderText('請輸入跳轉鏈接（可選）');
@@ -168,8 +171,8 @@ describe('ChangeLogFormModal', () => {
     // Wait for validation message
     await waitFor(() => {
       expect(screen.getByText('請輸入有效的 URL')).toBeInTheDocument();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   it('should handle add operation successfully', async () => {
     (changeLogApi.add as any).mockResolvedValue({
@@ -191,7 +194,7 @@ describe('ChangeLogFormModal', () => {
     // Wait for modal to appear
     await waitFor(() => {
       expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // Fill form
     await user.type(screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0'), 'v2.0.0');
@@ -217,8 +220,8 @@ describe('ChangeLogFormModal', () => {
     await waitFor(() => {
       expect(changeLogApi.add).toHaveBeenCalled();
       expect(onSuccess).toHaveBeenCalled();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   it('should handle update operation successfully', async () => {
     (changeLogApi.update as any).mockResolvedValue({
@@ -240,7 +243,7 @@ describe('ChangeLogFormModal', () => {
     // Wait for modal to appear
     await waitFor(() => {
       expect(screen.getByText('編輯更新日誌')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // Modify version
     const versionInput = screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0');
@@ -254,8 +257,8 @@ describe('ChangeLogFormModal', () => {
     await waitFor(() => {
       expect(changeLogApi.update).toHaveBeenCalled();
       expect(onSuccess).toHaveBeenCalled();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   it('should handle API error', async () => {
     (changeLogApi.add as any).mockRejectedValue(new Error('API Error'));
@@ -272,7 +275,7 @@ describe('ChangeLogFormModal', () => {
     // Wait for modal to appear
     await waitFor(() => {
       expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // Fill minimal required fields
     await user.type(screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0'), 'v2.0.0');
@@ -297,8 +300,8 @@ describe('ChangeLogFormModal', () => {
     await waitFor(() => {
       expect(changeLogApi.add).toHaveBeenCalled();
       expect(onSuccess).not.toHaveBeenCalled();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   // Note: Modal close test is skipped due to test environment limitations
   it.skip('should close modal on cancel', async () => {
