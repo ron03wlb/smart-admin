@@ -177,3 +177,4 @@ describe('ChangeLogManagement', () => {
     // This test verifies the initial query was called
   }, TEST_TIMEOUT);
 });
+
