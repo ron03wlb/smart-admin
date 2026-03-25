@@ -97,4 +97,22 @@ public class TurnoverRiskActionRuleService {
     riskActionRuleManager.evictCache(TenantContext.getTenantId());
     return ResponseDTO.ok();
   }
+
+  /**
+   * Get active risk action rule for a specific risk level (cached).
+   *
+   * <p>Delegates to {@link TurnoverRiskActionRuleManager#getActiveRule} which uses Redis cache
+   * (key: turnover:risk-action:tenant:{tenantId}:riskLevel:{riskLevel}).
+   *
+   * <p>Used by LiteFlow turnover calculation components to determine risk actions (block, flag,
+   * pass).
+   *
+   * @param tenantId tenant ID
+   * @param riskLevel risk level (1=LOW, 2=MEDIUM, 3=HIGH, 4=CRITICAL)
+   * @return active rule entity, or Option.none() if no active rule found
+   */
+  public Option<TurnoverRiskActionRuleEntity> getActionByRiskLevel(
+      Long tenantId, Integer riskLevel) {
+    return riskActionRuleManager.getActiveRule(tenantId, riskLevel);
+  }
 }

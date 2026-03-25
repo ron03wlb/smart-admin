@@ -97,4 +97,22 @@ public class TurnoverOddsThresholdRuleService {
     oddsThresholdRuleManager.evictCache(TenantContext.getTenantId());
     return ResponseDTO.ok();
   }
+
+  /**
+   * Get active odds threshold rule for a specific odds type (cached).
+   *
+   * <p>Delegates to {@link TurnoverOddsThresholdRuleManager#getActiveRule} which uses Redis cache
+   * (key: turnover:odds-threshold:tenant:{tenantId}:oddsType:{oddsType}).
+   *
+   * <p>Used by LiteFlow turnover calculation components to validate minimum odds requirement.
+   *
+   * @param tenantId tenant ID
+   * @param oddsType odds type (1=European, 2=Hong_Kong, 3=American, 4=Decimal, 5=Malay,
+   *     6=Indonesian)
+   * @return active rule entity, or Option.none() if no active rule found
+   */
+  public Option<TurnoverOddsThresholdRuleEntity> getThresholdByOddsType(
+      Long tenantId, Integer oddsType) {
+    return oddsThresholdRuleManager.getActiveRule(tenantId, oddsType);
+  }
 }

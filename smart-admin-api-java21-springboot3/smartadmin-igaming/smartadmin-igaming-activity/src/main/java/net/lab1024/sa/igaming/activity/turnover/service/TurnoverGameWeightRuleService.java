@@ -145,4 +145,21 @@ public class TurnoverGameWeightRuleService {
     gameWeightRuleManager.evictCache(TenantContext.getTenantId());
     return ResponseDTO.ok();
   }
+
+  /**
+   * Get active game weight rule for a specific game category (cached).
+   *
+   * <p>Delegates to {@link TurnoverGameWeightRuleManager#getActiveRule} which uses Redis cache
+   * (key: turnover:game-weight:tenant:{tenantId}:category:{gameCategory}).
+   *
+   * <p>Used by LiteFlow turnover calculation components to fetch game weight percentage.
+   *
+   * @param tenantId tenant ID
+   * @param gameCategory game category (1=Slots, 2=Live, 3=Sports, 4=Poker, 5=Table, 6=Lottery)
+   * @return active rule entity, or Option.none() if no active rule found
+   */
+  public Option<TurnoverGameWeightRuleEntity> getRuleByGameCategory(
+      Long tenantId, Integer gameCategory) {
+    return gameWeightRuleManager.getActiveRule(tenantId, gameCategory);
+  }
 }

@@ -97,4 +97,22 @@ public class TurnoverStatusFactorRuleService {
     statusFactorRuleManager.evictCache(TenantContext.getTenantId());
     return ResponseDTO.ok();
   }
+
+  /**
+   * Get active status factor rule for a specific settlement status (cached).
+   *
+   * <p>Delegates to {@link TurnoverStatusFactorRuleManager#getActiveRule} which uses Redis cache
+   * (key: turnover:status-factor:tenant:{tenantId}:status:{settlementStatus}).
+   *
+   * <p>Used by LiteFlow turnover calculation components to fetch status factor percentage.
+   *
+   * @param tenantId tenant ID
+   * @param settlementStatus settlement status (1=WIN, 2=LOSS, 3=DRAW, 4=TIE, 5=VOID, 6=CANCEL,
+   *     7=HALF_WIN, 8=HALF_LOSS, 9=RUNNING)
+   * @return active rule entity, or Option.none() if no active rule found
+   */
+  public Option<TurnoverStatusFactorRuleEntity> getFactorByStatus(
+      Long tenantId, Integer settlementStatus) {
+    return statusFactorRuleManager.getActiveRule(tenantId, settlementStatus);
+  }
 }
