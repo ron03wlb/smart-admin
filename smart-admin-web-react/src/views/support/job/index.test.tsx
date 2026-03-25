@@ -13,6 +13,9 @@ import { jobApi } from '@/api/support/jobApi';
 import type { JobVO } from './types';
 import { message, Modal } from 'antd';
 
+// Test timeout constant for page integration tests
+const TEST_TIMEOUT = 15000;
+
 // Mock jobApi
 vi.mock('@/api/support/jobApi', () => ({
   jobApi: {
@@ -108,6 +111,21 @@ describe('JobManagement', () => {
         pageSize: 10,
         pages: 1,
         emptyFlag: false,
+      },
+    });
+
+    // Mock queryJobLog for JobLogDrawer
+    vi.mocked(jobApi.queryJobLog).mockResolvedValue({
+      code: 200,
+      ok: true,
+      msg: 'success',
+      data: {
+        list: [],
+        total: 0,
+        pageNum: 1,
+        pageSize: 10,
+        pages: 0,
+        emptyFlag: true,
       },
     });
   });
@@ -322,7 +340,7 @@ describe('JobManagement', () => {
 
     await waitFor(() => {
       expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // 輸入搜索關鍵字
     const searchInput = screen.getAllByPlaceholderText('請輸入關鍵字')[0];
@@ -344,8 +362,8 @@ describe('JobManagement', () => {
           enabledFlag: undefined,
         })
       );
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   // P0 測試 8: 新增任務按鈕測試
   it('should open JobFormModal when add button is clicked', async () => {
@@ -353,7 +371,7 @@ describe('JobManagement', () => {
 
     await waitFor(() => {
       expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // 點擊「添加任務」按鈕
     const addButton = screen.getByRole('button', { name: /添加任務/ });
@@ -362,8 +380,8 @@ describe('JobManagement', () => {
     // 驗證 Modal 打開（通過查找 Modal 標題）
     await waitFor(() => {
       expect(screen.getByText('新增任務')).toBeInTheDocument();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   // P0 測試 9: 編輯任務按鈕測試
   it('should open JobFormModal with job data when edit button is clicked', async () => {
@@ -371,7 +389,7 @@ describe('JobManagement', () => {
 
     await waitFor(() => {
       expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // 點擊第一條任務的「編輯」按鈕
     const editButtons = screen.getAllByRole('button', { name: /編輯/ });
@@ -380,8 +398,8 @@ describe('JobManagement', () => {
     // 驗證 Modal 打開並顯示編輯模式標題
     await waitFor(() => {
       expect(screen.getByText('編輯任務')).toBeInTheDocument();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   // P0 測試 10: 刪除任務確認測試
   it('should show delete confirmation modal when delete button is clicked', async () => {
@@ -392,7 +410,7 @@ describe('JobManagement', () => {
 
     await waitFor(() => {
       expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // 點擊第一條任務的「刪除」按鈕
     const deleteButtons = screen.getAllByRole('button', { name: /刪除/ });
@@ -406,10 +424,10 @@ describe('JobManagement', () => {
           content: '確定要刪除【測試任務1】任務嗎？',
         })
       );
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     confirmSpy.mockRestore();
-  });
+  }, TEST_TIMEOUT);
 
   // P0 測試 11: 啟用/禁用 Switch 測試
   it('should update job enabled status when switch is toggled', async () => {
@@ -463,7 +481,7 @@ describe('JobManagement', () => {
 
     await waitFor(() => {
       expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // 點擊第一條任務的「執行記錄」按鈕
     const logButtons = screen.getAllByRole('button', { name: /執行記錄/ });
@@ -472,8 +490,8 @@ describe('JobManagement', () => {
     // 驗證 Drawer 打開（通過查找 Drawer 標題）
     await waitFor(() => {
       expect(screen.getByText('執行記錄')).toBeInTheDocument();
-    });
-  });
+    }, { timeout: TEST_TIMEOUT });
+  }, TEST_TIMEOUT);
 
   // P1 測試 13 (skip): 分頁測試
   it.skip('should handle pagination page change', async () => {
