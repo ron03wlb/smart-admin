@@ -297,6 +297,7 @@ Flyway Migration Integration Test: 8/8 passed ✅
 - `77fbad0a` - feat(igaming-activity): add TurnoverQueryService (2026-03-24)
 
 ### Sprint 4 (進行中)
+- `b44fced3` - feat(igaming): add V013 migration for Agent Commission System (2026-03-25 18:30)
 - `6384ead9` - docs(igaming): complete Sprint 4 Phase 0 planning (2026-03-25 18:02)
 
 ---

@@ -27,7 +27,10 @@
 
 ## Current Phase
 
-**Phase 0: Sprint 準備與架構設計**
+**Phase 1: 代理佣金系統 - Database Schema + Entity + Dao**
+- Database Schema: ✅ COMPLETED
+- Entity 類創建: ⏳ IN PROGRESS
+- Dao 接口創建: ⏳ PENDING
 
 ---
 
@@ -75,33 +78,94 @@
 
 ---
 
-### Phase 1: 代理佣金系統 - Database Schema
+### Phase 1: 代理佣金系統 - Database Schema + Entity + Dao ✓ in_progress
 
-**目標**: 創建代理佣金系統的數據庫表結構
+**目標**: 創建代理佣金系統的完整數據層（Database + Entity + Dao）
 
-**預估表數量**: 4-5 張表
-1. `t_agent_relationship` - 代理關係樹（玩家-代理多對一）
-2. `t_agent_commission_config` - 佣金配置（層級、比例、產品類型）
-3. `t_agent_commission_record` - 佣金記錄（結算週期、金額、狀態）
-4. `t_agent_commission_settlement` - 結算批次（防重複結算）
-5. `t_agent_performance_snapshot` - 代理業績快照（月度/週度）
+#### 1.1 Database Schema ✅ COMPLETED (2026-03-25 18:30)
 
-**任務清單**:
-- [ ] 創建 V013__create_agent_tables.sql
-- [ ] 定義代理層級結構（最多 5 層）
-- [ ] 設計佣金計算規則（有效投注額、負盈利抽佣）
-- [ ] 添加防重複結算機制（分佈式鎖）
-- [ ] 創建必要的索引和約束
+**預估表數量**: 5 張表
+1. ✅ `t_agent_relationship` - 代理關係樹（玩家-代理多對一）
+2. ✅ `t_agent_commission_config` - 佣金配置（層級、比例、產品類型）
+3. ✅ `t_agent_commission_record` - 佣金記錄（結算週期、金額、狀態）
+4. ✅ `t_agent_commission_settlement` - 結算批次（防重複結算）
+5. ✅ `t_agent_performance_snapshot` - 代理業績快照（月度/週度）
+
+**已完成任務**:
+- [x] 創建 V013__create_agent_tables.sql
+- [x] 定義代理層級結構（最多 5 層）
+- [x] 設計佣金計算規則（有效投注額、負盈利抽佣）
+- [x] 添加防重複結算機制（分佈式鎖）
+- [x] 創建必要的索引和約束（16 個索引，5 個外鍵）
+- [x] FlywayMigrationIntegrationTest 更新並通過（8/8 tests）
+
+**Git 提交**: `b44fced3` - feat(igaming): add V013 migration for Agent Commission System
+
+---
+
+#### 1.2 Entity 類創建 ⏳ IN PROGRESS
+
+**目標**: 創建 5 個 Entity 類對應 5 張資料庫表
+
+**Entity 類清單**:
+- [ ] `AgentRelationshipEntity` - 代理關係實體
+- [ ] `AgentCommissionConfigEntity` - 佣金配置實體
+- [ ] `AgentCommissionRecordEntity` - 佣金記錄實體
+- [ ] `AgentCommissionSettlementEntity` - 結算批次實體
+- [ ] `AgentPerformanceSnapshotEntity` - 業績快照實體
+
+**技術要求**:
+- MyBatis Plus 註解：`@TableName`, `@TableId`, `@TableField`
+- Lombok 註解：`@Data`, `@EqualsAndHashCode(callSuper = true)`, `@Builder`, `@NoArgsConstructor`, `@AllArgsConstructor`
+- 字段類型：`BigDecimal` for NUMERIC(19,4), `OffsetDateTime` for TIMESTAMP WITH TIME ZONE
+- Boolean 字段：使用 `Boolean` 類型（PostgreSQL 原生 BOOLEAN）
+- 包位置：`net.lab1024.sa.igaming.agent.commission.domain.entity`
+- 繼承：`extends SmartAdminBaseEntity`（提供 tenantId, deleted, createTime, updateTime）
+- 主鍵：`@TableId(type = IdType.AUTO)` for BIGSERIAL
 
 **完成標準**:
-- [ ] Flyway migration 通過
-- [ ] 所有表創建成功
-- [ ] 外鍵約束正確
-- [ ] 索引優化完成
+- [ ] 所有 5 個 Entity 類創建完成
+- [ ] 字段映射正確（與資料庫表一致）
+- [ ] Spotless 格式檢查通過
+- [ ] 編譯無錯誤
 
-**預計時間**: 4-6 小時
+---
 
-**Status**: pending
+#### 1.3 Dao 接口創建 ⏳ PENDING
+
+**目標**: 創建 5 個 Dao 接口繼承 BaseMapper
+
+**Dao 接口清單**:
+- [ ] `AgentRelationshipDao` extends `BaseMapper<AgentRelationshipEntity>`
+- [ ] `AgentCommissionConfigDao` extends `BaseMapper<AgentCommissionConfigEntity>`
+- [ ] `AgentCommissionRecordDao` extends `BaseMapper<AgentCommissionRecordEntity>`
+- [ ] `AgentCommissionSettlementDao` extends `BaseMapper<AgentCommissionSettlementEntity>`
+- [ ] `AgentPerformanceSnapshotDao` extends `BaseMapper<AgentPerformanceSnapshotEntity>`
+
+**技術要求**:
+- MyBatis Plus BaseMapper 繼承
+- `@Mapper` 註解
+- 包位置：`net.lab1024.sa.igaming.agent.commission.dao`
+
+**完成標準**:
+- [ ] 所有 5 個 Dao 接口創建完成
+- [ ] MyBatis Plus 自動配置生效
+- [ ] 編譯無錯誤
+
+---
+
+**Phase 1 整體完成標準**:
+- [x] Flyway migration 通過
+- [x] 所有表創建成功
+- [x] 外鍵約束正確
+- [x] 索引優化完成
+- [ ] 所有 Entity 類創建完成
+- [ ] 所有 Dao 接口創建完成
+- [ ] 編譯通過，無錯誤
+
+**預計時間**: 6-8 小時（已用 2 小時，剩餘 4-6 小時）
+
+**Status**: in_progress (Database Schema ✅, Entity ⏳, Dao ⏳)
 
 ---
 

@@ -8,6 +8,44 @@
 
 ## 架構設計發現
 
+### 0. Entity 命名與模塊組織 (2026-03-25 18:35)
+
+**發現問題**:
+- `smartadmin-igaming-agent` 模塊中已存在 `Affiliate*Entity` 類（AffiliateHierarchyEntity, AffiliateCommissionRecordEntity 等）
+- 這些 Entity 對應 `t_affiliate_*` 表，但這些表的 Flyway migration 不存在
+- V013 migration 創建的是 `t_agent_*` 表，與現有 Entity 命名不一致
+
+**架構決策**:
+
+**選項 A: 保持 t_agent_* 表名，創建新 Entity**
+- ✅ 優點: 不破壞現有代碼，清晰區分新舊設計
+- ❌ 缺點: 存在命名不一致，可能產生混淆
+
+**選項 B: 重命名表為 t_affiliate_*，更新現有 Entity**
+- ✅ 優點: 命名統一，符合現有模塊結構
+- ❌ 缺點: 需要修改已提交的 V013 migration，可能影響測試
+
+**最終決定**: ✅ **選項 A** - 保持 t_agent_* 表名，創建新 Entity
+
+**理由**:
+1. V013 migration 已提交並測試通過（commit: b44fced3）
+2. 修改 migration 會破壞 Flyway history
+3. 現有 `Affiliate*Entity` 類可能是舊設計或未完成功能
+4. 使用 `Agent*` 前綴更清晰表達業務含義（Agent Commission vs Affiliate Marketing）
+
+**Entity 命名規範**:
+- `AgentRelationshipEntity` → `t_agent_relationship`
+- `AgentCommissionConfigEntity` → `t_agent_commission_config`
+- `AgentCommissionRecordEntity` → `t_agent_commission_record`
+- `AgentCommissionSettlementEntity` → `t_agent_commission_settlement`
+- `AgentPerformanceSnapshotEntity` → `t_agent_performance_snapshot`
+
+**模塊放置**:
+- 位置: `smartadmin-igaming-agent/src/main/java/net/lab1024/sa/igaming/agent/commission/`
+- 創建新的 `commission` 子模塊，區分於現有的 `affiliate` 和 `credit` 模塊
+
+---
+
 ### 1. 代理佣金系統架構
 
 **業務需求分析**:
