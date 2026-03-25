@@ -103,18 +103,18 @@ class FlywayMigrationIntegrationTest {
         }
       }
 
-      // Verify all 13 migrations executed (including V004.5, V011, V012)
+      // Verify all 14 migrations executed (including V004.5, V011, V012, V013)
       assertThat(appliedMigrations)
-          .as("應該執行 13 個 migration scripts")
+          .as("應該執行 14 個 migration scripts")
           .containsExactly(
               "001", "002", "003", "004", "004.5", "005", "006", "007", "008", "009", "010", "011",
-              "012");
+              "012", "013");
     }
   }
 
   @Test
-  @DisplayName("應該創建所有 23 張表")
-  void shouldCreate23Tables() throws Exception {
+  @DisplayName("應該創建所有 28 張表")
+  void shouldCreate28Tables() throws Exception {
     try (Connection conn = dataSource.getConnection();
         Statement stmt = conn.createStatement()) {
       // Query all tables in public schema
@@ -128,8 +128,8 @@ class FlywayMigrationIntegrationTest {
         tables.add(rs.getString("table_name"));
       }
 
-      // Verify 23 tables + 1 flyway_schema_history
-      assertThat(tables).as("應該創建 23 張業務表 + flyway_schema_history").hasSize(24);
+      // Verify 28 tables + 1 flyway_schema_history
+      assertThat(tables).as("應該創建 28 張業務表 + flyway_schema_history").hasSize(29);
 
       // Verify expected tables exist
       assertThat(tables)
@@ -165,7 +165,13 @@ class FlywayMigrationIntegrationTest {
               "t_game_weight_config",
               // LiteFlow module (2) - V009
               "t_liteflow_chain",
-              "t_liteflow_script");
+              "t_liteflow_script",
+              // Agent Commission module (5) - V013
+              "t_agent_relationship",
+              "t_agent_commission_config",
+              "t_agent_commission_record",
+              "t_agent_commission_settlement",
+              "t_agent_performance_snapshot");
     }
   }
 
@@ -341,8 +347,8 @@ class FlywayMigrationIntegrationTest {
       String description = rs.getString("description");
       boolean success = rs.getBoolean("success");
 
-      assertThat(version).as("最新 schema version 應為 012").isEqualTo("012");
-      assertThat(description).as("最新 migration 描述").contains("add turnover rule indexes");
+      assertThat(version).as("最新 schema version 應為 013").isEqualTo("013");
+      assertThat(description).as("最新 migration 描述").contains("create agent tables");
       assertThat(success).as("最新 migration 應該成功").isTrue();
     }
   }
