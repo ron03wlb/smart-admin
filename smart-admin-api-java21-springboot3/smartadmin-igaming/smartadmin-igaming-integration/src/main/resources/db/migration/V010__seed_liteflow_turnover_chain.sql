@@ -31,7 +31,7 @@ INSERT INTO t_liteflow_chain (
     chain_data,
     version,
     status,
-    deleted_flag,
+    deleted,
     remark,
     create_user_id,
     create_user_name,
@@ -47,7 +47,7 @@ INSERT INTO t_liteflow_chain (
     'THEN(riskFilterNode, statusFactorNode, gameWeightNode, turnoverAggregateNode)',  -- chain_data: EL expression
     1,                                  -- version: Initial version
     1,                                  -- status: 1=啟用 (enabled)
-    0,                                  -- deleted_flag: 0=未刪除 (not deleted)
+    FALSE,                              -- deleted: false=未刪除 (not deleted)
     'Turnover calculation chain for bet settlement - 3-layer verification',  -- remark
     0,                                  -- create_user_id: SYSTEM
     'SYSTEM',                           -- create_user_name
@@ -56,7 +56,7 @@ INSERT INTO t_liteflow_chain (
     NOW(),                              -- create_time
     NOW()                               -- update_time
 )
-ON CONFLICT (tenant_id, chain_code) WHERE deleted_flag = 0 DO NOTHING;
+ON CONFLICT (tenant_id, chain_code) WHERE deleted = false DO NOTHING;
 
 -- =====================================================
 -- VERIFICATION:

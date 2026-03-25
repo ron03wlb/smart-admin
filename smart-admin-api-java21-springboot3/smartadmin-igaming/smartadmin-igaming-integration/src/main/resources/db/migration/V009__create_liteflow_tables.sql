@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS t_liteflow_chain (
     chain_data          TEXT            NOT NULL,       -- EL expression
     version             INTEGER         NOT NULL DEFAULT 0,  -- Optimistic lock
     status              INTEGER         NOT NULL DEFAULT 1,  -- 0=禁用 1=啟用
-    deleted_flag        INTEGER         NOT NULL DEFAULT 0,  -- ⭐ CRITICAL: 0=未刪除 1=已刪除
+    deleted             BOOLEAN        NOT NULL DEFAULT FALSE,  -- ⭐ CRITICAL: false=未刪除 true=已刪除
     remark              VARCHAR(512),
     create_user_id      BIGINT,
     create_user_name    VARCHAR(64),
@@ -31,10 +31,10 @@ COMMENT ON COLUMN t_liteflow_chain.chain_name IS '規則鏈名稱';
 COMMENT ON COLUMN t_liteflow_chain.chain_code IS '規則鏈編碼 (唯一業務鍵, used in DAO WHERE clause)';
 COMMENT ON COLUMN t_liteflow_chain.chain_type IS '規則鏈類型: 1=普通 2=條件 3=循環';
 COMMENT ON COLUMN t_liteflow_chain.chain_data IS 'EL 表達式定義: THEN(a, b, c)';
-COMMENT ON COLUMN t_liteflow_chain.deleted_flag IS '刪除標記: 0=未刪除 1=已刪除';
+COMMENT ON COLUMN t_liteflow_chain.deleted IS '刪除標記: 0=未刪除 1=已刪除';
 
 -- Unique constraint on chain_code (business key)
-CREATE UNIQUE INDEX IF NOT EXISTS uk_liteflow_chain_code ON t_liteflow_chain(tenant_id, chain_code) WHERE deleted_flag = 0;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_liteflow_chain_code ON t_liteflow_chain(tenant_id, chain_code) WHERE deleted = false;
 CREATE INDEX IF NOT EXISTS idx_liteflow_chain_status ON t_liteflow_chain(tenant_id, status);
 
 -- 2. LiteFlow Script Table (腳本節點定義表)
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS t_liteflow_script (
     script_language     VARCHAR(16),
     version             INTEGER         NOT NULL DEFAULT 0,  -- Optimistic lock
     status              INTEGER         NOT NULL DEFAULT 1,  -- 0=禁用 1=啟用
-    deleted_flag        INTEGER         NOT NULL DEFAULT 0,  -- 0=未刪除 1=已刪除
+    deleted             BOOLEAN        NOT NULL DEFAULT FALSE,  -- false=未刪除 true=已刪除
     remark              VARCHAR(512),
     create_user_id      BIGINT,
     create_user_name    VARCHAR(64),
@@ -63,10 +63,10 @@ COMMENT ON TABLE t_liteflow_script IS 'LiteFlow 腳本節點定義表 (aligned w
 COMMENT ON COLUMN t_liteflow_script.script_id IS '腳本節點唯一標識';
 COMMENT ON COLUMN t_liteflow_script.script_id_name IS '腳本節點 ID (EL 中引用的節點名稱)';
 COMMENT ON COLUMN t_liteflow_script.script_data IS '腳本內容 (Groovy, Java, JavaScript 等)';
-COMMENT ON COLUMN t_liteflow_script.deleted_flag IS '刪除標記: 0=未刪除 1=已刪除';
+COMMENT ON COLUMN t_liteflow_script.deleted IS '刪除標記: 0=未刪除 1=已刪除';
 
 -- Unique constraint on script_id_name (node ID)
-CREATE UNIQUE INDEX IF NOT EXISTS uk_liteflow_script_id_name ON t_liteflow_script(tenant_id, script_id_name) WHERE deleted_flag = 0;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_liteflow_script_id_name ON t_liteflow_script(tenant_id, script_id_name) WHERE deleted = false;
 CREATE INDEX IF NOT EXISTS idx_liteflow_script_status ON t_liteflow_script(tenant_id, status);
 
 -- Note: No seed data inserted here - TurnoverCalculationService creates chains dynamically

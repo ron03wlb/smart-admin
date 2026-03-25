@@ -101,22 +101,22 @@ CREATE TABLE t_risk_proposal (
 -- Pending proposals query index (for operator worklist)
 CREATE INDEX idx_risk_proposal_pending
     ON t_risk_proposal (tenant_id, status, priority DESC, sla_deadline ASC)
-    WHERE deleted = FALSE AND status IN (1, 2);  -- 1=PENDING, 2=IN_REVIEW
+    WHERE deleted = false AND status IN (1, 2);  -- 1=PENDING, 2=IN_REVIEW
 
 -- Player proposal history index
 CREATE INDEX idx_risk_proposal_player
     ON t_risk_proposal (tenant_id, player_id, create_time DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Assessment reference index
 CREATE INDEX idx_risk_proposal_assessment
     ON t_risk_proposal (assessment_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Assignee workload index
 CREATE INDEX idx_risk_proposal_assignee
     ON t_risk_proposal (tenant_id, assignee, status)
-    WHERE deleted = FALSE AND assignee IS NOT NULL;
+    WHERE deleted = false AND assignee IS NOT NULL;
 
 -- Foreign key constraints
 ALTER TABLE t_risk_proposal
@@ -156,7 +156,7 @@ CREATE TABLE t_risk_score (
     last_assessment_time TIMESTAMPTZ,                 -- Timestamp of last risk assessment
 
     -- Auto-Lock Flag
-    auto_locked         BOOLEAN NOT NULL DEFAULT FALSE,  -- True if player auto-locked due to high risk
+    auto_locked         BOOLEAN NOT NULL DEFAULT FALSE,  -- true if player auto-locked due to high risk
 
     -- Soft Delete & Optimistic Lock
     deleted             BOOLEAN NOT NULL DEFAULT FALSE,
@@ -170,17 +170,17 @@ CREATE TABLE t_risk_score (
 -- Unique constraint: One risk score per player per tenant
 CREATE UNIQUE INDEX uk_risk_score_player
     ON t_risk_score (tenant_id, player_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Risk level distribution index (for reporting)
 CREATE INDEX idx_risk_score_level
     ON t_risk_score (tenant_id, risk_level, cumulative_score DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Auto-locked players index (for compliance monitoring)
 CREATE INDEX idx_risk_score_auto_locked
     ON t_risk_score (tenant_id, auto_locked, risk_level)
-    WHERE deleted = FALSE AND auto_locked = TRUE;
+    WHERE deleted = false AND auto_locked = true;
 
 -- Foreign key constraint
 ALTER TABLE t_risk_score
@@ -235,12 +235,12 @@ CREATE TABLE t_risk_rule_param (
 -- Rule type query index
 CREATE INDEX idx_risk_rule_param_type
     ON t_risk_rule_param (tenant_id, rule_type, enabled)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Enabled rules query index (for hot reload)
 CREATE INDEX idx_risk_rule_param_enabled
     ON t_risk_rule_param (tenant_id, enabled)
-    WHERE deleted = FALSE AND enabled = TRUE;
+    WHERE deleted = false AND enabled = true;
 
 COMMENT ON TABLE t_risk_rule_param IS
 'Risk rule parameter configuration for LiteFlow rule engine components. Supports dynamic rule configuration with threshold values, time windows, weights, and flexible JSONB parameters. Enables real-time rule updates without code deployment.';
@@ -280,7 +280,7 @@ CREATE UNIQUE INDEX uk_geo_restriction_country
 -- Enabled restrictions query index (for runtime access control)
 CREATE INDEX idx_geo_restriction_enabled
     ON t_geo_restriction (tenant_id, enabled)
-    WHERE enabled = TRUE;
+    WHERE enabled = true;
 
 -- Restriction type index (for reporting)
 CREATE INDEX idx_geo_restriction_type

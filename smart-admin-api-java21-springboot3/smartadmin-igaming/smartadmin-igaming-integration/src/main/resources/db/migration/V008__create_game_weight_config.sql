@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS t_game_weight_config (
     tenant_id       BIGINT          NOT NULL,
     game_category   SMALLINT        NOT NULL,  -- 1=Slots, 2=Live, 3=Sports, 4=Poker, 5=Table, 6=Lottery
     weight          DECIMAL(5,4)    NOT NULL,  -- 0.0000-1.0000 (0%-100%)
-    deleted         BOOLEAN         NOT NULL DEFAULT FALSE,
+    deleted         BOOLEAN        NOT NULL DEFAULT FALSE,
     create_time     TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     update_time     TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 

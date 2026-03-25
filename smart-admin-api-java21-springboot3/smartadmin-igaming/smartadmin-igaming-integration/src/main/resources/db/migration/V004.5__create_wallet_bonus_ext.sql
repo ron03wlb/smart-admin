@@ -63,7 +63,7 @@ CREATE INDEX idx_wallet_bonus_ext_bonus ON t_wallet_bonus_ext (bonus_id);
 CREATE INDEX idx_wallet_bonus_ext_status ON t_wallet_bonus_ext (tenant_id, status);
 
 -- Tenant isolation index
-CREATE INDEX idx_wallet_bonus_ext_tenant ON t_wallet_bonus_ext (tenant_id) WHERE deleted = FALSE;
+CREATE INDEX idx_wallet_bonus_ext_tenant ON t_wallet_bonus_ext (tenant_id) WHERE deleted = false;
 
 -- ============================================================================
 -- Table Comments

@@ -60,42 +60,42 @@ CREATE TABLE t_payment_order (
 -- Unique constraint: One order per order_no (business primary key)
 CREATE UNIQUE INDEX uk_payment_order_order_no
     ON t_payment_order (order_no)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Unique constraint: One order per request_id (idempotency)
 CREATE UNIQUE INDEX uk_payment_order_request_id
     ON t_payment_order (tenant_id, request_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Player order lookup index (for player order history)
 CREATE INDEX idx_payment_order_player
     ON t_payment_order (tenant_id, player_id, create_time DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Wallet order lookup index (for wallet reconciliation)
 CREATE INDEX idx_payment_order_wallet
     ON t_payment_order (wallet_id, create_time DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Order type query index (for deposit/withdrawal statistics)
 CREATE INDEX idx_payment_order_type_status
     ON t_payment_order (tenant_id, order_type, status, create_time DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- PSP transaction lookup index (for callback processing)
 CREATE INDEX idx_payment_order_psp_transaction
     ON t_payment_order (psp_code, psp_transaction_id)
-    WHERE deleted = FALSE AND psp_transaction_id IS NOT NULL;
+    WHERE deleted = false AND psp_transaction_id IS NOT NULL;
 
 -- Reconciliation status index (for reconciliation jobs)
 CREATE INDEX idx_payment_order_reconciliation
     ON t_payment_order (tenant_id, reconciliation_status, create_time DESC)
-    WHERE deleted = FALSE AND reconciliation_status IS NOT NULL;
+    WHERE deleted = false AND reconciliation_status IS NOT NULL;
 
 -- Tenant isolation index
 CREATE INDEX idx_payment_order_tenant
     ON t_payment_order (tenant_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- ============================================================================
 -- Foreign Key Constraints

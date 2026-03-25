@@ -109,17 +109,17 @@ CREATE TABLE t_wallet_lock (
 -- Unique constraint: One wallet per (tenant, player, wallet_type, currency)
 CREATE UNIQUE INDEX uk_wallet_player_type_currency
     ON t_wallet (tenant_id, player_id, wallet_type, currency_code)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Player lookup index (for all wallets of a player)
 CREATE INDEX idx_wallet_player
     ON t_wallet (tenant_id, player_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Tenant isolation index
 CREATE INDEX idx_wallet_tenant
     ON t_wallet (tenant_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- ============================================================================
 -- Indexes for t_wallet_transaction

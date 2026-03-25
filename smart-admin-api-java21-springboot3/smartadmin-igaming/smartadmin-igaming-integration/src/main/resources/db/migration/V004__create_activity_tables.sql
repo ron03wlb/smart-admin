@@ -57,12 +57,12 @@ CREATE TABLE t_promotion_rule (
 -- Unique constraint on promotion_code per tenant
 CREATE UNIQUE INDEX uk_promotion_code_tenant
     ON t_promotion_rule (tenant_id, promotion_code)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Active promotions query index
 CREATE INDEX idx_promotion_status_time
     ON t_promotion_rule (tenant_id, status, start_time, end_time)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 COMMENT ON TABLE t_promotion_rule IS
 'Promotion rule master table for deposit bonuses, reload bonuses, and campaigns. Supports wagering requirements, time windows, and game restrictions via JSONB fields.';
@@ -114,17 +114,17 @@ CREATE TABLE t_player_bonus_record (
 -- Unique constraint on claim_id (idempotency)
 CREATE UNIQUE INDEX uk_bonus_record_claim_id
     ON t_player_bonus_record (tenant_id, claim_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Player bonus history index
 CREATE INDEX idx_bonus_record_player
     ON t_player_bonus_record (tenant_id, player_id, status, claimed_at DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Active bonuses query index (for wagering progress updates)
 CREATE INDEX idx_bonus_record_active
     ON t_player_bonus_record (player_id, status)
-    WHERE deleted = FALSE AND status = 1;  -- 1 = ACTIVE
+    WHERE deleted = false AND status = 1;  -- 1 = ACTIVE
 
 -- Foreign key constraints
 ALTER TABLE t_player_bonus_record
@@ -190,12 +190,12 @@ CREATE TABLE t_turnover_game_weight_rule (
 -- Unique constraint on rule_code per tenant
 CREATE UNIQUE INDEX uk_game_weight_rule_code
     ON t_turnover_game_weight_rule (tenant_id, rule_code)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Game category lookup index (for turnover calculation)
 CREATE INDEX idx_game_weight_category
     ON t_turnover_game_weight_rule (tenant_id, game_category, status, priority DESC)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 COMMENT ON TABLE t_turnover_game_weight_rule IS
 'Game category weight rules for turnover calculation (Layer 3: Activity System). Defines contribution of each game category (Slots 100%, Live Casino 15%, etc.) to valid turnover. Supports effective date ranges and priority-based rule selection.';
@@ -244,12 +244,12 @@ CREATE TABLE t_turnover_odds_threshold_rule (
 -- Unique constraint on rule_code per tenant
 CREATE UNIQUE INDEX uk_odds_threshold_rule_code
     ON t_turnover_odds_threshold_rule (tenant_id, rule_code)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Odds type lookup index
 CREATE INDEX idx_odds_threshold_type
     ON t_turnover_odds_threshold_rule (tenant_id, odds_type, status)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 COMMENT ON TABLE t_turnover_odds_threshold_rule IS
 'Odds threshold rules for anti-arbitrage protection (Layer 2: Finance Center). Defines minimum odds requirements (e.g., European >= 1.5) for bets to qualify for turnover. Prevents bonus abuse via low-odds hedging strategies.';
@@ -274,8 +274,8 @@ CREATE TABLE t_turnover_risk_action_rule (
     risk_level          INTEGER NOT NULL,             -- Risk level: 1=LOW, 2=MEDIUM, 3=HIGH, 4=CRITICAL
     action_type         INTEGER NOT NULL,             -- RiskActionTypeEnum: 1=PASS, 2=FLAG, 3=BLOCK
     turnover_factor     NUMERIC(5,2) NOT NULL,        -- Turnover factor: 0.00 ~ 100.00
-    allow_bet           BOOLEAN NOT NULL,             -- Allow betting flag
-    create_proposal     BOOLEAN NOT NULL,             -- Create risk proposal flag
+    allow_bet           BOOLEAN NOT NULL DEFAULT TRUE,             -- Allow betting flag
+    create_proposal     BOOLEAN NOT NULL DEFAULT FALSE,             -- Create risk proposal flag
 
     -- Effective Period
     effective_from      TIMESTAMPTZ,                  -- NULL = applies immediately
@@ -300,12 +300,12 @@ CREATE TABLE t_turnover_risk_action_rule (
 -- Unique constraint on rule_code per tenant
 CREATE UNIQUE INDEX uk_risk_action_rule_code
     ON t_turnover_risk_action_rule (tenant_id, rule_code)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Risk level lookup index
 CREATE INDEX idx_risk_action_level
     ON t_turnover_risk_action_rule (tenant_id, risk_level, status)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 COMMENT ON TABLE t_turnover_risk_action_rule IS
 'Risk engine action rules for automated risk management (Layer 1: Risk Engine). Defines actions (PASS/FLAG/BLOCK) based on player risk level. Integrates with risk scoring system (t_risk_assessment) to make real-time decisions on betting and turnover calculation.';
@@ -353,12 +353,12 @@ CREATE TABLE t_turnover_status_factor_rule (
 -- Unique constraint on rule_code per tenant
 CREATE UNIQUE INDEX uk_status_factor_rule_code
     ON t_turnover_status_factor_rule (tenant_id, rule_code)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Settlement status lookup index
 CREATE INDEX idx_status_factor_settlement
     ON t_turnover_status_factor_rule (tenant_id, settlement_status, status)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 COMMENT ON TABLE t_turnover_status_factor_rule IS
 'Settlement status factor rules for turnover calculation (Layer 2: Finance Center). Defines how each settlement outcome (WIN/LOSS/DRAW/VOID) affects turnover. Uses "Standard Principal Method" where HALF_WIN/HALF_LOSS count as 100% (not 50%).';

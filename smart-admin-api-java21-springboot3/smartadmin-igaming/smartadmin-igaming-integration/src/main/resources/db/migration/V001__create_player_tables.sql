@@ -51,37 +51,37 @@ CREATE TABLE t_player (
 -- Unique constraint on username per tenant
 CREATE UNIQUE INDEX uk_player_username_tenant
     ON t_player (tenant_id, username)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Unique constraint on email blind index per tenant (for encrypted email lookup)
 CREATE UNIQUE INDEX uk_player_email_idx_tenant
     ON t_player (tenant_id, email_blind_idx)
-    WHERE deleted = FALSE AND email_blind_idx IS NOT NULL;
+    WHERE deleted = false AND email_blind_idx IS NOT NULL;
 
 -- Unique constraint on phone blind index per tenant (for encrypted phone lookup)
 CREATE UNIQUE INDEX uk_player_phone_idx_tenant
     ON t_player (tenant_id, phone_blind_idx)
-    WHERE deleted = FALSE AND phone_blind_idx IS NOT NULL;
+    WHERE deleted = false AND phone_blind_idx IS NOT NULL;
 
 -- Tenant isolation index (for multi-tenant queries)
 CREATE INDEX idx_player_tenant
     ON t_player (tenant_id)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Status filter index (for active/suspended queries)
 CREATE INDEX idx_player_status
     ON t_player (tenant_id, status)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- VIP level index (for VIP-based campaigns)
 CREATE INDEX idx_player_vip_level
     ON t_player (tenant_id, vip_level)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- Registration time index (for cohort analysis)
 CREATE INDEX idx_player_create_time
     ON t_player (tenant_id, create_time)
-    WHERE deleted = FALSE;
+    WHERE deleted = false;
 
 -- ============================================================================
 -- Table Comments
@@ -104,7 +104,7 @@ COMMENT ON COLUMN t_player.vip_level IS 'VIP tier: 1=BRONZE, 2=SILVER, 3=GOLD, 4
 COMMENT ON COLUMN t_player.registration_ip IS 'IP address at registration (supports IPv4/IPv6)';
 COMMENT ON COLUMN t_player.last_login_ip IS 'IP address of most recent login';
 COMMENT ON COLUMN t_player.last_login_time IS 'Timestamp of most recent login (UTC with timezone)';
-COMMENT ON COLUMN t_player.deleted IS 'Soft delete flag (TRUE=deleted, FALSE=active)';
+COMMENT ON COLUMN t_player.deleted IS 'Soft delete flag (1=deleted, 0=active)';
 COMMENT ON COLUMN t_player.version IS 'Optimistic lock version for concurrent update protection';
 COMMENT ON COLUMN t_player.create_time IS 'Record creation timestamp (auto-filled by MyBatis MetaObjectHandler)';
 COMMENT ON COLUMN t_player.update_time IS 'Record last update timestamp (auto-filled by MyBatis MetaObjectHandler)';
