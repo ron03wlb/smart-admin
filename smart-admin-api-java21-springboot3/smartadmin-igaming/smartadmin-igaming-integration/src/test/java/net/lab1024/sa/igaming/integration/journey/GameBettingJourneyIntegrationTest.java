@@ -91,6 +91,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @DisplayName("Game Betting Journey Integration Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@org.springframework.test.annotation.DirtiesContext(
+    classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS)
 class GameBettingJourneyIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private GameBettingIntegrationService gameBettingService;

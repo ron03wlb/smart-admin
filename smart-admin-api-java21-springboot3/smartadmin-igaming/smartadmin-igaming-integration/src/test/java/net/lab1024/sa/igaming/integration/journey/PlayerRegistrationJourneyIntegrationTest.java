@@ -28,7 +28,6 @@ import net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao;
 import net.lab1024.sa.igaming.wallet.payment.domain.entity.PaymentOrderEntity;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Player registration journey integration test - end-to-end flow validation.
@@ -55,7 +54,6 @@ import org.springframework.transaction.annotation.Transactional;
  * <ul>
  *   <li>Testcontainers: PostgreSQL 16-alpine
  *   <li>Spring Boot Test Context: Full integration module loaded
- *   <li>Transaction Rollback: {@code @Transactional} ensures each test starts clean
  * </ul>
  *
  * @author iGaming Team
@@ -63,6 +61,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @DisplayName("Player Registration Journey Integration Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@org.springframework.test.annotation.DirtiesContext(
+    classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS)
 class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private PlayerRegistrationIntegrationService playerRegistrationService;
@@ -81,10 +81,10 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
     TenantContext.setTenantId(1L);
 
     // Clean up promotion rules and bonus records from previous tests
-    // This prevents "shouldHandleFirstDepositWithoutPromotion" from finding leftover rules
+    // Note: BaseIntegrationTest already handles cleanup for players, wallets, and payment orders
+    // This additional cleanup is only for test-specific data
     bonusRecordDao.delete(Wrappers.lambdaQuery());
     promotionRuleDao.delete(Wrappers.lambdaQuery());
-    paymentOrderDao.delete(Wrappers.lambdaQuery());
   }
 
   @AfterEach
@@ -100,7 +100,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(1)
   @DisplayName("Should register player with CASH and BONUS wallets")
-  @Transactional
   void shouldRegisterPlayerWithWallets() {
     // Arrange
     String username = PlayerRegistrationTestFixture.generateUniqueUsername("player");
@@ -150,7 +149,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(2)
   @DisplayName("Should register player with referral code")
-  @Transactional
   void shouldRegisterPlayerWithReferralCode() {
     // Arrange
     String username = PlayerRegistrationTestFixture.generateUniqueUsername("vip");
@@ -174,7 +172,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(3)
   @DisplayName("Should fail registration with duplicate username")
-  @Transactional
   void shouldFailRegistrationWithDuplicateUsername() {
     // Arrange
     String username = PlayerRegistrationTestFixture.generateUniqueUsername("duplicate");
@@ -202,7 +199,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(4)
   @DisplayName("Should award first deposit bonus on first deposit")
-  @Transactional
   void shouldAwardFirstDepositBonus() {
     // Arrange - Setup promotion rule
     PromotionRuleEntity bonusRule = PlayerRegistrationTestFixture.createFirstDepositBonusRule();
@@ -276,7 +272,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(5)
   @DisplayName("Should NOT award bonus on second deposit")
-  @Transactional
   void shouldNotAwardBonusOnSecondDeposit() {
     // Arrange - Setup promotion rule
     PromotionRuleEntity bonusRule = PlayerRegistrationTestFixture.createFirstDepositBonusRule();
@@ -336,7 +331,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(6)
   @DisplayName("Should handle first deposit without active promotion")
-  @Transactional
   void shouldHandleFirstDepositWithoutPromotion() {
     // Arrange - Register player (NO promotion rule setup)
     String username = PlayerRegistrationTestFixture.generateUniqueUsername("nopromo");
@@ -385,7 +379,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(7)
   @DisplayName("Should isolate player data across tenants")
-  @Transactional
   void shouldIsolateTenantData() {
     // Arrange - Tenant 1 player registration
     TenantContext.setTenantId(1L);
@@ -425,7 +418,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(8)
   @DisplayName("Should isolate wallet data across tenants")
-  @Transactional
   void shouldIsolateWalletAcrossTenants() {
     // Arrange - Tenant 1 player with wallets
     TenantContext.setTenantId(1L);
@@ -459,7 +451,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(9)
   @DisplayName("Should handle invalid deposit callback gracefully")
-  @Transactional
   void shouldHandleInvalidDepositCallback() {
     // Arrange - Deposit callback for non-existent order
     String invalidOrderNo = "INVALID-ORDER-999";
@@ -477,7 +468,6 @@ class PlayerRegistrationJourneyIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(10)
   @DisplayName("Should validate registration form constraints")
-  @Transactional
   void shouldValidateRegistrationFormConstraints() {
     // Arrange - Invalid form (username too short)
     PlayerRegistrationIntegrationForm invalidForm = new PlayerRegistrationIntegrationForm();
