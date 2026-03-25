@@ -1,6 +1,7 @@
 name: React Support Module Tests
 
 on:
+  workflow_dispatch:  # Allow manual triggering
   pull_request:
     paths:
       - 'smart-admin-web-react/src/views/support/**'
