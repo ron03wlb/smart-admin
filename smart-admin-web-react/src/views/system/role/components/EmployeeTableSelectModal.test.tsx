@@ -50,6 +50,8 @@ describe('EmployeeTableSelectModal', () => {
       disabledFlag: false,
       administratorFlag: true,
       remark: '',
+      gender: 1,
+      leaveFlag: false,
     },
     {
       employeeId: 2,
@@ -63,6 +65,8 @@ describe('EmployeeTableSelectModal', () => {
       disabledFlag: false,
       administratorFlag: false,
       remark: '',
+      gender: 1,
+      leaveFlag: false,
     },
     {
       employeeId: 3,
@@ -76,6 +80,8 @@ describe('EmployeeTableSelectModal', () => {
       disabledFlag: true,
       administratorFlag: false,
       remark: '',
+      gender: 1,
+      leaveFlag: false,
     },
   ];
 
@@ -97,6 +103,8 @@ describe('EmployeeTableSelectModal', () => {
         total: 3,
         pageNum: 1,
         pageSize: 10,
+        pages: 1,
+        emptyFlag: false,
       },
     });
   });
@@ -325,6 +333,8 @@ describe('EmployeeTableSelectModal', () => {
             total: 0,
             pageNum: 1,
             pageSize: 10,
+            pages: 0,
+            emptyFlag: true,
           },
         });
 

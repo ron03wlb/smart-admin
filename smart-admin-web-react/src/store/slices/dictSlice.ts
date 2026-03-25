@@ -92,8 +92,9 @@ export const fetchAllDictData = createAsyncThunk(
       } else {
         return rejectWithValue(response.msg || '獲取字典數據失敗');
       }
-    } catch (error: any) {
-      return rejectWithValue(error.message || '網絡錯誤');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '網絡錯誤';
+      return rejectWithValue(message);
     }
   }
 );

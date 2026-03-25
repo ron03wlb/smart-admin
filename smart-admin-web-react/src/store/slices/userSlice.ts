@@ -103,8 +103,9 @@ export const login = createAsyncThunk(
       } else {
         return rejectWithValue(response.msg || '登錄失敗');
       }
-    } catch (error: any) {
-      return rejectWithValue(error.message || '網絡錯誤');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '網絡錯誤';
+      return rejectWithValue(message);
     }
   }
 );
@@ -158,8 +159,9 @@ export const getLoginInfo = createAsyncThunk(
       } else {
         return rejectWithValue(response.msg || '獲取登錄信息失敗');
       }
-    } catch (error: any) {
-      return rejectWithValue(error.message || '網絡錯誤');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '網絡錯誤';
+      return rejectWithValue(message);
     }
   }
 );
@@ -176,8 +178,9 @@ export const logout = createAsyncThunk('user/logout', async (_, { rejectWithValu
     } else {
       return rejectWithValue(response.msg || '退出登錄失敗');
     }
-  } catch (error: any) {
-    return rejectWithValue(error.message || '網絡錯誤');
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : '網絡錯誤';
+    return rejectWithValue(message);
   }
 });
 

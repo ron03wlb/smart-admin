@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { Button, Space, Row } from 'antd';
+import { Button, Space, Row, ButtonProps } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -28,6 +28,9 @@ import {
 } from '@ant-design/icons';
 import PrivilegeButton from '@/components/PrivilegeButton';
 import './index.css';
+
+// Ant Design Button type definition
+type ButtonType = ButtonProps['type'];
 
 export interface TableOperatorButton {
   /**
@@ -194,7 +197,7 @@ const TableOperator: React.FC<TableOperatorProps> = props => {
     const button = (
       <Button
         key={index}
-        type={finalConfig.buttonType as any}
+        type={finalConfig.buttonType as ButtonType}
         icon={finalConfig.icon}
         onClick={onClick}
         disabled={disabled}

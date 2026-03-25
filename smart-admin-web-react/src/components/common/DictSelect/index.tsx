@@ -46,11 +46,17 @@ import { useMemo, useEffect, useState } from 'react';
 import { Select, SelectProps } from 'antd';
 import { useDict } from '@/hooks/useDict';
 
+// 定義選項類型（基於 Ant Design Select 的 options 類型）
+type SelectOptionType = NonNullable<SelectProps['options']>[number];
+
 /**
  * DictSelect Props
  * 繼承 Ant Design Select 的所有 Props
  */
-export interface DictSelectProps<ValueType = any> extends Omit<SelectProps<ValueType>, 'options'> {
+export interface DictSelectProps<ValueType extends string | string[] = string> extends Omit<
+  SelectProps<ValueType>,
+  'options'
+> {
   /**
    * 字典代碼（必填）
    * 示例：'GOODS_PLACE', 'GOODS_STATUS'
@@ -73,7 +79,9 @@ export interface DictSelectProps<ValueType = any> extends Omit<SelectProps<Value
 /**
  * DictSelect 組件
  */
-export default function DictSelect<ValueType = any>(props: DictSelectProps<ValueType>) {
+export default function DictSelect<ValueType extends string | string[] = string>(
+  props: DictSelectProps<ValueType>
+) {
   const {
     dictCode,
     disabledOption = [],
@@ -124,9 +132,9 @@ export default function DictSelect<ValueType = any>(props: DictSelectProps<Value
     // 多選模式：過濾數組中被禁用或隱藏的值
     if (Array.isArray(value)) {
       const filteredValue = value.filter(
-        (item: any) => !disabledOption.includes(item) && !hiddenOption.includes(item)
+        (item: string) => !disabledOption.includes(item) && !hiddenOption.includes(item)
       );
-      setInternalValue(filteredValue as any);
+      setInternalValue(filteredValue as ValueType);
     } else {
       // 單選模式：如果值被禁用或隱藏，清空
       const isHiddenOrDisabled =
@@ -138,9 +146,11 @@ export default function DictSelect<ValueType = any>(props: DictSelectProps<Value
   /**
    * 處理選擇變化
    */
-  const handleChange = (newValue: ValueType) => {
+  const handleChange = (newValue: ValueType, option?: SelectOptionType | SelectOptionType[]) => {
     setInternalValue(newValue);
-    onChange?.(newValue, options as any);
+    if (onChange) {
+      onChange(newValue, option);
+    }
   };
 
   return (

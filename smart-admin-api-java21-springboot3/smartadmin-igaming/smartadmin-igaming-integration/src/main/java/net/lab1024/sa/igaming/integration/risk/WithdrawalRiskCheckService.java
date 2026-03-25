@@ -17,6 +17,7 @@ import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.mq.kafka.constant.IgamingKafkaConst;
 import net.lab1024.sa.common.mq.kafka.event.DomainEvent;
 import net.lab1024.sa.common.mq.kafka.event.DomainEventPublisher;
+import net.lab1024.sa.igaming.activity.service.TurnoverQueryService;
 import net.lab1024.sa.igaming.common.constant.PaymentOrderTypeEnum;
 import net.lab1024.sa.igaming.common.constant.RiskDecisionEnum;
 import net.lab1024.sa.igaming.common.constant.RiskLevelEnum;
@@ -92,6 +93,7 @@ public class WithdrawalRiskCheckService {
   private final RiskAssessmentDao riskAssessmentDao;
   private final RiskProposalManager riskProposalManager;
   private final DomainEventPublisher domainEventPublisher;
+  private final TurnoverQueryService turnoverQueryService;
 
   /**
    * Execute withdrawal risk check for a given payment order.
@@ -219,47 +221,29 @@ public class WithdrawalRiskCheckService {
   /**
    * Calculate player's cumulative turnover (lifetime).
    *
-   * <p>This is a simplified implementation. In production, turnover should be queried from a
-   * pre-aggregated summary table or calculated via a database query summing all valid turnover
-   * records.
+   * <p>Delegates to {@link TurnoverQueryService#calculateCumulativeTurnover} which aggregates
+   * wagering_completed from all bonus records.
    *
    * @param playerId player ID
    * @param tenantId tenant ID
    * @return cumulative turnover
    */
   private BigDecimal calculateCumulativeTurnover(Long playerId, Long tenantId) {
-    // TODO: Implement actual turnover calculation
-    // Option 1: Query from t_wagering_progress (aggregate all activityValidTurnover)
-    // Option 2: Query from t_player_stats (pre-aggregated summary table)
-    // Option 3: Query from game betting history and apply turnover rules
-
-    // Placeholder: Return 0 for now
-    log.warn(
-        "[WITHDRAWAL_RISK_CHECK] cumulativeTurnover calculation not implemented. Returning 0 for"
-            + " playerId={}",
-        playerId);
-    return BigDecimal.ZERO;
+    return turnoverQueryService.calculateCumulativeTurnover(playerId, tenantId);
   }
 
   /**
    * Calculate player's total deposits (lifetime).
    *
-   * <p>Sum all SUCCESS deposits for this player.
+   * <p>Delegates to {@link PaymentOrderDao#sumSuccessfulDeposits} which aggregates all SUCCESS
+   * deposits (order_type=1, status=3) for this player.
    *
    * @param playerId player ID
    * @param tenantId tenant ID
    * @return total deposits
    */
   private BigDecimal calculateTotalDeposits(Long playerId, Long tenantId) {
-    // Query all SUCCESS deposits
-    // SELECT SUM(amount) FROM t_payment_order WHERE player_id = ? AND order_type = 1 AND status = 3
-
-    // Placeholder: Return 0 for now
-    log.warn(
-        "[WITHDRAWAL_RISK_CHECK] totalDeposits calculation not implemented. Returning 0 for"
-            + " playerId={}",
-        playerId);
-    return BigDecimal.ZERO;
+    return paymentOrderDao.sumSuccessfulDeposits(playerId, tenantId);
   }
 
   /**
