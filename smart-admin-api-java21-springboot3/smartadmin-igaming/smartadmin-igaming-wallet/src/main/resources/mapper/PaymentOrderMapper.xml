@@ -35,4 +35,14 @@
         ORDER BY payment_order_id DESC
     </select>
 
+    <select id="sumSuccessfulDeposits" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(amount), 0)
+        FROM t_payment_order
+        WHERE player_id = #{playerId}
+          AND tenant_id = #{tenantId}
+          AND order_type = 1  -- DEPOSIT (see PaymentOrderTypeEnum.DEPOSIT)
+          AND status = 3      -- SUCCESS (see PaymentOrderStatusEnum.SUCCESS)
+          AND deleted = 0
+    </select>
+
 </mapper>
