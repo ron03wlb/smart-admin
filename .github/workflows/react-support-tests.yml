@@ -43,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Run Job module tests
-        run: npm run test -- src/views/support/job
+        run: npm run test -- --run src/views/support/job
         env:
           CI: true
 
@@ -67,7 +67,7 @@ jobs:
         run: npm ci
 
       - name: Run ChangeLog module tests
-        run: npm run test -- src/views/support/change-log
+        run: npm run test -- --run src/views/support/change-log
         env:
           CI: true
 
@@ -91,7 +91,7 @@ jobs:
         run: npm ci
 
       - name: Run Message module tests
-        run: npm run test -- src/views/support/message
+        run: npm run test -- --run src/views/support/message
         env:
           CI: true
 
@@ -115,7 +115,7 @@ jobs:
         run: npm ci
 
       - name: Run Reload module tests
-        run: npm run test -- src/views/support/reload
+        run: npm run test -- --run src/views/support/reload
         env:
           CI: true
 
@@ -139,7 +139,7 @@ jobs:
         run: npm ci
 
       - name: Run Serial-number module tests
-        run: npm run test -- src/views/support/serial-number
+        run: npm run test -- --run src/views/support/serial-number
         env:
           CI: true
 
@@ -163,7 +163,7 @@ jobs:
         run: npm ci
 
       - name: Run Config module tests
-        run: npm run test -- src/views/support/config
+        run: npm run test -- --run src/views/support/config
         env:
           CI: true
 
@@ -187,7 +187,7 @@ jobs:
         run: npm ci
 
       - name: Run Dict module tests
-        run: npm run test -- src/views/support/dict
+        run: npm run test -- --run src/views/support/dict
         env:
           CI: true
 
