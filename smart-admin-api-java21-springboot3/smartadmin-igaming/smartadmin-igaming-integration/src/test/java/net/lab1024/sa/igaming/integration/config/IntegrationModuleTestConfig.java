@@ -45,6 +45,7 @@ import org.springframework.context.annotation.Import;
     scanBasePackages = {
       "net.lab1024.sa.igaming.integration",
       "net.lab1024.sa.igaming.player",
+      "net.lab1024.sa.igaming.player.vip", // ✅ Added VIP service package
       "net.lab1024.sa.igaming.wallet",
       "net.lab1024.sa.igaming.activity",
       "net.lab1024.sa.igaming.game",
@@ -67,6 +68,7 @@ import org.springframework.context.annotation.Import;
 @MapperScan(
     basePackages = {
       "net.lab1024.sa.igaming.player.dao",
+      "net.lab1024.sa.igaming.player.vip.dao", // ✅ Added VIP DAO package
       "net.lab1024.sa.igaming.wallet.dao",
       "net.lab1024.sa.igaming.wallet.payment.dao",
       "net.lab1024.sa.igaming.activity.dao",
