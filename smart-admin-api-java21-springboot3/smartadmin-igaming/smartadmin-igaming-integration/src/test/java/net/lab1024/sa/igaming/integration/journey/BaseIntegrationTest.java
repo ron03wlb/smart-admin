@@ -4,6 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
+import net.lab1024.sa.igaming.agent.commission.dao.AgentCommissionConfigDao;
+import net.lab1024.sa.igaming.agent.commission.dao.AgentCommissionRecordDao;
+import net.lab1024.sa.igaming.agent.commission.dao.AgentCommissionSettlementDao;
+import net.lab1024.sa.igaming.agent.commission.dao.AgentRelationshipDao;
 import net.lab1024.sa.igaming.player.dao.PlayerDao;
 import net.lab1024.sa.igaming.player.domain.entity.PlayerEntity;
 import net.lab1024.sa.igaming.wallet.dao.WalletDao;
@@ -13,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -76,6 +81,16 @@ public abstract class BaseIntegrationTest {
   @Autowired private net.lab1024.sa.igaming.wallet.dao.WalletTransactionDao walletTransactionDao;
 
   @Autowired private net.lab1024.sa.igaming.wallet.payment.dao.PaymentOrderDao paymentOrderDao;
+
+  @Autowired private AgentRelationshipDao agentRelationshipDao;
+
+  @Autowired private AgentCommissionRecordDao agentCommissionRecordDao;
+
+  @Autowired private AgentCommissionSettlementDao agentCommissionSettlementDao;
+
+  @Autowired private AgentCommissionConfigDao agentCommissionConfigDao;
+
+  @Autowired private JdbcTemplate jdbcTemplate;
 
   /**
    * Clean up test data before each test to ensure clean state.
@@ -157,6 +172,25 @@ public abstract class BaseIntegrationTest {
     // Then clean up wallets (foreign key constraint to players)
     int walletsDeleted = walletDao.delete(new LambdaQueryWrapper<WalletEntity>());
     System.out.println("[@BeforeEach] Deleted " + walletsDeleted + " wallets");
+
+    // ✅ CRITICAL FIX: Physically delete agent tables (bypass @TableLogic soft delete)
+    // Agent entities use @TableLogic, so dao.delete() only soft-deletes records.
+    // For test cleanup, we need physical deletion to avoid FK constraint violations.
+    int settlementDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_commission_settlement WHERE tenant_id = 1");
+    System.out.println("[@BeforeEach] Deleted " + settlementDeleted + " commission settlements");
+
+    int recordDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_commission_record WHERE tenant_id = 1");
+    System.out.println("[@BeforeEach] Deleted " + recordDeleted + " commission records");
+
+    int relationshipDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_relationship WHERE tenant_id = 1");
+    System.out.println("[@BeforeEach] Deleted " + relationshipDeleted + " agent relationships");
+
+    int configDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_commission_config WHERE tenant_id = 1");
+    System.out.println("[@BeforeEach] Deleted " + configDeleted + " commission configs");
 
     // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());
@@ -242,6 +276,25 @@ public abstract class BaseIntegrationTest {
     // Then clean up wallets (foreign key constraint to players)
     int walletsDeleted = walletDao.delete(new LambdaQueryWrapper<WalletEntity>());
     System.out.println("[@AfterEach] Deleted " + walletsDeleted + " wallets");
+
+    // ✅ CRITICAL FIX: Physically delete agent tables (bypass @TableLogic soft delete)
+    // Agent entities use @TableLogic, so dao.delete() only soft-deletes records.
+    // For test cleanup, we need physical deletion to avoid FK constraint violations.
+    int settlementDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_commission_settlement WHERE tenant_id = 1");
+    System.out.println("[@AfterEach] Deleted " + settlementDeleted + " commission settlements");
+
+    int recordDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_commission_record WHERE tenant_id = 1");
+    System.out.println("[@AfterEach] Deleted " + recordDeleted + " commission records");
+
+    int relationshipDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_relationship WHERE tenant_id = 1");
+    System.out.println("[@AfterEach] Deleted " + relationshipDeleted + " agent relationships");
+
+    int configDeleted =
+        jdbcTemplate.update("DELETE FROM t_agent_commission_config WHERE tenant_id = 1");
+    System.out.println("[@AfterEach] Deleted " + configDeleted + " commission configs");
 
     // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());

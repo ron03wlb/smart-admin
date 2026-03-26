@@ -1,6 +1,7 @@
 package net.lab1024.sa.igaming.agent.commission.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import io.vavr.control.Option;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -220,9 +221,14 @@ public class AgentCommissionSettlementService {
       return ResponseDTO.userErrorParam("只能解凍 FROZEN 狀態的佣金記錄");
     }
 
-    record.setStatus("PENDING");
-    record.setFrozenReason(null);
-    commissionRecordDao.updateById(record);
+    // ✅ Use UpdateWrapper to explicitly set frozenReason to NULL
+    // (updateById() ignores null values by default)
+    LambdaUpdateWrapper<AgentCommissionRecordEntity> updateWrapper =
+        new LambdaUpdateWrapper<AgentCommissionRecordEntity>()
+            .eq(AgentCommissionRecordEntity::getRecordId, recordId)
+            .set(AgentCommissionRecordEntity::getStatus, "PENDING")
+            .set(AgentCommissionRecordEntity::getFrozenReason, null);
+    commissionRecordDao.update(updateWrapper);
 
     log.info("Unfroze commission record {}", recordId);
     return ResponseDTO.ok();
@@ -246,18 +252,23 @@ public class AgentCommissionSettlementService {
       return ResponseDTO.userErrorParam("只能取消 COMPLETED 狀態的結算批次");
     }
 
-    // Revert all SETTLED records to PENDING
-    LambdaQueryWrapper<AgentCommissionRecordEntity> wrapper =
+    // ✅ Use UpdateWrapper to explicitly set settlementBatchId to NULL
+    // (updateById() ignores null values by default)
+    LambdaUpdateWrapper<AgentCommissionRecordEntity> updateWrapper =
+        new LambdaUpdateWrapper<AgentCommissionRecordEntity>()
+            .eq(AgentCommissionRecordEntity::getSettlementBatchId, batchId)
+            .eq(AgentCommissionRecordEntity::getStatus, "SETTLED")
+            .set(AgentCommissionRecordEntity::getStatus, "PENDING")
+            .set(AgentCommissionRecordEntity::getSettlementBatchId, null);
+
+    // Count records before update for logging
+    LambdaQueryWrapper<AgentCommissionRecordEntity> countWrapper =
         new LambdaQueryWrapper<AgentCommissionRecordEntity>()
             .eq(AgentCommissionRecordEntity::getSettlementBatchId, batchId)
             .eq(AgentCommissionRecordEntity::getStatus, "SETTLED");
+    long settledCount = commissionRecordDao.selectCount(countWrapper);
 
-    List<AgentCommissionRecordEntity> settledRecords = commissionRecordDao.selectList(wrapper);
-    for (AgentCommissionRecordEntity record : settledRecords) {
-      record.setStatus("PENDING");
-      record.setSettlementBatchId(null);
-      commissionRecordDao.updateById(record);
-    }
+    commissionRecordDao.update(updateWrapper);
 
     // Mark settlement as CANCELLED (using FAILED status with message)
     settlement.setStatus("FAILED");
@@ -265,9 +276,7 @@ public class AgentCommissionSettlementService {
     settlementDao.updateById(settlement);
 
     log.info(
-        "Cancelled settlement batch {} - {} records reverted to PENDING",
-        batchId,
-        settledRecords.size());
+        "Cancelled settlement batch {} - {} records reverted to PENDING", batchId, settledCount);
     return ResponseDTO.ok();
   }
 }

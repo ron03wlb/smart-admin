@@ -75,5 +75,6 @@ public class AgentCommissionSettlementEntity extends SmartAdminBaseEntity {
   private String errorMessage;
 
   /** Logical delete flag (MyBatis Plus). */
-  @TableLogic private Boolean deleted;
+  @TableLogic(value = "false", delval = "true")
+  private Boolean deleted;
 }

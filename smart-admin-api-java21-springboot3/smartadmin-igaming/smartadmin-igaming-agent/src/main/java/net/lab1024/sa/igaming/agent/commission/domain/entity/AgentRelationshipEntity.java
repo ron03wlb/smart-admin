@@ -59,5 +59,6 @@ public class AgentRelationshipEntity extends SmartAdminBaseEntity {
   private String status;
 
   /** Logical delete flag (MyBatis Plus). */
-  @TableLogic private Boolean deleted;
+  @TableLogic(value = "false", delval = "true")
+  private Boolean deleted;
 }

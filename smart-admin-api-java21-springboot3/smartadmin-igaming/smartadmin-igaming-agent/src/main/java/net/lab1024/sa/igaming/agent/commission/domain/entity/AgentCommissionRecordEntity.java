@@ -124,5 +124,6 @@ public class AgentCommissionRecordEntity extends SmartAdminBaseEntity {
   private String frozenReason;
 
   /** Logical delete flag (MyBatis Plus). */
-  @TableLogic private Boolean deleted;
+  @TableLogic(value = "false", delval = "true")
+  private Boolean deleted;
 }

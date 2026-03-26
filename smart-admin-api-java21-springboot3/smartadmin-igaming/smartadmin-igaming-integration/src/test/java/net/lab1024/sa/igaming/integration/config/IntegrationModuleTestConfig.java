@@ -25,11 +25,12 @@ import org.springframework.context.annotation.Import;
  *   <li>{@code activity} - Bonus distribution, promotion rule services
  *   <li>{@code game} - Game provider adapter services
  *   <li>{@code risk} - Risk assessment, risk proposal services
+ *   <li>{@code agent} - Agent commission calculation, settlement services
  *   <li>{@code common} - Shared constants, domain events
  * </ul>
  *
  * <p><b>MyBatis Mappers:</b> Scans all Dao interfaces across iGaming modules (player, wallet,
- * activity, game, risk).
+ * activity, game, risk, agent).
  *
  * <p><b>Test Beans:</b> Imports {@link TestKafkaConfig} to provide mock Kafka beans
  * (DomainEventPublisher) when Kafka is disabled in test profile.
@@ -48,6 +49,7 @@ import org.springframework.context.annotation.Import;
       "net.lab1024.sa.igaming.activity",
       "net.lab1024.sa.igaming.game",
       "net.lab1024.sa.igaming.risk",
+      "net.lab1024.sa.igaming.agent",
       "net.lab1024.sa.igaming.common",
       "net.lab1024.sa.common.mybatis",
       "net.lab1024.sa.common.mq",
@@ -71,6 +73,9 @@ import org.springframework.context.annotation.Import;
       "net.lab1024.sa.igaming.activity.turnover.dao",
       "net.lab1024.sa.igaming.game.dao",
       "net.lab1024.sa.igaming.risk.dao",
+      "net.lab1024.sa.igaming.agent.commission.dao",
+      "net.lab1024.sa.igaming.agent.affiliate.dao",
+      "net.lab1024.sa.igaming.agent.credit.dao",
       "net.lab1024.sa.support.liteflow.dao",
       "net.lab1024.sa.common.tenant.dao"
     })

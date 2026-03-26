@@ -86,5 +86,6 @@ public class AgentCommissionConfigEntity extends SmartAdminBaseEntity {
   private Integer status;
 
   /** Logical delete flag (MyBatis Plus). */
-  @TableLogic private Boolean deleted;
+  @TableLogic(value = "false", delval = "true")
+  private Boolean deleted;
 }

@@ -12,6 +12,7 @@ dependencies {
     api(project(":smartadmin-igaming:smartadmin-igaming-game"))
     api(project(":smartadmin-igaming:smartadmin-igaming-activity"))
     api(project(":smartadmin-igaming:smartadmin-igaming-risk"))
+    api(project(":smartadmin-igaming:smartadmin-igaming-agent"))
 
     // API Contract Layer
     api(project(":smartadmin-api:smartadmin-api-igaming"))
