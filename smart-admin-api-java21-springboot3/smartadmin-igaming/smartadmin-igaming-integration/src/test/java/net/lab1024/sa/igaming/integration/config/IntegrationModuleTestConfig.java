@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
  *   <li>{@code integration} - Integration orchestration services (PlayerRegistration,
  *       FirstDepositBonus, WithdrawalRiskCheck, WithdrawalApproval)
  *   <li>{@code player} - Player registration, authentication, KYC services
+ *   <li>{@code player.selfexclusion} - Self-exclusion request, enforcement, review services
  *   <li>{@code wallet} - Wallet management, payment processing services
  *   <li>{@code activity} - Bonus distribution, promotion rule services
  *   <li>{@code game} - Game provider adapter services
@@ -46,6 +47,7 @@ import org.springframework.context.annotation.Import;
       "net.lab1024.sa.igaming.integration",
       "net.lab1024.sa.igaming.player",
       "net.lab1024.sa.igaming.player.vip", // ✅ Added VIP service package
+      "net.lab1024.sa.igaming.player.selfexclusion", // ✅ Added Self-Exclusion service package
       "net.lab1024.sa.igaming.wallet",
       "net.lab1024.sa.igaming.activity",
       "net.lab1024.sa.igaming.game",
@@ -69,6 +71,7 @@ import org.springframework.context.annotation.Import;
     basePackages = {
       "net.lab1024.sa.igaming.player.dao",
       "net.lab1024.sa.igaming.player.vip.dao", // ✅ Added VIP DAO package
+      "net.lab1024.sa.igaming.player.selfexclusion.dao", // ✅ Added Self-Exclusion DAO package
       "net.lab1024.sa.igaming.wallet.dao",
       "net.lab1024.sa.igaming.wallet.payment.dao",
       "net.lab1024.sa.igaming.activity.dao",
