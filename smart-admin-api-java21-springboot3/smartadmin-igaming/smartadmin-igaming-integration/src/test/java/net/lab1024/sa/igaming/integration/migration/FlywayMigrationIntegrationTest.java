@@ -20,16 +20,18 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 /**
  * Flyway Migration Integration Test.
  *
- * <p>Validates that all 13 Flyway migration scripts execute successfully and create the expected
+ * <p>Validates that all 16 Flyway migration scripts execute successfully and create the expected
  * database schema:
  *
  * <ul>
- *   <li>23 tables (Player, Wallet x4, Payment, Activity x7, Risk x5, Game x3, LiteFlow x2)
- *   <li>60+ indexes (UNIQUE, composite, partial)
- *   <li>20+ foreign key constraints
- *   <li>15+ CHECK constraints
+ *   <li>31 tables (Player, Wallet x4, Payment, Activity x7, Risk x5, Game x3, LiteFlow x2, Agent
+ *       x5, VIP x3)
+ *   <li>70+ indexes (UNIQUE, composite, partial)
+ *   <li>25+ foreign key constraints
+ *   <li>18+ CHECK constraints
  *   <li>Complete table and column comments
  *   <li>LiteFlow turnover calculation chain pre-seeded
+ *   <li>VIP level config pre-seeded (10 levels: Bronze → Supreme)
  * </ul>
  *
  * <p><b>Test Strategy:</b> Uses Testcontainers to spin up PostgreSQL 16 container, runs Flyway
@@ -103,18 +105,18 @@ class FlywayMigrationIntegrationTest {
         }
       }
 
-      // Verify all 14 migrations executed (including V004.5, V011, V012, V013)
+      // Verify all 16 migrations executed (including V004.5, V011, V012, V013, V014, V015)
       assertThat(appliedMigrations)
-          .as("應該執行 14 個 migration scripts")
+          .as("應該執行 16 個 migration scripts")
           .containsExactly(
               "001", "002", "003", "004", "004.5", "005", "006", "007", "008", "009", "010", "011",
-              "012", "013");
+              "012", "013", "014", "015");
     }
   }
 
   @Test
-  @DisplayName("應該創建所有 28 張表")
-  void shouldCreate28Tables() throws Exception {
+  @DisplayName("應該創建所有 31 張表")
+  void shouldCreate31Tables() throws Exception {
     try (Connection conn = dataSource.getConnection();
         Statement stmt = conn.createStatement()) {
       // Query all tables in public schema
@@ -128,8 +130,8 @@ class FlywayMigrationIntegrationTest {
         tables.add(rs.getString("table_name"));
       }
 
-      // Verify 28 tables + 1 flyway_schema_history
-      assertThat(tables).as("應該創建 28 張業務表 + flyway_schema_history").hasSize(29);
+      // Verify 31 tables + 1 flyway_schema_history
+      assertThat(tables).as("應該創建 31 張業務表 + flyway_schema_history").hasSize(32);
 
       // Verify expected tables exist
       assertThat(tables)
@@ -171,7 +173,11 @@ class FlywayMigrationIntegrationTest {
               "t_agent_commission_config",
               "t_agent_commission_record",
               "t_agent_commission_settlement",
-              "t_agent_performance_snapshot");
+              "t_agent_performance_snapshot",
+              // VIP module (3) - V014
+              "t_vip_level_config",
+              "t_player_vip_history",
+              "t_vip_reward_record");
     }
   }
 
@@ -347,8 +353,8 @@ class FlywayMigrationIntegrationTest {
       String description = rs.getString("description");
       boolean success = rs.getBoolean("success");
 
-      assertThat(version).as("最新 schema version 應為 013").isEqualTo("013");
-      assertThat(description).as("最新 migration 描述").contains("create agent tables");
+      assertThat(version).as("最新 schema version 應為 015").isEqualTo("015");
+      assertThat(description).as("最新 migration 描述").contains("seed vip level config");
       assertThat(success).as("最新 migration 應該成功").isTrue();
     }
   }
