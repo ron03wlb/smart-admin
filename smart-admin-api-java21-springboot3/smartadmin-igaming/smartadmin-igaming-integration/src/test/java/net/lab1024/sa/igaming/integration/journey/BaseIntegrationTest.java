@@ -192,6 +192,17 @@ public abstract class BaseIntegrationTest {
         jdbcTemplate.update("DELETE FROM t_agent_commission_config WHERE tenant_id = 1");
     System.out.println("[@BeforeEach] Deleted " + configDeleted + " commission configs");
 
+    // ✅ CRITICAL FIX: Physically delete VIP tables (bypass @TableLogic soft delete)
+    // VIP entities use @TableLogic, so dao.delete() only soft-deletes records.
+    // For test cleanup, we need physical deletion to avoid FK constraint violations.
+    int vipRewardDeleted =
+        jdbcTemplate.update("DELETE FROM t_vip_reward_record WHERE tenant_id = 1");
+    System.out.println("[@BeforeEach] Deleted " + vipRewardDeleted + " VIP reward records");
+
+    int vipHistoryDeleted =
+        jdbcTemplate.update("DELETE FROM t_player_vip_history WHERE tenant_id = 1");
+    System.out.println("[@BeforeEach] Deleted " + vipHistoryDeleted + " VIP history records");
+
     // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println("[@BeforeEach] Deleted " + playersDeleted + " players");
@@ -295,6 +306,17 @@ public abstract class BaseIntegrationTest {
     int configDeleted =
         jdbcTemplate.update("DELETE FROM t_agent_commission_config WHERE tenant_id = 1");
     System.out.println("[@AfterEach] Deleted " + configDeleted + " commission configs");
+
+    // ✅ CRITICAL FIX: Physically delete VIP tables (bypass @TableLogic soft delete)
+    // VIP entities use @TableLogic, so dao.delete() only soft-deletes records.
+    // For test cleanup, we need physical deletion to avoid FK constraint violations.
+    int vipRewardDeleted =
+        jdbcTemplate.update("DELETE FROM t_vip_reward_record WHERE tenant_id = 1");
+    System.out.println("[@AfterEach] Deleted " + vipRewardDeleted + " VIP reward records");
+
+    int vipHistoryDeleted =
+        jdbcTemplate.update("DELETE FROM t_player_vip_history WHERE tenant_id = 1");
+    System.out.println("[@AfterEach] Deleted " + vipHistoryDeleted + " VIP history records");
 
     // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());
