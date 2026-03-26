@@ -2,6 +2,7 @@ package net.lab1024.sa.igaming.agent.commission.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -72,4 +73,7 @@ public class AgentCommissionSettlementEntity extends SmartAdminBaseEntity {
    * <p>Contains detailed error information for troubleshooting.
    */
   private String errorMessage;
+
+  /** Logical delete flag (MyBatis Plus). */
+  @TableLogic private Boolean deleted;
 }

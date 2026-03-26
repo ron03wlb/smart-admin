@@ -2,6 +2,7 @@ package net.lab1024.sa.igaming.agent.commission.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -89,4 +90,7 @@ public class AgentPerformanceSnapshotEntity extends SmartAdminBaseEntity {
 
   /** Total commission amount for this period (DECIMAL 19,4). */
   private BigDecimal totalCommissionAmount;
+
+  /** Logical delete flag (MyBatis Plus). */
+  @TableLogic private Boolean deleted;
 }

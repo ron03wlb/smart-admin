@@ -2,6 +2,7 @@ package net.lab1024.sa.igaming.agent.commission.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -121,4 +122,7 @@ public class AgentCommissionRecordEntity extends SmartAdminBaseEntity {
    * <p>Example: "Suspected fraud activity", "Risk review pending"
    */
   private String frozenReason;
+
+  /** Logical delete flag (MyBatis Plus). */
+  @TableLogic private Boolean deleted;
 }
