@@ -105,18 +105,18 @@ class FlywayMigrationIntegrationTest {
         }
       }
 
-      // Verify all 16 migrations executed (including V004.5, V011, V012, V013, V014, V015)
+      // Verify all 17 migrations executed (including V004.5, V011, V012, V013, V014, V015, V016)
       assertThat(appliedMigrations)
-          .as("應該執行 16 個 migration scripts")
+          .as("應該執行 17 個 migration scripts")
           .containsExactly(
               "001", "002", "003", "004", "004.5", "005", "006", "007", "008", "009", "010", "011",
-              "012", "013", "014", "015");
+              "012", "013", "014", "015", "016");
     }
   }
 
   @Test
-  @DisplayName("應該創建所有 31 張表")
-  void shouldCreate31Tables() throws Exception {
+  @DisplayName("應該創建所有 33 張表")
+  void shouldCreate33Tables() throws Exception {
     try (Connection conn = dataSource.getConnection();
         Statement stmt = conn.createStatement()) {
       // Query all tables in public schema
@@ -130,8 +130,8 @@ class FlywayMigrationIntegrationTest {
         tables.add(rs.getString("table_name"));
       }
 
-      // Verify 31 tables + 1 flyway_schema_history
-      assertThat(tables).as("應該創建 31 張業務表 + flyway_schema_history").hasSize(32);
+      // Verify 33 tables + 1 flyway_schema_history
+      assertThat(tables).as("應該創建 33 張業務表 + flyway_schema_history").hasSize(34);
 
       // Verify expected tables exist
       assertThat(tables)
@@ -177,7 +177,10 @@ class FlywayMigrationIntegrationTest {
               // VIP module (3) - V014
               "t_vip_level_config",
               "t_player_vip_history",
-              "t_vip_reward_record");
+              "t_vip_reward_record",
+              // Self-Exclusion module (2) - V016
+              "t_self_exclusion_request",
+              "t_self_exclusion_history");
     }
   }
 
@@ -353,8 +356,8 @@ class FlywayMigrationIntegrationTest {
       String description = rs.getString("description");
       boolean success = rs.getBoolean("success");
 
-      assertThat(version).as("最新 schema version 應為 015").isEqualTo("015");
-      assertThat(description).as("最新 migration 描述").contains("seed vip level config");
+      assertThat(version).as("最新 schema version 應為 016").isEqualTo("016");
+      assertThat(description).as("最新 migration 描述").contains("create self exclusion tables");
       assertThat(success).as("最新 migration 應該成功").isTrue();
     }
   }
