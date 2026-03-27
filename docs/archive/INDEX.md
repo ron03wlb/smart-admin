@@ -136,6 +136,100 @@
 
 ---
 
+### 2026-03 Sprint 歷史記錄
+**路徑**：`archive/2026-03-sprint-history/`
+**狀態**：✅ 已歸檔
+**歸檔原因**：Sprint 3-4 階段性進度文件歸檔，保持根目錄整潔
+
+**時間範圍**：2026-03-10 至 2026-03-25
+
+**文件統計**：
+- **Sprint 3**: 4 個文件（PR 描述、進度、發現、任務計劃）
+- **Sprint 4 進度**: 5 個文件（各模塊階段性進度）
+- **React 遷移**: 10 個文件（進度、發現、測試、任務計劃）
+- **總計**: 19 個進度/發現/任務文件（約 7,257 行）
+
+**子目錄結構**：
+- `sprint-3/` - Sprint 3 完成總結
+  - PR_DESCRIPTION.md, progress_sprint4.md, findings_sprint4.md, task_plan_sprint3.md
+- `sprint-4-progress/` - Sprint 4 各階段進度
+  - progress_update_2026-03-15.md, progress_job_module_2026-03-16.md, progress_home_module_2026-03-17.md, progress_typescript_fixes_2026-03-18.md, progress_vue_to_react_2026-03-18.md
+- `react-migration/` - Vue→React 遷移專案
+  - progress.md, findings.md, findings_react_2026-03-18.md, REACT_MIGRATION_FINAL_SUMMARY.md, M1-MILESTONE-CHECKLIST.md, react-test-findings.md, react-test-fix-plan.md, REACT-TEST-FIX-SUMMARY.md, task_plan_react_next.md, test_coverage_findings.md
+
+**關鍵成果**：
+- ✅ Sprint 3 完成：iGaming 基礎設施（代理佣金、VIP 升級、自我排除）
+- ✅ Sprint 4 進行中：玩家治理模塊開發
+- ✅ React 遷移 M1：核心框架與第一批模塊完成
+- ✅ 測試覆蓋率：單元測試 75%+，整合測試核心流程 100%
+
+**當前狀態**：Sprint 4 進行中，當前任務計劃保留於根目錄 `/task_plan.md`
+
+**參考文檔**：
+- [Sprint 3 README](2026-03-sprint-history/sprint-3/README.md)
+- [Sprint 4 進度 README](2026-03-sprint-history/sprint-4-progress/README.md)
+- [React 遷移 README](2026-03-sprint-history/react-migration/README.md)
+
+**歸檔日期**：2026-03-27
+
+---
+
+### K6 效能測試 - 2026-03-11 有效投注額測試
+**路徑**：`archive/performance-tests/2026-03-11-k6-turnover/`
+**狀態**：✅ 測試完成，優化已實施
+**歸檔原因**：效能測試完成，測試日誌和結果歸檔供未來參考
+
+**測試日期**：2026-03-11
+**測試目標**：驗證有效投注額（Valid Turnover）計算系統在高並發場景下的性能
+
+**文件清單**：
+- k6-quick-test.js (4.2K) - K6 測試腳本（可重用）
+- k6-test-output.log (451B) - 初始基準測試
+- k6-quick-test-output.log (5.4M) - 快速壓力測試
+- k6-test-final-output.log (5.7M) - 最終完整測試
+- k6-test-optimistic-lock-fix.log (67K) - 樂觀鎖修復驗證
+- README.md - 測試背景與結果摘要
+
+**關鍵指標**：
+- **響應時間 (P95)**: 800ms → 180ms ✅
+- **吞吐量**: 600 TPS → 1200 TPS ✅
+- **錯誤率**: 3.2% → 0.05% ✅
+- **數據庫連接池使用率**: 80% → 60% ✅
+
+**優化措施**：
+- Manager 層事務範圍優化（減少樂觀鎖衝突）
+- 批次處理策略（批次大小：100）
+- Redis 緩存熱點數據（TTL: 5 分鐘）
+- 數據庫索引優化（複合索引 + 分區表）
+
+**相關 Issues**：
+- #123: High concurrency turnover calculation optimization
+- #124: Optimistic lock conflict reduction
+
+**當前狀態**：系統滿足生產環境性能需求
+
+**參考文檔**：
+- [K6 測試 README](performance-tests/2026-03-11-k6-turnover/README.md)
+
+**歸檔日期**：2026-03-27
+
+---
+
+### LiteFlow 臨時 SQL 文件
+**路徑**：`archive/migration/liteflow/`
+**狀態**：🗄️ 歷史遷移文件
+**歸檔原因**：v3→v4 遷移所需的臨時表結構，保留供歷史參考
+
+**文件**：
+- temp-liteflow-tables.sql (6.6K) - LiteFlow 表結構（v3→v4 遷移用）
+
+**說明**：
+此文件包含 v3→v4 遷移過程中所需的 LiteFlow 表結構定義，用於在 Flyway V2 遷移之前創建臨時表。遷移完成後保留作為歷史記錄。
+
+**歸檔日期**：2026-03-27
+
+---
+
 ## 歸檔操作記錄
 
 | 日期 | 操作 | 文件數 | 執行人 |
@@ -147,6 +241,10 @@
 | 2026-01-27 | 刪除 docs/bak/ 目錄 | - | Claude Code |
 | 2026-02-04 | 歸檔 Snail-Job 計劃（Week 9） | 8 | Claude Code |
 | 2026-02-07 | 遷移 iGaming 歸檔至 archive/ | 14 | Claude Code |
+| 2026-03-27 | 歸檔 Sprint 3-4 進度文件 | 19 | Claude Code |
+| 2026-03-27 | 歸檔 React 遷移專案文件 | 10 | Claude Code |
+| 2026-03-27 | 歸檔 K6 效能測試日誌 | 6 | Claude Code |
+| 2026-03-27 | 歸檔 LiteFlow 臨時 SQL | 1 | Claude Code |
 
 ---
 

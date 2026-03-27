@@ -59,7 +59,7 @@ include(
     "smartadmin-modules:smartadmin-business",
     "smartadmin-modules:smartadmin-oa",
 
-    // === smartadmin-igaming: iGaming Business Modules (8 modules) ===
+    // === smartadmin-igaming: iGaming Business Modules (9 modules) ===
     "smartadmin-igaming:smartadmin-igaming-common",
     "smartadmin-igaming:smartadmin-igaming-wallet",
     "smartadmin-igaming:smartadmin-igaming-player",
@@ -67,6 +67,7 @@ include(
     "smartadmin-igaming:smartadmin-igaming-activity",
     "smartadmin-igaming:smartadmin-igaming-risk",
     "smartadmin-igaming:smartadmin-igaming-agent",
+    "smartadmin-igaming:smartadmin-igaming-governance",
     "smartadmin-igaming:smartadmin-igaming-integration",
 
     // === smartadmin-api: API Contract Layer (4 modules) ===

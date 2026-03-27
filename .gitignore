@@ -81,9 +81,6 @@ venv/
 **/.obsidian/
 
 # Claude IDE local configuration (contains sensitive data)
-.claude/settings.local.json
-.claude/*.local.*
-.claude/**/settings.local.json
 !.claude/settings.local.json.example
 
 # Environment variables (contains sensitive data)
