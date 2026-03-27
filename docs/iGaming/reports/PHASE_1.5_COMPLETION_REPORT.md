@@ -478,12 +478,12 @@ ls -lh docs/api/openapi.json
 
 ## 📚 相關文檔
 
-- [Phase 1.5 實施計劃](C:\Users\ron.chang\.claude\plans\memoized-beaming-pretzel.md) - 完整實施計劃
-- [錢包 API 文檔](c:\Workspace\open_source\smart-admin\docs\api\wallet-api.md) - 錢包 API 參考
-- [支付 API 文檔](c:\Workspace\open_source\smart-admin\docs\api\payment-api.md) - 支付 API 參考
-- [Postman Collection](c:\Workspace\open_source\smart-admin\docs\api\SmartAdmin-iGaming-API.postman_collection.json) - API 測試集合
-- [ArchUnit 測試報告](smart-admin-app/build/test-results/test/TEST-net.lab1024.sa.app.ArchitectureTest.xml) - 架構測試結果
-- [k6 測試報告](c:\Workspace\open_source\smart-admin\k6-summary.json) - 性能測試結果
+- Phase 1.5 實施計劃 - 完整實施計劃（內部規劃文檔）
+- 錢包 API 文檔 - 錢包 API 參考（待建立）
+- 支付 API 文檔 - 支付 API 參考（待建立）
+- Postman Collection - API 測試集合（待建立）
+- ArchUnit 測試報告 - 架構測試結果（建置產物）
+- k6 測試報告 - 性能測試結果（建置產物）
 
 ---
 

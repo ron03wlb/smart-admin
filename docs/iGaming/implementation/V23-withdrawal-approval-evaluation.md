@@ -536,7 +536,7 @@ public class WithdrawalApprovalController {
 - **業務需求**: [01-05_Withdrawal_Risk.md](../source-archive/01_Player_Center/01-05_Withdrawal_Risk.md)
 - **支付設計**: [01-payment-design.md](./01-payment-design.md)
 - **風控架構**: [03-risk-engine-design.md](./03-risk-engine-design.md)
-- **現有 V9 遷移**: [V9__payment_tables.sql](../smart-admin-api-java21-springboot3/smartadmin-app/src/main/resources/db/migration/V9__payment_tables.sql)
+- **現有遷移**: V9__payment_tables.sql（已合併至 V2__igaming_domain_tables.sql）
 
 ---
 
