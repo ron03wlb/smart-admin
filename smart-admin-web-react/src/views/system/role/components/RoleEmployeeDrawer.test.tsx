@@ -292,7 +292,9 @@ describe('RoleEmployeeDrawer', () => {
 
         // 找到所有按鈕，第二個應該是重置按鈕（第一個是搜索）
         const buttons = screen.getAllByRole('button');
-        const resetButton = buttons.find(btn => btn.textContent?.includes('重置') || btn.textContent === '重置');
+        const resetButton = buttons.find(
+          btn => btn.textContent?.includes('重置') || btn.textContent === '重置'
+        );
 
         if (resetButton) {
           await user.click(resetButton);

@@ -23,10 +23,10 @@ vi.mock('@/api/system/employeeApi', () => ({
 import { employeeApi } from '@/api/system/employeeApi';
 
 // Mock Redux store
-const createMockStore = (userInfo: { employeeId: number | undefined } = { employeeId: 1 }) =>
+const createMockStore = (employeeId: number | undefined = 1) =>
   configureStore({
     reducer: {
-      user: () => ({ userInfo }),
+      user: () => ({ employeeId }),
     },
   });
 
@@ -294,7 +294,7 @@ describe('Center', () => {
     });
 
     it('should not load data if employeeId is missing', () => {
-      const store = createMockStore({ employeeId: undefined });
+      const store = createMockStore(undefined);
       render(
         <Provider store={store}>
           <Center />

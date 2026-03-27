@@ -339,101 +339,141 @@ describe('JobManagement', () => {
   }, 10000);
 
   // P0 測試 7: 重置按鈕測試
-  it('should reset search form when reset button is clicked', async () => {
-    render(<JobManagement />);
+  it(
+    'should reset search form when reset button is clicked',
+    async () => {
+      render(<JobManagement />);
 
-    await waitFor(() => {
-      expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-
-    // 輸入搜索關鍵字
-    const searchInput = screen.getAllByPlaceholderText('請輸入關鍵字')[0];
-    fireEvent.change(searchInput, { target: { value: '測試任務1' } });
-
-    // 清除初始調用記錄
-    vi.clearAllMocks();
-
-    // 點擊重置按鈕
-    const resetButtons = screen.getAllByRole('button', { name: /重置/ });
-    fireEvent.click(resetButtons[0]);
-
-    // 驗證表單重置（searchWord 應為 undefined）
-    await waitFor(() => {
-      expect(jobApi.queryJob).toHaveBeenCalledWith(
-        expect.objectContaining({
-          searchWord: undefined,
-          triggerType: undefined,
-          enabledFlag: undefined,
-        })
+      await waitFor(
+        () => {
+          expect(screen.getByText('測試任務1')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
       );
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+
+      // 輸入搜索關鍵字
+      const searchInput = screen.getAllByPlaceholderText('請輸入關鍵字')[0];
+      fireEvent.change(searchInput, { target: { value: '測試任務1' } });
+
+      // 清除初始調用記錄
+      vi.clearAllMocks();
+
+      // 點擊重置按鈕
+      const resetButtons = screen.getAllByRole('button', { name: /重置/ });
+      fireEvent.click(resetButtons[0]);
+
+      // 驗證表單重置（searchWord 應為 undefined）
+      await waitFor(
+        () => {
+          expect(jobApi.queryJob).toHaveBeenCalledWith(
+            expect.objectContaining({
+              searchWord: undefined,
+              triggerType: undefined,
+              enabledFlag: undefined,
+            })
+          );
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // P0 測試 8: 新增任務按鈕測試
   // FIXME: Skipped due to Modal rendering timeout - See findings_job_page_tests.md
-  it.skip('should open JobFormModal when add button is clicked', async () => {
-    render(<JobManagement />);
+  it.skip(
+    'should open JobFormModal when add button is clicked',
+    async () => {
+      render(<JobManagement />);
 
-    await waitFor(() => {
-      expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      await waitFor(
+        () => {
+          expect(screen.getByText('測試任務1')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // 點擊「添加任務」按鈕
-    const addButton = screen.getByRole('button', { name: /添加任務/ });
-    fireEvent.click(addButton);
+      // 點擊「添加任務」按鈕
+      const addButton = screen.getByRole('button', { name: /添加任務/ });
+      fireEvent.click(addButton);
 
-    // 驗證 Modal 打開（通過查找 Modal 標題）
-    await waitFor(() => {
-      expect(screen.getByText('新增任務')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      // 驗證 Modal 打開（通過查找 Modal 標題）
+      await waitFor(
+        () => {
+          expect(screen.getByText('新增任務')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // P0 測試 9: 編輯任務按鈕測試
   // FIXME: Skipped due to Modal rendering timeout - See findings_job_page_tests.md
-  it.skip('should open JobFormModal with job data when edit button is clicked', async () => {
-    render(<JobManagement />);
+  it.skip(
+    'should open JobFormModal with job data when edit button is clicked',
+    async () => {
+      render(<JobManagement />);
 
-    await waitFor(() => {
-      expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      await waitFor(
+        () => {
+          expect(screen.getByText('測試任務1')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // 點擊第一條任務的「編輯」按鈕
-    const editButtons = screen.getAllByRole('button', { name: /編輯/ });
-    fireEvent.click(editButtons[0]);
+      // 點擊第一條任務的「編輯」按鈕
+      const editButtons = screen.getAllByRole('button', { name: /編輯/ });
+      fireEvent.click(editButtons[0]);
 
-    // 驗證 Modal 打開並顯示編輯模式標題
-    await waitFor(() => {
-      expect(screen.getByText('編輯任務')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      // 驗證 Modal 打開並顯示編輯模式標題
+      await waitFor(
+        () => {
+          expect(screen.getByText('編輯任務')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // P0 測試 10: 刪除任務確認測試
-  it('should show delete confirmation modal when delete button is clicked', async () => {
-    // Mock Modal.confirm
-    const confirmSpy = vi.spyOn(Modal, 'confirm');
+  it(
+    'should show delete confirmation modal when delete button is clicked',
+    async () => {
+      // Mock Modal.confirm
+      const confirmSpy = vi.spyOn(Modal, 'confirm');
 
-    render(<JobManagement />);
+      render(<JobManagement />);
 
-    await waitFor(() => {
-      expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-
-    // 點擊第一條任務的「刪除」按鈕
-    const deleteButtons = screen.getAllByRole('button', { name: /刪除/ });
-    fireEvent.click(deleteButtons[0]);
-
-    // 驗證 Modal.confirm 被調用
-    await waitFor(() => {
-      expect(confirmSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: '警告',
-          content: '確定要刪除【測試任務1】任務嗎？',
-        })
+      await waitFor(
+        () => {
+          expect(screen.getByText('測試任務1')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
       );
-    }, { timeout: TEST_TIMEOUT });
 
-    confirmSpy.mockRestore();
-  }, TEST_TIMEOUT);
+      // 點擊第一條任務的「刪除」按鈕
+      const deleteButtons = screen.getAllByRole('button', { name: /刪除/ });
+      fireEvent.click(deleteButtons[0]);
+
+      // 驗證 Modal.confirm 被調用
+      await waitFor(
+        () => {
+          expect(confirmSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              title: '警告',
+              content: '確定要刪除【測試任務1】任務嗎？',
+            })
+          );
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+
+      confirmSpy.mockRestore();
+    },
+    TEST_TIMEOUT
+  );
 
   // P0 測試 11: 啟用/禁用 Switch 測試
   it('should update job enabled status when switch is toggled', async () => {
@@ -483,22 +523,32 @@ describe('JobManagement', () => {
 
   // P0 測試 12: 查看執行記錄測試
   // FIXME: Skipped due to Drawer rendering timeout - See findings_job_page_tests.md
-  it.skip('should open JobLogDrawer when view log button is clicked', async () => {
-    render(<JobManagement />);
+  it.skip(
+    'should open JobLogDrawer when view log button is clicked',
+    async () => {
+      render(<JobManagement />);
 
-    await waitFor(() => {
-      expect(screen.getByText('測試任務1')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      await waitFor(
+        () => {
+          expect(screen.getByText('測試任務1')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // 點擊第一條任務的「執行記錄」按鈕
-    const logButtons = screen.getAllByRole('button', { name: /執行記錄/ });
-    fireEvent.click(logButtons[0]);
+      // 點擊第一條任務的「執行記錄」按鈕
+      const logButtons = screen.getAllByRole('button', { name: /執行記錄/ });
+      fireEvent.click(logButtons[0]);
 
-    // 驗證 Drawer 打開（通過查找 Drawer 標題）
-    await waitFor(() => {
-      expect(screen.getByText('執行記錄')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      // 驗證 Drawer 打開（通過查找 Drawer 標題）
+      await waitFor(
+        () => {
+          expect(screen.getByText('執行記錄')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // P1 測試 13 (skip): 分頁測試
   it.skip('should handle pagination page change', async () => {

@@ -60,121 +60,172 @@ describe('ChangeLogManagement', () => {
     (changeLogApi.queryPage as any).mockResolvedValue(createMockPageResponse(mockChangeLogData, 2));
   });
 
-  it('should render change log management page', async () => {
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.ALL_CRUD('support:changeLog'),
-    });
+  it(
+    'should render change log management page',
+    async () => {
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.ALL_CRUD('support:changeLog'),
+      });
 
-    // Wait for data to load
-    await waitFor(() => {
-      expect(changeLogApi.queryPage).toHaveBeenCalled();
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for data to load
+      await waitFor(
+        () => {
+          expect(changeLogApi.queryPage).toHaveBeenCalled();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Verify query form elements
-    expect(screen.getByPlaceholderText('關鍵字')).toBeInTheDocument();
-    // "更新類型" label exists (appears multiple times, so use getAllByText)
-    expect(screen.getAllByText('更新類型').length).toBeGreaterThan(0);
+      // Verify query form elements
+      expect(screen.getByPlaceholderText('關鍵字')).toBeInTheDocument();
+      // "更新類型" label exists (appears multiple times, so use getAllByText)
+      expect(screen.getAllByText('更新類型').length).toBeGreaterThan(0);
 
-    // Verify action buttons using accessible role
-    expect(screen.getByRole('button', { name: /查詢/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /重置/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /新建/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /批量刪除/ })).toBeInTheDocument();
-  }, TEST_TIMEOUT);
+      // Verify action buttons using accessible role
+      expect(screen.getByRole('button', { name: /查詢/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /重置/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /新建/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /批量刪除/ })).toBeInTheDocument();
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should display change log data in table', async () => {
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
-    });
+  it(
+    'should display change log data in table',
+    async () => {
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
+      });
 
-    await waitFor(() => {
-      expect(screen.getByText('v1.0.0')).toBeInTheDocument();
-      expect(screen.getByText('v1.1.0')).toBeInTheDocument();
-      expect(screen.getByText('Admin')).toBeInTheDocument();
-      expect(screen.getByText('Developer')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      await waitFor(
+        () => {
+          expect(screen.getByText('v1.0.0')).toBeInTheDocument();
+          expect(screen.getByText('v1.1.0')).toBeInTheDocument();
+          expect(screen.getByText('Admin')).toBeInTheDocument();
+          expect(screen.getByText('Developer')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle search operation', async () => {
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
-    });
+  it(
+    'should handle search operation',
+    async () => {
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
+      });
 
-    // Wait for initial load
-    await waitFor(() => {
-      expect(changeLogApi.queryPage).toHaveBeenCalledTimes(1);
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for initial load
+      await waitFor(
+        () => {
+          expect(changeLogApi.queryPage).toHaveBeenCalledTimes(1);
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Click search button
-    const searchButton = screen.getByRole('button', { name: /查詢/ });
-    fireEvent.click(searchButton);
+      // Click search button
+      const searchButton = screen.getByRole('button', { name: /查詢/ });
+      fireEvent.click(searchButton);
 
-    await waitFor(() => {
-      expect(changeLogApi.queryPage).toHaveBeenCalledTimes(2);
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      await waitFor(
+        () => {
+          expect(changeLogApi.queryPage).toHaveBeenCalledTimes(2);
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle reset operation', async () => {
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
-    });
+  it(
+    'should handle reset operation',
+    async () => {
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
+      });
 
-    // Wait for initial load
-    await waitFor(() => {
-      expect(changeLogApi.queryPage).toHaveBeenCalledTimes(1);
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for initial load
+      await waitFor(
+        () => {
+          expect(changeLogApi.queryPage).toHaveBeenCalledTimes(1);
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Verify reset button exists (simplified test)
-    const resetButton = screen.getByRole('button', { name: /重置/ });
-    expect(resetButton).toBeInTheDocument();
-  }, TEST_TIMEOUT);
+      // Verify reset button exists (simplified test)
+      const resetButton = screen.getByRole('button', { name: /重置/ });
+      expect(resetButton).toBeInTheDocument();
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle delete operation', async () => {
-    (changeLogApi.delete as any).mockResolvedValue({
-      code: 200,
-      ok: true,
-      msg: 'Success',
-      data: null,
-    });
+  it(
+    'should handle delete operation',
+    async () => {
+      (changeLogApi.delete as any).mockResolvedValue({
+        code: 200,
+        ok: true,
+        msg: 'Success',
+        data: null,
+      });
 
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.ALL_CRUD('support:changeLog'),
-    });
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.ALL_CRUD('support:changeLog'),
+      });
 
-    await waitFor(() => {
-      expect(screen.getByText('v1.0.0')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      await waitFor(
+        () => {
+          expect(screen.getByText('v1.0.0')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Verify delete buttons exist (simplified test)
-    const deleteButtons = screen.getAllByRole('button', { name: /刪除/ });
-    expect(deleteButtons.length).toBeGreaterThan(0);
-  }, TEST_TIMEOUT);
+      // Verify delete buttons exist (simplified test)
+      const deleteButtons = screen.getAllByRole('button', { name: /刪除/ });
+      expect(deleteButtons.length).toBeGreaterThan(0);
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should disable batch delete when no rows selected', async () => {
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.ALL_CRUD('support:changeLog'),
-    });
+  it(
+    'should disable batch delete when no rows selected',
+    async () => {
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.ALL_CRUD('support:changeLog'),
+      });
 
-    await waitFor(() => {
-      expect(screen.getByText('v1.0.0')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      await waitFor(
+        () => {
+          expect(screen.getByText('v1.0.0')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Batch delete button should be disabled
-    const batchDeleteButton = screen.getByRole('button', { name: /批量刪除/ });
-    expect(batchDeleteButton).toBeDisabled();
-  }, TEST_TIMEOUT);
+      // Batch delete button should be disabled
+      const batchDeleteButton = screen.getByRole('button', { name: /批量刪除/ });
+      expect(batchDeleteButton).toBeDisabled();
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle refresh operation', async () => {
-    renderWithProviders(<ChangeLogManagement />, {
-      permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
-    });
+  it(
+    'should handle refresh operation',
+    async () => {
+      renderWithProviders(<ChangeLogManagement />, {
+        permissions: PERMISSIONS.READ_ONLY('support:changeLog'),
+      });
 
-    await waitFor(() => {
-      expect(changeLogApi.queryPage).toHaveBeenCalledTimes(1);
-    }, { timeout: TEST_TIMEOUT });
+      await waitFor(
+        () => {
+          expect(changeLogApi.queryPage).toHaveBeenCalledTimes(1);
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Note: Refresh button test depends on TableOperator implementation
-    // This test verifies the initial query was called
-  }, TEST_TIMEOUT);
+      // Note: Refresh button test depends on TableOperator implementation
+      // This test verifies the initial query was called
+    },
+    TEST_TIMEOUT
+  );
 });
-

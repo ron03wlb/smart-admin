@@ -51,13 +51,7 @@ vi.mock('@/components/PrivilegeButton', () => ({
 
 // Mock DepartmentFormModal component
 vi.mock('./components/DepartmentFormModal', () => ({
-  default: ({
-    visible,
-    onCancel,
-  }: {
-    visible: boolean;
-    onCancel: () => void;
-  }) =>
+  default: ({ visible, onCancel }: { visible: boolean; onCancel: () => void }) =>
     visible ? (
       <div data-testid="department-form-modal">
         <button onClick={onCancel}>Cancel</button>

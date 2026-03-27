@@ -147,55 +147,63 @@ describe('JobExecuteModal', () => {
   });
 
   // P0 測試 5: 執行按鈕顯示
-  it('should show execute button', async () => {
-    render(<JobExecuteModal ref={ref} onSuccess={mockOnSuccess} />);
+  it(
+    'should show execute button',
+    async () => {
+      render(<JobExecuteModal ref={ref} onSuccess={mockOnSuccess} />);
 
-    act(() => {
-      ref.current?.show(mockJobData);
-    });
+      act(() => {
+        ref.current?.show(mockJobData);
+      });
 
-    // 等待 Modal 標題出現
-    await waitFor(
-      () => {
-        expect(screen.getByText('執行任務')).toBeInTheDocument();
-      },
-      { timeout: TEST_TIMEOUT }
-    );
+      // 等待 Modal 標題出現
+      await waitFor(
+        () => {
+          expect(screen.getByText('執行任務')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // 驗證所有按鈕都已渲染（簡化：只檢查至少有按鈕存在）
-    await waitFor(
-      () => {
-        const buttons = screen.getAllByRole('button');
-        expect(buttons.length).toBeGreaterThan(0);
-      },
-      { timeout: TEST_TIMEOUT }
-    );
-  }, TEST_TIMEOUT);
+      // 驗證所有按鈕都已渲染（簡化：只檢查至少有按鈕存在）
+      await waitFor(
+        () => {
+          const buttons = screen.getAllByRole('button');
+          expect(buttons.length).toBeGreaterThan(0);
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // P0 測試 6: 取消按鈕顯示
-  it('should show cancel button', async () => {
-    render(<JobExecuteModal ref={ref} onSuccess={mockOnSuccess} />);
+  it(
+    'should show cancel button',
+    async () => {
+      render(<JobExecuteModal ref={ref} onSuccess={mockOnSuccess} />);
 
-    act(() => {
-      ref.current?.show(mockJobData);
-    });
+      act(() => {
+        ref.current?.show(mockJobData);
+      });
 
-    // 先等待 Modal 標題出現，確保 Modal 已渲染
-    await waitFor(
-      () => {
-        expect(screen.getByText('執行任務')).toBeInTheDocument();
-      },
-      { timeout: TEST_TIMEOUT }
-    );
+      // 先等待 Modal 標題出現，確保 Modal 已渲染
+      await waitFor(
+        () => {
+          expect(screen.getByText('執行任務')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // 然後驗證取消按鈕存在
-    await waitFor(
-      () => {
-        expect(screen.getByText(/取\s*消/)).toBeInTheDocument();
-      },
-      { timeout: TEST_TIMEOUT }
-    );
-  }, TEST_TIMEOUT);
+      // 然後驗證取消按鈕存在
+      await waitFor(
+        () => {
+          expect(screen.getByText(/取\s*消/)).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // P1 測試 7 (skip): API 錯誤處理測試
   it.skip('should handle API error gracefully', async () => {

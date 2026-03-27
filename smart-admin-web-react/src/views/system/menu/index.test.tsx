@@ -52,13 +52,7 @@ vi.mock('@/components/PrivilegeButton', () => ({
 
 // Mock MenuFormModal component
 vi.mock('./components/MenuFormModal', () => ({
-  default: ({
-    visible,
-    onCancel,
-  }: {
-    visible: boolean;
-    onCancel: () => void;
-  }) =>
+  default: ({ visible, onCancel }: { visible: boolean; onCancel: () => void }) =>
     visible ? (
       <div data-testid="menu-form-modal">
         <button onClick={onCancel}>Cancel</button>
@@ -138,7 +132,9 @@ describe('MenuPage', () => {
         await waitFor(
           () => {
             expect(screen.getByText('菜單管理')).toBeInTheDocument();
-            expect(screen.getByPlaceholderText('菜單名稱/路由地址/組件路徑/權限字符串')).toBeInTheDocument();
+            expect(
+              screen.getByPlaceholderText('菜單名稱/路由地址/組件路徑/權限字符串')
+            ).toBeInTheDocument();
           },
           { timeout: TEST_TIMEOUT }
         );
@@ -245,7 +241,9 @@ describe('MenuPage', () => {
         // 簡化：只驗證搜索輸入框存在
         await waitFor(
           () => {
-            expect(screen.getByPlaceholderText('菜單名稱/路由地址/組件路徑/權限字符串')).toBeInTheDocument();
+            expect(
+              screen.getByPlaceholderText('菜單名稱/路由地址/組件路徑/權限字符串')
+            ).toBeInTheDocument();
           },
           { timeout: TEST_TIMEOUT }
         );
@@ -261,7 +259,9 @@ describe('MenuPage', () => {
 
         await waitFor(
           () => {
-            expect(screen.getByPlaceholderText('菜單名稱/路由地址/組件路徑/權限字符串')).toBeInTheDocument();
+            expect(
+              screen.getByPlaceholderText('菜單名稱/路由地址/組件路徑/權限字符串')
+            ).toBeInTheDocument();
           },
           { timeout: TEST_TIMEOUT }
         );

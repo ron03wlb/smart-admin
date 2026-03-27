@@ -63,13 +63,7 @@ vi.mock('@/components/PrivilegeButton', () => ({
 
 // Mock PositionFormModal component
 vi.mock('./components/PositionFormModal', () => ({
-  PositionFormModal: ({
-    visible,
-    onCancel,
-  }: {
-    visible: boolean;
-    onCancel: () => void;
-  }) =>
+  PositionFormModal: ({ visible, onCancel }: { visible: boolean; onCancel: () => void }) =>
     visible ? (
       <div data-testid="position-form-modal">
         <button onClick={onCancel}>Cancel</button>

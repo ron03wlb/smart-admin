@@ -124,184 +124,230 @@ describe('ChangeLogFormModal', () => {
     });
 
     // Wait for modal to appear
-    await waitFor(() => {
-      expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+    await waitFor(
+      () => {
+        expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
+      },
+      { timeout: TEST_TIMEOUT }
+    );
 
     // Click submit without filling form
     const submitButton = screen.getByRole('button', { name: /確定|OK/i });
     fireEvent.click(submitButton);
 
     // Wait for validation messages
-    await waitFor(() => {
-      expect(screen.getByText('請輸入版本號')).toBeInTheDocument();
-      expect(screen.getByText('請選擇更新類型')).toBeInTheDocument();
-      expect(screen.getByText('請輸入發布人')).toBeInTheDocument();
-      expect(screen.getByText('請選擇發布日期')).toBeInTheDocument();
-      expect(screen.getByText('請輸入更新內容')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+    await waitFor(
+      () => {
+        expect(screen.getByText('請輸入版本號')).toBeInTheDocument();
+        expect(screen.getByText('請選擇更新類型')).toBeInTheDocument();
+        expect(screen.getByText('請輸入發布人')).toBeInTheDocument();
+        expect(screen.getByText('請選擇發布日期')).toBeInTheDocument();
+        expect(screen.getByText('請輸入更新內容')).toBeInTheDocument();
+      },
+      { timeout: TEST_TIMEOUT }
+    );
 
     // Verify API not called
     expect(changeLogApi.add).not.toHaveBeenCalled();
   });
 
-  it('should validate URL format for link field', async () => {
-    const ref = { current: null } as any;
-    const user = userEvent.setup();
-    render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
+  it(
+    'should validate URL format for link field',
+    async () => {
+      const ref = { current: null } as any;
+      const user = userEvent.setup();
+      render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
 
-    // Open modal
-    act(() => {
-      ref.current?.show();
-    });
+      // Open modal
+      act(() => {
+        ref.current?.show();
+      });
 
-    // Wait for modal to appear
-    await waitFor(() => {
-      expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for modal to appear
+      await waitFor(
+        () => {
+          expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Fill invalid URL
-    const linkInput = screen.getByPlaceholderText('請輸入跳轉鏈接（可選）');
-    await user.type(linkInput, 'invalid-url');
+      // Fill invalid URL
+      const linkInput = screen.getByPlaceholderText('請輸入跳轉鏈接（可選）');
+      await user.type(linkInput, 'invalid-url');
 
-    // Click submit
-    const submitButton = screen.getByRole('button', { name: /確定|OK/i });
-    fireEvent.click(submitButton);
+      // Click submit
+      const submitButton = screen.getByRole('button', { name: /確定|OK/i });
+      fireEvent.click(submitButton);
 
-    // Wait for validation message
-    await waitFor(() => {
-      expect(screen.getByText('請輸入有效的 URL')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      // Wait for validation message
+      await waitFor(
+        () => {
+          expect(screen.getByText('請輸入有效的 URL')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle add operation successfully', async () => {
-    (changeLogApi.add as any).mockResolvedValue({
-      code: 200,
-      ok: true,
-      msg: 'Success',
-      data: null,
-    });
+  it(
+    'should handle add operation successfully',
+    async () => {
+      (changeLogApi.add as any).mockResolvedValue({
+        code: 200,
+        ok: true,
+        msg: 'Success',
+        data: null,
+      });
 
-    const ref = { current: null } as any;
-    const user = userEvent.setup();
-    render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
+      const ref = { current: null } as any;
+      const user = userEvent.setup();
+      render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
 
-    // Open modal
-    act(() => {
-      ref.current?.show();
-    });
+      // Open modal
+      act(() => {
+        ref.current?.show();
+      });
 
-    // Wait for modal to appear
-    await waitFor(() => {
-      expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for modal to appear
+      await waitFor(
+        () => {
+          expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Fill form
-    await user.type(screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0'), 'v2.0.0');
+      // Fill form
+      await user.type(screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0'), 'v2.0.0');
 
-    const typeSelect = screen.getByTestId('enum-select');
-    fireEvent.change(typeSelect, { target: { value: '1' } });
+      const typeSelect = screen.getByTestId('enum-select');
+      fireEvent.change(typeSelect, { target: { value: '1' } });
 
-    await user.type(screen.getByPlaceholderText('請輸入發布人'), 'Developer');
+      await user.type(screen.getByPlaceholderText('請輸入發布人'), 'Developer');
 
-    // Fill date (we'll use a valid date string)
-    const dateInput = screen.getByPlaceholderText('請選擇發布日期');
-    fireEvent.change(dateInput, { target: { value: '2026-03-19' } });
+      // Fill date (we'll use a valid date string)
+      const dateInput = screen.getByPlaceholderText('請選擇發布日期');
+      fireEvent.change(dateInput, { target: { value: '2026-03-19' } });
 
-    await user.type(
-      screen.getByPlaceholderText('請輸入更新內容，支持 Markdown 格式'),
-      '新版本發布測試'
-    );
+      await user.type(
+        screen.getByPlaceholderText('請輸入更新內容，支持 Markdown 格式'),
+        '新版本發布測試'
+      );
 
-    // Submit form
-    const submitButton = screen.getByRole('button', { name: /確定|OK/i });
-    fireEvent.click(submitButton);
+      // Submit form
+      const submitButton = screen.getByRole('button', { name: /確定|OK/i });
+      fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(changeLogApi.add).toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      await waitFor(
+        () => {
+          expect(changeLogApi.add).toHaveBeenCalled();
+          expect(onSuccess).toHaveBeenCalled();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle update operation successfully', async () => {
-    (changeLogApi.update as any).mockResolvedValue({
-      code: 200,
-      ok: true,
-      msg: 'Success',
-      data: null,
-    });
+  it(
+    'should handle update operation successfully',
+    async () => {
+      (changeLogApi.update as any).mockResolvedValue({
+        code: 200,
+        ok: true,
+        msg: 'Success',
+        data: null,
+      });
 
-    const ref = { current: null } as any;
-    const user = userEvent.setup();
-    render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
+      const ref = { current: null } as any;
+      const user = userEvent.setup();
+      render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
 
-    // Open modal in edit mode
-    act(() => {
-      ref.current?.show(mockChangeLogData);
-    });
+      // Open modal in edit mode
+      act(() => {
+        ref.current?.show(mockChangeLogData);
+      });
 
-    // Wait for modal to appear
-    await waitFor(() => {
-      expect(screen.getByText('編輯更新日誌')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for modal to appear
+      await waitFor(
+        () => {
+          expect(screen.getByText('編輯更新日誌')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Modify version
-    const versionInput = screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0');
-    await user.clear(versionInput);
-    await user.type(versionInput, 'v1.0.1');
+      // Modify version
+      const versionInput = screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0');
+      await user.clear(versionInput);
+      await user.type(versionInput, 'v1.0.1');
 
-    // Submit form
-    const submitButton = screen.getByRole('button', { name: /確定|OK/i });
-    fireEvent.click(submitButton);
+      // Submit form
+      const submitButton = screen.getByRole('button', { name: /確定|OK/i });
+      fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(changeLogApi.update).toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      await waitFor(
+        () => {
+          expect(changeLogApi.update).toHaveBeenCalled();
+          expect(onSuccess).toHaveBeenCalled();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
-  it('should handle API error', async () => {
-    (changeLogApi.add as any).mockRejectedValue(new Error('API Error'));
+  it(
+    'should handle API error',
+    async () => {
+      (changeLogApi.add as any).mockRejectedValue(new Error('API Error'));
 
-    const ref = { current: null } as any;
-    const user = userEvent.setup();
-    render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
+      const ref = { current: null } as any;
+      const user = userEvent.setup();
+      render(<ChangeLogFormModal ref={ref} onSuccess={onSuccess} />);
 
-    // Open modal
-    act(() => {
-      ref.current?.show();
-    });
+      // Open modal
+      act(() => {
+        ref.current?.show();
+      });
 
-    // Wait for modal to appear
-    await waitFor(() => {
-      expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
-    }, { timeout: TEST_TIMEOUT });
+      // Wait for modal to appear
+      await waitFor(
+        () => {
+          expect(screen.getByText('新增更新日誌')).toBeInTheDocument();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
 
-    // Fill minimal required fields
-    await user.type(screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0'), 'v2.0.0');
+      // Fill minimal required fields
+      await user.type(screen.getByPlaceholderText('請輸入版本號，例如：v1.0.0'), 'v2.0.0');
 
-    const typeSelect = screen.getByTestId('enum-select');
-    fireEvent.change(typeSelect, { target: { value: '1' } });
+      const typeSelect = screen.getByTestId('enum-select');
+      fireEvent.change(typeSelect, { target: { value: '1' } });
 
-    await user.type(screen.getByPlaceholderText('請輸入發布人'), 'Developer');
+      await user.type(screen.getByPlaceholderText('請輸入發布人'), 'Developer');
 
-    const dateInput = screen.getByPlaceholderText('請選擇發布日期');
-    fireEvent.change(dateInput, { target: { value: '2026-03-19' } });
+      const dateInput = screen.getByPlaceholderText('請選擇發布日期');
+      fireEvent.change(dateInput, { target: { value: '2026-03-19' } });
 
-    await user.type(
-      screen.getByPlaceholderText('請輸入更新內容，支持 Markdown 格式'),
-      '新版本發布測試'
-    );
+      await user.type(
+        screen.getByPlaceholderText('請輸入更新內容，支持 Markdown 格式'),
+        '新版本發布測試'
+      );
 
-    // Submit form
-    const submitButton = screen.getByRole('button', { name: /確定|OK/i });
-    fireEvent.click(submitButton);
+      // Submit form
+      const submitButton = screen.getByRole('button', { name: /確定|OK/i });
+      fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(changeLogApi.add).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    }, { timeout: TEST_TIMEOUT });
-  }, TEST_TIMEOUT);
+      await waitFor(
+        () => {
+          expect(changeLogApi.add).toHaveBeenCalled();
+          expect(onSuccess).not.toHaveBeenCalled();
+        },
+        { timeout: TEST_TIMEOUT }
+      );
+    },
+    TEST_TIMEOUT
+  );
 
   // Note: Modal close test is skipped due to test environment limitations
   it.skip('should close modal on cancel', async () => {

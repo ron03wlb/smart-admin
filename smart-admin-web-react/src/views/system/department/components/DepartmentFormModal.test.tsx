@@ -14,6 +14,40 @@ import type { DepartmentFormData } from '../types';
 // Mock dependencies
 vi.mock('@/api/system/departmentApi');
 vi.mock('@/hooks/useModal');
+
+// Mock DepartmentTreeSelect
+vi.mock('@/components/common/DepartmentTreeSelect', () => ({
+  default: ({ value, onChange, placeholder }: any) => (
+    <select
+      data-testid="department-tree-select"
+      value={value}
+      onChange={e => onChange?.(Number(e.target.value))}
+      aria-label={placeholder}
+    >
+      <option value="">請選擇部門</option>
+      <option value="1">公司總部</option>
+      <option value="2">技術部</option>
+      <option value="3">市場部</option>
+    </select>
+  ),
+}));
+
+// Mock EmployeeSelect
+vi.mock('@/components/common/EmployeeSelect', () => ({
+  default: ({ value, onChange, placeholder }: any) => (
+    <select
+      data-testid="employee-select"
+      value={value}
+      onChange={e => onChange?.(Number(e.target.value))}
+      aria-label={placeholder}
+    >
+      <option value="">請選擇員工</option>
+      <option value="1">張三</option>
+      <option value="2">李四</option>
+    </select>
+  ),
+}));
+
 vi.mock('antd', async () => {
   const actual = await vi.importActual('antd');
   return {

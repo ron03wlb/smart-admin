@@ -39,19 +39,23 @@ vi.mock('antd', async () => {
 
 // Mock all child components to simplify integration testing
 vi.mock('./components/RoleFormModal', () => ({
-  default: ({ visible }: { visible: boolean }) => (visible ? <div data-testid="role-form-modal">RoleFormModal</div> : null),
+  default: ({ visible }: { visible: boolean }) =>
+    visible ? <div data-testid="role-form-modal">RoleFormModal</div> : null,
 }));
 
 vi.mock('./components/RoleMenuModal', () => ({
-  default: ({ visible }: { visible: boolean }) => (visible ? <div data-testid="role-menu-modal">RoleMenuModal</div> : null),
+  default: ({ visible }: { visible: boolean }) =>
+    visible ? <div data-testid="role-menu-modal">RoleMenuModal</div> : null,
 }));
 
 vi.mock('./components/RoleEmployeeDrawer', () => ({
-  default: ({ visible }: { visible: boolean }) => (visible ? <div data-testid="role-employee-drawer">RoleEmployeeDrawer</div> : null),
+  default: ({ visible }: { visible: boolean }) =>
+    visible ? <div data-testid="role-employee-drawer">RoleEmployeeDrawer</div> : null,
 }));
 
 vi.mock('./components/RoleDataScopeModal', () => ({
-  default: ({ visible }: { visible: boolean }) => (visible ? <div data-testid="role-datascope-modal">RoleDataScopeModal</div> : null),
+  default: ({ visible }: { visible: boolean }) =>
+    visible ? <div data-testid="role-datascope-modal">RoleDataScopeModal</div> : null,
 }));
 
 // Mock PrivilegeButton to render children directly

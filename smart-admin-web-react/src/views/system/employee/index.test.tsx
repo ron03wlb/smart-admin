@@ -65,13 +65,7 @@ vi.mock('@/components/PrivilegeButton', () => ({
 
 // Mock EmployeeFormModal component
 vi.mock('./components/EmployeeFormModal', () => ({
-  EmployeeFormModal: ({
-    visible,
-    onCancel,
-  }: {
-    visible: boolean;
-    onCancel: () => void;
-  }) =>
+  EmployeeFormModal: ({ visible, onCancel }: { visible: boolean; onCancel: () => void }) =>
     visible ? (
       <div data-testid="employee-form-modal">
         <button onClick={onCancel}>Cancel</button>
@@ -81,13 +75,7 @@ vi.mock('./components/EmployeeFormModal', () => ({
 
 // Mock PasswordDisplayModal component
 vi.mock('./components/PasswordDisplayModal', () => ({
-  PasswordDisplayModal: ({
-    visible,
-    onClose,
-  }: {
-    visible: boolean;
-    onClose: () => void;
-  }) =>
+  PasswordDisplayModal: ({ visible, onClose }: { visible: boolean; onClose: () => void }) =>
     visible ? (
       <div data-testid="password-display-modal">
         <button onClick={onClose}>Close</button>
