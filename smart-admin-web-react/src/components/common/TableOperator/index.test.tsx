@@ -11,10 +11,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TableOperator from './index';
 import type { TableOperatorButton } from './index';
 
-// Mock PrivilegeButton component
-vi.mock('@/components/PrivilegeButton', () => ({
-  PrivilegeButton: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
+// Mock PrivilegeButton component (both named and default exports)
+vi.mock('@/components/PrivilegeButton', () => {
+  const MockPrivilegeButton = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
+  return {
+    default: MockPrivilegeButton,
+    PrivilegeButton: MockPrivilegeButton,
+  };
+});
 
 describe('TableOperator', () => {
   beforeEach(() => {

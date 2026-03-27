@@ -12,7 +12,7 @@
  * @Date: 2026-03-24
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Modal, Table, Input, Space, Tag, message } from 'antd';
 import type { TableColumnsType, TablePaginationConfig } from 'antd';
 import { employeeApi } from '@/api/system/employeeApi';
@@ -60,25 +60,12 @@ export default function EmployeeTableSelectModal({
     total: 0,
   });
 
-  // ==================== Effects ====================
-
-  useEffect(() => {
-    if (visible) {
-      loadEmployeeList();
-    } else {
-      // Modal 關閉時清空狀態
-      setKeyword('');
-      setSelectedRowKeys([]);
-      setPagination({ current: 1, pageSize: 10, total: 0 });
-    }
-  }, [visible]);
-
   // ==================== Data Loading ====================
 
   /**
    * 加載員工列表
    */
-  const loadEmployeeList = async (searchKeyword?: string, page = 1, pageSize = 10) => {
+  const loadEmployeeList = useCallback(async (searchKeyword?: string, page = 1, pageSize = 10) => {
     try {
       setLoading(true);
 
@@ -99,7 +86,7 @@ export default function EmployeeTableSelectModal({
       if (response.ok && response.data) {
         // 過濾掉已添加的員工
         const filteredList = response.data.list.filter(
-          (employee) => !excludeEmployeeIds.includes(employee.employeeId)
+          employee => !excludeEmployeeIds.includes(employee.employeeId)
         );
 
         setEmployeeList(filteredList);
@@ -115,7 +102,20 @@ export default function EmployeeTableSelectModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [keyword, departmentId, excludeEmployeeIds]);
+
+  // ==================== Effects ====================
+
+  useEffect(() => {
+    if (visible) {
+      loadEmployeeList();
+    } else {
+      // Modal 關閉時清空狀態
+      setKeyword('');
+      setSelectedRowKeys([]);
+      setPagination({ current: 1, pageSize: 10, total: 0 });
+    }
+  }, [visible, loadEmployeeList]);
 
   // ==================== Event Handlers ====================
 

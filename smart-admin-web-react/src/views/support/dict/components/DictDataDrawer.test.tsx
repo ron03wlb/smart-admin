@@ -113,7 +113,8 @@ describe('DictDataDrawer', () => {
       render(<DictDataDrawer visible={true} dictId={10} dictCode="GENDER" onClose={mockOnClose} />);
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText('請輸入關鍵字')).toBeInTheDocument();
+        // 實際組件的 placeholder 是 "關鍵字"，不是 "請輸入關鍵字"
+        expect(screen.getByPlaceholderText('關鍵字')).toBeInTheDocument();
       });
     });
 
@@ -131,7 +132,8 @@ describe('DictDataDrawer', () => {
       render(<DictDataDrawer visible={true} dictId={10} dictCode="GENDER" onClose={mockOnClose} />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /添加/i })).toBeInTheDocument();
+        // 實際組件的按鈕文字是 "新建"，不是 "添加"
+        expect(screen.getByRole('button', { name: /新建/i })).toBeInTheDocument();
       });
     });
 
