@@ -6,7 +6,7 @@
  * @Date: 2026-03-23
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Modal, Tree, message, Alert } from 'antd';
 import type { TreeProps, DataNode } from 'antd/es/tree';
 import { roleApi } from '@/api/system/roleApi';
@@ -24,10 +24,11 @@ interface RoleMenuModalProps {
  * 將 MenuVO 轉換為 Ant Design Tree 所需的 DataNode
  */
 function convertMenuToTreeData(menuList: MenuVO[]): DataNode[] {
-  return menuList.map((menu) => ({
+  return menuList.map(menu => ({
     key: menu.menuId,
     title: menu.menuName,
-    children: menu.children && menu.children.length > 0 ? convertMenuToTreeData(menu.children) : undefined,
+    children:
+      menu.children && menu.children.length > 0 ? convertMenuToTreeData(menu.children) : undefined,
   }));
 }
 
@@ -39,9 +40,23 @@ export default function RoleMenuModal({ visible, onCancel, onSuccess, role }: Ro
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
 
   /**
+   * 提取所有菜單 keys（用於展開）
+   */
+  const extractAllKeys = useCallback((menuList: MenuVO[]): number[] => {
+    const keys: number[] = [];
+    menuList.forEach(menu => {
+      keys.push(menu.menuId);
+      if (menu.children && menu.children.length > 0) {
+        keys.push(...extractAllKeys(menu.children));
+      }
+    });
+    return keys;
+  }, []);
+
+  /**
    * 加載角色菜單權限數據
    */
-  const loadRoleMenu = async () => {
+  const loadRoleMenu = useCallback(async () => {
     if (!role) return;
 
     try {
@@ -66,21 +81,7 @@ export default function RoleMenuModal({ visible, onCancel, onSuccess, role }: Ro
     } finally {
       setLoading(false);
     }
-  };
-
-  /**
-   * 提取所有菜單 keys（用於展開）
-   */
-  const extractAllKeys = (menuList: MenuVO[]): number[] => {
-    const keys: number[] = [];
-    menuList.forEach((menu) => {
-      keys.push(menu.menuId);
-      if (menu.children && menu.children.length > 0) {
-        keys.push(...extractAllKeys(menu.children));
-      }
-    });
-    return keys;
-  };
+  }, [role, extractAllKeys]);
 
   /**
    * Tree 選中事件
@@ -93,7 +94,7 @@ export default function RoleMenuModal({ visible, onCancel, onSuccess, role }: Ro
   /**
    * Tree 展開/收起事件
    */
-  const onExpand: TreeProps['onExpand'] = (expandedKeysValue) => {
+  const onExpand: TreeProps['onExpand'] = expandedKeysValue => {
     setExpandedKeys(expandedKeysValue);
   };
 
@@ -107,7 +108,7 @@ export default function RoleMenuModal({ visible, onCancel, onSuccess, role }: Ro
       setLoading(true);
 
       // 合併選中的 keys 和半選中的 keys（父節點）
-      const allSelectedKeys = [...checkedKeys, ...halfCheckedKeys].map((key) => Number(key));
+      const allSelectedKeys = [...checkedKeys, ...halfCheckedKeys].map(key => Number(key));
 
       if (allSelectedKeys.length === 0) {
         message.warning('請至少選擇一個菜單權限');
@@ -150,7 +151,7 @@ export default function RoleMenuModal({ visible, onCancel, onSuccess, role }: Ro
     if (visible && role) {
       loadRoleMenu();
     }
-  }, [visible, role]);
+  }, [visible, role, loadRoleMenu]);
 
   return (
     <Modal

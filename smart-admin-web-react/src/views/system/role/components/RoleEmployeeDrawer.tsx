@@ -6,7 +6,7 @@
  * @Date: 2026-03-23
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Drawer, Table, Input, Button, Space, message, Modal, Tag } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { SearchOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -44,7 +44,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
   /**
    * 查詢員工列表
    */
-  const queryEmployeeList = async () => {
+  const queryEmployeeList = useCallback(async () => {
     if (!role) return;
 
     try {
@@ -66,13 +66,13 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
     } finally {
       setLoading(false);
     }
-  };
+  }, [queryForm, role]);
 
   /**
    * 搜索
    */
   const handleSearch = () => {
-    setQueryForm((prev) => ({ ...prev, pageNum: 1 }));
+    setQueryForm(prev => ({ ...prev, pageNum: 1 }));
   };
 
   /**
@@ -91,7 +91,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
    * 分頁變化
    */
   const handlePaginationChange = (page: number, pageSize: number) => {
-    setQueryForm((prev) => ({ ...prev, pageNum: page, pageSize }));
+    setQueryForm(prev => ({ ...prev, pageNum: page, pageSize }));
   };
 
   /**
@@ -143,7 +143,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
         try {
           const res = await roleApi.batchRemoveRoleEmployee({
             roleId: role.roleId,
-            employeeIdList: selectedRowKeys.map((key) => Number(key)),
+            employeeIdList: selectedRowKeys.map(key => Number(key)),
           });
 
           if (res.ok) {
@@ -229,7 +229,12 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
       width: 80,
       fixed: 'right',
       render: (_: unknown, record: RoleEmployeeVO) => (
-        <Button type="link" size="small" danger onClick={() => handleRemoveEmployee(record.employeeId)}>
+        <Button
+          type="link"
+          size="small"
+          danger
+          onClick={() => handleRemoveEmployee(record.employeeId)}
+        >
           移除
         </Button>
       ),
@@ -246,7 +251,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
     showSizeChanger: true,
     showQuickJumper: true,
     pageSizeOptions: PAGE_SIZE_OPTIONS,
-    showTotal: (total) => `共 ${total} 條`,
+    showTotal: total => `共 ${total} 條`,
     onChange: handlePaginationChange,
   };
 
@@ -265,7 +270,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
    */
   useEffect(() => {
     if (visible && role) {
-      setQueryForm((prev) => ({
+      setQueryForm(prev => ({
         ...prev,
         roleId: role.roleId,
         pageNum: 1,
@@ -280,7 +285,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
     if (visible && role && queryForm.roleId === role.roleId) {
       queryEmployeeList();
     }
-  }, [queryForm, visible, role]);
+  }, [queryForm, visible, role, queryEmployeeList]);
 
   return (
     <>
@@ -297,7 +302,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
           <Input
             placeholder="姓名/手機號/登錄賬號"
             value={queryForm.keywords}
-            onChange={(e) => setQueryForm((prev) => ({ ...prev, keywords: e.target.value }))}
+            onChange={e => setQueryForm(prev => ({ ...prev, keywords: e.target.value }))}
             onPressEnter={handleSearch}
             style={{ width: 250 }}
             allowClear
@@ -341,7 +346,7 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
         visible={employeeSelectModalVisible}
         onCancel={() => setEmployeeSelectModalVisible(false)}
         onConfirm={handleAddEmployees}
-        excludeEmployeeIds={tableData.map((emp) => emp.employeeId)}
+        excludeEmployeeIds={tableData.map(emp => emp.employeeId)}
       />
     </>
   );

@@ -35,6 +35,7 @@ import {
 import type { TableColumnsType } from 'antd';
 import { usePrivilege } from '@/hooks/usePrivilege';
 import PrivilegeButton from '@/components/PrivilegeButton';
+import TableOperator from '@/components/common/TableOperator';
 import { menuApi } from '@/api/system/menuApi';
 import type { MenuVO, MenuQueryForm, MenuFormData, MenuTypeEnum } from './types';
 import {
@@ -79,44 +80,12 @@ export default function MenuPage() {
   const [formModalVisible, setFormModalVisible] = useState(false);
   const [formInitialData, setFormInitialData] = useState<MenuFormData | undefined>();
 
-  // ==================== Data Loading ====================
-
-  /**
-   * 查詢菜單列表並構建樹形結構
-   */
-  const queryMenuList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await menuApi.queryMenu();
-      const data = response.data || [];
-
-      setMenuList(data);
-
-      // 過濾並構建樹形數據
-      const filteredData = filterMenuByQueryForm(data, queryForm);
-      const treeData = buildMenuTree(filteredData, MENU_CONSTANTS.TOP_PARENT_ID);
-      setTableData(treeData);
-
-      // 默認展開所有節點
-      const allKeys = getAllKeys(treeData);
-      setExpandedRowKeys(allKeys);
-    } catch (error) {
-      message.error('查詢菜單列表失敗');
-    } finally {
-      setLoading(false);
-    }
-  }, [queryForm]);
-
-  useEffect(() => {
-    queryMenuList();
-  }, [queryMenuList]);
-
-  // ==================== Tree Building ====================
+  // ==================== Helper Functions ====================
 
   /**
    * 構建菜單樹
    */
-  const buildMenuTree = (data: MenuVO[], parentId: number): MenuVO[] => {
+  const buildMenuTree = useCallback((data: MenuVO[], parentId: number): MenuVO[] => {
     const children = data.filter(item => item.parentId === parentId);
 
     if (children.length === 0) {
@@ -133,12 +102,12 @@ export default function MenuPage() {
         }
         return node;
       });
-  };
+  }, []);
 
   /**
    * 過濾菜單（根據查詢條件）
    */
-  const filterMenuByQueryForm = (data: MenuVO[], form: MenuQueryForm): MenuVO[] => {
+  const filterMenuByQueryForm = useCallback((data: MenuVO[], form: MenuQueryForm): MenuVO[] => {
     return data.filter(menu => {
       // 關鍵字搜索
       if (form.keywords) {
@@ -180,12 +149,12 @@ export default function MenuPage() {
 
       return true;
     });
-  };
+  }, []);
 
   /**
    * 獲取所有節點的 key（用於默認展開）
    */
-  const getAllKeys = (data: MenuVO[]): React.Key[] => {
+  const getAllKeys = useCallback((data: MenuVO[]): React.Key[] => {
     const keys: React.Key[] = [];
     const traverse = (nodes: MenuVO[]) => {
       nodes.forEach(node => {
@@ -197,7 +166,39 @@ export default function MenuPage() {
     };
     traverse(data);
     return keys;
-  };
+  }, []);
+
+  // ==================== Data Loading ====================
+
+  /**
+   * 查詢菜單列表並構建樹形結構
+   */
+  const queryMenuList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await menuApi.queryMenu();
+      const data = response.data || [];
+
+      setMenuList(data);
+
+      // 過濾並構建樹形數據
+      const filteredData = filterMenuByQueryForm(data, queryForm);
+      const treeData = buildMenuTree(filteredData, MENU_CONSTANTS.TOP_PARENT_ID);
+      setTableData(treeData);
+
+      // 默認展開所有節點
+      const allKeys = getAllKeys(treeData);
+      setExpandedRowKeys(allKeys);
+    } catch (error) {
+      message.error('查詢菜單列表失敗');
+    } finally {
+      setLoading(false);
+    }
+  }, [queryForm, filterMenuByQueryForm, buildMenuTree, getAllKeys]);
+
+  useEffect(() => {
+    queryMenuList();
+  }, [queryMenuList]);
 
   // ==================== Search Operations ====================
 
@@ -559,27 +560,30 @@ export default function MenuPage() {
             )}
           </Form>
 
-          {/* Action Buttons */}
-          <Space style={{ marginBottom: 16 }}>
-            <PrivilegeButton
-              privilege={MENU_PERMISSION.ADD}
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-            >
-              添加菜單
-            </PrivilegeButton>
-
-            <PrivilegeButton
-              privilege={MENU_PERMISSION.BATCH_DELETE}
-              danger
-              icon={<DeleteOutlined />}
-              onClick={handleBatchDelete}
-              disabled={selectedRowKeys.length === 0}
-            >
-              批量刪除
-            </PrivilegeButton>
-          </Space>
+          {/* Table Operator */}
+          <TableOperator
+            buttons={[
+              {
+                type: 'add',
+                text: '添加菜單',
+                onClick: handleAdd,
+                privilege: MENU_PERMISSION.ADD,
+              },
+              {
+                type: 'delete',
+                text: '批量刪除',
+                onClick: handleBatchDelete,
+                privilege: MENU_PERMISSION.BATCH_DELETE,
+                disabled: selectedRowKeys.length === 0,
+              },
+            ]}
+            showRefresh={true}
+            onRefresh={queryMenuList}
+            showColumnSetting={true}
+            onColumnSettingClick={() => {
+              message.info('列設置功能開發中');
+            }}
+          />
         </div>
 
         {/* Table */}

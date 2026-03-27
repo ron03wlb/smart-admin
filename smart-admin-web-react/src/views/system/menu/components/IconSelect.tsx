@@ -119,7 +119,9 @@ export default function IconSelect({
    * 渲染圖標選項
    */
   const renderOption = (iconName: string) => {
-    const IconComponent = (AntdIcons as unknown as Record<string, React.ComponentType<{ style?: React.CSSProperties }>>)[iconName];
+    const IconComponent = (
+      AntdIcons as unknown as Record<string, React.ComponentType<{ style?: React.CSSProperties }>>
+    )[iconName];
 
     if (!IconComponent) {
       return {
@@ -143,7 +145,9 @@ export default function IconSelect({
    * 渲染選中的值（帶圖標）
    */
   const renderValue = (iconName: string) => {
-    const IconComponent = (AntdIcons as unknown as Record<string, React.ComponentType<{ style?: React.CSSProperties }>>)[iconName];
+    const IconComponent = (
+      AntdIcons as unknown as Record<string, React.ComponentType<{ style?: React.CSSProperties }>>
+    )[iconName];
 
     if (!IconComponent) {
       return iconName;

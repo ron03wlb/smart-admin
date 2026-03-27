@@ -11,7 +11,7 @@
  * @Date: 2026-03-24
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { TreeSelect } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { menuApi } from '@/api/system/menuApi';
@@ -65,11 +65,7 @@ export default function MenuTreeSelect({
   /**
    * 加載菜單列表並構建樹形數據
    */
-  useEffect(() => {
-    loadMenuTree();
-  }, [menuType, currentMenuId]);
-
-  const loadMenuTree = async () => {
+  const loadMenuTree = useCallback(async () => {
     try {
       setLoading(true);
       const response = await menuApi.queryMenu();
@@ -94,7 +90,14 @@ export default function MenuTreeSelect({
     } finally {
       setLoading(false);
     }
-  };
+  }, [menuType, currentMenuId]);
+
+  /**
+   * 監聽 menuType 和 currentMenuId 變化
+   */
+  useEffect(() => {
+    loadMenuTree();
+  }, [loadMenuTree]);
 
   /**
    * 構建樹形數據
@@ -120,7 +123,7 @@ export default function MenuTreeSelect({
     const childrenIds = getAllChildrenIds(menuList, currentId);
 
     // 排除當前節點和所有子節點
-    return menuList.filter((menu) => menu.menuId !== currentId && !childrenIds.includes(menu.menuId));
+    return menuList.filter(menu => menu.menuId !== currentId && !childrenIds.includes(menu.menuId));
   };
 
   /**
@@ -128,9 +131,9 @@ export default function MenuTreeSelect({
    */
   const getAllChildrenIds = (menuList: MenuVO[], parentId: number): number[] => {
     const childrenIds: number[] = [];
-    const children = menuList.filter((menu) => menu.parentId === parentId);
+    const children = menuList.filter(menu => menu.parentId === parentId);
 
-    children.forEach((child) => {
+    children.forEach(child => {
       childrenIds.push(child.menuId);
       // 遞歸獲取子節點的子節點
       const grandChildrenIds = getAllChildrenIds(menuList, child.menuId);
@@ -146,7 +149,7 @@ export default function MenuTreeSelect({
   const filterValidMenuTypes = (menuList: MenuVO[], currentType?: MenuTypeEnum): MenuVO[] => {
     if (!currentType) return menuList;
 
-    return menuList.filter((menu) => {
+    return menuList.filter(menu => {
       // 根據 SmartAdmin 規則：
       // - 目錄的父級：只能是目錄或頂級（menuType=1）
       // - 菜單的父級：只能是目錄（menuType=1）
@@ -171,7 +174,7 @@ export default function MenuTreeSelect({
    * 構建樹形結構（遞歸）
    */
   const buildTree = (menuList: MenuVO[], parentId: number): TreeNode[] => {
-    const children = menuList.filter((menu) => menu.parentId === parentId);
+    const children = menuList.filter(menu => menu.parentId === parentId);
 
     if (children.length === 0) {
       return [];
@@ -179,7 +182,7 @@ export default function MenuTreeSelect({
 
     return children
       .sort((a, b) => a.sort - b.sort)
-      .map((menu) => {
+      .map(menu => {
         const subChildren = buildTree(menuList, menu.menuId);
 
         const node: TreeNode = {

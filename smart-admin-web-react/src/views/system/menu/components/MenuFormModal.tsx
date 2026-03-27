@@ -71,7 +71,8 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
    * 多個權限格式正則（逗號分隔）
    * 例如: system:menu:add,system:menu:update
    */
-  const MULTI_PERMISSION_PATTERN = /^[a-z0-9]+:[a-z0-9]+:[a-z0-9]+(,[a-z0-9]+:[a-z0-9]+:[a-z0-9]+)*$/;
+  const MULTI_PERMISSION_PATTERN =
+    /^[a-z0-9]+:[a-z0-9]+:[a-z0-9]+(,[a-z0-9]+:[a-z0-9]+:[a-z0-9]+)*$/;
 
   const rules = {
     menuName: [
@@ -110,7 +111,8 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
     apiPerms: [
       {
         pattern: MULTI_PERMISSION_PATTERN,
-        message: '權限格式錯誤！正確格式：module:resource:action，多個用逗號分隔（例如：system:menu:add,system:menu:update）',
+        message:
+          '權限格式錯誤！正確格式：module:resource:action，多個用逗號分隔（例如：system:menu:add,system:menu:update）',
       },
     ],
   };
@@ -119,8 +121,9 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
 
   /**
    * 處理表單提交
+   * @param continueAdd - 是否繼續添加下一個
    */
-  const handleSubmit = async () => {
+  const handleSubmit = async (continueAdd = false) => {
     try {
       const values = await form.validateFields();
 
@@ -144,7 +147,13 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
 
         await menuApi.addMenu(addForm);
         message.success('添加成功');
-        onSuccess();
+
+        if (continueAdd) {
+          // 連續添加：智能重置表單
+          continueResetForm();
+        } else {
+          onSuccess();
+        }
       }
     } catch (error: any) {
       if (error.errorFields) {
@@ -152,6 +161,42 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
       } else {
         message.error(isEdit ? '更新失敗' : '添加失敗');
       }
+    }
+  };
+
+  /**
+   * 連續添加：智能表單重置
+   * 保留 menuType, parentId，重置其他字段
+   */
+  const continueResetForm = () => {
+    const currentMenuType = form.getFieldValue('menuType');
+    const currentParentId = form.getFieldValue('parentId');
+    const currentWebPerms = form.getFieldValue('webPerms');
+
+    // 重置表單
+    form.resetFields();
+
+    // 恢復保留字段
+    form.setFieldsValue({
+      menuType: currentMenuType,
+      parentId: currentParentId,
+    });
+    setMenuType(currentMenuType);
+
+    // 功能點特殊處理：設置 contextMenuId = parentId
+    if (currentMenuType === MenuTypeEnum.POINTS) {
+      form.setFieldsValue({
+        contextMenuId: currentParentId,
+      });
+    }
+
+    // 權限字段智能保留：移除最後一個冒號後面的內容
+    // 例如：system:menu:add → system:menu:
+    if (currentWebPerms && currentWebPerms.lastIndexOf(':') > 0) {
+      const prefix = currentWebPerms.substring(0, currentWebPerms.lastIndexOf(':') + 1);
+      form.setFieldsValue({
+        webPerms: prefix,
+      });
     }
   };
 
@@ -198,8 +243,9 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit(false)}
             style={{
+              marginRight: 8,
               padding: '4px 15px',
               border: 'none',
               borderRadius: '2px',
@@ -210,6 +256,22 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
           >
             提交
           </button>
+          {!isEdit && (
+            <button
+              type="button"
+              onClick={() => handleSubmit(true)}
+              style={{
+                padding: '4px 15px',
+                border: 'none',
+                borderRadius: '2px',
+                background: '#1890ff',
+                color: '#fff',
+                cursor: 'pointer',
+              }}
+            >
+              提交並添加下一個
+            </button>
+          )}
         </div>
       }
     >

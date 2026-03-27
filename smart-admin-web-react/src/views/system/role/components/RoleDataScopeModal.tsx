@@ -6,7 +6,7 @@
  * @Date: 2026-03-23
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Modal, Radio, Row, Col, message, Alert, Spin } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { roleApi } from '@/api/system/roleApi';
@@ -19,7 +19,12 @@ interface RoleDataScopeModalProps {
   role?: RoleVO;
 }
 
-export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role }: RoleDataScopeModalProps) {
+export default function RoleDataScopeModal({
+  visible,
+  onCancel,
+  onSuccess,
+  role,
+}: RoleDataScopeModalProps) {
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
   const [dataScopeList, setDataScopeList] = useState<DataScopeVO[]>([]);
@@ -28,7 +33,7 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
   /**
    * 加載數據範圍列表
    */
-  const loadDataScopeList = async () => {
+  const loadDataScopeList = useCallback(async () => {
     try {
       setDataLoading(true);
       const res = await roleApi.getDataScopeList();
@@ -42,12 +47,12 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
     } finally {
       setDataLoading(false);
     }
-  };
+  }, []);
 
   /**
    * 加載角色數據範圍配置
    */
-  const loadRoleDataScope = async () => {
+  const loadRoleDataScope = useCallback(async () => {
     if (!role) return;
 
     try {
@@ -55,7 +60,7 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
       const res = await roleApi.getDataScopeByRoleId(role.roleId);
       if (res.ok && res.data) {
         const newMap = new Map<number, number>();
-        res.data.forEach((item) => {
+        res.data.forEach(item => {
           if (item.viewType !== undefined) {
             newMap.set(item.dataScopeType, item.viewType);
           }
@@ -69,7 +74,7 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
     } finally {
       setDataLoading(false);
     }
-  };
+  }, [role]);
 
   /**
    * 數據範圍選擇變化
@@ -132,7 +137,7 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
       loadDataScopeList();
       loadRoleDataScope();
     }
-  }, [visible, role]);
+  }, [visible, role, loadDataScopeList, loadRoleDataScope]);
 
   return (
     <Modal
@@ -157,7 +162,14 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
         {dataScopeList.length > 0 ? (
           <>
             {/* 表頭 */}
-            <Row style={{ fontWeight: 600, borderBottom: '1px solid #f0f0f0', paddingBottom: 12, marginBottom: 16 }}>
+            <Row
+              style={{
+                fontWeight: 600,
+                borderBottom: '1px solid #f0f0f0',
+                paddingBottom: 12,
+                marginBottom: 16,
+              }}
+            >
               <Col span={4} style={{ textAlign: 'center' }}>
                 業務單據
               </Col>
@@ -166,7 +178,7 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
             </Row>
 
             {/* 數據範圍配置項 */}
-            {dataScopeList.map((dataScope) => (
+            {dataScopeList.map(dataScope => (
               <Row
                 key={dataScope.dataScopeType}
                 align="middle"
@@ -178,10 +190,14 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
                 <Col span={12}>
                   <Radio.Group
                     value={selectedDataScope.get(dataScope.dataScopeType)}
-                    onChange={(e) => handleDataScopeChange(dataScope.dataScopeType, e)}
+                    onChange={e => handleDataScopeChange(dataScope.dataScopeType, e)}
                   >
-                    {dataScope.viewTypeList.map((viewType) => (
-                      <Radio key={viewType.viewType} value={viewType.viewType} style={{ display: 'block', height: 32 }}>
+                    {dataScope.viewTypeList.map(viewType => (
+                      <Radio
+                        key={viewType.viewType}
+                        value={viewType.viewType}
+                        style={{ display: 'block', height: 32 }}
+                      >
                         {viewType.viewTypeName}
                       </Radio>
                     ))}
@@ -194,7 +210,9 @@ export default function RoleDataScopeModal({ visible, onCancel, onSuccess, role 
             ))}
           </>
         ) : (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>暫無數據範圍配置</div>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+            暫無數據範圍配置
+          </div>
         )}
       </Spin>
     </Modal>

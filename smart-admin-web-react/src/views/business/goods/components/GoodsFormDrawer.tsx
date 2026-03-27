@@ -9,12 +9,7 @@
 import React, { useEffect } from 'react';
 import { Drawer, Form, Input, InputNumber, message, Radio, Select } from 'antd';
 import { goodsApi } from '@/api/business/goodsApi';
-import type {
-  GoodsVO,
-  GoodsAddForm,
-  GoodsUpdateForm,
-  GoodsFormData,
-} from '../types';
+import type { GoodsVO, GoodsAddForm, GoodsUpdateForm, GoodsFormData } from '../types';
 import { useModal } from '@/hooks/useModal';
 import { GOODS_VALIDATION, GOODS_STATUS_LABELS } from '@/constants/business/goodsConst';
 
