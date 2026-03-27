@@ -85,7 +85,8 @@
       "Read(*)",
       "Bash(git mv:*)",
       "Bash(PYTHONUTF8*)",
-      "Bash(./gradlew clean build:*)"
+      "Bash(./gradlew clean build:*)",
+      "Bash(git show:*)"
     ],
     "deny": [
       "Bash(rm * /*)",
