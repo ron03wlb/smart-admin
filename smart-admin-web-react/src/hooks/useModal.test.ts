@@ -335,7 +335,7 @@ describe('useModal', () => {
       await act(async () => {
         try {
           await result.current.handleSubmit();
-        } catch (error) {
+        } catch (_error) {
           // 預期拋出錯誤
         }
       });

@@ -35,6 +35,7 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/system/account': lazy(() => import('@/views/system/account')),
 
   // ==================== Business 模塊 ====================
+  '/business/brand': lazy(() => import('@/views/business/brand')),
   '/business/goods': lazy(() => import('@/views/business/goods')),
   '/business/enterprise': lazy(() => import('@/views/business/enterprise')),
   '/business/notice': lazy(() => import('@/views/business/notice')),
@@ -64,8 +65,11 @@ export const viewModules: Record<string, ComponentType<any>> = {
   ),
   '/support/code-generator': lazy(() => import('@/views/support/code-generator')),
 
+  // ==================== OA 模塊 ====================
+  '/oa/bank': lazy(() => import('@/views/oa/bank')),
+  '/oa/invoice': lazy(() => import('@/views/oa/invoice')),
+
   // 更多路由映射將在實現對應頁面時添加...
-  // 例如：'/business/notice', '/business/category' 等
 };
 
 // ==================== 動態路由生成 ====================

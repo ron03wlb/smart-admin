@@ -13,7 +13,7 @@
  * @Date: 2026-03-10
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TreeSelect, TreeSelectProps, message } from 'antd';
 import { queryCategoryTree, CategoryTreeNode } from '@/api/business/categoryApi';
 
@@ -48,7 +48,7 @@ function CategoryTreeSelect(props: CategoryTreeSelectProps) {
   /**
    * 查詢分類樹數據
    */
-  const fetchCategoryTree = async () => {
+  const fetchCategoryTree = useCallback(async () => {
     if (!categoryType) {
       setTreeData([]);
       return;
@@ -70,14 +70,14 @@ function CategoryTreeSelect(props: CategoryTreeSelectProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categoryType]);
 
   /**
    * 監聽 categoryType 變化
    */
   useEffect(() => {
     fetchCategoryTree();
-  }, [categoryType]);
+  }, [fetchCategoryTree]);
 
   return (
     <TreeSelect

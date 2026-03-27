@@ -1,15 +1,17 @@
 /**
  * 404 Not Found Page
- * 404 頁面不存在
+ * 404 不存在頁面
+ *
+ * 參考：Vue 版本 smart-admin-web/src/views/system/40X/404.vue
  *
  * @Author: SmartAdmin React Team
- * @Date: 2026-03-14
+ * @Date: 2026-03-26
  */
 
 import { Result, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-const NotFoundPage: React.FC = () => {
+const NotFound404: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGoHome = () => {
@@ -29,4 +31,4 @@ const NotFoundPage: React.FC = () => {
   );
 };
 
-export default NotFoundPage;
+export default NotFound404;

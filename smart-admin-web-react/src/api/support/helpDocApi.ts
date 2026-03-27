@@ -15,6 +15,31 @@ import type {
   HelpDocDetailVO,
 } from '@/views/support/help-doc/types';
 
+/**
+ * 查看記錄查詢表單
+ */
+export interface ViewRecordQueryForm {
+  pageNum: number;
+  pageSize: number;
+  searchCount?: boolean;
+  helpDocId?: number;
+  keywords?: string;
+}
+
+/**
+ * 查看記錄 VO
+ */
+export interface ViewRecordVO {
+  id: number;
+  helpDocId: number;
+  helpDocTitle?: string;
+  userId: number;
+  userName?: string;
+  pageViewCount: number;
+  firstViewTime: string;
+  lastViewTime: string;
+}
+
 export const helpDocApi = {
   /**
    * 【管理】分頁查詢幫助文檔
@@ -75,7 +100,9 @@ export const helpDocApi = {
   /**
    * 【用戶】查詢查看記錄
    */
-  queryViewRecord: (params: any): Promise<ResponseDTO<PageResult<any>>> => {
+  queryViewRecord: (
+    params: ViewRecordQueryForm
+  ): Promise<ResponseDTO<PageResult<ViewRecordVO>>> => {
     return request.post('/support/helpDoc/user/queryViewRecord', params);
   },
 };

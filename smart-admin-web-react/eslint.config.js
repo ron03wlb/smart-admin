@@ -86,5 +86,21 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn', // 測試文件放寬 any 限制
     },
+  },
+  // scripts 目錄的 Node.js 環境配置
+  {
+    files: ['scripts/**/*.{cjs,js}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        require: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        console: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off', // scripts 允許 require
+    },
   }
 );

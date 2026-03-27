@@ -80,7 +80,9 @@ export const roleApi = {
    * 查詢角色員工列表（分頁）
    * @param params 查詢表單
    */
-  queryRoleEmployee: (params: RoleEmployeeQueryForm): Promise<ResponseDTO<PageResult<RoleEmployeeVO>>> => {
+  queryRoleEmployee: (
+    params: RoleEmployeeQueryForm
+  ): Promise<ResponseDTO<PageResult<RoleEmployeeVO>>> => {
     return request.post('/role/employee/queryRoleEmployee', params);
   },
 

@@ -57,15 +57,67 @@ export interface BasicConfig {
 }
 
 /**
+ * 代碼生成器 - 字段配置
+ */
+export interface FieldConfig {
+  columnName: string;
+  columnComment: string;
+  columnType: string;
+  javaType: string;
+  javaField: string;
+  frontField: string;
+  frontType?: string;
+}
+
+/**
+ * 代碼生成器 - 新增/編輯配置
+ */
+export interface InsertUpdateConfig {
+  fields: FieldConfig[];
+  requiredFlag?: boolean;
+}
+
+/**
+ * 代碼生成器 - 刪除配置
+ */
+export interface DeleteConfig {
+  primaryKey: string;
+  isBatch?: boolean;
+}
+
+/**
+ * 代碼生成器 - 查詢字段配置
+ */
+export interface QueryFieldConfig {
+  columnName: string;
+  queryType: 'eq' | 'like' | 'in' | 'between' | 'gt' | 'lt';
+  javaField: string;
+  frontField: string;
+  frontType?: string;
+}
+
+/**
+ * 代碼生成器 - 表格字段配置
+ */
+export interface TableFieldConfig {
+  columnName: string;
+  columnComment: string;
+  javaField: string;
+  frontField: string;
+  frontType?: string;
+  width?: number;
+}
+
+/**
  * 代碼生成器 - 配置信息
  */
 export interface CodeGeneratorConfig {
   basic?: BasicConfig;
-  fields?: any[];
-  insertAndUpdate?: any;
-  deleteInfo?: any;
-  queryFields?: any[];
-  tableFields?: any[];
+  fields?: FieldConfig[];
+  insertAndUpdate?: InsertUpdateConfig;
+  deleteInfo?: DeleteConfig;
+  queryFields?: QueryFieldConfig[];
+  tableFields?: TableFieldConfig[];
 }
 
 /**
@@ -74,11 +126,11 @@ export interface CodeGeneratorConfig {
 export interface UpdateConfigRequest {
   tableName: string;
   basic?: BasicConfig;
-  fields?: any[];
-  insertAndUpdate?: any;
-  deleteInfo?: any;
-  queryFields?: any[];
-  tableFields?: any[];
+  fields?: FieldConfig[];
+  insertAndUpdate?: InsertUpdateConfig;
+  deleteInfo?: DeleteConfig;
+  queryFields?: QueryFieldConfig[];
+  tableFields?: TableFieldConfig[];
 }
 
 /**

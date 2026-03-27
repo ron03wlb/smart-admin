@@ -102,7 +102,7 @@ export interface UseModalResult<TFormData> {
 /**
  * Modal/Drawer 邏輯 Hook
  */
-export function useModal<TFormData extends Record<string, any>>(
+export function useModal<TFormData extends Record<string, unknown>>(
   options: UseModalOptions<TFormData> = {}
 ): UseModalResult<TFormData> {
   const { defaultFormData = {} as TFormData, onOpen, onClose, onSubmit } = options;

@@ -9,7 +9,7 @@
  */
 
 import request from '@/utils/request';
-import { ResponseDTO } from '@/api/types/response';
+import { ResponseDTO, PageResult } from '@/api/types/response';
 
 /**
  * 文件上傳響應數據
@@ -32,6 +32,22 @@ export interface FileQueryForm {
   fileName?: string;
   fileKey?: string;
   folder?: number;
+}
+
+/**
+ * 文件 VO（用於分頁查詢返回）
+ */
+export interface FileVO {
+  fileId: number;
+  fileName: string;
+  fileUrl: string;
+  fileKey: string;
+  fileType: string;
+  fileSize: number;
+  folder: number;
+  creatorName?: string;
+  createTime?: string;
+  updateTime?: string;
 }
 
 /**
@@ -60,7 +76,7 @@ export const fileApi = {
    * 分頁查詢文件
    * @param params 查詢參數
    */
-  queryPage: (params: FileQueryForm): Promise<ResponseDTO<any>> => {
+  queryPage: (params: FileQueryForm): Promise<ResponseDTO<PageResult<FileVO>>> => {
     return request.post('/support/file/queryPage', params);
   },
 
@@ -82,7 +98,7 @@ export const fileApi = {
         params: { fileKey },
         responseType: 'blob',
       })
-      .then((response: any) => {
+      .then((response: Blob) => {
         // 創建 blob URL 並觸發下載
         const blob = new Blob([response]);
         const url = window.URL.createObjectURL(blob);
