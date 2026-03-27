@@ -77,7 +77,8 @@ public class SelfExclusionRequestService {
         new LambdaQueryWrapper<SelfExclusionRequestEntity>()
             .eq(SelfExclusionRequestEntity::getPlayerId, playerId)
             .eq(SelfExclusionRequestEntity::getExclusionType, exclusionType)
-            .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE");
+            .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE")
+            .eq(SelfExclusionRequestEntity::getDeleted, false);
 
     SelfExclusionRequestEntity existingActive = selfExclusionRequestDao.selectOne(activeCheck);
     if (existingActive != null) {
@@ -145,6 +146,7 @@ public class SelfExclusionRequestService {
         new LambdaQueryWrapper<SelfExclusionRequestEntity>()
             .eq(SelfExclusionRequestEntity::getPlayerId, playerId)
             .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE")
+            .eq(SelfExclusionRequestEntity::getDeleted, false)
             .orderByDesc(SelfExclusionRequestEntity::getCreateTime));
   }
 
@@ -163,6 +165,7 @@ public class SelfExclusionRequestService {
                 .eq(SelfExclusionRequestEntity::getPlayerId, playerId)
                 .eq(SelfExclusionRequestEntity::getExclusionType, exclusionType)
                 .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE")
+                .eq(SelfExclusionRequestEntity::getDeleted, false)
                 .last("LIMIT 1"));
 
     return Option.of(request);

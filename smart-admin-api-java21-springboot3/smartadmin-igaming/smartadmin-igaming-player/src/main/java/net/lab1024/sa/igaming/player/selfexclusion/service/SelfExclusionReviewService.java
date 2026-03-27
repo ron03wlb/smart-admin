@@ -178,11 +178,19 @@ public class SelfExclusionReviewService {
     }
 
     // Update request - clear removal request date and set rejection info
-    request.setRemovalRequestDate(null); // Clear removal request so player can try again later
-    request.setRemovalApprovedBy(adminId);
-    request.setRemovalApprovedAt(OffsetDateTime.now(ZoneId.systemDefault()));
-    request.setRemovalReason(rejectionReason);
-    selfExclusionRequestDao.updateById(request);
+    // Use UpdateWrapper to explicitly set null values (MyBatis Plus doesn't update null by default)
+    com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<SelfExclusionRequestEntity>
+        updateWrapper = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
+    updateWrapper
+        .eq(SelfExclusionRequestEntity::getRequestId, requestId)
+        .set(SelfExclusionRequestEntity::getRemovalRequestDate, null) // Explicitly set to null
+        .set(SelfExclusionRequestEntity::getRemovalApprovedBy, adminId)
+        .set(
+            SelfExclusionRequestEntity::getRemovalApprovedAt,
+            OffsetDateTime.now(ZoneId.systemDefault()))
+        .set(SelfExclusionRequestEntity::getRemovalReason, rejectionReason);
+
+    selfExclusionRequestDao.update(null, updateWrapper);
 
     // Record history
     Map<String, Object> metadata = new HashMap<>();

@@ -176,6 +176,103 @@ public class PlayerRegistrationTestFixture {
     return entity;
   }
 
+  // ===== Self-Exclusion Builders =====
+
+  /**
+   * Create a self-exclusion request entity with default values.
+   *
+   * <p>This method creates a self-exclusion request for testing purposes. All timestamps are set to
+   * current time, and the request is marked as ACTIVE with compliance acknowledgement.
+   *
+   * @param playerId player identifier
+   * @param exclusionType type of exclusion (DEPOSIT, BETTING, LOGIN, FULL_BLOCK)
+   * @param durationType duration type (24_HOURS, 7_DAYS, 30_DAYS, 6_MONTHS, PERMANENT)
+   * @return self-exclusion request entity ready for DAO insertion
+   */
+  public static net.lab1024.sa.igaming.player.selfexclusion.domain.entity.SelfExclusionRequestEntity
+      createSelfExclusionRequest(Long playerId, String exclusionType, String durationType) {
+    OffsetDateTime now = OffsetDateTime.now(java.time.ZoneId.systemDefault());
+
+    // Calculate end date based on duration type
+    OffsetDateTime endDate =
+        switch (durationType) {
+          case "24_HOURS" -> now.plusHours(24);
+          case "7_DAYS" -> now.plusDays(7);
+          case "30_DAYS" -> now.plusDays(30);
+          case "6_MONTHS" -> now.plusMonths(6);
+          case "PERMANENT" -> null; // No end date for permanent exclusions
+          default -> throw new IllegalArgumentException("Invalid duration type: " + durationType);
+        };
+
+    // Calculate cooling-off period end based on duration type
+    OffsetDateTime coolingOffPeriodEnd =
+        switch (durationType) {
+          case "24_HOURS" -> now.plusHours(24);
+          case "7_DAYS" -> now.plusDays(7);
+          case "30_DAYS" -> now.plusDays(7); // Shorter cooling-off for 30-day exclusions
+          case "6_MONTHS" -> now.plusDays(30); // 1 month cooling-off
+          case "PERMANENT" -> now.plusDays(90); // 3 months cooling-off
+          default -> throw new IllegalArgumentException("Invalid duration type: " + durationType);
+        };
+
+    net.lab1024.sa.igaming.player.selfexclusion.domain.entity.SelfExclusionRequestEntity entity =
+        new net.lab1024.sa.igaming.player.selfexclusion.domain.entity.SelfExclusionRequestEntity();
+    entity.setTenantId(1L);
+    entity.setPlayerId(playerId);
+    entity.setExclusionType(exclusionType);
+    entity.setDurationType(durationType);
+    entity.setStartDate(now);
+    entity.setEndDate(endDate);
+    entity.setCoolingOffPeriodEnd(coolingOffPeriodEnd);
+    entity.setStatus("ACTIVE");
+    entity.setRequestReason("Test self-exclusion request");
+    entity.setIpAddress("127.0.0.1");
+    entity.setUserAgent("TestAgent/1.0");
+    entity.setComplianceAcknowledgement(true);
+
+    return entity;
+  }
+
+  /**
+   * Create a self-exclusion request entity with custom timestamps.
+   *
+   * <p>This method allows explicit control over start date, end date, and cooling-off period for
+   * time-based testing scenarios (e.g., fast-forwarding cooling-off period).
+   *
+   * @param playerId player identifier
+   * @param exclusionType type of exclusion (DEPOSIT, BETTING, LOGIN, FULL_BLOCK)
+   * @param durationType duration type (24_HOURS, 7_DAYS, 30_DAYS, 6_MONTHS, PERMANENT)
+   * @param startDate when the exclusion takes effect
+   * @param endDate when the exclusion expires (NULL for PERMANENT)
+   * @param coolingOffPeriodEnd earliest date player can request removal
+   * @return self-exclusion request entity ready for DAO insertion
+   */
+  public static net.lab1024.sa.igaming.player.selfexclusion.domain.entity.SelfExclusionRequestEntity
+      createSelfExclusionRequest(
+          Long playerId,
+          String exclusionType,
+          String durationType,
+          OffsetDateTime startDate,
+          OffsetDateTime endDate,
+          OffsetDateTime coolingOffPeriodEnd) {
+    net.lab1024.sa.igaming.player.selfexclusion.domain.entity.SelfExclusionRequestEntity entity =
+        new net.lab1024.sa.igaming.player.selfexclusion.domain.entity.SelfExclusionRequestEntity();
+    entity.setTenantId(1L);
+    entity.setPlayerId(playerId);
+    entity.setExclusionType(exclusionType);
+    entity.setDurationType(durationType);
+    entity.setStartDate(startDate);
+    entity.setEndDate(endDate);
+    entity.setCoolingOffPeriodEnd(coolingOffPeriodEnd);
+    entity.setStatus("ACTIVE");
+    entity.setRequestReason("Test self-exclusion request with custom timestamps");
+    entity.setIpAddress("127.0.0.1");
+    entity.setUserAgent("TestAgent/1.0");
+    entity.setComplianceAcknowledgement(true);
+
+    return entity;
+  }
+
   // ===== Helper Methods =====
 
   /**

@@ -137,7 +137,8 @@ public class SelfExclusionEnforcementService {
         selfExclusionRequestDao.selectCount(
             new LambdaQueryWrapper<SelfExclusionRequestEntity>()
                 .eq(SelfExclusionRequestEntity::getPlayerId, playerId)
-                .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE"));
+                .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE")
+                .eq(SelfExclusionRequestEntity::getDeleted, false));
 
     return count > 0;
   }
@@ -158,6 +159,7 @@ public class SelfExclusionEnforcementService {
                 .eq(SelfExclusionRequestEntity::getPlayerId, playerId)
                 .in(SelfExclusionRequestEntity::getExclusionType, exclusionTypes)
                 .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE")
+                .eq(SelfExclusionRequestEntity::getDeleted, false)
                 .orderByDesc(SelfExclusionRequestEntity::getCreateTime)
                 .last("LIMIT 1"));
 
@@ -192,6 +194,7 @@ public class SelfExclusionEnforcementService {
         selfExclusionRequestDao.selectList(
             new LambdaQueryWrapper<SelfExclusionRequestEntity>()
                 .eq(SelfExclusionRequestEntity::getStatus, "ACTIVE")
+                .eq(SelfExclusionRequestEntity::getDeleted, false)
                 .isNotNull(SelfExclusionRequestEntity::getEndDate)
                 .le(SelfExclusionRequestEntity::getEndDate, now));
 

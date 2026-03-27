@@ -36,7 +36,7 @@ CREATE TABLE t_self_exclusion_request (
     -- Compliance Audit Fields
     ip_address VARCHAR(45),  -- IPv4/IPv6 address when request was created
     user_agent TEXT,  -- Browser/device information
-    compliance_acknowledgement BOOLEAN NOT NULL DEFAULT FALSE,  -- Player acknowledged responsible gaming policy
+    compliance_acknowledgement BOOLEAN NOT NULL DEFAULT FALSE,
 
     -- Audit Fields
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -58,15 +58,15 @@ CREATE TABLE t_self_exclusion_request (
 );
 
 -- Indexes
-CREATE INDEX idx_self_exclusion_request_tenant ON t_self_exclusion_request(tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_self_exclusion_request_player ON t_self_exclusion_request(player_id, create_time DESC) WHERE deleted = FALSE;
-CREATE INDEX idx_self_exclusion_request_status ON t_self_exclusion_request(status, create_time DESC) WHERE deleted = FALSE;
+CREATE INDEX idx_self_exclusion_request_tenant ON t_self_exclusion_request(tenant_id) WHERE deleted = false;
+CREATE INDEX idx_self_exclusion_request_player ON t_self_exclusion_request(player_id, create_time DESC) WHERE deleted = false;
+CREATE INDEX idx_self_exclusion_request_status ON t_self_exclusion_request(status, create_time DESC) WHERE deleted = false;
 CREATE INDEX idx_self_exclusion_request_active ON t_self_exclusion_request(player_id, exclusion_type)
-    WHERE status = 'ACTIVE' AND deleted = FALSE;
+    WHERE status = 'ACTIVE' AND deleted = false;
 CREATE INDEX idx_self_exclusion_request_cooling_off ON t_self_exclusion_request(cooling_off_period_end)
-    WHERE status = 'ACTIVE' AND removal_request_date IS NOT NULL AND deleted = FALSE;
+    WHERE status = 'ACTIVE' AND removal_request_date IS NOT NULL AND deleted = false;
 CREATE INDEX idx_self_exclusion_request_end_date ON t_self_exclusion_request(end_date)
-    WHERE status = 'ACTIVE' AND end_date IS NOT NULL AND deleted = FALSE;
+    WHERE status = 'ACTIVE' AND end_date IS NOT NULL AND deleted = false;
 
 -- Comments
 COMMENT ON TABLE t_self_exclusion_request IS 'Self-exclusion requests for responsible gaming compliance - allows players to restrict their own gaming activities';
@@ -123,12 +123,12 @@ CREATE TABLE t_self_exclusion_history (
 );
 
 -- Indexes
-CREATE INDEX idx_self_exclusion_history_tenant ON t_self_exclusion_history(tenant_id) WHERE deleted = FALSE;
-CREATE INDEX idx_self_exclusion_history_request ON t_self_exclusion_history(request_id, action_at DESC) WHERE deleted = FALSE;
-CREATE INDEX idx_self_exclusion_history_player ON t_self_exclusion_history(player_id, action_at DESC) WHERE deleted = FALSE;
-CREATE INDEX idx_self_exclusion_history_action_type ON t_self_exclusion_history(action_type, action_at DESC) WHERE deleted = FALSE;
+CREATE INDEX idx_self_exclusion_history_tenant ON t_self_exclusion_history(tenant_id) WHERE deleted = false;
+CREATE INDEX idx_self_exclusion_history_request ON t_self_exclusion_history(request_id, action_at DESC) WHERE deleted = false;
+CREATE INDEX idx_self_exclusion_history_player ON t_self_exclusion_history(player_id, action_at DESC) WHERE deleted = false;
+CREATE INDEX idx_self_exclusion_history_action_type ON t_self_exclusion_history(action_type, action_at DESC) WHERE deleted = false;
 CREATE INDEX idx_self_exclusion_history_action_by ON t_self_exclusion_history(action_by, action_at DESC)
-    WHERE action_by IS NOT NULL AND deleted = FALSE;
+    WHERE action_by IS NOT NULL AND deleted = false;
 
 -- Comments
 COMMENT ON TABLE t_self_exclusion_history IS 'Audit trail for all self-exclusion request state changes - required for regulatory compliance';

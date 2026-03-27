@@ -3,17 +3,14 @@ package net.lab1024.sa.igaming.player.selfexclusion.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
-import org.apache.ibatis.type.JdbcType;
+import net.lab1024.sa.igaming.player.typehandler.PostgresJsonbTypeHandler;
 
 /**
  * Self-Exclusion History Entity.
@@ -83,12 +80,10 @@ public class SelfExclusionHistoryEntity {
    *
    * <p>Example: {"ip_address": "1.2.3.4", "user_agent": "...", "notes": "..."}
    */
-  @TableField(jdbcType = JdbcType.OTHER, typeHandler = JacksonTypeHandler.class)
+  @TableField(typeHandler = PostgresJsonbTypeHandler.class)
   private Map<String, Object> metadata;
 
   /** Soft Delete Flag */
-  @TableLogic
-  @TableField(jdbcType = JdbcType.SMALLINT, typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deleted;
 
   /** Create Time */

@@ -1,17 +1,13 @@
 package net.lab1024.sa.igaming.player.selfexclusion.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler;
-import org.apache.ibatis.type.JdbcType;
 
 /**
  * Self-Exclusion Request Entity.
@@ -113,12 +109,9 @@ public class SelfExclusionRequestEntity {
    *
    * <p>TRUE if player acknowledged responsible gaming policy
    */
-  @TableField(jdbcType = JdbcType.SMALLINT, typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean complianceAcknowledgement;
 
   /** Soft Delete Flag */
-  @TableLogic
-  @TableField(jdbcType = JdbcType.SMALLINT, typeHandler = BooleanToSmallintTypeHandler.class)
   private Boolean deleted;
 
   /** Create Time */

@@ -386,33 +386,93 @@
 
 ---
 
-### Phase 9: 自我排除 - Integration Tests
+### Phase 9: 自我排除 - Integration Tests ✅ COMPLETED (2026-03-27)
 
 **目標**: 創建端到端集成測試，驗證自我排除完整流程
 
-**測試場景**:
-1. 玩家創建自我排除請求
-2. 限制立即生效（存款、投注、登入）
-3. 冷靜期內無法解除
-4. 冷靜期後申請解除審核
-5. 審核通過後限制解除
+**核心測試場景** (10 個測試 - 100% 通過率):
+1. ✅ 玩家創建自我排除請求 (shouldCreateSelfExclusionRequest)
+2. ✅ 存款限制執行 (shouldBlockDepositDuringActiveExclusion)
+3. ✅ 投注限制執行 (shouldBlockBettingDuringActiveExclusion)
+4. ✅ 登入限制執行 (shouldBlockLoginDuringActiveExclusion)
+5. ✅ 冷靜期內無法解除 (shouldPreventRemovalBeforeCoolingOffPeriodEnds)
+6. ✅ 冷靜期後申請解除 (shouldAllowRemovalRequestAfterCoolingOff)
+7. ✅ 管理員批准解除 (shouldApproveRemovalRequest)
+8. ✅ 管理員拒絕解除 (shouldRejectRemovalRequest)
+9. ✅ 管理員取消請求 (shouldCancelActiveExclusionRequest)
+10. ✅ 自動過期處理 (shouldAutomaticallyExpireCompletedRequests)
+
+**前置條件**:
+- [x] Phase 8 業務邏輯完成 ✅ 2026-03-26
+- [x] V016__create_self_exclusion_tables.sql 遷移腳本創建 ✅ 2026-03-27
+- [x] PlayerRegistrationTestFixture 擴展（添加 createSelfExclusionRequest 方法）✅ 2026-03-27
+- [x] BaseIntegrationTest 清理邏輯更新（包含自我排除表）✅ 2026-03-27
 
 **任務清單**:
-- [ ] 創建 `SelfExclusionJourneyIntegrationTest`
-- [ ] 測試存款限制
-- [ ] 測試投注限制
-- [ ] 測試登入限制
-- [ ] 測試冷靜期管理
-- [ ] 測試解除審核流程
+- [x] **Priority 1**: 創建 V016 遷移腳本 ✅ 2026-03-27
+  - t_self_exclusion_request 表（17 列，7 個索引）
+  - t_self_exclusion_history 表（13 列，4 個索引）
+  - 外鍵約束（CASCADE DELETE）
+  - 使用 BOOLEAN 類型（統一項目標準，非 SMALLINT）
+
+- [x] **Priority 2**: 擴展 PlayerRegistrationTestFixture ✅ 2026-03-27
+  - createSelfExclusionRequest() 方法
+  - 冷靜期計算邏輯（24_HOURS, 7_DAYS, 30_DAYS, 6_MONTHS, PERMANENT）
+  - 時間戳操作輔助方法
+
+- [x] **Priority 3**: 創建 SelfExclusionJourneyIntegrationTest ✅ 2026-03-27
+  - 10 個測試方法（600+ 行）
+  - 審計追蹤驗證邏輯（7 種操作類型）
+  - 時間操作策略（數據庫 UPDATE 修改 coolingOffPeriodEnd）
+
+- [x] **Priority 4**: 調試與修復 ✅ 2026-03-27
+  - 修復 BOOLEAN vs SMALLINT 類型衝突（統一使用 BOOLEAN）
+  - 修復 PostgreSQL JSONB TypeHandler 問題（創建 PostgresJsonbTypeHandler）
+  - 修復 MyBatis Plus null 更新問題（使用 LambdaUpdateWrapper.set()）
+  - 修復外鍵約束違規（添加 self-exclusion 表清理）
+  - 所有 10 個測試通過 ✅
+
+- [x] **Priority 5**: 覆蓋率驗證 ✅ 2026-03-27
+  - 生成 JaCoCo 覆蓋率報告
+  - Player integration package: 85% 覆蓋率 ✅ (超過 80% 要求)
+  - 審計追蹤完整性驗證（7 種操作類型記錄）
 
 **完成標準**:
-- [ ] Integration Tests 通過（預估 8-10 個測試）
-- [ ] 限制執行準確性驗證
-- [ ] 合規性驗證
+- [x] 所有 10 個測試通過（100% 通過率）✅
+- [x] JaCoCo 覆蓋率 >= 80% ✅ (實際 85%)
+  - SelfExclusionRequestService: 3/3 方法
+  - SelfExclusionEnforcementService: 5/5 方法
+  - SelfExclusionReviewService: 4/4 方法
+- [x] 審計追蹤驗證（7 種操作類型完整記錄）✅
+- [x] 無數據庫約束違規 ✅
+- [x] 測試執行時間 < 60 秒 ✅ (實際 ~7.5 秒)
 
-**預計時間**: 3-4 小時
+**技術挑戰與解決方案**:
+1. **時間模擬**: ✅ 使用數據庫時間戳操作（UPDATE t_self_exclusion_request SET cooling_off_period_end = ...）
+2. **冷靜期測試**: ✅ 快進 coolingOffPeriodEnd 到過去時間（模擬冷靜期結束）
+3. **審計追蹤**: ✅ 驗證每次狀態轉換都有對應的 history 記錄（7 種操作類型）
+4. **BOOLEAN vs SMALLINT**: ✅ 統一使用 PostgreSQL BOOLEAN 類型（修正 D03 規則）
+5. **JSONB TypeHandler**: ✅ 創建 PostgresJsonbTypeHandler（使用 PGobject）
+6. **MyBatis Plus null 更新**: ✅ 使用 LambdaUpdateWrapper.set(field, null) 明確設置 null
+7. **FK 約束清理**: ✅ 添加 self-exclusion 表清理到 BaseIntegrationTest
 
-**Status**: pending
+**預計時間**: 4 小時
+
+**實際時間**: ~6 小時（包含型別系統修正和 TypeHandler 創建）
+
+**Status**: ✅ completed - 2026-03-27
+
+**Git 提交**: 待提交 (Phase 9 完成後)
+
+**Phase 9 Complete**: ✅ All tests passed (10/10), coverage 85% (exceeds 80% requirement)
+
+**備註**:
+- 測試文件：`SelfExclusionJourneyIntegrationTest.java` (600+ 行)
+- TypeHandler：`PostgresJsonbTypeHandler.java` (68 行，支持 JSONB 序列化/反序列化)
+- 遷移腳本：`V016__create_self_exclusion_tables.sql` (192 行)
+- 測試工具擴展：`PlayerRegistrationTestFixture.createSelfExclusionRequest()` (38 行)
+- 清理邏輯：`BaseIntegrationTest` 添加 self-exclusion 表清理（8 行）
+- 型別標準修正：統一項目使用 BOOLEAN（非 SMALLINT）
 
 ---
 

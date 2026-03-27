@@ -318,6 +318,17 @@ public abstract class BaseIntegrationTest {
         jdbcTemplate.update("DELETE FROM t_player_vip_history WHERE tenant_id = 1");
     System.out.println("[@AfterEach] Deleted " + vipHistoryDeleted + " VIP history records");
 
+    // Self-Exclusion tables cleanup (Phase 9)
+    int selfExclusionHistoryDeleted =
+        jdbcTemplate.update("DELETE FROM t_self_exclusion_history WHERE tenant_id = 1");
+    System.out.println(
+        "[@AfterEach] Deleted " + selfExclusionHistoryDeleted + " self-exclusion history records");
+
+    int selfExclusionRequestDeleted =
+        jdbcTemplate.update("DELETE FROM t_self_exclusion_request WHERE tenant_id = 1");
+    System.out.println(
+        "[@AfterEach] Deleted " + selfExclusionRequestDeleted + " self-exclusion requests");
+
     // Finally clean up players (parent table)
     int playersDeleted = playerDao.delete(new LambdaQueryWrapper<PlayerEntity>());
     System.out.println("[@AfterEach] Deleted " + playersDeleted + " players");
