@@ -1,14 +1,17 @@
 {
-  "extraKnownMarketplaces": {
-    "everything-claude-code": {
-      "source": {
-        "source": "github",
-        "repo": "affaan-m/everything-claude-code"
-      }
-    }
-  },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
-    "everything-claude-code@everything-claude-code": true
+    "skill-creator@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "context7-plugin@context7-marketplace": true,
+    "jdtls-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true
   }
 }

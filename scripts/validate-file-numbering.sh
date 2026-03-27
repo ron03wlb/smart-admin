@@ -58,6 +58,14 @@ while IFS= read -r file; do
         if [[ "$file" =~ \.templates/ ]]; then
             continue
         fi
+        # 允許 .claude/ 目錄 (skills, agents, knowledge files)
+        if [[ "$file" =~ \.claude/ ]]; then
+            continue
+        fi
+        # 允許 .agent/ 目錄
+        if [[ "$file" =~ \.agent/ ]]; then
+            continue
+        fi
         # 允許根目錄特殊文件
         if [[ "$filename" =~ ^SSOT ]]; then
             continue

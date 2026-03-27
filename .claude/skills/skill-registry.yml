@@ -1,16 +1,21 @@
 # ====================================================================
-# SmartAdmin Skills Registry v4.0.0
+# SmartAdmin Skills Registry v5.0.0
 # ====================================================================
 # Purpose: Central metadata registry for all SmartAdmin skills
 # Status: Single Source of Truth (SSOT) for skill discovery and routing
-# Last Updated: 2026-03-07
-# Changes: v4.0.0 - Optimization: 37 → 17 skills (54% reduction)
+# Last Updated: 2026-03-27
+# Changes: v5.0.0 - Streamlined: 15 → 12 skills
+#   - Removed: concurrency-safety-auditor (SpotBugs covers 90%)
+#   - Merged: spring-pattern-checker + naming-convention-checker → archunit-test-generator/knowledge
+#   - Downgraded: security-hardening-pro P0→P2, postgresql-best-practices P1→P2
+#   - Moved: security-hardening-pro foundation/backend → extended/quality
+#   - Moved: smartadmin-react-crud P0→P1
 # ====================================================================
 
-version: "4.0.0"
-last_updated: "2026-03-07"
-total_skills: 15
-active_skills: 15
+version: "5.0.0"
+last_updated: "2026-03-27"
+total_skills: 12
+active_skills: 12
 deprecated_skills: 0
 
 # ====================================================================
@@ -26,7 +31,7 @@ conflict_resolution:
     - igaming: 2 skills (igaming-pm-analyst, igaming-feature-builder)
 
 # ====================================================================
-# Foundation Skills (P0 - Critical) - 7 skills
+# Foundation Skills (P0 - Critical) - 5 skills
 # ====================================================================
 skills:
   archunit-test-generator:
@@ -36,17 +41,7 @@ skills:
     category: "backend"
     aliases: ["archunit", "arch-test"]
     status: "stable"
-    description: "Generate ArchUnit tests to enforce architecture rules"
-    depends_on: []
-
-  security-hardening-pro:
-    path: "foundation/backend/security-hardening-pro"
-    priority: "P0"
-    type: "atomic"
-    category: "backend"
-    aliases: ["security", "hardening"]
-    status: "stable"
-    description: "Implement security best practices (SM2/SM3/SM4, data masking, XSS/CSRF protection)"
+    description: "Generate ArchUnit tests to enforce architecture rules (includes merged Spring pattern + naming convention rules)"
     depends_on: []
 
   vavr-refactoring-assistant:
@@ -90,19 +85,8 @@ skills:
     description: "Generate test data builders for complex domain objects"
     depends_on: []
 
-  smartadmin-react-crud:
-    path: "foundation/frontend/smartadmin-react-crud"
-    priority: "P0"
-    type: "atomic"
-    category: "frontend"
-    aliases: ["react-crud", "gen-react-crud"]
-    status: "stable"
-    description: "Generate React 19 CRUD modules (List + Form + API + Tests) with TypeScript, Ant Design 5"
-    phases: ["phase-1-types", "phase-2-api-client", "phase-3-list-component", "phase-4-form-modal", "phase-5-tests"]
-    depends_on: []
-
 # ====================================================================
-# Extended Skills (P1 - Important) - 8 skills
+# Extended Skills (P1 - Important) - 4 skills
 # ====================================================================
 
   # Domain Skills
@@ -137,36 +121,20 @@ skills:
     description: "Generate LiteFlow rule DSL (EL expressions and QLExpress scripts) for business workflows"
     depends_on: []
 
-  # Quality Skills
-  concurrency-safety-auditor:
-    path: "extended/quality/concurrency-safety-auditor"
+  smartadmin-react-crud:
+    path: "foundation/frontend/smartadmin-react-crud"
     priority: "P1"
     type: "atomic"
-    category: "quality"
-    aliases: ["concurrency-audit", "thread-safety-check"]
+    category: "frontend"
+    aliases: ["react-crud", "gen-react-crud"]
     status: "stable"
-    description: "Concurrency safety audit with 8 patterns and risk rating system"
+    description: "Generate React 19 CRUD modules (List + Form + API + Tests) with TypeScript, Ant Design 5"
+    phases: ["phase-1-types", "phase-2-api-client", "phase-3-list-component", "phase-4-form-modal", "phase-5-tests"]
     depends_on: []
 
-  spring-pattern-checker:
-    path: "extended/quality/spring-pattern-checker"
-    priority: "P1"
-    type: "atomic"
-    category: "quality"
-    aliases: ["spring", "spring-validation"]
-    status: "stable"
-    description: "Validate Spring patterns: @Transactional placement, dependency injection, layered architecture"
-    depends_on: []
-
-  naming-convention-checker:
-    path: "extended/quality/naming-convention-checker"
-    priority: "P1"
-    type: "atomic"
-    category: "quality"
-    aliases: ["naming-check", "naming"]
-    status: "stable"
-    description: "Validate SmartAdmin naming conventions (singular table names, class naming, field naming)"
-    depends_on: []
+# ====================================================================
+# Extended Skills (P1 - Quality) - 1 skill
+# ====================================================================
 
   smartadmin-manager-extractor:
     path: "extended/quality/smartadmin-manager-extractor"
@@ -178,9 +146,23 @@ skills:
     description: "Auto-extract @Transactional methods to Manager layer, fix ArchUnit violations (83% time saving)"
     depends_on: []
 
+# ====================================================================
+# Extended Skills (P2 - On-Demand) - 2 skills
+# ====================================================================
+
+  security-hardening-pro:
+    path: "extended/quality/security-hardening-pro"
+    priority: "P2"
+    type: "atomic"
+    category: "quality"
+    aliases: ["security", "hardening"]
+    status: "stable"
+    description: "SM2/SM3/SM4 cryptography, data masking, XSS/CSRF protection (on-demand)"
+    depends_on: []
+
   postgresql-best-practices:
     path: "extended/quality/postgresql-best-practices"
-    priority: "P1"
+    priority: "P2"
     type: "atomic"
     category: "quality"
     aliases: ["postgres-analyze", "database-performance"]
@@ -193,7 +175,7 @@ skills:
 # ====================================================================
 categories:
   backend:
-    skills: [archunit-test-generator, security-hardening-pro, vavr-refactoring-assistant]
+    skills: [archunit-test-generator, vavr-refactoring-assistant]
   frontend:
     skills: [smartadmin-react-crud]
   full-stack:
@@ -203,4 +185,4 @@ categories:
   domain:
     skills: [igaming-pm-analyst, igaming-feature-builder, liteflow-rule-builder]
   quality:
-    skills: [concurrency-safety-auditor, spring-pattern-checker, naming-convention-checker, smartadmin-manager-extractor, postgresql-best-practices]
+    skills: [smartadmin-manager-extractor, security-hardening-pro, postgresql-best-practices]

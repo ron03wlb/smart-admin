@@ -1,19 +1,9 @@
 {
   "$schema": "skill-aliases-schema",
   "description": "Skill alias mappings for shorthand invocation",
-  "version": "2.0.0",
-  "last_updated": "2026-03-07",
+  "version": "3.0.0",
+  "last_updated": "2026-03-27",
   "aliases": {
-    "spring": {
-      "redirect_to": "spring-pattern-checker",
-      "args": "",
-      "reason": "Shorthand alias"
-    },
-    "naming": {
-      "redirect_to": "naming-convention-checker",
-      "args": "",
-      "reason": "Shorthand alias"
-    },
     "crud": {
       "redirect_to": "smartadmin-crud-generator",
       "args": "",
