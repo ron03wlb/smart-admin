@@ -66,6 +66,10 @@ while IFS= read -r file; do
         if [[ "$file" =~ \.agent/ ]]; then
             continue
         fi
+        # 允許 .specs/ 目錄 (OpenSpec templates and configs)
+        if [[ "$file" =~ \.specs/ ]]; then
+            continue
+        fi
         # 允許根目錄特殊文件
         if [[ "$filename" =~ ^SSOT ]]; then
             continue

@@ -30,10 +30,30 @@
     ],
     "Stop": [
       {
+        "name": "Architecture Validation",
+        "description": "Validates SmartAdmin layered architecture rules using ArchUnit",
         "hooks": [{
           "type": "command",
-          "command": "cd smart-admin-api-java21-springboot3 && echo '--- ArchUnit Test ---' && ./gradlew :smartadmin-app:test --tests ArchitectureTest -q 2>&1 | tail -5",
+          "command": "cd smart-admin-api-java21-springboot3 && echo '========================================' && echo 'Phase 1: ArchUnit Architecture Test' && echo '========================================' && ./gradlew :smartadmin-app:test --tests ArchitectureTest -q 2>&1 | tail -10",
           "timeout": 120000
+        }]
+      },
+      {
+        "name": "OpenSpec Compliance Check",
+        "description": "Validates specs against SmartAdmin requirements",
+        "hooks": [{
+          "type": "command",
+          "command": "if [ -d .specs ] && command -v openspec >/dev/null 2>&1; then echo '========================================' && echo 'Phase 2: OpenSpec Validation' && echo '========================================' && (openspec validate --specs 2>&1 | grep -v 'telemetry' || echo 'INFO: No specs to validate'); else echo 'INFO: OpenSpec not initialized (skip validation)'; fi",
+          "timeout": 30000
+        }]
+      },
+      {
+        "name": "Quality Gate Summary",
+        "description": "Displays comprehensive test coverage and quality metrics",
+        "hooks": [{
+          "type": "command",
+          "command": "cd smart-admin-api-java21-springboot3 && echo '========================================' && echo 'Phase 3: Quality Gate Summary' && echo '========================================' && echo 'Running comprehensive tests...' && ./gradlew :smartadmin-app:test -q 2>&1 | grep -E '(BUILD|test|SUCCESS|FAILED)' | tail -5 && echo '' && echo 'Test Coverage Report:' && (./gradlew :smartadmin-app:jacocoTestReport -q 2>&1 && find smartadmin-app/build/reports/jacoco/test -name 'index.html' -exec echo 'Coverage report: {}' \\;) || echo 'Coverage report generation skipped'",
+          "timeout": 180000
         }]
       }
     ]

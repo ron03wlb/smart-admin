@@ -1,0 +1,30 @@
+{
+  "specDir": ".specs",
+  "templateDir": ".specs/templates",
+  "stages": {
+    "proposed": ".specs/proposed",
+    "applied": ".specs/applied",
+    "archived": ".specs/archived"
+  },
+  "validation": {
+    "requireApproval": true,
+    "approvers": ["team-lead", "architect"],
+    "requiredSections": [
+      "Executive Summary",
+      "SmartAdmin Architecture Mapping",
+      "Database Schema",
+      "Test Strategy",
+      "Acceptance Criteria"
+    ]
+  },
+  "integrations": {
+    "github": {
+      "enabled": false,
+      "repo": "your-org/smart-admin"
+    },
+    "hooks": {
+      "preApply": "./scripts/validate-spec.sh",
+      "postApply": "./scripts/notify-team.sh"
+    }
+  }
+}
