@@ -36,7 +36,7 @@ export interface TagNavItem {
   fixed?: boolean;
 }
 
-interface TagNavState {
+export interface TagNavState {
   /** 標籤列表 */
   tags: TagNavItem[];
 
@@ -239,6 +239,11 @@ export const selectTagClosable = (path: string) => (state: RootState) => {
   const tag = state.tagNav.tags.find(t => t.path === path);
   return tag ? !tag.fixed : false;
 };
+
+/** Aliases for backward compatibility */
+export const selectTagList = selectTags;
+export const selectActiveKey = selectActiveTagPath;
+export const { setActiveKey } = { setActiveKey: tagNavSlice.actions.setActiveTag };
 
 // ==================== Reducer ====================
 

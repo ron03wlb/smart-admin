@@ -66,16 +66,7 @@ const TagNav: React.FC = () => {
     const menuItem = findMenuByPath(menuTree, path);
     const title = menuItem?.menuName || path.split('/').pop() || path;
 
-    dispatch(
-      addTag({
-        tag: {
-          path,
-          title,
-          icon: menuItem?.icon,
-        },
-        fromPath: undefined,
-      })
-    );
+    dispatch(addTag({ path, title }));
   }, [location.pathname, dispatch, menuTree]);
 
   // Click tab to switch page

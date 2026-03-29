@@ -9,7 +9,7 @@ import { Form, message } from 'antd';
 import type { FormInstance } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/store/hooks';
-import { setUserLoginInfo } from '@/store/slices/userSlice';
+import { setUserInfo } from '@/store/slices/userSlice';
 import {
   getCaptcha,
   login,
@@ -170,7 +170,7 @@ export function useLoginForm(): UseLoginFormReturn {
 
         stopRefreshInterval();
         localSave(LocalStorageKey.USER_TOKEN, res.data.token);
-        dispatch(setUserLoginInfo(res.data));
+        dispatch(setUserInfo(res.data));
 
         if (res.data.tenantId) {
           localSave(LocalStorageKey.TENANT_ID, res.data.tenantId);

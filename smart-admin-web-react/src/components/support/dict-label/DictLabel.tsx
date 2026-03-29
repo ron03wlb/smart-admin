@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { useAppSelector } from '@/store/hooks';
-import { getDictLabel } from '@/store/slices/dictSlice';
+import { selectDictLabel } from '@/store/slices/dictSlice';
 
 interface DictLabelProps {
   dictCode: string;
@@ -14,8 +14,7 @@ interface DictLabelProps {
 }
 
 const DictLabel: React.FC<DictLabelProps> = ({ dictCode, dataValue }) => {
-  const dictMap = useAppSelector((state) => state.dict.dictMap);
-  const label = getDictLabel(dictMap, dictCode, dataValue);
+  const label = useAppSelector((state) => selectDictLabel(state, dictCode, dataValue));
   return <span>{label}</span>;
 };
 

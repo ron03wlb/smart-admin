@@ -8,12 +8,24 @@ import { useMemo } from 'react';
 import { useRoutes, Navigate } from 'react-router-dom';
 import type { RouteObject } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
-import { selectIsLoggedIn, selectMenuRouterList } from '@/store/slices/userSlice';
+import { selectIsLoggedIn, selectMenuTree } from '@/store/slices/userSlice';
 import { buildDynamicRoutes } from '@/utils/routeBuilder';
+import type { MenuItem } from '@/types/menu';
+
+function flattenMenuTree(tree: MenuItem[]): MenuItem[] {
+  const result: MenuItem[] = [];
+  for (const item of tree) {
+    result.push(item);
+    if (item.children && item.children.length > 0) {
+      result.push(...flattenMenuTree(item.children));
+    }
+  }
+  return result;
+}
 import Login from '@/views/Login';
 import Login2 from '@/views/Login2/Login2';
 import Login3 from '@/views/Login3/Login3';
-import Home from '@/views/Home';
+import Home from '@/views/home';
 import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -24,11 +36,11 @@ import ProtectedRoute from './ProtectedRoute';
  */
 export default function AppRoutes() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const menuRouterList = useAppSelector(selectMenuRouterList);
+  const menuTree = useAppSelector(selectMenuTree);
 
   const routes: RouteObject[] = useMemo(() => {
     // 從後端菜單列表生成動態路由
-    const dynamicRoutes = buildDynamicRoutes(menuRouterList);
+    const dynamicRoutes = buildDynamicRoutes(flattenMenuTree(menuTree));
 
     return [
       // 登入頁（公開）
@@ -77,7 +89,7 @@ export default function AppRoutes() {
         element: isLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />,
       },
     ];
-  }, [isLoggedIn, menuRouterList]);
+  }, [isLoggedIn, menuTree]);
 
   return useRoutes(routes);
 }

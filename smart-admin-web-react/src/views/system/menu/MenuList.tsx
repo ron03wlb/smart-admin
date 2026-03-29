@@ -16,7 +16,7 @@ import MenuOperateDrawer from './MenuOperateDrawer';
 /** Build tree from flat menu list */
 function buildMenuTree(menuList: MenuItem[]): MenuItem[] {
   const idSet = new Set(menuList.map((m) => m.menuId));
-  const map = new Map<string, MenuItem & { children?: MenuItem[] }>();
+  const map = new Map<string | number, MenuItem & { children?: MenuItem[] }>();
 
   for (const item of menuList) {
     map.set(item.menuId, { ...item, children: [] });
@@ -62,7 +62,7 @@ const MenuList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentMenu, setCurrentMenu] = useState<MenuItem | undefined>();
-  const [parentForAdd, setParentForAdd] = useState<{ parentId: string; menuType: number } | undefined>();
+  const [parentForAdd, setParentForAdd] = useState<{ parentId: string | number; menuType: number } | undefined>();
 
   const queryMenus = useCallback(async () => {
     setLoading(true);
@@ -106,7 +106,7 @@ const MenuList: React.FC = () => {
     setDrawerOpen(true);
   };
 
-  const handleDelete = (menuId: string) => {
+  const handleDelete = (menuId: string | number) => {
     Modal.confirm({
       title: '提示',
       content: '确定要删除该菜单么？',

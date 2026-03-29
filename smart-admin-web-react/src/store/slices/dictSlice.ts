@@ -24,7 +24,7 @@ import { DICT_SPLIT } from '@/constants/support/dictConst';
 
 // ==================== State Interface ====================
 
-interface DictState {
+export interface DictState {
   /**
    * 字典代碼列表
    * 用於顯示所有可用的字典

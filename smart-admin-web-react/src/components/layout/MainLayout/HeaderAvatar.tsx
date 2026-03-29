@@ -6,7 +6,8 @@
  */
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '@/store/hooks';
 import { Dropdown, Avatar } from 'antd';
 import type { MenuProps } from 'antd';
 import { UserOutlined, LockOutlined, LogoutOutlined } from '@ant-design/icons';
@@ -16,7 +17,7 @@ import ChangePasswordModal from './ChangePasswordModal';
 
 const HeaderAvatar: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const employeeName = useSelector(selectEmployeeName);
   const [pwdModalVisible, setPwdModalVisible] = useState(false);
 

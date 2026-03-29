@@ -105,7 +105,7 @@ function findMenuIdByPath(menuList: MenuItem[], pathname: string): string {
     if (menu.path) {
       const menuPath = (menu.path.startsWith('/') ? menu.path : `/${menu.path}`).replace(/\/$/, '');
       if (normalizedPath === menuPath) {
-        return menu.menuId;
+        return String(menu.menuId);
       }
     }
   }
@@ -126,7 +126,7 @@ function getParentKeys(menuList: MenuItem[], targetId: string): string[] {
 
       if (menu.children && menu.children.length > 0) {
         if (findParents(menu.children, targetId)) {
-          parentKeys.unshift(menu.menuId);
+          parentKeys.unshift(String(menu.menuId));
           return true;
         }
       }

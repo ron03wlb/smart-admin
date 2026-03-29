@@ -26,16 +26,16 @@ export enum MenuTypeEnum {
  */
 export interface MenuItem {
   /** 菜單ID */
-  menuId: number;
+  menuId: number | string;
 
   /** 菜單名稱 */
   menuName: string;
 
   /** 菜單類型（1目錄 2菜單 3功能點） */
-  menuType: MenuTypeEnum;
+  menuType: MenuTypeEnum | string;
 
   /** 父菜單ID */
-  parentId: number;
+  parentId: number | string;
 
   /** 排序號 */
   sort: number;
@@ -66,6 +66,24 @@ export interface MenuItem {
 
   /** Web權限標識 */
   webPerms?: string;
+
+  /** 後端權限標識 */
+  apiPerms?: string;
+
+  /** 是否為外鏈 iframe */
+  frameFlag?: boolean;
+
+  /** 外鏈地址 */
+  frameUrl?: string;
+
+  /** 是否已刪除 */
+  deletedFlag?: boolean;
+
+  /** 權限類型 */
+  permsType?: number;
+
+  /** 關聯菜單 ID */
+  contextMenuId?: number;
 }
 
 /**
@@ -73,7 +91,7 @@ export interface MenuItem {
  */
 export interface PermissionPoint {
   /** 菜單ID */
-  menuId: number;
+  menuId: number | string;
 
   /** Web權限標識 */
   webPerms: string;

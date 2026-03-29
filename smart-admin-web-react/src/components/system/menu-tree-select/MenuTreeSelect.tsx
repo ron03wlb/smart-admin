@@ -19,7 +19,7 @@ interface MenuTreeSelectProps {
 
 /** Build tree from flat menu list */
 function buildMenuTree(menuList: (MenuItem & { disabled?: boolean })[]): any[] {
-  const map = new Map<string, any>();
+  const map = new Map<string | number, any>();
   const roots: any[] = [];
 
   for (const item of menuList) {

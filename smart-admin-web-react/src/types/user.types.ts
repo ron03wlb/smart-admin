@@ -5,6 +5,9 @@
  * @date 2026-03-04
  */
 
+import type { MenuItem } from '@/types/menu';
+export type { MenuItem } from '@/types/menu';
+
 /**
  * 菜單功能點（權限點）
  *
@@ -34,62 +37,6 @@ export interface MenuPoint {
 
   /** 關聯菜單 ID */
   contextMenuId?: string;
-}
-
-/**
- * 菜單項（用於菜單樹）
- */
-export interface MenuItem {
-  /** 菜單 ID */
-  menuId: string;
-
-  /** 菜單名稱 */
-  menuName: string;
-
-  /** 菜單類型（CATALOG: 目錄, MENU: 菜單, POINTS: 功能點） */
-  menuType: string;
-
-  /** 路由路徑 */
-  path?: string;
-
-  /** 組件路徑（如 /system/employee/employee-list.vue） */
-  component?: string;
-
-  /** 圖標 */
-  icon?: string;
-
-  /** 父菜單 ID（0 為頂級） */
-  parentId?: string;
-
-  /** 排序 */
-  sort?: number;
-
-  /** 是否可見 */
-  visibleFlag: boolean;
-
-  /** 是否禁用 */
-  disabledFlag: boolean;
-
-  /** 是否緩存（keep-alive） */
-  cacheFlag?: boolean;
-
-  /** 是否為外鏈 iframe */
-  frameFlag?: boolean;
-
-  /** 外鏈地址 */
-  frameUrl?: string;
-
-  /** 是否已刪除 */
-  deletedFlag?: boolean;
-
-  /** 前端權限標識 */
-  webPerms?: string;
-
-  /** 後端權限標識 */
-  apiPerms?: string;
-
-  /** 子菜單列表 */
-  children?: MenuItem[];
 }
 
 /**

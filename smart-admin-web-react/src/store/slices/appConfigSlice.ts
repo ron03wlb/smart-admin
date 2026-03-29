@@ -53,6 +53,9 @@ export const getInitializedLanguage = (): LanguageType => {
 
 const initialState: AppConfig = loadInitialState();
 
+/** Default config values — exported for test factories */
+export const APP_CONFIG_DEFAULTS = appDefaultConfig;
+
 const appConfigSlice = createSlice({
   name: 'appConfig',
   initialState,
@@ -263,3 +266,18 @@ export const {
 } = appConfigSlice.actions;
 
 export default appConfigSlice.reducer;
+
+// ==================== Selectors ====================
+import type { RootState } from '../index';
+export const selectLayout = (state: RootState) => state.appConfig.layout;
+export const selectDarkMode = (state: RootState) => state.appConfig.darkModeFlag;
+export const selectLanguage = (state: RootState) => state.appConfig.language;
+export const selectPageTagFlag = (state: RootState) => state.appConfig.pageTagFlag;
+export const selectBreadCrumbFlag = (state: RootState) => state.appConfig.breadCrumbFlag;
+export const selectFooterFlag = (state: RootState) => state.appConfig.footerFlag;
+export const selectWatermarkFlag = (state: RootState) => state.appConfig.watermarkFlag;
+export const selectCompactFlag = (state: RootState) => state.appConfig.compactFlag;
+
+// ==================== Action Aliases ====================
+export const updateAppConfig = updateConfig;
+export const resetAppConfig = reset;

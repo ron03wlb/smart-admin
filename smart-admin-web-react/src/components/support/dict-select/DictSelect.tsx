@@ -44,7 +44,7 @@ const DictSelect: React.FC<DictSelectProps> = ({
   const options = useMemo(() => {
     const dictData = dictMap[dictCode] ?? [];
     return dictData
-      .filter((item) => !item.disabledFlag && !hiddenOption.includes(item.dataValue))
+      .filter((item) => !item.dictDisabledFlag && !hiddenOption.includes(item.dataValue))
       .map((item) => ({
         label: item.dataLabel,
         value: item.dataValue,

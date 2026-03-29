@@ -27,7 +27,7 @@ import {
 
 // ==================== State 類型定義 ====================
 
-interface UserState {
+export interface UserState {
   /** JWT Token */
   token: string;
 
@@ -56,7 +56,7 @@ interface UserState {
   menuRouterList: string[];
 
   /** 菜單父ID映射表（用於麵包屑導航） */
-  menuParentIdListMap: Record<number, number[]>;
+  menuParentIdListMap: Record<string | number, (string | number)[]>;
 
   /** 未讀消息數量 */
   unreadMessageCount: number;
@@ -344,6 +344,8 @@ export const selectMenuParentIdListMap = (state: RootState) => state.user.menuPa
 export const selectAdministratorFlag = (state: RootState) => state.user.administratorFlag;
 export const selectUserLoading = (state: RootState) => state.user.loading;
 export const selectUserError = (state: RootState) => state.user.error;
+export const selectEmployeeName = (state: RootState) => state.user.employeeName;
+export const selectIsLoggedIn = (state: RootState) => !!state.user.token;
 
 // ==================== Actions ====================
 

@@ -168,9 +168,9 @@ export function buildMenuParentMap(
 
   function walk(list: MenuItem[], parents: Array<{ id: string; title: string }>): void {
     for (const menu of list) {
-      result[menu.menuId] = [...parents];
+      result[String(menu.menuId)] = [...parents];
       if (menu.children && menu.children.length > 0) {
-        walk(menu.children, [...parents, { id: menu.menuId, title: menu.menuName }]);
+        walk(menu.children, [...parents, { id: String(menu.menuId), title: menu.menuName }]);
       }
     }
   }

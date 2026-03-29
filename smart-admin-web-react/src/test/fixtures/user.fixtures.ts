@@ -40,21 +40,11 @@ export function createMockPermissions(permissionCodes: string[]): MenuPoint[] {
   return permissionCodes.map((code, index) => ({
     menuId: `${index + 1}`,
     menuName: `權限 ${code}`,
-    menuType: 'POINTS' as const,
     webPerms: code,
     visibleFlag: true,
     disabledFlag: false,
-    parentId: '0',
-    path: '',
-    component: '',
-    icon: '',
-    sort: index,
     permsType: 1,
     apiPerms: '',
-    frameSrc: '',
-    frameFlag: false,
-    cacheFlag: false,
-    contextMenuId: '',
   }));
 }
 
@@ -96,10 +86,9 @@ export function createMockMenuTree(
       sort: item.sort !== undefined ? item.sort : index,
       permsType: item.permsType || 1,
       apiPerms: item.apiPerms || '',
-      frameSrc: item.frameSrc || '',
       frameFlag: item.frameFlag || false,
       cacheFlag: item.cacheFlag || false,
-      contextMenuId: item.contextMenuId || '',
+      contextMenuId: item.contextMenuId,
     }));
   }
 
@@ -119,10 +108,10 @@ export function createMockMenuTree(
       sort: 1,
       permsType: 1,
       apiPerms: '',
-      frameSrc: '',
+
       frameFlag: false,
       cacheFlag: false,
-      contextMenuId: '',
+      contextMenuId: undefined,
     },
     {
       menuId: '2',
@@ -138,10 +127,10 @@ export function createMockMenuTree(
       sort: 1,
       permsType: 1,
       apiPerms: '',
-      frameSrc: '',
+
       frameFlag: false,
       cacheFlag: false,
-      contextMenuId: '',
+      contextMenuId: undefined,
     },
     {
       menuId: '3',
@@ -157,10 +146,10 @@ export function createMockMenuTree(
       sort: 2,
       permsType: 1,
       apiPerms: '',
-      frameSrc: '',
+
       frameFlag: false,
       cacheFlag: false,
-      contextMenuId: '',
+      contextMenuId: undefined,
     },
     {
       menuId: '4',
@@ -176,10 +165,10 @@ export function createMockMenuTree(
       sort: 1,
       permsType: 1,
       apiPerms: '',
-      frameSrc: '',
+
       frameFlag: false,
       cacheFlag: false,
-      contextMenuId: '',
+      contextMenuId: undefined,
     },
   ];
 }

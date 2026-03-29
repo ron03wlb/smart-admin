@@ -8,6 +8,9 @@ import io.vavr.control.Option;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.List;
+import net.lab1024.sa.common.core.domain.response.PageResult;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.common.core.tenant.TenantContext;
 import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
@@ -15,7 +18,9 @@ import net.lab1024.sa.igaming.activity.dao.PromotionRuleDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
 import net.lab1024.sa.igaming.activity.domain.entity.PromotionRuleEntity;
 import net.lab1024.sa.igaming.activity.domain.form.BonusClaimForm;
+import net.lab1024.sa.igaming.activity.domain.form.WageringProgressQueryForm;
 import net.lab1024.sa.igaming.activity.domain.vo.BonusClaimResultVO;
+import net.lab1024.sa.igaming.activity.domain.vo.PlayerBonusRecordVO;
 import net.lab1024.sa.igaming.activity.domain.vo.WageringProgressVO;
 import net.lab1024.sa.igaming.activity.manager.BonusDistributionManager;
 import net.lab1024.sa.igaming.activity.manager.PromotionCacheManager;
@@ -80,7 +85,8 @@ class BonusClaimServiceTest {
       record.setBonusAmount(new BigDecimal("100.00"));
       record.setWageringRequired(new BigDecimal("2000.00"));
       record.setStatus(BonusRecordStatusEnum.ACTIVE.getValue());
-      when(bonusDistributionManager.distributeBonus(eq(1L), eq(rule), eq("claim-001"), eq(1L)))
+      when(bonusDistributionManager.distributeBonus(
+              eq(1L), eq(rule), isNull(), eq("claim-001"), eq(1L)))
           .thenReturn(record);
 
       BonusClaimForm form = new BonusClaimForm();
@@ -148,7 +154,8 @@ class BonusClaimServiceTest {
     void claimBonus_maxClaims() {
       PromotionRuleEntity rule = buildRule();
       when(promotionCacheManager.getRuleByCode(1L, "FIRST100")).thenReturn(rule);
-      when(bonusDistributionManager.distributeBonus(eq(1L), eq(rule), eq("claim-001"), eq(1L)))
+      when(bonusDistributionManager.distributeBonus(
+              eq(1L), eq(rule), isNull(), eq("claim-001"), eq(1L)))
           .thenThrow(new IllegalStateException(ActivityErrorCode.MAX_CLAIMS_REACHED.getMsg()));
 
       BonusClaimForm form = new BonusClaimForm();
@@ -166,7 +173,8 @@ class BonusClaimServiceTest {
     void claimBonus_duplicate() {
       PromotionRuleEntity rule = buildRule();
       when(promotionCacheManager.getRuleByCode(1L, "FIRST100")).thenReturn(rule);
-      when(bonusDistributionManager.distributeBonus(eq(1L), eq(rule), eq("claim-dup"), eq(1L)))
+      when(bonusDistributionManager.distributeBonus(
+              eq(1L), eq(rule), isNull(), eq("claim-dup"), eq(1L)))
           .thenThrow(new DuplicateKeyException("Duplicate"));
 
       BonusClaimForm form = new BonusClaimForm();
@@ -245,6 +253,40 @@ class BonusClaimServiceTest {
 
       assertThat(result.isDefined()).isTrue();
       assertThat(result.get().getProgressPercent()).isEqualByComparingTo("100");
+    }
+  }
+
+  @Nested
+  @DisplayName("queryBonusRecords")
+  class QueryBonusRecordsTest {
+
+    @Test
+    @DisplayName("成功查詢分頁數據")
+    void queryBonusRecords_success() {
+      WageringProgressQueryForm form = new WageringProgressQueryForm();
+      form.setPageNum(1L);
+      form.setPageSize(10L);
+
+      List<PlayerBonusRecordVO> records = Collections.emptyList();
+      when(playerBonusRecordDao.queryPage(any(), any())).thenReturn(records);
+
+      ResponseDTO<PageResult<PlayerBonusRecordVO>> result =
+          bonusClaimService.queryBonusRecords(1L, form);
+
+      assertThat(result.getOk()).isTrue();
+      assertThat(result.getData()).isNotNull();
+      assertThat(result.getData().getList()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("租戶上下文為 null — 返回錯誤")
+    void queryBonusRecords_tenantNull() {
+      tenantContextMock.when(TenantContext::getTenantId).thenReturn(null);
+
+      ResponseDTO<PageResult<PlayerBonusRecordVO>> result =
+          bonusClaimService.queryBonusRecords(1L, new WageringProgressQueryForm());
+
+      assertThat(result.getOk()).isFalse();
     }
   }
 

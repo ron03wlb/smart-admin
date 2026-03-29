@@ -14,32 +14,33 @@
  */
 
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from '@/store/slices/userSlice';
+import userReducer, { type UserState } from '@/store/slices/userSlice';
 import menuReducer from '@/store/slices/menuSlice';
-import tagNavReducer from '@/store/slices/tagNavSlice';
+import tagNavReducer, { type TagNavState } from '@/store/slices/tagNavSlice';
 import appConfigReducer, { APP_CONFIG_DEFAULTS } from '@/store/slices/appConfigSlice';
-import dictReducer from '@/store/slices/dictSlice';
+import dictReducer, { type DictState } from '@/store/slices/dictSlice';
 import spinReducer from '@/store/slices/spinSlice';
 import tenantReducer from '@/store/slices/tenantSlice';
-import type { UserState } from '@/types/user.types';
 import type { MenuState } from '@/store/slices/menuSlice';
-import type { TagNavState } from '@/store/slices/tagNavSlice';
-import type { AppConfigState } from '@/types/app-config.types';
-import type { DictState } from '@/store/slices/dictSlice';
+import type { AppConfig } from '@/types/appConfig';
 import type { SpinState } from '@/store/slices/spinSlice';
-import type { TenantState } from '@/store/slices/tenantSlice';
+import type { TenantState } from '@/types/tenant';
 
 export function createMockUserState(overrides?: Partial<UserState>): UserState {
   return {
     token: 'test-token',
     employeeId: 'test-employee-id',
     employeeName: 'Test User',
+    loginName: 'test-user',
     administratorFlag: false,
     pointsList: [],
     menuTree: [],
+    displayMenuTree: [],
     menuRouterList: [],
-    departmentId: undefined,
-    departmentName: undefined,
+    menuParentIdListMap: {},
+    unreadMessageCount: 0,
+    loading: false,
+    error: null,
     ...overrides,
   };
 }
@@ -55,13 +56,15 @@ export function createMockMenuState(overrides?: Partial<MenuState>): MenuState {
 
 export function createMockTagNavState(overrides?: Partial<TagNavState>): TagNavState {
   return {
-    tagList: [],
-    activeKey: '',
+    tags: [{ path: '/home', title: '首頁', fixed: true }],
+    activeTagPath: '/home',
+    keepAliveEnabled: true,
+    cachedPaths: ['/home'],
     ...overrides,
   };
 }
 
-export function createMockAppConfigState(overrides?: Partial<AppConfigState>): AppConfigState {
+export function createMockAppConfigState(overrides?: Partial<AppConfig>): AppConfig {
   return {
     ...APP_CONFIG_DEFAULTS,
     ...overrides,
@@ -72,6 +75,9 @@ export function createMockDictState(overrides?: Partial<DictState>): DictState {
   return {
     dictList: [],
     dictMap: {},
+    loading: false,
+    error: null,
+    lastUpdated: null,
     ...overrides,
   };
 }
@@ -99,7 +105,7 @@ export interface TestStorePreloadedState {
   user?: Partial<UserState>;
   menu?: Partial<MenuState>;
   tagNav?: Partial<TagNavState>;
-  appConfig?: Partial<AppConfigState>;
+  appConfig?: Partial<AppConfig>;
   dict?: Partial<DictState>;
   spin?: Partial<SpinState>;
   tenant?: Partial<TenantState>;
@@ -113,7 +119,7 @@ export function createTestStore(overrides?: TestStorePreloadedState | Partial<Us
   let userOverrides: Partial<UserState> = {};
   let menuOverrides: Partial<MenuState> = {};
   let tagNavOverrides: Partial<TagNavState> = {};
-  let appConfigOverrides: Partial<AppConfigState> = {};
+  let appConfigOverrides: Partial<AppConfig> = {};
   let dictOverrides: Partial<DictState> = {};
   let spinOverrides: Partial<SpinState> = {};
   let tenantOverrides: Partial<TenantState> = {};
@@ -144,6 +150,7 @@ export function createTestStore(overrides?: TestStorePreloadedState | Partial<Us
       spin: spinReducer,
       tenant: tenantReducer,
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     preloadedState: {
       user: createMockUserState(userOverrides),
       menu: createMockMenuState(menuOverrides),
@@ -152,6 +159,6 @@ export function createTestStore(overrides?: TestStorePreloadedState | Partial<Us
       dict: createMockDictState(dictOverrides),
       spin: createMockSpinState(spinOverrides),
       tenant: createMockTenantState(tenantOverrides),
-    },
+    } as any,
   });
 }

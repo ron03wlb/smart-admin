@@ -65,7 +65,8 @@ class BonusDistributionManagerTest {
           .thenReturn(txEntity);
 
       PlayerBonusRecordEntity result =
-          bonusDistributionManager.distributeBonus(1L, rule, "claim-001", 1L);
+          bonusDistributionManager.distributeBonus(
+              1L, rule, new BigDecimal("100.00"), "claim-001", 1L);
 
       assertThat(result).isNotNull();
       assertThat(result.getBonusAmount()).isEqualByComparingTo("100.00");
@@ -83,7 +84,10 @@ class BonusDistributionManagerTest {
           .when(playerBonusRecordDao)
           .insert(any(PlayerBonusRecordEntity.class));
 
-      assertThatThrownBy(() -> bonusDistributionManager.distributeBonus(1L, rule, "claim-dup", 1L))
+      assertThatThrownBy(
+              () ->
+                  bonusDistributionManager.distributeBonus(
+                      1L, rule, new BigDecimal("100.00"), "claim-dup", 1L))
           .isInstanceOf(DuplicateKeyException.class);
     }
 
@@ -93,7 +97,10 @@ class BonusDistributionManagerTest {
       PromotionRuleEntity rule = buildRule();
       when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 
-      assertThatThrownBy(() -> bonusDistributionManager.distributeBonus(1L, rule, "claim-002", 1L))
+      assertThatThrownBy(
+              () ->
+                  bonusDistributionManager.distributeBonus(
+                      1L, rule, new BigDecimal("100.00"), "claim-002", 1L))
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("BONUS wallet not found");
     }
@@ -106,6 +113,7 @@ class BonusDistributionManagerTest {
     rule.setPromotionCode("FIRST100");
     rule.setPromotionType(1);
     rule.setStatus(PromotionStatusEnum.ACTIVE.getValue());
+    rule.setBonusRate(new BigDecimal("1.00"));
     rule.setMaxBonus(new BigDecimal("100.00"));
     rule.setWageringMultiplier(new BigDecimal("20.00"));
     rule.setBonusExpiryDays(30);

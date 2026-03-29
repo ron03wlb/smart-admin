@@ -66,10 +66,10 @@ export function buildMenuChildren(parentMenu: MenuItem, allMenus: MenuItem[]): M
  * @param menuTree 菜單樹
  * @returns 父ID映射表
  */
-export function buildMenuParentIdListMap(menuTree: MenuItem[]): Record<number, number[]> {
-  const map: Record<number, number[]> = {};
+export function buildMenuParentIdListMap(menuTree: MenuItem[]): Record<string | number, (string | number)[]> {
+  const map: Record<string | number, (string | number)[]> = {};
 
-  const traverse = (menus: MenuItem[], parentIds: number[] = []) => {
+  const traverse = (menus: MenuItem[], parentIds: (string | number)[] = []) => {
     menus.forEach(menu => {
       // 當前菜單的所有父ID + 自身ID
       const currentPath = [...parentIds, menu.menuId];
