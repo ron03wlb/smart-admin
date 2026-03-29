@@ -26,6 +26,14 @@
           "command": "if echo $CLAUDE_TOOL_INPUT | grep -qiE '(DROP TABLE|TRUNCATE|DELETE FROM|ALTER TABLE.*DROP|rm -rf)'; then echo 'BLOCKED: Destructive operation detected' >&2; exit 2; fi",
           "timeout": 5000
         }]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [{
+          "type": "command",
+          "command": "if echo $CLAUDE_TOOL_INPUT | grep -qE 'git push.*(--force|-f)'; then echo 'BLOCKED: Force push is not allowed' >&2; exit 2; fi",
+          "timeout": 5000
+        }]
       }
     ],
     "Stop": [

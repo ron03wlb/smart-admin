@@ -1,0 +1,15 @@
+project: smart-admin-igaming
+language: Traditional Chinese
+spec_dir: .openspec/specs
+template:
+  requirements_style: GIVEN_WHEN_THEN
+  include_acceptance_criteria: true
+constraints:
+  - "Service 層必須使用 io.vavr.control.Option（非 java.util.Optional）"
+  - "@Transactional 僅允許在 Manager 層（Service/Controller 禁用）"
+  - "所有 DB 查詢必須包含 tenantId 過濾（多租戶隔離）"
+  - "布林欄位命名：deleted（非 isDeleted）"
+  - "依賴注入：@RequiredArgsConstructor + private final（禁止 @Autowired）"
+  - "API 回應統一使用 ResponseDTO.ok(data)"
+  - "分頁查詢使用 SmartPageUtil.convert2PageQuery(form)"
+  - "Bean 複製使用 SmartBeanUtil.copy(source, Target.class)"

@@ -70,6 +70,14 @@ while IFS= read -r file; do
         if [[ "$file" =~ \.specs/ ]]; then
             continue
         fi
+        # 允許 docs/workflow/ 目錄 (Claude Code 工作流程文件)
+        if [[ "$file" =~ docs/workflow/ ]]; then
+            continue
+        fi
+        # 允許 docs/superpowers/ 目錄 (Superpowers 設計規格)
+        if [[ "$file" =~ docs/superpowers/ ]]; then
+            continue
+        fi
         # 允許根目錄特殊文件
         if [[ "$filename" =~ ^SSOT ]]; then
             continue
