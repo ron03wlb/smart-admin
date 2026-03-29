@@ -1,11 +1,14 @@
 package net.lab1024.sa.igaming.activity.turnover.service;
 
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lab1024.sa.common.core.domain.response.ResponseDTO;
 import net.lab1024.sa.igaming.activity.turnover.domain.TurnoverContext;
 import net.lab1024.sa.support.liteflow.core.executor.SmartFlowExecutor;
+import net.lab1024.sa.support.liteflow.domain.form.LiteFlowChainAddForm;
+import net.lab1024.sa.support.liteflow.manager.LiteFlowChainManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,7 +39,40 @@ public class TurnoverCalculationService {
 
   private static final String CHAIN_CODE = "turnover_calculation_main";
 
+  private static final String CHAIN_EL =
+      "THEN(riskFilterNode, statusFactorNode, gameWeightNode, turnoverAggregateNode)";
+
   private final SmartFlowExecutor flowExecutor;
+  private final LiteFlowChainManager chainManager;
+
+  /**
+   * Initialize LiteFlow chain on application startup.
+   *
+   * <p>Attempts to reload existing chain. If not found, creates the default chain definition.
+   */
+  @PostConstruct
+  public void initializeChain() {
+    try {
+      flowExecutor.reloadRule();
+      log.info("LiteFlow chain '{}' already exists, skipping initialization", CHAIN_CODE);
+    } catch (RuntimeException e) {
+      log.info("LiteFlow chain '{}' not found, creating default definition", CHAIN_CODE);
+      LiteFlowChainAddForm form = new LiteFlowChainAddForm();
+      form.setChainName("Turnover Calculation Main Chain");
+      form.setChainCode(CHAIN_CODE);
+      form.setChainData(CHAIN_EL);
+      form.setRemark("Auto-initialized by TurnoverCalculationService");
+      ResponseDTO<String> result = chainManager.add(form, 0L, "SYSTEM");
+      if (result == null || !result.getOk()) {
+        log.error(
+            "Failed to initialize chain '{}': {}",
+            CHAIN_CODE,
+            result != null ? result.getMsg() : "null response");
+      } else {
+        log.info("LiteFlow chain '{}' initialized successfully", CHAIN_CODE);
+      }
+    }
+  }
 
   /**
    * Calculate turnover for a bet settlement.
