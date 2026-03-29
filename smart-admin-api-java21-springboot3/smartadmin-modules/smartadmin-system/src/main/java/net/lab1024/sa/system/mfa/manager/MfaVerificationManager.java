@@ -89,7 +89,9 @@ public class MfaVerificationManager {
     // Try backup code verification (8 digits)
     if (!verified && mfaToken.matches("^[0-9]{8}$")) {
       verified =
-          mfaBackupCodeManager.verifyBackupCode(employeeId, mfaToken, ipAddress).getOrElse(false);
+          mfaBackupCodeManager
+              .verifyBackupCodeTransaction(employeeId, mfaToken, ipAddress)
+              .getOrElse(false);
       verificationMethod = "BACKUP_CODE";
 
       if (verified) {
@@ -122,7 +124,7 @@ public class MfaVerificationManager {
     if (Boolean.TRUE.equals(trustDevice)) {
       String fingerprint = mfaTrustedDeviceManager.generateDeviceFingerprint(ipAddress, userAgent);
       mfaTrustedDeviceManager
-          .addTrustedDevice(employeeId, fingerprint, deviceName, ipAddress, userAgent)
+          .addTrustedDeviceTransaction(employeeId, fingerprint, deviceName, ipAddress, userAgent)
           .getOrElseThrow(e -> new RuntimeException("Failed to add trusted device", e));
 
       recordAuditLog(

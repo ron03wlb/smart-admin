@@ -97,7 +97,7 @@ public class MfaTrustedDeviceManager {
    * @return void
    */
   @Transactional(rollbackFor = Throwable.class)
-  public Try<Void> addTrustedDevice(
+  public Try<Void> addTrustedDeviceTransaction(
       Long employeeId,
       String deviceFingerprint,
       String deviceName,
@@ -149,7 +149,7 @@ public class MfaTrustedDeviceManager {
    * @return void
    */
   @Transactional(rollbackFor = Throwable.class)
-  public Try<Void> removeTrustedDevice(Long deviceId) {
+  public Try<Void> removeTrustedDeviceTransaction(Long deviceId) {
     return Try.run(
         () -> {
           MfaTrustedDeviceEntity entity = mfaTrustedDeviceDao.selectById(deviceId);

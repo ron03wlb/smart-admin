@@ -55,7 +55,7 @@ public class MfaBackupCodeManager {
    * @return List of 10 plaintext backup codes (8-digit strings)
    */
   @Transactional(rollbackFor = Throwable.class)
-  public Try<List<String>> generateBackupCodes(Long employeeId) {
+  public Try<List<String>> generateBackupCodesTransaction(Long employeeId) {
     return Try.of(
         () -> {
           // Soft delete all existing backup codes
@@ -100,7 +100,8 @@ public class MfaBackupCodeManager {
    * @return true if code is valid and unused, false otherwise
    */
   @Transactional(rollbackFor = Throwable.class)
-  public Try<Boolean> verifyBackupCode(Long employeeId, String plaintextCode, String ipAddress) {
+  public Try<Boolean> verifyBackupCodeTransaction(
+      Long employeeId, String plaintextCode, String ipAddress) {
     return Try.of(
         () -> {
           if (plaintextCode == null || plaintextCode.length() != BACKUP_CODE_LENGTH) {

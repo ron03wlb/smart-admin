@@ -80,7 +80,7 @@ public class MfaSetupManager {
     // Generate backup codes
     List<String> backupCodes =
         mfaBackupCodeManager
-            .generateBackupCodes(employeeId)
+            .generateBackupCodesTransaction(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to generate backup codes", e));
 
     // Update config to mark backup codes as generated
@@ -156,7 +156,7 @@ public class MfaSetupManager {
     // Generate new backup codes (automatically deletes old ones)
     List<String> backupCodes =
         mfaBackupCodeManager
-            .generateBackupCodes(employeeId)
+            .generateBackupCodesTransaction(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to regenerate backup codes", e));
 
     // Audit log
@@ -315,7 +315,7 @@ public class MfaSetupManager {
     // Generate backup codes
     List<String> backupCodes =
         mfaBackupCodeManager
-            .generateBackupCodes(employeeId)
+            .generateBackupCodesTransaction(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to generate backup codes", e));
 
     // Update config to mark backup codes as generated
@@ -326,7 +326,7 @@ public class MfaSetupManager {
     if (Boolean.TRUE.equals(trustDevice)) {
       String fingerprint = mfaTrustedDeviceManager.generateDeviceFingerprint(ipAddress, userAgent);
       mfaTrustedDeviceManager
-          .addTrustedDevice(employeeId, fingerprint, deviceName, ipAddress, userAgent)
+          .addTrustedDeviceTransaction(employeeId, fingerprint, deviceName, ipAddress, userAgent)
           .getOrElseThrow(e -> new RuntimeException("Failed to add trusted device", e));
     }
 
@@ -450,7 +450,7 @@ public class MfaSetupManager {
     // Generate new backup codes (automatically deletes old ones)
     List<String> backupCodes =
         mfaBackupCodeManager
-            .generateBackupCodes(employeeId)
+            .generateBackupCodesTransaction(employeeId)
             .getOrElseThrow(e -> new RuntimeException("Failed to regenerate backup codes", e));
 
     // Audit log

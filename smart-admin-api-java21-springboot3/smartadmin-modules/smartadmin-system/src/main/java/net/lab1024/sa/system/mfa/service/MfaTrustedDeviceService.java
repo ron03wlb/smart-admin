@@ -70,7 +70,7 @@ public class MfaTrustedDeviceService {
       String deviceName,
       String ipAddress,
       String userAgent) {
-    return mfaTrustedDeviceManager.addTrustedDevice(
+    return mfaTrustedDeviceManager.addTrustedDeviceTransaction(
         employeeId, deviceFingerprint, deviceName, ipAddress, userAgent);
   }
 
@@ -83,6 +83,6 @@ public class MfaTrustedDeviceService {
    * @return void
    */
   public Try<Void> removeTrustedDevice(Long deviceId) {
-    return mfaTrustedDeviceManager.removeTrustedDevice(deviceId);
+    return mfaTrustedDeviceManager.removeTrustedDeviceTransaction(deviceId);
   }
 }

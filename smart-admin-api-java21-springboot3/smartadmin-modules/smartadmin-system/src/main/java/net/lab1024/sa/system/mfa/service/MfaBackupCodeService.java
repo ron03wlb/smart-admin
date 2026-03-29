@@ -37,7 +37,7 @@ public class MfaBackupCodeService {
    * @return List of 10 plaintext backup codes (8-digit strings)
    */
   public Try<List<String>> generateBackupCodes(Long employeeId) {
-    return mfaBackupCodeManager.generateBackupCodes(employeeId);
+    return mfaBackupCodeManager.generateBackupCodesTransaction(employeeId);
   }
 
   /**
@@ -51,7 +51,7 @@ public class MfaBackupCodeService {
    * @return true if code is valid and unused, false otherwise
    */
   public Try<Boolean> verifyBackupCode(Long employeeId, String plaintextCode, String ipAddress) {
-    return mfaBackupCodeManager.verifyBackupCode(employeeId, plaintextCode, ipAddress);
+    return mfaBackupCodeManager.verifyBackupCodeTransaction(employeeId, plaintextCode, ipAddress);
   }
 
   /**
