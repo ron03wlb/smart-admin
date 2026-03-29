@@ -25,7 +25,7 @@ The `archunit-test-generator` skill has been validated against real SmartAdmin a
 
 ### Selection Criteria
 
-From `.agent/rules/`, identified rules without existing `archunit_test` frontmatter field:
+From `CLAUDE.md`, identified rules without existing `archunit_test` frontmatter field:
 
 | Rule File | Rule Description | Selection Reason |
 |-----------|------------------|------------------|
@@ -257,7 +257,7 @@ After removing violation files:
 ### Edge Case 1: Dual ArchitectureTest Files
 
 **Issue**: SmartAdmin has TWO `ArchitectureTest.java` files:
-- `.agent/configs/ArchitectureTest.java` (reference/template)
+- `CLAUDE.md` (reference/template)
 - `smartadmin-app/src/test/java/.../ArchitectureTest.java` (actual test)
 
 **Impact**: Initially edited wrong file (reference copy)
@@ -265,10 +265,7 @@ After removing violation files:
 **Resolution**: Skill documentation should clarify to edit the actual test file in `src/test/java`
 
 **Recommendation**: Add to skill's Step 2:
-```markdown
-**IMPORTANT**: Locate the ACTUAL test file (usually in src/test/java),
-not reference copies in .agent/configs/
-```
+```CLAUDE.md```
 
 ---
 
@@ -316,12 +313,7 @@ not reference copies in .agent/configs/
    ```markdown
    ### Step 2: Locate Actual Test File
 
-   ```bash
-   # Find all ArchitectureTest files
-   find . -name "ArchitectureTest.java" -type f
-
-   # Edit the one in src/test/java (NOT .agent/configs)
-   ```
+   ```CLAUDE.md```
    ```
 
 2. **Add Formatting Check** (Step 5)

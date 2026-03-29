@@ -18,17 +18,9 @@
 
 ## Part 1: Agent Selection
 
-### Unified Decision Center
+### Decision Center
 
-For complete agent routing, skill selection, and scenario-based decision trees, see:
-
-→ **[.agent/rules/00-INDEX.md](../../../.agent/rules/00-INDEX.md)** - Unified Decision Center
-
-**What you'll find there**:
-- Scenario-based rule routing (query keyword → rule file)
-- Skill selection logic (task type → recommended skill)
-- Agent orchestration (development scenario → agent workflow)
-- Complete keyword mapping
+For agent routing, skill selection, and constraints, see [CLAUDE.md](../../../CLAUDE.md).
 
 ---
 

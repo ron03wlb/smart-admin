@@ -17,7 +17,7 @@
 │   │   ├── technical-agent-mixin.md
 │   │   └── analysis-agent-mixin.md
 │   └── orchestration/             # Agent coordination
-│       ├── ../../.agent/rules/00-INDEX.md (→ moved to .agent/rules/00-INDEX.md)
+│       
 │       └── orchestration-playbook.md  # Unified: workflows + dependencies + handoffs
 ├── agents/                        # Individual agent definitions (8 agents)
 │   ├── java-architect.md          # Backend expert - References shared knowledge
@@ -408,7 +408,7 @@ When backend returns error, check `response.code`:
    - Focus on unique skills
    - Reference shared knowledge (don't duplicate)
 4. **Update orchestration:**
-   - Add to `../../.agent/rules/00-INDEX.md` (keywords, decision flow)
+   
    - Add to `agent-dependencies.md` (collaboration patterns)
    - Add to `workflow-patterns.md` if new workflows needed
 5. **Assign color and model:**
@@ -433,7 +433,7 @@ When backend returns error, check `response.code`:
 - [ ] References appropriate mixin
 - [ ] References shared knowledge files
 - [ ] Doesn't duplicate SmartAdmin patterns
-- [ ] Added to ../../.agent/rules/00-INDEX.md
+
 - [ ] Added to agent-dependencies.md
 - [ ] Color assigned (unique)
 - [ ] Model specified (opus)
@@ -465,7 +465,7 @@ When backend returns error, check `response.code`:
    - **Triggers:** Pre-merge, post-implementation, periodic assessment
 
 4. **Update orchestration:**
-   - Add to `../../.agent/rules/00-INDEX.md` with clear review triggers
+   
    - Add to `agent-dependencies.md` with Hub-and-Spoke pattern
    - Add to `workflow-patterns.md` with review workflow (similar to Pattern 10: Quality Gate)
 
@@ -495,7 +495,7 @@ When backend returns error, check `response.code`:
 - [ ] Defines clear review phases
 - [ ] Has structured output format (with severity levels)
 - [ ] Can act as Hub in Hub-and-Spoke pattern
-- [ ] Added to ../../.agent/rules/00-INDEX.md with review triggers
+ with review triggers
 - [ ] Added to agent-dependencies.md with coordination patterns
 - [ ] Added to workflow-patterns.md with review workflow
 - [ ] Model: opus (for deep analysis capability)
@@ -513,7 +513,7 @@ When backend returns error, check `response.code`:
 
 **Steps:**
 1. **Identify which file:**
-   - New keywords → `../../.agent/rules/00-INDEX.md`
+   
    - New dependencies → `agent-dependencies.md`
    - New workflow → `workflow-patterns.md`
 
@@ -654,7 +654,7 @@ After updating orchestration:
 - Multiple agents seem applicable
 
 **Solution:**
-1. Review `.claude/shared/orchestration/../../.agent/rules/00-INDEX.md`
+1. Review `CLAUDE.md` for constraints
 2. Add keywords to keyword mapping table
 3. Add scenario to context-based decision logic
 4. Update examples in decision matrix
@@ -784,7 +784,7 @@ git commit -m "revert(java-architect): rollback to previous version - [reason]"
 3. Add agent-specific expertise and examples
 4. Reference shared knowledge base
 5. Update agent-capability-matrix.md
-6. Update `.agent/rules/00-INDEX.md` with keywords
+
 7. Test agent selection logic
 8. Update version in META.md
 

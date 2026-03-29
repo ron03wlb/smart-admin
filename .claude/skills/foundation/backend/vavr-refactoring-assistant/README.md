@@ -141,10 +141,10 @@ public static final ArchRule serviceUsesVavrOption = methods()
 ## Integration with SmartAdmin Rules
 
 ### Foundation Rules Referenced
-- `.agent/technology/functional/08-vavr-fundamentals.md` - Option/Try basics
-- `.agent/technology/functional/08-vavr-advanced.md` - Either/Collections
-- `.agent/rules/technology/functional/08-vavr-mybatis-integration.md` - MyBatis patterns
-- `.agent/foundation/F04-architecture-rules.md` - Service layer constraints
+- `CLAUDE.md` - Option/Try basics
+- `CLAUDE.md` - Either/Collections
+- `CLAUDE.md` - MyBatis patterns
+- `CLAUDE.md` - Service layer constraints
 
 ### Architectural Constraints Enforced
 - Service layer MUST use `io.vavr.control.Option` (NOT `java.util.Optional`)

@@ -487,7 +487,6 @@ Before completing test generation:
   - Testcontainers 配置模式
   - ResponseDTO 斷言模式
 
-- **[Architecture Rules](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 整合測試可直接注入 Service, Dao（@Autowired）
   - 測試類不受分層架構限制（可同時注入多層）
   - 測試使用構造器注入或欄位注入均可
@@ -499,7 +498,6 @@ Before completing test generation:
   - AtomicInteger 計數器模式
   - Factory method 模式
 
-- **[Dependency Injection](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 測試類可使用 @Autowired 欄位注入（例外）
   - 生產代碼必須使用構造器注入
 

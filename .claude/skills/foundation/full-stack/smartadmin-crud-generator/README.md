@@ -168,7 +168,7 @@ cd smart-admin-web && npm run dev
 - **[SKILL.md](SKILL.md)** - Full technical specification and implementation details
 - **Phase docs**: [Backend](phases/phase-1-backend.md) | [Frontend](phases/phase-2-frontend.md) | [API Docs](phases/phase-3-api-docs.md) | [Tests](phases/phase-4-tests.md)
 - **Examples**: [examples/](examples/) - Complete Product CRUD sample
-- **SmartAdmin**: [Patterns](../../../shared/knowledge/smartadmin-patterns.md) | [Architecture Rules](../../../../../.agent/rules/foundation/F04-architecture-rules.md)
+- **SmartAdmin**: [Patterns](../../../shared/knowledge/smartadmin-patterns.md) | [Architecture Rules](CLAUDE.md)
 - **External**: [MyBatis-Plus](https://baomidou.com/) | [Vue 3](https://vuejs.org/) | [Ant Design Vue](https://antdv.com/) | [Knife4j](https://doc.xiaominfo.com/)
 
 ---

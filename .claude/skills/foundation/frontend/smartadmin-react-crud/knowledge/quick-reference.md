@@ -1592,4 +1592,4 @@ screen.getByRole('button', { name: /新增/i });  // ✅ 角色查詢
 此文檔涵蓋了 SmartAdmin React 開發的核心模式和最佳實踐。如需更多信息，請參考：
 - [SKILL.md](../SKILL.md) - 技能定義
 - [SmartAdmin Patterns](../../shared/knowledge/smartadmin-patterns.md) - 後端模式
-- [Architecture Rules](../../../.agent/rules/foundation/F04-architecture-rules.md) - 架構規則
+- [Architecture Rules](CLAUDE.md) - 架構規則

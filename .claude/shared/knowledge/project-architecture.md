@@ -8,12 +8,12 @@ This document provides essential context about the SmartAdmin project structure,
 
 | Component | Version | Purpose | Rules Reference |
 |-----------|---------|---------|-----------------|
-| **Java** | 21 | Programming language with modern features | [01-naming-conventions.md](../../../.agent/foundation/01-naming-conventions.md) |
-| **Spring Boot** | 3.5.4 | Application framework | [10-architecture-rules.md](../../../.agent/foundation/10-architecture-rules.md) |
-| **MyBatis Plus** | 3.5.12 | ORM and database access | [09-mybatis-plus-core.md](../../../.agent/rules/technology/database/09-mybatis-plus-core.md) |
+| **Java** | 21 | Programming language with modern features | - |
+| **Spring Boot** | 3.5.4 | Application framework | - |
+| **MyBatis Plus** | 3.5.12 | ORM and database access | - |
 | **Sa-Token** | 1.44.0 | Authentication and authorization | - |
-| **PostgreSQL Driver** | 42.7.5 | Database driver | [05-postgresql-basics.md](../../../.agent/technology/database/05-postgresql-basics.md) |
-| **Vavr** | 0.10.4 | Functional programming library | [08-vavr-fundamentals.md](../../../.agent/technology/functional/08-vavr-fundamentals.md) |
+| **PostgreSQL Driver** | 42.7.5 | Database driver | - |
+| **Vavr** | 0.10.4 | Functional programming library | - |
 | **Knife4j** | 4.6.0 | API documentation (Swagger UI) | - |
 | **Druid** | 1.2.25 | Database connection pool | - |
 | **Redisson** | 3.50.0 | Distributed Redis client with caching | - |
@@ -42,18 +42,14 @@ This document provides essential context about the SmartAdmin project structure,
 **Vavr 0.10.4**
 - Functional containers: `Option`, `Try`, `Either`
 - Replaces null checks and try-catch blocks
-- See: [08-vavr-fundamentals.md](../../../.agent/technology/functional/08-vavr-fundamentals.md)
-
 **PostgreSQL 16** (Target Architecture)
 - JSONB support for flexible document storage
 - Array types for efficient data structures
 - CTEs and window functions for complex queries
-- See: [05-postgresql-advanced.md](../../../.agent/technology/database/05-postgresql-advanced.md)
 
 **MyBatis Plus 3.5.12**
 - LambdaQueryWrapper for type-safe queries (preferred)
 - Automatic CRUD via BaseMapper
-- See: [09-mybatis-plus-core.md](../../../.agent/rules/technology/database/09-mybatis-plus-core.md)
 
 ## Module Structure
 
@@ -315,12 +311,7 @@ Run before committing:
 
 ### Code Quality Rules
 
-Located in `.agent/rules/` directory:
-- `01-naming-conventions.md` - Alibaba Java naming standards
-- `04-exception-logging.md` - Exception handling and logging standards
-- `09-manager-layer.md` - Manager layer constraints
-- `10-architecture-rules.md` - Layered architecture enforcement
-- `17-commit-message-conventions.md` - Git commit conventions
+See [CLAUDE.md](../../../CLAUDE.md) for naming conventions, architecture rules, Manager layer constraints, and commit message conventions.
 
 ## Project Guidelines
 
@@ -402,6 +393,5 @@ If test fails, fix architectural violations before committing.
 ## References
 
 - **CLAUDE.md** - Complete development guidelines (project root)
-- **`.agent/rules/`** - Detailed coding rules and conventions
 - **SmartAdmin Patterns** - See `smartadmin-patterns.md` in this directory
 - **Quality Standards** - See `quality-standards.md` in this directory

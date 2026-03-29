@@ -475,12 +475,10 @@ GRANT SELECT ON ALL TABLES IN SCHEMA public TO smartadmin_user;
 
 ### 強制要求
 
-- **[Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md)**
   - HikariCP 連接池由 Manager 層管理
   - 事務方法在 Manager 層（避免連接洩漏）
   - 長事務檢測與優化
 
-- **[Architecture Rules - Persistence Layer](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - Dao 層使用 MyBatis `#{}` 參數化查詢（防止 SQL 注入）
   - 本技能檢測 N+1 查詢問題
   - 慢查詢優化建議
@@ -495,7 +493,6 @@ GRANT SELECT ON ALL TABLES IN SCHEMA public TO smartadmin_user;
   - Testcontainers PostgreSQL 環境
   - 整合測試性能基準
 
-- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
   - 數據庫連接異常處理
   - HikariCP 連接池異常監控
 

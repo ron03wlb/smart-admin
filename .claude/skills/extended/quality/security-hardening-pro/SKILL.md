@@ -677,7 +677,6 @@ Detailed security guides:
 
 ### 強制要求
 
-- **[Exception & Logging Rules](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
   - 異常處理層級（Controller 禁止 try-catch）
   - 敏感資訊不得記錄到日誌（密碼、Token、信用卡號）
   - 審計日誌格式標準（操作類型、操作人、IP、時間戳）
@@ -686,7 +685,6 @@ Detailed security guides:
   - 第二十七條：商用密碼服務使用單位應當使用商用密碼進行保護
   - 本技能提供 SM2/SM3/SM4 國密算法實現（符合 GM/T 標準）
 
-- **[Architecture Rules - Data Security](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 禁止在代碼中硬編碼敏感資訊（密碼、API Key、證書）
   - 配置文件敏感資訊必須使用環境變數或加密配置
 

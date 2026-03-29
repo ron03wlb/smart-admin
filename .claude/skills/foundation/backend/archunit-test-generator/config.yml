@@ -16,7 +16,7 @@ metadata:
   description: "Auto-generate ArchUnit test methods from SmartAdmin architecture rules"
   ai_description: |
     Generates ArchUnit test methods from natural language architecture rules
-    defined in .agent/rules/*.md. Enforces SmartAdmin's layered architecture
+    defined in CLAUDE.md Enforces SmartAdmin's layered architecture
     constraints (Controller → Service → Manager → Dao), annotation restrictions
     (@Transactional only in Manager), naming conventions, and dependency injection
     patterns (constructor injection only).
@@ -73,7 +73,6 @@ dependencies:
   skills: []
 
   required_files:
-    - ".agent/rules/foundation/F04-architecture-rules.md"
     - "smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java"
 
   tools:
@@ -124,7 +123,7 @@ documentation:
 
   external_links:
     - title: "SmartAdmin Architecture Rules"
-      url: "../../../.agent/rules/foundation/F04-architecture-rules.md"
+      url: "CLAUDE.md"
 
     - title: "ArchUnit Documentation"
       url: "https://www.archunit.org/userguide/html/000_Index.html"

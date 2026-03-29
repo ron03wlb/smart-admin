@@ -226,22 +226,18 @@ cd smart-admin-api-java21-springboot3
 
 ### Mandatory Requirements
 
-- **[Architecture Rules - Service Layer Vavr Option](../../../.agent/rules/foundation/F04-architecture-rules.md)** - Service MUST use io.vavr.control.Option (ArchUnit enforced)
-- **[Manager Layer Transaction Rules](../../../.agent/rules/foundation/F03-manager-layer.md)** - When Service needs @Transactional, extract to Manager layer
 
 ### Reference Guidelines
 
-- **[Naming Conventions](../../../.agent/rules/foundation/F01-naming-conventions.md)** - Boolean: `deleted` not `isDeleted`; Class: `UserService` not `UserServiceImpl`
-- **[Exception and Logging Rules](../../../.agent/rules/technology/patterns/04-exception-logging.md)** - Try.Failure logging, Either.Left error handling
 
 ---
 
 ## Reference Files
 
 **Vavr rules:**
-- `.agent/technology/functional/08-vavr-fundamentals.md` - Option/Try basics
-- `.agent/technology/functional/08-vavr-advanced.md` - Either/Collections/Patterns
-- `.agent/rules/technology/functional/08-vavr-mybatis-integration.md` - MyBatis + Vavr
+- `CLAUDE.md` - Option/Try basics
+- `CLAUDE.md` - Either/Collections/Patterns
+- `CLAUDE.md` - MyBatis + Vavr
 
 **External:**
 - [Vavr Option docs](https://docs.vavr.io/#_option)

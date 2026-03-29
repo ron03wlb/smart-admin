@@ -181,12 +181,10 @@ BUILD SUCCESSFUL in 12s
 
 本範例直接關聯以下 SmartAdmin 架構規則：
 
-- **[Architecture Rules - Layer Dependencies](./../../../../../.agent/rules/foundation/F04-architecture-rules.md#layer-dependencies)**
   - Controller → Service ONLY（Controller CANNOT call Dao/Manager）
   - Service → Dao/Manager（Service CAN call both）
   - Manager → Dao（Manager CAN call Dao for @Transactional operations）
 
-- **[Naming Conventions](./../../../../../.agent/rules/foundation/F01-naming-conventions.md)**
   - 類別命名: `UserController`, `UserService`, `UserDao`（不使用 Impl 後綴）
 
 ---
@@ -271,5 +269,5 @@ public static final ArchRule domainShouldNotDependOnLayers =
 ## 參考資料
 
 - [ArchUnit 官方文檔](https://www.archunit.org/userguide/html/000_Index.html)
-- [SmartAdmin Architecture Rules](../../../../../.agent/rules/foundation/F04-architecture-rules.md)
+- [SmartAdmin Architecture Rules](CLAUDE.md)
 - [ArchitectureTest.java](../../../../../smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java)

@@ -36,8 +36,6 @@ execution:
 
 dependencies:
   required_files:
-    - ".agent/rules/foundation/F04-architecture-rules.md"
-    - ".agent/rules/foundation/F03-manager-layer.md"
     - "docs/iGame/technical-specs/"
 
 output:

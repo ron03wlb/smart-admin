@@ -5,7 +5,7 @@
 **User Request:**
 > "Create ArchUnit test to enforce that Boolean fields cannot start with 'is' prefix (use 'deleted', not 'isDeleted')"
 
-**Source Rule:** `.agent/foundation/FF01-naming-conventions.md`
+**Source Rule:** `CLAUDE.md`
 
 ---
 
@@ -173,7 +173,7 @@ static final ArchRule booleanFieldsNoIsPrefix = ...
 
 ### Step 7: Update Rule File Frontmatter
 
-**Edit:** `.agent/foundation/FF01-naming-conventions.md`
+**Edit:** `CLAUDE.md`
 
 **Before:**
 ```yaml

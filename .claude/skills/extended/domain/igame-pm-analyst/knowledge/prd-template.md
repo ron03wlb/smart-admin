@@ -1006,9 +1006,9 @@ redis-cli FLUSHDB
 #### SmartAdmin規範
 - [CLAUDE.md快速參考](CLAUDE.md)
 - [SmartAdmin模式](.claude/shared/knowledge/smartadmin-patterns.md)
-- [架構規則](.agent/foundation/F04-architecture-rules.md)
-- [Manager層規範](.agent/foundation/F03-manager-layer.md)
-- [命名規範](.agent/foundation/F01-naming-conventions.md)
+- [架構規則](CLAUDE.md)
+- [Manager層規範](CLAUDE.md)
+- [命名規範](CLAUDE.md)
 
 #### Support模組（原Foundation）
 - [Support模組總覽](smartadmin-support/README.md)

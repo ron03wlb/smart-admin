@@ -393,13 +393,11 @@ For detailed implementation patterns:
 
 ### 強制要求
 
-- **[Architecture Rules - Complete](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 嚴格遵循 Controller → Service → Manager → Dao 分層架構
   - Service 層使用 `io.vavr.control.Option`（禁止 `java.util.Optional`）
   - 構造器注入（@RequiredArgsConstructor + private final）
   - ResponseDTO 統一響應格式
 
-- **[Naming Conventions](./../../../.agent/rules/foundation/F01-naming-conventions.md)**
   - 類別命名：XXXController, XXXService, XXXManager, XXXDao
   - Entity 命名：XXXEntity（不是 XXXDomain, XXXPO, XXXDO）
   - Form 命名：XXXAddForm, XXXUpdateForm, XXXQueryForm
@@ -407,7 +405,6 @@ For detailed implementation patterns:
   - 布林欄位：`deleted` 不是 `isDeleted`
   - 表名：單數形式（`t_employee` 不是 `t_employees`）
 
-- **[Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md)**
   - Service 若需 @Transactional → 提取至 Manager 層
   - @Transactional 必須包含 `rollbackFor = Throwable.class`
   - Manager 層處理跨表事務和快取邏輯
@@ -420,10 +417,8 @@ For detailed implementation patterns:
   - Pagination Pattern - SmartPageUtil 分頁處理
   - Bean Conversion - SmartBeanUtil 對象轉換
 
-- **[Dependency Injection](./../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - 構造器注入強制要求（禁止 @Autowired 欄位注入）
 
-- **[Exception Handling](./../../../.agent/rules/technology/patterns/04-exception-logging.md)**
   - 異常處理層級（Service 返回 ResponseDTO.error()）
   - 業務異常使用 ResponseDTO 封裝
 
@@ -434,4 +429,4 @@ For detailed implementation patterns:
 - [SmartAdmin Architecture Documentation](./../../../../docs/architecture/) - 系統架構設計
 - [Backend Layer Patterns](references/backend-layer-patterns.md) - 後端分層模式詳解
 - [Frontend Component Patterns](references/frontend-component-patterns.md) - 前端組件模式詳解
-- [ArchitectureTest.java](./../../../.agent/configs/ArchitectureTest.java) - 架構測試驗證
+- [ArchitectureTest.java](CLAUDE.md) - 架構測試驗證

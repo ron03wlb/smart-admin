@@ -103,16 +103,7 @@ public class TestController {
 
 **Why**: Maintains bidirectional traceability
 
-```yaml
-# .agent/rules/foundation/F03-manager-layer.md
----
-trigger: always_on
-description: Manager Layer Architecture Rules
-tags: [architecture, manager, transaction, cache]
-archunit_test: ArchitectureTest#managerShouldNotAccessBusinessService
-last_updated: 2026-02-02
----
-```
+```CLAUDE.md```
 
 **After Creating Test**:
 1. Add `archunit_test` field with test method name

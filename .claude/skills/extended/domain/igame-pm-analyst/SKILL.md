@@ -74,9 +74,9 @@ Standardized Traditional Chinese PRD with 6-section structure: Executive Summary
 
 ## Related Rules
 
-- [Architecture Rules](../../../.agent/rules/foundation/F04-architecture-rules.md) - SmartAdmin layered design
-- [Manager Layer Rules](../../../.agent/rules/foundation/F03-manager-layer.md) - @Transactional, distributed lock
-- [Naming Conventions](../../../.agent/rules/foundation/F01-naming-conventions.md) - Entity/Service/Manager naming
+- [Architecture Rules](CLAUDE.md) - SmartAdmin layered design
+- [Manager Layer Rules](CLAUDE.md) - @Transactional, distributed lock
+- [Naming Conventions](CLAUDE.md) - Entity/Service/Manager naming
 
 ## Related Skills
 

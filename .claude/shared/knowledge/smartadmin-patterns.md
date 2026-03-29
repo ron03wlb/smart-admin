@@ -2,7 +2,7 @@
 
 This document provides SmartAdmin-specific implementation patterns and code examples. **All agents must adhere to these patterns when working with this codebase.**
 
-**For detailed architectural rules and enforcement**, see: [.agent/foundation/10-architecture-rules.md](../../../.agent/foundation/10-architecture-rules.md)
+**For detailed architectural rules and enforcement**, see: [CLAUDE.md](../../../CLAUDE.md)
 
 ## Layered Architecture Overview
 
@@ -12,7 +12,7 @@ SmartAdmin enforces strict layering rules validated by `ArchitectureTest.java`:
 Controller → Service → Manager → Dao → Entity
 ```
 
-**Quick Reference** (see [architecture rules](../../../.agent/foundation/10-architecture-rules.md) for complete details):
+**Quick Reference** (see [architecture rules](../../../CLAUDE.md) for complete details):
 
 ### Layer Responsibilities
 
@@ -49,14 +49,14 @@ Controller → Service → Manager → Dao → Entity
 
 ### Critical Architecture Rules
 
-**MANDATORY** (enforced by ArchitectureTest - see [complete rules](../../../.agent/foundation/10-architecture-rules.md)):
+**MANDATORY** (enforced by ArchitectureTest - see [complete rules](../../../CLAUDE.md)):
 - ✅ Controller → Service ONLY
 - ✅ `@Transactional` / `@Cacheable`: Manager layer ONLY
 - ✅ Constructor injection via `@RequiredArgsConstructor` + `private final`
 - ❌ NEVER `@Autowired` field injection
 
-→ **[Complete Architecture Rules & ArchUnit Tests](../../../.agent/foundation/10-architecture-rules.md)**
-→ **[Manager Layer Constraints](../../../.agent/foundation/09-manager-layer.md)**
+→ **[Complete Architecture Rules & ArchUnit Tests](../../../CLAUDE.md)**
+→ **[Manager Layer Constraints](../../../CLAUDE.md)**
 
 ## API Layer Pattern (v4.1.0)
 
@@ -267,7 +267,7 @@ public class EmployeeService {
 
 **Fix**: Move @Transactional to Manager layer (see Pattern B above).
 
-→ **[When to Use Manager Layer - Decision Tree](../../../.agent/foundation/09-manager-layer.md)**
+→ **[When to Use Manager Layer - Decision Tree](../../../CLAUDE.md)**
 
 ## ResponseDTO Pattern
 
@@ -527,4 +527,4 @@ This test enforces all architectural rules and will fail if patterns are violate
 ## References
 
 - See `CLAUDE.md` in project root for complete coding standards
-- See `.agent/rules/` directory for detailed rule documentation
+- See `CLAUDE.md` directory for detailed rule documentation

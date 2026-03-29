@@ -74,9 +74,9 @@ Every financial operation must log: operation, params, operatorId, ipAddress, ti
 
 ## Related Rules
 
-- [Architecture Rules](../../../.agent/rules/foundation/F04-architecture-rules.md) - Controller -> Service -> Manager -> Dao
-- [Manager Layer Rules](../../../.agent/rules/foundation/F03-manager-layer.md) - @Transactional in Manager only
-- [Naming Conventions](../../../.agent/rules/foundation/F01-naming-conventions.md) - WalletEntity, VipService, WalletManager
+- [Architecture Rules](CLAUDE.md) - Controller -> Service -> Manager -> Dao
+- [Manager Layer Rules](CLAUDE.md) - @Transactional in Manager only
+- [Naming Conventions](CLAUDE.md) - WalletEntity, VipService, WalletManager
 
 ## Related Skills
 

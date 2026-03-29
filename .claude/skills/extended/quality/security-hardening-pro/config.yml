@@ -84,7 +84,6 @@ dependencies:
   skills: []
 
   required_files:
-    - ".agent/rules/security/01-security-best-practices.md"
     - "smart-admin-api-java21-springboot3/smartadmin-common/foundation/api-encrypt/"
 
   tools:
@@ -135,7 +134,7 @@ documentation:
 
   external_links:
     - title: "SmartAdmin Security Best Practices"
-      url: "../../../.agent/rules/security/01-security-best-practices.md"
+      url: "CLAUDE.md"
 
     - title: "Sa-Token Documentation"
       url: "https://sa-token.cc/"

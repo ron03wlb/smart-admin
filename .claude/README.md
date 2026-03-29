@@ -69,7 +69,7 @@ Understanding where information lives:
 
 ### 1. Which agent do I need?
 
-**Check**: [Unified Decision Center](../.agent/rules/00-INDEX.md) for complete rules, skills, and agent routing
+**Check**: [CLAUDE.md](../CLAUDE.md) for rules, constraints, and navigation
 
 ---
 
@@ -117,7 +117,6 @@ Common patterns:
 ## Related Documentation
 
 - **Root Reference**: [CLAUDE.md](../CLAUDE.md) - Developer quick reference
-- **Technical Rules**: [.agent/rules/](.agent/rules/) - Detailed coding standards
 - **Architecture Docs**: [docs/](../docs/) - System architecture
 
 ---

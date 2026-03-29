@@ -275,7 +275,7 @@ After **java-architect** completes implementation, the hooks system automaticall
 - **`CLAUDE.md`** (root) - Quick reference card
 
 ### For Choosing Agents
-- **`../../.agent/rules/00-INDEX.md`** - Which agent to use?
+- - **`CLAUDE.md`** - Constraints and navigation hub
 - **`.claude/shared/orchestration/orchestration-playbook.md`** - Complete workflows, dependencies, handoffs
 
 ### For Maintenance
@@ -290,7 +290,7 @@ After **java-architect** completes implementation, the hooks system automaticall
 
 ### ❌ Mistake 2: Using wrong agent
 **Why wrong:** Inefficient, may miss best practices
-**Correct:** Check [decision-matrix.md](../../.agent/rules/00-INDEX.md) if unsure
+**Correct:** Check [CLAUDE.md](../../CLAUDE.md) for rules
 
 ### ❌ Mistake 3: Merging without code-reviewer
 **Why wrong:** Bugs and pattern violations slip into production
@@ -410,7 +410,7 @@ public class EmployeeManager {
 
 ### I want to learn more
 1. Read [README.md](../.claude/README.md) for system overview
-2. Read [decision-matrix.md](../../.agent/rules/00-INDEX.md) for agent selection details
+2. Read [CLAUDE.md](../../CLAUDE.md) for constraints and patterns
 3. Read [orchestration-playbook.md](../shared/orchestration/orchestration-playbook.md) for all 10 workflow patterns + collaboration protocols
 
 ### I want to contribute
@@ -432,7 +432,7 @@ public class EmployeeManager {
 - Run `.claude/scripts/verify-config.sh` to diagnose issues
 
 ### Agent Selection Unclear
-- Check [decision-matrix.md](../../.agent/rules/00-INDEX.md) - visual decision flow
+- Check [CLAUDE.md](../../CLAUDE.md) for rules and constraints
 - Look at example scenarios in [workflow-patterns.md](.claude/shared/orchestration/workflow-patterns.md)
 
 ### SmartAdmin Patterns Questions
@@ -443,7 +443,7 @@ public class EmployeeManager {
 ## Summary
 
 **Remember these key points:**
-1. **Choose the right agent** - use [decision-matrix.md](../../.agent/rules/00-INDEX.md)
+1. **Follow SmartAdmin patterns** - `CLAUDE.md` defines all rules
 2. **Follow SmartAdmin patterns** - `CLAUDE.md` is your friend
 3. **Use multi-agent workflows** - agents collaborate for complex tasks
 4. **Always review before merge** - code-reviewer is mandatory

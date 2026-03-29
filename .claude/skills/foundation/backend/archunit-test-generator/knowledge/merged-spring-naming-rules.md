@@ -78,7 +78,7 @@ class TableNameSingularCondition extends ArchCondition<JavaClass> {
 ---
 
 ## References
-- `.agent/rules/foundation/F04-architecture-rules.md`
-- `.agent/rules/foundation/F03-manager-layer.md`
-- `.agent/rules/foundation/F01-naming-conventions.md`
+- `CLAUDE.md`
+- `CLAUDE.md`
+- `CLAUDE.md`
 - `.claude/shared/knowledge/smartadmin-patterns.md`

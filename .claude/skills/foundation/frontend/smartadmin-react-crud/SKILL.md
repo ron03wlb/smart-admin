@@ -1010,7 +1010,7 @@ const employeeSlice = createSlice({
 **Documentation**:
 - [Quick Reference](knowledge/quick-reference.md) - React 19 patterns and examples
 - [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md) - Backend patterns
-- [Architecture Rules](.agent/rules/foundation/F04-architecture-rules.md) - Layered architecture
+- [Architecture Rules](CLAUDE.md) - Layered architecture
 
 **External Resources**:
 - [React 19 Docs](https://react.dev/)

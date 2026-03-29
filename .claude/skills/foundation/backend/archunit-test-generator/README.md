@@ -9,7 +9,7 @@
 
 ## Overview
 
-Auto-generates ArchUnit test methods from SmartAdmin's 6,530+ lines of architecture rules in `.agent/rules/*.md`. Eliminates manual test creation, ensures consistency, and prevents coverage gaps.
+Auto-generates ArchUnit test methods from SmartAdmin's 6,530+ lines of architecture rules in `CLAUDE.md`. Eliminates manual test creation, ensures consistency, and prevents coverage gaps.
 
 **Problem Solved:**
 - Current `ArchitectureTest.java` requires manual updates when architecture rules change
@@ -195,7 +195,7 @@ SmartAdmin has **23 architecture rule files** totaling 6,530+ lines:
 | File | Change Type | Purpose |
 |------|-------------|---------|
 | `ArchitectureTest.java` | Append | Add new test methods |
-| `.agent/rules/{rule}.md` | Update YAML | Add `archunit_test` field |
+| `CLAUDE.md` | Update YAML | Add `archunit_test` field |
 
 ### Validation Commands
 
@@ -242,7 +242,7 @@ Tests run automatically in GitHub Actions:
 ## Future Enhancements
 
 ### v1.1 (Planned)
-- [ ] Auto-detect rule changes in `.agent/rules/*.md` (git diff)
+- [ ] Auto-detect rule changes in `CLAUDE.md` (git diff)
 - [ ] Batch generation for all uncovered rules
 - [ ] Integration with `verification-before-completion` skill
 
@@ -272,7 +272,7 @@ Tests run automatically in GitHub Actions:
 ### SmartAdmin Architecture
 - [CLAUDE.md](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/CLAUDE.md) - Project conventions
 - [ArchitectureTest.java](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/ArchitectureTest.java) - Existing tests
-- [.agent/rules/](/Users/zhangxuanrong/Documents/Workspace/Java/smart-admin/.agent/rules/) - 23 architecture rule files
+- [CLAUDE.md](CLAUDE.md) - Architecture rules
 
 ### ArchUnit Documentation
 - [ArchUnit User Guide](https://www.archunit.org/userguide/html/000_Index.html)

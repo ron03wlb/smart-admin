@@ -16,7 +16,7 @@
 | Run All Tests | Execute ArchitectureTest suite | ./gradlew :smartadmin-app:test --tests ArchitectureTest |
 | Run Specific Test | Execute single test method | ./gradlew :smartadmin-app:test --tests ArchitectureTest#noFieldInjection |
 | Search Tests | Find existing test methods | grep -n "static final ArchRule" ArchitectureTest.java |
-| Check Rule Coverage | List archunit_test fields | grep -r "archunit_test:" .agent/rules/ |
+| Check Rule Coverage | List archunit_test fields | grep -r "archunit_test:" .claude/skills/ |
 
 ### Rapid Development Workflow
 
@@ -24,7 +24,7 @@ Time estimate: 10-15 minutes per rule
 
 | Step | Command | Time |
 |------|---------|------|
-| 1. Parse rule | Read .agent/rules/{rule-file}.md frontmatter | ~1 min |
+| 1. Parse rule | Read CLAUDE.md for architecture rules | ~1 min |
 | 2. Map DSL | Select ArchUnit pattern from decision matrix | ~2 min |
 | 3. Check existing | grep "static final ArchRule" ArchitectureTest.java | ~1 min |
 | 4. Generate test | Write method with correct style | ~3 min |

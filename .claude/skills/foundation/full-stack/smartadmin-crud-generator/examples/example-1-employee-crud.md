@@ -308,12 +308,10 @@ async function query() {
 
 ## 相關規則
 
-- **[Architecture Rules](../../../../../.agent/rules/foundation/F04-architecture-rules.md)**
   - Controller → Service → Dao 分層架構
   - ResponseDTO 統一響應格式
   - 布林欄位命名: `deleted` 不是 `isDeleted`
 
-- **[Naming Conventions](../../../../../.agent/rules/foundation/F01-naming-conventions.md)**
   - 類別命名: `EmployeeController`, `EmployeeService`, `EmployeeDao`
 
 ---

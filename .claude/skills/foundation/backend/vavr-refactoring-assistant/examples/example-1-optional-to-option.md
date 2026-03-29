@@ -99,7 +99,6 @@ BUILD SUCCESSFUL
 
 ## 相關規則
 
-- **[Architecture Rules - Service Layer](../../../../../.agent/rules/foundation/F04-architecture-rules.md#serviceusesvavroption)**
   - Service 層必須使用 `io.vavr.control.Option`（禁止 `java.util.Optional`）
   - ArchUnit 測試驗證: `serviceUsesVavrOption()`
 

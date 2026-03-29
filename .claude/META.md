@@ -1,6 +1,6 @@
 # AI Documentation System Metadata
 
-**Purpose**: Unified version tracking and metadata for entire SmartAdmin AI documentation system (CLAUDE.md, .claude/, .agent/)
+**Purpose**: Unified version tracking and metadata for entire SmartAdmin AI documentation system (CLAUDE.md, .claude/)
 
 **Last Updated**: 2026-02-07
 **System Version**: 3.2.0
@@ -14,10 +14,8 @@
 
 | Component | Version | Last Updated | Status | Owner |
 |-----------|---------|-------------|--------|-------|
-| **CLAUDE.md** | 3.4.0 | 2026-02-02 | ✅ Universal AI Support + Java 21 | Root |
-| **.claude/ System** | 3.2.0 | 2026-02-07 | ✅ Skill System Optimized (P0-P2 + Mermaid) | .claude/VERSION.md |
-| **.agent/ Rules** | 1.0.0 | 2026-01-27 | ✅ Production Ready | .agent/VERSION.md |
-| **.agents/skills/** | (external) | N/A | ✅ Active | Claude Code |
+| **CLAUDE.md** | 3.5.0 | 2026-03-29 | ✅ Claude Code Only | Root |
+| **.claude/ System** | 3.2.0 | 2026-02-07 | ✅ Skill System Optimized | .claude/VERSION.md |
 
 **Version Notes**:
 - .claude/ v3.2.0: Skill System Optimization - P0 frontmatter fix (spring-pattern-checker), P1 naming-convention-checker frontmatter + 3 .agent/ config.yml, P2 8 shorthand aliases, Type F (stateDiagram) Mermaid rule
@@ -39,20 +37,10 @@
 - `.claude/shared/knowledge/smartadmin-patterns.md` (implementation patterns)
 - `.claude/shared/knowledge/project-architecture.md` (build commands, tech stack)
 - `.claude/shared/knowledge/quality-standards.md` (quality checklist)
-- `.agent/rules/foundation/01-naming-conventions.md` (naming conventions)
-- `.agent/rules/foundation/10-architecture-rules.md` (architecture enforcement)
-- `.agent/rules/00-INDEX.md` (AI decision tree)
-- `.agent/rules/workflows/17-commit-message-conventions.md` (commit conventions)
 
 **.claude/shared/knowledge/ → Dependencies**:
-- `.agent/rules/*.md` (source of truth for technical rules)
-- References .agent/rules/ for detailed rule enforcement
+- `CLAUDE.md` (source of truth for rules and constraints)
 - Aggregates and links, does not duplicate content
-
-**.agent/rules/ → Dependencies**:
-- None (source of truth, no external dependencies)
-- All technical rules originate here
-- Other documents reference these as authoritative source
 
 ---
 
@@ -61,8 +49,7 @@
 See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership tracking.
 
 **Quick Reference**:
-- **Architecture Rules**: `.agent/rules/foundation/10-architecture-rules.md` (source of truth)
-- **Naming Conventions**: `.agent/rules/foundation/01-naming-conventions.md` (source of truth)
+- **Architecture Rules & Naming**: `CLAUDE.md` (source of truth)
 - **SmartAdmin Patterns**: `.claude/shared/knowledge/smartadmin-patterns.md` (source of truth for implementation)
 - **Build Commands**: `.claude/shared/knowledge/project-architecture.md` (source of truth)
 - **Quick Reference**: `CLAUDE.md` (never duplicates, only links + 1-3 examples)
@@ -80,7 +67,7 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 | Change Type | Primary File | Time | Cross-Ref Updates |
 |------------|--------------|------|-------------------|
 | **SmartAdmin Pattern** | `.claude/shared/knowledge/smartadmin-patterns.md` | ~5 min | Verify CLAUDE.md links, update version |
-| **Architecture Rule** | `.agent/rules/foundation/10-architecture-rules.md` | ~15 min | Update ArchitectureTest.java, verify shared knowledge |
+| **Architecture Rule** | `CLAUDE.md` | ~15 min | Update ArchitectureTest.java, verify shared knowledge |
 | **Build Command** | `.claude/shared/knowledge/project-architecture.md` | ~10 min | Update CLAUDE.md top 4 commands |
 | **New Agent** | `.claude/agents/[name].md` | 30-45 min | Update 00-INDEX.md, agent-capability-matrix.md |
 | **Permission** | `.claude/settings.local.json` | ~5 min | Update version if significant |
@@ -90,10 +77,9 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 **Always update the source of truth first, then propagate changes to references.**
 
 **Impact Chain Example** (Architecture Rule Change):
-1. Update `.agent/rules/foundation/10-architecture-rules.md` (source)
+1. Update `CLAUDE.md` (source)
 2. Verify `.claude/shared/knowledge/smartadmin-patterns.md` references
-3. Update `.agent/configs/ArchitectureTest.java` enforcement
-4. Bump `.agent/` version in this META.md
+3. Update ArchitectureTest.java enforcement
 
 ---
 
@@ -131,13 +117,6 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 └── scripts/
     └── validate-links.sh
 
-.agent/rules/
-├── 00-INDEX.md                          # Unified decision center (630 lines)
-├── foundation/                          # Core architecture rules (4 files)
-├── technology/                          # Tech-specific rules (10 files)
-├── security/                            # Security rules (2 files)
-├── quality-tools/                       # Tool enforcement (6 files)
-└── workflows/                           # Process rules (2 files)
 ```
 
 ---
@@ -178,7 +157,6 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 
 ### Version & History
 - **[.claude/VERSION.md](VERSION.md)** - Complete .claude/ version history
-- **[.agent/VERSION.md](../.agent/VERSION.md)** - .agent/ rules version history
 - **[.claude/docs/changelog.md](docs/changelog.md)** - Detailed change log with optimization history
 
 ### Maintenance & Support
@@ -187,7 +165,6 @@ See [../../CONTENT_MAP.md](../../CONTENT_MAP.md) for complete content ownership 
 - **[.claude/docs/quick-start-guide.md](docs/quick-start-guide.md)** - Getting started
 
 ### Agent System
-- **[.agent/rules/00-INDEX.md](../.agent/rules/00-INDEX.md)** - Unified decision center (rules routing, skill selection, agent orchestration)
 - **[.claude/shared/orchestration/orchestration-playbook.md](shared/orchestration/orchestration-playbook.md)** - Complete workflows, dependencies, collaboration protocols
 - **[.claude/docs/agent-capability-matrix.md](docs/agent-capability-matrix.md)** - Agent comparison
 

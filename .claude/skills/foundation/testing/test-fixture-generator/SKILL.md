@@ -724,7 +724,6 @@ When generating fixture, ensure:
   - @BeforeEach 中的 FK 依賴設置模式
   - 參數化覆寫方法模式
 
-- **[Naming Conventions](./../../../.agent/rules/foundation/F01-naming-conventions.md)**
   - 測試固件類命名：`{Entity}TestFixture`（不是 `{Entity}Builder`）
   - Factory 方法命名：`create{Entity}()`、`create{Form}()`
   - 參數命名：具體業務名稱（`categoryId` 不是 `fkId`）

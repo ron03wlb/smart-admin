@@ -3,10 +3,8 @@
 This document provides a quality checklist and quick reference for SmartAdmin code standards. **All agents must enforce these standards when writing or reviewing code.**
 
 **For detailed technical rules**, see:
-- [Architecture Rules](../../../.agent/foundation/10-architecture-rules.md) - Layered architecture enforcement
-- [Naming Conventions](../../../.agent/foundation/01-naming-conventions.md) - Complete Alibaba guidelines
-- [Exception & Logging](../../../.agent/technology/patterns/04-exception-logging.md) - Error handling standards
-- [Quality Tool Rules](../../../.agent/rules/) - PMD, SpotBugs, Checkstyle, etc.
+- [SmartAdmin Patterns](smartadmin-patterns.md) - Implementation patterns and conventions
+- [Project Architecture](project-architecture.md) - Architecture overview and constraints
 
 ## Code Quality Checklist
 
@@ -58,7 +56,7 @@ Before completing any implementation, verify:
 
 ## Naming Conventions
 
-→ **[Complete Naming Conventions (Alibaba Guidelines)](../../../.agent/foundation/01-naming-conventions.md)**
+→ **[SmartAdmin Patterns](smartadmin-patterns.md)**
 
 **Quick Reference:**
 
@@ -394,7 +392,5 @@ _No rules have been auto-generated yet. Rules will appear here after the first j
 
 ## References
 
-- **Alibaba Java Coding Guidelines**: See `.agent/foundation/01-naming-conventions.md`
-- **Exception Handling**: See `.agent/technology/patterns/04-exception-logging.md`
-- **Architecture Rules**: See `.agent/foundation/10-architecture-rules.md`
 - **SmartAdmin Patterns**: See `smartadmin-patterns.md` in this directory
+- **Project Architecture**: See `project-architecture.md` in this directory

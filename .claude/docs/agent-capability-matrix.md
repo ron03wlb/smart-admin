@@ -542,7 +542,6 @@ This capability matrix provides:
 - ✅ Troubleshooting agent selection issues
 
 **Related Documentation**:
-- [Unified Decision Center](../../.agent/rules/00-INDEX.md) - Rule routing, skill selection, agent orchestration
 - [Orchestration Playbook](../shared/orchestration/orchestration-playbook.md) - Complete workflows, dependencies, collaboration protocols, handoffs
 
 ---

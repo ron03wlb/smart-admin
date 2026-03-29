@@ -197,43 +197,7 @@ PostgreSQL performance analysis (HikariCP tuning, N+1 detection, EXPLAIN ANALYZE
 | "Generate integration tests" | `smartadmin-integration-test` |
 | "Check naming conventions" | `naming-convention-checker` |
 | "Extract @Transactional to Manager" | `smartadmin-manager-extractor` |
-| "Analyze slow queries" | `postgresql-best-practices` |
-
----
-
-## Configuration Standardization
-
-All skills have **config.yml** (100% coverage):
-- Metadata: name, version, priority, type, category
-- Triggers: keywords, patterns, exclude_keywords
-- Execution: type (single-shot, phase-based, mode-based), timeouts, quality gates
-- Dependencies: required skills, files, tools
-
-**Central Registry**: [skill-registry.yml](skill-registry.yml) - Single Source of Truth for all skill metadata
-
-**Version Registry**: [VERSIONS.yml](VERSIONS.yml) - Version tracking for all skills
-
-**Keyword Conflicts**: [keyword-resolution-matrix.yml](keyword-resolution-matrix.yml) - Priority-based routing
-
-**Aliases**: [skill-aliases.json](skill-aliases.json) - Shorthand invocation mappings
-
----
-
-## Related Documentation
-
-- [.claude/README.md](../README.md) - AI agent system overview
-- [.agent/rules/00-INDEX.md](../../../.agent/rules/00-INDEX.md) - Unified decision center (rules, skills, agents)
-- [CLAUDE.md](../../../CLAUDE.md) - Primary AI assistant entry point
-- [skill-registry.yml](skill-registry.yml) - Central skill metadata registry
-
----
-
-## Version History
-
-### 4.0.0 (2026-03-08) - Consolidation & Cleanup
-**Major Changes**:
-- Consolidated from 36 → 15 skills (removed phantom skills that no longer existed on disk)
-- Removed `productivity/`, `lifecycle/deprecated/` directory references (never existed in v4.0.0)
+| "Analyze slow queries" | `postgresql-best-practices`CLAUDE.md`productivity/`, `lifecycle/deprecated/` directory references (never existed in v4.0.0)
 - Synchronized README with skill-registry.yml v4.0.0 and VERSIONS.yml
 - Fixed all broken rule path references (e.g., `10-architecture-rules` → `F04-architecture-rules`)
 

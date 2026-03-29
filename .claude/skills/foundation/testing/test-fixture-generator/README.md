@@ -173,10 +173,10 @@ Auto-generate reusable test fixture builders for SmartAdmin integration tests fo
 
 | Pattern | Location | Integration |
 |---------|----------|-------------|
-| **BaseIntegrationTest** | `.agent/rules/` | Fixtures integrate with @Transactional rollback |
+| **BaseIntegrationTest** | `CLAUDE.md` | Fixtures integrate with @Transactional rollback |
 | **EmployeeTestFixture** | Reference impl | Exact pattern replication |
 | **ResponseDTO** | Service tests | Fixtures provide forms for service method calls |
-| **SmartAdmin Naming** | `.agent/foundation/F01-naming-conventions.md` | TestFixture suffix, Chinese field values |
+| **SmartAdmin Naming** | `CLAUDE.md` | TestFixture suffix, Chinese field values |
 | **Quality Standards** | `.claude/shared/knowledge/quality-standards.md` | No Lombok @Builder, constructor injection |
 
 ### Skill CSO Keywords
@@ -242,8 +242,8 @@ Auto-generate reusable test fixture builders for SmartAdmin integration tests fo
 - `/smart-admin-api-java21-springboot3/smartadmin-app/src/test/java/net/lab1024/sa/admin/BaseIntegrationTest.java`
 
 **Related Rules**:
-- `.agent/foundation/F04-architecture-rules.md` - @Transactional in Manager layer
-- `.agent/foundation/F01-naming-conventions.md` - TestFixture suffix
+- `CLAUDE.md` - @Transactional in Manager layer
+- `CLAUDE.md` - TestFixture suffix
 - `.claude/shared/knowledge/smartadmin-patterns.md` - Domain object patterns
 
 ---

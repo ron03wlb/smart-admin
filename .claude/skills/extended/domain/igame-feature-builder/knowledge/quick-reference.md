@@ -1037,4 +1037,4 @@ Before deploying iGaming features:
 - [VIP System Implementation](../references/vip-system-implementation.md) - Detailed VIP tier guide
 - [Fraud Detection Pattern Generator](../../fraud-detection-pattern-generator/) - Risk control integration
 - [SmartAdmin Patterns](./../../../.claude/shared/knowledge/smartadmin-patterns.md) - ResponseDTO, Transaction patterns
-- [Manager Layer Rules](./../../../.agent/rules/foundation/F03-manager-layer.md) - Transaction management
+- [Manager Layer Rules](CLAUDE.md) - Transaction management

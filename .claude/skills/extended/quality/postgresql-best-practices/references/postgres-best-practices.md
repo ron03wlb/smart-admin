@@ -474,8 +474,8 @@ groups:
 
 ### SmartAdmin 內部文檔
 
-- [架構規則](../../../../.agent/rules/foundation/F04-architecture-rules.md)
-- [Manager 層規範](../../../../.agent/rules/foundation/F03-manager-layer.md)
+- [架構規則](CLAUDE.md)
+- [Manager 層規範](CLAUDE.md)
 - [事務管理模式](../../../../.claude/shared/knowledge/smartadmin-patterns.md#transaction-management)
 
 ---

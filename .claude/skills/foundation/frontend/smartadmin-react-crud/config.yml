@@ -127,7 +127,6 @@ dependencies:
   skills: []
 
   required_files:
-    - ".agent/rules/foundation/F04-architecture-rules.md"
     - ".claude/shared/knowledge/smartadmin-patterns.md"
 
   tools:
@@ -195,7 +194,7 @@ documentation:
       url: "../../shared/knowledge/smartadmin-patterns.md"
 
     - title: "Architecture Rules"
-      url: "../../../.agent/rules/foundation/F04-architecture-rules.md"
+      url: "CLAUDE.md"
 
     - title: "React 19 Documentation"
       url: "https://react.dev/"

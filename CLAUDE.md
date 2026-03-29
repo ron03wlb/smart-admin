@@ -1,13 +1,12 @@
 # CLAUDE.md
 
-**For AI Assistants**: This documentation is designed for **Claude, Antigravity, Gemini, and other AI coding assistants**. All AI tools should read this as the primary entry point to SmartAdmin development guidelines.
+**For Claude Code**: This documentation is designed for **Claude Code**. Read this as the primary entry point to SmartAdmin development guidelines.
 
 **For Developers**: Quick Reference Card for SmartAdmin development patterns, conventions, and commands.
 
 **Navigation**:
 - [README.md](README.md) - Project overview and "I want to..." guide
 - [.claude/README.md](.claude/README.md) - AI agent system and orchestration
-- [.agent/README.md](.agent/README.md) - Comprehensive technical rules
 - [Architecture Documentation](docs/) - High-level system design
 
 ---
@@ -20,7 +19,7 @@
 | Paginated query | `SmartPageUtil.convert2PageQuery(form)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#pagination-pattern) |
 | Bean copy | `SmartBeanUtil.copy(source, Target.class)` | [→](.claude/shared/knowledge/smartadmin-patterns.md#bean-conversion) |
 | Transaction | `@Transactional` in Manager only | [→](.claude/shared/knowledge/smartadmin-patterns.md#transaction-management) |
-| Boolean → SMALLINT | `typeHandler=BooleanToSmallintTypeHandler` | [→](.agent/rules/technology/database/D03-postgresql-mybatis.md#mandatory-boolean-type-handling-smallint-mapping) |
+| Boolean → SMALLINT | `typeHandler=BooleanToSmallintTypeHandler` | [→](.claude/shared/knowledge/smartadmin-patterns.md) |
 
 **Complete Patterns**: [SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)
 
@@ -32,14 +31,10 @@
 
 When working with SmartAdmin codebase, read documentation in this order:
 
-1. **CLAUDE.md** (this file) - Quick reference and navigation hub
-2. **[.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md)** - Unified decision center (630 lines: rules routing, skill selection, agent orchestration) ⭐
-3. **[.agent/rules/foundation/F04-architecture-rules.md](.agent/rules/foundation/F04-architecture-rules.md)** - Mandatory architectural constraints (enforced by ArchUnit)
-4. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
-5. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks (optional, for Claude Code)
-6. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions (optional, for Claude Code)
-
-**Note**: For rule-specific questions (e.g., "How to name Service classes?"), skip directly to relevant rule files in step 3-4. The 00-INDEX.md in step 2 is primarily for AI decision-making (choosing rules/skills/agents).
+1. **CLAUDE.md** (this file) - Quick reference, key constraints, and navigation hub
+2. **[.claude/shared/knowledge/](.claude/shared/knowledge/)** - SmartAdmin implementation patterns
+3. **[.claude/skills/](.claude/skills/)** - Specialized skills for complex tasks
+4. **[.claude/agents/](.claude/agents/)** - Specialized agent definitions
 
 ### Interaction Language
 
@@ -166,7 +161,7 @@ COMMENT ON COLUMN t_player.player_id IS '玩家唯一標識';
 ### External Plugin Conflict Resolution
 
 When external plugin skills (e.g., `everything-claude-code`, `superpowers`) conflict with SmartAdmin rules:
-- **SmartAdmin `.agent/rules/` ALWAYS takes precedence** over any external plugin recommendation
+- **SmartAdmin rules defined in CLAUDE.md ALWAYS take precedence** over any external plugin recommendation
 - ❌ NEVER use JPA patterns (use MyBatis Plus: `@TableName`, `BaseMapper`, `LambdaQueryWrapper`)
 - ❌ NEVER use `java.util.Optional` in Service layer (use `io.vavr.control.Option`)
 - ❌ `@Transactional` ONLY in Manager layer (NEVER in Service, even if plugins suggest otherwise)
@@ -174,8 +169,7 @@ When external plugin skills (e.g., `everything-claude-code`, `superpowers`) conf
 
 ### When in Doubt
 
-- **Rule/Skill/Agent selection**: Consult [.agent/rules/00-INDEX.md](.agent/rules/00-INDEX.md) for unified decision center
-- **Architectural violations**: Will fail ArchUnit tests - check [.agent/configs/ArchitectureTest.java](.agent/configs/ArchitectureTest.java)
+- **Architectural violations**: Will fail ArchUnit tests - run `./gradlew :smartadmin-app:test --tests ArchitectureTest`
 - **Pattern implementation**: See [.claude/shared/knowledge/smartadmin-patterns.md](.claude/shared/knowledge/smartadmin-patterns.md)
 
 ---
@@ -209,7 +203,6 @@ Controller → Service → Manager → Dao → Entity
 - `@Transactional` / `@Cacheable`: Manager layer ONLY (NEVER in Service/Controller)
 - `@Autowired` field injection: FORBIDDEN
 
-→ **[Complete Architecture Rules](.agent/rules/foundation/F04-architecture-rules.md)**
 → **[SmartAdmin Patterns](.claude/shared/knowledge/smartadmin-patterns.md)**
 → **[Project Architecture](.claude/shared/knowledge/project-architecture.md)**
 
@@ -255,8 +248,7 @@ Controller → Service → Manager → Dao → Entity
 
 **Commit Format:** `<type>(<scope>): <subject>`
 
-→ **[Complete Naming Conventions](.agent/rules/foundation/F01-naming-conventions.md)**
-→ **[Commit Message Guide](.agent/rules/workflows/W02-commit-message-conventions.md)**
+→ **[Quality Standards](.claude/shared/knowledge/quality-standards.md)**
 
 ## Anti-Patterns to Avoid
 
@@ -306,18 +298,11 @@ SmartAdmin v4.0.0+ leverages Java 21 features for improved type safety and perfo
 
 ## Development Guidelines
 
-**Essential Rules** (see `.agent/rules/`):
-- Architecture: [`foundation/F04-architecture-rules.md`](.agent/rules/foundation/F04-architecture-rules.md)
-- Manager Layer: [`foundation/F03-manager-layer.md`](.agent/rules/foundation/F03-manager-layer.md)
-- Naming: [`foundation/F01-naming-conventions.md`](.agent/rules/foundation/F01-naming-conventions.md)
-- Exceptions: [`technology/patterns/04-exception-logging.md`](.agent/rules/technology/patterns/04-exception-logging.md)
-
 **Validation**:
 ```bash
 ./gradlew :smartadmin-app:test --tests ArchitectureTest
 ```
 
-→ **[Unified Decision Center](.agent/rules/00-INDEX.md)** - Rules, Skills, and Agent Routing
 → **[Quality Standards](.claude/shared/knowledge/quality-standards.md)**
 
 ### Mermaid Diagram Standards
@@ -421,18 +406,6 @@ SmartAdmin 提供兩套並行的技能系統（v4.0.0 優化後）：
 
 → **[Complete Skills Catalog](.claude/skills/README.md)**
 
----
-
-### 2. Antigravity/通用AI 技能系統 (`.agent/skills/`)
-**適用對象**：Antigravity, Gemini, 及其他AI助手
-**技能數量**：14個（P0:6, P1:8）— 同 .claude/ 但不含 React CRUD
-**詳細說明**：[.agent/skills/README.md](.agent/skills/README.md)
-
-**選擇指南**：
-- 使用 Claude Code CLI → 參考 `.claude/skills/`
-- 使用 Antigravity 或其他AI → 參考 `.agent/skills/`
-- 架構規則統一在 `.agent/rules/` 中
-
 ## Quality Tool Patterns
 
 Common quality tool violations and approved solutions:
@@ -449,7 +422,7 @@ Common quality tool violations and approved solutions:
 - **ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD**: @PostConstruct static field initialization pattern
 - **CT_CONSTRUCTOR_THROW**: Constructor validation pattern is safe for internal classes
 
-Detailed rules: See [.agent/rules/quality-tools/Q02-pmd-rules.md](.agent/rules/quality-tools/Q02-pmd-rules.md) and [.agent/rules/quality-tools/Q03-spotbugs-rules.md](.agent/rules/quality-tools/Q03-spotbugs-rules.md)
+Detailed rules: See [quality-standards.md](.claude/shared/knowledge/quality-standards.md)
 
 ---
 
@@ -544,7 +517,6 @@ docs/archive/
 | **This Document** | 3.5.0 | ✅ v4.1.0 Module Structure Sync | - |
 | **AI Doc System** | 3.0.2 | ✅ Optimized | [.claude/META.md](.claude/META.md) |
 | **.claude/** | 3.0.2 | ✅ Optimized | [.claude/README.md](.claude/README.md) |
-| **.agent/** | 1.0.0 | ✅ Production Ready | [.agent/VERSION.md](.agent/VERSION.md) |
 | **SmartAdmin** | v4.1.0 | ✅ Production | - |
 
 **System Metadata**: [.claude/META.md](.claude/META.md) - Unified version tracking and content ownership

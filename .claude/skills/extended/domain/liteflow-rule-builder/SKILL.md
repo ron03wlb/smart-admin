@@ -207,13 +207,9 @@ See [dsl-examples.md](examples/dsl-examples.md#red-phase-baseline-test) for expe
 
 ### Mandatory Requirements
 
-- **[Architecture Rules](../../../.agent/rules/foundation/F04-architecture-rules.md)** - LiteFlow chain calls in Service layer, complex execution (multi-table transactions) in Manager layer, constructor injection
-- **[Dependency Injection](../../../.agent/rules/foundation/F04-architecture-rules.md)** - LiteFlow nodes (@LiteflowComponent) use constructor injection (no @Autowired field injection)
 
 ### Reference Guidelines
 
-- **[Exception Handling](../../../.agent/rules/technology/patterns/04-exception-logging.md)** - CATCH node exception handling, execution failure rollback
-- **[Naming Conventions](../../../.agent/rules/foundation/F01-naming-conventions.md)** - Node: ApprovalValidationNode; Chain: approvalChain
 
 ### Related Skills
 
