@@ -118,9 +118,11 @@ export function buildDynamicRoutes(menuRouterList: MenuItem[]): RouteObject[] {
 }
 
 /**
- * 構建菜單樹（從扁平列表構建父子結構）
+ * 構建顯示用菜單樹（從扁平列表構建父子結構，並自動過濾功能點/隱藏/禁用項）
  *
- * 對應 Vue 的 buildMenuTree() 函數
+ * 注意：menuTreeUtils.ts 中的 buildMenuTree 是建構原始樹（不過濾），
+ * 此版本整合了過濾邏輯，專供路由渲染使用。
+ * 對應 Vue 的 buildMenuTree() 函數。
  */
 export function buildMenuTree(menuList: MenuItem[]): MenuItem[] {
   // 過濾有效菜單（目錄和菜單，排除功能點）

@@ -72,6 +72,8 @@ class BonusDistributionManagerTest {
       assertThat(result.getBonusAmount()).isEqualByComparingTo("100.00");
       assertThat(result.getWageringRequired()).isEqualByComparingTo("2000.00");
       assertThat(result.getStatus()).isEqualTo(BonusRecordStatusEnum.ACTIVE.getValue());
+      verify(walletDao).selectOne(any(LambdaQueryWrapper.class));
+      verify(walletManager).credit(any(WalletEntity.class), any(WalletTransactionEntity.class));
       verify(playerBonusRecordDao).insert(any(PlayerBonusRecordEntity.class));
       verify(walletBonusExtDao).insert(any(WalletBonusExtEntity.class));
     }
@@ -89,6 +91,27 @@ class BonusDistributionManagerTest {
                   bonusDistributionManager.distributeBonus(
                       1L, rule, new BigDecimal("100.00"), "claim-dup", 1L))
           .isInstanceOf(DuplicateKeyException.class);
+    }
+
+    @Test
+    @DisplayName("獎金金額超過上限 — 截頂至 maxBonus")
+    void distributeBonus_bonusCappedAtMaxBonus() {
+      PromotionRuleEntity rule = buildRule();
+      WalletEntity bonusWallet = buildBonusWallet();
+      when(walletDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(bonusWallet);
+
+      WalletTransactionEntity txEntity = new WalletTransactionEntity();
+      txEntity.setBalanceAfter(new BigDecimal("100.00"));
+      when(walletManager.credit(any(WalletEntity.class), any(WalletTransactionEntity.class)))
+          .thenReturn(txEntity);
+
+      // depositAmount=300 * bonusRate=1.00 = 300, capped at maxBonus=100
+      PlayerBonusRecordEntity result =
+          bonusDistributionManager.distributeBonus(
+              1L, rule, new BigDecimal("300.00"), "claim-003", 1L);
+
+      assertThat(result.getBonusAmount()).isEqualByComparingTo("100.00");
+      assertThat(result.getWageringRequired()).isEqualByComparingTo("2000.00");
     }
 
     @Test

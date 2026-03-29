@@ -77,13 +77,7 @@ export default function AppRoutes() {
         ],
       },
 
-      // 舊的根路徑登入頁兼容（重定向到 /login）
-      {
-        path: '/',
-        element: isLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />,
-      },
-
-      // 404
+      // 404 fallback
       {
         path: '*',
         element: isLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />,

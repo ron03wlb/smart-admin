@@ -176,20 +176,20 @@ public class ArchitectureTest {
    *
    * <p>錯誤示例：
    *
-   * <pre>
+   * <pre>{@code
    * @Transactional  // ❌ 未指定 rollbackFor
    * public void saveEmployee(Employee employee) { }
    *
    * @Transactional(rollbackFor = Exception.class)  // ❌ 無法捕獲 Error
    * public void updateEmployee(Employee employee) { }
-   * </pre>
+   * }</pre>
    *
    * <p>正確示例：
    *
-   * <pre>
+   * <pre>{@code
    * @Transactional(rollbackFor = Throwable.class)  // ✅ 正確
    * public void saveEmployee(Employee employee) { }
-   * </pre>
+   * }</pre>
    *
    * <p>規則來源：09-manager-layer.md
    */

@@ -62,7 +62,7 @@ const MenuList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentMenu, setCurrentMenu] = useState<MenuItem | undefined>();
-  const [parentForAdd, setParentForAdd] = useState<{ parentId: string | number; menuType: number } | undefined>();
+  const [parentForAdd, setParentForAdd] = useState<{ parentId: string; menuType: number } | undefined>();
 
   const queryMenus = useCallback(async () => {
     setLoading(true);
@@ -96,7 +96,7 @@ const MenuList: React.FC = () => {
     const childType = Number(parent.menuType) === MENU_TYPE_ENUM.MENU.value
       ? MENU_TYPE_ENUM.POINTS.value
       : MENU_TYPE_ENUM.MENU.value;
-    setParentForAdd({ parentId: parent.menuId, menuType: childType });
+    setParentForAdd({ parentId: String(parent.menuId), menuType: childType });
     setDrawerOpen(true);
   };
 
