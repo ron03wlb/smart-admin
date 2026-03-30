@@ -58,6 +58,10 @@ while IFS= read -r file; do
         if [[ "$file" =~ \.templates/ ]]; then
             continue
         fi
+        # 允許 docs/database 目錄（自由命名的技術文檔）
+        if [[ "$file" =~ docs/database/ ]]; then
+            continue
+        fi
         # 允許 .claude/ 目錄 (skills, agents, knowledge files)
         if [[ "$file" =~ \.claude/ ]]; then
             continue
