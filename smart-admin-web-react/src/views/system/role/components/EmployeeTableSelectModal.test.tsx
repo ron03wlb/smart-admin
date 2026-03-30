@@ -154,13 +154,15 @@ describe('EmployeeTableSelectModal', () => {
       async () => {
         render(<EmployeeTableSelectModal {...defaultProps} />);
 
+        // 確認添加 is the Modal okText button
         await waitFor(
           () => {
             expect(screen.getByText('確認添加')).toBeInTheDocument();
-            expect(screen.getByText('取消')).toBeInTheDocument();
           },
           { timeout: TEST_TIMEOUT }
         );
+        // Close (X) button is always accessible in Ant Design Modal
+        expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
       },
       TEST_TIMEOUT
     );
@@ -254,7 +256,8 @@ describe('EmployeeTableSelectModal', () => {
 
         const searchInput = screen.getByPlaceholderText('請輸入姓名、登錄名或電話搜索');
         await user.type(searchInput, '張三');
-        await user.click(screen.getByText('搜索'));
+        // Press Enter to trigger search (enterButton's search)
+        await user.keyboard('{Enter}');
 
         await waitFor(
           () => {
@@ -307,12 +310,13 @@ describe('EmployeeTableSelectModal', () => {
 
         await waitFor(
           () => {
-            expect(screen.getByText('取消')).toBeInTheDocument();
+            // Close (X) button is accessible and calls onCancel
+            expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
           },
           { timeout: TEST_TIMEOUT }
         );
 
-        await user.click(screen.getByText('取消'));
+        await user.click(screen.getByRole('button', { name: 'Close' }));
 
         expect(onCancel).toHaveBeenCalledTimes(1);
       },

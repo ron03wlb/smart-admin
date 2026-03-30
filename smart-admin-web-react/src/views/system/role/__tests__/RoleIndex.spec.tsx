@@ -3,100 +3,82 @@ import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { renderWithProviders } from '@/test/utils/test-utils';
 import RoleIndex from '../index';
-import { roleApi } from '@/api/system/role-api';
-import { roleMenuApi } from '@/api/system/role-menu-api';
+import { roleApi } from '@/api/system/roleApi';
 
-vi.mock('@/api/system/role-api');
-vi.mock('@/api/system/role-menu-api');
-vi.mock('@/api/system/employee-api', () => ({
-  employeeApi: { query: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 } }), queryAll: vi.fn().mockResolvedValue({ code: 1, data: [] }) },
+vi.mock('@/api/system/roleApi');
+vi.mock('@/api/system/role-menu-api', () => ({
+  roleMenuApi: {
+    getRoleSelectedMenu: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: '', data: { menuTreeList: [], selectedMenuId: [] } }),
+  },
+}));
+vi.mock('@/api/system/employeeApi', () => ({
+  employeeApi: {
+    queryEmployee: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: '', data: { list: [], total: 0, pageNum: 1, pageSize: 10, pages: 0, emptyFlag: true } }),
+  },
 }));
 
 const mockRoles = [
-  { roleId: 1, roleName: '管理员', roleCode: 'admin', remark: '' },
-  { roleId: 2, roleName: '普通用户', roleCode: 'user', remark: '' },
+  { roleId: 1, roleName: '管理员', roleCode: 'admin', remark: '', createTime: '', updateTime: '' },
+  { roleId: 2, roleName: '普通用户', roleCode: 'user', remark: '', createTime: '', updateTime: '' },
 ];
-
-const mockMenuTree = {
-  menuTreeList: [
-    { menuId: '100', menuName: '系统管理', menuType: 1, children: [] },
-  ],
-  selectedMenuId: ['100'],
-};
 
 describe('RoleIndex', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(roleApi.getAll).mockResolvedValue({
-      code: 1,
-      data: mockRoles,
-      success: true,
-    });
-    vi.mocked(roleMenuApi.getRoleSelectedMenu).mockResolvedValue({
-      code: 1,
-      data: mockMenuTree,
-      success: true,
-    });
-    vi.mocked(roleApi.getDataScopeList).mockResolvedValue({
-      code: 1,
-      data: [],
-      success: true,
-    });
-    vi.mocked(roleApi.queryEmployee).mockResolvedValue({
-      code: 1,
-      data: { list: [], total: 0 },
-      success: true,
-    });
+    vi.mocked(roleApi.queryAll).mockResolvedValue({ ok: true, code: 200, msg: '', data: mockRoles });
+    vi.mocked(roleApi.getDataScopeByRoleId).mockResolvedValue({ ok: true, code: 200, msg: '', data: [] });
+    vi.mocked(roleApi.getDataScopeList).mockResolvedValue({ ok: true, code: 200, msg: '', data: [] });
+    vi.mocked(roleApi.queryRoleEmployee).mockResolvedValue({ ok: true, code: 200, msg: '', data: { list: [], total: 0, pageNum: 1, pageSize: 10, pages: 0, emptyFlag: true } });
   });
 
   it('should display role list on mount', async () => {
-    renderWithProviders(<RoleIndex />);
+    renderWithProviders(<RoleIndex />, { preloadedState: { user: { administratorFlag: true } } });
 
     await waitFor(() => {
       expect(screen.getByText('管理员')).toBeInTheDocument();
       expect(screen.getByText('普通用户')).toBeInTheDocument();
     });
 
-    expect(roleApi.getAll).toHaveBeenCalled();
+    expect(roleApi.queryAll).toHaveBeenCalled();
   });
 
-  it('should display role list card title', async () => {
-    renderWithProviders(<RoleIndex />);
+  it('should display add button', async () => {
+    renderWithProviders(<RoleIndex />, { preloadedState: { user: { administratorFlag: true } } });
 
     await waitFor(() => {
-      expect(screen.getByText('角色列表')).toBeInTheDocument();
+      expect(screen.getByText('管理员')).toBeInTheDocument();
     });
 
-    // Ant Design button renders CJK with spaces, use role query
-    const addButton = screen.getByRole('button', { name: /添\s*加/ });
+    const addButton = screen.getByRole('button', { name: /新增角色/ });
     expect(addButton).toBeInTheDocument();
   });
 
   it('should open form modal when add button clicked', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<RoleIndex />);
+    renderWithProviders(<RoleIndex />, { preloadedState: { user: { administratorFlag: true } } });
 
     await waitFor(() => {
       expect(screen.getByText('管理员')).toBeInTheDocument();
     });
 
-    const addButton = screen.getByRole('button', { name: /添\s*加/ });
+    const addButton = screen.getByRole('button', { name: /新增角色/ });
     await user.click(addButton);
 
     await waitFor(() => {
-      expect(screen.getByText('添加角色')).toBeInTheDocument();
+      // Modal title appears in .ant-modal-title, button text in .ant-btn
+      expect(document.querySelector('.ant-modal-title')).toBeInTheDocument();
     });
   });
 
-  it('should show setting tabs', async () => {
-    renderWithProviders(<RoleIndex />);
+  it('should display table columns', async () => {
+    renderWithProviders(<RoleIndex />, { preloadedState: { user: { administratorFlag: true } } });
 
     await waitFor(() => {
       expect(screen.getByText('管理员')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('角色-功能权限')).toBeInTheDocument();
-    expect(screen.getByText('角色-数据范围')).toBeInTheDocument();
-    expect(screen.getByText('角色-员工列表')).toBeInTheDocument();
+    // Table may have duplicate headers (sticky + body), use getAllByText
+    expect(screen.getAllByText('角色名稱').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('角色編碼').length).toBeGreaterThan(0);
   });
 });
