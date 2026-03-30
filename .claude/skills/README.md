@@ -1,8 +1,8 @@
 # SmartAdmin Skills Catalog
 
-**Version**: 4.0.0
-**Last Updated**: 2026-03-08
-**Total Skills**: 15 (P0: 7, P1: 8)
+**Version**: 4.1.0
+**Last Updated**: 2026-03-29
+**Total Skills**: 16 (P0: 7, P1: 9)
 
 ---
 
@@ -17,9 +17,9 @@ Skills are organized in a **Two-Layer Architecture** combining priority (top lev
 │   ├── frontend/        (1: React CRUD)
 │   ├── full-stack/      (2: CRUD Generator, Integration Test)
 │   └── testing/         (1: Test Fixtures)
-└── extended/            (P1 - 8 skills: Domain & Quality)
+└── extended/            (P1 - 9 skills: Domain & Quality)
     ├── domain/          (3: iGaming PM, Feature Builder, LiteFlow)
-    └── quality/         (5: Concurrency, Spring, Naming, Manager Extractor, PostgreSQL)
+    └── quality/         (6: Concurrency, Spring, Naming, Manager Extractor, PostgreSQL, Java21+PG Migration)
 ```
 
 ## Quick Navigation
@@ -27,7 +27,7 @@ Skills are organized in a **Two-Layer Architecture** combining priority (top lev
 | Priority | Count | Categories | Purpose |
 |----------|-------|------------|---------|
 | **P0** (Foundation) | 7 skills | Backend, Frontend, Full-stack, Testing | Critical foundation patterns, essential workflows |
-| **P1** (Extended) | 8 skills | Domain, Quality | Business features, quality validation |
+| **P1** (Extended) | 9 skills | Domain, Quality | Business features, quality validation |
 
 ---
 
@@ -166,6 +166,13 @@ Auto-extract `@Transactional` methods from Service to Manager layer with AST man
 PostgreSQL performance analysis (HikariCP tuning, N+1 detection, EXPLAIN ANALYZE, index recommendations).
 
 **Trigger Keywords**: "database performance", "HikariCP", "N+1 detection", "EXPLAIN ANALYZE"
+
+---
+
+#### [java21-postgresql-migration](extended/quality/java21-postgresql-migration/)
+Java 17→21 與 MySQL→PostgreSQL 遷移規範。涵蓋 toolchain 配置、Virtual Threads、Jakarta EE、BooleanToSmallintTypeHandler、Flyway、SQL 語法差異，以及完整驗收 checklist。
+
+**Trigger Keywords**: "java migration", "java 21", "postgresql migration", "mysql to postgres", "BooleanToSmallintTypeHandler", "virtual threads", "validate migration"
 
 ---
 

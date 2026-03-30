@@ -380,9 +380,9 @@ SmartAdmin 提供兩套並行的技能系統（v4.0.0 優化後）：
 │   ├── frontend/    (1 skill: React CRUD)
 │   ├── full-stack/  (2 skills: CRUD Generator, Integration Test)
 │   └── testing/     (1 skill: Test Fixture)
-└── extended/        (P1 - 8 skills: Domain, Quality)
+└── extended/        (P1 - 9 skills: Domain, Quality)
     ├── domain/      (3 skills: iGaming PM, iGaming Feature Builder, LiteFlow)
-    └── quality/     (5 skills: Concurrency, Spring, Naming, Manager Extractor, PostgreSQL)
+    └── quality/     (6 skills: Concurrency, Spring, Naming, Manager Extractor, PostgreSQL, Java21+PG Migration)
 ```
 
 **P0 Skills (Foundation)** - 7 skills:
@@ -394,7 +394,7 @@ SmartAdmin 提供兩套並行的技能系統（v4.0.0 優化後）：
 - **[smartadmin-integration-test](.claude/skills/foundation/full-stack/smartadmin-integration-test/)** - Testcontainers integration tests
 - **[test-fixture-generator](.claude/skills/foundation/testing/test-fixture-generator/)** - Test data builders
 
-**P1 Skills (Extended)** - 8 skills:
+**P1 Skills (Extended)** - 9 skills:
 - **[igaming-pm-analyst](.claude/skills/extended/domain/igame-pm-analyst/)** - iGaming PM (PRD, multi-tenant, seamless wallet, compliance)
 - **[igaming-feature-builder](.claude/skills/extended/domain/igame-feature-builder/)** - iGaming features (VIP, Wallet, Bonus, Fraud detection)
 - **[liteflow-rule-builder](.claude/skills/extended/domain/liteflow-rule-builder/)** - LiteFlow DSL for business workflows
@@ -403,6 +403,7 @@ SmartAdmin 提供兩套並行的技能系統（v4.0.0 優化後）：
 - **[naming-convention-checker](.claude/skills/extended/quality/naming-convention-checker/)** - SmartAdmin naming validation
 - **[smartadmin-manager-extractor](.claude/skills/extended/quality/smartadmin-manager-extractor/)** - Auto-extract @Transactional to Manager (83% time saving)
 - **[postgresql-best-practices](.claude/skills/extended/quality/postgresql-best-practices/)** - PostgreSQL performance analysis
+- **[java21-postgresql-migration](.claude/skills/extended/quality/java21-postgresql-migration/)** - Java 17→21 + MySQL→PostgreSQL 遷移規範與驗收 checklist
 
 → **[Complete Skills Catalog](.claude/skills/README.md)**
 
