@@ -136,29 +136,32 @@ export type EmployeeFormData = Partial<EmployeeAddForm> & {
 /**
  * 性別枚舉
  */
-export enum GenderEnum {
+export const GenderEnum = {
   /** 男 */
-  MALE = 1,
+  MALE: 1,
   /** 女 */
-  FEMALE = 2,
-}
+  FEMALE: 2,
+} as const;
+export type GenderEnum = (typeof GenderEnum)[keyof typeof GenderEnum];
 
 /**
  * 員工狀態枚舉
  */
-export enum EmployeeStatusEnum {
+export const EmployeeStatusEnum = {
   /** 啟用 */
-  ENABLED = 0,
+  ENABLED: 0,
   /** 禁用 */
-  DISABLED = 1,
-}
+  DISABLED: 1,
+} as const;
+export type EmployeeStatusEnum = (typeof EmployeeStatusEnum)[keyof typeof EmployeeStatusEnum];
 
 /**
  * 離職狀態枚舉
  */
-export enum LeaveStatusEnum {
+export const LeaveStatusEnum = {
   /** 在職 */
-  ON_JOB = 0,
+  ON_JOB: 0,
   /** 離職 */
-  RESIGNED = 1,
-}
+  RESIGNED: 1,
+} as const;
+export type LeaveStatusEnum = (typeof LeaveStatusEnum)[keyof typeof LeaveStatusEnum];

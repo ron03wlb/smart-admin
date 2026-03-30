@@ -17,7 +17,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Select, message } from 'antd';
 import type { SelectProps } from 'antd';
-import { employeeApi, EmployeeVO } from '@/api/system/employeeApi';
+import { employeeApi } from '@/api/system/employeeApi';
+import type { EmployeeVO } from '@/api/system/employeeApi';
 
 /**
  * 員工選擇器 Props

@@ -9,7 +9,7 @@
  */
 
 import request from '@/utils/request';
-import { ResponseDTO, PageResult } from '@/api/types/response';
+import type { ResponseDTO, PageResult } from '@/api/types/response';
 import type {
   EmployeeVO,
   EmployeeQueryForm,
