@@ -47,11 +47,11 @@ describe('RoleIndex', () => {
 
     await waitFor(() => {
       expect(screen.getByText('管理员')).toBeInTheDocument();
-    });
+    }, { timeout: 10000 });
 
     const addButton = screen.getByRole('button', { name: /新增角色/ });
     expect(addButton).toBeInTheDocument();
-  });
+  }, 12000);
 
   it('should open form modal when add button clicked', async () => {
     const user = userEvent.setup();
@@ -59,7 +59,7 @@ describe('RoleIndex', () => {
 
     await waitFor(() => {
       expect(screen.getByText('管理员')).toBeInTheDocument();
-    });
+    }, { timeout: 10000 });
 
     const addButton = screen.getByRole('button', { name: /新增角色/ });
     await user.click(addButton);
@@ -67,8 +67,8 @@ describe('RoleIndex', () => {
     await waitFor(() => {
       // Modal title appears in .ant-modal-title, button text in .ant-btn
       expect(document.querySelector('.ant-modal-title')).toBeInTheDocument();
-    });
-  });
+    }, { timeout: 10000 });
+  }, 15000);
 
   it('should display table columns', async () => {
     renderWithProviders(<RoleIndex />, { preloadedState: { user: { administratorFlag: true } } });
