@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -16,10 +15,8 @@ import net.lab1024.sa.igaming.activity.dao.PlayerBonusRecordDao;
 import net.lab1024.sa.igaming.activity.domain.entity.PlayerBonusRecordEntity;
 import net.lab1024.sa.igaming.common.constant.BonusRecordStatusEnum;
 import net.lab1024.sa.igaming.common.constant.BonusStatusEnum;
-import net.lab1024.sa.igaming.common.constant.GameCategoryEnum;
 import net.lab1024.sa.igaming.game.dao.GameDao;
 import net.lab1024.sa.igaming.game.dao.GameWeightConfigDao;
-import net.lab1024.sa.igaming.game.domain.entity.GameEntity;
 import net.lab1024.sa.igaming.wallet.dao.WalletBonusExtDao;
 import net.lab1024.sa.igaming.wallet.domain.entity.WalletBonusExtEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,12 +70,6 @@ class WageringProgressManagerTest {
       record.setWalletBonusExtId(10L);
       when(playerBonusRecordDao.selectActiveByPlayerId(1L)).thenReturn(List.of(record));
 
-      GameEntity game = new GameEntity();
-      game.setCategory(GameCategoryEnum.SLOTS.getValue());
-      when(gameDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(game);
-      when(gameWeightConfigDao.selectWeight(1L, GameCategoryEnum.SLOTS.getValue()))
-          .thenReturn(new BigDecimal("1.00"));
-
       WalletBonusExtEntity ext = buildBonusExt();
       when(walletBonusExtDao.selectById(10L)).thenReturn(ext);
 
@@ -100,8 +91,6 @@ class WageringProgressManagerTest {
       record.setWageringCompleted(new BigDecimal("1950.00"));
       record.setWalletBonusExtId(10L);
       when(playerBonusRecordDao.selectActiveByPlayerId(1L)).thenReturn(List.of(record));
-
-      when(gameDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 
       WalletBonusExtEntity ext = buildBonusExt();
       when(walletBonusExtDao.selectById(10L)).thenReturn(ext);
@@ -137,8 +126,6 @@ class WageringProgressManagerTest {
       record.setWalletBonusExtId(10L);
       when(playerBonusRecordDao.selectActiveByPlayerId(1L)).thenReturn(List.of(record));
 
-      when(gameDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
-
       WalletBonusExtEntity ext = buildBonusExt();
       when(walletBonusExtDao.selectById(10L)).thenReturn(ext);
 
@@ -159,19 +146,14 @@ class WageringProgressManagerTest {
       record.setWageringCompleted(BigDecimal.ZERO);
       when(playerBonusRecordDao.selectActiveByPlayerId(1L)).thenReturn(List.of(record));
 
-      GameEntity game = new GameEntity();
-      game.setCategory(GameCategoryEnum.LIVE_CASINO.getValue());
-      when(gameDao.selectOne(any(LambdaQueryWrapper.class))).thenReturn(game);
-      when(gameWeightConfigDao.selectWeight(1L, GameCategoryEnum.LIVE_CASINO.getValue()))
-          .thenReturn(new BigDecimal("0.50"));
-
       int updated =
           wageringProgressManager.updateWageringProgress(
               1L, "LIVE001", new BigDecimal("200.00"), 1L);
 
       assertThat(updated).isEqualTo(1);
-      // 200 * 0.50 = 100
-      assertThat(record.getWageringCompleted()).isEqualByComparingTo("100.00");
+      // betAmount is passed directly (game weight already applied upstream in
+      // TurnoverCalculationService)
+      assertThat(record.getWageringCompleted()).isEqualByComparingTo("200.00");
     }
   }
 
