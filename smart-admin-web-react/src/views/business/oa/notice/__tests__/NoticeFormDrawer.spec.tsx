@@ -1,7 +1,7 @@
 /**
  * NoticeFormDrawer Tests
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import NoticeFormDrawer from '../NoticeFormDrawer';
 
@@ -18,9 +18,13 @@ vi.mock('@/api/business/oa/notice-api', () => ({
     update: vi.fn().mockResolvedValue({ code: 1 }),
     getUpdateVO: vi.fn().mockResolvedValue({ code: 1, data: {} }),
   },
+  noticeTypeApi: {
+    getAll: vi.fn().mockResolvedValue({ code: 1, data: [] }),
+    add: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
 }));
-
-import { noticeApi } from '@/api/business/oa/notice-api';
 
 const mockNoticeTypes = [
   { noticeTypeId: 1, noticeTypeName: '通知' },
@@ -33,33 +37,41 @@ describe('NoticeFormDrawer', () => {
 
   beforeEach(() => vi.clearAllMocks());
 
-  it('should render add mode', () => {
+  it('should render add mode', async () => {
     render(
       <NoticeFormDrawer open={true} noticeTypes={mockNoticeTypes} onClose={onClose} onSuccess={onSuccess} />,
     );
-    expect(screen.getByText(/新建通知公告/)).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByText(/新建通知公告/)).toBeDefined();
+    });
   });
 
-  it('should render form fields', () => {
+  it('should render form fields', async () => {
     render(
       <NoticeFormDrawer open={true} noticeTypes={mockNoticeTypes} onClose={onClose} onSuccess={onSuccess} />,
     );
-    expect(screen.getByLabelText('标题')).toBeDefined();
-    expect(screen.getByLabelText('作者')).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByLabelText('标题')).toBeDefined();
+      expect(screen.getByLabelText('作者')).toBeDefined();
+    });
   });
 
-  it('should render rich text editor', () => {
+  it('should render rich text editor', async () => {
     render(
       <NoticeFormDrawer open={true} noticeTypes={mockNoticeTypes} onClose={onClose} onSuccess={onSuccess} />,
     );
-    expect(screen.getByTestId('rich-editor')).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByTestId('rich-editor')).toBeDefined();
+    });
   });
 
-  it('should render save and cancel buttons', () => {
+  it('should render save and cancel buttons', async () => {
     render(
       <NoticeFormDrawer open={true} noticeTypes={mockNoticeTypes} onClose={onClose} onSuccess={onSuccess} />,
     );
-    expect(screen.getByRole('button', { name: /保\s*存/ })).toBeDefined();
-    expect(screen.getByRole('button', { name: /取\s*消/ })).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /保\s*存/ })).toBeDefined();
+      expect(screen.getByRole('button', { name: /取\s*消/ })).toBeDefined();
+    });
   });
 });

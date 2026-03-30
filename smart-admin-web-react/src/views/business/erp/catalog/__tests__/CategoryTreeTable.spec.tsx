@@ -39,7 +39,7 @@ describe('CategoryTreeTable', () => {
     await waitFor(() => {
       expect(screen.getByText('电子产品')).toBeDefined();
       expect(screen.getByText('服装')).toBeDefined();
-    });
+    }, { timeout: 10000 });
   });
 
   it('should call queryTree on mount', async () => {

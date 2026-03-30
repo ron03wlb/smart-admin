@@ -93,3 +93,6 @@ venv/
 backup/
 docs/ralph/.env
 docs/ralph/.rate-limit-until
+
+# OpenSpec local workspace
+openspec/
