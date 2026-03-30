@@ -63,12 +63,12 @@ describe('IconSelect', () => {
     it(
       '應該在禁用狀態下不可操作',
       async () => {
-        render(<IconSelect disabled />);
+        const { container } = render(<IconSelect disabled />);
 
         await waitFor(
           () => {
-            const select = screen.getByRole('combobox');
-            expect(select).toHaveClass('ant-select-disabled');
+            const selectWrapper = container.querySelector('.ant-select-disabled');
+            expect(selectWrapper).toBeInTheDocument();
           },
           { timeout: TEST_TIMEOUT }
         );

@@ -8,7 +8,8 @@
  * @Date: 2026-03-09
  */
 
-import { MenuItem, MenuTypeEnum, PermissionPoint } from '@/types/menu';
+import { MenuTypeEnum } from '@/types/menu';
+import type { MenuItem, PermissionPoint } from '@/types/menu';
 
 /**
  * 構建菜單樹

@@ -12,7 +12,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginApi, LoginForm } from '@/api/system/loginApi';
 import type { RootState } from '../index';
 import { LOCAL_STORAGE_KEYS } from '@/constants/storageKeys';
-import { MenuItem, PermissionPoint } from '@/types/menu';
+import type { MenuItem, PermissionPoint } from '@/types/menu';
 import {
   buildMenuTree,
   buildMenuParentIdListMap,

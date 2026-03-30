@@ -11,14 +11,15 @@
 /**
  * 菜單類型枚舉
  */
-export enum MenuTypeEnum {
+export const MenuTypeEnum = {
   /** 目錄 */
-  CATALOG = 1,
+  CATALOG: 1,
   /** 菜單 */
-  MENU = 2,
+  MENU: 2,
   /** 功能點 */
-  POINTS = 3,
-}
+  POINTS: 3,
+} as const;
+export type MenuTypeEnum = (typeof MenuTypeEnum)[keyof typeof MenuTypeEnum];
 
 /**
  * 菜單項接口

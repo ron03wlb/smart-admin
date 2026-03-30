@@ -9,24 +9,26 @@
 /**
  * 菜單類型枚舉
  */
-export enum MenuTypeEnum {
+export const MenuTypeEnum = {
   /** 目錄 */
-  CATALOG = 1,
+  CATALOG: 1,
   /** 菜單 */
-  MENU = 2,
+  MENU: 2,
   /** 功能點/權限點 */
-  POINTS = 3,
-}
+  POINTS: 3,
+} as const;
+export type MenuTypeEnum = (typeof MenuTypeEnum)[keyof typeof MenuTypeEnum];
 
 /**
  * 權限類型枚舉
  */
-export enum PermsTypeEnum {
+export const PermsTypeEnum = {
   /** Sa-Token */
-  SA_TOKEN = 1,
+  SA_TOKEN: 1,
   /** Spring Security */
-  SPRING_SECURITY = 2,
-}
+  SPRING_SECURITY: 2,
+} as const;
+export type PermsTypeEnum = (typeof PermsTypeEnum)[keyof typeof PermsTypeEnum];
 
 /**
  * 菜單 VO（View Object）

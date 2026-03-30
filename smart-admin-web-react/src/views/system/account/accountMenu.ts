@@ -8,7 +8,8 @@
  * @Date: 2026-03-14
  */
 
-import { lazy, ComponentType } from 'react';
+import { lazy } from 'react';
+import type { ComponentType } from 'react';
 
 /**
  * 菜單項接口

@@ -6,7 +6,7 @@
  * @Date: 2026-03-09
  */
 
-import { MenuItem, PermissionPoint, MenuTypeEnum } from '@/types/menu';
+import type { MenuItem, PermissionPoint, MenuTypeEnum } from '@/types/menu';
 import type { MenuVO, PointVO } from '@/api/system/loginApi';
 
 /**
