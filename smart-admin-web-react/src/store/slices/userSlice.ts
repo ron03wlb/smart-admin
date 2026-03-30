@@ -8,7 +8,8 @@
  * @Date: 2026-03-09
  */
 
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { loginApi } from '@/api/system/loginApi';
 import type { LoginForm } from '@/api/system/loginApi';
 import type { RootState } from '../index';

@@ -9,7 +9,7 @@
  */
 
 import request from '@/utils/request';
-import { ResponseDTO } from '@/api/types/response';
+import type { ResponseDTO } from '@/api/types/response';
 import type {
   CategoryVO,
   CategoryTreeQueryForm,

@@ -8,7 +8,7 @@
  * @Date: 2026-03-10
  */
 
-import { SmartEnum } from '@/types/smart-enum';
+import type { SmartEnum } from '@/types/smart-enum';
 
 /**
  * 文件上傳文件夾類型枚舉

@@ -8,7 +8,7 @@
  * @Date: 2026-03-10
  */
 
-import { SmartEnum, SmartEnumItem, SmartEnumWrapper } from '@/types/smart-enum';
+import type { SmartEnum, SmartEnumItem, SmartEnumWrapper } from '@/types/smart-enum';
 import * as COMMON_CONST from '@/constants/common-const';
 import { CHANGE_LOG_TYPE_ENUM } from '@/constants/support/changeLogConst';
 

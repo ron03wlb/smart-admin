@@ -14,8 +14,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { TreeSelect, TreeSelectProps, message } from 'antd';
-import { queryCategoryTree, CategoryTreeNode } from '@/api/business/categoryApi';
+import { TreeSelect, message } from 'antd';
+import type { TreeSelectProps } from 'antd';
+import { queryCategoryTree } from '@/api/business/categoryApi';
+import type { CategoryTreeNode } from '@/api/business/categoryApi';
 
 export interface CategoryTreeSelectProps extends Omit<TreeSelectProps, 'treeData'> {
   /**

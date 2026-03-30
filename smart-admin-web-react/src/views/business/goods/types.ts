@@ -9,14 +9,15 @@
 /**
  * 商品狀態枚舉
  */
-export enum GoodsStatusEnum {
+export const GoodsStatusEnum = {
   /** 預約中 */
-  APPOINTMENT = 1,
+  APPOINTMENT: 1,
   /** 售賣中 */
-  SELLING = 2,
+  SELLING: 2,
   /** 售罄 */
-  SOLD_OUT = 3,
-}
+  SOLD_OUT: 3,
+} as const;
+export type GoodsStatusEnum = (typeof GoodsStatusEnum)[keyof typeof GoodsStatusEnum];
 
 /**
  * 商品 VO (View Object)

@@ -9,7 +9,8 @@
  * @Date: 2026-03-09
  */
 
-import { Button, ButtonProps } from 'antd';
+import { Button } from 'antd';
+import type { ButtonProps } from 'antd';
 import { usePrivilege } from '@/hooks/usePrivilege';
 
 /**

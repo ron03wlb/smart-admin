@@ -8,7 +8,7 @@
  * @Date: 2026-03-13
  */
 
-import { SmartEnum } from '@/types/smart-enum';
+import type { SmartEnum } from '@/types/smart-enum';
 
 /**
  * 更新類型枚舉（SmartEnum 格式，用於 SmartEnumSelect）

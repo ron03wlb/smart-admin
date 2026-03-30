@@ -11,7 +11,8 @@
  * @Date: 2026-03-10
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import type { TenantState, TenantInfo } from '@/types/tenant';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 

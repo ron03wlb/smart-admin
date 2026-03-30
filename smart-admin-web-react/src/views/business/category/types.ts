@@ -90,19 +90,21 @@ export type CategoryFormData = Partial<CategoryAddForm> & {
 /**
  * 分類類型枚舉
  */
-export enum CategoryTypeEnum {
+export const CategoryTypeEnum = {
   /** 商品分類 */
-  GOODS = 1,
+  GOODS: 1,
   /** 演示分類 */
-  DEMO = 2,
-}
+  DEMO: 2,
+} as const;
+export type CategoryTypeEnum = (typeof CategoryTypeEnum)[keyof typeof CategoryTypeEnum];
 
 /**
  * 禁用狀態枚舉（使用 number 而非 boolean 以符合 TypeScript 枚舉規範）
  */
-export enum DisabledStatusEnum {
+export const DisabledStatusEnum = {
   /** 啟用 */
-  ENABLED = 0,
+  ENABLED: 0,
   /** 禁用 */
-  DISABLED = 1,
-}
+  DISABLED: 1,
+} as const;
+export type DisabledStatusEnum = (typeof DisabledStatusEnum)[keyof typeof DisabledStatusEnum];

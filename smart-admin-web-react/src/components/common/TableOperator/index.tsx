@@ -15,7 +15,8 @@
  */
 
 import React from 'react';
-import { Button, Space, Row, ButtonProps } from 'antd';
+import { Button, Space, Row } from 'antd';
+import type { ButtonProps } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,

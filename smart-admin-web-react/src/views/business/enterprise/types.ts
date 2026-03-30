@@ -9,18 +9,19 @@
 /**
  * 企業類型枚舉
  */
-export enum EnterpriseTypeEnum {
+export const EnterpriseTypeEnum = {
   /** 有限責任公司 */
-  LIMITED_LIABILITY = 1,
+  LIMITED_LIABILITY: 1,
   /** 股份有限公司 */
-  JOINT_STOCK = 2,
+  JOINT_STOCK: 2,
   /** 個人獨資企業 */
-  SOLE_PROPRIETORSHIP = 3,
+  SOLE_PROPRIETORSHIP: 3,
   /** 合夥企業 */
-  PARTNERSHIP = 4,
+  PARTNERSHIP: 4,
   /** 其他 */
-  OTHER = 5,
-}
+  OTHER: 5,
+} as const;
+export type EnterpriseTypeEnum = (typeof EnterpriseTypeEnum)[keyof typeof EnterpriseTypeEnum];
 
 /**
  * 企業 VO (View Object)

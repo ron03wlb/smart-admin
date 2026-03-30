@@ -9,7 +9,8 @@
  * @Date: 2026-03-09
  */
 
-import { lazy, ComponentType } from 'react';
+import { lazy } from 'react';
+import type { ComponentType } from 'react';
 
 // ==================== 視圖組件映射表 ====================
 
