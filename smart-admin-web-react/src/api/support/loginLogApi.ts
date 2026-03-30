@@ -7,7 +7,7 @@
  */
 
 import request from '@/utils/request';
-import { ResponseDTO, PageResult } from '@/api/types/response';
+import type { ResponseDTO, PageResult } from '@/api/types/response';
 import type { LoginLogVO, LoginLogQueryForm } from '@/views/support/login-log/types';
 
 /**

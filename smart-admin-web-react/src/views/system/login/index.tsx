@@ -43,7 +43,7 @@ export default function LoginPage() {
   const [emailCodeButtonDisabled, setEmailCodeButtonDisabled] = useState<boolean>(false);
 
   // 驗證碼自動刷新定時器
-  const [captchaRefreshInterval, setCaptchaRefreshInterval] = useState<NodeJS.Timeout | null>(null);
+  const [captchaRefreshInterval, setCaptchaRefreshInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   /**
    * 獲取驗證碼

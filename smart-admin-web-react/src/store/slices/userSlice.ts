@@ -9,7 +9,8 @@
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { loginApi, LoginForm } from '@/api/system/loginApi';
+import { loginApi } from '@/api/system/loginApi';
+import type { LoginForm } from '@/api/system/loginApi';
 import type { RootState } from '../index';
 import { LOCAL_STORAGE_KEYS } from '@/constants/storageKeys';
 import type { MenuItem, PermissionPoint } from '@/types/menu';

@@ -1,49 +1,79 @@
+/**
+ * AccountIndex Spec Tests
+ * 個人中心主頁面測試
+ *
+ * @Author: SmartAdmin React Team
+ * @Date: 2026-03-14
+ */
+
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import { renderWithProviders } from '@/test/utils/test-utils';
+import { render } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import { BrowserRouter } from 'react-router-dom';
 import AccountIndex from '../index';
+import userReducer from '@/store/slices/userSlice';
 
-vi.mock('@/api/system/login.api', () => ({
-  getLoginInfo: vi.fn().mockResolvedValue({
-    code: 1,
-    data: {
-      loginName: 'admin',
-      departmentName: '技术部',
-      actualName: '管理员',
-      gender: 1,
-      phone: '13800138000',
-      email: 'admin@test.com',
-    },
-  }),
-}));
-
-vi.mock('@/api/system/employee-api', () => ({
+// Mock employeeApi (used by Center and Password)
+vi.mock('@/api/system/employeeApi', () => ({
   employeeApi: {
-    updateCenter: vi.fn().mockResolvedValue({ code: 1, success: true }),
-    updatePassword: vi.fn().mockResolvedValue({ code: 1, success: true }),
-    query: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 } }),
-    queryAll: vi.fn().mockResolvedValue({ code: 1, data: [] }),
+    getEmployee: vi.fn().mockResolvedValue({
+      ok: true,
+      code: 200,
+      msg: 'Success',
+      data: {
+        employeeId: 1,
+        loginName: 'admin',
+        departmentId: 1,
+        actualName: '管理員',
+        gender: 1,
+        phone: '13800138000',
+        email: 'admin@test.com',
+        positionId: 1,
+        remark: '',
+      },
+    }),
+    updateEmployee: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: 'Success', data: undefined }),
+    getPasswordComplexityEnabled: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: 'Success', data: false }),
+    updateEmployeePassword: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: 'Success', data: undefined }),
   },
 }));
 
-vi.mock('@/api/support/login-log-api', () => ({
-  loginLogApi: {
-    queryListLogin: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 } }),
-  },
-}));
+/**
+ * Helper: render with Redux store + BrowserRouter
+ */
+function renderWithProviders(ui: React.ReactElement) {
+  const store = configureStore({
+    reducer: {
+      user: userReducer as any,
+    },
+    preloadedState: {
+      user: {
+        token: 'test-token',
+        employeeId: '1',
+        employeeName: '管理員',
+        loginName: 'admin',
+        administratorFlag: true,
+        menuTree: [],
+        displayMenuTree: [],
+        pointsList: [],
+        menuRouterList: [],
+        menuParentIdListMap: {},
+        unreadMessageCount: 0,
+        loading: false,
+        error: null,
+      },
+    },
+  });
 
-vi.mock('@/api/support/operate-log-api', () => ({
-  operateLogApi: {
-    queryListLogin: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 } }),
-  },
-}));
-
-vi.mock('@/api/support/message-api', () => ({
-  messageApi: {
-    queryMessage: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 } }),
-  },
-}));
+  return render(
+    <Provider store={store}>
+      <BrowserRouter>{ui}</BrowserRouter>
+    </Provider>
+  );
+}
 
 describe('AccountIndex', () => {
   beforeEach(() => {
@@ -54,11 +84,11 @@ describe('AccountIndex', () => {
     renderWithProviders(<AccountIndex />);
 
     await waitFor(() => {
-      expect(screen.getByText('个人中心')).toBeInTheDocument();
-      expect(screen.getByText('修改密码')).toBeInTheDocument();
+      expect(screen.getByText('個人中心')).toBeInTheDocument();
+      expect(screen.getByText('修改密碼')).toBeInTheDocument();
       expect(screen.getByText('我的消息')).toBeInTheDocument();
-      expect(screen.getByText('登录日志')).toBeInTheDocument();
-      expect(screen.getByText('操作日志')).toBeInTheDocument();
+      expect(screen.getByText('登錄日誌')).toBeInTheDocument();
+      expect(screen.getByText('操作日誌')).toBeInTheDocument();
     });
   });
 
@@ -66,8 +96,8 @@ describe('AccountIndex', () => {
     renderWithProviders(<AccountIndex />);
 
     await waitFor(() => {
-      // AccountCenter has a form with "登录账号" field
-      expect(screen.getByText('登录账号')).toBeInTheDocument();
+      // Center component has a form with "登錄賬號" field
+      expect(screen.getByText('登錄賬號')).toBeInTheDocument();
     });
   });
 
@@ -76,15 +106,17 @@ describe('AccountIndex', () => {
     renderWithProviders(<AccountIndex />);
 
     await waitFor(() => {
-      expect(screen.getByText('修改密码')).toBeInTheDocument();
+      expect(screen.getByText('修改密碼')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('修改密码'));
+    // Click the menu item (in the left nav)
+    const menuItems = screen.getAllByText('修改密碼');
+    await user.click(menuItems[0]);
 
     await waitFor(() => {
-      expect(screen.getByText('原密码')).toBeInTheDocument();
-      expect(screen.getByText('新密码')).toBeInTheDocument();
-      expect(screen.getByText('确认密码')).toBeInTheDocument();
+      expect(screen.getByText('原密碼')).toBeInTheDocument();
+      expect(screen.getByText('新密碼')).toBeInTheDocument();
+      expect(screen.getByText('確認密碼')).toBeInTheDocument();
     });
   });
 
@@ -96,10 +128,14 @@ describe('AccountIndex', () => {
       expect(screen.getByText('我的消息')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('我的消息'));
+    // Click the menu item
+    const menuItems = screen.getAllByText('我的消息');
+    await user.click(menuItems[0]);
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('搜索标题/内容')).toBeInTheDocument();
+      // Message component shows a Result with title "我的消息"
+      // and a button "前往消息管理"
+      expect(screen.getByText('前往消息管理')).toBeInTheDocument();
     });
   });
 });

@@ -22,11 +22,25 @@ vi.mock('@/api/system/employeeApi', () => ({
 
 import { employeeApi } from '@/api/system/employeeApi';
 
-// Mock Redux store
-const createMockStore = (userInfo: { employeeId: number | undefined } = { employeeId: 1 }) =>
+// Mock Redux store - matches UserState shape where employeeId is at state.user.employeeId (string)
+const createMockStore = (overrides: { employeeId?: string } = { employeeId: '1' }) =>
   configureStore({
     reducer: {
-      user: () => ({ userInfo }),
+      user: () => ({
+        token: 'test-token',
+        employeeId: overrides.employeeId ?? '1',
+        employeeName: '測試用戶',
+        loginName: 'testuser',
+        administratorFlag: false,
+        menuTree: [],
+        displayMenuTree: [],
+        pointsList: [],
+        menuRouterList: [],
+        menuParentIdListMap: {},
+        unreadMessageCount: 0,
+        loading: false,
+        error: null,
+      }),
     },
   });
 
@@ -294,7 +308,7 @@ describe('Center', () => {
     });
 
     it('should not load data if employeeId is missing', () => {
-      const store = createMockStore({ employeeId: undefined });
+      const store = createMockStore({ employeeId: '' });
       render(
         <Provider store={store}>
           <Center />
