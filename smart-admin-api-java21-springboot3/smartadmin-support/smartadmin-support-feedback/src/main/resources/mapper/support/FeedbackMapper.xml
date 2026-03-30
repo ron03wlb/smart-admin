@@ -8,8 +8,8 @@
         <where>
             <if test="query.searchWord != null and query.searchWord != '' ">
                 AND (
-                INSTR(feedback_content,#{query.searchWord})
-                OR INSTR(user_name,#{query.searchWord})
+                feedback_content ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR user_name ILIKE CONCAT('%', #{query.searchWord}, '%')
                 )
             </if>
             <if test="query.startDate != null">

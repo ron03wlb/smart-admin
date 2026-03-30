@@ -5,28 +5,30 @@
     <select id="countByTableName" resultType="Long">
         select count(*)
         from information_schema.tables
-        where table_schema = (select database())
+        where table_schema = current_schema()
           and table_name = #{tableName}
+          and table_type = 'BASE TABLE'
     </select>
 
     <select id="selectTableColumn" resultType="net.lab1024.sa.support.codegenerator.domain.vo.TableColumnVO">
         select *
         from information_schema.columns
-        where table_schema = (select database())
+        where table_schema = current_schema()
           and table_name = #{tableName}
         order by ordinal_position
     </select>
 
     <select id="queryTableList" resultType="net.lab1024.sa.support.codegenerator.domain.vo.TableVO">
         select
-        `tables`.table_name,
-        `tables`.table_comment,
+        tables.table_name,
+        obj_description((quote_ident(tables.table_schema) || '.' || quote_ident(tables.table_name))::regclass) as table_comment,
         t_code_generator_config.update_time configTime
-        from information_schema.tables `tables`
-        left join t_code_generator_config on `tables`.table_name = t_code_generator_config.table_name
-        where `tables`.table_schema = (select database())
+        from information_schema.tables tables
+        left join t_code_generator_config on tables.table_name = t_code_generator_config.table_name
+        where tables.table_schema = current_schema()
+          and tables.table_type = 'BASE TABLE'
         <if test="queryForm.tableNameKeywords != null and queryForm.tableNameKeywords != ''">
-            AND INSTR(`tables`.table_name,#{queryForm.tableNameKeywords})
+            AND tables.table_name ILIKE CONCAT('%', #{queryForm.tableNameKeywords}, '%')
         </if>
     </select>
 </mapper>

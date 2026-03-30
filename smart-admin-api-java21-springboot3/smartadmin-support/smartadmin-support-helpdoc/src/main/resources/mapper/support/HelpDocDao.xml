@@ -22,8 +22,8 @@
                 AND t_help_doc.help_doc_catalog_id = #{query.helpDocCatalogId}
             </if>
             <if test="query.keywords != null and query.keywords !=''">
-                AND ( INSTR(t_help_doc.title,#{query.keywords})
-                OR INSTR(t_help_doc.author,#{query.keywords})
+                AND ( t_help_doc.title ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_help_doc.author ILIKE CONCAT('%', #{query.keywords}, '%')
                 )
             </if>
             <if test="query.createTimeBegin != null">
@@ -111,11 +111,11 @@
         help_doc_id = #{queryForm.helpDocId}
         <if test="queryForm.keywords != null and queryForm.keywords !=''">
             AND (
-            INSTR(user_name,#{queryForm.keywords})
-            OR INSTR(first_ip,#{queryForm.keywords})
-            OR INSTR(first_user_agent,#{queryForm.keywords})
-            OR INSTR(last_ip,#{queryForm.keywords})
-            OR INSTR(last_user_agent,#{queryForm.keywords})
+            user_name ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR first_ip ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR first_user_agent ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR last_ip ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR last_user_agent ILIKE CONCAT('%', #{queryForm.keywords}, '%')
             )
         </if>
         <if test="queryForm.userId != null ">

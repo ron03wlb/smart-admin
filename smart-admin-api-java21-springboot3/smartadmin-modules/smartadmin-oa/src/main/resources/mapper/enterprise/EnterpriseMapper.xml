@@ -24,8 +24,8 @@
         <where>
             deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
-                AND (INSTR(enterprise_name,#{queryForm.keywords}) OR INSTR(contact,#{queryForm.keywords}) OR
-                INSTR(contact_phone,#{queryForm.keywords}) OR INSTR(create_user_name,#{queryForm.keywords}))
+                AND (enterprise_name ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR contact ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR
+                contact_phone ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR create_user_name ILIKE CONCAT('%', #{queryForm.keywords}, '%'))
             </if>
             <if test="queryForm.startTime != null">
                 AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= #{queryForm.startTime}
@@ -49,8 +49,8 @@
         <where>
             deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
-                AND (INSTR(enterprise_name,#{queryForm.keywords}) OR INSTR(contact,#{queryForm.keywords}) OR
-                INSTR(contact_phone,#{queryForm.keywords}) OR INSTR(create_user_name,#{queryForm.keywords}))
+                AND (enterprise_name ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR contact ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR
+                contact_phone ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR create_user_name ILIKE CONCAT('%', #{queryForm.keywords}, '%'))
             </if>
             <if test="queryForm.startTime != null">
                 AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= #{queryForm.startTime}

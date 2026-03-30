@@ -27,8 +27,8 @@
                 AND message_type = #{query.messageType}
             </if>
             <if test="query.searchWord != null and query.searchWord !=''">
-                AND ( INSTR(title,#{query.searchWord})
-                OR INSTR(content,#{query.searchWord})
+                AND ( title ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR content ILIKE CONCAT('%', #{query.searchWord}, '%')
                 )
             </if>
             <if test="query.readFlag != null">

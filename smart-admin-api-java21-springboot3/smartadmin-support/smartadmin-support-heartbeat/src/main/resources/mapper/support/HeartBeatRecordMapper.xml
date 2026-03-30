@@ -28,7 +28,7 @@
                 AND TO_CHAR(heart_beat_time, 'YYYY-MM-DD') &lt;= #{query.endDate}
             </if>
             <if test="query.keywords != null and query.keywords != ''">
-                AND (INSTR(project_path,#{query.keywords}) or INSTR(server_ip,#{query.keywords}) or INSTR(process_no,#{query.keywords}))
+                AND (project_path ILIKE CONCAT('%', #{query.keywords}, '%') OR server_ip ILIKE CONCAT('%', #{query.keywords}, '%') OR process_no ILIKE CONCAT('%', #{query.keywords}, '%'))
             </if>
         </where>
         order by heart_beat_time desc

@@ -20,7 +20,7 @@
                 AND data_id = #{query.dataId}
             </if>
             <if test="query.keywords != null and query.keywords != ''">
-                AND INSTR(content,#{query.keywords})
+                AND content ILIKE CONCAT('%', #{query.keywords}, '%')
             </if>
         </where>
         <if test="query.sortItemList == null or query.sortItemList.size == 0">

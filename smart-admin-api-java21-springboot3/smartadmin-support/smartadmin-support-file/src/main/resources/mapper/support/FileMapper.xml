@@ -15,11 +15,11 @@
             </if>
             <!--文件名词-->
             <if test="queryForm.fileName != null and queryForm.fileName != ''">
-                AND INSTR(t_file.file_name,#{queryForm.fileName})
+                AND t_file.file_name ILIKE CONCAT('%', #{queryForm.fileName}, '%')
             </if>
             <!--文件Key-->
             <if test="queryForm.fileKey != null and queryForm.fileKey != ''">
-                AND INSTR(t_file.file_key,#{queryForm.fileKey})
+                AND t_file.file_key ILIKE CONCAT('%', #{queryForm.fileKey}, '%')
             </if>
             <!--文件类型-->
             <if test="queryForm.fileType != null">
@@ -27,7 +27,7 @@
             </if>
             <!--创建人-->
             <if test="queryForm.creatorName != null and queryForm.creatorName != ''">
-                AND INSTR(t_file.creator_name,#{queryForm.creatorName})
+                AND t_file.creator_name ILIKE CONCAT('%', #{queryForm.creatorName}, '%')
             </if>
             <!--创建时间-->
             <if test="queryForm.createTimeBegin != null">

@@ -68,13 +68,13 @@
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}
             </if>
             <if test="query.keywords != null and query.keywords != ''">
-                AND ( INSTR(t_notice.title,#{query.keywords})
-                OR INSTR(t_notice.author,#{query.keywords})
-                OR INSTR(t_notice.source,#{query.keywords})
+                AND ( t_notice.title ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.author ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.source ILIKE CONCAT('%', #{query.keywords}, '%')
                 )
             </if>
             <if test="query.documentNumber != null and query.documentNumber != ''">
-                AND INSTR(t_notice.document_number, #{query.documentNumber})
+                AND t_notice.document_number ILIKE CONCAT('%', #{query.documentNumber}, '%')
             </if>
             <if test="query.createUserName != null and query.createUserName != ''">
                 AND t_employee.actual_name = #{query.createUserName}
@@ -138,10 +138,10 @@
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}
             </if>
             <if test="query.keywords != null and query.keywords !=''">
-                AND ( INSTR(t_notice.title,#{query.keywords})
-                OR INSTR(t_notice.author,#{query.keywords})
-                OR INSTR(t_notice.document_number,#{query.keywords})
-                OR INSTR(t_notice.source,#{query.keywords})
+                AND ( t_notice.title ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.author ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.document_number ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.source ILIKE CONCAT('%', #{query.keywords}, '%')
                 )
             </if>
             <if test="query.publishTimeBegin != null">
@@ -193,10 +193,10 @@
                 AND t_notice_type.notice_type_id = #{query.noticeTypeId}
             </if>
             <if test="query.keywords != null and query.keywords !=''">
-                AND ( INSTR(t_notice.title,#{query.keywords})
-                OR INSTR(t_notice.author,#{query.keywords})
-                OR INSTR(t_notice.documentNumber,#{query.keywords})
-                OR INSTR(t_notice.source,#{query.keywords})
+                AND ( t_notice.title ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.author ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.document_number ILIKE CONCAT('%', #{query.keywords}, '%')
+                OR t_notice.source ILIKE CONCAT('%', #{query.keywords}, '%')
                 )
             </if>
             <if test="query.publishTimeBegin != null">
@@ -220,11 +220,11 @@
         notice_id = #{queryForm.noticeId}
         <if test="queryForm.keywords != null and queryForm.keywords !=''">
             AND (
-            INSTR(t_employee.actual_name,#{queryForm.keywords})
-            OR INSTR(t_notice_view_record.first_ip,#{queryForm.keywords})
-            OR INSTR(t_notice_view_record.first_user_agent,#{queryForm.keywords})
-            OR INSTR(t_notice_view_record.last_ip,#{queryForm.keywords})
-            OR INSTR(t_notice_view_record.last_user_agent,#{queryForm.keywords})
+            t_employee.actual_name ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR t_notice_view_record.first_ip ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR t_notice_view_record.first_user_agent ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR t_notice_view_record.last_ip ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+            OR t_notice_view_record.last_user_agent ILIKE CONCAT('%', #{queryForm.keywords}, '%')
             )
         </if>
         <if test="queryForm.departmentId != null ">

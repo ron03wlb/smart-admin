@@ -15,10 +15,10 @@
         SELECT * FROM t_goods
         <where>
             <if test="query.searchWord != null and query.searchWord !=''">
-                INSTR(goods_name,#{query.searchWord})
+                goods_name ILIKE CONCAT('%', #{query.searchWord}, '%')
             </if>
             <if test="query.place != null">
-                AND INSTR(place,#{query.place})
+                AND place ILIKE CONCAT('%', #{query.place}, '%')
             </if>
             <if test="query.goodsStatus != null">
                 AND goods_status = #{query.goodsStatus}

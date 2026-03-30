@@ -8,10 +8,10 @@
         FROM t_smart_job_log
         <where>
             <if test="query.searchWord != null and query.searchWord != ''">
-                AND ( INSTR(job_name,#{query.searchWord})
-                OR INSTR(param,#{query.searchWord})
-                OR INSTR(execute_result,#{query.searchWord})
-                OR INSTR(create_name,#{query.searchWord})
+                AND ( job_name ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR param ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR execute_result ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR create_name ILIKE CONCAT('%', #{query.searchWord}, '%')
                 )
             </if>
             <if test="query.jobId != null">

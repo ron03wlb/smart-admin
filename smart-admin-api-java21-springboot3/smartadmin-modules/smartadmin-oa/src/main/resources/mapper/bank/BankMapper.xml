@@ -25,10 +25,10 @@
         <where>
             t_oa_bank.deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
-                AND (INSTR(t_oa_bank.bank_name,#{queryForm.keywords}) OR
-                INSTR(t_oa_bank.account_name,#{queryForm.keywords}) OR
-                INSTR(t_oa_bank.account_number,#{queryForm.keywords}) OR
-                INSTR(t_oa_bank.create_user_name,#{queryForm.keywords}))
+                AND (t_oa_bank.bank_name ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR
+                t_oa_bank.account_name ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR
+                t_oa_bank.account_number ILIKE CONCAT('%', #{queryForm.keywords}, '%') OR
+                t_oa_bank.create_user_name ILIKE CONCAT('%', #{queryForm.keywords}, '%'))
             </if>
             <if test="queryForm.startTime != null">
                 AND TO_CHAR(t_oa_bank.create_time, 'YYYY-MM-DD') &gt;= #{queryForm.startTime}

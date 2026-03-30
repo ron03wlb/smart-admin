@@ -14,16 +14,16 @@
         FROM t_smart_job
         <where>
             <if test="query.searchWord != null and query.searchWord != ''">
-                AND ( INSTR(job_name,#{query.searchWord})
-                OR INSTR(job_class,#{query.searchWord})
-                OR INSTR(trigger_value,#{query.searchWord})
+                AND ( job_name ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR job_class ILIKE CONCAT('%', #{query.searchWord}, '%')
+                OR trigger_value ILIKE CONCAT('%', #{query.searchWord}, '%')
                 )
             </if>
             <if test="query.triggerType != null">
                 AND trigger_type = #{query.triggerType}
             </if>
             <if test="query.enabledFlag != null">
-                AND enabled = #{query.enabledFlag}
+                AND enabled = #{query.enabledFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             </if>
             <if test="query.deleted != null">
                 AND deleted = #{query.deleted, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}

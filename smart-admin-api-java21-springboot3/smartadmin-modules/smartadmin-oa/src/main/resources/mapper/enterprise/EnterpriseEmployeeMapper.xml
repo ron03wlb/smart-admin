@@ -80,9 +80,9 @@
         where t_oa_enterprise_employee.enterprise_id = #{queryForm.enterpriseId}
         <if test="queryForm.keyword != null and queryForm.keyword != ''">
             AND (
-            INSTR(t_employee.actual_name,#{queryForm.keyword})
-            OR INSTR(t_employee.phone,#{queryForm.keyword})
-            OR INSTR(t_employee.login_name,#{queryForm.keyword})
+            t_employee.actual_name ILIKE CONCAT('%', #{queryForm.keyword}, '%')
+            OR t_employee.phone ILIKE CONCAT('%', #{queryForm.keyword}, '%')
+            OR t_employee.login_name ILIKE CONCAT('%', #{queryForm.keyword}, '%')
             )
         </if>
         <if test="queryForm.deletedFlag != null">

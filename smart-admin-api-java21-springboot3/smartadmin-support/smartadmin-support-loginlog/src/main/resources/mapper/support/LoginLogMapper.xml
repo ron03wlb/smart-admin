@@ -14,7 +14,7 @@
                 AND user_type = #{query.userType}
             </if>
             <if test="query.ip != null and query.ip != ''">
-                AND INSTR(login_ip,#{query.ip})
+                AND login_ip ILIKE CONCAT('%', #{query.ip}, '%')
             </if>
             <if test="query.startDate != null and query.startDate != ''">
                 AND TO_CHAR(create_time, 'YYYY-MM-DD') &gt;= #{query.startDate}
@@ -23,7 +23,7 @@
                 AND TO_CHAR(create_time, 'YYYY-MM-DD') &lt;= #{query.endDate}
             </if>
             <if test="query.userName != null and query.userName != ''">
-                AND INSTR(user_name,#{query.userName})
+                AND user_name ILIKE CONCAT('%', #{query.userName}, '%')
             </if>
         </where>
         order by create_time desc

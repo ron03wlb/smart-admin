@@ -20,13 +20,13 @@
                 AND TO_CHAR(create_time, 'YYYY-MM-DD') &lt;= #{query.endDate}
             </if>
             <if test="query.userName != null and query.userName != ''">
-                AND INSTR(operate_user_name,#{query.userName})
+                AND operate_user_name ILIKE CONCAT('%', #{query.userName}, '%')
             </if>
             <if test="query.keywords != null and query.keywords != ''">
-                AND (INSTR(module,#{query.keywords}) OR INSTR(content,#{query.keywords}))
+                AND (module ILIKE CONCAT('%', #{query.keywords}, '%') OR content ILIKE CONCAT('%', #{query.keywords}, '%'))
             </if>
             <if test="query.requestKeywords != null and query.requestKeywords != ''">
-                AND (INSTR(url,#{query.requestKeywords}) OR INSTR(method,#{query.requestKeywords}) OR INSTR(param,#{query.requestKeywords}) OR INSTR(response,#{query.requestKeywords}))
+                AND (url ILIKE CONCAT('%', #{query.requestKeywords}, '%') OR method ILIKE CONCAT('%', #{query.requestKeywords}, '%') OR param ILIKE CONCAT('%', #{query.requestKeywords}, '%') OR response ILIKE CONCAT('%', #{query.requestKeywords}, '%'))
             </if>
             <if test="query.successFlag != null">
                 AND success = #{query.successFlag}

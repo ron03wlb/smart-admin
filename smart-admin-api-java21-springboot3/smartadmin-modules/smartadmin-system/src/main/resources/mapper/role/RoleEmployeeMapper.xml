@@ -40,9 +40,9 @@
         <where>
             <if test="queryForm.keywords != null and queryForm.keywords!= ''">
                 AND (
-                INSTR(t_employee.actual_name,#{queryForm.keywords})
-                OR INSTR(t_employee.phone,#{queryForm.keywords})
-                OR INSTR(t_employee.login_name,#{queryForm.keywords})
+                t_employee.actual_name ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+                OR t_employee.phone ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+                OR t_employee.login_name ILIKE CONCAT('%', #{queryForm.keywords}, '%')
                 )
             </if>
             <if test="queryForm.roleId != null">

@@ -22,9 +22,9 @@
             <!--关键字-->
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
                 AND (
-                INSTR(t_dict.dict_name,#{queryForm.keywords})
-                OR INSTR(t_dict.dict_code,#{queryForm.keywords})
-                OR INSTR(t_dict.remark,#{queryForm.keywords})
+                t_dict.dict_name ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+                OR t_dict.dict_code ILIKE CONCAT('%', #{queryForm.keywords}, '%')
+                OR t_dict.remark ILIKE CONCAT('%', #{queryForm.keywords}, '%')
                 )
             </if>
             <!--禁用状态-->

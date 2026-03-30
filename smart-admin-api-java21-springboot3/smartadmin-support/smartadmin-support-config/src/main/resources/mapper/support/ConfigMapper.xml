@@ -7,7 +7,7 @@
         FROM t_config
         <where>
             <if test="query.configKey != null and query.configKey != ''">
-                AND INSTR(config_key,#{query.configKey})
+                AND config_key ILIKE CONCAT('%', #{query.configKey}, '%')
             </if>
         </where>
     </select>

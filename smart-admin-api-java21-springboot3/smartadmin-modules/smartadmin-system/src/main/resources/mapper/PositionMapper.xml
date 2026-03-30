@@ -11,7 +11,7 @@
             deleted = #{queryForm.deletedFlag, jdbcType=SMALLINT, typeHandler=net.lab1024.sa.common.mybatis.typehandler.BooleanToSmallintTypeHandler}
             <!--关键字查询-->
             <if test="queryForm.keywords != null and queryForm.keywords != ''">
-                AND INSTR(t_position.position_name,#{queryForm.keywords})
+                AND t_position.position_name ILIKE CONCAT('%', #{queryForm.keywords}, '%')
             </if>
         </where>
     </select>
