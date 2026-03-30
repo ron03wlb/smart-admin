@@ -12,7 +12,8 @@ import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Modal, Form, Input, Button, Select, Space, message } from 'antd';
 import { messageApi } from '@/api/support/messageApi';
 import { MESSAGE_TYPE_OPTIONS } from '@/constants/support/messageConst';
-import MessageReceiverModal, { MessageReceiverModalRef } from './MessageReceiverModal';
+import MessageReceiverModal from './MessageReceiverModal';
+import type { MessageReceiverModalRef } from './MessageReceiverModal';
 
 const { TextArea } = Input;
 

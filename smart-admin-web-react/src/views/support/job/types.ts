@@ -205,11 +205,12 @@ export interface JobLogQueryForm {
  * Job Trigger Type Enum
  * 觸發類型枚舉
  */
-export enum JobTriggerTypeEnum {
+export const JobTriggerTypeEnum = {
   /** CRON 表達式 */
-  CRON = 'CRON',
+  CRON: 'CRON',
   /** 固定延遲 */
-  FIXED_DELAY = 'FIXED_DELAY',
+  FIXED_DELAY: 'FIXED_DELAY',
   /** 固定頻率 */
-  FIXED_RATE = 'FIXED_RATE',
-}
+  FIXED_RATE: 'FIXED_RATE',
+} as const;
+export type JobTriggerTypeEnum = (typeof JobTriggerTypeEnum)[keyof typeof JobTriggerTypeEnum];

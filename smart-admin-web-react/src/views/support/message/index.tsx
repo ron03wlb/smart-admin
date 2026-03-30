@@ -27,7 +27,8 @@ import {
 import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { messageApi, type MessageQueryForm, type MessageVO } from '@/api/support/messageApi';
 import { MESSAGE_TYPE_OPTIONS, getMessageTypeLabel } from '@/constants/support/messageConst';
-import MessageSendForm, { MessageSendFormRef } from './components/MessageSendForm';
+import MessageSendForm from './components/MessageSendForm';
+import type { MessageSendFormRef } from './components/MessageSendForm';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 

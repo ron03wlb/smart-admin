@@ -105,11 +105,12 @@ export interface ChangeLogFormData {
  * ChangeLog Type Enum
  * 更新類型枚舉：1-重大更新, 2-功能更新, 3-Bug修復
  */
-export enum ChangeLogTypeEnum {
+export const ChangeLogTypeEnum = {
   /** 重大更新 */
-  MAJOR_UPDATE = 1,
+  MAJOR_UPDATE: 1,
   /** 功能更新 */
-  FUNCTION_UPDATE = 2,
+  FUNCTION_UPDATE: 2,
   /** Bug修復 */
-  BUG_FIX = 3,
-}
+  BUG_FIX: 3,
+} as const;
+export type ChangeLogTypeEnum = (typeof ChangeLogTypeEnum)[keyof typeof ChangeLogTypeEnum];

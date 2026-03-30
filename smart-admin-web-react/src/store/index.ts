@@ -61,7 +61,7 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production', // 開發環境啟用 Redux DevTools
+  devTools: import.meta.env.MODE !== 'production', // 開發環境啟用 Redux DevTools
 });
 
 // ==================== Persistor ====================

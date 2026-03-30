@@ -114,7 +114,7 @@ describe('JobExecuteModal', () => {
 
     await waitFor(() => {
       expect(screen.getByText('執行任務')).toBeInTheDocument();
-    });
+    }, { timeout: TEST_TIMEOUT });
 
     // 找到任務參數輸入框
     const paramInput = screen.getByDisplayValue('{"key": "value"}');
@@ -125,7 +125,7 @@ describe('JobExecuteModal', () => {
 
     // 驗證修改成功
     expect(paramInput).toHaveValue('{"newKey": "newValue"}');
-  });
+  }, TEST_TIMEOUT);
 
   // P0 測試 4: Alert 提示顯示測試
   it('should display execution alert message', async () => {

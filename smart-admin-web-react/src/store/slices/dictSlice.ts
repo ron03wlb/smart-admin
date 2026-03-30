@@ -16,7 +16,8 @@
  * @Date: 2026-03-09
  */
 
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { dictApi } from '@/api/support/dictApi';
 import type { DictItem, DictDataItem } from '@/types/dict';
 import type { RootState } from '../index';

@@ -43,7 +43,8 @@
  */
 
 import { useMemo, useEffect, useState } from 'react';
-import { Select, SelectProps } from 'antd';
+import { Select } from 'antd';
+import type { SelectProps } from 'antd';
 import { useDict } from '@/hooks/useDict';
 
 // 定義選項類型（基於 Ant Design Select 的 options 類型）
