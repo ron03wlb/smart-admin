@@ -116,12 +116,14 @@ describe('EmployeeFormModal', () => {
 
       expect(screen.getByLabelText('姓名')).toBeInTheDocument();
       expect(screen.getByLabelText('手機號')).toBeInTheDocument();
-      expect(screen.getByLabelText('部門')).toBeInTheDocument();
+      // DepartmentTreeSelect and PositionSelect are mocked as native <select>,
+      // so they don't get Ant Design Form label association. Check by testId instead.
+      expect(screen.getByTestId('department-tree-select')).toBeInTheDocument();
       expect(screen.getByLabelText('登錄名')).toBeInTheDocument();
       expect(screen.getByLabelText('郵箱')).toBeInTheDocument();
       expect(screen.getByLabelText('性別')).toBeInTheDocument();
       expect(screen.getByLabelText('狀態')).toBeInTheDocument();
-      expect(screen.getByLabelText('職務')).toBeInTheDocument();
+      expect(screen.getByTestId('position-select')).toBeInTheDocument();
       expect(screen.getByLabelText('角色')).toBeInTheDocument();
     });
 

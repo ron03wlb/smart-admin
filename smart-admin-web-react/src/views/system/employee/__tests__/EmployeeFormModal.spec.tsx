@@ -12,6 +12,22 @@ import { EmployeeFormModal } from '../EmployeeFormModal';
 import { employeeApi } from '@/api/system/employee-api';
 
 vi.mock('@/api/system/employee-api');
+vi.mock('@/components/system/department-tree-select', () => ({
+  DepartmentTreeSelect: (props: any) => (
+    <select data-testid="department-tree-select" onChange={(e) => props.onChange?.(Number(e.target.value))}>
+      <option value="">請選擇部門</option>
+      <option value="1">技術部</option>
+    </select>
+  ),
+}));
+vi.mock('@/components/system/position-select', () => ({
+  PositionSelect: (props: any) => (
+    <select data-testid="position-select" onChange={(e) => props.onChange?.(Number(e.target.value))}>
+      <option value="">請選擇職位</option>
+      <option value="1">開發工程師</option>
+    </select>
+  ),
+}));
 
 describe('EmployeeFormModal Component', () => {
   const mockOnCancel = vi.fn();
@@ -42,7 +58,7 @@ describe('EmployeeFormModal Component', () => {
       phone: '13800138000',
       departmentId: 1,
       departmentName: '技術部',
-      position: 'Developer',
+      positionId: 1,
       status: 1 as const,
       createTime: '2026-03-06T10:00:00Z',
       updateTime: '2026-03-06T10:00:00Z',
@@ -87,7 +103,8 @@ describe('EmployeeFormModal Component', () => {
     // Fill text inputs with fireEvent.change
     fireEvent.change(screen.getByLabelText('姓名'), { target: { value: 'John Doe' } });
     fireEvent.change(screen.getByLabelText('郵箱'), { target: { value: 'john@example.com' } });
-    fireEvent.change(screen.getByLabelText('職位'), { target: { value: 'Developer' } });
+    // Position is now a PositionSelect component (mocked)
+    fireEvent.change(screen.getByTestId('position-select'), { target: { value: '1' } });
 
     // Set Select values programmatically (JSDOM can't render Ant Design Select CSS classes)
     await act(async () => {
@@ -102,7 +119,6 @@ describe('EmployeeFormModal Component', () => {
         expect.objectContaining({
           employeeName: 'John Doe',
           email: 'john@example.com',
-          position: 'Developer',
         })
       );
       expect(mockOnSuccess).toHaveBeenCalled();
@@ -119,7 +135,7 @@ describe('EmployeeFormModal Component', () => {
       phone: '13800138000',
       departmentId: 1,
       departmentName: '技術部',
-      position: 'Developer',
+      positionId: 1,
       status: 1 as const,
       createTime: '2026-03-06T10:00:00Z',
       updateTime: '2026-03-06T10:00:00Z',
@@ -187,7 +203,8 @@ describe('EmployeeFormModal Component', () => {
     // Fill with invalid email (use fireEvent.change for speed)
     fireEvent.change(screen.getByLabelText('姓名'), { target: { value: 'John Doe' } });
     fireEvent.change(screen.getByLabelText('郵箱'), { target: { value: 'invalid-email' } });
-    fireEvent.change(screen.getByLabelText('職位'), { target: { value: 'Developer' } });
+    // Position is now a PositionSelect component (mocked)
+    fireEvent.change(screen.getByTestId('position-select'), { target: { value: '1' } });
 
     // Skip Select interaction — email format error shows regardless of department selection
     // Submit form
