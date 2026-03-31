@@ -86,6 +86,26 @@ while IFS= read -r file; do
         if [[ "$filename" =~ ^SSOT ]]; then
             continue
         fi
+        # 允許 docs/iGaming/ 根目錄的管理文件 (STANDARDS, AUDIT, TEMPLATE, TRANSLATION, 品質報告)
+        if [[ "$filename" =~ ^(STANDARDS|AUDIT|TEMPLATE|TRANSLATION|EXECUTION).*\.md$ ]]; then
+            continue
+        fi
+        # 允許 quality-reports/ 目錄
+        if [[ "$file" =~ quality-reports/ ]]; then
+            continue
+        fi
+        # 允許 testing/ 目錄
+        if [[ "$file" =~ /testing/ ]]; then
+            continue
+        fi
+        # 允許 research/ 目錄
+        if [[ "$file" =~ /research/ ]]; then
+            continue
+        fi
+        # 允許 adr/ 目錄
+        if [[ "$file" =~ /adr/ ]]; then
+            continue
+        fi
         echo "❌ 格式錯誤: $file"
         ((ERROR_COUNT++)) || true
     fi
