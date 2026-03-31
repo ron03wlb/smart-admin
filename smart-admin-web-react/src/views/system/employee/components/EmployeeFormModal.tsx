@@ -13,6 +13,8 @@ import { Modal, Form, Input, Select, Alert, message, Row, Col } from 'antd';
 import { useModal } from '@/hooks/useModal';
 import { employeeApi } from '@/api/system/employeeApi';
 import { roleApi } from '@/api/system/roleApi';
+import { DepartmentTreeSelect } from '@/components/system/department-tree-select';
+import { PositionSelect } from '@/components/system/position-select';
 import type { EmployeeFormData, EmployeeAddForm } from '../types';
 import { EMPLOYEE_VALIDATION } from '@/constants/system/employeeConst';
 
@@ -212,10 +214,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           name="departmentId"
           rules={[{ required: true, message: '部門不能為空' }]}
         >
-          <Select placeholder="請選擇部門">
-            {/* TODO: 集成 DepartmentTreeSelect 組件 */}
-            <Option value={1}>默認部門</Option>
-          </Select>
+          <DepartmentTreeSelect placeholder="請選擇部門" />
         </Form.Item>
 
         <Form.Item
@@ -273,10 +272,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
         </Row>
 
         <Form.Item label="職務" name="positionId">
-          <Select placeholder="請選擇職務" allowClear>
-            {/* TODO: 集成 PositionSelect 組件 */}
-            <Option value={1}>默認職務</Option>
-          </Select>
+          <PositionSelect placeholder="請選擇職務" />
         </Form.Item>
 
         <Form.Item label="角色" name="roleIdList">

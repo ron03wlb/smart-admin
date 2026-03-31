@@ -13,7 +13,7 @@
 |----------|-------------|-----------|
 | [00_Overview](00_Overview/) | Technology stack, data model, platform architecture | 5 |
 | [01_Player_Service](01_Player_Service/) | Player lifecycle implementation | 1 |
-| [02_Finance_Service](02_Finance_Service/) | Wallet, payment, transactions, turnover | 8 |
+| [02_Finance_Service](02_Finance_Service/) | Wallet, payment, transactions, turnover, seamless wallet API spec | 9 |
 | [03_Game_Integration](03_Game_Integration/) | GP API, turnover calculation, lobby system | 4 |
 | [04_Activity_Engine](04_Activity_Engine/) | Bonus calculation, activity risk, promotions | 3 |
 | [05_Risk_Engine](05_Risk_Engine/) | Fraud detection, ML integration, risk proposals | 10 |

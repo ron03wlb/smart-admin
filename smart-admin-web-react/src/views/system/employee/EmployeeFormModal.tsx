@@ -12,6 +12,8 @@ import type {
   EmployeeUpdateForm,
 } from '@/api/system/employee-types';
 import { EmployeeStatusEnum } from '@/api/system/employee-types';
+import { DepartmentTreeSelect } from '@/components/system/department-tree-select';
+import { PositionSelect } from '@/components/system/position-select';
 
 interface EmployeeFormModalProps {
   visible: boolean;
@@ -128,25 +130,15 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           name="departmentId"
           rules={[{ required: true, message: '請選擇部門' }]}
         >
-          <Select placeholder="請選擇部門">
-            <Select.Option value={1}>技術部</Select.Option>
-            <Select.Option value={2}>產品部</Select.Option>
-            <Select.Option value={3}>運營部</Select.Option>
-            <Select.Option value={4}>人力資源部</Select.Option>
-            <Select.Option value={5}>財務部</Select.Option>
-          </Select>
+          <DepartmentTreeSelect placeholder="請選擇部門" />
         </Form.Item>
 
         {/* Position */}
         <Form.Item
           label="職位"
-          name="position"
-          rules={[
-            { required: true, message: '請輸入職位' },
-            { min: 2, max: 30, message: '長度為 2-30 個字符' },
-          ]}
+          name="positionId"
         >
-          <Input placeholder="請輸入職位" />
+          <PositionSelect placeholder="請選擇職位" />
         </Form.Item>
 
         {/* Status */}

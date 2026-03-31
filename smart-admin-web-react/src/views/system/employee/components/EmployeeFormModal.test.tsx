@@ -15,6 +15,24 @@ import type { EmployeeFormData } from '../types';
 vi.mock('@/api/system/employeeApi');
 vi.mock('@/api/system/roleApi');
 vi.mock('@/hooks/useModal');
+vi.mock('@/components/system/department-tree-select', () => ({
+  DepartmentTreeSelect: (props: any) => (
+    <select data-testid="department-tree-select" onChange={(e) => props.onChange?.(Number(e.target.value))}>
+      <option value="">請選擇部門</option>
+      <option value="1">技術部</option>
+      <option value="2">產品部</option>
+    </select>
+  ),
+}));
+vi.mock('@/components/system/position-select', () => ({
+  PositionSelect: (props: any) => (
+    <select data-testid="position-select" onChange={(e) => props.onChange?.(Number(e.target.value))}>
+      <option value="">請選擇職務</option>
+      <option value="1">開發工程師</option>
+      <option value="2">產品經理</option>
+    </select>
+  ),
+}));
 vi.mock('antd', async () => {
   const actual = await vi.importActual('antd');
   return {
@@ -207,13 +225,9 @@ describe('EmployeeFormModal', () => {
       fireEvent.change(screen.getByLabelText('登錄名'), { target: { value: 'test' } });
       fireEvent.change(screen.getByLabelText('郵箱'), { target: { value: 'test@example.com' } });
 
-      // 選擇部門
-      const departmentSelect = screen.getByLabelText('部門');
-      fireEvent.mouseDown(departmentSelect);
-      await waitFor(() => {
-        const option = screen.getByText('默認部門');
-        fireEvent.click(option);
-      });
+      // 選擇部門（using mocked DepartmentTreeSelect）
+      const departmentSelect = screen.getByTestId('department-tree-select');
+      fireEvent.change(departmentSelect, { target: { value: '1' } });
 
       // 填寫無效的手機號
       const phoneInput = screen.getByLabelText('手機號');
@@ -237,13 +251,9 @@ describe('EmployeeFormModal', () => {
       fireEvent.change(screen.getByLabelText('手機號'), { target: { value: '13900139000' } });
       fireEvent.change(screen.getByLabelText('登錄名'), { target: { value: 'test' } });
 
-      // 選擇部門
-      const departmentSelect = screen.getByLabelText('部門');
-      fireEvent.mouseDown(departmentSelect);
-      await waitFor(() => {
-        const option = screen.getByText('默認部門');
-        fireEvent.click(option);
-      });
+      // 選擇部門（using mocked DepartmentTreeSelect）
+      const departmentSelect2 = screen.getByTestId('department-tree-select');
+      fireEvent.change(departmentSelect2, { target: { value: '1' } });
 
       // 填寫無效的郵箱
       const emailInput = screen.getByLabelText('郵箱');
@@ -297,13 +307,9 @@ describe('EmployeeFormModal', () => {
       fireEvent.change(screen.getByLabelText('登錄名'), { target: { value: 'lisi' } });
       fireEvent.change(screen.getByLabelText('郵箱'), { target: { value: 'lisi@example.com' } });
 
-      // 選擇部門（必填欄位）
-      const departmentSelect = screen.getByLabelText('部門');
-      fireEvent.mouseDown(departmentSelect);
-      await waitFor(() => {
-        const option = screen.getByText('默認部門');
-        fireEvent.click(option);
-      });
+      // 選擇部門（using mocked DepartmentTreeSelect）
+      const deptSelect = screen.getByTestId('department-tree-select');
+      fireEvent.change(deptSelect, { target: { value: '1' } });
 
       const submitButton = await findSubmitButton();
       fireEvent.click(submitButton);
@@ -329,13 +335,9 @@ describe('EmployeeFormModal', () => {
       fireEvent.change(screen.getByLabelText('登錄名'), { target: { value: 'lisi' } });
       fireEvent.change(screen.getByLabelText('郵箱'), { target: { value: 'lisi@example.com' } });
 
-      // 選擇部門（必填欄位）
-      const departmentSelect = screen.getByLabelText('部門');
-      fireEvent.mouseDown(departmentSelect);
-      await waitFor(() => {
-        const option = screen.getByText('默認部門');
-        fireEvent.click(option);
-      });
+      // 選擇部門（using mocked DepartmentTreeSelect）
+      const deptSelect2 = screen.getByTestId('department-tree-select');
+      fireEvent.change(deptSelect2, { target: { value: '1' } });
 
       const submitButton = await findSubmitButton();
       fireEvent.click(submitButton);
