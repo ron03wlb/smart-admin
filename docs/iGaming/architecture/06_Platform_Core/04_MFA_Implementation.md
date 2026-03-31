@@ -1,13 +1,9 @@
-# MFA 技術架構（MFA Technical Architecture）
+# MFA 技術實作（MFA Technical Implementation）
 
-> **業務需求**: [MFA_Requirements.md](../../requirements/06_Governance_Licensing/04_MFA_Requirements.md)
-> **規範來源**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
-> **視角**: Technical Architecture (Development & DevOps)
-> **目標讀者**: Backend Developers, Security Engineers, Compliance Officers
-
-**相關來源文件**:
-- [06-06-02 TOTP & WebAuthn Implementation](../../source-archive/06_Platform_Governance/06-06-02_TOTP_WebAuthn.md)
-- [06-06-03 Login & Recovery Flow](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
+> **目標讀者**: Backend Developers, Security Engineers
+> **業務需求**: [MFA 需求](../../requirements/06_Governance_Licensing/04_MFA_Requirements.md)
+> **XREF 架構設計**: [03_MFA_Architecture.md](03_MFA_Architecture.md) — 含方法選擇評估
+> **最後更新**: 2026-03-31（合併自 04_MFA_Technical.md + 06_TOTP_WebAuthn_Implementation.md）
 
 ---
 
@@ -1154,3 +1150,61 @@ class MfaIntegrationTest {
 ---
 
 **文件結束**
+
+---
+
+## 附錄 A：WebAuthn 詳細比較（TOTP vs WebAuthn）
+
+### 3.2 TOTP vs WebAuthn 比較（TOTP vs WebAuthn Comparison）
+
+| 特性 | TOTP (Google Authenticator) | WebAuthn (生物識別) |
+|------|---------------------------|-------------------|
+| **安全性** | 4/5 (需妥善保管密鑰) | 5/5 (公鑰加密 + 防釣魚) |
+| **用戶體驗** | 3/5 (需手動輸入 6 位數) | 5/5 (一鍵驗證) |
+| **設備支援** | 5/5 (所有智能手機) | 3/5 (需瀏覽器支援 + 硬體) |
+| **離線可用** | 5/5 (完全離線) | 2/5 (需設備連接) |
+| **實施複雜度** | 2/5 (簡單) | 4/5 (需前端集成) |
+
+### 3.3 WebAuthn 資料庫結構（WebAuthn Database Schema）
+
+```sql
+CREATE TABLE t_webauthn_credential (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES t_admin_user(user_id),
+    credential_id VARCHAR(500) NOT NULL UNIQUE,  -- Base64 編碼的憑證 ID
+    public_key TEXT NOT NULL,                     -- COSE 格式公鑰
+    sign_count BIGINT NOT NULL DEFAULT 0,         -- 防重放攻擊計數器
+    device_type VARCHAR(50),                      -- platform (生物識別) / cross-platform (安全密鑰)
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_used_at TIMESTAMP
+);
+
+CREATE INDEX idx_webauthn_user_id ON t_webauthn_credential(user_id);
+CREATE INDEX idx_webauthn_credential_id ON t_webauthn_credential(credential_id);
+```
+
+### 3.4 關鍵安全機制（Key Security Mechanisms）
+
+**TOTP 密鑰保護**:
+- ✅ 密鑰使用 AES-256-GCM 加密存儲
+- ✅ 主密鑰托管在 KMS (Vault/AWS KMS)
+- ✅ QR Code 僅顯示一次 (前端顯示後立即銷毀)
+- ✅ 允許 ±1 時間窗口 (共 90 秒驗證期)
+
+**WebAuthn 防護**:
+- ✅ Challenge 隨機生成 (32 bytes) 防重放
+- ✅ 公鑰加密 (私鑰永不離開設備)
+- ✅ Attestation 驗證設備真實性
+- ✅ Sign counter 防止憑證克隆攻擊
+
+---
+
+## 相關文檔（Related Documents）
+
+- [MFA_Technical_Architecture.md](./03_MFA_Technical_Architecture.md) - MFA 系統架構設計
+- [MFA_Compliance_Validation.md](./08_MFA_Compliance_Validation.md) - 合規驗證技術設計
+- [MFA_Recovery_Implementation.md](./09_MFA_Recovery_Implementation.md) - 恢復流程技術實現
+
+---
+
+**End of Document**

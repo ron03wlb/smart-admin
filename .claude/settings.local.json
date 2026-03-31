@@ -83,7 +83,8 @@
       "Bash(tmux *)",
       "Bash(npx @fission-ai/openspec *)",
       "Bash(openspec *)",
-      "Bash(__NEW_LINE_e1001d7a2cc2ef6b__ echo:*)"
+      "Bash(__NEW_LINE_e1001d7a2cc2ef6b__ echo:*)",
+      "Bash(1 echo:*)"
     ],
     "deny": [
       "Bash(git push --force*)",
