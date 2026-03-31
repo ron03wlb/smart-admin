@@ -16,7 +16,7 @@ export interface MessageVO {
 export interface MessageQueryForm {
   pageNum: number;
   pageSize: number;
-  keywords?: string;
+  searchWord?: string;
   startDate?: string;
   endDate?: string;
   readFlag?: boolean;

@@ -101,4 +101,31 @@ export interface LoginResult {
 
   /** 部門名稱 */
   departmentName?: string;
+
+  /** 登錄名 */
+  loginName?: string;
+
+  /** 真實姓名 */
+  actualName?: string;
+
+  /** 性別 */
+  gender?: number;
+
+  /** 手機號 */
+  phone?: string;
+
+  /** 郵箱 */
+  email?: string;
+
+  /** 職位 ID */
+  positionId?: number;
+
+  /** 頭像 */
+  avatar?: string;
+
+  /** 備註 */
+  remark?: string;
+
+  /** 禁用標記 */
+  disabledFlag?: number;
 }

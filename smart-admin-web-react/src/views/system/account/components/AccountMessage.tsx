@@ -29,7 +29,7 @@ const AccountMessage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
-  const [keywords, setKeywords] = useState('');
+  const [searchWord, setKeywords] = useState('');
   const [dateRange, setDateRange] = useState<DateRangeValue>(null);
   const [readFlag, setReadFlag] = useState<boolean | undefined>();
   const [detailOpen, setDetailOpen] = useState(false);
@@ -41,7 +41,7 @@ const AccountMessage: React.FC = () => {
       const res = await messageApi.queryMessage({
         pageNum: page,
         pageSize: PAGE_SIZE,
-        keywords,
+        searchWord,
         startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
         readFlag,
@@ -53,7 +53,7 @@ const AccountMessage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [keywords, dateRange, readFlag]);
+  }, [searchWord, dateRange, readFlag]);
 
   useEffect(() => {
     queryMessages(1);
@@ -100,7 +100,7 @@ const AccountMessage: React.FC = () => {
       <Space style={{ marginBottom: 16 }} wrap>
         <Input
           style={{ width: 200 }}
-          value={keywords}
+          value={searchWord}
           onChange={(e) => setKeywords(e.target.value)}
           placeholder="搜索标题/内容"
           allowClear

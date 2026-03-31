@@ -2,6 +2,8 @@
  * AccountIndex Spec Tests
  * 個人中心主頁面測試
  *
+ * Now tests against Account* full implementations (not placeholders).
+ *
  * @Author: SmartAdmin React Team
  * @Date: 2026-03-14
  */
@@ -16,28 +18,77 @@ import { BrowserRouter } from 'react-router-dom';
 import AccountIndex from '../index';
 import userReducer from '@/store/slices/userSlice';
 
-// Mock employeeApi (used by Center and Password)
-vi.mock('@/api/system/employeeApi', () => ({
+// Mock login API (used by AccountCenter)
+vi.mock('@/api/system/login.api', () => ({
+  getLoginInfo: vi.fn().mockResolvedValue({
+    code: 1,
+    data: {
+      loginName: 'admin',
+      departmentName: '技术部',
+      actualName: '管理员',
+      gender: 1,
+      phone: '13800138000',
+      email: 'admin@test.com',
+      positionId: 1,
+      remark: '',
+      avatar: '',
+    },
+    msg: 'Success',
+    success: true,
+  }),
+}));
+
+// Mock employee-api (used by AccountCenter, AccountPassword)
+vi.mock('@/api/system/employee-api', () => ({
   employeeApi: {
-    getEmployee: vi.fn().mockResolvedValue({
-      ok: true,
-      code: 200,
-      msg: 'Success',
-      data: {
-        employeeId: 1,
-        loginName: 'admin',
-        departmentId: 1,
-        actualName: '管理員',
-        gender: 1,
-        phone: '13800138000',
-        email: 'admin@test.com',
-        positionId: 1,
-        remark: '',
-      },
-    }),
-    updateEmployee: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: 'Success', data: undefined }),
-    getPasswordComplexityEnabled: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: 'Success', data: false }),
-    updateEmployeePassword: vi.fn().mockResolvedValue({ ok: true, code: 200, msg: 'Success', data: undefined }),
+    updateCenter: vi.fn().mockResolvedValue({ code: 1, data: null, msg: 'Success', success: true }),
+    updateAvatar: vi.fn().mockResolvedValue({ code: 1, data: null, msg: 'Success', success: true }),
+    updatePassword: vi.fn().mockResolvedValue({ code: 1, data: null, msg: 'Success', success: true }),
+    getPasswordComplexityEnabled: vi.fn().mockResolvedValue({ code: 1, data: false, msg: 'Success', success: true }),
+  },
+}));
+
+// Mock file-api (used by AccountCenter avatar upload)
+vi.mock('@/api/support/file-api', () => ({
+  fileApi: {
+    uploadFile: vi.fn().mockResolvedValue({ code: 1, data: { fileKey: 'key', fileUrl: 'url' }, msg: 'Success', success: true }),
+  },
+}));
+
+// Mock message-api (used by AccountMessage)
+vi.mock('@/api/support/message-api', () => ({
+  messageApi: {
+    queryMessage: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 }, msg: 'Success', success: true }),
+    read: vi.fn().mockResolvedValue({ code: 1, data: null, msg: 'Success', success: true }),
+  },
+}));
+
+// Mock login-log-api (used by AccountLoginLog)
+vi.mock('@/api/support/login-log-api', () => ({
+  loginLogApi: {
+    queryListLogin: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 }, msg: 'Success', success: true }),
+  },
+}));
+
+// Mock operate-log-api (used by AccountOperateLog)
+vi.mock('@/api/support/operate-log-api', () => ({
+  operateLogApi: {
+    queryListLogin: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 }, msg: 'Success', success: true }),
+  },
+}));
+
+// Mock notice-api (used by AccountNotice -> NoticeEmployeeList)
+vi.mock('@/api/business/oa/notice-api', () => ({
+  noticeApi: {
+    queryEmployeeNotice: vi.fn().mockResolvedValue({ code: 1, data: { list: [], total: 0 }, msg: 'Success', success: true }),
+  },
+}));
+
+// Mock mfa-api (used by AccountMfa)
+vi.mock('@/api/system/mfa-api', () => ({
+  mfaApi: {
+    getStatus: vi.fn().mockResolvedValue({ code: 1, data: { mfaEnabled: false }, msg: 'Success', success: true }),
+    getBackupCodeCount: vi.fn().mockResolvedValue({ code: 1, data: 0, msg: 'Success', success: true }),
   },
 }));
 
@@ -53,7 +104,7 @@ function renderWithProviders(ui: React.ReactElement) {
       user: {
         token: 'test-token',
         employeeId: '1',
-        employeeName: '管理員',
+        employeeName: '管理员',
         loginName: 'admin',
         administratorFlag: true,
         menuTree: [],
@@ -84,11 +135,12 @@ describe('AccountIndex', () => {
     renderWithProviders(<AccountIndex />);
 
     await waitFor(() => {
-      expect(screen.getByText('個人中心')).toBeInTheDocument();
-      expect(screen.getByText('修改密碼')).toBeInTheDocument();
+      expect(screen.getByText('个人中心')).toBeInTheDocument();
+      expect(screen.getByText('修改密码')).toBeInTheDocument();
       expect(screen.getByText('我的消息')).toBeInTheDocument();
-      expect(screen.getByText('登錄日誌')).toBeInTheDocument();
-      expect(screen.getByText('操作日誌')).toBeInTheDocument();
+      expect(screen.getByText('登录日志')).toBeInTheDocument();
+      expect(screen.getByText('操作日志')).toBeInTheDocument();
+      expect(screen.getByText('多因素认证')).toBeInTheDocument();
     });
   });
 
@@ -96,9 +148,9 @@ describe('AccountIndex', () => {
     renderWithProviders(<AccountIndex />);
 
     await waitFor(() => {
-      // Center component has a form with "登錄賬號" field
-      expect(screen.getByText('登錄賬號')).toBeInTheDocument();
-    });
+      // AccountCenter has form fields populated from getLoginInfo
+      expect(screen.getByText('登录账号')).toBeInTheDocument();
+    }, { timeout: 5000 });
   });
 
   it('should switch to password tab when clicked', async () => {
@@ -106,17 +158,17 @@ describe('AccountIndex', () => {
     renderWithProviders(<AccountIndex />);
 
     await waitFor(() => {
-      expect(screen.getByText('修改密碼')).toBeInTheDocument();
+      expect(screen.getByText('修改密码')).toBeInTheDocument();
     });
 
-    // Click the menu item (in the left nav)
-    const menuItems = screen.getAllByText('修改密碼');
+    // Click the menu item
+    const menuItems = screen.getAllByText('修改密码');
     await user.click(menuItems[0]);
 
     await waitFor(() => {
-      expect(screen.getByText('原密碼')).toBeInTheDocument();
-      expect(screen.getByText('新密碼')).toBeInTheDocument();
-      expect(screen.getByText('確認密碼')).toBeInTheDocument();
+      expect(screen.getByText('原密码')).toBeInTheDocument();
+      expect(screen.getByText('新密码')).toBeInTheDocument();
+      expect(screen.getByText('确认密码')).toBeInTheDocument();
     });
   });
 
@@ -133,9 +185,8 @@ describe('AccountIndex', () => {
     await user.click(menuItems[0]);
 
     await waitFor(() => {
-      // Message component shows a Result with title "我的消息"
-      // and a button "前往消息管理"
-      expect(screen.getByText('前往消息管理')).toBeInTheDocument();
+      // AccountMessage shows a table with search input
+      expect(screen.getByPlaceholderText('搜索标题/内容')).toBeInTheDocument();
     });
   });
 });

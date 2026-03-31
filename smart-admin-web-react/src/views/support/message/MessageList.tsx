@@ -28,7 +28,7 @@ const MessageList: React.FC = () => {
     setLoading(true);
     try {
       const res = await messageApi.query({
-        keywords,
+        searchWord: keywords,
         startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
         pageNum: page,

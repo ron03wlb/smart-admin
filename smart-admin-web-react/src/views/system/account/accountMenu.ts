@@ -22,42 +22,43 @@ export interface AccountMenuItem {
 
 /**
  * Account 菜單配置
+ * Points to full Account* implementations (matching Vue functionality)
  */
 export const ACCOUNT_MENU: Record<string, AccountMenuItem> = {
   CENTER: {
     menuId: 'center',
-    menuName: '個人中心',
-    component: lazy(() => import('./components/Center')),
+    menuName: '个人中心',
+    component: lazy(() => import('./components/AccountCenter')),
   },
   PASSWORD: {
     menuId: 'password',
-    menuName: '修改密碼',
-    component: lazy(() => import('./components/Password')),
+    menuName: '修改密码',
+    component: lazy(() => import('./components/AccountPassword')),
   },
   MESSAGE: {
     menuId: 'message',
     menuName: '我的消息',
-    component: lazy(() => import('./components/Message')),
+    component: lazy(() => import('./components/AccountMessage')),
   },
   NOTICE: {
     menuId: 'notice',
     menuName: '通知公告',
-    component: lazy(() => import('./components/Notice')),
+    component: lazy(() => import('./components/AccountNotice')),
   },
   LOGIN_LOG: {
     menuId: 'login-log',
-    menuName: '登錄日誌',
-    component: lazy(() => import('./components/LoginLog')),
+    menuName: '登录日志',
+    component: lazy(() => import('./components/AccountLoginLog')),
   },
   OPERATE_LOG: {
     menuId: 'operate-log',
-    menuName: '操作日誌',
-    component: lazy(() => import('./components/OperateLog')),
+    menuName: '操作日志',
+    component: lazy(() => import('./components/AccountOperateLog')),
   },
   MFA: {
     menuId: 'mfa',
-    menuName: '多因素認證',
-    component: lazy(() => import('./components/Mfa')),
+    menuName: '多因素认证',
+    component: lazy(() => import('./components/AccountMfa')),
   },
 };
 
