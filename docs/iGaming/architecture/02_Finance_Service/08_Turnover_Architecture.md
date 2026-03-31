@@ -1,5 +1,7 @@
 # 有效投注額架構：三層驗證與計算邏輯
 
+> **XREF（交叉引用）**: 完整業務規則定義見 [Turnover 業務規則](../../requirements/03_Gaming_Operations/01_Turnover_Business_Rules.md)
+
 > **SSOT 聲明**: 本文件是有效投注額 (Valid Turnover) 架構的唯一真實來源 (Single Source of Truth)。
 > 合併自 `08_Turnover_Calculation_Architecture.md` + `09_Turnover_Calculation_Logic_Detail.md`。
 >
