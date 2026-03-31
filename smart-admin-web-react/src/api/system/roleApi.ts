@@ -63,7 +63,7 @@ export const roleApi = {
    * @param roleId 角色ID
    */
   getRoleSelectedMenu: (roleId: number): Promise<ResponseDTO<RoleMenuSelectedVO>> => {
-    return request.get(`/role/getRoleSelectedMenu/${roleId}`);
+    return request.get(`/role/menu/getRoleSelectedMenu/${roleId}`);
   },
 
   /**
@@ -81,7 +81,7 @@ export const roleApi = {
    * @param params 查詢表單
    */
   queryRoleEmployee: (params: RoleEmployeeQueryForm): Promise<ResponseDTO<PageResult<RoleEmployeeVO>>> => {
-    return request.post('/role/employee/queryRoleEmployee', params);
+    return request.post('/role/employee/queryEmployee', params);
   },
 
   /**
@@ -89,7 +89,7 @@ export const roleApi = {
    * @param roleId 角色ID
    */
   getRoleAllEmployee: (roleId: number): Promise<ResponseDTO<RoleEmployeeVO[]>> => {
-    return request.get(`/role/employee/getAllEmployee/${roleId}`);
+    return request.get(`/role/employee/getAllEmployeeByRoleId/${roleId}`);
   },
 
   /**
@@ -97,7 +97,7 @@ export const roleApi = {
    * @param params 批量添加表單
    */
   batchAddRoleEmployee: (params: RoleEmployeeBatchForm): Promise<ResponseDTO<void>> => {
-    return request.post('/role/employee/batchAdd', params);
+    return request.post('/role/employee/batchAddRoleEmployee', params);
   },
 
   /**
@@ -106,7 +106,7 @@ export const roleApi = {
    * @param roleId 角色ID
    */
   deleteEmployeeRole: (employeeId: number, roleId: number): Promise<ResponseDTO<void>> => {
-    return request.get(`/role/employee/remove/${employeeId}/${roleId}`);
+    return request.get(`/role/employee/removeEmployee?employeeId=${employeeId}&roleId=${roleId}`);
   },
 
   /**
@@ -114,7 +114,7 @@ export const roleApi = {
    * @param params 批量移除表單
    */
   batchRemoveRoleEmployee: (params: RoleEmployeeBatchForm): Promise<ResponseDTO<void>> => {
-    return request.post('/role/employee/batchRemove', params);
+    return request.post('/role/employee/batchRemoveRoleEmployee', params);
   },
 
   // ==================== 角色-數據範圍 API ====================
@@ -123,7 +123,7 @@ export const roleApi = {
    * 獲取數據範圍列表
    */
   getDataScopeList: (): Promise<ResponseDTO<DataScopeVO[]>> => {
-    return request.get('/role/dataScope/list');
+    return request.get('/dataScope/list');
   },
 
   /**
@@ -139,6 +139,6 @@ export const roleApi = {
    * @param params 數據範圍更新表單
    */
   updateDataScope: (params: DataScopeUpdateForm): Promise<ResponseDTO<void>> => {
-    return request.post('/role/dataScope/update', params);
+    return request.post('/role/dataScope/updateRoleDataScopeList', params);
   },
 };

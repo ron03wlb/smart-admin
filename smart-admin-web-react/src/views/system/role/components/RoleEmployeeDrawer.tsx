@@ -13,6 +13,8 @@ import { SearchOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import { roleApi } from '@/api/system/roleApi';
 import type { RoleVO, RoleEmployeeVO, RoleEmployeeQueryForm } from '../types';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/common-const';
+import PrivilegeButton from '@/components/PrivilegeButton';
+import { ROLE_PERMISSION } from '@/constants/system/roleConst';
 import EmployeeTableSelectModal from './EmployeeTableSelectModal';
 
 interface RoleEmployeeDrawerProps {
@@ -229,9 +231,15 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
       width: 80,
       fixed: 'right',
       render: (_: unknown, record: RoleEmployeeVO) => (
-        <Button type="link" size="small" danger onClick={() => handleRemoveEmployee(record.employeeId)}>
+        <PrivilegeButton
+          type="link"
+          size="small"
+          danger
+          privilege={ROLE_PERMISSION.EMPLOYEE_DELETE}
+          onClick={() => handleRemoveEmployee(record.employeeId)}
+        >
           移除
-        </Button>
+        </PrivilegeButton>
       ),
     },
   ];
@@ -309,17 +317,23 @@ export default function RoleEmployeeDrawer({ visible, onClose, role }: RoleEmplo
         </Space>
 
         <Space style={{ marginBottom: 16 }}>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenEmployeeSelect}>
+          <PrivilegeButton
+            type="primary"
+            icon={<PlusOutlined />}
+            privilege={ROLE_PERMISSION.EMPLOYEE_ADD}
+            onClick={handleOpenEmployeeSelect}
+          >
             添加員工
-          </Button>
-          <Button
+          </PrivilegeButton>
+          <PrivilegeButton
             danger
             icon={<DeleteOutlined />}
+            privilege={ROLE_PERMISSION.EMPLOYEE_BATCH_DELETE}
             onClick={handleBatchRemove}
             disabled={selectedRowKeys.length === 0}
           >
             批量移除 {selectedRowKeys.length > 0 && `(${selectedRowKeys.length})`}
-          </Button>
+          </PrivilegeButton>
         </Space>
 
         {/* 員工列表表格 */}

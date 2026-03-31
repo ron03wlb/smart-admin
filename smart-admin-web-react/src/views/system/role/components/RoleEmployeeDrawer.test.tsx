@@ -7,8 +7,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { renderWithProviders } from '@/test/utils/test-utils';
 import RoleEmployeeDrawer from './RoleEmployeeDrawer';
 import { roleApi } from '@/api/system/roleApi';
 import type { RoleVO, RoleEmployeeVO } from '../types';
@@ -116,7 +117,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該顯示帶有角色名稱的 Drawer 標題',
       async () => {
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -131,7 +132,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該在 visible=false 時隱藏 Drawer',
       () => {
-        render(<RoleEmployeeDrawer {...defaultProps} visible={false} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} visible={false} />, { preloadedState: { user: { administratorFlag: true } } });
         expect(screen.queryByText(/角色員工列表/)).not.toBeInTheDocument();
       },
       TEST_TIMEOUT
@@ -140,7 +141,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該顯示搜索框和按鈕',
       async () => {
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -159,7 +160,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該顯示添加員工和批量移除按鈕',
       async () => {
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -177,7 +178,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該在 Drawer 打開時加載員工列表',
       async () => {
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -198,7 +199,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該顯示員工列表',
       async () => {
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -219,7 +220,7 @@ describe('RoleEmployeeDrawer', () => {
         const { message } = await import('antd');
         vi.mocked(roleApi.queryRoleEmployee).mockRejectedValue(new Error('網絡錯誤'));
 
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -234,7 +235,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該在沒有 role 時不加載數據',
       () => {
-        render(<RoleEmployeeDrawer {...defaultProps} role={undefined} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} role={undefined} />, { preloadedState: { user: { administratorFlag: true } } });
         expect(roleApi.queryRoleEmployee).not.toHaveBeenCalled();
       },
       TEST_TIMEOUT
@@ -246,7 +247,7 @@ describe('RoleEmployeeDrawer', () => {
       '應該支持關鍵字搜索',
       async () => {
         const user = userEvent.setup();
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -278,7 +279,7 @@ describe('RoleEmployeeDrawer', () => {
       '應該支持重置搜索',
       async () => {
         const user = userEvent.setup();
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -314,7 +315,7 @@ describe('RoleEmployeeDrawer', () => {
       '應該打開員工選擇 Modal',
       async () => {
         const user = userEvent.setup();
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -348,7 +349,7 @@ describe('RoleEmployeeDrawer', () => {
           data: undefined,
         });
 
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -390,7 +391,7 @@ describe('RoleEmployeeDrawer', () => {
 
         vi.mocked(roleApi.batchAddRoleEmployee).mockRejectedValue(new Error('權限不足'));
 
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -425,7 +426,7 @@ describe('RoleEmployeeDrawer', () => {
     it(
       '應該在未選擇員工時禁用批量移除按鈕',
       async () => {
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -448,7 +449,7 @@ describe('RoleEmployeeDrawer', () => {
       '應該在關閉 Drawer 時調用 onClose',
       async () => {
         const onClose = vi.fn();
-        render(<RoleEmployeeDrawer {...defaultProps} onClose={onClose} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} onClose={onClose} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -483,7 +484,7 @@ describe('RoleEmployeeDrawer', () => {
           },
         });
 
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -501,7 +502,7 @@ describe('RoleEmployeeDrawer', () => {
         const { message } = await import('antd');
         vi.mocked(roleApi.queryRoleEmployee).mockRejectedValue(new Error());
 
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
@@ -521,7 +522,7 @@ describe('RoleEmployeeDrawer', () => {
 
         vi.mocked(roleApi.batchAddRoleEmployee).mockRejectedValue(new Error());
 
-        render(<RoleEmployeeDrawer {...defaultProps} />);
+        renderWithProviders(<RoleEmployeeDrawer {...defaultProps} />, { preloadedState: { user: { administratorFlag: true } } });
 
         await waitFor(
           () => {
