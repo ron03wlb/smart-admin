@@ -239,7 +239,7 @@
 | **payment-service** | [Payment_Gateway_API.md](../02_Finance_Service/05_Payment_Gateway_API.md) | 存款、提款、支付網關集成 | PostgreSQL, Stripe/Adyen |
 | **game-integration-service** | [03_Game_Integration](../03_Game_Integration/) | Token 驗證、GP API、遊戲啟動 | Redis, PostgreSQL |
 | **bet-service** | [Game_Integration_Implementation.md](../03_Game_Integration/02_Game_Integration_Implementation.md) | Debit/Credit、投注記錄、冪等性 | PostgreSQL, Redis, Kafka |
-| **turnover-service** | [Turnover_Calculation_Architecture.md](../02_Finance_Service/08_Turnover_Calculation_Architecture.md) | 有效投注、投注要求追蹤 | PostgreSQL, Kafka, Flink |
+| **turnover-service** | [Turnover_Calculation_Architecture.md](../02_Finance_Service/08_Turnover_Architecture.md) | 有效投注、投注要求追蹤 | PostgreSQL, Kafka, Flink |
 | **bonus-service** | [04_Activity_Engine](../04_Activity_Engine/) | 獎金發放、投注要求、轉現金 | PostgreSQL, Redis |
 | **risk-service** | [05_Risk_Engine](../05_Risk_Engine/) | 風險評分、欺詐檢測、規則引擎 | PostgreSQL, Kafka, Flink, ML |
 | **reconciliation-service** | [Reconciliation_Technical.md](../02_Finance_Service/07_Reconciliation_Technical.md) | 三層驗證、GP API Pull、差異檢測 | PostgreSQL, Kafka, ClickHouse |
@@ -253,7 +253,7 @@
 |-----------|---------|---------|
 | **api-gateway** | [Gateway_Core.md](01_Gateway_Core.md) | Kong/Nginx、限流、路由 |
 | **auth-service** | [Authentication_Architecture.md](05_Authentication_Architecture.md) | JWT Token 簽發、OAuth、MFA |
-| **token-validation-service** | [Token_Validation_Architecture.md](19_Token_Validation_Architecture.md) | Token 緩存、多 Actor 驗證 |
+| **token-validation-service** | [Token_Validation_Architecture.md](17_Token_Security_Architecture.md) | Token 緩存、多 Actor 驗證 |
 | **cache-service** | [Caching_Strategy.md](14_Caching_Strategy.md) | Redis 集群管理 |
 | **stream-processing-service** | [Stream_Processing_Architecture.md](15_Stream_Processing_Architecture.md) | Kafka/Flink、實時投注額 |
 | **monitoring-service** | [Performance_Monitoring.md](12_Performance_Monitoring.md) | APM、日誌聚合、告警 |

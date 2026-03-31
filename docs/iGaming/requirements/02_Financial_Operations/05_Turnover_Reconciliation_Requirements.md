@@ -149,7 +149,7 @@
 2. **遊戲權重**：由活動模組定義（SLOTS: 1.0, SPORTS: 1.0, BACCARAT: 0.15 等）
 3. **狀態因子**：由財務模組定義（WIN: 1.0, LOSS: 1.0, DRAW: 0.0 等）
 
-→ **[三層驗證架構](../../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md#three-layer-validation)** - 技術責任矩陣、效能優化、短路實作
+→ **[三層驗證架構](../../architecture/02_Finance_Service/08_Turnover_Architecture.md#three-layer-validation)** - 技術責任矩陣、效能優化、短路實作
 
 ---
 
@@ -249,7 +249,7 @@
 | 每日對帳偏差率 | < 0.01% | 可接受偏差門檻 |
 | 事件發布成功率 | > 99.99% | 保證關鍵財務事件傳遞至下游系統 |
 
-→ **[事件發布架構](../../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md#event-publishing)**
+→ **[事件發布架構](../../architecture/02_Finance_Service/08_Turnover_Architecture.md#event-publishing)**
 
 ### 警報規則
 
@@ -274,7 +274,7 @@
 5. 如果玩家有活躍紅利：套用遊戲白名單檢查、貢獻上限，並計算活動投注額
 6. 更新投注進度
 
-→ **[技術流程圖](../../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md#calculation-flow)** - Mermaid 流程圖、決策樹、錯誤處理
+→ **[技術流程圖](../../architecture/02_Finance_Service/08_Turnover_Architecture.md#calculation-flow)** - Mermaid 流程圖、決策樹、錯誤處理
 
 ---
 
@@ -310,11 +310,11 @@
 
 ## 相關文件（Related Documentation）
 
-→ **[投注額計算邏輯（詳細）](../../architecture/02_Finance_Service/09_Turnover_Calculation_Logic_Detail.md)** - 投注狀態因子矩陣、遊戲權重表、HALF_WIN/HALF_LOSS 處理演算法
+→ **[投注額計算邏輯（詳細）](../../architecture/02_Finance_Service/08_Turnover_Architecture.md)** - 投注狀態因子矩陣、遊戲權重表、HALF_WIN/HALF_LOSS 處理演算法
 
-→ **[投注額流程圖](../../architecture/02_Finance_Service/11_Turnover_Flowcharts.md)** - 三層驗證架構、對帳流程和例外處理的視覺化工作流程圖
+→ **[投注額流程圖](../../architecture/02_Finance_Service/09_Turnover_Implementation.md)** - 三層驗證架構、對帳流程和例外處理的視覺化工作流程圖
 
-→ **[投注額系統實作](../../architecture/02_Finance_Service/10_Turnover_Implementation.md)** - 完整技術實作，包含 Java 程式碼、SQL schemas、Redis 快取策略和 Kafka 事件串流
+→ **[投注額系統實作](../../architecture/02_Finance_Service/09_Turnover_Implementation.md)** - 完整技術實作，包含 Java 程式碼、SQL schemas、Redis 快取策略和 Kafka 事件串流
 
 ---
 

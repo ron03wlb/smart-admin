@@ -521,7 +521,7 @@ Wallet Overview Balance = Cash + Bonus + (Credit Limit - Credit Used) - Locked B
     | 活動進度更新
 ```
 
-> **短路行為（Short-Circuit Behavior）**: 第一層（風險驗證）BLOCK 時立即回傳 `is_valid=false`，不執行第二/三層。SSOT 詳見 → [Turnover_Calculation_Architecture.md](../02_Finance_Service/08_Turnover_Calculation_Architecture.md)
+> **短路行為（Short-Circuit Behavior）**: 第一層（風險驗證）BLOCK 時立即回傳 `is_valid=false`，不執行第二/三層。SSOT 詳見 → [Turnover_Calculation_Architecture.md](../02_Finance_Service/08_Turnover_Architecture.md)
 
 ### 6.3 多租戶資料隔離（Multi-Tenant Data Isolation）
 

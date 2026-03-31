@@ -3,7 +3,7 @@
 > **規範來源**: [06-06 MFA Implementation](../../source-archive/06_Platform_Governance/06-06_MFA_Implementation.md)
 > **文件類型**: 業務需求
 > **目標讀者**: 產品經理、合規官員
-> **相關架構**: [MFA Technical Architecture](../../architecture/06_Platform_Core/04_MFA_Technical.md)
+> **相關架構**: [MFA Technical Architecture](../../architecture/06_Platform_Core/04_MFA_Implementation.md)
 > **最後同步**: 2026-02-09
 
 **Related Source Documents**:
@@ -137,7 +137,7 @@ SmartAdmin 後台的 Multi-Factor Authentication (MFA) 為業務提供關鍵價�
 1. 所有 Super Admin、Finance Manager、Risk Control 必須啟用 MFA
 2. MFA Secret 必須使用 NIST 批准的 256 位元加密標準加密
 
-→ **[MFA Secret Encryption](../../architecture/06_Platform_Core/04_MFA_Technical.md#secret-encryption)** — 查看 architecture 層了解批准的演算法詳情
+→ **[MFA Secret Encryption](../../architecture/06_Platform_Core/04_MFA_Implementation.md#secret-encryption)** — 查看 architecture 層了解批准的演算法詳情
 3. 審計日誌必須記錄所有 MFA 事件（設置、驗證、失敗）
 4. 恢復機制必須要求二次驗證（無自助恢復）
 5. MFA 實施必須通過滲透測試
@@ -198,7 +198,7 @@ SmartAdmin 後台的 Multi-Factor Authentication (MFA) 為業務提供關鍵價�
 - **生成**：SecureRandom，加密安全
 - **存儲**：NIST 批准的 256 位元加密，與用戶 MFA 記錄一起存儲
 
-→ **[Encryption Implementation Details](../../architecture/06_Platform_Core/04_MFA_Technical.md#secret-encryption)** — 查看 architecture 層了解批准的演算法詳情
+→ **[Encryption Implementation Details](../../architecture/06_Platform_Core/04_MFA_Implementation.md#secret-encryption)** — 查看 architecture 層了解批准的演算法詳情
 - **使用**：每個碼僅能使用一次
 
 **用戶指南**：
@@ -396,7 +396,7 @@ SmartAdmin 後台的 Multi-Factor Authentication (MFA) 為業務提供關鍵價�
 
 ## 相關文檔
 
-→ **[TOTP & WebAuthn Implementation](../../architecture/06_Platform_Core/06_TOTP_WebAuthn_Implementation.md)** - TOTP 演算法實作 (RFC 6238)、Secret 生成、QR Code 渲染、備份碼加密 (AES-256-GCM)、信任設備指紋、審計日誌 Schema
+→ **[TOTP & WebAuthn Implementation](../../architecture/06_Platform_Core/04_MFA_Implementation.md)** - TOTP 演算法實作 (RFC 6238)、Secret 生成、QR Code 渲染、備份碼加密 (AES-256-GCM)、信任設備指紋、審計日誌 Schema
 
 ---
 

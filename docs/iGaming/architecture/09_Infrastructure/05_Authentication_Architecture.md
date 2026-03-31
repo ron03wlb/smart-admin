@@ -317,7 +317,7 @@ CREATE INDEX idx_api_key_lookup ON t_api_key(api_key) WHERE status = 1;
 
 ## 相關文檔（Related Documents）
 
-- [Multi Actor Token Security](./17_Multi_Actor_Token_Security.md) - 多主體 Token 安全方案
-- [OAuth Refresh Token](./18_OAuth_Refresh_Token.md) - OAuth Refresh Token 實施
-- [Token Validation Service](./20_Token_Validation_Service.md) - Token 驗證服務
+- [Multi Actor Token Security](./17_Token_Security_Architecture.md) - 多主體 Token 安全方案
+- [OAuth Refresh Token](./17_Token_Security_Architecture.md) - OAuth Refresh Token 實施
+- [Token Validation Service](./18_Token_Operations.md) - Token 驗證服務
 - [API Design Principles](./04_API_Design_Principles.md) - API 設計原則

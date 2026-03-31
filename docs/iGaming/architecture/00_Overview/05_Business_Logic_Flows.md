@@ -519,7 +519,7 @@ WHERE DATE(bet_time) = CURRENT_DATE - INTERVAL 1 DAY
 GROUP BY player_id, DATE(bet_time);
 ```
 
-關於詳細的有效投注額計算流程圖，請參閱 [Turnover Flowcharts](../02_Finance_Service/11_Turnover_Flowcharts.md)。
+關於詳細的有效投注額計算流程圖，請參閱 [Turnover Flowcharts](../02_Finance_Service/09_Turnover_Implementation.md)。
 
 ---
 

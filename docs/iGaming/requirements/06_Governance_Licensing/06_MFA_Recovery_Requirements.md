@@ -2,7 +2,7 @@
 
 > **規範來源**: [06-06-03_Recovery_Flow.md](../../source-archive/06_Platform_Governance/06-06-03_Recovery_Flow.md)
 > **目標讀者**: 高層管理、合規官員、安全運營
-> **相關架構**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/10_MFA_Login_Recovery_Technical.md)
+> **相關架構**: [MFA_Login_Recovery_Technical.md](../../architecture/06_Platform_Core/06_MFA_Recovery.md)
 > **最後同步**: 2026-02-09
 >
 > **補充說明**: 技術細節（Two-Phase Login 序列圖、Trusted Device Token 生成 Java 代碼、Cookie 配置 HttpOnly/Secure/SameSite、MFA Session 存儲 Redis + 5 分鐘 TTL、SHA256 哈希、QR Code 生成）已移至 Architecture 層。本文檔專注於業務政策。
@@ -70,7 +70,7 @@ Multi-Factor Authentication (MFA) 是後台管理平台的強制安全控制。�
 | Session 存儲 | 僅服務器端 | 防止客戶端篡改 |
 | Session 為單次使用 | 是 | MFA 驗證成功後消耗並刪除 |
 
-→ **[MFA Session 存儲實作](../../architecture/06_Platform_Core/10_MFA_Login_Recovery_Technical.md#mfa-session-storage)** - Redis 存儲配置、5 分鐘 TTL、Session 清理機制
+→ **[MFA Session 存儲實作](../../architecture/06_Platform_Core/06_MFA_Recovery.md#mfa-session-storage)** - Redis 存儲配置、5 分鐘 TTL、Session 清理機制
 
 ---
 
@@ -98,7 +98,7 @@ Multi-Factor Authentication (MFA) 是後台管理平台的強制安全控制。�
 | 設備指紋碰撞 | 三重綁定（指紋 + IP + User-Agent）減少誤匹配 |
 | 信任期過長 | 30 天 TTL 自動過期；管理員可遠程撤銷 |
 
-→ **[Trusted Device Token 實作](../../architecture/06_Platform_Core/10_MFA_Login_Recovery_Technical.md#trusted-device-token)** - Cookie 配置（HttpOnly、Secure、SameSite=Strict）、SHA256 Token 生成、三重綁定實作
+→ **[Trusted Device Token 實作](../../architecture/06_Platform_Core/06_MFA_Recovery.md#trusted-device-token)** - Cookie 配置（HttpOnly、Secure、SameSite=Strict）、SHA256 Token 生成、三重綁定實作
 
 ---
 
@@ -147,7 +147,7 @@ MFA 註冊在以下條件下啟動：
 | 2 | 掃描 QR Code | 用戶使用 Google Authenticator（或兼容 TOTP App）掃描 QR Code |
 | 3 | 驗證和激活 | 用戶輸入第一個 6 位數代碼證明註冊成功 |
 
-→ **[TOTP Secret 和 QR Code 生成](../../architecture/06_Platform_Core/10_MFA_Login_Recovery_Technical.md#totp-registration)** - Secret 生成算法、QR Code 編碼、安全顯示實作
+→ **[TOTP Secret 和 QR Code 生成](../../architecture/06_Platform_Core/06_MFA_Recovery.md#totp-registration)** - Secret 生成算法、QR Code 編碼、安全顯示實作
 
 ### 5.3 Backup Code 政策
 
@@ -159,7 +159,7 @@ MFA 註冊在以下條件下啟動：
 | 存儲 | 服務器端安全存儲；明文僅在生成時顯示一次 |
 | 使用 | 單次使用；每個碼可用於一次帳號恢復 |
 
-→ **[Backup Code 存儲實作](../../architecture/06_Platform_Core/10_MFA_Login_Recovery_Technical.md#backup-codes)** - 加密算法（AES-256-GCM）、安全生成、存儲格式
+→ **[Backup Code 存儲實作](../../architecture/06_Platform_Core/06_MFA_Recovery.md#backup-codes)** - 加密算法（AES-256-GCM）、安全生成、存儲格式
 
 ---
 
@@ -231,7 +231,7 @@ MFA 註冊在以下條件下啟動：
 
 ### 技術實作
 
-→ **[MFA Recovery Implementation](../../architecture/06_Platform_Core/09_MFA_Recovery_Implementation.md)** - 兩階段登入序列圖、MFA Session 存儲（Redis + TTL）、信任設備 Token 生成（SHA256）、Cookie 配置（HttpOnly/Secure/SameSite）和 TOTP QR Code 生成
+→ **[MFA Recovery Implementation](../../architecture/06_Platform_Core/06_MFA_Recovery.md)** - 兩階段登入序列圖、MFA Session 存儲（Redis + TTL）、信任設備 Token 生成（SHA256）、Cookie 配置（HttpOnly/Secure/SameSite）和 TOTP QR Code 生成
 
 ---
 

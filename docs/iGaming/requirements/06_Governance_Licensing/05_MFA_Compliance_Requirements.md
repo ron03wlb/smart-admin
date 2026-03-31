@@ -2,7 +2,7 @@
 
 > **規範來源**: [06-06-04_Compliance_Audit.md](../../source-archive/06_Platform_Governance/06-06-04_Compliance_Audit.md)
 > **目標讀者**: 高層管理、合規官員
-> **相關架構**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/07_MFA_Compliance_Technical.md)
+> **相關架構**: [MFA_Compliance_Technical.md](../../architecture/06_Platform_Core/05_MFA_Compliance.md)
 > **最後同步**: 2026-02-09
 >
 > **Refinement Note**: 技術細節（Backup Code AES-256-GCM 加密、Identity Document S3 上傳實作、Audit Log JSONB 格式 + Kafka 整合、Anomaly Detection 規則實作、HTTP 狀態碼、Redis 快取配置）已移至 Architecture 層。本文檔專注於業務政策、合規要求和運營程序。
@@ -57,7 +57,7 @@ MFA 合規與審計為業務提供關鍵價值：
 | **低碼警告** | 當剩餘未使用碼降至 2 個或更少時，提示用戶重新生成 |
 | **重新生成** | 需要活躍 TOTP 驗證才能生成新碼 |
 
-→ **[Backup Code 存儲與加密](../../architecture/06_Platform_Core/07_MFA_Compliance_Technical.md#backup-code-encryption)** - AES-256-GCM 加密算法、安全生成、數據庫架構、狀態追蹤實作
+→ **[Backup Code 存儲與加密](../../architecture/06_Platform_Core/05_MFA_Compliance.md#backup-code-encryption)** - AES-256-GCM 加密算法、安全生成、數據庫架構、狀態追蹤實作
 
 ### 2.3 Backup Code 登入政策
 
@@ -116,7 +116,7 @@ MFA 合規與審計為業務提供關鍵價值：
 - 審核者 ID 和審核時間戳
 - 完整審計追蹤
 
-→ **[Identity Document 上傳實作](../../architecture/06_Platform_Core/07_MFA_Compliance_Technical.md#identity-document-upload)** - S3 存儲配置、文件驗證、安全上傳 API、文檔驗證工作流
+→ **[Identity Document 上傳實作](../../architecture/06_Platform_Core/05_MFA_Compliance.md#identity-document-upload)** - S3 存儲配置、文件驗證、安全上傳 API、文檔驗證工作流
 
 ---
 
@@ -244,7 +244,7 @@ MFA 策略基於三個維度的加權決策矩陣選擇：
 - 結構化格式的附加詳情（例如原因、嘗試次數、剩餘嘗試次數）
 - 時間戳
 
-→ **[Audit Log 實作](../../architecture/06_Platform_Core/07_MFA_Compliance_Technical.md#audit-log-implementation)** - JSONB 格式規範、Kafka 事件流整合、PostgreSQL 存儲架構、保留策略自動化
+→ **[Audit Log 實作](../../architecture/06_Platform_Core/05_MFA_Compliance.md#audit-log-implementation)** - JSONB 格式規範、Kafka 事件流整合、PostgreSQL 存儲架構、保留策略自動化
 
 ---
 
@@ -280,7 +280,7 @@ MFA 策略基於三個維度的加權決策矩陣選擇：
   - 人工審核：「為什麼高風險帳號禁用 MFA？」
   - 如果不是帳號持有人發起，視為安全事件並立即鎖定帳號
 
-→ **[Anomaly Detection 實作](../../architecture/06_Platform_Core/07_MFA_Compliance_Technical.md#anomaly-detection-rules)** - Java 規則引擎實作、閾值配置、警報觸發邏輯、地理位置檢測算法
+→ **[Anomaly Detection 實作](../../architecture/06_Platform_Core/05_MFA_Compliance.md#anomaly-detection-rules)** - Java 規則引擎實作、閾值配置、警報觸發邏輯、地理位置檢測算法
 
 ---
 
@@ -436,4 +436,4 @@ MFA 策略基於三個維度的加權決策矩陣選擇：
 
 ### 技術實作
 
-→ **[MFA Compliance Validation](../../architecture/06_Platform_Core/08_MFA_Compliance_Validation.md)** - Backup Code 存儲加密、身份證件上傳工作流、審計日誌實作（JSONB + Kafka）、異常檢測算法（失敗嘗試、地理位置、備份碼濫用）
+→ **[MFA Compliance Validation](../../architecture/06_Platform_Core/05_MFA_Compliance.md)** - Backup Code 存儲加密、身份證件上傳工作流、審計日誌實作（JSONB + Kafka）、異常檢測算法（失敗嘗試、地理位置、備份碼濫用）

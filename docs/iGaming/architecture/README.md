@@ -69,12 +69,8 @@
 | [Stream Processing Architecture](09_Infrastructure/15_Stream_Processing_Architecture.md) | Kafka/Flink, event sourcing, CQRS |
 | [Caching Strategy](09_Infrastructure/14_Caching_Strategy.md) | L1/L2/L3 cache, Redis, Caffeine |
 | [Cost Optimization Architecture](09_Infrastructure/16_Cost_Optimization_Architecture.md) | Auto-scaling, infrastructure cost |
-| [OAuth Refresh Token](09_Infrastructure/18_OAuth_Refresh_Token.md) | Token rotation, security |
-| [Multi Actor Token Security](09_Infrastructure/17_Multi_Actor_Token_Security.md) | Multi-actor token design |
-| [Token Validation Service](09_Infrastructure/20_Token_Validation_Service.md) | Centralized token validation |
-| [Token Validation Architecture](09_Infrastructure/19_Token_Validation_Architecture.md) | Validation flow, circuit breaker |
-| [Token Cache Performance](09_Infrastructure/21_Token_Cache_Performance.md) | Token cache hierarchy, TTL |
-| [Token Edge Deployment](09_Infrastructure/22_Token_Edge_Deployment.md) | Edge deployment, CDN |
+| [Token Security Architecture](09_Infrastructure/17_Token_Security_Architecture.md) | Multi-actor token design, OAuth refresh token, token validation architecture |
+| [Token Operations](09_Infrastructure/18_Token_Operations.md) | Token validation service, 3-tier cache performance, edge deployment, rate limiting |
 
 ### 10 Platform Management (3 documents)
 
@@ -172,7 +168,7 @@ See individual module READMEs for full listings:
 ### API Design
 - [API Design Principles](09_Infrastructure/04_API_Design_Principles.md) - REST API standards
 - [Authentication Architecture](09_Infrastructure/05_Authentication_Architecture.md) - OAuth2, JWT
-- [Token Validation Service](09_Infrastructure/20_Token_Validation_Service.md) - Centralized validation
+- [Token Operations](09_Infrastructure/18_Token_Operations.md) - Centralized token validation, cache performance
 
 ### Data Layer
 - [Multi-Tenant Architecture](06_Platform_Core/01_Multi_Tenant_Architecture.md) - RLS, tenant isolation

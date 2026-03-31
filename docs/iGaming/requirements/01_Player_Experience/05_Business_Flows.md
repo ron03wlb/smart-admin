@@ -539,7 +539,7 @@ flowchart LR
 - 每小時缺失記錄 > 10 筆：告警通知，檢查遊戲供應商 API
 - 連續 3 小時對帳失敗：緊急告警，暫停受影響的遊戲
 
-> 有關詳細的投注額計算流程圖及技術實作，請參閱 [投注額流程圖](../../architecture/02_Finance_Service/11_Turnover_Flowcharts.md)。
+> 有關詳細的投注額計算流程圖及技術實作，請參閱 [投注額流程圖](../../architecture/02_Finance_Service/09_Turnover_Implementation.md)。
 
 ---
 
@@ -662,7 +662,7 @@ flowchart TD
 
 - [業務邏輯流程（架構視圖）](../../architecture/00_Overview/05_Business_Logic_Flows.md) -- 所有 6 個流程的技術實作細節
 - [投注額業務規則](../../requirements/03_Gaming_Operations/01_Turnover_Business_Rules.md) -- 詳細的投注及投注額政策
-- [投注額流程圖](../../architecture/02_Finance_Service/11_Turnover_Flowcharts.md) -- 技術性投注額計算圖表
+- [投注額流程圖](../../architecture/02_Finance_Service/09_Turnover_Implementation.md) -- 技術性投注額計算圖表
 
 ---
 

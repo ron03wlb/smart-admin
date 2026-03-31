@@ -2,7 +2,7 @@
 
 > **規範來源**: [06-06-01_MFA_Architecture.md](../../source-archive/06_Platform_Governance/06-06-01_MFA_Architecture.md)
 > **目標讀者**: 高階主管、合規官、風險官
-> **相關架構**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/05_MFA_Technical_Evaluation.md)
+> **相關架構**: [MFA_Technical_Evaluation.md](../../architecture/06_Platform_Core/03_MFA_Architecture.md)
 > **最後同步**: 2026-02-09
 >
 > **精煉說明**: 技術細節（TOTP RFC 6238 規範、HMAC-SHA1 演算法、SIM Swap 攻擊向量、SS7 劫持、TOTP secret 加密 AES/GCM、FIDO2 技術標準）已移至架構層。本文件僅關注業務風險分析和決策制定。
@@ -104,7 +104,7 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 | 4 | 備份恢復機制必須有二次驗證（不能自助恢復） |
 | 5 | MFA 實施後需通過滲透測試（Penetration Test） |
 
-→ **[MFA Secret Encryption Implementation](../../architecture/06_Platform_Core/05_MFA_Technical_Evaluation.md#secret-encryption)** - AES-256-GCM encryption algorithm, key rotation policy, HSM integration
+→ **[MFA Secret Encryption Implementation](../../architecture/06_Platform_Core/03_MFA_Architecture.md#secret-encryption)** - AES-256-GCM encryption algorithm, key rotation policy, HSM integration
 
 ---
 
@@ -129,7 +129,7 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 | **缺點** | 設備丟失風險（需備份恢復機制）；時間同步問題 |
 | **適用場景** | Super Admin、Finance Manager（高權限角色）；開發者、DevOps |
 
-→ **[TOTP RFC 6238 Implementation](../../architecture/06_Platform_Core/05_MFA_Technical_Evaluation.md#totp-specification)** - HMAC-SHA1 algorithm, time step (30s), code length (6 digits), time window tolerance
+→ **[TOTP RFC 6238 Implementation](../../architecture/06_Platform_Core/03_MFA_Architecture.md#totp-specification)** - HMAC-SHA1 algorithm, time step (30s), code length (6 digits), time window tolerance
 
 #### SMS OTP
 
@@ -141,7 +141,7 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 
 **標準機構立場**：SMS OTP 已被國際安全標準列為棄用（deprecated），未來版本將禁止使用。
 
-→ **[SMS Security Threat Analysis](../../architecture/06_Platform_Core/05_MFA_Technical_Evaluation.md#sms-vulnerabilities)** - SIM Swap attack vectors, SS7 hijacking, NIST SP 800-63B deprecation notice
+→ **[SMS Security Threat Analysis](../../architecture/06_Platform_Core/03_MFA_Architecture.md#sms-vulnerabilities)** - SIM Swap attack vectors, SS7 hijacking, NIST SP 800-63B deprecation notice
 
 #### Email OTP
 
@@ -159,7 +159,7 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 | **缺點** | 成本高（每個設備 $50-$70 USD）；物流問題（需郵寄給遠程員工）；丟失風險 |
 | **適用場景** | 超高權限角色（Super Admin、CTO、CFO）；有預算的大型企業 |
 
-→ **[FIDO2/WebAuthn Standards](../../architecture/06_Platform_Core/05_MFA_Technical_Evaluation.md#fido2-webauthn)** - FIDO2 protocol specification, WebAuthn API integration, hardware token support
+→ **[FIDO2/WebAuthn Standards](../../architecture/06_Platform_Core/03_MFA_Architecture.md#fido2-webauthn)** - FIDO2 protocol specification, WebAuthn API integration, hardware token support
 
 ---
 
@@ -236,14 +236,14 @@ iGaming 行業需遵守以下監管要求，大部分明確要求或強烈建議
 
 ## 相關文檔
 
-- [MFA_Technical_Architecture.md](../../architecture/06_Platform_Core/03_MFA_Technical_Architecture.md) - MFA 技術架構設計
-- [TOTP_WebAuthn_Implementation.md](../../architecture/06_Platform_Core/06_TOTP_WebAuthn_Implementation.md) - TOTP 與 WebAuthn 技術實作
+- [MFA_Technical_Architecture.md](../../architecture/06_Platform_Core/03_MFA_Architecture.md) - MFA 技術架構設計
+- [TOTP_WebAuthn_Implementation.md](../../architecture/06_Platform_Core/04_MFA_Implementation.md) - TOTP 與 WebAuthn 技術實作
 - [MFA_Compliance_Requirements.md](./05_MFA_Compliance_Requirements.md) - 合規與審計要求
 - [MFA_Recovery_Requirements.md](./06_MFA_Recovery_Requirements.md) - 登入與恢復流程需求
 
 ### 技術實現
 
-→ **[MFA 技術架構](../../architecture/06_Platform_Core/03_MFA_Technical_Architecture.md)** - TOTP RFC 6238 規範、TOTP Secret 加密（AES-256-GCM）、SMS 安全威脅分析（SIM Swap/SS7 劫持）、FIDO2/WebAuthn 標準協議、技術比較矩陣
+→ **[MFA 技術架構](../../architecture/06_Platform_Core/03_MFA_Architecture.md)** - TOTP RFC 6238 規範、TOTP Secret 加密（AES-256-GCM）、SMS 安全威脅分析（SIM Swap/SS7 劫持）、FIDO2/WebAuthn 標準協議、技術比較矩陣
 
 ---
 
