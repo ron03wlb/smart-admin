@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Card, Input, Button, Table, Space, Modal, message, Typography } from 'antd';
+import { Card, Input, Table, Space, Modal, message } from 'antd';
 import {
   SearchOutlined,
   ReloadOutlined,
@@ -17,7 +17,6 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
-import { usePrivilege } from '@/hooks/usePrivilege';
 import PrivilegeButton from '@/components/PrivilegeButton';
 import { departmentApi } from '@/api/system/departmentApi';
 import type { DepartmentVO, DepartmentFormData } from './types';
@@ -29,16 +28,10 @@ import {
 import { formatDateTime } from '@/utils/date';
 import DepartmentFormModal from './components/DepartmentFormModal';
 
-const { Title } = Typography;
-const { Search } = Input;
-
 /**
  * 部門管理頁面
  */
 export default function DepartmentPage() {
-  const hasQueryPrivilege = usePrivilege(DEPARTMENT_PERMISSION.QUERY);
-  const hasUpdatePrivilege = usePrivilege(DEPARTMENT_PERMISSION.UPDATE);
-  const hasDeletePrivilege = usePrivilege(DEPARTMENT_PERMISSION.DELETE);
 
   // ==================== State Management ====================
 
@@ -62,6 +55,10 @@ export default function DepartmentPage() {
     try {
       setLoading(true);
       const response = await departmentApi.queryAllDepartment();
+      if (!response.ok) {
+        message.error(response.msg || '查詢部門列表失敗');
+        return;
+      }
       const data = response.data || [];
 
       setDepartmentList(data);
@@ -229,21 +226,25 @@ export default function DepartmentPage() {
             添加下級
           </PrivilegeButton>
 
-          {hasUpdatePrivilege && (
-            <Button type="link" size="small" onClick={() => handleEdit(record)}>
-              編輯
-            </Button>
-          )}
+          <PrivilegeButton
+            privilege={DEPARTMENT_PERMISSION.UPDATE}
+            type="link"
+            size="small"
+            onClick={() => handleEdit(record)}
+          >
+            編輯
+          </PrivilegeButton>
 
-          {hasDeletePrivilege && record.departmentId !== topDepartmentId && (
-            <Button
+          {record.departmentId !== topDepartmentId && (
+            <PrivilegeButton
+              privilege={DEPARTMENT_PERMISSION.DELETE}
               type="link"
               size="small"
               danger
               onClick={() => handleDelete(record.departmentId)}
             >
               刪除
-            </Button>
+            </PrivilegeButton>
           )}
         </Space>
       ),
@@ -324,31 +325,34 @@ export default function DepartmentPage() {
   return (
     <div style={{ padding: '24px' }}>
       <Card>
-        {/* Header */}
+        {/* Search Bar */}
         <div style={{ marginBottom: 16 }}>
-          <Title level={5} style={{ marginBottom: 16 }}>
-            部門管理
-          </Title>
-
-          {/* Search Bar */}
           <Space style={{ marginBottom: 16, width: '100%' }} wrap>
-            <Search
+            <Input
               placeholder="請輸入部門名稱"
               allowClear
               style={{ width: 300 }}
               value={keyword}
               onChange={e => setKeyword(e.target.value)}
-              onSearch={handleSearch}
-              enterButton={
-                <Button type="primary" icon={<SearchOutlined />} disabled={!hasQueryPrivilege}>
-                  查詢
-                </Button>
-              }
+              onPressEnter={handleSearch}
             />
 
-            <Button icon={<ReloadOutlined />} onClick={handleReset} disabled={!hasQueryPrivilege}>
+            <PrivilegeButton
+              privilege={DEPARTMENT_PERMISSION.QUERY}
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={handleSearch}
+            >
+              查詢
+            </PrivilegeButton>
+
+            <PrivilegeButton
+              privilege={DEPARTMENT_PERMISSION.QUERY}
+              icon={<ReloadOutlined />}
+              onClick={handleReset}
+            >
               重置
-            </Button>
+            </PrivilegeButton>
 
             <PrivilegeButton
               privilege={DEPARTMENT_PERMISSION.ADD}

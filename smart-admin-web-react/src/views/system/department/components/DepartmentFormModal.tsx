@@ -12,6 +12,8 @@ import { useModal } from '@/hooks/useModal';
 import { departmentApi } from '@/api/system/departmentApi';
 import type { DepartmentFormData, DepartmentAddForm, DepartmentUpdateForm } from '../types';
 import { DEPARTMENT_VALIDATION, DEPARTMENT_CONSTANTS } from '@/constants/system/departmentConst';
+import DepartmentTreeSelect from '@/components/system/department-tree-select/DepartmentTreeSelect';
+import EmployeeSelect from '@/components/system/employee-select/EmployeeSelect';
 
 interface DepartmentFormModalProps {
   visible: boolean;
@@ -144,7 +146,7 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
         {/* 上級部門（僅非頂級部門顯示） */}
         {initialData?.parentId !== DEPARTMENT_CONSTANTS.TOP_PARENT_ID && (
           <Form.Item label="上級部門" name="parentId" rules={rules.parentId}>
-            <Input placeholder="上級部門ID（後續實現 DepartmentTreeSelect）" disabled />
+            <DepartmentTreeSelect placeholder="請選擇上級部門" />
           </Form.Item>
         )}
 
@@ -155,7 +157,7 @@ export const DepartmentFormModal: React.FC<DepartmentFormModalProps> = ({
 
         {/* 部門負責人 */}
         <Form.Item label="部門負責人" name="managerId">
-          <Input placeholder="負責人ID（後續實現 EmployeeSelect）" />
+          <EmployeeSelect placeholder="請選擇部門負責人" />
         </Form.Item>
 
         {/* 部門排序 */}

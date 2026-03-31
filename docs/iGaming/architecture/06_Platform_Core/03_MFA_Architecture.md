@@ -260,13 +260,164 @@ CREATE INDEX idx_mfa_audit_user ON t_mfa_audit_log(user_id, created_at DESC);
 
 ---
 
-## 相關文檔（Related Documents）
+---
 
-- [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/03_MFA_Architecture_Spec.md) - MFA 業務需求與方法選擇
-- [TOTP_WebAuthn_Implementation.md](./06_TOTP_WebAuthn_Implementation.md) - TOTP 算法實現與密鑰管理
-- [MFA_Compliance_Validation.md](./08_MFA_Compliance_Validation.md) - 合規驗證技術設計
-- [MFA_Recovery_Implementation.md](./09_MFA_Recovery_Implementation.md) - 恢復流程技術實現
+## 8. MFA 方法選擇評估（Method Evaluation Summary）
+
+> 本節摘自原始技術評估文件，包含安全性比較矩陣與合規對齊分析。
+> TOTP 演算法實作細節見 [04_MFA_Implementation.md](04_MFA_Implementation.md)
+
+## 5. 安全性比較矩陣（Security Comparison Matrix）
+
+### 5.1 技術比較（Technical Comparison）
+
+| 特性 | TOTP | SMS OTP | Email OTP | 硬體權杖（Hardware Token, FIDO2） |
+|---------|------|---------|-----------|------------------------|
+| **演算法** | HMAC-SHA1（RFC 6238） | N/A（電信） | N/A | ECDSA P-256 / RSA 2048 |
+| **離線能力** | ✅ 是 | ❌ 否（需網路） | ❌ 否 | ✅ 是 |
+| **抗網路釣魚** | ⚠️ 部分（驗證碼可能被釣魚） | ❌ 否 | ❌ 否 | ✅ 是（網域綁定） |
+| **SIM 卡交換漏洞** | ✅ 否 | ❌ 是 | ✅ 否 | ✅ 否 |
+| **SS7 攻擊漏洞** | ✅ 否 | ❌ 是 | ✅ 否 | ✅ 否 |
+| **裝置依賴性** | ⚠️ 手機/應用程式 | ⚠️ 手機 | ⚠️ 電子郵件存取 | ⚠️ 硬體權杖 |
+| **每位使用者成本** | $0 | $0.05-$0.10 每則簡訊 | $0 | $50-$70（一次性） |
+| **設定複雜度** | 中（QR Code 掃描） | 低（自動） | 低（自動） | 高（USB/NFC 配對） |
+| **NIST 建議** | ✅ 建議 | ⚠️ 已淘汰 | ⚠️ 不建議 | ✅ 建議（AAL3） |
+
+### 5.2 攻擊面分析（Attack Surface Analysis）
+
+**TOTP 攻擊向量**:
+- ⚠️ 網路釣魚: 使用者在假登入頁面輸入驗證碼
+  - 緩解: 短有效期（30秒）、使用者教育
+- ⚠️ 裝置失竊: 實體存取手機
+  - 緩解: 需裝置 PIN/生物辨識才能存取應用程式
+- ⚠️ 備份碼失竊: 儲存不安全
+  - 緩解: 加密備份碼，需 MFA 才能查看
+
+**SMS OTP 攻擊向量**:
+- ❌ **SIM 卡交換**（高風險）: 攻擊者取得電話號碼
+- ❌ **SS7 劫持**（中風險）: 電信層級攔截
+- ❌ **網路釣魚**（高風險）: 驗證碼可被攔截
+- ❌ **惡意軟體**（中風險）: 手機上的簡訊讀取惡意軟體
+
+**硬體權杖（FIDO2）攻擊向量**:
+- ⚠️ 實體失竊: 攻擊者竊取權杖
+  - 緩解: 需 PIN/生物辨識才能使用權杖
+- ⚠️ 供應鏈: 受損硬體（罕見）
+  - 緩解: 從可信供應商購買（Yubico、Google Titan）
+
+### 5.3 合規性對齊（Compliance Alignment）
+
+| 法規 | TOTP | SMS OTP | 硬體權杖（Hardware Token, FIDO2） |
+|-----------|------|---------|------------------------|
+| **NIST AAL2**（中度保證） | ✅ 核准 | ⚠️ 受限（有條件） | ✅ 核准 |
+| **NIST AAL3**（高度保證） | ❌ 不足 | ❌ 禁止 | ✅ 必要 |
+| **PSD2 SCA**（歐盟支付） | ✅ 合規 | ⚠️ 2025年前允許 | ✅ 合規 |
+| **GDPR Art. 32**（資料保護） | ✅ 充足 | ⚠️ 可疑（SMS 風險） | ✅ 強 |
+| **UKGC LCCP**（博彩執照） | ✅ 可接受 | ⚠️ 可接受但有警告 | ✅ 首選 |
+| **MGA B2C/183/2010** | ✅ 管理員強制 | ❌ 單獨使用不足 | ✅ 建議 |
+
+### 5.4 成本效益分析（Cost-Benefit Analysis）
+
+**情境: 200 位管理員使用者**
+
+| 方法 | 設定成本 | 年度成本 | 安全等級 | 建議 |
+|--------|-----------|-------------|----------------|----------------|
+| **僅 TOTP** | $0 | $0 | 高（5/5） | ✅ **符合成本效益的基準** |
+| **TOTP + SMS 備用** | $500（整合） | $3,600（簡訊費） | 高（5/5） | ✅ 良好平衡 |
+| **TOTP + 硬體權杖** | $10,000（權杖） | $0 | 極高（5/5） | ⚠️ 僅適用 AAL3 合規 |
+| **僅 SMS** | $500 | $3,600 | 低（2/5） | ❌ **不建議** |
+
+**ROI 計算**:
+- **風險降低**: TOTP 將帳號入侵風險從 8.1 CVSS（高）降至 4.3（中）
+- **資料外洩成本**: 平均 iGaming 平台資料外洩成本 $500K-$2M
+- **預期損失降低**: TOTP（$0/年）vs. 潛在外洩（$1M）= ∞% ROI
 
 ---
 
-**End of Document**
+## 6. 實作建議（Implementation Recommendations）
+
+### 6.1 高風險角色強制 TOTP（Mandatory TOTP for High-Risk Roles）
+
+```java
+@Component
+public class MFAEnforcementPolicy {
+
+    /**
+     * Determine if MFA is mandatory for user role
+     *
+     * @param role User role
+     * @return true if MFA required
+     */
+    public boolean isMFAMandatory(Role role) {
+        return role == Role.SUPER_ADMIN
+            || role == Role.FINANCE_MANAGER
+            || role == Role.RISK_CONTROL
+            || role == Role.DEVELOPER;
+    }
+
+    /**
+     * Determine allowed MFA methods for role
+     *
+     * @param role User role
+     * @return List of allowed methods
+     */
+    public List<MFAMethod> getAllowedMethods(Role role) {
+        if (role == Role.SUPER_ADMIN || role == Role.FINANCE_MANAGER) {
+            // AAL3: Only hardware token or TOTP
+            return Arrays.asList(MFAMethod.TOTP, MFAMethod.HARDWARE_TOKEN);
+        }
+
+        // AAL2: TOTP or SMS fallback
+        return Arrays.asList(MFAMethod.TOTP, MFAMethod.SMS, MFAMethod.BACKUP_CODES);
+    }
+}
+```
+
+### 6.2 從 SMS 逐步遷移至 TOTP（Gradual Migration from SMS to TOTP）
+
+**階段 1**（第 1-3 個月）: 鼓勵採用 TOTP
+- 發送電子郵件鼓勵使用者從 SMS 切換至 TOTP
+- 強調安全優勢
+
+**階段 2**（第 4-6 個月）: 新帳號淘汰 SMS
+- 新管理員帳號必須使用 TOTP
+- 現有 SMS 使用者可繼續（既有權利）
+
+**階段 3**（第 7-12 個月）: 強制遷移
+- 所有使用者必須在期限前遷移至 TOTP
+- 提供遷移指南和支援
+
+**階段 4**（第 13 個月+）: 完全移除 SMS
+- 平台全面停用 SMS OTP
+
+---
+
+## 7. 相關文件（Related Documents）
+
+### 業務需求（Business Requirements）
+- [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/03_MFA_Architecture_Spec.md) - MFA 方法選擇、風險分析、決策矩陣
+
+### 技術實作（Technical Implementation）
+- [MFA_Login_Recovery_Technical.md](10_MFA_Login_Recovery_Technical.md) - 兩階段登入、信任裝置權杖
+- [MFA_Compliance_Technical.md](07_MFA_Compliance_Technical.md) - 稽核日誌、備份碼、合規驗證
+
+### 安全標準（Security Standards）
+- **NIST SP 800-63B**: 數位身分指南（AAL2/AAL3）
+- **RFC 6238**: TOTP 規格
+- **RFC 4226**: HOTP 規格
+- **W3C WebAuthn Level 2**: Web Authentication API
+
+
+---
+
+## 相關文檔（Related Documents）
+
+- **業務需求**: [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/03_MFA_Architecture_Spec.md)
+- **MFA 實作細節**: [04_MFA_Implementation.md](04_MFA_Implementation.md) — TOTP 演算法、AES 加密、WebAuthn
+- **MFA 合規技術**: [05_MFA_Compliance.md](05_MFA_Compliance.md) — 稽核日誌、合規驗證
+- **MFA 恢復流程**: [06_MFA_Recovery.md](06_MFA_Recovery.md) — 備份碼、設備恢復
+
+---
+
+**文件版本**: 2.0.0（合併自 03_MFA_Technical_Architecture.md + 05_MFA_Technical_Evaluation.md）
+**最後更新**: 2026-03-31
