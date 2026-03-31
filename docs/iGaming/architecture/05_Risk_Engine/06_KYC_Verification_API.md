@@ -1,5 +1,7 @@
 # KYC 驗證 API 架構（KYC Verification API Architecture）
 
+> **XREF（交叉引用）**: 完整業務規則定義見 [KYC/AML 合規需求](../../requirements/05_Risk_Compliance/03_KYC_AML_Requirements.md)
+
 > **規範來源**: [source-archive/05_Risk_Control/05-03_KYC_AML.md](../../source-archive/05_Risk_Control/05-03_KYC_AML.md)
 > **目標讀者**: Architects, Backend Developers, DevOps Engineers
 > **業務需求**: [KYC_AML_Requirements.md](../../requirements/05_Risk_Compliance/03_KYC_AML_Requirements.md)
