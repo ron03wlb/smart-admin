@@ -19,7 +19,6 @@ import {
 } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { useTable } from '@/hooks/useTable';
-import { usePrivilege } from '@/hooks/usePrivilege';
 import PrivilegeButton from '@/components/PrivilegeButton';
 import { positionApi } from '@/api/system/positionApi';
 import type { PositionVO, PositionQueryForm, PositionFormData } from './types';
@@ -35,10 +34,6 @@ import { PositionFormModal } from './components/PositionFormModal';
  */
 export default function PositionPage() {
   const [form] = Form.useForm();
-  // const _hasAddPrivilege = usePrivilege(POSITION_PERMISSION.ADD);
-  const hasUpdatePrivilege = usePrivilege(POSITION_PERMISSION.UPDATE);
-  const hasDeletePrivilege = usePrivilege(POSITION_PERMISSION.DELETE);
-  // const _hasBatchDeletePrivilege = usePrivilege(POSITION_PERMISSION.BATCH_DELETE);
 
   // ==================== Modal State ====================
 
@@ -131,16 +126,23 @@ export default function PositionPage() {
       fixed: 'right',
       render: (_: any, record: PositionVO) => (
         <Space size="small">
-          {hasUpdatePrivilege && (
-            <Button type="link" size="small" onClick={() => handleEdit(record)}>
-              編輯
-            </Button>
-          )}
-          {hasDeletePrivilege && (
-            <Button type="link" size="small" danger onClick={() => handleDelete(record.positionId)}>
-              刪除
-            </Button>
-          )}
+          <PrivilegeButton
+            privilege={POSITION_PERMISSION.UPDATE}
+            type="link"
+            size="small"
+            onClick={() => handleEdit(record)}
+          >
+            編輯
+          </PrivilegeButton>
+          <PrivilegeButton
+            privilege={POSITION_PERMISSION.DELETE}
+            type="link"
+            size="small"
+            danger
+            onClick={() => handleDelete(record.positionId)}
+          >
+            刪除
+          </PrivilegeButton>
         </Space>
       ),
     },
