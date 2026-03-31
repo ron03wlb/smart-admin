@@ -1,23 +1,24 @@
 # iGaming 平台文檔中心
 
 > **版本**: v4.1.0
-> **最後更新**: 2026-02-09
-> **文檔數量**: 290+ 個 Markdown 文件
+> **最後更新**: 2026-03-31（文檔重整完成）
+> **文檔規範**: [STANDARDS.md](STANDARDS.md)
+> **文檔數量**: ~385 個 Markdown 文件
 > **總行數**: ~150,000 行
 
 ---
 
-## 文檔結構 (2026-02-09 Phase 9 Complete)
+## 文檔結構（2026-03-31 重組完成）
 
 文檔已按受眾分為兩個主要目錄 + 一個存檔目錄：
 
 | 目錄 | 受眾 | 說明 | 文件數 |
 |------|------|------|--------|
-| **[requirements/](requirements/)** | 老闆、產品經理、合規人員 | 業務需求 - WHAT & WHY | ~66 |
-| **[architecture/](architecture/)** | 架構師、開發人員、DevOps | 技術實現 - HOW | ~117 |
-| **[source-archive/](source-archive/)** | 唯讀參考 | 原始 SSOT 文檔（存檔） | 193 |
+| **[requirements/](requirements/)** | 老闆、產品經理、合規人員 | 業務需求 - WHAT & WHY | ~68 |
+| **[architecture/](architecture/)** | 架構師、開發人員、DevOps | 技術實現 - HOW | ~120 |
+| **[source-archive/](source-archive/)** | 唯讀參考 | 原始 SSOT 文檔（存檔） | 191 |
 
-### For Executives (requirements/) - 66 documents
+### For Executives (requirements/) - 68 documents
 
 | Category | Documents | Key Topics |
 |----------|-----------|------------|
@@ -36,23 +37,24 @@
 | [13_Customer_Service](requirements/13_Customer_Service/) | 2 | CS platform, operations |
 | [14_Integration_Standards](requirements/14_Integration_Standards/) | 1 | Third-party integration |
 | [15_Responsible_Gambling](requirements/15_Responsible_Gambling/) | 4 | Self-exclusion, deposit limits, session protection |
+| [16_Metrics_KPIs](requirements/16_Metrics_KPIs/) | 2 | Core KPI definitions, business metrics framework |
 
 See full listing: **[requirements/README.md](requirements/README.md)**
 
-### For Developers (architecture/) - 117 documents
+### For Developers (architecture/) - 120 documents
 
 | Category | Documents | Key Topics |
 |----------|-----------|------------|
-| [00_Overview](architecture/00_Overview/) | 5 | Tech stack, data model, platform architecture |
+| [00_Overview](architecture/00_Overview/) | 6 | Tech stack, data model, cross-module integration |
 | [01_Player_Service](architecture/01_Player_Service/) | 1 | Player state machine, database design |
-| [02_Finance_Service](architecture/02_Finance_Service/) | 8 | Payment API, wallet, turnover calculation |
+| [02_Finance_Service](architecture/02_Finance_Service/) | 10 | Payment API, wallet, turnover calculation |
 | [03_Game_Integration](architecture/03_Game_Integration/) | 4 | GP API, turnover logic, lobby system |
 | [04_Activity_Engine](architecture/04_Activity_Engine/) | 3 | Bonus engine, activity risk, promotions |
 | [05_Risk_Engine](architecture/05_Risk_Engine/) | 10 | Kafka/Flink, ML pipeline, fraud detection |
-| [06_Platform_Core](architecture/06_Platform_Core/) | 8 | Multi-tenant, MFA, jurisdiction routing |
+| [06_Platform_Core](architecture/06_Platform_Core/) | 7 | Multi-tenant, MFA (4 docs), jurisdiction routing |
 | [07_Agent_Service](architecture/07_Agent_Service/) | 2 | Credit network, agent system |
 | [08_Analytics_Service](architecture/08_Analytics_Service/) | 2 | Reporting, BI dashboards |
-| [09_Infrastructure](architecture/09_Infrastructure/) | 23 | API Gateway, caching, streaming, token validation |
+| [09_Infrastructure](architecture/09_Infrastructure/) | 19 | API Gateway, caching, streaming, token operations |
 | [10_Platform_Management](architecture/10_Platform_Management/) | 3 | Tenant config, notifications, data pipeline |
 | [11_Frontend](architecture/11_Frontend/) | 11 | Layout engine, i18n, mobile, A/B testing |
 | [12_Security](architecture/12_Security/) | 10 | Encryption, GDPR, blind index, ISO 27001 |
@@ -189,7 +191,8 @@ docs/iGaming/
 │   ├── 12_Security_Compliance/        # 安全合規
 │   ├── 13_Customer_Service/           # 客服
 │   ├── 14_Integration_Standards/      # 整合標準
-│   └── 15_Responsible_Gambling/       # 負責任博彩
+│   ├── 15_Responsible_Gambling/       # 負責任博彩
+│   └── 16_Metrics_KPIs/               # KPI 定義與業務指標
 ├── architecture/                      # 技術架構文檔 (給架構師/開發者)
 │   ├── 00_Overview/                   # 技術概覽
 │   ├── 01_Player_Service/             # 玩家服務
@@ -226,8 +229,7 @@ docs/iGaming/
 
 ---
 
-**索引版本**: 4.0.0
+**索引版本**: 4.2.0
 **創建日期**: 2026-02-07
-**重組日期**: 2026-02-09
-**Phase 9 Complete**: 2026-02-09 (Full 16-module coverage: requirements + architecture)
+**重組完成**: 2026-03-31（25 個任務全部完成，詳見 [AUDIT_ISSUES.md](AUDIT_ISSUES.md)）
 **維護團隊**: iGaming Platform Team
