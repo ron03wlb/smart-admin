@@ -36,10 +36,10 @@ export const viewModules: Record<string, ComponentType<any>> = {
   '/system/account': lazy(() => import('@/views/system/account')),
 
   // ==================== Business 模塊 ====================
-  '/business/goods': lazy(() => import('@/views/business/goods')),
-  '/business/enterprise': lazy(() => import('@/views/business/enterprise')),
-  '/business/notice': lazy(() => import('@/views/business/notice')),
-  '/business/category': lazy(() => import('@/views/business/category')),
+  '/business/goods': lazy(() => import('@/views/business/erp/goods')),
+  '/business/enterprise': lazy(() => import('@/views/business/oa/enterprise')),
+  '/business/notice': lazy(() => import('@/views/business/oa/notice')),
+  '/business/category': lazy(() => import('@/views/business/erp/catalog')),
   '/business/goods-catalog': lazy(() => import('@/views/business/erp/catalog')),
 
   // ==================== Support 模塊 ====================
