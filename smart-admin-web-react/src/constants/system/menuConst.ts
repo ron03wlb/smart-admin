@@ -51,7 +51,7 @@ export const MENU_TYPE_LABELS = {
 export const MENU_TYPE_COLORS = {
   [MenuTypeEnum.CATALOG]: 'red',
   [MenuTypeEnum.MENU]: 'blue',
-  [MenuTypeEnum.POINTS]: 'green',
+  [MenuTypeEnum.POINTS]: 'orange',
 } as const;
 
 /**

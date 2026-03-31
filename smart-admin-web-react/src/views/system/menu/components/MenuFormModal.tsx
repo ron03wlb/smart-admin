@@ -178,7 +178,7 @@ export const MenuFormModal: React.FC<MenuFormModalProps> = ({
       open={visible}
       onClose={handleCancel}
       width={600}
-      bodyStyle={{ paddingBottom: 80 }}
+      styles={{ body: { paddingBottom: 80 } }}
       destroyOnClose
       footer={
         <div style={{ textAlign: 'left' }}>
