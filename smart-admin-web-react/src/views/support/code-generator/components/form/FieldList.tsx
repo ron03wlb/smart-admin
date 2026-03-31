@@ -3,8 +3,8 @@
  *
  * Editable table mapping database columns to Java/JS types, dict, and enum names.
  */
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
-import { Table, Input, Select, Tag, Alert, Button } from 'antd';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef, useCallback } from 'react';
+import { Table, Input, Select, Tag, Alert, Button, message } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useCodeGeneratorContext } from '../../CodeGeneratorContext';
@@ -14,6 +14,8 @@ import {
 } from '../../code-generator-util';
 import DictSelect from '@/components/support/dict-select/DictSelect';
 import type { FieldConfig } from '@/types/code-generator.types';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchAllDictData, selectDictLoading } from '@/store/slices/dictSlice';
 
 export interface FieldListRef {
   getForm: () => FieldConfig[];
@@ -29,6 +31,17 @@ const FieldList = forwardRef<FieldListRef>((_props, ref) => {
   const { tableInfo, tableColumns, tableConfig } = useCodeGeneratorContext();
   const [tableData, setTableData] = useState<FieldRow[]>([]);
   const initializedRef = useRef(false);
+  const dispatch = useAppDispatch();
+  const dictLoading = useAppSelector(selectDictLoading);
+
+  const handleRefreshDict = useCallback(async () => {
+    try {
+      await dispatch(fetchAllDictData()).unwrap();
+      message.success('字典刷新成功');
+    } catch {
+      message.error('字典刷新失败');
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (!tableConfig || !tableColumns.length || initializedRef.current) return;
@@ -150,7 +163,7 @@ const FieldList = forwardRef<FieldListRef>((_props, ref) => {
         icon={<SmileOutlined />}
       />
       <div style={{ float: 'right', padding: '10px 0' }}>
-        <Button type="primary" onClick={() => { /* TODO: refresh dict store */ }}>
+        <Button type="primary" loading={dictLoading} onClick={handleRefreshDict}>
           刷新字典
         </Button>
       </div>
