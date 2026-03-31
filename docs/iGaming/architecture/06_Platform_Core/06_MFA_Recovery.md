@@ -1640,9 +1640,10 @@ public class CookieSecurityConfig {
 ### 業務需求（Business Requirements）
 - [MFA_Recovery_Requirements.md](../../requirements/06_Governance_Licensing/06_MFA_Recovery_Requirements.md) - MFA session 規則、信任裝置政策、鎖定規則
 
-### 技術實現（Technical Implementation）
-- [MFA_Technical_Evaluation.md](05_MFA_Technical_Evaluation.md) - TOTP 演算法、密鑰加密、安全分析
-- [MFA_Compliance_Technical.md](07_MFA_Compliance_Technical.md) - 審計日誌、合規驗證
+### 技術文件（Technical Documents）
+- [03_MFA_Architecture.md](03_MFA_Architecture.md) - MFA 系統架構、STRIDE 威脅建模、方法選擇評估
+- [04_MFA_Implementation.md](04_MFA_Implementation.md) - TOTP 演算法、AES 加密、WebAuthn
+- [05_MFA_Compliance.md](05_MFA_Compliance.md) - 審計日誌、合規驗證
 
 ### 安全標準（Security Standards）
 - **RFC 6238**: TOTP 規範
@@ -1651,6 +1652,6 @@ public class CookieSecurityConfig {
 
 ---
 
-**文件版本**: 1.0.0
-**最後更新**: 2026-02-09
+**文件版本**: 2.0.0（合併自 09_MFA_Recovery_Implementation.md + 10_MFA_Login_Recovery_Technical.md）
+**最後更新**: 2026-03-31
 **維護者**: Security Team, Backend Team
