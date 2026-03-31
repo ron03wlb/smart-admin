@@ -82,16 +82,16 @@ export const employeeApi = {
 
   // --- Account Center ---
 
-  /** Update personal center info */
-  updateCenter: (data: any) => postRequest<void>(`${BASE_URL}/update/center`, data),
+  /** Update personal center info (backend: /employee/update/center) */
+  updateCenter: (data: any) => postRequest<void>('/employee/update/center', data),
 
-  /** Update avatar */
-  updateAvatar: (data: { avatarUrl: string }) => postRequest<void>(`${BASE_URL}/update/avatar`, data),
+  /** Update avatar (backend: /employee/update/avatar) */
+  updateAvatar: (data: { avatar: string }) => postRequest<void>('/employee/update/avatar', data),
 
-  /** Update password */
+  /** Update password (backend: /employee/update/password) */
   updatePassword: (data: { oldPassword: string; newPassword: string }) =>
-    postRequest<void>(`${BASE_URL}/update/password`, data),
+    postRequest<void>('/employee/update/password', data),
 
-  /** Check password complexity setting */
-  getPasswordComplexityEnabled: () => getRequest<boolean>(`${BASE_URL}/password/complexity/enabled`),
+  /** Check password complexity setting (backend: /employee/getPasswordComplexityEnabled) */
+  getPasswordComplexityEnabled: () => getRequest<boolean>('/employee/getPasswordComplexityEnabled'),
 };
